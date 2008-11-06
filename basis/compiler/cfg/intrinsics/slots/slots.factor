@@ -25,7 +25,7 @@ IN: compiler.cfg.intrinsics.slots
     dup node-input-infos
     dup first value-tag [
         nip
-        dup second value-info-small-tagged?
+        dup second value-info-small-fixnum?
         [ (emit-slot-imm) ] [ (emit-slot) ] if
         ds-push
     ] [ drop emit-primitive ] if ;
@@ -46,7 +46,7 @@ IN: compiler.cfg.intrinsics.slots
     dup second value-tag [
         nip
         [
-            dup third value-info-small-tagged?
+            dup third value-info-small-fixnum?
             [ (emit-set-slot-imm) ] [ (emit-set-slot) ] if
         ] [ first class>> immediate class<= ] bi
         [ drop ] [ i i ##write-barrier ] if

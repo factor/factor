@@ -293,15 +293,13 @@ M:: x86 %box-alien ( dst src temp -- )
         [ quot call ] with-save/restore
     ] if ; inline
 
-: aux-offset 2 cells string tag-number - ; inline
-
 M:: x86 %string-nth ( dst src index temp -- )
     "end" define-label
     dst { src index temp } [| new-dst |
         temp src index [+] LEA
         new-dst 1 small-reg temp string-offset [+] MOV
         new-dst new-dst 1 small-reg MOVZX
-        temp src aux-offset [+] MOV
+        temp src string-aux-offset [+] MOV
         temp \ f tag-number CMP
         "end" get JE
         new-dst temp XCHG

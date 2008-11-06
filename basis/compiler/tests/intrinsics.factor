@@ -4,7 +4,8 @@ continuations sequences.private hashtables.private byte-arrays
 strings.private system random layouts vectors
 sbufs strings.private slots.private alien math.order
 alien.accessors alien.c-types alien.syntax alien.strings
-namespaces libc sequences.private io.encodings.ascii ;
+namespaces libc sequences.private io.encodings.ascii
+classes ;
 IN: compiler.tests
 
 ! Make sure that intrinsic ops compile to correct code.
@@ -27,6 +28,9 @@ IN: compiler.tests
 
 [ 1 ] [ { 1 2 } [ 2 slot ] compile-call ] unit-test
 [ 1 ] [ [ { 1 2 } 2 slot ] compile-call ] unit-test
+
+[ { f f } ] [ 2 f <array> ] unit-test
+
 [ 3 ] [ 3 1 2 2array [ { array } declare [ 2 set-slot ] keep ] compile-call first ] unit-test
 [ 3 ] [ 3 1 2 [ 2array [ 2 set-slot ] keep ] compile-call first ] unit-test
 [ 3 ] [ [ 3 1 2 2array [ 2 set-slot ] keep ] compile-call first ] unit-test
@@ -37,13 +41,19 @@ IN: compiler.tests
 ! Write barrier hits on the wrong value were causing segfaults
 [ -3 ] [ -3 1 2 [ 2array [ 3 set-slot ] keep ] compile-call second ] unit-test
 
-! [ CHAR: b ] [ 1 "abc" [ char-slot ] compile-call ] unit-test
-! [ CHAR: b ] [ 1 [ "abc" char-slot ] compile-call ] unit-test
-! [ CHAR: b ] [ [ 1 "abc" char-slot ] compile-call ] unit-test
-! 
-! [ "axc" ] [ CHAR: x 1 "abc" [ [ set-char-slot ] keep { string } declare dup rehash-string ] compile-call ] unit-test
-! [ "axc" ] [ CHAR: x 1 [ "abc" [ set-char-slot ] keep { string } declare dup rehash-string ] compile-call ] unit-test
-! [ "axc" ] [ CHAR: x [ 1 "abc" [ set-char-slot ] keep { string } declare dup rehash-string ] compile-call ] unit-test
+[ CHAR: a ] [ 0 "abc" [ string-nth ] compile-call ] unit-test
+[ CHAR: a ] [ 0 [ "abc" string-nth ] compile-call ] unit-test
+[ CHAR: a ] [ [ 0 "abc" string-nth ] compile-call ] unit-test
+[ CHAR: b ] [ 1 "abc" [ string-nth ] compile-call ] unit-test
+[ CHAR: b ] [ 1 [ "abc" string-nth ] compile-call ] unit-test
+[ CHAR: b ] [ [ 1 "abc" string-nth ] compile-call ] unit-test
+
+[ HEX: 123456 ] [ 0 "\u123456bc" [ string-nth ] compile-call ] unit-test
+[ HEX: 123456 ] [ 0 [ "\u123456bc" string-nth ] compile-call ] unit-test
+[ HEX: 123456 ] [ [ 0 "\u123456bc" string-nth ] compile-call ] unit-test
+[ HEX: 123456 ] [ 1 "a\u123456c" [ string-nth ] compile-call ] unit-test
+[ HEX: 123456 ] [ 1 [ "a\u123456c" string-nth ] compile-call ] unit-test
+[ HEX: 123456 ] [ [ 1 "a\u123456c" string-nth ] compile-call ] unit-test
 
 [ ] [ [ 0 getenv ] compile-call drop ] unit-test
 [ ] [ 1 getenv [ 1 setenv ] compile-call ] unit-test
@@ -158,6 +168,10 @@ IN: compiler.tests
 [ 4 ] [ 1 [ 3 fixnum+fast ] compile-call ] unit-test
 [ 4 ] [ [ 1 3 fixnum+fast ] compile-call ] unit-test
 
+[ -2 ] [ 1 3 [ fixnum-fast ] compile-call ] unit-test
+[ -2 ] [ 1 [ 3 fixnum-fast ] compile-call ] unit-test
+[ -2 ] [ [ 1 3 fixnum-fast ] compile-call ] unit-test
+
 [ 30001 ] [ 1 [ 30000 fixnum+fast ] compile-call ] unit-test
 
 [ 6 ] [ 2 3 [ fixnum*fast ] compile-call ] unit-test
@@ -262,6 +276,8 @@ cell 8 = [
 ] unit-test
 
 : compiled-fixnum>bignum fixnum>bignum ;
+
+[ bignum ] [ 0 compiled-fixnum>bignum class ] unit-test
 
 [ ] [
     10000 [
