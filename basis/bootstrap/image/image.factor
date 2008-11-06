@@ -378,6 +378,19 @@ M: array '
     [ ' ] map array type-number object tag-number
     [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
 
+! This is a hack. We need to detect arrays which are tuple
+! layout arrays so that they can be internalized, but making
+! them a built-in type is not worth it.
+PREDICATE: tuple-layout-array < array
+    dup length 5 >= [
+        [ first tuple-class? ]
+        [ second fixnum? ]
+        [ third fixnum? ]
+        tri and and
+    ] [ drop f ] if ;
+
+M: tuple-layout-array ' [ call-next-method ] cache-object ;
+
 ! Quotations
 
 M: quotation '
