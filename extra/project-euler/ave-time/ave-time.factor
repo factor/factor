@@ -9,7 +9,7 @@ IN: project-euler.ave-time
         [ datastack ]
         [ '[ _ gc benchmark , ] tuck '[ _ _ with-datastack drop ] ]
         [ 1- ] tri* swap times call
-    ] { } make ;
+    ] { } make ; inline
 
 : nth-place ( x n -- y )
     10 swap ^ [ * round ] keep / ;
