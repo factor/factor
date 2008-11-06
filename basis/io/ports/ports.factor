@@ -100,7 +100,7 @@ TUPLE: output-port < buffered-port ;
 
 : wait-to-write ( len port -- )
     tuck buffer>> buffer-capacity <=
-    [ drop ] [ stream-flush ] if ;
+    [ drop ] [ stream-flush ] if ; inline
 
 M: output-port stream-write1
     dup check-disposed
@@ -161,4 +161,4 @@ HINTS: decoder-read-until { string input-port utf8 } { string input-port ascii }
 
 HINTS: decoder-readln { input-port utf8 } { input-port ascii } ;
 
-HINTS: decoder-write { string output-port utf8 } { string output-port ascii } ;
+HINTS: encoder-write { string output-port utf8 } { string output-port ascii } ;

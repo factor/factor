@@ -131,7 +131,7 @@ DEFER: (flat-length)
     ] bi* + + + + + ;
 
 : should-inline? ( #call word -- ? )
-    inlining-rank 5 >= ;
+    dup "inline" word-prop [ 2drop t ] [ inlining-rank 5 >= ] if ;
 
 SYMBOL: history
 
