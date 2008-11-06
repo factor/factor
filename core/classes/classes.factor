@@ -32,8 +32,7 @@ SYMBOL: update-map
 
 SYMBOL: implementors-map
 
-PREDICATE: class < word
-    "class" word-prop ;
+PREDICATE: class < word "class" word-prop ;
 
 : classes ( -- seq ) implementors-map get keys ;
 
@@ -42,9 +41,12 @@ PREDICATE: class < word
 
 PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
+M: predicate reset-word
+    [ call-next-method ] [ { "predicating" } reset-props ] bi ;
+
 : define-predicate ( class quot -- )
-    >r "predicate" word-prop first
-    r> (( object -- ? )) define-declared ;
+    [ "predicate" word-prop first ] dip
+    (( object -- ? )) define-declared ;
 
 : superclass ( class -- super )
     #! Output f for non-classes to work with algebra code
@@ -121,13 +123,13 @@ M: sequence implementors [ implementors ] gather ;
     ] H{ } make-assoc ;
 
 : (define-class) ( word props -- )
-    >r
-    dup class? [ dup [ implementors-map+ ] [ new-class ] bi ] unless
-    dup reset-class
-    dup deferred? [ dup define-symbol ] when
-    dup redefined
-    dup props>>
-    r> assoc-union >>props
+    [
+        dup class? [ dup [ implementors-map+ ] [ new-class ] bi ] unless
+        dup reset-class
+        dup deferred? [ dup define-symbol ] when
+        dup redefined
+        dup props>>
+    ] dip assoc-union >>props
     dup predicate-word
     [ 1quotation "predicate" set-word-prop ]
     [ swap "predicating" set-word-prop ]

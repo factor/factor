@@ -152,7 +152,7 @@ M: ##not     generate-insn dst/src       %not     ;
     [ dst/src ] [ temp>> register ] bi ; inline
 
 M: ##integer>bignum generate-insn dst/src/temp %integer>bignum ;
-M: ##bignum>integer generate-insn dst/src %bignum>integer ;
+M: ##bignum>integer generate-insn dst/src/temp %bignum>integer ;
 
 M: ##add-float generate-insn dst/src1/src2 %add-float ;
 M: ##sub-float generate-insn dst/src1/src2 %sub-float ;

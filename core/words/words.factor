@@ -204,13 +204,9 @@ GENERIC: reset-word ( word -- )
 
 M: word reset-word
     {
-        "unannotated-def"
-        "parsing" "inline" "recursive" "foldable" "flushable"
-        "predicating"
-        "reading" "writing"
-        "reader" "writer"
-        "constructing"
-        "declared-effect" "constructor-quot" "delimiter"
+        "unannotated-def" "parsing" "inline" "recursive"
+        "foldable" "flushable" "reading" "writing" "reader"
+        "writer" "declared-effect" "delimiter"
     } reset-props ;
 
 GENERIC: subwords ( word -- seq )
@@ -261,7 +257,7 @@ M: word forget*
     dup "forgotten" word-prop [ drop ] [
         [ delete-xref ]
         [ [ name>> ] [ vocabulary>> vocab-words ] bi delete-at ]
-        [ t "forgotten" set-word-prop ]
+        [ [ reset-word ] [ t "forgotten" set-word-prop ] bi ]
         tri
     ] if ;
 

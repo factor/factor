@@ -20,7 +20,8 @@ IN: mason.updates
     = not ;
 
 : new-image-available? ( -- ? )
-    boot-image-name need-new-image? [ download-my-image t ] [ f ] if ;
+    boot-image-name need-new-image?
+    [ boot-image-arch download-image t ] [ f ] if ;
 
 : new-code-available? ( -- ? )
     updates-available?
