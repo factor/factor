@@ -26,8 +26,7 @@ IN: project-euler.036
 <PRIVATE
 
 : both-bases? ( n -- ? )
-    { [ dup palindrome? ]
-      [ dup >bin dup reverse = ] } 0&& nip ;
+    { [ palindrome? ] [ >bin dup reverse = ] } 1&& ;
 
 PRIVATE>
 

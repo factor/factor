@@ -40,14 +40,14 @@ IN: project-euler.043
 
 : interesting? ( seq -- ? )
     {
-        [ 17 8 pick subseq-divisible? ]
-        [ 13 7 pick subseq-divisible? ]
-        [ 11 6 pick subseq-divisible? ]
-        [ 7 5 pick subseq-divisible? ]
-        [ 5 4 pick subseq-divisible? ]
-        [ 3 3 pick subseq-divisible? ]
-        [ 2 2 pick subseq-divisible? ]
-    } 0&& nip ;
+        [ 17 8 rot subseq-divisible? ]
+        [ 13 7 rot subseq-divisible? ]
+        [ 11 6 rot subseq-divisible? ]
+        [ 7  5 rot subseq-divisible? ]
+        [ 5  4 rot subseq-divisible? ]
+        [ 3  3 rot subseq-divisible? ]
+        [ 2  2 rot subseq-divisible? ]
+    } 1&& ;
 
 PRIVATE>
 
