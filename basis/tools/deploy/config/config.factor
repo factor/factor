@@ -10,7 +10,7 @@ SYMBOL: deploy-name
 SYMBOL: deploy-ui?
 SYMBOL: deploy-compiler?
 SYMBOL: deploy-math?
-SYMBOL: deploy-random?
+SYMBOL: deploy-unicode?
 SYMBOL: deploy-threads?
 
 SYMBOL: deploy-io
@@ -58,7 +58,7 @@ SYMBOL: deploy-image
         { deploy-reflection         1 }
         { deploy-compiler?          t }
         { deploy-threads?           t }
-        { deploy-random?            t }
+        { deploy-unicode?           f }
         { deploy-math?              t }
         { deploy-word-props?        f }
         { deploy-word-defs?         f }

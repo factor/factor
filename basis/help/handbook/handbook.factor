@@ -86,14 +86,11 @@ ARTICLE: "objects" "Objects"
 { $subsection "slots" }
 { $subsection "mirrors" } ;
 
-USE: random
-
 ARTICLE: "numbers" "Numbers"
 { $subsection "arithmetic" }
 { $subsection "math-constants" }
 { $subsection "math-functions" }
 { $subsection "number-strings" }
-{ $subsection "random" }
 "Number implementations:"
 { $subsection "integers" }
 { $subsection "rationals" }
