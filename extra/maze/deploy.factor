@@ -8,7 +8,6 @@ H{
     { deploy-io 2 }
     { deploy-ui? t }
     { "stop-after-last-window?" t }
-    { deploy-random? t }
     { deploy-word-defs? f }
     { deploy-compiler? t }
     { deploy-reflection 1 }
