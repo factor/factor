@@ -7,7 +7,7 @@ IN: json.reader
 
 ! Grammar for JSON from RFC 4627
 
-SYMBOL: json-null
+SINGLETON: json-null
 
 : [<&>] ( quot -- quot )
   { } make unclip [ <&> ] reduce ;

@@ -16,7 +16,10 @@ M: f json-print ( f -- )
   drop "false" write ;
 
 M: t json-print ( t -- )
-  drop "true" write
+  drop "true" write ;
+
+M: json-null json-print ( null -- )
+  drop "null" write ;
 
 M: string json-print ( obj -- )
   CHAR: " write1 "\"" split "\\\"" join CHAR: \r swap remove "\n" split "\\r\\n" join write CHAR: " write1 ;
@@ -44,4 +47,4 @@ M: hashtable json-print ( hashtable -- )
   CHAR: } write1 ;
 
 M: object json-print ( object -- )
-    dup json-null = [ "null" write drop ] [ unparse json-print ] if ;
+    unparse json-print ;
