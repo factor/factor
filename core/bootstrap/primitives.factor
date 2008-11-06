@@ -147,7 +147,6 @@ bootstrapping? on
 "alien" "alien" create register-builtin
 "word" "words" create register-builtin
 "byte-array" "byte-arrays" create register-builtin
-"tuple-layout" "classes.tuple.private" create register-builtin
 
 ! For predicate classes
 "predicate-instance?" "classes.predicate" create drop
@@ -271,14 +270,6 @@ bi
 } define-builtin
 
 "callstack" "kernel" create { } define-builtin
-
-"tuple-layout" "classes.tuple.private" create {
-    { "hashcode" { "fixnum" "math" } read-only }
-    { "class" { "word" "words" } initial: t read-only }
-    { "size" { "fixnum" "math" } read-only }
-    { "superclasses" { "array" "arrays" } initial: { } read-only }
-    { "echelon" { "fixnum" "math" } read-only }
-} define-builtin
 
 "tuple" "kernel" create
 [ { } define-builtin ]
@@ -510,7 +501,6 @@ tuple
     { "array>quotation" "quotations.private" }
     { "quotation-xt" "quotations" }
     { "<tuple>" "classes.tuple.private" }
-    { "<tuple-layout>" "classes.tuple.private" }
     { "profiling" "tools.profiler.private" }
     { "become" "kernel.private" }
     { "(sleep)" "threads.private" }

@@ -281,7 +281,7 @@ generic-comparison-ops [
 
 { <tuple> <tuple-boa> } [
     [
-        literal>> dup tuple-layout? [ class>> ] [ drop tuple ] if <class-info>
+        literal>> dup array? [ first ] [ drop tuple ] if <class-info>
         [ clear ] dip
     ] "outputs" set-word-prop
 ] each

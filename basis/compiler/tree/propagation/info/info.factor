@@ -307,5 +307,5 @@ SYMBOL: value-infos
 : immutable-tuple-boa? ( #call -- ? )
     dup word>> \ <tuple-boa> eq? [
         dup in-d>> peek node-value-info
-        literal>> class>> immutable-tuple-class?
+        literal>> first immutable-tuple-class?
     ] [ drop f ] if ;

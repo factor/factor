@@ -244,8 +244,6 @@ CELL unaligned_object_size(CELL pointer)
 	case CALLSTACK_TYPE:
 		return callstack_size(
 			untag_fixnum_fast(((F_CALLSTACK *)pointer)->length));
-	case TUPLE_LAYOUT_TYPE:
-		return sizeof(F_TUPLE_LAYOUT);
 	default:
 		critical_error("Invalid header",pointer);
 		return -1; /* can't happen */

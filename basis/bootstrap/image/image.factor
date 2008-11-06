@@ -368,21 +368,6 @@ M: byte-array '
 
 M: tuple ' emit-tuple ;
 
-M: tuple-layout '
-    [
-        [
-            {
-                [ hashcode>> , ]
-                [ class>> , ]
-                [ size>> , ]
-                [ superclasses>> , ]
-                [ echelon>> , ]
-            } cleave
-        ] { } make [ ' ] map
-        \ tuple-layout type-number
-        object tag-number [ emit-seq ] emit-object
-    ] cache-object ;
-
 M: tombstone '
     state>> "((tombstone))" "((empty))" ?
     "hashtables.private" lookup def>> first

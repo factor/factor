@@ -49,4 +49,5 @@ load-help? off
             1 exit
         ] if
     ] %
-] [ ] make bootstrap-boot-quot set
+] [ ] make
+bootstrap-boot-quot set

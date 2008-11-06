@@ -45,7 +45,7 @@ UNION: fixed-length-sequence array byte-array string ;
 
 : propagate-<tuple-boa> ( #call -- info )
     in-d>> unclip-last
-    value-info literal>> class>> (propagate-tuple-constructor) ;
+    value-info literal>> first (propagate-tuple-constructor) ;
 
 : propagate-<complex> ( #call -- info )
     in-d>> [ value-info ] map complex <tuple-info> ;

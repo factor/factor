@@ -10,8 +10,6 @@ IN: classes.tuple
 PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
-M: tuple class 1 slot 2 slot { word } declare ;
-
 ERROR: not-a-tuple object ;
 
 : check-tuple ( object -- tuple )
@@ -29,10 +27,12 @@ PREDICATE: immutable-tuple-class < tuple-class ( class -- ? )
     "layout" word-prop ;
 
 : layout-of ( tuple -- layout )
-    1 slot { tuple-layout } declare ; inline
+    1 slot { array } declare ; inline
+
+M: tuple class layout-of 2 slot { word } declare ;
 
 : tuple-size ( tuple -- size )
-    layout-of size>> ; inline
+    layout-of second ; inline
 
 : prepare-tuple>array ( tuple -- n tuple layout )
     check-tuple [ tuple-size ] [ ] [ layout-of ] tri ;
@@ -90,15 +90,19 @@ ERROR: bad-superclass class ;
         2drop f
     ] if ; inline
 
-: tuple-instance? ( object class echelon -- ? )
+: tuple-instance? ( object class offset -- ? )
     #! 4 slot == superclasses>>
     rot dup tuple? [
-        layout-of 4 slot { array } declare
-        2dup 1 slot fixnum< [ array-nth eq? ] [ 3drop f ] if
+        layout-of
+        2dup 1 slot fixnum<=
+        [ swap slot eq? ] [ 3drop f ] if
     ] [ 3drop f ] if ; inline
 
+: layout-class-offset ( class -- n )
+    tuple-layout third 2 * 5 + ;
+
 : define-tuple-predicate ( class -- )
-    dup dup tuple-layout echelon>>
+    dup dup layout-class-offset
     [ tuple-instance? ] 2curry define-predicate ;
 
 : class-size ( class -- n )
@@ -145,10 +149,14 @@ ERROR: bad-superclass class ;
     define-accessors ;
 
 : make-tuple-layout ( class -- layout )
-    [ ]
-    [ [ superclass class-size ] [ "slots" word-prop length ] bi + ]
-    [ superclasses dup length 1- ] tri
-    <tuple-layout> ;
+    [
+        {
+            [ , ]
+            [ [ superclass class-size ] [ "slots" word-prop length ] bi + , ]
+            [ superclasses length 1- , ]
+            [ superclasses [ [ , ] [ hashcode , ] bi ] each ]
+        } cleave
+    ] { } make ;
 
 : define-tuple-layout ( class -- )
     dup make-tuple-layout "layout" set-word-prop ;
@@ -284,7 +292,7 @@ M: tuple-class reset-class
 M: tuple-class rank-class drop 0 ;
 
 M: tuple-class instance?
-    dup tuple-layout echelon>> tuple-instance? ;
+    dup layout-class-offset tuple-instance? ;
 
 M: tuple-class (flatten-class) dup set ;
 

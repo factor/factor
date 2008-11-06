@@ -94,7 +94,7 @@ TUPLE: size-test a b c d ;
 
 [ t ] [
     T{ size-test } tuple-size
-    size-test tuple-layout size>> =
+    size-test tuple-layout second =
 ] unit-test
 
 GENERIC: <yo-momma>

@@ -1,5 +1,7 @@
 #include "master.h"
 
+static bool full_output;
+
 void print_chars(F_STRING* str)
 {
 	CELL i;
@@ -39,7 +41,7 @@ void print_array(F_ARRAY* array, CELL nesting)
 	CELL i;
 	bool trimmed;
 
-	if(length > 10)
+	if(length > 10 && !full_output)
 	{
 		trimmed = true;
 		length = 10;
@@ -68,7 +70,7 @@ void print_tuple(F_TUPLE* tuple, CELL nesting)
 	CELL i;
 	bool trimmed;
 
-	if(length > 10)
+	if(length > 10 && !full_output)
 	{
 		trimmed = true;
 		length = 10;
@@ -88,7 +90,7 @@ void print_tuple(F_TUPLE* tuple, CELL nesting)
 
 void print_nested_obj(CELL obj, F_FIXNUM nesting)
 {
-	if(nesting <= 0)
+	if(nesting <= 0 && !full_output)
 	{
 		printf(" ... ");
 		return;
@@ -342,6 +344,7 @@ void factorbug(void)
 	printf("d <addr> <count> -- dump memory\n");
 	printf("u <addr>         -- dump object at tagged <addr>\n");
 	printf(". <addr>         -- print object at tagged <addr>\n");
+	printf("t                -- toggle output trimming\n");
 	printf("s r              -- dump data, retain stacks\n");
 	printf(".s .r .c         -- print data, retain, call stacks\n");
 	printf("e                -- dump environment\n");
@@ -404,6 +407,8 @@ void factorbug(void)
 			print_obj(addr);
 			printf("\n");
 		}
+		else if(strcmp(cmd,"t") == 0)
+			full_output = !full_output;
 		else if(strcmp(cmd,"s") == 0)
 			dump_memory(ds_bot,ds);
 		else if(strcmp(cmd,"r") == 0)

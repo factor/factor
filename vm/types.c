@@ -298,18 +298,6 @@ F_BYTE_ARRAY *growable_byte_array_append(F_BYTE_ARRAY *result, void *elts, CELL 
 	return result;
 }
 
-/* Tuple layouts */
-DEFINE_PRIMITIVE(tuple_layout)
-{
-	F_TUPLE_LAYOUT *layout = allot_object(TUPLE_LAYOUT_TYPE,sizeof(F_TUPLE_LAYOUT));
-	layout->echelon = dpop();
-	layout->superclasses = dpop();
-	layout->size = dpop();
-	layout->class = dpop();
-	layout->hashcode = untag_word(layout->class)->hashcode;
-	dpush(tag_object(layout));
-}
-
 /* Tuples */
 
 /* push a new tuple on the stack */
@@ -325,7 +313,7 @@ F_TUPLE *allot_tuple(F_TUPLE_LAYOUT *layout)
 DEFINE_PRIMITIVE(tuple)
 {
 	F_TUPLE_LAYOUT *layout = untag_object(dpop());
-	F_FIXNUM size = to_fixnum(layout->size);
+	F_FIXNUM size = untag_fixnum_fast(layout->size);
 
 	F_TUPLE *tuple = allot_tuple(layout);
 	F_FIXNUM i;
@@ -339,7 +327,7 @@ DEFINE_PRIMITIVE(tuple)
 DEFINE_PRIMITIVE(tuple_boa)
 {
 	F_TUPLE_LAYOUT *layout = untag_object(dpop());
-	F_FIXNUM size = to_fixnum(layout->size);
+	F_FIXNUM size = untag_fixnum_fast(layout->size);
 
 	REGISTER_UNTAGGED(layout);
 	F_TUPLE *tuple = allot_tuple(layout);
