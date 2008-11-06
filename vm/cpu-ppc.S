@@ -60,8 +60,8 @@ DEF(void,c_to_factor,(CELL quot)):
 	PROLOGUE
 
 	SAVE_INT(r13,0)	   /* save GPRs */
-			   /* don't save ds pointer */
-			   /* don't save rs pointer */
+	SAVE_INT(r14,1)
+	SAVE_INT(r15,2)
 	SAVE_INT(r16,3)
 	SAVE_INT(r17,4)
 	SAVE_INT(r18,5)
@@ -75,9 +75,6 @@ DEF(void,c_to_factor,(CELL quot)):
 	SAVE_INT(r26,13)
 	SAVE_INT(r27,14)
 	SAVE_INT(r28,15)
-	SAVE_INT(r29,16)
-	SAVE_INT(r30,17)
-	SAVE_INT(r31,18)
 
 	SAVE_FP(f14,20)    /* save FPRs */
 	SAVE_FP(f15,22)
@@ -125,10 +122,7 @@ DEF(void,c_to_factor,(CELL quot)):
 	RESTORE_FP(f15,22)
 	RESTORE_FP(f14,20)    /* save FPRs */
 
-	RESTORE_INT(r31,18)    /* restore GPRs */
-	RESTORE_INT(r30,17)
-	RESTORE_INT(r29,16)
-	RESTORE_INT(r28,15)
+	RESTORE_INT(r28,15)   /* restore GPRs */
 	RESTORE_INT(r27,14)
 	RESTORE_INT(r26,13)
 	RESTORE_INT(r25,12)
@@ -141,8 +135,8 @@ DEF(void,c_to_factor,(CELL quot)):
 	RESTORE_INT(r18,5)
 	RESTORE_INT(r17,4)
 	RESTORE_INT(r16,3)
-			   /* don't restore rs pointer */
-			   /* don't restore ds pointer */
+	RESTORE_INT(r15,2)
+	RESTORE_INT(r14,1)
 	RESTORE_INT(r13,0)
 
 	EPILOGUE

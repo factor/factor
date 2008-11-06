@@ -19,10 +19,10 @@ namespaces compiler.codegen.fixup ;
 IN: cpu.ppc
 
 ! PowerPC register assignments:
-! r2-r28: integer vregs
-! r29: integer scratch
-! r30: data stack
-! r31: retain stack
+! r2-r27: integer vregs
+! r28: integer scratch
+! r29: data stack
+! r30: retain stack
 ! f0-f29: float vregs
 ! f30, f31: float scratch
 
@@ -40,13 +40,13 @@ IN: cpu.ppc
 
 M: ppc machine-registers
     {
-        { int-regs T{ range f 2 27 1 } }
+        { int-regs T{ range f 2 26 1 } }
         { double-float-regs T{ range f 0 28 1 } }
     } ;
 
-: scratch-reg 29 ; inline
-: fp-scratch-reg-1 30 ; inline
-: fp-scratch-reg-2 31 ; inline
+: scratch-reg 28 ; inline
+: fp-scratch-reg-1 29 ; inline
+: fp-scratch-reg-2 30 ; inline
 
 M: ppc two-operand? f ;
 
