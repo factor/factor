@@ -5,8 +5,10 @@ IN: advice
 
 SYMBOLS: before after around advised ;
 
+<PRIVATE
 : advise ( quot name word loc --  )
     word-prop set-at ;
+PRIVATE>
     
 : advise-before ( quot name word --  )
     before advise ;
@@ -15,7 +17,7 @@ SYMBOLS: before after around advised ;
     after advise ;
 
 : advise-around ( quot name word --  )
-    [ \ coterminate suffix cocreate ] 2dip
+    [ \ coterminate suffix ] 2dip
     around advise ;
 
 : get-advice ( word type -- seq )
@@ -28,7 +30,7 @@ SYMBOLS: before after around advised ;
     after get-advice [ call ] each ;
 
 : call-around ( main word --  )
-    around get-advice tuck 
+    around get-advice [ cocreate ] map tuck 
     [ [ coresume ] each ] [ call ] [ reverse [ coresume ] each ] tri* ;
 
 : remove-advice ( name word loc --  )
