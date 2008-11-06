@@ -13,7 +13,7 @@ HELP: make-advised
 { $see-also advised? annotate } ;
 
 HELP: advised?
-{ $values { "word" "a word" } { "?" "t or f, indicating if " { $snippet word } " is advised" } }
+{ $values { "word" "a word" } { "?" "t or f, indicating if " { $snippet "word" } " is advised" } }
 { $description "Determines whether or not the given word has any advice on it." } ;
 
 ARTICLE: "advice" "Advice"
