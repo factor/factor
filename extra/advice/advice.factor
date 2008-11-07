@@ -3,6 +3,8 @@
 USING: kernel sequences symbols fry words assocs tools.annotations coroutines ;
 IN: advice
 
+! TODO: What should be the order in which the advice is called?
+
 SYMBOLS: before after around advised ;
 
 <PRIVATE
@@ -17,7 +19,7 @@ PRIVATE>
     after advise ;
 
 : advise-around ( quot name word --  )
-    [ \ coterminate suffix ] 2dip
+    [ \ coreset suffix cocreate ] 2dip
     around advise ;
 
 : get-advice ( word type -- seq )
@@ -30,7 +32,7 @@ PRIVATE>
     after get-advice [ call ] each ;
 
 : call-around ( main word --  )
-    around get-advice [ cocreate ] map tuck 
+    around get-advice tuck 
     [ [ coresume ] each ] [ call ] [ reverse [ coresume ] each ] tri* ;
 
 : remove-advice ( name word loc --  )
@@ -46,4 +48,6 @@ PRIVATE>
     [ dup [ over dup '[ _ call-before _ _ call-around _ call-after ] ] annotate ]
     [ { before after around } [ H{ } clone swap set-word-prop ] with each ] 
     [ t advised set-word-prop ] tri ;
-    
+
+: unadvise ( word --  )
+    [ reset ] [ { before after around advised } [ f swap set-word-prop ] with each ] bi ;
