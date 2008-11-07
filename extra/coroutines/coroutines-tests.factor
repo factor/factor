@@ -17,3 +17,5 @@ test1 dup *coresume . dup *coresume . dup *coresume . dup *coresume 2drop
   [ [ coyield* ] each ] cocreate ;
 
 { "c" "b" "a" } [ test3 { "a" "b" "c" } over coresume >r dup *coresume >r *coresume r> r> ] unit-test
+
+{ 4+2/3 } [ [ 1+ coyield 2 * coyield 3 / coreset ] cocreate 1 5 [ over coresume ] times nip ] unit-test

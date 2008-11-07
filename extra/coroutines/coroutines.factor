@@ -6,7 +6,7 @@ IN: coroutines
 
 SYMBOL: current-coro
 
-TUPLE: coroutine resumecc exitcc ;
+TUPLE: coroutine resumecc exitcc originalcc ;
 
 : cocreate ( quot -- co )
   coroutine new
@@ -14,7 +14,7 @@ TUPLE: coroutine resumecc exitcc ;
   [ swapd , , \ bind , 
     "Coroutine has terminated illegally." , \ throw ,
   ] [ ] make
-  >>resumecc ;
+  [ >>resumecc ] [ >>originalcc ] bi ;
 
 : coresume ( v co -- result )
   [ 
@@ -42,4 +42,9 @@ TUPLE: coroutine resumecc exitcc ;
 : coterminate ( v -- )
   current-coro get
   [ ] >>resumecc
+  exitcc>> continue-with ;
+
+: coreset ( v --  )
+  current-coro get dup
+  originalcc>> >>resumecc
   exitcc>> continue-with ;

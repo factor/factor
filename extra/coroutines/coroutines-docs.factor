@@ -46,7 +46,13 @@ HELP: coyield*
 HELP: coterminate
 { $values { "v" "an object" } }
 { $description "Terminate the current coroutine, leaving the value v on the stack when control is passed to the " { $link coresume } " caller. Resuming a terminated coroutine is a no-op." }
-{ $see-also coyield }
+{ $see-also coyield coreset }
+;
+
+HELP: coreset
+{ $values { "v" "an object" } }
+{ $description "Reset the current coroutine, leaving the value v on the stack when control is passed to the " { $link coresume } " caller. When the coroutine is resumed, it will continue at the beginning of the coroutine." }
+{ $see-also coyield coterminate }
 ;
 
 HELP: current-coro
