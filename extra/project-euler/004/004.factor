@@ -32,6 +32,6 @@ PRIVATE>
     source-004 dup cartesian-product [ product ] map prune max-palindrome ;
 
 ! [ euler004 ] 100 ave-time
-! 1608 ms run / 102 ms GC ave time - 100 trials
+! 1164 ms ave run time - 39.35 SD (100 trials)
 
 MAIN: euler004

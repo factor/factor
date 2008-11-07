@@ -42,6 +42,6 @@ PRIVATE>
     50 (euler117) ;
 
 ! [ euler117 ] 100 ave-time
-! 0 ms run time - 100 trials
+! 0 ms ave run time - 0.29 SD (100 trials)
 
 MAIN: euler117

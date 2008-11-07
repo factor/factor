@@ -66,6 +66,6 @@ PRIVATE>
     source-026 max-period drop denominator ;
 
 ! [ euler026 ] 100 ave-time
-! 724 ms run / 7 ms GC ave time - 100 trials
+! 290 ms ave run time - 19.2 SD (100 trials)
 
 MAIN: euler026

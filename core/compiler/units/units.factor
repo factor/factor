@@ -111,7 +111,7 @@ SYMBOL: remake-generics-hook
 : (compiled-generic-usages) ( generic class -- assoc )
     [ compiled-generic-usage ] dip
     [
-        2dup [ class? ] both?
+        2dup [ valid-class? ] both?
         [ classes-intersect? ] [ 2drop f ] if nip
     ] curry assoc-filter ;
 

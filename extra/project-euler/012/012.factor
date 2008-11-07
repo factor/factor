@@ -37,6 +37,6 @@ IN: project-euler.012
     8 [ dup nth-triangle tau* 500 < ] [ 1+ ] [ ] while nth-triangle ;
 
 ! [ euler012 ] 10 ave-time
-! 5413 ms run / 1 ms GC ave time - 10 trials
+! 6573 ms ave run time - 346.27 SD (10 trials)
 
 MAIN: euler012

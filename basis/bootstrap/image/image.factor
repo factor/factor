@@ -368,30 +368,34 @@ M: byte-array '
 
 M: tuple ' emit-tuple ;
 
-M: tuple-layout '
-    [
-        [
-            {
-                [ hashcode>> , ]
-                [ class>> , ]
-                [ size>> , ]
-                [ superclasses>> , ]
-                [ echelon>> , ]
-            } cleave
-        ] { } make [ ' ] map
-        \ tuple-layout type-number
-        object tag-number [ emit-seq ] emit-object
-    ] cache-object ;
-
 M: tombstone '
     state>> "((tombstone))" "((empty))" ?
     "hashtables.private" lookup def>> first
     [ emit-tuple ] cache-object ;
 
 ! Arrays
-M: array '
+: emit-array ( array -- offset )
     [ ' ] map array type-number object tag-number
     [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
+
+M: array ' emit-array ;
+
+! This is a hack. We need to detect arrays which are tuple
+! layout arrays so that they can be internalized, but making
+! them a built-in type is not worth it.
+PREDICATE: tuple-layout-array < array
+    dup length 5 >= [
+        [ first tuple-class? ]
+        [ second fixnum? ]
+        [ third fixnum? ]
+        tri and and
+    ] [ drop f ] if ;
+
+M: tuple-layout-array '
+    [
+        [ dup integer? [ <fake-bignum> ] when ] map
+        emit-array
+    ] cache-object ;
 
 ! Quotations
 

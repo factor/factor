@@ -44,6 +44,6 @@ PRIVATE>
     143 next-solution ;
 
 ! [ euler045 ] 100 ave-time
-! 18 ms run / 1 ms GC ave time - 100 trials
+! 12 ms ave run time - 1.71 SD (100 trials)
 
 MAIN: euler045

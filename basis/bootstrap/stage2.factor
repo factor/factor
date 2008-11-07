@@ -50,7 +50,7 @@ SYMBOL: bootstrap-time
 
     default-image-name "output-image" set-global
 
-    "math compiler threads help io tools ui ui.tools random unicode handbook" "include" set-global
+    "math compiler threads help io tools ui ui.tools unicode handbook" "include" set-global
     "" "exclude" set-global
 
     parse-command-line

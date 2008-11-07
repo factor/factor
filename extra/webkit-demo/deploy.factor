@@ -4,7 +4,6 @@ H{
     { deploy-compiler? t }
     { deploy-c-types? f }
     { deploy-reflection 1 }
-    { deploy-random? f }
     { deploy-name "WebKit demo" }
     { deploy-io 1 }
     { deploy-math? f }

@@ -60,21 +60,22 @@ ERROR: no-method object generic ;
     [ 1quotation ] [ extra-values \ drop <repetition> ] bi*
     prepend [ ] like ;
 
+: <standard-engine> ( word -- engine )
+    object bootstrap-word assumed set {
+        [ generic set ]
+        [ "engines" word-prop forget-all ]
+        [ V{ } clone "engines" set-word-prop ]
+        [
+            "methods" word-prop
+            [ generic get mangle-method ] assoc-map
+            [ find-default default set ]
+            [ <big-dispatch-engine> ]
+            bi
+        ]
+    } cleave ;
+
 : single-combination ( word -- quot )
-    [
-        object bootstrap-word assumed set {
-            [ generic set ]
-            [ "engines" word-prop forget-all ]
-            [ V{ } clone "engines" set-word-prop ]
-            [
-                "methods" word-prop
-                [ generic get mangle-method ] assoc-map
-                [ find-default default set ]
-                [ <big-dispatch-engine> ]
-                bi engine>quot
-            ]
-        } cleave
-    ] with-scope ;
+    [ <standard-engine> engine>quot ] with-scope ;
 
 ERROR: inconsistent-next-method class generic ;
 

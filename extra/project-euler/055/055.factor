@@ -64,6 +64,6 @@ PRIVATE>
     10000 [ lychrel? ] count ;
 
 ! [ euler055 ] 100 ave-time
-! 1370 ms run / 31 ms GC ave time - 100 trials
+! 478 ms ave run time - 30.63 SD (100 trials)
 
 MAIN: euler055

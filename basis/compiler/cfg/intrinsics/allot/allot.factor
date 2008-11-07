@@ -16,14 +16,14 @@ IN: compiler.cfg.intrinsics.allot
     [ ##set-slots ] [ [ drop ] [ ds-push ] [ drop ] tri* ] 3bi ;
 
 : tuple-slot-regs ( layout -- vregs )
-    [ size>> ds-load ] [ ^^load-literal ] bi prefix ;
+    [ second ds-load ] [ ^^load-literal ] bi prefix ;
 
 : emit-<tuple-boa> ( node -- )
     dup node-input-infos peek literal>>
-    dup tuple-layout? [
+    dup array? [
         nip
         ds-drop
-        [ tuple-slot-regs ] [ size>> ^^allot-tuple ] bi
+        [ tuple-slot-regs ] [ second ^^allot-tuple ] bi
         [ tuple ##set-slots ] [ ds-push drop ] 2bi
     ] [ drop emit-primitive ] if ;
 

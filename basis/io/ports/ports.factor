@@ -39,7 +39,7 @@ HOOK: (wait-to-read) io-backend ( port -- )
 
 M: input-port stream-read1
     dup check-disposed
-    dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ;
+    dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ; inline
 
 : read-step ( count port -- byte-array/f )
     dup wait-to-read [ 2drop f ] [ buffer>> buffer-read ] if ;
@@ -100,12 +100,12 @@ TUPLE: output-port < buffered-port ;
 
 : wait-to-write ( len port -- )
     tuck buffer>> buffer-capacity <=
-    [ drop ] [ stream-flush ] if ;
+    [ drop ] [ stream-flush ] if ; inline
 
 M: output-port stream-write1
     dup check-disposed
     1 over wait-to-write
-    buffer>> byte>buffer ;
+    buffer>> byte>buffer ; inline
 
 M: output-port stream-write
     dup check-disposed
@@ -161,4 +161,4 @@ HINTS: decoder-read-until { string input-port utf8 } { string input-port ascii }
 
 HINTS: decoder-readln { input-port utf8 } { input-port ascii } ;
 
-HINTS: decoder-write { string output-port utf8 } { string output-port ascii } ;
+HINTS: encoder-write { string output-port utf8 } { string output-port ascii } ;

@@ -1,7 +1,6 @@
 USING: tools.deploy.config ;
 H{
     { deploy-threads? t }
-    { deploy-random? f }
     { deploy-c-types? f }
     { deploy-ui? f }
     { deploy-word-props? f }

@@ -36,6 +36,10 @@ M: ##set-slot propagate
     [ resolve ] change-obj
     [ resolve ] change-slot ;
 
+M: ##string-nth propagate
+    [ resolve ] change-obj
+    [ resolve ] change-index ;
+
 M: ##set-slot-imm propagate
     call-next-method
     [ resolve ] change-obj ;

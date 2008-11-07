@@ -1,6 +1,6 @@
 IN: compiler.cfg.value-numbering.tests
 USING: compiler.cfg.value-numbering compiler.cfg.instructions
-compiler.cfg.registers cpu.architecture tools.test kernel ;
+compiler.cfg.registers cpu.architecture tools.test kernel math ;
 [
     {
         T{ ##peek f V int-regs 45 D 1 }
@@ -64,5 +64,79 @@ compiler.cfg.registers cpu.architecture tools.test kernel ;
         T{ ##mul-imm f V int-regs 2 V int-regs 1 8 }
         T{ ##shr-imm f V int-regs 3 V int-regs 2 3 }
         T{ ##replace f V int-regs 3 D 0 }
+    } value-numbering
+] unit-test
+
+[
+    {
+        T{ ##load-indirect f V int-regs 1 + }
+        T{ ##peek f V int-regs 2 D 0 }
+        T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc> }
+        T{ ##compare f V int-regs 6 V int-regs 2 V int-regs 1 cc> }
+        T{ ##replace f V int-regs 4 D 0 }
+    }
+] [
+    {
+        T{ ##load-indirect f V int-regs 1 + }
+        T{ ##peek f V int-regs 2 D 0 }
+        T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc> }
+        T{ ##compare-imm f V int-regs 6 V int-regs 4 7 cc/= }
+        T{ ##replace f V int-regs 6 D 0 }
+    } value-numbering
+] unit-test
+
+[
+    {
+        T{ ##load-indirect f V int-regs 1 + }
+        T{ ##peek f V int-regs 2 D 0 }
+        T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc<= }
+        T{ ##compare f V int-regs 6 V int-regs 2 V int-regs 1 cc> }
+        T{ ##replace f V int-regs 6 D 0 }
+    }
+] [
+    {
+        T{ ##load-indirect f V int-regs 1 + }
+        T{ ##peek f V int-regs 2 D 0 }
+        T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc<= }
+        T{ ##compare-imm f V int-regs 6 V int-regs 4 7 cc= }
+        T{ ##replace f V int-regs 6 D 0 }
+    } value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 8 D 0 }
+        T{ ##peek f V int-regs 9 D -1 }
+        T{ ##unbox-float f V double-float-regs 10 V int-regs 8 }
+        T{ ##unbox-float f V double-float-regs 11 V int-regs 9 }
+        T{ ##compare-float f V int-regs 12 V double-float-regs 10 V double-float-regs 11 cc< }
+        T{ ##compare-float f V int-regs 14 V double-float-regs 10 V double-float-regs 11 cc>= }
+        T{ ##replace f V int-regs 14 D 0 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 8 D 0 }
+        T{ ##peek f V int-regs 9 D -1 }
+        T{ ##unbox-float f V double-float-regs 10 V int-regs 8 }
+        T{ ##unbox-float f V double-float-regs 11 V int-regs 9 }
+        T{ ##compare-float f V int-regs 12 V double-float-regs 10 V double-float-regs 11 cc< }
+        T{ ##compare-imm f V int-regs 14 V int-regs 12 7 cc= }
+        T{ ##replace f V int-regs 14 D 0 }
+    } value-numbering
+] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 29 D -1 }
+        T{ ##peek f V int-regs 30 D -2 }
+        T{ ##compare f V int-regs 33 V int-regs 29 V int-regs 30 cc<= }
+        T{ ##compare-branch f V int-regs 29 V int-regs 30 cc<= }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 29 D -1 }
+        T{ ##peek f V int-regs 30 D -2 }
+        T{ ##compare f V int-regs 33 V int-regs 29 V int-regs 30 cc<= }
+        T{ ##compare-imm-branch f V int-regs 33 7 cc/= }
     } value-numbering
 ] unit-test

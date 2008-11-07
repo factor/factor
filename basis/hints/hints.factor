@@ -64,9 +64,11 @@ IN: hints
 { first first2 first3 first4 }
 [ { array } "specializer" set-word-prop ] each
 
-{ peek pop* pop push } [
+{ peek pop* pop } [
     { vector } "specializer" set-word-prop
 ] each
+
+\ push { { vector } { sbuf } } "specializer" set-word-prop
 
 \ push-all
 { { string sbuf } { array vector } { byte-array byte-vector } }

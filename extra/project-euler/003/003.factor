@@ -10,16 +10,16 @@ IN: project-euler.003
 
 ! The prime factors of 13195 are 5, 7, 13 and 29.
 
-! What is the largest prime factor of the number 317584931803?
+! What is the largest prime factor of the number 600851475143 ?
 
 
 ! SOLUTION
 ! --------
 
 : euler003 ( -- answer )
-    317584931803 factors supremum ;
+    600851475143 factors supremum ;
 
 ! [ euler003 ] 100 ave-time
-! 1 ms run / 0 ms GC ave time - 100 trials
+! 1 ms ave run time - 0.49 SD (100 trials)
 
 MAIN: euler003

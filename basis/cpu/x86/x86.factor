@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs alien alien.c-types arrays
+USING: accessors assocs alien alien.c-types arrays strings
 cpu.x86.assembler cpu.x86.assembler.private cpu.architecture
 kernel kernel.private math memory namespaces make sequences
 words system layouts combinators math.order fry locals
@@ -278,27 +278,47 @@ M:: x86 %box-alien ( dst src temp -- )
 : small-regs ( -- regs ) { EAX ECX EDX EBX } ; inline
 
 : small-reg-that-isn't ( exclude -- reg' )
-    small-reg-4 small-regs [ eq? not ] with find nip ;
+    small-regs swap [ small-reg-4 ] map '[ _ memq? not ] find nip ;
 
 : with-save/restore ( reg quot -- )
     [ drop PUSH ] [ call ] [ drop POP ] 2tri ; inline
 
-:: with-small-register ( dst src quot: ( dst src -- ) -- )
+:: with-small-register ( dst exclude quot: ( new-dst -- ) -- )
     #! If the destination register overlaps a small register, we
     #! call the quot with that. Otherwise, we find a small
-    #! register that is not equal to src, and call quot, saving
+    #! register that is not in exclude, and call quot, saving
     #! and restoring the small register.
-    dst small-reg-4 small-regs memq? [ dst src quot call ] [
-        src small-reg-that-isn't
-        [| new-dst |
-            new-dst src quot call
-            dst new-dst MOV
-        ] with-save/restore
+    dst small-reg-4 small-regs memq? [ dst quot call ] [
+        exclude small-reg-that-isn't
+        [ quot call ] with-save/restore
     ] if ; inline
 
-: %alien-integer-getter ( dst src size quot -- )
-    '[ [ dup _ small-reg dup ] [ [] ] bi* MOV @ ]
-    with-small-register ; inline
+M:: x86 %string-nth ( dst src index temp -- )
+    "end" define-label
+    dst { src index temp } [| new-dst |
+        temp src index [+] LEA
+        new-dst 1 small-reg temp string-offset [+] MOV
+        new-dst new-dst 1 small-reg MOVZX
+        temp src string-aux-offset [+] MOV
+        temp \ f tag-number CMP
+        "end" get JE
+        new-dst temp XCHG
+        new-dst index ADD
+        new-dst index ADD
+        new-dst 2 small-reg new-dst byte-array-offset [+] MOV
+        new-dst new-dst 2 small-reg MOVZX
+        new-dst 8 SHL
+        new-dst temp OR
+        "end" resolve-label
+        dst new-dst ?MOV
+    ] with-small-register ;
+
+:: %alien-integer-getter ( dst src size quot -- )
+    dst { src } [| new-dst |
+        new-dst dup size small-reg dup src [] MOV
+        quot call
+        dst new-dst ?MOV
+    ] with-small-register ; inline
 
 : %alien-unsigned-getter ( dst src size -- )
     [ MOVZX ] %alien-integer-getter ; inline
@@ -320,7 +340,7 @@ M: x86 %alien-float dupd [] MOVSS dup CVTSS2SD ;
 M: x86 %alien-double [] MOVSD ;
 
 :: %alien-integer-setter ( ptr value size -- )
-    value ptr [| new-value ptr |
+    value { ptr } [| new-value |
         new-value value ?MOV
         ptr [] new-value size small-reg MOV
     ] with-small-register ; inline

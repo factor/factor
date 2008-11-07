@@ -26,8 +26,7 @@ IN: project-euler.036
 <PRIVATE
 
 : both-bases? ( n -- ? )
-    { [ dup palindrome? ]
-      [ dup >bin dup reverse = ] } 0&& nip ;
+    { [ palindrome? ] [ >bin dup reverse = ] } 1&& ;
 
 PRIVATE>
 
@@ -35,6 +34,6 @@ PRIVATE>
     1 1000000 2 <range> [ both-bases? ] filter sum ;
 
 ! [ euler036 ] 100 ave-time
-! 3891 ms run / 173 ms GC ave time - 100 trials
+! 1703 ms ave run time - 96.6 SD (100 trials)
 
 MAIN: euler036

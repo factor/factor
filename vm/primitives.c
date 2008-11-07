@@ -127,7 +127,6 @@ void *primitives[] = {
 	primitive_array_to_quotation,
 	primitive_quotation_xt,
 	primitive_tuple,
-	primitive_tuple_layout,
 	primitive_profiling,
 	primitive_become,
 	primitive_sleep,

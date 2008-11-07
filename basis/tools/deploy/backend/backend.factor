@@ -42,7 +42,7 @@ IN: tools.deploy.backend
         { "compiler" deploy-compiler? }
         { "threads"  deploy-threads?  }
         { "ui"       deploy-ui?       }
-        { "random"   deploy-random?   }
+        { "unicode"  deploy-unicode?  }
     } [ nip get ] assoc-filter keys
     native-io? [ "io" suffix ] when ;
 

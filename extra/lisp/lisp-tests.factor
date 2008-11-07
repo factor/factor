@@ -84,4 +84,11 @@ IN: lisp.test
         <LISP ((lambda (x y) (if x (+ 1 y) (+ 2 y))) #t 3) LISP>
     ] unit-test
     
+    { { 3 3 4 } } [
+        <LISP (defun foo (x y &rest z)
+                  (cons (+ x y) z))
+              (foo 1 2 3 4)
+        LISP> cons>seq
+    ] unit-test
+    
 ] with-interactive-vocabs

@@ -131,6 +131,9 @@ MACRO: undo ( quot -- ) [undo] ;
 \ pick [ >r pick r> =/fail ] define-inverse
 \ tuck [ swapd [ =/fail ] keep ] define-inverse
 
+\ not [ not ] define-inverse
+\ >boolean [ { t f } memq? assure ] define-inverse
+
 \ >r [ r> ] define-inverse
 \ r> [ >r ] define-inverse
 

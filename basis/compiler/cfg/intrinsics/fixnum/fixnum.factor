@@ -9,7 +9,10 @@ IN: compiler.cfg.intrinsics.fixnum
 
 : (emit-fixnum-imm-op) ( infos insn -- dst )
     ds-drop
-    [ ds-pop ] [ second literal>> tag-fixnum ] [ ] tri*
+    [ ds-pop ]
+    [ second literal>> [ tag-fixnum ] [ \ f tag-number ] if* ]
+    [ ]
+    tri*
     call ; inline
 
 : (emit-fixnum-op) ( insn -- dst )
@@ -25,7 +28,7 @@ IN: compiler.cfg.intrinsics.fixnum
     ] ; inline
 
 : emit-fixnum-shift-fast ( node -- )
-    dup node-input-infos dup second value-info-small-tagged? [
+    dup node-input-infos dup second value-info-small-fixnum? [
         nip
         [ ds-drop ds-pop ] dip
         second literal>> dup sgn {
@@ -48,7 +51,7 @@ IN: compiler.cfg.intrinsics.fixnum
 
 : emit-fixnum*fast ( node -- )
     node-input-infos
-    dup second value-info-small-tagged?
+    dup second value-info-small-fixnum?
     [ (emit-fixnum*fast-imm) ] [ drop (emit-fixnum*fast) ] if
     ds-push ;
 

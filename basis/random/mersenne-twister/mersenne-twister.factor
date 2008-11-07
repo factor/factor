@@ -68,3 +68,10 @@ M: mersenne-twister random-32* ( mt -- r )
     [ next-index ]
     [ seq>> nth mt-temper ]
     [ [ 1+ ] change-i drop ] tri ;
+
+USE: init
+
+[
+    [ 32 random-bits ] with-system-random
+    <mersenne-twister> random-generator set-global
+] "bootstrap.random" add-init-hook

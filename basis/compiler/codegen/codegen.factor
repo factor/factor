@@ -123,6 +123,14 @@ M: ##set-slot generate-insn
 M: ##set-slot-imm generate-insn
     >set-slot< %set-slot-imm ;
 
+M: ##string-nth generate-insn
+    {
+        [ dst>> register ]
+        [ obj>> register ]
+        [ index>> register ]
+        [ temp>> register ]
+    } cleave %string-nth ;
+
 : dst/src ( insn -- dst src )
     [ dst>> register ] [ src>> register ] bi ; inline
 
