@@ -14,8 +14,8 @@ IN: bootstrap.image
 
 : arch ( os cpu -- arch )
     {
-        { "ppc" [ name>> "-ppc" append ] }
-        { "x86.64" [ name>> "winnt" = "winnt" "unix" ? "-x86.64" append ] }
+        { "ppc" [ "-ppc" append ] }
+        { "x86.64" [ "winnt" = "winnt" "unix" ? "-x86.64" append ] }
         [ nip ]
     } case ;
 
