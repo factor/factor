@@ -76,6 +76,25 @@ IN: math.functions.tests
     gcd nip
 ] unit-test
 
+[ 11 ] [
+    13262642990609552931815424
+    159151715887314635181785
+    gcd nip
+] unit-test
+
+[ 3 ] [
+    13262642990609552931
+    1591517158873146351
+    gcd nip
+] unit-test
+
+[ 26525285981219 ] [
+    132626429906095
+    159151715887314
+    gcd nip
+] unit-test
+
+
 : verify-gcd ( a b -- ? )
     2dup gcd
     >r rot * swap rem r> = ; 
