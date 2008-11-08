@@ -435,7 +435,7 @@ M: long-long-type box-return ( type -- )
         [ >float ] >>unboxer-quot
     "double" define-primitive-type
 
-    os winnt? cpu x86.64? and "longlong" "long" ? "ptrdiff_t" typedef
+    "long" "ptrdiff_t" typedef
 
     "ulong" "size_t" typedef
 ] with-compilation-unit

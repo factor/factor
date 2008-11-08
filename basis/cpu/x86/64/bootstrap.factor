@@ -9,8 +9,6 @@ IN: bootstrap.x86
 : shift-arg ( -- reg ) RCX ;
 : div-arg ( -- reg ) RAX ;
 : mod-arg ( -- reg ) RDX ;
-: arg0 ( -- reg ) RDI ;
-: arg1 ( -- reg ) RSI ;
 : temp-reg ( -- reg ) RBX ;
 : stack-reg ( -- reg ) RSP ;
 : ds-reg ( -- reg ) R14 ;

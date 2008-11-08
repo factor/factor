@@ -26,6 +26,8 @@ M: x86.32 stack-reg ESP ;
 M: x86.32 temp-reg-1 EAX ;
 M: x86.32 temp-reg-2 ECX ;
 
+M: x86.32 reserved-area-size 0 ;
+
 M: x86.32 %alien-global 0 [] MOV rc-absolute-cell rel-dlsym ;
 
 M: x86.32 %alien-invoke (CALL) rel-dlsym ;
