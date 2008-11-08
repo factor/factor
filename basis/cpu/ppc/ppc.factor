@@ -4,8 +4,7 @@ USING: accessors assocs sequences kernel combinators make math
 math.order math.ranges system namespaces locals layouts words
 alien alien.c-types cpu.architecture cpu.ppc.assembler
 compiler.cfg.registers compiler.cfg.instructions
-compiler.constants compiler.codegen compiler.codegen.fixup
-compiler.cfg.intrinsics compiler.cfg.stack-frame ;
+compiler.constants compiler.codegen compiler.codegen.fixup ;
 IN: cpu.ppc
 
 ! PowerPC register assignments:
@@ -16,31 +15,15 @@ IN: cpu.ppc
 ! f0-f29: float vregs
 ! f30, f31: float scratch
 
-<< {
-    { [ os macosx? ] [
-        4 "longlong" c-type (>>align)
-        4 "ulonglong" c-type (>>align)
-        4 "double" c-type (>>align)
-    ] }
-    { [ os linux? ] [
-        t "longlong" c-type (>>stack-align?)
-        t "ulonglong" c-type (>>stack-align?)
-    ] }
-} cond
-
-enable-float-intrinsics
-
-\ ##integer>float t frame-required? set-word-prop
-\ ##float>integer t frame-required? set-word-prop >>
-
 M: ppc machine-registers
     {
         { int-regs T{ range f 2 26 1 } }
-        { double-float-regs T{ range f 0 29 1 } }
+        { double-float-regs T{ range f 0 28 1 } }
     } ;
 
 : scratch-reg 28 ; inline
-: fp-scratch-reg 30 ; inline
+: fp-scratch-reg-1 29 ; inline
+: fp-scratch-reg-2 30 ; inline
 
 M: ppc two-operand? f ;
 
@@ -70,21 +53,9 @@ M: ppc %replace loc>operand STW ;
 M: ppc %inc-d ( n -- ) ds-reg (%inc) ;
 M: ppc %inc-r ( n -- ) rs-reg (%inc) ;
 
-: reserved-area-size ( -- n )
-    os {
-        { linux [ 2 ] }
-        { macosx [ 6 ] }
-    } case cells ; foldable
+HOOK: reserved-area-size os ( -- n )
+HOOK: lr-save os ( -- n )
 
-! The start of the stack frame contains the size of this frame
-! as well as the currently executing XT
-: factor-area-size ( -- n ) 2 cells ; foldable
-: next-save ( n -- i ) cell - ;
-: xt-save ( n -- i ) 2 cells - ;
-
-! Next, we have the spill area as well as the FFI parameter area.
-! They overlap, since basic blocks with FFI calls will never
-! spill.
 : param@ ( n -- x ) reserved-area-size + ; inline
 
 : param-save-size ( -- n ) 8 cells ; foldable
@@ -92,38 +63,19 @@ M: ppc %inc-r ( n -- ) rs-reg (%inc) ;
 : local@ ( n -- x )
     reserved-area-size param-save-size + + ; inline
 
-: spill-integer-base ( -- n )
-    stack-frame get spill-counts>> double-float-regs swap at
-    double-float-regs reg-size * ;
+: factor-area-size ( -- n ) 2 cells ; foldable
 
-: spill-integer@ ( n -- offset )
-    cells spill-integer-base + param@ ;
+: next-save ( n -- i ) cell - ;
 
-: spill-float@ ( n -- offset )
-    double-float-regs reg-size * param@ ;
-
-! Some FP intrinsics need a temporary scratch area in the stack
-! frame, 8 bytes in size
-: scratch@ ( n -- offset )
-   stack-frame get total-size>>
-   factor-area-size -
-   param-save-size -
-   + ;
-
-! Finally we have the linkage area
-: lr-save ( -- n )
-    os {
-        { linux [ 1 ] }
-        { macosx [ 2 ] }
-    } case cells ; foldable
+: xt-save ( n -- i ) 2 cells - ;
 
 M: ppc stack-frame-size ( stack-frame -- i )
     [ spill-counts>> [ swap reg-size * ] { } assoc>map sum ]
     [ params>> ]
     [ return>> ]
     tri + +
-    param-save-size +
     reserved-area-size +
+    param-save-size +
     factor-area-size +
     4 cells align ;
 
@@ -246,29 +198,25 @@ M: ppc %div-float FDIV ;
 
 M:: ppc %integer>float ( dst src -- )
     HEX: 4330 scratch-reg LIS
-    scratch-reg 1 0 scratch@ STW
+    scratch-reg 1 0 param@ STW
     scratch-reg src MR
     scratch-reg dup HEX: 8000 XORIS
-    scratch-reg 1 4 scratch@ STW
-    dst 1 0 scratch@ LFD
+    scratch-reg 1 cell param@ STW
+    fp-scratch-reg-2 1 0 param@ LFD
     scratch-reg 4503601774854144.0 %load-indirect
-    fp-scratch-reg scratch-reg float-offset LFD
-    dst dst fp-scratch-reg FSUB ;
+    fp-scratch-reg-2 scratch-reg float-offset LFD
+    fp-scratch-reg-2 fp-scratch-reg-2 fp-scratch-reg-2 FSUB ;
 
 M:: ppc %float>integer ( dst src -- )
-    fp-scratch-reg src FCTIWZ
-    fp-scratch-reg 1 0 scratch@ STFD
-    dst 1 4 scratch@ LWZ ;
+    fp-scratch-reg-1 src FCTIWZ
+    fp-scratch-reg-2 1 0 param@ STFD
+    dst 1 4 param@ LWZ ;
 
 M: ppc %copy ( dst src -- ) MR ;
 
 M: ppc %copy-float ( dst src -- ) FMR ;
 
 M: ppc %unbox-float ( dst src -- ) float-offset LFD ;
-
-M:: ppc %box-float ( dst src temp -- )
-    dst 16 float temp %allot
-    src dst float-offset STFD ;
 
 M:: ppc %unbox-any-c-ptr ( dst src temp -- )
     [
@@ -401,12 +349,12 @@ M: ppc %gc
     "end" resolve-label ;
 
 M: ppc %prologue ( n -- )
-    0 11 LOAD32 rc-absolute-ppc-2/2 rel-this
+    0 scratch-reg LOAD32 rc-absolute-ppc-2/2 rel-this
     0 MFLR
     1 1 pick neg ADDI
-    11 1 pick xt-save STW
-    dup 11 LI
-    11 1 pick next-save STW
+    scratch-reg 1 pick xt-save STW
+    dup scratch-reg LI
+    scratch-reg 1 pick next-save STW
     0 1 rot lr-save + STW ;
 
 M: ppc %epilogue ( n -- )
@@ -457,22 +405,38 @@ M: ppc %compare-branch (%compare) %branch ;
 M: ppc %compare-imm-branch (%compare-imm) %branch ;
 M: ppc %compare-float-branch (%compare-float) %branch ;
 
-M: ppc %spill-integer ( src n -- ) spill-integer@ 1 swap STW ;
-M: ppc %reload-integer ( dst n -- ) spill-integer@ 1 swap LWZ ;
+: spill-integer-base ( stack-frame -- n )
+    [ params>> ] [ return>> ] bi + ;
 
-M: ppc %spill-float ( src n -- ) spill-float@ 1 swap STFD ;
-M: ppc %reload-float ( dst n -- ) spill-float@ 1 swap LFD ;
+: stack@ 1 swap ; inline
+
+: spill-integer@ ( n -- reg offset )
+    cells
+    stack-frame get spill-integer-base
+    + stack@ ;
+
+: spill-float-base ( stack-frame -- n )
+    [ spill-counts>> int-regs swap at int-regs reg-size * ]
+    [ params>> ]
+    [ return>> ]
+    tri + + ;
+
+: spill-float@ ( n -- reg offset )
+    double-float-regs reg-size *
+    stack-frame get spill-float-base
+    + stack@ ;
+
+M: ppc %spill-integer ( src n -- ) spill-integer@ STW ;
+M: ppc %reload-integer ( dst n -- ) spill-integer@ LWZ ;
+
+M: ppc %spill-float ( src n -- ) spill-float@ STFD ;
+M: ppc %reload-float ( dst n -- ) spill-float@ LFD ;
 
 M: ppc %loop-entry ;
 
 M: int-regs return-reg drop 3 ;
 M: int-regs param-regs drop { 3 4 5 6 7 8 9 10 } ;
 M: float-regs return-reg drop 1 ;
-M: float-regs param-regs 
-    drop os H{
-        { macosx { 1 2 3 4 5 6 7 8 9 10 11 12 13 } }
-        { linux { 1 2 3 4 5 6 7 8 } }
-    } at ;
 
 M: int-regs %save-param-reg drop 1 rot local@ STW ;
 M: int-regs %load-param-reg drop 1 rot local@ LWZ ;
@@ -595,13 +559,6 @@ M: ppc %callback-value ( ctype -- )
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
-M: ppc value-structs?
-    #! On Linux/PPC, value structs are passed in the same way
-    #! as reference structs, we just have to make a copy first.
-    os linux? not ;
-
-M: ppc fp-shadows-int? ( -- ? ) os macosx? ;
-
 M: ppc small-enough? ( n -- ? ) -32768 32767 between? ;
 
 M: ppc struct-small-enough? ( size -- ? ) drop f ;
@@ -611,3 +568,10 @@ M: ppc %box-small-struct
 
 M: ppc %unbox-small-struct
     drop "No small structs" throw ;
+
+USE: vocabs.loader
+
+{
+    { [ os macosx? ] [ "cpu.ppc.macosx" require ] }
+    { [ os linux? ] [ "cpu.ppc.linux" require ] }
+} cond
