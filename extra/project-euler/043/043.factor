@@ -52,8 +52,11 @@ IN: project-euler.043
 PRIVATE>
 
 : euler043 ( -- answer )
-    1234567890 number>digits all-permutations
-    [ interesting? ] filter [ 10 digits>integer ] map sum ;
+    1234567890 number>digits 0 [
+        dup interesting? [
+            10 digits>integer +
+        ] [ drop ] if
+    ] reduce-permutations ;
 
 ! [ euler043 ] time
 ! 104526 ms run / 42735 ms GC time

@@ -167,11 +167,11 @@ GENERIC: boa ( ... class -- tuple )
     compose compose ; inline
 
 ! Booleans
-: not ( obj -- ? ) f t ? ; inline
+: not ( obj -- ? ) [ f ] [ t ] if ; inline
 
 : and ( obj1 obj2 -- ? ) over ? ; inline
 
-: >boolean ( obj -- ? ) t f ? ; inline
+: >boolean ( obj -- ? ) [ t ] [ f ] if ; inline
 
 : or ( obj1 obj2 -- ? ) dupd ? ; inline
 

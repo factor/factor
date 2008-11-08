@@ -6,12 +6,12 @@ continuations debugger ;
 IN: benchmark
 
 : run-benchmark ( vocab -- result )
-  [ [ require ] [ [ run ] benchmark ] bi ] curry
-  [ error. f ] recover ;
+    [ [ require ] [ [ run ] benchmark ] bi ] curry
+    [ error. f ] recover ;
 
 : run-benchmarks ( -- assoc )
-  "benchmark" all-child-vocabs-seq
-  [ dup run-benchmark ] { } map>assoc ;
+    "benchmark" all-child-vocabs-seq
+    [ dup run-benchmark ] { } map>assoc ;
 
 : benchmarks. ( assoc -- )
     standard-table-style [

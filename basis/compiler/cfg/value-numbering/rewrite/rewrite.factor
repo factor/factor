@@ -42,25 +42,75 @@ M: ##mul-imm rewrite
 
 : tag-fixnum-expr? ( expr -- ? )
     dup op>> \ ##shl-imm eq?
-    [ in2>> vn>expr value>> tag-bits get = ] [ drop f ] if ;
+    [ in2>> vn>constant tag-bits get = ] [ drop f ] if ;
 
 : rewrite-tagged-comparison? ( insn -- ? )
     #! Are we comparing two tagged fixnums? Then untag them.
-    dup ##compare-imm-branch? [
-        [ src1>> vreg>expr tag-fixnum-expr? ]
-        [ src2>> tag-mask get bitand 0 = ]
-        bi and
-    ] [ drop f ] if ; inline
+    [ src1>> vreg>expr tag-fixnum-expr? ]
+    [ src2>> tag-mask get bitand 0 = ]
+    bi and ; inline
 
-: rewrite-tagged-comparison ( insn -- insn' )
+: (rewrite-tagged-comparison) ( insn -- src1 src2 cc )
     [ src1>> vreg>expr in1>> vn>vreg ]
     [ src2>> tag-bits get neg shift ]
     [ cc>> ]
-    tri
-    f \ ##compare-imm-branch boa ;
+    tri ; inline
+
+GENERIC: rewrite-tagged-comparison ( insn -- insn' )
+
+M: ##compare-imm-branch rewrite-tagged-comparison
+    (rewrite-tagged-comparison) f \ ##compare-imm-branch boa ;
+
+M: ##compare-imm rewrite-tagged-comparison
+    [ dst>> ] [ (rewrite-tagged-comparison) ] bi
+    f \ ##compare-imm boa ;
 
 M: ##compare-imm-branch rewrite
     dup rewrite-boolean-comparison? [ rewrite-boolean-comparison ] when
-    dup rewrite-tagged-comparison? [ rewrite-tagged-comparison ] when ;
+    dup ##compare-imm-branch? [
+        dup rewrite-tagged-comparison? [ rewrite-tagged-comparison ] when
+    ] when ;
+
+: flip-comparison? ( insn -- ? )
+    dup cc>> cc= eq? [ src1>> vreg>expr constant-expr? ] [ drop f ] if ;
+
+: flip-comparison ( insn -- insn' )
+    [ dst>> ]
+    [ src2>> ]
+    [ src1>> vreg>vn vn>constant ] tri
+    cc= f \ ##compare-imm boa ;
+
+M: ##compare rewrite
+    dup flip-comparison? [
+        flip-comparison
+        dup number-values
+        rewrite
+    ] when ;
+
+: rewrite-redundant-comparison? ( insn -- ? )
+    [ src1>> vreg>expr compare-expr? ]
+    [ src2>> \ f tag-number = ]
+    [ cc>> { cc= cc/= } memq? ]
+    tri and and ; inline
+
+: rewrite-redundant-comparison ( insn -- insn' )
+    [ cc>> ] [ dst>> ] [ src1>> vreg>expr dup op>> ] tri {
+        { \ ##compare [ >compare-expr< f \ ##compare boa ] }
+        { \ ##compare-imm [ >compare-imm-expr< f \ ##compare-imm boa ] }
+        { \ ##compare-float [ >compare-expr< f \ ##compare-float boa ] }
+    } case
+    swap cc= eq? [ [ negate-cc ] change-cc ] when ;
+
+M: ##compare-imm rewrite
+    dup rewrite-redundant-comparison? [
+        rewrite-redundant-comparison
+        dup number-values rewrite
+    ] when
+    dup ##compare-imm? [
+        dup rewrite-tagged-comparison? [
+            rewrite-tagged-comparison
+            dup number-values rewrite
+        ] when
+    ] when ;
 
 M: insn rewrite ;

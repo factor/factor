@@ -167,7 +167,6 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 	}
 
 	init_factor(&p);
-
 	nest_stacks();
 
 	F_ARRAY *args = allot_array(ARRAY_TYPE,argc,F);

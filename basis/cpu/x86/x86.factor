@@ -39,12 +39,15 @@ M: x86 %inc-r ( n -- ) rs-reg (%inc) ;
 : align-stack ( n -- n' )
     os macosx? cpu x86.64? or [ 16 align ] when ;
 
+HOOK: reserved-area-size cpu ( -- n )
+
 M: x86 stack-frame-size ( stack-frame -- i )
     [ spill-counts>> [ swap reg-size * ] { } assoc>map sum ]
     [ params>> ]
     [ return>> ]
     tri + +
     3 cells +
+    reserved-area-size +
     align-stack ;
 
 M: x86 %call ( label -- ) CALL ;
@@ -293,15 +296,13 @@ M:: x86 %box-alien ( dst src temp -- )
         [ quot call ] with-save/restore
     ] if ; inline
 
-: aux-offset 2 cells string tag-number - ; inline
-
 M:: x86 %string-nth ( dst src index temp -- )
     "end" define-label
     dst { src index temp } [| new-dst |
         temp src index [+] LEA
         new-dst 1 small-reg temp string-offset [+] MOV
         new-dst new-dst 1 small-reg MOVZX
-        temp src aux-offset [+] MOV
+        temp src string-aux-offset [+] MOV
         temp \ f tag-number CMP
         "end" get JE
         new-dst temp XCHG
@@ -467,7 +468,7 @@ M: x86 %compare-float-branch ( label cc src1 src2 -- )
 : stack@ ( n -- op ) stack-reg swap [+] ;
 
 : spill-integer-base ( stack-frame -- n )
-    [ params>> ] [ return>> ] bi + ;
+    [ params>> ] [ return>> ] bi + reserved-area-size + ;
 
 : spill-integer@ ( n -- op )
     cells
@@ -475,10 +476,9 @@ M: x86 %compare-float-branch ( label cc src1 src2 -- )
     + stack@ ;
 
 : spill-float-base ( stack-frame -- n )
+    [ spill-integer-base ]
     [ spill-counts>> int-regs swap at int-regs reg-size * ]
-    [ params>> ]
-    [ return>> ]
-    tri + + ;
+    bi + ;
 
 : spill-float@ ( n -- op )
     double-float-regs reg-size *

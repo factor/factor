@@ -129,17 +129,17 @@ void divide_by_zero_error(F_STACK_FRAME *native_stack)
 
 void memory_signal_handler_impl(void)
 {
-    memory_protection_error(signal_fault_addr,signal_callstack_top);
+	memory_protection_error(signal_fault_addr,signal_callstack_top);
 }
 
 void divide_by_zero_signal_handler_impl(void)
 {
-    divide_by_zero_error(signal_callstack_top);
+	divide_by_zero_error(signal_callstack_top);
 }
 
 void misc_signal_handler_impl(void)
 {
-    signal_error(signal_number,signal_callstack_top);
+	signal_error(signal_number,signal_callstack_top);
 }
 
 DEFINE_PRIMITIVE(throw)
