@@ -271,18 +271,18 @@ check_os_arch_word() {
 set_build_info() {
     check_os_arch_word
     MAKE_TARGET=$OS-$ARCH-$WORD
-    MAKE_IMAGE_TARGET=$ARCH.$WORD
-    BOOT_IMAGE=boot.$ARCH.$WORD.image
     if [[ $OS == macosx && $ARCH == ppc ]] ; then
-        MAKE_IMAGE_TARGET=$OS-$ARCH
-        MAKE_TARGET=$OS-$ARCH
-        BOOT_IMAGE=boot.macosx-ppc.image
+        MAKE_IMAGE_TARGET=macosx-ppc
+    elif [[ $OS == linux && $ARCH == ppc ]] ; then
+        MAKE_IMAGE_TARGET=linux-ppc
+    elif [[ $OS == winnt && $ARCH == x86 && $WORD == 64 ]] ; then
+        MAKE_IMAGE_TARGET=winnt-x86.64
+    elif [[ $ARCH == x86 && $WORD == 64 ]] ; then
+        MAKE_IMAGE_TARGET=unix-x86.64
+	else
+        MAKE_IMAGE_TARGET=$ARCH.$WORD
     fi
-    if [[ $OS == linux && $ARCH == ppc ]] ; then
-        MAKE_IMAGE_TARGET=$OS-$ARCH
-        MAKE_TARGET=$OS-$ARCH
-        BOOT_IMAGE=boot.linux-ppc.image
-    fi
+    BOOT_IMAGE_NAME=boot.$MAKE_IMAGE_TARGET.image
 }
 
 parse_build_info() {
