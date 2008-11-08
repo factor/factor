@@ -16,9 +16,9 @@ IN: math.quaternions
 
 : 2q ( u v -- u' u'' v' v'' ) [ first2 ] bi@ ; inline
 
-: q*a ( u v -- a ) 2q swapd ** >r * r> - ; inline
+: q*a ( u v -- a ) 2q swapd ** [ * ] dip - ; inline
 
-: q*b ( u v -- b ) 2q >r ** swap r> * + ; inline
+: q*b ( u v -- b ) 2q [ ** swap ] dip * + ; inline
 
 PRIVATE>
 
@@ -51,12 +51,12 @@ PRIVATE>
 
 : v>q ( v -- q )
     #! Turn a 3-vector into a quaternion with real part 0.
-    first3 rect> >r 0 swap rect> r> 2array ;
+    first3 rect> [ 0 swap rect> ] dip 2array ;
 
 : q>v ( q -- v )
     #! Get the vector part of a quaternion, discarding the real
     #! part.
-    first2 >r imaginary-part r> >rect 3array ;
+    first2 [ imaginary-part ] dip >rect 3array ;
 
 ! Zero
 : q0 { 0 0 } ;
@@ -71,7 +71,7 @@ PRIVATE>
 ! http://www.mathworks.com/access/helpdesk/help/toolbox/aeroblks/euleranglestoquaternions.html
 
 : (euler) ( theta unit -- q )
-    >r -0.5 * dup cos c>q swap sin r> n*v v- ;
+    [ -0.5 * dup cos c>q swap sin ] dip n*v v- ;
 
 : euler ( phi theta psi -- q )
   [ qi (euler) ] [ qj (euler) ] [ qk (euler) ] tri* q* q* ;
