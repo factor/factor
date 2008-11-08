@@ -1,4 +1,4 @@
-USING: arrays json.reader kernel multiline strings tools.test ;
+USING: arrays json.reader kernel multiline strings tools.test hashtables ;
 IN: json.reader.tests
 
 { f } [ "false" json> ] unit-test
@@ -19,14 +19,24 @@ IN: json.reader.tests
 { 0.125 } [ "0.125" json> ] unit-test
 { -0.125 } [ "-0.125" json> ] unit-test
 
+! not widely supported by javascript, but allowed in the grammar, and a nice
+! feature to get
+{ -0.0 } [ "-0.0" json> ] unit-test
+
 { " fuzzy  pickles " } [ <" " fuzzy  pickles " "> json> ] unit-test
 { "while 1:\n\tpass" } [ <" "while 1:\n\tpass" "> json> ] unit-test
+! unicode is allowed in json
+{ "ß∂¬ƒ˚∆" } [ <" "ß∂¬ƒ˚∆""> json> ] unit-test
 { 8 9 10 12 13 34 47 92 } >string 1array [ <" "\b\t\n\f\r\"\/\\" "> json> ] unit-test
 { HEX: abcd } >string 1array [ <" "\uaBCd" "> json> ] unit-test
 
 { { } } [ "[]" json> ] unit-test 
 { { 1 "two" 3.0 } } [ <" [1, "two", 3.0] "> json> ] unit-test
 { H{ } } [ "{}" json> ] unit-test
+
+! the returned hashtable should be different every time
+{ H{ } } [ "key" "value" "{}" json> ?set-at "{}" json> swap drop ] unit-test
+
 { H{ { "US$" 1.0 } { "EU€" 1.5 } } } [ <" { "US$":1.00, "EU\u20AC":1.50 } "> json> ] unit-test
 { H{
     { "fib" { 1 1 2 3 5 8 H{ { "etc" "etc" } } } }

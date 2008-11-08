@@ -1,10 +1,13 @@
 ! Copyright (C) 2008 Peter Burns.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel peg peg.ebnf math.parser math.private strings math math.functions sequences
-       arrays vectors hashtables prettyprint ;
+       arrays vectors hashtables assocs prettyprint ;
 IN: json.reader
 
 SINGLETON: json-null
+
+
+: grammar-list>vector ( seq -- vec ) first2 values swap prefix ;
 
 ! Grammar for JSON from RFC 4627
 EBNF: json>
@@ -24,22 +27,22 @@ char = '\\"'  [[ CHAR: "  ]]
      | "\\n"  [[ CHAR: \n ]]
      | "\\r"  [[ CHAR: \r ]]
      | "\\t"  [[ CHAR: \t ]]
-     | "\\u" (hex hex hex hex) [[ hex> ]] => [[ 1 swap nth ]]
+     | "\\u" (hex hex hex hex) [[ hex> ]] => [[ second ]]
      | [^"\]
 string = '"' char*:cs '"' => [[ cs >string ]]
 
-sign = ("-" | "+")? => [[ "-" = [ "-" ] [ "" ] if ]]
+sign = ("-" | "+")? => [[ "-" = "-" "" ? ]]
 digits = [0-9]+     => [[ >string ]]
 decimal = "." digits  => [[ concat ]]
 exp = ("e" | "E") sign digits => [[ concat ]]
 number = sign digits decimal? exp? => [[ dup concat swap fourth [ string>float ] [ string>number ] if ]]
 
-elements = value ("," value)* => [[ first2 [ second ] map swap prefix >array ]]
-array = "[" elements?:arr "]" => [[ arr { } or ]]
+elements = value ("," value)* => [[ grammar-list>vector ]]
+array = "[" elements?:arr "]" => [[ arr >array ]]
 
 pair = ws string:key ws ":" value:val => [[ { key val } ]]
-members = pair ("," pair)* => [[ first2 [ second ] map swap prefix >hashtable ]]
-object = "{" (members)?:hash "}" => [[ hash H{ } or ]]
+members = pair ("," pair)* => [[ grammar-list>vector ]]
+object = "{" members?:hash "}" => [[ hash >hashtable ]]
 
 val = true
     | false
