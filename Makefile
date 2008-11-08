@@ -170,7 +170,7 @@ vm/resources.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 .S.o:
-	$(CC) -c $(CFLAGS) -o $@ $<
+	$(CC) -x assembler-with-cpp -c $(CFLAGS) -o $@ $<
 
 .m.o:
 	$(CC) -c $(CFLAGS) -o $@ $<

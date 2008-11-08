@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces accessors math.order assocs kernel sequences
-combinators make cpu.architecture compiler.cfg.instructions
-compiler.cfg.registers ;
+combinators make classes words cpu.architecture
+compiler.cfg.instructions compiler.cfg.registers ;
 IN: compiler.cfg.stack-frame
 
 SYMBOL: frame-required?
@@ -24,16 +24,16 @@ M: ##stack-frame compute-stack-frame*
 M: ##call compute-stack-frame*
     word>> sub-primitive>> [ frame-required? on ] unless ;
 
-M: _gc compute-stack-frame*
-    drop frame-required? on ;
-
-M: _spill compute-stack-frame*
-    drop frame-required? on ;
-
 M: _spill-counts compute-stack-frame*
     counts>> stack-frame get (>>spill-counts) ;
 
-M: insn compute-stack-frame* drop ;
+M: insn compute-stack-frame*
+    class frame-required? word-prop [
+        frame-required? on
+    ] when ;
+
+\ _gc t frame-required? set-word-prop
+\ _spill t frame-required? set-word-prop
 
 : compute-stack-frame ( insns -- )
     frame-required? off

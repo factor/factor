@@ -11,6 +11,7 @@ and the callstack top is passed in EDX */
 #define RETURN_REG %eax
 
 #define CELL_SIZE 4
+#define STACK_PADDING 12
 
 #define PUSH_NONVOLATILE \
 	push %ebx ; \
