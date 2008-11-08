@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel layouts system compiler.cfg.registers
-cpu.architecture cpu.x86.assembler ;
+cpu.architecture cpu.x86.assembler cpu.x86 ;
 IN: cpu.x86.64.unix
 
 M: int-regs param-regs drop { RDI RSI RDX RCX R8 R9 } ;

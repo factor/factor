@@ -8,5 +8,5 @@ IN: bootstrap.x86
 : arg0 ( -- reg ) RDI ;
 : arg1 ( -- reg ) RSI ;
 
-<< "resource:basis/cpu/x86/64/bootstrap.factor" parsed-file parsed >>
+<< "resource:basis/cpu/x86/64/bootstrap.factor" parse-file parsed >>
 call
