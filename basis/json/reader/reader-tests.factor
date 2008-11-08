@@ -35,7 +35,7 @@ IN: json.reader.tests
 { H{ } } [ "{}" json> ] unit-test
 
 ! the returned hashtable should be different every time
-{ H{ } } [ "key" "value" "{}" json> ?set-at "{}" json> swap drop ] unit-test
+{ H{ } } [ "key" "value" "{}" json> ?set-at "{}" json> nip ] unit-test
 
 { H{ { "US$" 1.0 } { "EU€" 1.5 } } } [ <" { "US$":1.00, "EU\u20AC":1.50 } "> json> ] unit-test
 { H{
@@ -54,4 +54,3 @@ IN: json.reader.tests
 { 0 } [ "      0" json> ] unit-test
 { 0 } [ "0      " json> ] unit-test
 { 0 } [ "   0   " json> ] unit-test
-
