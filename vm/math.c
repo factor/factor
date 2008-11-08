@@ -363,13 +363,13 @@ CELL unbox_array_size(void)
 	case BIGNUM_TYPE:
 		{
 			bignum_type zero = untag_object(bignum_zero);
-			bignum_type max = ulong_to_bignum(ARRAY_SIZE_MAX);
+			bignum_type max = cell_to_bignum(ARRAY_SIZE_MAX);
 			bignum_type n = untag_object(dpeek());
 			if(bignum_compare(n,zero) != bignum_comparison_less
 				&& bignum_compare(n,max) == bignum_comparison_less)
 			{
 				dpop();
-				return bignum_to_ulong(n);
+				return bignum_to_cell(n);
 			}
 			break;
 		}

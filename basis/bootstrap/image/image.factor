@@ -31,7 +31,7 @@ IN: bootstrap.image
 : images ( -- seq )
     {
         "x86.32"
-        "x86.64"
+        "winnt-x86.64" "unix-x86.64"
         "linux-ppc" "macosx-ppc"
     } ;
 

@@ -20,7 +20,8 @@ H{ } clone sub-primitives set
 
 "resource:basis/cpu/" architecture get {
     { "x86.32" "x86/32" }
-    { "x86.64" "x86/64" }
+    { "winnt-x86.64" "x86/64/winnt" }
+    { "unix-x86.64" "x86/64/unix" }
     { "linux-ppc" "ppc/linux" }
     { "macosx-ppc" "ppc/macosx" }
     { "arm" "arm" }
