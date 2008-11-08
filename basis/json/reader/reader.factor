@@ -1,55 +1,53 @@
 ! Copyright (C) 2008 Peter Burns.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel peg peg.ebnf math.parser strings math math.functions sequences
-       arrays vectors hashtables ;
+USING: kernel peg peg.ebnf math.parser math.private strings math math.functions sequences
+       arrays vectors hashtables prettyprint ;
 IN: json.reader
-
-! Grammar for JSON from RFC 4627
 
 SINGLETON: json-null
 
+! Grammar for JSON from RFC 4627
 EBNF: json>
 
 ws = (" " | "\r" | "\t" | "\n")*
 
-hex = [0-9a-fA-F]
+true = "true" => [[ t ]]
+false = "false" => [[ f ]]
+null = "null" => [[ json-null ]]
 
-char = '\\"'  [[ drop CHAR: "  ]]
-     | "\\\\" [[ drop CHAR: \  ]]
-     | "\\/"  [[ drop CHAR: /  ]]
-     | "\\b"  [[ drop 8        ]]
-     | "\\f"  [[ drop 12       ]]
-     | "\\n"  [[ drop CHAR: \n ]]
-     | "\\r"  [[ drop CHAR: \r ]]
-     | "\\t"  [[ drop CHAR: \t ]]
+hex = [0-9a-fA-F]
+char = '\\"'  [[ CHAR: "  ]]
+     | "\\\\" [[ CHAR: \  ]]
+     | "\\/"  [[ CHAR: /  ]]
+     | "\\b"  [[ 8        ]]
+     | "\\f"  [[ 12       ]]
+     | "\\n"  [[ CHAR: \n ]]
+     | "\\r"  [[ CHAR: \r ]]
+     | "\\t"  [[ CHAR: \t ]]
      | "\\u" (hex hex hex hex) [[ hex> ]] => [[ 1 swap nth ]]
      | [^"\]
-
 string = '"' char*:cs '"' => [[ cs >string ]]
 
-number = base:base exp?:exp            => [[ base exp [ exp * ] when ]]
-base   = sign?:s float:f               => [[ f s "-" = [ neg ] when ]]
-float  = digits:int ("." digits)?:frac => [[ int frac [ frac concat append ] when string>number ]]
-digits = [0-9]+                        => [[ >string ]]
+sign = ("-" | "+")? => [[ "-" = [ "-" ] [ "" ] if ]]
+digits = [0-9]+     => [[ >string ]]
+decimal = "." digits  => [[ concat ]]
+exp = ("e" | "E") sign digits => [[ concat ]]
+number = sign digits decimal? exp? => [[ dup concat swap fourth [ string>float ] [ string>number ] if ]]
 
-exp  = ("e" | "E") (sign)?:s digits:ex => [[ ex string>number s "-" = [ neg ] when 10 swap ^ ]]
-sign = "-" | "+"
+elements = value ("," value)* => [[ first2 [ second ] map swap prefix >array ]]
+array = "[" elements?:arr "]" => [[ arr { } or ]]
 
-
-array = "[" elements*:vec "]" => [[ 0 vec nth <reversed> >array ]]
-elements = value:head ("," elements)?:tail => [[ head tail [ 1 tail nth ?push ] [ f ?push ] if ]]
-
-object = "{" (members)*:assoc "}" => [[ 0 assoc nth >hashtable ]]
-members = pair:head ("," members)?:tail => [[ head tail [ 1 tail nth ?push ] [ f ?push ] if ]]
 pair = ws string:key ws ":" value:val => [[ { key val } ]]
+members = pair ("," pair)* => [[ first2 [ second ] map swap prefix >hashtable ]]
+object = "{" (members)?:hash "}" => [[ hash H{ } or ]]
 
-val = string
+val = true
+    | false
+    | null
+    | string
     | number
-    | object
     | array
-    | "true"      [[ drop t ]]
-    | "false"     [[ drop f ]]
-    | "null"      [[ drop json-null ]]
+    | object
 
 value = ws val:v ws => [[ v ]]
 
