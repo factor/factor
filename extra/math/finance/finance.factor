@@ -7,7 +7,7 @@ IN: math.finance
 <PRIVATE
 
 : weighted ( x y a -- z )
-    tuck [ * ] [ 1 swap - * ] 2bi* + ;
+    tuck [ * ] [ 1- neg * ] 2bi* + ;
 
 : a ( n -- a )
     1+ 2 swap / ;
@@ -15,7 +15,7 @@ IN: math.finance
 PRIVATE>
 
 : ema ( seq n -- newseq )
-    a swap unclip [ [ dup ] 2dip swap rot weighted ] accumulate 2nip ;
+    a swap unclip [ [ dup ] 2dip spin weighted ] accumulate 2nip ;
 
 : sma ( seq n -- newseq )
     clump [ mean ] map ;

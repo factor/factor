@@ -15,7 +15,7 @@ TUPLE: erato limit bits latest ;
     [ ind ] [ bits>> ] bi* nth ; inline
 
 : indices ( n erato -- range )
-    limit>> ind over 3 * ind swap rot <range> ;
+    limit>> ind over 3 * ind spin <range> ;
 
 : mark-multiples ( n erato -- )
     2dup [ sq ] [ limit>> ] bi* <= [
