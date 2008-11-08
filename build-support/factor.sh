@@ -60,10 +60,11 @@ check_gcc_version() {
     GCC_VERSION=`$CC --version`
     check_ret gcc
     if [[ $GCC_VERSION == *3.3.* ]] ; then
-        $ECHO "bad!"
         $ECHO "You have a known buggy version of gcc (3.3)"
         $ECHO "Install gcc 3.4 or higher and try again."
         exit 3
+    elif [[ $GCC_VERSION == *4.3.* ]] ; then
+       MAKE_OPTS="$MAKE_OPTS SITE_CFLAGS=-fno-forward-propagate"
     fi
     $ECHO "ok."
 }
@@ -282,7 +283,7 @@ set_build_info() {
 	else
         MAKE_IMAGE_TARGET=$ARCH.$WORD
     fi
-    BOOT_IMAGE_NAME=boot.$MAKE_IMAGE_TARGET.image
+    BOOT_IMAGE=boot.$MAKE_IMAGE_TARGET.image
 }
 
 parse_build_info() {
@@ -335,7 +336,7 @@ cd_factor() {
 }
 
 invoke_make() {
-   $MAKE $*
+   $MAKE $MAKE_OPTS $*
    check_ret $MAKE
 }
 
