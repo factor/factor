@@ -24,13 +24,11 @@ M: x86.64 stack-reg RSP ;
 M: x86.64 temp-reg-1 RAX ;
 M: x86.64 temp-reg-2 RCX ;
 
+: param-reg-1 int-regs param-regs first ; inline
+: param-reg-2 int-regs param-regs second ; inline
+
 M: int-regs return-reg drop RAX ;
-M: int-regs param-regs drop { RDI RSI RDX RCX R8 R9 } ;
-
 M: float-regs return-reg drop XMM0 ;
-
-M: float-regs param-regs
-    drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
 M: x86.64 rel-literal-x86 rc-relative rel-literal ;
 
@@ -90,7 +88,7 @@ M: struct-type flatten-value-type ( type -- seq )
 
 M: x86.64 %prepare-unbox ( -- )
     ! First parameter is top of stack
-    RDI R14 [] MOV
+    param-reg-1 R14 [] MOV
     R14 cell SUB ;
 
 M: x86.64 %unbox ( n reg-class func -- )
@@ -103,27 +101,27 @@ M: x86.64 %unbox-long-long ( n func -- )
     int-regs swap %unbox ;
 
 : %unbox-struct-field ( c-type i -- )
-    ! Alien must be in RDI.
-    RDI swap cells [+] swap reg-class>> {
+    ! Alien must be in param-reg-1.
+    param-reg-1 swap cells [+] swap reg-class>> {
         { int-regs [ int-regs get pop swap MOV ] }
         { double-float-regs [ float-regs get pop swap MOVSD ] }
     } case ;
 
 M: x86.64 %unbox-small-struct ( c-type -- )
-    ! Alien must be in RDI.
+    ! Alien must be in param-reg-1.
     "alien_offset" f %alien-invoke
-    ! Move alien_offset() return value to RDI so that we don't
+    ! Move alien_offset() return value to param-reg-1 so that we don't
     ! clobber it.
-    RDI RAX MOV
+    param-reg-1 RAX MOV
     [
         flatten-small-struct [ %unbox-struct-field ] each-index
     ] with-return-regs ;
 
 M: x86.64 %unbox-large-struct ( n c-type -- )
-    ! Source is in RDI
+    ! Source is in param-reg-1
     heap-size
     ! Load destination address
-    RSI rot stack@ LEA
+    param-reg-2 rot stack@ LEA
     ! Load structure size
     RDX swap MOV
     ! Copy the struct to the C stack
@@ -160,8 +158,8 @@ M: x86.64 %box-small-struct ( c-type -- )
     [
         [ flatten-small-struct [ %box-struct-field ] each-index ]
         [ RDX swap heap-size MOV ] bi
-        RDI 0 box-struct-field@ MOV
-        RSI 1 box-struct-field@ MOV
+        param-reg-1 0 box-struct-field@ MOV
+        param-reg-2 1 box-struct-field@ MOV
         "box_small_struct" f %alien-invoke
     ] with-return-regs ;
 
@@ -170,9 +168,9 @@ M: x86.64 %box-small-struct ( c-type -- )
 
 M: x86.64 %box-large-struct ( n c-type -- )
     ! Struct size is parameter 2
-    RSI swap heap-size MOV
+    param-reg-2 swap heap-size MOV
     ! Compute destination address
-    RDI swap struct-return@ LEA
+    param-reg-1 swap struct-return@ LEA
     ! Copy the struct from the C stack
     "box_value_struct" f %alien-invoke ;
 
@@ -200,7 +198,7 @@ M: x86.64 %alien-indirect ( -- )
     RBP CALL ;
 
 M: x86.64 %alien-callback ( quot -- )
-    RDI swap %load-indirect
+    param-reg-1 swap %load-indirect
     "c_to_factor" f %alien-invoke ;
 
 M: x86.64 %callback-value ( ctype -- )
@@ -208,11 +206,11 @@ M: x86.64 %callback-value ( ctype -- )
     %prepare-unbox
     ! Save top of data stack
     RSP 8 SUB
-    RDI PUSH
+    param-reg-1 PUSH
     ! Restore data/call/retain stacks
     "unnest_stacks" f %alien-invoke
-    ! Put former top of data stack in RDI
-    RDI POP
+    ! Put former top of data stack in param-reg-1
+    param-reg-1 POP
     RSP 8 ADD
     ! Unbox former top of data stack to return registers
     unbox-return ;
@@ -223,3 +221,10 @@ enable-alien-4-intrinsics
 
 ! SSE2 is always available on x86-64.
 enable-float-intrinsics
+
+USE: vocabs.loader
+
+{
+    { [ os unix? ] [ "cpu.x86.64.unix" require ] }
+    { [ os winnt? ] [ "cpu.x86.64.winnt" require ] }
+} cond

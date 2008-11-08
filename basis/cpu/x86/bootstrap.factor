@@ -10,8 +10,6 @@ big-endian off
 
 1 jit-code-format set
 
-: stack-frame-size ( -- n ) 4 bootstrap-cells ;
-
 [
     ! Load word
     temp-reg 0 MOV
@@ -30,7 +28,7 @@ big-endian off
     temp-reg 0 MOV                             ! load XT
     stack-frame-size PUSH                      ! save stack frame size
     temp-reg PUSH                              ! push XT
-    arg1 PUSH                                  ! alignment
+    stack-reg stack-frame-size 3 bootstrap-cells - SUB   ! alignment
 ] rc-absolute-cell rt-label 1 rex-length + jit-prolog jit-define
 
 [
@@ -302,14 +300,14 @@ big-endian off
     shift-arg ds-reg [] MOV                    ! load shift count
     shift-arg tag-bits get SAR                 ! untag shift count
     ds-reg bootstrap-cell SUB                  ! adjust stack pointer
-    arg0 ds-reg [] MOV                         ! load value
-    arg1 arg0 MOV                              ! make a copy
+    temp-reg ds-reg [] MOV                     ! load value
+    arg1 temp-reg MOV                          ! make a copy
     arg1 CL SHL                                ! compute positive shift value in arg1
     shift-arg NEG                              ! compute negative shift value in arg0
-    arg0 CL SAR
-    arg0 tag-mask get bitnot AND
+    temp-reg CL SAR
+    temp-reg tag-mask get bitnot AND
     shift-arg 0 CMP                            ! if shift count was negative, move arg0 to arg1
-    arg1 arg0 CMOVGE
+    arg1 temp-reg CMOVGE
     ds-reg [] arg1 MOV                         ! push to stack
 ] f f f \ fixnum-shift-fast define-sub-primitive
 
