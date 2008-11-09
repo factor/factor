@@ -12,7 +12,7 @@ USING: mason.release.branch mason.config tools.test namespaces ;
     ] with-scope
 ] unit-test
 
-[ { "scp" "boot.x86.64.image" "joe@blah.com:/stuff/clean/netbsd-x86-64" } ] [
+[ { "scp" "boot.unix-x86.64.image" "joe@blah.com:/stuff/clean/netbsd-x86-64" } ] [
     [
         "joe" image-username set
         "blah.com" image-host set

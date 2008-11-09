@@ -1,7 +1,7 @@
 /* :tabSize=2:indentSize=2:noTabs=true:
 
 Copyright (C) 1989-94 Massachusetts Institute of Technology
-Portions copyright (C) 2004-2007 Slava Pestov
+Portions copyright (C) 2004-2008 Slava Pestov
 
 This material was developed by the Scheme project at the Massachusetts
 Institute of Technology, Department of Electrical Engineering and
@@ -45,6 +45,7 @@ MIT in each case. */
  *  - Remove unused functions
  *  - Add local variable GC root recording
  *  - Remove s48 prefix from function names
+ *  - Various fixes for Win64
  */
 
 #include "master.h"
@@ -366,8 +367,6 @@ bignum_remainder(bignum_type numerator, bignum_type denominator)
 /* all below allocate memory */
 FOO_TO_BIGNUM(cell,CELL,CELL)
 FOO_TO_BIGNUM(fixnum,F_FIXNUM,CELL)
-FOO_TO_BIGNUM(long,long,unsigned long)
-FOO_TO_BIGNUM(ulong,unsigned long,unsigned long)
 FOO_TO_BIGNUM(long_long,s64,u64)
 FOO_TO_BIGNUM(ulong_long,u64,u64)
 
@@ -389,8 +388,6 @@ FOO_TO_BIGNUM(ulong_long,u64,u64)
 /* all of the below allocate memory */
 BIGNUM_TO_FOO(cell,CELL,CELL);
 BIGNUM_TO_FOO(fixnum,F_FIXNUM,CELL);
-BIGNUM_TO_FOO(long,long,unsigned long)
-BIGNUM_TO_FOO(ulong,unsigned long,unsigned long)
 BIGNUM_TO_FOO(long_long,s64,u64)
 BIGNUM_TO_FOO(ulong_long,u64,u64)
 
@@ -435,7 +432,7 @@ double_to_bignum(double x)
     bignum_digit_type digit;
     int odd_bits = (exponent % BIGNUM_DIGIT_LENGTH);
     if (odd_bits > 0)
-      DTB_WRITE_DIGIT (1L << odd_bits);
+      DTB_WRITE_DIGIT ((F_FIXNUM)1 << odd_bits);
     while (start < scan)
       {
         if (significand == 0)
@@ -1117,7 +1114,7 @@ bignum_destructive_normalization(bignum_type source, bignum_type target,
   bignum_digit_type * end_source = (scan_source + (BIGNUM_LENGTH (source)));
   bignum_digit_type * end_target = (scan_target + (BIGNUM_LENGTH (target)));
   int shift_right = (BIGNUM_DIGIT_LENGTH - shift_left);
-  bignum_digit_type mask = ((1L << shift_right) - 1);
+  bignum_digit_type mask = (((CELL)1 << shift_right) - 1);
   while (scan_source < end_source)
     {
       digit = (*scan_source++);
@@ -1139,7 +1136,7 @@ bignum_destructive_unnormalization(bignum_type bignum, int shift_right)
   bignum_digit_type digit;
   bignum_digit_type carry = 0;
   int shift_left = (BIGNUM_DIGIT_LENGTH - shift_right);
-  bignum_digit_type mask = ((1L << shift_right) - 1);
+  bignum_digit_type mask = (((F_FIXNUM)1 << shift_right) - 1);
   while (start < scan)
     {
       digit = (*--scan);
@@ -1489,7 +1486,7 @@ bignum_bitwise_not(bignum_type x)
 
 /* allocates memory */
 bignum_type
-bignum_arithmetic_shift(bignum_type arg1, long n)
+bignum_arithmetic_shift(bignum_type arg1, F_FIXNUM n)
 {
   if (BIGNUM_NEGATIVE_P(arg1) && n < 0)
     return bignum_bitwise_not(bignum_magnitude_ash(bignum_bitwise_not(arg1), n));
@@ -1550,14 +1547,14 @@ bignum_bitwise_xor(bignum_type arg1, bignum_type arg2)
 /* ash for the magnitude */
 /* assume arg1 is a big number, n is a long */
 bignum_type
-bignum_magnitude_ash(bignum_type arg1, long n)
+bignum_magnitude_ash(bignum_type arg1, F_FIXNUM n)
 {
   bignum_type result = NULL;
   bignum_digit_type *scan1;
   bignum_digit_type *scanr;
   bignum_digit_type *end;
 
-  long digit_offset,bit_offset;
+  F_FIXNUM digit_offset,bit_offset;
 
   if (BIGNUM_ZERO_P (arg1)) return (arg1);
 
@@ -1642,10 +1639,6 @@ bignum_pospos_bitwise_op(int op, bignum_type arg1, bignum_type arg2)
   while (scanr < endr) {
     digit1 = (scan1 < end1) ? *scan1++ : 0;
     digit2 = (scan2 < end2) ? *scan2++ : 0;
-    /*
-    fprintf(stderr, "[pospos op = %d, i = %ld, d1 = %lx, d2 = %lx]\n",
-            op, endr - scanr, digit1, digit2);
-            */
     *scanr++ = (op == AND_OP) ? digit1 & digit2 :
                (op == IOR_OP) ? digit1 | digit2 :
                                 digit1 ^ digit2;
@@ -1856,8 +1849,8 @@ digit_stream_to_bignum(unsigned int n_digits,
     return (BIGNUM_ZERO ());
   if (n_digits == 1)
     {
-      long digit = ((long) ((*producer) (0)));
-      return (long_to_bignum (negative_p ? (- digit) : digit));
+      F_FIXNUM digit = ((F_FIXNUM) ((*producer) (0)));
+      return (fixnum_to_bignum (negative_p ? (- digit) : digit));
     }
   {
     bignum_length_type length;

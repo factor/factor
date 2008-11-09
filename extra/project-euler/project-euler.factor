@@ -1,7 +1,7 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer, Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: definitions io io.files kernel math math.parser project-euler.ave-time
-    sequences vocabs vocabs.loader
+    sequences vocabs vocabs.loader prettyprint
     project-euler.001 project-euler.002 project-euler.003 project-euler.004
     project-euler.005 project-euler.006 project-euler.007 project-euler.008
     project-euler.009 project-euler.010 project-euler.011 project-euler.012
@@ -33,7 +33,7 @@ IN: project-euler
 
 : solution-path ( n -- str/f )
     number>euler "project-euler." prepend
-    vocab where dup [ first ] when ;
+    vocab where dup [ first <pathname> ] when ;
 
 PRIVATE>
 
@@ -43,8 +43,8 @@ PRIVATE>
 : run-project-euler ( -- )
     problem-prompt dup problem-solved? [
         dup number>euler "project-euler." prepend run
-        "Answer: " swap dup number? [ number>string ] when append print
-        "Source: " swap solution-path append print
+        "Answer: " write dup number? [ number>string ] when print
+        "Source: " write solution-path .
     ] [
         drop "That problem has not been solved yet..." print
     ] if ;

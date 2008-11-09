@@ -39,12 +39,15 @@ M: x86 %inc-r ( n -- ) rs-reg (%inc) ;
 : align-stack ( n -- n' )
     os macosx? cpu x86.64? or [ 16 align ] when ;
 
+HOOK: reserved-area-size cpu ( -- n )
+
 M: x86 stack-frame-size ( stack-frame -- i )
     [ spill-counts>> [ swap reg-size * ] { } assoc>map sum ]
     [ params>> ]
     [ return>> ]
     tri + +
     3 cells +
+    reserved-area-size +
     align-stack ;
 
 M: x86 %call ( label -- ) CALL ;
@@ -464,8 +467,10 @@ M: x86 %compare-float-branch ( label cc src1 src2 -- )
 
 : stack@ ( n -- op ) stack-reg swap [+] ;
 
+: param@ ( n -- op ) reserved-area-size + stack@ ;
+
 : spill-integer-base ( stack-frame -- n )
-    [ params>> ] [ return>> ] bi + ;
+    [ params>> ] [ return>> ] bi + reserved-area-size + ;
 
 : spill-integer@ ( n -- op )
     cells
@@ -473,10 +478,9 @@ M: x86 %compare-float-branch ( label cc src1 src2 -- )
     + stack@ ;
 
 : spill-float-base ( stack-frame -- n )
+    [ spill-integer-base ]
     [ spill-counts>> int-regs swap at int-regs reg-size * ]
-    [ params>> ]
-    [ return>> ]
-    tri + + ;
+    bi + ;
 
 : spill-float@ ( n -- op )
     double-float-regs reg-size *
@@ -491,16 +495,16 @@ M: x86 %reload-float ( dst n -- ) spill-float@ MOVSD ;
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
-M: int-regs %save-param-reg drop >r stack@ r> MOV ;
-M: int-regs %load-param-reg drop swap stack@ MOV ;
+M: int-regs %save-param-reg drop >r param@ r> MOV ;
+M: int-regs %load-param-reg drop swap param@ MOV ;
 
 GENERIC: MOVSS/D ( dst src reg-class -- )
 
 M: single-float-regs MOVSS/D drop MOVSS ;
 M: double-float-regs MOVSS/D drop MOVSD ;
 
-M: float-regs %save-param-reg >r >r stack@ r> r> MOVSS/D ;
-M: float-regs %load-param-reg >r swap stack@ r> MOVSS/D ;
+M: float-regs %save-param-reg >r >r param@ r> r> MOVSS/D ;
+M: float-regs %load-param-reg >r swap param@ r> MOVSS/D ;
 
 GENERIC: push-return-reg ( reg-class -- )
 GENERIC: load-return-reg ( n reg-class -- )
@@ -515,8 +519,6 @@ M: x86 %prepare-alien-invoke
     temp-reg-1 [] cell SUB
     temp-reg-1 2 cells [+] ds-reg MOV
     temp-reg-1 3 cells [+] rs-reg MOV ;
-
-M: x86 fp-shadows-int? ( -- ? ) f ;
 
 M: x86 value-structs? t ;
 

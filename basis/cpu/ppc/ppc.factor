@@ -15,18 +15,6 @@ IN: cpu.ppc
 ! f0-f29: float vregs
 ! f30, f31: float scratch
 
-<< {
-    { [ os macosx? ] [
-        4 "longlong" c-type (>>align)
-        4 "ulonglong" c-type (>>align)
-        4 "double" c-type (>>align)
-    ] }
-    { [ os linux? ] [
-        t "longlong" c-type (>>stack-align?)
-        t "ulonglong" c-type (>>stack-align?)
-    ] }
-} cond >>
-
 M: ppc machine-registers
     {
         { int-regs T{ range f 2 26 1 } }
@@ -65,17 +53,8 @@ M: ppc %replace loc>operand STW ;
 M: ppc %inc-d ( n -- ) ds-reg (%inc) ;
 M: ppc %inc-r ( n -- ) rs-reg (%inc) ;
 
-: reserved-area-size ( -- n )
-    os {
-        { linux [ 2 ] }
-        { macosx [ 6 ] }
-    } case cells ; foldable
-
-: lr-save ( -- n )
-    os {
-        { linux [ 1 ] }
-        { macosx [ 2 ] }
-    } case cells ; foldable
+HOOK: reserved-area-size os ( -- n )
+HOOK: lr-save os ( -- n )
 
 : param@ ( n -- x ) reserved-area-size + ; inline
 
@@ -370,12 +349,17 @@ M: ppc %gc
     "end" resolve-label ;
 
 M: ppc %prologue ( n -- )
-    0 scratch-reg LOAD32 rc-absolute-ppc-2/2 rel-this
+    #! We use a volatile register (r11) here for scratch. Because
+    #! callback bodies have a prologue too, we cannot assume
+    #! that c_to_factor saved all non-volatile registers, so
+    #! we have to respect the C calling convention. Also, we
+    #! cannot touch any param-regs either.
+    0 11 LOAD32 rc-absolute-ppc-2/2 rel-this
     0 MFLR
     1 1 pick neg ADDI
-    scratch-reg 1 pick xt-save STW
-    dup scratch-reg LI
-    scratch-reg 1 pick next-save STW
+    11 1 pick xt-save STW
+    dup 11 LI
+    11 1 pick next-save STW
     0 1 rot lr-save + STW ;
 
 M: ppc %epilogue ( n -- )
@@ -458,11 +442,6 @@ M: ppc %loop-entry ;
 M: int-regs return-reg drop 3 ;
 M: int-regs param-regs drop { 3 4 5 6 7 8 9 10 } ;
 M: float-regs return-reg drop 1 ;
-M: float-regs param-regs 
-    drop os H{
-        { macosx { 1 2 3 4 5 6 7 8 9 10 11 12 13 } }
-        { linux { 1 2 3 4 5 6 7 8 } }
-    } at ;
 
 M: int-regs %save-param-reg drop 1 rot local@ STW ;
 M: int-regs %load-param-reg drop 1 rot local@ LWZ ;
@@ -585,13 +564,6 @@ M: ppc %callback-value ( ctype -- )
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
-M: ppc value-structs?
-    #! On Linux/PPC, value structs are passed in the same way
-    #! as reference structs, we just have to make a copy first.
-    os linux? not ;
-
-M: ppc fp-shadows-int? ( -- ? ) os macosx? ;
-
 M: ppc small-enough? ( n -- ? ) -32768 32767 between? ;
 
 M: ppc struct-small-enough? ( size -- ? ) drop f ;
@@ -601,3 +573,10 @@ M: ppc %box-small-struct
 
 M: ppc %unbox-small-struct
     drop "No small structs" throw ;
+
+USE: vocabs.loader
+
+{
+    { [ os macosx? ] [ "cpu.ppc.macosx" require ] }
+    { [ os linux? ] [ "cpu.ppc.linux" require ] }
+} cond

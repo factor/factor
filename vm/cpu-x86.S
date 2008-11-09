@@ -1,31 +1,35 @@
 DEF(F_FASTCALL void,c_to_factor,(CELL quot)):
 	PUSH_NONVOLATILE
-	push ARG0                             /* Save quot */
+	mov ARG0,NV_TEMP_REG
 
-	lea -CELL_SIZE(STACK_REG),ARG0        /* Save stack pointer */
+	/* Create register shadow area for Win64 */
+	sub $32,STACK_REG
+
+	/* Save stack pointer */
+	lea -CELL_SIZE(STACK_REG),ARG0
 	call MANGLE(save_callstack_bottom)
 
-	mov (STACK_REG),ARG0                  /* Pass quot as arg 1 */
-	call *QUOT_XT_OFFSET(ARG0)            /* Call quot-xt */
+	/* Call quot-xt */
+	mov NV_TEMP_REG,ARG0
+	call *QUOT_XT_OFFSET(ARG0)
 
-	POP ARG0
+	/* Tear down register shadow area */
+	add $32,STACK_REG
+
 	POP_NONVOLATILE
 	ret
 
 DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
-	mov ARG1,STACK_REG                    /* rewind_to */
+	/* rewind_to */
+	mov ARG1,STACK_REG                    
 	jmp *QUOT_XT_OFFSET(ARG0)
 
 DEF(FASTCALL void,lazy_jit_compile,(CELL quot)):
 	mov STACK_REG,ARG1           /* Save stack pointer */
-	push ARG1                    /* Alignment */
-	push ARG1
-	push ARG1
+	sub $STACK_PADDING,STACK_REG
 	call MANGLE(primitive_jit_compile)
 	mov RETURN_REG,ARG0          /* No-op on 32-bit */
-	pop ARG1                     /* OK to clobber ARG1 here */
-	pop ARG1
-	pop ARG1
+	add $STACK_PADDING,STACK_REG
         jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
 
 #ifdef WINDOWS
