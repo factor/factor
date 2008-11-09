@@ -12,9 +12,15 @@ io.encodings.binary math.order math.private accessors
 slots.private compiler.units ;
 IN: bootstrap.image
 
+: arch ( os cpu -- arch )
+    {
+        { "ppc" [ "-ppc" append ] }
+        { "x86.64" [ "winnt" = "winnt" "unix" ? "-x86.64" append ] }
+        [ nip ]
+    } case ;
+
 : my-arch ( -- arch )
-    cpu name>> 
-    dup "ppc" = [ >r os name>> "-" r> 3append ] when ;
+    os name>> cpu name>> arch ;
 
 : boot-image-name ( arch -- string )
     "boot." swap ".image" 3append ;

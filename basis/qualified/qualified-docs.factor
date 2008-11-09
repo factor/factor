@@ -32,3 +32,14 @@ HELP: RENAME:
     "RENAME: + math => -"
     "2 3 - ! => 5" } } ;
 
+ARTICLE: "qualified" "Qualified word lookup"
+"The " { $vocab-link "qualified" } " vocabulary provides a handful of parsing words which give more control over word lookup than is offered by " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } "."
+$nl
+"These words are useful when there is no way to avoid using two vocabularies with identical word names in the same source file."
+{ $subsection POSTPONE: QUALIFIED: }
+{ $subsection POSTPONE: QUALIFIED-WITH: }
+{ $subsection POSTPONE: FROM: }
+{ $subsection POSTPONE: EXCLUDE: }
+{ $subsection POSTPONE: RENAME: } ;
+
+ABOUT: "qualified"
