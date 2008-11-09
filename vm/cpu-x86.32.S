@@ -10,7 +10,7 @@ and the callstack top is passed in EDX */
 #define DS_REG %esi
 #define RETURN_REG %eax
 
-#define NV_TEMP_REG %rbx
+#define NV_TEMP_REG %ebx
 
 #define CELL_SIZE 4
 #define STACK_PADDING 12
