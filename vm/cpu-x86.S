@@ -1,20 +1,21 @@
 DEF(F_FASTCALL void,c_to_factor,(CELL quot)):
 	PUSH_NONVOLATILE
-	push ARG0
-
-	/* Save stack pointer */
-	lea -CELL_SIZE(STACK_REG),ARG0      
+	mov ARG0,NV_TEMP_REG
 
 	/* Create register shadow area for Win64 */
-	sub $32,STACK_REG                    
+	sub $32,STACK_REG
+
+	/* Save stack pointer */
+	lea -CELL_SIZE(STACK_REG),ARG0
 	call MANGLE(save_callstack_bottom)
-	add $32,STACK_REG
 
 	/* Call quot-xt */
-	mov (STACK_REG),ARG0
+	mov NV_TEMP_REG,ARG0
 	call *QUOT_XT_OFFSET(ARG0)
 
-	pop ARG0
+	/* Tear down register shadow area */
+	add $32,STACK_REG
+
 	POP_NONVOLATILE
 	ret
 

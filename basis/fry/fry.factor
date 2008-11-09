@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences combinators parser splitting math
-quotations arrays make qualified words ;
+quotations arrays make words ;
 IN: fry
 
 : _ ( -- * ) "Only valid inside a fry" throw ;
