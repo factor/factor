@@ -14,6 +14,10 @@ M: linux lr-save 1 ;
 
 M: float-regs param-regs { 1 2 3 4 5 6 7 8 } ;
 
-M: ppc value-structs? drop f ;
+M: ppc value-structs? f ;
 
-M: ppc fp-shadows-int? drop f ;
+M: ppc dummy-stack-params? f ;
+
+M: ppc dummy-int-params? f ;
+
+M: ppc dummy-fp-params? f ;
