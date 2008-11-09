@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Michael Judge.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.analysis math.functions math.vectors sequences
-sequences.lib sorting ;
+USING: arrays kernel math math.analysis math.functions sequences sequences.lib
+    sorting ;
 IN: math.statistics
 
 : mean ( seq -- n )
@@ -19,10 +19,10 @@ IN: math.statistics
 
 : median ( seq -- n )
     #! middle number if odd, avg of two middle numbers if even
-    natural-sort dup length dup even? [
-        1- 2 / swap [ nth ] [ [ 1+ ] dip nth ] 2bi + 2 /
+    natural-sort dup length even? [
+        [ midpoint@ dup 1- 2array ] keep nths mean
     ] [
-        2 / swap nth
+        [ midpoint@ ] keep nth
     ] if ;
 
 : range ( seq -- n )
@@ -44,14 +44,14 @@ IN: math.statistics
 
 : ste ( seq -- x )
     #! standard error, standard deviation / sqrt ( length of sequence )
-    dup std swap length sqrt / ;
+    [ std ] [ length ] bi sqrt / ;
 
 : ((r)) ( mean(x) mean(y) {x} {y} -- (r) )
     ! finds sigma((xi-mean(x))(yi-mean(y))
-    0 [ [ >r pick r> swap - ] bi@ * + ] 2reduce 2nip ;
+    0 [ [ [ pick ] dip swap - ] bi@ * + ] 2reduce 2nip ;
 
 : (r) ( mean(x) mean(y) {x} {y} sx sy -- r )
-    * recip >r [ ((r)) ] keep length 1- / r> * ;
+    * recip [ [ ((r)) ] keep length 1- / ] dip * ;
 
 : [r] ( {{x,y}...} -- mean(x) mean(y) {x} {y} sx sy )
     first2 [ [ [ mean ] bi@ ] 2keep ] 2keep [ std ] bi@ ;
