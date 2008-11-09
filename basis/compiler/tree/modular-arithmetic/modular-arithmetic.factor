@@ -53,17 +53,8 @@ M: node maybe-modularize* 2drop ;
 GENERIC: compute-modularized-values* ( node -- )
 
 M: #call compute-modularized-values*
-    dup word>> {
-        { [ \ >fixnum eq? ] [ in-d>> first maybe-modularize ] }
-        ! { [
-        !     {
-        !         mod-integer-fixnum
-        !         mod-integer-integer
-        !         mod-fixnum-integer
-        !     } memq?
-        ! ] [ ] }
-        [ drop ]
-    } cond ;
+    dup word>> \ >fixnum eq?
+    [ in-d>> first maybe-modularize ] [ drop ] if ;
 
 M: node compute-modularized-values* drop ;
 

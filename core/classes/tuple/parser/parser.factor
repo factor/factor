@@ -60,14 +60,19 @@ ERROR: invalid-slot-name name ;
     dup check-duplicate-slots
     3dup check-slot-shadowing ;
 
-: parse-slot-value ( -- )
-    scan scan-object 2array , scan "}" assert= ;
-
 ERROR: bad-literal-tuple ;
+
+: parse-slot-value ( -- )
+    scan scan-object 2array , scan {
+        { f [ unexpected-eof ] }
+        { "}" [ ] }
+        [ bad-literal-tuple ]
+    } case ;
 
 : (parse-slot-values) ( -- )
     parse-slot-value
     scan {
+        { f [ unexpected-eof ] }
         { "{" [ (parse-slot-values) ] }
         { "}" [ ] }
         [ bad-literal-tuple ]

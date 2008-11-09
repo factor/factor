@@ -1,6 +1,6 @@
-! Copyright (c) 2007 Aaron Schaefer.
+! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.functions math.parser project-euler.common sequences ;
+USING: math.functions project-euler.common sequences ;
 IN: project-euler.016
 
 ! http://projecteuler.net/index.php?section=problems&id=16
@@ -20,6 +20,6 @@ IN: project-euler.016
     2 1000 ^ number>digits sum ;
 
 ! [ euler016 ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run time - 0.67 SD (100 trials)
 
 MAIN: euler016

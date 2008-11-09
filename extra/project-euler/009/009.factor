@@ -1,6 +1,6 @@
-! Copyright (c) 2007 Aaron Schaefer.
+! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions namespaces make sequences sorting ;
+USING: kernel make math sequences sorting ;
 IN: project-euler.009
 
 ! http://projecteuler.net/index.php?section=problems&id=9
@@ -30,14 +30,14 @@ IN: project-euler.009
 
 : abc ( p q -- triplet )
     [
-        2dup * ,                    ! a = p * q
-        [ sq ] bi@ 2dup - 2 / ,  ! b = (p² - q²) / 2
-        + 2 / ,                     ! c = (p² + q²) / 2
+        2dup * ,         ! a = p * q
+        [ sq ] bi@
+        [ - 2 / , ]      ! b = (p² - q²) / 2
+        [ + 2 / , ] 2bi  ! c = (p² + q²) / 2
     ] { } make natural-sort ;
 
 : (ptriplet) ( target p q triplet -- target p q )
-    roll [ swap sum = ] keep -roll
-    [ next-pq 2dup abc (ptriplet) ] unless ;
+    sum [ pick ] dip = [ next-pq 2dup abc (ptriplet) ] unless ;
 
 : ptriplet ( target -- triplet )
    3 1 { 3 4 5 } (ptriplet) abc nip ;
@@ -48,6 +48,6 @@ PRIVATE>
     1000 ptriplet product ;
 
 ! [ euler009 ] 100 ave-time
-! 1 ms run / 0 ms GC ave time - 100 trials
+! 1 ms ave run time - 0.73 SD (100 trials)
 
 MAIN: euler009

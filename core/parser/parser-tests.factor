@@ -490,3 +490,9 @@ must-fail-with
 ] [
     error>> staging-violation?
 ] must-fail-with
+
+! Bogus error message
+DEFER: blah
+
+[ "IN: parser.tests USE: kernel TUPLE: blah < tuple ; : blah ; TUPLE: blah < tuple ; : blah ;" eval ]
+[ error>> error>> def>> \ blah eq? ] must-fail-with

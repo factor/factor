@@ -140,7 +140,7 @@ M: postgresql-db bind# ( spec object -- )
 
 : create-function-sql ( class -- statement )
     [
-        [ remove-id ] dip
+        [ dup remove-id ] dip
         "create function add_" 0% dup 0%
         "(" 0%
         over [ "," 0% ]
@@ -157,7 +157,9 @@ M: postgresql-db bind# ( spec object -- )
         ") values(" 0%
         swap [ ", " 0% ] [ drop bind-name% ] interleave
         "); " 0%
-        "select currval(''" 0% 0% "_id_seq'');' language sql;" 0%
+        "select currval(''" 0% 0% "_" 0%
+        find-primary-key first column-name>> 0%
+        "_seq'');' language sql;" 0%
     ] query-make ;
 
 M: postgresql-db create-sql-statement ( class -- seq )

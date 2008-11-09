@@ -10,8 +10,6 @@ IN: classes.tuple
 PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
-M: tuple class 1 slot 2 slot { word } declare ;
-
 ERROR: not-a-tuple object ;
 
 : check-tuple ( object -- tuple )
@@ -29,10 +27,12 @@ PREDICATE: immutable-tuple-class < tuple-class ( class -- ? )
     "layout" word-prop ;
 
 : layout-of ( tuple -- layout )
-    1 slot { tuple-layout } declare ; inline
+    1 slot { array } declare ; inline
+
+M: tuple class layout-of 2 slot { word } declare ;
 
 : tuple-size ( tuple -- size )
-    layout-of size>> ; inline
+    layout-of second ; inline
 
 : prepare-tuple>array ( tuple -- n tuple layout )
     check-tuple [ tuple-size ] [ ] [ layout-of ] tri ;
@@ -59,7 +59,7 @@ PRIVATE>
 : tuple>array ( tuple -- array )
     prepare-tuple>array
     >r copy-tuple-slots r>
-    class>> prefix ;
+    first prefix ;
 
 : tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
@@ -90,20 +90,32 @@ ERROR: bad-superclass class ;
         2drop f
     ] if ; inline
 
-: tuple-instance? ( object class echelon -- ? )
-    #! 4 slot == superclasses>>
+: tuple-instance-1? ( object class -- ? )
+    swap dup tuple? [
+        layout-of 7 slot eq?
+    ] [ 2drop f ] if ; inline
+
+: tuple-instance? ( object class offset -- ? )
     rot dup tuple? [
-        layout-of 4 slot
-        2dup 1 slot fixnum<
-        [ array-nth eq? ] [ 3drop f ] if
+        layout-of
+        2dup 1 slot fixnum<=
+        [ swap slot eq? ] [ 3drop f ] if
     ] [ 3drop f ] if ; inline
 
-: define-tuple-predicate ( class -- )
-    dup dup tuple-layout echelon>>
-    [ tuple-instance? ] 2curry define-predicate ;
+: layout-class-offset ( echelon -- n )
+    2 * 5 + ;
 
-: superclass-size ( class -- n )
-    superclasses but-last [ "slots" word-prop length ] sigma ;
+: echelon-of ( class -- n )
+    tuple-layout third ;
+
+: define-tuple-predicate ( class -- )
+    dup dup echelon-of {
+        { 1 [ [ tuple-instance-1? ] curry ] }
+        [ layout-class-offset [ tuple-instance? ] 2curry ]
+    } case define-predicate ;
+
+: class-size ( class -- n )
+    superclasses [ "slots" word-prop length ] sigma ;
 
 : (instance-check-quot) ( class -- quot )
     [
@@ -138,18 +150,22 @@ ERROR: bad-superclass class ;
 : define-tuple-prototype ( class -- )
     dup tuple-prototype "prototype" set-word-prop ;
 
-: finalize-tuple-slots ( class slots -- slots )
-    swap superclass-size 2 + finalize-slots ;
+: prepare-slots ( slots superclass -- slots' )
+    [ make-slots ] [ class-size 2 + ] bi* finalize-slots ;
 
 : define-tuple-slots ( class -- )
-    dup dup "slots" word-prop finalize-tuple-slots
+    dup "slots" word-prop over superclass prepare-slots
     define-accessors ;
 
 : make-tuple-layout ( class -- layout )
-    [ ]
-    [ [ superclass-size ] [ "slots" word-prop length ] bi + ]
-    [ superclasses dup length 1- ] tri
-    <tuple-layout> ;
+    [
+        {
+            [ , ]
+            [ [ superclass class-size ] [ "slots" word-prop length ] bi + , ]
+            [ superclasses length 1- , ]
+            [ superclasses [ [ , ] [ hashcode , ] bi ] each ]
+        } cleave
+    ] { } make ;
 
 : define-tuple-layout ( class -- )
     dup make-tuple-layout "layout" set-word-prop ;
@@ -170,13 +186,13 @@ ERROR: bad-superclass class ;
     [ first3 update-slot ] with map ;
 
 : permute-slots ( old-values layout -- new-values )
-    [ class>> all-slots ] [ outdated-tuples get at ] bi
+    [ first all-slots ] [ outdated-tuples get at ] bi
     compute-slot-permutation
     apply-slot-permutation ;
 
 : update-tuple ( tuple -- newtuple )
     [ tuple-slots ] [ layout-of ] bi
-    [ permute-slots ] [ class>> ] bi
+    [ permute-slots ] [ first ] bi
     slots>tuple ;
 
 : outdated-tuple? ( tuple assoc -- ? )
@@ -208,7 +224,6 @@ M: tuple-class update-class
     } cleave ;
 
 : define-new-tuple-class ( class superclass slots -- )
-    make-slots
     [ drop f f tuple-class define-class ]
     [ nip "slots" set-word-prop ]
     [ 2drop update-classes ]
@@ -241,16 +256,19 @@ M: tuple-class update-class
 : check-superclass ( superclass -- )
     dup valid-superclass? [ bad-superclass ] unless drop ;
 
+GENERIC# (define-tuple-class) 2 ( class superclass slots -- )
+
 PRIVATE>
 
-GENERIC# define-tuple-class 2 ( class superclass slots -- )
-
-M: word define-tuple-class
+: define-tuple-class ( class superclass slots -- )
     over check-superclass
+    over prepare-slots
+    (define-tuple-class) ;
+
+M: word (define-tuple-class)
     define-new-tuple-class ;
 
-M: tuple-class define-tuple-class
-    over check-superclass
+M: tuple-class (define-tuple-class)
     3dup tuple-class-unchanged?
     [ 3drop ] [ redefine-tuple-class ] if ;
 
@@ -283,7 +301,7 @@ M: tuple-class reset-class
 M: tuple-class rank-class drop 0 ;
 
 M: tuple-class instance?
-    dup tuple-layout echelon>> tuple-instance? ;
+    dup echelon-of layout-class-offset tuple-instance? ;
 
 M: tuple-class (flatten-class) dup set ;
 

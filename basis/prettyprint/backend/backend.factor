@@ -233,6 +233,3 @@ M: wrapper pprint*
     ] [
         pprint-object
     ] if ;
-
-M: tuple-layout pprint*
-    "( tuple layout )" swap present-text ;

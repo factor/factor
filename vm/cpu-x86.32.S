@@ -11,6 +11,7 @@ and the callstack top is passed in EDX */
 #define RETURN_REG %eax
 
 #define CELL_SIZE 4
+#define STACK_PADDING 12
 
 #define PUSH_NONVOLATILE \
 	push %ebx ; \
@@ -39,4 +40,20 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	add $12,%esp                       /* pop args from the stack */
 	ret                                /* return _with new stack_ */
 
+/* cpu.x86.32 calls this */
+DEF(bool,check_sse2,(void)):
+	push %ebx
+	mov $1,%eax
+	cpuid
+	shr $26,%edx
+	and $1,%edx
+	pop %ebx
+	mov %edx,%eax
+	ret
+
 #include "cpu-x86.S"
+
+#ifdef WINDOWS
+	.section .drectve
+	.ascii " -export:check_sse2"
+#endif

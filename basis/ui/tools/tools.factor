@@ -40,11 +40,11 @@ IN: ui.tools
 
 : resize-workspace ( workspace -- )
     dup sizes>> over control-value zero? [
-        1/5 1 pick set-nth
-        4/5 2 rot set-nth
+        1/5 over set-second
+        4/5 swap set-third
     ] [
-        2/3 1 pick set-nth
-        1/3 2 rot set-nth
+        2/3 over set-second
+        1/3 swap set-third
     ] if relayout ;
 
 M: workspace model-changed

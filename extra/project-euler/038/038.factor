@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser math.ranges project-euler.common sequences ;
+USING: kernel math math.parser math.ranges project-euler.common sequences
+    strings ;
 IN: project-euler.038
 
 ! http://projecteuler.net/index.php?section=problems&id=38
@@ -50,6 +51,6 @@ PRIVATE>
     9123 9876 [a,b] [ concat-product ] map [ pandigital? ] filter supremum ;
 
 ! [ euler038 ] 100 ave-time
-! 37 ms run / 1 ms GC ave time - 100 trials
+! 11 ms ave run time - 1.5 SD (100 trials)
 
 MAIN: euler038

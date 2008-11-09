@@ -16,7 +16,7 @@ ARTICLE: "deploy-flags" "Deployment flags"
 "There are two sets of deployment flags. The first set controls the major subsystems which are to be included in the deployment image:"
 { $subsection deploy-math?     }
 { $subsection deploy-compiler? }
-{ $subsection deploy-random?   }
+{ $subsection deploy-unicode?   }
 { $subsection deploy-threads?  }
 { $subsection deploy-ui?       }
 "The second set of flags controls the level of stripping to be performed on the deployment image; there is a trade-off between image size, and retaining functionality which is required by the application:"
@@ -73,10 +73,10 @@ HELP: deploy-compiler?
 $nl
 "On by default. Most programs should be compiled, not only for performance but because features which depend on the C library interface only function after compilation." } ;
 
-HELP: deploy-random?
-{ $description "Deploy flag. If set, the random number generator protocol is included, together with two implementations: a native OS-specific random number generator, and the Mersenne Twister."
+HELP: deploy-unicode?
+{ $description "Deploy flag. If set, full Unicode " { $link POSTPONE: CHAR: } " syntax is included."
 $nl
-"On by default. If your program does not generate random numbers you can disable this to save some space." } ;
+"Off by default. If your program needs to use " { $link POSTPONE: CHAR: } " with named characters, enable this flag." } ;
 
 HELP: deploy-threads?
 { $description "Deploy flag. If set, thread support will be included in the final image."

@@ -1,7 +1,7 @@
-! Copyright (c) 2007 Aaron Schaefer.
+! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib kernel math math.functions math.parser namespaces
-sequences splitting grouping combinators.short-circuit ;
+USING: combinators.short-circuit grouping kernel math math.parser namespaces
+    sequences ;
 IN: math.text.english
 
 <PRIVATE
@@ -52,13 +52,11 @@ SYMBOL: and-needed?
     ] if ;
 
 : 3digits>text ( n -- str )
-    dup hundreds-place swap tens-place append ;
+    [ hundreds-place ] [ tens-place ] bi append ;
 
 : text-with-scale ( index seq -- str )
-    dupd nth 3digits>text swap
-    scale-numbers [
-        " " swap 3append
-    ] unless-empty ;
+    [ nth 3digits>text ] [ drop scale-numbers ] 2bi
+    [ " " swap 3append ] unless-empty ;
 
 : append-with-conjunction ( str1 str2 -- newstr )
     over length zero? [
@@ -68,20 +66,19 @@ SYMBOL: and-needed?
         and-needed? off
     ] if ;
 
-: (recombine) ( str index seq -- newstr seq )
+: (recombine) ( str index seq -- newstr )
     2dup nth zero? [
-        nip
+        2drop
     ] [
-        [ text-with-scale ] keep
-        -rot append-with-conjunction swap
+        text-with-scale append-with-conjunction
     ] if ;
 
 : recombine ( seq -- str )
     dup length 1 = [
         first 3digits>text
     ] [
-        dup set-conjunction "" swap
-        dup length [ swap (recombine) ] each drop
+        [ set-conjunction "" ] [ length ] [ ] tri
+        [ (recombine) ] curry each
     ] if ;
 
 : (number>text) ( n -- str )

@@ -379,7 +379,7 @@ TUPLE: mutable-tuple-test { x sequence } ;
     [ T{ mutable-tuple-test f "hey" } x>> ] final-classes
 ] unit-test
 
-[ V{ tuple-layout } ] [
+[ V{ array } ] [
     [ T{ mutable-tuple-test f "hey" } layout-of ] final-classes
 ] unit-test
 

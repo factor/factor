@@ -36,7 +36,7 @@ IN: project-euler.019
     ] map concat [ zero? ] count ;
 
 ! [ euler019 ] 100 ave-time
-! 1 ms run / 0 ms GC ave time - 100 trials
+! 1 ms ave run time - 0.51 SD (100 trials)
 
 
 ! ALTERNATE SOLUTIONS
@@ -61,6 +61,6 @@ PRIVATE>
     end-date start-date first-days [ zero? ] count ;
 
 ! [ euler019a ] 100 ave-time
-! 131 ms run / 3 ms GC ave time - 100 trials
+! 17 ms ave run time - 2.13 SD (100 trials)
 
 MAIN: euler019

@@ -42,7 +42,7 @@ TUPLE: check-mixin-class mixin ;
 : update-classes/new ( mixin -- )
     class-usages
     [ [ update-class ] each ]
-    [ implementors [ make-generic ] each ] bi ;
+    [ implementors [ remake-generic ] each ] bi ;
 
 : add-mixin-instance ( class mixin -- )
     #! Note: we call update-classes on the new member, not the

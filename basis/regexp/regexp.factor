@@ -92,7 +92,6 @@ IN: regexp
     reversed-regexp initial-option
     construct-regexp ;
 
-
 : parsing-regexp ( accum end -- accum )
     lexer get dup skip-blank
     [ [ index-from dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
@@ -111,7 +110,6 @@ IN: regexp
 : R` CHAR: ` parsing-regexp ; parsing
 : R{ CHAR: } parsing-regexp ; parsing
 : R| CHAR: | parsing-regexp ; parsing
-
 
 : find-regexp-syntax ( string -- prefix suffix )
     {

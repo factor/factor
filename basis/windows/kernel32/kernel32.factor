@@ -812,22 +812,42 @@ FUNCTION: HANDLE FindFirstFileW ( LPCTSTR lpFileName, LPWIN32_FIND_DATA lpFindFi
 ALIAS: FindFirstFile FindFirstFileW
 ! FUNCTION: FindFirstVolumeA
 ! FUNCTION: FindFirstVolumeMountPointA
-! FUNCTION: FindFirstVolumeMountPointW
-! FUNCTION: FindFirstVolumeW
+
+FUNCTION: HANDLE FindFirstVolumeMountPointW (
+    LPTSTR lpszRootPathName,
+    LPTSTR lpszVolumeMountPoint,
+    DWORD cchBufferLength
+) ;
+ALIAS: FindFirstVolumeMountPoint FindFirstVolumeMountPointW
+
+FUNCTION: HANDLE FindFirstVolumeW ( LPTSTR lpszVolumeName, DWORD cchBufferLength ) ;
+ALIAS: FindFirstVolume FindFirstVolumeW
+
 FUNCTION: BOOL FindNextChangeNotification ( HANDLE hChangeHandle ) ;
+
 ! FUNCTION: FindNextFileA
 FUNCTION: BOOL FindNextFileW ( HANDLE hFindFile, LPWIN32_FIND_DATA lpFindFileData ) ;
 ALIAS: FindNextFile FindNextFileW
+
 ! FUNCTION: FindNextVolumeA
 ! FUNCTION: FindNextVolumeMountPointA
-! FUNCTION: FindNextVolumeMountPointW
-! FUNCTION: FindNextVolumeW
+
+FUNCTION: BOOL FindNextVolumeMountPointW (
+    HANDLE hFindVolumeMountPoint,
+    LPTSTR lpszVolumeMountPoint,
+    DWORD cchBufferLength
+) ;
+ALIAS: FindNextVolumeMountPoint FindNextVolumeMountPointW
+
+FUNCTION: BOOL FindNextVolumeW ( HANDLE hFindVolume, LPTSTR lpszVolumeName, DWORD cchBufferLength ) ;
+ALIAS: FindNextVolume FindNextVolumeW
+
 ! FUNCTION: FindResourceA
 ! FUNCTION: FindResourceExA
 ! FUNCTION: FindResourceExW
 ! FUNCTION: FindResourceW
-! FUNCTION: FindVolumeClose
-! FUNCTION: FindVolumeMountPointClose
+FUNCTION: BOOL FindVolumeClose ( HANDLE hFindVolume ) ;
+FUNCTION: BOOL FindVolumeMountPointClose ( HANDLE hFindVolumeMountPoint ) ;
 ! FUNCTION: FlushConsoleInputBuffer
 ! FUNCTION: FlushFileBuffers
 ! FUNCTION: FlushInstructionCache
@@ -928,7 +948,8 @@ FUNCTION: HANDLE GetCurrentThread ( ) ;
 ! FUNCTION: GetDevicePowerState
 ! FUNCTION: GetDiskFreeSpaceA
 ! FUNCTION: GetDiskFreeSpaceExA
-! FUNCTION: GetDiskFreeSpaceExW
+FUNCTION: BOOL GetDiskFreeSpaceExW ( LPCTSTR lpDirectoryName, PULARGE_INTEGER pFreeBytesAvailable, PULARGE_INTEGER lpTotalNumberOfBytes, PULARGE_INTEGER lpTotalNumberOfFreeBytes ) ;
+ALIAS: GetDiskFreeSpaceEx GetDiskFreeSpaceExW
 ! FUNCTION: GetDiskFreeSpaceW
 ! FUNCTION: GetDllDirectoryA
 ! FUNCTION: GetDllDirectoryW
@@ -1093,7 +1114,17 @@ FUNCTION: DWORD GetVersion ( ) ;
 FUNCTION: BOOL GetVersionExW ( LPOSVERSIONINFO lpVersionInfo ) ;
 ALIAS: GetVersionEx GetVersionExW
 ! FUNCTION: GetVolumeInformationA
-! FUNCTION: GetVolumeInformationW
+FUNCTION: BOOL GetVolumeInformationW (
+    LPCTSTR lpRootPathName,
+    LPTSTR lpVolumNameBuffer,
+    DWORD nVolumeNameSize,
+    LPDWORD lpVolumeSerialNumber,
+    LPDWORD lpMaximumComponentLength,
+    LPDWORD lpFileSystemFlags,
+    LPCTSTR lpFileSystemNameBuffer,
+    DWORD nFileSystemNameSize
+) ;
+ALIAS: GetVolumeInformation GetVolumeInformationW
 ! FUNCTION: GetVolumeNameForVolumeMountPointA
 ! FUNCTION: GetVolumeNameForVolumeMountPointW
 ! FUNCTION: GetVolumePathNameA

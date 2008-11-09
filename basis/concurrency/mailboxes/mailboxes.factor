@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: concurrency.mailboxes
 USING: dlists deques threads sequences continuations
-destructors namespaces random math quotations words kernel
+destructors namespaces math quotations words kernel
 arrays assocs init system concurrency.conditions accessors
 debugger debugger.threads locals ;
 

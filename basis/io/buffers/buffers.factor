@@ -36,9 +36,7 @@ M: buffer dispose* ptr>> free ;
     [ ptr>> ] [ pos>> ] bi alien-unsigned-1 ; inline
 
 : buffer-pop ( buffer -- byte )
-    [ buffer-peek ] [ 1 swap buffer-consume ] bi ;
-
-HINTS: buffer-pop buffer ;
+    [ buffer-peek ] [ 1 swap buffer-consume ] bi ; inline
 
 : buffer-length ( buffer -- n )
     [ fill>> ] [ pos>> ] bi - ; inline
@@ -69,14 +67,13 @@ HINTS: n>buffer fixnum buffer ;
 HINTS: >buffer byte-array buffer ;
 
 : byte>buffer ( byte buffer -- )
+    [ >fixnum ] dip
     [ [ ptr>> ] [ fill>> ] bi set-alien-unsigned-1 ]
     [ 1 swap n>buffer ]
-    bi ;
-
-HINTS: byte>buffer fixnum buffer ;
+    bi ; inline
 
 : search-buffer-until ( pos fill ptr separators -- n )
-    [ [ swap alien-unsigned-1 ] dip memq? ] 2curry find-from drop ;
+    [ [ swap alien-unsigned-1 ] dip memq? ] 2curry find-from drop ; inline
 
 : finish-buffer-until ( buffer n -- byte-array separator )
     [
@@ -86,7 +83,7 @@ HINTS: byte>buffer fixnum buffer ;
     ] [
         [ buffer-length ] keep
         buffer-read f
-    ] if* ;
+    ] if* ; inline
 
 : buffer-until ( separators buffer -- byte-array separator )
     swap [ { [ ] [ pos>> ] [ fill>> ] [ ptr>> ] } cleave ] dip

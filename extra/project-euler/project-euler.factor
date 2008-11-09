@@ -1,7 +1,7 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer, Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: definitions io io.files kernel math math.parser project-euler.ave-time
-    sequences vocabs vocabs.loader
+    sequences vocabs vocabs.loader prettyprint
     project-euler.001 project-euler.002 project-euler.003 project-euler.004
     project-euler.005 project-euler.006 project-euler.007 project-euler.008
     project-euler.009 project-euler.010 project-euler.011 project-euler.012
@@ -14,12 +14,12 @@ USING: definitions io io.files kernel math math.parser project-euler.ave-time
     project-euler.037 project-euler.038 project-euler.039 project-euler.040
     project-euler.041 project-euler.042 project-euler.043 project-euler.044
     project-euler.045 project-euler.046 project-euler.047 project-euler.048
-    project-euler.052 project-euler.053 project-euler.056 project-euler.059
-    project-euler.067 project-euler.075 project-euler.079 project-euler.092
-    project-euler.097 project-euler.100 project-euler.116 project-euler.117
-    project-euler.134 project-euler.148 project-euler.150 project-euler.151
-    project-euler.164 project-euler.169 project-euler.173 project-euler.175
-    project-euler.186 project-euler.190 ;
+    project-euler.052 project-euler.053 project-euler.055 project-euler.056
+    project-euler.059 project-euler.067 project-euler.075 project-euler.076
+    project-euler.079 project-euler.092 project-euler.097 project-euler.100
+    project-euler.116 project-euler.117 project-euler.134 project-euler.148
+    project-euler.150 project-euler.151 project-euler.164 project-euler.169
+    project-euler.173 project-euler.175 project-euler.186 project-euler.190 ;
 IN: project-euler
 
 <PRIVATE
@@ -33,7 +33,7 @@ IN: project-euler
 
 : solution-path ( n -- str/f )
     number>euler "project-euler." prepend
-    vocab where dup [ first ] when ;
+    vocab where dup [ first <pathname> ] when ;
 
 PRIVATE>
 
@@ -43,8 +43,8 @@ PRIVATE>
 : run-project-euler ( -- )
     problem-prompt dup problem-solved? [
         dup number>euler "project-euler." prepend run
-        "Answer: " swap dup number? [ number>string ] when append print
-        "Source: " swap solution-path append print
+        "Answer: " write dup number? [ number>string ] when print
+        "Source: " write solution-path .
     ] [
         drop "That problem has not been solved yet..." print
     ] if ;

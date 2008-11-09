@@ -1,34 +1,43 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types combinators kernel io.files unix.stat
-math accessors system unix io.backend ;
+math accessors system unix io.backend layouts vocabs.loader
+sequences csv io.streams.string io.encodings.utf8 namespaces
+unix.statfs io.files ;
 IN: unix.statfs.linux
 
-TUPLE: linux-file-system-info < file-system-info
-type bsize blocks bfree bavail files ffree fsid
-namelen frsize spare ;
+cell-bits {
+    { 32 [ "unix.statfs.linux.32" require ] }
+    { 64 [ "unix.statfs.linux.64" require ] }
+} case
 
-: statfs>file-system-info ( struct -- statfs )
-    [ \ linux-file-system-info new ] dip
+TUPLE: mtab-entry file-system-name mount-point type options
+frequency pass-number ;
+
+: mtab-csv>mtab-entry ( csv -- mtab-entry )
+    [ mtab-entry new ] dip
     {
-        [
-            [ statfs64-f_bsize ]
-            [ statfs64-f_bavail ] bi * >>free-space
-        ]
-        [ statfs64-f_type >>type ]
-        [ statfs64-f_bsize >>bsize ]
-        [ statfs64-f_blocks >>blocks ]
-        [ statfs64-f_bfree >>bfree ]
-        [ statfs64-f_bavail >>bavail ]
-        [ statfs64-f_files >>files ]
-        [ statfs64-f_ffree >>ffree ]
-        [ statfs64-f_fsid >>fsid ]
-        [ statfs64-f_namelen >>namelen ]
-        [ statfs64-f_frsize >>frsize ]
-        [ statfs64-f_spare >>spare ]
+        [ first >>file-system-name ]
+        [ second >>mount-point ]
+        [ third >>type ]
+        [ fourth <string-reader> csv first >>options ]
+        [ 4 swap nth >>frequency ]
+        [ 5 swap nth >>pass-number ]
     } cleave ;
 
-M: linux file-system-info ( path -- byte-array )
-    normalize-path
-    "statfs64" <c-object> tuck statfs64 io-error
-    statfs>file-system-info ;
+: parse-mtab ( -- array )
+    [
+        "/etc/mtab" utf8 <file-reader>
+        CHAR: \s delimiter set csv
+    ] with-scope
+    [ mtab-csv>mtab-entry ] map ;
+
+M: linux mounted
+    parse-mtab [
+        [ mount-point>> file-system-info ] keep
+        {
+            [ file-system-name>> >>device-name ]
+            [ mount-point>> >>mount-point ]
+            [ type>> >>type ]
+        } cleave
+    ] map ;

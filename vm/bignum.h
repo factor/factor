@@ -55,14 +55,10 @@ bignum_type bignum_quotient(bignum_type, bignum_type);
 bignum_type bignum_remainder(bignum_type, bignum_type);
 DLLEXPORT bignum_type fixnum_to_bignum(F_FIXNUM);
 DLLEXPORT bignum_type cell_to_bignum(CELL);
-DLLEXPORT bignum_type long_to_bignum(long);
 DLLEXPORT bignum_type long_long_to_bignum(s64 n);
 DLLEXPORT bignum_type ulong_long_to_bignum(u64 n);
-DLLEXPORT bignum_type ulong_to_bignum(unsigned long);
 F_FIXNUM bignum_to_fixnum(bignum_type);
 CELL bignum_to_cell(bignum_type);
-long bignum_to_long(bignum_type);
-unsigned long bignum_to_ulong(bignum_type);
 s64 bignum_to_long_long(bignum_type);
 u64 bignum_to_ulong_long(bignum_type);
 bignum_type double_to_bignum(double);
@@ -71,7 +67,7 @@ double bignum_to_double(bignum_type);
 /* Added bitwise operators. */
 
 DLLEXPORT bignum_type bignum_bitwise_not(bignum_type),
-                   bignum_arithmetic_shift(bignum_type, long),
+                   bignum_arithmetic_shift(bignum_type, F_FIXNUM),
                    bignum_bitwise_and(bignum_type, bignum_type),
                    bignum_bitwise_ior(bignum_type, bignum_type),
                    bignum_bitwise_xor(bignum_type, bignum_type);
@@ -116,7 +112,7 @@ bignum_type bignum_maybe_new_sign(bignum_type, int);
 void bignum_destructive_copy(bignum_type, bignum_type);
 
 /* Added for bitwise operations. */
-bignum_type bignum_magnitude_ash(bignum_type arg1, long n);
+bignum_type bignum_magnitude_ash(bignum_type arg1, F_FIXNUM n);
 bignum_type bignum_pospos_bitwise_op(int op, bignum_type, bignum_type);
 bignum_type bignum_posneg_bitwise_op(int op, bignum_type, bignum_type);
 bignum_type bignum_negneg_bitwise_op(int op, bignum_type, bignum_type);

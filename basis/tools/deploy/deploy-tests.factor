@@ -1,7 +1,8 @@
 IN: tools.deploy.tests
 USING: tools.test system io.files kernel tools.deploy.config
 tools.deploy.backend math sequences io.launcher arrays
-namespaces continuations layouts accessors ;
+namespaces continuations layouts accessors io.encodings.ascii
+urls math.parser ;
 
 : shake-and-bake ( vocab -- )
     [ "test.image" temp-file delete-file ] ignore-errors
@@ -35,10 +36,10 @@ namespaces continuations layouts accessors ;
 
 [ t ] [ 1200000 small-enough? ] unit-test
 
-! [ ] [ "tetris" shake-and-bake ] unit-test
-! 
-! [ t ] [ 1500000 small-enough? ] unit-test
-! 
+[ ] [ "tetris" shake-and-bake ] unit-test
+
+[ t ] [ 1500000 small-enough? ] unit-test
+
 [ ] [ "bunny" shake-and-bake ] unit-test
 
 [ t ] [ 2500000 small-enough? ] unit-test
@@ -71,22 +72,24 @@ M: quit-responder call-responder*
 : add-quot-responder ( responder -- responder )
     quit-responder "quit" add-responder ;
 
-: test-httpd ( -- )
-    #! Return as soon as server is running.
-    <http-server>
-        1237 >>insecure
-        f >>secure
-    start-server* ;
+: test-httpd ( responder -- )
+    [
+        main-responder set
+        <http-server>
+            0 >>insecure
+            f >>secure
+        dup start-server*
+        sockets>> first addr>> port>>
+        dup number>string "resource:temp/port-number" ascii set-file-contents
+    ] with-scope
+    "port" set ;
 
 [ ] [
-    [
-        <dispatcher>
-            add-quot-responder
-            "resource:basis/http/test" <static> >>default
-        main-responder set
+    <dispatcher>
+        add-quot-responder
+        "resource:basis/http/test" <static> >>default
 
-        test-httpd
-    ] with-scope
+    test-httpd
 ] unit-test
 
 [ ] [
@@ -94,7 +97,10 @@ M: quit-responder call-responder*
     run-temp-image
 ] unit-test
 
-[ ] [ "http://localhost:1237/quit" http-get 2drop ] unit-test
+: add-port ( url -- url' )
+    >url clone "port" get >>port ;
+
+[ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test
 
 [ ] [
     "tools.deploy.test.6" shake-and-bake

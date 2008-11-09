@@ -49,6 +49,6 @@ PRIVATE>
     2 15 [a,b] [ P_m truncate ] sigma ;
 
 ! [ euler150 ] 100 ave-time
-! 7 ms run time - 100 trials
+! 5 ms ave run time - 1.01 SD (100 trials)
 
 MAIN: euler190

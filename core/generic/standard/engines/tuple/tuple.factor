@@ -7,18 +7,28 @@ classes.algebra math math.private kernel.private
 quotations arrays definitions ;
 IN: generic.standard.engines.tuple
 
+: nth-superclass% ( n -- ) 2 * 5 + , \ slot , ; inline
+
+: nth-hashcode% ( n -- ) 2 * 6 + , \ slot , ; inline
+
+: tuple-layout% ( -- )
+    [ { tuple } declare 1 slot { array } declare ] % ; inline
+
+: tuple-layout-echelon% ( -- )
+    [ 4 slot ] % ; inline
+
 TUPLE: echelon-dispatch-engine n methods ;
 
 C: <echelon-dispatch-engine> echelon-dispatch-engine
 
-TUPLE: trivial-tuple-dispatch-engine methods ;
+TUPLE: trivial-tuple-dispatch-engine n methods ;
 
 C: <trivial-tuple-dispatch-engine> trivial-tuple-dispatch-engine
 
 TUPLE: tuple-dispatch-engine echelons ;
 
 : push-echelon ( class method assoc -- )
-    >r swap dup "layout" word-prop echelon>> r>
+    [ swap dup "layout" word-prop third ] dip
     [ ?set-at ] change-at ;
 
 : echelon-sort ( assoc -- assoc' )
@@ -38,19 +48,24 @@ TUPLE: tuple-dispatch-engine echelons ;
     \ <tuple-dispatch-engine> convert-methods ;
 
 M: trivial-tuple-dispatch-engine engine>quot
-    methods>> engines>quots* linear-dispatch-quot ;
+    [ n>> ] [ methods>> ] bi dup assoc-empty? [
+        2drop default get [ drop ] prepend
+    ] [
+        [
+            [ nth-superclass% ]
+            [ engines>quots* linear-dispatch-quot % ] bi*
+        ] [ ] make
+    ] if ;
 
-: hash-methods ( methods -- buckets )
+: hash-methods ( n methods -- buckets )
     >alist V{ } clone [ hashcode 1array ] distribute-buckets
-    [ <trivial-tuple-dispatch-engine> ] map ;
+    [ <trivial-tuple-dispatch-engine> ] with map ;
 
-: word-hashcode% ( -- ) [ 1 slot ] % ;
-
-: class-hash-dispatch-quot ( methods -- quot )
+: class-hash-dispatch-quot ( n methods -- quot )
     [
         \ dup ,
-        word-hashcode%
-        hash-methods [ engine>quot ] map hash-dispatch-quot %
+        [ drop nth-hashcode% ]
+        [ hash-methods [ engine>quot ] map hash-dispatch-quot % ] 2bi
     ] [ ] make ;
 
 : engine-word-name ( -- string )
@@ -79,29 +94,16 @@ M: engine-word irrelevant? drop t ;
     dup generic get "tuple-dispatch-generic" set-word-prop ;
 
 : define-engine-word ( quot -- word )
-    >r <engine-word> dup r> define ;
-
-: array-nth% ( n -- ) 2 + , [ slot { word } declare ] % ;
-
-: tuple-layout-superclasses% ( -- )
-    [
-        { tuple } declare
-        1 slot { tuple-layout } declare
-        4 slot { array } declare
-    ] % ; inline
+    [ <engine-word> dup ] dip define ;
 
 : tuple-dispatch-engine-body ( engine -- quot )
     [
         picker %
-        tuple-layout-superclasses%
-        [ n>> array-nth% ]
-        [
-            methods>> [
-                <trivial-tuple-dispatch-engine> engine>quot
-            ] [
-                class-hash-dispatch-quot
-            ] if-small? %
-        ] bi
+        tuple-layout%
+        [ n>> ] [ methods>> ] bi
+        [ <trivial-tuple-dispatch-engine> engine>quot ]
+        [ class-hash-dispatch-quot ]
+        if-small? %
     ] [ ] make ;
 
 M: echelon-dispatch-engine engine>quot
@@ -109,22 +111,11 @@ M: echelon-dispatch-engine engine>quot
         methods>> dup assoc-empty?
         [ drop default get ] [ values first engine>quot ] if
     ] [
-        [
-            picker %
-            tuple-layout-superclasses%
-            [ n>> array-nth% ]
-            [
-                methods>> [
-                    <trivial-tuple-dispatch-engine> engine>quot
-                ] [
-                    class-hash-dispatch-quot
-                ] if-small? %
-            ] bi
-        ] [ ] make
+        tuple-dispatch-engine-body
     ] if ;
 
-: >=-case-quot ( alist -- quot )
-    default get [ drop ] prepend swap
+: >=-case-quot ( default alist -- quot )
+    [ [ drop ] prepend ] dip
     [
         [ [ dup ] swap [ fixnum>= ] curry compose ]
         [ [ drop ] prepose ]
@@ -132,31 +123,45 @@ M: echelon-dispatch-engine engine>quot
     ] assoc-map
     alist>quot ;
 
-: tuple-layout-echelon% ( -- )
+: simplify-echelon-alist ( default alist -- default' alist' )
+    dup empty? [
+        dup first first 1 <= [
+            nip unclip second swap
+            simplify-echelon-alist
+        ] when
+    ] unless ;
+
+: echelon-case-quot ( alist -- quot )
+    #! We don't have to test for echelon 1 since all tuple
+    #! classes are at least at depth 1 in the inheritance
+    #! hierarchy.
+    default get swap simplify-echelon-alist
     [
-        { tuple } declare
-        1 slot { tuple-layout } declare
-        5 slot
-    ] % ; inline
+        [
+            picker %
+            tuple-layout%
+            tuple-layout-echelon%
+            >=-case-quot %
+        ] [ ] make
+    ] unless-empty ;
 
 M: tuple-dispatch-engine engine>quot
     [
-        picker %
-        tuple-layout-echelon%
         [
             tuple assumed set
-            echelons>> dup empty? [
-                unclip-last
+            echelons>> unclip-last
+            [
                 [
-                    [
-                        engine>quot define-engine-word
+                    engine>quot
+                    over 0 = [
+                        define-engine-word
                         [ remember-engine ] [ 1quotation ] bi
-                        dup default set
-                    ] assoc-map
-                ]
-                [ first2 engine>quot 2array ] bi*
-                suffix
-            ] unless
+                    ] unless
+                    dup default set
+                ] assoc-map
+            ]
+            [ first2 engine>quot 2array ] bi*
+            suffix
         ] with-scope
-        >=-case-quot %
+        echelon-case-quot %
     ] [ ] make ;

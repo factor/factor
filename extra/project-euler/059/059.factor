@@ -87,6 +87,6 @@ PRIVATE>
     source-059 dup 3 crack-key decrypt sum ;
 
 ! [ euler059 ] 100 ave-time
-! 13 ms run / 0 ms GC ave time - 100 trials
+! 8 ms ave run time - 1.4 SD (100 trials)
 
 MAIN: euler059

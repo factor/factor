@@ -41,7 +41,7 @@ scroller H{
         dup model>> dependencies>> first  <x-slider> >>x dup x>> @bottom grid-add
         dup model>> dependencies>> second <y-slider> >>y dup y>> @right  grid-add
 
-        swap over model>> <viewport> >>viewport
+        tuck model>> <viewport> >>viewport
         dup viewport>> @center grid-add ;
 
 : <scroller> ( gadget -- scroller ) scroller new-scroller ;

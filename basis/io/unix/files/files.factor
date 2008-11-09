@@ -6,7 +6,7 @@ math.bitwise byte-arrays alien combinators calendar
 io.encodings.binary accessors sequences strings system
 io.files.private destructors vocabs.loader calendar.unix
 unix.stat alien.c-types arrays unix.users unix.groups
-environment fry io.encodings.utf8 alien.strings ;
+environment fry io.encodings.utf8 alien.strings unix.statfs ;
 IN: io.unix.files
 
 M: unix cwd ( -- path )

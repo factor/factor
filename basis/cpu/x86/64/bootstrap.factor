@@ -6,8 +6,9 @@ IN: bootstrap.x86
 
 8 \ cell set
 
-: arg0 ( -- reg ) RDI ;
-: arg1 ( -- reg ) RSI ;
+: shift-arg ( -- reg ) RCX ;
+: div-arg ( -- reg ) RAX ;
+: mod-arg ( -- reg ) RDX ;
 : temp-reg ( -- reg ) RBX ;
 : stack-reg ( -- reg ) RSP ;
 : ds-reg ( -- reg ) R14 ;

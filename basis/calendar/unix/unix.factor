@@ -4,13 +4,19 @@ USING: alien alien.c-types alien.syntax arrays calendar
 kernel math unix unix.time namespaces system ;
 IN: calendar.unix
 
-: timeval>unix-time ( timeval -- timestamp )
+: timeval>seconds ( timeval -- seconds )
     [ timeval-sec seconds ] [ timeval-usec microseconds ] bi
-    time+ since-1970 ;
+    time+ ;
 
-: timespec>unix-time ( timeval -- timestamp )
+: timeval>unix-time ( timeval -- timestamp )
+    timeval>seconds since-1970 ;
+
+: timespec>seconds ( timespec -- seconds )
     [ timespec-sec seconds ] [ timespec-nsec nanoseconds ] bi
-    time+ since-1970 ;
+    time+ ;
+
+: timespec>unix-time ( timespec -- timestamp )
+    timespec>seconds since-1970 ;
 
 : get-time ( -- alien )
     f time <uint> localtime ;

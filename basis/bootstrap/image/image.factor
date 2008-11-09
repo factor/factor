@@ -8,12 +8,19 @@ grouping growable classes classes.builtin classes.tuple
 classes.tuple.private words.private io.binary io.files vocabs
 vocabs.loader source-files definitions debugger
 quotations.private sequences.private combinators
-io.encodings.binary math.order math.private accessors slots.private ;
+io.encodings.binary math.order math.private accessors
+slots.private compiler.units ;
 IN: bootstrap.image
 
+: arch ( os cpu -- arch )
+    {
+        { "ppc" [ "-ppc" append ] }
+        { "x86.64" [ "winnt" = "winnt" "unix" ? "-x86.64" append ] }
+        [ nip ]
+    } case ;
+
 : my-arch ( -- arch )
-    cpu name>> 
-    dup "ppc" = [ >r os name>> "-" r> 3append ] when ;
+    os name>> cpu name>> arch ;
 
 : boot-image-name ( arch -- string )
     "boot." swap ".image" 3append ;
@@ -24,7 +31,7 @@ IN: bootstrap.image
 : images ( -- seq )
     {
         "x86.32"
-        "x86.64"
+        "winnt-x86.64" "unix-x86.64"
         "linux-ppc" "macosx-ppc"
     } ;
 
@@ -367,30 +374,34 @@ M: byte-array '
 
 M: tuple ' emit-tuple ;
 
-M: tuple-layout '
-    [
-        [
-            {
-                [ hashcode>> , ]
-                [ class>> , ]
-                [ size>> , ]
-                [ superclasses>> , ]
-                [ echelon>> , ]
-            } cleave
-        ] { } make [ ' ] map
-        \ tuple-layout type-number
-        object tag-number [ emit-seq ] emit-object
-    ] cache-object ;
-
 M: tombstone '
     state>> "((tombstone))" "((empty))" ?
     "hashtables.private" lookup def>> first
     [ emit-tuple ] cache-object ;
 
 ! Arrays
-M: array '
+: emit-array ( array -- offset )
     [ ' ] map array type-number object tag-number
     [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
+
+M: array ' emit-array ;
+
+! This is a hack. We need to detect arrays which are tuple
+! layout arrays so that they can be internalized, but making
+! them a built-in type is not worth it.
+PREDICATE: tuple-layout-array < array
+    dup length 5 >= [
+        [ first tuple-class? ]
+        [ second fixnum? ]
+        [ third fixnum? ]
+        tri and and
+    ] [ drop f ] if ;
+
+M: tuple-layout-array '
+    [
+        [ dup integer? [ <fake-bignum> ] when ] map
+        emit-array
+    ] cache-object ;
 
 ! Quotations
 
@@ -458,6 +469,8 @@ M: quotation '
     800000 <vector> image set
     20000 <hashtable> objects set
     emit-header t, 0, 1, -1,
+    "Building generic words..." print flush
+    call-remake-generics-hook
     "Serializing words..." print flush
     emit-words
     "Serializing JIT data..." print flush

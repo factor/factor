@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel io.files unix.stat math unix
+USING: alien.syntax kernel unix.stat math unix
 combinators system io.backend accessors alien.c-types
-io.encodings.utf8 alien.strings ;
+io.encodings.utf8 alien.strings unix.types unix.statfs io.files ;
 IN: unix.statfs.netbsd
 
 : _VFS_NAMELEN    32   ; inline
@@ -34,6 +34,8 @@ C-STRUCT: statvfs
     { { "char" _VFS_NAMELEN } "f_mntonname" }
     { { "char" _VFS_NAMELEN } "f_mntfromname" } ;
 
+FUNCTION: int statvfs ( char* path, statvfs *buf ) ;
+
 TUPLE: netbsd-file-system-info < file-system-info
 flag bsize frsize io-size
 blocks blocks-free blocks-available blocks-reserved
@@ -41,7 +43,7 @@ files ffree sync-reads sync-writes async-reads async-writes
 fsidx fsid namemax owner spare fstype mnotonname mntfromname
 file-system-type-name mount-from ;
 
-: statvfs>file-system-info ( byte-array -- netbsd-file-system-info )
+M: netbsd >file-system-info ( byte-array -- netbsd-file-system-info )
     [ \ netbsd-file-system-info new ] dip
     {
         [
@@ -67,10 +69,10 @@ file-system-type-name mount-from ;
         [ statvfs-f_owner >>owner ]
         [ statvfs-f_spare >>spare ]
         [ statvfs-f_fstypename utf8 alien>string >>file-system-type-name ]
-        [ statvfs-f_mntonname utf8 alien>string >>mount-on ]
+        [ statvfs-f_mntonname utf8 alien>string >>mount-point ]
         [ statvfs-f_mntfromname utf8 alien>string >>mount-from ]
     } cleave ;
 
 M: netbsd file-system-info
     normalize-path "statvfs" <c-object> tuck statvfs io-error 
-    statvfs>file-system-info ;
+    >file-system-info ;

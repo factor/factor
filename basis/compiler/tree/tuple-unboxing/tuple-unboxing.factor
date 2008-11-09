@@ -4,7 +4,6 @@ USING: namespaces assocs accessors kernel combinators
 classes.algebra sequences sequences.deep slots.private
 classes.tuple.private math math.private arrays
 stack-checker.branches
-compiler.intrinsics
 compiler.tree
 compiler.tree.combinators
 compiler.tree.propagation.info

@@ -20,6 +20,14 @@ C: <anonymous-complement> anonymous-complement
 : 2cache ( key1 key2 assoc quot -- value )
     >r >r 2array r> [ first2 ] r> compose cache ; inline
 
+GENERIC: valid-class? ( obj -- ? )
+
+M: class valid-class? drop t ;
+M: anonymous-union valid-class? members>> [ valid-class? ] all? ;
+M: anonymous-intersection valid-class? participants>> [ valid-class? ] all? ;
+M: anonymous-complement valid-class? class>> valid-class? ;
+M: word valid-class? drop f ;
+
 DEFER: (class<=)
 
 : class<= ( first second -- ? )
@@ -55,7 +63,7 @@ DEFER: (class-or)
     class-or-cache get [ (class-or) ] 2cache ;
 
 : superclass<= ( first second -- ? )
-    >r superclass r> class<= ;
+    swap superclass dup [ swap class<= ] [ 2drop f ] if ;
 
 : left-anonymous-union<= ( first second -- ? )
     >r members>> r> [ class<= ] curry all? ;
@@ -103,19 +111,20 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
 
 : (class<=) ( first second -- -1/0/1 )
     2dup eq? [ 2drop t ] [
-        [ normalize-class ] bi@ {
-            { [ dup empty-intersection? ] [ 2drop t ] }
-            { [ over empty-union? ] [ 2drop t ] }
-            { [ 2dup [ anonymous-complement? ] both? ] [ anonymous-complement<= ] }
-            { [ over anonymous-union? ] [ left-anonymous-union<= ] }
-            { [ over anonymous-intersection? ] [ left-anonymous-intersection<= ] }
-            { [ over nontrivial-anonymous-complement? ] [ left-anonymous-complement<= ] }
-            { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
-            { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
-            { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
-            { [ over superclass ] [ superclass<= ] }
-            [ 2drop f ]
-        } cond
+        2dup superclass<= [ 2drop t ] [
+            [ normalize-class ] bi@ {
+                { [ dup empty-intersection? ] [ 2drop t ] }
+                { [ over empty-union? ] [ 2drop t ] }
+                { [ 2dup [ anonymous-complement? ] both? ] [ anonymous-complement<= ] }
+                { [ over anonymous-union? ] [ left-anonymous-union<= ] }
+                { [ over anonymous-intersection? ] [ left-anonymous-intersection<= ] }
+                { [ over nontrivial-anonymous-complement? ] [ left-anonymous-complement<= ] }
+                { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
+                { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
+                { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
+                [ 2drop f ]
+            } cond
+        ] if
     ] if ;
 
 M: anonymous-union (classes-intersect?)

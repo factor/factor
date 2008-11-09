@@ -9,7 +9,7 @@ IN: io.encodings.ascii
 
 : decode-if< ( stream encoding max -- character )
     nip swap stream-read1 dup
-    [ tuck > [ drop replacement-char ] unless ] [ 2drop f ] if ; inline
+    [ tuck > [ >fixnum ] [ drop replacement-char ] if ] [ 2drop f ] if ; inline
 PRIVATE>
 
 SINGLETON: ascii

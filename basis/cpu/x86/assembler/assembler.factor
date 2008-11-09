@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays compiler.generator.fixup io.binary kernel
-combinators kernel.private math namespaces make sequences
-words system layouts math.order accessors
-cpu.x86.assembler.syntax ;
+USING: arrays cpu.architecture compiler.constants
+compiler.codegen.fixup io.binary kernel combinators
+kernel.private math namespaces make sequences words system
+layouts math.order accessors cpu.x86.assembler.syntax ;
 IN: cpu.x86.assembler
 
 ! A postfix assembler for x86 and AMD64.
@@ -64,18 +64,18 @@ M: indirect extended? base>> extended? ;
 
 : canonicalize-EBP ( indirect -- indirect )
     #! { EBP } ==> { EBP 0 }
-    dup base>> { EBP RBP R13 } member? [
-        dup displacement>> [ 0 >>displacement ] unless
-    ] when ;
+    dup [ base>> { EBP RBP R13 } member? ] [ displacement>> not ] bi and
+    [ 0 >>displacement ] when ;
 
-: canonicalize-ESP ( indirect -- indirect )
-    #! { ESP } ==> { ESP ESP }
-    dup base>> { ESP RSP R12 } member? [ ESP >>index ] when ;
+ERROR: bad-index indirect ;
+
+: check-ESP ( indirect -- indirect )
+    dup index>> { ESP RSP } memq? [ bad-index ] when ;
 
 : canonicalize ( indirect -- indirect )
     #! Modify the indirect to work around certain addressing mode
     #! quirks.
-    canonicalize-EBP canonicalize-ESP ;
+    canonicalize-EBP check-ESP ;
 
 : <indirect> ( base index scale displacement -- indirect )
     indirect boa canonicalize ;
@@ -91,7 +91,7 @@ M: indirect extended? base>> extended? ;
 GENERIC: sib-present? ( op -- ? )
 
 M: indirect sib-present?
-    [ base>> { ESP RSP } member? ] [ index>> ] [ scale>> ] tri or or ;
+    [ base>> { ESP RSP R12 } member? ] [ index>> ] [ scale>> ] tri or or ;
 
 M: register sib-present? drop f ;
 
@@ -254,7 +254,8 @@ M: object operand-64? drop f ;
     reg-code swap addressing ;
 
 : direction-bit ( dst src op -- dst' src' op' )
-    pick register? [ BIN: 10 opcode-or swapd ] when ;
+    pick register? pick register? not and
+    [ BIN: 10 opcode-or swapd ] when ;
 
 : operand-size-bit ( dst src op -- dst' src' op' )
     over register-8? [ BIN: 1 opcode-or ] unless ;
@@ -378,6 +379,8 @@ GENERIC: CMP ( dst src -- )
 M: immediate CMP swap { BIN: 111 t HEX: 80 } immediate-1/4 ;
 M: operand CMP OCT: 070 2-operand ;
 
+: XCHG ( dst src -- ) OCT: 207 2-operand ;
+
 : NOT  ( dst -- ) { BIN: 010 t HEX: f7 } 1-operand ;
 : NEG  ( dst -- ) { BIN: 011 t HEX: f7 } 1-operand ;
 : MUL  ( dst -- ) { BIN: 100 t HEX: f7 } 1-operand ;
@@ -388,13 +391,20 @@ M: operand CMP OCT: 070 2-operand ;
 : CDQ ( -- ) HEX: 99 , ;
 : CQO ( -- ) HEX: 48 , CDQ ;
 
-: ROL ( dst n -- ) swap { BIN: 000 t HEX: c0 } immediate-1 ;
-: ROR ( dst n -- ) swap { BIN: 001 t HEX: c0 } immediate-1 ;
-: RCL ( dst n -- ) swap { BIN: 010 t HEX: c0 } immediate-1 ;
-: RCR ( dst n -- ) swap { BIN: 011 t HEX: c0 } immediate-1 ;
-: SHL ( dst n -- ) swap { BIN: 100 t HEX: c0 } immediate-1 ;
-: SHR ( dst n -- ) swap { BIN: 101 t HEX: c0 } immediate-1 ;
-: SAR ( dst n -- ) swap { BIN: 111 t HEX: c0 } immediate-1 ;
+: (SHIFT) ( dst src op -- )
+    over CL eq? [
+        nip t HEX: d3 3array 1-operand
+    ] [
+        swapd t HEX: c0 3array immediate-1
+    ] if ; inline
+
+: ROL ( dst n -- ) BIN: 000 (SHIFT) ;
+: ROR ( dst n -- ) BIN: 001 (SHIFT) ;
+: RCL ( dst n -- ) BIN: 010 (SHIFT) ;
+: RCR ( dst n -- ) BIN: 011 (SHIFT) ;
+: SHL ( dst n -- ) BIN: 100 (SHIFT) ;
+: SHR ( dst n -- ) BIN: 101 (SHIFT) ;
+: SAR ( dst n -- ) BIN: 111 (SHIFT) ;
 
 GENERIC: IMUL2 ( dst src -- )
 M: immediate IMUL2 swap dup reg-code t HEX: 68 3array immediate-1/4 ;
@@ -402,6 +412,12 @@ M: operand IMUL2 OCT: 257 extended-opcode (2-operand) ;
 
 : MOVSX ( dst src -- )
     dup register-32? OCT: 143 OCT: 276 extended-opcode ?
+    over register-16? [ BIN: 1 opcode-or ] when
+    swapd
+    (2-operand) ;
+
+: MOVZX ( dst src -- )
+    OCT: 266 extended-opcode
     over register-16? [ BIN: 1 opcode-or ] when
     swapd
     (2-operand) ;
@@ -429,6 +445,10 @@ M: operand IMUL2 OCT: 257 extended-opcode (2-operand) ;
 ! CPU Identification
 
 : CPUID ( -- ) HEX: a2 extended-opcode, ;
+
+! Misc
+
+: NOP ( -- ) HEX: 90 , ;
 
 ! x87 Floating Point Unit
 

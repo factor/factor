@@ -60,3 +60,12 @@ PRIVATE>
 
 : with-secure-random ( quot -- )
     secure-random-generator get swap with-random ; inline
+
+USE: vocabs.loader
+
+{
+    { [ os windows? ] [ "random.windows" require ] }
+    { [ os unix? ] [ "random.unix" require ] }
+} cond
+
+"random.mersenne-twister" require

@@ -83,8 +83,6 @@ IN: math.intervals.tests
     0 1 (a,b) 1 2 [a,b] interval-union 0 2 (a,b] =
 ] unit-test
 
-[ f ] [ 0 1 (a,b) f interval-union ] unit-test
-
 [ t ] [
     0 1 (a,b) 0 1 [a,b] interval-intersect 0 1 (a,b) =
 ] unit-test

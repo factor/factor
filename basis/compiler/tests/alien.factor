@@ -173,7 +173,7 @@ C-STRUCT: rect
     { "float" "h" }
 ;
 
-: <rect>
+: <rect> ( x y w h -- rect )
     "rect" <c-object>
     [ set-rect-h ] keep
     [ set-rect-w ] keep

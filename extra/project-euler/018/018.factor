@@ -74,7 +74,7 @@ PRIVATE>
     source-018 propagate-all first first ;
 
 ! [ euler018 ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run time - 0.29 SD (100 trials)
 
 
 ! ALTERNATE SOLUTIONS
@@ -84,6 +84,6 @@ PRIVATE>
     source-018 max-path ;
 
 ! [ euler018a ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run time - 0.39 SD (100 trials)
 
 MAIN: euler018a

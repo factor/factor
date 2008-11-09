@@ -1,7 +1,8 @@
 USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
 accessors generic eval combinators combinators.short-circuit
-combinators.short-circuit.smart math.order math.functions ;
+combinators.short-circuit.smart math.order math.functions
+definitions compiler.units ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -377,6 +378,12 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 \ big-case-test must-infer
 
 [ 9 ] [ 3 big-case-test ] unit-test
+
+GENERIC: lambda-method-forget-test ( a -- b )
+
+M:: integer lambda-method-forget-test ( a -- b ) ;
+
+[ ] [ [ { integer lambda-method-forget-test } forget ] with-compilation-unit ] unit-test
 
 ! :: wlet-&&-test ( a -- ? )
 !     [wlet | is-integer? [ a integer? ]

@@ -10,7 +10,7 @@ IN: stack-checker
 GENERIC: infer ( quot -- effect )
 
 M: callable infer ( quot -- effect )
-    [ recursive-state get infer-quot ] with-infer drop ;
+    [ infer-quot-here ] with-infer drop ;
 
 : infer. ( quot -- )
     #! Safe to call from inference transforms.

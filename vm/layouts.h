@@ -52,13 +52,12 @@ typedef signed long long s64;
 #define BYTE_ARRAY_TYPE 10
 #define CALLSTACK_TYPE 11
 #define STRING_TYPE 12
-#define TUPLE_LAYOUT_TYPE 13
+#define WORD_TYPE 13
 #define QUOTATION_TYPE 14
 #define DLL_TYPE 15
 #define ALIEN_TYPE 16
-#define WORD_TYPE 17
 
-#define TYPE_COUNT 20
+#define TYPE_COUNT 17
 
 INLINE bool immediate_p(CELL obj)
 {
@@ -154,7 +153,8 @@ typedef struct {
 
 /* Assembly code makes assumptions about the layout of this struct */
 typedef struct {
-/* C sucks. */
+/* We use a union here to force the float value to be aligned on an
+8-byte boundary. */
 	union {
 		CELL header;
 		long long padding;
@@ -222,17 +222,17 @@ typedef struct
 	CELL size;
 } F_STACK_FRAME;
 
+/* These are really just arrays, but certain elements have special
+significance */
 typedef struct
 {
 	CELL header;
-	/* tagged fixnum */
-	CELL hashcode;
+	/* tagged */
+	CELL capacity;
 	/* tagged */
 	CELL class;
 	/* tagged fixnum */
 	CELL size;
-	/* tagged array */
-	CELL superclasses;
 	/* tagged fixnum */
 	CELL echelon;
 } F_TUPLE_LAYOUT;

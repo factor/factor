@@ -450,7 +450,7 @@ M: lambda-method definition
     "lambda" word-prop body>> ;
 
 M: lambda-method reset-word
-    [ f "lambda" set-word-prop ] [ call-next-method ] bi ;
+    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
 
 INTERSECTION: lambda-memoized memoized lambda-word ;
 

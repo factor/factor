@@ -9,23 +9,32 @@ SYMBOL: inlined-dependency
 SYMBOL: flushed-dependency
 SYMBOL: called-dependency
 
+<PRIVATE
+
+: set-in-unit ( value key assoc -- )
+    [ set-at ] [ no-compilation-unit ] if* ;
+
+PRIVATE>
+
 SYMBOL: changed-definitions
 
 : changed-definition ( defspec -- )
-    inlined-dependency swap changed-definitions get
-    [ set-at ] [ no-compilation-unit ] if* ;
+    inlined-dependency swap changed-definitions get set-in-unit ;
 
 SYMBOL: changed-generics
 
 : changed-generic ( class generic -- )
-    changed-generics get
-    [ set-at ] [ no-compilation-unit ] if* ;
+    changed-generics get set-in-unit ;
+
+SYMBOL: remake-generics
+
+: remake-generic ( generic -- )
+    dup remake-generics get set-in-unit ;
 
 SYMBOL: new-classes
 
 : new-class ( word -- )
-    dup new-classes get
-    [ set-at ] [ no-compilation-unit ] if* ;
+    dup new-classes get set-in-unit ;
 
 : new-class? ( word -- ? )
     new-classes get key? ;

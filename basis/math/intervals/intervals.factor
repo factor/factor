@@ -115,14 +115,10 @@ TUPLE: interval { from read-only } { to read-only } ;
         { [ dup empty-interval eq? ] [ nip ] }
         { [ over empty-interval eq? ] [ drop ] }
         [
-            2dup and [
-                [ interval>points ] bi@ swapd
-                [ [ swap endpoint< ] most ]
-                [ [ swap endpoint> ] most ] 2bi*
-                <interval>
-            ] [
-                or
-            ] if
+            [ interval>points ] bi@ swapd
+            [ [ swap endpoint< ] most ]
+            [ [ swap endpoint> ] most ] 2bi*
+            <interval>
         ]
     } cond ;
 
@@ -133,13 +129,7 @@ TUPLE: interval { from read-only } { to read-only } ;
     {
         { [ dup empty-interval eq? ] [ drop ] }
         { [ over empty-interval eq? ] [ nip ] }
-        [
-            2dup and [
-                [ interval>points 2array ] bi@ append points>interval
-            ] [
-                2drop f
-            ] if
-        ]
+        [ [ interval>points 2array ] bi@ append points>interval ]
     } cond ;
 
 : interval-subset? ( i1 i2 -- ? )
@@ -183,7 +173,6 @@ TUPLE: interval { from read-only } { to read-only } ;
 : interval-length ( int -- n )
     {
         { [ dup empty-interval eq? ] [ drop 0 ] }
-        { [ dup not ] [ drop 0 ] }
         [ interval>points [ first ] bi@ swap - ]
     } cond ;
 
