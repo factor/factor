@@ -97,7 +97,7 @@ M: list focusable-child* drop t ;
     ] if ;
 
 : select-gadget ( gadget list -- )
-    swap over children>> index
+    tuck children>> index
     [ swap select-index ] [ drop ] if* ;
 
 : clamp-loc ( point max -- point )
