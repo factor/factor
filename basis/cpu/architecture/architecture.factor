@@ -146,8 +146,14 @@ HOOK: struct-small-enough? cpu ( heap-size -- ? )
 ! Do we pass value structs by value or hidden reference?
 HOOK: value-structs? cpu ( -- ? )
 
-! If t, fp parameters are shadowed by dummy int parameters
-HOOK: fp-shadows-int? cpu ( -- ? )
+! If t, all parameters are shadowed by dummy stack parameters
+HOOK: dummy-stack-params? cpu ( -- ? )
+
+! If t, all FP parameters are shadowed by dummy int parameters
+HOOK: dummy-int-params? cpu ( -- ? )
+
+! If t, all int parameters are shadowed by dummy FP parameters
+HOOK: dummy-fp-params? cpu ( -- ? )
 
 HOOK: %prepare-unbox cpu ( -- )
 

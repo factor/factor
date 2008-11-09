@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make math math.parser sequences accessors
+USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
 alien.strings alien.arrays sets threads libc continuations.private
@@ -234,13 +234,26 @@ M: float-regs reg-class-variable drop float-regs ;
 
 GENERIC: inc-reg-class ( register-class -- )
 
-M: reg-class inc-reg-class
-    dup reg-class-variable inc
-    fp-shadows-int? [ reg-size stack-params +@ ] [ drop ] if ;
+: ?dummy-stack-params ( reg-class -- )
+    dummy-stack-params? [ reg-size stack-params +@ ] [ drop ] if ;
+
+: ?dummy-int-params ( reg-class -- )
+    dummy-int-params? [ reg-size cell /i 1 max int-regs +@ ] [ drop ] if ;
+
+: ?dummy-fp-params ( reg-class -- )
+    drop dummy-fp-params? [ float-regs inc ] when ;
+
+M: int-regs inc-reg-class
+    [ reg-class-variable inc ]
+    [ ?dummy-stack-params ]
+    [ ?dummy-fp-params ]
+    tri ;
 
 M: float-regs inc-reg-class
-    dup call-next-method
-    fp-shadows-int? [ reg-size cell /i int-regs +@ ] [ drop ] if ;
+    [ reg-class-variable inc ]
+    [ ?dummy-stack-params ]
+    [ ?dummy-int-params ]
+    tri ;
 
 GENERIC: reg-class-full? ( class -- ? )
 
