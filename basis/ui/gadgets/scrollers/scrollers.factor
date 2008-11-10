@@ -73,7 +73,7 @@ scroller H{
 
 : find-scroller* ( gadget -- scroller/f )
     dup find-scroller
-        { [ nip ] [ viewport>> gadget-child swap child? ] [ nip ] }
+    { [ nip ] [ viewport>> gadget-child swap child? ] [ nip ] }
     2&& ;
 
 : scroll>rect ( rect gadget -- )
