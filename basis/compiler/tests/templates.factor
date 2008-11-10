@@ -219,3 +219,14 @@ TUPLE: my-tuple ;
 : bad-value-bug ( a -- b ) [ 3 ] [ 3 ] if f <array> ;
 
 [ { f f f } ] [ t bad-value-bug ] unit-test
+
+! PowerPC regression
+TUPLE: id obj ;
+
+: (gc-check-bug) ( a b -- c )
+    { [ id boa ] [ id boa ] } dispatch ;
+
+: gc-check-bug ( -- )
+    10000000 [ "hi" 0 (gc-check-bug) drop ] times ;
+
+[ ] [ gc-check-bug ] unit-test

@@ -487,7 +487,7 @@ M: ebnf-terminal (transform) ( ast -- parser )
 M: ebnf-foreign (transform) ( ast -- parser )
   dup word>> search
   [ "Foreign word '" swap word>> append "' not found" append throw ] unless*
-  swap rule>> [ main ] unless* dupd swap rule [
+  swap rule>> [ main ] unless* over rule [
     nip
   ] [
     execute
