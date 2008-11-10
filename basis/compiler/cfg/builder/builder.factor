@@ -171,6 +171,7 @@ M: #if emit-node
             [
                 V{ } clone node-stack set
                 ##prologue
+                begin-basic-block
                 emit-nodes
                 basic-block get [
                     ##epilogue
