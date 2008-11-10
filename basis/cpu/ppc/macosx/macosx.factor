@@ -18,4 +18,8 @@ M: float-regs param-regs drop { 1 2 3 4 5 6 7 8 9 10 11 12 13 } ;
 
 M: ppc value-structs? t ;
 
-M: ppc fp-shadows-int? t ;
+M: ppc dummy-stack-params? t ;
+
+M: ppc dummy-int-params? t ;
+
+M: ppc dummy-fp-params? f ;

@@ -21,9 +21,9 @@ IN: hexdump
     [ >hex-digit ] { } map-as concat 48 CHAR: \s pad-right ;
 
 : >ascii ( bytes -- str )
-    [ [ printable? ] keep CHAR: . ? ] map ;
+    [ [ printable? ] keep CHAR: . ? ] "" map-as ;
 
-: write-hex-line ( str lineno -- )
+: write-hex-line ( bytes lineno -- )
     write-offset [ >hex-digits write ] [ >ascii write ] bi nl ;
 
 PRIVATE>

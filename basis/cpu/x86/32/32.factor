@@ -274,6 +274,12 @@ M: x86.32 %callback-return ( n -- )
         [ drop 0 ]
     } cond RET ;
 
+M: x86.32 dummy-stack-params? f ;
+
+M: x86.32 dummy-int-params? f ;
+
+M: x86.32 dummy-fp-params? f ;
+
 os windows? [
     cell "longlong" c-type (>>align)
     cell "ulonglong" c-type (>>align)

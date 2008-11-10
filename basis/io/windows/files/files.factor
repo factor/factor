@@ -276,7 +276,7 @@ M: winnt file-system-info ( path -- file-system-info )
         swap >>type
         swap >>mount-point ;
 
-: find-first-volume ( word -- string handle )
+: find-first-volume ( -- string handle )
     MAX_PATH 1+ <byte-array> dup length
     dupd
     FindFirstVolume dup win32-error=0/f

@@ -117,7 +117,7 @@ CELL frame_executing(F_STACK_FRAME *frame)
 F_STACK_FRAME *frame_successor(F_STACK_FRAME *frame)
 {
 	if(frame->size == 0)
-		critical_error("Stack frame has zero size",frame);
+		critical_error("Stack frame has zero size",(CELL)frame);
 	return (F_STACK_FRAME *)((CELL)frame - frame->size);
 }
 
