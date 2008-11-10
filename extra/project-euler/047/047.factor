@@ -66,7 +66,7 @@ SYMBOL: sieve
     0 <repetition> >array sieve set ;
 
 : is-prime? ( index -- ? )
-    sieve get nth zero? ;
+    sieve get nth 0 = ;
 
 : multiples ( n -- seq )
     sieve get length 1- over <range> ;

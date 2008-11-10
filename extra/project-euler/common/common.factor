@@ -42,7 +42,7 @@ IN: project-euler.common
 
 : (sum-divisors) ( n -- sum )
     dup sqrt >fixnum [1,b] [
-        [ 2dup mod zero? [ 2dup / + , ] [ drop ] if ] each
+        [ 2dup mod 0 = [ 2dup / + , ] [ drop ] if ] each
         dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
     ] { } make sum ;
 
@@ -68,7 +68,7 @@ PRIVATE>
     ] if ;
 
 : number>digits ( n -- seq )
-    [ dup zero? not ] [ 10 /mod ] [ ] produce reverse nip ;
+    [ dup 0 = not ] [ 10 /mod ] [ ] produce reverse nip ;
 
 : nth-triangle ( n -- n )
     dup 1+ * 2 / ;
@@ -112,7 +112,7 @@ PRIVATE>
     factor-2s dup [ 1+ ]
     [ perfect-square? -1 0 ? ]
     [ dup sqrt >fixnum [1,b] ] tri* [
-        dupd mod zero? [ [ 2 + ] dip ] when
+        dupd mod 0 = [ [ 2 + ] dip ] when
     ] each drop * ;
 
 ! These transforms are for generating primitive Pythagorean triples
