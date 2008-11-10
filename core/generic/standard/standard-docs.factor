@@ -16,7 +16,7 @@ HELP: standard-combination
 { $examples
     "A generic word for append strings and characters to a sequence, dispatching on the object underneath the top of the stack:"
     { $code
-        "G: build-string 1 standard-combination ;"
+        "GENERIC# build-string 1 ( elt str -- )"
         "M: string build-string swap push-all ;"
         "M: integer build-string push ;"
     }
