@@ -17,7 +17,7 @@ ARTICLE: "tools.test.run" "Running unit tests"
 { $subsection test-all } ;
 
 ARTICLE: "tools.test.failure" "Handling test failures"
-"Most of the time the words documented in " { $link "tools.test.run" } " are used because they print all test failures in human-readable form. Sometimes, you want to develop a tool which inspects the test failures and takes some kind of action instead; one example is " { $vocab-link "builder" } "."
+"Most of the time the words documented in " { $link "tools.test.run" } " are used because they print all test failures in human-readable form. Some tools inspect the test failures and takes some kind of action instead, for example, " { $vocab-link "mason" } "."
 $nl
 "The following words output an association list mapping vocabulary names to sequences of failures; a failure is an array having the shape " { $snippet "{ error test continuation }" } ", and the elements are as follows:"
 { $list
