@@ -4,7 +4,8 @@ USING: accessors arrays ui.gadgets ui.gadgets.viewports
 ui.gadgets.frames ui.gadgets.grids ui.gadgets.theme
 ui.gadgets.sliders ui.gestures kernel math namespaces sequences
 models models.range models.compose
-combinators math.vectors classes.tuple math.geometry.rect ;
+combinators math.vectors classes.tuple math.geometry.rect
+combinators.short-circuit ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller < frame viewport x y follows ;
@@ -70,13 +71,10 @@ scroller H{
 : relative-scroll-rect ( rect gadget scroller -- newrect )
     viewport>> gadget-child relative-loc offset-rect ;
 
-: find-scroller* ( gadget -- scroller )
-    dup find-scroller dup [
-        2dup viewport>> gadget-child
-        swap child? [ nip ] [ 2drop f ] if
-    ] [
-        2drop f
-    ] if ;
+: find-scroller* ( gadget -- scroller/f )
+    dup find-scroller
+    { [ nip ] [ viewport>> gadget-child swap child? ] [ nip ] }
+    2&& ;
 
 : scroll>rect ( rect gadget -- )
     dup find-scroller* dup [
