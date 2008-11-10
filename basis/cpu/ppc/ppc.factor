@@ -349,12 +349,17 @@ M: ppc %gc
     "end" resolve-label ;
 
 M: ppc %prologue ( n -- )
-    0 scratch-reg LOAD32 rc-absolute-ppc-2/2 rel-this
+    #! We use a volatile register (r11) here for scratch. Because
+    #! callback bodies have a prologue too, we cannot assume
+    #! that c_to_factor saved all non-volatile registers, so
+    #! we have to respect the C calling convention. Also, we
+    #! cannot touch any param-regs either.
+    0 11 LOAD32 rc-absolute-ppc-2/2 rel-this
     0 MFLR
     1 1 pick neg ADDI
-    scratch-reg 1 pick xt-save STW
-    dup scratch-reg LI
-    scratch-reg 1 pick next-save STW
+    11 1 pick xt-save STW
+    dup 11 LI
+    11 1 pick next-save STW
     0 1 rot lr-save + STW ;
 
 M: ppc %epilogue ( n -- )
