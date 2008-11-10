@@ -1,8 +1,8 @@
 ! Copyright (c) 2007-2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make math math.functions math.matrices math.miller-rabin
-    math.order math.parser math.primes.factors math.ranges sequences
-    sequences.lib sorting strings unicode.case ;
+    math.order math.parser math.primes.factors math.ranges math.ratios
+    sequences sequences.lib sorting strings unicode.case ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -14,6 +14,7 @@ IN: project-euler.common
 ! cartesian-product - #4, #27, #29, #32, #33, #43, #44, #56
 ! log10 - #25, #134
 ! max-path - #18, #67
+! mediant - #71, #73
 ! nth-triangle - #12, #42
 ! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56, #92
 ! palindrome? - #4, #36, #55
@@ -59,6 +60,9 @@ PRIVATE>
 
 : log10 ( m -- n )
     log 10 log / ;
+
+: mediant ( a/c b/d -- (a+b)/(c+d) )
+    2>fraction [ + ] 2bi@ / ;
 
 : max-path ( triangle -- n )
     dup length 1 > [

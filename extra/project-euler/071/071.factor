@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.ratios sequences ;
+USING: kernel math project-euler.common sequences ;
 IN: project-euler.071
 
 ! http://projecteuler.net/index.php?section=problems&id=71
@@ -36,9 +36,6 @@ IN: project-euler.071
 
 : penultimate ( seq -- elt )
     dup length 2 - swap nth ;
-
-: mediant ( a/c b/d -- [a+b]/[c+d] )
-    [ >fraction ] bi@ swapd [ + ] 2bi@ / ;
 
 PRIVATE>
 
