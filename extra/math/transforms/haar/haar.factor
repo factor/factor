@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs columns grouping kernel math math.statistics math.vectors
     sequences ;
-IN: math.haar
+IN: math.transforms.haar
 
 ! Haar Wavelet Transform -- http://dmr.ath.cx/gfx/haar/
 

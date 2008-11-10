@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: columns grouping kernel math math.constants math.functions math.vectors
     sequences ;
-IN: math.fft
+IN: math.transforms.fft
 
 ! Fast Fourier Transform
 
