@@ -34,7 +34,7 @@ slots ;
 
 : null-info T{ value-info f null empty-interval } ; inline
 
-: object-info T{ value-info f object T{ interval f { -1.0/0.0 t } { 1.0/0.0 t } } } ; inline
+: object-info T{ value-info f object full-interval } ; inline
 
 : class-interval ( class -- interval )
     dup real class<=
@@ -43,7 +43,7 @@ slots ;
 : interval>literal ( class interval -- literal literal? )
     #! If interval has zero length and the class is sufficiently
     #! precise, we can turn it into a literal
-    dup empty-interval eq? [
+    dup special-interval? [
         2drop f f
     ] [
         dup from>> first {
@@ -243,7 +243,7 @@ DEFER: (value-info-union)
 : literals<= ( info1 info2 -- ? )
     {
         { [ dup literal?>> not ] [ 2drop t ] }
-        { [ over literal?>> not ] [ 2drop f ] }
+        { [ over literal?>> not ] [ drop class>> null-class? ] }
         [ [ literal>> ] bi@ eql? ]
     } cond ;
 
