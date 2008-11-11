@@ -176,7 +176,7 @@ find_os() {
         *FreeBSD*) OS=freebsd;;
         *OpenBSD*) OS=openbsd;;
         *DragonFly*) OS=dragonflybsd;;
-    	SunOS) OS=solaris;;
+        SunOS) OS=solaris;;
     esac
 }
 
@@ -264,7 +264,7 @@ check_os_arch_word() {
         $ECHO "WORD: $WORD"
         $ECHO "OS, ARCH, or WORD is empty.  Please report this."
 
-    	echo $MAKE_TARGET
+        echo $MAKE_TARGET
         exit 5
     fi
 }
@@ -339,9 +339,21 @@ cd_factor() {
     check_ret cd
 }
 
+check_makefile_exists() {
+    if [[ ! -e "Makefile" ]] ; then
+        echo ""
+        echo "***Makefile not found***"
+        echo "You are likely in the wrong directory."
+        echo "Run this script from your factor directory:"
+        echo "     ./build-support/factor.sh"
+        exit 6
+    fi
+}
+
 invoke_make() {
-   $MAKE $MAKE_OPTS $*
-   check_ret $MAKE
+    check_makefile_exists
+    $MAKE $MAKE_OPTS $*
+    check_ret $MAKE
 }
 
 make_clean() {
