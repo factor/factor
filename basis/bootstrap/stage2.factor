@@ -32,18 +32,15 @@ SYMBOL: bootstrap-time
 : count-words ( pred -- )
     all-words swap count number>string write ;
 
-: print-report ( -- )
-    core-bootstrap-time get
+: print-time ( time -- )
     1000 /i
     60 /mod swap
-    "Core bootstrap completed in " write number>string write
-    " minutes and " write number>string write " seconds." print
+    number>string write
+    " minutes and " write number>string write " seconds." print ;
 
-    bootstrap-time get
-    1000 /i
-    60 /mod swap
-    "Bootstrap completed in " write number>string write
-    " minutes and " write number>string write " seconds." print
+: print-report ( -- )
+    "Core bootstrap completed in " write core-bootstrap-time get print-time
+    "Bootstrap completed in "      write bootstrap-time      get print-time
 
     [ compiled>> ] count-words " compiled words" print
     [ symbol? ] count-words " symbol words" print
