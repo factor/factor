@@ -8,6 +8,8 @@ definitions assocs compiler.errors compiler.units
 math.parser generic sets debugger command-line ;
 IN: bootstrap.stage2
 
+SYMBOL: core-bootstrap-time
+
 SYMBOL: bootstrap-time
 
 : default-image-name ( -- string )
@@ -30,7 +32,14 @@ SYMBOL: bootstrap-time
 : count-words ( pred -- )
     all-words swap count number>string write ;
 
-: print-report ( time -- )
+: print-report ( -- )
+    core-bootstrap-time get
+    1000 /i
+    60 /mod swap
+    "Core bootstrap completed in " write number>string write
+    " minutes and " write number>string write " seconds." print
+
+    bootstrap-time get
     1000 /i
     60 /mod swap
     "Bootstrap completed in " write number>string write
@@ -46,7 +55,7 @@ SYMBOL: bootstrap-time
 
 [
     ! We time bootstrap
-    millis >r
+    millis
 
     default-image-name "output-image" set-global
 
@@ -71,6 +80,8 @@ SYMBOL: bootstrap-time
     [
         load-components
 
+        millis over - core-bootstrap-time set-global
+
         run-bootstrap-init
     ] with-compiler-errors
     :errors
@@ -92,7 +103,7 @@ SYMBOL: bootstrap-time
             ] [ print-error 1 exit ] recover
         ] set-boot-quot
 
-        millis r> - dup bootstrap-time set-global
+        millis swap - bootstrap-time set-global
         print-report
 
         "output-image" get save-image-and-exit
