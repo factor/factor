@@ -7,7 +7,7 @@
 
 
 USING: cairo.ffi math math.constants byte-arrays kernel ui ui.render
-           ui.gadgets opengl.gl ;
+           ui.gadgets opengl.gl accessors ;
 
 IN: cairo-demo
 
@@ -20,17 +20,16 @@ IN: cairo-demo
   cairo_image_surface_create_for_data ;
 
 
-TUPLE: cairo-gadget image-array cairo-t ;
+TUPLE: cairo-gadget < gadget image-array cairo-t ;
 
 M: cairo-gadget draw-gadget* ( gadget -- )
     0 0 glRasterPos2i
     1.0 -1.0 glPixelZoom
     >r 384 256 GL_RGBA GL_UNSIGNED_BYTE r>
-    cairo-gadget-image-array glDrawPixels ;
+    image-array>> glDrawPixels ;
 
 : create-surface ( gadget -- cairo_surface_t )
-    make-image-array
-    [ swap set-cairo-gadget-image-array ] keep
+    make-image-array [ swap (>>image-array) ] keep
     convert-array-to-surface ;
 
 : init-cairo ( gadget -- cairo_t )
@@ -39,7 +38,7 @@ M: cairo-gadget draw-gadget* ( gadget -- )
 M: cairo-gadget pref-dim* drop { 384 256 0 } ;
 
 : draw-hello-world ( gadget -- )
-  cairo-gadget-cairo-t
+  cairo-t>>
   dup "Sans" CAIRO_FONT_SLANT_NORMAL CAIRO_FONT_WEIGHT_BOLD cairo_select_font_face
   dup 90.0 cairo_set_font_size
   dup 10.0 135.0 cairo_move_to
@@ -58,13 +57,13 @@ M: cairo-gadget pref-dim* drop { 384 256 0 } ;
   cairo_fill ;
 
 M: cairo-gadget graft* ( gadget -- )
-  dup dup init-cairo swap set-cairo-gadget-cairo-t draw-hello-world ;
+  dup dup init-cairo swap (>>cairo-t) draw-hello-world ;
 
 M: cairo-gadget ungraft* ( gadget -- )
-   cairo-gadget-cairo-t cairo_destroy ;
+   cairo-t>> cairo_destroy ;
 
 : <cairo-gadget> ( -- gadget )
-  cairo-gadget construct-gadget ;
+  cairo-gadget new-gadget ;
 
 : run ( -- )
   [
