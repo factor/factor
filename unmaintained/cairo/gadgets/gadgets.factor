@@ -3,7 +3,7 @@
 USING: sequences math opengl.gadgets kernel
 byte-arrays cairo.ffi cairo io.backend
 ui.gadgets accessors opengl.gl
-arrays ;
+arrays fry classes ;
 
 IN: cairo.gadgets
 
@@ -15,21 +15,22 @@ IN: cairo.gadgets
     [ cairo_image_surface_create_for_data ] 3bi
     r> with-cairo-from-surface ; inline
 
-TUPLE: cairo-gadget < texture-gadget dim quot ;
+TUPLE: cairo-gadget < texture-gadget ;
 
-: <cairo-gadget> ( dim quot -- gadget )
-    cairo-gadget construct-gadget
-        swap >>quot
+: <cairo-gadget> ( dim -- gadget )
+    cairo-gadget new-gadget
         swap >>dim ;
 
-M: cairo-gadget cache-key* [ dim>> ] [ quot>> ] bi 2array ;
+M: cairo-gadget cache-key* [ dim>> ] [ class ] bi 2array ;
 
 : render-cairo ( dim quot -- bytes format )
     >r 2^-bounds r> copy-cairo GL_BGRA ; inline
 
-! M: cairo-gadget render*
-!     [ dim>> dup ] [ quot>> ] bi
-!     render-cairo render-bytes* ;
+GENERIC: render-cairo* ( gadget -- )
+
+M: cairo-gadget render*
+    [ dim>> dup ] [ '[ _ render-cairo* ] ] bi
+    render-cairo render-bytes* ;
 
 ! maybe also texture>png
 ! : cairo>png ( gadget path -- )
@@ -44,7 +45,7 @@ M: cairo-gadget cache-key* [ dim>> ] [ quot>> ] bi 2array ;
 
 TUPLE: png-gadget < texture-gadget path ;
 : <png> ( path -- gadget )
-    png-gadget construct-gadget
+    png-gadget new-gadget
         swap >>path ;
 
 M: png-gadget render*

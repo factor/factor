@@ -10,7 +10,7 @@ alien.c-types accessors sequences arrays ui.gadgets ;
 IN: cairo.ffi
 << "cairo" {
     { [ os winnt? ] [ "libcairo-2.dll" ] }
-    { [ os macosx? ] [ "libcairo.dylib" ] }
+    { [ os macosx? ] [ "/opt/local/lib/libcairo.dylib" ] }
     { [ os unix? ] [ "libcairo.so.2" ] }
 } cond "cdecl" add-library >>
 

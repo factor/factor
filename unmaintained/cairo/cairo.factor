@@ -33,4 +33,4 @@ SYMBOL: cairo
     >r <cairo-surface-t> r> [ (with-surface) ] curry with-disposal ; inline
 
 : with-cairo-from-surface ( cairo_surface quot -- )
-    '[ cairo_create , with-cairo ] with-surface ; inline
+    '[ cairo_create _ with-cairo ] with-surface ; inline
