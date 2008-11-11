@@ -134,3 +134,6 @@ IN: math.functions.tests
 [ -4.0 ] [ -4.4 round ] unit-test
 [ 5.0 ] [ 4.5 round ] unit-test
 [ 4.0 ] [ 4.4 round ] unit-test
+
+[ 6 59967 ] [ 3837888 factor-2s ] unit-test
+[ 6 -59967 ] [ -3837888 factor-2s ] unit-test
