@@ -80,16 +80,19 @@ M: #recursive propagate-around ( #recursive -- )
 : save-return-infos ( node infos -- )
     swap out-d>> set-value-infos ;
 
+: unless-loop ( node quot -- )
+    [ dup label>> loop?>> [ drop ] ] dip if ; inline
+
 M: #call-recursive propagate-before ( #call-recursive -- )
     [
         [ ] [ latest-input-infos ] [ recursive-phi-infos ] tri
         check-fixed-point
     ]
     [
-        dup label>> loop?>> [ drop ] [
+        [
             [ ] [ return-infos ] [ node-output-infos ] tri
             [ check-fixed-point ] [ drop save-return-infos ] 3bi
-        ] if
+        ] unless-loop
     ] bi ;
 
 M: #call-recursive annotate-node
@@ -99,10 +102,10 @@ M: #enter-recursive annotate-node
     dup out-d>> (annotate-node) ;
 
 M: #return-recursive propagate-before ( #return-recursive -- )
-    dup label>> loop?>> [ drop ] [
+    [
         [ ] [ latest-input-infos ] [ node-input-infos ] tri
         check-fixed-point
-    ] if ;
+    ] unless-loop ;
 
 M: #return-recursive annotate-node
     dup in-d>> (annotate-node) ;
