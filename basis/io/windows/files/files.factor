@@ -300,7 +300,7 @@ M: winnt file-system-info ( path -- file-system-info )
         utf16n alien>string
     ] if ;
 
-M: winnt file-systems ( -- array )
+: find-volumes ( -- array )
     find-first-volume
     [
         '[
@@ -309,8 +309,14 @@ M: winnt file-systems ( -- array )
             [ drop ] produce
             swap prefix
         ]
-    ] [ '[ _ FindVolumeClose win32-error=0/f ] ] bi [ ] cleanup
-    [ volume>paths ] map ;
+    ] [ '[ _ FindVolumeClose win32-error=0/f ] ] bi [ ] cleanup ;
+
+M: winnt file-systems ( -- array )
+    find-volumes [ volume>paths ] map
+    concat [
+        [ file-system-info ]
+        [ drop winnt-file-system-info new swap >>mount-point ] recover
+    ] map ;
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
