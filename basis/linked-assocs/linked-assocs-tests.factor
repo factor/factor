@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences assocs tools.test linked-assocs ;
+USING: kernel sequences assocs tools.test linked-assocs math ;
 IN: linked-assocs.test
 
 { { 1 2 3 } } [
@@ -46,4 +46,12 @@ IN: linked-assocs.test
     2 "q" pick set-at
     3 "a" pick set-at
     [ values ] bi@
+] unit-test
+
+{ 9 } [
+    <linked-hash>
+    { [ 3 * ] [ 1- ] }          "first"   pick set-at
+    { [ [ 1- ] bi@ ] [ 2 / ] }  "second"  pick set-at
+    4 6 pick values [ first call ] each
+    + swap values <reversed> [ second call ] each
 ] unit-test
