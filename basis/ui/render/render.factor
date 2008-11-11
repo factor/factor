@@ -23,7 +23,7 @@ SYMBOL: viewport-translation
     [ rect-intersect ] keep
     dim>> dup { 0 1 } v* viewport-translation set
     { 0 0 } over gl-viewport
-    0 swap first2 0 gluOrtho2D
+    -0.5 swap first2 [ 0.5 - ] [ 0.5 + ] bi* 0.5 gluOrtho2D
     clip set
     do-clip ;
 
@@ -103,26 +103,31 @@ GENERIC: recompute-pen ( gadget pen -- )
     ] if ;
 
 ! Solid fill/border
-TUPLE: solid < caching-pen color last-vertices ;
+TUPLE: solid < caching-pen color interior-vertices boundary-vertices ;
 
 : <solid> ( color -- solid ) solid new swap >>color ;
 
 M: solid recompute-pen
-    swap dim>> (rectangle-vertices) >>last-vertices drop ;
+    swap dim>>
+    [ (fill-rect-vertices) >>interior-vertices ]
+    [ (rect-vertices) >>boundary-vertices ]
+    bi drop ;
 
 <PRIVATE
 
 ! Solid pen
 : (solid) ( gadget pen -- )
-    [ compute-pen ]
-    [ color>> gl-color ]
-    [ last-vertices>> gl-vertex-pointer ] tri ;
+    [ compute-pen ] [ color>> gl-color ] bi ;
 
 PRIVATE>
 
-M: solid draw-interior (solid) (gl-fill-rect) ;
+M: solid draw-interior
+    [ (solid) ] [ interior-vertices>> gl-vertex-pointer ] bi
+    (gl-fill-rect) ;
 
-M: solid draw-boundary (solid) (gl-rect) ;
+M: solid draw-boundary
+    [ (solid) ] [ boundary-vertices>> gl-vertex-pointer ] bi
+    (gl-rect) ;
 
 ! Gradient pen
 TUPLE: gradient < caching-pen colors last-vertices last-colors ;
