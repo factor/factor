@@ -45,15 +45,20 @@ ARTICLE: "server-config-handler" "Client handler quotation"
 $nl
 "The two methods are equivalent, representing a functional versus an object-oriented approach to the problem." ;
 
+ARTICLE: "server-examples" "Threaded server examples"
+"The " { $vocab-link "time-server" } " vocabulary implements a simple threaded server which sends the current time to the client. The " { $vocab-link "concurrency.distributed" } ", " { $vocab-link "ftp.server" } ", and " { $vocab-link "http.server" } " vocabularies demonstrate more complex usage of the threaded server library." ;
+
 ARTICLE: "io.servers.connection" "Threaded servers"
 "The " { $vocab-link "io.servers.connection" } " vocabulary implements a generic server abstraction for " { $link "network-connection" } ". A set of threads listen for connections, and additional threads are spawned for each client connection. In addition to this basic functionality, it provides some advanced features such as logging, connection limits and secure socket support."
-{ $subsection threaded-server }
-{ $subsection "server-config" }
+{ $subsection "server-examples" }
 "Creating threaded servers with client handler quotations:"
 { $subsection <threaded-server> }
 "Client handlers can also be implemented by subclassing a threaded server; see " { $link "server-config-handler" } " for details:"
+{ $subsection threaded-server }
 { $subsection new-threaded-server }
 { $subsection handle-client* }
+"The server must be configured before it can be started." 
+{ $subsection "server-config" }
 "Starting the server:"
 { $subsection start-server }
 { $subsection start-server* }

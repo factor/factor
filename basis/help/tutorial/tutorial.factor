@@ -1,29 +1,24 @@
 USING: help.markup help.syntax ui.commands ui.operations
 ui.tools.search ui.tools.workspace editors vocabs.loader
 kernel sequences prettyprint tools.test tools.vocabs strings
-unicode.categories unicode.case ;
+unicode.categories unicode.case ui.tools.browser ;
 IN: help.tutorial
 
 ARTICLE: "first-program-start" "Creating a vocabulary for your first program"
 "Factor source code is organized into " { $link "vocabularies" } ". Before we can write our first program, we must create a vocabulary for it."
 $nl
-"Start by asking Factor for the path to your ``work'' directory, where you will place your own code:"
+"Start by loading the scaffold tool:"
+{ $code "USE: tools.scaffold" }
+"Then, ask the scaffold tool to create a new vocabulary named " { $snippet "palindrome" } ":"
+{ $code "\"resource:work\" \"palindrome\" scaffold-vocab" }
+"If you look at the output, you will see that a few files were created in your ``work'' directory. The following phrase will print the full path of your work directory:"
 { $code "\"work\" resource-path ." }
-"Open the work directory in your file manager, and create a subdirectory named " { $snippet "palindrome" } ". Inside this directory, create a file named " { $snippet "palindrome.factor" } " using your favorite text editor. Leave the file empty for now."
+"Open the work directory in your file manager, and open the subdirectory named " { $snippet "palindrome" } ". Inside this subdirectory you will see a file named " { $snippet "palindrome.factor" } ". We will be editing this file."
 $nl
-"Inside the Factor listener, type"
-{ $code "USE: palindrome" }
-"The source file should now load. Since it is empty, it does nothing. If you get an error message, make sure you created the directory and the file in the right place and gave them the right names."
-$nl
-"Now, we will start filling out this source file. Go back to your editor, and type:"
-{ $code
-    "! Copyright (C) 2008 <your name here>"
-    "! See http://factorcode.org/license.txt for BSD license."
-}
-"This is the standard header for Factor source files; it consists of two " { $link "syntax-comments" } "."
-$nl
-"Now, we tell Factor that all definitions in this source file should go into the " { $snippet "palindrome" } " vocabulary using the " { $link POSTPONE: IN: } " word:"
+"Notice that the file ends with an " { $link POSTPONE: IN: } " form telling Factor that all definitions in this source file should go into the " { $snippet "palindrome" } " vocabulary using the " { $link POSTPONE: IN: } " word:"
 { $code "IN: palindrome" }
+"We will add new definitions after the " { $link POSTPONE: IN: } " form."
+$nl
 "You are now ready to go on to the next section: " { $link "first-program-logic" } "." ;
 
 ARTICLE: "first-program-logic" "Writing some logic in your first program"
@@ -43,20 +38,16 @@ $nl
 $nl
 "When you do this, you will get an error about the " { $link dup } " word not being found. This is because this word is part of the " { $vocab-link "kernel" } " vocabulary, but this vocabulary is not part of the source file's " { $link "vocabulary-search" } ". You must explicitly list dependencies in source files. This allows Factor to automatically load required vocabularies and makes larger programs easier to maintain."
 $nl
-"To add the word to the search path, first convince yourself that this word is in the " { $vocab-link "kernel" } " vocabulary by entering the following in the listener:"
-{ $code "\\ dup see" }
-"This shows the definition of " { $link dup } ", along with an " { $link POSTPONE: IN: } " form."
+"To add the word to the search path, first convince yourself that this word is in the " { $vocab-link "kernel" } " vocabulary. Enter " { $snippet "dup" } " in the listener's input area, and press " { $operation com-follow } ". This will open the documentation browser tool, viewing the help for the " { $link dup } " word. One of the subheadings in the help article will mention the word's vocabulary."
 $nl
-"Now, add the following at the start of the source file:"
+"So now, add the following at the start of the source file:"
 { $code "USING: kernel ;" }
-"Next, find out what vocabulary " { $link reverse } " lives in:"
-{ $code "\\ reverse see" }
+"Next, find out what vocabulary " { $link reverse } " lives in; type the word name " { $snippet "reverse" } " in the workspace listener's input area, and press " { $operation com-follow } "."
+$nl
 "It lives in the " { $vocab-link "sequences" } " vocabulary, so we add that to the search path:"
 { $code "USING: kernel sequences ;" }
-"Finally, check what vocabulary " { $link = } " lives in:"
-{ $code "\\ = see" }
-"It's in the " { $vocab-link "kernel" } " vocabulary, which we've already added to the search path."
-
+"Finally, check what vocabulary " { $link = } " lives in, and confirm that it's in the " { $vocab-link "kernel" } " vocabulary, which we've already added to the search path."
+$nl
 "Now press " { $command workspace "workflow" refresh-all } " again, and the source file should reload without any errors. You can now go on and learn about " { $link "first-program-test" } "." ;
 
 ARTICLE: "first-program-test" "Testing your first program"
@@ -81,9 +72,9 @@ $nl
 { $code "." }
 "What we just did is called " { $emphasis "interactive testing" } ". A more advanced technique which comes into play with larger programs is " { $link "tools.test" } "."
 $nl
-"Create a file named " { $snippet "palindrome-tests.factor" } " in the same directory as " { $snippet "palindrome.factor" } ". Now, we can run unit tests from the listener:"
-{ $code "\"palindrome\" test" }
-"We will add some unit tests corresponding to the interactive tests we did above. Unit tests are defined with the " { $link unit-test } " word, which takes a sequence of expected outputs, and a piece of code. It runs the code, and asserts that it outputs the expected values."
+"Open the file named " { $snippet "palindrome-tests.factor" } "; it is located in the same directory as " { $snippet "palindrome.factor" } ", and it was created by the scaffold tool."
+$nl
+"We will add some unit tests, which are similar to the interactive tests we did above. Unit tests are defined with the " { $link unit-test } " word, which takes a sequence of expected outputs, and a piece of code. It runs the code, and asserts that it outputs the expected values."
 $nl
 "Add the following three lines to " { $snippet "palindrome-tests.factor" } ":"
 { $code
@@ -145,7 +136,7 @@ $nl
 ARTICLE: "first-program" "Your first program"
 "In this tutorial, we will write a simple Factor program which prompts the user to enter a word, and tests if it is a palindrome (that is, the word is spelled the same backwards and forwards)."
 $nl
-"In this tutorial, you will learn about basic Factor development tools, as well as application deployment."
+"In this tutorial, you will learn about basic Factor development tools. You may want to open a second workspace window by pressing " { $command workspace "workflow" workspace-window } "; this will allow you to read this tutorial and browse other documentation at the same time."
 { $subsection "first-program-start" }
 { $subsection "first-program-logic" }
 { $subsection "first-program-test" }

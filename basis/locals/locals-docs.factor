@@ -1,5 +1,5 @@
 USING: help.syntax help.markup kernel macros prettyprint
-memoize ;
+memoize combinators arrays ;
 IN: locals
 
 HELP: [|
@@ -84,6 +84,39 @@ HELP: MEMO::
 
 { POSTPONE: MEMO: POSTPONE: MEMO:: } related-words
 
+ARTICLE: "locals-literals" "Locals in array and hashtable literals"
+"Certain data type literals are permitted to contain free variables. Any such literals are written into code which constructs an instance of the type with the free variable values spliced in. Conceptually, this is similar to the transformation applied to quotations containing free variables."
+$nl
+"The data types which receive this special handling are the following:"
+{ $list
+    { $link "arrays" }
+    { $link "hashtables" }
+    { $link "vectors" }
+    { $link "tuples" }
+}
+"This feature changes the semantics of literal object identity. An ordinary word containing a literal pushes the same literal on the stack every time it is invoked:"
+{ $example
+    "IN: scratchpad"
+    "TUPLE: person first-name last-name ;"
+    ": ordinary-word-test ( -- tuple )"
+    "    T{ person { first-name \"Alan\" } { last-name \"Kay\" } } ;"
+    "ordinary-word-test ordinary-word-test eq? ."
+    "t"
+}
+"In a word with locals, literals expand into code which constructs the literal, and so every invocation pushes a new object:"
+{ $example
+    "IN: scratchpad"
+    "TUPLE: person first-name last-name ;"
+    ":: ordinary-word-test ( -- tuple )"
+    "    T{ person { first-name \"Alan\" } { last-name \"Kay\" } } ;"
+    "ordinary-word-test ordinary-word-test eq? ."
+    "f"
+}
+"One exception to the above rule is that array instances containing no free variables do retain identity. This allows macros such as " { $link cond } " to recognize that the array is constant and expand at compile-time."
+$nl
+"For example, here is an implementation of the " { $link 3array } " word which uses this feature:"
+{ $code ":: 3array ( x y z -- array ) { x y z } ;" } ;
+
 ARTICLE: "locals-mutable" "Mutable locals"
 "In the list of bindings supplied to " { $link POSTPONE: :: } ", " { $link POSTPONE: [let } ", " { $link POSTPONE: [let* } " or " { $link POSTPONE: [| } ", a mutable binding may be introduced by suffixing its named with " { $snippet "!" } ". Mutable bindings are read by giving their name as usual; the suffix is not part of the binding's name. To write to a mutable binding, use the binding's name with the " { $snippet "!" } " suffix."
 $nl
@@ -139,6 +172,7 @@ $nl
 "Lambda abstractions:"
 { $subsection POSTPONE: [| }
 "Additional topics:"
+{ $subsection "locals-literals" }
 { $subsection "locals-mutable" }
 { $subsection "locals-limitations" }
 "Locals complement dynamically scoped variables implemented in the " { $vocab-link "namespaces" } " vocabulary." ;
