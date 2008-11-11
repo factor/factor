@@ -21,7 +21,7 @@ TUPLE: coroutine resumecc exitcc originalcc ;
     >>exitcc
     resumecc>> call
     #! At this point, the coroutine quotation must have terminated
-    #! normally (without calling coyield or coterminate). This shouldn't happen.
+    #! normally (without calling coyield, coreset, or coterminate). This shouldn't happen.
     f over
   ] callcc1 2nip ;
 
