@@ -1,26 +1,31 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences symbols fry words assocs tools.annotations coroutines ;
+USING: kernel sequences symbols fry words assocs linked-assocs tools.annotations
+coroutines lexer parser quotations arrays namespaces continuations ;
 IN: advice
 
-! TODO: What should be the order in which the advice is called?
+SYMBOLS: before after around advised in-advice? ;
 
-SYMBOLS: before after around advised ;
+: advised? ( word -- ? )
+    advised word-prop ;
+
+DEFER: make-advised
 
 <PRIVATE
-: advise ( quot name word loc --  )
-    word-prop set-at ;
+: init-around-co ( quot -- coroutine )
+    \ coreset suffix cocreate ;
 PRIVATE>
-    
-: advise-before ( quot name word --  )
-    before advise ;
-    
-: advise-after ( quot name word --  )
-    after advise ;
 
-: advise-around ( quot name word --  )
-    [ \ coreset suffix cocreate ] 2dip
-    around advise ;
+: advise ( quot name word loc --  )
+    dup around eq? [ [ init-around-co ] 3dip ] when
+    over advised? [ over make-advised ] unless
+    word-prop set-at ;
+    
+: advise-before ( quot name word --  ) before advise ;
+    
+: advise-after ( quot name word --  ) after advise ;
+
+: advise-around ( quot name word --  ) around advise ;
 
 : get-advice ( word type -- seq )
     word-prop values ;
@@ -32,22 +37,27 @@ PRIVATE>
     after get-advice [ call ] each ;
 
 : call-around ( main word --  )
-    around get-advice tuck 
-    [ [ coresume ] each ] [ call ] [ reverse [ coresume ] each ] tri* ;
+    t in-advice? [
+        around get-advice tuck 
+        [ [ coresume ] each ] [ call ] [ <reversed> [ coresume ] each ] tri*
+    ] with-variable ;
 
 : remove-advice ( name word loc --  )
     word-prop delete-at ;
 
 : ad-do-it ( input -- result )
-    coyield ;
-
-: advised? ( word -- ? )
-    advised word-prop ;
+    in-advice? get [ "ad-do-it should only be called inside 'around' advice" throw ] unless coyield ;
     
 : make-advised ( word -- )
     [ dup [ over dup '[ _ call-before _ _ call-around _ call-after ] ] annotate ]
-    [ { before after around } [ H{ } clone swap set-word-prop ] with each ] 
+    [ { before after around } [ <linked-hash> swap set-word-prop ] with each ] 
     [ t advised set-word-prop ] tri ;
 
 : unadvise ( word --  )
     [ reset ] [ { before after around advised } [ f swap set-word-prop ] with each ] bi ;
+
+: ADVISE: ! word adname location => word adname quot loc
+    scan-word scan scan-word parse-definition swap [ spin ] dip advise ; parsing
+    
+: UNADVISE:    
+    scan-word parsed \ unadvise parsed ; parsing
