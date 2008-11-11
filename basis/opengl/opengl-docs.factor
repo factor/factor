@@ -9,14 +9,6 @@ HELP: gl-color
 HELP: gl-error
 { $description "If the most recent OpenGL call resulted in an error, print the error to " { $link output-stream } "." } ;
 
-HELP: do-state
-  {
-    $values
-      { "mode" { "One of the " { $link "opengl-geometric-primitives" } } }
-      { "quot" quotation }
-  }
-{ $description "Wraps a quotation in " { $link glBegin } "/" { $link glEnd } " calls." } ;
-
 HELP: do-enabled
 { $values { "what" integer } { "quot" quotation } }
 { $description "Wraps a quotation in " { $link glEnable } "/" { $link glDisable } " calls." } ;
@@ -24,10 +16,6 @@ HELP: do-enabled
 HELP: do-matrix
 { $values { "mode" { $link GL_MODELVIEW } " or " { $link GL_PROJECTION } } { "quot" quotation } }
 { $description "Saves and restores the matrix specified by " { $snippet "mode" } " before and after calling the quotation." } ;
-
-HELP: gl-vertex
-{ $values { "point" "a pair of integers" } }
-{ $description "Wrapper for " { $link glVertex2d } " taking a point object." } ;
 
 HELP: gl-line
 { $values { "a" "a pair of integers" } { "b" "a pair of integers" } }
@@ -40,22 +28,6 @@ HELP: gl-fill-rect
 HELP: gl-rect
 { $values { "loc" "a pair of integers" } { "ext" "a pair of integers" } }
 { $description "Draws the outline of a rectangle with top-left corner " { $snippet "loc" } " and bottom-right corner " { $snippet "ext" } "." } ;
-
-HELP: rect-vertices
-{ $values { "lower-left" "A pair of numbers indicating the lower-left coordinates of the rectangle." } { "upper-right" "The upper-right coordinates of the rectangle." } }
-{ $description "Emits" { $link glVertex2d } " calls outlining the axis-aligned rectangle from " { $snippet "lower-left" } " to " { $snippet "upper-right" } " on the z=0 plane in counterclockwise order." } ;
-
-HELP: gl-fill-poly
-{ $values { "points" "a sequence of pairs of integers" } }
-{ $description "Draws a filled polygon." } ;
-
-HELP: gl-poly
-{ $values { "points" "a sequence of pairs of integers" } }
-{ $description "Draws the outline of a polygon." } ;
-
-HELP: gl-gradient
-{ $values { "direction" "an orientation specifier" } { "colors" "a sequence of color specifiers" } { "dim" "a pair of integers" } }
-{ $description "Draws a rectangle with top-left corner " { $snippet "{ 0 0 }" } " and dimensions " { $snippet "dim" } ", filled with a smoothly shaded transition between the colors in " { $snippet "colors" } "." } ;
 
 HELP: gen-texture
 { $values { "id" integer } }
@@ -131,12 +103,10 @@ $nl
 { $subsection "opengl-low-level" }
 "Wrappers:"
 { $subsection gl-color }
-{ $subsection gl-vertex }
 { $subsection gl-translate }
 { $subsection gen-texture }
 { $subsection bind-texture-unit }
 "Combinators:"
-{ $subsection do-state }
 { $subsection do-enabled }
 { $subsection do-attribs }
 { $subsection do-matrix }
@@ -146,9 +116,6 @@ $nl
 { $subsection gl-line }
 { $subsection gl-fill-rect }
 { $subsection gl-rect }
-{ $subsection gl-fill-poly }
-{ $subsection gl-poly }
-{ $subsection gl-gradient }
 ;
 
 ABOUT: "gl-utilities"

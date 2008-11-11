@@ -1,9 +1,9 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays hashtables io kernel math namespaces opengl
-opengl.gl opengl.glu sequences strings io.styles vectors
-combinators math.vectors ui.gadgets colors
-math.order math.geometry.rect ;
+USING: accessors alien alien.c-types arrays hashtables io kernel
+math namespaces opengl opengl.gl opengl.glu sequences strings
+io.styles vectors combinators math.vectors ui.gadgets colors
+math.order math.geometry.rect locals ;
 IN: ui.render
 
 SYMBOL: clip
@@ -21,7 +21,7 @@ SYMBOL: viewport-translation
 : init-clip ( clip-rect rect -- )
     GL_SCISSOR_TEST glEnable
     [ rect-intersect ] keep
-    rect-dim dup { 0 1 } v* viewport-translation set
+    dim>> dup { 0 1 } v* viewport-translation set
     { 0 0 } over gl-viewport
     0 swap first2 0 gluOrtho2D
     clip set
@@ -31,12 +31,13 @@ SYMBOL: viewport-translation
     GL_SMOOTH glShadeModel
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
+    GL_VERTEX_ARRAY glEnableClientState
     init-matrices
     init-clip
     ! white gl-clear is broken w.r.t window resizing
     ! Linux/PPC Radeon 9200
-    white set-color
-    clip get rect-extent gl-fill-rect ;
+    white gl-color
+    clip get dim>> gl-fill-rect ;
 
 GENERIC: draw-gadget* ( gadget -- )
 
@@ -60,10 +61,15 @@ DEFER: draw-gadget
 : (draw-gadget) ( gadget -- )
     [
         dup translate
-        dup dup interior>> draw-interior
+        dup interior>> [
+            origin get [ dupd draw-interior ] with-translation
+        ] when*
         dup draw-gadget*
         dup visible-children [ draw-gadget ] each
-        dup boundary>> draw-boundary
+        dup boundary>> [
+            origin get [ dupd draw-boundary ] with-translation
+        ] when*
+        drop
     ] with-scope ;
 
 : >absolute ( rect -- rect )
@@ -84,51 +90,97 @@ DEFER: draw-gadget
         [ [ (draw-gadget) ] with-clipping ]
     } cond ;
 
-! Pen paint properties
-M: f draw-interior 2drop ;
-M: f draw-boundary 2drop ;
+! A pen that caches vertex arrays, etc
+TUPLE: caching-pen last-dim ;
+
+GENERIC: recompute-pen ( gadget pen -- )
+
+: compute-pen ( gadget pen -- )
+    2dup [ dim>> ] [ last-dim>> ] bi* = [
+        2drop
+    ] [
+        [ swap dim>> >>last-dim drop ] [ recompute-pen ] 2bi
+    ] if ;
 
 ! Solid fill/border
-TUPLE: solid color ;
+TUPLE: solid < caching-pen color last-vertices ;
 
-C: <solid> solid
+: <solid> ( color -- solid ) solid new swap >>color ;
+
+M: solid recompute-pen
+    swap dim>> (rectangle-vertices) >>last-vertices drop ;
+
+<PRIVATE
 
 ! Solid pen
-: (solid) ( gadget paint -- loc dim )
-    color>> set-color rect-dim >r origin get dup r> v+ ;
+: (solid) ( gadget pen -- )
+    [ compute-pen ]
+    [ color>> gl-color ]
+    [ last-vertices>> gl-vertex-pointer ] tri ;
 
-M: solid draw-interior (solid) gl-fill-rect ;
+PRIVATE>
 
-M: solid draw-boundary (solid) gl-rect ;
+M: solid draw-interior (solid) (gl-fill-rect) ;
+
+M: solid draw-boundary (solid) (gl-rect) ;
 
 ! Gradient pen
-TUPLE: gradient colors ;
+TUPLE: gradient < caching-pen colors last-vertices last-colors ;
 
-C: <gradient> gradient
+: <gradient> ( colors -- gradient ) gradient new swap >>colors ;
+
+<PRIVATE
+
+:: gradient-vertices ( direction dim colors -- seq )
+    direction dim v* dim over v- swap
+    colors length dup 1- v/n [ v*n ] with map
+    [ dup rot v+ 2array ] with map
+    concat concat >c-float-array ;
+
+: gradient-colors ( colors -- seq )
+    [ color>raw 4array dup 2array ] map concat concat >c-float-array ;
+
+M: gradient recompute-pen ( gadget gradient -- )
+    tuck
+    [ [ orientation>> ] [ dim>> ] bi ] [ colors>> ] bi*
+    [ gradient-vertices >>last-vertices ]
+    [ gradient-colors >>last-colors ] bi
+    drop ;
+
+: draw-gradient ( colors -- )
+    GL_COLOR_ARRAY [
+        [ GL_QUAD_STRIP 0 ] dip length 2 * glDrawArrays
+    ] do-enabled-client-state ;
+
+PRIVATE>
 
 M: gradient draw-interior
-    origin get [
-        over orientation>>
-        swap colors>>
-        rot rect-dim
-        gl-gradient
-    ] with-translation ;
+    {
+        [ compute-pen ]
+        [ last-vertices>> gl-vertex-pointer ]
+        [ last-colors>> gl-color-pointer ]
+        [ colors>> draw-gradient ]
+    } cleave ;
 
 ! Polygon pen
-TUPLE: polygon color points ;
+TUPLE: polygon color vertex-array count ;
 
-C: <polygon> polygon
+: <polygon> ( color points -- polygon )
+    [ concat >c-float-array ] [ length ] bi polygon boa ;
 
-: draw-polygon ( polygon quot -- )
-    origin get [
-        >r dup color>> set-color points>> r> call
-    ] with-translation ; inline
+: draw-polygon ( polygon mode -- )
+    swap
+    [ color>> gl-color ]
+    [ vertex-array>> gl-vertex-pointer ]
+    [ 0 swap count>> glDrawArrays ]
+    tri ;
 
 M: polygon draw-boundary
-    [ gl-poly ] draw-polygon drop ;
+    GL_LINE_LOOP draw-polygon drop ;
 
 M: polygon draw-interior
-    [ gl-fill-poly ] draw-polygon drop ;
+    dup count>> 2 > GL_POLYGON GL_LINES ?
+    draw-polygon drop ;
 
 : arrow-up    { { 3 0 } { 6 6 } { 0 6 } } ;
 : arrow-right { { 0 0 } { 6 3 } { 0 6 } } ;

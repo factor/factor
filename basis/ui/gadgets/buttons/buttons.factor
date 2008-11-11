@@ -1,12 +1,11 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math models namespaces sequences
-       strings quotations assocs combinators classes colors
-       classes.tuple opengl math.vectors
-       ui.commands ui.gadgets ui.gadgets.borders
-       ui.gadgets.labels ui.gadgets.theme
-       ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
-       ui.render math.geometry.rect ;
+strings quotations assocs combinators classes colors
+classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
+ui.gadgets.borders ui.gadgets.labels ui.gadgets.theme
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
+ui.render math.geometry.rect locals alien.c-types ;
 
 IN: ui.gadgets.buttons
 
@@ -62,10 +61,10 @@ C: <button-paint> button-paint
     } cond ;
 
 M: button-paint draw-interior
-    button-paint draw-interior ;
+    button-paint dup [ draw-interior ] [ 2drop ] if ;
 
 M: button-paint draw-boundary
-    button-paint draw-boundary ;
+    button-paint dup [ draw-boundary ] [ 2drop ] if ;
 
 : align-left ( button -- button )
     { 0 1/2 } >>align ; inline
@@ -103,17 +102,34 @@ repeat-button H{
     #! the mouse is held down.
     repeat-button new-button bevel-button-theme ;
 
-TUPLE: checkmark-paint color ;
+TUPLE: checkmark-paint < caching-pen color last-vertices ;
 
-C: <checkmark-paint> checkmark-paint
+: <checkmark-paint> ( color -- paint )
+    checkmark-paint new swap >>color ;
+
+<PRIVATE
+
+: checkmark-points ( dim -- points )
+    {
+        [ { 0 0 } v* ]
+        [ { 1 1 } v* ]
+        [ { 0 1 } v* ]
+        [ { 1 0 } v* ]
+    } cleave 4array ;
+
+: checkmark-vertices ( dim -- vertices )
+    checkmark-points concat >c-float-array ;
+
+PRIVATE>
+
+M: checkmark-paint recompute-pen
+    swap dim>> checkmark-vertices >>last-vertices drop ;
 
 M: checkmark-paint draw-interior
-    color>> set-color
-    origin get [
-        rect-dim
-        { 0 0 } over gl-line
-        dup { 0 1 } v* swap { 1 0 } v* gl-line
-    ] with-translation ;
+    [ compute-pen ]
+    [ color>> gl-color ]
+    [ last-vertices>> gl-vertex-pointer ] tri
+    GL_LINES 0 4 glDrawArrays ;
 
 : checkmark-theme ( gadget -- gadget )
     f
@@ -148,30 +164,47 @@ TUPLE: checkbox < button ;
 M: checkbox model-changed
     swap value>> >>selected? relayout-1 ;
 
-TUPLE: radio-paint color ;
+TUPLE: radio-paint < caching-pen color interior-vertices boundary-vertices ;
 
-C: <radio-paint> radio-paint
+: <radio-paint> ( color -- paint ) radio-paint new swap >>color ;
+
+<PRIVATE
+
+: circle-steps 12 ;
+
+PRIVATE>
+
+M: radio-paint recompute-pen
+    swap dim>>
+    [ { 4 4 } swap { 8 8 } v- 12 circle-vertices >>interior-vertices ]
+    [ { 1 1 } swap { 2 2 } v- 12 circle-vertices >>boundary-vertices ] bi
+    drop ;
+
+<PRIVATE
+
+: (radio-paint) ( gadget paint -- )
+    [ compute-pen ] [ color>> gl-color ] bi ;
+
+PRIVATE>
 
 M: radio-paint draw-interior
-    color>> set-color
-    origin get { 4 4 } v+ swap rect-dim { 8 8 } v- 12 gl-fill-circle ;
+    [ (radio-paint) ] [ interior-vertices>> gl-vertex-pointer ] bi
+    GL_POLYGON 0 circle-steps glDrawArrays ;
 
 M: radio-paint draw-boundary
-    color>> set-color
-    origin get { 1 1 } v+ swap rect-dim { 2 2 } v- 12 gl-circle ;
+    [ (radio-paint) ] [ boundary-vertices>> gl-vertex-pointer ] bi
+    GL_LINE_LOOP 0 circle-steps glDrawArrays ;
 
-: radio-knob-theme ( gadget -- gadget )
-    f
-    f
-    black <radio-paint>
-    black <radio-paint>
-    <button-paint> >>interior
-    black <radio-paint> >>boundary ;
+:: radio-knob-theme ( gadget -- gadget )
+    [let | radio-paint [ black <radio-paint> ] |
+        gadget
+        f f radio-paint radio-paint <button-paint> >>interior
+        radio-paint >>boundary
+        { 16 16 } >>dim
+    ] ;
 
 : <radio-knob> ( -- gadget )
-    <gadget>
-    radio-knob-theme
-    { 16 16 } >>dim ;
+    <gadget> radio-knob-theme ;
 
 TUPLE: radio-control < button value ;
 

@@ -30,10 +30,10 @@ M: labelled-gadget focusable-child* content>> ;
 
 : title-theme ( gadget -- gadget )
     { 1 0 } >>orientation
-    T{ gradient f {
+    {
         T{ rgba f 0.65 0.65 1.0 1.0 }
         T{ rgba f 0.65 0.45 1.0 1.0 }
-    } } >>interior ;
+    } <gradient> >>interior ;
 
 : <title-label> ( text -- label ) <label> title-theme ;
 
