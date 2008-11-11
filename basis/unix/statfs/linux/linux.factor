@@ -32,7 +32,7 @@ frequency pass-number ;
     ] with-scope
     [ mtab-csv>mtab-entry ] map ;
 
-M: linux mounted
+M: linux file-systems
     parse-mtab [
         [ mount-point>> file-system-info ] keep
         {

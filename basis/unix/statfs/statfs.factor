@@ -8,7 +8,7 @@ TUPLE: file-system-info root-directory total-free-size total-size ;
 
 HOOK: >file-system-info os ( struct -- statfs )
 
-HOOK: mounted os ( -- array )
+HOOK: file-systems os ( -- array )
 
 os {
     { linux   [ "unix.statfs.linux"   require ] }
