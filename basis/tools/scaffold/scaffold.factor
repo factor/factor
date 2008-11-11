@@ -148,7 +148,7 @@ ERROR: no-vocab vocab ;
             "{ $values" print
             [ "    " write ($values.) ]
             [ [ nl "    " write ($values.) ] unless-empty ] bi*
-            " }" write nl
+            nl "}" print
         ] if
     ] when* ;
 
