@@ -36,7 +36,6 @@ TUPLE: ftp-response n strings parsed ;
 : ftp-ipv4 1 ; inline
 : ftp-ipv6 2 ; inline
 
-
 : ch>type ( ch -- type )
     {
         { CHAR: d [ +directory+ ] }
@@ -54,9 +53,13 @@ TUPLE: ftp-response n strings parsed ;
     } case ;
 
 : file-info>string ( file-info name -- string )
-    >r [ [ type>> type>ch 1string ] [ drop "rwx------" append ] bi ]
-    [ size>> number>string 15 CHAR: \s pad-left ] bi r>
-    3array " " join ;
+    [
+        [
+            [ type>> type>ch 1string ]
+            [ drop "rwx------" append ] bi
+        ]
+        [ size>> number>string 15 CHAR: \s pad-left ] bi
+    ] dip 3array " " join ;
 
 : directory-list ( -- seq )
     "" directory-files

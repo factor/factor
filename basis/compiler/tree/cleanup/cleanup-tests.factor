@@ -5,7 +5,7 @@ strings sbufs sequences.private slots.private combinators
 definitions system layouts vectors math.partial-dispatch
 math.order math.functions accessors hashtables classes assocs
 io.encodings.utf8 io.encodings.ascii io.encodings fry slots
-sorting.private combinators.short-circuit
+sorting.private combinators.short-circuit grouping prettyprint
 compiler.tree
 compiler.tree.combinators
 compiler.tree.cleanup
@@ -499,4 +499,14 @@ cell-bits 32 = [
 [ t ] [
     [ { array-capacity } declare 1 fixnum+ ] cleaned-up-tree
     [ { [ #call? ] [ node-input-infos second literal>> 1 = ] } 1&& ] contains?
+] unit-test
+
+[ ] [
+    [ { null } declare [ 1 ] [ 2 ] if ]
+    build-tree normalize propagate cleanup check-nodes
+] unit-test
+
+[ t ] [
+    [ { array } declare 2 <groups> [ . . ] assoc-each ]
+    \ nth-unsafe inlined?
 ] unit-test

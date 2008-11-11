@@ -56,8 +56,12 @@ M: list model-changed
 
 M: list draw-gadget*
     origin get [
-        dup color>> set-color
-        selected-rect [ rect-extent gl-fill-rect ] when*
+        dup color>> gl-color
+        selected-rect [
+            dup loc>> [
+                dim>> gl-fill-rect
+            ] with-translation
+        ] when*
     ] with-translation ;
 
 M: list focusable-child* drop t ;

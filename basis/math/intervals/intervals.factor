@@ -7,6 +7,8 @@ IN: math.intervals
 
 SYMBOL: empty-interval
 
+SYMBOL: full-interval
+
 TUPLE: interval { from read-only } { to read-only } ;
 
 : <interval> ( from to -- int )
@@ -46,8 +48,7 @@ TUPLE: interval { from read-only } { to read-only } ;
 
 : (a,inf] ( a -- interval ) 1./0. (a,b] ; inline
 
-: [-inf,inf] ( -- interval )
-    T{ interval f { -1./0. t } { 1./0. t } } ; inline
+: [-inf,inf] ( -- interval ) full-interval ; inline
 
 : compare-endpoints ( p1 p2 quot -- ? )
     >r over first over first r> call [
@@ -99,8 +100,10 @@ TUPLE: interval { from read-only } { to read-only } ;
 
 : do-empty-interval ( i1 i2 quot -- i3 )
     {
-        { [ pick empty-interval eq? ] [ drop drop ] }
+        { [ pick empty-interval eq? ] [ 2drop ] }
         { [ over empty-interval eq? ] [ drop nip ] }
+        { [ pick full-interval eq? ] [ 2drop ] }
+        { [ over full-interval eq? ] [ drop nip ] }
         [ call ]
     } cond ; inline
 
@@ -112,8 +115,10 @@ TUPLE: interval { from read-only } { to read-only } ;
 
 : interval-intersect ( i1 i2 -- i3 )
     {
-        { [ dup empty-interval eq? ] [ nip ] }
         { [ over empty-interval eq? ] [ drop ] }
+        { [ dup empty-interval eq? ] [ nip ] }
+        { [ over full-interval eq? ] [ nip ] }
+        { [ dup full-interval eq? ] [ drop ] }
         [
             [ interval>points ] bi@ swapd
             [ [ swap endpoint< ] most ]
@@ -127,8 +132,10 @@ TUPLE: interval { from read-only } { to read-only } ;
 
 : interval-union ( i1 i2 -- i3 )
     {
-        { [ dup empty-interval eq? ] [ drop ] }
         { [ over empty-interval eq? ] [ nip ] }
+        { [ dup empty-interval eq? ] [ drop ] }
+        { [ over full-interval eq? ] [ drop ] }
+        { [ dup full-interval eq? ] [ nip ] }
         [ [ interval>points 2array ] bi@ append points>interval ]
     } cond ;
 
@@ -137,9 +144,11 @@ TUPLE: interval { from read-only } { to read-only } ;
 
 : interval-contains? ( x int -- ? )
     dup empty-interval eq? [ 2drop f ] [
-        [ from>> first2 [ >= ] [ > ] if ]
-        [ to>>   first2 [ <= ] [ < ] if ]
-        2bi and
+        dup full-interval eq? [ 2drop t ] [
+            [ from>> first2 [ >= ] [ > ] if ]
+            [ to>>   first2 [ <= ] [ < ] if ]
+            2bi and
+        ] if
     ] if ;
 
 : interval-zero? ( int -- ? )
@@ -160,8 +169,11 @@ TUPLE: interval { from read-only } { to read-only } ;
 
 : interval-sq ( i1 -- i2 ) dup interval* ;
 
+: special-interval? ( interval -- ? )
+    { empty-interval full-interval } memq? ;
+
 : interval-singleton? ( int -- ? )
-    dup empty-interval eq? [
+    dup special-interval? [
         drop f
     ] [
         interval>points
@@ -173,6 +185,7 @@ TUPLE: interval { from read-only } { to read-only } ;
 : interval-length ( int -- n )
     {
         { [ dup empty-interval eq? ] [ drop 0 ] }
+        { [ dup full-interval eq? ] [ drop 1/0. ] }
         [ interval>points [ first ] bi@ swap - ]
     } cond ;
 
@@ -211,7 +224,7 @@ TUPLE: interval { from read-only } { to read-only } ;
     [ [ interval-closure ] bi@ [ min ] interval-op ] do-empty-interval ;
 
 : interval-interior ( i1 -- i2 )
-    dup empty-interval eq? [
+    dup special-interval? [
         interval>points [ first ] bi@ (a,b)
     ] unless ;
 
@@ -249,6 +262,7 @@ TUPLE: interval { from read-only } { to read-only } ;
 : interval-abs ( i1 -- i2 )
     {
         { [ dup empty-interval eq? ] [ ] }
+        { [ dup full-interval eq? ] [ drop 0 [a,inf] ] }
         { [ 0 over interval-contains? ] [ (interval-abs) { 0 t } suffix points>interval ] }
         [ (interval-abs) points>interval ]
     } cond ;
@@ -292,7 +306,7 @@ SYMBOL: incomparable
 
 : interval< ( i1 i2 -- ? )
     {
-        { [ 2dup [ empty-interval eq? ] either? ] [ incomparable ] }
+        { [ 2dup [ special-interval? ] either? ] [ incomparable ] }
         { [ 2dup interval-intersect empty-interval eq? ] [ (interval<) ] }
         { [ 2dup left-endpoint-< ] [ f ] }
         { [ 2dup right-endpoint-< ] [ f ] }
@@ -307,7 +321,7 @@ SYMBOL: incomparable
 
 : interval<= ( i1 i2 -- ? )
     {
-        { [ 2dup [ empty-interval eq? ] either? ] [ incomparable ] }
+        { [ 2dup [ special-interval? ] either? ] [ incomparable ] }
         { [ 2dup interval-intersect empty-interval eq? ] [ (interval<) ] }
         { [ 2dup right-endpoint-<= ] [ t ] }
         [ incomparable ]
@@ -360,27 +374,27 @@ SYMBOL: incomparable
     interval-bitor ;
 
 : assume< ( i1 i2 -- i3 )
-    dup empty-interval eq? [ drop ] [
+    dup special-interval? [ drop ] [
         to>> first [-inf,a) interval-intersect
     ] if ;
 
 : assume<= ( i1 i2 -- i3 )
-    dup empty-interval eq? [ drop ] [
+    dup special-interval? [ drop ] [
         to>> first [-inf,a] interval-intersect
     ] if ;
 
 : assume> ( i1 i2 -- i3 )
-    dup empty-interval eq? [ drop ] [
+    dup special-interval? [ drop ] [
         from>> first (a,inf] interval-intersect
     ] if ;
 
 : assume>= ( i1 i2 -- i3 )
-    dup empty-interval eq? [ drop ] [
+    dup special-interval? [ drop ] [
         from>> first [a,inf] interval-intersect
     ] if ;
 
 : integral-closure ( i1 -- i2 )
-    dup empty-interval eq? [
+    dup special-interval? [
         [ from>> first2 [ 1+ ] unless ]
         [ to>> first2 [ 1- ] unless ]
         bi [a,b]

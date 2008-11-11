@@ -1,8 +1,9 @@
-! Copyright © 2008 Reginald Keith Ford II
+! Copyright (c) 2008 Reginald Keith Ford II.
 ! See http://factorcode.org/license.txt for BSD license.
-! Newton's Method of approximating roots
 USING: kernel math math.derivatives ;
 IN: math.newtons-method
+
+! Newton's method of approximating roots
 
 <PRIVATE
 

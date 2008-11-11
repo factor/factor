@@ -22,3 +22,5 @@ IN: unix.users.tests
 
 [ ] [ effective-username [ ] with-effective-user ] unit-test
 [ ] [ effective-user-id [ ] with-effective-user ] unit-test
+
+[ ] [ [ ] with-user-cache ] unit-test

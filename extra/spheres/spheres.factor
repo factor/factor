@@ -1,6 +1,7 @@
-USING: kernel opengl.demo-support opengl.gl opengl.shaders opengl.framebuffers
-opengl multiline ui.gadgets accessors sequences ui.render ui math locals
-arrays generalizations combinators opengl.capabilities ui.gadgets.worlds ;
+USING: kernel opengl opengl.demo-support opengl.gl
+opengl.shaders opengl.framebuffers opengl.capabilities multiline
+ui.gadgets accessors sequences ui.render ui math locals arrays
+generalizations combinators ui.gadgets.worlds ;
 IN: spheres
 
 STRING: plane-vertex-shader

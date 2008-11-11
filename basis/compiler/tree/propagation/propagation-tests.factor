@@ -8,7 +8,7 @@ math.functions math.private strings layouts
 compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
-float-arrays system ;
+float-arrays system sorting ;
 IN: compiler.tree.propagation.tests
 
 \ propagate must-infer
@@ -591,6 +591,8 @@ MIXIN: empty-mixin
 [ V{ float-array } ] [ [| | F{ } ] final-classes ] unit-test
 
 [ V{ t } ] [ [ netbsd unix? ] final-literals ] unit-test
+
+[ V{ array } ] [ [ [ <=> ] sort [ <=> ] sort ] final-classes ] unit-test
 
 ! [ V{ string } ] [
 !     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes

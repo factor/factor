@@ -96,6 +96,10 @@ IN: math.intervals.tests
 [ empty-interval ] [ 0 5 (a,b] empty-interval interval-intersect ] unit-test
 
 [ t ] [
+    0 1 (a,b) full-interval interval-intersect 0 1 (a,b) =
+] unit-test
+
+[ t ] [
     empty-interval empty-interval interval-subset?
 ] unit-test
 
@@ -209,22 +213,28 @@ IN: math.intervals.tests
 
 ! Interval random tester
 : random-element ( interval -- n )
-    dup to>> first over from>> first tuck - random +
-    2dup swap interval-contains? [
-        nip
+    dup full-interval eq? [
+        drop 32 random-bits 31 2^ -
     ] [
-        drop random-element
+        dup to>> first over from>> first tuck - random +
+        2dup swap interval-contains? [
+            nip
+        ] [
+            drop random-element
+        ] if
     ] if ;
 
 : random-interval ( -- interval )
-    2000 random 1000 - dup 2 1000 random + +
-    1 random zero? [ [ neg ] bi@ swap ] when
-    4 random {
-        { 0 [ [a,b] ] }
-        { 1 [ [a,b) ] }
-        { 2 [ (a,b) ] }
-        { 3 [ (a,b] ] }
-    } case ;
+    10 random 0 = [ full-interval ] [
+        2000 random 1000 - dup 2 1000 random + +
+        1 random zero? [ [ neg ] bi@ swap ] when
+        4 random {
+            { 0 [ [a,b] ] }
+            { 1 [ [a,b) ] }
+            { 2 [ (a,b) ] }
+            { 3 [ (a,b] ] }
+        } case
+    ] if ;
 
 : random-unary-op ( -- pair )
     {
@@ -263,7 +273,7 @@ IN: math.intervals.tests
         { bitand interval-bitand }
         { bitor interval-bitor }
         { bitxor interval-bitxor }
-        { shift interval-shift }
+        ! { shift interval-shift }
         { min interval-min }
         { max interval-max }
     }

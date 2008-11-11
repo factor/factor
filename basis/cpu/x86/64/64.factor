@@ -26,6 +26,7 @@ M: x86.64 temp-reg-2 RCX ;
 
 : param-reg-1 int-regs param-regs first ; inline
 : param-reg-2 int-regs param-regs second ; inline
+: param-reg-3 int-regs param-regs third ; inline
 
 M: int-regs return-reg drop RAX ;
 M: float-regs return-reg drop XMM0 ;
@@ -40,13 +41,13 @@ M: x86.64 %prologue ( n -- )
 
 M: stack-params %load-param-reg
     drop
-    >r R11 swap stack@ MOV
-    r> stack@ R11 MOV ;
+    >r R11 swap param@ MOV
+    r> param@ R11 MOV ;
 
 M: stack-params %save-param-reg
     drop
     R11 swap next-stack@ MOV
-    stack@ R11 MOV ;
+    param@ R11 MOV ;
 
 : with-return-regs ( quot -- )
     [
@@ -54,37 +55,6 @@ M: stack-params %save-param-reg
         V{ XMM1 XMM0 } clone float-regs set
         call
     ] with-scope ; inline
-
-! The ABI for passing structs by value is pretty messed up
-<< "void*" c-type clone "__stack_value" define-primitive-type
-stack-params "__stack_value" c-type (>>reg-class) >>
-
-: struct-types&offset ( struct-type -- pairs )
-    fields>> [
-        [ type>> ] [ offset>> ] bi 2array
-    ] map ;
-
-: split-struct ( pairs -- seq )
-    [
-        [ 8 mod zero? [ t , ] when , ] assoc-each
-    ] { } make { t } split harvest ;
-
-: flatten-small-struct ( c-type -- seq )
-    struct-types&offset split-struct [
-        [ c-type c-type-reg-class ] map
-        int-regs swap member? "void*" "double" ? c-type
-    ] map ;
-
-: flatten-large-struct ( c-type -- seq )
-    heap-size cell align
-    cell /i "__stack_value" c-type <repetition> ;
-
-M: struct-type flatten-value-type ( type -- seq )
-    dup heap-size 16 > [
-        flatten-large-struct
-    ] [
-        flatten-small-struct
-    ] if ;
 
 M: x86.64 %prepare-unbox ( -- )
     ! First parameter is top of stack
@@ -102,7 +72,7 @@ M: x86.64 %unbox-long-long ( n func -- )
 
 : %unbox-struct-field ( c-type i -- )
     ! Alien must be in param-reg-1.
-    param-reg-1 swap cells [+] swap reg-class>> {
+    R11 swap cells [+] swap reg-class>> {
         { int-regs [ int-regs get pop swap MOV ] }
         { double-float-regs [ float-regs get pop swap MOVSD ] }
     } case ;
@@ -110,20 +80,20 @@ M: x86.64 %unbox-long-long ( n func -- )
 M: x86.64 %unbox-small-struct ( c-type -- )
     ! Alien must be in param-reg-1.
     "alien_offset" f %alien-invoke
-    ! Move alien_offset() return value to param-reg-1 so that we don't
+    ! Move alien_offset() return value to R11 so that we don't
     ! clobber it.
-    param-reg-1 RAX MOV
+    R11 RAX MOV
     [
-        flatten-small-struct [ %unbox-struct-field ] each-index
+        flatten-value-type [ %unbox-struct-field ] each-index
     ] with-return-regs ;
 
 M: x86.64 %unbox-large-struct ( n c-type -- )
     ! Source is in param-reg-1
     heap-size
     ! Load destination address
-    param-reg-2 rot stack@ LEA
+    param-reg-2 rot param@ LEA
     ! Load structure size
-    RDX swap MOV
+    param-reg-3 swap MOV
     ! Copy the struct to the C stack
     "to_value_struct" f %alien-invoke ;
 
@@ -142,10 +112,7 @@ M: x86.64 %box ( n reg-class func -- )
 M: x86.64 %box-long-long ( n func -- )
     int-regs swap %box ;
 
-M: x86.64 struct-small-enough? ( size -- ? )
-    heap-size 2 cells <= ;
-
-: box-struct-field@ ( i -- operand ) 1+ cells stack@ ;
+: box-struct-field@ ( i -- operand ) 1+ cells param@ ;
 
 : %box-struct-field ( c-type i -- )
     box-struct-field@ swap reg-class>> {
@@ -156,15 +123,15 @@ M: x86.64 struct-small-enough? ( size -- ? )
 M: x86.64 %box-small-struct ( c-type -- )
     #! Box a <= 16-byte struct.
     [
-        [ flatten-small-struct [ %box-struct-field ] each-index ]
-        [ RDX swap heap-size MOV ] bi
+        [ flatten-value-type [ %box-struct-field ] each-index ]
+        [ param-reg-3 swap heap-size MOV ] bi
         param-reg-1 0 box-struct-field@ MOV
         param-reg-2 1 box-struct-field@ MOV
         "box_small_struct" f %alien-invoke
     ] with-return-regs ;
 
 : struct-return@ ( n -- operand )
-    [ stack-frame get params>> ] unless* stack@ ;
+    [ stack-frame get params>> ] unless* param@ ;
 
 M: x86.64 %box-large-struct ( n c-type -- )
     ! Struct size is parameter 2
@@ -178,7 +145,7 @@ M: x86.64 %prepare-box-struct ( -- )
     ! Compute target address for value struct return
     RAX f struct-return@ LEA
     ! Store it as the first parameter
-    0 stack@ RAX MOV ;
+    0 param@ RAX MOV ;
 
 M: x86.64 %prepare-var-args RAX RAX XOR ;
 

@@ -26,7 +26,7 @@ IN: math.text.english
 
 SYMBOL: and-needed?
 : set-conjunction ( seq -- )
-    first { [ dup 100 < ] [ dup 0 > ] } 0&& and-needed? set drop ;
+    first { [ 100 < ] [ 0 > ] } 1&& and-needed? set ;
 
 : negative-text ( n -- str )
     0 < "Negative " "" ? ;

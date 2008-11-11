@@ -1,7 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel sequences math math.functions
-math.vectors math.order ;
+USING: arrays kernel math math.order math.vectors sequences ;
 IN: math.matrices
 
 ! Matrices
@@ -29,8 +28,8 @@ IN: math.matrices
 : m.v ( m v -- v ) [ v. ] curry map ;
 : m.  ( m m -- m ) flip [ swap m.v ] curry map ;
 
-: mmin ( m -- n ) >r 1/0. r> [ [ min ] each ] each ;
-: mmax ( m -- n ) >r -1/0. r> [ [ max ] each ] each ;
+: mmin ( m -- n ) [ 1/0. ] dip [ [ min ] each ] each ;
+: mmax ( m -- n ) [ -1/0. ] dip [ [ max ] each ] each ;
 : mnorm ( m -- n ) dup mmax abs m/n ;
 
 <PRIVATE

@@ -5,7 +5,7 @@ USING: alien arrays byte-arrays combinators summary
 io.backend graphics.viewer io io.binary io.files kernel libc
 math math.functions namespaces opengl opengl.gl prettyprint
 sequences strings ui ui.gadgets.panes io.encodings.binary
-accessors ;
+accessors grouping ;
 IN: graphics.bitmap
 
 ! Currently can only handle 24bit bitmaps.
@@ -23,16 +23,25 @@ TUPLE: bitmap magic size reserved offset header-length width
         swap [ >>array ] [ >>color-index ] bi
         24 >>bit-count ;
 
-: raw-bitmap>string ( str n -- str )
+: 8bit>array ( bitmap -- array )
+    [ rgb-quads>> 4 <sliced-groups> [ 3 head-slice ] map ]
+    [ color-index>> >array ] bi [ swap nth ] with map concat ;
+
+: 4bit>array ( bitmap -- array )
+    [ rgb-quads>> 4 <sliced-groups> [ 3 head-slice ] map ]
+    [ color-index>> >array ] bi [ swap nth ] with map concat ;
+
+: raw-bitmap>array ( bitmap -- array )
+    dup bit-count>>
     {
         { 32 [ "32bit" throw ] }
-        { 24 [ ] }
+        { 24 [ color-index>> ] }
         { 16 [ "16bit" throw ] }
-        { 8 [ "8bit" throw ] }
-        { 4 [ "4bit" throw ] }
+        { 8 [ 8bit>array ] }
+        { 4 [ 4bit>array ] }
         { 2 [ "2bit" throw ] }
         { 1 [ "1bit" throw ] }
-    } case ;
+    } case >byte-array ;
 
 ERROR: bitmap-magic ;
 
@@ -72,13 +81,12 @@ M: bitmap-magic summary
 
 : load-bitmap ( path -- bitmap )
     normalize-path binary [
-        T{ bitmap } clone
-        dup parse-file-header
-        dup parse-bitmap-header
-        dup parse-bitmap
+        bitmap new
+            dup parse-file-header
+            dup parse-bitmap-header
+            dup parse-bitmap
     ] with-file-reader
-    dup color-index>> over bit-count>>
-    raw-bitmap>string >byte-array >>array ;
+    dup raw-bitmap>array >>array ;
 
 : save-bitmap ( bitmap path -- )
     binary [
@@ -118,6 +126,8 @@ M: bitmap draw-image ( bitmap -- )
         bit-count>> {
             ! { 32 [ GL_BGRA GL_UNSIGNED_INT_8_8_8_8 ] } ! broken
             { 24 [ GL_BGR GL_UNSIGNED_BYTE ] }
+            { 8 [ GL_BGR GL_UNSIGNED_BYTE ] }
+            { 4 [ GL_BGR GL_UNSIGNED_BYTE ] }
         } case
     ] keep array>> glDrawPixels ;
 

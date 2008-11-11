@@ -1,8 +1,7 @@
 ! Copyright (C) 2007 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel lists.lazy math math.functions math.miller-rabin
-       math.order math.primes.list math.ranges sequences sorting
-       binary-search ;
+USING: binary-search combinators kernel lists.lazy math math.functions
+    math.miller-rabin math.primes.list sequences ;
 IN: math.primes
 
 <PRIVATE
@@ -45,8 +44,7 @@ PRIVATE>
     } cond ; foldable
 
 : primes-between ( low high -- seq )
-    primes-upto
-    [ 1- next-prime ] dip
-    [ natural-search drop ] keep [ length ] keep <slice> ; foldable
+    primes-upto [ 1- next-prime ] dip
+    [ natural-search drop ] [ length ] [ ] tri <slice> ; foldable
 
 : coprime? ( a b -- ? ) gcd nip 1 = ; foldable

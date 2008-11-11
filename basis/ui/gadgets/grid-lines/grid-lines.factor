@@ -23,13 +23,10 @@ SYMBOL: grid-dim
     ] with each ;
 
 M: grid-lines draw-boundary
-    origin get [
-        -0.5 -0.5 0.0 glTranslated
-        color>> set-color [
-            dup grid set
-            dup rect-dim half-gap v- grid-dim set
-            compute-grid
-            { 0 1 } draw-grid-lines
-            { 1 0 } draw-grid-lines
-        ] with-scope
-    ] with-translation ;
+    color>> gl-color [
+        dup grid set
+        dup rect-dim half-gap v- grid-dim set
+        compute-grid
+        { 0 1 } draw-grid-lines
+        { 1 0 } draw-grid-lines
+    ] with-scope ;

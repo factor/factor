@@ -70,3 +70,7 @@ TUPLE: test-tuple { x read-only } ;
     f f 3 <literal-info> 3array test-tuple <tuple-info> dup
     object-info value-info-intersect =
 ] unit-test
+
+[ t ] [
+    null-info 3 <literal-info> value-info<=
+] unit-test

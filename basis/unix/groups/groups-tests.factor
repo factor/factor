@@ -22,3 +22,5 @@ IN: unix.groups.tests
 
 [ ] [ effective-group-name [ ] with-effective-group ] unit-test
 [ ] [ effective-group-id [ ] with-effective-group ] unit-test
+
+[ ] [ [ ] with-group-cache ] unit-test

@@ -6,22 +6,22 @@ IN: tetris.gl
 #! OpenGL rendering for tetris
 
 : draw-block ( block -- )
-    dup { 1 1 } v+ gl-fill-rect ;
+    [ { 1 1 } gl-fill-rect ] with-translation ;
 
 : draw-piece-blocks ( piece -- )
     piece-blocks [ draw-block ] each ;
 
 : draw-piece ( piece -- )
-    dup tetromino>> colour>> set-color draw-piece-blocks ;
+    dup tetromino>> colour>> gl-color draw-piece-blocks ;
 
 : draw-next-piece ( piece -- )
     dup tetromino>> colour>>
-    clone 0.2 >>alpha set-color draw-piece-blocks ;
+    clone 0.2 >>alpha gl-color draw-piece-blocks ;
 
 ! TODO: move implementation specific stuff into tetris-board
 : (draw-row) ( x y row -- )
     >r over r> nth dup
-    [ set-color 2array draw-block ] [ 3drop ] if ;
+    [ gl-color 2array draw-block ] [ 3drop ] if ;
 
 : draw-row ( y row -- )
     dup length -rot [ (draw-row) ] 2curry each ;
