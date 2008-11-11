@@ -276,18 +276,31 @@ M: winnt file-system-info ( path -- file-system-info )
         swap >>type
         swap >>mount-point ;
 
+: volume>paths ( string -- array )
+    16384 "ushort" <c-array> tuck dup length
+    0 <uint> dup [ GetVolumePathNamesForVolumeName 0 = ] dip swap [
+        win32-error-string throw
+    ] [
+        *uint "ushort" heap-size * head
+        utf16n alien>string CHAR: \0 split
+    ] if ;
+
 : find-first-volume ( -- string handle )
     MAX_PATH 1+ <byte-array> dup length
     dupd
     FindFirstVolume dup win32-error=0/f
     [ utf16n alien>string ] dip ;
 
-: find-next-volume ( handle -- string )
+: find-next-volume ( handle -- string/f )
     MAX_PATH 1+ <byte-array> dup length
-    [ FindNextVolume win32-error=0/f ] 2keep drop
-    utf16n alien>string ;
+    over [ FindNextVolume ] dip swap 0 = [
+        GetLastError ERROR_NO_MORE_FILES =
+        [ drop f ] [ win32-error ] if
+    ] [
+        utf16n alien>string
+    ] if ;
 
-: mounted ( -- array )
+M: winnt file-systems ( -- array )
     find-first-volume
     [
         '[
@@ -296,7 +309,8 @@ M: winnt file-system-info ( path -- file-system-info )
             [ drop ] produce
             swap prefix
         ]
-    ] [ '[ _ FindVolumeClose win32-error=0/f ] ] bi [ ] cleanup ;
+    ] [ '[ _ FindVolumeClose win32-error=0/f ] ] bi [ ] cleanup
+    [ volume>paths ] map ;
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
