@@ -20,9 +20,9 @@ IN: cairo-demo
   cairo_image_surface_create_for_data ;
 
 
-TUPLE: cairo-gadget < gadget image-array cairo-t ;
+TUPLE: cairo-demo-gadget < gadget image-array cairo-t ;
 
-M: cairo-gadget draw-gadget* ( gadget -- )
+M: cairo-demo-gadget draw-gadget* ( gadget -- )
     0 0 glRasterPos2i
     1.0 -1.0 glPixelZoom
     >r 384 256 GL_RGBA GL_UNSIGNED_BYTE r>
@@ -35,7 +35,7 @@ M: cairo-gadget draw-gadget* ( gadget -- )
 : init-cairo ( gadget -- cairo_t )
    create-surface cairo_create ;
 
-M: cairo-gadget pref-dim* drop { 384 256 0 } ;
+M: cairo-demo-gadget pref-dim* drop { 384 256 0 } ;
 
 : draw-hello-world ( gadget -- )
   cairo-t>>
@@ -56,18 +56,18 @@ M: cairo-gadget pref-dim* drop { 384 256 0 } ;
   dup 70.0 165.0 5.12 0 pi 2 * cairo_arc
   cairo_fill ;
 
-M: cairo-gadget graft* ( gadget -- )
+M: cairo-demo-gadget graft* ( gadget -- )
   dup dup init-cairo swap (>>cairo-t) draw-hello-world ;
 
-M: cairo-gadget ungraft* ( gadget -- )
+M: cairo-demo-gadget ungraft* ( gadget -- )
    cairo-t>> cairo_destroy ;
 
-: <cairo-gadget> ( -- gadget )
-  cairo-gadget new-gadget ;
+: <cairo-demo-gadget> ( -- gadget )
+  cairo-demo-gadget new-gadget ;
 
 : run ( -- )
   [
-        <cairo-gadget> "Hello World from Factor!" open-window
+        <cairo-demo-gadget> "Hello World from Factor!" open-window
   ] with-ui ;
 
 MAIN: run
