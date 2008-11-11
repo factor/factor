@@ -262,17 +262,19 @@ DEFER: (value-info-union)
         ]
     } cond ;
 
-! Current value --> info mapping
+! Assoc stack of current value --> info mapping
 SYMBOL: value-infos
 
 : value-info ( value -- info )
-    resolve-copy value-infos get at null-info or ;
+    resolve-copy value-infos get assoc-stack null-info or ;
 
 : set-value-info ( info value -- )
-    resolve-copy value-infos get set-at ;
+    resolve-copy value-infos get peek set-at ;
 
 : refine-value-info ( info value -- )
-    resolve-copy value-infos get [ value-info-intersect ] change-at ;
+    resolve-copy value-infos get
+    [ assoc-stack value-info-intersect ] 2keep
+    peek set-at ;
 
 : value-literal ( value -- obj ? )
     value-info >literal< ;

@@ -40,8 +40,8 @@ M: #dispatch live-branches
 SYMBOL: infer-children-data
 
 : copy-value-info ( -- )
-    value-infos [ clone ] change
-    constraints [ clone ] change ;
+    value-infos [ H{ } clone suffix ] change
+    constraints [ H{ } clone suffix ] change ;
 
 : no-value-info ( -- )
     value-infos off
