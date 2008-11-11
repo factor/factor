@@ -120,7 +120,7 @@ name target ;
 
 ERROR: ftp-error got expected ;
 : ftp-assert ( ftp-response n -- )
-    2dup >r n>> r> = [ 2drop ] [ ftp-error ] if ;
+    2dup [ n>> ] dip = [ 2drop ] [ ftp-error ] if ;
 
 : ftp-login ( ftp-client -- )
     read-response 220 ftp-assert
@@ -156,12 +156,12 @@ GENERIC: ftp-download ( path obj -- )
     dupd '[
         _ [ ftp-login ] [ @ ] bi
         ftp-quit drop
-    ] >r ftp-connect r> with-stream ; inline
+    ] [ ftp-connect ] dip with-stream ; inline
 
 M: ftp-client ftp-download ( path ftp-client -- )
     [
         [ drop parent-directory ftp-cwd drop ]
-        [ >r file-name r> ftp-get drop ] 2bi
+        [ [ file-name ] dip ftp-get drop ] 2bi
     ] with-ftp-client ;
 
 M: string ftp-download ( path string -- )

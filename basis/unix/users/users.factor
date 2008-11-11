@@ -39,16 +39,16 @@ PRIVATE>
         [ getpwent dup ] [ passwd>new-passwd ] [ drop ] produce
     ] with-pwent ;
 
-SYMBOL: passwd-cache
+SYMBOL: user-cache
 
-: with-passwd-cache ( quot -- )
+: with-user-cache ( quot -- )
     all-users [ [ uid>> ] keep ] H{ } map>assoc
-    passwd-cache swap with-variable ; inline
+    user-cache rot with-variable ; inline
 
 GENERIC: user-passwd ( obj -- passwd )
 
 M: integer user-passwd ( id -- passwd/f )
-    passwd-cache get
+    user-cache get
     [ at ] [ getpwuid passwd>new-passwd ] if* ;
 
 M: string user-passwd ( string -- passwd/f )

@@ -22,8 +22,8 @@ HELP: new-passwd
 HELP: passwd
 { $description "A platform-specific tuple correspding to every field from the Unix passwd struct. BSD passwd structures have four extra slots: " { $slot "change" } ", " { $slot "class" } "," { $slot "expire" } ", " { $slot "fields" } "." } ;
 
-HELP: passwd-cache
-{ $description "A symbol storing passwd structures indexed by user-ids when within a " { $link with-passwd-cache } "." } ;
+HELP: user-cache
+{ $description "A symbol storing passwd structures indexed by user-ids when within a " { $link with-user-cache } "." } ;
 
 HELP: passwd>new-passwd
 { $values
@@ -70,10 +70,10 @@ HELP: with-effective-user
      { "string/id" "a string or a uid" } { "quot" quotation } }
 { $description "Sets the effective username and calls the quotation. Restores the current username on success or on error after the call." } ;
 
-HELP: with-passwd-cache
+HELP: with-user-cache
 { $values
      { "quot" quotation } }
-{ $description "Iterates over the password file using library calls and creates a cache in the " { $link passwd-cache } " symbol. The cache is a hashtable indexed by user id. When looking up many users, this approach is much faster than calling system calls." } ;
+{ $description "Iterates over the password file using library calls and creates a cache in the " { $link user-cache } " symbol. The cache is a hashtable indexed by user id. When looking up many users, this approach is much faster than calling system calls." } ;
 
 HELP: with-real-user
 { $values
