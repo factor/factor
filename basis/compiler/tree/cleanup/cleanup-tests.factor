@@ -500,3 +500,8 @@ cell-bits 32 = [
     [ { array-capacity } declare 1 fixnum+ ] cleaned-up-tree
     [ { [ #call? ] [ node-input-infos second literal>> 1 = ] } 1&& ] contains?
 ] unit-test
+
+[ ] [
+    [ { null } declare [ 1 ] [ 2 ] if ]
+    build-tree normalize propagate cleanup check-nodes
+] unit-test
