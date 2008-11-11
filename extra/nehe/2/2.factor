@@ -1,5 +1,5 @@
-USING: arrays kernel math opengl opengl.gl opengl.glu ui
-ui.gadgets ui.render ;
+USING: arrays kernel math opengl opengl.gl opengl.glu
+opengl.demo-support ui ui.gadgets ui.render ;
 IN: nehe.2
 
 TUPLE: nehe2-gadget < gadget ;

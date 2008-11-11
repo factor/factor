@@ -30,7 +30,7 @@ IN: automata.ui
 
 : draw-bitmap ( bitmap -- ) GL_POINTS glBegin (draw-bitmap) glEnd ;
 
-: display ( -- ) black set-color bitmap> draw-bitmap ;
+: display ( -- ) black gl-color bitmap> draw-bitmap ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: locals math.functions math namespaces
-opengl.gl accessors kernel opengl ui.gadgets
+opengl.gl opengl.demo-support accessors kernel opengl ui.gadgets
 fry assocs
 destructors sequences ui.render colors ;
 IN: opengl.gadgets
