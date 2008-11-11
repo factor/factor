@@ -10,7 +10,7 @@ TUPLE: linked-assoc assoc dlist ;
 
 M: linked-assoc assoc-size assoc>> assoc-size ;
 
-M: linked-assoc at* assoc>> at* tuck [ obj>> second ] when swap ;
+M: linked-assoc at* assoc>> at* [ [ obj>> second ] when ] keep ;
 
 M: linked-assoc delete-at
     [ [ assoc>> ] [ dlist>> ] bi [ at ] dip '[ _ delete-node ] when* ]
@@ -22,7 +22,7 @@ M: linked-assoc delete-at
 PRIVATE>
 
 M: linked-assoc set-at
-    [ 2dup assoc>> key? [ 2dup delete-at  ] when add-to-dlist ] 2keep
+    [ 2dup assoc>> key? [ 2dup delete-at ] when add-to-dlist ] 2keep
     assoc>> set-at ;
 
 : dlist>seq ( dlist -- seq )
