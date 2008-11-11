@@ -30,7 +30,7 @@ IN: project-euler.052
     [ number>digits natural-sort ] map all-equal? ;
 
 : candidate? ( n -- ? )
-    { [ odd? ] [ 3 mod zero? ] } 1&& ;
+    { [ odd? ] [ 3 mod 0 = ] } 1&& ;
 
 : next-all-same ( x n -- n )
     dup candidate? [

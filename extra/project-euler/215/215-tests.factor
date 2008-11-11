@@ -1,4 +1,4 @@
-USING: project-euler.215 tools.test ;
+USING: project-euler.215 project-euler.215.private tools.test ;
 IN: project-euler.215.tests
 
 [ 8 ] [ 9 3 solve ] unit-test

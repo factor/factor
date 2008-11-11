@@ -21,17 +21,17 @@ SYMBOL: matrix
 : cols ( -- n ) 0 nth-row length ;
 
 : skip ( i seq quot -- n )
-    over >r find-from drop r> length or ; inline
+    over [ find-from drop ] dip length or ; inline
 
 : first-col ( row# -- n )
     #! First non-zero column
     0 swap nth-row [ zero? not ] skip ;
 
 : clear-scale ( col# pivot-row i-row -- n )
-    >r over r> nth dup zero? [
+    [ over ] dip nth dup zero? [
         3drop 0
     ] [
-        >r nth dup zero? r> swap [
+        [ nth dup zero? ] dip swap [
             2drop 0
         ] [
             swap / neg
@@ -39,13 +39,13 @@ SYMBOL: matrix
     ] if ;
 
 : (clear-col) ( col# pivot-row i -- )
-    [ [ clear-scale ] 2keep >r n*v r> v+ ] change-row ;
+    [ [ clear-scale ] 2keep [ n*v ] dip v+ ] change-row ;
 
 : rows-from ( row# -- slice )
     rows dup <slice> ;
 
 : clear-col ( col# row# rows -- )
-    >r nth-row r> [ >r 2dup r> (clear-col) ] each 2drop ;
+    [ nth-row ] dip [ [ 2dup ] dip (clear-col) ] each 2drop ;
 
 : do-row ( exchange-with row# -- )
     [ exchange-rows ] keep
@@ -53,7 +53,7 @@ SYMBOL: matrix
     dup 1+ rows-from clear-col ;
 
 : find-row ( row# quot -- i elt )
-    >r rows-from r> find ; inline
+    [ rows-from ] dip find ; inline
 
 : pivot-row ( col# row# -- n )
     [ dupd nth-row nth zero? not ] find-row 2nip ;
@@ -61,7 +61,7 @@ SYMBOL: matrix
 : (echelon) ( col# row# -- )
     over cols < over rows < and [
         2dup pivot-row [ over do-row 1+ ] when*
-        >r 1+ r> (echelon)
+        [ 1+ ] dip (echelon)
     ] [
         2drop
     ] if ;
@@ -86,10 +86,10 @@ SYMBOL: matrix
     ] with-matrix ;
 
 : basis-vector ( row col# -- )
-    >r clone r>
+    [ clone ] dip
     [ swap nth neg recip ] 2keep
     [ 0 spin set-nth ] 2keep
-    >r n*v r>
+    [ n*v ] dip
     matrix get set-nth ;
 
 : nullspace ( matrix -- seq )

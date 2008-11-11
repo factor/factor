@@ -12,7 +12,7 @@ IN: math.miller-rabin
 TUPLE: positive-even-expected n ;
 
 : (factor-2s) ( r s -- r s )
-    dup even? [ -1 shift >r 1+ r> (factor-2s) ] when ;
+    dup even? [ -1 shift [ 1+ ] dip (factor-2s) ] when ;
 
 : factor-2s ( n -- r s )
     #! factor an integer into s * 2^r

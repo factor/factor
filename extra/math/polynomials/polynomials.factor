@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel sequences vectors math math.vectors
-namespaces make shuffle splitting sequences.lib math.order ;
+USING: arrays kernel make math math.order math.vectors sequences shuffle
+    splitting vectors ;
 IN: math.polynomials
 
 ! Polynomials are vectors with the highest powers on the right:
@@ -13,14 +13,16 @@ IN: math.polynomials
     <array> 1 [ * ] accumulate nip ;
 
 <PRIVATE
-: 2pad-left ( p p n -- p p ) 0 [ pad-left swap ] 2keep pad-left swap ;
-: 2pad-right ( p p n -- p p ) 0 [ pad-right swap ] 2keep pad-right swap ;
+
+: 2pad-left ( p p n -- p p ) [ 0 pad-left ] curry bi@ ;
+: 2pad-right ( p p n -- p p ) [ 0 pad-right ] curry bi@ ;
 : pextend ( p p -- p p ) 2dup [ length ] bi@ max 2pad-right ;
 : pextend-left ( p p -- p p ) 2dup [ length ] bi@ max 2pad-left ;
 : unempty ( seq -- seq ) [ { 0 } ] when-empty ;
 : 2unempty ( seq seq -- seq seq ) [ unempty ] bi@ ;
 
 PRIVATE>
+
 : p= ( p p -- ? ) pextend = ;
 
 : ptrim ( p -- p )
@@ -33,14 +35,14 @@ PRIVATE>
 
 ! convolution
 : pextend-conv ( p p -- p p )
-    #! extend to: p_m + p_n - 1 
+    #! extend to: p_m + p_n - 1
     2dup [ length ] bi@ + 1- 2pad-right [ >vector ] bi@ ;
 
 : p* ( p p -- p )
     #! Multiply two polynomials.
     2unempty pextend-conv <reversed> dup length
     [ over length pick <slice> pick [ * ] 2map sum ] map 2nip reverse ;
-    
+
 : p-sq ( p -- p-sq )
     dup p* ;
 
@@ -72,7 +74,7 @@ PRIVATE>
     dup V{ 0 } clone p= [
         drop nip
     ] [
-        tuck p/mod >r pick p* swap >r swapd p- r> r> (pgcd)
+        tuck p/mod [ pick p* swap [ swapd p- ] dip ] dip (pgcd)
     ] if ;
 
 : pgcd ( p p -- p q )
