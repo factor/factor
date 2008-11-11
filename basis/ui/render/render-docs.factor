@@ -52,7 +52,7 @@ HELP: polygon
 } ;
 
 HELP: <polygon>
-{ $values { "color" "a color specifier" } { "points" "a sequence of points" } }
+{ $values { "color" "a color specifier" } { "points" "a sequence of points" } { "polygon" polygon } }
 { $description "Creates a new instance of " { $link polygon } "." } ;
 
 HELP: <polygon-gadget>

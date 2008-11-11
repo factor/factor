@@ -22,12 +22,12 @@ HELP: gl-line
 { $description "Draws a line between two points." } ;
 
 HELP: gl-fill-rect
-{ $values { "loc" "a pair of integers" } { "ext" "a pair of integers" } }
-{ $description "Draws a filled rectangle with top-left corner " { $snippet "loc" } " and bottom-right corner " { $snippet "ext" } "." } ;
+{ $values { "dim" "a pair of integers" } }
+{ $description "Draws a filled rectangle with the top-left corner at the origin and the given dimensions." } ;
 
 HELP: gl-rect
-{ $values { "loc" "a pair of integers" } { "ext" "a pair of integers" } }
-{ $description "Draws the outline of a rectangle with top-left corner " { $snippet "loc" } " and bottom-right corner " { $snippet "ext" } "." } ;
+{ $values { "dim" "a pair of integers" } }
+{ $description "Draws the outline of a rectangle with the top-left corner at the origin and the given dimensions." } ;
 
 HELP: gen-texture
 { $values { "id" integer } }
