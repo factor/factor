@@ -1,12 +1,15 @@
 ! Copyright (C) 2008 Slava Pestov, James Cash.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs arrays kernel deques dlists sequences hashtables fry ;
+USING: accessors assocs arrays kernel deques dlists sequences fry ;
 IN: linked-assocs
 
 TUPLE: linked-assoc assoc dlist ;
 
+: <linked-assoc> ( exemplar -- assoc )
+    0 swap new-assoc <dlist> linked-assoc boa ;
+
 : <linked-hash> ( -- assoc )
-    0 <hashtable> <dlist> linked-assoc boa ;
+    H{ } <linked-assoc> ;
 
 M: linked-assoc assoc-size assoc>> assoc-size ;
 
