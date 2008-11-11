@@ -29,5 +29,5 @@ IN: io.unix.launcher.parser
 
 PEG: tokenize-command ( command -- ast/f )
     'argument' " " token repeat1 list-of
-    " " token repeat0 swap over pack
+    " " token repeat0 tuck pack
     just ;

@@ -1,6 +1,6 @@
 
 USING: kernel namespaces system io.files bootstrap.image http.client
-       builder.util update update.backup ;
+       update update.backup update.util ;
 
 IN: update.latest
 
