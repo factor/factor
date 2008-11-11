@@ -8,8 +8,6 @@ TUPLE: file-system-info root-directory total-free-size total-size ;
 
 HOOK: >file-system-info os ( struct -- statfs )
 
-HOOK: file-systems os ( -- array )
-
 os {
     { linux   [ "unix.statfs.linux"   require ] }
     { macosx  [ "unix.statfs.macosx"  require ] }
