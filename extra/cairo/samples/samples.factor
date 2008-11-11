@@ -4,11 +4,13 @@
 ! these samples are a subset of the samples on
 ! http://cairographics.org/samples/
 USING: cairo cairo.ffi locals math.constants math
-io.backend kernel alien.c-types libc namespaces ;
+io.backend kernel alien.c-types libc namespaces
+cairo.gadgets ui.gadgets accessors ;
 
 IN: cairo.samples
 
-:: arc ( -- )
+TUPLE: arc-gadget < cairo-gadget ;
+M:: arc-gadget render-cairo* ( gadget -- )
     [let | xc [ 128.0 ]
            yc [ 128.0 ]
            radius [ 100.0 ]
@@ -32,7 +34,9 @@ IN: cairo.samples
         cr cairo_stroke
     ] ;
 
-: clip ( -- )
+TUPLE: clip-gadget < cairo-gadget ;
+M: clip-gadget render-cairo* ( gadget -- )
+    drop
     cr 128 128 76.8 0 2 pi * cairo_arc
     cr cairo_clip
     cr cairo_new_path
@@ -47,7 +51,8 @@ IN: cairo.samples
     cr 10 cairo_set_line_width
     cr cairo_stroke ;
 
-:: clip-image ( -- )
+TUPLE: clip-image-gadget < cairo-gadget ;
+M:: clip-image-gadget render-cairo* ( gadget -- )
     [let* | png [ "resource:misc/icons/Factor_128x128.png"
                   normalize-path cairo_image_surface_create_from_png ]
             w [ png cairo_image_surface_get_width ]
@@ -62,7 +67,8 @@ IN: cairo.samples
         png cairo_surface_destroy
     ] ;
 
-:: dash ( -- )
+TUPLE: dash-gadget < cairo-gadget ;
+M:: dash-gadget render-cairo* ( gadget -- )
     [let | dashes [ { 50 10 10 10 } >c-double-array ]
            ndash [ 4 ] |
         cr dashes ndash -50 cairo_set_dash
@@ -74,7 +80,8 @@ IN: cairo.samples
         cr cairo_stroke
     ] ;
 
-:: gradient ( -- )
+TUPLE: gradient-gadget < cairo-gadget ;
+M:: gradient-gadget render-cairo* ( gadget -- )
     [let | pat [ 0 0 0 256 cairo_pattern_create_linear ]
            radial [ 115.2 102.4 25.6 102.4 102.4 128.0
                     cairo_pattern_create_radial ] |
@@ -93,7 +100,9 @@ IN: cairo.samples
         radial cairo_pattern_destroy
     ] ;
 
-: text ( -- )
+TUPLE: text-gadget < cairo-gadget ;
+M: text-gadget render-cairo* ( gadget -- )
+    drop
     cr "Serif" CAIRO_FONT_SLANT_NORMAL CAIRO_FONT_WEIGHT_BOLD
     cairo_select_font_face
     cr 50 cairo_set_font_size
@@ -115,7 +124,9 @@ IN: cairo.samples
     cr 70 165 5.12 0 2 pi * cairo_arc
     cr cairo_fill ;
 
-: utf8 ( -- )
+TUPLE: utf8-gadget < cairo-gadget ;
+M: utf8-gadget render-cairo* ( gadget -- )
+    drop
     cr "Sans" CAIRO_FONT_SLANT_NORMAL CAIRO_FONT_WEIGHT_NORMAL
     cairo_select_font_face
     cr 50 cairo_set_font_size
@@ -141,7 +152,10 @@ IN: cairo.samples
  
  USING: quotations cairo.gadgets ui.gadgets.panes sequences ;
  : samples ( -- )
-    { arc clip clip-image dash gradient text utf8 }
-    [ { 256 256 } swap 1quotation <cairo-gadget> gadget. ] each ;
+    {
+        arc-gadget clip-gadget clip-image-gadget dash-gadget
+        gradient-gadget text-gadget utf8-gadget
+    }
+    [ new-gadget { 256 256 } >>dim gadget. ] each ;
  
  MAIN: samples

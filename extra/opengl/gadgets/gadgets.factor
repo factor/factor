@@ -6,7 +6,7 @@ fry assocs
 destructors sequences ui.render colors ;
 IN: opengl.gadgets
 
-TUPLE: texture-gadget ;
+TUPLE: texture-gadget < gadget ;
 
 GENERIC: render* ( gadget -- texture dims )
 GENERIC: cache-key* ( gadget -- key )

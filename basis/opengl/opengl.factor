@@ -16,16 +16,16 @@ IN: opengl
 : fix-coordinates ( point1 point2 -- x1 y2 x2 y2 )
     [ first2 [ >fixnum ] bi@ ] bi@ ;
 
-: gl-color ( color -- ) first4 glColor4d ; inline
+: color>raw ( object -- r g b a )
+    >rgba { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave ;
+
+: gl-color ( color -- ) color>raw glColor4d ; inline
 
 : gl-clear-color ( color -- )
-    first4 glClearColor ;
+    color>raw glClearColor ;
 
 : gl-clear ( color -- )
     gl-clear-color GL_COLOR_BUFFER_BIT glClear ;
-
-: color>raw ( object -- r g b a )
-    >rgba { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave ;
 
 : set-color ( object -- ) color>raw glColor4d ;
 : set-clear-color ( object -- ) color>raw glClearColor ;
