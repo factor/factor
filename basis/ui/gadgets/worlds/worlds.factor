@@ -83,7 +83,6 @@ SYMBOL: ui-error-hook
 [ rethrow ] ui-error-hook set-global
 
 : draw-world ( world -- )
-    [
     dup draw-world? [
         dup world [
             [
@@ -95,8 +94,7 @@ SYMBOL: ui-error-hook
         ] with-variable
     ] [
         drop
-    ] if USE: prettyprint
-    ] USE: tools.time benchmark global [ "timings" get-global push ] bind ;
+    ] if ;
 
 world H{
     { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }

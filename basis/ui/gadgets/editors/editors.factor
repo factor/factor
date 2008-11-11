@@ -127,10 +127,12 @@ M: editor ungraft*
 : draw-caret ( -- )
     editor get focused?>> [
         editor get
-        dup caret-color>> gl-color
-        dup caret-loc origin get v+
-        swap caret-dim over v+
-        [ { 0.5 -0.5 } v+ ] bi@ gl-line
+        [ caret-color>> gl-color ]
+        [
+            dup caret-loc origin get v+
+            swap caret-dim over v+
+            gl-line
+        ] bi
     ] when ;
 
 : line-translation ( n -- loc )
@@ -180,12 +182,14 @@ M: editor ungraft*
     dup editor-mark* swap editor-caret* sort-pair ;
 
 : (draw-selection) ( x1 x2 -- )
-    2dup = [ 2 + ] when
-    0.0 swap editor get line-height glRectd ;
+    over -
+    dup 0 = [ 2 + ] when
+    [ 0.0 2array ] [ editor get line-height 2array ] bi*
+    swap [ gl-fill-rect ] with-translation ;
 
 : draw-selected-line ( start end n -- )
     [ start/end-on-line ] keep tuck
-    >r >r editor get offset>x r> r>
+    [ editor get offset>x ] 2dip
     editor get offset>x
     (draw-selection) ;
 

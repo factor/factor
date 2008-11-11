@@ -69,7 +69,24 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : gl-line ( a b -- )
     line-vertices GL_LINES 0 2 glDrawArrays ;
 
-: (rectangle-vertices) ( dim -- vertices )
+: (rect-vertices) ( dim -- vertices )
+    {
+        [ drop 0 1 ]
+        [ first 1- 1 ]
+        [ [ first 1- ] [ second ] bi ]
+        [ second 0 swap ]
+    } cleave 8 narray >c-float-array ;
+
+: rect-vertices ( dim -- )
+    (rect-vertices) gl-vertex-pointer ;
+
+: (gl-rect) ( -- )
+    GL_LINE_LOOP 0 4 glDrawArrays ;
+
+: gl-rect ( dim -- )
+    rect-vertices (gl-rect) ;
+
+: (fill-rect-vertices) ( dim -- vertices )
     {
         [ drop 0 0 ]
         [ first 0 ]
@@ -77,20 +94,14 @@ MACRO: all-enabled-client-state ( seq quot -- )
         [ second 0 swap ]
     } cleave 8 narray >c-float-array ;
 
-: rectangle-vertices ( dim -- )
-    (rectangle-vertices) gl-vertex-pointer ;
-
-: (gl-rect) ( -- )
-    GL_LINE_LOOP 0 4 glDrawArrays ;
-
-: gl-rect ( dim -- )
-    rectangle-vertices (gl-rect) ;
+: fill-rect-vertices ( dim -- )
+    (fill-rect-vertices) gl-vertex-pointer ;
 
 : (gl-fill-rect) ( -- )
     GL_QUADS 0 4 glDrawArrays ;
 
 : gl-fill-rect ( dim -- )
-    rectangle-vertices (gl-fill-rect) ;
+    fill-rect-vertices (gl-fill-rect) ;
 
 : circle-steps ( steps -- angles )
     dup length v/n 2 pi * v*n ;
@@ -203,7 +214,7 @@ MEMO: (rect-texture-coords) ( -- seq )
         dup loc>> gl-translate
         GL_TEXTURE_2D over texture>> glBindTexture
         init-texture rect-texture-coords
-        dim2>> rectangle-vertices
+        dim2>> fill-rect-vertices
         (gl-fill-rect)
         GL_TEXTURE_2D 0 glBindTexture
     ] do-enabled-client-state ;

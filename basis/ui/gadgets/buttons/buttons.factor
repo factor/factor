@@ -111,8 +111,8 @@ TUPLE: checkmark-paint < caching-pen color last-vertices ;
 
 : checkmark-points ( dim -- points )
     {
-        [ { 0 0 } v* ]
-        [ { 1 1 } v* ]
+        [ { 0 0 } v* { 0 1 } v+ ]
+        [ { 1 1 } v* { 0 1 } v+ ]
         [ { 0 1 } v* ]
         [ { 1 0 } v* ]
     } cleave 4array ;
@@ -170,14 +170,14 @@ TUPLE: radio-paint < caching-pen color interior-vertices boundary-vertices ;
 
 <PRIVATE
 
-: circle-steps 12 ;
+: circle-steps 8 ;
 
 PRIVATE>
 
 M: radio-paint recompute-pen
     swap dim>>
-    [ { 4 4 } swap { 8 8 } v- 12 circle-vertices >>interior-vertices ]
-    [ { 1 1 } swap { 2 2 } v- 12 circle-vertices >>boundary-vertices ] bi
+    [ { 4 4 } swap { 9 9 } v- circle-steps circle-vertices >>interior-vertices ]
+    [ { 1 1 } swap { 3 3 } v- circle-steps circle-vertices >>boundary-vertices ] bi
     drop ;
 
 <PRIVATE
