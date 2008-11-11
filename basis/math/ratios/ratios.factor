@@ -3,9 +3,6 @@
 USING: accessors kernel kernel.private math math.functions math.private ;
 IN: math.ratios
 
-: >fraction ( a/b -- a b )
-    dup numerator swap denominator ; inline
-
 : 2>fraction ( a/b c/d -- a c b d )
     [ >fraction ] bi@ swapd ; inline
 

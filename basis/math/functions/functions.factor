@@ -1,8 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel math.constants math.private
-math.libm combinators math.order math.ratios sequences ;
+math.libm combinators math.order sequences ;
 IN: math.functions
+
+: >fraction ( a/b -- a b )
+    [ numerator ] [ denominator ] bi ; inline
 
 <PRIVATE
 
