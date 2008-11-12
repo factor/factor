@@ -4,13 +4,11 @@ IN: editors.emacs
 
 : emacsclient ( file line -- )
     [
-        \ emacsclient get ,
+        \ emacsclient get "emacsclient" or ,
         "--no-wait" ,
         "+" swap number>string append ,
         ,
     ] { } make try-process ;
-
-\ emacsclient "emacsclient" set-global
 
 : emacs ( word -- )
     where first2 emacsclient ;
