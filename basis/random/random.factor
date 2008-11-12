@@ -16,7 +16,7 @@ GENERIC: random-bytes* ( n tuple -- byte-array )
 <PRIVATE
 
 : adjust-random ( n m -- n' )
-    3 mask 0 = [ 1+ ] unless ; inline
+    3 mask zero? [ 1+ ] unless ; inline
 
 PRIVATE>
 
@@ -39,7 +39,7 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
 : random-bytes ( n -- byte-array )
     [
         dup adjust-random random-generator get random-bytes*
-    ] keep head >byte-array ;
+    ] keep head-slice >byte-array ;
 
 <PRIVATE
 
