@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel kernel.private slots.private math
-assocs math.private sequences sequences.private vectors grouping ;
+assocs math.private sequences sequences.private vectors ;
 IN: hashtables
 
 TUPLE: hashtable
@@ -129,14 +129,21 @@ M: hashtable set-at ( value key hash -- )
     2 <hashtable> [ set-at ] keep ;
 
 M: hashtable >alist
-    array>> 2 <groups> [ first tombstone? not ] filter ;
+    array>> [ length 2/ ] keep V{ } clone [
+        [
+            >r
+            >r 1 fixnum-shift-fast r>
+            [ array-nth ] [ >r 1 fixnum+fast r> array-nth ] 2bi r>
+            pick tombstone? [ 3drop ] [ [ 2array ] dip push ] if
+        ] 2curry each
+    ] keep ;
 
 M: hashtable clone
     (clone) [ clone ] change-array ;
 
 M: hashtable equal?
     over hashtable? [
-        2dup [ assoc-size ] bi@ number=
+        2dup [ assoc-size ] bi@ eq?
         [ assoc= ] [ 2drop f ] if
     ] [ 2drop f ] if ;
 
