@@ -214,6 +214,7 @@ M: tuple pprint-narrow? drop t ;
 
 M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
+M: byte-vector pprint* pprint-object ;
 M: hashtable pprint* pprint-object ;
 
 M: curry pprint*
