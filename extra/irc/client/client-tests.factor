@@ -169,6 +169,20 @@ M: mb-writer dispose drop ;
   ] unit-test
 ] with-irc
 
+[ { H{ { "factorbot" +operator+ } { "ircuser" +normal+ } } } [
+      "#factortest" <irc-channel-chat>
+          H{ { "ircuser" +normal+ } } clone >>participants
+      [ %add-named-chat ] keep
+      ":ircserver.net 353 factorbot @ #factortest :@factorbot " %push-line
+      ":ircserver.net 353 factorbot @ #factortest :ircuser2 " %push-line
+      ":ircserver.net 366 factorbot #factortest :End of /NAMES list." %push-line
+      ":ircserver.net 353 factorbot @ #factortest :@factorbot " %push-line
+      ":ircserver.net 353 factorbot @ #factortest :ircuser " %push-line
+      ":ircserver.net 366 factorbot #factortest :End of /NAMES list." %push-line
+      participants>>
+  ] unit-test
+] with-irc
+
 ! Namelist change notification
 [ { T{ participant-changed f f f f } } [
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
