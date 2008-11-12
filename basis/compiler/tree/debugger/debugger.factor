@@ -3,7 +3,7 @@
 USING: kernel assocs match fry accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
 prettyprint prettyprint.backend prettyprint.sections math words
-combinators io sorting hints qualified
+combinators combinators.short-circuit io sorting hints qualified
 compiler.tree
 compiler.tree.recursive
 compiler.tree.normalization
@@ -57,9 +57,41 @@ TUPLE: shuffle-node { effect effect } ;
 
 M: shuffle-node pprint* effect>> effect>string text ;
  
+: (shuffle-effect) ( in out #shuffle -- effect )
+    mapping>> '[ _ at ] map <effect> ;
+
+: shuffle-effect ( #shuffle -- effect )
+    [ in-d>> ] [ out-d>> ] [ ] tri (shuffle-effect) ;
+
+: #>r? ( #shuffle -- ? )
+    {
+        [ in-d>> length 1 = ]
+        [ out-r>> length 1 = ]
+        [ in-r>> empty? ]
+        [ out-d>> empty? ]
+    } 1&& ;
+
+: #r>? ( #shuffle -- ? )
+    {
+        [ in-d>> empty? ]
+        [ out-r>> empty? ]
+        [ in-r>> length 1 = ]
+        [ out-d>> length 1 = ]
+    } 1&& ;
+
 M: #shuffle node>quot
-    shuffle-effect dup pretty-shuffle
-    [ % ] [ shuffle-node boa , ] ?if ;
+    {
+        { [ dup #>r? ] [ drop \ >r , ] }
+        { [ dup #r>? ] [ drop \ r> , ] }
+        {
+            [ dup [ in-r>> empty? ] [ out-r>> empty? ] bi and ]
+            [
+                dup shuffle-effect pretty-shuffle
+                [ % ] [ shuffle-node boa , ] ?if
+            ]
+        }
+        [ drop "COMPLEX SHUFFLE" , ]
+    } cond ;
 
 M: #push node>quot literal>> , ;
 
@@ -81,16 +113,6 @@ M: #if node>quot
 
 M: #dispatch node>quot
     children>> [ nodes>quot ] map , \ dispatch , ;
-
-M: #>r node>quot
-    [ in-d>> length ] [ out-r>> empty? \ drop \ >r ? ] bi
-    <repetition> % ;
-
-DEFER: rdrop
-
-M: #r> node>quot
-    [ in-r>> length ] [ out-d>> empty? \ rdrop \ r> ? ] bi
-    <repetition> % ;
 
 M: #alien-invoke node>quot params>> , \ #alien-invoke , ;
 

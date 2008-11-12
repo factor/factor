@@ -221,21 +221,14 @@ M: #push emit-node
     literal>> ^^load-literal ds-push iterate-next ;
 
 ! #shuffle
-: emit-shuffle ( effect -- )
-    [ out>> ] [ in>> dup length ds-load zip ] bi
-    '[ _ at ] map ds-store ;
-
 M: #shuffle emit-node
-    shuffle-effect emit-shuffle iterate-next ;
-
-M: #>r emit-node
-    [ in-d>> length ] [ out-r>> empty? ] bi
-    [ neg ##inc-d ] [ ds-load rs-store ] if
-    iterate-next ;
-
-M: #r> emit-node
-    [ in-r>> length ] [ out-d>> empty? ] bi
-    [ neg ##inc-r ] [ rs-load ds-store ] if
+    dup
+    H{ } clone
+    [ [ in-d>> [ length ds-load ] keep ] dip '[ _ set-at ] 2each ]
+    [ [ in-r>> [ length rs-load ] keep ] dip '[ _ set-at ] 2each ]
+    [ nip ] 2tri
+    [ [ [ out-d>> ] [ mapping>> ] bi ] dip '[ _ at _ at ] map ds-store ]
+    [ [ [ out-r>> ] [ mapping>> ] bi ] dip '[ _ at _ at ] map rs-store ] 2bi
     iterate-next ;
 
 ! #return

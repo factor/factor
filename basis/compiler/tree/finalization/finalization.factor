@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences words memoize classes.builtin
+fry assocs
 compiler.tree
 compiler.tree.combinators
 compiler.tree.propagation.info
@@ -27,9 +28,10 @@ GENERIC: finalize* ( node -- nodes )
 M: #copy finalize* drop f ;
 
 M: #shuffle finalize*
-    dup shuffle-effect
-    [ in>> ] [ out>> ] bi sequence=
-    [ drop f ] when ;
+    dup
+    [ [ in-d>> ] [ out-d>> ] [ mapping>> ] tri '[ _ at ] map sequence= ]
+    [ [ in-r>> ] [ out-r>> ] [ mapping>> ] tri '[ _ at ] map sequence= ]
+    bi and [ drop f ] when ;
 
 : builtin-predicate? ( #call -- ? )
     word>> "predicating" word-prop builtin-class? ;
