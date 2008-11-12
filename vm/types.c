@@ -61,6 +61,9 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	update_word_xt(word);
 	UNREGISTER_UNTAGGED(word);
 
+	if(profiling_p)
+		iterate_code_heap_step(word->profiling,relocate_code_block);
+
 	return word;
 }
 
@@ -76,7 +79,7 @@ DEFINE_PRIMITIVE(word)
 DEFINE_PRIMITIVE(word_xt)
 {
 	F_WORD *word = untag_word(dpop());
-	F_COMPILED *code = word->code;
+	F_COMPILED *code = (profiling_p ? word->profiling : word->code);
 	dpush(allot_cell((CELL)code + sizeof(F_COMPILED)));
 	dpush(allot_cell((CELL)code + sizeof(F_COMPILED) + code->code_length));
 }

@@ -32,7 +32,6 @@ F_COMPILED *compile_profiling_stub(F_WORD *word)
 /* Allocates memory */
 void update_word_xt(F_WORD *word)
 {
-	/* If we just enabled the profiler, reset call count */
 	if(profiling_p)
 	{
 		if(!word->profiling)
