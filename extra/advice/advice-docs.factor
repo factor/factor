@@ -17,7 +17,7 @@ HELP: advised?
 { $description "Determines whether or not the given word has any advice on it." } ;
 
 HELP: ad-do-it
-{ $values { "input" "an object" } { "output" "an object" } }
+{ $values { "input" "an object" } { "result" "an object" } }
 { $description "Calls either the next applicable around advice or the main body, returning back to the point it was called from when finished.  This word should only be called from inside advice." }
 { $see-also coyield } ;
 
