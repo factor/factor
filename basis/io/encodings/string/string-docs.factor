@@ -4,7 +4,8 @@ USING: help.markup help.syntax byte-arrays strings ;
 IN: io.encodings.string
 
 ARTICLE: "io.encodings.string" "Encoding and decoding strings"
-"Strings can be encoded or decoded to and from byte arrays through an encoding with the following words:"
+"Strings can be encoded or decoded to and from byte arrays through an encoding by passing "
+{ $link "encodings-descriptors" } " to the following words:"
 { $subsection encode }
 { $subsection decode } ;
 

@@ -1,1 +1,1 @@
-Sieve of Eratosthene
+Sieve of Eratosthenes

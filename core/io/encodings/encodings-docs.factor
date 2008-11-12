@@ -5,8 +5,10 @@ ABOUT: "io.encodings"
 
 ARTICLE: "io.encodings" "I/O encodings"
 "Bytes can't be understood in isolation as text. They must be interpreted under a certain encoding. Factor provides utilities for dealing with encoded text by declaring that a stream has a particular encoding, and utilities to encode and decode strings."
-{ $subsection "encodings-constructors" }
 { $subsection "encodings-descriptors" }
+{ $subsection "encodings-constructors" }
+{ $subsection "io.encodings.string" }
+"New types of encodings can be defined:"
 { $subsection "encodings-protocol" } ;
 
 ARTICLE: "encodings-constructors" "Manually constructing an encoded stream"

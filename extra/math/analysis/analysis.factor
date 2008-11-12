@@ -1,7 +1,7 @@
-! Copyright (C) 2008 Doug Coleman, Slava Pestov.
+! Copyright (C) 2008 Doug Coleman, Slava Pestov, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.constants math.functions math.intervals
-math.vectors namespaces sequences combinators.short-circuit ;
+USING: combinators.short-circuit kernel math math.constants math.functions
+    math.vectors sequences ;
 IN: math.analysis
 
 <PRIVATE
@@ -14,7 +14,7 @@ IN: math.analysis
 : gamma-p6
     {
         2.50662827563479526904 225.525584619175212544 -268.295973841304927459
-        80.9030806934622512966 -5.00757863970517583837 0.0114684895434781459556 
+        80.9030806934622512966 -5.00757863970517583837 0.0114684895434781459556
     } ; inline
 
 : gamma-z ( x n -- seq )
@@ -22,16 +22,16 @@ IN: math.analysis
 
 : (gamma-lanczos6) ( x -- log[gamma[x+1]] )
     #! log(gamma(x+1)
-    [ 0.5 + dup gamma-g6 + dup [ log * ] dip - ]
+    [ 0.5 + dup gamma-g6 + [ log * ] keep - ]
     [ 6 gamma-z gamma-p6 v. log ] bi + ;
 
 : gamma-lanczos6 ( x -- gamma[x] )
     #! gamma(x) = gamma(x+1) / x
-    dup (gamma-lanczos6) exp swap / ;
+    [ (gamma-lanczos6) exp ] keep / ;
 
 : gammaln-lanczos6 ( x -- gammaln[x] )
     #! log(gamma(x)) = log(gamma(x+1)) - log(x)
-    dup (gamma-lanczos6) swap log - ;
+    [ (gamma-lanczos6) ] keep log - ;
 
 : gamma-neg ( gamma[abs[x]] x -- gamma[x] )
     dup pi * sin * * pi neg swap / ; inline
@@ -42,22 +42,22 @@ PRIVATE>
     #! gamma(x) = integral 0..inf [ t^(x-1) exp(-t) ] dt
     #! gamma(n+1) = n! for n > 0
     dup { [ 0.0 <= ] [ 1.0 mod zero? ] } 1&& [
-            drop 1./0.
-        ] [
-            dup abs gamma-lanczos6 swap dup 0 > [ drop ] [ gamma-neg ] if
+        drop 1./0.
+    ] [
+        [ abs gamma-lanczos6 ] keep dup 0 > [ drop ] [ gamma-neg ] if
     ] if ;
 
 : gammaln ( x -- gamma[x] )
     #! gammaln(x) is an alternative when gamma(x)'s range
     #! varies too widely
     dup 0 < [
-            drop 1./0.
-        ] [
-            dup abs gammaln-lanczos6 swap dup 0 > [ drop ] [ gamma-neg ] if
+        drop 1./0.
+    ] [
+        [ abs gammaln-lanczos6 ] keep dup 0 > [ drop ] [ gamma-neg ] if
     ] if ;
 
 : nth-root ( n x -- y )
-    [ recip ] dip swap ^ ;
+    swap recip ^ ;
 
 ! Forth Scientific Library Algorithm #1
 !
@@ -116,6 +116,6 @@ PRIVATE>
 
 : stirling-fact ( n -- fact )
     [ pi 2 * * sqrt ]
-    [ dup e / swap ^ ]
-    [ 12 * recip 1 + ]
-    tri * * ;
+    [ [ e / ] keep ^ ]
+    [ 12 * recip 1+ ] tri * * ;
+

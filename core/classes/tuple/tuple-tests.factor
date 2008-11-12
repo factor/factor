@@ -94,7 +94,7 @@ TUPLE: size-test a b c d ;
 
 [ t ] [
     T{ size-test } tuple-size
-    size-test tuple-layout size>> =
+    size-test tuple-layout second =
 ] unit-test
 
 GENERIC: <yo-momma>
@@ -237,12 +237,6 @@ C: <laptop> laptop
     [ t ] [ "laptop" get battery>> 3 hours = ] unit-test ;
 
 test-laptop-slot-values
-
-[ laptop ] [
-    "laptop" get 1 slot
-    dup echelon>> swap
-    superclasses>> nth
-] unit-test
 
 [ "TUPLE: laptop < computer battery ;" ] [
     [ \ laptop see ] with-string-writer string-lines second

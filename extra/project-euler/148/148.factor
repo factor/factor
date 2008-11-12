@@ -49,6 +49,6 @@ PRIVATE>
     10 9 ^ (euler148) ;
 
 ! [ euler148 ] 100 ave-time
-! 0 ms run time - 100 trials
+! 0 ms ave run time - 0.17 SD (100 trials)
 
 MAIN: euler148

@@ -9,7 +9,7 @@ BIN: 111 tag-mask set
 8 num-tags set
 3 tag-bits set
 
-18 num-types set
+17 num-types set
 
 H{
     { fixnum      BIN: 000 }
@@ -29,9 +29,8 @@ tag-numbers get H{
     { byte-array 10 }
     { callstack 11 }
     { string 12 }
-    { tuple-layout 13 }
+    { word 13 }
     { quotation 14 }
     { dll 15 }
     { alien 16 }
-    { word 17 }
 } assoc-union type-numbers set

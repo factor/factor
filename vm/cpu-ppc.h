@@ -1,8 +1,8 @@
 #define FACTOR_CPU_STRING "ppc"
 #define F_FASTCALL
 
-register CELL ds asm("r14");
-register CELL rs asm("r15");
+register CELL ds asm("r29");
+register CELL rs asm("r30");
 
 void c_to_factor(CELL quot);
 void undefined(CELL word);

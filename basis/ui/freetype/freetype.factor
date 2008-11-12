@@ -196,6 +196,7 @@ M: freetype-renderer string-height ( open-font string -- h )
 :: (draw-string) ( open-font sprites string loc -- )
     GL_TEXTURE_2D [
         loc [
+            -0.5 0.5 0.0 glTranslated
             string open-font string char-widths scan-sums [
                 [ open-font sprites ] 2dip draw-char
             ] 2each

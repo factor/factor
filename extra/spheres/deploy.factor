@@ -1,7 +1,6 @@
 USING: tools.deploy.config ;
 H{
     { deploy-reflection 1 }
-    { deploy-random? t }
     { deploy-word-defs? f }
     { deploy-word-props? f }
     { deploy-name "Spheres" }

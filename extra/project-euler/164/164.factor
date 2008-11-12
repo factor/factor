@@ -33,6 +33,6 @@ PRIVATE>
     init-table 19 [ next-table ] times values sum ;
 
 ! [ euler164 ] 100 ave-time
-! 8 ms run time - 100 trials
+! 7 ms ave run time - 1.23 SD (100 trials)
 
 MAIN: euler164

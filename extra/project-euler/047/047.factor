@@ -49,7 +49,7 @@ PRIVATE>
     4 646 consecutive ;
 
 ! [ euler047 ] time
-! 542708 ms run / 60548 ms GC time
+! 344688 ms run / 20727 ms GC time
 
 
 ! ALTERNATE SOLUTIONS
@@ -66,7 +66,7 @@ SYMBOL: sieve
     0 <repetition> >array sieve set ;
 
 : is-prime? ( index -- ? )
-    sieve get nth zero? ;
+    sieve get nth 0 = ;
 
 : multiples ( n -- seq )
     sieve get length 1- over <range> ;
@@ -88,7 +88,7 @@ PRIVATE>
     4 200000 consecutive-under ;
 
 ! [ euler047a ] 100 ave-time
-! 503 ms run / 5 ms GC ave time - 100 trials
+! 331 ms ave run time - 19.14 SD (100 trials)
 
 ! TODO: I don't like that you have to specify the upper bound, maybe try making
 ! this lazy so it could also short-circuit when it finds the answer?

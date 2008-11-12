@@ -6,6 +6,10 @@ IN: bootstrap.x86
 
 4 \ cell set
 
+: stack-frame-size ( -- n ) 4 bootstrap-cells ;
+: shift-arg ( -- reg ) ECX ;
+: div-arg ( -- reg ) EAX ;
+: mod-arg ( -- reg ) EDX ;
 : arg0 ( -- reg ) EAX ;
 : arg1 ( -- reg ) EDX ;
 : temp-reg ( -- reg ) EBX ;

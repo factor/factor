@@ -28,9 +28,9 @@ IN: project-euler.100
     [ dup dup 1- * 2 * 10 24 ^ <= ]
     [ tuck 6 * swap - 2 - ] [ ] while nip ;
 
-! TODO: solution is incredibly slow (>30 minutes) and needs generalization
+! TODO: solution needs generalization
 
-! [ euler100 ] time
-! ? ms run time
+! [ euler100 ] 100 ave-time
+! 0 ms ave run time - 0.14 SD (100 trials)
 
 MAIN: euler100

@@ -4,7 +4,6 @@ USING: kernel accessors sequences classes.tuple
 classes.tuple.private arrays math math.private slots.private
 combinators deques search-deques namespaces fry classes
 classes.algebra stack-checker.state
-compiler.intrinsics
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.escape-analysis.nodes

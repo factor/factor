@@ -20,7 +20,8 @@ H{ } clone sub-primitives set
 
 "resource:basis/cpu/" architecture get {
     { "x86.32" "x86/32" }
-    { "x86.64" "x86/64" }
+    { "winnt-x86.64" "x86/64/winnt" }
+    { "unix-x86.64" "x86/64/unix" }
     { "linux-ppc" "ppc/linux" }
     { "macosx-ppc" "ppc/macosx" }
     { "arm" "arm" }
@@ -36,6 +37,7 @@ H{ } clone dictionary set
 H{ } clone new-classes set
 H{ } clone changed-definitions set
 H{ } clone changed-generics set
+H{ } clone remake-generics set
 H{ } clone forgotten-definitions set
 H{ } clone root-cache set
 H{ } clone source-files set
@@ -80,6 +82,7 @@ bootstrapping? on
     "io.files"
     "io.files.private"
     "io.streams.c"
+    "locals.backend"
     "kernel"
     "kernel.private"
     "math"
@@ -145,7 +148,6 @@ bootstrapping? on
 "alien" "alien" create register-builtin
 "word" "words" create register-builtin
 "byte-array" "byte-arrays" create register-builtin
-"tuple-layout" "classes.tuple.private" create register-builtin
 
 ! For predicate classes
 "predicate-instance?" "classes.predicate" create drop
@@ -270,14 +272,6 @@ bi
 
 "callstack" "kernel" create { } define-builtin
 
-"tuple-layout" "classes.tuple.private" create {
-    { "hashcode" { "fixnum" "math" } read-only }
-    { "class" { "word" "words" } initial: t read-only }
-    { "size" { "fixnum" "math" } read-only }
-    { "superclasses" { "array" "arrays" } initial: { } read-only }
-    { "echelon" { "fixnum" "math" } read-only }
-} define-builtin
-
 "tuple" "kernel" create
 [ { } define-builtin ]
 [ define-tuple-layout ]
@@ -345,6 +339,8 @@ tuple
     { "fixnum-bitor" "math.private" }
     { "fixnum-bitxor" "math.private" }
     { "fixnum-bitnot" "math.private" }
+    { "fixnum-mod" "math.private" }
+    { "fixnum-shift-fast" "math.private" }
     { "fixnum<" "math.private" }
     { "fixnum<=" "math.private" }
     { "fixnum>" "math.private" }
@@ -370,6 +366,8 @@ tuple
     { "eq?" "kernel" }
     { "tag" "kernel.private" }
     { "slot" "slots.private" }
+    { "get-local" "locals.backend" }
+    { "drop-locals" "locals.backend" }
 } [ make-sub-primitive ] assoc-each
 
 ! Primitive words
@@ -396,10 +394,8 @@ tuple
     { "fixnum-" "math.private" }
     { "fixnum*" "math.private" }
     { "fixnum/i" "math.private" }
-    { "fixnum-mod" "math.private" }
     { "fixnum/mod" "math.private" }
     { "fixnum-shift" "math.private" }
-    { "fixnum-shift-fast" "math.private" }
     { "bignum=" "math.private" }
     { "bignum+" "math.private" }
     { "bignum-" "math.private" }
@@ -506,7 +502,6 @@ tuple
     { "array>quotation" "quotations.private" }
     { "quotation-xt" "quotations" }
     { "<tuple>" "classes.tuple.private" }
-    { "<tuple-layout>" "classes.tuple.private" }
     { "profiling" "tools.profiler.private" }
     { "become" "kernel.private" }
     { "(sleep)" "threads.private" }

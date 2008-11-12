@@ -1,7 +1,6 @@
-! Copyright (c) 2007 Aaron Schaefer.
+! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces make project-euler.common sequences
-splitting grouping ;
+USING: grouping kernel make sequences ;
 IN: project-euler.011
 
 ! http://projecteuler.net/index.php?section=problems&id=11
@@ -88,7 +87,7 @@ IN: project-euler.011
     horizontal pad-front pad-back flip ;
 
 : max-product ( matrix width -- n )
-    [ collect-consecutive ] curry map concat
+    [ clump ] curry map concat
     [ product ] map supremum ; inline
 
 PRIVATE>
@@ -100,6 +99,6 @@ PRIVATE>
     ] { } make supremum ;
 
 ! [ euler011 ] 100 ave-time
-! 4 ms run / 0 ms GC ave time - 100 trials
+! 3 ms ave run time - 0.77 SD (100 trials)
 
 MAIN: euler011

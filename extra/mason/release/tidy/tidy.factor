@@ -1,16 +1,14 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces continuations debugger sequences fry
-io.files io.launcher mason.common mason.platform
+io.files io.launcher bootstrap.image qualified mason.common
 mason.config ;
+FROM: mason.config => target-os ;
 IN: mason.release.tidy
 
 : common-files ( -- seq )
+    images [ boot-image-name ] map
     {
-        "boot.x86.32.image"
-        "boot.x86.64.image"
-        "boot.macosx-ppc.image"
-        "boot.linux-ppc.image"
         "vm"
         "temp"
         "logs"
@@ -20,7 +18,8 @@ IN: mason.release.tidy
         "unmaintained"
         "unfinished"
         "build-support"
-    } ;
+    }
+    append ;
 
 : remove-common-files ( -- )
     common-files [ delete-tree ] each ;

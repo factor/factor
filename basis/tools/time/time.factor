@@ -7,20 +7,6 @@ IN: tools.time
 : benchmark ( quot -- runtime )
     millis >r call millis r> - ; inline
 
-: simple-table. ( values -- )
-    standard-table-style [
-        [
-            [
-                [
-                    dup string?
-                    [ [ write ] with-cell ]
-                    [ pprint-cell ]
-                    if
-                ] each
-            ] with-row
-        ] each
-    ] tabular-output ;
-
 : time. ( data -- )
     unclip
     "==== RUNNING TIME" print nl pprint " ms" print nl

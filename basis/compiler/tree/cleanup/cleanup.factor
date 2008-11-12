@@ -5,7 +5,6 @@ classes.algebra namespaces assocs words math math.private
 math.partial-dispatch math.intervals classes classes.tuple
 classes.tuple.private layouts definitions stack-checker.state
 stack-checker.branches
-compiler.intrinsics
 compiler.tree
 compiler.tree.combinators
 compiler.tree.propagation.info
@@ -79,7 +78,7 @@ GENERIC: cleanup* ( node -- node/nodes )
     } cond ;
 
 : remove-overflow-check ( #call -- #call )
-    [ in-d>> ] [ out-d>> ] [ word>> no-overflow-variant ] tri #call cleanup* ;
+    [ no-overflow-variant ] change-word cleanup* ;
 
 M: #call cleanup*
     {
@@ -103,7 +102,7 @@ M: #declare cleanup* drop f ;
     #! If only one branch is live we don't need to branch at
     #! all; just drop the condition value.
     dup live-children sift dup length {
-        { 0 [ 2drop f ] }
+        { 0 [ drop in-d>> #drop ] }
         { 1 [ first swap in-d>> #drop prefix ] }
         [ 2drop ]
     } case ;

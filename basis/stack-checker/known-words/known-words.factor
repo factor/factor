@@ -68,14 +68,14 @@ M: literal infer-call*
 
 M: curried infer-call*
     swap push-d
-    [ uncurry ] recursive-state get infer-quot
+    [ uncurry ] infer-quot-here
     [ quot>> known pop-d [ set-known ] keep ]
     [ obj>> known pop-d [ set-known ] keep ] bi
     push-d infer-call ;
 
 M: composed infer-call*
     swap push-d
-    [ uncompose ] recursive-state get infer-quot
+    [ uncompose ] infer-quot-here
     [ quot2>> known pop-d [ set-known ] keep ]
     [ quot1>> known pop-d [ set-known ] keep ] bi
     push-d push-d
@@ -108,7 +108,7 @@ M: object infer-call*
 
 : infer-<tuple-boa> ( -- )
     \ <tuple-boa>
-    peek-d literal value>> size>> 1+ { tuple } <effect>
+    peek-d literal value>> second 1+ { tuple } <effect>
     apply-word/effect ;
 
 : infer-(throw) ( -- )
@@ -560,9 +560,6 @@ do-primitive alien-invoke alien-indirect alien-callback
 
 \ <tuple> { tuple-layout } { tuple } define-primitive
 \ <tuple> make-flushable
-
-\ <tuple-layout> { word fixnum array fixnum } { tuple-layout } define-primitive
-\ <tuple-layout> make-foldable
 
 \ datastack { } { array } define-primitive
 \ datastack make-flushable

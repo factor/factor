@@ -63,7 +63,11 @@ GENERIC: draw-selection ( loc obj -- )
     >r clip get over intersects? r> [ drop ] if ; inline
 
 M: gadget draw-selection ( loc gadget -- )
-    swap offset-rect [ rect-extent gl-fill-rect ] if-fits ;
+    swap offset-rect [
+        dup loc>> [
+            dim>> gl-fill-rect
+        ] with-translation
+    ] if-fits ;
 
 M: node draw-selection ( loc node -- )
     2dup value>> swap offset-rect [
@@ -74,7 +78,7 @@ M: node draw-selection ( loc node -- )
 
 M: pane draw-gadget*
     dup gadget-selection? [
-        dup selection-color>> set-color
+        dup selection-color>> gl-color
         origin get over rect-loc v- swap selected-children
         [ draw-selection ] with each
     ] [

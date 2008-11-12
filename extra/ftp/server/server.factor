@@ -6,7 +6,8 @@ io.encodings.utf8 io.files io.sockets kernel math.parser
 namespaces make sequences ftp io.unix.launcher.parser
 unicode.case splitting assocs classes io.servers.connection
 destructors calendar io.timeouts io.streams.duplex threads
-continuations math concurrency.promises byte-arrays ;
+continuations math concurrency.promises byte-arrays sequences.lib
+hexdump ;
 IN: ftp.server
 
 SYMBOL: client
@@ -19,12 +20,14 @@ TUPLE: ftp-command raw tokenized ;
 TUPLE: ftp-get path ;
 
 : <ftp-get> ( path -- obj )
-    ftp-get new swap >>path ;
+    ftp-get new
+        swap >>path ;
 
 TUPLE: ftp-put path ;
 
 : <ftp-put> ( path -- obj )
-    ftp-put new swap >>path ;
+    ftp-put new
+        swap >>path ;
 
 TUPLE: ftp-list ;
 
@@ -62,7 +65,7 @@ C: <ftp-list> ftp-list
 
 : handle-USER ( ftp-command -- )
     [
-        tokenized>> second client get swap >>user drop
+        tokenized>> second client get (>>user)
         331 "Please specify the password." server-response
     ] [
         2drop "bad USER" ftp-error
@@ -70,7 +73,7 @@ C: <ftp-list> ftp-list
 
 : handle-PASS ( ftp-command -- )
     [
-        tokenized>> second client get swap >>password drop
+        tokenized>> second client get (>>password)
         230 "Login successful" server-response
     ] [
         2drop "PASS error" ftp-error
@@ -101,20 +104,20 @@ ERROR: type-error type ;
 
 : handle-PWD ( obj -- )
     drop
-    257 current-directory get "\"" swap "\"" 3append server-response ;
+    257 current-directory get "\"" "\"" surround server-response ;
 
 : handle-SYST ( obj -- )
     drop
     215 "UNIX Type: L8" server-response ;
 
 : if-command-promise ( quot -- )
-    >r client get command-promise>> r>
+    [ client get command-promise>> ] dip
     [ "Establish an active or passive connection first" ftp-error ] if* ;
 
 : handle-STOR ( obj -- )
     [
         tokenized>> second
-        [ >r <ftp-put> r> fulfill ] if-command-promise
+        [ [ <ftp-put> ] dip fulfill ] if-command-promise
     ] [
         2drop
     ] recover ;
@@ -145,7 +148,7 @@ M: ftp-list service-command ( stream obj -- )
     rot   
     [ file-name ] [
         " " swap  file-info size>> number>string
-        "(" " bytes)." swapd 3append append
+        "(" " bytes)." surround append
     ] bi 3append server-response ;
 
 : transfer-incoming-file ( path -- )
@@ -191,7 +194,7 @@ M: ftp-put service-command ( stream obj -- )
 
 : handle-LIST ( obj -- )
     drop
-    [ >r <ftp-list> r> fulfill ] if-command-promise ;
+    [ [ <ftp-list> ] dip fulfill ] if-command-promise ;
 
 : handle-SIZE ( obj -- )
     [
@@ -217,7 +220,7 @@ M: ftp-put service-command ( stream obj -- )
     expect-connection
     [
         "Entering Passive Mode (127,0,0,1," %
-        port>bytes [ number>string ] bi@ "," swap 3append %
+        port>bytes [ number>string ] bi@ "," splice %
         ")" %
     ] "" make 227 swap server-response ;
 
@@ -242,7 +245,7 @@ ERROR: not-a-directory ;
             set-current-directory
             250 "Directory successully changed." server-response
         ] [
-            not-a-directory throw
+            not-a-directory
         ] if
     ] [
         2drop

@@ -64,14 +64,9 @@ PRIVATE>
 : macro-expand ( cons -- quot )
     uncons [ list>seq >quotation ] [ lookup-macro ] bi* call call ;
 
-<PRIVATE
-: (expand-macros) ( cons -- cons )
-    [ dup list? [ (expand-macros) dup car lisp-macro? [ macro-expand ] when ] when ] lmap ;
-PRIVATE>
-
 : expand-macros ( cons -- cons )
-    dup list? [ (expand-macros) dup car lisp-macro? [ macro-expand ] when ] when ;
-
+    dup list? [ [ expand-macros ] lmap dup car lisp-macro? [ macro-expand expand-macros ] when ] when ;
+    
 : convert-begin ( cons -- quot )
     cdr [ convert-form ] [ ] lmap-as [ 1 tail* ] [ but-last ] bi
     [ '[ { } _ with-datastack drop ] ] map prepend '[ _ [ call ] each ] ;
@@ -169,15 +164,15 @@ M: no-such-var summary drop "No such variable" ;
 
    "set" "lisp" "define-lisp-var" define-primitive
     
-   "(lambda (&rest xs) xs)" lisp-string>factor first "list" lisp-define
-   "(defmacro setq (var val) (list (quote set) (list (quote quote) var) val))" lisp-eval
+   "(set 'list (lambda (&rest xs) xs))" lisp-eval
+   "(defmacro setq (var val) (list 'set (list 'quote var) val))" lisp-eval
     
    <" (defmacro defun (name vars &rest body)
-        (list (quote setq) name (list (quote lambda) vars body))) "> lisp-eval
+        (list 'setq name (cons 'lambda (cons vars body)))) "> lisp-eval
     
-   "(defmacro if (pred tr fl) (list (quote cond) (list pred tr) (list (quote #t) fl)))" lisp-eval
+   "(defmacro if (pred tr fl) (list 'cond (list pred tr) (list (quote #t) fl)))" lisp-eval
    ;
 
 : <LISP 
-    "LISP>" parse-multiline-string define-lisp-builtins
+    "LISP>" parse-multiline-string "(begin " prepend ")" append define-lisp-builtins
     lisp-string>factor parsed \ call parsed ; parsing

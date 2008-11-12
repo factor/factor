@@ -1,7 +1,6 @@
 USING: tools.deploy.config ;
 H{
     { deploy-word-defs? f }
-    { deploy-random? f }
     { deploy-name "Sudoku" }
     { deploy-threads? f }
     { deploy-compiler? t }

@@ -69,7 +69,7 @@ $nl
 { $subsection POSTPONE: PRIVATE> }
 { $subsection "vocabulary-search-errors" }
 { $subsection "vocabulary-search-shadow" }
-{ $see-also "words" } ;
+{ $see-also "words" "qualified" } ;
 
 ARTICLE: "reading-ahead" "Reading ahead"
 "Parsing words can consume input:"

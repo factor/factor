@@ -75,8 +75,8 @@ SYMBOL: meta-r
     recursive-state get at ;
 
 : local-recursive-state ( -- assoc )
-    recursive-state get dup keys
-    [ dup word? [ inline? ] when not ] find drop
+    recursive-state get dup
+    [ first dup word? [ inline? ] when not ] find drop
     [ head-slice ] when* ;
 
 : inline-recursive-label ( word -- label/f )

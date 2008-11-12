@@ -4,7 +4,6 @@ H{
     { deploy-word-defs? f }
     { deploy-reflection 1 }
     { deploy-compiler? t }
-    { deploy-random? f }
     { deploy-c-types? f }
     { deploy-name "Bunny" }
     { deploy-word-props? f }

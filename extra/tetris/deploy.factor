@@ -6,7 +6,6 @@ H{
     { deploy-word-props? f }
     { deploy-reflection 1 }
     { "stop-after-last-window?" t }
-    { deploy-random? t }
     { deploy-io 2 }
     { deploy-math? t }
     { deploy-word-defs? f }

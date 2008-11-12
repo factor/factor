@@ -43,6 +43,6 @@ PRIVATE>
     [ [ s + ] keep ] leach drop ;
 
 ! [ euler134 ] 10 ave-time
-! 2430 ms run / 36 ms GC ave time - 10 trials
+! 933 ms ave run timen - 19.58 SD (10 trials)
 
 MAIN: euler134

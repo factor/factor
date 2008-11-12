@@ -77,3 +77,10 @@ IN: dlists.tests
 [ f ] [ <dlist> 3 over push-front 4 over push-back -1 swap deque-member? ] unit-test
 
 [ f ] [ <dlist> 0 swap deque-member? ] unit-test
+
+! Make sure clone does the right thing
+[ V{ 2 1 } V{ 2 1 3 } ] [
+    <dlist> 1 over push-front 2 over push-front
+    dup clone 3 over push-back
+    [ dlist>seq ] bi@
+] unit-test

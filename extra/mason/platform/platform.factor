@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel system accessors namespaces splitting sequences make
-mason.config ;
+USING: kernel system accessors namespaces splitting sequences
+mason.config bootstrap.image ;
 IN: mason.platform
 
 : platform ( -- string )
@@ -10,10 +10,8 @@ IN: mason.platform
 : gnu-make ( -- string )
     target-os get { "freebsd" "openbsd" "netbsd" } member? "gmake" "make" ? ;
 
+: boot-image-arch ( -- string )
+    target-os get target-cpu get arch ;
+
 : boot-image-name ( -- string )
-    [
-        "boot." %
-        target-cpu get "ppc" = [ target-os get % "-" % ] when
-        target-cpu get %
-        ".image" %
-    ] "" make ;
+    "boot." boot-image-arch ".image" 3append ;

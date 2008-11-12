@@ -126,8 +126,6 @@ $nl
 
     { { $snippet "\"specializer\"" } { $link "hints" } }
     
-    { { { $snippet "\"intrinsics\"" } ", " { $snippet "\"if-intrinsics\"" } } { $link "generator" } }
-
     { { $snippet "\"predicating\"" } " Set on class predicates, stores the corresponding class word" }
 }
 "Properties which are defined for classes only:"
