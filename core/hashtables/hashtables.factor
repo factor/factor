@@ -128,15 +128,25 @@ M: hashtable set-at ( value key hash -- )
 : associate ( value key -- hash )
     2 <hashtable> [ set-at ] keep ;
 
+<PRIVATE
+
+: push-unsafe ( elt seq -- )
+    [ length ] keep
+    [ underlying>> set-array-nth ]
+    [ >r 1+ r> (>>length) ]
+    2bi ; inline
+
+PRIVATE>
+
 M: hashtable >alist
-    array>> [ length 2/ ] keep V{ } clone [
+    [ array>> [ length 2/ ] keep ] [ assoc-size <vector> ] bi [
         [
             >r
             >r 1 fixnum-shift-fast r>
             [ array-nth ] [ >r 1 fixnum+fast r> array-nth ] 2bi r>
-            pick tombstone? [ 3drop ] [ [ 2array ] dip push ] if
+            pick tombstone? [ 3drop ] [ [ 2array ] dip push-unsafe ] if
         ] 2curry each
-    ] keep ;
+    ] keep { } like ;
 
 M: hashtable clone
     (clone) [ clone ] change-array ;

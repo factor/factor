@@ -119,7 +119,7 @@ t compile-dependencies? set-global
         H{ } clone compiled set
         [ queue-compile ] each
         compile-queue get compile-loop
-        compiled get >alist >array
+        compiled get >alist
     ] with-scope ;
 
 : enable-compiler ( -- )
