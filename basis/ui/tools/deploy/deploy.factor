@@ -36,7 +36,7 @@ TUPLE: deploy-gadget < pack vocab settings ;
     deploy-compiler? get "Use optimizing compiler" <checkbox> add-gadget
     deploy-math? get "Rational and complex number support" <checkbox> add-gadget
     deploy-threads? get "Threading support" <checkbox> add-gadget
-    deploy-random? get "Random number generator support" <checkbox> add-gadget
+    deploy-unicode? get "Unicode character literal support" <checkbox> add-gadget
     deploy-word-props? get "Retain all word properties" <checkbox> add-gadget
     deploy-word-defs? get "Retain all word definitions" <checkbox> add-gadget
     deploy-c-types? get "Retain all C types" <checkbox> add-gadget ;

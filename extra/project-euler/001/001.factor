@@ -46,7 +46,7 @@ PRIVATE>
 
 
 : euler001b ( -- answer )
-    1000 [ dup 5 mod swap 3 mod [ zero? ] either? ] filter sum ;
+    1000 [ [ 5 mod ] [ 3 mod ] bi [ 0 = ] either? ] filter sum ;
 
 ! [ euler001b ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials

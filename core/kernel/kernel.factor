@@ -167,11 +167,11 @@ GENERIC: boa ( ... class -- tuple )
     compose compose ; inline
 
 ! Booleans
-: not ( obj -- ? ) f t ? ; inline
+: not ( obj -- ? ) [ f ] [ t ] if ; inline
 
 : and ( obj1 obj2 -- ? ) over ? ; inline
 
-: >boolean ( obj -- ? ) t f ? ; inline
+: >boolean ( obj -- ? ) [ t ] [ f ] if ; inline
 
 : or ( obj1 obj2 -- ? ) dupd ? ; inline
 
@@ -194,9 +194,9 @@ ERROR: assert got expect ;
 
 <PRIVATE
 
-: hi-tag ( obj -- n ) 0 slot ; inline
-
 : declare ( spec -- ) drop ;
+
+: hi-tag ( obj -- n ) { hi-tag } declare 0 slot ; inline
 
 : do-primitive ( number -- ) "Improper primitive call" throw ;
 

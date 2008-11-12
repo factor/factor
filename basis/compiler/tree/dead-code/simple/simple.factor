@@ -39,12 +39,6 @@ M: #copy compute-live-values*
 
 M: #call compute-live-values* nip look-at-inputs ;
 
-M: #>r compute-live-values*
-    [ out-r>> ] [ in-d>> ] bi look-at-mapping ;
-
-M: #r> compute-live-values*
-    [ out-d>> ] [ in-r>> ] bi look-at-mapping ;
-
 M: #shuffle compute-live-values*
     mapping>> at look-at-value ;
 
@@ -61,7 +55,7 @@ M: #alien-indirect compute-live-values* nip look-at-inputs ;
     zip filter-mapping values ;
 
 : filter-live ( values -- values' )
-    [ live-value? ] filter ;
+    dup empty? [ [ live-value? ] filter ] unless ;
 
 :: drop-values ( inputs outputs mapping-keys mapping-values -- #shuffle )
     inputs
@@ -69,7 +63,7 @@ M: #alien-indirect compute-live-values* nip look-at-inputs ;
     outputs
     mapping-keys
     mapping-values
-    filter-corresponding zip #shuffle ; inline
+    filter-corresponding zip #data-shuffle ; inline
 
 :: drop-dead-values ( outputs -- #shuffle )
     [let* | new-outputs [ outputs make-values ]
@@ -95,16 +89,6 @@ M: #alien-indirect compute-live-values* nip look-at-inputs ;
 M: #introduce remove-dead-code* ( #introduce -- nodes )
     maybe-drop-dead-outputs ;
 
-M: #>r remove-dead-code*
-    [ filter-live ] change-out-r
-    [ filter-live ] change-in-d
-    dup in-d>> empty? [ drop f ] when ;
-
-M: #r> remove-dead-code*
-    [ filter-live ] change-out-d
-    [ filter-live ] change-in-r
-    dup in-r>> empty? [ drop f ] when ;
-
 M: #push remove-dead-code*
     dup out-d>> first live-value? [ drop f ] unless ;
 
@@ -125,12 +109,14 @@ M: #call remove-dead-code*
 M: #shuffle remove-dead-code*
     [ filter-live ] change-in-d
     [ filter-live ] change-out-d
+    [ filter-live ] change-in-r
+    [ filter-live ] change-out-r
     [ filter-mapping ] change-mapping
-    dup in-d>> empty? [ drop f ] when ;
+    dup [ in-d>> empty? ] [ in-r>> empty? ] bi and [ drop f ] when ;
 
 M: #copy remove-dead-code*
     [ in-d>> ] [ out-d>> ] bi
-    2dup swap zip #shuffle
+    2dup swap zip #data-shuffle
     remove-dead-code* ;
 
 M: #terminate remove-dead-code*

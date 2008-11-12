@@ -5,7 +5,6 @@ H{
     { deploy-threads? f }
     { deploy-word-props? f }
     { deploy-reflection 2 }
-    { deploy-random? f }
     { deploy-io 2 }
     { deploy-math? f }
     { deploy-ui? f }

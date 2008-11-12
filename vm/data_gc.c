@@ -244,8 +244,6 @@ CELL unaligned_object_size(CELL pointer)
 	case CALLSTACK_TYPE:
 		return callstack_size(
 			untag_fixnum_fast(((F_CALLSTACK *)pointer)->length));
-	case TUPLE_LAYOUT_TYPE:
-		return sizeof(F_TUPLE_LAYOUT);
 	default:
 		critical_error("Invalid header",pointer);
 		return -1; /* can't happen */
@@ -440,6 +438,8 @@ void collect_gen_cards(CELL gen)
 old->new references */
 void collect_cards(void)
 {
+	GC_PRINT("Collect cards\n");
+
 	int i;
 	for(i = collecting_gen + 1; i < data_heap->gen_count; i++)
 		collect_gen_cards(i);
@@ -467,7 +467,10 @@ void collect_callstack(F_CONTEXT *stacks)
 	{
 		CELL top = (CELL)stacks->callstack_top;
 		CELL bottom = (CELL)stacks->callstack_bottom;
+
+		GC_PRINT("Collect callstack %ld %ld\n",top,bottom);
 		iterate_callstack(top,bottom,collect_stack_frame);
+		GC_PRINT("Done\n");
 	}
 }
 
@@ -483,6 +486,7 @@ void collect_gc_locals(void)
 the user environment and extra roots registered with REGISTER_ROOT */
 void collect_roots(void)
 {
+	GC_PRINT("Collect roots\n");
 	copy_handle(&T);
 	copy_handle(&bignum_zero);
 	copy_handle(&bignum_pos_one);

@@ -10,7 +10,8 @@ sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
-combinators locals.backend words.private quotations.private
+combinators locals locals.backend locals.private words.private
+quotations.private
 stack-checker.state
 stack-checker.backend
 stack-checker.branches
@@ -48,7 +49,7 @@ IN: stack-checker.known-words
 : infer-shuffle ( shuffle -- )
     [ in>> length consume-d ] keep ! inputs shuffle
     [ drop ] [ shuffle dup copy-values dup output-d ] 2bi ! inputs outputs copies
-    [ nip ] [ swap zip ] 2bi ! inputs copies mapping
+    [ nip f f ] [ swap zip ] 2bi ! in-d out-d in-r out-r mapping
     #shuffle, ;
 
 : infer-shuffle-word ( word -- )
@@ -68,14 +69,14 @@ M: literal infer-call*
 
 M: curried infer-call*
     swap push-d
-    [ uncurry ] recursive-state get infer-quot
+    [ uncurry ] infer-quot-here
     [ quot>> known pop-d [ set-known ] keep ]
     [ obj>> known pop-d [ set-known ] keep ] bi
     push-d infer-call ;
 
 M: composed infer-call*
     swap push-d
-    [ uncompose ] recursive-state get infer-quot
+    [ uncompose ] infer-quot-here
     [ quot2>> known pop-d [ set-known ] keep ]
     [ quot1>> known pop-d [ set-known ] keep ] bi
     push-d push-d
@@ -108,7 +109,7 @@ M: object infer-call*
 
 : infer-<tuple-boa> ( -- )
     \ <tuple-boa>
-    peek-d literal value>> size>> 1+ { tuple } <effect>
+    peek-d literal value>> second 1+ { tuple } <effect>
     apply-word/effect ;
 
 : infer-(throw) ( -- )
@@ -123,21 +124,23 @@ M: object infer-call*
 
 : infer-load-locals ( -- )
     pop-literal nip
-    [ dup reverse <effect> infer-shuffle ]
-    [ infer->r ]
-    bi ;
+    consume-d dup reverse copy-values dup output-r
+    [ [ f f ] dip ] [ reverse swap zip ] 2bi #shuffle, ;
 
 : infer-get-local ( -- )
-    pop-literal nip
-    [ infer-r> ]
-    [ dup 0 prefix <effect> infer-shuffle ]
-    [ infer->r ]
-    tri ;
+    [let* | n [ pop-literal nip ]
+            in-r [ n consume-r ]
+            out-d [ in-r first copy-value 1array ]
+            out-r [ in-r copy-values ] |
+         out-d output-d
+         out-r output-r
+         f out-d in-r out-r
+         out-r in-r zip out-d first in-r first 2array suffix
+         #shuffle,
+    ] ;
 
 : infer-drop-locals ( -- )
-    pop-literal nip
-    [ infer-r> ]
-    [ { } <effect> infer-shuffle ] bi ;
+    f f pop-literal nip consume-r f f #shuffle, ;
 
 : infer-special ( word -- )
     {
@@ -164,6 +167,12 @@ M: object infer-call*
         { \ alien-callback [ infer-alien-callback ] }
     } case ;
 
+: infer-local-reader ( word -- )
+    (( -- value )) apply-word/effect ;
+
+: infer-local-writer ( word -- )
+    (( value -- )) apply-word/effect ;
+
 {
     >r r> declare call (call) curry compose execute (execute) if
 dispatch <tuple-boa> (throw) load-locals get-local drop-locals
@@ -183,6 +192,9 @@ do-primitive alien-invoke alien-indirect alien-callback
         { [ dup "macro" word-prop ] [ apply-macro ] }
         { [ dup "cannot-infer" word-prop ] [ cannot-infer-effect ] }
         { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
+        { [ dup local? ] [ infer-local-reader ] }
+        { [ dup local-reader? ] [ infer-local-reader ] }
+        { [ dup local-writer? ] [ infer-local-writer ] }
         { [ dup recursive-label ] [ call-recursive-word ] }
         [ dup infer-word apply-word/effect ]
     } cond ;
@@ -560,9 +572,6 @@ do-primitive alien-invoke alien-indirect alien-callback
 
 \ <tuple> { tuple-layout } { tuple } define-primitive
 \ <tuple> make-flushable
-
-\ <tuple-layout> { word fixnum array fixnum } { tuple-layout } define-primitive
-\ <tuple-layout> make-foldable
 
 \ datastack { } { array } define-primitive
 \ datastack make-flushable

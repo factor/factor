@@ -60,6 +60,6 @@ PRIVATE>
     ] with-scope ;
 
 ! [ euler039 ] 100 ave-time
-! 2 ms run / 0 ms GC ave time - 100 trials
+! 1 ms ave run time - 0.37 SD (100 trials)
 
 MAIN: euler039

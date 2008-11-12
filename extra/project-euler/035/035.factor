@@ -53,7 +53,7 @@ PRIVATE>
     source-035 [ possible? ] filter [ circular? ] count ;
 
 ! [ euler035 ] 100 ave-time
-! 904 ms run / 86 ms GC ave time - 100 trials
+! 538 ms ave run time - 17.16 SD (100 trials)
 
 ! TODO: try using bit arrays or other methods outlined here:
 !     http://home.comcast.net/~babdulbaki/Circular_Primes.html

@@ -21,7 +21,7 @@ IN: project-euler.004
 <PRIVATE
 
 : source-004 ( -- seq )
-    100 999 [a,b] [ 10 mod zero? not ] filter ;
+    100 999 [a,b] [ 10 mod 0 = not ] filter ;
 
 : max-palindrome ( seq -- palindrome )
     natural-sort [ palindrome? ] find-last nip ;
@@ -32,6 +32,6 @@ PRIVATE>
     source-004 dup cartesian-product [ product ] map prune max-palindrome ;
 
 ! [ euler004 ] 100 ave-time
-! 1608 ms run / 102 ms GC ave time - 100 trials
+! 1164 ms ave run time - 39.35 SD (100 trials)
 
 MAIN: euler004

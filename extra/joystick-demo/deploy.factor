@@ -4,7 +4,6 @@ H{
     { deploy-io 2 }
     { deploy-word-defs? f }
     { deploy-c-types? t }
-    { deploy-random? t }
     { deploy-word-props? f }
     { deploy-reflection 1 }
     { deploy-threads? t }

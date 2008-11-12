@@ -71,10 +71,10 @@ ERROR: no-current-vocab ;
         ] keep
     ] { } map>assoc ;
 
-TUPLE: no-word-error name ;
+ERROR: no-word-error name ;
 
 : no-word ( name -- newword )
-    dup no-word-error boa
+    dup \ no-word-error boa
     swap words-named [ forward-reference? not ] filter
     word-restarts throw-restarts
     dup vocabulary>> (use+) ;

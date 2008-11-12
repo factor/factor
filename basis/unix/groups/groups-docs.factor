@@ -4,21 +4,15 @@ USING: help.markup help.syntax io.streams.string kernel quotations sequences str
 IN: unix.groups
 
 HELP: all-groups
-{ $values
-    
-     { "seq" sequence } }
+{ $values { "seq" sequence } }
 { $description "Returns a sequence of " { $link group } " tuples that are platform-dependent and field for field complete with the Unix " { $link group } " structure." } ;
 
 HELP: effective-group-id
-{ $values
-    
-     { "string" string } }
+{ $values { "string" string } }
 { $description "Returns the effective group id for the current user." } ;
 
 HELP: effective-group-name
-{ $values
-    
-     { "string" string } }
+{ $values { "string" string } }
 { $description "Returns the effective group name for the current user." } ;
 
 HELP: group
@@ -46,15 +40,11 @@ HELP: group-struct
 { $description "Returns an alien group struct to be turned into a group tuple by calling subsequent words." } ;
 
 HELP: real-group-id
-{ $values
-    
-     { "id" integer } }
+{ $values { "id" integer } }
 { $description "Returns the real group id for the current user." } ;
 
 HELP: real-group-name
-{ $values
-    
-     { "string" string } }
+{ $values { "string" string } }
 { $description "Returns the real group name for the current user." } ;
 
 HELP: set-effective-group
@@ -88,8 +78,9 @@ HELP: with-real-group
      { "string/id" "a string or a group id" } { "quot" quotation } }
 { $description "Sets the real group name and calls the quotation. Restores the current group name on success or on error after the call." } ;
 
-ARTICLE: "unix.groups" "unix.groups"
+ARTICLE: "unix.groups" "Unix groups"
 "The " { $vocab-link "unix.groups" } " vocabulary contains words that return information about Unix groups."
+$nl
 "Listing all groups:"
 { $subsection all-groups }
 "Returning a passwd tuple:"

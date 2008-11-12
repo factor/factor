@@ -131,7 +131,7 @@ DEFER: (flat-length)
     ] bi* + + + + + ;
 
 : should-inline? ( #call word -- ? )
-    inlining-rank 5 >= ;
+    dup "inline" word-prop [ 2drop t ] [ inlining-rank 5 >= ] if ;
 
 SYMBOL: history
 
@@ -164,7 +164,16 @@ SYMBOL: history
     first object swap eliminate-dispatch ;
 
 : do-inlining ( #call word -- ? )
+    #! If the generic was defined in an outer compilation unit,
+    #! then it doesn't have a definition yet; the definition
+    #! is built at the end of the compilation unit. We do not
+    #! attempt inlining at this stage since the stack discipline
+    #! is not finalized yet, so dispatch# might return an out
+    #! of bounds value. This case comes up if a parsing word
+    #! calls the compiler at parse time (doing so is
+    #! discouraged, but it should still work.)
     {
+        { [ dup deferred? ] [ 2drop f ] }
         { [ dup custom-inlining? ] [ inline-custom ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }

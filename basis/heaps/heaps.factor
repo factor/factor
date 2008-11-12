@@ -62,7 +62,7 @@ M: heap heap-size ( heap -- n )
 
 : data-set-nth ( entry n heap -- )
     >r [ >>index drop ] 2keep r>
-    data>> set-nth-unsafe ;
+    data>> set-nth-unsafe ; inline
 
 : data-push ( entry heap -- n )
     dup heap-size [

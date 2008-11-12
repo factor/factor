@@ -348,7 +348,7 @@ $nl
 { $list
     { { $snippet "\"predicate\"" } " - a quotation which tests if the top of the stack is an instance of this tuple class" }
     { { $snippet "\"slots\"" } " - a sequence of " { $link slot-spec } " instances" }
-    { { $snippet "\"tuple-layout\"" } " - a " { $link tuple-layout } " instance" }
+    { { $snippet "\"tuple-layout\"" } " - an array with the tuple size and superclasses encoded in a format amneable to fast method dispatch" }
 } } ;
 
 HELP: define-tuple-predicate
@@ -405,11 +405,11 @@ HELP: tuple>array ( tuple -- array )
 { $description "Outputs an array having the tuple's slots as elements. The first element is the tuple class word and remainder are declared slots." } ;
 
 HELP: <tuple> ( layout -- tuple )
-{ $values { "layout" tuple-layout } { "tuple" tuple } }
+{ $values { "layout" "a tuple layout array" } { "tuple" tuple } }
 { $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link new } "." } ;
 
 HELP: <tuple-boa> ( ... layout -- tuple )
-{ $values { "..." "values" } { "layout" tuple-layout } { "tuple" tuple } }
+{ $values { "..." "values" } { "layout" "a tuple layout array" } { "tuple" tuple } }
 { $description "Low-level tuple constructor. User code should never call this directly, and instead use " { $link boa } "." } ;
 
 HELP: new

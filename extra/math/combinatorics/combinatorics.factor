@@ -19,7 +19,7 @@ IN: math.combinatorics
     0 [ over 0 > ] [ 1+ [ /mod ] keep swap ] [ ] produce reverse 2nip ;
 
 : (>permutation) ( seq n -- seq )
-    [ [ dupd >= [ 1+ ] when ] curry map ] keep prefix ;
+    [ '[ _ dupd >= [ 1+ ] when ] map ] keep prefix ;
 
 : >permutation ( factoradic -- permutation )
     reverse 1 cut [ (>permutation) ] each ;
@@ -43,6 +43,13 @@ PRIVATE>
 
 : all-permutations ( seq -- seq )
     [ length factorial ] keep '[ _ permutation ] map ;
+
+: each-permutation ( seq quot -- )
+    [ [ length factorial ] keep ] dip
+    '[ _ permutation @ ] each ; inline
+
+: reduce-permutations ( seq initial quot -- result )
+    swapd each-permutation ; inline
 
 : inverse-permutation ( seq -- permutation )
     <enum> >alist sort-values keys ;

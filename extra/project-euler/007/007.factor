@@ -24,6 +24,6 @@ IN: project-euler.007
     10001 nth-prime ;
 
 ! [ euler007 ] 100 ave-time
-! 10 ms run / 0 ms GC ave time - 100 trials
+! 5 ms ave run time - 1.13 SD (100 trials)
 
 MAIN: euler007

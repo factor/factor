@@ -26,6 +26,6 @@ IN: project-euler.097
      2 7830457 10 10 ^ ^mod 28433 * 10 10 ^ mod 1+ ;
 
 ! [ euler097 ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run timen - 0.22 SD (100 trials)
 
 MAIN: euler097

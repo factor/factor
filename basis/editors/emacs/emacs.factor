@@ -4,7 +4,7 @@ IN: editors.emacs
 
 : emacsclient ( file line -- )
     [
-        "emacsclient" ,
+        \ emacsclient get "emacsclient" or ,
         "--no-wait" ,
         "+" swap number>string append ,
         ,

@@ -644,7 +644,7 @@ $nl
 HELP: loop
 { $values
      { "pred" quotation } }
-{ $description "Calls the quotation repeatedly until the output is true." }
+     { $description "Calls the quotation repeatedly until it outputs " { $link f } "." }
 { $examples "Loop until we hit a zero:"
     { $unchecked-example "USING: kernel random math io ; "
     " [ \"hi\" write bl 10 random zero? not ] loop"

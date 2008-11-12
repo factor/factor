@@ -4,7 +4,6 @@ USING: namespaces assocs accessors kernel combinators
 classes.algebra sequences sequences.deep slots.private
 classes.tuple.private math math.private arrays
 stack-checker.branches
-compiler.intrinsics
 compiler.tree
 compiler.tree.combinators
 compiler.tree.propagation.info
@@ -43,7 +42,7 @@ M: #push unbox-tuples* ( #push -- nodes )
     [ dup unboxed-allocation [ (flatten-values) ] [ ] ?if ] map ;
 
 : flatten-values ( values -- values' )
-    (flatten-values) flatten ;
+    dup empty? [ (flatten-values) flatten ] unless ;
 
 : prepare-slot-access ( #call -- tuple-values outputs slot-values )
     [ in-d>> flatten-values ]
@@ -55,7 +54,7 @@ M: #push unbox-tuples* ( #push -- nodes )
     ] tri ;
 
 : slot-access-shuffle ( tuple-values outputs slot-values -- #shuffle )
-    [ drop ] [ zip ] 2bi #shuffle ;
+    [ drop ] [ zip ] 2bi #data-shuffle ;
 
 : unbox-slot-access ( #call -- nodes )
     dup out-d>> first unboxed-slot-access? [
@@ -78,17 +77,11 @@ M: #copy unbox-tuples*
     [ flatten-values ] change-in-d
     [ flatten-values ] change-out-d ;
 
-M: #>r unbox-tuples*
-    [ flatten-values ] change-in-d
-    [ flatten-values ] change-out-r ;
-
-M: #r> unbox-tuples*
-    [ flatten-values ] change-in-r
-    [ flatten-values ] change-out-d ;
-
 M: #shuffle unbox-tuples*
     [ flatten-values ] change-in-d
     [ flatten-values ] change-out-d
+    [ flatten-values ] change-in-r
+    [ flatten-values ] change-out-r
     [ unzip [ flatten-values ] bi@ zip ] change-mapping ;
 
 M: #terminate unbox-tuples*

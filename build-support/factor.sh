@@ -60,10 +60,11 @@ check_gcc_version() {
     GCC_VERSION=`$CC --version`
     check_ret gcc
     if [[ $GCC_VERSION == *3.3.* ]] ; then
-        $ECHO "bad!"
         $ECHO "You have a known buggy version of gcc (3.3)"
         $ECHO "Install gcc 3.4 or higher and try again."
         exit 3
+    elif [[ $GCC_VERSION == *4.3.* ]] ; then
+       MAKE_OPTS="$MAKE_OPTS SITE_CFLAGS=-fno-forward-propagate"
     fi
     $ECHO "ok."
 }
@@ -175,7 +176,7 @@ find_os() {
         *FreeBSD*) OS=freebsd;;
         *OpenBSD*) OS=openbsd;;
         *DragonFly*) OS=dragonflybsd;;
-    	SunOS) OS=solaris;;
+        SunOS) OS=solaris;;
     esac
 }
 
@@ -263,26 +264,30 @@ check_os_arch_word() {
         $ECHO "WORD: $WORD"
         $ECHO "OS, ARCH, or WORD is empty.  Please report this."
 
-    	echo $MAKE_TARGET
+        echo $MAKE_TARGET
         exit 5
     fi
 }
 
 set_build_info() {
     check_os_arch_word
-    MAKE_TARGET=$OS-$ARCH-$WORD
-    MAKE_IMAGE_TARGET=$ARCH.$WORD
-    BOOT_IMAGE=boot.$ARCH.$WORD.image
     if [[ $OS == macosx && $ARCH == ppc ]] ; then
-        MAKE_IMAGE_TARGET=$OS-$ARCH
-        MAKE_TARGET=$OS-$ARCH
-        BOOT_IMAGE=boot.macosx-ppc.image
+        MAKE_IMAGE_TARGET=macosx-ppc
+        MAKE_TARGET=macosx-ppc
+    elif [[ $OS == linux && $ARCH == ppc ]] ; then
+        MAKE_IMAGE_TARGET=linux-ppc
+        MAKE_TARGET=linux-ppc
+    elif [[ $OS == winnt && $ARCH == x86 && $WORD == 64 ]] ; then
+        MAKE_IMAGE_TARGET=winnt-x86.64
+        MAKE_TARGET=winnt-x86-64
+    elif [[ $ARCH == x86 && $WORD == 64 ]] ; then
+        MAKE_IMAGE_TARGET=unix-x86.64
+        MAKE_TARGET=$OS-x86-64
+    else
+        MAKE_IMAGE_TARGET=$ARCH.$WORD
+        MAKE_TARGET=$OS-$ARCH-$WORD
     fi
-    if [[ $OS == linux && $ARCH == ppc ]] ; then
-        MAKE_IMAGE_TARGET=$OS-$ARCH
-        MAKE_TARGET=$OS-$ARCH
-        BOOT_IMAGE=boot.linux-ppc.image
-    fi
+    BOOT_IMAGE=boot.$MAKE_IMAGE_TARGET.image
 }
 
 parse_build_info() {
@@ -334,9 +339,21 @@ cd_factor() {
     check_ret cd
 }
 
+check_makefile_exists() {
+    if [[ ! -e "Makefile" ]] ; then
+        echo ""
+        echo "***Makefile not found***"
+        echo "You are likely in the wrong directory."
+        echo "Run this script from your factor directory:"
+        echo "     ./build-support/factor.sh"
+        exit 6
+    fi
+}
+
 invoke_make() {
-   $MAKE $*
-   check_ret $MAKE
+    check_makefile_exists
+    $MAKE $MAKE_OPTS $*
+    check_ret $MAKE
 }
 
 make_clean() {

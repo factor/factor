@@ -10,7 +10,7 @@ SYMBOL: rename-map
     [ rename-map get at ] keep or ;
 
 : rename-values ( values -- values' )
-    rename-map get '[ [ _ at ] keep or ] map ;
+    dup empty? [ rename-map get '[ [ _ at ] keep or ] map ] unless ;
 
 : add-renamings ( old new -- )
     [ rename-values ] dip
@@ -22,12 +22,10 @@ M: #introduce rename-node-values* ;
 
 M: #shuffle rename-node-values*
     [ rename-values ] change-in-d
+    [ rename-values ] change-in-r
     [ [ rename-value ] assoc-map ] change-mapping ;
 
 M: #push rename-node-values* ;
-
-M: #r> rename-node-values*
-    [ rename-values ] change-in-r ;
 
 M: #terminate rename-node-values*
     [ rename-values ] change-in-d

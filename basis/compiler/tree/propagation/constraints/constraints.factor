@@ -32,7 +32,7 @@ TUPLE: true-constraint value ;
 
 M: true-constraint assume*
     [ \ f class-not <class-info> swap value>> refine-value-info ]
-    [ constraints get at [ assume ] when* ]
+    [ constraints get assoc-stack [ assume ] when* ]
     bi ;
 
 M: true-constraint satisfied?
@@ -44,7 +44,7 @@ TUPLE: false-constraint value ;
 
 M: false-constraint assume*
     [ \ f <class-info> swap value>> refine-value-info ]
-    [ constraints get at [ assume ] when* ]
+    [ constraints get assoc-stack [ assume ] when* ]
     bi ;
 
 M: false-constraint satisfied?
@@ -83,7 +83,7 @@ TUPLE: implication p q ;
 C: --> implication
 
 : assume-implication ( p q -- )
-    [ constraints get [ swap suffix ] change-at ]
+    [ constraints get [ assoc-stack swap suffix ] 2keep peek set-at ]
     [ satisfied? [ assume ] [ drop ] if ] 2bi ;
 
 M: implication assume*

@@ -48,7 +48,7 @@ IN: compiler.tree.combinators
 : sift-children ( seq flags -- seq' )
     zip [ nip ] assoc-filter keys ;
 
-: (3each) [ 3array flip ] dip [ first3 ] prepose ; inline
+: (3each) [ 3array flip ] dip '[ first3 @ ] ; inline
 
 : 3each ( seq1 seq2 seq3 quot -- seq ) (3each) each ; inline
 

@@ -85,12 +85,6 @@ DEFINE_PRIMITIVE(fixnum_divmod)
 	dpush(tag_fixnum(x % y));
 }
 
-DEFINE_PRIMITIVE(fixnum_mod)
-{
-	POP_FIXNUMS(x,y)
-	dpush(tag_fixnum(x % y));
-}
-
 /*
  * Note the hairy overflow check.
  * If we're shifting right by n bits, we won't overflow as long as none of the
@@ -125,12 +119,6 @@ DEFINE_PRIMITIVE(fixnum_shift)
 
 	dpush(tag_bignum(bignum_arithmetic_shift(
 		fixnum_to_bignum(x),y)));
-}
-
-DEFINE_PRIMITIVE(fixnum_shift_fast)
-{
-	POP_FIXNUMS(x,y)
-	dpush(tag_fixnum(y < 0 ? (x >> -y) : (x << y)));
 }
 
 /* Bignums */
@@ -375,13 +363,13 @@ CELL unbox_array_size(void)
 	case BIGNUM_TYPE:
 		{
 			bignum_type zero = untag_object(bignum_zero);
-			bignum_type max = ulong_to_bignum(ARRAY_SIZE_MAX);
+			bignum_type max = cell_to_bignum(ARRAY_SIZE_MAX);
 			bignum_type n = untag_object(dpeek());
 			if(bignum_compare(n,zero) != bignum_comparison_less
 				&& bignum_compare(n,max) == bignum_comparison_less)
 			{
 				dpop();
-				return bignum_to_ulong(n);
+				return bignum_to_cell(n);
 			}
 			break;
 		}

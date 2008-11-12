@@ -1,5 +1,5 @@
-USING: arrays kernel math opengl opengl.gl opengl.glu ui
-ui.gadgets ui.render threads accessors ;
+USING: arrays kernel math opengl opengl.gl opengl.glu
+opengl.demo-support ui ui.gadgets ui.render threads accessors ;
 IN: nehe.4
 
 TUPLE: nehe4-gadget < gadget rtri rquad thread quit? ;

@@ -35,6 +35,6 @@ IN: project-euler.041
     [ 10 digits>integer ] map [ prime? ] find nip ;
 
 ! [ euler041 ] 100 ave-time
-! 107 ms run / 7 ms GC ave time - 100 trials
+! 64 ms ave run time - 4.22 SD (100 trials)
 
 MAIN: euler041

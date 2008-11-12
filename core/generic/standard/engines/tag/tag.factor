@@ -3,7 +3,7 @@
 USING: classes.private generic.standard.engines namespaces make
 arrays assocs sequences.private quotations kernel.private
 math slots.private math.private kernel accessors words
-layouts ;
+layouts sorting sequences ;
 IN: generic.standard.engines.tag
 
 TUPLE: lo-tag-dispatch-engine methods ;
@@ -23,9 +23,11 @@ C: <lo-tag-dispatch-engine> lo-tag-dispatch-engine
     ] if ;
 
 M: lo-tag-dispatch-engine engine>quot
-    methods>> engines>quots* [ >r lo-tag-number r> ] assoc-map
+    methods>> engines>quots*
+    [ >r lo-tag-number r> ] assoc-map
     [
         picker % [ tag ] % [
+            >alist sort-keys reverse
             linear-dispatch-quot
         ] [
             num-tags get direct-dispatch-quot
@@ -43,10 +45,10 @@ C: <hi-tag-dispatch-engine> hi-tag-dispatch-engine
 : num-hi-tags ( -- n ) num-types get num-tags get - ;
 
 : hi-tag-number ( class -- n )
-    "type" word-prop num-tags get - ;
+    "type" word-prop ;
 
 : hi-tag-quot ( -- quot )
-    [ 0 slot ] num-tags get [ fixnum-fast ] curry compose ;
+    \ hi-tag def>> ;
 
 M: hi-tag-dispatch-engine engine>quot
     methods>> engines>quots* [ >r hi-tag-number r> ] assoc-map
@@ -54,6 +56,8 @@ M: hi-tag-dispatch-engine engine>quot
         picker % hi-tag-quot % [
             linear-dispatch-quot
         ] [
+            num-tags get , \ fixnum-fast ,
+            [ >r num-tags get - r> ] assoc-map
             num-hi-tags direct-dispatch-quot
         ] if-small? %
     ] [ ] make ;

@@ -1,7 +1,9 @@
 
 USING: kernel system sequences io.files io.launcher bootstrap.image
        http.client
-       builder.util builder.release.branch ;
+       update.util ;
+
+       ! builder.util builder.release.branch ;
 
 IN: update
 

@@ -1,36 +1,36 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io io.streams.string kernel math math.parser
-namespaces prettyprint sequences splitting grouping strings
-ascii ;
+namespaces sequences splitting grouping strings ascii ;
 IN: hexdump
 
 <PRIVATE
 
 : write-header ( len -- )
     "Length: " write
-    [ unparse write ", " write ]
+    [ number>string write ", " write ]
     [ >hex write "h" write nl ] bi ;
 
 : write-offset ( lineno -- )
     16 * >hex 8 CHAR: 0 pad-left write "h: " write ;
 
-: write-hex-digit ( digit -- )
-    >hex 2 CHAR: 0 pad-left write ;
+: >hex-digit ( digit -- str )
+    >hex 2 CHAR: 0 pad-left " " append ;
 
-: write-hex-line ( str n -- )
-    write-offset
-    dup [ write-hex-digit bl ] each
-    16 over length - 3 * CHAR: \s <string> write
-    [ dup printable? [ drop CHAR: . ] unless write1 ] each
-    nl ;
+: >hex-digits ( bytes -- str )
+    [ >hex-digit ] { } map-as concat 48 CHAR: \s pad-right ;
+
+: >ascii ( bytes -- str )
+    [ [ printable? ] keep CHAR: . ? ] "" map-as ;
+
+: write-hex-line ( bytes lineno -- )
+    write-offset [ >hex-digits write ] [ >ascii write ] bi nl ;
 
 PRIVATE>
 
-: hexdump ( seq -- str )
-    [
-        [ length write-header ]
-        [ 16 <sliced-groups> [ write-hex-line ] each-index ] bi
-    ] with-string-writer ;
+: hexdump. ( seq -- )
+    [ length write-header ]
+    [ 16 <sliced-groups> [ write-hex-line ] each-index ] bi ;
 
-: hexdump. ( seq -- ) hexdump write ;
+: hexdump ( seq -- str )
+    [ hexdump. ] with-string-writer ;

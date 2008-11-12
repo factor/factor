@@ -30,25 +30,25 @@ IN: project-euler.031
     drop 1 ;
 
 : 2p ( m -- n )
-    dup 0 >= [ [ 2 - 2p ] keep 1p + ] [ drop 0 ] if ;
+    dup 0 >= [ [ 2 - 2p ] [ 1p ] bi + ] [ drop 0 ] if ;
 
 : 5p ( m -- n )
-    dup 0 >= [ [ 5 - 5p ] keep 2p + ] [ drop 0 ] if ;
+    dup 0 >= [ [ 5 - 5p ] [ 2p ] bi + ] [ drop 0 ] if ;
 
 : 10p ( m -- n )
-    dup 0 >= [ [ 10 - 10p ] keep 5p + ] [ drop 0 ] if ;
+    dup 0 >= [ [ 10 - 10p ] [ 5p ] bi + ] [ drop 0 ] if ;
 
 : 20p ( m -- n )
-    dup 0 >= [ [ 20 - 20p ] keep 10p + ] [ drop 0 ] if ;
+    dup 0 >= [ [ 20 - 20p ] [ 10p ] bi + ] [ drop 0 ] if ;
 
 : 50p ( m -- n )
-    dup 0 >= [ [ 50 - 50p ] keep 20p + ] [ drop 0 ] if ;
+    dup 0 >= [ [ 50 - 50p ] [ 20p ] bi + ] [ drop 0 ] if ;
 
 : 100p ( m -- n )
-    dup 0 >= [ [ 100 - 100p ] keep 50p + ] [ drop 0 ] if ;
+    dup 0 >= [ [ 100 - 100p ] [ 50p ] bi + ] [ drop 0 ] if ;
 
 : 200p ( m -- n )
-    dup 0 >= [ [ 200 - 200p ] keep 100p + ] [ drop 0 ] if ;
+    dup 0 >= [ [ 200 - 200p ] [ 100p ] bi + ] [ drop 0 ] if ;
 
 PRIVATE>
 
@@ -56,7 +56,7 @@ PRIVATE>
     200 200p ;
 
 ! [ euler031 ] 100 ave-time
-! 4 ms run / 0 ms GC ave time - 100 trials
+! 3 ms ave run time - 0.91 SD (100 trials)
 
 ! TODO: generalize to eliminate duplication; use a sequence to specify denominations?
 

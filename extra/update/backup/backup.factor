@@ -1,5 +1,5 @@
 
-USING: namespaces debugger io.files bootstrap.image builder.util ;
+USING: namespaces debugger io.files bootstrap.image update.util ;
 
 IN: update.backup
 

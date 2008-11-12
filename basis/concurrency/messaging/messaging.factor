@@ -4,7 +4,7 @@
 ! Concurrency library for Factor, based on Erlang/Termite style
 ! concurrency.
 USING: kernel threads concurrency.mailboxes continuations
-namespaces assocs random accessors summary ;
+namespaces assocs accessors summary ;
 IN: concurrency.messaging
 
 GENERIC: send ( message thread -- )
@@ -40,7 +40,7 @@ M: thread send ( message thread -- )
 TUPLE: synchronous data sender tag ;
 
 : <synchronous> ( data -- sync )
-    self 256 random-bits synchronous boa ;
+    self synchronous counter synchronous boa ;
 
 TUPLE: reply data tag ;
 

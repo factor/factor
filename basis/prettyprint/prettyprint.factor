@@ -134,6 +134,20 @@ PRIVATE>
 
 : pprint-cell ( obj -- ) [ pprint ] with-cell ;
 
+: simple-table. ( values -- )
+    standard-table-style [
+        [
+            [
+                [
+                    dup string?
+                    [ [ write ] with-cell ]
+                    [ pprint-cell ]
+                    if
+                ] each
+            ] with-row
+        ] each
+    ] tabular-output ;
+
 GENERIC: see ( defspec -- )
 
 : comment. ( string -- )

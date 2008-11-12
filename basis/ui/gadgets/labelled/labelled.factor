@@ -30,16 +30,16 @@ M: labelled-gadget focusable-child* content>> ;
 
 : title-theme ( gadget -- gadget )
     { 1 0 } >>orientation
-    T{ gradient f {
+    {
         T{ rgba f 0.65 0.65 1.0 1.0 }
         T{ rgba f 0.65 0.45 1.0 1.0 }
-    } } >>interior ;
+    } <gradient> >>interior ;
 
 : <title-label> ( text -- label ) <label> title-theme ;
 
 : <title-bar> ( title quot -- gadget )
     <frame>
-        swap dup [ <close-box> @left grid-add ] [ drop ] if
+        swap [ <close-box> @left grid-add ] when*
         swap <title-label> @center grid-add ;
 
 TUPLE: closable-gadget < frame content ;

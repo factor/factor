@@ -1,15 +1,14 @@
 USING: tools.deploy.config ;
 H{
-    { deploy-word-defs? f }
-    { deploy-random? f }
-    { deploy-name "Hello world" }
     { deploy-threads? t }
-    { deploy-compiler? t }
     { deploy-math? t }
+    { deploy-name "Hello world" }
     { deploy-c-types? f }
-    { deploy-io 1 }
-    { deploy-reflection 1 }
+    { deploy-word-props? f }
+    { deploy-io 2 }
     { deploy-ui? t }
     { "stop-after-last-window?" t }
-    { deploy-word-props? f }
+    { deploy-word-defs? f }
+    { deploy-compiler? t }
+    { deploy-reflection 1 }
 }

@@ -16,7 +16,7 @@ TUPLE: mersenne-twister seq i ;
 : mt-a HEX: 9908b0df ; inline
 
 : calculate-y ( n seq -- y )
-    [ nth 32 mask-bit ]
+    [ nth 31 mask-bit ]
     [ [ 1+ ] [ nth ] bi* 31 bits ] 2bi bitor ; inline
 
 : (mt-generate) ( n seq -- next-mt )
@@ -68,3 +68,10 @@ M: mersenne-twister random-32* ( mt -- r )
     [ next-index ]
     [ seq>> nth mt-temper ]
     [ [ 1+ ] change-i drop ] tri ;
+
+USE: init
+
+[
+    [ 32 random-bits ] with-system-random
+    <mersenne-twister> random-generator set-global
+] "bootstrap.random" add-init-hook

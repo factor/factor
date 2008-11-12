@@ -233,15 +233,22 @@ ERROR: invalid-range a b ;
 SINGLETON: beginning-of-input
 SINGLETON: end-of-input
 
-! : beginning-of-input ( -- obj ) 
-: handle-front-anchor ( -- ) front-anchor push-stack ;
-: end-of-line ( -- obj )
-    end-of-input
+: newlines ( -- obj1 obj2 obj3 )
     CHAR: \r <constant>
     CHAR: \n <constant>
-    2dup 2array <concatenation> 4array <alternation> lookahead boa ;
+    2dup 2array <concatenation> ;
 
-: handle-back-anchor ( -- ) end-of-line push-stack ;
+: beginning-of-line ( -- obj )
+    beginning-of-input newlines 4array <alternation> lookbehind boa ;
+
+: end-of-line ( -- obj )
+    end-of-input newlines 4array <alternation> lookahead boa ;
+
+: handle-front-anchor ( -- )
+    get-multiline beginning-of-line beginning-of-input ? push-stack ;
+
+: handle-back-anchor ( -- )
+    get-multiline end-of-line end-of-input ? push-stack ;
 
 ERROR: bad-character-class obj ;
 ERROR: expected-posix-class ;
@@ -412,16 +419,11 @@ DEFER: handle-left-bracket
     [ [ push ] keep current-regexp get (>>stack) ]
     [ finish-regexp-parse push-stack ] bi* ;
 
-
 : parse-regexp-token ( token -- ? )
     {
-! todo: only match these at beginning/end of regexp
-        { CHAR: ^ [ handle-front-anchor t ] }
-        { CHAR: $ [ handle-back-anchor t ] }
-
-        { CHAR: . [ handle-dot t ] }
-        { CHAR: ( [ handle-left-parenthesis t ] }
+        { CHAR: ( [ handle-left-parenthesis t ] } ! handle (?..) at beginning?
         { CHAR: ) [ handle-right-parenthesis f ] }
+        { CHAR: . [ handle-dot t ] }
         { CHAR: | [ handle-pipe t ] }
         { CHAR: ? [ handle-question t ] }
         { CHAR: * [ handle-star t ] }
@@ -429,16 +431,28 @@ DEFER: handle-left-bracket
         { CHAR: { [ handle-left-brace t ] }
         { CHAR: [ [ handle-left-bracket t ] }
         { CHAR: \ [ handle-escape t ] }
-        [ <constant> push-stack t ]
+        [
+            dup CHAR: $ = peek1 f = and [
+                drop
+                handle-back-anchor f
+            ] [
+                <constant> push-stack t
+            ] if
+        ]
     } case ;
 
 : (parse-regexp) ( -- )
     read1 [ parse-regexp-token [ (parse-regexp) ] when ] when* ;
 
+: parse-regexp-beginning ( -- )
+    peek1 CHAR: ^ = [ drop1 handle-front-anchor ] when ;
+
 : parse-regexp ( regexp -- )
     dup current-regexp [
         raw>> [
-            <string-reader> [ (parse-regexp) ] with-input-stream
+            <string-reader> [
+                parse-regexp-beginning (parse-regexp)
+            ] with-input-stream
         ] unless-empty
         current-regexp get
         stack finish-regexp-parse

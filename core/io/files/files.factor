@@ -184,6 +184,8 @@ SYMBOL: +unknown+
 
 ! File-system
 
+HOOK: file-systems os ( -- array )
+
 TUPLE: file-system-info device-name mount-point type free-space ;
 
 HOOK: file-system-info os ( path -- file-system-info )

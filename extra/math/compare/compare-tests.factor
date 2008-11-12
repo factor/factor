@@ -1,8 +1,4 @@
-! Copyright (C) 2008 John Benediktsson
-! See http://factorcode.org/license.txt for BSD license
-
-USING: kernel math math.functions math.compare tools.test ;
-
+USING: kernel math math.compare math.functions tools.test ;
 IN: math.compare.tests
 
 [ -1 ] [ -1 5 absmin ] unit-test
@@ -22,7 +18,4 @@ IN: math.compare.tests
 [ 0 ] [ 0 -1 2 clamp ] unit-test
 [ 1 ] [ 0 1 2 clamp ] unit-test
 [ 2 ] [ 0 3 2 clamp ] unit-test
-
-
-
 

@@ -1,12 +1,12 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals alien.c-types arrays cpu.x86.assembler
-cpu.x86.architecture cpu.x86.intrinsics cpu.x86.allot
-cpu.architecture kernel kernel.private math namespaces sequences
-stack-checker.known-words compiler.generator.registers
-compiler.generator.fixup compiler.generator system layouts
-combinators command-line compiler compiler.units io
-vocabs.loader accessors init ;
+USING: locals alien.c-types alien.syntax arrays kernel
+math namespaces sequences system layouts io vocabs.loader
+accessors init combinators command-line cpu.x86.assembler
+cpu.x86 cpu.architecture compiler compiler.units
+compiler.constants compiler.alien compiler.codegen
+compiler.codegen.fixup compiler.cfg.instructions
+compiler.cfg.builder compiler.cfg.intrinsics ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
@@ -14,13 +14,19 @@ IN: cpu.x86.32
 ! this on all platforms, sacrificing some stack space for
 ! code simplicity.
 
+M: x86.32 machine-registers
+    {
+        { int-regs { EAX ECX EDX EBP EBX } }
+        { double-float-regs { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } }
+    } ;
+
 M: x86.32 ds-reg ESI ;
 M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
 M: x86.32 temp-reg-1 EAX ;
 M: x86.32 temp-reg-2 ECX ;
 
-M: temp-reg v>operand drop EBX ;
+M: x86.32 reserved-area-size 0 ;
 
 M: x86.32 %alien-global 0 [] MOV rc-absolute-cell rel-dlsym ;
 
@@ -36,7 +42,6 @@ M: x86.32 struct-small-enough? ( size -- ? )
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
 M: int-regs param-regs drop { } ;
-M: int-regs vregs drop { EAX ECX EDX EBP } ;
 M: int-regs push-return-reg return-reg PUSH ;
 
 M: int-regs load-return-reg
@@ -46,7 +51,6 @@ M: int-regs store-return-reg
     [ stack@ ] [ return-reg ] bi* MOV ;
 
 M: float-regs param-regs drop { } ;
-M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
 : FSTP ( operand size -- ) 4 = [ FSTPS ] [ FSTPL ] if ;
 
@@ -72,12 +76,12 @@ M: float-regs store-return-reg
     [ [ align-sub ] [ call ] bi* ]
     [ [ align-add ] [ drop ] bi* ] 2bi ; inline
 
-M: x86.32 fixnum>slot@ 1 SHR ;
+M: x86.32 rel-literal-x86 rc-absolute-cell rel-literal ;
 
-M: x86.32 prepare-division CDQ ;
-
-M: x86.32 load-indirect
-    0 [] MOV rc-absolute-cell rel-literal ;
+M: x86.32 %prologue ( n -- )
+    dup PUSH
+    0 PUSH rc-absolute-cell rel-this
+    stack-reg swap 3 cells - SUB ;
 
 M: object %load-param-reg 3drop ;
 
@@ -219,7 +223,7 @@ M: x86.32 %alien-indirect ( -- )
 
 M: x86.32 %alien-callback ( quot -- )
     4 [
-        EAX load-indirect
+        EAX swap %load-indirect
         EAX PUSH
         "c_to_factor" f %alien-invoke
     ] with-aligned-stack ;
@@ -239,7 +243,7 @@ M: x86.32 %callback-value ( ctype -- )
     ! Unbox EAX
     unbox-return ;
 
-M: x86.32 %cleanup ( alien-node -- )
+M: x86.32 %cleanup ( params -- )
     #! a) If we just called an stdcall function in Windows, it
     #! cleaned up the stack frame for us. But we don't want that
     #! so we 'undo' the cleanup since we do that in %epilogue.
@@ -256,7 +260,25 @@ M: x86.32 %cleanup ( alien-node -- )
         [ drop ]
     } cond ;
 
-M: x86.32 %unwind ( n -- ) %epilogue-later RET ;
+M: x86.32 %callback-return ( n -- )
+    #! a) If the callback is stdcall, we have to clean up the
+    #! caller's stack frame.
+    #! b) If the callback is returning a large struct, we have
+    #! to fix ESP.
+    {
+        { [ dup abi>> "stdcall" = ] [
+            <alien-stack-frame>
+            [ params>> ] [ return>> ] bi +
+        ] }
+        { [ dup return>> large-struct? ] [ drop 4 ] }
+        [ drop 0 ]
+    } cond RET ;
+
+M: x86.32 dummy-stack-params? f ;
+
+M: x86.32 dummy-int-params? f ;
+
+M: x86.32 dummy-fp-params? f ;
 
 os windows? [
     cell "longlong" c-type (>>align)
@@ -264,34 +286,19 @@ os windows? [
     4 "double" c-type (>>align)
 ] unless
 
-: (sse2?) ( -- ? ) "Intrinsic" throw ;
+FUNCTION: bool check_sse2 ( ) ;
 
-<<
-
-\ (sse2?) [
-    { EAX EBX ECX EDX } [ PUSH ] each
-    EAX 1 MOV
-    CPUID
-    EDX 26 SHR
-    EDX 1 AND
-    { EAX EBX ECX EDX } [ POP ] each
-    JE
-] { } define-if-intrinsic
-
-\ (sse2?) { } { object } define-primitive
-
->>
-
-: sse2? ( -- ? ) (sse2?) ;
+: sse2? ( -- ? )
+    check_sse2 ;
 
 "-no-sse2" cli-args member? [
+    [ optimized-recompile-hook ] recompile-hook
+    [ { check_sse2 } compile ] with-variable
+
     "Checking if your CPU supports SSE2..." print flush
-    [ optimized-recompile-hook ] recompile-hook [
-        [ sse2? ] compile-call
-    ] with-variable
-    [
+    sse2? [
         " - yes" print
-        "cpu.x86.sse2" require
+        enable-float-intrinsics
         [
             sse2? [
                 "This image was built to use SSE2, which your CPU does not support." print
@@ -300,7 +307,5 @@ os windows? [
                 1 exit
             ] unless
         ] "cpu.x86" add-init-hook
-    ] [
-        " - no" print
-    ] if
+    ] [ " - no" print ] if
 ] unless

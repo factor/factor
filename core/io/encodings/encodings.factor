@@ -124,11 +124,11 @@ M: object <encoder> encoder boa ;
 M: encoder stream-write1
     >encoder< encode-char ;
 
-: decoder-write ( string stream encoding -- )
+: encoder-write ( string stream encoding -- )
     [ encode-char ] 2curry each ;
 
 M: encoder stream-write
-    >encoder< decoder-write ;
+    >encoder< encoder-write ;
 
 M: encoder dispose stream>> dispose ;
 

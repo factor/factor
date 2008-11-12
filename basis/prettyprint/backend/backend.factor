@@ -214,6 +214,7 @@ M: tuple pprint-narrow? drop t ;
 
 M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
+M: byte-vector pprint* pprint-object ;
 M: hashtable pprint* pprint-object ;
 
 M: curry pprint*
@@ -233,6 +234,3 @@ M: wrapper pprint*
     ] [
         pprint-object
     ] if ;
-
-M: tuple-layout pprint*
-    "( tuple layout )" swap present-text ;

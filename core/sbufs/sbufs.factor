@@ -33,7 +33,7 @@ M: string new-resizable drop <sbuf> ;
 M: string like
     drop dup string? [
         dup sbuf? [
-            dup length over underlying>> length number= [
+            dup length over underlying>> length eq? [
                 underlying>> dup reset-string-hashcode
             ] [
                 >string

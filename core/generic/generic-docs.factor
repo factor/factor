@@ -1,6 +1,6 @@
 USING: help.markup help.syntax words classes classes.algebra
 definitions kernel alien sequences math quotations
-generic.standard generic.math combinators ;
+generic.standard generic.math combinators prettyprint ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"
@@ -46,7 +46,8 @@ $nl
 "Low-level method constructor:"
 { $subsection <method> }
 "A " { $emphasis "method specifier" } " refers to a method and implements the " { $link "definition-protocol" } ":"
-{ $subsection method-spec } ;
+{ $subsection method-spec }
+{ $see-also see see-methods } ;
 
 ARTICLE: "method-combination" "Custom method combination"
 "Abstractly, a generic word can be thought of as a big chain of type conditional tests applied to the top of the stack, with methods as the bodies of each test. The " { $emphasis "method combination" } " is this control flow glue between the set of methods, and several aspects of it can be customized:"

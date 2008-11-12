@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators kernel math math.ranges
 quotations sequences regexp.parser regexp.classes fry arrays
-combinators.short-circuit regexp.utils prettyprint regexp.nfa ;
+combinators.short-circuit regexp.utils prettyprint regexp.nfa
+shuffle ;
 IN: regexp.traversal
 
 TUPLE: dfa-traverser
@@ -23,8 +24,7 @@ TUPLE: dfa-traverser
     [ dfa-table>> ] [ dfa-traversal-flags>> ] bi
     dfa-traverser new
         swap >>traversal-flags
-        swap [ start-state>> >>current-state ] keep
-        >>dfa-table
+        swap [ start-state>> >>current-state ] [ >>dfa-table ] bi
         swap >>text
         t >>traverse-forward
         0 >>start-index
@@ -102,7 +102,7 @@ M: capture-group-off flag-action ( dfa-traverser flag -- )
     [ [ first2 1+ 2array ] map ] change-capture-counters
     ! dup current-state>> .
     dup [ current-state>> ] [ traversal-flags>> ] bi
-    at [ dup . flag-action ] with each ;
+    at [ flag-action ] with each ;
 
 : increment-state ( dfa-traverser state -- dfa-traverser )
     [
@@ -116,7 +116,7 @@ M: capture-group-off flag-action ( dfa-traverser flag -- )
     V{ } clone >>matches ;
 
 : match-literal ( transition from-state table -- to-state/f )
-    transitions>> at* [ at ] [ 2drop f ] if ;
+    transitions>> at at ;
 
 : match-class ( transition from-state table -- to-state/f )
     transitions>> at* [
@@ -124,8 +124,7 @@ M: capture-group-off flag-action ( dfa-traverser flag -- )
     ] [ drop ] if ;
 
 : match-default ( transition from-state table -- to-state/f )
-    [ nip ] dip transitions>> at*
-    [ t swap at* [ ] [ drop f ] if ] [ drop f ] if ;
+    nipd transitions>> at t swap at ;
 
 : match-transition ( obj from-state dfa -- to-state/f )
     { [ match-literal ] [ match-class ] [ match-default ] } 3|| ;

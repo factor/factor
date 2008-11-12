@@ -9,16 +9,14 @@ IN: tools.deploy.windows
     "resource:factor.dll" swap copy-file-into ;
 
 : copy-freetype ( bundle-name -- )
-    deploy-ui? get [
-        {
-            "resource:freetype6.dll"
-            "resource:zlib1.dll"
-        } swap copy-files-into
-    ] [ drop ] if ;
+    {
+        "resource:freetype6.dll"
+        "resource:zlib1.dll"
+    } swap copy-files-into ;
 
 : create-exe-dir ( vocab bundle-name -- vm )
+    dup copy-dll
     deploy-ui? get [
-        dup copy-dll
         dup copy-freetype
         dup "" copy-fonts
     ] when
@@ -26,14 +24,14 @@ IN: tools.deploy.windows
 
 M: winnt deploy*
     "resource:" [
-        deploy-name over deploy-config at
-        [
-            {
+        dup deploy-config [
+            deploy-name get
+            [
                 [ create-exe-dir ]
                 [ image-name ]
                 [ drop ]
-                [ drop deploy-config ]
-            } 2cleave make-deploy-image
-        ]
-        [ nip open-in-explorer ] 2bi
+                2tri namespace make-deploy-image
+            ]
+            [ nip open-in-explorer ] 2bi
+        ] bind
     ] with-directory ;

@@ -26,6 +26,6 @@ IN: project-euler.056
     [ first2 ^ number>digits sum ] map supremum ;
 
 ! [ euler056 ] 100 ave-time
-! 33 ms run / 1 ms GC ave time - 100 trials
+! 22 ms ave run time - 2.13 SD (100 trials)
 
 MAIN: euler056

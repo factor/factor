@@ -50,6 +50,6 @@ PRIVATE>
     source-033 curious-fractions product denominator ;
 
 ! [ euler033 ] 100 ave-time
-! 5 ms run / 0 ms GC ave time - 100 trials
+! 7 ms ave run time - 1.31 SD (100 trials)
 
 MAIN: euler033

@@ -154,6 +154,14 @@ M: dlist clear-deque ( dlist -- )
 : dlist-each ( dlist quot -- )
     [ obj>> ] prepose dlist-each-node ; inline
 
+: dlist>seq ( dlist -- seq )
+    [ ] pusher [ dlist-each ] dip ;
+
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
+
+M: dlist clone
+    <dlist> [
+        [ push-back ] curry dlist-each
+    ] keep ;
 
 INSTANCE: dlist deque
