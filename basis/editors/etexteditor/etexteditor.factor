@@ -12,7 +12,7 @@ IN: editors.etexteditor
 : etexteditor ( file line -- )
     [
         etexteditor-path ,
-        "-n" swap number>string append , ,
+        [ , ] [ "--line" , number>string , ] bi*
     ] { } make run-detached drop ;
 
 [ etexteditor ] edit-hook set-global
