@@ -1,9 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors quotations kernel sequences namespaces
-assocs words arrays vectors hints combinators stack-checker
-stack-checker.state stack-checker.visitor stack-checker.errors
-stack-checker.backend compiler.tree ;
+assocs words arrays vectors hints combinators compiler.tree
+stack-checker
+stack-checker.state
+stack-checker.errors
+stack-checker.visitor
+stack-checker.backend
+stack-checker.recursive-state ;
 IN: compiler.tree.builder
 
 : with-tree-builder ( quot -- nodes )

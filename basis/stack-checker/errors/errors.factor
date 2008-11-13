@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic sequences prettyprint io words arrays
 summary effects debugger assocs accessors namespaces
-compiler.errors stack-checker.state ;
+compiler.errors stack-checker.values
+stack-checker.recursive-state ;
 IN: stack-checker.errors
 
-TUPLE: inference-error error type rstate ;
+TUPLE: inference-error error type word ;
 
 M: inference-error compiler-error-type type>> ;
 
@@ -13,7 +14,7 @@ M: inference-error error-help error>> error-help ;
 
 : (inference-error) ( ... class type -- * )
     >r boa r>
-    recursive-state get
+    recursive-state get word>>
     \ inference-error boa throw ; inline
 
 : inference-error ( ... class -- * )
@@ -23,10 +24,7 @@ M: inference-error error-help error>> error-help ;
     +warning+ (inference-error) ; inline
 
 M: inference-error error.
-    [
-        rstate>>
-        [ "Nesting:" print stack. ] unless-empty
-    ] [ error>> error. ] bi ;
+    [ "In word: " write word>> . ] [ error>> error. ] bi ;
 
 TUPLE: literal-expected ;
 

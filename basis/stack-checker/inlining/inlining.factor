@@ -4,18 +4,20 @@ USING: fry namespaces assocs kernel sequences words accessors
 definitions math math.order effects classes arrays combinators
 vectors arrays
 stack-checker.state
+stack-checker.errors
+stack-checker.values
 stack-checker.visitor
 stack-checker.backend
 stack-checker.branches
-stack-checker.errors
-stack-checker.known-words ;
+stack-checker.known-words
+stack-checker.recursive-state ;
 IN: stack-checker.inlining
 
 ! Code to handle inline words. Much of the complexity stems from
 ! having to handle recursive inline words.
 
 : infer-inline-word-def ( word label -- )
-    [ drop def>> ] [ add-local-recursive-state ] 2bi infer-quot ;
+    [ drop def>> ] [ add-inline-word ] 2bi infer-quot ;
 
 TUPLE: inline-recursive < identity-tuple
 id

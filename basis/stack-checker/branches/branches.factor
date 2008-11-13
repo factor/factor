@@ -3,7 +3,7 @@
 USING: fry vectors sequences assocs math accessors kernel
 combinators quotations namespaces stack-checker.state
 stack-checker.backend stack-checker.errors stack-checker.visitor
-;
+stack-checker.values stack-checker.recursive-state ;
 IN: stack-checker.branches
 
 : balanced? ( pairs -- ? )

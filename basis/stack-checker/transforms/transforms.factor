@@ -5,7 +5,8 @@ namespaces make quotations assocs combinators classes.tuple
 classes.tuple.private effects summary hashtables classes generic
 sets definitions generic.standard slots.private continuations
 stack-checker.backend stack-checker.state stack-checker.visitor
-stack-checker.errors ;
+stack-checker.errors stack-checker.values
+stack-checker.recursive-state ;
 IN: stack-checker.transforms
 
 : give-up-transform ( word -- )

@@ -11,14 +11,15 @@ strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
 combinators locals locals.backend locals.private words.private
-quotations.private
+quotations.private stack-checker.values
+stack-checker.alien
 stack-checker.state
+stack-checker.errors
+stack-checker.visitor
 stack-checker.backend
 stack-checker.branches
-stack-checker.errors
 stack-checker.transforms
-stack-checker.visitor
-stack-checker.alien ;
+stack-checker.recursive-state ;
 IN: stack-checker.known-words
 
 : infer-primitive ( word -- )
