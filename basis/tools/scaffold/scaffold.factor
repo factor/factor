@@ -263,3 +263,12 @@ SYMBOL: examples-flag
         [ example ] times
         "}" print
     ] with-variable ;
+
+: scaffold-rc ( path -- )
+    [ touch-file ] [ "Click to edit: " write <pathname> . ] bi ;
+
+: scaffold-factor-boot-rc ( -- )
+    home ".factor-boot-rc" append-path scaffold-rc ;
+
+: scaffold-factor-rc ( -- )
+    home ".factor-rc" append-path scaffold-rc ;
