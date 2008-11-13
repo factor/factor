@@ -1,5 +1,4 @@
 F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom);
-F_FASTCALL __attribute__((noinline)) void save_callstack_top(F_STACK_FRAME *callstack_top);
 
 #define FIRST_STACK_FRAME(stack) (F_STACK_FRAME *)((stack) + 1)
 
@@ -14,11 +13,11 @@ CELL frame_executing(F_STACK_FRAME *frame);
 CELL frame_scan(F_STACK_FRAME *frame);
 CELL frame_type(F_STACK_FRAME *frame);
 
-DECLARE_PRIMITIVE(callstack);
-DECLARE_PRIMITIVE(set_datastack);
-DECLARE_PRIMITIVE(set_retainstack);
-DECLARE_PRIMITIVE(set_callstack);
-DECLARE_PRIMITIVE(callstack_to_array);
-DECLARE_PRIMITIVE(innermost_stack_frame_quot);
-DECLARE_PRIMITIVE(innermost_stack_frame_scan);
-DECLARE_PRIMITIVE(set_innermost_stack_frame_quot);
+void primitive_callstack(void);
+void primitive_set_datastack(void);
+void primitive_set_retainstack(void);
+void primitive_set_callstack(void);
+void primitive_callstack_to_array(void);
+void primitive_innermost_stack_frame_quot(void);
+void primitive_innermost_stack_frame_scan(void);
+void primitive_set_innermost_stack_frame_quot(void);

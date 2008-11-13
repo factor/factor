@@ -57,7 +57,12 @@ big-endian on
 
 [
     0 6 LOAD32
-    4 1 MR
+    7 6 0 LWZ
+    1 7 0 STW
+] rc-absolute-ppc-2/2 rt-primitive 1 jit-save-stack jit-define
+
+[
+    0 6 LOAD32
     6 MTCTR
     BCTR
 ] rc-absolute-ppc-2/2 rt-primitive 1 jit-primitive jit-define

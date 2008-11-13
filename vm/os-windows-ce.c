@@ -27,7 +27,7 @@ char *getenv(char *name)
 	return 0; /* unreachable */
 }
 
-DEFINE_PRIMITIVE(os_envs)
+void primitive_os_envs(void)
 {
 	not_implemented_error();
 }

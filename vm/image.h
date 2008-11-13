@@ -40,8 +40,8 @@ void load_image(F_PARAMETERS *p);
 void init_objects(F_HEADER *h);
 bool save_image(const F_CHAR *file);
 
-DECLARE_PRIMITIVE(save_image);
-DECLARE_PRIMITIVE(save_image_and_exit);
+void primitive_save_image(void);
+void primitive_save_image_and_exit(void);
 
 /* relocation base of currently loaded image's data heap */
 CELL data_relocation_base;

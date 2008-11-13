@@ -209,6 +209,7 @@ void jit_compile(CELL quot, bool relocate)
 		case FIXNUM_TYPE:
 			if(jit_primitive_call_p(untag_object(array),i))
 			{
+				EMIT(userenv[JIT_SAVE_STACK],0);
 				EMIT(userenv[JIT_PRIMITIVE],to_fixnum(obj));
 
 				i++;
@@ -344,6 +345,7 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 		case FIXNUM_TYPE:
 			if(jit_primitive_call_p(untag_object(array),i))
 			{
+				COUNT(userenv[JIT_SAVE_STACK],i);
 				COUNT(userenv[JIT_PRIMITIVE],i);
 
 				i++;
@@ -412,7 +414,7 @@ F_FASTCALL CELL primitive_jit_compile(CELL quot, F_STACK_FRAME *stack)
 }
 
 /* push a new quotation on the stack */
-DEFINE_PRIMITIVE(array_to_quotation)
+void primitive_array_to_quotation(void)
 {
 	F_QUOTATION *quot = allot_object(QUOTATION_TYPE,sizeof(F_QUOTATION));
 	quot->array = dpeek();
@@ -421,7 +423,7 @@ DEFINE_PRIMITIVE(array_to_quotation)
 	drepl(tag_object(quot));
 }
 
-DEFINE_PRIMITIVE(quotation_xt)
+void primitive_quotation_xt(void)
 {
 	F_QUOTATION *quot = untag_quotation(dpeek());
 	drepl(allot_cell((CELL)quot->xt));

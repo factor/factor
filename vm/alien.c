@@ -82,7 +82,7 @@ void box_alien(void *ptr)
 }
 
 /* make an alien pointing at an offset of another alien */
-DEFINE_PRIMITIVE(displaced_alien)
+void primitive_displaced_alien(void)
 {
 	CELL alien = dpop();
 	CELL displacement = to_cell(dpop());
@@ -107,7 +107,7 @@ DEFINE_PRIMITIVE(displaced_alien)
 
 /* address of an object representing a C pointer. Explicitly throw an error
 if the object is a byte array, as a sanity check. */
-DEFINE_PRIMITIVE(alien_address)
+void primitive_alien_address(void)
 {
 	box_unsigned_cell((CELL)pinned_alien_offset(dpop()));
 }
@@ -121,11 +121,11 @@ INLINE void *alien_pointer(void)
 
 /* define words to read/write values at an alien address */
 #define DEFINE_ALIEN_ACCESSOR(name,type,boxer,to) \
-	DEFINE_PRIMITIVE(alien_##name) \
+	void primitive_alien_##name(void) \
 	{ \
 		boxer(*(type*)alien_pointer()); \
 	} \
-	DEFINE_PRIMITIVE(set_alien_##name) \
+	void primitive_set_alien_##name(void) \
 	{ \
 		type* ptr = alien_pointer(); \
 		type value = to(dpop()); \
@@ -170,7 +170,7 @@ void box_small_struct(CELL x, CELL y, CELL size)
 }
 
 /* open a native library and push a handle */
-DEFINE_PRIMITIVE(dlopen)
+void primitive_dlopen(void)
 {
 	CELL path = tag_object(string_to_native_alien(
 		untag_string(dpop())));
@@ -183,7 +183,7 @@ DEFINE_PRIMITIVE(dlopen)
 }
 
 /* look up a symbol in a native library */
-DEFINE_PRIMITIVE(dlsym)
+void primitive_dlsym(void)
 {
 	CELL dll = dpop();
 	REGISTER_ROOT(dll);
@@ -205,12 +205,12 @@ DEFINE_PRIMITIVE(dlsym)
 }
 
 /* close a native library handle */
-DEFINE_PRIMITIVE(dlclose)
+void primitive_dlclose(void)
 {
 	ffi_dlclose(untag_dll(dpop()));
 }
 
-DEFINE_PRIMITIVE(dll_validp)
+void primitive_dll_validp(void)
 {
 	CELL dll = dpop();
 	if(dll == F)
