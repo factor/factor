@@ -60,19 +60,6 @@ M: x86 %return ( -- ) 0 RET ;
 : align-code ( n -- )
     0 <repetition> % ;
 
-M:: x86 %dispatch ( src temp -- )
-    ! Load jump table base. We use a temporary register
-    ! since on AMD64 we have to load a 64-bit immediate. On
-    ! x86, this is redundant.
-    ! Add jump table base
-    temp HEX: ffffffff MOV rc-absolute-cell rel-here
-    src temp ADD
-    src HEX: 7f [+] JMP
-    ! Fix up the displacement above
-    cell code-alignment dup bootstrap-cell 8 = 15 9 ? +
-    building get dup pop* push
-    align-code ;
-
 M: x86 %dispatch-label ( word -- )
     0 cell, rc-absolute-cell rel-word ;
 

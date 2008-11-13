@@ -22,13 +22,14 @@ C: <lo-tag-dispatch-engine> lo-tag-dispatch-engine
         "type" word-prop
     ] if ;
 
+: sort-tags ( assoc -- alist ) >alist sort-keys reverse ;
+
 M: lo-tag-dispatch-engine engine>quot
     methods>> engines>quots*
     [ >r lo-tag-number r> ] assoc-map
     [
         picker % [ tag ] % [
-            >alist sort-keys reverse
-            linear-dispatch-quot
+            sort-tags linear-dispatch-quot
         ] [
             num-tags get direct-dispatch-quot
         ] if-small? %
@@ -51,10 +52,11 @@ C: <hi-tag-dispatch-engine> hi-tag-dispatch-engine
     \ hi-tag def>> ;
 
 M: hi-tag-dispatch-engine engine>quot
-    methods>> engines>quots* [ >r hi-tag-number r> ] assoc-map
+    methods>> engines>quots*
+    [ >r hi-tag-number r> ] assoc-map
     [
         picker % hi-tag-quot % [
-            linear-dispatch-quot
+            sort-tags linear-dispatch-quot
         ] [
             num-tags get , \ fixnum-fast ,
             [ >r num-tags get - r> ] assoc-map

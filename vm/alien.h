@@ -1,7 +1,7 @@
 CELL allot_alien(CELL delegate, CELL displacement);
 
-DECLARE_PRIMITIVE(displaced_alien);
-DECLARE_PRIMITIVE(alien_address);
+void primitive_displaced_alien(void);
+void primitive_alien_address(void);
 
 DLLEXPORT void *alien_offset(CELL object);
 
@@ -10,32 +10,32 @@ void fixup_alien(F_ALIEN* d);
 DLLEXPORT void *unbox_alien(void);
 DLLEXPORT void box_alien(void *ptr);
 
-DECLARE_PRIMITIVE(alien_signed_cell);
-DECLARE_PRIMITIVE(set_alien_signed_cell);
-DECLARE_PRIMITIVE(alien_unsigned_cell);
-DECLARE_PRIMITIVE(set_alien_unsigned_cell);
-DECLARE_PRIMITIVE(alien_signed_8);
-DECLARE_PRIMITIVE(set_alien_signed_8);
-DECLARE_PRIMITIVE(alien_unsigned_8);
-DECLARE_PRIMITIVE(set_alien_unsigned_8);
-DECLARE_PRIMITIVE(alien_signed_4);
-DECLARE_PRIMITIVE(set_alien_signed_4);
-DECLARE_PRIMITIVE(alien_unsigned_4);
-DECLARE_PRIMITIVE(set_alien_unsigned_4);
-DECLARE_PRIMITIVE(alien_signed_2);
-DECLARE_PRIMITIVE(set_alien_signed_2);
-DECLARE_PRIMITIVE(alien_unsigned_2);
-DECLARE_PRIMITIVE(set_alien_unsigned_2);
-DECLARE_PRIMITIVE(alien_signed_1);
-DECLARE_PRIMITIVE(set_alien_signed_1);
-DECLARE_PRIMITIVE(alien_unsigned_1);
-DECLARE_PRIMITIVE(set_alien_unsigned_1);
-DECLARE_PRIMITIVE(alien_float);
-DECLARE_PRIMITIVE(set_alien_float);
-DECLARE_PRIMITIVE(alien_double);
-DECLARE_PRIMITIVE(set_alien_double);
-DECLARE_PRIMITIVE(alien_cell);
-DECLARE_PRIMITIVE(set_alien_cell);
+void primitive_alien_signed_cell(void);
+void primitive_set_alien_signed_cell(void);
+void primitive_alien_unsigned_cell(void);
+void primitive_set_alien_unsigned_cell(void);
+void primitive_alien_signed_8(void);
+void primitive_set_alien_signed_8(void);
+void primitive_alien_unsigned_8(void);
+void primitive_set_alien_unsigned_8(void);
+void primitive_alien_signed_4(void);
+void primitive_set_alien_signed_4(void);
+void primitive_alien_unsigned_4(void);
+void primitive_set_alien_unsigned_4(void);
+void primitive_alien_signed_2(void);
+void primitive_set_alien_signed_2(void);
+void primitive_alien_unsigned_2(void);
+void primitive_set_alien_unsigned_2(void);
+void primitive_alien_signed_1(void);
+void primitive_set_alien_signed_1(void);
+void primitive_alien_unsigned_1(void);
+void primitive_set_alien_unsigned_1(void);
+void primitive_alien_float(void);
+void primitive_set_alien_float(void);
+void primitive_alien_double(void);
+void primitive_set_alien_double(void);
+void primitive_alien_cell(void);
+void primitive_set_alien_cell(void);
 
 DLLEXPORT void to_value_struct(CELL src, void *dest, CELL size);
 DLLEXPORT void box_value_struct(void *src, CELL size);
@@ -43,7 +43,7 @@ DLLEXPORT void box_small_struct(CELL x, CELL y, CELL size);
 
 DEFINE_UNTAG(F_DLL,DLL_TYPE,dll)
 
-DECLARE_PRIMITIVE(dlopen);
-DECLARE_PRIMITIVE(dlsym);
-DECLARE_PRIMITIVE(dlclose);
-DECLARE_PRIMITIVE(dll_validp);
+void primitive_dlopen(void);
+void primitive_dlsym(void);
+void primitive_dlclose(void);
+void primitive_dll_validp(void);

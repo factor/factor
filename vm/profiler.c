@@ -79,7 +79,7 @@ void set_profiling(bool profiling)
 	iterate_code_heap(relocate_code_block);
 }
 
-DEFINE_PRIMITIVE(profiling)
+void primitive_profiling(void)
 {
 	set_profiling(to_boolean(dpop()));
 }
