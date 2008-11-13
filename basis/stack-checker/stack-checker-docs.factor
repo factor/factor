@@ -27,7 +27,7 @@ ARTICLE: "inference-combinators" "Combinator stack effects"
 "Consider a combinator such as " { $link keep } ". The combinator itself does not have a stack effect, because it applies " { $link call } " to a potentially arbitrary quotation. However, since the combinator is declared " { $link POSTPONE: inline } ", a given usage of it can have a stack effect:"
 { $example "[ [ 2 + ] keep ] infer." "( object -- object object )" }
 "Another example is the " { $link compose } " combinator. Because it is decared " { $link POSTPONE: inline } ", we can infer the stack effect of applying " { $link call } " to the result of " { $link compose } ":"
-{ $example "[ 2 [ + ] curry [ sq ] compose ] infer." "( -- object object )" }
+{ $example "[ 2 [ + ] curry [ sq ] compose ] infer." "( -- object )" }
 "Incidentally, this example demonstrates that the stack effect of nested currying and composition can also be inferred."
 $nl
 "A general rule of thumb is that any word which applies " { $link call } " or " { $link curry } " to one of its inputs must be declared " { $link POSTPONE: inline } "."
