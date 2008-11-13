@@ -11,7 +11,7 @@ IN: editors.etexteditor
 
 : etexteditor ( file line -- )
     [
-        etexteditor-path , "-a" ,
+        etexteditor-path ,
         [ , ] [ "--line" , number>string , ] bi*
     ] { } make run-detached drop ;
 
