@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private namespaces make
 quotations accessors words continuations vectors effects math
-generalizations stack-checker.transforms fry ;
+generalizations fry ;
 IN: macros.expander
 
 GENERIC: expand-macros ( quot -- quot' )
