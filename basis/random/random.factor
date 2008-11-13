@@ -13,17 +13,13 @@ GENERIC: seed-random ( tuple seed -- )
 GENERIC: random-32* ( tuple -- r )
 GENERIC: random-bytes* ( n tuple -- byte-array )
 
-<PRIVATE
-
-: adjust-random ( n m -- n' )
-    3 mask zero? [ 1+ ] unless ; inline
-
-PRIVATE>
-
 M: object random-bytes* ( n tuple -- byte-array )
-    [ [ 4 /i ] keep adjust-random ] dip
-    over 4 * <byte-vector>
-    [ '[ _ random-32* 4 >le _ push-all ] times ] keep ;
+    [ [ <byte-vector> ] keep 4 /mod ] dip tuck
+    [ pick '[ _ random-32* 4 >le _ push-all ] times ]
+    [
+        over zero?
+        [ 2drop ] [ random-32* 4 >le swap head over push-all ] if
+    ] 2bi* ;
 
 M: object random-32* ( tuple -- r ) 4 random-bytes* le> ;
 
@@ -37,15 +33,13 @@ M: f random-bytes* ( n obj -- * ) no-random-number-generator ;
 M: f random-32* ( obj -- * ) no-random-number-generator ;
 
 : random-bytes ( n -- byte-array )
-    [
-        dup adjust-random random-generator get random-bytes*
-    ] keep head-slice >byte-array ;
+    random-generator get random-bytes* ;
 
 <PRIVATE
 
 : random-integer ( n -- n' )
     dup log2 7 + 8 /i 1+
-    [ random-bytes byte-array>bignum ]
+    [ random-bytes >byte-array byte-array>bignum ]
     [ 3 shift 2^ ] bi / * >integer ;
 
 PRIVATE>
