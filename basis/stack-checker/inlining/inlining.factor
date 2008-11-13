@@ -14,8 +14,8 @@ IN: stack-checker.inlining
 ! Code to handle inline words. Much of the complexity stems from
 ! having to handle recursive inline words.
 
-: (inline-word) ( word label -- )
-    [ [ def>> ] keep ] dip infer-quot-recursive ;
+: infer-inline-word-def ( word label -- )
+    [ drop def>> ] [ add-local-recursive-state ] 2bi infer-quot ;
 
 TUPLE: inline-recursive < identity-tuple
 id
@@ -88,7 +88,7 @@ SYMBOL: enter-out
         nest-visitor
 
         dup <inline-recursive>
-        [ dup emit-enter-recursive (inline-word) ]
+        [ dup emit-enter-recursive infer-inline-word-def ]
         [ end-recursive-word ]
         [ nip ]
         2tri
@@ -133,20 +133,23 @@ SYMBOL: enter-out
     object <repetition> '[ _ prepend ] bi@
     <effect> ;
 
-: call-recursive-inline-word ( word -- )
-    dup "recursive" word-prop [
-        [ required-stack-effect adjust-stack-effect ] [ ] [ recursive-label ] tri
-        [ 2nip check-call ] [ nip '[ _ #call-recursive, ] consume/produce ] 3bi
-    ] [ undeclared-recursion-error inference-error ] if ;
+: call-recursive-inline-word ( word label -- )
+    over "recursive" word-prop [
+        [ required-stack-effect adjust-stack-effect ] dip
+        [ check-call ] [ '[ _ #call-recursive, ] consume/produce ] bi
+    ] [ drop undeclared-recursion-error inference-error ] if ;
 
 : inline-word ( word -- )
     [ inlined-dependency depends-on ]
     [
-        {
-            { [ dup inline-recursive-label ] [ call-recursive-inline-word ] }
-            { [ dup "recursive" word-prop ] [ inline-recursive-word ] }
-            [ dup (inline-word) ]
-        } cond
+        dup inline-recursive-label [
+            call-recursive-inline-word
+        ] [
+            dup "recursive" word-prop
+            [ inline-recursive-word ]
+            [ dup infer-inline-word-def ]
+            if
+        ] if*
     ] bi ;
 
 M: word apply-object

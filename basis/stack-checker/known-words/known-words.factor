@@ -195,7 +195,7 @@ do-primitive alien-invoke alien-indirect alien-callback
         { [ dup local? ] [ infer-local-reader ] }
         { [ dup local-reader? ] [ infer-local-reader ] }
         { [ dup local-writer? ] [ infer-local-writer ] }
-        { [ dup recursive-label ] [ call-recursive-word ] }
+        { [ dup recursive-word? ] [ call-recursive-word ] }
         [ dup infer-word apply-word/effect ]
     } cond ;
 

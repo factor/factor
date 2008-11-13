@@ -9,7 +9,7 @@ stack-checker.errors ;
 IN: stack-checker.transforms
 
 : give-up-transform ( word -- )
-    dup recursive-label
+    dup recursive-word?
     [ call-recursive-word ]
     [ dup infer-word apply-word/effect ]
     if ;

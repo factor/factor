@@ -2,10 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic sequences prettyprint io words arrays
 summary effects debugger assocs accessors namespaces
-compiler.errors ;
+compiler.errors stack-checker.state ;
 IN: stack-checker.errors
-
-SYMBOL: recursive-state
 
 TUPLE: inference-error error type rstate ;
 
@@ -34,6 +32,8 @@ TUPLE: literal-expected ;
 
 M: literal-expected summary
     drop "Literal value expected" ;
+
+M: object (literal) \ literal-expected inference-warning ;
 
 TUPLE: unbalanced-branches-error branches quots ;
 

@@ -82,9 +82,6 @@ M: object apply-object push-literal ;
         infer-quot-here
     ] dip recursive-state set ;
 
-: infer-quot-recursive ( quot word label -- )
-    2array recursive-state get swap prefix infer-quot ;
-
 : time-bomb ( error -- )
     '[ _ throw ] infer-quot-here ;
 
@@ -97,7 +94,7 @@ M: object apply-object push-literal ;
     ] [
         dup value>> callable? [
             [ value>> ]
-            [ [ recursion>> ] keep f 2array prefix ]
+            [ [ recursion>> ] keep add-local-quotation ]
             bi infer-quot
         ] [
             drop bad-call
@@ -125,6 +122,9 @@ M: object apply-object push-literal ;
         drop
         terminated?>> [ terminate ] when
     ] 2bi ; inline
+
+: infer-word-def ( word -- )
+    [ def>> ] [ add-recursive-state ] bi infer-quot ;
 
 : check->r ( -- )
     meta-r get empty? terminated? get or
@@ -174,7 +174,7 @@ M: object apply-object push-literal ;
             stack-visitor off
             dependencies off
             generic-dependencies off
-            [ [ def>> ] [ ] [ ] tri infer-quot-recursive end-infer ]
+            [ infer-word-def end-infer ]
             [ finish-word current-effect ]
             bi
         ] with-scope
