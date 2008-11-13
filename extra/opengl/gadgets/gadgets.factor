@@ -47,6 +47,11 @@ C: <entry> cache-entry
     cache-key* textures get delete-at*
     [ tex>> delete-texture ] [ drop ] if ;
 
+: clear-textures ( -- )
+    textures get values [ tex>> delete-texture ] each
+    H{ } clone textures set-global
+    H{ } clone refcounts set-global ;
+
 M: texture-gadget graft* ( gadget -- ) [ 1+ ] refcount-change ;
 
 M: texture-gadget ungraft* ( gadget -- )
