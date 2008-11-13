@@ -113,9 +113,8 @@ M: ppc %return ( -- ) BLR ;
 
 M:: ppc %dispatch ( src temp offset -- )
     0 temp LOAD32
-    5 offset + cells rc-absolute-ppc-2/2 rel-here
-    temp temp src ADD
-    temp temp 0 LWZ
+    4 offset + cells rc-absolute-ppc-2/2 rel-here
+    temp temp src LWZX
     temp MTCTR
     BCTR ;
 
