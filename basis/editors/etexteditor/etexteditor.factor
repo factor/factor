@@ -11,8 +11,8 @@ IN: editors.etexteditor
 
 : etexteditor ( file line -- )
     [
-        etexteditor-path ,
+        etexteditor-path , "-a" ,
         [ , ] [ "--line" , number>string , ] bi*
-    ] { } make USE: prettyprint dup . run-detached drop ;
+    ] { } make run-detached drop ;
 
 [ etexteditor ] edit-hook set-global
