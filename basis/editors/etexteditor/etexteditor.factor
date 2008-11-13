@@ -12,7 +12,7 @@ IN: editors.etexteditor
 : etexteditor ( file line -- )
     [
         etexteditor-path ,
-        "-n" swap number>string append , ,
-    ] { } make run-detached drop ;
+        [ , ] [ "--line" , number>string , ] bi*
+    ] { } make USE: prettyprint dup . run-detached drop ;
 
 [ etexteditor ] edit-hook set-global
