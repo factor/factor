@@ -72,8 +72,8 @@ SYMBOL: literal-table
 : rel-this ( class -- )
     0 swap rt-label rel-fixup ;
 
-: rel-here ( class -- )
-    0 swap rt-here rel-fixup ;
+: rel-here ( offset class -- )
+    rt-here rel-fixup ;
 
 : init-fixup ( -- )
     BV{ } clone relocation-table set
