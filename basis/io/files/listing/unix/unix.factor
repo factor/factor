@@ -2,8 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel system unicode.case
 io.unix.files io.files.listing generalizations strings
-arrays sequences io.files math.parser unix.groups unix.users ;
+arrays sequences io.files math.parser unix.groups unix.users
+io.files.listing.private ;
 IN: io.files.listing.unix
+
+<PRIVATE
 
 : unix-execute>string ( str bools -- str' )
     swap {
@@ -41,3 +44,5 @@ M: unix (directory.) ( path -- lines )
             } cleave 4 narray swap suffix " " join
         ] map
     ] with-group-cache ] with-user-cache ;
+
+PRIVATE>

@@ -2,8 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar.format combinators io.files
 kernel math.parser sequences splitting system io.files.listing
-generalizations ;
+generalizations io.files.listing.private ;
 IN: io.files.listing.windows
+
+<PRIVATE
 
 : directory-or-size ( file-info -- str )
     dup directory? [
@@ -19,3 +21,5 @@ M: windows (directory.) ( entries -- lines )
             [ directory-or-size ]
         } cleave 2 narray swap suffix " " join
     ] map ;
+
+PRIVATE>
