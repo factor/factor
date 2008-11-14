@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.singleton combinators
 continuations io io.encodings.binary io.encodings.utf8
-io.files io.sockets kernel io.streams.duplex math
+io.files io.sockets kernel io.streams.duplex math ls
 math.parser sequences splitting namespaces strings fry ftp ;
 IN: ftp.client
 

@@ -1,5 +1,5 @@
-IN: hexdump.tests
-USING: hexdump kernel sequences tools.test ;
+USING: tools.hexdump kernel sequences tools.test ;
+IN: tools.hexdump.tests
 
 [ t ] [ "" hexdump "Length: 0, 0h\n" = ] unit-test
 [ t ] [ "abcdefghijklmnopqrstuvwxyz" hexdump "Length: 26, 1ah\n00000000h: 61 62 63 64 65 66 67 68 69 6a 6b 6c 6d 6e 6f 70 abcdefghijklmnop\n00000010h: 71 72 73 74 75 76 77 78 79 7a                   qrstuvwxyz\n" = ] unit-test
