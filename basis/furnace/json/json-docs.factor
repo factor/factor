@@ -1,4 +1,4 @@
-USING: kernel http.server help.markup help.syntax ;
+USING: kernel http.server help.markup help.syntax http ;
 IN: furnace.json
 
 HELP: <json-content>
