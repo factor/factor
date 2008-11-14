@@ -19,9 +19,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; BUG: A double quote character on a commented line will break the
-;; syntax highlighting for that line.
-
 (defgroup factor nil
   "Factor mode"
   :group 'languages)
@@ -82,23 +79,35 @@
   :type 'hook
   :group 'factor)
 
+(defconst factor--parsing-words
+  '("{" "}" "^:" "^::" ";" "<<" "<PRIVATE" ">>"
+    "BIN:" "BV{" "B{" "C:" "C-STRUCT:" "C-UNION:" "CHAR:" "CS{" "C{"
+    "DEFER:" "ERROR:" "FORGET:"
+    "GENERIC#" "GENERIC:" "HEX:" "HOOK:" "H{"
+    "IN:" "INSTANCE:" "INTERSECTION:"
+    "M:" "MACRO:" "MACRO::" "MAIN:" "MATH:" "METHOD:" "MIXIN:"
+    "OCT:" "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
+    "REQUIRE:"  "REQUIRES:" "SINGLETON:" "SLOT:" "SYMBOL:" "SYMBOLS:"
+    "TUPLE:" "T{" "t\\??" "TYPEDEF:"
+    "UNION:" "USE:" "USING:" "V{" "VAR:" "VARS:" "W{"))
+
+(defconst factor--regex--parsing-words-ext
+  (regexp-opt '("B" "call-next-method" "delimiter" "f" "flushable" "foldable"
+                "initial:" "inline" "parsing" "read-only" "recursive")
+              'words))
+
 (defconst factor-font-lock-keywords
-  '(("#!.*$" . font-lock-comment-face)
+  `(("#!.*$" . font-lock-comment-face)
     ("!( .* )" . font-lock-comment-face)
     ("^!.*$" . font-lock-comment-face)
     (" !.*$" . font-lock-comment-face)
     ("( .* )" . font-lock-comment-face)
-    "BIN:"
-    "MAIN:"
-    "IN:" "USING:" "TUPLE:" "^C:" "^M:"
-    "METHOD:"
-    "USE:" "REQUIRE:" "PROVIDE:"
-    "REQUIRES:"
-    "GENERIC:" "GENERIC#" "SYMBOL:" "PREDICATE:" "VAR:" "VARS:"
-    "C-STRUCT:"
-    "C-UNION:" "<PRIVATE" "PRIVATE>" "MACRO:" "MACRO::" "DEFER:" "TYPEDEF:"
-    "SYMBOLS:"
-))
+    ("\"[^ ][^\"]*\"" . font-lock-string-face)
+    ("\\(P\\|SBUF\\)\"" 1 font-lock-keyword-face)
+    ,@(mapcar #'(lambda (w) (cons (concat "\\(^\\| \\)\\(" w "\\)\\($\\| \\)")
+                             '(2 font-lock-keyword-face)))
+              factor--parsing-words)
+    (,factor--regex--parsing-words-ext . font-lock-keyword-face)))
 
 (defun factor-indent-line ()
   "Indent current line as Factor code"
@@ -116,7 +125,7 @@
   (setq comment-start "! ")
   (make-local-variable 'font-lock-defaults)
   (setq font-lock-defaults
-	'(factor-font-lock-keywords nil nil nil nil))
+	'(factor-font-lock-keywords t nil nil nil))
   (set-syntax-table factor-mode-syntax-table)
   (make-local-variable 'indent-line-function)
   (setq indent-line-function 'factor-indent-line)

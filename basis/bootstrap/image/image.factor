@@ -134,6 +134,7 @@ SYMBOL: jit-epilog
 SYMBOL: jit-return
 SYMBOL: jit-profiling
 SYMBOL: jit-declare-word
+SYMBOL: jit-save-stack
 
 ! Default definition for undefined words
 SYMBOL: undefined-quot
@@ -158,6 +159,7 @@ SYMBOL: undefined-quot
         { jit-profiling 35 }
         { jit-push-immediate 36 }
         { jit-declare-word 42 }
+        { jit-save-stack 43 }
         { undefined-quot 60 }
     } at header-size + ;
 
@@ -459,6 +461,7 @@ M: quotation '
         jit-return
         jit-profiling
         jit-declare-word
+        jit-save-stack
         undefined-quot
     } [ emit-userenv ] each ;
 

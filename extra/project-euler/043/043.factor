@@ -59,7 +59,7 @@ PRIVATE>
     ] reduce-permutations ;
 
 ! [ euler043 ] time
-! 104526 ms run / 42735 ms GC time
+! 60280 ms run / 59 ms GC time
 
 
 ! ALTERNATE SOLUTIONS

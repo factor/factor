@@ -1,8 +1,8 @@
 ! Copyright (c) 2007-2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make math math.functions math.matrices math.miller-rabin
-    math.order math.parser math.primes.factors math.ranges sequences
-    sequences.lib sorting strings unicode.case ;
+    math.order math.parser math.primes.factors math.ranges math.ratios
+    sequences sequences.lib sorting strings unicode.case ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -14,6 +14,7 @@ IN: project-euler.common
 ! cartesian-product - #4, #27, #29, #32, #33, #43, #44, #56
 ! log10 - #25, #134
 ! max-path - #18, #67
+! mediant - #71, #73
 ! nth-triangle - #12, #42
 ! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56, #92
 ! palindrome? - #4, #36, #55
@@ -42,7 +43,7 @@ IN: project-euler.common
 
 : (sum-divisors) ( n -- sum )
     dup sqrt >fixnum [1,b] [
-        [ 2dup mod zero? [ 2dup / + , ] [ drop ] if ] each
+        [ 2dup mod 0 = [ 2dup / + , ] [ drop ] if ] each
         dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
     ] { } make sum ;
 
@@ -60,6 +61,9 @@ PRIVATE>
 : log10 ( m -- n )
     log 10 log / ;
 
+: mediant ( a/c b/d -- (a+b)/(c+d) )
+    2>fraction [ + ] 2bi@ / ;
+
 : max-path ( triangle -- n )
     dup length 1 > [
         2 cut* first2 max-children [ + ] 2map suffix max-path
@@ -68,7 +72,7 @@ PRIVATE>
     ] if ;
 
 : number>digits ( n -- seq )
-    [ dup zero? not ] [ 10 /mod ] [ ] produce reverse nip ;
+    [ dup 0 = not ] [ 10 /mod ] [ ] produce reverse nip ;
 
 : nth-triangle ( n -- n )
     dup 1+ * 2 / ;
@@ -112,7 +116,7 @@ PRIVATE>
     factor-2s dup [ 1+ ]
     [ perfect-square? -1 0 ? ]
     [ dup sqrt >fixnum [1,b] ] tri* [
-        dupd mod zero? [ [ 2 + ] dip ] when
+        dupd mod 0 = [ [ 2 + ] dip ] when
     ] each drop * ;
 
 ! These transforms are for generating primitive Pythagorean triples

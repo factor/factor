@@ -102,7 +102,7 @@ M: #declare cleanup* drop f ;
     #! If only one branch is live we don't need to branch at
     #! all; just drop the condition value.
     dup live-children sift dup length {
-        { 0 [ 2drop f ] }
+        { 0 [ drop in-d>> #drop ] }
         { 1 [ first swap in-d>> #drop prefix ] }
         [ 2drop ]
     } case ;

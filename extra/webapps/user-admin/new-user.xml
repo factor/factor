@@ -46,7 +46,7 @@
 	
 	<p>
 		<button type="submit" class="link-button link">Create</button>
-		<t:validation-messages />
+		<t:validation-errors />
 	</p>
 
 	</t:form>

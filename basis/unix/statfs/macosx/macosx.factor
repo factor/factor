@@ -122,7 +122,7 @@ TUPLE: macosx-file-system-info < file-system-info
 block-size io-size blocks blocks-free blocks-available files
 files-free file-system-id owner type-id flags filesystem-subtype ;
 
-M: macosx mounted ( -- array )
+M: macosx file-systems ( -- array )
     f <void*> dup 0 getmntinfo64 dup io-error
     [ *void* ] dip
     "statfs64" heap-size [ * memory>byte-array ] keep group

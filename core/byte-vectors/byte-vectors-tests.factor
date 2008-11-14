@@ -1,5 +1,6 @@
 IN: byte-vectors.tests
-USING: tools.test byte-vectors vectors sequences kernel ;
+USING: tools.test byte-vectors vectors sequences kernel
+prettyprint ;
 
 [ 0 ] [ 123 <byte-vector> length ] unit-test
 
@@ -12,3 +13,5 @@ USING: tools.test byte-vectors vectors sequences kernel ;
 ] unit-test
 
 [ t ] [ BV{ } byte-vector? ] unit-test
+
+[ "BV{ }" ] [ BV{ } unparse ] unit-test

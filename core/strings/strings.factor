@@ -20,7 +20,7 @@ PRIVATE>
 
 M: string equal?
     over string? [
-        over hashcode over hashcode number=
+        over hashcode over hashcode eq?
         [ sequence= ] [ 2drop f ] if
     ] [
         2drop f

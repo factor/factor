@@ -3,7 +3,7 @@
 USING: arrays generic hashtables kernel kernel.private math
 namespaces make sequences words quotations layouts combinators
 sequences.private classes classes.builtin classes.algebra
-definitions math.order ;
+definitions math.order math.private ;
 IN: generic.math
 
 PREDICATE: math-class < class
@@ -62,13 +62,17 @@ ERROR: no-math-method left right generic ;
         2drop object-method
     ] if ;
 
+SYMBOL: picker
+
 : math-vtable ( picker quot -- quot )
     [
-        >r
-        , \ tag ,
-        num-tags get [ bootstrap-type>class ]
-        r> compose map ,
-        \ dispatch ,
+        swap picker set
+        picker get , [ tag 0 eq? ] %
+        num-tags get swap [ bootstrap-type>class ] prepose map
+        unclip ,
+        [
+            picker get , [ tag 1 fixnum-fast ] % , \ dispatch ,
+        ] [ ] make , \ if ,
     ] [ ] make ; inline
 
 TUPLE: math-combination ;
@@ -85,8 +89,7 @@ M: math-combination perform-combination
         ] [
             over object-method
         ] if nip
-    ] math-vtable nip
-    define ;
+    ] math-vtable nip define ;
 
 PREDICATE: math-generic < generic ( word -- ? )
     "combination" word-prop math-combination? ;

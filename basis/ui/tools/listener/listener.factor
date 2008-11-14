@@ -50,7 +50,8 @@ M: listener-gadget tool-scroller
     listener>> input>> interactor-busy? ;
 
 : listener-input ( string -- )
-    get-workspace listener>> input>> set-editor-string ;
+    get-workspace listener>> input>>
+    [ set-editor-string ] [ request-focus ] bi ;
 
 : (call-listener) ( quot listener -- )
     input>> interactor-call ;

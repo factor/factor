@@ -97,16 +97,16 @@ ERROR: bad-slot-value value class ;
 : setter-word ( name -- word )
     ">>" prepend (( object value -- object )) create-accessor ;
 
-: define-setter ( slot-spec -- )
-    name>> dup setter-word dup deferred? [
+: define-setter ( name -- )
+    dup setter-word dup deferred? [
         [ \ over , swap writer-word , ] [ ] make define-inline
     ] [ 2drop ] if ;
 
 : changer-word ( name -- word )
     "change-" prepend (( object quot -- object )) create-accessor ;
 
-: define-changer ( slot-spec -- )
-    name>> dup changer-word dup deferred? [
+: define-changer ( name -- )
+    dup changer-word dup deferred? [
         [
             [ over >r >r ] %
             over reader-word ,
@@ -119,8 +119,8 @@ ERROR: bad-slot-value value class ;
     [ define-reader ]
     [
         dup read-only>> [ 2drop ] [
-            [ define-setter drop ]
-            [ define-changer drop ]
+            [ name>> define-setter drop ]
+            [ name>> define-changer drop ]
             [ define-writer ]
             2tri
         ] if
@@ -131,10 +131,10 @@ ERROR: bad-slot-value value class ;
 
 : define-protocol-slot ( name -- )
     {
-        [ reader-word drop ]
-        [ writer-word drop ]
-        [ setter-word drop ]
-        [ changer-word drop ]
+        [ reader-word define-simple-generic ]
+        [ writer-word define-simple-generic ]
+        [ define-setter ]
+        [ define-changer ]
     } cleave ;
 
 ERROR: no-initial-value class ;

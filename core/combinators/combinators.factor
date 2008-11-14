@@ -167,6 +167,6 @@ M: slice hashcode* [ sequence-hashcode ] recursive-hashcode ;
 
 M: hashtable hashcode*
     [
-        dup assoc-size 1 number=
+        dup assoc-size 1 eq?
         [ assoc-hashcode ] [ nip assoc-size ] if
     ] recursive-hashcode ;

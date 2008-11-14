@@ -152,3 +152,6 @@ PRIVATE>
 
 : enumerate ( seq -- seq' ) <enum> >alist ;
 
+: splice ( left-seq right-seq seq -- newseq ) swap 3append ;
+
+: surround ( seq left-seq right-seq -- newseq ) swapd 3append ;

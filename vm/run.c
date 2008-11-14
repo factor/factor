@@ -105,13 +105,13 @@ bool stack_to_array(CELL bottom, CELL top)
 	}
 }
 
-DEFINE_PRIMITIVE(datastack)
+void primitive_datastack(void)
 {
 	if(!stack_to_array(ds_bot,ds))
 		general_error(ERROR_DS_UNDERFLOW,F,F,NULL);
 }
 
-DEFINE_PRIMITIVE(retainstack)
+void primitive_retainstack(void)
 {
 	if(!stack_to_array(rs_bot,rs))
 		general_error(ERROR_RS_UNDERFLOW,F,F,NULL);
@@ -125,45 +125,45 @@ CELL array_to_stack(F_ARRAY *array, CELL bottom)
 	return bottom + depth - CELLS;
 }
 
-DEFINE_PRIMITIVE(set_datastack)
+void primitive_set_datastack(void)
 {
 	ds = array_to_stack(untag_array(dpop()),ds_bot);
 }
 
-DEFINE_PRIMITIVE(set_retainstack)
+void primitive_set_retainstack(void)
 {
 	rs = array_to_stack(untag_array(dpop()),rs_bot);
 }
 
-DEFINE_PRIMITIVE(getenv)
+void primitive_getenv(void)
 {
 	F_FIXNUM e = untag_fixnum_fast(dpeek());
 	drepl(userenv[e]);
 }
 
-DEFINE_PRIMITIVE(setenv)
+void primitive_setenv(void)
 {
 	F_FIXNUM e = untag_fixnum_fast(dpop());
 	CELL value = dpop();
 	userenv[e] = value;
 }
 
-DEFINE_PRIMITIVE(exit)
+void primitive_exit(void)
 {
 	exit(to_fixnum(dpop()));
 }
 
-DEFINE_PRIMITIVE(millis)
+void primitive_millis(void)
 {
 	box_unsigned_8(current_millis());
 }
 
-DEFINE_PRIMITIVE(sleep)
+void primitive_sleep(void)
 {
 	sleep_millis(to_cell(dpop()));
 }
 
-DEFINE_PRIMITIVE(set_slot)
+void primitive_set_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
 	CELL obj = dpop();

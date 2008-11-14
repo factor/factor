@@ -62,7 +62,7 @@
 
 	<p>
 		<button>Update</button>
-		<t:validation-messages />
+		<t:validation-errors />
 	</p>
 
 	</t:form>

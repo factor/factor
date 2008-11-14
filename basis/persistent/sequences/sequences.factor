@@ -14,3 +14,6 @@ M: sequence ppop 1 head* ;
 GENERIC: new-nth ( val i seq -- seq' )
 
 M: sequence new-nth clone [ set-nth ] keep ;
+
+: changed-nth ( i seq quot -- seq' )
+    [ [ nth ] dip call ] [ drop new-nth ] 3bi ; inline

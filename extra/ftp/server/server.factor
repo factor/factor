@@ -6,10 +6,21 @@ io.encodings.utf8 io.files io.sockets kernel math.parser
 namespaces make sequences ftp io.unix.launcher.parser
 unicode.case splitting assocs classes io.servers.connection
 destructors calendar io.timeouts io.streams.duplex threads
-continuations math concurrency.promises byte-arrays ;
+continuations math concurrency.promises byte-arrays
+io.backend sequences.lib tools.hexdump io.files.listing ;
 IN: ftp.server
 
+TUPLE: ftp-client url mode state command-promise ;
+
+: <ftp-client> ( url -- ftp-client )
+    ftp-client new
+        swap >>url ;
+    
 SYMBOL: client
+
+: ftp-server-directory ( -- str )
+    \ ftp-server-directory get-global "resource:temp" or
+    normalize-path ;
 
 TUPLE: ftp-command raw tokenized ;
 
@@ -19,12 +30,14 @@ TUPLE: ftp-command raw tokenized ;
 TUPLE: ftp-get path ;
 
 : <ftp-get> ( path -- obj )
-    ftp-get new swap >>path ;
+    ftp-get new
+        swap >>path ;
 
 TUPLE: ftp-put path ;
 
 : <ftp-put> ( path -- obj )
-    ftp-put new swap >>path ;
+    ftp-put new
+        swap >>path ;
 
 TUPLE: ftp-list ;
 
@@ -62,7 +75,7 @@ C: <ftp-list> ftp-list
 
 : handle-USER ( ftp-command -- )
     [
-        tokenized>> second client get swap >>user drop
+        tokenized>> second client get (>>user)
         331 "Please specify the password." server-response
     ] [
         2drop "bad USER" ftp-error
@@ -70,7 +83,7 @@ C: <ftp-list> ftp-list
 
 : handle-PASS ( ftp-command -- )
     [
-        tokenized>> second client get swap >>password drop
+        tokenized>> second client get (>>password)
         230 "Login successful" server-response
     ] [
         2drop "PASS error" ftp-error
@@ -101,20 +114,20 @@ ERROR: type-error type ;
 
 : handle-PWD ( obj -- )
     drop
-    257 current-directory get "\"" swap "\"" 3append server-response ;
+    257 current-directory get "\"" "\"" surround server-response ;
 
 : handle-SYST ( obj -- )
     drop
     215 "UNIX Type: L8" server-response ;
 
 : if-command-promise ( quot -- )
-    >r client get command-promise>> r>
+    [ client get command-promise>> ] dip
     [ "Establish an active or passive connection first" ftp-error ] if* ;
 
 : handle-STOR ( obj -- )
     [
         tokenized>> second
-        [ >r <ftp-put> r> fulfill ] if-command-promise
+        [ [ <ftp-put> ] dip fulfill ] if-command-promise
     ] [
         2drop
     ] recover ;
@@ -136,7 +149,7 @@ M: ftp-list service-command ( stream obj -- )
     start-directory
     [
         utf8 encode-output
-        directory-list [ ftp-send ] each
+        directory. [ ftp-send ] each
     ] with-output-stream
     finish-directory ;
 
@@ -145,7 +158,7 @@ M: ftp-list service-command ( stream obj -- )
     rot   
     [ file-name ] [
         " " swap  file-info size>> number>string
-        "(" " bytes)." swapd 3append append
+        "(" " bytes)." surround append
     ] bi 3append server-response ;
 
 : transfer-incoming-file ( path -- )
@@ -191,7 +204,7 @@ M: ftp-put service-command ( stream obj -- )
 
 : handle-LIST ( obj -- )
     drop
-    [ >r <ftp-list> r> fulfill ] if-command-promise ;
+    [ [ <ftp-list> ] dip fulfill ] if-command-promise ;
 
 : handle-SIZE ( obj -- )
     [
@@ -217,7 +230,7 @@ M: ftp-put service-command ( stream obj -- )
     expect-connection
     [
         "Entering Passive Mode (127,0,0,1," %
-        port>bytes [ number>string ] bi@ "," swap 3append %
+        port>bytes [ number>string ] bi@ "," splice %
         ")" %
     ] "" make 227 swap server-response ;
 
@@ -235,14 +248,20 @@ M: ftp-put service-command ( stream obj -- )
 ! : handle-LPRT ( obj -- ) tokenized>> "," split ;
 
 ERROR: not-a-directory ;
+ERROR: no-permissions ;
 
 : handle-CWD ( obj -- )
     [
-        tokenized>> second dup directory? [
+        tokenized>> second dup normalize-path
+        dup ftp-server-directory head? [
+            no-permissions
+        ] unless
+
+        file-info directory? [
             set-current-directory
             250 "Directory successully changed." server-response
         ] [
-            not-a-directory throw
+            not-a-directory
         ] if
     ] [
         2drop
@@ -253,6 +272,7 @@ ERROR: not-a-directory ;
 
 : handle-client-loop ( -- )
     <ftp-command> readln
+    USE: prettyprint    global [ dup . flush ] bind
     [ >>raw ]
     [ tokenize-command >>tokenized ] bi
     dup tokenized>> first >upper {
@@ -310,7 +330,7 @@ TUPLE: ftp-server < threaded-server ;
 M: ftp-server handle-client* ( server -- )
     drop
     [
-        "" [
+        ftp-server-directory [
             host-name <ftp-client> client set
             send-banner handle-client-loop
         ] with-directory
@@ -320,6 +340,7 @@ M: ftp-server handle-client* ( server -- )
     ftp-server new-threaded-server
         swap >>insecure
         "ftp.server" >>name
+        5 minutes >>timeout
         latin1 >>encoding ;
 
 : ftpd ( port -- )

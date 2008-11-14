@@ -148,7 +148,7 @@ ERROR: no-vocab vocab ;
             "{ $values" print
             [ "    " write ($values.) ]
             [ [ nl "    " write ($values.) ] unless-empty ] bi*
-            " }" write nl
+            nl "}" print
         ] if
     ] when* ;
 
@@ -263,3 +263,12 @@ SYMBOL: examples-flag
         [ example ] times
         "}" print
     ] with-variable ;
+
+: scaffold-rc ( path -- )
+    [ touch-file ] [ "Click to edit: " write <pathname> . ] bi ;
+
+: scaffold-factor-boot-rc ( -- )
+    home ".factor-boot-rc" append-path scaffold-rc ;
+
+: scaffold-factor-rc ( -- )
+    home ".factor-rc" append-path scaffold-rc ;

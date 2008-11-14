@@ -1,6 +1,6 @@
-USING: arrays kernel math math.functions
-math.order math.vectors namespaces opengl opengl.gl sequences ui
-ui.gadgets ui.gestures ui.render accessors ;
+USING: arrays kernel math math.functions math.order math.vectors
+namespaces opengl opengl.gl sequences ui ui.gadgets ui.gestures
+ui.render accessors combinators ;
 IN: opengl.demo-support
 
 : FOV 2.0 sqrt 1+ ; inline
@@ -73,6 +73,26 @@ M: demo-gadget pref-dim* ( gadget -- dim )
 
 : drag-yaw-pitch ( -- yaw pitch )
     last-drag-rel MOUSE-MOTION-SCALE v*n first2 ;
+
+: gl-vertex ( point -- )
+    dup length {
+        { 2 [ first2 glVertex2d ] }
+        { 3 [ first3 glVertex3d ] }
+        { 4 [ first4 glVertex4d ] }
+    } case ;
+
+: gl-normal ( normal -- ) first3 glNormal3d ;
+
+: do-state ( mode quot -- )
+    swap glBegin call glEnd ; inline
+
+: rect-vertices ( lower-left upper-right -- )
+    GL_QUADS [
+        over first2 glVertex2d
+        dup first pick second glVertex2d
+        dup first2 glVertex2d
+        swap first swap second glVertex2d
+    ] do-state ;
 
 demo-gadget H{
     { T{ key-down f f "LEFT"  } [ KEY-ROTATE-STEP neg swap yaw-demo-gadget ] }

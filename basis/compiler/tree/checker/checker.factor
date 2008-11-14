@@ -22,21 +22,14 @@ ERROR: check-use-error value message ;
 GENERIC: check-node* ( node -- )
 
 M: #shuffle check-node*
-    [ [ mapping>> values ] [ in-d>> ] bi subset? [ "Bad mapping inputs" throw ] unless ]
-    [ [ mapping>> keys ] [ out-d>> ] bi set= [ "Bad mapping outputs" throw ] unless ]
+    [ [ mapping>> values ] [ [ in-d>> ] [ in-r>> ] bi append ] bi subset? [ "Bad mapping inputs" throw ] unless ]
+    [ [ mapping>> keys ] [ [ out-d>> ] [ out-r>> ] bi append ] bi set= [ "Bad mapping outputs" throw ] unless ]
     bi ;
 
 : check-lengths ( seq -- )
     [ length ] map all-equal? [ "Bad lengths" throw ] unless ;
 
 M: #copy check-node* inputs/outputs 2array check-lengths ;
-
-: check->r/r> ( node -- )
-    inputs/outputs [ drop ] [ 2array check-lengths ] if-empty ;
-
-M: #>r check-node* check->r/r> ;
-
-M: #r> check-node* check->r/r> ;
 
 M: #return-recursive check-node* inputs/outputs 2array check-lengths ;
 
@@ -113,11 +106,8 @@ M: #push check-stack-flow* check-out-d ;
 
 M: #call check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
 
-M: #shuffle check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
-
-M: #>r check-stack-flow* [ check-in-d ] [ check-out-r ] bi ;
-
-M: #r> check-stack-flow* [ check-in-r ] [ check-out-d ] bi ;
+M: #shuffle check-stack-flow*
+    { [ check-in-d ] [ check-in-r ] [ check-out-d ] [ check-out-r ] } cleave ;
 
 : assert-datastack-empty ( -- )
     datastack get empty? [ "Data stack not empty" throw ] unless ;

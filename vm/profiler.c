@@ -32,7 +32,6 @@ F_COMPILED *compile_profiling_stub(F_WORD *word)
 /* Allocates memory */
 void update_word_xt(F_WORD *word)
 {
-	/* If we just enabled the profiler, reset call count */
 	if(profiling_p)
 	{
 		if(!word->profiling)
@@ -80,7 +79,7 @@ void set_profiling(bool profiling)
 	iterate_code_heap(relocate_code_block);
 }
 
-DEFINE_PRIMITIVE(profiling)
+void primitive_profiling(void)
 {
 	set_profiling(to_boolean(dpop()));
 }

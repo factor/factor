@@ -65,6 +65,9 @@ CHLOE: comment drop ;
 CHLOE: call-next-template
     drop reset-buffer \ call-next-template , ;
 
+CHLOE: validation-errors
+    drop [ render-validation-errors ] [code] ;
+
 : attr>word ( value -- word/f )
     ":" split1 swap lookup ;
 

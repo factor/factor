@@ -14,7 +14,7 @@ IN: cfdg
 
 SELF-SLOTS: hsva
 
-: clear-color ( color -- ) set-clear-color GL_COLOR_BUFFER_BIT glClear ;
+: clear-color ( color -- ) gl-clear-color GL_COLOR_BUFFER_BIT glClear ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -49,7 +49,7 @@ VAR: color-stack
 
 : push-color ( -- ) self> color-stack> push   self> clone >self ;
 
-: pop-color ( -- ) color-stack> pop dup >self set-color ;
+: pop-color ( -- ) color-stack> pop dup >self gl-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -80,11 +80,11 @@ VAR: threshold
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : circle ( -- )
-  self> set-color
+  self> gl-color
   gluNewQuadric dup 0 0.5 20 10 gluDisk gluDeleteQuadric ;
 
 : triangle ( -- )
-  self> set-color
+  self> gl-color
   GL_POLYGON glBegin
     0    0.577 glVertex2d
     0.5 -0.289 glVertex2d
@@ -92,7 +92,7 @@ VAR: threshold
   glEnd ;
 
 : square ( -- )
-  self> set-color
+  self> gl-color
   GL_POLYGON glBegin
     -0.5  0.5 glVertex2d
      0.5  0.5 glVertex2d
@@ -192,7 +192,7 @@ SYMBOL: dlist
 
   set-initial-color
 
-  self> set-color
+  self> gl-color
 
   start-shape> call
       

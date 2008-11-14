@@ -474,7 +474,7 @@ void factorbug(void)
 	}
 }
 
-DEFINE_PRIMITIVE(die)
+void primitive_die(void)
 {
 	fprintf(stderr,"The die word was called by the library. Unless you called it yourself,\n");
 	fprintf(stderr,"you have triggered a bug in Factor. Please report.\n");

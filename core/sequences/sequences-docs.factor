@@ -841,7 +841,8 @@ HELP: unclip
 
 HELP: unclip-slice
 { $values { "seq" sequence } { "rest-slice" slice } { "first" object } }
-{ $description "Outputs a tail sequence and the first element of " { $snippet "seq" } "; the tail sequence consists of all elements of " { $snippet "seq" } " but the first. Unlike " { $link unclip } ", this word does not make a copy of the input sequence, and runs in constant time." } ;
+{ $description "Outputs a tail sequence and the first element of " { $snippet "seq" } "; the tail sequence consists of all elements of " { $snippet "seq" } " but the first. Unlike " { $link unclip } ", this word does not make a copy of the input sequence, and runs in constant time." }
+{ $examples { $example "USING: math.order prettyprint sequences ;" "{ 3 -1 -10 5 7 } unclip-slice [ min ] reduce ." "-10" } } ;
 
 HELP: unclip-last
 { $values { "seq" sequence } { "butlast" sequence } { "last" object } }

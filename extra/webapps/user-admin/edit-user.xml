@@ -51,7 +51,7 @@
 	
 	<p>
 		<button type="submit" >Update</button>
-		<t:validation-messages />
+		<t:validation-errors />
 	</p>
 
 	</t:form>

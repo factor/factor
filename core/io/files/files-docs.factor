@@ -1,5 +1,5 @@
-USING: help.markup help.syntax io strings
-       io.backend io.files.private quotations ;
+USING: help.markup help.syntax io strings arrays io.backend
+io.files.private quotations ;
 IN: io.files
 
 ARTICLE: "file-streams" "Reading and writing files"
@@ -322,6 +322,10 @@ HELP: directory-files
 HELP: with-directory-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
 { $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
+
+HELP: file-systems
+{ $values { "array" array } }
+{ $description "Returns an array of " { $link file-system-info } " objects returned by iterating the mount points and calling " { $link file-system-info } " on each." } ;
 
 HELP: file-system-info
 { $values

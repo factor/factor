@@ -1,8 +1,11 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel math.constants math.private
-math.libm combinators math.order ;
+math.libm combinators math.order sequences ;
 IN: math.functions
+
+: >fraction ( a/b -- a b )
+    [ numerator ] [ denominator ] bi ; inline
 
 <PRIVATE
 
@@ -30,13 +33,34 @@ M: real sqrt
         2dup >r >r >r odd? r> call r> 2/ r> each-bit
     ] if ; inline recursive
 
-: ^n ( z w -- z^w )
-    1 swap [
-        [ dupd * ] when >r sq r>
-    ] each-bit nip ; inline
+: map-bits ( n quot: ( ? -- obj ) -- seq )
+    accumulator [ each-bit ] dip ; inline
+
+: factor-2s ( n -- r s )
+    #! factor an integer into 2^r * s
+    dup 0 = [ 1 ] [
+        0 swap [ dup even? ] [ [ 1+ ] [ 2/ ] bi* ] [ ] while
+    ] if ; inline
+
+<PRIVATE
+
+GENERIC# ^n 1 ( z w -- z^w )
+
+: (^n) 1 swap [ [ dupd * ] when [ sq ] dip ] each-bit nip ; inline
+
+M: integer ^n
+    [ factor-2s ] dip [ (^n) ] keep rot * shift ;
+
+M: ratio ^n
+    [ >fraction ] dip tuck [ ^n ] 2bi@ / ;
+
+M: float ^n
+    (^n) ;
 
 : integer^ ( x y -- z )
     dup 0 > [ ^n ] [ neg ^n recip ] if ; inline
+
+PRIVATE>
 
 : >rect ( z -- x y )
     [ real-part ] [ imaginary-part ] bi ; inline
@@ -51,6 +75,8 @@ M: real sqrt
 : cis ( arg -- z ) dup fcos swap fsin rect> ; inline
 
 : polar> ( abs arg -- z ) cis * ; inline
+
+<PRIVATE
 
 : ^mag ( w abs arg -- magnitude )
     >r >r >float-rect swap r> swap fpow r> rot * fexp /f ;
@@ -67,6 +93,8 @@ M: real sqrt
 
 : 0^ ( x -- z )
     dup zero? [ drop 0./0. ] [ 0 < 1./0. 0 ? ] if ; inline
+
+PRIVATE>
 
 : ^ ( x y -- z )
     {

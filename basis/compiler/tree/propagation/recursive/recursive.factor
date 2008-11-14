@@ -17,9 +17,12 @@ IN: compiler.tree.propagation.recursive
     [ value-info<= ] 2all?
     [ drop ] [ label>> f >>fixed-point drop ] if ;
 
+: latest-input-infos ( node -- infos )
+    in-d>> [ value-info ] map ;
+
 : recursive-stacks ( #enter-recursive -- stacks initial )
     [ label>> calls>> [ node-input-infos ] map flip ]
-    [ in-d>> [ value-info ] map ] bi ;
+    [ latest-input-infos ] bi ;
 
 : generalize-counter-interval ( interval initial-interval -- interval' )
     {
@@ -46,14 +49,13 @@ IN: compiler.tree.propagation.recursive
     ] if ;
 
 : propagate-recursive-phi ( #enter-recursive -- )
-    [ ] [ recursive-stacks unify-recursive-stacks ] [ ] tri
-    [ node-output-infos check-fixed-point ]
-    [ out-d>> set-value-infos drop ]
-    3bi ;
+    [ recursive-stacks unify-recursive-stacks ] keep
+    out-d>> set-value-infos ;
 
 M: #recursive propagate-around ( #recursive -- )
+    constraints [ H{ } clone suffix ] change
     [
-        constraints [ clone ] change
+        constraints [ but-last H{ } clone suffix ] change
 
         child>>
         [ first compute-copy-equiv ]
@@ -61,6 +63,9 @@ M: #recursive propagate-around ( #recursive -- )
         [ (propagate) ]
         tri
     ] until-fixed-point ;
+
+: recursive-phi-infos ( node -- infos )
+    label>> enter-recursive>> node-output-infos ;
 
 : generalize-return-interval ( info -- info' )
     dup [ literal?>> ] [ class>> null-class? ] bi or
@@ -70,18 +75,37 @@ M: #recursive propagate-around ( #recursive -- )
     [ generalize-return-interval ] map ;
 
 : return-infos ( node -- infos )
-    label>> [ return>> node-input-infos ] [ loop?>> ] bi
-    [ generalize-return ] unless ;
+    label>> return>> node-input-infos generalize-return ;
+
+: save-return-infos ( node infos -- )
+    swap out-d>> set-value-infos ;
+
+: unless-loop ( node quot -- )
+    [ dup label>> loop?>> [ drop ] ] dip if ; inline
 
 M: #call-recursive propagate-before ( #call-recursive -- )
-    [ ] [ return-infos ] [ node-output-infos ] tri
-    [ check-fixed-point ] [ drop swap out-d>> set-value-infos ] 3bi ;
+    [
+        [ ] [ latest-input-infos ] [ recursive-phi-infos ] tri
+        check-fixed-point
+    ]
+    [
+        [
+            [ ] [ return-infos ] [ node-output-infos ] tri
+            [ check-fixed-point ] [ drop save-return-infos ] 3bi
+        ] unless-loop
+    ] bi ;
 
 M: #call-recursive annotate-node
     dup [ in-d>> ] [ out-d>> ] bi append (annotate-node) ;
 
 M: #enter-recursive annotate-node
     dup out-d>> (annotate-node) ;
+
+M: #return-recursive propagate-before ( #return-recursive -- )
+    [
+        [ ] [ latest-input-infos ] [ node-input-infos ] tri
+        check-fixed-point
+    ] unless-loop ;
 
 M: #return-recursive annotate-node
     dup in-d>> (annotate-node) ;
