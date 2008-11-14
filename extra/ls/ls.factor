@@ -1,12 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators generalizations
-io.files io.unix.files math.parser sequences.lib calendar math
-kernel sequences unix.groups unix.users combinators.cleave
-strings combinators.short-circuit unicode.case ;
-IN: ls
+USING: accessors arrays combinators io io.files kernel
+math.parser sequences system vocabs.loader calendar
+sequences.lib ;
 
-TUPLE: ls-info path user group size ;
+IN: ls
 
 : ls-time ( timestamp -- string )
     [ hour>> ] [ minute>> ] bi
@@ -25,39 +23,18 @@ TUPLE: ls-info path user group size ;
 
 : write>string ( ? -- string ) "w" "-" ? ; inline
 
-: execute-string ( str bools -- str' )
-    swap {
-        { { t t } [ >lower ] }
-        { { t f } [ >upper ] }
-        { { f t } [ drop "x" ] }
-        [ 2drop "-" ]
-    } case ;
+HOOK: execute>string os ( ? -- string )
 
-: permissions-string ( permissions -- str )
-    {
-        [ type>> file-type>ch 1string ]
-        [ user-read? read>string ]
-        [ user-write? write>string ]
-        [ [ uid? ] [ user-execute? ] bi 2array "s" execute-string ]      
-        [ group-read? read>string ]
-        [ group-write? write>string ]
-        [ [ gid? ] [ group-execute? ] bi 2array "s" execute-string ]      
-        [ other-read? read>string ]
-        [ other-write? write>string ]
-        [ [ sticky? ] [ other-execute? ] bi 2array "t" execute-string ]      
-    } <arr> concat ;
+M: object execute>string ( ? -- string ) "x" "-" ? ; inline
 
-: ls ( path -- lines )
-    [ [ [
-        "" directory-files [
-            dup file-info
-            {
-                [ permissions-string ]
-                [ nlink>> number>string 3 CHAR: \s pad-left ]
-                ! [ uid>> ]
-                ! [ gid>> ]
-                [ size>> number>string 15 CHAR: \s pad-left ]
-                [ modified>> ls-timestamp ]
-            } <arr> swap suffix " " join
-        ] map
-    ] with-group-cache ] with-user-cache ] with-directory ;
+HOOK: permissions-string os ( -- str )
+
+HOOK: (directory.) os ( path -- lines )
+
+: directory. ( path -- )
+    [ (directory.) ] with-directory-files [ print ] each ;
+
+{
+    { [ os unix? ] [ "ls.unix" ] }
+    { [ os windows? ] [ "ls.windows" ] }
+} cond require
