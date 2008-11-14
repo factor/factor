@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel sequences strings ;
-IN: hexdump
+IN: tools.hexdump
 
 HELP: hexdump.
 { $values { "seq" sequence } }
