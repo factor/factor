@@ -5,6 +5,8 @@ math.parser sequences system vocabs.loader calendar ;
 
 IN: io.files.listing
 
+<PRIVATE
+
 : ls-time ( timestamp -- string )
     [ hour>> ] [ minute>> ] bi
     [ number>string 2 CHAR: 0 pad-left ] bi@ ":" swap 3append ;
@@ -25,6 +27,8 @@ IN: io.files.listing
 : execute>string ( ? -- string ) "x" "-" ? ; inline
 
 HOOK: (directory.) os ( path -- lines )
+
+PRIVATE>
 
 : directory. ( path -- )
     [ (directory.) ] with-directory-files [ print ] each ;

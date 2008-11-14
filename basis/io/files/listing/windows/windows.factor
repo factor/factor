@@ -5,6 +5,8 @@ kernel math.parser sequences splitting system io.files.listing
 generalizations ;
 IN: io.files.listing.windows
 
+<PRIVATE
+
 : directory-or-size ( file-info -- str )
     dup directory? [
         drop "<DIR>" 20 CHAR: \s pad-right
@@ -19,3 +21,5 @@ M: windows (directory.) ( entries -- lines )
             [ directory-or-size ]
         } cleave 2 narray swap suffix " " join
     ] map ;
+
+PRIVATE>

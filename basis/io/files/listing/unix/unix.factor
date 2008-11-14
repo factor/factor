@@ -5,6 +5,8 @@ io.unix.files io.files.listing generalizations strings
 arrays sequences io.files math.parser unix.groups unix.users ;
 IN: io.files.listing.unix
 
+<PRIVATE
+
 : unix-execute>string ( str bools -- str' )
     swap {
         { { t t } [ >lower ] }
@@ -41,3 +43,5 @@ M: unix (directory.) ( path -- lines )
             } cleave 4 narray swap suffix " " join
         ] map
     ] with-group-cache ] with-user-cache ;
+
+PRIVATE>
