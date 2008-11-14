@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar.format combinators io.files
 kernel math.parser sequences splitting system io.files.listing
-generalizations ;
+generalizations io.files.listing.private ;
 IN: io.files.listing.windows
 
 <PRIVATE
