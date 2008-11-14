@@ -1,20 +1,16 @@
-! Copyright (C) 2008 Your name.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.streams.string ;
+USING: help.markup help.syntax db http.server ;
 IN: furnace.db
 
 HELP: <db-persistence>
 { $values
-     { "responder" null } { "db" null }
-     { "responder'" null }
+     { "responder" "a responder" } { "db" db }
+     { "responder'" db-persistence }
 }
-{ $description "" } ;
-
-HELP: db-persistence
-{ $description "" } ;
+{ $description "Wraps a responder with database persistence support. The responder's " { $link call-responder* } " method will run in a " { $link with-db } " scope." } ;
 
 ARTICLE: "furnace.db" "Furnace database support"
-{ $vocab-link "furnace.db" }
-;
+"The " { $vocab-link "furnace.db" } " vocabulary implements a responder which maintains a database connection pool and runs each request in a " { $link with-db } " scope."
+{ $subsection <db-persistence> }
+"The " { $vocab-link "furnace.alloy" } " vocabulary combines database persistence with several other features." ;
 
 ABOUT: "furnace.db"
