@@ -154,6 +154,9 @@ ARTICLE: "html.templates.chloe.tags.form" "Chloe link and form tags"
             "</t:button>"
         }
     } }
+    { { $snippet "t:validation-errors" } {
+        "Renders validation errors in the current form which are not associated with any field. Such errors are reported by invoking " { $link validation-error } "."
+    } }
 } ;
 
 ARTICLE: "html.templates.chloe.tags" "Standard Chloe tags"

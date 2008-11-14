@@ -13,5 +13,5 @@
 		</t:form>
 	</div>
 
-	<t:validation-messages />
+	<t:validation-errors />
 </t:chloe>
