@@ -1,4 +1,4 @@
-USING: hexdump kernel sequences tools.test ;
+USING: tools.hexdump kernel sequences tools.test ;
 IN: tools.hexdump.tests
 
 [ t ] [ "" hexdump "Length: 0, 0h\n" = ] unit-test

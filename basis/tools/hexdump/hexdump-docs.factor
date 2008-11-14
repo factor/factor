@@ -12,11 +12,11 @@ HELP: hexdump
 { $description "Converts a sequence to its hexadecimal and ASCII representation sixteen characters at a time.  Lines are separated by a newline character." }
 { $see-also hexdump. } ;
 
-ARTICLE: "hexdump" "Hexdump"
-"The " { $vocab-link "hexdump" } " vocabulary provides a traditional hexdump view of a sequence." $nl
+ARTICLE: "tools.hexdump" "Hexdump"
+"The " { $vocab-link "tools.hexdump" } " vocabulary provides a traditional hexdump view of a sequence." $nl
 "Write hexdump to string:"
 { $subsection hexdump }
 "Write the hexdump to the output stream:"
 { $subsection hexdump. } ;
 
-ABOUT: "hexdump"
+ABOUT: "tools.hexdump"
