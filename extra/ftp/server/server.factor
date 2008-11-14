@@ -7,9 +7,15 @@ namespaces make sequences ftp io.unix.launcher.parser
 unicode.case splitting assocs classes io.servers.connection
 destructors calendar io.timeouts io.streams.duplex threads
 continuations math concurrency.promises byte-arrays
-io.backend sequences.lib tools.hexdump ;
+io.backend sequences.lib tools.hexdump io.files.listing ;
 IN: ftp.server
 
+TUPLE: ftp-client url mode state command-promise ;
+
+: <ftp-client> ( url -- ftp-client )
+    ftp-client new
+        swap >>url ;
+    
 SYMBOL: client
 
 : ftp-server-directory ( -- str )
@@ -143,7 +149,7 @@ M: ftp-list service-command ( stream obj -- )
     start-directory
     [
         utf8 encode-output
-        directory-list [ ftp-send ] each
+        directory. [ ftp-send ] each
     ] with-output-stream
     finish-directory ;
 
