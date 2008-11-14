@@ -22,11 +22,7 @@ IN: io.files.listing
 
 : write>string ( ? -- string ) "w" "-" ? ; inline
 
-HOOK: execute>string os ( ? -- string )
-
-M: object execute>string ( ? -- string ) "x" "-" ? ; inline
-
-HOOK: permissions-string os ( -- str )
+: execute>string ( ? -- string ) "x" "-" ? ; inline
 
 HOOK: (directory.) os ( path -- lines )
 
