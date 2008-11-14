@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators io io.files kernel
-math.parser sequences strings ;
+math.parser sequences strings ls ;
 IN: ftp
 
 SINGLETON: active
@@ -32,35 +32,7 @@ TUPLE: ftp-response n strings parsed ;
     over strings>> push ;
 
 : ftp-send ( string -- ) write "\r\n" write flush ;
-
 : ftp-ipv4 1 ; inline
 : ftp-ipv6 2 ; inline
 
-: ch>type ( ch -- type )
-    {
-        { CHAR: d [ +directory+ ] }
-        { CHAR: l [ +symbolic-link+ ] }
-        { CHAR: - [ +regular-file+ ] }
-        [ drop +unknown+ ]
-    } case ;
-
-: type>ch ( type -- string )
-    {   
-        { +directory+ [ CHAR: d ] }
-        { +symbolic-link+ [ CHAR: l ] }
-        { +regular-file+ [ CHAR: - ] }
-        [ drop CHAR: - ]
-    } case ;
-
-: file-info>string ( file-info name -- string )
-    [
-        [
-            [ type>> type>ch 1string ]
-            [ drop "rwx------" append ] bi
-        ]
-        [ size>> number>string 15 CHAR: \s pad-left ] bi
-    ] dip 3array " " join ;
-
-: directory-list ( -- seq )
-    "" directory-files
-    [ [ link-info ] keep file-info>string ] map ;
+: directory-list ( -- seq ) "" ls ;
