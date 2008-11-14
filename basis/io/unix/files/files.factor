@@ -172,6 +172,30 @@ M: unix (directory-entries) ( path -- seq )
 
 PRIVATE>
 
+: ch>file-type ( ch -- type )
+    {
+        { CHAR: b [ +block-device+ ] }
+        { CHAR: c [ +character-device+ ] }   
+        { CHAR: d [ +directory+ ] }
+        { CHAR: l [ +symbolic-link+ ] }
+        { CHAR: s [ +socket+ ] }
+        { CHAR: p [ +fifo+ ] }
+        { CHAR: - [ +regular-file+ ] }
+        [ drop +unknown+ ]
+    } case ;
+
+: file-type>ch ( type -- string )
+    {
+        { +block-device+ [ CHAR: b ] }
+        { +character-device+ [ CHAR: c ] }
+        { +directory+ [ CHAR: d ] }
+        { +symbolic-link+ [ CHAR: l ] }
+        { +socket+ [ CHAR: s ] }
+        { +fifo+ [ CHAR: p ] }
+        { +regular-file+ [ CHAR: - ] }
+        [ drop CHAR: - ]
+    } case ;
+
 : UID           OCT: 0004000 ; inline
 : GID           OCT: 0002000 ; inline
 : STICKY        OCT: 0001000 ; inline
