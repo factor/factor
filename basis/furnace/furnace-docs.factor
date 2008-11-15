@@ -166,10 +166,8 @@ ARTICLE: "furnace" "Furnace web framework"
 }
 "Major functionality:"
 { $subsection "furnace.actions" }
-{ $subsection "furnace.syndication" }
-{ $subsection "furnace.boilerplate" }
-{ $subsection "furnace.db" }
 "Server-side state:"
+{ $subsection "furnace.db" }
 { $subsection "furnace.sessions" }
 { $subsection "furnace.conversations" }
 { $subsection "furnace.asides" }
@@ -180,8 +178,10 @@ ARTICLE: "furnace" "Furnace web framework"
 { $subsection "html.templates" }
 { $subsection "html.templates.chloe" }
 { $subsection "html.templates.fhtml" }
+{ $subsection "furnace.boilerplate" }
 "Utilities:"
 { $subsection "furnace.alloy" }
+{ $subsection "furnace.syndication" }
 { $subsection "furnace.json" }
 { $subsection "furnace.redirection" }
 { $subsection "furnace.referrer" } ;
