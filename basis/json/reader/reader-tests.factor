@@ -1,4 +1,5 @@
-USING: arrays json.reader kernel multiline strings tools.test hashtables ;
+USING: arrays json.reader kernel multiline strings tools.test
+hashtables json ;
 IN: json.reader.tests
 
 { f } [ "false" json> ] unit-test

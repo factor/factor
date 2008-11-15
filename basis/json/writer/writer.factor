@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel io.streams.string io strings splitting sequences
-math math.parser assocs classes words namespaces make
-prettyprint hashtables mirrors tr json.reader ;
+USING: accessors kernel io.streams.string io strings splitting
+sequences math math.parser assocs classes words namespaces make
+prettyprint hashtables mirrors tr json ;
 IN: json.writer
 
 #! Writes the object out to a stream in JSON format
@@ -24,8 +24,11 @@ M: json-null json-print ( null -- )
 M: string json-print ( obj -- )
     CHAR: " write1 "\"" split "\\\"" join CHAR: \r swap remove "\n" split "\\r\\n" join write CHAR: " write1 ;
 
-M: number json-print ( num -- )  
+M: integer json-print ( num -- )
     number>string write ;
+
+M: real json-print ( num -- )
+    >float number>string write ;
 
 M: sequence json-print ( array -- ) 
     CHAR: [ write1 [ >json ] map "," join write CHAR: ] write1 ;
@@ -46,5 +49,4 @@ M: hashtable json-print ( hashtable -- )
     { } assoc>map "," join write 
     CHAR: } write1 ;
 
-M: object json-print ( object -- )
-    unparse json-print ;
+M: word json-print name>> json-print ;

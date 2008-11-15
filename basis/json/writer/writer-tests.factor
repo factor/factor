@@ -1,4 +1,4 @@
-USING: json.writer tools.test multiline json.reader ;
+USING: json.writer tools.test multiline json.reader json ;
 IN: json.writer.tests
 
 { "false" } [ f >json ] unit-test
@@ -16,3 +16,5 @@ IN: json.writer.tests
 ! Random symbols are written simply as strings
 SYMBOL: testSymbol
 { <" "testSymbol""> } [ testSymbol >json ] unit-test
+
+[ { 0.5 } ] [ { 1/2 } >json json> ] unit-test

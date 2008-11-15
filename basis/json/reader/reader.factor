@@ -1,13 +1,15 @@
 ! Copyright (C) 2008 Peter Burns.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel peg peg.ebnf math.parser math.private strings math math.functions sequences
-       arrays vectors hashtables assocs prettyprint ;
+USING: kernel peg peg.ebnf math.parser math.private strings math
+math.functions sequences arrays vectors hashtables assocs
+prettyprint json ;
 IN: json.reader
 
-SINGLETON: json-null
-
+<PRIVATE
 
 : grammar-list>vector ( seq -- vec ) first2 values swap prefix ;
+
+PRIVATE>
 
 ! Grammar for JSON from RFC 4627
 EBNF: json>
