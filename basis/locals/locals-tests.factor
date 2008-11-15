@@ -346,7 +346,6 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 
 { 3 1 } [| from to seq | T{ slice f from to seq } ] must-infer-as
 
-
 :: literal-identity-test ( -- a b )
     { } V{ } ;
 

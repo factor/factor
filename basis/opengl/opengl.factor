@@ -6,7 +6,8 @@ USING: alien alien.c-types continuations kernel libc math macros
 namespaces math.vectors math.constants math.functions
 math.parser opengl.gl opengl.glu combinators arrays sequences
 splitting words byte-arrays assocs colors accessors
-generalizations locals memoize ;
+generalizations locals specialized-arrays.float
+specialized-arrays.uint ;
 IN: opengl
 
 : color>raw ( object -- r g b a )
@@ -52,7 +53,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     glMatrixMode glPopMatrix ; inline
 
 : gl-material ( face pname params -- )
-    >c-float-array glMaterialfv ;
+    >float-array underlying>> glMaterialfv ;
 
 : gl-vertex-pointer ( seq -- )
     [ 2 GL_FLOAT 0 ] dip glVertexPointer ; inline
@@ -64,7 +65,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     [ 2 GL_FLOAT 0 ] dip glTexCoordPointer ; inline
 
 : line-vertices ( a b -- )
-    append >c-float-array gl-vertex-pointer ;
+    append >float-array underlying>> gl-vertex-pointer ;
 
 : gl-line ( a b -- )
     line-vertices GL_LINES 0 2 glDrawArrays ;
@@ -75,7 +76,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
         [ first 1- 1 ]
         [ [ first 1- ] [ second ] bi ]
         [ second 0 swap ]
-    } cleave 8 narray >c-float-array ;
+    } cleave 8 float-array{ } nsequence underlying>> ;
 
 : rect-vertices ( dim -- )
     (rect-vertices) gl-vertex-pointer ;
@@ -92,7 +93,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
         [ first 0 ]
         [ first2 ]
         [ second 0 swap ]
-    } cleave 8 narray >c-float-array ;
+    } cleave 8 float-array{ } nsequence underlying>> ;
 
 : fill-rect-vertices ( dim -- )
     (fill-rect-vertices) gl-vertex-pointer ;
@@ -119,7 +120,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     circle-steps unit-circle adjust-points scale-points ;
 
 : circle-vertices ( loc dim steps -- vertices )
-    circle-points concat >c-float-array ;
+    circle-points concat >float-array underlying>> ;
 
 : (gen-gl-object) ( quot -- id )
     >r 1 0 <uint> r> keep *uint ; inline
@@ -160,7 +161,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     glActiveTexture swap glBindTexture gl-error ;
 
 : (set-draw-buffers) ( buffers -- )
-    dup length swap >c-uint-array glDrawBuffers ;
+    [ length ] [ >uint-array underlying>> ] bi glDrawBuffers ;
 
 MACRO: set-draw-buffers ( buffers -- )
     words>values [ (set-draw-buffers) ] curry ;
@@ -203,11 +204,8 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 
 : gl-translate ( point -- ) first2 0.0 glTranslated ;
 
-MEMO: (rect-texture-coords) ( -- seq )
-    { 0 0 1 0 1 1 0 1 } >c-float-array ;
-
 : rect-texture-coords ( -- )
-    (rect-texture-coords) gl-texture-coord-pointer ;
+    float-array{ 0 0 1 0 1 1 0 1 } gl-texture-coord-pointer ;
 
 : draw-sprite ( sprite -- )
     GL_TEXTURE_COORD_ARRAY [

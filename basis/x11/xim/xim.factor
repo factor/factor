@@ -38,17 +38,17 @@ SYMBOL: keybuf
 SYMBOL: keysym
 
 : prepare-lookup ( -- )
-    buf-size "uint" <c-array> keybuf set
+    buf-size <uint-array> keybuf set
     0 <KeySym> keysym set ;
 
 : finish-lookup ( len -- string keysym )
-    keybuf get swap c-uint-array> >string
+    keybuf get swap 2 * head utf16n decode
     keysym get *KeySym ;
 
 : lookup-string ( event xic -- string keysym )
     [
         prepare-lookup
-        swap keybuf get buf-size keysym get 0 <int>
+        swap keybuf get underlying>> buf-size keysym get 0 <int>
         XwcLookupString
         finish-lookup
     ] with-scope ;

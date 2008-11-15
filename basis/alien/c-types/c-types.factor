@@ -19,7 +19,7 @@ reg-class size align stack-align? ;
 
 : new-c-type ( class -- type )
     new
-        int-regs >>reg-class ;
+        int-regs >>reg-class ; inline
 
 : <c-type> ( -- type )
     \ c-type new-c-type ;
@@ -172,12 +172,12 @@ M: byte-array byte-length length ;
 
 : c-getter ( name -- quot )
     c-type-getter [
-        [ "Cannot read struct fields with type" throw ]
+        [ "Cannot read struct fields with this type" throw ]
     ] unless* ;
 
 : c-setter ( name -- quot )
     c-type-setter [
-        [ "Cannot write struct fields with type" throw ]
+        [ "Cannot write struct fields with this type" throw ]
     ] unless* ;
 
 : <c-array> ( n type -- array )
@@ -201,27 +201,12 @@ M: byte-array byte-length length ;
 : byte-array>memory ( byte-array base -- )
     swap dup length memcpy ;
 
-: (define-nth) ( word type quot -- )
+: array-accessor ( type quot -- def )
     [
         \ swap , [ heap-size , [ * >fixnum ] % ] [ % ] bi*
-    ] [ ] make define-inline ;
-
-: nth-word ( name vocab -- word )
-    >r "-nth" append r> create ;
-
-: define-nth ( name vocab -- )
-    dupd nth-word swap dup c-getter (define-nth) ;
-
-: set-nth-word ( name vocab -- word )
-    >r "set-" swap "-nth" 3append r> create ;
-
-: define-set-nth ( name vocab -- )
-    dupd set-nth-word swap dup c-setter (define-nth) ;
+    ] [ ] make ;
 
 : typedef ( old new -- ) c-types get set-at ;
-
-: define-c-type ( type name vocab -- )
-    >r tuck typedef r> [ define-nth ] 2keep define-set-nth ;
 
 TUPLE: long-long-type < c-type ;
 
@@ -240,62 +225,34 @@ M: long-long-type box-parameter ( n type -- )
 M: long-long-type box-return ( type -- )
     f swap box-parameter ;
 
-: define-deref ( name vocab -- )
-    >r dup CHAR: * prefix r> create
-    swap c-getter 0 prefix define-inline ;
+: define-deref ( name -- )
+    [ CHAR: * prefix "alien.c-types" create ]
+    [ c-getter 0 prefix ] bi
+    define-inline ;
 
-: define-out ( name vocab -- )
-    over [ <c-object> tuck 0 ] over c-setter append swap
-    >r >r constructor-word r> r> prefix define-inline ;
+: define-out ( name -- )
+    [ "alien.c-types" constructor-word ]
+    [ [ [ <c-object> ] curry ] [ c-setter ] bi append ] bi
+    define-inline ;
 
 : c-bool> ( int -- ? )
     zero? not ;
 
-: >c-array ( seq type word -- byte-array )
-    [ [ dup length ] dip <c-array> ] dip
-    [ [ execute ] 2curry each-index ] 2keep drop ; inline
-
-: >c-array-quot ( type vocab -- quot )
-    dupd set-nth-word [ >c-array ] 2curry ;
-
-: to-array-word ( name vocab -- word )
-    >r ">c-" swap "-array" 3append r> create ;
-
-: define-to-array ( type vocab -- )
-    [ to-array-word ] 2keep >c-array-quot
-    (( array -- byte-array )) define-declared ;
-
-: c-array>quot ( type vocab -- quot )
-    [
-        \ swap ,
-        nth-word 1quotation ,
-        [ curry map ] %
-    ] [ ] make ;
-
-: from-array-word ( name vocab -- word )
-    >r "c-" swap "-array>" 3append r> create ;
-
-: define-from-array ( type vocab -- )
-    [ from-array-word ] 2keep c-array>quot
-    (( c-ptr n -- array )) define-declared ;
-
 : define-primitive-type ( type name -- )
-    "alien.c-types"
-    {
-        [ define-c-type ]
-        [ define-deref ]
-        [ define-to-array ]
-        [ define-from-array ]
-        [ define-out ]
-    } 2cleave ;
+    [ typedef ]
+    [ define-deref ]
+    [ define-out ]
+    tri ;
 
 : expand-constants ( c-type -- c-type' )
     dup array? [
-        unclip >r [
-            dup word? [
-                def>> { } swap with-datastack first
-            ] when
-        ] map r> prefix
+        unclip [
+            [
+                dup word? [
+                    def>> { } swap with-datastack first
+                ] when
+            ] map
+        ] dip prefix
     ] when ;
 
 : malloc-file-contents ( path -- alien len )
@@ -303,6 +260,17 @@ M: long-long-type box-return ( type -- )
 
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
+
+: primitive-types
+    {
+        "char" "uchar"
+        "short" "ushort"
+        "int" "uint"
+        "long" "ulong"
+        "longlong" "ulonglong"
+        "float" "double"
+        "void*" "bool"
+    } ;
 
 [
     <c-type>

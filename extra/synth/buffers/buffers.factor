@@ -38,10 +38,10 @@ M: 8bit-stereo-buffer buffer-format drop AL_FORMAT_STEREO8 ;
 M: 16bit-stereo-buffer buffer-format drop AL_FORMAT_STEREO16 ;
 
 : 8bit-buffer-data ( seq -- data size )
-    [ 128 * >integer 128 + ] map [ >c-uchar-array ] [ length ] bi ;
+    [ 128 * >integer 128 + ] uchar-array{ } map-as [ underlying>> ] [ length ] bi ;
 
 : 16bit-buffer-data ( seq -- data size )
-    [ 32768 * >integer ] map [ >c-short-array ] [ length 2 * ] bi ;
+    [ 32768 * >integer ] short-array{ } map-as [ underlying>> ] [ byte-length ] bi ;
 
 : stereo-data ( stereo-buffer -- left right )
     [ left-data>> ] [ right-data>> ] bi@ ;

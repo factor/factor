@@ -6,7 +6,7 @@ USING: kernel alien.c-types combinators namespaces make arrays
        vars colors self self.slots
        random-weighted colors.hsv cfdg.gl accessors
        ui.gadgets.handler ui.gestures assocs ui.gadgets macros
-       qualified ;
+       qualified speicalized-arrays.double ;
 QUALIFIED: syntax
 IN: cfdg
 
@@ -75,7 +75,7 @@ VAR: threshold
     2 * sin ,   2 * cos neg ,   0 ,   0 ,
           0 ,             0 ,   1 ,   0 , 
           0 ,             0 ,   0 ,   1 , ]
-  { } make >c-double-array glMultMatrixd ;
+  double-array{ } make underlying>> glMultMatrixd ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

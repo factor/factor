@@ -34,10 +34,10 @@ M: struct-type stack-size
 
 : c-struct? ( type -- ? ) (c-type) struct-type? ;
 
-: (define-struct) ( name vocab size align fields -- )
+: (define-struct) ( name size align fields -- )
     >r [ align ] keep r>
     struct-type boa
-    -rot define-c-type ;
+    swap typedef ;
 
 : define-struct-early ( name vocab fields -- fields )
     -rot [ rot first2 <field-spec> ] 2curry map ;

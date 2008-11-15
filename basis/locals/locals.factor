@@ -274,29 +274,26 @@ SYMBOL: in-lambda?
     "|" parse-tokens make-locals dup push-locals
     \ ] (parse-lambda) <lambda> ;
 
-: parse-binding ( -- pair/f )
-    scan dup "|" = [
+: parse-binding ( end -- pair/f )
+    scan tuck = [
         drop f
     ] [
-        scan {
-            { "[" [ \ ] parse-until >quotation ] }
-            { "[|" [ parse-lambda ] }
-        } case 2array
+        scan-object 2array
     ] if ;
 
-: (parse-bindings) ( -- )
-    parse-binding [
+: (parse-bindings) ( end -- )
+    dup parse-binding dup [
         first2 >r make-local r> 2array ,
         (parse-bindings)
-    ] when* ;
+    ] [ 2drop ] if ;
 
-: parse-bindings ( -- bindings vars )
+: parse-bindings ( end -- bindings vars )
     [
         [ (parse-bindings) ] H{ } make-assoc
         dup push-locals
     ] { } make swap ;
 
-: parse-bindings* ( -- words assoc )
+: parse-bindings* ( end -- words assoc )
     [
         [
             namespace push-locals
@@ -305,13 +302,13 @@ SYMBOL: in-lambda?
         ] { } make-assoc
     ] { } make swap ;
 
-: (parse-wbindings) ( -- )
-    parse-binding [
+: (parse-wbindings) ( end -- )
+    dup parse-binding dup [
         first2 >r make-local-word r> 2array ,
         (parse-wbindings)
-    ] when* ;
+    ] [ 2drop ] if ;
 
-: parse-wbindings ( -- bindings vars )
+: parse-wbindings ( end -- bindings vars )
     [
         [ (parse-wbindings) ] H{ } make-assoc
         dup push-locals
@@ -334,12 +331,12 @@ M: wlet local-rewrite*
     let-rewrite ;
 
 : parse-locals ( -- vars assoc )
-    ")" parse-effect
+    scan "(" assert= ")" parse-effect
     word [ over "declared-effect" set-word-prop ] when*
     in>> [ dup pair? [ first ] when ] map make-locals dup push-locals ;
 
 : parse-locals-definition ( word -- word quot )
-    scan "(" assert= parse-locals \ ; (parse-lambda) <lambda>
+    parse-locals \ ; (parse-lambda) <lambda>
     2dup "lambda" set-word-prop
     lambda-rewrite first ;
 
@@ -357,15 +354,15 @@ PRIVATE>
 : [| parse-lambda parsed-lambda ; parsing
 
 : [let
-    scan "|" assert= parse-bindings
+    scan "|" assert= "|" parse-bindings
     \ ] (parse-lambda) <let> parsed-lambda ; parsing
 
 : [let*
-    scan "|" assert= parse-bindings*
+    scan "|" assert= "|" parse-bindings*
     \ ] (parse-lambda) <let*> parsed-lambda ; parsing
 
 : [wlet
-    scan "|" assert= parse-wbindings
+    scan "|" assert= "|" parse-wbindings
     \ ] (parse-lambda) <wlet> parsed-lambda ; parsing
 
 : :: (::) define ; parsing

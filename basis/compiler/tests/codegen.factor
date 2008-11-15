@@ -3,7 +3,7 @@ kernel.private math hashtables.private math.private namespaces
 sequences sequences.private tools.test namespaces.private
 slots.private sequences.private byte-arrays alien
 alien.accessors layouts words definitions compiler.units io
-combinators vectors float-arrays ;
+combinators vectors ;
 IN: compiler.tests
 
 ! Originally, this file did black box testing of templating

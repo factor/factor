@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! 
 USING: tools.test kernel serialize io io.streams.byte-array math
-alien arrays byte-arrays bit-arrays float-arrays sequences math
-prettyprint parser classes math.constants io.encodings.binary
-random assocs ;
+alien arrays byte-arrays bit-arrays specialized-arrays.double
+sequences math prettyprint parser classes math.constants
+io.encodings.binary random assocs ;
 IN: serialize.tests
 
 : test-serialize-cell
@@ -48,7 +48,7 @@ C: <serialize-test> serialize-test
         T{ serialize-test f "a" 2 }
         B{ 50 13 55 64 1 }
         ?{ t f t f f t f }
-        F{ 1.0 3.0 4.0 1.0 2.35 0.33 }
+        double-array{ 1.0 3.0 4.0 1.0 2.35 0.33 }
         << 1 [ 2 ] curry parsed >>
         { { "a" "bc" } { "de" "fg" } }
         H{ { "a" "bc" } { "de" "fg" } }

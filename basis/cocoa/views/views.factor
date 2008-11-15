@@ -1,8 +1,8 @@
-! Copyright (C) 2006, 2007 Slava Pestov
+! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types arrays kernel math namespaces make cocoa
-cocoa.messages cocoa.classes cocoa.types sequences
-continuations ;
+USING: specialized-arrays.int arrays kernel math namespaces make
+cocoa cocoa.messages cocoa.classes cocoa.types sequences
+continuations accessors ;
 IN: cocoa.views
 
 : NSOpenGLPFAAllRenderers 1 ;
@@ -69,7 +69,7 @@ PRIVATE>
             NSOpenGLPFASamples , 8 ,
         ] when
         0 ,
-    ] { } make >c-int-array
+    ] int-array{ } make underlying>>
     -> initWithAttributes:
     -> autorelease ;
 

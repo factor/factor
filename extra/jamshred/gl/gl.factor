@@ -3,7 +3,7 @@
 USING: accessors alien.c-types jamshred.game jamshred.oint
 jamshred.player jamshred.tunnel kernel math math.constants
 math.functions math.vectors opengl opengl.gl opengl.glu
-opengl.demo-support sequences float-arrays ;
+opengl.demo-support sequences specialized-arrays.float ;
 IN: jamshred.gl
 
 : min-vertices 6 ; inline
@@ -84,10 +84,10 @@ IN: jamshred.gl
     GL_FOG_DENSITY 0.09 glFogf
     GL_FRONT GL_AMBIENT_AND_DIFFUSE glColorMaterial
     GL_COLOR_MATERIAL glEnable
-    GL_LIGHT0 GL_POSITION F{ 0.0 0.0 0.0 1.0 } >c-float-array glLightfv
-    GL_LIGHT0 GL_AMBIENT F{ 0.2 0.2 0.2 1.0 } >c-float-array glLightfv
-    GL_LIGHT0 GL_DIFFUSE F{ 1.0 1.0 1.0 1.0 } >c-float-array glLightfv
-    GL_LIGHT0 GL_SPECULAR F{ 1.0 1.0 1.0 1.0 } >c-float-array glLightfv ;
+    GL_LIGHT0 GL_POSITION float-array{ 0.0 0.0 0.0 1.0 } underlying>> glLightfv
+    GL_LIGHT0 GL_AMBIENT float-array{ 0.2 0.2 0.2 1.0 } underlying>> glLightfv
+    GL_LIGHT0 GL_DIFFUSE float-array{ 1.0 1.0 1.0 1.0 } underlying>> glLightfv
+    GL_LIGHT0 GL_SPECULAR float-array{ 1.0 1.0 1.0 1.0 } underlying>> glLightfv ;
 
 : player-view ( player -- )
     [ location>> ]

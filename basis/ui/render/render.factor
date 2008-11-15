@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types arrays hashtables io kernel
 math namespaces opengl opengl.gl opengl.glu sequences strings
 io.styles vectors combinators math.vectors ui.gadgets colors
-math.order math.geometry.rect locals ;
+math.order math.geometry.rect locals specialized-arrays.float ;
 IN: ui.render
 
 SYMBOL: clip
@@ -140,10 +140,11 @@ TUPLE: gradient < caching-pen colors last-vertices last-colors ;
     direction dim v* dim over v- swap
     colors length dup 1- v/n [ v*n ] with map
     [ dup rot v+ 2array ] with map
-    concat concat >c-float-array ;
+    concat concat >float-array underlying>> ;
 
 : gradient-colors ( colors -- seq )
-    [ color>raw 4array dup 2array ] map concat concat >c-float-array ;
+    [ color>raw 4array dup 2array ] map concat concat
+    >float-array underlying>> ;
 
 M: gradient recompute-pen ( gadget gradient -- )
     tuck
@@ -171,7 +172,7 @@ M: gradient draw-interior
 TUPLE: polygon color vertex-array count ;
 
 : <polygon> ( color points -- polygon )
-    [ concat >c-float-array ] [ length ] bi polygon boa ;
+    [ concat >float-array underlying>> ] [ length ] bi polygon boa ;
 
 : draw-polygon ( polygon mode -- )
     swap

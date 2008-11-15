@@ -5,7 +5,8 @@ strings quotations assocs combinators classes colors
 classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.labels ui.gadgets.theme
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
-ui.render math.geometry.rect locals alien.c-types ;
+ui.render math.geometry.rect locals alien.c-types
+specialized-arrays.float ;
 
 IN: ui.gadgets.buttons
 
@@ -118,7 +119,7 @@ TUPLE: checkmark-paint < caching-pen color last-vertices ;
     } cleave 4array ;
 
 : checkmark-vertices ( dim -- vertices )
-    checkmark-points concat >c-float-array ;
+    checkmark-points concat >float-array underlying>> ;
 
 PRIVATE>
 

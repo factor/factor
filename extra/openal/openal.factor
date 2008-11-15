@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays alien system combinators alien.syntax namespaces
        alien.c-types sequences vocabs.loader shuffle combinators.lib
-       openal.backend ;
+       openal.backend specialized-arrays.uint ;
 IN: openal
 
 << "alut" {
@@ -248,10 +248,10 @@ SYMBOL: init
 : <uint-array> ( n -- byte-array ) "ALuint" <c-array> ;
 
 : gen-sources ( size -- seq )
-  dup <uint-array> 2dup alGenSources swap c-uint-array> ;
+  dup <uint-array> 2dup underlying>> alGenSources swap ;
 
 : gen-buffers ( size -- seq )
-  dup <uint-array> 2dup alGenBuffers swap c-uint-array> ;
+  dup <uint-array> 2dup underlying>> alGenBuffers swap ;
 
 : gen-buffer ( -- buffer ) 1 gen-buffers first ;
 
@@ -267,7 +267,7 @@ os macosx? "openal.macosx" "openal.other" ? require
   [ alBufferData ] 4keep alutUnloadWAV ;
 
 : queue-buffers ( source buffers -- )
-    [ length ] [ >c-uint-array ] bi alSourceQueueBuffers ;
+    [ length ] [ >uint-array underlying>> ] bi alSourceQueueBuffers ;
 
 : queue-buffer ( source buffer -- )
     1array queue-buffers ;
