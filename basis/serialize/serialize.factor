@@ -15,6 +15,8 @@ locals prettyprint compiler.units sequences.private
 classes.tuple.private ;
 IN: serialize
 
+<PRIVATE
+
 ! Variable holding a assoc of objects already serialized
 SYMBOL: serialized
 
@@ -298,6 +300,8 @@ SYMBOL: deserialized
 
 : (deserialize) ( -- obj )
     deserialize* [ "End of stream" throw ] unless ;
+
+PRIVATE>
 
 : deserialize ( -- obj )
     ! [
