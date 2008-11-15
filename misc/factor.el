@@ -130,7 +130,8 @@
   (indent-line-to (+ (current-indentation) 4)))
 
 (defun factor-mode ()
-  "A mode for editing programs written in the Factor programming language."
+  "A mode for editing programs written in the Factor programming language.
+\\{factor-mode-map}"
   (interactive)
   (kill-all-local-variables)
   (use-local-map factor-mode-map)
