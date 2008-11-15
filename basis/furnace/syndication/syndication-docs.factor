@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io.streams.string kernel sequences strings urls syndication ;
+USING: help.markup help.syntax io.streams.string kernel sequences strings urls syndication calendar ;
 IN: furnace.syndication
 
 HELP: <feed-action>
@@ -22,34 +22,38 @@ HELP: feed-action
 HELP: feed-entry-date
 { $values
      { "object" object }
-     { "timestamp" null }
+     { "timestamp" timestamp }
 }
-{ $description "" } ;
+{ $contract "Outputs a feed entry timestmap." } ;
 
 HELP: feed-entry-description
 { $values
      { "object" object }
      { "description" null }
 }
-{ $description "" } ;
+{ $contract "Outputs a feed entry description." } ;
 
 HELP: feed-entry-title
 { $values
      { "object" object }
      { "string" string }
 }
-{ $description "" } ;
+{ $contract "Outputs a feed entry title." } ;
 
 HELP: feed-entry-url
 { $values
      { "object" object }
      { "url" url }
 }
-{ $description "" } ;
+{ $contract "Outputs a feed entry URL." } ;
 
 ARTICLE: "furnace.syndication.config" "Configuring Atom feed actions"
-
-;
+"Instances of " { $link feed-action } " have three slots which need to be set:"
+{ $table
+    { { $slot "title" } "The title of the feed as a string" }
+    { { $slot "url" } { "The feed " { $link url } } }
+    { { $slot "entries" } { "A quotation with stack effect " { $snippet "( -- seq )" } ", which produces a sequence of objects responding to the " { $link "furnace.syndication.protocol" } " protocol" } }
+} ;
 
 ARTICLE: "furnace.syndication.protocol" "Atom feed entry protocol"
 "An Atom feed action takes a sequence of objects and converts them into Atom feed entries. The objects must implement a protocol consisting of either a single generic word:"
