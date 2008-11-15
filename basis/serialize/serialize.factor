@@ -15,6 +15,8 @@ locals prettyprint compiler.units sequences.private
 classes.tuple.private ;
 IN: serialize
 
+GENERIC: (serialize) ( obj -- )
+
 <PRIVATE
 
 ! Variable holding a assoc of objects already serialized
@@ -36,9 +38,6 @@ M: id equal? over id? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
 : object-id ( obj -- id )
     #! Return the id of an already serialized object 
     <id> serialized get at ;
-
-! Serialize object
-GENERIC: (serialize) ( obj -- )
 
 ! Numbers are serialized as follows:
 ! 0 => B{ 0 }
@@ -304,10 +303,8 @@ SYMBOL: deserialized
 PRIVATE>
 
 : deserialize ( -- obj )
-    ! [
     V{ } clone deserialized
     [ (deserialize) ] with-variable ;
-    ! ] with-compilation-unit ;
 
 : serialize ( obj -- )
     H{ } clone serialized [ (serialize) ] with-variable ;
