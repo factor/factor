@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io.streams.string quotations 
-strings math parser-combinators.regexp ;
+strings math regexp ;
 IN: validators
 
 HELP: v-captcha
