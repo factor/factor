@@ -3,7 +3,7 @@
 USING: help.markup help.syntax ;
 IN: json.reader
 
-HELP: json> ( string -- object )
+HELP: json>
 { $values { "string" "a string in JSON format" } { "object" "a deserialized object" } }
 { $description "Deserializes the JSON formatted string into a Factor object. JSON objects are converted to Factor hashtables. All other JSON objects convert to their obvious Factor equivalents." } ;
 

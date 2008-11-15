@@ -9,10 +9,8 @@ IN: json.reader
 
 : grammar-list>vector ( seq -- vec ) first2 values swap prefix ;
 
-PRIVATE>
-
 ! Grammar for JSON from RFC 4627
-EBNF: json>
+EBNF: (json>)
 
 ws = (" " | "\r" | "\t" | "\n")*
 
@@ -57,3 +55,7 @@ val = true
 value = ws val:v ws => [[ v ]]
 
 ;EBNF
+
+PRIVATE>
+
+: json> ( string -- object ) (json>) ;
