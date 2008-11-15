@@ -1,180 +1,57 @@
-! Copyright (C) 2006 Chris Double.
+! Copyright (C) 2008 Peter Burns.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel parser-combinators namespaces make sequences promises strings 
-       assocs math math.parser math.vectors math.functions math.order
-       lists hashtables ascii accessors ;
+USING: kernel peg peg.ebnf math.parser math.private strings math math.functions sequences
+       arrays vectors hashtables assocs prettyprint ;
 IN: json.reader
 
+SINGLETON: json-null
+
+
+: grammar-list>vector ( seq -- vec ) first2 values swap prefix ;
+
 ! Grammar for JSON from RFC 4627
+EBNF: json>
 
-SYMBOL: json-null
+ws = (" " | "\r" | "\t" | "\n")*
 
-: [<&>] ( quot -- quot )
-  { } make unclip [ <&> ] reduce ;
+true = "true" => [[ t ]]
+false = "false" => [[ f ]]
+null = "null" => [[ json-null ]]
 
-: [<|>] ( quot -- quot )
-  { } make unclip [ <|> ] reduce ;
+hex = [0-9a-fA-F]
+char = '\\"'  [[ CHAR: "  ]]
+     | "\\\\" [[ CHAR: \  ]]
+     | "\\/"  [[ CHAR: /  ]]
+     | "\\b"  [[ 8        ]]
+     | "\\f"  [[ 12       ]]
+     | "\\n"  [[ CHAR: \n ]]
+     | "\\r"  [[ CHAR: \r ]]
+     | "\\t"  [[ CHAR: \t ]]
+     | "\\u" (hex hex hex hex) [[ hex> ]] => [[ second ]]
+     | [^"\]
+string = '"' char*:cs '"' => [[ cs >string ]]
 
-LAZY: 'ws' ( -- parser )
-  " " token 
-  "\n" token <|>
-  "\r" token <|>
-  "\t" token <|> <*> ;
+sign = ("-" | "+")? => [[ "-" = "-" "" ? ]]
+digits = [0-9]+     => [[ >string ]]
+decimal = "." digits  => [[ concat ]]
+exp = ("e" | "E") sign digits => [[ concat ]]
+number = sign digits decimal? exp? => [[ dup concat swap fourth [ string>float ] [ string>number ] if ]]
 
-LAZY: spaced ( parser -- parser )
-  'ws' swap &> 'ws' <& ;
+elements = value ("," value)* => [[ grammar-list>vector ]]
+array = "[" elements?:arr "]" => [[ arr >array ]]
 
-LAZY: 'begin-array' ( -- parser )
-  "[" token spaced ;
+pair = ws string:key ws ":" value:val => [[ { key val } ]]
+members = pair ("," pair)* => [[ grammar-list>vector ]]
+object = "{" members?:hash "}" => [[ hash >hashtable ]]
 
-LAZY: 'begin-object' ( -- parser )
-  "{" token spaced ;
+val = true
+    | false
+    | null
+    | string
+    | number
+    | array
+    | object
 
-LAZY: 'end-array' ( -- parser )
-  "]" token spaced ;
+value = ws val:v ws => [[ v ]]
 
-LAZY: 'end-object' ( -- parser )
-  "}" token spaced ;
-
-LAZY: 'name-separator' ( -- parser )
-  ":" token spaced ;
-
-LAZY: 'value-separator' ( -- parser )
-  "," token spaced ;
-
-LAZY: 'false' ( -- parser )
-  "false" token [ drop f ] <@ ;
-
-LAZY: 'null' ( -- parser )
-  "null" token [ drop json-null ] <@ ;
-
-LAZY: 'true' ( -- parser )
-  "true" token [ drop t ] <@ ;
-
-LAZY: 'quot' ( -- parser )
-  "\"" token ;
-
-LAZY: 'hex-digit' ( -- parser )
-  [ digit> ] satisfy [ digit> ] <@ ;
-
-: hex-digits>ch ( digits -- ch )
-    0 [ swap 16 * + ] reduce ;
-
-LAZY: 'string-char' ( -- parser )
-  [ quotable? ] satisfy
-  "\\b" token [ drop 8 ] <@ <|>
-  "\\t" token [ drop CHAR: \t ] <@ <|>
-  "\\n" token [ drop CHAR: \n ] <@ <|>
-  "\\f" token [ drop 12 ] <@ <|>
-  "\\r" token [ drop CHAR: \r ] <@ <|>
-  "\\\"" token [ drop CHAR: " ] <@ <|>
-  "\\/" token [ drop CHAR: / ] <@ <|>
-  "\\\\" token [ drop CHAR: \\ ] <@ <|>
-  "\\u" token 'hex-digit' 4 exactly-n &>
-  [ hex-digits>ch ] <@ <|> ;
-
-LAZY: 'string' ( -- parser )
-  'quot' 
-  'string-char' <*> &> 
-  'quot' <& [ >string ] <@  ;
-
-DEFER: 'value'
-
-LAZY: 'member' ( -- parser )
-  'string'
-  'name-separator' <&  
-  'value' <&> ;
-
-USE: prettyprint 
-LAZY: 'object' ( -- parser )
-  'begin-object' 
-  'member' 'value-separator' list-of &>
-  'end-object' <& [ >hashtable ] <@ ;
-
-LAZY: 'array' ( -- parser )
-  'begin-array' 
-  'value' 'value-separator' list-of &>
-  'end-array' <&  ;
-  
-LAZY: 'minus' ( -- parser )
-  "-" token ;
-
-LAZY: 'plus' ( -- parser )
-  "+" token ;
-
-LAZY: 'sign' ( -- parser )
-  'minus' 'plus' <|> ;
-
-LAZY: 'zero' ( -- parser )
-  "0" token [ drop 0 ] <@ ;
-
-LAZY: 'decimal-point' ( -- parser )
-  "." token ;
-
-LAZY: 'digit1-9' ( -- parser )
-  [ 
-    dup integer? [ 
-      CHAR: 1 CHAR: 9 between? 
-    ] [ 
-      drop f 
-    ] if 
-  ] satisfy [ digit> ] <@ ;
-
-LAZY: 'digit0-9' ( -- parser )
-  [ digit? ] satisfy [ digit> ] <@ ;
-
-: decimal>integer ( seq -- num ) 10 digits>integer ;
-
-LAZY: 'int' ( -- parser )
-  'zero' 
-  'digit1-9' 'digit0-9' <*> <&:> [ decimal>integer ] <@ <|>  ;
-
-LAZY: 'e' ( -- parser )
-  "e" token "E" token <|> ;
-
-: sign-number ( pair -- number )
-  #! Pair is { minus? num }
-  #! Convert the json number value to a factor number
-  dup second swap first [ first "-" = [ -1 * ] when ] when* ;
-
-LAZY: 'exp' ( -- parser )
-    'e' 
-    'sign' <?> &>
-    'digit0-9' <+> [ decimal>integer ] <@ <&> [ sign-number ] <@ ;
-
-: sequence>frac ( seq -- num ) 
-  #! { 1 2 3 } => 0.123
-  reverse 0 [ swap 10 / + ] reduce 10 / >float ;
-
-LAZY: 'frac' ( -- parser )
-  'decimal-point' 'digit0-9' <+> &> [ sequence>frac ] <@ ;
-
-: raise-to-power ( pair -- num )
-  #! Pair is { num exp }.
-  #! Multiply 'num' by 10^exp
-  dup second dup [ 10 swap first ^ swap first * ] [ drop first ] if ;
-
-LAZY: 'number' ( -- parser )
-  'sign' <?>
-  [ 'int' , 'frac' 0 succeed <|> , ] [<&>] [ sum ] <@ 
-  'exp' <?> <&> [ raise-to-power ] <@ <&> [ sign-number ] <@ ;
-
-LAZY: 'value' ( -- parser )
-  [
-    'false' ,
-    'null' ,
-    'true' ,
-    'string' ,
-    'object' ,
-    'array' ,
-    'number' ,
-  ] [<|>] spaced ;
-ERROR: could-not-parse-json ;
-
-: json> ( string -- object )
-  #! Parse a json formatted string to a factor object
-  'value' parse dup nil? [ 
-      could-not-parse-json
-  ] [ 
-    car parsed>> 
-  ] if ;
+;EBNF
