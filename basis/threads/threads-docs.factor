@@ -129,7 +129,7 @@ HELP: interrupt
 { $description "Interrupts a sleeping thread." } ;
 
 HELP: suspend
-{ $values { "quot" "a quotation with stack effect " { $snippet "( thread -- )" } } { "state" string } { "obj" object } }
+{ $values { "quot" { $quotation "( thread -- )" } } { "state" string } { "obj" object } }
 { $description "Suspends the current thread and passes it to the quotation."
 $nl
 "After the quotation returns, control yields to the next runnable thread and the current thread does not execute again until it is resumed, and so the quotation must arrange for another thread to later resume the suspended thread with a call to " { $link resume } " or " { $link resume-with } "."
@@ -149,7 +149,7 @@ $nl
 } ;
 
 HELP: spawn-server
-{ $values { "quot" "a quotation with stack effect " { $snippet "( -- ? )" } } { "name" string } { "thread" thread } }
+{ $values { "quot" { $quotation "( -- ? )" } } { "name" string } { "thread" thread } }
 { $description "Convenience wrapper around " { $link spawn } " which repeatedly calls the quotation in a new thread until it outputs " { $link f } "." }
 { $examples
     "A thread that runs forever:"
@@ -172,5 +172,5 @@ HELP: tset
 { $description "Sets the value of a thread-local variable." } ;
 
 HELP: tchange
-{ $values { "key" object } { "quot" "a quotation with stack effect " { $snippet "( value -- newvalue )" } } }
+{ $values { "key" object } { "quot" { $quotation "( value -- newvalue )" } } }
 { $description "Applies the quotation to the current value of a thread-local variable, storing the result back to the same variable." } ;

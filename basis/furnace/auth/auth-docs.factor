@@ -63,7 +63,7 @@ HELP: realm
 { $class-description "The class of authentication realms. See " { $link "furnace.auth.realms" } " for details." } ;
 
 HELP: uchange
-{ $values { "key" symbol } { "quot" "a quotation with stack effect " { $snippet "( old -- new )" } } }
+{ $values { "key" symbol } { "quot" { $quotation "( old -- new )" } } }
 { $description "Applies the quotation to the old value of the user profile variable, and assigns the resulting value back to the variable." } ;
 
 HELP: uget

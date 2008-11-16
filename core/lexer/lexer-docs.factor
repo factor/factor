@@ -32,7 +32,7 @@ HELP: skip
 { $description "Skips to the first space character (if " { $snippet "boolean" } " is " { $link f } ") or the first non-space character (otherwise)." } ;
 
 HELP: change-lexer-column
-{ $values { "lexer" lexer } { "quot" "a quotation with stack effect " { $snippet "( col line -- newcol )" } } }
+{ $values { "lexer" lexer } { "quot" { $quotation "( col line -- newcol )" } } }
 { $description "Applies a quotation to the current column and line text to produce a new column, and moves the lexer position." } ;
 
 HELP: skip-blank

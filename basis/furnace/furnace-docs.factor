@@ -3,47 +3,23 @@ quotations sequences strings urls ;
 IN: furnace
 
 HELP: adjust-redirect-url
-{ $values
-     { "url" url }
-     { "url'" url }
-}
+{ $values { "url" url } { "url'" url } }
 { $description "" } ;
 
 HELP: adjust-url
-{ $values
-     { "url" url }
-     { "url'" url }
-}
+{ $values { "url" url } { "url'" url } }
 { $description "" } ;
 
 HELP: base-path
-{ $values
-     { "string" string }
-     { "pair" null }
-}
+{ $values { "string" string } { "pair" "a pair with shape " { $snippet "{ path responder }" } } }
 { $description "" } ;
 
 HELP: client-state
-{ $values
-     { "key" null }
-     { "value/f" null }
-}
-{ $description "" } ;
-
-HELP: cookie-client-state
-{ $values
-     { "key" null } { "request" null }
-     { "value/f" null }
-}
+{ $values { "key" string } { "value/f" { $maybe string } } }
 { $description "" } ;
 
 HELP: each-responder
-{ $values
-     { "quot" quotation }
-}
-{ $description "" } ;
-
-HELP: exit-continuation
+{ $values { "quot" "a " { $link quotation } " with stack effect " { $snippet "( responder -- )" } } }
 { $description "" } ;
 
 HELP: exit-with

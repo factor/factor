@@ -90,7 +90,7 @@ M: object modify-form drop ;
     } case ;
 
 : referrer ( -- referrer/f )
-    #! Typo is intentional, its in the HTTP spec!
+    #! Typo is intentional, it's in the HTTP spec!
     "referer" request get header>> at
     dup [ >url ensure-port [ remap-port ] change-port ] when ;
 

@@ -3,7 +3,8 @@
 USING: accessors arrays definitions generic io kernel assocs
 hashtables namespaces make parser prettyprint sequences strings
 io.styles vectors words math sorting splitting classes slots
-vocabs help.stylesheet help.topics vocabs.loader alias ;
+vocabs help.stylesheet help.topics vocabs.loader alias
+quotations ;
 IN: help.markup
 
 ! Simple markup language.
@@ -252,6 +253,10 @@ M: f ($instance)
 
 : $maybe ( children -- )
     $instance " or " print-element { f } $instance ;
+
+: $quotation ( children -- )
+    { "a " { $link quotation } " with stack effect " } print-element
+    $snippet ;
 
 : values-row ( seq -- seq )
     unclip \ $snippet swap ?word-name 2array

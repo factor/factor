@@ -44,7 +44,7 @@ HELP: max-dim
 { pref-dims max-dim dim-sum } related-words
 
 HELP: each-child
-{ $values { "gadget" gadget } { "quot" "a quotation with stack effect " { $snippet "( child -- )" } } }
+{ $values { "gadget" gadget } { "quot" { $quotation "( child -- )" } } }
 { $description "Applies the quotation to each child of the gadget." } ;
 
 HELP: gadget-selection?
@@ -146,11 +146,11 @@ HELP: parents
 { $description "Outputs a sequence of all parents of the gadget, with the first element being the gadget itself." } ;
 
 HELP: each-parent
-{ $values { "gadget" gadget } { "quot" "a quotation with stack effect " { $snippet "( gadget -- ? )" } } { "?" "a boolean" } }
+{ $values { "gadget" gadget } { "quot" { $quotation "( gadget -- ? )" } } { "?" "a boolean" } }
 { $description "Applies the quotation to every parent of the gadget, starting from the gadget itself, stopping if the quotation yields " { $link f } ". Outputs " { $link t } " if the iteration completed, and outputs " { $link f } " if it was stopped prematurely." } ;
 
 HELP: find-parent
-{ $values { "gadget" gadget } { "quot" "a quotation with stack effect " { $snippet "( gadget -- ? )" } } { "parent" gadget } }
+{ $values { "gadget" gadget } { "quot" { $quotation "( gadget -- ? )" } } { "parent" gadget } }
 { $description "Outputs the first parent of the gadget, starting from the gadget itself, for which the quotation outputs a true value, or " { $link f } " if the quotation outputs " { $link f } " for every parent." } ;
 
 HELP: screen-loc

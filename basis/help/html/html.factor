@@ -22,6 +22,7 @@ IN: help.html
         { CHAR: / "__slash__" }
         { CHAR: \\ "__backslash__" }
         { CHAR: , "__comma__" }
+        { CHAR: @ "__at__" }
     } at [ % ] [ , ] ?if ;
 
 : escape-filename ( string -- filename )

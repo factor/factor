@@ -23,7 +23,7 @@ HELP: fullscreen?
 { fullscreen? set-fullscreen? } related-words
 
 HELP: find-window
-{ $values { "quot" "a quotation with stack effect " { $snippet "( world -- ? )" } } { "world" { $maybe world } } }
+{ $values { "quot" { $quotation "( world -- ? )" } } { "world" { $maybe world } } }
 { $description "Finds a native window such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting " { $link f } " if no such gadget could be found. The front-most native window is checked first." } ;
 
 HELP: register-window

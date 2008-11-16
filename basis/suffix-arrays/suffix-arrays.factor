@@ -5,6 +5,7 @@ math.vectors math.order sorting binary-search sets assocs fry ;
 IN: suffix-arrays
 
 <PRIVATE
+
 : suffixes ( string -- suffixes-seq )
     dup length [ tail-slice ] with map ;
 
