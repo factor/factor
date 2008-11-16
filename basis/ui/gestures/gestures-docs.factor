@@ -189,7 +189,7 @@ HELP: under-hand
 { $description "Outputs a sequence where the first element is the " { $link hand-world } " and the last is the " { $link hand-gadget } ", with all parents in between." } ;
 
 HELP: gesture>string
-{ $values { "gesture" "a gesture" } { "string/f" "a " { $link string } " or " { $link f } } }
+{ $values { "gesture" "a gesture" } { "string/f" { $maybe string } } }
 { $contract "Creates a human-readable string from a gesture object, returning " { $link f } " if the gesture does not have a human-readable form." }
 { $examples
     { $example "USING: io ui.gestures ;" "T{ key-down f { C+ } \"x\" } gesture>string print" "C+x" }

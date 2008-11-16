@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel kernel.private io
-threads.private continuations dlists init quotations strings
+threads.private continuations init quotations strings
 assocs heaps boxes namespaces deques ;
 IN: threads
 
@@ -82,7 +82,7 @@ $nl
 { $notes "In most cases, user code should call " { $link spawn } " instead, however for control over the error handler quotation, threads can be created with " { $link <thread> } " then passed to " { $link (spawn) } "." } ;
 
 HELP: run-queue
-{ $values { "queue" dlist } }
+{ $values { "queue" deque } }
 { $var-description "Global variable holding the queue of runnable threads. Calls to " { $link yield } " switch to the thread which has been in the queue for the longest period of time."
 $nl
 "By convention, threads are queued with " { $link push-front } 

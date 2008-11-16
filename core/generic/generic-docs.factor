@@ -127,7 +127,7 @@ HELP: method-body
 { $class-description "The class of method bodies, which are words with special word properties set." } ;
 
 HELP: method
-{ $values { "class" class } { "generic" generic } { "method/f" "a " { $link method-body } " or " { $link f } } }
+{ $values { "class" class } { "generic" generic } { "method/f" { $maybe method-body } } }
 { $description "Looks up a method definition." } ;
 
 { method create-method POSTPONE: M: } related-words

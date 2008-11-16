@@ -234,7 +234,8 @@ ALIAS: $slot $snippet
     ] ($grid) ;
 
 : a/an ( str -- str )
-    first "aeiou" member? "an" "a" ? ;
+    [ first ] [ length ] bi 1 =
+    "afhilmnorsx" "aeiou" ? member? "an" "a" ? ;
 
 GENERIC: ($instance) ( element -- )
 
@@ -244,7 +245,13 @@ M: word ($instance)
 M: string ($instance)
     dup a/an write bl $snippet ;
 
+M: f ($instance)
+    drop { f } $link ;
+
 : $instance ( children -- ) first ($instance) ;
+
+: $maybe ( children -- )
+    $instance " or " print-element { f } $instance ;
 
 : values-row ( seq -- seq )
     unclip \ $snippet swap ?word-name 2array

@@ -77,7 +77,7 @@ HELP: ensure-port
 } ;
 
 HELP: parse-host
-{ $values { "string" string } { "host" string } { "port" "an " { $link integer } " or " { $link f } } }
+{ $values { "string" string } { "host" string } { "port" { $maybe integer } } }
 { $description "Splits a string of the form " { $snippet "host:port" } " into a host and a port number. If the port number is not specified, outputs " { $link f } "." }
 { $notes "This word is used by " { $link >url } ". It can also be used directly to parse " { $snippet "host:port" } " strings which are not full URLs." }
 { $examples
@@ -89,13 +89,13 @@ HELP: parse-host
 } ;
 
 HELP: protocol-port
-{ $values { "protocol" "a protocol string" } { "port" "an " { $link integer } " or " { $link f } } }
+{ $values { "protocol" "a protocol string" } { "port" { $maybe integer } } }
 { $description "Outputs the port number associated with a protocol, or " { $link f } " if the protocol is unknown." } ;
 
 HELP: query-param
 { $values
      { "url" url } { "key" string }
-    { "value" "a " { $link string } " or " { $link f } } }
+    { "value" { $maybe string } } }
 { $description "Outputs the URL-decoded value of a URL query parameter." }
 { $examples
     { $example

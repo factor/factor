@@ -14,7 +14,7 @@ HELP: required-attr
 { $errors "Throws an error if the attribute is not specified." } ;
 
 HELP: optional-attr
-{ $values { "tag" tag } { "name" string } { "value" "a " { $link string } " or " { $link f } } }
+{ $values { "tag" tag } { "name" string } { "value" { $maybe string } } }
 { $description "Extracts an attribute from a tag." }
 { $notes "Outputs " { $link f } " if the attribute is not specified." } ;
 

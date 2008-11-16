@@ -54,11 +54,11 @@ HELP: still-parsing-line?
 { $description "Outputs " { $link f } " if the end of the current line has been reached, " { $link t } " otherwise." } ;
 
 HELP: parse-token
-{ $values { "lexer" lexer } { "str/f" "a " { $link string } " or " { $link f } } }
+{ $values { "lexer" lexer } { "str/f" { $maybe string } } }
 { $description "Reads the next token from the lexer. Tokens are delimited by whitespace, with the exception that " { $snippet "\"" } " is treated like a single token even when not followed by whitespace." } ;
 
 HELP: scan
-{ $values { "str/f" "a " { $link string } " or " { $link f } } }
+{ $values { "str/f" { $maybe string } } }
 { $description "Reads the next token from the lexer. See " { $link parse-token } " for details." }
 $parsing-note ;
 
@@ -73,7 +73,7 @@ HELP: parse-tokens
 $parsing-note ;
 
 HELP: unexpected
-{ $values { "want" "a " { $link word } " or " { $link f } } { "got" word } }
+{ $values { "want" { $maybe word } } { "got" word } }
 { $description "Throws an " { $link unexpected } " error." }
 { $error-description "Thrown by the parser if an unmatched closing delimiter is encountered." }
 { $examples

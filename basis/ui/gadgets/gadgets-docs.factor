@@ -34,7 +34,7 @@ HELP: children-on
 { $notes "This does not have to be an accurate intersection test, and simply returning " { $snippet "children" } " is a valid implementation. However, an accurate intersection test reduces the amount of work done when drawing this gadget if it is partially clipped and not all children are visible." } ;
 
 HELP: pick-up
-{ $values { "point" "a pair of integers" } { "gadget" gadget } { "child/f" "a " { $link gadget } " or " { $link f } } }
+{ $values { "point" "a pair of integers" } { "gadget" gadget } { "child/f" { $maybe gadget } } }
 { $description "Outputs the child at a point in the gadget's co-ordinate system. This word recursively descends the gadget hierarchy, and so outputs the deepest child." } ;
 
 HELP: max-dim
@@ -52,7 +52,7 @@ HELP: gadget-selection?
 { $contract "Outputs if the gadget has an active text selection; if so, the selected text can be obtained with a call to " { $link gadget-selection } "." } ;
 
 HELP: gadget-selection
-{ $values { "gadget" gadget } { "string/f" "a " { $link string } " or " { $link f } } }
+{ $values { "gadget" gadget } { "string/f" { $maybe string } } }
 { $contract "Outputs the gadget's text selection, or " { $link f } " if nothing is selected." } ;
 
 HELP: relayout
