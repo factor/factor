@@ -16,8 +16,11 @@ IN: mason.help
     help-directory get "/docs.tar.gz" append
     upload-safely ;
 
-: upload-help ( -- )
+: (upload-help) ( -- )
     upload-help? get [
         make-help-archive
         upload-help-archive
     ] when ;
+
+: upload-help ( -- )
+    status get status-clean eq? [ (upload-help) ] when ;
