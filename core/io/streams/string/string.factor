@@ -26,11 +26,11 @@ M: null-encoding decode-char drop stream-read1 ;
 : map-last ( seq quot -- seq )
     >r dup length <reversed> [ zero? ] r> compose 2map ; inline
 
+PRIVATE>
+
 : format-table ( table -- seq )
     flip [ format-column ] map-last
     flip [ " " join ] map ;
-
-PRIVATE>
 
 M: growable dispose drop ;
 
