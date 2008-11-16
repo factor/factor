@@ -125,7 +125,7 @@ SYMBOL: exit-continuation
 : exit-with ( value -- )
     exit-continuation get continue-with ;
 
-: with-exit-continuation ( quot -- )
+: with-exit-continuation ( quot -- value )
     '[ exit-continuation set @ ] callcc1 exit-continuation off ;
 
 USE: vocabs.loader

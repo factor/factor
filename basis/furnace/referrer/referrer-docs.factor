@@ -1,4 +1,5 @@
-USING: help.markup help.syntax io.streams.string ;
+USING: help.markup help.syntax io.streams.string
+furnace ;
 IN: furnace.referrer
 
 HELP: <check-form-submissions>
@@ -10,6 +11,9 @@ HELP: <check-form-submissions>
 
 ARTICLE: "furnace.referrer" "Form submission referrer checking"
 "The " { $vocab-link "furnace.referrer" } " implements a simple security measure which can be used to thwart cross-site scripting attacks."
-{ $subsection <check-form-submissions> } ;
+{ $subsection <check-form-submissions> }
+"Explicit referrer checking:"
+{ $subsection referrer }
+{ $subsection same-host? } ;
 
 ABOUT: "furnace.referrer"
