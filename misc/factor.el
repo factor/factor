@@ -82,7 +82,7 @@
 (defconst factor--parsing-words
   '("{" "}" "^:" "^::" ";" "<<" "<PRIVATE" ">>"
     "BIN:" "BV{" "B{" "C:" "C-STRUCT:" "C-UNION:" "CHAR:" "CS{" "C{"
-    "DEFER:" "ERROR:" "FORGET:"
+    "DEFER:" "ERROR:" "EXCLUDE:" "FORGET:"
     "GENERIC#" "GENERIC:" "HEX:" "HOOK:" "H{"
     "IN:" "INSTANCE:" "INTERSECTION:"
     "M:" "MACRO:" "MACRO::" "MAIN:" "MATH:" "METHOD:" "MIXIN:"
@@ -108,6 +108,9 @@
 (defconst factor--regex-const-definition
   (factor--regex-second-word '("SYMBOL:")))
 
+(defconst factor--regex-using-line "^USING: +\\([^;]*\\);")
+(defconst factor--regex-use-line "^USE: +\\(.*\\)$")
+
 (defconst factor-font-lock-keywords
   `(("#!.*$" . font-lock-comment-face)
     ("!( .* )" . font-lock-comment-face)
@@ -122,7 +125,9 @@
     (,factor--regex-parsing-words-ext . font-lock-keyword-face)
     (,factor--regex-word-definition 2 font-lock-function-name-face)
     (,factor--regex-type-definition 2 font-lock-type-face)
-    (,factor--regex-const-definition 2 font-lock-constant-face)))
+    (,factor--regex-const-definition 2 font-lock-constant-face)
+    (,factor--regex-using-line 1 font-lock-constant-face)
+    (,factor--regex-use-line 1 font-lock-constant-face)))
 
 (defun factor-indent-line ()
   "Indent current line as Factor code"
