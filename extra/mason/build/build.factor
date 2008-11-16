@@ -23,6 +23,7 @@ IN: mason.build
     clone-builds-factor
     record-id
     build-child
+    upload-help
     release
     email-report
     cleanup ;
