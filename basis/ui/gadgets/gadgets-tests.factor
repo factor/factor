@@ -138,7 +138,7 @@ M: mock-gadget ungraft*
             [ V{ { f t } } ] [ status-flags ] unit-test
             dup [ [ ] [ notify-queued ] unit-test ] when
             [ ] [ "g" get clear-gadget ] unit-test
-            [ [ 1 ] [ graft-queue length>> ] unit-test ] unless
+            [ [ t ] [ graft-queue [ front>> ] [ back>> ] bi eq? ] unit-test ] unless
             [ [ ] [ notify-queued ] unit-test ] when
             [ ] [ add-some-children ] unit-test
             [ { f t } ] [ "1" get graft-state>> ] unit-test

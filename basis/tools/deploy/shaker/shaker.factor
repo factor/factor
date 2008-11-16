@@ -9,7 +9,7 @@ sorting compiler.units definitions ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line
-QUALIFIED: compiler.errors.private
+QUALIFIED: compiler.errors
 QUALIFIED: continuations
 QUALIFIED: definitions
 QUALIFIED: init
@@ -291,7 +291,7 @@ IN: tools.deploy.shaker
 
         strip-debugger? [
             {
-                compiler.errors.private:compiler-errors
+                compiler.errors:compiler-errors
                 continuations:thread-error-hook
             } %
         ] when

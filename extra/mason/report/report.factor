@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces debugger fry io io.files io.sockets
 io.encodings.utf8 prettyprint benchmark mason.common
-mason.platform mason.config ;
+mason.platform mason.config sequences ;
 IN: mason.report
 
 : time. ( file -- )
@@ -46,21 +46,29 @@ IN: mason.report
         test-time-file time.
         help-lint-time-file time.
         benchmark-time-file time.
+        html-help-time-file time.
 
         nl
 
-        "Did not pass load-everything:" print
-        load-everything-vocabs-file cat
-        load-everything-errors-file cat
+        load-everything-vocabs-file eval-file [
+            "== Did not pass load-everything:" print .
+            load-everything-errors-file cat
+        ] unless-empty
 
-        "Did not pass test-all:" print
-        test-all-vocabs-file cat
-        test-all-errors-file cat
+        compiler-errors-file eval-file [
+            "== Vocabularies with compiler errors:" print .
+        ] unless-empty
 
-        "Did not pass help-lint:" print
-        help-lint-vocabs-file cat
-        help-lint-errors-file cat
+        test-all-vocabs-file eval-file [
+            "== Did not pass test-all:" print .
+            test-all-errors-file cat
+        ] unless-empty
 
-        "Benchmarks:" print
+        help-lint-vocabs-file eval-file [
+            "== Did not pass help-lint:" print .
+            help-lint-errors-file cat
+        ] unless-empty
+
+        "== Benchmarks:" print
         benchmarks-file eval-file benchmarks.
     ] with-report ;

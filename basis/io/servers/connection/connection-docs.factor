@@ -114,11 +114,11 @@ HELP: stop-this-server
 { $description "Stops the current threaded server, preventing it from accepting any more connections and returning to the caller of " { $link start-server } ". All client connections which have already been opened continue to be serviced." } ;
 
 HELP: secure-port
-{ $values { "n" "an " { $link integer } " or " { $link f } } }
+{ $values { "n" { $maybe integer } } }
 { $description "Outputs the port number on which the current threaded server accepts secure socket connections. Outputs " { $link f } " if the current threaded server does not accept secure socket connections." }
 { $notes "Can only be used from the dynamic scope of a " { $link handle-client* } " call." } ;
 
 HELP: insecure-port
-{ $values { "n" "an " { $link integer } " or " { $link f } } }
+{ $values { "n" { $maybe integer } } }
 { $description "Outputs the port number on which the current threaded server accepts ordinary socket connections. Outputs " { $link f } " if the current threaded server does not accept ordinary socket connections." }
 { $notes "Can only be used from the dynamic scope of a " { $link handle-client* } " call." } ;

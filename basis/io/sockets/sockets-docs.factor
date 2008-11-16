@@ -56,7 +56,7 @@ ARTICLE: "network-streams" "Networking"
 { $subsection "network-addressing" }
 { $subsection "network-connection" }
 { $subsection "network-packet" }
-{ $subsection "io.sockets.secure" }
+{ $vocab-subsection "Secure sockets (SSL, TLS)" "io.sockets.secure" }
 { $see-also "io.pipes" } ;
 
 ABOUT: "network-streams"

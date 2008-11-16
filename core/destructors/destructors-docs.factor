@@ -21,7 +21,7 @@ HELP: dispose*
 } ;
 
 HELP: with-disposal
-{ $values { "object" "a disposable object" } { "quot" "a quotation with stack effect " { $snippet "( object -- )" } } }
+{ $values { "object" "a disposable object" } { "quot" { $quotation "( object -- )" } } }
 { $description "Calls the quotation, disposing the object with " { $link dispose } " after the quotation returns or if it throws an error." } ;
 
 HELP: with-destructors

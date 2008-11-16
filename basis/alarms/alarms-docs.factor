@@ -5,7 +5,7 @@ HELP: alarm
 { $class-description "An alarm. Can be passed to " { $link cancel-alarm } "." } ;
 
 HELP: add-alarm
-{ $values { "quot" quotation } { "time" timestamp } { "frequency" "a " { $link duration } " or " { $link f } } { "alarm" alarm } }
+{ $values { "quot" quotation } { "time" timestamp } { "frequency" { $maybe duration } } { "alarm" alarm } }
 { $description "Creates and registers an alarm. If " { $snippet "frequency" } " is " { $link f } ", this will be a one-time alarm, otherwise it will fire with the given frequency. The quotation will be called from the alarm thread." } ;
 
 HELP: later

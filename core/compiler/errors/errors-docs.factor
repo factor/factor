@@ -1,6 +1,6 @@
 IN: compiler.errors
 USING: help.markup help.syntax vocabs.loader words io
-quotations compiler.errors.private ;
+quotations ;
 
 ARTICLE: "compiler-errors" "Compiler warnings and errors"
 "The compiler saves various notifications in a global variable:"
