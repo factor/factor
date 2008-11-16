@@ -24,7 +24,10 @@ $nl
 
 ABOUT: "dlists"
 
-HELP: <hashed-dlist> ( -- search-deque )
+HELP: <dlist>
+{ $description "Creates a new double-linked list." } ;
+
+HELP: <hashed-dlist>
 { $values { "search-deque" search-deque } }
 { $description "Creates a new " { $link search-deque } " backed by a " { $link dlist } ", with a " { $link hashtable } " for fast membership tests." } ;
 
