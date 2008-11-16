@@ -23,7 +23,7 @@ TUPLE: dlist
 { front ?dlist-node }
 { back ?dlist-node } ;
 
-: <dlist> ( -- obj )
+: <dlist> ( -- list )
     dlist new ; inline
 
 : <hashed-dlist> ( -- search-deque )

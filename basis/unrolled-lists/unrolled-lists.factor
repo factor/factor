@@ -23,7 +23,7 @@ TUPLE: unrolled-list
     unrolled-list new
         unroll-factor >>back-pos ; inline
 
-: <hashed-unrolled-list> ( -- list )
+: <hashed-unrolled-list> ( -- search-deque )
     20 <hashtable> <unrolled-list> <search-deque> ;
 
 ERROR: empty-unrolled-list list ;

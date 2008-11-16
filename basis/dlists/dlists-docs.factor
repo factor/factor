@@ -25,6 +25,7 @@ $nl
 ABOUT: "dlists"
 
 HELP: <dlist>
+{ $values { "list" dlist } }
 { $description "Creates a new double-linked list." } ;
 
 HELP: <hashed-dlist>
