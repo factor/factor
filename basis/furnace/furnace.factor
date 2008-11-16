@@ -152,3 +152,4 @@ USE: vocabs.loader
 "furnace.scopes" require
 "furnace.sessions" require
 "furnace.syndication" require
+"webapps.user-admin" require

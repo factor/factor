@@ -1,4 +1,5 @@
-USING: assocs help.markup help.syntax io.streams.string quotations sequences strings urls ;
+USING: assocs help.markup help.syntax kernel
+quotations sequences strings urls ;
 IN: furnace
 
 HELP: adjust-redirect-url
@@ -193,6 +194,7 @@ ARTICLE: "furnace" "Furnace framework"
 { $subsection "furnace.alloy" }
 { $subsection "furnace.persistence" }
 { $subsection "furnace.presentation" }
+{ $subsection "furnace.auth" }
 { $subsection "furnace.load-balancing" }
 "Utilities:"
 { $subsection "furnace.referrer" }
