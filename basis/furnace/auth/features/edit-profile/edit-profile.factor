@@ -58,7 +58,7 @@ IN: furnace.auth.features.edit-profile
     <protected>
         "edit your profile" >>description ;
 
-: allow-edit-profile ( login -- login )
+: allow-edit-profile ( realm -- realm )
     <edit-profile-action> <auth-boilerplate> "edit-profile" add-responder ;
 
 : allow-edit-profile? ( -- ? )

@@ -1,9 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors quotations kernel sequences namespaces
-assocs words arrays vectors hints combinators stack-checker
-stack-checker.state stack-checker.visitor stack-checker.errors
-stack-checker.backend compiler.tree ;
+assocs words arrays vectors hints combinators compiler.tree
+stack-checker
+stack-checker.state
+stack-checker.errors
+stack-checker.visitor
+stack-checker.backend
+stack-checker.recursive-state ;
 IN: compiler.tree.builder
 
 : with-tree-builder ( quot -- nodes )
@@ -12,12 +16,13 @@ IN: compiler.tree.builder
 
 : build-tree ( quot -- nodes )
     #! Not safe to call from inference transforms.
-    [ f infer-quot ] with-tree-builder nip ;
+    [ f initial-recursive-state infer-quot ] with-tree-builder nip ;
 
 : build-tree-with ( in-stack quot -- nodes out-stack )
     #! Not safe to call from inference transforms.
     [
-        [ >vector meta-d set ] [ f infer-quot ] bi*
+        [ >vector meta-d set ]
+        [ f initial-recursive-state infer-quot ] bi*
     ] with-tree-builder nip
     unclip-last in-d>> ;
 
@@ -32,10 +37,10 @@ IN: compiler.tree.builder
     dup
     [ "inline" word-prop ]
     [ "recursive" word-prop ] bi and [
-        1quotation f infer-quot
+        1quotation f initial-recursive-state infer-quot
     ] [
-        [ specialized-def ]
-        [ dup 2array 1array ] bi infer-quot
+        [ specialized-def ] [ initial-recursive-state ] bi
+        infer-quot
     ] if ;
 
 : check-cannot-infer ( word -- )

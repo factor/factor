@@ -87,7 +87,7 @@ const F_CHAR *vm_executable_path(void)
 	return safe_strdup(full_path);
 }
 
-DEFINE_PRIMITIVE(existsp)
+void primitive_existsp(void)
 {
 	BY_HANDLE_FILE_INFORMATION bhfi;
 

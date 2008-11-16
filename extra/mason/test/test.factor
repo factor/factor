@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces assocs io.files io.encodings.utf8
 prettyprint help.lint benchmark tools.time bootstrap.stage2
-tools.test tools.vocabs mason.common ;
+tools.test tools.vocabs help.html mason.common ;
 IN: mason.test
 
 : do-load ( -- )
@@ -30,6 +30,7 @@ IN: mason.test
     ".." [
         bootstrap-time get boot-time-file to-file
         [ do-load ] benchmark load-time-file to-file
+        [ generate-help ] benchmark html-help-time-file to-file
         [ do-tests ] benchmark test-time-file to-file
         [ do-help-lint ] benchmark help-lint-time-file to-file
         [ do-benchmarks ] benchmark benchmark-time-file to-file

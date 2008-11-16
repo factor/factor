@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel quotations
-deques ;
+deques search-deques hashtables ;
 IN: dlists
 
 ARTICLE: "dlists" "Double-linked lists"
@@ -18,9 +18,19 @@ $nl
 { $subsection dlist-contains? }
 "Deleting a node matching a predicate:"
 { $subsection delete-node-if* }
-{ $subsection delete-node-if } ;
+{ $subsection delete-node-if }
+"Search deque implementation:"
+{ $subsection <hashed-dlist> } ;
 
 ABOUT: "dlists"
+
+HELP: <dlist>
+{ $values { "list" dlist } }
+{ $description "Creates a new double-linked list." } ;
+
+HELP: <hashed-dlist>
+{ $values { "search-deque" search-deque } }
+{ $description "Creates a new " { $link search-deque } " backed by a " { $link dlist } ", with a " { $link hashtable } " for fast membership tests." } ;
 
 HELP: dlist-find
 { $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" "an object or " { $link f } } { "?" "a boolean" } }

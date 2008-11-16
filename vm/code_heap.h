@@ -13,8 +13,10 @@ typedef enum {
 	RT_HERE,
 	/* a local label */
 	RT_LABEL,
-	/* immeditae literal */
-	RT_IMMEDIATE
+	/* immediate literal */
+	RT_IMMEDIATE,
+	/* address of stack_chain var */
+	RT_STACK_CHAIN
 } F_RELTYPE;
 
 typedef enum {
@@ -71,4 +73,4 @@ F_COMPILED *add_compiled_block(
 CELL compiled_code_format(void);
 bool stack_traces_p(void);
 
-DECLARE_PRIMITIVE(modify_code_heap);
+void primitive_modify_code_heap(void);

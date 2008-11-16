@@ -12,7 +12,7 @@ HELP: promise-fulfilled?
 { $description "Tests if " { $link fulfill } " has previously been called on the promise, in which case " { $link ?promise } " will return immediately without blocking." } ;
 
 HELP: ?promise-timeout
-{ $values { "promise" promise } { "timeout" "a " { $link duration } " or " { $link f } } { "result" object } }
+{ $values { "promise" promise } { "timeout" { $maybe duration } } { "result" object } }
 { $description "Waits for another thread to fulfill a promise, returning immediately if the promise has already been fulfilled. A timeout of " { $link f } " indicates that the thread may block indefinitely, otherwise it will wait up to " { $snippet "timeout" } " milliseconds." }
 { $errors "Throws an error if the timeout expires before the promise has been fulfilled." } ;
 

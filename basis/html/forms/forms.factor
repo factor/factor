@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors strings namespaces assocs hashtables
-mirrors math fry sequences words continuations ;
+USING: kernel accessors strings namespaces assocs hashtables io
+mirrors math fry sequences words continuations html.elements
+xml.entities ;
 IN: html.forms
 
 TUPLE: form errors values validation-failed ;
@@ -104,3 +105,11 @@ C: <validation-error> validation-error
 
 : validate-values ( assoc validators -- )
     swap '[ [ dup _ at ] dip validate-value ] assoc-each ;
+
+: render-validation-errors ( -- )
+    form get errors>>
+    [
+        <ul "errors" =class ul>
+            [ <li> escape-string write </li> ] each
+        </ul>
+    ] unless-empty ;

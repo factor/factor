@@ -110,7 +110,7 @@ SYMBOL: lost-password-from
     <page-action>
         { realm "features/recover-password/recover-4" } >>template ;
 
-: allow-password-recovery ( login -- login )
+: allow-password-recovery ( realm -- realm )
     <recover-action-1> <auth-boilerplate>
         "recover-password" add-responder
     <recover-action-2> <auth-boilerplate>

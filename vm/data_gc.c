@@ -250,13 +250,13 @@ CELL unaligned_object_size(CELL pointer)
 	}
 }
 
-DEFINE_PRIMITIVE(size)
+void primitive_size(void)
 {
 	box_unsigned_cell(object_size(dpop()));
 }
 
 /* Push memory usage statistics in data heap */
-DEFINE_PRIMITIVE(data_room)
+void primitive_data_room(void)
 {
 	F_ARRAY *a = allot_array(ARRAY_TYPE,data_heap->gen_count * 2,F);
 	int gen;
@@ -281,7 +281,7 @@ void begin_scan(void)
 	gc_off = true;
 }
 
-DEFINE_PRIMITIVE(begin_scan)
+void primitive_begin_scan(void)
 {
 	gc();
 	begin_scan();
@@ -306,13 +306,13 @@ CELL next_object(void)
 }
 
 /* Push object at heap scan cursor and advance; pushes f when done */
-DEFINE_PRIMITIVE(next_object)
+void primitive_next_object(void)
 {
 	dpush(next_object());
 }
 
 /* Re-enables GC */
-DEFINE_PRIMITIVE(end_scan)
+void primitive_end_scan(void)
 {
 	gc_off = false;
 }
@@ -911,12 +911,12 @@ void minor_gc(void)
 	garbage_collection(NURSERY,false,0);
 }
 
-DEFINE_PRIMITIVE(gc)
+void primitive_gc(void)
 {
 	gc();
 }
 
-DEFINE_PRIMITIVE(gc_stats)
+void primitive_gc_stats(void)
 {
 	GROWABLE_ARRAY(stats);
 
@@ -945,12 +945,12 @@ DEFINE_PRIMITIVE(gc_stats)
 	dpush(stats);
 }
 
-DEFINE_PRIMITIVE(gc_reset)
+void primitive_gc_reset(void)
 {
 	gc_reset();
 }
 
-DEFINE_PRIMITIVE(become)
+void primitive_become(void)
 {
 	F_ARRAY *new_objects = untag_array(dpop());
 	F_ARRAY *old_objects = untag_array(dpop());

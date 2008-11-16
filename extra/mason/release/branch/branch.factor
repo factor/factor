@@ -45,4 +45,4 @@ IN: mason.release.branch
     ] with-directory ;
 
 : update-clean-branch ( -- )
-    upload-to-factorcode get [ (update-clean-branch) ] when ;
+    upload-to-factorcode? get [ (update-clean-branch) ] when ;

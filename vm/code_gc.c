@@ -295,7 +295,7 @@ void recursive_mark(F_BLOCK *block)
 }
 
 /* Push the free space and total size of the code heap */
-DEFINE_PRIMITIVE(code_room)
+void primitive_code_room(void)
 {
 	CELL used, total_free, max_free;
 	heap_usage(&code_heap,&used,&total_free,&max_free);

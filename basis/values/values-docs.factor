@@ -35,5 +35,5 @@ HELP: to:
 } ;
 
 HELP: change-value
-{ $values { "word" "a value word" } { "quot" "a quotation with stack effect " { $snippet "( oldvalue -- newvalue )" } } }
+{ $values { "word" "a value word" } { "quot" { $quotation "( oldvalue -- newvalue )" } } }
 { $description "Changes the value using the given quotation." } ;

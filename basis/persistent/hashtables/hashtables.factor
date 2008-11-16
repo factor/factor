@@ -53,3 +53,6 @@ M: persistent-hash clone ;
 M: persistent-hash pprint-delims drop \ PH{ \ } ;
 M: persistent-hash >pprint-sequence >alist ;
 M: persistent-hash pprint* pprint-object ;
+
+: passociate ( value key -- phash )
+    T{ persistent-hash } new-at ; inline

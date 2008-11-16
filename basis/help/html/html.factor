@@ -5,7 +5,7 @@ io.files html.streams html.elements html.components help kernel
 assocs sequences make words accessors arrays help.topics vocabs
 tools.vocabs tools.vocabs.browser namespaces prettyprint io
 vocabs.loader serialize fry memoize unicode.case math.order
-sorting ;
+sorting debugger ;
 IN: help.html
 
 : escape-char ( ch -- )
@@ -22,6 +22,7 @@ IN: help.html
         { CHAR: / "__slash__" }
         { CHAR: \\ "__backslash__" }
         { CHAR: , "__comma__" }
+        { CHAR: @ "__at__" }
     } at [ % ] [ , ] ?if ;
 
 : escape-filename ( string -- filename )
@@ -88,19 +89,17 @@ M: topic browser-link-href topic>filename ;
     all-vocabs-really [ dup vocab-name ] { } map>assoc "vocabs.idx" serialize-index ;
 
 : generate-help-files ( -- )
-    all-topics [ help>html ] each ;
+    all-topics [ '[ _ help>html ] try ] each ;
 
 : generate-help ( -- )
-    { "resource:core" "resource:basis" "resource:extra" } vocab-roots [
-        load-everything
-
-        "/tmp/docs/" make-directory
-
-        "/tmp/docs/" [
+    "docs" temp-file
+    [ make-directories ]
+    [
+        [
             generate-indices
             generate-help-files
         ] with-directory
-    ] with-variable ;
+    ] bi ;
 
 MEMO: load-index ( name -- index )
     binary file-contents bytes>object ;
@@ -118,10 +117,10 @@ M: result link-href href>> ;
     [ [ title>> ] compare ] sort ;
 
 : article-apropos ( string -- results )
-    "articles.idx" offline-apropos ;
+    "articles.idx" temp-file offline-apropos ;
 
 : word-apropos ( string -- results )
-    "words.idx" offline-apropos ;
+    "words.idx" temp-file offline-apropos ;
 
 : vocab-apropos ( string -- results )
-    "vocabs.idx" offline-apropos ;
+    "vocabs.idx" temp-file offline-apropos ;

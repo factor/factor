@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry arrays generic assocs kernel math namespaces parser
-sequences words vectors math.intervals effects classes
+sequences words vectors math.intervals classes
 accessors combinators stack-checker.state stack-checker.visitor
 stack-checker.inlining ;
 IN: compiler.tree
@@ -42,30 +42,21 @@ TUPLE: #push < node literal out-d ;
 
 TUPLE: #renaming < node ;
 
-TUPLE: #shuffle < #renaming mapping in-d out-d ;
+TUPLE: #shuffle < #renaming mapping in-d out-d in-r out-r ;
 
-: #shuffle ( inputs outputs mapping -- node )
+: #shuffle ( in-d out-d in-r out-r mapping -- node )
     \ #shuffle new
         swap >>mapping
+        swap >>out-r
+        swap >>in-r
         swap >>out-d
         swap >>in-d ;
+
+: #data-shuffle ( in-d out-d mapping -- node )
+    [ f f ] dip #shuffle ; inline
 
 : #drop ( inputs -- node )
-    { } { } #shuffle ;
-
-TUPLE: #>r < #renaming in-d out-r ;
-
-: #>r ( inputs outputs -- node )
-    \ #>r new
-        swap >>out-r
-        swap >>in-d ;
-
-TUPLE: #r> < #renaming in-r out-d ;
-
-: #r> ( inputs outputs -- node )
-    \ #r> new
-        swap >>out-d
-        swap >>in-r ;
+    { } { } #data-shuffle ;
 
 TUPLE: #terminate < node in-d in-r ;
 
@@ -171,15 +162,8 @@ TUPLE: #alien-callback < #alien-node ;
 GENERIC: inputs/outputs ( #renaming -- inputs outputs )
 
 M: #shuffle inputs/outputs mapping>> unzip swap ;
-M: #>r inputs/outputs [ in-d>> ] [ out-r>> ] bi ;
-M: #r> inputs/outputs [ in-r>> ] [ out-d>> ] bi ;
 M: #copy inputs/outputs [ in-d>> ] [ out-d>> ] bi ;
 M: #return-recursive inputs/outputs [ in-d>> ] [ out-d>> ] bi ;
-
-: shuffle-effect ( #shuffle -- effect )
-    [ in-d>> ] [ out-d>> ] [ mapping>> ] tri
-    '[ _ at ] map
-    <effect> ;
 
 : recursive-phi-in ( #enter-recursive -- seq )
     [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix ;
@@ -193,8 +177,8 @@ M: vector #call, #call node, ;
 M: vector #push, #push node, ;
 M: vector #shuffle, #shuffle node, ;
 M: vector #drop, #drop node, ;
-M: vector #>r, #>r node, ;
-M: vector #r>, #r> node, ;
+M: vector #>r, [ [ f f ] dip ] [ swap zip ] 2bi #shuffle, ;
+M: vector #r>, [ swap [ f swap ] dip f ] [ swap zip ] 2bi #shuffle, ;
 M: vector #return, #return node, ;
 M: vector #enter-recursive, #enter-recursive node, ;
 M: vector #return-recursive, #return-recursive node, ;

@@ -62,7 +62,7 @@ INSN: ##jump word ;
 INSN: ##return ;
 
 ! Jump tables
-INSN: ##dispatch src temp ;
+INSN: ##dispatch src temp offset ;
 INSN: ##dispatch-label label ;
 
 ! Slot access

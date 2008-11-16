@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io io.streams.string kernel math math.parser
 namespaces sequences splitting grouping strings ascii ;
-IN: hexdump
+IN: tools.hexdump
 
 <PRIVATE
 

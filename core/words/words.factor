@@ -135,9 +135,7 @@ compiled-generic-crossref global [ H{ } assoc-like ] change-at
     [ compiled-generic-crossref get delete-at ]
     tri ;
 
-GENERIC: inline? ( word -- ? )
-
-M: word inline? "inline" word-prop ;
+: inline? ( word -- ? ) "inline" word-prop ; inline
 
 SYMBOL: visited
 

@@ -81,7 +81,7 @@ HELP: delete-cookie
 { $side-effects "request/response" } ;
 
 HELP: get-cookie
-{ $values { "request/response" "a " { $link request } " or a " { $link response } } { "name" string } { "cookie/f" "a " { $link cookie } " or " { $link f } } }
+{ $values { "request/response" "a " { $link request } " or a " { $link response } } { "name" string } { "cookie/f" { $maybe cookie } } }
 { $description "Gets a named cookie from a request or response." } ;
 
 HELP: put-cookie

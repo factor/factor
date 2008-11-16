@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences layouts accessors combinators namespaces
-math
+math fry
 compiler.cfg.instructions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.simplify
@@ -112,5 +112,19 @@ M: ##compare-imm rewrite
             dup number-values rewrite
         ] when
     ] when ;
+
+: dispatch-offset ( expr -- n )
+    [ in2>> vn>constant tag-bits get neg shift ] [ op>> ] bi
+    \ ##sub-imm eq? [ neg ] when ;
+
+: add-dispatch-offset? ( insn -- expr ? )
+    src>> vreg>expr dup op>> { ##add-imm ##sub-imm } memq? ; inline
+
+M: ##dispatch rewrite
+    dup add-dispatch-offset? [
+        [ clone ] dip
+        [ in1>> vn>vreg >>src ]
+        [ dispatch-offset '[ _ + ] change-offset ] bi
+    ] [ drop ] if ;
 
 M: insn rewrite ;

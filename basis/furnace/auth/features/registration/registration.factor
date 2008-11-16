@@ -38,7 +38,7 @@ IN: furnace.auth.features.registration
     <auth-boilerplate>
     <secure-realm-only> ;
 
-: allow-registration ( login -- login )
+: allow-registration ( realm -- realm )
     <register-action> "register" add-responder ;
 
 : allow-registration? ( -- ? )

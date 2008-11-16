@@ -5,7 +5,7 @@ HELP: linked-assoc
 { $class-description "The class of linked assocs. Linked assoc are implemented by combining an assoc with a dlist.  The assoc is used for lookup and retrieval of single values, while the dlist is used for getting lists of keys/values, which will be in insertion order." } ;
 
 HELP: <linked-assoc>
-{ $values { "exemplar" "an exemplar assoc" } }
+{ $values { "exemplar" "an exemplar assoc" } { "assoc" linked-assoc } }
 { $description "Creates an empty linked assoc backed by a new instance of the same type as the exemplar." } ;
 
 HELP: <linked-hash>

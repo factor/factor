@@ -19,12 +19,12 @@ HELP: end-scan ( -- )
 { $notes "This is a low-level facility and can be dangerous. Use the " { $link each-object } " combinator instead." } ;
 
 HELP: each-object
-{ $values { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } } }
+{ $values { "quot" { $quotation "( obj -- )" } } }
 { $description "Applies a quotation to each object in the heap. The garbage collector is switched off while this combinator runs, so the given quotation must not allocate too much memory." }
 { $notes "This word is the low-level facility used to implement the " { $link instances } " word." } ;
 
 HELP: instances
-{ $values { "quot" "a quotation with stack effect " { $snippet "( obj -- ? )" } } { "seq" "a fresh sequence" } }
+{ $values { "quot" { $quotation "( obj -- ? )" } } { "seq" "a fresh sequence" } }
 { $description "Outputs a sequence of all objects in the heap which satisfy the quotation." }
 { $notes "This word relies on " { $link each-object } ", so in particular the garbage collector is switched off while it runs and the given quotation must not allocate too much memory." } ;
 

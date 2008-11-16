@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math namespaces make sequences
 system layouts alien alien.c-types alien.accessors alien.structs
-slots splitting assocs combinators cpu.x86.assembler
+slots splitting assocs combinators make locals cpu.x86.assembler
 cpu.x86 cpu.architecture compiler.constants
 compiler.codegen compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
@@ -23,6 +23,19 @@ M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
 M: x86.64 temp-reg-1 RAX ;
 M: x86.64 temp-reg-2 RCX ;
+
+M:: x86.64 %dispatch ( src temp offset -- )
+    ! Load jump table base.
+    temp HEX: ffffffff MOV
+    offset cells rc-absolute-cell rel-here
+    ! Add jump table base
+    src temp ADD
+    src HEX: 7f [+] JMP
+    ! Fix up the displacement above
+    cell code-alignment
+    [ 15 + building get dup pop* push ]
+    [ align-code ]
+    bi ;
 
 : param-reg-1 int-regs param-regs first ; inline
 : param-reg-2 int-regs param-regs second ; inline
