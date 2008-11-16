@@ -16,7 +16,7 @@ GENERIC: word-vocabulary ( word -- vocabulary )
 
 M: word word-vocabulary vocabulary>> ;
 
-M: method-body word-vocabulary "method-generic" word-prop ;
+M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
 
 : do-compile-errors ( -- )
     compiler-errors-file utf8 [
