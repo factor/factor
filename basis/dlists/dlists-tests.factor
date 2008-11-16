@@ -5,7 +5,7 @@ IN: dlists.tests
 
 [ t ] [ <dlist> deque-empty? ] unit-test
 
-[ T{ dlist f T{ dlist-node f 1 f f } T{ dlist-node f 1 f f } 1 } ]
+[ T{ dlist f T{ dlist-node f 1 f f } T{ dlist-node f 1 f f } } ]
 [ <dlist> 1 over push-front ] unit-test
 
 ! Make sure empty lists are empty
@@ -17,10 +17,10 @@ IN: dlists.tests
 [ 1 ] [ <dlist> 1 over push-front pop-back ] unit-test
 [ 1 ] [ <dlist> 1 over push-back pop-front ] unit-test
 [ 1 ] [ <dlist> 1 over push-back pop-back ] unit-test
-[ T{ dlist f f f 0 } ] [ <dlist> 1 over push-front dup pop-front* ] unit-test
-[ T{ dlist f f f 0 } ] [ <dlist> 1 over push-front dup pop-back* ] unit-test
-[ T{ dlist f f f 0 } ] [ <dlist> 1 over push-back dup pop-front* ] unit-test
-[ T{ dlist f f f 0 } ] [ <dlist> 1 over push-back dup pop-back* ] unit-test
+[ T{ dlist f f f } ] [ <dlist> 1 over push-front dup pop-front* ] unit-test
+[ T{ dlist f f f } ] [ <dlist> 1 over push-front dup pop-back* ] unit-test
+[ T{ dlist f f f } ] [ <dlist> 1 over push-back dup pop-front* ] unit-test
+[ T{ dlist f f f } ] [ <dlist> 1 over push-back dup pop-back* ] unit-test
 
 ! Test the prev,next links for two nodes
 [ f ] [

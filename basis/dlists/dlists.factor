@@ -148,7 +148,6 @@ M: dlist delete-node ( dlist-node dlist -- )
 M: dlist clear-deque ( dlist -- )
     f >>front
     f >>back
-    0 >>length
     drop ;
 
 : dlist-each ( dlist quot -- )
