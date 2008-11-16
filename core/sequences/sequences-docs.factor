@@ -338,8 +338,7 @@ HELP: 2reduce
 { $values { "seq1" sequence }
           { "seq2" sequence }
           { "identity" object }
-          { "quot" "a quotation with stack effect "
-                   { $snippet "( prev elt1 elt2 -- next )" } }
+          { "quot" { $quotation "( prev elt1 elt2 -- next )" } }
           { "result" "the final result" } }
 { $description "Combines successive pairs of elements from the two sequences using a ternary operation. The first input value at each iteration except the first one is the result of the previous iteration. The first input value at the first iteration is " { $snippet "identity" } "." } ;
 
@@ -357,18 +356,16 @@ HELP: 2all?
 
 HELP: find
 { $values { "seq" sequence }
-          { "quot" "a quotation with stack effect "
-                   { $snippet "( elt -- ? )" } }
-          { "i" "the index of the first match, or f" }
+          { "quot" { $quotation "( elt -- ? )" } }
+          { "i" "the index of the first match, or " { $link f } }
           { "elt" "the first matching element, or " { $link f } } }
 { $description "A simpler variant of " { $link find-from } " where the starting index is 0." } ;
 
 HELP: find-from
 { $values { "n" "a starting index" }
           { "seq" sequence }
-          { "quot" "a quotation with stack effect "
-                   { $snippet "( elt -- ? )" } }
-          { "i" "the index of the first match, or f" }
+          { "quot" { $quotation "( elt -- ? )" } }
+          { "i" "the index of the first match, or " { $link f } }
           { "elt" "the first matching element, or " { $link f } } }
 { $description "Applies the quotation to each element of the sequence in turn, until it outputs a true value or the end of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of f and " { $link f } " as the element." } ;
 
