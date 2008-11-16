@@ -14,8 +14,6 @@ M: object compiler-error-type drop +error+ ;
 
 GENERIC# compiler-error. 1 ( error word -- )
 
-<PRIVATE
-
 SYMBOL: compiler-errors
 
 SYMBOL: with-compiler-errors?
@@ -46,8 +44,6 @@ SYMBOL: with-compiler-errors?
     "semantic errors" +error+ "errors" (compiler-report)
     "semantic warnings" +warning+ "warnings" (compiler-report)
     "linkage errors" +linkage+ "linkage" (compiler-report) ;
-
-PRIVATE>
 
 : :errors ( -- ) +error+ compiler-errors. ;
 
