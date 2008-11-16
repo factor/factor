@@ -31,6 +31,9 @@
   :type '(choice (const :tag "Enable" t) (const :tag "Disable" nil))
   :group 'factor)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; factor-mode syntax
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (if factor-mode-syntax-table
     ()
@@ -72,12 +75,59 @@
     (modify-syntax-entry ?\) ")(" factor-mode-syntax-table)
     (modify-syntax-entry ?\" "\"    " factor-mode-syntax-table)))
 
-(defvar factor-mode-map (make-sparse-keymap))
-
 (defcustom factor-mode-hook nil
   "Hook run when entering Factor mode."
   :type 'hook
   :group 'factor)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; factor-mode font lock
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'font-lock)
+
+(defgroup factor-faces nil
+  "Faces used in Factor mode"
+  :group 'factor
+  :group 'faces)
+
+(defsubst factor--face (face) `((t ,(face-attr-construct face))))
+
+(defface factor-font-lock-parsing-word (factor--face font-lock-keyword-face)
+  "Face for parsing words."
+  :group 'factor-faces)
+
+(defface factor-font-lock-comment (factor--face font-lock-comment-face)
+  "Face for comments."
+  :group 'factor-faces)
+
+(defface factor-font-lock-string (factor--face font-lock-string-face)
+  "Face for strings."
+  :group 'factor-faces)
+
+(defface factor-font-lock-stack-effect (factor--face font-lock-comment-face)
+  "Face for stack effect specifications."
+  :group 'factor-faces)
+
+(defface factor-font-lock-word-definition (factor--face font-lock-function-name-face)
+  "Face for word, generic or method being defined."
+  :group 'factor-faces)
+
+(defface factor-font-lock-symbol-definition (factor--face font-lock-variable-name-face)
+  "Face for name of symbol being defined."
+  :group 'factor-faces)
+
+(defface factor-font-lock-vocabulary-name (factor--face font-lock-constant-face)
+  "Face for names of vocabularies in USE or USING."
+  :group 'factor-faces)
+
+(defface factor-font-lock-type-definition (factor--face font-lock-type-face)
+  "Face for type (tuple) names."
+  :group 'factor-faces)
+
+(defface factor-font-lock-parsing-word (factor--face font-lock-keyword-face)
+  "Face for parsing words."
+  :group 'factor-faces)
 
 (defconst factor--parsing-words
   '("{" "}" "^:" "^::" ";" "<<" "<PRIVATE" ">>"
@@ -97,7 +147,7 @@
               'words))
 
 (defun factor--regex-second-word (prefixes)
-  (format "^%s +\\([^ ]+\\)" (regexp-opt prefixes t)))
+  (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
 
 (defconst factor--regex-word-definition
   (factor--regex-second-word '(":" "::" "M:" "GENERIC:")))
@@ -105,55 +155,32 @@
 (defconst factor--regex-type-definition
   (factor--regex-second-word '("TUPLE:")))
 
-(defconst factor--regex-const-definition
+(defconst factor--regex-symbol-definition
   (factor--regex-second-word '("SYMBOL:")))
 
 (defconst factor--regex-using-line "^USING: +\\([^;]*\\);")
 (defconst factor--regex-use-line "^USE: +\\(.*\\)$")
 
 (defconst factor-font-lock-keywords
-  `(("#!.*$" . font-lock-comment-face)
-    ("!( .* )" . font-lock-comment-face)
-    ("^!.*$" . font-lock-comment-face)
-    (" !.*$" . font-lock-comment-face)
-    ("( .* )" . font-lock-comment-face)
-    ("\"\\(\\\\\"\\|[^\"]\\)*\"" . font-lock-string-face)
-    ("\\(P\\|SBUF\\)\"" 1 font-lock-keyword-face)
+  `(("#!.*$" . 'factor-font-lock-comment)
+    ("!( .* )" . 'factor-font-lock-comment)
+    ("^!.*$" . 'factor-font-lock-comment)
+    (" !.*$" . 'factor-font-lock-comment)
+    ("( .* )" . 'factor-font-lock-stack-effect)
+    ("\"\\(\\\\\"\\|[^\"]\\)*\"" . 'factor-font-lock-string)
+    ("\\(P\\|SBUF\\)\"" 1 'factor-font-lock-parsing-word)
     ,@(mapcar #'(lambda (w) (cons (concat "\\(^\\| \\)\\(" w "\\)\\($\\| \\)")
-                             '(2 font-lock-keyword-face)))
+                             '(2 'factor-font-lock-parsing-word)))
               factor--parsing-words)
-    (,factor--regex-parsing-words-ext . font-lock-keyword-face)
-    (,factor--regex-word-definition 2 font-lock-function-name-face)
-    (,factor--regex-type-definition 2 font-lock-type-face)
-    (,factor--regex-const-definition 2 font-lock-constant-face)
-    (,factor--regex-using-line 1 font-lock-constant-face)
-    (,factor--regex-use-line 1 font-lock-constant-face)))
+    (,factor--regex-parsing-words-ext . 'factor-font-lock-parsing-word)
+    (,factor--regex-word-definition 2 'factor-font-lock-word-definition)
+    (,factor--regex-type-definition 2 'factor-font-lock-type-definition)
+    (,factor--regex-symbol-definition 2 'factor-font-lock-symbol-definition)
+    (,factor--regex-using-line 1 'factor-font-lock-vocabulary-name)
+    (,factor--regex-use-line 1 'factor-font-lock-vocabulary-name)))
 
-(defun factor-indent-line ()
-  "Indent current line as Factor code"
-  (indent-line-to (+ (current-indentation) 4)))
-
-(defun factor-mode ()
-  "A mode for editing programs written in the Factor programming language.
-\\{factor-mode-map}"
-  (interactive)
-  (kill-all-local-variables)
-  (use-local-map factor-mode-map)
-  (setq major-mode 'factor-mode)
-  (setq mode-name "Factor")
-  (set (make-local-variable 'indent-line-function) #'factor-indent-line)
-  (make-local-variable 'comment-start)
-  (setq comment-start "! ")
-  (make-local-variable 'font-lock-defaults)
-  (setq font-lock-defaults
-	'(factor-font-lock-keywords t nil nil nil))
-  (set-syntax-table factor-mode-syntax-table)
-  (make-local-variable 'indent-line-function)
-  (setq indent-line-function 'factor-indent-line)
-  (run-hooks 'factor-mode-hook))
-
-(add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; factor-mode commands
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'comint)
@@ -247,6 +274,8 @@
   (beginning-of-line)
   (insert "! "))
 
+(defvar factor-mode-map (make-sparse-keymap))
+
 (define-key factor-mode-map "\C-c\C-f" 'factor-run-file)
 (define-key factor-mode-map "\C-c\C-r" 'factor-send-region)
 (define-key factor-mode-map "\C-c\C-d" 'factor-send-definition)
@@ -258,8 +287,12 @@
 (define-key factor-mode-map [tab]      'indent-for-tab-command)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; indentation
+;; factor-mode indentation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun factor-indent-line ()
+  "Indent current line as Factor code"
+  (indent-line-to (+ (current-indentation) 4)))
 
 (defconst factor-word-starting-keywords
   '("" ":" "TUPLE" "MACRO" "MACRO:" "M"))
@@ -322,6 +355,31 @@
       (indent-to target)
       (if (> (- (point-max) pos) (point))
           (goto-char (- (point-max) pos))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; factor-mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun factor-mode ()
+  "A mode for editing programs written in the Factor programming language.
+\\{factor-mode-map}"
+  (interactive)
+  (kill-all-local-variables)
+  (use-local-map factor-mode-map)
+  (setq major-mode 'factor-mode)
+  (setq mode-name "Factor")
+  (set (make-local-variable 'indent-line-function) #'factor-indent-line)
+  (make-local-variable 'comment-start)
+  (setq comment-start "! ")
+  (make-local-variable 'font-lock-defaults)
+  (setq font-lock-defaults
+        '(factor-font-lock-keywords t nil nil nil))
+  (set-syntax-table factor-mode-syntax-table)
+  (make-local-variable 'indent-line-function)
+  (setq indent-line-function 'factor-indent-line)
+  (run-hooks 'factor-mode-hook))
+
+(add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; factor-listener-mode
