@@ -19,7 +19,7 @@ HELP: <page-action>
 { $description "Creates a new action which serves a Chloe template when servicing a GET request." } ;
 
 HELP: action
-{ $description "The class of Furnace actions. New instances are created with " { $link <action> } ". New instances of subclasses can be created with " { $link new-action } ". The " { $link page-action } " class is a useful subclass."
+{ $class-description "The class of Furnace actions. New instances are created with " { $link <action> } ". New instances of subclasses can be created with " { $link new-action } ". The " { $link page-action } " class is a useful subclass."
 $nl
 "Action slots are documented in " { $link "furnace.actions.config" } "." } ;
 
@@ -31,7 +31,7 @@ HELP: new-action
 { $description "Constructs a subclass of " { $link action } "." } ;
 
 HELP: page-action
-{ $description "The class of Chloe page actions. These are actions whose " { $slot "display" } " slot is pre-set to serve the Chloe template stored in the " { $slot "page" } " slot." } ;
+{ $class-description "The class of Chloe page actions. These are actions whose " { $slot "display" } " slot is pre-set to serve the Chloe template stored in the " { $slot "page" } " slot." } ;
 
 HELP: param
 { $values

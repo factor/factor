@@ -1,149 +1,55 @@
-! Copyright (C) 2008 Your name.
-! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.streams.string quotations strings ;
+USING: help.markup help.syntax io.streams.string quotations strings calendar serialize kernel furnace.db words kernel ;
 IN: furnace.sessions
-
-HELP: <session-cookie>
-{ $values
-    
-     { "cookie" null }
-}
-{ $description "" } ;
-
-HELP: <session>
-{ $values
-     { "id" null }
-     { "session" null }
-}
-{ $description "" } ;
 
 HELP: <sessions>
 { $values
-     { "responder" null }
-     { "responder'" null }
+     { "responder" "a responder" }
+     { "responder'" "a new responder" }
 }
-{ $description "" } ;
-
-HELP: begin-session
-{ $values
-    
-     { "session" null }
-}
-{ $description "" } ;
-
-HELP: check-session
-{ $values
-     { "state/f" null }
-     { "state/f" null }
-}
-{ $description "" } ;
-
-HELP: empty-session
-{ $values
-    
-     { "session" null }
-}
-{ $description "" } ;
-
-HELP: existing-session
-{ $values
-     { "path" "a pathname string" } { "session" null }
-     { "response" null }
-}
-{ $description "" } ;
-
-HELP: get-session
-{ $values
-     { "id" null }
-     { "session" null }
-}
-{ $description "" } ;
-
-HELP: init-session
-{ $values
-     { "session" null }
-}
-{ $description "" } ;
-
-HELP: init-session*
-{ $values
-     { "responder" null }
-}
-{ $description "" } ;
-
-HELP: put-session-cookie
-{ $values
-     { "response" null }
-     { "response'" null }
-}
-{ $description "" } ;
-
-HELP: remote-host
-{ $values
-    
-     { "string" string }
-}
-{ $description "" } ;
-
-HELP: request-session
-{ $values
-    
-     { "session/f" null }
-}
-{ $description "" } ;
-
-HELP: save-session-after
-{ $values
-     { "session" null }
-}
-{ $description "" } ;
+{ $description "Wraps a responder in a session manager responder." } ;
 
 HELP: schange
-{ $values
-     { "key" null } { "quot" quotation }
-}
-{ $description "" } ;
-
-HELP: session
-{ $description "" } ;
-
-HELP: session-changed
-{ $description "" } ;
-
-HELP: session-id-key
-{ $description "" } ;
-
-HELP: sessions
-{ $description "" } ;
+{ $values { "key" symbol } { "quot" "a quotation with stack effect " { $snippet "( old -- new )" } } }
+{ $description "Applies the quotation to the old value of the session variable, and assigns the resulting value back to the variable." } ;
 
 HELP: sget
-{ $values
-     { "key" null }
-     { "value" null }
-}
-{ $description "" } ;
+{ $values { "key" symbol } { "value" object } }
+{ $description "Outputs the value of a session variable." } ;
 
 HELP: sset
-{ $values
-     { "value" null } { "key" null }
-}
-{ $description "" } ;
+{ $values { "value" object } { "key" symbol } }
+{ $description "Sets the value of a session variable." } ;
 
-HELP: touch-session
-{ $values
-     { "session" null }
-}
-{ $description "" } ;
+ARTICLE: "furnace.sessions.config" "Session manager configuration"
+"The " { $link sessions } " tuple has two slots which contain configuration parameters:"
+{ $table
+    { { $slot "verify?" } { "If set to a true value, the client IP address and user agent of each session is tracked, and checked every time a client attempts to re-establish a session. While this does not offer any real security, it can thwart unskilled packet-sniffing attacks. On by default." } }
+    { { $slot "timeout" } { "A " { $link duration } " storing the maximum time that inactive sessions will be stored on the server. The default timeout is 20 minutes. Note that for sessions to actually expire, you must start a thread to do so; see the " { $vocab-link "furnace.alloy" } " vocabulary for an easy way of doing this." } }
+} ;
 
-HELP: verify-session
-{ $values
-     { "session" null }
-     { "session" null }
-}
-{ $description "" } ;
+ARTICLE: "furnace.sessions.serialize" "Session state serialization"
+"Session variable values are serialized to the database using the " { $link "serialize" } " library."
+$nl
+"This means that there are three restrictions on the values stored in the session:"
+{ $list
+    "Continuations cannot be stored at all."
+    { "Object identity is not preserved between serialization and deserialization. That is, if an object is stored with " { $link sset } " and later retrieved with " { $link sget } ", the retrieved value will be " { $link = } " to the original, but not necessarily " { $link eq? } "." }
+    { "All objects reachable from the value passed to " { $link sset } " are serialized, so large structures should not be stored in the session state, and neither should anything that can reference the global namespace. Large structures should be persisted in the database directly instead, using " { $vocab-link "db.tuples" } "." }
+} ;
 
 ARTICLE: "furnace.sessions" "Furnace sessions"
-{ $vocab-link "furnace.sessions" }
-;
+"The " { $vocab-link "furnace.sessions" } " vocabulary implements session management, which allows state to be maintained between HTTP requests. The session state is stored on the server; the client receives an opaque ID which is saved in a cookie (for GET requests) or a hidden form field (for POST requests)."
+$nl
+"To use session management, wrap your responder in an session manager:"
+{ $subsection <sessions> }
+"The sessions responder must be wrapped inside a database persistence responder (" { $link <db-persistence> } "). The " { $vocab-link "furnace.alloy" } " vocabulary combines all of these responders into one."
+$nl
+"Reading and writing session variables from a request:"
+{ $subsection sget }
+{ $subsection sset }
+{ $subsection schange }
+"Additional topics:"
+{ $subsection "furnace.sessions.config" }
+{ $subsection "furnace.sessions.serialize" } ;
 
 ABOUT: "furnace.sessions"

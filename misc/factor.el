@@ -91,10 +91,22 @@
     "TUPLE:" "T{" "t\\??" "TYPEDEF:"
     "UNION:" "USE:" "USING:" "V{" "VAR:" "VARS:" "W{"))
 
-(defconst factor--regex--parsing-words-ext
+(defconst factor--regex-parsing-words-ext
   (regexp-opt '("B" "call-next-method" "delimiter" "f" "flushable" "foldable"
                 "initial:" "inline" "parsing" "read-only" "recursive")
               'words))
+
+(defun factor--regex-second-word (prefixes)
+  (format "^%s +\\([^ ]+\\)" (regexp-opt prefixes t)))
+
+(defconst factor--regex-word-definition
+  (factor--regex-second-word '(":" "::" "M:" "GENERIC:")))
+
+(defconst factor--regex-type-definition
+  (factor--regex-second-word '("TUPLE:")))
+
+(defconst factor--regex-const-definition
+  (factor--regex-second-word '("SYMBOL:")))
 
 (defconst factor-font-lock-keywords
   `(("#!.*$" . font-lock-comment-face)
@@ -103,18 +115,23 @@
     (" !.*$" . font-lock-comment-face)
     ("( .* )" . font-lock-comment-face)
     ("\"[^ ][^\"]*\"" . font-lock-string-face)
+    ("\"\"" . font-lock-string-face)
     ("\\(P\\|SBUF\\)\"" 1 font-lock-keyword-face)
     ,@(mapcar #'(lambda (w) (cons (concat "\\(^\\| \\)\\(" w "\\)\\($\\| \\)")
                              '(2 font-lock-keyword-face)))
               factor--parsing-words)
-    (,factor--regex--parsing-words-ext . font-lock-keyword-face)))
+    (,factor--regex-parsing-words-ext . font-lock-keyword-face)
+    (,factor--regex-word-definition 2 font-lock-function-name-face)
+    (,factor--regex-type-definition 2 font-lock-type-face)
+    (,factor--regex-const-definition 2 font-lock-constant-face)))
 
 (defun factor-indent-line ()
   "Indent current line as Factor code"
   (indent-line-to (+ (current-indentation) 4)))
 
 (defun factor-mode ()
-  "A mode for editing programs written in the Factor programming language."
+  "A mode for editing programs written in the Factor programming language.
+\\{factor-mode-map}"
   (interactive)
   (kill-all-local-variables)
   (use-local-map factor-mode-map)

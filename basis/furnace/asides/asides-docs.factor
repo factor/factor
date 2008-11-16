@@ -5,7 +5,7 @@ IN: furnace.asides
 HELP: <asides>
 { $values
      { "responder" "a responder" }
-     { "responder'" asides }
+     { "responder'" "a new responder" }
 }
 { $description "Creates a new " { $link asides } " responder wrapping an existing responder." } ;
 
@@ -22,7 +22,7 @@ ARTICLE: "furnace.asides" "Furnace asides"
 $nl
 "To use asides, wrap your responder in an aside responder:"
 { $subsection <asides> }
-"The aside responder must be wrapped inside a session responder (" { $link <sessions> } "), which in turn must be wrapped inside a database persistence responder (" { $link <db-persistence> } "). The " { $vocab-link "furnace.alloy" } " vocabulary combines all of these responders into one."
+"The asides responder must be wrapped inside a session responder (" { $link <sessions> } "), which in turn must be wrapped inside a database persistence responder (" { $link <db-persistence> } "). The " { $vocab-link "furnace.alloy" } " vocabulary combines all of these responders into one."
 $nl
 "Saving the current page in an aside which propagates through " { $link <redirect> } " responses:"
 { $subsection begin-aside }
