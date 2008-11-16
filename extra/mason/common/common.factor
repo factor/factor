@@ -75,6 +75,7 @@ SYMBOL: stamp
 
 : boot-time-file "boot-time" ;
 : load-time-file "load-time" ;
+: compiler-errors-file "compiler-errors" ;
 : test-time-file "test-time" ;
 : help-lint-time-file "help-lint-time" ;
 : benchmark-time-file "benchmark-time" ;
