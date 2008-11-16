@@ -5,7 +5,7 @@ io.files html.streams html.elements html.components help kernel
 assocs sequences make words accessors arrays help.topics vocabs
 tools.vocabs tools.vocabs.browser namespaces prettyprint io
 vocabs.loader serialize fry memoize unicode.case math.order
-sorting ;
+sorting debugger ;
 IN: help.html
 
 : escape-char ( ch -- )
@@ -89,7 +89,7 @@ M: topic browser-link-href topic>filename ;
     all-vocabs-really [ dup vocab-name ] { } map>assoc "vocabs.idx" serialize-index ;
 
 : generate-help-files ( -- )
-    all-topics [ help>html ] each ;
+    all-topics [ '[ _ help>html ] try ] each ;
 
 : generate-help ( -- )
     "docs" temp-file
