@@ -3,7 +3,7 @@
 USING: kernel namespaces sequences splitting system accessors
 math.functions make io io.files io.launcher io.encodings.utf8
 prettyprint combinators.short-circuit parser combinators
-calendar calendar.format arrays mason.config ;
+calendar calendar.format arrays mason.config locals ;
 IN: mason.common
 
 : short-running-process ( command -- )
@@ -12,6 +12,13 @@ IN: mason.common
         swap >>command
         15 minutes >>timeout
     try-process ;
+
+:: upload-safely ( local username host remote -- )
+    [let* | temp [ remote ".incomplete" append ]
+            scp-remote [ { username "@" host ":" temp } concat ] |
+        { "scp" local scp-remote } short-running-process
+        { "ssh" host "-l" username "mv" temp remote } short-running-process
+    ] ;
 
 : eval-file ( file -- obj )
     dup utf8 file-lines parse-fresh
@@ -71,6 +78,7 @@ SYMBOL: stamp
 : test-time-file "test-time" ;
 : help-lint-time-file "help-lint-time" ;
 : benchmark-time-file "benchmark-time" ;
+: html-help-time-file "html-help-time" ;
 
 : benchmarks-file "benchmarks" ;
 

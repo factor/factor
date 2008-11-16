@@ -46,6 +46,7 @@ IN: mason.report
         test-time-file time.
         help-lint-time-file time.
         benchmark-time-file time.
+        html-help-time-file time.
 
         nl
 

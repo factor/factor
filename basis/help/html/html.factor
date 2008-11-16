@@ -92,16 +92,14 @@ M: topic browser-link-href topic>filename ;
     all-topics [ help>html ] each ;
 
 : generate-help ( -- )
-    { "resource:core" "resource:basis" "resource:extra" } vocab-roots [
-        load-everything
-
-        "/tmp/docs/" make-directory
-
-        "/tmp/docs/" [
+    "docs" temp-file
+    [ make-directories ]
+    [
+        [
             generate-indices
             generate-help-files
         ] with-directory
-    ] with-variable ;
+    ] bi ;
 
 MEMO: load-index ( name -- index )
     binary file-contents bytes>object ;
@@ -119,10 +117,10 @@ M: result link-href href>> ;
     [ [ title>> ] compare ] sort ;
 
 : article-apropos ( string -- results )
-    "articles.idx" offline-apropos ;
+    "articles.idx" temp-file offline-apropos ;
 
 : word-apropos ( string -- results )
-    "words.idx" offline-apropos ;
+    "words.idx" temp-file offline-apropos ;
 
 : vocab-apropos ( string -- results )
-    "vocabs.idx" offline-apropos ;
+    "vocabs.idx" temp-file offline-apropos ;
