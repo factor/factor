@@ -18,12 +18,16 @@ TUPLE: definition value node uses ;
         swap >>node
         V{ } clone >>uses ;
 
+ERROR: no-def-error value ;
+
 : def-of ( value -- definition )
-    def-use get at* [ "No def" throw ] unless ;
+    dup def-use get at* [ nip ] [ no-def-error ] if ;
+
+ERROR: multiple-defs-error ;
 
 : def-value ( node value -- )
     def-use get 2dup key? [
-        "Multiple defs" throw
+        multiple-defs-error
     ] [
         [ [ <definition> ] keep ] dip set-at
     ] if ;

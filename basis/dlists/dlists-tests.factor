@@ -52,15 +52,6 @@ IN: dlists.tests
 [ 1 ] [ <dlist> 1 over push-back [ 1 = ] delete-node-if ] unit-test
 [ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-empty? ] unit-test
 [ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-empty? ] unit-test
-[ 0 ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-length ] unit-test
-[ 1 ] [ <dlist> 1 over push-back 2 over push-back dup [ 1 = ] delete-node-if drop deque-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 1 = ] delete-node-if drop deque-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 2 = ] delete-node-if drop deque-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 3 = ] delete-node-if drop deque-length ] unit-test
-
-[ 0 ] [ <dlist> deque-length ] unit-test
-[ 1 ] [ <dlist> 1 over push-front deque-length ] unit-test
-[ 0 ] [ <dlist> 1 over push-front dup pop-front* deque-length ] unit-test
 
 [ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 4 = ] dlist-find-node drop class dlist-node = ] unit-test
 [ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 5 = ] dlist-find-node drop class dlist-node = ] unit-test
