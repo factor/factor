@@ -17,23 +17,42 @@
 
 ;; M-x run-factor === Start a Factor listener inside Emacs
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Customization
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defgroup factor nil
   "Factor mode"
   :group 'languages)
 
-(defvar factor-mode-syntax-table nil
-  "Syntax table used while in Factor mode.")
+(defcustom factor-default-indent-width 4
+  "Default indentantion width for factor-mode.
+
+This value will be used for the local variable
+`factor-indent-width' in new factor buffers. For existing code,
+we first check if `factor-indent-width' is set explicitly in a
+local variable section or line (e.g. '! -*- factor-indent-witdth: 2 -*-').
+If that's not the case, `factor-mode' tries to infer its correct
+value from the existing code in the buffer."
+  :type 'integer
+  :group 'factor)
 
 (defcustom factor-display-compilation-output t
   "Display the REPL buffer before compiling files."
   :type '(choice (const :tag "Enable" t) (const :tag "Disable" nil))
   :group 'factor)
 
+(defcustom factor-mode-hook nil
+  "Hook run when entering Factor mode."
+  :type 'hook
+  :group 'factor)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; factor-mode syntax
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defvar factor-mode-syntax-table nil
+  "Syntax table used while in Factor mode.")
 
 (if factor-mode-syntax-table
     ()
@@ -74,11 +93,6 @@
     (modify-syntax-entry ?\( "()" factor-mode-syntax-table)
     (modify-syntax-entry ?\) ")(" factor-mode-syntax-table)
     (modify-syntax-entry ?\" "\"    " factor-mode-syntax-table)))
-
-(defcustom factor-mode-hook nil
-  "Hook run when entering Factor mode."
-  :type 'hook
-  :group 'factor)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; factor-mode font lock
@@ -146,7 +160,7 @@
                 "initial:" "inline" "parsing" "read-only" "recursive")
               'words))
 
-(defun factor--regex-second-word (prefixes)
+(defsubst factor--regex-second-word (prefixes)
   (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
 
 (defconst factor--regex-word-definition
@@ -290,10 +304,6 @@
 ;; factor-mode indentation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun factor-indent-line ()
-  "Indent current line as Factor code"
-  (indent-line-to (+ (current-indentation) 4)))
-
 (defconst factor-word-starting-keywords
   '("" ":" "TUPLE" "MACRO" "MACRO:" "M"))
 
@@ -301,6 +311,26 @@
   `(format
     "^\\(%s\\): "
     (mapconcat 'identity ,keywords "\\|")))
+
+(defvar factor-indent-width factor-default-indent-width
+  "Indentation width in factor buffers. A local variable.")
+
+(make-variable-buffer-local 'factor-indent-width)
+
+(defun factor--guess-indent-width ()
+  "Chooses an indentation value from existing code."
+  (let ((word-def (factor-word-start-re factor-word-starting-keywords))
+        (word-cont "^ +[^ ]")
+        (iw))
+    (save-excursion
+      (beginning-of-buffer)
+      (while (not iw)
+        (if (not (re-search-forward word-def nil t))
+            (setq iw factor-default-indent-width)
+          (forward-line)
+          (when (looking-at word-cont)
+            (setq iw (current-indentation))))))
+    iw))
 
 (defun factor-calculate-indentation ()
   "Calculate Factor indentation for line at point."
@@ -317,21 +347,21 @@
               (let ((cur-depth (factor-brackets-depth)))
                 (forward-line -1)
                 (setq cur-indent (+ (current-indentation)
-                                    (* default-tab-width
+                                    (* factor-indent-width
                                        (- cur-depth (factor-brackets-depth)))))
                 (setq not-indented nil)))
             (forward-line -1)
               ;; Check that we are after the end of previous word
               (if (looking-at ".*;[ \t]*$")
                   (progn
-                    (setq cur-indent (- (current-indentation) default-tab-width))
+                    (setq cur-indent (- (current-indentation) factor-indent-width))
                     (setq not-indented nil))
                 ;; Check that we are after the start of word
                 (if (looking-at (factor-word-start-re factor-word-starting-keywords))
 ;                (if (looking-at "^[A-Z:]*: ")
                     (progn
                       (message "inword")
-                      (setq cur-indent (+ (current-indentation) default-tab-width))
+                      (setq cur-indent (+ (current-indentation) factor-indent-width))
                       (setq not-indented nil))
                   (if (bobp)
                       (setq not-indented nil))))))))
@@ -369,14 +399,13 @@
   (setq major-mode 'factor-mode)
   (setq mode-name "Factor")
   (set (make-local-variable 'indent-line-function) #'factor-indent-line)
-  (make-local-variable 'comment-start)
-  (setq comment-start "! ")
-  (make-local-variable 'font-lock-defaults)
-  (setq font-lock-defaults
-        '(factor-font-lock-keywords t nil nil nil))
+  (set (make-local-variable 'comment-start) "! ")
+  (set (make-local-variable 'font-lock-defaults)
+       '(factor-font-lock-keywords t nil nil nil))
   (set-syntax-table factor-mode-syntax-table)
-  (make-local-variable 'indent-line-function)
-  (setq indent-line-function 'factor-indent-line)
+  (set (make-local-variable 'indent-line-function) 'factor-indent-line)
+  (setq factor-indent-width (factor--guess-indent-width))
+  (setq indent-tabs-mode nil)
   (run-hooks 'factor-mode-hook))
 
 (add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))
