@@ -249,12 +249,12 @@ M: string ($instance)
 M: f ($instance)
     drop { f } $link ;
 
-: $instance ( children -- ) first ($instance) ;
+: $instance ( element -- ) first ($instance) ;
 
-: $maybe ( children -- )
+: $maybe ( element -- )
     $instance " or " print-element { f } $instance ;
 
-: $quotation ( children -- )
+: $quotation ( element -- )
     { "a " { $link quotation } " with stack effect " } print-element
     $snippet ;
 
