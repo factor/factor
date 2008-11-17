@@ -34,14 +34,10 @@ IN: compiler.tree.builder
     if ;
 
 : (build-tree-from-word) ( word -- )
-    dup
-    [ "inline" word-prop ]
-    [ "recursive" word-prop ] bi and [
-        1quotation f initial-recursive-state infer-quot
-    ] [
-        [ specialized-def ] [ initial-recursive-state ] bi
-        infer-quot
-    ] if ;
+    dup initial-recursive-state recursive-state set
+    dup [ "inline" word-prop ] [ "recursive" word-prop ] bi and
+    [ 1quotation ] [ specialized-def ] if
+    infer-quot-here ;
 
 : check-cannot-infer ( word -- )
     dup "cannot-infer" word-prop [ cannot-infer-effect ] [ drop ] if ;
