@@ -115,10 +115,10 @@ M: result link-href href>> ;
     [ [ title>> ] compare ] sort ;
 
 : article-apropos ( string -- results )
-    "articles.idx" temp-file offline-apropos ;
+    "docs/articles.idx" temp-file offline-apropos ;
 
 : word-apropos ( string -- results )
-    "words.idx" temp-file offline-apropos ;
+    "docs/words.idx" temp-file offline-apropos ;
 
 : vocab-apropos ( string -- results )
-    "vocabs.idx" temp-file offline-apropos ;
+    "docs/vocabs.idx" temp-file offline-apropos ;
