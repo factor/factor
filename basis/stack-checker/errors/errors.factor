@@ -24,7 +24,7 @@ M: inference-error error-help error>> error-help ;
     +warning+ (inference-error) ; inline
 
 M: inference-error error.
-    [ "In word: " write word>> . ] [ error>> error. ] bi ;
+    [ word>> [ "In word: " write . ] when* ] [ error>> error. ] bi ;
 
 TUPLE: literal-expected ;
 
@@ -108,3 +108,9 @@ M: inconsistent-recursive-call-error error.
     "The recursive word " write
     word>> pprint
     " calls itself with a different set of quotation parameters than were input" print ;
+
+TUPLE: unknown-primitive-error ;
+
+M: unknown-primitive-error error.
+    drop
+    "Cannot determine stack effect statically" print ;

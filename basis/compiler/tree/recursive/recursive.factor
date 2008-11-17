@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs arrays namespaces accessors sequences deques
-search-deques compiler.tree compiler.tree.combinators ;
+search-deques dlists compiler.tree compiler.tree.combinators ;
 IN: compiler.tree.recursive
 
 ! Collect label info

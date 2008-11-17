@@ -13,12 +13,12 @@ HELP: closable-gadget
 { $class-description "A closable gadget displays a title bar with a close box on top of another gadget. Clicking the close box invokes a quotation. Closable gadgets are created by calling " { $link <closable-gadget> } "." } ;
 
 HELP: <closable-gadget>
-{ $values { "gadget" gadget } { "title" string } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } }
+{ $values { "gadget" gadget } { "title" string } { "quot" { $quotation "( button -- )" } } }
 { $description "Creates a new " { $link closable-gadget } ". Clicking the close box calls " { $snippet "quot" } "." }
 { $notes "The quotation can find the " { $link closable-gadget } " instance, or any other parent gadget by calling " { $link find-parent } " with the gadget it receives on the stack." } ;
 
 HELP: <labelled-pane>
-{ $values { "model" model } { "quot" "a quotation with stack effect " { $snippet "( value -- )" } } { "scrolls?" "a boolean" } { "title" string } { "gadget" "a new " { $link gadget } } }
+{ $values { "model" model } { "quot" { $quotation "( value -- )" } } { "scrolls?" "a boolean" } { "title" string } { "gadget" "a new " { $link gadget } } }
 { $description "Creates a new control delegating to a " { $link pane } ", and wraps it in a " { $link labelled-gadget } ". When the value of the model changes, the value is pushed on the stack and the quotation is called using " { $link with-pane } "." } ;
 
 { <labelled-pane> <pane-control> } related-words

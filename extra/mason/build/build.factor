@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io.launcher io.encodings.utf8 prettyprint arrays
 calendar namespaces mason.common mason.child
-mason.release mason.report mason.email mason.cleanup ;
+mason.release mason.report mason.email mason.cleanup
+mason.help ;
 IN: mason.build
 
 : create-build-dir ( -- )
@@ -23,6 +24,7 @@ IN: mason.build
     clone-builds-factor
     record-id
     build-child
+    upload-help
     release
     email-report
     cleanup ;

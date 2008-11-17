@@ -112,7 +112,7 @@ M: editor ungraft*
     line-height * ;
 
 : caret-loc ( editor -- loc )
-    [ editor-caret* ] keep 2dup loc>x
+    [ editor-caret* ] keep 2dup loc>x 1+
     rot first rot line>y 2array ;
 
 : caret-dim ( editor -- dim )
@@ -120,7 +120,7 @@ M: editor ungraft*
 
 : scroll>caret ( editor -- )
     dup graft-state>> second [
-        dup caret-loc over caret-dim { 1 0 } v+ <rect>
+        dup caret-loc over caret-dim <rect>
         over scroll>rect
     ] when drop ;
 

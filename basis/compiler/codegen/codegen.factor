@@ -235,7 +235,7 @@ M: float-regs reg-class-variable drop float-regs ;
 GENERIC: inc-reg-class ( register-class -- )
 
 : ?dummy-stack-params ( reg-class -- )
-    dummy-stack-params? [ reg-size stack-params +@ ] [ drop ] if ;
+    dummy-stack-params? [ reg-size cell align stack-params +@ ] [ drop ] if ;
 
 : ?dummy-int-params ( reg-class -- )
     dummy-int-params? [ reg-size cell /i 1 max int-regs +@ ] [ drop ] if ;
@@ -264,7 +264,7 @@ M: object reg-class-full?
 
 : spill-param ( reg-class -- n reg-class )
     stack-params get
-    >r reg-size stack-params +@ r>
+    >r reg-size cell align stack-params +@ r>
     stack-params ;
 
 : fastcall-param ( reg-class -- n reg-class )

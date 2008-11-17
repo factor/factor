@@ -61,6 +61,7 @@ IN: mason.child
         [ load-everything-vocabs-file eval-file empty? ]
         [ test-all-vocabs-file eval-file empty? ]
         [ help-lint-vocabs-file eval-file empty? ]
+        [ compiler-errors-file eval-file empty? ]
     } 0&& ;
 
 : build-child ( -- )

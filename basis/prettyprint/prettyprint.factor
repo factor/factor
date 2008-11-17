@@ -253,6 +253,9 @@ M: object see
         block>
     ] with-use nl ;
 
+M: method-spec see
+    first2 method see ;
+
 GENERIC: see-class* ( word -- )
 
 M: union-class see-class*
