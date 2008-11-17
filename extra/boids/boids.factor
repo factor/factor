@@ -43,19 +43,19 @@ VAR: separation-radius
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : init-variables ( -- )
-1.0 >cohesion-weight
-1.0 >alignment-weight
-1.0 >separation-weight
+  1.0 >cohesion-weight
+  1.0 >alignment-weight
+  1.0 >separation-weight
 
-75 >cohesion-radius
-50 >alignment-radius
-25 >separation-radius
+  75 >cohesion-radius
+  50 >alignment-radius
+  25 >separation-radius
 
-180 >cohesion-view-angle
-180 >alignment-view-angle
-180 >separation-view-angle
+  180 >cohesion-view-angle
+  180 >alignment-view-angle
+  180 >separation-view-angle
 
-10 >time-slice ;
+  10 >time-slice ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! random-boid and random-boids
