@@ -68,9 +68,11 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	case RT_XT:
 		return (CELL)untag_word(get(CREF(literals_start,REL_ARGUMENT(rel))))->xt;
 	case RT_HERE:
-		return rel->offset + code_start;
+		return rel->offset + code_start + (short)REL_ARGUMENT(rel);
 	case RT_LABEL:
 		return code_start + REL_ARGUMENT(rel);
+	case RT_STACK_CHAIN:
+		return (CELL)&stack_chain;
 	default:
 		critical_error("Bad rel type",rel->type);
 		return -1; /* Can't happen */
@@ -322,7 +324,7 @@ void default_word_code(F_WORD *word, bool relocate)
 	word->compiledp = F;
 }
 
-DEFINE_PRIMITIVE(modify_code_heap)
+void primitive_modify_code_heap(void)
 {
 	bool rescan_code_heap = to_boolean(dpop());
 	F_ARRAY *alist = untag_array(dpop());

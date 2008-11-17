@@ -1,16 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel assocs deques dlists hashtables ;
+USING: accessors kernel assocs deques ;
 IN: search-deques
 
 TUPLE: search-deque assoc deque ;
 
 C: <search-deque> search-deque
 
-: <hashed-dlist> ( -- search-deque )
-    0 <hashtable> <dlist> <search-deque> ;
-
-M: search-deque deque-length deque>> deque-length ;
+M: search-deque deque-empty? deque>> deque-empty? ;
 
 M: search-deque peek-front deque>> peek-front ;
 

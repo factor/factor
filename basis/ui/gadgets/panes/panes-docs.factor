@@ -43,7 +43,7 @@ HELP: <scrolling-pane>
 { $description "Creates a new " { $link pane } " gadget which scrolls any scroll pane containing it to the bottom on output. behaving much like a terminal or logger." } ;
 
 HELP: <pane-control>
-{ $values { "model" model } { "quot" "a quotation with stack effect " { $snippet "( value -- )" } } { "pane" "a new " { $link pane } } }
+{ $values { "model" model } { "quot" { $quotation "( value -- )" } } { "pane" "a new " { $link pane } } }
 { $description "Creates a new control delegating to a " { $link pane } ". When the value of the model changes, the value is pushed on the stack and the quotation is called using " { $link with-pane } "." } ;
 
 HELP: pane-stream

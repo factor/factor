@@ -161,7 +161,7 @@ bool save_image(const F_CHAR *filename)
 	return true;
 }
 
-DEFINE_PRIMITIVE(save_image)
+void primitive_save_image(void)
 {
 	/* do a full GC to push everything into tenured space */
 	gc();
@@ -184,7 +184,7 @@ void strip_compiled_quotations(void)
 	gc_off = false;
 }
 
-DEFINE_PRIMITIVE(save_image_and_exit)
+void primitive_save_image_and_exit(void)
 {
 	/* We unbox this before doing anything else. This is the only point
 	where we might throw an error, so we have to throw an error here since

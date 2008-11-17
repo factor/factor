@@ -29,7 +29,7 @@ void io_error(void)
 	general_error(ERROR_IO,error,F,NULL);
 }
 
-DEFINE_PRIMITIVE(fopen)
+void primitive_fopen(void)
 {
 	char *mode = unbox_char_string();
 	REGISTER_C_STRING(mode);
@@ -49,7 +49,7 @@ DEFINE_PRIMITIVE(fopen)
 	}
 }
 
-DEFINE_PRIMITIVE(fgetc)
+void primitive_fgetc(void)
 {
 	FILE* file = unbox_alien();
 
@@ -74,7 +74,7 @@ DEFINE_PRIMITIVE(fgetc)
 	}
 }
 
-DEFINE_PRIMITIVE(fread)
+void primitive_fread(void)
 {
 	FILE* file = unbox_alien();
 	CELL size = unbox_array_size();
@@ -116,7 +116,7 @@ DEFINE_PRIMITIVE(fread)
 	}
 }
 
-DEFINE_PRIMITIVE(fputc)
+void primitive_fputc(void)
 {
 	FILE *file = unbox_alien();
 	F_FIXNUM ch = to_fixnum(dpop());
@@ -134,7 +134,7 @@ DEFINE_PRIMITIVE(fputc)
 	}
 }
 
-DEFINE_PRIMITIVE(fwrite)
+void primitive_fwrite(void)
 {
 	FILE *file = unbox_alien();
 	F_BYTE_ARRAY *text = untag_byte_array(dpop());
@@ -163,7 +163,7 @@ DEFINE_PRIMITIVE(fwrite)
 	}
 }
 
-DEFINE_PRIMITIVE(fflush)
+void primitive_fflush(void)
 {
 	FILE *file = unbox_alien();
 	for(;;)
@@ -175,7 +175,7 @@ DEFINE_PRIMITIVE(fflush)
 	}
 }
 
-DEFINE_PRIMITIVE(fclose)
+void primitive_fclose(void)
 {
 	FILE *file = unbox_alien();
 	for(;;)

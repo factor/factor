@@ -127,7 +127,7 @@ HELP: method-body
 { $class-description "The class of method bodies, which are words with special word properties set." } ;
 
 HELP: method
-{ $values { "class" class } { "generic" generic } { "method/f" "a " { $link method-body } " or " { $link f } } }
+{ $values { "class" class } { "generic" generic } { "method/f" { $maybe method-body } } }
 { $description "Looks up a method definition." } ;
 
 { method create-method POSTPONE: M: } related-words
@@ -146,7 +146,7 @@ HELP: check-method
 { $error-description "Thrown if " { $link POSTPONE: M: } " or " { $link create-method } " is given an invalid class or generic word." } ;
 
 HELP: with-methods
-{ $values { "class" class } { "generic" generic } { "quot" "a quotation with stack effect " { $snippet "( methods -- )" } } }
+{ $values { "class" class } { "generic" generic } { "quot" { $quotation "( methods -- )" } } }
 { $description "Applies a quotation to the generic word's methods hashtable, and regenerates the generic word's definition when the quotation returns." }
 $low-level-note ;
 

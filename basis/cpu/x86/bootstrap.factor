@@ -45,12 +45,6 @@ big-endian off
 ] rc-absolute-cell rt-immediate 1 rex-length + jit-push-immediate jit-define
 
 [
-    arg0 0 MOV                                 ! load XT
-    arg1 stack-reg MOV                         ! pass callstack pointer as arg 2
-    arg0 JMP                                   ! go
-] rc-absolute-cell rt-primitive 1 rex-length + jit-primitive jit-define
-
-[
     (JMP) drop
 ] rc-relative rt-xt 1 jit-word-jump jit-define
 

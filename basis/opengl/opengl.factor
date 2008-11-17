@@ -31,7 +31,7 @@ IN: opengl
     over glEnableClientState dip glDisableClientState ; inline
 
 : words>values ( word/value-seq -- value-seq )
-    [ dup word? [ execute ] [ ] if ] map ;
+    [ dup word? [ execute ] when ] map ;
 
 : (all-enabled) ( seq quot -- )
     over [ glEnable ] each dip [ glDisable ] each ; inline
@@ -71,10 +71,10 @@ MACRO: all-enabled-client-state ( seq quot -- )
 
 : (rect-vertices) ( dim -- vertices )
     {
-        [ drop 0 1 ]
-        [ first 1- 1 ]
-        [ [ first 1- ] [ second ] bi ]
-        [ second 0 swap ]
+        [ drop 0.5 0.5 ]
+        [ first 0.5 - 0.5 ]
+        [ [ first 0.5 - ] [ second 0.5 - ] bi ]
+        [ second 0.5 - 0.5 swap ]
     } cleave 8 narray >c-float-array ;
 
 : rect-vertices ( dim -- )

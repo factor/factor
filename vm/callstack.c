@@ -6,11 +6,6 @@ F_FASTCALL void save_callstack_bottom(F_STACK_FRAME *callstack_bottom)
 	stack_chain->callstack_bottom = callstack_bottom;
 }
 
-F_FASTCALL __attribute__((noinline)) void save_callstack_top(F_STACK_FRAME *callstack_top)
-{
-	stack_chain->callstack_top = callstack_top;
-}
-
 void iterate_callstack(CELL top, CELL bottom, CALLSTACK_ITER iterator)
 {
 	F_STACK_FRAME *frame = (F_STACK_FRAME *)bottom - 1;
@@ -68,7 +63,7 @@ F_STACK_FRAME *capture_start(void)
 	return frame + 1;
 }
 
-DEFINE_PRIMITIVE(callstack)
+void primitive_callstack(void)
 {
 	F_STACK_FRAME *top = capture_start();
 	F_STACK_FRAME *bottom = stack_chain->callstack_bottom;
@@ -82,7 +77,7 @@ DEFINE_PRIMITIVE(callstack)
 	dpush(tag_object(callstack));
 }
 
-DEFINE_PRIMITIVE(set_callstack)
+void primitive_set_callstack(void)
 {
 	F_CALLSTACK *stack = untag_callstack(dpop());
 
@@ -158,7 +153,7 @@ void stack_frame_to_array(F_STACK_FRAME *frame)
 	set_array_nth(array,frame_index++,frame_scan(frame));
 }
 
-DEFINE_PRIMITIVE(callstack_to_array)
+void primitive_callstack_to_array(void)
 {
 	F_CALLSTACK *stack = untag_callstack(dpop());
 
@@ -190,7 +185,7 @@ F_STACK_FRAME *innermost_stack_frame(F_CALLSTACK *callstack)
 
 /* Some primitives implementing a limited form of callstack mutation.
 Used by the single stepper. */
-DEFINE_PRIMITIVE(innermost_stack_frame_quot)
+void primitive_innermost_stack_frame_quot(void)
 {
 	F_STACK_FRAME *inner = innermost_stack_frame(
 		untag_callstack(dpop()));
@@ -199,7 +194,7 @@ DEFINE_PRIMITIVE(innermost_stack_frame_quot)
 	dpush(frame_executing(inner));
 }
 
-DEFINE_PRIMITIVE(innermost_stack_frame_scan)
+void primitive_innermost_stack_frame_scan(void)
 {
 	F_STACK_FRAME *inner = innermost_stack_frame(
 		untag_callstack(dpop()));
@@ -208,7 +203,7 @@ DEFINE_PRIMITIVE(innermost_stack_frame_scan)
 	dpush(frame_scan(inner));
 }
 
-DEFINE_PRIMITIVE(set_innermost_stack_frame_quot)
+void primitive_set_innermost_stack_frame_quot(void)
 {
 	F_CALLSTACK *callstack = untag_callstack(dpop());
 	F_QUOTATION *quot = untag_quotation(dpop());

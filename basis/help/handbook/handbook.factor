@@ -166,16 +166,16 @@ ARTICLE: "io" "Input and output"
 { $heading "Encodings" }
 { $subsection "encodings-introduction" }
 { $subsection "io.encodings" }
-"Wrapper streams:"
+{ $heading "Wrapper streams" }
 { $subsection "io.streams.duplex" }
 { $subsection "io.streams.plain" }
 { $subsection "io.streams.string" }
 { $subsection "io.streams.byte-array" }
-"Utilities:"
+{ $heading "Utilities" }
 { $subsection "stream-binary" }
 { $subsection "styles" }
 { $subsection "checksums" }
-"Implementation:"
+{ $heading "Implementation" }
 { $subsection "io.streams.c" }
 { $subsection "io.ports" }
 { $see-also "destructors" } ;

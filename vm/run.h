@@ -48,8 +48,8 @@ typedef enum {
 	JIT_RETURN,
 	JIT_PROFILING,
 	JIT_PUSH_IMMEDIATE,
-
 	JIT_DECLARE_WORD    = 42,
+	JIT_SAVE_STACK,
 
 	STACK_TRACES_ENV    = 59,
 
@@ -226,18 +226,18 @@ DLLEXPORT void nest_stacks(void);
 DLLEXPORT void unnest_stacks(void);
 void init_stacks(CELL ds_size, CELL rs_size);
 
-DECLARE_PRIMITIVE(datastack);
-DECLARE_PRIMITIVE(retainstack);
-DECLARE_PRIMITIVE(getenv);
-DECLARE_PRIMITIVE(setenv);
-DECLARE_PRIMITIVE(exit);
-DECLARE_PRIMITIVE(os_env);
-DECLARE_PRIMITIVE(os_envs);
-DECLARE_PRIMITIVE(set_os_env);
-DECLARE_PRIMITIVE(unset_os_env);
-DECLARE_PRIMITIVE(set_os_envs);
-DECLARE_PRIMITIVE(millis);
-DECLARE_PRIMITIVE(sleep);
-DECLARE_PRIMITIVE(set_slot);
+void primitive_datastack(void);
+void primitive_retainstack(void);
+void primitive_getenv(void);
+void primitive_setenv(void);
+void primitive_exit(void);
+void primitive_os_env(void);
+void primitive_os_envs(void);
+void primitive_set_os_env(void);
+void primitive_unset_os_env(void);
+void primitive_set_os_envs(void);
+void primitive_millis(void);
+void primitive_sleep(void);
+void primitive_set_slot(void);
 
 bool stage2;

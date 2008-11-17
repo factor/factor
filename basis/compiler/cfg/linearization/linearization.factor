@@ -43,8 +43,8 @@ M: ##branch linearize-insn
 
 : binary-conditional ( basic-block insn -- basic-block successor label2 src1 src2 cc )
     [ (binary-conditional) ]
-    [ drop dup successors>> first useless-branch? ] 2bi
-    [ [ number>> ] 3dip negate-cc ] [ [ swap number>> ] 3dip ] if ;
+    [ drop dup successors>> second useless-branch? ] 2bi
+    [ [ swap number>> ] 3dip ] [ [ number>> ] 3dip negate-cc ] if ;
 
 M: ##compare-branch linearize-insn
     binary-conditional _compare-branch emit-branch ;

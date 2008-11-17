@@ -5,14 +5,18 @@ kernel.private namespaces parser sequences strings system
 splitting io.files eval ;
 IN: command-line
 
+: rc-path ( name -- path )
+    os windows? [ "." prepend ] unless
+    home prepend-path ;
+
 : run-bootstrap-init ( -- )
     "user-init" get [
-        home ".factor-boot-rc" append-path ?run-file
+        "factor-boot-rc" rc-path ?run-file
     ] when ;
 
 : run-user-init ( -- )
     "user-init" get [
-        home ".factor-rc" append-path ?run-file
+        "factor-rc" rc-path ?run-file
     ] when ;
 
 : cli-var-param ( name value -- ) swap set-global ;

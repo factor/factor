@@ -15,16 +15,28 @@ IN: compiler.cfg.stacks
     1 ##inc-d D 0 ##replace ;
 
 : ds-load ( n -- vregs )
-    [ <reversed> [ <ds-loc> ^^peek ] map ] [ neg ##inc-d ] bi ;
+    dup 0 =
+    [ drop f ]
+    [ [ <reversed> [ <ds-loc> ^^peek ] map ] [ neg ##inc-d ] bi ] if ;
 
 : ds-store ( vregs -- )
-    <reversed> [ length ##inc-d ] [ [ <ds-loc> ##replace ] each-index ] bi ;
+    [
+        <reversed>
+        [ length ##inc-d ]
+        [ [ <ds-loc> ##replace ] each-index ] bi
+    ] unless-empty ;
 
 : rs-load ( n -- vregs )
-    [ <reversed> [ <rs-loc> ^^peek ] map ] [ neg ##inc-r ] bi ;
+    dup 0 =
+    [ drop f ]
+    [ [ <reversed> [ <rs-loc> ^^peek ] map ] [ neg ##inc-r ] bi ] if ;
 
 : rs-store ( vregs -- )
-    <reversed> [ length ##inc-r ] [ [ <rs-loc> ##replace ] each-index ] bi ;
+    [
+        <reversed>
+        [ length ##inc-r ]
+        [ [ <rs-loc> ##replace ] each-index ] bi
+    ] unless-empty ;
 
 : 2inputs ( -- vreg1 vreg2 )
     D 1 ^^peek D 0 ^^peek -2 ##inc-d ;

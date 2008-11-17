@@ -55,7 +55,7 @@ void ffi_dlclose(F_DLL *dll)
 	dll->dll = NULL;
 }
 
-DEFINE_PRIMITIVE(existsp)
+void primitive_existsp(void)
 {
 	struct stat sb;
 	box_boolean(stat(unbox_char_string(),&sb) >= 0);

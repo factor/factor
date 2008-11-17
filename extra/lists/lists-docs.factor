@@ -61,19 +61,19 @@ HELP: uncons
 { leach foldl lmap>array } related-words
 
 HELP: leach
-{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- )" } }
+{ $values { "list" "a cons object" } { "quot" { $quotation "( obj -- )" } } }
 { $description "Call the quotation for each item in the list." } ;
 
 HELP: foldl
-{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" "a quotation with stack effect ( prev elt -- next )" } { "result" "the final result" } }
+{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" { $quotation "( prev elt -- next )" } } { "result" "the final result" } }
 { $description "Combines successive elements of the list (in a left-assocative order) using a binary operation and outputs the final result." } ;
 
 HELP: foldr
-{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" "a quotation with stack effect ( prev elt -- next )" } { "result" "the final result" } }
+{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" { $quotation "( prev elt -- next )" } } { "result" "the final result" } }
 { $description "Combines successive elements of the list (in a right-assocative order) using a binary operation, and outputs the final result." } ;
 
 HELP: lmap
-{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( old -- new )" } { "result" "the final result" } }
+{ $values { "list" "a cons object" } { "quot" { $quotation "( old -- new )" } } { "result" "the final result" } }
 { $description "Applies the quotation to each element of the list in order, collecting the new elements into a new list." } ;
     
 HELP: lreverse
@@ -97,8 +97,8 @@ HELP: seq>cons
 { $description "Recursively turns the given sequence into a cons object, maintaing order and also converting nested lists." } ;
     
 HELP: traverse    
-{ $values { "list"  "a cons object" } { "pred" "a quotation with stack effect ( list/elt -- ? )" }
-          { "quot" "a quotation with stack effect ( list/elt -- result)" }  { "result" "a new cons object" } }
+{ $values { "list"  "a cons object" } { "pred" { $quotation "( list/elt -- ? )" } }
+          { "quot" { $quotation "( list/elt -- result)" } }  { "result" "a new cons object" } }
 { $description "Recursively traverses the list object, replacing any elements (which can themselves be sublists) that pred" 
     " returns true for with the result of applying quot to." } ;
     

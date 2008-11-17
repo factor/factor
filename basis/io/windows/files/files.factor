@@ -149,35 +149,39 @@ SYMBOLS: +read-only+ +hidden+ +system+
 +sparse-file+ +reparse-point+ +compressed+ +offline+
 +not-content-indexed+ +encrypted+ ;
 
-: win32-file-attribute ( n attr symbol -- n )
-    >r dupd mask? r> swap [ , ] [ drop ] if ;
+TUPLE: windows-file-info < file-info attributes ;
+
+: win32-file-attribute ( n attr symbol -- )
+    rot mask? [ , ] [ drop ] if ;
 
 : win32-file-attributes ( n -- seq )
     [
-        FILE_ATTRIBUTE_READONLY +read-only+ win32-file-attribute
-        FILE_ATTRIBUTE_HIDDEN +hidden+ win32-file-attribute
-        FILE_ATTRIBUTE_SYSTEM +system+ win32-file-attribute
-        FILE_ATTRIBUTE_DIRECTORY +directory+ win32-file-attribute
-        FILE_ATTRIBUTE_ARCHIVE +archive+ win32-file-attribute
-        FILE_ATTRIBUTE_DEVICE +device+ win32-file-attribute
-        FILE_ATTRIBUTE_NORMAL +normal+ win32-file-attribute
-        FILE_ATTRIBUTE_TEMPORARY +temporary+ win32-file-attribute
-        FILE_ATTRIBUTE_SPARSE_FILE +sparse-file+ win32-file-attribute
-        FILE_ATTRIBUTE_REPARSE_POINT +reparse-point+ win32-file-attribute
-        FILE_ATTRIBUTE_COMPRESSED +compressed+ win32-file-attribute
-        FILE_ATTRIBUTE_OFFLINE +offline+ win32-file-attribute
-        FILE_ATTRIBUTE_NOT_CONTENT_INDEXED +not-content-indexed+ win32-file-attribute
-        FILE_ATTRIBUTE_ENCRYPTED +encrypted+ win32-file-attribute
-        drop
+        {
+            [ +read-only+ FILE_ATTRIBUTE_READONLY win32-file-attribute ]
+            [ +hidden+ FILE_ATTRIBUTE_HIDDEN win32-file-attribute ]
+            [ +system+ FILE_ATTRIBUTE_SYSTEM win32-file-attribute ]
+            [ +directory+ FILE_ATTRIBUTE_DIRECTORY win32-file-attribute ]
+            [ +archive+ FILE_ATTRIBUTE_ARCHIVE win32-file-attribute ]
+            [ +device+ FILE_ATTRIBUTE_DEVICE win32-file-attribute ]
+            [ +normal+ FILE_ATTRIBUTE_NORMAL win32-file-attribute ]
+            [ +temporary+ FILE_ATTRIBUTE_TEMPORARY win32-file-attribute ]
+            [ +sparse-file+ FILE_ATTRIBUTE_SPARSE_FILE win32-file-attribute ]
+            [ +reparse-point+ FILE_ATTRIBUTE_REPARSE_POINT win32-file-attribute ]
+            [ +compressed+ FILE_ATTRIBUTE_COMPRESSED win32-file-attribute ]
+            [ +offline+ FILE_ATTRIBUTE_OFFLINE win32-file-attribute ]
+            [ +not-content-indexed+ FILE_ATTRIBUTE_NOT_CONTENT_INDEXED win32-file-attribute ]
+            [ +encrypted+ FILE_ATTRIBUTE_ENCRYPTED win32-file-attribute ]
+        } cleave
     ] { } make ;
 
 : win32-file-type ( n -- symbol )
     FILE_ATTRIBUTE_DIRECTORY mask? +directory+ +regular-file+ ? ;
 
 : WIN32_FIND_DATA>file-info ( WIN32_FIND_DATA -- file-info )
-    [ \ file-info new ] dip
+    [ \ windows-file-info new ] dip
     {
         [ WIN32_FIND_DATA-dwFileAttributes win32-file-type >>type ]
+        [ WIN32_FIND_DATA-dwFileAttributes win32-file-attributes >>attributes ]
         [
             [ WIN32_FIND_DATA-nFileSizeLow ]
             [ WIN32_FIND_DATA-nFileSizeHigh ] bi >64bit >>size
@@ -196,9 +200,10 @@ SYMBOLS: +read-only+ +hidden+ +system+
     ] keep ;
 
 : BY_HANDLE_FILE_INFORMATION>file-info ( HANDLE_FILE_INFORMATION -- file-info )
-    [ \ file-info new ] dip
+    [ \ windows-file-info new ] dip
     {
         [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-type >>type ]
+        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-attributes >>attributes ]
         [
             [ BY_HANDLE_FILE_INFORMATION-nFileSizeLow ]
             [ BY_HANDLE_FILE_INFORMATION-nFileSizeHigh ] bi >64bit >>size

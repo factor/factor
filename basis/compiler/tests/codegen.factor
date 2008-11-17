@@ -230,3 +230,14 @@ TUPLE: id obj ;
     10000000 [ "hi" 0 (gc-check-bug) drop ] times ;
 
 [ ] [ gc-check-bug ] unit-test
+
+! New optimization
+: test-1 ( a -- b ) 8 fixnum-fast { [ "a" ] [ "b" ] } dispatch ;
+
+[ "a" ] [ 8 test-1 ] unit-test
+[ "b" ] [ 9 test-1 ] unit-test
+
+: test-2 ( a -- b ) 1 fixnum-fast { [ "a" ] [ "b" ] } dispatch ;
+
+[ "a" ] [ 1 test-2 ] unit-test
+[ "b" ] [ 2 test-2 ] unit-test

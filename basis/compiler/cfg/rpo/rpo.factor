@@ -9,7 +9,10 @@ SYMBOL: visited
 : post-order-traversal ( bb -- )
     dup id>> visited get key? [ drop ] [
         dup id>> visited get conjoin
-        [ successors>> [ post-order-traversal ] each ] [ , ] bi
+        [
+            successors>> <reversed>
+            [ post-order-traversal ] each
+        ] [ , ] bi
     ] if ;
 
 : post-order ( bb -- blocks )

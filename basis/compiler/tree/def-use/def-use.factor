@@ -18,12 +18,16 @@ TUPLE: definition value node uses ;
         swap >>node
         V{ } clone >>uses ;
 
+ERROR: no-def-error value ;
+
 : def-of ( value -- definition )
-    def-use get at* [ "No def" throw ] unless ;
+    dup def-use get at* [ nip ] [ no-def-error ] if ;
+
+ERROR: multiple-defs-error ;
 
 : def-value ( node value -- )
     def-use get 2dup key? [
-        "Multiple defs" throw
+        multiple-defs-error
     ] [
         [ [ <definition> ] keep ] dip set-at
     ] if ;
@@ -38,16 +42,16 @@ GENERIC: node-uses-values ( node -- values )
 
 M: #introduce node-uses-values drop f ;
 M: #push node-uses-values drop f ;
-M: #r> node-uses-values in-r>> ;
 M: #phi node-uses-values phi-in-d>> concat remove-bottom prune ;
 M: #declare node-uses-values declaration>> keys ;
 M: #terminate node-uses-values [ in-d>> ] [ in-r>> ] bi append ;
+M: #shuffle node-uses-values [ in-d>> ] [ in-r>> ] bi append ;
 M: #alien-callback node-uses-values drop f ;
 M: node node-uses-values in-d>> ;
 
 GENERIC: node-defs-values ( node -- values )
 
-M: #>r node-defs-values out-r>> ;
+M: #shuffle node-defs-values [ out-d>> ] [ out-r>> ] bi append ;
 M: #branch node-defs-values drop f ;
 M: #declare node-defs-values drop f ;
 M: #return node-defs-values drop f ;

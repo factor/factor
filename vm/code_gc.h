@@ -82,4 +82,4 @@ void recursive_mark(F_BLOCK *block);
 void dump_heap(F_HEAP *heap);
 void compact_code_heap(void);
 
-DECLARE_PRIMITIVE(code_room);
+void primitive_code_room(void);

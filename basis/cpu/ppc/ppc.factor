@@ -111,10 +111,10 @@ M: ppc %call ( label -- ) BL ;
 M: ppc %jump-label ( label -- ) B ;
 M: ppc %return ( -- ) BLR ;
 
-M:: ppc %dispatch ( src temp -- )
-    0 temp LOAD32 rc-absolute-ppc-2/2 rel-here
-    temp temp src ADD
-    temp temp 5 cells LWZ
+M:: ppc %dispatch ( src temp offset -- )
+    0 temp LOAD32
+    4 offset + cells rc-absolute-ppc-2/2 rel-here
+    temp temp src LWZX
     temp MTCTR
     BCTR ;
 

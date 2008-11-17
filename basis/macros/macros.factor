@@ -1,21 +1,18 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser kernel sequences words effects
-stack-checker.transforms combinators assocs definitions
-quotations namespaces memoize accessors ;
+USING: parser kernel sequences words effects combinators assocs
+definitions quotations namespaces memoize accessors ;
 IN: macros
 
 : real-macro-effect ( word -- effect' )
     "declared-effect" word-prop in>> 1 <effect> ;
 
 : define-macro ( word definition -- )
-    over "declared-effect" word-prop in>> length >r
-    2dup "macro" set-word-prop
-    2dup over real-macro-effect memoize-quot [ call ] append define
-    r> define-transform ;
+    [ "macro" set-word-prop ]
+    [ over real-macro-effect memoize-quot [ call ] append define ]
+    2bi ;
 
-: MACRO:
-    (:) define-macro ; parsing
+: MACRO: (:) define-macro ; parsing
 
 PREDICATE: macro < word "macro" word-prop >boolean ;
 
