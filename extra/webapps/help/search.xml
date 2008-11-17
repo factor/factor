@@ -30,7 +30,7 @@
 		
 		<t:form t:action="$help-webapp/search">
 			<t:field t:name="search" />
-			<button>Search</button>
+			<button type="submit">Search</button>
 		</t:form>
 		
 		<t:if t:value="articles">
