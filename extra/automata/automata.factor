@@ -13,14 +13,14 @@ VAR: rule   VAR: rule-number
 : init-rule ( -- ) 8 <hashtable> >rule ;
 
 : rule-keys ( -- array )
-{ { 1 1 1 }
-  { 1 1 0 }
-  { 1 0 1 }
-  { 1 0 0 }
-  { 0 1 1 }
-  { 0 1 0 }
-  { 0 0 1 }
-  { 0 0 0 } } ;
+  { { 1 1 1 }
+    { 1 1 0 }
+    { 1 0 1 }
+    { 1 0 0 }
+    { 0 1 1 }
+    { 0 1 0 }
+    { 0 0 1 }
+    { 0 0 0 } } ;
 
 : rule-values ( n -- seq ) >bin 8 CHAR: 0 pad-left string>digits ;
 
@@ -61,8 +61,8 @@ VARS: width height ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : interesting ( -- seq )
-{ 18 22 26 30 41 45 54 60 73 75 82 86 89 90 97 101 102 105 106 107 109
-  110 120 121 122 124 126 129 137 146 147 149 150 151 153 154 161 165 } ;
+  { 18 22 26 30 41 45 54 60 73 75 82 86 89 90 97 101 102 105 106 107 109
+    110 120 121 122 124 126 129 137 146 147 149 150 151 153 154 161 165 } ;
 
 : mild ( -- seq ) { 6 9 11 57 62 74 118 } ;
 
@@ -75,7 +75,7 @@ VAR: bitmap
 VAR: last-line
 
 : run-rule ( -- )
-last-line> height> [ drop step-capped-line dup ] map >bitmap >last-line ;
+  last-line> height> [ drop step-capped-line dup ] map >bitmap >last-line ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
