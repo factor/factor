@@ -1,11 +1,11 @@
 USING: definitions io.launcher kernel parser words sequences math
-math.parser namespaces editors make ;
+math.parser namespaces editors make system ;
 IN: editors.emacs
 
 : emacsclient ( file line -- )
     [
         \ emacsclient get "emacsclient" or ,
-        "--no-wait" ,
+        os windows? [ "--no-wait" , ] unless
         "+" swap number>string append ,
         ,
     ] { } make try-process ;

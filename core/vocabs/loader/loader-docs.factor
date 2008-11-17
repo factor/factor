@@ -11,7 +11,7 @@ ARTICLE: "vocabs.roots" "Vocabulary roots"
     { { $snippet "extra" } " - additional contributed libraries." }
     { { $snippet "work" } " - a root for vocabularies which are not intended to be contributed back to Factor." }
 }
-"Your own vocabularies should go into " { $snippet "extra" } " or " { $snippet "work" } ", depending on whether or not you intend to contribute them back to the Factor project. If you wish to work on vocabularies outside of the Factor source directory, create a " { $snippet "~/.factor-rc" } " file like the following,"
+"Your own vocabularies should go into " { $snippet "extra" } " or " { $snippet "work" } ", depending on whether or not you intend to contribute them back to the Factor project. If you wish to work on vocabularies outside of the Factor source directory, create a " { $link "factor-boot-rc" } " file like the following:"
 { $code
     "USING: namespaces sequences vocabs.loader ;"
     "\"/home/jane/sources/\" vocab-roots get push"
