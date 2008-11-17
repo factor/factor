@@ -162,7 +162,7 @@ M: object infer-call*
         { \ load-locals [ infer-load-locals ] }
         { \ get-local [ infer-get-local ] }
         { \ drop-locals [ infer-drop-locals ] }
-        { \ do-primitive [ unknown-primitive-error inference-error ] }
+        { \ do-primitive [ unknown-primitive-error inference-warning ] }
         { \ alien-invoke [ infer-alien-invoke ] }
         { \ alien-indirect [ infer-alien-indirect ] }
         { \ alien-callback [ infer-alien-callback ] }
