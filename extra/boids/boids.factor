@@ -76,7 +76,7 @@ VAR: separation-radius
 : constrain ( n a b -- n ) rot min max ;
 
 : angle-between ( vec vec -- angle )
-2dup v. -rot norm swap norm * / -1 1 constrain acos rad>deg ;
+  2dup v. -rot norm swap norm * / -1 1 constrain acos rad>deg ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
