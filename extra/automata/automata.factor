@@ -25,7 +25,7 @@ VAR: rule   VAR: rule-number
 : rule-values ( n -- seq ) >bin 8 CHAR: 0 pad-left string>digits ;
 
 : set-rule ( n -- )
-dup >rule-number rule-values rule-keys [ rule> set-at ] 2each ;
+  dup >rule-number rule-values rule-keys [ rule> set-at ] 2each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! step-capped-line
@@ -37,7 +37,7 @@ dup >rule-number rule-values rule-keys [ rule> set-at ] 2each ;
 : cap-line ( line -- 0-line-0 ) { 0 } prepend { 0 } append ;
 
 : wrap-line ( a-line-z -- za-line-za )
-dup peek 1array swap dup first 1array append append ;
+  dup peek 1array swap dup first 1array append append ;
 
 : step-line ( line -- new-line ) 3 <clumps> [ pattern>state ] map ;
 
