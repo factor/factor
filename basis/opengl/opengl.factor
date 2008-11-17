@@ -72,9 +72,9 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : (rect-vertices) ( dim -- vertices )
     {
         [ drop 0.5 0.5 ]
-        [ first 0.5 ]
-        [ [ first ] [ second ] bi ]
-        [ second 0.5 swap ]
+        [ first 0.5 - 0.5 ]
+        [ [ first 0.5 - ] [ second 0.5 - ] bi ]
+        [ second 0.5 - 0.5 swap ]
     } cleave 8 narray >c-float-array ;
 
 : rect-vertices ( dim -- )
