@@ -164,7 +164,7 @@ GENERIC: stack-size ( type -- size ) foldable
 
 M: string stack-size c-type stack-size ;
 
-M: c-type stack-size size>> ;
+M: c-type stack-size size>> cell align ;
 
 GENERIC: byte-length ( seq -- n ) flushable
 

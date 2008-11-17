@@ -10,8 +10,9 @@ M: float-regs param-regs drop { XMM0 XMM1 XMM2 XMM3 } ;
 
 M: x86.64 reserved-area-size 4 cells ;
 
-M: x86.64 struct-small-enough? ( size -- ? )
-    heap-size cell <= ;
+M: x86.64 struct-small-enough? heap-size { 1 2 4 8 } member? ;
+
+M: x86.64 value-struct? heap-size { 1 2 4 8 } member? ;
 
 M: x86.64 dummy-stack-params? f ;
 
