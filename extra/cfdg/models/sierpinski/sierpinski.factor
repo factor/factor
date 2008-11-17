@@ -1,6 +1,6 @@
 
 USING: kernel namespaces math opengl.gl opengl.glu ui ui.gadgets.slate
-       mortar random-weighted cfdg ;
+       random-weighted cfdg ;
 
 IN: cfdg.models.sierpinski
 
