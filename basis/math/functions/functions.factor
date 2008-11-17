@@ -146,7 +146,7 @@ M: real absq sq ;
 
 : ~ ( x y epsilon -- ? )
     {
-        { [ pick pick [ fp-nan? ] either? ] [ 3drop f ] }
+        { [ 2over [ fp-nan? ] either? ] [ 3drop f ] }
         { [ dup zero? ] [ drop number= ] }
         { [ dup 0 < ] [ ~rel ] }
         [ ~abs ]
