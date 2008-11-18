@@ -122,12 +122,12 @@ IN: io.windows.launcher.nt.tests
     "resource:basis/io/windows/nt/launcher/test" [
         <process>
             vm "-script" "env.factor" 3array >>command
-            { { "HOME" "XXX" } } >>environment
+            { { "USERPROFILE" "XXX" } } >>environment
             +prepend-environment+ >>environment-mode
         ascii <process-reader> contents
     ] with-directory eval
 
-    "HOME" swap at "XXX" =
+    "USERPROFILE" swap at "XXX" =
 ] unit-test
 
 2 [
