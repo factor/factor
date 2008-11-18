@@ -114,19 +114,29 @@ M: threaded-server handle-client* handler>> call ;
         ] when*
     ] unless ;
 
+: (start-server) ( threaded-server -- )
+    init-server
+    dup threaded-server [
+        dup name>> [
+            [ listen-on [ start-accept-loop ] parallel-each ]
+            [ ready>> raise-flag ]
+            bi
+        ] with-logging
+    ] with-variable ;
+
 PRIVATE>
 
 : start-server ( threaded-server -- )
-    init-server
-    dup secure-config>> [
-        dup threaded-server [
-            dup name>> [
-                [ listen-on [ start-accept-loop ] parallel-each ]
-                [ ready>> raise-flag ]
-                bi
-            ] with-logging
-        ] with-variable
-    ] with-secure-context ;
+    #! Only create a secure-context if we want to listen on
+    #! a secure port, otherwise start-server won't work at
+    #! all if SSL is not available.
+    dup secure>> [
+        dup secure-config>> [
+            (start-server)
+        ] with-secure-context
+    ] [
+        (start-server)
+    ] if ;
 
 : wait-for-server ( threaded-server -- )
     ready>> wait-for-flag ;
