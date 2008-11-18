@@ -22,8 +22,12 @@ TUPLE: ui-render-test < pack { first-time? initial: t } ;
 : message-window ( text -- )
     <label> "Message" open-window ;
 
+: twiddle ( bytes -- bytes )
+    #! On Windows, white is { 253 253 253 } ?
+    [ dup 253 = [ 2 + ] when ] map ;
+
 : check-rendering ( gadget -- )
-    gl-screenshot
+    gl-screenshot twiddle
     "resource:extra/ui/render/test/reference.bmp" load-bitmap array>>
     = "perfect" "needs work" ? "Your UI rendering is " prepend
     message-window ;
