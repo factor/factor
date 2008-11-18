@@ -189,13 +189,12 @@ boids> [ within-alignment-neighborhood? ] with filter ;
 : above? ( n a b -- ? ) nip > ;
 
 : wrap ( n a b -- n )
-{ { [ 3dup below? ]
-    [ 2nip ] }
-  { [ 3dup above? ]
-    [ drop nip ] }
-  { [ t ]
-    [ 2drop ] } }
-cond ;
+  {
+    { [ 3dup below? ] [ 2nip     ] }
+    { [ 3dup above? ] [ drop nip ] }
+    { [ t           ] [ 2drop    ] }
+  }
+  cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
