@@ -342,3 +342,7 @@ IN: regexp-tests
 [ { 0 3 } ] [ "abc" "(ab|a)(bc)?" <regexp> first-match ] unit-test
 
 [ { 23 24 } ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match ] unit-test
+
+[ t ] [ "a:b" ".+:?" <regexp> matches? ] unit-test
+
+[ 1 ] [ "hello" ".+?" <regexp> match length ] unit-test
