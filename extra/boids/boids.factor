@@ -83,7 +83,7 @@ VAR: separation-radius
 : relative-position ( self other -- v ) swap [ pos>> ] bi@ v- ;
 
 : relative-angle ( self other -- angle )
-over vel>> -rot relative-position angle-between ;
+  over vel>> -rot relative-position angle-between ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
