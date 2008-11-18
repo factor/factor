@@ -83,7 +83,7 @@ VAR: separation-radius
 : relative-position ( self other -- v ) swap [ pos>> ] bi@ v- ;
 
 : relative-angle ( self other -- angle )
-over vel>> -rot relative-position angle-between ;
+  over vel>> -rot relative-position angle-between ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -189,13 +189,12 @@ boids> [ within-alignment-neighborhood? ] with filter ;
 : above? ( n a b -- ? ) nip > ;
 
 : wrap ( n a b -- n )
-{ { [ 3dup below? ]
-    [ 2nip ] }
-  { [ 3dup above? ]
-    [ drop nip ] }
-  { [ t ]
-    [ 2drop ] } }
-cond ;
+  {
+    { [ 3dup below? ] [ 2nip     ] }
+    { [ 3dup above? ] [ drop nip ] }
+    { [ t           ] [ 2drop    ] }
+  }
+  cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

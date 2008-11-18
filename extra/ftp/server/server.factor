@@ -75,7 +75,7 @@ C: <ftp-list> ftp-list
 
 : handle-USER ( ftp-command -- )
     [
-        tokenized>> second client get (>>user)
+        drop
         331 "Please specify the password." server-response
     ] [
         2drop "bad USER" ftp-error
