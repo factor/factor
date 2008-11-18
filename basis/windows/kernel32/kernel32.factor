@@ -199,11 +199,11 @@ TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 : THREAD_PRIORITY_TIME_CRITICAL 15 ; inline
 
 C-STRUCT: OVERLAPPED
-    { "int" "internal" }
-    { "int" "internal-high" }
-    { "int" "offset" }
-    { "int" "offset-high" }
-    { "void*" "event" } ;
+    { "UINT_PTR" "internal" }
+    { "UINT_PTR" "internal-high" }
+    { "DWORD" "offset" }
+    { "DWORD" "offset-high" }
+    { "HANDLE" "event" } ;
 
 C-STRUCT: SYSTEMTIME
     { "WORD" "wYear" }
