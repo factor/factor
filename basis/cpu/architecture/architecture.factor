@@ -141,10 +141,10 @@ HOOK: %loop-entry cpu ( -- )
 HOOK: small-enough? cpu ( n -- ? )
 
 ! Is this structure small enough to be returned in registers?
-HOOK: struct-small-enough? cpu ( heap-size -- ? )
+HOOK: struct-small-enough? cpu ( c-type -- ? )
 
-! Do we pass value structs by value or hidden reference?
-HOOK: value-structs? cpu ( -- ? )
+! Do we pass this struct by value or hidden reference?
+HOOK: value-struct? cpu ( c-type -- ? )
 
 ! If t, all parameters are shadowed by dummy stack parameters
 HOOK: dummy-stack-params? cpu ( -- ? )
@@ -207,14 +207,3 @@ M: object %callback-return drop %return ;
 M: stack-params param-reg drop ;
 
 M: stack-params param-regs drop f ;
-
-: if-small-struct ( n size true false -- ? )
-    [ 2dup [ not ] [ struct-small-enough? ] bi* and ] 2dip
-    [ '[ nip @ ] ] dip if ;
-    inline
-
-: %unbox-struct ( n c-type -- )
-    [ %unbox-small-struct ] [ %unbox-large-struct ] if-small-struct ;
-
-: %box-struct ( n c-type -- )
-    [ %box-small-struct ] [ %box-large-struct ] if-small-struct ;

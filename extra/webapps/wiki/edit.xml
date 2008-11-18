@@ -16,7 +16,7 @@
 		</p>
 
 		<p>
-			<button>Save</button>
+			<button type="submit">Save</button>
 		</p>
 
 	</t:form>
