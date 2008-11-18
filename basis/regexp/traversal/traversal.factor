@@ -107,7 +107,8 @@ M: capture-group-off flag-action ( dfa-traverser flag -- )
 : increment-state ( dfa-traverser state -- dfa-traverser )
     [
         dup traverse-forward>>
-        [ 1+ ] [ 1- ] ? change-current-index
+        [ [ 1+ ] change-current-index ]
+        [ [ 1- ] change-current-index ] if
         dup current-state>> >>last-state
     ] dip
     first >>current-state ;

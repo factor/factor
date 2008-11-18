@@ -7,10 +7,11 @@ namespaces make sequences ftp io.unix.launcher.parser
 unicode.case splitting assocs classes io.servers.connection
 destructors calendar io.timeouts io.streams.duplex threads
 continuations math concurrency.promises byte-arrays
-io.backend sequences.lib tools.hexdump io.files.listing ;
+io.backend sequences.lib tools.hexdump io.files.listing
+io.streams.string ;
 IN: ftp.server
 
-TUPLE: ftp-client url mode state command-promise ;
+TUPLE: ftp-client url mode state command-promise user password ;
 
 : <ftp-client> ( url -- ftp-client )
     ftp-client new
@@ -140,16 +141,16 @@ ERROR: type-error type ;
     150 "Here comes the directory listing." server-response ;
 
 : finish-directory ( -- )
-    226 "Opening " server-response ;
+    226 "Directory send OK." server-response ;
 
 GENERIC: service-command ( stream obj -- )
 
 M: ftp-list service-command ( stream obj -- )
     drop
-    start-directory
-    [
+    start-directory [
         utf8 encode-output
-        directory. [ ftp-send ] each
+        [ current-directory get directory. ] with-string-writer string-lines
+        harvest [ ftp-send ] each
     ] with-output-stream
     finish-directory ;
 

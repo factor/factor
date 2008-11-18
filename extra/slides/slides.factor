@@ -48,19 +48,17 @@ IN: slides
 : $divider ( -- )
     [
         <gadget>
-        T{ gradient f
-           {
-             T{ rgba f 0.25 0.25 0.25 1.0 }
-             T{ rgba f 1.0 1.0 1.0 0.0 }
-           }
-         } >>interior
+        {
+            T{ rgba f 0.25 0.25 0.25 1.0 }
+            T{ rgba f 1.0 1.0 1.0 0.0 }
+        } <gradient> >>interior
         { 800 10 } >>dim
         { 1 0 } >>orientation
         gadget.
     ] ($block) ;
 
 : page-theme ( gadget -- )
-    T{ gradient f { T{ rgba f 0.8 0.8 1.0 1.0 } T{ rgba f 0.8 1.0 1.0 1.0 } } }
+    { T{ rgba f 0.8 0.8 1.0 1.0 } T{ rgba f 0.8 1.0 1.0 1.0 } } <gradient>
     >>interior drop ;
 
 : <page> ( list -- gadget )

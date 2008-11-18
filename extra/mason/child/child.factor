@@ -2,14 +2,26 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces make debugger sequences io.files
 io.launcher arrays accessors calendar continuations
-combinators.short-circuit mason.common mason.report mason.platform ;
+combinators.short-circuit mason.common mason.report
+mason.platform mason.config http.client ;
 IN: mason.child
 
 : make-cmd ( -- args )
-    [ gnu-make , "clean" , platform , ] { } make ;
+    gnu-make platform 2array ;
+
+: download-dlls ( -- )
+    target-os get "winnt" = [
+        "http://factorcode.org/dlls/"
+        target-cpu get "x86.64" = [ "64/" append ] when
+        [ "freetype6.dll" append ]
+        [ "zlib1.dll" append ] bi
+        [ download ] bi@
+    ] when ;
 
 : make-vm ( -- )
     "factor" [
+        download-dlls
+
         <process>
             make-cmd >>command
             "../compile-log" >>stdout

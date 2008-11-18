@@ -64,7 +64,7 @@ C-STRUCT: glyph
     { "FT_Pos" "advance-x" }
     { "FT_Pos" "advance-y" }
 
-    { "long" "format" }
+    { "intptr_t" "format" }
 
     { "int" "bitmap-rows" }
     { "int" "bitmap-width" }

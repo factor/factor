@@ -1,6 +1,6 @@
 USING: io io.files io.streams.string io.encodings.utf8
 html.templates html.templates.fhtml kernel
-tools.test sequences parser ;
+tools.test sequences parser splitting prettyprint ;
 IN: html.templates.fhtml.tests
 
 : test-template ( path -- ? )
@@ -8,8 +8,10 @@ IN: html.templates.fhtml.tests
     prepend
     [
         ".fhtml" append <fhtml> [ call-template ] with-string-writer
+        <string-reader> lines
     ] keep
-    ".html" append utf8 file-contents = ;
+    ".html" append utf8 file-lines
+    [ . . ] [ = ] 2bi ;
 
 [ t ] [ "example" test-template ] unit-test
 [ t ] [ "bug" test-template ] unit-test

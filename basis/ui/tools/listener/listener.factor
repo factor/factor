@@ -181,8 +181,8 @@ M: stack-display tool-scroller
 
 listener-gadget "toolbar" f {
     { f restart-listener }
-    { T{ key-down f f "CLEAR" } clear-output }
-    { T{ key-down f { C+ } "CLEAR" } clear-stack }
+    {  T{ key-down f { A+ } "c" } clear-output }
+    {  T{ key-down f { A+ } "C" } clear-stack }
     { T{ key-down f { C+ } "d" } com-end }
     { T{ key-down f f "F1" } listener-help }
 } define-command-map
