@@ -126,7 +126,7 @@ SYMBOL: fast-math-ops
 
 : math-method* ( word left right -- quot )
     3dup math-op
-    [ >r 3drop r> 1quotation ] [ drop math-method ] if ;
+    [ [ 3drop ] dip 1quotation ] [ drop math-method ] if ;
 
 : math-both-known? ( word left right -- ? )
     3dup math-op
@@ -157,13 +157,13 @@ SYMBOL: fast-math-ops
     ] bi@ append ;
 
 : each-derived-op ( word quot -- )
-    >r derived-ops r> each ; inline
+    [ derived-ops ] dip each ; inline
 
 : each-fast-derived-op ( word quot -- )
-    >r fast-derived-ops r> each ; inline
+    [ fast-derived-ops ] dip each ; inline
 
 : each-integer-derived-op ( word quot -- )
-    >r integer-derived-ops r> each ; inline
+    [ integer-derived-ops ] dip each ; inline
 
 [
     [

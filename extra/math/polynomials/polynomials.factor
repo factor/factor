@@ -4,46 +4,38 @@ USING: arrays kernel make math math.order math.vectors sequences shuffle
     splitting vectors ;
 IN: math.polynomials
 
-! Polynomials are vectors with the highest powers on the right:
-! { 1 1 0 1 } -> 1 + x + x^3
-! { } -> 0
-
-: powers ( n x -- seq )
-    #! Output sequence has n elements, { 1 x x^2 x^3 ... }
-    <array> 1 [ * ] accumulate nip ;
-
 <PRIVATE
 
-: 2pad-left ( p p n -- p p ) [ 0 pad-left ] curry bi@ ;
-: 2pad-right ( p p n -- p p ) [ 0 pad-right ] curry bi@ ;
-: pextend ( p p -- p p ) 2dup [ length ] bi@ max 2pad-right ;
-: pextend-left ( p p -- p p ) 2dup [ length ] bi@ max 2pad-left ;
+: 2pad-left ( p q n -- p q ) [ 0 pad-left ] curry bi@ ;
+: 2pad-right ( p q n -- p q ) [ 0 pad-right ] curry bi@ ;
+: pextend ( p q -- p q ) 2dup [ length ] bi@ max 2pad-right ;
+: pextend-left ( p q -- p q ) 2dup [ length ] bi@ max 2pad-left ;
 : unempty ( seq -- seq ) [ { 0 } ] when-empty ;
 : 2unempty ( seq seq -- seq seq ) [ unempty ] bi@ ;
 
 PRIVATE>
 
-: p= ( p p -- ? ) pextend = ;
+: powers ( n x -- seq )
+    <array> 1 [ * ] accumulate nip ;
+
+: p= ( p q -- ? ) pextend = ;
 
 : ptrim ( p -- p )
     dup length 1 = [ [ zero? ] trim-right ] unless ;
 
-: 2ptrim ( p p -- p p ) [ ptrim ] bi@ ;
-: p+ ( p p -- p ) pextend v+ ;
-: p- ( p p -- p ) pextend v- ;
+: 2ptrim ( p q -- p q ) [ ptrim ] bi@ ;
+: p+ ( p q -- r ) pextend v+ ;
+: p- ( p q -- r ) pextend v- ;
 : n*p ( n p -- n*p ) n*v ;
 
-! convolution
-: pextend-conv ( p p -- p p )
-    #! extend to: p_m + p_n - 1
+: pextend-conv ( p q -- p q )
     2dup [ length ] bi@ + 1- 2pad-right [ >vector ] bi@ ;
 
-: p* ( p p -- p )
-    #! Multiply two polynomials.
+: p* ( p q -- r )
     2unempty pextend-conv <reversed> dup length
     [ over length pick <slice> pick [ * ] 2map sum ] map 2nip reverse ;
 
-: p-sq ( p -- p-sq )
+: p-sq ( p -- p^2 )
     dup p* ;
 
 <PRIVATE
@@ -66,9 +58,11 @@ PRIVATE>
 
 PRIVATE>
 
-: p/mod ( a b -- / mod )
+: p/mod ( p q -- z w )
     p/mod-setup [ [ (p/mod) ] times ] V{ } make
     reverse nip swap 2ptrim pextend ;
+
+<PRIVATE
 
 : (pgcd) ( b a y x -- a d )
     dup V{ 0 } clone p= [
@@ -77,14 +71,14 @@ PRIVATE>
         tuck p/mod [ pick p* swap [ swapd p- ] dip ] dip (pgcd)
     ] if ;
 
-: pgcd ( p p -- p q )
+PRIVATE>
+
+: pgcd ( p q -- a d )
     swap V{ 0 } clone V{ 1 } clone 2swap (pgcd) [ >array ] bi@ ;
 
 : pdiff ( p -- p' )
-    #! Polynomial derivative.
     dup length v* { 0 } ?head drop ;
 
 : polyval ( p x -- p[x] )
-    #! Evaluate a polynomial.
     [ dup length ] dip powers v. ;
 

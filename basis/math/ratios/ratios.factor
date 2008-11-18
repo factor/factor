@@ -12,10 +12,10 @@ IN: math.ratios
     dup 1 number= [ drop ] [ <ratio> ] if ; inline
 
 : scale ( a/b c/d -- a*d b*c )
-    2>fraction >r * swap r> * swap ; inline
+    2>fraction [ * swap ] dip * swap ; inline
 
 : ratio+d ( a/b c/d -- b*d )
-    denominator swap denominator * ; inline
+    [ denominator ] bi@ * ; inline
 
 PRIVATE>
 
@@ -24,7 +24,7 @@ M: integer /
         "Division by zero" throw
     ] [
         dup 0 < [ [ neg ] bi@ ] when
-        2dup gcd nip tuck /i >r /i r> fraction>
+        2dup gcd nip tuck /i [ /i ] dip fraction>
     ] if ;
 
 M: ratio hashcode*
@@ -52,7 +52,7 @@ M: ratio >= scale >= ;
 
 M: ratio + 2dup scale + -rot ratio+d / ;
 M: ratio - 2dup scale - -rot ratio+d / ;
-M: ratio * 2>fraction * >r * r> / ;
+M: ratio * 2>fraction * [ * ] dip / ;
 M: ratio / scale / ;
 M: ratio /i scale /i ;
 M: ratio /f scale /f ;
