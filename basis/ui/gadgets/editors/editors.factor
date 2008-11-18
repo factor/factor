@@ -112,7 +112,7 @@ M: editor ungraft*
     line-height * ;
 
 : caret-loc ( editor -- loc )
-    [ editor-caret* ] keep 2dup loc>x 1+
+    [ editor-caret* ] keep 2dup loc>x
     rot first rot line>y 2array ;
 
 : caret-dim ( editor -- dim )

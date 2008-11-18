@@ -64,7 +64,8 @@ MACRO: all-enabled-client-state ( seq quot -- )
     [ 2 GL_FLOAT 0 ] dip glTexCoordPointer ; inline
 
 : line-vertices ( a b -- )
-    append >c-float-array gl-vertex-pointer ;
+    [ first2 [ 0.5 + ] bi@ ] bi@ 4 narray
+    >c-float-array gl-vertex-pointer ;
 
 : gl-line ( a b -- )
     line-vertices GL_LINES 0 2 glDrawArrays ;

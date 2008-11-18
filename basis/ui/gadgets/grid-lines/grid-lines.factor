@@ -27,7 +27,7 @@ M: grid-lines draw-boundary
         dup grid set
         dup rect-dim half-gap v- grid-dim set
         compute-grid
-        [ { 1 0 } draw-grid-lines ]
+        [ { -0.5 -0.5 } gl-translate { 1 0 } draw-grid-lines ]
         [
             { 0.5 -0.5 } gl-translate
             { 0 1 } draw-grid-lines
