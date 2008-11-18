@@ -6,7 +6,7 @@ HELP: enable-compiler
 { $description "Enables the optimizing compiler." } ;
 
 HELP: disable-compiler
-{ $description "Enables the optimizing compiler." } ;
+{ $description "Disable the optimizing compiler." } ;
 
 ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 "Normally, new word definitions are recompiled automatically. This can be changed:"
