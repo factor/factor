@@ -97,7 +97,7 @@ HELP: with-exit-continuation
 { $notes "Furnace actions and authentication realms wrap their execution in this combinator, allowing form validation failures and login requests, respectively, to immediately return an HTTP response to the client without running any more responder code." } ;
 
 ARTICLE: "furnace.extension-points" "Furnace extension points"
-"Furnace features such as session management, conversation scope and asides need to modify URLs in links and redirects, and insert hidden form fields, to implement state on top of the setateless HTTP protocol. In order to decouple the server-side state management code from the HTML templating code, a series of hooks are used."
+"Furnace features such as session management, conversation scope and asides need to modify URLs in links and redirects, and insert hidden form fields, to implement state on top of the stateless HTTP protocol. In order to decouple the server-side state management code from the HTML templating code, a series of hooks are used."
 $nl
 "Responders can implement methods on the following generic words:"
 { $subsection modify-query }
