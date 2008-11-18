@@ -41,9 +41,11 @@ PRIVATE>
 
 SYMBOL: user-cache
 
+: <user-cache> ( -- assoc )
+    all-users [ [ uid>> ] keep ] H{ } map>assoc ;
+
 : with-user-cache ( quot -- )
-    all-users [ [ uid>> ] keep ] H{ } map>assoc
-    user-cache rot with-variable ; inline
+    [ <user-cache> user-cache ] dip with-variable ; inline
 
 GENERIC: user-passwd ( obj -- passwd )
 
