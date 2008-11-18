@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel layouts system math alien.c-types
+USING: kernel layouts system math alien.c-types sequences
 compiler.cfg.registers cpu.architecture cpu.x86.assembler cpu.x86 ;
 IN: cpu.x86.64.winnt
 
@@ -22,6 +22,7 @@ M: x86.64 dummy-fp-params? t ;
 
 <<
 "longlong" "ptrdiff_t" typedef
+"longlong" "intptr_t" typedef
 "int" "long" typedef
 "uint" "ulong" typedef
 >>

@@ -436,6 +436,6 @@ M: long-long-type box-return ( type -- )
     "double" define-primitive-type
 
     "long" "ptrdiff_t" typedef
-
+    "long" "intptr_t" typedef
     "ulong" "size_t" typedef
 ] with-compilation-unit
