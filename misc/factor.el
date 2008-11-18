@@ -317,10 +317,9 @@ value from the existing code in the buffer."
 
 ;;; Factor mode indentation:
 
-(defvar factor-indent-width factor-default-indent-width
-  "Indentation width in factor buffers. A local variable.")
-
-(make-variable-buffer-local 'factor-indent-width)
+(make-variable-buffer-local
+ (defvar factor-indent-width factor-default-indent-width
+   "Indentation width in factor buffers. A local variable."))
 
 (defconst factor--regexp-word-start
   (let ((sws '("" ":" "TUPLE" "MACRO" "MACRO:" "M")))
@@ -340,45 +339,67 @@ value from the existing code in the buffer."
             (setq iw (current-indentation))))))
     iw))
 
-(defun factor--brackets-depth ()
-  "Returns number of brackets, not closed on previous lines."
-  (syntax-ppss-depth
-   (save-excursion
-     (syntax-ppss (line-beginning-position)))))
+(defsubst factor--ppss-brackets-depth ()
+  (nth 0 (syntax-ppss)))
+
+(defsubst factor--ppss-brackets-start ()
+  (nth 1 (syntax-ppss)))
+
+(defsubst factor--line-indent (pos)
+  (save-excursion (goto-char pos) (current-indentation)))
+
+(defconst factor--regex-closing-paren "[])}]")
+(defsubst factor--at-closing-paren-p ()
+  (looking-at factor--regex-closing-paren))
+
+(defsubst factor--at-first-char-p ()
+  (= (- (point) (line-beginning-position)) (current-indentation)))
+
+(defconst factor--regex-single-liner
+  (format "^%s" (regexp-opt '("USE:" "IN:" "PRIVATE>" "<PRIVATE"))))
+
+(defun factor--at-end-of-def ()
+  (or (looking-at ".*;[ \t]*$")
+      (looking-at factor--regex-single-liner)))
+
+(defun factor--indent-in-brackets ()
+  (save-excursion
+    (beginning-of-line)
+    (when (or (and (re-search-forward factor--regex-closing-paren
+                                      (line-end-position) t)
+                   (not (backward-char)))
+               (> (factor--ppss-brackets-depth) 0))
+      (let ((op (factor--ppss-brackets-start)))
+        (when (> (line-number-at-pos) (line-number-at-pos op))
+          (if (factor--at-closing-paren-p)
+              (factor--line-indent op)
+            (+ (factor--line-indent op) factor-indent-width)))))))
+
+(defun factor--indent-definition ()
+  (save-excursion
+    (beginning-of-line)
+    (when (looking-at "\\([^ ]\\|^\\)+:") 0)))
+
+(defun factor--indent-continuation ()
+  (save-excursion
+    (forward-line -1)
+    (beginning-of-line)
+    (if (bobp) 0
+      (if (looking-at "^[ \t]*$")
+          (factor--indent-continuation)
+        (if (factor--at-end-of-def)
+            (- (current-indentation) factor-indent-width)
+          (if (factor--indent-definition)
+              (+ (current-indentation) factor-indent-width)
+            (current-indentation)))))))
 
 (defun factor--calculate-indentation ()
   "Calculate Factor indentation for line at point."
-  (let ((not-indented t)
-        (cur-indent 0))
-    (save-excursion
-      (beginning-of-line)
-      (if (bobp)
-          (setq cur-indent 0)
-        (save-excursion
-          (while not-indented
-            ;; Check that we are inside open brackets
-            (save-excursion
-              (let ((cur-depth (factor--brackets-depth)))
-                (forward-line -1)
-                (setq cur-indent (+ (current-indentation)
-                                    (* factor-indent-width
-                                       (- cur-depth (factor--brackets-depth)))))
-                (setq not-indented nil)))
-            (forward-line -1)
-              ;; Check that we are after the end of previous word
-              (if (looking-at ".*;[ \t]*$")
-                  (progn
-                    (setq cur-indent (- (current-indentation) factor-indent-width))
-                    (setq not-indented nil))
-                ;; Check that we are after the start of word
-                (if (looking-at factor--regexp-word-start)
-                    (progn
-                      (message "inword")
-                      (setq cur-indent (+ (current-indentation) factor-indent-width))
-                      (setq not-indented nil))
-                  (if (bobp)
-                      (setq not-indented nil))))))))
-    cur-indent))
+  (or (and (bobp) 0)
+      (factor--indent-definition)
+      (factor--indent-in-brackets)
+      (factor--indent-continuation)
+      0))
 
 (defun factor-indent-line ()
   "Indent current line as Factor code"
@@ -420,11 +441,15 @@ value from the existing code in the buffer."
 
 ;;; Factor listener mode
 
+;;;###autoload
 (define-derived-mode factor-listener-mode comint-mode "Factor Listener")
 
 (define-key factor-listener-mode-map [f8] 'factor-refresh-all)
 
+;;;###autoload
 (defun run-factor ()
+  "Start a factor listener inside emacs, or switch to it if it
+already exists."
   (interactive)
   (switch-to-buffer
    (make-comint-in-buffer "factor" nil (expand-file-name factor-binary) nil
@@ -433,6 +458,8 @@ value from the existing code in the buffer."
   (factor-listener-mode))
 
 (defun factor-refresh-all ()
+  "Reload source files and documentation for all loaded
+vocabularies which have been modified on disk."
   (interactive)
   (comint-send-string "*factor*" "refresh-all\n"))
 

@@ -109,7 +109,7 @@ void primitive_fixnum_shift(void)
 	}
 	else if(y < WORD_SIZE - TAG_BITS)
 	{
-		F_FIXNUM mask = -(1L << (WORD_SIZE - 1 - TAG_BITS - y));
+		F_FIXNUM mask = -((F_FIXNUM)1 << (WORD_SIZE - 1 - TAG_BITS - y));
 		if((x > 0 && (x & mask) == 0) || (x & mask) == mask)
 		{
 			dpush(tag_fixnum(x << y));

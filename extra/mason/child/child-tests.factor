@@ -1,7 +1,7 @@
 IN: mason.child.tests
 USING: mason.child mason.config tools.test namespaces ;
 
-[ { "make" "clean" "winnt-x86-32" } ] [
+[ { "make" "winnt-x86-32" } ] [
     [
         "winnt" target-os set
         "x86.32" target-cpu set
@@ -9,7 +9,7 @@ USING: mason.child mason.config tools.test namespaces ;
     ] with-scope
 ] unit-test
 
-[ { "make" "clean" "macosx-x86-32" } ] [
+[ { "make" "macosx-x86-32" } ] [
     [
         "macosx" target-os set
         "x86.32" target-cpu set
@@ -17,7 +17,7 @@ USING: mason.child mason.config tools.test namespaces ;
     ] with-scope
 ] unit-test
 
-[ { "gmake" "clean" "netbsd-ppc" } ] [
+[ { "gmake" "netbsd-ppc" } ] [
     [
         "netbsd" target-os set
         "ppc" target-cpu set

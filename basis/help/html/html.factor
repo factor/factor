@@ -10,17 +10,15 @@ IN: help.html
 
 : escape-char ( ch -- )
     dup H{
-        { CHAR: " "__quote__" }
+        { CHAR: " "__quo__" }
         { CHAR: * "__star__" }
         { CHAR: : "__colon__" }
         { CHAR: < "__lt__" }
         { CHAR: > "__gt__" }
-        { CHAR: ? "__question__" }
-        { CHAR: \\ "__backslash__" }
+        { CHAR: ? "__que__" }
+        { CHAR: \\ "__back__" }
         { CHAR: | "__pipe__" }
-        { CHAR: _ "__underscore__" }
         { CHAR: / "__slash__" }
-        { CHAR: \\ "__backslash__" }
         { CHAR: , "__comma__" }
         { CHAR: @ "__at__" }
     } at [ % ] [ , ] ?if ;
@@ -117,10 +115,10 @@ M: result link-href href>> ;
     [ [ title>> ] compare ] sort ;
 
 : article-apropos ( string -- results )
-    "articles.idx" temp-file offline-apropos ;
+    "articles.idx" offline-apropos ;
 
 : word-apropos ( string -- results )
-    "words.idx" temp-file offline-apropos ;
+    "words.idx" offline-apropos ;
 
 : vocab-apropos ( string -- results )
-    "vocabs.idx" temp-file offline-apropos ;
+    "vocabs.idx" offline-apropos ;

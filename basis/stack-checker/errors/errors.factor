@@ -108,3 +108,9 @@ M: inconsistent-recursive-call-error error.
     "The recursive word " write
     word>> pprint
     " calls itself with a different set of quotation parameters than were input" print ;
+
+TUPLE: unknown-primitive-error ;
+
+M: unknown-primitive-error error.
+    drop
+    "Cannot determine stack effect statically" print ;
