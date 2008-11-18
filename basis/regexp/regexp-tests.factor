@@ -46,6 +46,14 @@ IN: regexp-tests
 [ t ] [ "a" ".+" <regexp> matches? ] unit-test
 [ t ] [ "ab" ".+" <regexp> matches? ] unit-test
 
+[ t ] [ " " "[\\s]" <regexp> matches? ] unit-test
+[ f ] [ "a" "[\\s]" <regexp> matches? ] unit-test
+[ f ] [ " " "[\\S]" <regexp> matches? ] unit-test
+[ t ] [ "a" "[\\S]" <regexp> matches? ] unit-test
+[ f ] [ " " "[\\w]" <regexp> matches? ] unit-test
+[ t ] [ "a" "[\\w]" <regexp> matches? ] unit-test
+[ t ] [ " " "[\\W]" <regexp> matches? ] unit-test
+[ f ] [ "a" "[\\W]" <regexp> matches? ] unit-test
 
 [ t ] [ "" "a|b*|c+|d?" <regexp> matches? ] unit-test
 [ t ] [ "a" "a|b*|c+|d?" <regexp> matches? ] unit-test
