@@ -28,7 +28,7 @@ IN: regexp
 : match ( string regexp -- pair )
     <dfa-traverser> do-match return-match ;
 
-: match* ( string regexp -- pair )
+: match* ( string regexp -- pair captured-groups )
     <dfa-traverser> do-match [ return-match ] [ captured-groups>> ] bi ;
 
 : matches? ( string regexp -- ? )
