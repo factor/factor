@@ -57,6 +57,8 @@ IN: regexp-tests
 
 [ t ] [ "/" "\\/" <regexp> matches? ] unit-test
 
+[ t ] [ "a" R' a'i matches? ] unit-test
+
 [ t ] [ "" "a|b*|c+|d?" <regexp> matches? ] unit-test
 [ t ] [ "a" "a|b*|c+|d?" <regexp> matches? ] unit-test
 [ t ] [ "c" "a|b*|c+|d?" <regexp> matches? ] unit-test
