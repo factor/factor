@@ -18,7 +18,7 @@ IN: hardware-info.windows
 : processor-architecture ( -- n )
     system-info SYSTEM_INFO-dwOemId HEX: ffff0000 bitand ;
 
-: os-version
+: os-version ( -- os-version )
     "OSVERSIONINFO" <c-object>
     "OSVERSIONINFO" heap-size over set-OSVERSIONINFO-dwOSVersionInfoSize
     [ GetVersionEx ] keep swap zero? [ win32-error ] when ;
@@ -67,4 +67,4 @@ IN: hardware-info.windows
 {
     { [ os wince? ] [ "hardware-info.windows.ce" ] }
     { [ os winnt? ] [ "hardware-info.windows.nt" ] }
-} cond [ require ] when* >>
+} cond require >>

@@ -2,6 +2,9 @@ USING: regexp tools.test kernel sequences regexp.parser
 regexp.traversal eval ;
 IN: regexp-tests
 
+\ <regexp> must-infer
+\ matches? must-infer
+
 [ f ] [ "b" "a*" <regexp> matches? ] unit-test
 [ t ] [ "" "a*" <regexp> matches? ] unit-test
 [ t ] [ "a" "a*" <regexp> matches? ] unit-test

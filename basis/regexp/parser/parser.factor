@@ -137,7 +137,7 @@ ERROR: bad-special-group string ;
 DEFER: (parse-regexp)
 : nested-parse-regexp ( token ? -- )
     [ push-stack (parse-regexp) pop-stack ] dip
-    [ <negation> ] when pop-stack boa push-stack ;
+    [ <negation> ] when pop-stack new swap >>term push-stack ;
 
 ! non-capturing groups
 : (parse-special-group) ( -- )
