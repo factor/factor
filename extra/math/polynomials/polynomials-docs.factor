@@ -40,7 +40,7 @@ HELP: ptrim
 HELP: 2ptrim
 { $values { "p" "a polynomial" } { "q" "a polynomial" } { "p" "a polynomial" } { "q" "a polynomial" } }
 { $description "Trims excess zeros from two polynomials." }
-{ $examples { $example "USING: math.polynomials prettyprint ;" "{ 0 1 0 0 } { 1 0 0 } 2ptrim swap . ." "{ 0 1 }\n{ 1 }" } } ;
+{ $examples { $example "USING: kernel math.polynomials prettyprint ;" "{ 0 1 0 0 } { 1 0 0 } 2ptrim swap . ." "{ 0 1 }\n{ 1 }" } } ;
 
 HELP: p+
 { $values { "p" "a polynomial" } { "q" "a polynomial" } { "r" "a polynomial" } }
@@ -60,7 +60,7 @@ HELP: n*p
 HELP: pextend-conv
 { $values { "p" "a polynomial" } { "q" "a polynomial" } { "p" "a polynomial" } { "q" "a polynomial" } }
 { $description "Convulution, extending to " { $snippet "p_m + q_n - 1" } "." }
-{ $examples { $example "USING: math.polynomials prettyprint ;" "{ 1 0 1 } { 0 1 } pextend-conv swap . ." "V{ 1 0 1 0 }\nV{ 0 1 0 0 }" } } ;
+{ $examples { $example "USING: kernel math.polynomials prettyprint ;" "{ 1 0 1 } { 0 1 } pextend-conv swap . ." "V{ 1 0 1 0 }\nV{ 0 1 0 0 }" } } ;
 
 HELP: p*
 { $values { "p" "a polynomial" } { "q" "a polynomial" } { "r" "a polynomial" } }
@@ -75,13 +75,18 @@ HELP: p-sq
 HELP: p/mod
 { $values { "p" "a polynomial" } { "q" "a polynomial" } { "z" "a polynomial" } { "w" "a polynomial" } }
 { $description "Computes to quotient " { $snippet "z" } " and remainder " { $snippet "w" } " of dividing " { $snippet "p" } " by " { $snippet "q" } "." }
-{ $examples { $example "USING: math.polynomials prettyprint ;" "{ 1 1 1 1 } { 3 1 } p/mod swap . ." "V{ 7 -2 1 }\nV{ -20 0 0 }" } } ;
+{ $examples { $example "USING: kernel math.polynomials prettyprint ;" "{ 1 1 1 1 } { 3 1 } p/mod swap . ." "V{ 7 -2 1 }\nV{ -20 0 0 }" } } ;
 
 HELP: pgcd
 { $values { "p" "a polynomial" } { "q" "a polynomial" } { "a" "a polynomial" } { "d" "a polynomial" } }
 { $description "Computes the greatest common divisor " { $snippet "d" } " of " { $snippet "p" } " and " { $snippet "q" } ", and another value " { $snippet "a" } " satisfying:" { $code "a*q = d mod p" } }
 { $notes "GCD in the case of polynomials is a monic polynomial of the highest possible degree that divides into both " { $snippet "p" } " and " { $snippet "q" } "." }
-{ $examples { $example "USING: math.polynomials prettyprint ;" "{ 1 1 1 1} { 1 1 } pgcd swap . ." "{ 0 0 }\n{ 1 1 }" } } ;
+{ $examples
+    { $example "USING: kernel math.polynomials prettyprint ;"
+               "{ 1 1 1 1 } { 1 1 } pgcd [ . ] bi@"
+               "{ 0 0 }\n{ 1 1 }"
+    }
+} ;
 
 HELP: pdiff
 { $values { "p" "a polynomial" } { "p'" "a polynomial" } }
