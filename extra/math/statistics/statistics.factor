@@ -5,20 +5,15 @@ USING: arrays combinators kernel math math.analysis math.functions sequences
 IN: math.statistics
 
 : mean ( seq -- n )
-    #! arithmetic mean, sum divided by length
     [ sum ] [ length ] bi / ;
 
 : geometric-mean ( seq -- n )
-    #! geometric mean, nth root of product
     [ length ] [ product ] bi nth-root ;
 
 : harmonic-mean ( seq -- n )
-    #! harmonic mean, reciprocal of sum of reciprocals.
-    #! positive reals only
     [ recip ] sigma recip ;
 
 : median ( seq -- n )
-    #! middle number if odd, avg of two middle numbers if even
     natural-sort dup length even? [
         [ midpoint@ dup 1- 2array ] keep nths mean
     ] [
@@ -26,11 +21,10 @@ IN: math.statistics
     ] if ;
 
 : range ( seq -- n )
-    #! max - min
     minmax swap - ;
 
 : var ( seq -- x )
-    #! variance, normalize by N-1
+    #! normalize by N-1
     dup length 1 <= [
         drop 0
     ] [
@@ -39,11 +33,9 @@ IN: math.statistics
     ] if ;
 
 : std ( seq -- x )
-    #! standard deviation, sqrt of variance
     var sqrt ;
 
 : ste ( seq -- x )
-    #! standard error, standard deviation / sqrt ( length of sequence )
     [ std ] [ length ] bi sqrt / ;
 
 : ((r)) ( mean(x) mean(y) {x} {y} -- (r) )
