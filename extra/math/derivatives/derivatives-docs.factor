@@ -90,7 +90,6 @@ HELP: derivative-func
             "            [ cos ]"
             "       bi - abs"
             "] map minmax"
-            
         }
     }
 } ;
@@ -100,4 +99,5 @@ ARTICLE: "derivatives" "The Derivative Toolkit"
 { $subsection derivative }
 { $subsection derivative-func }
 { $subsection (derivative) } ;
+
 ABOUT: "derivatives"

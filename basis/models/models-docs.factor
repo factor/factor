@@ -66,11 +66,11 @@ HELP: set-model
 { set-model change-model (change-model) } related-words
 
 HELP: change-model
-{ $values { "model" model } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } }
+{ $values { "model" model } { "quot" { $quotation "( obj -- newobj )" } } }
 { $description "Applies the quotation to the current value of the model to yield a new value, then changes the value of the model to the new value, and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
 
 HELP: (change-model)
-{ $values { "model" model } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } }
+{ $values { "model" model } { "quot" { $quotation "( obj -- newobj )" } } }
 { $description "Applies the quotation to the current value of the model to yield a new value, then changes the value of the model to the new value without notifying any observers registered with " { $link add-connection } "." }
 { $notes "There are very few reasons for user code to call this word. Instead, call " { $link change-model } ", which notifies observers." } ;
 

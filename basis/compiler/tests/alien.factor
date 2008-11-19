@@ -147,13 +147,21 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
 
 ! Make sure XT doesn't get clobbered in stack frame
 
-: ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a ptr -- result y )
-    "void"
+: ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result y )
+    "int"
     f "ffi_test_31"
     { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
     alien-invoke gc 3 ;
 
-[ 3 ] [ 42 [ ] each ffi_test_31 ] unit-test
+[ 861 3 ] [ 42 [ ] each ffi_test_31 ] unit-test
+
+: ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
+    "float"
+    f "ffi_test_31_point_5"
+    { "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" }
+    alien-invoke ;
+
+[ 861.0 ] [ 42 [ >float ] each ffi_test_31_point_5 ] unit-test
 
 FUNCTION: longlong ffi_test_21 long x long y ;
 

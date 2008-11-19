@@ -204,14 +204,6 @@ typedef struct {
 typedef struct {
 	CELL header;
 	/* tagged */
-	CELL obj;
-	/* tagged */
-	CELL quot;
-} F_CURRY;
-
-typedef struct {
-	CELL header;
-	/* tagged */
 	CELL length;
 } F_CALLSTACK;
 

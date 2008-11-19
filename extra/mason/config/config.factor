@@ -33,10 +33,23 @@ target-os get-global [
 ! Keep test-log around?
 SYMBOL: builder-debug
 
-! Boolean. Do we release binaries and update the clean branch?
-SYMBOL: upload-to-factorcode
+SYMBOL: upload-help?
 
-! The below are only needed if upload-to-factorcode is true.
+! The below are only needed if upload-help is true.
+
+! Host with HTML help
+SYMBOL: help-host
+
+! Username to log in.
+SYMBOL: help-username
+
+! Directory to upload docs to.
+SYMBOL: help-directory
+
+! Boolean. Do we release binaries and update the clean branch?
+SYMBOL: upload-to-factorcode?
+
+! The below are only needed if upload-to-factorcode? is true.
 
 ! Host with clean git repo.
 SYMBOL: branch-host

@@ -10,19 +10,19 @@ $nl
 "A button can be selected, which is distinct from being pressed. This state is held in the " { $snippet "selected?" } " slot, and is used by the " { $link <toggle-buttons> } " word to construct a row of buttons for choosing among several alternatives." } ;
 
 HELP: <button>
-{ $values { "label" gadget } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } { "button" "a new " { $link button } } }
+{ $values { "label" gadget } { "quot" { $quotation "( button -- )" } } { "button" "a new " { $link button } } }
 { $description "Creates a new " { $link button } " which calls the quotation when clicked. The given gadget becomes the button's only child." } ;
 
 HELP: <roll-button>
-{ $values { "label" "a label specifier" } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } { "button" button } }
+{ $values { "label" "a label specifier" } { "quot" { $quotation "( button -- )" } } { "button" button } }
 { $description "Creates a new " { $link button } " which is displayed with a solid border when it is under the mouse, informing the user that the gadget is clickable." } ;
 
 HELP: <bevel-button>
-{ $values { "label" "a label specifier" } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } { "button" button } }
+{ $values { "label" "a label specifier" } { "quot" { $quotation "( button -- )" } } { "button" button } }
 { $description "Creates a new " { $link button } " with a shaded border which is always visible. The button appearance changes in response to mouse gestures using a " { $link button-paint } "." } ;
 
 HELP: <repeat-button>
-{ $values { "label" object } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } { "button" repeat-button } }
+{ $values { "label" object } { "quot" { $quotation "( button -- )" } } { "button" repeat-button } }
 { $description "Creates a new " { $link button } " derived from a " { $link <bevel-button> } " which calls the quotation every 100 milliseconds as long as the mouse button is held down." } ;
 
 HELP: button-paint

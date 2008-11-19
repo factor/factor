@@ -3,6 +3,12 @@
 USING: help.markup help.syntax ;
 IN: json.reader
 
-HELP: json> "( string -- object )"
-{ $values { "string" "a string in JSON format" } { "object" "yhe object deserialized from the JSON string" } }
+HELP: json>
+{ $values { "string" "a string in JSON format" } { "object" "a deserialized object" } }
 { $description "Deserializes the JSON formatted string into a Factor object. JSON objects are converted to Factor hashtables. All other JSON objects convert to their obvious Factor equivalents." } ;
+
+ARTICLE: "json.reader" "JSON reader"
+"The " { $vocab-link "json.reader" } " vocabulary defines a word for parsing strings in JSON format."
+{ $subsection json> } ;
+
+ABOUT: "json.reader"

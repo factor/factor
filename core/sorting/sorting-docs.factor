@@ -19,7 +19,7 @@ $nl
 ABOUT: "sequences-sorting"
 
 HELP: sort
-{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj1 obj2 -- <=> )" } } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" "a sequence" } { "quot" { $quotation "( obj1 obj2 -- <=> )" } } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements into a new array." } ;
 
 HELP: sort-keys

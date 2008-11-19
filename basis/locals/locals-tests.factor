@@ -355,6 +355,10 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
     swapd [ eq? ] [ eq? ] 2bi*
 ] unit-test
 
+:: mutable-local-in-literal-test ( a! -- b ) a 1 + a! { a } ;
+
+[ { 4 } ] [ 3 mutable-local-in-literal-test ] unit-test
+
 :: compare-case ( obj1 obj2 lt-quot eq-quot gt-quot -- )
     obj1 obj2 <=> {
         { +lt+ [ lt-quot call ] }

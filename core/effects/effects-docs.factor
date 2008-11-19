@@ -68,5 +68,5 @@ HELP: effect>string
 } ;
 
 HELP: stack-effect
-{ $values { "word" word } { "effect/f" "an " { $link effect } " or " { $link f } } }
+{ $values { "word" word } { "effect/f" { $maybe effect } } }
 { $description "Outputs the stack effect of a word; either a stack effect declared with " { $link POSTPONE: ( } ", or an inferred stack effect (see " { $link "inference" } "." } ;

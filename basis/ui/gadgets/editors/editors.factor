@@ -120,7 +120,7 @@ M: editor ungraft*
 
 : scroll>caret ( editor -- )
     dup graft-state>> second [
-        dup caret-loc over caret-dim { 1 0 } v+ <rect>
+        dup caret-loc over caret-dim <rect>
         over scroll>rect
     ] when drop ;
 

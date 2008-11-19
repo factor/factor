@@ -23,7 +23,7 @@ SYMBOL: viewport-translation
     [ rect-intersect ] keep
     dim>> dup { 0 1 } v* viewport-translation set
     { 0 0 } over gl-viewport
-    -0.5 swap first2 [ 0.5 - ] [ 0.5 + ] bi* 0.5 gluOrtho2D
+    0 swap first2 0 gluOrtho2D
     clip set
     do-clip ;
 

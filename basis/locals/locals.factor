@@ -229,6 +229,8 @@ M: tuple rewrite-element
 
 M: local rewrite-element , ;
 
+M: local-reader rewrite-element , ;
+
 M: word rewrite-element literalize , ;
 
 M: object rewrite-element , ;

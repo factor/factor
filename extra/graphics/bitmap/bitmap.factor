@@ -1,11 +1,11 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: alien arrays byte-arrays combinators summary
-io.backend graphics.viewer io io.binary io.files kernel libc
-math math.functions namespaces opengl opengl.gl prettyprint
-sequences strings ui ui.gadgets.panes io.encodings.binary
-accessors grouping ;
+USING: alien arrays byte-arrays combinators summary io.backend
+graphics.viewer io io.binary io.files kernel libc math
+math.functions math.bitwise namespaces opengl opengl.gl
+prettyprint sequences strings ui ui.gadgets.panes
+io.encodings.binary accessors grouping ;
 IN: graphics.bitmap
 
 ! Currently can only handle 24bit bitmaps.
@@ -56,8 +56,8 @@ M: bitmap-magic summary
 
 : parse-bitmap-header ( bitmap -- )
     4 read le> >>header-length
-    4 read le> >>width
-    4 read le> >>height
+    4 read signed-le> >>width
+    4 read signed-le> >>height
     2 read le> >>planes
     2 read le> >>bit-count
     4 read le> >>compression

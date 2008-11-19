@@ -12,11 +12,11 @@ FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, voi
 : make-int-array ( seq -- byte-array )
     [ <int> ] map concat ;
 
-: (sysctl-query) ( name namelen oldp oldlenp -- oldp error/f )
-    over >r f 0 sysctl io-error r> ;
+: (sysctl-query) ( name namelen oldp oldlenp -- oldp )
+    over [ f 0 sysctl io-error ] dip ;
 
 : sysctl-query ( seq n -- byte-array )
-    >r [ make-int-array ] [ length ] bi r>
+    [ [ make-int-array ] [ length ] bi ] dip
     [ <byte-array> ] [ <uint> ] bi (sysctl-query) ;
 
 : sysctl-query-string ( seq -- n )

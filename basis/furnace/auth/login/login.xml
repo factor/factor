@@ -35,7 +35,7 @@
 
 		<p>
 
-			<button>Log in</button>
+			<button type="submit">Log in</button>
 			<t:validation-errors />
 
 		</p>

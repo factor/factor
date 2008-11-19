@@ -156,8 +156,8 @@ HELP: interval*
 { $description "Multiplies two intervals." } ;
 
 HELP: interval-shift
-{ $values { "i1" interval } { "i2" interval } { "i3" "an " { $link interval } " or " { $link f } } }
-{ $description "Shifts " { $snippet "i1" } " to the left by " { $snippet "i2" } " bits. Outputs " { $link f } " if the endpoints of either " { $snippet "i1" } " or " { $snippet "i2" } " are not integers." } ;
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Shifts " { $snippet "i1" } " to the left by " { $snippet "i2" } " bits. Outputs " { $link full-interval } " if the endpoints of either " { $snippet "i1" } " or " { $snippet "i2" } " are not integers." } ;
 
 HELP: interval-max
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
@@ -253,8 +253,8 @@ HELP: points>interval
 ;
 
 HELP: interval-shift-safe
-{ $values { "i1" interval } { "i2" interval } { "i3" "an " { $link interval } " or " { $link f } } }
-{ $description "Shifts " { $snippet "i1" } " to the left by " { $snippet "i2" } " bits. Outputs " { $link f } " if the endpoints of either " { $snippet "i1" } " or " { $snippet "i2" } " are not integers, or if the endpoints of " { $snippet "i2" } " are so large that the resulting interval will consume too much memory." } ;
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Shifts " { $snippet "i1" } " to the left by " { $snippet "i2" } " bits. Outputs " { $link full-interval } " if the endpoints of either " { $snippet "i1" } " or " { $snippet "i2" } " are not integers, or if the endpoints of " { $snippet "i2" } " are so large that the resulting interval will consume too much memory." } ;
 
 HELP: incomparable
 { $description "Output value from " { $link interval<= } ", " { $link interval< } ", " { $link interval>= } " and " { $link interval> } " in the case where the result of the comparison is ambiguous." } ;
@@ -304,20 +304,20 @@ HELP: interval>points
 { $description "Outputs both endpoints of the interval." } ;
 
 HELP: assume<
-{ $values { "i1" interval } { "i2" interval } { "i3" "an " { $link interval } " or " { $link f } } }
-{ $description "Outputs the interval consisting of points from " { $snippet "i1" } " which are less than all points in " { $snippet "i2" } ". If the resulting interval is empty, outputs " { $link f } "." } ;
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Outputs the interval consisting of points from " { $snippet "i1" } " which are less than all points in " { $snippet "i2" } "." } ;
 
 HELP: assume<=
-{ $values { "i1" interval } { "i2" interval } { "i3" "an " { $link interval } " or " { $link f } } }
-{ $description "Outputs the interval consisting of points from " { $snippet "i1" } " which are less or equal to all points in " { $snippet "i2" } ". If the resulting interval is empty, outputs " { $link f } "." } ;
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Outputs the interval consisting of points from " { $snippet "i1" } " which are less or equal to all points in " { $snippet "i2" } "." } ;
 
 HELP: assume>
 { $values { "i1" interval } { "i2" interval } { "i3" "an " { $link interval } " or " { $link f } } }
 { $description "Outputs the interval consisting of points from " { $snippet "i1" } " which are greater than all points in " { $snippet "i2" } ". If the resulting interval is empty, outputs " { $link f } "." } ;
 
 HELP: assume>=
-{ $values { "i1" interval } { "i2" interval } { "i3" "an " { $link interval } " or " { $link f } } }
-{ $description "Outputs the interval consisting of points from " { $snippet "i1" } " which are greater than or equal to all points in " { $snippet "i2" } ". If the resulting interval is empty, outputs " { $link f } "." } ;
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Outputs the interval consisting of points from " { $snippet "i1" } " which are greater than or equal to all points in " { $snippet "i2" } "." } ;
 
 HELP: integral-closure
 { $values { "i1" "an " { $link interval } " with integer end-points" } { "i2" "a closed " { $link interval } " with integer end-points" } }

@@ -8,7 +8,7 @@ TUPLE: range
 { step read-only } ;
 
 : <range> ( a b step -- range )
-    >r over - r>
+    [ over - ] dip
     [ / 1+ 0 max >integer ] keep
     range boa ; inline
 

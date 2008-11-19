@@ -13,7 +13,7 @@ ARTICLE: "tools.annotations" "Word annotations"
 ABOUT: "tools.annotations"
 
 HELP: annotate
-{ $values { "word" "a word" } { "quot" "a quotation with stack effect " { $snippet "( word def -- def )" } } }
+{ $values { "word" "a word" } { "quot" { $quotation "( word def -- def )" } } }
 { $description "Changes a word definition to the result of applying a quotation to the old definition." }
 { $notes "This word is used to implement " { $link watch } "." } ;
 
@@ -28,7 +28,7 @@ HELP: breakpoint
 { $description "Annotates a word definition to enter the single stepper when executed." } ;
 
 HELP: breakpoint-if
-{ $values { "quot" "a quotation with stack effect" { $snippet "( -- ? )" } } { "word" word } }
+{ $values { "quot" { $quotation "( -- ? )" } } { "word" word } }
 { $description "Annotates a word definition to enter the single stepper if the quotation yields true." } ;
 
 HELP: annotate-methods

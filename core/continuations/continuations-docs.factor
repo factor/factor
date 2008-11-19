@@ -108,17 +108,17 @@ HELP: >continuation<
 { $description "Takes a continuation apart into its constituents." } ;
 
 HELP: ifcc
-{ $values { "capture" "a quotation with stack effect " { $snippet "( continuation -- )" } } { "restore" quotation } }
+{ $values { "capture" { $quotation "( continuation -- )" } } { "restore" quotation } }
 { $description "Reifies a continuation from the point immediately after which this word returns, and passes it to " { $snippet "capture" } ". When the continuation is restored, execution resumes and "{ $snippet "restore" } " is called." } ;
 
 { callcc0 continue callcc1 continue-with ifcc } related-words
 
 HELP: callcc0
-{ $values { "quot" "a quotation with stack effect " { $snippet "( continuation -- )" } } }
+{ $values { "quot" { $quotation "( continuation -- )" } } }
 { $description "Applies the quotation to the current continuation, which is reified from the point immediately after which the caller returns. The " { $link continue } " word resumes the continuation." } ;
 
 HELP: callcc1
-{ $values { "quot" "a quotation with stack effect " { $snippet "( continuation -- )" } } { "obj" "an object provided when resuming the continuation" } }
+{ $values { "quot" { $quotation "( continuation -- )" } } { "obj" "an object provided when resuming the continuation" } }
 { $description "Applies the quotation to the current continuation, which is reified from the point immediately after which the caller returns. The " { $link continue-with } " word resumes the continuation, passing a value back to the original execution context." } ;
 
 HELP: continue
@@ -160,7 +160,7 @@ HELP: cleanup
 { $description "Calls the " { $snippet "try" } " quotation. If no error is thrown, calls " { $snippet "cleanup-always" } " without restoring the data stack. If an error is thrown, restores the data stack, calls " { $snippet "cleanup-always" } " followed by " { $snippet "cleanup-error" } ", and rethrows the error." } ;
 
 HELP: recover
-{ $values { "try" quotation } { "recovery" "a quotation with stack effect " { $snippet "( error -- )" } } }
+{ $values { "try" quotation } { "recovery" { $quotation "( error -- )" } } }
 { $description "Calls the " { $snippet "try" } " quotation. If an exception is thrown in the dynamic extent of the " { $snippet "try" } " quotation, restores the data stack and calls the " { $snippet "recovery" } " quotation to handle the error." } ;
 
 HELP: ignore-errors

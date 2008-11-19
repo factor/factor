@@ -60,13 +60,13 @@ TUPLE: link attributes clickable ;
         [ [ [ blank? ] trim ] change-text ] when
     ] map ;
 
-: find-by-id ( vector id -- vector' )
+: find-by-id ( vector id -- vector' elt/f )
     '[ attributes>> "id" at _ = ] find ;
     
-: find-by-class ( vector id -- vector' )
+: find-by-class ( vector id -- vector' elt/f )
     '[ attributes>> "class" at _ = ] find ;
 
-: find-by-name ( vector string -- vector )
+: find-by-name ( vector string -- vector elt/f )
     >lower '[ name>> _ = ] find ;
 
 : find-by-id-between ( vector string -- vector' )
@@ -83,7 +83,7 @@ TUPLE: link attributes clickable ;
         [ attributes>> "id" swap at _ = ] bi and
     ] dupd find find-between* ;
 
-: find-by-attribute-key ( vector key -- vector' )
+: find-by-attribute-key ( vector key -- vector' elt/? )
     >lower
     [ attributes>> at _ = ] filter sift ;
 

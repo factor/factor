@@ -39,12 +39,12 @@ HELP: byte-length
 { $contract "Outputs the size of the byte array or float array data in bytes as presented to the C library interface." } ;
 
 HELP: c-getter
-{ $values { "name" string } { "quot" "a quotation with stack effect " { $snippet "( c-ptr n -- obj )" } } }
+{ $values { "name" string } { "quot" { $quotation "( c-ptr n -- obj )" } } }
 { $description "Outputs a quotation which reads values of this C type from a C structure." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
 HELP: c-setter
-{ $values { "name" string } { "quot" "a quotation with stack effect " { $snippet "( obj c-ptr n -- )" } } }
+{ $values { "name" string } { "quot" { $quotation "( obj c-ptr n -- )" } } }
 { $description "Outputs a quotation which writes values of this C type to a C structure." }
 { $errors "Throws an error if the type does not exist." } ;
 

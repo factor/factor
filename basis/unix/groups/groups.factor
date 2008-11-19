@@ -76,9 +76,11 @@ M: integer user-groups ( id -- seq )
 : all-groups ( -- seq )
     [ getgrent dup ] [ group-struct>group ] [ drop ] produce ;
 
+: <group-cache> ( -- assoc )
+    all-groups [ [ id>> ] keep ] H{ } map>assoc ;
+
 : with-group-cache ( quot -- )
-    all-groups [ [ id>> ] keep ] H{ } map>assoc
-    group-cache rot with-variable ; inline
+    [ <group-cache> group-cache ] dip with-variable ; inline
 
 : real-group-id ( -- id )
     getgid ; inline

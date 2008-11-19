@@ -507,7 +507,7 @@ M: x86 %prepare-alien-invoke
     temp-reg-1 2 cells [+] ds-reg MOV
     temp-reg-1 3 cells [+] rs-reg MOV ;
 
-M: x86 value-structs? t ;
+M: x86 value-struct? drop t ;
 
 M: x86 small-enough? ( n -- ? )
     HEX: -80000000 HEX: 7fffffff between? ;

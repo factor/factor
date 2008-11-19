@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io debugger
-words fry continuations vocabs assocs dlists definitions math
-threads graphs generic combinators deques search-deques
+words fry continuations vocabs assocs dlists definitions
+math threads graphs generic combinators deques search-deques
 prettyprint io stack-checker stack-checker.state
 stack-checker.inlining compiler.errors compiler.units
 compiler.tree.builder compiler.tree.optimizer
