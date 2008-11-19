@@ -63,3 +63,5 @@ ARTICLE: "math.geometry.rect" "Rectangles"
 { $subsection offset-rect }
 { $subsection rect-intersect }
 { $subsection intersects? } ;
+
+ABOUT: "math.geometry.rect"
