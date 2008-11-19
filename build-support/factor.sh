@@ -374,6 +374,7 @@ backup_factor() {
     $ECHO "Backing up factor..."
     $COPY $FACTOR_BINARY $FACTOR_BINARY.bak
     $COPY $FACTOR_LIBRARY $FACTOR_LIBRARY.bak
+    $COPY $BOOT_IMAGE $BOOT_IMAGE.bak
     $COPY $FACTOR_IMAGE $FACTOR_IMAGE.bak
     $ECHO "Done with backup."
 }
@@ -406,7 +407,8 @@ make_factor() {
 update_boot_images() {
     echo "Deleting old images..."
     $DELETE checksums.txt* > /dev/null 2>&1
-    $DELETE $BOOT_IMAGE.* > /dev/null 2>&1
+	# delete boot images with one or two characters after the dot
+    $DELETE $BOOT_IMAGE.{?,??} > /dev/null 2>&1
     $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
         get_url http://factorcode.org/images/latest/checksums.txt
