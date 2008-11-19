@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors arrays kernel sequences math byte-arrays
-namespaces cap graphics.bitmap
+namespaces grouping fry cap graphics.bitmap
 ui.gadgets ui.gadgets.packs ui.gadgets.borders ui.gadgets.grids
 ui.gadgets.grid-lines ui.gadgets.labels ui.gadgets.buttons
 ui.render ui opengl opengl.gl ;
@@ -20,18 +20,26 @@ M: line-test draw-interior
 : message-window ( text -- )
     <label> "Message" open-window ;
 
-: twiddle ( bytes -- bytes )
-    #! On Windows, white is { 253 253 253 } ?
-    [ dup 253 = [ 2 + ] when ] map ;
-
 SYMBOL: render-output
 
+: twiddle ( bytes -- bytes )
+    #! On Windows, white is { 253 253 253 } ?
+    [ 10 /i ] map ;
+
+: stride ( bitmap -- n ) width>> 3 * ;
+
+: bitmap= ( bitmap1 bitmap2 -- ? )
+    [
+        [ [ array>> ] [ stride 4 align ] bi group ] [ stride ] bi
+        '[ _ head twiddle ] map
+    ] bi@ = ;
+
 : check-rendering ( gadget -- )
-    screenshot [ twiddle ] change-array
+    screenshot
     [ render-output set-global ]
     [
         "resource:extra/ui/render/test/reference.bmp" load-bitmap
-        [ array>> ] bi@ = "is perfect" "needs work" ?
+        bitmap= "is perfect" "needs work" ?
         "Your UI rendering " prepend
         message-window
     ] bi ;
