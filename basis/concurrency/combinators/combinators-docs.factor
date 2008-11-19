@@ -27,11 +27,17 @@ HELP: parallel-filter
 { $errors "Throws an error if one of the iterations throws an error." } ;
 
 ARTICLE: "concurrency.combinators" "Concurrent combinators"
-"The " { $vocab-link "concurrency.combinators" } " vocabulary provides concurrent variants of " { $link each } ", " { $link map } " and " { $link filter } ":"
+"The " { $vocab-link "concurrency.combinators" } " vocabulary provides concurrent variants of various combinators."
+$nl
+"Concurrent sequence combinators:"
 { $subsection parallel-each }
 { $subsection 2parallel-each }
 { $subsection parallel-map }
 { $subsection 2parallel-map }
-{ $subsection parallel-filter } ;
+{ $subsection parallel-filter }
+"Concurrent cleave combinators:"
+{ $subsection parallel-cleave }
+{ $subsection parallel-spread }
+{ $subsection parallel-napply } ;
 
 ABOUT: "concurrency.combinators"
