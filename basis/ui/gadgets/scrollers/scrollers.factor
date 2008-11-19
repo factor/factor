@@ -43,7 +43,7 @@ scroller H{
         dup model>> dependencies>> second <y-slider> >>y dup y>> @right  grid-add
 
         tuck model>> <viewport> >>viewport
-        dup viewport>> @center grid-add ;
+        dup viewport>> @center grid-add ; inline
 
 : <scroller> ( gadget -- scroller ) scroller new-scroller ;
 
@@ -54,18 +54,18 @@ scroller H{
     ] keep
     2dup control-value = [ 2drop ] [ set-control-value ] if ;
 
-: rect-min ( rect1 rect2 -- rect )
-    >r [ rect-loc ] keep r> [ rect-dim ] bi@ vmin <rect> ;
+: rect-min ( rect dim -- rect' )
+    [ [ loc>> ] [ dim>> ] bi ] dip vmin <rect> ;
 
 : (scroll>rect) ( rect scroller -- )
     [
         scroller-value vneg offset-rect
         viewport-gap offset-rect
     ] keep
-    [ viewport>> rect-min ] keep
+    [ viewport>> dim>> rect-min ] keep
     [
         viewport>> 2rect-extent
-        >r >r v- { 0 0 } vmin r> r> v- { 0 0 } vmax v+
+        [ v- { 1 1 } v- { 0 0 } vmin ] [ v- { 0 0 } vmax ] 2bi* v+
     ] keep dup scroller-value rot v+ swap scroll ;
 
 : relative-scroll-rect ( rect gadget scroller -- newrect )
