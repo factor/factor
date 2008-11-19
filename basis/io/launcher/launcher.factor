@@ -4,7 +4,8 @@ USING: system kernel namespaces strings hashtables sequences
 assocs combinators vocabs.loader init threads continuations
 math accessors concurrency.flags destructors environment
 io io.backend io.timeouts io.pipes io.pipes.private io.encodings
-io.streams.duplex io.ports debugger prettyprint summary ;
+io.streams.duplex io.ports debugger prettyprint summary
+calendar ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -65,7 +66,7 @@ SYMBOL: wait-flag
 : wait-loop ( -- )
     processes get assoc-empty?
     [ wait-flag get-global lower-flag ]
-    [ wait-for-processes [ 100 sleep ] when ] if ;
+    [ wait-for-processes [ 100 milliseconds sleep ] when ] if ;
 
 : start-wait-thread ( -- )
     <flag> wait-flag set-global

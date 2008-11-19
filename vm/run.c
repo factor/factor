@@ -153,14 +153,14 @@ void primitive_exit(void)
 	exit(to_fixnum(dpop()));
 }
 
-void primitive_millis(void)
+void primitive_micros(void)
 {
-	box_unsigned_8(current_millis());
+	box_unsigned_8(current_micros());
 }
 
 void primitive_sleep(void)
 {
-	sleep_millis(to_cell(dpop()));
+	sleep_micros(to_cell(dpop()));
 }
 
 void primitive_set_slot(void)

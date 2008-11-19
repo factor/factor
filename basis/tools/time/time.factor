@@ -5,20 +5,20 @@ namespaces system sequences splitting grouping assocs strings ;
 IN: tools.time
 
 : benchmark ( quot -- runtime )
-    millis >r call millis r> - ; inline
+    micros >r call micros r> - ; inline
 
 : time. ( data -- )
     unclip
-    "==== RUNNING TIME" print nl pprint " ms" print nl
+    "==== RUNNING TIME" print nl pprint " us" print nl
     4 cut*
     "==== GARBAGE COLLECTION" print nl
     [
         6 group
         {
             "GC count:"
-            "Cumulative GC time (ms):"
-            "Longest GC pause (ms):"
-            "Average GC pause (ms):"
+            "Cumulative GC time (us):"
+            "Longest GC pause (us):"
+            "Average GC pause (us):"
             "Objects copied:"
             "Bytes copied:"
         } prefix
@@ -37,4 +37,4 @@ IN: tools.time
     ] bi* ;
 
 : time ( quot -- )
-    gc-reset millis >r call gc-stats millis r> - prefix time. ; inline
+    gc-reset micros >r call gc-stats micros r> - prefix time. ; inline

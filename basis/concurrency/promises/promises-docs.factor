@@ -13,7 +13,7 @@ HELP: promise-fulfilled?
 
 HELP: ?promise-timeout
 { $values { "promise" promise } { "timeout" { $maybe duration } } { "result" object } }
-{ $description "Waits for another thread to fulfill a promise, returning immediately if the promise has already been fulfilled. A timeout of " { $link f } " indicates that the thread may block indefinitely, otherwise it will wait up to " { $snippet "timeout" } " milliseconds." }
+{ $description "Waits for another thread to fulfill a promise, returning immediately if the promise has already been fulfilled. A timeout of " { $link f } " indicates that the thread may block indefinitely, otherwise it will wait up to the " { $snippet "timeout" } " before throwing an error." }
 { $errors "Throws an error if the timeout expires before the promise has been fulfilled." } ;
 
 HELP: ?promise

@@ -94,7 +94,7 @@ SYMBOL: scroll-direction
 { 0 0 } scroll-direction set-global
 
 SYMBOL: double-click-timeout
-300 double-click-timeout set-global
+300 milliseconds double-click-timeout set-global
 
 : hand-moved? ( -- ? )
     hand-loc get hand-click-loc get = not ;
@@ -182,7 +182,7 @@ SYMBOL: drag-timer
     hand-click-loc get-global swap screen-loc v- ;
 
 : multi-click-timeout? ( -- ? )
-    millis hand-last-time get - double-click-timeout get <= ;
+    now hand-last-time get time- double-click-timeout get before=? ;
 
 : multi-click-button? ( button -- button ? )
     dup hand-last-button get = ;
@@ -207,7 +207,7 @@ SYMBOL: drag-timer
             1 hand-click# set
         ] if
         hand-last-button set
-        millis hand-last-time set
+        now hand-last-time set
     ] bind ;
 
 : update-clicked ( -- )

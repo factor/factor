@@ -100,7 +100,7 @@ threads sequences calendar accessors ;
                c await
                l [
                    4 v push
-                   1000 sleep
+                   1 seconds sleep
                    5 v push
                ] with-write-lock
                c'' count-down
@@ -139,7 +139,7 @@ threads sequences calendar accessors ;
                l [
                    1 v push
                    c count-down
-                   1000 sleep
+                   1 seconds sleep
                    2 v push
                ] with-write-lock
                c' count-down

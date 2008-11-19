@@ -443,7 +443,7 @@ tuple
     { "exit" "system" }
     { "data-room" "memory" }
     { "code-room" "memory" }
-    { "millis" "system" }
+    { "micros" "system" }
     { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
     { "dlsym" "alien" }

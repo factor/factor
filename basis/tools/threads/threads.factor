@@ -14,8 +14,8 @@ IN: tools.threads
     ] with-cell
     [
         sleep-entry>> [
-            key>> millis [-] number>string write
-            " ms" write
+            key>> micros [-] number>string write
+            " us" write
         ] when*
     ] with-cell ;
 

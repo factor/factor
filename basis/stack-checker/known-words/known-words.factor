@@ -423,8 +423,8 @@ do-primitive alien-invoke alien-indirect alien-callback
 \ code-room { } { integer integer integer integer } define-primitive
 \ code-room  make-flushable
 
-\ millis { } { integer } define-primitive
-\ millis make-flushable
+\ micros { } { integer } define-primitive
+\ micros make-flushable
 
 \ tag { object } { fixnum } define-primitive
 \ tag make-foldable

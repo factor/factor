@@ -236,7 +236,7 @@ void primitive_os_envs(void);
 void primitive_set_os_env(void);
 void primitive_unset_os_env(void);
 void primitive_set_os_envs(void);
-void primitive_millis(void);
+void primitive_micros(void);
 void primitive_sleep(void);
 void primitive_set_slot(void);
 

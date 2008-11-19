@@ -40,14 +40,17 @@ M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
 : do-benchmarks ( -- )
     run-benchmarks benchmarks-file to-file ;
 
+: benchmark-ms ( quot -- ms )
+    benchmark 1000 /i ; inline
+
 : do-all ( -- )
     ".." [
         bootstrap-time get boot-time-file to-file
-        [ do-load do-compile-errors ] benchmark load-time-file to-file
-        [ generate-help ] benchmark html-help-time-file to-file
-        [ do-tests ] benchmark test-time-file to-file
-        [ do-help-lint ] benchmark help-lint-time-file to-file
-        [ do-benchmarks ] benchmark benchmark-time-file to-file
+        [ do-load do-compile-errors ] benchmark-ms load-time-file to-file
+        [ generate-help ]  html-help-time-file to-file
+        [ do-tests ] benchmark-ms test-time-file to-file
+        [ do-help-lint ] benchmark-ms help-lint-time-file to-file
+        [ do-benchmarks ] benchmark-ms benchmark-time-file to-file
     ] with-directory ;
 
 MAIN: do-all
