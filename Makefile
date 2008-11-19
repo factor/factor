@@ -161,7 +161,7 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 
 clean:
 	rm -f vm/*.o
-	rm -f factor*.dll libfactor*.*
+	rm -f factor*.dll libfactor{.a,.so}
 
 vm/resources.o:
 	$(WINDRES) vm/factor.rs vm/resources.o
