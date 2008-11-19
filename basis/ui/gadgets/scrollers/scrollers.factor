@@ -129,10 +129,12 @@ M: scroller focusable-child*
 M: scroller model-changed
     nip f >>follows drop ;
 
-TUPLE: limited-scroller < scroller fixed-dim ;
+TUPLE: limited-scroller < scroller
+{ min-dim initial: { 0 0 } }
+{ max-dim initial: { 1/0. 1/0. } } ;
 
-: <limited-scroller> ( gadget dim -- scroller )
-    >r limited-scroller new-scroller r> >>fixed-dim ;
+: <limited-scroller> ( gadget -- scroller )
+    limited-scroller new-scroller ;
 
 M: limited-scroller pref-dim*
-    fixed-dim>> ;
+    [ call-next-method ] [ min-dim>> vmax ] [ max-dim>> vmin ] tri ;
