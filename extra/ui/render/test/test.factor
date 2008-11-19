@@ -17,8 +17,6 @@ M: line-test draw-interior
         line-test >>interior
         { 1 10 } >>dim ;
 
-TUPLE: ui-render-test < pack { first-time? initial: t } ;
-
 : message-window ( text -- )
     <label> "Message" open-window ;
 
@@ -26,24 +24,30 @@ TUPLE: ui-render-test < pack { first-time? initial: t } ;
     #! On Windows, white is { 253 253 253 } ?
     [ dup 253 = [ 2 + ] when ] map ;
 
-: check-rendering ( gadget -- )
-    gl-screenshot twiddle
-    "resource:extra/ui/render/test/reference.bmp" load-bitmap array>>
-    = "perfect" "needs work" ? "Your UI rendering is " prepend
-    message-window ;
+SYMBOL: render-output
 
-M: ui-render-test draw-gadget*
-    [ call-next-method ] [
-        dup first-time?>> [
-            dup check-rendering
-            f >>first-time?
-        ] when
-        drop
+: check-rendering ( gadget -- )
+    screenshot [ twiddle ] change-array
+    [ render-output set-global ]
+    [
+        "resource:extra/ui/render/test/reference.bmp" load-bitmap
+        [ array>> ] bi@ = "perfect" "needs work" ?
+        "Your UI rendering is " prepend
+        message-window
     ] bi ;
 
+TUPLE: take-screenshot { first-time? initial: t } ;
+
+M: take-screenshot draw-boundary
+    dup first-time?>> [
+        over check-rendering
+        f >>first-time?
+    ] when
+    2drop ;
+
 : <ui-render-test> ( -- gadget )
-    \ ui-render-test new-gadget
-        { 1 0 } >>orientation
+    <shelf>
+        take-screenshot new >>boundary
         <gadget>
             black <solid> >>interior
             { 98 98 } >>dim
