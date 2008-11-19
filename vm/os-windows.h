@@ -20,10 +20,21 @@ typedef wchar_t F_CHAR;
 #define STRNCMP wcsncmp
 #define STRDUP _wcsdup
 
+#define CELL_FORMAT "%Iu"
+#define CELL_HEX_FORMAT "%Ix"
+
+#ifdef FACTOR_64
+	#define CELL_HEX_PAD_FORMAT "%016Ix"
+#else
+	#define CELL_HEX_PAD_FORMAT "%08Ix"
+#endif
+
+#define FIXNUM_FORMAT "%Id"
+
 #define OPEN_READ(path) _wfopen(path,L"rb")
 #define OPEN_WRITE(path) _wfopen(path,L"wb")
-#define FPRINTF(stream,format,arg) fwprintf(stream,L##format,arg)
 
+#define print_native_string(string) wprintf(L"%s",arg)
 
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
