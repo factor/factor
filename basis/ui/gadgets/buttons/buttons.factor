@@ -118,7 +118,7 @@ TUPLE: checkmark-paint < caching-pen color last-vertices ;
     } cleave 4array ;
 
 : checkmark-vertices ( dim -- vertices )
-    checkmark-points concat >float-array underlying>> ;
+    checkmark-points concat >float-array ;
 
 PRIVATE>
 

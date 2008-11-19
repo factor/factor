@@ -53,20 +53,20 @@ MACRO: all-enabled-client-state ( seq quot -- )
     glMatrixMode glPopMatrix ; inline
 
 : gl-material ( face pname params -- )
-    >float-array underlying>> glMaterialfv ;
+    float-array{ } like underlying>> glMaterialfv ;
 
 : gl-vertex-pointer ( seq -- )
-    [ 2 GL_FLOAT 0 ] dip glVertexPointer ; inline
+    [ 2 GL_FLOAT 0 ] dip underlying>> glVertexPointer ; inline
 
 : gl-color-pointer ( seq -- )
-    [ 4 GL_FLOAT 0 ] dip glColorPointer ; inline
+    [ 4 GL_FLOAT 0 ] dip underlying>> glColorPointer ; inline
 
 : gl-texture-coord-pointer ( seq -- )
     [ 2 GL_FLOAT 0 ] dip glTexCoordPointer ; inline
 
 : line-vertices ( a b -- )
-    [ first2 [ 0.5 + ] bi@ ] bi@ 4 narray
-    >float-array underlying>> gl-vertex-pointer ;
+    [ first2 [ 0.5 + ] bi@ ] bi@ 4 float-array{ } nsequence
+    gl-vertex-pointer ;
 
 : gl-line ( a b -- )
     line-vertices GL_LINES 0 2 glDrawArrays ;
@@ -77,7 +77,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
         [ first 0.3 - 0.5 ]
         [ [ first 0.3 - ] [ second 0.3 - ] bi ]
         [ second 0.3 - 0.5 swap ]
-    } cleave 8 float-array{ } nsequence underlying>> ;
+    } cleave 8 float-array{ } nsequence ;
 
 : rect-vertices ( dim -- )
     (rect-vertices) gl-vertex-pointer ;
@@ -94,7 +94,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
         [ first 0 ]
         [ first2 ]
         [ second 0 swap ]
-    } cleave 8 float-array{ } nsequence underlying>> ;
+    } cleave 8 float-array{ } nsequence ;
 
 : fill-rect-vertices ( dim -- )
     (fill-rect-vertices) gl-vertex-pointer ;
@@ -121,7 +121,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     circle-steps unit-circle adjust-points scale-points ;
 
 : circle-vertices ( loc dim steps -- vertices )
-    circle-points concat >float-array underlying>> ;
+    circle-points concat >float-array ;
 
 : (gen-gl-object) ( quot -- id )
     >r 1 0 <uint> r> keep *uint ; inline

@@ -140,11 +140,11 @@ TUPLE: gradient < caching-pen colors last-vertices last-colors ;
     direction dim v* dim over v- swap
     colors length dup 1- v/n [ v*n ] with map
     [ dup rot v+ 2array ] with map
-    concat concat >float-array underlying>> ;
+    concat concat >float-array ;
 
 : gradient-colors ( colors -- seq )
     [ color>raw 4array dup 2array ] map concat concat
-    >float-array underlying>> ;
+    >float-array ;
 
 M: gradient recompute-pen ( gadget gradient -- )
     tuck
@@ -172,7 +172,7 @@ M: gradient draw-interior
 TUPLE: polygon color vertex-array count ;
 
 : <polygon> ( color points -- polygon )
-    [ concat >float-array underlying>> ] [ length ] bi polygon boa ;
+    [ concat >float-array ] [ length ] bi polygon boa ;
 
 : draw-polygon ( polygon mode -- )
     swap
