@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces assocs io.files io.encodings.utf8
 prettyprint help.lint benchmark tools.time bootstrap.stage2
-tools.test tools.vocabs help.html mason.common ;
+tools.test tools.vocabs help.html mason.common words generic
+accessors compiler.errors sequences sets sorting ;
 IN: mason.test
 
 : do-load ( -- )
@@ -10,6 +11,19 @@ IN: mason.test
     [ keys load-everything-vocabs-file to-file ]
     [ load-everything-errors-file utf8 [ load-failures. ] with-file-writer ]
     bi ;
+
+GENERIC: word-vocabulary ( word -- vocabulary )
+
+M: word word-vocabulary vocabulary>> ;
+
+M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
+
+: do-compile-errors ( -- )
+    compiler-errors-file utf8 [
+        +error+ errors-of-type keys
+        [ word-vocabulary ] map
+        prune natural-sort .
+    ] with-file-writer ;
 
 : do-tests ( -- )
     run-all-tests
@@ -29,7 +43,7 @@ IN: mason.test
 : do-all ( -- )
     ".." [
         bootstrap-time get boot-time-file to-file
-        [ do-load ] benchmark load-time-file to-file
+        [ do-load do-compile-errors ] benchmark load-time-file to-file
         [ generate-help ] benchmark html-help-time-file to-file
         [ do-tests ] benchmark test-time-file to-file
         [ do-help-lint ] benchmark help-lint-time-file to-file

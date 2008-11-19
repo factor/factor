@@ -52,3 +52,5 @@ namespaces assocs ;
 [ "4561_2612_1234_5467" v-credit-card ] must-fail
 
 [ "4561-2621-1234-5467" v-credit-card ] must-fail
+
+[ t ] [ "http://double.co.nz/w?v=foo" dup v-url = ] unit-test

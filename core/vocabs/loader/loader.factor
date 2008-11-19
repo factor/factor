@@ -55,7 +55,7 @@ SYMBOL: load-help?
     f over set-vocab-source-loaded?
     [ vocab-source-path [ parse-file ] [ [ ] ] if* ] keep
     t swap set-vocab-source-loaded?
-    [ % ] [ call ] if-bootstrapping ;
+    [ % ] [ assert-depth ] if-bootstrapping ;
 
 : load-docs ( vocab -- vocab )
     load-help? get [

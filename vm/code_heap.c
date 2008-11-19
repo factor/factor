@@ -238,10 +238,10 @@ CELL allot_code_block(CELL size)
 			CELL used, total_free, max_free;
 			heap_usage(&code_heap,&used,&total_free,&max_free);
 
-			fprintf(stderr,"Code heap stats:\n");
-			fprintf(stderr,"Used: %ld\n",used);
-			fprintf(stderr,"Total free space: %ld\n",total_free);
-			fprintf(stderr,"Largest free block: %ld\n",max_free);
+			print_string("Code heap stats:\n");
+			print_string("Used: "); print_cell(used); nl();
+			print_string("Total free space: "); print_cell(total_free); nl();
+			print_string("Largest free block: "); print_cell(max_free); nl();
 			fatal_error("Out of memory in add-compiled-block",0);
 		}
 	}

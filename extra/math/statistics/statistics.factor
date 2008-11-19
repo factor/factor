@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Michael Judge.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.analysis math.functions sequences sequences.lib
-    sorting ;
+USING: arrays combinators kernel math math.analysis math.functions sequences
+    sequences.lib sorting ;
 IN: math.statistics
 
 : mean ( seq -- n )
@@ -63,7 +63,7 @@ IN: math.statistics
     r sq ;
 
 : least-squares ( {{x,y}...} -- alpha beta )
-    [r] >r >r >r >r 2dup r> r> r> r>
+    [r] { [ 2dup ] [ ] [ ] [ ] [ ] } spread
     ! stack is mean(x) mean(y) mean(x) mean(y) {x} {y} sx sy
     [ (r) ] 2keep ! stack is mean(x) mean(y) r sx sy
     swap / * ! stack is mean(x) mean(y) beta

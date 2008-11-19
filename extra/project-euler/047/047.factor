@@ -32,7 +32,7 @@ IN: project-euler.047
 <PRIVATE
 
 : (consecutive) ( count goal test -- n )
-    pick pick = [
+    2over = [
         swap - nip
     ] [
         dup prime? [ [ drop 0 ] 2dip ] [

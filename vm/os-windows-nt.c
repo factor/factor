@@ -29,7 +29,13 @@ long exception_handler(PEXCEPTION_POINTERS pe)
 		signal_number = ERROR_DIVIDE_BY_ZERO;
 		c->EIP = (CELL)divide_by_zero_signal_handler_impl;
 	}
-	else
+	/* If the Widcomm bluetooth stack is installed, the BTTray.exe process
+	injects code into running programs. For some reason this results in
+	random SEH exceptions with this (undocumented) exception code being
+	raised. The workaround seems to be ignoring this altogether, since that
+	is what happens if SEH is not enabled. Don't really have any idea what
+	this exception means. */
+	else if(e->ExceptionCode != 0x40010006)
 	{
 		signal_number = 11;
 		c->EIP = (CELL)misc_signal_handler_impl;

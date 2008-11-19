@@ -4,9 +4,7 @@ USING: accessors arrays sequences kernel sequences assocs
 namespaces stack-checker.recursive-state.tree ;
 IN: stack-checker.recursive-state
 
-TUPLE: recursive-state words word quotations inline-words ;
-
-C: <recursive-state> recursive-state
+TUPLE: recursive-state word words quotations inline-words ;
 
 : prepare-recursive-state ( word rstate -- rstate )
     swap >>word

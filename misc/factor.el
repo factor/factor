@@ -1,25 +1,42 @@
-;; Eduardo Cavazos - wayo.cavazos@gmail.com
+;;; factor.el --- Interacting with Factor within emacs
+;;
+;; Authors: Eduardo Cavazos <wayo.cavazos@gmail.com>
+;;          Jose A Ortega Ruiz <jao@gnu.org>
+;; Keywords: languages
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Commentary:
+
+;;; Quick setup:
+
 ;; Add these lines to your .emacs file:
-
-;; (load-file "/scratch/repos/Factor/misc/factor.el")
-;; (setq factor-binary "/scratch/repos/Factor/factor")
-;; (setq factor-image "/scratch/repos/Factor/factor.image")
-
+;;
+;;   (load-file "/scratch/repos/Factor/misc/factor.el")
+;;   (setq factor-binary "/scratch/repos/Factor/factor")
+;;   (setq factor-image "/scratch/repos/Factor/factor.image")
+;;
 ;; Of course, you'll have to edit the directory paths for your system
-;; accordingly.
-
+;; accordingly. Alternatively, put this file in your load-path and use
+;;
+;;   (require 'factor)
+;;
+;; instead of load-file.
+;;
 ;; That's all you have to do to "install" factor.el on your
 ;; system. Whenever you edit a factor file, Emacs will know to switch
 ;; to Factor mode.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; For further customization options,
+;;   M-x customize-group RET factor
+;;
+;; To start a Factor listener inside Emacs,
+;;   M-x run-factor
 
-;; M-x run-factor === Start a Factor listener inside Emacs
+;;; Requirements:
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Customization
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(require 'font-lock)
+(require 'comint)
+
+;;; Customization:
 
 (defgroup factor nil
   "Factor mode"
@@ -37,68 +54,25 @@ value from the existing code in the buffer."
   :type 'integer
   :group 'factor)
 
+(defcustom factor-binary "~/factor/factor"
+  "Full path to the factor executable to use when starting a listener."
+  :type '(file :must-match t)
+  :group 'factor)
+
+(defcustom factor-image "~/factor/factor.image"
+  "Full path to the factor image to use when starting a listener."
+  :type '(file :must-match t)
+  :group 'factor)
+
 (defcustom factor-display-compilation-output t
   "Display the REPL buffer before compiling files."
-  :type '(choice (const :tag "Enable" t) (const :tag "Disable" nil))
+  :type 'boolean
   :group 'factor)
 
 (defcustom factor-mode-hook nil
   "Hook run when entering Factor mode."
   :type 'hook
   :group 'factor)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; factor-mode syntax
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defvar factor-mode-syntax-table nil
-  "Syntax table used while in Factor mode.")
-
-(if factor-mode-syntax-table
-    ()
-  (let ((i 0))
-    (setq factor-mode-syntax-table (make-syntax-table))
-
-    ;; Default is atom-constituent
-    (while (< i 256)
-      (modify-syntax-entry i "_   " factor-mode-syntax-table)
-      (setq i (1+ i)))
-
-    ;; Word components.
-    (setq i ?0)
-    (while (<= i ?9)
-      (modify-syntax-entry i "w   " factor-mode-syntax-table)
-      (setq i (1+ i)))
-    (setq i ?A)
-    (while (<= i ?Z)
-      (modify-syntax-entry i "w   " factor-mode-syntax-table)
-      (setq i (1+ i)))
-    (setq i ?a)
-    (while (<= i ?z)
-      (modify-syntax-entry i "w   " factor-mode-syntax-table)
-      (setq i (1+ i)))
-
-    ;; Whitespace
-    (modify-syntax-entry ?\t " " factor-mode-syntax-table)
-    (modify-syntax-entry ?\n ">" factor-mode-syntax-table)
-    (modify-syntax-entry ?\f " " factor-mode-syntax-table)
-    (modify-syntax-entry ?\r " " factor-mode-syntax-table)
-    (modify-syntax-entry ?  " " factor-mode-syntax-table)
-
-    (modify-syntax-entry ?\[ "(]  " factor-mode-syntax-table)
-    (modify-syntax-entry ?\] ")[  " factor-mode-syntax-table)
-    (modify-syntax-entry ?{ "(}  " factor-mode-syntax-table)
-    (modify-syntax-entry ?} "){  " factor-mode-syntax-table)
-
-    (modify-syntax-entry ?\( "()" factor-mode-syntax-table)
-    (modify-syntax-entry ?\) ")(" factor-mode-syntax-table)
-    (modify-syntax-entry ?\" "\"    " factor-mode-syntax-table)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; factor-mode font lock
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(require 'font-lock)
 
 (defgroup factor-faces nil
   "Faces used in Factor mode"
@@ -142,6 +116,9 @@ value from the existing code in the buffer."
 (defface factor-font-lock-parsing-word (factor--face font-lock-keyword-face)
   "Face for parsing words."
   :group 'factor-faces)
+
+
+;;; Factor mode font lock:
 
 (defconst factor--parsing-words
   '("{" "}" "^:" "^::" ";" "<<" "<PRIVATE" ">>"
@@ -191,16 +168,57 @@ value from the existing code in the buffer."
     (,factor--regex-type-definition 2 'factor-font-lock-type-definition)
     (,factor--regex-symbol-definition 2 'factor-font-lock-symbol-definition)
     (,factor--regex-using-line 1 'factor-font-lock-vocabulary-name)
-    (,factor--regex-use-line 1 'factor-font-lock-vocabulary-name)))
+    (,factor--regex-use-line 1 'factor-font-lock-vocabulary-name))
+  "Font lock keywords definition for Factor mode.")
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; factor-mode commands
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; Factor mode syntax:
 
-(require 'comint)
+(defvar factor-mode-syntax-table nil
+  "Syntax table used while in Factor mode.")
 
-(defvar factor-binary "~/factor/factor")
-(defvar factor-image "~/factor/factor.image")
+(if factor-mode-syntax-table
+    ()
+  (let ((i 0))
+    (setq factor-mode-syntax-table (make-syntax-table))
+
+    ;; Default is atom-constituent
+    (while (< i 256)
+      (modify-syntax-entry i "_   " factor-mode-syntax-table)
+      (setq i (1+ i)))
+
+    ;; Word components.
+    (setq i ?0)
+    (while (<= i ?9)
+      (modify-syntax-entry i "w   " factor-mode-syntax-table)
+      (setq i (1+ i)))
+    (setq i ?A)
+    (while (<= i ?Z)
+      (modify-syntax-entry i "w   " factor-mode-syntax-table)
+      (setq i (1+ i)))
+    (setq i ?a)
+    (while (<= i ?z)
+      (modify-syntax-entry i "w   " factor-mode-syntax-table)
+      (setq i (1+ i)))
+
+    ;; Whitespace
+    (modify-syntax-entry ?\t " " factor-mode-syntax-table)
+    (modify-syntax-entry ?\n ">" factor-mode-syntax-table)
+    (modify-syntax-entry ?\f " " factor-mode-syntax-table)
+    (modify-syntax-entry ?\r " " factor-mode-syntax-table)
+    (modify-syntax-entry ?  " " factor-mode-syntax-table)
+
+    (modify-syntax-entry ?\[ "(]  " factor-mode-syntax-table)
+    (modify-syntax-entry ?\] ")[  " factor-mode-syntax-table)
+    (modify-syntax-entry ?{ "(}  " factor-mode-syntax-table)
+    (modify-syntax-entry ?} "){  " factor-mode-syntax-table)
+
+    (modify-syntax-entry ?\( "()" factor-mode-syntax-table)
+    (modify-syntax-entry ?\) ")(" factor-mode-syntax-table)
+    (modify-syntax-entry ?\" "\"    " factor-mode-syntax-table)))
+
+
+;;; Factor mode commands:
 
 (defun factor-telnet-to-port (port)
   (interactive "nPort: ")
@@ -230,11 +248,6 @@ value from the existing code in the buffer."
 	(goto-char (point-max))
 	(unless (get-buffer-window (current-buffer) t)
 	  (display-buffer (current-buffer) t))))
-
-;; (defun factor-send-region (start end)
-;;   (interactive "r")
-;;   (comint-send-region "*factor*" start end)
-;;   (comint-send-string "*factor*" "\n"))
 
 (defun factor-send-string (str)
   (let ((n (length (split-string str "\n"))))
@@ -288,7 +301,8 @@ value from the existing code in the buffer."
   (beginning-of-line)
   (insert "! "))
 
-(defvar factor-mode-map (make-sparse-keymap))
+(defvar factor-mode-map (make-sparse-keymap)
+  "Key map used by Factor mode.")
 
 (define-key factor-mode-map "\C-c\C-f" 'factor-run-file)
 (define-key factor-mode-map "\C-c\C-r" 'factor-send-region)
@@ -300,82 +314,96 @@ value from the existing code in the buffer."
 (define-key factor-mode-map [return]   'newline-and-indent)
 (define-key factor-mode-map [tab]      'indent-for-tab-command)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; factor-mode indentation
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; Factor mode indentation:
 
-(defconst factor-word-starting-keywords
-  '("" ":" "TUPLE" "MACRO" "MACRO:" "M"))
+(make-variable-buffer-local
+ (defvar factor-indent-width factor-default-indent-width
+   "Indentation width in factor buffers. A local variable."))
 
-(defmacro factor-word-start-re (keywords)
-  `(format
-    "^\\(%s\\): "
-    (mapconcat 'identity ,keywords "\\|")))
-
-(defvar factor-indent-width factor-default-indent-width
-  "Indentation width in factor buffers. A local variable.")
-
-(make-variable-buffer-local 'factor-indent-width)
+(defconst factor--regexp-word-start
+  (let ((sws '("" ":" "TUPLE" "MACRO" "MACRO:" "M")))
+    (format "^\\(%s\\): " (mapconcat 'identity sws "\\|"))))
 
 (defun factor--guess-indent-width ()
   "Chooses an indentation value from existing code."
-  (let ((word-def (factor-word-start-re factor-word-starting-keywords))
-        (word-cont "^ +[^ ]")
+  (let ((word-cont "^ +[^ ]")
         (iw))
     (save-excursion
       (beginning-of-buffer)
       (while (not iw)
-        (if (not (re-search-forward word-def nil t))
+        (if (not (re-search-forward factor--regexp-word-start nil t))
             (setq iw factor-default-indent-width)
           (forward-line)
           (when (looking-at word-cont)
             (setq iw (current-indentation))))))
     iw))
 
-(defun factor-calculate-indentation ()
-  "Calculate Factor indentation for line at point."
-  (let ((not-indented t)
-        (cur-indent 0))
-    (save-excursion
-      (beginning-of-line)
-      (if (bobp)
-          (setq cur-indent 0)
-        (save-excursion
-          (while not-indented
-            ;; Check that we are inside open brackets
-            (save-excursion
-              (let ((cur-depth (factor-brackets-depth)))
-                (forward-line -1)
-                (setq cur-indent (+ (current-indentation)
-                                    (* factor-indent-width
-                                       (- cur-depth (factor-brackets-depth)))))
-                (setq not-indented nil)))
-            (forward-line -1)
-              ;; Check that we are after the end of previous word
-              (if (looking-at ".*;[ \t]*$")
-                  (progn
-                    (setq cur-indent (- (current-indentation) factor-indent-width))
-                    (setq not-indented nil))
-                ;; Check that we are after the start of word
-                (if (looking-at (factor-word-start-re factor-word-starting-keywords))
-;                (if (looking-at "^[A-Z:]*: ")
-                    (progn
-                      (message "inword")
-                      (setq cur-indent (+ (current-indentation) factor-indent-width))
-                      (setq not-indented nil))
-                  (if (bobp)
-                      (setq not-indented nil))))))))
-    cur-indent))
+(defsubst factor--ppss-brackets-depth ()
+  (nth 0 (syntax-ppss)))
 
-(defun factor-brackets-depth ()
-  "Returns number of brackets, not closed on previous lines."
-  (syntax-ppss-depth
-   (save-excursion
-     (syntax-ppss (line-beginning-position)))))
+(defsubst factor--ppss-brackets-start ()
+  (nth 1 (syntax-ppss)))
+
+(defsubst factor--line-indent (pos)
+  (save-excursion (goto-char pos) (current-indentation)))
+
+(defconst factor--regex-closing-paren "[])}]")
+(defsubst factor--at-closing-paren-p ()
+  (looking-at factor--regex-closing-paren))
+
+(defsubst factor--at-first-char-p ()
+  (= (- (point) (line-beginning-position)) (current-indentation)))
+
+(defconst factor--regex-single-liner
+  (format "^%s" (regexp-opt '("USE:" "IN:" "PRIVATE>" "<PRIVATE"))))
+
+(defun factor--at-end-of-def ()
+  (or (looking-at ".*;[ \t]*$")
+      (looking-at factor--regex-single-liner)))
+
+(defun factor--indent-in-brackets ()
+  (save-excursion
+    (beginning-of-line)
+    (when (or (and (re-search-forward factor--regex-closing-paren
+                                      (line-end-position) t)
+                   (not (backward-char)))
+               (> (factor--ppss-brackets-depth) 0))
+      (let ((op (factor--ppss-brackets-start)))
+        (when (> (line-number-at-pos) (line-number-at-pos op))
+          (if (factor--at-closing-paren-p)
+              (factor--line-indent op)
+            (+ (factor--line-indent op) factor-indent-width)))))))
+
+(defun factor--indent-definition ()
+  (save-excursion
+    (beginning-of-line)
+    (when (looking-at "\\([^ ]\\|^\\)+:") 0)))
+
+(defun factor--indent-continuation ()
+  (save-excursion
+    (forward-line -1)
+    (beginning-of-line)
+    (if (bobp) 0
+      (if (looking-at "^[ \t]*$")
+          (factor--indent-continuation)
+        (if (factor--at-end-of-def)
+            (- (current-indentation) factor-indent-width)
+          (if (factor--indent-definition)
+              (+ (current-indentation) factor-indent-width)
+            (current-indentation)))))))
+
+(defun factor--calculate-indentation ()
+  "Calculate Factor indentation for line at point."
+  (or (and (bobp) 0)
+      (factor--indent-definition)
+      (factor--indent-in-brackets)
+      (factor--indent-continuation)
+      0))
 
 (defun factor-indent-line ()
   "Indent current line as Factor code"
-  (let ((target (factor-calculate-indentation))
+  (let ((target (factor--calculate-indentation))
         (pos (- (point-max) (point))))
     (if (= target (current-indentation))
         (if (< (current-column) (current-indentation))
@@ -386,10 +414,10 @@ value from the existing code in the buffer."
       (if (> (- (point-max) pos) (point))
           (goto-char (- (point-max) pos))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; factor-mode
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Factor mode:
 
+;;;###autoload
 (defun factor-mode ()
   "A mode for editing programs written in the Factor programming language.
 \\{factor-mode-map}"
@@ -410,15 +438,18 @@ value from the existing code in the buffer."
 
 (add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; factor-listener-mode
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; Factor listener mode
 
+;;;###autoload
 (define-derived-mode factor-listener-mode comint-mode "Factor Listener")
 
 (define-key factor-listener-mode-map [f8] 'factor-refresh-all)
 
+;;;###autoload
 (defun run-factor ()
+  "Start a factor listener inside emacs, or switch to it if it
+already exists."
   (interactive)
   (switch-to-buffer
    (make-comint-in-buffer "factor" nil (expand-file-name factor-binary) nil
@@ -427,5 +458,12 @@ value from the existing code in the buffer."
   (factor-listener-mode))
 
 (defun factor-refresh-all ()
+  "Reload source files and documentation for all loaded
+vocabularies which have been modified on disk."
   (interactive)
   (comint-send-string "*factor*" "refresh-all\n"))
+
+
+
+(provide 'factor)
+;;; factor.el ends here

@@ -2,6 +2,9 @@ USING: regexp tools.test kernel sequences regexp.parser
 regexp.traversal eval ;
 IN: regexp-tests
 
+\ <regexp> must-infer
+\ matches? must-infer
+
 [ f ] [ "b" "a*" <regexp> matches? ] unit-test
 [ t ] [ "" "a*" <regexp> matches? ] unit-test
 [ t ] [ "a" "a*" <regexp> matches? ] unit-test
@@ -43,6 +46,18 @@ IN: regexp-tests
 [ t ] [ "a" ".+" <regexp> matches? ] unit-test
 [ t ] [ "ab" ".+" <regexp> matches? ] unit-test
 
+[ t ] [ " " "[\\s]" <regexp> matches? ] unit-test
+[ f ] [ "a" "[\\s]" <regexp> matches? ] unit-test
+[ f ] [ " " "[\\S]" <regexp> matches? ] unit-test
+[ t ] [ "a" "[\\S]" <regexp> matches? ] unit-test
+[ f ] [ " " "[\\w]" <regexp> matches? ] unit-test
+[ t ] [ "a" "[\\w]" <regexp> matches? ] unit-test
+[ t ] [ " " "[\\W]" <regexp> matches? ] unit-test
+[ f ] [ "a" "[\\W]" <regexp> matches? ] unit-test
+
+[ t ] [ "/" "\\/" <regexp> matches? ] unit-test
+
+[ t ] [ "a" R' a'i matches? ] unit-test
 
 [ t ] [ "" "a|b*|c+|d?" <regexp> matches? ] unit-test
 [ t ] [ "a" "a|b*|c+|d?" <regexp> matches? ] unit-test
@@ -331,3 +346,7 @@ IN: regexp-tests
 [ { 0 3 } ] [ "abc" "(ab|a)(bc)?" <regexp> first-match ] unit-test
 
 [ { 23 24 } ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match ] unit-test
+
+[ t ] [ "a:b" ".+:?" <regexp> matches? ] unit-test
+
+[ 1 ] [ "hello" ".+?" <regexp> match length ] unit-test

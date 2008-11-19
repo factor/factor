@@ -52,7 +52,7 @@
 				</tr>
 			</table>
 
-			<p> <button>Done</button> </p>
+			<p> <button type="submit">Done</button> </p>
 
 		</t:form>
 

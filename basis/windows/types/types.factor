@@ -40,10 +40,11 @@ TYPEDEF: void*               LPVOID
 TYPEDEF: void*               LPCVOID
 
 TYPEDEF: float               FLOAT
-TYPEDEF: short       HALF_PTR
-TYPEDEF: ushort      UHALF_PTR
-TYPEDEF: int         INT_PTR
-TYPEDEF: uint        UINT_PTR
+
+TYPEDEF: intptr_t    HALF_PTR
+TYPEDEF: intptr_t    UHALF_PTR
+TYPEDEF: intptr_t    INT_PTR
+TYPEDEF: intptr_t    UINT_PTR
 
 TYPEDEF: int         LONG_PTR
 TYPEDEF: ulong       ULONG_PTR
