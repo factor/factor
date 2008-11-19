@@ -178,7 +178,8 @@ M: windows >directory-entry ( byte-array -- directory-entry )
     [ WIN32_FIND_DATA-cFileName utf16n alien>string ]
     [ WIN32_FIND_DATA-dwFileAttributes win32-file-type ]
     [ WIN32_FIND_DATA-dwFileAttributes win32-file-attributes ]
-    tri windows-directory-entry boa ;
+    tri
+    dupd remove windows-directory-entry boa ;
 
 : WIN32_FIND_DATA>file-info ( WIN32_FIND_DATA -- file-info )
     [ \ windows-file-info new ] dip
