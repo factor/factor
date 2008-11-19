@@ -15,7 +15,7 @@ int WINAPI WinMain(
 	szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
 	if(NULL == szArglist)
 	{
-		print_string("CommandLineToArgvW failed\n");
+		puts("CommandLineToArgvW failed");
 		return 1;
 	}
 
