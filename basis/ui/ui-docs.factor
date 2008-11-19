@@ -105,24 +105,7 @@ ARTICLE: "gadgets" "Pre-made UI gadgets"
 
 ARTICLE: "ui-geometry" "Gadget geometry"
 "The " { $link gadget } " class inherits from the " { $link rect } " class, and thus all gadgets have a bounding box:"
-{ $subsection rect }
-"Rectangles can be taken apart:"
-{ $subsection rect-loc }
-{ $subsection rect-dim }
-{ $subsection rect-bounds }
-{ $subsection rect-extent }
-"New rectangles can be created:"
-{ $subsection <zero-rect> }
-{ $subsection <rect> }
-{ $subsection <extent-rect> }
-"More utility words for working with rectangles:"
-{ $subsection offset-rect }
-{ $subsection rect-intersect }
-{ $subsection intersects? }
-
-! "A gadget's bounding box is always relative to its parent. "
-! { $subsection gadget-parent }
-
+{ $subsection "math.geometry.rect" }
 "Word for converting from a child gadget's co-ordinate system to a parent's:"
 { $subsection relative-loc }
 { $subsection screen-loc }
