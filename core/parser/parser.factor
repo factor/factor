@@ -69,19 +69,20 @@ TUPLE: no-current-vocab ;
 
 : CREATE-WORD ( -- word ) CREATE dup reset-generic ;
 
-: word-restarts ( possibilities name -- restarts )
-    [
-        natural-sort
-        [
-            [ "Use the " swap vocabulary>> " vocabulary" 3append ] keep
-        ] { } map>assoc
-    ]
-    [ "Defer word in current vocabulary" swap 2array ] bi*
+: word-restarts ( name possibilities -- restarts )
+    natural-sort
+    [ [ "Use the " swap vocabulary>> " vocabulary" 3append ] keep ] { } map>assoc
+    swap "Defer word in current vocabulary" swap 2array
     suffix ;
 
 ERROR: no-word-error name ;
 
+: <no-word-error> ( name possibilities -- error restarts )
+    [ drop \ no-word-error boa ] [ word-restarts ] 2bi ;
+
 SYMBOL: amended-use?
+
+SYMBOL: do-what-i-mean?
 
 : no-word-restarted ( restart-value -- word )
     dup word?
@@ -90,10 +91,11 @@ SYMBOL: amended-use?
     if ;
 
 : no-word ( name -- newword )
-    dup \ no-word-error boa
-    swap [ words-named [ forward-reference? not ] filter ] keep
-    word-restarts throw-restarts
-    no-word-restarted ;
+    dup words-named [ forward-reference? not ] filter
+    dup length 1 = do-what-i-mean? get and
+    [ nip first no-word-restarted ]
+    [ <no-word-error> throw-restarts no-word-restarted ]
+    if ;
 
 : check-forward ( str word -- word/f )
     dup forward-reference? [
@@ -226,7 +228,7 @@ SYMBOL: interactive-vocabs
 
 SYMBOL: print-use-hook
 
-[ ] print-use-hook set-global
+print-use-hook global [ [ ] or ] change-at
 
 : parse-fresh ( lines -- quot )
     [
