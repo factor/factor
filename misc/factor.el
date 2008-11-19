@@ -265,7 +265,7 @@ value from the existing code in the buffer."
 (defsubst factor--ppss-brackets-start ()
   (nth 1 (syntax-ppss)))
 
-(defsubst factor--line-indent (pos)
+(defsubst factor--indentation-at (pos)
   (save-excursion (goto-char pos) (current-indentation)))
 
 (defconst factor--regex-closing-paren "[])}]")
@@ -276,7 +276,8 @@ value from the existing code in the buffer."
   (= (- (point) (line-beginning-position)) (current-indentation)))
 
 (defconst factor--regex-single-liner
-  (format "^%s" (regexp-opt '("DEFER:" "GENERIC:" "IN:" "PRIVATE>" "<PRIVATE" "USE:"))))
+  (format "^%s" (regexp-opt '("DEFER:" "GENERIC:" "IN:"
+                              "PRIVATE>" "<PRIVATE" "SYMBOL:" "USE:"))))
 
 (defsubst factor--at-begin-of-def ()
   (looking-at "\\([^ ]\\|^\\)+:"))
@@ -302,6 +303,11 @@ value from the existing code in the buffer."
     (beginning-of-line)
     (re-search-forward factor--regex-constructor (line-end-position) t)))
 
+(defsubst factor--increased-indentation (&optional i)
+  (+ (or i (current-indentation)) factor-indent-width))
+(defsubst factor--decreased-indentation (&optional i)
+  (- (or i (current-indentation)) factor-indent-width))
+
 (defun factor--indent-in-brackets ()
   (save-excursion
     (beginning-of-line)
@@ -312,8 +318,8 @@ value from the existing code in the buffer."
       (let ((op (factor--ppss-brackets-start)))
         (when (> (line-number-at-pos) (line-number-at-pos op))
           (if (factor--at-closing-paren-p)
-              (factor--line-indent op)
-            (+ (factor--line-indent op) factor-indent-width)))))))
+              (factor--indentation-at op)
+            (factor--increased-indentation (factor--indentation-at op))))))))
 
 (defun factor--indent-definition ()
   (save-excursion
@@ -323,29 +329,26 @@ value from the existing code in the buffer."
 (defun factor--indent-setter-line ()
   (when (factor--at-setter-line)
     (save-excursion
-      (beginning-of-line)
-      (let ((indent (when (factor--at-constructor-line) (current-indentation))))
+      (let ((indent (and (factor--at-constructor-line) (current-indentation))))
         (while (not (or indent
                         (bobp)
                         (factor--at-begin-of-def)
                         (factor--at-end-of-def)))
           (if (factor--at-constructor-line)
-              (setq indent (+ (current-indentation) factor-indent-width))
+              (setq indent (factor--increased-indentation))
             (forward-line -1)))
         indent))))
 
 (defun factor--indent-continuation ()
   (save-excursion
     (forward-line -1)
-    (beginning-of-line)
-    (if (bobp) 0
-      (if (factor--looking-at-emptiness)
-          (factor--indent-continuation)
-        (if (or (factor--at-end-of-def) (factor--at-setter-line))
-            (- (current-indentation) factor-indent-width)
-          (if (factor--at-begin-of-def)
-              (+ (current-indentation) factor-indent-width)
-            (current-indentation)))))))
+    (while (and (not (bobp)) (factor--looking-at-emptiness))
+      (forward-line -1))
+    (if (or (factor--at-end-of-def) (factor--at-setter-line))
+        (factor--decreased-indentation)
+      (if (factor--at-begin-of-def)
+          (factor--increased-indentation)
+        (current-indentation)))))
 
 (defun factor--calculate-indentation ()
   "Calculate Factor indentation for line at point."
