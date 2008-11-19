@@ -281,9 +281,26 @@ value from the existing code in the buffer."
 (defsubst factor--at-begin-of-def ()
   (looking-at "\\([^ ]\\|^\\)+:"))
 
+(defsubst factor--looking-at-emptiness ()
+  (looking-at "^[ \t]*$"))
+
 (defun factor--at-end-of-def ()
   (or (looking-at ".*;[ \t]*$")
       (looking-at factor--regex-single-liner)))
+
+(defun factor--at-setter-line ()
+  (save-excursion
+    (beginning-of-line)
+    (if (not (factor--looking-at-emptiness))
+        (re-search-forward factor--regex-setter (line-end-position) t)
+      (forward-line -1)
+      (or (factor--at-constructor-line)
+          (factor--at-setter-line)))))
+
+(defun factor--at-constructor-line ()
+  (save-excursion
+    (beginning-of-line)
+    (re-search-forward factor--regex-constructor (line-end-position) t)))
 
 (defun factor--indent-in-brackets ()
   (save-excursion
@@ -303,14 +320,28 @@ value from the existing code in the buffer."
     (beginning-of-line)
     (when (factor--at-begin-of-def) 0)))
 
+(defun factor--indent-setter-line ()
+  (when (factor--at-setter-line)
+    (save-excursion
+      (beginning-of-line)
+      (let ((indent (when (factor--at-constructor-line) (current-indentation))))
+        (while (not (or indent
+                        (bobp)
+                        (factor--at-begin-of-def)
+                        (factor--at-end-of-def)))
+          (if (factor--at-constructor-line)
+              (setq indent (+ (current-indentation) factor-indent-width))
+            (forward-line -1)))
+        indent))))
+
 (defun factor--indent-continuation ()
   (save-excursion
     (forward-line -1)
     (beginning-of-line)
     (if (bobp) 0
-      (if (looking-at "^[ \t]*$")
+      (if (factor--looking-at-emptiness)
           (factor--indent-continuation)
-        (if (factor--at-end-of-def)
+        (if (or (factor--at-end-of-def) (factor--at-setter-line))
             (- (current-indentation) factor-indent-width)
           (if (factor--at-begin-of-def)
               (+ (current-indentation) factor-indent-width)
@@ -321,6 +352,7 @@ value from the existing code in the buffer."
   (or (and (bobp) 0)
       (factor--indent-definition)
       (factor--indent-in-brackets)
+      (factor--indent-setter-line)
       (factor--indent-continuation)
       0))
 
