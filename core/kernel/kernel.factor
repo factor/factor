@@ -55,18 +55,18 @@ DEFER: if
 
 : 3slip ( quot x y z -- x y z ) >r >r >r call r> r> r> ; inline
 
-: dip ( obj quot -- obj ) swap slip ; inline
+: dip ( x quot -- x ) swap slip ; inline
 
-: 2dip ( obj1 obj2 quot -- obj1 obj2 ) -rot 2slip ; inline
+: 2dip ( x y quot -- x y ) swap >r dip r> ; inline
 
-: 3dip ( obj1 obj2 obj3 quot -- obj1 obj2 obj3 ) -roll 3slip ; inline
+: 3dip ( x y z quot -- x y z ) swap >r 2dip r> ; inline
 
 ! Keepers
-: keep ( x quot -- x ) over slip ; inline
+: keep ( x quot -- x ) dupd dip ; inline
 
-: 2keep ( x y quot -- x y ) 2over 2slip ; inline
+: 2keep ( x y quot -- x y ) >r 2dup r> 2dip ; inline
 
-: 3keep ( x y z quot -- x y z ) >r 3dup r> -roll 3slip ; inline
+: 3keep ( x y z quot -- x y z ) >r 3dup r> 3dip ; inline
 
 ! Cleavers
 : bi ( x p q -- )

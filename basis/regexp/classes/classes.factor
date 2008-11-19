@@ -30,6 +30,10 @@ M: ascii-class class-member? ( obj class -- ? )
 M: digit-class class-member? ( obj class -- ? )
     drop digit? ;
 
+M: c-identifier-class class-member? ( obj class -- ? )
+    drop
+    { [ digit? ] [ Letter? ] [ CHAR: _ = ] } 1|| ;
+
 M: alpha-class class-member? ( obj class -- ? )
     drop alpha? ;
 

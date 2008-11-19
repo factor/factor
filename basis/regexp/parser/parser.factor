@@ -294,6 +294,7 @@ ERROR: unrecognized-escape char ;
     read1
     {
         { CHAR: \ [ CHAR: \ <constant> ] }
+        { CHAR: / [ CHAR: / <constant> ] }
         { CHAR: ^ [ CHAR: ^ <constant> ] }
         { CHAR: $ [ CHAR: $ <constant> ] }
         { CHAR: - [ CHAR: - <constant> ] }

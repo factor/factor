@@ -131,10 +131,10 @@ check_library_exists() {
         $ECHO "***Factor will compile NO_UI=1"
         NO_UI=1
     fi
-    rm -f $GCC_TEST
-    check_ret rm
-    rm -f $GCC_OUT
-    check_ret rm
+    $DELETE -f $GCC_TEST
+    check_ret $DELETE
+    $DELETE -f $GCC_OUT
+    check_ret $DELETE
     $ECHO "found."
 }
 
@@ -209,7 +209,7 @@ c_find_word_size() {
     gcc -o $C_WORD $C_WORD.c
     WORD=$(./$C_WORD)
     check_ret $C_WORD
-    rm -f $C_WORD*
+    $DELETE -f $C_WORD*
 }
 
 intel_macosx_word_size() {
@@ -236,10 +236,21 @@ find_word_size() {
 
 set_factor_binary() {
     case $OS in
-        # winnt) FACTOR_BINARY=factor-nt;;
-        # macosx) FACTOR_BINARY=./Factor.app/Contents/MacOS/factor;;
+        winnt) FACTOR_BINARY=factor.exe;;
         *) FACTOR_BINARY=factor;;
     esac
+}
+
+set_factor_library() {
+    case $OS in
+        winnt) FACTOR_LIBRARY=factor.dll;;
+        macosx) FACTOR_LIBRARY=libfactor.dylib;;
+        *) FACTOR_LIBRARY=libfactor.a;;
+    esac
+}
+
+set_factor_image() {
+    FACTOR_IMAGE=factor.image
 }
 
 echo_build_info() {
@@ -247,6 +258,8 @@ echo_build_info() {
     $ECHO ARCH=$ARCH
     $ECHO WORD=$WORD
     $ECHO FACTOR_BINARY=$FACTOR_BINARY
+    $ECHO FACTOR_LIBRARY=$FACTOR_LIBRARY
+    $ECHO FACTOR_IMAGE=$FACTOR_IMAGE
     $ECHO MAKE_TARGET=$MAKE_TARGET
     $ECHO BOOT_IMAGE=$BOOT_IMAGE
     $ECHO MAKE_IMAGE_TARGET=$MAKE_IMAGE_TARGET
@@ -255,6 +268,8 @@ echo_build_info() {
     $ECHO DOWNLOADER=$DOWNLOADER
     $ECHO CC=$CC
     $ECHO MAKE=$MAKE
+    $ECHO COPY=$COPY
+    $ECHO DELETE=$DELETE
 }
 
 check_os_arch_word() {
@@ -312,6 +327,8 @@ find_build_info() {
     find_architecture
     find_word_size
     set_factor_binary
+    set_factor_library
+    set_factor_image
     set_build_info
     set_downloader
     set_gcc
@@ -337,6 +354,28 @@ git_pull_factorcode() {
 cd_factor() {
     cd factor
     check_ret cd
+}
+
+set_copy() {
+    case $OS in
+        winnt) COPY=cp;;
+        *) COPY=cp;;
+    esac
+}
+
+set_delete() {
+    case $OS in
+        winnt) DELETE=rm;;
+        *) DELETE=rm;;
+    esac
+}
+
+backup_factor() {
+    $ECHO "Backing up factor..."
+    $COPY $FACTOR_BINARY $FACTOR_BINARY.bak
+    $COPY $FACTOR_LIBRARY $FACTOR_LIBRARY.bak
+    $COPY $FACTOR_IMAGE $FACTOR_IMAGE.bak
+    $ECHO "Done with backup."
 }
 
 check_makefile_exists() {
@@ -366,9 +405,9 @@ make_factor() {
 
 update_boot_images() {
     echo "Deleting old images..."
-    rm checksums.txt* > /dev/null 2>&1
-    rm $BOOT_IMAGE.* > /dev/null 2>&1
-    rm temp/staging.*.image > /dev/null 2>&1
+    $DELETE checksums.txt* > /dev/null 2>&1
+    $DELETE $BOOT_IMAGE.* > /dev/null 2>&1
+    $DELETE temp/staging.*.image > /dev/null 2>&1
     if [[ -f $BOOT_IMAGE ]] ; then
         get_url http://factorcode.org/images/latest/checksums.txt
         factorcode_md5=`cat checksums.txt|grep $BOOT_IMAGE|cut -f2 -d' '`;
@@ -382,7 +421,7 @@ update_boot_images() {
         if [[ "$factorcode_md5" == "$disk_md5" ]] ; then
             echo "Your disk boot image matches the one on factorcode.org."
         else
-            rm $BOOT_IMAGE > /dev/null 2>&1
+            $DELETE $BOOT_IMAGE > /dev/null 2>&1
             get_boot_image;
         fi
     else
@@ -459,6 +498,7 @@ install() {
 update() {
     get_config_info
     git_pull_factorcode
+    backup_factor
     make_clean
     make_factor
 }
@@ -469,12 +509,12 @@ update_bootstrap() {
 }
 
 refresh_image() {
-    ./$FACTOR_BINARY -script -e="USE: vocabs.loader refresh-all USE: memory save 0 USE: system exit"
+    ./$FACTOR_BINARY -script -e="USE: vocabs.loader USE: system refresh-all USE: memory save 0 exit"
     check_ret factor
 }
 
 make_boot_image() {
-    ./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USE: bootstrap.image make-image save 0 USE: system exit"
+    ./$FACTOR_BINARY -script -e="\"$MAKE_IMAGE_TARGET\" USE: system USE: bootstrap.image make-image save 0 exit"
     check_ret factor
 
 }
@@ -512,6 +552,9 @@ MAKE_TARGET=unknown
 if [[ -n "$2" ]] ; then
     parse_build_info $2
 fi
+
+set_copy
+set_delete
 
 case "$1" in
     install) install ;;

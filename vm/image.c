@@ -28,12 +28,15 @@ INLINE void load_data_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 
 	F_ZONE *tenured = &data_heap->generations[TENURED];
 
-	long int bytes_read = fread((void*)tenured->start,1,h->data_size,file);
+	F_FIXNUM bytes_read = fread((void*)tenured->start,1,h->data_size,file);
 
 	if(bytes_read != h->data_size)
 	{
-		fprintf(stderr,"truncated image: %ld bytes read, %ld bytes expected\n",
-			bytes_read,h->data_size);
+		print_string("truncated image: ");
+		print_fixnum(bytes_read);
+		print_string(" bytes read, ");
+		print_cell(h->data_size);
+		print_string(" bytes expected\n");
 		fatal_error("load_data_heap failed",0);
 	}
 
@@ -52,11 +55,14 @@ INLINE void load_code_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 
 	if(h->code_size != 0)
 	{
-		long int bytes_read = fread(first_block(&code_heap),1,h->code_size,file);
+		F_FIXNUM bytes_read = fread(first_block(&code_heap),1,h->code_size,file);
 		if(bytes_read != h->code_size)
 		{
-			fprintf(stderr,"truncated image: %ld bytes read, %ld bytes expected\n",
-				bytes_read,h->code_size);
+			print_string("truncated image: ");
+			print_fixnum(bytes_read);
+			print_string(" bytes read, ");
+			print_cell(h->code_size);
+			print_string(" bytes expected\n");
 			fatal_error("load_code_heap failed",0);
 		}
 	}
@@ -72,8 +78,8 @@ void load_image(F_PARAMETERS *p)
 	FILE *file = OPEN_READ(p->image);
 	if(file == NULL)
 	{
-		FPRINTF(stderr,"Cannot open image file: %s\n",p->image);
-		fprintf(stderr,"%s\n",strerror(errno));
+		print_string("Cannot open image file: "); print_native_string(p->image); nl();
+		print_string(strerror(errno)); nl();
 		exit(1);
 	}
 
@@ -106,12 +112,11 @@ bool save_image(const F_CHAR *filename)
 	FILE* file;
 	F_HEADER h;
 
-	FPRINTF(stderr,"*** Saving %s...\n",filename);
-
 	file = OPEN_WRITE(filename);
 	if(file == NULL)
 	{
-		fprintf(stderr,"Cannot open image file: %s\n",strerror(errno));
+		print_string("Cannot open image file: "); print_native_string(filename); nl();
+		print_string(strerror(errno)); nl();
 		return false;
 	}
 
@@ -142,19 +147,19 @@ bool save_image(const F_CHAR *filename)
 
 	if(fwrite((void*)tenured->start,h.data_size,1,file) != 1)
 	{
-		fprintf(stderr,"Save data heap failed: %s\n",strerror(errno));
+		print_string("Save data heap failed: "); print_string(strerror(errno)); nl();
 		return false;
 	}
 
 	if(fwrite(first_block(&code_heap),h.code_size,1,file) != 1)
 	{
-		fprintf(stderr,"Save code heap failed: %s\n",strerror(errno));
+		print_string("Save code heap failed: "); print_string(strerror(errno)); nl();
 		return false;
 	}
 
 	if(fclose(file))
 	{
-		fprintf(stderr,"Failed to close image file: %s\n",strerror(errno));
+		print_string("Failed to close image file: "); print_string(strerror(errno)); nl();
 		return false;
 	}
 

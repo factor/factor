@@ -606,7 +606,7 @@ HELP: 3compose
 } ;
 
 HELP: dip
-{ $values { "obj" object } { "quot" quotation } }
+{ $values { "x" object } { "quot" quotation } }
 { $description "Calls " { $snippet "quot" } " with " { $snippet "obj" } " hidden on the retain stack." }
 { $notes "The following are equivalent:"
     { $code ">r foo bar r>" }
@@ -614,7 +614,7 @@ HELP: dip
 } ;
 
 HELP: 2dip
-{ $values { "obj1" object } { "obj2" object } { "quot" quotation } }
+{ $values { "x" object } { "y" object } { "quot" quotation } }
 { $description "Calls " { $snippet "quot" } " with " { $snippet "obj1" } " and " { $snippet "obj2" } " hidden on the retain stack." }
 { $notes "The following are equivalent:"
     { $code ">r >r foo bar r> r>" }
@@ -622,7 +622,7 @@ HELP: 2dip
 } ;
 
 HELP: 3dip
-{ $values { "obj1" object } { "obj2" object } { "obj3" object } { "quot" quotation } }
+{ $values { "x" object } { "y" object } { "z" object } { "quot" quotation } }
 { $description "Calls " { $snippet "quot" } " with " { $snippet "obj1" } ", " { $snippet "obj2" } " and " { $snippet "obj3" } " hidden on the retain stack." }
 { $notes "The following are equivalent:"
     { $code ">r >r >r foo bar r> r> r>" }

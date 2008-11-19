@@ -52,7 +52,12 @@ SYMBOL: in
 
 M: parsing-word stack-effect drop (( parsed -- parsed )) ;
 
-ERROR: no-current-vocab ;
+TUPLE: no-current-vocab ;
+
+: no-current-vocab ( -- vocab )
+    \ no-current-vocab boa
+    { { "Define words in scratchpad vocabulary" "scratchpad" } }
+    throw-restarts dup set-in ;
 
 : current-vocab ( -- str )
     in get [ no-current-vocab ] unless* ;
@@ -64,20 +69,33 @@ ERROR: no-current-vocab ;
 
 : CREATE-WORD ( -- word ) CREATE dup reset-generic ;
 
-: word-restarts ( possibilities -- restarts )
-    natural-sort [
-        [
-            "Use the " swap vocabulary>> " vocabulary" 3append
-        ] keep
-    ] { } map>assoc ;
+: word-restarts ( name possibilities -- restarts )
+    natural-sort
+    [ [ "Use the " swap vocabulary>> " vocabulary" 3append ] keep ] { } map>assoc
+    swap "Defer word in current vocabulary" swap 2array
+    suffix ;
 
 ERROR: no-word-error name ;
 
+: <no-word-error> ( name possibilities -- error restarts )
+    [ drop \ no-word-error boa ] [ word-restarts ] 2bi ;
+
+SYMBOL: amended-use?
+
+SYMBOL: do-what-i-mean?
+
+: no-word-restarted ( restart-value -- word )
+    dup word?
+    [ amended-use? on dup vocabulary>> (use+) ]
+    [ create-in ]
+    if ;
+
 : no-word ( name -- newword )
-    dup \ no-word-error boa
-    swap words-named [ forward-reference? not ] filter
-    word-restarts throw-restarts
-    dup vocabulary>> (use+) ;
+    dup words-named [ forward-reference? not ] filter
+    dup length 1 = do-what-i-mean? get and
+    [ nip first no-word-restarted ]
+    [ <no-word-error> throw-restarts no-word-restarted ]
+    if ;
 
 : check-forward ( str word -- word/f )
     dup forward-reference? [
@@ -127,7 +145,9 @@ ERROR: staging-violation word ;
 : parsed ( accum obj -- accum ) over push ;
 
 : (parse-lines) ( lexer -- quot )
-    [ f parse-until >quotation ] with-lexer ;
+    [
+        f parse-until >quotation
+    ] with-lexer ;
 
 : parse-lines ( lines -- quot )
     lexer-factory get call (parse-lines) ;
@@ -206,8 +226,18 @@ SYMBOL: interactive-vocabs
         call
     ] with-scope ; inline
 
+SYMBOL: print-use-hook
+
+print-use-hook global [ [ ] or ] change-at
+
 : parse-fresh ( lines -- quot )
-    [ parse-lines ] with-file-vocabs ;
+    [
+        amended-use? off
+        parse-lines
+        amended-use? get [
+            print-use-hook get call
+        ] when
+    ] with-file-vocabs ;
 
 : parsing-file ( file -- )
     "quiet" get [

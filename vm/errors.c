@@ -2,21 +2,23 @@
 
 void out_of_memory(void)
 {
-	fprintf(stderr,"Out of memory\n\n");
+	print_string("Out of memory\n\n");
 	dump_generations();
 	exit(1);
 }
 
 void fatal_error(char* msg, CELL tagged)
 {
-	fprintf(stderr,"fatal_error: %s %lx\n",msg,tagged);
+	print_string("fatal_error: "); print_string(msg);
+	print_string(": "); print_cell_hex(tagged); nl();
 	exit(1);
 }
 
 void critical_error(char* msg, CELL tagged)
 {
-	fprintf(stderr,"You have triggered a bug in Factor. Please report.\n");
-	fprintf(stderr,"critical_error: %s %lx\n",msg,tagged);
+	print_string("You have triggered a bug in Factor. Please report.\n");
+	print_string("critical_error: "); print_string(msg);
+	print_string(": "); print_cell_hex(tagged); nl();
 	factorbug();
 }
 
@@ -57,10 +59,10 @@ void throw_error(CELL error, F_STACK_FRAME *callstack_top)
 	crash. */
 	else
 	{
-		printf("You have triggered a bug in Factor. Please report.\n");
-		printf("early_error: ");
+		print_string("You have triggered a bug in Factor. Please report.\n");
+		print_string("early_error: ");
 		print_obj(error);
-		printf("\n");
+		nl();
 		factorbug();
 	}
 }

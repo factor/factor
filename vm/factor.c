@@ -41,8 +41,8 @@ void default_parameters(F_PARAMETERS *p)
 /* Do some initialization that we do once only */
 void do_stage1_init(void)
 {
-	fprintf(stderr,"*** Stage 2 early init... ");
-	fflush(stderr);
+	print_string("*** Stage 2 early init... ");
+	fflush(stdout);
 
 	CELL words = find_all_words();
 
@@ -65,8 +65,8 @@ void do_stage1_init(void)
 
 	userenv[STAGE2_ENV] = T;
 
-	fprintf(stderr,"done\n");
-	fflush(stderr);
+	print_string("done\n");
+	fflush(stdout);
 }
 
 /* Get things started */
