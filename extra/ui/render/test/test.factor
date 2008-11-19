@@ -31,8 +31,8 @@ SYMBOL: render-output
     [ render-output set-global ]
     [
         "resource:extra/ui/render/test/reference.bmp" load-bitmap
-        [ array>> ] bi@ = "perfect" "needs work" ?
-        "Your UI rendering is " prepend
+        [ array>> ] bi@ = "is perfect" "needs work" ?
+        "Your UI rendering " prepend
         message-window
     ] bi ;
 
