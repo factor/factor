@@ -113,6 +113,14 @@ value from the existing code in the buffer."
   "Face for type (tuple) names."
   :group 'factor-faces)
 
+(defface factor-font-lock-constructor (factor--face font-lock-type-face)
+  "Face for constructors (<foo>)."
+  :group 'factor-faces)
+
+(defface factor-font-lock-setter-word (factor--face font-lock-function-name-face)
+  "Face for setter words (>>foo)."
+  :group 'factor-faces)
+
 (defface factor-font-lock-parsing-word (factor--face font-lock-keyword-face)
   "Face for parsing words."
   :group 'factor-faces)
@@ -146,6 +154,12 @@ value from the existing code in the buffer."
 (defconst factor--regex-type-definition
   (factor--regex-second-word '("TUPLE:")))
 
+(defconst factor--regex-parent-type "^TUPLE: +[^ ]+ +< +\\([^ ]+\\)")
+
+(defconst factor--regex-constructor "<[^ >]+>")
+
+(defconst factor--regex-setter "\\W>>[^ ]+\\b")
+
 (defconst factor--regex-symbol-definition
   (factor--regex-second-word '("SYMBOL:")))
 
@@ -166,6 +180,9 @@ value from the existing code in the buffer."
     (,factor--regex-parsing-words-ext . 'factor-font-lock-parsing-word)
     (,factor--regex-word-definition 2 'factor-font-lock-word-definition)
     (,factor--regex-type-definition 2 'factor-font-lock-type-definition)
+    (,factor--regex-parent-type 1 'factor-font-lock-type-definition)
+    (,factor--regex-constructor . 'factor-font-lock-constructor)
+    (,factor--regex-setter . 'factor-font-lock-setter-word)
     (,factor--regex-symbol-definition 2 'factor-font-lock-symbol-definition)
     (,factor--regex-using-line 1 'factor-font-lock-vocabulary-name)
     (,factor--regex-use-line 1 'factor-font-lock-vocabulary-name))
@@ -216,6 +233,141 @@ value from the existing code in the buffer."
     (modify-syntax-entry ?\( "()" factor-mode-syntax-table)
     (modify-syntax-entry ?\) ")(" factor-mode-syntax-table)
     (modify-syntax-entry ?\" "\"    " factor-mode-syntax-table)))
+
+
+;;; Factor mode indentation:
+
+(make-variable-buffer-local
+ (defvar factor-indent-width factor-default-indent-width
+   "Indentation width in factor buffers. A local variable."))
+
+(defconst factor--regexp-word-start
+  (let ((sws '("" ":" "TUPLE" "MACRO" "MACRO:" "M")))
+    (format "^\\(%s\\): " (mapconcat 'identity sws "\\|"))))
+
+(defun factor--guess-indent-width ()
+  "Chooses an indentation value from existing code."
+  (let ((word-cont "^ +[^ ]")
+        (iw))
+    (save-excursion
+      (beginning-of-buffer)
+      (while (not iw)
+        (if (not (re-search-forward factor--regexp-word-start nil t))
+            (setq iw factor-default-indent-width)
+          (forward-line)
+          (when (looking-at word-cont)
+            (setq iw (current-indentation))))))
+    iw))
+
+(defsubst factor--ppss-brackets-depth ()
+  (nth 0 (syntax-ppss)))
+
+(defsubst factor--ppss-brackets-start ()
+  (nth 1 (syntax-ppss)))
+
+(defsubst factor--line-indent (pos)
+  (save-excursion (goto-char pos) (current-indentation)))
+
+(defconst factor--regex-closing-paren "[])}]")
+(defsubst factor--at-closing-paren-p ()
+  (looking-at factor--regex-closing-paren))
+
+(defsubst factor--at-first-char-p ()
+  (= (- (point) (line-beginning-position)) (current-indentation)))
+
+(defconst factor--regex-single-liner
+  (format "^%s" (regexp-opt '("DEFER:" "GENERIC:" "IN:" "PRIVATE>" "<PRIVATE" "USE:"))))
+
+(defsubst factor--at-begin-of-def ()
+  (looking-at "\\([^ ]\\|^\\)+:"))
+
+(defsubst factor--looking-at-emptiness ()
+  (looking-at "^[ \t]*$"))
+
+(defun factor--at-end-of-def ()
+  (or (looking-at ".*;[ \t]*$")
+      (looking-at factor--regex-single-liner)))
+
+(defun factor--at-setter-line ()
+  (save-excursion
+    (beginning-of-line)
+    (if (not (factor--looking-at-emptiness))
+        (re-search-forward factor--regex-setter (line-end-position) t)
+      (forward-line -1)
+      (or (factor--at-constructor-line)
+          (factor--at-setter-line)))))
+
+(defun factor--at-constructor-line ()
+  (save-excursion
+    (beginning-of-line)
+    (re-search-forward factor--regex-constructor (line-end-position) t)))
+
+(defun factor--indent-in-brackets ()
+  (save-excursion
+    (beginning-of-line)
+    (when (or (and (re-search-forward factor--regex-closing-paren
+                                      (line-end-position) t)
+                   (not (backward-char)))
+              (> (factor--ppss-brackets-depth) 0))
+      (let ((op (factor--ppss-brackets-start)))
+        (when (> (line-number-at-pos) (line-number-at-pos op))
+          (if (factor--at-closing-paren-p)
+              (factor--line-indent op)
+            (+ (factor--line-indent op) factor-indent-width)))))))
+
+(defun factor--indent-definition ()
+  (save-excursion
+    (beginning-of-line)
+    (when (factor--at-begin-of-def) 0)))
+
+(defun factor--indent-setter-line ()
+  (when (factor--at-setter-line)
+    (save-excursion
+      (beginning-of-line)
+      (let ((indent (when (factor--at-constructor-line) (current-indentation))))
+        (while (not (or indent
+                        (bobp)
+                        (factor--at-begin-of-def)
+                        (factor--at-end-of-def)))
+          (if (factor--at-constructor-line)
+              (setq indent (+ (current-indentation) factor-indent-width))
+            (forward-line -1)))
+        indent))))
+
+(defun factor--indent-continuation ()
+  (save-excursion
+    (forward-line -1)
+    (beginning-of-line)
+    (if (bobp) 0
+      (if (factor--looking-at-emptiness)
+          (factor--indent-continuation)
+        (if (or (factor--at-end-of-def) (factor--at-setter-line))
+            (- (current-indentation) factor-indent-width)
+          (if (factor--at-begin-of-def)
+              (+ (current-indentation) factor-indent-width)
+            (current-indentation)))))))
+
+(defun factor--calculate-indentation ()
+  "Calculate Factor indentation for line at point."
+  (or (and (bobp) 0)
+      (factor--indent-definition)
+      (factor--indent-in-brackets)
+      (factor--indent-setter-line)
+      (factor--indent-continuation)
+      0))
+
+(defun factor--indent-line ()
+  "Indent current line as Factor code"
+  (let ((target (factor--calculate-indentation))
+        (pos (- (point-max) (point))))
+    (if (= target (current-indentation))
+        (if (< (current-column) (current-indentation))
+            (back-to-indentation))
+      (beginning-of-line)
+      (delete-horizontal-space)
+      (indent-to target)
+      (if (> (- (point-max) pos) (point))
+          (goto-char (- (point-max) pos))))))
 
 
 ;;; Factor mode commands:
@@ -314,105 +466,6 @@ value from the existing code in the buffer."
 (define-key factor-mode-map [return]   'newline-and-indent)
 (define-key factor-mode-map [tab]      'indent-for-tab-command)
 
-
-;;; Factor mode indentation:
-
-(make-variable-buffer-local
- (defvar factor-indent-width factor-default-indent-width
-   "Indentation width in factor buffers. A local variable."))
-
-(defconst factor--regexp-word-start
-  (let ((sws '("" ":" "TUPLE" "MACRO" "MACRO:" "M")))
-    (format "^\\(%s\\): " (mapconcat 'identity sws "\\|"))))
-
-(defun factor--guess-indent-width ()
-  "Chooses an indentation value from existing code."
-  (let ((word-cont "^ +[^ ]")
-        (iw))
-    (save-excursion
-      (beginning-of-buffer)
-      (while (not iw)
-        (if (not (re-search-forward factor--regexp-word-start nil t))
-            (setq iw factor-default-indent-width)
-          (forward-line)
-          (when (looking-at word-cont)
-            (setq iw (current-indentation))))))
-    iw))
-
-(defsubst factor--ppss-brackets-depth ()
-  (nth 0 (syntax-ppss)))
-
-(defsubst factor--ppss-brackets-start ()
-  (nth 1 (syntax-ppss)))
-
-(defsubst factor--line-indent (pos)
-  (save-excursion (goto-char pos) (current-indentation)))
-
-(defconst factor--regex-closing-paren "[])}]")
-(defsubst factor--at-closing-paren-p ()
-  (looking-at factor--regex-closing-paren))
-
-(defsubst factor--at-first-char-p ()
-  (= (- (point) (line-beginning-position)) (current-indentation)))
-
-(defconst factor--regex-single-liner
-  (format "^%s" (regexp-opt '("USE:" "IN:" "PRIVATE>" "<PRIVATE"))))
-
-(defun factor--at-end-of-def ()
-  (or (looking-at ".*;[ \t]*$")
-      (looking-at factor--regex-single-liner)))
-
-(defun factor--indent-in-brackets ()
-  (save-excursion
-    (beginning-of-line)
-    (when (or (and (re-search-forward factor--regex-closing-paren
-                                      (line-end-position) t)
-                   (not (backward-char)))
-               (> (factor--ppss-brackets-depth) 0))
-      (let ((op (factor--ppss-brackets-start)))
-        (when (> (line-number-at-pos) (line-number-at-pos op))
-          (if (factor--at-closing-paren-p)
-              (factor--line-indent op)
-            (+ (factor--line-indent op) factor-indent-width)))))))
-
-(defun factor--indent-definition ()
-  (save-excursion
-    (beginning-of-line)
-    (when (looking-at "\\([^ ]\\|^\\)+:") 0)))
-
-(defun factor--indent-continuation ()
-  (save-excursion
-    (forward-line -1)
-    (beginning-of-line)
-    (if (bobp) 0
-      (if (looking-at "^[ \t]*$")
-          (factor--indent-continuation)
-        (if (factor--at-end-of-def)
-            (- (current-indentation) factor-indent-width)
-          (if (factor--indent-definition)
-              (+ (current-indentation) factor-indent-width)
-            (current-indentation)))))))
-
-(defun factor--calculate-indentation ()
-  "Calculate Factor indentation for line at point."
-  (or (and (bobp) 0)
-      (factor--indent-definition)
-      (factor--indent-in-brackets)
-      (factor--indent-continuation)
-      0))
-
-(defun factor-indent-line ()
-  "Indent current line as Factor code"
-  (let ((target (factor--calculate-indentation))
-        (pos (- (point-max) (point))))
-    (if (= target (current-indentation))
-        (if (< (current-column) (current-indentation))
-            (back-to-indentation))
-      (beginning-of-line)
-      (delete-horizontal-space)
-      (indent-to target)
-      (if (> (- (point-max) pos) (point))
-          (goto-char (- (point-max) pos))))))
 
 
 ;; Factor mode:
@@ -426,12 +479,11 @@ value from the existing code in the buffer."
   (use-local-map factor-mode-map)
   (setq major-mode 'factor-mode)
   (setq mode-name "Factor")
-  (set (make-local-variable 'indent-line-function) #'factor-indent-line)
   (set (make-local-variable 'comment-start) "! ")
   (set (make-local-variable 'font-lock-defaults)
        '(factor-font-lock-keywords t nil nil nil))
   (set-syntax-table factor-mode-syntax-table)
-  (set (make-local-variable 'indent-line-function) 'factor-indent-line)
+  (set (make-local-variable 'indent-line-function) 'factor--indent-line)
   (setq factor-indent-width (factor--guess-indent-width))
   (setq indent-tabs-mode nil)
   (run-hooks 'factor-mode-hook))
