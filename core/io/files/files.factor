@@ -175,6 +175,7 @@ SYMBOL: +character-device+
 SYMBOL: +block-device+
 SYMBOL: +fifo+
 SYMBOL: +socket+
+SYMBOL: +whiteout+
 SYMBOL: +unknown+
 
 ! File metadata
