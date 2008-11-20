@@ -2,13 +2,15 @@ USING: help.markup help.syntax ;
 IN: values
 
 ARTICLE: "values" "Global values"
-"Usually, dynamically scoped variables are sufficient for holding data which is not literal. But occasionally, for global information that's calculated just once, it's useful to use the word mechanism instead, and set the word to the appropriate value just once. Values abstract over this concept. To create a new word as a value, use the following syntax:"
+"Usually, dynamically scoped variables are sufficient for holding data which is not literal. But occasionally, for global information that's calculated just once, it's useful to use the word mechanism instead, and set the word to the appropriate value just once. The " { $vocab-link "values" } " vocabulary implements " { $emphasis "values" } ", which abstract over this concept. To create a new word as a value, use the following syntax:"
 { $subsection POSTPONE: VALUE: }
 "To get the value, just call the word. The following words manipulate values:"
 { $subsection get-value }
 { $subsection set-value }
 { $subsection POSTPONE: to: }
 { $subsection change-value } ;
+
+ABOUT: "values"
 
 HELP: VALUE:
 { $syntax "VALUE: word" }
@@ -35,5 +37,5 @@ HELP: to:
 } ;
 
 HELP: change-value
-{ $values { "word" "a value word" } { "quot" "a quotation with stack effect " { $snippet "( oldvalue -- newvalue )" } } }
+{ $values { "word" "a value word" } { "quot" { $quotation "( oldvalue -- newvalue )" } } }
 { $description "Changes the value using the given quotation." } ;

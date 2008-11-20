@@ -284,22 +284,22 @@ HELP: power-of-2?
 { $description "Tests if " { $snippet "n" } " is a power of 2." } ;
 
 HELP: each-integer
-{ $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- )" } } }
+{ $values { "n" integer } { "quot" { $quotation "( i -- )" } } }
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } "." }
 { $notes "This word is used to implement " { $link each } "." } ;
 
 HELP: all-integers?
-{ $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- ? )" } } { "?" "a boolean" } }
+{ $values { "n" integer } { "quot" { $quotation "( i -- ? )" } } { "?" "a boolean" } }
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iterationi stops when the quotation outputs " { $link f } " or the end is reached. If the quotation yields a false value for some integer, this word outputs " { $link f } ". Otherwise, this word outputs " { $link t } "." }
 { $notes "This word is used to implement " { $link all? } "." } ;
 
 HELP: find-integer
-{ $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- ? )" } } { "i" "an integer or " { $link f } } }
+{ $values { "n" integer } { "quot" { $quotation "( i -- ? )" } } { "i" "an integer or " { $link f } } }
 { $description "Applies the quotation to each integer from 0 up to " { $snippet "n" } ", excluding " { $snippet "n" } ". Iterationi stops when the quotation outputs a true value or the end is reached. If the quotation yields a true value for some integer, this word outputs that integer. Otherwise, this word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find } "." } ;
 
 HELP: find-last-integer
-{ $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- ? )" } } { "i" "an integer or " { $link f } } }
+{ $values { "n" integer } { "quot" { $quotation "( i -- ? )" } } { "i" "an integer or " { $link f } } }
 { $description "Applies the quotation to each integer from " { $snippet "n" } " down to 0, inclusive. Iteration stops when the quotation outputs a true value or 0 is reached. If the quotation yields a true value for some integer, the word outputs that integer. Otherwise, the word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find-last } "." } ;
 
@@ -348,6 +348,7 @@ ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
 { $subsection 2/ }
 { $subsection 2^ }
 { $subsection bit? }
+"The " { $vocab-link "math.bitwise" } " vocabulary implements additional bitwise integer operations."
 { $see-also "conditionals" } ;
 
 ARTICLE: "arithmetic" "Arithmetic"

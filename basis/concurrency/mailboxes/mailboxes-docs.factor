@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel arrays ;
+USING: help.markup help.syntax kernel arrays calendar ;
 IN: concurrency.mailboxes
 
 HELP: <mailbox>
@@ -18,46 +18,41 @@ HELP: mailbox-put
 { $description "Put the object into the mailbox. Any threads that have a blocking get on the mailbox are resumed. Only one of those threads will successfully get the object, the rest will immediately block waiting for the next item in the mailbox." } ;
 
 HELP: block-unless-pred
-{ $values { "pred" "a quotation with stack effect " { $snippet "( X -- bool )" } } 
-          { "mailbox" mailbox }
-          { "timeout" "a timeout in milliseconds, or " { $link f } }
+{ $values { "pred" { $quotation "( obj -- ? )" } } 
+    { "mailbox" mailbox }
+    { "timeout" "a " { $link duration } " or " { $link f } }
 }
 { $description "Block the thread if there are no items in the mailbox that return true when the predicate is called with the item on the stack." } ;
 
 HELP: block-if-empty
 { $values { "mailbox" mailbox } 
-      { "timeout" "a timeout in milliseconds, or " { $link f } }
+    { "timeout" "a " { $link duration } " or " { $link f } }
 }
 { $description "Block the thread if the mailbox is empty." } ;
 
 HELP: mailbox-get
-{ $values { "mailbox" mailbox } 
-          { "obj" object }
-}
+{ $values { "mailbox" mailbox } { "obj" object } }
 { $description "Get the first item put into the mailbox. If it is empty the thread blocks until an item is put into it. The thread then resumes, leaving the item on the stack." } ;
 
 HELP: mailbox-get-all
-{ $values { "mailbox" mailbox } 
-          { "array" array }
-}
+{ $values { "mailbox" mailbox } { "array" array } }
 { $description "Blocks the thread if the mailbox is empty, otherwise removes all objects in the mailbox and returns an array containing the objects." } ;
 
 HELP: while-mailbox-empty
 { $values { "mailbox" mailbox } 
-          { "quot" "a quotation with stack effect " { $snippet "( -- )" } }
+          { "quot" { $quotation "( -- )" } }
 }
 { $description "Repeatedly call the quotation while there are no items in the mailbox." } ;
 
 HELP: mailbox-get?
 { $values { "mailbox" mailbox } 
-          { "pred" "a quotation with stack effect " { $snippet "( X -- bool )" } }
+          { "pred" { $quotation "( obj -- ? )" } }
           { "obj" object }
 }
-{ $description "Get the first item in the mailbox which satisfies the predicate. 'pred' will be called repeatedly for each item in the mailbox. When 'pred' returns true that item will be returned. If nothing in the mailbox satisfies the predicate then the thread will block until something does." } ;
-
+{ $description "Get the first item in the mailbox which satisfies the predicate. When the predicate returns true that item will be returned. If nothing in the mailbox satisfies the predicate then the thread will block until something does." } ;
 
 ARTICLE: "concurrency.mailboxes" "Mailboxes"
-"A " { $emphasis "mailbox" } " is a first-in-first-out queue where the operation of removing an element blocks if the queue is empty, instead of throwing an error. Mailboxes are implemented in the " { $vocab-link "concurrency.mailboxes" } " vocabulary."
+"A " { $emphasis "mailbox" } " is a first-in-first-out queue where the operation of removing an element blocks if the queue is empty. Mailboxes are implemented in the " { $vocab-link "concurrency.mailboxes" } " vocabulary."
 { $subsection mailbox }
 { $subsection <mailbox> }
 "Removing the first element:"

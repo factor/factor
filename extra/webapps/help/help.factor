@@ -16,11 +16,11 @@ TUPLE: help-webapp < dispatcher ;
                 { "search" [ 1 v-min-length 50 v-max-length v-one-line ] }
             } validate-params
 
-            help-dir set-current-directory
-
-            "search" value article-apropos "articles" set-value
-            "search" value word-apropos "words" set-value
-            "search" value vocab-apropos "vocabs" set-value
+            help-dir [
+                "search" value article-apropos "articles" set-value
+                "search" value word-apropos "words" set-value
+                "search" value vocab-apropos "vocabs" set-value
+            ] with-directory
 
             { help-webapp "search" } <chloe-content>
         ] >>submit ;

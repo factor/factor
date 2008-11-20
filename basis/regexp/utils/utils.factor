@@ -5,9 +5,7 @@ namespaces regexp.backend sequences unicode.categories
 math.ranges fry combinators.short-circuit vectors ;
 IN: regexp.utils
 
-: (while-changes) ( obj quot pred pred-ret -- obj )
-    ! quot: ( obj -- obj' )
-    ! pred: ( obj -- <=> )
+: (while-changes) ( obj quot: ( obj -- obj' ) pred: ( obj -- <=> ) pred-ret -- obj )
     [ [ dup slip ] dip pick over call ] dip dupd =
     [ 3drop ] [ (while-changes) ] if ; inline recursive
 

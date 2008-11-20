@@ -1,20 +1,5 @@
 #include "master.h"
 
-#define ALLOC_DATA_HEAP "alloc_data_heap: gens=%ld, young_size=%ld, aging_size=%ld, tenured_size=%ld\n"
-#define GC_REQUESTED "garbage_collection: growing_data_heap=%d, requested_bytes=%ld\n"
-#define BEGIN_GC "begin_gc: growing_data_heap=%d, collecting_gen=%ld\n"
-#define END_GC "end_gc: gc_elapsed=%ld\n"
-#define END_AGING_GC "end_gc: aging_collections=%ld, cards_scanned=%ld\n"
-#define END_NURSERY_GC "end_gc: nursery_collections=%ld, cards_scanned=%ld\n"
-
-/* #define GC_DEBUG */
-
-#ifdef GC_DEBUG
-	#define GC_PRINT printf
-#else
-	INLINE void GC_PRINT() { }
-#endif
-
 CELL init_zone(F_ZONE *z, CELL size, CELL start)
 {
 	z->size = size;
@@ -36,8 +21,6 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 	CELL aging_size,
 	CELL tenured_size)
 {
-	GC_PRINT(ALLOC_DATA_HEAP,gens,young_size,aging_size,tenured_size);
-
 	young_size = align(young_size,DECK_SIZE);
 	aging_size = align(aging_size,DECK_SIZE);
 	tenured_size = align(tenured_size,DECK_SIZE);
@@ -438,8 +421,6 @@ void collect_gen_cards(CELL gen)
 old->new references */
 void collect_cards(void)
 {
-	GC_PRINT("Collect cards\n");
-
 	int i;
 	for(i = collecting_gen + 1; i < data_heap->gen_count; i++)
 		collect_gen_cards(i);
@@ -468,9 +449,7 @@ void collect_callstack(F_CONTEXT *stacks)
 		CELL top = (CELL)stacks->callstack_top;
 		CELL bottom = (CELL)stacks->callstack_bottom;
 
-		GC_PRINT("Collect callstack %ld %ld\n",top,bottom);
 		iterate_callstack(top,bottom,collect_stack_frame);
-		GC_PRINT("Done\n");
 	}
 }
 
@@ -486,7 +465,6 @@ void collect_gc_locals(void)
 the user environment and extra roots registered with REGISTER_ROOT */
 void collect_roots(void)
 {
-	GC_PRINT("Collect roots\n");
 	copy_handle(&T);
 	copy_handle(&bignum_zero);
 	copy_handle(&bignum_pos_one);
@@ -759,14 +737,6 @@ void begin_gc(CELL requested_bytes)
 		so we set the newspace so the next generation. */
 		newspace = &data_heap->generations[collecting_gen + 1];
 	}
-
-#ifdef GC_DEBUG
-	printf("\n");
-	dump_generations();
-	printf("Newspace: ");
-	dump_zone(newspace);
-	printf("\n");
-#endif
 }
 
 void end_gc(CELL gc_elapsed)
@@ -823,8 +793,6 @@ void garbage_collection(CELL gen,
 		return;
 	}
 
-	GC_PRINT(GC_REQUESTED,growing_data_heap_,requested_bytes);
-
 	s64 start = current_millis();
 
 	performing_gc = true;
@@ -858,7 +826,6 @@ void garbage_collection(CELL gen,
 		}
 	}
 
-	GC_PRINT(BEGIN_GC,growing_data_heap,collecting_gen);
 	begin_gc(requested_bytes);
 
 	/* initialize chase pointer */
@@ -895,7 +862,6 @@ void garbage_collection(CELL gen,
 
 	CELL gc_elapsed = (current_millis() - start);
 
-	GC_PRINT(END_GC,gc_elapsed);
 	end_gc(gc_elapsed);
 
 	performing_gc = false;

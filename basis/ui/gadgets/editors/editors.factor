@@ -120,9 +120,10 @@ M: editor ungraft*
 
 : scroll>caret ( editor -- )
     dup graft-state>> second [
-        dup caret-loc over caret-dim { 1 0 } v+ <rect>
-        over scroll>rect
-    ] when drop ;
+        [
+            [ caret-loc ] [ caret-dim { 1 0 } v+ ] bi <rect>
+        ] keep scroll>rect
+    ] [ drop ] if ;
 
 : draw-caret ( -- )
     editor get focused?>> [

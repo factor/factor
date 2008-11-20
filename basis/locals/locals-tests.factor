@@ -346,7 +346,6 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 
 { 3 1 } [| from to seq | T{ slice f from to seq } ] must-infer-as
 
-
 :: literal-identity-test ( -- a b )
     { } V{ } ;
 
@@ -355,6 +354,10 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
     literal-identity-test
     swapd [ eq? ] [ eq? ] 2bi*
 ] unit-test
+
+:: mutable-local-in-literal-test ( a! -- b ) a 1 + a! { a } ;
+
+[ { 4 } ] [ 3 mutable-local-in-literal-test ] unit-test
 
 :: compare-case ( obj1 obj2 lt-quot eq-quot gt-quot -- )
     obj1 obj2 <=> {
@@ -384,6 +387,8 @@ GENERIC: lambda-method-forget-test ( a -- b )
 M:: integer lambda-method-forget-test ( a -- b ) ;
 
 [ ] [ [ { integer lambda-method-forget-test } forget ] with-compilation-unit ] unit-test
+
+[ { [ 10 ] } ] [ 10 [| A | { [ A ] } ] call ] unit-test
 
 ! :: wlet-&&-test ( a -- ? )
 !     [wlet | is-integer? [ a integer? ]

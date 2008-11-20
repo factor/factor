@@ -7,7 +7,7 @@ prettyprint.config sorting splitting grouping math.parser vocabs
 definitions effects classes.builtin classes.tuple io.files
 classes continuations hashtables classes.mixin classes.union
 classes.intersection classes.predicate classes.singleton
-combinators quotations sets accessors colors ;
+combinators quotations sets accessors colors parser ;
 IN: prettyprint
 
 : make-pprint ( obj quot -- block in use )
@@ -47,6 +47,22 @@ IN: prettyprint
 : vocabs. ( in use -- )
     dupd remove [ { "syntax" "scratchpad" } member? not ] filter
     use. in. ;
+
+: vocab-names ( words -- vocabs )
+    dictionary get
+    [ [ words>> eq? nip ] with assoc-find 2drop ] curry map sift ;
+
+: prelude. ( -- )
+    in get use get vocab-names vocabs. ;
+
+[
+    nl
+    "Restarts were invoked adding vocabularies to the search path." print
+    "To avoid doing this in the future, add the following USING:" print
+    "and IN: forms at the top of the source file:" print nl
+    prelude.
+    nl
+] print-use-hook set-global
 
 : with-use ( obj quot -- )
     make-pprint vocabs. do-pprint ; inline
@@ -252,6 +268,9 @@ M: object see
         dup definer nip [ pprint-word ] when* declarations.
         block>
     ] with-use nl ;
+
+M: method-spec see
+    first2 method see ;
 
 GENERIC: see-class* ( word -- )
 

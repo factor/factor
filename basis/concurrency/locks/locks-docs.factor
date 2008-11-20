@@ -14,7 +14,7 @@ HELP: <reentrant-lock>
 { $description "Creates a reentrant lock." } ;
 
 HELP: with-lock-timeout
-{ $values { "lock" lock } { "timeout" "a " { $link duration } " or " { $link f } } { "quot" quotation } }
+{ $values { "lock" lock } { "timeout" { $maybe duration } } { "quot" quotation } }
 { $description "Calls the quotation, ensuring that only one thread executes with the lock held at a time. If another thread is holding the lock, blocks until the thread releases the lock." }
 { $errors "Throws an error if the lock could not be acquired before the timeout expires. A timeout value of " { $link f } " means the thread is willing to wait indefinitely." } ;
 
@@ -36,7 +36,7 @@ HELP: rw-lock
 { $class-description "The class of reader/writer locks." } ;
 
 HELP: with-read-lock-timeout
-{ $values { "lock" lock } { "timeout" "a " { $link duration } " or " { $link f } } { "quot" quotation } }
+{ $values { "lock" lock } { "timeout" { $maybe duration } } { "quot" quotation } }
 { $description "Calls the quotation, ensuring that no other thread is holding a write lock at the same time. If another thread is holding a write lock, blocks until the thread releases the lock." }
 { $errors "Throws an error if the lock could not be acquired before the timeout expires. A timeout value of " { $link f } " means the thread is willing to wait indefinitely." } ;
 
@@ -45,7 +45,7 @@ HELP: with-read-lock
 { $description "Calls the quotation, ensuring that no other thread is holding a write lock at the same time. If another thread is holding a write lock, blocks until the thread releases the lock." } ;
 
 HELP: with-write-lock-timeout
-{ $values { "lock" lock } { "timeout" "a " { $link duration } " or " { $link f } } { "quot" quotation } }
+{ $values { "lock" lock } { "timeout" { $maybe duration } } { "quot" quotation } }
 { $description "Calls the quotation, ensuring that no other thread is holding a read or write lock at the same time. If another thread is holding a read or write lock, blocks until the thread releases the lock." }
 { $errors "Throws an error if the lock could not be acquired before the timeout expires. A timeout value of " { $link f } " means the thread is willing to wait indefinitely." } ;
 

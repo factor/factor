@@ -72,7 +72,9 @@ IN: tools.completion
     ] if ;
 
 : string-completions ( short strs -- seq )
-    [ dup ] { } map>assoc completions ;
+    dup zip completions ;
 
 : limited-completions ( short candidates -- seq )
-    completions dup length 1000 > [ drop f ] when ;
+    [ completions ] [ drop ] 2bi
+    2dup [ length 50 > ] [ empty? ] bi* and
+    [ 2drop f ] [ drop 50 short head ] if ;

@@ -4,7 +4,6 @@ USING: kernel sequences db.tuples alarms calendar db fry
 furnace.db
 furnace.cache
 furnace.asides
-furnace.referrer
 furnace.sessions
 furnace.conversations
 furnace.auth.providers
@@ -24,8 +23,7 @@ IN: furnace.alloy
         <conversations>
         <sessions>
     ] dip
-    <db-persistence>
-    <check-form-submissions> ;
+    <db-persistence> ;
 
 : start-expiring ( db -- )
     '[

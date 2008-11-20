@@ -28,7 +28,7 @@ IN: regexp
 : match ( string regexp -- pair )
     <dfa-traverser> do-match return-match ;
 
-: match* ( string regexp -- pair )
+: match* ( string regexp -- pair captured-groups )
     <dfa-traverser> do-match [ return-match ] [ captured-groups>> ] bi ;
 
 : matches? ( string regexp -- ? )
@@ -129,8 +129,6 @@ IN: regexp
 : option? ( option regexp -- ? )
     options>> key? ;
 
-USE: multiline
-/*
 M: regexp pprint*
     [
         [
@@ -139,4 +137,3 @@ M: regexp pprint*
             case-insensitive swap option? [ "i" % ] when
         ] "" make
     ] keep present-text ;
-*/

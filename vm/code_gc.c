@@ -333,12 +333,14 @@ void dump_heap(F_HEAP *heap)
 			break;
 		}
 
-		fprintf(stderr,"%lx %lx %s\n",(CELL)scan,scan->size,status);
+		print_cell_hex((CELL)scan); print_string(" ");
+		print_cell_hex(scan->size); print_string(" ");
+		print_string(status); print_string("\n");
 
 		scan = next_block(heap,scan);
 	}
 	
-	printf("%ld bytes of relocation data\n",size);
+	print_cell(size); print_string(" bytes of relocation data\n");
 }
 
 /* Compute where each block is going to go, after compaction */
@@ -459,9 +461,6 @@ void compact_code_heap(void)
 {
 	/* Free all unreachable code blocks */
 	gc();
-
-	fprintf(stderr,"*** Code heap compaction...\n");
-	fflush(stderr);
 
 	/* Figure out where the code heap blocks are going to end up */
 	CELL size = compute_heap_forwarding(&code_heap);

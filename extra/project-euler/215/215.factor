@@ -9,7 +9,7 @@ IN: project-euler.215
 ! -----------
 
 ! Consider the problem of building a wall out of 2x1 and 3x1 bricks
-! (horizontalvertical dimensions) such that, for extra strength, the gaps
+! (horizontal x vertical dimensions) such that, for extra strength, the gaps
 ! between horizontally-adjacent bricks never line up in consecutive layers,
 ! i.e. never form a "running crack".
 

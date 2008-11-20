@@ -5,23 +5,22 @@ io.files html.streams html.elements html.components help kernel
 assocs sequences make words accessors arrays help.topics vocabs
 tools.vocabs tools.vocabs.browser namespaces prettyprint io
 vocabs.loader serialize fry memoize unicode.case math.order
-sorting ;
+sorting debugger ;
 IN: help.html
 
 : escape-char ( ch -- )
     dup H{
-        { CHAR: " "__quote__" }
+        { CHAR: " "__quo__" }
         { CHAR: * "__star__" }
         { CHAR: : "__colon__" }
         { CHAR: < "__lt__" }
         { CHAR: > "__gt__" }
-        { CHAR: ? "__question__" }
-        { CHAR: \\ "__backslash__" }
+        { CHAR: ? "__que__" }
+        { CHAR: \\ "__back__" }
         { CHAR: | "__pipe__" }
-        { CHAR: _ "__underscore__" }
         { CHAR: / "__slash__" }
-        { CHAR: \\ "__backslash__" }
         { CHAR: , "__comma__" }
+        { CHAR: @ "__at__" }
     } at [ % ] [ , ] ?if ;
 
 : escape-filename ( string -- filename )
@@ -88,19 +87,17 @@ M: topic browser-link-href topic>filename ;
     all-vocabs-really [ dup vocab-name ] { } map>assoc "vocabs.idx" serialize-index ;
 
 : generate-help-files ( -- )
-    all-topics [ help>html ] each ;
+    all-topics [ '[ _ help>html ] try ] each ;
 
 : generate-help ( -- )
-    { "resource:core" "resource:basis" "resource:extra" } vocab-roots [
-        load-everything
-
-        "/tmp/docs/" make-directory
-
-        "/tmp/docs/" [
+    "docs" temp-file
+    [ make-directories ]
+    [
+        [
             generate-indices
             generate-help-files
         ] with-directory
-    ] with-variable ;
+    ] bi ;
 
 MEMO: load-index ( name -- index )
     binary file-contents bytes>object ;

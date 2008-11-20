@@ -9,7 +9,7 @@ IN: update.latest
 : git-pull-master ( -- )
   image parent-directory
     [
-      { "git" "pull" "git://factorcode.org/git/factor.git" "master" }
+      { "git" "pull" "http://factorcode.org/git/factor.git" "master" }
       run-command
     ]
   with-directory ;

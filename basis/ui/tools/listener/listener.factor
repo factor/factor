@@ -25,7 +25,9 @@ TUPLE: listener-gadget < track input output stack ;
 : listener-input, ( listener -- listener )
     dup <listener-input> >>input
     dup input>>
-        { 0 100 } <limited-scroller>
+        <limited-scroller>
+            { 0 100 } >>min-dim
+            { 1/0. 100 } >>max-dim
         "Input" <labelled-gadget>
     f track-add ;
 
@@ -181,8 +183,8 @@ M: stack-display tool-scroller
 
 listener-gadget "toolbar" f {
     { f restart-listener }
-    { T{ key-down f f "CLEAR" } clear-output }
-    { T{ key-down f { C+ } "CLEAR" } clear-stack }
+    {  T{ key-down f { A+ } "c" } clear-output }
+    {  T{ key-down f { A+ } "C" } clear-stack }
     { T{ key-down f { C+ } "d" } com-end }
     { T{ key-down f f "F1" } listener-help }
 } define-command-map

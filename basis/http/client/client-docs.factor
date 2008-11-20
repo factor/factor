@@ -40,7 +40,7 @@ HELP: http-post
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: with-http-get
-{ $values { "url" "a " { $link url } " or " { $link string } } { "quot" "a quotation with stack effect " { $snippet "( chunk -- )" } } { "response" response } }
+{ $values { "url" "a " { $link url } " or " { $link string } } { "quot" { $quotation "( chunk -- )" } } { "response" response } }
 { $description "Downloads the contents of a URL. Chunks of data are passed to the quotation as they are read." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
@@ -50,7 +50,7 @@ HELP: http-request
 { $errors "Throws an error if the HTTP request fails." } ;
 
 HELP: with-http-request
-{ $values { "request" request } { "quot" "a quotation with stack effect " { $snippet "( chunk -- )" } } { "response" response } }
+{ $values { "request" request } { "quot" { $quotation "( chunk -- )" } } { "response" response } }
 { $description "Sends an HTTP request to an HTTP server, and reads the response incrementally. Chunks of data are passed to the quotation as they are read." }
 { $errors "Throws an error if the HTTP request fails." } ;
 

@@ -1,9 +1,9 @@
-! Unit tests for vocabs.loader vocabulary
 IN: vocabs.loader.tests
 USING: vocabs.loader tools.test continuations vocabs math
 kernel arrays sequences namespaces io.streams.string
 parser source-files words assocs classes.tuple definitions
-debugger compiler.units tools.vocabs accessors eval ;
+debugger compiler.units tools.vocabs accessors eval
+combinators ;
 
 ! This vocab should not exist, but just in case...
 [ ] [
@@ -151,3 +151,8 @@ forget-junk
 [ "xabbabbja" forget-vocab ] with-compilation-unit
 
 forget-junk
+
+[ ] [ [ "vocabs.loader.test.e" forget-vocab ] with-compilation-unit ] unit-test
+
+[ "vocabs.loader.test.e" require ]
+[ relative-overflow? ] must-fail-with
