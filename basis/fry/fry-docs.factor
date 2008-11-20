@@ -87,7 +87,10 @@ $nl
 { $subsection "fry.examples" }
 { $subsection "fry.philosophy" }
 { $subsection "fry.limitations" }
-"Quotations can also be fried without using a parsing word:"
-{ $subsection fry } ;
+"Fry is implemented as a parsing word which reads a quotation and scans for occurrences of " { $link _ } " and " { $link @ } "; these words are not actually executed, and doing so raises an error (this can happen if they're accidentally used outside of a fry)."
+$nl
+"Fried quotations can also be constructed without using a parsing word; this is useful when meta-programming:"
+{ $subsection fry }
+"Fried quotations are an abstraction on top of the " { $link "compositional-combinators" } "; their use is encouraged over the combinators, because often the fry form is shorter and clearer than the combinator form." ;
 
 ABOUT: "fry"
