@@ -43,7 +43,10 @@ M: traceback-gadget pref-dim* drop { 550 600 } ;
     <pane-control> ;
 
 : <variables-gadget> ( model -- gadget )
-    <namestack-display> { 400 400 } <limited-scroller> ;
+    <namestack-display>
+    <limited-scroller>
+        { 400 400 } >>min-dim
+        { 400 400 } >>max-dim ;
 
 : variables ( traceback -- )
     model>> <variables-gadget>

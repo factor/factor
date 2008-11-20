@@ -310,8 +310,9 @@ ARTICLE: "math-bitfields" "Constructing bit fields"
 "Some applications, such as binary communication protocols and assemblers, need to construct integers from elaborate bit field specifications. Hand-coding this using " { $link shift } " and " { $link bitor } " results in repetitive code. A higher-level facility exists to factor out this repetition:"
 { $subsection bitfield } ;
 
-ARTICLE: "math.bitwise" "Bitwise arithmetic"
-"The " { $vocab-link "math.bitwise" } " vocabulary can implements bitwise arithmetic words that are useful for efficiency, low-level programming, and interfacing with C libraries." $nl
+ARTICLE: "math.bitwise" "Additional bitwise arithmetic"
+"The " { $vocab-link "math.bitwise" } " vocabulary provides bitwise arithmetic words extending " { $link "bitwise-arithmetic" } ". They are useful for efficiency, low-level programming, and interfacing with C libraries."
+$nl
 "Setting and clearing bits:"
 { $subsection set-bit }
 { $subsection clear-bit }

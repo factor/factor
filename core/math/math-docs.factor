@@ -348,6 +348,7 @@ ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
 { $subsection 2/ }
 { $subsection 2^ }
 { $subsection bit? }
+"The " { $vocab-link "math.bitwise" } " vocabulary implements additional bitwise integer operations."
 { $see-also "conditionals" } ;
 
 ARTICLE: "arithmetic" "Arithmetic"
