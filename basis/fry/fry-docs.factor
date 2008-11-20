@@ -15,7 +15,7 @@ HELP: fry
 } ;
 
 HELP: '[
-{ $syntax "code... ]" }
+{ $syntax "'[ code... ]" }
 { $description "Literal fried quotation. Expands into code which takes values from the stack and substitutes them in place of the fry specifiers " { $link _ } " and " { $link @ } "." }
 { $examples "See " { $link "fry.examples" } "." } ;
 
@@ -49,6 +49,8 @@ $nl
     "{ 8 13 14 27 } [ even? ] 5 [ dup ] swap [ ? ] curry 3compose map"
     "{ 8 13 14 27 } [ even? dup 5 ? ] map"
 }
+"The following is a no-op:"
+{ $code "'[ @ ]" }
 "Here are some built-in combinators rewritten in terms of fried quotations:"
 { $table
     { { $link literalize } { $snippet ": literalize '[ _ ] ;" } }
@@ -74,14 +76,14 @@ ARTICLE: "fry.limitations" "Fried quotation limitations"
 "As with " { $vocab-link "locals" } ", fried quotations cannot contain " { $link >r } " and " { $link r> } ". This is not a real limitation in practice, since " { $link dip } " can be used instead." ;
 
 ARTICLE: "fry" "Fried quotations"
-"A " { $emphasis "fried quotation" } " differs from a literal quotation in that when it is evaluated, instead of just pushing itself on the stack, it consumes zero or more stack values and inserts them into the quotation."
+"The " { $vocab-link "fry" } " vocabulary implements " { $emphasis "fried quotation" } ". Conceptually, fried quotations are quotations with ``holes'' (more formally, " { $emphasis "fry specifiers" } "), and the holes are filled in when the fried quotation is pushed on the stack."
 $nl
-"Fried quotations are denoted with a special parsing word:"
+"Fried quotations are started by a special parsing word:"
 { $subsection POSTPONE: '[ }
-"Fried quotations contain zero or more " { $emphasis "fry specifiers" } ":"
+"There are two types of fry specifiers; the first can hold a value, and the second ``splices'' a quotation, as if it were inserted without surrounding brackets:"
 { $subsection _ }
 { $subsection @ }
-"When a fried quotation is being evaluated, values are consumed from the stack and spliced into the quotation from right to left."
+"The holes are filled in with the top of stack going in the rightmost hole, the second item on the stack going in the second hole from the right, and so on."
 { $subsection "fry.examples" }
 { $subsection "fry.philosophy" }
 { $subsection "fry.limitations" }
