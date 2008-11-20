@@ -35,7 +35,15 @@ M: debugger focusable-child* restarts>> ;
     #! No restarts for the debugger window
     f [ drop ] <debugger> "Error" open-window ;
 
-[ debugger-window ] ui-error-hook set-global
+GENERIC: error-in-debugger? ( error -- ? )
+
+M: world-error error-in-debugger? world>> gadget-child debugger? ;
+
+M: object error-in-debugger? drop f ;
+
+[
+    dup error-in-debugger? [ rethrow ] [ debugger-window ] if 
+] ui-error-hook set-global
 
 M: world-error error.
     "An error occurred while drawing the world " write
