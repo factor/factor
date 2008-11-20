@@ -156,7 +156,7 @@ VAR: separation-radius
   2&& ;
 
 : alignment-neighborhood ( self -- boids )
-boids> [ within-alignment-neighborhood? ] with filter ;
+  boids> [ within-alignment-neighborhood? ] with filter ;
 
 : alignment-force ( self -- force )
   alignment-neighborhood
