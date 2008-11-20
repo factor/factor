@@ -185,7 +185,7 @@ M: world client-event
 
 M: x11-ui-backend do-events
     wait-event dup XAnyEvent-window window dup
-    [ [ 2dup handle-event ] assert-depth ] when 2drop ;
+    [ [ [ 2dup handle-event ] ui-try ] assert-depth ] when 2drop ;
 
 : x-clipboard@ ( gadget clipboard -- prop win )
     atom>> swap
