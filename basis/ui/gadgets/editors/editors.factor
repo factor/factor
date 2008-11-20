@@ -453,7 +453,7 @@ editor "caret-motion" f {
     T{ doc-elt } editor-select-next ;
 
 editor "selection" f {
-    { T{ button-down f { S+ } } extend-selection }
+    { T{ button-down f { S+ } 1 } extend-selection }
     { T{ drag } drag-selection }
     { T{ gain-focus } focus-editor }
     { T{ lose-focus } unfocus-editor }
