@@ -3,7 +3,7 @@
 USING: accessors combinators kernel system unicode.case
 io.unix.files io.files.listing generalizations strings
 arrays sequences io.files math.parser unix.groups unix.users
-io.files.listing.private ;
+io.files.listing.private unix.stat math ;
 IN: io.files.listing.unix
 
 <PRIVATE
@@ -29,6 +29,18 @@ IN: io.files.listing.unix
         [ other-write? write>string ]
         [ [ sticky? ] [ other-execute? ] bi 2array "t" unix-execute>string ]
     } cleave 10 narray concat ;
+
+: mode>symbol ( mode -- ch )
+    S_IFMT bitand
+    {
+        { [ dup S_IFDIR = ] [ drop "/" ] }
+        { [ dup S_IFIFO = ] [ drop "|" ] }
+        { [ dup any-execute? ] [ drop "*" ] }
+        { [ dup S_IFLNK = ] [ drop "@" ] }
+        { [ dup S_IFWHT = ] [ drop "%" ] }
+        { [ dup S_IFSOCK = ] [ drop "=" ] }
+        { [ t ] [ drop "" ] }
+    } cond ;
 
 M: unix (directory.) ( path -- lines )
     [ [
