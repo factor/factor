@@ -29,6 +29,8 @@ M: word integer-op-input-classes
         { fixnum- fixnum-fast }
         { fixnum* fixnum*fast }
         { fixnum-shift fixnum-shift-fast }
+        { fixnum/i fixnum/i-fast }
+        { fixnum/mod fixnum/mod-fast }
     } at ;
 
 : modular-variant ( op -- fast-op )

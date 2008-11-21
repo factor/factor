@@ -138,6 +138,12 @@ most-negative-fixnum most-positive-fixnum [a,b]
 \ mod [ [ interval-mod ] [ real-valued ] binary-op ] each-derived-op
 \ rem [ [ interval-rem ] [ may-overflow real-valued ] binary-op ] each-derived-op
 
+{ /mod fixnum/mod } [
+    \ /i \ mod
+    [ "outputs" word-prop ] bi@
+    '[ _ _ 2bi ] "outputs" set-word-prop
+] each
+
 \ shift [ [ interval-shift-safe ] [ may-overflow integer-valued ] binary-op ] each-derived-op
 \ shift [ [ interval-shift-safe ] [ integer-valued ] binary-op ] each-fast-derived-op
 

@@ -1,22 +1,19 @@
 IN: fry.tests
 USING: fry tools.test math prettyprint kernel io arrays
-sequences ;
+sequences eval accessors ;
 
 [ [ 3 + ] ] [ 3 '[ _ + ] ] unit-test
 
 [ [ 1 3 + ] ] [ 1 3 '[ _ _ + ] ] unit-test
 
-[ [ 1 + ] ] [ 1 [ + ] '[ _ @ ] ] unit-test
+[ [ 1 [ + ] call ] ] [ 1 [ + ] '[ _ @ ] ] unit-test
 
-[ [ 1 + . ] ] [ 1 [ + ] '[ _ @ . ] ] unit-test
+[ [ 1 [ + ] call . ] ] [ 1 [ + ] '[ _ @ . ] ] unit-test
 
-[ [ + - ] ] [ [ + ] [ - ] '[ @ @ ] ] unit-test
+[ [ [ + ] [ - ] [ call ] dip call ] ] [ [ + ] [ - ] '[ @ @ ] ] unit-test
 
-[ [ "a" write "b" print ] ]
+[ [ "a" "b" [ write ] dip print ] ]
 [ "a" "b" '[ _ write _ print ] ] unit-test
-
-[ [ 1 2 + 3 4 - ] ]
-[ [ + ] [ - ] '[ 1 2 @ 3 4 @ ] ] unit-test
 
 [ 1/2 ] [
     1 '[ [ _ ] dip / ] 2 swap call
@@ -57,4 +54,11 @@ sequences ;
 
 [ { { { 3 } } } ] [
     3 '[ [ [ _ 1array ] call 1array ] call 1array ] call
+] unit-test
+
+[ "USING: fry kernel ; f '[ >r _ r> ]" eval ]
+[ error>> >r/r>-in-fry-error? ] must-fail-with
+
+[ { { "a" 1 } { "b" 2 } { "c" 3 } { "d" 4 } } ] [
+    1 2 3 4 '[ "a" _ 2array "b" _ 2array "c" _ 2array "d" _ 2array 4array ] call
 ] unit-test
