@@ -30,7 +30,7 @@ ERROR: no-world-found ;
 
 : (request-focus) ( child world ? -- )
     pick parent>> pick eq? [
-        >r >r dup parent>> dup r> r>
+        [ dup parent>> dup ] 2dip
         [ (request-focus) ] keep
     ] unless focus-child ;
 
@@ -80,7 +80,7 @@ SYMBOL: ui-error-hook
 : ui-error ( error -- )
     ui-error-hook get [ call ] [ print-error ] if* ;
 
-[ rethrow ] ui-error-hook set-global
+ui-error-hook global [ [ rethrow ] or ] change-at
 
 : draw-world ( world -- )
     dup draw-world? [

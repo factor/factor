@@ -21,9 +21,11 @@ TUPLE: viewport < gadget ;
         swap add-gadget ;
 
 M: viewport layout*
-    dup rect-dim viewport-gap 2 v*n v-
-    over gadget-child pref-dim vmax
-    swap gadget-child (>>dim) ;
+    [
+        [ rect-dim viewport-gap 2 v*n v- ]
+        [ gadget-child pref-dim ]
+        bi vmax
+    ] [ gadget-child ] bi (>>dim) ;
 
 M: viewport focusable-child*
     gadget-child ;
