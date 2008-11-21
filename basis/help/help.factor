@@ -89,9 +89,16 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
         ] with-nesting
     ] with-style nl ;
 
-: help ( topic -- )
+: print-topic ( topic -- )
     last-element off dup $title
     article-content print-content nl ;
+
+SYMBOL: help-hook
+
+help-hook global [ [ print-topic ] or ] change-at
+
+: help ( topic -- )
+    help-hook get call ;
 
 : about ( vocab -- )
     dup require

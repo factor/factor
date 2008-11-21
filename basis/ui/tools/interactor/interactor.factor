@@ -178,10 +178,6 @@ M: interactor stream-read-quot
         ]
     } cond ;
 
-M: interactor pref-dim*
-    [ line-height 4 * 0 swap 2array ] [ call-next-method ] bi
-    vmax ;
-
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }
     { T{ key-down f { C+ } "k" } clear-input }

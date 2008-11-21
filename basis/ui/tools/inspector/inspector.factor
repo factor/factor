@@ -17,7 +17,7 @@ TUPLE: inspector-gadget < track object pane ;
 
 : <inspector-gadget> ( -- gadget )
     { 0 1 } inspector-gadget new-track
-        dup <toolbar> f track-add
+        add-toolbar
         <pane> >>pane
         dup pane>> <scroller> 1 track-add ;
 
