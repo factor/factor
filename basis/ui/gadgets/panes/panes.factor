@@ -363,7 +363,11 @@ M: f sloppy-pick-up*
     dup hand-rel over sloppy-pick-up >>caret
     dup relayout-1 ;
 
-: begin-selection ( pane -- ) move-caret f >>mark drop ;
+: begin-selection ( pane -- )
+    f >>selecting?
+    move-caret
+    f >>mark
+    drop ;
 
 : extend-selection ( pane -- )
     hand-moved? [
@@ -389,6 +393,7 @@ M: f sloppy-pick-up*
     ] if ;
 
 : select-to-caret ( pane -- )
+    t >>selecting?
     dup mark>> [ caret>mark ] unless
     move-caret
     dup request-focus
