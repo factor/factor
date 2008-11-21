@@ -5,11 +5,11 @@ ARTICLE: "listener-watch" "Watching variables in the listener"
 "The listener prints the concepts of the data and retain stacks after every expression. It can also print values of dynamic variables which are added to a watch list:"
 { $subsection visible-vars }
 "To add or remove a single variable:"
-{ $subsection watch-var }
-{ $subsection unwatch-var }
+{ $subsection show-var }
+{ $subsection hide-var }
 "To add and remove multiple variables:"
-{ $subsection watch-vars }
-{ $subsection unwatch-vars } ;
+{ $subsection show-vars }
+{ $subsection hide-vars } ;
 
 ARTICLE: "listener" "The listener"
 "The listener evaluates Factor expressions read from a stream. The listener is the primary interface to the Factor runtime. Typically, you write Factor code in a text editor, then load it using the listener and test it."

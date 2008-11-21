@@ -42,13 +42,13 @@ PRIVATE>
 
 SYMBOL: visible-vars
 
-: watch-var ( sym -- ) visible-vars  [ swap suffix ] change ;
+: show-var ( sym -- ) visible-vars  [ swap suffix ] change ;
 
-: watch-vars ( seq -- ) visible-vars [ swap union ] change ;
+: show-vars ( seq -- ) visible-vars [ swap union ] change ;
 
-: unwatch-var ( sym -- ) visible-vars [ remove ] change ;
+: hide-var ( sym -- ) visible-vars [ remove ] change ;
 
-: unwatch-vars ( seq -- ) visible-vars [ swap diff ] change ;
+: hide-vars ( seq -- ) visible-vars [ swap diff ] change ;
 
 SYMBOL: error-hook
 
