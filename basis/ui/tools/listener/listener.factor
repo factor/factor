@@ -25,7 +25,7 @@ TUPLE: listener-gadget < track input output ;
 
 : listener-input, ( listener -- listener )
     dup <listener-input>
-    [ >>input ] [ 1 <border> { 0 0 } >>align f track-add ] bi ;
+    [ >>input ] [ 1 <border> { 1 1 } >>fill f track-add ] bi ;
 
 : welcome. ( -- )
     "If this is your first time with Factor, please read the " print

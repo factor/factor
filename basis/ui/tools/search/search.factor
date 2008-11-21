@@ -66,7 +66,7 @@ search-field H{
         <search-field> >>field
         seq limited? init-search-model
         presenter over <search-list> >>list
-        dup field>> 1 <border> { 0 0 } >>align f track-add
+        dup field>> 1 <border> { 1 1 } >>fill f track-add
         dup list>> <scroller> 1 track-add
         string over field>> set-editor-string
         dup field>> end-of-document ;
