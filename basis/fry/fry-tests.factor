@@ -58,3 +58,7 @@ sequences eval accessors ;
 
 [ "USING: fry kernel ; f '[ >r _ r> ]" eval ]
 [ error>> >r/r>-in-fry-error? ] must-fail-with
+
+[ { { "a" 1 } { "b" 2 } { "c" 3 } { "d" 4 } } ] [
+    1 2 3 4 '[ "a" _ 2array "b" _ 2array "c" _ 2array "d" _ 2array 4array ] call
+] unit-test

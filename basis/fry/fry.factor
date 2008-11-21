@@ -17,7 +17,7 @@ ERROR: >r/r>-in-fry-error ;
         { 1 [ [ curry ] ] }
         { 2 [ [ 2curry ] ] }
         { 3 [ [ 3curry ] ] }
-        [ [ curry ] <repetition> ]
+        [ \ curry <repetition> ]
     } case ;
 
 M: >r/r>-in-fry-error summary
