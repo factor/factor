@@ -1,34 +1,39 @@
 USING: help.markup help.syntax kernel io system prettyprint ;
 IN: listener
 
+ARTICLE: "listener-watch" "Watching variables in the listener"
+"The listener prints the concepts of the data and retain stacks after every expression. It can also print values of dynamic variables which are added to a watch list:"
+{ $subsection visible-vars }
+"To add or remove a single variable:"
+{ $subsection watch-var }
+{ $subsection unwatch-var }
+"To add and remove multiple variables:"
+{ $subsection watch-vars }
+{ $subsection unwatch-vars } ;
+
 ARTICLE: "listener" "The listener"
 "The listener evaluates Factor expressions read from a stream. The listener is the primary interface to the Factor runtime. Typically, you write Factor code in a text editor, then load it using the listener and test it."
 $nl
 "The classical first program can be run in the listener:"
 { $example "\"Hello, world\" print" "Hello, world" }
-"Multi-line phrases are supported:"
+"Multi-line expressions are supported:"
 { $example "{ 1 2 3 } [\n    .\n] each" "1\n2\n3" }
 "The listener knows when to expect more input by looking at the height of the stack. Parsing words such as " { $link POSTPONE: { } " leave elements on the parser stack, and corresponding words such as " { $link POSTPONE: } } " pop them."
-$nl
-"A very common operation is to inspect the contents of the data stack in the listener:"
-{ $subsection .s }
-"Note that calls to " { $link .s } " can also be included inside words as a debugging aid, however a more convenient way to achieve this is to use the annotation facility. See " { $link "tools.annotations" } "."
-$nl
+{ $subsection "listener-watch" }
 "You can start a nested listener or exit a listener using the following words:"
 { $subsection listener }
 { $subsection bye }
-"The following variables can be rebound inside a nested scope to customize the behavior of a listener; this can be done to create a development tool with a custom interaction loop:"
-{ $subsection listener-hook }
 "Finally, the multi-line expression reading word can be used independently of the rest of the listener:"
 { $subsection read-quot } ;
 
 ABOUT: "listener"
 
+<PRIVATE
+
 HELP: quit-flag
 { $var-description "Variable set to true by " { $link bye } " word; it forces the next iteration of the " { $link listener } " loop to end." } ;
 
-HELP: listener-hook
-{ $var-description "Variable holding a quotation called by the listener before reading an input expression. The UI sets this variable to a quotation which updates the stack display in a listener gadget." } ;
+PRIVATE>
 
 HELP: read-quot
 { $values { "quot/f" "a parsed quotation, or " { $link f } " indicating end of file" } }
