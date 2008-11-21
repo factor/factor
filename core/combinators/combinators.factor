@@ -28,10 +28,7 @@ IN: combinators
 
 ! spread
 : spread>quot ( seq -- quot )
-    [ ] [
-        [ dup empty? [ [ >r ] swap [ r> ] 3append ] unless ] dip
-        append
-    ] reduce ;
+    [ ] [ [ dup empty? [ [ dip ] curry ] unless ] dip append ] reduce ;
 
 : spread ( objs... seq -- )
     spread>quot call ;
