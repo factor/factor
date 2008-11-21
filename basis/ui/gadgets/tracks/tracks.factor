@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io kernel namespaces fry
 math math.vectors math.geometry.rect math.order
-sequences words ui.gadgets ui.gadgets.packs ;
+sequences words ui.gadgets ui.gadgets.packs ui.gadgets.buttons ;
 
 IN: ui.gadgets.tracks
 
@@ -41,7 +41,8 @@ M: track layout* ( track -- ) dup track-layout pack-layout ;
 : track-pref-dims-2 ( track -- dim )
     [
         [ children>> pref-dims ] [ normalized-sizes ] bi
-        [ [ v/n ] when* ] 2map max-dim [ >fixnum ] map
+        [ dup { 0 f } memq? [ drop ] [ v/n ] if ] 2map
+        max-dim [ >fixnum ] map
     ]
     [ [ gap>> ] [ children>> length 1 [-] ] bi v*n ] bi
     v+ ;
@@ -55,6 +56,9 @@ M: track pref-dim* ( gadget -- dim )
 
 : track-add ( track gadget constraint -- track )
     pick sizes>> push add-gadget ;
+
+: add-toolbar ( track -- track )
+    dup <toolbar> f track-add ;
 
 : track-remove ( track gadget -- track )
     dupd dup [
