@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes classes.algebra classes.tuple
 classes.tuple.private kernel accessors math math.intervals
-namespaces sequences words combinators combinators.short-circuit
+namespaces sequences words combinators
 arrays compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
 
@@ -253,12 +253,13 @@ DEFER: (value-info-union)
         { [ over not ] [ 2drop f ] }
         [
             {
-                [ [ class>> ] bi@ class<= ]
-                [ [ interval>> ] bi@ interval-subset? ]
-                [ literals<= ]
-                [ [ length>> ] bi@ value-info<= ]
-                [ [ slots>> ] bi@ [ value-info<= ] 2all? ]
-            } 2&&
+                { [ 2dup [ class>> ] bi@ class<= not ] [ f ] }
+                { [ 2dup [ interval>> ] bi@ interval-subset? not ] [ f ] }
+                { [ 2dup literals<= not ] [ f ] }
+                { [ 2dup [ length>> ] bi@ value-info<= not ] [ f ] }
+                { [ 2dup [ slots>> ] bi@ [ value-info<= ] 2all? not ] [ f ] }
+                [ t ]
+            } cond 2nip
         ]
     } cond ;
 

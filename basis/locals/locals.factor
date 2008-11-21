@@ -6,11 +6,17 @@ quotations debugger macros arrays macros splitting combinators
 prettyprint.backend definitions prettyprint hashtables
 prettyprint.sections sets sequences.private effects
 effects.parser generic generic.parser compiler.units accessors
-locals.backend memoize macros.expander lexer classes ;
+locals.backend memoize macros.expander lexer classes summary ;
 IN: locals
 
 ! Inspired by
 ! http://cat-language.googlecode.com/svn/trunk/CatPointFreeForm.cs
+
+ERROR: >r/r>-in-lambda-error ;
+
+M: >r/r>-in-lambda-error summary
+    drop
+    "Explicit retain stack manipulation is not permitted in lambda bodies" ;
 
 <PRIVATE
 
@@ -141,20 +147,17 @@ GENERIC: free-vars* ( form -- )
 : free-vars ( form -- vars )
     [ free-vars* ] { } make prune ;
 
-: add-if-free ( object -- )
-    {
-        { [ dup local-writer? ] [ "local-reader" word-prop , ] }
-        { [ dup lexical? ] [ , ] }
-        { [ dup quote? ] [ local>> , ] }
-        { [ t ] [ free-vars* ] }
-    } cond ;
+M: local-writer free-vars* "local-reader" word-prop , ;
+
+M: lexical free-vars* , ;
+
+M: quote free-vars* , ;
 
 M: object free-vars* drop ;
 
-M: quotation free-vars* [ add-if-free ] each ;
+M: quotation free-vars* [ free-vars* ] each ;
 
-M: lambda free-vars*
-    [ vars>> ] [ body>> ] bi free-vars swap diff % ;
+M: lambda free-vars* [ vars>> ] [ body>> ] bi free-vars swap diff % ;
 
 GENERIC: lambda-rewrite* ( obj -- )
 
@@ -201,6 +204,8 @@ M: special rewrite-literal? drop t ;
 
 M: array rewrite-literal? [ rewrite-literal? ] contains? ;
 
+M: quotation rewrite-literal? [ rewrite-literal? ] contains? ;
+
 M: hashtable rewrite-literal? drop t ;
 
 M: vector rewrite-literal? drop t ;
@@ -215,9 +220,12 @@ GENERIC: rewrite-element ( obj -- )
     [ rewrite-element ] each ;
 
 : rewrite-sequence ( seq -- )
-    [ rewrite-elements ] [ length , ] [ , ] tri \ nsequence , ;
+    [ rewrite-elements ] [ length , ] [ 0 head , ] tri \ nsequence , ;
 
 M: array rewrite-element
+    dup rewrite-literal? [ rewrite-sequence ] [ , ] if ;
+
+M: quotation rewrite-element
     dup rewrite-literal? [ rewrite-sequence ] [ , ] if ;
 
 M: vector rewrite-element rewrite-sequence ;
@@ -225,7 +233,7 @@ M: vector rewrite-element rewrite-sequence ;
 M: hashtable rewrite-element >alist rewrite-sequence \ >hashtable , ;
 
 M: tuple rewrite-element
-    [ tuple-slots rewrite-elements ] [ class , ] bi \ boa , ;
+    [ tuple-slots rewrite-elements ] [ class literalize , ] bi \ boa , ;
 
 M: local rewrite-element , ;
 
@@ -242,6 +250,10 @@ M: vector local-rewrite* rewrite-element ;
 M: tuple local-rewrite* rewrite-element ;
 
 M: hashtable local-rewrite* rewrite-element ;
+
+M: word local-rewrite*
+    dup { >r r> } memq?
+    [ >r/r>-in-lambda-error ] [ call-next-method ] if ;
 
 M: object lambda-rewrite* , ;
 

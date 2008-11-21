@@ -351,7 +351,7 @@ big-endian on
     7 6 4 SUBF
     5 ds-reg -4 STW
     7 ds-reg 0 STW
-] f f f \ fixnum-/mod-fast define-sub-primitive
+] f f f \ fixnum/mod-fast define-sub-primitive
 
 [
     3 ds-reg 0 LWZ

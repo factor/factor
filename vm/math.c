@@ -86,7 +86,7 @@ void primitive_fixnum_divmod(void)
 {
 	F_FIXNUM y = get(ds);
 	F_FIXNUM x = get(ds - CELLS);
-	if(y == -1 && x == tag_fixnum(FIXNUM_MIN))
+	if(y == tag_fixnum(-1) && x == tag_fixnum(FIXNUM_MIN))
 	{
 		put(ds - CELLS,allot_integer(-FIXNUM_MIN));
 		put(ds,tag_fixnum(0));

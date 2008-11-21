@@ -1,7 +1,5 @@
-
 USING: kernel sequences math stack-checker effects accessors macros
-       combinators.short-circuit ;
-
+fry combinators.short-circuit ;
 IN: combinators.short-circuit.smart
 
 <PRIVATE
@@ -13,6 +11,6 @@ IN: combinators.short-circuit.smart
 
 PRIVATE>
 
-MACRO: && ( quots -- quot ) dup arity n&&-rewrite ;
+MACRO: && ( quots -- quot ) dup arity '[ _ _ n&& ] ;
 
-MACRO: || ( quots -- quot ) dup arity n||-rewrite ;
+MACRO: || ( quots -- quot ) dup arity '[ _ _ n|| ] ;
