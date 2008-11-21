@@ -303,7 +303,13 @@ tuple
     [ f "inline" set-word-prop ]
     [ make-flushable ]
     [ ]
-    [ tuple-layout [ <tuple-boa> ] curry ]
+    [
+        [
+            callable instance-check-quot %
+            tuple-layout ,
+            \ <tuple-boa> ,
+        ] [ ] make
+    ]
 } cleave
 (( obj quot -- curry )) define-declared
 
@@ -319,7 +325,16 @@ tuple
     [ f "inline" set-word-prop ]
     [ make-flushable ]
     [ ]
-    [ tuple-layout [ <tuple-boa> ] curry ]
+    [
+        [
+            \ >r ,
+            callable instance-check-quot %
+            \ r> ,
+            callable instance-check-quot %
+            tuple-layout ,
+            \ <tuple-boa> ,
+        ] [ ] make
+    ]
 } cleave
 (( quot1 quot2 -- compose )) define-declared
 
