@@ -53,7 +53,7 @@ focused? blink blink-alarm ;
     dup '[ _ blink-caret ] 750 milliseconds every >>blink-alarm drop ;
 
 : stop-blinking ( editor -- )
-    blink-alarm>> cancel-alarm ;
+    [ [ cancel-alarm ] when* f ] change-blink-alarm drop ;
 
 : restart-blinking ( editor -- )
     dup focused?>> [
