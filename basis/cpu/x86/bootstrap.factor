@@ -305,15 +305,32 @@ big-endian off
     ds-reg [] arg1 MOV                         ! push to stack
 ] f f f \ fixnum-shift-fast define-sub-primitive
 
-[
+: jit-fixnum-/mod
     temp-reg ds-reg [] MOV                     ! load second parameter
-    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
-    div-arg ds-reg [] MOV                      ! load first parameter
+    div-arg ds-reg bootstrap-cell neg [+] MOV  ! load first parameter
     mod-arg div-arg MOV                        ! make a copy
     mod-arg bootstrap-cell-bits 1- SAR         ! sign-extend
-    temp-reg IDIV                              ! divide
+    temp-reg IDIV ;                            ! divide
+
+[
+    jit-fixnum-/mod
+    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
     ds-reg [] mod-arg MOV                      ! push to stack
 ] f f f \ fixnum-mod define-sub-primitive
+
+[
+    jit-fixnum-/mod
+    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
+    div-arg tag-bits get SHL                   ! tag it
+    ds-reg [] div-arg MOV                      ! push to stack
+] f f f \ fixnum/i-fast define-sub-primitive
+
+[
+    jit-fixnum-/mod
+    div-arg tag-bits get SHL                   ! tag it
+    ds-reg [] mod-arg MOV                      ! push to stack
+    ds-reg bootstrap-cell neg [+] div-arg MOV
+] f f f \ fixnum/mod-fast define-sub-primitive
 
 [
     arg0 ds-reg [] MOV                         ! load local number

@@ -36,7 +36,7 @@ M: traceback-gadget pref-dim* drop { 550 600 } ;
 
     dup model>> <callstack-display> 2/3 track-add
 
-    dup <toolbar> f track-add ;
+    add-toolbar ;
 
 : <namestack-display> ( model -- gadget )
     [ [ name>> namestack. ] when* ]

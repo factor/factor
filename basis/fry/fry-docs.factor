@@ -19,6 +19,9 @@ HELP: '[
 { $description "Literal fried quotation. Expands into code which takes values from the stack and substitutes them in place of the fry specifiers " { $link _ } " and " { $link @ } "." }
 { $examples "See " { $link "fry.examples" } "." } ;
 
+HELP: >r/r>-in-fry-error
+{ $error-description "Thrown by " { $link POSTPONE: '[ } " if the fried quotation contains calls to " { $link >r } " or " { $link r> } ". Explicit retain stack manipulation of this form does not work with fry; use " { $link dip } " instead." } ;
+
 ARTICLE: "fry.examples" "Examples of fried quotations"
 "The easiest way to understand fried quotations is to look at some examples."
 $nl
@@ -73,7 +76,10 @@ ARTICLE: "fry.philosophy" "Fried quotation philosophy"
 } ;
 
 ARTICLE: "fry.limitations" "Fried quotation limitations"
-"As with " { $vocab-link "locals" } ", fried quotations cannot contain " { $link >r } " and " { $link r> } ". This is not a real limitation in practice, since " { $link dip } " can be used instead." ;
+"As with " { $vocab-link "locals" } ", fried quotations cannot contain " { $link >r } " and " { $link r> } ". This is not a real limitation in practice, since " { $link dip } " can be used instead."
+$nl
+"An error thrown if a fried quotation contains calls to " { $link >r } " and " { $link r> } ":"
+{ $subsection >r/r>-in-fry-error } ;
 
 ARTICLE: "fry" "Fried quotations"
 "The " { $vocab-link "fry" } " vocabulary implements " { $emphasis "fried quotation" } ". Conceptually, fried quotations are quotations with ``holes'' (more formally, " { $emphasis "fry specifiers" } "), and the holes are filled in when the fried quotation is pushed on the stack."

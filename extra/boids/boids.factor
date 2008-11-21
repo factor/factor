@@ -1,5 +1,5 @@
 
-USING: combinators.short-circuit kernel namespaces
+USING: kernel namespaces
        math
        math.constants
        math.functions
@@ -10,6 +10,7 @@ USING: combinators.short-circuit kernel namespaces
        math.physics.vel
        combinators arrays sequences random vars
        combinators.lib
+       combinators.short-circuit
        accessors ;
 
 IN: boids
@@ -156,7 +157,7 @@ VAR: separation-radius
   2&& ;
 
 : alignment-neighborhood ( self -- boids )
-boids> [ within-alignment-neighborhood? ] with filter ;
+  boids> [ within-alignment-neighborhood? ] with filter ;
 
 : alignment-force ( self -- force )
   alignment-neighborhood

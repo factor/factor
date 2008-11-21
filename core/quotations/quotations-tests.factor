@@ -15,4 +15,4 @@ IN: quotations.tests
 
 [ [ "hi" ] ] [ "hi" 1quotation ] unit-test
 
-! [ 1 \ + curry ] must-fail
+[ 1 \ + curry ] must-fail

@@ -1,12 +1,12 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes continuations help help.topics kernel models
-       sequences ui ui.backend ui.tools.debugger ui.gadgets
-       ui.gadgets.books ui.gadgets.buttons ui.gadgets.labelled
-       ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks
-       ui.gadgets.worlds ui.gadgets.presentations ui.gadgets.status-bar
-       ui.commands ui.gestures assocs arrays namespaces accessors ;
-
+sequences assocs arrays namespaces accessors math.vectors ui
+ui.backend ui.tools.debugger ui.gadgets ui.gadgets.books
+ui.gadgets.buttons ui.gadgets.labelled ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.tracks ui.gadgets.worlds
+ui.gadgets.presentations ui.gadgets.status-bar ui.commands
+ui.gestures ;
 IN: ui.tools.workspace
 
 TUPLE: workspace < track book listener popup ;
@@ -31,8 +31,6 @@ M: gadget tool-scroller drop f ;
 : show-tool ( class workspace -- tool )
     [ find-tool swap ] keep book>> model>>
     set-model ;
-
-: select-tool ( workspace class -- ) swap show-tool drop ;
 
 : get-workspace* ( quot -- workspace )
     [ >r dup workspace? r> [ drop f ] if ] curry find-window
@@ -81,7 +79,7 @@ SYMBOL: workspace-dim
 
 { 600 700 } workspace-dim set-global
 
-M: workspace pref-dim* drop workspace-dim get ;
+M: workspace pref-dim* call-next-method workspace-dim get vmax ;
 
 M: workspace focusable-child*
     dup popup>> [ ] [ listener>> ] ?if ;

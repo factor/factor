@@ -25,7 +25,7 @@ TUPLE: debugger < track restarts ;
 
 : <debugger> ( error restarts restart-hook -- gadget )
     { 0 1 } debugger new-track
-        dup <toolbar> f track-add
+        add-toolbar
         -rot <restart-list> >>restarts
         dup restarts>> rot <debugger-display> <scroller> 1 track-add ;
 
@@ -35,7 +35,15 @@ M: debugger focusable-child* restarts>> ;
     #! No restarts for the debugger window
     f [ drop ] <debugger> "Error" open-window ;
 
-[ debugger-window ] ui-error-hook set-global
+GENERIC: error-in-debugger? ( error -- ? )
+
+M: world-error error-in-debugger? world>> gadget-child debugger? ;
+
+M: object error-in-debugger? drop f ;
+
+[
+    dup error-in-debugger? [ rethrow ] [ debugger-window ] if 
+] ui-error-hook set-global
 
 M: world-error error.
     "An error occurred while drawing the world " write

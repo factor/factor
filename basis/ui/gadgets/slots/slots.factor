@@ -71,7 +71,7 @@ M: value-ref finish-editing
 : <slot-editor> ( ref -- gadget )
     { 0 1 } slot-editor new-track
         swap >>ref
-        dup <toolbar> f track-add
+        add-toolbar
         <source-editor> >>text
         dup text>> <scroller> 1 track-add
         dup revert ;

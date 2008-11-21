@@ -1,14 +1,14 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs ui.tools.interactor ui.tools.listener
-ui.tools.workspace help help.topics io.files io.styles kernel
-models models.delay models.filter namespaces prettyprint
+USING: accessors assocs help help.topics io.files io.styles
+kernel models models.delay models.filter namespaces prettyprint
 quotations sequences sorting source-files definitions strings
-tools.completion tools.crossref classes.tuple ui.commands
-ui.gadgets ui.gadgets.editors ui.gadgets.lists
-ui.gadgets.scrollers ui.gadgets.tracks ui.gestures ui.operations
-vocabs words vocabs.loader tools.vocabs unicode.case calendar ui
-;
+tools.completion tools.crossref classes.tuple vocabs words
+vocabs.loader tools.vocabs unicode.case calendar locals
+ui.tools.interactor ui.tools.listener ui.tools.workspace
+ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.lists
+ui.gadgets.scrollers ui.gadgets.tracks ui.gadgets.borders
+ui.gestures ui.operations ui ;
 IN: ui.tools.search
 
 TUPLE: live-search < track field list ;
@@ -23,7 +23,7 @@ TUPLE: live-search < track field list ;
 M: live-search handle-gesture ( gesture live-search -- ? )
     tuck search-gesture dup [
         over find-workspace hide-popup
-        >r search-value r> invoke-command f
+        [ search-value ] dip invoke-command f
     ] [
         2drop t
     ] if ;
@@ -47,27 +47,29 @@ search-field H{
     { T{ key-down f f "RET" } [ find-search-list invoke-value-action ] }
 } set-gestures
 
-: <search-model> ( live-search producer -- live-search filter )
-    >r dup field>> model>>                   ! live-search model :: producer
-    ui-running? [ 1/5 seconds <delay> ] when
-    [ "\n" join ] r> append <filter> ;
+: <search-model> ( live-search producer -- filter )
+    [
+        field>> model>>
+        ui-running? [ 1/5 seconds <delay> ] when
+    ] dip [ "\n" join ] prepend <filter> ;
 
-: <search-list> ( live-search seq limited? presenter -- live-search list )
-    >r
-    [ limited-completions ] [ completions ] ? curry
-    <search-model>
-    >r [ find-workspace hide-popup ] r> r>
-    swap <list> ;
+: init-search-model ( live-search seq limited? -- live-search )
+    [ 2drop ]
+    [ [ limited-completions ] [ completions ] ? curry <search-model> ] 3bi
+    >>model ; inline
 
-: <live-search> ( string seq limited? presenter -- gadget )
+: <search-list> ( presenter live-search -- list )
+    [ [ find-workspace hide-popup ] ] [ ] [ model>> ] tri* <list> ;
+
+:: <live-search> ( string seq limited? presenter -- gadget )
     { 0 1 } live-search new-track
         <search-field> >>field
-        dup field>> f track-add
-        -roll <search-list> >>list
+        seq limited? init-search-model
+        presenter over <search-list> >>list
+        dup field>> 1 <border> { 1 1 } >>fill f track-add
         dup list>> <scroller> 1 track-add
-    swap                         
-        over field>> set-editor-string
-    dup field>> end-of-document ;
+        string over field>> set-editor-string
+        dup field>> end-of-document ;
 
 M: live-search focusable-child* field>> ;
 
@@ -80,26 +82,27 @@ M: live-search pref-dim* drop { 400 200 } ;
     [ dup synopsis >lower ] { } map>assoc sort-values ;
 
 : <definition-search> ( string words limited? -- gadget )
-    >r definition-candidates r> [ synopsis ] <live-search> ;
+    [ definition-candidates ] dip [ synopsis ] <live-search> ;
 
 : word-candidates ( words -- candidates )
     [ dup name>> >lower ] { } map>assoc ;
 
 : <word-search> ( string words limited? -- gadget )
-    >r word-candidates r> [ synopsis ] <live-search> ;
+    [ word-candidates ] dip [ synopsis ] <live-search> ;
 
 : com-words ( workspace -- )
     dup current-word all-words t <word-search>
     "Word search" show-titled-popup ;
 
 : show-vocab-words ( workspace vocab -- )
-    "" over words natural-sort f <word-search>
-    "Words in " rot vocab-name append show-titled-popup ;
+    [ "" swap words natural-sort f <word-search> ]
+    [ "Words in " swap vocab-name append ]
+    bi show-titled-popup ;
 
 : show-word-usage ( workspace word -- )
-    "" over smart-usage f <definition-search>
-    "Words and methods using " rot name>> append
-    show-titled-popup ;
+    [ "" swap smart-usage f <definition-search> ]
+    [ "Words and methods using " swap name>> append ]
+    bi show-titled-popup ;
 
 : help-candidates ( seq -- candidates )
     [ dup >link swap article-title >lower ] { } map>assoc
@@ -127,8 +130,9 @@ M: live-search pref-dim* drop { 400 200 } ;
     "Source file search" show-titled-popup ;
 
 : show-vocab-files ( workspace vocab -- )
-    "" over vocab-files <source-file-search>
-    "Source files in " rot vocab-name append show-titled-popup ;
+    [ "" swap vocab-files <source-file-search> ]
+    [ "Source files in " swap vocab-name append ]
+    bi show-titled-popup ;
 
 : vocab-candidates ( -- candidates )
     all-vocabs-seq [ dup vocab-name >lower ] { } map>assoc ;
