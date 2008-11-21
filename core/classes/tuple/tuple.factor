@@ -121,7 +121,7 @@ ERROR: bad-superclass class ;
     [
         \ dup ,
         [ "predicate" word-prop % ]
-        [ [ bad-slot-value ] curry , ] bi
+        [ [ literalize , \ bad-slot-value , ] [ ] make , ] bi
         \ unless ,
     ] [ ] make ;
 
