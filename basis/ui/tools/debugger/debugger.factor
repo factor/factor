@@ -25,7 +25,7 @@ TUPLE: debugger < track restarts ;
 
 : <debugger> ( error restarts restart-hook -- gadget )
     { 0 1 } debugger new-track
-        dup <toolbar> f track-add
+        add-toolbar
         -rot <restart-list> >>restarts
         dup restarts>> rot <debugger-display> <scroller> 1 track-add ;
 
