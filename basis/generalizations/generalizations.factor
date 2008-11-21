@@ -6,8 +6,11 @@ math.ranges combinators macros quotations fry arrays ;
 IN: generalizations
 
 MACRO: nsequence ( n seq -- quot )
-    [ drop <reversed> ] [ '[ _ _ new-sequence ] ] 2bi
-    [ '[ @ [ _ swap set-nth-unsafe ] keep ] ] reduce ;
+    [
+        [ drop <reversed> ] [ '[ _ _ new-sequence ] ] 2bi
+        [ '[ @ [ _ swap set-nth-unsafe ] keep ] ] reduce
+    ] keep
+    '[ @ _ like ] ;
 
 MACRO: narray ( n -- quot )
     '[ _ { } nsequence ] ;
