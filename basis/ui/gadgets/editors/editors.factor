@@ -48,9 +48,13 @@ focused? blink blink-alarm ;
 : blink-caret ( editor -- )
     [ not ] change-blink relayout-1 ;
 
+SYMBOL: blink-interval
+
+750 milliseconds blink-interval set-global
+
 : start-blinking ( editor -- )
     t >>blink
-    dup '[ _ blink-caret ] 750 milliseconds every >>blink-alarm drop ;
+    dup '[ _ blink-caret ] blink-interval get every >>blink-alarm drop ;
 
 : stop-blinking ( editor -- )
     [ [ cancel-alarm ] when* f ] change-blink-alarm drop ;
