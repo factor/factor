@@ -25,7 +25,7 @@ t parser-notes set-global
 : note. ( str -- )
     parser-notes? [
         file get [ path>> write ":" write ] when* 
-        lexer get line>> number>string write ": " write
+        lexer get [ line>> number>string write ": " write ] when*
         "Note: " write dup print
     ] when drop ;
 
@@ -82,17 +82,20 @@ ERROR: no-word-error name ;
 
 SYMBOL: amended-use?
 
-SYMBOL: do-what-i-mean?
+SYMBOL: auto-use?
 
 : no-word-restarted ( restart-value -- word )
-    dup word?
-    [ amended-use? on dup vocabulary>> (use+) ]
-    [ create-in ]
-    if ;
+    dup word? [
+        amended-use? on
+        dup vocabulary>>
+        [ (use+) ] [
+            "Added ``" swap "'' vocabulary to search path" 3append note.
+        ] bi
+    ] [ create-in ] if ;
 
 : no-word ( name -- newword )
     dup words-named [ forward-reference? not ] filter
-    dup length 1 = do-what-i-mean? get and
+    dup length 1 = auto-use? get and
     [ nip first no-word-restarted ]
     [ <no-word-error> throw-restarts no-word-restarted ]
     if ;
