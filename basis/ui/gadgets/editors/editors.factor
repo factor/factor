@@ -45,6 +45,24 @@ focused? blink blink-alarm ;
     dup deactivate-model
     swap model>> remove-loc ;
 
+: blink-caret ( editor -- )
+    [ not ] change-blink relayout-1 ;
+
+: start-blinking ( editor -- )
+    t >>blink
+    dup '[ _ blink-caret ] 750 milliseconds every >>blink-alarm drop ;
+
+: stop-blinking ( editor -- )
+    blink-alarm>> cancel-alarm ;
+
+: restart-blinking ( editor -- )
+    dup focused?>> [
+        [ stop-blinking ]
+        [ start-blinking ]
+        [ relayout-1 ]
+        tri
+    ] [ drop ] if ;
+
 M: editor graft*
     dup
     dup caret>> activate-editor-model
@@ -52,6 +70,7 @@ M: editor graft*
 
 M: editor ungraft*
     dup
+    dup stop-blinking
     dup caret>> deactivate-editor-model
     dup mark>> deactivate-editor-model ;
 
@@ -95,24 +114,6 @@ M: editor ungraft*
 
 : click-loc ( editor model -- )
     [ clicked-loc ] dip set-model ;
-
-: blink-caret ( editor -- )
-    [ not ] change-blink relayout-1 ;
-
-: start-blinking ( editor -- )
-    t >>blink
-    dup '[ _ blink-caret ] 750 milliseconds every >>blink-alarm drop ;
-
-: stop-blinking ( editor -- )
-    blink-alarm>> cancel-alarm ;
-
-: restart-blinking ( editor -- )
-    dup focused?>> [
-        [ stop-blinking ]
-        [ start-blinking ]
-        [ relayout-1 ]
-        tri
-    ] [ drop ] if ;
 
 : focus-editor ( editor -- )
     dup start-blinking
