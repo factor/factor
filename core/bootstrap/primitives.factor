@@ -341,6 +341,8 @@ tuple
     { "fixnum-bitnot" "math.private" }
     { "fixnum-mod" "math.private" }
     { "fixnum-shift-fast" "math.private" }
+    { "fixnum/i-fast" "math.private" }
+    { "fixnum/mod-fast" "math.private" }
     { "fixnum<" "math.private" }
     { "fixnum<=" "math.private" }
     { "fixnum>" "math.private" }
