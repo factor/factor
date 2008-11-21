@@ -496,3 +496,5 @@ DEFER: blah
 
 [ "IN: parser.tests USE: kernel TUPLE: blah < tuple ; : blah ; TUPLE: blah < tuple ; : blah ;" eval ]
 [ error>> error>> def>> \ blah eq? ] must-fail-with
+
+[ ] [ f lexer set f file set "Hello world" note. ] unit-test
