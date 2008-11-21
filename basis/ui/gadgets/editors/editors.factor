@@ -120,9 +120,10 @@ M: editor ungraft*
 
 : scroll>caret ( editor -- )
     dup graft-state>> second [
-        dup caret-loc over caret-dim <rect>
-        over scroll>rect
-    ] when drop ;
+        [
+            [ caret-loc ] [ caret-dim { 1 0 } v+ ] bi <rect>
+        ] keep scroll>rect
+    ] [ drop ] if ;
 
 : draw-caret ( -- )
     editor get focused?>> [
@@ -452,7 +453,7 @@ editor "caret-motion" f {
     T{ doc-elt } editor-select-next ;
 
 editor "selection" f {
-    { T{ button-down f { S+ } } extend-selection }
+    { T{ button-down f { S+ } 1 } extend-selection }
     { T{ drag } drag-selection }
     { T{ gain-focus } focus-editor }
     { T{ lose-focus } unfocus-editor }

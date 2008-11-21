@@ -47,12 +47,15 @@ M: gadget tool-scroller drop f ;
 : get-tool ( class -- gadget )
     get-workspace find-tool nip ;
 
+: <help-pane> ( topic -- pane )
+    <pane> [ [ help ] with-pane ] keep ;
+
 : help-window ( topic -- )
     [
-        <pane> [ [ help ] with-pane ] keep
-        { 550 700 } <limited-scroller>
-    ] keep
-    article-title open-window ;
+        <help-pane> <limited-scroller>
+            { 550 700 } >>max-dim
+    ] [ article-title ] bi
+    open-window ;
 
 : hide-popup ( workspace -- )
     dup popup>> track-remove

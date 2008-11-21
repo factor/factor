@@ -25,7 +25,9 @@ TUPLE: listener-gadget < track input output stack ;
 : listener-input, ( listener -- listener )
     dup <listener-input> >>input
     dup input>>
-        { 0 100 } <limited-scroller>
+        <limited-scroller>
+            { 0 100 } >>min-dim
+            { 1/0. 100 } >>max-dim
         "Input" <labelled-gadget>
     f track-add ;
 

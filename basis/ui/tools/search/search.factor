@@ -48,7 +48,7 @@ search-field H{
 } set-gestures
 
 : <search-model> ( live-search producer -- live-search filter )
-    >r dup field>> model>>                   ! live-search model :: producer
+    >r dup field>> model>>
     ui-running? [ 1/5 seconds <delay> ] when
     [ "\n" join ] r> append <filter> ;
 
