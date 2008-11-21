@@ -267,6 +267,7 @@ IN: tools.deploy.shaker
                 layouts:type-numbers
                 lexer-factory
                 listener:listener-hook
+                parser:print-use-hook
                 root-cache
                 vocab-roots
                 vocabs:dictionary
