@@ -117,12 +117,14 @@ PREDICATE: specific-drag < drag #>> ;
     clone f >># button-gesture ;
 
 M: world handle-gesture ( gesture gadget -- ? )
-    {
-        { [ over specific-button-up? ] [ drop generalize-gesture t ] }
-        { [ over specific-button-down? ] [ drop generalize-gesture t ] }
-        { [ over specific-drag? ] [ drop generalize-gesture t ] }
-        [ call-next-method ]
-    } cond ;
+    2dup call-next-method [
+        {
+            { [ over specific-button-up? ] [ drop generalize-gesture f ] }
+            { [ over specific-button-down? ] [ drop generalize-gesture f ] }
+            { [ over specific-drag? ] [ drop generalize-gesture f ] }
+            [ 2drop t ]
+        } cond
+    ] [ 2drop f ] if ;
 
 : close-global ( world global -- )
     dup get-global find-world rot eq?
