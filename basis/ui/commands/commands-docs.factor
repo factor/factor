@@ -8,7 +8,7 @@ IN: ui.commands
         [ gesture>string , ]
         [
             [ command-name , ]
-            [ command-word \ $link swap 2array , ]
+            [ command-word <$link> , ]
             [ command-description , ]
             tri
         ] bi*
