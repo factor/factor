@@ -82,7 +82,7 @@ SYMBOLS: C+ A+ M+ S+ ;
 TUPLE: key-down mods sym ;
 
 : <key-gesture> ( mods sym action? class -- mods' sym' )
-    [ [ S+ rot remove swap ] unless ] dip boa ; inline
+    [ [ [ S+ swap remove f like ] dip ] unless ] dip boa ; inline
 
 : <key-down> ( mods sym action? -- key-down )
     key-down <key-gesture> ;
