@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators kernel math math.ranges
+USING: accessors assocs combinators kernel math
 quotations sequences regexp.parser regexp.classes fry arrays
 combinators.short-circuit regexp.utils prettyprint regexp.nfa
 shuffle ;
