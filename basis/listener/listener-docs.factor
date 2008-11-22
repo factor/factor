@@ -9,7 +9,29 @@ ARTICLE: "listener-watch" "Watching variables in the listener"
 { $subsection hide-var }
 "To add and remove multiple variables:"
 { $subsection show-vars }
-{ $subsection hide-vars } ;
+{ $subsection hide-vars }
+"Hiding all visible variables:"
+{ $subsection hide-all-vars } ;
+
+HELP: show-var
+{ $values { "var" "a variable name" } }
+{ $description "Adds a variable to the watch list; its value will be printed by the listener after every expression." } ;
+
+HELP: show-vars
+{ $values { "seq" "a sequence of variable names" } }
+{ $description "Adds a sequence of variables to the watch list; their values will be printed by the listener after every expression." } ;
+
+HELP: hide-var
+{ $values { "var" "a variable name" } }
+{ $description "Removes a variable from the watch list." } ;
+
+HELP: hide-vars
+{ $values { "seq" "a sequence of variable names" } }
+{ $description "Removes a sequence of variables from the watch list." } ;
+
+HELP: hide-all-vars
+{ $values { "seq" "a sequence of variable names" } }
+{ $description "Removes all variables from the watch list." } ;
 
 ARTICLE: "listener" "The listener"
 "The listener evaluates Factor expressions read from a stream. The listener is the primary interface to the Factor runtime. Typically, you write Factor code in a text editor, then load it using the listener and test it."

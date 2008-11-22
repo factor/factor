@@ -206,9 +206,8 @@ M: no-cond summary
 M: no-case summary
     drop "Fall-through in case" ;
 
-M: slice-error error.
-    "Cannot create slice because " write
-    reason>> print ;
+M: slice-error summary
+    drop "Cannot create slice" ;
 
 M: bounds-error summary drop "Sequence index out of bounds" ;
 

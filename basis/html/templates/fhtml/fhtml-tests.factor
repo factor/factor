@@ -6,11 +6,8 @@ IN: html.templates.fhtml.tests
 : test-template ( path -- ? )
     "resource:basis/html/templates/fhtml/test/"
     prepend
-    [
-        ".fhtml" append <fhtml> [ call-template ] with-string-writer
-        <string-reader> lines
-    ] keep
-    ".html" append utf8 file-lines
+    [ ".fhtml" append <fhtml> [ call-template ] with-string-writer ]
+    [ ".html" append utf8 file-contents ] bi
     [ . . ] [ = ] 2bi ;
 
 [ t ] [ "example" test-template ] unit-test
