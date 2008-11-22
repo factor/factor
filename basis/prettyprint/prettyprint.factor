@@ -44,7 +44,7 @@ IN: prettyprint
         ] with-pprint nl
     ] unless-empty ;
 
-: vocabs. ( in use -- )
+: use/in. ( in use -- )
     dupd remove [ { "syntax" "scratchpad" } member? not ] filter
     use. in. ;
 
@@ -53,7 +53,7 @@ IN: prettyprint
     [ [ words>> eq? nip ] with assoc-find 2drop ] curry map sift ;
 
 : prelude. ( -- )
-    in get use get vocab-names vocabs. ;
+    in get use get vocab-names use/in. ;
 
 [
     nl
@@ -65,7 +65,7 @@ IN: prettyprint
 ] print-use-hook set-global
 
 : with-use ( obj quot -- )
-    make-pprint vocabs. do-pprint ; inline
+    make-pprint use/in. do-pprint ; inline
 
 : with-in ( obj quot -- )
     make-pprint drop [ write-in bl ] when* do-pprint ; inline
