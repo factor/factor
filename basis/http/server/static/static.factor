@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar io io.files kernel math math.order
 math.parser namespaces parser sequences strings
-assocs hashtables debugger mime-types sorting logging
+assocs hashtables debugger mime.types sorting logging
 calendar.format accessors splitting
 io.encodings.binary fry xml.entities destructors urls
 html.elements html.templates.fhtml
