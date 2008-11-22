@@ -10,7 +10,6 @@ io.streams.nested assocs ui.gadgets.presentations
 ui.gadgets.slots ui.gadgets.grids ui.gadgets.grid-lines
 classes.tuple models continuations destructors accessors
 math.geometry.rect ;
-
 IN: ui.gadgets.panes
 
 TUPLE: pane < pack
@@ -402,7 +401,7 @@ M: f sloppy-pick-up*
 pane H{
     { T{ button-down } [ begin-selection ] }
     { T{ button-down f { S+ } 1 } [ select-to-caret ] }
-    { T{ button-up f { S+ } 1 } [ drop ] }
+    { T{ button-up f { S+ } 1 } [ end-selection ] }
     { T{ button-up } [ end-selection ] }
     { T{ drag } [ extend-selection ] }
     { T{ copy-action } [ com-copy ] }
