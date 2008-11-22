@@ -73,9 +73,15 @@ SYMBOL: error-hook
         ] tabular-output
     ] unless-empty ;
 
+SYMBOL: display-stacks?
+
+t display-stacks? set-global
+
 : stacks. ( -- )
-    datastack [ nl "--- Data stack:" title. stack. ] unless-empty
-    retainstack [ nl "--- Retain stack:" title. stack. ] unless-empty ;
+    display-stacks? get [
+        datastack [ nl "--- Data stack:" title. stack. ] unless-empty
+        retainstack [ nl "--- Retain stack:" title. stack. ] unless-empty
+    ] when ;
 
 : prompt. ( -- )
     "( " in get auto-use? get [ " - auto" append ] when " )" 3append
