@@ -6,10 +6,15 @@ IN: splitting.tests
 [ "goodbye" f ] [ "goodbye" " " split1 ] unit-test
 [ "" "" ] [ "great" "great" split1 ] unit-test
 
-[ "hello world" "." ] [ "hello world ." " " last-split1 ] unit-test
-[ "hello-+world" "." ] [ "hello-+world-+." "-+" last-split1 ] unit-test
-[ "goodbye" f ] [ "goodbye" " " last-split1 ] unit-test
-[ "" "" ] [ "great" "great" last-split1 ] unit-test
+[ "hello world" "." ] [ "hello world ." " " split1-last ] unit-test
+[ "hello-+world" "." ] [ "hello-+world-+." "-+" split1-last ] unit-test
+[ "goodbye" f ] [ "goodbye" " " split1-last ] unit-test
+[ "" "" ] [ "great" "great" split1-last ] unit-test
+
+[ "hello world" "." ] [ "hello world ." " " split1-last-slice [ >string ] bi@ ] unit-test
+[ "hello-+world" "." ] [ "hello-+world-+." "-+" split1-last-slice [ >string ] bi@ ] unit-test
+[ "goodbye" f ] [ "goodbye" " " split1-last-slice [ dup [ >string ] when ] bi@ ] unit-test
+[ "" "" ] [ "great" "great" split1-last-slice [ >string ] bi@ ] unit-test
 
 [ "and end" t ] [ "Beginning and end" "Beginning " ?head ] unit-test
 [ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?head ] unit-test

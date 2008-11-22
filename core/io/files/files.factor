@@ -150,7 +150,7 @@ PRIVATE>
     ] unless ;
 
 : file-extension ( filename -- extension )
-    "." last-split1 nip ;
+    "." split1-last nip ;
 
 ! File info
 TUPLE: file-info type size permissions created modified

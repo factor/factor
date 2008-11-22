@@ -23,9 +23,20 @@ IN: splitting
         2drop f
     ] if ;
 
-: last-split1 ( seq subseq -- before after )
+: split1-slice ( seq subseq -- before-slice after-slice )
+    dup pick start dup [
+        [ >r over r> head-slice -rot length ] keep + tail-slice
+    ] [
+        2drop f
+    ] if ;
+
+: split1-last ( seq subseq -- before after )
     [ <reversed> ] bi@ split1 [ reverse ] bi@
     dup [ swap ] when ;
+
+: split1-last-slice ( seq subseq -- before-slice after-slice )
+    [ <reversed> ] bi@ split1-slice [ <reversed> ] bi@
+    [ f ] [ swap ] if-empty ;
 
 : (split) ( separators n seq -- )
     3dup rot [ member? ] curry find-from drop

@@ -1,5 +1,5 @@
 USING: regexp tools.test kernel sequences regexp.parser
-regexp.traversal eval ;
+regexp.traversal eval strings ;
 IN: regexp-tests
 
 \ <regexp> must-infer
@@ -350,3 +350,15 @@ IN: regexp-tests
 [ t ] [ "a:b" ".+:?" <regexp> matches? ] unit-test
 
 [ 1 ] [ "hello" ".+?" <regexp> match length ] unit-test
+
+[ { "1" "2" "3" "4" } ]
+[ "1ABC2DEF3GHI4" R/ [A-Z]+/ re-split [ >string ] map ] unit-test
+
+[ { "1" "2" "3" "4" } ]
+[ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ re-split [ >string ] map ] unit-test
+
+[ { "ABC" "DEF" "GHI" } ]
+[ "1ABC2DEF3GHI4" R/ [A-Z]+/ all-matches [ >string ] map ] unit-test
+
+[ "1.2.3.4" ]
+[ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ "." re-replace ] unit-test
