@@ -27,11 +27,10 @@ TUPLE: multipart-stream stream n leftover separator ;
 : multipart-split ( bytes separator -- before after seq=? )
     2dup sequence= [ 2drop f f t ] [ split1 f ] if ;
 
-PRIVATE>
-
 :: multipart-step ( stream bytes end-stream? separator quot: ( bytes -- ) -- ? end-stream? )
     #! return t to loop again
-    bytes separator multipart-split [ dup >boolean ] dip [
+    bytes separator multipart-split
+    [ dup >boolean ] dip [
         ! separator == input
         3drop f quot call f
     ] [
@@ -53,6 +52,8 @@ PRIVATE>
             ] if
         ] if
     ] if stream leftover>> end-stream? not or ;
+
+PRIVATE>
 
 :: multipart-step-loop ( stream quot1: ( bytes -- ) quot2: ( -- ) -- ? )
     stream dup [ read-n ] [ separator>> ] bi quot1 multipart-step
