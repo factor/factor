@@ -101,7 +101,7 @@ M: engine-word word-completion-string
 
 : insert-word ( word -- )
     get-workspace listener>> input>>
-    [ >r word-completion-string r> user-input* ]
+    [ >r word-completion-string r> user-input* drop ]
     [ interactor-use use-if-necessary ]
     2bi ;
 

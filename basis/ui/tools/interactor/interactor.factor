@@ -164,7 +164,7 @@ M: interactor dispose drop ;
 : handle-interactive ( lines interactor -- quot/f ? )
     tuck try-parse {
         { [ dup quotation? ] [ nip t ] }
-        { [ dup not ] [ drop "\n" swap user-input* f f ] }
+        { [ dup not ] [ drop "\n" swap user-input* drop f f ] }
         [ handle-parse-error f f ]
     } cond ;
 
