@@ -30,7 +30,6 @@ HELP: hide-vars
 { $description "Removes a sequence of variables from the watch list." } ;
 
 HELP: hide-all-vars
-{ $values { "seq" "a sequence of variable names" } }
 { $description "Removes all variables from the watch list." } ;
 
 ARTICLE: "listener" "The listener"

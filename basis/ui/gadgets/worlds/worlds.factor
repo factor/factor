@@ -103,9 +103,26 @@ world H{
     { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
     { T{ button-down f { C+ } 1 } [ drop T{ button-down f f 3 } button-gesture ] }
     { T{ button-down f { A+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
+    { T{ button-down f { M+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
     { T{ button-up f { C+ } 1 } [ drop T{ button-up f f 3 } button-gesture ] }
     { T{ button-up f { A+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
+    { T{ button-up f { M+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
 } set-gestures
+
+PREDICATE: specific-button-up < button-up #>> ;
+PREDICATE: specific-button-down < button-down #>> ;
+PREDICATE: specific-drag < drag #>> ;
+
+: generalize-gesture ( gesture -- )
+    clone f >># button-gesture ;
+
+M: world handle-gesture ( gesture gadget -- ? )
+    {
+        { [ over specific-button-up? ] [ drop generalize-gesture t ] }
+        { [ over specific-button-down? ] [ drop generalize-gesture t ] }
+        { [ over specific-drag? ] [ drop generalize-gesture t ] }
+        [ call-next-method ]
+    } cond ;
 
 : close-global ( world global -- )
     dup get-global find-world rot eq?

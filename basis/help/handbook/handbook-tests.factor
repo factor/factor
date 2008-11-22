@@ -1,8 +1,8 @@
 IN: help.handbook.tests
 USING: help tools.test ;
 
-[ ] [ "article-index" help ] unit-test
-[ ] [ "primitive-index" help ] unit-test
-[ ] [ "error-index" help ] unit-test
-[ ] [ "type-index" help ] unit-test
-[ ] [ "class-index" help ] unit-test
+[ ] [ "article-index" print-topic ] unit-test
+[ ] [ "primitive-index" print-topic ] unit-test
+[ ] [ "error-index" print-topic ] unit-test
+[ ] [ "type-index" print-topic ] unit-test
+[ ] [ "class-index" print-topic ] unit-test

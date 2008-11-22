@@ -211,6 +211,8 @@ typedef struct _F_CONTEXT {
 
 DLLEXPORT F_CONTEXT *stack_chain;
 
+F_CONTEXT *unused_contexts;
+
 CELL ds_size, rs_size;
 
 #define ds_bot (stack_chain->datastack_region->start)

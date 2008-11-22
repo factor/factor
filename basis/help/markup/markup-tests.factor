@@ -6,12 +6,12 @@ TUPLE: blahblah quux ;
 
 [ "an int" ] [ [ { "int" } $instance ] with-string-writer ] unit-test
 
-[ ] [ \ quux>> help ] unit-test
-[ ] [ \ >>quux help ] unit-test
-[ ] [ \ blahblah? help ] unit-test
+[ ] [ \ quux>> print-topic ] unit-test
+[ ] [ \ >>quux print-topic ] unit-test
+[ ] [ \ blahblah? print-topic ] unit-test
 
 : fooey "fooey" throw ;
 
-[ ] [ \ fooey help ] unit-test
+[ ] [ \ fooey print-topic ] unit-test
 
-[ ] [ gensym help ] unit-test
+[ ] [ gensym print-topic ] unit-test

@@ -67,10 +67,10 @@ M: browser-gadget definitions-changed ( assoc browser -- )
 \ browser-help H{ { +nullary+ t } } define-command
 
 browser-gadget "toolbar" f {
-    { T{ key-down f { A+ } "b" } com-back }
-    { T{ key-down f { A+ } "f" } com-forward }
-    { T{ key-down f { A+ } "h" } com-documentation }
-    { T{ key-down f { A+ } "v" } com-vocabularies }
+    { T{ key-down f { A+ } "LEFT" } com-back }
+    { T{ key-down f { A+ } "RIGHT" } com-forward }
+    { f com-documentation }
+    { f com-vocabularies }
     { T{ key-down f f "F1" } browser-help }
 } define-command-map
 
