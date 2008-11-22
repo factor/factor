@@ -21,9 +21,9 @@ IN: tools.vocabs.browser
 
 : vocab. ( vocab -- )
     [
-        dup [ write-status ] with-cell
-        dup [ ($link) ] with-cell
-        [ vocab-summary write ] with-cell
+        [ [ write-status ] with-cell ]
+        [ [ ($link) ] with-cell ]
+        [ [ vocab-summary write ] with-cell ] tri
     ] with-row ;
 
 : vocab-headings. ( -- )
@@ -39,13 +39,13 @@ IN: tools.vocabs.browser
 
 : $vocabs ( assoc -- )
     [
-        [
-            drop
-        ] [
-            swap root-heading.
-            standard-table-style [
-                vocab-headings. [ vocab. ] each
-            ] ($grid)
+        [ drop ] [
+            [ root-heading. ]
+            [
+                standard-table-style [
+                    vocab-headings. [ vocab. ] each
+                ] ($grid)
+            ] bi*
         ] if-empty
     ] assoc-each ;
 
@@ -201,7 +201,7 @@ C: <vocab-author> vocab-author
         [ <$link> 1array ] map $table
     ] unless-empty ;
 
-: words. ( vocab -- )
+: describe-words ( vocab -- )
     words [
         "Words" $heading
 
@@ -227,6 +227,10 @@ C: <vocab-author> vocab-author
         ] bi
     ] unless-empty ;
 
+: words. ( vocab -- )
+    last-element off
+    vocab-name describe-words ;
+
 : describe-metadata ( vocab -- )
     [
         [ vocab-tags [ "Tags:" swap \ $tags prefix 2array , ] unless-empty ]
@@ -239,7 +243,7 @@ C: <vocab-author> vocab-author
     first {
         [ describe-help ]
         [ describe-metadata ]
-        [ words. ]
+        [ describe-words ]
         [ describe-files ]
         [ describe-children ]
     } cleave ;
