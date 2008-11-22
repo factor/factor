@@ -288,28 +288,9 @@ ERROR: bad-escaped-literals seq ;
         first|concatenation
     ] if-empty ;
 
-ERROR: unrecognized-escape char ;
-
 : parse-escaped ( -- obj )
     read1
     {
-        { CHAR: \ [ CHAR: \ <constant> ] }
-        { CHAR: / [ CHAR: / <constant> ] }
-        { CHAR: ^ [ CHAR: ^ <constant> ] }
-        { CHAR: $ [ CHAR: $ <constant> ] }
-        { CHAR: - [ CHAR: - <constant> ] }
-        { CHAR: { [ CHAR: { <constant> ] }
-        { CHAR: } [ CHAR: } <constant> ] }
-        { CHAR: [ [ CHAR: [ <constant> ] }
-        { CHAR: ] [ CHAR: ] <constant> ] }
-        { CHAR: ( [ CHAR: ( <constant> ] }
-        { CHAR: ) [ CHAR: ) <constant> ] }
-        { CHAR: @ [ CHAR: @ <constant> ] }
-        { CHAR: * [ CHAR: * <constant> ] }
-        { CHAR: + [ CHAR: + <constant> ] }
-        { CHAR: ? [ CHAR: ? <constant> ] }
-        { CHAR: . [ CHAR: . <constant> ] }
-        { CHAR: : [ CHAR: : <constant> ] }
         { CHAR: t [ CHAR: \t <constant> ] }
         { CHAR: n [ CHAR: \n <constant> ] }
         { CHAR: r [ CHAR: \r <constant> ] }
@@ -349,7 +330,7 @@ ERROR: unrecognized-escape char ;
         ! { CHAR: 9 [ CHAR: 9 <constant> ] }
 
         { CHAR: Q [ parse-escaped-literals ] }
-        [ unrecognized-escape ]
+        [ <constant> ]
     } case ;
 
 : handle-escape ( -- ) parse-escaped push-stack ;
