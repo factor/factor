@@ -289,14 +289,18 @@ SYMBOL: in-lambda?
     \ ] (parse-lambda) <lambda> ;
 
 : parse-binding ( -- pair/f )
-    scan dup "|" = [
-        drop f
-    ] [
-        scan {
-            { "[" [ \ ] parse-until >quotation ] }
-            { "[|" [ parse-lambda ] }
-        } case 2array
-    ] if ;
+    scan {
+        { [ dup "|" = ] [ drop f ] }
+        { [ dup "!" = ] [ drop lexer get next-line parse-binding ] }
+        { [ t ]
+          [
+              scan {
+                  { "["  [ \ ] parse-until >quotation ] }
+                  { "[|" [ parse-lambda ] }
+              } case 2array
+          ]
+        }
+    } cond ;
 
 : (parse-bindings) ( -- )
     parse-binding [

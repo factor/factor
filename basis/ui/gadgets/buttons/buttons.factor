@@ -71,6 +71,7 @@ M: button-paint draw-boundary
 
 : roll-button-theme ( button -- button )
     f black <solid> dup f <button-paint> >>boundary
+    f f pressed-gradient f <button-paint> >>interior
     align-left ; inline
 
 : <roll-button> ( label quot -- button )

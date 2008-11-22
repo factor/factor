@@ -194,7 +194,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 :: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     wParam exclude-key-wm-keydown? [
         wParam keystroke>gesture <key-down>
-        hWnd window-focus send-gesture drop
+        hWnd window-focus propagate-gesture
     ] unless ;
 
 :: handle-wm-char ( hWnd uMsg wParam lParam -- )
@@ -205,7 +205,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
 :: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
     wParam keystroke>gesture <key-up>
-    hWnd window-focus send-gesture drop ;
+    hWnd window-focus propagate-gesture ;
 
 :: set-window-active ( hwnd uMsg wParam lParam ? -- n )
     ? hwnd window (>>active?)
@@ -381,11 +381,9 @@ SYMBOL: trace-messages?
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
-        [
-            pick
-            trace-messages? get-global [ dup windows-message-name name>> print flush ] when
-            wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
-        ] ui-try
+        pick
+        trace-messages? get-global [ dup windows-message-name name>> print flush ] when
+        wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
      ] alien-callback ;
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;

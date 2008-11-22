@@ -19,7 +19,7 @@ GENERIC: word-help* ( word -- content )
     { { "object" object } { "?" "a boolean" } } $values
     [
         "Tests if the object is an instance of the " ,
-        first "predicating" word-prop \ $link swap 2array ,
+        first "predicating" word-prop <$link> ,
         " class." ,
     ] { } make $description ;
 
@@ -58,14 +58,35 @@ M: word article-title
         append
     ] if ;
 
-M: word article-content
+<PRIVATE
+
+: (word-help) ( word -- element )
     [
-        \ $vocabulary over 2array ,
-        dup word-help %
-        \ $related over 2array ,
-        dup get-global [ \ $value swap 2array , ] when*
-        \ $definition swap 2array ,
+        {
+            [ \ $vocabulary swap 2array , ]
+            [ word-help % ]
+            [ \ $related swap 2array , ]
+            [ get-global [ \ $value swap 2array , ] when* ]
+            [ \ $definition swap 2array , ]
+        } cleave
     ] { } make ;
+
+M: word article-content (word-help) ;
+
+<PRIVATE
+
+: word-with-methods ( word -- elements )
+    [
+        [ (word-help) % ]
+        [ \ $methods swap 2array , ]
+        bi
+    ] { } make ;
+
+PRIVATE>
+
+M: generic article-content word-with-methods ;
+
+M: class article-content word-with-methods ;
 
 M: word article-parent "help-parent" word-prop ;
 
