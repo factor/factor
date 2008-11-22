@@ -290,21 +290,15 @@ SYMBOL: in-lambda?
 
 : parse-binding ( -- pair/f )
     scan {
+        { [ dup not ] [ unexpected-eof ] }
         { [ dup "|" = ] [ drop f ] }
-        { [ dup "!" = ] [ drop lexer get next-line parse-binding ] }
-        { [ t ]
-          [
-              scan {
-                  { "["  [ \ ] parse-until >quotation ] }
-                  { "[|" [ parse-lambda ] }
-              } case 2array
-          ]
-        }
+        { [ dup "!" = ] [ drop POSTPONE: ! parse-binding ] }
+        [ scan-object 2array ]
     } cond ;
 
 : (parse-bindings) ( -- )
     parse-binding [
-        first2 >r make-local r> 2array ,
+        first2 [ make-local ] dip 2array ,
         (parse-bindings)
     ] when* ;
 
@@ -357,7 +351,7 @@ M: wlet local-rewrite*
     in>> [ dup pair? [ first ] when ] map make-locals dup push-locals ;
 
 : parse-locals-definition ( word -- word quot )
-    scan "(" assert= parse-locals \ ; (parse-lambda) <lambda>
+    "(" expect parse-locals \ ; (parse-lambda) <lambda>
     2dup "lambda" set-word-prop
     lambda-rewrite first ;
 
@@ -375,15 +369,15 @@ PRIVATE>
 : [| parse-lambda parsed-lambda ; parsing
 
 : [let
-    scan "|" assert= parse-bindings
+    "|" expect parse-bindings
     \ ] (parse-lambda) <let> parsed-lambda ; parsing
 
 : [let*
-    scan "|" assert= parse-bindings*
+    "|" expect parse-bindings*
     \ ] (parse-lambda) <let*> parsed-lambda ; parsing
 
 : [wlet
-    scan "|" assert= parse-wbindings
+    "|" expect parse-wbindings
     \ ] (parse-lambda) <wlet> parsed-lambda ; parsing
 
 : :: (::) define ; parsing

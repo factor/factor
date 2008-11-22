@@ -74,6 +74,12 @@ PREDICATE: unexpected-eof < unexpected
 
 : unexpected-eof ( word -- * ) f unexpected ;
 
+: expect ( token -- )
+    scan
+    [ 2dup = [ 2drop ] [ unexpected ] if ]
+    [ unexpected-eof ]
+    if* ;
+
 : (parse-tokens) ( accum end -- accum )
     scan 2dup = [
         2drop
