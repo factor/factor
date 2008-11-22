@@ -2,7 +2,7 @@ USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
 accessors generic eval combinators combinators.short-circuit
 combinators.short-circuit.smart math.order math.functions
-definitions compiler.units fry ;
+definitions compiler.units fry lexer ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -411,6 +411,12 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 
 [ t ] [ 3 funny-macro-test ] unit-test
 [ f ] [ 2 funny-macro-test ] unit-test
+
+! Some odd parser corner cases
+[ "USE: locals [let" eval ] [ error>> unexpected-eof? ] must-fail-with
+[ "USE: locals [let |" eval ] [ error>> unexpected-eof? ] must-fail-with
+[ "USE: locals [let | a" eval ] [ error>> unexpected-eof? ] must-fail-with
+[ "USE: locals [|" eval ] [ error>> unexpected-eof? ] must-fail-with
 
 ! :: wlet-&&-test ( a -- ? )
 !     [wlet | is-integer? [ a integer? ]
