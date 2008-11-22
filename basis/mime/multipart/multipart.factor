@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io kernel locals math multiline
-sequences splitting ;
+sequences splitting prettyprint ;
 IN: mime.multipart
 
 TUPLE: multipart-stream stream n leftover separator ;
@@ -27,30 +27,29 @@ TUPLE: multipart-stream stream n leftover separator ;
 : multipart-split ( bytes separator -- before after seq=? )
     2dup sequence= [ 2drop f f t ] [ split1 f ] if ;
 
+:: multipart-step-found ( bytes stream quot -- ? )
+    bytes [
+        quot unless-empty
+    ] [
+        stream (>>leftover)
+        [ quot call ] unless-empty
+    ] if-empty f quot call f ;
+
+:: multipart-step-not-found ( stream end-stream? separator quot -- ? )
+    end-stream? [
+        quot unless-empty f
+    ] [
+        separator length 1- ?cut* stream (>>leftover)
+        quot unless-empty t
+    ] if ;
+
 :: multipart-step ( stream bytes end-stream? separator quot: ( bytes -- ) -- ? end-stream? )
     #! return t to loop again
     bytes separator multipart-split
-    [ dup >boolean ] dip [
-        ! separator == input
-        3drop f quot call f
-    ] [
-        [
-            ! found
-            [ quot unless-empty ]
-            [
-                stream (>>leftover)
-                quot unless-empty
-            ] if-empty f quot call f
-        ] [
-            ! not found
-            drop
-            end-stream? [
-                quot unless-empty f
-            ] [
-                separator length 1- ?cut* stream (>>leftover)
-                quot unless-empty t
-            ] if
-        ] if
+    [ 2drop f quot call f ]
+    [
+        [ stream quot multipart-step-found ]
+        [ stream end-stream? separator quot multipart-step-not-found ] if*
     ] if stream leftover>> end-stream? not or ;
 
 PRIVATE>
@@ -60,4 +59,5 @@ PRIVATE>
     swap [ drop stream quot1 quot2 multipart-step-loop ] quot2 if ;
 
 : multipart-loop-all ( stream quot1: ( bytes -- ) quot2: ( -- ) -- )
-    3dup multipart-step-loop [ multipart-loop-all ] [ 3drop ] if ;
+    3dup multipart-step-loop
+    [ multipart-loop-all ] [ 3drop ] if ;
