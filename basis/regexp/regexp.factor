@@ -33,9 +33,9 @@ IN: regexp
 
 : matches? ( string regexp -- ? )
     dupd match
-    [ [ length ] [ length>> 1- ] bi* = ] [ drop f ] if* ;
+    [ [ length ] bi@ = ] [ drop f ] if* ;
 
-: match-head ( string regexp -- end/f ) match [ length>> 1- ] [ f ] if* ;
+: match-head ( string regexp -- end/f ) match [ length ] [ f ] if* ;
 
 : match-at ( string m regexp -- n/f finished? )
     [

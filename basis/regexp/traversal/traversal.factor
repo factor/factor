@@ -144,7 +144,10 @@ M: capture-group-off flag-action ( dfa-traverser flag -- )
         [ increment-state do-match ] when*
     ] unless ;
 
-: return-match ( dfa-traverser -- interval/f )
+: return-match ( dfa-traverser -- slice/f )
     dup matches>>
     [ drop f ]
-    [ [ start-index>> ] [ peek ] bi* 1 <range> ] if-empty ;
+    [
+        [ [ text>> ] [ start-index>> ] bi ]
+        [ peek ] bi* rot <slice>
+    ] if-empty ;
