@@ -190,7 +190,7 @@ TUPLE: slice
 : collapse-slice ( m n slice -- m' n' seq )
     [ from>> ] [ seq>> ] bi >r tuck + >r + r> r> ; inline
 
-ERROR: slice-error reason ;
+ERROR: slice-error from to seq reason ;
 
 : check-slice ( from to seq -- from to seq )
     pick 0 < [ "start < 0" slice-error ] when
