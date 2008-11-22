@@ -19,7 +19,7 @@ GENERIC: word-help* ( word -- content )
     { { "object" object } { "?" "a boolean" } } $values
     [
         "Tests if the object is an instance of the " ,
-        first "predicating" word-prop \ $link swap 2array ,
+        first "predicating" word-prop <$link> ,
         " class." ,
     ] { } make $description ;
 

@@ -348,3 +348,6 @@ M: array elements*
             ] each
         ] curry each
     ] H{ } make-assoc keys ;
+
+: <$link> ( topic -- element )
+    \ $link swap 2array ;
