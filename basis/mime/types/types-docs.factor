@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs help.markup help.syntax io.streams.string sequences ;
-IN: mime-types
+IN: mime.types
 
 HELP: mime-db
 { $values
@@ -27,9 +27,9 @@ HELP: nonstandard-mime-types
      { "assoc" assoc } }
 { $description "A list of Factor-specific MIME types that are added to the MIME database loaded from disk." } ;
 
-ARTICLE: "mime-types" "MIME types"
-"The " { $vocab-link "mime-types" } " vocabulary loads a file of MIME types and provides a word to look up the MIME type based on a file extension." $nl
+ARTICLE: "mime.types" "MIME types"
+"The " { $vocab-link "mime.types" } " vocabulary loads a file of MIME types and provides a word to look up the MIME type based on a file extension." $nl
 "Looking up a MIME type:"
 { $subsection mime-type } ;
 
-ABOUT: "mime-types"
+ABOUT: "mime.types"

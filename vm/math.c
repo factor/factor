@@ -33,18 +33,18 @@ void primitive_float_to_fixnum(void)
 
 #define POP_FIXNUMS(x,y) \
 	F_FIXNUM y = untag_fixnum_fast(dpop()); \
-	F_FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpeek());
 
 void primitive_fixnum_add(void)
 {
 	POP_FIXNUMS(x,y)
-	box_signed_cell(x + y);
+	drepl(allot_integer(x + y));
 }
 
 void primitive_fixnum_subtract(void)
 {
 	POP_FIXNUMS(x,y)
-	box_signed_cell(x - y);
+	drepl(allot_integer(x - y));
 }
 
 /* Multiply two integers, and trap overflow.
@@ -54,20 +54,20 @@ void primitive_fixnum_multiply(void)
 	POP_FIXNUMS(x,y)
 
 	if(x == 0 || y == 0)
-		dpush(tag_fixnum(0));
+		drepl(tag_fixnum(0));
 	else
 	{
 		F_FIXNUM prod = x * y;
 		/* if this is not equal, we have overflow */
 		if(prod / x == y)
-			box_signed_cell(prod);
+			drepl(allot_integer(prod));
 		else
 		{
 			F_ARRAY *bx = fixnum_to_bignum(x);
 			REGISTER_BIGNUM(bx);
 			F_ARRAY *by = fixnum_to_bignum(y);
 			UNREGISTER_BIGNUM(bx);
-			dpush(tag_bignum(bignum_multiply(bx,by)));
+			drepl(tag_bignum(bignum_multiply(bx,by)));
 		}
 	}
 }
@@ -75,14 +75,27 @@ void primitive_fixnum_multiply(void)
 void primitive_fixnum_divint(void)
 {
 	POP_FIXNUMS(x,y)
-	box_signed_cell(x / y);
+	F_FIXNUM result = x / y;
+	if(result == -FIXNUM_MIN)
+		drepl(allot_integer(-FIXNUM_MIN));
+	else
+		drepl(tag_fixnum(result));
 }
 
 void primitive_fixnum_divmod(void)
 {
-	POP_FIXNUMS(x,y)
-	box_signed_cell(x / y);
-	dpush(tag_fixnum(x % y));
+	F_FIXNUM y = get(ds);
+	F_FIXNUM x = get(ds - CELLS);
+	if(y == tag_fixnum(-1) && x == tag_fixnum(FIXNUM_MIN))
+	{
+		put(ds - CELLS,allot_integer(-FIXNUM_MIN));
+		put(ds,tag_fixnum(0));
+	}
+	else
+	{
+		put(ds - CELLS,tag_fixnum(x / y));
+		put(ds,x % y);
+	}
 }
 
 /*
@@ -96,15 +109,15 @@ void primitive_fixnum_shift(void)
 
 	if(x == 0 || y == 0)
 	{
-		dpush(tag_fixnum(x));
+		drepl(tag_fixnum(x));
 		return;
 	}
 	else if(y < 0)
 	{
 		if(y <= -WORD_SIZE)
-			dpush(x < 0 ? tag_fixnum(-1) : tag_fixnum(0));
+			drepl(x < 0 ? tag_fixnum(-1) : tag_fixnum(0));
 		else
-			dpush(tag_fixnum(x >> -y));
+			drepl(tag_fixnum(x >> -y));
 		return;
 	}
 	else if(y < WORD_SIZE - TAG_BITS)
@@ -112,12 +125,12 @@ void primitive_fixnum_shift(void)
 		F_FIXNUM mask = -((F_FIXNUM)1 << (WORD_SIZE - 1 - TAG_BITS - y));
 		if((x > 0 && (x & mask) == 0) || (x & mask) == mask)
 		{
-			dpush(tag_fixnum(x << y));
+			drepl(tag_fixnum(x << y));
 			return;
 		}
 	}
 
-	dpush(tag_bignum(bignum_arithmetic_shift(
+	drepl(tag_bignum(bignum_arithmetic_shift(
 		fixnum_to_bignum(x),y)));
 }
 

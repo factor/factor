@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.syntax kernel libc
 sequences continuations byte-arrays strings math namespaces
 system combinators vocabs.loader qualified accessors
 stack-checker macros locals generalizations unix.types
-debugger io prettyprint ;
+debugger io prettyprint io.files ;
 IN: unix
 
 : PROT_NONE   0 ; inline
@@ -19,6 +19,29 @@ IN: unix
 : MAP_FAILED -1 <alien> ; inline
 
 : NGROUPS_MAX 16 ; inline
+
+: DT_UNKNOWN   0 ; inline
+: DT_FIFO      1 ; inline
+: DT_CHR       2 ; inline
+: DT_DIR       4 ; inline
+: DT_BLK       6 ; inline
+: DT_REG       8 ; inline
+: DT_LNK      10 ; inline
+: DT_SOCK     12 ; inline
+: DT_WHT      14 ; inline
+
+: dirent-type>file-type ( ch -- type )
+    {
+        { DT_BLK  [ +block-device+ ] }
+        { DT_CHR  [ +character-device+ ] }
+        { DT_DIR  [ +directory+ ] }
+        { DT_LNK  [ +symbolic-link+ ] }
+        { DT_SOCK [ +socket+ ] }
+        { DT_FIFO [ +fifo+ ] }
+        { DT_REG  [ +regular-file+ ] }
+        { DT_WHT  [ +whiteout+ ] }
+        [ drop +unknown+ ]
+    } case ;
 
 C-STRUCT: group
     { "char*" "gr_name" }

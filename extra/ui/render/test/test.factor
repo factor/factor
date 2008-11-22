@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors arrays kernel sequences math byte-arrays
-namespaces cap graphics.bitmap
+namespaces grouping fry cap graphics.bitmap
 ui.gadgets ui.gadgets.packs ui.gadgets.borders ui.gadgets.grids
 ui.gadgets.grid-lines ui.gadgets.labels ui.gadgets.buttons
 ui.render ui opengl opengl.gl ;
@@ -17,33 +17,45 @@ M: line-test draw-interior
         line-test >>interior
         { 1 10 } >>dim ;
 
-TUPLE: ui-render-test < pack { first-time? initial: t } ;
-
 : message-window ( text -- )
     <label> "Message" open-window ;
 
+SYMBOL: render-output
+
 : twiddle ( bytes -- bytes )
     #! On Windows, white is { 253 253 253 } ?
-    [ dup 253 = [ 2 + ] when ] map ;
+    [ 10 /i ] map ;
+
+: stride ( bitmap -- n ) width>> 3 * ;
+
+: bitmap= ( bitmap1 bitmap2 -- ? )
+    [
+        [ [ array>> ] [ stride 4 align ] bi group ] [ stride ] bi
+        '[ _ head twiddle ] map
+    ] bi@ = ;
 
 : check-rendering ( gadget -- )
-    gl-screenshot twiddle
-    "resource:extra/ui/render/test/reference.bmp" load-bitmap array>>
-    = "perfect" "needs work" ? "Your UI rendering is " prepend
-    message-window ;
-
-M: ui-render-test draw-gadget*
-    [ call-next-method ] [
-        dup first-time?>> [
-            dup check-rendering
-            f >>first-time?
-        ] when
-        drop
+    screenshot
+    [ render-output set-global ]
+    [
+        "resource:extra/ui/render/test/reference.bmp" load-bitmap
+        bitmap= "is perfect" "needs work" ?
+        "Your UI rendering " prepend
+        message-window
     ] bi ;
 
+TUPLE: take-screenshot { first-time? initial: t } ;
+
+M: take-screenshot draw-boundary
+    dup first-time?>> [
+        over check-rendering
+        f >>first-time?
+    ] when
+    2drop ;
+
 : <ui-render-test> ( -- gadget )
-    \ ui-render-test new-gadget
-        { 1 0 } >>orientation
+    <shelf>
+        take-screenshot new >>boundary
         <gadget>
             black <solid> >>interior
             { 98 98 } >>dim

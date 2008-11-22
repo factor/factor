@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces make
 prettyprint dlists deques sequences threads sequences words
@@ -87,6 +87,7 @@ SYMBOL: ui-hook
 : init-ui ( -- )
     <dlist> \ graft-queue set-global
     <dlist> \ layout-queue set-global
+    <dlist> \ gesture-queue set-global
     V{ } clone windows set-global ;
 
 : restore-gadget-later ( gadget -- )
@@ -129,8 +130,8 @@ SYMBOL: ui-hook
 
 : notify ( gadget -- )
     dup graft-state>>
-    dup first { f f } { t t } ?
-    pick (>>graft-state) {
+    [ first { f f } { t t } ? >>graft-state ] keep
+    {
         { { f t } [ dup activate-control graft* ] }
         { { t f } [ dup deactivate-control ungraft* ] }
     } case ;
@@ -138,13 +139,21 @@ SYMBOL: ui-hook
 : notify-queued ( -- )
     graft-queue [ notify ] slurp-deque ;
 
+: send-queued-gestures ( -- )
+    gesture-queue [ send-queued-gesture ] slurp-deque ;
+
 : update-ui ( -- )
-    [ notify-queued layout-queued redraw-worlds ] assert-depth ;
+    [
+        [
+            notify-queued
+            layout-queued
+            redraw-worlds
+            send-queued-gestures
+        ] assert-depth
+    ] [ ui-error ] recover ;
 
 : ui-wait ( -- )
     10 sleep ;
-
-: ui-try ( quot -- ) [ ui-error ] recover ;
 
 SYMBOL: ui-thread
 
@@ -156,11 +165,9 @@ SYMBOL: ui-thread
     \ ui-running get-global ;
 
 : update-ui-loop ( -- )
-    ui-running? ui-thread get-global self eq? and [
-        ui-notify-flag get lower-flag
-        [ update-ui ] ui-try
-        update-ui-loop
-    ] when ;
+    [ ui-running? ui-thread get-global self eq? and ]
+    [ ui-notify-flag get lower-flag update-ui ]
+    [ ] while ;
 
 : start-ui-thread ( -- )
     [ self ui-thread set-global update-ui-loop ]

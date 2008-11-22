@@ -323,10 +323,6 @@ M: class-see-layout class-see-layout ;
     [ 2 break 2 \ + (step-into-execute) . ] (remove-breakpoints)
 ] unit-test
 
-[ ] [ 1 \ + curry unparse drop ] unit-test
-
-[ ] [ 1 \ + compose unparse drop ] unit-test
-
 GENERIC: generic-see-test-with-f ( obj -- obj )
 
 M: f generic-see-test-with-f ;

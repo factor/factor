@@ -32,7 +32,7 @@ ARTICLE: "ui-listener" "UI listener"
 { $heading "Editing commands" }
 "The text editing commands are standard; see " { $link "gadgets-editors" } "."
 { $heading "Implementation" }
-"Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } "), and an input area (instance of " { $link interactor } "), and a stack display kept up to date using a " { $link listener-hook } "." ;
+"Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } ") and an input area (instance of " { $link interactor } ")." ;
 
 ARTICLE: "ui-inspector" "UI inspector"
 "The graphical inspector builds on the terminal inspector (see " { $link "inspector" } ") and provides in-place editing of slot values."

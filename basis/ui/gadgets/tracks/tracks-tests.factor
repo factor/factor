@@ -14,3 +14,10 @@ IN: ui.gadgets.tracks.tests
         <gadget> { 100 100 } >>dim 1 track-add
     pref-dim
 ] unit-test
+
+[ { 10 10 } ] [
+    { 0 1 } <track>
+        <gadget> { 10 10 } >>dim 1 track-add
+        <gadget> { 10 10 } >>dim 0 track-add
+    pref-dim
+] unit-test
