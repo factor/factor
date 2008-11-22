@@ -381,11 +381,9 @@ SYMBOL: trace-messages?
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
-        [
-            pick
-            trace-messages? get-global [ dup windows-message-name name>> print flush ] when
-            wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
-        ] ui-try
+        pick
+        trace-messages? get-global [ dup windows-message-name name>> print flush ] when
+        wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
      ] alien-callback ;
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;

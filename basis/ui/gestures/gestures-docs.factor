@@ -22,7 +22,7 @@ HELP: propagate-gesture
 { $description "Calls " { $link handle-gesture } " on every parent of " { $snippet "gadget" } ". Outputs " { $link f } " if some parent handled the gesture, else outputs " { $link t } "." } ;
 
 HELP: user-input
-{ $values { "str" string } { "gadget" gadget } }
+{ $values { "string" string } { "gadget" gadget } }
 { $description "Calls " { $link user-input* } " on every parent of the gadget." } ;
 
 HELP: motion
@@ -89,10 +89,6 @@ HELP: delete-action
 HELP: select-all-action
 { $class-description "Gesture sent when the " { $emphasis "select all" } " standard window system action is invoked." }
 { $examples { $code "T{ select-all-action }" } } ;
-
-HELP: generalize-gesture
-{ $values { "gesture" "a gesture" } { "newgesture" "a new gesture" } }
-{ $description "Turns a " { $link button-down } ", " { $link button-up } " or " { $link drag } " action naming a specific mouse button into one which can apply regardless of which mouse button was pressed." } ;
 
 HELP: C+
 { $description "Control key modifier." } ;

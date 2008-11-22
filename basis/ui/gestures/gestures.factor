@@ -3,10 +3,8 @@
 USING: accessors arrays assocs kernel math models namespaces
 make sequences words strings system hashtables math.parser
 math.vectors classes.tuple classes  boxes calendar
-alarms symbols combinators sets columns fry ui.gadgets ;
+alarms symbols combinators sets columns fry deques ui.gadgets ;
 IN: ui.gestures
-
-: set-gestures ( class hash -- ) "gestures" set-word-prop ;
 
 GENERIC: handle-gesture ( gesture gadget -- ? )
 
@@ -15,17 +13,42 @@ M: object handle-gesture
     [ "gestures" word-prop ] map
     assoc-stack dup [ call f ] [ 2drop t ] if ;
 
+: set-gestures ( class hash -- ) "gestures" set-word-prop ;
+
+: gesture-queue ( -- deque ) \ gesture-queue get ;
+
+GENERIC: send-queued-gesture ( request -- )
+
+TUPLE: send-gesture gesture gadget ;
+
+M: send-gesture send-queued-gesture
+    [ gesture>> ] [ gadget>> ] bi handle-gesture drop ;
+
+: queue-gesture ( ... class -- )
+    boa gesture-queue push-front notify-ui-thread ; inline
+
 : send-gesture ( gesture gadget -- )
-    handle-gesture drop ;
+    \ send-gesture queue-gesture ;
 
-: each-gesture ( gesture seq -- )
-    [ send-gesture ] with each ;
+: each-gesture ( gesture seq -- ) [ send-gesture ] with each ;
 
-: propagate-gesture ( gesture gadget -- )
+TUPLE: propagate-gesture gesture gadget ;
+
+M: propagate-gesture send-queued-gesture
+    [ gesture>> ] [ gadget>> ] bi
     [ handle-gesture ] with each-parent drop ;
 
-: user-input ( str gadget -- )
-    '[ _ [ user-input* ] with each-parent drop ] unless-empty ;
+: propagate-gesture ( gesture gadget -- )
+    \ propagate-gesture queue-gesture ;
+
+TUPLE: user-input string gadget ;
+
+M: user-input send-queued-gesture
+    [ string>> ] [ gadget>> ] bi
+    [ user-input* ] with each-parent drop ;
+
+: user-input ( string gadget -- )
+    '[ _ \ user-input queue-gesture ] unless-empty ;
 
 ! Gesture objects
 TUPLE: motion ;             C: <motion> motion

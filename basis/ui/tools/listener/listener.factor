@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: inspector help help.markup io io.styles
-kernel models namespaces parser quotations sequences  vocabs words
-prettyprint listener debugger threads boxes concurrency.flags
-math arrays generic accessors combinators assocs fry ui.commands
-ui.gadgets ui.gadgets.editors ui.gadgets.labelled
-ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
+USING: inspector help help.markup io io.styles kernel models
+namespaces parser quotations sequences vocabs words prettyprint
+listener debugger threads boxes concurrency.flags math arrays
+generic accessors combinators assocs fry ui.commands ui.gadgets
+ui.gadgets.editors ui.gadgets.labelled ui.gadgets.panes
+ui.gadgets.buttons ui.gadgets.scrollers ui.gadgets.packs
 ui.gadgets.tracks ui.gadgets.borders ui.gestures ui.operations
 ui.tools.browser ui.tools.interactor ui.tools.inspector
 ui.tools.workspace ;
@@ -13,19 +13,11 @@ IN: ui.tools.listener
 
 TUPLE: listener-gadget < track input output ;
 
-: listener-output, ( listener -- listener )
-    <scrolling-pane>
-    [ >>output ] [ <scroller> 1 track-add ] bi ;
-
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> ] bi ;
 
 : <listener-input> ( listener -- gadget )
     output>> <pane-stream> <interactor> ;
-
-: listener-input, ( listener -- listener )
-    dup <listener-input>
-    [ >>input ] [ 1 <border> { 1 1 } >>fill f track-add ] bi ;
 
 : welcome. ( -- )
     "If this is your first time with Factor, please read the " print
@@ -109,7 +101,7 @@ M: engine-word word-completion-string
 
 : insert-word ( word -- )
     get-workspace listener>> input>>
-    [ >r word-completion-string r> user-input ]
+    [ >r word-completion-string r> user-input* ]
     [ interactor-use use-if-necessary ]
     2bi ;
 
@@ -156,11 +148,21 @@ M: engine-word word-completion-string
         [ wait-for-listener ]
     } cleave ;
 
+: init-listener ( listener -- listener )
+    <scrolling-pane> >>output
+    dup <listener-input> >>input ;
+
+: <listener-scroller> ( listener -- scroller )
+    <filled-pile>
+        over output>> add-gadget
+        swap input>> add-gadget
+    <scroller> ;
+
 : <listener-gadget> ( -- gadget )
     { 0 1 } listener-gadget new-track
         add-toolbar
-        listener-output,
-        listener-input, ;
+        init-listener
+        dup <listener-scroller> 1 track-add ;
 
 : listener-help ( -- ) "ui-listener" help-window ;
 
@@ -177,9 +179,9 @@ listener-gadget "misc" "Miscellaneous commands" {
 
 listener-gadget "toolbar" f {
     { f restart-listener }
-    { T{ key-down f { A+ } "a" } com-auto-use }
-    { T{ key-down f { A+ } "c" } clear-output }
-    { T{ key-down f { A+ } "C" } clear-stack }
+    { T{ key-down f { A+ } "u" } com-auto-use }
+    { T{ key-down f { A+ } "k" } clear-output }
+    { T{ key-down f { A+ } "K" } clear-stack }
     { T{ key-down f { C+ } "d" } com-end }
 } define-command-map
 

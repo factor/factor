@@ -10,11 +10,9 @@ SYMBOL: ui-notify-flag
 
 : notify-ui-thread ( -- ) ui-notify-flag get-global raise-flag ;
 
-TUPLE: gadget < rect
-       pref-dim parent children orientation focus
-       visible? root? clipped? layout-state graft-state graft-node
-       interior boundary
-       model ;
+TUPLE: gadget < rect pref-dim parent children orientation focus
+visible? root? clipped? layout-state graft-state graft-node
+interior boundary model ;
 
 M: gadget equal? 2drop f ;
 

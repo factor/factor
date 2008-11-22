@@ -8,7 +8,7 @@ HELP: <debugger>
     "Creates a gadget displaying a description of the error, along with buttons to print the contents of the stacks in the listener, and a list of restarts."
 } ;
 
-{ <debugger> debugger-window ui-try } related-words
+{ <debugger> debugger-window } related-words
 
 HELP: debugger-window
 { $values { "error" "an error" } }

@@ -62,9 +62,6 @@ IN: ui.cocoa.views
 : send-key-event ( view gesture -- )
     swap window-focus propagate-gesture ;
 
-: send-user-input ( view string -- )
-    CF>string swap window-focus user-input ;
-
 : interpret-key-event ( view event -- )
     NSArray swap -> arrayWithObject: -> interpretKeyEvents: ;
 
@@ -138,83 +135,83 @@ CLASS: {
 }
 
 { "mouseEntered:" "void" { "id" "SEL" "id" }
-    [ [ nip send-mouse-moved ] ui-try ]
+    [ nip send-mouse-moved ]
 }
 
 { "mouseExited:" "void" { "id" "SEL" "id" }
-    [ [ 3drop forget-rollover ] ui-try ]
+    [ 3drop forget-rollover ]
 }
 
 { "mouseMoved:" "void" { "id" "SEL" "id" }
-    [ [ nip send-mouse-moved ] ui-try ]
+    [ nip send-mouse-moved ]
 }
 
 { "mouseDragged:" "void" { "id" "SEL" "id" }
-    [ [ nip send-mouse-moved ] ui-try ]
+    [ nip send-mouse-moved ]
 }
 
 { "rightMouseDragged:" "void" { "id" "SEL" "id" }
-    [ [ nip send-mouse-moved ] ui-try ]
+    [ nip send-mouse-moved ]
 }
 
 { "otherMouseDragged:" "void" { "id" "SEL" "id" }
-    [ [ nip send-mouse-moved ] ui-try ]
+    [ nip send-mouse-moved ]
 }
 
 { "mouseDown:" "void" { "id" "SEL" "id" }
-    [ [ nip send-button-down$ ] ui-try ]
+    [ nip send-button-down$ ]
 }
 
 { "mouseUp:" "void" { "id" "SEL" "id" }
-    [ [ nip send-button-up$ ] ui-try ]
+    [ nip send-button-up$ ]
 }
 
 { "rightMouseDown:" "void" { "id" "SEL" "id" }
-    [ [ nip send-button-down$ ] ui-try ]
+    [ nip send-button-down$ ]
 }
 
 { "rightMouseUp:" "void" { "id" "SEL" "id" }
-    [ [ nip send-button-up$ ] ui-try ]
+    [ nip send-button-up$ ]
 }
 
 { "otherMouseDown:" "void" { "id" "SEL" "id" }
-    [ [ nip send-button-down$ ] ui-try ]
+    [ nip send-button-down$ ]
 }
 
 { "otherMouseUp:" "void" { "id" "SEL" "id" }
-    [ [ nip send-button-up$ ] ui-try ]
+    [ nip send-button-up$ ]
 }
 
 { "scrollWheel:" "void" { "id" "SEL" "id" }
-    [ [ nip send-wheel$ ] ui-try ]
+    [ nip send-wheel$ ]
 }
 
 { "keyDown:" "void" { "id" "SEL" "id" }
-    [ [ nip send-key-down-event ] ui-try ]
+    [ nip send-key-down-event ]
 }
 
 { "keyUp:" "void" { "id" "SEL" "id" }
-    [ [ nip send-key-up-event ] ui-try ]
+    [ nip send-key-up-event ]
 }
 
 { "cut:" "id" { "id" "SEL" "id" }
-    [ [ nip T{ cut-action } send-action$ ] ui-try ]
+    [ nip T{ cut-action } send-action$ ]
 }
 
 { "copy:" "id" { "id" "SEL" "id" }
-    [ [ nip T{ copy-action } send-action$ ] ui-try ]
+    [ nip T{ copy-action } send-action$ ]
 }
 
 { "paste:" "id" { "id" "SEL" "id" }
-    [ [ nip T{ paste-action } send-action$ ] ui-try ]
+    [ nip T{ paste-action } send-action$ ]
 }
 
 { "delete:" "id" { "id" "SEL" "id" }
-    [ [ nip T{ delete-action } send-action$ ] ui-try ]
+    [ nip T{ delete-action } send-action$ ]
 }
 
 { "selectAll:" "id" { "id" "SEL" "id" }
-    [ [ nip T{ select-all-action } send-action$ ] ui-try ]
+    [ nip T{ select-all-action } send-action$ ]
 }
 
 ! Multi-touch gestures: this is undocumented.
@@ -290,7 +287,7 @@ CLASS: {
 
 ! Text input
 { "insertText:" "void" { "id" "SEL" "id" }
-    [ [ nip send-user-input ] ui-try ]
+    [ nip CF>string swap window-focus user-input ]
 }
 
 { "hasMarkedText" "char" { "id" "SEL" }
@@ -335,11 +332,11 @@ CLASS: {
 
 ! Initialization
 { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
-    [
-        [
-            2drop dup view-dim swap window (>>dim) yield
-        ] ui-try
-    ]
+    [ 2drop dup view-dim swap window (>>dim) yield ]
+}
+
+{ "doCommandBySelector:" "void" { "id" "SEL" "SEL" }
+    [ 3drop ]
 }
 
 { "initWithFrame:pixelFormat:" "id" { "id" "SEL" "NSRect" "id" }

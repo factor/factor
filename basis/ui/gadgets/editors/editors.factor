@@ -356,7 +356,7 @@ M: editor gadget-text* editor-string % ;
     [ drop dup extend-selection dup mark>> click-loc ]
     [ select-elt ] if ;
 
-: insert-newline ( editor -- ) "\n" swap user-input ;
+: insert-newline ( editor -- ) "\n" swap user-input* ;
 
 : delete-next-character ( editor -- ) 
     T{ char-elt } editor-delete ;
