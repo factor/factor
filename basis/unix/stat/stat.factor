@@ -13,6 +13,7 @@ IN: unix.stat
 : S_IFIFO  OCT: 010000 ; inline   ! FIFO.
 : S_IFLNK  OCT: 120000 ; inline   ! Symbolic link.
 : S_IFSOCK OCT: 140000 ; inline   ! Socket.
+: S_IFWHT  OCT: 160000 ; inline   ! Whiteout.
 
 FUNCTION: int chmod ( char* path, mode_t mode ) ;
 FUNCTION: int fchmod ( int fd, mode_t mode ) ;
