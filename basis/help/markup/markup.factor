@@ -285,10 +285,15 @@ M: f ($instance)
 
 : $see ( element -- ) first [ see ] ($see) ;
 
+: $see-methods ( element -- ) first [ see-methods ] ($see) ;
+
 : $synopsis ( element -- ) first [ synopsis write ] ($see) ;
 
 : $definition ( element -- )
     "Definition" $heading $see ;
+
+: $methods ( element -- )
+    "Methods" $heading $see-methods ;
 
 : $value ( object -- )
     "Variable value" $heading
