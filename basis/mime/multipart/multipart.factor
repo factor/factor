@@ -24,38 +24,32 @@ TUPLE: multipart-stream stream n leftover separator ;
     [ f ] change-leftover
     [ n>> ] [ stream>> ] bi stream-read [ ?append ] keep not ;
 
-: multipart-split ( bytes separator -- before after ? empty? )
-    #! first boolean: return true if found
-    #! second boolean: true if sequence=
-    2dup sequence= [
-        2drop f f f t
-    ] [
-        split1 dup >boolean f
-    ] if ;
+: multipart-split ( bytes separator -- before after seq=? )
+    2dup sequence= [ 2drop f f t ] [ split1 f ] if ;
 
 PRIVATE>
 
 :: multipart-step ( stream bytes end-stream? separator quot: ( bytes -- ) -- ? end-stream? )
     #! return t to loop again
-    bytes separator multipart-split [
+    bytes separator multipart-split [ dup >boolean ] dip [
         ! separator == input
         3drop f quot call f
     ] [
         [
             ! found
-            [ [ quot call ] unless-empty ]
+            [ quot unless-empty ]
             [
                 stream (>>leftover)
-                [ quot call ] unless-empty
+                quot unless-empty
             ] if-empty f quot call f
         ] [
             ! not found
             drop
             end-stream? [
-                [ quot call ] unless-empty f
+                quot unless-empty f
             ] [
                 separator length 1- ?cut* stream (>>leftover)
-                [ quot call ] unless-empty t
+                quot unless-empty t
             ] if
         ] if
     ] if stream leftover>> end-stream? not or ;
