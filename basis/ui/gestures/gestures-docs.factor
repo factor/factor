@@ -18,8 +18,8 @@ $nl
 { propagate-gesture handle-gesture set-gestures } related-words
 
 HELP: propagate-gesture
-{ $values { "gesture" "a gesture" } { "gadget" gadget } { "?" "a boolean" } }
-{ $description "Calls " { $link handle-gesture } " on every parent of " { $snippet "gadget" } ". Outputs " { $link f } " if some parent handled the gesture, else outputs " { $link t } "." } ;
+{ $values { "gesture" "a gesture" } { "gadget" gadget } }
+{ $description "Calls " { $link handle-gesture } " on every parent of " { $snippet "gadget" } "." } ;
 
 HELP: user-input
 { $values { "string" string } { "gadget" gadget } }
