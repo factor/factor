@@ -32,7 +32,7 @@ TUPLE: multipart-stream stream n leftover separator ;
         quot unless-empty
     ] [
         stream (>>leftover)
-        [ quot call ] unless-empty
+        quot unless-empty
     ] if-empty f quot call f ;
 
 :: multipart-step-not-found ( stream end-stream? separator quot -- ? )
