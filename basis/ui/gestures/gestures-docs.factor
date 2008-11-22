@@ -15,11 +15,11 @@ $nl
 "The default implementation looks at the " { $snippet "\"gestures\"" } " word property of each superclass of the gadget's class." }
 { $notes "Methods should be defined on this word if you desire to handle an arbitrary set of gestures. To define handlers for a fixed set, it is easier to use " { $link set-gestures } "." } ;
 
-{ send-gesture handle-gesture set-gestures } related-words
+{ propagate-gesture handle-gesture set-gestures } related-words
 
-HELP: send-gesture
+HELP: propagate-gesture
 { $values { "gesture" "a gesture" } { "gadget" gadget } { "?" "a boolean" } }
-{ $description "Calls " { $link send-gesture } " on every parent of " { $snippet "gadget" } ". Outputs " { $link f } " if some parent handled the gesture, else outputs " { $link t } "." } ;
+{ $description "Calls " { $link handle-gesture } " on every parent of " { $snippet "gadget" } ". Outputs " { $link f } " if some parent handled the gesture, else outputs " { $link t } "." } ;
 
 HELP: user-input
 { $values { "str" string } { "gadget" gadget } }

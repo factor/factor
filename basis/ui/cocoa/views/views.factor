@@ -18,8 +18,8 @@ IN: ui.cocoa.views
     {
         { S+ HEX: 20000 }
         { C+ HEX: 40000 }
-        { A+ HEX: 80000 }
-        { M+ HEX: 100000 }
+        { A+ HEX: 100000 }
+        { M+ HEX: 80000 }
     } ;
 
 : key-codes
@@ -59,9 +59,8 @@ IN: ui.cocoa.views
 : key-event>gesture ( event -- modifiers keycode action? )
     dup event-modifiers swap key-code ;
 
-: send-key-event ( view event quot -- ? )
-    >r key-event>gesture r> call swap window-focus
-    send-gesture ; inline
+: send-key-event ( view gesture -- )
+    swap window-focus propagate-gesture ;
 
 : send-user-input ( view string -- )
     CF>string swap window-focus user-input ;
@@ -70,18 +69,19 @@ IN: ui.cocoa.views
     NSArray swap -> arrayWithObject: -> interpretKeyEvents: ;
 
 : send-key-down-event ( view event -- )
-    2dup [ <key-down> ] send-key-event
-    [ interpret-key-event ] [ 2drop ] if ;
+    [ key-event>gesture <key-down> send-key-event ]
+    [ interpret-key-event ]
+    2bi ;
 
 : send-key-up-event ( view event -- )
-    [ <key-up> ] send-key-event drop ;
+    key-event>gesture <key-up> send-key-event ;
 
 : mouse-event>gesture ( event -- modifiers button )
     dup event-modifiers swap button ;
 
 : send-button-down$ ( view event -- )
-    [ mouse-event>gesture <button-down> ] 2keep
-    mouse-location rot window send-button-down ;
+    [ mouse-event>gesture <button-down> ]
+    [ mouse-location rot window send-button-down ] 2bi ;
 
 : send-button-up$ ( view event -- )
     [ mouse-event>gesture <button-up> ] 2keep

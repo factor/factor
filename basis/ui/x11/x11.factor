@@ -72,15 +72,19 @@ M: world configure-event
     handle>> xic>> lookup-string
     >r swap event-modifiers r> key-code <key-down> ;
 
+: valid-input? ( string -- ? )
+    [ f ] [ [ [ 127 = not ] [ CHAR: \s >= ] bi and ] all? ] if-empty ;
+
 M: world key-down-event
-    [ key-down-event>gesture ] keep world-focus
-    [ send-gesture ] keep swap [ user-input ] [ 2drop ] if ;
+    [ key-down-event>gesture ] keep
+    world-focus [ propagate-gesture ] keep
+    over valid-input? [ user-input ] [ 2drop ] if ;
 
 : key-up-event>gesture ( event -- gesture )
     dup event-modifiers swap 0 XLookupKeysym key-code <key-up> ;
 
 M: world key-up-event
-    >r key-up-event>gesture r> world-focus send-gesture drop ;
+    >r key-up-event>gesture r> world-focus propagate-gesture ;
 
 : mouse-event>gesture ( event -- modifiers button loc )
     dup event-modifiers over XButtonEvent-button

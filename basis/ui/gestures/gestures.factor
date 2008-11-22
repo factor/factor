@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel math models namespaces
 make sequences words strings system hashtables math.parser
-math.vectors classes.tuple classes ui.gadgets boxes calendar
-alarms symbols combinators sets columns ;
+math.vectors classes.tuple classes  boxes calendar
+alarms symbols combinators sets columns fry ui.gadgets ;
 IN: ui.gestures
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
@@ -15,13 +15,17 @@ M: object handle-gesture
     [ "gestures" word-prop ] map
     assoc-stack dup [ call f ] [ 2drop t ] if ;
 
-: send-gesture ( gesture gadget -- ? )
-    [ dupd handle-gesture ] each-parent nip ;
+: send-gesture ( gesture gadget -- )
+    handle-gesture drop ;
+
+: each-gesture ( gesture seq -- )
+    [ send-gesture ] with each ;
+
+: propagate-gesture ( gesture gadget -- )
+    [ handle-gesture ] with each-parent drop ;
 
 : user-input ( str gadget -- )
-    over empty?
-    [ [ dupd user-input* ] each-parent ] unless
-    2drop ;
+    '[ _ [ user-input* ] with each-parent drop ] unless-empty ;
 
 ! Gesture objects
 TUPLE: motion ;             C: <motion> motion
@@ -46,11 +50,8 @@ TUPLE: right-action ;       C: <right-action> right-action
 TUPLE: up-action ;          C: <up-action> up-action
 TUPLE: down-action ;        C: <down-action> down-action
 
-TUPLE: zoom-in-action ;  C: <zoom-in-action> zoom-in-action
-TUPLE: zoom-out-action ; C: <zoom-out-action> zoom-out-action
-
-: generalize-gesture ( gesture -- newgesture )
-    clone f >># ;
+TUPLE: zoom-in-action ;     C: <zoom-in-action> zoom-in-action
+TUPLE: zoom-out-action ;    C: <zoom-out-action> zoom-out-action
 
 ! Modifiers
 SYMBOLS: C+ A+ M+ S+ ;
@@ -58,7 +59,7 @@ SYMBOLS: C+ A+ M+ S+ ;
 TUPLE: key-down mods sym ;
 
 : <key-gesture> ( mods sym action? class -- mods' sym' )
-    >r [ S+ rot remove swap ] unless r> boa ; inline
+    [ [ S+ rot remove swap ] unless ] dip boa ; inline
 
 : <key-down> ( mods sym action? -- key-down )
     key-down <key-gesture> ;
@@ -100,11 +101,7 @@ SYMBOL: double-click-timeout
     hand-loc get hand-click-loc get = not ;
 
 : button-gesture ( gesture -- )
-    hand-clicked get-global 2dup send-gesture [
-        >r generalize-gesture r> send-gesture drop
-    ] [
-        2drop
-    ] if ;
+    hand-clicked get-global propagate-gesture ;
 
 : drag-gesture ( -- )
     hand-buttons get-global
@@ -130,13 +127,10 @@ SYMBOL: drag-timer
 
 : fire-motion ( -- )
     hand-buttons get-global empty? [
-        T{ motion } hand-gadget get-global send-gesture drop
+        T{ motion } hand-gadget get-global propagate-gesture
     ] [
         drag-gesture
     ] if ;
-
-: each-gesture ( gesture seq -- )
-    [ handle-gesture drop ] with each ;
 
 : hand-gestures ( new old -- )
     drop-prefix <reversed>
@@ -145,15 +139,15 @@ SYMBOL: drag-timer
 
 : forget-rollover ( -- )
     f hand-world set-global
-    hand-gadget get-global >r
-    f hand-gadget set-global
-    f r> parents hand-gestures ;
+    hand-gadget get-global
+    [ f hand-gadget set-global f ] dip
+    parents hand-gestures ;
 
 : send-lose-focus ( gadget -- )
-    T{ lose-focus } swap handle-gesture drop ;
+    T{ lose-focus } swap send-gesture ;
 
 : send-gain-focus ( gadget -- )
-    T{ gain-focus } swap handle-gesture drop ;
+    T{ gain-focus } swap send-gesture ;
 
 : focus-child ( child gadget ? -- )
     [
@@ -219,9 +213,11 @@ SYMBOL: drag-timer
 
 : move-hand ( loc world -- )
     dup hand-world set-global
-    under-hand >r over hand-loc set-global
-    pick-up hand-gadget set-global
-    under-hand r> hand-gestures ;
+    under-hand [
+        over hand-loc set-global
+        pick-up hand-gadget set-global
+        under-hand
+    ] dip hand-gestures ;
 
 : send-button-down ( gesture loc world -- )
     move-hand
@@ -240,14 +236,13 @@ SYMBOL: drag-timer
 : send-wheel ( direction loc world -- )
     move-hand
     scroll-direction set-global
-    T{ mouse-scroll } hand-gadget get-global send-gesture
-    drop ;
+    T{ mouse-scroll } hand-gadget get-global propagate-gesture ;
 
 : world-focus ( world -- gadget )
     dup focus>> [ world-focus ] [ ] ?if ;
 
 : send-action ( world gesture -- )
-    swap world-focus send-gesture drop ;
+    swap world-focus propagate-gesture ;
 
 GENERIC: gesture>string ( gesture -- string/f )
 

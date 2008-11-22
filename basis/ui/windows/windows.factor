@@ -194,7 +194,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 :: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     wParam exclude-key-wm-keydown? [
         wParam keystroke>gesture <key-down>
-        hWnd window-focus send-gesture drop
+        hWnd window-focus propagate-gesture
     ] unless ;
 
 :: handle-wm-char ( hWnd uMsg wParam lParam -- )
@@ -205,7 +205,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
 :: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
     wParam keystroke>gesture <key-up>
-    hWnd window-focus send-gesture drop ;
+    hWnd window-focus propagate-gesture ;
 
 :: set-window-active ( hwnd uMsg wParam lParam ? -- n )
     ? hwnd window (>>active?)

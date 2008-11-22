@@ -107,6 +107,20 @@ world H{
     { T{ button-up f { A+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
 } set-gestures
 
+PREDICATE: specific-button-up < button-up #>> ;
+
+PREDICATE: specific-button-down < button-down #>> ;
+
+: generalize-gesture ( gesture -- )
+    clone f >># button-gesture ;
+
+M: world handle-gesture ( gesture gadget -- ? )
+    {
+        { [ over specific-button-up? ] [ drop generalize-gesture t ] }
+        { [ over specific-button-down? ] [ drop generalize-gesture t ] }
+        [ call-next-method ]
+    } cond ;
+
 : close-global ( world global -- )
     dup get-global find-world rot eq?
     [ f swap set-global ] [ drop ] if ;
