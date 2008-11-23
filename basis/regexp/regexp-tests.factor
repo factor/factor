@@ -283,6 +283,12 @@ IN: regexp-tests
 [ { "ABC" "DEF" "GHI" } ]
 [ "1ABC2DEF3GHI4" R/ [A-Z]+/ all-matches [ >string ] map ] unit-test
 
+[ 3 ]
+[ "1ABC2DEF3GHI4" R/ [A-Z]+/ count-matches ] unit-test
+
+[ 0 ]
+[ "123" R/ [A-Z]+/ count-matches ] unit-test
+
 [ "1.2.3.4" ]
 [ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ "." re-replace ] unit-test
 

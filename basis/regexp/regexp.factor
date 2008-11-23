@@ -73,7 +73,7 @@ IN: regexp
     [ dup ] swap '[ _ next-match ] [ ] produce nip harvest ;
 
 : count-matches ( string regexp -- n )
-    all-matches length 1- ;
+    all-matches length ;
 
 : initial-option ( regexp option -- regexp' )
     over options>> conjoin ;
