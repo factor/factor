@@ -83,6 +83,6 @@ M: c-io-backend (file-appender)
     #! print stuff from contexts where the I/O system would
     #! otherwise not work (tools.deploy.shaker, the I/O
     #! multiplexer thread).
-    "\r\n" append >byte-array
+    "\n" append >byte-array
     stdout-handle fwrite
     stdout-handle fflush ;
