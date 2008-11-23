@@ -12,6 +12,7 @@ IN: bootstrap.x86
 : mod-arg ( -- reg ) EDX ;
 : arg0 ( -- reg ) EAX ;
 : arg1 ( -- reg ) EDX ;
+: arg2 ( -- reg ) ECX ;
 : temp-reg ( -- reg ) EBX ;
 : stack-reg ( -- reg ) ESP ;
 : ds-reg ( -- reg ) ESI ;

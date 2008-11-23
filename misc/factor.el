@@ -35,6 +35,7 @@
 
 (require 'font-lock)
 (require 'comint)
+(require 'view)
 
 ;;; Customization:
 
@@ -64,6 +65,30 @@ value from the existing code in the buffer."
   :type '(file :must-match t)
   :group 'factor)
 
+(defcustom factor-use-doc-window t
+  "When on, use a separate window to display help information.
+Disable to see that information in the factor-listener comint
+window."
+  :type 'boolean
+  :group 'factor)
+
+(defcustom factor-listener-use-other-window t
+  "Use a window other than the current buffer's when switching to
+the factor-listener buffer."
+  :type 'boolean
+  :group 'factor)
+
+(defcustom factor-listener-window-allow-split t
+  "Allow window splitting when switching to the factor-listener
+buffer."
+  :type 'boolean
+  :group 'factor)
+
+(defcustom factor-help-always-ask t
+  "When enabled, always ask for confirmation in help prompts."
+  :type 'boolean
+  :group 'factor)
+
 (defcustom factor-display-compilation-output t
   "Display the REPL buffer before compiling files."
   :type 'boolean
@@ -71,6 +96,11 @@ value from the existing code in the buffer."
 
 (defcustom factor-mode-hook nil
   "Hook run when entering Factor mode."
+  :type 'hook
+  :group 'factor)
+
+(defcustom factor-help-mode-hook nil
+  "Hook run by `factor-help-mode'."
   :type 'hook
   :group 'factor)
 
@@ -123,6 +153,10 @@ value from the existing code in the buffer."
 
 (defface factor-font-lock-parsing-word (factor--face font-lock-keyword-face)
   "Face for parsing words."
+  :group 'factor-faces)
+
+(defface factor-font-lock-help-mode-headlines '((t (:bold t :weight bold)))
+  "Face for headlines in help buffers."
   :group 'factor-faces)
 
 
@@ -265,7 +299,7 @@ value from the existing code in the buffer."
 (defsubst factor--ppss-brackets-start ()
   (nth 1 (syntax-ppss)))
 
-(defsubst factor--line-indent (pos)
+(defsubst factor--indentation-at (pos)
   (save-excursion (goto-char pos) (current-indentation)))
 
 (defconst factor--regex-closing-paren "[])}]")
@@ -276,7 +310,8 @@ value from the existing code in the buffer."
   (= (- (point) (line-beginning-position)) (current-indentation)))
 
 (defconst factor--regex-single-liner
-  (format "^%s" (regexp-opt '("DEFER:" "GENERIC:" "IN:" "PRIVATE>" "<PRIVATE" "USE:"))))
+  (format "^%s" (regexp-opt '("DEFER:" "GENERIC:" "IN:"
+                              "PRIVATE>" "<PRIVATE" "SYMBOL:" "USE:"))))
 
 (defsubst factor--at-begin-of-def ()
   (looking-at "\\([^ ]\\|^\\)+:"))
@@ -302,6 +337,11 @@ value from the existing code in the buffer."
     (beginning-of-line)
     (re-search-forward factor--regex-constructor (line-end-position) t)))
 
+(defsubst factor--increased-indentation (&optional i)
+  (+ (or i (current-indentation)) factor-indent-width))
+(defsubst factor--decreased-indentation (&optional i)
+  (- (or i (current-indentation)) factor-indent-width))
+
 (defun factor--indent-in-brackets ()
   (save-excursion
     (beginning-of-line)
@@ -312,8 +352,8 @@ value from the existing code in the buffer."
       (let ((op (factor--ppss-brackets-start)))
         (when (> (line-number-at-pos) (line-number-at-pos op))
           (if (factor--at-closing-paren-p)
-              (factor--line-indent op)
-            (+ (factor--line-indent op) factor-indent-width)))))))
+              (factor--indentation-at op)
+            (factor--increased-indentation (factor--indentation-at op))))))))
 
 (defun factor--indent-definition ()
   (save-excursion
@@ -323,29 +363,26 @@ value from the existing code in the buffer."
 (defun factor--indent-setter-line ()
   (when (factor--at-setter-line)
     (save-excursion
-      (beginning-of-line)
-      (let ((indent (when (factor--at-constructor-line) (current-indentation))))
+      (let ((indent (and (factor--at-constructor-line) (current-indentation))))
         (while (not (or indent
                         (bobp)
                         (factor--at-begin-of-def)
                         (factor--at-end-of-def)))
           (if (factor--at-constructor-line)
-              (setq indent (+ (current-indentation) factor-indent-width))
+              (setq indent (factor--increased-indentation))
             (forward-line -1)))
         indent))))
 
 (defun factor--indent-continuation ()
   (save-excursion
     (forward-line -1)
-    (beginning-of-line)
-    (if (bobp) 0
-      (if (factor--looking-at-emptiness)
-          (factor--indent-continuation)
-        (if (or (factor--at-end-of-def) (factor--at-setter-line))
-            (- (current-indentation) factor-indent-width)
-          (if (factor--at-begin-of-def)
-              (+ (current-indentation) factor-indent-width)
-            (current-indentation)))))))
+    (while (and (not (bobp)) (factor--looking-at-emptiness))
+      (forward-line -1))
+    (if (or (factor--at-end-of-def) (factor--at-setter-line))
+        (factor--decreased-indentation)
+      (if (factor--at-begin-of-def)
+          (factor--increased-indentation)
+        (current-indentation)))))
 
 (defun factor--calculate-indentation ()
   "Calculate Factor indentation for line at point."
@@ -426,18 +463,6 @@ value from the existing code in the buffer."
   (factor-send-region (search-backward ":")
                       (search-forward  ";")))
 
-(defun factor-see ()
-  (interactive)
-  (comint-send-string "*factor*" "\\ ")
-  (comint-send-string "*factor*" (thing-at-point 'sexp))
-  (comint-send-string "*factor*" " see\n"))
-
-(defun factor-help ()
-  (interactive)
-  (comint-send-string "*factor*" "\\ ")
-  (comint-send-string "*factor*" (thing-at-point 'sexp))
-  (comint-send-string "*factor*" " help\n"))
-
 (defun factor-edit ()
   (interactive)
   (comint-send-string "*factor*" "\\ ")
@@ -455,17 +480,6 @@ value from the existing code in the buffer."
 
 (defvar factor-mode-map (make-sparse-keymap)
   "Key map used by Factor mode.")
-
-(define-key factor-mode-map "\C-c\C-f" 'factor-run-file)
-(define-key factor-mode-map "\C-c\C-r" 'factor-send-region)
-(define-key factor-mode-map "\C-c\C-d" 'factor-send-definition)
-(define-key factor-mode-map "\C-c\C-s" 'factor-see)
-(define-key factor-mode-map "\C-ce"    'factor-edit)
-(define-key factor-mode-map "\C-c\C-h" 'factor-help)
-(define-key factor-mode-map "\C-cc"    'comment-region)
-(define-key factor-mode-map [return]   'newline-and-indent)
-(define-key factor-mode-map [tab]      'indent-for-tab-command)
-
 
 
 ;; Factor mode:
@@ -491,23 +505,118 @@ value from the existing code in the buffer."
 (add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))
 
 
-;;; Factor listener mode
+;;; Factor listener mode:
 
 ;;;###autoload
-(define-derived-mode factor-listener-mode comint-mode "Factor Listener")
+(define-derived-mode factor-listener-mode comint-mode "Factor Listener"
+  "Major mode for interacting with an inferior Factor listener process.
+\\{factor-listener-mode-map}"
+  (set (make-local-variable 'comint-prompt-regexp) "^( [^)]+ ) "))
 
-(define-key factor-listener-mode-map [f8] 'factor-refresh-all)
+(defvar factor--listener-buffer nil
+  "The buffer in which the Factor listener is running.")
+
+(defun factor--listener-start-process ()
+  "Start an inferior Factor listener process, using
+`factor-binary' and `factor-image'."
+  (setq factor--listener-buffer
+        (apply 'make-comint "factor" (expand-file-name factor-binary) nil
+               `("-run=listener" ,(format "-i=%s" (expand-file-name factor-image)))))
+  (with-current-buffer factor--listener-buffer
+    (factor-listener-mode)))
+
+(defun factor--listener-process ()
+  (or (and (buffer-live-p factor--listener-buffer)
+           (get-buffer-process factor--listener-buffer))
+      (progn (factor--listener-start-process)
+             (factor--listener-process))))
 
 ;;;###autoload
-(defun run-factor ()
-  "Start a factor listener inside emacs, or switch to it if it
-already exists."
+(defalias 'switch-to-factor 'run-factor)
+;;;###autoload
+(defun run-factor (&optional arg)
+  "Show the factor-listener buffer, starting the process if needed."
   (interactive)
-  (switch-to-buffer
-   (make-comint-in-buffer "factor" nil (expand-file-name factor-binary) nil
-			  (concat "-i=" (expand-file-name factor-image))
-			  "-run=listener"))
-  (factor-listener-mode))
+  (let ((buf (process-buffer (factor--listener-process)))
+        (pop-up-windows factor-listener-window-allow-split))
+    (if factor-listener-use-other-window
+        (pop-to-buffer buf)
+      (switch-to-buffer buf))))
+
+
+;;;; Factor help mode:
+
+(defvar factor-help-mode-map (make-sparse-keymap)
+  "Keymap for Factor help mode.")
+
+(defconst factor--help-headlines
+  (regexp-opt '("Parent topics:"
+                "Inputs and outputs"
+                "Word description"
+                "Generic word contract"
+                "Vocabulary"
+                "Definition")
+              t))
+
+(defconst factor--help-headlines-regexp (format "^%s" factor--help-headlines))
+
+(defconst factor--help-font-lock-keywords
+  `((,factor--help-headlines-regexp . 'factor-font-lock-help-mode-headlines)
+    ,@factor-font-lock-keywords))
+
+(defun factor-help-mode ()
+  "Major mode for displaying Factor help messages.
+\\{factor-help-mode-map}"
+  (interactive)
+  (kill-all-local-variables)
+  (use-local-map factor-help-mode-map)
+  (setq mode-name "Factor Help")
+  (setq major-mode 'factor-help-mode)
+  (set (make-local-variable 'font-lock-defaults)
+       '(factor--help-font-lock-keywords t nil nil nil))
+  (set (make-local-variable 'comint-redirect-subvert-readonly) t)
+  (set (make-local-variable 'view-no-disable-on-exit) t)
+  (view-mode)
+  (setq view-exit-action
+        (lambda (buffer)
+          ;; Use `with-current-buffer' to make sure that `bury-buffer'
+          ;; also removes BUFFER from the selected window.
+          (with-current-buffer buffer
+            (bury-buffer))))
+  (run-mode-hooks 'factor-help-mode-hook))
+
+(defun factor--listener-help-buffer ()
+  (set-buffer (get-buffer-create "*factor-help*"))
+  (let ((inhibit-read-only t))
+    (delete-region (point-min) (point-max)))
+  (factor-help-mode)
+  (current-buffer))
+
+(defvar factor--help-history nil)
+
+(defun factor--listener-show-help (&optional see)
+  (let* ((def (thing-at-point 'sexp))
+         (prompt (format "%s (%s): " (if see "See" "Help") def))
+         (ask (or (not (eq major-mode 'factor-mode))
+                  (not def)
+                  factor-help-always-ask))
+         (cmd (format "\\ %s %s"
+                      (if ask (read-string prompt nil 'factor--help-history def) def)
+                      (if see "see" "help")))
+         (hb (factor--listener-help-buffer))
+         (proc (factor--listener-process)))
+    (comint-redirect-send-command-to-process cmd hb proc nil)
+    (pop-to-buffer hb)))
+
+(defun factor-see ()
+  (interactive)
+  (factor--listener-show-help t))
+
+(defun factor-help ()
+  (interactive)
+  (factor--listener-show-help))
+
+
 
 (defun factor-refresh-all ()
   "Reload source files and documentation for all loaded
@@ -516,6 +625,28 @@ vocabularies which have been modified on disk."
   (comint-send-string "*factor*" "refresh-all\n"))
 
 
+;;; Key bindings:
 
+(defmacro factor--define-key (key cmd)
+  `(progn
+     (define-key factor-mode-map [(control ?c) ,key] ,cmd)
+     (define-key factor-mode-map [(control ?c) (control ,key)] ,cmd)))
+
+(factor--define-key ?f 'factor-run-file)
+(factor--define-key ?r 'factor-send-region)
+(factor--define-key ?d 'factor-send-definition)
+(factor--define-key ?s 'factor-see)
+(factor--define-key ?e 'factor-edit)
+(factor--define-key ?z 'switch-to-factor)
+(factor--define-key ?c 'comment-region)
+
+(define-key factor-mode-map "\C-ch" 'factor-help)
+(define-key factor-mode-map "\C-m" 'newline-and-indent)
+(define-key factor-mode-map [tab] 'indent-for-tab-command)
+
+(define-key factor-listener-mode-map [f8] 'factor-refresh-all)
+
+
+
 (provide 'factor)
 ;;; factor.el ends here

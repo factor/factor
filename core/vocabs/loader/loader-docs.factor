@@ -1,4 +1,5 @@
-USING: vocabs help.markup help.syntax words strings io ;
+USING: vocabs vocabs.loader.private help.markup help.syntax
+words strings io ;
 IN: vocabs.loader
 
 ARTICLE: "vocabs.roots" "Vocabulary roots"

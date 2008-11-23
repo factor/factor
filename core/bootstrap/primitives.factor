@@ -129,8 +129,7 @@ bootstrapping? on
     [ "slots" set-word-prop ] [ define-accessors ] 2bi ;
 
 : define-builtin ( symbol slotspec -- )
-    >r [ define-builtin-predicate ] keep
-    r> define-builtin-slots ;
+    [ [ define-builtin-predicate ] keep ] dip define-builtin-slots ;
 
 "fixnum" "math" create register-builtin
 "bignum" "math" create register-builtin
@@ -303,7 +302,13 @@ tuple
     [ f "inline" set-word-prop ]
     [ make-flushable ]
     [ ]
-    [ tuple-layout [ <tuple-boa> ] curry ]
+    [
+        [
+            callable instance-check-quot %
+            tuple-layout ,
+            \ <tuple-boa> ,
+        ] [ ] make
+    ]
 } cleave
 (( obj quot -- curry )) define-declared
 
@@ -319,7 +324,14 @@ tuple
     [ f "inline" set-word-prop ]
     [ make-flushable ]
     [ ]
-    [ tuple-layout [ <tuple-boa> ] curry ]
+    [
+        [
+            callable instance-check-quot [ dip ] curry %
+            callable instance-check-quot %
+            tuple-layout ,
+            \ <tuple-boa> ,
+        ] [ ] make
+    ]
 } cleave
 (( quot1 quot2 -- compose )) define-declared
 
@@ -341,6 +353,8 @@ tuple
     { "fixnum-bitnot" "math.private" }
     { "fixnum-mod" "math.private" }
     { "fixnum-shift-fast" "math.private" }
+    { "fixnum/i-fast" "math.private" }
+    { "fixnum/mod-fast" "math.private" }
     { "fixnum<" "math.private" }
     { "fixnum<=" "math.private" }
     { "fixnum>" "math.private" }
@@ -372,7 +386,7 @@ tuple
 
 ! Primitive words
 : make-primitive ( word vocab n -- )
-    >r create dup reset-word r>
+    [ create dup reset-word ] dip
     [ do-primitive ] curry [ ] like define ;
 
 {
@@ -516,7 +530,7 @@ tuple
     { "unimplemented" "kernel.private" }
     { "gc-reset" "memory" }
 }
-[ >r first2 r> make-primitive ] each-index
+[ [ first2 ] dip make-primitive ] each-index
 
 ! Bump build number
 "build" "kernel" create build 1+ 1quotation define

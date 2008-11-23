@@ -130,6 +130,12 @@ SYMBOL: jit-if-word
 SYMBOL: jit-if-jump
 SYMBOL: jit-dispatch-word
 SYMBOL: jit-dispatch
+SYMBOL: jit-dip-word
+SYMBOL: jit-dip
+SYMBOL: jit-2dip-word
+SYMBOL: jit-2dip
+SYMBOL: jit-3dip-word
+SYMBOL: jit-3dip
 SYMBOL: jit-epilog
 SYMBOL: jit-return
 SYMBOL: jit-profiling
@@ -139,8 +145,8 @@ SYMBOL: jit-save-stack
 ! Default definition for undefined words
 SYMBOL: undefined-quot
 
-: userenv-offset ( symbol -- n )
-    {
+: userenvs ( -- assoc )
+    H{
         { bootstrap-boot-quot 20 }
         { bootstrap-global 21 }
         { jit-code-format 22 }
@@ -160,8 +166,17 @@ SYMBOL: undefined-quot
         { jit-push-immediate 36 }
         { jit-declare-word 42 }
         { jit-save-stack 43 }
+        { jit-dip-word 44 }
+        { jit-dip 45 }
+        { jit-2dip-word 46 }
+        { jit-2dip 47 }
+        { jit-3dip-word 48 }
+        { jit-3dip 49 }
         { undefined-quot 60 }
-    } at header-size + ;
+    } ; inline
+
+: userenv-offset ( symbol -- n )
+    userenvs at header-size + ;
 
 : emit ( cell -- ) image get push ;
 
@@ -443,6 +458,9 @@ M: quotation '
     \ dispatch jit-dispatch-word set
     \ do-primitive jit-primitive-word set
     \ declare jit-declare-word set
+    \ dip jit-dip-word set
+    \ 2dip jit-2dip-word set
+    \ 3dip jit-3dip-word set
     [ undefined ] undefined-quot set
     {
         jit-code-format
@@ -457,6 +475,12 @@ M: quotation '
         jit-if-jump
         jit-dispatch-word
         jit-dispatch
+        jit-dip-word
+        jit-dip
+        jit-2dip-word
+        jit-2dip
+        jit-3dip-word
+        jit-3dip
         jit-epilog
         jit-return
         jit-profiling

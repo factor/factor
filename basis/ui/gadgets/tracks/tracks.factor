@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors io kernel math namespaces
-       sequences words math.vectors ui.gadgets ui.gadgets.packs
-       math.geometry.rect fry ;
+USING: accessors io kernel namespaces fry
+math math.vectors math.geometry.rect math.order
+sequences words ui.gadgets ui.gadgets.packs ;
 
 IN: ui.gadgets.tracks
 
@@ -35,13 +35,17 @@ TUPLE: track < pack sizes ;
 
 M: track layout* ( track -- ) dup track-layout pack-layout ;
 
-: track-pref-dims-1 ( track -- dim ) children>> pref-dims max-dim ;
+: track-pref-dims-1 ( track -- dim )
+    children>> pref-dims max-dim ;
 
 : track-pref-dims-2 ( track -- dim )
-    [ children>> pref-dims ] [ normalized-sizes ] bi
-    [ [ v/n ] when* ] 2map
-    max-dim
-    [ >fixnum ] map ;
+    [
+        [ children>> pref-dims ] [ normalized-sizes ] bi
+        [ dup { 0 f } memq? [ drop ] [ v/n ] if ] 2map
+        max-dim [ >fixnum ] map
+    ]
+    [ [ gap>> ] [ children>> length 1 [-] ] bi v*n ] bi
+    v+ ;
 
 M: track pref-dim* ( gadget -- dim )
     [ track-pref-dims-1 ]

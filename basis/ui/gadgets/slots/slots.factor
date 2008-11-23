@@ -26,10 +26,10 @@ TUPLE: slot-editor < track ref text ;
 GENERIC: finish-editing ( slot-editor ref -- )
 
 M: key-ref finish-editing
-    drop T{ update-object } swap send-gesture drop ;
+    drop T{ update-object } swap propagate-gesture ;
 
 M: value-ref finish-editing
-    drop T{ update-slot } swap send-gesture drop ;
+    drop T{ update-slot } swap propagate-gesture ;
 
 : slot-editor-value ( slot-editor -- object )
     text>> control-value parse-fresh ;
@@ -55,14 +55,14 @@ M: value-ref finish-editing
 
 : delete ( slot-editor -- )
     dup ref>> delete-ref
-    T{ update-object } swap send-gesture drop ;
+    T{ update-object } swap propagate-gesture ;
 
 \ delete H{
     { +description+ "Delete the slot and close the slot editor." }
 } define-command
 
 : close ( slot-editor -- )
-    T{ update-slot } swap send-gesture drop ;
+    T{ update-slot } swap propagate-gesture ;
 
 \ close H{
     { +description+ "Close the slot editor without saving changes." }
@@ -71,7 +71,7 @@ M: value-ref finish-editing
 : <slot-editor> ( ref -- gadget )
     { 0 1 } slot-editor new-track
         swap >>ref
-        dup <toolbar> f track-add
+        add-toolbar
         <source-editor> >>text
         dup text>> <scroller> 1 track-add
         dup revert ;
@@ -92,7 +92,7 @@ TUPLE: editable-slot < track printer ref ;
 
 : <edit-button> ( -- gadget )
     "..."
-    [ T{ edit-slot } swap send-gesture drop ]
+    [ T{ edit-slot } swap propagate-gesture ]
     <roll-button> ;
 
 : display-slot ( gadget editable-slot -- )

@@ -50,6 +50,12 @@ typedef enum {
 	JIT_PUSH_IMMEDIATE,
 	JIT_DECLARE_WORD    = 42,
 	JIT_SAVE_STACK,
+	JIT_DIP_WORD,
+	JIT_DIP,
+	JIT_2DIP_WORD,
+	JIT_2DIP,
+	JIT_3DIP_WORD,
+	JIT_3DIP,
 
 	STACK_TRACES_ENV    = 59,
 
@@ -210,6 +216,8 @@ typedef struct _F_CONTEXT {
 } F_CONTEXT;
 
 DLLEXPORT F_CONTEXT *stack_chain;
+
+F_CONTEXT *unused_contexts;
 
 CELL ds_size, rs_size;
 

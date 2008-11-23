@@ -129,12 +129,17 @@ HELP: $title
 { $values { "topic" "a help article name or a word" } }
 { $description "Prints a help article's title, or a word's " { $link summary } ", depending on the type of " { $snippet "topic" } "." } ;
 
+HELP: print-topic
+{ $values { "topic" "an article name or a word" } }
+{ $description
+    "Displays a help topic on " { $link output-stream } "."
+} ;
+
 HELP: help
 { $values { "topic" "an article name or a word" } }
 { $description
-    "Displays a help article or documentation associated to a word on " { $link output-stream } "."
+    "Displays a help topic."
 } ;
-
 HELP: about
 { $values { "vocab" "a vocabulary specifier" } }
 { $description

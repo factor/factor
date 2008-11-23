@@ -36,9 +36,10 @@ PREDICATE: math-class < class
 
 : math-upgrade ( class1 class2 -- quot )
     [ math-class-max ] 2keep
-    >r over r> (math-upgrade) >r (math-upgrade)
-    dup empty? [ [ dip ] curry [ ] like ] unless
-    r> append ;
+    [ over ] dip (math-upgrade) [
+        (math-upgrade)
+        dup empty? [ [ dip ] curry [ ] like ] unless
+    ] dip append ;
 
 ERROR: no-math-method left right generic ;
 
@@ -55,9 +56,9 @@ ERROR: no-math-method left right generic ;
 
 : math-method ( word class1 class2 -- quot )
     2dup and [
-        2dup math-upgrade >r
-        math-class-max over order min-class applicable-method
-        r> prepend
+        2dup math-upgrade
+        [ math-class-max over order min-class applicable-method ] dip
+        prepend
     ] [
         2drop object-method
     ] if ;
@@ -85,7 +86,7 @@ M: math-combination perform-combination
     dup
     \ over [
         dup math-class? [
-            \ dup [ >r 2dup r> math-method ] math-vtable
+            \ dup [ [ 2dup ] dip math-method ] math-vtable
         ] [
             over object-method
         ] if nip

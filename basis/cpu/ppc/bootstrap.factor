@@ -71,10 +71,15 @@ big-endian on
 
 [ 0 B ] rc-relative-ppc-3 rt-xt 0 jit-word-jump jit-define
 
-: jit-call-quot ( -- )
+: jit-jump-quot ( -- )
     4 3 quot-xt-offset LWZ
     4 MTCTR
     BCTR ;
+
+: jit-call-quot ( -- )
+    4 3 quot-xt-offset LWZ
+    4 MTLR
+    BLR ;
 
 [
     0 3 LOAD32
@@ -84,7 +89,7 @@ big-endian on
     3 3 4 ADDI
     3 3 0 LWZ
     ds-reg dup 4 SUBI
-    jit-call-quot
+    jit-jump-quot
 ] rc-absolute-ppc-2/2 rt-literal 1 jit-if-jump jit-define
 
 [
@@ -95,8 +100,82 @@ big-endian on
     3 3 6 ADD
     3 3 array-start-offset LWZ
     ds-reg dup 4 SUBI
-    jit-call-quot
+    jit-jump-quot
 ] rc-absolute-ppc-2/2 rt-literal 1 jit-dispatch jit-define
+
+! These should not clobber r3 since we store a quotation in there
+! in jit-dip
+
+: jit->r ( -- )
+    4 ds-reg 0 LWZ
+    ds-reg dup 4 SUBI
+    4 rs-reg 4 STWU ;
+
+: jit-2>r ( -- )
+    4 ds-reg 0 LWZ
+    5 ds-reg -4 LWZ
+    ds-reg dup 8 SUBI
+    rs-reg dup 8 ADDI
+    4 rs-reg 0 STW
+    5 rs-reg -4 STW ;
+
+: jit-3>r ( -- )
+    4 ds-reg 0 LWZ
+    5 ds-reg -4 LWZ
+    6 ds-reg -8 LWZ
+    ds-reg dup 12 SUBI
+    rs-reg dup 12 ADDI
+    4 rs-reg 0 STW
+    5 rs-reg -4 STW
+    6 rs-reg -8 STW ;
+
+: jit-r> ( -- )
+    4 ds-reg 0 LWZ
+    ds-reg dup 4 SUBI
+    4 rs-reg 4 STWU ;
+
+: jit-2r> ( -- )
+    4 rs-reg 0 LWZ
+    5 rs-reg -4 LWZ
+    rs-reg dup 8 SUBI
+    ds-reg dup 8 ADDI
+    4 ds-reg 0 STW
+    5 ds-reg -4 STW ;
+
+: jit-3r> ( -- )
+    4 rs-reg 0 LWZ
+    5 rs-reg -4 LWZ
+    6 rs-reg -8 LWZ
+    rs-reg dup 12 SUBI
+    ds-reg dup 12 ADDI
+    4 ds-reg 0 STW
+    5 ds-reg -4 STW
+    6 ds-reg -8 STW ;
+
+: prepare-dip ( -- )
+    0 3 LOAD32
+    3 3 0 LWZ ;
+
+[
+    prepare-dip
+    jit->r
+    jit-call-quot
+    jit-r>
+] rc-absolute-ppc-2/2 rt-literal 1 jit-dip jit-define
+
+[
+    prepare-dip
+    jit-2>r
+    jit-call-quot
+    jit-2r>
+] rc-absolute-ppc-2/2 rt-literal 1 jit-2dip jit-define
+
+[
+    prepare-dip
+    jit-3>r
+    jit-call-quot
+    jit-3r>
+] rc-absolute-ppc-2/2 rt-literal 1 jit-3dip jit-define
 
 [
     0 1 lr-save stack-frame + LWZ
@@ -112,7 +191,7 @@ big-endian on
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
-    jit-call-quot
+    jit-jump-quot
 ] f f f \ (call) define-sub-primitive
 
 [
@@ -245,17 +324,9 @@ big-endian on
     4 ds-reg 0 STW
 ] f f f \ -rot define-sub-primitive
 
-[
-    3 ds-reg 0 LWZ
-    ds-reg dup 4 SUBI
-    3 rs-reg 4 STWU
-] f f f \ >r define-sub-primitive
+[ jit->r ] f f f \ >r define-sub-primitive
 
-[
-    3 rs-reg 0 LWZ
-    rs-reg dup 4 SUBI
-    3 ds-reg 4 STWU
-] f f f \ r> define-sub-primitive
+[ jit-r> ] f f f \ r> define-sub-primitive
 
 ! Comparisons
 : jit-compare ( insn -- )
@@ -334,6 +405,24 @@ big-endian on
     7 6 4 SUBF
     7 ds-reg 0 STW
 ] f f f \ fixnum-mod define-sub-primitive
+
+[
+    3 ds-reg 0 LWZ
+    ds-reg ds-reg 4 SUBI
+    4 ds-reg 0 LWZ
+    5 4 3 DIVW
+    5 ds-reg 0 STW
+] f f f \ fixnum/i-fast define-sub-primitive
+
+[
+    3 ds-reg 0 LWZ
+    4 ds-reg -4 LWZ
+    5 4 3 DIVW
+    6 5 3 MULLW
+    7 6 4 SUBF
+    5 ds-reg -4 STW
+    7 ds-reg 0 STW
+] f f f \ fixnum/mod-fast define-sub-primitive
 
 [
     3 ds-reg 0 LWZ

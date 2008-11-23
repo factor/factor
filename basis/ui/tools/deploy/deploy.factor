@@ -96,9 +96,12 @@ TUPLE: deploy-gadget < pack vocab settings ;
 : com-close ( gadget -- )
     close-window ;
 
+deploy-gadget "misc" "Miscellaneous commands" {
+    { T{ key-down f f "ESC" } com-close }
+} define-command-map
+
 deploy-gadget "toolbar" f {
-    { f com-close }
-    { f com-help }
+    { T{ key-down f f "F1" } com-help }
     { f com-revert }
     { f com-save }
     { T{ key-down f f "RET" } com-deploy }

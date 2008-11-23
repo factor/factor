@@ -67,7 +67,7 @@ SYMBOL: bootstrap-time
     os wince? [ "windows.ce" require ] when
     os winnt? [ "windows.nt" require ] when
 
-    "deploy-vocab" get [
+    "staging" get "deploy-vocab" get or [
         "stage2: deployment mode" print
     ] [
         "listener" require

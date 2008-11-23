@@ -107,7 +107,7 @@ M: float fp-infinity? ( float -- ? )
     2dup >= [
         drop
     ] [
-        >r 1 shift r> (next-power-of-2)
+        [ 1 shift ] dip (next-power-of-2)
     ] if ;
 
 : next-power-of-2 ( m -- n ) 2 swap (next-power-of-2) ; foldable
@@ -122,13 +122,13 @@ M: float fp-infinity? ( float -- ? )
 
 : iterate-prep 0 -rot ; inline
 
-: if-iterate? >r >r 2over < r> r> if ; inline
+: if-iterate? [ 2over < ] 2dip if ; inline
 
 : iterate-step ( i n quot -- i n quot )
     #! Apply quot to i, keep i and quot, hide n.
-    swap >r 2dup 2slip r> swap ; inline
+    swap [ 2dup 2slip ] dip swap ; inline
 
-: iterate-next >r >r 1+ r> r> ; inline
+: iterate-next [ 1+ ] 2dip ; inline
 
 PRIVATE>
 
@@ -167,6 +167,6 @@ PRIVATE>
         2dup 2slip rot [
             drop
         ] [
-            >r 1- r> find-last-integer
+            [ 1- ] dip find-last-integer
         ] if
     ] if ; inline recursive

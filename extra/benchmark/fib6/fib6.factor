@@ -9,6 +9,6 @@ USING: math kernel alien ;
     ] alien-callback
     "int" { "int" } "cdecl" alien-indirect ;
 
-: fib-main ( -- ) 25 fib drop ;
+: fib-main ( -- ) 34 fib drop ;
 
 MAIN: fib-main

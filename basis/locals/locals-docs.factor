@@ -132,8 +132,8 @@ $nl
 "Unlike some languages such as Python and Java, writing to mutable locals in outer scopes is fully supported and has the expected semantics." ;
 
 ARTICLE: "locals-limitations" "Limitations of locals"
-"The first limitation is that the " { $link >r } " and " { $link r> } " words may not be used together with locals. Instead, use the " { $link dip } " combinator."
-$nl
+"The first limitation is also shared by " { $vocab-link "fry" } ": the " { $link >r } " and " { $link r> } " words may not be used together with locals. Instead, use the " { $link dip } " combinator. An error is thrown at parse time if an attempt is made to use " { $link >r } " and " { $link r> } " inside a lambda body:"
+{ $subsection >r/r>-in-lambda-error }
 "Another limitation concerns combinators implemented as macros. Locals can only be used with such combinators if the input array immediately precedes the combinator call. For example, the following will work:"
 { $code
     ":: good-cond-usage ( a -- ... )"

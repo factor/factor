@@ -1,11 +1,11 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors unix byte-arrays kernel debugger sequences namespaces math
-math.order combinators init alien alien.c-types alien.strings libc
-continuations destructors
-openssl openssl.libcrypto openssl.libssl
-io.files io.ports io.unix.backend io.unix.sockets
-io.encodings.ascii io.buffers io.sockets io.sockets.secure
+USING: accessors unix byte-arrays kernel debugger sequences
+namespaces math math.order combinators init alien alien.c-types
+alien.strings libc continuations destructors openssl
+openssl.libcrypto openssl.libssl io.files io.ports
+io.unix.backend io.unix.sockets io.encodings.ascii io.buffers
+io.sockets io.sockets.secure io.sockets.secure.openssl
 io.timeouts system summary ;
 IN: io.unix.sockets.secure
 

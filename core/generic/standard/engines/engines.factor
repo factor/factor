@@ -18,7 +18,7 @@ GENERIC: engine>quot ( engine -- quot )
     [ over assumed [ engine>quot ] with-variable ] assoc-map ;
 
 : if-small? ( assoc true false -- )
-    >r >r dup assoc-size 4 <= r> r> if ; inline
+    [ dup assoc-size 4 <= ] 2dip if ; inline
 
 : linear-dispatch-quot ( alist -- quot )
     default get [ drop ] prepend swap
@@ -45,7 +45,7 @@ GENERIC: engine>quot ( engine -- quot )
         { 0 [ [ dup ] ] }
         { 1 [ [ over ] ] }
         { 2 [ [ pick ] ] }
-        [ 1- (picker) [ >r ] swap [ r> swap ] 3append ]
+        [ 1- (picker) [ dip swap ] curry ]
     } case ;
 
 : picker ( -- quot ) \ (dispatch#) get (picker) ;

@@ -114,11 +114,6 @@ M: windows delete-directory ( path -- )
     normalize-path
     RemoveDirectory win32-error=0/f ;
 
-M: windows >directory-entry ( byte-array -- directory-entry )
-    [ WIN32_FIND_DATA-cFileName utf16n alien>string ]
-    [ WIN32_FIND_DATA-dwFileAttributes ]
-    bi directory-entry boa ;
-
 : find-first-file ( path -- WIN32_FIND_DATA handle )
     "WIN32_FIND_DATA" <c-object> tuck
     FindFirstFile
@@ -176,6 +171,15 @@ TUPLE: windows-file-info < file-info attributes ;
 
 : win32-file-type ( n -- symbol )
     FILE_ATTRIBUTE_DIRECTORY mask? +directory+ +regular-file+ ? ;
+
+TUPLE: windows-directory-entry < directory-entry attributes ;
+
+M: windows >directory-entry ( byte-array -- directory-entry )
+    [ WIN32_FIND_DATA-cFileName utf16n alien>string ]
+    [ WIN32_FIND_DATA-dwFileAttributes win32-file-type ]
+    [ WIN32_FIND_DATA-dwFileAttributes win32-file-attributes ]
+    tri
+    dupd remove windows-directory-entry boa ;
 
 : WIN32_FIND_DATA>file-info ( WIN32_FIND_DATA -- file-info )
     [ \ windows-file-info new ] dip

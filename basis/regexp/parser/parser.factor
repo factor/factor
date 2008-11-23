@@ -43,6 +43,7 @@ INSTANCE: comment-group parentheses-group
 TUPLE: character-class-range from to ; INSTANCE: character-class-range node
 SINGLETON: epsilon INSTANCE: epsilon node
 SINGLETON: any-char INSTANCE: any-char node
+SINGLETON: any-char-no-nl INSTANCE: any-char-no-nl node
 SINGLETON: front-anchor INSTANCE: front-anchor node
 SINGLETON: back-anchor INSTANCE: back-anchor node
 
@@ -172,7 +173,7 @@ DEFER: (parse-regexp)
     [ drop1 (parse-special-group) ]
     [ capture-group f nested-parse-regexp ] if ;
 
-: handle-dot ( -- ) any-char push-stack ;
+: handle-dot ( -- ) get-dotall any-char any-char-no-nl ? push-stack ;
 : handle-pipe ( -- ) pipe push-stack ;
 : (handle-star) ( obj -- kleene-star )
     peek1 {
@@ -288,28 +289,9 @@ ERROR: bad-escaped-literals seq ;
         first|concatenation
     ] if-empty ;
 
-ERROR: unrecognized-escape char ;
-
 : parse-escaped ( -- obj )
     read1
     {
-        { CHAR: \ [ CHAR: \ <constant> ] }
-        { CHAR: / [ CHAR: / <constant> ] }
-        { CHAR: ^ [ CHAR: ^ <constant> ] }
-        { CHAR: $ [ CHAR: $ <constant> ] }
-        { CHAR: - [ CHAR: - <constant> ] }
-        { CHAR: { [ CHAR: { <constant> ] }
-        { CHAR: } [ CHAR: } <constant> ] }
-        { CHAR: [ [ CHAR: [ <constant> ] }
-        { CHAR: ] [ CHAR: ] <constant> ] }
-        { CHAR: ( [ CHAR: ( <constant> ] }
-        { CHAR: ) [ CHAR: ) <constant> ] }
-        { CHAR: @ [ CHAR: @ <constant> ] }
-        { CHAR: * [ CHAR: * <constant> ] }
-        { CHAR: + [ CHAR: + <constant> ] }
-        { CHAR: ? [ CHAR: ? <constant> ] }
-        { CHAR: . [ CHAR: . <constant> ] }
-        { CHAR: : [ CHAR: : <constant> ] }
         { CHAR: t [ CHAR: \t <constant> ] }
         { CHAR: n [ CHAR: \n <constant> ] }
         { CHAR: r [ CHAR: \r <constant> ] }
@@ -349,7 +331,7 @@ ERROR: unrecognized-escape char ;
         ! { CHAR: 9 [ CHAR: 9 <constant> ] }
 
         { CHAR: Q [ parse-escaped-literals ] }
-        [ unrecognized-escape ]
+        [ <constant> ]
     } case ;
 
 : handle-escape ( -- ) parse-escaped push-stack ;
