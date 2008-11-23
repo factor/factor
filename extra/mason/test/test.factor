@@ -3,7 +3,7 @@
 USING: kernel namespaces assocs io.files io.encodings.utf8
 prettyprint help.lint benchmark tools.time bootstrap.stage2
 tools.test tools.vocabs help.html mason.common words generic
-accessors compiler.errors sequences sets sorting ;
+accessors compiler.errors sequences sets sorting math ;
 IN: mason.test
 
 : do-load ( -- )
