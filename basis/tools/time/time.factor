@@ -9,7 +9,7 @@ IN: tools.time
 
 : time. ( data -- )
     unclip
-    "==== RUNNING TIME" print nl pprint " us" print nl
+    "==== RUNNING TIME" print nl 1000000 /f pprint " seconds" print nl
     4 cut*
     "==== GARBAGE COLLECTION" print nl
     [
