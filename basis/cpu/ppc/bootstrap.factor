@@ -79,7 +79,7 @@ big-endian on
 : jit-call-quot ( -- )
     4 3 quot-xt-offset LWZ
     4 MTLR
-    BLR ;
+    BLRL ;
 
 [
     0 3 LOAD32
