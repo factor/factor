@@ -21,7 +21,7 @@ GENERIC: assoc-clone-like ( assoc exemplar -- newassoc )
 GENERIC: >alist ( assoc -- newassoc )
 
 : (assoc-each) ( assoc quot -- seq quot' )
-    >r >alist r> [ first2 ] prepose ; inline
+    [ >alist ] dip [ first2 ] prepose ; inline
 
 : assoc-find ( assoc quot -- key value ? )
     (assoc-each) find swap [ first2 t ] [ drop f f f ] if ; inline
@@ -32,23 +32,26 @@ GENERIC: >alist ( assoc -- newassoc )
     (assoc-each) each ; inline
 
 : assoc>map ( assoc quot exemplar -- seq )
-    >r accumulator >r assoc-each r> r> like ; inline
+    [ accumulator [ assoc-each ] dip ] dip like ; inline
 
 : assoc-map-as ( assoc quot exemplar -- newassoc )
-    >r [ 2array ] compose V{ } assoc>map r> assoc-like ; inline
+    [ [ 2array ] compose V{ } assoc>map ] dip assoc-like ; inline
 
 : assoc-map ( assoc quot -- newassoc )
     over assoc-map-as ; inline
 
 : assoc-push-if ( key value quot accum -- )
-    >r 2keep r> roll
-    [ >r 2array r> push ] [ 3drop ] if ; inline
+    [ 2keep rot ] dip swap
+    [ [ 2array ] dip push ] [ 3drop ] if ; inline
 
 : assoc-pusher ( quot -- quot' accum )
     V{ } clone [ [ assoc-push-if ] 2curry ] keep ; inline
 
+: assoc-filter-as ( assoc quot exemplar -- subassoc )
+    [ assoc-pusher [ assoc-each ] dip ] dip assoc-like ; inline
+
 : assoc-filter ( assoc quot -- subassoc )
-    over >r assoc-pusher >r assoc-each r> r> assoc-like ; inline
+    over assoc-filter-as ; inline
 
 : assoc-contains? ( assoc quot -- ? )
     assoc-find 2nip ; inline
@@ -130,13 +133,13 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 
 : cache ( key assoc quot -- value )
     2over at* [
-        >r 3drop r>
+        [ 3drop ] dip
     ] [
-        drop pick rot >r >r call dup r> r> set-at
+        drop pick rot [ call dup ] 2dip set-at
     ] if ; inline
 
 : change-at ( key assoc quot -- )
-    [ >r at r> call ] 3keep drop set-at ; inline
+    [ [ at ] dip call ] 3keep drop set-at ; inline
 
 : at+ ( n key assoc -- )
     [ 0 or + ] change-at ;
@@ -173,7 +176,7 @@ M: sequence at*
 M: sequence set-at
     2dup search-alist
     [ 2nip set-second ]
-    [ drop >r swap 2array r> push ] if ;
+    [ drop [ swap 2array ] dip push ] if ;
 
 M: sequence new-assoc drop <vector> ;
 
