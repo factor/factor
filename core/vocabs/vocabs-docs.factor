@@ -53,14 +53,6 @@ HELP: vocab-words
 { $values { "vocab-spec" "a vocabulary specifier" } { "words" "an assoc mapping strings to words" } }
 { $description "Outputs the words defined in a vocabulary." } ;
 
-HELP: vocab-source-loaded?
-{ $values { "vocab-spec" "a vocabulary specifier" } { "?" "a boolean" } }
-{ $description "Outputs if the source for this vocubulary has been loaded." } ;
-
-HELP: vocab-docs-loaded?
-{ $values { "vocab-spec" "a vocabulary specifier" } { "?" "a boolean" } }
-{ $description "Outputs if the documentation for this vocubulary has been loaded." } ;
-
 HELP: words
 { $values { "vocab" string } { "seq" "a sequence of words" } }
 { $description "Outputs a sequence of words defined in the vocabulary, or " { $link f } " if no vocabulary with this name exists." } ;
