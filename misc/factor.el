@@ -162,6 +162,10 @@ buffer."
 
 ;;; Factor mode font lock:
 
+(defconst factor--regexp-word-start
+  (let ((sws '("" ":" "TUPLE" "MACRO" "MACRO:" "M")))
+    (format "^\\(%s\\)\\(:\\) " (mapconcat 'identity sws "\\|"))))
+
 (defconst factor--parsing-words
   '("{" "}" "^:" "^::" ";" "<<" "<PRIVATE" ">>"
     "BIN:" "BV{" "B{" "C:" "C-STRUCT:" "C-UNION:" "CHAR:" "CS{" "C{"
@@ -201,12 +205,7 @@ buffer."
 (defconst factor--regex-use-line "^USE: +\\(.*\\)$")
 
 (defconst factor-font-lock-keywords
-  `(("#!.*$" . 'factor-font-lock-comment)
-    ("!( .* )" . 'factor-font-lock-comment)
-    ("^!.*$" . 'factor-font-lock-comment)
-    (" !.*$" . 'factor-font-lock-comment)
-    ("( .* )" . 'factor-font-lock-stack-effect)
-    ("\"\\(\\\\\"\\|[^\"]\\)*\"" . 'factor-font-lock-string)
+  `(("( .* )" . 'factor-font-lock-stack-effect)
     ("\\(P\\|SBUF\\)\"" 1 'factor-font-lock-parsing-word)
     ,@(mapcar #'(lambda (w) (cons (concat "\\(^\\| \\)\\(" w "\\)\\($\\| \\)")
                              '(2 'factor-font-lock-parsing-word)))
@@ -224,6 +223,14 @@ buffer."
 
 
 ;;; Factor mode syntax:
+
+(defconst factor--font-lock-syntactic-keywords
+  `(("^\\(:\\)\\(:\\)" (1 ".") (2 "(;"))
+    (,factor--regexp-word-start (2 "(;"))
+    ("\\(;\\)" (1 "):"))
+    ("\\(#!\\)" (1 "<"))
+    ("\\(!\\)" (1 "<"))
+    ("\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))))
 
 (defvar factor-mode-syntax-table nil
   "Syntax table used while in Factor mode.")
@@ -254,11 +261,14 @@ buffer."
 
     ;; Whitespace
     (modify-syntax-entry ?\t " " factor-mode-syntax-table)
-    (modify-syntax-entry ?\n ">" factor-mode-syntax-table)
     (modify-syntax-entry ?\f " " factor-mode-syntax-table)
     (modify-syntax-entry ?\r " " factor-mode-syntax-table)
     (modify-syntax-entry ?  " " factor-mode-syntax-table)
 
+    ;; (end of) Comments
+    (modify-syntax-entry ?\n ">" factor-mode-syntax-table)
+
+    ;; Parenthesis
     (modify-syntax-entry ?\[ "(]  " factor-mode-syntax-table)
     (modify-syntax-entry ?\] ")[  " factor-mode-syntax-table)
     (modify-syntax-entry ?{ "(}  " factor-mode-syntax-table)
@@ -266,7 +276,10 @@ buffer."
 
     (modify-syntax-entry ?\( "()" factor-mode-syntax-table)
     (modify-syntax-entry ?\) ")(" factor-mode-syntax-table)
-    (modify-syntax-entry ?\" "\"    " factor-mode-syntax-table)))
+
+    ;; Strings
+    (modify-syntax-entry ?\" "\"" factor-mode-syntax-table)
+    (modify-syntax-entry ?\\ "/" factor-mode-syntax-table)))
 
 
 ;;; Factor mode indentation:
@@ -274,10 +287,6 @@ buffer."
 (make-variable-buffer-local
  (defvar factor-indent-width factor-default-indent-width
    "Indentation width in factor buffers. A local variable."))
-
-(defconst factor--regexp-word-start
-  (let ((sws '("" ":" "TUPLE" "MACRO" "MACRO:" "M")))
-    (format "^\\(%s\\): " (mapconcat 'identity sws "\\|"))))
 
 (defun factor--guess-indent-width ()
   "Chooses an indentation value from existing code."
@@ -494,8 +503,12 @@ buffer."
   (setq major-mode 'factor-mode)
   (setq mode-name "Factor")
   (set (make-local-variable 'comment-start) "! ")
+  (set (make-local-variable 'font-lock-comment-face) 'factor-font-lock-comment)
+  (set (make-local-variable 'font-lock-string-face) 'factor-font-lock-string)
   (set (make-local-variable 'font-lock-defaults)
-       '(factor-font-lock-keywords t nil nil nil))
+       `(factor-font-lock-keywords
+         nil nil nil nil
+         (font-lock-syntactic-keywords . ,factor--font-lock-syntactic-keywords)))
   (set-syntax-table factor-mode-syntax-table)
   (set (make-local-variable 'indent-line-function) 'factor--indent-line)
   (setq factor-indent-width (factor--guess-indent-width))
@@ -550,12 +563,15 @@ buffer."
   "Keymap for Factor help mode.")
 
 (defconst factor--help-headlines
-  (regexp-opt '("Parent topics:"
-                "Inputs and outputs"
-                "Word description"
+  (regexp-opt '("Definition"
+                "Examples"
                 "Generic word contract"
+                "Inputs and outputs"
+                "Parent topics:"
+                "Syntax"
                 "Vocabulary"
-                "Definition")
+                "Warning"
+                "Word description")
               t))
 
 (defconst factor--help-headlines-regexp (format "^%s" factor--help-headlines))
@@ -627,20 +643,24 @@ vocabularies which have been modified on disk."
 
 ;;; Key bindings:
 
-(defmacro factor--define-key (key cmd)
-  `(progn
-     (define-key factor-mode-map [(control ?c) ,key] ,cmd)
-     (define-key factor-mode-map [(control ?c) (control ,key)] ,cmd)))
+(defmacro factor--define-key (key cmd &optional both)
+  (let ((m (gensym))
+        (ms '(factor-mode-map)))
+    (when both (push 'factor-help-mode-map ms))
+    `(dolist (,m (list ,@ms))
+       (define-key ,m [(control ?c) ,key] ,cmd)
+       (define-key ,m [(control ?c) (control ,key)] ,cmd))))
 
 (factor--define-key ?f 'factor-run-file)
 (factor--define-key ?r 'factor-send-region)
 (factor--define-key ?d 'factor-send-definition)
-(factor--define-key ?s 'factor-see)
+(factor--define-key ?s 'factor-see t)
 (factor--define-key ?e 'factor-edit)
-(factor--define-key ?z 'switch-to-factor)
+(factor--define-key ?z 'switch-to-factor t)
 (factor--define-key ?c 'comment-region)
 
 (define-key factor-mode-map "\C-ch" 'factor-help)
+(define-key factor-help-mode-map "\C-ch" 'factor-help)
 (define-key factor-mode-map "\C-m" 'newline-and-indent)
 (define-key factor-mode-map [tab] 'indent-for-tab-command)
 
