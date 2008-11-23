@@ -253,7 +253,7 @@ IN: regexp-tests
 
 [ ] [ "(\\$[\\p{XDigit}]|[\\p{Digit}])" <regexp> drop ] unit-test
 
-! Comment
+! Comment inside a regular expression
 [ t ] [ "ac" "a(?#boo)c" <regexp> matches? ] unit-test
 
 [ ] [ "USING: regexp kernel ; R' -{3}[+]{1,6}(?:!!)?\\s' drop" eval ] unit-test
@@ -291,6 +291,12 @@ IN: regexp-tests
 [ "a" ] [ "ba" "a(?<=b)(?<=b)" <regexp> first-match >string ] unit-test
 [ "a" ] [ "cab" "a(?=b)(?<=c)" <regexp> first-match >string ] unit-test
 
+[ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head ] unit-test
+[ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
+
+! Bug in parsing word
+[ t ] [ "a" R' a' matches?  ] unit-test
+
 ! [ "{Lower}" <regexp> ] [ invalid-range? ] must-fail-with
 
 ! [ 1 ] [ "aaacb" "a+?" <regexp> match-head ] unit-test
@@ -302,9 +308,6 @@ IN: regexp-tests
 
 ! [ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 ! [ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
-
-[ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head ] unit-test
-[ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
 
 ! [ f ] [ "foobxr" "foo\\z" <regexp> match-head ] unit-test
 ! [ 3 ] [ "foo" "foo\\z" <regexp> match-head ] unit-test
@@ -322,10 +325,6 @@ IN: regexp-tests
 ! [ f ] [ "foo bar" "foo\\B bar" <regexp> matches? ] unit-test
 ! [ t ] [ "fooxbar" "foo\\Bxbar" <regexp> matches? ] unit-test
 ! [ f ] [ "foo" "foo\\Bbar" <regexp> matches? ] unit-test
-
-
-! Bug in parsing word
-! [ t ] [ "a" R' a' matches?  ] unit-test
 
 ! clear "a(?=b*)" <regexp> "ab" over match
 ! clear "a(?=b*c)" <regexp> "abbbbbc" over match
@@ -355,7 +354,6 @@ IN: regexp-tests
 [ "a" ] [ "ac" "a(?!b)" <regexp> first-match >string ] unit-test
 
 ! "a(?<=b)" <regexp> "caba" over first-match
-
 
 ! capture group 1: "aaaa"  2: ""
 ! "aaaa" "(a*)(a*)" <regexp> match*
