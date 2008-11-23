@@ -18,7 +18,7 @@ TUPLE: anonymous-complement class ;
 C: <anonymous-complement> anonymous-complement
 
 : 2cache ( key1 key2 assoc quot -- value )
-    >r >r 2array r> [ first2 ] r> compose cache ; inline
+    [ 2array ] 2dip [ first2 ] prepose cache ; inline
 
 GENERIC: valid-class? ( obj -- ? )
 
@@ -66,13 +66,13 @@ DEFER: (class-or)
     swap superclass dup [ swap class<= ] [ 2drop f ] if ;
 
 : left-anonymous-union<= ( first second -- ? )
-    >r members>> r> [ class<= ] curry all? ;
+    [ members>> ] dip [ class<= ] curry all? ;
 
 : right-anonymous-union<= ( first second -- ? )
     members>> [ class<= ] with contains? ;
 
 : left-anonymous-intersection<= ( first second -- ? )
-    >r participants>> r> [ class<= ] curry contains? ;
+    [ participants>> ] dip [ class<= ] curry contains? ;
 
 : right-anonymous-intersection<= ( first second -- ? )
     participants>> [ class<= ] with all? ;
@@ -95,7 +95,7 @@ DEFER: (class-or)
     } cond ;
 
 : left-anonymous-complement<= ( first second -- ? )
-    >r normalize-complement r> class<= ;
+    [ normalize-complement ] dip class<= ;
 
 PREDICATE: nontrivial-anonymous-complement < anonymous-complement
     class>> {
@@ -212,7 +212,7 @@ M: anonymous-complement (classes-intersect?)
 : sort-classes ( seq -- newseq )
     [ [ name>> ] compare ] sort >vector
     [ dup empty? not ]
-    [ dup largest-class >r over delete-nth r> ]
+    [ dup largest-class [ over delete-nth ] dip ]
     [ ] produce nip ;
 
 : min-class ( class seq -- class/f )

@@ -73,6 +73,80 @@ big-endian off
     arg0 quot-xt-offset [+] JMP                ! execute branch
 ] rc-absolute-cell rt-literal 1 rex-length + jit-dispatch jit-define
 
+! The jit->r words cannot clobber arg0
+
+: jit->r ( -- )
+    rs-reg bootstrap-cell ADD
+    temp-reg ds-reg [] MOV
+    ds-reg bootstrap-cell SUB
+    rs-reg [] temp-reg MOV ;
+
+: jit-2>r ( -- )
+    rs-reg 2 bootstrap-cells ADD
+    temp-reg ds-reg [] MOV
+    arg1 ds-reg -1 bootstrap-cells [+] MOV
+    ds-reg 2 bootstrap-cells SUB
+    rs-reg [] temp-reg MOV
+    rs-reg -1 bootstrap-cells [+] arg1 MOV ;
+
+: jit-3>r ( -- )
+    rs-reg 3 bootstrap-cells ADD
+    temp-reg ds-reg [] MOV
+    arg1 ds-reg -1 bootstrap-cells [+] MOV
+    arg2 ds-reg -2 bootstrap-cells [+] MOV
+    ds-reg 3 bootstrap-cells SUB
+    rs-reg [] temp-reg MOV
+    rs-reg -1 bootstrap-cells [+] arg1 MOV
+    rs-reg -2 bootstrap-cells [+] arg2 MOV ;
+
+: jit-r> ( -- )
+    ds-reg bootstrap-cell ADD
+    temp-reg rs-reg [] MOV
+    rs-reg bootstrap-cell SUB
+    ds-reg [] temp-reg MOV ;
+
+: jit-2r> ( -- )
+    ds-reg 2 bootstrap-cells ADD
+    temp-reg rs-reg [] MOV
+    arg1 rs-reg -1 bootstrap-cells [+] MOV
+    rs-reg 2 bootstrap-cells SUB
+    ds-reg [] temp-reg MOV
+    ds-reg -1 bootstrap-cells [+] arg1 MOV ;
+
+: jit-3r> ( -- )
+    ds-reg 3 bootstrap-cells ADD
+    temp-reg rs-reg [] MOV
+    arg1 rs-reg -1 bootstrap-cells [+] MOV
+    arg2 rs-reg -2 bootstrap-cells [+] MOV
+    rs-reg 3 bootstrap-cells SUB
+    ds-reg [] temp-reg MOV
+    ds-reg -1 bootstrap-cells [+] arg1 MOV
+    ds-reg -2 bootstrap-cells [+] arg2 MOV ;
+
+[
+    arg0 0 MOV                                 ! load quotation addr
+    arg0 arg0 [] MOV                           ! load quotation
+    jit->r
+    arg0 quot-xt-offset [+] CALL               ! call quotation
+    jit-r>
+] rc-absolute-cell rt-literal 1 rex-length + jit-dip jit-define
+
+[
+    arg0 0 MOV                                 ! load quotation addr
+    arg0 arg0 [] MOV                           ! load quotation
+    jit-2>r
+    arg0 quot-xt-offset [+] CALL               ! call quotation
+    jit-2r>
+] rc-absolute-cell rt-literal 1 rex-length + jit-2dip jit-define
+
+[
+    arg0 0 MOV                                 ! load quotation addr
+    arg0 arg0 [] MOV                           ! load quotation
+    jit-3>r                                    
+    arg0 quot-xt-offset [+] CALL               ! call quotation
+    jit-3r>
+] rc-absolute-cell rt-literal 1 rex-length + jit-3dip jit-define
+
 [
     stack-reg stack-frame-size bootstrap-cell - ADD ! unwind stack frame
 ] f f f jit-epilog jit-define
@@ -223,19 +297,9 @@ big-endian off
     ds-reg [] arg1 MOV
 ] f f f \ -rot define-sub-primitive
 
-[
-    rs-reg bootstrap-cell ADD
-    arg0 ds-reg [] MOV
-    ds-reg bootstrap-cell SUB
-    rs-reg [] arg0 MOV
-] f f f \ >r define-sub-primitive
+[ jit->r ] f f f \ >r define-sub-primitive
 
-[
-    ds-reg bootstrap-cell ADD
-    arg0 rs-reg [] MOV
-    rs-reg bootstrap-cell SUB
-    ds-reg [] arg0 MOV
-] f f f \ r> define-sub-primitive
+[ jit-r> ] f f f \ r> define-sub-primitive
 
 ! Comparisons
 : jit-compare ( insn -- )

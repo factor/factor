@@ -23,7 +23,7 @@ IN: bootstrap.syntax
     "syntax" lookup t "delimiter" set-word-prop ;
 
 : define-syntax ( name quot -- )
-    >r "syntax" lookup dup r> define t "parsing" set-word-prop ;
+    [ "syntax" lookup dup ] dip define t "parsing" set-word-prop ;
 
 [
     { "]" "}" ";" ">>" } [ define-delimiter ] each
@@ -145,9 +145,10 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "INSTANCE:" [
-        location >r
-        scan-word scan-word 2dup add-mixin-instance
-        <mixin-instance> r> remember-definition
+        location [
+            scan-word scan-word 2dup add-mixin-instance
+            <mixin-instance>
+        ] dip remember-definition
     ] define-syntax
 
     "PREDICATE:" [

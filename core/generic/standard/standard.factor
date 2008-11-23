@@ -33,8 +33,8 @@ ERROR: no-method object generic ;
     ] change-at ;
 
 : flatten-method ( class method assoc -- )
-    >r >r dup flatten-class keys swap r> r> [
-        >r spin r> push-method
+    [ dup flatten-class keys swap ] 2dip [
+        [ spin ] dip push-method
     ] 3curry each ;
 
 : flatten-methods ( assoc -- assoc' )
@@ -113,7 +113,7 @@ PREDICATE: simple-generic < standard-generic
     T{ standard-combination f 0 } define-generic ;
 
 : with-standard ( combination quot -- quot' )
-    >r #>> (dispatch#) r> with-variable ; inline
+    [ #>> (dispatch#) ] dip with-variable ; inline
 
 M: standard-generic extra-values drop 0 ;
 

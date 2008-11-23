@@ -485,7 +485,7 @@ must-fail-with
 [ t ] [ "forget-accessors-test" "classes.tuple.tests" lookup class? ] unit-test
 
 : accessor-exists? ( class name -- ? )
-    >r "forget-accessors-test" "classes.tuple.tests" lookup r>
+    [ "forget-accessors-test" "classes.tuple.tests" lookup ] dip
     ">>" append "accessors" lookup method >boolean ;
 
 [ t ] [ "x" accessor-exists? ] unit-test

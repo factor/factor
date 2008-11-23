@@ -86,7 +86,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
         3drop f
     ] [
         3dup nth-unsafe at*
-        [ >r 3drop r> ] [ drop >r 1- r> (assoc-stack) ] if
+        [ [ 3drop ] dip ] [ drop [ 1- ] dip (assoc-stack) ] if
     ] if ; inline recursive
 
 : assoc-stack ( key seq -- value )
@@ -100,7 +100,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 
 : assoc-hashcode ( n assoc -- code )
     [
-        >r over r> hashcode* 2/ >r dupd hashcode* r> bitxor
+        [ over ] dip hashcode* 2/ [ dupd hashcode* ] dip bitxor
     ] { } assoc>map hashcode* ;
 
 : assoc-intersect ( assoc1 assoc2 -- intersection )
@@ -145,7 +145,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ 0 or + ] change-at ;
 
 : map>assoc ( seq quot exemplar -- assoc )
-    >r [ 2array ] compose { } map-as r> assoc-like ; inline
+    [ [ 2array ] compose { } map-as ] dip assoc-like ; inline
 
 : extract-keys ( seq assoc -- subassoc )
     [ [ dupd at ] curry ] keep map>assoc ;
@@ -189,10 +189,10 @@ M: sequence delete-at
 M: sequence assoc-size length ;
 
 M: sequence assoc-clone-like
-    >r >alist r> clone-like ;
+    [ >alist ] dip clone-like ;
 
 M: sequence assoc-like
-    >r >alist r> like ;
+    [ >alist ] dip like ;
 
 M: sequence >alist ;
 

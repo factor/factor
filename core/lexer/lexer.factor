@@ -23,7 +23,7 @@ TUPLE: lexer text line line-text line-length column ;
     lexer new-lexer ;
 
 : skip ( i seq ? -- n )
-    >r tuck r>
+    [ tuck ] dip
     [ swap CHAR: \s eq? xor ] curry find-from drop
     [ ] [ length ] ?if ;
 

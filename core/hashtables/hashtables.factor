@@ -15,7 +15,7 @@ TUPLE: hashtable
     length>> 1 fixnum-fast fixnum-bitand ; inline
 
 : hash@ ( key array -- i )
-    >r hashcode >fixnum dup fixnum+fast r> wrap ; inline
+    [ hashcode >fixnum dup fixnum+fast ] dip wrap ; inline
 
 : probe ( array i -- array i )
     2 fixnum+fast over wrap ; inline
@@ -105,7 +105,7 @@ M: hashtable clear-assoc ( hash -- )
 
 M: hashtable delete-at ( key hash -- )
     tuck key@ [
-        >r >r ((tombstone)) dup r> r> set-nth-pair
+        [ ((tombstone)) dup ] 2dip set-nth-pair
         hash-deleted+
     ] [
         3drop
@@ -115,9 +115,9 @@ M: hashtable assoc-size ( hash -- n )
     [ count>> ] [ deleted>> ] bi - ;
 
 : rehash ( hash -- )
-    dup >alist >r
+    dup >alist [
     dup clear-assoc
-    r> (rehash) ;
+    ] dip (rehash) ;
 
 M: hashtable set-at ( value key hash -- )
     dup ?grow-hash
@@ -133,7 +133,7 @@ M: hashtable set-at ( value key hash -- )
 : push-unsafe ( elt seq -- )
     [ length ] keep
     [ underlying>> set-array-nth ]
-    [ >r 1+ r> (>>length) ]
+    [ [ 1+ ] dip (>>length) ]
     2bi ; inline
 
 PRIVATE>
@@ -141,9 +141,10 @@ PRIVATE>
 M: hashtable >alist
     [ array>> [ length 2/ ] keep ] [ assoc-size <vector> ] bi [
         [
-            >r
-            >r 1 fixnum-shift-fast r>
-            [ array-nth ] [ >r 1 fixnum+fast r> array-nth ] 2bi r>
+            [
+                [ 1 fixnum-shift-fast ] dip
+                [ array-nth ] [ [ 1 fixnum+fast ] dip array-nth ] 2bi
+            ] dip
             pick tombstone? [ 3drop ] [ [ 2array ] dip push-unsafe ] if
         ] 2curry each
     ] keep { } like ;
