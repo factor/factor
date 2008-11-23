@@ -305,7 +305,7 @@ big-endian off
     ds-reg [] arg1 MOV                         ! push to stack
 ] f f f \ fixnum-shift-fast define-sub-primitive
 
-: jit-fixnum-/mod
+: jit-fixnum-/mod ( -- )
     temp-reg ds-reg [] MOV                     ! load second parameter
     div-arg ds-reg bootstrap-cell neg [+] MOV  ! load first parameter
     mod-arg div-arg MOV                        ! make a copy
