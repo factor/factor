@@ -40,7 +40,11 @@ IN: regexp-tests
 [ f ] [ "" "." <regexp> matches? ] unit-test
 [ t ] [ "a" "." <regexp> matches? ] unit-test
 [ t ] [ "." "." <regexp> matches? ] unit-test
-! [ f ] [ "\n" "." <regexp> matches? ] unit-test
+
+! Dotall mode -- when on, . matches newlines.
+! Off by default.
+[ f ] [ "\n" "." <regexp> matches? ] unit-test
+[ t ] [ "\n" "(?s)." <regexp> matches? ] unit-test
 
 [ f ] [ "" ".+" <regexp> matches? ] unit-test
 [ t ] [ "a" ".+" <regexp> matches? ] unit-test
@@ -170,7 +174,6 @@ IN: regexp-tests
 [ f ] [ "ABC" "\\p{Lower}{3}" <regexp> matches? ] unit-test
 [ t ] [ "ABC" "\\p{Upper}{3}" <regexp> matches? ] unit-test
 [ f ] [ "abc" "\\p{Upper}{3}" <regexp> matches? ] unit-test
-! 
 [ f ] [ "abc" "[\\p{Upper}]{3}" <regexp> matches? ] unit-test
 [ t ] [ "ABC" "[\\p{Upper}]{3}" <regexp> matches? ] unit-test
 
@@ -252,7 +255,40 @@ IN: regexp-tests
 ! Comment
 [ t ] [ "ac" "a(?#boo)c" <regexp> matches? ] unit-test
 
+[ ] [ "USING: regexp kernel ; R' -{3}[+]{1,6}(?:!!)?\\s' drop" eval ] unit-test
 
+[ ] [ "USING: regexp kernel ; R' (ftp|http|https)://(\\w+:?\\w*@)?(\\S+)(:[0-9]+)?(/|/([\\w#!:.?+=&%@!\\-/]))?' drop" eval ] unit-test
+
+[ ] [ "USING: regexp kernel ; R' \\*[^\s*][^*]*\\*' drop" eval ] unit-test
+
+[ "ab" ] [ "ab" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
+[ "abc" ] [ "abc" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
+
+[ "ab" ] [ "ab" "(ab|a)(bc)?" <regexp> first-match >string ] unit-test
+[ "abc" ] [ "abc" "(ab|a)(bc)?" <regexp> first-match >string ] unit-test
+
+[ "b" ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match >string ] unit-test
+
+[ t ] [ "a:b" ".+:?" <regexp> matches? ] unit-test
+
+[ 1 ] [ "hello" ".+?" <regexp> match length ] unit-test
+
+[ { "1" "2" "3" "4" } ]
+[ "1ABC2DEF3GHI4" R/ [A-Z]+/ re-split [ >string ] map ] unit-test
+
+[ { "1" "2" "3" "4" } ]
+[ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ re-split [ >string ] map ] unit-test
+
+[ { "ABC" "DEF" "GHI" } ]
+[ "1ABC2DEF3GHI4" R/ [A-Z]+/ all-matches [ >string ] map ] unit-test
+
+[ "1.2.3.4" ]
+[ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ "." re-replace ] unit-test
+
+[ f ] [ "ab" "a(?!b)" <regexp> first-match ] unit-test
+[ "a" ] [ "ab" "a(?=b)(?=b)" <regexp> first-match >string ] unit-test
+[ "a" ] [ "ba" "a(?<=b)(?<=b)" <regexp> first-match >string ] unit-test
+[ "a" ] [ "cab" "a(?=b)(?<=c)" <regexp> first-match >string ] unit-test
 
 ! [ "{Lower}" <regexp> ] [ invalid-range? ] must-fail-with
 
@@ -286,20 +322,9 @@ IN: regexp-tests
 ! [ t ] [ "fooxbar" "foo\\Bxbar" <regexp> matches? ] unit-test
 ! [ f ] [ "foo" "foo\\Bbar" <regexp> matches? ] unit-test
 
-[ ] [ "USING: regexp kernel ; R' -{3}[+]{1,6}(?:!!)?\\s' drop" eval ] unit-test
-
-[ ] [ "USING: regexp kernel ; R' (ftp|http|https)://(\\w+:?\\w*@)?(\\S+)(:[0-9]+)?(/|/([\\w#!:.?+=&%@!\\-/]))?' drop" eval ] unit-test
-
-[ ] [ "USING: regexp kernel ; R' \\*[^\s*][^*]*\\*' drop" eval ] unit-test
 
 ! Bug in parsing word
 ! [ t ] [ "a" R' a' matches?  ] unit-test
-
-! ((A)(B(C)))
-! 1.  ((A)(B(C)))
-! 2. (A)
-! 3. (B(C))
-! 4. (C) 
 
 ! clear "a(?=b*)" <regexp> "ab" over match
 ! clear "a(?=b*c)" <regexp> "abbbbbc" over match
@@ -327,38 +352,10 @@ IN: regexp-tests
 ! "a(?:bcdefg)" <regexp> "abcdefg" over first-match
 
 [ "a" ] [ "ac" "a(?!b)" <regexp> first-match >string ] unit-test
-[ f ] [ "ab" "a(?!b)" <regexp> first-match ] unit-test
 
 ! "a(?<=b)" <regexp> "caba" over first-match
 
-[ "a" ] [ "ab" "a(?=b)(?=b)" <regexp> first-match >string ] unit-test
-[ "a" ] [ "ba" "a(?<=b)(?<=b)" <regexp> first-match >string ] unit-test
-[ "a" ] [ "cab" "a(?=b)(?<=c)" <regexp> first-match >string ] unit-test
 
 ! capture group 1: "aaaa"  2: ""
 ! "aaaa" "(a*)(a*)" <regexp> match*
 ! "aaaa" "(a*)(a+)" <regexp> match*
-
-[ "ab" ] [ "ab" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
-[ "abc" ] [ "abc" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
-
-[ "ab" ] [ "ab" "(ab|a)(bc)?" <regexp> first-match >string ] unit-test
-[ "abc" ] [ "abc" "(ab|a)(bc)?" <regexp> first-match >string ] unit-test
-
-[ "b" ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match >string ] unit-test
-
-[ t ] [ "a:b" ".+:?" <regexp> matches? ] unit-test
-
-[ 1 ] [ "hello" ".+?" <regexp> match length ] unit-test
-
-[ { "1" "2" "3" "4" } ]
-[ "1ABC2DEF3GHI4" R/ [A-Z]+/ re-split [ >string ] map ] unit-test
-
-[ { "1" "2" "3" "4" } ]
-[ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ re-split [ >string ] map ] unit-test
-
-[ { "ABC" "DEF" "GHI" } ]
-[ "1ABC2DEF3GHI4" R/ [A-Z]+/ all-matches [ >string ] map ] unit-test
-
-[ "1.2.3.4" ]
-[ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ "." re-replace ] unit-test

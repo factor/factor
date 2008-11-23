@@ -14,6 +14,9 @@ M: character-class-range class-member? ( obj class -- ? )
 
 M: any-char class-member? ( obj class -- ? )
     2drop t ;
+
+M: any-char-no-nl class-member? ( obj class -- ? )
+    drop CHAR: \n = not ;
     
 M: letter-class class-member? ( obj class -- ? )
     drop letter? ;
