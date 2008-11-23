@@ -134,7 +134,7 @@ H{ } "x" set
 
 [ H{ { -1 4 } { -3 16 } { -5 36 } } ] [
     H{ { 1 2 } { 3 4 } { 5 6 } }
-    [ >r neg r> sq ] assoc-map
+    [ [ neg ] dip sq ] assoc-map
 ] unit-test
 
 ! Bug discovered by littledan

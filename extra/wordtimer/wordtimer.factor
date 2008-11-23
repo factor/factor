@@ -1,5 +1,5 @@
 USING: kernel sequences namespaces make math assocs words arrays
-tools.annotations vocabs sorting prettyprint io micros
+tools.annotations vocabs sorting prettyprint io system
 math.statistics accessors ;
 IN: wordtimer
 
@@ -30,7 +30,7 @@ SYMBOL: *calling*
   *calling* get-global at ; inline
     
 : timed-call ( quot word -- )
-  [ calling ] [ >r micro-time r> register-time ] [ finished ] tri ; inline
+  [ calling ] [ >r benchmark r> register-time ] [ finished ] tri ; inline
 
 : time-unless-recursing ( quot word -- )
   dup called-recursively? not
@@ -51,7 +51,7 @@ SYMBOL: *calling*
 : dummy-word ( -- ) ;
 
 : time-dummy-word ( -- n )
-  [ 100000 [ [ dummy-word ] micro-time , ] times ] { } make median ;
+  [ 100000 [ [ dummy-word ] benchmark , ] times ] { } make median ;
 
 : subtract-overhead ( {oldtime,n} overhead -- {newtime,n} )
   [ first2 ] dip
@@ -71,7 +71,7 @@ SYMBOL: *calling*
 
 : wordtimer-call ( quot -- )
   reset-word-timer 
-  [ call ] micro-time >r
+  benchmark >r
   correct-for-timing-overhead
   "total time:" write r> pprint nl
   print-word-timings nl ;
@@ -81,7 +81,7 @@ SYMBOL: *calling*
   over [ reset-vocab ] [ add-timers ] bi
   reset-word-timer
   "executing quotation..." print flush
-  [ call ] micro-time >r
+  benchmark >r
   "resetting annotations..." print flush
   reset-vocab
   correct-for-timing-overhead

@@ -161,8 +161,8 @@ void init_data_heap(CELL gens,
 /* statistics */
 typedef struct {
 	CELL collections;
-	CELL gc_time;
-	CELL max_gc_time;
+	u64 gc_time;
+	u64 max_gc_time;
 	CELL object_count;
 	u64 bytes_copied;
 } F_GC_STATS;

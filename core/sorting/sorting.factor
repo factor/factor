@@ -25,20 +25,20 @@ TUPLE: merge
 
 : dump ( from to seq accum -- )
     #! Optimize common case where to - from = 1, 2, or 3.
-    >r >r 2dup swap - r> r> pick 1 = 
-    [ >r >r 2drop r> nth-unsafe r> push ] [
+    [ 2dup swap - ] 2dip pick 1 = 
+    [ [ [ 2drop ] dip nth-unsafe ] dip push ] [
         pick 2 = [
-            >r >r 2drop dup 1+
-            r> [ nth-unsafe ] curry bi@
-            r> [ push ] curry bi@
+            [
+                [ 2drop dup 1+ ] dip
+                [ nth-unsafe ] curry bi@
+            ] dip [ push ] curry bi@
         ] [
             pick 3 = [
-                >r >r 2drop dup 1+ dup 1+
-                r> [ nth-unsafe ] curry tri@
-                r> [ push ] curry tri@
-            ] [
-                >r nip subseq r> push-all
-            ] if
+                [
+                    [ 2drop dup 1+ dup 1+ ] dip
+                    [ nth-unsafe ] curry tri@
+                ] dip [ push ] curry tri@
+            ] [ [ nip subseq ] dip push-all ] if
         ] if
     ] if ; inline
 

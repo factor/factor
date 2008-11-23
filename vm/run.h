@@ -50,6 +50,12 @@ typedef enum {
 	JIT_PUSH_IMMEDIATE,
 	JIT_DECLARE_WORD    = 42,
 	JIT_SAVE_STACK,
+	JIT_DIP_WORD,
+	JIT_DIP,
+	JIT_2DIP_WORD,
+	JIT_2DIP,
+	JIT_3DIP_WORD,
+	JIT_3DIP,
 
 	STACK_TRACES_ENV    = 59,
 
@@ -238,7 +244,7 @@ void primitive_os_envs(void);
 void primitive_set_os_env(void);
 void primitive_unset_os_env(void);
 void primitive_set_os_envs(void);
-void primitive_millis(void);
+void primitive_micros(void);
 void primitive_sleep(void);
 void primitive_set_slot(void);
 

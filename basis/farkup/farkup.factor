@@ -36,7 +36,7 @@ TUPLE: line-break ;
     { "http://" "https://" "ftp://" } [ head? ] with contains? ;
 
 : simple-link-title ( string -- string' )
-    dup absolute-url? [ "/" last-split1 swap or ] unless ;
+    dup absolute-url? [ "/" split1-last swap or ] unless ;
 
 EBNF: parse-farkup
 nl               = ("\r\n" | "\r" | "\n") => [[ drop "\n" ]]

@@ -162,6 +162,6 @@ HELP: forget-methods
 { sort-classes order } related-words
 
 HELP: (call-next-method)
-{ $values { "class" class } { "generic" generic } }
+{ $values { "method" method-body } }
 { $description "Low-level word implementing " { $link POSTPONE: call-next-method } "." }
 { $notes "In most cases, " { $link POSTPONE: call-next-method } " should be used instead." } ;

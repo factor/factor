@@ -11,14 +11,14 @@ C-STRUCT: timespec
     { "time_t" "sec" }
     { "long" "nsec" } ;
 
-: make-timeval ( ms -- timeval )
-    1000 /mod 1000 *
+: make-timeval ( us -- timeval )
+    1000000 /mod
     "timeval" <c-object>
     [ set-timeval-usec ] keep
     [ set-timeval-sec ] keep ;
 
-: make-timespec ( ms -- timespec )
-    1000 /mod 1000000 *
+: make-timespec ( us -- timespec )
+    1000000 /mod 1000 *
     "timespec" <c-object>
     [ set-timespec-nsec ] keep
     [ set-timespec-sec ] keep ;

@@ -281,8 +281,8 @@ $nl
         "Gives all Factor threads a chance to run."
     } }
     { {
-        { $code "void factor_sleep(long ms)" }
-        "Gives all Factor threads a chance to run for " { $snippet "ms" } " milliseconds."
+        { $code "void factor_sleep(long us)" }
+        "Gives all Factor threads a chance to run for " { $snippet "us" } " microseconds."
     } }
 } ;
 

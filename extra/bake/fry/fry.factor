@@ -44,7 +44,7 @@ DEFER: shallow-fry
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : deep-fry ( quot -- quot )
-  { _ } last-split1 dup
+  { _ } split1-last dup
     [
       shallow-fry [ >r ] rot
       deep-fry    [ [ dip ] curry r> compose ] 4array concat

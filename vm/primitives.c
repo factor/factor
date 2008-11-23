@@ -68,7 +68,7 @@ void *primitives[] = {
 	primitive_exit,
 	primitive_data_room,
 	primitive_code_room,
-	primitive_millis,
+	primitive_micros,
 	primitive_modify_code_heap,
 	primitive_dlopen,
 	primitive_dlsym,
