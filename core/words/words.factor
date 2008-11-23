@@ -113,7 +113,7 @@ compiled-generic-crossref global [ H{ } assoc-like ] change-at
     bi* 2bi ;
 
 : compiled-xref ( word dependencies generic-dependencies -- )
-    [ [ drop crossref? ] assoc-filter >alist f like ] bi@
+    [ [ drop crossref? ] { } assoc-filter-as f like ] bi@
     [ over ] dip
     [ "compiled-uses" compiled-crossref (compiled-xref) ]
     [ "compiled-generic-uses" compiled-generic-crossref (compiled-xref) ]
