@@ -291,28 +291,28 @@ M: immutable-sequence clone-like like ;
 
 <PRIVATE
 
-: ((append)) ( seq1 seq2 accum -- accum )
-    [ >r over length r> copy ]
-    [ 0 swap copy ] 
+: (append) ( seq1 seq2 accum -- accum )
+    [ [ over length ] dip copy ]
+    [ 0 swap copy ]
     [ ] tri ; inline
-
-: (append) ( seq1 seq2 exemplar -- newseq )
-    >r over length over length + r>
-    [ ((append)) ] new-like ; inline
-
-: (3append) ( seq1 seq2 seq3 exemplar -- newseq )
-    >r pick length pick length pick length + + r> [
-        [ >r pick length pick length + r> copy ]
-        [ ((append)) ] bi
-    ] new-like ; inline
 
 PRIVATE>
 
-: append ( seq1 seq2 -- newseq ) over (append) ;
+: append-as ( seq1 seq2 exemplar -- newseq )
+    [ over length over length + ] dip
+    [ (append) ] new-like ; inline
+
+: 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
+    [ pick length pick length pick length + + ] dip [
+        [ [ pick length pick length + ] dip copy ]
+        [ (append) ] bi
+    ] new-like ; inline
+
+: append ( seq1 seq2 -- newseq ) over append-as ;
 
 : prepend ( seq1 seq2 -- newseq ) swap append ; inline
 
-: 3append ( seq1 seq2 seq3 -- newseq ) pick (3append) ;
+: 3append ( seq1 seq2 seq3 -- newseq ) pick 3append-as ;
 
 : change-nth ( i seq quot -- )
     [ >r nth r> call ] 3keep drop set-nth ; inline
@@ -696,7 +696,7 @@ PRIVATE>
     ] dip compose if ; inline
 
 : pad-left ( seq n elt -- padded )
-    [ swap dup (append) ] padding ;
+    [ swap dup append-as ] padding ;
 
 : pad-right ( seq n elt -- padded )
     [ append ] padding ;
