@@ -132,7 +132,7 @@ M: url present
         { [ dup empty? ] [ drop ] }
         { [ over "/" tail? ] [ append ] }
         { [ "/" pick start not ] [ nip ] }
-        [ [ "/" last-split1 drop "/" ] dip 3append ]
+        [ [ "/" split1-last drop "/" ] dip 3append ]
     } cond ;
 
 PRIVATE>
