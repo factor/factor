@@ -202,13 +202,12 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "call-next-method" [
-        current-class get current-generic get
-        2dup [ word? ] both? [
-            [ literalize parsed ] bi@
+        current-method get [
+            literalize parsed
             \ (call-next-method) parsed
         ] [
             not-in-a-method-error
-        ] if
+        ] if*
     ] define-syntax
     
     "initial:" "syntax" lookup define-symbol

@@ -106,3 +106,8 @@ M: quit-responder call-responder*
     "tools.deploy.test.6" shake-and-bake
     run-temp-image
 ] unit-test
+
+[ ] [
+    "tools.deploy.test.7" shake-and-bake
+    run-temp-image
+] unit-test

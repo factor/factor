@@ -83,7 +83,7 @@ M: object add-breakpoint ;
 : (step-into-continuation) ( -- )
     continuation callstack >>call break ;
 
-: (step-into-call-next-method) ( class generic -- )
+: (step-into-call-next-method) ( method -- )
     next-method-quot (step-into-quot) ;
 
 ! Messages sent to walker thread
