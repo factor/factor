@@ -168,5 +168,5 @@ long getpagesize(void)
 
 void sleep_micros(DWORD usec)
 {
-	Sleep(msec / 1000);
+	Sleep(usec);
 }
