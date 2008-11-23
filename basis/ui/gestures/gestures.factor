@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs kernel math models namespaces
-make sequences words strings system hashtables math.parser
-math.vectors classes.tuple classes  boxes calendar
+USING: accessors arrays assocs kernel math math.order models
+namespaces make sequences words strings system hashtables
+math.parser math.vectors classes.tuple classes boxes calendar
 alarms symbols combinators sets columns fry deques ui.gadgets ;
 IN: ui.gestures
 
@@ -109,7 +109,7 @@ SYMBOL: hand-click#
 SYMBOL: hand-last-button
 SYMBOL: hand-last-time
 0 hand-last-button set-global
-0 hand-last-time set-global
+<zero> hand-last-time set-global
 
 SYMBOL: hand-buttons
 V{ } clone hand-buttons set-global
