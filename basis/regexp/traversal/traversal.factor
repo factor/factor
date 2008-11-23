@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators kernel math math.ranges
+USING: accessors assocs combinators kernel math
 quotations sequences regexp.parser regexp.classes fry arrays
 combinators.short-circuit regexp.utils prettyprint regexp.nfa
 shuffle ;
@@ -144,7 +144,10 @@ M: capture-group-off flag-action ( dfa-traverser flag -- )
         [ increment-state do-match ] when*
     ] unless ;
 
-: return-match ( dfa-traverser -- interval/f )
+: return-match ( dfa-traverser -- slice/f )
     dup matches>>
     [ drop f ]
-    [ [ start-index>> ] [ peek ] bi* 1 <range> ] if-empty ;
+    [
+        [ [ text>> ] [ start-index>> ] bi ]
+        [ peek ] bi* rot <slice>
+    ] if-empty ;
