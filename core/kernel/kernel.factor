@@ -53,11 +53,23 @@ DEFER: if
     pick [ roll 2drop call ] [ 2nip call ] if ; inline
 
 ! Slippers
-: slip ( quot x -- x ) [ call ] dip ;
+: slip ( quot x -- x )
+    #! 'slip' and 'dip' can be defined in terms of each other
+    #! because the JIT special-cases a 'dip' preceeded by
+    #! a literal quotation.
+    [ call ] dip ;
 
-: 2slip ( quot x y -- x y ) [ call ] 2dip ;
+: 2slip ( quot x y -- x y )
+    #! '2slip' and '2dip' can be defined in terms of each other
+    #! because the JIT special-cases a '2dip' preceeded by
+    #! a literal quotation.
+    [ call ] 2dip ;
 
-: 3slip ( quot x y z -- x y z ) [ call ] 3dip ;
+: 3slip ( quot x y z -- x y z )
+    #! '3slip' and '3dip' can be defined in terms of each other
+    #! because the JIT special-cases a '3dip' preceeded by
+    #! a literal quotation.
+    [ call ] 3dip ;
 
 : dip ( x quot -- x ) swap slip ; inline
 
