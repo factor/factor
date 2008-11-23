@@ -225,7 +225,7 @@ ERROR: invalid-range a b ;
 
 : handle-left-brace ( -- )
     parse-repetition
-    >r 2dup [ [ 0 < [ invalid-range ] when ] when* ] bi@ r>
+    [ 2dup [ [ 0 < [ invalid-range ] when ] when* ] bi@ ] dip
     [
         2dup and [ from-m-to-n ]
         [ [ nip at-most-n ] [ at-least-n ] if* ] if
