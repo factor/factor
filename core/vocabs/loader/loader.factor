@@ -95,9 +95,9 @@ PRIVATE>
         "To define one, refer to \\ MAIN: help" print
     ] ?if ;
 
-<PRIVATE
-
 SYMBOL: blacklist
+
+<PRIVATE
 
 : add-to-blacklist ( error vocab -- )
     vocab-name blacklist get dup [ set-at ] [ 3drop ] if ;
