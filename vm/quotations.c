@@ -54,6 +54,27 @@ bool jit_fast_dispatch_p(F_ARRAY *array, CELL i)
 		&& array_nth(array,i + 1) == userenv[JIT_DISPATCH_WORD];
 }
 
+bool jit_fast_dip_p(F_ARRAY *array, CELL i)
+{
+	return (i + 2) <= array_capacity(array)
+		&& type_of(array_nth(array,i)) == QUOTATION_TYPE
+		&& array_nth(array,i + 1) == userenv[JIT_DIP_WORD];
+}
+
+bool jit_fast_2dip_p(F_ARRAY *array, CELL i)
+{
+	return (i + 2) <= array_capacity(array)
+		&& type_of(array_nth(array,i)) == QUOTATION_TYPE
+		&& array_nth(array,i + 1) == userenv[JIT_2DIP_WORD];
+}
+
+bool jit_fast_3dip_p(F_ARRAY *array, CELL i)
+{
+	return (i + 2) <= array_capacity(array)
+		&& type_of(array_nth(array,i)) == QUOTATION_TYPE
+		&& array_nth(array,i + 1) == userenv[JIT_3DIP_WORD];
+}
+
 bool jit_ignore_declare_p(F_ARRAY *array, CELL i)
 {
 	return (i + 1) < array_capacity(array)
@@ -113,6 +134,13 @@ bool jit_stack_frame_p(F_ARRAY *array)
 		{
 			F_WORD *word = untag_object(obj);
 			if(word->subprimitive == F && obj != userenv[JIT_DECLARE_WORD])
+				return true;
+		}
+		else if(type_of(obj) == QUOTATION_TYPE)
+		{
+			if(jit_fast_dip_p(array,i)
+				|| jit_fast_2dip_p(array,i)
+				|| jit_fast_3dip_p(array,i))
 				return true;
 		}
 	}
@@ -230,6 +258,30 @@ void jit_compile(CELL quot, bool relocate)
 				i += 2;
 
 				tail_call = true;
+				break;
+			}
+			else if(jit_fast_dip_p(untag_object(array),i))
+			{
+				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
+				EMIT(userenv[JIT_DIP],literals_count - 1);
+
+				i++;
+				break;
+			}
+			else if(jit_fast_2dip_p(untag_object(array),i))
+			{
+				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
+				EMIT(userenv[JIT_2DIP],literals_count - 1);
+
+				i++;
+				break;
+			}
+			else if(jit_fast_3dip_p(untag_object(array),i))
+			{
+				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
+				EMIT(userenv[JIT_3DIP],literals_count - 1);
+
+				i++;
 				break;
 			}
 		case ARRAY_TYPE:
@@ -364,6 +416,24 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				COUNT(userenv[JIT_IF_JUMP],i)
 
 				tail_call = true;
+				break;
+			}
+			else if(jit_fast_dip_p(untag_object(array),i))
+			{
+				i++;
+				COUNT(userenv[JIT_DIP],i)
+				break;
+			}
+			else if(jit_fast_2dip_p(untag_object(array),i))
+			{
+				i++;
+				COUNT(userenv[JIT_2DIP],i)
+				break;
+			}
+			else if(jit_fast_3dip_p(untag_object(array),i))
+			{
+				i++;
+				COUNT(userenv[JIT_3DIP],i)
 				break;
 			}
 		case ARRAY_TYPE:

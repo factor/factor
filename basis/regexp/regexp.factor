@@ -3,7 +3,7 @@
 USING: accessors combinators kernel math sequences
 sets assocs prettyprint.backend make lexer namespaces parser
 arrays fry regexp.backend regexp.utils regexp.parser regexp.nfa
-regexp.dfa regexp.traversal regexp.transition-tables ;
+regexp.dfa regexp.traversal regexp.transition-tables splitting ;
 IN: regexp
 
 : default-regexp ( string -- regexp )
@@ -52,27 +52,25 @@ IN: regexp
         [ 3drop drop f f ] [ drop [ 1+ ] dip match-range ] if
     ] if ;
 
-: first-match ( string regexp -- pair/f )
+: first-match ( string regexp -- slice/f )
     dupd 0 swap match-range rot over [ <slice> ] [ 3drop f ] if ;
 
 : re-cut ( string regexp -- end/f start )
     dupd first-match
-    [ [ second tail-slice ] [ first head ] 2bi ]
-    [ "" like f swap ]
-    if* ;
+    [ split1-slice swap ] [ "" like f swap ] if* ;
 
 : re-split ( string regexp -- seq )
-    [ dup ] swap '[ _ re-cut ] [ ] produce nip ;
+    [ dup length 0 > ] swap '[ _ re-cut ] [ ] produce nip ;
 
 : re-replace ( string regexp replacement -- result )
     [ re-split ] dip join ;
 
 : next-match ( string regexp -- end/f match/f )
     dupd first-match dup
-    [ [ length 1+ tail-slice ] keep ] [ 2drop f f ] if ;
+    [ [ split1-slice nip ] keep ] [ 2drop f f ] if ;
 
 : all-matches ( string regexp -- seq )
-    [ dup ] swap '[ _ next-match ] [ ] produce nip ;
+    [ dup ] swap '[ _ next-match ] [ ] produce nip harvest ;
 
 : count-matches ( string regexp -- n )
     all-matches length 1- ;

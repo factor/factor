@@ -7,7 +7,7 @@ SYMBOL: time
 
 : (time-thread) ( -- )
     now time get set-model
-    1000 sleep (time-thread) ;
+    1 seconds sleep (time-thread) ;
 
 : time-thread ( -- )
     [

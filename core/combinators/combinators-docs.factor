@@ -74,7 +74,7 @@ HELP: spread
     { $code
         "! Equivalent"
         "{ [ p ] [ q ] [ r ] [ s ] } spread"
-        ">r >r >r p r> q r> r r> s"
+        "[ [ [ p ] dip q ] dip r ] dip s"
     }
 } ;
 

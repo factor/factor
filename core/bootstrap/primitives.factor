@@ -129,8 +129,7 @@ bootstrapping? on
     [ "slots" set-word-prop ] [ define-accessors ] 2bi ;
 
 : define-builtin ( symbol slotspec -- )
-    >r [ define-builtin-predicate ] keep
-    r> define-builtin-slots ;
+    [ [ define-builtin-predicate ] keep ] dip define-builtin-slots ;
 
 "fixnum" "math" create register-builtin
 "bignum" "math" create register-builtin
@@ -327,9 +326,7 @@ tuple
     [ ]
     [
         [
-            \ >r ,
-            callable instance-check-quot %
-            \ r> ,
+            callable instance-check-quot [ dip ] curry %
             callable instance-check-quot %
             tuple-layout ,
             \ <tuple-boa> ,
@@ -389,7 +386,7 @@ tuple
 
 ! Primitive words
 : make-primitive ( word vocab n -- )
-    >r create dup reset-word r>
+    [ create dup reset-word ] dip
     [ do-primitive ] curry [ ] like define ;
 
 {
@@ -460,7 +457,7 @@ tuple
     { "exit" "system" }
     { "data-room" "memory" }
     { "code-room" "memory" }
-    { "millis" "system" }
+    { "micros" "system" }
     { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
     { "dlsym" "alien" }
@@ -533,7 +530,7 @@ tuple
     { "unimplemented" "kernel.private" }
     { "gc-reset" "memory" }
 }
-[ >r first2 r> make-primitive ] each-index
+[ [ first2 ] dip make-primitive ] each-index
 
 ! Bump build number
 "build" "kernel" create build 1+ 1quotation define

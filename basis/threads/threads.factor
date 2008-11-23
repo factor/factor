@@ -93,7 +93,7 @@ PRIVATE>
     {
         { [ run-queue deque-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
-        [ sleep-queue heap-peek nip millis [-] ]
+        [ sleep-queue heap-peek nip micros [-] ]
     } cond ;
 
 DEFER: stop
@@ -106,7 +106,7 @@ DEFER: stop
 
 : expire-sleep? ( heap -- ? )
     dup heap-empty?
-    [ drop f ] [ heap-peek nip millis <= ] if ;
+    [ drop f ] [ heap-peek nip micros <= ] if ;
 
 : expire-sleep ( thread -- )
     f >>sleep-entry resume ;
@@ -184,7 +184,7 @@ M: f sleep-until
 GENERIC: sleep ( dt -- )
 
 M: real sleep
-    millis + >integer sleep-until ;
+    micros + >integer sleep-until ;
 
 : interrupt ( thread -- )
     dup state>> [

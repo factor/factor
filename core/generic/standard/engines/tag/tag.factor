@@ -26,7 +26,7 @@ C: <lo-tag-dispatch-engine> lo-tag-dispatch-engine
 
 M: lo-tag-dispatch-engine engine>quot
     methods>> engines>quots*
-    [ >r lo-tag-number r> ] assoc-map
+    [ [ lo-tag-number ] dip ] assoc-map
     [
         picker % [ tag ] % [
             sort-tags linear-dispatch-quot
@@ -53,13 +53,13 @@ C: <hi-tag-dispatch-engine> hi-tag-dispatch-engine
 
 M: hi-tag-dispatch-engine engine>quot
     methods>> engines>quots*
-    [ >r hi-tag-number r> ] assoc-map
+    [ [ hi-tag-number ] dip ] assoc-map
     [
         picker % hi-tag-quot % [
             sort-tags linear-dispatch-quot
         ] [
             num-tags get , \ fixnum-fast ,
-            [ >r num-tags get - r> ] assoc-map
+            [ [ num-tags get - ] dip ] assoc-map
             num-hi-tags direct-dispatch-quot
         ] if-small? %
     ] [ ] make ;

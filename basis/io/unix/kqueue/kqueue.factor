@@ -94,7 +94,7 @@ M: kqueue-mx unregister-io-task ( task mx -- )
 : handle-kevents ( mx n -- )
     [ over events>> kevent-nth handle-kevent ] with each ;
 
-M: kqueue-mx wait-for-events ( ms mx -- )
+M: kqueue-mx wait-for-events ( us mx -- )
     swap dup [ make-timespec ] when
     dupd wait-kevent handle-kevents ;
 

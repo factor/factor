@@ -10,7 +10,7 @@ IN: parser
 
 : location ( -- loc )
     file get lexer get line>> 2dup and
-    [ >r path>> r> 2array ] [ 2drop f ] if ;
+    [ [ path>> ] dip 2array ] [ 2drop f ] if ;
 
 : save-location ( definition -- )
     location remember-definition ;
@@ -140,7 +140,7 @@ ERROR: staging-violation word ;
     } cond ;
 
 : (parse-until) ( accum end -- accum )
-    dup >r parse-step [ r> (parse-until) ] [ r> drop ] if ;
+    [ parse-step ] keep swap [ (parse-until) ] [ drop ] if ;
 
 : parse-until ( end -- vec )
     100 <vector> swap (parse-until) ;
@@ -156,7 +156,7 @@ ERROR: staging-violation word ;
     lexer-factory get call (parse-lines) ;
 
 : parse-literal ( accum end quot -- accum )
-    >r parse-until r> call parsed ; inline
+    [ parse-until ] dip call parsed ; inline
 
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;

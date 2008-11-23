@@ -24,7 +24,7 @@ M: null-encoding decode-char drop stream-read1 ;
     ] unless ;
 
 : map-last ( seq quot -- seq )
-    >r dup length <reversed> [ zero? ] r> compose 2map ; inline
+    [ dup length <reversed> ] dip [ 0 = ] prepose 2map ; inline
 
 PRIVATE>
 
@@ -75,7 +75,7 @@ M: growable stream-read-partial
     >sbuf dup reverse-here null-encoding <decoder> ;
 
 : with-string-reader ( str quot -- )
-    >r <string-reader> r> with-input-stream ; inline
+    [ <string-reader> ] dip with-input-stream ; inline
 
 INSTANCE: growable plain-writer
 

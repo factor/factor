@@ -167,7 +167,9 @@ void print_stack_frame(F_STACK_FRAME *frame)
 	print_obj(frame_scan(frame));
 	print_string("\n");
 	print_cell_hex((CELL)frame_executing(frame));
+	print_string(" ");
 	print_cell_hex((CELL)frame->xt);
+	print_string("\n");
 }
 
 void print_callstack(void)

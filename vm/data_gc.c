@@ -793,7 +793,7 @@ void garbage_collection(CELL gen,
 		return;
 	}
 
-	s64 start = current_millis();
+	s64 start = current_micros();
 
 	performing_gc = true;
 	growing_data_heap = growing_data_heap_;
@@ -860,7 +860,7 @@ void garbage_collection(CELL gen,
 	while(scan < newspace->here)
 		scan = collect_next(scan);
 
-	CELL gc_elapsed = (current_millis() - start);
+	CELL gc_elapsed = (current_micros() - start);
 
 	end_gc(gc_elapsed);
 
@@ -887,14 +887,14 @@ void primitive_gc_stats(void)
 	GROWABLE_ARRAY(stats);
 
 	CELL i;
-	CELL total_gc_time = 0;
+	u64 total_gc_time = 0;
 
 	for(i = 0; i < MAX_GEN_COUNT; i++)
 	{
 		F_GC_STATS *s = &gc_stats[i];
 		GROWABLE_ARRAY_ADD(stats,allot_cell(s->collections));
-		GROWABLE_ARRAY_ADD(stats,allot_cell(s->gc_time));
-		GROWABLE_ARRAY_ADD(stats,allot_cell(s->max_gc_time));
+		GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(s->gc_time)));
+		GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(s->max_gc_time)));
 		GROWABLE_ARRAY_ADD(stats,allot_cell(s->collections == 0 ? 0 : s->gc_time / s->collections));
 		GROWABLE_ARRAY_ADD(stats,allot_cell(s->object_count));
 		GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(s->bytes_copied)));
@@ -902,7 +902,7 @@ void primitive_gc_stats(void)
 		total_gc_time += s->gc_time;
 	}
 
-	GROWABLE_ARRAY_ADD(stats,allot_cell(total_gc_time));
+	GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(total_gc_time)));
 	GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(cards_scanned)));
 	GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(decks_scanned)));
 	GROWABLE_ARRAY_ADD(stats,allot_cell(code_heap_scans));

@@ -1,13 +1,13 @@
 #include "master.h"
 
-s64 current_millis(void)
+s64 current_micros(void)
 {
 	SYSTEMTIME st;
 	FILETIME ft;
 	GetSystemTime(&st);
 	SystemTimeToFileTime(&st, &ft);
 	return (((s64)ft.dwLowDateTime
-		| (s64)ft.dwHighDateTime<<32) - EPOCH_OFFSET) / 10000;
+		| (s64)ft.dwHighDateTime<<32) - EPOCH_OFFSET) / 10;
 }
 
 char *strerror(int err)

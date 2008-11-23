@@ -303,7 +303,7 @@ M: string other-execute? ( path -- ? ) OTHER-EXECUTE file-mode? ;
     dup length [ over [ pick set-timeval-nth ] [ 2drop ] if ] 2each ;
 
 : timestamp>timeval ( timestamp -- timeval )
-    unix-1970 time- duration>milliseconds make-timeval ;
+    unix-1970 time- duration>microseconds make-timeval ;
 
 : timestamps>byte-array ( timestamps -- byte-array )
     [ dup [ timestamp>timeval ] when ] map make-timeval-array ;

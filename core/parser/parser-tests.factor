@@ -498,3 +498,5 @@ DEFER: blah
 [ error>> error>> def>> \ blah eq? ] must-fail-with
 
 [ ] [ f lexer set f file set "Hello world" note. ] unit-test
+
+[ "CHAR: \\u9999999999999" eval ] must-fail

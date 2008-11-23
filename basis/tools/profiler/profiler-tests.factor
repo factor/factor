@@ -11,7 +11,7 @@ words ;
 
 [ ] [ [ 10 [ gc ] times ] profile ] unit-test
 
-[ ] [ [ 1000 sleep ] profile ] unit-test 
+[ ] [ [ 1000000 sleep ] profile ] unit-test 
 
 [ ] [ profile. ] unit-test
 

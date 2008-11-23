@@ -49,7 +49,7 @@ void ffi_dlopen(F_DLL *dll);
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);
 void ffi_dlclose(F_DLL *dll);
 
-void sleep_millis(DWORD msec);
+void sleep_micros(DWORD msec);
 
 INLINE void init_signals(void) {}
 INLINE void early_init(void) {}
@@ -57,5 +57,5 @@ const F_CHAR *vm_executable_path(void);
 const F_CHAR *default_image_path(void);
 long getpagesize (void);
 
-s64 current_millis(void);
+s64 current_micros(void);
 

@@ -11,7 +11,7 @@ math.parser ;
 
 [ { 1 4 9 } ] [ { 1 2 3 } [ sq ] parallel-map ] unit-test
 
-[ { 1 4 9 } ] [ { 1 2 3 } [ 1000 random sleep sq ] parallel-map ] unit-test
+[ { 1 4 9 } ] [ { 1 2 3 } [ 1000000 random sleep sq ] parallel-map ] unit-test
 
 [ { 1 2 3 } [ dup 2 mod 0 = [ "Even" throw ] when ] parallel-map ]
 [ error>> "Even" = ] must-fail-with
