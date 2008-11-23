@@ -210,7 +210,7 @@ M: broadcast-forward forward-message
 GENERIC: process-message ( irc-message -- )
 M: object      process-message drop ; 
 M: logged-in   process-message
-    name>> f irc> [ (>>is-ready) ] [ (>>nick) ] [ chats>> ] tri
+    name>> t irc> [ (>>is-ready) ] [ (>>nick) ] [ chats>> ] tri
     values [ initialize-chat ] each ;
 M: ping        process-message trailing>> /PONG ;
 M: nick-in-use process-message name>> "_" append /NICK ;
