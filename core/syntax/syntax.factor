@@ -62,7 +62,7 @@ IN: bootstrap.syntax
     "CHAR:" [
         scan {
             { [ dup length 1 = ] [ first ] }
-            { [ "\\" ?head ] [ next-escape drop ] }
+            { [ "\\" ?head ] [ next-escape >string "" assert= ] }
             [ name>char-hook get call ]
         } cond parsed
     ] define-syntax
