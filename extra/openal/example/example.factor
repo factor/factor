@@ -2,17 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 IN: openal.example
-USING: openal kernel alien threads sequences ;
+USING: openal kernel alien threads sequences calendar ;
 
 : play-hello ( -- )
   init-openal
   1 gen-sources
   first dup AL_BUFFER  alutCreateBufferHelloWorld set-source-param
   source-play
-  1000 sleep ;
+  1000 milliseconds sleep ;
   
 : (play-file) ( source -- )
-  100 sleep
+  100 milliseconds sleep
   dup source-playing? [ (play-file) ] [ drop ] if ;
 
 : play-file ( filename -- )

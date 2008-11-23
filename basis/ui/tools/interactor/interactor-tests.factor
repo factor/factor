@@ -38,7 +38,7 @@ tools.test kernel calendar parser accessors calendar io ;
 
 [ ] [ [ "interactor" get stream-read-quot drop ] "B" spawn drop ] unit-test
 
-[ ] [ 1000 sleep ] unit-test
+[ ] [ 1 seconds sleep ] unit-test
 
 [ ] [ "interactor" get interactor-eof ] unit-test
 
@@ -57,11 +57,11 @@ tools.test kernel calendar parser accessors calendar io ;
     ] in-thread
 ] unit-test
 
-[ ] [ 100 sleep ] unit-test
+[ ] [ 100 milliseconds sleep ] unit-test
 
 [ ] [ "interactor" get evaluate-input ] unit-test
 
-[ ] [ 100 sleep ] unit-test
+[ ] [ 100 milliseconds sleep ] unit-test
     
 [ ] [ "interactor" get interactor-eof ] unit-test
 
@@ -80,7 +80,7 @@ tools.test kernel calendar parser accessors calendar io ;
     ] in-thread
 ] unit-test
 
-[ ] [ 100 sleep ] unit-test
+[ ] [ 100 milliseconds sleep ] unit-test
 
 [ ] [ "interactor" get evaluate-input ] unit-test
 

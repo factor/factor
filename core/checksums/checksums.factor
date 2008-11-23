@@ -12,14 +12,17 @@ GENERIC: checksum-stream ( stream checksum -- value )
 
 GENERIC: checksum-lines ( lines checksum -- value )
 
-M: checksum checksum-bytes >r binary <byte-reader> r> checksum-stream ;
+M: checksum checksum-bytes
+    [ binary <byte-reader> ] dip checksum-stream ;
 
-M: checksum checksum-stream >r contents r> checksum-bytes ;
+M: checksum checksum-stream
+    [ contents ] dip checksum-bytes ;
 
-M: checksum checksum-lines >r B{ CHAR: \n } join r> checksum-bytes ;
+M: checksum checksum-lines
+    [ B{ CHAR: \n } join ] dip checksum-bytes ;
 
 : checksum-file ( path checksum -- value )
-    >r binary <file-reader> r> checksum-stream ;
+    [ binary <file-reader> ] dip checksum-stream ;
 
 : hex-string ( seq -- str )
     [ >hex 2 CHAR: 0 pad-left ] { } map-as concat ;

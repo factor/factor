@@ -67,7 +67,7 @@ M: c-io-backend init-io ;
 
 M: c-io-backend (init-stdio) init-c-stdio ;
 
-M: c-io-backend io-multiplex 60 60 * 1000 * or (sleep) ;
+M: c-io-backend io-multiplex 60 60 * 1000 * 1000 * or (sleep) ;
 
 M: c-io-backend (file-reader)
     "rb" fopen <c-reader> ;

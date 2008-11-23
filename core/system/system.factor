@@ -65,3 +65,5 @@ PRIVATE>
 ] "system" add-init-hook
 
 : embedded? ( -- ? ) 15 getenv ;
+
+: millis ( -- ms ) micros 1000 /i ;

@@ -24,4 +24,7 @@ M: callable infer ( quot -- effect )
 
 : forget-effects ( -- )
     forget-errors
-    all-words [ f "inferred-effect" set-word-prop ] each ;
+    all-words [
+        dup subwords [ f "inferred-effect" set-word-prop ] each
+        f "inferred-effect" set-word-prop
+    ] each ;

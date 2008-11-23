@@ -1,12 +1,13 @@
 USING: arrays kernel math opengl opengl.gl opengl.glu
-opengl.demo-support ui ui.gadgets ui.render threads accessors ;
+opengl.demo-support ui ui.gadgets ui.render threads accessors
+calendar ;
 IN: nehe.4
 
 TUPLE: nehe4-gadget < gadget rtri rquad thread quit? ;
 
 : width 256 ;
 : height 256 ;
-: redraw-interval 10 ;
+: redraw-interval 10 milliseconds ;
 
 : <nehe4-gadget> (  -- gadget )
   nehe4-gadget new-gadget

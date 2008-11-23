@@ -34,11 +34,11 @@ M: string length
     length>> ;
 
 M: string nth-unsafe
-    >r >fixnum r> string-nth ;
+    [ >fixnum ] dip string-nth ;
 
 M: string set-nth-unsafe
     dup reset-string-hashcode
-    >r >fixnum >r >fixnum r> r> set-string-nth ;
+    [ [ >fixnum ] dip >fixnum ] dip set-string-nth ;
 
 M: string clone
     (clone) [ clone ] change-aux ;

@@ -325,9 +325,15 @@ M: duration time-
 : timestamp>millis ( timestamp -- n )
     unix-1970 (time-) 1000 * >integer ;
 
+: micros>timestamp ( x -- timestamp )
+    >r unix-1970 r> microseconds time+ ;
+
+: timestamp>micros ( timestamp -- n )
+    unix-1970 (time-) 1000000 * >integer ;
+
 : gmt ( -- timestamp )
     #! GMT time, right now
-    unix-1970 millis milliseconds time+ ;
+    unix-1970 micros microseconds time+ ;
 
 : now ( -- timestamp ) gmt >local-time ;
 : hence ( duration -- timestamp ) now swap time+ ;
@@ -404,7 +410,7 @@ PRIVATE>
 : since-1970 ( duration -- timestamp )
     unix-1970 time+ >local-time ;
 
-M: timestamp sleep-until timestamp>millis sleep-until ;
+M: timestamp sleep-until timestamp>micros sleep-until ;
 
 M: duration sleep hence sleep-until ;
 

@@ -18,14 +18,14 @@ IN: splitting
 
 : split1 ( seq subseq -- before after )
     dup pick start dup [
-        [ >r over r> head -rot length ] keep + tail
+        [ [ over ] dip head -rot length ] keep + tail
     ] [
         2drop f
     ] if ;
 
 : split1-slice ( seq subseq -- before-slice after-slice )
     dup pick start dup [
-        [ >r over r> head-slice -rot length ] keep + tail-slice
+        [ [ over ] dip head-slice -rot length ] keep + tail-slice
     ] [
         2drop f
     ] if ;

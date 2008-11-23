@@ -43,10 +43,10 @@ M: growable set-length ( n seq -- )
     growable-check
     2dup length >= [
         2dup capacity >= [ over new-size over expand ] when
-        >r >fixnum r>
+        [ >fixnum ] dip
         over 1 fixnum+fast over (>>length)
     ] [
-        >r >fixnum r>
+        [ >fixnum ] dip
     ] if ; inline
 
 M: growable set-nth ensure set-nth-unsafe ;

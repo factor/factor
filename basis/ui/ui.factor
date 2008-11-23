@@ -4,7 +4,7 @@ USING: arrays assocs io kernel math models namespaces make
 prettyprint dlists deques sequences threads sequences words
 debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
 ui.gestures ui.backend ui.render continuations init combinators
-hashtables concurrency.flags sets accessors ;
+hashtables concurrency.flags sets accessors calendar ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -153,7 +153,7 @@ SYMBOL: ui-hook
     ] [ ui-error ] recover ;
 
 : ui-wait ( -- )
-    10 sleep ;
+    10 milliseconds sleep ;
 
 SYMBOL: ui-thread
 

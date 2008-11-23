@@ -365,12 +365,12 @@ HELP: unix-1970
 { $values { "timestamp" timestamp } }
 { $description "Outputs the beginning of UNIX time, or midnight, January 1, 1970." } ;
 
-HELP: millis>timestamp
+HELP: micros>timestamp
 { $values { "x" number } { "timestamp" timestamp } }
-{ $description "Converts a number of milliseconds into a timestamp value in GMT time." }
+{ $description "Converts a number of microseconds into a timestamp value in GMT time." }
 { $examples
     { $example "USING: accessors calendar prettyprint ;"
-               "1000 millis>timestamp year>> ."
+               "1000 micros>timestamp year>> ."
                "1970"
     }
 } ;

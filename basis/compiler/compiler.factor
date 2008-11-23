@@ -91,8 +91,8 @@ t compile-dependencies? set-global
     [
         dup crossref?
         [
-            dependencies get >alist
-            generic-dependencies get >alist
+            dependencies get
+            generic-dependencies get
             compiled-xref
         ] [ drop ] if
     ] tri ;

@@ -134,12 +134,12 @@ SYMBOL: modified-docs
             [
                 [
                     [ modified-sources ]
-                    [ vocab-source-loaded? ]
+                    [ vocab source-loaded?>> ]
                     [ vocab-source-path ]
                     tri (to-refresh)
                 ] [
                     [ modified-docs ]
-                    [ vocab-docs-loaded? ]
+                    [ vocab docs-loaded?>> ]
                     [ vocab-docs-path ]
                     tri (to-refresh)
                 ] bi
@@ -154,8 +154,8 @@ SYMBOL: modified-docs
 : do-refresh ( modified-sources modified-docs unchanged -- )
     unchanged-vocabs
     [
-        [ [ f swap set-vocab-source-loaded? ] each ]
-        [ [ f swap set-vocab-docs-loaded? ] each ] bi*
+        [ [ vocab f >>source-loaded? drop ] each ]
+        [ [ vocab f >>docs-loaded? drop ] each ] bi*
     ]
     [
         append prune
