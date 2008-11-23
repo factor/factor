@@ -29,7 +29,7 @@ IN: tools.time
     [
         nl
         {
-            "Total GC time (ms):"
+            "Total GC time (us):"
             "Cards scanned:"
             "Decks scanned:"
             "Code heap literal scans:"
