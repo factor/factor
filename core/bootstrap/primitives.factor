@@ -1,13 +1,13 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays generic hashtables
-hashtables.private io kernel math math.order namespaces make
-parser sequences strings vectors words quotations assocs layouts
-classes classes.builtin classes.tuple classes.tuple.private
-kernel.private vocabs vocabs.loader source-files definitions
-slots classes.union classes.intersection classes.predicate
-compiler.units bootstrap.image.private io.files accessors
-combinators ;
+hashtables.private io kernel math math.private math.order
+namespaces make parser sequences strings vectors words
+quotations assocs layouts classes classes.builtin classes.tuple
+classes.tuple.private kernel.private vocabs vocabs.loader
+source-files definitions slots classes.union
+classes.intersection classes.predicate compiler.units
+bootstrap.image.private io.files accessors combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -185,7 +185,11 @@ define-union-class
 ! A predicate class used for declarations
 "array-capacity" "sequences.private" create
 "fixnum" "math" lookup
-0 bootstrap-max-array-capacity <fake-bignum> [ between? ] 2curry
+[
+    [ dup 0 fixnum>= ] %
+    bootstrap-max-array-capacity <fake-bignum> [ fixnum<= ] curry ,
+    [ [ drop f ] if ] %
+] [ ] make
 define-predicate-class
 
 ! Catch-all class for providing a default method.
