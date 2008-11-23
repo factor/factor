@@ -35,7 +35,7 @@ ERROR: bad-alarm-frequency frequency ;
     [ time>> ] dip before=? ;
 
 : reschedule-alarm ( alarm -- )
-    dup [ swap interval>> time+ ] change-time register-alarm ;
+    dup [ swap interval>> time+ now max ] change-time register-alarm ;
 
 : call-alarm ( alarm -- )
     [ entry>> box> drop ]
