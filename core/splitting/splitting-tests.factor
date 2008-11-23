@@ -1,4 +1,4 @@
-USING: splitting tools.test kernel sequences arrays ;
+USING: splitting tools.test kernel sequences arrays strings ;
 IN: splitting.tests
 
 [ "hello" "world ." ] [ "hello world ." " " split1 ] unit-test
