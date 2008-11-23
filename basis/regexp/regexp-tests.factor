@@ -326,26 +326,26 @@ IN: regexp-tests
 ! "a(?#bcdefg)bcd" <regexp> "abcdefg" over first-match
 ! "a(?:bcdefg)" <regexp> "abcdefg" over first-match
 
-[ { 0 1 } ] [ "ac" "a(?!b)" <regexp> first-match ] unit-test
+[ "a" ] [ "ac" "a(?!b)" <regexp> first-match >string ] unit-test
 [ f ] [ "ab" "a(?!b)" <regexp> first-match ] unit-test
 
 ! "a(?<=b)" <regexp> "caba" over first-match
 
-[ { 0 1 } ] [ "ab" "a(?=b)(?=b)" <regexp> first-match ] unit-test
-[ { 1 2 } ] [ "ba" "a(?<=b)(?<=b)" <regexp> first-match ] unit-test
-[ { 1 2 } ] [ "cab" "a(?=b)(?<=c)" <regexp> first-match ] unit-test
+[ "a" ] [ "ab" "a(?=b)(?=b)" <regexp> first-match >string ] unit-test
+[ "a" ] [ "ba" "a(?<=b)(?<=b)" <regexp> first-match >string ] unit-test
+[ "a" ] [ "cab" "a(?=b)(?<=c)" <regexp> first-match >string ] unit-test
 
 ! capture group 1: "aaaa"  2: ""
 ! "aaaa" "(a*)(a*)" <regexp> match*
 ! "aaaa" "(a*)(a+)" <regexp> match*
 
-[ { 0 2 } ] [ "ab" "(a|ab)(bc)?" <regexp> first-match ] unit-test
-[ { 0 3 } ] [ "abc" "(a|ab)(bc)?" <regexp> first-match ] unit-test
+[ "ab" ] [ "ab" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
+[ "abc" ] [ "abc" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
 
-[ { 0 2 } ] [ "ab" "(ab|a)(bc)?" <regexp> first-match ] unit-test
-[ { 0 3 } ] [ "abc" "(ab|a)(bc)?" <regexp> first-match ] unit-test
+[ "ab" ] [ "ab" "(ab|a)(bc)?" <regexp> first-match >string ] unit-test
+[ "abc" ] [ "abc" "(ab|a)(bc)?" <regexp> first-match >string ] unit-test
 
-[ { 23 24 } ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match ] unit-test
+[ "b" ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match >string ] unit-test
 
 [ t ] [ "a:b" ".+:?" <regexp> matches? ] unit-test
 
