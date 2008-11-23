@@ -45,6 +45,7 @@ IN: regexp-tests
 ! Off by default.
 [ f ] [ "\n" "." <regexp> matches? ] unit-test
 [ t ] [ "\n" "(?s)." <regexp> matches? ] unit-test
+[ f ] [ "\n\n" "(?s).(?-s)." <regexp> matches? ] unit-test
 
 [ f ] [ "" ".+" <regexp> matches? ] unit-test
 [ t ] [ "a" ".+" <regexp> matches? ] unit-test
