@@ -113,7 +113,7 @@ compiled-generic-crossref global [ H{ } assoc-like ] change-at
     bi* 2bi ;
 
 : compiled-xref ( word dependencies generic-dependencies -- )
-    [ [ drop crossref? ] assoc-filter ] bi@
+    [ [ drop crossref? ] assoc-filter >alist f like ] bi@
     [ over ] dip
     [ "compiled-uses" compiled-crossref (compiled-xref) ]
     [ "compiled-generic-uses" compiled-generic-crossref (compiled-xref) ]
@@ -121,7 +121,7 @@ compiled-generic-crossref global [ H{ } assoc-like ] change-at
 
 : (compiled-unxref) ( word word-prop variable -- )
     [ [ [ dupd word-prop ] dip get remove-vertex* ] 2curry ]
-    [ drop [ f swap set-word-prop ] curry ]
+    [ drop [ remove-word-prop ] curry ]
     2bi bi ;
 
 : compiled-unxref ( word -- )
