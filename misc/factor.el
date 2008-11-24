@@ -109,49 +109,47 @@ buffer."
   :group 'factor
   :group 'faces)
 
-(defsubst factor--face (face) `((t ,(face-attr-construct face))))
-
-(defface factor-font-lock-parsing-word (factor--face font-lock-keyword-face)
+(defface factor-font-lock-parsing-word (face-default-spec font-lock-keyword-face)
   "Face for parsing words."
   :group 'factor-faces)
 
-(defface factor-font-lock-comment (factor--face font-lock-comment-face)
+(defface factor-font-lock-comment (face-default-spec font-lock-comment-face)
   "Face for comments."
   :group 'factor-faces)
 
-(defface factor-font-lock-string (factor--face font-lock-string-face)
+(defface factor-font-lock-string (face-default-spec font-lock-string-face)
   "Face for strings."
   :group 'factor-faces)
 
-(defface factor-font-lock-stack-effect (factor--face font-lock-comment-face)
+(defface factor-font-lock-stack-effect (face-default-spec font-lock-comment-face)
   "Face for stack effect specifications."
   :group 'factor-faces)
 
-(defface factor-font-lock-word-definition (factor--face font-lock-function-name-face)
+(defface factor-font-lock-word-definition (face-default-spec font-lock-function-name-face)
   "Face for word, generic or method being defined."
   :group 'factor-faces)
 
-(defface factor-font-lock-symbol-definition (factor--face font-lock-variable-name-face)
+(defface factor-font-lock-symbol-definition (face-default-spec font-lock-variable-name-face)
   "Face for name of symbol being defined."
   :group 'factor-faces)
 
-(defface factor-font-lock-vocabulary-name (factor--face font-lock-constant-face)
+(defface factor-font-lock-vocabulary-name (face-default-spec font-lock-constant-face)
   "Face for names of vocabularies in USE or USING."
   :group 'factor-faces)
 
-(defface factor-font-lock-type-definition (factor--face font-lock-type-face)
+(defface factor-font-lock-type-definition (face-default-spec font-lock-type-face)
   "Face for type (tuple) names."
   :group 'factor-faces)
 
-(defface factor-font-lock-constructor (factor--face font-lock-type-face)
+(defface factor-font-lock-constructor (face-default-spec font-lock-type-face)
   "Face for constructors (<foo>)."
   :group 'factor-faces)
 
-(defface factor-font-lock-setter-word (factor--face font-lock-function-name-face)
+(defface factor-font-lock-setter-word (face-default-spec font-lock-function-name-face)
   "Face for setter words (>>foo)."
   :group 'factor-faces)
 
-(defface factor-font-lock-parsing-word (factor--face font-lock-keyword-face)
+(defface factor-font-lock-parsing-word (face-default-spec font-lock-keyword-face)
   "Face for parsing words."
   :group 'factor-faces)
 
@@ -204,7 +202,7 @@ buffer."
 (defconst factor--regex-using-line "^USING: +\\([^;]*\\);")
 (defconst factor--regex-use-line "^USE: +\\(.*\\)$")
 
-(defconst factor-font-lock-keywords
+(defconst factor--font-lock-keywords
   `(("( .* )" . 'factor-font-lock-stack-effect)
     ("\\(P\\|SBUF\\)\"" 1 'factor-font-lock-parsing-word)
     ,@(mapcar #'(lambda (w) (cons (concat "\\(^\\| \\)\\(" w "\\)\\($\\| \\)")
@@ -502,17 +500,25 @@ buffer."
   (use-local-map factor-mode-map)
   (setq major-mode 'factor-mode)
   (setq mode-name "Factor")
+  ;; Font locking
   (set (make-local-variable 'comment-start) "! ")
+  (set (make-local-variable 'parse-sexp-lookup-properties) t)
   (set (make-local-variable 'font-lock-comment-face) 'factor-font-lock-comment)
   (set (make-local-variable 'font-lock-string-face) 'factor-font-lock-string)
   (set (make-local-variable 'font-lock-defaults)
-       `(factor-font-lock-keywords
+       `(factor--font-lock-keywords
          nil nil nil nil
          (font-lock-syntactic-keywords . ,factor--font-lock-syntactic-keywords)))
+
   (set-syntax-table factor-mode-syntax-table)
+  ;; Defun navigation
+  (setq defun-prompt-regexp "[^ :]+")
+  (set (make-local-variable 'open-paren-in-column-0-is-defun-start) t)
+  ;; Indentation
   (set (make-local-variable 'indent-line-function) 'factor--indent-line)
   (setq factor-indent-width (factor--guess-indent-width))
   (setq indent-tabs-mode nil)
+
   (run-hooks 'factor-mode-hook))
 
 (add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))
@@ -568,6 +574,7 @@ buffer."
                 "Generic word contract"
                 "Inputs and outputs"
                 "Parent topics:"
+                "See also"
                 "Syntax"
                 "Vocabulary"
                 "Warning"
@@ -578,7 +585,7 @@ buffer."
 
 (defconst factor--help-font-lock-keywords
   `((,factor--help-headlines-regexp . 'factor-font-lock-help-mode-headlines)
-    ,@factor-font-lock-keywords))
+    ,@factor--font-lock-keywords))
 
 (defun factor-help-mode ()
   "Major mode for displaying Factor help messages.
@@ -591,6 +598,7 @@ buffer."
   (set (make-local-variable 'font-lock-defaults)
        '(factor--help-font-lock-keywords t nil nil nil))
   (set (make-local-variable 'comint-redirect-subvert-readonly) t)
+  (set (make-local-variable 'comint-redirect-echo-input) nil)
   (set (make-local-variable 'view-no-disable-on-exit) t)
   (view-mode)
   (setq view-exit-action
@@ -602,11 +610,11 @@ buffer."
   (run-mode-hooks 'factor-help-mode-hook))
 
 (defun factor--listener-help-buffer ()
-  (set-buffer (get-buffer-create "*factor-help*"))
-  (let ((inhibit-read-only t))
-    (delete-region (point-min) (point-max)))
-  (factor-help-mode)
-  (current-buffer))
+  (with-current-buffer (get-buffer-create "*factor-help*")
+    (let ((inhibit-read-only t))
+      (delete-region (point-min) (point-max)))
+    (factor-help-mode)
+    (current-buffer)))
 
 (defvar factor--help-history nil)
 
@@ -622,7 +630,8 @@ buffer."
          (hb (factor--listener-help-buffer))
          (proc (factor--listener-process)))
     (comint-redirect-send-command-to-process cmd hb proc nil)
-    (pop-to-buffer hb)))
+    (pop-to-buffer hb)
+    (beginning-of-buffer hb)))
 
 (defun factor-see ()
   (interactive)
