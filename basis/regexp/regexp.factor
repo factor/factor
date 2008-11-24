@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel math sequences
+USING: accessors combinators kernel math sequences strings
 sets assocs prettyprint.backend make lexer namespaces parser
 arrays fry regexp.backend regexp.utils regexp.parser regexp.nfa
-regexp.dfa regexp.traversal regexp.transition-tables splitting ;
+regexp.dfa regexp.traversal regexp.transition-tables splitting
+sorting ;
 IN: regexp
 
 : default-regexp ( string -- regexp )
@@ -75,40 +76,7 @@ IN: regexp
 : count-matches ( string regexp -- n )
     all-matches length ;
 
-: initial-option ( regexp option -- regexp' )
-    over options>> conjoin ;
-
-: <regexp> ( string -- regexp )
-    default-regexp construct-regexp ;
-
-: <iregexp> ( string -- regexp )
-    default-regexp
-    case-insensitive initial-option
-    construct-regexp ;
-
-: <rregexp> ( string -- regexp )
-    default-regexp
-    reversed-regexp initial-option
-    construct-regexp ;
-
-: parsing-regexp ( accum end -- accum )
-    lexer get dup skip-blank
-    [ [ index-from dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
-    lexer get dup still-parsing-line?
-    [ (parse-token) ] [ drop f ] if
-    "i" = [ <iregexp> ] [ <regexp> ] if parsed ;
-
-: R! CHAR: ! parsing-regexp ; parsing
-: R" CHAR: " parsing-regexp ; parsing
-: R# CHAR: # parsing-regexp ; parsing
-: R' CHAR: ' parsing-regexp ; parsing
-: R( CHAR: ) parsing-regexp ; parsing
-: R/ CHAR: / parsing-regexp ; parsing
-: R@ CHAR: @ parsing-regexp ; parsing
-: R[ CHAR: ] parsing-regexp ; parsing
-: R` CHAR: ` parsing-regexp ; parsing
-: R{ CHAR: } parsing-regexp ; parsing
-: R| CHAR: | parsing-regexp ; parsing
+<PRIVATE
 
 : find-regexp-syntax ( string -- prefix suffix )
     {
@@ -125,14 +93,67 @@ IN: regexp
         { "R| "  "|"  }
     } swap [ subseq? not nip ] curry assoc-find drop ;
 
-: option? ( option regexp -- ? )
-    options>> key? ;
+ERROR: unknown-regexp-option option ;
+
+: option>ch ( option -- string )
+    {
+        { case-insensitive [ CHAR: i ] }
+        { multiline [ CHAR: m ] }
+        { reversed-regexp [ CHAR: r ] }
+        { dotall [ CHAR: s ] }
+        [ unknown-regexp-option ]
+    } case ;
+
+: ch>option ( ch -- option )
+    {
+        { CHAR: i [ case-insensitive ] }
+        { CHAR: m [ multiline ] }
+        { CHAR: r [ reversed-regexp ] }
+        { CHAR: s [ dotall ] }
+        [ unknown-regexp-option ]
+    } case ;
+
+: string>options ( string -- options )
+    [ ch>option dup ] H{ } map>assoc ;
+
+: options>string ( options -- string )
+    keys [ option>ch ] map natural-sort >string ;
+
+PRIVATE>
+
+: <optioned-regexp> ( string option-string -- regexp )
+    [ default-regexp ] [ string>options ] bi* >>options
+    construct-regexp ;
+
+: <regexp> ( string -- regexp ) "" <optioned-regexp> ;
+
+<PRIVATE
+
+: parsing-regexp ( accum end -- accum )
+    lexer get dup skip-blank
+    [ [ index-from dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
+    lexer get dup still-parsing-line?
+    [ (parse-token) ] [ drop f ] if
+    <optioned-regexp> parsed ;
+
+PRIVATE>
+
+: R! CHAR: ! parsing-regexp ; parsing
+: R" CHAR: " parsing-regexp ; parsing
+: R# CHAR: # parsing-regexp ; parsing
+: R' CHAR: ' parsing-regexp ; parsing
+: R( CHAR: ) parsing-regexp ; parsing
+: R/ CHAR: / parsing-regexp ; parsing
+: R@ CHAR: @ parsing-regexp ; parsing
+: R[ CHAR: ] parsing-regexp ; parsing
+: R` CHAR: ` parsing-regexp ; parsing
+: R{ CHAR: } parsing-regexp ; parsing
+: R| CHAR: | parsing-regexp ; parsing
 
 M: regexp pprint*
     [
         [
-            dup raw>>
-            dup find-regexp-syntax swap % swap % %
-            case-insensitive swap option? [ "i" % ] when
+            [ raw>> dup find-regexp-syntax swap % swap % % ]
+            [ options>> options>string % ] bi
         ] "" make
     ] keep present-text ;

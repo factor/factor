@@ -4,7 +4,7 @@ USING: accessors arrays assocs combinators io io.streams.string
 kernel math math.parser namespaces qualified sets
 quotations sequences splitting symbols vectors math.order
 unicode.categories strings regexp.backend regexp.utils
-unicode.case words ;
+unicode.case words locals ;
 IN: regexp.parser
 
 FROM: math.ranges => [a,b] ;
@@ -44,18 +44,21 @@ TUPLE: character-class-range from to ; INSTANCE: character-class-range node
 SINGLETON: epsilon INSTANCE: epsilon node
 SINGLETON: any-char INSTANCE: any-char node
 SINGLETON: any-char-no-nl INSTANCE: any-char-no-nl node
-SINGLETON: front-anchor INSTANCE: front-anchor node
-SINGLETON: back-anchor INSTANCE: back-anchor node
+SINGLETON: beginning-of-input INSTANCE: beginning-of-input node
+SINGLETON: end-of-input INSTANCE: end-of-input node
+SINGLETON: beginning-of-line INSTANCE: beginning-of-line node
+SINGLETON: end-of-line INSTANCE: end-of-line node
 
 TUPLE: option-on option ; INSTANCE: option-on node
 TUPLE: option-off option ; INSTANCE: option-off node
-SINGLETONS: unix-lines dotall multiline comments case-insensitive unicode-case reversed-regexp ;
+SINGLETONS: unix-lines dotall multiline comments case-insensitive
+unicode-case reversed-regexp ;
 
 SINGLETONS: letter-class LETTER-class Letter-class digit-class
 alpha-class non-newline-blank-class
 ascii-class punctuation-class java-printable-class blank-class
 control-character-class hex-digit-class java-blank-class c-identifier-class
-unmatchable-class ;
+terminator-class unmatchable-class word-boundary-class ;
 
 SINGLETONS: beginning-of-group end-of-group
 beginning-of-character-class end-of-character-class
@@ -231,20 +234,6 @@ ERROR: invalid-range a b ;
         [ [ nip at-most-n ] [ at-least-n ] if* ] if
     ] [ drop 0 max exactly-n ] if ;
 
-SINGLETON: beginning-of-input
-SINGLETON: end-of-input
-
-: newlines ( -- obj1 obj2 obj3 )
-    CHAR: \r <constant>
-    CHAR: \n <constant>
-    2dup 2array <concatenation> ;
-
-: beginning-of-line ( -- obj )
-    beginning-of-input newlines 4array <alternation> lookbehind boa ;
-
-: end-of-line ( -- obj )
-    end-of-input newlines 4array <alternation> lookahead boa ;
-
 : handle-front-anchor ( -- )
     get-multiline beginning-of-line beginning-of-input ? push-stack ;
 
@@ -281,13 +270,26 @@ ERROR: expected-posix-class ;
 : parse-control-character ( -- n ) read1 ;
 
 ERROR: bad-escaped-literals seq ;
-: parse-escaped-literals ( -- obj )
-    "\\E" read-until [ bad-escaped-literals ] unless
+
+: parse-til-E ( -- obj )
+    "\\E" read-until [ bad-escaped-literals ] unless ;
+    
+:: (parse-escaped-literals) ( quot: ( obj -- obj' ) -- obj )
+    parse-til-E
     drop1
     [ epsilon ] [
-        [ <constant> ] V{ } map-as
+        [ quot call <constant> ] V{ } map-as
         first|concatenation
-    ] if-empty ;
+    ] if-empty ; inline
+
+: parse-escaped-literals ( -- obj )
+    [ ] (parse-escaped-literals) ;
+
+: lower-case-literals ( -- obj )
+    [ ch>lower ] (parse-escaped-literals) ;
+
+: upper-case-literals ( -- obj )
+    [ ch>upper ] (parse-escaped-literals) ;
 
 : parse-escaped ( -- obj )
     read1
@@ -299,12 +301,12 @@ ERROR: bad-escaped-literals seq ;
         { CHAR: a [ HEX: 7 <constant> ] }
         { CHAR: e [ HEX: 1b <constant> ] }
 
-        { CHAR: d [ digit-class ] }
-        { CHAR: D [ digit-class <negation> ] }
-        { CHAR: s [ java-blank-class ] }
-        { CHAR: S [ java-blank-class <negation> ] }
         { CHAR: w [ c-identifier-class ] }
         { CHAR: W [ c-identifier-class <negation> ] }
+        { CHAR: s [ java-blank-class ] }
+        { CHAR: S [ java-blank-class <negation> ] }
+        { CHAR: d [ digit-class ] }
+        { CHAR: D [ digit-class <negation> ] }
 
         { CHAR: p [ parse-posix-class ] }
         { CHAR: P [ parse-posix-class <negation> ] }
@@ -313,13 +315,19 @@ ERROR: bad-escaped-literals seq ;
         { CHAR: 0 [ parse-octal <constant> ] }
         { CHAR: c [ parse-control-character ] }
 
-        ! { CHAR: b [ handle-word-boundary ] }
-        ! { CHAR: B [ handle-word-boundary <negation> ] }
-        ! { CHAR: A [ handle-beginning-of-input ] }
-        ! { CHAR: G [ end of previous match ] }
-        ! { CHAR: Z [ handle-end-of-input ] }
-        ! { CHAR: z [ handle-end-of-input ] } ! except for terminator
+        { CHAR: Q [ parse-escaped-literals ] }
 
+        ! { CHAR: b [ word-boundary-class ] }
+        ! { CHAR: B [ word-boundary-class <negation> ] }
+        ! { CHAR: A [ handle-beginning-of-input ] }
+        ! { CHAR: z [ handle-end-of-input ] }
+
+        ! { CHAR: Z [ handle-end-of-input ] } ! plus a final terminator
+
+        ! m//g mode
+        ! { CHAR: G [ end of previous match ] }
+
+        ! Group capture
         ! { CHAR: 1 [ CHAR: 1 <constant> ] }
         ! { CHAR: 2 [ CHAR: 2 <constant> ] }
         ! { CHAR: 3 [ CHAR: 3 <constant> ] }
@@ -330,7 +338,11 @@ ERROR: bad-escaped-literals seq ;
         ! { CHAR: 8 [ CHAR: 8 <constant> ] }
         ! { CHAR: 9 [ CHAR: 9 <constant> ] }
 
-        { CHAR: Q [ parse-escaped-literals ] }
+        ! Perl extensions
+        ! can't do \l and \u because \u is already a 4-hex
+        { CHAR: L [ lower-case-literals ] }
+        { CHAR: U [ upper-case-literals ] }
+
         [ <constant> ]
     } case ;
 
