@@ -18,6 +18,9 @@ SINGLETON: lookbehind-on INSTANCE: lookbehind-on traversal-flag
 SINGLETON: lookbehind-off INSTANCE: lookbehind-off traversal-flag
 SINGLETON: capture-group-on INSTANCE: capture-group-on traversal-flag
 SINGLETON: capture-group-off INSTANCE: capture-group-off traversal-flag
+SINGLETON: front-anchor INSTANCE: front-anchor traversal-flag
+SINGLETON: back-anchor INSTANCE: back-anchor traversal-flag
+SINGLETON: word-boundary INSTANCE: word-boundary traversal-flag
 
 : next-state ( regexp -- state )
     [ state>> ] [ [ 1+ ] change-state drop ] bi ;
@@ -135,7 +138,21 @@ M: non-capture-group nfa-node ( node -- )
 M: reluctant-kleene-star nfa-node ( node -- )
     term>> <kleene-star> nfa-node ;
 
-!
+
+: add-epsilon-flag ( flag -- )
+    eps literal-transition add-simple-entry add-traversal-flag ;
+
+M: beginning-of-line nfa-node ( node -- )
+    drop beginning-of-line add-epsilon-flag ;
+
+M: end-of-line nfa-node ( node -- )
+    drop end-of-line add-epsilon-flag ;
+
+M: beginning-of-input nfa-node ( node -- )
+    drop beginning-of-input add-epsilon-flag ;
+
+M: end-of-input nfa-node ( node -- )
+    drop end-of-input add-epsilon-flag ;
 
 M: negation nfa-node ( node -- )
     negation-mode inc

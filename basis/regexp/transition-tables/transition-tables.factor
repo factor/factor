@@ -40,7 +40,7 @@ TUPLE: transition-table transitions start-state final-states ;
     2dup [ to>> ] dip maybe-initialize-key
     [ [ to>> ] [ obj>> ] [ from>> ] tri ] dip
     2dup at* [ 2nip insert-at ]
-    [ drop >r >r H{ } clone [ insert-at ] keep r> r> set-at ] if ;
+    [ drop [ H{ } clone [ insert-at ] keep ] 2dip set-at ] if ;
 
 : add-transition ( transition transition-table -- )
     transitions>> set-transition ;
