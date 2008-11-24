@@ -3,7 +3,7 @@
 USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
 prettyprint calendar sequences db.sqlite math.intervals
-db.postgresql accessors random math.bitwise
+db.postgresql accessors random math.bitwise system
 math.ranges strings urls fry db.tuples.private ;
 IN: db.tuples.tests
 
@@ -26,7 +26,9 @@ IN: db.tuples.tests
 
 : test-postgresql ( quot -- )
     '[
-        [ ] [ postgresql-db _ with-db ] unit-test
+        os windows? cpu x86.64? and [
+            [ ] [ postgresql-db _ with-db ] unit-test
+        ] unless
     ] call ; inline
 
 ! These words leak resources, but are useful for interactivel testing 

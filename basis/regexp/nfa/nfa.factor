@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs grouping kernel regexp.backend
-locals math namespaces regexp.parser sequences state-tables fry
-quotations math.order math.ranges vectors unicode.categories
-regexp.utils regexp.transition-tables words sets ;
+locals math namespaces regexp.parser sequences fry quotations
+math.order math.ranges vectors unicode.categories regexp.utils
+regexp.transition-tables words sets ;
 IN: regexp.nfa
 
 SYMBOL: negation-mode
@@ -18,6 +18,12 @@ SINGLETON: lookbehind-on INSTANCE: lookbehind-on traversal-flag
 SINGLETON: lookbehind-off INSTANCE: lookbehind-off traversal-flag
 SINGLETON: capture-group-on INSTANCE: capture-group-on traversal-flag
 SINGLETON: capture-group-off INSTANCE: capture-group-off traversal-flag
+SINGLETON: front-anchor INSTANCE: front-anchor traversal-flag
+SINGLETON: back-anchor INSTANCE: back-anchor traversal-flag
+SINGLETON: word-boundary INSTANCE: word-boundary traversal-flag
+
+: add-global-flag ( flag -- )
+    current-regexp get nfa-table>> flags>> conjoin ;
 
 : next-state ( regexp -- state )
     [ state>> ] [ [ 1+ ] change-state drop ] bi ;
@@ -135,7 +141,25 @@ M: non-capture-group nfa-node ( node -- )
 M: reluctant-kleene-star nfa-node ( node -- )
     term>> <kleene-star> nfa-node ;
 
-!
+M: beginning-of-line nfa-node ( node -- )
+    drop 
+    eps literal-transition add-simple-entry
+    beginning-of-line add-global-flag ;
+
+M: end-of-line nfa-node ( node -- )
+    drop
+    eps literal-transition add-simple-entry
+    end-of-line add-global-flag ;
+
+M: beginning-of-input nfa-node ( node -- )
+    drop
+    eps literal-transition add-simple-entry
+    beginning-of-input add-global-flag ;
+
+M: end-of-input nfa-node ( node -- )
+    drop
+    eps literal-transition add-simple-entry
+    end-of-input add-global-flag ;
 
 M: negation nfa-node ( node -- )
     negation-mode inc

@@ -111,8 +111,7 @@ void clear_cards(CELL from, CELL to)
 	/* NOTE: reverse order due to heap layout. */
 	F_CARD *first_card = ADDR_TO_CARD(data_heap->generations[to].start);
 	F_CARD *last_card = ADDR_TO_CARD(data_heap->generations[from].end);
-	F_CARD *ptr;
-	for(ptr = first_card; ptr < last_card; ptr++) *ptr = 0;
+	memset(first_card,0,last_card - first_card);
 }
 
 void clear_decks(CELL from, CELL to)
@@ -120,8 +119,7 @@ void clear_decks(CELL from, CELL to)
 	/* NOTE: reverse order due to heap layout. */
 	F_DECK *first_deck = ADDR_TO_DECK(data_heap->generations[to].start);
 	F_DECK *last_deck = ADDR_TO_DECK(data_heap->generations[from].end);
-	F_DECK *ptr;
-	for(ptr = first_deck; ptr < last_deck; ptr++) *ptr = 0;
+	memset(first_deck,0,last_deck - first_deck);
 }
 
 void clear_allot_markers(CELL from, CELL to)
@@ -129,8 +127,7 @@ void clear_allot_markers(CELL from, CELL to)
 	/* NOTE: reverse order due to heap layout. */
 	F_CARD *first_card = ADDR_TO_ALLOT_MARKER(data_heap->generations[to].start);
 	F_CARD *last_card = ADDR_TO_ALLOT_MARKER(data_heap->generations[from].end);
-	F_CARD *ptr;
-	for(ptr = first_card; ptr < last_card; ptr++) *ptr = INVALID_ALLOT_MARKER;
+	memset(first_card,INVALID_ALLOT_MARKER,last_card - first_card);
 }
 
 void set_data_heap(F_DATA_HEAP *data_heap_)
@@ -303,21 +300,15 @@ void primitive_end_scan(void)
 /* Scan all the objects in the card */
 void collect_card(F_CARD *ptr, CELL gen, CELL here)
 {
-	CELL offset = CARD_OFFSET(ptr);
+	CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + CARD_OFFSET(ptr);
+	CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
 
-	if(offset != INVALID_ALLOT_MARKER)
-	{
-		if(offset & TAG_MASK)
-			critical_error("Bad card",(CELL)ptr);
+	if(here < card_end)
+		card_end = here;
 
-		CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + offset;
-		CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
+	collect_next_loop(card_scan,&card_end);
 
-		while(card_scan < card_end && card_scan < here)
-			card_scan = collect_next(card_scan);
-
-		cards_scanned++;
-	}
+	cards_scanned++;
 }
 
 void collect_card_deck(F_DECK *deck, CELL gen, F_CARD mask, F_CARD unmask)
@@ -497,11 +488,10 @@ void collect_roots(void)
 /* Given a pointer to oldspace, copy it to newspace */
 INLINE void *copy_untagged_object(void *pointer, CELL size)
 {
-	void *newpointer;
 	if(newspace->here + size >= newspace->end)
 		longjmp(gc_jmp,1);
 	allot_barrier(newspace->here);
-	newpointer = allot_zone(newspace,size);
+	void *newpointer = allot_zone(newspace,size);
 
 	F_GC_STATS *s = &gc_stats[collecting_gen];
 	s->object_count++;
@@ -571,6 +561,9 @@ the GC. Some types have a binary payload at the end (string, word, DLL) which
 we ignore. */
 CELL binary_payload_start(CELL pointer)
 {
+	F_TUPLE *tuple;
+	F_TUPLE_LAYOUT *layout;
+
 	switch(untag_header(get(pointer)))
 	{
 	/* these objects do not refer to other objects at all */
@@ -591,8 +584,21 @@ CELL binary_payload_start(CELL pointer)
 	case STRING_TYPE:
 		return sizeof(F_STRING);
 	/* everything else consists entirely of pointers */
+	case ARRAY_TYPE:
+		return array_size(array_capacity((F_ARRAY*)pointer));
+	case TUPLE_TYPE:
+		tuple = untag_object(pointer);
+		layout = untag_object(tuple->layout);
+		return tuple_size(layout);
+	case RATIO_TYPE:
+		return sizeof(F_RATIO);
+	case COMPLEX_TYPE:
+		return sizeof(F_COMPLEX);
+	case WRAPPER_TYPE:
+		return sizeof(F_WRAPPER);
 	default:
-		return unaligned_object_size(pointer);
+		critical_error("Invalid header",pointer);
+		return -1; /* can't happen */
 	}
 }
 
@@ -622,19 +628,15 @@ void do_code_slots(CELL scan)
 	}
 }
 
-/* This function is performance-critical */
-CELL collect_next(CELL scan)
+CELL collect_next_nursery(CELL scan)
 {
 	CELL *obj = (CELL *)scan;
 	CELL *end = (CELL *)(scan + binary_payload_start(scan));
 
-	obj++;
-
-	CELL newspace_start = newspace->start;
-	CELL newspace_end = newspace->end;
-
-	if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	if(obj != end)
 	{
+		obj++;
+
 		CELL nursery_start = nursery.start;
 		CELL nursery_end = nursery.end;
 
@@ -647,12 +649,24 @@ CELL collect_next(CELL scan)
 				*obj = copy_object(pointer);
 		}
 	}
-	else if(HAVE_AGING_P && collecting_gen == AGING)
-	{
-		F_ZONE *tenured = &data_heap->generations[TENURED];
 
-		CELL tenured_start = tenured->start;
-		CELL tenured_end = tenured->end;
+	return scan + untagged_object_size(scan);
+}
+
+CELL collect_next_aging(CELL scan)
+{
+	CELL *obj = (CELL *)scan;
+	CELL *end = (CELL *)(scan + binary_payload_start(scan));
+
+	if(obj != end)
+	{
+		obj++;
+
+		CELL tenured_start = data_heap->generations[TENURED].start;
+		CELL tenured_end = data_heap->generations[TENURED].end;
+
+		CELL newspace_start = newspace->start;
+		CELL newspace_end = newspace->end;
 
 		for(; obj < end; obj++)
 		{
@@ -664,23 +678,54 @@ CELL collect_next(CELL scan)
 				*obj = copy_object(pointer);
 		}
 	}
-	else if(collecting_gen == TENURED)
+
+	return scan + untagged_object_size(scan);
+}
+
+/* This function is performance-critical */
+CELL collect_next_tenured(CELL scan)
+{
+	CELL *obj = (CELL *)scan;
+	CELL *end = (CELL *)(scan + binary_payload_start(scan));
+
+	if(obj != end)
 	{
+		obj++;
+
+		CELL newspace_start = newspace->start;
+		CELL newspace_end = newspace->end;
+
 		for(; obj < end; obj++)
 		{
 			CELL pointer = *obj;
 
-			if(!immediate_p(pointer)
-				&& !(pointer >= newspace_start && pointer < newspace_end))
+			if(!immediate_p(pointer) && !(pointer >= newspace_start && pointer < newspace_end))
 				*obj = copy_object(pointer);
 		}
-
-		do_code_slots(scan);
 	}
-	else
-		critical_error("Bug in collect_next",0);
+
+	do_code_slots(scan);
 
 	return scan + untagged_object_size(scan);
+}
+
+void collect_next_loop(CELL scan, CELL *end)
+{
+	if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	{
+		while(scan < *end)
+			scan = collect_next_nursery(scan);
+	}
+	else if(HAVE_AGING_P && collecting_gen == AGING)
+	{
+		while(scan < *end)
+			scan = collect_next_aging(scan);
+	}
+	else if(collecting_gen == TENURED)
+	{
+		while(scan < *end)
+			scan = collect_next_tenured(scan);
+	}
 }
 
 INLINE void reset_generation(CELL i)
@@ -763,6 +808,10 @@ void end_gc(CELL gc_elapsed)
 		if(collecting_gen != NURSERY)
 			reset_generations(NURSERY,collecting_gen - 1);
 	}
+	else if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	{
+		nursery.here = nursery.start;
+	}
 	else
 	{
 		/* all generations up to and including the one
@@ -793,7 +842,7 @@ void garbage_collection(CELL gen,
 		return;
 	}
 
-	s64 start = current_millis();
+	s64 start = current_micros();
 
 	performing_gc = true;
 	growing_data_heap = growing_data_heap_;
@@ -857,10 +906,9 @@ void garbage_collection(CELL gen,
 		}
 	}
 
-	while(scan < newspace->here)
-		scan = collect_next(scan);
+	collect_next_loop(scan,&newspace->here);
 
-	CELL gc_elapsed = (current_millis() - start);
+	CELL gc_elapsed = (current_micros() - start);
 
 	end_gc(gc_elapsed);
 
@@ -887,14 +935,14 @@ void primitive_gc_stats(void)
 	GROWABLE_ARRAY(stats);
 
 	CELL i;
-	CELL total_gc_time = 0;
+	u64 total_gc_time = 0;
 
 	for(i = 0; i < MAX_GEN_COUNT; i++)
 	{
 		F_GC_STATS *s = &gc_stats[i];
 		GROWABLE_ARRAY_ADD(stats,allot_cell(s->collections));
-		GROWABLE_ARRAY_ADD(stats,allot_cell(s->gc_time));
-		GROWABLE_ARRAY_ADD(stats,allot_cell(s->max_gc_time));
+		GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(s->gc_time)));
+		GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(s->max_gc_time)));
 		GROWABLE_ARRAY_ADD(stats,allot_cell(s->collections == 0 ? 0 : s->gc_time / s->collections));
 		GROWABLE_ARRAY_ADD(stats,allot_cell(s->object_count));
 		GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(s->bytes_copied)));
@@ -902,7 +950,7 @@ void primitive_gc_stats(void)
 		total_gc_time += s->gc_time;
 	}
 
-	GROWABLE_ARRAY_ADD(stats,allot_cell(total_gc_time));
+	GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(total_gc_time)));
 	GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(cards_scanned)));
 	GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(decks_scanned)));
 	GROWABLE_ARRAY_ADD(stats,allot_cell(code_heap_scans));

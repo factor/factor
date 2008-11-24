@@ -21,28 +21,27 @@ M: object branch? drop f ;
     [ [ deep-map ] curry map ] [ drop ] if ; inline recursive
 
 : deep-filter ( obj quot: ( elt -- ? ) -- seq )
-    over >r
-    pusher >r deep-each r>
-    r> dup branch? [ like ] [ drop ] if ; inline recursive
+    over [ pusher [ deep-each ] dip ] dip
+    dup branch? [ like ] [ drop ] if ; inline recursive
 
-: deep-find-from ( obj quot: ( elt -- ? ) -- elt ? )
+: (deep-find) ( obj quot: ( elt -- ? ) -- elt ? )
     [ call ] 2keep rot [ drop t ] [
         over branch? [
-            f -rot [ >r nip r> deep-find-from ] curry find drop >boolean
+            f -rot [ [ nip ] dip (deep-find) ] curry find drop >boolean
         ] [ 2drop f f ] if  
     ] if ; inline recursive
 
-: deep-find ( obj quot -- elt ) deep-find-from drop ; inline
+: deep-find ( obj quot -- elt ) (deep-find) drop ; inline
 
-: deep-contains? ( obj quot -- ? ) deep-find-from nip ; inline
+: deep-contains? ( obj quot -- ? ) (deep-find) nip ; inline
 
 : deep-all? ( obj quot -- ? )
     [ not ] compose deep-contains? not ; inline
 
 : deep-change-each ( obj quot: ( elt -- elt' ) -- )
-    over branch? [ [
-        [ call ] keep over >r deep-change-each r>
-    ] curry change-each ] [ 2drop ] if ; inline recursive
+    over branch? [
+        [ [ call ] keep over [ deep-change-each ] dip ] curry change-each
+    ] [ 2drop ] if ; inline recursive
 
 : flatten ( obj -- seq )
     [ branch? not ] deep-filter ;

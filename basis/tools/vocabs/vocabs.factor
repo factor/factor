@@ -4,8 +4,30 @@ USING: kernel io io.styles io.files io.encodings.utf8
 vocabs.loader vocabs sequences namespaces make math.parser
 arrays hashtables assocs memoize summary sorting splitting
 combinators source-files debugger continuations compiler.errors
-init checksums checksums.crc32 sets accessors ;
+init checksums checksums.crc32 sets accessors generic
+definitions words ;
 IN: tools.vocabs
+
+: vocab-xref ( vocab quot -- vocabs )
+    [ [ vocab-name ] [ words [ generic? not ] filter ] bi ] dip map
+    [
+        [ [ word? ] [ generic? not ] bi and ] filter [
+            dup method-body?
+            [ "method-generic" word-prop ] when
+            vocabulary>>
+        ] map
+    ] gather natural-sort remove sift ; inline
+
+: vocabs. ( seq -- )
+    [ dup >vocab-link write-object nl ] each ;
+
+: vocab-uses ( vocab -- vocabs ) [ uses ] vocab-xref ;
+
+: vocab-uses. ( vocab -- ) vocab-uses vocabs. ;
+
+: vocab-usage ( vocab -- vocabs ) [ usage ] vocab-xref ;
+
+: vocab-usage. ( vocab -- ) vocab-usage vocabs. ;
 
 : vocab-tests-file ( vocab -- path )
     dup "-tests.factor" vocab-dir+ vocab-append-path dup
@@ -112,12 +134,12 @@ SYMBOL: modified-docs
             [
                 [
                     [ modified-sources ]
-                    [ vocab-source-loaded? ]
+                    [ vocab source-loaded?>> ]
                     [ vocab-source-path ]
                     tri (to-refresh)
                 ] [
                     [ modified-docs ]
-                    [ vocab-docs-loaded? ]
+                    [ vocab docs-loaded?>> ]
                     [ vocab-docs-path ]
                     tri (to-refresh)
                 ] bi
@@ -132,8 +154,8 @@ SYMBOL: modified-docs
 : do-refresh ( modified-sources modified-docs unchanged -- )
     unchanged-vocabs
     [
-        [ [ f swap set-vocab-source-loaded? ] each ]
-        [ [ f swap set-vocab-docs-loaded? ] each ] bi*
+        [ [ vocab f >>source-loaded? drop ] each ]
+        [ [ vocab f >>docs-loaded? drop ] each ] bi*
     ]
     [
         append prune

@@ -58,7 +58,7 @@ PRIVATE>
 
 : tuple>array ( tuple -- array )
     prepare-tuple>array
-    >r copy-tuple-slots r>
+    [ copy-tuple-slots ] dip
     first prefix ;
 
 : tuple-slots ( tuple -- seq )
@@ -121,7 +121,7 @@ ERROR: bad-superclass class ;
     [
         \ dup ,
         [ "predicate" word-prop % ]
-        [ [ bad-slot-value ] curry , ] bi
+        [ [ literalize , \ bad-slot-value , ] [ ] make , ] bi
         \ unless ,
     ] [ ] make ;
 
@@ -178,9 +178,9 @@ ERROR: bad-superclass class ;
 
 : update-slot ( old-values n class initial -- value )
     pick [
-        >r >r swap nth dup r> instance? r> swap
+        [ [ swap nth dup ] dip instance? ] dip swap
         [ drop ] [ nip ] if
-    ] [ >r 3drop r> ] if ;
+    ] [ [ 3drop ] dip ] if ;
 
 : apply-slot-permutation ( old-values triples -- new-values )
     [ first3 update-slot ] with map ;
@@ -233,7 +233,7 @@ M: tuple-class update-class
     class-usages [ tuple-class? ] filter ;
 
 : each-subclass ( class quot -- )
-    >r subclasses r> each ; inline
+    [ subclasses ] dip each ; inline
 
 : redefine-tuple-class ( class superclass slots -- )
     [
@@ -320,7 +320,7 @@ M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
 M: tuple hashcode*
     [
         [ class hashcode ] [ tuple-size ] [ ] tri
-        >r rot r> [
+        [ rot ] dip [
             swapd array-nth hashcode* sequence-hashcode-step
         ] 2curry each
     ] recursive-hashcode ;

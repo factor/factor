@@ -216,27 +216,8 @@ M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
 M: byte-vector pprint* pprint-object ;
 M: hashtable pprint* pprint-object ;
-
-GENERIC: valid-callable? ( obj -- ? )
-
-M: object valid-callable? drop f ;
-
-M: quotation valid-callable? drop t ;
-
-M: curry valid-callable? quot>> valid-callable? ;
-
-M: compose valid-callable?
-    [ first>> ] [ second>> ] bi [ valid-callable? ] both? ;
-
-M: curry pprint*
-    dup valid-callable? [ pprint-object ] [
-        "( invalid curry )" swap present-text
-    ] if ;
-
-M: compose pprint*
-    dup valid-callable? [ pprint-object ] [
-        "( invalid compose )" swap present-text
-    ] if ;
+M: curry pprint* pprint-object ;
+M: compose pprint* pprint-object ;
 
 M: wrapper pprint*
     dup wrapped>> word? [

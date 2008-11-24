@@ -11,7 +11,7 @@ IN: checksums.crc32
 
 256 [
     8 [
-        dup even? >r 2/ r> [ crc32-polynomial bitxor ] unless
+        [ 2/ ] [ even? ] bi [ crc32-polynomial bitxor ] unless
     ] times >bignum
 ] map 0 crc32-table copy
 
@@ -24,7 +24,7 @@ SINGLETON: crc32
 
 INSTANCE: crc32 checksum
 
-: init-crc32 drop >r HEX: ffffffff dup r> ; inline
+: init-crc32 drop [ HEX: ffffffff dup ] dip ; inline
 
 : finish-crc32 bitxor 4 >be ; inline
 

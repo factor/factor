@@ -161,8 +161,8 @@ void init_data_heap(CELL gens,
 /* statistics */
 typedef struct {
 	CELL collections;
-	CELL gc_time;
-	CELL max_gc_time;
+	u64 gc_time;
+	u64 max_gc_time;
 	CELL object_count;
 	u64 bytes_copied;
 } F_GC_STATS;
@@ -386,7 +386,7 @@ INLINE void* allot_object(CELL type, CELL a)
 	return object;
 }
 
-CELL collect_next(CELL scan);
+void collect_next_loop(CELL scan, CELL *end);
 
 void primitive_gc(void);
 void primitive_gc_stats(void);

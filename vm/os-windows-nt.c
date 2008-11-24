@@ -1,11 +1,11 @@
 #include "master.h"
 
-s64 current_millis(void)
+s64 current_micros(void)
 {
 	FILETIME t;
 	GetSystemTimeAsFileTime(&t);
 	return (((s64)t.dwLowDateTime | (s64)t.dwHighDateTime<<32)
-		- EPOCH_OFFSET) / 10000;
+		- EPOCH_OFFSET) / 10;
 }
 
 long exception_handler(PEXCEPTION_POINTERS pe)

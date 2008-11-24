@@ -87,6 +87,15 @@ M: composed infer-call*
 M: object infer-call*
     \ literal-expected inference-warning ;
 
+: infer-slip ( -- )
+    1 infer->r pop-d infer-call 1 infer-r> ;
+
+: infer-2slip ( -- )
+    2 infer->r pop-d infer-call 2 infer-r> ;
+
+: infer-3slip ( -- )
+    3 infer->r pop-d infer-call 3 infer-r> ;
+
 : infer-curry ( -- )
     2 consume-d
     dup first2 <curried> make-known
@@ -150,6 +159,9 @@ M: object infer-call*
         { \ declare [ infer-declare ] }
         { \ call [ pop-d infer-call ] }
         { \ (call) [ pop-d infer-call ] }
+        { \ slip [ infer-slip ] }
+        { \ 2slip [ infer-2slip ] }
+        { \ 3slip [ infer-3slip ] }
         { \ curry [ infer-curry ] }
         { \ compose [ infer-compose ] }
         { \ execute [ infer-execute ] }
@@ -175,9 +187,10 @@ M: object infer-call*
     (( value -- )) apply-word/effect ;
 
 {
-    >r r> declare call (call) curry compose execute (execute) if
-dispatch <tuple-boa> (throw) load-locals get-local drop-locals
-do-primitive alien-invoke alien-indirect alien-callback
+    >r r> declare call (call) slip 2slip 3slip curry compose
+    execute (execute) if dispatch <tuple-boa> (throw)
+    load-locals get-local drop-locals do-primitive alien-invoke
+    alien-indirect alien-callback
 } [ t "special" set-word-prop ] each
 
 { call execute dispatch load-locals get-local drop-locals }
@@ -423,8 +436,8 @@ do-primitive alien-invoke alien-indirect alien-callback
 \ code-room { } { integer integer integer integer } define-primitive
 \ code-room  make-flushable
 
-\ millis { } { integer } define-primitive
-\ millis make-flushable
+\ micros { } { integer } define-primitive
+\ micros make-flushable
 
 \ tag { object } { fixnum } define-primitive
 \ tag make-foldable
@@ -601,3 +614,9 @@ do-primitive alien-invoke alien-indirect alien-callback
 \ modify-code-heap { array object } { } define-primitive
 
 \ unimplemented { } { } define-primitive
+
+\ gc-reset { } { } define-primitive
+
+\ gc-stats { } { array } define-primitive
+
+\ jit-compile { quotation } { } define-primitive

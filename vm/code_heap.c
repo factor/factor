@@ -7,8 +7,6 @@ void undefined_symbol(void)
 	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
 }
 
-#define CREF(array,i) ((CELL)(array) + CELLS * (i))
-
 INLINE CELL get_literal(CELL literals_start, CELL num)
 {
 	return get(CREF(literals_start,num));
@@ -55,18 +53,22 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 INLINE CELL compute_code_rel(F_REL *rel,
 	CELL code_start, CELL literals_start)
 {
+	CELL obj;
+
 	switch(REL_TYPE(rel))
 	{
 	case RT_PRIMITIVE:
 		return (CELL)primitives[REL_ARGUMENT(rel)];
 	case RT_DLSYM:
 		return (CELL)get_rel_symbol(rel,literals_start);
-	case RT_LITERAL:
-		return CREF(literals_start,REL_ARGUMENT(rel));
 	case RT_IMMEDIATE:
 		return get(CREF(literals_start,REL_ARGUMENT(rel)));
 	case RT_XT:
-		return (CELL)untag_word(get(CREF(literals_start,REL_ARGUMENT(rel))))->xt;
+		obj = get(CREF(literals_start,REL_ARGUMENT(rel)));
+		if(type_of(obj) == WORD_TYPE)
+			return (CELL)untag_word(obj)->xt;
+		else
+			return (CELL)untag_quotation(obj)->xt;
 	case RT_HERE:
 		return rel->offset + code_start + (short)REL_ARGUMENT(rel);
 	case RT_LABEL:
@@ -277,6 +279,7 @@ F_COMPILED *add_compiled_block(
 	/* compiled header */
 	F_COMPILED *header = (void *)here;
 	header->type = type;
+	header->last_scan = NURSERY;
 	header->code_length = code_length;
 	header->literals_length = literals_length;
 	header->relocation = relocation;

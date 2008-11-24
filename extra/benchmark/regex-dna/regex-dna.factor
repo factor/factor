@@ -11,14 +11,14 @@ IN: benchmark.regex-dna
 
 : count-patterns ( string -- )
     {
-        R/ agggtaaa|tttaccct/i,
-        R/ [cgt]gggtaaa|tttaccc[acg]/i,
-        R/ a[act]ggtaaa|tttacc[agt]t/i,
-        R/ ag[act]gtaaa|tttac[agt]ct/i,
-        R/ agg[act]taaa|ttta[agt]cct/i,
-        R/ aggg[acg]aaa|ttt[cgt]ccct/i,
-        R/ agggt[cgt]aa|tt[acg]accct/i,
-        R/ agggta[cgt]a|t[acg]taccct/i,
+        R/ agggtaaa|tttaccct/i
+        R/ [cgt]gggtaaa|tttaccc[acg]/i
+        R/ a[act]ggtaaa|tttacc[agt]t/i
+        R/ ag[act]gtaaa|tttac[agt]ct/i
+        R/ agg[act]taaa|ttta[agt]cct/i
+        R/ aggg[acg]aaa|ttt[cgt]ccct/i
+        R/ agggt[cgt]aa|tt[acg]accct/i
+        R/ agggta[cgt]a|t[acg]taccct/i
         R/ agggtaa[cgt]|[acg]ttaccct/i
     } [
         [ raw>> write bl ]

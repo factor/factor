@@ -47,11 +47,6 @@ HELP: (open-window)
 { $description "Opens a native window containing the given world. This grafts the world by calling " { $link graft } ". Each world can only be displayed in one top-level window at a time." }
 { $notes "This word should not be called directly by user code. Instead, use " { $link open-window } "." } ;
 
-HELP: ui-try
-{ $values { "quot" quotation } }
-{ $description "Calls the quotation. If it throws an error, opens a window with the error and restores the data stack." }
-{ $notes "This is essentially a graphical variant of " { $link try } "." } ;
-
 ARTICLE: "ui-glossary" "UI glossary"
 { $table
     { "color specifier"

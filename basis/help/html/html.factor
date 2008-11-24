@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.encodings.utf8 io.encodings.ascii io.encodings.binary
-io.files html.streams html.elements html.components help kernel
+io.files html.streams html.elements help kernel
 assocs sequences make words accessors arrays help.topics vocabs
 tools.vocabs tools.vocabs.browser namespaces prettyprint io
 vocabs.loader serialize fry memoize unicode.case math.order
@@ -103,10 +103,6 @@ MEMO: load-index ( name -- index )
     binary file-contents bytes>object ;
 
 TUPLE: result title href ;
-
-M: result link-title title>> ;
-
-M: result link-href href>> ;
 
 : offline-apropos ( string index -- results )
     load-index swap >lower

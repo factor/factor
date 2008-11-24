@@ -2,7 +2,7 @@ USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
 sorting classes.tuple compiler.units debugger vocabs
-vocabs.loader accessors eval combinators ;
+vocabs.loader accessors eval combinators lexer ;
 IN: parser.tests
 
 [
@@ -498,3 +498,5 @@ DEFER: blah
 [ error>> error>> def>> \ blah eq? ] must-fail-with
 
 [ ] [ f lexer set f file set "Hello world" note. ] unit-test
+
+[ "CHAR: \\u9999999999999" eval ] must-fail

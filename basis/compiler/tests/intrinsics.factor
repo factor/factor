@@ -160,6 +160,11 @@ IN: compiler.tests
 [ -2 ] [ 4 [ -2 fixnum/i ] compile-call ] unit-test
 [ 3 1 ] [ 10 3 [ fixnum/mod ] compile-call ] unit-test
 
+[ 2 ] [ 4 2 [ fixnum/i-fast ] compile-call ] unit-test
+[ 2 ] [ 4 [ 2 fixnum/i-fast ] compile-call ] unit-test
+[ -2 ] [ 4 [ -2 fixnum/i-fast ] compile-call ] unit-test
+[ 3 1 ] [ 10 3 [ fixnum/mod-fast ] compile-call ] unit-test
+
 [ 4 ] [ 1 3 [ fixnum+ ] compile-call ] unit-test
 [ 4 ] [ 1 [ 3 fixnum+ ] compile-call ] unit-test
 [ 4 ] [ [ 1 3 fixnum+ ] compile-call ] unit-test

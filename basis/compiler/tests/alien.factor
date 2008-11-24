@@ -361,7 +361,7 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 [ 1 2 3 ] [ callback-6 callback_test_1 1 2 3 ] unit-test
 
 : callback-7 ( -- callback )
-    "void" { } "cdecl" [ 1000 sleep ] alien-callback ;
+    "void" { } "cdecl" [ 1000000 sleep ] alien-callback ;
 
 [ 1 2 3 ] [ callback-7 callback_test_1 1 2 3 ] unit-test
 

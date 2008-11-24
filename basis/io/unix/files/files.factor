@@ -6,7 +6,8 @@ math.bitwise byte-arrays alien combinators calendar
 io.encodings.binary accessors sequences strings system
 io.files.private destructors vocabs.loader calendar.unix
 unix.stat alien.c-types arrays unix.users unix.groups
-environment fry io.encodings.utf8 alien.strings unix.statfs ;
+environment fry io.encodings.utf8 alien.strings unix.statfs
+combinators.short-circuit ;
 IN: io.unix.files
 
 M: unix cwd ( -- path )
@@ -228,6 +229,15 @@ GENERIC: other-read? ( obj -- ? )
 GENERIC: other-write? ( obj -- ? )
 GENERIC: other-execute? ( obj -- ? )
 
+: any-read? ( obj -- ? )
+    { [ user-read? ] [ group-read? ] [ other-read? ] } 1|| ;
+
+: any-write? ( obj -- ? )
+    { [ user-write? ] [ group-write? ] [ other-write? ] } 1|| ;
+
+: any-execute? ( obj -- ? )
+    { [ user-execute? ] [ group-execute? ] [ other-execute? ] } 1|| ;
+
 M: integer uid? ( integer -- ? ) UID mask? ;
 M: integer gid? ( integer -- ? ) GID mask? ;
 M: integer sticky? ( integer -- ? ) STICKY mask? ;
@@ -293,7 +303,7 @@ M: string other-execute? ( path -- ? ) OTHER-EXECUTE file-mode? ;
     dup length [ over [ pick set-timeval-nth ] [ 2drop ] if ] 2each ;
 
 : timestamp>timeval ( timestamp -- timeval )
-    unix-1970 time- duration>milliseconds make-timeval ;
+    unix-1970 time- duration>microseconds make-timeval ;
 
 : timestamps>byte-array ( timestamps -- byte-array )
     [ dup [ timestamp>timeval ] when ] map make-timeval-array ;

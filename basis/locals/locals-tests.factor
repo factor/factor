@@ -2,7 +2,7 @@ USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
 accessors generic eval combinators combinators.short-circuit
 combinators.short-circuit.smart math.order math.functions
-definitions compiler.units ;
+definitions compiler.units fry lexer ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -286,12 +286,16 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
         { [ a b > ] [ 5 ] }
     } cond ;
 
+\ cond-test must-infer
+
 [ 3 ] [ 1 2 cond-test ] unit-test
 [ 4 ] [ 2 2 cond-test ] unit-test
 [ 5 ] [ 3 2 cond-test ] unit-test
 
 :: 0&&-test ( a -- ? )
     { [ a integer? ] [ a even? ] [ a 10 > ] } 0&& ;
+
+\ 0&&-test must-infer
 
 [ f ] [ 1.5 0&&-test ] unit-test
 [ f ] [ 3 0&&-test ] unit-test
@@ -300,6 +304,8 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 
 :: &&-test ( a -- ? )
     { [ a integer? ] [ a even? ] [ a 10 > ] } && ;
+
+\ &&-test must-infer
 
 [ f ] [ 1.5 &&-test ] unit-test
 [ f ] [ 3 &&-test ] unit-test
@@ -346,6 +352,10 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 
 { 3 1 } [| from to seq | T{ slice f from to seq } ] must-infer-as
 
+ERROR: punned-class x ;
+
+[ T{ punned-class f 3 } ] [ 3 [| a | T{ punned-class f a } ] call ] unit-test
+
 :: literal-identity-test ( -- a b )
     { } V{ } ;
 
@@ -389,6 +399,24 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 [ ] [ [ { integer lambda-method-forget-test } forget ] with-compilation-unit ] unit-test
 
 [ { [ 10 ] } ] [ 10 [| A | { [ A ] } ] call ] unit-test
+
+[
+    "USING: locals fry math ; [ 0 '[ [let | A [ 10 ] | A _ + ] ] ]" eval
+] [ error>> >r/r>-in-fry-error? ] must-fail-with
+
+:: (funny-macro-test) ( obj quot -- ? ) obj { quot } 1&& ; inline
+: funny-macro-test ( n -- ? ) [ odd? ] (funny-macro-test) ;
+
+\ funny-macro-test must-infer
+
+[ t ] [ 3 funny-macro-test ] unit-test
+[ f ] [ 2 funny-macro-test ] unit-test
+
+! Some odd parser corner cases
+[ "USE: locals [let" eval ] [ error>> unexpected-eof? ] must-fail-with
+[ "USE: locals [let |" eval ] [ error>> unexpected-eof? ] must-fail-with
+[ "USE: locals [let | a" eval ] [ error>> unexpected-eof? ] must-fail-with
+[ "USE: locals [|" eval ] [ error>> unexpected-eof? ] must-fail-with
 
 ! :: wlet-&&-test ( a -- ? )
 !     [wlet | is-integer? [ a integer? ]

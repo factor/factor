@@ -44,8 +44,6 @@ M:: x86.64 %dispatch ( src temp offset -- )
 M: int-regs return-reg drop RAX ;
 M: float-regs return-reg drop XMM0 ;
 
-M: x86.64 rel-literal-x86 rc-relative rel-literal ;
-
 M: x86.64 %prologue ( n -- )
     temp-reg-1 0 MOV rc-absolute-cell rel-this
     dup PUSH

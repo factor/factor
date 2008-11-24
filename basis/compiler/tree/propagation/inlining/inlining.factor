@@ -85,6 +85,8 @@ DEFER: (flat-length)
 
 : word-flat-length ( word -- n )
     {
+        ! special-case
+        { [ dup { dip 2dip 3dip } memq? ] [ drop 1 ] }
         ! not inline
         { [ dup inline? not ] [ drop 1 ] }
         ! recursive and inline

@@ -3,7 +3,7 @@ kernel.private math hashtables.private math.private namespaces
 sequences sequences.private tools.test namespaces.private
 slots.private sequences.private byte-arrays alien
 alien.accessors layouts words definitions compiler.units io
-combinators vectors float-arrays ;
+combinators vectors float-arrays grouping make ;
 IN: compiler.tests
 
 ! Originally, this file did black box testing of templating
@@ -241,3 +241,16 @@ TUPLE: id obj ;
 
 [ "a" ] [ 1 test-2 ] unit-test
 [ "b" ] [ 2 test-2 ] unit-test
+
+! I accidentally fixnum/i-fast on PowerPC
+[ { { 1 2 } { 3 4 } } ] [
+    { 1 2 3 4 }
+    [
+        [ { array } declare 2 <groups> [ , ] each ] compile-call
+    ] { } make
+] unit-test
+
+[ 2 ] [
+    { 1 2 3 4 }
+    [ { array } declare 2 <groups> length ] compile-call
+] unit-test

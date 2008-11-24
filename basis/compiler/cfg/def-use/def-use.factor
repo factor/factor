@@ -12,9 +12,12 @@ M: ##write-barrier defs-vregs [ card#>> ] [ table>> ] bi 2array ;
 M: ##unary/temp defs-vregs dst/tmp-vregs ;
 M: ##allot defs-vregs dst/tmp-vregs ;
 M: ##dispatch defs-vregs temp>> 1array ;
-M: ##slot defs-vregs [ dst>> ] [ temp>> ] bi 2array ;
+M: ##slot defs-vregs dst/tmp-vregs ;
 M: ##set-slot defs-vregs temp>> 1array ;
-M: ##string-nth defs-vregs [ dst>> ] [ temp>> ] bi 2array ;
+M: ##string-nth defs-vregs dst/tmp-vregs ;
+M: ##compare defs-vregs dst/tmp-vregs ;
+M: ##compare-imm defs-vregs dst/tmp-vregs ;
+M: ##compare-float defs-vregs dst/tmp-vregs ;
 M: insn defs-vregs drop f ;
 
 M: ##unary uses-vregs src>> 1array ;

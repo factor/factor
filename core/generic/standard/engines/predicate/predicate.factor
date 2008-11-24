@@ -10,7 +10,7 @@ TUPLE: predicate-dispatch-engine methods ;
 C: <predicate-dispatch-engine> predicate-dispatch-engine
 
 : class-predicates ( assoc -- assoc )
-    [ >r "predicate" word-prop picker prepend r> ] assoc-map ;
+    [ [ "predicate" word-prop picker prepend ] dip ] assoc-map ;
 
 : keep-going? ( assoc -- ? )
     assumed get swap second first class<= ;

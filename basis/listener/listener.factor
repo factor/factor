@@ -42,13 +42,15 @@ PRIVATE>
 
 SYMBOL: visible-vars
 
-: show-var ( sym -- ) visible-vars  [ swap suffix ] change ;
+: show-var ( var -- ) visible-vars  [ swap suffix ] change ;
 
 : show-vars ( seq -- ) visible-vars [ swap union ] change ;
 
-: hide-var ( sym -- ) visible-vars [ remove ] change ;
+: hide-var ( var -- ) visible-vars [ remove ] change ;
 
 : hide-vars ( seq -- ) visible-vars [ swap diff ] change ;
+
+: hide-all-vars ( -- ) visible-vars off ;
 
 SYMBOL: error-hook
 
@@ -73,9 +75,15 @@ SYMBOL: error-hook
         ] tabular-output
     ] unless-empty ;
 
+SYMBOL: display-stacks?
+
+t display-stacks? set-global
+
 : stacks. ( -- )
-    datastack [ nl "--- Data stack:" title. stack. ] unless-empty
-    retainstack [ nl "--- Retain stack:" title. stack. ] unless-empty ;
+    display-stacks? get [
+        datastack [ nl "--- Data stack:" title. stack. ] unless-empty
+        retainstack [ nl "--- Retain stack:" title. stack. ] unless-empty
+    ] when ;
 
 : prompt. ( -- )
     "( " in get auto-use? get [ " - auto" append ] when " )" 3append

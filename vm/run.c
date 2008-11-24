@@ -29,10 +29,35 @@ void save_stacks(void)
 	}
 }
 
+F_CONTEXT *alloc_context(void)
+{
+	F_CONTEXT *context;
+
+	if(unused_contexts)
+	{
+		context = unused_contexts;
+		unused_contexts = unused_contexts->next;
+	}
+	else
+	{
+		context = safe_malloc(sizeof(F_CONTEXT));
+		context->datastack_region = alloc_segment(ds_size);
+		context->retainstack_region = alloc_segment(rs_size);
+	}
+
+	return context;
+}
+
+void dealloc_context(F_CONTEXT *context)
+{
+	context->next = unused_contexts;
+	unused_contexts = context;
+}
+
 /* called on entry into a compiled callback */
 void nest_stacks(void)
 {
-	F_CONTEXT *new_stacks = safe_malloc(sizeof(F_CONTEXT));
+	F_CONTEXT *new_stacks = alloc_context();
 
 	new_stacks->callstack_bottom = (F_STACK_FRAME *)-1;
 	new_stacks->callstack_top = (F_STACK_FRAME *)-1;
@@ -54,9 +79,6 @@ void nest_stacks(void)
 	new_stacks->current_callback_save = userenv[CURRENT_CALLBACK_ENV];
 	new_stacks->catchstack_save = userenv[CATCHSTACK_ENV];
 
-	new_stacks->datastack_region = alloc_segment(ds_size);
-	new_stacks->retainstack_region = alloc_segment(rs_size);
-
 	new_stacks->next = stack_chain;
 	stack_chain = new_stacks;
 
@@ -67,9 +89,6 @@ void nest_stacks(void)
 /* called when leaving a compiled callback */
 void unnest_stacks(void)
 {
-	dealloc_segment(stack_chain->datastack_region);
-	dealloc_segment(stack_chain->retainstack_region);
-
 	ds = stack_chain->datastack_save;
 	rs = stack_chain->retainstack_save;
 
@@ -79,7 +98,7 @@ void unnest_stacks(void)
 
 	F_CONTEXT *old_stacks = stack_chain;
 	stack_chain = old_stacks->next;
-	free(old_stacks);
+	dealloc_context(old_stacks);
 }
 
 /* called on startup */
@@ -88,6 +107,7 @@ void init_stacks(CELL ds_size_, CELL rs_size_)
 	ds_size = ds_size_;
 	rs_size = rs_size_;
 	stack_chain = NULL;
+	unused_contexts = NULL;
 }
 
 bool stack_to_array(CELL bottom, CELL top)
@@ -153,14 +173,14 @@ void primitive_exit(void)
 	exit(to_fixnum(dpop()));
 }
 
-void primitive_millis(void)
+void primitive_micros(void)
 {
-	box_unsigned_8(current_millis());
+	box_unsigned_8(current_micros());
 }
 
 void primitive_sleep(void)
 {
-	sleep_millis(to_cell(dpop()));
+	sleep_micros(to_cell(dpop()));
 }
 
 void primitive_set_slot(void)

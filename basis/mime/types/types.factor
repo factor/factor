@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io.encodings.ascii assocs sequences splitting
 kernel namespaces fry memoize ;
-IN: mime-types
+IN: mime.types
 
 MEMO: mime-db ( -- seq )
-    "resource:basis/mime-types/mime.types" ascii file-lines
+    "resource:basis/mime/types/mime.types" ascii file-lines
     [ "#" head? not ] filter [ " \t" split harvest ] map harvest ;
 
 : nonstandard-mime-types ( -- assoc )
