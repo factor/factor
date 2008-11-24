@@ -348,8 +348,10 @@ worse than the duplication itself (eg, putting all state in some global
 struct.) */
 #define COUNT(name,scan) \
 	{ \
+		CELL size = array_capacity(code_to_emit(name)) * code_format; \
 		if(offset == 0) return scan - 1; \
-		offset -= array_capacity(code_to_emit(name)) * code_format; \
+		if(offset < size) return scan + 1; \
+		offset -= size; \
 	}
 
 F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
@@ -411,29 +413,28 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				if(stack_frame)
 					COUNT(userenv[JIT_EPILOG],i)
 
-				i += 2;
-
 				COUNT(userenv[JIT_IF_JUMP],i)
+				i += 2;
 
 				tail_call = true;
 				break;
 			}
 			else if(jit_fast_dip_p(untag_object(array),i))
 			{
-				i++;
 				COUNT(userenv[JIT_DIP],i)
+				i++;
 				break;
 			}
 			else if(jit_fast_2dip_p(untag_object(array),i))
 			{
-				i++;
 				COUNT(userenv[JIT_2DIP],i)
+				i++;
 				break;
 			}
 			else if(jit_fast_3dip_p(untag_object(array),i))
 			{
-				i++;
 				COUNT(userenv[JIT_3DIP],i)
+				i++;
 				break;
 			}
 		case ARRAY_TYPE:

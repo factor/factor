@@ -64,6 +64,12 @@ M: object add-breakpoint ;
 
 : (step-into-quot) ( quot -- ) add-breakpoint call ;
 
+: (step-into-dip) ( quot -- ) add-breakpoint dip ;
+
+: (step-into-2dip) ( quot -- ) add-breakpoint 2dip ;
+
+: (step-into-3dip) ( quot -- ) add-breakpoint 3dip ;
+
 : (step-into-if) ( true false ? -- ) ? (step-into-quot) ;
 
 : (step-into-dispatch) ( array n -- ) nth (step-into-quot) ;
@@ -130,6 +136,9 @@ SYMBOL: +stopped+
 
 {
     { call [ (step-into-quot) ] }
+    { dip [ (step-into-dip) ] }
+    { 2dip [ (step-into-2dip) ] }
+    { 3dip [ (step-into-3dip) ] }
     { (throw) [ drop (step-into-quot) ] }
     { execute [ (step-into-execute) ] }
     { if [ (step-into-if) ] }
@@ -152,13 +161,16 @@ SYMBOL: +stopped+
 : step-into-msg ( continuation -- continuation' )
     [
         swap cut [
-            swap % unclip {
-                { [ dup \ break eq? ] [ , ] }
-                { [ dup quotation? ] [ add-breakpoint , \ break , ] }
-                { [ dup array? ] [ add-breakpoint , \ break , ] }
-                { [ dup word? ] [ literalize , \ (step-into-execute) , ] }
-                [ , \ break , ]
-            } cond %
+            swap %
+            [ \ break , ] [
+                unclip {
+                    { [ dup \ break eq? ] [ , ] }
+                    { [ dup quotation? ] [ add-breakpoint , \ break , ] }
+                    { [ dup array? ] [ add-breakpoint , \ break , ] }
+                    { [ dup word? ] [ literalize , \ (step-into-execute) , ] }
+                    [ , \ break , ]
+                } cond %
+            ] if-empty
         ] [ ] make
     ] change-frame ;
 
