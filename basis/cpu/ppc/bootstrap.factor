@@ -82,15 +82,16 @@ big-endian on
     BLRL ;
 
 [
-    0 3 LOAD32
-    6 ds-reg 0 LWZ
-    0 6 \ f tag-number CMPI
-    2 BNE
-    3 3 4 ADDI
-    3 3 0 LWZ
+    3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
-    jit-jump-quot
-] rc-absolute-ppc-2/2 rt-literal 1 jit-if-jump jit-define
+    0 3 \ f tag-number CMPI
+    2 BNE
+    0 B
+] rc-relative-ppc-3 rt-xt 3 jit-if-1 jit-define
+
+[
+    0 B
+] rc-relative-ppc-3 rt-xt 0 jit-if-2 jit-define
 
 [
     0 3 LOAD32
@@ -102,9 +103,6 @@ big-endian on
     ds-reg dup 4 SUBI
     jit-jump-quot
 ] rc-absolute-ppc-2/2 rt-literal 1 jit-dispatch jit-define
-
-! These should not clobber r3 since we store a quotation in there
-! in jit-dip
 
 : jit->r ( -- )
     4 ds-reg 0 LWZ
@@ -152,30 +150,23 @@ big-endian on
     5 ds-reg -4 STW
     6 ds-reg -8 STW ;
 
-: prepare-dip ( -- )
-    0 3 LOAD32
-    3 3 0 LWZ ;
-
 [
-    prepare-dip
     jit->r
-    jit-call-quot
+    0 BL
     jit-r>
-] rc-absolute-ppc-2/2 rt-literal 1 jit-dip jit-define
+] rc-relative-ppc-3 rt-xt 3 jit-dip jit-define
 
 [
-    prepare-dip
     jit-2>r
-    jit-call-quot
+    0 BL
     jit-2r>
-] rc-absolute-ppc-2/2 rt-literal 1 jit-2dip jit-define
+] rc-relative-ppc-3 rt-xt 6 jit-2dip jit-define
 
 [
-    prepare-dip
     jit-3>r
-    jit-call-quot
+    0 BL
     jit-3r>
-] rc-absolute-ppc-2/2 rt-literal 1 jit-3dip jit-define
+] rc-relative-ppc-3 rt-xt 8 jit-3dip jit-define
 
 [
     0 1 lr-save stack-frame + LWZ
