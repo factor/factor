@@ -533,6 +533,7 @@ tuple
     { "dll-valid?" "alien" }
     { "unimplemented" "kernel.private" }
     { "gc-reset" "memory" }
+    { "jit-compile" "quotations" }
 }
 [ [ first2 ] dip make-primitive ] each-index
 

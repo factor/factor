@@ -165,7 +165,7 @@ DEF(void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
 DEF(void,lazy_jit_compile,(CELL quot)):
 	mr r4,r1	   /* save stack pointer */
 	PROLOGUE
-	bl MANGLE(primitive_jit_compile)
+	bl MANGLE(lazy_jit_compile_impl)
 	EPILOGUE
 	JUMP_QUOT	   /* call the quotation */
 
