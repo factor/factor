@@ -55,6 +55,8 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 INLINE CELL compute_code_rel(F_REL *rel,
 	CELL code_start, CELL literals_start)
 {
+	CELL obj;
+
 	switch(REL_TYPE(rel))
 	{
 	case RT_PRIMITIVE:
@@ -66,7 +68,11 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	case RT_IMMEDIATE:
 		return get(CREF(literals_start,REL_ARGUMENT(rel)));
 	case RT_XT:
-		return (CELL)untag_word(get(CREF(literals_start,REL_ARGUMENT(rel))))->xt;
+		obj = get(CREF(literals_start,REL_ARGUMENT(rel)));
+		if(type_of(obj) == WORD_TYPE)
+			return (CELL)untag_word(obj)->xt;
+		else
+			return (CELL)untag_quotation(obj)->xt;
 	case RT_HERE:
 		return rel->offset + code_start + (short)REL_ARGUMENT(rel);
 	case RT_LABEL:
