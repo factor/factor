@@ -614,3 +614,9 @@ M: object infer-call*
 \ modify-code-heap { array object } { } define-primitive
 
 \ unimplemented { } { } define-primitive
+
+\ gc-reset { } { } define-primitive
+
+\ gc-stats { } { array } define-primitive
+
+\ jit-compile { quotation } { } define-primitive

@@ -493,13 +493,18 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 	return -1;
 }
 
-F_FASTCALL CELL primitive_jit_compile(CELL quot, F_STACK_FRAME *stack)
+F_FASTCALL CELL lazy_jit_compile_impl(CELL quot, F_STACK_FRAME *stack)
 {
 	stack_chain->callstack_top = stack;
 	REGISTER_ROOT(quot);
 	jit_compile(quot,true);
 	UNREGISTER_ROOT(quot);
 	return quot;
+}
+
+void primitive_jit_compile(void)
+{
+	jit_compile(dpop(),true);
 }
 
 /* push a new quotation on the stack */

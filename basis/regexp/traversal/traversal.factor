@@ -82,6 +82,7 @@ M: end-of-input flag-action ( dfa-traverser flag -- )
     drop
     dup end-of-text? [ t >>match-failed? ] unless drop ;
 
+
 M: beginning-of-line flag-action ( dfa-traverser flag -- )
     drop
     dup {
@@ -96,12 +97,14 @@ M: end-of-line flag-action ( dfa-traverser flag -- )
         [ next-text-character terminator-class class-member? ]
     } 1|| [ t >>match-failed? ] unless drop ;
 
+
 M: word-boundary flag-action ( dfa-traverser flag -- )
     drop
     dup {
         [ end-of-text? ]
         [ current-text-character terminator-class class-member? ]
     } 1|| [ t >>match-failed? ] unless drop ;
+
 
 M: lookahead-on flag-action ( dfa-traverser flag -- )
     drop
