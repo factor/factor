@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system io.files namespaces kernel accessors ;
+USING: system io.files namespaces kernel accessors assocs ;
 IN: mason.config
 
 ! (Optional) Location for build directories
@@ -77,3 +77,10 @@ SYMBOL: upload-username
 
 ! Directory with binary packages.
 SYMBOL: upload-directory
+
+! Optional: override ssh and scp command names
+SYMBOL: scp-command
+scp-command global [ "scp" or ] change-at
+
+SYMBOL: ssh-command
+ssh-command global [ "ssh" or ] change-at
