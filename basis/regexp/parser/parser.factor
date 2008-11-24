@@ -58,7 +58,7 @@ SINGLETONS: letter-class LETTER-class Letter-class digit-class
 alpha-class non-newline-blank-class
 ascii-class punctuation-class java-printable-class blank-class
 control-character-class hex-digit-class java-blank-class c-identifier-class
-terminator-class unmatchable-class word-boundary-class ;
+unmatchable-class terminator-class word-boundary-class ;
 
 SINGLETONS: beginning-of-group end-of-group
 beginning-of-character-class end-of-character-class
@@ -87,8 +87,8 @@ left-parenthesis pipe caret dash ;
 : <kleene-star> ( obj -- kleene-star ) kleene-star boa ;
 : <constant> ( obj -- constant )
     dup Letter? get-case-insensitive and [
-        [ ch>lower constant boa ]
-        [ ch>upper constant boa ] bi 2array <alternation>
+        [ ch>lower ] [ ch>upper ] bi
+        [ constant boa ] bi@ 2array <alternation>
     ] [
         constant boa
     ] if ;
@@ -384,20 +384,22 @@ DEFER: handle-left-bracket
     } case
     [ (parse-character-class) ] when ;
 
+: push-constant ( ch -- ) <constant> push-stack ;
+
 : parse-character-class-second ( -- )
     read1 {
-        { CHAR: [ [ CHAR: [ <constant> push-stack ] }
-        { CHAR: ] [ CHAR: ] <constant> push-stack ] }
-        { CHAR: - [ CHAR: - <constant> push-stack ] }
+        { CHAR: [ [ CHAR: [ push-constant ] }
+        { CHAR: ] [ CHAR: ] push-constant ] }
+        { CHAR: - [ CHAR: - push-constant ] }
         [ push1 ]
     } case ;
 
 : parse-character-class-first ( -- )
     read1 {
         { CHAR: ^ [ caret push-stack parse-character-class-second ] }
-        { CHAR: [ [ CHAR: [ <constant> push-stack ] }
-        { CHAR: ] [ CHAR: ] <constant> push-stack ] }
-        { CHAR: - [ CHAR: - <constant> push-stack ] }
+        { CHAR: [ [ CHAR: [ push-constant ] }
+        { CHAR: ] [ CHAR: ] push-constant ] }
+        { CHAR: - [ CHAR: - push-constant ] }
         [ push1 ]
     } case ;
 
@@ -431,7 +433,7 @@ DEFER: handle-left-bracket
                 drop
                 handle-back-anchor f
             ] [
-                <constant> push-stack t
+                push-constant t
             ] if
         ]
     } case ;
