@@ -17,7 +17,11 @@ IN: tools.walker.tests
 ] unit-test
 
 [ { "Yo" 2 } ] [
-    [ 2 >r "Yo" r> ] test-walker
+    [ 2 [ "Yo" ] dip ] test-walker
+] unit-test
+
+[ { "Yo" 2 3 } ] [
+    [ 2 [ "Yo" ] dip 3 ] test-walker
 ] unit-test
 
 [ { 2 } ] [

@@ -1,7 +1,7 @@
 USING: arrays byte-arrays kernel kernel.private math memory
 namespaces sequences tools.test math.private quotations
 continuations prettyprint io.streams.string debugger assocs
-sequences.private ;
+sequences.private accessors ;
 IN: kernel.tests
 
 [ 0 ] [ f size ] unit-test
@@ -124,3 +124,42 @@ IN: kernel.tests
 [ [ sq ] tri@ ] must-infer
 
 [ 4 ] [ 1 { [ 1 ] [ 2 ] } dispatch sq ] unit-test
+
+! Test traceback accuracy
+: last-frame ( -- pair )
+    error-continuation get call>> callstack>array 4 head* 2 tail* ;
+
+[
+    { [ 1 2 [ 3 throw ] call 4 ] 3 }
+] [
+    [ [ 1 2 [ 3 throw ] call 4 ] call ] ignore-errors
+    last-frame
+] unit-test
+
+[
+    { [ 1 2 [ 3 throw ] dip 4 ] 3 }
+] [
+    [ [ 1 2 [ 3 throw ] dip 4 ] call ] ignore-errors
+    last-frame
+] unit-test
+
+[
+    { [ 1 2 3 throw [ ] call 4 ] 3 }
+] [
+    [ [ 1 2 3 throw [ ] call 4 ] call ] ignore-errors
+    last-frame
+] unit-test
+
+[
+    { [ 1 2 3 throw [ ] dip 4 ] 3 }
+] [
+    [ [ 1 2 3 throw [ ] dip 4 ] call ] ignore-errors
+    last-frame
+] unit-test
+
+[
+    { [ 1 2 3 throw [ ] [ ] if 4 ] 3 }
+] [
+    [ [ 1 2 3 throw [ ] [ ] if 4 ] call ] ignore-errors
+    last-frame
+] unit-test
