@@ -109,25 +109,25 @@ SYMBOL: +stopped+
 : change-frame ( continuation quot -- continuation' )
     #! Applies quot to innermost call frame of the
     #! continuation.
-    >r clone r> [
-        >r clone r>
+    [ clone ] dip [
+        [ clone ] dip
         [
-            >r
-            [ innermost-frame-scan 1+ ]
-            [ innermost-frame-quot ] bi
-            r> call
+            [
+                [ innermost-frame-scan 1+ ]
+                [ innermost-frame-quot ] bi
+            ] dip call
         ]
         [ drop set-innermost-frame-quot ]
         [ drop ]
         2tri
     ] curry change-call ; inline
 
-: step-msg ( continuation -- continuation' )
+: step-msg ( continuation -- continuation' ) USE: io
     [
-        2dup nth \ break = [
-            nip
-        ] [
-            swap 1+ cut [ break ] swap 3append
+        2dup length = [ nip [ break ] append ] [
+            2dup nth \ break = [ nip ] [
+                swap 1+ cut [ break ] swap 3append
+            ] if
         ] if
     ] change-frame ;
 
