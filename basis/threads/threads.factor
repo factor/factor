@@ -89,7 +89,7 @@ PRIVATE>
     f >>state
     check-registered 2array run-queue push-front ;
 
-: sleep-time ( -- ms/f )
+: sleep-time ( -- us/f )
     {
         { [ run-queue deque-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }

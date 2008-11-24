@@ -32,8 +32,8 @@ SYMBOL: bootstrap-time
 : count-words ( pred -- )
     all-words swap count number>string write ;
 
-: print-time ( us -- )
-    1000000 /i
+: print-time ( ms -- )
+    1000 /i
     60 /mod swap
     number>string write
     " minutes and " write number>string write " seconds." print ;
@@ -52,7 +52,7 @@ SYMBOL: bootstrap-time
 
 [
     ! We time bootstrap
-    micros
+    millis
 
     default-image-name "output-image" set-global
 
@@ -77,7 +77,7 @@ SYMBOL: bootstrap-time
     [
         load-components
 
-        micros over - core-bootstrap-time set-global
+        millis over - core-bootstrap-time set-global
 
         run-bootstrap-init
     ] with-compiler-errors
@@ -100,7 +100,7 @@ SYMBOL: bootstrap-time
             ] [ print-error 1 exit ] recover
         ] set-boot-quot
 
-        micros swap - bootstrap-time set-global
+        millis swap - bootstrap-time set-global
         print-report
 
         "output-image" get save-image-and-exit

@@ -174,21 +174,6 @@ void primitive_save_image(void)
 	save_image(unbox_native_string());
 }
 
-void strip_compiled_quotations(void)
-{
-	begin_scan();
-	CELL obj;
-	while((obj = next_object()) != F)
-	{
-		if(type_of(obj) == QUOTATION_TYPE)
-		{
-			F_QUOTATION *quot = untag_object(obj);
-			quot->compiledp = F;
-		}
-	}
-	gc_off = false;
-}
-
 void primitive_save_image_and_exit(void)
 {
 	/* We unbox this before doing anything else. This is the only point
@@ -197,9 +182,6 @@ void primitive_save_image_and_exit(void)
 	F_CHAR *path = unbox_native_string();
 
 	REGISTER_C_STRING(path);
-
-	/* This reduces deployed image size */
-	strip_compiled_quotations();
 
 	/* strip out userenv data which is set on startup anyway */
 	CELL i;

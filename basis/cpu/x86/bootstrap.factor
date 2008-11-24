@@ -45,22 +45,23 @@ big-endian off
 ] rc-absolute-cell rt-immediate 1 rex-length + jit-push-immediate jit-define
 
 [
-    (JMP) drop
+    f JMP
 ] rc-relative rt-xt 1 jit-word-jump jit-define
 
 [
-    (CALL) drop
+    f CALL
 ] rc-relative rt-xt 1 jit-word-call jit-define
 
 [
-    arg1 0 MOV                                 ! load addr of true quotation
     arg0 ds-reg [] MOV                         ! load boolean
     ds-reg bootstrap-cell SUB                  ! pop boolean
-    arg0 \ f tag-number CMP                    ! compare it with f
-    arg0 arg1 [] CMOVNE                        ! load true branch if not equal
-    arg0 arg1 bootstrap-cell [+] CMOVE         ! load false branch if equal
-    arg0 quot-xt-offset [+] JMP                ! jump to quotation-xt
-] rc-absolute-cell rt-literal 1 rex-length + jit-if-jump jit-define
+    arg0 \ f tag-number CMP                    ! compare boolean with f
+    f JNE                                      ! jump to true branch if not equal
+] rc-relative rt-xt 10 rex-length 3 * + jit-if-1 jit-define
+
+[
+    f JMP                                      ! jump to false branch if equal
+] rc-relative rt-xt 1 jit-if-2 jit-define
 
 [
     arg1 0 MOV                                 ! load dispatch table
@@ -73,79 +74,71 @@ big-endian off
     arg0 quot-xt-offset [+] JMP                ! execute branch
 ] rc-absolute-cell rt-literal 1 rex-length + jit-dispatch jit-define
 
-! The jit->r words cannot clobber arg0
-
 : jit->r ( -- )
     rs-reg bootstrap-cell ADD
-    temp-reg ds-reg [] MOV
+    arg0 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
-    rs-reg [] temp-reg MOV ;
+    rs-reg [] arg0 MOV ;
 
 : jit-2>r ( -- )
     rs-reg 2 bootstrap-cells ADD
-    temp-reg ds-reg [] MOV
+    arg0 ds-reg [] MOV
     arg1 ds-reg -1 bootstrap-cells [+] MOV
     ds-reg 2 bootstrap-cells SUB
-    rs-reg [] temp-reg MOV
+    rs-reg [] arg0 MOV
     rs-reg -1 bootstrap-cells [+] arg1 MOV ;
 
 : jit-3>r ( -- )
     rs-reg 3 bootstrap-cells ADD
-    temp-reg ds-reg [] MOV
+    arg0 ds-reg [] MOV
     arg1 ds-reg -1 bootstrap-cells [+] MOV
     arg2 ds-reg -2 bootstrap-cells [+] MOV
     ds-reg 3 bootstrap-cells SUB
-    rs-reg [] temp-reg MOV
+    rs-reg [] arg0 MOV
     rs-reg -1 bootstrap-cells [+] arg1 MOV
     rs-reg -2 bootstrap-cells [+] arg2 MOV ;
 
 : jit-r> ( -- )
     ds-reg bootstrap-cell ADD
-    temp-reg rs-reg [] MOV
+    arg0 rs-reg [] MOV
     rs-reg bootstrap-cell SUB
-    ds-reg [] temp-reg MOV ;
+    ds-reg [] arg0 MOV ;
 
 : jit-2r> ( -- )
     ds-reg 2 bootstrap-cells ADD
-    temp-reg rs-reg [] MOV
+    arg0 rs-reg [] MOV
     arg1 rs-reg -1 bootstrap-cells [+] MOV
     rs-reg 2 bootstrap-cells SUB
-    ds-reg [] temp-reg MOV
+    ds-reg [] arg0 MOV
     ds-reg -1 bootstrap-cells [+] arg1 MOV ;
 
 : jit-3r> ( -- )
     ds-reg 3 bootstrap-cells ADD
-    temp-reg rs-reg [] MOV
+    arg0 rs-reg [] MOV
     arg1 rs-reg -1 bootstrap-cells [+] MOV
     arg2 rs-reg -2 bootstrap-cells [+] MOV
     rs-reg 3 bootstrap-cells SUB
-    ds-reg [] temp-reg MOV
+    ds-reg [] arg0 MOV
     ds-reg -1 bootstrap-cells [+] arg1 MOV
     ds-reg -2 bootstrap-cells [+] arg2 MOV ;
 
 [
-    arg0 0 MOV                                 ! load quotation addr
-    arg0 arg0 [] MOV                           ! load quotation
     jit->r
-    arg0 quot-xt-offset [+] CALL               ! call quotation
+    f CALL
     jit-r>
-] rc-absolute-cell rt-literal 1 rex-length + jit-dip jit-define
+] rc-relative rt-xt 11 rex-length 4 * + jit-dip jit-define
 
 [
-    arg0 0 MOV                                 ! load quotation addr
-    arg0 arg0 [] MOV                           ! load quotation
     jit-2>r
-    arg0 quot-xt-offset [+] CALL               ! call quotation
+    f CALL
     jit-2r>
-] rc-absolute-cell rt-literal 1 rex-length + jit-2dip jit-define
+] rc-relative rt-xt 17 rex-length 6 * + jit-2dip jit-define
 
 [
-    arg0 0 MOV                                 ! load quotation addr
-    arg0 arg0 [] MOV                           ! load quotation
     jit-3>r                                    
-    arg0 quot-xt-offset [+] CALL               ! call quotation
+    f CALL
     jit-3r>
-] rc-absolute-cell rt-literal 1 rex-length + jit-3dip jit-define
+] rc-relative rt-xt 23 rex-length 8 * + jit-3dip jit-define
 
 [
     stack-reg stack-frame-size bootstrap-cell - ADD ! unwind stack frame
