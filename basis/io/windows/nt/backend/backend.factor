@@ -53,7 +53,7 @@ M: winnt add-completion ( win32-handle -- )
     0 <int> [ ! bytes
         f <void*> ! key
         f <void*> [ ! overlapped
-            us 1000 /i INFINITE or ! timeout
+            us [ 1000 /i ] [ INFINITE ] if* ! timeout
             GetQueuedCompletionStatus zero?
         ] keep *void*
     ] keep *int spin ;
