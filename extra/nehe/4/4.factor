@@ -7,7 +7,7 @@ TUPLE: nehe4-gadget < gadget rtri rquad thread quit? ;
 
 : width 256 ;
 : height 256 ;
-: redraw-interval 10 milliseconds ;
+: redraw-interval ( -- dt ) 10 milliseconds ;
 
 : <nehe4-gadget> (  -- gadget )
   nehe4-gadget new-gadget
