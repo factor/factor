@@ -1,6 +1,6 @@
 USING: kernel sequences namespaces make math assocs words arrays
 tools.annotations vocabs sorting prettyprint io system
-math.statistics accessors ;
+math.statistics accessors tools.time ;
 IN: wordtimer
 
 SYMBOL: *wordtimes*
