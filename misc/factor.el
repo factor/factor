@@ -109,49 +109,47 @@ buffer."
   :group 'factor
   :group 'faces)
 
-(defsubst factor--face (face) `((t ,(face-attr-construct face))))
-
-(defface factor-font-lock-parsing-word (factor--face font-lock-keyword-face)
+(defface factor-font-lock-parsing-word (face-default-spec font-lock-keyword-face)
   "Face for parsing words."
   :group 'factor-faces)
 
-(defface factor-font-lock-comment (factor--face font-lock-comment-face)
+(defface factor-font-lock-comment (face-default-spec font-lock-comment-face)
   "Face for comments."
   :group 'factor-faces)
 
-(defface factor-font-lock-string (factor--face font-lock-string-face)
+(defface factor-font-lock-string (face-default-spec font-lock-string-face)
   "Face for strings."
   :group 'factor-faces)
 
-(defface factor-font-lock-stack-effect (factor--face font-lock-comment-face)
+(defface factor-font-lock-stack-effect (face-default-spec font-lock-comment-face)
   "Face for stack effect specifications."
   :group 'factor-faces)
 
-(defface factor-font-lock-word-definition (factor--face font-lock-function-name-face)
+(defface factor-font-lock-word-definition (face-default-spec font-lock-function-name-face)
   "Face for word, generic or method being defined."
   :group 'factor-faces)
 
-(defface factor-font-lock-symbol-definition (factor--face font-lock-variable-name-face)
+(defface factor-font-lock-symbol-definition (face-default-spec font-lock-variable-name-face)
   "Face for name of symbol being defined."
   :group 'factor-faces)
 
-(defface factor-font-lock-vocabulary-name (factor--face font-lock-constant-face)
+(defface factor-font-lock-vocabulary-name (face-default-spec font-lock-constant-face)
   "Face for names of vocabularies in USE or USING."
   :group 'factor-faces)
 
-(defface factor-font-lock-type-definition (factor--face font-lock-type-face)
+(defface factor-font-lock-type-definition (face-default-spec font-lock-type-face)
   "Face for type (tuple) names."
   :group 'factor-faces)
 
-(defface factor-font-lock-constructor (factor--face font-lock-type-face)
+(defface factor-font-lock-constructor (face-default-spec font-lock-type-face)
   "Face for constructors (<foo>)."
   :group 'factor-faces)
 
-(defface factor-font-lock-setter-word (factor--face font-lock-function-name-face)
+(defface factor-font-lock-setter-word (face-default-spec font-lock-function-name-face)
   "Face for setter words (>>foo)."
   :group 'factor-faces)
 
-(defface factor-font-lock-parsing-word (factor--face font-lock-keyword-face)
+(defface factor-font-lock-parsing-word (face-default-spec font-lock-keyword-face)
   "Face for parsing words."
   :group 'factor-faces)
 
