@@ -232,7 +232,7 @@ void jit_compile(CELL quot, bool relocate)
 		case WRAPPER_TYPE:
 			wrapper = untag_object(obj);
 			GROWABLE_ARRAY_ADD(literals,wrapper->object);
-			EMIT(userenv[JIT_PUSH_LITERAL],literals_count - 1);
+			EMIT(userenv[JIT_PUSH_IMMEDIATE],literals_count - 1);
 			break;
 		case FIXNUM_TYPE:
 			if(jit_primitive_call_p(untag_object(array),i))
@@ -404,7 +404,7 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				COUNT(userenv[JIT_WORD_CALL],i)
 			break;
 		case WRAPPER_TYPE:
-			COUNT(userenv[JIT_PUSH_LITERAL],i)
+			COUNT(userenv[JIT_PUSH_IMMEDIATE],i)
 			break;
 		case FIXNUM_TYPE:
 			if(jit_primitive_call_p(untag_object(array),i))
@@ -470,7 +470,7 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				break;
 			}
 		default:
-			COUNT(userenv[immediate_p(obj) ? JIT_PUSH_IMMEDIATE : JIT_PUSH_LITERAL],i)
+			COUNT(userenv[JIT_PUSH_IMMEDIATE],i)
 			break;
 		}
 	}

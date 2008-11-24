@@ -3,8 +3,6 @@ typedef enum {
 	RT_PRIMITIVE,
 	/* arg is a literal table index, holding an array pair (symbol/dll) */
 	RT_DLSYM,
-	/* an indirect literal from the word's literal table */
-	RT_LITERAL,
 	/* a pointer to a compiled word reference */
 	RT_DISPATCH,
 	/* a compiled word reference */

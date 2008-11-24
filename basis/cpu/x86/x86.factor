@@ -16,8 +16,6 @@ HOOK: temp-reg-2 cpu ( -- reg )
 
 M: x86 %load-immediate MOV ;
 
-HOOK: rel-literal-x86 cpu ( literal -- )
-
 M: x86 %load-indirect swap 0 MOV rc-absolute-cell rel-immediate ;
 
 HOOK: ds-reg cpu ( -- reg )
@@ -401,12 +399,12 @@ HOOK: stack-reg cpu ( -- reg )
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
-: %boolean ( dst word -- )
-    over \ f tag-number MOV
-    0 [] swap execute
-    \ t rel-literal-x86 ; inline
+:: %boolean ( dst temp word -- )
+    dst \ f tag-number MOV
+    temp 0 MOV \ t rc-absolute-cell rel-immediate
+    dst temp word execute ; inline
 
-M: x86 %compare ( dst cc src1 src2 -- )
+M: x86 %compare ( dst temp cc src1 src2 -- )
     CMP {
         { cc< [ \ CMOVL %boolean ] }
         { cc<= [ \ CMOVLE %boolean ] }
@@ -416,10 +414,10 @@ M: x86 %compare ( dst cc src1 src2 -- )
         { cc/= [ \ CMOVNE %boolean ] }
     } case ;
 
-M: x86 %compare-imm ( dst cc src1 src2 -- )
+M: x86 %compare-imm ( dst temp cc src1 src2 -- )
     %compare ;
 
-M: x86 %compare-float ( dst cc src1 src2 -- )
+M: x86 %compare-float ( dst temp cc src1 src2 -- )
     UCOMISD {
         { cc< [ \ CMOVB %boolean ] }
         { cc<= [ \ CMOVBE %boolean ] }

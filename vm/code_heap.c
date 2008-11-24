@@ -61,8 +61,6 @@ INLINE CELL compute_code_rel(F_REL *rel,
 		return (CELL)primitives[REL_ARGUMENT(rel)];
 	case RT_DLSYM:
 		return (CELL)get_rel_symbol(rel,literals_start);
-	case RT_LITERAL:
-		return CREF(literals_start,REL_ARGUMENT(rel));
 	case RT_IMMEDIATE:
 		return get(CREF(literals_start,REL_ARGUMENT(rel)));
 	case RT_XT:

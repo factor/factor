@@ -32,13 +32,6 @@ big-endian off
 
 [
     arg0 0 MOV                                 ! load literal
-    arg0 dup [] MOV
-    ds-reg bootstrap-cell ADD                  ! increment datastack pointer
-    ds-reg [] arg0 MOV                         ! store literal on datastack
-] rc-absolute-cell rt-literal 1 rex-length + jit-push-literal jit-define
-
-[
-    arg0 0 MOV                                 ! load literal
     ds-reg bootstrap-cell ADD                  ! increment datastack pointer
     ds-reg [] arg0 MOV                         ! store literal on datastack
 ] rc-absolute-cell rt-immediate 1 rex-length + jit-push-immediate jit-define
@@ -294,9 +287,8 @@ big-endian off
 
 ! Comparisons
 : jit-compare ( insn -- )
-    arg1 0 MOV                                 ! load t
-    arg1 dup [] MOV
-    temp-reg \ f tag-number MOV                ! load f
+    temp-reg 0 MOV                             ! load t
+    arg1 \ f tag-number MOV                    ! load f
     arg0 ds-reg [] MOV                         ! load first value
     ds-reg bootstrap-cell SUB                  ! adjust stack pointer
     ds-reg [] arg0 CMP                         ! compare with second value
@@ -305,14 +297,14 @@ big-endian off
     ;
 
 : define-jit-compare ( insn word -- )
-    [ [ jit-compare ] curry rc-absolute-cell rt-literal 1 rex-length + ] dip
+    [ [ jit-compare ] curry rc-absolute-cell rt-immediate 1 rex-length + ] dip
     define-sub-primitive ;
 
-\ CMOVNE \ eq? define-jit-compare
-\ CMOVL \ fixnum>= define-jit-compare
-\ CMOVG \ fixnum<= define-jit-compare
-\ CMOVLE \ fixnum> define-jit-compare
-\ CMOVGE \ fixnum< define-jit-compare
+\ CMOVE \ eq? define-jit-compare
+\ CMOVGE \ fixnum>= define-jit-compare
+\ CMOVLE \ fixnum<= define-jit-compare
+\ CMOVG \ fixnum> define-jit-compare
+\ CMOVL \ fixnum< define-jit-compare
 
 ! Math
 : jit-math ( insn -- )

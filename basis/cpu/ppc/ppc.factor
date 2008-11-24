@@ -34,10 +34,8 @@ M: ppc two-operand? f ;
 
 M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
-M:: ppc %load-indirect ( reg obj -- )
-    0 reg LOAD32
-    obj rc-absolute-ppc-2/2 rel-literal
-    reg reg 0 LWZ ;
+M: ppc %load-indirect ( reg obj -- )
+    [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-immediate ] bi* ;
 
 : ds-reg 29 ; inline
 : rs-reg 30 ; inline

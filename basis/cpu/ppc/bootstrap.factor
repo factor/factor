@@ -24,7 +24,6 @@ big-endian on
 
 [
     0 6 LOAD32
-    6 dup 0 LWZ
     11 6 profile-count-offset LWZ
     11 11 1 tag-fixnum ADDI
     11 6 profile-count-offset STW
@@ -32,7 +31,7 @@ big-endian on
     11 11 compiled-header-size ADDI
     11 MTCTR
     BCTR
-] rc-absolute-ppc-2/2 rt-literal 1 jit-profiling jit-define
+] rc-absolute-ppc-2/2 rt-immediate 1 jit-profiling jit-define
 
 [
     0 6 LOAD32
@@ -43,12 +42,6 @@ big-endian on
     6 1 next-save STW
     0 1 lr-save stack-frame + STW
 ] rc-absolute-ppc-2/2 rt-label 1 jit-prolog jit-define
-
-[
-    0 6 LOAD32
-    6 dup 0 LWZ
-    6 ds-reg 4 STWU
-] rc-absolute-ppc-2/2 rt-literal 1 jit-push-literal jit-define
 
 [
     0 6 LOAD32
@@ -90,14 +83,13 @@ big-endian on
 
 [
     0 3 LOAD32
-    3 3 0 LWZ
     6 ds-reg 0 LWZ
     6 6 1 SRAWI
     3 3 6 ADD
     3 3 array-start-offset LWZ
     ds-reg dup 4 SUBI
     jit-jump-quot
-] rc-absolute-ppc-2/2 rt-literal 1 jit-dispatch jit-define
+] rc-absolute-ppc-2/2 rt-immediate 1 jit-dispatch jit-define
 
 : jit->r ( -- )
     4 ds-reg 0 LWZ
@@ -317,7 +309,6 @@ big-endian on
 ! Comparisons
 : jit-compare ( insn -- )
     0 3 LOAD32
-    3 3 0 LWZ
     4 ds-reg 0 LWZ
     5 ds-reg -4 LWZU
     5 0 4 CMP
@@ -326,7 +317,7 @@ big-endian on
     3 ds-reg 0 STW ;
 
 : define-jit-compare ( insn word -- )
-    [ [ jit-compare ] curry rc-absolute-ppc-2/2 rt-literal 1 ] dip
+    [ [ jit-compare ] curry rc-absolute-ppc-2/2 rt-immediate 1 ] dip
     define-sub-primitive ;
 
 \ BEQ \ eq? define-jit-compare
