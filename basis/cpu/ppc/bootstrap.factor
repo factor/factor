@@ -71,27 +71,22 @@ big-endian on
 
 [ 0 B ] rc-relative-ppc-3 rt-xt 0 jit-word-jump jit-define
 
-: jit-jump-quot ( -- )
-    4 3 quot-xt-offset LWZ
-    4 MTCTR
-    BCTR ;
-
-: jit-call-quot ( -- )
-    4 3 quot-xt-offset LWZ
-    4 MTLR
-    BLRL ;
-
 [
     3 ds-reg 0 LWZ
     ds-reg dup 4 SUBI
     0 3 \ f tag-number CMPI
-    2 BNE
+    2 BEQ
     0 B
-] rc-relative-ppc-3 rt-xt 3 jit-if-1 jit-define
+] rc-relative-ppc-3 rt-xt 4 jit-if-1 jit-define
 
 [
     0 B
 ] rc-relative-ppc-3 rt-xt 0 jit-if-2 jit-define
+
+: jit-jump-quot ( -- )
+    4 3 quot-xt-offset LWZ
+    4 MTCTR
+    BCTR ;
 
 [
     0 3 LOAD32
@@ -128,9 +123,9 @@ big-endian on
     6 rs-reg -8 STW ;
 
 : jit-r> ( -- )
-    4 ds-reg 0 LWZ
-    ds-reg dup 4 SUBI
-    4 rs-reg 4 STWU ;
+    4 rs-reg 0 LWZ
+    rs-reg dup 4 SUBI
+    4 ds-reg 4 STWU ;
 
 : jit-2r> ( -- )
     4 rs-reg 0 LWZ
