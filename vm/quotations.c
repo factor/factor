@@ -251,8 +251,8 @@ void jit_compile(CELL quot, bool relocate)
 				if(stack_frame)
 					EMIT(userenv[JIT_EPILOG],0);
 
-				jit_compile(array_nth(untag_object(array),i),true);
-				jit_compile(array_nth(untag_object(array),i + 1),true);
+				jit_compile(array_nth(untag_object(array),i),relocate);
+				jit_compile(array_nth(untag_object(array),i + 1),relocate);
 
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
 				EMIT(userenv[JIT_IF_1],literals_count - 1);
@@ -266,7 +266,7 @@ void jit_compile(CELL quot, bool relocate)
 			}
 			else if(jit_fast_dip_p(untag_object(array),i))
 			{
-				jit_compile(obj,true);
+				jit_compile(obj,relocate);
 
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
 				EMIT(userenv[JIT_DIP],literals_count - 1);
@@ -276,7 +276,7 @@ void jit_compile(CELL quot, bool relocate)
 			}
 			else if(jit_fast_2dip_p(untag_object(array),i))
 			{
-				jit_compile(obj,true);
+				jit_compile(obj,relocate);
 
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
 				EMIT(userenv[JIT_2DIP],literals_count - 1);
@@ -286,7 +286,7 @@ void jit_compile(CELL quot, bool relocate)
 			}
 			else if(jit_fast_3dip_p(untag_object(array),i))
 			{
-				jit_compile(obj,true);
+				jit_compile(obj,relocate);
 
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
 				EMIT(userenv[JIT_3DIP],literals_count - 1);
