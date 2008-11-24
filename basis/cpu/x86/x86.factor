@@ -18,7 +18,7 @@ M: x86 %load-immediate MOV ;
 
 HOOK: rel-literal-x86 cpu ( literal -- )
 
-M: x86 %load-indirect swap 0 [] MOV rel-literal-x86 ;
+M: x86 %load-indirect swap 0 MOV rc-absolute-cell rel-immediate ;
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )

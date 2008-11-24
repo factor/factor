@@ -315,7 +315,7 @@ void jit_compile(CELL quot, bool relocate)
 			}
 		default:
 			GROWABLE_ARRAY_ADD(literals,obj);
-			EMIT(userenv[immediate_p(obj) ? JIT_PUSH_IMMEDIATE : JIT_PUSH_LITERAL],literals_count - 1);
+			EMIT(userenv[JIT_PUSH_IMMEDIATE],literals_count - 1);
 			break;
 		}
 	}

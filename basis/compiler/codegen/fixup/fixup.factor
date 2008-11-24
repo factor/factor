@@ -69,6 +69,9 @@ SYMBOL: literal-table
 : rel-literal ( literal class -- )
     >r add-literal r> rt-literal rel-fixup ;
 
+: rel-immediate ( literal class -- )
+    >r add-literal r> rt-immediate rel-fixup ;
+
 : rel-this ( class -- )
     0 swap rt-label rel-fixup ;
 

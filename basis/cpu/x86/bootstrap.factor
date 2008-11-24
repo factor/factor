@@ -13,7 +13,6 @@ big-endian off
 [
     ! Load word
     temp-reg 0 MOV
-    temp-reg dup [] MOV
     ! Bump profiling counter
     temp-reg profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
@@ -22,7 +21,7 @@ big-endian off
     temp-reg compiled-header-size ADD
     ! Jump to XT
     temp-reg JMP
-] rc-absolute-cell rt-literal 1 rex-length + jit-profiling jit-define
+] rc-absolute-cell rt-immediate 1 rex-length + jit-profiling jit-define
 
 [
     temp-reg 0 MOV                             ! load XT
@@ -65,14 +64,13 @@ big-endian off
 
 [
     arg1 0 MOV                                 ! load dispatch table
-    arg1 dup [] MOV
     arg0 ds-reg [] MOV                         ! load index
     fixnum>slot@                               ! turn it into an array offset
     ds-reg bootstrap-cell SUB                  ! pop index
     arg0 arg1 ADD                              ! compute quotation location
     arg0 arg0 array-start-offset [+] MOV       ! load quotation
     arg0 quot-xt-offset [+] JMP                ! execute branch
-] rc-absolute-cell rt-literal 1 rex-length + jit-dispatch jit-define
+] rc-absolute-cell rt-immediate 1 rex-length + jit-dispatch jit-define
 
 : jit->r ( -- )
     rs-reg bootstrap-cell ADD

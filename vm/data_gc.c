@@ -303,21 +303,13 @@ void primitive_end_scan(void)
 /* Scan all the objects in the card */
 void collect_card(F_CARD *ptr, CELL gen, CELL here)
 {
-	CELL offset = CARD_OFFSET(ptr);
+	CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + CARD_OFFSET(ptr);
+	CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
 
-	if(offset != INVALID_ALLOT_MARKER)
-	{
-		if(offset & TAG_MASK)
-			critical_error("Bad card",(CELL)ptr);
+	while(card_scan < card_end && card_scan < here)
+		card_scan = collect_next(card_scan);
 
-		CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + offset;
-		CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
-
-		while(card_scan < card_end && card_scan < here)
-			card_scan = collect_next(card_scan);
-
-		cards_scanned++;
-	}
+	cards_scanned++;
 }
 
 void collect_card_deck(F_DECK *deck, CELL gen, F_CARD mask, F_CARD unmask)

@@ -259,13 +259,43 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 /* Copy all literals referenced from a code block to newspace */
 void collect_literals_step(F_COMPILED *compiled, CELL code_start, CELL literals_start)
 {
-	CELL scan;
-	CELL literal_end = literals_start + compiled->literals_length;
+	if(collecting_gen >= compiled->last_scan)
+	{
+		CELL scan;
+		CELL literal_end = literals_start + compiled->literals_length;
 
-	copy_handle(&compiled->relocation);
+		if(collecting_accumulation_gen_p())
+			compiled->last_scan = collecting_gen;
+		else
+			compiled->last_scan = collecting_gen + 1;
 
-	for(scan = literals_start; scan < literal_end; scan += CELLS)
-		copy_handle((CELL*)scan);
+		for(scan = literals_start; scan < literal_end; scan += CELLS)
+			copy_handle((CELL*)scan);
+
+		if(compiled->relocation != F)
+		{
+			copy_handle(&compiled->relocation);
+
+			F_BYTE_ARRAY *relocation = untag_object(compiled->relocation);
+
+			F_REL *rel = (F_REL *)(relocation + 1);
+			F_REL *rel_end = (F_REL *)((char *)rel + byte_array_capacity(relocation));
+
+			while(rel < rel_end)
+			{
+				if(REL_TYPE(rel) == RT_IMMEDIATE)
+				{
+					CELL offset = rel->offset + code_start;
+					F_FIXNUM absolute_value = get(CREF(literals_start,REL_ARGUMENT(rel)));
+					apply_relocation(REL_CLASS(rel),offset,absolute_value);
+				}
+
+				rel++;
+			}
+		}
+
+		flush_icache(code_start,literals_start - code_start);
+	}
 }
 
 /* Copy literals referenced from all code blocks to newspace */

@@ -57,6 +57,10 @@ typedef struct {
 	unsigned int offset;
 } F_REL;
 
+#define CREF(array,i) ((CELL)(array) + CELLS * (i))
+
+void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value);
+
 void relocate_code_block(F_COMPILED *relocating, CELL code_start, CELL literals_start);
 
 void default_word_code(F_WORD *word, bool relocate);

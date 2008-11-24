@@ -7,8 +7,6 @@ void undefined_symbol(void)
 	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
 }
 
-#define CREF(array,i) ((CELL)(array) + CELLS * (i))
-
 INLINE CELL get_literal(CELL literals_start, CELL num)
 {
 	return get(CREF(literals_start,num));
@@ -283,6 +281,7 @@ F_COMPILED *add_compiled_block(
 	/* compiled header */
 	F_COMPILED *header = (void *)here;
 	header->type = type;
+	header->last_scan = NURSERY;
 	header->code_length = code_length;
 	header->literals_length = literals_length;
 	header->relocation = relocation;
