@@ -388,6 +388,7 @@ big-endian on
     ds-reg ds-reg 4 SUBI
     4 ds-reg 0 LWZ
     5 4 3 DIVW
+    5 5 tag-bits get SLWI
     5 ds-reg 0 STW
 ] f f f \ fixnum/i-fast define-sub-primitive
 
@@ -397,6 +398,7 @@ big-endian on
     5 4 3 DIVW
     6 5 3 MULLW
     7 6 4 SUBF
+    5 5 tag-bits get SLWI
     5 ds-reg -4 STW
     7 ds-reg 0 STW
 ] f f f \ fixnum/mod-fast define-sub-primitive
