@@ -205,18 +205,18 @@ HELP: 3slip
 { $description "Calls a quotation while hiding the top three stack elements." } ;
 
 HELP: keep
-{ $values { "quot" { $quotation "( x -- )" } } { "x" object } }
+{ $values { "quot" { $quotation "( x -- ... )" } } { "x" object } }
 { $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." }
 { $examples
     { $example "USING: arrays kernel prettyprint ;" "2 \"greetings\" [ <array> ] keep 2array ." "{ { \"greetings\" \"greetings\" } \"greetings\" }" }
 } ;
 
 HELP: 2keep
-{ $values { "quot" { $quotation "( x y -- )" } } { "x" object } { "y" object } }
+{ $values { "quot" { $quotation "( x y -- ... )" } } { "x" object } { "y" object } }
 { $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
-{ $values { "quot" { $quotation "( x y z -- )" } } { "x" object } { "y" object } { "z" object } }
+{ $values { "quot" { $quotation "( x y z -- ... )" } } { "x" object } { "y" object } { "z" object } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: bi
@@ -371,7 +371,7 @@ HELP: tri*
 } ;
 
 HELP: bi@
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- )" } } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- ... )" } } }
 { $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -387,7 +387,7 @@ HELP: bi@
 } ;
 
 HELP: 2bi@
-{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj1 obj2 -- )" } } }
+{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj1 obj2 -- ... )" } } }
 { $description "Applies the quotation to " { $snippet "w" } " and " { $snippet "x" } ", then to " { $snippet "y" } " and " { $snippet "z" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -403,7 +403,7 @@ HELP: 2bi@
 } ;
 
 HELP: tri@
-{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj -- )" } } }
+{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj -- ... )" } } }
 { $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } ", and finally to " { $snippet "z" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -437,7 +437,7 @@ $nl
 "The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
 
 HELP: if*
-{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- )" } } { "false" quotation } }
+{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } { "false" quotation } }
 { $description "Alternative conditional form that preserves the " { $snippet "cond" } " value if it is true."
 $nl
 "If the condition is true, it is retained on the stack before the " { $snippet "true" } " quotation is called. Otherwise, the condition is removed from the stack and the " { $snippet "false" } " quotation is called."
@@ -446,7 +446,7 @@ $nl
 { $code "X [ Y ] [ Z ] if*" "X dup [ Y ] [ drop Z ] if" } } ;
 
 HELP: when*
-{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- )" } } }
+{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } }
 { $description "Variant of " { $link if* } " with no false quotation."
 $nl
 "The following two lines are equivalent:"
@@ -460,7 +460,7 @@ HELP: unless*
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
 HELP: ?if
-{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation "( cond -- )" } } { "false" { $quotation "( default -- )" } } }
+{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } { "false" { $quotation "( default -- ... )" } } }
 { $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack." }
 { $notes
 "The following two lines are equivalent:"
