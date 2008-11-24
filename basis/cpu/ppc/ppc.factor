@@ -396,14 +396,14 @@ M: ppc %epilogue ( n -- )
     1 1 rot ADDI
     0 MTLR ;
 
-:: (%boolean) ( dst word -- )
+:: (%boolean) ( dst temp word -- )
     "end" define-label
     dst \ f tag-number %load-immediate
     "end" get word execute
     dst \ t %load-indirect
     "end" get resolve-label ; inline
 
-: %boolean ( dst cc -- )
+: %boolean ( dst temp cc -- )
     negate-cc {
         { cc< [ \ BLT (%boolean) ] }
         { cc<= [ \ BLE (%boolean) ] }
