@@ -9,6 +9,10 @@ The non-optimizing compiler compiles a quotation at a time by concatenating
 machine code chunks; prolog, epilog, call word, jump to word, etc. These machine
 code chunks are generated from Factor code in core/cpu/.../bootstrap.factor.
 
+Calls to words and constant quotations (referenced by conditionals and dips)
+are direct jumps to machine code blocks. Literals are also referenced directly
+without going through the literal table.
+
 It actually does do a little bit of very simple optimization:
 
 1) Tail call optimization.
@@ -21,12 +25,15 @@ generated.
 'if' and 'dispatch' conditionals are generated inline, instead of as a call to
 the 'if' word.
 
-4) When preceded by an array, calls to the 'declare' word are optimized out
+4) When preceded by a quotation, calls to 'dip', '2dip' and '3dip' are
+open-coded as retain stack manipulation surrounding a subroutine call.
+
+5) When preceded by an array, calls to the 'declare' word are optimized out
 entirely. This word is only used by the optimizing compiler, and with the
 non-optimizing compiler it would otherwise just decrease performance to have to
 push the array and immediately drop it after.
 
-5) Sub-primitives are primitive words which are implemented in assembly and not
+6) Sub-primitives are primitive words which are implemented in assembly and not
 in the VM. They are open-coded and no subroutine call is generated. This
 includes stack shufflers, some fixnum arithmetic words, and words such as tag,
 slot and eq?. A primitive call is relatively expensive (two subroutine calls)
