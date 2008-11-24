@@ -155,9 +155,12 @@ help-hook global [ [ print-topic ] or ] change-at
     ":get  ( var -- value ) accesses variables at time of the error" print
     ":vars - list all variables at error time" print ;
 
-: :help ( -- )
-    error get error-help [ help ] [ "No help for this error. " print ] if*
+: (:help) ( error -- )
+    error-help [ help ] [ "No help for this error. " print ] if*
     :help-debugger ;
+
+: :help ( -- )
+    error get (:help) ;
 
 : remove-article ( name -- )
     dup articles get key? [
