@@ -204,7 +204,7 @@ buffer."
 (defconst factor--regex-using-line "^USING: +\\([^;]*\\);")
 (defconst factor--regex-use-line "^USE: +\\(.*\\)$")
 
-(defconst factor-font-lock-keywords
+(defconst factor--font-lock-keywords
   `(("( .* )" . 'factor-font-lock-stack-effect)
     ("\\(P\\|SBUF\\)\"" 1 'factor-font-lock-parsing-word)
     ,@(mapcar #'(lambda (w) (cons (concat "\\(^\\| \\)\\(" w "\\)\\($\\| \\)")
@@ -502,17 +502,25 @@ buffer."
   (use-local-map factor-mode-map)
   (setq major-mode 'factor-mode)
   (setq mode-name "Factor")
+  ;; Font locking
   (set (make-local-variable 'comment-start) "! ")
+  (set (make-local-variable 'parse-sexp-lookup-properties) t)
   (set (make-local-variable 'font-lock-comment-face) 'factor-font-lock-comment)
   (set (make-local-variable 'font-lock-string-face) 'factor-font-lock-string)
   (set (make-local-variable 'font-lock-defaults)
-       `(factor-font-lock-keywords
+       `(factor--font-lock-keywords
          nil nil nil nil
          (font-lock-syntactic-keywords . ,factor--font-lock-syntactic-keywords)))
+
   (set-syntax-table factor-mode-syntax-table)
+  ;; Defun navigation
+  (setq defun-prompt-regexp "[^ :]+")
+  (set (make-local-variable 'open-paren-in-column-0-is-defun-start) t)
+  ;; Indentation
   (set (make-local-variable 'indent-line-function) 'factor--indent-line)
   (setq factor-indent-width (factor--guess-indent-width))
   (setq indent-tabs-mode nil)
+
   (run-hooks 'factor-mode-hook))
 
 (add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))
@@ -568,6 +576,7 @@ buffer."
                 "Generic word contract"
                 "Inputs and outputs"
                 "Parent topics:"
+                "See also"
                 "Syntax"
                 "Vocabulary"
                 "Warning"
@@ -578,7 +587,7 @@ buffer."
 
 (defconst factor--help-font-lock-keywords
   `((,factor--help-headlines-regexp . 'factor-font-lock-help-mode-headlines)
-    ,@factor-font-lock-keywords))
+    ,@factor--font-lock-keywords))
 
 (defun factor-help-mode ()
   "Major mode for displaying Factor help messages.
@@ -591,6 +600,7 @@ buffer."
   (set (make-local-variable 'font-lock-defaults)
        '(factor--help-font-lock-keywords t nil nil nil))
   (set (make-local-variable 'comint-redirect-subvert-readonly) t)
+  (set (make-local-variable 'comint-redirect-echo-input) nil)
   (set (make-local-variable 'view-no-disable-on-exit) t)
   (view-mode)
   (setq view-exit-action
@@ -602,11 +612,11 @@ buffer."
   (run-mode-hooks 'factor-help-mode-hook))
 
 (defun factor--listener-help-buffer ()
-  (set-buffer (get-buffer-create "*factor-help*"))
-  (let ((inhibit-read-only t))
-    (delete-region (point-min) (point-max)))
-  (factor-help-mode)
-  (current-buffer))
+  (with-current-buffer (get-buffer-create "*factor-help*")
+    (let ((inhibit-read-only t))
+      (delete-region (point-min) (point-max)))
+    (factor-help-mode)
+    (current-buffer)))
 
 (defvar factor--help-history nil)
 
@@ -622,7 +632,8 @@ buffer."
          (hb (factor--listener-help-buffer))
          (proc (factor--listener-process)))
     (comint-redirect-send-command-to-process cmd hb proc nil)
-    (pop-to-buffer hb)))
+    (pop-to-buffer hb)
+    (beginning-of-buffer hb)))
 
 (defun factor-see ()
   (interactive)
