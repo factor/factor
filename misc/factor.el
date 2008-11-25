@@ -652,13 +652,12 @@ vocabularies which have been modified on disk."
 
 ;;; Key bindings:
 
-(defmacro factor--define-key (key cmd &optional both)
-  (let ((m (gensym))
-        (ms '(factor-mode-map)))
-    (when both (push 'factor-help-mode-map ms))
-    `(dolist (,m (list ,@ms))
-       (define-key ,m [(control ?c) ,key] ,cmd)
-       (define-key ,m [(control ?c) (control ,key)] ,cmd))))
+(defun factor--define-key (key cmd &optional both)
+  (let ((ms (list factor-mode-map)))
+    (when both (push factor-help-mode-map ms))
+    (dolist (m ms)
+      (define-key m (vector '(control ?c) key) cmd)
+      (define-key m (vector '(control ?c) `(control ,key)) cmd))))
 
 (factor--define-key ?f 'factor-run-file)
 (factor--define-key ?r 'factor-send-region)
