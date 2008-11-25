@@ -12,8 +12,7 @@ TUPLE: canvas < gadget dlist ;
 
 : delete-canvas-dlist ( canvas -- )
     [ find-gl-context ]
-    [ dlist>> [ delete-dlist ] when* ]
-    [ f >>dlist drop ] tri ;
+    [ [ [ delete-dlist ] when* f ] change-dlist drop ] bi ;
 
 : make-canvas-dlist ( canvas quot -- dlist )
     [ drop ] [ GL_COMPILE swap make-dlist ] 2bi
