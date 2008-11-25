@@ -22,8 +22,13 @@ MACRO: firstn ( n -- )
         bi prefix '[ _ cleave ]
     ] if ;
 
-MACRO: npick ( n -- )
-    1- dup saver [ dup ] rot [ r> swap ] n*quot 3append ;
+: npick-wrap ( quot n -- quot )
+    dup 1 >
+        [ swap '[ _ dip swap ] swap 1 - npick-wrap ]
+        [ drop ]
+    if ;
+
+MACRO: npick ( n -- quot ) [ dup ] swap npick-wrap ;
 
 MACRO: ndup ( n -- )
     dup '[ _ npick ] n*quot ;
