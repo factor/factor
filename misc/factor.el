@@ -160,10 +160,6 @@ buffer."
 
 ;;; Factor mode font lock:
 
-(defconst factor--regexp-word-start
-  (let ((sws '("" ":" "TUPLE" "MACRO" "MACRO:" "M")))
-    (format "^\\(%s\\)\\(:\\) " (mapconcat 'identity sws "\\|"))))
-
 (defconst factor--parsing-words
   '("{" "}" "^:" "^::" ";" "<<" "<PRIVATE" ">>"
     "BIN:" "BV{" "B{" "C:" "C-STRUCT:" "C-UNION:" "CHAR:" "CS{" "C{"
@@ -221,6 +217,10 @@ buffer."
 
 
 ;;; Factor mode syntax:
+
+(defconst factor--regexp-word-start
+  (let ((sws '("" ":" "TUPLE" "MACRO" "MACRO:" "M")))
+    (format "^\\(%s\\)\\(:\\) " (regexp-opt sws))))
 
 (defconst factor--font-lock-syntactic-keywords
   `(("^\\(:\\)\\(:\\)" (1 ".") (2 "(;"))
@@ -321,7 +321,7 @@ buffer."
                               "PRIVATE>" "<PRIVATE" "SYMBOL:" "USE:"))))
 
 (defsubst factor--at-begin-of-def ()
-  (looking-at "\\([^ ]\\|^\\)+:"))
+  (looking-at factor--regexp-word-start))
 
 (defsubst factor--looking-at-emptiness ()
   (looking-at "^[ \t]*$"))
@@ -652,13 +652,12 @@ vocabularies which have been modified on disk."
 
 ;;; Key bindings:
 
-(defmacro factor--define-key (key cmd &optional both)
-  (let ((m (gensym))
-        (ms '(factor-mode-map)))
-    (when both (push 'factor-help-mode-map ms))
-    `(dolist (,m (list ,@ms))
-       (define-key ,m [(control ?c) ,key] ,cmd)
-       (define-key ,m [(control ?c) (control ,key)] ,cmd))))
+(defun factor--define-key (key cmd &optional both)
+  (let ((ms (list factor-mode-map)))
+    (when both (push factor-help-mode-map ms))
+    (dolist (m ms)
+      (define-key m (vector '(control ?c) key) cmd)
+      (define-key m (vector '(control ?c) `(control ,key)) cmd))))
 
 (factor--define-key ?f 'factor-run-file)
 (factor--define-key ?r 'factor-send-region)
@@ -671,7 +670,6 @@ vocabularies which have been modified on disk."
 (define-key factor-mode-map "\C-ch" 'factor-help)
 (define-key factor-help-mode-map "\C-ch" 'factor-help)
 (define-key factor-mode-map "\C-m" 'newline-and-indent)
-(define-key factor-mode-map [tab] 'indent-for-tab-command)
 
 (define-key factor-listener-mode-map [f8] 'factor-refresh-all)
 
