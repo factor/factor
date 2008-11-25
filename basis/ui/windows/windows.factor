@@ -9,7 +9,7 @@ windows.user32 windows.opengl32 windows.messages windows.types
 windows.nt windows threads libc combinators
 combinators.short-circuit continuations command-line shuffle
 opengl ui.render ascii math.bitwise locals symbols accessors
-math.geometry.rect math.order ascii ;
+math.geometry.rect math.order ascii calendar ;
 IN: ui.windows
 
 SINGLETON: windows-ui-backend
@@ -472,7 +472,7 @@ M: windows-ui-backend do-events
     "MSG" malloc-object msg-obj set-global
     "Factor-window" utf16n malloc-string class-name-ptr set-global
     register-wndclassex drop
-    GetDoubleClickTime double-click-timeout set-global ;
+    GetDoubleClickTime milliseconds double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
     class-name-ptr get-global [ dup f UnregisterClass drop free ] when*
