@@ -20,18 +20,19 @@ TUPLE: default ;
 
 : <literal-transition> ( from to obj -- transition )
     literal-transition make-transition ;
+
 : <class-transition> ( from to obj -- transition )
     class-transition make-transition ;
+
 : <default-transition> ( from to -- transition )
     t default-transition make-transition ;
 
-TUPLE: transition-table transitions start-state final-states flags ;
+TUPLE: transition-table transitions start-state final-states ;
 
 : <transition-table> ( -- transition-table )
     transition-table new
         H{ } clone >>transitions
-        H{ } clone >>final-states
-        H{ } clone >>flags ;
+        H{ } clone >>final-states ;
 
 : maybe-initialize-key ( key hashtable -- )
     2dup key? [ 2drop ] [ H{ } clone -rot set-at ] if ;
