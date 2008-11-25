@@ -1,13 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math.intervals math.parser namespaces
-strings random accessors quotations hashtables sequences continuations
-fry calendar combinators combinators.short-circuit destructors alarms
-io.servers.connection
-db db.tuples db.types
+strings random accessors quotations hashtables sequences
+continuations fry calendar combinators combinators.short-circuit
+destructors alarms io.servers.connection db db.tuples db.types
 http http.server http.server.dispatchers http.server.filters
-html.elements
-furnace furnace.cache furnace.scopes ;
+html.elements furnace.cache furnace.scopes furnace.utilities ;
 IN: furnace.sessions
 
 TUPLE: session < scope user-agent client ;
