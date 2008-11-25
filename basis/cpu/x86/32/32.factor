@@ -39,8 +39,8 @@ M:: x86.32 %dispatch ( src temp offset -- )
     bi ;
 
 ! Registers for fastcall
-M: x86.32 param-reg-1 drop EAX ;
-M: x86.32 param-reg-2 drop EDX ;
+M: x86.32 param-reg-1 EAX ;
+M: x86.32 param-reg-2 EDX ;
 
 M: x86.32 reserved-area-size 0 ;
 
