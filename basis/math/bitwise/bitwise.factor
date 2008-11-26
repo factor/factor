@@ -22,15 +22,12 @@ IN: math.bitwise
     [ shift ] dip 2^ wrap ; inline
 
 : bitroll ( x s w -- y )
+    [ wrap ] keep
     [ shift-mod ] [ [ - ] keep shift-mod ] 3bi bitor ; inline
 
 : bitroll-32 ( n s -- n' ) 32 bitroll ; inline
 
-HINTS: bitroll-32 { bignum fixnum } { fixnum fixnum } ;
-
 : bitroll-64 ( n s -- n' ) 64 bitroll ; inline
-
-HINTS: bitroll-64 { bignum fixnum } { fixnum fixnum } ;
 
 ! 32-bit arithmetic
 : w+ ( int int -- int ) + 32 bits ; inline
