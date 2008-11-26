@@ -168,24 +168,29 @@ M: gradient draw-interior
     } cleave ;
 
 ! Polygon pen
-TUPLE: polygon color vertex-array count ;
+TUPLE: polygon color
+interior-vertices
+interior-count
+boundary-vertices
+boundary-count ;
 
 : <polygon> ( color points -- polygon )
-    [ concat >c-float-array ] [ length ] bi polygon boa ;
-
-: draw-polygon ( polygon mode -- )
-    swap
-    [ color>> gl-color ]
-    [ vertex-array>> gl-vertex-pointer ]
-    [ 0 swap count>> glDrawArrays ]
-    tri ;
+    dup close-path [ [ concat >c-float-array ] [ length ] bi ] bi@
+    polygon boa ;
 
 M: polygon draw-boundary
-    GL_LINE_LOOP draw-polygon drop ;
+    nip
+    [ color>> gl-color ]
+    [ boundary-vertices>> gl-vertex-pointer ]
+    [ [ GL_LINE_STRIP 0 ] dip boundary-count>> glDrawArrays ]
+    tri ;
 
 M: polygon draw-interior
-    dup count>> 2 > GL_POLYGON GL_LINES ?
-    draw-polygon drop ;
+    nip
+    [ color>> gl-color ]
+    [ interior-vertices>> gl-vertex-pointer ]
+    [ [ GL_POLYGON 0 ] dip interior-count>> glDrawArrays ]
+    tri ;
 
 : arrow-up    { { 3 0 } { 6 6 } { 0 6 } } ;
 : arrow-right { { 0 0 } { 6 3 } { 0 6 } } ;

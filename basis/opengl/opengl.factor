@@ -71,18 +71,22 @@ MACRO: all-enabled-client-state ( seq quot -- )
     line-vertices GL_LINES 0 2 glDrawArrays ;
 
 : (rect-vertices) ( dim -- vertices )
+    #! We use GL_LINE_STRIP with a duplicated first vertex
+    #! instead of GL_LINE_LOOP to work around a bug in Apple's
+    #! X3100 driver.
     {
         [ drop 0.5 0.5 ]
         [ first 0.3 - 0.5 ]
         [ [ first 0.3 - ] [ second 0.3 - ] bi ]
         [ second 0.3 - 0.5 swap ]
-    } cleave 8 narray >c-float-array ;
+        [ drop 0.5 0.5 ]
+    } cleave 10 narray >c-float-array ;
 
 : rect-vertices ( dim -- )
     (rect-vertices) gl-vertex-pointer ;
 
 : (gl-rect) ( -- )
-    GL_LINE_LOOP 0 4 glDrawArrays ;
+    GL_LINE_STRIP 0 5 glDrawArrays ;
 
 : gl-rect ( dim -- )
     rect-vertices (gl-rect) ;
@@ -119,7 +123,16 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : circle-points ( loc dim steps -- points )
     circle-steps unit-circle adjust-points scale-points ;
 
+: close-path ( points -- points' )
+    dup first suffix ;
+
 : circle-vertices ( loc dim steps -- vertices )
+    #! We use GL_LINE_STRIP with a duplicated first vertex
+    #! instead of GL_LINE_LOOP to work around a bug in Apple's
+    #! X3100 driver.
+    circle-points close-path concat >c-float-array ;
+
+: fill-circle-vertices ( loc dim steps -- vertices )
     circle-points concat >c-float-array ;
 
 : (gen-gl-object) ( quot -- id )
