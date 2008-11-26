@@ -45,7 +45,7 @@ ERROR: no-cond ;
     [ rot \ if 3array append [ ] like ] assoc-each ;
 
 : cond>quot ( assoc -- quot )
-    [ dup callable? [ [ t ] swap 2array ] when ] map
+    [ dup pair? [ [ t ] swap 2array ] unless ] map
     reverse [ no-cond ] swap alist>quot ;
 
 ! case

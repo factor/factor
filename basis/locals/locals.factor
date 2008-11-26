@@ -206,6 +206,8 @@ M: array rewrite-literal? [ rewrite-literal? ] contains? ;
 
 M: quotation rewrite-literal? [ rewrite-literal? ] contains? ;
 
+M: wrapper rewrite-literal? drop t ;
+
 M: hashtable rewrite-literal? drop t ;
 
 M: vector rewrite-literal? drop t ;
@@ -235,11 +237,16 @@ M: hashtable rewrite-element >alist rewrite-sequence \ >hashtable , ;
 M: tuple rewrite-element
     [ tuple-slots rewrite-elements ] [ class literalize , ] bi \ boa , ;
 
+M: lambda rewrite-element local-rewrite* ;
+
 M: local rewrite-element , ;
 
 M: local-reader rewrite-element , ;
 
 M: word rewrite-element literalize , ;
+
+M: wrapper rewrite-element
+    dup rewrite-literal? [ wrapped>> rewrite-element ] [ , ] if ;
 
 M: object rewrite-element , ;
 
@@ -251,8 +258,10 @@ M: tuple local-rewrite* rewrite-element ;
 
 M: hashtable local-rewrite* rewrite-element ;
 
+M: wrapper local-rewrite* rewrite-element ;
+
 M: word local-rewrite*
-    dup { >r r> } memq?
+    dup { >r r> load-locals get-local drop-locals } memq?
     [ >r/r>-in-lambda-error ] [ call-next-method ] if ;
 
 M: object lambda-rewrite* , ;
@@ -350,10 +359,15 @@ M: wlet local-rewrite*
     word [ over "declared-effect" set-word-prop ] when*
     in>> [ dup pair? [ first ] when ] map make-locals dup push-locals ;
 
+ERROR: bad-lambda-rewrite output ;
+
+M: bad-lambda-rewrite summary
+    drop "You have found a bug in locals. Please report." ;
+
 : parse-locals-definition ( word -- word quot )
     "(" expect parse-locals \ ; (parse-lambda) <lambda>
     2dup "lambda" set-word-prop
-    lambda-rewrite first ;
+    lambda-rewrite dup length 1 = [ first ] [ bad-lambda-rewrite ] if ;
 
 : (::) ( -- word def ) CREATE-WORD parse-locals-definition ;
 
