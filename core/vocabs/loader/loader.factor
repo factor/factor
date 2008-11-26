@@ -19,23 +19,26 @@ V{
     vocab-name { { CHAR: . CHAR: / } } substitute ;
 
 : vocab-dir+ ( vocab str/f -- path )
-    >r vocab-name "." split r>
-    [ >r dup peek r> append suffix ] when*
+    [ vocab-name "." split ] dip
+    [ [ dup peek ] dip append suffix ] when*
     "/" join ;
 
 : vocab-dir? ( root name -- ? )
-    over [
-        ".factor" vocab-dir+ append-path exists?
-    ] [
-        2drop f
-    ] if ;
+    over
+    [ ".factor" vocab-dir+ append-path exists? ]
+    [ 2drop f ]
+    if ;
 
 SYMBOL: root-cache
 
 H{ } clone root-cache set-global
 
+<PRIVATE
+
 : (find-vocab-root) ( name -- path/f )
     vocab-roots get swap [ vocab-dir? ] curry find nip ;
+
+PRIVATE>
 
 : find-vocab-root ( vocab -- path/f )
     vocab-name dup root-cache get at [ ] [ (find-vocab-root) ] ?if ;
@@ -51,26 +54,37 @@ H{ } clone root-cache set-global
 
 SYMBOL: load-help?
 
-: load-source ( vocab -- vocab )
-    f over set-vocab-source-loaded?
-    [ vocab-source-path [ parse-file ] [ [ ] ] if* ] keep
-    t swap set-vocab-source-loaded?
-    [ % ] [ call ] if-bootstrapping ;
+ERROR: circular-dependency name ;
 
-: load-docs ( vocab -- vocab )
-    load-help? get [
-        f over set-vocab-docs-loaded?
-        [ vocab-docs-path [ ?run-file ] when* ] keep
-        t swap set-vocab-docs-loaded?
-    ] [ drop ] if ;
+<PRIVATE
 
-: reload ( name -- )
+: load-source ( vocab -- )
     [
-        dup vocab [ [ load-source ] [ load-docs ] bi ] [ no-vocab ] ?if
-    ] with-compiler-errors ;
+        +parsing+ >>source-loaded?
+        dup vocab-source-path [ parse-file ] [ [ ] ] if*
+        [ % ] [ assert-depth ] if-bootstrapping
+        +done+ >>source-loaded? drop
+    ] [ ] [ f >>source-loaded? ] cleanup ;
+
+: load-docs ( vocab -- )
+    load-help? get [
+        [
+            +parsing+ >>docs-loaded?
+            [ vocab-docs-path [ ?run-file ] when* ] keep
+            +done+ >>docs-loaded?
+        ] [ ] [ f >>docs-loaded? ] cleanup
+    ] when drop ;
+
+PRIVATE>
 
 : require ( vocab -- )
-    load-vocab drop ;
+    [ load-vocab drop ] with-compiler-errors ;
+
+: reload ( name -- )
+    dup vocab
+    [ [ [ load-source ] [ load-docs ] bi ] with-compiler-errors ]
+    [ require ]
+    ?if ;
 
 : run ( vocab -- )
     dup load-vocab vocab-main [
@@ -83,6 +97,8 @@ SYMBOL: load-help?
 
 SYMBOL: blacklist
 
+<PRIVATE
+
 : add-to-blacklist ( error vocab -- )
     vocab-name blacklist get dup [ set-at ] [ 3drop ] if ;
 
@@ -90,9 +106,10 @@ GENERIC: (load-vocab) ( name -- )
 
 M: vocab (load-vocab)
     [
-        dup vocab-source-loaded? [ dup load-source ] unless
-        dup vocab-docs-loaded? [ dup load-docs ] unless
-        drop
+        dup source-loaded?>> +parsing+ eq? [
+            dup source-loaded?>> [ dup load-source ] unless
+            dup docs-loaded?>> [ dup load-docs ] unless
+        ] unless drop
     ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 
 M: vocab-link (load-vocab)
@@ -103,18 +120,16 @@ M: string (load-vocab)
 
 [
     [
-        dup vocab-name blacklist get at* [
-            rethrow
-        ] [
-            drop
-            dup find-vocab-root [
-                [ (load-vocab) ] with-compiler-errors
-            ] [
-                dup vocab [ drop ] [ no-vocab ] if
-            ] if
+        dup vocab-name blacklist get at* [ rethrow ] [
+            drop dup find-vocab-root
+            [ [ (load-vocab) ] with-compiler-errors ]
+            [ dup vocab [ drop ] [ no-vocab ] if ]
+            if
         ] if
     ] with-compiler-errors
 ] load-vocab-hook set-global
+
+PRIVATE>
 
 : vocab-where ( vocab -- loc )
     vocab-source-path dup [ 1 2array ] when ;

@@ -68,7 +68,7 @@ IN: help.lint
     ] each ;
 
 : check-rendering ( word element -- )
-    [ help ] with-string-writer drop ;
+    [ print-topic ] with-string-writer drop ;
 
 : all-word-help ( words -- seq )
     [ word-help ] filter ;

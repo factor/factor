@@ -15,7 +15,7 @@ HELP: filter
 } ;
 
 HELP: <filter>
-{ $values { "model" model } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "filter" "a new " { $link filter } } }
+{ $values { "model" model } { "quot" { $quotation "( obj -- newobj )" } } { "filter" "a new " { $link filter } } }
 { $description "Creates a new instance of " { $link filter } ". The value of the new filter model is computed by applying the quotation to the value." }
 { $examples "See the example in the documentation for " { $link filter } "." } ;
 

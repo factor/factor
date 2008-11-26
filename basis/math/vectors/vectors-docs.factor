@@ -34,7 +34,7 @@ HELP: n*v
 { $description "Multiplies each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
 
 HELP: v*n
-{ $values { "n" "a number" } { "u" "a sequence of numbers" } { "v" "a sequence of numbers" } }
+{ $values { "u" "a sequence of numbers" } { "n" "a number" } { "v" "a sequence of numbers" } }
 { $description "Multiplies each element of " { $snippet "u" } " by " { $snippet "n" } "." } ;
 
 HELP: n/v

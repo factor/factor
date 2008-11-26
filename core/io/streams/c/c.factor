@@ -67,7 +67,7 @@ M: c-io-backend init-io ;
 
 M: c-io-backend (init-stdio) init-c-stdio ;
 
-M: c-io-backend io-multiplex 60 60 * 1000 * or (sleep) ;
+M: c-io-backend io-multiplex 60 60 * 1000 * 1000 * or (sleep) ;
 
 M: c-io-backend (file-reader)
     "rb" fopen <c-reader> ;
@@ -83,6 +83,6 @@ M: c-io-backend (file-appender)
     #! print stuff from contexts where the I/O system would
     #! otherwise not work (tools.deploy.shaker, the I/O
     #! multiplexer thread).
-    "\r\n" append >byte-array
+    "\n" append >byte-array
     stdout-handle fwrite
     stdout-handle fflush ;

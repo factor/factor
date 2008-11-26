@@ -31,8 +31,8 @@
 		</table>
 
 		<p>
-			<button>Set password</button>
-			<t:validation-messages />
+			<button type="submit">Set password</button>
+			<t:validation-errors />
 		</p>
 
 	</t:form>

@@ -15,16 +15,26 @@ main()
 ;
 
 STRING: plane-fragment-shader
+uniform float checker_size_inv;
+uniform vec4 checker_color_1, checker_color_2;
 varying vec3 object_position;
+
+bool
+checker_color(vec3 p)
+{
+    vec3 pprime = checker_size_inv * object_position;
+    return fract((floor(pprime.x) + floor(pprime.z)) * 0.5) == 0.0;
+}
+
 void
 main()
 {
     float distance_factor = (gl_FragCoord.z * 0.5 + 0.5);
     distance_factor = pow(distance_factor, 500.0)*0.5;
     
-    gl_FragColor = fract((floor(0.125*object_position.x)+floor(0.125*object_position.z)) * 0.5) == 0.0
-        ? vec4(1.0, 1.0 - distance_factor, 1.0 - distance_factor, 1.0)
-        : vec4(1.0, distance_factor, distance_factor, 1.0);
+    gl_FragColor = checker_color(object_position)
+        ? mix(checker_color_1, checker_color_2, distance_factor)
+        : mix(checker_color_2, checker_color_1, distance_factor);
 }
 ;
 
@@ -213,7 +223,11 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
         ] with-gl-program
     ] [
         plane-program>> [
-            drop
+            {
+                [ "checker_size_inv" glGetUniformLocation 0.125 glUniform1f ]
+                [ "checker_color_1"  glGetUniformLocation 1.0 0.5 0.0 1.0 glUniform4f ]
+                [ "checker_color_2"  glGetUniformLocation 0.0 0.0 0.0 1.0 glUniform4f ]
+            } cleave
             GL_QUADS [
                 -1000.0 -30.0  1000.0 glVertex3f
                 -1000.0 -30.0 -1000.0 glVertex3f

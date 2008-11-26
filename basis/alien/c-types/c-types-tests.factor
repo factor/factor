@@ -56,3 +56,7 @@ TYPEDEF: uchar* MyLPBYTE
 ] must-fail
 
 [ t ] [ { t f t } >c-bool-array { 1 0 1 } >c-int-array = ] unit-test
+
+os windows? cpu x86.64? and [
+    [ -2147467259 ] [ 2147500037 <long> *long  ] unit-test
+] when

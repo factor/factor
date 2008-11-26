@@ -29,10 +29,10 @@ name>char-hook global [
 : unicode-escape ( str -- ch str' )
     "{" ?head-slice [
         CHAR: } over index cut-slice
-        >r >string name>char-hook get call r>
+        [ >string name>char-hook get call ] dip
         rest-slice
     ] [
-        6 cut-slice >r hex> r>
+        6 cut-slice [ hex> ] dip
     ] if ;
 
 : next-escape ( str -- ch str' )
@@ -44,11 +44,11 @@ name>char-hook global [
 
 : (parse-string) ( str -- m )
     dup [ "\"\\" member? ] find dup [
-        >r cut-slice >r % r> rest-slice r>
+        [ cut-slice [ % ] dip rest-slice ] dip
         dup CHAR: " = [
             drop from>>
         ] [
-            drop next-escape >r , r> (parse-string)
+            drop next-escape [ , ] dip (parse-string)
         ] if
     ] [
         "Unterminated string" throw

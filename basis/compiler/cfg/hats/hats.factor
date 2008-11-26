@@ -65,9 +65,9 @@ IN: compiler.cfg.hats
 : ^^alien-cell ( src -- dst ) ^^i1 ##alien-cell ; inline
 : ^^alien-float ( src -- dst ) ^^d1 ##alien-float ; inline
 : ^^alien-double ( src -- dst ) ^^d1 ##alien-double ; inline
-: ^^compare ( src1 src2 cc -- dst ) ^^i3 ##compare ; inline
-: ^^compare-imm ( src1 src2 cc -- dst ) ^^i3 ##compare-imm ; inline
-: ^^compare-float ( src1 src2 cc -- dst ) ^^i3 ##compare-float ; inline
+: ^^compare ( src1 src2 cc -- dst ) ^^i3 i ##compare ; inline
+: ^^compare-imm ( src1 src2 cc -- dst ) ^^i3 i ##compare-imm ; inline
+: ^^compare-float ( src1 src2 cc -- dst ) ^^i3 i ##compare-float ; inline
 : ^^offset>slot ( vreg -- vreg' ) cell 4 = [ 1 ^^shr-imm ] when ; inline
 : ^^tag-fixnum ( src -- dst ) ^^i1 ##tag-fixnum ; inline
 : ^^untag-fixnum ( src -- dst ) ^^i1 ##untag-fixnum ; inline

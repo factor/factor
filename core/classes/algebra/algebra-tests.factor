@@ -13,9 +13,9 @@ IN: classes.algebra.tests
 \ flatten-class must-infer
 \ flatten-builtin-class must-infer
 
-: class-and* ( cls1 cls2 cls3 -- ? ) >r class-and r> class= ;
+: class-and* ( cls1 cls2 cls3 -- ? ) [ class-and ] dip class= ;
 
-: class-or* ( cls1 cls2 cls3 -- ? ) >r class-or r> class= ;
+: class-or* ( cls1 cls2 cls3 -- ? ) [ class-or ] dip class= ;
 
 [ t ] [ object  object  object class-and* ] unit-test
 [ t ] [ fixnum  object  fixnum class-and* ] unit-test
@@ -240,9 +240,9 @@ UNION: z1 b1 c1 ;
         20 [ random-boolean-op ] [ ] replicate-as dup .
         [ infer in>> [ random-boolean ] replicate dup . ] keep
         
-        [ >r [ ] each r> call ] 2keep
+        [ [ [ ] each ] dip call ] 2keep
         
-        >r [ boolean>class ] each r> [ boolean-op>class-op ] map call object class=
+        [ [ boolean>class ] each ] dip [ boolean-op>class-op ] map call object class=
         
         =
     ] unit-test

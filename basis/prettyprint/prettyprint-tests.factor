@@ -323,10 +323,6 @@ M: class-see-layout class-see-layout ;
     [ 2 break 2 \ + (step-into-execute) . ] (remove-breakpoints)
 ] unit-test
 
-[ ] [ 1 \ + curry unparse drop ] unit-test
-
-[ ] [ 1 \ + compose unparse drop ] unit-test
-
 GENERIC: generic-see-test-with-f ( obj -- obj )
 
 M: f generic-see-test-with-f ;
@@ -355,3 +351,13 @@ INTERSECTION: intersection-see-test sequence number ;
 [ ] [ \ curry see ] unit-test
 
 [ "POSTPONE: [" ] [ \ [ unparse ] unit-test
+    
+TUPLE: started-out-hustlin' ;
+
+GENERIC: ended-up-ballin'
+
+M: started-out-hustlin' ended-up-ballin' ; inline
+
+[ "USING: prettyprint.tests ;\nM: started-out-hustlin' ended-up-ballin' ; inline\n" ] [
+    [ { started-out-hustlin' ended-up-ballin' } see ] with-string-writer
+] unit-test

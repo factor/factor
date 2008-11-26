@@ -15,7 +15,7 @@ IN: math.functions
 PRIVATE>
 
 : rect> ( x y -- z )
-    over real? over real? and [
+    2dup [ real? ] both? [
         (rect>)
     ] [
         "Complex number must have real components" throw
@@ -27,10 +27,10 @@ M: real sqrt
     >float dup 0.0 < [ neg fsqrt 0.0 swap rect> ] [ fsqrt ] if ;
 
 : each-bit ( n quot: ( ? -- ) -- )
-    over 0 = pick -1 = or [
+    over [ 0 = ] [ -1 = ] bi or [
         2drop
     ] [
-        2dup >r >r >r odd? r> call r> 2/ r> each-bit
+        2dup { [ odd? ] [ call ] [ 2/ ] [ each-bit ] } spread
     ] if ; inline recursive
 
 : map-bits ( n quot: ( ? -- obj ) -- seq )
@@ -69,8 +69,7 @@ PRIVATE>
     >rect [ >float ] bi@ ; inline
 
 : >polar ( z -- abs arg )
-    >float-rect [ [ sq ] bi@ + fsqrt ] [ swap fatan2 ] 2bi ;
-    inline
+    >float-rect [ [ sq ] bi@ + fsqrt ] [ swap fatan2 ] 2bi ; inline
 
 : cis ( arg -- z ) dup fcos swap fsin rect> ; inline
 
@@ -79,11 +78,10 @@ PRIVATE>
 <PRIVATE
 
 : ^mag ( w abs arg -- magnitude )
-    >r >r >float-rect swap r> swap fpow r> rot * fexp /f ;
-    inline
+    [ >float-rect swap ] [ swap fpow ] [ rot * fexp /f ] tri* ; inline
 
 : ^theta ( w abs arg -- theta )
-    >r >r >float-rect r> flog * swap r> * + ; inline
+    [ >float-rect ] [ flog * swap ] [ * + ] tri* ; inline
 
 : ^complex ( x y -- z )
     swap >polar [ ^mag ] [ ^theta ] 3bi polar> ; inline
@@ -106,18 +104,18 @@ PRIVATE>
 
 : (^mod) ( n x y -- z )
     1 swap [
-        [ dupd * pick mod ] when >r sq over mod r>
+        [ dupd * pick mod ] when [ sq over mod ] dip
     ] each-bit 2nip ; inline
 
 : (gcd) ( b a x y -- a d )
     over zero? [
         2nip
     ] [
-        swap [ /mod >r over * swapd - r> ] keep (gcd)
+        swap [ /mod [ over * swapd - ] dip ] keep (gcd)
     ] if ;
 
 : gcd ( x y -- a d )
-    0 -rot 1 -rot (gcd) dup 0 < [ neg ] when ; foldable
+    [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; foldable
 
 : lcm ( a b -- c )
     [ * ] 2keep gcd nip /i ; foldable
@@ -131,7 +129,7 @@ PRIVATE>
 
 : ^mod ( x y n -- z )
     over 0 < [
-        [ >r neg r> ^mod ] keep mod-inv
+        [ [ neg ] dip ^mod ] keep mod-inv
     ] [
         -rot (^mod)
     ] if ; foldable
@@ -141,14 +139,14 @@ GENERIC: absq ( x -- y ) foldable
 M: real absq sq ;
 
 : ~abs ( x y epsilon -- ? )
-    >r - abs r> < ;
+    [ - abs ] dip < ;
 
 : ~rel ( x y epsilon -- ? )
-    >r [ - abs ] 2keep [ abs ] bi@ + r> * < ;
+    [ [ - abs ] 2keep [ abs ] bi@ + ] dip * < ;
 
 : ~ ( x y epsilon -- ? )
     {
-        { [ pick fp-nan? pick fp-nan? or ] [ 3drop f ] }
+        { [ 2over [ fp-nan? ] either? ] [ 3drop f ] }
         { [ dup zero? ] [ drop number= ] }
         { [ dup 0 < ] [ ~rel ] }
         [ ~abs ]

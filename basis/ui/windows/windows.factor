@@ -6,9 +6,10 @@ ui.gadgets ui.backend ui.clipboards ui.gadgets.worlds
 ui.gestures io kernel math math.vectors namespaces make
 sequences strings vectors words windows.kernel32 windows.gdi32
 windows.user32 windows.opengl32 windows.messages windows.types
-windows.nt windows threads libc combinators continuations
-command-line shuffle opengl ui.render unicode.case ascii
-math.bitwise locals symbols accessors math.geometry.rect ;
+windows.nt windows threads libc combinators
+combinators.short-circuit continuations command-line shuffle
+opengl ui.render ascii math.bitwise locals symbols accessors
+math.geometry.rect math.order ascii calendar ;
 IN: ui.windows
 
 SINGLETON: windows-ui-backend
@@ -144,11 +145,6 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 : alt? ( -- ? ) left-alt? right-alt? or ;
 : caps-lock? ( -- ? ) VK_CAPITAL GetKeyState zero? not ;
 
-: switch-case ( seq -- seq )
-    dup first CHAR: a >= [ >upper ] [ >lower ] if ;
-
-: switch-case? ( -- ? ) shift? caps-lock? xor not ;
-
 : key-modifiers ( -- seq )
     [
         shift? [ S+ , ] when
@@ -179,33 +175,53 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 : exclude-key-wm-char? ( n -- bool )
     exclude-keys-wm-char key? ;
 
-: keystroke>gesture ( n -- mods sym ? )
-    dup wm-keydown-codes at* [
-        nip >r key-modifiers r> t
-    ] [
-        drop 1string >r key-modifiers r>
-        C+ pick member? >r A+ pick member? r> or [
-            shift? [ >lower ] unless f
-        ] [
-            switch-case? [ switch-case ] when t
-        ] if
-    ] if ;
+: keystroke>gesture ( n -- mods sym )
+    wm-keydown-codes at* [ key-modifiers swap ] [ drop f f ] if ;
+
+: send-key-gesture ( sym action? quot hWnd -- )
+    [ [ key-modifiers ] 3dip call ] dip
+    window-focus propagate-gesture ; inline
+
+: send-key-down ( sym action? hWnd -- )
+    [ [ <key-down> ] ] dip send-key-gesture ;
+
+: send-key-up ( sym action? hWnd -- )
+    [ [ <key-up> ] ] dip send-key-gesture ;
+
+: key-sym ( wParam -- string/f action? )
+    {
+        {
+            [ dup LETTER? ]
+            [ shift? caps-lock? xor [ CHAR: a + CHAR: A - ] unless 1string f ]
+        }
+        { [ dup digit? ] [ 1string f ] }
+        [ wm-keydown-codes at t ]
+    } cond ;
 
 :: handle-wm-keydown ( hWnd uMsg wParam lParam -- )
     wParam exclude-key-wm-keydown? [
-        wParam keystroke>gesture <key-down>
-        hWnd window-focus send-gesture drop
+        wParam key-sym over [
+            dup ctrl? alt? xor or [
+                hWnd send-key-down
+            ] [ 2drop ] if
+        ] [ 2drop ] if
     ] unless ;
 
 :: handle-wm-char ( hWnd uMsg wParam lParam -- )
-    wParam exclude-key-wm-char? ctrl? alt? xor or [
-        wParam 1string
-        hWnd window-focus user-input
+    wParam exclude-key-wm-char? [
+        ctrl? alt? xor [
+            wParam 1string
+            [ f hWnd send-key-down ]
+            [ hWnd window-focus user-input ] bi
+        ] unless
     ] unless ;
 
 :: handle-wm-keyup ( hWnd uMsg wParam lParam -- )
-    wParam keystroke>gesture <key-up>
-    hWnd window-focus send-gesture drop ;
+    wParam exclude-key-wm-keydown? [
+        wParam key-sym over [
+            hWnd send-key-up
+        ] [ 2drop ] if
+    ] unless ;
 
 :: set-window-active ( hwnd uMsg wParam lParam ? -- n )
     ? hwnd window (>>active?)
@@ -241,20 +257,20 @@ M: windows-ui-backend (close-window)
 
 : message>button ( uMsg -- button down? )
     {
-        { [ dup WM_LBUTTONDOWN   = ] [ drop 1 t ] }
-        { [ dup WM_LBUTTONUP     = ] [ drop 1 f ] }
-        { [ dup WM_MBUTTONDOWN   = ] [ drop 2 t ] }
-        { [ dup WM_MBUTTONUP     = ] [ drop 2 f ] }
-        { [ dup WM_RBUTTONDOWN   = ] [ drop 3 t ] }
-        { [ dup WM_RBUTTONUP     = ] [ drop 3 f ] }
+        { WM_LBUTTONDOWN   [ 1 t ] }
+        { WM_LBUTTONUP     [ 1 f ] }
+        { WM_MBUTTONDOWN   [ 2 t ] }
+        { WM_MBUTTONUP     [ 2 f ] }
+        { WM_RBUTTONDOWN   [ 3 t ] }
+        { WM_RBUTTONUP     [ 3 f ] }
 
-        { [ dup WM_NCLBUTTONDOWN = ] [ drop 1 t ] }
-        { [ dup WM_NCLBUTTONUP   = ] [ drop 1 f ] }
-        { [ dup WM_NCMBUTTONDOWN = ] [ drop 2 t ] }
-        { [ dup WM_NCMBUTTONUP   = ] [ drop 2 f ] }
-        { [ dup WM_NCRBUTTONDOWN = ] [ drop 3 t ] }
-        { [ dup WM_NCRBUTTONUP   = ] [ drop 3 f ] }
-    } cond ;
+        { WM_NCLBUTTONDOWN [ 1 t ] }
+        { WM_NCLBUTTONUP   [ 1 f ] }
+        { WM_NCMBUTTONDOWN [ 2 t ] }
+        { WM_NCMBUTTONUP   [ 2 f ] }
+        { WM_NCRBUTTONDOWN [ 3 t ] }
+        { WM_NCRBUTTONUP   [ 3 f ] }
+    } case ;
 
 ! If the user clicks in the window border ("non-client area")
 ! Windows sends us an NC[LMR]BUTTONDOWN message; but if the
@@ -381,11 +397,9 @@ SYMBOL: trace-messages?
 ! return 0 if you handle the message, else just let DefWindowProc return its val
 : ui-wndproc ( -- object )
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
-        [
-            pick
-            trace-messages? get-global [ dup windows-message-name name>> print flush ] when
-            wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
-        ] ui-try
+        pick
+        trace-messages? get-global [ dup windows-message-name name>> print flush ] when
+        wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
      ] alien-callback ;
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
@@ -458,7 +472,7 @@ M: windows-ui-backend do-events
     "MSG" malloc-object msg-obj set-global
     "Factor-window" utf16n malloc-string class-name-ptr set-global
     register-wndclassex drop
-    GetDoubleClickTime double-click-timeout set-global ;
+    GetDoubleClickTime milliseconds double-click-timeout set-global ;
 
 : cleanup-win32-ui ( -- )
     class-name-ptr get-global [ dup f UnregisterClass drop free ] when*

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.functions sequences
 sequences.private words namespaces macros hints
-combinators fry ;
+combinators fry io.binary ;
 IN: math.bitwise
 
 ! utilities
@@ -93,3 +93,11 @@ PRIVATE>
 
 : bit-count ( x -- n )
     dup 0 < [ bitnot ] when (bit-count) ; inline
+
+! Signed byte array to integer conversion
+: signed-le> ( bytes -- x )
+    [ le> ] [ length 8 * 1- on-bits ] bi
+    2dup > [ bitnot bitor ] [ drop ] if ;
+
+: signed-be> ( bytes -- x )
+    <reversed> signed-le> ;

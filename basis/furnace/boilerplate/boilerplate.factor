@@ -1,12 +1,13 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math.order namespaces furnace combinators.short-circuit
+USING: accessors kernel math.order namespaces combinators.short-circuit
 html.forms
 html.templates
 html.templates.chloe
 locals
 http.server
-http.server.filters ;
+http.server.filters
+furnace.utilities ;
 IN: furnace.boilerplate
 
 TUPLE: boilerplate < filter-responder template init ;

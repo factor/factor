@@ -23,7 +23,7 @@ PRIVATE>
 : off ( variable -- ) f swap set ; inline
 : get-global ( variable -- value ) global at ;
 : set-global ( value variable -- ) global set-at ;
-: change ( variable quot -- ) >r dup get r> rot slip set ; inline
+: change ( variable quot -- ) [ [ get ] keep ] dip dip set ; inline
 : +@ ( n variable -- ) [ 0 or + ] change ;
 : inc ( variable -- ) 1 swap +@ ; inline
 : dec ( variable -- ) -1 swap +@ ; inline
@@ -37,4 +37,4 @@ PRIVATE>
     H{ } clone >n call ndrop ; inline
 
 : with-variable ( value key quot -- )
-    >r associate >n r> call ndrop ; inline
+    [ associate >n ] dip call ndrop ; inline

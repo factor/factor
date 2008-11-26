@@ -9,6 +9,10 @@ The non-optimizing compiler compiles a quotation at a time by concatenating
 machine code chunks; prolog, epilog, call word, jump to word, etc. These machine
 code chunks are generated from Factor code in core/cpu/.../bootstrap.factor.
 
+Calls to words and constant quotations (referenced by conditionals and dips)
+are direct jumps to machine code blocks. Literals are also referenced directly
+without going through the literal table.
+
 It actually does do a little bit of very simple optimization:
 
 1) Tail call optimization.
@@ -21,12 +25,15 @@ generated.
 'if' and 'dispatch' conditionals are generated inline, instead of as a call to
 the 'if' word.
 
-4) When preceded by an array, calls to the 'declare' word are optimized out
+4) When preceded by a quotation, calls to 'dip', '2dip' and '3dip' are
+open-coded as retain stack manipulation surrounding a subroutine call.
+
+5) When preceded by an array, calls to the 'declare' word are optimized out
 entirely. This word is only used by the optimizing compiler, and with the
 non-optimizing compiler it would otherwise just decrease performance to have to
 push the array and immediately drop it after.
 
-5) Sub-primitives are primitive words which are implemented in assembly and not
+6) Sub-primitives are primitive words which are implemented in assembly and not
 in the VM. They are open-coded and no subroutine call is generated. This
 includes stack shufflers, some fixnum arithmetic words, and words such as tag,
 slot and eq?. A primitive call is relatively expensive (two subroutine calls)
@@ -52,6 +59,27 @@ bool jit_fast_dispatch_p(F_ARRAY *array, CELL i)
 	return (i + 2) == array_capacity(array)
 		&& type_of(array_nth(array,i)) == ARRAY_TYPE
 		&& array_nth(array,i + 1) == userenv[JIT_DISPATCH_WORD];
+}
+
+bool jit_fast_dip_p(F_ARRAY *array, CELL i)
+{
+	return (i + 2) <= array_capacity(array)
+		&& type_of(array_nth(array,i)) == QUOTATION_TYPE
+		&& array_nth(array,i + 1) == userenv[JIT_DIP_WORD];
+}
+
+bool jit_fast_2dip_p(F_ARRAY *array, CELL i)
+{
+	return (i + 2) <= array_capacity(array)
+		&& type_of(array_nth(array,i)) == QUOTATION_TYPE
+		&& array_nth(array,i + 1) == userenv[JIT_2DIP_WORD];
+}
+
+bool jit_fast_3dip_p(F_ARRAY *array, CELL i)
+{
+	return (i + 2) <= array_capacity(array)
+		&& type_of(array_nth(array,i)) == QUOTATION_TYPE
+		&& array_nth(array,i + 1) == userenv[JIT_3DIP_WORD];
 }
 
 bool jit_ignore_declare_p(F_ARRAY *array, CELL i)
@@ -113,6 +141,13 @@ bool jit_stack_frame_p(F_ARRAY *array)
 		{
 			F_WORD *word = untag_object(obj);
 			if(word->subprimitive == F && obj != userenv[JIT_DECLARE_WORD])
+				return true;
+		}
+		else if(type_of(obj) == QUOTATION_TYPE)
+		{
+			if(jit_fast_dip_p(array,i)
+				|| jit_fast_2dip_p(array,i)
+				|| jit_fast_3dip_p(array,i))
 				return true;
 		}
 	}
@@ -204,11 +239,12 @@ void jit_compile(CELL quot, bool relocate)
 		case WRAPPER_TYPE:
 			wrapper = untag_object(obj);
 			GROWABLE_ARRAY_ADD(literals,wrapper->object);
-			EMIT(userenv[JIT_PUSH_LITERAL],literals_count - 1);
+			EMIT(userenv[JIT_PUSH_IMMEDIATE],literals_count - 1);
 			break;
 		case FIXNUM_TYPE:
 			if(jit_primitive_call_p(untag_object(array),i))
 			{
+				EMIT(userenv[JIT_SAVE_STACK],0);
 				EMIT(userenv[JIT_PRIMITIVE],to_fixnum(obj));
 
 				i++;
@@ -222,13 +258,47 @@ void jit_compile(CELL quot, bool relocate)
 				if(stack_frame)
 					EMIT(userenv[JIT_EPILOG],0);
 
+				jit_compile(array_nth(untag_object(array),i),relocate);
+				jit_compile(array_nth(untag_object(array),i + 1),relocate);
+
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
+				EMIT(userenv[JIT_IF_1],literals_count - 1);
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i + 1));
-				EMIT(userenv[JIT_IF_JUMP],literals_count - 2);
+				EMIT(userenv[JIT_IF_2],literals_count - 1);
 
 				i += 2;
 
 				tail_call = true;
+				break;
+			}
+			else if(jit_fast_dip_p(untag_object(array),i))
+			{
+				jit_compile(obj,relocate);
+
+				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
+				EMIT(userenv[JIT_DIP],literals_count - 1);
+
+				i++;
+				break;
+			}
+			else if(jit_fast_2dip_p(untag_object(array),i))
+			{
+				jit_compile(obj,relocate);
+
+				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
+				EMIT(userenv[JIT_2DIP],literals_count - 1);
+
+				i++;
+				break;
+			}
+			else if(jit_fast_3dip_p(untag_object(array),i))
+			{
+				jit_compile(obj,relocate);
+
+				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
+				EMIT(userenv[JIT_3DIP],literals_count - 1);
+
+				i++;
 				break;
 			}
 		case ARRAY_TYPE:
@@ -252,7 +322,7 @@ void jit_compile(CELL quot, bool relocate)
 			}
 		default:
 			GROWABLE_ARRAY_ADD(literals,obj);
-			EMIT(userenv[immediate_p(obj) ? JIT_PUSH_IMMEDIATE : JIT_PUSH_LITERAL],literals_count - 1);
+			EMIT(userenv[JIT_PUSH_IMMEDIATE],literals_count - 1);
 			break;
 		}
 	}
@@ -295,8 +365,10 @@ worse than the duplication itself (eg, putting all state in some global
 struct.) */
 #define COUNT(name,scan) \
 	{ \
+		CELL size = array_capacity(code_to_emit(name)) * code_format; \
 		if(offset == 0) return scan - 1; \
-		offset -= array_capacity(code_to_emit(name)) * code_format; \
+		if(offset < size) return scan + 1; \
+		offset -= size; \
 	}
 
 F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
@@ -339,11 +411,12 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				COUNT(userenv[JIT_WORD_CALL],i)
 			break;
 		case WRAPPER_TYPE:
-			COUNT(userenv[JIT_PUSH_LITERAL],i)
+			COUNT(userenv[JIT_PUSH_IMMEDIATE],i)
 			break;
 		case FIXNUM_TYPE:
 			if(jit_primitive_call_p(untag_object(array),i))
 			{
+				COUNT(userenv[JIT_SAVE_STACK],i);
 				COUNT(userenv[JIT_PRIMITIVE],i);
 
 				i++;
@@ -357,11 +430,29 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				if(stack_frame)
 					COUNT(userenv[JIT_EPILOG],i)
 
+				COUNT(userenv[JIT_IF_1],i)
+				COUNT(userenv[JIT_IF_2],i)
 				i += 2;
 
-				COUNT(userenv[JIT_IF_JUMP],i)
-
 				tail_call = true;
+				break;
+			}
+			else if(jit_fast_dip_p(untag_object(array),i))
+			{
+				COUNT(userenv[JIT_DIP],i)
+				i++;
+				break;
+			}
+			else if(jit_fast_2dip_p(untag_object(array),i))
+			{
+				COUNT(userenv[JIT_2DIP],i)
+				i++;
+				break;
+			}
+			else if(jit_fast_3dip_p(untag_object(array),i))
+			{
+				COUNT(userenv[JIT_3DIP],i)
+				i++;
 				break;
 			}
 		case ARRAY_TYPE:
@@ -386,7 +477,7 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				break;
 			}
 		default:
-			COUNT(userenv[immediate_p(obj) ? JIT_PUSH_IMMEDIATE : JIT_PUSH_LITERAL],i)
+			COUNT(userenv[JIT_PUSH_IMMEDIATE],i)
 			break;
 		}
 	}
@@ -402,7 +493,7 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 	return -1;
 }
 
-F_FASTCALL CELL primitive_jit_compile(CELL quot, F_STACK_FRAME *stack)
+F_FASTCALL CELL lazy_jit_compile_impl(CELL quot, F_STACK_FRAME *stack)
 {
 	stack_chain->callstack_top = stack;
 	REGISTER_ROOT(quot);
@@ -411,8 +502,13 @@ F_FASTCALL CELL primitive_jit_compile(CELL quot, F_STACK_FRAME *stack)
 	return quot;
 }
 
+void primitive_jit_compile(void)
+{
+	jit_compile(dpop(),true);
+}
+
 /* push a new quotation on the stack */
-DEFINE_PRIMITIVE(array_to_quotation)
+void primitive_array_to_quotation(void)
 {
 	F_QUOTATION *quot = allot_object(QUOTATION_TYPE,sizeof(F_QUOTATION));
 	quot->array = dpeek();
@@ -421,7 +517,7 @@ DEFINE_PRIMITIVE(array_to_quotation)
 	drepl(tag_object(quot));
 }
 
-DEFINE_PRIMITIVE(quotation_xt)
+void primitive_quotation_xt(void)
 {
 	F_QUOTATION *quot = untag_quotation(dpeek());
 	drepl(allot_cell((CELL)quot->xt));

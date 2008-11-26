@@ -6,11 +6,22 @@ io.encodings.utf8 io.files io.sockets kernel math.parser
 namespaces make sequences ftp io.unix.launcher.parser
 unicode.case splitting assocs classes io.servers.connection
 destructors calendar io.timeouts io.streams.duplex threads
-continuations math concurrency.promises byte-arrays sequences.lib
-hexdump ;
+continuations math concurrency.promises byte-arrays
+io.backend sequences.lib tools.hexdump io.files.listing
+io.streams.string ;
 IN: ftp.server
 
+TUPLE: ftp-client url mode state command-promise user password ;
+
+: <ftp-client> ( url -- ftp-client )
+    ftp-client new
+        swap >>url ;
+    
 SYMBOL: client
+
+: ftp-server-directory ( -- str )
+    \ ftp-server-directory get-global "resource:temp" or
+    normalize-path ;
 
 TUPLE: ftp-command raw tokenized ;
 
@@ -130,16 +141,16 @@ ERROR: type-error type ;
     150 "Here comes the directory listing." server-response ;
 
 : finish-directory ( -- )
-    226 "Opening " server-response ;
+    226 "Directory send OK." server-response ;
 
 GENERIC: service-command ( stream obj -- )
 
 M: ftp-list service-command ( stream obj -- )
     drop
-    start-directory
-    [
+    start-directory [
         utf8 encode-output
-        directory-list [ ftp-send ] each
+        [ current-directory get directory. ] with-string-writer string-lines
+        harvest [ ftp-send ] each
     ] with-output-stream
     finish-directory ;
 
@@ -238,10 +249,16 @@ M: ftp-put service-command ( stream obj -- )
 ! : handle-LPRT ( obj -- ) tokenized>> "," split ;
 
 ERROR: not-a-directory ;
+ERROR: no-permissions ;
 
 : handle-CWD ( obj -- )
     [
-        tokenized>> second dup directory? [
+        tokenized>> second dup normalize-path
+        dup ftp-server-directory head? [
+            no-permissions
+        ] unless
+
+        file-info directory? [
             set-current-directory
             250 "Directory successully changed." server-response
         ] [
@@ -256,6 +273,7 @@ ERROR: not-a-directory ;
 
 : handle-client-loop ( -- )
     <ftp-command> readln
+    USE: prettyprint    global [ dup . flush ] bind
     [ >>raw ]
     [ tokenize-command >>tokenized ] bi
     dup tokenized>> first >upper {
@@ -313,7 +331,7 @@ TUPLE: ftp-server < threaded-server ;
 M: ftp-server handle-client* ( server -- )
     drop
     [
-        "" [
+        ftp-server-directory [
             host-name <ftp-client> client set
             send-banner handle-client-loop
         ] with-directory
@@ -323,6 +341,7 @@ M: ftp-server handle-client* ( server -- )
     ftp-server new-threaded-server
         swap >>insecure
         "ftp.server" >>name
+        5 minutes >>timeout
         latin1 >>encoding ;
 
 : ftpd ( port -- )

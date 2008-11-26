@@ -15,14 +15,14 @@ $nl
 "The default implementation looks at the " { $snippet "\"gestures\"" } " word property of each superclass of the gadget's class." }
 { $notes "Methods should be defined on this word if you desire to handle an arbitrary set of gestures. To define handlers for a fixed set, it is easier to use " { $link set-gestures } "." } ;
 
-{ send-gesture handle-gesture set-gestures } related-words
+{ propagate-gesture handle-gesture set-gestures } related-words
 
-HELP: send-gesture
-{ $values { "gesture" "a gesture" } { "gadget" gadget } { "?" "a boolean" } }
-{ $description "Calls " { $link send-gesture } " on every parent of " { $snippet "gadget" } ". Outputs " { $link f } " if some parent handled the gesture, else outputs " { $link t } "." } ;
+HELP: propagate-gesture
+{ $values { "gesture" "a gesture" } { "gadget" gadget } }
+{ $description "Calls " { $link handle-gesture } " on every parent of " { $snippet "gadget" } "." } ;
 
 HELP: user-input
-{ $values { "str" string } { "gadget" gadget } }
+{ $values { "string" string } { "gadget" gadget } }
 { $description "Calls " { $link user-input* } " on every parent of the gadget." } ;
 
 HELP: motion
@@ -90,10 +90,6 @@ HELP: select-all-action
 { $class-description "Gesture sent when the " { $emphasis "select all" } " standard window system action is invoked." }
 { $examples { $code "T{ select-all-action }" } } ;
 
-HELP: generalize-gesture
-{ $values { "gesture" "a gesture" } { "newgesture" "a new gesture" } }
-{ $description "Turns a " { $link button-down } ", " { $link button-up } " or " { $link drag } " action naming a specific mouse button into one which can apply regardless of which mouse button was pressed." } ;
-
 HELP: C+
 { $description "Control key modifier." } ;
 
@@ -147,7 +143,7 @@ HELP: hand-last-button
 { $var-description "Global variable. The mouse button most recently pressed." } ;
 
 HELP: hand-last-time
-{ $var-description "Global variable. The timestamp of the most recent mouse button click. This timestamp has the same format as the output value of " { $link millis } "." } ;
+{ $var-description "Global variable. The timestamp of the most recent mouse button click. This timestamp has the same format as the output value of " { $link micros } "." } ;
 
 HELP: hand-buttons
 { $var-description "Global variable. A vector of mouse buttons currently held down." } ;
@@ -189,7 +185,7 @@ HELP: under-hand
 { $description "Outputs a sequence where the first element is the " { $link hand-world } " and the last is the " { $link hand-gadget } ", with all parents in between." } ;
 
 HELP: gesture>string
-{ $values { "gesture" "a gesture" } { "string/f" "a " { $link string } " or " { $link f } } }
+{ $values { "gesture" "a gesture" } { "string/f" { $maybe string } } }
 { $contract "Creates a human-readable string from a gesture object, returning " { $link f } " if the gesture does not have a human-readable form." }
 { $examples
     { $example "USING: io ui.gestures ;" "T{ key-down f { C+ } \"x\" } gesture>string print" "C+x" }

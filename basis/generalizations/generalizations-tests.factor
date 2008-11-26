@@ -36,3 +36,5 @@ IN: generalizations.tests
 [ 1 2 3 4 ] [ { 1 2 3 4 } 4 firstn ] unit-test
 [ ] [ { } 0 firstn ] unit-test
 [ "a" ] [ { "a" } 1 firstn ] unit-test
+
+[ [ 1 2 ] ] [ 1 2 2 [ ] nsequence ] unit-test

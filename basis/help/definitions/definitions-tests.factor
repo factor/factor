@@ -34,7 +34,7 @@ IN: help.definitions.tests
 
     [ ] [ "IN: help.definitions.tests USING: help.syntax ; : xxx ; HELP: xxx ;" eval ] unit-test
 
-    [ ] [ "xxx" "help.definitions.tests" lookup help ] unit-test
+    [ ] [ "xxx" "help.definitions.tests" lookup print-topic ] unit-test
 
     [ ] [ "xxx" "help.definitions.tests" lookup >link synopsis print ] unit-test
 ] with-file-vocabs

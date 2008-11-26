@@ -8,7 +8,7 @@ IN: ui.commands
         [ gesture>string , ]
         [
             [ command-name , ]
-            [ command-word \ $link swap 2array , ]
+            [ command-word <$link> , ]
             [ command-description , ]
             tri
         ] bi*
@@ -71,7 +71,7 @@ HELP: command-word
 { $description "Outputs the word that will be executed by " { $link invoke-command } ". This is only used for documentation purposes." } ;
 
 HELP: command-map
-{ $values { "group" string } { "class" "a class word" } { "command-map" "a " { $link command-map } " or " { $link f } } }
+{ $values { "group" string } { "class" "a class word" } { "command-map" { $maybe command-map } } }
 { $description "Outputs a named command map defined on a class." }
 { $class-description "A command map stores a group of related commands. The " { $snippet "commands" } " slot stores an association list mapping gestures to commands, and the " { $snippet "blurb" } " slot stores an optional one-line description string of this command map."
 $nl
@@ -82,7 +82,7 @@ HELP: commands
 { $description "Outputs a hashtable mapping command map names to " { $link command-map } " instances." } ;
 
 HELP: define-command-map
-{ $values { "class" "a class word" } { "group" string } { "blurb" "a " { $link string } " or " { $link f } } { "pairs" "a sequence of gesture/word pairs" } }
+{ $values { "class" "a class word" } { "group" string } { "blurb" { $maybe string } } { "pairs" "a sequence of gesture/word pairs" } }
 { $description
     "Defines a command map on the specified gadget class. The " { $snippet "specs" } " parameter is a sequence of pairs " { $snippet "{ gesture word }" } ". The words must be valid commands; see " { $link define-command } "."
 }

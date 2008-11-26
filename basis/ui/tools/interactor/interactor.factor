@@ -164,7 +164,7 @@ M: interactor dispose drop ;
 : handle-interactive ( lines interactor -- quot/f ? )
     tuck try-parse {
         { [ dup quotation? ] [ nip t ] }
-        { [ dup not ] [ drop "\n" swap user-input f f ] }
+        { [ dup not ] [ drop "\n" swap user-input* drop f f ] }
         [ handle-parse-error f f ]
     } cond ;
 
@@ -177,10 +177,6 @@ M: interactor stream-read-quot
             [ interactor-finish ] [ nip stream-read-quot ] if
         ]
     } cond ;
-
-M: interactor pref-dim*
-    [ line-height 4 * 0 swap 2array ] [ call-next-method ] bi
-    vmax ;
 
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }

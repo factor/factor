@@ -32,7 +32,7 @@ SYMBOL: bootstrap-time
 : count-words ( pred -- )
     all-words swap count number>string write ;
 
-: print-time ( time -- )
+: print-time ( ms -- )
     1000 /i
     60 /mod swap
     number>string write
@@ -67,7 +67,7 @@ SYMBOL: bootstrap-time
     os wince? [ "windows.ce" require ] when
     os winnt? [ "windows.nt" require ] when
 
-    "deploy-vocab" get [
+    "staging" get "deploy-vocab" get or [
         "stage2: deployment mode" print
     ] [
         "listener" require

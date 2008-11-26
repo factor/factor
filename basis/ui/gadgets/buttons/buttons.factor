@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math models namespaces sequences
 strings quotations assocs combinators classes colors
-classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.labels ui.gadgets.theme
-ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
-ui.render math.geometry.rect locals alien.c-types ;
-
+classes.tuple locals alien.c-types fry opengl opengl.gl
+math.vectors ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.labels ui.gadgets.theme ui.gadgets.tracks
+ui.gadgets.packs ui.gadgets.worlds ui.gestures ui.render
+math.geometry.rect ;
 IN: ui.gadgets.buttons
 
 TUPLE: button < border pressed? selected? quot ;
@@ -28,7 +28,7 @@ TUPLE: button < border pressed? selected? quot ;
     relayout-1 ;
 
 : if-clicked ( button quot -- )
-    >r dup button-update dup button-rollover? r> [ drop ] if ;
+    [ dup button-update dup button-rollover? ] dip [ drop ] if ;
 
 : button-clicked ( button -- ) dup quot>> if-clicked ;
 
@@ -71,6 +71,7 @@ M: button-paint draw-boundary
 
 : roll-button-theme ( button -- button )
     f black <solid> dup f <button-paint> >>boundary
+    f f pressed-gradient f <button-paint> >>interior
     align-left ; inline
 
 : <roll-button> ( label quot -- button )
@@ -111,10 +112,10 @@ TUPLE: checkmark-paint < caching-pen color last-vertices ;
 
 : checkmark-points ( dim -- points )
     {
-        [ { 0 0 } v* { 0 1 } v+ ]
-        [ { 1 1 } v* { 0 1 } v+ ]
-        [ { 0 1 } v* ]
-        [ { 1 0 } v* ]
+        [ { 0 0 } v* { 0.5 0.5 } v+ ]
+        [ { 1 1 } v* { 0.5 0.5 } v+ ]
+        [ { 1 0 } v* { -0.3 0.5 } v+ ]
+        [ { 0 1 } v* { -0.3 0.5 } v+ ]
     } cleave 4array ;
 
 : checkmark-vertices ( dim -- vertices )
@@ -220,9 +221,8 @@ M: radio-control model-changed
     over value>> = >>selected?
     relayout-1 ;
 
-: <radio-controls> ( parent model assoc quot -- parent )
-    #! quot has stack effect ( value model label -- )
-    swapd [ swapd call add-gadget ] 2curry assoc-each ; inline
+: <radio-controls> ( assoc model parent quot: ( value model label -- ) -- parent )
+    '[ _ swap _ call add-gadget ] assoc-each ; inline
 
 : radio-button-theme ( gadget -- gadget )
     { 5 5 } >>gap
@@ -233,8 +233,7 @@ M: radio-control model-changed
 
 : <radio-buttons> ( model assoc -- gadget )
     <filled-pile>
-        -rot
-        [ <radio-button> ] <radio-controls>
+        spin [ <radio-button> ] <radio-controls>
         { 5 5 } >>gap ;
 
 : <toggle-button> ( value model label -- gadget )
@@ -242,20 +241,19 @@ M: radio-control model-changed
 
 : <toggle-buttons> ( model assoc -- gadget )
     <shelf>
-        -rot
-        [ <toggle-button> ] <radio-controls> ;
+        spin [ <toggle-button> ] <radio-controls> ;
 
 : command-button-quot ( target command -- quot )
-    [ invoke-command drop ] 2curry ;
+    '[ _ _ invoke-command drop ] ;
 
 : <command-button> ( target gesture command -- button )
-    [ command-string ] keep
-    swapd
-    command-button-quot
-    <bevel-button> ;
+    [ command-string swap ] keep command-button-quot <bevel-button> ;
 
 : <toolbar> ( target -- toolbar )
     <shelf>
         swap
         "toolbar" over class command-map commands>> swap
-        [ -rot <command-button> add-gadget ] curry assoc-each ;
+        '[ [ _ ] 2dip <command-button> add-gadget ] assoc-each ;
+
+: add-toolbar ( track -- track )
+    dup <toolbar> f track-add ;

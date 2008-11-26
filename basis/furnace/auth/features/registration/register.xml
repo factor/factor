@@ -62,8 +62,8 @@
 
 		<p>
 
-			<button>Register</button>
-			<t:validation-messages />
+			<button type="submit">Register</button>
+			<t:validation-errors />
 
 		</p>
 

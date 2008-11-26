@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system io.files namespaces kernel accessors ;
+USING: system io.files namespaces kernel accessors assocs ;
 IN: mason.config
 
 ! (Optional) Location for build directories
@@ -33,10 +33,23 @@ target-os get-global [
 ! Keep test-log around?
 SYMBOL: builder-debug
 
-! Boolean. Do we release binaries and update the clean branch?
-SYMBOL: upload-to-factorcode
+SYMBOL: upload-help?
 
-! The below are only needed if upload-to-factorcode is true.
+! The below are only needed if upload-help is true.
+
+! Host with HTML help
+SYMBOL: help-host
+
+! Username to log in.
+SYMBOL: help-username
+
+! Directory to upload docs to.
+SYMBOL: help-directory
+
+! Boolean. Do we release binaries and update the clean branch?
+SYMBOL: upload-to-factorcode?
+
+! The below are only needed if upload-to-factorcode? is true.
 
 ! Host with clean git repo.
 SYMBOL: branch-host
@@ -64,3 +77,10 @@ SYMBOL: upload-username
 
 ! Directory with binary packages.
 SYMBOL: upload-directory
+
+! Optional: override ssh and scp command names
+SYMBOL: scp-command
+scp-command global [ "scp" or ] change-at
+
+SYMBOL: ssh-command
+ssh-command global [ "ssh" or ] change-at

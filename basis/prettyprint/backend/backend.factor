@@ -216,17 +216,8 @@ M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
 M: byte-vector pprint* pprint-object ;
 M: hashtable pprint* pprint-object ;
-
-M: curry pprint*
-    dup quot>> callable? [ pprint-object ] [
-        "( invalid curry )" swap present-text
-    ] if ;
-
-M: compose pprint*
-    dup [ first>> callable? ] [ second>> callable? ] bi and
-    [ pprint-object ] [
-        "( invalid compose )" swap present-text
-    ] if ;
+M: curry pprint* pprint-object ;
+M: compose pprint* pprint-object ;
 
 M: wrapper pprint*
     dup wrapped>> word? [

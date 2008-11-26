@@ -19,7 +19,7 @@ GENERIC: word-help* ( word -- content )
     { { "object" object } { "?" "a boolean" } } $values
     [
         "Tests if the object is an instance of the " ,
-        first "predicating" word-prop \ $link swap 2array ,
+        first "predicating" word-prop <$link> ,
         " class." ,
     ] { } make $description ;
 
@@ -58,14 +58,35 @@ M: word article-title
         append
     ] if ;
 
-M: word article-content
+<PRIVATE
+
+: (word-help) ( word -- element )
     [
-        \ $vocabulary over 2array ,
-        dup word-help %
-        \ $related over 2array ,
-        dup get-global [ \ $value swap 2array , ] when*
-        \ $definition swap 2array ,
+        {
+            [ \ $vocabulary swap 2array , ]
+            [ word-help % ]
+            [ \ $related swap 2array , ]
+            [ get-global [ \ $value swap 2array , ] when* ]
+            [ \ $definition swap 2array , ]
+        } cleave
     ] { } make ;
+
+M: word article-content (word-help) ;
+
+<PRIVATE
+
+: word-with-methods ( word -- elements )
+    [
+        [ (word-help) % ]
+        [ \ $methods swap 2array , ]
+        bi
+    ] { } make ;
+
+PRIVATE>
+
+M: generic article-content word-with-methods ;
+
+M: class article-content word-with-methods ;
 
 M: word article-parent "help-parent" word-prop ;
 
@@ -89,9 +110,16 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
         ] with-nesting
     ] with-style nl ;
 
-: help ( topic -- )
+: print-topic ( topic -- )
     last-element off dup $title
     article-content print-content nl ;
+
+SYMBOL: help-hook
+
+help-hook global [ [ print-topic ] or ] change-at
+
+: help ( topic -- )
+    help-hook get call ;
 
 : about ( vocab -- )
     dup require
@@ -127,9 +155,12 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     ":get  ( var -- value ) accesses variables at time of the error" print
     ":vars - list all variables at error time" print ;
 
-: :help ( -- )
-    error get error-help [ help ] [ "No help for this error. " print ] if*
+: (:help) ( error -- )
+    error-help [ help ] [ "No help for this error. " print ] if*
     :help-debugger ;
+
+: :help ( -- )
+    error get (:help) ;
 
 : remove-article ( name -- )
     dup articles get key? [

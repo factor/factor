@@ -49,7 +49,7 @@ SYMBOL: this-test
     [ drop t ] must-fail-with ;
 
 : (run-test) ( vocab -- )
-    dup vocab-source-loaded? [
+    dup vocab source-loaded?>> [
         vocab-tests [ run-file ] each
     ] [ drop ] if ;
 

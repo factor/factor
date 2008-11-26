@@ -13,17 +13,10 @@ ERROR: not-in-a-method-error ;
 : CREATE-METHOD ( -- method )
     scan-word bootstrap-word scan-word create-method-in ;
 
-SYMBOL: current-class
-SYMBOL: current-generic
+SYMBOL: current-method
 
-: with-method-definition ( quot -- parsed )
-    [
-        [
-            [ "method-class" word-prop current-class set ]
-            [ "method-generic" word-prop current-generic set ]
-            [ ] tri
-        ] dip call
-    ] with-scope ; inline
+: with-method-definition ( method quot -- )
+    over current-method set call current-method off ; inline
 
 : (M:) ( method def -- )
     CREATE-METHOD [ parse-definition ] with-method-definition ;

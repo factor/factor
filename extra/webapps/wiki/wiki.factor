@@ -7,8 +7,8 @@ syndication farkup
 html.components html.forms
 http.server
 http.server.dispatchers
-furnace
 furnace.actions
+furnace.utilities
 furnace.redirection
 furnace.auth
 furnace.auth.login

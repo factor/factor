@@ -7,6 +7,7 @@ IN: regexp.classes
 GENERIC: class-member? ( obj class -- ? )
 
 M: word class-member? ( obj class -- ? ) 2drop f ;
+
 M: integer class-member? ( obj class -- ? ) 2drop f ;
 
 M: character-class-range class-member? ( obj class -- ? )
@@ -14,6 +15,9 @@ M: character-class-range class-member? ( obj class -- ? )
 
 M: any-char class-member? ( obj class -- ? )
     2drop t ;
+
+M: any-char-no-nl class-member? ( obj class -- ? )
+    drop CHAR: \n = not ;
     
 M: letter-class class-member? ( obj class -- ? )
     drop letter? ;
@@ -29,6 +33,10 @@ M: ascii-class class-member? ( obj class -- ? )
 
 M: digit-class class-member? ( obj class -- ? )
     drop digit? ;
+
+M: c-identifier-class class-member? ( obj class -- ? )
+    drop
+    { [ digit? ] [ Letter? ] [ CHAR: _ = ] } 1|| ;
 
 M: alpha-class class-member? ( obj class -- ? )
     drop alpha? ;
@@ -53,3 +61,12 @@ M: java-blank-class class-member? ( obj class -- ? )
 
 M: unmatchable-class class-member? ( obj class -- ? )
     2drop f ;
+
+M: terminator-class class-member? ( obj class -- ? )
+    drop {
+        [ CHAR: \r = ]
+        [ CHAR: \n = ]
+        [ CHAR: \u000085 = ]
+        [ CHAR: \u002028 = ]
+        [ CHAR: \u002029 = ]
+    } 1|| ;

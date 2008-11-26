@@ -580,3 +580,5 @@ DEFER: eee'
     dup "A" throw [ bogus-error ] [ drop ] if ; inline recursive
 
 [ bogus-error ] must-infer
+
+[ [ clear ] infer. ] [ inference-error? ] must-fail-with

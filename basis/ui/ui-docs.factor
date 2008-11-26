@@ -23,7 +23,7 @@ HELP: fullscreen?
 { fullscreen? set-fullscreen? } related-words
 
 HELP: find-window
-{ $values { "quot" "a quotation with stack effect " { $snippet "( world -- ? )" } } { "world" "a " { $link world } " or " { $link f } } }
+{ $values { "quot" { $quotation "( world -- ? )" } } { "world" { $maybe world } } }
 { $description "Finds a native window such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting " { $link f } " if no such gadget could be found. The front-most native window is checked first." } ;
 
 HELP: register-window
@@ -46,11 +46,6 @@ HELP: (open-window)
 { $values { "world" world } }
 { $description "Opens a native window containing the given world. This grafts the world by calling " { $link graft } ". Each world can only be displayed in one top-level window at a time." }
 { $notes "This word should not be called directly by user code. Instead, use " { $link open-window } "." } ;
-
-HELP: ui-try
-{ $values { "quot" quotation } }
-{ $description "Calls the quotation. If it throws an error, opens a window with the error and restores the data stack." }
-{ $notes "This is essentially a graphical variant of " { $link try } "." } ;
 
 ARTICLE: "ui-glossary" "UI glossary"
 { $table
@@ -105,24 +100,7 @@ ARTICLE: "gadgets" "Pre-made UI gadgets"
 
 ARTICLE: "ui-geometry" "Gadget geometry"
 "The " { $link gadget } " class inherits from the " { $link rect } " class, and thus all gadgets have a bounding box:"
-{ $subsection rect }
-"Rectangles can be taken apart:"
-{ $subsection rect-loc }
-{ $subsection rect-dim }
-{ $subsection rect-bounds }
-{ $subsection rect-extent }
-"New rectangles can be created:"
-{ $subsection <zero-rect> }
-{ $subsection <rect> }
-{ $subsection <extent-rect> }
-"More utility words for working with rectangles:"
-{ $subsection offset-rect }
-{ $subsection rect-intersect }
-{ $subsection intersects? }
-
-! "A gadget's bounding box is always relative to its parent. "
-! { $subsection gadget-parent }
-
+{ $subsection "math.geometry.rect" }
 "Word for converting from a child gadget's co-ordinate system to a parent's:"
 { $subsection relative-loc }
 { $subsection screen-loc }

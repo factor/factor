@@ -93,7 +93,7 @@ M: ##return generate-insn drop %return ;
 M: ##dispatch-label generate-insn label>> %dispatch-label ;
 
 M: ##dispatch generate-insn
-    [ src>> register ] [ temp>> register ] bi %dispatch ;
+    [ src>> register ] [ temp>> register ] [ offset>> ] tri %dispatch ;
 
 : >slot<
     {
@@ -235,7 +235,7 @@ M: float-regs reg-class-variable drop float-regs ;
 GENERIC: inc-reg-class ( register-class -- )
 
 : ?dummy-stack-params ( reg-class -- )
-    dummy-stack-params? [ reg-size stack-params +@ ] [ drop ] if ;
+    dummy-stack-params? [ reg-size cell align stack-params +@ ] [ drop ] if ;
 
 : ?dummy-int-params ( reg-class -- )
     dummy-int-params? [ reg-size cell /i 1 max int-regs +@ ] [ drop ] if ;
@@ -264,7 +264,7 @@ M: object reg-class-full?
 
 : spill-param ( reg-class -- n reg-class )
     stack-params get
-    >r reg-size stack-params +@ r>
+    >r reg-size cell align stack-params +@ r>
     stack-params ;
 
 : fastcall-param ( reg-class -- n reg-class )
@@ -491,9 +491,10 @@ M: _label generate-insn
 M: _branch generate-insn
     label>> lookup-label %jump-label ;
 
-: >compare< ( insn -- label cc src1 src2 )
+: >compare< ( insn -- dst temp cc src1 src2 )
     {
         [ dst>> register ]
+        [ temp>> register ]
         [ cc>> ]
         [ src1>> register ]
         [ src2>> ?register ]

@@ -14,7 +14,7 @@ HELP: required-attr
 { $errors "Throws an error if the attribute is not specified." } ;
 
 HELP: optional-attr
-{ $values { "tag" tag } { "name" string } { "value" "a " { $link string } " or " { $link f } } }
+{ $values { "tag" tag } { "name" string } { "value" { $maybe string } } }
 { $description "Extracts an attribute from a tag." }
 { $notes "Outputs " { $link f } " if the attribute is not specified." } ;
 
@@ -24,7 +24,7 @@ HELP: compile-attr
 
 HELP: CHLOE:
 { $syntax "name definition... ;" }
-{ $values { "name" "the tag name" } { "definition" "a quotation with stack effect " { $snippet "( tag -- )" } } }
+{ $values { "name" "the tag name" } { "definition" { $quotation "( tag -- )" } } }
 { $description "Defines compilation semantics for the Chloe tag named " { $snippet "tag" } ". The definition body receives a " { $link tag } " on the stack." } ;
 
 HELP: COMPONENT:
@@ -46,7 +46,7 @@ HELP: [code]
 { $description "Compiles the quotation. It will be called when the template is called." } ;
 
 HELP: process-children
-{ $values { "tag" tag } { "quot" "a quotation with stack effect " { $snippet "( compiled-tag -- )" } } }
+{ $values { "tag" tag } { "quot" { $quotation "( compiled-tag -- )" } } }
 { $description "Compiles the tag. The quotation will be applied to the resulting quotation when the template is called." }
 { $examples "See " { $link "html.templates.chloe.extend.tags.example" } " for an example which uses this word to implement a custom control flow tag." } ;
 
@@ -153,6 +153,9 @@ ARTICLE: "html.templates.chloe.tags.form" "Chloe link and form tags"
             "    Delete"
             "</t:button>"
         }
+    } }
+    { { $snippet "t:validation-errors" } {
+        "Renders validation errors in the current form which are not associated with any field. Such errors are reported by invoking " { $link validation-error } "."
     } }
 } ;
 

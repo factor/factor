@@ -16,16 +16,16 @@ void start_thread(void *(*start_routine)(void *))
 
 static void *null_dll;
 
-s64 current_millis(void)
+s64 current_micros(void)
 {
 	struct timeval t;
 	gettimeofday(&t,NULL);
-	return (s64)t.tv_sec * 1000 + t.tv_usec / 1000;
+	return (s64)t.tv_sec * 1000000 + t.tv_usec;
 }
 
-void sleep_millis(CELL msec)
+void sleep_micros(CELL usec)
 {
-	usleep(msec * 1000);
+	usleep(usec);
 }
 
 void init_ffi(void)
@@ -55,7 +55,7 @@ void ffi_dlclose(F_DLL *dll)
 	dll->dll = NULL;
 }
 
-DEFINE_PRIMITIVE(existsp)
+void primitive_existsp(void)
 {
 	struct stat sb;
 	box_boolean(stat(unbox_char_string(),&sb) >= 0);

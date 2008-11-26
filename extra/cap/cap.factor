@@ -6,7 +6,7 @@ models opengl.framebuffers ui.gadgets.worlds ui.gadgets fry alien.syntax ;
 IN: cap
 
 : screenshot-array ( world -- byte-array )
-    dim>> product 3 * <byte-array> ;
+    dim>> [ first 3 * 4 align ] [ second ] bi * <byte-array> ;
 
 : gl-screenshot ( gadget -- byte-array )
     [

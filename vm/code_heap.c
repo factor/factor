@@ -7,8 +7,6 @@ void undefined_symbol(void)
 	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
 }
 
-#define CREF(array,i) ((CELL)(array) + CELLS * (i))
-
 INLINE CELL get_literal(CELL literals_start, CELL num)
 {
 	return get(CREF(literals_start,num));
@@ -55,22 +53,28 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 INLINE CELL compute_code_rel(F_REL *rel,
 	CELL code_start, CELL literals_start)
 {
+	CELL obj;
+
 	switch(REL_TYPE(rel))
 	{
 	case RT_PRIMITIVE:
 		return (CELL)primitives[REL_ARGUMENT(rel)];
 	case RT_DLSYM:
 		return (CELL)get_rel_symbol(rel,literals_start);
-	case RT_LITERAL:
-		return CREF(literals_start,REL_ARGUMENT(rel));
 	case RT_IMMEDIATE:
 		return get(CREF(literals_start,REL_ARGUMENT(rel)));
 	case RT_XT:
-		return (CELL)untag_word(get(CREF(literals_start,REL_ARGUMENT(rel))))->xt;
+		obj = get(CREF(literals_start,REL_ARGUMENT(rel)));
+		if(type_of(obj) == WORD_TYPE)
+			return (CELL)untag_word(obj)->xt;
+		else
+			return (CELL)untag_quotation(obj)->xt;
 	case RT_HERE:
-		return rel->offset + code_start;
+		return rel->offset + code_start + (short)REL_ARGUMENT(rel);
 	case RT_LABEL:
 		return code_start + REL_ARGUMENT(rel);
+	case RT_STACK_CHAIN:
+		return (CELL)&stack_chain;
 	default:
 		critical_error("Bad rel type",rel->type);
 		return -1; /* Can't happen */
@@ -236,10 +240,10 @@ CELL allot_code_block(CELL size)
 			CELL used, total_free, max_free;
 			heap_usage(&code_heap,&used,&total_free,&max_free);
 
-			fprintf(stderr,"Code heap stats:\n");
-			fprintf(stderr,"Used: %ld\n",used);
-			fprintf(stderr,"Total free space: %ld\n",total_free);
-			fprintf(stderr,"Largest free block: %ld\n",max_free);
+			print_string("Code heap stats:\n");
+			print_string("Used: "); print_cell(used); nl();
+			print_string("Total free space: "); print_cell(total_free); nl();
+			print_string("Largest free block: "); print_cell(max_free); nl();
 			fatal_error("Out of memory in add-compiled-block",0);
 		}
 	}
@@ -275,6 +279,7 @@ F_COMPILED *add_compiled_block(
 	/* compiled header */
 	F_COMPILED *header = (void *)here;
 	header->type = type;
+	header->last_scan = NURSERY;
 	header->code_length = code_length;
 	header->literals_length = literals_length;
 	header->relocation = relocation;
@@ -322,7 +327,7 @@ void default_word_code(F_WORD *word, bool relocate)
 	word->compiledp = F;
 }
 
-DEFINE_PRIMITIVE(modify_code_heap)
+void primitive_modify_code_heap(void)
 {
 	bool rescan_code_heap = to_boolean(dpop());
 	F_ARRAY *alist = untag_array(dpop());

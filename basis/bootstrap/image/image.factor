@@ -124,22 +124,29 @@ SYMBOL: jit-primitive-word
 SYMBOL: jit-primitive
 SYMBOL: jit-word-jump
 SYMBOL: jit-word-call
-SYMBOL: jit-push-literal
 SYMBOL: jit-push-immediate
 SYMBOL: jit-if-word
-SYMBOL: jit-if-jump
+SYMBOL: jit-if-1
+SYMBOL: jit-if-2
 SYMBOL: jit-dispatch-word
 SYMBOL: jit-dispatch
+SYMBOL: jit-dip-word
+SYMBOL: jit-dip
+SYMBOL: jit-2dip-word
+SYMBOL: jit-2dip
+SYMBOL: jit-3dip-word
+SYMBOL: jit-3dip
 SYMBOL: jit-epilog
 SYMBOL: jit-return
 SYMBOL: jit-profiling
 SYMBOL: jit-declare-word
+SYMBOL: jit-save-stack
 
 ! Default definition for undefined words
 SYMBOL: undefined-quot
 
-: userenv-offset ( symbol -- n )
-    {
+: userenvs ( -- assoc )
+    H{
         { bootstrap-boot-quot 20 }
         { bootstrap-global 21 }
         { jit-code-format 22 }
@@ -148,9 +155,9 @@ SYMBOL: undefined-quot
         { jit-primitive 25 }
         { jit-word-jump 26 }
         { jit-word-call 27 }
-        { jit-push-literal 28 }
-        { jit-if-word 29 }
-        { jit-if-jump 30 }
+        { jit-if-word 28 }
+        { jit-if-1 29 }
+        { jit-if-2 30 }
         { jit-dispatch-word 31 }
         { jit-dispatch 32 }
         { jit-epilog 33 }
@@ -158,8 +165,18 @@ SYMBOL: undefined-quot
         { jit-profiling 35 }
         { jit-push-immediate 36 }
         { jit-declare-word 42 }
+        { jit-save-stack 43 }
+        { jit-dip-word 44 }
+        { jit-dip 45 }
+        { jit-2dip-word 46 }
+        { jit-2dip 47 }
+        { jit-3dip-word 48 }
+        { jit-3dip 49 }
         { undefined-quot 60 }
-    } at header-size + ;
+    } ; inline
+
+: userenv-offset ( symbol -- n )
+    userenvs at header-size + ;
 
 : emit ( cell -- ) image get push ;
 
@@ -441,6 +458,9 @@ M: quotation '
     \ dispatch jit-dispatch-word set
     \ do-primitive jit-primitive-word set
     \ declare jit-declare-word set
+    \ dip jit-dip-word set
+    \ 2dip jit-2dip-word set
+    \ 3dip jit-3dip-word set
     [ undefined ] undefined-quot set
     {
         jit-code-format
@@ -449,16 +469,23 @@ M: quotation '
         jit-primitive
         jit-word-jump
         jit-word-call
-        jit-push-literal
         jit-push-immediate
         jit-if-word
-        jit-if-jump
+        jit-if-1
+        jit-if-2
         jit-dispatch-word
         jit-dispatch
+        jit-dip-word
+        jit-dip
+        jit-2dip-word
+        jit-2dip
+        jit-3dip-word
+        jit-3dip
         jit-epilog
         jit-return
         jit-profiling
         jit-declare-word
+        jit-save-stack
         undefined-quot
     } [ emit-userenv ] each ;
 

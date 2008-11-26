@@ -1,33 +1,37 @@
 ! Copyright (C) 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences combinators parser splitting math
-quotations arrays make words ;
+quotations arrays make words locals.backend summary sets ;
 IN: fry
 
 : _ ( -- * ) "Only valid inside a fry" throw ;
 : @ ( -- * ) "Only valid inside a fry" throw ;
 
+ERROR: >r/r>-in-fry-error ;
+
 <PRIVATE
 
-DEFER: (shallow-fry)
-DEFER: shallow-fry
+: [ncurry] ( n -- quot )
+    {
+        { 0 [ [ ] ] }
+        { 1 [ [ curry ] ] }
+        { 2 [ [ 2curry ] ] }
+        { 3 [ [ 3curry ] ] }
+        [ \ curry <repetition> ]
+    } case ;
 
-: ((shallow-fry)) ( accum quot adder -- result )
-    >r shallow-fry r>
-    append swap [
-        [ prepose ] curry append
-    ] unless-empty ; inline
+M: >r/r>-in-fry-error summary
+    drop
+    "Explicit retain stack manipulation is not permitted in fried quotations" ;
 
-: (shallow-fry) ( accum quot -- result )
-    [ 1quotation ] [
-        unclip {
-            { \ _ [ [ curry ] ((shallow-fry)) ] }
-            { \ @ [ [ compose ] ((shallow-fry)) ] }
-            [ swap >r suffix r> (shallow-fry) ]
-        } case
-    ] if-empty ;
+: check-fry ( quot -- quot )
+    dup { >r r> load-locals get-local drop-locals } intersect
+    empty? [ >r/r>-in-fry-error ] unless ;
 
-: shallow-fry ( quot -- quot' ) [ ] swap (shallow-fry) ;
+: shallow-fry ( quot -- quot' )
+    check-fry
+    [ dup \ @ = [ drop [ _ call ] ] [ 1array ] if ] map concat
+    { _ } split [ length 1- [ncurry] ] [ spread>quot ] bi prefix ;
 
 PREDICATE: fry-specifier < word { _ @ } memq? ;
 

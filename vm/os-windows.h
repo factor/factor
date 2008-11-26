@@ -20,10 +20,22 @@ typedef wchar_t F_CHAR;
 #define STRNCMP wcsncmp
 #define STRDUP _wcsdup
 
+#ifdef WIN64
+        #define CELL_FORMAT "%Iu"
+        #define CELL_HEX_FORMAT "%Ix"
+	#define CELL_HEX_PAD_FORMAT "%016Ix"
+#else
+        #define CELL_FORMAT "%lu"
+        #define CELL_HEX_FORMAT "%lx"
+	#define CELL_HEX_PAD_FORMAT "%08lx"
+#endif
+
+#define FIXNUM_FORMAT "%Id"
+
 #define OPEN_READ(path) _wfopen(path,L"rb")
 #define OPEN_WRITE(path) _wfopen(path,L"wb")
-#define FPRINTF(stream,format,arg) fwprintf(stream,L##format,arg)
 
+#define print_native_string(string) wprintf(L"%s",string)
 
 /* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 #define EPOCH_OFFSET 0x019db1ded53e8000LL
@@ -37,7 +49,7 @@ void ffi_dlopen(F_DLL *dll);
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);
 void ffi_dlclose(F_DLL *dll);
 
-void sleep_millis(DWORD msec);
+void sleep_micros(DWORD msec);
 
 INLINE void init_signals(void) {}
 INLINE void early_init(void) {}
@@ -45,5 +57,5 @@ const F_CHAR *vm_executable_path(void);
 const F_CHAR *default_image_path(void);
 long getpagesize (void);
 
-s64 current_millis(void);
+s64 current_micros(void);
 

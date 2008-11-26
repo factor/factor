@@ -190,7 +190,7 @@ M: #if emit-node
 
 : emit-dispatch ( node -- )
     ##epilogue
-    ds-pop ^^offset>slot i ##dispatch
+    ds-pop ^^offset>slot i 0 ##dispatch
     dispatch-branches ;
 
 : <dispatch-block> ( -- word )

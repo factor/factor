@@ -53,14 +53,6 @@ HELP: vocab-words
 { $values { "vocab-spec" "a vocabulary specifier" } { "words" "an assoc mapping strings to words" } }
 { $description "Outputs the words defined in a vocabulary." } ;
 
-HELP: vocab-source-loaded?
-{ $values { "vocab-spec" "a vocabulary specifier" } { "?" "a boolean" } }
-{ $description "Outputs if the source for this vocubulary has been loaded." } ;
-
-HELP: vocab-docs-loaded?
-{ $values { "vocab-spec" "a vocabulary specifier" } { "?" "a boolean" } }
-{ $description "Outputs if the documentation for this vocubulary has been loaded." } ;
-
 HELP: words
 { $values { "vocab" string } { "seq" "a sequence of words" } }
 { $description "Outputs a sequence of words defined in the vocabulary, or " { $link f } " if no vocabulary with this name exists." } ;
@@ -75,7 +67,7 @@ HELP: forget-vocab
 { $notes "This word must be called from inside " { $link with-compilation-unit } "." } ;
 
 HELP: load-vocab-hook
-{ $var-description "a quotation with stack effect " { $snippet "( name -- vocab )" } " which loads a vocabulary. This quotation is called by " { $link load-vocab } ". The default value should not need to be changed; this functinality is implemented via a hook stored in a variable to break a circular dependency which would otherwise exist from " { $vocab-link "vocabs" } " to " { $vocab-link "vocabs.loader" } " to " { $vocab-link "parser" } " back to " { $vocab-link "vocabs" } "." } ;
+{ $var-description { $quotation "( name -- vocab )" } " which loads a vocabulary. This quotation is called by " { $link load-vocab } ". The default value should not need to be changed; this functinality is implemented via a hook stored in a variable to break a circular dependency which would otherwise exist from " { $vocab-link "vocabs" } " to " { $vocab-link "vocabs.loader" } " to " { $vocab-link "parser" } " back to " { $vocab-link "vocabs" } "." } ;
 
 HELP: words-named
 { $values { "str" string } { "seq" "a sequence of words" } }

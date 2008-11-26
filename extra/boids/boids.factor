@@ -1,5 +1,5 @@
 
-USING: combinators.short-circuit kernel namespaces
+USING: kernel namespaces
        math
        math.constants
        math.functions
@@ -10,6 +10,7 @@ USING: combinators.short-circuit kernel namespaces
        math.physics.vel
        combinators arrays sequences random vars
        combinators.lib
+       combinators.short-circuit
        accessors ;
 
 IN: boids
@@ -43,19 +44,19 @@ VAR: separation-radius
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : init-variables ( -- )
-1.0 >cohesion-weight
-1.0 >alignment-weight
-1.0 >separation-weight
+  1.0 >cohesion-weight
+  1.0 >alignment-weight
+  1.0 >separation-weight
 
-75 >cohesion-radius
-50 >alignment-radius
-25 >separation-radius
+  75 >cohesion-radius
+  50 >alignment-radius
+  25 >separation-radius
 
-180 >cohesion-view-angle
-180 >alignment-view-angle
-180 >separation-view-angle
+  180 >cohesion-view-angle
+  180 >alignment-view-angle
+  180 >separation-view-angle
 
-10 >time-slice ;
+  10 >time-slice ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! random-boid and random-boids
@@ -76,14 +77,14 @@ VAR: separation-radius
 : constrain ( n a b -- n ) rot min max ;
 
 : angle-between ( vec vec -- angle )
-2dup v. -rot norm swap norm * / -1 1 constrain acos rad>deg ;
+  2dup v. -rot norm swap norm * / -1 1 constrain acos rad>deg ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : relative-position ( self other -- v ) swap [ pos>> ] bi@ v- ;
 
 : relative-angle ( self other -- angle )
-over vel>> -rot relative-position angle-between ;
+  over vel>> -rot relative-position angle-between ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -156,7 +157,7 @@ over vel>> -rot relative-position angle-between ;
   2&& ;
 
 : alignment-neighborhood ( self -- boids )
-boids> [ within-alignment-neighborhood? ] with filter ;
+  boids> [ within-alignment-neighborhood? ] with filter ;
 
 : alignment-force ( self -- force )
   alignment-neighborhood
@@ -189,13 +190,12 @@ boids> [ within-alignment-neighborhood? ] with filter ;
 : above? ( n a b -- ? ) nip > ;
 
 : wrap ( n a b -- n )
-{ { [ 3dup below? ]
-    [ 2nip ] }
-  { [ 3dup above? ]
-    [ drop nip ] }
-  { [ t ]
-    [ 2drop ] } }
-cond ;
+  {
+    { [ 3dup below? ] [ 2nip     ] }
+    { [ 3dup above? ] [ drop nip ] }
+    { [ t           ] [ 2drop    ] }
+  }
+  cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

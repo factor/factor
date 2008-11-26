@@ -460,10 +460,8 @@ ARTICLE: { "xml" "entities" } "XML entities"
     { $subsection with-entities }
     { $subsection with-html-entities } ;
 
-ARTICLE: { "xml" "intro" } "XML"
-    "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress."
-    $nl
-    "The XML module was implemented by Daniel Ehrenberg, with contributions from the Factor community"
+ARTICLE: "xml" "XML parser"
+"The " { $vocab-link "xml" } " vocabulary implements the XML 1.1 standard, converting strings of text into XML and vice versa."
     { $subsection { "xml" "reading" } }
     { $subsection { "xml" "writing" } }
     { $subsection { "xml" "classes" } }
@@ -476,4 +474,4 @@ ARTICLE: { "xml" "intro" } "XML"
 
 IN: xml
 
-ABOUT: { "xml" "intro" }
+ABOUT: "xml"

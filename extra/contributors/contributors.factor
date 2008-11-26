@@ -7,7 +7,7 @@ IN: contributors
 
 : changelog ( -- authors )
     image parent-directory [
-        "git-log --pretty=format:%an" ascii <process-reader> lines
+        "git log --pretty=format:%an" ascii <process-reader> lines
     ] with-directory ;
 
 : patch-counts ( authors -- assoc )

@@ -2,7 +2,8 @@ USING: continuations documents ui.tools.interactor
 ui.tools.listener hashtables kernel namespaces parser sequences
 tools.test ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.panes vocabs words tools.test.ui slots.private
-threads arrays generic threads accessors listener math ;
+threads arrays generic threads accessors listener math
+calendar ;
 IN: ui.tools.listener.tests
 
 [ f ] [ "word" source-editor command-map commands>> empty? ] unit-test
@@ -47,7 +48,7 @@ IN: ui.tools.listener.tests
 
     [ ] [ "listener" get restart-listener ] unit-test
 
-    [ ] [ 1000 sleep ] unit-test
+    [ ] [ 1 seconds sleep ] unit-test
 
     [ ] [ "listener" get com-end ] unit-test
 ] with-grafted-gadget

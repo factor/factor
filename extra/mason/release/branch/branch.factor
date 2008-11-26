@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences prettyprint io.files
-io.launcher make
-mason.common mason.platform mason.config ;
+io.launcher make mason.common mason.platform mason.config ;
 IN: mason.release.branch
 
 : branch-name ( -- string ) "clean-" platform append ;
@@ -25,7 +24,7 @@ IN: mason.release.branch
 
 : upload-clean-image-cmd ( -- args )
     [
-        "scp" ,
+        scp-command get ,
         boot-image-name ,
         [
             image-username get % "@" %
@@ -45,4 +44,4 @@ IN: mason.release.branch
     ] with-directory ;
 
 : update-clean-branch ( -- )
-    upload-to-factorcode get [ (update-clean-branch) ] when ;
+    upload-to-factorcode? get [ (update-clean-branch) ] when ;

@@ -5,8 +5,6 @@ USING: kernel vocabs.loader sequences strings splitting words irc.messages ;
 
 IN: irc.ui.commandparser
 
-"irc.ui.commands" require
-
 : command ( string string -- string command )
     [ "say" ] when-empty
     dup "irc.ui.commands" lookup

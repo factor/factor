@@ -8,7 +8,7 @@ $nl
 "Scroller gadgets are created by calling " { $link <scroller> } "." } ;
 
 HELP: find-scroller
-{ $values { "gadget" gadget } { "scroller/f" "a " { $link scroller } " or " { $link f } } }
+{ $values { "gadget" gadget } { "scroller/f" { $maybe scroller } } }
 { $description "Finds the first parent of " { $snippet "gadget" } " which is a " { $link scroller } ". Outputs " { $link f } " if the gadget is not contained in a " { $link scroller } "." } ;
 
 HELP: scroller-value

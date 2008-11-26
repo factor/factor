@@ -95,7 +95,7 @@ M: decoder stream-read-partial stream-read ;
 
 : ((read-until)) ( buf quot: ( -- char stop? ) -- string/f sep/f )
     dup call
-    [ >r drop "" like r> ]
+    [ [ drop "" like ] dip ]
     [ pick push ((read-until)) ] if ; inline recursive
 
 : (read-until) ( quot -- string/f sep/f )

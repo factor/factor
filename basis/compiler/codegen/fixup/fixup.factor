@@ -66,14 +66,14 @@ SYMBOL: literal-table
 : rel-primitive ( word class -- )
     >r def>> first r> rt-primitive rel-fixup ;
 
-: rel-literal ( literal class -- )
-    >r add-literal r> rt-literal rel-fixup ;
+: rel-immediate ( literal class -- )
+    >r add-literal r> rt-immediate rel-fixup ;
 
 : rel-this ( class -- )
     0 swap rt-label rel-fixup ;
 
-: rel-here ( class -- )
-    0 swap rt-here rel-fixup ;
+: rel-here ( offset class -- )
+    rt-here rel-fixup ;
 
 : init-fixup ( -- )
     BV{ } clone relocation-table set

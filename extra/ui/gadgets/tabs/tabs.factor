@@ -12,9 +12,9 @@ TUPLE: tabbed < frame names toggler content ;
 
 DEFER: (del-page)
 
-:: add-toggle ( model n name toggler -- )
+:: add-toggle ( n name model toggler -- )
   <frame>
-    n name toggler parent>> '[ _ _ _ (del-page) ] "X" swap <bevel-button>
+    n name toggler parent>> '[ drop _ _ _ (del-page) ] "X" swap <bevel-button>
       @right grid-add
     n model name <toggle-button> @center grid-add
   toggler swap add-gadget drop ;
@@ -23,7 +23,7 @@ DEFER: (del-page)
      [ names>> ] [ model>> ] [ toggler>> ] tri
      [ clear-gadget ] keep
      [ [ length ] keep ] 2dip
-     '[ [ _ ] 2dip _ add-toggle ] 2each ;
+     '[ _ _ add-toggle ] 2each ;
 
 : refresh-book ( tabbed -- )
     model>> [ ] change-model ;
@@ -39,8 +39,8 @@ DEFER: (del-page)
 
 : add-page ( page name tabbed -- )
     [ names>> push ] 2keep
-    [ [ model>> swap ]
-      [ names>> length 1 - swap ]
+    [ [ names>> length 1 - swap ]
+      [ model>> ]
       [ toggler>> ] tri add-toggle ]
     [ content>> swap add-gadget drop ]
     [ refresh-book ] tri ;

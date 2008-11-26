@@ -6,7 +6,8 @@ math.bitwise byte-arrays alien combinators calendar
 io.encodings.binary accessors sequences strings system
 io.files.private destructors vocabs.loader calendar.unix
 unix.stat alien.c-types arrays unix.users unix.groups
-environment fry io.encodings.utf8 alien.strings unix.statfs ;
+environment fry io.encodings.utf8 alien.strings unix.statfs
+combinators.short-circuit ;
 IN: io.unix.files
 
 M: unix cwd ( -- path )
@@ -117,8 +118,8 @@ M: unix stat>file-info ( stat -- file-info )
         [ stat-st_blksize >>blocksize ]
     } cleave ;
 
-M: unix stat>type ( stat -- type )
-    stat-st_mode S_IFMT bitand {
+: n>file-type ( n -- type )
+    S_IFMT bitand {
         { S_IFREG [ +regular-file+ ] }
         { S_IFDIR [ +directory+ ] }
         { S_IFCHR [ +character-device+ ] }
@@ -128,6 +129,9 @@ M: unix stat>type ( stat -- type )
         { S_IFSOCK [ +socket+ ] }
         [ drop +unknown+ ]
     } case ;
+
+M: unix stat>type ( stat -- type )
+    stat-st_mode n>file-type ;
 
 ! Linux has no extra fields in its stat struct
 os {
@@ -150,7 +154,7 @@ os {
 
 M: unix >directory-entry ( byte-array -- directory-entry )
     [ dirent-d_name utf8 alien>string ]
-    [ dirent-d_type ] bi directory-entry boa ;
+    [ dirent-d_type dirent-type>file-type ] bi directory-entry boa ;
 
 M: unix (directory-entries) ( path -- seq )
     [
@@ -171,6 +175,30 @@ M: unix (directory-entries) ( path -- seq )
 : file-mode? ( path mask -- ? ) [ stat-mode ] dip mask? ;
 
 PRIVATE>
+
+: ch>file-type ( ch -- type )
+    {
+        { CHAR: b [ +block-device+ ] }
+        { CHAR: c [ +character-device+ ] }   
+        { CHAR: d [ +directory+ ] }
+        { CHAR: l [ +symbolic-link+ ] }
+        { CHAR: s [ +socket+ ] }
+        { CHAR: p [ +fifo+ ] }
+        { CHAR: - [ +regular-file+ ] }
+        [ drop +unknown+ ]
+    } case ;
+
+: file-type>ch ( type -- string )
+    {
+        { +block-device+ [ CHAR: b ] }
+        { +character-device+ [ CHAR: c ] }
+        { +directory+ [ CHAR: d ] }
+        { +symbolic-link+ [ CHAR: l ] }
+        { +socket+ [ CHAR: s ] }
+        { +fifo+ [ CHAR: p ] }
+        { +regular-file+ [ CHAR: - ] }
+        [ drop CHAR: - ]
+    } case ;
 
 : UID           OCT: 0004000 ; inline
 : GID           OCT: 0002000 ; inline
@@ -200,6 +228,15 @@ GENERIC: group-execute? ( obj -- ? )
 GENERIC: other-read? ( obj -- ? )
 GENERIC: other-write? ( obj -- ? )
 GENERIC: other-execute? ( obj -- ? )
+
+: any-read? ( obj -- ? )
+    { [ user-read? ] [ group-read? ] [ other-read? ] } 1|| ;
+
+: any-write? ( obj -- ? )
+    { [ user-write? ] [ group-write? ] [ other-write? ] } 1|| ;
+
+: any-execute? ( obj -- ? )
+    { [ user-execute? ] [ group-execute? ] [ other-execute? ] } 1|| ;
 
 M: integer uid? ( integer -- ? ) UID mask? ;
 M: integer gid? ( integer -- ? ) GID mask? ;
@@ -266,7 +303,7 @@ M: string other-execute? ( path -- ? ) OTHER-EXECUTE file-mode? ;
     dup length [ over [ pick set-timeval-nth ] [ 2drop ] if ] 2each ;
 
 : timestamp>timeval ( timestamp -- timeval )
-    unix-1970 time- duration>milliseconds make-timeval ;
+    unix-1970 time- duration>microseconds make-timeval ;
 
 : timestamps>byte-array ( timestamps -- byte-array )
     [ dup [ timestamp>timeval ] when ] map make-timeval-array ;

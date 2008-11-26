@@ -87,12 +87,11 @@ const F_CHAR *vm_executable_path(void)
 	return safe_strdup(full_path);
 }
 
-DEFINE_PRIMITIVE(existsp)
+void primitive_existsp(void)
 {
 	BY_HANDLE_FILE_INFORMATION bhfi;
 
 	F_CHAR *path = unbox_u16_string();
-	//wprintf(L"path = %s\n", path);
 	HANDLE h = CreateFileW(path,
 			GENERIC_READ,
 			FILE_SHARE_READ,
@@ -167,7 +166,7 @@ long getpagesize(void)
 	return g_pagesize;
 }
 
-void sleep_millis(DWORD msec)
+void sleep_micros(DWORD usec)
 {
-	Sleep(msec);
+	Sleep(usec);
 }

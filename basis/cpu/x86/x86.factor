@@ -16,9 +16,7 @@ HOOK: temp-reg-2 cpu ( -- reg )
 
 M: x86 %load-immediate MOV ;
 
-HOOK: rel-literal-x86 cpu ( literal -- )
-
-M: x86 %load-indirect swap 0 [] MOV rel-literal-x86 ;
+M: x86 %load-indirect swap 0 MOV rc-absolute-cell rel-immediate ;
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
@@ -59,19 +57,6 @@ M: x86 %return ( -- ) 0 RET ;
 
 : align-code ( n -- )
     0 <repetition> % ;
-
-M:: x86 %dispatch ( src temp -- )
-    ! Load jump table base. We use a temporary register
-    ! since on AMD64 we have to load a 64-bit immediate. On
-    ! x86, this is redundant.
-    ! Add jump table base
-    temp HEX: ffffffff MOV rc-absolute-cell rel-here
-    src temp ADD
-    src HEX: 7f [+] JMP
-    ! Fix up the displacement above
-    cell code-alignment dup bootstrap-cell 8 = 15 9 ? +
-    building get dup pop* push
-    align-code ;
 
 M: x86 %dispatch-label ( word -- )
     0 cell, rc-absolute-cell rel-word ;
@@ -414,12 +399,12 @@ HOOK: stack-reg cpu ( -- reg )
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
-: %boolean ( dst word -- )
-    over \ f tag-number MOV
-    0 [] swap execute
-    \ t rel-literal-x86 ; inline
+:: %boolean ( dst temp word -- )
+    dst \ f tag-number MOV
+    temp 0 MOV \ t rc-absolute-cell rel-immediate
+    dst temp word execute ; inline
 
-M: x86 %compare ( dst cc src1 src2 -- )
+M: x86 %compare ( dst temp cc src1 src2 -- )
     CMP {
         { cc< [ \ CMOVL %boolean ] }
         { cc<= [ \ CMOVLE %boolean ] }
@@ -429,10 +414,10 @@ M: x86 %compare ( dst cc src1 src2 -- )
         { cc/= [ \ CMOVNE %boolean ] }
     } case ;
 
-M: x86 %compare-imm ( dst cc src1 src2 -- )
+M: x86 %compare-imm ( dst temp cc src1 src2 -- )
     %compare ;
 
-M: x86 %compare-float ( dst cc src1 src2 -- )
+M: x86 %compare-float ( dst temp cc src1 src2 -- )
     UCOMISD {
         { cc< [ \ CMOVB %boolean ] }
         { cc<= [ \ CMOVBE %boolean ] }
@@ -520,7 +505,7 @@ M: x86 %prepare-alien-invoke
     temp-reg-1 2 cells [+] ds-reg MOV
     temp-reg-1 3 cells [+] rs-reg MOV ;
 
-M: x86 value-structs? t ;
+M: x86 value-struct? drop t ;
 
 M: x86 small-enough? ( n -- ? )
     HEX: -80000000 HEX: 7fffffff between? ;

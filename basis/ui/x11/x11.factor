@@ -7,7 +7,7 @@ x11.events x11.xim x11.glx x11.clipboard x11.constants
 x11.windows io.encodings.string io.encodings.ascii
 io.encodings.utf8 combinators debugger command-line qualified
 math.vectors classes.tuple opengl.gl threads math.geometry.rect
-environment ;
+environment ascii ;
 IN: ui.x11
 
 SINGLETON: x11-ui-backend
@@ -67,20 +67,32 @@ M: world configure-event
 : event-modifiers ( event -- seq )
     XKeyEvent-state modifiers modifier ;
 
+: valid-input? ( string gesture -- ? )
+    over empty? [ 2drop f ] [
+        mods>> { f { S+ } } member? [
+            [ [ 127 = not ] [ CHAR: \s >= ] bi and ] all?
+        ] [
+            [ [ 127 = not ] [ CHAR: \s >= ] [ alpha? not ] tri and and ] all?
+        ] if
+    ] if ;
+
 : key-down-event>gesture ( event world -- string gesture )
     dupd
     handle>> xic>> lookup-string
     >r swap event-modifiers r> key-code <key-down> ;
 
 M: world key-down-event
-    [ key-down-event>gesture ] keep world-focus
-    [ send-gesture ] keep swap [ user-input ] [ 2drop ] if ;
+    [ key-down-event>gesture ] keep
+    world-focus
+    [ propagate-gesture drop ]
+    [ 2over valid-input? [ nip user-input ] [ 3drop ] if ]
+    3bi ;
 
 : key-up-event>gesture ( event -- gesture )
     dup event-modifiers swap 0 XLookupKeysym key-code <key-up> ;
 
 M: world key-up-event
-    >r key-up-event>gesture r> world-focus send-gesture drop ;
+    >r key-up-event>gesture r> world-focus propagate-gesture ;
 
 : mouse-event>gesture ( event -- modifiers button loc )
     dup event-modifiers over XButtonEvent-button
@@ -185,7 +197,7 @@ M: world client-event
 
 M: x11-ui-backend do-events
     wait-event dup XAnyEvent-window window dup
-    [ [ 2dup handle-event ] assert-depth ] when 2drop ;
+    [ handle-event ] [ 2drop ] if ;
 
 : x-clipboard@ ( gadget clipboard -- prop win )
     atom>> swap

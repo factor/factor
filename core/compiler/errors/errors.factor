@@ -14,15 +14,13 @@ M: object compiler-error-type drop +error+ ;
 
 GENERIC# compiler-error. 1 ( error word -- )
 
-<PRIVATE
-
 SYMBOL: compiler-errors
 
 SYMBOL: with-compiler-errors?
 
 : errors-of-type ( type -- assoc )
     compiler-errors get-global
-    swap [ >r nip compiler-error-type r> eq? ] curry
+    swap [ [ nip compiler-error-type ] dip eq? ] curry
     assoc-filter ;
 
 : compiler-errors. ( type -- )
@@ -46,8 +44,6 @@ SYMBOL: with-compiler-errors?
     "semantic errors" +error+ "errors" (compiler-report)
     "semantic warnings" +warning+ "warnings" (compiler-report)
     "linkage errors" +linkage+ "linkage" (compiler-report) ;
-
-PRIVATE>
 
 : :errors ( -- ) +error+ compiler-errors. ;
 

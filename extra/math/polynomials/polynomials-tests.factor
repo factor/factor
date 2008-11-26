@@ -1,7 +1,6 @@
-IN: math.polynomials.tests
 USING: kernel math math.polynomials tools.test ;
+IN: math.polynomials.tests
 
-! Tests
 [ { 0 1 } ] [ { 0 1 0 0 } ptrim ] unit-test
 [ { 1 } ] [ { 1 0 0 } ptrim ] unit-test
 [ { 0 } ] [ { 0 } ptrim ] unit-test

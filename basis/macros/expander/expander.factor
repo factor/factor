@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private namespaces make
 quotations accessors words continuations vectors effects math
-generalizations stack-checker.transforms fry ;
+generalizations fry ;
 IN: macros.expander
 
 GENERIC: expand-macros ( quot -- quot' )
@@ -37,9 +37,17 @@ M: wrapper expand-macros* wrapped>> literal ;
         [ '[ _ ndrop _ nnip call ] [ ] like ] 2map , \ dispatch ,
     ] bi ;
 
-: expand-macro ( quot -- )
-    stack [ swap with-datastack >vector ] change
-    stack get pop >quotation end (expand-macros) ;
+: word, ( word -- ) end , ;
+
+: expand-macro ( word quot -- )
+    '[
+        drop
+        stack [ _ with-datastack >vector ] change
+        stack get pop >quotation end (expand-macros)
+    ] [
+        drop
+        word,
+    ] recover ;
 
 : expand-macro? ( word -- quot ? )
     dup [ "transform-quot" word-prop ] [ "macro" word-prop ] bi or dup [
@@ -47,11 +55,9 @@ M: wrapper expand-macros* wrapped>> literal ;
         stack get length <=
     ] [ 2drop f f ] if ;
 
-: word, ( word -- ) end , ;
-
 M: word expand-macros*
     dup expand-dispatch? [ drop expand-dispatch ] [
-        dup expand-macro? [ nip expand-macro ] [
+        dup expand-macro? [ expand-macro ] [
             drop word,
         ] if
     ] if ;

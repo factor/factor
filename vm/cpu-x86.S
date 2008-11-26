@@ -27,7 +27,7 @@ DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
 DEF(FASTCALL void,lazy_jit_compile,(CELL quot)):
 	mov STACK_REG,ARG1           /* Save stack pointer */
 	sub $STACK_PADDING,STACK_REG
-	call MANGLE(primitive_jit_compile)
+	call MANGLE(lazy_jit_compile_impl)
 	mov RETURN_REG,ARG0          /* No-op on 32-bit */
 	add $STACK_PADDING,STACK_REG
         jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */

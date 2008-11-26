@@ -11,37 +11,11 @@ IN: mason.release.upload
 : remote-archive-name ( -- dest )
     remote-location "/" archive-name 3append ;
 
-: temp-archive-name ( -- dest )
-    remote-archive-name ".incomplete" append ;
-
-: upload-command ( -- args )
-    "scp"
-    archive-name
-    [
-        upload-username get % "@" %
-        upload-host get % ":" %
-        temp-archive-name %
-    ] "" make
-    3array ;
-
-: rename-command ( -- args )
-    [
-        "ssh" ,
-        upload-host get ,
-        "-l" ,
-        upload-username get ,
-        "mv" ,
-        temp-archive-name ,
-        remote-archive-name ,
-    ] { } make ;
-
-: upload-temp-file ( -- )
-    upload-command short-running-process ;
-
-: rename-temp-file ( -- )
-    rename-command short-running-process ;
-
 : upload ( -- )
-    upload-to-factorcode get
-    [ upload-temp-file rename-temp-file ]
-    when ;
+    upload-to-factorcode? get [
+        archive-name
+        upload-username get
+        upload-host get
+        remote-archive-name
+        upload-safely
+    ] when ;

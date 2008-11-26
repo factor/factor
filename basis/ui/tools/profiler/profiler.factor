@@ -9,7 +9,7 @@ TUPLE: profiler-gadget < track pane ;
 
 : <profiler-gadget> ( -- gadget )
     { 0 1 } profiler-gadget new-track
-        dup <toolbar> f track-add
+        add-toolbar
         <pane> >>pane
         dup pane>> <scroller> 1 track-add ;
 
