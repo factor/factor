@@ -12,6 +12,10 @@ and the callstack top is passed in EDX */
 
 #define NV_TEMP_REG %ebx
 
+#define ARITH_TEMP_1 %ebp
+#define ARITH_TEMP_2 %ebx
+#define DIV_RESULT %eax
+
 #define CELL_SIZE 4
 #define STACK_PADDING 12
 
