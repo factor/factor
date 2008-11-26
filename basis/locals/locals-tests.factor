@@ -429,6 +429,8 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 
 \ FAILdog-2 must-infer
 
+[ 3 ] [ 3 [| a | \ a ] call ] unit-test
+
 ! :: wlet-&&-test ( a -- ? )
 !     [wlet | is-integer? [ a integer? ]
 !             is-even? [ a even? ]

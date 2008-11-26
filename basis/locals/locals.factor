@@ -206,6 +206,8 @@ M: array rewrite-literal? [ rewrite-literal? ] contains? ;
 
 M: quotation rewrite-literal? [ rewrite-literal? ] contains? ;
 
+M: wrapper rewrite-literal? drop t ;
+
 M: hashtable rewrite-literal? drop t ;
 
 M: vector rewrite-literal? drop t ;
@@ -243,6 +245,9 @@ M: local-reader rewrite-element , ;
 
 M: word rewrite-element literalize , ;
 
+M: wrapper rewrite-element
+    dup rewrite-literal? [ wrapped>> rewrite-element ] [ , ] if ;
+
 M: object rewrite-element , ;
 
 M: array local-rewrite* rewrite-element ;
@@ -252,6 +257,8 @@ M: vector local-rewrite* rewrite-element ;
 M: tuple local-rewrite* rewrite-element ;
 
 M: hashtable local-rewrite* rewrite-element ;
+
+M: wrapper local-rewrite* rewrite-element ;
 
 M: word local-rewrite*
     dup { >r r> load-locals get-local drop-locals } memq?
