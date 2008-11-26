@@ -885,12 +885,13 @@ void garbage_collection(CELL gen,
 	/* collect objects referenced from older generations */
 	collect_cards();
 
-	if(collecting_gen != TENURED)
+	/* don't scan code heap unless it has pointers to this
+	generation or younger */
+	if(collecting_gen >= last_code_heap_scan)
 	{
-		/* don't scan code heap unless it has pointers to this
-		generation or younger */
-		if(collecting_gen >= last_code_heap_scan)
+		if(collecting_gen != TENURED)
 		{
+		
 			/* if we are doing code GC, then we will copy over
 			literals from any code block which gets marked as live.
 			if we are not doing code GC, just consider all literals
@@ -898,12 +899,12 @@ void garbage_collection(CELL gen,
 			code_heap_scans++;
 
 			collect_literals();
-
-			if(collecting_accumulation_gen_p())
-				last_code_heap_scan = collecting_gen;
-			else
-				last_code_heap_scan = collecting_gen + 1;
 		}
+
+		if(collecting_accumulation_gen_p())
+			last_code_heap_scan = collecting_gen;
+		else
+			last_code_heap_scan = collecting_gen + 1;
 	}
 
 	collect_next_loop(scan,&newspace->here);
