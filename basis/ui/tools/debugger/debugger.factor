@@ -1,35 +1,43 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ui ui.commands ui.gestures ui.gadgets
-       ui.gadgets.worlds ui.gadgets.packs ui.gadgets.buttons
-       ui.gadgets.labels ui.gadgets.panes ui.gadgets.presentations
-       ui.gadgets.viewports ui.gadgets.lists ui.gadgets.tracks
-       ui.gadgets.scrollers ui.gadgets.panes hashtables io kernel math
-       models namespaces sequences sequences words continuations
-       debugger prettyprint ui.tools.traceback help editors ;
-
+USING: accessors arrays hashtables io kernel math models
+namespaces sequences sequences words continuations debugger
+prettyprint help editors ui ui.commands ui.gestures ui.gadgets
+ui.gadgets.worlds ui.gadgets.packs ui.gadgets.buttons
+ui.gadgets.labels ui.gadgets.panes ui.gadgets.presentations
+ui.gadgets.viewports ui.gadgets.lists ui.gadgets.tracks
+ui.gadgets.scrollers ui.gadgets.panes ui.tools.traceback ;
 IN: ui.tools.debugger
 
-: <restart-list> ( restarts restart-hook -- gadget )
-    [ name>> ] rot <model> <list> ;
+TUPLE: debugger < track error restarts restart-hook restart-list continuation ;
 
-TUPLE: debugger < track restarts ;
+<PRIVATE
 
-: <debugger-display> ( restart-list error -- gadget )
+: <restart-list> ( debugger -- gadget )
+    [ restart-hook>> ] [ restarts>> ] bi
+    [ name>> ] swap <model> <list> ; inline
+
+: <error-pane> ( error -- pane )
+    <pane> [ [ print-error ] with-pane ] keep ; inline
+
+: <debugger-display> ( debugger -- gadget )
     <filled-pile>
-        <pane>
-            swapd tuck [ print-error ] with-pane
-        add-gadget
+        over error>> <error-pane> add-gadget
+        swap restart-list>> add-gadget ; inline
 
-        swap add-gadget ;
+PRIVATE>
 
 : <debugger> ( error restarts restart-hook -- gadget )
     { 0 1 } debugger new-track
         add-toolbar
-        -rot <restart-list> >>restarts
-        dup restarts>> rot <debugger-display> <scroller> 1 track-add ;
+        swap >>restart-hook
+        swap >>restarts
+        swap >>error
+        error-continuation get >>continuation
+        dup <restart-list> >>restart-list
+        dup <debugger-display> <scroller> 1 track-add ;
 
-M: debugger focusable-child* restarts>> ;
+M: debugger focusable-child* restart-list>> ;
 
 : debugger-window ( error -- )
     #! No restarts for the debugger window
@@ -55,16 +63,20 @@ debugger "gestures" f {
     { T{ button-down } request-focus }
 } define-command-map
 
-: com-traceback ( -- ) error-continuation get traceback-window ;
+: com-traceback ( debugger -- ) continuation>> traceback-window ;
 
-\ com-traceback H{ { +nullary+ t } } define-command
+\ com-traceback H{ } define-command
 
-\ :help H{ { +nullary+ t } { +listener+ t } } define-command
+: com-help ( debugger -- ) error>> (:help) ;
 
-\ :edit H{ { +nullary+ t } { +listener+ t } } define-command
+\ com-help H{ { +listener+ t } } define-command
+
+: com-edit ( debugger -- ) error>> (:edit) ;
+
+\ com-edit H{ { +listener+ t } } define-command
 
 debugger "toolbar" f {
     { T{ key-down f f "s" } com-traceback }
-    { T{ key-down f f "h" } :help }
-    { T{ key-down f f "e" } :edit }
+    { T{ key-down f f "h" } com-help }
+    { T{ key-down f f "e" } com-edit }
 } define-command-map

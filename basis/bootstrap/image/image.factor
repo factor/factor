@@ -124,10 +124,10 @@ SYMBOL: jit-primitive-word
 SYMBOL: jit-primitive
 SYMBOL: jit-word-jump
 SYMBOL: jit-word-call
-SYMBOL: jit-push-literal
 SYMBOL: jit-push-immediate
 SYMBOL: jit-if-word
-SYMBOL: jit-if-jump
+SYMBOL: jit-if-1
+SYMBOL: jit-if-2
 SYMBOL: jit-dispatch-word
 SYMBOL: jit-dispatch
 SYMBOL: jit-dip-word
@@ -155,9 +155,9 @@ SYMBOL: undefined-quot
         { jit-primitive 25 }
         { jit-word-jump 26 }
         { jit-word-call 27 }
-        { jit-push-literal 28 }
-        { jit-if-word 29 }
-        { jit-if-jump 30 }
+        { jit-if-word 28 }
+        { jit-if-1 29 }
+        { jit-if-2 30 }
         { jit-dispatch-word 31 }
         { jit-dispatch 32 }
         { jit-epilog 33 }
@@ -469,10 +469,10 @@ M: quotation '
         jit-primitive
         jit-word-jump
         jit-word-call
-        jit-push-literal
         jit-push-immediate
         jit-if-word
-        jit-if-jump
+        jit-if-1
+        jit-if-2
         jit-dispatch-word
         jit-dispatch
         jit-dip-word

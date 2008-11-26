@@ -64,9 +64,12 @@ M: object error-file
 M: object error-line
     drop f ;
 
-: :edit ( -- )
-    error get [ error-file ] [ error-line ] bi
+: (:edit) ( error -- )
+    [ error-file ] [ error-line ] bi
     2dup and [ edit-location ] [ 2drop ] if ;
+
+: :edit ( -- )
+    error get (:edit) ;
 
 : edit-each ( seq -- )
     [

@@ -53,4 +53,4 @@ M: traceback-gadget pref-dim* drop { 550 600 } ;
     "Dynamic variables" open-status-window ;
 
 : traceback-window ( continuation -- )
-    <model> <traceback-gadget> "Traceback" open-window ;
+    <model> <traceback-gadget> "Traceback" open-status-window ;

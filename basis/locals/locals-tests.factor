@@ -418,6 +418,19 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 [ "USE: locals [let | a" eval ] [ error>> unexpected-eof? ] must-fail-with
 [ "USE: locals [|" eval ] [ error>> unexpected-eof? ] must-fail-with
 
+[ 25 ] [ 5 [| a | { [ a sq ] } cond ] call ] unit-test
+[ 25 ] [ 5 [| | { [| a | a sq ] } ] call first call ] unit-test
+
+:: FAILdog-1 ( -- b ) { [| c | c ] } ;
+
+\ FAILdog-1 must-infer
+
+:: FAILdog-2 ( a -- b ) a { [| c | c ] } cond ;
+
+\ FAILdog-2 must-infer
+
+[ 3 ] [ 3 [| a | \ a ] call ] unit-test
+
 ! :: wlet-&&-test ( a -- ? )
 !     [wlet | is-integer? [ a integer? ]
 !             is-even? [ a even? ]

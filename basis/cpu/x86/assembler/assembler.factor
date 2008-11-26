@@ -308,18 +308,21 @@ M: operand MOV HEX: 88 2-operand ;
 ! Control flow
 GENERIC: JMP ( op -- )
 : (JMP) ( -- rel-class ) HEX: e9 , 0 4, rc-relative ;
+M: f JMP (JMP) 2drop ;
 M: callable JMP (JMP) rel-word ;
 M: label JMP (JMP) label-fixup ;
 M: operand JMP { BIN: 100 t HEX: ff } 1-operand ;
 
 GENERIC: CALL ( op -- )
 : (CALL) ( -- rel-class ) HEX: e8 , 0 4, rc-relative ;
+M: f CALL (CALL) 2drop ;
 M: callable CALL (CALL) rel-word ;
 M: label CALL (CALL) label-fixup ;
 M: operand CALL { BIN: 010 t HEX: ff } 1-operand ;
 
 GENERIC# JUMPcc 1 ( addr opcode -- )
 : (JUMPcc) ( n -- rel-class ) extended-opcode, 0 4, rc-relative ;
+M: f JUMPcc nip (JUMPcc) drop ;
 M: callable JUMPcc (JUMPcc) rel-word ;
 M: label JUMPcc (JUMPcc) label-fixup ;
 

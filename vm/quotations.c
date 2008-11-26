@@ -9,6 +9,10 @@ The non-optimizing compiler compiles a quotation at a time by concatenating
 machine code chunks; prolog, epilog, call word, jump to word, etc. These machine
 code chunks are generated from Factor code in core/cpu/.../bootstrap.factor.
 
+Calls to words and constant quotations (referenced by conditionals and dips)
+are direct jumps to machine code blocks. Literals are also referenced directly
+without going through the literal table.
+
 It actually does do a little bit of very simple optimization:
 
 1) Tail call optimization.
@@ -21,12 +25,15 @@ generated.
 'if' and 'dispatch' conditionals are generated inline, instead of as a call to
 the 'if' word.
 
-4) When preceded by an array, calls to the 'declare' word are optimized out
+4) When preceded by a quotation, calls to 'dip', '2dip' and '3dip' are
+open-coded as retain stack manipulation surrounding a subroutine call.
+
+5) When preceded by an array, calls to the 'declare' word are optimized out
 entirely. This word is only used by the optimizing compiler, and with the
 non-optimizing compiler it would otherwise just decrease performance to have to
 push the array and immediately drop it after.
 
-5) Sub-primitives are primitive words which are implemented in assembly and not
+6) Sub-primitives are primitive words which are implemented in assembly and not
 in the VM. They are open-coded and no subroutine call is generated. This
 includes stack shufflers, some fixnum arithmetic words, and words such as tag,
 slot and eq?. A primitive call is relatively expensive (two subroutine calls)
@@ -232,7 +239,7 @@ void jit_compile(CELL quot, bool relocate)
 		case WRAPPER_TYPE:
 			wrapper = untag_object(obj);
 			GROWABLE_ARRAY_ADD(literals,wrapper->object);
-			EMIT(userenv[JIT_PUSH_LITERAL],literals_count - 1);
+			EMIT(userenv[JIT_PUSH_IMMEDIATE],literals_count - 1);
 			break;
 		case FIXNUM_TYPE:
 			if(jit_primitive_call_p(untag_object(array),i))
@@ -251,9 +258,13 @@ void jit_compile(CELL quot, bool relocate)
 				if(stack_frame)
 					EMIT(userenv[JIT_EPILOG],0);
 
+				jit_compile(array_nth(untag_object(array),i),relocate);
+				jit_compile(array_nth(untag_object(array),i + 1),relocate);
+
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
+				EMIT(userenv[JIT_IF_1],literals_count - 1);
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i + 1));
-				EMIT(userenv[JIT_IF_JUMP],literals_count - 2);
+				EMIT(userenv[JIT_IF_2],literals_count - 1);
 
 				i += 2;
 
@@ -262,6 +273,8 @@ void jit_compile(CELL quot, bool relocate)
 			}
 			else if(jit_fast_dip_p(untag_object(array),i))
 			{
+				jit_compile(obj,relocate);
+
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
 				EMIT(userenv[JIT_DIP],literals_count - 1);
 
@@ -270,6 +283,8 @@ void jit_compile(CELL quot, bool relocate)
 			}
 			else if(jit_fast_2dip_p(untag_object(array),i))
 			{
+				jit_compile(obj,relocate);
+
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
 				EMIT(userenv[JIT_2DIP],literals_count - 1);
 
@@ -278,6 +293,8 @@ void jit_compile(CELL quot, bool relocate)
 			}
 			else if(jit_fast_3dip_p(untag_object(array),i))
 			{
+				jit_compile(obj,relocate);
+
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
 				EMIT(userenv[JIT_3DIP],literals_count - 1);
 
@@ -305,7 +322,7 @@ void jit_compile(CELL quot, bool relocate)
 			}
 		default:
 			GROWABLE_ARRAY_ADD(literals,obj);
-			EMIT(userenv[immediate_p(obj) ? JIT_PUSH_IMMEDIATE : JIT_PUSH_LITERAL],literals_count - 1);
+			EMIT(userenv[JIT_PUSH_IMMEDIATE],literals_count - 1);
 			break;
 		}
 	}
@@ -394,7 +411,7 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				COUNT(userenv[JIT_WORD_CALL],i)
 			break;
 		case WRAPPER_TYPE:
-			COUNT(userenv[JIT_PUSH_LITERAL],i)
+			COUNT(userenv[JIT_PUSH_IMMEDIATE],i)
 			break;
 		case FIXNUM_TYPE:
 			if(jit_primitive_call_p(untag_object(array),i))
@@ -413,7 +430,8 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				if(stack_frame)
 					COUNT(userenv[JIT_EPILOG],i)
 
-				COUNT(userenv[JIT_IF_JUMP],i)
+				COUNT(userenv[JIT_IF_1],i)
+				COUNT(userenv[JIT_IF_2],i)
 				i += 2;
 
 				tail_call = true;
@@ -459,7 +477,7 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				break;
 			}
 		default:
-			COUNT(userenv[immediate_p(obj) ? JIT_PUSH_IMMEDIATE : JIT_PUSH_LITERAL],i)
+			COUNT(userenv[JIT_PUSH_IMMEDIATE],i)
 			break;
 		}
 	}
@@ -475,13 +493,18 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 	return -1;
 }
 
-F_FASTCALL CELL primitive_jit_compile(CELL quot, F_STACK_FRAME *stack)
+F_FASTCALL CELL lazy_jit_compile_impl(CELL quot, F_STACK_FRAME *stack)
 {
 	stack_chain->callstack_top = stack;
 	REGISTER_ROOT(quot);
 	jit_compile(quot,true);
 	UNREGISTER_ROOT(quot);
 	return quot;
+}
+
+void primitive_jit_compile(void)
+{
+	jit_compile(dpop(),true);
 }
 
 /* push a new quotation on the stack */

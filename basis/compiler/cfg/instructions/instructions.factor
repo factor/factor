@@ -198,11 +198,11 @@ TUPLE: ##conditional-branch < insn { src1 vreg } { src2 vreg } cc ;
 INSN: ##compare-branch < ##conditional-branch ;
 INSN: ##compare-imm-branch { src1 vreg } { src2 integer } cc ;
 
-INSN: ##compare < ##binary cc ;
-INSN: ##compare-imm < ##binary-imm cc ;
+INSN: ##compare < ##binary cc temp ;
+INSN: ##compare-imm < ##binary-imm cc temp ;
 
 INSN: ##compare-float-branch < ##conditional-branch ;
-INSN: ##compare-float < ##binary cc ;
+INSN: ##compare-float < ##binary cc temp ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;

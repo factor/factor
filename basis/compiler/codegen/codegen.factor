@@ -491,9 +491,10 @@ M: _label generate-insn
 M: _branch generate-insn
     label>> lookup-label %jump-label ;
 
-: >compare< ( insn -- label cc src1 src2 )
+: >compare< ( insn -- dst temp cc src1 src2 )
     {
         [ dst>> register ]
+        [ temp>> register ]
         [ cc>> ]
         [ src1>> register ]
         [ src2>> ?register ]

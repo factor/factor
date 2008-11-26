@@ -6,9 +6,9 @@ listener debugger threads boxes concurrency.flags math arrays
 generic accessors combinators assocs fry ui.commands ui.gadgets
 ui.gadgets.editors ui.gadgets.labelled ui.gadgets.panes
 ui.gadgets.buttons ui.gadgets.scrollers ui.gadgets.packs
-ui.gadgets.tracks ui.gadgets.borders ui.gestures ui.operations
-ui.tools.browser ui.tools.interactor ui.tools.inspector
-ui.tools.workspace ;
+ui.gadgets.tracks ui.gadgets.borders ui.gadgets.frames
+ui.gadgets.grids ui.gestures ui.operations ui.tools.browser
+ui.tools.interactor ui.tools.inspector ui.tools.workspace ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget < track input output ;
@@ -153,9 +153,9 @@ M: engine-word word-completion-string
     dup <listener-input> >>input ;
 
 : <listener-scroller> ( listener -- scroller )
-    <filled-pile>
-        over output>> add-gadget
-        swap input>> add-gadget
+    <frame>
+        over output>> @top grid-add
+        swap input>> @center grid-add
     <scroller> ;
 
 : <listener-gadget> ( -- gadget )

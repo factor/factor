@@ -321,20 +321,27 @@ IN: tools.deploy.shaker
         ] with-compilation-unit
     ] unless ;
 
-: compress ( pred string -- )
+: compress ( pred post-process string -- )
     "Compressing " prepend show
-    instances
-    dup H{ } clone [ [ ] cache ] curry map
+    [ instances dup H{ } clone [ [ ] cache ] curry map ] dip call
     become ; inline
 
 : compress-byte-arrays ( -- )
-    [ byte-array? ] "byte arrays" compress ;
+    [ byte-array? ] [ ] "byte arrays" compress ;
+
+: remain-compiled ( old new -- old new )
+    #! Quotations which were formerly compiled must remain
+    #! compiled.
+    2dup [
+        2dup [ compiled>> ] [ compiled>> not ] bi* and
+        [ nip jit-compile ] [ 2drop ] if
+    ] 2each ;
 
 : compress-quotations ( -- )
-    [ quotation? ] "quotations" compress ;
+    [ quotation? ] [ remain-compiled ] "quotations" compress ;
 
 : compress-strings ( -- )
-    [ string? ] "strings" compress ;
+    [ string? ] [ ] "strings" compress ;
 
 : finish-deploy ( final-image -- )
     "Finishing up" show

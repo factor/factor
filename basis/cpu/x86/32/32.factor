@@ -88,8 +88,6 @@ M: float-regs store-return-reg
     [ [ align-sub ] [ call ] bi* ]
     [ [ align-add ] [ drop ] bi* ] 2bi ; inline
 
-M: x86.32 rel-literal-x86 rc-absolute-cell rel-literal ;
-
 M: x86.32 %prologue ( n -- )
     dup PUSH
     0 PUSH rc-absolute-cell rel-this

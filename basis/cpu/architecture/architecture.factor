@@ -119,9 +119,9 @@ HOOK: %gc cpu ( -- )
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )
 
-HOOK: %compare cpu ( dst cc src1 src2 -- )
-HOOK: %compare-imm cpu ( dst cc src1 src2 -- )
-HOOK: %compare-float cpu ( dst cc src1 src2 -- )
+HOOK: %compare cpu ( dst temp cc src1 src2 -- )
+HOOK: %compare-imm cpu ( dst temp cc src1 src2 -- )
+HOOK: %compare-float cpu ( dst temp cc src1 src2 -- )
 
 HOOK: %compare-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-imm-branch cpu ( label cc src1 src2 -- )

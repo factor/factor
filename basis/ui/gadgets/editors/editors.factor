@@ -1,12 +1,12 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays documents io kernel math models
-namespaces make opengl opengl.gl sequences strings io.styles
-math.vectors sorting colors combinators assocs math.order fry
-calendar alarms ui.clipboards ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.theme ui.gadgets.wrappers
-ui.render ui.gestures math.geometry.rect ;
+namespaces locals fry make opengl opengl.gl sequences strings
+io.styles math.vectors sorting colors combinators assocs
+math.order fry calendar alarms ui.clipboards ui.commands
+ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.theme
+ui.gadgets.wrappers ui.render ui.gestures math.geometry.rect ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget
@@ -104,14 +104,20 @@ M: editor ungraft*
     editor-font* "" string-height ;
 
 : y>line ( y editor -- line# )
-    [ line-height / >fixnum ] keep model>> validate-line ;
+    line-height / >fixnum ;
 
-: point>loc ( point editor -- loc )
-    [
-        [ first2 ] dip tuck y>line dup ,
-        [ dup editor-font* ] dip
-        rot editor-line x>offset ,
-    ] { } make ;
+:: point>loc ( point editor -- loc )
+    point second editor y>line {
+        { [ dup 0 < ] [ drop { 0 0 } ] }
+        { [ dup editor model>> last-line# > ] [ drop editor model>> doc-end ] }
+        [| n |
+            n
+            point first
+            editor editor-font*
+            n editor editor-line
+            x>offset 2array
+        ]
+    } cond ;
 
 : clicked-loc ( editor -- loc )
     [ hand-rel ] keep point>loc ;
@@ -141,8 +147,8 @@ M: editor ungraft*
     line-height * ;
 
 : caret-loc ( editor -- loc )
-    [ editor-caret* ] keep 2dup loc>x
-    rot first rot line>y 2array ;
+    [ editor-caret* ] keep
+    [ loc>x ] [ [ first ] dip line>y ] 2bi 2array ;
 
 : caret-dim ( editor -- dim )
     line-height 0 swap 2array ;
@@ -175,12 +181,16 @@ M: editor ungraft*
     [ font>> ] dip { 0 0 } draw-string ;
 
 : first-visible-line ( editor -- n )
-    clip get rect-loc second origin get second -
-    swap y>line ;
+    [
+        [ clip get rect-loc second origin get second - ] dip
+        y>line
+    ] keep model>> validate-line ;
 
 : last-visible-line ( editor -- n )
-    clip get rect-extent nip second origin get second -
-    swap y>line 1+ ;
+    [
+        [ clip get rect-extent nip second origin get second - ] dip
+        y>line
+    ] keep model>> validate-line 1+ ;
 
 : with-editor ( editor quot -- )
     [
@@ -193,9 +203,8 @@ M: editor ungraft*
     ] with-scope ; inline
 
 : visible-lines ( editor -- seq )
-    \ first-visible-line get
-    \ last-visible-line get
-    rot control-value <slice> ;
+    [ \ first-visible-line get \ last-visible-line get ] dip
+    control-value <slice> ;
 
 : with-editor-translation ( n quot -- )
     [ line-translation origin get v+ ] dip with-translation ;
@@ -313,9 +322,9 @@ M: editor gadget-text* editor-string % ;
 : editor-cut ( editor clipboard -- )
     dupd gadget-copy remove-selection ;
 
-: delete/backspace ( elt editor quot -- )
+: delete/backspace ( editor quot -- )
     over gadget-selection? [
-        drop nip remove-selection
+        drop remove-selection
     ] [
         [ [ [ editor-caret* ] [ model>> ] bi ] dip call ]
         [ drop model>> ]
@@ -323,19 +332,19 @@ M: editor gadget-text* editor-string % ;
     ] if ; inline
 
 : editor-delete ( editor elt -- )
-    swap [ over [ rot next-elt ] dip swap ] delete/backspace ;
+    '[ dupd _ next-elt ] delete/backspace ;
 
 : editor-backspace ( editor elt -- )
-    swap [ over [ rot prev-elt ] dip ] delete/backspace ;
+    '[ over [ _ prev-elt ] dip ] delete/backspace ;
 
 : editor-select-prev ( editor elt -- )
-    swap [ rot prev-elt ] change-caret ;
+    '[ _ prev-elt ] change-caret ;
 
 : editor-prev ( editor elt -- )
     dupd editor-select-prev mark>caret ;
 
 : editor-select-next ( editor elt -- )
-    swap [ rot next-elt ] change-caret ;
+    '[ _ next-elt ] change-caret ;
 
 : editor-next ( editor elt -- )
     dupd editor-select-next mark>caret ;

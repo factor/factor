@@ -25,12 +25,13 @@ TUPLE: default ;
 : <default-transition> ( from to -- transition )
     t default-transition make-transition ;
 
-TUPLE: transition-table transitions start-state final-states ;
+TUPLE: transition-table transitions start-state final-states flags ;
 
 : <transition-table> ( -- transition-table )
     transition-table new
         H{ } clone >>transitions
-        H{ } clone >>final-states ;
+        H{ } clone >>final-states
+        H{ } clone >>flags ;
 
 : maybe-initialize-key ( key hashtable -- )
     2dup key? [ 2drop ] [ H{ } clone -rot set-at ] if ;
@@ -40,7 +41,7 @@ TUPLE: transition-table transitions start-state final-states ;
     2dup [ to>> ] dip maybe-initialize-key
     [ [ to>> ] [ obj>> ] [ from>> ] tri ] dip
     2dup at* [ 2nip insert-at ]
-    [ drop >r >r H{ } clone [ insert-at ] keep r> r> set-at ] if ;
+    [ drop [ H{ } clone [ insert-at ] keep ] 2dip set-at ] if ;
 
 : add-transition ( transition transition-table -- )
     transitions>> set-transition ;

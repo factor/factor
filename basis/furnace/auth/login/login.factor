@@ -3,7 +3,6 @@
 USING: kernel accessors namespaces sequences math.parser
 calendar validators urls logging html.forms
 http http.server http.server.dispatchers
-furnace
 furnace.auth
 furnace.asides
 furnace.actions
