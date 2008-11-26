@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel namespaces validators html.forms urls
 http.server.dispatchers
-furnace furnace.auth furnace.auth.providers furnace.actions
+furnace.auth furnace.auth.providers furnace.actions
 furnace.redirection ;
 IN: furnace.auth.features.registration
 

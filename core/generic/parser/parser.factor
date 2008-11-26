@@ -16,7 +16,7 @@ ERROR: not-in-a-method-error ;
 SYMBOL: current-method
 
 : with-method-definition ( method quot -- )
-    [ dup current-method ] dip with-variable ; inline
+    over current-method set call current-method off ; inline
 
 : (M:) ( method def -- )
     CREATE-METHOD [ parse-definition ] with-method-definition ;
