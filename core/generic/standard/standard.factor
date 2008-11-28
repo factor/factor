@@ -83,15 +83,12 @@ ERROR: no-next-method class generic ;
 
 : single-next-method-quot ( class generic -- quot )
     [
-        [ drop "predicate" word-prop % ]
-        [
-            2dup next-method
-            [ 2nip 1quotation ]
-            [ [ no-next-method ] 2curry [ ] like ] if* ,
-        ]
-        [ [ inconsistent-next-method ] 2curry , ]
-        2tri
-        \ if ,
+        2dup next-method [
+            pick "predicate" word-prop %
+            1quotation ,
+            [ inconsistent-next-method ] 2curry ,
+            \ if ,
+        ] [ [ no-next-method ] 2curry % ] if*
     ] [ ] make ;
 
 : single-effective-method ( obj word -- method )
