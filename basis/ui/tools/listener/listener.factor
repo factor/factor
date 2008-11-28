@@ -28,7 +28,7 @@ M: listener-gadget focusable-child*
     input>> ;
 
 M: listener-gadget call-tool* ( input listener -- )
-    >r string>> r> input>> set-editor-string ;
+    [ string>> ] dip input>> set-editor-string ;
 
 M: listener-gadget tool-scroller
     output>> find-scroller ;
@@ -95,13 +95,13 @@ M: engine-word word-completion-string
 : use-if-necessary ( word seq -- )
     over vocabulary>> over and [
         2dup [ assoc-stack ] keep = [ 2drop ] [
-            >r vocabulary>> vocab-words r> push
+            [ vocabulary>> vocab-words ] dip push
         ] if
     ] [ 2drop ] if ;
 
 : insert-word ( word -- )
     get-workspace listener>> input>>
-    [ >r word-completion-string r> user-input* drop ]
+    [ [ word-completion-string ] dip user-input* drop ]
     [ interactor-use use-if-necessary ]
     2bi ;
 

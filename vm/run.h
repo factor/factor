@@ -247,5 +247,6 @@ void primitive_set_os_envs(void);
 void primitive_micros(void);
 void primitive_sleep(void);
 void primitive_set_slot(void);
+void primitive_load_locals(void);
 
 bool stage2;

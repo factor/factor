@@ -38,3 +38,7 @@ IN: generalizations.tests
 [ "a" ] [ { "a" } 1 firstn ] unit-test
 
 [ [ 1 2 ] ] [ 1 2 2 [ ] nsequence ] unit-test
+
+[ 4 5 1 2 3 ] [ 1 2 3 4 5 2 3 mnswap ] unit-test
+
+[ 1 2 3 4 5 6 ] [ 1 2 3 4 5 6 2 4 mnswap 4 2 mnswap ] unit-test

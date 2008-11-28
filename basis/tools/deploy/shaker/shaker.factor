@@ -343,6 +343,9 @@ IN: tools.deploy.shaker
 : compress-strings ( -- )
     [ string? ] [ ] "strings" compress ;
 
+: compress-wrappers ( -- )
+    [ wrapper? ] [ ] "wrappers" compress ;
+
 : finish-deploy ( final-image -- )
     "Finishing up" show
     >r { } set-datastack r>
@@ -391,7 +394,8 @@ SYMBOL: deploy-vocab
     r> strip-words
     compress-byte-arrays
     compress-quotations
-    compress-strings ;
+    compress-strings
+    compress-wrappers ;
 
 : (deploy) ( final-image vocab config -- )
     #! Does the actual work of a deployment in the slave

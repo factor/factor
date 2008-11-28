@@ -16,4 +16,4 @@ IN: ui.gadgets.status-bar
     open-world-window ;
 
 : show-summary ( object gadget -- )
-    >r [ summary ] [ "" ] if* r> show-status ;
+    [ [ summary ] [ "" ] if* ] dip show-status ;
