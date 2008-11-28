@@ -186,6 +186,9 @@ M: object infer-call*
 : infer-local-writer ( word -- )
     (( value -- )) apply-word/effect ;
 
+: infer-local-word ( word -- )
+    "local-word-def" word-prop infer-quot-here ;
+
 {
     >r r> declare call (call) slip 2slip 3slip curry compose
     execute (execute) if dispatch <tuple-boa> (throw)
@@ -209,6 +212,7 @@ M: object infer-call*
         { [ dup local? ] [ infer-local-reader ] }
         { [ dup local-reader? ] [ infer-local-reader ] }
         { [ dup local-writer? ] [ infer-local-writer ] }
+        { [ dup local-word? ] [ infer-local-word ] }
         { [ dup recursive-word? ] [ call-recursive-word ] }
         [ dup infer-word apply-word/effect ]
     } cond ;
