@@ -141,4 +141,5 @@ void *primitives[] = {
 	primitive_unimplemented,
 	primitive_gc_reset,
 	primitive_jit_compile,
+	primitive_load_locals,
 };

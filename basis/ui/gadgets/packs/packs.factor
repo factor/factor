@@ -19,10 +19,10 @@ TUPLE: pack < gadget
     { 0 0 } [ v+ over v+ ] accumulate 2nip ;
 
 : aligned-locs ( gadget sizes -- seq )
-    [ >r dup align>> swap rect-dim r> v- n*v ] with map ;
+    [ [ dup align>> swap rect-dim ] dip v- n*v ] with map ;
 
 : packed-locs ( gadget sizes -- seq )
-    over gap>> over gap-locs >r dupd aligned-locs r> orient ;
+    over gap>> over gap-locs [ dupd aligned-locs ] dip orient ;
 
 : round-dims ( seq -- newseq )
     { 0 0 } swap
@@ -31,8 +31,9 @@ TUPLE: pack < gadget
 
 : pack-layout ( pack sizes -- )
     round-dims over children>>
-    >r dupd packed-dims r> 2dup [ (>>dim) ] 2each
-    >r packed-locs r> [ (>>loc) ] 2each ;
+    [ dupd packed-dims ] dip
+    [ [ (>>dim) ] 2each ]
+    [ [ packed-locs ] dip [ (>>loc) ] 2each ] 2bi ;
 
 : <pack> ( orientation -- pack )
     pack new-gadget
@@ -48,7 +49,7 @@ TUPLE: pack < gadget
     [ dim-sum ] keep length 1 [-] rot n*v v+ ;
 
 : pack-pref-dim ( gadget sizes -- dim )
-    over gap>> over gap-dims >r max-dim r>
+    over gap>> over gap-dims [ max-dim ] dip
     rot orientation>> set-axis ;
 
 M: pack pref-dim*

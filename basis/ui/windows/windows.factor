@@ -288,7 +288,7 @@ SYMBOL: nc-buttons
 : mouse-wheel ( lParam -- array ) >lo-hi [ sgn neg ] map ;
 
 : mouse-absolute>relative ( lparam handle -- array )
-    >r >lo-hi r>
+    [ >lo-hi ] dip
     "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep
     get-RECT-top-left 2array v- ;
 
@@ -297,7 +297,7 @@ SYMBOL: nc-buttons
     [ <button-down> ] [ <button-up> ] if ;
 
 : prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
-    nip >r mouse-event>gesture r> >lo-hi rot window ;
+    [ drop mouse-event>gesture ] dip >lo-hi rot window ;
 
 : set-capture ( hwnd -- )
     mouse-captured get [
@@ -312,10 +312,10 @@ SYMBOL: nc-buttons
     mouse-captured off ;
 
 : handle-wm-buttondown ( hWnd uMsg wParam lParam -- )
-    >r >r
-    over set-capture
-    dup message>button drop nc-buttons get delete
-    r> r> prepare-mouse send-button-down ;
+    [
+        over set-capture
+        dup message>button drop nc-buttons get delete
+    ] 2dip prepare-mouse send-button-down ;
 
 : handle-wm-buttonup ( hWnd uMsg wParam lParam -- )
     mouse-captured get [ release-capture ] when
@@ -337,9 +337,10 @@ SYMBOL: nc-buttons
     TrackMouseEvent drop
     >lo-hi swap window move-hand fire-motion ;
 
-: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
-    >r nip r>
-    pick mouse-absolute>relative >r mouse-wheel r> rot window send-wheel ;
+:: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
+    lParam mouse-wheel
+    hWnd mouse-absolute>relative
+    hWnd window send-wheel ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
@@ -456,10 +457,11 @@ M: windows-ui-backend do-events
 
 : create-window ( rect -- hwnd )
     make-adjusted-RECT
-    >r class-name-ptr get-global f r>
-    >r >r >r ex-style r> r>
+    [ class-name-ptr get-global f ] dip
+    [
+        [ ex-style ] 2dip
         { WS_CLIPSIBLINGS WS_CLIPCHILDREN style } flags
-    r> get-RECT-dimensions
+    ] dip get-RECT-dimensions
     f f f GetModuleHandle f CreateWindowEx dup win32-error=0/f ;
 
 : show-window ( hWnd -- )
@@ -515,7 +517,7 @@ M: windows-ui-backend raise-window* ( world -- )
 M: windows-ui-backend set-title ( string world -- )
     handle>>
     dup title>> [ free ] when*
-    >r utf16n malloc-string r>
+    [ utf16n malloc-string ] dip
     2dup (>>title)
     hWnd>> WM_SETTEXT 0 roll alien-address SendMessage drop ;
 

@@ -4,7 +4,7 @@ USING: accessors arrays ui.gestures ui.gadgets ui.gadgets.buttons
 ui.gadgets.frames ui.gadgets.grids math.order
 ui.gadgets.theme ui.render kernel math namespaces sequences
 vectors models models.range math.vectors math.functions
-quotations colors math.geometry.rect ;
+quotations colors math.geometry.rect fry ;
 IN: ui.gadgets.sliders
 
 TUPLE: elevator < gadget direction ;
@@ -104,13 +104,14 @@ elevator H{
 
 : layout-thumb-loc ( slider -- )
     dup thumb-loc (layout-thumb)
-    >r [ floor ] map r> (>>loc) ;
+    [ [ floor ] map ] dip (>>loc) ;
 
 : layout-thumb-dim ( slider -- )
-    dup dup thumb-dim (layout-thumb) >r
-    >r dup rect-dim r>
-    rot orientation>> set-axis [ ceiling ] map
-    r> (>>dim) ;
+    dup dup thumb-dim (layout-thumb)
+    [
+        [ dup rect-dim ] dip
+        rot orientation>> set-axis [ ceiling ] map
+    ] dip (>>dim) ;
 
 : layout-thumb ( slider -- )
     dup layout-thumb-loc layout-thumb-dim ;
@@ -121,13 +122,13 @@ M: elevator layout*
 : slide-by-line ( amount slider -- ) [ line>> * ] keep slide-by ;
 
 : <slide-button> ( vector polygon amount -- button )
-    >r gray swap <polygon-gadget> r>
-    [ swap find-slider slide-by-line ] curry <repeat-button>
+    [ gray swap <polygon-gadget> ] dip
+    '[ _ swap find-slider slide-by-line ] <repeat-button>
     swap >>orientation ;
 
 : elevator, ( gadget orientation -- gadget )
     tuck <elevator> >>elevator
-    swap <thumb>    >>thumb
+    swap <thumb> >>thumb
     dup elevator>> over thumb>> add-gadget
     @center grid-add ;
 

@@ -8,13 +8,13 @@ math.geometry.rect ;
 IN: ui.gadgets.menus
 
 : menu-loc ( world menu -- loc )
-    >r rect-dim r> pref-dim [v-] hand-loc get-global vmin ;
+    [ rect-dim ] [ pref-dim ] bi* [v-] hand-loc get-global vmin ;
 
 TUPLE: menu-glass < gadget ;
 
 : <menu-glass> ( menu world -- glass )
     menu-glass new-gadget
-    >r over menu-loc >>loc r>
+    [ over menu-loc >>loc ] dip
     swap add-gadget ;
 
 M: menu-glass layout* gadget-child prefer ;

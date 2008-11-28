@@ -382,9 +382,7 @@ big-endian off
 [
     arg0 ds-reg [] MOV                         ! load local number
     fixnum>slot@                               ! turn local number into offset
-    arg1 bootstrap-cell MOV                    ! load base
-    arg1 arg0 SUB                              ! turn it into a stack offset
-    arg0 rs-reg arg1 [+] MOV                   ! load local value
+    arg0 rs-reg arg0 [+] MOV                   ! load local value
     ds-reg [] arg0 MOV                         ! push to stack
 ] f f f \ get-local define-sub-primitive
 

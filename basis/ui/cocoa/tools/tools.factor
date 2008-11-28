@@ -25,7 +25,7 @@ CLASS: {
 }
 
 { "application:openFiles:" "void" { "id" "SEL" "id" "id" }
-    [ >r 3drop r> finder-run-files ]
+    [ [ 3drop ] dip finder-run-files ]
 }
 
 { "newFactorWorkspace:" "id" { "id" "SEL" "id" }

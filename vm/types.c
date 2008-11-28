@@ -139,18 +139,6 @@ CELL allot_array_1(CELL obj)
 	return tag_object(a);
 }
 
-CELL allot_array_2(CELL v1, CELL v2)
-{
-	REGISTER_ROOT(v1);
-	REGISTER_ROOT(v2);
-	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,2);
-	UNREGISTER_ROOT(v2);
-	UNREGISTER_ROOT(v1);
-	set_array_nth(a,0,v1);
-	set_array_nth(a,1,v2);
-	return tag_object(a);
-}
-
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 {
 	REGISTER_ROOT(v1);
@@ -331,15 +319,9 @@ void primitive_tuple_boa(void)
 {
 	F_TUPLE_LAYOUT *layout = untag_object(dpop());
 	F_FIXNUM size = untag_fixnum_fast(layout->size);
-
-	REGISTER_UNTAGGED(layout);
 	F_TUPLE *tuple = allot_tuple(layout);
-	UNREGISTER_UNTAGGED(layout);
-
-	F_FIXNUM i;
-	for(i = size - 1; i >= 0; i--)
-		put(AREF(tuple,i),dpop());
-
+	memcpy(tuple + 1,(CELL *)(ds - CELLS * (size - 1)),CELLS * size);
+	ds -= CELLS * size;
 	dpush(tag_tuple(tuple));
 }
 
