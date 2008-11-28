@@ -108,22 +108,42 @@ M: x86 %not     drop NOT ;
         ]
     } cond ;
 
-:: overflow-template ( src1 src2 temp insn func -- )
-    <label> "end" set
-    temp src1 MOV
-    temp src2 insn call
-    ds-reg [] temp MOV
-    "end" get JNO
+HOOK: %alien-invoke-tail cpu ( func dll -- )
+
+:: overflow-template ( src1 src2 insn inverse func -- )
+    <label> "no-overflow" set
+    src1 src2 insn call
+    ds-reg [] src1 MOV
+    "no-overflow" get JNO
+    src1 src2 inverse call
     src1 src2 move>args
     %prepare-alien-invoke
     func f %alien-invoke
-    "end" resolve-label ;
+    "no-overflow" resolve-label ; inline
 
-M: x86 %fixnum-add ( src1 src2 temp -- )
-    [ ADD ] "overflow_fixnum_add" overflow-template ;
+:: overflow-template-tail ( src1 src2 insn inverse func -- )
+    <label> "no-overflow" set
+    src1 src2 insn call
+    "no-overflow" get JNO
+    src1 src2 inverse call
+    src1 src2 move>args
+    %prepare-alien-invoke
+    func f %alien-invoke-tail
+    "no-overflow" resolve-label
+    ds-reg [] src1 MOV
+    0 RET ; inline
 
-M: x86 %fixnum-sub ( src1 src2 temp -- )
-    [ SUB ] "overflow_fixnum_subtract" overflow-template ;
+M: x86 %fixnum-add ( src1 src2 -- )
+    [ ADD ] [ SUB ] "overflow_fixnum_add" overflow-template ;
+
+M: x86 %fixnum-add-tail ( src1 src2 -- )
+    [ ADD ] [ SUB ] "overflow_fixnum_add" overflow-template-tail ;
+
+M: x86 %fixnum-sub ( src1 src2 -- )
+    [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template ;
+
+M: x86 %fixnum-sub-tail ( src1 src2 -- )
+    [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template-tail ;
 
 : bignum@ ( reg n -- op )
     cells bignum tag-number - [+] ; inline

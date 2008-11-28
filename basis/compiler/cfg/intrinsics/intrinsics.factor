@@ -8,7 +8,8 @@ compiler.cfg.intrinsics.alien
 compiler.cfg.intrinsics.allot
 compiler.cfg.intrinsics.fixnum
 compiler.cfg.intrinsics.float
-compiler.cfg.intrinsics.slots ;
+compiler.cfg.intrinsics.slots
+compiler.cfg.iterator ;
 QUALIFIED: kernel
 QUALIFIED: arrays
 QUALIFIED: byte-arrays
@@ -87,63 +88,63 @@ IN: compiler.cfg.intrinsics
         alien.accessors:set-alien-double
     } [ t "intrinsic" set-word-prop ] each ;
 
-: emit-intrinsic ( node word -- )
+: emit-intrinsic ( node word -- node/f )
     {
-        { \ kernel.private:tag [ drop emit-tag ] }
-        { \ math.private:fixnum+ [ drop [ ##fixnum-add ] emit-fixnum-overflow-op ] }
-        { \ math.private:fixnum- [ drop [ ##fixnum-sub ] emit-fixnum-overflow-op ] }
-        { \ math.private:fixnum* [ drop [ ##fixnum-mul ] emit-fixnum-overflow-op ] }
-        { \ math.private:fixnum+fast [ [ ^^add ] [ ^^add-imm ] emit-fixnum-op ] }
-        { \ math.private:fixnum-fast [ [ ^^sub ] [ ^^sub-imm ] emit-fixnum-op ] }
-        { \ math.private:fixnum-bitand [ [ ^^and ] [ ^^and-imm ] emit-fixnum-op ] }
-        { \ math.private:fixnum-bitor [ [ ^^or ] [ ^^or-imm ] emit-fixnum-op ] }
-        { \ math.private:fixnum-bitxor [ [ ^^xor ] [ ^^xor-imm ] emit-fixnum-op ] }
-        { \ math.private:fixnum-shift-fast [ emit-fixnum-shift-fast ] }
-        { \ math.private:fixnum-bitnot [ drop emit-fixnum-bitnot ] }
-        { \ math.private:fixnum*fast [ emit-fixnum*fast ] }
-        { \ math.private:fixnum< [ cc< emit-fixnum-comparison ] }
-        { \ math.private:fixnum<= [ cc<= emit-fixnum-comparison ] }
-        { \ math.private:fixnum>= [ cc>= emit-fixnum-comparison ] }
-        { \ math.private:fixnum> [ cc> emit-fixnum-comparison ] }
-        { \ kernel:eq? [ cc= emit-fixnum-comparison ] }
-        { \ math.private:bignum>fixnum [ drop emit-bignum>fixnum ] }
-        { \ math.private:fixnum>bignum [ drop emit-fixnum>bignum ] }
-        { \ math.private:float+ [ drop [ ^^add-float ] emit-float-op ] }
-        { \ math.private:float- [ drop [ ^^sub-float ] emit-float-op ] }
-        { \ math.private:float* [ drop [ ^^mul-float ] emit-float-op ] }
-        { \ math.private:float/f [ drop [ ^^div-float ] emit-float-op ] }
-        { \ math.private:float< [ drop cc< emit-float-comparison ] }
-        { \ math.private:float<= [ drop cc<= emit-float-comparison ] }
-        { \ math.private:float>= [ drop cc>= emit-float-comparison ] }
-        { \ math.private:float> [ drop cc> emit-float-comparison ] }
-        { \ math.private:float= [ drop cc= emit-float-comparison ] }
-        { \ math.private:float>fixnum [ drop emit-float>fixnum ] }
-        { \ math.private:fixnum>float [ drop emit-fixnum>float ] }
-        { \ slots.private:slot [ emit-slot ] }
-        { \ slots.private:set-slot [ emit-set-slot ] }
-        { \ strings.private:string-nth [ drop emit-string-nth ] }
-        { \ classes.tuple.private:<tuple-boa> [ emit-<tuple-boa> ] }
-        { \ arrays:<array> [ emit-<array> ] }
-        { \ byte-arrays:<byte-array> [ emit-<byte-array> ] }
-        { \ math.private:<complex> [ emit-simple-allot ] }
-        { \ math.private:<ratio> [ emit-simple-allot ] }
-        { \ kernel:<wrapper> [ emit-simple-allot ] }
-        { \ alien.accessors:alien-unsigned-1 [ 1 emit-alien-unsigned-getter ] }
-        { \ alien.accessors:set-alien-unsigned-1 [ 1 emit-alien-integer-setter ] }
-        { \ alien.accessors:alien-signed-1 [ 1 emit-alien-signed-getter ] }
-        { \ alien.accessors:set-alien-signed-1 [ 1 emit-alien-integer-setter ] }
-        { \ alien.accessors:alien-unsigned-2 [ 2 emit-alien-unsigned-getter ] }
-        { \ alien.accessors:set-alien-unsigned-2 [ 2 emit-alien-integer-setter ] }
-        { \ alien.accessors:alien-signed-2 [ 2 emit-alien-signed-getter ] }
-        { \ alien.accessors:set-alien-signed-2 [ 2 emit-alien-integer-setter ] }
-        { \ alien.accessors:alien-unsigned-4 [ 4 emit-alien-unsigned-getter ] }
-        { \ alien.accessors:set-alien-unsigned-4 [ 4 emit-alien-integer-setter ] }
-        { \ alien.accessors:alien-signed-4 [ 4 emit-alien-signed-getter ] }
-        { \ alien.accessors:set-alien-signed-4 [ 4 emit-alien-integer-setter ] }
-        { \ alien.accessors:alien-cell [ emit-alien-cell-getter ] }
-        { \ alien.accessors:set-alien-cell [ emit-alien-cell-setter ] }
-        { \ alien.accessors:alien-float [ single-float-regs emit-alien-float-getter ] }
-        { \ alien.accessors:set-alien-float [ single-float-regs emit-alien-float-setter ] }
-        { \ alien.accessors:alien-double [ double-float-regs emit-alien-float-getter ] }
-        { \ alien.accessors:set-alien-double [ double-float-regs emit-alien-float-setter ] }
+        { \ kernel.private:tag [ drop emit-tag iterate-next ] }
+        { \ math.private:fixnum+ [ drop [ ##fixnum-add ] [ ##fixnum-add-tail ] emit-fixnum-overflow-op ] }
+        { \ math.private:fixnum- [ drop [ ##fixnum-sub ] [ ##fixnum-sub-tail ] emit-fixnum-overflow-op ] }
+        { \ math.private:fixnum* [ drop [ ##fixnum-mul ] [ ##fixnum-mul-tail ] emit-fixnum-overflow-op ] }
+        { \ math.private:fixnum+fast [ [ ^^add ] [ ^^add-imm ] emit-fixnum-op iterate-next ] }
+        { \ math.private:fixnum-fast [ [ ^^sub ] [ ^^sub-imm ] emit-fixnum-op iterate-next ] }
+        { \ math.private:fixnum-bitand [ [ ^^and ] [ ^^and-imm ] emit-fixnum-op iterate-next ] }
+        { \ math.private:fixnum-bitor [ [ ^^or ] [ ^^or-imm ] emit-fixnum-op iterate-next ] }
+        { \ math.private:fixnum-bitxor [ [ ^^xor ] [ ^^xor-imm ] emit-fixnum-op iterate-next ] }
+        { \ math.private:fixnum-shift-fast [ emit-fixnum-shift-fast iterate-next ] }
+        { \ math.private:fixnum-bitnot [ drop emit-fixnum-bitnot iterate-next ] }
+        { \ math.private:fixnum*fast [ emit-fixnum*fast iterate-next ] }
+        { \ math.private:fixnum< [ cc< emit-fixnum-comparison iterate-next ] }
+        { \ math.private:fixnum<= [ cc<= emit-fixnum-comparison iterate-next ] }
+        { \ math.private:fixnum>= [ cc>= emit-fixnum-comparison iterate-next ] }
+        { \ math.private:fixnum> [ cc> emit-fixnum-comparison iterate-next ] }
+        { \ kernel:eq? [ cc= emit-fixnum-comparison iterate-next ] }
+        { \ math.private:bignum>fixnum [ drop emit-bignum>fixnum iterate-next ] }
+        { \ math.private:fixnum>bignum [ drop emit-fixnum>bignum iterate-next ] }
+        { \ math.private:float+ [ drop [ ^^add-float ] emit-float-op iterate-next ] }
+        { \ math.private:float- [ drop [ ^^sub-float ] emit-float-op iterate-next ] }
+        { \ math.private:float* [ drop [ ^^mul-float ] emit-float-op iterate-next ] }
+        { \ math.private:float/f [ drop [ ^^div-float ] emit-float-op iterate-next ] }
+        { \ math.private:float< [ drop cc< emit-float-comparison iterate-next ] }
+        { \ math.private:float<= [ drop cc<= emit-float-comparison iterate-next ] }
+        { \ math.private:float>= [ drop cc>= emit-float-comparison iterate-next ] }
+        { \ math.private:float> [ drop cc> emit-float-comparison iterate-next ] }
+        { \ math.private:float= [ drop cc= emit-float-comparison iterate-next ] }
+        { \ math.private:float>fixnum [ drop emit-float>fixnum iterate-next ] }
+        { \ math.private:fixnum>float [ drop emit-fixnum>float iterate-next ] }
+        { \ slots.private:slot [ emit-slot iterate-next ] }
+        { \ slots.private:set-slot [ emit-set-slot iterate-next ] }
+        { \ strings.private:string-nth [ drop emit-string-nth iterate-next ] }
+        { \ classes.tuple.private:<tuple-boa> [ emit-<tuple-boa> iterate-next ] }
+        { \ arrays:<array> [ emit-<array> iterate-next ] }
+        { \ byte-arrays:<byte-array> [ emit-<byte-array> iterate-next ] }
+        { \ math.private:<complex> [ emit-simple-allot iterate-next ] }
+        { \ math.private:<ratio> [ emit-simple-allot iterate-next ] }
+        { \ kernel:<wrapper> [ emit-simple-allot iterate-next ] }
+        { \ alien.accessors:alien-unsigned-1 [ 1 emit-alien-unsigned-getter iterate-next ] }
+        { \ alien.accessors:set-alien-unsigned-1 [ 1 emit-alien-integer-setter iterate-next ] }
+        { \ alien.accessors:alien-signed-1 [ 1 emit-alien-signed-getter iterate-next ] }
+        { \ alien.accessors:set-alien-signed-1 [ 1 emit-alien-integer-setter iterate-next ] }
+        { \ alien.accessors:alien-unsigned-2 [ 2 emit-alien-unsigned-getter iterate-next ] }
+        { \ alien.accessors:set-alien-unsigned-2 [ 2 emit-alien-integer-setter iterate-next ] }
+        { \ alien.accessors:alien-signed-2 [ 2 emit-alien-signed-getter iterate-next ] }
+        { \ alien.accessors:set-alien-signed-2 [ 2 emit-alien-integer-setter iterate-next ] }
+        { \ alien.accessors:alien-unsigned-4 [ 4 emit-alien-unsigned-getter iterate-next ] }
+        { \ alien.accessors:set-alien-unsigned-4 [ 4 emit-alien-integer-setter iterate-next ] }
+        { \ alien.accessors:alien-signed-4 [ 4 emit-alien-signed-getter iterate-next ] }
+        { \ alien.accessors:set-alien-signed-4 [ 4 emit-alien-integer-setter iterate-next ] }
+        { \ alien.accessors:alien-cell [ emit-alien-cell-getter iterate-next ] }
+        { \ alien.accessors:set-alien-cell [ emit-alien-cell-setter iterate-next ] }
+        { \ alien.accessors:alien-float [ single-float-regs emit-alien-float-getter iterate-next ] }
+        { \ alien.accessors:set-alien-float [ single-float-regs emit-alien-float-setter iterate-next ] }
+        { \ alien.accessors:alien-double [ double-float-regs emit-alien-float-getter iterate-next ] }
+        { \ alien.accessors:set-alien-double [ double-float-regs emit-alien-float-setter iterate-next ] }
     } case ;

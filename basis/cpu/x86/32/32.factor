@@ -48,6 +48,8 @@ M: x86.32 %alien-global 0 [] MOV rc-absolute-cell rel-dlsym ;
 
 M: x86.32 %alien-invoke (CALL) rel-dlsym ;
 
+M: x86.32 %alien-invoke-tail (JMP) rel-dlsym ;
+
 M: x86.32 struct-small-enough? ( size -- ? )
     heap-size { 1 2 4 8 } member?
     os { linux netbsd solaris } member? not and ;
