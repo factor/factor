@@ -73,3 +73,6 @@ MACRO: napply ( n -- )
     2 [a,b]
     [ [ 1- ] [ ] bi '[ _ ntuck _ nslip ] ]
     map concat >quotation [ call ] append ;
+
+MACRO: mnswap ( m n -- )
+    1+ '[ _ -nrot ] <repetition> spread>quot ;
