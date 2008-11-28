@@ -596,23 +596,28 @@ buffer."
 (defconst factor--regex-error-marker "^Type :help for debugging")
 (defconst factor--regex-data-stack "^--- Data stack:")
 
-(defun factor--prune-stack (ans)
-  (do ((res '() (cons (car s) res)) (s ans (cdr s)))
-      ((or (not s)
-           (and (car res) (string-match factor--regex-stack-effect (car res)))
-           (string-match factor--regex-data-stack (car s)))
-       (and (not (string-match factor--regex-error-marker (car res)))
-            (nreverse res)))))
+(defun factor--prune-ans-strings (ans)
+  (nreverse
+   (catch 'done
+     (let ((res))
+       (dolist (a ans res)
+         (cond ((string-match factor--regex-stack-effect a)
+                (throw 'done (cons a res)))
+               ((string-match factor--regex-data-stack a)
+                (throw 'done res))
+               ((string-match factor--regex-error-marker a)
+                (throw 'done nil))
+               (t (push a res))))))))
 
 (defun factor--see-ans-to-string (ans)
-  (let ((s (mapconcat #'identity (factor--prune-stack ans) " ")))
+  (let ((s (mapconcat #'identity (factor--prune-ans-strings ans) " "))
+        (font-lock-verbose nil))
     (and (> (length s) 0)
-         (let ((font-lock-verbose nil))
-           (with-temp-buffer
-             (insert s)
-             (factor-mode)
-             (font-lock-fontify-buffer)
-             (buffer-string))))))
+         (with-temp-buffer
+           (insert s)
+           (factor-mode)
+           (font-lock-fontify-buffer)
+           (buffer-string)))))
 
 (defun factor--see-current-word (&optional word)
   (let ((word (or word (factor--symbol-at-point))))
