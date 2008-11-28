@@ -476,7 +476,7 @@ buffer."
   (setq factor-indent-width (factor--guess-indent-width))
   (setq indent-tabs-mode nil)
   ;; ElDoc
-  (set (make-local-variable 'eldoc-documentation-function) 'factor--see-current-word)
+  (set (make-local-variable 'eldoc-documentation-function) 'factor--eldoc)
 
   (run-hooks 'factor-mode-hook))
 
@@ -503,11 +503,12 @@ buffer."
   (with-current-buffer factor--listener-buffer
     (factor-listener-mode)))
 
-(defun factor--listener-process ()
+(defun factor--listener-process (&optional start)
   (or (and (buffer-live-p factor--listener-buffer)
            (get-buffer-process factor--listener-buffer))
-      (progn (factor--listener-start-process)
-             (factor--listener-process))))
+      (when start
+        (factor--listener-start-process)
+        (factor--listener-process t))))
 
 ;;;###autoload
 (defalias 'switch-to-factor 'run-factor)
@@ -515,7 +516,7 @@ buffer."
 (defun run-factor (&optional arg)
   "Show the factor-listener buffer, starting the process if needed."
   (interactive)
-  (let ((buf (process-buffer (factor--listener-process)))
+  (let ((buf (process-buffer (factor--listener-process t)))
         (pop-up-windows factor-listener-window-allow-split))
     (if factor-listener-use-other-window
         (pop-to-buffer buf)
@@ -538,15 +539,16 @@ buffer."
 ;;; Factor listener interaction:
 
 (defun factor--listener-send-cmd (cmd)
-  (let* ((out (get-buffer-create "*factor messages*"))
-         (beg (with-current-buffer out (goto-char (point-max))))
-         (proc (factor--listener-process)))
-    (comint-redirect-send-command-to-process cmd out proc nil t)
-    (with-current-buffer factor--listener-buffer
-      (while (not comint-redirect-completed) (sleep-for 0 1)))
-    (with-current-buffer out
-      (split-string (buffer-substring-no-properties beg (point-max))
-                    "[\"\f\n\r\v]+" t))))
+  (let ((proc (factor--listener-process)))
+    (when proc
+      (let* ((out (get-buffer-create "*factor messages*"))
+             (beg (with-current-buffer out (goto-char (point-max)))))
+        (comint-redirect-send-command-to-process cmd out proc nil t)
+        (with-current-buffer factor--listener-buffer
+          (while (not comint-redirect-completed) (sleep-for 0 1)))
+        (with-current-buffer out
+          (split-string (buffer-substring-no-properties beg (point-max))
+                        "[\"\f\n\r\v]+" t))))))
 
 ;;;;; Current vocabulary:
 (make-variable-buffer-local
@@ -581,15 +583,13 @@ buffer."
 
 ;;;;; Synchronous interaction:
 
-(defun factor--listener-sync-cmds (cmds &optional vocab)
+(defsubst factor--listener-vocab-cmds (cmds &optional vocab)
   (factor--with-vocab vocab
-    (mapcar #'(lambda (c)
-                (comint-redirect-results-list-from-process
-                 (factor--listener-process) c ".+" 0))
-            cmds)))
+    (mapcar #'factor--listener-send-cmd cmds)))
 
-(defsubst factor--listener-sync-cmd (cmd &optional vocab)
-  (car (factor--listener-sync-cmds (list cmd) vocab)))
+(defsubst factor--listener-vocab-cmd (cmd &optional vocab)
+  (factor--with-vocab vocab
+    (factor--listener-send-cmd cmd)))
 
 ;;;;; Interface: see
 
@@ -618,11 +618,15 @@ buffer."
   (let ((word (or word (factor--symbol-at-point))))
     (when word
       (let ((answer (factor--listener-send-cmd (format "\\ %s see" word))))
-        (factor--see-ans-to-string answer)))))
+        (and answer (factor--see-ans-to-string answer))))))
+
+(defalias 'factor--eldoc 'factor--see-current-word)
 
 (defun factor-see-current-word (&optional word)
   "Echo in the minibuffer information about word at point."
   (interactive)
+  (unless (factor--listener-process)
+    (error "No factor listener running. Try M-x run-factor"))
   (let ((word (or word (factor--symbol-at-point)))
         (msg (factor--see-current-word word)))
     (if msg (message "%s" msg)
@@ -742,6 +746,8 @@ buffer."
 (defvar factor--help-history nil)
 
 (defun factor--listener-show-help (&optional see)
+  (unless (factor--listener-process)
+    (error "No running factor listener. Try M-x run-factor"))
   (let* ((def (factor--symbol-at-point))
          (prompt (format "See%s help on%s: " (if see " short" "")
                          (if def (format " (%s)" def) "")))
