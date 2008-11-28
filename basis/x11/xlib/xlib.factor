@@ -13,7 +13,7 @@
 
 USING: kernel arrays alien alien.c-types alien.strings
 alien.syntax math math.bitwise words sequences namespaces
-continuations io.encodings.ascii ;
+continuations io io.encodings.ascii ;
 IN: x11.xlib
 
 LIBRARY: xlib
@@ -1359,8 +1359,8 @@ SYMBOL: scr
 SYMBOL: root
 
 : init-locale ( -- )
-   LC_ALL "" setlocale [ "setlocale() failed" throw ] unless
-   XSupportsLocale [ "XSupportsLocale() failed" throw ] unless ;
+   LC_ALL "" setlocale [ "setlocale() failed" print flush ] unless
+   XSupportsLocale [ "XSupportsLocale() failed" print flush ] unless ;
 
 : flush-dpy ( -- ) dpy get XFlush drop ;
 
@@ -1381,4 +1381,4 @@ SYMBOL: root
 : close-x ( -- ) dpy get XCloseDisplay drop ;
 
 : with-x ( display-string quot -- )
-    >r initialize-x r> [ close-x ] [ ] cleanup ;
+    [ initialize-x ] dip [ close-x ] [ ] cleanup ;
