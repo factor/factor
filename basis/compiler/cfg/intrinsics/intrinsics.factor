@@ -23,6 +23,7 @@ IN: compiler.cfg.intrinsics
 
 {
     kernel.private:tag
+    math.private:both-fixnums?
     math.private:fixnum+
     math.private:fixnum-
     math.private:fixnum+fast
@@ -91,6 +92,7 @@ IN: compiler.cfg.intrinsics
 : emit-intrinsic ( node word -- node/f )
     {
         { \ kernel.private:tag [ drop emit-tag iterate-next ] }
+        { \ math.private:both-fixnums? [ drop emit-both-fixnums? iterate-next ] }
         { \ math.private:fixnum+ [ drop [ ##fixnum-add ] [ ##fixnum-add-tail ] emit-fixnum-overflow-op ] }
         { \ math.private:fixnum- [ drop [ ##fixnum-sub ] [ ##fixnum-sub-tail ] emit-fixnum-overflow-op ] }
         { \ math.private:fixnum* [ drop [ ##fixnum-mul ] [ ##fixnum-mul-tail ] emit-fixnum-overflow-op ] }

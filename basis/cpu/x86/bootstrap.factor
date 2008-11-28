@@ -380,6 +380,17 @@ big-endian off
 ] f f f \ fixnum/mod-fast define-sub-primitive
 
 [
+    arg0 ds-reg [] MOV
+    arg0 ds-reg bootstrap-cell neg [+] OR
+    ds-reg bootstrap-cell ADD
+    arg0 tag-mask get AND
+    arg0 \ f tag-number MOV
+    arg1 1 tag-fixnum MOV
+    arg0 arg1 CMOVE
+    ds-reg [] arg0 MOV
+] f f f \ both-fixnums? define-sub-primitive
+
+[
     arg0 ds-reg [] MOV                         ! load local number
     fixnum>slot@                               ! turn local number into offset
     arg0 rs-reg arg0 [+] MOV                   ! load local value

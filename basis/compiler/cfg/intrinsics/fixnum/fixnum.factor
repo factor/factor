@@ -7,8 +7,17 @@ compiler.cfg.hats
 compiler.cfg.stacks
 compiler.cfg.iterator
 compiler.cfg.instructions
-compiler.cfg.utilities ;
+compiler.cfg.utilities
+compiler.cfg.registers ;
 IN: compiler.cfg.intrinsics.fixnum
+
+: emit-both-fixnums? ( -- )
+    D 0 ^^peek
+    D 1 ^^peek
+    ^^or
+    tag-mask get ^^and-imm
+    0 cc= ^^compare-imm
+    ds-push ;
 
 : (emit-fixnum-imm-op) ( infos insn -- dst )
     ds-drop
