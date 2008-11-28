@@ -13,7 +13,7 @@ TUPLE: label < gadget text font color ;
 
 : set-label-string ( string label -- )
     CHAR: \n pick memq? [
-        >r string-lines r> (>>text)
+        [ string-lines ] dip (>>text)
     ] [
         (>>text)
     ] if ; inline

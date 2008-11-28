@@ -33,7 +33,7 @@ SYMBOL: selection
 
 : gadget-copy ( gadget clipboard -- )
     over gadget-selection?
-        [ >r [ gadget-selection ] keep r> copy-clipboard ]
+        [ [ [ gadget-selection ] keep ] dip copy-clipboard ]
         [ 2drop ]
     if ;
 

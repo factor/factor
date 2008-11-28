@@ -19,7 +19,7 @@ IN: ui.tools.search.tests
     ] with-grafted-gadget ;
 
 : test-live-search ( gadget quot -- ? )
-    >r update-live-search dup assert-non-empty r> all? ;
+    [ update-live-search dup assert-non-empty ] dip all? ;
 
 [ t ] [
     "swp" all-words f <definition-search>

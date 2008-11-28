@@ -12,7 +12,7 @@ TUPLE: presentation < button object hook ;
 
 : invoke-presentation ( presentation command -- )
     over dup hook>> call
-    >r object>> r> invoke-command ;
+    [ object>> ] dip invoke-command ;
 
 : invoke-primary ( presentation -- )
     dup object>> primary-operation

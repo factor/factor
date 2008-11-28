@@ -1,6 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences models ui.gadgets math.geometry.rect ;
+USING: accessors kernel sequences models ui.gadgets
+math.geometry.rect fry ;
 IN: ui.gadgets.books
 
 TUPLE: book < gadget ;
@@ -25,6 +26,6 @@ M: book model-changed ( model book -- )
 M: book pref-dim* ( book -- dim ) children>> pref-dims max-dim ;
 
 M: book layout* ( book -- )
-    [ children>> ] [ dim>> ] bi [ >>dim drop ] curry each ;
+    [ children>> ] [ dim>> ] bi '[ _ >>dim drop ] each ;
 
 M: book focusable-child* ( book -- child/t ) current-page ;

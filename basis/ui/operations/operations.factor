@@ -38,7 +38,7 @@ SYMBOL: operations
     operations get [ predicate>> call ] with filter ;
 
 : find-operation ( obj quot -- command )
-    >r object-operations r> find-last nip ; inline
+    [ object-operations ] dip find-last nip ; inline
 
 : primary-operation ( obj -- operation )
     [ command>> +primary+ word-prop ] find-operation ;

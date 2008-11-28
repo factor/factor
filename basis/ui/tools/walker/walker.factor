@@ -5,7 +5,7 @@ ui.tools.listener ui.tools.traceback ui.gadgets.buttons
 ui.gadgets.status-bar ui.gadgets.tracks ui.commands ui.gadgets
 models models.filter ui.tools.workspace ui.gestures
 ui.gadgets.labels ui threads namespaces make tools.walker assocs
-combinators ;
+combinators fry ;
 IN: ui.tools.walker
 
 TUPLE: walker-gadget < track
@@ -53,7 +53,7 @@ M: walker-gadget focusable-child*
     ] "" make ;
 
 : <thread-status> ( model thread -- gadget )
-    [ walker-state-string ] curry <filter> <label-control> ;
+    '[ _ walker-state-string ] <filter> <label-control> ;
 
 : <walker-gadget> ( status continuation thread -- gadget )
     { 0 1 } walker-gadget new-track
@@ -89,7 +89,7 @@ walker-gadget "toolbar" f {
     } cond ;
 
 : find-walker-window ( thread -- world/f )
-    [ swap walker-for-thread? ] curry find-window ;
+    '[ _ swap walker-for-thread? ] find-window ;
 
 : walker-window ( status continuation thread -- )
     [ <walker-gadget> ] [ name>> ] bi open-status-window ;
