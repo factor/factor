@@ -86,8 +86,8 @@ void primitive_fixnum_divmod(void)
  * If we're shifting right by n bits, we won't overflow as long as none of the
  * high WORD_SIZE-TAG_BITS-n bits are set.
  */
-#define SIGN_MASK(x) ((x) >> (CELLS * 8 - 1))
-#define BRANCHLESS_MAX(x,y) (x - ((x - y) & SIGN_MASK(x - y)))
+#define SIGN_MASK(x) ((x) >> (WORD_SIZE - 1))
+#define BRANCHLESS_MAX(x,y) ((x) - (((x) - (y)) & SIGN_MASK((x) - (y))))
 #define BRANCHLESS_ABS(x) ((x ^ SIGN_MASK(x)) - SIGN_MASK(x))
 
 void primitive_fixnum_shift(void)
