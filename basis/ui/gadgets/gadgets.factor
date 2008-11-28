@@ -93,7 +93,7 @@ M: gadget children-on nip children>> ;
 : dim-sum ( seq -- dim ) { 0 0 } [ v+ ] reduce ;
 
 : orient ( gadget seq1 seq2 -- seq )
-    rot orientation>> '[ [ _ ] 2dip set-axis ] 2map ;
+    rot orientation>> '[ _ set-axis ] 2map ;
 
 : each-child ( gadget quot -- )
     [ children>> ] dip each ; inline
