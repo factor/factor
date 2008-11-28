@@ -13,14 +13,14 @@ IN: generalizations
 
 >>
 
-MACRO: nsequence ( n seq -- quot )
+MACRO: nsequence ( n seq -- )
     [
         [ drop <reversed> ] [ '[ _ _ new-sequence ] ] 2bi
         [ '[ @ [ _ swap set-nth-unsafe ] keep ] ] reduce
     ] keep
     '[ @ _ like ] ;
 
-MACRO: narray ( n -- quot )
+MACRO: narray ( n -- )
     '[ _ { } nsequence ] ;
 
 MACRO: firstn ( n -- )
@@ -30,7 +30,7 @@ MACRO: firstn ( n -- )
         bi prefix '[ _ cleave ]
     ] if ;
 
-MACRO: npick ( n -- quot )
+MACRO: npick ( n -- )
     1- [ dup ] [ '[ _ dip swap ] ] repeat ;
 
 MACRO: ndup ( n -- )
@@ -51,7 +51,7 @@ MACRO: nnip ( n -- )
 MACRO: ntuck ( n -- )
     2 + '[ dup _ -nrot ] ;
 
-MACRO: nrev ( n -- quot )
+MACRO: nrev ( n -- )
     1 [a,b] [ ] [ '[ @ _ -nrot ] ] reduce ;
 
 MACRO: ndip ( quot n -- )
