@@ -331,15 +331,9 @@ void primitive_tuple_boa(void)
 {
 	F_TUPLE_LAYOUT *layout = untag_object(dpop());
 	F_FIXNUM size = untag_fixnum_fast(layout->size);
-
-	REGISTER_UNTAGGED(layout);
 	F_TUPLE *tuple = allot_tuple(layout);
-	UNREGISTER_UNTAGGED(layout);
-
-	F_FIXNUM i;
-	for(i = size - 1; i >= 0; i--)
-		put(AREF(tuple,i),dpop());
-
+	memcpy(tuple + 1,(CELL *)(ds - CELLS * (size - 1)),CELLS * size);
+	ds -= CELLS * size;
 	dpush(tag_tuple(tuple));
 }
 

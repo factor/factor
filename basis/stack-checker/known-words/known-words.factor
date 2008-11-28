@@ -134,11 +134,11 @@ M: object infer-call*
 
 : infer-load-locals ( -- )
     pop-literal nip
-    consume-d dup reverse copy-values dup output-r
-    [ [ f f ] dip ] [ reverse swap zip ] 2bi #shuffle, ;
+    consume-d dup copy-values dup output-r
+    [ [ f f ] dip ] [ swap zip ] 2bi #shuffle, ;
 
 : infer-get-local ( -- )
-    [let* | n [ pop-literal nip ]
+    [let* | n [ pop-literal nip 1 swap - ]
             in-r [ n consume-r ]
             out-d [ in-r first copy-value 1array ]
             out-r [ in-r copy-values ] |

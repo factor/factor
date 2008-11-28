@@ -103,7 +103,7 @@ C: <quote> quote
     [ dup quote? [ local>> ] when eq? ] with find drop ;
 
 : read-local-quot ( obj args -- quot )
-    local-index 1+ [ get-local ] curry ;
+    local-index neg [ get-local ] curry ;
 
 GENERIC# localize 1 ( obj args -- quot )
 
@@ -139,19 +139,17 @@ UNION: special local quote local-word local-reader local-writer ;
 : point-free-end ( quot args -- newquot )
     over peek special?
     [ dup drop-locals-quot [ [ peek ] dip localize ] dip append ]
-    [ dup drop-locals-quot nip swap peek suffix ]
+    [ drop-locals-quot swap peek suffix ]
     if ;
 
 : (point-free) ( quot args -- newquot )
     [ nip load-locals-quot ]
-    [ point-free-body ]
-    [ point-free-end ]
-    2tri 3append >quotation ;
+    [ reverse point-free-body ]
+    [ reverse point-free-end ]
+    2tri [ ] 3append-as ;
 
 : point-free ( quot args -- newquot )
-    over empty?
-    [ nip length \ drop <repetition> >quotation ]
-    [ (point-free) ] if ;
+    over empty? [ nip length '[ _ ndrop ] ] [ (point-free) ] if ;
 
 UNION: lexical local local-reader local-writer local-word ;
 
