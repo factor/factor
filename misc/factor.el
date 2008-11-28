@@ -89,6 +89,11 @@ buffer."
   :type 'boolean
   :group 'factor)
 
+(defcustom factor-help-use-minibuffer t
+  "When enabled, use the minibuffer for short help messages."
+  :type 'boolean
+  :group 'factor)
+
 (defcustom factor-display-compilation-output t
   "Display the REPL buffer before compiling files."
   :type 'boolean
@@ -195,11 +200,14 @@ buffer."
 (defconst factor--regex-symbol-definition
   (factor--regex-second-word '("SYMBOL:")))
 
+(defconst factor--regex-stack-effect " ( .* )")
+
 (defconst factor--regex-using-line "^USING: +\\([^;]*\\);")
+
 (defconst factor--regex-use-line "^USE: +\\(.*\\)$")
 
 (defconst factor--font-lock-keywords
-  `(("( .* )" . 'factor-font-lock-stack-effect)
+  `((,factor--regex-stack-effect . 'factor-font-lock-stack-effect)
     ("\\(P\\|SBUF\\)\"" 1 'factor-font-lock-parsing-word)
     ,@(mapcar #'(lambda (w) (cons (concat "\\(^\\| \\)\\(" w "\\)\\($\\| \\)")
                              '(2 'factor-font-lock-parsing-word)))
@@ -218,13 +226,15 @@ buffer."
 
 ;;; Factor mode syntax:
 
+(defconst factor--regexp-word-starters
+  (regexp-opt '("TUPLE" "MACRO" "MACRO:" "M" ":" "")))
+
 (defconst factor--regexp-word-start
-  (let ((sws '("" ":" "TUPLE" "MACRO" "MACRO:" "M")))
-    (format "^\\(%s\\)\\(:\\) " (regexp-opt sws))))
+  (format "^\\(%s:\\) " factor--regexp-word-starters))
 
 (defconst factor--font-lock-syntactic-keywords
-  `(("^\\(:\\)\\(:\\)" (1 ".") (2 "(;"))
-    (,factor--regexp-word-start (2 "(;"))
+  `((,(format "^\\(%s\\)\\(:\\)" factor--regexp-word-starters)
+     (1 "w") (2 "(;"))
     ("\\(;\\)" (1 "):"))
     ("\\(#!\\)" (1 "<"))
     (" \\(!\\)" (1 "<"))
@@ -279,6 +289,25 @@ buffer."
     ;; Strings
     (modify-syntax-entry ?\" "\"" factor-mode-syntax-table)
     (modify-syntax-entry ?\\ "/" factor-mode-syntax-table)))
+
+;;; symbol-at-point
+
+(defun factor--beginning-of-symbol ()
+  "Move point to the beginning of the current symbol."
+  (while (eq (char-before) ?:) (backward-char))
+  (skip-syntax-backward "w_"))
+
+(defun factor--end-of-symbol ()
+  "Move point to the end of the current symbol."
+  (skip-syntax-forward "w_")
+  (while (looking-at ":") (forward-char)))
+
+(put 'factor-symbol 'end-op 'factor--end-of-symbol)
+(put 'factor-symbol 'beginning-op 'factor--beginning-of-symbol)
+
+(defsubst factor--symbol-at-point ()
+  (let ((s (substring-no-properties (thing-at-point 'factor-symbol))))
+    (and (> (length s) 0) s)))
 
 
 ;;; Factor mode indentation:
@@ -415,82 +444,9 @@ buffer."
           (goto-char (- (point-max) pos))))))
 
 
-;;; Factor mode commands:
-
-(defun factor-telnet-to-port (port)
-  (interactive "nPort: ")
-  (switch-to-buffer
-   (make-comint-in-buffer "factor-telnet" nil (cons "localhost" port))))
-
-(defun factor-telnet ()
-  (interactive)
-  (factor-telnet-to-port 9000))
-
-(defun factor-telnet-factory ()
-  (interactive)
-  (factor-telnet-to-port 9010))
-
-(defun factor-run-file ()
-  (interactive)
-  (when (and (buffer-modified-p)
-			 (y-or-n-p (format "Save file %s? " (buffer-file-name))))
-	(save-buffer))
-  (when factor-display-compilation-output
-	(factor-display-output-buffer))
-  (comint-send-string "*factor*" (format "\"%s\"" (buffer-file-name)))
-  (comint-send-string "*factor*" " run-file\n"))
-
-(defun factor-display-output-buffer ()
-  (with-current-buffer "*factor*"
-	(goto-char (point-max))
-	(unless (get-buffer-window (current-buffer) t)
-	  (display-buffer (current-buffer) t))))
-
-(defun factor-send-string (str)
-  (let ((n (length (split-string str "\n"))))
-    (save-excursion
-      (set-buffer "*factor*")
-      (goto-char (point-max))
-      (if (> n 1) (newline))
-      (insert str)
-      (comint-send-input))))
-
-(defun factor-send-region (start end)
-  (interactive "r")
-  (let ((str (buffer-substring start end))
-        (n   (count-lines      start end)))
-    (save-excursion
-      (set-buffer "*factor*")
-      (goto-char (point-max))
-      (if (> n 1) (newline))
-      (insert str)
-      (comint-send-input))))
-
-(defun factor-send-definition ()
-  (interactive)
-  (factor-send-region (search-backward ":")
-                      (search-forward  ";")))
-
-(defun factor-edit ()
-  (interactive)
-  (comint-send-string "*factor*" "\\ ")
-  (comint-send-string "*factor*" (thing-at-point 'sexp))
-  (comint-send-string "*factor*" " edit\n"))
-
-(defun factor-clear ()
-  (interactive)
-  (factor-send-string "clear"))
-
-(defun factor-comment-line ()
-  (interactive)
-  (beginning-of-line)
-  (insert "! "))
-
+;; Factor mode:
 (defvar factor-mode-map (make-sparse-keymap)
   "Key map used by Factor mode.")
-
-
-;; Factor mode:
 
 ;;;###autoload
 (defun factor-mode ()
@@ -519,6 +475,8 @@ buffer."
   (set (make-local-variable 'indent-line-function) 'factor--indent-line)
   (setq factor-indent-width (factor--guess-indent-width))
   (setq indent-tabs-mode nil)
+  ;; ElDoc
+  (set (make-local-variable 'eldoc-documentation-function) 'factor--see-current-word)
 
   (run-hooks 'factor-mode-hook))
 
@@ -562,6 +520,171 @@ buffer."
     (if factor-listener-use-other-window
         (pop-to-buffer buf)
       (switch-to-buffer buf))))
+
+(defun factor-telnet-to-port (port)
+  (interactive "nPort: ")
+  (switch-to-buffer
+   (make-comint-in-buffer "factor-telnet" nil (cons "localhost" port))))
+
+(defun factor-telnet ()
+  (interactive)
+  (factor-telnet-to-port 9000))
+
+(defun factor-telnet-factory ()
+  (interactive)
+  (factor-telnet-to-port 9010))
+
+
+;;; Factor listener interaction:
+
+(defun factor--listener-send-cmd (cmd)
+  (let* ((out (get-buffer-create "*factor messages*"))
+         (beg (with-current-buffer out (goto-char (point-max))))
+         (proc (factor--listener-process)))
+    (comint-redirect-send-command-to-process cmd out proc nil t)
+    (with-current-buffer factor--listener-buffer
+      (while (not comint-redirect-completed) (sleep-for 0 1)))
+    (with-current-buffer out
+      (split-string (buffer-substring-no-properties beg (point-max))
+                    "[\"\f\n\r\v]+" t))))
+
+;;;;; Current vocabulary:
+(make-variable-buffer-local
+ (defvar factor--current-vocab nil
+   "Current vocabulary."))
+
+(defconst factor--regexp-current-vocab "^IN: +\\([^ \r\n\f]+\\)")
+
+(defun factor--current-buffer-vocab ()
+  (save-excursion
+    (when (or (re-search-backward factor--regexp-current-vocab nil t)
+              (re-search-forward factor--regexp-current-vocab nil t))
+      (setq factor--current-vocab (match-string-no-properties 1)))))
+
+(defun factor--current-listener-vocab ()
+  (car (factor--listener-send-cmd "USING: parser ; in get .")))
+
+
+(defun factor--set-current-listener-vocab (&optional vocab)
+  (factor--listener-send-cmd
+   (format "IN: %s" (or vocab (factor--current-buffer-vocab))))
+  t)
+
+(defmacro factor--with-vocab (vocab &rest body)
+  (let ((current (make-symbol "current")))
+    `(let ((,current (factor--current-listener-vocab)))
+       (factor--set-current-listener-vocab ,vocab)
+       (prog1 (condition-case nil (progn . ,body) (error nil))
+         (factor--set-current-listener-vocab ,current)))))
+
+(put 'factor--with-vocab 'lisp-indent-function 1)
+
+;;;;; Synchronous interaction:
+
+(defun factor--listener-sync-cmds (cmds &optional vocab)
+  (factor--with-vocab vocab
+    (mapcar #'(lambda (c)
+                (comint-redirect-results-list-from-process
+                 (factor--listener-process) c ".+" 0))
+            cmds)))
+
+(defsubst factor--listener-sync-cmd (cmd &optional vocab)
+  (car (factor--listener-sync-cmds (list cmd) vocab)))
+
+;;;;; Interface: see
+
+(defconst factor--regex-error-marker "^Type :help for debugging")
+(defconst factor--regex-data-stack "^--- Data stack:")
+
+(defun factor--prune-stack (ans)
+  (do ((res '() (cons (car s) res)) (s ans (cdr s)))
+      ((or (not s)
+           (and (car res) (string-match factor--regex-stack-effect (car res)))
+           (string-match factor--regex-data-stack (car s)))
+       (and (not (string-match factor--regex-error-marker (car res)))
+            (nreverse res)))))
+
+(defun factor--see-ans-to-string (ans)
+  (let ((s (mapconcat #'identity (factor--prune-stack ans) " ")))
+    (and (> (length s) 0)
+         (let ((font-lock-verbose nil))
+           (with-temp-buffer
+             (insert s)
+             (factor-mode)
+             (font-lock-fontify-buffer)
+             (buffer-string))))))
+
+(defun factor--see-current-word (&optional word)
+  (let ((word (or word (factor--symbol-at-point))))
+    (when word
+      (let ((answer (factor--listener-send-cmd (format "\\ %s see" word))))
+        (factor--see-ans-to-string answer)))))
+
+(defun factor-see-current-word (&optional word)
+  "Echo in the minibuffer information about word at point."
+  (interactive)
+  (let ((word (or word (factor--symbol-at-point)))
+        (msg (factor--see-current-word word)))
+    (if msg (message "%s" msg)
+      (if word (message "No help found for '%s'" word)
+        (message "No word at point")))))
+
+;;; to fix:
+(defun factor-run-file ()
+  (interactive)
+  (when (and (buffer-modified-p)
+             (y-or-n-p (format "Save file %s? " (buffer-file-name))))
+    (save-buffer))
+  (when factor-display-compilation-output
+    (factor-display-output-buffer))
+  (comint-send-string "*factor*" (format "\"%s\"" (buffer-file-name)))
+  (comint-send-string "*factor*" " run-file\n"))
+
+(defun factor-display-output-buffer ()
+  (with-current-buffer "*factor*"
+    (goto-char (point-max))
+    (unless (get-buffer-window (current-buffer) t)
+      (display-buffer (current-buffer) t))))
+
+(defun factor-send-string (str)
+  (let ((n (length (split-string str "\n"))))
+    (save-excursion
+      (set-buffer "*factor*")
+      (goto-char (point-max))
+      (if (> n 1) (newline))
+      (insert str)
+      (comint-send-input))))
+
+(defun factor-send-region (start end)
+  (interactive "r")
+  (let ((str (buffer-substring start end))
+        (n   (count-lines      start end)))
+    (save-excursion
+      (set-buffer "*factor*")
+      (goto-char (point-max))
+      (if (> n 1) (newline))
+      (insert str)
+      (comint-send-input))))
+
+(defun factor-send-definition ()
+  (interactive)
+  (factor-send-region (search-backward ":")
+                      (search-forward  ";")))
+
+(defun factor-edit ()
+  (interactive)
+  (comint-send-string "*factor*" "\\ ")
+  (comint-send-string "*factor*" (thing-at-point 'sexp))
+  (comint-send-string "*factor*" " edit\n"))
+
+(defun factor-clear ()
+  (interactive)
+  (factor-send-string "clear"))
+
+(defun factor-comment-line ()
+  (interactive)
+  (beginning-of-line)
+  (insert "! "))
 
 
 ;;;; Factor help mode:
@@ -612,16 +735,16 @@ buffer."
 
 (defun factor--listener-help-buffer ()
   (with-current-buffer (get-buffer-create "*factor-help*")
-    (let ((inhibit-read-only t))
-      (delete-region (point-min) (point-max)))
+    (let ((inhibit-read-only t)) (erase-buffer))
     (factor-help-mode)
     (current-buffer)))
 
 (defvar factor--help-history nil)
 
 (defun factor--listener-show-help (&optional see)
-  (let* ((def (thing-at-point 'sexp))
-         (prompt (format "%s (%s): " (if see "See" "Help") def))
+  (let* ((def (factor--symbol-at-point))
+         (prompt (format "See%s help on%s: " (if see " short" "")
+                         (if def (format " (%s)" def) "")))
          (ask (or (not (eq major-mode 'factor-mode))
                   (not def)
                   factor-help-always-ask))
@@ -634,11 +757,21 @@ buffer."
     (pop-to-buffer hb)
     (beginning-of-buffer hb)))
 
-(defun factor-see ()
-  (interactive)
-  (factor--listener-show-help t))
+;;;; Interface: see/help commands
+
+(defun factor-see (&optional arg)
+  "See a help summary of symbol at point.
+By default, the information is shown in the minibuffer. When
+called with a prefix argument, the information is displayed in a
+separate help buffer."
+  (interactive "P")
+  (if (if factor-help-use-minibuffer (not arg) arg)
+      (factor-see-current-word)
+    (factor--listener-show-help t)))
 
 (defun factor-help ()
+  "Show extended help about the symbol at point, using a help
+buffer."
   (interactive)
   (factor--listener-show-help))
 
