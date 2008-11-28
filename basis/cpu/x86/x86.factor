@@ -14,6 +14,9 @@ M: x86 two-operand? t ;
 HOOK: temp-reg-1 cpu ( -- reg )
 HOOK: temp-reg-2 cpu ( -- reg )
 
+HOOK: param-reg-1 cpu ( -- reg )
+HOOK: param-reg-2 cpu ( -- reg )
+
 M: x86 %load-immediate MOV ;
 
 M: x86 %load-indirect swap 0 MOV rc-absolute-cell rel-immediate ;
@@ -90,6 +93,38 @@ M: x86 %shr-imm nip SHR ;
 M: x86 %sar-imm nip SAR ;
 M: x86 %not     drop NOT ;
 
+: ?MOV ( dst src -- )
+    2dup = [ 2drop ] [ MOV ] if ; inline
+
+:: move>args ( src1 src2 -- )
+    {
+        { [ src1 param-reg-2 = ] [ param-reg-1 src2 ?MOV param-reg-1 param-reg-2 XCHG ] }
+        { [ src1 param-reg-1 = ] [ param-reg-2 src2 ?MOV ] }
+        { [ src2 param-reg-1 = ] [ param-reg-2 src1 ?MOV param-reg-1 param-reg-2 XCHG ] }
+        { [ src2 param-reg-2 = ] [ param-reg-1 src1 ?MOV ] }
+        [
+            param-reg-1 src1 MOV
+            param-reg-2 src2 MOV
+        ]
+    } cond ;
+
+:: overflow-template ( src1 src2 temp insn func -- )
+    <label> "end" set
+    temp src1 MOV
+    temp src2 insn call
+    ds-reg [] temp MOV
+    "end" get JNO
+    src1 src2 move>args
+    %prepare-alien-invoke
+    func f %alien-invoke
+    "end" resolve-label ;
+
+M: x86 %fixnum-add ( src1 src2 temp -- )
+    [ ADD ] "overflow_fixnum_add" overflow-template ;
+
+M: x86 %fixnum-sub ( src1 src2 temp -- )
+    [ SUB ] "overflow_fixnum_subtract" overflow-template ;
+
 : bignum@ ( reg n -- op )
     cells bignum tag-number - [+] ; inline
 
@@ -157,9 +192,6 @@ M: x86 %div-float nip DIVSD ;
 
 M: x86 %integer>float CVTSI2SD ;
 M: x86 %float>integer CVTTSD2SI ;
-
-: ?MOV ( dst src -- )
-    2dup = [ 2drop ] [ MOV ] if ; inline
 
 M: x86 %copy ( dst src -- ) ?MOV ;
 

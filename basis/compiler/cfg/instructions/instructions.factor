@@ -92,6 +92,12 @@ INSN: ##shr-imm < ##binary-imm ;
 INSN: ##sar-imm < ##binary-imm ;
 INSN: ##not < ##unary ;
 
+! Overflowing arithmetic
+TUPLE: ##fixnum-overflow < insn src1 src2 temp ;
+INSN: ##fixnum-add < ##fixnum-overflow ;
+INSN: ##fixnum-sub < ##fixnum-overflow ;
+INSN: ##fixnum-mul < ##fixnum-overflow ;
+
 : ##tag-fixnum ( dst src -- ) tag-bits get ##shl-imm ; inline
 : ##untag-fixnum ( dst src -- ) tag-bits get ##sar-imm ; inline
 

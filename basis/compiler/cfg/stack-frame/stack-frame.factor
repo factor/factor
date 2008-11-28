@@ -34,6 +34,9 @@ M: insn compute-stack-frame*
 
 \ _gc t frame-required? set-word-prop
 \ _spill t frame-required? set-word-prop
+\ ##fixnum-add t frame-required? set-word-prop
+\ ##fixnum-sub t frame-required? set-word-prop
+\ ##fixnum-mul t frame-required? set-word-prop
 
 : compute-stack-frame ( insns -- )
     frame-required? off

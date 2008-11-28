@@ -23,8 +23,8 @@ M: x86.32 machine-registers
 M: x86.32 ds-reg ESI ;
 M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
-M: x86.32 temp-reg-1 EAX ;
-M: x86.32 temp-reg-2 ECX ;
+M: x86.32 temp-reg-1 ECX ;
+M: x86.32 temp-reg-2 EDX ;
 
 M:: x86.32 %dispatch ( src temp offset -- )
     ! Load jump table base.
@@ -37,6 +37,10 @@ M:: x86.32 %dispatch ( src temp offset -- )
     [ 7 + building get dup pop* push ]
     [ align-code ]
     bi ;
+
+! Registers for fastcall
+M: x86.32 param-reg-1 drop EAX ;
+M: x86.32 param-reg-2 drop EDX ;
 
 M: x86.32 reserved-area-size 0 ;
 

@@ -64,3 +64,6 @@ IN: compiler.cfg.intrinsics.fixnum
 
 : emit-fixnum>bignum ( -- )
     ds-pop ^^untag-fixnum ^^integer>bignum ds-push ;
+
+: emit-fixnum-overflow-op ( quot -- )
+    [ 2inputs i 1 ##inc-d ] dip call begin-basic-block ; inline

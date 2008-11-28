@@ -156,6 +156,15 @@ M: ##shr-imm generate-insn dst/src1/src2 %shr-imm ;
 M: ##sar-imm generate-insn dst/src1/src2 %sar-imm ;
 M: ##not     generate-insn dst/src       %not     ;
 
+: src1/src2/temp ( insn -- src1 src2 temp )
+    [ src1>> register ]
+    [ src2>> register ]
+    [ temp>> register ] tri ; inline
+
+M: ##fixnum-add generate-insn src1/src2/temp %fixnum-add ;
+M: ##fixnum-sub generate-insn src1/src2/temp %fixnum-sub ;
+M: ##fixnum-mul generate-insn src1/src2/temp %fixnum-mul ;
+
 : dst/src/temp ( insn -- dst src temp )
     [ dst/src ] [ temp>> register ] bi ; inline
 

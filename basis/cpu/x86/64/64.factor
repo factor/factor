@@ -21,8 +21,8 @@ M: x86.64 machine-registers
 M: x86.64 ds-reg R14 ;
 M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
-M: x86.64 temp-reg-1 RAX ;
-M: x86.64 temp-reg-2 RCX ;
+M: x86.64 temp-reg-1 R8 ;
+M: x86.64 temp-reg-2 R9 ;
 
 M:: x86.64 %dispatch ( src temp offset -- )
     ! Load jump table base.
@@ -37,8 +37,8 @@ M:: x86.64 %dispatch ( src temp offset -- )
     [ align-code ]
     bi ;
 
-: param-reg-1 int-regs param-regs first ; inline
-: param-reg-2 int-regs param-regs second ; inline
+M: x86.64 param-reg-1 int-regs param-regs first ;
+M: x86.64 param-reg-2 int-regs param-regs second ;
 : param-reg-3 int-regs param-regs third ; inline
 
 M: int-regs return-reg drop RAX ;
