@@ -4,7 +4,7 @@ USING: fry arrays generic io io.streams.string kernel math
 namespaces parser prettyprint sequences strings vectors words
 quotations effects classes continuations debugger assocs
 combinators compiler.errors accessors math.order definitions
-sets generic.standard.engines.tuple stack-checker.state
+sets generic.standard.engines.tuple hints stack-checker.state
 stack-checker.visitor stack-checker.errors
 stack-checker.values stack-checker.recursive-state ;
 IN: stack-checker.backend
@@ -125,7 +125,7 @@ M: object apply-object push-literal ;
     ] 2bi ; inline
 
 : infer-word-def ( word -- )
-    [ def>> ] [ add-recursive-state ] bi infer-quot ;
+    [ specialized-def ] [ add-recursive-state ] bi infer-quot ;
 
 : check->r ( -- )
     meta-r get empty? terminated? get or
