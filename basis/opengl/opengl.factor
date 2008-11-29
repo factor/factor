@@ -42,10 +42,10 @@ IN: opengl
     [ glDisableClientState ] each ; inline
 
 MACRO: all-enabled ( seq quot -- )
-    >r words>values r> [ (all-enabled) ] 2curry ;
+    [ words>values ] dip [ (all-enabled) ] 2curry ;
 
 MACRO: all-enabled-client-state ( seq quot -- )
-    >r words>values r> [ (all-enabled-client-state) ] 2curry ;
+    [ words>values ] dip [ (all-enabled-client-state) ] 2curry ;
 
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep
@@ -136,7 +136,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     circle-points concat >c-float-array ;
 
 : (gen-gl-object) ( quot -- id )
-    >r 1 0 <uint> r> keep *uint ; inline
+    [ 1 0 <uint> ] dip keep *uint ; inline
 
 : gen-texture ( -- id )
     [ glGenTextures ] (gen-gl-object) ;
@@ -145,7 +145,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     [ glGenBuffers ] (gen-gl-object) ;
 
 : (delete-gl-object) ( id quot -- )
-    >r 1 swap <uint> r> call ; inline
+    [ 1 swap <uint> ] dip call ; inline
 
 : delete-texture ( id -- )
     [ glDeleteTextures ] (delete-gl-object) ;
@@ -164,7 +164,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
 
 : <gl-buffer> ( target data hint -- id )
     pick gen-gl-buffer [ [
-        >r dup byte-length swap r> glBufferData
+        [ dup byte-length swap ] dip glBufferData
     ] with-gl-buffer ] keep ;
 
 : buffer-offset ( int -- alien )
@@ -198,9 +198,11 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     gen-texture [
         GL_TEXTURE_BIT [
             GL_TEXTURE_2D swap glBindTexture
-            >r >r GL_TEXTURE_2D 0 GL_RGBA r>
-            sprite-size2 0 GL_LUMINANCE_ALPHA
-            GL_UNSIGNED_BYTE r> glTexImage2D
+            [
+                [ GL_TEXTURE_2D 0 GL_RGBA ] dip
+                sprite-size2 0 GL_LUMINANCE_ALPHA
+                GL_UNSIGNED_BYTE
+            ] dip glTexImage2D
         ] do-attribs
     ] keep ;
     
@@ -252,7 +254,7 @@ MEMO: (rect-texture-coords) ( -- seq )
     [ nip [ free-sprite ] when* ] assoc-each ;
 
 : with-translation ( loc quot -- )
-    GL_MODELVIEW [ >r gl-translate r> call ] do-matrix ; inline
+    GL_MODELVIEW [ [ gl-translate ] dip call ] do-matrix ; inline
 
 : fix-coordinates ( point1 point2 -- x1 y2 x2 y2 )
     [ first2 [ >fixnum ] bi@ ] bi@ ;
