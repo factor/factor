@@ -352,7 +352,7 @@ buffer."
     (condition-case nil
         (progn (forward-sexp)
                (1- (point)))
-      (error -1)))))
+      (error -1))))
 
 (defsubst factor--indentation-at (pos)
   (save-excursion (goto-char pos) (current-indentation)))
