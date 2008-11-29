@@ -1,6 +1,6 @@
-USING: alien alien.syntax combinators kernel parser sequences
-system words namespaces hashtables init math arrays assocs
-continuations lexer ;
+USING: alien alien.syntax alien.syntax.private combinators
+kernel parser sequences system words namespaces hashtables init
+math arrays assocs continuations lexer ;
 IN: opengl.gl.extensions
 
 ERROR: unknown-gl-platform ;
@@ -35,6 +35,15 @@ reset-gl-function-number-counter
         dup r>
         +gl-function-pointers+ get-global set-at
     ] if* ;
+
+: indirect-quot ( function-ptr-quot return types abi -- quot )
+    [ alien-indirect ] 3curry compose ;
+
+: define-indirect ( abi return function-ptr-quot function-name parameters -- )
+    [ pick ] dip parse-arglist
+    rot create-in
+    [ swapd roll indirect-quot ] 2dip
+    -rot define-declared ;
 
 : GL-FUNCTION:
     gl-function-calling-convention
