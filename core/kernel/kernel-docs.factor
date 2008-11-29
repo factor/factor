@@ -599,7 +599,7 @@ HELP: dip
 
 HELP: 2dip
 { $values { "x" object } { "y" object } { "quot" quotation } }
-{ $description "Calls " { $snippet "quot" } " with " { $snippet "obj1" } " and " { $snippet "obj2" } " hidden on the retain stack." }
+{ $description "Calls " { $snippet "quot" } " with " { $snippet "x" } " and " { $snippet "y" } " hidden on the retain stack." }
 { $notes "The following are equivalent:"
     { $code "[ [ foo bar ] dip ] dip" }
     { $code "[ foo bar ] 2dip" }

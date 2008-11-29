@@ -118,6 +118,10 @@ buffer."
   "Face for parsing words."
   :group 'factor-faces)
 
+(defface factor-font-lock-declaration (face-default-spec font-lock-keyword-face)
+  "Face for declaration words (inline, parsing ...)."
+  :group 'factor-faces)
+
 (defface factor-font-lock-comment (face-default-spec font-lock-comment-face)
   "Face for comments."
   :group 'factor-faces)
@@ -178,9 +182,14 @@ buffer."
     "UNION:" "USE:" "USING:" "V{" "VAR:" "VARS:" "W{"))
 
 (defconst factor--regex-parsing-words-ext
-  (regexp-opt '("B" "call-next-method" "delimiter" "f" "flushable" "foldable"
-                "initial:" "inline" "parsing" "read-only" "recursive")
+  (regexp-opt '("B" "call-next-method" "delimiter" "f" "initial:" "read-only")
               'words))
+
+(defconst factor--declaration-words
+  '("flushable" "foldable" "inline" "parsing" "recursive"))
+
+(defconst factor--regex-declaration-words
+  (regexp-opt factor--declaration-words 'words))
 
 (defsubst factor--regex-second-word (prefixes)
   (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
@@ -213,6 +222,7 @@ buffer."
                              '(2 'factor-font-lock-parsing-word)))
               factor--parsing-words)
     (,factor--regex-parsing-words-ext . 'factor-font-lock-parsing-word)
+    (,factor--regex-declaration-words 1 'factor-font-lock-declaration)
     (,factor--regex-word-definition 2 'factor-font-lock-word-definition)
     (,factor--regex-type-definition 2 'factor-font-lock-type-definition)
     (,factor--regex-parent-type 1 'factor-font-lock-type-definition)
@@ -226,17 +236,17 @@ buffer."
 
 ;;; Factor mode syntax:
 
-(defconst factor--regexp-word-starters
+(defconst factor--regex-definition-starters
   (regexp-opt '("TUPLE" "MACRO" "MACRO:" "M" ":" "")))
 
-(defconst factor--regexp-word-start
-  (format "^\\(%s:\\) " factor--regexp-word-starters))
+(defconst factor--regex-definition-start
+  (format "^\\(%s:\\) " factor--regex-definition-starters))
+
+(defconst factor--regex-definition-end
+  (format "\\(;\\( +%s\\)?\\)" factor--regex-declaration-words))
 
 (defconst factor--font-lock-syntactic-keywords
-  `((,(format "^\\(%s\\)\\(:\\)" factor--regexp-word-starters)
-     (1 "w") (2 "(;"))
-    ("\\(;\\)" (1 "):"))
-    ("\\(#!\\)" (1 "<"))
+  `(("\\(#!\\)" (1 "<"))
     (" \\(!\\)" (1 "<"))
     ("^\\(!\\)" (1 "<"))
     ("\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))))
@@ -323,7 +333,7 @@ buffer."
     (save-excursion
       (beginning-of-buffer)
       (while (not iw)
-        (if (not (re-search-forward factor--regexp-word-start nil t))
+        (if (not (re-search-forward factor--regex-definition-start nil t))
             (setq iw factor-default-indent-width)
           (forward-line)
           (when (looking-at word-cont)
@@ -336,12 +346,16 @@ buffer."
 (defsubst factor--ppss-brackets-start ()
   (nth 1 (syntax-ppss)))
 
+(defun factor--ppss-brackets-end ()
+  (save-excursion
+    (goto-char (factor--ppss-brackets-start))
+    (condition-case nil
+        (progn (forward-sexp)
+               (1- (point)))
+      (error -1))))
+
 (defsubst factor--indentation-at (pos)
   (save-excursion (goto-char pos) (current-indentation)))
-
-(defconst factor--regex-closing-paren "[])}]")
-(defsubst factor--at-closing-paren-p ()
-  (looking-at factor--regex-closing-paren))
 
 (defsubst factor--at-first-char-p ()
   (= (- (point) (line-beginning-position)) (current-indentation)))
@@ -351,13 +365,17 @@ buffer."
                               "PRIVATE>" "<PRIVATE" "SYMBOL:" "USE:"))))
 
 (defsubst factor--at-begin-of-def ()
-  (looking-at factor--regexp-word-start))
+  (or (looking-at factor--regex-definition-start)
+      (looking-at factor--regex-single-liner)))
 
 (defsubst factor--looking-at-emptiness ()
   (looking-at "^[ \t]*$"))
 
-(defun factor--at-end-of-def ()
-  (or (looking-at ".*;[ \t]*$")
+(defconst factor--regex-end-of-def-line
+  (format "^.*%s" factor--regex-definition-end))
+
+(defsubst factor--at-end-of-def ()
+  (or (looking-at factor--regex-end-of-def-line)
       (looking-at factor--regex-single-liner)))
 
 (defun factor--at-setter-line ()
@@ -382,13 +400,12 @@ buffer."
 (defun factor--indent-in-brackets ()
   (save-excursion
     (beginning-of-line)
-    (when (or (and (re-search-forward factor--regex-closing-paren
-                                      (line-end-position) t)
-                   (not (backward-char)))
-              (> (factor--ppss-brackets-depth) 0))
-      (let ((op (factor--ppss-brackets-start)))
-        (when (> (line-number-at-pos) (line-number-at-pos op))
-          (if (factor--at-closing-paren-p)
+    (when (> (factor--ppss-brackets-depth) 0)
+      (let ((op (factor--ppss-brackets-start))
+            (cl (factor--ppss-brackets-end))
+            (ln (line-number-at-pos)))
+        (when (> ln (line-number-at-pos op))
+          (if (and (> cl 0) (= ln (line-number-at-pos cl)))
               (factor--indentation-at op)
             (factor--increased-indentation (factor--indentation-at op))))))))
 
@@ -448,6 +465,12 @@ buffer."
 (defvar factor-mode-map (make-sparse-keymap)
   "Key map used by Factor mode.")
 
+(defsubst factor--beginning-of-defun (times)
+  (re-search-backward factor--regex-definition-start nil t times))
+
+(defsubst factor--end-of-defun ()
+  (re-search-forward factor--regex-definition-end nil t))
+
 ;;;###autoload
 (defun factor-mode ()
   "A mode for editing programs written in the Factor programming language.
@@ -469,8 +492,9 @@ buffer."
 
   (set-syntax-table factor-mode-syntax-table)
   ;; Defun navigation
-  (setq defun-prompt-regexp "[^ :]+")
-  (set (make-local-variable 'open-paren-in-column-0-is-defun-start) t)
+  (set (make-local-variable 'beginning-of-defun-function) 'factor--beginning-of-defun)
+  (set (make-local-variable 'end-of-defun-function) 'factor--end-of-defun)
+  (set (make-local-variable 'open-paren-in-column-0-is-defun-start) nil)
   ;; Indentation
   (set (make-local-variable 'indent-line-function) 'factor--indent-line)
   (setq factor-indent-width (factor--guess-indent-width))
@@ -596,23 +620,28 @@ buffer."
 (defconst factor--regex-error-marker "^Type :help for debugging")
 (defconst factor--regex-data-stack "^--- Data stack:")
 
-(defun factor--prune-stack (ans)
-  (do ((res '() (cons (car s) res)) (s ans (cdr s)))
-      ((or (not s)
-           (and (car res) (string-match factor--regex-stack-effect (car res)))
-           (string-match factor--regex-data-stack (car s)))
-       (and (not (string-match factor--regex-error-marker (car res)))
-            (nreverse res)))))
+(defun factor--prune-ans-strings (ans)
+  (nreverse
+   (catch 'done
+     (let ((res))
+       (dolist (a ans res)
+         (cond ((string-match factor--regex-stack-effect a)
+                (throw 'done (cons a res)))
+               ((string-match factor--regex-data-stack a)
+                (throw 'done res))
+               ((string-match factor--regex-error-marker a)
+                (throw 'done nil))
+               (t (push a res))))))))
 
 (defun factor--see-ans-to-string (ans)
-  (let ((s (mapconcat #'identity (factor--prune-stack ans) " ")))
+  (let ((s (mapconcat #'identity (factor--prune-ans-strings ans) " "))
+        (font-lock-verbose nil))
     (and (> (length s) 0)
-         (let ((font-lock-verbose nil))
-           (with-temp-buffer
-             (insert s)
-             (factor-mode)
-             (font-lock-fontify-buffer)
-             (buffer-string))))))
+         (with-temp-buffer
+           (insert s)
+           (factor-mode)
+           (font-lock-fontify-buffer)
+           (buffer-string)))))
 
 (defun factor--see-current-word (&optional word)
   (let ((word (or word (factor--symbol-at-point))))
@@ -799,6 +828,13 @@ vocabularies which have been modified on disk."
       (define-key m (vector '(control ?c) key) cmd)
       (define-key m (vector '(control ?c) `(control ,key)) cmd))))
 
+(defun factor--define-auto-indent-key (key)
+  (define-key factor-mode-map (vector key)
+    (lambda (n)
+      (interactive "p")
+      (self-insert-command n)
+      (indent-for-tab-command))))
+
 (factor--define-key ?f 'factor-run-file)
 (factor--define-key ?r 'factor-send-region)
 (factor--define-key ?d 'factor-send-definition)
@@ -806,6 +842,9 @@ vocabularies which have been modified on disk."
 (factor--define-key ?e 'factor-edit)
 (factor--define-key ?z 'switch-to-factor t)
 (factor--define-key ?c 'comment-region)
+
+(factor--define-auto-indent-key ?\])
+(factor--define-auto-indent-key ?\})
 
 (define-key factor-mode-map "\C-ch" 'factor-help)
 (define-key factor-help-mode-map "\C-ch" 'factor-help)
