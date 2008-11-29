@@ -349,8 +349,10 @@ buffer."
 (defun factor--ppss-brackets-end ()
   (save-excursion
     (goto-char (factor--ppss-brackets-start))
-    (forward-sexp)
-    (1- (point))))
+    (condition-case nil
+        (progn (forward-sexp)
+               (1- (point)))
+      (error -1)))))
 
 (defsubst factor--indentation-at (pos)
   (save-excursion (goto-char pos) (current-indentation)))
@@ -369,8 +371,11 @@ buffer."
 (defsubst factor--looking-at-emptiness ()
   (looking-at "^[ \t]*$"))
 
+(defconst factor--regex-end-of-def-line
+  (format "^.*%s" factor--regex-definition-end))
+
 (defsubst factor--at-end-of-def ()
-  (or (looking-at factor--regex-definition-end)
+  (or (looking-at factor--regex-end-of-def-line)
       (looking-at factor--regex-single-liner)))
 
 (defun factor--at-setter-line ()
@@ -400,7 +405,7 @@ buffer."
             (cl (factor--ppss-brackets-end))
             (ln (line-number-at-pos)))
         (when (> ln (line-number-at-pos op))
-          (if (= ln (line-number-at-pos cl))
+          (if (and (> cl 0) (= ln (line-number-at-pos cl)))
               (factor--indentation-at op)
             (factor--increased-indentation (factor--indentation-at op))))))))
 
@@ -823,6 +828,13 @@ vocabularies which have been modified on disk."
       (define-key m (vector '(control ?c) key) cmd)
       (define-key m (vector '(control ?c) `(control ,key)) cmd))))
 
+(defun factor--define-auto-indent-key (key)
+  (define-key factor-mode-map (vector key)
+    (lambda (n)
+      (interactive "p")
+      (self-insert-command n)
+      (indent-for-tab-command))))
+
 (factor--define-key ?f 'factor-run-file)
 (factor--define-key ?r 'factor-send-region)
 (factor--define-key ?d 'factor-send-definition)
@@ -830,6 +842,9 @@ vocabularies which have been modified on disk."
 (factor--define-key ?e 'factor-edit)
 (factor--define-key ?z 'switch-to-factor t)
 (factor--define-key ?c 'comment-region)
+
+(factor--define-auto-indent-key ?\])
+(factor--define-auto-indent-key ?\})
 
 (define-key factor-mode-map "\C-ch" 'factor-help)
 (define-key factor-help-mode-map "\C-ch" 'factor-help)
