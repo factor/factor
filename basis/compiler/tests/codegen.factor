@@ -273,3 +273,6 @@ TUPLE: id obj ;
     ] if ;
 
 [ 4.0 ] [ 2.0 blah ] unit-test
+
+[ 4 ] [ 2 [ dup fixnum* ] compile-call ] unit-test
+[ 7 ] [ 2 [ dup fixnum* 3 fixnum+fast ] compile-call ] unit-test

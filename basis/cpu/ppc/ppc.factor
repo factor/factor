@@ -228,12 +228,12 @@ M:: ppc %fixnum-mul ( src1 src2 -- )
     "no-overflow" define-label
     0 0 LI
     0 MTXER
-    src1 src1 tag-bits get SRAWI
-    scratch-reg src1 src2 MULLWO.
+    scratch-reg src1 tag-bits get SRAWI
+    scratch-reg scratch-reg src2 MULLWO.
     scratch-reg ds-reg 0 STW
     "no-overflow" get BNO
     src2 src2 tag-bits get SRAWI
-    src1 src2 move>args
+    scratch-reg src2 move>args
     %prepare-alien-invoke
     "overflow_fixnum_multiply" f %alien-invoke
     "no-overflow" resolve-label ;
@@ -242,14 +242,14 @@ M:: ppc %fixnum-mul-tail ( src1 src2 -- )
     "overflow" define-label
     0 0 LI
     0 MTXER
-    src1 src1 tag-bits get SRAWI
-    scratch-reg src1 src2 MULLWO.
+    scratch-reg src1 tag-bits get SRAWI
+    scratch-reg scratch-reg src2 MULLWO.
     "overflow" get BO
     scratch-reg ds-reg 0 STW
     BLR
     "overflow" resolve-label
     src2 src2 tag-bits get SRAWI
-    src1 src2 move>args
+    scratch-reg src2 move>args
     %prepare-alien-invoke
     "overflow_fixnum_multiply" f %alien-invoke-tail ;
 
