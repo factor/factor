@@ -2,6 +2,43 @@
 in the public domain. */
 #include "asm.h"
 
+#define DS_REG 29
+
+DEF(void,primitive_fixnum_add,(void)):
+    lwz r3,0(DS_REG)
+    lwz r4,-4(DS_REG)
+    subi DS_REG,DS_REG,4
+    li r0,0
+    mtxer r0
+    addo. r5,r3,r4
+    bo MANGLE(overflow_fixnum_add)
+    stw r5,0(DS_REG)
+    blr
+
+DEF(void,primitive_fixnum_subtract,(void)):
+    lwz r3,0(DS_REG)
+    lwz r4,-4(DS_REG)
+    subi DS_REG,DS_REG,4
+    li r0,0
+    mtxer r0
+    subfo. r5,r3,r4
+    bo MANGLE(overflow_fixnum_subtract)
+    stw r5,0(DS_REG)
+    blr
+
+DEF(void,primitive_fixnum_multiply,(void)):
+    lwz r3,0(DS_REG)
+    lwz r4,-4(DS_REG)
+    subi DS_REG,DS_REG,4
+    srawi r3,r3,3
+    mullwo. r5,r3,r4
+    bo multiply_overflow
+    stw r5,0(DS_REG)
+    blr
+multiply_overflow:
+    srawi r4,r4,3
+    jmp MANGLE(overflow_fixnum_multiply)
+    
 /* Note that the XT is passed to the quotation in r11 */
 #define CALL_OR_JUMP_QUOT \
 	lwz r11,9(r3)	   /* load quotation-xt slot */ XX \

@@ -17,6 +17,7 @@ IN: cpu.ppc
 ! f30, f31: float scratch
 
 enable-float-intrinsics
+enable-fixnum*-intrinsic
 
 << \ ##integer>float t frame-required? set-word-prop
 \ ##float>integer t frame-required? set-word-prop >>
@@ -163,6 +164,63 @@ M: ppc %shl-imm swapd SLWI ;
 M: ppc %shr-imm swapd SRWI ;
 M: ppc %sar-imm SRAWI ;
 M: ppc %not     NOT ;
+
+: %alien-invoke-tail ( func dll -- )
+    11 %load-dlsym 11 MTCTR BCTR ;
+
+: exchange-regs ( r1 r2 -- )
+    scratch-reg swap MR scratch-reg MR ;
+
+:: move>args ( src1 src2 -- )
+    {
+        { [ src1 4 = ] [ 3 src2 ?MR 3 4 exchange-regs ] }
+        { [ src1 3 = ] [ 4 src2 ?MR ] }
+        { [ src2 3 = ] [ 4 src1 ?MR 3 4 exchange-regs ] }
+        { [ src2 4 = ] [ 3 src1 ?MR ] }
+        [ 3 src1 MR 4 src2 MR ]
+    } cond ;
+
+:: overflow-check ( src1 src2 insn insn-o func -- )
+    "no-overflow" define-label
+    0 0 LI
+    0 MTXER
+    scratch-reg src1 src2 insn-o execute
+    scratch-reg ds-reg 0 STW
+    "no-overflow" get BNO
+    move>args
+    %prepare-alien-invoke
+    func f %alien-invoke
+    "no-overflow" resolve-label ; inline
+
+:: overflow-check-tail ( src1 src2 insn insn-o func -- )
+    "no-overflow" define-label
+    0 0 LI
+    0 MTXER
+    scratch-reg src1 src2 insn-o execute
+    "no-overflow" get BNO
+    move>args
+    %prepare-alien-invoke
+    func f %alien-invoke-tail
+    "no-overflow" resolve-label
+    scratch-reg ds-reg 0 STW ; inline
+
+M: ppc %fixnum-add ( src1 src2 -- )
+    [ ADD ] [ ADDO. ] "overflow_fixnum_add" overflow-template ;
+
+M: ppc %fixnum-add-tail ( src1 src2 -- )
+    [ ADD ] [ ADDO. ] "overflow_fixnum_add" overflow-template-tail ;
+
+M: ppc %fixnum-sub ( src1 src2 -- )
+    [ SUBF ] [ SUBFO. ] "overflow_fixnum_subtract" overflow-template ;
+
+M: ppc %fixnum-sub-tail ( src1 src2 -- )
+    [ SUBF ] [ SUBFO. ] "overflow_fixnum_subtract" overflow-template-tail ;
+
+M: ppc %fixnum-mul ( src1 src2 -- )
+    [ MULLW ] [ MULLWO. ] "overflow_fixnum_multiply" overflow-template ;
+
+M: ppc %fixnum-mul-tail ( src1 src2 -- )
+    [ MULLW ] [ MULLWO. ] "overflow_fixnum_multiply" overflow-template-tail ;
 
 : bignum@ ( n -- offset ) cells bignum tag-number - ; inline
 

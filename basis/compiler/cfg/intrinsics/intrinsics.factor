@@ -89,6 +89,9 @@ IN: compiler.cfg.intrinsics
         alien.accessors:set-alien-double
     } [ t "intrinsic" set-word-prop ] each ;
 
+: enable-fixnum*-intrinsic ( -- )
+    \ math.private:fixnum* t "intrinsic" set-word-prop ;
+
 : emit-intrinsic ( node word -- node/f )
     {
         { \ kernel.private:tag [ drop emit-tag iterate-next ] }
