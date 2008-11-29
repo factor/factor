@@ -327,6 +327,18 @@ big-endian on
 \ BLT \ fixnum< define-jit-compare
 
 ! Math
+[
+    3 ds-reg 0 LWZ
+    4 ds-reg -4 LWZ
+    3 3 4 OR
+    3 3 tag-mask get ANDI
+    \ f tag-number 4 LI
+    0 3 0 CMPI
+    2 BNE
+    1 tag-fixnum 4 LI
+    4 ds-reg 4 STWU
+] f f f \ both-fixnums? define-sub-primitive
+
 : jit-math ( insn -- )
     3 ds-reg 0 LWZ
     4 ds-reg -4 LWZU
