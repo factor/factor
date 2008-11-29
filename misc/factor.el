@@ -211,7 +211,7 @@ buffer."
 
 (defconst factor--regex-stack-effect " ( .* )")
 
-(defconst factor--regex-using-line "^USING: +\\([^;]*\\);")
+(defconst factor--regex-using-lines "^USING: +\\(\\([^;]\\|[\n\r\f]\\)*\\);")
 
 (defconst factor--regex-use-line "^USE: +\\(.*\\)$")
 
@@ -229,7 +229,7 @@ buffer."
     (,factor--regex-constructor . 'factor-font-lock-constructor)
     (,factor--regex-setter . 'factor-font-lock-setter-word)
     (,factor--regex-symbol-definition 2 'factor-font-lock-symbol-definition)
-    (,factor--regex-using-line 1 'factor-font-lock-vocabulary-name)
+    (,factor--regex-using-lines 1 'factor-font-lock-vocabulary-name)
     (,factor--regex-use-line 1 'factor-font-lock-vocabulary-name))
   "Font lock keywords definition for Factor mode.")
 
@@ -243,7 +243,7 @@ buffer."
   (format "^\\(%s:\\) " factor--regex-definition-starters))
 
 (defconst factor--regex-definition-end
-  (format "\\(;\\( +%s\\)?\\)" factor--regex-declaration-words))
+  (format "\\(;\\( +%s\\)*\\)" factor--regex-declaration-words))
 
 (defconst factor--font-lock-syntactic-keywords
   `(("\\(#!\\)" (1 "<"))
@@ -300,6 +300,7 @@ buffer."
     (modify-syntax-entry ?\" "\"" factor-mode-syntax-table)
     (modify-syntax-entry ?\\ "/" factor-mode-syntax-table)))
 
+
 ;;; symbol-at-point
 
 (defun factor--beginning-of-symbol ()
@@ -364,19 +365,27 @@ buffer."
   (format "^%s" (regexp-opt '("DEFER:" "GENERIC:" "IN:"
                               "PRIVATE>" "<PRIVATE" "SYMBOL:" "USE:"))))
 
-(defsubst factor--at-begin-of-def ()
-  (or (looking-at factor--regex-definition-start)
-      (looking-at factor--regex-single-liner)))
-
-(defsubst factor--looking-at-emptiness ()
-  (looking-at "^[ \t]*$"))
+(defconst factor--regex-begin-of-def
+  (format "^USING: \\|\\(%s\\)\\|\\(%s .*\\)"
+          factor--regex-definition-start
+          factor--regex-single-liner))
 
 (defconst factor--regex-end-of-def-line
   (format "^.*%s" factor--regex-definition-end))
 
+(defconst factor--regex-end-of-def
+  (format "\\(%s\\)\\|\\(%s .*\\)"
+          factor--regex-end-of-def-line
+          factor--regex-single-liner))
+
+(defsubst factor--at-begin-of-def ()
+  (looking-at factor--regex-begin-of-def))
+
 (defsubst factor--at-end-of-def ()
-  (or (looking-at factor--regex-end-of-def-line)
-      (looking-at factor--regex-single-liner)))
+  (looking-at factor--regex-end-of-def))
+
+(defsubst factor--looking-at-emptiness ()
+  (looking-at "^[ \t]*$"))
 
 (defun factor--at-setter-line ()
   (save-excursion
@@ -434,7 +443,8 @@ buffer."
       (forward-line -1))
     (if (or (factor--at-end-of-def) (factor--at-setter-line))
         (factor--decreased-indentation)
-      (if (factor--at-begin-of-def)
+      (if (and (factor--at-begin-of-def)
+               (not (looking-at factor--regex-using-lines)))
           (factor--increased-indentation)
         (current-indentation)))))
 
@@ -466,10 +476,10 @@ buffer."
   "Key map used by Factor mode.")
 
 (defsubst factor--beginning-of-defun (times)
-  (re-search-backward factor--regex-definition-start nil t times))
+  (re-search-backward factor--regex-begin-of-def nil t times))
 
 (defsubst factor--end-of-defun ()
-  (re-search-forward factor--regex-definition-end nil t))
+  (re-search-forward factor--regex-end-of-def nil t))
 
 ;;;###autoload
 (defun factor-mode ()
@@ -530,7 +540,8 @@ buffer."
 (defun factor--listener-process (&optional start)
   (or (and (buffer-live-p factor--listener-buffer)
            (get-buffer-process factor--listener-buffer))
-      (when start
+      (if (not start)
+          (error "No running factor listener. Try M-x run-factor.")
         (factor--listener-start-process)
         (factor--listener-process t))))
 
@@ -589,7 +600,6 @@ buffer."
 
 (defun factor--current-listener-vocab ()
   (car (factor--listener-send-cmd "USING: parser ; in get .")))
-
 
 (defun factor--set-current-listener-vocab (&optional vocab)
   (factor--listener-send-cmd
@@ -654,10 +664,9 @@ buffer."
 (defun factor-see-current-word (&optional word)
   "Echo in the minibuffer information about word at point."
   (interactive)
-  (unless (factor--listener-process)
-    (error "No factor listener running. Try M-x run-factor"))
-  (let ((word (or word (factor--symbol-at-point)))
-        (msg (factor--see-current-word word)))
+  (let* ((proc (factor--listener-process))
+         (word (or word (factor--symbol-at-point)))
+         (msg (factor--see-current-word word)))
     (if msg (message "%s" msg)
       (if word (message "No help found for '%s'" word)
         (message "No word at point")))))
@@ -775,9 +784,8 @@ buffer."
 (defvar factor--help-history nil)
 
 (defun factor--listener-show-help (&optional see)
-  (unless (factor--listener-process)
-    (error "No running factor listener. Try M-x run-factor"))
-  (let* ((def (factor--symbol-at-point))
+  (let* ((proc (factor--listener-process))
+         (def (factor--symbol-at-point))
          (prompt (format "See%s help on%s: " (if see " short" "")
                          (if def (format " (%s)" def) "")))
          (ask (or (not (eq major-mode 'factor-mode))
@@ -786,8 +794,7 @@ buffer."
          (cmd (format "\\ %s %s"
                       (if ask (read-string prompt nil 'factor--help-history def) def)
                       (if see "see" "help")))
-         (hb (factor--listener-help-buffer))
-         (proc (factor--listener-process)))
+         (hb (factor--listener-help-buffer)))
     (comint-redirect-send-command-to-process cmd hb proc nil)
     (pop-to-buffer hb)
     (beginning-of-buffer hb)))
