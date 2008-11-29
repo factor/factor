@@ -285,7 +285,7 @@ SYMBOL: nc-buttons
     swap [ push ] [ delete ] if ;
 
 : >lo-hi ( WORD -- array ) [ lo-word ] keep hi-word 2array ;
-: mouse-wheel ( lParam -- array ) >lo-hi [ sgn neg ] map ;
+: mouse-wheel ( wParam -- array ) >lo-hi [ sgn neg ] map ;
 
 : mouse-absolute>relative ( lparam handle -- array )
     [ >lo-hi ] dip
@@ -338,8 +338,8 @@ SYMBOL: nc-buttons
     >lo-hi swap window move-hand fire-motion ;
 
 :: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
-    lParam mouse-wheel
-    hWnd mouse-absolute>relative
+    wParam mouse-wheel
+    lParam hWnd mouse-absolute>relative
     hWnd window send-wheel ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
