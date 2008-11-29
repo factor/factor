@@ -60,3 +60,5 @@ unit-test
 [ 0 ] [ 1/0. >bignum ] unit-test
 
 [ t ] [ 64 [ 2^ 0.5 * ] map [ < ] monotonic? ] unit-test
+
+[ 5 ] [ 10.5 1.9 /i ] unit-test

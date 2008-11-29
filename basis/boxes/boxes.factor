@@ -23,4 +23,4 @@ ERROR: box-empty box ;
     dup occupied>> [ box> t ] [ drop f f ] if ;
 
 : if-box? ( box quot -- )
-    >r ?box r> [ drop ] if ; inline
+    [ ?box ] dip [ drop ] if ; inline

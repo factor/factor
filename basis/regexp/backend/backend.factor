@@ -5,12 +5,13 @@ IN: regexp.backend
 
 TUPLE: regexp
     raw
-    { stack vector }
-    parse-tree
     { options hashtable }
+    stack
+    parse-tree
     nfa-table
     dfa-table
     minimized-table
+    matchers
     { nfa-traversal-flags hashtable }
     { dfa-traversal-flags hashtable }
     { state integer }

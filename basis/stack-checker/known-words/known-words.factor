@@ -134,11 +134,11 @@ M: object infer-call*
 
 : infer-load-locals ( -- )
     pop-literal nip
-    consume-d dup reverse copy-values dup output-r
-    [ [ f f ] dip ] [ reverse swap zip ] 2bi #shuffle, ;
+    consume-d dup copy-values dup output-r
+    [ [ f f ] dip ] [ swap zip ] 2bi #shuffle, ;
 
 : infer-get-local ( -- )
-    [let* | n [ pop-literal nip ]
+    [let* | n [ pop-literal nip 1 swap - ]
             in-r [ n consume-r ]
             out-d [ in-r first copy-value 1array ]
             out-r [ in-r copy-values ] |
@@ -186,6 +186,9 @@ M: object infer-call*
 : infer-local-writer ( word -- )
     (( value -- )) apply-word/effect ;
 
+: infer-local-word ( word -- )
+    "local-word-def" word-prop infer-quot-here ;
+
 {
     >r r> declare call (call) slip 2slip 3slip curry compose
     execute (execute) if dispatch <tuple-boa> (throw)
@@ -209,6 +212,7 @@ M: object infer-call*
         { [ dup local? ] [ infer-local-reader ] }
         { [ dup local-reader? ] [ infer-local-reader ] }
         { [ dup local-writer? ] [ infer-local-writer ] }
+        { [ dup local-word? ] [ infer-local-word ] }
         { [ dup recursive-word? ] [ call-recursive-word ] }
         [ dup infer-word apply-word/effect ]
     } cond ;
@@ -276,6 +280,8 @@ M: object infer-call*
 
 \ <complex> { real real } { complex } define-primitive
 \ <complex> make-foldable
+
+\ both-fixnums? { object object } { object object object } define-primitive
 
 \ fixnum+ { fixnum fixnum } { integer } define-primitive
 \ fixnum+ make-foldable

@@ -8,7 +8,7 @@ core-foundation threads combinators math.geometry.rect ;
 IN: ui.cocoa.views
 
 : send-mouse-moved ( view event -- )
-    over >r mouse-location r> window move-hand fire-motion ;
+    [ mouse-location ] [ drop window ] 2bi move-hand fire-motion ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
@@ -85,18 +85,19 @@ IN: ui.cocoa.views
     mouse-location rot window send-button-up ;
 
 : send-wheel$ ( view event -- )
-    over >r
-    dup -> deltaX sgn neg over -> deltaY sgn neg 2array -rot
-    mouse-location
-    r> window send-wheel ;
+    [
+        dup -> deltaX sgn neg over -> deltaY sgn neg 2array -rot
+        mouse-location
+    ] [ drop window ] 2bi send-wheel ;
 
 : send-action$ ( view event gesture -- junk )
-    >r drop window r> send-action f ;
+    [ drop window ] dip send-action f ;
 
 : add-resize-observer ( observer object -- )
-    >r "updateFactorGadgetSize:"
-    "NSViewFrameDidChangeNotification" <NSString>
-    r> add-observer ;
+    [
+        "updateFactorGadgetSize:"
+        "NSViewFrameDidChangeNotification" <NSString>
+    ] dip add-observer ;
 
 : string-or-nil? ( NSString -- ? )
     [ CF>string NSStringPboardType = ] [ t ] if* ;
@@ -109,7 +110,7 @@ IN: ui.cocoa.views
     ] if ;
 
 : NSRect>rect ( NSRect world -- rect )
-    >r dup NSRect-x over NSRect-y r>
+    [ dup NSRect-x over NSRect-y ] dip
     rect-dim second swap - 2array
     over NSRect-w rot NSRect-h 2array
     <rect> ;
@@ -256,7 +257,7 @@ CLASS: {
 { "validRequestorForSendType:returnType:" "id" { "id" "SEL" "id" "id" }
     [
         ! We return either self or nil
-        >r >r over window-focus r> r>
+        [ over window-focus ] 2dip
         valid-service? [ drop ] [ 2drop f ] if
     ]
 }
@@ -278,7 +279,7 @@ CLASS: {
 { "readSelectionFromPasteboard:" "char" { "id" "SEL" "id" }
     [
         pasteboard-string dup [
-            >r drop window-focus r> swap user-input 1
+            [ drop window-focus ] dip swap user-input 1
         ] [
             3drop 0
         ] if

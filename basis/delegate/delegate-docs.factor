@@ -28,21 +28,21 @@ HELP: group-words
 { $values { "group" "a group" } { "words" "an array of words" } }
 { $description "Given a protocol or tuple class, this returns the corresponding generic words that this group contains." } ;
 
-ARTICLE: { "delegate" "intro" } "Delegation"
+ARTICLE: "delegate" "Delegation"
 "The " { $vocab-link "delegate" } " vocabulary implements run-time consultation for method dispatch."
 $nl
-"Fundamental to the concept of " { $emphasis "protocols" } ", which are groups of tuple slot accessors, or groups of arbtirary generic words."
+"A " { $emphasis "protocol" } " is a collection of related generic words. An object is said to " { $emphasis "consult" } " another object if it implements a protocol by forwarding all methods onto the other object."
 $nl
-"This allows an object to implement a certain protocol by passing the method calls to another object."
+"Using this vocabulary, protocols can be defined and consulation can be set up without any repetitive boilerplate."
 $nl
 "Unlike " { $link "tuple-subclassing" } ", which expresses " { $emphasis "is-a" } " relationships by statically including the methods and slots of the superclass in all subclasses, consultation forwards generic word calls to another distinct object."
 $nl
-"Fundamentally, a protocol is a word which has a method for " { $link group-words } ". One type of protocol is a tuple, which consists of the slot accessors. To define a protocol as a set of words, use"
+"Defining new protocols:"
 { $subsection POSTPONE: PROTOCOL: }
 { $subsection define-protocol }
-"The literal syntax and defining word are:"
+"Defining consultation:"
 { $subsection POSTPONE: CONSULT: }
 { $subsection define-consult }
-"The " { $vocab-link "delegate.protocols" } " vocabulary defines formal protocols for the various informal protocols used in the Factor core, such as " { $link "sequence-protocol" } ", " { $link "assocs-protocol" } " or " { $link "stream-protocol" } ;
+"Every tuple class has an associated protocol consisting of all of its slot accessor methods. The " { $vocab-link "delegate.protocols" } " vocabulary defines formal protocols for the various informal protocols used in the Factor core, such as " { $link "sequence-protocol" } ", " { $link "assocs-protocol" } " or " { $link "stream-protocol" } ;
 
-ABOUT: { "delegate" "intro" }
+ABOUT: "delegate"

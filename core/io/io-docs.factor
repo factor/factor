@@ -114,6 +114,9 @@ HELP: input-stream
 HELP: output-stream
 { $var-description "Holds an output stream for various implicit stream operations. Rebound using " { $link with-output-stream } " and " { $link with-output-stream* } "." } ;
 
+HELP: error-stream
+{ $var-description "Holds an error stream." } ;
+
 HELP: readln
 { $values { "str/f" "a string or " { $link f } } }
 { $description "Reads a line of input from " { $link input-stream } ". Outputs " { $link f } " on stream exhaustion." }

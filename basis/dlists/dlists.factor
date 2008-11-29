@@ -57,11 +57,11 @@ M: dlist-node node-value obj>> ;
 : (dlist-find-node) ( dlist-node quot: ( node -- ? ) -- node/f ? )
     over [
         [ call ] 2keep rot
-        [ drop t ] [ >r next>> r> (dlist-find-node) ] if
+        [ drop t ] [ [ next>> ] dip (dlist-find-node) ] if
     ] [ 2drop f f ] if ; inline recursive
 
 : dlist-find-node ( dlist quot -- node/f ? )
-    >r front>> r> (dlist-find-node) ; inline
+    [ front>> ] dip (dlist-find-node) ; inline
 
 : dlist-each-node ( dlist quot -- )
     [ f ] compose dlist-find-node 2drop ; inline

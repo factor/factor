@@ -10,10 +10,10 @@ IN: assocs.lib
     dupd at [ nip ] when* ;
 
 : replace-at ( assoc value key -- assoc )
-    >r >r dup r> 1vector r> rot set-at ;
+    [ dupd 1vector ] dip rot set-at ;
 
 : peek-at* ( assoc key -- obj ? )
-    swap at* dup [ >r peek r> ] when ;
+    swap at* dup [ [ peek ] dip ] when ;
 
 : peek-at ( assoc key -- obj )
     peek-at* drop ;
@@ -27,7 +27,7 @@ IN: assocs.lib
 : insert ( value variable -- ) namespace push-at ;
 
 : generate-key ( assoc -- str )
-    >r 32 random-bits >hex r>
+    [ 32 random-bits >hex ] dip
     2dup key? [ nip generate-key ] [ drop ] if ;
 
 : set-at-unique ( value assoc -- key )

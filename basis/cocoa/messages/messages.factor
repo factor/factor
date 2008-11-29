@@ -27,7 +27,7 @@ super-message-senders global [ H{ } assoc-like ] change-at
 
 : cache-stub ( method function hash -- )
     [
-        over get [ 2drop ] [ over >r sender-stub r> set ] if
+        over get [ 2drop ] [ over [ sender-stub ] dip set ] if
     ] bind ;
 
 : cache-stubs ( method -- )
@@ -37,7 +37,7 @@ super-message-senders global [ H{ } assoc-like ] change-at
 
 : <super> ( receiver -- super )
     "objc-super" <c-object> [
-        >r dup object_getClass class_getSuperclass r>
+        [ dup object_getClass class_getSuperclass ] dip
         set-objc-super-class
     ] keep
     [ set-objc-super-receiver ] keep ;
@@ -75,7 +75,7 @@ MEMO: make-prepare-send ( selector method super? -- quot )
     swap second length 2 - make-dip ;
 
 MACRO: (send) ( selector super? -- quot )
-    >r dup lookup-method r>
+    [ dup lookup-method ] dip
     [ make-prepare-send ] 2keep
     super-message-senders message-senders ? get at
     [ slip execute ] 2curry ;
@@ -172,7 +172,7 @@ assoc-union alien>objc-types set-global
     ] unless ;
 
 : (parse-objc-type) ( i string -- ctype )
-    2dup nth >r >r 1+ r> r> {
+    2dup nth [ 1+ ] 2dip {
         { [ dup "rnNoORV" member? ] [ drop (parse-objc-type) ] }
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
@@ -223,12 +223,12 @@ assoc-union alien>objc-types set-global
 : class-exists? ( string -- class ) objc_getClass >boolean ;
 
 : unless-defined ( class quot -- )
-    >r class-exists? r> unless ; inline
+    [ class-exists? ] dip unless ; inline
 
 : define-objc-class-word ( name quot -- )
     [
         over , , \ unless-defined , dup , \ objc-class ,
-    ] [ ] make >r "cocoa.classes" create r>
+    ] [ ] make [ "cocoa.classes" create ] dip
     (( -- class )) define-declared ;
 
 : import-objc-class ( name quot -- )

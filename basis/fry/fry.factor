@@ -28,11 +28,6 @@ M: >r/r>-in-fry-error summary
     dup { >r r> load-locals get-local drop-locals } intersect
     empty? [ >r/r>-in-fry-error ] unless ;
 
-: shallow-fry ( quot -- quot' )
-    check-fry
-    [ dup \ @ = [ drop [ _ call ] ] [ 1array ] if ] map concat
-    { _ } split [ length 1- [ncurry] ] [ spread>quot ] bi prefix ;
-
 PREDICATE: fry-specifier < word { _ @ } memq? ;
 
 GENERIC: count-inputs ( quot -- n )
@@ -41,15 +36,21 @@ M: callable count-inputs [ count-inputs ] sigma ;
 M: fry-specifier count-inputs drop 1 ;
 M: object count-inputs drop 0 ;
 
+GENERIC: deep-fry ( obj -- )
+
+: shallow-fry ( quot -- quot' curry# )
+    check-fry
+    [ [ deep-fry ] each ] [ ] make
+    [ dup \ @ = [ drop [ _ call ] ] [ 1array ] if ] map concat
+    { _ } split [ spread>quot ] [ length 1- ] bi ;
+
 PRIVATE>
 
-: fry ( quot -- quot' )
-    [
-        [
-            dup callable? [
-                [ count-inputs \ _ <repetition> % ] [ fry % ] bi
-            ] [ , ] if
-        ] each
-    ] [ ] make shallow-fry ;
+: fry ( quot -- quot' ) shallow-fry [ncurry] swap prefix ;
+
+M: callable deep-fry
+    [ count-inputs \ _ <repetition> % ] [ fry % ] bi ;
+
+M: object deep-fry , ;
 
 : '[ \ ] parse-until fry over push-all ; parsing

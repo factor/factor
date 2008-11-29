@@ -117,7 +117,9 @@ M: word integer-op-input-classes
     { fixnum bignum float }
     [ [ dup 3array ] [ swap method ] 2bi ] with { } map>assoc
     [ nip ] assoc-filter
-    [ def>> peek ] assoc-map % ;
+    [ def>> ] assoc-map
+    [ nip length 1 = ] assoc-filter
+    [ first ] assoc-map % ;
 
 SYMBOL: math-ops
 

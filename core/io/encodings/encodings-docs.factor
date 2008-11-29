@@ -1,20 +1,5 @@
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax io quotations ;
 IN: io.encodings
-
-ABOUT: "io.encodings"
-
-ARTICLE: "io.encodings" "I/O encodings"
-"Bytes can't be understood in isolation as text. They must be interpreted under a certain encoding. Factor provides utilities for dealing with encoded text by declaring that a stream has a particular encoding, and utilities to encode and decode strings."
-{ $subsection "encodings-descriptors" }
-{ $subsection "encodings-constructors" }
-{ $subsection "io.encodings.string" }
-"New types of encodings can be defined:"
-{ $subsection "encodings-protocol" } ;
-
-ARTICLE: "encodings-constructors" "Manually constructing an encoded stream"
-"The following words can be used to construct encoded streams. Note that they are usually not used directly, but rather by the stream constructors themselves. Most stream constructors take an encoding descriptor as a parameter and internally call these constructors."
-{ $subsection <encoder> }
-{ $subsection <decoder> } ;
 
 HELP: <encoder>
 { $values { "stream" "an output stream" }
@@ -30,8 +15,66 @@ HELP: <decoder>
 { $description "Wraps the given stream in a new stream using the given encoding for all input. The encoding descriptor can either be a class or an instance of something conforming to the " { $link "encodings-protocol" } "." }
 $low-level-note ;
 
+HELP: decode-char
+{ $values { "stream" "an underlying input stream" }
+    { "encoding" "An encoding descriptor tuple" } { "char/f" "a code point or " { $link f } } }
+{ $contract "Reads a single code point from the underlying stream, interpreting it by the encoding. Returns " { $link f } " if the stream is reached." }
+$low-level-note ;
+
+HELP: encode-char
+{ $values { "char" "a character" }
+    { "stream" "an underlying output stream" }
+    { "encoding" "an encoding descriptor" } }
+{ $contract "Writes the code point to the underlying stream in the given encoding." }
+$low-level-note ;
+
+{ encode-char decode-char } related-words
+
+HELP: decode-input
+{ $values
+     { "encoding" "an encoding descriptor" }
+}
+{ $description "Changes the encoding of the current input stream stored in the " { $link input-stream } " variable." } ;
+
+HELP: encode-output
+{ $values
+     { "encoding" "an encoding descriptor" }
+}
+{ $description "Changes the encoding of the current output stream stored in the " { $link output-stream } " variable." } ;
+
+HELP: re-decode
+{ $values
+     { "stream" "a stream" } { "encoding" "an encoding descriptor" }
+     { "newstream" "a new stream" }
+}
+{ $description "Creates a new decoding stream with the supplied encoding descriptor from an existing stream by calling the " { $link <decoder> } " word." } ;
+
+HELP: re-encode
+{ $values
+     { "stream" "a stream" } { "encoding" "an encoding descriptor" }
+     { "newstream" "a new stream" }
+}
+{ $description "Creates a new encoding stream with the supplied encoding descriptor from an existing stream by calling the " { $link <encoder> } " word." } ;
+
+{ re-decode re-encode } related-words
+
+HELP: with-decoded-input
+{ $values
+     { "encoding" "an encoding descriptor" } { "quot" quotation }
+}
+{ $description "Creates a new decoding stream with the given encoding descriptor and calls the quotation with this stream set to the " { $link input-stream } " variable. The original decoder stream is restored after the quotation returns and the stream is kept open for future input operations." } ;
+
+HELP: with-encoded-output
+{ $values
+     { "encoding" "an encoding descriptor" } { "quot" quotation }
+}
+{ $description "Creates a new encoder with the given encoding descriptor and calls the quotation using this encoder. The original encoder object is restored after the quotation returns and the stream is kept open for future output operations." } ;
+
+HELP: replacement-char
+{ $description "A code point that replaces input that could not be decoded. The presence of this character in the decoded data usually signifies an error." } ;
+
 ARTICLE: "encodings-descriptors" "Encoding descriptors"
-"An encoding descriptor is something which can be used for input or output streams to encode or decode files. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use are defined in the following vocabularies:"
+"An encoding descriptor is something which can be used for input or output streams to encode or decode bytes stored in a certain representation. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use are defined in the following vocabularies:"
 { $subsection "io.encodings.binary" }
 { $subsection "io.encodings.utf8" }
 { $subsection "io.encodings.utf16" }
@@ -50,17 +93,26 @@ ARTICLE: "encodings-protocol" "Encoding protocol"
 { $subsection encode-char }
 { $see-also "encodings-introduction" } ;
 
-HELP: decode-char
-{ $values { "stream" "an underlying input stream" }
-    { "encoding" "An encoding descriptor tuple" } { "char/f" "a code point or " { $link f } } }
-{ $contract "Reads a single code point from the underlying stream, interpreting it by the encoding." }
-$low-level-note ;
+ARTICLE: "encodings-constructors" "Manually constructing an encoded stream"
+"The following words can be used to construct encoded streams. Note that they are usually not used directly, but rather by the stream constructors themselves. Most stream constructors take an encoding descriptor as a parameter and call these constructors internally."
+{ $subsection <encoder> }
+{ $subsection <decoder> } ;
 
-HELP: encode-char
-{ $values { "char" "a character" }
-    { "stream" "an underlying output stream" }
-    { "encoding" "an encoding descriptor" } }
-{ $contract "Writes the code point in the encoding to the underlying stream given." }
-$low-level-note ;
+ARTICLE: "io.encodings" "I/O encodings"
+"The " { $vocab-link "io.encodings" } " vocabulary provides utilities for encoding and decoding bytes that represent text. Both strings and streams may be encoded."
+{ $subsection "encodings-descriptors" }
+{ $subsection "encodings-constructors" }
+{ $subsection "io.encodings.string" }
+"New types of encodings can be defined:"
+{ $subsection "encodings-protocol" }
+"Setting encodings on the current streams:"
+{ $subsection encode-output }
+{ $subsection decode-input }
+"Setting encodings on streams:"
+{ $subsection re-encode }
+{ $subsection re-decode }
+"Combinators to change the encoding:"
+{ $subsection with-encoded-output }
+{ $subsection with-decoded-input } ;
 
-{ encode-char decode-char } related-words
+ABOUT: "io.encodings"

@@ -95,7 +95,7 @@ M: random-id-generator eval-generator ( singleton -- obj )
         3drop
     ] [
         pick column-name>> 0%
-        >r first2 r> interval-comparison 0%
+        [ first2 ] dip interval-comparison 0%
         bind#
     ] if ;
 
@@ -201,7 +201,7 @@ M: db <count-statement> ( query -- statement )
 
 : create-index ( index-name table-name columns -- )
     [
-        >r >r "create index " % % r> " on " % % r> "(" %
+        [ [ "create index " % % ] dip " on " % % ] 2dip "(" %
         "," join % ")" %
     ] "" make sql-command ;
 

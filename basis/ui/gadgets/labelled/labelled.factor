@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.gadgets.buttons ui.gadgets.borders
 ui.gadgets.labels ui.gadgets.panes ui.gadgets.scrollers
@@ -19,10 +19,10 @@ TUPLE: labelled-gadget < track content ;
 M: labelled-gadget focusable-child* content>> ;
 
 : <labelled-scroller> ( gadget title -- gadget )
-    >r <scroller> r> <labelled-gadget> ;
+    [ <scroller> ] dip <labelled-gadget> ;
 
 : <labelled-pane> ( model quot scrolls? title -- gadget )
-    >r >r <pane-control> r> >>scrolls? r>
+    [ [ <pane-control> ] dip >>scrolls? ] dip
     <labelled-scroller> ;
 
 : <close-box> ( quot -- button/f )

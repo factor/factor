@@ -101,14 +101,17 @@ M: integer nth-unsafe drop ;
 
 INSTANCE: integer immutable-sequence
 
+: first-unsafe
+    0 swap nth-unsafe ; inline
+
 : first2-unsafe
-    [ 0 swap nth-unsafe 1 ] [ nth-unsafe ] bi ; inline
+    [ first-unsafe ] [ 1 swap nth-unsafe ] bi ; inline
 
 : first3-unsafe
-    [ first2-unsafe 2 ] [ nth-unsafe ] bi ; inline
+    [ first2-unsafe ] [ 2 swap nth-unsafe ] bi ; inline
 
 : first4-unsafe
-    [ first3-unsafe 3 ] [ nth-unsafe ] bi ; inline
+    [ first3-unsafe ] [ 3 swap nth-unsafe ] bi ; inline
 
 : exchange-unsafe ( m n seq -- )
     [ tuck [ nth-unsafe ] 2bi@ ]
@@ -774,13 +777,13 @@ PRIVATE>
     tuck [ tail-slice ] 2bi@ ;
 
 : unclip ( seq -- rest first )
-    [ rest ] [ first ] bi ;
+    [ rest ] [ first-unsafe ] bi ;
 
 : unclip-last ( seq -- butlast last )
     [ but-last ] [ peek ] bi ;
 
 : unclip-slice ( seq -- rest-slice first )
-    [ rest-slice ] [ first ] bi ; inline
+    [ rest-slice ] [ first-unsafe ] bi ; inline
 
 : 2unclip-slice ( seq1 seq2 -- rest-slice1 rest-slice2 first1 first2 )
     [ unclip-slice ] bi@ swapd ; inline

@@ -34,6 +34,7 @@ M: ##compare-imm-branch uses-vregs src1>> 1array ;
 M: ##dispatch uses-vregs src>> 1array ;
 M: ##alien-getter uses-vregs src>> 1array ;
 M: ##alien-setter uses-vregs [ src>> ] [ value>> ] bi 2array ;
+M: ##fixnum-overflow uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _compare-imm-branch uses-vregs src1>> 1array ;
 M: insn uses-vregs drop f ;
@@ -43,6 +44,7 @@ UNION: vreg-insn
 ##write-barrier
 ##dispatch
 ##effect
+##fixnum-overflow
 ##conditional-branch
 ##compare-imm-branch
 _conditional-branch

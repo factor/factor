@@ -26,7 +26,7 @@ SYMBOL: tagstack
         swap >>name ;
 
 : make-tag ( string attribs -- tag )
-    >r [ closing-tag? ] keep "/" trim1 r> rot <tag> ;
+    [ [ closing-tag? ] keep "/" trim1 ] dip rot <tag> ;
 
 : make-text-tag ( string -- tag )
     tag new
