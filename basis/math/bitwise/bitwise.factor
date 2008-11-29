@@ -17,6 +17,7 @@ IN: math.bitwise
 : bits ( m n -- m' ) 2^ wrap ; inline
 : mask-bit ( m n -- m' ) 2^ mask ; inline
 : on-bits ( n -- m ) 2^ 1- ; inline
+: toggle-bit ( m n -- m' ) 2^ bitxor ; inline
 
 : shift-mod ( n s w -- n )
     [ shift ] dip 2^ wrap ; inline
