@@ -189,11 +189,11 @@ M: string >ber ( str -- byte-array )
     >byte-array append ;
 
 : >ber-application-string ( n str -- byte-array )
-    >r HEX: 40 + set-tag r> >ber ;
+    [ HEX: 40 + set-tag ] dip >ber ;
 
 GENERIC: >ber-contextspecific ( n obj -- byte-array )
 M: string >ber-contextspecific ( n str -- byte-array )
-    >r HEX: 80 + set-tag r> >ber ;
+    [ HEX: 80 + set-tag ] dip >ber ;
 
 ! =========================================================
 ! Array

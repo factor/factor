@@ -31,7 +31,7 @@ IN: combinators.lib
 ! Generalized versions of core combinators
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: quad ( x p q r s -- ) >r >r >r keep r> keep r> keep r> call ; inline
+: quad ( x p q r s -- ) [ keep ] 3dip [ keep ] 2dip [ keep ] dip call ; inline
 
 : 4slip ( quot a b c d -- a b c d ) 4 nslip ; inline
 
@@ -123,10 +123,10 @@ MACRO: construct-slots ( assoc tuple-class -- tuple )
     >r pick >r with r> r> swapd with ;
 
 : or? ( obj quot1 quot2 -- ? )
-    >r keep r> rot [ 2nip ] [ call ] if* ; inline
+    [ keep ] dip rot [ 2nip ] [ call ] if* ; inline
 
 : and? ( obj quot1 quot2 -- ? )
-    >r keep r> rot [ call ] [ 2drop f ] if ; inline
+    [ keep ] dip rot [ call ] [ 2drop f ] if ; inline
 
 MACRO: multikeep ( word out-indexes -- ... )
     [
@@ -139,7 +139,7 @@ MACRO: multikeep ( word out-indexes -- ... )
     [ drop ] rot compose attempt-all ; inline
 
 : do-while ( pred body tail -- )
-    >r tuck 2slip r> while ; inline
+    [ tuck 2slip ] dip while ; inline
 
 : generate ( generator predicate -- obj )
     [ dup ] swap [ dup [ nip ] unless not ] 3compose
@@ -147,7 +147,7 @@ MACRO: multikeep ( word out-indexes -- ... )
 
 MACRO: predicates ( seq -- quot/f )
     dup [ 1quotation [ drop ] prepend ] map
-    >r [ [ dup ] prepend ] map r> zip [ drop f ] suffix
+    [ [ [ dup ] prepend ] map ] dip zip [ drop f ] suffix
     [ cond ] curry ;
 
 : %chance ( quot n -- ) 100 random > swap when ; inline
