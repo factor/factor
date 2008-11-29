@@ -254,3 +254,10 @@ TUPLE: id obj ;
     { 1 2 3 4 }
     [ { array } declare 2 <groups> length ] compile-call
 ] unit-test
+
+! Oops with new intrinsics
+: fixnum-overflow-control-flow-test ( a b -- c )
+    [ 1 fixnum- ] [ 2 fixnum- ] if 3 fixnum+fast ;
+
+[ 3 ] [ 1 t fixnum-overflow-control-flow-test ] unit-test
+[ 2 ] [ 1 f fixnum-overflow-control-flow-test ] unit-test
