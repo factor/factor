@@ -261,3 +261,6 @@ TUPLE: id obj ;
 
 [ 3 ] [ 1 t fixnum-overflow-control-flow-test ] unit-test
 [ 2 ] [ 1 f fixnum-overflow-control-flow-test ] unit-test
+
+[ 4 ] [ 2 [ dup fixnum* ] compile-call ] unit-test
+[ 7 ] [ 2 [ dup fixnum* 3 fixnum+fast ] compile-call ] unit-test
