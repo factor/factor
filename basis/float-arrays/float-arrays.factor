@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private alien.accessors sequences
 sequences.private math math.private byte-arrays accessors
-alien.c-types parser prettyprint.backend ;
+alien.c-types parser prettyprint.backend combinators ;
 IN: float-arrays
 
 TUPLE: float-array
@@ -66,6 +66,8 @@ M: float-array pprint* pprint-object ;
 
 ! Specializer hints
 USING: hints math.vectors arrays ;
+
+HINTS: <float-array> { 2 } { 3 } ;
 
 HINTS: vneg { array } { float-array } ;
 HINTS: v*n { array object } { float-array float } ;
