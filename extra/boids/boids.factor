@@ -6,18 +6,17 @@ USING: kernel namespaces
        math.order
        math.vectors
        math.trig
-       math.physics.pos
-       math.physics.vel
        combinators arrays sequences random vars
        combinators.lib
        combinators.short-circuit
-       accessors ;
+       accessors
+       flatland ;
 
 IN: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: boid < vel ;
+TUPLE: boid < <vel> ;
 
 C: <boid> boid
 
