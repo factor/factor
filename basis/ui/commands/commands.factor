@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel sequences strings
 math assocs words generic namespaces make assocs quotations
-splitting ui.gestures unicode.case unicode.categories tr ;
+splitting ui.gestures unicode.case unicode.categories tr fry ;
 IN: ui.commands
 
 SYMBOL: +nullary+
@@ -37,7 +37,7 @@ GENERIC: command-word ( command -- word )
         [
             commands>>
             [ drop ] assoc-filter
-            [ [ invoke-command ] curry swap set ] assoc-each
+            [ '[ _ invoke-command ] swap set ] assoc-each
         ] each
     ] H{ } make-assoc ;
 

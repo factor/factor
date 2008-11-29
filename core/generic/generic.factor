@@ -58,8 +58,10 @@ GENERIC: next-method-quot* ( class generic combination -- quot )
         ] bi next-method-quot*
     ] cache ;
 
+ERROR: no-next-method method ;
+
 : (call-next-method) ( method -- )
-    next-method-quot call ;
+    dup next-method-quot [ call ] [ no-next-method ] ?if ;
 
 TUPLE: check-method class generic ;
 

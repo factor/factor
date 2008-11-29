@@ -16,6 +16,7 @@ IN: regexp
         H{ } clone >>nfa-traversal-flags
         H{ } clone >>dfa-traversal-flags
         H{ } clone >>options
+        H{ } clone >>matchers
         reset-regexp ;
 
 : construct-regexp ( regexp -- regexp' )
@@ -92,26 +93,6 @@ IN: regexp
         { "R{ "  "}"  }
         { "R| "  "|"  }
     } swap [ subseq? not nip ] curry assoc-find drop ;
-
-ERROR: unknown-regexp-option option ;
-
-: option>ch ( option -- string )
-    {
-        { case-insensitive [ CHAR: i ] }
-        { multiline [ CHAR: m ] }
-        { reversed-regexp [ CHAR: r ] }
-        { dotall [ CHAR: s ] }
-        [ unknown-regexp-option ]
-    } case ;
-
-: ch>option ( ch -- option )
-    {
-        { CHAR: i [ case-insensitive ] }
-        { CHAR: m [ multiline ] }
-        { CHAR: r [ reversed-regexp ] }
-        { CHAR: s [ dotall ] }
-        [ unknown-regexp-option ]
-    } case ;
 
 : string>options ( string -- options )
     [ ch>option dup ] H{ } map>assoc ;

@@ -29,3 +29,6 @@ IN: math.bitwise.tests
 \ foo must-infer
 
 [ 1 ] [ { 1 } flags ] unit-test
+
+[ 8 ] [ 0 3 toggle-bit ] unit-test
+[ 0 ] [ 8 3 toggle-bit ] unit-test

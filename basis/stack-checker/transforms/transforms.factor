@@ -94,7 +94,10 @@ IN: stack-checker.transforms
         [ "method-class" word-prop ]
         [ "method-generic" word-prop ] bi
         [ inlined-dependency depends-on ] bi@
-    ] [ next-method-quot ] bi
+    ] [
+        [ next-method-quot ]
+        [ '[ _ no-next-method ] ] bi or
+    ] bi
 ] 1 define-transform
 
 ! Constructors

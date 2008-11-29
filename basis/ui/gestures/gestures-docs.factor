@@ -191,6 +191,43 @@ HELP: gesture>string
     { $example "USING: io ui.gestures ;" "T{ key-down f { C+ } \"x\" } gesture>string print" "C+x" }
 } ;
 
+HELP: left-action
+{ $class-description "Gesture sent when the user performs a multi-touch three-finger swipe left." } ;
+
+HELP: right-action
+{ $class-description "Gesture sent when the user performs a multi-touch three-finger swipe right." } ;
+
+HELP: up-action
+{ $class-description "Gesture sent when the user performs a multi-touch three-finger swipe up." } ;
+
+HELP: down-action
+{ $class-description "Gesture sent when the user performs a multi-touch three-finger swipe down." } ;
+
+HELP: zoom-in-action
+{ $class-description "Gesture sent when the user performs a multi-touch two-finger pinch in." } ;
+
+HELP: zoom-out-action
+{ $class-description "Gesture sent when the user performs a multi-touch two-finger pinch out." } ;
+
+ARTICLE: "gesture-differences" "Gesture handling differences between platforms"
+"On Mac OS X, the modifier keys map as follows:"
+{ $table
+    { { $link S+ } "Shift" }
+    { { $link A+ } "Command (Apple)" }
+    { { $link C+ } "Control" }
+    { { $link M+ } "Option" }
+}
+"On Windows and X11:"
+{ $table
+    { { $link S+ } "Shift" }
+    { { $link A+ } "Alt" }
+    { { $link C+ } "Control" }
+    { { $link M+ } "Windows key" }
+}
+"On Windows, " { $link key-up } " gestures are not reported for all keyboard events."
+$nl
+{ $link "multitouch-gestures" } " are only supported on Mac OS X." ;
+
 ARTICLE: "ui-gestures" "UI gestures"
 "User actions such as keyboard input and mouse button clicks deliver " { $emphasis "gestures" } " to gadgets. If the direct receiver of the gesture does not handle it, the gesture is passed on to the receiver's parent, and this way it travels up the gadget hierarchy. Gestures which are not handled at some point are ignored."
 $nl
@@ -207,6 +244,9 @@ $nl
 { $subsection "ui-user-input" }
 "Mouse input:"
 { $subsection "mouse-gestures" }
+{ $subsection "multitouch-gestures" }
+"Guidelines for cross-platform applications:"
+{ $subsection "gesture-differences" }
 "Abstractions built on top of gestures:"
 { $subsection "ui-commands" }
 { $subsection "ui-operations" } ;
@@ -300,6 +340,18 @@ $nl
 { $subsection mouse-scroll }
 "Global variable set when a mouse scroll wheel gesture is sent:"
 { $subsection scroll-direction } ;
+
+ARTICLE: "multitouch-gestures" "Multi-touch gestures"
+"Multi-touch gestures are only supported on Mac OS X with newer MacBook and MacBook Pro models."
+$nl
+"Three-finger swipe:"
+{ $subsection left-action }
+{ $subsection right-action }
+{ $subsection up-action }
+{ $subsection down-action }
+"Two-finger pinch:"
+{ $subsection zoom-in-action }
+{ $subsection zoom-out-action } ;
 
 ARTICLE: "action-gestures" "Action gestures"
 "Action gestures exist to keep keyboard shortcuts for common clipboard operations consistent."

@@ -12,6 +12,11 @@ void primitive_float_to_fixnum(void);
 void primitive_fixnum_add(void);
 void primitive_fixnum_subtract(void);
 void primitive_fixnum_multiply(void);
+
+DLLEXPORT F_FASTCALL void overflow_fixnum_add(F_FIXNUM x, F_FIXNUM y);
+DLLEXPORT F_FASTCALL void overflow_fixnum_subtract(F_FIXNUM x, F_FIXNUM y);
+DLLEXPORT F_FASTCALL void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y);
+
 void primitive_fixnum_divint(void);
 void primitive_fixnum_divmod(void);
 void primitive_fixnum_shift(void);

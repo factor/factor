@@ -23,8 +23,8 @@ M: x86.32 machine-registers
 M: x86.32 ds-reg ESI ;
 M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
-M: x86.32 temp-reg-1 EAX ;
-M: x86.32 temp-reg-2 ECX ;
+M: x86.32 temp-reg-1 ECX ;
+M: x86.32 temp-reg-2 EDX ;
 
 M:: x86.32 %dispatch ( src temp offset -- )
     ! Load jump table base.
@@ -38,11 +38,17 @@ M:: x86.32 %dispatch ( src temp offset -- )
     [ align-code ]
     bi ;
 
+! Registers for fastcall
+M: x86.32 param-reg-1 EAX ;
+M: x86.32 param-reg-2 EDX ;
+
 M: x86.32 reserved-area-size 0 ;
 
 M: x86.32 %alien-global 0 [] MOV rc-absolute-cell rel-dlsym ;
 
 M: x86.32 %alien-invoke (CALL) rel-dlsym ;
+
+M: x86.32 %alien-invoke-tail (JMP) rel-dlsym ;
 
 M: x86.32 struct-small-enough? ( size -- ? )
     heap-size { 1 2 4 8 } member?

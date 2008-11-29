@@ -3,10 +3,17 @@
 USING: kernel math math.bitwise combinators.lib math.parser
 random sequences sequences.lib continuations namespaces
 io.files io arrays io.files.unique.backend system
-combinators vocabs.loader ;
+combinators vocabs.loader fry ;
 IN: io.files.unique
 
+SYMBOL: unique-length
+SYMBOL: unique-retries
+
+10 unique-length set-global
+10 unique-retries set-global
+
 <PRIVATE
+
 : random-letter ( -- ch )
     26 random { CHAR: a CHAR: A } random + ;
 
@@ -17,29 +24,27 @@ IN: io.files.unique
 : random-name ( n -- string )
     [ random-ch ] "" replicate-as ;
 
-: unique-length ( -- n ) 10 ; inline
-: unique-retries ( -- n ) 10 ; inline
 PRIVATE>
 
 : make-unique-file ( prefix suffix -- path )
     temporary-path -rot
     [
-        unique-length random-name swap 3append append-path
+        unique-length get random-name swap 3append append-path
         dup (make-unique-file)
-    ] 3curry unique-retries retry ;
+    ] 3curry unique-retries get retry ;
 
-: with-unique-file ( prefix suffix quot -- )
-    >r make-unique-file r> keep delete-file ; inline
+: with-unique-file ( prefix suffix quot: ( path -- ) -- )
+    [ make-unique-file ] dip [ delete-file ] bi ; inline
 
 : make-unique-directory ( -- path )
     [
-        temporary-path unique-length random-name append-path
+        temporary-path unique-length get random-name append-path
         dup make-directory
-    ] unique-retries retry ;
+    ] unique-retries get retry ;
 
-: with-unique-directory ( quot -- )
-    >r make-unique-directory r>
-    [ with-directory ] curry keep delete-tree ; inline
+: with-unique-directory ( quot: ( -- ) -- )
+    [ make-unique-directory ] dip
+    '[ _ with-directory ] [ delete-tree ] bi ; inline
 
 {
     { [ os unix? ] [ "io.unix.files.unique" ] }

@@ -19,8 +19,8 @@ IN: regexp.parser
 [ ] [ "(?:a)" test-regexp ] unit-test
 [ ] [ "(?i:a)" test-regexp ] unit-test
 [ ] [ "(?-i:a)" test-regexp ] unit-test
-[ "(?z:a)" test-regexp ] [ bad-option? ] must-fail-with
-[ "(?-z:a)" test-regexp ] [ bad-option? ] must-fail-with
+[ "(?z:a)" test-regexp ] [ unknown-regexp-option? ] must-fail-with
+[ "(?-z:a)" test-regexp ] [ unknown-regexp-option? ] must-fail-with
 
 [ ] [ "(?=a)" test-regexp ] unit-test
 

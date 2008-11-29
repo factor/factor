@@ -40,6 +40,9 @@ PREDICATE: string-type < pair
 
 M: string-type c-type ;
 
+M: string-type c-type-class
+    drop object ;
+
 M: string-type heap-size
     drop "void*" heap-size ;
 

@@ -1,7 +1,8 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors math namespaces opengl opengl.gl sequences
-math.vectors ui.gadgets ui.gadgets.grids ui.render math.geometry.rect ;
+USING: kernel accessors math namespaces opengl opengl.gl
+sequences math.vectors ui.gadgets ui.gadgets.grids ui.render
+math.geometry.rect fry ;
 IN: ui.gadgets.grid-lines
 
 TUPLE: grid-lines color ;
@@ -19,8 +20,8 @@ SYMBOL: grid-dim
 
 : draw-grid-lines ( gaps orientation -- )
     [ grid get swap grid-positions grid get rect-dim suffix ] dip
-    [ [ v- ] curry map ] keep
-    [ swap grid-line-from/to gl-line ] curry each ;
+    [ '[ _ v- ] map ] keep
+    '[ _ swap grid-line-from/to gl-line ] each ;
 
 M: grid-lines draw-boundary
     color>> gl-color [

@@ -75,12 +75,6 @@ ARTICLE: "fry.philosophy" "Fried quotation philosophy"
     "[let | a [ ] b [ ] | [ 3 a + 4 b / ] ]"
 } ;
 
-ARTICLE: "fry.limitations" "Fried quotation limitations"
-"As with " { $vocab-link "locals" } ", fried quotations cannot contain " { $link >r } " and " { $link r> } ". This is not a real limitation in practice, since " { $link dip } " can be used instead."
-$nl
-"An error thrown if a fried quotation contains calls to " { $link >r } " and " { $link r> } ":"
-{ $subsection >r/r>-in-fry-error } ;
-
 ARTICLE: "fry" "Fried quotations"
 "The " { $vocab-link "fry" } " vocabulary implements " { $emphasis "fried quotation" } ". Conceptually, fried quotations are quotations with ``holes'' (more formally, " { $emphasis "fry specifiers" } "), and the holes are filled in when the fried quotation is pushed on the stack."
 $nl
@@ -92,7 +86,6 @@ $nl
 "The holes are filled in with the top of stack going in the rightmost hole, the second item on the stack going in the second hole from the right, and so on."
 { $subsection "fry.examples" }
 { $subsection "fry.philosophy" }
-{ $subsection "fry.limitations" }
 "Fry is implemented as a parsing word which reads a quotation and scans for occurrences of " { $link _ } " and " { $link @ } "; these words are not actually executed, and doing so raises an error (this can happen if they're accidentally used outside of a fry)."
 $nl
 "Fried quotations can also be constructed without using a parsing word; this is useful when meta-programming:"
