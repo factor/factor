@@ -36,6 +36,7 @@
 (require 'font-lock)
 (require 'comint)
 (require 'view)
+(require 'ring)
 
 ;;; Customization:
 
@@ -165,6 +166,15 @@ buffer."
 (defface factor-font-lock-help-mode-headlines '((t (:bold t :weight bold)))
   "Face for headlines in help buffers."
   :group 'factor-faces)
+
+
+;;; Compatibility
+(when (not (fboundp 'ring-member))
+  (defun ring-member (ring item)
+    (catch 'found
+      (dotimes (ind (ring-length ring) nil)
+        (when (equal item (ring-ref ring ind))
+          (throw 'found ind))))))
 
 
 ;;; Factor mode font lock:
@@ -625,7 +635,43 @@ buffer."
   (factor--with-vocab vocab
     (factor--listener-send-cmd cmd)))
 
-;;;;; Interface: see
+
+;;;;; Buffer cycling and docs
+
+
+(defconst factor--cycle-endings
+  '(".factor" "-tests.factor" "-docs.factor"))
+
+(defconst factor--regex-cycle-endings
+  (format "\\(.*?\\)\\(%s\\)$"
+          (regexp-opt factor--cycle-endings)))
+
+(defconst factor--cycle-endings-ring
+  (let ((ring (make-ring (length factor--cycle-endings))))
+    (dolist (e factor--cycle-endings ring)
+      (ring-insert ring e))))
+
+(defun factor--cycle-next (file)
+  (let* ((match (string-match factor--regex-cycle-endings file))
+         (base (and match (match-string-no-properties 1 file)))
+         (ending (and match (match-string-no-properties 2 file)))
+         (idx (and ending (ring-member factor--cycle-endings-ring ending)))
+         (gfl (lambda (i) (concat base (ring-ref factor--cycle-endings-ring i)))))
+    (if (not idx) file
+      (let ((l (length factor--cycle-endings)) (i 1) next)
+        (while (and (not next) (< i l))
+          (when (file-exists-p (funcall gfl (+ idx i)))
+            (setq next (+ idx i)))
+          (setq i (1+ i)))
+        (funcall gfl (or next idx))))))
+
+(defun factor-visit-other-file (&optional file)
+  "Cycle between code, tests and docs factor files."
+  (interactive)
+  (find-file (factor--cycle-next (or file (buffer-file-name)))))
+
+
+;;;;; Interface: See
 
 (defconst factor--regex-error-marker "^Type :help for debugging")
 (defconst factor--regex-data-stack "^--- Data stack:")
@@ -848,6 +894,7 @@ vocabularies which have been modified on disk."
 (factor--define-key ?s 'factor-see t)
 (factor--define-key ?e 'factor-edit)
 (factor--define-key ?z 'switch-to-factor t)
+(factor--define-key ?o 'factor-visit-other-file)
 (factor--define-key ?c 'comment-region)
 
 (factor--define-auto-indent-key ?\])
