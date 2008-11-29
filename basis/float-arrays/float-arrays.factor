@@ -64,29 +64,29 @@ M: float-array pprint-delims drop \ F{ \ } ;
 M: float-array >pprint-sequence ;
 M: float-array pprint* pprint-object ;
 
-! Rice
+! Specializer hints
 USING: hints math.vectors arrays ;
 
-HINTS: vneg { float-array } { array } ;
-HINTS: v*n { float-array float } { array object } ;
-HINTS: n*v { float float-array } { array object } ;
-HINTS: v/n { float-array float } { array object } ;
-HINTS: n/v { float float-array } { object array } ;
-HINTS: v+ { float-array float-array } { array array } ;
-HINTS: v- { float-array float-array } { array array } ;
-HINTS: v* { float-array float-array } { array array } ;
-HINTS: v/ { float-array float-array } { array array } ;
-HINTS: vmax { float-array float-array } { array array } ;
-HINTS: vmin { float-array float-array } { array array } ;
-HINTS: v. { float-array float-array } { array array } ;
-HINTS: norm-sq { float-array } { array } ;
-HINTS: norm { float-array } { array } ;
-HINTS: normalize { float-array } { array } ;
+HINTS: vneg { array } { float-array } ;
+HINTS: v*n { array object } { float-array float } ;
+HINTS: n*v { array object } { float float-array } ;
+HINTS: v/n { array object } { float-array float } ;
+HINTS: n/v { object array } { float float-array } ;
+HINTS: v+ { array array } { float-array float-array } ;
+HINTS: v- { array array } { float-array float-array } ;
+HINTS: v* { array array } { float-array float-array } ;
+HINTS: v/ { array array } { float-array float-array } ;
+HINTS: vmax { array array } { float-array float-array } ;
+HINTS: vmin { array array } { float-array float-array } ;
+HINTS: v. { array array } { float-array float-array } ;
+HINTS: norm-sq { array } { float-array } ;
+HINTS: norm { array } { float-array } ;
+HINTS: normalize { array } { float-array } ;
+HINTS: distance { array array } { float-array float-array } ;
 
-! More rice. Experimental, currently causes a slowdown in raytracer
-! for some odd reason.
-
-USING: words classes.algebra compiler.tree.propagation.info ;
+! Type functions
+USING: words classes.algebra compiler.tree.propagation.info
+math.intervals ;
 
 { v+ v- v* v/ vmax vmin } [
     [
@@ -114,10 +114,15 @@ USING: words classes.algebra compiler.tree.propagation.info ;
 ] each
 
 \ norm-sq [
-    class>> float-array class<= float object ? <class-info>
+    class>> float-array class<= [ float 0. 1/0. [a,b] <class/interval-info> ] [ object-info ] if
 ] "outputs" set-word-prop
 
 \ v. [
     [ class>> float-array class<= ] both?
     float object ? <class-info>
+] "outputs" set-word-prop
+
+\ distance [
+    [ class>> float-array class<= ] both?
+    [ float 0. 1/0. [a,b] <class/interval-info> ] [ object-info ] if
 ] "outputs" set-word-prop
