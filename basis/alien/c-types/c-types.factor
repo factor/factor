@@ -52,7 +52,7 @@ GENERIC: c-type ( name -- type ) foldable
 
 : parse-array-type ( name -- array )
     "[" split unclip
-    >r [ "]" ?tail drop string>number ] map r> prefix ;
+    [ [ "]" ?tail drop string>number ] map ] dip prefix ;
 
 M: string c-type ( name -- type )
     CHAR: ] over member? [
@@ -215,13 +215,13 @@ M: byte-array byte-length length ;
     ] [ ] make define-inline ;
 
 : nth-word ( name vocab -- word )
-    >r "-nth" append r> create ;
+    [ "-nth" append ] dip create ;
 
 : define-nth ( name vocab -- )
     dupd nth-word swap dup c-getter (define-nth) ;
 
 : set-nth-word ( name vocab -- word )
-    >r "set-" swap "-nth" 3append r> create ;
+    [ "set-" swap "-nth" 3append ] dip create ;
 
 : define-set-nth ( name vocab -- )
     dupd set-nth-word swap dup c-setter (define-nth) ;
@@ -229,7 +229,7 @@ M: byte-array byte-length length ;
 : typedef ( old new -- ) c-types get set-at ;
 
 : define-c-type ( type name vocab -- )
-    >r tuck typedef r> [ define-nth ] 2keep define-set-nth ;
+    [ tuck typedef ] dip [ define-nth ] 2keep define-set-nth ;
 
 TUPLE: long-long-type < c-type ;
 
@@ -249,12 +249,12 @@ M: long-long-type box-return ( type -- )
     f swap box-parameter ;
 
 : define-deref ( name vocab -- )
-    >r dup CHAR: * prefix r> create
+    [ dup CHAR: * prefix ] dip create
     swap c-getter 0 prefix define-inline ;
 
 : define-out ( name vocab -- )
     over [ <c-object> tuck 0 ] over c-setter append swap
-    >r >r constructor-word r> r> prefix define-inline ;
+    [ constructor-word ] 2dip prefix define-inline ;
 
 : c-bool> ( int -- ? )
     zero? not ;
@@ -267,7 +267,7 @@ M: long-long-type box-return ( type -- )
     dupd set-nth-word [ >c-array ] 2curry ;
 
 : to-array-word ( name vocab -- word )
-    >r ">c-" swap "-array" 3append r> create ;
+    [ ">c-" swap "-array" 3append ] dip create ;
 
 : define-to-array ( type vocab -- )
     [ to-array-word ] 2keep >c-array-quot
@@ -281,7 +281,7 @@ M: long-long-type box-return ( type -- )
     ] [ ] make ;
 
 : from-array-word ( name vocab -- word )
-    >r "c-" swap "-array>" 3append r> create ;
+    [ "c-" swap "-array>" 3append ] dip create ;
 
 : define-from-array ( type vocab -- )
     [ from-array-word ] 2keep c-array>quot
@@ -299,11 +299,13 @@ M: long-long-type box-return ( type -- )
 
 : expand-constants ( c-type -- c-type' )
     dup array? [
-        unclip >r [
-            dup word? [
-                def>> { } swap with-datastack first
-            ] when
-        ] map r> prefix
+        unclip [
+            [
+                dup word? [
+                    def>> { } swap with-datastack first
+                ] when
+            ] map
+        ] dip prefix
     ] when ;
 
 : malloc-file-contents ( path -- alien len )
