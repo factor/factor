@@ -260,7 +260,7 @@ M: #terminate emit-node drop stop-iterating ;
 
 : emit-alien-node ( node quot -- next )
     [ params>> ] dip [ drop alien-stack-frame ] [ call ] 2bi
-    begin-basic-block iterate-next ; inline
+    ##branch begin-basic-block iterate-next ; inline
 
 M: #alien-invoke emit-node
     [ ##alien-invoke ] emit-alien-node ;

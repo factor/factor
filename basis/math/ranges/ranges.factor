@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel layouts math math.order namespaces sequences
 sequences.private accessors ;
 IN: math.ranges
@@ -8,9 +10,7 @@ TUPLE: range
 { step read-only } ;
 
 : <range> ( a b step -- range )
-    [ over - ] dip
-    [ / 1+ 0 max >integer ] keep
-    range boa ; inline
+    [ over - ] dip [ /i 1+ 0 max ] keep range boa ; inline
 
 M: range length ( seq -- n )
     length>> ;

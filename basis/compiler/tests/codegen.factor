@@ -262,5 +262,17 @@ TUPLE: id obj ;
 [ 3 ] [ 1 t fixnum-overflow-control-flow-test ] unit-test
 [ 2 ] [ 1 f fixnum-overflow-control-flow-test ] unit-test
 
+! LOL
+: blah ( a -- b )
+    { float } declare dup 0 =
+    [ drop 1 ] [
+        dup 0 >=
+        [ 2 "double" "libm" "pow" { "double" "double" } alien-invoke ]
+        [ -0.5 "double" "libm" "pow" { "double" "double" } alien-invoke ]
+        if
+    ] if ;
+
+[ 4.0 ] [ 2.0 blah ] unit-test
+
 [ 4 ] [ 2 [ dup fixnum* ] compile-call ] unit-test
 [ 7 ] [ 2 [ dup fixnum* 3 fixnum+fast ] compile-call ] unit-test
