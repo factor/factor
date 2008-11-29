@@ -102,5 +102,6 @@ HINTS: inertia body ;
 HINTS: newton's-law body body ;
 HINTS: nbody fixnum ;
 
-: nbody-main ( -- )
-    1000000 nbody ;
+: nbody-main ( -- ) 1000000 nbody ;
+
+MAIN: nbody-main
