@@ -239,7 +239,6 @@ buffer."
     (,factor--regex-constructor . 'factor-font-lock-constructor)
     (,factor--regex-setter . 'factor-font-lock-setter-word)
     (,factor--regex-symbol-definition 2 'factor-font-lock-symbol-definition)
-    (,factor--regex-using-lines 1 'factor-font-lock-vocabulary-name)
     (,factor--regex-use-line 1 'factor-font-lock-vocabulary-name))
   "Font lock keywords definition for Factor mode.")
 
