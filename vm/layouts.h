@@ -104,7 +104,8 @@ typedef struct {
 /* The compiled code heap is structured into blocks. */
 typedef struct
 {
-	CELL type; /* this is WORD_TYPE or QUOTATION_TYPE */
+	char type; /* this is WORD_TYPE or QUOTATION_TYPE */
+	char last_scan; /* the youngest generation in which this block's literals may live */
 	CELL code_length; /* # bytes */
 	CELL literals_length; /* # bytes */
 	CELL relocation; /* tagged pointer to byte-array or f */

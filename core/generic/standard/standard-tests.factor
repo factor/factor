@@ -200,7 +200,7 @@ M: ceo salary
 [ T{ inconsistent-next-method f ceo salary } = ] must-fail-with
 
 [ intern boa salary ]
-[ T{ no-next-method f intern salary } = ] must-fail-with
+[ no-next-method? ] must-fail-with
 
 ! Weird shit
 TUPLE: a ;

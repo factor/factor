@@ -224,13 +224,13 @@ SYMBOL: dlist
 
 : delete-dlist ( -- ) dlist get [ dlist get 1 glDeleteLists dlist off ] when ;
 
-: cfdg-window* ( -- )
+: cfdg-window* ( -- slate )
   C[ display ] <slate>
     { 500 500 }       >>pdim
     C[ delete-dlist ] >>ungraft
   dup "CFDG" open-window ;
 
-: cfdg-window ( -- ) [ cfdg-window* ] with-ui ;
+: cfdg-window ( -- slate ) [ cfdg-window* ] with-ui ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

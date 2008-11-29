@@ -7,7 +7,7 @@ quotations sequences strings threads listener classes.tuple
 ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.status-bar
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures
 definitions calendar concurrency.flags concurrency.mailboxes
-ui.tools.workspace accessors sets destructors ;
+ui.tools.workspace accessors sets destructors fry ;
 IN: ui.tools.interactor
 
 ! If waiting is t, we're waiting for user input, and invoking
@@ -88,7 +88,7 @@ M: interactor model-changed
     [ editor-string ] keep
     [ interactor-input. ] 2keep
     [ add-interactor-history ] keep
-    [ clear-input ] curry "Clearing input" spawn drop ;
+    '[ _ clear-input ] "Clearing input" spawn drop ;
 
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
@@ -126,7 +126,7 @@ M: interactor stream-read
     swap dup zero? [
         2drop ""
     ] [
-        >r interactor-read dup [ "\n" join ] when r> short head
+        [ interactor-read dup [ "\n" join ] when ] dip short head
     ] if ;
 
 M: interactor stream-read-partial
@@ -164,7 +164,7 @@ M: interactor dispose drop ;
 : handle-interactive ( lines interactor -- quot/f ? )
     tuck try-parse {
         { [ dup quotation? ] [ nip t ] }
-        { [ dup not ] [ drop "\n" swap user-input f f ] }
+        { [ dup not ] [ drop "\n" swap user-input* drop f f ] }
         [ handle-parse-error f f ]
     } cond ;
 
@@ -177,10 +177,6 @@ M: interactor stream-read-quot
             [ interactor-finish ] [ nip stream-read-quot ] if
         ]
     } cond ;
-
-M: interactor pref-dim*
-    [ line-height 4 * 0 swap 2array ] [ call-next-method ] bi
-    vmax ;
 
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }

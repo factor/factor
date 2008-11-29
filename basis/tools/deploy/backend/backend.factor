@@ -55,6 +55,8 @@ DEFER: ?make-staging-image
 
 : staging-command-line ( profile -- flags )
     [
+        "-staging" ,
+
         dup empty? [
             "-i=" my-boot-image-name append ,
         ] [

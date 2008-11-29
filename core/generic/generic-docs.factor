@@ -162,6 +162,22 @@ HELP: forget-methods
 { sort-classes order } related-words
 
 HELP: (call-next-method)
-{ $values { "class" class } { "generic" generic } }
+{ $values { "method" method-body } }
 { $description "Low-level word implementing " { $link POSTPONE: call-next-method } "." }
 { $notes "In most cases, " { $link POSTPONE: call-next-method } " should be used instead." } ;
+
+HELP: no-next-method
+{ $error-description "Thrown by " { $link POSTPONE: call-next-method } " if the current method is already the least specific method." }
+{ $examples
+    "The following code throws this error:"
+    { $code
+        "GENERIC: error-test ( object -- )"
+        ""
+        "M: number error-test 3 + call-next-method ;"
+        ""
+        "M: integer error-test recip call-next-method ;"
+        ""
+        "123 error-test"
+    }
+    "This results in the method on " { $link integer } " being called, which then calls the method on " { $link number } ". The latter then calls " { $link POSTPONE: call-next-method } ", however there is no method less specific than the method on " { $link number } " and so an error is thrown."
+} ;

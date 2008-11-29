@@ -9,7 +9,7 @@ USING: accessors kernel threads combinators concurrency.mailboxes
        ui.gadgets.tabs ui.gadgets.grids ui.gadgets.packs ui.gadgets.labels
        io io.styles namespaces calendar calendar.format models continuations
        irc.client irc.client.private irc.messages
-       irc.ui.commandparser irc.ui.load ;
+       irc.ui.commandparser irc.ui.load vocabs.loader ;
 
 RENAME: join sequences => sjoin
 
@@ -245,3 +245,5 @@ M: irc-tab pref-dim*
 : main-run ( -- ) run-ircui ;
 
 MAIN: main-run
+
+"irc.ui.commands" require

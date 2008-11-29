@@ -25,7 +25,7 @@ M: fixnum + fixnum+ ;
 M: fixnum - fixnum- ;
 M: fixnum * fixnum* ;
 M: fixnum /i fixnum/i ;
-M: fixnum /f >r >float r> >float float/f ;
+M: fixnum /f [ >float ] dip >float float/f ;
 
 M: fixnum mod fixnum-mod ;
 
@@ -41,7 +41,7 @@ M: fixnum bitnot fixnum-bitnot ;
 M: fixnum bit? neg shift 1 bitand 0 > ;
 
 : (fixnum-log2) ( accum n -- accum )
-    dup 1 number= [ drop ] [ >r 1+ r> 2/ (fixnum-log2) ] if ;
+    dup 1 number= [ drop ] [ [ 1+ ] [ 2/ ] bi* (fixnum-log2) ] if ;
     inline recursive
 
 M: fixnum (log2) 0 swap (fixnum-log2) ;
@@ -94,7 +94,7 @@ M: bignum (log2) bignum-log2 ;
 
 : pre-scale ( num den -- scale shifted-num scaled-den )
     2dup [ log2 ] bi@ -
-    tuck [ neg 54 + shift ] [ >r scale-denonimator r> + ] 2bi*
+    tuck [ neg 54 + shift ] [ [ scale-denonimator ] dip + ] 2bi*
     -rot ; inline
 
 ! Second step: loop
@@ -103,7 +103,7 @@ M: bignum (log2) bignum-log2 ;
 
 : /f-loop ( scale mantissa den -- scale' fraction-and-guard rem )
     [ 2dup /i log2 53 > ]
-    [ >r shift-mantissa r> ]
+    [ [ shift-mantissa ] dip ]
     [ ] while /mod ; inline
 
 ! Third step: post-scaling
@@ -111,7 +111,7 @@ M: bignum (log2) bignum-log2 ;
     52 2^ 1- bitand 1022 52 shift bitor bits>double ; inline
 
 : scale-float ( scale mantissa -- float' )
-    >r dup 0 < [ neg 2^ recip ] [ 2^ ] if r> * ; inline
+    [ dup 0 < [ neg 2^ recip ] [ 2^ ] if ] dip * ; inline
 
 : post-scale ( scale mantissa -- n )
     2/ dup log2 52 > [ shift-mantissa ] when

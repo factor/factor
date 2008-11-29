@@ -71,7 +71,7 @@ IN: vectors.tests
 
 [ t ] [
     V{ 1 2 3 4 } dup underlying>> length
-    >r clone underlying>> length r>
+    [ clone underlying>> length ] dip
     =
 ] unit-test
 
@@ -91,7 +91,7 @@ IN: vectors.tests
 [ 4 ] [ 5 V{ 1 2 3 4 5 } index ] unit-test
 
 [ t ] [
-    100 >array dup >vector <reversed> >array >r reverse r> =
+    100 >array dup >vector <reversed> >array [ reverse ] dip =
 ] unit-test
 
 [ fixnum ] [ 1 >bignum V{ } new-sequence length class ] unit-test

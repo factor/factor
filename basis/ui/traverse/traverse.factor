@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors namespaces make sequences kernel math arrays io
 ui.gadgets generic combinators ;
@@ -7,7 +7,7 @@ IN: ui.traverse
 TUPLE: node value children ;
 
 : traverse-step ( path gadget -- path' gadget' )
-    >r unclip r> children>> ?nth ;
+    [ unclip ] dip children>> ?nth ;
 
 : make-node ( quot -- ) { } make node boa , ; inline
 
@@ -43,7 +43,7 @@ TUPLE: node value children ;
     traverse-step traverse-from-path ;
 
 : (traverse-middle) ( frompath topath gadget -- )
-    >r >r first 1+ r> first r> children>> <slice> % ;
+    [ first 1+ ] [ first ] [ children>> ] tri* <slice> % ;
 
 : traverse-post ( topath gadget -- )
     traverse-step traverse-to-path ;
@@ -59,8 +59,8 @@ TUPLE: node value children ;
 DEFER: (gadget-subtree)
 
 : traverse-child ( frompath topath gadget -- )
-    dup -roll [
-        >r >r rest-slice r> r> traverse-step (gadget-subtree)
+    [ -rot ] keep [
+        [ rest-slice ] 2dip traverse-step (gadget-subtree)
     ] make-node ;
 
 : (gadget-subtree) ( frompath topath gadget -- )

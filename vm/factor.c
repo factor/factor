@@ -91,7 +91,7 @@ void init_factor(F_PARAMETERS *p)
 	if(p->image == NULL)
 		p->image = default_image_path();
 
-	srand(current_millis());
+	srand(current_micros());
 	init_ffi();
 	init_stacks(p->ds_size,p->rs_size);
 	load_image(p);
@@ -216,8 +216,8 @@ void factor_yield(void)
 	callback();
 }
 
-void factor_sleep(long ms)
+void factor_sleep(long us)
 {
 	void (*callback)() = alien_offset(userenv[SLEEP_CALLBACK_ENV]);
-	callback(ms);
+	callback(us);
 }

@@ -129,7 +129,7 @@ void print_nested_obj(CELL obj, F_FIXNUM nesting)
 		print_string(" ]");
 		break;
 	default:
-		print_string("#<type "); print_cell(type_of(obj)); print_string(" @ "); print_cell_hex(obj);
+		print_string("#<type "); print_cell(type_of(obj)); print_string(" @ "); print_cell_hex(obj); print_string(">");
 		break;
 	}
 }
@@ -167,7 +167,9 @@ void print_stack_frame(F_STACK_FRAME *frame)
 	print_obj(frame_scan(frame));
 	print_string("\n");
 	print_cell_hex((CELL)frame_executing(frame));
+	print_string(" ");
 	print_cell_hex((CELL)frame->xt);
+	print_string("\n");
 }
 
 void print_callstack(void)

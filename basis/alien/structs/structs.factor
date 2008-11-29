@@ -9,6 +9,8 @@ TUPLE: struct-type size align fields ;
 
 M: struct-type heap-size size>> ;
 
+M: struct-type c-type-class drop object ;
+
 M: struct-type c-type-align align>> ;
 
 M: struct-type c-type-stack-align? drop f ;

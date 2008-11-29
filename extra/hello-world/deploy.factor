@@ -7,9 +7,8 @@ H{
     { deploy-name "Hello world (console)" }
     { deploy-word-defs? f }
     { "stop-after-last-window?" t }
-    { deploy-compiler? t }
     { deploy-ui? f }
-    { deploy-threads? f }
+    { deploy-compiler? f }
     { deploy-io 2 }
     { deploy-c-types? f }
 }

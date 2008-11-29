@@ -8,7 +8,7 @@ SYMBOL: io-backend
 
 SINGLETON: c-io-backend
 
-c-io-backend io-backend set-global
+io-backend global [ c-io-backend or ] change-at
 
 HOOK: init-io io-backend ( -- )
 
@@ -20,7 +20,7 @@ HOOK: (init-stdio) io-backend ( -- stdin stdout stderr )
     [ utf8 <encoder> output-stream set-global ]
     [ utf8 <encoder> error-stream set-global ] tri* ;
 
-HOOK: io-multiplex io-backend ( ms -- )
+HOOK: io-multiplex io-backend ( us -- )
 
 HOOK: normalize-directory io-backend ( str -- newstr )
 

@@ -5,7 +5,7 @@ command-line kernel memory namespaces cocoa.messages
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
 cocoa.windows cocoa.classes cocoa.application sequences system
 ui ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
-ui.cocoa.views core-foundation threads math.geometry.rect ;
+ui.cocoa.views core-foundation threads math.geometry.rect fry ;
 IN: ui.cocoa
 
 TUPLE: handle view window ;
@@ -15,9 +15,7 @@ C: <handle> handle
 SINGLETON: cocoa-ui-backend
 
 M: cocoa-ui-backend do-events ( -- )
-    [
-        [ NSApp [ do-event ] curry loop ui-wait ] ui-try
-    ] with-autorelease-pool ;
+    [ NSApp '[ _ do-event ] loop ui-wait ] with-autorelease-pool ;
 
 TUPLE: pasteboard handle ;
 

@@ -30,7 +30,7 @@ ERROR: no-world-found ;
 
 : (request-focus) ( child world ? -- )
     pick parent>> pick eq? [
-        >r >r dup parent>> dup r> r>
+        [ dup parent>> dup ] 2dip
         [ (request-focus) ] keep
     ] unless focus-child ;
 
@@ -52,7 +52,7 @@ M: world request-focus-on ( child gadget -- )
 M: world layout*
     dup call-next-method
     dup glass>> [
-        >r dup rect-dim r> (>>dim)
+        [ dup rect-dim ] dip (>>dim)
     ] when* drop ;
 
 M: world focusable-child* gadget-child ;
@@ -80,7 +80,7 @@ SYMBOL: ui-error-hook
 : ui-error ( error -- )
     ui-error-hook get [ call ] [ print-error ] if* ;
 
-[ rethrow ] ui-error-hook set-global
+ui-error-hook global [ [ rethrow ] or ] change-at
 
 : draw-world ( world -- )
     dup draw-world? [
@@ -103,9 +103,28 @@ world H{
     { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
     { T{ button-down f { C+ } 1 } [ drop T{ button-down f f 3 } button-gesture ] }
     { T{ button-down f { A+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
+    { T{ button-down f { M+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
     { T{ button-up f { C+ } 1 } [ drop T{ button-up f f 3 } button-gesture ] }
     { T{ button-up f { A+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
+    { T{ button-up f { M+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
 } set-gestures
+
+PREDICATE: specific-button-up < button-up #>> ;
+PREDICATE: specific-button-down < button-down #>> ;
+PREDICATE: specific-drag < drag #>> ;
+
+: generalize-gesture ( gesture -- )
+    clone f >># button-gesture ;
+
+M: world handle-gesture ( gesture gadget -- ? )
+    2dup call-next-method [
+        {
+            { [ over specific-button-up? ] [ drop generalize-gesture f ] }
+            { [ over specific-button-down? ] [ drop generalize-gesture f ] }
+            { [ over specific-drag? ] [ drop generalize-gesture f ] }
+            [ 2drop t ]
+        } cond
+    ] [ 2drop f ] if ;
 
 : close-global ( world global -- )
     dup get-global find-world rot eq?

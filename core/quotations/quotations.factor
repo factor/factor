@@ -49,7 +49,10 @@ M: wrapper literalize <wrapper> ;
 M: curry length quot>> length 1+ ;
 
 M: curry nth
-    over zero? [ nip obj>> literalize ] [ >r 1- r> quot>> nth ] if ;
+    over 0 =
+    [ nip obj>> literalize ]
+    [ [ 1- ] dip quot>> nth ]
+    if ;
 
 INSTANCE: curry immutable-sequence
 

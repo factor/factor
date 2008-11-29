@@ -10,7 +10,7 @@ IN: parser
 
 : location ( -- loc )
     file get lexer get line>> 2dup and
-    [ >r path>> r> 2array ] [ 2drop f ] if ;
+    [ [ path>> ] dip 2array ] [ 2drop f ] if ;
 
 : save-location ( definition -- )
     location remember-definition ;
@@ -25,7 +25,7 @@ t parser-notes set-global
 : note. ( str -- )
     parser-notes? [
         file get [ path>> write ":" write ] when* 
-        lexer get line>> number>string write ": " write
+        lexer get [ line>> number>string write ": " write ] when*
         "Note: " write dup print
     ] when drop ;
 
@@ -52,7 +52,12 @@ SYMBOL: in
 
 M: parsing-word stack-effect drop (( parsed -- parsed )) ;
 
-ERROR: no-current-vocab ;
+TUPLE: no-current-vocab ;
+
+: no-current-vocab ( -- vocab )
+    \ no-current-vocab boa
+    { { "Define words in scratchpad vocabulary" "scratchpad" } }
+    throw-restarts dup set-in ;
 
 : current-vocab ( -- str )
     in get [ no-current-vocab ] unless* ;
@@ -64,20 +69,36 @@ ERROR: no-current-vocab ;
 
 : CREATE-WORD ( -- word ) CREATE dup reset-generic ;
 
-: word-restarts ( possibilities -- restarts )
-    natural-sort [
-        [
-            "Use the " swap vocabulary>> " vocabulary" 3append
-        ] keep
-    ] { } map>assoc ;
+: word-restarts ( name possibilities -- restarts )
+    natural-sort
+    [ [ "Use the " swap vocabulary>> " vocabulary" 3append ] keep ] { } map>assoc
+    swap "Defer word in current vocabulary" swap 2array
+    suffix ;
 
 ERROR: no-word-error name ;
 
+: <no-word-error> ( name possibilities -- error restarts )
+    [ drop \ no-word-error boa ] [ word-restarts ] 2bi ;
+
+SYMBOL: amended-use?
+
+SYMBOL: auto-use?
+
+: no-word-restarted ( restart-value -- word )
+    dup word? [
+        amended-use? on
+        dup vocabulary>>
+        [ (use+) ] [
+            "Added ``" swap "'' vocabulary to search path" 3append note.
+        ] bi
+    ] [ create-in ] if ;
+
 : no-word ( name -- newword )
-    dup \ no-word-error boa
-    swap words-named [ forward-reference? not ] filter
-    word-restarts throw-restarts
-    dup vocabulary>> (use+) ;
+    dup words-named [ forward-reference? not ] filter
+    dup length 1 = auto-use? get and
+    [ nip first no-word-restarted ]
+    [ <no-word-error> throw-restarts no-word-restarted ]
+    if ;
 
 : check-forward ( str word -- word/f )
     dup forward-reference? [
@@ -119,7 +140,7 @@ ERROR: staging-violation word ;
     } cond ;
 
 : (parse-until) ( accum end -- accum )
-    dup >r parse-step [ r> (parse-until) ] [ r> drop ] if ;
+    [ parse-step ] keep swap [ (parse-until) ] [ drop ] if ;
 
 : parse-until ( end -- vec )
     100 <vector> swap (parse-until) ;
@@ -127,13 +148,15 @@ ERROR: staging-violation word ;
 : parsed ( accum obj -- accum ) over push ;
 
 : (parse-lines) ( lexer -- quot )
-    [ f parse-until >quotation ] with-lexer ;
+    [
+        f parse-until >quotation
+    ] with-lexer ;
 
 : parse-lines ( lines -- quot )
     lexer-factory get call (parse-lines) ;
 
 : parse-literal ( accum end quot -- accum )
-    >r parse-until r> call parsed ; inline
+    [ parse-until ] dip call parsed ; inline
 
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
@@ -206,8 +229,18 @@ SYMBOL: interactive-vocabs
         call
     ] with-scope ; inline
 
+SYMBOL: print-use-hook
+
+print-use-hook global [ [ ] or ] change-at
+
 : parse-fresh ( lines -- quot )
-    [ parse-lines ] with-file-vocabs ;
+    [
+        amended-use? off
+        parse-lines
+        amended-use? get [
+            print-use-hook get call
+        ] when
+    ] with-file-vocabs ;
 
 : parsing-file ( file -- )
     "quiet" get [

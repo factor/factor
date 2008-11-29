@@ -14,11 +14,12 @@ M: x86 two-operand? t ;
 HOOK: temp-reg-1 cpu ( -- reg )
 HOOK: temp-reg-2 cpu ( -- reg )
 
+HOOK: param-reg-1 cpu ( -- reg )
+HOOK: param-reg-2 cpu ( -- reg )
+
 M: x86 %load-immediate MOV ;
 
-HOOK: rel-literal-x86 cpu ( literal -- )
-
-M: x86 %load-indirect swap 0 [] MOV rel-literal-x86 ;
+M: x86 %load-indirect swap 0 MOV rc-absolute-cell rel-immediate ;
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
@@ -92,6 +93,58 @@ M: x86 %shr-imm nip SHR ;
 M: x86 %sar-imm nip SAR ;
 M: x86 %not     drop NOT ;
 
+: ?MOV ( dst src -- )
+    2dup = [ 2drop ] [ MOV ] if ; inline
+
+:: move>args ( src1 src2 -- )
+    {
+        { [ src1 param-reg-2 = ] [ param-reg-1 src2 ?MOV param-reg-1 param-reg-2 XCHG ] }
+        { [ src1 param-reg-1 = ] [ param-reg-2 src2 ?MOV ] }
+        { [ src2 param-reg-1 = ] [ param-reg-2 src1 ?MOV param-reg-1 param-reg-2 XCHG ] }
+        { [ src2 param-reg-2 = ] [ param-reg-1 src1 ?MOV ] }
+        [
+            param-reg-1 src1 MOV
+            param-reg-2 src2 MOV
+        ]
+    } cond ;
+
+HOOK: %alien-invoke-tail cpu ( func dll -- )
+
+:: overflow-template ( src1 src2 insn inverse func -- )
+    <label> "no-overflow" set
+    src1 src2 insn call
+    ds-reg [] src1 MOV
+    "no-overflow" get JNO
+    src1 src2 inverse call
+    src1 src2 move>args
+    %prepare-alien-invoke
+    func f %alien-invoke
+    "no-overflow" resolve-label ; inline
+
+:: overflow-template-tail ( src1 src2 insn inverse func -- )
+    <label> "no-overflow" set
+    src1 src2 insn call
+    "no-overflow" get JNO
+    src1 src2 inverse call
+    src1 src2 move>args
+    %prepare-alien-invoke
+    func f %alien-invoke-tail
+    "no-overflow" resolve-label
+    ds-reg [] src1 MOV
+    0 RET ; inline
+
+M: x86 %fixnum-add ( src1 src2 -- )
+    [ ADD ] [ SUB ] "overflow_fixnum_add" overflow-template ;
+
+M: x86 %fixnum-add-tail ( src1 src2 -- )
+    [ ADD ] [ SUB ] "overflow_fixnum_add" overflow-template-tail ;
+
+M: x86 %fixnum-sub ( src1 src2 -- )
+    [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template ;
+
+M: x86 %fixnum-sub-tail ( src1 src2 -- )
+    [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template-tail ;
+
 : bignum@ ( reg n -- op )
     cells bignum tag-number - [+] ; inline
 
@@ -159,9 +212,6 @@ M: x86 %div-float nip DIVSD ;
 
 M: x86 %integer>float CVTSI2SD ;
 M: x86 %float>integer CVTTSD2SI ;
-
-: ?MOV ( dst src -- )
-    2dup = [ 2drop ] [ MOV ] if ; inline
 
 M: x86 %copy ( dst src -- ) ?MOV ;
 
@@ -401,12 +451,12 @@ HOOK: stack-reg cpu ( -- reg )
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
-: %boolean ( dst word -- )
-    over \ f tag-number MOV
-    0 [] swap execute
-    \ t rel-literal-x86 ; inline
+:: %boolean ( dst temp word -- )
+    dst \ f tag-number MOV
+    temp 0 MOV \ t rc-absolute-cell rel-immediate
+    dst temp word execute ; inline
 
-M: x86 %compare ( dst cc src1 src2 -- )
+M: x86 %compare ( dst temp cc src1 src2 -- )
     CMP {
         { cc< [ \ CMOVL %boolean ] }
         { cc<= [ \ CMOVLE %boolean ] }
@@ -416,10 +466,10 @@ M: x86 %compare ( dst cc src1 src2 -- )
         { cc/= [ \ CMOVNE %boolean ] }
     } case ;
 
-M: x86 %compare-imm ( dst cc src1 src2 -- )
+M: x86 %compare-imm ( dst temp cc src1 src2 -- )
     %compare ;
 
-M: x86 %compare-float ( dst cc src1 src2 -- )
+M: x86 %compare-float ( dst temp cc src1 src2 -- )
     UCOMISD {
         { cc< [ \ CMOVB %boolean ] }
         { cc<= [ \ CMOVBE %boolean ] }

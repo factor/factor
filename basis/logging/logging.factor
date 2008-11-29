@@ -123,4 +123,3 @@ USE: vocabs.loader
 
 "logging.parser" require
 "logging.analysis" require
-"logging.insomniac" require

@@ -2,7 +2,7 @@ USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
 sorting classes.tuple compiler.units debugger vocabs
-vocabs.loader accessors eval combinators ;
+vocabs.loader accessors eval combinators lexer ;
 IN: parser.tests
 
 [
@@ -428,7 +428,7 @@ must-fail-with
     "USE: this-better-not-exist" eval
 ] must-fail
 
-[ ": foo ;" eval ] [ error>> no-current-vocab? ] must-fail-with
+[ ": foo ;" eval ] [ error>> error>> no-current-vocab? ] must-fail-with
 
 [ 92 ] [ "CHAR: \\" eval ] unit-test
 [ 92 ] [ "CHAR: \\\\" eval ] unit-test
@@ -483,7 +483,7 @@ must-fail-with
 
 [ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
 
-[ "DEFER: blah" eval ] [ error>> no-current-vocab? ] must-fail-with
+[ "DEFER: blah" eval ] [ error>> error>> no-current-vocab? ] must-fail-with
 
 [
     "IN: parser.tests : blah ; parsing FORGET: blah" eval
@@ -496,3 +496,7 @@ DEFER: blah
 
 [ "IN: parser.tests USE: kernel TUPLE: blah < tuple ; : blah ; TUPLE: blah < tuple ; : blah ;" eval ]
 [ error>> error>> def>> \ blah eq? ] must-fail-with
+
+[ ] [ f lexer set f file set "Hello world" note. ] unit-test
+
+[ "CHAR: \\u9999999999999" eval ] must-fail

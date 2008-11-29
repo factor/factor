@@ -49,13 +49,19 @@ GENERIC: effective-method ( generic -- method )
 
 GENERIC: next-method-quot* ( class generic combination -- quot )
 
-: next-method-quot ( class generic -- quot )
+: next-method-quot ( method -- quot )
     next-method-quot-cache get [
-        dup "combination" word-prop next-method-quot*
-    ] 2cache ;
+        [ "method-class" word-prop ]
+        [
+            "method-generic" word-prop
+            dup "combination" word-prop
+        ] bi next-method-quot*
+    ] cache ;
 
-: (call-next-method) ( class generic -- )
-    next-method-quot call ;
+ERROR: no-next-method method ;
+
+: (call-next-method) ( method -- )
+    dup next-method-quot [ call ] [ no-next-method ] ?if ;
 
 TUPLE: check-method class generic ;
 

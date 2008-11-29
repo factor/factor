@@ -29,12 +29,6 @@ HELP: spin                           $shuffle ;
 HELP: roll                           $shuffle ;
 HELP: -roll                          $shuffle ;
 
-HELP: >r ( x -- )
-{ $values { "x" object } } { $description "Moves the top of the data stack to the retain stack." } ;
-
-HELP: r> ( -- x )
-{ $values { "x" object } } { $description "Moves the top of the retain stack to the data stack." } ;
-
 HELP: datastack ( -- ds )
 { $values { "ds" array } }
 { $description "Outputs an array containing a copy of the data stack contents right before the call to this word, with the top of the stack at the end of the array." } ;
@@ -211,15 +205,18 @@ HELP: 3slip
 { $description "Calls a quotation while hiding the top three stack elements." } ;
 
 HELP: keep
-{ $values { "quot" { $quotation "( x -- )" } } { "x" object } }
-{ $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." } ;
+{ $values { "quot" { $quotation "( x -- ... )" } } { "x" object } }
+{ $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." }
+{ $examples
+    { $example "USING: arrays kernel prettyprint ;" "2 \"greetings\" [ <array> ] keep 2array ." "{ { \"greetings\" \"greetings\" } \"greetings\" }" }
+} ;
 
 HELP: 2keep
-{ $values { "quot" { $quotation "( x y -- )" } } { "x" object } { "y" object } }
+{ $values { "quot" { $quotation "( x y -- ... )" } } { "x" object } { "y" object } }
 { $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
-{ $values { "quot" { $quotation "( x y z -- )" } } { "x" object } { "y" object } { "z" object } }
+{ $values { "quot" { $quotation "( x y z -- ... )" } } { "x" object } { "y" object } { "z" object } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: bi
@@ -347,7 +344,7 @@ HELP: bi*
     "The following two lines are equivalent:"
     { $code
         "[ p ] [ q ] bi*"
-        ">r p r> q"
+        "[ p ] dip q"
     }
 } ;
 
@@ -358,7 +355,7 @@ HELP: 2bi*
     "The following two lines are equivalent:"
     { $code
         "[ p ] [ q ] 2bi*"
-        ">r >r p r> r> q"
+        "[ p ] 2dip q"
     }
 } ;
 
@@ -369,18 +366,18 @@ HELP: tri*
     "The following two lines are equivalent:"
     { $code
         "[ p ] [ q ] [ r ] tri*"
-        ">r >r p r> q r> r"
+        "[ [ p ] dip q ] dip r"
     }
 } ;
 
 HELP: bi@
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- )" } } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- ... )" } } }
 { $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } "." }
 { $examples
     "The following two lines are equivalent:"
     { $code
         "[ p ] bi@"
-        ">r p r> p"
+        "[ p ] dip p"
     }
     "The following two lines are also equivalent:"
     { $code
@@ -390,13 +387,13 @@ HELP: bi@
 } ;
 
 HELP: 2bi@
-{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj1 obj2 -- )" } } }
+{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj1 obj2 -- ... )" } } }
 { $description "Applies the quotation to " { $snippet "w" } " and " { $snippet "x" } ", then to " { $snippet "y" } " and " { $snippet "z" } "." }
 { $examples
     "The following two lines are equivalent:"
     { $code
         "[ p ] 2bi@"
-        ">r >r p r> r> p"
+        "[ p ] 2dip p"
     }
     "The following two lines are also equivalent:"
     { $code
@@ -406,13 +403,13 @@ HELP: 2bi@
 } ;
 
 HELP: tri@
-{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj -- )" } } }
+{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj -- ... )" } } }
 { $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } ", and finally to " { $snippet "z" } "." }
 { $examples
     "The following two lines are equivalent:"
     { $code
         "[ p ] tri@"
-        ">r >r p r> p r> p"
+        "[ [ p ] dip p ] dip p"
     }
     "The following two lines are also equivalent:"
     { $code
@@ -440,7 +437,7 @@ $nl
 "The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
 
 HELP: if*
-{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- )" } } { "false" quotation } }
+{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } { "false" quotation } }
 { $description "Alternative conditional form that preserves the " { $snippet "cond" } " value if it is true."
 $nl
 "If the condition is true, it is retained on the stack before the " { $snippet "true" } " quotation is called. Otherwise, the condition is removed from the stack and the " { $snippet "false" } " quotation is called."
@@ -449,7 +446,7 @@ $nl
 { $code "X [ Y ] [ Z ] if*" "X dup [ Y ] [ drop Z ] if" } } ;
 
 HELP: when*
-{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- )" } } }
+{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } }
 { $description "Variant of " { $link if* } " with no false quotation."
 $nl
 "The following two lines are equivalent:"
@@ -463,7 +460,7 @@ HELP: unless*
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
 HELP: ?if
-{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation "( cond -- )" } } { "false" { $quotation "( default -- )" } } }
+{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } { "false" { $quotation "( default -- ... )" } } }
 { $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack." }
 { $notes
 "The following two lines are equivalent:"
@@ -565,11 +562,7 @@ HELP: compose
 { $values { "quot1" callable } { "quot2" callable } { "compose" compose } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } " followed by " { $snippet "quot2" } "." }
 { $notes
-    "The two quotations must leave the retain stack in the same state on exit as it was on entry, so the following code is not allowed:"
-    { $code
-        "[ 3 >r ] [ r> . ] compose"
-    }
-    "Except for this restriction, the following two lines are equivalent:"
+    "The following two lines are equivalent:"
     { $code
         "compose call"
         "append call"
@@ -589,15 +582,7 @@ HELP: 3compose
 { $values { "quot1" callable } { "quot2" callable } { "quot3" callable } { "compose" compose } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } ", " { $snippet "quot2" } " and then " { $snippet "quot3" } "." }
 { $notes
-    "The three quotations must leave the retain stack in the same state on exit as it was on entry, so for example, the following code is not allowed:"
-    { $code
-        "[ >r ] swap [ r> ] 3compose"
-    }
-    "The correct way to achieve the effect of the above is the following:"
-    { $code
-        "[ dip ] curry"
-    }
-    "Excepting the retain stack restriction, the following two lines are equivalent:"
+    "The following two lines are equivalent:"
     { $code
         "3compose call"
         "3append call"
@@ -608,16 +593,15 @@ HELP: 3compose
 HELP: dip
 { $values { "x" object } { "quot" quotation } }
 { $description "Calls " { $snippet "quot" } " with " { $snippet "obj" } " hidden on the retain stack." }
-{ $notes "The following are equivalent:"
-    { $code ">r foo bar r>" }
-    { $code "[ foo bar ] dip" }
+{ $examples
+    { $example "USING: arrays kernel math prettyprint ;" "10 20 30 [ / ] dip 2array ." "{ 1/2 30 }" }
 } ;
 
 HELP: 2dip
 { $values { "x" object } { "y" object } { "quot" quotation } }
-{ $description "Calls " { $snippet "quot" } " with " { $snippet "obj1" } " and " { $snippet "obj2" } " hidden on the retain stack." }
+{ $description "Calls " { $snippet "quot" } " with " { $snippet "x" } " and " { $snippet "y" } " hidden on the retain stack." }
 { $notes "The following are equivalent:"
-    { $code ">r >r foo bar r> r>" }
+    { $code "[ [ foo bar ] dip ] dip" }
     { $code "[ foo bar ] 2dip" }
 } ;
 
@@ -625,7 +609,7 @@ HELP: 3dip
 { $values { "x" object } { "y" object } { "z" object } { "quot" quotation } }
 { $description "Calls " { $snippet "quot" } " with " { $snippet "obj1" } ", " { $snippet "obj2" } " and " { $snippet "obj3" } " hidden on the retain stack." }
 { $notes "The following are equivalent:"
-    { $code ">r >r >r foo bar r> r> r>" }
+    { $code "[ [ [ foo bar ] dip ] dip ] dip" }
     { $code "[ foo bar ] 3dip" }
 } ;
 
@@ -692,15 +676,7 @@ $nl
 { $subsection -rot }
 { $subsection spin }
 { $subsection roll }
-{ $subsection -roll }
-"Sometimes an additional storage area is needed to hold objects. The " { $emphasis "retain stack" } " is an auxilliary stack for this purpose. Objects can be moved between the data and retain stacks using the following two words:"
-{ $subsection >r }
-{ $subsection r> }
-"The top of the data stack is ``hidden'' between " { $link >r } " and " { $link r> } ":"
-{ $example "1 2 3 >r .s r>" "1\n2" }
-"Usages of " { $link >r } " and " { $link r> } " must be balanced within a single quotation; quotations are not permitted to pop retain stack elements they did not push, or leave elements on the retain stack after returning."
-$nl
-"The " { $link "inference" } " tool checks retain stack usage. The " { $link "slip-keep-combinators" } " combinators abstract out common retain stack usage patterns." ;
+{ $subsection -roll } ;
 
 ARTICLE: "cleave-shuffle-equivalence" "Expressing shuffle words with cleave combinators"
 "Cleave combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to cleave combinators are discussed in the documentation for " { $link bi } ", " { $link 2bi } ", " { $link 3bi } ", " { $link tri } ", " { $link 2tri } " and " { $link 3tri } "."
@@ -793,14 +769,10 @@ $nl
 { $subsection tri* }
 "Technically, the spread combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on three related values can be written in one of two ways:"
 { $code
-    "! First alternative; uses retain stack explicitly"
-    ">r >r 1 +"
-    "r> 1 -"
-    "r> 2 *"
+    "! First alternative; uses dip"
+    "[ [ 1 + ] dip 1 - dip ] 2 *"
     "! Second alternative: uses tri*"
-    "[ 1 + ]"
-    "[ 1 - ]"
-    "[ 2 * ] tri*"
+    "[ 1 + ] [ 1 - ] [ 2 * ] tri*"
 }
 
 $nl
@@ -819,7 +791,9 @@ $nl
 { $subsection both? }
 { $subsection either? } ;
 
-ARTICLE: "slip-keep-combinators" "The dip, slip and keep combinators"
+ARTICLE: "slip-keep-combinators" "Retain stack combinators"
+"Sometimes an additional storage area is needed to hold objects. The " { $emphasis "retain stack" } " is an auxilliary stack for this purpose. Objects can be moved between the data and retain stacks using a set of combinators."
+$nl
 "The dip combinators invoke the quotation at the top of the stack, hiding the values underneath:"
 { $subsection dip }
 { $subsection 2dip }
@@ -851,7 +825,7 @@ ARTICLE: "implementing-combinators" "Implementing combinators"
 "These words are used to implement combinators. Note that combinator definitions must be followed by the " { $link POSTPONE: inline } " declaration in order to compile in the optimizing compiler; for example:"
 { $code
     ": keep ( x quot -- x )"
-    "    over >r call r> ; inline"
+    "    over [ call ] dip ; inline"
 }
 "Word inlining is documented in " { $link "declarations" } "." ;
 
@@ -935,10 +909,10 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "booleans" }
 { $subsection "shuffle-words" }
 "A central concept in Factor is that of a " { $emphasis "combinator" } ", which is a word taking code as input."
+{ $subsection "slip-keep-combinators" }
 { $subsection "cleave-combinators" }
 { $subsection "spread-combinators" }
 { $subsection "apply-combinators" }
-{ $subsection "slip-keep-combinators" }
 { $subsection "conditionals" }
 { $subsection "compositional-combinators" }
 { $subsection "combinators" }

@@ -21,8 +21,8 @@ M: x86.64 machine-registers
 M: x86.64 ds-reg R14 ;
 M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
-M: x86.64 temp-reg-1 RAX ;
-M: x86.64 temp-reg-2 RCX ;
+M: x86.64 temp-reg-1 R8 ;
+M: x86.64 temp-reg-2 R9 ;
 
 M:: x86.64 %dispatch ( src temp offset -- )
     ! Load jump table base.
@@ -37,14 +37,12 @@ M:: x86.64 %dispatch ( src temp offset -- )
     [ align-code ]
     bi ;
 
-: param-reg-1 int-regs param-regs first ; inline
-: param-reg-2 int-regs param-regs second ; inline
+M: x86.64 param-reg-1 int-regs param-regs first ;
+M: x86.64 param-reg-2 int-regs param-regs second ;
 : param-reg-3 int-regs param-regs third ; inline
 
 M: int-regs return-reg drop RAX ;
 M: float-regs return-reg drop XMM0 ;
-
-M: x86.64 rel-literal-x86 rc-relative rel-literal ;
 
 M: x86.64 %prologue ( n -- )
     temp-reg-1 0 MOV rc-absolute-cell rel-this
@@ -169,6 +167,11 @@ M: x86.64 %alien-invoke
     R11 0 MOV
     rc-absolute-cell rel-dlsym
     R11 CALL ;
+
+M: x86.64 %alien-invoke-tail
+    R11 0 MOV
+    rc-absolute-cell rel-dlsym
+    R11 JMP ;
 
 M: x86.64 %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke

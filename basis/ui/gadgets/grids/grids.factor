@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces make sequences words io
 io.streams.string math.vectors ui.gadgets columns accessors
-math.geometry.rect locals ;
+math.geometry.rect locals fry ;
 IN: ui.gadgets.grids
 
 TUPLE: grid < gadget
@@ -48,21 +48,18 @@ grid
     dupd add-gaps dim-sum v+ ;
 
 M: grid pref-dim*
-    dup gap>> swap compute-grid >r over r>
-    gap-sum >r gap-sum r> (pair-up) ;
+    dup gap>> swap compute-grid [ over ] dip
+    [ gap-sum ] 2bi@ (pair-up) ;
 
 : do-grid ( dims grid quot -- )
-    -rot grid>>
-    [ [ pick call ] 2each ] 2each
-    drop ; inline
+    [ grid>> ] dip '[ _ 2each ] 2each ; inline
 
 : grid-positions ( grid dims -- locs )
-    >r gap>> dup r> add-gaps swap [ v+ ] accumulate nip ;
+    [ gap>> dup ] dip add-gaps swap [ v+ ] accumulate nip ;
 
 : position-grid ( grid horiz vert -- )
-    pick >r
-    >r over r> grid-positions >r grid-positions r>
-    pair-up r> [ (>>loc) ] do-grid ;
+    pick [ [ over ] dip [ grid-positions ] 2bi@ pair-up ] dip
+    [ (>>loc) ] do-grid ;
 
 : resize-grid ( grid horiz vert -- )
     pick fill?>> [

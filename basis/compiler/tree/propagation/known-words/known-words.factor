@@ -37,31 +37,6 @@ most-negative-fixnum most-positive-fixnum [a,b]
 
 \ bitnot { integer } "input-classes" set-word-prop
 
-{
-    fcosh
-    flog
-    fsinh
-    fexp
-    fasin
-    facosh
-    fasinh
-    ftanh
-    fatanh
-    facos
-    fpow
-    fatan
-    fatan2
-    fcos
-    ftan
-    fsin
-    fsqrt
-} [
-    dup stack-effect
-    [ in>> length real <repetition> "input-classes" set-word-prop ]
-    [ out>> length float <repetition> "default-output-classes" set-word-prop ]
-    2bi
-] each
-
 : ?change-interval ( info quot -- quot' )
     over interval>> [ [ clone ] dip change-interval ] [ 2drop ] if ; inline
 
@@ -137,6 +112,12 @@ most-negative-fixnum most-positive-fixnum [a,b]
 
 \ mod [ [ interval-mod ] [ real-valued ] binary-op ] each-derived-op
 \ rem [ [ interval-rem ] [ may-overflow real-valued ] binary-op ] each-derived-op
+
+{ /mod fixnum/mod } [
+    \ /i \ mod
+    [ "outputs" word-prop ] bi@
+    '[ _ _ 2bi ] "outputs" set-word-prop
+] each
 
 \ shift [ [ interval-shift-safe ] [ may-overflow integer-valued ] binary-op ] each-derived-op
 \ shift [ [ interval-shift-safe ] [ integer-valued ] binary-op ] each-fast-derived-op
@@ -216,8 +197,15 @@ generic-comparison-ops [
 
 {
     { >fixnum fixnum }
+    { bignum>fixnum fixnum }
+
     { >bignum bignum }
+    { fixnum>bignum bignum }
+    { float>bignum bignum }
+
     { >float float }
+    { fixnum>float float }
+    { bignum>float float }
 } [
     '[
         _

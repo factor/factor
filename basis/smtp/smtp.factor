@@ -145,7 +145,7 @@ ERROR: invalid-header-string string ;
         "<" %
         64 random-bits #
         "-" %
-        millis #
+        micros #
         "@" %
         smtp-domain get [ host-name ] unless* %
         ">" %
@@ -153,7 +153,7 @@ ERROR: invalid-header-string string ;
 
 : extract-email ( recepient -- email )
     ! This could be much smarter.
-    " " last-split1 swap or "<" ?head drop ">" ?tail drop ;
+    " " split1-last swap or "<" ?head drop ">" ?tail drop ;
 
 : email>headers ( email -- hashtable )
     [

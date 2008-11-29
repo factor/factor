@@ -20,7 +20,7 @@ SYMBOL: with-compiler-errors?
 
 : errors-of-type ( type -- assoc )
     compiler-errors get-global
-    swap [ >r nip compiler-error-type r> eq? ] curry
+    swap [ [ nip compiler-error-type ] dip eq? ] curry
     assoc-filter ;
 
 : compiler-errors. ( type -- )

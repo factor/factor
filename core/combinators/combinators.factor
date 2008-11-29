@@ -28,10 +28,7 @@ IN: combinators
 
 ! spread
 : spread>quot ( seq -- quot )
-    [ ] [
-        [ dup empty? [ [ >r ] swap [ r> ] 3append ] unless ] dip
-        append
-    ] reduce ;
+    [ ] [ [ dup empty? [ [ dip ] curry ] unless ] dip append ] reduce ;
 
 : spread ( objs... seq -- )
     spread>quot call ;
@@ -48,7 +45,7 @@ ERROR: no-cond ;
     [ rot \ if 3array append [ ] like ] assoc-each ;
 
 : cond>quot ( assoc -- quot )
-    [ dup callable? [ [ t ] swap 2array ] when ] map
+    [ dup pair? [ [ t ] swap 2array ] unless ] map
     reverse [ no-cond ] swap alist>quot ;
 
 ! case
@@ -83,7 +80,7 @@ ERROR: no-case ;
         drop [ swap adjoin ] curry each
     ] [
         [
-            >r 2dup r> hashcode pick length rem rot nth adjoin
+            [ 2dup ] dip hashcode pick length rem rot nth adjoin
         ] each 2drop
     ] if ;
 
@@ -91,13 +88,13 @@ ERROR: no-case ;
     next-power-of-2 swap [ nip clone ] curry map ;
 
 : distribute-buckets ( alist initial quot -- buckets )
-    swapd [ >r dup first r> call 2array ] curry map
+    swapd [ [ dup first ] dip call 2array ] curry map
     [ length <buckets> dup ] keep
     [ first2 (distribute-buckets) ] with each ; inline
 
 : hash-case-table ( default assoc -- array )
     V{ } [ 1array ] distribute-buckets
-    [ [ >r literalize r> ] assoc-map linear-case-quot ] with map ;
+    [ [ [ literalize ] dip ] assoc-map linear-case-quot ] with map ;
 
 : hash-dispatch-quot ( table -- quot )
     [ length 1- [ fixnum-bitand ] curry ] keep
@@ -133,20 +130,20 @@ ERROR: no-case ;
         { [ dup [ length 4 <= ] [ [ word? ] contains? ] bi or ] [ drop linear-case-quot ] }
         { [ dup contiguous-range? ] [ drop dispatch-case-quot ] }
         { [ dup [ wrapper? ] contains? not ] [ drop hash-case-quot ] }
-        { [ dup [ wrapper? ] all? ] [ drop [ >r wrapped>> r> ] assoc-map hash-case-quot ] }
+        { [ dup [ wrapper? ] all? ] [ drop [ [ wrapped>> ] dip ] assoc-map hash-case-quot ] }
         [ drop linear-case-quot ]
     } cond ;
 
 ! assert-depth
 : trim-datastacks ( seq1 seq2 -- seq1' seq2' )
-    2dup [ length ] bi@ min tuck tail >r tail r> ;
+    2dup [ length ] bi@ min tuck [ tail ] 2bi@ ;
 
 ERROR: relative-underflow stack ;
 
 ERROR: relative-overflow stack ;
 
 : assert-depth ( quot -- )
-    >r datastack r> dip >r datastack r>
+    [ datastack ] dip dip [ datastack ] dip
     2dup [ length ] compare {
         { +lt+ [ trim-datastacks nip relative-underflow ] }
         { +eq+ [ 2drop ] }

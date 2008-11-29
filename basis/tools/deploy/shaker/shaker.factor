@@ -5,7 +5,7 @@ namespaces make assocs kernel parser lexer strings.parser
 tools.deploy.config vocabs sequences words words.private memory
 kernel.private continuations io prettyprint vocabs.loader
 debugger system strings sets vectors quotations byte-arrays
-sorting compiler.units definitions ;
+sorting compiler.units definitions generic generic.standard ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line
@@ -14,7 +14,6 @@ QUALIFIED: continuations
 QUALIFIED: definitions
 QUALIFIED: init
 QUALIFIED: layouts
-QUALIFIED: listener
 QUALIFIED: prettyprint.config
 QUALIFIED: source-files
 QUALIFIED: vocabs
@@ -95,20 +94,13 @@ IN: tools.deploy.shaker
 
 : stripped-word-props ( -- seq )
     [
-        strip-dictionary? deploy-compiler? get and [
-            {
-                "combination"
-                "members"
-                "methods"
-            } %
-        ] when
-
         strip-dictionary? [
             {
                 "alias"
                 "boa-check"
                 "cannot-infer"
                 "coercer"
+                "combination"
                 "compiled-effect"
                 "compiled-generic-uses"
                 "compiled-uses"
@@ -138,7 +130,9 @@ IN: tools.deploy.shaker
                 "local-writer?"
                 "local?"
                 "macro"
+                "members"
                 "memo-quot"
+                "methods"
                 "mixin"
                 "method-class"
                 "method-generic"
@@ -201,17 +195,13 @@ IN: tools.deploy.shaker
 
 : stripped-globals ( -- seq )
     [
-        "callbacks" "alien.compiler" lookup ,
-
         "inspector-hook" "inspector" lookup ,
 
         {
-            bootstrap.stage2:bootstrap-time
             continuations:error
             continuations:error-continuation
             continuations:error-thread
             continuations:restarts
-            listener:error-hook
             init:init-hooks
             source-files:source-files
             input-stream
@@ -234,6 +224,10 @@ IN: tools.deploy.shaker
             "tools"
             "io.launcher"
             "random"
+            "compiler"
+            "stack-checker"
+            "bootstrap"
+            "listener"
         } strip-vocab-globals %
 
         strip-dictionary? [
@@ -244,6 +238,7 @@ IN: tools.deploy.shaker
             {
                 gensym
                 name>char-hook
+                classes:next-method-quot-cache
                 classes:class-and-cache
                 classes:class-not-cache
                 classes:class-or-cache
@@ -266,7 +261,7 @@ IN: tools.deploy.shaker
                 layouts:tag-numbers
                 layouts:type-numbers
                 lexer-factory
-                listener:listener-hook
+                print-use-hook
                 root-cache
                 vocab-roots
                 vocabs:dictionary
@@ -304,10 +299,7 @@ IN: tools.deploy.shaker
             "ui-error-hook" "ui.gadgets.worlds" lookup ,
         ] when
 
-        "<value>" "stack-checker.state" lookup [ , ] when*
-
         "windows-messages" "windows.messages" lookup [ , ] when*
-
     ] { } make ;
 
 : strip-globals ( stripped-globals -- )
@@ -329,20 +321,30 @@ IN: tools.deploy.shaker
         ] with-compilation-unit
     ] unless ;
 
-: compress ( pred string -- )
+: compress ( pred post-process string -- )
     "Compressing " prepend show
-    instances
-    dup H{ } clone [ [ ] cache ] curry map
+    [ instances dup H{ } clone [ [ ] cache ] curry map ] dip call
     become ; inline
 
 : compress-byte-arrays ( -- )
-    [ byte-array? ] "byte arrays" compress ;
+    [ byte-array? ] [ ] "byte arrays" compress ;
+
+: remain-compiled ( old new -- old new )
+    #! Quotations which were formerly compiled must remain
+    #! compiled.
+    2dup [
+        2dup [ compiled>> ] [ compiled>> not ] bi* and
+        [ nip jit-compile ] [ 2drop ] if
+    ] 2each ;
 
 : compress-quotations ( -- )
-    [ quotation? ] "quotations" compress ;
+    [ quotation? ] [ remain-compiled ] "quotations" compress ;
 
 : compress-strings ( -- )
-    [ string? ] "strings" compress ;
+    [ string? ] [ ] "strings" compress ;
+
+: compress-wrappers ( -- )
+    [ wrapper? ] [ ] "wrappers" compress ;
 
 : finish-deploy ( final-image -- )
     "Finishing up" show
@@ -368,11 +370,21 @@ SYMBOL: deploy-vocab
     t "quiet" set-global
     f output-stream set-global ;
 
+: compute-next-methods ( -- )
+    [ standard-generic? ] instances [
+        "methods" word-prop [
+            nip
+            dup next-method-quot "next-method-quot" set-word-prop
+        ] assoc-each
+    ] each
+    "resource:basis/tools/deploy/shaker/next-methods.factor" run-file ;
+
 : strip ( -- )
     init-stripper
     strip-libc
     strip-cocoa
     strip-debugger
+    compute-next-methods
     strip-init-hooks
     strip-c-io
     f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
@@ -383,7 +395,7 @@ SYMBOL: deploy-vocab
     compress-byte-arrays
     compress-quotations
     compress-strings
-    H{ } clone classes:next-method-quot-cache set-global ;
+    compress-wrappers ;
 
 : (deploy) ( final-image vocab config -- )
     #! Does the actual work of a deployment in the slave

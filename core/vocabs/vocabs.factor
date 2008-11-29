@@ -11,6 +11,11 @@ name words
 main help
 source-loaded? docs-loaded? ;
 
+! sources-loaded? slot is one of these two
+SYMBOL: +parsing+
+SYMBOL: +running+
+SYMBOL: +done+
+
 : <vocab> ( name -- vocab )
     \ vocab new
         swap >>name
@@ -51,42 +56,6 @@ M: vocab vocab-main main>> ;
 M: object vocab-main vocab vocab-main ;
 
 M: f vocab-main ;
-
-GENERIC: vocab-source-loaded? ( vocab-spec -- ? )
-
-M: vocab vocab-source-loaded? source-loaded?>> ;
-
-M: object vocab-source-loaded?
-    vocab vocab-source-loaded? ;
-
-M: f vocab-source-loaded? ;
-
-GENERIC: set-vocab-source-loaded? ( ? vocab-spec -- )
-
-M: vocab set-vocab-source-loaded? (>>source-loaded?) ;
-
-M: object set-vocab-source-loaded?
-    vocab set-vocab-source-loaded? ;
-
-M: f set-vocab-source-loaded? 2drop ;
-
-GENERIC: vocab-docs-loaded? ( vocab-spec -- ? )
-
-M: vocab vocab-docs-loaded? docs-loaded?>> ;
-
-M: object vocab-docs-loaded?
-    vocab vocab-docs-loaded? ;
-
-M: f vocab-docs-loaded? ;
-
-GENERIC: set-vocab-docs-loaded? ( ? vocab-spec -- )
-
-M: vocab set-vocab-docs-loaded? (>>docs-loaded?) ;
-
-M: object set-vocab-docs-loaded?
-    vocab set-vocab-docs-loaded? ;
-
-M: f set-vocab-docs-loaded? 2drop ;
 
 : create-vocab ( name -- vocab )
     dictionary get [ <vocab> ] cache ;

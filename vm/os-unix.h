@@ -50,7 +50,7 @@ void unix_init_signals(void);
 void signal_handler(int signal, siginfo_t* siginfo, void* uap);
 void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 
-s64 current_millis(void);
-void sleep_millis(CELL msec);
+s64 current_micros(void);
+void sleep_micros(CELL usec);
 
 void open_console(void);

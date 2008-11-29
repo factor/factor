@@ -23,7 +23,7 @@ M: jamshred-gadget draw-gadget* ( gadget -- )
     ] [
         [ jamshred>> jamshred-update ]
         [ relayout-1 ]
-        [ 10 sleep yield jamshred-loop ] tri
+        [ 10 milliseconds sleep yield jamshred-loop ] tri
     ] if ;
 
 : fullscreen ( gadget -- )

@@ -43,10 +43,10 @@ IN: opengl
     [ glDisableClientState ] each ; inline
 
 MACRO: all-enabled ( seq quot -- )
-    >r words>values r> [ (all-enabled) ] 2curry ;
+    [ words>values ] dip [ (all-enabled) ] 2curry ;
 
 MACRO: all-enabled-client-state ( seq quot -- )
-    >r words>values r> [ (all-enabled-client-state) ] 2curry ;
+    [ words>values ] dip [ (all-enabled-client-state) ] 2curry ;
 
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep
@@ -72,18 +72,21 @@ MACRO: all-enabled-client-state ( seq quot -- )
     line-vertices GL_LINES 0 2 glDrawArrays ;
 
 : (rect-vertices) ( dim -- vertices )
+    #! We use GL_LINE_STRIP with a duplicated first vertex
+    #! instead of GL_LINE_LOOP to work around a bug in Apple's
+    #! X3100 driver.
     {
         [ drop 0.5 0.5 ]
         [ first 0.3 - 0.5 ]
         [ [ first 0.3 - ] [ second 0.3 - ] bi ]
         [ second 0.3 - 0.5 swap ]
-    } cleave 8 float-array{ } nsequence ;
+    } cleave 10 float-array{ } nsequence ;
 
 : rect-vertices ( dim -- )
     (rect-vertices) gl-vertex-pointer ;
 
 : (gl-rect) ( -- )
-    GL_LINE_LOOP 0 4 glDrawArrays ;
+    GL_LINE_STRIP 0 5 glDrawArrays ;
 
 : gl-rect ( dim -- )
     rect-vertices (gl-rect) ;
@@ -120,11 +123,20 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : circle-points ( loc dim steps -- points )
     circle-steps unit-circle adjust-points scale-points ;
 
+: close-path ( points -- points' )
+    dup first suffix ;
+
 : circle-vertices ( loc dim steps -- vertices )
+    #! We use GL_LINE_STRIP with a duplicated first vertex
+    #! instead of GL_LINE_LOOP to work around a bug in Apple's
+    #! X3100 driver.
+    circle-points close-path concat >float-array ;
+
+: fill-circle-vertices ( loc dim steps -- vertices )
     circle-points concat >float-array ;
 
 : (gen-gl-object) ( quot -- id )
-    >r 1 0 <uint> r> keep *uint ; inline
+    [ 1 0 <uint> ] dip keep *uint ; inline
 
 : gen-texture ( -- id )
     [ glGenTextures ] (gen-gl-object) ;
@@ -133,7 +145,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     [ glGenBuffers ] (gen-gl-object) ;
 
 : (delete-gl-object) ( id quot -- )
-    >r 1 swap <uint> r> call ; inline
+    [ 1 swap <uint> ] dip call ; inline
 
 : delete-texture ( id -- )
     [ glDeleteTextures ] (delete-gl-object) ;
@@ -152,7 +164,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
 
 : <gl-buffer> ( target data hint -- id )
     pick gen-gl-buffer [ [
-        >r dup byte-length swap r> glBufferData
+        [ dup byte-length swap ] dip glBufferData
     ] with-gl-buffer ] keep ;
 
 : buffer-offset ( int -- alien )
@@ -186,9 +198,11 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     gen-texture [
         GL_TEXTURE_BIT [
             GL_TEXTURE_2D swap glBindTexture
-            >r >r GL_TEXTURE_2D 0 GL_RGBA r>
-            sprite-size2 0 GL_LUMINANCE_ALPHA
-            GL_UNSIGNED_BYTE r> glTexImage2D
+            [
+                [ GL_TEXTURE_2D 0 GL_RGBA ] dip
+                sprite-size2 0 GL_LUMINANCE_ALPHA
+                GL_UNSIGNED_BYTE
+            ] dip glTexImage2D
         ] do-attribs
     ] keep ;
     
@@ -237,7 +251,7 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     [ nip [ free-sprite ] when* ] assoc-each ;
 
 : with-translation ( loc quot -- )
-    GL_MODELVIEW [ >r gl-translate r> call ] do-matrix ; inline
+    GL_MODELVIEW [ [ gl-translate ] dip call ] do-matrix ; inline
 
 : fix-coordinates ( point1 point2 -- x1 y2 x2 y2 )
     [ first2 [ >fixnum ] bi@ ] bi@ ;

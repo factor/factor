@@ -23,7 +23,7 @@ IN: bootstrap.syntax
     "syntax" lookup t "delimiter" set-word-prop ;
 
 : define-syntax ( name quot -- )
-    >r "syntax" lookup dup r> define make-parsing ;
+    [ "syntax" lookup dup ] dip define make-parsing ;
 
 [
     { "]" "}" ";" ">>" } [ define-delimiter ] each
@@ -62,7 +62,7 @@ IN: bootstrap.syntax
     "CHAR:" [
         scan {
             { [ dup length 1 = ] [ first ] }
-            { [ "\\" ?head ] [ next-escape drop ] }
+            { [ "\\" ?head ] [ next-escape >string "" assert= ] }
             [ name>char-hook get call ]
         } cond parsed
     ] define-syntax
@@ -145,9 +145,10 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "INSTANCE:" [
-        location >r
-        scan-word scan-word 2dup add-mixin-instance
-        <mixin-instance> r> remember-definition
+        location [
+            scan-word scan-word 2dup add-mixin-instance
+            <mixin-instance>
+        ] dip remember-definition
     ] define-syntax
 
     "PREDICATE:" [
@@ -202,13 +203,12 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "call-next-method" [
-        current-class get current-generic get
-        2dup [ word? ] both? [
-            [ literalize parsed ] bi@
+        current-method get [
+            literalize parsed
             \ (call-next-method) parsed
         ] [
             not-in-a-method-error
-        ] if
+        ] if*
     ] define-syntax
     
     "initial:" "syntax" lookup define-symbol

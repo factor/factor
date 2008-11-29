@@ -1,9 +1,13 @@
 USING: compiler.units words vocabs kernel threads.private ;
 IN: debugger
 
-: print-error ( error -- ) die drop ;
+: consume ( error -- )
+    #! We don't want DCE to drop the error before the die call!
+    drop ;
 
-: error. ( error -- ) die drop ;
+: print-error ( error -- ) die consume ;
+
+: error. ( error -- ) die consume ;
 
 "threads" vocab [
     [

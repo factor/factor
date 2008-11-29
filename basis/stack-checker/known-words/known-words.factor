@@ -87,6 +87,15 @@ M: composed infer-call*
 M: object infer-call*
     \ literal-expected inference-warning ;
 
+: infer-slip ( -- )
+    1 infer->r pop-d infer-call 1 infer-r> ;
+
+: infer-2slip ( -- )
+    2 infer->r pop-d infer-call 2 infer-r> ;
+
+: infer-3slip ( -- )
+    3 infer->r pop-d infer-call 3 infer-r> ;
+
 : infer-curry ( -- )
     2 consume-d
     dup first2 <curried> make-known
@@ -125,11 +134,11 @@ M: object infer-call*
 
 : infer-load-locals ( -- )
     pop-literal nip
-    consume-d dup reverse copy-values dup output-r
-    [ [ f f ] dip ] [ reverse swap zip ] 2bi #shuffle, ;
+    consume-d dup copy-values dup output-r
+    [ [ f f ] dip ] [ swap zip ] 2bi #shuffle, ;
 
 : infer-get-local ( -- )
-    [let* | n [ pop-literal nip ]
+    [let* | n [ pop-literal nip 1 swap - ]
             in-r [ n consume-r ]
             out-d [ in-r first copy-value 1array ]
             out-r [ in-r copy-values ] |
@@ -150,6 +159,9 @@ M: object infer-call*
         { \ declare [ infer-declare ] }
         { \ call [ pop-d infer-call ] }
         { \ (call) [ pop-d infer-call ] }
+        { \ slip [ infer-slip ] }
+        { \ 2slip [ infer-2slip ] }
+        { \ 3slip [ infer-3slip ] }
         { \ curry [ infer-curry ] }
         { \ compose [ infer-compose ] }
         { \ execute [ infer-execute ] }
@@ -174,10 +186,14 @@ M: object infer-call*
 : infer-local-writer ( word -- )
     (( value -- )) apply-word/effect ;
 
+: infer-local-word ( word -- )
+    "local-word-def" word-prop infer-quot-here ;
+
 {
-    >r r> declare call (call) curry compose execute (execute) if
-dispatch <tuple-boa> (throw) load-locals get-local drop-locals
-do-primitive alien-invoke alien-indirect alien-callback
+    >r r> declare call (call) slip 2slip 3slip curry compose
+    execute (execute) if dispatch <tuple-boa> (throw)
+    load-locals get-local drop-locals do-primitive alien-invoke
+    alien-indirect alien-callback
 } [ t "special" set-word-prop ] each
 
 { call execute dispatch load-locals get-local drop-locals }
@@ -196,6 +212,7 @@ do-primitive alien-invoke alien-indirect alien-callback
         { [ dup local? ] [ infer-local-reader ] }
         { [ dup local-reader? ] [ infer-local-reader ] }
         { [ dup local-writer? ] [ infer-local-writer ] }
+        { [ dup local-word? ] [ infer-local-word ] }
         { [ dup recursive-word? ] [ call-recursive-word ] }
         [ dup infer-word apply-word/effect ]
     } cond ;
@@ -263,6 +280,8 @@ do-primitive alien-invoke alien-indirect alien-callback
 
 \ <complex> { real real } { complex } define-primitive
 \ <complex> make-foldable
+
+\ both-fixnums? { object object } { object object object } define-primitive
 
 \ fixnum+ { fixnum fixnum } { integer } define-primitive
 \ fixnum+ make-foldable
@@ -423,8 +442,8 @@ do-primitive alien-invoke alien-indirect alien-callback
 \ code-room { } { integer integer integer integer } define-primitive
 \ code-room  make-flushable
 
-\ millis { } { integer } define-primitive
-\ millis make-flushable
+\ micros { } { integer } define-primitive
+\ micros make-flushable
 
 \ tag { object } { fixnum } define-primitive
 \ tag make-foldable
@@ -601,3 +620,9 @@ do-primitive alien-invoke alien-indirect alien-callback
 \ modify-code-heap { array object } { } define-primitive
 
 \ unimplemented { } { } define-primitive
+
+\ gc-reset { } { } define-primitive
+
+\ gc-stats { } { array } define-primitive
+
+\ jit-compile { quotation } { } define-primitive

@@ -13,13 +13,15 @@ DEFER: *char
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
 TUPLE: c-type
+class
 boxer boxer-quot unboxer unboxer-quot
 getter setter
 reg-class size align stack-align? ;
 
 : new-c-type ( class -- type )
     new
-        int-regs >>reg-class ; inline
+        int-regs >>reg-class
+        object >>class ; inline
 
 : <c-type> ( -- type )
     \ c-type new-c-type ;
@@ -62,6 +64,12 @@ M: string c-type ( name -- type )
             "*" ?tail [ resolve-pointer-type ] [ no-c-type ] if
         ] ?if
     ] if ;
+
+GENERIC: c-type-class ( name -- class )
+
+M: c-type c-type-class class>> ;
+
+M: string c-type-class c-type c-type-class ;
 
 GENERIC: c-type-boxer ( name -- boxer )
 
@@ -274,6 +282,7 @@ M: long-long-type box-return ( type -- )
 
 [
     <c-type>
+        c-ptr >>class
         [ alien-cell ] >>getter
         [ set-alien-cell ] >>setter
         bootstrap-cell >>size
@@ -283,6 +292,7 @@ M: long-long-type box-return ( type -- )
     "void*" define-primitive-type
 
     <long-long-type>
+        integer >>class
         [ alien-signed-8 ] >>getter
         [ set-alien-signed-8 ] >>setter
         8 >>size
@@ -292,6 +302,7 @@ M: long-long-type box-return ( type -- )
     "longlong" define-primitive-type
 
     <long-long-type>
+        integer >>class
         [ alien-unsigned-8 ] >>getter
         [ set-alien-unsigned-8 ] >>setter
         8 >>size
@@ -301,6 +312,7 @@ M: long-long-type box-return ( type -- )
     "ulonglong" define-primitive-type
 
     <c-type>
+        integer >>class
         [ alien-signed-cell ] >>getter
         [ set-alien-signed-cell ] >>setter
         bootstrap-cell >>size
@@ -310,6 +322,7 @@ M: long-long-type box-return ( type -- )
     "long" define-primitive-type
 
     <c-type>
+        integer >>class
         [ alien-unsigned-cell ] >>getter
         [ set-alien-unsigned-cell ] >>setter
         bootstrap-cell >>size
@@ -319,6 +332,7 @@ M: long-long-type box-return ( type -- )
     "ulong" define-primitive-type
 
     <c-type>
+        integer >>class
         [ alien-signed-4 ] >>getter
         [ set-alien-signed-4 ] >>setter
         4 >>size
@@ -328,6 +342,7 @@ M: long-long-type box-return ( type -- )
     "int" define-primitive-type
 
     <c-type>
+        integer >>class
         [ alien-unsigned-4 ] >>getter
         [ set-alien-unsigned-4 ] >>setter
         4 >>size
@@ -337,6 +352,7 @@ M: long-long-type box-return ( type -- )
     "uint" define-primitive-type
 
     <c-type>
+        fixnum >>class
         [ alien-signed-2 ] >>getter
         [ set-alien-signed-2 ] >>setter
         2 >>size
@@ -346,6 +362,7 @@ M: long-long-type box-return ( type -- )
     "short" define-primitive-type
 
     <c-type>
+        fixnum >>class
         [ alien-unsigned-2 ] >>getter
         [ set-alien-unsigned-2 ] >>setter
         2 >>size
@@ -355,6 +372,7 @@ M: long-long-type box-return ( type -- )
     "ushort" define-primitive-type
 
     <c-type>
+        fixnum >>class
         [ alien-signed-1 ] >>getter
         [ set-alien-signed-1 ] >>setter
         1 >>size
@@ -364,6 +382,7 @@ M: long-long-type box-return ( type -- )
     "char" define-primitive-type
 
     <c-type>
+        fixnum >>class
         [ alien-unsigned-1 ] >>getter
         [ set-alien-unsigned-1 ] >>setter
         1 >>size
@@ -382,6 +401,7 @@ M: long-long-type box-return ( type -- )
     "bool" define-primitive-type
 
     <c-type>
+        float >>class
         [ alien-float ] >>getter
         [ [ >float ] 2dip set-alien-float ] >>setter
         4 >>size
@@ -393,6 +413,7 @@ M: long-long-type box-return ( type -- )
     "float" define-primitive-type
 
     <c-type>
+        float >>class
         [ alien-double ] >>getter
         [ [ >float ] 2dip set-alien-double ] >>setter
         8 >>size

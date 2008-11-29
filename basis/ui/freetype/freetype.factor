@@ -111,7 +111,7 @@ M: freetype-renderer open-font ( font -- open-font )
     freetype drop open-fonts get [ <font> ] cache ;
 
 : load-glyph ( font char -- glyph )
-    >r handle>> dup r> 0 FT_Load_Char
+    [ handle>> dup ] dip 0 FT_Load_Char
     freetype-error face-glyph ;
 
 : char-width ( open-font char -- w )
@@ -174,7 +174,7 @@ M: freetype-renderer string-height ( open-font string -- h )
     bi 2array ;
 
 : <char-sprite> ( open-font char -- sprite )
-    over >r render-glyph dup r> glyph-texture-loc
+    over [ render-glyph dup ] dip glyph-texture-loc
     over glyph-size pick glyph-texture-size <sprite>
     [ bitmap>texture ] keep [ init-sprite ] keep ;
 
@@ -206,7 +206,7 @@ M: freetype-renderer string-height ( open-font string -- h )
     fonts>> [ open-font H{ } clone 2array ] cache first2 ;
 
 M: freetype-renderer draw-string ( font string loc -- )
-    >r >r world get font-sprites r> r> (draw-string) ;
+    [ world get font-sprites ] 2dip (draw-string) ;
 
 : run-char-widths ( open-font string -- widths )
     char-widths [ scan-sums ] [ 2 v/n ] bi v+ ;

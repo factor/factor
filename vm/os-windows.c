@@ -166,7 +166,7 @@ long getpagesize(void)
 	return g_pagesize;
 }
 
-void sleep_millis(DWORD msec)
+void sleep_micros(DWORD usec)
 {
-	Sleep(msec);
+	Sleep(usec);
 }

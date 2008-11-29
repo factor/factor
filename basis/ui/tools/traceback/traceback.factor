@@ -36,18 +36,21 @@ M: traceback-gadget pref-dim* drop { 550 600 } ;
 
     dup model>> <callstack-display> 2/3 track-add
 
-    dup <toolbar> f track-add ;
+    add-toolbar ;
 
 : <namestack-display> ( model -- gadget )
     [ [ name>> namestack. ] when* ]
     <pane-control> ;
 
 : <variables-gadget> ( model -- gadget )
-    <namestack-display> { 400 400 } <limited-scroller> ;
+    <namestack-display>
+    <limited-scroller>
+        { 400 400 } >>min-dim
+        { 400 400 } >>max-dim ;
 
 : variables ( traceback -- )
     model>> <variables-gadget>
     "Dynamic variables" open-status-window ;
 
 : traceback-window ( continuation -- )
-    <model> <traceback-gadget> "Traceback" open-window ;
+    <model> <traceback-gadget> "Traceback" open-status-window ;

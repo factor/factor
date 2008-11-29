@@ -3,18 +3,16 @@
 USING: accessors arrays hashtables kernel models math namespaces
 make sequences quotations math.vectors combinators sorting
 binary-search vectors dlists deques models threads
-concurrency.flags math.order math.geometry.rect ;
+concurrency.flags math.order math.geometry.rect fry ;
 IN: ui.gadgets
 
 SYMBOL: ui-notify-flag
 
 : notify-ui-thread ( -- ) ui-notify-flag get-global raise-flag ;
 
-TUPLE: gadget < rect
-       pref-dim parent children orientation focus
-       visible? root? clipped? layout-state graft-state graft-node
-       interior boundary
-       model ;
+TUPLE: gadget < rect pref-dim parent children orientation focus
+visible? root? clipped? layout-state graft-state graft-node
+interior boundary model ;
 
 M: gadget equal? 2drop f ;
 
@@ -58,9 +56,7 @@ M: gadget model-changed 2drop ;
     2dup eq? [
         2drop { 0 0 }
     ] [
-        over rect-loc >r
-        >r parent>> r> relative-loc
-        r> v+
+        over rect-loc [ [ parent>> ] dip relative-loc ] dip v+
     ] if ;
 
 GENERIC: user-input* ( str gadget -- ? )
@@ -75,7 +71,7 @@ M: gadget children-on nip children>> ;
     [ swap loc>> v- ] dip v. 0 <=> ;
 
 : (fast-children-on) ( dim axis children -- i )
-    -rot [ ((fast-children-on)) ] 2curry search drop ;
+    -rot '[ _ _ ((fast-children-on)) ] search drop ;
 
 : fast-children-on ( rect axis children -- from to )
     [ [ rect-loc ] 2dip (fast-children-on) 0 or ]
@@ -97,10 +93,10 @@ M: gadget children-on nip children>> ;
 : dim-sum ( seq -- dim ) { 0 0 } [ v+ ] reduce ;
 
 : orient ( gadget seq1 seq2 -- seq )
-    >r >r orientation>> r> r> [ pick set-axis ] 2map nip ;
+    rot orientation>> '[ _ set-axis ] 2map ;
 
 : each-child ( gadget quot -- )
-    >r children>> r> each ; inline
+    [ children>> ] dip each ; inline
 
 ! Selection protocol
 GENERIC: gadget-selection? ( gadget -- ? )
@@ -312,18 +308,18 @@ SYMBOL: in-layout?
     [ parent>> ] follow ;
 
 : each-parent ( gadget quot -- ? )
-    >r parents r> all? ; inline
+    [ parents ] dip all? ; inline
 
 : find-parent ( gadget quot -- parent )
-    >r parents r> find nip ; inline
+    [ parents ] dip find nip ; inline
 
 : screen-loc ( gadget -- loc )
     parents { 0 0 } [ rect-loc v+ ] reduce ;
 
 : (screen-rect) ( gadget -- loc ext )
     dup parent>> [
-        >r rect-extent r> (screen-rect)
-        >r tuck v+ r> vmin >r v+ r>
+        [ rect-extent ] dip (screen-rect)
+        [ tuck v+ ] dip vmin [ v+ ] dip
     ] [
         rect-extent
     ] if* ;

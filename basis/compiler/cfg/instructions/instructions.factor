@@ -92,6 +92,15 @@ INSN: ##shr-imm < ##binary-imm ;
 INSN: ##sar-imm < ##binary-imm ;
 INSN: ##not < ##unary ;
 
+! Overflowing arithmetic
+TUPLE: ##fixnum-overflow < insn src1 src2 ;
+INSN: ##fixnum-add < ##fixnum-overflow ;
+INSN: ##fixnum-add-tail < ##fixnum-overflow ;
+INSN: ##fixnum-sub < ##fixnum-overflow ;
+INSN: ##fixnum-sub-tail < ##fixnum-overflow ;
+INSN: ##fixnum-mul < ##fixnum-overflow ;
+INSN: ##fixnum-mul-tail < ##fixnum-overflow ;
+
 : ##tag-fixnum ( dst src -- ) tag-bits get ##shl-imm ; inline
 : ##untag-fixnum ( dst src -- ) tag-bits get ##sar-imm ; inline
 
@@ -198,11 +207,11 @@ TUPLE: ##conditional-branch < insn { src1 vreg } { src2 vreg } cc ;
 INSN: ##compare-branch < ##conditional-branch ;
 INSN: ##compare-imm-branch { src1 vreg } { src2 integer } cc ;
 
-INSN: ##compare < ##binary cc ;
-INSN: ##compare-imm < ##binary-imm cc ;
+INSN: ##compare < ##binary cc temp ;
+INSN: ##compare-imm < ##binary-imm cc temp ;
 
 INSN: ##compare-float-branch < ##conditional-branch ;
-INSN: ##compare-float < ##binary cc ;
+INSN: ##compare-float < ##binary cc temp ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;

@@ -23,6 +23,6 @@ M: x86.64 dummy-fp-params? t ;
 <<
 "longlong" "ptrdiff_t" typedef
 "longlong" "intptr_t" typedef
-"int" "long" typedef
-"uint" "ulong" typedef
+"int" c-type "long" define-primitive-type
+"uint" c-type "ulong" define-primitive-type
 >>

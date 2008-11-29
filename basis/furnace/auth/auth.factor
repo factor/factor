@@ -8,8 +8,8 @@ html.forms
 http.server
 http.server.filters
 http.server.dispatchers
-furnace
 furnace.actions
+furnace.utilities
 furnace.redirection
 furnace.boilerplate
 furnace.auth.providers
