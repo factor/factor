@@ -14,10 +14,10 @@ IN: hash2
 : <hash2> ( size -- hash2 ) f <array> ;
 
 : 2= ( a b pair -- ? )
-    first2 swapd [ = ] 2dip = and ; inline
+    first2 swapd [ = ] 2bi@ and ; inline
 
 : (assoc2) ( a b alist -- {a,b,val} )
-    [ [ 2dup ] dip 2= ] find [ 3drop ] dip ; inline
+    [ 2= ] with with find nip ; inline
 
 : assoc2 ( a b alist -- value )
     (assoc2) dup [ third ] when ; inline
@@ -29,7 +29,7 @@ IN: hash2
     [ 2dup hashcode2 ] dip [ length mod ] keep ; inline
 
 : hash2 ( a b hash2 -- value/f )
-    hash2@ nth [ assoc2 ] [ 2drop f ] if* ;
+    hash2@ nth dup [ assoc2 ] [ 3drop f ] if ;
 
 : set-hash2 ( a b value hash2 -- )
     [ -rot ] dip hash2@ [ set-assoc2 ] change-nth ;

@@ -62,23 +62,18 @@ objc-methods global [ H{ } assoc-like ] change-at
     dup objc-methods get at
     [ ] [ "No such method: " prepend throw ] ?if ;
 
-: make-dip ( quot n -- quot' )
-    dup
-    \ >r <repetition> >quotation -rot
-    \ r> <repetition> >quotation 3append ;
-
 MEMO: make-prepare-send ( selector method super? -- quot )
     [
         [ \ <super> , ] when
         swap <selector> , \ selector ,
     ] [ ] make
-    swap second length 2 - make-dip ;
+    swap second length 2 - '[ @ _ ndip ] ;
 
 MACRO: (send) ( selector super? -- quot )
     [ dup lookup-method ] dip
     [ make-prepare-send ] 2keep
     super-message-senders message-senders ? get at
-    [ slip execute ] 2curry ;
+    '[ _ _ slip execute ] ;
 
 : send ( receiver args... selector -- return... ) f (send) ; inline
 
@@ -172,7 +167,7 @@ assoc-union alien>objc-types set-global
     ] unless ;
 
 : (parse-objc-type) ( i string -- ctype )
-    2dup nth [ 1+ ] 2dip {
+    [ 1+ ] [ nth ] 2bi {
         { [ dup "rnNoORV" member? ] [ drop (parse-objc-type) ] }
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
@@ -234,11 +229,12 @@ assoc-union alien>objc-types set-global
 : import-objc-class ( name quot -- )
     2dup unless-defined
     dupd define-objc-class-word
-    [
+    '[
+        _
         dup
         objc-class register-objc-methods
         objc-meta-class register-objc-methods
-    ] curry try ;
+    ] try ;
 
 : root-class ( class -- root )
     dup class_getSuperclass [ root-class ] [ ] ?if ;
