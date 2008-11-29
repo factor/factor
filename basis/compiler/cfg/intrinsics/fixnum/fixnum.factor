@@ -85,6 +85,7 @@ IN: compiler.cfg.intrinsics.fixnum
         stop-iterating
     ] [
         drop call
+        ##branch
         begin-basic-block
         iterate-next
     ] if ; inline
