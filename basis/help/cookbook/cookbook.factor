@@ -325,6 +325,15 @@ ARTICLE: "cookbook-pitfalls" "Pitfalls to avoid"
     { "If " { $link run-file } " throws a stack depth assertion, it means that the top-level form in the file left behind values on the stack. The stack depth is compared before and after loading a source file, since this type of situation is almost always an error. If you have a legitimate need to load a source file which returns data in some manner, define a word in the source file which produces this data on the stack and call the word after loading the file." }
 } ;
 
+ARTICLE: "cookbook-images" "Image file cookbook"
+"Factor has the ability to save the entire state of the system into an " { $emphasis "image file" } "."
+$nl
+"You can save a custom image if you find yourself loading the same libraries in every Factor session; some libraries take a little while to compile, so saving an image with those libraries loaded can save you a lot of time."
+$nl
+"For example, to save an image with the web framework loaded,"
+{ $code "USE: furnace" "save" }
+"See " { $link "images" } " for details." ;
+
 ARTICLE: "cookbook-next" "Next steps"
 "Once you have read through " { $link "first-program" } " and " { $link "cookbook" } ", the best way to keep learning Factor is to start looking at some simple example programs. Here are a few particularly nice vocabularies which should keep you busy for a little while:"
 { $list
@@ -349,6 +358,7 @@ ARTICLE: "cookbook" "Factor cookbook"
 { $subsection "cookbook-application" }
 { $subsection "cookbook-scripts" }
 { $subsection "cookbook-compiler" }
+{ $subsection "cookbook-images" }
 { $subsection "cookbook-philosophy" }
 { $subsection "cookbook-pitfalls" }
 { $subsection "cookbook-next" } ;

@@ -281,6 +281,8 @@ M: object infer-call*
 \ <complex> { real real } { complex } define-primitive
 \ <complex> make-foldable
 
+\ both-fixnums? { object object } { object object object } define-primitive
+
 \ fixnum+ { fixnum fixnum } { integer } define-primitive
 \ fixnum+ make-foldable
 

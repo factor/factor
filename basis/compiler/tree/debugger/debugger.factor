@@ -93,7 +93,7 @@ M: #shuffle node>quot
         [ drop "COMPLEX SHUFFLE" , ]
     } cond ;
 
-M: #push node>quot literal>> , ;
+M: #push node>quot literal>> literalize , ;
 
 M: #call node>quot word>> , ;
 

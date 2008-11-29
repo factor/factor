@@ -33,5 +33,7 @@ IN: compiler.cfg.utilities
     building off
     basic-block off ;
 
+: stop-iterating ( -- next ) end-basic-block f ;
+
 : emit-primitive ( node -- )
     word>> ##call ##branch begin-basic-block ;

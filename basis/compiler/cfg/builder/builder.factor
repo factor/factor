@@ -21,8 +21,6 @@ IN: compiler.cfg.builder
 
 ! Convert tree SSA IR to CFG SSA IR.
 
-: stop-iterating ( -- next ) end-basic-block f ;
-
 SYMBOL: procedures
 SYMBOL: current-word
 SYMBOL: current-label
@@ -211,7 +209,7 @@ M: #dispatch emit-node
 ! #call
 M: #call emit-node
     dup word>> dup "intrinsic" word-prop
-    [ emit-intrinsic iterate-next ] [ nip emit-call ] if ;
+    [ emit-intrinsic ] [ nip emit-call ] if ;
 
 ! #call-recursive
 M: #call-recursive emit-node label>> id>> emit-call ;

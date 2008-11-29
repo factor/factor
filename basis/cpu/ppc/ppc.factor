@@ -17,6 +17,7 @@ IN: cpu.ppc
 ! f30, f31: float scratch
 
 enable-float-intrinsics
+enable-fixnum*-intrinsic
 
 << \ ##integer>float t frame-required? set-word-prop
 \ ##float>integer t frame-required? set-word-prop >>
@@ -36,6 +37,9 @@ M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
 M: ppc %load-indirect ( reg obj -- )
     [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-immediate ] bi* ;
+
+: %load-dlsym ( symbol dll register -- )
+    0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
 
 : ds-reg 29 ; inline
 : rs-reg 30 ; inline
@@ -163,6 +167,91 @@ M: ppc %shl-imm swapd SLWI ;
 M: ppc %shr-imm swapd SRWI ;
 M: ppc %sar-imm SRAWI ;
 M: ppc %not     NOT ;
+
+: %alien-invoke-tail ( func dll -- )
+    scratch-reg %load-dlsym scratch-reg MTCTR BCTR ;
+
+:: exchange-regs ( r1 r2 -- )
+    scratch-reg r1 MR
+    r1 r2 MR
+    r2 scratch-reg MR ;
+
+: ?MR ( r1 r2 -- ) 2dup = [ 2drop ] [ MR ] if ;
+
+:: move>args ( src1 src2 -- )
+    {
+        { [ src1 4 = ] [ 3 src2 ?MR 3 4 exchange-regs ] }
+        { [ src1 3 = ] [ 4 src2 ?MR ] }
+        { [ src2 3 = ] [ 4 src1 ?MR 3 4 exchange-regs ] }
+        { [ src2 4 = ] [ 3 src1 ?MR ] }
+        [ 3 src1 MR 4 src2 MR ]
+    } cond ;
+
+:: overflow-template ( src1 src2 insn func -- )
+    "no-overflow" define-label
+    0 0 LI
+    0 MTXER
+    scratch-reg src2 src1 insn call
+    scratch-reg ds-reg 0 STW
+    "no-overflow" get BNO
+    src2 src1 move>args
+    %prepare-alien-invoke
+    func f %alien-invoke
+    "no-overflow" resolve-label ; inline
+
+:: overflow-template-tail ( src1 src2 insn func -- )
+    "overflow" define-label
+    0 0 LI
+    0 MTXER
+    scratch-reg src2 src1 insn call
+    "overflow" get BO
+    scratch-reg ds-reg 0 STW
+    BLR
+    "overflow" resolve-label
+    src2 src1 move>args
+    %prepare-alien-invoke
+    func f %alien-invoke-tail ;
+
+M: ppc %fixnum-add ( src1 src2 -- )
+    [ ADDO. ] "overflow_fixnum_add" overflow-template ;
+
+M: ppc %fixnum-add-tail ( src1 src2 -- )
+    [ ADDO. ] "overflow_fixnum_add" overflow-template-tail ;
+
+M: ppc %fixnum-sub ( src1 src2 -- )
+    [ SUBFO. ] "overflow_fixnum_subtract" overflow-template ;
+
+M: ppc %fixnum-sub-tail ( src1 src2 -- )
+    [ SUBFO. ] "overflow_fixnum_subtract" overflow-template-tail ;
+
+M:: ppc %fixnum-mul ( src1 src2 -- )
+    "no-overflow" define-label
+    0 0 LI
+    0 MTXER
+    src1 src1 tag-bits get SRAWI
+    scratch-reg src1 src2 MULLWO.
+    scratch-reg ds-reg 0 STW
+    "no-overflow" get BNO
+    src2 src2 tag-bits get SRAWI
+    src1 src2 move>args
+    %prepare-alien-invoke
+    "overflow_fixnum_multiply" f %alien-invoke
+    "no-overflow" resolve-label ;
+
+M:: ppc %fixnum-mul-tail ( src1 src2 -- )
+    "overflow" define-label
+    0 0 LI
+    0 MTXER
+    src1 src1 tag-bits get SRAWI
+    scratch-reg src1 src2 MULLWO.
+    "overflow" get BO
+    scratch-reg ds-reg 0 STW
+    BLR
+    "overflow" resolve-label
+    src2 src2 tag-bits get SRAWI
+    src1 src2 move>args
+    %prepare-alien-invoke
+    "overflow_fixnum_multiply" f %alien-invoke-tail ;
 
 : bignum@ ( n -- offset ) cells bignum tag-number - ; inline
 
@@ -317,9 +406,6 @@ M: ppc %set-alien-cell swap 0 STW ;
 
 M: ppc %set-alien-float swap 0 STFS ;
 M: ppc %set-alien-double swap 0 STFD ;
-
-: %load-dlsym ( symbol dll register -- )
-    0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
 
 : load-zone-ptr ( reg -- )
     [ "nursery" f ] dip %load-dlsym ;
@@ -538,11 +624,11 @@ M: ppc %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    "stack_chain" f 11 %load-dlsym
-    11 11 0 LWZ
-    1 11 0 STW
-    ds-reg 11 8 STW
-    rs-reg 11 12 STW ;
+    "stack_chain" f scratch-reg %load-dlsym
+    scratch-reg scratch-reg 0 LWZ
+    1 scratch-reg 0 STW
+    ds-reg scratch-reg 8 STW
+    rs-reg scratch-reg 12 STW ;
 
 M: ppc %alien-invoke ( symbol dll -- )
     11 %load-dlsym 11 MTLR BLRL ;

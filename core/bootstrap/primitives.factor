@@ -348,6 +348,7 @@ tuple
 {
     { "(execute)" "words.private" }
     { "(call)" "kernel.private" }
+    { "both-fixnums?" "math.private" }
     { "fixnum+fast" "math.private" }
     { "fixnum-fast" "math.private" }
     { "fixnum*fast" "math.private" }

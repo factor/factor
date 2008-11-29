@@ -11,3 +11,7 @@ ARTICLE: "vocab-index" "Vocabulary index"
 { $subsection "vocab-tags" }
 { $subsection "vocab-authors" }
 { $describe-vocab "" } ;
+
+HELP: words.
+{ $values { "vocab" "a vocabulary name" } }
+{ $description "Printings a listing of all the words in a vocabulary, categorized by type." } ;
