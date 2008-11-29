@@ -201,7 +201,7 @@ M: db <count-statement> ( query -- statement )
 
 : create-index ( index-name table-name columns -- )
     [
-        [ [ "create index " % % ] dip " on " % % ] 2dip "(" %
+        [ [ "create index " % % ] dip " on " % % ] dip "(" %
         "," join % ")" %
     ] "" make sql-command ;
 
