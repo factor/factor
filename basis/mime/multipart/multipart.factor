@@ -55,8 +55,6 @@ TUPLE: multipart-stream stream n leftover separator ;
     stream dup [ read-n ] [ separator>> ] bi quot1 multipart-step
     swap [ drop stream quot1 multipart-step-loop ] when ; inline recursive
 
-PRIVATE>
-
 SYMBOL: header
 SYMBOL: parsed-header
 SYMBOL: magic-separator
@@ -94,6 +92,8 @@ TUPLE: uploaded-file path filename name ;
         nip [ "filename" swap at ] [ "name" swap at ] bi
         uploaded-file boa ,
     ] if ;
+
+PRIVATE>
 
 : parse-multipart ( stream -- array )
     [
