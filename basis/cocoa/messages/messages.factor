@@ -67,13 +67,13 @@ MEMO: make-prepare-send ( selector method super? -- quot )
         [ \ <super> , ] when
         swap <selector> , \ selector ,
     ] [ ] make
-    swap second length 2 - '[ @ _ ndip ] ;
+    swap second length 2 - '[ _ _ ndip ] ;
 
 MACRO: (send) ( selector super? -- quot )
     [ dup lookup-method ] dip
     [ make-prepare-send ] 2keep
     super-message-senders message-senders ? get at
-    '[ _ _ slip execute ] ;
+    '[ _ call _ execute ] ;
 
 : send ( receiver args... selector -- return... ) f (send) ; inline
 
@@ -167,7 +167,7 @@ assoc-union alien>objc-types set-global
     ] unless ;
 
 : (parse-objc-type) ( i string -- ctype )
-    [ 1+ ] [ nth ] 2bi {
+    [ [ 1+ ] dip ] [ nth ] 2bi {
         { [ dup "rnNoORV" member? ] [ drop (parse-objc-type) ] }
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
