@@ -3,10 +3,10 @@
 USING: accessors unix byte-arrays kernel debugger sequences
 namespaces math math.order combinators init alien alien.c-types
 alien.strings libc continuations destructors openssl
-openssl.libcrypto openssl.libssl io.files io.ports
+openssl.libcrypto openssl.libssl io io.files io.ports
 io.unix.backend io.unix.sockets io.encodings.ascii io.buffers
 io.sockets io.sockets.secure io.sockets.secure.openssl
-io.timeouts system summary ;
+io.timeouts system summary fry ;
 IN: io.unix.sockets.secure
 
 M: ssl-handle handle-fd file>> handle-fd ;
@@ -18,9 +18,7 @@ M: ssl-handle handle-fd file>> handle-fd ;
             { -1 [ err_no ECONNRESET = [ premature-close ] [ (io-error) ] if ] }
             { 0 [ premature-close ] }
         } case
-    ] [
-        nip (ssl-error)
-    ] if ;
+    ] [ nip (ssl-error) ] if ;
 
 : check-accept-response ( handle r -- event )
     over handle>> over SSL_get_error
@@ -36,7 +34,7 @@ M: ssl-handle handle-fd file>> handle-fd ;
 
 : do-ssl-accept ( ssl-handle -- )
     dup dup handle>> SSL_accept check-accept-response dup
-    [ >r dup file>> r> wait-for-fd do-ssl-accept ] [ 2drop ] if ;
+    [ [ dup file>> ] dip wait-for-fd do-ssl-accept ] [ 2drop ] if ;
 
 : maybe-handshake ( ssl-handle -- )
     dup connected>> [ drop ] [
@@ -130,24 +128,23 @@ M: secure (get-local-address) addrspec>> (get-local-address) ;
     [ [ handle>> SSL_get1_session ] dip save-session ]
     2bi ;
 
-: secure-connection ( ssl-handle addrspec -- )
-    dup get-session [ resume-session ] [ begin-session ] ?if ;
+: secure-connection ( client-out addrspec -- )
+    [ handle>> ] dip
+    [
+        '[
+            _ dup get-session
+            [ resume-session ] [ begin-session ] ?if
+        ] with-timeout
+    ] [ drop t >>connected drop ] 2bi ;
 
 M: secure establish-connection ( client-out remote -- )
-    addrspec>>
-    [ establish-connection ]
-    [
-        [ handle>> ] dip
-        [ [ secure-connection ] curry with-timeout ]
-        [ drop t >>connected drop ]
-        2bi
-    ] 2bi ;
+    addrspec>> [ establish-connection ] [ secure-connection ] 2bi ;
 
 M: secure (server) addrspec>> (server) ;
 
 M: secure (accept)
     [
-        addrspec>> (accept) >r |dispose <ssl-socket> r>
+        addrspec>> (accept) [ |dispose <ssl-socket> ] dip
     ] with-destructors ;
 
 : check-shutdown-response ( handle r -- event )
@@ -172,3 +169,32 @@ M: ssl-handle shutdown
     dup connected>> [
         f >>connected [ (shutdown) ] with-timeout
     ] [ drop ] if ;
+
+: check-buffer ( port -- port )
+    dup buffer>> buffer-empty? [ upgrade-buffers-full ] unless ;
+
+: input/output-ports ( -- input output )
+    input-stream output-stream
+    [ get underlying-port check-buffer ] bi@
+    2dup [ handle>> ] bi@ eq? [ upgrade-on-non-socket ] unless ;
+
+: make-input/output-secure ( input output -- )
+    dup handle>> fd? [ upgrade-on-non-socket ] unless
+    [ <ssl-socket> ] change-handle
+    handle>> >>handle drop ;
+
+: (send-secure-handshake) ( output -- )
+    remote-address get [ upgrade-on-non-socket ] unless*
+    secure-connection ;
+
+M: openssl send-secure-handshake
+    input/output-ports
+    [ make-input/output-secure ] keep
+    [ (send-secure-handshake) ] keep
+    remote-address get dup inet? [
+        host>> swap handle>> check-certificate
+    ] [ 2drop ] if ;
+
+M: openssl accept-secure-handshake
+    input/output-ports
+    make-input/output-secure ;

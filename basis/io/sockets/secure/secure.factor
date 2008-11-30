@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel symbols namespaces continuations
-destructors io.sockets sequences summary calendar delegate
-system vocabs.loader combinators present ;
+destructors io debugger io.sockets sequences summary calendar
+delegate system vocabs.loader combinators present ;
 IN: io.sockets.secure
 
 SYMBOL: secure-socket-timeout
@@ -52,9 +52,9 @@ M: secure resolve-host ( secure -- seq )
 
 HOOK: check-certificate secure-socket-backend ( host handle -- )
 
-<PRIVATE
-
 PREDICATE: secure-inet < secure addrspec>> inet? ;
+
+<PRIVATE
 
 M: secure-inet (client)
     [
@@ -78,6 +78,23 @@ ERROR: common-name-verify-error expected got ;
 
 M: common-name-verify-error summary
     drop "Common name verification failed" ;
+
+ERROR: upgrade-on-non-socket ;
+
+M: upgrade-on-non-socket summary
+    drop
+    "send-secure-handshake can only be used if input-stream and" print
+    "output-stream are a socket" ;
+
+ERROR: upgrade-buffers-full ;
+
+M: upgrade-buffers-full summary
+    drop
+    "send-secure-handshake can only be used if buffers are empty" ;
+
+HOOK: send-secure-handshake secure-socket-backend ( -- )
+
+HOOK: accept-secure-handshake secure-socket-backend ( -- )
 
 {
     { [ os unix? ] [ "io.unix.sockets.secure" require ] }
