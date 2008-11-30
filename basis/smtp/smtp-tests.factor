@@ -1,6 +1,7 @@
-USING: smtp tools.test io.streams.string io.sockets threads
-smtp.server kernel sequences namespaces logging accessors
-assocs sorting smtp.private concurrency.promises ;
+USING: smtp tools.test io.streams.string io.sockets
+io.sockets.secure threads smtp.server kernel sequences
+namespaces logging accessors assocs sorting smtp.private
+concurrency.promises system ;
 IN: smtp.tests
 
 \ send-email must-infer
