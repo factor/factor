@@ -22,7 +22,7 @@ IN: benchmark.fannkuch
     pick 30 < [ [ 1+ ] [ ] [ dup write-permutation ] tri* ] when
     count-flips max ; inline
 
-: fannkuch ( n -- flip# )
+: fannkuch ( n -- )
     [
         [ 0 0 ] dip [ 1+ ] B{ } map-as
         [ fannkuch-step ] each-permutation nip
