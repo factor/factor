@@ -32,4 +32,4 @@ C-STRUCT: statvfs
     { { "char" _VFS_MNAMELEN } "f_mntonname" }
     { { "char" _VFS_MNAMELEN } "f_mntfromname" } ;
 
-FUNCTION: int statvfs ( char* path, statvfs *buf ) ;
+FUNCTION: int statvfs ( char* path, statvfs* buf ) ;
