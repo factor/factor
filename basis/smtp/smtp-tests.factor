@@ -77,10 +77,10 @@ IN: smtp.tests
 [ ] [ "p" get mock-smtp-server ] unit-test
 
 [ ] [
-    [
+    <secure-config> f >>verify [
         "localhost" "p" get ?promise <inet> smtp-server set
         no-auth smtp-auth set
-        smtp-tls? on
+        os unix? [ smtp-tls? on ] when
 
         <email>
             "Hi guys\nBye guys" >>body
@@ -91,5 +91,5 @@ IN: smtp.tests
             } >>to
             "Doug <erg@factorcode.org>" >>from
         send-email
-    ] with-scope
+    ] with-secure-context
 ] unit-test
