@@ -211,7 +211,7 @@ M: ppc %not     NOT ;
     "overflow" resolve-label
     src1 src2 move>args
     %prepare-alien-invoke
-    func f %alien-invoke-tail ;
+    func f %alien-invoke-tail ; inline
 
 M: ppc %fixnum-add ( src1 src2 -- )
     [ ADDO. ] "overflow_fixnum_add" overflow-template ;
