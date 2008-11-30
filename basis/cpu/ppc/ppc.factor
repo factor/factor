@@ -194,7 +194,7 @@ M: ppc %not     NOT ;
     scratch-reg src2 src1 insn call
     scratch-reg ds-reg 0 STW
     "no-overflow" get BNO
-    src2 src1 move>args
+    src1 src2 move>args
     %prepare-alien-invoke
     func f %alien-invoke
     "no-overflow" resolve-label ; inline
@@ -208,7 +208,7 @@ M: ppc %not     NOT ;
     scratch-reg ds-reg 0 STW
     BLR
     "overflow" resolve-label
-    src2 src1 move>args
+    src1 src2 move>args
     %prepare-alien-invoke
     func f %alien-invoke-tail ;
 
