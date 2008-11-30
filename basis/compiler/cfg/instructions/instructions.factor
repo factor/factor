@@ -98,8 +98,8 @@ INSN: ##fixnum-add < ##fixnum-overflow ;
 INSN: ##fixnum-add-tail < ##fixnum-overflow ;
 INSN: ##fixnum-sub < ##fixnum-overflow ;
 INSN: ##fixnum-sub-tail < ##fixnum-overflow ;
-INSN: ##fixnum-mul < ##fixnum-overflow ;
-INSN: ##fixnum-mul-tail < ##fixnum-overflow ;
+INSN: ##fixnum-mul < ##fixnum-overflow temp1 temp2 ;
+INSN: ##fixnum-mul-tail < ##fixnum-overflow temp1 temp2 ;
 
 : ##tag-fixnum ( dst src -- ) tag-bits get ##shl-imm ; inline
 : ##untag-fixnum ( dst src -- ) tag-bits get ##sar-imm ; inline

@@ -18,12 +18,12 @@ add_overflow:
 	b MANGLE(overflow_fixnum_add)
 
 DEF(void,primitive_fixnum_subtract,(void)):
-    lwz r3,0(DS_REG)
-    lwz r4,-4(DS_REG)
+    lwz r3,-4(DS_REG)
+    lwz r4,0(DS_REG)
     subi DS_REG,DS_REG,4
     li r0,0
     mtxer r0
-    subfo. r5,r3,r4
+    subfo. r5,r4,r3
 	bso sub_overflow
     stw r5,0(DS_REG)
     blr

@@ -24,15 +24,6 @@ IN: alien.syntax
 
 PRIVATE>
 
-: indirect-quot ( function-ptr-quot return types abi -- quot )
-    [ alien-indirect ] 3curry compose ;
-
-: define-indirect ( abi return function-ptr-quot function-name parameters -- )
-    [ pick ] dip parse-arglist
-    rot create-in dup reset-generic
-    [ swapd roll indirect-quot ] dip
-    -rot define-declared ;
-
 : DLL" lexer get skip-blank parse-string dlopen parsed ; parsing
 
 : ALIEN: scan string>number <alien> parsed ; parsing

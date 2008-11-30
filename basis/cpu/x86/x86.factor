@@ -145,6 +145,35 @@ M: x86 %fixnum-sub ( src1 src2 -- )
 M: x86 %fixnum-sub-tail ( src1 src2 -- )
     [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template-tail ;
 
+M:: x86 %fixnum-mul ( src1 src2 temp1 temp2 -- )
+    "no-overflow" define-label
+    temp1 src1 MOV
+    temp1 tag-bits get SAR
+    src2 temp1 IMUL2
+    ds-reg [] temp1 MOV
+    "no-overflow" get JNO
+    src1 src2 move>args
+    param-reg-1 tag-bits get SAR
+    param-reg-2 tag-bits get SAR
+    %prepare-alien-invoke
+    "overflow_fixnum_multiply" f %alien-invoke
+    "no-overflow" resolve-label ;
+
+M:: x86 %fixnum-mul-tail ( src1 src2 temp1 temp2 -- )
+    "overflow" define-label
+    temp1 src1 MOV
+    temp1 tag-bits get SAR
+    src2 temp1 IMUL2
+    "overflow" get JO
+    ds-reg [] temp1 MOV
+    0 RET
+    "overflow" resolve-label
+    src1 src2 move>args
+    param-reg-1 tag-bits get SAR
+    param-reg-2 tag-bits get SAR
+    %prepare-alien-invoke
+    "overflow_fixnum_multiply" f %alien-invoke-tail ;
+
 : bignum@ ( reg n -- op )
     cells bignum tag-number - [+] ; inline
 

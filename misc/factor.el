@@ -189,7 +189,7 @@ buffer."
     "OCT:" "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
     "REQUIRE:"  "REQUIRES:" "SINGLETON:" "SLOT:" "SYMBOL:" "SYMBOLS:"
     "TUPLE:" "T{" "t\\??" "TYPEDEF:"
-    "UNION:" "USE:" "USING:" "V{" "VAR:" "VARS:" "W{"))
+    "UNION:" "USE:" "USING:" "V{" "VARS:" "W{"))
 
 (defconst factor--regex-parsing-words-ext
   (regexp-opt '("B" "call-next-method" "delimiter" "f" "initial:" "read-only")
@@ -204,11 +204,14 @@ buffer."
 (defsubst factor--regex-second-word (prefixes)
   (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
 
+(defconst factor--regex-method-definition
+  "^M: +\\([^ ]+\\) +\\([^ ]+\\)")
+
 (defconst factor--regex-word-definition
-  (factor--regex-second-word '(":" "::" "M:" "GENERIC:")))
+  (factor--regex-second-word '(":" "::" "GENERIC:")))
 
 (defconst factor--regex-type-definition
-  (factor--regex-second-word '("TUPLE:")))
+  (factor--regex-second-word '("TUPLE:" "SINGLETON:")))
 
 (defconst factor--regex-parent-type "^TUPLE: +[^ ]+ +< +\\([^ ]+\\)")
 
@@ -217,7 +220,7 @@ buffer."
 (defconst factor--regex-setter "\\W>>[^ ]+\\b")
 
 (defconst factor--regex-symbol-definition
-  (factor--regex-second-word '("SYMBOL:")))
+  (factor--regex-second-word '("SYMBOL:" "VAR:")))
 
 (defconst factor--regex-stack-effect " ( .* )")
 
@@ -235,11 +238,12 @@ buffer."
     (,factor--regex-declaration-words 1 'factor-font-lock-declaration)
     (,factor--regex-word-definition 2 'factor-font-lock-word-definition)
     (,factor--regex-type-definition 2 'factor-font-lock-type-definition)
+    (,factor--regex-method-definition (1 'factor-font-lock-type-definition)
+                                      (2 'factor-font-lock-word-definition))
     (,factor--regex-parent-type 1 'factor-font-lock-type-definition)
     (,factor--regex-constructor . 'factor-font-lock-constructor)
     (,factor--regex-setter . 'factor-font-lock-setter-word)
     (,factor--regex-symbol-definition 2 'factor-font-lock-symbol-definition)
-    (,factor--regex-using-lines 1 'factor-font-lock-vocabulary-name)
     (,factor--regex-use-line 1 'factor-font-lock-vocabulary-name))
   "Font lock keywords definition for Factor mode.")
 
@@ -247,7 +251,7 @@ buffer."
 ;;; Factor mode syntax:
 
 (defconst factor--regex-definition-starters
-  (regexp-opt '("TUPLE" "MACRO" "MACRO:" "M" ":" "")))
+  (regexp-opt '("VARS" "TUPLE" "MACRO" "MACRO:" "M" ":" "")))
 
 (defconst factor--regex-definition-start
   (format "^\\(%s:\\) " factor--regex-definition-starters))
@@ -373,7 +377,8 @@ buffer."
 
 (defconst factor--regex-single-liner
   (format "^%s" (regexp-opt '("DEFER:" "GENERIC:" "IN:"
-                              "PRIVATE>" "<PRIVATE" "SYMBOL:" "USE:"))))
+                              "PRIVATE>" "<PRIVATE"
+                              "SINGLETON:" "SYMBOL:" "USE:" "VAR:"))))
 
 (defconst factor--regex-begin-of-def
   (format "^USING: \\|\\(%s\\)\\|\\(%s .*\\)"
@@ -485,7 +490,7 @@ buffer."
 (defvar factor-mode-map (make-sparse-keymap)
   "Key map used by Factor mode.")
 
-(defsubst factor--beginning-of-defun (times)
+(defsubst factor--beginning-of-defun (&optional times)
   (re-search-backward factor--regex-begin-of-def nil t times))
 
 (defsubst factor--end-of-defun ()
