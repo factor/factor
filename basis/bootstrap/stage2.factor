@@ -59,9 +59,9 @@ SYMBOL: bootstrap-time
     "math compiler threads help io tools ui ui.tools unicode handbook" "include" set-global
     "" "exclude" set-global
 
-    parse-command-line
+    (command-line) parse-command-line
 
-    "-no-crossref" cli-args member? [ do-crossref ] unless
+    do-crossref
 
     ! Set dll paths
     os wince? [ "windows.ce" require ] when
@@ -92,12 +92,7 @@ SYMBOL: bootstrap-time
         [
             boot
             do-init-hooks
-            [
-                parse-command-line
-                run-user-init
-                "run" get run
-                output-stream get [ stream-flush ] when*
-            ] [ print-error 1 exit ] recover
+            handle-command-line
         ] set-boot-quot
 
         millis swap - bootstrap-time set-global

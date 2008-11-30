@@ -12,12 +12,12 @@ ARTICLE: "vocabs.roots" "Vocabulary roots"
     { { $snippet "extra" } " - additional contributed libraries." }
     { { $snippet "work" } " - a root for vocabularies which are not intended to be contributed back to Factor." }
 }
-"Your own vocabularies should go into " { $snippet "extra" } " or " { $snippet "work" } ", depending on whether or not you intend to contribute them back to the Factor project. If you wish to work on vocabularies outside of the Factor source directory, create a " { $link "factor-boot-rc" } " file like the following:"
-{ $code
-    "USING: namespaces sequences vocabs.loader ;"
-    "\"/home/jane/sources/\" vocab-roots get push"
-}
-"See " { $link "rc-files" } " for details." ;
+"You can store your own vocabularies in the " { $snippet "work" } " directory. You can also store code outside of the Factor source tree by making Factor aware of it first. There are two ways of doing this."
+$nl
+"You can list additional vocabulary roots in a file that Factor reads at startup:"
+{ $subsection "factor-roots" }
+"Or you can add them dynamically using a word:"
+{ $subsection add-vocab-root } ;
 
 ARTICLE: "vocabs.loader" "Vocabulary loader"
 "The vocabulary loader is defined in the " { $vocab-link "vocabs.loader" } " vocabulary."
@@ -56,6 +56,11 @@ HELP: vocab-main
 
 HELP: vocab-roots
 { $var-description "A sequence of pathname strings to search for vocabularies." } ;
+
+HELP: add-vocab-root
+{ $values { "path" "a pathname string" } }
+{ $description "Adds a directory pathname to the list of vocabulary roots." }
+{ $see-also "factor-roots" } ;
 
 HELP: find-vocab-root
 { $values { "vocab" "a vocabulary specifier" } { "path/f" "a pathname string" } }

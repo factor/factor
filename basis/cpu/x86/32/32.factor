@@ -307,7 +307,7 @@ FUNCTION: bool check_sse2 ( ) ;
 : sse2? ( -- ? )
     check_sse2 ;
 
-"-no-sse2" cli-args member? [
+"-no-sse2" (command-line) member? [
     [ optimized-recompile-hook ] recompile-hook
     [ { check_sse2 } compile ] with-variable
 
