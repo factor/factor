@@ -284,7 +284,7 @@ SYMBOL: nc-buttons
     message>button nc-buttons get
     swap [ push ] [ delete ] if ;
 
-: >lo-hi ( WORD -- array ) [ lo-word ] keep hi-word 2array ;
+: >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
 : mouse-wheel ( wParam -- array ) >lo-hi [ sgn neg ] map ;
 
 : mouse-absolute>relative ( lparam handle -- array )
