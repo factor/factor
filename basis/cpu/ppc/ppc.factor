@@ -17,7 +17,6 @@ IN: cpu.ppc
 ! f30, f31: float scratch
 
 enable-float-intrinsics
-enable-fixnum*-intrinsic
 
 << \ ##integer>float t frame-required? set-word-prop
 \ ##float>integer t frame-required? set-word-prop >>

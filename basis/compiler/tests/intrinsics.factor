@@ -213,6 +213,7 @@ IN: compiler.tests
 [ -1 ] [ [ -123 -64 fixnum-shift ] compile-call ] unit-test
 [ -1 ] [ -123 -64 [ fixnum-shift ] compile-call ] unit-test
 
+[ HEX: 10000000 ] [ HEX: 1000000 HEX: 10 [ fixnum* ] compile-call ] unit-test
 [ HEX: 10000000 ] [ HEX: -10000000 >fixnum [ 0 swap fixnum- ] compile-call ] unit-test
 [ HEX: 10000000 ] [ HEX: -fffffff >fixnum [ 1 swap fixnum- ] compile-call ] unit-test
 
