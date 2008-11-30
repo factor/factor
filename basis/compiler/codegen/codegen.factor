@@ -159,12 +159,15 @@ M: ##not     generate-insn dst/src       %not     ;
 : src1/src2 ( insn -- src1 src2 )
     [ src1>> register ] [ src2>> register ] bi ; inline
 
+: src1/src2/temp1/temp2 ( insn -- src1 src2 temp1 temp2 )
+    [ src1/src2 ] [ temp1>> register ] [ temp2>> register ] tri ; inline
+
 M: ##fixnum-add generate-insn src1/src2 %fixnum-add ;
 M: ##fixnum-add-tail generate-insn src1/src2 %fixnum-add-tail ;
 M: ##fixnum-sub generate-insn src1/src2 %fixnum-sub ;
 M: ##fixnum-sub-tail generate-insn src1/src2 %fixnum-sub-tail ;
-M: ##fixnum-mul generate-insn src1/src2 %fixnum-mul ;
-M: ##fixnum-mul-tail generate-insn src1/src2 %fixnum-mul-tail ;
+M: ##fixnum-mul generate-insn src1/src2/temp1/temp2 %fixnum-mul ;
+M: ##fixnum-mul-tail generate-insn src1/src2/temp1/temp2 %fixnum-mul-tail ;
 
 : dst/src/temp ( insn -- dst src temp )
     [ dst/src ] [ temp>> register ] bi ; inline
