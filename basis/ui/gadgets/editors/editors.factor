@@ -6,7 +6,8 @@ io.styles math.vectors sorting colors combinators assocs
 math.order fry calendar alarms ui.clipboards ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.theme
-ui.gadgets.wrappers ui.render ui.gestures math.geometry.rect ;
+ui.gadgets.menus ui.gadgets.wrappers ui.render ui.gestures
+math.geometry.rect ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget
@@ -513,6 +514,13 @@ editor "selection" f {
     { T{ key-down f { S+ } "END" } select-end-of-line }
     { T{ key-down f { S+ C+ } "HOME" } select-start-of-document }
     { T{ key-down f { S+ C+ } "END" } select-end-of-document }
+} define-command-map
+
+: editor-menu ( editor -- )
+    { cut com-copy paste } show-commands-menu ;
+
+editor "misc" f {
+    { T{ button-down f f 3 } editor-menu }
 } define-command-map
 
 ! Multi-line editors

@@ -3,10 +3,10 @@
 USING: arrays ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.paragraphs
 ui.gadgets.incremental ui.gadgets.packs ui.gadgets.theme
-ui.clipboards ui.gestures ui.traverse ui.render hashtables io
-kernel namespaces sequences io.styles strings quotations math
-opengl combinators math.vectors sorting splitting
-io.streams.nested assocs ui.gadgets.presentations
+ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
+hashtables io kernel namespaces sequences io.styles strings
+quotations math opengl combinators math.vectors sorting
+splitting io.streams.nested assocs ui.gadgets.presentations
 ui.gadgets.slots ui.gadgets.grids ui.gadgets.grid-lines
 classes.tuple models continuations destructors accessors
 math.geometry.rect fry ;
@@ -398,6 +398,8 @@ M: f sloppy-pick-up*
     dup request-focus
     com-copy-selection ;
 
+: pane-menu ( pane -- ) { com-copy } show-commands-menu ;
+
 pane H{
     { T{ button-down } [ begin-selection ] }
     { T{ button-down f { S+ } 1 } [ select-to-caret ] }
@@ -405,4 +407,5 @@ pane H{
     { T{ button-up } [ end-selection ] }
     { T{ drag } [ extend-selection ] }
     { T{ copy-action } [ com-copy ] }
+    { T{ button-down f f 3 } [ pane-menu ] }
 } set-gestures
