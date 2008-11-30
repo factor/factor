@@ -81,14 +81,15 @@ M: interactor model-changed
 : interactor-continue ( obj interactor -- )
     mailbox>> mailbox-put ;
 
-: clear-input ( interactor -- ) model>> clear-doc ;
+: clear-input ( interactor -- )
+    #! The with-datastack is a kludge to make it infer. Stupid.
+    model>> 1array [ clear-doc ] with-datastack drop ;
 
 : interactor-finish ( interactor -- )
-    #! The spawn is a kludge to make it infer. Stupid.
     [ editor-string ] keep
     [ interactor-input. ] 2keep
     [ add-interactor-history ] keep
-    '[ _ clear-input ] "Clearing input" spawn drop ;
+    clear-input ;
 
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
