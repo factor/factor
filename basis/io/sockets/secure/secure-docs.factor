@@ -116,10 +116,13 @@ ARTICLE: "ssl-errors" "Secure socket errors"
 
 ARTICLE: "io.sockets.secure" "Secure sockets (SSL, TLS)"
 "The " { $vocab-link "io.sockets.secure" } " vocabulary implements secure, encrypted sockets using the OpenSSL library."
+$nl
+"At present, this vocabulary is only supported on Unix, and not on Windows."
+$nl
+"This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (" { $url "http://www.openssl.org/" } "), cryptographic software written by Eric Young (eay@cryptsoft.com) and software written by Tim Hudson (tjh@cryptsoft.com)."
 { $subsection "ssl-config" }
 { $subsection "ssl-contexts" }
 { $subsection "ssl-addresses" }
-{ $subsection "ssl-errors" }
-"This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (" { $url "http://www.openssl.org/" } "), cryptographic software written by Eric Young (eay@cryptsoft.com) and software written by Tim Hudson (tjh@cryptsoft.com)." ;
+{ $subsection "ssl-errors" } ;
 
 ABOUT: "io.sockets.secure"
