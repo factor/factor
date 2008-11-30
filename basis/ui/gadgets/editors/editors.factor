@@ -52,19 +52,21 @@ SYMBOL: blink-interval
 
 750 milliseconds blink-interval set-global
 
-: start-blinking ( editor -- )
-    t >>blink
-    dup '[ _ blink-caret ] blink-interval get every >>blink-alarm drop ;
-
 : stop-blinking ( editor -- )
     [ [ cancel-alarm ] when* f ] change-blink-alarm drop ;
 
+: start-blinking ( editor -- )
+    [ stop-blinking ] [
+        t >>blink
+        dup '[ _ blink-caret ] blink-interval get every
+        >>blink-alarm drop
+    ] bi ;
+
 : restart-blinking ( editor -- )
     dup focused?>> [
-        [ stop-blinking ]
         [ start-blinking ]
         [ relayout-1 ]
-        tri
+        bi
     ] [ drop ] if ;
 
 M: editor graft*
