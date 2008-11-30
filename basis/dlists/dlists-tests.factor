@@ -75,3 +75,7 @@ IN: dlists.tests
     dup clone 3 over push-back
     [ dlist>seq ] bi@
 ] unit-test
+
+[ V{ f 3 1 f } ] [ <dlist> 1 over push-front 3 over push-front f over push-front f over push-back dlist>seq ] unit-test
+
+[ V{ } ] [ <dlist> dlist>seq ] unit-test
