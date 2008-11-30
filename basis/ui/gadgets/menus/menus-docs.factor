@@ -11,8 +11,8 @@ HELP: show-menu
 { $description "Displays a popup menu in the " { $link world } " containing " { $snippet "owner" } " at the current mouse location. The popup menu can be any gadget." } ;
 
 HELP: show-commands-menu
-{ $values { "owner" gadget } { "commands" "a sequence of commands" } }
-{ $description "Displays a popup menu with the given commands. This is just a convenience word that combines " { $link <commands-menu> } " with " { $link show-menu } "." }
+{ $values { "target" gadget } { "commands" "a sequence of commands" } }
+{ $description "Displays a popup menu with the given commands. The commands act on the target gadget. This is just a convenience word that combines " { $link <commands-menu> } " with " { $link show-menu } "." }
 { $notes "Useful for right-click context menus." } ;
 
 ARTICLE: "ui.gadgets.menus" "Popup menus"
