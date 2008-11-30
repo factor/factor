@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel ui.commands
 ui.gestures sequences strings math words generic namespaces make
-hashtables help.markup quotations assocs ;
+hashtables help.markup quotations assocs fry ;
 IN: ui.operations
 
 SYMBOL: +keyboard+
@@ -63,7 +63,7 @@ SYMBOL: operations
         t >>listener? ;
 
 : modify-operations ( operations hook translator -- operations )
-    rot [ modify-operation ] with with map ;
+    '[ [ _ _ ] dip modify-operation ] map ;
 
 : operations>commands ( object hook translator -- pairs )
     [ object-operations ] 2dip modify-operations

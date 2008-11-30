@@ -300,7 +300,7 @@ PREDICATE: callable < word register? not ;
 
 GENERIC: MOV ( dst src -- )
 M: immediate MOV swap (MOV-I) ;
-M: callable MOV 0 rot (MOV-I) rc-absolute-cell rel-word ;
+M: callable MOV [ 0 ] 2dip (MOV-I) rc-absolute-cell rel-word ;
 M: operand MOV HEX: 88 2-operand ;
 
 : LEA ( dst src -- ) swap HEX: 8d 2-operand ;

@@ -33,16 +33,13 @@ M: pasteboard set-clipboard-contents
     <clipboard> selection set-global ;
 
 : world>NSRect ( world -- NSRect )
-    dup window-loc>> first2 rot rect-dim first2 <NSRect> ;
+    [ window-loc>> ] [ dim>> ] bi [ first2 ] bi@ <NSRect> ;
 
 : gadget-window ( world -- )
-    [
-        dup <FactorView>
-        dup rot world>NSRect <ViewWindow>
-        dup install-window-delegate
-        over -> release
-        <handle>
-    ] keep (>>handle) ;
+    dup <FactorView>
+    2dup swap world>NSRect <ViewWindow>
+    [ [ -> release ] [ install-window-delegate ] bi* ] [ <handle> ] 2bi
+    >>handle drop ;
 
 M: cocoa-ui-backend set-title ( string world -- )
     handle>> window>> swap <NSString> -> setTitle: ;

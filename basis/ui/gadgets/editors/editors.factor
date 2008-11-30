@@ -138,11 +138,8 @@ M: editor ungraft*
     f >>focused?
     relayout-1 ;
 
-: (offset>x) ( font col# str -- x )
-    swap head-slice string-width ;
-
 : offset>x ( col# line# editor -- x )
-    [ editor-line ] keep editor-font* -rot (offset>x) ;
+    [ editor-line ] keep editor-font* spin head-slice string-width ;
 
 : loc>x ( loc editor -- x ) [ first2 swap ] dip offset>x ;
 
