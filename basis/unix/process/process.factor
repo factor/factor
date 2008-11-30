@@ -33,7 +33,7 @@ FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
     [ first ] [ ] bi exec-with-path ;
 
 : exec-args-with-env  ( seq seq -- int )
-    >r [ first ] [ ] bi r> exec-with-env ;
+    [ [ first ] [ ] bi ] dip exec-with-env ;
 
 : with-fork ( child parent -- )
     [ [ fork-process dup zero? ] dip [ drop ] prepose ] dip
