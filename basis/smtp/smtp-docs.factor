@@ -10,6 +10,9 @@ HELP: smtp-domain
 HELP: smtp-server
 { $var-description "Holds an " { $link inet } " object with the address of an SMTP server." } ;
 
+HELP: smtp-tls?
+{ $var-description "If set to true, secure socket communication will be established after connecting to the SMTP server. The server must support the " { $snippet "STARTTLS" } " command. Off by default." } ;
+
 HELP: smtp-read-timeout
 { $var-description "Holds a " { $link duration } " object that specifies how long to wait for a response from the SMTP server." } ;
 
@@ -75,6 +78,7 @@ ARTICLE: "smtp" "SMTP client library"
 $nl
 "This library is configured by a set of dynamically-scoped variables:"
 { $subsection smtp-server }
+{ $subsection smtp-tls? }
 { $subsection smtp-read-timeout }
 { $subsection smtp-domain }
 { $subsection smtp-auth }

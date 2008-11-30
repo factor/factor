@@ -18,15 +18,22 @@ IN: smtp.tests
     "hello\nworld" [ send-body ] with-string-writer
 ] unit-test
 
-[ "500 syntax error" check-response ] must-fail
+[ { "500 syntax error" } <response> check-response ]
+[ smtp-error? ] must-fail-with
 
-[ ] [ "220 success" check-response ] unit-test
+[ ] [ { "220 success" } <response> check-response ] unit-test
 
-[ "220 success" ] [
+[ T{ response f 220 { "220 success" } } ] [
     "220 success" [ receive-response ] with-string-reader
 ] unit-test
 
-[ "220 the end" ] [
+[
+    T{ response f 220 {
+        "220-a multiline response"
+        "250-another line"
+        "220 the end"
+    } }
+] [
     "220-a multiline response\r\n250-another line\r\n220 the end"
     [ receive-response ] with-string-reader
 ] unit-test
@@ -72,6 +79,8 @@ IN: smtp.tests
 [ ] [
     [
         "localhost" "p" get ?promise <inet> smtp-server set
+        no-auth smtp-auth set
+        smtp-tls? on
 
         <email>
             "Hi guys\nBye guys" >>body
