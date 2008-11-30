@@ -17,21 +17,12 @@ IN: alien.syntax
     [ alien-invoke ] 2curry 2curry ;
 
 : define-function ( return library function parameters -- )
-    >r pick r> parse-arglist
+    [ pick ] dip parse-arglist
     pick create-in dup reset-generic
-    >r >r function-quot r> r> 
+    [ function-quot ] 2dip
     -rot define-declared ;
 
 PRIVATE>
-
-: indirect-quot ( function-ptr-quot return types abi -- quot )
-    [ alien-indirect ] 3curry compose ;
-
-: define-indirect ( abi return function-ptr-quot function-name parameters -- )
-    >r pick r> parse-arglist
-    rot create-in dup reset-generic
-    >r >r swapd roll indirect-quot r> r>
-    -rot define-declared ;
 
 : DLL" lexer get skip-blank parse-string dlopen parsed ; parsing
 
@@ -55,7 +46,7 @@ PRIVATE>
 : C-STRUCT:
     scan in get
     parse-definition
-    >r 2dup r> define-struct-early
+    [ 2dup ] dip define-struct-early
     define-struct ; parsing
 
 : C-UNION:
@@ -64,7 +55,7 @@ PRIVATE>
 : C-ENUM:
     ";" parse-tokens
     dup length
-    [ >r create-in r> 1quotation define ] 2each ;
+    [ [ create-in ] dip 1quotation define ] 2each ;
     parsing
 
 M: alien pprint*

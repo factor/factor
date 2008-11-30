@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors combinators float-arrays kernel jamshred.oint locals math math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences vectors ;
-USE: tools.walker
+USING: accessors arrays colors combinators float-arrays kernel
+locals math math.constants math.matrices math.order math.ranges
+math.vectors math.quadratic random sequences vectors jamshred.oint ;
 IN: jamshred.tunnel
 
 : n-segments ( -- n ) 5000 ; inline

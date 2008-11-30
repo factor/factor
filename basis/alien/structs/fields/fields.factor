@@ -29,10 +29,10 @@ PREDICATE: slot-writer < word "writing" word-prop >boolean ;
     writer>> swap "writing" set-word-prop ;
 
 : reader-word ( class name vocab -- word )
-    >r >r "-" r> 3append r> create ;
+    [ "-" swap 3append ] dip create ;
 
 : writer-word ( class name vocab -- word )
-    >r [ swap "set-" % % "-" % % ] "" make r> create ;
+    [ [ swap "set-" % % "-" % % ] "" make ] dip create ;
 
 : <field-spec> ( struct-name vocab type field-name -- spec )
     field-spec new
