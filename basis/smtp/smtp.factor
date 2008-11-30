@@ -1,16 +1,28 @@
 ! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels,
 ! Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays namespaces make io io.timeouts kernel logging
-io.sockets sequences combinators splitting assocs strings
-math.parser random system calendar io.encodings.ascii summary
-calendar.format accessors sets hashtables ;
+USING: arrays namespaces make io io.encodings.string
+io.encodings.utf8 io.timeouts kernel logging io.sockets
+sequences combinators splitting assocs strings math.parser
+random system calendar io.encodings.ascii summary
+calendar.format accessors sets hashtables base64 ;
 IN: smtp
 
 SYMBOL: smtp-domain
-SYMBOL: smtp-server     "localhost" 25 <inet> smtp-server set-global
-SYMBOL: smtp-read-timeout    1 minutes smtp-read-timeout set-global
-SYMBOL: esmtp?           t esmtp? set-global
+
+SYMBOL: smtp-server
+"localhost" 25 <inet> smtp-server set-global
+
+SYMBOL: smtp-read-timeout
+1 minutes smtp-read-timeout set-global
+
+SINGLETON: no-auth
+
+TUPLE: plain-auth username password ;
+C: <plain-auth> plain-auth
+
+SYMBOL: smtp-auth
+no-auth smtp-auth set-global
 
 LOG: log-smtp-connection NOTICE ( addrspec -- )
 
@@ -34,12 +46,12 @@ TUPLE: email
 : <email> ( -- email ) email new ;
 
 <PRIVATE
+
 : crlf ( -- ) "\r\n" write ;
 
 : command ( string -- ) write crlf flush ;
 
-: helo ( -- )
-    esmtp? get "EHLO " "HELO " ? host-name append command ;
+: helo ( -- ) "EHLO " host-name append command ;
 
 ERROR: bad-email-address email ;
 
@@ -60,8 +72,7 @@ ERROR: bad-email-address email ;
 ERROR: message-contains-dot message ;
 
 M: message-contains-dot summary ( obj -- string )
-    drop
-    "Message cannot contain . on a line by itself" ;
+    drop "Message cannot contain . on a line by itself" ;
 
 : validate-message ( msg -- msg' )
     "." over member?
@@ -115,7 +126,7 @@ ERROR: smtp-transaction-failed < smtp-error ;
     3 swap ?nth CHAR: - = ;
 
 : process-multiline ( multiline -- response )
-    >r readln r> 2dup " " append head? [
+    [ readln ] dip 2dup " " append head? [
         drop dup smtp-response
     ] [
         swap check-response process-multiline
@@ -126,6 +137,16 @@ ERROR: smtp-transaction-failed < smtp-error ;
     dup multiline? [ 3 head process-multiline ] when ;
 
 : get-ok ( -- ) receive-response check-response ;
+
+GENERIC: send-auth ( auth -- )
+
+M: no-auth send-auth drop ;
+
+M: plain-auth send-auth
+    [ username>> ] [ password>> ] bi "\0" swap 3append utf8 encode >base64
+    "AUTH PLAIN " prepend command ;
+
+: auth ( -- ) smtp-auth get send-auth get-ok ;
 
 ERROR: invalid-header-string string ;
 
@@ -170,6 +191,7 @@ ERROR: invalid-header-string string ;
 : (send-email) ( headers email -- )
     [
         helo get-ok
+        auth
         dup from>> extract-email mail-from get-ok
         dup to>> [ extract-email rcpt-to get-ok ] each
         dup cc>> [ extract-email rcpt-to get-ok ] each
@@ -180,6 +202,7 @@ ERROR: invalid-header-string string ;
         body>> send-body get-ok
         quit get-ok
     ] with-smtp-connection ;
+
 PRIVATE>
 
 : send-email ( email -- )

@@ -1,7 +1,9 @@
 USING: smtp tools.test io.streams.string io.sockets threads
 smtp.server kernel sequences namespaces logging accessors
-assocs sorting smtp.private ;
+assocs sorting smtp.private concurrency.promises ;
 IN: smtp.tests
+
+\ send-email must-infer
 
 { 0 0 } [ [ ] with-smtp-connection ] must-infer-as
 
@@ -63,13 +65,13 @@ IN: smtp.tests
     [ from>> extract-email ] tri
 ] unit-test
 
-[ ] [ [ 4321 mock-smtp-server ] "SMTP server" spawn drop ] unit-test
+<promise> "p" set
 
-[ ] [ yield ] unit-test
+[ ] [ "p" get mock-smtp-server ] unit-test
 
 [ ] [
     [
-        "localhost" 4321 <inet> smtp-server set
+        "localhost" "p" get ?promise <inet> smtp-server set
 
         <email>
             "Hi guys\nBye guys" >>body
@@ -82,5 +84,3 @@ IN: smtp.tests
         send-email
     ] with-scope
 ] unit-test
-
-[ ] [ yield ] unit-test

@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel prettyprint io io.timeouts
 sequences namespaces io.sockets continuations calendar
-io.encodings.ascii io.streams.duplex destructors ;
+io.encodings.ascii io.streams.duplex destructors
+locals concurrency.promises threads accessors ;
 IN: smtp.server
 
 ! Mock SMTP server for testing purposes.
 
-! Usage: 4321 mock-smtp-server
 ! $ telnet 127.0.0.1 4321
 ! Trying 127.0.0.1...
 ! Connected to localhost.
@@ -62,13 +62,16 @@ SYMBOL: data-mode
         ]
     } cond nip [ process ] when ;
 
-: mock-smtp-server ( port -- )
-    "Starting SMTP server on port " write dup . flush
-    "127.0.0.1" swap <inet4> ascii <server> [
-        accept drop [
-            1 minutes timeouts
-            "220 hello\r\n" write flush
-            process
-            global [ flush ] bind
-        ] with-stream
-    ] with-disposal ;
+:: mock-smtp-server ( promise -- )
+    #! Store the port we are running on in the promise.
+    [
+        "127.0.0.1" 0 <inet4> ascii <server> [
+        dup addr>> port>> promise fulfill
+            accept drop [
+                1 minutes timeouts
+                "220 hello\r\n" write flush
+                process
+                global [ flush ] bind
+            ] with-stream
+        ] with-disposal
+    ] in-thread ;
