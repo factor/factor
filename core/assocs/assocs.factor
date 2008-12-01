@@ -110,8 +110,8 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     swap [ swapd set-at ] curry assoc-each ;
 
 : assoc-union ( assoc1 assoc2 -- union )
-    2dup [ assoc-size ] bi@ + pick new-assoc
-    [ rot update ] keep [ swap update ] keep ;
+    [ [ [ assoc-size ] bi@ + ] [ drop ] 2bi new-assoc ] 2keep
+    [ dupd update ] bi@ ;
 
 : assoc-combine ( seq -- union )
     H{ } clone [ dupd update ] reduce ;
