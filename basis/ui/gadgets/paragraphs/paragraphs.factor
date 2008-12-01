@@ -1,7 +1,8 @@
-! Copyright (C) 2005, 2007 Slava Pestov
+! Copyright (C) 2005, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ui.gadgets ui.gadgets.labels ui.render kernel math
-namespaces sequences math.order math.geometry.rect ;
+USING: accessors arrays ui.gadgets ui.gadgets.labels ui.render
+kernel math namespaces sequences math.order math.geometry.rect
+locals ;
 IN: ui.gadgets.paragraphs
 
 ! A word break gadget
@@ -46,12 +47,19 @@ SYMBOL: margin
     dup line-height [ max ] change
     y get + max-y [ max ] change ;
 
-: wrap-step ( quot child -- )
-    dup pref-dim [
-        over word-break-gadget? [
-            dup first overrun? [ wrap-line ] when
-        ] unless drop wrap-pos rot call
-    ] keep first2 advance-y advance-x ; inline
+:: wrap-step ( quot child -- )
+    child pref-dim
+    [
+        child
+        [
+            word-break-gadget?
+            [ drop ] [ first overrun? [ wrap-line ] when ] if
+        ]
+        [ wrap-pos quot call ] bi
+    ]
+    [ first advance-x ]
+    [ second advance-y ]
+    tri ; inline
 
 : wrap-dim ( -- dim ) max-x get max-y get 2array ;
 

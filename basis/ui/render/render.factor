@@ -227,7 +227,7 @@ HOOK: free-fonts font-renderer ( world -- )
     dup string? [
         string-width
     ] [
-        0 -rot [ string-width max ] with each
+        [ 0 ] 2dip [ string-width max ] with each
     ] if ;
 
 : text-dim ( open-font text -- dim )

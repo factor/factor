@@ -117,5 +117,7 @@ deploy-gadget "toolbar" f {
     dup com-revert ;
     
 : deploy-tool ( vocab -- )
-    vocab-name dup <deploy-gadget> 10 <border>
-    "Deploying \"" rot "\"" 3append open-window ;
+    vocab-name
+    [ <deploy-gadget> 10 <border> ]
+    [ "Deploying \"" swap "\"" 3append ] bi
+    open-window ;

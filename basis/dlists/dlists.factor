@@ -93,11 +93,11 @@ M: dlist peek-front ( dlist -- obj )
 
 M: dlist pop-front* ( dlist -- )
     [
-        dup front>> [ empty-dlist ] unless*
-        dup next>>
-        f rot (>>next)
-        f over set-prev-when
-        swap (>>front)
+        [
+            [ empty-dlist ] unless*
+            [ f ] change-next drop
+            f over set-prev-when
+        ] change-front drop
     ] keep
     normalize-back ;
 
@@ -106,11 +106,11 @@ M: dlist peek-back ( dlist -- obj )
 
 M: dlist pop-back* ( dlist -- )
     [
-        dup back>> [ empty-dlist ] unless*
-        dup prev>>
-        f rot (>>prev)
-        f over set-next-when
-        swap (>>back)
+        [
+            [ empty-dlist ] unless*
+            [ f ] change-prev drop
+            f over set-next-when
+        ] change-back drop
     ] keep
     normalize-front ;
 

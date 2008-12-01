@@ -95,8 +95,10 @@ M: world key-up-event
     [ key-up-event>gesture ] dip world-focus propagate-gesture ;
 
 : mouse-event>gesture ( event -- modifiers button loc )
-    dup event-modifiers over XButtonEvent-button
-    rot mouse-event-loc ;
+    [ event-modifiers ]
+    [ XButtonEvent-button ]
+    [ mouse-event-loc ]
+    tri ;
 
 M: world button-down-event
     [ mouse-event>gesture [ <button-down> ] dip ] dip
@@ -222,8 +224,8 @@ M: x-clipboard paste-clipboard
     utf8 encode dup length XChangeProperty drop ;
 
 M: x11-ui-backend set-title ( string world -- )
-    handle>> window>> swap dpy get -rot
-    3dup set-title-old set-title-new ;
+    handle>> window>> swap
+    [ dpy get ] 2dip [ set-title-old ] [ set-title-new ] 3bi ;
 
 M: x11-ui-backend set-fullscreen* ( ? world -- )
     handle>> window>> "XClientMessageEvent" <c-object>

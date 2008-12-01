@@ -1,7 +1,10 @@
-USING: smtp tools.test io.streams.string io.sockets threads
-smtp.server kernel sequences namespaces logging accessors
-assocs sorting smtp.private ;
+USING: smtp tools.test io.streams.string io.sockets
+io.sockets.secure threads smtp.server kernel sequences
+namespaces logging accessors assocs sorting smtp.private
+concurrency.promises system ;
 IN: smtp.tests
+
+\ send-email must-infer
 
 { 0 0 } [ [ ] with-smtp-connection ] must-infer-as
 
@@ -16,15 +19,22 @@ IN: smtp.tests
     "hello\nworld" [ send-body ] with-string-writer
 ] unit-test
 
-[ "500 syntax error" check-response ] must-fail
+[ { "500 syntax error" } <response> check-response ]
+[ smtp-error? ] must-fail-with
 
-[ ] [ "220 success" check-response ] unit-test
+[ ] [ { "220 success" } <response> check-response ] unit-test
 
-[ "220 success" ] [
+[ T{ response f 220 { "220 success" } } ] [
     "220 success" [ receive-response ] with-string-reader
 ] unit-test
 
-[ "220 the end" ] [
+[
+    T{ response f 220 {
+        "220-a multiline response"
+        "250-another line"
+        "220 the end"
+    } }
+] [
     "220-a multiline response\r\n250-another line\r\n220 the end"
     [ receive-response ] with-string-reader
 ] unit-test
@@ -63,13 +73,15 @@ IN: smtp.tests
     [ from>> extract-email ] tri
 ] unit-test
 
-[ ] [ [ 4321 mock-smtp-server ] "SMTP server" spawn drop ] unit-test
+<promise> "p" set
 
-[ ] [ yield ] unit-test
+[ ] [ "p" get mock-smtp-server ] unit-test
 
 [ ] [
-    [
-        "localhost" 4321 <inet> smtp-server set
+    <secure-config> f >>verify [
+        "localhost" "p" get ?promise <inet> smtp-server set
+        no-auth smtp-auth set
+        os unix? [ smtp-tls? on ] when
 
         <email>
             "Hi guys\nBye guys" >>body
@@ -80,7 +92,5 @@ IN: smtp.tests
             } >>to
             "Doug <erg@factorcode.org>" >>from
         send-email
-    ] with-scope
+    ] with-secure-context
 ] unit-test
-
-[ ] [ yield ] unit-test

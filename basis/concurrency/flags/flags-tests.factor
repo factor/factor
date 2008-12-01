@@ -2,7 +2,7 @@ IN: concurrency.flags.tests
 USING: tools.test concurrency.flags concurrency.combinators
 kernel threads locals accessors calendar ;
 
-:: flag-test-1 ( -- )
+:: flag-test-1 ( -- val )
     [let | f [ <flag> ] |
         [ f raise-flag ] "Flag test" spawn drop
         f lower-flag
@@ -20,7 +20,7 @@ kernel threads locals accessors calendar ;
 
 [ f ] [ flag-test-2 ] unit-test
 
-:: flag-test-3 ( -- )
+:: flag-test-3 ( -- val )
     [let | f [ <flag> ] |
         f raise-flag
         f value>>
@@ -28,7 +28,7 @@ kernel threads locals accessors calendar ;
 
 [ t ] [ flag-test-3 ] unit-test
 
-:: flag-test-4 ( -- )
+:: flag-test-4 ( -- val )
     [let | f [ <flag> ] |
         [ f raise-flag ] "Flag test" spawn drop
         f wait-for-flag
@@ -37,7 +37,7 @@ kernel threads locals accessors calendar ;
 
 [ t ] [ flag-test-4 ] unit-test
 
-:: flag-test-5 ( -- )
+:: flag-test-5 ( -- val )
     [let | f [ <flag> ] |
         [ 1 seconds sleep f raise-flag ] "Flag test" spawn drop
         f wait-for-flag

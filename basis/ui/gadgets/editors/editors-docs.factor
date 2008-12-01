@@ -20,21 +20,11 @@ HELP: <editor>
 { $values { "editor" "a new " { $link editor } } }
 { $description "Creates a new " { $link editor } " with an empty document." } ;
 
-! 'editor-caret' is now an old accessor, but it's documented as a word here. Maybe move this description somewhere else.
-
-! HELP: editor-caret ( editor -- caret )
-! { $values { "editor" editor } { "caret" model } }
-! { $description "Outputs a " { $link model } " holding the current caret location." } ;
-
 { editor-caret* editor-mark* } related-words
 
 HELP: editor-caret*
 { $values { "editor" editor } { "loc" "a pair of integers" } }
 { $description "Outputs the current caret location as a line/column number pair." } ;
-
-! HELP: editor-mark ( editor -- mark )
-! { $values { "editor" editor } { "mark" model } }
-! { $description "Outputs a " { $link model } " holding the current mark location." } ;
 
 HELP: editor-mark*
 { $values { "editor" editor } { "loc" "a pair of integers" } }
