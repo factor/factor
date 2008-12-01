@@ -3,7 +3,7 @@ USING: tools.test concurrency.locks concurrency.count-downs
 concurrency.messaging concurrency.mailboxes locals kernel
 threads sequences calendar accessors ;
 
-:: lock-test-0 ( -- )
+:: lock-test-0 ( -- v )
     [let | v [ V{ } clone ]
            c [ 2 <count-down> ] |
 
@@ -27,7 +27,7 @@ threads sequences calendar accessors ;
            v
     ] ;
 
-:: lock-test-1 ( -- )
+:: lock-test-1 ( -- v )
     [let | v [ V{ } clone ]
            l [ <lock> ]
            c [ 2 <count-down> ] |
@@ -79,7 +79,7 @@ threads sequences calendar accessors ;
 
 [ ] [ <rw-lock> dup [ [ ] with-read-lock ] with-write-lock ] unit-test
 
-:: rw-lock-test-1 ( -- )
+:: rw-lock-test-1 ( -- v )
     [let | l [ <rw-lock> ]
            c [ 1 <count-down> ]
            c' [ 1 <count-down> ]
@@ -129,7 +129,7 @@ threads sequences calendar accessors ;
 
 [ V{ 1 2 3 4 5 6 } ] [ rw-lock-test-1 ] unit-test
 
-:: rw-lock-test-2 ( -- )
+:: rw-lock-test-2 ( -- v )
     [let | l [ <rw-lock> ]
            c [ 1 <count-down> ]
            c' [ 2 <count-down> ]
@@ -160,7 +160,7 @@ threads sequences calendar accessors ;
 [ V{ 1 2 3 } ] [ rw-lock-test-2 ] unit-test
 
 ! Test lock timeouts
-:: lock-timeout-test ( -- )
+:: lock-timeout-test ( -- v )
     [let | l [ <lock> ] |
         [
             l [ 1 seconds sleep ] with-lock
@@ -176,19 +176,6 @@ threads sequences calendar accessors ;
 [ lock-timeout-test ] [
     thread>> name>> "Lock timeout-er" =
 ] must-fail-with
-
-:: read/write-test ( -- )
-    [let | l [ <lock> ] |
-        [
-            l [ 1 seconds sleep ] with-lock
-        ] "Lock holder" spawn drop
-
-        [
-            l 1/10 seconds [ ] with-lock-timeout
-        ] "Lock timeout-er" spawn-linked drop
-
-        receive
-    ] ;
 
 [
     <rw-lock> dup [
