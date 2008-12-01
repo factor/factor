@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs combinators kernel sequences splitting system
-vocabs.loader ;
+vocabs.loader init ;
 IN: environment
 
 HOOK: os-env os ( key -- value )
@@ -25,3 +25,8 @@ HOOK: (set-os-envs) os ( seq -- )
     { [ os winnt? ] [ "environment.winnt" require ] }
     { [ os wince? ] [ ] }
 } cond
+
+[
+    "FACTOR_ROOTS" os-env os windows? ";" ":" ? split
+    [ add-vocab-root ] each
+] "environment" add-init-hook
