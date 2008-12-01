@@ -4,8 +4,6 @@ USING: sequences system vocabs.loader combinators accessors
 kernel math.order sorting ;
 IN: unix.statfs
 
-HOOK: >file-system-info os ( struct -- statfs )
-
 os {
     { linux   [ "unix.statfs.linux"   require ] }
     { macosx  [ "unix.statfs.macosx"  require ] }
