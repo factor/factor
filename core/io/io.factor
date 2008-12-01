@@ -99,6 +99,9 @@ SYMBOL: error-stream
 : lines ( stream -- seq )
     [ [ readln dup ] [ ] [ drop ] produce ] with-input-stream ;
 
+: each-line ( quot -- )
+    [ [ readln dup ] ] dip [ drop ] while ; inline
+
 : contents ( stream -- str )
     [
         [ 65536 read dup ] [ ] [ drop ] produce concat f like
