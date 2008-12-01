@@ -187,7 +187,8 @@ SYMBOL: +unknown+
 
 HOOK: file-systems os ( -- array )
 
-TUPLE: file-system-info device-name mount-point type free-space ;
+TUPLE: file-system-info device-name mount-point type
+free-space used-space total-space ;
 
 HOOK: file-system-info os ( path -- file-system-info )
 
