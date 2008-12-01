@@ -20,7 +20,7 @@ IN: cocoa.pasteboard
 : set-pasteboard-string ( str pasteboard -- )
     NSStringPboardType <NSString>
     dup 1array pick set-pasteboard-types
-    >r swap <NSString> r> -> setString:forType: drop ;
+    [ swap <NSString> ] dip -> setString:forType: drop ;
 
 : pasteboard-error ( error -- f )
     "Pasteboard does not hold a string" <NSString>

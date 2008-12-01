@@ -86,14 +86,11 @@ M: gadget children-on nip children>> ;
 
 : pick-up ( point gadget -- child/f )
     2dup (pick-up) dup
-    [ nip [ rect-loc v- ] keep pick-up ] [ rot 2drop ] if ;
+    [ nip [ rect-loc v- ] keep pick-up ] [ drop nip ] if ;
 
 : max-dim ( dims -- dim ) { 0 0 } [ vmax ] reduce ;
 
 : dim-sum ( seq -- dim ) { 0 0 } [ v+ ] reduce ;
-
-: orient ( gadget seq1 seq2 -- seq )
-    rot orientation>> '[ _ set-axis ] 2map ;
 
 : each-child ( gadget quot -- )
     [ children>> ] dip each ; inline

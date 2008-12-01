@@ -95,6 +95,7 @@ ARTICLE: "gadgets" "Pre-made UI gadgets"
 { $subsection "ui.gadgets.sliders" }
 { $subsection "ui.gadgets.scrollers" }
 { $subsection "gadgets-editors" }
+{ $subsection "ui.gadgets.menus" }
 { $subsection "ui.gadgets.panes" }
 { $subsection "ui.gadgets.presentations" }
 { $subsection "ui.gadgets.lists" } ;

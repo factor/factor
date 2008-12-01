@@ -152,13 +152,6 @@ M: mock-gadget ungraft*
     { { f f } { f t } { t f } { t t } } [ notify-combo ] assoc-each
 ] with-string-writer print
 
-[ { { 10 30 } } ] [
-    <gadget> { 0 1 } >>orientation
-    { { 10 20 } }
-    { { 100 30 } }
-    orient
-] unit-test
-
 \ <gadget> must-infer
 \ unparent must-infer
 \ add-gadget must-infer

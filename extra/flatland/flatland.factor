@@ -176,3 +176,45 @@ METHOD: height ( <extent> -- height ) \\ top>>   bottom>> bi - ;
 ! METHOD: to-extent ( <rectangle> -- <extent> )
 !   { [ left>> ] [ right>> ] [ bottom>> ] [ top>> ] } cleave <extent> boa ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+METHOD: to-the-left-of?  ( sequence <rectangle> -- ? ) \\ x left  bi* < ;
+METHOD: to-the-right-of? ( sequence <rectangle> -- ? ) \\ x right bi* > ;
+
+METHOD: below? ( sequence <rectangle> -- ? ) \\ y bottom bi* < ;
+METHOD: above? ( sequence <rectangle> -- ? ) \\ y top    bi* > ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Some support for the' 'rect' class from math.geometry.rect'
+
+! METHOD: width  ( rect -- width  ) dim>> first  ;
+! METHOD: height ( rect -- height ) dim>> second ;
+
+! METHOD: left  ( rect -- left  ) loc>> x
+! METHOD: right ( rect -- right ) [ loc>> x ] [ width ] bi + ;
+
+! METHOD: to-the-left-of?  ( sequence rect -- ? ) [ x ] [ loc>> x ] bi* < ;
+! METHOD: to-the-right-of? ( sequence rect -- ? ) [ x ] [ loc>> x ] bi* > ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: locals combinators ; 
+
+:: wrap ( POINT RECT -- POINT )
+    
+  {
+      { [ POINT RECT to-the-left-of?  ] [ RECT right ] }
+      { [ POINT RECT to-the-right-of? ] [ RECT left  ] }
+      { [ t                           ] [ POINT x    ] }
+  }
+  cond
+
+  {
+      { [ POINT RECT below? ] [ RECT top    ] }
+      { [ POINT RECT above? ] [ RECT bottom ] }
+      { [ t                 ] [ POINT y     ] }
+  }
+  cond
+
+  2array ;

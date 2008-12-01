@@ -296,8 +296,10 @@ SYMBOL: nc-buttons
     key-modifiers swap message>button
     [ <button-down> ] [ <button-up> ] if ;
 
-: prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
-    [ drop mouse-event>gesture ] dip >lo-hi rot window ;
+:: prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
+    uMsg mouse-event>gesture
+    lParam >lo-hi
+    hWnd window ;
 
 : set-capture ( hwnd -- )
     mouse-captured get [
@@ -435,7 +437,7 @@ M: windows-ui-backend do-events
     style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
 
 : make-RECT ( world -- RECT )
-    dup window-loc>> dup rot rect-dim v+
+    [ window-loc>> dup ] [ rect-dim ] bi v+
     "RECT" <c-object>
     over first over set-RECT-right
     swap second over set-RECT-bottom

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel threads boxes accessors ;
+USING: kernel threads boxes accessors fry ;
 IN: concurrency.exchangers
 
 ! Motivated by
@@ -14,8 +14,8 @@ TUPLE: exchanger thread object ;
 : exchange ( obj exchanger -- newobj )
     dup thread>> occupied>> [
         dup object>> box>
-        >r thread>> box> resume-with r>
+        [ thread>> box> resume-with ] dip
     ] [
         [ object>> >box ] keep
-        [ thread>> >box ] curry "exchange" suspend
+        '[ _ thread>> >box ] "exchange" suspend
     ] if ;
