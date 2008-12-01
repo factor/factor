@@ -92,16 +92,6 @@ PRIVATE>
 : 0^ ( x -- z )
     dup zero? [ drop 0./0. ] [ 0 < 1./0. 0 ? ] if ; inline
 
-PRIVATE>
-
-: ^ ( x y -- z )
-    {
-        { [ over zero? ] [ nip 0^ ] }
-        { [ dup integer? ] [ integer^ ] }
-        { [ 2dup real^? ] [ fpow ] }
-        [ ^complex ]
-    } cond ; inline
-
 : (^mod) ( n x y -- z )
     1 swap [
         [ dupd * pick mod ] when [ sq over mod ] dip
@@ -113,6 +103,16 @@ PRIVATE>
     ] [
         swap [ /mod [ over * swapd - ] dip ] keep (gcd)
     ] if ;
+
+PRIVATE>
+
+: ^ ( x y -- z )
+    {
+        { [ over zero? ] [ nip 0^ ] }
+        { [ dup integer? ] [ integer^ ] }
+        { [ 2dup real^? ] [ fpow ] }
+        [ ^complex ]
+    } cond ; inline
 
 : gcd ( x y -- a d )
     [ 0 1 ] 2dip (gcd) dup 0 < [ neg ] when ; foldable
@@ -177,9 +177,9 @@ M: complex log >polar swap flog swap rect> ;
 GENERIC: cos ( x -- y ) foldable
 
 M: complex cos
-    >float-rect 2dup
-    fcosh swap fcos * -rot
-    fsinh swap fsin neg * rect> ;
+    >float-rect
+    [ [ fcos ] [ fcosh ] bi* * ]
+    [ [ fsin neg ] [ fsinh ] bi* * ] 2bi rect> ;
 
 M: real cos fcos ;
 
@@ -188,9 +188,9 @@ M: real cos fcos ;
 GENERIC: cosh ( x -- y ) foldable
 
 M: complex cosh
-    >float-rect 2dup
-    fcos swap fcosh * -rot
-    fsin swap fsinh * rect> ;
+    >float-rect
+    [ [ fcosh ] [ fcos ] bi* * ]
+    [ [ fsinh ] [ fsin ] bi* * ] 2bi rect> ;
 
 M: real cosh fcosh ;
 
@@ -199,9 +199,9 @@ M: real cosh fcosh ;
 GENERIC: sin ( x -- y ) foldable
 
 M: complex sin
-    >float-rect 2dup
-    fcosh swap fsin * -rot
-    fsinh swap fcos * rect> ;
+    >float-rect
+    [ [ fsin ] [ fcosh ] bi* * ]
+    [ [ fcos ] [ fsinh ] bi* * ] 2bi rect> ;
 
 M: real sin fsin ;
 
@@ -210,9 +210,9 @@ M: real sin fsin ;
 GENERIC: sinh ( x -- y ) foldable
 
 M: complex sinh 
-    >float-rect 2dup
-    fcos swap fsinh * -rot
-    fsin swap fcosh * rect> ;
+    >float-rect
+    [ [ fsinh ] [ fcos ] bi* * ]
+    [ [ fcosh ] [ fsin ] bi* * ] 2bi rect> ;
 
 M: real sinh fsinh ;
 

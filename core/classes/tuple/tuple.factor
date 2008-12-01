@@ -248,7 +248,9 @@ M: tuple-class update-class
     3bi ;
 
 : tuple-class-unchanged? ( class superclass slots -- ? )
-    rot tuck [ superclass = ] [ "slots" word-prop = ] 2bi* and ;
+    [ over ] dip
+    [ [ superclass ] dip = ]
+    [ [ "slots" word-prop ] dip = ] 2bi* and ;
 
 : valid-superclass? ( class -- ? )
     [ tuple-class? ] [ tuple eq? ] bi or ;

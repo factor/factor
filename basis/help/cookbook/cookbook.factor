@@ -1,6 +1,6 @@
 USING: help.markup help.syntax io kernel math namespaces parser
 prettyprint sequences vocabs.loader namespaces stack-checker
-help ;
+help command-line multiline ;
 IN: help.cookbook
 
 ARTICLE: "cookbook-syntax" "Basic syntax cookbook"
@@ -263,15 +263,65 @@ ARTICLE: "cookbook-application" "Application cookbook"
 ARTICLE: "cookbook-scripts" "Scripting cookbook"
 "Factor can be used for command-line scripting on Unix-like systems."
 $nl
-"A text file can begin with a comment like the following, and made executable:"
-{ $code "#! /usr/bin/env factor -script" }
-"Running the text file will run it through Factor, assuming the " { $snippet "factor" } " binary is in your " { $snippet "$PATH" } "."
+"To run a script, simply pass it as an argument to the Factor executable:"
+{ $code "./factor cleanup.factor" }
+"The script may access command line arguments by inspecting the value of the " { $link command-line } " variable. It can also get its own path from the " { $link script } " variable."
+{ $heading "Example: ls" }
+"Here is an example implementing a simplified version of the Unix " { $snippet "ls" } " command in Factor:"
+{ $code
+    <" USING: command-line namespaces io io.files io.files.listing
+sequences kernel ;
+
+command-line get [
+    current-directory get directory.
+] [
+    dup length 1 = [ first directory. ] [
+        [ [ nl write ":" print ] [ directory. ] bi ] each
+    ] if
+] if-empty">
+}
+"You can put it in a file named " { $snippet "ls.factor" } ", and then run it, to list the " { $snippet "/usr/bin" } " directory for example:"
+{ $code "./factor ls.factor /usr/bin" }
+{ $heading "Example: grep" }
+"The following is a more complicated example, implementing something like the Unix " { $snippet "grep" } " command:"
+{ $code <" USING: kernel fry io io.files io.encodings.ascii sequences
+regexp command-line namespaces ;
+IN: grep
+
+: grep-lines ( pattern -- )
+    '[ dup _ matches? [ print ] [ drop ] if ] each-line ;
+
+: grep-file ( pattern filename -- )
+    ascii [ grep-lines ] with-file-reader ;
+
+: grep-usage ( -- )
+    "Usage: factor grep.factor <pattern> [<file>...]" print ;
+
+command-line get [
+    grep-usage
+] [
+    unclip <regexp> swap [
+        grep-lines
+    ] [
+        [ grep-file ] with each
+    ] if-empty
+] if-empty"> }
+"You can run it like so,"
+{ $code "./factor grep.factor '.*hello.*' myfile.txt" }
+"You'll notice this script takes a while to start. This is because it is loading and compiling the " { $vocab-link "regexp" } " vocabulary every time. To speed up startup, load the vocabulary into your image, and save the image:"
+{ $code "USE: regexp" "save" }
+"Now, the " { $snippet "grep.factor" } " script will start up much faster. See " { $link "images" } " for details."
+{ $heading "Executable scripts" }
+"It is also possible to make executable scripts. A Factor file can begin with a comment like the following:"
+{ $code "#! /usr/bin/env factor" }
+"If the text file is made executable, then it can be run, assuming the " { $snippet "factor" } " binary is in your " { $snippet "$PATH" } "."
 $nl
-"The space between " { $snippet "#!" } " and " { $snippet "/usr/bin/env" } " is necessary, since " { $link POSTPONE: #! } " is a parsing word, and a syntax error would otherwise result. The " { $snippet "-script" } " switch suppresses compiler messages, and exits Factor when the script finishes."
+"The space between " { $snippet "#!" } " and " { $snippet "/usr/bin/env" } " is necessary, since " { $link POSTPONE: #! } " is a parsing word, and a syntax error would otherwise result."
 { $references
     { }
     "cli"
     "cookbook-application"
+    "images"
 } ;
 
 ARTICLE: "cookbook-philosophy" "Factor philosophy"
@@ -325,15 +375,6 @@ ARTICLE: "cookbook-pitfalls" "Pitfalls to avoid"
     { "If " { $link run-file } " throws a stack depth assertion, it means that the top-level form in the file left behind values on the stack. The stack depth is compared before and after loading a source file, since this type of situation is almost always an error. If you have a legitimate need to load a source file which returns data in some manner, define a word in the source file which produces this data on the stack and call the word after loading the file." }
 } ;
 
-ARTICLE: "cookbook-images" "Image file cookbook"
-"Factor has the ability to save the entire state of the system into an " { $emphasis "image file" } "."
-$nl
-"You can save a custom image if you find yourself loading the same libraries in every Factor session; some libraries take a little while to compile, so saving an image with those libraries loaded can save you a lot of time."
-$nl
-"For example, to save an image with the web framework loaded,"
-{ $code "USE: furnace" "save" }
-"See " { $link "images" } " for details." ;
-
 ARTICLE: "cookbook-next" "Next steps"
 "Once you have read through " { $link "first-program" } " and " { $link "cookbook" } ", the best way to keep learning Factor is to start looking at some simple example programs. Here are a few particularly nice vocabularies which should keep you busy for a little while:"
 { $list
@@ -358,7 +399,6 @@ ARTICLE: "cookbook" "Factor cookbook"
 { $subsection "cookbook-application" }
 { $subsection "cookbook-scripts" }
 { $subsection "cookbook-compiler" }
-{ $subsection "cookbook-images" }
 { $subsection "cookbook-philosophy" }
 { $subsection "cookbook-pitfalls" }
 { $subsection "cookbook-next" } ;
