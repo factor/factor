@@ -1,81 +1,44 @@
 
-USING: kernel namespaces
-       math
-       math.constants
-       math.functions
-       math.order
-       math.vectors
-       math.trig
-       math.ranges
-       combinators arrays sequences random vars
-       combinators.lib
-       combinators.short-circuit
+USING: kernel
+       namespaces
+       arrays
        accessors
+       strings
+       sequences
+       locals
+       threads
+       math
+       math.functions
+       math.trig
+       math.order
+       math.ranges
+       math.vectors
+       random
+       calendar
+       opengl.gl
+       opengl
+       ui
+       ui.gadgets
+       ui.gadgets.tracks
+       ui.gadgets.frames
+       ui.gadgets.grids
+       ui.render
+       multi-methods
+       multi-method-syntax
+       combinators.short-circuit.smart       
+       processing.shapes
        flatland ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 IN: boids
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-TUPLE: boid < <vel> ;
-
-C: <boid> boid
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-VAR: boids
-VAR: world-size
-VAR: time-slice
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-VAR: cohesion-weight
-VAR: alignment-weight
-VAR: separation-weight
-
-VAR: cohesion-view-angle
-VAR: alignment-view-angle
-VAR: separation-view-angle
-
-VAR: cohesion-radius
-VAR: alignment-radius
-VAR: separation-radius
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: init-variables ( -- )
-  1.0 >cohesion-weight
-  1.0 >alignment-weight
-  1.0 >separation-weight
-
-  75 >cohesion-radius
-  50 >alignment-radius
-  25 >separation-radius
-
-  180 >cohesion-view-angle
-  180 >alignment-view-angle
-  180 >separation-view-angle
-
-  10 >time-slice ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! random-boid and random-boids
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: random-pos ( -- pos ) world-size> [ random ] map ;
-
-: random-vel ( -- vel ) 2 [ drop -10 10 [a,b] random ] map ;
-
-: random-boid ( -- boid ) random-pos random-vel <boid> ;
-
-: random-boids ( n -- boids ) [ drop random-boid ] map ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : constrain ( n a b -- n ) rot min max ;
 
 : angle-between ( vec vec -- angle )
-  2dup v. -rot norm swap norm * / -1 1 constrain acos rad>deg ;
+  [ v. ] [ [ norm ] bi@ * ] 2bi / -1 1 constrain acos rad>deg ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -86,19 +49,47 @@ VAR: separation-radius
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: in-radius? ( self other radius -- ? ) [ distance       ] dip     <= ;
+: in-view?   ( self other angle  -- ? ) [ relative-angle ] dip 2 / <= ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : vsum ( vector-of-vectors -- vec ) { 0 0 } [ v+ ] reduce ;
 
 : vaverage ( seq-of-vectors -- seq ) [ vsum ] [ length ] bi v/n ;
 
 : average-position ( boids -- pos ) [ pos>> ] map vaverage ;
-
 : average-velocity ( boids -- vel ) [ vel>> ] map vaverage ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: in-range? ( self other radius -- ? ) >r distance r> <= ;
+TUPLE: <boid> < <vel> ;
 
-: in-view? ( self other angle -- ? ) >r relative-angle r> 2 / <= ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+TUPLE: <behaviour>
+  { weight     initial: 1.0 }
+  { view-angle initial: 180 }
+  { radius                  } ;
+
+TUPLE: <cohesion>   < <behaviour> { radius initial: 75 } ;
+TUPLE: <alignment>  < <behaviour> { radius initial: 50 } ;
+TUPLE: <separation> < <behaviour> { radius initial: 25 } ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: within-neighborhood? ( SELF OTHER BEHAVIOUR -- ? )
+
+  SELF OTHER
+    {
+      [ BEHAVIOUR radius>>     in-radius? ]
+      [ BEHAVIOUR view-angle>> in-view?   ]
+      [ eq? not                           ]
+    }
+  && ;
+
+:: neighborhood ( SELF OTHERS BEHAVIOUR -- boids )
+  OTHERS [| OTHER | SELF OTHER BEHAVIOUR within-neighborhood? ] filter ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -106,127 +97,264 @@ VAR: separation-radius
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! average_position(neighbors) - self_position
+GENERIC: force* ( sequence <boid> <behaviour> -- force )
 
-: within-cohesion-neighborhood? ( self other -- ? )
-  { [ cohesion-radius> in-range? ]
-    [ cohesion-view-angle> in-view? ]
-    [ eq? not ] }
-  2&& ;
+:: cohesion-force ( OTHERS SELF BEHAVIOUR -- force )
+  OTHERS average-position SELF pos>> v- normalize* BEHAVIOUR weight>> v*n ;
 
-: cohesion-neighborhood ( self -- boids )
-  boids> [ within-cohesion-neighborhood? ] with filter ;
+:: alignment-force ( OTHERS SELF BEHAVIOUR -- force )
+  OTHERS average-velocity normalize* BEHAVIOUR weight>> v*n ;
 
-: cohesion-force ( self -- force )
-  dup cohesion-neighborhood
-  dup empty?
-  [ 2drop { 0 0 } ]
-  [ average-position swap pos>> v- normalize* cohesion-weight> v*n ]
+:: separation-force ( OTHERS SELF BEHAVIOUR -- force )
+  SELF pos>> OTHERS average-position v- normalize* BEHAVIOUR weight>> v*n ;
+
+METHOD: force* ( sequence <boid> <cohesion>   -- force ) cohesion-force   ;
+METHOD: force* ( sequence <boid> <alignment>  -- force ) alignment-force  ;
+METHOD: force* ( sequence <boid> <separation> -- force ) separation-force ;
+
+:: force ( OTHERS SELF BEHAVIOUR -- force )
+  SELF OTHERS BEHAVIOUR neighborhood
+    [ { 0 0 } ]
+    [ SELF BEHAVIOUR force* ]
+  if-empty ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: random-boids ( count -- boids )
+  [
+    drop
+    <boid> new
+      2 [ drop         1000 random ] map >>pos
+      2 [ drop -10 10 [a,b] random ] map >>vel
+  ]
+  map ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: draw-boid ( boid -- )
+  glPushMatrix
+    dup pos>> gl-translate-2d
+        vel>> first2 rect> arg rad>deg 0 0 1 glRotated
+    { { 0 5 } { 0 -5 } { 20 0 } } triangle
+    fill-mode
+  glPopMatrix ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: gadget->sky ( gadget -- sky ) { 0 0 } swap dim>> <rectangle> boa ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USE: syntax ! Switch back to non-multi-method 'TUPLE:' syntax
+
+TUPLE: <boids-gadget> < gadget paused boids behaviours time-slice ;
+
+M:  <boids-gadget> pref-dim*    ( <boids-gadget> -- dim ) drop { 600 400 } ;
+M:  <boids-gadget> ungraft*     ( <boids-gadget> --     ) t >>paused drop  ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M:: <boids-gadget> draw-gadget* ( BOIDS-GADGET -- )
+
+  [let | SKY        [ BOIDS-GADGET gadget->sky   ]
+         BOIDS      [ BOIDS-GADGET boids>>       ]
+         TIME-SLICE [ BOIDS-GADGET time-slice>>  ]
+         BEHAVIOURS [ BOIDS-GADGET behaviours>>  ] |
+
+    BOIDS
+
+      [| SELF |
+
+        [wlet | force-due-to [| BEHAVIOUR | BOIDS SELF BEHAVIOUR force ] |
+
+          ! F = m a. M is 1. So F = a.
+            
+          [let | ACCEL [ BEHAVIOURS [ force-due-to ] map vsum ] |
+
+            [let | POS [ SELF pos>> SELF vel>> TIME-SLICE v*n v+ ]
+                   VEL [ SELF vel>> ACCEL      TIME-SLICE v*n v+ ] |
+
+              [let | POS [ POS SKY wrap   ]
+                     VEL [ VEL normalize* ] |
+                    
+                T{ <boid> f POS VEL } ] ] ] ]
+
+      ]
+      
+    map
+
+    BOIDS-GADGET (>>boids)
+
+    origin get
+      [ BOIDS-GADGET boids>> [ draw-boid ] each ]
+    with-translation ] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: start-boids-thread ( GADGET -- )
+  GADGET f >>paused drop
+  [
+    [
+      GADGET paused>>
+        [ f ]
+        [ GADGET relayout-1 25 milliseconds sleep t ]
+      if
+    ]
+    loop
+  ]
+  in-thread ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: default-behaviours ( -- seq )
+  { <cohesion> <alignment> <separation> } [ new ] map ;
+
+: boids-gadget ( -- gadget )
+  <boids-gadget> new-gadget
+    100 random-boids   >>boids
+    default-behaviours >>behaviours
+    10                 >>time-slice
+    t                  >>clipped? ;
+
+: run-boids ( -- ) boids-gadget dup "Boids" open-window start-boids-thread ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: math.parser
+       ui.gadgets.labels
+       ui.gadgets.buttons
+       ui.gadgets.packs ;
+
+: truncate-number ( n -- n ) 10 * round 10 / ;
+
+:: make-behaviour-control ( NAME BEHAVIOUR -- gadget )
+  [let | NAME-LABEL  [ NAME           <label> reverse-video-theme ]
+         VALUE-LABEL [ 20 32 <string> <label> reverse-video-theme ] |
+
+    [wlet | update-value-label [ ! ( -- )
+              BEHAVIOUR weight>> truncate-number number>string
+              VALUE-LABEL
+              set-label-string ] |
+
+      update-value-label
+      
+    <pile> 1 >>fill
+      { 1 0 } <track>
+        NAME-LABEL  0.5 track-add
+        VALUE-LABEL 0.5 track-add
+      add-gadget
+      
+      "+0.1"
+      [
+        drop
+        BEHAVIOUR [ 0.1 + ] change-weight drop
+        update-value-label
+      ]
+      <bevel-button> add-gadget
+      
+      "-0.1"
+      [
+        drop
+        BEHAVIOUR weight>> 0.1 >
+        [
+          BEHAVIOUR [ 0.1 - ] change-weight drop
+          update-value-label
+        ]
+        when
+      ]
+      <bevel-button> add-gadget ] ] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: make-population-control ( BOIDS-GADGET -- gadget )
+  [let | VALUE-LABEL [ 20 32 <string> <label> reverse-video-theme ] |
+
+    [wlet | update-value-label [ ( -- )
+              BOIDS-GADGET boids>> length number>string
+              VALUE-LABEL
+              set-label-string ] |
+
+      update-value-label
+      
+      <pile> 1 >>fill
+    
+        { 1 0 } <track>
+          "Population: " <label> reverse-video-theme 0.5 track-add
+          VALUE-LABEL                                0.5 track-add
+        add-gadget
+
+        "Add 10"
+        [
+          drop
+          BOIDS-GADGET
+            BOIDS-GADGET boids>> 10 random-boids append
+          >>boids
+          drop
+          update-value-label
+        ]
+        <bevel-button>
+        add-gadget
+
+        "Sub 10"
+        [
+          drop
+          BOIDS-GADGET boids>> length 10 >
+          [
+            BOIDS-GADGET
+              BOIDS-GADGET boids>> 10 tail
+            >>boids
+            drop
+            update-value-label
+          ]
+          when
+        ]
+        <bevel-button>
+        add-gadget ] ] ( gadget -- gadget ) ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: pause-toggle ( BOIDS-GADGET -- )
+  BOIDS-GADGET paused>>
+    [ BOIDS-GADGET start-boids-thread ]
+    [ BOIDS-GADGET t >>paused drop    ]
   if ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+:: randomize-boids ( BOIDS-GADGET -- )
+  BOIDS-GADGET   BOIDS-GADGET boids>> length random-boids   >>boids drop ;
 
-! self_position - average_position(neighbors)
+: boids-app ( -- )
 
-: within-separation-neighborhood? ( self other -- ? )
-  { [ separation-radius> in-range? ]
-    [ separation-view-angle> in-view? ]
-    [ eq? not ] }
-  2&& ;
+  [let | BOIDS-GADGET [ boids-gadget ] |
 
-: separation-neighborhood ( self -- boids )
-  boids> [ within-separation-neighborhood? ] with filter ;
+    <frame>
 
-: separation-force ( self -- force )
-  dup separation-neighborhood
-  dup empty?
-  [ 2drop { 0 0 } ]
-  [ average-position swap pos>> swap v- normalize* separation-weight> v*n ]
-  if ;
+      <shelf>
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        1 >>fill
 
-! average_velocity(neighbors)
+        "Pause" [ drop BOIDS-GADGET pause-toggle ] <bevel-button> add-gadget
 
-: within-alignment-neighborhood? ( self other -- ? )
-  { [ alignment-radius> in-range? ]
-    [ alignment-view-angle> in-view? ]
-    [ eq? not ] }
-  2&& ;
+        "Randomize"
+        [ drop BOIDS-GADGET randomize-boids ] <bevel-button> add-gadget
 
-: alignment-neighborhood ( self -- boids )
-  boids> [ within-alignment-neighborhood? ] with filter ;
+        BOIDS-GADGET make-population-control add-gadget
+    
+        "Cohesion:   " BOIDS-GADGET behaviours>> first  make-behaviour-control 
+        "Alignment:  " BOIDS-GADGET behaviours>> second make-behaviour-control
+        "Separation: " BOIDS-GADGET behaviours>> third  make-behaviour-control
 
-: alignment-force ( self -- force )
-  alignment-neighborhood
-  dup empty?
-  [ drop { 0 0 } ]
-  [ average-velocity normalize* alignment-weight> v*n ]
-  if ;
+        [ add-gadget ] tri@
+
+      @top grid-add
+
+      BOIDS-GADGET @center grid-add
+
+    "Boids" open-window
+
+    BOIDS-GADGET start-boids-thread ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! F = m a
-!
-! We let m be equal to 1 so then this is simply: F = a
+: boids-main ( -- ) [ boids-app ] with-ui ;
 
-: acceleration ( boid -- acceleration )
-  { separation-force alignment-force cohesion-force } map-exec-with vsum ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! iterate-boid
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: world-width ( -- w ) world-size> first ;
-
-: world-height ( -- w ) world-size> second ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: below? ( n a b -- ? ) drop < ;
-
-: above? ( n a b -- ? ) nip > ;
-
-: wrap ( n a b -- n )
-  {
-    { [ 3dup below? ] [ 2nip     ] }
-    { [ 3dup above? ] [ drop nip ] }
-    { [ t           ] [ 2drop    ] }
-  }
-  cond ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: wrap-x ( x -- x ) 0 world-width 1- wrap ;
-
-: wrap-y ( y -- y ) 0 world-height 1- wrap ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: new-pos ( boid -- pos ) [ pos>> ] [ vel>> time-slice> v*n ] bi v+ ;
-
-: new-vel ( boid -- vel )
-  [ vel>> ] [ acceleration time-slice> v*n ] bi v+ normalize* ;
-
-: wrap-pos ( pos -- pos ) { [ wrap-x ] [ wrap-y ] } parallel-call ;
-
-: iterate-boid ( self -- self ) [ new-pos wrap-pos ] [ new-vel ] bi <boid> ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: iterate-boids ( -- ) boids> [ iterate-boid ] map >boids ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: init-boids ( -- ) 100 random-boids >boids ;
-
-: init-world-size ( -- ) { 100 100 } >world-size ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: randomize ( -- ) boids> length random-boids >boids ;
-
-: inc* ( variable -- ) dup  get 0.1 +  0 1 constrain  swap set ;
-
-: dec* ( variable -- ) dup  get 0.1 -  0 1 constrain  swap set ;
-
+MAIN: boids-main
