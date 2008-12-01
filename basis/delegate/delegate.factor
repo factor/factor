@@ -36,7 +36,7 @@ M: tuple-class group-words
 
 : define-consult ( group class quot -- )
     [ register-protocol ]
-    [ rot group-words -rot [ consult-method ] 2curry each ]
+    [ [ group-words ] 2dip [ consult-method ] 2curry each ]
     3bi ;
 
 : CONSULT:

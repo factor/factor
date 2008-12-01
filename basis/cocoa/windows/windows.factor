@@ -34,5 +34,6 @@ IN: cocoa.windows
     dup 0 -> setReleasedWhenClosed: ;
 
 : window-content-rect ( window -- rect )
-    NSWindow over -> frame rot -> styleMask
+    [ NSWindow ] dip
+    [ -> frame ] [ -> styleMask ] bi
     -> contentRectForFrameRect:styleMask: ;

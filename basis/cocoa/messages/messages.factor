@@ -160,7 +160,7 @@ objc>alien-types get [ swap ] assoc-map
 assoc-union alien>objc-types set-global
 
 : objc-struct-type ( i string -- ctype )
-    2dup CHAR: = -rot index-from swap subseq
+    [ CHAR: = ] 2keep index-from swap subseq
     dup c-types get key? [
         "Warning: no such C type: " write dup print
         drop "void*"

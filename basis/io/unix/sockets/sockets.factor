@@ -114,7 +114,7 @@ SYMBOL: receive-buffer
     ] call ;
 
 M: unix (receive) ( datagram -- packet sockaddr )
-    dup do-receive dup [ rot drop ] [
+    dup do-receive dup [ [ drop ] 2dip ] [
         2drop [ +input+ wait-for-port ] [ (receive) ] bi
     ] if ;
 
