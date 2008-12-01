@@ -1,9 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types combinators kernel unix.stat
-math accessors system unix io.backend layouts vocabs.loader
-sequences csv io.streams.string io.encodings.utf8 namespaces
-unix.statfs io.files ;
+USING: alien.syntax ;
 IN: unix.statfs.linux
 
 C-STRUCT: statfs64

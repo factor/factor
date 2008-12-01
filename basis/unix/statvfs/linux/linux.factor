@@ -14,7 +14,7 @@ C-STRUCT: statvfs64
     { "__fsfilcnt64_t" "f_favail" }
     { "ulong" "f_fsid" }
     { "ulong" "f_flag" }
-    { "ulong" f_namemax" }
+    { "ulong" "f_namemax" }
     { { "int" 6 } "__f_spare" } ;
 
 FUNCTION: int statvfs64 ( char* path, statvfs64* buf ) ;

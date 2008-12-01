@@ -1,12 +1,15 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-
+USING: accessors alien.c-types alien.syntax combinators csv
+io.encodings.utf8 io.files io.streams.string io.unix.files
+kernel namespaces sequences system unix unix.statfs.linux
+unix.statvfs.linux ;
 IN: io.unix.files.linux
 
 TUPLE: linux-file-system-info < unix-file-system-info
 namelen spare ;
 
-M: linux new-file-system-info unix-file-system-info new ;
+M: linux new-file-system-info linux-file-system-info new ;
 
 M: linux file-system-statfs ( path -- byte-array )
     "statfs64" <c-object> tuck statfs64 io-error ;
@@ -35,16 +38,6 @@ M: linux statvfs>file-system-info ( struct -- statfs )
         [ statvfs64-f_namemax >>name-max ]
     } cleave ;
 
-M: linux file-systems
-    parse-mtab [
-        [ mount-point>> file-system-info ] keep
-        {
-            [ file-system-name>> >>device-name ]
-            [ mount-point>> >>mount-point ]
-            [ type>> >>type ]
-        } cleave
-    ] map ;
-
 TUPLE: mtab-entry file-system-name mount-point type options
 frequency pass-number ;
 
@@ -65,3 +58,13 @@ frequency pass-number ;
         CHAR: \s delimiter set csv
     ] with-scope
     [ mtab-csv>mtab-entry ] map ;
+
+M: linux file-systems
+    parse-mtab [
+        [ mount-point>> file-system-info ] keep
+        {
+            [ file-system-name>> >>device-name ]
+            [ mount-point>> >>mount-point ]
+            [ type>> >>type ]
+        } cleave
+    ] map ;
