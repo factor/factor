@@ -22,9 +22,9 @@ INSTANCE: range immutable-sequence
 
 : twiddle 2dup > -1 1 ? ; inline
 
-: (a, dup roll + -rot ; inline
+: (a, dup [ + ] curry 2dip ; inline
 
-: ,b) dup neg rot + swap ; inline
+: ,b) dup [ - ] curry dip ; inline
 
 : [a,b] ( a b -- range ) twiddle <range> ; inline
 

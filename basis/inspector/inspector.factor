@@ -49,10 +49,8 @@ SYMBOL: +editable+
     ] [ keys ] if ;
 
 : describe* ( obj mirror keys -- )
-    rot summary.
-    [
-        drop
-    ] [
+    [ summary. ] 2dip
+    [ drop ] [
         dup enum? [ +sequence+ on ] when
         standard-table-style [
             swap [ -rot describe-row ] curry each-index
