@@ -6,18 +6,18 @@ USING: kernel namespaces
        math.order
        math.vectors
        math.trig
-       math.physics.pos
-       math.physics.vel
+       math.ranges
        combinators arrays sequences random vars
        combinators.lib
        combinators.short-circuit
-       accessors ;
+       accessors
+       flatland ;
 
 IN: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: boid < vel ;
+TUPLE: boid < <vel> ;
 
 C: <boid> boid
 
@@ -62,11 +62,9 @@ VAR: separation-radius
 ! random-boid and random-boids
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: random-range ( a b -- n ) 1+ over - random + ;
-
 : random-pos ( -- pos ) world-size> [ random ] map ;
 
-: random-vel ( -- vel ) 2 [ drop -10 10 random-range ] map ;
+: random-vel ( -- vel ) 2 [ drop -10 10 [a,b] random ] map ;
 
 : random-boid ( -- boid ) random-pos random-vel <boid> ;
 

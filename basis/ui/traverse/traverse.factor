@@ -59,15 +59,15 @@ TUPLE: node value children ;
 DEFER: (gadget-subtree)
 
 : traverse-child ( frompath topath gadget -- )
-    [ -rot ] keep [
-        [ rest-slice ] 2dip traverse-step (gadget-subtree)
-    ] make-node ;
+    [ 2nip ] 3keep
+    [ [ rest-slice ] 2dip traverse-step (gadget-subtree) ]
+    make-node ;
 
 : (gadget-subtree) ( frompath topath gadget -- )
     {
         { [ dup not ] [ 3drop ] }
         { [ pick empty? pick empty? and ] [ 2nip , ] }
-        { [ pick empty? ] [ rot drop traverse-to-path ] }
+        { [ pick empty? ] [ traverse-to-path drop ] }
         { [ over empty? ] [ nip traverse-from-path ] }
         { [ pick first pick first = ] [ traverse-child ] }
         [ traverse-middle ]

@@ -18,6 +18,8 @@ M: ##string-nth defs-vregs dst/tmp-vregs ;
 M: ##compare defs-vregs dst/tmp-vregs ;
 M: ##compare-imm defs-vregs dst/tmp-vregs ;
 M: ##compare-float defs-vregs dst/tmp-vregs ;
+M: ##fixnum-mul defs-vregs [ temp1>> ] [ temp2>> ] bi 2array ;
+M: ##fixnum-mul-tail defs-vregs [ temp1>> ] [ temp2>> ] bi 2array ;
 M: insn defs-vregs drop f ;
 
 M: ##unary uses-vregs src>> 1array ;

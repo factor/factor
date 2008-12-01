@@ -15,9 +15,10 @@ HOOK: (pipe) io-backend ( -- pipe )
 
 : <pipe> ( encoding -- stream )
     [
-        >r (pipe) |dispose
-        [ in>> <input-port> ] [ out>> <output-port> ] bi
-        r> <encoder-duplex>
+        [
+            (pipe) |dispose
+            [ in>> <input-port> ] [ out>> <output-port> ] bi
+        ] dip <encoder-duplex>
     ] with-destructors ;
 
 <PRIVATE
@@ -32,8 +33,7 @@ GENERIC: run-pipeline-element ( input-fd output-fd obj -- quot )
 
 M: callable run-pipeline-element
     [
-        >r [ ?reader ] [ ?writer ] bi*
-        r> with-streams*
+        [ [ ?reader ] [ ?writer ] bi* ] dip with-streams*
     ] with-destructors ;
 
 : <pipes> ( n -- pipes )
@@ -48,8 +48,8 @@ PRIVATE>
 : run-pipeline ( seq -- results )
     [ length dup zero? [ drop { } ] [ 1- <pipes> ] if ] keep
     [
-        >r [ first in>> ] [ second out>> ] bi
-        r> run-pipeline-element
+        [ [ first in>> ] [ second out>> ] bi ] dip
+        run-pipeline-element
     ] 2parallel-map ;
 
 {

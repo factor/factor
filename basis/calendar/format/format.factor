@@ -138,11 +138,11 @@ M: timestamp year. ( timestamp -- )
 
 : read-rfc3339-gmt-offset ( ch -- dt )
     dup CHAR: Z = [ drop instant ] [
-        >r
-        read-00 hours
-        read1 { { CHAR: : [ read-00 ] } { f [ 0 ] } } case minutes
-        time+
-        r> signed-gmt-offset
+        [
+            read-00 hours
+            read1 { { CHAR: : [ read-00 ] } { f [ 0 ] } } case minutes
+            time+
+        ] dip signed-gmt-offset
     ] if ;
 
 : read-ymd ( -- y m d )
@@ -152,8 +152,9 @@ M: timestamp year. ( timestamp -- )
     read-00 ":" expect read-00 ":" expect read-00 ;
 
 : read-rfc3339-seconds ( s -- s' ch )
-    "+-Z" read-until >r
-    [ string>number ] [ length 10 swap ^ ] bi / + r> ;
+    "+-Z" read-until [
+        [ string>number ] [ length 10 swap ^ ] bi / +
+    ] dip ;
 
 : (rfc3339>timestamp) ( -- timestamp )
     read-ymd
@@ -181,9 +182,9 @@ ERROR: invalid-timestamp-format ;
 
 : parse-rfc822-gmt-offset ( string -- dt )
     dup "GMT" = [ drop instant ] [
-        unclip >r
-        2 cut [ string>number ] bi@ [ hours ] [ minutes ] bi* time+
-        r> signed-gmt-offset
+        unclip [ 
+            2 cut [ string>number ] bi@ [ hours ] [ minutes ] bi* time+
+        ] dip signed-gmt-offset
     ] if ;
 
 : (rfc822>timestamp) ( -- timestamp )

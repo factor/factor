@@ -3,25 +3,34 @@
 USING: parser words definitions kernel sequences assocs arrays
 kernel.private fry combinators accessors vectors strings sbufs
 byte-arrays byte-vectors io.binary io.streams.string splitting
-math generic generic.standard generic.standard.engines ;
+math generic generic.standard generic.standard.engines classes ;
 IN: hints
 
-: (make-specializer) ( class picker -- quot )
-    swap "predicate" word-prop append ;
+GENERIC: specializer-predicate ( spec -- quot )
 
-: make-specializer ( classes -- quot )
+M: class specializer-predicate "predicate" word-prop ;
+
+M: object specializer-predicate '[ _ eq? ] ;
+
+GENERIC: specializer-declaration ( spec -- class )
+
+M: class specializer-declaration ;
+
+M: object specializer-declaration class ;
+
+: make-specializer ( specs -- quot )
     dup length <reversed>
     [ (picker) 2array ] 2map
     [ drop object eq? not ] assoc-filter
     [ [ t ] ] [
-        [ (make-specializer) ] { } assoc>map
+        [ swap specializer-predicate append ] { } assoc>map
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
     ] if-empty ;
 
 : specializer-cases ( quot word -- default alist )
     dup [ array? ] all? [ 1array ] unless [
         [ make-specializer ] keep
-        '[ _ declare ] pick append
+        [ specializer-declaration ] map '[ _ declare ] pick append
     ] { } map>assoc ;
 
 : method-declaration ( method -- quot )

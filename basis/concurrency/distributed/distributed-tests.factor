@@ -15,7 +15,7 @@ concurrency.messaging continuations accessors prettyprint ;
 
 [ ] [
     [
-        receive first2 >r 3 + r> send
+        receive first2 [ 3 + ] dip send
         "thread-a" unregister-process
     ] "Thread A" spawn
     "thread-a" swap register-process

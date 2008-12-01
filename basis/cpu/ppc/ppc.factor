@@ -17,7 +17,6 @@ IN: cpu.ppc
 ! f30, f31: float scratch
 
 enable-float-intrinsics
-enable-fixnum*-intrinsic
 
 << \ ##integer>float t frame-required? set-word-prop
 \ ##float>integer t frame-required? set-word-prop >>
@@ -187,30 +186,32 @@ M: ppc %not     NOT ;
         [ 3 src1 MR 4 src2 MR ]
     } cond ;
 
+: clear-xer ( -- )
+    0 0 LI
+    0 MTXER ; inline
+
 :: overflow-template ( src1 src2 insn func -- )
     "no-overflow" define-label
-    0 0 LI
-    0 MTXER
+    clear-xer
     scratch-reg src2 src1 insn call
     scratch-reg ds-reg 0 STW
     "no-overflow" get BNO
-    src2 src1 move>args
+    src1 src2 move>args
     %prepare-alien-invoke
     func f %alien-invoke
     "no-overflow" resolve-label ; inline
 
 :: overflow-template-tail ( src1 src2 insn func -- )
     "overflow" define-label
-    0 0 LI
-    0 MTXER
+    clear-xer
     scratch-reg src2 src1 insn call
     "overflow" get BO
     scratch-reg ds-reg 0 STW
     BLR
     "overflow" resolve-label
-    src2 src1 move>args
+    src1 src2 move>args
     %prepare-alien-invoke
-    func f %alien-invoke-tail ;
+    func f %alien-invoke-tail ; inline
 
 M: ppc %fixnum-add ( src1 src2 -- )
     [ ADDO. ] "overflow_fixnum_add" overflow-template ;
@@ -224,32 +225,30 @@ M: ppc %fixnum-sub ( src1 src2 -- )
 M: ppc %fixnum-sub-tail ( src1 src2 -- )
     [ SUBFO. ] "overflow_fixnum_subtract" overflow-template-tail ;
 
-M:: ppc %fixnum-mul ( src1 src2 -- )
+M:: ppc %fixnum-mul ( src1 src2 temp1 temp2 -- )
     "no-overflow" define-label
-    0 0 LI
-    0 MTXER
-    scratch-reg src1 tag-bits get SRAWI
-    scratch-reg scratch-reg src2 MULLWO.
-    scratch-reg ds-reg 0 STW
+    clear-xer
+    temp1 src1 tag-bits get SRAWI
+    temp2 temp1 src2 MULLWO.
+    temp2 ds-reg 0 STW
     "no-overflow" get BNO
     src2 src2 tag-bits get SRAWI
-    scratch-reg src2 move>args
+    temp1 src2 move>args
     %prepare-alien-invoke
     "overflow_fixnum_multiply" f %alien-invoke
     "no-overflow" resolve-label ;
 
-M:: ppc %fixnum-mul-tail ( src1 src2 -- )
+M:: ppc %fixnum-mul-tail ( src1 src2 temp1 temp2 -- )
     "overflow" define-label
-    0 0 LI
-    0 MTXER
-    scratch-reg src1 tag-bits get SRAWI
-    scratch-reg scratch-reg src2 MULLWO.
+    clear-xer
+    temp1 src1 tag-bits get SRAWI
+    temp2 temp1 src2 MULLWO.
     "overflow" get BO
-    scratch-reg ds-reg 0 STW
+    temp2 ds-reg 0 STW
     BLR
     "overflow" resolve-label
     src2 src2 tag-bits get SRAWI
-    scratch-reg src2 move>args
+    temp1 src2 move>args
     %prepare-alien-invoke
     "overflow_fixnum_multiply" f %alien-invoke-tail ;
 

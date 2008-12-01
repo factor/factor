@@ -26,6 +26,7 @@ IN: compiler.cfg.intrinsics
     math.private:both-fixnums?
     math.private:fixnum+
     math.private:fixnum-
+    math.private:fixnum*
     math.private:fixnum+fast
     math.private:fixnum-fast
     math.private:fixnum-bitand
@@ -89,16 +90,13 @@ IN: compiler.cfg.intrinsics
         alien.accessors:set-alien-double
     } [ t "intrinsic" set-word-prop ] each ;
 
-: enable-fixnum*-intrinsic ( -- )
-    \ math.private:fixnum* t "intrinsic" set-word-prop ;
-
 : emit-intrinsic ( node word -- node/f )
     {
         { \ kernel.private:tag [ drop emit-tag iterate-next ] }
         { \ math.private:both-fixnums? [ drop emit-both-fixnums? iterate-next ] }
         { \ math.private:fixnum+ [ drop [ ##fixnum-add ] [ ##fixnum-add-tail ] emit-fixnum-overflow-op ] }
         { \ math.private:fixnum- [ drop [ ##fixnum-sub ] [ ##fixnum-sub-tail ] emit-fixnum-overflow-op ] }
-        { \ math.private:fixnum* [ drop [ ##fixnum-mul ] [ ##fixnum-mul-tail ] emit-fixnum-overflow-op ] }
+        { \ math.private:fixnum* [ drop [ i i ##fixnum-mul ] [ i i ##fixnum-mul-tail ] emit-fixnum-overflow-op ] }
         { \ math.private:fixnum+fast [ [ ^^add ] [ ^^add-imm ] emit-fixnum-op iterate-next ] }
         { \ math.private:fixnum-fast [ [ ^^sub ] [ ^^sub-imm ] emit-fixnum-op iterate-next ] }
         { \ math.private:fixnum-bitand [ [ ^^and ] [ ^^and-imm ] emit-fixnum-op iterate-next ] }

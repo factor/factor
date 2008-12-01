@@ -167,7 +167,7 @@ stand-alone
     } cond ;
 
 : escape-link ( href text -- href-esc text-esc )
-    >r check-url escape-quoted-string r> escape-string ;
+    [ check-url escape-quoted-string ] dip escape-string ;
 
 : write-link ( href text -- )
     escape-link
@@ -185,7 +185,7 @@ stand-alone
     ] if ;
 
 : render-code ( string mode -- string' )
-    >r string-lines r>
+    [ string-lines ] dip
     [
         <pre>
             htmlize-lines

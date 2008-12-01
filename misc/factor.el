@@ -36,6 +36,7 @@
 (require 'font-lock)
 (require 'comint)
 (require 'view)
+(require 'ring)
 
 ;;; Customization:
 
@@ -167,6 +168,15 @@ buffer."
   :group 'factor-faces)
 
 
+;;; Compatibility
+(when (not (fboundp 'ring-member))
+  (defun ring-member (ring item)
+    (catch 'found
+      (dotimes (ind (ring-length ring) nil)
+        (when (equal item (ring-ref ring ind))
+          (throw 'found ind))))))
+
+
 ;;; Factor mode font lock:
 
 (defconst factor--parsing-words
@@ -179,7 +189,7 @@ buffer."
     "OCT:" "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
     "REQUIRE:"  "REQUIRES:" "SINGLETON:" "SLOT:" "SYMBOL:" "SYMBOLS:"
     "TUPLE:" "T{" "t\\??" "TYPEDEF:"
-    "UNION:" "USE:" "USING:" "V{" "VAR:" "VARS:" "W{"))
+    "UNION:" "USE:" "USING:" "V{" "VARS:" "W{"))
 
 (defconst factor--regex-parsing-words-ext
   (regexp-opt '("B" "call-next-method" "delimiter" "f" "initial:" "read-only")
@@ -194,11 +204,14 @@ buffer."
 (defsubst factor--regex-second-word (prefixes)
   (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
 
+(defconst factor--regex-method-definition
+  "^M: +\\([^ ]+\\) +\\([^ ]+\\)")
+
 (defconst factor--regex-word-definition
-  (factor--regex-second-word '(":" "::" "M:" "GENERIC:")))
+  (factor--regex-second-word '(":" "::" "GENERIC:")))
 
 (defconst factor--regex-type-definition
-  (factor--regex-second-word '("TUPLE:")))
+  (factor--regex-second-word '("TUPLE:" "SINGLETON:")))
 
 (defconst factor--regex-parent-type "^TUPLE: +[^ ]+ +< +\\([^ ]+\\)")
 
@@ -207,7 +220,7 @@ buffer."
 (defconst factor--regex-setter "\\W>>[^ ]+\\b")
 
 (defconst factor--regex-symbol-definition
-  (factor--regex-second-word '("SYMBOL:")))
+  (factor--regex-second-word '("SYMBOL:" "VAR:")))
 
 (defconst factor--regex-stack-effect " ( .* )")
 
@@ -225,11 +238,12 @@ buffer."
     (,factor--regex-declaration-words 1 'factor-font-lock-declaration)
     (,factor--regex-word-definition 2 'factor-font-lock-word-definition)
     (,factor--regex-type-definition 2 'factor-font-lock-type-definition)
+    (,factor--regex-method-definition (1 'factor-font-lock-type-definition)
+                                      (2 'factor-font-lock-word-definition))
     (,factor--regex-parent-type 1 'factor-font-lock-type-definition)
     (,factor--regex-constructor . 'factor-font-lock-constructor)
     (,factor--regex-setter . 'factor-font-lock-setter-word)
     (,factor--regex-symbol-definition 2 'factor-font-lock-symbol-definition)
-    (,factor--regex-using-lines 1 'factor-font-lock-vocabulary-name)
     (,factor--regex-use-line 1 'factor-font-lock-vocabulary-name))
   "Font lock keywords definition for Factor mode.")
 
@@ -237,7 +251,7 @@ buffer."
 ;;; Factor mode syntax:
 
 (defconst factor--regex-definition-starters
-  (regexp-opt '("TUPLE" "MACRO" "MACRO:" "M" ":" "")))
+  (regexp-opt '("VARS" "TUPLE" "MACRO" "MACRO:" "M" ":" "")))
 
 (defconst factor--regex-definition-start
   (format "^\\(%s:\\) " factor--regex-definition-starters))
@@ -363,7 +377,8 @@ buffer."
 
 (defconst factor--regex-single-liner
   (format "^%s" (regexp-opt '("DEFER:" "GENERIC:" "IN:"
-                              "PRIVATE>" "<PRIVATE" "SYMBOL:" "USE:"))))
+                              "PRIVATE>" "<PRIVATE"
+                              "SINGLETON:" "SYMBOL:" "USE:" "VAR:"))))
 
 (defconst factor--regex-begin-of-def
   (format "^USING: \\|\\(%s\\)\\|\\(%s .*\\)"
@@ -475,7 +490,7 @@ buffer."
 (defvar factor-mode-map (make-sparse-keymap)
   "Key map used by Factor mode.")
 
-(defsubst factor--beginning-of-defun (times)
+(defsubst factor--beginning-of-defun (&optional times)
   (re-search-backward factor--regex-begin-of-def nil t times))
 
 (defsubst factor--end-of-defun ()
@@ -625,7 +640,43 @@ buffer."
   (factor--with-vocab vocab
     (factor--listener-send-cmd cmd)))
 
-;;;;; Interface: see
+
+;;;;; Buffer cycling and docs
+
+
+(defconst factor--cycle-endings
+  '(".factor" "-tests.factor" "-docs.factor"))
+
+(defconst factor--regex-cycle-endings
+  (format "\\(.*?\\)\\(%s\\)$"
+          (regexp-opt factor--cycle-endings)))
+
+(defconst factor--cycle-endings-ring
+  (let ((ring (make-ring (length factor--cycle-endings))))
+    (dolist (e factor--cycle-endings ring)
+      (ring-insert ring e))))
+
+(defun factor--cycle-next (file)
+  (let* ((match (string-match factor--regex-cycle-endings file))
+         (base (and match (match-string-no-properties 1 file)))
+         (ending (and match (match-string-no-properties 2 file)))
+         (idx (and ending (ring-member factor--cycle-endings-ring ending)))
+         (gfl (lambda (i) (concat base (ring-ref factor--cycle-endings-ring i)))))
+    (if (not idx) file
+      (let ((l (length factor--cycle-endings)) (i 1) next)
+        (while (and (not next) (< i l))
+          (when (file-exists-p (funcall gfl (+ idx i)))
+            (setq next (+ idx i)))
+          (setq i (1+ i)))
+        (funcall gfl (or next idx))))))
+
+(defun factor-visit-other-file (&optional file)
+  "Cycle between code, tests and docs factor files."
+  (interactive)
+  (find-file (factor--cycle-next (or file (buffer-file-name)))))
+
+
+;;;;; Interface: See
 
 (defconst factor--regex-error-marker "^Type :help for debugging")
 (defconst factor--regex-data-stack "^--- Data stack:")
@@ -848,6 +899,7 @@ vocabularies which have been modified on disk."
 (factor--define-key ?s 'factor-see t)
 (factor--define-key ?e 'factor-edit)
 (factor--define-key ?z 'switch-to-factor t)
+(factor--define-key ?o 'factor-visit-other-file)
 (factor--define-key ?c 'comment-region)
 
 (factor--define-auto-indent-key ?\])

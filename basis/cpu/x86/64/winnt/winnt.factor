@@ -20,6 +20,10 @@ M: x86.64 dummy-int-params? t ;
 
 M: x86.64 dummy-fp-params? t ;
 
+M: x86.64 temp-reg-1 RAX ;
+
+M: x86.64 temp-reg-2 RCX ;
+
 <<
 "longlong" "ptrdiff_t" typedef
 "longlong" "intptr_t" typedef

@@ -2,19 +2,13 @@ IN: io.sockets.secure.tests
 USING: accessors kernel namespaces io io.sockets
 io.sockets.secure io.encodings.ascii io.streams.duplex
 io.unix.backend classes words destructors threads tools.test
-concurrency.promises byte-arrays locals calendar io.timeouts ;
+concurrency.promises byte-arrays locals calendar io.timeouts
+io.unix.sockets.secure.debug ;
 
 \ <secure-config> must-infer
 { 1 0 } [ [ ] with-secure-context ] must-infer-as
 
 [ ] [ <promise> "port" set ] unit-test
-
-: with-test-context ( quot -- )
-    <secure-config>
-        "resource:basis/openssl/test/server.pem" >>key-file
-        "resource:basis/openssl/test/dh1024.pem" >>dh-file
-        "password" >>password
-    swap with-secure-context ; inline
 
 :: server-test ( quot -- )
     [

@@ -26,10 +26,11 @@ TUPLE: slider < frame elevator thumb saved line ;
 : slider-max*  ( gadget -- n ) model>> range-max-value*    ;
 
 : thumb-dim ( slider -- h )
-    dup slider-page over slider-max 1 max / 1 min
-    over elevator-length * min-thumb-dim max
-    over elevator>> rect-dim
-    rot orientation>> v. min ;
+    [
+        [ [ slider-page ] [ slider-max 1 max ] bi / 1 min ]
+        [ elevator-length ] bi * min-thumb-dim max
+    ]
+    [ [ elevator>> dim>> ] [ orientation>> ] bi v. ] bi min ;
 
 : slider-scale ( slider -- n )
     #! A scaling factor such that if x is a slider co-ordinate,
@@ -109,8 +110,8 @@ elevator H{
 : layout-thumb-dim ( slider -- )
     dup dup thumb-dim (layout-thumb)
     [
-        [ dup rect-dim ] dip
-        rot orientation>> set-axis [ ceiling ] map
+        [ [ rect-dim ] dip ] [ drop orientation>> ] 2bi set-axis
+        [ ceiling ] map
     ] dip (>>dim) ;
 
 : layout-thumb ( slider -- )

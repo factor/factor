@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry namespaces assocs kernel sequences words accessors
 definitions math math.order effects classes arrays combinators
-vectors arrays
+vectors arrays hints
 stack-checker.state
 stack-checker.errors
 stack-checker.values
@@ -17,7 +17,7 @@ IN: stack-checker.inlining
 ! having to handle recursive inline words.
 
 : infer-inline-word-def ( word label -- )
-    [ drop def>> ] [ add-inline-word ] 2bi infer-quot ;
+    [ drop specialized-def ] [ add-inline-word ] 2bi infer-quot ;
 
 TUPLE: inline-recursive < identity-tuple
 id

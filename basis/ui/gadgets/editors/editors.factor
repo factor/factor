@@ -6,7 +6,8 @@ io.styles math.vectors sorting colors combinators assocs
 math.order fry calendar alarms ui.clipboards ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.theme
-ui.gadgets.wrappers ui.render ui.gestures math.geometry.rect ;
+ui.gadgets.menus ui.gadgets.wrappers ui.render ui.gestures
+math.geometry.rect ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget
@@ -52,19 +53,21 @@ SYMBOL: blink-interval
 
 750 milliseconds blink-interval set-global
 
-: start-blinking ( editor -- )
-    t >>blink
-    dup '[ _ blink-caret ] blink-interval get every >>blink-alarm drop ;
-
 : stop-blinking ( editor -- )
     [ [ cancel-alarm ] when* f ] change-blink-alarm drop ;
 
+: start-blinking ( editor -- )
+    [ stop-blinking ] [
+        t >>blink
+        dup '[ _ blink-caret ] blink-interval get every
+        >>blink-alarm drop
+    ] bi ;
+
 : restart-blinking ( editor -- )
     dup focused?>> [
-        [ stop-blinking ]
         [ start-blinking ]
         [ relayout-1 ]
-        tri
+        bi
     ] [ drop ] if ;
 
 M: editor graft*
@@ -135,11 +138,8 @@ M: editor ungraft*
     f >>focused?
     relayout-1 ;
 
-: (offset>x) ( font col# str -- x )
-    swap head-slice string-width ;
-
 : offset>x ( col# line# editor -- x )
-    [ editor-line ] keep editor-font* -rot (offset>x) ;
+    [ editor-line ] keep editor-font* spin head-slice string-width ;
 
 : loc>x ( loc editor -- x ) [ first2 swap ] dip offset>x ;
 
@@ -511,6 +511,13 @@ editor "selection" f {
     { T{ key-down f { S+ } "END" } select-end-of-line }
     { T{ key-down f { S+ C+ } "HOME" } select-start-of-document }
     { T{ key-down f { S+ C+ } "END" } select-end-of-document }
+} define-command-map
+
+: editor-menu ( editor -- )
+    { cut com-copy paste } show-commands-menu ;
+
+editor "misc" f {
+    { T{ button-down f f 3 } editor-menu }
 } define-command-map
 
 ! Multi-line editors

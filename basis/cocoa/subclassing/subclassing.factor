@@ -36,7 +36,7 @@ IN: cocoa.subclassing
     ] map concat ;
 
 : prepare-method ( ret types quot -- type imp )
-    >r [ encode-types ] 2keep r> [
+    [ [ encode-types ] 2keep ] dip [
         "cdecl" swap 4array % \ alien-callback ,
     ] [ ] make define-temp ;
 

@@ -97,14 +97,15 @@ SYMBOL: dpi
     dup handle>> init-descent
     dup [ ascent>> ] [ descent>> ] bi - ft-ceil >>height ; inline
 
-: set-char-size ( handle size -- )
-    0 swap 6 shift dpi get-global dup FT_Set_Char_Size freetype-error ;
+: set-char-size ( open-font size -- open-font )
+    [ dup handle>> 0 ] dip
+    6 shift dpi get-global dup FT_Set_Char_Size freetype-error ;
 
-: <font> ( handle -- font )
+: <font> ( font -- open-font )
     font new
         H{ } clone >>widths
         over first2 open-face >>handle
-        dup handle>> rot third set-char-size
+        swap third set-char-size
         init-font ;
 
 M: freetype-renderer open-font ( font -- open-font )
@@ -120,7 +121,7 @@ M: freetype-renderer open-font ( font -- open-font )
     ] cache nip ;
 
 M: freetype-renderer string-width ( open-font string -- w )
-    0 -rot [ char-width + ] with each ;
+    [ 0 ] 2dip [ char-width + ] with each ;
 
 M: freetype-renderer string-height ( open-font string -- h )
     drop height>> ;
@@ -165,8 +166,9 @@ M: freetype-renderer string-height ( open-font string -- h )
     ] with-malloc ;
 
 : glyph-texture-loc ( glyph font -- loc )
-    over glyph-hori-bearing-x ft-floor -rot
-    ascent>> swap glyph-hori-bearing-y - ft-floor 2array ;
+    [ drop glyph-hori-bearing-x ft-floor ]
+    [ ascent>> swap glyph-hori-bearing-y - ft-floor ]
+    2bi 2array ;
 
 : glyph-texture-size ( glyph -- dim )
     [ glyph-bitmap-width next-power-of-2 ]
