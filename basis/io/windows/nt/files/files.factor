@@ -59,6 +59,6 @@ M: winnt FileArgs-overlapped ( port -- overlapped )
 
 M: winnt open-append
     [ dup file-info size>> ] [ drop 0 ] recover
-    >r (open-append) r> >>ptr ;
+    [ (open-append) ] dip >>ptr ;
 
 M: winnt home "USERPROFILE" os-env ;
