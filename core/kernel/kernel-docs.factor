@@ -578,18 +578,6 @@ HELP: prepose
 
 { compose prepose } related-words
 
-HELP: 3compose
-{ $values { "quot1" callable } { "quot2" callable } { "quot3" callable } { "compose" compose } }
-{ $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } ", " { $snippet "quot2" } " and then " { $snippet "quot3" } "." }
-{ $notes
-    "The following two lines are equivalent:"
-    { $code
-        "3compose call"
-        "3append call"
-    }
-    "However, " { $link 3compose } " runs in constant time, and the compiler is able to compile code which calls composed quotations."
-} ;
-
 HELP: dip
 { $values { "x" object } { "quot" quotation } }
 { $description "Calls " { $snippet "quot" } " with " { $snippet "obj" } " hidden on the retain stack." }
@@ -814,7 +802,6 @@ ARTICLE: "compositional-combinators" "Compositional combinators"
 { $subsection 3curry }
 { $subsection with }
 { $subsection compose }
-{ $subsection 3compose }
 { $subsection prepose }
 "Quotations also implement the sequence protocol, and can be manipulated with sequence words; see " { $link "quotations" } "." ;
 
