@@ -8,6 +8,6 @@ os {
     { linux   [ "unix.statfs.linux"   require ] }
     { macosx  [ "unix.statfs.macosx"  require ] }
     { freebsd [ "unix.statfs.freebsd" require ] }
+    { openbsd [ "unix.statfs.openbsd" require ] }
     { netbsd  [ ] }
-    { openbsd [ ] }
 } case
