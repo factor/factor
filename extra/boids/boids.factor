@@ -25,7 +25,7 @@ USING: kernel
        ui.render
        multi-methods
        multi-method-syntax
-       combinators.short-circuit.smart       
+       combinators.short-circuit
        processing.shapes
        flatland ;
 
@@ -86,7 +86,7 @@ TUPLE: <separation> < <behaviour> { radius initial: 25 } ;
       [ BEHAVIOUR view-angle>> in-view?   ]
       [ eq? not                           ]
     }
-  && ;
+  2&& ;
 
 :: neighborhood ( SELF OTHERS BEHAVIOUR -- boids )
   OTHERS [| OTHER | SELF OTHER BEHAVIOUR within-neighborhood? ] filter ;
@@ -154,7 +154,7 @@ M:  <boids-gadget> ungraft*     ( <boids-gadget> --     ) t >>paused drop  ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M:: <boids-gadget> draw-gadget* ( BOIDS-GADGET -- )
+:: iterate-system ( BOIDS-GADGET -- )
 
   [let | SKY        [ BOIDS-GADGET gadget->sky   ]
          BOIDS      [ BOIDS-GADGET boids>>       ]
@@ -183,11 +183,14 @@ M:: <boids-gadget> draw-gadget* ( BOIDS-GADGET -- )
       
     map
 
-    BOIDS-GADGET (>>boids)
+    BOIDS-GADGET (>>boids) ] ;
 
-    origin get
-      [ BOIDS-GADGET boids>> [ draw-boid ] each ]
-    with-translation ] ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M:: <boids-gadget> draw-gadget* ( BOIDS-GADGET -- )
+  origin get
+    [ BOIDS-GADGET boids>> [ draw-boid ] each ]
+  with-translation ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -197,7 +200,7 @@ M:: <boids-gadget> draw-gadget* ( BOIDS-GADGET -- )
     [
       GADGET paused>>
         [ f ]
-        [ GADGET relayout-1 25 milliseconds sleep t ]
+        [ GADGET iterate-system GADGET relayout-1 1 milliseconds sleep t ]
       if
     ]
     loop

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel io.ports io.unix.backend
 bit-arrays sequences assocs unix math namespaces
-accessors math.order locals unix.time ;
+accessors math.order locals unix.time fry ;
 IN: io.unix.select
 
 TUPLE: select-mx < mx read-fdset write-fdset ;
@@ -28,7 +28,7 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
     [ check-fd ] 3curry each ; inline
 
 : init-fdset ( fds fdset -- )
-    [ >r t swap munge r> set-nth ] curry each ;
+    '[ t swap munge _ set-nth ] each ;
 
 : read-fdset/tasks ( mx -- seq fdset )
     [ reads>> keys ] [ read-fdset>> ] bi ;

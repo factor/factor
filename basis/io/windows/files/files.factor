@@ -10,7 +10,7 @@ IN: io.windows.files
 
 : open-file ( path access-mode create-mode flags -- handle )
     [
-        >r >r share-mode default-security-attributes r> r>
+        [ share-mode default-security-attributes ] 2dip
         CreateFile-flags f CreateFile opened-file
     ] with-destructors ;
 
@@ -46,7 +46,7 @@ IN: io.windows.files
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
 : set-file-pointer ( handle length method -- )
-    >r dupd d>w/w <uint> r> SetFilePointer
+    [ dupd d>w/w <uint> ] dip SetFilePointer
     INVALID_SET_FILE_POINTER = [
         CloseHandle "SetFilePointer failed" throw
     ] when drop ;
@@ -257,9 +257,6 @@ M: winnt link-info ( path -- info )
 
 HOOK: root-directory os ( string -- string' )
 
-TUPLE: winnt-file-system-info < file-system-info
-total-bytes total-free-bytes ;
-
 : file-system-type ( normalized-path -- str )
     MAX_PATH 1+ <byte-array>
     MAX_PATH 1+
@@ -269,21 +266,28 @@ total-bytes total-free-bytes ;
     [ GetVolumeInformation win32-error=0/f ] 2keep drop
     utf16n alien>string ;
 
-: file-system-space ( normalized-path -- free-space total-bytes total-free-bytes )
+: file-system-space ( normalized-path -- available-space total-space free-space )
     "ULARGE_INTEGER" <c-object>
     "ULARGE_INTEGER" <c-object>
     "ULARGE_INTEGER" <c-object>
     [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep ;
 
+: calculate-file-system-info ( file-system-info -- file-system-info' )
+    {
+        [ dup [ total-space>> ] [ free-space>> ] bi - >>used-space drop ]
+        [ ]
+    } cleave ;
+
 M: winnt file-system-info ( path -- file-system-info )
     normalize-path root-directory
     dup [ file-system-type ] [ file-system-space ] bi
-    \ winnt-file-system-info new
-        swap *ulonglong >>total-free-bytes
-        swap *ulonglong >>total-bytes
+    \ file-system-info new
         swap *ulonglong >>free-space
+        swap *ulonglong >>total-space
+        swap *ulonglong >>available-space
         swap >>type
-        swap >>mount-point ;
+        swap >>mount-point
+    calculate-file-system-info ;
 
 : volume>paths ( string -- array )
     16384 "ushort" <c-array> tuck dup length
@@ -324,7 +328,7 @@ M: winnt file-systems ( -- array )
     find-volumes [ volume>paths ] map
     concat [
         [ file-system-info ]
-        [ drop winnt-file-system-info new swap >>mount-point ] recover
+        [ drop \ file-system-info new swap >>mount-point ] recover
     ] map ;
 
 : file-times ( path -- timestamp timestamp timestamp )
@@ -344,23 +348,23 @@ M: winnt file-systems ( -- array )
 : set-file-times ( path timestamp/f timestamp/f timestamp/f -- )
     #! timestamp order: creation access write
     [
-        >r >r >r
+        [
             normalize-path open-existing &dispose handle>>
-        r> r> r> (set-file-times)
+        ] 3dip (set-file-times)
     ] with-destructors ;
 
 : set-file-create-time ( path timestamp -- )
     f f set-file-times ;
 
 : set-file-access-time ( path timestamp -- )
-    >r f r> f set-file-times ;
+    [ f ] dip f set-file-times ;
 
 : set-file-write-time ( path timestamp -- )
-    >r f f r> set-file-times ;
+    [ f f ] dip set-file-times ;
 
 M: winnt touch-file ( path -- )
     [
         normalize-path
-        maybe-create-file >r &dispose r>
+        maybe-create-file [ &dispose ] dip
         [ drop ] [ handle>> f now dup (set-file-times) ] if
     ] with-destructors ;

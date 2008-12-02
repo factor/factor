@@ -3,7 +3,7 @@
 USING: accessors sequences assocs arrays continuations
 destructors combinators kernel threads concurrency.messaging
 concurrency.mailboxes concurrency.promises io.files io.monitors
-debugger ;
+debugger fry ;
 IN: io.monitors.recursive
 
 ! Simulate recursive monitors on platforms that don't have them
@@ -29,10 +29,10 @@ DEFER: add-child-monitor
     qualify-path dup link-info directory? [
         [ add-child-monitors ]
         [
-            [
-                [ f my-mailbox (monitor) ] keep
+            '[
+                _ [ f my-mailbox (monitor) ] keep
                 monitor tget children>> set-at
-            ] curry ignore-errors
+            ] ignore-errors
         ] bi
     ] [ drop ] if ;
 
@@ -48,7 +48,7 @@ M: recursive-monitor dispose*
     monitor tget children>> [ nip dispose ] assoc-each ;
 
 : pump-step ( msg -- )
-    first3 path>> swap >r prepend-path r> monitor tget 3array
+    first3 path>> swap [ prepend-path ] dip monitor tget 3array
     monitor tget queue>>
     mailbox-put ;
 
@@ -71,9 +71,9 @@ M: recursive-monitor dispose*
 
 : pump-loop ( -- )
     receive dup synchronous? [
-        >r stop-pump t r> reply-synchronous
+        [ stop-pump t ] dip reply-synchronous
     ] [
-        [ [ update-hierarchy ] curry ignore-errors ] [ pump-step ] bi
+        [ '[ _ update-hierarchy ] ignore-errors ] [ pump-step ] bi
         pump-loop
     ] if ;
 
@@ -88,7 +88,7 @@ M: recursive-monitor dispose*
     pump-loop ;
 
 : start-pump-thread ( monitor -- )
-    dup [ pump-thread ] curry
+    dup '[ _ pump-thread ]
     "Recursive monitor pump" spawn
     >>thread drop ;
 
@@ -96,7 +96,7 @@ M: recursive-monitor dispose*
     ready>> ?promise ?linked drop ;
 
 : <recursive-monitor> ( path mailbox -- monitor )
-    >r (normalize-path) r>
+    [ (normalize-path) ] dip
     recursive-monitor new-monitor
         H{ } clone >>children
         <promise> >>ready

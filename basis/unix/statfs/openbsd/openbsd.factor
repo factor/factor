@@ -1,53 +1,33 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax accessors combinators kernel
-unix.types math system io.backend alien.c-types unix
-unix.statfs io.files ;
+USING: alien.syntax ;
 IN: unix.statfs.openbsd
 
-C-STRUCT: statvfs
-    { "ulong" "f_bsize" }
-    { "ulong" "f_frsize" }
-    { "fsblkcnt_t" "f_blocks" }
-    { "fsblkcnt_t" "f_bfree" }
-    { "fsblkcnt_t" "f_bavail" }
-    { "fsfilcnt_t" "f_files" }
-    { "fsfilcnt_t" "f_ffree" }
-    { "fsfilcnt_t" "f_favail" }
-    { "ulong" "f_fsid" }
-    { "ulong" "f_flag" }
-    { "ulong" "f_namemax" } ;
+: MFSNAMELEN 16 ; inline
+: MNAMELEN 90 ; inline
 
-: ST_RDONLY       1 ; inline
-: ST_NOSUID       2 ; inline
+C-STRUCT: statfs
+    { "u_int32_t"       "f_flags" }
+    { "u_int32_t"       "f_bsize" }
+    { "u_int32_t"       "f_iosize" }
+    { "u_int64_t"       "f_blocks" }
+    { "u_int64_t"       "f_bfree" }
+    { "int64_t"         "f_bavail" }
+    { "u_int64_t"       "f_files" }
+    { "u_int64_t"       "f_ffree" }
+    { "int64_t"         "f_favail" }
+    { "u_int64_t"       "f_syncwrites" }
+    { "u_int64_t"       "f_syncreads" }
+    { "u_int64_t"       "f_asyncwrites" }
+    { "u_int64_t"       "f_asyncreads" }
+    { "fsid_t"          "f_fsid" }
+    { "u_int32_t"       "f_namemax" }
+    { "uid_t"           "f_owner" }
+    { "u_int32_t"       "f_ctime" }
+    { { "u_int32_t" 3 } "f_spare" }
+    { { "char" MFSNAMELEN } "f_fstypename" }
+    { { "char" MNAMELEN } "f_mntonname" }
+    { { "char" MNAMELEN } "f_mntfromname" } ;
+    ! { "mount_info" "mount_info" } ;
 
-FUNCTION: int statvfs ( char* path, statvfs* buf ) ;
-
-TUPLE: openbsd-file-system-info < file-system-info
-bsize frsize blocks bfree bavail files ffree favail
-fsid flag namemax ;
-
-M: openbsd >file-system-info ( struct -- statfs )
-    [ \ openbsd-file-system-info new ] dip
-    {
-        [
-            [ statvfs-f_bsize ]
-            [ statvfs-f_bavail ] bi * >>free-space
-        ]
-        [ statvfs-f_bsize >>bsize ]
-        [ statvfs-f_frsize >>frsize ]
-        [ statvfs-f_blocks >>blocks ]
-        [ statvfs-f_bfree >>bfree ]
-        [ statvfs-f_bavail >>bavail ]
-        [ statvfs-f_files >>files ]
-        [ statvfs-f_ffree >>ffree ]
-        [ statvfs-f_favail >>favail ]
-        [ statvfs-f_fsid >>fsid ]
-        [ statvfs-f_flag >>flag ]
-        [ statvfs-f_namemax >>namemax ]
-    } cleave ;
-
-M: openbsd file-system-info ( path -- byte-array )
-    normalize-path
-    "statvfs" <c-object> tuck statvfs io-error
-    >file-system-info ;
+FUNCTION: int statfs ( char* path, statvfs* buf ) ;
