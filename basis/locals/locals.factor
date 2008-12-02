@@ -373,12 +373,12 @@ M: wlet local-rewrite*
     let-rewrite ;
 
 : parse-locals ( -- vars assoc )
-    ")" parse-effect
+    "(" expect ")" parse-effect
     word [ over "declared-effect" set-word-prop ] when*
     in>> [ dup pair? [ first ] when ] map make-locals dup push-locals ;
 
 : parse-locals-definition ( word -- word quot )
-    "(" expect parse-locals \ ; (parse-lambda) <lambda>
+    parse-locals \ ; (parse-lambda) <lambda>
     2dup "lambda" set-word-prop
     lambda-rewrite dup length 1 = [ first ] [ bad-lambda-rewrite ] if ;
 

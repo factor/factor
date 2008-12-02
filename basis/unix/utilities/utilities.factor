@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings
 combinators.short-circuit fry kernel layouts sequences
-specialized-arrays.alien ;
+specialized-arrays.alien accessors ;
 IN: unix.utilities
 
 : more? ( alien -- ? )
@@ -17,4 +17,4 @@ IN: unix.utilities
     [ ] produce nip ;
 
 : strings>alien ( strings encoding -- alien )
-    '[ _ malloc-string ] void*-array{ } map f suffix underlying>> ;
+    '[ _ malloc-string ] void*-array{ } map-as f suffix underlying>> ;

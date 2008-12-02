@@ -167,7 +167,8 @@ IN: compiler.tree.propagation.tests
 
 [ V{ fixnum } ] [
     [
-        [ uchar-nth ] 2keep [ uchar-nth ] 2keep uchar-nth
+        { fixnum byte-array } declare
+        [ nth-unsafe ] 2keep [ nth-unsafe ] 2keep nth-unsafe
         >r >r 298 * r> 100 * - r> 208 * - 128 + -8 shift
         255 min 0 max
     ] final-classes

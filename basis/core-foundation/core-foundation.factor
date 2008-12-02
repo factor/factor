@@ -104,7 +104,7 @@ FUNCTION: CFTypeID CFGetTypeID ( CFTypeRef cf ) ;
     CF>array [ CF>string ] map ;
 
 : <CFStringArray> ( seq -- alien )
-    [ <CFString> ] map dup <CFArray> swap [ CFRelease ] each ;
+    [ <CFString> ] map [ <CFArray> ] [ [ CFRelease ] each ] bi ;
 
 : <CFFileSystemURL> ( string dir? -- url )
     [ <CFString> f over kCFURLPOSIXPathStyle ] dip

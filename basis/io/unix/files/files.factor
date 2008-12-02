@@ -313,8 +313,7 @@ PRIVATE>
 <PRIVATE
 
 : make-timeval-array ( array -- byte-array )
-    [ length "timeval" <c-array> ] keep
-    dup length [ over [ pick set-timeval-nth ] [ 2drop ] if ] 2each ;
+    [ [ "timeval" <c-object> ] unless* ] map concat ;
 
 : timestamp>timeval ( timestamp -- timeval )
     unix-1970 time- duration>microseconds make-timeval ;

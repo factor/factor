@@ -4,7 +4,9 @@ USING: alien alien.c-types alien.strings alien.syntax kernel
 math sequences namespaces make assocs init accessors
 continuations combinators core-foundation
 core-foundation.run-loop core-foundation.run-loop.thread
-io.encodings.utf8 destructors locals arrays ;
+io.encodings.utf8 destructors locals arrays
+specialized-arrays.direct.alien specialized-arrays.direct.int
+specialized-arrays.direct.longlong ;
 IN: core-foundation.fsevents
 
 : kFSEventStreamCreateFlagUseCFTypes 2 ; inline
@@ -160,11 +162,12 @@ SYMBOL: event-stream-callbacks
 : remove-event-source-callback ( id -- )
     event-stream-callbacks get delete-at ;
 
-:: >event-triple ( n eventPaths eventFlags eventIds -- triple )
-    n eventPaths void*-nth utf8 alien>string
-    n eventFlags int-nth
-    n eventIds longlong-nth
-    3array ;
+:: (master-event-source-callback) ( eventStream info numEvents eventPaths eventFlags eventIds -- )
+    eventPaths numEvents <direct-void*-array> [ utf8 alien>string ] { } map-as
+    eventFlags numEvents <direct-int-array>
+    eventIds numEvents <direct-longlong-array>
+    3array flip
+    info event-stream-callbacks get at [ drop ] or call ;
 
 : master-event-source-callback ( -- alien )
     "void"
@@ -176,19 +179,15 @@ SYMBOL: event-stream-callbacks
         "FSEventStreamEventFlags*"
         "FSEventStreamEventId*"
     }
-    "cdecl" [
-        [ >event-triple ] 3curry map
-        swap event-stream-callbacks get at
-        dup [ call drop ] [ 3drop ] if
-    ] alien-callback ;
+    "cdecl" [ (master-event-source-callback) ] alien-callback ;
 
 TUPLE: event-stream info handle disposed ;
 
 : <event-stream> ( quot paths latency flags -- event-stream )
-    >r >r >r
-    add-event-source-callback dup
-    >r master-event-source-callback r>
-    r> r> r> <FSEventStream>
+    [
+        add-event-source-callback dup
+        [ master-event-source-callback ] dip
+    ] 3dip <FSEventStream>
     dup enable-event-stream
     f event-stream boa ;
 

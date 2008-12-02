@@ -54,7 +54,7 @@ IN: functors
     [ scan interpolate-locals ] dip
     '[ _ with-string-writer @ ] parsed ;
 
-: IS [ search ] (INTERPOLATE) ; parsing
+: IS [ dup search [ ] [ no-word ] ?if ] (INTERPOLATE) ; parsing
 
 : DEFINES [ in get create ] (INTERPOLATE) ; parsing
 

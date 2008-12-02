@@ -62,7 +62,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     [ 4 GL_FLOAT 0 ] dip underlying>> glColorPointer ; inline
 
 : gl-texture-coord-pointer ( seq -- )
-    [ 2 GL_FLOAT 0 ] dip glTexCoordPointer ; inline
+    [ 2 GL_FLOAT 0 ] dip underlying>> glTexCoordPointer ; inline
 
 : line-vertices ( a b -- )
     [ first2 [ 0.5 + ] bi@ ] bi@ 4 float-array{ } nsequence
@@ -80,6 +80,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
         [ first 0.3 - 0.5 ]
         [ [ first 0.3 - ] [ second 0.3 - ] bi ]
         [ second 0.3 - 0.5 swap ]
+        [ drop 0.5 0.5 ]
     } cleave 10 float-array{ } nsequence ;
 
 : rect-vertices ( dim -- )
