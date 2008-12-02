@@ -117,7 +117,7 @@ M: world button-up-event
     } at ;
 
 M: world wheel-event
-    [ dup mouse-event>scroll-direction swap mouse-event-loc ] dip
+    [ [ mouse-event>scroll-direction ] [ mouse-event-loc ] bi ] dip
     send-wheel ;
 
 M: world enter-event motion-event ;
@@ -125,7 +125,7 @@ M: world enter-event motion-event ;
 M: world leave-event 2drop forget-rollover ;
 
 M: world motion-event
-    [ dup XMotionEvent-x swap XMotionEvent-y 2array ] dip
+    [ [ XMotionEvent-x ] [ XMotionEvent-y ] bi 2array ] dip
     move-hand fire-motion ;
 
 M: world focus-in-event
@@ -146,10 +146,10 @@ M: world selection-notify-event
 
 : clipboard-for-atom ( atom -- clipboard )
     {
-        { [ dup XA_PRIMARY = ] [ drop selection get ] }
-        { [ dup XA_CLIPBOARD = ] [ drop clipboard get ] }
+        { XA_PRIMARY [ selection get ] }
+        { XA_CLIPBOARD [ clipboard get ] }
         [ drop <clipboard> ]
-    } cond ;
+    } case ;
 
 : encode-clipboard ( string type -- bytes )
     XSelectionRequestEvent-target
