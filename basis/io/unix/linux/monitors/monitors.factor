@@ -36,9 +36,7 @@ TUPLE: linux-monitor < monitor wd inotify watches disposed ;
     inotify-fd -rot inotify_add_watch dup io-error dup check-existing ;
 
 : add-watch ( path mask mailbox -- monitor )
-    >r
-    >r (normalize-path) r>
-    [ (add-watch) ] [ drop ] 2bi r>
+    [ [ (normalize-path) ] dip [ (add-watch) ] [ drop ] 2bi ] dip
     <linux-monitor> [ ] [ ] [ wd>> ] tri watches get set-at ;
 
 : check-inotify ( -- )
@@ -103,12 +101,12 @@ M: linux-monitor dispose* ( monitor -- )
 : next-event ( i buffer -- i buffer )
     2dup inotify-event@
     inotify-event-len "inotify-event" heap-size +
-    swap >r + r> ;
+    swap [ + ] dip ;
 
 : parse-file-notifications ( i buffer -- )
     2dup events-exhausted? [ 2drop ] [
         2dup inotify-event@ dup inotify-event-wd wd>monitor
-        >r parse-file-notify r> queue-change
+        [ parse-file-notify ] dip queue-change
         next-event parse-file-notifications
     ] if ;
 

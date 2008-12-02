@@ -4,7 +4,7 @@ IN: concurrency.mailboxes
 USING: dlists deques threads sequences continuations
 destructors namespaces math quotations words kernel
 arrays assocs init system concurrency.conditions accessors
-debugger debugger.threads locals ;
+debugger debugger.threads locals fry ;
 
 TUPLE: mailbox threads data disposed ;
 
@@ -21,7 +21,7 @@ M: mailbox dispose* threads>> notify-all ;
     [ threads>> notify-all ] bi yield ;
 
 : wait-for-mailbox ( mailbox timeout -- )
-    >r threads>> r> "mailbox" wait ;
+    [ threads>> ] dip "mailbox" wait ;
 
 :: block-unless-pred ( mailbox timeout pred: ( message -- ? ) -- )
     mailbox check-disposed
@@ -57,11 +57,11 @@ M: mailbox dispose* threads>> notify-all ;
     f mailbox-get-all-timeout ;
 
 : while-mailbox-empty ( mailbox quot -- )
-    [ [ mailbox-empty? ] curry ] dip [ ] while ; inline
+    [ '[ _ mailbox-empty? ] ] dip [ ] while ; inline
 
 : mailbox-get-timeout? ( mailbox timeout pred -- obj )
     [ block-unless-pred ]
-    [ nip >r data>> r> delete-node-if ]
+    [ [ drop data>> ] dip delete-node-if ]
     3bi ; inline
 
 : mailbox-get? ( mailbox pred -- obj )
@@ -90,7 +90,7 @@ M: linked-thread error-in-thread
     [ <linked-error> ] [ supervisor>> ] bi mailbox-put ;
 
 : <linked-thread> ( quot name mailbox -- thread' )
-    >r linked-thread new-thread r> >>supervisor ;
+    [ linked-thread new-thread ] dip >>supervisor ;
 
 : spawn-linked-to ( quot name mailbox -- thread )
     <linked-thread> [ (spawn) ] keep ;

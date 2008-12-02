@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes continuations help help.topics kernel models
-sequences assocs arrays namespaces accessors math.vectors ui
+sequences assocs arrays namespaces accessors math.vectors fry ui
 ui.backend ui.tools.debugger ui.gadgets ui.gadgets.books
 ui.gadgets.buttons ui.gadgets.labelled ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.tracks ui.gadgets.worlds
@@ -33,7 +33,7 @@ M: gadget tool-scroller drop f ;
     set-model ;
 
 : get-workspace* ( quot -- workspace )
-    [ >r dup workspace? r> [ drop f ] if ] curry find-window
+    '[ dup workspace? _ [ drop f ] if ] find-window
     [ dup raise-window gadget-child ]
     [ workspace-window* ] if* ; inline
 

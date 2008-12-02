@@ -62,4 +62,8 @@ M: ##compare-imm-branch propagate
 M: ##dispatch propagate
     [ resolve ] change-src ;
 
+M: ##fixnum-overflow propagate
+    [ resolve ] change-src1
+    [ resolve ] change-src2 ;
+
 M: insn propagate ;

@@ -9,7 +9,7 @@ ui.gadgets.books ui.gadgets.buttons ui.gadgets.labelled
 ui.gadgets.scrollers ui.gadgets.tracks ui.gadgets.worlds
 ui.gadgets.presentations ui.gestures words vocabs.loader
 tools.test tools.vocabs ui.gadgets.buttons ui.gadgets.status-bar
-mirrors ;
+mirrors fry ;
 IN: ui.tools
 
 : <workspace-tabs> ( workspace -- tabs )
@@ -93,7 +93,7 @@ workspace "workflow" f {
 ] workspace-window-hook set-global
 
 : inspect-continuation ( traceback -- )
-    control-value [ inspect ] curry call-listener ;
+    control-value '[ _ inspect ] call-listener ;
 
 traceback-gadget "toolbar" f {
     { T{ key-down f f "v" } variables }

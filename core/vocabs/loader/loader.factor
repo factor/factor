@@ -3,7 +3,7 @@
 USING: namespaces make sequences io.files kernel assocs words
 vocabs definitions parser continuations io hashtables sorting
 source-files arrays combinators strings system math.parser
-compiler.errors splitting init accessors ;
+compiler.errors splitting init accessors sets ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -14,6 +14,9 @@ V{
     "resource:extra"
     "resource:work"
 } clone vocab-roots set-global
+
+: add-vocab-root ( root -- )
+    vocab-roots get adjoin ;
 
 : vocab-dir ( vocab -- dir )
     vocab-name { { CHAR: . CHAR: / } } substitute ;

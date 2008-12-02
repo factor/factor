@@ -65,7 +65,7 @@ SYMBOL: error-stream
 
 : with-streams ( input output quot -- )
     [ [ with-streams* ] 3curry ]
-    [ [ drop dispose dispose ] 3curry ] 3bi
+    [ drop [ [ dispose ] bi@ ] 2curry ] 3bi
     [ ] cleanup ; inline
 
 : tabular-output ( style quot -- )
@@ -98,6 +98,9 @@ SYMBOL: error-stream
 
 : lines ( stream -- seq )
     [ [ readln dup ] [ ] [ drop ] produce ] with-input-stream ;
+
+: each-line ( quot -- )
+    [ [ readln dup ] ] dip [ drop ] while ; inline
 
 : contents ( stream -- str )
     [

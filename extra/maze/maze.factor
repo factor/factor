@@ -41,7 +41,6 @@ SYMBOL: visited
     ] if ;
 
 : draw-maze ( n -- )
-    -0.5 0.5 0 glTranslated
     line-width 2 - glLineWidth
     line-width 2 - glPointSize
     1.0 1.0 1.0 1.0 glColor4d

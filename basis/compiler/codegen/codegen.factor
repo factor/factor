@@ -156,6 +156,19 @@ M: ##shr-imm generate-insn dst/src1/src2 %shr-imm ;
 M: ##sar-imm generate-insn dst/src1/src2 %sar-imm ;
 M: ##not     generate-insn dst/src       %not     ;
 
+: src1/src2 ( insn -- src1 src2 )
+    [ src1>> register ] [ src2>> register ] bi ; inline
+
+: src1/src2/temp1/temp2 ( insn -- src1 src2 temp1 temp2 )
+    [ src1/src2 ] [ temp1>> register ] [ temp2>> register ] tri ; inline
+
+M: ##fixnum-add generate-insn src1/src2 %fixnum-add ;
+M: ##fixnum-add-tail generate-insn src1/src2 %fixnum-add-tail ;
+M: ##fixnum-sub generate-insn src1/src2 %fixnum-sub ;
+M: ##fixnum-sub-tail generate-insn src1/src2 %fixnum-sub-tail ;
+M: ##fixnum-mul generate-insn src1/src2/temp1/temp2 %fixnum-mul ;
+M: ##fixnum-mul-tail generate-insn src1/src2/temp1/temp2 %fixnum-mul-tail ;
+
 : dst/src/temp ( insn -- dst src temp )
     [ dst/src ] [ temp>> register ] bi ; inline
 
@@ -264,7 +277,7 @@ M: object reg-class-full?
 
 : spill-param ( reg-class -- n reg-class )
     stack-params get
-    >r reg-size cell align stack-params +@ r>
+    [ reg-size cell align stack-params +@ ] dip
     stack-params ;
 
 : fastcall-param ( reg-class -- n reg-class )
@@ -300,10 +313,10 @@ M: long-long-type flatten-value-type ( type -- types )
     ] { } make ;
 
 : each-parameter ( parameters quot -- )
-    >r [ parameter-sizes nip ] keep r> 2each ; inline
+    [ [ parameter-sizes nip ] keep ] dip 2each ; inline
 
 : reverse-each-parameter ( parameters quot -- )
-    >r [ parameter-sizes nip ] keep r> 2reverse-each ; inline
+    [ [ parameter-sizes nip ] keep ] dip 2reverse-each ; inline
 
 : reset-freg-counts ( -- )
     { int-regs float-regs stack-params } [ 0 swap set ] each ;
@@ -316,15 +329,13 @@ M: long-long-type flatten-value-type ( type -- types )
     #! Moves values from C stack to registers (if word is
     #! %load-param-reg) and registers to C stack (if word is
     #! %save-param-reg).
-    >r
-    alien-parameters
-    flatten-value-types
-    r> '[ alloc-parameter _ execute ] each-parameter ;
-    inline
+    [ alien-parameters flatten-value-types ]
+    [ '[ alloc-parameter _ execute ] ]
+    bi* each-parameter ; inline
 
 : unbox-parameters ( offset node -- )
     parameters>> [
-        %prepare-unbox >r over + r> unbox-parameter
+        %prepare-unbox [ over + ] dip unbox-parameter
     ] reverse-each-parameter drop ;
 
 : prepare-box-struct ( node -- offset )

@@ -23,10 +23,8 @@ IN: tools.deploy.shaker
 
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
-    "cpu.x86" init-hooks get delete-at
-    "command-line" init-hooks get delete-at
-    "libc" init-hooks get delete-at
-    "system" init-hooks get delete-at
+    { "cpu.x86" "command-line" "libc" "system" "environment" }
+    [ init-hooks get delete-at ] each
     deploy-threads? get [
         "threads" init-hooks get delete-at
     ] unless
@@ -343,6 +341,9 @@ IN: tools.deploy.shaker
 : compress-strings ( -- )
     [ string? ] [ ] "strings" compress ;
 
+: compress-wrappers ( -- )
+    [ wrapper? ] [ ] "wrappers" compress ;
+
 : finish-deploy ( final-image -- )
     "Finishing up" show
     >r { } set-datastack r>
@@ -391,7 +392,8 @@ SYMBOL: deploy-vocab
     r> strip-words
     compress-byte-arrays
     compress-quotations
-    compress-strings ;
+    compress-strings
+    compress-wrappers ;
 
 : (deploy) ( final-image vocab config -- )
     #! Does the actual work of a deployment in the slave

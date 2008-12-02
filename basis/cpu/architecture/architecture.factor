@@ -77,6 +77,13 @@ HOOK: %shr-imm cpu ( dst src1 src2 -- )
 HOOK: %sar-imm cpu ( dst src1 src2 -- )
 HOOK: %not     cpu ( dst src -- )
 
+HOOK: %fixnum-add cpu ( src1 src2 -- )
+HOOK: %fixnum-add-tail cpu ( src1 src2 -- )
+HOOK: %fixnum-sub cpu ( src1 src2 -- )
+HOOK: %fixnum-sub-tail cpu ( src1 src2 -- )
+HOOK: %fixnum-mul cpu ( src1 src2 temp1 temp2 -- )
+HOOK: %fixnum-mul-tail cpu ( src1 src2 temp1 temp2 -- )
+
 HOOK: %integer>bignum cpu ( dst src temp -- )
 HOOK: %bignum>integer cpu ( dst src temp -- )
 

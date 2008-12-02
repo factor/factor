@@ -5,7 +5,7 @@ combinators compiler compiler.alien kernel math namespaces make
 parser prettyprint prettyprint.sections quotations sequences
 strings words cocoa.runtime io macros memoize debugger
 io.encodings.ascii effects libc libc.private parser lexer init
-core-foundation fry ;
+core-foundation fry generalizations ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -27,7 +27,7 @@ super-message-senders global [ H{ } assoc-like ] change-at
 
 : cache-stub ( method function hash -- )
     [
-        over get [ 2drop ] [ over >r sender-stub r> set ] if
+        over get [ 2drop ] [ over [ sender-stub ] dip set ] if
     ] bind ;
 
 : cache-stubs ( method -- )
@@ -37,7 +37,7 @@ super-message-senders global [ H{ } assoc-like ] change-at
 
 : <super> ( receiver -- super )
     "objc-super" <c-object> [
-        >r dup object_getClass class_getSuperclass r>
+        [ dup object_getClass class_getSuperclass ] dip
         set-objc-super-class
     ] keep
     [ set-objc-super-receiver ] keep ;
@@ -62,23 +62,18 @@ objc-methods global [ H{ } assoc-like ] change-at
     dup objc-methods get at
     [ ] [ "No such method: " prepend throw ] ?if ;
 
-: make-dip ( quot n -- quot' )
-    dup
-    \ >r <repetition> >quotation -rot
-    \ r> <repetition> >quotation 3append ;
-
 MEMO: make-prepare-send ( selector method super? -- quot )
     [
         [ \ <super> , ] when
         swap <selector> , \ selector ,
     ] [ ] make
-    swap second length 2 - make-dip ;
+    swap second length 2 - '[ _ _ ndip ] ;
 
 MACRO: (send) ( selector super? -- quot )
-    >r dup lookup-method r>
+    [ dup lookup-method ] dip
     [ make-prepare-send ] 2keep
     super-message-senders message-senders ? get at
-    [ slip execute ] 2curry ;
+    '[ _ call _ execute ] ;
 
 : send ( receiver args... selector -- return... ) f (send) ; inline
 
@@ -165,14 +160,14 @@ objc>alien-types get [ swap ] assoc-map
 assoc-union alien>objc-types set-global
 
 : objc-struct-type ( i string -- ctype )
-    2dup CHAR: = -rot index-from swap subseq
+    [ CHAR: = ] 2keep index-from swap subseq
     dup c-types get key? [
         "Warning: no such C type: " write dup print
         drop "void*"
     ] unless ;
 
 : (parse-objc-type) ( i string -- ctype )
-    2dup nth >r >r 1+ r> r> {
+    [ [ 1+ ] dip ] [ nth ] 2bi {
         { [ dup "rnNoORV" member? ] [ drop (parse-objc-type) ] }
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
@@ -223,22 +218,23 @@ assoc-union alien>objc-types set-global
 : class-exists? ( string -- class ) objc_getClass >boolean ;
 
 : unless-defined ( class quot -- )
-    >r class-exists? r> unless ; inline
+    [ class-exists? ] dip unless ; inline
 
 : define-objc-class-word ( name quot -- )
     [
         over , , \ unless-defined , dup , \ objc-class ,
-    ] [ ] make >r "cocoa.classes" create r>
+    ] [ ] make [ "cocoa.classes" create ] dip
     (( -- class )) define-declared ;
 
 : import-objc-class ( name quot -- )
     2dup unless-defined
     dupd define-objc-class-word
-    [
+    '[
+        _
         dup
         objc-class register-objc-methods
         objc-meta-class register-objc-methods
-    ] curry try ;
+    ] try ;
 
 : root-class ( class -- root )
     dup class_getSuperclass [ root-class ] [ ] ?if ;

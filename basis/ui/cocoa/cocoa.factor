@@ -5,7 +5,7 @@ command-line kernel memory namespaces cocoa.messages
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
 cocoa.windows cocoa.classes cocoa.application sequences system
 ui ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
-ui.cocoa.views core-foundation threads math.geometry.rect ;
+ui.cocoa.views core-foundation threads math.geometry.rect fry ;
 IN: ui.cocoa
 
 TUPLE: handle view window ;
@@ -15,7 +15,7 @@ C: <handle> handle
 SINGLETON: cocoa-ui-backend
 
 M: cocoa-ui-backend do-events ( -- )
-    [ NSApp [ do-event ] curry loop ui-wait ] with-autorelease-pool ;
+    [ NSApp '[ _ do-event ] loop ui-wait ] with-autorelease-pool ;
 
 TUPLE: pasteboard handle ;
 
@@ -33,16 +33,13 @@ M: pasteboard set-clipboard-contents
     <clipboard> selection set-global ;
 
 : world>NSRect ( world -- NSRect )
-    dup window-loc>> first2 rot rect-dim first2 <NSRect> ;
+    [ window-loc>> ] [ dim>> ] bi [ first2 ] bi@ <NSRect> ;
 
 : gadget-window ( world -- )
-    [
-        dup <FactorView>
-        dup rot world>NSRect <ViewWindow>
-        dup install-window-delegate
-        over -> release
-        <handle>
-    ] keep (>>handle) ;
+    dup <FactorView>
+    2dup swap world>NSRect <ViewWindow>
+    [ [ -> release ] [ install-window-delegate ] bi* ] [ <handle> ] 2bi
+    >>handle drop ;
 
 M: cocoa-ui-backend set-title ( string world -- )
     handle>> window>> swap <NSString> -> setTitle: ;

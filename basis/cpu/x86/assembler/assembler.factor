@@ -130,7 +130,7 @@ M: register modifier drop BIN: 11 ;
 GENERIC# n, 1 ( value n -- )
 
 M: integer n, >le % ;
-M: byte n, >r value>> r> n, ;
+M: byte n, [ value>> ] dip n, ;
 : 1, ( n -- ) 1 n, ; inline
 : 4, ( n -- ) 4 n, ; inline
 : 2, ( n -- ) 2 n, ; inline
@@ -209,7 +209,7 @@ M: object operand-64? drop f ;
 : short-operand ( reg rex.w n -- )
     #! Some instructions encode their single operand as part of
     #! the opcode.
-    >r dupd prefix-1 reg-code r> + , ;
+    [ dupd prefix-1 reg-code ] dip + , ;
 
 : opcode, ( opcode -- ) dup array? [ % ] [ , ] if ;
 
@@ -224,7 +224,7 @@ M: object operand-64? drop f ;
 : 1-operand ( op reg,rex.w,opcode -- )
     #! The 'reg' is not really a register, but a value for the
     #! 'reg' field of the mod-r/m byte.
-    first3 >r >r over r> prefix-1 r> opcode, swap addressing ;
+    first3 [ [ over ] dip prefix-1 ] dip opcode, swap addressing ;
 
 : immediate-operand-size-bit ( imm dst reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
     pick integer? [ first3 BIN: 1 opcode-or 3array ] when ;
@@ -250,7 +250,7 @@ M: object operand-64? drop f ;
     ] if ;
 
 : (2-operand) ( dst src op -- )
-    >r 2dup t rex-prefix r> opcode,
+    [ 2dup t rex-prefix ] dip opcode,
     reg-code swap addressing ;
 
 : direction-bit ( dst src op -- dst' src' op' )
@@ -271,11 +271,11 @@ M: object operand-64? drop f ;
 PRIVATE>
 
 : [] ( reg/displacement -- indirect )
-    dup integer? [ >r f f f r> ] [ f f f ] if <indirect> ;
+    dup integer? [ [ f f f ] dip ] [ f f f ] if <indirect> ;
 
 : [+] ( reg displacement -- indirect )
     dup integer?
-    [ dup zero? [ drop f ] when >r f f r> ]
+    [ dup zero? [ drop f ] when [ f f ] dip ]
     [ f f ] if
     <indirect> ;
 
@@ -300,7 +300,7 @@ PREDICATE: callable < word register? not ;
 
 GENERIC: MOV ( dst src -- )
 M: immediate MOV swap (MOV-I) ;
-M: callable MOV 0 rot (MOV-I) rc-absolute-cell rel-word ;
+M: callable MOV [ 0 ] 2dip (MOV-I) rc-absolute-cell rel-word ;
 M: operand MOV HEX: 88 2-operand ;
 
 : LEA ( dst src -- ) swap HEX: 8d 2-operand ;

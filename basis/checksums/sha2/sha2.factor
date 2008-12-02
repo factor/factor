@@ -59,7 +59,7 @@ SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
     [ 15 - swap nth s0-256 ] 2keep
     [ 7 - swap nth ] 2keep
     [ 2 - swap nth s1-256 ] 2keep
-    >r >r + + w+ r> r> swap set-nth ; inline
+    [ + + w+ ] 2dip swap set-nth ; inline
 
 : prepare-message-schedule ( seq -- w-seq )
     word-size get group [ be> ] map block-size get 0 pad-right
@@ -71,7 +71,7 @@ SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
     [ bitxor bitand ] keep bitxor ;
 
 : maj ( x y z -- x' )
-    >r [ bitand ] 2keep bitor r> bitand bitor ;
+    [ [ bitand ] 2keep bitor ] dip bitand bitor ;
 
 : S0-256 ( x -- x' )
     [ -2 bitroll-32 ] keep
@@ -83,7 +83,7 @@ SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
     [ -11 bitroll-32 ] keep
     -25 bitroll-32 bitxor bitxor ; inline
 
-: slice3 ( n seq -- a b c ) >r dup 3 + r> <slice> first3 ; inline
+: slice3 ( n seq -- a b c ) [ dup 3 + ] dip <slice> first3 ; inline
 
 : T1 ( W n -- T1 )
     [ swap nth ] keep
@@ -105,7 +105,7 @@ SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
     d c pick exchange
     c b pick exchange
     b a pick exchange
-    >r w+ a r> set-nth ;
+    [ w+ a ] dip set-nth ;
 
 : process-chunk ( M -- )
     H get clone vars set
@@ -118,7 +118,7 @@ SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
 
 : preprocess-plaintext ( string big-endian? -- padded-string )
     #! pad 0x80 then 00 til 8 bytes left, then 64bit length in bits
-    >r >sbuf r> over [
+    [ >sbuf ] dip over [
         HEX: 80 ,
         dup length HEX: 3f bitand
         calculate-pad-length 0 <string> %

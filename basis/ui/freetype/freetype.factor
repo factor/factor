@@ -97,21 +97,22 @@ SYMBOL: dpi
     dup handle>> init-descent
     dup [ ascent>> ] [ descent>> ] bi - ft-ceil >>height ; inline
 
-: set-char-size ( handle size -- )
-    0 swap 6 shift dpi get-global dup FT_Set_Char_Size freetype-error ;
+: set-char-size ( open-font size -- open-font )
+    [ dup handle>> 0 ] dip
+    6 shift dpi get-global dup FT_Set_Char_Size freetype-error ;
 
-: <font> ( handle -- font )
+: <font> ( font -- open-font )
     font new
         H{ } clone >>widths
         over first2 open-face >>handle
-        dup handle>> rot third set-char-size
+        swap third set-char-size
         init-font ;
 
 M: freetype-renderer open-font ( font -- open-font )
     freetype drop open-fonts get [ <font> ] cache ;
 
 : load-glyph ( font char -- glyph )
-    >r handle>> dup r> 0 FT_Load_Char
+    [ handle>> dup ] dip 0 FT_Load_Char
     freetype-error face-glyph ;
 
 : char-width ( open-font char -- w )
@@ -120,7 +121,7 @@ M: freetype-renderer open-font ( font -- open-font )
     ] cache nip ;
 
 M: freetype-renderer string-width ( open-font string -- w )
-    0 -rot [ char-width + ] with each ;
+    [ 0 ] 2dip [ char-width + ] with each ;
 
 M: freetype-renderer string-height ( open-font string -- h )
     drop height>> ;
@@ -165,8 +166,9 @@ M: freetype-renderer string-height ( open-font string -- h )
     ] with-malloc ;
 
 : glyph-texture-loc ( glyph font -- loc )
-    over glyph-hori-bearing-x ft-floor -rot
-    ascent>> swap glyph-hori-bearing-y - ft-floor 2array ;
+    [ drop glyph-hori-bearing-x ft-floor ]
+    [ ascent>> swap glyph-hori-bearing-y - ft-floor ]
+    2bi 2array ;
 
 : glyph-texture-size ( glyph -- dim )
     [ glyph-bitmap-width next-power-of-2 ]
@@ -174,7 +176,7 @@ M: freetype-renderer string-height ( open-font string -- h )
     bi 2array ;
 
 : <char-sprite> ( open-font char -- sprite )
-    over >r render-glyph dup r> glyph-texture-loc
+    over [ render-glyph dup ] dip glyph-texture-loc
     over glyph-size pick glyph-texture-size <sprite>
     [ bitmap>texture ] keep [ init-sprite ] keep ;
 
@@ -206,7 +208,7 @@ M: freetype-renderer string-height ( open-font string -- h )
     fonts>> [ open-font H{ } clone 2array ] cache first2 ;
 
 M: freetype-renderer draw-string ( font string loc -- )
-    >r >r world get font-sprites r> r> (draw-string) ;
+    [ world get font-sprites ] 2dip (draw-string) ;
 
 : run-char-widths ( open-font string -- widths )
     char-widths [ scan-sums ] [ 2 v/n ] bi v+ ;

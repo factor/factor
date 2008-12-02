@@ -129,7 +129,7 @@ void print_nested_obj(CELL obj, F_FIXNUM nesting)
 		print_string(" ]");
 		break;
 	default:
-		print_string("#<type "); print_cell(type_of(obj)); print_string(" @ "); print_cell_hex(obj);
+		print_string("#<type "); print_cell(type_of(obj)); print_string(" @ "); print_cell_hex(obj); print_string(">");
 		break;
 	}
 }

@@ -1,10 +1,7 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-!
-! Concurrency library for Factor, based on Erlang/Termite style
-! concurrency.
 USING: kernel threads concurrency.mailboxes continuations
-namespaces assocs accessors summary ;
+namespaces assocs accessors summary fry ;
 IN: concurrency.messaging
 
 GENERIC: send ( message thread -- )
@@ -32,7 +29,7 @@ M: thread send ( message thread -- )
     my-mailbox -rot mailbox-get-timeout? ?linked ; inline
 
 : rethrow-linked ( error process supervisor -- )
-    >r <linked-error> r> send ;
+    [ <linked-error> ] dip send ;
 
 : spawn-linked ( quot name -- thread )
     my-mailbox spawn-linked-to ;
@@ -48,9 +45,7 @@ TUPLE: reply data tag ;
     tag>> \ reply boa ;
 
 : synchronous-reply? ( response synchronous -- ? )
-    over reply?
-    [ >r tag>> r> tag>> = ]
-    [ 2drop f ] if ;
+    over reply? [ [ tag>> ] bi@ = ] [ 2drop f ] if ;
 
 ERROR: cannot-send-synchronous-to-self message thread ;
 
@@ -61,8 +56,8 @@ M: cannot-send-synchronous-to-self summary
     dup self eq? [
         cannot-send-synchronous-to-self
     ] [
-        >r <synchronous> dup r> send
-        [ synchronous-reply? ] curry receive-if
+        [ <synchronous> dup ] dip send
+        '[ _ synchronous-reply? ] receive-if
         data>>
     ] if ;
 

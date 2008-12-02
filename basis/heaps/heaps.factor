@@ -18,7 +18,7 @@ GENERIC: heap-size ( heap -- n )
 TUPLE: heap data ;
 
 : <heap> ( class -- heap )
-    >r V{ } clone r> boa ; inline
+    [ V{ } clone ] dip boa ; inline
 
 TUPLE: entry value key heap index ;
 
@@ -52,16 +52,16 @@ M: heap heap-size ( heap -- n )
     data>> nth-unsafe ; inline
 
 : up-value ( n heap -- entry )
-    >r up r> data-nth ; inline
+    [ up ] dip data-nth ; inline
 
 : left-value ( n heap -- entry )
-    >r left r> data-nth ; inline
+    [ left ] dip data-nth ; inline
 
 : right-value ( n heap -- entry )
-    >r right r> data-nth ; inline
+    [ right ] dip data-nth ; inline
 
 : data-set-nth ( entry n heap -- )
-    >r [ >>index drop ] 2keep r>
+    [ [ >>index drop ] 2keep ] dip
     data>> set-nth-unsafe ; inline
 
 : data-push ( entry heap -- n )
@@ -82,8 +82,8 @@ M: heap heap-size ( heap -- n )
     data>> first ; inline
 
 : data-exchange ( m n heap -- )
-    [ tuck data-nth >r data-nth r> ] 3keep
-    tuck >r >r data-set-nth r> r> data-set-nth ; inline
+    [ tuck data-nth [ data-nth ] dip ] 3keep
+    tuck [ data-set-nth ] 2dip data-set-nth ; inline
 
 GENERIC: heap-compare ( pair1 pair2 heap -- ? )
 
@@ -97,10 +97,10 @@ M: max-heap heap-compare (heap-compare) +lt+ eq? ;
     heap-size >= ; inline
 
 : left-bounds-check? ( m heap -- ? )
-    >r left r> heap-bounds-check? ; inline
+    [ left ] dip heap-bounds-check? ; inline
 
 : right-bounds-check? ( m heap -- ? )
-    >r right r> heap-bounds-check? ; inline
+    [ right ] dip heap-bounds-check? ; inline
 
 : continue? ( m up[m] heap -- ? )
     [ data-nth swap ] keep [ data-nth ] keep
@@ -109,7 +109,7 @@ M: max-heap heap-compare (heap-compare) +lt+ eq? ;
 DEFER: up-heap
 
 : (up-heap) ( n heap -- )
-    >r dup up r>
+    [ dup up ] dip
     3dup continue? [
         [ data-exchange ] 2keep up-heap
     ] [
@@ -121,7 +121,7 @@ DEFER: up-heap
 
 : (child) ( m heap -- n )
     2dup right-value
-    >r 2dup left-value r>
+    [ 2dup left-value ] dip
     rot heap-compare
     [ right ] [ left ] if ;
 

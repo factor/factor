@@ -238,7 +238,7 @@ IN: regexp-tests
 
 [ t ] [ "abc" <reversed> R/ abc/r matches? ] unit-test
 [ t ] [ "abc" <reversed> R/ a[bB][cC]/r matches? ] unit-test
-[ t ] [ "adcbe" R/ a(?r)(bcd)(?-r)e/r matches? ] unit-test
+[ t ] [ "adcbe" R/ a(?r)(bcd)(?-r)e/ matches? ] unit-test
 
 [ t ] [ "s@f" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
 [ f ] [ "a" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
@@ -271,9 +271,9 @@ IN: regexp-tests
 
 [ "b" ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match >string ] unit-test
 
-[ t ] [ "a:b" ".+:?" <regexp> matches? ] unit-test
+! [ t ] [ "a:b" ".+:?" <regexp> matches? ] unit-test
 
-[ 1 ] [ "hello" ".+?" <regexp> match length ] unit-test
+! [ 1 ] [ "hello" ".+?" <regexp> match length ] unit-test
 
 [ { "1" "2" "3" "4" } ]
 [ "1ABC2DEF3GHI4" R/ [A-Z]+/ re-split [ >string ] map ] unit-test
@@ -295,7 +295,7 @@ IN: regexp-tests
 
 [ f ] [ "ab" "a(?!b)" <regexp> first-match ] unit-test
 [ "a" ] [ "ac" "a(?!b)" <regexp> first-match >string ] unit-test
-[ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
+! [ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 [ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 [ "a" ] [ "ab" "a(?=b)(?=b)" <regexp> first-match >string ] unit-test
 [ "a" ] [ "ba" "a(?<=b)(?<=b)" <regexp> first-match >string ] unit-test
@@ -307,17 +307,30 @@ IN: regexp-tests
 ! Bug in parsing word
 [ t ] [ "a" R' a' matches?  ] unit-test
 
+! Convert to lowercase until E
+[ f ] [ "AA" R/ \LAA\E/ matches? ] unit-test
+[ t ] [ "aa" R/ \LAA\E/ matches? ] unit-test
+
+! Convert to uppercase until E
+[ t ] [ "AA" R/ \Uaa\E/ matches? ] unit-test
+[ f ] [ "aa" R/ \Uaa\E/ matches? ] unit-test
+
 ! [ "{Lower}" <regexp> ] [ invalid-range? ] must-fail-with
 
-[ t ] [ "a" R/ ^a/ matches? ] unit-test
-[ f ] [ "\na" R/ ^a/ matches? ] unit-test
-[ f ] [ "\r\na" R/ ^a/ matches? ] unit-test
-[ f ] [ "\ra" R/ ^a/ matches? ] unit-test
+! [ t ] [ "a" R/ ^a/ matches? ] unit-test
+! [ f ] [ "\na" R/ ^a/ matches? ] unit-test
+! [ f ] [ "\r\na" R/ ^a/ matches? ] unit-test
+! [ f ] [ "\ra" R/ ^a/ matches? ] unit-test
 
-[ t ] [ "a" R/ a$/ matches? ] unit-test
-[ f ] [ "a\n" R/ a$/ matches? ] unit-test
-[ f ] [ "a\r" R/ a$/ matches? ] unit-test
-[ f ] [ "a\r\n" R/ a$/ matches? ] unit-test
+! [ t ] [ "a" R/ a$/ matches? ] unit-test
+! [ f ] [ "a\n" R/ a$/ matches? ] unit-test
+! [ f ] [ "a\r" R/ a$/ matches? ] unit-test
+! [ f ] [ "a\r\n" R/ a$/ matches? ] unit-test
+
+! [ t ] [ "a" R/ a$|b$/ matches? ] unit-test
+! [ t ] [ "b" R/ a$|b$/ matches? ] unit-test
+! [ t ] [ "ab" R/ a$|b$/ matches? ] unit-test
+! [ t ] [ "ba" R/ ba$|b$/ matches? ] unit-test
 
 ! [ t ] [ "a" R/ \Aa/ matches? ] unit-test
 ! [ f ] [ "\na" R/ \Aaa/ matches? ] unit-test
@@ -346,14 +359,6 @@ IN: regexp-tests
 ! [ t ] [ "\na" R/ ^a/m matches? ] unit-test
 ! [ t ] [ "\r\na" R/ ^a/m matches? ] unit-test
 ! [ t ] [ "\ra" R/ ^a/m matches? ] unit-test
-
-! Convert to lowercase until E
-[ f ] [ "AA" R/ \LAA\E/ matches? ] unit-test
-[ t ] [ "aa" R/ \LAA\E/ matches? ] unit-test
-
-! Convert to uppercase until E
-[ t ] [ "AA" R/ \Uaa\E/ matches? ] unit-test
-[ f ] [ "aa" R/ \Uaa\E/ matches? ] unit-test
 
 ! [ t ] [ "a" "a$" R/ a$/m matches? ] unit-test
 ! [ t ] [ "a\n" "a$" R/ a$/m matches? ] unit-test

@@ -79,7 +79,7 @@ M: world configure-event
 : key-down-event>gesture ( event world -- string gesture )
     dupd
     handle>> xic>> lookup-string
-    >r swap event-modifiers r> key-code <key-down> ;
+    [ swap event-modifiers ] dip key-code <key-down> ;
 
 M: world key-down-event
     [ key-down-event>gesture ] keep
@@ -92,18 +92,20 @@ M: world key-down-event
     dup event-modifiers swap 0 XLookupKeysym key-code <key-up> ;
 
 M: world key-up-event
-    >r key-up-event>gesture r> world-focus propagate-gesture ;
+    [ key-up-event>gesture ] dip world-focus propagate-gesture ;
 
 : mouse-event>gesture ( event -- modifiers button loc )
-    dup event-modifiers over XButtonEvent-button
-    rot mouse-event-loc ;
+    [ event-modifiers ]
+    [ XButtonEvent-button ]
+    [ mouse-event-loc ]
+    tri ;
 
 M: world button-down-event
-    >r mouse-event>gesture >r <button-down> r> r>
+    [ mouse-event>gesture [ <button-down> ] dip ] dip
     send-button-down ;
 
 M: world button-up-event
-    >r mouse-event>gesture >r <button-up> r> r>
+    [ mouse-event>gesture [ <button-up> ] dip ] dip
     send-button-up ;
 
 : mouse-event>scroll-direction ( event -- pair )
@@ -115,7 +117,7 @@ M: world button-up-event
     } at ;
 
 M: world wheel-event
-    >r dup mouse-event>scroll-direction swap mouse-event-loc r>
+    [ [ mouse-event>scroll-direction ] [ mouse-event-loc ] bi ] dip
     send-wheel ;
 
 M: world enter-event motion-event ;
@@ -123,7 +125,7 @@ M: world enter-event motion-event ;
 M: world leave-event 2drop forget-rollover ;
 
 M: world motion-event
-    >r dup XMotionEvent-x swap XMotionEvent-y 2array r>
+    [ [ XMotionEvent-x ] [ XMotionEvent-y ] bi 2array ] dip
     move-hand fire-motion ;
 
 M: world focus-in-event
@@ -144,10 +146,10 @@ M: world selection-notify-event
 
 : clipboard-for-atom ( atom -- clipboard )
     {
-        { [ dup XA_PRIMARY = ] [ drop selection get ] }
-        { [ dup XA_CLIPBOARD = ] [ drop clipboard get ] }
+        { XA_PRIMARY [ selection get ] }
+        { XA_CLIPBOARD [ clipboard get ] }
         [ drop <clipboard> ]
-    } cond ;
+    } case ;
 
 : encode-clipboard ( string type -- bytes )
     XSelectionRequestEvent-target
@@ -158,7 +160,7 @@ M: world selection-notify-event
     [ XSelectionRequestEvent-requestor ] keep
     [ XSelectionRequestEvent-property ] keep
     [ XSelectionRequestEvent-target ] keep
-    >r 8 PropModeReplace r>
+    [ 8 PropModeReplace ] dip
     [
         XSelectionRequestEvent-selection
         clipboard-for-atom contents>>
@@ -208,8 +210,7 @@ M: x-clipboard copy-clipboard
     (>>contents) ;
 
 M: x-clipboard paste-clipboard
-    >r find-world handle>> window>>
-    r> atom>> convert-selection ;
+    [ find-world handle>> window>> ] dip atom>> convert-selection ;
 
 : init-clipboard ( -- )
     XA_PRIMARY <x-clipboard> selection set-global
@@ -219,14 +220,13 @@ M: x-clipboard paste-clipboard
     dup [ 127 <= ] all? [ XStoreName drop ] [ 3drop ] if ;
 
 : set-title-new ( dpy window string -- )
-    >r
-    XA_NET_WM_NAME XA_UTF8_STRING 8 PropModeReplace
-    r> utf8 encode dup length XChangeProperty drop ;
+    [ XA_NET_WM_NAME XA_UTF8_STRING 8 PropModeReplace ] dip
+    utf8 encode dup length XChangeProperty drop ;
 
 M: x11-ui-backend set-title ( string world -- )
-    handle>> window>> swap dpy get -rot
-    3dup set-title-old set-title-new ;
-    
+    handle>> window>> swap
+    [ dpy get ] 2dip [ set-title-old ] [ set-title-new ] 3bi ;
+
 M: x11-ui-backend set-fullscreen* ( ? world -- )
     handle>> window>> "XClientMessageEvent" <c-object>
     tuck set-XClientMessageEvent-window
@@ -237,8 +237,7 @@ M: x11-ui-backend set-fullscreen* ( ? world -- )
     "_NET_WM_STATE" x-atom over set-XClientMessageEvent-message_type
     32 over set-XClientMessageEvent-format
     "_NET_WM_STATE_FULLSCREEN" x-atom over set-XClientMessageEvent-data1
-    >r dpy get root get 0 SubstructureNotifyMask r> XSendEvent drop ;
-
+    [ dpy get root get 0 SubstructureNotifyMask ] dip XSendEvent drop ;
 
 M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window

@@ -18,7 +18,7 @@ IN: compiler.alien
     dup c-type-stack-align? [ c-type-align ] [ drop cell ] if ;
 
 : parameter-align ( n type -- n delta )
-    over >r c-type-stack-align align dup r> - ;
+    [ c-type-stack-align align dup ] [ drop ] 2bi - ;
 
 : parameter-sizes ( types -- total offsets )
     #! Compute stack frame locations.

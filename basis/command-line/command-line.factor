@@ -1,9 +1,14 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: init continuations debugger hashtables io kernel
-kernel.private namespaces parser sequences strings system
-splitting io.files eval ;
+USING: init continuations debugger hashtables io
+io.encodings.utf8 io.files kernel kernel.private namespaces
+parser sequences strings system splitting eval vocabs.loader ;
 IN: command-line
+
+SYMBOL: script
+SYMBOL: command-line
+
+: (command-line) ( -- args ) 10 getenv sift ;
 
 : rc-path ( name -- path )
     os windows? [ "." prepend ] unless
@@ -19,17 +24,33 @@ IN: command-line
         "factor-rc" rc-path ?run-file
     ] when ;
 
-: cli-var-param ( name value -- ) swap set-global ;
+: load-vocab-roots ( -- )
+    "user-init" get [
+        "factor-roots" rc-path dup exists? [
+            utf8 file-lines [ add-vocab-root ] each
+        ] [ drop ] if
+    ] when ;
 
-: cli-bool-param ( name -- ) "no-" ?head not cli-var-param ;
+<PRIVATE
 
-: cli-param ( param -- )
-    "=" split1 [ cli-var-param ] [ cli-bool-param ] if* ;
+: var-param ( name value -- ) swap set-global ;
 
-: cli-arg ( argument -- argument )
-    "-" ?head [ cli-param f ] when ;
+: bool-param ( name -- ) "no-" ?head not var-param ;
 
-: cli-args ( -- args ) 10 getenv ;
+: param ( param -- )
+    "=" split1 [ var-param ] [ bool-param ] if* ;
+
+: run-script ( file -- )
+    t "quiet" set-global run-file ;
+
+PRIVATE>
+
+: parse-command-line ( args -- )
+    [ command-line off script off ] [
+        unclip "-" ?head
+        [ param parse-command-line ]
+        [ script set command-line set ] if
+    ] if-empty ;
 
 SYMBOL: main-vocab-hook
 
@@ -53,14 +74,17 @@ SYMBOL: main-vocab-hook
 : ignore-cli-args? ( -- ? )
     os macosx? "run" get "ui" = and ;
 
-: script-mode ( -- )
-    t "quiet" set-global
-    "none" "run" set-global ;
+: script-mode ( -- ) ;
 
-: parse-command-line ( -- )
-    cli-args [ cli-arg ] filter
-    "script" get [ script-mode ] when
-    ignore-cli-args? [ drop ] [ [ run-file ] each ] if
-    "e" get [ eval ] when* ;
+: handle-command-line ( -- )
+    [
+        (command-line) parse-command-line
+        load-vocab-roots
+        run-user-init
+        "e" get [ eval ] when*
+        ignore-cli-args? not script get and
+        [ run-script ] [ "run" get run ] if*
+        output-stream get [ stream-flush ] when*
+    ] [ print-error 1 exit ] recover ;
 
 [ default-cli-args ] "command-line" add-init-hook

@@ -3,7 +3,7 @@
 USING: alien.c-types io.encodings.utf8 io.encodings.string
 kernel sequences unix.stat accessors unix combinators math
 grouping system unix.statfs io.files io.backend alien.strings
-math.bitwise alien.syntax ;
+math.bitwise alien.syntax io.unix.files ;
 IN: unix.statfs.macosx
 
 : MNT_RDONLY  HEX: 00000001 ; inline
@@ -116,50 +116,3 @@ C-STRUCT: statfs64
 
 FUNCTION: int statfs64 ( char* path, statfs64* buf ) ;
 FUNCTION: int getmntinfo64 ( statfs64** mntbufp, int flags ) ;
-
-
-TUPLE: macosx-file-system-info < file-system-info
-block-size io-size blocks blocks-free blocks-available files
-files-free file-system-id owner type-id flags filesystem-subtype ;
-
-M: macosx file-systems ( -- array )
-    f <void*> dup 0 getmntinfo64 dup io-error
-    [ *void* ] dip
-    "statfs64" heap-size [ * memory>byte-array ] keep group
-    [ >file-system-info ] map ;
-
-M: macosx >file-system-info ( byte-array -- file-system-info )
-    [ \ macosx-file-system-info new ] dip
-    {
-        [
-            [ statfs64-f_bavail ] [ statfs64-f_bsize ] bi *
-            >>free-space
-        ]
-        [ statfs64-f_mntonname utf8 alien>string >>mount-point ]
-        [ statfs64-f_bsize >>block-size ]
-
-        [ statfs64-f_iosize >>io-size ]
-        [ statfs64-f_blocks >>blocks ]
-        [ statfs64-f_bfree >>blocks-free ]
-        [ statfs64-f_bavail >>blocks-available ]
-        [ statfs64-f_files >>files ]
-        [ statfs64-f_ffree >>files-free ]
-        [ statfs64-f_fsid >>file-system-id ]
-        [ statfs64-f_owner >>owner ]
-        [ statfs64-f_type >>type-id ]
-        [ statfs64-f_flags >>flags ]
-        [ statfs64-f_fssubtype >>filesystem-subtype ]
-        [
-            statfs64-f_fstypename utf8 alien>string
-            >>type
-        ]
-        [
-            statfs64-f_mntfromname
-            utf8 alien>string >>device-name
-        ]
-    } cleave ;
-
-M: macosx file-system-info ( path -- file-system-info )
-    normalize-path
-    "statfs64" <c-object> tuck statfs64 io-error
-    >file-system-info ;

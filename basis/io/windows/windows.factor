@@ -8,7 +8,8 @@ splitting continuations math.bitwise system accessors ;
 IN: io.windows
 
 : set-inherit ( handle ? -- )
-    >r HANDLE_FLAG_INHERIT r> >BOOLEAN SetHandleInformation win32-error=0/f ;
+    [ HANDLE_FLAG_INHERIT ] dip
+    >BOOLEAN SetHandleInformation win32-error=0/f ;
 
 TUPLE: win32-handle handle disposed ;
 

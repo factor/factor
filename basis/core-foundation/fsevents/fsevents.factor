@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.strings alien.syntax kernel
 math sequences namespaces make assocs init accessors
 continuations combinators core-foundation
 core-foundation.run-loop core-foundation.run-loop.thread
-io.encodings.utf8 destructors ;
+io.encodings.utf8 destructors locals arrays ;
 IN: core-foundation.fsevents
 
 : kFSEventStreamCreateFlagUseCFTypes 2 ; inline
@@ -105,15 +105,14 @@ FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef 
     "FSEventStreamContext" <c-object>
     [ set-FSEventStreamContext-info ] keep ;
 
-: <FSEventStream> ( callback info paths latency flags -- event-stream )
-    >r >r >r >r >r
+:: <FSEventStream> ( callback info paths latency flags -- event-stream )
     f ! allocator
-    r> ! callback
-    r> make-FSEventStreamContext
-    r> <CFStringArray> ! paths
+    callback
+    info make-FSEventStreamContext
+    paths <CFStringArray>
     FSEventStreamEventIdSinceNow ! sinceWhen
-    r> ! latency
-    r> ! flags
+    latency
+    flags
     FSEventStreamCreate ;
 
 : kCFRunLoopCommonModes ( -- string )
@@ -161,13 +160,11 @@ SYMBOL: event-stream-callbacks
 : remove-event-source-callback ( id -- )
     event-stream-callbacks get delete-at ;
 
-: >event-triple ( n eventPaths eventFlags eventIds -- triple )
-    [
-        >r >r >r dup dup
-        r> void*-nth utf8 alien>string ,
-        r> int-nth ,
-        r> longlong-nth ,
-    ] { } make ;
+:: >event-triple ( n eventPaths eventFlags eventIds -- triple )
+    n eventPaths void*-nth utf8 alien>string
+    n eventFlags int-nth
+    n eventIds longlong-nth
+    3array ;
 
 : master-event-source-callback ( -- alien )
     "void"

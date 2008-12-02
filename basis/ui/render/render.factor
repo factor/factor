@@ -12,7 +12,7 @@ SYMBOL: viewport-translation
 
 : flip-rect ( rect -- loc dim )
     rect-bounds [
-        >r { 1 -1 } v* r> { 0 -1 } v* v+
+        [ { 1 -1 } v* ] dip { 0 -1 } v* v+
         viewport-translation get v+
     ] keep ;
 
@@ -79,9 +79,7 @@ DEFER: draw-gadget
     >absolute clip [ rect-intersect ] change ;
 
 : with-clipping ( gadget quot -- )
-    clip get >r
-    over change-clip do-clip call
-    r> clip set do-clip ; inline
+    clip get [ over change-clip do-clip call ] dip clip set do-clip ; inline
 
 : draw-gadget ( gadget -- )
     {
@@ -200,7 +198,7 @@ M: polygon draw-interior
 
 : <polygon-gadget> ( color points -- gadget )
     dup max-dim
-    >r <polygon> <gadget> r> >>dim
+    [ <polygon> <gadget> ] dip >>dim
     swap >>interior ;
 
 ! Font rendering
@@ -229,7 +227,7 @@ HOOK: free-fonts font-renderer ( world -- )
     dup string? [
         string-width
     ] [
-        0 -rot [ string-width max ] with each
+        [ 0 ] 2dip [ string-width max ] with each
     ] if ;
 
 : text-dim ( open-font text -- dim )
@@ -242,7 +240,7 @@ HOOK: free-fonts font-renderer ( world -- )
         [
             [
                 2dup { 0 0 } draw-string
-                >r open-font r> string-height
+                [ open-font ] dip string-height
                 0.0 swap 0.0 glTranslated
             ] with each
         ] with-translation

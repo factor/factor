@@ -79,20 +79,15 @@ ERROR: no-method object generic ;
 
 ERROR: inconsistent-next-method class generic ;
 
-ERROR: no-next-method class generic ;
-
-: single-next-method-quot ( class generic -- quot )
-    [
-        [ drop "predicate" word-prop % ]
+: single-next-method-quot ( class generic -- quot/f )
+    2dup next-method dup [
         [
-            2dup next-method
-            [ 2nip 1quotation ]
-            [ [ no-next-method ] 2curry [ ] like ] if* ,
-        ]
-        [ [ inconsistent-next-method ] 2curry , ]
-        2tri
-        \ if ,
-    ] [ ] make ;
+            pick "predicate" word-prop %
+            1quotation ,
+            [ inconsistent-next-method ] 2curry ,
+            \ if ,
+        ] [ ] make
+    ] [ 3drop f ] if ;
 
 : single-effective-method ( obj word -- method )
     [ [ order [ instance? ] with find-last nip ] keep method ]
@@ -130,7 +125,8 @@ M: standard-combination method-declaration
 
 M: standard-combination next-method-quot*
     [
-        single-next-method-quot picker prepend
+        single-next-method-quot
+        dup [ picker prepend ] when
     ] with-standard ;
 
 M: standard-generic effective-method
@@ -145,8 +141,11 @@ PREDICATE: hook-generic < generic
 
 : with-hook ( combination quot -- quot' )
     0 (dispatch#) [
-        dip var>> [ get ] curry prepend
+        [ hook-combination ] dip with-variable
     ] with-variable ; inline
+
+: prepend-hook-var ( quot -- quot' )
+    hook-combination get var>> [ get ] curry prepend ;
 
 M: hook-combination dispatch# drop 0 ;
 
@@ -159,13 +158,18 @@ M: hook-generic effective-method
     single-effective-method ;
 
 M: hook-combination make-default-method
-    [ error-method ] with-hook ;
+    [ error-method prepend-hook-var ] with-hook ;
 
 M: hook-combination perform-combination
-    [ drop ] [ [ single-combination ] with-hook ] 2bi define ;
+    [ drop ] [
+        [ single-combination prepend-hook-var ] with-hook
+    ] 2bi define ;
 
 M: hook-combination next-method-quot*
-    [ single-next-method-quot ] with-hook ;
+    [
+        single-next-method-quot
+        dup [ prepend-hook-var ] when
+    ] with-hook ;
 
 M: simple-generic definer drop \ GENERIC: f ;
 

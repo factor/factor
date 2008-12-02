@@ -9,6 +9,8 @@ TUPLE: struct-type size align fields ;
 
 M: struct-type heap-size size>> ;
 
+M: struct-type c-type-class drop object ;
+
 M: struct-type c-type-align align>> ;
 
 M: struct-type c-type-stack-align? drop f ;
@@ -37,7 +39,7 @@ M: struct-type stack-size
 : c-struct? ( type -- ? ) (c-type) struct-type? ;
 
 : (define-struct) ( name vocab size align fields -- )
-    >r [ align ] keep r>
+    [ [ align ] keep ] dip
     struct-type boa
     -rot define-c-type ;
 
@@ -48,11 +50,11 @@ M: struct-type stack-size
     [ c-type-align ] map supremum ;
 
 : define-struct ( name vocab fields -- )
-    pick >r
-    [ struct-offsets ] keep
-    [ [ type>> ] map compute-struct-align ] keep
-    [ (define-struct) ] keep
-    r> [ swap define-field ] curry each ;
+    pick [
+        [ struct-offsets ] keep
+        [ [ type>> ] map compute-struct-align ] keep
+        [ (define-struct) ] keep
+    ] dip [ swap define-field ] curry each ;
 
 : define-union ( name vocab members -- )
     [ expand-constants ] map

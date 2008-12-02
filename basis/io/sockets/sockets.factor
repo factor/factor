@@ -6,7 +6,7 @@ sequences arrays io.encodings io.ports io.streams.duplex
 io.encodings.ascii alien.strings io.binary accessors destructors
 classes debugger byte-arrays system combinators parser
 alien.c-types math.parser splitting grouping math assocs summary
-system vocabs.loader combinators present ;
+system vocabs.loader combinators present fry ;
 IN: io.sockets
 
 << {
@@ -89,7 +89,7 @@ M: inet4 make-sockaddr ( inet -- sockaddr )
     rot inet-pton *uint over set-sockaddr-in-addr ;
 
 M: inet4 parse-sockaddr
-    >r dup sockaddr-in-addr <uint> r> inet-ntop
+    [ dup sockaddr-in-addr <uint> ] dip inet-ntop
     swap sockaddr-in-port ntohs <inet4> ;
 
 TUPLE: inet6 < abstract-inet ;
@@ -144,7 +144,7 @@ M: inet6 make-sockaddr ( inet -- sockaddr )
     rot inet-pton over set-sockaddr-in6-addr ;
 
 M: inet6 parse-sockaddr
-    >r dup sockaddr-in6-addr r> inet-ntop
+    [ dup sockaddr-in6-addr ] dip inet-ntop
     swap sockaddr-in6-port ntohs <inet6> ;
 
 : addrspec-of-family ( af -- addrspec )
@@ -184,7 +184,7 @@ M: object (client) ( remote -- client-in client-out local )
     [
         [ ((client)) ] keep
         [
-            >r <ports> [ |dispose ] bi@ dup r>
+            [ <ports> [ |dispose ] bi@ dup ] dip
             establish-connection
         ]
         [ get-local-address ]
@@ -192,13 +192,19 @@ M: object (client) ( remote -- client-in client-out local )
     ] with-destructors ;
 
 : <client> ( remote encoding -- stream local )
-    >r (client) -rot r> <encoder-duplex> swap ;
+    [ (client) -rot ] dip <encoder-duplex> swap ;
 
 SYMBOL: local-address
 
+SYMBOL: remote-address
+
 : with-client ( remote encoding quot -- )
-    >r <client> [ local-address set ] curry
-    r> compose with-stream ; inline
+    [
+        [
+            over remote-address set
+            <client> local-address set
+        ] dip with-stream
+    ] with-scope ; inline
 
 TUPLE: server-port < port addr encoding ;
 
@@ -209,10 +215,11 @@ TUPLE: server-port < port addr encoding ;
 GENERIC: (server) ( addrspec -- handle )
 
 : <server> ( addrspec encoding -- server )
-    >r
-    [ (server) ] keep
-    [ drop server-port <port> ] [ get-local-address ] 2bi
-    >>addr r> >>encoding ;
+    [
+        [ (server) ] keep
+        [ drop server-port <port> ] [ get-local-address ] 2bi
+        >>addr
+    ] dip >>encoding ;
 
 GENERIC: (accept) ( server addrspec -- handle sockaddr )
 
@@ -281,7 +288,7 @@ C: <inet> inet
     IPPROTO_TCP over set-addrinfo-protocol ;
 
 : fill-in-ports ( addrspecs port -- addrspecs )
-    [ >>port ] curry map ;
+    '[ _ >>port ] map ;
 
 M: inet resolve-host
     [ port>> ] [ host>> ] bi [

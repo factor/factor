@@ -6,17 +6,35 @@ quotations debugger macros arrays macros splitting combinators
 prettyprint.backend definitions prettyprint hashtables
 prettyprint.sections sets sequences.private effects
 effects.parser generic generic.parser compiler.units accessors
-locals.backend memoize macros.expander lexer classes summary ;
+locals.backend memoize macros.expander lexer classes summary fry
+fry.private ;
 IN: locals
-
-! Inspired by
-! http://cat-language.googlecode.com/svn/trunk/CatPointFreeForm.cs
 
 ERROR: >r/r>-in-lambda-error ;
 
 M: >r/r>-in-lambda-error summary
     drop
     "Explicit retain stack manipulation is not permitted in lambda bodies" ;
+
+ERROR: binding-form-in-literal-error ;
+
+M: binding-form-in-literal-error summary
+    drop "[let, [let* and [wlet not permitted inside literals" ;
+
+ERROR: local-writer-in-literal-error ;
+
+M: local-writer-in-literal-error summary
+    drop "Local writer words not permitted inside literals" ;
+
+ERROR: local-word-in-literal-error ;
+
+M: local-word-in-literal-error summary
+    drop "Local words not permitted inside literals" ;
+
+ERROR: bad-lambda-rewrite output ;
+
+M: bad-lambda-rewrite summary
+    drop "You have found a bug in locals. Please report." ;
 
 <PRIVATE
 
@@ -85,60 +103,53 @@ C: <quote> quote
     [ dup quote? [ local>> ] when eq? ] with find drop ;
 
 : read-local-quot ( obj args -- quot )
-    local-index 1+ [ get-local ] curry ;
+    local-index neg [ get-local ] curry ;
 
-: localize-writer ( obj args -- quot )
-    >r "local-reader" word-prop r>
+GENERIC# localize 1 ( obj args -- quot )
+
+M: local localize read-local-quot ;
+
+M: quote localize [ local>> ] dip read-local-quot ;
+
+M: local-word localize read-local-quot [ call ] append ;
+
+M: local-reader localize read-local-quot [ local-value ] append ;
+
+M: local-writer localize
+    [ "local-reader" word-prop ] dip
     read-local-quot [ set-local-value ] append ;
 
-: localize ( obj args -- quot )
-    {
-        { [ over local? ]        [ read-local-quot ] }
-        { [ over quote? ]        [ >r local>> r> read-local-quot ] }
-        { [ over local-word? ]   [ read-local-quot [ call ] append ] }
-        { [ over local-reader? ] [ read-local-quot [ local-value ] append ] }
-        { [ over local-writer? ] [ localize-writer ] }
-        { [ over \ lambda eq? ]  [ 2drop [ ] ] }
-        { [ t ]                  [ drop 1quotation ] }
-    } cond ;
+M: object localize drop 1quotation ;
 
 UNION: special local quote local-word local-reader local-writer ;
 
 : load-locals-quot ( args -- quot )
-    [
-        [ ]
-    ] [
+    [ [ ] ] [
         dup [ local-reader? ] contains? [
-            <reversed> [
-                local-reader? [ 1array >r ] [ >r ] ?
-            ] map concat
-        ] [
-            length [ load-locals ] curry >quotation
-        ] if
+            dup [ local-reader? [ 1array ] [ ] ? ] map spread>quot
+        ] [ [ ] ] if swap length [ load-locals ] curry append
     ] if-empty ;
 
 : drop-locals-quot ( args -- quot )
     [ [ ] ] [ length [ drop-locals ] curry ] if-empty ;
 
 : point-free-body ( quot args -- newquot )
-    >r but-last-slice r> [ localize ] curry map concat ;
+    [ but-last-slice ] dip '[ _ localize ] map concat ;
 
 : point-free-end ( quot args -- newquot )
     over peek special?
-    [ dup drop-locals-quot >r >r peek r> localize r> append ]
-    [ dup drop-locals-quot nip swap peek suffix ]
+    [ dup drop-locals-quot [ [ peek ] dip localize ] dip append ]
+    [ drop-locals-quot swap peek suffix ]
     if ;
 
 : (point-free) ( quot args -- newquot )
     [ nip load-locals-quot ]
-    [ point-free-body ]
-    [ point-free-end ]
-    2tri 3append >quotation ;
+    [ reverse point-free-body ]
+    [ reverse point-free-end ]
+    2tri [ ] 3append-as ;
 
 : point-free ( quot args -- newquot )
-    over empty?
-    [ nip length \ drop <repetition> >quotation ]
-    [ (point-free) ] if ;
+    over empty? [ nip length '[ _ ndrop ] ] [ (point-free) ] if ;
 
 UNION: lexical local local-reader local-writer local-word ;
 
@@ -227,9 +238,6 @@ GENERIC: rewrite-element ( obj -- )
 M: array rewrite-element
     dup rewrite-literal? [ rewrite-sequence ] [ , ] if ;
 
-M: quotation rewrite-element
-    dup rewrite-literal? [ rewrite-sequence ] [ , ] if ;
-
 M: vector rewrite-element rewrite-sequence ;
 
 M: hashtable rewrite-element >alist rewrite-sequence \ >hashtable , ;
@@ -237,11 +245,21 @@ M: hashtable rewrite-element >alist rewrite-sequence \ >hashtable , ;
 M: tuple rewrite-element
     [ tuple-slots rewrite-elements ] [ class literalize , ] bi \ boa , ;
 
+M: quotation rewrite-element local-rewrite* ;
+
 M: lambda rewrite-element local-rewrite* ;
+
+M: binding-form rewrite-element binding-form-in-literal-error ;
 
 M: local rewrite-element , ;
 
 M: local-reader rewrite-element , ;
+
+M: local-writer rewrite-element
+    local-writer-in-literal-error ;
+
+M: local-word rewrite-element
+    local-word-in-literal-error ;
 
 M: word rewrite-element literalize , ;
 
@@ -278,8 +296,9 @@ M: object local-rewrite* , ;
 : make-locals ( seq -- words assoc )
     [ [ make-local ] map ] H{ } make-assoc ;
 
-: make-local-word ( name -- word )
-    <local-word> dup dup name>> set ;
+: make-local-word ( name def -- word )
+    [ <local-word> [ dup name>> set ] [ ] [ ] tri ] dip
+    "local-word-def" set-word-prop ;
 
 : push-locals ( assoc -- )
     use get push ;
@@ -328,7 +347,7 @@ SYMBOL: in-lambda?
 
 : (parse-wbindings) ( -- )
     parse-binding [
-        first2 >r make-local-word r> 2array ,
+        first2 [ make-local-word ] keep 2array ,
         (parse-wbindings)
     ] when* ;
 
@@ -340,7 +359,7 @@ SYMBOL: in-lambda?
 
 : let-rewrite ( body bindings -- )
     <reversed> [
-        >r 1array r> spin <lambda> [ call ] curry compose
+        [ 1array ] dip spin <lambda> '[ @ @ ]
     ] assoc-each local-rewrite* \ call , ;
 
 M: let local-rewrite*
@@ -351,18 +370,13 @@ M: let* local-rewrite*
 
 M: wlet local-rewrite*
     [ body>> ] [ bindings>> ] bi
-    [ [ ] curry ] assoc-map
+    [ '[ _ ] ] assoc-map
     let-rewrite ;
 
 : parse-locals ( -- vars assoc )
     ")" parse-effect
     word [ over "declared-effect" set-word-prop ] when*
     in>> [ dup pair? [ first ] when ] map make-locals dup push-locals ;
-
-ERROR: bad-lambda-rewrite output ;
-
-M: bad-lambda-rewrite summary
-    drop "You have found a bug in locals. Please report." ;
 
 : parse-locals-definition ( word -- word quot )
     "(" expect parse-locals \ ; (parse-lambda) <lambda>
@@ -431,7 +445,7 @@ M: lambda pprint*
     \ | pprint-word
     t <inset
     <block
-    [ <block >r pprint-var r> pprint* block> ] assoc-each
+    [ <block [ pprint-var ] dip pprint* block> ] assoc-each
     block>
     \ | pprint-word
     <block pprint-elements block>
@@ -497,3 +511,15 @@ M: lambda-method synopsis*
     method-stack-effect effect>string comment. ;
 
 PRIVATE>
+
+! Locals and fry
+M: binding-form count-inputs body>> count-inputs ;
+
+M: lambda count-inputs body>> count-inputs ;
+
+M: lambda deep-fry
+    clone [ shallow-fry swap ] change-body
+    [ [ vars>> length ] keep '[ _ _ mnswap @ ] , ] [ drop [ncurry] % ] 2bi ;
+
+M: binding-form deep-fry
+    clone [ fry '[ @ call ] ] change-body , ;
