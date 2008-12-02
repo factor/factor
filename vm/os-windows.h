@@ -20,13 +20,13 @@ typedef wchar_t F_CHAR;
 #define STRNCMP wcsncmp
 #define STRDUP _wcsdup
 
+#define FIXNUM_FORMAT "%Id"
+#define CELL_FORMAT "%lu"
+#define CELL_HEX_FORMAT "%Ix"
+
 #ifdef WIN64
-        #define CELL_FORMAT "%Iu"
-        #define CELL_HEX_FORMAT "%Ix"
 	#define CELL_HEX_PAD_FORMAT "%016Ix"
 #else
-        #define CELL_FORMAT "%lu"
-        #define CELL_HEX_FORMAT "%lx"
 	#define CELL_HEX_PAD_FORMAT "%08lx"
 #endif
 
