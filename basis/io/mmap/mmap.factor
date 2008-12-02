@@ -22,7 +22,7 @@ INSTANCE: mapped-file sequence
 HOOK: (mapped-file) io-backend ( path length -- address handle )
 
 : <mapped-file> ( path length -- mmap )
-    [ >r normalize-path r> (mapped-file) ] keep
+    [ [ normalize-path ] dip (mapped-file) ] keep
     f mapped-file boa ;
 
 HOOK: close-mapped-file io-backend ( mmap -- )
@@ -30,7 +30,7 @@ HOOK: close-mapped-file io-backend ( mmap -- )
 M: mapped-file dispose* ( mmap -- ) close-mapped-file ;
 
 : with-mapped-file ( path length quot -- )
-    >r <mapped-file> r> with-disposal ; inline
+    [ <mapped-file> ] dip with-disposal ; inline
 
 APPLY: mapped-array-functor primitive-types
 
