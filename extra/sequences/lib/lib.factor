@@ -5,7 +5,7 @@ USING: combinators.lib kernel sequences math namespaces make
 assocs random sequences.private shuffle math.functions arrays
 math.parser math.private sorting strings ascii macros assocs.lib
 quotations hashtables math.order locals generalizations
-math.ranges random  ;
+math.ranges random fry ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
