@@ -23,10 +23,8 @@ IN: tools.deploy.shaker
 
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
-    "cpu.x86" init-hooks get delete-at
-    "command-line" init-hooks get delete-at
-    "libc" init-hooks get delete-at
-    "system" init-hooks get delete-at
+    { "cpu.x86" "command-line" "libc" "system" "environment" }
+    [ init-hooks get delete-at ] each
     deploy-threads? get [
         "threads" init-hooks get delete-at
     ] unless

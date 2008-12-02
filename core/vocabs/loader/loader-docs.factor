@@ -66,7 +66,7 @@ HELP: vocab-roots
 { $var-description "A sequence of pathname strings to search for vocabularies." } ;
 
 HELP: add-vocab-root
-{ $values { "path" "a pathname string" } }
+{ $values { "root" "a pathname string" } }
 { $description "Adds a directory pathname to the list of vocabulary roots." }
 { $see-also "factor-roots" } ;
 
