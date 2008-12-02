@@ -257,9 +257,6 @@ M: winnt link-info ( path -- info )
 
 HOOK: root-directory os ( string -- string' )
 
-TUPLE: winnt-file-system-info < file-system-info
-total-bytes total-free-bytes ;
-
 : file-system-type ( normalized-path -- str )
     MAX_PATH 1+ <byte-array>
     MAX_PATH 1+
@@ -269,21 +266,28 @@ total-bytes total-free-bytes ;
     [ GetVolumeInformation win32-error=0/f ] 2keep drop
     utf16n alien>string ;
 
-: file-system-space ( normalized-path -- free-space total-bytes total-free-bytes )
+: file-system-space ( normalized-path -- available-space total-space free-space )
     "ULARGE_INTEGER" <c-object>
     "ULARGE_INTEGER" <c-object>
     "ULARGE_INTEGER" <c-object>
     [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep ;
 
+: calculate-file-system-info ( file-system-info -- file-system-info' )
+    {
+        [ dup [ total-space>> ] [ free-space>> ] bi - >>used-space drop ]
+        [ ]
+    } cleave ;
+
 M: winnt file-system-info ( path -- file-system-info )
     normalize-path root-directory
     dup [ file-system-type ] [ file-system-space ] bi
-    \ winnt-file-system-info new
-        swap *ulonglong >>total-free-bytes
-        swap *ulonglong >>total-bytes
+    \ file-system-info new
         swap *ulonglong >>free-space
+        swap *ulonglong >>total-space
+        swap *ulonglong >>available-space
         swap >>type
-        swap >>mount-point ;
+        swap >>mount-point
+    calculate-file-system-info ;
 
 : volume>paths ( string -- array )
     16384 "ushort" <c-array> tuck dup length
@@ -324,7 +328,7 @@ M: winnt file-systems ( -- array )
     find-volumes [ volume>paths ] map
     concat [
         [ file-system-info ]
-        [ drop winnt-file-system-info new swap >>mount-point ] recover
+        [ drop \ file-system-info new swap >>mount-point ] recover
     ] map ;
 
 : file-times ( path -- timestamp timestamp timestamp )
