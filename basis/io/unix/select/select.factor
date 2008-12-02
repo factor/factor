@@ -19,7 +19,7 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
         FD_SETSIZE 8 * <bit-array> >>write-fdset ;
 
 : clear-nth ( n seq -- ? )
-    [ nth ] [ f -rot set-nth ] 2bi ;
+    [ nth ] [ [ f ] 2dip set-nth ] 2bi ;
 
 :: check-fd ( fd fdset mx quot -- )
     fd munge fdset clear-nth [ fd mx quot call ] when ; inline

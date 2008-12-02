@@ -74,7 +74,7 @@ PRIVATE>
     -> autorelease ;
 
 : <GLView> ( class dim -- view )
-    >r -> alloc 0 0 r> first2 <NSRect> <PixelFormat>
+    [ -> alloc 0 0 ] dip first2 <NSRect> <PixelFormat>
     -> initWithFrame:pixelFormat:
     dup 1 -> setPostsBoundsChangedNotifications:
     dup 1 -> setPostsFrameChangedNotifications: ;
@@ -85,10 +85,11 @@ PRIVATE>
     swap NSRect-h >fixnum 2array ;
 
 : mouse-location ( view event -- loc )
-    over >r
-    -> locationInWindow f -> convertPoint:fromView:
-    dup NSPoint-x swap NSPoint-y
-    r> -> frame NSRect-h swap - 2array ;
+    [
+        -> locationInWindow f -> convertPoint:fromView:
+        [ NSPoint-x ] [ NSPoint-y ] bi
+    ] [ drop -> frame NSRect-h ] 2bi
+    swap - 2array ;
 
 USE: opengl.gl
 USE: alien.syntax

@@ -1,1 +1,1 @@
-Prints formatted hex dump of an arbitrary sequence
+Prints the formatted hex dump of a byte-array

@@ -31,10 +31,10 @@ C-STRUCT: statvfs
     { "uid_t"   "f_owner" }
     { { "uint32_t" 4 } "f_spare" }     
     { { "char" _VFS_NAMELEN } "f_fstypename" }
-    { { "char" _VFS_NAMELEN } "f_mntonname" }
-    { { "char" _VFS_NAMELEN } "f_mntfromname" } ;
+    { { "char" _VFS_MNAMELEN } "f_mntonname" }
+    { { "char" _VFS_MNAMELEN } "f_mntfromname" } ;
 
-FUNCTION: int statvfs ( char* path, statvfs *buf ) ;
+FUNCTION: int statvfs ( char* path, statvfs* buf ) ;
 
 TUPLE: netbsd-file-system-info < file-system-info
 flag bsize frsize io-size

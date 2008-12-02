@@ -9,7 +9,7 @@ IN: alien.strings
 GENERIC# alien>string 1 ( c-ptr encoding -- string/f )
 
 M: c-ptr alien>string
-    >r <memory-stream> r> <decoder>
+    [ <memory-stream> ] [ <decoder> ] bi*
     "\0" swap stream-read-until drop ;
 
 M: f alien>string

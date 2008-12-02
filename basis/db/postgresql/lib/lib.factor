@@ -76,7 +76,7 @@ M: postgresql-result-null summary ( obj -- str )
 : param-values ( statement -- seq seq2 )
     [ bind-params>> ] [ in-params>> ] bi
     [
-        >r value>> r> type>> {
+        [ value>> ] [ type>> ] bi* {
             { FACTOR-BLOB [
                 dup [ object>bytes malloc-byte-array/length ] [ 0 ] if
             ] }
@@ -99,7 +99,7 @@ M: postgresql-result-null summary ( obj -- str )
 
 : do-postgresql-bound-statement ( statement -- res )
     [
-        >r db get handle>> r>
+        [ db get handle>> ] dip
         {
             [ sql>> ]
             [ bind-params>> length ]
@@ -117,7 +117,7 @@ M: postgresql-result-null summary ( obj -- str )
 
 : pq-get-string ( handle row column -- obj )
     3dup PQgetvalue utf8 alien>string
-    dup empty? [ >r pq-get-is-null f r> ? ] [ 3nip ] if ;
+    dup empty? [ [ pq-get-is-null f ] dip ? ] [ 3nip ] if ;
 
 : pq-get-number ( handle row column -- obj )
     pq-get-string dup [ string>number ] when ;

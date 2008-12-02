@@ -117,7 +117,9 @@ M: word integer-op-input-classes
     { fixnum bignum float }
     [ [ dup 3array ] [ swap method ] 2bi ] with { } map>assoc
     [ nip ] assoc-filter
-    [ def>> peek ] assoc-map % ;
+    [ def>> ] assoc-map
+    [ nip length 1 = ] assoc-filter
+    [ first ] assoc-map % ;
 
 SYMBOL: math-ops
 
@@ -150,7 +152,7 @@ SYMBOL: fast-math-ops
 : integer-derived-ops ( word -- words )
     [ math-ops get (derived-ops) ] [ fast-math-ops get (derived-ops) ] bi
     [
-            [
+        [
             drop
             [ second integer class<= ]
             [ third integer class<= ]
@@ -172,7 +174,6 @@ SYMBOL: fast-math-ops
         \ +       define-math-ops
         \ -       define-math-ops
         \ *       define-math-ops
-        \ shift   define-math-ops
         \ mod     define-math-ops
         \ /i      define-math-ops
 
@@ -185,6 +186,9 @@ SYMBOL: fast-math-ops
         \ >       define-math-ops
         \ >=      define-math-ops
         \ number= define-math-ops
+
+        { { shift bignum bignum } bignum-shift } ,
+        { { shift fixnum fixnum } fixnum-shift } ,
 
         \ + \ fixnum+ \ bignum+ define-integer-ops
         \ - \ fixnum- \ bignum- define-integer-ops

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors furnace.actions http.server
-http.server.dispatchers html.forms io.servers.connection
+http.server.dispatchers html.forms io.sockets
 namespaces prettyprint ;
 IN: webapps.ip
 

@@ -80,17 +80,17 @@ ERROR: no-word-error name ;
 : <no-word-error> ( name possibilities -- error restarts )
     [ drop \ no-word-error boa ] [ word-restarts ] 2bi ;
 
-SYMBOL: amended-use?
+SYMBOL: amended-use
 
 SYMBOL: auto-use?
 
 : no-word-restarted ( restart-value -- word )
     dup word? [
-        amended-use? on
         dup vocabulary>>
-        [ (use+) ] [
-            "Added ``" swap "'' vocabulary to search path" 3append note.
-        ] bi
+        [ (use+) ]
+        [ amended-use get dup [ push ] [ 2drop ] if ]
+        [ "Added ``" swap "'' vocabulary to search path" 3append note. ]
+        tri
     ] [ create-in ] if ;
 
 : no-word ( name -- newword )
@@ -232,22 +232,16 @@ SYMBOL: interactive-vocabs
 SYMBOL: print-use-hook
 
 print-use-hook global [ [ ] or ] change-at
-
+!
 : parse-fresh ( lines -- quot )
     [
-        amended-use? off
+        V{ } clone amended-use set
         parse-lines
-        amended-use? get [
-            print-use-hook get call
-        ] when
+        amended-use get empty? [ print-use-hook get call ] unless
     ] with-file-vocabs ;
 
 : parsing-file ( file -- )
-    "quiet" get [
-        drop
-    ] [
-        "Loading " write print flush
-    ] if ;
+    "quiet" get [ drop ] [ "Loading " write print flush ] if ;
 
 : filter-moved ( assoc1 assoc2 -- seq )
     swap assoc-diff [

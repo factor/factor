@@ -18,14 +18,14 @@ grid
 : <grid> ( children -- grid )
     grid new-grid ;
 
-: grid-child ( grid i j -- gadget ) rot grid>> nth nth ;
+:: grid-child ( grid i j -- gadget ) i j grid grid>> nth nth ;
 
 :: grid-add ( grid child i j -- grid )
     grid i j grid-child unparent
     grid child add-gadget
     child i j grid grid>> nth set-nth ;
 
-: grid-remove ( grid i j -- grid ) <gadget> -rot grid-add ;
+: grid-remove ( grid i j -- grid ) [ <gadget> ] 2dip grid-add ;
 
 : pref-dim-grid ( grid -- dims )
     grid>> [ [ pref-dim ] map ] map ;

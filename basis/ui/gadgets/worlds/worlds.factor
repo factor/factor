@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations kernel math models
-namespaces opengl sequences io combinators math.vectors
+namespaces opengl sequences io combinators fry math.vectors
 ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
 debugger math.geometry.rect ;
 IN: ui.gadgets.worlds
@@ -67,9 +67,7 @@ M: world children-on nip children>> ;
 : draw-world? ( world -- ? )
     #! We don't draw deactivated worlds, or those with 0 size.
     #! On Windows, the latter case results in GL errors.
-    dup active?>>
-    over handle>>
-    rot rect-dim [ 0 > ] all? and and ;
+    [ active?>> ] [ handle>> ] [ dim>> [ 0 > ] all? ] tri and and ;
 
 TUPLE: world-error error world ;
 
@@ -127,5 +125,4 @@ M: world handle-gesture ( gesture gadget -- ? )
     ] [ 2drop f ] if ;
 
 : close-global ( world global -- )
-    dup get-global find-world rot eq?
-    [ f swap set-global ] [ drop ] if ;
+    [ get-global find-world eq? ] keep '[ f _ set-global ] when ;

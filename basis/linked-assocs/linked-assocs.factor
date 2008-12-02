@@ -28,9 +28,6 @@ M: linked-assoc set-at
     [ 2dup assoc>> key? [ 2dup delete-at ] when add-to-dlist ] 2keep
     assoc>> set-at ;
 
-: dlist>seq ( dlist -- seq )
-    [ ] pusher [ dlist-each ] dip ;
-
 M: linked-assoc >alist
     dlist>> dlist>seq ;
 

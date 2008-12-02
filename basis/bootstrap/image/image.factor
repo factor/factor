@@ -72,7 +72,7 @@ SYMBOL: objects
 : put-object ( n obj -- ) (objects) set-at ;
 
 : cache-object ( obj quot -- value )
-    >r (objects) r> [ obj>> ] prepose cache ; inline
+    [ (objects) ] dip [ obj>> ] prepose cache ; inline
 
 ! Constants
 
@@ -97,10 +97,10 @@ SYMBOL: sub-primitives
     { [ { } make ] [ ] [ ] [ ] } spread 4array ; inline
 
 : jit-define ( quot rc rt offset name -- )
-    >r make-jit r> set ; inline
+    [ make-jit ] dip set ; inline
 
 : define-sub-primitive ( quot rc rt offset word -- )
-    >r make-jit r> sub-primitives get set-at ;
+    [ make-jit ] dip sub-primitives get set-at ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -205,7 +205,7 @@ SYMBOL: undefined-quot
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
 : emit-object ( header tag quot -- addr )
-    swap here-as >r swap tag-fixnum emit call align-here r> ;
+    swap here-as [ swap tag-fixnum emit call align-here ] dip ;
     inline
 
 ! Write an object to the image.

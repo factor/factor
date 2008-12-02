@@ -11,7 +11,7 @@ TUPLE: chunking-seq { seq read-only } { n read-only } ;
 : check-groups dup 0 <= [ "Invalid group count" throw ] when ; inline
 
 : new-groups ( seq n class -- groups )
-    >r check-groups r> boa ; inline
+    [ check-groups ] dip boa ; inline
 
 GENERIC: group@ ( n groups -- from to seq )
 

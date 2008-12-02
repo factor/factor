@@ -20,7 +20,7 @@ ERROR: promise-already-fulfilled promise ;
     ] if ;
 
 : ?promise-timeout ( promise timeout -- result )
-    >r mailbox>> r> block-if-empty mailbox-peek ;
+    [ mailbox>> ] dip block-if-empty mailbox-peek ;
 
 : ?promise ( promise -- result )
     f ?promise-timeout ;

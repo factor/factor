@@ -36,12 +36,13 @@ M: presentation ungraft*
     call-next-method ;
 
 : <operations-menu> ( presentation -- menu )
-    dup dup hook>> curry
-    swap object>>
-    dup object-operations <commands-menu> ;
+    [ object>> ]
+    [ dup hook>> curry ]
+    [ object>> object-operations ]
+    tri <commands-menu> ;
 
 : operations-menu ( presentation -- )
-    dup <operations-menu> swap show-menu ;
+    dup <operations-menu> show-menu ;
 
 presentation H{
     { T{ button-down f f 3 } [ operations-menu ] }

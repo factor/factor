@@ -77,18 +77,22 @@ IN: ui.cocoa.views
     dup event-modifiers swap button ;
 
 : send-button-down$ ( view event -- )
-    [ mouse-event>gesture <button-down> ]
-    [ mouse-location rot window send-button-down ] 2bi ;
+    [ nip mouse-event>gesture <button-down> ]
+    [ mouse-location ]
+    [ drop window ]
+    2tri send-button-down ;
 
 : send-button-up$ ( view event -- )
-    [ mouse-event>gesture <button-up> ] 2keep
-    mouse-location rot window send-button-up ;
+    [ nip mouse-event>gesture <button-up> ]
+    [ mouse-location ]
+    [ drop window ]
+    2tri send-button-up ;
 
 : send-wheel$ ( view event -- )
-    [
-        dup -> deltaX sgn neg over -> deltaY sgn neg 2array -rot
-        mouse-location
-    ] [ drop window ] 2bi send-wheel ;
+    [ nip [ -> deltaX ] [ -> deltaY ] bi [ sgn neg ] bi@ 2array ]
+    [ mouse-location ]
+    [ drop window ]
+    2tri send-wheel ;
 
 : send-action$ ( view event gesture -- junk )
     [ drop window ] dip send-action f ;
@@ -103,21 +107,18 @@ IN: ui.cocoa.views
     [ CF>string NSStringPboardType = ] [ t ] if* ;
 
 : valid-service? ( gadget send-type return-type -- ? )
-    over string-or-nil? over string-or-nil? and [
-        drop [ gadget-selection? ] [ drop t ] if
-    ] [
-        3drop f
-    ] if ;
+    over string-or-nil? over string-or-nil? and
+    [ drop [ gadget-selection? ] [ drop t ] if ] [ 3drop f ] if ;
 
 : NSRect>rect ( NSRect world -- rect )
-    [ dup NSRect-x over NSRect-y ] dip
-    rect-dim second swap - 2array
-    over NSRect-w rot NSRect-h 2array
-    <rect> ;
+    [ [ [ NSRect-x ] [ NSRect-y ] bi ] [ dim>> second ] bi* swap - 2array ]
+    [ drop [ NSRect-w ] [ NSRect-h ] bi 2array ]
+    2bi <rect> ;
 
 : rect>NSRect ( rect world -- NSRect )
-    over rect-loc first2 rot rect-dim second swap -
-    rot rect-dim first2 <NSRect> ;
+    [ [ rect-loc first2 ] [ dim>> second ] bi* swap - ]
+    [ drop rect-dim first2 ]
+    2bi <NSRect> ;
 
 CLASS: {
     { +superclass+ "NSOpenGLView" }
@@ -342,7 +343,7 @@ CLASS: {
 
 { "initWithFrame:pixelFormat:" "id" { "id" "SEL" "NSRect" "id" }
     [
-        rot drop
+        [ drop ] 2dip
         SUPER-> initWithFrame:pixelFormat:
         dup dup add-resize-observer
     ]
@@ -351,9 +352,10 @@ CLASS: {
 { "dealloc" "void" { "id" "SEL" }
     [
         drop
-        dup unregister-window
-        dup remove-observer
-        SUPER-> dealloc
+        [ unregister-window ]
+        [ remove-observer ]
+        [ SUPER-> dealloc ]
+        tri
     ]
 } ;
 

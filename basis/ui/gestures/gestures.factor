@@ -205,7 +205,7 @@ SYMBOL: drag-timer
     dup hand-last-button get = ;
 
 : multi-click-position? ( -- ? )
-    hand-loc get hand-click-loc get v- norm-sq 100 <= ;
+    hand-loc get hand-click-loc get distance 10 <= ;
 
 : multi-click? ( button -- ? )
     {

@@ -284,20 +284,18 @@ SYMBOL: nc-buttons
     message>button nc-buttons get
     swap [ push ] [ delete ] if ;
 
-: >lo-hi ( WORD -- array ) [ lo-word ] keep hi-word 2array ;
-: mouse-wheel ( wParam -- array ) >lo-hi [ sgn neg ] map ;
+: >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
 
-: mouse-absolute>relative ( lparam handle -- array )
-    [ >lo-hi ] dip
-    "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep
-    get-RECT-top-left 2array v- ;
+: mouse-wheel ( wParam -- array ) >lo-hi [ sgn neg ] map ;
 
 : mouse-event>gesture ( uMsg -- button )
     key-modifiers swap message>button
     [ <button-down> ] [ <button-up> ] if ;
 
-: prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
-    [ drop mouse-event>gesture ] dip >lo-hi rot window ;
+:: prepare-mouse ( hWnd uMsg wParam lParam -- button coordinate world )
+    uMsg mouse-event>gesture
+    lParam >lo-hi
+    hWnd window ;
 
 : set-capture ( hwnd -- )
     mouse-captured get [
@@ -338,9 +336,7 @@ SYMBOL: nc-buttons
     >lo-hi swap window move-hand fire-motion ;
 
 :: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
-    wParam mouse-wheel
-    lParam hWnd mouse-absolute>relative
-    hWnd window send-wheel ;
+    wParam mouse-wheel hand-loc get hWnd window send-wheel ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging
@@ -435,7 +431,7 @@ M: windows-ui-backend do-events
     style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
 
 : make-RECT ( world -- RECT )
-    dup window-loc>> dup rot rect-dim v+
+    [ window-loc>> dup ] [ rect-dim ] bi v+
     "RECT" <c-object>
     over first over set-RECT-right
     swap second over set-RECT-bottom

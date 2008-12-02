@@ -52,7 +52,7 @@ GENERIC: c-type ( name -- type ) foldable
 
 : parse-array-type ( name -- array )
     "[" split unclip
-    >r [ "]" ?tail drop string>number ] map r> prefix ;
+    [ [ "]" ?tail drop string>number ] map ] dip prefix ;
 
 M: string c-type ( name -- type )
     CHAR: ] over member? [
@@ -201,10 +201,10 @@ M: byte-array byte-length length ;
     1 swap malloc-array ; inline
 
 : malloc-byte-array ( byte-array -- alien )
-    dup length dup malloc [ -rot memcpy ] keep ;
+    dup length [ nip malloc dup ] 2keep memcpy ;
 
 : memory>byte-array ( alien len -- byte-array )
-    dup <byte-array> [ -rot memcpy ] keep ;
+    [ nip <byte-array> dup ] 2keep memcpy ;
 
 : byte-array>memory ( byte-array base -- )
     swap dup length memcpy ;

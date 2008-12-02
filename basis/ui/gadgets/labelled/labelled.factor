@@ -48,9 +48,10 @@ TUPLE: closable-gadget < frame content ;
     [ closable-gadget? ] find-parent ;
 
 : <closable-gadget> ( gadget title quot -- gadget )
-    closable-gadget new-frame
-        -rot <title-bar> @top grid-add
-        swap >>content
-        dup content>> @center grid-add ;
+    [
+        [ closable-gadget new-frame ] dip
+        [ >>content ] [ @center grid-add ] bi
+    ] 2dip
+    <title-bar> @top grid-add ;
     
 M: closable-gadget focusable-child* content>> ;
