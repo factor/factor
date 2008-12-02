@@ -27,6 +27,9 @@ HOOK: (set-os-envs) os ( seq -- )
 } cond
 
 [
-    "FACTOR_ROOTS" os-env os windows? ";" ":" ? split
-    [ add-vocab-root ] each
+    "FACTOR_ROOTS" os-env
+    [
+        os windows? ";" ":" ? split
+        [ add-vocab-root ] each
+    ] when*    
 ] "environment" add-init-hook
