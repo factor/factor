@@ -5,7 +5,7 @@ USING: combinators.lib kernel sequences math namespaces make
 assocs random sequences.private shuffle math.functions arrays
 math.parser math.private sorting strings ascii macros assocs.lib
 quotations hashtables math.order locals generalizations
-math.ranges random  ;
+math.ranges random fry ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -90,12 +90,8 @@ ERROR: element-not-found ;
     dupd find over [ element-not-found ] unless
     >r cut rest r> swap ; inline
 
-: (map-until) ( quot pred -- quot )
-    [ dup ] swap 3compose
-    [ [ drop t ] [ , f ] if ] compose [ find 2drop ] curry ;
-
 : map-until ( seq quot pred -- newseq )
-    (map-until) { } make ;
+    '[ [ @ dup @ [ drop t ] [ , f ] if ] find 2drop ] { } make ;
 
 : take-while ( seq quot -- newseq )
     [ not ] compose

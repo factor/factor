@@ -46,10 +46,10 @@ $nl
     "{ 10 20 30 } [ sq ] [ . ] compose each"
     "{ 10 20 30 } [ sq . ] each"
 }
-"The " { $link _ } " and " { $link @ } " specifiers may be freely mixed:"
+"The " { $link _ } " and " { $link @ } " specifiers may be freely mixed, and the result is considerably more concise and readable than the version using " { $link curry } " and " { $link compose } " directly:"
 { $code
     "{ 8 13 14 27 } [ even? ] 5 '[ @ dup _ ? ] map"
-    "{ 8 13 14 27 } [ even? ] 5 [ dup ] swap [ ? ] curry 3compose map"
+    "{ 8 13 14 27 } [ even? ] 5 [ dup ] swap [ ? ] curry compose compose map"
     "{ 8 13 14 27 } [ even? dup 5 ? ] map"
 }
 "The following is a no-op:"

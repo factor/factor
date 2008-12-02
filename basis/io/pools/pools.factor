@@ -42,7 +42,7 @@ GENERIC: make-connection ( pool -- conn )
     [ nip call ] [ drop return-connection ] 3bi ; inline
 
 : with-pooled-connection ( pool quot -- )
-    >r [ acquire-connection ] keep r>
+    [ [ acquire-connection ] keep ] dip
     [ (with-pooled-connection) ] [ ] [ 2drop dispose ] cleanup ; inline
 
 M: return-connection dispose

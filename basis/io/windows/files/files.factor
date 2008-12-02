@@ -10,7 +10,7 @@ IN: io.windows.files
 
 : open-file ( path access-mode create-mode flags -- handle )
     [
-        >r >r share-mode default-security-attributes r> r>
+        [ share-mode default-security-attributes ] 2dip
         CreateFile-flags f CreateFile opened-file
     ] with-destructors ;
 
@@ -46,7 +46,7 @@ IN: io.windows.files
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
 : set-file-pointer ( handle length method -- )
-    >r dupd d>w/w <uint> r> SetFilePointer
+    [ dupd d>w/w <uint> ] dip SetFilePointer
     INVALID_SET_FILE_POINTER = [
         CloseHandle "SetFilePointer failed" throw
     ] when drop ;
@@ -348,23 +348,23 @@ M: winnt file-systems ( -- array )
 : set-file-times ( path timestamp/f timestamp/f timestamp/f -- )
     #! timestamp order: creation access write
     [
-        >r >r >r
+        [
             normalize-path open-existing &dispose handle>>
-        r> r> r> (set-file-times)
+        ] 3dip (set-file-times)
     ] with-destructors ;
 
 : set-file-create-time ( path timestamp -- )
     f f set-file-times ;
 
 : set-file-access-time ( path timestamp -- )
-    >r f r> f set-file-times ;
+    [ f ] dip f set-file-times ;
 
 : set-file-write-time ( path timestamp -- )
-    >r f f r> set-file-times ;
+    [ f f ] dip set-file-times ;
 
 M: winnt touch-file ( path -- )
     [
         normalize-path
-        maybe-create-file >r &dispose r>
+        maybe-create-file [ &dispose ] dip
         [ drop ] [ handle>> f now dup (set-file-times) ] if
     ] with-destructors ;
