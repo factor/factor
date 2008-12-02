@@ -46,7 +46,7 @@ TUPLE: CreateProcess-args
     CreateProcess win32-error=0/f ;
 
 : count-trailing-backslashes ( str n -- str n )
-    >r "\\" ?tail r> swap [
+    [ "\\" ?tail ] dip swap [
         1+ count-trailing-backslashes
     ] when ;
 
@@ -85,8 +85,7 @@ TUPLE: CreateProcess-args
 
 : fill-lpApplicationName ( process args -- process args )
     over app-name/cmd-line
-    >r >>lpApplicationName
-    r> >>lpCommandLine ;
+    [ >>lpApplicationName ] [ >>lpCommandLine ] bi* ;
 
 : fill-lpCommandLine ( process args -- process args )
     over cmd-line >>lpCommandLine ;
