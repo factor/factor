@@ -23,6 +23,7 @@ typedef char F_SYMBOL;
 #define STRNCMP strncmp
 #define STRDUP strdup
 
+#define FIXNUM_FORMAT "%ld"
 #define CELL_FORMAT "%lu"
 #define CELL_HEX_FORMAT "%lx"
 
