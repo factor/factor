@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax accessors combinators kernel
 unix.types math system io.backend alien.c-types unix
-unix.statfs io.files io.unix.files unix.statvfs.openbsd ;
+io.files io.unix.files unix.statvfs.openbsd ;
 IN: io.unix.files.openbsd
 
 M: openbsd file-system-statvfs ( normalized-path -- statvfs )
