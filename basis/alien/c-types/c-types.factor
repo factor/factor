@@ -4,7 +4,7 @@ USING: byte-arrays arrays assocs kernel kernel.private libc math
 namespaces make parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
 layouts system compiler.units io.files io.encodings.binary
-accessors combinators effects continuations ;
+accessors combinators effects continuations fry ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -240,8 +240,8 @@ M: long-long-type box-return ( type -- )
 
 : define-out ( name -- )
     [ "alien.c-types" constructor-word ]
-    [ [ [ <c-object> ] curry ] [ c-setter ] bi append ] bi
-    define-inline ;
+    [ dup c-setter '[ _ <c-object> [ 0 @ ] keep ] ]
+    bi define-inline ;
 
 : c-bool> ( int -- ? )
     zero? not ;
