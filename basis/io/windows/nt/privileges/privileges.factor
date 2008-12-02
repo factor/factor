@@ -20,12 +20,12 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 
 : with-process-token ( quot -- )
     #! quot: ( token-handle -- token-handle )
-    >r open-process-token r>
+    [ open-process-token ] dip
     [ keep ] curry
     [ CloseHandle drop ] [ ] cleanup ; inline
 
 : lookup-privilege ( string -- luid )
-    >r f r> "LUID" <c-object>
+    [ f ] dip "LUID" <c-object>
     [ LookupPrivilegeValue win32-error=0/f ] keep ;
 
 : make-token-privileges ( name ? -- obj )
@@ -39,10 +39,10 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
         set-LUID_AND_ATTRIBUTES-Attributes
     ] when
 
-    >r lookup-privilege r>
+    [ lookup-privilege ] dip
     [
         TOKEN_PRIVILEGES-Privileges
-        >r 0 r> LUID_AND_ATTRIBUTES-nth
+        [ 0 ] dip LUID_AND_ATTRIBUTES-nth
         set-LUID_AND_ATTRIBUTES-Luid
     ] keep ;
 
