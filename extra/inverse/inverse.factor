@@ -5,7 +5,7 @@ sequences assocs math arrays stack-checker effects generalizations
 continuations debugger classes.tuple namespaces make vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
 sequences.private combinators mirrors
-combinators.short-circuit ;
+combinators.short-circuit fry ;
 IN: inverse
 
 TUPLE: fail ;
@@ -46,7 +46,7 @@ M: no-inverse summary
     dup word? [ "Badly formed math inverse" throw ] when 1quotation ;
 
 : swap-inverse ( math-inverse revquot -- revquot* quot )
-    next assure-constant rot second [ swap ] swap 3compose ;
+    next assure-constant rot second '[ @ swap @ ] ;
 
 : pull-inverse ( math-inverse revquot const -- revquot* quot )
     assure-constant rot first compose ;
@@ -236,8 +236,7 @@ DEFER: _
     ] recover ; inline
 
 : true-out ( quot effect -- quot' )
-    out>> [ ndrop ] curry
-    [ t ] 3compose ;
+    out>> '[ @ _ ndrop t ] ;
 
 : false-recover ( effect -- quot )
     in>> [ ndrop f ] curry [ recover-fail ] curry ;

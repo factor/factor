@@ -142,7 +142,7 @@ MACRO: multikeep ( word out-indexes -- ... )
     [ tuck 2slip ] dip while ; inline
 
 : generate ( generator predicate -- obj )
-    [ dup ] swap [ dup [ nip ] unless not ] 3compose
+    '[ dup @ dup [ nip ] unless not ]
     swap [ ] do-while ;
 
 MACRO: predicates ( seq -- quot/f )

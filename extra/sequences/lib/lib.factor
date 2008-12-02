@@ -90,12 +90,8 @@ ERROR: element-not-found ;
     dupd find over [ element-not-found ] unless
     >r cut rest r> swap ; inline
 
-: (map-until) ( quot pred -- quot )
-    [ dup ] swap 3compose
-    [ [ drop t ] [ , f ] if ] compose [ find 2drop ] curry ;
-
 : map-until ( seq quot pred -- newseq )
-    (map-until) { } make ;
+    '[ [ @ dup @ [ drop t ] [ , f ] if ] find 2drop ] { } make ;
 
 : take-while ( seq quot -- newseq )
     [ not ] compose
