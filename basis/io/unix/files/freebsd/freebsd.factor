@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax combinators
 io.backend io.files io.unix.files kernel math system unix
-unix.statfs unix.statvfs.freebsd ;
+unix.statvfs.freebsd ;
 IN: io.unix.files.freebsd
 
 M: freebsd file-system-statvfs ( path -- byte-array )

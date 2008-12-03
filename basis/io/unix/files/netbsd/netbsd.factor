@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax kernel unix.stat math unix
 combinators system io.backend accessors alien.c-types
-io.encodings.utf8 alien.strings unix.types unix.statfs 
-io.unix.files io.files unix.statvfs.netbsd ;
+io.encodings.utf8 alien.strings unix.types io.unix.files
+io.files unix.statvfs.netbsd ;
 IN: io.unix.files.netbsd
 
 TUPLE: netbsd-file-system-info < unix-file-system-info
