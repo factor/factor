@@ -11,7 +11,7 @@ IN: functors
 
 : define* ( word def effect -- ) pick set-word define-declared ;
 
-: DEFINE* ( -- ) effect get parsed \ define* parsed ;
+: DEFINE* ( accum -- accum ) effect get parsed \ define* parsed ;
 
 : `TUPLE:
     scan-param parsed
@@ -65,7 +65,7 @@ IN: functors
 
 : IS [ dup search [ ] [ no-word ] ?if ] (INTERPOLATE) ; parsing
 
-: DEFINES [ in get create ] (INTERPOLATE) ; parsing
+: DEFINES [ create-in ] (INTERPOLATE) ; parsing
 
 DEFER: ;FUNCTOR delimiter
 
@@ -104,5 +104,3 @@ DEFER: ;FUNCTOR delimiter
     lambda-rewrite first ;
 
 : FUNCTOR: (FUNCTOR:) define ; parsing
-
-: APPLY: scan-word scan-word execute swap '[ _ execute ] each ; parsing
