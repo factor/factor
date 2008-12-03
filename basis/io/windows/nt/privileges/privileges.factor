@@ -42,7 +42,6 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
     [ lookup-privilege ] dip
     [
         TOKEN_PRIVILEGES-Privileges
-        [ 0 ] dip LUID_AND_ATTRIBUTES-nth
         set-LUID_AND_ATTRIBUTES-Luid
     ] keep ;
 
