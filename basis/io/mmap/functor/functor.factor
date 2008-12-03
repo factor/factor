@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: functors accessors alien.c-types math kernel words ;
+USING: io.mmap functors accessors alien.c-types math kernel
+words fry ;
 IN: io.mmap.functor
 
 SLOT: address
@@ -10,13 +11,18 @@ SLOT: length
     [ [ address>> ] [ length>> ] bi ] dip
     heap-size [ 1- + ] keep /i ;
 
-FUNCTOR: mapped-array-functor ( T -- )
+FUNCTOR: define-mapped-array ( T -- )
 
-C   DEFINES <mapped-${T}-array>
-<A> IS      <direct-${T}-array>
+<mapped-A>         DEFINES <mapped-${T}-array>
+<A>                IS      <direct-${T}-array>
+with-mapped-A-file DEFINES with-mapped-${T}-file
 
 WHERE
 
-: C mapped-file>direct <A> execute ; inline
+: <mapped-A> ( mapped-file -- direct-array )
+    T mapped-file>direct <A> execute ; inline
+
+: with-mapped-A-file ( path length quot -- )
+    '[ <mapped-A> execute @ ] with-mapped-file ; inline
 
 ;FUNCTOR
