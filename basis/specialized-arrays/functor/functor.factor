@@ -1,19 +1,25 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: functors sequences sequences.private
-prettyprint.backend kernel words classes math parser
-alien.c-types byte-arrays accessors ;
+USING: functors sequences sequences.private prettyprint.backend
+kernel words classes math parser alien.c-types byte-arrays
+accessors summary ;
 IN: specialized-arrays.functor
+
+ERROR: bad-byte-array-length byte-array type ;
+
+M: bad-byte-array-length summary
+    drop "Byte array length doesn't divide type width" ;
 
 FUNCTOR: define-array ( T -- )
 
-A       DEFINES ${T}-array
-<A>     DEFINES <${A}>
->A      DEFINES >${A}
-A{      DEFINES ${A}{
+A            DEFINES ${T}-array
+<A>          DEFINES <${A}>
+>A           DEFINES >${A}
+byte-array>A DEFINES byte-array>${A}
+A{           DEFINES ${A}{
 
-NTH     [ T dup c-getter array-accessor ]
-SET-NTH [ T dup c-setter array-accessor ]
+NTH          [ T dup c-getter array-accessor ]
+SET-NTH      [ T dup c-setter array-accessor ]
 
 WHERE
 
@@ -21,7 +27,11 @@ TUPLE: A
 { length array-capacity read-only }
 { underlying byte-array read-only } ;
 
-: <A> dup T <c-array> A boa ; inline
+: <A> ( n -- specialized-array ) dup T <c-array> A boa ; inline
+
+: byte-array>A ( byte-array -- specialized-array )
+    dup length T heap-size /mod 0 = [ drop T bad-byte-array-length ] unless
+    swap A boa ; inline
 
 M: A clone [ length>> ] [ underlying>> clone ] bi A boa ;
 
@@ -31,7 +41,7 @@ M: A nth-unsafe underlying>> NTH call ;
 
 M: A set-nth-unsafe underlying>> SET-NTH call ;
 
-: >A A new clone-like ; inline
+: >A ( seq -- specialized-array ) A new clone-like ; inline
 
 M: A like drop dup A instance? [ >A execute ] unless ;
 

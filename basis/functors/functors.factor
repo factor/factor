@@ -1,15 +1,17 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser kernel locals.private quotations classes.tuple
-classes.tuple.parser make lexer combinators generic words
-interpolate namespaces sequences io.streams.string fry
-classes.mixin ;
+USING: kernel locals.private quotations classes.tuple make
+combinators generic words interpolate namespaces sequences
+io.streams.string fry classes.mixin effects lexer parser
+classes.tuple.parser effects.parser ;
 IN: functors
 
 : scan-param ( -- obj )
     scan-object dup special? [ literalize ] unless ;
 
-: define* ( word def -- ) over set-word define ;
+: define* ( word def effect -- ) pick set-word define-declared ;
+
+: DEFINE* ( -- ) effect get parsed \ define* parsed ;
 
 : `TUPLE:
     scan-param parsed
@@ -25,21 +27,25 @@ IN: functors
     \ define-tuple-class parsed ; parsing
 
 : `M:
+    effect off
     scan-param parsed
     scan-param parsed
     \ create-method parsed
     parse-definition parsed
-    \ define* parsed ; parsing
+    DEFINE* ; parsing
 
 : `C:
+    effect off
     scan-param parsed
     scan-param parsed
-    [ [ boa ] curry define* ] over push-all ; parsing
+    [ [ boa ] curry ] over push-all
+    DEFINE* ; parsing
 
 : `:
+    effect off
     scan-param parsed
     parse-definition parsed
-    \ define* parsed ; parsing
+    DEFINE* ; parsing
 
 : `INSTANCE:
     scan-param parsed
@@ -49,6 +55,9 @@ IN: functors
 : `inline \ inline parsed ; parsing
 
 : `parsing \ parsing parsed ; parsing
+
+: `(
+    ")" parse-effect effect set ; parsing
 
 : (INTERPOLATE) ( accum quot -- accum )
     [ scan interpolate-locals ] dip
@@ -69,6 +78,7 @@ DEFER: ;FUNCTOR delimiter
         { "INSTANCE:" POSTPONE: `INSTANCE: }
         { "inline" POSTPONE: `inline }
         { "parsing" POSTPONE: `parsing }
+        { "(" POSTPONE: `( }
     } ;
 
 : push-functor-words ( -- )

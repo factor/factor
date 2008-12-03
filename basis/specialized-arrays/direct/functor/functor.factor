@@ -23,7 +23,7 @@ TUPLE: A
 { underlying alien read-only }
 { length fixnum read-only } ;
 
-: <A> A boa ; inline
+: <A> ( alien len -- direct-array ) A boa ; inline
 M: A length length>> ;
 M: A nth-unsafe underlying>> NTH call ;
 M: A set-nth-unsafe underlying>> SET-NTH call ;
