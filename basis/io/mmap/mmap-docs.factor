@@ -17,7 +17,7 @@ HELP: <mapped-file>
 { $errors "Throws an error if a memory mapping could not be established." } ;
 
 HELP: with-mapped-file
-{ $values { "path" "a pathname string" } { "length" integer } { "quot" { $quotation "( mmap -- )" } } }
+{ $values { "path" "a pathname string" } { "quot" { $quotation "( mmap -- )" } } }
 { $contract "Opens a file and maps its contents into memory, passing the " { $link mapped-file } " instance to the quotation. The mapped file is disposed of when the quotation returns, or if an error is thrown." }
 { $errors "Throws an error if a memory mapping could not be established." } ;
 
