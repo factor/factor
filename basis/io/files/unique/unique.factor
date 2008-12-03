@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.bitwise combinators.lib math.parser
-random sequences sequences.lib continuations namespaces
+USING: kernel math math.bitwise math.parser
+random sequences continuations namespaces
 io.files io arrays io.files.unique.backend system
 combinators vocabs.loader fry ;
 IN: io.files.unique
