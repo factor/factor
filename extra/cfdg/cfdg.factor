@@ -6,8 +6,10 @@ USING: kernel alien.c-types combinators namespaces make arrays
        vars colors self self.slots
        random-weighted colors.hsv cfdg.gl accessors
        ui.gadgets.handler ui.gestures assocs ui.gadgets macros
-       qualified speicalized-arrays.double ;
+       qualified specialized-arrays.double ;
+
 QUALIFIED: syntax
+
 IN: cfdg
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -53,7 +55,10 @@ VAR: color-stack
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: double-nth* ( c-array indices -- seq ) swap [ double-nth ] curry map ;
+! : double-nth* ( c-array indices -- seq ) swap [ double-nth ] curry map ;
+
+: double-nth* ( c-array indices -- seq )
+  swap byte-array>double-array [ nth ] curry map ;
 
 : check-size ( modelview -- num ) { 0 1 4 5 } double-nth* [ abs ] map biggest ;
 
