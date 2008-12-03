@@ -10,10 +10,10 @@ TUPLE: macosx-file-system-info < unix-file-system-info
 io-size owner type-id filesystem-subtype ;
 
 M: macosx file-systems ( -- array )
-    f 0 0 getfsstat64 dup io-error
-    "statfs" <c-array> dup dup length 0 getfsstat64 io-error
-    "statfs" heap-size group
-    [ statfs64-f_mntonname alien>native-string file-system-info ] map ;
+    f <void*> dup 0 getmntinfo64 dup io-error
+    [ *void* ] dip
+    "statfs64" heap-size [ * memory>byte-array ] keep group
+    [ [ new-file-system-info ] dip statfs>file-system-info ] map ;
 
 M: macosx new-file-system-info macosx-file-system-info new ;
 
