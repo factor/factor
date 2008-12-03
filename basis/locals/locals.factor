@@ -346,7 +346,7 @@ SYMBOL: in-lambda?
 
 : (parse-wbindings) ( end -- )
     dup parse-binding dup [
-        first2 [ make-local-word ] dip 2array ,
+        first2 [ make-local-word ] keep 2array ,
         (parse-wbindings)
     ] [ 2drop ] if ;
 
