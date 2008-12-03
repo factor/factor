@@ -4,7 +4,7 @@ IN: xml.tests
 USING: kernel xml tools.test io namespaces make sequences
 xml.errors xml.entities parser strings xml.data io.files
 xml.writer xml.utilities state-parser continuations assocs
-sequences.deep accessors ;
+sequences.deep accessors io.streams.string ;
 
 ! This is insufficient
 \ read-xml must-infer
@@ -44,10 +44,20 @@ SYMBOL: xml-file
     "c" get-id children>string
 ] unit-test
 [ "foo" ] [ "<x y='foo'/>" string>xml "y" over
-    at swap "z" >r tuck r> swap set-at
+    at swap "z" [ tuck ] dip swap set-at
     T{ name f "blah" "z" f } swap at ] unit-test
 [ "foo" ] [ "<boo><![CDATA[foo]]></boo>" string>xml children>string ] unit-test
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>bar baz</foo>" ]
 [ "<foo>bar</foo>" string>xml [ " baz" append ] map xml>string ] unit-test
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  bar\n</foo>" ]
 [ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test
+[ "<!-- B+, B, or B--->" string>xml ] must-fail
+[ ] [ "<?xml version='1.0'?><!-- declarations for <head> & <body> --><foo/>" string>xml drop ] unit-test
+[ T{ element-decl f "br" "EMPTY" } ] [ "<!ELEMENT br EMPTY>" string>xml-chunk second ] unit-test
+[ T{ element-decl f "p" "(#PCDATA|emph)*" } ] [ "<!ELEMENT p (#PCDATA|emph)*>" string>xml-chunk second ] unit-test
+[ T{ element-decl f "%name.para;" "%content.para;" } ] [ "<!ELEMENT %name.para; %content.para;>" string>xml-chunk second ] unit-test
+[ T{ element-decl f "container" "ANY" } ] [ "<!ELEMENT container ANY>" string>xml-chunk second ] unit-test
+[ T{ doctype-decl f "foo" } ] [ "<!DOCTYPE foo>" string>xml-chunk second ] unit-test
+[ T{ doctype-decl f "foo" } ] [ "<!DOCTYPE foo >" string>xml-chunk second ] unit-test
+[ T{ doctype-decl f "foo" T{ system-id f "blah.dtd" } } ] [ "<!DOCTYPE foo SYSTEM 'blah.dtd'>" string>xml-chunk second ] unit-test
+[ T{ doctype-decl f "foo" T{ system-id f "blah.dtd" } } ] [ "<!DOCTYPE foo   SYSTEM \"blah.dtd\"   >" string>xml-chunk second ] unit-test
