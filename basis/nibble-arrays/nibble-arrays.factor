@@ -17,10 +17,10 @@ TUPLE: nibble-array
 : byte/nibble ( n -- shift n' )
     [ 1 bitand 2 shift ] [ -1 shift ] bi ; inline
 
-: get-nibble ( shift n byte -- nibble )
+: get-nibble ( n byte -- nibble )
     swap neg shift nibble bitand ; inline
 
-: set-nibble ( value shift n byte -- byte' )
+: set-nibble ( value n byte -- byte' )
     nibble pick shift bitnot bitand -rot shift bitor ; inline
 
 : nibble@ ( n nibble-array -- shift n' byte-array )
