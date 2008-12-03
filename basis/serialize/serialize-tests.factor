@@ -4,7 +4,7 @@
 USING: tools.test kernel serialize io io.streams.byte-array math
 alien arrays byte-arrays bit-arrays specialized-arrays.double
 sequences math prettyprint parser classes math.constants
-io.encodings.binary random assocs ;
+io.encodings.binary random assocs serialize.private ;
 IN: serialize.tests
 
 : test-serialize-cell
