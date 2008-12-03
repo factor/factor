@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! mersenne twister based on 
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
-USING: arrays kernel math namespaces sequences system init
+USING: kernel math namespaces sequences system init
 accessors math.ranges random circular math.bitwise
-combinators ;
+combinators specialized-arrays.uint ;
 IN: random.mersenne-twister
 
 <PRIVATE
@@ -39,11 +39,11 @@ TUPLE: mersenne-twister seq i ;
 
 : init-mt-rest ( seq -- )
     mt-n 1- swap [
-        [ init-mt-formula ] [ >r 1+ r> set-nth ] 2bi
+        [ init-mt-formula ] [ [ 1+ ] dip set-nth ] 2bi
     ] curry each ;
 
 : init-mt-seq ( seed -- seq )
-    32 bits mt-n 0 <array> <circular>
+    32 bits mt-n <uint-array> <circular>
     [ set-first ] [ init-mt-rest ] [ ] tri ;
 
 : mt-temper ( y -- yt )

@@ -28,9 +28,10 @@ COM-INTERFACE: IDropTarget IUnknown {00000122-0000-0000-C000-000000000046}
     HRESULT Drop ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect ) ;
 
 : com-query-interface ( interface iid -- interface' )
-    "void*" heap-size [
+    [
+        "void*" malloc-object &free
         [ IUnknown::QueryInterface ole32-error ] keep *void*
-    ] with-malloc ;
+    ] with-destructors ;
 
 : com-add-ref ( interface -- interface )
      [ IUnknown::AddRef drop ] keep ; inline

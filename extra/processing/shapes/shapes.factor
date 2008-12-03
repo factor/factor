@@ -2,10 +2,14 @@
 USING: kernel namespaces arrays sequences grouping
        alien.c-types
        math math.vectors math.geometry.rect
-       opengl.gl opengl.glu opengl.demo-support opengl generalizations vars
+       opengl.gl opengl.glu opengl generalizations vars
        combinators.cleave colors ;
 
 IN: processing.shapes
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: do-state ( mode quot -- ) swap glBegin call glEnd ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

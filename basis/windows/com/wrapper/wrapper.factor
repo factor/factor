@@ -92,9 +92,6 @@ unless
     [ [ (( -- alien )) define-declared ] pick slip ]
     with-compilation-unit ;
 
-: byte-array>malloc ( byte-array -- alien )
-    [ byte-length malloc ] [ over byte-array>memory ] bi ;
-
 : (callback-word) ( function-name interface-name counter -- word )
     [ "::" rot 3append "-callback-" ] dip number>string 3append
     "windows.com.wrapper.callbacks" create ;
@@ -132,7 +129,7 @@ unless
     1 0 rot set-ulong-nth ;
 
 : (callbacks>vtbl) ( callbacks -- vtbl )
-    [ execute ] map >c-void*-array byte-array>malloc ;
+    [ execute ] void*-array{ } map-as underlying>> malloc-byte-array ;
 : (callbacks>vtbls) ( callbacks -- vtbls )
     [ (callbacks>vtbl) ] map ;
 

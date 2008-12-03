@@ -4,8 +4,7 @@ USING: alien alien.accessors alien.c-types arrays io kernel libc
 math math.vectors namespaces opengl opengl.gl prettyprint assocs
 sequences io.files io.styles continuations freetype
 ui.gadgets.worlds ui.render ui.backend byte-arrays accessors
-locals ;
-
+locals specialized-arrays.direct.uchar ;
 IN: ui.freetype
 
 TUPLE: freetype-renderer ;
@@ -135,8 +134,8 @@ M: freetype-renderer string-height ( open-font string -- h )
     FT_RENDER_MODE_NORMAL FT_Render_Glyph freetype-error ;
 
 :: copy-pixel ( i j bitmap texture -- i j )
-    255 j texture set-char-nth
-    i bitmap char-nth j 1 + texture set-char-nth
+    255 j texture set-nth
+    i bitmap nth j 1 + texture set-nth
     i 1 + j 2 + ; inline
 
 :: (copy-row) ( i j bitmap texture end -- )
@@ -155,15 +154,18 @@ M: freetype-renderer string-height ( open-font string -- h )
             rows [ glyph glyph-bitmap-rows ]
             width [ glyph glyph-bitmap-width ]
             width2 [ width next-power-of-2 2 * ] |
-        0 0
-        rows [ bitmap texture width width2 copy-row ] times
-        2drop
+        bitmap [
+            [let | bitmap' [ bitmap rows width * <direct-uchar-array> ] |
+                0 0
+                rows [ bitmap' texture width width2 copy-row ] times
+                2drop
+            ]
+        ] when
     ] ;
 
 : bitmap>texture ( glyph sprite -- id )
-    tuck sprite-size2 * 2 * [
-        [ copy-bitmap ] keep gray-texture
-    ] with-malloc ;
+    tuck sprite-size2 * 2 * <byte-array>
+    [ copy-bitmap ] keep gray-texture ;
 
 : glyph-texture-loc ( glyph font -- loc )
     [ drop glyph-hori-bearing-x ft-floor ]

@@ -109,6 +109,7 @@ IN: tools.deploy.shaker
                 "default-method"
                 "default-output-classes"
                 "derived-from"
+                "ebnf-parser"
                 "engines"
                 "forgotten"
                 "identities"
@@ -269,8 +270,8 @@ IN: tools.deploy.shaker
             } %
 
             { } { "math.partial-dispatch" } strip-vocab-globals %
-            
-            "peg-cache" "peg" lookup ,
+
+            { } { "peg" } strip-vocab-globals %
         ] when
 
         strip-prettyprint? [
@@ -346,7 +347,7 @@ IN: tools.deploy.shaker
 
 : finish-deploy ( final-image -- )
     "Finishing up" show
-    >r { } set-datastack r>
+    [ { } set-datastack ] dip
     { } set-retainstack
     V{ } set-namestack
     V{ } set-catchstack
@@ -387,9 +388,9 @@ SYMBOL: deploy-vocab
     strip-c-io
     f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
     deploy-vocab get vocab-main set-boot-quot*
-    stripped-word-props >r
+    stripped-word-props
     stripped-globals strip-globals
-    r> strip-words
+    strip-words
     compress-byte-arrays
     compress-quotations
     compress-strings

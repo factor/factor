@@ -38,25 +38,26 @@ M: struct-type stack-size
 
 : c-struct? ( type -- ? ) (c-type) struct-type? ;
 
-: (define-struct) ( name vocab size align fields -- )
+: (define-struct) ( name size align fields -- )
     [ [ align ] keep ] dip
     struct-type boa
-    -rot define-c-type ;
+    swap typedef ;
 
-: define-struct-early ( name vocab fields -- fields )
+: make-fields ( name vocab fields -- fields )
     [ first2 <field-spec> ] with with map ;
 
 : compute-struct-align ( types -- n )
     [ c-type-align ] map supremum ;
 
 : define-struct ( name vocab fields -- )
-    pick [
+    [
+        [ 2drop ] [ make-fields ] 3bi
         [ struct-offsets ] keep
         [ [ type>> ] map compute-struct-align ] keep
         [ (define-struct) ] keep
-    ] dip [ swap define-field ] curry each ;
+    ] [ 2drop '[ _ swap define-field ] ] 3bi each ;
 
-: define-union ( name vocab members -- )
+: define-union ( name members -- )
     [ expand-constants ] map
     [ [ heap-size ] map supremum ] keep
     compute-struct-align f (define-struct) ;

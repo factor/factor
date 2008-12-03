@@ -8,7 +8,7 @@ math.functions math.private strings layouts
 compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
-float-arrays system sorting math.libm ;
+specialized-arrays.double system sorting math.libm ;
 IN: compiler.tree.propagation.tests
 
 \ propagate must-infer
@@ -167,7 +167,8 @@ IN: compiler.tree.propagation.tests
 
 [ V{ fixnum } ] [
     [
-        [ uchar-nth ] 2keep [ uchar-nth ] 2keep uchar-nth
+        { fixnum byte-array } declare
+        [ nth-unsafe ] 2keep [ nth-unsafe ] 2keep nth-unsafe
         >r >r 298 * r> 100 * - r> 208 * - 128 + -8 shift
         255 min 0 max
     ] final-classes
@@ -588,7 +589,7 @@ MIXIN: empty-mixin
     [ { fixnum integer } declare bitand ] final-classes
 ] unit-test
 
-[ V{ float-array } ] [ [| | F{ } ] final-classes ] unit-test
+[ V{ double-array } ] [ [| | double-array{ } ] final-classes ] unit-test
 
 [ V{ t } ] [ [ netbsd unix? ] final-literals ] unit-test
 

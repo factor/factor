@@ -40,9 +40,9 @@ urls math.parser ;
 
 [ t ] [ 1500000 small-enough? ] unit-test
 
-[ ] [ "bunny" shake-and-bake ] unit-test
+! [ ] [ "bunny" shake-and-bake ] unit-test
 
-[ t ] [ 2500000 small-enough? ] unit-test
+! [ t ] [ 2500000 small-enough? ] unit-test
 
 : run-temp-image ( -- )
     vm

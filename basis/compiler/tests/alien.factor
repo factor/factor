@@ -3,7 +3,8 @@ USING: alien alien.c-types alien.syntax compiler kernel
 namespaces namespaces tools.test sequences stack-checker
 stack-checker.errors words arrays parser quotations
 continuations effects namespaces.private io io.streams.string
-memory system threads tools.test math accessors combinators ;
+memory system threads tools.test math accessors combinators
+specialized-arrays.float ;
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test
@@ -196,7 +197,11 @@ FUNCTION: int ffi_test_12 int a int b rect c int d int e int f ;
 
 FUNCTION: float ffi_test_23 ( float[3] x, float[3] y ) ;
 
-[ 32.0 ] [ { 1.0 2.0 3.0 } >c-float-array { 4.0 5.0 6.0 } >c-float-array ffi_test_23 ] unit-test
+[ 32.0 ] [
+    { 1.0 2.0 3.0 } >float-array underlying>>
+    { 4.0 5.0 6.0 } >float-array underlying>>
+    ffi_test_23
+] unit-test
 
 ! Test odd-size structs
 C-STRUCT: test-struct-1 { { "char" 1 } "x" } ;
