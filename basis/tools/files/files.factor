@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators io io.files kernel
 math.parser sequences system vocabs.loader calendar ;
-
-IN: io.files.listing
+IN: tools.files
 
 <PRIVATE
 
@@ -34,6 +33,6 @@ PRIVATE>
     [ (directory.) ] with-directory-files [ print ] each ;
 
 {
-    { [ os unix? ] [ "io.files.listing.unix" ] }
-    { [ os windows? ] [ "io.files.listing.windows" ] }
+    { [ os unix? ] [ "tools.files.unix" ] }
+    { [ os windows? ] [ "tools.files.windows" ] }
 } cond require

@@ -7,7 +7,7 @@ namespaces make sequences ftp io.unix.launcher.parser
 unicode.case splitting assocs classes io.servers.connection
 destructors calendar io.timeouts io.streams.duplex threads
 continuations math concurrency.promises byte-arrays
-io.backend sequences.lib tools.hexdump io.files.listing
+io.backend sequences.lib tools.hexdump tools.files
 io.streams.string ;
 IN: ftp.server
 
