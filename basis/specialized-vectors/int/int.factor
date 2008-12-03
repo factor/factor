@@ -1,4 +1,4 @@
-USE: specialized-arrays.functor
+USING: specialized-vectors.functor specialized-arrays.int ;
 IN: specialized-vector.int
 
 << "int" define-vector >>

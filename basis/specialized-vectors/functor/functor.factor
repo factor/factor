@@ -7,7 +7,7 @@ IN: specialized-vectors.functor
 FUNCTOR: define-vector ( T -- )
 
 A   IS      ${T}-array
-<A> IS      <A>
+<A> IS      <${A}>
 
 V   DEFINES ${T}-vector
 <V> DEFINES <${V}>
