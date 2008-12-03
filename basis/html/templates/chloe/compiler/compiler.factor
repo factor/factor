@@ -87,7 +87,7 @@ DEFER: compile-element
         { [ dup [ tag? ] [ xml? ] bi or ] [ compile-tag ] }
         { [ dup string? ] [ escape-string [write] ] }
         { [ dup comment? ] [ drop ] }
-        [ [ write-item ] [code-with] ]
+        [ [ write-xml-chunk ] [code-with] ]
     } cond ;
 
 : with-compiler ( quot -- quot' )

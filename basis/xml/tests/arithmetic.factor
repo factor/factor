@@ -6,7 +6,7 @@ USING: xml io kernel math sequences strings xml.utilities tools.test math.parser
 PROCESS: calculate ( tag -- n )
 
 : calc-2children ( tag -- n n )
-    children-tags first2 >r calculate r> calculate ;
+    children-tags first2 [ calculate ] dip calculate ;
 
 TAG: number calculate
     children>string string>number ;
