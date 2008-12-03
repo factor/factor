@@ -24,7 +24,7 @@ SYMBOL: html
 : html-word ( name def effect -- )
     #! Define 'word creating' word to allow
     #! dynamically creating words.
-    >r >r elements-vocab create r> r> define-declared ;
+    [ elements-vocab create ] 2dip define-declared ;
 
 : <foo> ( str -- <str> ) "<" swap ">" 3append ;
 

@@ -38,8 +38,8 @@ SYMBOL: message-histogram
 
 : histogram. ( assoc quot -- )
     standard-table-style [
-        >r >alist sort-values <reversed> r> [
-            [ >r swap r> with-cell pprint-cell ] with-row
+        [ >alist sort-values <reversed> ] dip [
+            [ swapd with-cell pprint-cell ] with-row
         ] curry assoc-each
     ] tabular-output ;
 
@@ -69,7 +69,7 @@ SYMBOL: message-histogram
     errors. ;
 
 : analyze-log ( lines word-names -- )
-    >r parse-log r> analyze-entries analysis. ;
+    [ parse-log ] dip analyze-entries analysis. ;
 
 : analyze-log-file ( service word-names -- )
-    >r parse-log-file r> analyze-entries analysis. ;
+    [ parse-log-file ] dip analyze-entries analysis. ;

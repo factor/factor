@@ -3,20 +3,18 @@ IN: sequences.next
 
 <PRIVATE
 
-: iterate-seq >r dup length swap r> ; inline
+: iterate-seq [ dup length swap ] dip ; inline
 
 : (map-next) ( i seq quot -- )
     ! this uses O(n) more bounds checks than is really necessary
-    >r [ >r 1+ r> ?nth ] 2keep nth-unsafe r> call ; inline
+    [ [ [ 1+ ] dip ?nth ] 2keep nth-unsafe ] dip call ; inline
 
 PRIVATE>
 
-: each-next ( seq quot -- )
-    ! quot: next-elt elt --
+: each-next ( seq quot: ( next-elt elt -- ) -- )
     iterate-seq [ (map-next) ] 2curry each-integer ; inline
 
-: map-next ( seq quot -- newseq )
-    ! quot: next-elt elt -- newelt
-    over dup length swap new-sequence >r
-    iterate-seq [ (map-next) ] 2curry
-    r> [ collect ] keep ; inline
+: map-next ( seq quot: ( next-elt elt -- newelt ) -- newseq )
+    over dup length swap new-sequence [
+        iterate-seq [ (map-next) ] 2curry
+    ] dip [ collect ] keep ; inline

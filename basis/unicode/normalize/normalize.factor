@@ -27,14 +27,17 @@ IN: unicode.normalize
 
 : hangul>jamo ( hangul -- jamo-string )
     hangul-base - final-count /mod final-base +
-    >r medial-count /mod medial-base +
-    >r initial-base + r> r>
+    [
+        medial-count /mod medial-base +
+        [ initial-base + ] dip
+    ] dip
     dup final-base = [ drop 2array ] [ 3array ] if ;
 
 : jamo>hangul ( initial medial final -- hangul )
-    >r >r initial-base - medial-count *
-    r> medial-base - + final-count *
-    r> final-base - + hangul-base + ;
+    [
+        [ initial-base - medial-count * ] dip
+        medial-base - + final-count *
+    ] dip final-base - + hangul-base + ;
 
 ! Normalization -- Decomposition 
 
@@ -45,7 +48,7 @@ IN: unicode.normalize
 : reorder-next ( string i -- new-i done? )
     over [ non-starter? ] find-from drop [
         reorder-slice
-        >r dup [ combining-class ] insertion-sort to>> r>
+        [ dup [ combining-class ] insertion-sort to>> ] dip
     ] [ length t ] if* ;
 
 : reorder-loop ( string start -- )

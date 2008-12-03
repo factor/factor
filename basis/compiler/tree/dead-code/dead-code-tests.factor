@@ -75,9 +75,9 @@ IN: compiler.tree.dead-code.tests
     remove-dead-code
     "no-check" get [ dup check-nodes ] unless nodes>quot ;
 
-[ [ drop 1 ] ] [ [ >r 1 r> drop ] optimize-quot ] unit-test
+[ [ drop 1 ] ] [ [ [ 1 ] dip drop ] optimize-quot ] unit-test
 
-[ [ read drop 1 2 ] ] [ [ read >r 1 2 r> drop ] optimize-quot ] unit-test
+[ [ read drop 1 2 ] ] [ [ read [ 1 2 ] dip drop ] optimize-quot ] unit-test
 
 [ [ over >r + r> ] ] [ [ [ + ] [ drop ] 2bi ] optimize-quot ] unit-test
 
