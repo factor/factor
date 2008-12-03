@@ -5,7 +5,8 @@ sequences assocs math arrays stack-checker effects generalizations
 continuations debugger classes.tuple namespaces make vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
 sequences.private combinators mirrors
-combinators.short-circuit fry ;
+combinators.short-circuit fry qualified ;
+RENAME: _ fry => __
 IN: inverse
 
 TUPLE: fail ;
@@ -236,7 +237,7 @@ DEFER: _
     ] recover ; inline
 
 : true-out ( quot effect -- quot' )
-    out>> '[ @ _ ndrop t ] ;
+    out>> '[ @ __ ndrop t ] ;
 
 : false-recover ( effect -- quot )
     in>> [ ndrop f ] curry [ recover-fail ] curry ;

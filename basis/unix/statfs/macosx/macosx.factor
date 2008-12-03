@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types io.encodings.utf8 io.encodings.string
 kernel sequences unix.stat accessors unix combinators math
-grouping system unix.statfs io.files io.backend alien.strings
-math.bitwise alien.syntax io.unix.files ;
+grouping system io.files io.backend alien.strings math.bitwise
+alien.syntax io.unix.files ;
 IN: unix.statfs.macosx
 
 : MNT_RDONLY  HEX: 00000001 ; inline
@@ -115,4 +115,3 @@ C-STRUCT: statfs64
     { { "uint32_t" 8 } "f_reserved" } ;
 
 FUNCTION: int statfs64 ( char* path, statfs64* buf ) ;
-FUNCTION: int getmntinfo64 ( statfs64** mntbufp, int flags ) ;
