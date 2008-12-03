@@ -220,9 +220,7 @@ $nl
 "You can copy a range of bytes from memory into a byte array:"
 { $subsection memory>byte-array }
 "You can copy a byte array to memory unsafely:"
-{ $subsection byte-array>memory }
-"A wrapper for temporarily allocating a block of memory:"
-{ $subsection with-malloc } ;
+{ $subsection byte-array>memory } ;
 
 ARTICLE: "c-data" "Passing data between Factor and C"
 "Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers."

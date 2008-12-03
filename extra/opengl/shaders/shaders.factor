@@ -44,9 +44,10 @@ IN: opengl.shaders
 
 : gl-shader-info-log ( shader -- log )
     dup gl-shader-info-log-length dup [
+        1 calloc &free
         [ 0 <int> swap glGetShaderInfoLog ] keep
         ascii alien>string
-    ] with-malloc ;
+    ] with-destructors ;
 
 : check-gl-shader ( shader -- shader )
     dup gl-shader-ok? [ dup gl-shader-info-log throw ] unless ;
@@ -79,9 +80,10 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 
 : gl-program-info-log ( program -- log )
     dup gl-program-info-log-length dup [
+        1 calloc &free
         [ 0 <int> swap glGetProgramInfoLog ] keep
         ascii alien>string
-    ] with-malloc ;
+    ] with-destructors ;
 
 : check-gl-program ( program -- program )
     dup gl-program-ok? [ dup gl-program-info-log throw ] unless ;
