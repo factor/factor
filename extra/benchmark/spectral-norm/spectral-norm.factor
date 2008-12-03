@@ -1,8 +1,8 @@
 ! Factor port of
 ! http://shootout.alioth.debian.org/gp4/benchmark.php?test=spectralnorm&lang=all
-USING: float-arrays kernel math math.functions math.vectors
-sequences sequences.private prettyprint words
-hints locals ;
+USING: specialized-arrays.double kernel math math.functions
+math.vectors sequences sequences.private prettyprint words hints
+locals ;
 IN: benchmark.spectral-norm
 
 :: inner-loop ( u n quot -- seq )
@@ -10,7 +10,7 @@ IN: benchmark.spectral-norm
         n 0.0 [| j |
             u i j quot call +
         ] reduce
-    ] F{ } map-as ; inline
+    ] double-array{ } map-as ; inline
 
 : eval-A ( i j -- n )
     [ >float ] bi@
@@ -32,7 +32,7 @@ IN: benchmark.spectral-norm
 : eval-AtA-times-u ( u n -- seq )
     [ eval-A-times-u ] [ eval-At-times-u ] bi ; inline
 
-: ones ( n -- seq ) [ 1.0 ] F{ } replicate-as ; inline
+: ones ( n -- seq ) [ 1.0 ] double-array{ } replicate-as ; inline
 
 :: u/v ( n -- u v )
     n ones dup
