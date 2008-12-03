@@ -80,7 +80,7 @@ TUPLE: unix-file-system-info < file-system-info
 block-size preferred-block-size
 blocks blocks-free blocks-available
 files files-free files-available
-name-max flags id id0 id1 ;
+name-max flags id ;
 
 HOOK: new-file-system-info os ( --  file-system-info )
 
@@ -108,8 +108,6 @@ M: unix statvfs>file-system-info drop ;
         [ dup [ blocks-free>> ] [ block-size>> ] bi * >>free-space drop ]
         [ dup [ blocks>> ] [ block-size>> ] bi * >>total-space drop ]
         [ dup [ total-space>> ] [ free-space>> ] bi - >>used-space drop ]
-        [ dup id>> 2 c-uint-array> first2 [ >>id0 ] [ >>id1 ] bi* drop ]
-        [ f >>id drop ]
         [ ]
     } cleave ;
 
