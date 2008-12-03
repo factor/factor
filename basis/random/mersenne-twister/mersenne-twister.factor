@@ -44,9 +44,9 @@ TUPLE: mersenne-twister { seq uint-array } { i fixnum } ;
     dupd wrap-nth dup -30 shift bitxor 1812433253 * + 1+ 32 bits ; inline
 
 : init-mt-rest ( seq -- )
-    mt-n 1- swap [
-        [ init-mt-formula ] [ [ 1+ ] dip set-wrap-nth ] 2bi
-    ] curry each ; inline
+    mt-n 1- swap '[
+        _ [ init-mt-formula ] [ [ 1+ ] dip set-wrap-nth ] 2bi
+    ] each ; inline
 
 : init-mt-seq ( seed -- seq )
     32 bits mt-n <uint-array>
