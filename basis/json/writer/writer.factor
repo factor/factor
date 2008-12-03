@@ -12,9 +12,6 @@ GENERIC: json-print ( obj -- )
     #! Returns a string representing the factor object in JSON format
     [ json-print ] with-string-writer ;
 
-M: t json-print ( f -- )
-  drop "true" write ;
-
 M: f json-print ( f -- )
     drop "false" write ;
 
