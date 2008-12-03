@@ -28,7 +28,7 @@ SYMBOL: visited
 : (draw-maze) ( cell -- )
     dup vertex
     glEnd
-    GL_POINTS [ dup vertex ] do-state
+    GL_POINTS glBegin dup vertex glEnd
     GL_LINE_STRIP glBegin
     dup vertex
     dup visit

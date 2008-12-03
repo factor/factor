@@ -90,25 +90,25 @@ FUNCTION: CFTypeID CFGetTypeID ( CFTypeRef cf ) ;
 : <CFArray> ( seq -- alien )
     [ f swap length f CFArrayCreateMutable ] keep
     [ length ] keep
-    [ >r dupd r> CFArraySetValueAtIndex ] 2each ;
+    [ [ dupd ] dip CFArraySetValueAtIndex ] 2each ;
 
 : <CFString> ( string -- alien )
     f swap dup length CFStringCreateWithCharacters ;
 
 : CF>string ( alien -- string )
     dup CFStringGetLength 1+ "ushort" <c-array> [
-        >r 0 over CFStringGetLength r> CFStringGetCharacters
+        [ 0 over CFStringGetLength ] dip CFStringGetCharacters
     ] keep utf16n alien>string ;
 
 : CF>string-array ( alien -- seq )
     CF>array [ CF>string ] map ;
 
 : <CFStringArray> ( seq -- alien )
-    [ <CFString> ] map dup <CFArray> swap [ CFRelease ] each ;
+    [ <CFString> ] map [ <CFArray> ] [ [ CFRelease ] each ] bi ;
 
 : <CFFileSystemURL> ( string dir? -- url )
-    >r <CFString> f over kCFURLPOSIXPathStyle
-    r> CFURLCreateWithFileSystemPath swap CFRelease ;
+    [ <CFString> f over kCFURLPOSIXPathStyle ] dip
+    CFURLCreateWithFileSystemPath swap CFRelease ;
 
 : <CFURL> ( string -- url )
     <CFString>

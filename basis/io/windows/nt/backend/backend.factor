@@ -18,8 +18,8 @@ C: <io-callback> io-callback
     "OVERLAPPED" malloc-object &free ;
 
 : make-overlapped ( port -- overlapped-ext )
-    >r (make-overlapped)
-    r> handle>> ptr>> [ over set-OVERLAPPED-offset ] when* ;
+    [ (make-overlapped) ] dip
+    handle>> ptr>> [ over set-OVERLAPPED-offset ] when* ;
 
 : <completion-port> ( handle existing -- handle )
      f 1 CreateIoCompletionPort dup win32-error=0/f ;
@@ -48,12 +48,12 @@ M: winnt add-completion ( win32-handle -- )
         } cond
     ] with-timeout ;
 
-:: wait-for-overlapped ( ms -- bytes-transferred overlapped error? )
+:: wait-for-overlapped ( us -- bytes-transferred overlapped error? )
     master-completion-port get-global
     0 <int> [ ! bytes
         f <void*> ! key
         f <void*> [ ! overlapped
-            ms INFINITE or ! timeout
+            us [ 1000 /i ] [ INFINITE ] if* ! timeout
             GetQueuedCompletionStatus zero?
         ] keep *void*
     ] keep *int spin ;
@@ -61,21 +61,17 @@ M: winnt add-completion ( win32-handle -- )
 : resume-callback ( result overlapped -- )
     pending-overlapped get-global delete-at* drop resume-with ;
 
-: handle-overlapped ( timeout -- ? )
+: handle-overlapped ( us -- ? )
     wait-for-overlapped [
         dup [
-            >r drop GetLastError 1array r> resume-callback t
-        ] [
-            2drop f
-        ] if
-    ] [
-        resume-callback t
-    ] if ;
+            [ drop GetLastError 1array ] dip resume-callback t
+        ] [ 2drop f ] if
+    ] [ resume-callback t ] if ;
 
 M: win32-handle cancel-operation
     [ check-disposed ] [ handle>> CancelIo drop ] bi ;
 
-M: winnt io-multiplex ( ms -- )
+M: winnt io-multiplex ( us -- )
     handle-overlapped [ 0 io-multiplex ] when ;
 
 M: winnt init-io ( -- )
@@ -94,7 +90,7 @@ M: winnt init-io ( -- )
 
 : wait-for-file ( FileArgs n port -- n )
     swap file-error?
-    [ 2drop 0 ] [ >r lpOverlapped>> r> twiddle-thumbs ] if ;
+    [ 2drop 0 ] [ [ lpOverlapped>> ] dip twiddle-thumbs ] if ;
 
 : update-file-ptr ( n port -- )
     handle>> dup ptr>> [ rot + >>ptr drop ] [ 2drop ] if* ;

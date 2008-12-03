@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 William Schlieper
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors kernel arrays irc.client irc.messages irc.ui namespaces ;
+USING: accessors kernel sequences arrays irc.client
+       irc.messages irc.ui namespaces ;
 
 IN: irc.ui.commands
 
@@ -9,6 +10,9 @@ IN: irc.ui.commands
     irc-tab get
     [ window>> client>> profile>> nickname>> <own-message> print-irc ]
     [ chat>> speak ] 2bi ;
+
+: me ( string -- ) ! Placeholder until I make /me look different
+    "ACTION " 1 prefix prepend 1 suffix say ;
 
 : join ( string -- )
     irc-tab get window>> join-channel ;

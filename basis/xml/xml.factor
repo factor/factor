@@ -24,17 +24,17 @@ M: object process add-child ;
 
 M: prolog process
     xml-stack get V{ { f V{ "" } } } =
-    [ <bad-prolog> throw ] unless drop ;
+    [ bad-prolog ] unless drop ;
 
 M: instruction process
     xml-stack get length 1 =
-    [ <bad-instruction> throw ] unless
+    [ bad-instruction ] unless
     add-child ;
 
 M: directive process
     xml-stack get dup length 1 =
     swap first second [ tag? ] contains? not and
-    [ <bad-directive> throw ] unless
+    [ misplaced-directive ] unless
     add-child ;
 
 M: contained process
@@ -44,13 +44,13 @@ M: contained process
 M: opener process push-xml ;
 
 : check-closer ( name opener -- name opener )
-    dup [ <unopened> throw ] unless
+    dup [ unopened ] unless
     2dup name>> =
-    [ name>> swap <mismatched> throw ] unless ;
+    [ name>> swap mismatched ] unless ;
 
 M: closer process
     name>> pop-xml first2
-    >r check-closer attrs>> r>
+    [ check-closer attrs>> ] dip
     <tag> add-child ;
 
 : init-xml-stack ( -- )
@@ -69,27 +69,25 @@ M: closer process
     swap [ string? ] filter
     [
         dup [ blank? ] all?
-        [ drop ] [ swap <pre/post-content> throw ] if
+        [ drop ] [ swap pre/post-content ] if
     ] each drop ;
 
 : no-pre/post ( pre post -- pre post/* )
     ! this does *not* affect the contents of the stack
-    >r dup t assert-blanks r>
-    dup f assert-blanks ;
+    [ dup t assert-blanks ] [ dup f assert-blanks ] bi* ;
 
 : no-post-tags ( post -- post/* )
     ! this does *not* affect the contents of the stack
-    dup [ tag? ] contains? [ <multitags> throw ] when ; 
+    dup [ tag? ] contains? [ multitags ] when ; 
 
 : assure-tags ( seq -- seq )
     ! this does *not* affect the contents of the stack
-    [ <notags> throw ] unless* ;
+    [ notags ] unless* ;
 
 : make-xml-doc ( prolog seq -- xml-doc )
     dup [ tag? ] find
-    >r assure-tags cut rest
-    no-pre/post no-post-tags
-    r> swap <xml> ;
+    [ assure-tags cut rest no-pre/post no-post-tags ] dip
+    swap <xml> ;
 
 ! * Views of XML
 
@@ -142,23 +140,26 @@ TUPLE: pull-xml scope ;
 : (read-xml) ( -- )
     [ process ] sax-loop ; inline
 
-: (xml-chunk) ( stream -- prolog seq )
+: (read-xml-chunk) ( stream -- prolog seq )
     [
         init-xml (read-xml)
-        done? [ <unclosed> throw ] unless
+        done? [ unclosed ] unless
         xml-stack get first second
         prolog-data get swap
     ] state-parse ;
 
 : read-xml ( stream -- xml )
     #! Produces a tree of XML nodes
-    (xml-chunk) make-xml-doc ;
+    (read-xml-chunk) make-xml-doc ;
 
-: xml-chunk ( stream -- seq )
-    (xml-chunk) nip ;
+: read-xml-chunk ( stream -- seq )
+    (read-xml-chunk) nip ;
 
 : string>xml ( string -- xml )
     <string-reader> read-xml ;
+
+: string>xml-chunk ( string -- xml )
+    <string-reader> read-xml-chunk ;
 
 : file>xml ( filename -- xml )
     ! Autodetect encoding!

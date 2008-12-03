@@ -1,37 +1,34 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.functions sequences
 sequences.private words namespaces macros hints
-combinators fry ;
+combinators fry io.binary ;
 IN: math.bitwise
 
 ! utilities
 : clear-bit ( x n -- y ) 2^ bitnot bitand ; inline
 : set-bit ( x n -- y ) 2^ bitor ; inline
-: bit-clear? ( x n -- ? ) 2^ bitand zero? ; inline
+: bit-clear? ( x n -- ? ) 2^ bitand 0 = ; inline
 : unmask ( x n -- ? ) bitnot bitand ; inline
 : unmask? ( x n -- ? ) unmask 0 > ; inline
 : mask ( x n -- ? ) bitand ; inline
 : mask? ( x n -- ? ) mask 0 > ; inline
 : wrap ( m n -- m' ) 1- bitand ; inline
 : bits ( m n -- m' ) 2^ wrap ; inline
-: mask-bit ( m n -- m' ) 1- 2^ mask ; inline
+: mask-bit ( m n -- m' ) 2^ mask ; inline
+: on-bits ( n -- m ) 2^ 1- ; inline
+: toggle-bit ( m n -- m' ) 2^ bitxor ; inline
 
 : shift-mod ( n s w -- n )
-    >r shift r> 2^ wrap ; inline
+    [ shift ] dip 2^ wrap ; inline
 
 : bitroll ( x s w -- y )
-     [ wrap ] keep
-     [ shift-mod ]
-     [ [ - ] keep shift-mod ] 3bi bitor ; inline
+    [ wrap ] keep
+    [ shift-mod ] [ [ - ] keep shift-mod ] 3bi bitor ; inline
 
-: bitroll-32 ( n s -- n' ) 32 bitroll ;
+: bitroll-32 ( n s -- n' ) 32 bitroll ; inline
 
-HINTS: bitroll-32 bignum fixnum ;
-
-: bitroll-64 ( n s -- n' ) 64 bitroll ;
-
-HINTS: bitroll-64 bignum fixnum ;
+: bitroll-64 ( n s -- n' ) 64 bitroll ; inline
 
 ! 32-bit arithmetic
 : w+ ( int int -- int ) + 32 bits ; inline
@@ -40,7 +37,7 @@ HINTS: bitroll-64 bignum fixnum ;
 
 ! flags
 MACRO: flags ( values -- )
-    [ 0 ] [ [ execute bitor ] curry compose ] reduce ;
+    [ 0 ] [ [ dup word? [ execute ] when bitor ] curry compose ] reduce ;
 
 ! bitfield
 <PRIVATE
@@ -51,7 +48,7 @@ M: integer (bitfield-quot) ( spec -- quot )
     [ swapd shift bitor ] curry ;
 
 M: pair (bitfield-quot) ( spec -- quot )
-    first2 over word? [ >r swapd execute r> ] [ ] ?
+    first2 over word? [ [ swapd execute ] dip ] [ ] ?
     [ shift bitor ] append 2curry ;
 
 PRIVATE>
@@ -91,4 +88,12 @@ M: bignum (bit-count)
 PRIVATE>
 
 : bit-count ( x -- n )
-    dup 0 >= [ (bit-count) ] [ bitnot (bit-count) ] if ; inline
+    dup 0 < [ bitnot ] when (bit-count) ; inline
+
+! Signed byte array to integer conversion
+: signed-le> ( bytes -- x )
+    [ le> ] [ length 8 * 1- on-bits ] bi
+    2dup > [ bitnot bitor ] [ drop ] if ;
+
+: signed-be> ( bytes -- x )
+    <reversed> signed-le> ;

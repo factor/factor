@@ -6,4 +6,4 @@ void dump_zone(F_ZONE *z);
 
 bool fep_disabled;
 
-DECLARE_PRIMITIVE(die);
+void primitive_die(void);

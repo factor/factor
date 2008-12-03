@@ -21,9 +21,6 @@ M: effect pprint* effect>string "(" swap ")" 3append text ;
 : ?end-group ( word -- )
     ?effect-height 0 < [ end-group ] when ;
 
-\ >r hard "break-before" set-word-prop
-\ r> hard "break-after" set-word-prop
-
 ! Atoms
 : word-style ( word -- style )
     dup "word-style" word-prop >hashtable [
@@ -93,7 +90,7 @@ M: f pprint* drop \ f pprint-word ;
     ] H{ } make-assoc ;
 
 : unparse-string ( str prefix suffix -- str )
-    [ >r % do-string-limit [ unparse-ch ] each r> % ] "" make ;
+    [ [ % do-string-limit [ unparse-ch ] each ] dip % ] "" make ;
 
 : pprint-string ( obj str prefix suffix -- )
     unparse-string swap string-style styled-text ;
@@ -156,13 +153,13 @@ M: tuple pprint*
 : do-length-limit ( seq -- trimmed n/f )
     length-limit get dup [
         over length over [-]
-        dup zero? [ 2drop f ] [ >r head r> ] if
+        dup zero? [ 2drop f ] [ [ head ] dip ] if
     ] when ;
 
 : pprint-elements ( seq -- )
-    do-length-limit >r
-    [ pprint* ] each
-    r> [ "~" swap number>string " more~" 3append text ] when* ;
+    do-length-limit
+    [ [ pprint* ] each ] dip
+    [ "~" swap number>string " more~" 3append text ] when* ;
 
 GENERIC: pprint-delims ( obj -- start end )
 
@@ -206,26 +203,20 @@ M: tuple pprint-narrow? drop t ;
 : pprint-object ( obj -- )
     [
         <flow
-        dup pprint-delims >r pprint-word
-        dup pprint-narrow? <inset
-        >pprint-sequence pprint-elements
-        block> r> pprint-word block>
+        dup pprint-delims [
+            pprint-word
+            dup pprint-narrow? <inset
+            >pprint-sequence pprint-elements
+            block>
+        ] dip pprint-word block>
     ] check-recursion ;
 
 M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
+M: byte-vector pprint* pprint-object ;
 M: hashtable pprint* pprint-object ;
-
-M: curry pprint*
-    dup quot>> callable? [ pprint-object ] [
-        "( invalid curry )" swap present-text
-    ] if ;
-
-M: compose pprint*
-    dup [ first>> callable? ] [ second>> callable? ] bi and
-    [ pprint-object ] [
-        "( invalid compose )" swap present-text
-    ] if ;
+M: curry pprint* pprint-object ;
+M: compose pprint* pprint-object ;
 
 M: wrapper pprint*
     dup wrapped>> word? [

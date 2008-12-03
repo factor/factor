@@ -2,20 +2,19 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic sequences prettyprint io words arrays
 summary effects debugger assocs accessors namespaces
-compiler.errors ;
+compiler.errors stack-checker.values
+stack-checker.recursive-state ;
 IN: stack-checker.errors
 
-SYMBOL: recursive-state
-
-TUPLE: inference-error error type rstate ;
+TUPLE: inference-error error type word ;
 
 M: inference-error compiler-error-type type>> ;
 
 M: inference-error error-help error>> error-help ;
 
 : (inference-error) ( ... class type -- * )
-    >r boa r>
-    recursive-state get
+    [ boa ] dip
+    recursive-state get word>>
     \ inference-error boa throw ; inline
 
 : inference-error ( ... class -- * )
@@ -25,15 +24,14 @@ M: inference-error error-help error>> error-help ;
     +warning+ (inference-error) ; inline
 
 M: inference-error error.
-    [
-        rstate>>
-        [ "Nesting:" print stack. ] unless-empty
-    ] [ error>> error. ] bi ;
+    [ word>> [ "In word: " write . ] when* ] [ error>> error. ] bi ;
 
 TUPLE: literal-expected ;
 
 M: literal-expected summary
     drop "Literal value expected" ;
+
+M: object (literal) \ literal-expected inference-warning ;
 
 TUPLE: unbalanced-branches-error branches quots ;
 
@@ -110,3 +108,9 @@ M: inconsistent-recursive-call-error error.
     "The recursive word " write
     word>> pprint
     " calls itself with a different set of quotation parameters than were input" print ;
+
+TUPLE: unknown-primitive-error ;
+
+M: unknown-primitive-error error.
+    drop
+    "Cannot determine stack effect statically" print ;

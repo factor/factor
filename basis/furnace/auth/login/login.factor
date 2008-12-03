@@ -3,7 +3,6 @@
 USING: kernel accessors namespaces sequences math.parser
 calendar validators urls logging html.forms
 http http.server http.server.dispatchers
-furnace
 furnace.auth
 furnace.asides
 furnace.actions
@@ -58,8 +57,12 @@ M: login-realm modify-form ( responder -- )
     permit-id get [ delete-permit ] when*
     URL" $realm" end-aside ;
 
+<PRIVATE
+
 SYMBOL: description
 SYMBOL: capabilities
+
+PRIVATE>
 
 : flashed-variables { description capabilities } ;
 
@@ -107,7 +110,7 @@ M: login-realm login-required* ( description capabilities login -- response )
 M: login-realm user-registered ( user realm -- )
     drop successful-login ;
 
-: <login-realm> ( responder name -- auth )
+: <login-realm> ( responder name -- realm )
     login-realm new-realm
         <login-action> "login" add-responder
         <logout-action> "logout" add-responder

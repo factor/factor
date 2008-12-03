@@ -9,6 +9,10 @@ IN: processing.shapes
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: do-state ( mode quot -- ) swap glBegin call glEnd ; inline
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 VAR: fill-color
 VAR: stroke-color
 
@@ -19,13 +23,13 @@ T{ rgba f 1 1 1 1 } fill-color   set-global
 
 : fill-mode ( -- )
   GL_FRONT_AND_BACK GL_FILL glPolygonMode
-  fill-color> set-color ;
+  fill-color> gl-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : stroke-mode ( -- )
   GL_FRONT_AND_BACK GL_LINE glPolygonMode
-  stroke-color> set-color ;
+  stroke-color> gl-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -105,8 +109,8 @@ T{ rgba f 1 1 1 1 } fill-color   set-global
 
 : ellipse ( center dim -- )
   GL_FRONT_AND_BACK GL_FILL glPolygonMode
-  [ stroke-color> set-color                                 gl-ellipse ]
-  [ fill-color> set-color gl-get-line-width 2 * dup 2array v- gl-ellipse ] 2bi ;
+  [ stroke-color> gl-color                                 gl-ellipse ]
+  [ fill-color> gl-color gl-get-line-width 2 * dup 2array v- gl-ellipse ] 2bi ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

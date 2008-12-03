@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes classes.algebra classes.tuple
 classes.tuple.private kernel accessors math math.intervals
-namespaces sequences words combinators combinators.short-circuit
+namespaces sequences words combinators
 arrays compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
 
@@ -34,7 +34,7 @@ slots ;
 
 : null-info T{ value-info f null empty-interval } ; inline
 
-: object-info T{ value-info f object T{ interval f { -1.0/0.0 t } { 1.0/0.0 t } } } ; inline
+: object-info T{ value-info f object full-interval } ; inline
 
 : class-interval ( class -- interval )
     dup real class<=
@@ -43,7 +43,7 @@ slots ;
 : interval>literal ( class interval -- literal literal? )
     #! If interval has zero length and the class is sufficiently
     #! precise, we can turn it into a literal
-    dup empty-interval eq? [
+    dup special-interval? [
         2drop f f
     ] [
         dup from>> first {
@@ -243,7 +243,7 @@ DEFER: (value-info-union)
 : literals<= ( info1 info2 -- ? )
     {
         { [ dup literal?>> not ] [ 2drop t ] }
-        { [ over literal?>> not ] [ 2drop f ] }
+        { [ over literal?>> not ] [ drop class>> null-class? ] }
         [ [ literal>> ] bi@ eql? ]
     } cond ;
 
@@ -253,26 +253,29 @@ DEFER: (value-info-union)
         { [ over not ] [ 2drop f ] }
         [
             {
-                [ [ class>> ] bi@ class<= ]
-                [ [ interval>> ] bi@ interval-subset? ]
-                [ literals<= ]
-                [ [ length>> ] bi@ value-info<= ]
-                [ [ slots>> ] bi@ [ value-info<= ] 2all? ]
-            } 2&&
+                { [ 2dup [ class>> ] bi@ class<= not ] [ f ] }
+                { [ 2dup [ interval>> ] bi@ interval-subset? not ] [ f ] }
+                { [ 2dup literals<= not ] [ f ] }
+                { [ 2dup [ length>> ] bi@ value-info<= not ] [ f ] }
+                { [ 2dup [ slots>> ] bi@ [ value-info<= ] 2all? not ] [ f ] }
+                [ t ]
+            } cond 2nip
         ]
     } cond ;
 
-! Current value --> info mapping
+! Assoc stack of current value --> info mapping
 SYMBOL: value-infos
 
 : value-info ( value -- info )
-    resolve-copy value-infos get at null-info or ;
+    resolve-copy value-infos get assoc-stack null-info or ;
 
 : set-value-info ( info value -- )
-    resolve-copy value-infos get set-at ;
+    resolve-copy value-infos get peek set-at ;
 
 : refine-value-info ( info value -- )
-    resolve-copy value-infos get [ value-info-intersect ] change-at ;
+    resolve-copy value-infos get
+    [ assoc-stack value-info-intersect ] 2keep
+    peek set-at ;
 
 : value-literal ( value -- obj ? )
     value-info >literal< ;

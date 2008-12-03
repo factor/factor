@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov
+! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel cocoa cocoa.messages cocoa.classes
 cocoa.application sequences splitting core-foundation ;
@@ -26,9 +26,9 @@ IN: cocoa.dialogs
     [ -> filenames CF>string-array ] [ drop f ] if ;
 
 : split-path ( path -- dir file )
-    "/" last-split1 [ <NSString> ] bi@ ;
+    "/" split1-last [ <NSString> ] bi@ ;
 
 : save-panel ( path -- paths )
-    <NSSavePanel> dup
-    rot split-path -> runModalForDirectory:file: NSOKButton =
+    [ <NSSavePanel> dup ] dip
+    split-path -> runModalForDirectory:file: NSOKButton =
     [ -> filename CF>string ] [ drop f ] if ;

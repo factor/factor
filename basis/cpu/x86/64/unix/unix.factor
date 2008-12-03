@@ -52,3 +52,7 @@ M: x86.64 dummy-stack-params? f ;
 M: x86.64 dummy-int-params? f ;
 
 M: x86.64 dummy-fp-params? f ;
+
+M: x86.64 temp-reg-1 R8 ;
+
+M: x86.64 temp-reg-2 R9 ;

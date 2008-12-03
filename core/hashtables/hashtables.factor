@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel kernel.private slots.private math
-assocs math.private sequences sequences.private vectors grouping ;
+assocs math.private sequences sequences.private vectors ;
 IN: hashtables
 
 TUPLE: hashtable
@@ -15,7 +15,7 @@ TUPLE: hashtable
     length>> 1 fixnum-fast fixnum-bitand ; inline
 
 : hash@ ( key array -- i )
-    >r hashcode >fixnum dup fixnum+fast r> wrap ; inline
+    [ hashcode >fixnum dup fixnum+fast ] dip wrap ; inline
 
 : probe ( array i -- array i )
     2 fixnum+fast over wrap ; inline
@@ -105,7 +105,7 @@ M: hashtable clear-assoc ( hash -- )
 
 M: hashtable delete-at ( key hash -- )
     tuck key@ [
-        >r >r ((tombstone)) dup r> r> set-nth-pair
+        [ ((tombstone)) dup ] 2dip set-nth-pair
         hash-deleted+
     ] [
         3drop
@@ -115,9 +115,9 @@ M: hashtable assoc-size ( hash -- n )
     [ count>> ] [ deleted>> ] bi - ;
 
 : rehash ( hash -- )
-    dup >alist >r
+    dup >alist [
     dup clear-assoc
-    r> (rehash) ;
+    ] dip (rehash) ;
 
 M: hashtable set-at ( value key hash -- )
     dup ?grow-hash
@@ -128,15 +128,33 @@ M: hashtable set-at ( value key hash -- )
 : associate ( value key -- hash )
     2 <hashtable> [ set-at ] keep ;
 
+<PRIVATE
+
+: push-unsafe ( elt seq -- )
+    [ length ] keep
+    [ underlying>> set-array-nth ]
+    [ [ 1+ ] dip (>>length) ]
+    2bi ; inline
+
+PRIVATE>
+
 M: hashtable >alist
-    array>> 2 <groups> [ first tombstone? not ] filter ;
+    [ array>> [ length 2/ ] keep ] [ assoc-size <vector> ] bi [
+        [
+            [
+                [ 1 fixnum-shift-fast ] dip
+                [ array-nth ] [ [ 1 fixnum+fast ] dip array-nth ] 2bi
+            ] dip
+            pick tombstone? [ 3drop ] [ [ 2array ] dip push-unsafe ] if
+        ] 2curry each
+    ] keep { } like ;
 
 M: hashtable clone
     (clone) [ clone ] change-array ;
 
 M: hashtable equal?
     over hashtable? [
-        2dup [ assoc-size ] bi@ number=
+        2dup [ assoc-size ] bi@ eq?
         [ assoc= ] [ 2drop f ] if
     ] [ 2drop f ] if ;
 

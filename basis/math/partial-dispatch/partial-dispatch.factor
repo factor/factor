@@ -29,6 +29,8 @@ M: word integer-op-input-classes
         { fixnum- fixnum-fast }
         { fixnum* fixnum*fast }
         { fixnum-shift fixnum-shift-fast }
+        { fixnum/i fixnum/i-fast }
+        { fixnum/mod fixnum/mod-fast }
     } at ;
 
 : modular-variant ( op -- fast-op )
@@ -115,7 +117,9 @@ M: word integer-op-input-classes
     { fixnum bignum float }
     [ [ dup 3array ] [ swap method ] 2bi ] with { } map>assoc
     [ nip ] assoc-filter
-    [ def>> peek ] assoc-map % ;
+    [ def>> ] assoc-map
+    [ nip length 1 = ] assoc-filter
+    [ first ] assoc-map % ;
 
 SYMBOL: math-ops
 
@@ -126,7 +130,7 @@ SYMBOL: fast-math-ops
 
 : math-method* ( word left right -- quot )
     3dup math-op
-    [ >r 3drop r> 1quotation ] [ drop math-method ] if ;
+    [ [ 3drop ] dip 1quotation ] [ drop math-method ] if ;
 
 : math-both-known? ( word left right -- ? )
     3dup math-op
@@ -148,7 +152,7 @@ SYMBOL: fast-math-ops
 : integer-derived-ops ( word -- words )
     [ math-ops get (derived-ops) ] [ fast-math-ops get (derived-ops) ] bi
     [
-            [
+        [
             drop
             [ second integer class<= ]
             [ third integer class<= ]
@@ -157,20 +161,19 @@ SYMBOL: fast-math-ops
     ] bi@ append ;
 
 : each-derived-op ( word quot -- )
-    >r derived-ops r> each ; inline
+    [ derived-ops ] dip each ; inline
 
 : each-fast-derived-op ( word quot -- )
-    >r fast-derived-ops r> each ; inline
+    [ fast-derived-ops ] dip each ; inline
 
 : each-integer-derived-op ( word quot -- )
-    >r integer-derived-ops r> each ; inline
+    [ integer-derived-ops ] dip each ; inline
 
 [
     [
         \ +       define-math-ops
         \ -       define-math-ops
         \ *       define-math-ops
-        \ shift   define-math-ops
         \ mod     define-math-ops
         \ /i      define-math-ops
 
@@ -183,6 +186,9 @@ SYMBOL: fast-math-ops
         \ >       define-math-ops
         \ >=      define-math-ops
         \ number= define-math-ops
+
+        { { shift bignum bignum } bignum-shift } ,
+        { { shift fixnum fixnum } fixnum-shift } ,
 
         \ + \ fixnum+ \ bignum+ define-integer-ops
         \ - \ fixnum- \ bignum- define-integer-ops

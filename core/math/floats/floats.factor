@@ -24,6 +24,7 @@ M: float - float- ;
 M: float * float* ;
 M: float / float/f ;
 M: float /f float/f ;
+M: float /i float/f >integer ;
 M: float mod float-mod ;
 
 M: real abs dup 0 < [ neg ] when ;

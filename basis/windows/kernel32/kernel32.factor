@@ -199,11 +199,11 @@ TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 : THREAD_PRIORITY_TIME_CRITICAL 15 ; inline
 
 C-STRUCT: OVERLAPPED
-    { "int" "internal" }
-    { "int" "internal-high" }
-    { "int" "offset" }
-    { "int" "offset-high" }
-    { "void*" "event" } ;
+    { "UINT_PTR" "internal" }
+    { "UINT_PTR" "internal-high" }
+    { "DWORD" "offset" }
+    { "DWORD" "offset-high" }
+    { "HANDLE" "event" } ;
 
 C-STRUCT: SYSTEMTIME
     { "WORD" "wYear" }
@@ -954,7 +954,8 @@ ALIAS: GetDiskFreeSpaceEx GetDiskFreeSpaceExW
 ! FUNCTION: GetDllDirectoryA
 ! FUNCTION: GetDllDirectoryW
 ! FUNCTION: GetDriveTypeA
-! FUNCTION: GetDriveTypeW
+FUNCTION: UINT GetDriveTypeW ( LPCTSTR lpRootPathName ) ;
+ALIAS: GetDriveType GetDriveTypeW
 FUNCTION: void* GetEnvironmentStringsW ( ) ;
 ! FUNCTION: GetEnvironmentStringsA
 ALIAS: GetEnvironmentStrings GetEnvironmentStringsW
@@ -999,7 +1000,7 @@ FUNCTION: DWORD GetLastError ( ) ;
 ! FUNCTION: GetLocaleInfoA
 ! FUNCTION: GetLocaleInfoW
 ! FUNCTION: GetLocalTime
-! FUNCTION: GetLogicalDrives
+FUNCTION: DWORD GetLogicalDrives ( ) ;
 ! FUNCTION: GetLogicalDriveStringsA
 ! FUNCTION: GetLogicalDriveStringsW
 ! FUNCTION: GetLongPathNameA
@@ -1129,7 +1130,9 @@ ALIAS: GetVolumeInformation GetVolumeInformationW
 ! FUNCTION: GetVolumeNameForVolumeMountPointW
 ! FUNCTION: GetVolumePathNameA
 ! FUNCTION: GetVolumePathNamesForVolumeNameA
-! FUNCTION: GetVolumePathNamesForVolumeNameW
+FUNCTION: BOOL GetVolumePathNamesForVolumeNameW ( LPCTSTR lpszVolumeName, LPTSTR lpszVolumePathNames, DWORD cchBufferLength, PDWORD lpcchReturnLength ) ;
+ALIAS: GetVolumePathNamesForVolumeName GetVolumePathNamesForVolumeNameW
+
 ! FUNCTION: GetVolumePathNameW
 ! FUNCTION: GetWindowsDirectoryA
 FUNCTION: UINT GetWindowsDirectoryW ( LPTSTR lpBuffer, UINT uSize ) ;

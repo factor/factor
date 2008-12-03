@@ -6,15 +6,17 @@ USING: kernel alien.c-types combinators namespaces make arrays
        vars colors self self.slots
        random-weighted colors.hsv cfdg.gl accessors
        ui.gadgets.handler ui.gestures assocs ui.gadgets macros
-       qualified ;
+       qualified specialized-arrays.double ;
+
 QUALIFIED: syntax
+
 IN: cfdg
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SELF-SLOTS: hsva
 
-: clear-color ( color -- ) set-clear-color GL_COLOR_BUFFER_BIT glClear ;
+: clear-color ( color -- ) gl-clear-color GL_COLOR_BUFFER_BIT glClear ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -49,11 +51,14 @@ VAR: color-stack
 
 : push-color ( -- ) self> color-stack> push   self> clone >self ;
 
-: pop-color ( -- ) color-stack> pop dup >self set-color ;
+: pop-color ( -- ) color-stack> pop dup >self gl-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: double-nth* ( c-array indices -- seq ) swap [ double-nth ] curry map ;
+! : double-nth* ( c-array indices -- seq ) swap [ double-nth ] curry map ;
+
+: double-nth* ( c-array indices -- seq )
+  swap byte-array>double-array [ nth ] curry map ;
 
 : check-size ( modelview -- num ) { 0 1 4 5 } double-nth* [ abs ] map biggest ;
 
@@ -75,16 +80,16 @@ VAR: threshold
     2 * sin ,   2 * cos neg ,   0 ,   0 ,
           0 ,             0 ,   1 ,   0 , 
           0 ,             0 ,   0 ,   1 , ]
-  { } make >c-double-array glMultMatrixd ;
+  double-array{ } make underlying>> glMultMatrixd ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : circle ( -- )
-  self> set-color
+  self> gl-color
   gluNewQuadric dup 0 0.5 20 10 gluDisk gluDeleteQuadric ;
 
 : triangle ( -- )
-  self> set-color
+  self> gl-color
   GL_POLYGON glBegin
     0    0.577 glVertex2d
     0.5 -0.289 glVertex2d
@@ -92,7 +97,7 @@ VAR: threshold
   glEnd ;
 
 : square ( -- )
-  self> set-color
+  self> gl-color
   GL_POLYGON glBegin
     -0.5  0.5 glVertex2d
      0.5  0.5 glVertex2d
@@ -192,7 +197,7 @@ SYMBOL: dlist
 
   set-initial-color
 
-  self> set-color
+  self> gl-color
 
   start-shape> call
       
@@ -224,13 +229,13 @@ SYMBOL: dlist
 
 : delete-dlist ( -- ) dlist get [ dlist get 1 glDeleteLists dlist off ] when ;
 
-: cfdg-window* ( -- )
+: cfdg-window* ( -- slate )
   C[ display ] <slate>
     { 500 500 }       >>pdim
     C[ delete-dlist ] >>ungraft
   dup "CFDG" open-window ;
 
-: cfdg-window ( -- ) [ cfdg-window* ] with-ui ;
+: cfdg-window ( -- slate ) [ cfdg-window* ] with-ui ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

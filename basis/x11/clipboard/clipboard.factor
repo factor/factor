@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax arrays
 kernel math namespaces sequences io.encodings.string
-io.encodings.utf8 io.encodings.ascii x11.xlib x11.constants ;
+io.encodings.utf8 io.encodings.ascii x11.xlib x11.constants
+specialized-arrays.int accessors ;
 IN: x11.clipboard
 
 ! This code was based on by McCLIM's Backends/CLX/port.lisp
@@ -50,7 +51,7 @@ TUPLE: x-clipboard atom contents ;
     "TARGETS" x-atom 32 PropModeReplace
     {
         "UTF8_STRING" "STRING" "TARGETS" "TIMESTAMP"
-    } [ x-atom ] map >c-int-array
+    } [ x-atom ] int-array{ } map-as underlying>>
     4 XChangeProperty drop ;
 
 : set-timestamp-prop ( evt -- )
@@ -58,7 +59,7 @@ TUPLE: x-clipboard atom contents ;
     [ XSelectionRequestEvent-requestor ] keep
     [ XSelectionRequestEvent-property ] keep
     >r "TIMESTAMP" x-atom 32 PropModeReplace r>
-    XSelectionRequestEvent-time 1array >c-int-array
+    XSelectionRequestEvent-time <int>
     1 XChangeProperty drop ;
 
 : send-notify ( evt prop -- )

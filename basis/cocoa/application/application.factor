@@ -40,12 +40,13 @@ FUNCTION: void NSBeep ( ) ;
     dup next-event [ -> sendEvent: t ] [ drop f ] if* ;
 
 : add-observer ( observer selector name object -- )
-    >r >r >r >r NSNotificationCenter -> defaultCenter
-    r> r> sel_registerName
-    r> r> -> addObserver:selector:name:object: ;
+    [
+        [ NSNotificationCenter -> defaultCenter ] 2dip
+        sel_registerName
+    ] 2dip -> addObserver:selector:name:object: ;
 
 : remove-observer ( observer -- )
-    >r NSNotificationCenter -> defaultCenter r>
+    [ NSNotificationCenter -> defaultCenter ] dip
     -> removeObserver: ;
 
 : finish-launching ( -- ) NSApp -> finishLaunching ;

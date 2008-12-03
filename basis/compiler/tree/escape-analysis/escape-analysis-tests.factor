@@ -8,6 +8,7 @@ math.private kernel tools.test accessors slots.private
 quotations.private prettyprint classes.tuple.private classes
 classes.tuple namespaces
 compiler.tree.propagation.info stack-checker.errors
+compiler.tree.checker
 kernel.private ;
 
 \ escape-analysis must-infer
@@ -34,6 +35,7 @@ M: node count-unboxed-allocations* drop ;
     propagate
     cleanup
     escape-analysis
+    dup check-nodes
     0 swap [ count-unboxed-allocations* ] each-node ;
 
 [ 0 ] [ [ [ + ] curry ] count-unboxed-allocations ] unit-test
@@ -307,7 +309,7 @@ C: <ro-box> ro-box
 : bleach-node ( quot: ( node -- ) -- )
     [ bleach-node ] curry [ ] compose impeach-node ; inline recursive
 
-[ 2 ] [ [ [ ] bleach-node ] count-unboxed-allocations ] unit-test
+[ 3 ] [ [ [ ] bleach-node ] count-unboxed-allocations ] unit-test
 
 [ 0 ] [
     [ dup -1 over >= [ 0 >= [ "A" throw ] unless ] [ drop ] if ]

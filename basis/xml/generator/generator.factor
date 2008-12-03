@@ -5,12 +5,11 @@ sequences ;
 IN: xml.generator
 
 : comment, ( string -- ) <comment> , ;
-: directive, ( string -- ) <directive> , ;
 : instruction, ( string -- ) <instruction> , ;
 : nl, ( -- ) "\n" , ;
 
 : (tag,) ( name attrs quot -- tag )
-    -rot >r >r V{ } make r> r> rot <tag> ; inline
+    -rot [ V{ } make ] 2dip rot <tag> ; inline
 : tag*, ( name attrs quot -- )
     (tag,) , ; inline
 

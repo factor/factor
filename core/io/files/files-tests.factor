@@ -283,3 +283,6 @@ USE: debugger.threads
     [ "resource:core/bootstrap/stage2.factor" (normalize-path) ]
     unit-test
 ] with-scope
+
+[ t ] [ "/" file-system-info file-system-info? ] unit-test
+[ t ] [ file-systems [ file-system-info? ] all? ] unit-test

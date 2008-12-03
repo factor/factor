@@ -19,7 +19,7 @@ http
 http.server
 http.server.redirection
 http.server.responses
-furnace ;
+furnace.utilities ;
 QUALIFIED-WITH: assocs a
 IN: furnace.chloe-tags
 

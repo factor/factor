@@ -21,8 +21,6 @@ IN: compiler.cfg.builder
 
 ! Convert tree SSA IR to CFG SSA IR.
 
-: stop-iterating ( -- next ) end-basic-block f ;
-
 SYMBOL: procedures
 SYMBOL: current-word
 SYMBOL: current-label
@@ -190,7 +188,7 @@ M: #if emit-node
 
 : emit-dispatch ( node -- )
     ##epilogue
-    ds-pop ^^offset>slot i ##dispatch
+    ds-pop ^^offset>slot i 0 ##dispatch
     dispatch-branches ;
 
 : <dispatch-block> ( -- word )
@@ -211,7 +209,7 @@ M: #dispatch emit-node
 ! #call
 M: #call emit-node
     dup word>> dup "intrinsic" word-prop
-    [ emit-intrinsic iterate-next ] [ nip emit-call ] if ;
+    [ emit-intrinsic ] [ nip emit-call ] if ;
 
 ! #call-recursive
 M: #call-recursive emit-node label>> id>> emit-call ;
@@ -221,21 +219,14 @@ M: #push emit-node
     literal>> ^^load-literal ds-push iterate-next ;
 
 ! #shuffle
-: emit-shuffle ( effect -- )
-    [ out>> ] [ in>> dup length ds-load zip ] bi
-    '[ _ at ] map ds-store ;
-
 M: #shuffle emit-node
-    shuffle-effect emit-shuffle iterate-next ;
-
-M: #>r emit-node
-    [ in-d>> length ] [ out-r>> empty? ] bi
-    [ neg ##inc-d ] [ ds-load rs-store ] if
-    iterate-next ;
-
-M: #r> emit-node
-    [ in-r>> length ] [ out-d>> empty? ] bi
-    [ neg ##inc-r ] [ rs-load ds-store ] if
+    dup
+    H{ } clone
+    [ [ in-d>> [ length ds-load ] keep ] dip '[ _ set-at ] 2each ]
+    [ [ in-r>> [ length rs-load ] keep ] dip '[ _ set-at ] 2each ]
+    [ nip ] 2tri
+    [ [ [ out-d>> ] [ mapping>> ] bi ] dip '[ _ at _ at ] map ds-store ]
+    [ [ [ out-r>> ] [ mapping>> ] bi ] dip '[ _ at _ at ] map rs-store ] 2bi
     iterate-next ;
 
 ! #return
@@ -269,7 +260,7 @@ M: #terminate emit-node drop stop-iterating ;
 
 : emit-alien-node ( node quot -- next )
     [ params>> ] dip [ drop alien-stack-frame ] [ call ] 2bi
-    begin-basic-block iterate-next ; inline
+    ##branch begin-basic-block iterate-next ; inline
 
 M: #alien-invoke emit-node
     [ ##alien-invoke ] emit-alien-node ;

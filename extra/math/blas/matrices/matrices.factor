@@ -3,7 +3,7 @@ combinators.lib combinators.short-circuit fry kernel locals macros
 math math.blas.cblas math.blas.vectors math.blas.vectors.private
 math.complex math.functions math.order multi-methods qualified
 sequences sequences.merged sequences.private generalizations
-shuffle symbols ;
+shuffle symbols speicalized-arrays.float specialized-arrays.double ;
 QUALIFIED: syntax
 IN: math.blas.matrices
 
@@ -143,14 +143,14 @@ METHOD: (blas-vector-like) { object object object double-complex-blas-matrix }
 PRIVATE>
 
 : >float-blas-matrix ( arrays -- matrix )
-    [ >c-float-array ] (>matrix) <float-blas-matrix> ;
+    [ >float-array underlying>> ] (>matrix) <float-blas-matrix> ;
 : >double-blas-matrix ( arrays -- matrix )
-    [ >c-double-array ] (>matrix) <double-blas-matrix> ;
+    [ >double-array underlying>> ] (>matrix) <double-blas-matrix> ;
 : >float-complex-blas-matrix ( arrays -- matrix )
-    [ (flatten-complex-sequence) >c-float-array ] (>matrix)
+    [ (flatten-complex-sequence) >float-array underlying>> ] (>matrix)
     <float-complex-blas-matrix> ;
 : >double-complex-blas-matrix ( arrays -- matrix )
-    [ (flatten-complex-sequence) >c-double-array ] (>matrix)
+    [ (flatten-complex-sequence) >double-array underlying>> ] (>matrix)
     <double-complex-blas-matrix> ;
 
 GENERIC: n*M.V+n*V! ( alpha A x beta y -- y=alpha*A.x+b*y )

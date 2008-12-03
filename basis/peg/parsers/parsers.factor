@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces make math assocs
-shuffle vectors arrays math.parser accessors unicode.categories
+vectors arrays math.parser accessors unicode.categories
 sequences.deep peg peg.private peg.search math.ranges words ;
 IN: peg.parsers
 
@@ -24,7 +24,7 @@ M: just-parser (compile) ( parser -- quot )
 : 1token ( ch -- parser ) 1string token ;
 
 : (list-of) ( items separator repeat1? -- parser )
-  >r over 2seq r> [ repeat1 ] [ repeat0 ] if [ concat ] action 2seq
+  [ over 2seq ] dip [ repeat1 ] [ repeat0 ] if [ concat ] action 2seq
   [ unclip 1vector swap first append ] action ;
 
 : list-of ( items separator -- parser )
@@ -60,11 +60,11 @@ PRIVATE>
   [ flatten-vectors ] action ;
 
 : from-m-to-n ( parser m n -- parser' )
-  >r [ exactly-n ] 2keep r> swap - at-most-n 2seq
+  [ [ exactly-n ] 2keep ] dip swap - at-most-n 2seq
   [ flatten-vectors ] action ;
 
 : pack ( begin body end -- parser )
-  >r >r hide r> r> hide 3seq [ first ] action ;
+  [ hide ] 2dip hide 3seq [ first ] action ;
 
 : surrounded-by ( parser begin end -- parser' )
   [ token ] bi@ swapd pack ;

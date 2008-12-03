@@ -3,7 +3,8 @@ USING: alien alien.c-types alien.syntax compiler kernel
 namespaces namespaces tools.test sequences stack-checker
 stack-checker.errors words arrays parser quotations
 continuations effects namespaces.private io io.streams.string
-memory system threads tools.test math accessors combinators ;
+memory system threads tools.test math accessors combinators
+specialized-arrays.float ;
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test
@@ -146,13 +147,21 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
 
 ! Make sure XT doesn't get clobbered in stack frame
 
-: ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a ptr -- result y )
-    "void"
+: ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result y )
+    "int"
     f "ffi_test_31"
     { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
     alien-invoke gc 3 ;
 
-[ 3 ] [ 42 [ ] each ffi_test_31 ] unit-test
+[ 861 3 ] [ 42 [ ] each ffi_test_31 ] unit-test
+
+: ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
+    "float"
+    f "ffi_test_31_point_5"
+    { "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" }
+    alien-invoke ;
+
+[ 861.0 ] [ 42 [ >float ] each ffi_test_31_point_5 ] unit-test
 
 FUNCTION: longlong ffi_test_21 long x long y ;
 
@@ -188,7 +197,11 @@ FUNCTION: int ffi_test_12 int a int b rect c int d int e int f ;
 
 FUNCTION: float ffi_test_23 ( float[3] x, float[3] y ) ;
 
-[ 32.0 ] [ { 1.0 2.0 3.0 } >c-float-array { 4.0 5.0 6.0 } >c-float-array ffi_test_23 ] unit-test
+[ 32.0 ] [
+    { 1.0 2.0 3.0 } >float-array underlying>>
+    { 4.0 5.0 6.0 } >float-array underlying>>
+    ffi_test_23
+] unit-test
 
 ! Test odd-size structs
 C-STRUCT: test-struct-1 { { "char" 1 } "x" } ;
@@ -353,7 +366,7 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 [ 1 2 3 ] [ callback-6 callback_test_1 1 2 3 ] unit-test
 
 : callback-7 ( -- callback )
-    "void" { } "cdecl" [ 1000 sleep ] alien-callback ;
+    "void" { } "cdecl" [ 1000000 sleep ] alien-callback ;
 
 [ 1 2 3 ] [ callback-7 callback_test_1 1 2 3 ] unit-test
 

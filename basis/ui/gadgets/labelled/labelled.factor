@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.gadgets.buttons ui.gadgets.borders
 ui.gadgets.labels ui.gadgets.panes ui.gadgets.scrollers
@@ -19,10 +19,10 @@ TUPLE: labelled-gadget < track content ;
 M: labelled-gadget focusable-child* content>> ;
 
 : <labelled-scroller> ( gadget title -- gadget )
-    >r <scroller> r> <labelled-gadget> ;
+    [ <scroller> ] dip <labelled-gadget> ;
 
 : <labelled-pane> ( model quot scrolls? title -- gadget )
-    >r >r <pane-control> r> >>scrolls? r>
+    [ [ <pane-control> ] dip >>scrolls? ] dip
     <labelled-scroller> ;
 
 : <close-box> ( quot -- button/f )
@@ -30,10 +30,10 @@ M: labelled-gadget focusable-child* content>> ;
 
 : title-theme ( gadget -- gadget )
     { 1 0 } >>orientation
-    T{ gradient f {
+    {
         T{ rgba f 0.65 0.65 1.0 1.0 }
         T{ rgba f 0.65 0.45 1.0 1.0 }
-    } } >>interior ;
+    } <gradient> >>interior ;
 
 : <title-label> ( text -- label ) <label> title-theme ;
 
@@ -48,9 +48,10 @@ TUPLE: closable-gadget < frame content ;
     [ closable-gadget? ] find-parent ;
 
 : <closable-gadget> ( gadget title quot -- gadget )
-    closable-gadget new-frame
-        -rot <title-bar> @top grid-add
-        swap >>content
-        dup content>> @center grid-add ;
+    [
+        [ closable-gadget new-frame ] dip
+        [ >>content ] [ @center grid-add ] bi
+    ] 2dip
+    <title-bar> @top grid-add ;
     
 M: closable-gadget focusable-child* content>> ;

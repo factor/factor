@@ -1,22 +1,34 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup ;
+USING: help.syntax help.markup byte-arrays io ;
 IN: serialize
 
 HELP: serialize
-{ $values { "obj" "object to serialize" } 
-}
-{ $description "Serializes the object to the current output stream. Object references within the structure being serialized are maintained." } 
-{ $examples 
-    { $example "USING: serialize io.encodings.binary io.streams.byte-array prettyprint ;" "binary [ { 1 2 } serialize ] with-byte-writer\n\nbinary [ deserialize ] with-byte-reader ." "{ 1 2 }" }
-}
-{ $see-also deserialize } ;
+{ $values { "obj" "object to serialize" } }
+{ $description "Serializes the object to " { $link output-stream } "." } ;
 
 HELP: deserialize
-{ $values { "obj" "deserialized object" } 
+{ $values { "obj" "deserialized object" } }
+{ $description "Deserializes an object by reading from " { $link input-stream } "." } ;
+
+HELP: object>bytes
+{ $values { "obj" "object to serialize" } { "bytes" byte-array }
 }
-{ $description "Deserializes an object by reading from the current input stream. Object references within the structure that was originally serialized are maintained." } 
-{ $examples 
-    { $example "USING: serialize io.encodings.binary io.streams.byte-array prettyprint ;" "binary [ { 1 2 } serialize ] with-byte-writer\n\nbinary [ deserialize ] with-byte-reader ." "{ 1 2 }" }
+{ $description "Serializes the object to a byte array." } ;
+
+HELP: bytes>object
+{ $values { "bytes" byte-array } { "obj" "deserialized object" } 
 }
-{ $see-also serialize } ;
+{ $description "Deserializes an object from a byte array." } ;
+
+ARTICLE: "serialize" "Binary object serialization"
+"The " { $vocab-link "serialize" } " vocabulary implements binary serialization for all Factor data types except for continuations. Unlike the prettyprinter, shared structure and circularity is preserved."
+$nl
+"Storing objects on streams:"
+{ $subsection serialize }
+{ $subsection deserialize }
+"Storing objects as byte arrays:"
+{ $subsection object>bytes }
+{ $subsection bytes>object } ;
+
+ABOUT: "serialize"

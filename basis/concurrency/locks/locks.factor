@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: deques dlists kernel threads continuations math
-concurrency.conditions combinators.short-circuit accessors ;
+concurrency.conditions combinators.short-circuit accessors
+locals ;
 IN: concurrency.locks
 
 ! Simple critical sections
@@ -17,16 +18,16 @@ TUPLE: lock threads owner reentrant? ;
 
 : acquire-lock ( lock timeout -- )
     over owner>>
-    [ 2dup >r threads>> r> "lock" wait ] when drop
+    [ 2dup [ threads>> ] dip "lock" wait ] when drop
     self >>owner drop ;
 
 : release-lock ( lock -- )
     f >>owner
     threads>> notify-1 ;
 
-: do-lock ( lock timeout quot acquire release -- )
-    >r >r pick rot r> call ! use up  timeout acquire
-    swap r> curry [ ] cleanup ; inline
+:: do-lock ( lock timeout quot acquire release -- )
+    lock timeout acquire call
+    quot lock release curry [ ] cleanup ; inline
 
 : (with-lock) ( lock timeout quot -- )
     [ acquire-lock ] [ release-lock ] do-lock ; inline
@@ -60,7 +61,7 @@ TUPLE: rw-lock readers writers reader# writer ;
 
 : acquire-read-lock ( lock timeout -- )
     over writer>>
-    [ 2dup >r readers>> r> "read lock" wait ] when drop
+    [ 2dup [ readers>> ] dip "read lock" wait ] when drop
     add-reader ;
 
 : notify-writer ( lock -- )
@@ -75,7 +76,7 @@ TUPLE: rw-lock readers writers reader# writer ;
 
 : acquire-write-lock ( lock timeout -- )
     over writer>> pick reader#>> 0 > or
-    [ 2dup >r writers>> r> "write lock" wait ] when drop
+    [ 2dup [ writers>> ] dip "write lock" wait ] when drop
     self >>writer drop ;
 
 : release-write-lock ( lock -- )

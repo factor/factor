@@ -4,7 +4,7 @@ USING: tools.test bit-vectors vectors sequences kernel math ;
 [ 0 ] [ 123 <bit-vector> length ] unit-test
 
 : do-it
-    1234 swap [ >r even? r> push ] curry each ;
+    1234 swap [ [ even? ] dip push ] curry each ;
 
 [ t ] [
     3 <bit-vector> dup do-it

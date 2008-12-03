@@ -18,7 +18,7 @@ TUPLE: history < model back forward ;
 
 : go-back/forward ( history to from -- )
     [ 2drop ]
-    [ >r dupd (add-history) r> pop swap set-model ] if-empty ;
+    [ [ dupd (add-history) ] dip pop swap set-model ] if-empty ;
 
 : go-back ( history -- )
     dup [ forward>> ] [ back>> ] bi go-back/forward ;

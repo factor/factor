@@ -1,13 +1,12 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math models namespaces sequences
-       strings quotations assocs combinators classes colors
-       classes.tuple opengl math.vectors
-       ui.commands ui.gadgets ui.gadgets.borders
-       ui.gadgets.labels ui.gadgets.theme
-       ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
-       ui.render math.geometry.rect ;
-
+strings quotations assocs combinators classes colors
+classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
+ui.gadgets.borders ui.gadgets.labels ui.gadgets.theme
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
+ui.render math.geometry.rect locals alien.c-types
+specialized-arrays.float fry ;
 IN: ui.gadgets.buttons
 
 TUPLE: button < border pressed? selected? quot ;
@@ -29,7 +28,7 @@ TUPLE: button < border pressed? selected? quot ;
     relayout-1 ;
 
 : if-clicked ( button quot -- )
-    >r dup button-update dup button-rollover? r> [ drop ] if ;
+    [ dup button-update dup button-rollover? ] dip [ drop ] if ;
 
 : button-clicked ( button -- ) dup quot>> if-clicked ;
 
@@ -62,16 +61,17 @@ C: <button-paint> button-paint
     } cond ;
 
 M: button-paint draw-interior
-    button-paint draw-interior ;
+    button-paint dup [ draw-interior ] [ 2drop ] if ;
 
 M: button-paint draw-boundary
-    button-paint draw-boundary ;
+    button-paint dup [ draw-boundary ] [ 2drop ] if ;
 
 : align-left ( button -- button )
     { 0 1/2 } >>align ; inline
 
 : roll-button-theme ( button -- button )
     f black <solid> dup f <button-paint> >>boundary
+    f f pressed-gradient f <button-paint> >>interior
     align-left ; inline
 
 : <roll-button> ( label quot -- button )
@@ -103,17 +103,34 @@ repeat-button H{
     #! the mouse is held down.
     repeat-button new-button bevel-button-theme ;
 
-TUPLE: checkmark-paint color ;
+TUPLE: checkmark-paint < caching-pen color last-vertices ;
 
-C: <checkmark-paint> checkmark-paint
+: <checkmark-paint> ( color -- paint )
+    checkmark-paint new swap >>color ;
+
+<PRIVATE
+
+: checkmark-points ( dim -- points )
+    {
+        [ { 0 0 } v* { 0.5 0.5 } v+ ]
+        [ { 1 1 } v* { 0.5 0.5 } v+ ]
+        [ { 1 0 } v* { -0.3 0.5 } v+ ]
+        [ { 0 1 } v* { -0.3 0.5 } v+ ]
+    } cleave 4array ;
+
+: checkmark-vertices ( dim -- vertices )
+    checkmark-points concat >float-array ;
+
+PRIVATE>
+
+M: checkmark-paint recompute-pen
+    swap dim>> checkmark-vertices >>last-vertices drop ;
 
 M: checkmark-paint draw-interior
-    color>> set-color
-    origin get [
-        rect-dim
-        { 0 0 } over gl-line
-        dup { 0 1 } v* swap { 1 0 } v* gl-line
-    ] with-translation ;
+    [ compute-pen ]
+    [ color>> gl-color ]
+    [ last-vertices>> gl-vertex-pointer ] tri
+    GL_LINES 0 4 glDrawArrays ;
 
 : checkmark-theme ( gadget -- gadget )
     f
@@ -148,30 +165,47 @@ TUPLE: checkbox < button ;
 M: checkbox model-changed
     swap value>> >>selected? relayout-1 ;
 
-TUPLE: radio-paint color ;
+TUPLE: radio-paint < caching-pen color interior-vertices boundary-vertices ;
 
-C: <radio-paint> radio-paint
+: <radio-paint> ( color -- paint ) radio-paint new swap >>color ;
+
+<PRIVATE
+
+: circle-steps 8 ;
+
+PRIVATE>
+
+M: radio-paint recompute-pen
+    swap dim>>
+    [ { 4 4 } swap { 9 9 } v- circle-steps fill-circle-vertices >>interior-vertices ]
+    [ { 1 1 } swap { 3 3 } v- circle-steps circle-vertices >>boundary-vertices ] bi
+    drop ;
+
+<PRIVATE
+
+: (radio-paint) ( gadget paint -- )
+    [ compute-pen ] [ color>> gl-color ] bi ;
+
+PRIVATE>
 
 M: radio-paint draw-interior
-    color>> set-color
-    origin get { 4 4 } v+ swap rect-dim { 8 8 } v- 12 gl-fill-circle ;
+    [ (radio-paint) ] [ interior-vertices>> gl-vertex-pointer ] bi
+    GL_POLYGON 0 circle-steps glDrawArrays ;
 
 M: radio-paint draw-boundary
-    color>> set-color
-    origin get { 1 1 } v+ swap rect-dim { 2 2 } v- 12 gl-circle ;
+    [ (radio-paint) ] [ boundary-vertices>> gl-vertex-pointer ] bi
+    GL_LINE_STRIP 0 circle-steps 1+ glDrawArrays ;
 
-: radio-knob-theme ( gadget -- gadget )
-    f
-    f
-    black <radio-paint>
-    black <radio-paint>
-    <button-paint> >>interior
-    black <radio-paint> >>boundary ;
+:: radio-knob-theme ( gadget -- gadget )
+    [let | radio-paint [ black <radio-paint> ] |
+        gadget
+        f f radio-paint radio-paint <button-paint> >>interior
+        radio-paint >>boundary
+        { 16 16 } >>dim
+    ] ;
 
 : <radio-knob> ( -- gadget )
-    <gadget>
-    radio-knob-theme
-    { 16 16 } >>dim ;
+    <gadget> radio-knob-theme ;
 
 TUPLE: radio-control < button value ;
 
@@ -187,9 +221,8 @@ M: radio-control model-changed
     over value>> = >>selected?
     relayout-1 ;
 
-: <radio-controls> ( parent model assoc quot -- parent )
-    #! quot has stack effect ( value model label -- )
-    swapd [ swapd call add-gadget ] 2curry assoc-each ; inline
+: <radio-controls> ( assoc model parent quot: ( value model label -- ) -- parent )
+    '[ _ swap _ call add-gadget ] assoc-each ; inline
 
 : radio-button-theme ( gadget -- gadget )
     { 5 5 } >>gap
@@ -200,8 +233,7 @@ M: radio-control model-changed
 
 : <radio-buttons> ( model assoc -- gadget )
     <filled-pile>
-        -rot
-        [ <radio-button> ] <radio-controls>
+        spin [ <radio-button> ] <radio-controls>
         { 5 5 } >>gap ;
 
 : <toggle-button> ( value model label -- gadget )
@@ -209,20 +241,19 @@ M: radio-control model-changed
 
 : <toggle-buttons> ( model assoc -- gadget )
     <shelf>
-        -rot
-        [ <toggle-button> ] <radio-controls> ;
+        spin [ <toggle-button> ] <radio-controls> ;
 
 : command-button-quot ( target command -- quot )
-    [ invoke-command drop ] 2curry ;
+    '[ _ _ invoke-command drop ] ;
 
 : <command-button> ( target gesture command -- button )
-    [ command-string ] keep
-    swapd
-    command-button-quot
-    <bevel-button> ;
+    [ command-string swap ] keep command-button-quot <bevel-button> ;
 
 : <toolbar> ( target -- toolbar )
     <shelf>
         swap
         "toolbar" over class command-map commands>> swap
-        [ -rot <command-button> add-gadget ] curry assoc-each ;
+        '[ [ _ ] 2dip <command-button> add-gadget ] assoc-each ;
+
+: add-toolbar ( track -- track )
+    dup <toolbar> f track-add ;

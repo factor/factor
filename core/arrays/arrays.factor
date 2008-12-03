@@ -6,8 +6,8 @@ IN: arrays
 
 M: array clone (clone) ;
 M: array length length>> ;
-M: array nth-unsafe >r >fixnum r> array-nth ;
-M: array set-nth-unsafe >r >fixnum r> set-array-nth ;
+M: array nth-unsafe [ >fixnum ] dip array-nth ;
+M: array set-nth-unsafe [ >fixnum ] dip set-array-nth ;
 M: array resize resize-array ;
 
 : >array ( seq -- array ) { } clone-like ;

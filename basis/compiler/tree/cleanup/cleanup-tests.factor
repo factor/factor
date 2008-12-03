@@ -5,7 +5,7 @@ strings sbufs sequences.private slots.private combinators
 definitions system layouts vectors math.partial-dispatch
 math.order math.functions accessors hashtables classes assocs
 io.encodings.utf8 io.encodings.ascii io.encodings fry slots
-sorting.private combinators.short-circuit
+sorting.private combinators.short-circuit grouping prettyprint
 compiler.tree
 compiler.tree.combinators
 compiler.tree.cleanup
@@ -71,7 +71,7 @@ M: object xyz ;
     2over fixnum>= [
         3drop
     ] [
-        [ swap >r call 1 fixnum+fast r> ] keep (fx-repeat)
+        [ swap [ call 1 fixnum+fast ] dip ] keep (fx-repeat)
     ] if ; inline recursive
 
 : fx-repeat ( n quot -- )
@@ -87,10 +87,10 @@ M: object xyz ;
     2over dup xyz drop >= [
         3drop
     ] [
-        [ swap >r call 1+ r> ] keep (i-repeat)
+        [ swap [ call 1+ ] dip ] keep (i-repeat)
     ] if ; inline recursive
 
-: i-repeat >r { integer } declare r> 0 -rot (i-repeat) ; inline
+: i-repeat [ { integer } declare ] dip 0 -rot (i-repeat) ; inline
 
 [ t ] [
     [ [ dup xyz drop ] i-repeat ] \ xyz inlined?
@@ -194,7 +194,7 @@ M: fixnum annotate-entry-test-1 drop ;
     2dup >= [
         2drop
     ] [
-        >r dup annotate-entry-test-1 1+ r> (annotate-entry-test-2)
+        [ dup annotate-entry-test-1 1+ ] dip (annotate-entry-test-2)
     ] if ; inline recursive
 
 : annotate-entry-test-2 0 -rot (annotate-entry-test-2) ; inline
@@ -448,7 +448,7 @@ cell-bits 32 = [
 ] unit-test
 
 [ ] [
-    [ [ >r "A" throw r> ] [ "B" throw ] if ]
+    [ [ [ "A" throw ] dip ] [ "B" throw ] if ]
     cleaned-up-tree drop
 ] unit-test
 
@@ -463,7 +463,7 @@ cell-bits 32 = [
 : buffalo-wings ( i seq -- )
     2dup < [
         2dup chicken-fingers
-        >r 1+ r> buffalo-wings
+        [ 1+ ] dip buffalo-wings
     ] [
         2drop
     ] if ; inline recursive
@@ -482,7 +482,7 @@ cell-bits 32 = [
 : ribs ( i seq -- )
     2dup < [
         steak
-        >r 1+ r> ribs
+        [ 1+ ] dip ribs
     ] [
         2drop
     ] if ; inline recursive
@@ -499,4 +499,14 @@ cell-bits 32 = [
 [ t ] [
     [ { array-capacity } declare 1 fixnum+ ] cleaned-up-tree
     [ { [ #call? ] [ node-input-infos second literal>> 1 = ] } 1&& ] contains?
+] unit-test
+
+[ ] [
+    [ { null } declare [ 1 ] [ 2 ] if ]
+    build-tree normalize propagate cleanup check-nodes
+] unit-test
+
+[ t ] [
+    [ { array } declare 2 <groups> [ . . ] assoc-each ]
+    \ nth-unsafe inlined?
 ] unit-test

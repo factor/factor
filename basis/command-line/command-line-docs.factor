@@ -1,13 +1,17 @@
-USING: help.markup help.syntax parser vocabs.loader strings ;
+USING: help.markup help.syntax parser vocabs.loader strings
+command-line.private ;
 IN: command-line
 
 HELP: run-bootstrap-init
-{ $description "Runs the " { $snippet ".factor-boot-rc" } " file in the user's home directory unless the " { $snippet "-no-user-init" } " command line switch was given." } ;
+{ $description "Runs the bootstrap initialization file in the user's home directory, unless the " { $snippet "-no-user-init" } " command line switch was given. This file is named " { $snippet ".factor-boot-rc" } " on Unix and " { $snippet "factor-boot-rc" } " on Windows." } ;
 
 HELP: run-user-init
-{ $description "Runs the " { $snippet ".factor-rc" } " file in the user's home directory unless the " { $snippet "-no-user-init" } " command line switch was given." } ;
+{ $description "Runs the startup initialization file in the user's home directory, unless the " { $snippet "-no-user-init" } " command line switch was given. This file is named " { $snippet ".factor-rc" } " on Unix and " { $snippet "factor-rc" } " on Windows." } ;
 
-HELP: cli-param
+HELP: load-vocab-roots
+{ $description "Loads the newline-separated list of additional vocabulary roots from the file named " { $snippet ".factor-roots" } " on Unix and " { $snippet "factor-roots" } " on Windows." } ;
+
+HELP: param
 { $values { "param" string } }
 { $description "Process a command-line switch."
 $nl
@@ -17,9 +21,12 @@ $nl
 $nl
 "Otherwise, sets the global variable named by the parameter to " { $link t } "." } ;
 
-HELP: cli-args
+HELP: (command-line)
 { $values { "args" "a sequence of strings" } }
 { $description "Outputs the command line parameters which were passed to the Factor VM on startup." } ;
+
+HELP: command-line
+{ $var-description "The command line parameters which follow the name of the script on the command line." } ;
 
 HELP: main-vocab-hook
 { $var-description "Global variable holding a quotation which outputs a vocabulary name. UI backends set this so that the UI can automatically start if the prerequisites are met (for example, " { $snippet "$DISPLAY" } " being set on X11)." } ;
@@ -34,9 +41,6 @@ HELP: default-cli-args
 HELP: ignore-cli-args?
 { $values { "?" "a boolean" } }
 { $description "On Mac OS X, source files to run are supplied by the Cocoa API, so to avoid running them twice the startup code has to call this word." } ;
-
-HELP: parse-command-line
-{ $description "Called on startup to process command line arguments. This sets global variables with " { $link cli-param } ", runs source files, and evaluates the string given by the " { $snippet "-e" } " switch, if there is one." } ;
 
 ARTICLE: "runtime-cli-args" "Command line switches for the VM"
 "A handful of command line switches are processed by the VM and not the library. They control low-level features."
@@ -57,16 +61,19 @@ ARTICLE: "bootstrap-cli-args" "Command line switches for bootstrap"
 "A number of command line switches can be passed to a bootstrap image to modify the behavior of the resulting image:"
 { $table
     { { $snippet "-output-image=" { $emphasis "image" } } { "Save the result to " { $snippet "image" } ". The default is " { $snippet "factor.image" } "." } }
-    { { $snippet "-no-user-init" } { "Inhibits the running of the " { $snippet ".factor-boot-rc" } " file in the user's home directory." } }
+    { { $snippet "-no-user-init" } { "Inhibits the running of user initialization files on startup. See " { $link "rc-files" } "." } }
     { { $snippet "-include=" { $emphasis "components..." } } "A list of components to include (see below)." }
     { { $snippet "-exclude=" { $emphasis "components..." } } "A list of components to exclude." }
     { { $snippet "-ui-backend=" { $emphasis "backend" } } { "One of " { $snippet "x11" } ", " { $snippet "windows" } ", or " { $snippet "cocoa" } ". The default is platform-specific." } }
 }
 "Bootstrap can load various optional components:"
 { $table
+    { { $snippet "math" } "Rational and complex number support." }
+    { { $snippet "threads" } "Thread support." }
     { { $snippet "compiler" } "The compiler." }
     { { $snippet "tools" } "Terminal-based developer tools." }
     { { $snippet "help" } "The help system." }
+    { { $snippet "help.handbook" } "The help handbook." }
     { { $snippet "ui" } "The graphical user interface." }
     { { $snippet "ui.tools" } "Graphical developer tools." }
     { { $snippet "io" } "Non-blocking I/O and networking." }
@@ -74,9 +81,9 @@ ARTICLE: "bootstrap-cli-args" "Command line switches for bootstrap"
 "By default, all optional components are loaded. To load all optional components except for a given list, use the " { $snippet "-exclude=" } " switch; to only load specified optional components, use the " { $snippet "-include=" } "."
 $nl
 "For example, to build an image with the compiler but no other components, you could do:"
-{ $code "./factor -i=boot.ppc.image -include=compiler" }
+{ $code "./factor -i=boot.macosx-ppc.image -include=compiler" }
 "To build an image with everything except for the user interface and graphical tools,"
-{ $code "./factor -i=boot.ppc.image -exclude=\"ui ui.tools\"" }
+{ $code "./factor -i=boot.macosx-ppc.image -exclude=\"ui ui.tools\"" }
 "To generate a bootstrap image in the first place, see " { $link "bootstrap.image" } "." ;
 
 ARTICLE: "standard-cli-args" "Command line switches for general usage"
@@ -84,20 +91,60 @@ ARTICLE: "standard-cli-args" "Command line switches for general usage"
 { $table
     { { $snippet "-e=" { $emphasis "code" } } { "This specifies a code snippet to evaluate. If you want Factor to exit immediately after, also specify " { $snippet "-run=none" } "." } }
     { { $snippet "-run=" { $emphasis "vocab" } } { { $snippet { $emphasis "vocab" } } " is the name of a vocabulary with a " { $link POSTPONE: MAIN: } " hook to run on startup, for example " { $vocab-link "listener" } ", " { $vocab-link "ui" } " or " { $vocab-link "none" } "." } }
-    { { $snippet "-no-user-init" } { "Inhibits the running of the " { $snippet ".factor-rc" } " file in the user's home directory on startup." } }
+    { { $snippet "-no-user-init" } { "Inhibits the running of user initialization files on startup. See " { $link "rc-files" } "." } }
     { { $snippet "-quiet" } { "If set, " { $link run-file } " and " { $link require } " will not print load messages." } }
-    { { $snippet "-script" } { "Equivalent to " { $snippet "-quiet -run=none" } "." $nl "On Unix systems, Factor can be used for scripting - just create an executable text file whose first line is:" { $code "#! /usr/local/bin/factor -script" } "The space after " { $snippet "#!" } " is necessary because of Factor syntax." } }
 } ;
 
-ARTICLE: "rc-files" "Running code on startup"
-"Unless the " { $snippet "-no-user-init" } " command line switch is specified, The startup routine runs the " { $snippet ".factor-rc" } " file in the user's home directory, if it exists. This file can contain initialization and customization for your development environment."
+ARTICLE: "factor-boot-rc" "Bootstrap initialization file"
+"The botstrap initialization file is named " { $snippet "factor-boot-rc" } " on Windows and " { $snippet ".factor-boot-rc" } " on Unix. This file can contain " { $link require } " calls for vocabularies you use frequently, and other such long-running tasks that you do not want to perform every time Factor starts."
 $nl
-"The " { $snippet ".factor-rc" } " and " { $snippet ".factor-boot-rc" } " files can be run explicitly:"
-{ $subsection run-user-init }
-{ $subsection run-bootstrap-init } ;
+"A word to run this file from an existing Factor session:"
+{ $subsection run-bootstrap-init }
+"For example, if you changed " { $snippet ".factor-boot-rc" } " and do not want to bootstrap again, you can just invoke " { $link run-bootstrap-init } " in the listener." ;
 
-ARTICLE: "cli" "Command line usage"
-"Zero or more command line arguments may be passed to the Factor runtime. Command line arguments starting with a dash (" { $snippet "-" } ") is interpreted as switches. All other arguments are taken to be file names to be run by " { $link run-file } "."
+ARTICLE: "factor-rc" "Startup initialization file"
+"The startup initialization file is named " { $snippet "factor-rc" } " on Windows and " { $snippet ".factor-rc" } " on Unix. If it exists, it is run every time Factor starts."
+$nl
+"A word to run this file from an existing Factor session:"
+{ $subsection run-user-init } ;
+
+ARTICLE: "factor-roots" "Additional vocabulary roots file"
+"The vocabulary roots file is named " { $snippet "factor-roots" } " on Windows and " { $snippet ".factor-roots" } " on Unix. If it exists, it is loaded every time Factor starts. It contains a newline-separated list of " { $link "vocabs.roots" } "."
+$nl
+"A word to run this file from an existing Factor session:"
+{ $subsection load-vocab-roots } ;
+
+ARTICLE: "rc-files" "Running code on startup"
+"Factor looks for three optional files in your home directory."
+{ $subsection "factor-boot-rc" }
+{ $subsection "factor-rc" }
+{ $subsection "factor-roots" }
+"The " { $snippet "-no-user-init" } " command line switch will inhibit loading running of these files."
+$nl
+"If you are unsure where the files should be located, evaluate the following code:"
+{ $code
+    "USE: command-line"
+    "\"factor-rc\" rc-path print"
+    "\"factor-boot-rc\" rc-path print"
+}
+"Here is an example " { $snippet ".factor-boot-rc" } " which sets up GVIM editor integration, adds an additional vocabulary root (see " { $link "vocabs.roots" } "), and increases the font size in the UI by setting the DPI (dots-per-inch) variable:"
+{ $code
+    "USING: editors.gvim vocabs.loader ui.freetype namespaces sequences ;"
+    "\"/opt/local/bin\" \\ gvim-path set-global"
+    "\"/home/jane/src/\" vocab-roots get push"
+    "100 dpi set-global"
+} ;
+
+ARTICLE: "cli" "Command line arguments"
+"Factor command line usage:"
+{ $code "factor [system switches...] [script args...]" }
+"Zero or more system switches can be passed in, followed by an optional script file name. If the script file is specified, it will be run on startup, any arguments after the script file are stored in a variable, with no further processing by Factor itself:"
+{ $subsection command-line }
+"Instead of running a script, it is also possible to run a vocabulary; this invokes the vocabulary's " { $link POSTPONE: MAIN: } " word:"
+{ $code "factor [system switches...] -run=<vocab name>" }
+"If no script file or " { $snippet "-run=" } " switch is specified, Factor will start " { $link "listener" } " or " { $link "ui-tools" } ", depending on the operating system."
+$nl
+"As stated above, arguments in the first part of the command line, before the optional script name, are interpreted by to the Factor system. These arguments all start with a dash (" { $snippet "-" } ")."
 $nl
 "Switches can take one of the following three forms:"
 { $list
@@ -108,9 +155,9 @@ $nl
 { $subsection "runtime-cli-args" }
 { $subsection "bootstrap-cli-args" }
 { $subsection "standard-cli-args" }
-"The list of command line arguments can be obtained and inspected directly:"
-{ $subsection cli-args }
-"There is a way to override the default vocabulary to run on startup:"
+"The raw list of command line arguments can also be obtained and inspected directly:"
+{ $subsection (command-line) }
+"There is a way to override the default vocabulary to run on startup, if no script name or " { $snippet "-run" } " switch is specified:"
 { $subsection main-vocab-hook } ;
 
 ABOUT: "cli"

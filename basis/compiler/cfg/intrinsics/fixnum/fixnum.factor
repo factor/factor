@@ -3,9 +3,21 @@
 USING: sequences accessors layouts kernel math namespaces
 combinators fry locals
 compiler.tree.propagation.info
-compiler.cfg.stacks compiler.cfg.hats compiler.cfg.instructions
-compiler.cfg.utilities ;
+compiler.cfg.hats
+compiler.cfg.stacks
+compiler.cfg.iterator
+compiler.cfg.instructions
+compiler.cfg.utilities
+compiler.cfg.registers ;
 IN: compiler.cfg.intrinsics.fixnum
+
+: emit-both-fixnums? ( -- )
+    D 0 ^^peek
+    D 1 ^^peek
+    ^^or
+    tag-mask get ^^and-imm
+    0 cc= ^^compare-imm
+    ds-push ;
 
 : (emit-fixnum-imm-op) ( infos insn -- dst )
     ds-drop
@@ -64,3 +76,16 @@ IN: compiler.cfg.intrinsics.fixnum
 
 : emit-fixnum>bignum ( -- )
     ds-pop ^^untag-fixnum ^^integer>bignum ds-push ;
+
+: emit-fixnum-overflow-op ( quot quot-tail -- next )
+    [ 2inputs 1 ##inc-d ] 2dip
+    tail-call? [
+        ##epilogue
+        nip call
+        stop-iterating
+    ] [
+        drop call
+        ##branch
+        begin-basic-block
+        iterate-next
+    ] if ; inline

@@ -17,23 +17,17 @@ ERROR: no-vocab vocab ;
 
 <PRIVATE
 
-: root? ( string -- ? ) vocab-roots get member?  ;
+: root? ( string -- ? ) vocab-roots get member? ;
 
-: length-changes? ( seq quot -- ? )
-    dupd call [ length ] bi@ = not ; inline
+: contains-dot? ( string -- ? ) ".." swap subseq? ;
+
+: contains-separator? ( string -- ? ) [ path-separator? ] contains? ;
 
 : check-vocab-name ( string -- string )
-    dup [ [ CHAR: . = ] trim ] length-changes?
-    [ vocab-name-contains-dot ] when
-
-    ".." over subseq? [ vocab-name-contains-dot ] when
-
-    dup [ path-separator? ] contains?
-    [ vocab-name-contains-separator ] when ;
+    dup contains-dot? [ vocab-name-contains-dot ] when
+    dup contains-separator? [ vocab-name-contains-separator ] when ;
 
 : check-root ( string -- string )
-    check-vocab-name
-    dup "resource:" head? [ "resource:" prepend ] unless
     dup root? [ not-a-vocab-root ] unless ;
 
 : directory-exists ( path -- )
@@ -148,7 +142,7 @@ ERROR: no-vocab vocab ;
             "{ $values" print
             [ "    " write ($values.) ]
             [ [ nl "    " write ($values.) ] unless-empty ] bi*
-            " }" write nl
+            nl "}" print
         ] if
     ] when* ;
 
@@ -263,3 +257,12 @@ SYMBOL: examples-flag
         [ example ] times
         "}" print
     ] with-variable ;
+
+: scaffold-rc ( path -- )
+    [ touch-file ] [ "Click to edit: " write <pathname> . ] bi ;
+
+: scaffold-factor-boot-rc ( -- )
+    home ".factor-boot-rc" append-path scaffold-rc ;
+
+: scaffold-factor-rc ( -- )
+    home ".factor-rc" append-path scaffold-rc ;

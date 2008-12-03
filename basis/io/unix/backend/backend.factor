@@ -5,7 +5,7 @@ math io.ports sequences strings sbufs threads unix
 vectors io.buffers io.backend io.encodings math.parser
 continuations system libc qualified namespaces make io.timeouts
 io.encodings.utf8 destructors accessors summary combinators
-locals unix.time ;
+locals unix.time fry ;
 QUALIFIED: io
 IN: io.unix.backend
 
@@ -88,19 +88,16 @@ M: io-timeout summary drop "I/O operation timed out" ;
 
 : wait-for-fd ( handle event -- )
     dup +retry+ eq? [ 2drop ] [
-        [
-            >r
-            swap handle-fd
-            mx get-global
-            r> {
+        '[
+            swap handle-fd mx get-global _ {
                 { +input+ [ add-input-callback ] }
                 { +output+ [ add-output-callback ] }
             } case
-        ] curry "I/O" suspend nip [ io-timeout ] when
+        ] "I/O" suspend nip [ io-timeout ] when
     ] if ;
 
 : wait-for-port ( port event -- )
-    [ >r handle>> r> wait-for-fd ] curry with-timeout ;
+    '[ handle>> _ wait-for-fd ] with-timeout ;
 
 ! Some general stuff
 : file-mode OCT: 0666 ;

@@ -52,7 +52,7 @@ IN: io.windows.nt.launcher
     CreateFile dup invalid-handle? <win32-file> &dispose handle>> ;
 
 : redirect-append ( path access-mode create-mode -- handle )
-    >r >r path>> r> r>
+    [ path>> ] 2dip
     drop OPEN_ALWAYS
     redirect-file
     dup 0 FILE_END set-file-pointer ;
@@ -61,7 +61,7 @@ IN: io.windows.nt.launcher
     2drop handle>> duplicate-handle ;
 
 : redirect-stream ( stream access-mode create-mode -- handle )
-    >r >r underlying-handle handle>> r> r> redirect-handle ;
+    [ underlying-handle handle>> ] 2dip redirect-handle ;
 
 : redirect ( obj access-mode create-mode -- handle )
     {

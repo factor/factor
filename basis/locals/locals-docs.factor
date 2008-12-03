@@ -1,5 +1,5 @@
 USING: help.syntax help.markup kernel macros prettyprint
-memoize ;
+memoize combinators arrays generalizations ;
 IN: locals
 
 HELP: [|
@@ -84,6 +84,39 @@ HELP: MEMO::
 
 { POSTPONE: MEMO: POSTPONE: MEMO:: } related-words
 
+ARTICLE: "locals-literals" "Locals in array and hashtable literals"
+"Certain data type literals are permitted to contain free variables. Any such literals are written into code which constructs an instance of the type with the free variable values spliced in. Conceptually, this is similar to the transformation applied to quotations containing free variables."
+$nl
+"The data types which receive this special handling are the following:"
+{ $list
+    { $link "arrays" }
+    { $link "hashtables" }
+    { $link "vectors" }
+    { $link "tuples" }
+}
+"This feature changes the semantics of literal object identity. An ordinary word containing a literal pushes the same literal on the stack every time it is invoked:"
+{ $example
+    "IN: scratchpad"
+    "TUPLE: person first-name last-name ;"
+    ": ordinary-word-test ( -- tuple )"
+    "    T{ person { first-name \"Alan\" } { last-name \"Kay\" } } ;"
+    "ordinary-word-test ordinary-word-test eq? ."
+    "t"
+}
+"In a word with locals, literals expand into code which constructs the literal, and so every invocation pushes a new object:"
+{ $example
+    "IN: scratchpad"
+    "TUPLE: person first-name last-name ;"
+    ":: ordinary-word-test ( -- tuple )"
+    "    T{ person { first-name \"Alan\" } { last-name \"Kay\" } } ;"
+    "ordinary-word-test ordinary-word-test eq? ."
+    "f"
+}
+"One exception to the above rule is that array instances containing no free variables do retain identity. This allows macros such as " { $link cond } " to recognize that the array is constant and expand at compile-time."
+$nl
+"For example, here is an implementation of the " { $link 3array } " word which uses this feature:"
+{ $code ":: 3array ( x y z -- array ) { x y z } ;" } ;
+
 ARTICLE: "locals-mutable" "Mutable locals"
 "In the list of bindings supplied to " { $link POSTPONE: :: } ", " { $link POSTPONE: [let } ", " { $link POSTPONE: [let* } " or " { $link POSTPONE: [| } ", a mutable binding may be introduced by suffixing its named with " { $snippet "!" } ". Mutable bindings are read by giving their name as usual; the suffix is not part of the binding's name. To write to a mutable binding, use the binding's name with the " { $snippet "!" } " suffix."
 $nl
@@ -98,10 +131,40 @@ $nl
 $nl
 "Unlike some languages such as Python and Java, writing to mutable locals in outer scopes is fully supported and has the expected semantics." ;
 
-ARTICLE: "locals-limitations" "Limitations of locals"
-"The first limitation is that the " { $link >r } " and " { $link r> } " words may not be used together with locals. Instead, use the " { $link dip } " combinator."
+ARTICLE: "locals-fry" "Locals and fry"
+"Locals integrate with " { $link "fry" } " so that mixing locals with fried quotations gives intuitive results."
 $nl
-"Another limitation concerns combinators implemented as macros. Locals can only be used with such combinators if the input array immediately precedes the combinator call. For example, the following will work:"
+"Recall that the following two code snippets are equivalent:"
+{ $code "'[ sq _ + ]" }
+{ $code "[ [ sq ] dip + ] curry" }
+"The semantics of " { $link dip } " and " { $link curry } " are such that the first example behaves as if the top of the stack as ``inserted'' in the ``hole'' in the quotation's second element."
+$nl
+"Conceptually, " { $link curry } " is defined so that the following two code snippets are equivalent:"
+{ $code "3 [ - ] curry" }
+{ $code "[ 3 - ]" }
+"With lambdas, " { $link curry } " behaves differently. Rather than prepending an element, it fills in named parameters from right to left. The following two snippets are equivalent:"
+{ $code "3 [| a b | a b - ] curry" }
+{ $code "[| a | a 3 - ]" }
+"Because of this, the behavior of fry changes when applied to a lambda, to ensure that conceptually, fry behaves as with quotations. So the following snippets are no longer equivalent:"
+{ $code "'[ [| a | _ a - ] ]" }
+{ $code "'[ [| a | a - ] curry ] call" }
+"Instead, the first line above expands into something like the following:"
+{ $code "[ [ swap [| a | a - ] ] curry call ]" }
+"This ensures that the fried value appears ``underneath'' the local variable " { $snippet "a" } " when the quotation calls."
+$nl
+"The precise behavior is the following. When frying a lambda, a stack shuffle (" { $link mnswap } ") is prepended to the lambda so that the " { $snippet "m" } " curried values, which start off at the top of the stack, are transposed with the " { $snippet "n" } " inputs to the lambda." ;
+
+ARTICLE: "locals-limitations" "Limitations of locals"
+"There are two main limitations of the current locals implementation, and both concern macros."
+{ $heading "Macro expansions with free variables" }
+"The expansion of a macro cannot reference local variables bound in the outer scope. For example, the following macro is invalid:"
+{ $code "MACRO:: twice ( quot -- ) [ quot call quot call ] ;" }
+"The following is fine, though:"
+{ $code "MACRO:: twice ( quot -- ) quot quot '[ @ @ ] ;" }
+{ $heading "Static stack effect inference and macros" }
+"Recall that a macro will only expand at compile-time, and the word containing it will only get a static stack effect, if all inputs to the macro are literal. When locals are used, there is an additional restriction; the literals must immediately precede the macro call, lexically."
+$nl
+"For example, all of the following three examples are equivalent semantically, but only the first will have a static stack effect and compile with the optimizing compiler:"
 { $code
     ":: good-cond-usage ( a -- ... )"
     "    {"
@@ -110,7 +173,7 @@ $nl
     "        { [ a 0 = ] [ ... ] }"
     "    } cond ;"
 }
-"But not the following:"
+"The following two will not, and will run slower as a result:"
 { $code
     ": my-cond ( alist -- ) cond ; inline"
     ""
@@ -120,6 +183,14 @@ $nl
     "        { [ a 0 > ] [ ... ] }"
     "        { [ a 0 = ] [ ... ] }"
     "    } my-cond ;"
+}
+{ $code
+    ":: bad-cond-usage ( a -- ... )"
+    "    {"
+    "        { [ a 0 < ] [ ... ] }"
+    "        { [ a 0 > ] [ ... ] }"
+    "        { [ a 0 = ] [ ... ] }"
+    "    } swap swap cond ;"
 }
 "The reason is that locals are rewritten into stack code at parse time, whereas macro expansion is performed later during compile time. To circumvent this problem, the " { $vocab-link "macros.expander" } " vocabulary is used to rewrite simple macro usages prior to local transformation, however "{ $vocab-link "macros.expander" } " does not deal with more complicated cases where the literal inputs to the macro do not immediately precede the macro call in the source." ;
 
@@ -139,7 +210,9 @@ $nl
 "Lambda abstractions:"
 { $subsection POSTPONE: [| }
 "Additional topics:"
+{ $subsection "locals-literals" }
 { $subsection "locals-mutable" }
+{ $subsection "locals-fry" }
 { $subsection "locals-limitations" }
 "Locals complement dynamically scoped variables implemented in the " { $vocab-link "namespaces" } " vocabulary." ;
 

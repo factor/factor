@@ -25,7 +25,7 @@ ERROR: missing-bom ;
 : quad-be ( stream byte -- stream char )
     double-be over stream-read1 [
         dup -2 shift BIN: 110111 number= [
-            >r 2 shift r> BIN: 11 bitand bitor
+            [ 2 shift ] dip BIN: 11 bitand bitor
             over stream-read1 swap append-nums HEX: 10000 +
         ] [ 2drop dup stream-read1 drop replacement-char ] if
     ] when* ;

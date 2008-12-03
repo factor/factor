@@ -10,7 +10,7 @@ IN: io.windows.files
 
 : open-file ( path access-mode create-mode flags -- handle )
     [
-        >r >r share-mode default-security-attributes r> r>
+        [ share-mode default-security-attributes ] 2dip
         CreateFile-flags f CreateFile opened-file
     ] with-destructors ;
 
@@ -46,7 +46,7 @@ IN: io.windows.files
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
 : set-file-pointer ( handle length method -- )
-    >r dupd d>w/w <uint> r> SetFilePointer
+    [ dupd d>w/w <uint> ] dip SetFilePointer
     INVALID_SET_FILE_POINTER = [
         CloseHandle "SetFilePointer failed" throw
     ] when drop ;
@@ -114,11 +114,6 @@ M: windows delete-directory ( path -- )
     normalize-path
     RemoveDirectory win32-error=0/f ;
 
-M: windows >directory-entry ( byte-array -- directory-entry )
-    [ WIN32_FIND_DATA-cFileName utf16n alien>string ]
-    [ WIN32_FIND_DATA-dwFileAttributes ]
-    bi directory-entry boa ;
-
 : find-first-file ( path -- WIN32_FIND_DATA handle )
     "WIN32_FIND_DATA" <c-object> tuck
     FindFirstFile
@@ -149,35 +144,48 @@ SYMBOLS: +read-only+ +hidden+ +system+
 +sparse-file+ +reparse-point+ +compressed+ +offline+
 +not-content-indexed+ +encrypted+ ;
 
-: win32-file-attribute ( n attr symbol -- n )
-    >r dupd mask? r> swap [ , ] [ drop ] if ;
+TUPLE: windows-file-info < file-info attributes ;
+
+: win32-file-attribute ( n attr symbol -- )
+    rot mask? [ , ] [ drop ] if ;
 
 : win32-file-attributes ( n -- seq )
     [
-        FILE_ATTRIBUTE_READONLY +read-only+ win32-file-attribute
-        FILE_ATTRIBUTE_HIDDEN +hidden+ win32-file-attribute
-        FILE_ATTRIBUTE_SYSTEM +system+ win32-file-attribute
-        FILE_ATTRIBUTE_DIRECTORY +directory+ win32-file-attribute
-        FILE_ATTRIBUTE_ARCHIVE +archive+ win32-file-attribute
-        FILE_ATTRIBUTE_DEVICE +device+ win32-file-attribute
-        FILE_ATTRIBUTE_NORMAL +normal+ win32-file-attribute
-        FILE_ATTRIBUTE_TEMPORARY +temporary+ win32-file-attribute
-        FILE_ATTRIBUTE_SPARSE_FILE +sparse-file+ win32-file-attribute
-        FILE_ATTRIBUTE_REPARSE_POINT +reparse-point+ win32-file-attribute
-        FILE_ATTRIBUTE_COMPRESSED +compressed+ win32-file-attribute
-        FILE_ATTRIBUTE_OFFLINE +offline+ win32-file-attribute
-        FILE_ATTRIBUTE_NOT_CONTENT_INDEXED +not-content-indexed+ win32-file-attribute
-        FILE_ATTRIBUTE_ENCRYPTED +encrypted+ win32-file-attribute
-        drop
+        {
+            [ +read-only+ FILE_ATTRIBUTE_READONLY win32-file-attribute ]
+            [ +hidden+ FILE_ATTRIBUTE_HIDDEN win32-file-attribute ]
+            [ +system+ FILE_ATTRIBUTE_SYSTEM win32-file-attribute ]
+            [ +directory+ FILE_ATTRIBUTE_DIRECTORY win32-file-attribute ]
+            [ +archive+ FILE_ATTRIBUTE_ARCHIVE win32-file-attribute ]
+            [ +device+ FILE_ATTRIBUTE_DEVICE win32-file-attribute ]
+            [ +normal+ FILE_ATTRIBUTE_NORMAL win32-file-attribute ]
+            [ +temporary+ FILE_ATTRIBUTE_TEMPORARY win32-file-attribute ]
+            [ +sparse-file+ FILE_ATTRIBUTE_SPARSE_FILE win32-file-attribute ]
+            [ +reparse-point+ FILE_ATTRIBUTE_REPARSE_POINT win32-file-attribute ]
+            [ +compressed+ FILE_ATTRIBUTE_COMPRESSED win32-file-attribute ]
+            [ +offline+ FILE_ATTRIBUTE_OFFLINE win32-file-attribute ]
+            [ +not-content-indexed+ FILE_ATTRIBUTE_NOT_CONTENT_INDEXED win32-file-attribute ]
+            [ +encrypted+ FILE_ATTRIBUTE_ENCRYPTED win32-file-attribute ]
+        } cleave
     ] { } make ;
 
 : win32-file-type ( n -- symbol )
     FILE_ATTRIBUTE_DIRECTORY mask? +directory+ +regular-file+ ? ;
 
+TUPLE: windows-directory-entry < directory-entry attributes ;
+
+M: windows >directory-entry ( byte-array -- directory-entry )
+    [ WIN32_FIND_DATA-cFileName utf16n alien>string ]
+    [ WIN32_FIND_DATA-dwFileAttributes win32-file-type ]
+    [ WIN32_FIND_DATA-dwFileAttributes win32-file-attributes ]
+    tri
+    dupd remove windows-directory-entry boa ;
+
 : WIN32_FIND_DATA>file-info ( WIN32_FIND_DATA -- file-info )
-    [ \ file-info new ] dip
+    [ \ windows-file-info new ] dip
     {
         [ WIN32_FIND_DATA-dwFileAttributes win32-file-type >>type ]
+        [ WIN32_FIND_DATA-dwFileAttributes win32-file-attributes >>attributes ]
         [
             [ WIN32_FIND_DATA-nFileSizeLow ]
             [ WIN32_FIND_DATA-nFileSizeHigh ] bi >64bit >>size
@@ -196,9 +204,10 @@ SYMBOLS: +read-only+ +hidden+ +system+
     ] keep ;
 
 : BY_HANDLE_FILE_INFORMATION>file-info ( HANDLE_FILE_INFORMATION -- file-info )
-    [ \ file-info new ] dip
+    [ \ windows-file-info new ] dip
     {
         [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-type >>type ]
+        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-attributes >>attributes ]
         [
             [ BY_HANDLE_FILE_INFORMATION-nFileSizeLow ]
             [ BY_HANDLE_FILE_INFORMATION-nFileSizeHigh ] bi >64bit >>size
@@ -248,9 +257,6 @@ M: winnt link-info ( path -- info )
 
 HOOK: root-directory os ( string -- string' )
 
-TUPLE: winnt-file-system-info < file-system-info
-total-bytes total-free-bytes ;
-
 : file-system-type ( normalized-path -- str )
     MAX_PATH 1+ <byte-array>
     MAX_PATH 1+
@@ -260,21 +266,37 @@ total-bytes total-free-bytes ;
     [ GetVolumeInformation win32-error=0/f ] 2keep drop
     utf16n alien>string ;
 
-: file-system-space ( normalized-path -- free-space total-bytes total-free-bytes )
+: file-system-space ( normalized-path -- available-space total-space free-space )
     "ULARGE_INTEGER" <c-object>
     "ULARGE_INTEGER" <c-object>
     "ULARGE_INTEGER" <c-object>
     [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep ;
 
+: calculate-file-system-info ( file-system-info -- file-system-info' )
+    {
+        [ dup [ total-space>> ] [ free-space>> ] bi - >>used-space drop ]
+        [ ]
+    } cleave ;
+
 M: winnt file-system-info ( path -- file-system-info )
     normalize-path root-directory
     dup [ file-system-type ] [ file-system-space ] bi
-    \ winnt-file-system-info new
-        swap *ulonglong >>total-free-bytes
-        swap *ulonglong >>total-bytes
+    \ file-system-info new
         swap *ulonglong >>free-space
+        swap *ulonglong >>total-space
+        swap *ulonglong >>available-space
         swap >>type
-        swap >>mount-point ;
+        swap >>mount-point
+    calculate-file-system-info ;
+
+: volume>paths ( string -- array )
+    16384 "ushort" <c-array> tuck dup length
+    0 <uint> dup [ GetVolumePathNamesForVolumeName 0 = ] dip swap [
+        win32-error-string throw
+    ] [
+        *uint "ushort" heap-size * head
+        utf16n alien>string CHAR: \0 split
+    ] if ;
 
 : find-first-volume ( -- string handle )
     MAX_PATH 1+ <byte-array> dup length
@@ -282,12 +304,16 @@ M: winnt file-system-info ( path -- file-system-info )
     FindFirstVolume dup win32-error=0/f
     [ utf16n alien>string ] dip ;
 
-: find-next-volume ( handle -- string )
+: find-next-volume ( handle -- string/f )
     MAX_PATH 1+ <byte-array> dup length
-    [ FindNextVolume win32-error=0/f ] 2keep drop
-    utf16n alien>string ;
+    over [ FindNextVolume ] dip swap 0 = [
+        GetLastError ERROR_NO_MORE_FILES =
+        [ drop f ] [ win32-error ] if
+    ] [
+        utf16n alien>string
+    ] if ;
 
-: mounted ( -- array )
+: find-volumes ( -- array )
     find-first-volume
     [
         '[
@@ -297,6 +323,13 @@ M: winnt file-system-info ( path -- file-system-info )
             swap prefix
         ]
     ] [ '[ _ FindVolumeClose win32-error=0/f ] ] bi [ ] cleanup ;
+
+M: winnt file-systems ( -- array )
+    find-volumes [ volume>paths ] map
+    concat [
+        [ file-system-info ]
+        [ drop \ file-system-info new swap >>mount-point ] recover
+    ] map ;
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
@@ -315,23 +348,23 @@ M: winnt file-system-info ( path -- file-system-info )
 : set-file-times ( path timestamp/f timestamp/f timestamp/f -- )
     #! timestamp order: creation access write
     [
-        >r >r >r
+        [
             normalize-path open-existing &dispose handle>>
-        r> r> r> (set-file-times)
+        ] 3dip (set-file-times)
     ] with-destructors ;
 
 : set-file-create-time ( path timestamp -- )
     f f set-file-times ;
 
 : set-file-access-time ( path timestamp -- )
-    >r f r> f set-file-times ;
+    [ f ] dip f set-file-times ;
 
 : set-file-write-time ( path timestamp -- )
-    >r f f r> set-file-times ;
+    [ f f ] dip set-file-times ;
 
 M: winnt touch-file ( path -- )
     [
         normalize-path
-        maybe-create-file >r &dispose r>
+        maybe-create-file [ &dispose ] dip
         [ drop ] [ handle>> f now dup (set-file-times) ] if
     ] with-destructors ;

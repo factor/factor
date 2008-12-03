@@ -1,14 +1,12 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-
-! Everybody's favorite non-commutative skew field, the
-! quaternions!
-
-! Quaternions are represented as pairs of complex numbers,
-! using the identity: (a+bi)+(c+di)j = a+bi+cj+dk.
-USING: arrays kernel math math.vectors math.functions
-arrays sequences ;
+USING: arrays kernel math math.functions math.vectors sequences ;
 IN: math.quaternions
+
+! Everybody's favorite non-commutative skew field, the quaternions!
+
+! Quaternions are represented as pairs of complex numbers, using the
+! identity: (a+bi)+(c+di)j = a+bi+cj+dk.
 
 <PRIVATE
 
@@ -16,47 +14,35 @@ IN: math.quaternions
 
 : 2q ( u v -- u' u'' v' v'' ) [ first2 ] bi@ ; inline
 
-: q*a ( u v -- a ) 2q swapd ** >r * r> - ; inline
+: q*a ( u v -- a ) 2q swapd ** [ * ] dip - ; inline
 
-: q*b ( u v -- b ) 2q >r ** swap r> * + ; inline
+: q*b ( u v -- b ) 2q [ ** swap ] dip * + ; inline
 
 PRIVATE>
 
 : q* ( u v -- u*v )
-    #! Multiply quaternions.
     [ q*a ] [ q*b ] 2bi 2array ;
 
 : qconjugate ( u -- u' )
-    #! Quaternion conjugate.
     first2 [ conjugate ] [ neg  ] bi* 2array ;
 
 : qrecip ( u -- 1/u )
-    #! Quaternion inverse.
     qconjugate dup norm-sq v/n ;
 
 : q/ ( u v -- u/v )
-    #! Divide quaternions.
     qrecip q* ;
 
 : q*n ( q n -- q )
-    #! Note: you will get the wrong result if you try to
-    #! multiply a quaternion by a complex number on the right
-    #! using v*n. Use this word instead. Note that v*n with a
-    #! quaternion and a real is okay.
     conjugate v*n ;
 
 : c>q ( c -- q )
-    #! Turn a complex number into a quaternion.
     0 2array ;
 
 : v>q ( v -- q )
-    #! Turn a 3-vector into a quaternion with real part 0.
-    first3 rect> >r 0 swap rect> r> 2array ;
+    first3 rect> [ 0 swap rect> ] dip 2array ;
 
 : q>v ( q -- v )
-    #! Get the vector part of a quaternion, discarding the real
-    #! part.
-    first2 >r imaginary-part r> >rect 3array ;
+    first2 [ imaginary-part ] dip >rect 3array ;
 
 ! Zero
 : q0 { 0 0 } ;
@@ -67,11 +53,14 @@ PRIVATE>
 : qj { 0 1 } ;
 : qk { 0 C{ 0 1 } } ;
 
-! Euler angles -- see
-! http://www.mathworks.com/access/helpdesk/help/toolbox/aeroblks/euleranglestoquaternions.html
+! Euler angles
+
+<PRIVATE
 
 : (euler) ( theta unit -- q )
-    >r -0.5 * dup cos c>q swap sin r> n*v v- ;
+    [ -0.5 * [ cos c>q ] [ sin ] bi ] dip n*v v- ;
+
+PRIVATE>
 
 : euler ( phi theta psi -- q )
   [ qi (euler) ] [ qj (euler) ] [ qk (euler) ] tri* q* q* ;

@@ -29,7 +29,7 @@ CELL clone_object(CELL object)
 	}
 }
 
-DEFINE_PRIMITIVE(clone)
+void primitive_clone(void)
 {
 	drepl(clone_object(dpeek()));
 }
@@ -61,11 +61,14 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	update_word_xt(word);
 	UNREGISTER_UNTAGGED(word);
 
+	if(profiling_p)
+		iterate_code_heap_step(word->profiling,relocate_code_block);
+
 	return word;
 }
 
 /* <word> ( name vocabulary -- word ) */
-DEFINE_PRIMITIVE(word)
+void primitive_word(void)
 {
 	CELL vocab = dpop();
 	CELL name = dpop();
@@ -73,15 +76,15 @@ DEFINE_PRIMITIVE(word)
 }
 
 /* word-xt ( word -- start end ) */
-DEFINE_PRIMITIVE(word_xt)
+void primitive_word_xt(void)
 {
 	F_WORD *word = untag_word(dpop());
-	F_COMPILED *code = word->code;
+	F_COMPILED *code = (profiling_p ? word->profiling : word->code);
 	dpush(allot_cell((CELL)code + sizeof(F_COMPILED)));
 	dpush(allot_cell((CELL)code + sizeof(F_COMPILED) + code->code_length));
 }
 
-DEFINE_PRIMITIVE(wrapper)
+void primitive_wrapper(void)
 {
 	F_WRAPPER *wrapper = allot_object(WRAPPER_TYPE,sizeof(F_WRAPPER));
 	wrapper->object = dpeek();
@@ -120,7 +123,7 @@ F_ARRAY *allot_array(CELL type, CELL capacity, CELL fill)
 }
 
 /* push a new array on the stack */
-DEFINE_PRIMITIVE(array)
+void primitive_array(void)
 {
 	CELL initial = dpop();
 	CELL size = unbox_array_size();
@@ -133,18 +136,6 @@ CELL allot_array_1(CELL obj)
 	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,1);
 	UNREGISTER_ROOT(obj);
 	set_array_nth(a,0,obj);
-	return tag_object(a);
-}
-
-CELL allot_array_2(CELL v1, CELL v2)
-{
-	REGISTER_ROOT(v1);
-	REGISTER_ROOT(v2);
-	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,2);
-	UNREGISTER_ROOT(v2);
-	UNREGISTER_ROOT(v1);
-	set_array_nth(a,0,v1);
-	set_array_nth(a,1,v2);
 	return tag_object(a);
 }
 
@@ -191,7 +182,7 @@ F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill)
 	return new_array;
 }
 
-DEFINE_PRIMITIVE(resize_array)
+void primitive_resize_array(void)
 {
 	F_ARRAY* array = untag_array(dpop());
 	CELL capacity = unbox_array_size();
@@ -256,7 +247,7 @@ F_BYTE_ARRAY *allot_byte_array(CELL size)
 }
 
 /* push a new byte array on the stack */
-DEFINE_PRIMITIVE(byte_array)
+void primitive_byte_array(void)
 {
 	CELL size = unbox_array_size();
 	dpush(tag_object(allot_byte_array(size)));
@@ -277,7 +268,7 @@ F_BYTE_ARRAY *reallot_byte_array(F_BYTE_ARRAY *array, CELL capacity)
 	return new_array;
 }
 
-DEFINE_PRIMITIVE(resize_byte_array)
+void primitive_resize_byte_array(void)
 {
 	F_BYTE_ARRAY* array = untag_byte_array(dpop());
 	CELL capacity = unbox_array_size();
@@ -310,7 +301,7 @@ F_TUPLE *allot_tuple(F_TUPLE_LAYOUT *layout)
 	return tuple;
 }
 
-DEFINE_PRIMITIVE(tuple)
+void primitive_tuple(void)
 {
 	F_TUPLE_LAYOUT *layout = untag_object(dpop());
 	F_FIXNUM size = untag_fixnum_fast(layout->size);
@@ -324,19 +315,13 @@ DEFINE_PRIMITIVE(tuple)
 }
 
 /* push a new tuple on the stack, filling its slots from the stack */
-DEFINE_PRIMITIVE(tuple_boa)
+void primitive_tuple_boa(void)
 {
 	F_TUPLE_LAYOUT *layout = untag_object(dpop());
 	F_FIXNUM size = untag_fixnum_fast(layout->size);
-
-	REGISTER_UNTAGGED(layout);
 	F_TUPLE *tuple = allot_tuple(layout);
-	UNREGISTER_UNTAGGED(layout);
-
-	F_FIXNUM i;
-	for(i = size - 1; i >= 0; i--)
-		put(AREF(tuple,i),dpop());
-
+	memcpy(tuple + 1,(CELL *)(ds - CELLS * (size - 1)),CELLS * size);
+	ds -= CELLS * size;
 	dpush(tag_tuple(tuple));
 }
 
@@ -431,7 +416,7 @@ F_STRING *allot_string(CELL capacity, CELL fill)
 	return string;
 }
 
-DEFINE_PRIMITIVE(string)
+void primitive_string(void)
 {
 	CELL initial = to_cell(dpop());
 	CELL length = unbox_array_size();
@@ -474,7 +459,7 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)
 	return new_string;
 }
 
-DEFINE_PRIMITIVE(resize_string)
+void primitive_resize_string(void)
 {
 	F_STRING* string = untag_string(dpop());
 	CELL capacity = unbox_array_size();
@@ -541,7 +526,7 @@ F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 		for(i = 0; i < capacity; i++) \
 			string[i] = string_nth(s,i); \
 	} \
-	DEFINE_PRIMITIVE(type##_string_to_memory) \
+	void primitive_##type##_string_to_memory(void) \
 	{ \
 		type *address = unbox_alien(); \
 		F_STRING *str = untag_string(dpop()); \
@@ -573,14 +558,14 @@ F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 STRING_TO_MEMORY(char);
 STRING_TO_MEMORY(u16);
 
-DEFINE_PRIMITIVE(string_nth)
+void primitive_string_nth(void)
 {
 	F_STRING *string = untag_object(dpop());
 	CELL index = untag_fixnum_fast(dpop());
 	dpush(tag_fixnum(string_nth(string,index)));
 }
 
-DEFINE_PRIMITIVE(set_string_nth)
+void primitive_set_string_nth(void)
 {
 	F_STRING *string = untag_object(dpop());
 	CELL index = untag_fixnum_fast(dpop());

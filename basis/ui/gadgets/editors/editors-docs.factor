@@ -20,28 +20,18 @@ HELP: <editor>
 { $values { "editor" "a new " { $link editor } } }
 { $description "Creates a new " { $link editor } " with an empty document." } ;
 
-! 'editor-caret' is now an old accessor, but it's documented as a word here. Maybe move this description somewhere else.
-
-! HELP: editor-caret ( editor -- caret )
-! { $values { "editor" editor } { "caret" model } }
-! { $description "Outputs a " { $link model } " holding the current caret location." } ;
-
 { editor-caret* editor-mark* } related-words
 
 HELP: editor-caret*
 { $values { "editor" editor } { "loc" "a pair of integers" } }
 { $description "Outputs the current caret location as a line/column number pair." } ;
 
-! HELP: editor-mark ( editor -- mark )
-! { $values { "editor" editor } { "mark" model } }
-! { $description "Outputs a " { $link model } " holding the current mark location." } ;
-
 HELP: editor-mark*
 { $values { "editor" editor } { "loc" "a pair of integers" } }
 { $description "Outputs the current mark location as a line/column number pair." } ;
 
 HELP: change-caret
-{ $values { "editor" editor } { "quot" "a quotation with stack effect " { $snippet "( loc -- newloc )" } } }
+{ $values { "editor" editor } { "quot" { $quotation "( loc -- newloc )" } } }
 { $description "Applies a quotation to the current caret location and moves the caret to the location output by the quotation." } ;
 
 { change-caret change-caret&mark mark>caret } related-words
@@ -51,7 +41,7 @@ HELP: mark>caret
 { $description "Moves the mark to the caret location, effectively deselecting any selected text." } ;
 
 HELP: change-caret&mark
-{ $values { "editor" editor } { "quot" "a quotation with stack effect " { $snippet "( loc -- newloc )" } } }
+{ $values { "editor" editor } { "quot" { $quotation "( loc -- newloc )" } } }
 { $description "Applies a quotation to the current caret location and moves the caret and the mark to the location output by the quotation." } ;
 
 HELP: point>loc

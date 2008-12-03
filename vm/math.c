@@ -1,7 +1,6 @@
 #include "master.h"
 
 /* Fixnums */
-
 F_FIXNUM to_fixnum(CELL tagged)
 {
 	switch(TAG(tagged))
@@ -21,113 +20,110 @@ CELL to_cell(CELL tagged)
 	return (CELL)to_fixnum(tagged);
 }
 
-DEFINE_PRIMITIVE(bignum_to_fixnum)
+void primitive_bignum_to_fixnum(void)
 {
 	drepl(tag_fixnum(bignum_to_fixnum(untag_object(dpeek()))));
 }
 
-DEFINE_PRIMITIVE(float_to_fixnum)
+void primitive_float_to_fixnum(void)
 {
 	drepl(tag_fixnum(float_to_fixnum(dpeek())));
 }
 
-#define POP_FIXNUMS(x,y) \
+/* The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
+overflow, they call these functions. */
+F_FASTCALL void overflow_fixnum_add(F_FIXNUM x, F_FIXNUM y)
+{
+	drepl(tag_bignum(fixnum_to_bignum(
+		untag_fixnum_fast(x) + untag_fixnum_fast(y))));
+}
+
+F_FASTCALL void overflow_fixnum_subtract(F_FIXNUM x, F_FIXNUM y)
+{
+	drepl(tag_bignum(fixnum_to_bignum(
+		untag_fixnum_fast(x) - untag_fixnum_fast(y))));
+}
+
+F_FASTCALL void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y)
+{
+	F_ARRAY *bx = fixnum_to_bignum(x);
+	REGISTER_BIGNUM(bx);
+	F_ARRAY *by = fixnum_to_bignum(y);
+	UNREGISTER_BIGNUM(bx);
+	drepl(tag_bignum(bignum_multiply(bx,by)));
+}
+
+/* Division can only overflow when we are dividing the most negative fixnum
+by -1. */
+void primitive_fixnum_divint(void)
+{
 	F_FIXNUM y = untag_fixnum_fast(dpop()); \
-	F_FIXNUM x = untag_fixnum_fast(dpop());
-
-DEFINE_PRIMITIVE(fixnum_add)
-{
-	POP_FIXNUMS(x,y)
-	box_signed_cell(x + y);
+	F_FIXNUM x = untag_fixnum_fast(dpeek());
+	F_FIXNUM result = x / y;
+	if(result == -FIXNUM_MIN)
+		drepl(allot_integer(-FIXNUM_MIN));
+	else
+		drepl(tag_fixnum(result));
 }
 
-DEFINE_PRIMITIVE(fixnum_subtract)
+void primitive_fixnum_divmod(void)
 {
-	POP_FIXNUMS(x,y)
-	box_signed_cell(x - y);
-}
-
-/* Multiply two integers, and trap overflow.
-Thanks to David Blaikie (The_Vulture from freenode #java) for the hint. */
-DEFINE_PRIMITIVE(fixnum_multiply)
-{
-	POP_FIXNUMS(x,y)
-
-	if(x == 0 || y == 0)
-		dpush(tag_fixnum(0));
+	F_FIXNUM y = get(ds);
+	F_FIXNUM x = get(ds - CELLS);
+	if(y == tag_fixnum(-1) && x == tag_fixnum(FIXNUM_MIN))
+	{
+		put(ds - CELLS,allot_integer(-FIXNUM_MIN));
+		put(ds,tag_fixnum(0));
+	}
 	else
 	{
-		F_FIXNUM prod = x * y;
-		/* if this is not equal, we have overflow */
-		if(prod / x == y)
-			box_signed_cell(prod);
-		else
-		{
-			F_ARRAY *bx = fixnum_to_bignum(x);
-			REGISTER_BIGNUM(bx);
-			F_ARRAY *by = fixnum_to_bignum(y);
-			UNREGISTER_BIGNUM(bx);
-			dpush(tag_bignum(bignum_multiply(bx,by)));
-		}
+		put(ds - CELLS,tag_fixnum(x / y));
+		put(ds,x % y);
 	}
-}
-
-DEFINE_PRIMITIVE(fixnum_divint)
-{
-	POP_FIXNUMS(x,y)
-	box_signed_cell(x / y);
-}
-
-DEFINE_PRIMITIVE(fixnum_divmod)
-{
-	POP_FIXNUMS(x,y)
-	box_signed_cell(x / y);
-	dpush(tag_fixnum(x % y));
 }
 
 /*
- * Note the hairy overflow check.
  * If we're shifting right by n bits, we won't overflow as long as none of the
  * high WORD_SIZE-TAG_BITS-n bits are set.
  */
-DEFINE_PRIMITIVE(fixnum_shift)
-{
-	POP_FIXNUMS(x,y)
+#define SIGN_MASK(x) ((x) >> (WORD_SIZE - 1))
+#define BRANCHLESS_MAX(x,y) ((x) - (((x) - (y)) & SIGN_MASK((x) - (y))))
+#define BRANCHLESS_ABS(x) ((x ^ SIGN_MASK(x)) - SIGN_MASK(x))
 
-	if(x == 0 || y == 0)
-	{
-		dpush(tag_fixnum(x));
+void primitive_fixnum_shift(void)
+{
+	F_FIXNUM y = untag_fixnum_fast(dpop()); \
+	F_FIXNUM x = untag_fixnum_fast(dpeek());
+
+	if(x == 0)
 		return;
-	}
 	else if(y < 0)
 	{
-		if(y <= -WORD_SIZE)
-			dpush(x < 0 ? tag_fixnum(-1) : tag_fixnum(0));
-		else
-			dpush(tag_fixnum(x >> -y));
+		y = BRANCHLESS_MAX(y,-WORD_SIZE + 1);
+		drepl(tag_fixnum(x >> -y));
 		return;
 	}
 	else if(y < WORD_SIZE - TAG_BITS)
 	{
-		F_FIXNUM mask = -(1L << (WORD_SIZE - 1 - TAG_BITS - y));
-		if((x > 0 && (x & mask) == 0) || (x & mask) == mask)
+		F_FIXNUM mask = -((F_FIXNUM)1 << (WORD_SIZE - 1 - TAG_BITS - y));
+		if(!(BRANCHLESS_ABS(x) & mask))
 		{
-			dpush(tag_fixnum(x << y));
+			drepl(tag_fixnum(x << y));
 			return;
 		}
 	}
 
-	dpush(tag_bignum(bignum_arithmetic_shift(
+	drepl(tag_bignum(bignum_arithmetic_shift(
 		fixnum_to_bignum(x),y)));
 }
 
 /* Bignums */
-DEFINE_PRIMITIVE(fixnum_to_bignum)
+void primitive_fixnum_to_bignum(void)
 {
 	drepl(tag_bignum(fixnum_to_bignum(untag_fixnum_fast(dpeek()))));
 }
 
-DEFINE_PRIMITIVE(float_to_bignum)
+void primitive_float_to_bignum(void)
 {
 	drepl(tag_bignum(float_to_bignum(dpeek())));
 }
@@ -136,37 +132,37 @@ DEFINE_PRIMITIVE(float_to_bignum)
 	F_ARRAY *y = untag_object(dpop()); \
 	F_ARRAY *x = untag_object(dpop());
 
-DEFINE_PRIMITIVE(bignum_eq)
+void primitive_bignum_eq(void)
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_equal_p(x,y));
 }
 
-DEFINE_PRIMITIVE(bignum_add)
+void primitive_bignum_add(void)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(bignum_add(x,y)));
 }
 
-DEFINE_PRIMITIVE(bignum_subtract)
+void primitive_bignum_subtract(void)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(bignum_subtract(x,y)));
 }
 
-DEFINE_PRIMITIVE(bignum_multiply)
+void primitive_bignum_multiply(void)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(bignum_multiply(x,y)));
 }
 
-DEFINE_PRIMITIVE(bignum_divint)
+void primitive_bignum_divint(void)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(bignum_quotient(x,y)));
 }
 
-DEFINE_PRIMITIVE(bignum_divmod)
+void primitive_bignum_divmod(void)
 {
 	F_ARRAY *q, *r;
 	POP_BIGNUMS(x,y);
@@ -175,74 +171,74 @@ DEFINE_PRIMITIVE(bignum_divmod)
 	dpush(tag_bignum(r));
 }
 
-DEFINE_PRIMITIVE(bignum_mod)
+void primitive_bignum_mod(void)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(bignum_remainder(x,y)));
 }
 
-DEFINE_PRIMITIVE(bignum_and)
+void primitive_bignum_and(void)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(bignum_bitwise_and(x,y)));
 }
 
-DEFINE_PRIMITIVE(bignum_or)
+void primitive_bignum_or(void)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(bignum_bitwise_ior(x,y)));
 }
 
-DEFINE_PRIMITIVE(bignum_xor)
+void primitive_bignum_xor(void)
 {
 	POP_BIGNUMS(x,y);
 	dpush(tag_bignum(bignum_bitwise_xor(x,y)));
 }
 
-DEFINE_PRIMITIVE(bignum_shift)
+void primitive_bignum_shift(void)
 {
 	F_FIXNUM y = to_fixnum(dpop());
         F_ARRAY* x = untag_object(dpop());
 	dpush(tag_bignum(bignum_arithmetic_shift(x,y)));
 }
 
-DEFINE_PRIMITIVE(bignum_less)
+void primitive_bignum_less(void)
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_compare(x,y) == bignum_comparison_less);
 }
 
-DEFINE_PRIMITIVE(bignum_lesseq)
+void primitive_bignum_lesseq(void)
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_compare(x,y) != bignum_comparison_greater);
 }
 
-DEFINE_PRIMITIVE(bignum_greater)
+void primitive_bignum_greater(void)
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_compare(x,y) == bignum_comparison_greater);
 }
 
-DEFINE_PRIMITIVE(bignum_greatereq)
+void primitive_bignum_greatereq(void)
 {
 	POP_BIGNUMS(x,y);
 	box_boolean(bignum_compare(x,y) != bignum_comparison_less);
 }
 
-DEFINE_PRIMITIVE(bignum_not)
+void primitive_bignum_not(void)
 {
 	drepl(tag_bignum(bignum_bitwise_not(untag_object(dpeek()))));
 }
 
-DEFINE_PRIMITIVE(bignum_bitp)
+void primitive_bignum_bitp(void)
 {
 	F_FIXNUM bit = to_fixnum(dpop());
 	F_ARRAY *x = untag_object(dpop());
 	box_boolean(bignum_logbitp(bit,x));
 }
 
-DEFINE_PRIMITIVE(bignum_log2)
+void primitive_bignum_log2(void)
 {
 	drepl(tag_bignum(bignum_integer_length(untag_object(dpeek()))));
 }
@@ -253,7 +249,7 @@ unsigned int bignum_producer(unsigned int digit)
 	return *(ptr + digit);
 }
 
-DEFINE_PRIMITIVE(byte_array_to_bignum)
+void primitive_byte_array_to_bignum(void)
 {
 	type_check(BYTE_ARRAY_TYPE,dpeek());
 	CELL n_digits = array_capacity(untag_object(dpeek()));
@@ -383,7 +379,7 @@ CELL unbox_array_size(void)
 
 /* Does not reduce to lowest terms, so should only be used by math
 library implementation, to avoid breaking invariants. */
-DEFINE_PRIMITIVE(from_fraction)
+void primitive_from_fraction(void)
 {
 	F_RATIO* ratio = allot_object(RATIO_TYPE,sizeof(F_RATIO));
 	ratio->denominator = dpop();
@@ -392,17 +388,17 @@ DEFINE_PRIMITIVE(from_fraction)
 }
 
 /* Floats */
-DEFINE_PRIMITIVE(fixnum_to_float)
+void primitive_fixnum_to_float(void)
 {
 	drepl(allot_float(fixnum_to_float(dpeek())));
 }
 
-DEFINE_PRIMITIVE(bignum_to_float)
+void primitive_bignum_to_float(void)
 {
 	drepl(allot_float(bignum_to_float(dpeek())));
 }
 
-DEFINE_PRIMITIVE(str_to_float)
+void primitive_str_to_float(void)
 {
 	char *c_str, *end;
 	double f;
@@ -418,7 +414,7 @@ DEFINE_PRIMITIVE(str_to_float)
 		drepl(allot_float(f));
 }
 
-DEFINE_PRIMITIVE(float_to_str)
+void primitive_float_to_str(void)
 {
 	char tmp[33];
 	snprintf(tmp,32,"%.16g",untag_float(dpop()));
@@ -430,82 +426,82 @@ DEFINE_PRIMITIVE(float_to_str)
 	double y = untag_float_fast(dpop()); \
 	double x = untag_float_fast(dpop());
 
-DEFINE_PRIMITIVE(float_eq)
+void primitive_float_eq(void)
 {
 	POP_FLOATS(x,y);
 	box_boolean(x == y);
 }
 
-DEFINE_PRIMITIVE(float_add)
+void primitive_float_add(void)
 {
 	POP_FLOATS(x,y);
 	box_double(x + y);
 }
 
-DEFINE_PRIMITIVE(float_subtract)
+void primitive_float_subtract(void)
 {
 	POP_FLOATS(x,y);
 	box_double(x - y);
 }
 
-DEFINE_PRIMITIVE(float_multiply)
+void primitive_float_multiply(void)
 {
 	POP_FLOATS(x,y);
 	box_double(x * y);
 }
 
-DEFINE_PRIMITIVE(float_divfloat)
+void primitive_float_divfloat(void)
 {
 	POP_FLOATS(x,y);
 	box_double(x / y);
 }
 
-DEFINE_PRIMITIVE(float_mod)
+void primitive_float_mod(void)
 {
 	POP_FLOATS(x,y);
 	box_double(fmod(x,y));
 }
 
-DEFINE_PRIMITIVE(float_less)
+void primitive_float_less(void)
 {
 	POP_FLOATS(x,y);
 	box_boolean(x < y);
 }
 
-DEFINE_PRIMITIVE(float_lesseq)
+void primitive_float_lesseq(void)
 {
 	POP_FLOATS(x,y);
 	box_boolean(x <= y);
 }
 
-DEFINE_PRIMITIVE(float_greater)
+void primitive_float_greater(void)
 {
 	POP_FLOATS(x,y);
 	box_boolean(x > y);
 }
 
-DEFINE_PRIMITIVE(float_greatereq)
+void primitive_float_greatereq(void)
 {
 	POP_FLOATS(x,y);
 	box_boolean(x >= y);
 }
 
-DEFINE_PRIMITIVE(float_bits)
+void primitive_float_bits(void)
 {
 	box_unsigned_4(float_bits(untag_float(dpop())));
 }
 
-DEFINE_PRIMITIVE(bits_float)
+void primitive_bits_float(void)
 {
 	box_float(bits_float(to_cell(dpop())));
 }
 
-DEFINE_PRIMITIVE(double_bits)
+void primitive_double_bits(void)
 {
 	box_unsigned_8(double_bits(untag_float(dpop())));
 }
 
-DEFINE_PRIMITIVE(bits_double)
+void primitive_bits_double(void)
 {
 	box_double(bits_double(to_unsigned_8(dpop())));
 }
@@ -532,7 +528,7 @@ void box_double(double flo)
 
 /* Complex numbers */
 
-DEFINE_PRIMITIVE(from_rect)
+void primitive_from_rect(void)
 {
 	F_COMPLEX* complex = allot_object(COMPLEX_TYPE,sizeof(F_COMPLEX));
 	complex->imaginary = dpop();

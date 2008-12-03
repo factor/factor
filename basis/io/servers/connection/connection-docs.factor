@@ -45,15 +45,20 @@ ARTICLE: "server-config-handler" "Client handler quotation"
 $nl
 "The two methods are equivalent, representing a functional versus an object-oriented approach to the problem." ;
 
+ARTICLE: "server-examples" "Threaded server examples"
+"The " { $vocab-link "time-server" } " vocabulary implements a simple threaded server which sends the current time to the client. The " { $vocab-link "concurrency.distributed" } ", " { $vocab-link "ftp.server" } ", and " { $vocab-link "http.server" } " vocabularies demonstrate more complex usage of the threaded server library." ;
+
 ARTICLE: "io.servers.connection" "Threaded servers"
 "The " { $vocab-link "io.servers.connection" } " vocabulary implements a generic server abstraction for " { $link "network-connection" } ". A set of threads listen for connections, and additional threads are spawned for each client connection. In addition to this basic functionality, it provides some advanced features such as logging, connection limits and secure socket support."
-{ $subsection threaded-server }
-{ $subsection "server-config" }
+{ $subsection "server-examples" }
 "Creating threaded servers with client handler quotations:"
 { $subsection <threaded-server> }
 "Client handlers can also be implemented by subclassing a threaded server; see " { $link "server-config-handler" } " for details:"
+{ $subsection threaded-server }
 { $subsection new-threaded-server }
 { $subsection handle-client* }
+"The server must be configured before it can be started." 
+{ $subsection "server-config" }
 "Starting the server:"
 { $subsection start-server }
 { $subsection start-server* }
@@ -61,11 +66,11 @@ ARTICLE: "io.servers.connection" "Threaded servers"
 "Stopping the server:"
 { $subsection stop-server }
 "From within the dynamic scope of a client handler, several words can be used to interact with the threaded server:"
-{ $subsection remote-address }
 { $subsection stop-this-server }
 { $subsection secure-port }
 { $subsection insecure-port }
-"Additionally, the " { $link local-address } " variable is set, as in " { $link with-client } "." ;
+"Additionally, the " { $link local-address } " and "
+{ $subsection remote-address } " variables are set, as in " { $link with-client } "." ;
 
 ABOUT: "io.servers.connection"
 
@@ -109,11 +114,11 @@ HELP: stop-this-server
 { $description "Stops the current threaded server, preventing it from accepting any more connections and returning to the caller of " { $link start-server } ". All client connections which have already been opened continue to be serviced." } ;
 
 HELP: secure-port
-{ $values { "n" "an " { $link integer } " or " { $link f } } }
+{ $values { "n" { $maybe integer } } }
 { $description "Outputs the port number on which the current threaded server accepts secure socket connections. Outputs " { $link f } " if the current threaded server does not accept secure socket connections." }
 { $notes "Can only be used from the dynamic scope of a " { $link handle-client* } " call." } ;
 
 HELP: insecure-port
-{ $values { "n" "an " { $link integer } " or " { $link f } } }
+{ $values { "n" { $maybe integer } } }
 { $description "Outputs the port number on which the current threaded server accepts ordinary socket connections. Outputs " { $link f } " if the current threaded server does not accept ordinary socket connections." }
 { $notes "Can only be used from the dynamic scope of a " { $link handle-client* } " call." } ;

@@ -1,7 +1,7 @@
-USING: alien alien.c-types effects kernel windows.ole32
-parser lexer splitting grouping sequences namespaces
-assocs quotations generalizations accessors words macros alien.syntax
-fry arrays ;
+USING: alien alien.c-types alien.accessors effects kernel
+windows.ole32 parser lexer splitting grouping sequences
+namespaces assocs quotations generalizations accessors words
+macros alien.syntax fry arrays layouts math ;
 IN: windows.com.syntax
 
 <PRIVATE
@@ -10,9 +10,9 @@ C-STRUCT: com-interface
     { "void*" "vtbl" } ;
 
 MACRO: com-invoke ( n return parameters -- )
-    dup length -roll
+    [ 2nip length ] 3keep
     '[
-        _ npick com-interface-vtbl _ swap void*-nth _ _
+        _ npick com-interface-vtbl _ cell * alien-cell _ _
         "stdcall" alien-indirect
     ] ;
 

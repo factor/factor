@@ -5,17 +5,17 @@ USING: help.markup help.syntax ;
 IN: promises
 
 HELP: promise 
-{ $values { "quot" "a quotation with stack effect ( -- X )" } { "promise" "a promise object" } }
+{ $values { "quot" { $quotation "( -- X )" } } { "promise" "a promise object" } }
 { $description "Creates a promise to return a value. When forced this quotation is called and the value returned. The value is memorised so that calling " { $link force } " again does not call the quotation again, instead the previous value is returned directly." } 
 { $see-also force promise-with promise-with2 } ;
 
 HELP: promise-with
-{ $values { "value" "an object" } { "quot" "a quotation with stack effect ( value -- X )" } { "promise" "a promise object" } }
+{ $values { "value" "an object" } { "quot" { $quotation "( value -- X )" } } { "promise" "a promise object" } }
 { $description "Creates a promise to return a value. When forced this quotation is called with the given value on the stack and the result returned. The value is memorised so that calling " { $link force } " again does not call the quotation again, instead the previous value is returned directly." } 
 { $see-also force promise promise-with2 } ;
 
 HELP: promise-with2
-{ $values { "value1" "an object" } { "value2" "an object" } { "quot" "a quotation with stack effect ( value1 value2 -- X )" } { "promise" "a promise object" } }
+{ $values { "value1" "an object" } { "value2" "an object" } { "quot" { $quotation "( value1 value2 -- X )" } } { "promise" "a promise object" } }
 { $description "Creates a promise to return a value. When forced this quotation is called with the given values on the stack and the result returned. The value is memorised so that calling " { $link force } " again does not call the quotation again, instead the previous value is returned directly." } 
 { $see-also force promise promise-with2 } ;
 

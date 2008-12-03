@@ -109,26 +109,25 @@ F_ARRAY *allot_array(CELL type, CELL capacity, CELL fill);
 F_BYTE_ARRAY *allot_byte_array(CELL size);
 
 CELL allot_array_1(CELL obj);
-CELL allot_array_2(CELL v1, CELL v2);
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
 
-DECLARE_PRIMITIVE(array);
-DECLARE_PRIMITIVE(tuple);
-DECLARE_PRIMITIVE(tuple_boa);
-DECLARE_PRIMITIVE(tuple_layout);
-DECLARE_PRIMITIVE(byte_array);
-DECLARE_PRIMITIVE(clone);
+void primitive_array(void);
+void primitive_tuple(void);
+void primitive_tuple_boa(void);
+void primitive_tuple_layout(void);
+void primitive_byte_array(void);
+void primitive_clone(void);
 
 F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill);
 F_BYTE_ARRAY *reallot_byte_array(F_BYTE_ARRAY *array, CELL capacity);
-DECLARE_PRIMITIVE(resize_array);
-DECLARE_PRIMITIVE(resize_byte_array);
+void primitive_resize_array(void);
+void primitive_resize_byte_array(void);
 
 F_STRING* allot_string_internal(CELL capacity);
 F_STRING* allot_string(CELL capacity, CELL fill);
-DECLARE_PRIMITIVE(string);
+void primitive_string(void);
 F_STRING *reallot_string(F_STRING *string, CELL capacity, CELL fill);
-DECLARE_PRIMITIVE(resize_string);
+void primitive_resize_string(void);
 
 F_STRING *memory_to_char_string(const char *string, CELL length);
 F_STRING *from_char_string(const char *c_string);
@@ -152,14 +151,14 @@ DLLEXPORT u16 *unbox_u16_string(void);
 CELL string_nth(F_STRING* string, CELL index);
 void set_string_nth(F_STRING* string, CELL index, CELL value);
 
-DECLARE_PRIMITIVE(string_nth);
-DECLARE_PRIMITIVE(set_string_nth);
+void primitive_string_nth(void);
+void primitive_set_string_nth(void);
 
 F_WORD *allot_word(CELL vocab, CELL name);
-DECLARE_PRIMITIVE(word);
-DECLARE_PRIMITIVE(word_xt);
+void primitive_word(void);
+void primitive_word_xt(void);
 
-DECLARE_PRIMITIVE(wrapper);
+void primitive_wrapper(void);
 
 /* Macros to simulate a vector in C */
 #define GROWABLE_ARRAY(result) \

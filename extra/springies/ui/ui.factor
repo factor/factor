@@ -7,7 +7,7 @@ IN: springies.ui
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: draw-node ( node -- ) pos>> { -5 -5 } v+ dup { 10 10 } v+ gl-rect ;
+: draw-node ( node -- ) pos>> { -5 -5 } v+ [ { 10 10 } gl-rect ] with-translation ;
 
 : draw-spring ( spring -- )
   [ node-a>> pos>> ] [ node-b>> pos>> ] bi gl-line ;
@@ -25,7 +25,7 @@ IN: springies.ui
 
 ! : display ( -- ) set-projection black gl-color draw-nodes draw-springs ;
 
-: display ( -- ) set-projection black set-color draw-nodes draw-springs ;
+: display ( -- ) set-projection black gl-color draw-nodes draw-springs ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

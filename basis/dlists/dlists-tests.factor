@@ -5,7 +5,7 @@ IN: dlists.tests
 
 [ t ] [ <dlist> deque-empty? ] unit-test
 
-[ T{ dlist f T{ dlist-node f 1 f f } T{ dlist-node f 1 f f } 1 } ]
+[ T{ dlist f T{ dlist-node f 1 f f } T{ dlist-node f 1 f f } } ]
 [ <dlist> 1 over push-front ] unit-test
 
 ! Make sure empty lists are empty
@@ -17,10 +17,10 @@ IN: dlists.tests
 [ 1 ] [ <dlist> 1 over push-front pop-back ] unit-test
 [ 1 ] [ <dlist> 1 over push-back pop-front ] unit-test
 [ 1 ] [ <dlist> 1 over push-back pop-back ] unit-test
-[ T{ dlist f f f 0 } ] [ <dlist> 1 over push-front dup pop-front* ] unit-test
-[ T{ dlist f f f 0 } ] [ <dlist> 1 over push-front dup pop-back* ] unit-test
-[ T{ dlist f f f 0 } ] [ <dlist> 1 over push-back dup pop-front* ] unit-test
-[ T{ dlist f f f 0 } ] [ <dlist> 1 over push-back dup pop-back* ] unit-test
+[ T{ dlist f f f } ] [ <dlist> 1 over push-front dup pop-front* ] unit-test
+[ T{ dlist f f f } ] [ <dlist> 1 over push-front dup pop-back* ] unit-test
+[ T{ dlist f f f } ] [ <dlist> 1 over push-back dup pop-front* ] unit-test
+[ T{ dlist f f f } ] [ <dlist> 1 over push-back dup pop-back* ] unit-test
 
 ! Test the prev,next links for two nodes
 [ f ] [
@@ -52,15 +52,6 @@ IN: dlists.tests
 [ 1 ] [ <dlist> 1 over push-back [ 1 = ] delete-node-if ] unit-test
 [ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-empty? ] unit-test
 [ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-empty? ] unit-test
-[ 0 ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-length ] unit-test
-[ 1 ] [ <dlist> 1 over push-back 2 over push-back dup [ 1 = ] delete-node-if drop deque-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 1 = ] delete-node-if drop deque-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 2 = ] delete-node-if drop deque-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 3 = ] delete-node-if drop deque-length ] unit-test
-
-[ 0 ] [ <dlist> deque-length ] unit-test
-[ 1 ] [ <dlist> 1 over push-front deque-length ] unit-test
-[ 0 ] [ <dlist> 1 over push-front dup pop-front* deque-length ] unit-test
 
 [ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 4 = ] dlist-find-node drop class dlist-node = ] unit-test
 [ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 5 = ] dlist-find-node drop class dlist-node = ] unit-test
@@ -77,3 +68,14 @@ IN: dlists.tests
 [ f ] [ <dlist> 3 over push-front 4 over push-back -1 swap deque-member? ] unit-test
 
 [ f ] [ <dlist> 0 swap deque-member? ] unit-test
+
+! Make sure clone does the right thing
+[ V{ 2 1 } V{ 2 1 3 } ] [
+    <dlist> 1 over push-front 2 over push-front
+    dup clone 3 over push-back
+    [ dlist>seq ] bi@
+] unit-test
+
+[ V{ f 3 1 f } ] [ <dlist> 1 over push-front 3 over push-front f over push-front f over push-back dlist>seq ] unit-test
+
+[ V{ } ] [ <dlist> dlist>seq ] unit-test

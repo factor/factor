@@ -56,7 +56,7 @@ M: style-stream stream-write
     [ style>> ] [ stream>> ] bi stream-format ;
 
 M: style-stream stream-write1
-    >r 1string r> stream-write ;
+    [ 1string ] dip stream-write ;
 
 M: style-stream make-span-stream
     do-nested-style make-span-stream ;

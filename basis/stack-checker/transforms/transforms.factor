@@ -5,11 +5,12 @@ namespaces make quotations assocs combinators classes.tuple
 classes.tuple.private effects summary hashtables classes generic
 sets definitions generic.standard slots.private continuations
 stack-checker.backend stack-checker.state stack-checker.visitor
-stack-checker.errors ;
+stack-checker.errors stack-checker.values
+stack-checker.recursive-state ;
 IN: stack-checker.transforms
 
 : give-up-transform ( word -- )
-    dup recursive-label
+    dup recursive-word?
     [ call-recursive-word ]
     [ dup infer-word apply-word/effect ]
     if ;
@@ -89,8 +90,15 @@ IN: stack-checker.transforms
 \ spread [ spread>quot ] 1 define-transform
 
 \ (call-next-method) [
-    [ [ inlined-dependency depends-on ] bi@ ] [ next-method-quot ] 2bi
-] 2 define-transform
+    [
+        [ "method-class" word-prop ]
+        [ "method-generic" word-prop ] bi
+        [ inlined-dependency depends-on ] bi@
+    ] [
+        [ next-method-quot ]
+        [ '[ _ no-next-method ] ] bi or
+    ] bi
+] 1 define-transform
 
 ! Constructors
 \ boa [

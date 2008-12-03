@@ -2,11 +2,11 @@ IN: io.timeouts
 USING: help.markup help.syntax math kernel calendar ;
 
 HELP: timeout
-{ $values { "obj" object } { "dt/f" "a " { $link duration } " or " { $link f } } }
+{ $values { "obj" object } { "dt/f" { $maybe duration } } }
 { $contract "Outputs an object's timeout." } ;
 
 HELP: set-timeout
-{ $values { "dt/f" "a " { $link duration } " or " { $link f } } { "obj" object } }
+{ $values { "dt/f" { $maybe duration } } { "obj" object } }
 { $contract "Sets an object's timeout." } ;
 
 HELP: cancel-operation
@@ -14,7 +14,7 @@ HELP: cancel-operation
 { $contract "Handles a timeout, usually by waking up all threads waiting on the object." } ;
 
 HELP: with-timeout
-{ $values { "obj" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- )" } } }
+{ $values { "obj" object } { "quot" { $quotation "( obj -- )" } } }
 { $description "Applies the quotation to the object. If the object's timeout expires before the quotation returns, " { $link cancel-operation } " is called on the object." } ;
 
 ARTICLE: "io.timeouts" "I/O timeout protocol"

@@ -3,7 +3,7 @@
 USING: accessors kernel arrays sequences math math.order
 math.partial-dispatch generic generic.standard generic.math
 classes.algebra classes.union sets quotations assocs combinators
-words namespaces continuations
+words namespaces continuations classes fry
 compiler.tree
 compiler.tree.builder
 compiler.tree.recursive
@@ -26,7 +26,7 @@ GENERIC: splicing-nodes ( #call word/quot/f -- nodes )
 M: word splicing-nodes
     [ [ in-d>> ] [ out-d>> ] bi ] dip #call 1array ;
 
-M: quotation splicing-nodes
+M: callable splicing-nodes
     build-sub-tree analyze-recursive normalize ;
 
 : propagate-body ( #call -- )
@@ -85,6 +85,8 @@ DEFER: (flat-length)
 
 : word-flat-length ( word -- n )
     {
+        ! special-case
+        { [ dup { dip 2dip 3dip } memq? ] [ drop 1 ] }
         ! not inline
         { [ dup inline? not ] [ drop 1 ] }
         ! recursive and inline
@@ -138,17 +140,20 @@ SYMBOL: history
 : remember-inlining ( word -- )
     history [ swap suffix ] change ;
 
-: inline-word ( #call word -- ? )
-    dup history get memq? [
-        2drop f
+: inline-word-def ( #call word quot -- ? )
+    over history get memq? [
+        3drop f
     ] [
         [
-            dup remember-inlining
-            dupd def>> splicing-nodes >>body
+            swap remember-inlining
+            dupd splicing-nodes >>body
             propagate-body
         ] with-scope
         t
     ] if ;
+
+: inline-word ( #call word -- ? )
+    dup def>> inline-word-def ;
 
 : inline-method-body ( #call word -- ? )
     2dup should-inline? [ inline-word ] [ 2drop f ] if ;
@@ -163,6 +168,10 @@ SYMBOL: history
     [ dup 1array ] [ "custom-inlining" word-prop ] bi* with-datastack
     first object swap eliminate-dispatch ;
 
+: inline-instance-check ( #call word -- ? )
+    over in-d>> second value-info literal>> dup class?
+    [ "predicate" word-prop '[ drop @ ] inline-word-def ] [ 3drop f ] if ;
+
 : do-inlining ( #call word -- ? )
     #! If the generic was defined in an outer compilation unit,
     #! then it doesn't have a definition yet; the definition
@@ -175,6 +184,7 @@ SYMBOL: history
     {
         { [ dup deferred? ] [ 2drop f ] }
         { [ dup custom-inlining? ] [ inline-custom ] }
+        { [ dup \ instance? eq? ] [ inline-instance-check ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }

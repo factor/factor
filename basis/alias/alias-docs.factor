@@ -16,7 +16,7 @@ HELP: ALIAS:
     }
 } ;
 
-ARTICLE: "alias" "Alias"
+ARTICLE: "alias" "Word aliasing"
 "The " { $vocab-link "alias" } " vocabulary implements a way to make many different names for the same word. Although creating new names for words is generally frowned upon, aliases are useful for the Win32 API and other cases where words need to be renamed for symmetry." $nl 
 "Make a new word that aliases another word:"
 { $subsection define-alias }

@@ -8,6 +8,8 @@ definitions assocs compiler.errors compiler.units
 math.parser generic sets debugger command-line ;
 IN: bootstrap.stage2
 
+SYMBOL: core-bootstrap-time
+
 SYMBOL: bootstrap-time
 
 : default-image-name ( -- string )
@@ -30,11 +32,15 @@ SYMBOL: bootstrap-time
 : count-words ( pred -- )
     all-words swap count number>string write ;
 
-: print-report ( time -- )
+: print-time ( ms -- )
     1000 /i
     60 /mod swap
-    "Bootstrap completed in " write number>string write
-    " minutes and " write number>string write " seconds." print
+    number>string write
+    " minutes and " write number>string write " seconds." print ;
+
+: print-report ( -- )
+    "Core bootstrap completed in " write core-bootstrap-time get print-time
+    "Bootstrap completed in "      write bootstrap-time      get print-time
 
     [ compiled>> ] count-words " compiled words" print
     [ symbol? ] count-words " symbol words" print
@@ -46,22 +52,22 @@ SYMBOL: bootstrap-time
 
 [
     ! We time bootstrap
-    millis >r
+    millis
 
     default-image-name "output-image" set-global
 
     "math compiler threads help io tools ui ui.tools unicode handbook" "include" set-global
     "" "exclude" set-global
 
-    parse-command-line
+    (command-line) parse-command-line
 
-    "-no-crossref" cli-args member? [ do-crossref ] unless
+    do-crossref
 
     ! Set dll paths
     os wince? [ "windows.ce" require ] when
     os winnt? [ "windows.nt" require ] when
 
-    "deploy-vocab" get [
+    "staging" get "deploy-vocab" get or [
         "stage2: deployment mode" print
     ] [
         "listener" require
@@ -70,6 +76,8 @@ SYMBOL: bootstrap-time
 
     [
         load-components
+
+        millis over - core-bootstrap-time set-global
 
         run-bootstrap-init
     ] with-compiler-errors
@@ -84,15 +92,10 @@ SYMBOL: bootstrap-time
         [
             boot
             do-init-hooks
-            [
-                parse-command-line
-                run-user-init
-                "run" get run
-                output-stream get [ stream-flush ] when*
-            ] [ print-error 1 exit ] recover
+            handle-command-line
         ] set-boot-quot
 
-        millis r> - dup bootstrap-time set-global
+        millis swap - bootstrap-time set-global
         print-report
 
         "output-image" get save-image-and-exit

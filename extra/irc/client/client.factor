@@ -32,7 +32,7 @@ TUPLE: irc-client profile stream in-messages out-messages
 
 TUPLE: irc-chat in-messages client ;
 TUPLE: irc-server-chat < irc-chat ;
-TUPLE: irc-channel-chat < irc-chat name password timeout participants ;
+TUPLE: irc-channel-chat < irc-chat name password timeout participants clean-participants ;
 TUPLE: irc-nick-chat < irc-chat name ;
 SYMBOL: +server-chat+
 
@@ -55,7 +55,7 @@ SYMBOL: +nick+
      <mailbox> f irc-server-chat boa ;
 
 : <irc-channel-chat> ( name -- irc-channel-chat )
-     [ <mailbox> f ] dip f 60 seconds H{ } clone
+     [ <mailbox> f ] dip f 60 seconds H{ } clone t
      irc-channel-chat boa ;
 
 : <irc-nick-chat> ( name -- irc-nick-chat )
@@ -148,7 +148,9 @@ M: irc-chat to-chat in-messages>> mailbox-put ;
 : change-participant-mode ( channel mode nick -- )
     rot chat>
     [ participants>> set-at ]
-    [ [ [ +mode+ ] dip <participant-changed> ] dip to-chat ] 3bi ; ! FIXME
+    [ [ participant-changed new
+        [ (>>nick) ] [ (>>parameter) ] [ +mode+ >>action ] tri ] dip to-chat ]
+    3bi ; ! FIXME
 
 DEFER: me?
 
@@ -208,7 +210,7 @@ M: broadcast-forward forward-message
 GENERIC: process-message ( irc-message -- )
 M: object      process-message drop ; 
 M: logged-in   process-message
-    name>> f irc> [ (>>is-ready) ] [ (>>nick) ] [ chats>> ] tri
+    name>> t irc> [ (>>is-ready) ] [ (>>nick) ] [ chats>> ] tri
     values [ initialize-chat ] each ;
 M: ping        process-message trailing>> /PONG ;
 M: nick-in-use process-message name>> "_" append /NICK ;
@@ -231,11 +233,11 @@ M: quit process-message
 M: nick process-message
     [ irc-message-sender ] [ trailing>> ] bi rename-participant-in-all ;
 
-! M: mode process-message ( mode -- )
-!    [ channel-mode? ] keep and [
-!        [ name>> ] [ mode>> ] [ parameter>> ] tri
-!        [ change-participant-mode ] [ 2drop ] if*
-!    ] when* ;
+M: mode process-message ( mode -- )
+    [ channel-mode? ] keep and [
+        [ name>> ] [ mode>> ] [ parameter>> ] tri
+        [ change-participant-mode ] [ 2drop ] if*
+    ] when* ;
 
 : >nick/mode ( string -- nick mode )
     dup first "+@" member? [ unclip ] [ 0 ] if participant-mode ;
@@ -244,11 +246,23 @@ M: nick process-message
     trailing>> [ blank? ] trim " " split
     [ >nick/mode 2array ] map >hashtable ;
 
+: maybe-clean-participants ( channel-chat -- )
+    dup clean-participants>> [
+        H{ } clone >>participants f >>clean-participants
+    ] when drop ;
+
 M: names-reply process-message
     [ names-reply>participants ] [ channel>> chat> ] bi [
-        [ (>>participants) ]
-        [ [ f f f <participant-changed> ] dip name>> to-chat ] bi
+        [ maybe-clean-participants ] 
+        [ participants>> 2array assoc-combine ]
+        [ (>>participants) ] tri
     ] [ drop ] if* ;
+
+M: end-of-names process-message
+    channel>> chat> [
+        t >>clean-participants
+        [ f f f <participant-changed> ] dip name>> to-chat
+    ] when* ;
 
 ! ======================================
 ! Client message handling
@@ -283,7 +297,7 @@ DEFER: (connect-irc)
         |dispose stream-readln [
             parse-irc-line handle-reader-message t
         ] [
-            irc> terminate-irc f
+            handle-disconnect
         ] if*
     ] with-destructors ;
 

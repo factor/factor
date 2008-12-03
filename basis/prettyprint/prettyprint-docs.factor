@@ -1,6 +1,6 @@
 USING: prettyprint.backend prettyprint.config
 prettyprint.sections prettyprint.private help.markup help.syntax
-io kernel words definitions quotations strings ;
+io kernel words definitions quotations strings generic classes ;
 IN: prettyprint
 
 ARTICLE: "prettyprint-numbers" "Prettyprinting numbers"
@@ -17,7 +17,8 @@ ARTICLE: "prettyprint-stacks" "Prettyprinting stacks"
 "Prettyprinting any stack:"
 { $subsection stack. }
 "Prettyprinting any call stack:"
-{ $subsection callstack. } ;
+{ $subsection callstack. }
+"Note that calls to " { $link .s } " can also be included inside words as a debugging aid, however a more convenient way to achieve this is to use the annotation facility. See " { $link "tools.annotations" } "." ;
 
 ARTICLE: "prettyprint-variables" "Prettyprint control variables"
 "The following variables affect the " { $link . } " and " { $link pprint } " words if set in the current dynamic scope:"
@@ -150,6 +151,8 @@ $nl
 { $subsection pprint-cell }
 "Printing a definition (see " { $link "definitions" } "):"
 { $subsection see }
+"Printing the methods defined on a generic word or class (see " { $link "objects" } "):"
+{ $subsection see-methods }
 "More prettyprinter usage:"
 { $subsection "prettyprint-numbers" }
 { $subsection "prettyprint-stacks" }
@@ -167,17 +170,26 @@ HELP: with-pprint
 
 HELP: pprint
 { $values { "obj" object } }
-{ $description "Prettyprints an object to " { $link output-stream } ". Output is influenced by many variables; see " { $link "prettyprint-variables" } "." } ;
+{ $description "Prettyprints an object to " { $link output-stream } ". Output is influenced by many variables; see " { $link "prettyprint-variables" } "." }
+{ $warning
+    "Unparsing a large object can take a long time and consume a lot of memory. If you need to print large objects, use " { $link pprint-short } " or set some " { $link "prettyprint-variables" } " to limit output size."
+} ;
 
 { pprint pprint* with-pprint } related-words
 
 HELP: .
 { $values { "obj" object } }
-{ $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." } ;
+{ $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." }
+{ $warning
+    "Printing a large object can take a long time and consume a lot of memory. If you need to print large objects, use " { $link short. } " or set some " { $link "prettyprint-variables" } " to limit output size."
+} ;
 
 HELP: unparse
 { $values { "obj" object } { "str" "Factor source string" } }
-{ $description "Outputs a prettyprinted string representation of an object. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." } ;
+{ $description "Outputs a prettyprinted string representation of an object. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." }
+{ $warning
+    "Unparsing a large object can take a long time and consume a lot of memory. If you need to unparse large objects, use " { $link unparse-short } " or set some " { $link "prettyprint-variables" } " to limit output size."
+} ;
 
 HELP: pprint-short
 { $values { "obj" object } }
@@ -239,6 +251,10 @@ $prettyprinting-note ;
 HELP: see
 { $values { "defspec" "a definition specifier" } }
 { $contract "Prettyprints a definition." } ;
+
+HELP: see-methods
+{ $values { "word" "a " { $link generic } " or a " { $link class } } }
+{ $contract "Prettyprints the methods defined on a generic word or class." } ;
 
 HELP: definer
 { $values { "defspec" "a definition specifier" } { "start" word } { "end" "a word or " { $link f } } }

@@ -4,12 +4,11 @@ USING: accessors arrays assocs combinators io io.streams.string
 kernel math math.parser namespaces qualified sets
 quotations sequences splitting symbols vectors math.order
 unicode.categories strings regexp.backend regexp.utils
-unicode.case words ;
+unicode.case words locals regexp.classes ;
 IN: regexp.parser
 
 FROM: math.ranges => [a,b] ;
 
-MIXIN: node
 TUPLE: concatenation seq ; INSTANCE: concatenation node
 TUPLE: alternation seq ; INSTANCE: alternation node
 TUPLE: kleene-star term ; INSTANCE: kleene-star node
@@ -40,34 +39,31 @@ INSTANCE: independent-group parentheses-group
 TUPLE: comment-group term ; INSTANCE: comment-group node
 INSTANCE: comment-group parentheses-group
 
-TUPLE: character-class-range from to ; INSTANCE: character-class-range node
 SINGLETON: epsilon INSTANCE: epsilon node
-SINGLETON: any-char INSTANCE: any-char node
-SINGLETON: front-anchor INSTANCE: front-anchor node
-SINGLETON: back-anchor INSTANCE: back-anchor node
 
-TUPLE: option-on option ; INSTANCE: option-on node
-TUPLE: option-off option ; INSTANCE: option-off node
-SINGLETONS: unix-lines dotall multiline comments case-insensitive unicode-case reversed-regexp ;
+TUPLE: option option on? ; INSTANCE: option node
 
-SINGLETONS: letter-class LETTER-class Letter-class digit-class
-alpha-class non-newline-blank-class
-ascii-class punctuation-class java-printable-class blank-class
-control-character-class hex-digit-class java-blank-class c-identifier-class
-unmatchable-class ;
+SINGLETONS: unix-lines dotall multiline comments case-insensitive
+unicode-case reversed-regexp ;
 
-SINGLETONS: beginning-of-group end-of-group
-beginning-of-character-class end-of-character-class
+SINGLETONS: beginning-of-character-class end-of-character-class
 left-parenthesis pipe caret dash ;
 
-: get-option ( option -- ? ) current-regexp get options>> at ;
-: get-unix-lines ( -- ? ) unix-lines get-option ;
-: get-dotall ( -- ? ) dotall get-option ;
-: get-multiline ( -- ? ) multiline get-option ;
-: get-comments ( -- ? ) comments get-option ;
-: get-case-insensitive ( -- ? ) case-insensitive get-option ;
-: get-unicode-case ( -- ? ) unicode-case get-option ;
-: get-reversed-regexp ( -- ? ) reversed-regexp get-option ;
+: push1 ( obj -- ) input-stream get stream>> push ;
+: peek1 ( -- obj ) input-stream get stream>> [ f ] [ peek ] if-empty ;
+: pop3 ( seq -- obj1 obj2 obj3 ) [ pop ] [ pop ] [ pop ] tri spin ;
+: drop1 ( -- ) read1 drop ;
+
+: stack ( -- obj ) current-regexp get stack>> ;
+: change-whole-stack ( quot -- )
+    current-regexp get
+    [ stack>> swap call ] keep (>>stack) ; inline
+: push-stack ( obj -- ) stack push ;
+: pop-stack ( -- obj ) stack pop ;
+: cut-out ( vector n -- vector' vector ) cut rest ;
+ERROR: cut-stack-error ;
+: cut-stack ( obj vector -- vector' vector )
+    tuck last-index [ cut-stack-error ] unless* cut-out swap ;
 
 : <possessive-kleene-star> ( obj -- kleene ) possessive-kleene-star boa ;
 : <reluctant-kleene-star> ( obj -- kleene ) reluctant-kleene-star boa ;
@@ -76,18 +72,11 @@ left-parenthesis pipe caret dash ;
 
 : <negation> ( obj -- negation ) negation boa ;
 : <concatenation> ( seq -- concatenation )
-    >vector get-reversed-regexp [ reverse ] when
-    [ epsilon ] [ concatenation boa ] if-empty ;
+    >vector [ epsilon ] [ concatenation boa ] if-empty ;
 : <alternation> ( seq -- alternation ) >vector alternation boa ;
 : <capture-group> ( obj -- capture-group ) capture-group boa ;
 : <kleene-star> ( obj -- kleene-star ) kleene-star boa ;
-: <constant> ( obj -- constant )
-    dup Letter? get-case-insensitive and [
-        [ ch>lower constant boa ]
-        [ ch>upper constant boa ] bi 2array <alternation>
-    ] [
-        constant boa
-    ] if ;
+: <constant> ( obj -- constant ) constant boa ;
 
 : first|concatenation ( seq -- first/concatenation )
     dup length 1 = [ first ] [ <concatenation> ] if ;
@@ -96,21 +85,14 @@ left-parenthesis pipe caret dash ;
     dup length 1 = [ first ] [ <alternation> ] if ;
 
 : <character-class-range> ( from to -- obj )
-    2dup [ Letter? ] bi@ or get-case-insensitive and [
-        [ [ ch>lower ] bi@ character-class-range boa ]
-        [ [ ch>upper ] bi@ character-class-range boa ] 2bi
-        2array [ [ from>> ] [ to>> ] bi < ] filter
-        [ unmatchable-class ] [ first|alternation ] if-empty
-    ] [
-        2dup <
-        [ character-class-range boa ] [ 2drop unmatchable-class ] if
-    ] if ;
+    2dup <
+    [ character-class-range boa ] [ 2drop unmatchable-class ] if ;
 
 ERROR: unmatched-parentheses ;
 
-ERROR: bad-option ch ;
+ERROR: unknown-regexp-option option ;
 
-: option ( ch -- singleton )
+: ch>option ( ch -- singleton )
     {
         { CHAR: i [ case-insensitive ] }
         { CHAR: d [ unix-lines ] }
@@ -120,13 +102,21 @@ ERROR: bad-option ch ;
         { CHAR: s [ dotall ] }
         { CHAR: u [ unicode-case ] }
         { CHAR: x [ comments ] }
-        [ bad-option ]
+        [ unknown-regexp-option ]
     } case ;
 
-: option-on ( option -- ) current-regexp get options>> conjoin ;
-: option-off ( option -- ) current-regexp get options>> delete-at ;
+: option>ch ( option -- string )
+    {
+        { case-insensitive [ CHAR: i ] }
+        { multiline [ CHAR: m ] }
+        { reversed-regexp [ CHAR: r ] }
+        { dotall [ CHAR: s ] }
+        [ unknown-regexp-option ]
+    } case ;
 
-: toggle-option ( ch ? -- ) [ option ] dip [ option-on ] [ option-off ] if ;
+: toggle-option ( ch ? -- ) 
+    [ ch>option ] dip option boa push-stack ;
+
 : (parse-options) ( string ? -- ) [ toggle-option ] curry each ;
 
 : parse-options ( string -- )
@@ -137,7 +127,7 @@ ERROR: bad-special-group string ;
 DEFER: (parse-regexp)
 : nested-parse-regexp ( token ? -- )
     [ push-stack (parse-regexp) pop-stack ] dip
-    [ <negation> ] when pop-stack boa push-stack ;
+    [ <negation> ] when pop-stack new swap >>term push-stack ;
 
 ! non-capturing groups
 : (parse-special-group) ( -- )
@@ -224,31 +214,14 @@ ERROR: invalid-range a b ;
 
 : handle-left-brace ( -- )
     parse-repetition
-    >r 2dup [ [ 0 < [ invalid-range ] when ] when* ] bi@ r>
+    [ 2dup [ [ 0 < [ invalid-range ] when ] when* ] bi@ ] dip
     [
         2dup and [ from-m-to-n ]
         [ [ nip at-most-n ] [ at-least-n ] if* ] if
     ] [ drop 0 max exactly-n ] if ;
 
-SINGLETON: beginning-of-input
-SINGLETON: end-of-input
-
-: newlines ( -- obj1 obj2 obj3 )
-    CHAR: \r <constant>
-    CHAR: \n <constant>
-    2dup 2array <concatenation> ;
-
-: beginning-of-line ( -- obj )
-    beginning-of-input newlines 4array <alternation> lookbehind boa ;
-
-: end-of-line ( -- obj )
-    end-of-input newlines 4array <alternation> lookahead boa ;
-
-: handle-front-anchor ( -- )
-    get-multiline beginning-of-line beginning-of-input ? push-stack ;
-
-: handle-back-anchor ( -- )
-    get-multiline end-of-line end-of-input ? push-stack ;
+: handle-front-anchor ( -- ) beginning-of-line push-stack ;
+: handle-back-anchor ( -- ) end-of-line push-stack ;
 
 ERROR: bad-character-class obj ;
 ERROR: expected-posix-class ;
@@ -257,8 +230,8 @@ ERROR: expected-posix-class ;
     read1 CHAR: { = [ expected-posix-class ] unless
     "}" read-until [ bad-character-class ] unless
     {
-        { "Lower" [ get-case-insensitive Letter-class letter-class ? ] }
-        { "Upper" [ get-case-insensitive Letter-class LETTER-class ? ] }
+        { "Lower" [ letter-class ] }
+        { "Upper" [ LETTER-class ] }
         { "Alpha" [ Letter-class ] }
         { "ASCII" [ ascii-class ] }
         { "Digit" [ digit-class ] }
@@ -280,35 +253,30 @@ ERROR: expected-posix-class ;
 : parse-control-character ( -- n ) read1 ;
 
 ERROR: bad-escaped-literals seq ;
-: parse-escaped-literals ( -- obj )
-    "\\E" read-until [ bad-escaped-literals ] unless
+
+: parse-til-E ( -- obj )
+    "\\E" read-until [ bad-escaped-literals ] unless ;
+    
+:: (parse-escaped-literals) ( quot: ( obj -- obj' ) -- obj )
+    parse-til-E
     drop1
     [ epsilon ] [
-        [ <constant> ] V{ } map-as
+        [ quot call <constant> ] V{ } map-as
         first|concatenation
-    ] if-empty ;
+    ] if-empty ; inline
 
-ERROR: unrecognized-escape char ;
+: parse-escaped-literals ( -- obj )
+    [ ] (parse-escaped-literals) ;
+
+: lower-case-literals ( -- obj )
+    [ ch>lower ] (parse-escaped-literals) ;
+
+: upper-case-literals ( -- obj )
+    [ ch>upper ] (parse-escaped-literals) ;
 
 : parse-escaped ( -- obj )
     read1
     {
-        { CHAR: \ [ CHAR: \ <constant> ] }
-        { CHAR: ^ [ CHAR: ^ <constant> ] }
-        { CHAR: $ [ CHAR: $ <constant> ] }
-        { CHAR: - [ CHAR: - <constant> ] }
-        { CHAR: { [ CHAR: { <constant> ] }
-        { CHAR: } [ CHAR: } <constant> ] }
-        { CHAR: [ [ CHAR: [ <constant> ] }
-        { CHAR: ] [ CHAR: ] <constant> ] }
-        { CHAR: ( [ CHAR: ( <constant> ] }
-        { CHAR: ) [ CHAR: ) <constant> ] }
-        { CHAR: @ [ CHAR: @ <constant> ] }
-        { CHAR: * [ CHAR: * <constant> ] }
-        { CHAR: + [ CHAR: + <constant> ] }
-        { CHAR: ? [ CHAR: ? <constant> ] }
-        { CHAR: . [ CHAR: . <constant> ] }
-        { CHAR: : [ CHAR: : <constant> ] }
         { CHAR: t [ CHAR: \t <constant> ] }
         { CHAR: n [ CHAR: \n <constant> ] }
         { CHAR: r [ CHAR: \r <constant> ] }
@@ -316,12 +284,12 @@ ERROR: unrecognized-escape char ;
         { CHAR: a [ HEX: 7 <constant> ] }
         { CHAR: e [ HEX: 1b <constant> ] }
 
-        { CHAR: d [ digit-class ] }
-        { CHAR: D [ digit-class <negation> ] }
-        { CHAR: s [ java-blank-class ] }
-        { CHAR: S [ java-blank-class <negation> ] }
         { CHAR: w [ c-identifier-class ] }
         { CHAR: W [ c-identifier-class <negation> ] }
+        { CHAR: s [ java-blank-class ] }
+        { CHAR: S [ java-blank-class <negation> ] }
+        { CHAR: d [ digit-class ] }
+        { CHAR: D [ digit-class <negation> ] }
 
         { CHAR: p [ parse-posix-class ] }
         { CHAR: P [ parse-posix-class <negation> ] }
@@ -330,13 +298,19 @@ ERROR: unrecognized-escape char ;
         { CHAR: 0 [ parse-octal <constant> ] }
         { CHAR: c [ parse-control-character ] }
 
-        ! { CHAR: b [ handle-word-boundary ] }
-        ! { CHAR: B [ handle-word-boundary <negation> ] }
-        ! { CHAR: A [ handle-beginning-of-input ] }
-        ! { CHAR: G [ end of previous match ] }
-        ! { CHAR: Z [ handle-end-of-input ] }
-        ! { CHAR: z [ handle-end-of-input ] } ! except for terminator
+        { CHAR: Q [ parse-escaped-literals ] }
 
+        ! { CHAR: b [ word-boundary-class ] }
+        ! { CHAR: B [ word-boundary-class <negation> ] }
+        ! { CHAR: A [ handle-beginning-of-input ] }
+        ! { CHAR: z [ handle-end-of-input ] }
+
+        ! { CHAR: Z [ handle-end-of-input ] } ! plus a final terminator
+
+        ! m//g mode
+        ! { CHAR: G [ end of previous match ] }
+
+        ! Group capture
         ! { CHAR: 1 [ CHAR: 1 <constant> ] }
         ! { CHAR: 2 [ CHAR: 2 <constant> ] }
         ! { CHAR: 3 [ CHAR: 3 <constant> ] }
@@ -347,8 +321,12 @@ ERROR: unrecognized-escape char ;
         ! { CHAR: 8 [ CHAR: 8 <constant> ] }
         ! { CHAR: 9 [ CHAR: 9 <constant> ] }
 
-        { CHAR: Q [ parse-escaped-literals ] }
-        [ unrecognized-escape ]
+        ! Perl extensions
+        ! can't do \l and \u because \u is already a 4-hex
+        { CHAR: L [ lower-case-literals ] }
+        { CHAR: U [ upper-case-literals ] }
+
+        [ <constant> ]
     } case ;
 
 : handle-escape ( -- ) parse-escaped push-stack ;
@@ -389,20 +367,22 @@ DEFER: handle-left-bracket
     } case
     [ (parse-character-class) ] when ;
 
+: push-constant ( ch -- ) <constant> push-stack ;
+
 : parse-character-class-second ( -- )
     read1 {
-        { CHAR: [ [ CHAR: [ <constant> push-stack ] }
-        { CHAR: ] [ CHAR: ] <constant> push-stack ] }
-        { CHAR: - [ CHAR: - <constant> push-stack ] }
+        { CHAR: [ [ CHAR: [ push-constant ] }
+        { CHAR: ] [ CHAR: ] push-constant ] }
+        { CHAR: - [ CHAR: - push-constant ] }
         [ push1 ]
     } case ;
 
 : parse-character-class-first ( -- )
     read1 {
         { CHAR: ^ [ caret push-stack parse-character-class-second ] }
-        { CHAR: [ [ CHAR: [ <constant> push-stack ] }
-        { CHAR: ] [ CHAR: ] <constant> push-stack ] }
-        { CHAR: - [ CHAR: - <constant> push-stack ] }
+        { CHAR: [ [ CHAR: [ push-constant ] }
+        { CHAR: ] [ CHAR: ] push-constant ] }
+        { CHAR: - [ CHAR: - push-constant ] }
         [ push1 ]
     } case ;
 
@@ -415,7 +395,8 @@ DEFER: handle-left-bracket
     [ first|concatenation ] map first|alternation ;
 
 : handle-right-parenthesis ( -- )
-    stack dup [ parentheses-group "members" word-prop member? ] find-last -rot cut rest
+    stack dup [ parentheses-group "members" word-prop member? ] find-last
+    -rot cut rest
     [ [ push ] keep current-regexp get (>>stack) ]
     [ finish-regexp-parse push-stack ] bi* ;
 
@@ -432,12 +413,9 @@ DEFER: handle-left-bracket
         { CHAR: [ [ handle-left-bracket t ] }
         { CHAR: \ [ handle-escape t ] }
         [
-            dup CHAR: $ = peek1 f = and [
-                drop
-                handle-back-anchor f
-            ] [
-                <constant> push-stack t
-            ] if
+            dup CHAR: $ = peek1 f = and
+            [ drop handle-back-anchor f ]
+            [ push-constant t ] if
         ]
     } case ;
 
@@ -454,7 +432,6 @@ DEFER: handle-left-bracket
                 parse-regexp-beginning (parse-regexp)
             ] with-input-stream
         ] unless-empty
-        current-regexp get
-        stack finish-regexp-parse
-            >>parse-tree drop
+        current-regexp get [ finish-regexp-parse ] change-stack
+        dup stack>> >>parse-tree drop
     ] with-variable ;

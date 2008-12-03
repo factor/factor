@@ -7,13 +7,12 @@ urls math.parser ;
 : shake-and-bake ( vocab -- )
     [ "test.image" temp-file delete-file ] ignore-errors
     "resource:" [
-        >r vm
-        "test.image" temp-file
-        r> dup deploy-config make-deploy-image
+        [ vm "test.image" temp-file ] dip
+        dup deploy-config make-deploy-image
     ] with-directory ;
 
 : small-enough? ( n -- ? )
-    >r "test.image" temp-file file-info size>> r> cell 4 / * <= ;
+    [ "test.image" temp-file file-info size>> ] [ cell 4 / * ] bi* <= ;
 
 [ ] [ "hello-world" shake-and-bake ] unit-test
 
@@ -40,9 +39,9 @@ urls math.parser ;
 
 [ t ] [ 1500000 small-enough? ] unit-test
 
-[ ] [ "bunny" shake-and-bake ] unit-test
+! [ ] [ "bunny" shake-and-bake ] unit-test
 
-[ t ] [ 2500000 small-enough? ] unit-test
+! [ t ] [ 2500000 small-enough? ] unit-test
 
 : run-temp-image ( -- )
     vm
@@ -104,5 +103,10 @@ M: quit-responder call-responder*
 
 [ ] [
     "tools.deploy.test.6" shake-and-bake
+    run-temp-image
+] unit-test
+
+[ ] [
+    "tools.deploy.test.7" shake-and-bake
     run-temp-image
 ] unit-test

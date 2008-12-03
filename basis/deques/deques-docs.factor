@@ -4,19 +4,13 @@ IN: deques
 
 HELP: deque-empty?
 { $values { "deque" deque } { "?" "a boolean" } }
-{ $description "Returns true if a deque is empty." }
+{ $contract "Returns true if a deque is empty." }
 { $notes "This operation is O(1)." } ;
 
 HELP: clear-deque
 { $values
      { "deque" deque } }
 { $description "Removes all elements from a deque." } ;
-
-HELP: deque-length
-{ $values
-     { "deque" deque }
-     { "n" integer } }
-{ $description "Returns the number of elements in a deque." } ;
 
 HELP: deque-member?
 { $values
@@ -31,7 +25,7 @@ HELP: push-front
 
 HELP: push-front*
 { $values { "obj" object } { "deque" deque } { "node" "a node" } }
-{ $description "Push the object onto the front of the deque and return the newly created node." } 
+{ $contract "Push the object onto the front of the deque and return the newly created node." } 
 { $notes "This operation is O(1)." } ;
 
 HELP: push-back
@@ -41,7 +35,7 @@ HELP: push-back
 
 HELP: push-back*
 { $values { "obj" object } { "deque" deque } { "node" "a node" } }
-{ $description "Push the object onto the back of the deque and return the newly created node." } 
+{ $contract "Push the object onto the back of the deque and return the newly created node." } 
 { $notes "This operation is O(1)." } ;
 
 HELP: push-all-back
@@ -56,7 +50,7 @@ HELP: push-all-front
 
 HELP: peek-front
 { $values { "deque" deque } { "obj" object } }
-{ $description "Returns the object at the front of the deque." } ;
+{ $contract "Returns the object at the front of the deque." } ;
 
 HELP: pop-front
 { $values { "deque" deque } { "obj" object } }
@@ -65,12 +59,12 @@ HELP: pop-front
 
 HELP: pop-front*
 { $values { "deque" deque } }
-{ $description "Pop the object off the front of the deque." }
+{ $contract "Pop the object off the front of the deque." }
 { $notes "This operation is O(1)." } ;
 
 HELP: peek-back
 { $values { "deque" deque } { "obj" object } }
-{ $description "Returns the object at the back of the deque." } ;
+{ $contract "Returns the object at the back of the deque." } ;
 
 HELP: pop-back
 { $values { "deque" deque } { "obj" object } }
@@ -79,13 +73,13 @@ HELP: pop-back
 
 HELP: pop-back*
 { $values { "deque" deque } }
-{ $description "Pop the object off the back of the deque." }
+{ $contract "Pop the object off the back of the deque." }
 { $notes "This operation is O(1)." } ;
 
 HELP: delete-node
 { $values
      { "node" object } { "deque" deque } }
-{ $description "Deletes the node from the deque." } ;
+{ $contract "Deletes the node from the deque." } ;
 
 HELP: deque
 { $description "A data structure that has constant-time insertion and removal of elements at both ends." } ;
@@ -111,7 +105,7 @@ $nl
 "Querying the deque:"
 { $subsection peek-front }
 { $subsection peek-back }
-{ $subsection deque-length }
+{ $subsection deque-empty? }
 { $subsection deque-member? }
 "Adding and removing elements:"
 { $subsection push-front* }
@@ -123,7 +117,6 @@ $nl
 { $subsection delete-node }
 { $subsection node-value }
 "Utility operations built in terms of the above:"
-{ $subsection deque-empty? }
 { $subsection push-front }
 { $subsection push-all-front }
 { $subsection push-back }

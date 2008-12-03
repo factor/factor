@@ -54,7 +54,6 @@ TR: convert-separators "/\\" ".." ;
     [ monitor-thread ] "Vocabulary monitor" spawn drop ;
 
 [
-    "-no-monitors" cli-args member? [
-        start-monitor-thread
-    ] unless
+    "-no-monitors" (command-line) member?
+    [ start-monitor-thread ] unless
 ] "tools.vocabs.monitor" add-init-hook

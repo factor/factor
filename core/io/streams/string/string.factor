@@ -5,6 +5,33 @@ strings generic splitting continuations destructors
 io.streams.plain io.encodings math.order growable ;
 IN: io.streams.string
 
+<PRIVATE
+
+: harden-as ( seq growble-exemplar -- newseq )
+    underlying>> like ;
+
+: growable-read-until ( growable n -- str )
+    >fixnum dupd tail-slice swap harden-as dup reverse-here ;
+
+SINGLETON: null-encoding
+
+M: null-encoding decode-char drop stream-read1 ;
+
+: format-column ( seq ? -- seq )
+    [
+        [ 0 [ length max ] reduce ] keep
+        swap [ CHAR: \s pad-right ] curry map
+    ] unless ;
+
+: map-last ( seq quot -- seq )
+    [ dup length <reversed> ] dip [ 0 = ] prepose 2map ; inline
+
+PRIVATE>
+
+: format-table ( table -- seq )
+    flip [ format-column ] map-last
+    flip [ " " join ] map ;
+
 M: growable dispose drop ;
 
 M: growable stream-write1 push ;
@@ -19,12 +46,6 @@ M: growable stream-flush drop ;
     >string ; inline
 
 M: growable stream-read1 [ f ] [ pop ] if-empty ;
-
-: harden-as ( seq growble-exemplar -- newseq )
-    underlying>> like ;
-
-: growable-read-until ( growable n -- str )
-    >fixnum dupd tail-slice swap harden-as dup reverse-here ;
 
 : find-last-sep ( seq seps -- n )
     swap [ memq? ] curry find-last drop ;
@@ -50,29 +71,13 @@ M: growable stream-read
 M: growable stream-read-partial
     stream-read ;
 
-SINGLETON: null
-M: null decode-char drop stream-read1 ;
-
 : <string-reader> ( str -- stream )
-    >sbuf dup reverse-here null <decoder> ;
+    >sbuf dup reverse-here null-encoding <decoder> ;
 
 : with-string-reader ( str quot -- )
-    >r <string-reader> r> with-input-stream ; inline
+    [ <string-reader> ] dip with-input-stream ; inline
 
 INSTANCE: growable plain-writer
-
-: format-column ( seq ? -- seq )
-    [
-        [ 0 [ length max ] reduce ] keep
-        swap [ CHAR: \s pad-right ] curry map
-    ] unless ;
-
-: map-last ( seq quot -- seq )
-    >r dup length <reversed> [ zero? ] r> compose 2map ; inline
-
-: format-table ( table -- seq )
-    flip [ format-column ] map-last
-    flip [ " " join ] map ;
 
 M: plain-writer stream-write-table
     [ drop format-table [ print ] each ] with-output-stream* ;

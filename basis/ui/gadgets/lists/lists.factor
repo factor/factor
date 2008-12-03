@@ -33,7 +33,7 @@ TUPLE: list < pack index presenter color hook ;
     hook>> [ [ list? ] find-parent ] prepend ;
 
 : <list-presentation> ( hook elt presenter -- gadget )
-    keep >r >label text-theme r>
+    keep [ >label text-theme ] dip
     <presentation>
     swap >>hook ; inline
 
@@ -42,7 +42,7 @@ TUPLE: list < pack index presenter color hook ;
     [ presenter>> ]
     [ control-value ]
     tri [
-        >r 2dup r> swap <list-presentation>
+        [ 2dup ] dip swap <list-presentation>
     ] map 2nip ;
 
 M: list model-changed
@@ -56,8 +56,12 @@ M: list model-changed
 
 M: list draw-gadget*
     origin get [
-        dup color>> set-color
-        selected-rect [ rect-extent gl-fill-rect ] when*
+        dup color>> gl-color
+        selected-rect [
+            dup loc>> [
+                dim>> gl-fill-rect
+            ] with-translation
+        ] when*
     ] with-translation ;
 
 M: list focusable-child* drop t ;
@@ -109,8 +113,8 @@ M: list focusable-child* drop t ;
     select-gadget ;
 
 : list-page ( list vec -- )
-    >r dup selected-rect rect-bounds 2 v/n v+
-    over visible-dim r> v* v+ swap select-at ;
+    [ dup selected-rect rect-bounds 2 v/n v+ over visible-dim ] dip
+    v* v+ swap select-at ;
 
 : list-page-up ( list -- ) { 0 -1 } list-page ;
 

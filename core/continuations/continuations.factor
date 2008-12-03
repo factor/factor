@@ -65,7 +65,7 @@ C: <continuation> continuation
     #! ( value f r:capture r:restore )
     #! Execution begins right after the call to 'continuation'.
     #! The 'restore' branch is taken.
-    >r >r dummy-1 continuation r> r> [ dummy-2 ] prepose ?if ; inline
+    [ dummy-1 continuation ] 2dip [ dummy-2 ] prepose ?if ; inline
 
 : callcc0 ( quot -- ) [ drop ] ifcc ; inline
 
@@ -78,7 +78,7 @@ C: <continuation> continuation
     set-catchstack
     set-namestack
     set-retainstack
-    >r set-datastack r>
+    [ set-datastack ] dip
     set-callstack ;
 
 : (continue-with) ( obj continuation -- )
@@ -87,7 +87,7 @@ C: <continuation> continuation
     set-catchstack
     set-namestack
     set-retainstack
-    >r set-datastack drop 4 getenv f 4 setenv f r>
+    [ set-datastack drop 4 getenv f 4 setenv f ] dip
     set-callstack ;
 
 PRIVATE>
@@ -135,14 +135,13 @@ SYMBOL: thread-error-hook
     c> continue-with ;
 
 : recover ( try recovery -- )
-    >r [ swap >c call c> drop ] curry r> ifcc ; inline
+    [ [ swap >c call c> drop ] curry ] dip ifcc ; inline
 
 : ignore-errors ( quot -- )
     [ drop ] recover ; inline
 
 : cleanup ( try cleanup-always cleanup-error -- )
-    over >r compose [ dip rethrow ] curry
-    recover r> call ; inline
+    [ compose [ dip rethrow ] curry recover ] [ drop ] 2bi call ; inline
 
 ERROR: attempt-all-error ;
 

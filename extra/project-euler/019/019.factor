@@ -33,7 +33,7 @@ IN: project-euler.019
 : euler019 ( -- answer )
     1901 2000 [a,b] [
         12 [1,b] [ 1 zeller-congruence ] with map
-    ] map concat [ zero? ] count ;
+    ] map concat [ 0 = ] count ;
 
 ! [ euler019 ] 100 ave-time
 ! 1 ms ave run time - 0.51 SD (100 trials)
@@ -58,7 +58,7 @@ IN: project-euler.019
 PRIVATE>
 
 : euler019a ( -- answer )
-    end-date start-date first-days [ zero? ] count ;
+    end-date start-date first-days [ 0 = ] count ;
 
 ! [ euler019a ] 100 ave-time
 ! 17 ms ave run time - 2.13 SD (100 trials)

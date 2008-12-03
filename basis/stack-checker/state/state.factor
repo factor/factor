@@ -1,47 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs namespaces sequences kernel definitions math
-effects accessors words fry classes.algebra stack-checker.errors
+USING: assocs arrays namespaces sequences kernel definitions
+math effects accessors words fry classes.algebra
 compiler.units ;
 IN: stack-checker.state
-
-: <value> ( -- value ) \ <value> counter ;
-
-SYMBOL: known-values
-
-: known ( value -- known ) known-values get at ;
-
-: set-known ( known value -- )
-    over [ known-values get set-at ] [ 2drop ] if ;
-
-: make-known ( known -- value )
-    <value> [ set-known ] keep ;
-
-: copy-value ( value -- value' )
-    known make-known ;
-
-: copy-values ( values -- values' )
-    [ copy-value ] map ;
-
-! Literal value
-TUPLE: literal < identity-tuple value recursion ;
-
-: <literal> ( obj -- value )
-    recursive-state get \ literal boa ;
-
-: literal ( value -- literal )
-    known dup literal?
-    [  \ literal-expected inference-warning ] unless ;
-
-! Result of curry
-TUPLE: curried obj quot ;
-
-C: <curried> curried
-
-! Result of compose
-TUPLE: composed quot1 quot2 ;
-
-C: <composed> composed
 
 ! Did the current control-flow path throw an error?
 SYMBOL: terminated?
@@ -68,23 +30,6 @@ SYMBOL: meta-r
     V{ } clone meta-r set
     0 d-in set ;
 
-: init-known-values ( -- )
-    H{ } clone known-values set ;
-
-: recursive-label ( word -- label/f )
-    recursive-state get at ;
-
-: local-recursive-state ( -- assoc )
-    recursive-state get dup
-    [ first dup word? [ inline? ] when not ] find drop
-    [ head-slice ] when* ;
-
-: inline-recursive-label ( word -- label/f )
-    local-recursive-state at ;
-
-: recursive-quotation? ( quot -- ? )
-    local-recursive-state [ first eq? ] with contains? ;
-
 ! Words that the current quotation depends on
 SYMBOL: dependencies
 
@@ -98,9 +43,12 @@ SYMBOL: dependencies
 ! Generic words that the current quotation depends on
 SYMBOL: generic-dependencies
 
+: ?class-or ( class/f class -- class' )
+    swap [ class-or ] when* ;
+
 : depends-on-generic ( generic class -- )
     generic-dependencies get dup
-    [ swap '[ null or _ class-or ] change-at ] [ 3drop ] if ;
+    [ swap '[ _ ?class-or ] change-at ] [ 3drop ] if ;
 
 ! Words we've inferred the stack effect of, for rollback
 SYMBOL: recorded

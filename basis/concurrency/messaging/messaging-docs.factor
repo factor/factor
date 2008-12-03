@@ -55,7 +55,7 @@ ARTICLE: { "concurrency" "synchronous-sends" } "Synchronous sends"
 { $example
     "USING: concurrency.messaging kernel threads ;"
     ": pong-server ( -- )"
-    "    receive >r \"pong\" r> reply-synchronous ;"
+    "    receive [ \"pong\" ] dip reply-synchronous ;"
     "[ pong-server t ] \"pong-server\" spawn-server"
     "\"ping\" swap send-synchronous ."
     "\"pong\""

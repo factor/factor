@@ -6,15 +6,20 @@
 DLLEXPORT F_FIXNUM to_fixnum(CELL tagged);
 DLLEXPORT CELL to_cell(CELL tagged);
 
-DECLARE_PRIMITIVE(bignum_to_fixnum);
-DECLARE_PRIMITIVE(float_to_fixnum);
+void primitive_bignum_to_fixnum(void);
+void primitive_float_to_fixnum(void);
 
-DECLARE_PRIMITIVE(fixnum_add);
-DECLARE_PRIMITIVE(fixnum_subtract);
-DECLARE_PRIMITIVE(fixnum_multiply);
-DECLARE_PRIMITIVE(fixnum_divint);
-DECLARE_PRIMITIVE(fixnum_divmod);
-DECLARE_PRIMITIVE(fixnum_shift);
+void primitive_fixnum_add(void);
+void primitive_fixnum_subtract(void);
+void primitive_fixnum_multiply(void);
+
+DLLEXPORT F_FASTCALL void overflow_fixnum_add(F_FIXNUM x, F_FIXNUM y);
+DLLEXPORT F_FASTCALL void overflow_fixnum_subtract(F_FIXNUM x, F_FIXNUM y);
+DLLEXPORT F_FASTCALL void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y);
+
+void primitive_fixnum_divint(void);
+void primitive_fixnum_divmod(void);
+void primitive_fixnum_shift(void);
 
 CELL bignum_zero;
 CELL bignum_pos_one;
@@ -25,27 +30,27 @@ INLINE CELL tag_bignum(F_ARRAY* bignum)
 	return RETAG(bignum,BIGNUM_TYPE);
 }
 
-DECLARE_PRIMITIVE(fixnum_to_bignum);
-DECLARE_PRIMITIVE(float_to_bignum);
-DECLARE_PRIMITIVE(bignum_eq);
-DECLARE_PRIMITIVE(bignum_add);
-DECLARE_PRIMITIVE(bignum_subtract);
-DECLARE_PRIMITIVE(bignum_multiply);
-DECLARE_PRIMITIVE(bignum_divint);
-DECLARE_PRIMITIVE(bignum_divmod);
-DECLARE_PRIMITIVE(bignum_mod);
-DECLARE_PRIMITIVE(bignum_and);
-DECLARE_PRIMITIVE(bignum_or);
-DECLARE_PRIMITIVE(bignum_xor);
-DECLARE_PRIMITIVE(bignum_shift);
-DECLARE_PRIMITIVE(bignum_less);
-DECLARE_PRIMITIVE(bignum_lesseq);
-DECLARE_PRIMITIVE(bignum_greater);
-DECLARE_PRIMITIVE(bignum_greatereq);
-DECLARE_PRIMITIVE(bignum_not);
-DECLARE_PRIMITIVE(bignum_bitp);
-DECLARE_PRIMITIVE(bignum_log2);
-DECLARE_PRIMITIVE(byte_array_to_bignum);
+void primitive_fixnum_to_bignum(void);
+void primitive_float_to_bignum(void);
+void primitive_bignum_eq(void);
+void primitive_bignum_add(void);
+void primitive_bignum_subtract(void);
+void primitive_bignum_multiply(void);
+void primitive_bignum_divint(void);
+void primitive_bignum_divmod(void);
+void primitive_bignum_mod(void);
+void primitive_bignum_and(void);
+void primitive_bignum_or(void);
+void primitive_bignum_xor(void);
+void primitive_bignum_shift(void);
+void primitive_bignum_less(void);
+void primitive_bignum_lesseq(void);
+void primitive_bignum_greater(void);
+void primitive_bignum_greatereq(void);
+void primitive_bignum_not(void);
+void primitive_bignum_bitp(void);
+void primitive_bignum_log2(void);
+void primitive_byte_array_to_bignum(void);
 
 INLINE CELL allot_integer(F_FIXNUM x)
 {
@@ -80,7 +85,7 @@ DLLEXPORT u64 to_unsigned_8(CELL obj);
 
 CELL unbox_array_size(void);
 
-DECLARE_PRIMITIVE(from_fraction);
+void primitive_from_fraction(void);
 
 INLINE double untag_float_fast(CELL tagged)
 {
@@ -125,26 +130,26 @@ DLLEXPORT float to_float(CELL value);
 DLLEXPORT void box_double(double flo);
 DLLEXPORT double to_double(CELL value);
 
-DECLARE_PRIMITIVE(fixnum_to_float);
-DECLARE_PRIMITIVE(bignum_to_float);
-DECLARE_PRIMITIVE(str_to_float);
-DECLARE_PRIMITIVE(float_to_str);
-DECLARE_PRIMITIVE(float_to_bits);
+void primitive_fixnum_to_float(void);
+void primitive_bignum_to_float(void);
+void primitive_str_to_float(void);
+void primitive_float_to_str(void);
+void primitive_float_to_bits(void);
 
-DECLARE_PRIMITIVE(float_eq);
-DECLARE_PRIMITIVE(float_add);
-DECLARE_PRIMITIVE(float_subtract);
-DECLARE_PRIMITIVE(float_multiply);
-DECLARE_PRIMITIVE(float_divfloat);
-DECLARE_PRIMITIVE(float_mod);
-DECLARE_PRIMITIVE(float_less);
-DECLARE_PRIMITIVE(float_lesseq);
-DECLARE_PRIMITIVE(float_greater);
-DECLARE_PRIMITIVE(float_greatereq);
+void primitive_float_eq(void);
+void primitive_float_add(void);
+void primitive_float_subtract(void);
+void primitive_float_multiply(void);
+void primitive_float_divfloat(void);
+void primitive_float_mod(void);
+void primitive_float_less(void);
+void primitive_float_lesseq(void);
+void primitive_float_greater(void);
+void primitive_float_greatereq(void);
 
-DECLARE_PRIMITIVE(float_bits);
-DECLARE_PRIMITIVE(bits_float);
-DECLARE_PRIMITIVE(double_bits);
-DECLARE_PRIMITIVE(bits_double);
+void primitive_float_bits(void);
+void primitive_bits_float(void);
+void primitive_double_bits(void);
+void primitive_bits_double(void);
 
-DECLARE_PRIMITIVE(from_rect);
+void primitive_from_rect(void);

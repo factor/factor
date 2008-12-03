@@ -1,6 +1,6 @@
 USING: help.markup help.syntax strings quotations debugger
 io.styles namespaces ui.backend ui.gadgets ui.gadgets.worlds
-ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids math.geometry.rect ;
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids math.geometry.rect colors ;
 IN: ui
 
 HELP: windows
@@ -23,7 +23,7 @@ HELP: fullscreen?
 { fullscreen? set-fullscreen? } related-words
 
 HELP: find-window
-{ $values { "quot" "a quotation with stack effect " { $snippet "( world -- ? )" } } { "world" "a " { $link world } " or " { $link f } } }
+{ $values { "quot" { $quotation "( world -- ? )" } } { "world" { $maybe world } } }
 { $description "Finds a native window such that the gadget passed to " { $link open-window } " satisfies the quotation, outputting " { $link f } " if no such gadget could be found. The front-most native window is checked first." } ;
 
 HELP: register-window
@@ -47,23 +47,19 @@ HELP: (open-window)
 { $description "Opens a native window containing the given world. This grafts the world by calling " { $link graft } ". Each world can only be displayed in one top-level window at a time." }
 { $notes "This word should not be called directly by user code. Instead, use " { $link open-window } "." } ;
 
-HELP: ui-try
+HELP: raise-window
+{ $values { "gadget" gadget } }
+{ $description "Makes the native window containing the given gadget the front-most window." } ;
+
+HELP: with-ui
 { $values { "quot" quotation } }
-{ $description "Calls the quotation. If it throws an error, opens a window with the error and restores the data stack." }
-{ $notes "This is essentially a graphical variant of " { $link try } "." } ;
+{ $description "Calls the quotation, starting the UI first if necessary." }
+{ $notes "This combinator should be used in the " { $link POSTPONE: MAIN: } " word of a vocabulary, in order for the vocabulary to work when run from the UI listener (" { $snippet "\"my-app\" run" } " and the command line (" { $snippet "./factor -run=my-app" } ")." }
+{ $examples "The " { $vocab-link "hello-ui" } " vocabulary implements a simple UI application which uses this combinator." } ;
 
 ARTICLE: "ui-glossary" "UI glossary"
 { $table
-    { "color specifier"
-        { "an array of four elements, all numbers between 0 and 1:"
-            { $list
-                "red"
-                "green"
-                "blue"
-                "alpha - 0 is completely transparent, 1 is completely opaque"
-            }
-        }
-    }
+    { "color" { "an instance of " { $link color } } }
     { "dimension" "a pair of integers denoting pixel size on screen" }
     { "font specifier"
         { "an array of three elements:"
@@ -99,30 +95,14 @@ ARTICLE: "gadgets" "Pre-made UI gadgets"
 { $subsection "ui.gadgets.sliders" }
 { $subsection "ui.gadgets.scrollers" }
 { $subsection "gadgets-editors" }
+{ $subsection "ui.gadgets.menus" }
 { $subsection "ui.gadgets.panes" }
 { $subsection "ui.gadgets.presentations" }
 { $subsection "ui.gadgets.lists" } ;
 
 ARTICLE: "ui-geometry" "Gadget geometry"
 "The " { $link gadget } " class inherits from the " { $link rect } " class, and thus all gadgets have a bounding box:"
-{ $subsection rect }
-"Rectangles can be taken apart:"
-{ $subsection rect-loc }
-{ $subsection rect-dim }
-{ $subsection rect-bounds }
-{ $subsection rect-extent }
-"New rectangles can be created:"
-{ $subsection <zero-rect> }
-{ $subsection <rect> }
-{ $subsection <extent-rect> }
-"More utility words for working with rectangles:"
-{ $subsection offset-rect }
-{ $subsection rect-intersect }
-{ $subsection intersects? }
-
-! "A gadget's bounding box is always relative to its parent. "
-! { $subsection gadget-parent }
-
+{ $subsection "math.geometry.rect" }
 "Word for converting from a child gadget's co-ordinate system to a parent's:"
 { $subsection relative-loc }
 { $subsection screen-loc }
@@ -151,9 +131,7 @@ ARTICLE: "ui-backend" "Developing UI backends"
 "UI backends may implement the " { $link "clipboard-protocol" } "." ;
 
 ARTICLE: "ui-backend-init" "UI initialization and the event loop"
-"An UI backend is required to define a word to start the UI:"
-{ $subsection ui }
-"This word should contain backend initialization, together with some boilerplate:"
+"An UI backend is required to define a method on the " { $link ui } " word. This word should contain backend initialization, together with some boilerplate:"
 { $code
     "IN: shells"
     ""
@@ -184,10 +162,6 @@ ARTICLE: "ui-backend-windows" "UI backend window management"
 { $subsection flush-gl-context }
 "If the user clicks the window's close box, you must call the following word:"
 { $subsection close-window } ;
-
-HELP: raise-window
-{ $values { "gadget" gadget } }
-{ $description "Makes the native window containing the given gadget the front-most window." } ;
 
 ARTICLE: "ui-layouts" "Gadget hierarchy and layouts"
 "A layout gadget is a gadget whose sole purpose is to contain other gadgets. Layout gadgets position and resize children according to a certain policy, taking the preferred size of the children into account. Gadget hierarchies are constructed by building up nested layouts."
@@ -262,7 +236,23 @@ $nl
 { $subsection "clipboard-protocol" }
 { $see-also "ui-layout-impl" } ;
 
+ARTICLE: "starting-ui" "Starting the UI"
+"The UI starts automatically where possible:"
+{ $list
+    { "On Windows, the UI starts when the Factor executable is run." }
+    { "On X11, the UI starts if the " { $snippet "DISPLAY" } " environment variable is set." }
+    { "On Mac OS X, the UI starts if the " { $snippet "Factor.app" } " application bundle is run." }
+}
+"In all cases, passing the " { $snippet "-run=listener" } " command line switch starts the terminal listener instead. The UI can be started from the terminal listener using a word:"
+{ $subsection ui }
+"To run the terminal listener and the UI simultaneously, start the UI in a new thread:"
+{ $code "USING: threads ui ;" "[ ui ] in-thread" }
+"The main word of a vocabulary implementing a UI application should use a combinator to ensure that the application works when run from the command line as well as in the UI listener:"
+{ $subsection with-ui } ;
+
 ARTICLE: "ui" "UI framework"
+"The " { $vocab-link "ui" } " vocabulary hierarchy implements the Factor UI framework. The implementation relies on a small amount of platform-specific code to open windows and receive keyboard and mouse events; UI gadgets are rendered using OpenGL."
+{ $subsection "starting-ui" }
 { $subsection "ui-glossary" }
 { $subsection "building-ui" }
 { $subsection "new-gadgets" }

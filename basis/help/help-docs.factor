@@ -1,6 +1,6 @@
 USING: help.markup help.crossref help.stylesheet help.topics
 help.syntax definitions io prettyprint summary arrays math
-sequences vocabs ;
+sequences vocabs strings ;
 IN: help
 
 ARTICLE: "printing-elements" "Printing markup elements"
@@ -33,6 +33,10 @@ ARTICLE: "block-elements" "Block elements"
 { $subsection $side-effects }
 { $subsection $errors }
 { $subsection $see-also }
+"Elements used in " { $link $values } " forms:"
+{ $subsection $instance }
+{ $subsection $maybe }
+{ $subsection $quotation }
 "Boilerplate paragraphs:"
 { $subsection $low-level-note }
 { $subsection $io-error }
@@ -125,12 +129,17 @@ HELP: $title
 { $values { "topic" "a help article name or a word" } }
 { $description "Prints a help article's title, or a word's " { $link summary } ", depending on the type of " { $snippet "topic" } "." } ;
 
+HELP: print-topic
+{ $values { "topic" "an article name or a word" } }
+{ $description
+    "Displays a help topic on " { $link output-stream } "."
+} ;
+
 HELP: help
 { $values { "topic" "an article name or a word" } }
 { $description
-    "Displays a help article or documentation associated to a word on " { $link output-stream } "."
+    "Displays a help topic."
 } ;
-
 HELP: about
 { $values { "vocab" "a vocabulary specifier" } }
 { $description
@@ -281,7 +290,7 @@ HELP: $link
 } ;
 
 HELP: textual-list
-{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- )" } } }
+{ $values { "seq" "a sequence" } { "quot" { $quotation "( elt -- )" } } }
 { $description "Applies the quotation to each element of the sequence, printing a comma between each pair of elements." }
 { $examples
     { $example "USING: help.markup io ;" "{ \"fish\" \"chips\" \"salt\" } [ write ] textual-list" "fish, chips, salt" }
@@ -318,7 +327,37 @@ HELP: $table
 
 HELP: $values
 { $values { "element" "an array of pairs of markup elements" } }
-{ $description "Prints the description of arguments and values found on every word help page. The first element of a pair is the argument name and is output with " { $link $snippet } ". The remainder can be an element of any form." } ;
+{ $description "Prints the description of arguments and values found on every word help page. The first element of a pair is the argument name and is output with " { $link $snippet } ". The remainder is either a single class word, or an element. If it is a class word " { $snippet "class" } ", it is intereted as if it were shorthand for " { $snippet "{ $instance class }" } "." }
+{ $see-also $maybe $instance $quotation } ;
+
+HELP: $instance
+{ $values { "element" "an array with shape " { $snippet "{ class }" } } }
+{ $description
+    "Produces the text ``a " { $emphasis "class" } "'' or ``an " { $emphasis "class" } "'', depending on the first letter of " { $emphasis "class" } "."
+}
+{ $examples
+    { $markup-example { $instance string } }
+    { $markup-example { $instance integer } }
+    { $markup-example { $instance f } }
+} ;
+
+HELP: $maybe
+{ $values { "element" "an array with shape " { $snippet "{ class }" } } }
+{ $description
+    "Produces the text ``a " { $emphasis "class" } " or f'' or ``an " { $emphasis "class" } " or f'', depending on the first letter of " { $emphasis "class" } "."
+}
+{ $examples
+    { $markup-example { $maybe string } }
+} ;
+
+HELP: $quotation
+{ $values { "element" "an array with shape " { $snippet "{ effect }" } } }
+{ $description
+    "Produces the text ``a quotation with stack effect " { $emphasis "effect" } "''."
+}
+{ $examples
+    { $markup-example { $quotation "( obj -- )" } }
+} ;
 
 HELP: $list
 { $values { "element" "an array of markup elements" } }

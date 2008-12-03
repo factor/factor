@@ -2,7 +2,8 @@ USING: ui.gadgets ui.gadgets.scrollers namespaces tools.test
 kernel models models.compose models.range ui.gadgets.viewports
 ui.gadgets.labels ui.gadgets.grids ui.gadgets.frames
 ui.gadgets.sliders math math.vectors arrays sequences
-tools.test.ui math.geometry.rect accessors ;
+tools.test.ui math.geometry.rect accessors ui.gadgets.buttons
+ui.gadgets.packs ;
 IN: ui.gadgets.scrollers.tests
 
 [ ] [
@@ -74,7 +75,7 @@ dup layout
         "g2" get scroll>gadget
         "s" get layout
         "s" get scroller-value
-    ] map [ { 3 0 } = ] all?
+    ] map [ { 2 0 } = ] all?
 ] unit-test
 
 [ ] [ "Hi" <label> dup "l" set <scroller> "s" set ] unit-test
@@ -85,5 +86,23 @@ dup layout
 [ f ] [ "s" get viewport>> find-scroller* ] unit-test
 [ t ] [ "s" get @right grid-child slider? ] unit-test
 [ f ] [ "s" get @right grid-child find-scroller* ] unit-test
+
+[ ] [
+    "Click Me" [ [ scroll>gadget ] [ unparent ] bi ] <bevel-button>
+    [ <pile> swap add-gadget <scroller> ] keep
+    dup quot>> call
+    layout
+] unit-test
+
+[ t ] [
+    <gadget> { 200 200 } >>dim
+    [ [ scroll>gadget ] [ unparent ] bi ] <bevel-button>
+    dup
+    <pile> swap add-gadget <scroller> { 100 100 } >>dim dup layout
+    swap dup quot>> call
+    dup layout
+    model>> dependencies>> [ range-max value>> ] map
+    viewport-gap 2 v*n =
+] unit-test
 
 \ <scroller> must-infer

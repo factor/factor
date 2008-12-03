@@ -6,7 +6,7 @@ accessors init combinators command-line cpu.x86.assembler
 cpu.x86 cpu.architecture compiler compiler.units
 compiler.constants compiler.alien compiler.codegen
 compiler.codegen.fixup compiler.cfg.instructions
-compiler.cfg.builder compiler.cfg.intrinsics ;
+compiler.cfg.builder compiler.cfg.intrinsics make ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
@@ -23,14 +23,32 @@ M: x86.32 machine-registers
 M: x86.32 ds-reg ESI ;
 M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
-M: x86.32 temp-reg-1 EAX ;
-M: x86.32 temp-reg-2 ECX ;
+M: x86.32 temp-reg-1 ECX ;
+M: x86.32 temp-reg-2 EDX ;
+
+M:: x86.32 %dispatch ( src temp offset -- )
+    ! Load jump table base.
+    src HEX: ffffffff ADD
+    offset cells rc-absolute-cell rel-here
+    ! Go
+    src HEX: 7f [+] JMP
+    ! Fix up the displacement above
+    cell code-alignment
+    [ 7 + building get dup pop* push ]
+    [ align-code ]
+    bi ;
+
+! Registers for fastcall
+M: x86.32 param-reg-1 EAX ;
+M: x86.32 param-reg-2 EDX ;
 
 M: x86.32 reserved-area-size 0 ;
 
 M: x86.32 %alien-global 0 [] MOV rc-absolute-cell rel-dlsym ;
 
 M: x86.32 %alien-invoke (CALL) rel-dlsym ;
+
+M: x86.32 %alien-invoke-tail (JMP) rel-dlsym ;
 
 M: x86.32 struct-small-enough? ( size -- ? )
     heap-size { 1 2 4 8 } member?
@@ -75,8 +93,6 @@ M: float-regs store-return-reg
 : with-aligned-stack ( n quot -- )
     [ [ align-sub ] [ call ] bi* ]
     [ [ align-add ] [ drop ] bi* ] 2bi ; inline
-
-M: x86.32 rel-literal-x86 rc-absolute-cell rel-literal ;
 
 M: x86.32 %prologue ( n -- )
     dup PUSH
@@ -291,7 +307,7 @@ FUNCTION: bool check_sse2 ( ) ;
 : sse2? ( -- ? )
     check_sse2 ;
 
-"-no-sse2" cli-args member? [
+"-no-sse2" (command-line) member? [
     [ optimized-recompile-hook ] recompile-hook
     [ { check_sse2 } compile ] with-variable
 

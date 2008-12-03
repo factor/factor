@@ -30,7 +30,7 @@ IN: automata.ui
 
 : draw-bitmap ( bitmap -- ) GL_POINTS glBegin (draw-bitmap) glEnd ;
 
-: display ( -- ) black set-color bitmap> draw-bitmap ;
+: display ( -- ) black gl-color bitmap> draw-bitmap ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -39,10 +39,10 @@ VAR: slate
 ! Call a 'model' quotation with the current 'view'.
 
 : with-view ( quot -- )
-slate> rect-dim first >width
-slate> rect-dim second >height
-call
-slate> relayout-1 ;
+  slate> rect-dim first >width
+  slate> rect-dim second >height
+  call
+  slate> relayout-1 ;
 
 ! Create a quotation that is appropriate for buttons and gesture handler.
 

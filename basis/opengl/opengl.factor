@@ -2,97 +2,112 @@
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: alien alien.c-types continuations kernel libc math macros
-       namespaces math.vectors math.constants math.functions
-       math.parser opengl.gl opengl.glu combinators arrays sequences
-       splitting words byte-arrays assocs colors accessors ;
-
+namespaces math.vectors math.constants math.functions
+math.parser opengl.gl opengl.glu combinators arrays sequences
+splitting words byte-arrays assocs colors accessors
+generalizations locals specialized-arrays.float
+specialized-arrays.uint ;
 IN: opengl
 
-: coordinates ( point1 point2 -- x1 y2 x2 y2 )
-    [ first2 ] bi@ ;
-
-: fix-coordinates ( point1 point2 -- x1 y2 x2 y2 )
-    [ first2 [ >fixnum ] bi@ ] bi@ ;
-
 : color>raw ( object -- r g b a )
-    >rgba { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave ;
+    >rgba { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave ; inline
 
 : gl-color ( color -- ) color>raw glColor4d ; inline
 
-: gl-clear-color ( color -- )
-    color>raw glClearColor ;
+: gl-clear-color ( color -- ) color>raw glClearColor ;
 
 : gl-clear ( color -- )
     gl-clear-color GL_COLOR_BUFFER_BIT glClear ;
-
-: set-color ( object -- ) color>raw glColor4d ;
-: set-clear-color ( object -- ) color>raw glClearColor ;
 
 : gl-error ( -- )
     glGetError dup zero? [
         "GL error: " over gluErrorString append throw
     ] unless drop ;
 
-: do-state ( mode quot -- )
-    swap glBegin call glEnd ; inline
-
 : do-enabled ( what quot -- )
     over glEnable dip glDisable ; inline
+
 : do-enabled-client-state ( what quot -- )
     over glEnableClientState dip glDisableClientState ; inline
 
 : words>values ( word/value-seq -- value-seq )
-    [ dup word? [ execute ] [ ] if ] map ;
+    [ dup word? [ execute ] when ] map ;
 
 : (all-enabled) ( seq quot -- )
     over [ glEnable ] each dip [ glDisable ] each ; inline
+
 : (all-enabled-client-state) ( seq quot -- )
     [ dup [ glEnableClientState ] each ] dip
     dip
     [ glDisableClientState ] each ; inline
 
 MACRO: all-enabled ( seq quot -- )
-    >r words>values r> [ (all-enabled) ] 2curry ;
+    [ words>values ] dip [ (all-enabled) ] 2curry ;
+
 MACRO: all-enabled-client-state ( seq quot -- )
-    >r words>values r> [ (all-enabled-client-state) ] 2curry ;
+    [ words>values ] dip [ (all-enabled-client-state) ] 2curry ;
 
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep
     glMatrixMode glPopMatrix ; inline
 
-: gl-vertex ( point -- )
-    dup length {
-        { 2 [ first2 glVertex2d ] }
-        { 3 [ first3 glVertex3d ] }
-        { 4 [ first4 glVertex4d ] }
-    } case ;
-
-: gl-normal ( normal -- ) first3 glNormal3d ;
-
 : gl-material ( face pname params -- )
-    >c-float-array glMaterialfv ;
+    float-array{ } like underlying>> glMaterialfv ;
+
+: gl-vertex-pointer ( seq -- )
+    [ 2 GL_FLOAT 0 ] dip underlying>> glVertexPointer ; inline
+
+: gl-color-pointer ( seq -- )
+    [ 4 GL_FLOAT 0 ] dip underlying>> glColorPointer ; inline
+
+: gl-texture-coord-pointer ( seq -- )
+    [ 2 GL_FLOAT 0 ] dip underlying>> glTexCoordPointer ; inline
+
+: line-vertices ( a b -- )
+    [ first2 [ 0.5 + ] bi@ ] bi@ 4 float-array{ } nsequence
+    gl-vertex-pointer ;
 
 : gl-line ( a b -- )
-    GL_LINES [ gl-vertex gl-vertex ] do-state ;
+    line-vertices GL_LINES 0 2 glDrawArrays ;
 
-: gl-fill-rect ( loc ext -- )
-    coordinates glRectd ;
+: (rect-vertices) ( dim -- vertices )
+    #! We use GL_LINE_STRIP with a duplicated first vertex
+    #! instead of GL_LINE_LOOP to work around a bug in Apple's
+    #! X3100 driver.
+    {
+        [ drop 0.5 0.5 ]
+        [ first 0.3 - 0.5 ]
+        [ [ first 0.3 - ] [ second 0.3 - ] bi ]
+        [ second 0.3 - 0.5 swap ]
+        [ drop 0.5 0.5 ]
+    } cleave 10 float-array{ } nsequence ;
 
-: gl-rect ( loc ext -- )
-    GL_FRONT_AND_BACK GL_LINE glPolygonMode
-    >r { 0.5 0.5 } v+ r> { 0.5 0.5 } v- gl-fill-rect
-    GL_FRONT_AND_BACK GL_FILL glPolygonMode ;
+: rect-vertices ( dim -- )
+    (rect-vertices) gl-vertex-pointer ;
 
-: (gl-poly) ( points state -- )
-    [ [ gl-vertex ] each ] do-state ;
+: (gl-rect) ( -- )
+    GL_LINE_STRIP 0 5 glDrawArrays ;
 
-: gl-fill-poly ( points -- )
-    dup length 2 > GL_POLYGON GL_LINES ? (gl-poly) ;
+: gl-rect ( dim -- )
+    rect-vertices (gl-rect) ;
 
-: gl-poly ( points -- )
-    GL_LINE_LOOP (gl-poly) ;
+: (fill-rect-vertices) ( dim -- vertices )
+    {
+        [ drop 0 0 ]
+        [ first 0 ]
+        [ first2 ]
+        [ second 0 swap ]
+    } cleave 8 float-array{ } nsequence ;
+
+: fill-rect-vertices ( dim -- )
+    (fill-rect-vertices) gl-vertex-pointer ;
+
+: (gl-fill-rect) ( -- )
+    GL_QUADS 0 4 glDrawArrays ;
+
+: gl-fill-rect ( dim -- )
+    fill-rect-vertices (gl-fill-rect) ;
 
 : circle-steps ( steps -- angles )
     dup length v/n 2 pi * v*n ;
@@ -109,35 +124,33 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : circle-points ( loc dim steps -- points )
     circle-steps unit-circle adjust-points scale-points ;
 
-: gl-circle ( loc dim steps -- )
-    circle-points gl-poly ;
+: close-path ( points -- points' )
+    dup first suffix ;
 
-: gl-fill-circle ( loc dim steps -- )
-    circle-points gl-fill-poly ;
+: circle-vertices ( loc dim steps -- vertices )
+    #! We use GL_LINE_STRIP with a duplicated first vertex
+    #! instead of GL_LINE_LOOP to work around a bug in Apple's
+    #! X3100 driver.
+    circle-points close-path concat >float-array ;
 
-: prepare-gradient ( direction dim -- v1 v2 )
-    tuck v* [ v- ] keep ;
-
-: gl-gradient ( direction colors dim -- )
-    GL_QUAD_STRIP [
-        swap >r prepare-gradient r>
-        [ length dup 1- v/n ] keep [
-            >r >r 2dup r> r> set-color v*n
-            dup gl-vertex v+ gl-vertex
-        ] 2each 2drop
-    ] do-state ;
+: fill-circle-vertices ( loc dim steps -- vertices )
+    circle-points concat >float-array ;
 
 : (gen-gl-object) ( quot -- id )
-    >r 1 0 <uint> r> keep *uint ; inline
+    [ 1 0 <uint> ] dip keep *uint ; inline
+
 : gen-texture ( -- id )
     [ glGenTextures ] (gen-gl-object) ;
+
 : gen-gl-buffer ( -- id )
     [ glGenBuffers ] (gen-gl-object) ;
 
 : (delete-gl-object) ( id quot -- )
-    >r 1 swap <uint> r> call ; inline
+    [ 1 swap <uint> ] dip call ; inline
+
 : delete-texture ( id -- )
     [ glDeleteTextures ] (delete-gl-object) ;
+
 : delete-gl-buffer ( id -- )
     [ glDeleteBuffers ] (delete-gl-object) ;
 
@@ -152,7 +165,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
 
 : <gl-buffer> ( target data hint -- id )
     pick gen-gl-buffer [ [
-        >r dup byte-length swap r> glBufferData
+        [ dup byte-length swap ] dip glBufferData
     ] with-gl-buffer ] keep ;
 
 : buffer-offset ( int -- alien )
@@ -162,7 +175,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     glActiveTexture swap glBindTexture gl-error ;
 
 : (set-draw-buffers) ( buffers -- )
-    dup length swap >c-uint-array glDrawBuffers ;
+    [ length ] [ >uint-array underlying>> ] bi glDrawBuffers ;
 
 MACRO: set-draw-buffers ( buffers -- )
     words>values [ (set-draw-buffers) ] curry ;
@@ -186,9 +199,11 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     gen-texture [
         GL_TEXTURE_BIT [
             GL_TEXTURE_2D swap glBindTexture
-            >r >r GL_TEXTURE_2D 0 GL_RGBA r>
-            sprite-size2 0 GL_LUMINANCE_ALPHA
-            GL_UNSIGNED_BYTE r> glTexImage2D
+            [
+                [ GL_TEXTURE_2D 0 GL_RGBA ] dip
+                sprite-size2 0 GL_LUMINANCE_ALPHA
+                GL_UNSIGNED_BYTE
+            ] dip glTexImage2D
         ] do-attribs
     ] keep ;
     
@@ -205,35 +220,18 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 
 : gl-translate ( point -- ) first2 0.0 glTranslated ;
 
-<PRIVATE
-
-: top-left drop 0 0 glTexCoord2i 0.0 0.0 glVertex2d ; inline
-
-: top-right 1 0 glTexCoord2i first 0.0 glVertex2d ; inline
-
-: bottom-left 0 1 glTexCoord2i second 0.0 swap glVertex2d ; inline
-
-: bottom-right 1 1 glTexCoord2i gl-vertex ; inline
-
-PRIVATE>
-
-: four-sides ( dim -- )
-    dup top-left dup top-right dup bottom-right bottom-left ;
+: rect-texture-coords ( -- )
+    float-array{ 0 0 1 0 1 1 0 1 } gl-texture-coord-pointer ;
 
 : draw-sprite ( sprite -- )
-    dup loc>> gl-translate
-    GL_TEXTURE_2D over texture>> glBindTexture
-    init-texture
-    GL_QUADS [ dim2>> four-sides ] do-state
-    GL_TEXTURE_2D 0 glBindTexture ;
-
-: rect-vertices ( lower-left upper-right -- )
-    GL_QUADS [
-        over first2 glVertex2d
-        dup first pick second glVertex2d
-        dup first2 glVertex2d
-        swap first swap second glVertex2d
-    ] do-state ;
+    GL_TEXTURE_COORD_ARRAY [
+        dup loc>> gl-translate
+        GL_TEXTURE_2D over texture>> glBindTexture
+        init-texture rect-texture-coords
+        dim2>> fill-rect-vertices
+        (gl-fill-rect)
+        GL_TEXTURE_2D 0 glBindTexture
+    ] do-enabled-client-state ;
 
 : make-sprite-dlist ( sprite -- id )
     GL_MODELVIEW [
@@ -254,7 +252,10 @@ PRIVATE>
     [ nip [ free-sprite ] when* ] assoc-each ;
 
 : with-translation ( loc quot -- )
-    GL_MODELVIEW [ >r gl-translate r> call ] do-matrix ; inline
+    GL_MODELVIEW [ [ gl-translate ] dip call ] do-matrix ; inline
+
+: fix-coordinates ( point1 point2 -- x1 y2 x2 y2 )
+    [ first2 [ >fixnum ] bi@ ] bi@ ;
 
 : gl-set-clip ( loc dim -- )
     fix-coordinates glScissor ;

@@ -69,7 +69,7 @@ HELP: on
 { $side-effects "variable" } ;
 
 HELP: change
-{ $values { "variable" "a variable, by convention a symbol" } { "quot" "a quotation with stack effect " { $snippet "( old -- new )" } } }
+{ $values { "variable" "a variable, by convention a symbol" } { "quot" { $quotation "( old -- new )" } } }
 { $description "Applies the quotation to the old value of the variable, and assigns the resulting value to the variable." }
 { $side-effects "variable" } ;
 
@@ -99,7 +99,10 @@ HELP: counter
 
 HELP: with-scope
 { $values { "quot" quotation } }
-{ $description "Calls the quotation in a new namespace. Any variables set by the quotation are discarded when it returns." } ;
+{ $description "Calls the quotation in a new namespace. Any variables set by the quotation are discarded when it returns." }
+{ $examples
+    { $example "USING: math namespaces prettyprint ;" "IN: scratchpad" "SYMBOL: x" "0 x set" "[ x [ 5 + ] change x get . ] with-scope x get ." "5\n0" }
+} ;
 
 HELP: with-variable
 { $values { "value" object } { "key" "a variable, by convention a symbol" } { "quot" quotation } }

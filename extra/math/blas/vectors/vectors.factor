@@ -1,7 +1,9 @@
 USING: accessors alien alien.c-types arrays byte-arrays combinators
 combinators.short-circuit fry kernel macros math math.blas.cblas
 math.complex math.functions math.order multi-methods qualified
-sequences sequences.private generalizations ;
+sequences sequences.private generalizations
+specialized-arrays.float specialized-arrays.double
+specialized-arrays.direct.float specialized-arrays.direct.double ;
 QUALIFIED: syntax
 IN: math.blas.vectors
 
@@ -90,14 +92,14 @@ MACRO: (do-copy) ( copy make-vector -- )
     [ [ real-part ] [ imaginary-part ] bi 2array ] map concat ;
 
 : (>c-complex) ( complex -- alien )
-    [ real-part ] [ imaginary-part ] bi 2array >c-float-array ;
+    [ real-part ] [ imaginary-part ] bi float-array{ } 2sequence underlying>> ;
 : (>z-complex) ( complex -- alien )
-    [ real-part ] [ imaginary-part ] bi 2array >c-double-array ;
+    [ real-part ] [ imaginary-part ] bi double-array{ } 2sequence underlying>> ;
 
 : (c-complex>) ( alien -- complex )
-    2 c-float-array> first2 rect> ;
+    2 <direct-float-array> first2 rect> ;
 : (z-complex>) ( alien -- complex )
-    2 c-double-array> first2 rect> ;
+    2 <direct-double-array> first2 rect> ;
 
 : (prepare-nth) ( n v -- n*inc v-data )
     [ inc>> ] [ data>> ] bi [ * ] dip ;
@@ -170,14 +172,14 @@ syntax:M: blas-vector-base equal?
     } 2&& ;
 
 : >float-blas-vector ( seq -- v )
-    [ >c-float-array ] [ length ] bi 1 <float-blas-vector> ;
+    [ >float-array underlying>> ] [ length ] bi 1 <float-blas-vector> ;
 : >double-blas-vector ( seq -- v )
-    [ >c-double-array ] [ length ] bi 1 <double-blas-vector> ;
+    [ >double-array underlying>> ] [ length ] bi 1 <double-blas-vector> ;
 : >float-complex-blas-vector ( seq -- v )
-    [ (flatten-complex-sequence) >c-float-array ] [ length ] bi
+    [ (flatten-complex-sequence) >float-array underlying>> ] [ length ] bi
     1 <float-complex-blas-vector> ;
 : >double-complex-blas-vector ( seq -- v )
-    [ (flatten-complex-sequence) >c-double-array ] [ length ] bi
+    [ (flatten-complex-sequence) >double-array underlying>> ] [ length ] bi
     1 <double-complex-blas-vector> ;
 
 syntax:M: float-blas-vector clone

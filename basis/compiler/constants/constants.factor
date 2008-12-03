@@ -37,14 +37,14 @@ IN: compiler.constants
 : rc-indirect-arm-pc  8 ; inline
 
 ! Relocation types
-: rt-primitive 0 ; inline
-: rt-dlsym     1 ; inline
-: rt-literal   2 ; inline
-: rt-dispatch  3 ; inline
-: rt-xt        4 ; inline
-: rt-here      5 ; inline
-: rt-label     6 ; inline
-: rt-immediate 7 ; inline
+: rt-primitive   0 ; inline
+: rt-dlsym       1 ; inline
+: rt-dispatch    2 ; inline
+: rt-xt          3 ; inline
+: rt-here        4 ; inline
+: rt-label       5 ; inline
+: rt-immediate   6 ; inline
+: rt-stack-chain 7 ; inline
 
 : rc-absolute? ( n -- ? )
     [ rc-absolute-ppc-2/2 = ]

@@ -3,28 +3,31 @@ namespaces make sequences splitting grouping combinators
 continuations ;
 IN: money
 
+SYMBOL: currency-token
+CHAR: $ \ currency-token set-global
+
 : dollars/cents ( dollars -- dollars cents )
     100 * 100 /mod round ;
 
+: (money>string) ( dollars cents -- string )
+    [ number>string ] bi@
+    [ <reversed> 3 group "," join <reversed> ]
+    [ 2 CHAR: 0 pad-left ] bi* "." swap 3append ;
+
 : money>string ( object -- string )
-    dollars/cents [
-        "$" %
-        swap number>string
-        <reversed> 3 group "," join <reversed> %
-        "." % number>string 2 CHAR: 0 pad-left %
-    ] "" make ;
+    dollars/cents (money>string) currency-token get prefix ;
 
-: money. ( object -- )
-    money>string print ;
+: money. ( object -- ) money>string print ;
 
-ERROR: not-a-decimal x ;
+ERROR: not-an-integer x ;
 
 : parse-decimal ( str -- ratio )
     "." split1
-    >r dup "-" head? [ drop t "0" ] [ f swap ] if r>
+    [ "-" ?head swap ] dip
     [ [ "0" ] when-empty ] bi@
-    dup length
-    >r [ dup string>number [ nip ] [ not-a-decimal ] if* ] bi@ r>
+    [
+        [ dup string>number [ nip ] [ not-an-integer ] if* ] bi@
+    ] keep length
     10 swap ^ / + swap [ neg ] when ;
 
 : DECIMAL:

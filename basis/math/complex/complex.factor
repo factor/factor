@@ -14,8 +14,8 @@ M: complex imaginary-part imaginary>> ;
 M: complex absq >rect [ sq ] bi@ + ;
 
 : 2>rect ( x y -- xr yr xi yi )
-    [ [ real-part ] bi@ ] 2keep
-    [ imaginary-part ] bi@ ; inline
+    [ [ real-part ] bi@ ]
+    [ [ imaginary-part ] bi@ ] 2bi ; inline
 
 M: complex hashcode*
     nip >rect [ hashcode ] bi@ bitxor ;
@@ -28,21 +28,21 @@ M: complex equal?
 M: complex number=
     2>rect number= [ number= ] [ 2drop f ] if ;
 
-: *re ( x y -- xr*yr xi*ri ) 2>rect * >r * r> ; inline
-: *im ( x y -- xi*yr xr*yi ) 2>rect >r * swap r> * ; inline
+: *re ( x y -- xr*yr xi*ri ) 2>rect [ * ] 2bi@ ; inline
+: *im ( x y -- xi*yr xr*yi ) 2>rect [ * swap ] dip * ; inline
 
-M: complex + 2>rect + >r + r> (rect>) ;
-M: complex - 2>rect - >r - r> (rect>) ;
-M: complex * 2dup *re - -rot *im + (rect>) ;
+M: complex + 2>rect [ + ] 2bi@ (rect>) ;
+M: complex - 2>rect [ - ] 2bi@ (rect>) ;
+M: complex * [ *re - ] [ *im + ] 2bi (rect>) ;
 
 : complex/ ( x y -- r i m )
-    dup absq >r 2dup *re + -rot *im - r> ; inline
+    [ [ *re + ] [ *im - ] 2bi ] keep absq ; inline
 
-M: complex / complex/ tuck / >r / r> (rect>) ;
+M: complex / complex/ tuck [ / ] 2bi@ (rect>) ;
 
 M: complex abs absq >float fsqrt ;
 
-M: complex sqrt >polar swap fsqrt swap 2.0 / polar> ;
+M: complex sqrt >polar [ fsqrt ] [ 2.0 / ] bi* polar> ;
 
 IN: syntax
 

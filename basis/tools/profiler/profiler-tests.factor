@@ -1,6 +1,7 @@
 IN: tools.profiler.tests
 USING: accessors tools.profiler tools.test kernel memory math
-threads alien tools.profiler.private sequences compiler.units ;
+threads alien tools.profiler.private sequences compiler.units
+words ;
 
 [ t ] [
     \ length counter>>
@@ -10,7 +11,7 @@ threads alien tools.profiler.private sequences compiler.units ;
 
 [ ] [ [ 10 [ gc ] times ] profile ] unit-test
 
-[ ] [ [ 1000 sleep ] profile ] unit-test 
+[ ] [ [ 1000000 sleep ] profile ] unit-test 
 
 [ ] [ profile. ] unit-test
 
@@ -54,3 +55,7 @@ threads alien tools.profiler.private sequences compiler.units ;
 ] unit-test
 
 [ 666 ] [ \ recompile-while-profiling-test counter>> ] unit-test
+
+[ ] [ [ [ ] compile-call ] profile ] unit-test
+
+[ [ gensym execute ] profile ] [ T{ undefined } = ] must-fail-with

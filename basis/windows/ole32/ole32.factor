@@ -1,7 +1,7 @@
 USING: alien alien.syntax alien.c-types alien.strings math
 kernel sequences windows windows.types debugger io accessors
 math.order namespaces make math.parser windows.kernel32
-combinators ;
+combinators locals specialized-arrays.direct.uchar ;
 IN: windows.ole32
 
 LIBRARY: ole32
@@ -134,49 +134,57 @@ M: ole32-error error.
 : GUID-STRING-LENGTH
     "{01234567-89ab-cdef-0123-456789abcdef}" length ; inline
 
-: (guid-section>guid) ( guid string start end quot -- )
-    [ roll subseq hex> swap ] dip call ; inline
-: (guid-byte>guid) ( guid string start end byte -- )
-    [ roll subseq hex> ] dip
-    rot GUID-Data4 set-uchar-nth ; inline
+:: (guid-section>guid) ( string guid start end quot -- )
+    start end string subseq hex> guid quot call ; inline
+
+:: (guid-byte>guid) ( string guid start end byte -- )
+    start end string subseq hex> byte guid set-nth ; inline
 
 : string>guid ( string -- guid )
-    "GUID" <c-object> [ {
-        [  1  9 [ set-GUID-Data1 ] (guid-section>guid) ]
+    "GUID" <c-object> [
+        {
+            [  1  9 [ set-GUID-Data1 ] (guid-section>guid) ]
+            [ 10 14 [ set-GUID-Data2 ] (guid-section>guid) ]
+            [ 15 19 [ set-GUID-Data3 ] (guid-section>guid) ]
+            [ ]
+        } 2cleave
 
-        [ 10 14 [ set-GUID-Data2 ] (guid-section>guid) ]
+        GUID-Data4 8 <direct-uchar-array> {
+            [ 20 22 0 (guid-byte>guid) ]
+            [ 22 24 1 (guid-byte>guid) ]
 
-        [ 15 19 [ set-GUID-Data3 ] (guid-section>guid) ]
-
-        [ 20 22 0 (guid-byte>guid) ]
-        [ 22 24 1 (guid-byte>guid) ]
-
-        [ 25 27 2 (guid-byte>guid) ]
-        [ 27 29 3 (guid-byte>guid) ]
-        [ 29 31 4 (guid-byte>guid) ]
-        [ 31 33 5 (guid-byte>guid) ]
-        [ 33 35 6 (guid-byte>guid) ]
-        [ 35 37 7 (guid-byte>guid) ]
-    } 2cleave ] keep ;
+            [ 25 27 2 (guid-byte>guid) ]
+            [ 27 29 3 (guid-byte>guid) ]
+            [ 29 31 4 (guid-byte>guid) ]
+            [ 31 33 5 (guid-byte>guid) ]
+            [ 33 35 6 (guid-byte>guid) ]
+            [ 35 37 7 (guid-byte>guid) ]
+        } 2cleave
+    ] keep ;
 
 : (guid-section%) ( guid quot len -- )
     [ call >hex ] dip CHAR: 0 pad-left % ; inline
+
 : (guid-byte%) ( guid byte -- )
-    swap GUID-Data4 uchar-nth >hex 2
-    CHAR: 0 pad-left % ; inline
+    swap nth >hex 2 CHAR: 0 pad-left % ; inline
 
 : guid>string ( guid -- string )
-    [ "{" % {
-        [ [ GUID-Data1 ] 8 (guid-section%) "-" % ]
-        [ [ GUID-Data2 ] 4 (guid-section%) "-" % ]
-        [ [ GUID-Data3 ] 4 (guid-section%) "-" % ]
-        [ 0 (guid-byte%) ]
-        [ 1 (guid-byte%) "-" % ]
-        [ 2 (guid-byte%) ]
-        [ 3 (guid-byte%) ]
-        [ 4 (guid-byte%) ]
-        [ 5 (guid-byte%) ]
-        [ 6 (guid-byte%) ]
-        [ 7 (guid-byte%) "}" % ]
-    } cleave ] "" make ;
+    [
+        "{" % {
+            [ [ GUID-Data1 ] 8 (guid-section%) "-" % ]
+            [ [ GUID-Data2 ] 4 (guid-section%) "-" % ]
+            [ [ GUID-Data3 ] 4 (guid-section%) "-" % ]
+            [ ]
+        } cleave
+        GUID-Data4 8 <direct-uchar-array> {
+            [ 0 (guid-byte%) ]
+            [ 1 (guid-byte%) "-" % ]
+            [ 2 (guid-byte%) ]
+            [ 3 (guid-byte%) ]
+            [ 4 (guid-byte%) ]
+            [ 5 (guid-byte%) ]
+            [ 6 (guid-byte%) ]
+            [ 7 (guid-byte%) "}" % ]
+        } cleave
+    ] "" make ;
 

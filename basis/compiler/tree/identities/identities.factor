@@ -79,7 +79,7 @@ GENERIC: apply-identities* ( node -- node )
 
 : select-input ( node n -- #shuffle )
     [ [ in-d>> ] [ out-d>> ] bi ] dip
-    pick nth over first associate #shuffle ;
+    pick nth over first associate #data-shuffle ;
 
 M: #call apply-identities*
     dup word>> "identities" word-prop [

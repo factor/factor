@@ -32,10 +32,6 @@ HELP: free
 { $values { "alien" c-ptr } }
 { $description "Deallocates a block of memory allocated by " { $link malloc } ", " { $link calloc } " or " { $link realloc } "." } ;
 
-HELP: with-malloc
-{ $values { "size" "a positive integer" } { "quot" "a quotation with stack effect " { $snippet "( c-ptr -- )" } } }
-{ $description "Allocates a zeroed block of " { $snippet "n" } " bytes and passes it to the quotation. When the quotation returns, the block is freed." } ;
-
 HELP: &free
 { $values { "alien" c-ptr } }
 { $description "Marks the block of memory for unconditional deallocation at the end of the current " { $link with-destructors } " scope." } ;

@@ -3,7 +3,7 @@ sequences quotations ;
 IN: generic.math
 
 HELP: math-upgrade
-{ $values { "class1" class } { "class2" class } { "quot" "a quotation with stack effect " { $snippet "( n n -- n n )" } } }
+{ $values { "class1" class } { "class2" class } { "quot" { $quotation "( n n -- n n )" } } }
 { $description "Outputs a quotation for upgrading numberical types. It takes two numbers on the stack, an instance of " { $snippet "class1" } ", and an instance of " { $snippet "class2" } ", and converts the one with the lower priority to the higher priority type." }
 { $examples { $example "USING: generic.math math kernel prettyprint ;" "fixnum bignum math-upgrade ." "[ [ >bignum ] dip ]" } } ;
 
@@ -15,7 +15,7 @@ HELP: no-math-method
 HELP: math-method
 { $values { "word" generic } { "class1" class } { "class2" class } { "quot" quotation } }
 { $description "Generates a definition for " { $snippet "word" } " when the two inputs are instances of " { $snippet "class1" } " and " { $snippet "class2" } ", respectively." }
-{ $examples { $example "USING: generic.math math prettyprint ;" "\\ + fixnum float math-method ." "[ [ >float ] dip float=>+ ]" } } ;
+{ $examples { $example "USING: generic.math math prettyprint ;" "\\ + fixnum float math-method ." "[ { fixnum float } declare [ >float ] dip float=>+ ]" } } ;
 
 HELP: math-class
 { $class-description "The class of subtypes of " { $link number } " which are not " { $link null } "." } ;

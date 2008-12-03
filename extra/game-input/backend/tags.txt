@@ -1,3 +1,1 @@
-gamepads
-joysticks
-input
+games

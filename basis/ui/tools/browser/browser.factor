@@ -4,17 +4,17 @@ USING: debugger ui.tools.workspace help help.topics kernel
 models models.history ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
 ui.gadgets.buttons compiler.units assocs words vocabs
-accessors ;
+accessors fry combinators.short-circuit ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < track pane history ;
 
 : show-help ( link help -- )
-    dup history>> add-history
-    >r >link r> history>> set-model ;
+    history>> dup add-history
+    [ >link ] dip set-model ;
 
 : <help-pane> ( browser-gadget -- gadget )
-    history>> [ [ help ] curry try ] <pane-control> ;
+    history>> [ '[ _ print-topic ] try ] <pane-control> ;
 
 : init-history ( browser-gadget -- )
     "handbook" >link <history> >>history drop ;
@@ -22,7 +22,7 @@ TUPLE: browser-gadget < track pane history ;
 : <browser-gadget> ( -- gadget )
     { 0 1 } browser-gadget new-track
         dup init-history
-        dup <toolbar> f track-add
+        add-toolbar
         dup <help-pane> >>pane
         dup pane>> <scroller> 1 track-add ;
 
@@ -38,10 +38,11 @@ M: browser-gadget ungraft*
     [ call-next-method ] [ remove-definition-observer ] bi ;
 
 : showing-definition? ( defspec assoc -- ? )
-    [ key? ] 2keep
-    [ >r dup word-link? [ name>> ] when r> key? ] 2keep
-    >r dup vocab-link? [ vocab ] when r> key?
-    or or ;
+    {
+        [ key? ]
+        [ [ dup word-link? [ name>> ] when ] dip key? ]
+        [ [ dup vocab-link? [ vocab ] when ] dip key? ]
+    } 2|| ;
 
 M: browser-gadget definitions-changed ( assoc browser -- )
     history>>
@@ -66,10 +67,10 @@ M: browser-gadget definitions-changed ( assoc browser -- )
 \ browser-help H{ { +nullary+ t } } define-command
 
 browser-gadget "toolbar" f {
-    { T{ key-down f { A+ } "b" } com-back }
-    { T{ key-down f { A+ } "f" } com-forward }
-    { T{ key-down f { A+ } "h" } com-documentation }
-    { T{ key-down f { A+ } "v" } com-vocabularies }
+    { T{ key-down f { A+ } "LEFT" } com-back }
+    { T{ key-down f { A+ } "RIGHT" } com-forward }
+    { f com-documentation }
+    { f com-vocabularies }
     { T{ key-down f f "F1" } browser-help }
 } define-command-map
 

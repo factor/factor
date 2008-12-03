@@ -1,15 +1,15 @@
 ! Copyright (C) 2004, 2008 Mackenzie Straight, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays destructors io io.backend
-io.buffers io.files io.ports io.sockets io.binary
-io.sockets io.timeouts windows.errors strings
-kernel math namespaces sequences windows windows.kernel32
-windows.shell32 windows.types windows.winsock splitting
-continuations math.bitwise system accessors ;
+io.buffers io.files io.ports io.binary io.timeouts
+windows.errors strings kernel math namespaces sequences windows
+windows.kernel32 windows.shell32 windows.types windows.winsock
+splitting continuations math.bitwise system accessors ;
 IN: io.windows
 
 : set-inherit ( handle ? -- )
-    >r HANDLE_FLAG_INHERIT r> >BOOLEAN SetHandleInformation win32-error=0/f ;
+    [ HANDLE_FLAG_INHERIT ] dip
+    >BOOLEAN SetHandleInformation win32-error=0/f ;
 
 TUPLE: win32-handle handle disposed ;
 

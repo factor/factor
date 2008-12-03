@@ -18,6 +18,6 @@
 			</tr>
 		</table>
 
-		<p> <button>Submit</button> </p>
+		<p> <button type="submit">Submit</button> </p>
 	</t:form>
 </t:chloe>

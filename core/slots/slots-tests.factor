@@ -1,6 +1,6 @@
 IN: slots.tests
 USING: math accessors slots strings generic.standard kernel
-tools.test generic words parser eval ;
+tools.test generic words parser eval math.functions ;
 
 TUPLE: r/w-test foo ;
 
@@ -34,3 +34,18 @@ TUPLE: hello length ;
 
 [ f ] [ r/w-test \ foo>> method "foldable" word-prop ] unit-test
 [ t ] [ r/w-test \ foo>> method "flushable" word-prop ] unit-test
+
+! Test protocol slots
+SLOT: my-protocol-slot-test
+
+TUPLE: protocol-slot-test-tuple x ;
+
+M: protocol-slot-test-tuple my-protocol-slot-test>> x>> sq ;
+M: protocol-slot-test-tuple (>>my-protocol-slot-test) [ sqrt ] dip (>>x) ;
+
+[ 9 ] [ T{ protocol-slot-test-tuple { x 3 } } my-protocol-slot-test>> ] unit-test
+
+[ 4.0 ] [
+    T{ protocol-slot-test-tuple { x 3 } } clone
+    [ 7 + ] change-my-protocol-slot-test x>>
+] unit-test

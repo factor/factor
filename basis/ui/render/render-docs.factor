@@ -1,5 +1,6 @@
 USING: ui.gadgets ui.gestures help.markup help.syntax
-kernel classes strings opengl.gl models math.geometry.rect ;
+kernel classes strings opengl opengl.gl models
+math.geometry.rect ;
 IN: ui.render
 
 HELP: gadget
@@ -52,7 +53,7 @@ HELP: polygon
 } ;
 
 HELP: <polygon>
-{ $values { "color" "a color specifier" } { "points" "a sequence of points" } }
+{ $values { "color" "a color specifier" } { "points" "a sequence of points" } { "polygon" polygon } }
 { $description "Creates a new instance of " { $link polygon } "." } ;
 
 HELP: <polygon-gadget>
@@ -128,21 +129,11 @@ $nl
 { $subsection draw-string }
 { $subsection draw-text } ;
 
-ARTICLE: "ui-paint-custom" "Implementing custom drawing logic"
-"The UI uses OpenGL to render gadgets. Custom rendering logic can be plugged in with the " { $link "ui-pen-protocol" } ", or by implementing a generic word:"
-{ $subsection draw-gadget* }
-"Custom drawing code has access to the full OpenGL API in the " { $vocab-link "opengl" } " vocabulary."
-$nl
+ARTICLE: "ui-paint-coord" "The UI co-ordinate system"
 "The UI uses a co-ordinate system where the y axis is oriented down. The OpenGL " { $link GL_MODELVIEW } " matrix is not saved or restored when rendering a gadget. Instead, the origin of the gadget relative to the OpenGL context is stored in a variable:"
 { $subsection origin }
-"Custom drawing implementations can translate co-ordinates manually, or save and restore the " { $link GL_MODELVIEW } " matrix."
+"Custom drawing implementations can translate co-ordinates manually, or save and restore the " { $link GL_MODELVIEW } " matrix using a word such as " { $link with-translation } "."
 $nl
-"OpenGL state must not be altered as a result of drawing a gadget, so any flags which were enabled should be disabled, and vice versa."
-$nl
-"Gadgets must not draw outside of their bounding box, however clipping is not enforced by default, for performance reasons. This can be changed by setting the " { $snippet "clipped?" } " slot to " { $link t } " in the gadget's constructor."
-$nl
-"Saving the " { $link GL_MODELVIEW } " matrix and enabling/disabling flags can be done in a clean way using the combinators documented in the following section."
-{ $subsection "gl-utilities" }
-{ $subsection "text-rendering" } ;
+"Gadgets must not draw outside of their bounding box, however clipping is not enforced by default, for performance reasons. This can be changed by setting the " { $slot "clipped?" } " slot to " { $link t } " in the gadget's constructor." ;
 
 ABOUT: "ui-paint-custom"

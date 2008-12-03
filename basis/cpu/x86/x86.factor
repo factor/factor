@@ -14,11 +14,12 @@ M: x86 two-operand? t ;
 HOOK: temp-reg-1 cpu ( -- reg )
 HOOK: temp-reg-2 cpu ( -- reg )
 
+HOOK: param-reg-1 cpu ( -- reg )
+HOOK: param-reg-2 cpu ( -- reg )
+
 M: x86 %load-immediate MOV ;
 
-HOOK: rel-literal-x86 cpu ( literal -- )
-
-M: x86 %load-indirect swap 0 [] MOV rel-literal-x86 ;
+M: x86 %load-indirect swap 0 MOV rc-absolute-cell rel-immediate ;
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
@@ -60,19 +61,6 @@ M: x86 %return ( -- ) 0 RET ;
 : align-code ( n -- )
     0 <repetition> % ;
 
-M:: x86 %dispatch ( src temp -- )
-    ! Load jump table base. We use a temporary register
-    ! since on AMD64 we have to load a 64-bit immediate. On
-    ! x86, this is redundant.
-    ! Add jump table base
-    temp HEX: ffffffff MOV rc-absolute-cell rel-here
-    src temp ADD
-    src HEX: 7f [+] JMP
-    ! Fix up the displacement above
-    cell code-alignment dup bootstrap-cell 8 = 15 9 ? +
-    building get dup pop* push
-    align-code ;
-
 M: x86 %dispatch-label ( word -- )
     0 cell, rc-absolute-cell rel-word ;
 
@@ -104,6 +92,87 @@ M: x86 %shl-imm nip SHL ;
 M: x86 %shr-imm nip SHR ;
 M: x86 %sar-imm nip SAR ;
 M: x86 %not     drop NOT ;
+
+: ?MOV ( dst src -- )
+    2dup = [ 2drop ] [ MOV ] if ; inline
+
+:: move>args ( src1 src2 -- )
+    {
+        { [ src1 param-reg-2 = ] [ param-reg-1 src2 ?MOV param-reg-1 param-reg-2 XCHG ] }
+        { [ src1 param-reg-1 = ] [ param-reg-2 src2 ?MOV ] }
+        { [ src2 param-reg-1 = ] [ param-reg-2 src1 ?MOV param-reg-1 param-reg-2 XCHG ] }
+        { [ src2 param-reg-2 = ] [ param-reg-1 src1 ?MOV ] }
+        [
+            param-reg-1 src1 MOV
+            param-reg-2 src2 MOV
+        ]
+    } cond ;
+
+HOOK: %alien-invoke-tail cpu ( func dll -- )
+
+:: overflow-template ( src1 src2 insn inverse func -- )
+    <label> "no-overflow" set
+    src1 src2 insn call
+    ds-reg [] src1 MOV
+    "no-overflow" get JNO
+    src1 src2 inverse call
+    src1 src2 move>args
+    %prepare-alien-invoke
+    func f %alien-invoke
+    "no-overflow" resolve-label ; inline
+
+:: overflow-template-tail ( src1 src2 insn inverse func -- )
+    <label> "no-overflow" set
+    src1 src2 insn call
+    "no-overflow" get JNO
+    src1 src2 inverse call
+    src1 src2 move>args
+    %prepare-alien-invoke
+    func f %alien-invoke-tail
+    "no-overflow" resolve-label
+    ds-reg [] src1 MOV
+    0 RET ; inline
+
+M: x86 %fixnum-add ( src1 src2 -- )
+    [ ADD ] [ SUB ] "overflow_fixnum_add" overflow-template ;
+
+M: x86 %fixnum-add-tail ( src1 src2 -- )
+    [ ADD ] [ SUB ] "overflow_fixnum_add" overflow-template-tail ;
+
+M: x86 %fixnum-sub ( src1 src2 -- )
+    [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template ;
+
+M: x86 %fixnum-sub-tail ( src1 src2 -- )
+    [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template-tail ;
+
+M:: x86 %fixnum-mul ( src1 src2 temp1 temp2 -- )
+    "no-overflow" define-label
+    temp1 src1 MOV
+    temp1 tag-bits get SAR
+    src2 temp1 IMUL2
+    ds-reg [] temp1 MOV
+    "no-overflow" get JNO
+    src1 src2 move>args
+    param-reg-1 tag-bits get SAR
+    param-reg-2 tag-bits get SAR
+    %prepare-alien-invoke
+    "overflow_fixnum_multiply" f %alien-invoke
+    "no-overflow" resolve-label ;
+
+M:: x86 %fixnum-mul-tail ( src1 src2 temp1 temp2 -- )
+    "overflow" define-label
+    temp1 src1 MOV
+    temp1 tag-bits get SAR
+    src2 temp1 IMUL2
+    "overflow" get JO
+    ds-reg [] temp1 MOV
+    0 RET
+    "overflow" resolve-label
+    src1 src2 move>args
+    param-reg-1 tag-bits get SAR
+    param-reg-2 tag-bits get SAR
+    %prepare-alien-invoke
+    "overflow_fixnum_multiply" f %alien-invoke-tail ;
 
 : bignum@ ( reg n -- op )
     cells bignum tag-number - [+] ; inline
@@ -172,9 +241,6 @@ M: x86 %div-float nip DIVSD ;
 
 M: x86 %integer>float CVTSI2SD ;
 M: x86 %float>integer CVTTSD2SI ;
-
-: ?MOV ( dst src -- )
-    2dup = [ 2drop ] [ MOV ] if ; inline
 
 M: x86 %copy ( dst src -- ) ?MOV ;
 
@@ -414,12 +480,12 @@ HOOK: stack-reg cpu ( -- reg )
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
-: %boolean ( dst word -- )
-    over \ f tag-number MOV
-    0 [] swap execute
-    \ t rel-literal-x86 ; inline
+:: %boolean ( dst temp word -- )
+    dst \ f tag-number MOV
+    temp 0 MOV \ t rc-absolute-cell rel-immediate
+    dst temp word execute ; inline
 
-M: x86 %compare ( dst cc src1 src2 -- )
+M: x86 %compare ( dst temp cc src1 src2 -- )
     CMP {
         { cc< [ \ CMOVL %boolean ] }
         { cc<= [ \ CMOVLE %boolean ] }
@@ -429,10 +495,10 @@ M: x86 %compare ( dst cc src1 src2 -- )
         { cc/= [ \ CMOVNE %boolean ] }
     } case ;
 
-M: x86 %compare-imm ( dst cc src1 src2 -- )
+M: x86 %compare-imm ( dst temp cc src1 src2 -- )
     %compare ;
 
-M: x86 %compare-float ( dst cc src1 src2 -- )
+M: x86 %compare-float ( dst temp cc src1 src2 -- )
     UCOMISD {
         { cc< [ \ CMOVB %boolean ] }
         { cc<= [ \ CMOVBE %boolean ] }
@@ -495,7 +561,7 @@ M: x86 %reload-float ( dst n -- ) spill-float@ MOVSD ;
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
-M: int-regs %save-param-reg drop >r param@ r> MOV ;
+M: int-regs %save-param-reg drop [ param@ ] dip MOV ;
 M: int-regs %load-param-reg drop swap param@ MOV ;
 
 GENERIC: MOVSS/D ( dst src reg-class -- )
@@ -503,8 +569,8 @@ GENERIC: MOVSS/D ( dst src reg-class -- )
 M: single-float-regs MOVSS/D drop MOVSS ;
 M: double-float-regs MOVSS/D drop MOVSD ;
 
-M: float-regs %save-param-reg >r >r param@ r> r> MOVSS/D ;
-M: float-regs %load-param-reg >r swap param@ r> MOVSS/D ;
+M: float-regs %save-param-reg [ param@ ] 2dip MOVSS/D ;
+M: float-regs %load-param-reg [ swap param@ ] dip MOVSS/D ;
 
 GENERIC: push-return-reg ( reg-class -- )
 GENERIC: load-return-reg ( n reg-class -- )
@@ -520,7 +586,7 @@ M: x86 %prepare-alien-invoke
     temp-reg-1 2 cells [+] ds-reg MOV
     temp-reg-1 3 cells [+] rs-reg MOV ;
 
-M: x86 value-structs? t ;
+M: x86 value-struct? drop t ;
 
 M: x86 small-enough? ( n -- ? )
     HEX: -80000000 HEX: 7fffffff between? ;

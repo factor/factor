@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs grouping kernel regexp.backend
-locals math namespaces regexp.parser sequences state-tables fry
-quotations math.order math.ranges vectors unicode.categories
-regexp.utils regexp.transition-tables words sets ;
+locals math namespaces regexp.parser sequences fry quotations
+math.order math.ranges vectors unicode.categories regexp.utils
+regexp.transition-tables words sets regexp.classes unicode.case ;
 IN: regexp.nfa
 
 SYMBOL: negation-mode
@@ -18,6 +18,17 @@ SINGLETON: lookbehind-on INSTANCE: lookbehind-on traversal-flag
 SINGLETON: lookbehind-off INSTANCE: lookbehind-off traversal-flag
 SINGLETON: capture-group-on INSTANCE: capture-group-on traversal-flag
 SINGLETON: capture-group-off INSTANCE: capture-group-off traversal-flag
+SINGLETON: front-anchor INSTANCE: front-anchor traversal-flag
+SINGLETON: back-anchor INSTANCE: back-anchor traversal-flag
+SINGLETON: word-boundary INSTANCE: word-boundary traversal-flag
+
+: options ( -- obj ) current-regexp get options>> ;
+
+: option? ( obj -- ? ) options key? ;
+
+: option-on ( obj -- ) options conjoin ;
+
+: option-off ( obj -- ) options delete-at ;
 
 : next-state ( regexp -- state )
     [ state>> ] [ [ 1+ ] change-state drop ] bi ;
@@ -100,6 +111,7 @@ M: kleene-star nfa-node ( node -- )
 
 M: concatenation nfa-node ( node -- )
     seq>>
+    reversed-regexp option? [ <reversed> ] when
     [ [ nfa-node ] each ]
     [ length 1- [ concatenate-nodes ] times ] bi ;
 
@@ -109,16 +121,59 @@ M: alternation nfa-node ( node -- )
     [ length 1- [ alternate-nodes ] times ] bi ;
 
 M: constant nfa-node ( node -- )
-    char>> literal-transition add-simple-entry ;
+    case-insensitive option? [
+        dup char>> [ ch>lower ] [ ch>upper ] bi
+        2dup = [
+            2drop
+            char>> literal-transition add-simple-entry
+        ] [
+            [ literal-transition add-simple-entry ] bi@
+            alternate-nodes drop
+        ] if
+    ] [
+        char>> literal-transition add-simple-entry
+    ] if ;
 
 M: epsilon nfa-node ( node -- )
     drop eps literal-transition add-simple-entry ;
 
-M: word nfa-node ( node -- )
+M: word nfa-node ( node -- ) class-transition add-simple-entry ;
+
+M: any-char nfa-node ( node -- )
+    [ dotall option? ] dip any-char-no-nl ?
     class-transition add-simple-entry ;
 
+! M: beginning-of-text nfa-node ( node -- ) ;
+
+M: beginning-of-line nfa-node ( node -- ) class-transition add-simple-entry ;
+
+M: end-of-line nfa-node ( node -- ) class-transition add-simple-entry ;
+
+: choose-letter-class ( node -- node' )
+    case-insensitive option? Letter-class rot ? ;
+
+M: letter-class nfa-node ( node -- )
+    choose-letter-class class-transition add-simple-entry ;
+
+M: LETTER-class nfa-node ( node -- )
+    choose-letter-class class-transition add-simple-entry ;
+
 M: character-class-range nfa-node ( node -- )
-    class-transition add-simple-entry ;
+    case-insensitive option? [
+        dup [ from>> ] [ to>> ] bi
+        2dup [ Letter? ] bi@ and [
+            rot drop
+            [ [ ch>lower ] bi@ character-class-range boa ]
+            [ [ ch>upper ] bi@ character-class-range boa ] 2bi 
+            [ class-transition add-simple-entry ] bi@
+            alternate-nodes
+        ] [
+            2drop
+            class-transition add-simple-entry
+        ] if
+    ] [
+        class-transition add-simple-entry
+    ] if ;
 
 M: capture-group nfa-node ( node -- )
     eps literal-transition add-simple-entry
@@ -134,8 +189,6 @@ M: non-capture-group nfa-node ( node -- )
 
 M: reluctant-kleene-star nfa-node ( node -- )
     term>> <kleene-star> nfa-node ;
-
-!
 
 M: negation nfa-node ( node -- )
     negation-mode inc
@@ -157,6 +210,10 @@ M: lookbehind nfa-node ( node -- )
     eps literal-transition add-simple-entry
     lookbehind-off add-traversal-flag
     2 [ concatenate-nodes ] times ;
+
+M: option nfa-node ( node -- )
+    [ option>> ] [ on?>> ] bi [ option-on ] [ option-off ] if
+    eps literal-transition add-simple-entry ;
 
 : construct-nfa ( regexp -- )
     [

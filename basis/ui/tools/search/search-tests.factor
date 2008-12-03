@@ -1,7 +1,7 @@
 USING: assocs ui.tools.search help.topics io.files io.styles
 kernel namespaces sequences source-files threads
 tools.test ui.gadgets ui.gestures vocabs accessors
-vocabs.loader words tools.test.ui debugger ;
+vocabs.loader words tools.test.ui debugger calendar ;
 IN: ui.tools.search.tests
 
 [ f ] [
@@ -14,12 +14,12 @@ IN: ui.tools.search.tests
 
 : update-live-search ( search -- seq )
     dup [
-        300 sleep
+        300 milliseconds sleep
         list>> control-value
     ] with-grafted-gadget ;
 
 : test-live-search ( gadget quot -- ? )
-    >r update-live-search dup assert-non-empty r> all? ;
+    [ update-live-search dup assert-non-empty ] dip all? ;
 
 [ t ] [
     "swp" all-words f <definition-search>
@@ -30,7 +30,7 @@ IN: ui.tools.search.tests
     "" all-words t <definition-search>
     dup [
         { "set-word-prop" } over field>> set-control-value
-        300 sleep
+        300 milliseconds sleep
         search-value \ set-word-prop eq?
     ] with-grafted-gadget
 ] unit-test

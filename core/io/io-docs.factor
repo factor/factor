@@ -114,6 +114,9 @@ HELP: input-stream
 HELP: output-stream
 { $var-description "Holds an output stream for various implicit stream operations. Rebound using " { $link with-output-stream } " and " { $link with-output-stream* } "." } ;
 
+HELP: error-stream
+{ $var-description "Holds an error stream." } ;
+
 HELP: readln
 { $values { "str/f" "a string or " { $link f } } }
 { $description "Reads a line of input from " { $link input-stream } ". Outputs " { $link f } " on stream exhaustion." }
@@ -250,6 +253,10 @@ HELP: lines
 { $values { "stream" "an input stream" } { "seq" "a sequence of strings" } }
 { $description "Reads lines of text until the stream is exhausted, collecting them in a sequence of strings." } ;
 
+HELP: each-line
+{ $values { "quot" { $quotation "( str -- )" } } }
+{ $description "Calls the quotatin with successive lines of text, until the current " { $link input-stream } " is exhausted." } ;
+
 HELP: contents
 { $values { "stream" "an input stream" } { "str" string } }
 { $description "Reads the entire contents of a stream into a string." }
@@ -361,6 +368,8 @@ ARTICLE: "stream-utils" "Stream utilities"
 $nl
 "First, a simple composition of " { $link stream-write } " and " { $link stream-nl } ":"
 { $subsection stream-print }
+"Processing lines one by one:"
+{ $subsection each-line }
 "Sluring an entire stream into memory all at once:"
 { $subsection lines }
 { $subsection contents }

@@ -3,7 +3,7 @@
 USING: arrays generic hashtables kernel kernel.private math
 namespaces make sequences words quotations layouts combinators
 sequences.private classes classes.builtin classes.algebra
-definitions math.order ;
+definitions math.order math.private ;
 IN: generic.math
 
 PREDICATE: math-class < class
@@ -36,9 +36,10 @@ PREDICATE: math-class < class
 
 : math-upgrade ( class1 class2 -- quot )
     [ math-class-max ] 2keep
-    >r over r> (math-upgrade) >r (math-upgrade)
-    dup empty? [ [ dip ] curry [ ] like ] unless
-    r> append ;
+    [ over ] dip (math-upgrade) [
+        (math-upgrade)
+        dup empty? [ [ dip ] curry [ ] like ] unless
+    ] dip append ;
 
 ERROR: no-math-method left right generic ;
 
@@ -55,19 +56,21 @@ ERROR: no-math-method left right generic ;
 
 : math-method ( word class1 class2 -- quot )
     2dup and [
-        2dup math-upgrade >r
-        math-class-max over order min-class applicable-method
-        r> prepend
+        [
+            2dup 2array , \ declare ,
+            2dup math-upgrade %
+            math-class-max over order min-class applicable-method %
+        ] [ ] make
     ] [
         2drop object-method
     ] if ;
 
+SYMBOL: picker
+
 : math-vtable ( picker quot -- quot )
     [
-        >r
-        , \ tag ,
-        num-tags get [ bootstrap-type>class ]
-        r> compose map ,
+        [ , \ tag , ]
+        [ num-tags get swap [ bootstrap-type>class ] prepose map , ] bi*
         \ dispatch ,
     ] [ ] make ; inline
 
@@ -79,14 +82,18 @@ M: math-combination make-default-method
 M: math-combination perform-combination
     drop
     dup
-    \ over [
-        dup math-class? [
-            \ dup [ >r 2dup r> math-method ] math-vtable
-        ] [
-            over object-method
-        ] if nip
-    ] math-vtable nip
-    define ;
+    [
+        \ both-fixnums? ,
+        dup fixnum bootstrap-word dup math-method ,
+        \ over [
+            dup math-class? [
+                \ dup [ [ 2dup ] dip math-method ] math-vtable
+            ] [
+                over object-method
+            ] if nip
+        ] math-vtable nip ,
+        \ if ,
+    ] [ ] make define ;
 
 PREDICATE: math-generic < generic ( word -- ? )
     "combination" word-prop math-combination? ;

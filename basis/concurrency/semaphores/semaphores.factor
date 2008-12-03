@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: dlists kernel threads math concurrency.conditions
-continuations accessors summary ;
+continuations accessors summary locals fry ;
 IN: concurrency.semaphores
 
 TUPLE: semaphore count threads ;
@@ -30,9 +30,9 @@ M: negative-count-semaphore summary
     [ 1+ ] change-count
     threads>> notify-1 ;
 
-: with-semaphore-timeout ( semaphore timeout quot -- )
-    pick rot acquire-timeout swap
-    [ release ] curry [ ] cleanup ; inline
+:: with-semaphore-timeout ( semaphore timeout quot -- )
+    semaphore timeout acquire-timeout
+    quot [ semaphore release ] [ ] cleanup ; inline
 
 : with-semaphore ( semaphore quot -- )
-    over acquire swap [ release ] curry [ ] cleanup ; inline
+    swap dup acquire '[ _ release ] [ ] cleanup ; inline

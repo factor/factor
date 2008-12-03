@@ -39,12 +39,12 @@ HELP: byte-length
 { $contract "Outputs the size of the byte array or float array data in bytes as presented to the C library interface." } ;
 
 HELP: c-getter
-{ $values { "name" string } { "quot" "a quotation with stack effect " { $snippet "( c-ptr n -- obj )" } } }
+{ $values { "name" string } { "quot" { $quotation "( c-ptr n -- obj )" } } }
 { $description "Outputs a quotation which reads values of this C type from a C structure." }
 { $errors "Throws a " { $link no-c-type } " error if the type does not exist." } ;
 
 HELP: c-setter
-{ $values { "name" string } { "quot" "a quotation with stack effect " { $snippet "( obj c-ptr n -- )" } } }
+{ $values { "name" string } { "quot" { $quotation "( obj c-ptr n -- )" } } }
 { $description "Outputs a quotation which writes values of this C type to a C structure." }
 { $errors "Throws an error if the type does not exist." } ;
 
@@ -89,16 +89,6 @@ HELP: malloc-byte-array
 { $warning "Don't forget to deallocate the memory with a call to " { $link free } "." }
 { $errors "Throws an error if memory allocation fails." } ;
 
-HELP: define-nth
-{ $values { "name" "a word name" } { "vocab" "a vocabulary name" } }
-{ $description "Defines a word " { $snippet { $emphasis "name" } "-nth" } " with stack effect " { $snippet "( n c-ptr -- value )" } " for reading the value with C type " { $snippet "name" } " stored at an alien pointer, displaced by a multiple of the C type's size." }
-{ $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
-
-HELP: define-set-nth
-{ $values { "name" "a word name" } { "vocab" "a vocabulary name" } }
-{ $description "Defines a word " { $snippet "set-" { $emphasis "name" } "-nth" } " with stack effect " { $snippet "( value n c-ptr -- )" } " for writing the value with C type " { $snippet "name" } " to an alien pointer, displaced by a multiple of the C type's size." }
-{ $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
-
 HELP: box-parameter
 { $values { "n" integer } { "ctype" string } }
 { $description "Generates code for converting a C value stored at  offset " { $snippet "n" } " from the top of the stack into a Factor object to be pushed on the data stack." }
@@ -115,12 +105,12 @@ HELP: unbox-return
 { $notes "This is an internal word used by the compiler when compiling callbacks." } ;
 
 HELP: define-deref
-{ $values { "name" "a word name" } { "vocab" "a vocabulary name" } }
+{ $values { "name" "a word name" } }
 { $description "Defines a word " { $snippet "*name" } " with stack effect " { $snippet "( c-ptr -- value )" } " for reading a value with C type " { $snippet "name" } " stored at an alien pointer." }
 { $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
 
 HELP: define-out
-{ $values { "name" "a word name" } { "vocab" "a vocabulary name" } }
+{ $values { "name" "a word name" } }
 { $description "Defines a word " { $snippet "<" { $emphasis "name" } ">" } " with stack effect " { $snippet "( value -- array )" } ". This word allocates a byte array large enough to hold a value with C type " { $snippet "name" } ", and writes the value at the top of the stack to the array." }
 { $notes "This is an internal word called when defining C types, there is no need to call it on your own." } ;
 
@@ -230,9 +220,7 @@ $nl
 "You can copy a range of bytes from memory into a byte array:"
 { $subsection memory>byte-array }
 "You can copy a byte array to memory unsafely:"
-{ $subsection byte-array>memory }
-"A wrapper for temporarily allocating a block of memory:"
-{ $subsection with-malloc } ;
+{ $subsection byte-array>memory } ;
 
 ARTICLE: "c-data" "Passing data between Factor and C"
 "Two defining characteristics of Factor are dynamic typing and automatic memory management, which are somewhat incompatible with the machine-level data model exposed by C. Factor's C library interface defines its own set of C data types, distinct from Factor language types, together with automatic conversion between Factor values and C types. For example, C integer types must be declared and are fixed-width, whereas Factor supports arbitrary-precision integers."

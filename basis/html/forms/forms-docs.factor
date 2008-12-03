@@ -85,6 +85,14 @@ HELP: validate-values
 { $values { "assoc" assoc } { "validators" "an assoc mapping value names to quotations" } }
 { $description "Validates values in the assoc by looking up the corresponding validation quotation, and storing the results in named values of the current form." } ;
 
+HELP: validation-error
+{ $values { "message" string } }
+{ $description "Reports a validation error not associated with a specific form field." }
+{ $notes "Such errors can be rendered by calling the " { $link render-validation-errors } " word." } ;
+
+HELP: render-validation-errors
+{ $description "Renders any validation errors reported by calls to the " { $link validation-error } " word." } ;
+
 ARTICLE: "html.forms.forms" "HTML form infrastructure"
 "The below words are used to implement the " { $vocab-link "furnace.actions" } " vocabulary. Calling them directly is rarely necessary."
 $nl

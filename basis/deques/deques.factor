@@ -10,13 +10,10 @@ GENERIC: peek-back ( deque -- obj )
 GENERIC: pop-front* ( deque -- )
 GENERIC: pop-back* ( deque -- )
 GENERIC: delete-node ( node deque -- )
-GENERIC: deque-length ( deque -- n )
 GENERIC: deque-member? ( value deque -- ? )
 GENERIC: clear-deque ( deque -- )
 GENERIC: node-value ( node -- value )
-
-: deque-empty? ( deque -- ? )
-    deque-length zero? ;
+GENERIC: deque-empty? ( deque -- ? )
 
 : push-front ( obj deque -- )
     push-front* drop ;

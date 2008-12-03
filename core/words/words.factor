@@ -87,11 +87,11 @@ M: word (quot-uses) over crossref? [ conjoin ] [ 2drop ] if ;
 
 M: array (quot-uses) seq-uses ;
 
-M: hashtable (quot-uses) >r >alist r> seq-uses ;
+M: hashtable (quot-uses) [ >alist ] dip seq-uses ;
 
 M: callable (quot-uses) seq-uses ;
 
-M: wrapper (quot-uses) >r wrapped>> r> (quot-uses) ;
+M: wrapper (quot-uses) [ wrapped>> ] dip (quot-uses) ;
 
 : quot-uses ( quot -- assoc )
     global [ H{ } clone [ (quot-uses) ] keep ] bind ;
@@ -113,7 +113,7 @@ compiled-generic-crossref global [ H{ } assoc-like ] change-at
     bi* 2bi ;
 
 : compiled-xref ( word dependencies generic-dependencies -- )
-    [ [ drop crossref? ] assoc-filter ] bi@
+    [ [ drop crossref? ] { } assoc-filter-as f like ] bi@
     [ over ] dip
     [ "compiled-uses" compiled-crossref (compiled-xref) ]
     [ "compiled-generic-uses" compiled-generic-crossref (compiled-xref) ]
@@ -121,7 +121,7 @@ compiled-generic-crossref global [ H{ } assoc-like ] change-at
 
 : (compiled-unxref) ( word word-prop variable -- )
     [ [ [ dupd word-prop ] dip get remove-vertex* ] 2curry ]
-    [ drop [ f swap set-word-prop ] curry ]
+    [ drop [ remove-word-prop ] curry ]
     2bi bi ;
 
 : compiled-unxref ( word -- )
@@ -135,9 +135,7 @@ compiled-generic-crossref global [ H{ } assoc-like ] change-at
     [ compiled-generic-crossref get delete-at ]
     tri ;
 
-GENERIC: inline? ( word -- ? )
-
-M: word inline? "inline" word-prop ;
+: inline? ( word -- ? ) "inline" word-prop ; inline
 
 SYMBOL: visited
 
@@ -223,7 +221,7 @@ M: word subwords drop f ;
     "( gensym )" f <word> ;
 
 : define-temp ( quot -- word )
-    gensym dup rot define ;
+    [ gensym dup ] dip define ;
 
 : reveal ( word -- )
     dup [ name>> ] [ vocabulary>> ] bi dup vocab-words
@@ -241,9 +239,11 @@ ERROR: bad-create name vocab ;
     dup [ 2nip ] [ drop <word> dup reveal ] if ;
 
 : constructor-word ( name vocab -- word )
-    >r "<" swap ">" 3append r> create ;
+    [ "<" swap ">" 3append ] dip create ;
 
 PREDICATE: parsing-word < word "parsing" word-prop ;
+
+: make-parsing ( word -- ) t "parsing" set-word-prop ;
 
 : delimiter? ( obj -- ? )
     dup word? [ "delimiter" word-prop ] [ drop f ] if ;

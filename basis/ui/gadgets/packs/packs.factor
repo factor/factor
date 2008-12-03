@@ -1,28 +1,30 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences ui.gadgets kernel math math.functions
-math.vectors namespaces math.order accessors math.geometry.rect ;
+math.vectors math.order math.geometry.rect namespaces accessors
+fry ;
 IN: ui.gadgets.packs
 
 TUPLE: pack < gadget
-    { align initial: 0 }
-    { fill  initial: 0 }
-    { gap   initial: { 0 0 } } ;
+{ align initial: 0 } { fill initial: 0 } { gap initial: { 0 0 } } ;
 
 : packed-dim-2 ( gadget sizes -- list )
-    [ over rect-dim over v- rot fill>> v*n v+ ] with map ;
+    swap [ dim>> ] [ fill>> ] bi '[ _ over v- _ v*n v+ ] map ;
+
+: orient ( seq1 seq2 gadget -- seq )
+    orientation>> '[ _ set-axis ] 2map ;
 
 : packed-dims ( gadget sizes -- seq )
-    2dup packed-dim-2 swap orient ;
+    [ packed-dim-2 ] [ nip ] [ drop ] 2tri orient ;
 
 : gap-locs ( gap sizes -- seq )
     { 0 0 } [ v+ over v+ ] accumulate 2nip ;
 
 : aligned-locs ( gadget sizes -- seq )
-    [ >r dup align>> swap rect-dim r> v- n*v ] with map ;
+    [ [ [ align>> ] [ dim>> ] bi ] dip v- n*v ] with map ;
 
 : packed-locs ( gadget sizes -- seq )
-    over gap>> over gap-locs >r dupd aligned-locs r> orient ;
+    [ aligned-locs ] [ [ gap>> ] dip gap-locs ] [ drop ] 2tri orient ;
 
 : round-dims ( seq -- newseq )
     { 0 0 } swap
@@ -31,8 +33,9 @@ TUPLE: pack < gadget
 
 : pack-layout ( pack sizes -- )
     round-dims over children>>
-    >r dupd packed-dims r> 2dup [ (>>dim) ] 2each
-    >r packed-locs r> [ (>>loc) ] 2each ;
+    [ dupd packed-dims ] dip
+    [ [ (>>dim) ] 2each ]
+    [ [ packed-locs ] dip [ (>>loc) ] 2each ] 2bi ;
 
 : <pack> ( orientation -- pack )
     pack new-gadget
@@ -44,12 +47,14 @@ TUPLE: pack < gadget
 
 : <shelf> ( -- pack ) { 1 0 } <pack> ;
 
-: gap-dims ( gap sizes -- seeq )
-    [ dim-sum ] keep length 1 [-] rot n*v v+ ;
+: gap-dims ( sizes gadget -- seeq )
+    [ [ dim-sum ] [ length 1 [-] ] bi ] [ gap>> ] bi* n*v v+ ;
 
 : pack-pref-dim ( gadget sizes -- dim )
-    over gap>> over gap-dims >r max-dim r>
-    rot orientation>> set-axis ;
+    [ nip max-dim ]
+    [ swap gap-dims ]
+    [ drop orientation>> ]
+    2tri set-axis ;
 
 M: pack pref-dim*
     dup children>> pref-dims pack-pref-dim ;

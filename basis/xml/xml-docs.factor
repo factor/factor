@@ -173,10 +173,10 @@ HELP: names-match?
 { $example "USING: prettyprint xml.data ;" "T{ name f \"rpc\" \"methodCall\" f } T{ name f f \"methodCall\" \"http://www.xmlrpc.org/\" } names-match? ." "t" }
 { $see-also name } ;
 
-HELP: xml-chunk
+HELP: read-xml-chunk
 { $values { "stream" "an input stream" } { "seq" "a sequence of elements" } }
 { $description "rather than parse a document, as " { $link read-xml } " does, this word parses and returns a sequence of XML elements (tags, strings, etc), ie a document fragment. This is useful for pieces of XML which may have more than one main tag." }
-{ $see-also write-chunk read-xml } ;
+{ $see-also write-xml-chunk read-xml } ;
 
 HELP: get-id
 { $values { "tag" "an XML tag or document" } { "id" "a string" } { "elem" "an XML element or f" } }
@@ -239,15 +239,10 @@ HELP: pull-event
 { $description "gets the next XML event from the given XML pull parser. Returns f upon exhaustion." }
 { $see-also pull-xml <pull-xml> pull-elem } ;
 
-HELP: write-item
+HELP: write-xml-chunk
 { $values { "object" "an XML element" } }
 { $description "writes an XML element to " { $link output-stream } "." }
-{ $see-also write-chunk write-xml } ;
-
-HELP: write-chunk
-{ $values { "seq" "an XML document fragment" } }
-{ $description "writes an XML document fragment, ie a sequence of XML elements, to " { $link output-stream } "." }
-{ $see-also write-item write-xml } ;
+{ $see-also write-xml-chunk write-xml } ;
 
 HELP: deep-tag-named
 { $values { "tag" "an XML tag or document" } { "name/string" "an XML name or string representing a name" } { "matching-tag" tag } }
@@ -352,13 +347,13 @@ ARTICLE: { "xml" "reading" } "Reading XML"
     "The following words are used to read something into an XML document"
     { $subsection string>xml }
     { $subsection read-xml }
-    { $subsection xml-chunk }
+    { $subsection read-xml-chunk }
+    { $subsection string>xml-chunk }
     { $subsection file>xml } ;
 
 ARTICLE: { "xml" "writing" } "Writing XML"
     "These words are used in implementing prettyprint"
-    { $subsection write-item }
-    { $subsection write-chunk }
+    { $subsection write-xml-chunk }
     "These words are used to print XML normally"
     { $subsection xml>string }
     { $subsection write-xml }
@@ -460,10 +455,8 @@ ARTICLE: { "xml" "entities" } "XML entities"
     { $subsection with-entities }
     { $subsection with-html-entities } ;
 
-ARTICLE: { "xml" "intro" } "XML"
-    "The XML module attempts to implement the XML 1.1 standard, converting strings of text into XML and vice versa. It currently is a work in progress."
-    $nl
-    "The XML module was implemented by Daniel Ehrenberg, with contributions from the Factor community"
+ARTICLE: "xml" "XML parser"
+"The " { $vocab-link "xml" } " vocabulary implements the XML 1.1 standard, converting strings of text into XML and vice versa."
     { $subsection { "xml" "reading" } }
     { $subsection { "xml" "writing" } }
     { $subsection { "xml" "classes" } }
@@ -476,4 +469,4 @@ ARTICLE: { "xml" "intro" } "XML"
 
 IN: xml
 
-ABOUT: { "xml" "intro" }
+ABOUT: "xml"

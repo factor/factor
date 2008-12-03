@@ -2,7 +2,7 @@ USING: http http.server http.client tools.test multiline
 io.streams.string io.encodings.utf8 io.encodings.8-bit
 io.encodings.binary io.encodings.string kernel arrays splitting
 sequences assocs io.sockets db db.sqlite continuations urls
-hashtables accessors ;
+hashtables accessors namespaces ;
 IN: http.tests
 
 [ "text/plain" latin1 ] [ "text/plain" parse-content-type ] unit-test
@@ -10,6 +10,12 @@ IN: http.tests
 [ "text/html" utf8 ] [ "text/html;  charset=UTF-8" parse-content-type ] unit-test
 
 [ "application/octet-stream" binary ] [ "application/octet-stream" parse-content-type ] unit-test
+
+[ { } ] [ "" parse-cookie ] unit-test
+[ { } ] [ "" parse-set-cookie ] unit-test
+
+! Make sure that totally invalid cookies don't confuse us
+[ { } ] [ "hello world; how are you" parse-cookie ] unit-test
 
 : lf>crlf "\n" split "\r\n" join ;
 
@@ -126,6 +132,7 @@ content-type: text/html; charset=UTF-8
 ;
 
 read-response-test-1' 1array [
+    URL" http://localhost/" url set
     read-response-test-1 lf>crlf
     [ read-response ] with-string-reader
     [ write-response ] with-string-writer

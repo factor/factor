@@ -7,7 +7,7 @@ prettyprint.config sorting splitting grouping math.parser vocabs
 definitions effects classes.builtin classes.tuple io.files
 classes continuations hashtables classes.mixin classes.union
 classes.intersection classes.predicate classes.singleton
-combinators quotations sets accessors colors ;
+combinators quotations sets accessors colors parser ;
 IN: prettyprint
 
 : make-pprint ( obj quot -- block in use )
@@ -44,12 +44,28 @@ IN: prettyprint
         ] with-pprint nl
     ] unless-empty ;
 
-: vocabs. ( in use -- )
+: use/in. ( in use -- )
     dupd remove [ { "syntax" "scratchpad" } member? not ] filter
     use. in. ;
 
+: vocab-names ( words -- vocabs )
+    dictionary get
+    [ [ words>> eq? nip ] with assoc-find 2drop ] curry map sift ;
+
+: prelude. ( -- )
+    in get use get vocab-names use/in. ;
+
+[
+    nl
+    "Restarts were invoked adding vocabularies to the search path." print
+    "To avoid doing this in the future, add the following USING:" print
+    "and IN: forms at the top of the source file:" print nl
+    prelude.
+    nl
+] print-use-hook set-global
+
 : with-use ( obj quot -- )
-    make-pprint vocabs. do-pprint ; inline
+    make-pprint use/in. do-pprint ; inline
 
 : with-in ( obj quot -- )
     make-pprint drop [ write-in bl ] when* do-pprint ; inline
@@ -253,6 +269,9 @@ M: object see
         block>
     ] with-use nl ;
 
+M: method-spec see
+    first2 method see ;
+
 GENERIC: see-class* ( word -- )
 
 M: union-class see-class*
@@ -351,9 +370,12 @@ M: word see
 : (see-methods) ( generic -- seq )
     "methods" word-prop values natural-sort ;
 
-: see-methods ( word -- )
+: methods ( word -- seq )
     [
         dup class? [ dup (see-implementors) % ] when
         dup generic? [ dup (see-methods) % ] when
         drop
-    ] { } make prune see-all ;
+    ] { } make prune ;
+
+: see-methods ( word -- )
+    methods see-all ;

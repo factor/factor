@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: http.client checksums checksums.openssl splitting assocs
+USING: http.client checksums checksums.md5 splitting assocs
 kernel io.files bootstrap.image sequences io urls ;
 IN: bootstrap.image.download
 
@@ -13,7 +13,7 @@ IN: bootstrap.image.download
 : need-new-image? ( image -- ? )
     dup exists?
     [
-        [ openssl-md5 checksum-file hex-string ]
+        [ md5 checksum-file hex-string ]
         [ download-checksums at ]
         bi = not
     ] [ drop t ] if ;

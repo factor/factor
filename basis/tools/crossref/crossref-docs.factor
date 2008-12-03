@@ -1,10 +1,10 @@
-USING: help.markup help.syntax words definitions ;
+USING: help.markup help.syntax words definitions prettyprint ;
 IN: tools.crossref
 
 ARTICLE: "tools.crossref" "Cross-referencing tools" 
 { $subsection usage. }
 { $subsection apropos }
-{ $see-also "definitions" "words" } ;
+{ $see-also "definitions" "words" see see-methods } ;
 
 ABOUT: "tools.crossref"
 

@@ -1,5 +1,2 @@
 unportable
-input
-gamepads
-joysticks
-windows
+games

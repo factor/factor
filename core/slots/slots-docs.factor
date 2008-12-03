@@ -166,5 +166,5 @@ HELP: set-slot ( value obj n -- )
 { $warning "This word is in the " { $vocab-link "slots.private" } " vocabulary because it does not perform type or bounds checks, and slot numbers are implementation detail." } ;
 
 HELP: slot-named
-{ $values { "name" string } { "specs" "a sequence of " { $link slot-spec } " instances" } { "spec/f" "a " { $link slot-spec } " or " { $link f } } }
+{ $values { "name" string } { "specs" "a sequence of " { $link slot-spec } " instances" } { "spec/f" { $maybe slot-spec } } }
 { $description "Outputs the " { $link slot-spec } " with the given name." } ;

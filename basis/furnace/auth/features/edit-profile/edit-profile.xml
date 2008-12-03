@@ -61,8 +61,8 @@
 	</table>
 
 	<p>
-		<button>Update</button>
-		<t:validation-messages />
+		<button type="submit">Update</button>
+		<t:validation-errors />
 	</p>
 
 	</t:form>

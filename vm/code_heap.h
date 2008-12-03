@@ -3,8 +3,6 @@ typedef enum {
 	RT_PRIMITIVE,
 	/* arg is a literal table index, holding an array pair (symbol/dll) */
 	RT_DLSYM,
-	/* an indirect literal from the word's literal table */
-	RT_LITERAL,
 	/* a pointer to a compiled word reference */
 	RT_DISPATCH,
 	/* a compiled word reference */
@@ -13,8 +11,10 @@ typedef enum {
 	RT_HERE,
 	/* a local label */
 	RT_LABEL,
-	/* immeditae literal */
-	RT_IMMEDIATE
+	/* immediate literal */
+	RT_IMMEDIATE,
+	/* address of stack_chain var */
+	RT_STACK_CHAIN
 } F_RELTYPE;
 
 typedef enum {
@@ -55,6 +55,10 @@ typedef struct {
 	unsigned int offset;
 } F_REL;
 
+#define CREF(array,i) ((CELL)(array) + CELLS * (i))
+
+void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value);
+
 void relocate_code_block(F_COMPILED *relocating, CELL code_start, CELL literals_start);
 
 void default_word_code(F_WORD *word, bool relocate);
@@ -71,4 +75,4 @@ F_COMPILED *add_compiled_block(
 CELL compiled_code_format(void);
 bool stack_traces_p(void);
 
-DECLARE_PRIMITIVE(modify_code_heap);
+void primitive_modify_code_heap(void);

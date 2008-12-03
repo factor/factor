@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! based on glx.h from xfree86, and some of glxtokens.h
-USING: alien alien.c-types alien.syntax alien.syntax.private x11.xlib
-namespaces make kernel sequences parser words ;
+USING: alien alien.c-types alien.syntax x11.xlib namespaces make
+kernel sequences parser words specialized-arrays.int accessors ;
 IN: x11.glx
 
 LIBRARY: glx
@@ -93,7 +93,7 @@ FUNCTION: void* glXGetProcAddressARB ( char* procname ) ;
         GLX_DOUBLEBUFFER ,
         GLX_DEPTH_SIZE , 16 ,
         0 ,
-    ] { } make >c-int-array
+    ] int-array{ } make underlying>>
     glXChooseVisual
     [ "Could not get a double-buffered GLX RGBA visual" throw ] unless* ;
 

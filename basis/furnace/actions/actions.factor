@@ -6,7 +6,7 @@ io arrays math boxes splitting urls
 xml.entities
 http.server
 http.server.responses
-furnace
+furnace.utilities
 furnace.redirection
 furnace.conversations
 html.forms
@@ -22,18 +22,7 @@ SYMBOL: params
 
 SYMBOL: rest
 
-: render-validation-messages ( -- )
-    form get errors>>
-    [
-        <ul "errors" =class ul>
-            [ <li> escape-string write </li> ] each
-        </ul>
-    ] unless-empty ;
-
-CHLOE: validation-messages
-    drop [ render-validation-messages ] [code] ;
-
-TUPLE: action rest authorize init display validate submit ;
+TUPLE: action rest init authorize display validate submit ;
 
 : new-action ( class -- action )
     new [ ] >>init [ ] >>validate [ ] >>authorize ; inline

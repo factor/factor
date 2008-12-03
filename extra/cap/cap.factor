@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays kernel math namespaces
 opengl.gl sequences math.vectors ui graphics.bitmap graphics.viewer
-models opengl.framebuffers ui.gadgets.worlds ui.gadgets fry alien.syntax ;
+models ui.gadgets.worlds ui.gadgets fry alien.syntax ;
 IN: cap
 
 : screenshot-array ( world -- byte-array )
-    dim>> product 3 * <byte-array> ;
+    dim>> [ first 3 * 4 align ] [ second ] bi * <byte-array> ;
 
 : gl-screenshot ( gadget -- byte-array )
     [
