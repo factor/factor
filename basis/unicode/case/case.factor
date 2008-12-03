@@ -5,7 +5,7 @@ unicode.normalize math unicode.categories combinators
 assocs strings splitting kernel accessors ;
 IN: unicode.case
 
-: at-default ( key assoc -- value/key ) over >r at r> or ;
+: at-default ( key assoc -- value/key ) [ at ] [ drop ] 2bi or ;
 
 : ch>lower ( ch -- lower ) simple-lower at-default ;
 : ch>upper ( ch -- upper ) simple-upper at-default ;

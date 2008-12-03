@@ -77,7 +77,7 @@ TUPLE: html-sub-stream < html-stream style parent ;
     "font-family: " % % "; " % ;
 
 : apply-style ( style key quot -- style gadget )
-    >r over at r> when* ; inline
+    [ over at ] dip when* ; inline
 
 : make-css ( style quot -- str )
     "" make nip ; inline
@@ -163,13 +163,13 @@ M: html-stream stream-flush
     stream>> stream-flush ;
 
 M: html-stream stream-write1
-    >r 1string r> stream-write ;
+    [ 1string ] dip stream-write ;
 
 M: html-stream stream-write
-    not-a-div >r escape-string r> stream>> stream-write ;
+    not-a-div [ escape-string ] dip stream>> stream-write ;
 
 M: html-stream stream-format
-    >r html over at [ >r escape-string r> ] unless r>
+    [ html over at [ [ escape-string ] dip ] unless ] dip
     format-html-span ;
 
 M: html-stream stream-nl

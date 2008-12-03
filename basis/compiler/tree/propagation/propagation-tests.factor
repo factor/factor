@@ -435,7 +435,7 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 ] unit-test
 
 : recursive-test-4 ( i n -- )
-    2dup < [ >r 1+ r> recursive-test-4 ] [ 2drop ] if ; inline recursive
+    2dup < [ [ 1+ ] dip recursive-test-4 ] [ 2drop ] if ; inline recursive
 
 [ ] [ [ recursive-test-4 ] final-info drop ] unit-test
 

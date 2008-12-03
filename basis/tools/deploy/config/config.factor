@@ -76,7 +76,7 @@ SYMBOL: deploy-image
     parse-fresh [ first assoc-union ] unless-empty ;
 
 : set-deploy-config ( assoc vocab -- )
-    >r unparse-use string-lines r>
+    [ unparse-use string-lines ] dip
     dup deploy-config-path set-vocab-file-contents ;
 
 : set-deploy-flag ( value key vocab -- )
