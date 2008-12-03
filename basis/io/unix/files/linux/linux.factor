@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax combinators csv
-io.encodings.utf8 io.files io.streams.string io.unix.files
-kernel namespaces sequences system unix unix.statfs.linux
-unix.statvfs.linux ;
+io.backend io.encodings.utf8 io.files io.streams.string
+io.unix.files kernel math.order namespaces sequences sorting
+system unix unix.statfs.linux unix.statvfs.linux ;
 IN: io.unix.files.linux
 
 TUPLE: linux-file-system-info < unix-file-system-info
-namelen spare ;
+namelen ;
 
 M: linux new-file-system-info linux-file-system-info new ;
 
@@ -26,7 +26,7 @@ M: linux statfs>file-system-info ( struct -- statfs )
         [ statfs64-f_fsid >>id ]
         [ statfs64-f_namelen >>namelen ]
         [ statfs64-f_frsize >>preferred-block-size ]
-        [ statfs64-f_spare >>spare ]
+        ! [ statfs64-f_spare >>spare ]
     } cleave ;
 
 M: linux file-system-statvfs ( path -- byte-array )
@@ -68,3 +68,22 @@ M: linux file-systems
             [ type>> >>type ]
         } cleave
     ] map ;
+
+ERROR: file-system-not-found ;
+
+M: linux file-system-info ( path -- )
+    normalize-path
+    [
+        [ new-file-system-info ] dip
+        [ file-system-statfs statfs>file-system-info ]
+        [ file-system-statvfs statvfs>file-system-info ] bi
+        file-system-calculations
+    ] keep
+    
+    parse-mtab [ [ mount-point>> ] bi@ <=> invert-comparison ] sort
+    [ mount-point>> head? ] with find nip [ file-system-not-found ] unless*
+    {
+        [ file-system-name>> >>device-name drop ]
+        [ mount-point>> >>mount-point drop ]
+        [ type>> >>type ]
+    } 2cleave ;
