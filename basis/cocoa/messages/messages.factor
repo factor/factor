@@ -5,7 +5,8 @@ combinators compiler compiler.alien kernel math namespaces make
 parser prettyprint prettyprint.sections quotations sequences
 strings words cocoa.runtime io macros memoize debugger
 io.encodings.ascii effects libc libc.private parser lexer init
-core-foundation fry generalizations ;
+core-foundation fry generalizations
+specialized-arrays.direct.alien ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -198,8 +199,11 @@ assoc-union alien>objc-types set-global
     objc-methods get set-at ;
 
 : each-method-in-class ( class quot -- )
-    [ 0 <uint> [ class_copyMethodList ] keep *uint over ] dip
-    '[ _ void*-nth @ ] each (free) ; inline
+    [ 0 <uint> [ class_copyMethodList ] keep *uint ] dip
+    over 0 = [ 3drop ] [
+        [ <direct-void*-array> ] dip
+        [ each ] [ drop underlying>> (free) ] 2bi
+    ] if ; inline
 
 : register-objc-methods ( class -- )
     [ register-objc-method ] each-method-in-class ;

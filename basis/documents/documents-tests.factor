@@ -1,7 +1,36 @@
 IN: documents.tests
-USING: documents namespaces tools.test ;
+USING: documents namespaces tools.test make arrays kernel fry ;
 
 ! Tests
+
+[ { } ] [
+    [
+        { 1 10 }
+        { 1 10 } [ , "HI" , ] each-line
+    ] { } make
+] unit-test
+
+[ { 1 "HI" } ] [
+    [
+        { 1 10 }
+        { 1 11 } [ , "HI" , ] each-line
+    ] { } make
+] unit-test
+
+[ { 1 "HI" 2 "HI" } ] [
+    [
+        { 1 10 }
+        { 2 11 } [ , "HI" , ] each-line
+    ] { } make
+] unit-test
+
+[ { { t f 1 } { t f 2 } } ] [
+    [
+        { 1 10 } { 2 11 }
+        t f
+        '[ [ _ _ ] dip 3array , ] each-line
+    ] { } make
+] unit-test
 
 [ { 10 4 } ] [ { "a" } { 10 3 } text+loc ] unit-test
 [ { 10 4 } ] [ { "a" } { 10 3 } text+loc ] unit-test

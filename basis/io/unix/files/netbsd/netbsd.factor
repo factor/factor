@@ -2,16 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax kernel unix.stat math unix
 combinators system io.backend accessors alien.c-types
-io.encodings.utf8 alien.strings unix.types unix.statfs 
-io.unix.files io.files unix.statvfs.netbsd ;
+io.encodings.utf8 alien.strings unix.types io.unix.files
+io.files unix.statvfs.netbsd unix.getfsstat.netbsd
+grouping sequences ;
 IN: io.unix.files.netbsd
 
 TUPLE: netbsd-file-system-info < unix-file-system-info
 blocks-reserved files-reserved
-owner io-size
-sync-reads sync-writes
-async-reads async-writes
-idx mount-from spare ;
+owner io-size sync-reads sync-writes async-reads async-writes
+idx mount-from ;
 
 M: netbsd new-file-system-info netbsd-file-system-info new ;
 
@@ -40,10 +39,14 @@ M: netbsd statvfs>file-system-info ( file-system-info statvfs -- file-system-inf
         [ statvfs-f_fsid >>id ]
         [ statvfs-f_namemax >>name-max ]
         [ statvfs-f_owner >>owner ]
-        [ statvfs-f_spare >>spare ]
+        ! [ statvfs-f_spare >>spare ]
         [ statvfs-f_fstypename alien>native-string >>type ]
         [ statvfs-f_mntonname alien>native-string >>mount-point ]
         [ statvfs-f_mntfromname alien>native-string >>device-name ]
     } cleave ;
 
-FUNCTION: int statvfs ( char* path, statvfs* buf ) ;
+M: netbsd file-systems ( -- array )
+    f 0 0 getvfsstat dup io-error
+    "statvfs" <c-array> dup dup length 0 getvfsstat io-error
+    "statvfs" heap-size group
+    [ statvfs-f_mntonname alien>native-string file-system-info ] map ;

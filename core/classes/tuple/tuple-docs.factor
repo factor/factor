@@ -90,7 +90,7 @@ ARTICLE: "tuple-constructors" "Tuple constructors"
 { $subsection POSTPONE: C: }
 "By convention, construction logic is encapsulated in a word named after the tuple class surrounded in angle brackets; for example, the constructor word for a " { $snippet "point" } " class might be named " { $snippet "<point>" } "."
 $nl
-"Constructors play a part in enforcing the invariant that slot values must always match slot declarations. The " { $link new } " word fills in the tuple will initial values, and " { $link boa } " ensures that the values on the stack match the corresponding slot declarations. See " { $link "tuple-declarations" } "."
+"Constructors play a part in enforcing the invariant that slot values must always match slot declarations. The " { $link new } " word fills in the tuple with initial values, and " { $link boa } " ensures that the values on the stack match the corresponding slot declarations. See " { $link "tuple-declarations" } "."
 $nl
 "All tuple construction should be done through constructor words, and construction primitives should be encapsulated and never called outside of the vocabulary where the class is defined, because this encourages looser coupling. For example, a constructor word could be changed to use memoization instead of always constructing a new instance, or it could be changed to construt a different class, without breaking callers."
 $nl
@@ -103,11 +103,11 @@ $nl
     "{ alpha integer initial: 1 } ;"
     ""
     "! The following two are equivalent"
-    "C: <rgba> rgba"
+    "C: <rgba> color"
     ": <rgba> color boa ;"
     ""
     "! We can define constructors which call other constructors"
-    ": <rgb> 1 <rgba> ;"
+    ": <rgb> ( r g b -- color ) 1 <rgba> ;"
     ""
     "! The following two are equivalent; note the initial value"
     ": <color> ( -- color ) color new ;"

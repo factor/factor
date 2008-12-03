@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings combinators
 grouping io.encodings.utf8 io.files kernel math sequences
-system unix unix.statfs.macosx io.unix.files unix.statvfs.macosx ;
+system unix io.unix.files
+unix.statfs.macosx unix.statvfs.macosx unix.getfsstat.macosx ;
 IN: io.unix.files.macosx
 
 TUPLE: macosx-file-system-info < unix-file-system-info
@@ -47,4 +48,3 @@ M: macosx statvfs>file-system-info ( file-system-info byte-array -- file-system-
         [ statvfs-f_favail >>files-available ]
         [ statvfs-f_namemax >>name-max ]
     } cleave ;
-

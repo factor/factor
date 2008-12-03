@@ -3,7 +3,7 @@
 USING: xml.errors xml.data xml.utilities xml.char-classes sets
 xml.entities kernel state-parser kernel namespaces make strings
 math math.parser sequences assocs arrays splitting combinators
-unicode.case accessors ;
+unicode.case accessors fry ascii ;
 IN: xml.tokenize
 
 ! XML namespace processing: ns = namespace
@@ -26,7 +26,7 @@ SYMBOL: ns-stack
 
 : add-ns ( name -- )
     dup space>> dup ns-stack get assoc-stack
-    [ nip ] [ <nonexist-ns> throw ] if* >>url drop ;
+    [ nip ] [ nonexist-ns ] if* >>url drop ;
 
 : push-ns ( hash -- )
     ns-stack get push ;
@@ -44,7 +44,7 @@ SYMBOL: ns-stack
 
 : tag-ns ( name attrs-alist -- name attrs )
     dup attrs>ns push-ns
-    >r dup add-ns r> dup [ drop add-ns ] assoc-each <attrs> ;
+    [ dup add-ns ] dip dup [ drop add-ns ] assoc-each <attrs> ;
 
 ! Parsing names
 
@@ -58,7 +58,7 @@ SYMBOL: ns-stack
     get-char name-start? [
         [ dup get-char name-char? not ] take-until nip
     ] [
-        "Malformed name" <xml-string-error> throw
+        "Malformed name" xml-string-error
     ] if ;
 
 : parse-name ( -- name )
@@ -70,9 +70,9 @@ SYMBOL: ns-stack
 : (parse-entity) ( string -- )
     dup entities at [ , ] [ 
         prolog-data get standalone>>
-        [ <no-entity> throw ] [
+        [ no-entity ] [
             dup extra-entities get at
-            [ , ] [ <no-entity> throw ] ?if
+            [ , ] [ no-entity ] ?if
         ] if
     ] ?if ;
 
@@ -95,7 +95,7 @@ SYMBOL: ns-stack
 
 : parse-quot ( ch -- string )
     parse-char get-char
-    [ "XML file ends in a quote" <xml-string-error> throw ] unless ;
+    [ "XML file ends in a quote" xml-string-error ] unless ;
 
 : parse-text ( -- string )
     CHAR: < parse-char ;
@@ -111,7 +111,7 @@ SYMBOL: ns-stack
     get-char dup "'\"" member? [
         next parse-quot
     ] [
-        "Attribute lacks quote" <xml-string-error> throw
+        "Attribute lacks quote" xml-string-error
     ] if ;
 
 : parse-attr ( -- )
@@ -141,8 +141,92 @@ SYMBOL: ns-stack
 : take-cdata ( -- string )
     "[CDATA[" expect-string "]]>" take-string ;
 
+: take-element-decl ( -- element-decl )
+    pass-blank " " take-string pass-blank ">" take-string <element-decl> ;
+
+: take-attlist-decl ( -- doctype-decl )
+    pass-blank " " take-string pass-blank ">" take-string <attlist-decl> ;
+
+: take-until-one-of ( seps -- str sep )
+    '[ get-char _ member? ] take-until get-char ;
+
+: only-blanks ( str -- )
+    [ blank? ] all? [ bad-doctype-decl ] unless ;
+
+: take-system-literal ( -- str )
+    pass-blank get-char next {
+        { CHAR: ' [ "'" take-string ] }
+        { CHAR: " [ "\"" take-string ] }
+    } case ;
+
+: take-system-id ( -- system-id )
+    take-system-literal <system-id>
+    ">" take-string only-blanks ;
+
+: take-public-id ( -- public-id )
+    take-system-literal
+    take-system-literal <public-id>
+    ">" take-string only-blanks ;
+
+DEFER: direct
+
+: (take-internal-subset) ( -- )
+    pass-blank get-char {
+        { CHAR: ] [ next ] }
+        [ drop "<!" expect-string direct , (take-internal-subset) ]
+    } case ;
+
+: take-internal-subset ( -- seq )
+    [ (take-internal-subset) ] { } make ;
+
+: (take-external-id) ( token -- external-id )
+    pass-blank {
+        { "SYSTEM" [ take-system-id ] }
+        { "PUBLIC" [ take-public-id ] }
+        [ bad-external-id ]
+    } case ;
+
+: take-external-id ( -- external-id )
+    " " take-string (take-external-id) ;
+
+: take-doctype-decl ( -- doctype-decl )
+    pass-blank " >" take-until-one-of {
+        { CHAR: \s [
+            pass-blank get-char CHAR: [ = [
+                next take-internal-subset f swap
+                ">" take-string only-blanks
+            ] [
+                " >" take-until-one-of {
+                    { CHAR: \s [ (take-external-id) ] }
+                    { CHAR: > [ only-blanks f ] }
+                } case f
+            ] if
+        ] }
+        { CHAR: > [ f f ] }
+    } case <doctype-decl> ;
+
+: take-entity-def ( -- entity-name entity-def )
+    " " take-string pass-blank get-char {
+        { CHAR: ' [ take-system-literal ] }
+        { CHAR: " [ take-system-literal ] }
+        [ drop take-external-id ]
+    } case ;
+
+: take-entity-decl ( -- entity-decl )
+    pass-blank get-char {
+        { CHAR: % [ next pass-blank take-entity-def ] }
+        [ drop take-entity-def ]
+    } case
+    ">" take-string only-blanks <entity-decl> ;
+
 : take-directive ( -- directive )
-    CHAR: > take-char <directive> next ;
+    " " take-string {
+        { "ELEMENT" [ take-element-decl ] }
+        { "ATTLIST" [ take-attlist-decl ] }
+        { "DOCTYPE" [ take-doctype-decl ] }
+        { "ENTITY" [ take-entity-decl ] }
+        [ bad-directive ]
+    } case ;
 
 : direct ( -- object )
     get-char {
@@ -155,7 +239,7 @@ SYMBOL: ns-stack
     {
         { "yes" [ t ] }
         { "no" [ f ] }
-        [ <not-yes/no> throw ]
+        [ not-yes/no ]
     } case ;
 
 : assure-no-extra ( seq -- )
@@ -164,14 +248,14 @@ SYMBOL: ns-stack
         T{ name f "" "encoding" f }
         T{ name f "" "standalone" f }
     } diff
-    [ <extra-attrs> throw ] unless-empty ; 
+    [ extra-attrs ] unless-empty ; 
 
 : good-version ( version -- version )
-    dup { "1.0" "1.1" } member? [ <bad-version> throw ] unless ;
+    dup { "1.0" "1.1" } member? [ bad-version ] unless ;
 
 : prolog-attrs ( alist -- prolog )
     [ T{ name f "" "version" f } swap at
-      [ good-version ] [ <versionless-prolog> throw ] if* ] keep
+      [ good-version ] [ versionless-prolog ] if* ] keep
     [ T{ name f "" "encoding" f } swap at
       "UTF-8" or ] keep
     T{ name f "" "standalone" f } swap at
@@ -187,7 +271,7 @@ SYMBOL: ns-stack
     (parse-name) dup "xml" =
     [ drop parse-prolog ] [
         dup >lower "xml" =
-        [ <capitalized-prolog> throw ]
+        [ capitalized-prolog ]
         [ "?>" take-string append <instruction> ] if
     ] if ;
 

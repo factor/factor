@@ -50,7 +50,7 @@ TUPLE: win32-monitor < monitor port ;
     } case 1array ;
 
 : memory>u16-string ( alien len -- string )
-    [ memory>byte-array ] keep 2/ c-ushort-array> >string ;
+    memory>byte-array utf16n decode ;
 
 : parse-notify-record ( buffer -- path changed )
     [

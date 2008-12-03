@@ -1,8 +1,8 @@
-! Copyright (C) 2006, 2007 Slava Pestov
+! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io kernel math models namespaces make
 sequences strings splitting combinators unicode.categories
-math.order ;
+math.order math.ranges ;
 IN: documents
 
 : +col ( loc n -- newloc ) [ first2 ] dip + 2array ;
@@ -47,7 +47,7 @@ TUPLE: document < model locs ;
     2over = [
         3drop
     ] [
-        [ [ first ] bi@ 1+ dup <slice> ] dip each
+        [ [ first ] bi@ [a,b] ] dip each
     ] if ; inline
 
 : start/end-on-line ( from to line# -- n1 n2 )

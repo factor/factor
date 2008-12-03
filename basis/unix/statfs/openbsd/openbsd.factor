@@ -27,7 +27,7 @@ C-STRUCT: statfs
     { { "u_int32_t" 3 } "f_spare" }
     { { "char" MFSNAMELEN } "f_fstypename" }
     { { "char" MNAMELEN } "f_mntonname" }
-    { { "char" MNAMELEN } "f_mntfromname" } ;
-    ! { "mount_info" "mount_info" } ;
+    { { "char" MNAMELEN } "f_mntfromname" }
+    { { "char" 160 } "mount_info" } ;
 
 FUNCTION: int statfs ( char* path, statvfs* buf ) ;

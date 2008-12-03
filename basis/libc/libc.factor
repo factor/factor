@@ -87,9 +87,6 @@ PRIVATE>
 : memcpy ( dst src size -- )
     "void" "libc" "memcpy" { "void*" "void*" "ulong" } alien-invoke ;
 
-: with-malloc ( size quot -- )
-    swap 1 calloc [ swap keep ] [ free ] [ ] cleanup ; inline
-
 : strlen ( alien -- len )
     "size_t" "libc" "strlen" { "char*" } alien-invoke ;
 
