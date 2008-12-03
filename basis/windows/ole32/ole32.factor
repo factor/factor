@@ -1,7 +1,7 @@
 USING: alien alien.syntax alien.c-types alien.strings math
 kernel sequences windows windows.types debugger io accessors
 math.order namespaces make math.parser windows.kernel32
-combinators locals specialized-arrays.uchar ;
+combinators locals specialized-arrays.direct.uchar ;
 IN: windows.ole32
 
 LIBRARY: ole32
@@ -137,8 +137,8 @@ M: ole32-error error.
 :: (guid-section>guid) ( string guid start end quot -- )
     start end string subseq hex> guid quot call ; inline
 
-: (guid-byte>guid) ( string guid start end byte -- )
-    start end string subseq hex> guid byte set-nth ; inline
+:: (guid-byte>guid) ( string guid start end byte -- )
+    start end string subseq hex> byte guid set-nth ; inline
 
 : string>guid ( string -- guid )
     "GUID" <c-object> [
