@@ -297,7 +297,7 @@ DEFER: (connect-irc)
         |dispose stream-readln [
             parse-irc-line handle-reader-message t
         ] [
-            irc> terminate-irc f
+            handle-disconnect
         ] if*
     ] with-destructors ;
 
