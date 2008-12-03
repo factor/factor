@@ -6,7 +6,8 @@ USING: alien alien.c-types continuations kernel libc math macros
 namespaces math.vectors math.constants math.functions
 math.parser opengl.gl opengl.glu combinators arrays sequences
 splitting words byte-arrays assocs colors accessors
-generalizations locals memoize ;
+generalizations locals specialized-arrays.float
+specialized-arrays.uint ;
 IN: opengl
 
 : color>raw ( object -- r g b a )
@@ -52,20 +53,20 @@ MACRO: all-enabled-client-state ( seq quot -- )
     glMatrixMode glPopMatrix ; inline
 
 : gl-material ( face pname params -- )
-    >c-float-array glMaterialfv ;
+    float-array{ } like underlying>> glMaterialfv ;
 
 : gl-vertex-pointer ( seq -- )
-    [ 2 GL_FLOAT 0 ] dip glVertexPointer ; inline
+    [ 2 GL_FLOAT 0 ] dip underlying>> glVertexPointer ; inline
 
 : gl-color-pointer ( seq -- )
-    [ 4 GL_FLOAT 0 ] dip glColorPointer ; inline
+    [ 4 GL_FLOAT 0 ] dip underlying>> glColorPointer ; inline
 
 : gl-texture-coord-pointer ( seq -- )
-    [ 2 GL_FLOAT 0 ] dip glTexCoordPointer ; inline
+    [ 2 GL_FLOAT 0 ] dip underlying>> glTexCoordPointer ; inline
 
 : line-vertices ( a b -- )
-    [ first2 [ 0.5 + ] bi@ ] bi@ 4 narray
-    >c-float-array gl-vertex-pointer ;
+    [ first2 [ 0.5 + ] bi@ ] bi@ 4 float-array{ } nsequence
+    gl-vertex-pointer ;
 
 : gl-line ( a b -- )
     line-vertices GL_LINES 0 2 glDrawArrays ;
@@ -80,7 +81,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
         [ [ first 0.3 - ] [ second 0.3 - ] bi ]
         [ second 0.3 - 0.5 swap ]
         [ drop 0.5 0.5 ]
-    } cleave 10 narray >c-float-array ;
+    } cleave 10 float-array{ } nsequence ;
 
 : rect-vertices ( dim -- )
     (rect-vertices) gl-vertex-pointer ;
@@ -97,7 +98,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
         [ first 0 ]
         [ first2 ]
         [ second 0 swap ]
-    } cleave 8 narray >c-float-array ;
+    } cleave 8 float-array{ } nsequence ;
 
 : fill-rect-vertices ( dim -- )
     (fill-rect-vertices) gl-vertex-pointer ;
@@ -130,10 +131,10 @@ MACRO: all-enabled-client-state ( seq quot -- )
     #! We use GL_LINE_STRIP with a duplicated first vertex
     #! instead of GL_LINE_LOOP to work around a bug in Apple's
     #! X3100 driver.
-    circle-points close-path concat >c-float-array ;
+    circle-points close-path concat >float-array ;
 
 : fill-circle-vertices ( loc dim steps -- vertices )
-    circle-points concat >c-float-array ;
+    circle-points concat >float-array ;
 
 : (gen-gl-object) ( quot -- id )
     [ 1 0 <uint> ] dip keep *uint ; inline
@@ -174,7 +175,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     glActiveTexture swap glBindTexture gl-error ;
 
 : (set-draw-buffers) ( buffers -- )
-    dup length swap >c-uint-array glDrawBuffers ;
+    [ length ] [ >uint-array underlying>> ] bi glDrawBuffers ;
 
 MACRO: set-draw-buffers ( buffers -- )
     words>values [ (set-draw-buffers) ] curry ;
@@ -219,11 +220,8 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 
 : gl-translate ( point -- ) first2 0.0 glTranslated ;
 
-MEMO: (rect-texture-coords) ( -- seq )
-    { 0 0 1 0 1 1 0 1 } >c-float-array ;
-
 : rect-texture-coords ( -- )
-    (rect-texture-coords) gl-texture-coord-pointer ;
+    float-array{ 0 0 1 0 1 1 0 1 } gl-texture-coord-pointer ;
 
 : draw-sprite ( sprite -- )
     GL_TEXTURE_COORD_ARRAY [

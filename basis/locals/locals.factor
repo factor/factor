@@ -316,27 +316,26 @@ SYMBOL: in-lambda?
     "|" parse-tokens make-locals dup push-locals
     \ ] (parse-lambda) <lambda> ;
 
-: parse-binding ( -- pair/f )
+: parse-binding ( end -- pair/f )
     scan {
         { [ dup not ] [ unexpected-eof ] }
-        { [ dup "|" = ] [ drop f ] }
-        { [ dup "!" = ] [ drop POSTPONE: ! parse-binding ] }
-        [ scan-object 2array ]
+        { [ 2dup = ] [ 2drop f ] }
+        [ nip scan-object 2array ]
     } cond ;
 
-: (parse-bindings) ( -- )
-    parse-binding [
+: (parse-bindings) ( end -- )
+    dup parse-binding dup [
         first2 [ make-local ] dip 2array ,
         (parse-bindings)
-    ] when* ;
+    ] [ 2drop ] if ;
 
-: parse-bindings ( -- bindings vars )
+: parse-bindings ( end -- bindings vars )
     [
         [ (parse-bindings) ] H{ } make-assoc
         dup push-locals
     ] { } make swap ;
 
-: parse-bindings* ( -- words assoc )
+: parse-bindings* ( end -- words assoc )
     [
         [
             namespace push-locals
@@ -345,13 +344,13 @@ SYMBOL: in-lambda?
         ] { } make-assoc
     ] { } make swap ;
 
-: (parse-wbindings) ( -- )
-    parse-binding [
-        first2 [ make-local-word ] keep 2array ,
+: (parse-wbindings) ( end -- )
+    dup parse-binding dup [
+        first2 [ make-local-word ] dip 2array ,
         (parse-wbindings)
-    ] when* ;
+    ] [ 2drop ] if ;
 
-: parse-wbindings ( -- bindings vars )
+: parse-wbindings ( end -- bindings vars )
     [
         [ (parse-wbindings) ] H{ } make-assoc
         dup push-locals
@@ -374,12 +373,12 @@ M: wlet local-rewrite*
     let-rewrite ;
 
 : parse-locals ( -- vars assoc )
-    ")" parse-effect
+    "(" expect ")" parse-effect
     word [ over "declared-effect" set-word-prop ] when*
     in>> [ dup pair? [ first ] when ] map make-locals dup push-locals ;
 
 : parse-locals-definition ( word -- word quot )
-    "(" expect parse-locals \ ; (parse-lambda) <lambda>
+    parse-locals \ ; (parse-lambda) <lambda>
     2dup "lambda" set-word-prop
     lambda-rewrite dup length 1 = [ first ] [ bad-lambda-rewrite ] if ;
 
@@ -397,15 +396,15 @@ PRIVATE>
 : [| parse-lambda parsed-lambda ; parsing
 
 : [let
-    "|" expect parse-bindings
+    "|" expect "|" parse-bindings
     \ ] (parse-lambda) <let> parsed-lambda ; parsing
 
 : [let*
-    "|" expect parse-bindings*
+    "|" expect "|" parse-bindings*
     \ ] (parse-lambda) <let*> parsed-lambda ; parsing
 
 : [wlet
-    "|" expect parse-wbindings
+    "|" expect "|" parse-wbindings
     \ ] (parse-lambda) <wlet> parsed-lambda ; parsing
 
 : :: (::) define ; parsing
