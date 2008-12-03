@@ -1,4 +1,4 @@
 USING: specialized-vectors.functor specialized-arrays.alien ;
-IN: specialized-vector.alien
+IN: specialized-vectors.alien
 
 << "void*" define-vector >>

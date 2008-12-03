@@ -1,4 +1,4 @@
 USING: specialized-vectors.functor specialized-arrays.long ;
-IN: specialized-vector.long
+IN: specialized-vectors.long
 
 << "long" define-vector >>

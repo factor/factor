@@ -1,4 +1,4 @@
 USING: specialized-vectors.functor specialized-arrays.uchar ;
-IN: specialized-vector.uchar
+IN: specialized-vectors.uchar
 
 << "uchar" define-vector >>

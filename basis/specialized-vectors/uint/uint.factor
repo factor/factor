@@ -1,4 +1,4 @@
 USING: specialized-vectors.functor specialized-arrays.uint ;
-IN: specialized-vector.uint
+IN: specialized-vectors.uint
 
 << "uint" define-vector >>
