@@ -1,4 +1,4 @@
-USE: specialized-arrays.functor
-IN: specialized-arrays.ushort
+USING: io.mmap.functor specialized-arrays.direct.ushort ;
+IN: io.mmap.ushort
 
-<< "ushort" define-array >>
+<< "ushort" define-mapped-array >>
