@@ -131,11 +131,11 @@ HELP: datastack-overflow.
 { $notes "This error usually indicates a run-away recursion, however if you legitimately need a data stack larger than the default, see " { $link "runtime-cli-args" } "." } ;
 
 HELP: retainstack-underflow.
-{ $error-description "Thrown by the Factor VM if " { $link r> } " is called while the retain stack is empty." }
+{ $error-description "Thrown by the Factor VM if an attempt is made to access the retain stack in an invalid manner. This bug should never come up in practice and indicates a bug in Factor." }
 { $notes "You can use the stack effect tool to statically check stack effects of quotations. See " { $link "inference" } "." } ;
 
 HELP: retainstack-overflow.
-{ $error-description "Thrown by the Factor VM if " { $link >r } " is called when the retain stack is full." }
+{ $error-description "Thrown by the Factor VM if " { $link dip } " is called when the retain stack is full." }
 { $notes "This error usually indicates a run-away recursion, however if you legitimately need a retain stack larger than the default, see " { $link "runtime-cli-args" } "." } ;
 
 HELP: memory-error.

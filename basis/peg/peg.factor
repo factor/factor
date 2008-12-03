@@ -146,8 +146,8 @@ TUPLE: peg-head rule-id involved-set eval-set ;
   pos set dup involved-set>> clone >>eval-set drop ;
 
 : (grow-lr) ( h p r: ( -- result ) m -- )
-  >r >r [ setup-growth ] 2keep r> r>
-  >r dup eval-rule r> swap
+  [ [ setup-growth ] 2keep ] 2dip
+  [ dup eval-rule ] dip swap
   dup pick stop-growth? [
     5 ndrop
   ] [
@@ -156,8 +156,8 @@ TUPLE: peg-head rule-id involved-set eval-set ;
   ] if ; inline recursive
  
 : grow-lr ( h p r m -- ast )
-  >r >r [ heads set-at ] 2keep r> r>
-  pick over >r >r (grow-lr) r> r>
+  [ [ heads set-at ] 2keep ] 2dip
+  pick over [ (grow-lr) ] 2dip
   swap heads delete-at
   dup pos>> pos set ans>>
   ; inline
@@ -352,7 +352,7 @@ TUPLE: token-parser symbol ;
   [ ?head-slice ] keep swap [
     <parse-result> f f add-error
   ] [
-    >r drop pos get "token '" r> append "'" append 1vector add-error f
+    [ drop pos get "token '" ] dip append "'" append 1vector add-error f
   ] if ;
 
 M: token-parser (compile) ( peg -- quot )

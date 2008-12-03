@@ -561,7 +561,7 @@ M: x86 %reload-float ( dst n -- ) spill-float@ MOVSD ;
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
-M: int-regs %save-param-reg drop >r param@ r> MOV ;
+M: int-regs %save-param-reg drop [ param@ ] dip MOV ;
 M: int-regs %load-param-reg drop swap param@ MOV ;
 
 GENERIC: MOVSS/D ( dst src reg-class -- )
@@ -569,8 +569,8 @@ GENERIC: MOVSS/D ( dst src reg-class -- )
 M: single-float-regs MOVSS/D drop MOVSS ;
 M: double-float-regs MOVSS/D drop MOVSD ;
 
-M: float-regs %save-param-reg >r >r param@ r> r> MOVSS/D ;
-M: float-regs %load-param-reg >r swap param@ r> MOVSS/D ;
+M: float-regs %save-param-reg [ param@ ] 2dip MOVSS/D ;
+M: float-regs %load-param-reg [ swap param@ ] dip MOVSS/D ;
 
 GENERIC: push-return-reg ( reg-class -- )
 GENERIC: load-return-reg ( n reg-class -- )

@@ -135,20 +135,6 @@ M: object method-layout ;
     [ \ method-layout see-methods ] with-string-writer "\n" split
 ] unit-test
 
-: retain-stack-test
-    {
-        "USING: io kernel sequences words ;"
-        "IN: prettyprint.tests"
-        ": retain-stack-layout ( x -- )"
-        "    dup stream-readln stream-readln"
-        "    >r [ define ] map r>"
-        "    define ;"
-    } ;
-
-[ t ] [
-    "retain-stack-layout" retain-stack-test check-see
-] unit-test
-
 : soft-break-test
     {
         "USING: kernel math sequences strings ;"
@@ -162,19 +148,6 @@ M: object method-layout ;
 
 [ t ] [
     "soft-break-layout" soft-break-test check-see
-] unit-test
-
-: another-retain-layout-test
-    {
-        "USING: kernel sequences ;"
-        "IN: prettyprint.tests"
-        ": another-retain-layout ( seq1 seq2 quot -- newseq )"
-        "    -rot 2dup dupd min-length [ each drop roll ] map"
-        "    >r 3drop r> ; inline"
-    } ;
-
-[ t ] [
-    "another-retain-layout" another-retain-layout-test check-see
 ] unit-test
 
 DEFER: parse-error-file
@@ -219,8 +192,7 @@ DEFER: parse-error-file
         "USING: kernel sequences ;"
         "IN: prettyprint.tests"
         ": final-soft-break-layout ( class dim -- view )"
-        "    >r \"alloc\" send 0 0 r>"
-        "    first2 <NSRect>"
+        "    [ \"alloc\" send 0 0 ] dip first2 <NSRect>"
         "    <PixelFormat> \"initWithFrame:pixelFormat:\" send"
         "    dup 1 \"setPostsBoundsChangedNotifications:\" send"
         "    dup 1 \"setPostsFrameChangedNotifications:\" send ;"
