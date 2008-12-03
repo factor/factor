@@ -5,13 +5,13 @@ debugger sequences state-parser accessors summary
 namespaces io.streams.string xml.backend ;
 IN: xml.errors
 
-TUPLE: multitags ;
-C: <multitags> multitags
+ERROR: multitags ;
+
 M: multitags summary ( obj -- str )
     drop "XML document contains multiple main tags" ;
 
-TUPLE: pre/post-content string pre? ;
-C: <pre/post-content> pre/post-content
+ERROR: pre/post-content string pre? ;
+
 M: pre/post-content summary ( obj -- str )
     [
         "The text string:" print
@@ -22,8 +22,10 @@ M: pre/post-content summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: no-entity < parsing-error thing ;
-: <no-entity> ( string -- error )
-    \ no-entity parsing-error swap >>thing ;
+
+: no-entity ( string -- * )
+    \ no-entity parsing-error swap >>thing throw ;
+
 M: no-entity summary ( obj -- str )
     [
         dup call-next-method write
@@ -31,8 +33,10 @@ M: no-entity summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: xml-string-error < parsing-error string ; ! this should not exist
-: <xml-string-error> ( string -- xml-string-error )
-    \ xml-string-error parsing-error swap >>string ;
+
+: xml-string-error ( string -- * )
+    \ xml-string-error parsing-error swap >>string throw ;
+
 M: xml-string-error summary ( obj -- str )
     [
         dup call-next-method write
@@ -40,8 +44,10 @@ M: xml-string-error summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: mismatched < parsing-error open close ;
-: <mismatched> ( open close -- error )
-    \ mismatched parsing-error swap >>close swap >>open ;
+
+: mismatched ( open close -- * )
+    \ mismatched parsing-error swap >>close swap >>open throw ;
+
 M: mismatched summary ( obj -- str )
     [
         dup call-next-method write
@@ -51,9 +57,12 @@ M: mismatched summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: unclosed < parsing-error tags ;
-: <unclosed> ( -- unclosed )
-    unclosed parsing-error
-        xml-stack get rest-slice [ first name>> ] map >>tags ;
+
+: unclosed ( -- * )
+    \ unclosed parsing-error
+        xml-stack get rest-slice [ first name>> ] map >>tags
+    throw ;
+
 M: unclosed summary ( obj -- str )
     [
         dup call-next-method write
@@ -63,8 +72,10 @@ M: unclosed summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: bad-uri < parsing-error string ;
-: <bad-uri> ( string -- bad-uri )
-    \ bad-uri parsing-error swap >>string ;
+
+: bad-uri ( string -- * )
+    \ bad-uri parsing-error swap >>string throw ;
+
 M: bad-uri summary ( obj -- str )
     [
         dup call-next-method write
@@ -72,8 +83,10 @@ M: bad-uri summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: nonexist-ns < parsing-error name ;
-: <nonexist-ns> ( name-string -- nonexist-ns )
-    \ nonexist-ns parsing-error swap >>name ;
+
+: nonexist-ns ( name-string -- * )
+    \ nonexist-ns parsing-error swap >>name throw ;
+
 M: nonexist-ns summary ( obj -- str )
     [
         dup call-next-method write
@@ -81,8 +94,10 @@ M: nonexist-ns summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: unopened < parsing-error ; ! this should give which tag was unopened
-: <unopened> ( -- unopened )
-    \ unopened parsing-error ;
+
+: unopened ( -- * )
+    \ unopened parsing-error throw ;
+
 M: unopened summary ( obj -- str )
     [
         call-next-method write
@@ -90,8 +105,10 @@ M: unopened summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: not-yes/no < parsing-error text ;
-: <not-yes/no> ( text -- not-yes/no )
-    \ not-yes/no parsing-error swap >>text ;
+
+: not-yes/no ( text -- * )
+    \ not-yes/no parsing-error swap >>text throw ;
+
 M: not-yes/no summary ( obj -- str )
     [
         dup call-next-method write
@@ -101,8 +118,10 @@ M: not-yes/no summary ( obj -- str )
 
 ! this should actually print the names
 TUPLE: extra-attrs < parsing-error attrs ;
-: <extra-attrs> ( attrs -- extra-attrs )
-    \ extra-attrs parsing-error swap >>attrs ;
+
+: extra-attrs ( attrs -- * )
+    \ extra-attrs parsing-error swap >>attrs throw ;
+
 M: extra-attrs summary ( obj -- str )
     [
         dup call-next-method write
@@ -111,22 +130,26 @@ M: extra-attrs summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: bad-version < parsing-error num ;
-: <bad-version> ( num -- error )
-    \ bad-version parsing-error swap >>num ;
+
+: bad-version ( num -- * )
+    \ bad-version parsing-error swap >>num throw ;
+
 M: bad-version summary ( obj -- str )
     [
         "XML version must be \"1.0\" or \"1.1\". Version here was " write
         num>> .
     ] with-string-writer ;
 
-TUPLE: notags ;
-C: <notags> notags
+ERROR: notags ;
+
 M: notags summary ( obj -- str )
     drop "XML document lacks a main tag" ;
 
 TUPLE: bad-prolog < parsing-error prolog ;
-: <bad-prolog> ( prolog -- bad-prolog )
-    \ bad-prolog parsing-error swap >>prolog ;
+
+: bad-prolog ( prolog -- * )
+    \ bad-prolog parsing-error swap >>prolog throw ;
+
 M: bad-prolog summary ( obj -- str )
     [
         dup call-next-method write
@@ -135,8 +158,10 @@ M: bad-prolog summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: capitalized-prolog < parsing-error name ;
-: <capitalized-prolog> ( name -- capitalized-prolog )
-    \ capitalized-prolog parsing-error swap >>name ;
+
+: capitalized-prolog ( name -- capitalized-prolog )
+    \ capitalized-prolog parsing-error swap >>name throw ;
+
 M: capitalized-prolog summary ( obj -- str )
     [
         dup call-next-method write
@@ -146,8 +171,10 @@ M: capitalized-prolog summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: versionless-prolog < parsing-error ;
-: <versionless-prolog> ( -- versionless-prolog )
-    \ versionless-prolog parsing-error ;
+
+: versionless-prolog ( -- * )
+    \ versionless-prolog parsing-error throw ;
+
 M: versionless-prolog summary ( obj -- str )
     [
         call-next-method write
@@ -155,23 +182,55 @@ M: versionless-prolog summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: bad-instruction < parsing-error instruction ;
-: <bad-instruction> ( instruction -- bad-instruction )
-    \ bad-instruction parsing-error swap >>instruction ;
+
+: bad-instruction ( instruction -- * )
+    \ bad-instruction parsing-error swap >>instruction throw ;
+
 M: bad-instruction summary ( obj -- str )
     [
         dup call-next-method write
         "Misplaced processor instruction:" print
-        instruction>> write-item nl
+        instruction>> write-xml-chunk nl
     ] with-string-writer ;
 
 TUPLE: bad-directive < parsing-error dir ;
-: <bad-directive> ( directive -- bad-directive )
-    \ bad-directive parsing-error swap >>dir ;
+
+: bad-directive ( directive -- * )
+    \ bad-directive parsing-error swap >>dir throw ;
+
 M: bad-directive summary ( obj -- str )
     [
         dup call-next-method write
+        "Unknown directive:" print
+        dir>> write
+    ] with-string-writer ;
+
+TUPLE: bad-doctype-decl < parsing-error ;
+
+: bad-doctype-decl ( -- * )
+    \ bad-doctype-decl parsing-error throw ;
+
+M: bad-doctype-decl summary ( obj -- str )
+    call-next-method "\nBad DOCTYPE" append ;
+
+TUPLE: bad-external-id < parsing-error ;
+
+: bad-external-id ( -- * )
+    \ bad-external-id parsing-error throw ;
+
+M: bad-external-id summary ( obj -- str )
+    call-next-method "\nBad external ID" append ;
+
+TUPLE: misplaced-directive < parsing-error dir ;
+
+: misplaced-directive ( directive -- * )
+    \ misplaced-directive parsing-error swap >>dir throw ;
+
+M: misplaced-directive summary ( obj -- str )
+    [
+        dup call-next-method write
         "Misplaced directive:" print
-        dir>> write-item nl
+        dir>> write-xml-chunk nl
     ] with-string-writer ;
 
 UNION: xml-parse-error multitags notags extra-attrs nonexist-ns
