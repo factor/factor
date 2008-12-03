@@ -37,7 +37,7 @@ M: rect rect-dim dim>> ;
     over rect-loc v+ swap rect-dim <rect> ;
 
 : (rect-intersect) ( rect rect -- array array )
-    2rect-extent vmin >r vmax r> ;
+    2rect-extent [ vmax ] [ vmin ] 2bi* ;
 
 : rect-intersect ( rect1 rect2 -- newrect )
     (rect-intersect) <extent-rect> ;
@@ -46,7 +46,7 @@ M: rect rect-dim dim>> ;
     (rect-intersect) [v-] { 0 0 } = ;
 
 : (rect-union) ( rect rect -- array array )
-    2rect-extent vmax >r vmin r> ;
+    2rect-extent [ vmin ] [ vmax ] 2bi* ;
 
 : rect-union ( rect1 rect2 -- newrect )
     (rect-union) <extent-rect> ;

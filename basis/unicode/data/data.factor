@@ -49,7 +49,7 @@ VALUE: properties
 : (process-data) ( index data -- newdata )
     filter-comments
     [ [ nth ] keep first swap ] with { } map>assoc
-    [ >r hex> r> ] assoc-map ;
+    [ [ hex> ] dip ] assoc-map ;
 
 : process-data ( index data -- hash )
     (process-data) [ hex> ] assoc-map [ nip ] assoc-filter >hashtable ;

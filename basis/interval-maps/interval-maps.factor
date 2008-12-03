@@ -15,7 +15,7 @@ TUPLE: interval-map array ;
     first2 between? ;
 
 : all-intervals ( sequence -- intervals )
-    [ >r dup number? [ dup 2array ] when r> ] { } assoc-map-as ;
+    [ [ dup number? [ dup 2array ] when ] dip ] { } assoc-map-as ;
 
 : disjoint? ( node1 node2 -- ? )
     [ second ] [ first ] bi* < ;
