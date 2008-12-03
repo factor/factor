@@ -1,15 +1,16 @@
-! Copyright (C) 2007 Slava Pestov
+! Copyright (C) 2007, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays byte-arrays hashtables
-io kernel math namespaces sequences strings
-continuations x11.xlib ;
+USING: alien alien.c-types alien.strings arrays byte-arrays
+hashtables io io.encodings.string kernel math namespaces
+sequences strings continuations x11.xlib specialized-arrays.uint
+accessors ;
 IN: x11.xim
 
 SYMBOL: xim
 
 : (init-xim) ( classname medifier -- im )
    XSetLocaleModifiers [ "XSetLocaleModifiers() failed" throw ] unless
-   dpy get f rot dup XOpenIM ;
+   [ dpy get f ] dip dup XOpenIM ;
 
 : init-xim ( classname -- )
    dup "" (init-xim)
@@ -21,14 +22,15 @@ SYMBOL: xim
     xim get-global XCloseIM drop f xim set-global ;
 
 : with-xim ( quot -- )
-    >r "Factor" init-xim r> [ close-xim ] [ ] cleanup ;
+    [ "Factor" init-xim ] dip [ close-xim ] [ ] cleanup ;
 
 : create-xic ( window classname -- xic )
-    >r >r xim get-global
-    XNClientWindow r>
-    XNFocusWindow over
-    XNInputStyle XIMPreeditNothing XIMStatusNothing bitor
-    XNResourceName r>
+    [
+        [ xim get-global XNClientWindow ] dip
+        XNFocusWindow over
+        XNInputStyle XIMPreeditNothing XIMStatusNothing bitor
+        XNResourceName
+    ] dip
     XNResourceClass over 0 XCreateIC
     [ "XCreateIC() failed" throw ] unless* ;
 

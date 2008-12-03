@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.strings alien.syntax arrays
 kernel math namespaces sequences io.encodings.string
 io.encodings.utf8 io.encodings.ascii x11.xlib x11.constants
-specialized-arrays.int ;
+specialized-arrays.int accessors ;
 IN: x11.clipboard
 
 ! This code was based on by McCLIM's Backends/CLX/port.lisp
