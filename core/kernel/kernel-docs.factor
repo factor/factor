@@ -770,7 +770,7 @@ $nl
 "Technically, the spread combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on three related values can be written in one of two ways:"
 { $code
     "! First alternative; uses dip"
-    "[ [ 1 + ] dip 1 - dip ] 2 *"
+    "[ [ 1 + ] dip 1 - ] dip 2 *"
     "! Second alternative: uses tri*"
     "[ 1 + ] [ 1 - ] [ 2 * ] tri*"
 }
