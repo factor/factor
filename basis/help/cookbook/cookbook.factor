@@ -269,7 +269,7 @@ $nl
 { $heading "Example: ls" }
 "Here is an example implementing a simplified version of the Unix " { $snippet "ls" } " command in Factor:"
 { $code
-    <" USING: command-line namespaces io io.files io.files.listing
+    <" USING: command-line namespaces io io.files tools.files
 sequences kernel ;
 
 command-line get [
