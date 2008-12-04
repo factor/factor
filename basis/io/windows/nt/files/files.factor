@@ -1,6 +1,6 @@
 USING: continuations destructors io.buffers io.files io.backend
 io.timeouts io.ports io.files.private io.windows
-io.windows.files io.windows.nt.backend io.encodings.ut16n
+io.windows.files io.windows.nt.backend io.encodings.utf16n
 windows windows.kernel32 kernel libc math threads system
 environment alien.c-types alien.arrays alien.strings sequences
 combinators combinators.short-circuit ascii splitting alien
