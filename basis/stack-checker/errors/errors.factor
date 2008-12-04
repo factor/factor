@@ -13,7 +13,7 @@ M: inference-error compiler-error-type type>> ;
 M: inference-error error-help error>> error-help ;
 
 : (inference-error) ( ... class type -- * )
-    >r boa r>
+    [ boa ] dip
     recursive-state get word>>
     \ inference-error boa throw ; inline
 

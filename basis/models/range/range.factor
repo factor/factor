@@ -6,7 +6,7 @@ IN: models.range
 
 TUPLE: range < compose ;
 
-: <range> ( value min max page -- range )
+: <range> ( value page min max -- range )
     4array [ <model> ] map range new-compose ;
 
 : range-model ( range -- model ) dependencies>> first ;

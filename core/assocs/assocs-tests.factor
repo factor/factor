@@ -1,7 +1,7 @@
 IN: assocs.tests
 USING: kernel math namespaces make tools.test vectors sequences
 sequences.private hashtables io prettyprint assocs
-continuations float-arrays ;
+continuations specialized-arrays.double ;
 
 [ t ] [ H{ } dup assoc-subset? ] unit-test
 [ f ] [ H{ { 1 3 } } H{ } assoc-subset? ] unit-test
@@ -91,7 +91,7 @@ unit-test
 [
     H{ { 1.0 1.0 } { 2.0 2.0 } }
 ] [
-    F{ 1.0 2.0 } [ dup ] H{ } map>assoc
+    double-array{ 1.0 2.0 } [ dup ] H{ } map>assoc
 ] unit-test
 
 [ { 3 } ] [

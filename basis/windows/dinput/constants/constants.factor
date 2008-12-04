@@ -1,7 +1,8 @@
 USING: windows.dinput windows.kernel32 windows.ole32 windows.com
 windows.com.syntax alien alien.c-types alien.syntax kernel system namespaces
 combinators sequences symbols fry math accessors macros words quotations
-libc continuations generalizations splitting locals assocs init ;
+libc continuations generalizations splitting locals assocs init
+struct-arrays ;
 IN: windows.dinput.constants
 
 ! Some global variables aren't provided by the DirectInput DLL (they're in the
@@ -52,14 +53,14 @@ SYMBOLS:
     } cleave
     "DIOBJECTDATAFORMAT" <c-object> (DIOBJECTDATAFORMAT) ;
 
-: malloc-DIOBJECTDATAFORMAT-array ( struct array -- alien )
-    [ nip length "DIOBJECTDATAFORMAT" malloc-array dup ]
-    [
-        -rot [| args i alien struct |
+:: malloc-DIOBJECTDATAFORMAT-array ( struct array -- alien )
+    [let | alien [ array length "DIOBJECTDATAFORMAT" malloc-struct-array ] |
+        array [| args i |
             struct args <DIOBJECTDATAFORMAT>
-            i alien set-DIOBJECTDATAFORMAT-nth
-        ] 2curry each-index
-    ] 2bi ;
+            i alien set-nth
+        ] each-index
+        alien underlying>>
+    ] ;
 
 : (DIDATAFORMAT) ( dwSize dwObjSize dwFlags dwDataSize dwNumObjs rgodf alien -- alien )
     [ {

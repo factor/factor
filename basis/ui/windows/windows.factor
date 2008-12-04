@@ -284,13 +284,9 @@ SYMBOL: nc-buttons
     message>button nc-buttons get
     swap [ push ] [ delete ] if ;
 
-: >lo-hi ( WORD -- array ) [ lo-word ] keep hi-word 2array ;
-: mouse-wheel ( wParam -- array ) >lo-hi [ sgn neg ] map ;
+: >lo-hi ( WORD -- array ) [ lo-word ] [ hi-word ] bi 2array ;
 
-: mouse-absolute>relative ( lparam handle -- array )
-    [ >lo-hi ] dip
-    "RECT" <c-object> [ GetWindowRect win32-error=0/f ] keep
-    get-RECT-top-left 2array v- ;
+: mouse-wheel ( wParam -- array ) >lo-hi [ sgn neg ] map ;
 
 : mouse-event>gesture ( uMsg -- button )
     key-modifiers swap message>button
@@ -340,9 +336,7 @@ SYMBOL: nc-buttons
     >lo-hi swap window move-hand fire-motion ;
 
 :: handle-wm-mousewheel ( hWnd uMsg wParam lParam -- )
-    wParam mouse-wheel
-    lParam hWnd mouse-absolute>relative
-    hWnd window send-wheel ;
+    wParam mouse-wheel hand-loc get hWnd window send-wheel ;
 
 : handle-wm-cancelmode ( hWnd uMsg wParam lParam -- )
     #! message sent if windows needs application to stop dragging

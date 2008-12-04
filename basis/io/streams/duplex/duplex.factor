@@ -27,7 +27,7 @@ M: duplex-stream dispose
     ] with-destructors ;
 
 : <encoder-duplex> ( stream-in stream-out encoding -- duplex )
-    tuck re-encode >r re-decode r> <duplex-stream> ;
+    tuck [ re-decode ] [ re-encode ] 2bi* <duplex-stream> ;
 
 : with-stream* ( stream quot -- )
     [ [ in>> ] [ out>> ] bi ] dip with-streams* ; inline

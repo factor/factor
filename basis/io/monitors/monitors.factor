@@ -53,7 +53,7 @@ SYMBOL: +rename-file-new+
 SYMBOL: +rename-file+
 
 : with-monitor ( path recursive? quot -- )
-    >r <monitor> r> with-disposal ; inline
+    [ <monitor> ] dip with-disposal ; inline
 
 {
     { [ os macosx? ] [ "io.unix.macosx.monitors" require ] }

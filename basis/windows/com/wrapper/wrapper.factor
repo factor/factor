@@ -1,8 +1,9 @@
-USING: alien alien.c-types windows.com.syntax init
-windows.com.syntax.private windows.com continuations kernel
+USING: alien alien.c-types alien.accessors windows.com.syntax
+init windows.com.syntax.private windows.com continuations kernel
 namespaces windows.ole32 libc vocabs assocs accessors arrays
 sequences quotations combinators math words compiler.units
-destructors fry math.parser generalizations sets ;
+destructors fry math.parser generalizations sets
+specialized-arrays.alien specialized-arrays.direct.alien ;
 IN: windows.com.wrapper
 
 TUPLE: com-wrapper callbacks vtbls disposed ;
@@ -51,23 +52,26 @@ unless
         _ case
         [
             "void*" heap-size * rot <displaced-alien> com-add-ref
-            0 rot set-void*-nth S_OK
-        ] [ nip f 0 rot set-void*-nth E_NOINTERFACE ] if*
+            swap 0 set-alien-cell S_OK
+        ] [ nip f swap 0 set-alien-cell E_NOINTERFACE ] if*
     ] ;
 
 : (make-add-ref) ( interfaces -- quot )
     length "void*" heap-size * '[
-        _ swap <displaced-alien>
-        0 over ulong-nth
-        1+ [ 0 rot set-ulong-nth ] keep
+        _
+        [ alien-unsigned-4 1+ dup ]
+        [ set-alien-unsigned-4 ]
+        2bi
     ] ;
 
 : (make-release) ( interfaces -- quot )
     length "void*" heap-size * '[
-        _ over <displaced-alien>
-        0 over ulong-nth
-        1- [ 0 rot set-ulong-nth ] keep
-        dup zero? [ swap (free-wrapped-object) ] [ nip ] if
+        _
+        [ drop ]
+        [ alien-unsigned-4 1- dup ]
+        [ set-alien-unsigned-4 ]
+        2tri
+        dup 0 = [ swap (free-wrapped-object) ] [ nip ] if
     ] ;
 
 : (make-iunknown-methods) ( interfaces -- quots )
@@ -91,9 +95,6 @@ unless
     '[ _ _ _ _ alien-callback ]
     [ [ (( -- alien )) define-declared ] pick slip ]
     with-compilation-unit ;
-
-: byte-array>malloc ( byte-array -- alien )
-    [ byte-length malloc ] [ over byte-array>memory ] bi ;
 
 : (callback-word) ( function-name interface-name counter -- word )
     [ "::" rot 3append "-callback-" ] dip number>string 3append
@@ -128,11 +129,10 @@ unless
 : (malloc-wrapped-object) ( wrapper -- wrapped-object )
     vtbls>> length "void*" heap-size *
     [ "ulong" heap-size + malloc ] keep
-    over <displaced-alien>
-    1 0 rot set-ulong-nth ;
+    [ [ 1 ] 2dip set-alien-unsigned-4 ] [ drop ] 2bi ;
 
 : (callbacks>vtbl) ( callbacks -- vtbl )
-    [ execute ] map >c-void*-array byte-array>malloc ;
+    [ execute ] void*-array{ } map-as underlying>> malloc-byte-array ;
 : (callbacks>vtbls) ( callbacks -- vtbls )
     [ (callbacks>vtbl) ] map ;
 
@@ -162,5 +162,5 @@ M: com-wrapper dispose*
 
 : com-wrap ( object wrapper -- wrapped-object )
     [ vtbls>> ] [ (malloc-wrapped-object) ] bi
-    [ [ set-void*-nth ] curry each-index ] keep
+    [ over length <direct-void*-array> 0 swap copy ] keep
     [ +wrapped-objects+ get-global set-at ] keep ;

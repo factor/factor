@@ -4,7 +4,7 @@ USING: kernel generalizations ;
 
 IN: shuffle
 
-: 2swap ( x y z t -- z t x y ) rot >r rot r> ; inline
+: 2swap ( x y z t -- z t x y ) 2 2 mnswap ; inline
 
 : nipd ( a b c -- b c ) rot drop ; inline
 

@@ -203,7 +203,7 @@ M: vocab summary
 M: vocab-link summary vocab-summary ;
 
 : set-vocab-summary ( string vocab -- )
-    >r 1array r>
+    [ 1array ] dip
     dup vocab-summary-path
     set-vocab-file-contents ;
 
@@ -238,7 +238,7 @@ M: vocab-link summary vocab-summary ;
         vocab-dir append-path dup exists?
         [ subdirs ] [ drop { } ] if
     ] keep [
-        swap [ "." swap 3append ] with map
+        swap [ "." glue ] with map
     ] unless-empty ;
 
 : vocabs-in-dir ( root name -- )

@@ -1,30 +1,30 @@
 USING: accessors sequences assocs kernel quotations namespaces
-xml.data xml.utilities combinators macros parser lexer words ;
+xml.data xml.utilities combinators macros parser lexer words fry ;
 IN: xmode.utilities
 
-: implies >r not r> or ; inline
+: implies [ not ] dip or ; inline
 
 : child-tags ( tag -- seq ) children>> [ tag? ] filter ;
 
 : map-find ( seq quot -- result elt )
     f -rot
-    [ nip ] swap [ dup ] 3compose find
-    >r [ drop f ] unless r> ; inline
+    '[ nip @ dup ] find
+    [ [ drop f ] unless ] dip ; inline
 
 : tag-init-form ( spec -- quot )
     {
         { [ dup quotation? ] [ [ object get tag get ] prepose ] }
         { [ dup length 2 = ] [
-            first2 [
-                >r >r tag get children>string
-                r> [ execute ] when* object get r> execute
-            ] 2curry
+            first2 '[
+                tag get children>string
+                _ [ execute ] when* object get _ execute
+            ]
         ] }
         { [ dup length 3 = ] [
-            first3 [
-                >r >r tag get at
-                r> [ execute ] when* object get r> execute
-            ] 3curry
+            first3 '[
+                _ tag get at
+                _ [ execute ] when* object get _ execute
+            ]
         ] }
     } cond ;
 
@@ -36,7 +36,7 @@ MACRO: (init-from-tag) ( specs -- )
     [ with-tag-initializer ] curry ;
 
 : init-from-tag ( tag tuple specs -- tuple )
-    over >r (init-from-tag) r> ; inline
+    over [ (init-from-tag) ] dip ; inline
 
 SYMBOL: tag-handlers
 SYMBOL: tag-handler-word

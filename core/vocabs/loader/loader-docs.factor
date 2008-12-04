@@ -2,6 +2,18 @@ USING: vocabs vocabs.loader.private help.markup help.syntax
 words strings io ;
 IN: vocabs.loader
 
+ARTICLE: "add-vocab-roots" "Working with code outside of the Factor source tree"
+"You can work with code outside of the Factor source tree by adding additional directories to the list of vocabulary roots."
+$nl
+"There are three ways of doing this."
+$nl
+"The first way is to use an environment variable. Factor looks at the " { $snippet "FACTOR_ROOTS" } " environment variable for a list of " { $snippet ":" } "-separated paths (on Unix) or a list of " { $snippet ";" } "-separated paths (on Windows)."
+$nl
+"The second way is to create a configuration file. You can list additional vocabulary roots in a file that Factor reads at startup:"
+{ $subsection "factor-roots" }
+"Finally, you can add vocabulary roots dynamically using a word:"
+{ $subsection add-vocab-root } ;
+
 ARTICLE: "vocabs.roots" "Vocabulary roots"
 "The vocabulary loader searches for it in one of the root directories:"
 { $subsection vocab-roots }
@@ -12,12 +24,8 @@ ARTICLE: "vocabs.roots" "Vocabulary roots"
     { { $snippet "extra" } " - additional contributed libraries." }
     { { $snippet "work" } " - a root for vocabularies which are not intended to be contributed back to Factor." }
 }
-"You can store your own vocabularies in the " { $snippet "work" } " directory. You can also store code outside of the Factor source tree by making Factor aware of it first. There are two ways of doing this."
-$nl
-"You can list additional vocabulary roots in a file that Factor reads at startup:"
-{ $subsection "factor-roots" }
-"Or you can add them dynamically using a word:"
-{ $subsection add-vocab-root } ;
+"You can store your own vocabularies in the " { $snippet "work" } " directory."
+{ $subsection "add-vocab-roots" } ;
 
 ARTICLE: "vocabs.loader" "Vocabulary loader"
 "The vocabulary loader is defined in the " { $vocab-link "vocabs.loader" } " vocabulary."
@@ -58,7 +66,7 @@ HELP: vocab-roots
 { $var-description "A sequence of pathname strings to search for vocabularies." } ;
 
 HELP: add-vocab-root
-{ $values { "path" "a pathname string" } }
+{ $values { "root" "a pathname string" } }
 { $description "Adds a directory pathname to the list of vocabulary roots." }
 { $see-also "factor-roots" } ;
 

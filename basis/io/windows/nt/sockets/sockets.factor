@@ -176,8 +176,8 @@ TUPLE: WSASendTo-args port
 
 : make-send-buffer ( packet -- WSABUF )
     "WSABUF" malloc-object &free
-    [ >r malloc-byte-array &free r> set-WSABUF-buf ]
-    [ >r length r> set-WSABUF-len ]
+    [ [ malloc-byte-array &free ] dip set-WSABUF-buf ]
+    [ [ length ] dip set-WSABUF-len ]
     [ nip ]
     2tri ; inline
 
@@ -186,8 +186,8 @@ TUPLE: WSASendTo-args port
         swap >>port
         dup port>> handle>> handle>> >>s
         swap make-sockaddr/size
-            >r malloc-byte-array &free
-            r> [ >>lpTo ] [ >>iToLen ] bi*
+            [ malloc-byte-array &free ] dip
+            [ >>lpTo ] [ >>iToLen ] bi*
         swap make-send-buffer >>lpBuffers
         1 >>dwBufferCount
         0 >>dwFlags

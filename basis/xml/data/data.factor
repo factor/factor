@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private assocs arrays
 delegate.protocols delegate vectors accessors multiline
-macros words quotations combinators slots ;
+macros words quotations combinators slots fry ;
 IN: xml.data
 
 TUPLE: name space main url ;
@@ -34,8 +34,25 @@ C: <contained> contained
 TUPLE: comment text ;
 C: <comment> comment
 
-TUPLE: directive text ;
-C: <directive> directive
+TUPLE: directive ;
+
+TUPLE: element-decl < directive name content-spec ;
+C: <element-decl> element-decl
+
+TUPLE: attlist-decl < directive name att-defs ;
+C: <attlist-decl> attlist-decl
+
+TUPLE: entity-decl < directive name def ;
+C: <entity-decl> entity-decl
+
+TUPLE: system-id system-literal ;
+C: <system-id> system-id
+
+TUPLE: public-id pubid-literal system-literal ;
+C: <public-id> public-id
+
+TUPLE: doctype-decl < directive name external-id internal-subset ;
+C: <doctype-decl> doctype-decl
 
 TUPLE: instruction text ;
 C: <instruction> instruction
@@ -47,7 +64,7 @@ TUPLE: attrs alist ;
 C: <attrs> attrs
 
 : attr@ ( key alist -- index {key,value} )
-    >r assure-name r> alist>>
+    [ assure-name ] dip alist>>
     [ first names-match? ] with find ;
 
 M: attrs at*
@@ -56,7 +73,7 @@ M: attrs set-at
     2dup attr@ nip [
         2nip set-second
     ] [
-        >r assure-name swap 2array r>
+        [ assure-name swap 2array ] dip
         [ alist>> ?push ] keep (>>alist)
     ] if* ;
 
@@ -67,7 +84,7 @@ M: attrs >alist alist>> ;
 : >attrs ( assoc -- attrs )
     dup [
         V{ } assoc-clone-like
-        [ >r assure-name r> ] assoc-map
+        [ [ assure-name ] dip ] assoc-map
     ] when <attrs> ;
 M: attrs assoc-like
     drop dup attrs? [ >attrs ] unless ;
@@ -107,9 +124,9 @@ M: tag like
 MACRO: clone-slots ( class -- tuple )
     [
         "slots" word-prop
-        [ name>> reader-word 1quotation [ clone ] compose ] map
-        [ cleave ] curry
-    ] [ [ boa ] curry ] bi compose ;
+        [ name>> reader-word '[ _ execute clone ] ] map
+        '[ _ cleave ]
+    ] [ '[ _ boa ] ] bi compose ;
 
 M: tag clone
     tag clone-slots ;
@@ -129,7 +146,7 @@ CONSULT: name xml body>> ;
 
 <PRIVATE
 : tag>xml ( xml tag -- newxml )
-    >r [ prolog>> ] [ before>> ] [ after>> ] tri r>
+    [ [ prolog>> ] [ before>> ] [ after>> ] tri ] dip
     swap <xml> ;
 
 : seq>xml ( xml seq -- newxml )

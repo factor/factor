@@ -1,21 +1,16 @@
-USING: sequences alien.c-types math hints kernel byte-arrays ;
+USING: sequences hints kernel math specialized-arrays.int fry ;
 IN: benchmark.dawes
 
 ! Phil Dawes's performance problem
 
-: int-length ( byte-array -- n ) length "int" heap-size /i ; inline
+: count-ones ( int-array -- n ) [ 1 = ] count ; inline
 
-: count-ones ( byte-array -- n )
-    0 swap [ int-length ] keep [
-        int-nth 1 = [ 1 + ] when
-    ] curry each-integer ;
+HINTS: count-ones int-array ;
 
-HINTS: count-ones byte-array ;
-
-: make-byte-array ( -- byte-array )
-    120000 [ 255 bitand ] map >c-int-array ;
+: make-int-array ( -- int-array )
+    120000 [ 255 bitand ] int-array{ } map-as ;
 
 : dawes-benchmark ( -- )
-    make-byte-array 200 swap [ count-ones ] curry replicate drop ;
+    make-int-array 200 swap '[ _ count-ones ] replicate drop ;
 
 MAIN: dawes-benchmark

@@ -23,7 +23,7 @@ IN: bootstrap.syntax
     "syntax" lookup t "delimiter" set-word-prop ;
 
 : define-syntax ( name quot -- )
-    [ "syntax" lookup dup ] dip define t "parsing" set-word-prop ;
+    [ "syntax" lookup dup ] dip define make-parsing ;
 
 [
     { "]" "}" ";" ">>" } [ define-delimiter ] each
@@ -93,7 +93,7 @@ IN: bootstrap.syntax
     "foldable" [ word make-foldable ] define-syntax
     "flushable" [ word make-flushable ] define-syntax
     "delimiter" [ word t "delimiter" set-word-prop ] define-syntax
-    "parsing" [ word t "parsing" set-word-prop ] define-syntax
+    "parsing" [ word make-parsing ] define-syntax
 
     "SYMBOL:" [
         CREATE-WORD define-symbol

@@ -16,7 +16,7 @@ USE: unix
     command>> dup string? [ tokenize-command ] when ;
 
 : assoc>env ( assoc -- env )
-    [ "=" swap 3append ] { } assoc>map ;
+    [ "=" glue ] { } assoc>map ;
 
 : setup-priority ( process -- process )
     dup priority>> [

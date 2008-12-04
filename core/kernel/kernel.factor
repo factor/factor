@@ -179,9 +179,6 @@ GENERIC: boa ( ... class -- tuple )
 : prepose ( quot1 quot2 -- compose )
     swap compose ; inline
 
-: 3compose ( quot1 quot2 quot3 -- compose )
-    compose compose ; inline
-
 ! Booleans
 : not ( obj -- ? ) [ f ] [ t ] if ; inline
 

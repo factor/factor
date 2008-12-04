@@ -6,7 +6,7 @@ math.bitwise byte-arrays alien combinators calendar
 io.encodings.binary accessors sequences strings system
 io.files.private destructors vocabs.loader calendar.unix
 unix.stat alien.c-types arrays unix.users unix.groups
-environment fry io.encodings.utf8 alien.strings unix.statfs
+environment fry io.encodings.utf8 alien.strings
 combinators.short-circuit ;
 IN: io.unix.files
 
@@ -76,14 +76,64 @@ M: unix copy-file ( from to -- )
     [ swap file-info permissions>> chmod io-error ]
     2bi ;
 
-HOOK: stat>file-info os ( stat -- file-info )
+TUPLE: unix-file-system-info < file-system-info
+block-size preferred-block-size
+blocks blocks-free blocks-available
+files files-free files-available
+name-max flags id ;
 
-HOOK: stat>type os ( stat -- file-info )
+HOOK: new-file-system-info os ( --  file-system-info )
 
-HOOK: new-file-info os ( -- class )
+M: unix new-file-system-info ( -- ) unix-file-system-info new ;
+
+HOOK: file-system-statfs os ( path -- statfs )
+
+M: unix file-system-statfs drop f ;
+
+HOOK: file-system-statvfs os ( path -- statvfs )
+
+M: unix file-system-statvfs drop f ;
+
+HOOK: statfs>file-system-info os ( file-system-info statfs -- file-system-info' )
+
+M: unix statfs>file-system-info drop ;
+
+HOOK: statvfs>file-system-info os ( file-system-info statvfs -- file-system-info' )
+
+M: unix statvfs>file-system-info drop ;
+
+: file-system-calculations ( file-system-info -- file-system-info' )
+    {
+        [ dup [ blocks-available>> ] [ block-size>> ] bi * >>available-space drop ]
+        [ dup [ blocks-free>> ] [ block-size>> ] bi * >>free-space drop ]
+        [ dup [ blocks>> ] [ block-size>> ] bi * >>total-space drop ]
+        [ dup [ total-space>> ] [ free-space>> ] bi - >>used-space drop ]
+        [ ]
+    } cleave ;
+
+M: unix file-system-info
+    normalize-path
+    [ new-file-system-info ] dip
+    [ file-system-statfs statfs>file-system-info ]
+    [ file-system-statvfs statvfs>file-system-info ] bi
+    file-system-calculations ;
+
+os {
+    { linux   [ "io.unix.files.linux"   require ] }
+    { macosx  [ "io.unix.files.macosx"  require ] }
+    { freebsd [ "io.unix.files.freebsd" require ] }
+    { netbsd  [ "io.unix.files.netbsd"  require ] }
+    { openbsd [ "io.unix.files.openbsd" require ] }
+} case
 
 TUPLE: unix-file-info < file-info uid gid dev ino
 nlink rdev blocks blocksize ;
+
+HOOK: new-file-info os ( -- file-info )
+
+HOOK: stat>file-info os ( stat -- file-info )
+
+HOOK: stat>type os ( stat -- file-info )
 
 M: unix file-info ( path -- info )
     normalize-path file-status stat>file-info ;
@@ -264,8 +314,7 @@ PRIVATE>
 <PRIVATE
 
 : make-timeval-array ( array -- byte-array )
-    [ length "timeval" <c-array> ] keep
-    dup length [ over [ pick set-timeval-nth ] [ 2drop ] if ] 2each ;
+    [ [ "timeval" <c-object> ] unless* ] map concat ;
 
 : timestamp>timeval ( timestamp -- timeval )
     unix-1970 time- duration>microseconds make-timeval ;

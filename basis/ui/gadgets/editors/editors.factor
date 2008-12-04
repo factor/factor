@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays documents io kernel math models
+USING: accessors arrays documents kernel math models
 namespaces locals fry make opengl opengl.gl sequences strings
 io.styles math.vectors sorting colors combinators assocs
 math.order fry calendar alarms ui.clipboards ui.commands
@@ -218,7 +218,7 @@ M: editor ungraft*
     ] with-editor-translation ;
 
 : selection-start/end ( editor -- start end )
-    dup editor-mark* swap editor-caret* sort-pair ;
+    [ editor-mark* ] [ editor-caret* ] bi sort-pair ;
 
 : (draw-selection) ( x1 x2 -- )
     over -
@@ -227,19 +227,19 @@ M: editor ungraft*
     swap [ gl-fill-rect ] with-translation ;
 
 : draw-selected-line ( start end n -- )
-    [ start/end-on-line ] keep tuck
-    [ editor get offset>x ] 2dip
-    editor get offset>x
+    [ start/end-on-line ] keep
+    tuck [ editor get offset>x ] 2bi@
     (draw-selection) ;
 
 : draw-selection ( -- )
     editor get selection-color>> gl-color
     editor get selection-start/end
     over first [
-        2dup [
-            [ 2dup ] dip draw-selected-line
+        2dup '[
+            [ _ _ ] dip
+            draw-selected-line
             1 translate-lines
-        ] each-line 2drop
+        ] each-line
     ] with-editor-translation ;
 
 M: editor draw-gadget*

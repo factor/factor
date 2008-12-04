@@ -28,7 +28,7 @@ PRIVATE>
 : (parse-multiline-string) ( start-index end-text -- end-index )
     lexer get line-text>> [
         2dup start
-        [ rot dupd >r >r swap subseq % r> r> length + ] [
+        [ rot dupd [ swap subseq % ] 2dip length + ] [
             rot tail % "\n" % 0
             lexer get next-line swap (parse-multiline-string)
         ] if*

@@ -5,7 +5,8 @@ quotations sequences db.postgresql.ffi alien alien.c-types
 db.types tools.walker ascii splitting math.parser combinators
 libc shuffle calendar.format byte-arrays destructors prettyprint
 accessors strings serialize io.encodings.binary io.encodings.utf8
-alien.strings io.streams.byte-array summary present urls ;
+alien.strings io.streams.byte-array summary present urls
+specialized-arrays.uint specialized-arrays.alien ;
 IN: db.postgresql.lib
 
 : postgresql-result-error-message ( res -- str/f )
@@ -64,7 +65,7 @@ M: postgresql-result-null summary ( obj -- str )
     } case ;
 
 : param-types ( statement -- seq )
-    in-params>> [ type>> type>oid ] map >c-uint-array ;
+    in-params>> [ type>> type>oid ] uint-array{ } map-as underlying>> ;
 
 : malloc-byte-array/length ( byte-array -- alien length )
     [ malloc-byte-array &free ] [ length ] bi ;
@@ -90,11 +91,11 @@ M: postgresql-result-null summary ( obj -- str )
     ] 2map flip [
         f f
     ] [
-        first2 [ >c-void*-array ] [ >c-uint-array ] bi*
+        first2 [ >void*-array underlying>> ] [ >uint-array underlying>> ] bi*
     ] if-empty ;
 
 : param-formats ( statement -- seq )
-    in-params>> [ type>> type>param-format ] map >c-uint-array ;
+    in-params>> [ type>> type>param-format ] uint-array{ } map-as underlying>> ;
 
 : do-postgresql-bound-statement ( statement -- res )
     [

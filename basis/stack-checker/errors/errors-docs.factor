@@ -115,7 +115,6 @@ ARTICLE: "inference-errors" "Inference warnings and errors"
 { $subsection inconsistent-recursive-call-error }
 "Retain stack usage errors:"
 { $subsection too-many->r }
-{ $subsection too-many-r> }
-"See " { $link "shuffle-words" } " for retain stack usage conventions. This error can only occur if your code calls " { $link >r } " and " { $link r> } " directly. The " { $link dip } " combinator is safer to use because there is no way to leave the retain stack in an unbalanced state." ;
+{ $subsection too-many-r> } ;
 
 ABOUT: "inference-errors"
