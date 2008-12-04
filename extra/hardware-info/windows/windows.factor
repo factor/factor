@@ -21,7 +21,7 @@ IN: hardware-info.windows
 : os-version ( -- os-version )
     "OSVERSIONINFO" <c-object>
     "OSVERSIONINFO" heap-size over set-OSVERSIONINFO-dwOSVersionInfoSize
-    [ GetVersionEx ] keep swap zero? [ win32-error ] when ;
+    dup GetVersionEx win32-error=0/f ;
 
 : windows-major ( -- n )
     os-version OSVERSIONINFO-dwMajorVersion ;
@@ -36,7 +36,7 @@ IN: hardware-info.windows
     os-version OSVERSIONINFO-dwPlatformId ;
 
 : windows-service-pack ( -- string )
-    os-version OSVERSIONINFO-szCSDVersion utf16n alien>string ;
+    os-version OSVERSIONINFO-szCSDVersion alien>native-string ;
 
 : feature-present? ( n -- ? )
     IsProcessorFeaturePresent zero? not ;
@@ -51,8 +51,8 @@ IN: hardware-info.windows
     "ushort" <c-array> ;
 
 : get-directory ( word -- str )
-    >r MAX_UNICODE_PATH [ <u16-string-object> ] keep dupd r>
-    execute win32-error=0/f utf16n alien>string ; inline
+    [ MAX_UNICODE_PATH [ <u16-string-object> ] keep dupd ] dip
+    execute win32-error=0/f alien>native-string ; inline
 
 : windows-directory ( -- str )
     \ GetWindowsDirectory get-directory ;
