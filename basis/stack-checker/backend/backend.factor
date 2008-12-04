@@ -116,10 +116,10 @@ M: object apply-object push-literal ;
     ] if ;
 
 : infer->r ( n -- )
-    consume-d dup copy-values [ #>r, ] [ nip output-r ] 2bi ;
+    consume-d dup copy-values [ nip output-r ] [ #>r, ] 2bi ;
 
 : infer-r> ( n -- )
-    consume-r dup copy-values [ #r>, ] [ nip output-d ] 2bi ;
+    consume-r dup copy-values [ nip output-d ] [ #r>, ] 2bi ;
 
 : undo-infer ( -- )
     recorded get [ f "inferred-effect" set-word-prop ] each ;
