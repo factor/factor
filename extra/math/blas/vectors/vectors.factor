@@ -128,8 +128,6 @@ FUNCTOR: (define-blas-vector) ( TYPE T -- )
 >ARRAY         IS >${TYPE}-array
 XCOPY          IS cblas_${T}copy
 XSWAP          IS cblas_${T}swap
-XAXPY          IS cblas_${T}axpy
-XSCAL          IS cblas_${T}scal
 IXAMAX         IS cblas_i${T}amax
 
 VECTOR         DEFINES ${TYPE}-blas-vector
@@ -150,10 +148,6 @@ M: VECTOR clone
 
 M: VECTOR element-type
     drop TYPE ;
-M: VECTOR n*V+V!
-    (prepare-axpy) [ XAXPY execute ] dip ;
-M: VECTOR n*V!
-    (prepare-scal) [ XSCAL execute ] dip ;
 M: VECTOR Vswap
     (prepare-swap) [ XSWAP execute ] 2dip ;
 M: VECTOR Viamax
@@ -176,6 +170,8 @@ VECTOR         IS ${TYPE}-blas-vector
 XDOT           IS cblas_${T}dot
 XNRM2          IS cblas_${T}nrm2
 XASUM          IS cblas_${T}asum
+XAXPY          IS cblas_${T}axpy
+XSCAL          IS cblas_${T}scal
 
 WHERE
 
@@ -187,6 +183,10 @@ M: VECTOR Vnorm
     (prepare-nrm2) XNRM2 execute ;
 M: VECTOR Vasum
     (prepare-nrm2) XASUM execute ;
+M: VECTOR n*V+V!
+    (prepare-axpy) [ XAXPY execute ] dip ;
+M: VECTOR n*V!
+    (prepare-scal) [ XSCAL execute ] dip ;
 
 ;FUNCTOR
 
@@ -196,15 +196,18 @@ FUNCTOR: (define-complex-helpers) ( TYPE -- )
 <DIRECT-COMPLEX-ARRAY> DEFINES <direct-${TYPE}-complex-array>
 >COMPLEX-ARRAY         DEFINES >${TYPE}-complex-array
 ALIEN>COMPLEX          DEFINES alien>${TYPE}-complex
+COMPLEX>ALIEN          DEFINES ${TYPE}-complex>alien
 <DIRECT-ARRAY>         IS      <direct-${TYPE}-array>
 >ARRAY                 IS      >${TYPE}-array
 
 WHERE
 
 : <DIRECT-COMPLEX-ARRAY> ( alien len -- sequence )
-    <DIRECT-ARRAY> execute <complex-sequence> ;
+    1 shift <DIRECT-ARRAY> execute <complex-sequence> ;
 : >COMPLEX-ARRAY ( sequence -- sequence )
     <complex-components> >ARRAY execute ;
+: COMPLEX>ALIEN ( complex -- alien )
+    >rect 2array >ARRAY execute underlying>> ;
 : ALIEN>COMPLEX ( alien -- complex )
     2 <DIRECT-ARRAY> execute first2 rect> ;
 
@@ -218,6 +221,9 @@ XDOTU_SUB      IS cblas_${C}dotu_sub
 XDOTC_SUB      IS cblas_${C}dotc_sub
 XXNRM2         IS cblas_${S}${C}nrm2
 XXASUM         IS cblas_${S}${C}asum
+XAXPY          IS cblas_${C}axpy
+XSCAL          IS cblas_${C}scal
+TYPE>ALIEN     IS ${TYPE}>alien
 ALIEN>TYPE     IS alien>${TYPE}
 
 WHERE
@@ -234,6 +240,12 @@ M: VECTOR Vnorm
     (prepare-nrm2) XXNRM2 execute ;
 M: VECTOR Vasum
     (prepare-nrm2) XXASUM execute ;
+M: VECTOR n*V+V!
+    [ TYPE>ALIEN execute ] 2dip
+    (prepare-axpy) [ XAXPY execute ] dip ;
+M: VECTOR n*V!
+    [ TYPE>ALIEN execute ] dip
+    (prepare-scal) [ XSCAL execute ] dip ;
 
 ;FUNCTOR
 
@@ -245,8 +257,7 @@ M: VECTOR Vasum
     TYPE (define-complex-helpers)
     TYPE "-complex" append
     [ C (define-blas-vector) ]
-    [ C S (define-complex-blas-vector) ] bi
-    ;
+    [ C S (define-complex-blas-vector) ] bi ;
 
 "float"  "s" define-real-blas-vector
 "double" "d" define-real-blas-vector
