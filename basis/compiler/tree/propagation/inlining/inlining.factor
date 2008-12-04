@@ -20,6 +20,10 @@ SYMBOL: node-count
 : count-nodes ( nodes -- )
     0 swap [ drop 1+ ] each-node node-count set ;
 
+! We try not to inline the same word too many times, to avoid
+! combinatorial explosion
+SYMBOL: inlining-count
+
 ! Splicing nodes
 GENERIC: splicing-nodes ( #call word/quot/f -- nodes )
 
@@ -120,17 +124,25 @@ DEFER: (flat-length)
         bi and
     ] contains? ;
 
+: node-count-bias ( -- n )
+    45 node-count get [-] 8 /i ;
+
+: body-length-bias ( word -- n )
+    [ flat-length ] [ inlining-count get at 0 or 2/ 1+ ] bi *
+    24 swap [-] 4 /i ;
+
 : inlining-rank ( #call word -- n )
     [ classes-known? 2 0 ? ]
     [
         {
-            [ drop node-count get 45 swap [-] 8 /i ]
-            [ flat-length 24 swap [-] 4 /i ]
+            [ body-length-bias ]
             [ "default" word-prop -4 0 ? ]
             [ "specializer" word-prop 1 0 ? ]
             [ method-body? 1 0 ? ]
         } cleave
-    ] bi* + + + + + ;
+        node-count-bias
+        loop-nesting get 0 or 2 *
+    ] bi* + + + + + + ;
 
 : should-inline? ( #call word -- ? )
     dup "inline" word-prop [ 2drop t ] [ inlining-rank 5 >= ] if ;
@@ -138,12 +150,12 @@ DEFER: (flat-length)
 SYMBOL: history
 
 : remember-inlining ( word -- )
-    history [ swap suffix ] change ;
+    [ [ 1 ] dip inlining-count get at+ ]
+    [ history [ swap suffix ] change ]
+    bi ;
 
 : inline-word-def ( #call word quot -- ? )
-    over history get memq? [
-        3drop f
-    ] [
+    over history get memq? [ 3drop f ] [
         [
             swap remember-inlining
             dupd splicing-nodes >>body
