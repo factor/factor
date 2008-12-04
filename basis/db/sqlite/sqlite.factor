@@ -308,7 +308,7 @@ M: sqlite-db persistent-table ( -- assoc )
 
 M: sqlite-db compound ( string seq -- new-string )
     over {
-        { "default" [ first number>string join-space ] }
+        { "default" [ first number>string " " glue ] }
         { "references" [
             [ >reference-string ] keep
             first2 [ "foreign-table" set ]

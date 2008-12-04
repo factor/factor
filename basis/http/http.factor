@@ -111,7 +111,7 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
                 { [ dup real? ] [ number>string ] }
                 [ ]
             } cond
-            [ check-cookie-string ] bi@ "=" swap 3append ,
+            [ check-cookie-string ] bi@ "=" glue ,
         ]
     } case ;
 

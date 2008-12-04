@@ -7,8 +7,7 @@ namespaces make sequences ftp io.unix.launcher.parser
 unicode.case splitting assocs classes io.servers.connection
 destructors calendar io.timeouts io.streams.duplex threads
 continuations math concurrency.promises byte-arrays
-io.backend sequences.lib tools.hexdump tools.files
-io.streams.string ;
+io.backend tools.hexdump tools.files io.streams.string ;
 IN: ftp.server
 
 TUPLE: ftp-client url mode state command-promise user password ;
@@ -231,7 +230,7 @@ M: ftp-put service-command ( stream obj -- )
     expect-connection
     [
         "Entering Passive Mode (127,0,0,1," %
-        port>bytes [ number>string ] bi@ "," splice %
+        port>bytes [ number>string ] bi@ "," glue %
         ")" %
     ] "" make 227 swap server-response ;
 

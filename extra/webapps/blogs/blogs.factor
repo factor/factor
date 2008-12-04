@@ -50,7 +50,7 @@ M: entity feed-entry-date date>> ;
 TUPLE: post < entity title comments ;
 
 M: post feed-entry-title
-    [ author>> ] [ title>> ] bi ": " swap 3append ;
+    [ author>> ] [ title>> ] bi ": " glue ;
 
 M: post entity-url
     id>> view-post-url ;

@@ -10,7 +10,7 @@ IN: tools.memory
 
 : write-size ( n -- )
     number>string
-    dup length 4 > [ 3 cut* "," swap 3append ] when
+    dup length 4 > [ 3 cut* "," glue ] when
     " KB" append write-cell ;
 
 : write-total/used/free ( free total str -- )
