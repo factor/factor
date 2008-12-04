@@ -125,9 +125,13 @@ M: node node>quot drop ;
 : nodes>quot ( node -- quot )
     [ [ node>quot ] each ] [ ] make ;
 
-: optimized. ( quot/word -- )
-    dup word? [ specialized-def ] when
-    build-tree optimize-tree nodes>quot . ;
+GENERIC: optimized. ( quot/word -- )
+
+M: method-spec optimized. first2 method optimized. ;
+
+M: word optimized. specialized-def optimized. ;
+
+M: callable optimized. build-tree optimize-tree nodes>quot . ;
 
 SYMBOL: words-called
 SYMBOL: generics-called

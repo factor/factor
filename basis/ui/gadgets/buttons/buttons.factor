@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math models namespaces sequences
 strings quotations assocs combinators classes colors
-classes.tuple locals alien.c-types fry opengl opengl.gl
-math.vectors ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.labels ui.gadgets.theme ui.gadgets.tracks
-ui.gadgets.packs ui.gadgets.worlds ui.gestures ui.render
-math.geometry.rect ;
+classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
+ui.gadgets.borders ui.gadgets.labels ui.gadgets.theme
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
+ui.render math.geometry.rect locals alien.c-types
+specialized-arrays.float fry ;
 IN: ui.gadgets.buttons
 
 TUPLE: button < border pressed? selected? quot ;
@@ -119,7 +119,7 @@ TUPLE: checkmark-paint < caching-pen color last-vertices ;
     } cleave 4array ;
 
 : checkmark-vertices ( dim -- vertices )
-    checkmark-points concat >c-float-array ;
+    checkmark-points concat >float-array ;
 
 PRIVATE>
 

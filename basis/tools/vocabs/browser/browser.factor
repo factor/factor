@@ -250,9 +250,9 @@ C: <vocab-author> vocab-author
 
 : keyed-vocabs ( str quot -- seq )
     all-vocabs [
-        swap >r
-        [ >r 2dup r> swap call member? ] filter
-        r> swap
+        swap [
+            [ [ 2dup ] dip swap call member? ] filter
+        ] dip swap
     ] assoc-map 2nip ; inline
 
 : tagged ( tag -- assoc )

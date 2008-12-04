@@ -104,7 +104,8 @@ M: unix statvfs>file-system-info drop ;
 
 : file-system-calculations ( file-system-info -- file-system-info' )
     {
-        [ dup [ blocks-available>> ] [ block-size>> ] bi * >>free-space drop ]
+        [ dup [ blocks-available>> ] [ block-size>> ] bi * >>available-space drop ]
+        [ dup [ blocks-free>> ] [ block-size>> ] bi * >>free-space drop ]
         [ dup [ blocks>> ] [ block-size>> ] bi * >>total-space drop ]
         [ dup [ total-space>> ] [ free-space>> ] bi - >>used-space drop ]
         [ ]
@@ -313,8 +314,7 @@ PRIVATE>
 <PRIVATE
 
 : make-timeval-array ( array -- byte-array )
-    [ length "timeval" <c-array> ] keep
-    dup length [ over [ pick set-timeval-nth ] [ 2drop ] if ] 2each ;
+    [ [ "timeval" <c-object> ] unless* ] map concat ;
 
 : timestamp>timeval ( timestamp -- timeval )
     unix-1970 time- duration>microseconds make-timeval ;

@@ -1,24 +1,34 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel unix math accessors
-combinators system io.backend alien.c-types unix.statfs 
-io.files ;
+USING: alien.syntax ;
 IN: unix.statfs.freebsd
 
-: ST_RDONLY       1 ; inline
-: ST_NOSUID       2 ; inline
+: MFSNAMELEN      16            ; inline ! length of type name including null */
+: MNAMELEN        88            ; inline ! size of on/from name bufs
+: STATFS_VERSION  HEX: 20030518 ; inline ! current version number 
 
-C-STRUCT: statvfs               
-    { "fsblkcnt_t" "f_bavail" }
-    { "fsblkcnt_t" "f_bfree" }
-    { "fsblkcnt_t" "f_blocks" }
-    { "fsfilcnt_t" "f_favail" }
-    { "fsfilcnt_t" "f_ffree" }
-    { "fsfilcnt_t" "f_files" }
-    { "ulong" "f_bsize" }
-    { "ulong" "f_flag" }
-    { "ulong" "f_frsize" }
-    { "ulong" "f_fsid" }
-    { "ulong" "f_namemax" } ;
+C-STRUCT: statfs
+    { "uint32_t" "f_version" }
+    { "uint32_t" "f_type" }
+    { "uint64_t" "f_flags" }
+    { "uint64_t" "f_bsize" }
+    { "uint64_t" "f_iosize" }
+    { "uint64_t" "f_blocks" }
+    { "uint64_t" "f_bfree" }
+    { "int64_t"  "f_bavail" }
+    { "uint64_t" "f_files" }
+    { "int64_t"  "f_ffree" }
+    { "uint64_t" "f_syncwrites" }
+    { "uint64_t" "f_asyncwrites" }
+    { "uint64_t" "f_syncreads" }
+    { "uint64_t" "f_asyncreads" }
+    { { "uint64_t" 10 } "f_spare" }
+    { "uint32_t" "f_namemax" }
+    { "uid_t"    "f_owner" }
+    { "fsid_t"   "f_fsid" }
+    { { "char" 80 } "f_charspare" }
+    { { "char" MFSNAMELEN } "f_fstypename" }
+    { { "char" MNAMELEN } "f_mntfromname" }
+    { { "char" MNAMELEN } "f_mntonname" } ;
 
-FUNCTION: int statvfs ( char* path, statvfs* buf ) ;
+FUNCTION: int statfs ( char* path, statvfs* buf ) ;

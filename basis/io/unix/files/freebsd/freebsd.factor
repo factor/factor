@@ -2,23 +2,53 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax combinators
 io.backend io.files io.unix.files kernel math system unix
-unix.statfs unix.statvfs.freebsd ;
+unix.statfs.freebsd unix.statvfs.freebsd unix.getfsstat.freebsd
+sequences grouping alien.strings io.encodings.utf8 ;
 IN: io.unix.files.freebsd
+
+TUPLE: freebsd-file-system-info < unix-file-system-info
+version io-size owner syncreads syncwrites asyncreads asyncwrites ;
+
+M: freebsd new-file-system-info freebsd-file-system-info new ;
+
+M: freebsd file-system-statfs ( path -- byte-array )
+    "statfs" <c-object> tuck statfs io-error ;
+
+M: freebsd statfs>file-system-info ( file-system-info statvfs -- file-system-info )
+    {
+        [ statfs-f_version >>version ]
+        [ statfs-f_type >>type ]
+        [ statfs-f_flags >>flags ]
+        [ statfs-f_bsize >>block-size ]
+        [ statfs-f_iosize >>io-size ]
+        [ statfs-f_blocks >>blocks ]
+        [ statfs-f_bfree >>blocks-free ]
+        [ statfs-f_bavail >>blocks-available ]
+        [ statfs-f_files >>files ]
+        [ statfs-f_ffree >>files-free ]
+        [ statfs-f_syncwrites >>syncwrites ]
+        [ statfs-f_asyncwrites >>asyncwrites ]
+        [ statfs-f_syncreads >>syncreads ]
+        [ statfs-f_asyncreads >>asyncreads ]
+        [ statfs-f_namemax >>name-max ]
+        [ statfs-f_owner >>owner ]
+        [ statfs-f_fsid >>id ]
+        [ statfs-f_fstypename utf8 alien>string >>type ]
+        [ statfs-f_mntfromname utf8 alien>string >>device-name ]
+        [ statfs-f_mntonname utf8 alien>string >>mount-point ]
+    } cleave ;
 
 M: freebsd file-system-statvfs ( path -- byte-array )
     "statvfs" <c-object> tuck statvfs io-error ;
 
 M: freebsd statvfs>file-system-info ( file-system-info statvfs -- file-system-info )
     {
-        [ statvfs-f_bavail >>blocks-available ]
-        [ statvfs-f_bfree >>blocks-free ]
-        [ statvfs-f_blocks >>blocks ]
         [ statvfs-f_favail >>files-available ]
-        [ statvfs-f_ffree >>files-free ]
-        [ statvfs-f_files >>files ]
-        [ statvfs-f_bsize >>block-size ]
-        [ statvfs-f_flag >>flags ]
         [ statvfs-f_frsize >>preferred-block-size ]
-        [ statvfs-f_fsid >>id ]
-        [ statvfs-f_namemax >>name-max ]
     } cleave ;
+
+M: freebsd file-systems ( -- array )
+    f 0 0 getfsstat dup io-error
+    "statfs" <c-array> dup dup length 0 getfsstat io-error
+    "statfs" heap-size group
+    [ statfs-f_mntonname alien>native-string file-system-info ] map ;

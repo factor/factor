@@ -205,10 +205,10 @@ ARTICLE: "cookbook-io" "Input and output cookbook"
 }
 "Convert a file of 4-byte cells from little to big endian or vice versa, by directly mapping it into memory and operating on it with sequence words:"
 { $code
-    "USING: accessors grouping io.files io.mmap kernel sequences ;"
-    "\"mydata.dat\" dup file-info size>> ["
+    "USING: accessors grouping io.files io.mmap.char kernel sequences ;"
+    "\"mydata.dat\" ["
     "    4 <sliced-groups> [ reverse-here ] change-each"
-    "] with-mapped-file"
+    "] with-mapped-char-file"
 }
 "Send some bytes to a remote host:"
 { $code
@@ -269,7 +269,7 @@ $nl
 { $heading "Example: ls" }
 "Here is an example implementing a simplified version of the Unix " { $snippet "ls" } " command in Factor:"
 { $code
-    <" USING: command-line namespaces io io.files io.files.listing
+    <" USING: command-line namespaces io io.files tools.files
 sequences kernel ;
 
 command-line get [

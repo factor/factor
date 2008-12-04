@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces make kernel assocs sequences ;
+USING: namespaces make kernel assocs sequences fry ;
 IN: xml.entities
 
 : entities-out
@@ -19,7 +19,7 @@ IN: xml.entities
 
 : escape-string-by ( str table -- escaped )
     #! Convert <, >, &, ' and " to HTML entities.
-    [ [ dupd at [ % ] [ , ] ?if ] curry each ] "" make ;
+    [ '[ dup _ at [ % ] [ , ] ?if ] each ] "" make ;
 
 : escape-string ( str -- newstr )
     entities-out escape-string-by ;

@@ -42,7 +42,7 @@ TUPLE: pprinter last-newline line-count indent ;
 
 : text-fits? ( len -- ? )
     margin get dup zero?
-    [ 2drop t ] [ >r pprinter get indent>> + r> <= ] if ;
+    [ 2drop t ] [ [ pprinter get indent>> + ] dip <= ] if ;
 
 ! break only if position margin 2 / >
 SYMBOL: soft
@@ -189,7 +189,7 @@ M: block short-section ( block -- )
 : empty-block? ( block -- ? ) sections>> empty? ;
 
 : if-nonempty ( block quot -- )
-    >r dup empty-block? [ drop ] r> if ; inline
+    [ dup empty-block? [ drop ] ] dip if ; inline
 
 : (<block) ( block -- ) pprinter-stack get push ;
 

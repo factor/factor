@@ -235,10 +235,11 @@ M: editor ungraft*
     editor get selection-color>> gl-color
     editor get selection-start/end
     over first [
-        2dup [
+        2dup '[
+            [ _ _ ] dip
             draw-selected-line
             1 translate-lines
-        ] with with each-line
+        ] each-line
     ] with-editor-translation ;
 
 M: editor draw-gadget*

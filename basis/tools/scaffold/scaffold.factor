@@ -17,23 +17,17 @@ ERROR: no-vocab vocab ;
 
 <PRIVATE
 
-: root? ( string -- ? ) vocab-roots get member?  ;
+: root? ( string -- ? ) vocab-roots get member? ;
 
-: length-changes? ( seq quot -- ? )
-    dupd call [ length ] bi@ = not ; inline
+: contains-dot? ( string -- ? ) ".." swap subseq? ;
+
+: contains-separator? ( string -- ? ) [ path-separator? ] contains? ;
 
 : check-vocab-name ( string -- string )
-    dup [ [ CHAR: . = ] trim ] length-changes?
-    [ vocab-name-contains-dot ] when
-
-    ".." over subseq? [ vocab-name-contains-dot ] when
-
-    dup [ path-separator? ] contains?
-    [ vocab-name-contains-separator ] when ;
+    dup contains-dot? [ vocab-name-contains-dot ] when
+    dup contains-separator? [ vocab-name-contains-separator ] when ;
 
 : check-root ( string -- string )
-    check-vocab-name
-    dup "resource:" head? [ "resource:" prepend ] unless
     dup root? [ not-a-vocab-root ] unless ;
 
 : directory-exists ( path -- )

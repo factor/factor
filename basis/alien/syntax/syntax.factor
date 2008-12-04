@@ -24,13 +24,10 @@ IN: alien.syntax
     scan scan typedef ; parsing
 
 : C-STRUCT:
-    scan in get
-    parse-definition
-    [ 2dup ] dip define-struct-early
-    define-struct ; parsing
+    scan in get parse-definition define-struct ; parsing
 
 : C-UNION:
-    scan in get parse-definition define-union ; parsing
+    scan parse-definition define-union ; parsing
 
 : C-ENUM:
     ";" parse-tokens
