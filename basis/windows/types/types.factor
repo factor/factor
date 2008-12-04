@@ -30,7 +30,7 @@ TYPEDEF: long*               LPLONG
 TYPEDEF: long                LONG_PTR
 TYPEDEF: long*               PLONG_PTR
 
-TYPEDEF: int                 ULONG
+TYPEDEF: uint                ULONG
 TYPEDEF: void*               ULONG_PTR
 TYPEDEF: void*               PULONG_PTR
 
