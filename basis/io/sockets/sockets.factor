@@ -115,7 +115,7 @@ M: invalid-inet6 summary drop "Invalid IPv6 address" ;
 : pad-inet6 ( string1 string2 -- seq )
     2dup [ length ] bi@ + 8 swap -
     dup 0 < [ "More than 8 components" throw ] when
-    <byte-array> swap 3append ;
+    <byte-array> glue ;
 
 : inet6-bytes ( seq -- bytes )
     [ 2 >be ] { } map-as concat >byte-array ;

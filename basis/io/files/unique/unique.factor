@@ -29,7 +29,7 @@ PRIVATE>
 : make-unique-file ( prefix suffix -- path )
     temporary-path -rot
     [
-        unique-length get random-name swap 3append append-path
+        unique-length get random-name glue append-path
         dup (make-unique-file)
     ] 3curry unique-retries get retry ;
 

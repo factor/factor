@@ -158,12 +158,6 @@ ERROR: no-sql-type type ;
     modifiers>> [ lookup-modifier ] map " " join
     [ "" ] [ " " prepend ] if-empty ;
 
-: join-space ( string1 string2 -- new-string )
-    " " swap 3append ;
-
-: paren ( string -- new-string )
-    "(" swap ")" 3append ;
-
 HOOK: bind% db ( spec -- )
 HOOK: bind# db ( spec obj -- )
 
@@ -171,7 +165,7 @@ ERROR: no-column column ;
 
 : >reference-string ( string pair -- string )
     first2
-    [ [ unparse join-space ] [ db-columns ] bi ] dip
+    [ [ unparse " " glue ] [ db-columns ] bi ] dip
     swap [ column-name>> = ] with find nip
     [ no-column ] unless*
-    column-name>> paren append ;
+    column-name>> "(" ")" surround append ;
