@@ -38,13 +38,6 @@ IN: math.floating-point
         11 [ bl ] times print
     ] tri ;
 
-: nan? ( double -- ? )
-    double>bits
-    {
-        [ (double-exponent-bits) 11 on-bits = ]
-        [ (double-mantissa-bits) 0 > ]
-    } 1&& ;
-
 : infinity? ( double -- ? )
     double>bits
     {

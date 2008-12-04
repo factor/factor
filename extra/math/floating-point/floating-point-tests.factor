@@ -13,5 +13,3 @@ IN: math.floating-point.tests
 [ f ] [ 10. infinity? ] unit-test
 [ f ] [ -10. infinity? ] unit-test
 [ f ] [ 0. infinity? ] unit-test
-
-[ t ] [ 0/0. nan? ] unit-test
