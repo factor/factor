@@ -97,7 +97,7 @@ ALIAS: $slot $snippet
     [
         snippet-style get [
             last-element off
-            >r ($code-style) r> with-nesting
+            [ ($code-style) ] dip with-nesting
         ] with-style
     ] ($block) ; inline
 

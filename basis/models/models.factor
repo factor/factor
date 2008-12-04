@@ -91,7 +91,7 @@ M: model update-model drop ;
     ] if ;
 
 : ((change-model)) ( model quot -- newvalue model )
-    over >r >r value>> r> call r> ; inline
+    over [ [ value>> ] dip call ] dip ; inline
 
 : change-model ( model quot -- )
     ((change-model)) set-model ; inline

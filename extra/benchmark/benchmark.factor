@@ -22,7 +22,7 @@ IN: benchmark
         [
             [
                 [ [ 1array $vocab-link ] with-cell ]
-                [ 1000000 /f pprint-cell ] bi*
+                [ [ 1000000 /f pprint-cell ] [ "failed" write ] if* ] bi*
             ] with-row
         ] assoc-each
     ] tabular-output ;
