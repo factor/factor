@@ -26,7 +26,7 @@ GENERIC: effect>string ( obj -- str )
 M: string effect>string ;
 M: word effect>string name>> ;
 M: integer effect>string number>string ;
-M: pair effect>string first2 [ effect>string ] bi@ ": " swap 3append ;
+M: pair effect>string first2 [ effect>string ] bi@ ": " glue ;
 
 : stack-picture ( seq -- string )
     dup integer? [ "object" <repetition> ] when

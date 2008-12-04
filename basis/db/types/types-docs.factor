@@ -147,12 +147,6 @@ HELP: get-slot-named
      { "value" "the value stored in the slot" } }
 { $description "Returns the value stored in a tuple slot, where the tuple slot is a string." } ;
 
-HELP: join-space
-{ $values
-     { "string1" string } { "string2" string }
-     { "new-string" null } }
-{ $description "" } ;
-
 HELP: literal-bind
 { $description "" } ;
 

@@ -1,4 +1,4 @@
-! Copyright (c) 2007 Aaron Schaefer, Alexander Solovyov.
+! Copyright (c) 2007, 2008 Aaron Schaefer, Alexander Solovyov, Vishal Talwar.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences shuffle ;
 IN: project-euler.002
@@ -50,4 +50,31 @@ PRIVATE>
 ! [ euler002a ] 100 ave-time
 ! 0 ms ave run time - 0.2 SD (100 trials)
 
-MAIN: euler002a
+
+<PRIVATE
+
+: next-fibs ( x y -- y x+y )
+    tuck + ;
+
+: ?retotal ( total fib- fib+ -- retotal fib- fib+ )
+    dup even? [ [ nip + ] 2keep ] when ;
+
+: (sum-even-fibs-below) ( partial fib- fib+ max -- total )
+    2dup > [
+        3drop
+    ] [
+        [ ?retotal next-fibs ] dip (sum-even-fibs-below)
+    ] if ;
+
+PRIVATE>
+
+: sum-even-fibs-below ( max -- sum )
+    [ 0 0 1 ] dip (sum-even-fibs-below) ;
+
+: euler002b ( -- answer )
+    4000000 sum-even-fibs-below ;
+
+! [ euler002b ] 100 ave-time
+! 0 ms ave run time - 0.0 SD (100 trials)
+
+MAIN: euler002b

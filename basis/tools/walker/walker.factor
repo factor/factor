@@ -126,7 +126,7 @@ SYMBOL: +stopped+
     [
         2dup length = [ nip [ break ] append ] [
             2dup nth \ break = [ nip ] [
-                swap 1+ cut [ break ] swap 3append
+                swap 1+ cut [ break ] glue 
             ] if
         ] if
     ] change-frame ;
