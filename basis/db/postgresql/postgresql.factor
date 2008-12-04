@@ -267,7 +267,7 @@ ERROR: no-compound-found string object ;
 M: postgresql-db compound ( string object -- string' )
     over {
         { "default" [ first number>string " " glue ] }
-        { "varchar" [ first number>string paren append ] }
+        { "varchar" [ first number>string "(" ")" surround append ] }
         { "references" [ >reference-string ] }
         [ drop no-compound-found ]
     } case ;
