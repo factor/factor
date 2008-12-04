@@ -317,6 +317,10 @@ PRIVATE>
 
 : 3append ( seq1 seq2 seq3 -- newseq ) pick 3append-as ;
 
+: surround ( seq1 seq2 seq3 -- newseq ) swapd 3append ; inline
+
+: glue ( seq1 seq2 seq3 -- newseq ) swap 3append ; inline
+
 : change-nth ( i seq quot -- )
     [ [ nth ] dip call ] 3keep drop set-nth ; inline
 

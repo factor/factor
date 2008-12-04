@@ -5,7 +5,7 @@ IN: hardware-info.windows.ce
 : memory-status ( -- MEMORYSTATUS )
     "MEMORYSTATUS" <c-object>
     "MEMORYSTATUS" heap-size over set-MEMORYSTATUS-dwLength
-    [ GlobalMemoryStatus ] keep ;
+    dup GlobalMemoryStatus ;
 
 M: wince cpus ( -- n ) 1 ;
 
