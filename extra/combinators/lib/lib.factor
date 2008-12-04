@@ -135,9 +135,6 @@ MACRO: multikeep ( word out-indexes -- ... )
         r> [ drop \ r> , ] each
     ] [ ] make ;
 
-: retry ( quot n -- )
-    [ drop ] rot compose attempt-all ; inline
-
 : do-while ( pred body tail -- )
     [ tuck 2slip ] dip while ; inline
 

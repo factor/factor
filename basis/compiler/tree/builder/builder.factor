@@ -21,7 +21,7 @@ IN: compiler.tree.builder
 : build-tree-with ( in-stack quot -- nodes out-stack )
     #! Not safe to call from inference transforms.
     [
-        [ >vector meta-d set ]
+        [ >vector \ meta-d set ]
         [ f initial-recursive-state infer-quot ] bi*
     ] with-tree-builder nip
     unclip-last in-d>> ;

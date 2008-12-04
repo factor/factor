@@ -19,11 +19,8 @@ IN: stack-checker.transforms
     rot with-datastack first2
     dup [
         [
-            [ drop ] [
-                [ length meta-d get '[ _ pop* ] times ]
-                [ #drop, ]
-                bi
-            ] bi*
+            [ drop ]
+            [ [ length meta-d shorten-by ] [ #drop, ] bi ] bi*
         ] 2dip
         swap infer-quot
     ] [

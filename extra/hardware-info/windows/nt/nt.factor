@@ -1,10 +1,8 @@
 USING: alien alien.c-types alien.strings
 kernel libc math namespaces hardware-info.backend
-windows windows.advapi32 windows.kernel32 system ;
+hardware-info.windows windows windows.advapi32
+windows.kernel32 system byte-arrays ;
 IN: hardware-info.windows.nt
-
-: system-info ( -- SYSTEM_INFO )
-    "SYSTEM_INFO" <c-object> [ GetSystemInfo ] keep ;
 
 M: winnt cpus ( -- n )
     system-info SYSTEM_INFO-dwNumberOfProcessors ;
@@ -12,7 +10,7 @@ M: winnt cpus ( -- n )
 : memory-status ( -- MEMORYSTATUSEX )
     "MEMORYSTATUSEX" <c-object>
     "MEMORYSTATUSEX" heap-size over set-MEMORYSTATUSEX-dwLength
-    [ GlobalMemoryStatusEx ] keep swap zero? [ win32-error ] when ;
+    dup GlobalMemoryStatusEx win32-error=0/f ;
 
 M: winnt memory-load ( -- n )
     memory-status MEMORYSTATUSEX-dwMemoryLoad ;
@@ -35,21 +33,12 @@ M: winnt total-virtual-mem ( -- n )
 M: winnt available-virtual-mem ( -- n )
     memory-status MEMORYSTATUSEX-ullAvailVirtual ;
 
-: pull-win32-string ( alien -- string )
-    [ utf16n alien>string ] keep free ;
-
 : computer-name ( -- string )
-    MAX_COMPUTERNAME_LENGTH 1+ [ malloc ] keep
-    <int> dupd GetComputerName zero? [
-        free win32-error f
-    ] [
-        pull-win32-string
-    ] if ;
+    MAX_COMPUTERNAME_LENGTH 1+
+    [ <byte-array> dup ] keep <uint>
+    GetComputerName win32-error=0/f alien>native-string ;
  
 : username ( -- string )
-    UNLEN 1+ [ malloc ] keep
-    <int> dupd GetUserName zero? [
-        free win32-error f
-    ] [
-        pull-win32-string
-    ] if ;
+    UNLEN 1+
+    [ <byte-array> dup ] keep <uint>
+    GetUserName win32-error=0/f alien>native-string ;

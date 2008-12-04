@@ -14,7 +14,10 @@ IN: editors.scite
 
 : scite-path ( -- path )
     \ scite-path get-global [
-        program-files "wscite\\SciTE.exe" append-path
+        program-files "ScITE Source Code Editor\\SciTE.exe" append-path
+        dup exists? [
+            drop program-files "wscite\\SciTE.exe" append-path
+        ] unless
     ] unless* ;
 
 : scite-command ( file line -- cmd )

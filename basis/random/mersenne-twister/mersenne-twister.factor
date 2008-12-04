@@ -15,11 +15,14 @@ TUPLE: mersenne-twister { seq uint-array } { i fixnum } ;
 : mt-m 397 ; inline
 : mt-a HEX: 9908b0df ; inline
 
+: mersenne-wrap ( n -- n' )
+    dup mt-n > [ mt-n - ] when ; inline
+
 : wrap-nth ( n seq -- obj )
-    [ length mod ] keep nth-unsafe ; inline
+    [ mersenne-wrap ] dip nth-unsafe ; inline
 
 : set-wrap-nth ( obj n seq -- )
-    [ length mod ] keep set-nth-unsafe ; inline
+    [ mersenne-wrap ] dip set-nth-unsafe ; inline
 
 : calculate-y ( n seq -- y )
     [ wrap-nth 31 mask-bit ]
@@ -50,7 +53,7 @@ TUPLE: mersenne-twister { seq uint-array } { i fixnum } ;
 
 : init-mt-seq ( seed -- seq )
     32 bits mt-n <uint-array>
-    [ set-first ] [ init-mt-rest ] [ ] tri ;
+    [ set-first ] [ init-mt-rest ] [ ] tri ; inline
 
 : mt-temper ( y -- yt )
     dup -11 shift bitxor

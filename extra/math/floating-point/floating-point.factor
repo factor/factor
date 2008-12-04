@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences prettyprint math.parser io
-math.functions math.bitwise ;
+math.functions math.bitwise combinators.short-circuit ;
 IN: math.floating-point
 
 : (double-sign) ( bits -- n ) -63 shift ; inline
@@ -37,3 +37,10 @@ IN: math.floating-point
         (double-mantissa-bits) >bin 52 CHAR: 0 pad-left
         11 [ bl ] times print
     ] tri ;
+
+: infinity? ( double -- ? )
+    double>bits
+    {
+        [ (double-exponent-bits) 11 on-bits = ]
+        [ (double-mantissa-bits) 0 = ]
+    } 1&& ;

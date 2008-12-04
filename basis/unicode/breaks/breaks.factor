@@ -72,7 +72,7 @@ VALUE: grapheme-table
     grapheme-table nth nth not ;
 
 : chars ( i str n -- str[i] str[i+n] )
-    swap >r dupd + r> [ ?nth ] curry bi@ ;
+    swap [ dupd + ] dip [ ?nth ] curry bi@ ;
 
 : find-index ( seq quot -- i ) find drop ; inline
 : find-last-index ( seq quot -- i ) find-last drop ; inline
