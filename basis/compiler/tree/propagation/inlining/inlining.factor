@@ -128,8 +128,8 @@ DEFER: (flat-length)
     45 node-count get [-] 8 /i ;
 
 : body-length-bias ( word -- n )
-    [ flat-length ] [ inlining-count get at 0 or 2/ 1+ ] bi *
-    24 swap [-] 4 /i ;
+    [ flat-length ] [ inlining-count get at 0 or ] bi
+    over 2 <= [ drop ] [ 2/ 1+ * ] if 24 swap [-] 4 /i ;
 
 : inlining-rank ( #call word -- n )
     [ classes-known? 2 0 ? ]
