@@ -119,6 +119,10 @@ M: blas-vector-base virtual-seq
 M: blas-vector-base virtual@
     [ inc>> * ] [ nip (blas-direct-array) ] 2bi ;
 
+: float>arg ( f -- f ) ; inline
+: double>arg ( f -- f ) ; inline
+: arg>float ( f -- f ) ; inline
+: arg>double ( f -- f ) ; inline
 
 <<
 
@@ -195,8 +199,8 @@ FUNCTOR: (define-complex-helpers) ( TYPE -- )
 
 <DIRECT-COMPLEX-ARRAY> DEFINES <direct-${TYPE}-complex-array>
 >COMPLEX-ARRAY         DEFINES >${TYPE}-complex-array
-ALIEN>COMPLEX          DEFINES alien>${TYPE}-complex
-COMPLEX>ALIEN          DEFINES ${TYPE}-complex>alien
+ARG>COMPLEX            DEFINES arg>${TYPE}-complex
+COMPLEX>ARG            DEFINES ${TYPE}-complex>arg
 <DIRECT-ARRAY>         IS      <direct-${TYPE}-array>
 >ARRAY                 IS      >${TYPE}-array
 
@@ -206,9 +210,9 @@ WHERE
     1 shift <DIRECT-ARRAY> execute <complex-sequence> ;
 : >COMPLEX-ARRAY ( sequence -- sequence )
     <complex-components> >ARRAY execute ;
-: COMPLEX>ALIEN ( complex -- alien )
+: COMPLEX>ARG ( complex -- alien )
     >rect 2array >ARRAY execute underlying>> ;
-: ALIEN>COMPLEX ( alien -- complex )
+: ARG>COMPLEX ( alien -- complex )
     2 <DIRECT-ARRAY> execute first2 rect> ;
 
 ;FUNCTOR
@@ -223,28 +227,28 @@ XXNRM2         IS cblas_${S}${C}nrm2
 XXASUM         IS cblas_${S}${C}asum
 XAXPY          IS cblas_${C}axpy
 XSCAL          IS cblas_${C}scal
-TYPE>ALIEN     IS ${TYPE}>alien
-ALIEN>TYPE     IS alien>${TYPE}
+TYPE>ARG       IS ${TYPE}>arg
+ARG>TYPE       IS arg>${TYPE}
 
 WHERE
 
 M: VECTOR V.
     (prepare-dot) TYPE <c-object>
     [ XDOTU_SUB execute ] keep
-    ALIEN>TYPE execute ;
+    ARG>TYPE execute ;
 M: VECTOR V.conj
     (prepare-dot) TYPE <c-object>
     [ XDOTC_SUB execute ] keep
-    ALIEN>TYPE execute ;
+    ARG>TYPE execute ;
 M: VECTOR Vnorm
     (prepare-nrm2) XXNRM2 execute ;
 M: VECTOR Vasum
     (prepare-nrm2) XXASUM execute ;
 M: VECTOR n*V+V!
-    [ TYPE>ALIEN execute ] 2dip
+    [ TYPE>ARG execute ] 2dip
     (prepare-axpy) [ XAXPY execute ] dip ;
 M: VECTOR n*V!
-    [ TYPE>ALIEN execute ] dip
+    [ TYPE>ARG execute ] dip
     (prepare-scal) [ XSCAL execute ] dip ;
 
 ;FUNCTOR
