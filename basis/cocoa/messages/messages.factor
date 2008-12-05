@@ -91,7 +91,7 @@ class-init-hooks global [ H{ } clone or ] change-at
 
 : (objc-class) ( name word -- class )
     2dup execute dup [ 2nip ] [
-        drop over class-init-hooks get at [ call ] when*
+        drop over class-init-hooks get at [ assert-depth ] when*
         2dup execute dup [ 2nip ] [
             2drop "No such class: " prepend throw
         ] if

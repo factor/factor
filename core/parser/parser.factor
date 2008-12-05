@@ -307,7 +307,7 @@ print-use-hook global [ [ ] or ] change-at
     ] recover ;
 
 : run-file ( file -- )
-    [ dup parse-file call ] assert-depth drop ;
+    [ parse-file call ] curry assert-depth ;
 
 : ?run-file ( path -- )
     dup exists? [ run-file ] [ drop ] if ;
