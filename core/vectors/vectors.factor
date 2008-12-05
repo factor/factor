@@ -1,6 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math sequences sequences.private growable ;
+USING: arrays kernel math sequences sequences.private growable
+accessors ;
 IN: vectors
 
 TUPLE: vector
@@ -21,6 +22,19 @@ M: vector new-sequence
 
 M: vector equal?
     over vector? [ sequence= ] [ 2drop f ] if ;
+
+M: array like
+    #! If we have an array, we're done.
+    #! If we have a vector, and it's at full capacity, we're done.
+    #! Otherwise, call resize-array, which is a relatively
+    #! fast primitive.
+    drop dup array? [
+        dup vector? [
+            [ length ] [ underlying>> ] bi
+            2dup length eq?
+            [ nip ] [ resize-array ] if
+        ] [ >array ] if
+    ] unless ;
 
 M: sequence new-resizable drop <vector> ;
 
