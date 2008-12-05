@@ -483,6 +483,9 @@ M: object infer-call*
 \ <byte-array> { integer } { byte-array } define-primitive
 \ <byte-array> make-flushable
 
+\ (byte-array) { integer } { byte-array } define-primitive
+\ (byte-array) make-flushable
+
 \ <displaced-alien> { integer c-ptr } { c-ptr } define-primitive
 \ <displaced-alien> make-flushable
 
@@ -610,6 +613,9 @@ M: object infer-call*
 
 \ <string> { integer integer } { string } define-primitive
 \ <string> make-flushable
+
+\ (string) { integer } { string } define-primitive
+\ (string) make-flushable
 
 \ array>quotation { array } { quotation } define-primitive
 \ array>quotation make-flushable

@@ -468,6 +468,7 @@ tuple
     { "dlsym" "alien" }
     { "dlclose" "alien" }
     { "<byte-array>" "byte-arrays" }
+    { "(byte-array)" "byte-arrays" }
     { "<displaced-alien>" "alien" }
     { "alien-signed-cell" "alien.accessors" }
     { "set-alien-signed-cell" "alien.accessors" }
@@ -519,6 +520,7 @@ tuple
     { "<wrapper>" "kernel" }
     { "(clone)" "kernel" }
     { "<string>" "strings" }
+    { "(string)" "strings.private" }
     { "array>quotation" "quotations.private" }
     { "quotation-xt" "quotations" }
     { "<tuple>" "classes.tuple.private" }

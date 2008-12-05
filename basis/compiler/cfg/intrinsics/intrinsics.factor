@@ -49,6 +49,7 @@ IN: compiler.cfg.intrinsics
     classes.tuple.private:<tuple-boa>
     arrays:<array>
     byte-arrays:<byte-array>
+    byte-arrays:(byte-array)
     math.private:<complex>
     math.private:<ratio>
     kernel:<wrapper>
@@ -131,6 +132,7 @@ IN: compiler.cfg.intrinsics
         { \ classes.tuple.private:<tuple-boa> [ emit-<tuple-boa> iterate-next ] }
         { \ arrays:<array> [ emit-<array> iterate-next ] }
         { \ byte-arrays:<byte-array> [ emit-<byte-array> iterate-next ] }
+        { \ byte-arrays:(byte-array) [ emit-(byte-array) iterate-next ] }
         { \ math.private:<complex> [ emit-simple-allot iterate-next ] }
         { \ math.private:<ratio> [ emit-simple-allot iterate-next ] }
         { \ kernel:<wrapper> [ emit-simple-allot iterate-next ] }

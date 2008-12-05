@@ -59,7 +59,7 @@ HELP: immutable
 
 HELP: new-sequence
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a mutable sequence" } }
-{ $contract "Outputs a mutable sequence of length " { $snippet "n" } " which can hold the elements of " { $snippet "seq" } "." } ;
+{ $contract "Outputs a mutable sequence of length " { $snippet "n" } " which can hold the elements of " { $snippet "seq" } ". The initial contents of the sequence are undefined." } ;
 
 HELP: new-resizable
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a resizable mutable sequence" } }

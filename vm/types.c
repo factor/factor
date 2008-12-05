@@ -253,6 +253,12 @@ void primitive_byte_array(void)
 	dpush(tag_object(allot_byte_array(size)));
 }
 
+void primitive_uninitialized_byte_array(void)
+{
+	CELL size = unbox_array_size();
+	dpush(tag_object(allot_byte_array_internal(size)));
+}
+
 F_BYTE_ARRAY *reallot_byte_array(F_BYTE_ARRAY *array, CELL capacity)
 {
 	CELL to_copy = array_capacity(array);
@@ -431,6 +437,12 @@ void primitive_string(void)
 	CELL initial = to_cell(dpop());
 	CELL length = unbox_array_size();
 	dpush(tag_object(allot_string(length,initial)));
+}
+
+void primitive_uninitialized_string(void)
+{
+	CELL length = unbox_array_size();
+	dpush(tag_object(allot_string_internal(length)));
 }
 
 F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)

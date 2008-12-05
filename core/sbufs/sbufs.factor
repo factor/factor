@@ -8,7 +8,7 @@ TUPLE: sbuf
 { underlying string }
 { length array-capacity } ;
 
-: <sbuf> ( n -- sbuf ) 0 <string> 0 sbuf boa ; inline
+: <sbuf> ( n -- sbuf ) (string) 0 sbuf boa ; inline
 
 M: sbuf set-nth-unsafe
     [ >fixnum ] [ >fixnum ] [ underlying>> ] tri* set-string-nth ;
