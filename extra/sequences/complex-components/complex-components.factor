@@ -5,7 +5,7 @@ IN: sequences.complex-components
 TUPLE: complex-components seq ;
 INSTANCE: complex-components sequence
 
-: <complex-components> ( sequence -- complex-sequence )
+: <complex-components> ( sequence -- complex-components )
     complex-components boa ; inline
 
 <PRIVATE
