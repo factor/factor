@@ -1,7 +1,7 @@
 IN: cocoa.tests
 USING: cocoa cocoa.messages cocoa.subclassing cocoa.types
 compiler kernel namespaces cocoa.classes tools.test memory
-compiler.units ;
+compiler.units math ;
 
 CLASS: {
     { +superclass+ "NSObject" }
@@ -45,3 +45,27 @@ Bar [
 [ 2.0 ] [ "x" get NSRect-y ] unit-test
 [ 101.0 ] [ "x" get NSRect-w ] unit-test
 [ 102.0 ] [ "x" get NSRect-h ] unit-test
+
+! Make sure that we can add methods
+CLASS: {
+    { +superclass+ "NSObject" }
+    { +name+ "Bar" }
+} {
+    "bar"
+    "NSRect"
+    { "id" "SEL" }
+    [ 2drop test-foo "x" get ]
+} {
+    "babb"
+    "int"
+    { "id" "SEL" "int" }
+    [ 2nip sq ]
+} ;
+
+[ 144 ] [
+    Bar [
+        -> alloc -> init
+        dup 12 -> babb
+        swap -> release
+    ] compile-call
+] unit-test
