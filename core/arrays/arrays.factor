@@ -16,8 +16,6 @@ M: object new-sequence drop f <array> ;
 
 M: f new-sequence drop dup zero? [ drop f ] [ f <array> ] if ;
 
-M: array like drop dup array? [ >array ] unless ;
-
 M: array equal?
     over array? [ sequence= ] [ 2drop f ] if ;
 

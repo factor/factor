@@ -1,230 +1,76 @@
 USING: accessors alien alien.c-types arrays byte-arrays combinators
-combinators.short-circuit fry kernel macros math math.blas.cblas
-math.complex math.functions math.order multi-methods qualified
-sequences sequences.private generalizations
+combinators.short-circuit fry kernel math math.blas.cblas
+math.complex math.functions math.order sequences.complex
+sequences.complex-components sequences sequences.private
+functors words locals
 specialized-arrays.float specialized-arrays.double
 specialized-arrays.direct.float specialized-arrays.direct.double ;
-QUALIFIED: syntax
 IN: math.blas.vectors
 
-TUPLE: blas-vector-base data length inc ;
-TUPLE: float-blas-vector < blas-vector-base ;
-TUPLE: double-blas-vector < blas-vector-base ;
-TUPLE: float-complex-blas-vector < blas-vector-base ;
-TUPLE: double-complex-blas-vector < blas-vector-base ;
+TUPLE: blas-vector-base underlying length inc ;
 
-INSTANCE: float-blas-vector sequence
-INSTANCE: double-blas-vector sequence
-INSTANCE: float-complex-blas-vector sequence
-INSTANCE: double-complex-blas-vector sequence
+INSTANCE: blas-vector-base virtual-sequence
 
-C: <float-blas-vector> float-blas-vector
-C: <double-blas-vector> double-blas-vector
-C: <float-complex-blas-vector> float-complex-blas-vector
-C: <double-complex-blas-vector> double-complex-blas-vector
+GENERIC: element-type ( v -- type )
 
 GENERIC: n*V+V! ( alpha x y -- y=alpha*x+y )
 GENERIC: n*V!   ( alpha x -- x=alpha*x )
-
 GENERIC: V. ( x y -- x.y )
 GENERIC: V.conj ( x y -- xconj.y )
 GENERIC: Vnorm ( x -- norm )
 GENERIC: Vasum ( x -- sum )
 GENERIC: Vswap ( x y -- x=y y=x )
-
 GENERIC: Viamax ( x -- max-i )
-
-GENERIC: element-type ( v -- type )
-
-METHOD: element-type { float-blas-vector }
-    drop "float" ;
-METHOD: element-type { double-blas-vector }
-    drop "double" ;
-METHOD: element-type { float-complex-blas-vector }
-    drop "CBLAS_C" ;
-METHOD: element-type { double-complex-blas-vector }
-    drop "CBLAS_Z" ;
 
 <PRIVATE
 
 GENERIC: (blas-vector-like) ( data length inc exemplar -- vector )
 
-METHOD: (blas-vector-like) { object object object float-blas-vector }
-    drop <float-blas-vector> ;
-METHOD: (blas-vector-like) { object object object double-blas-vector }
-    drop <double-blas-vector> ;
-METHOD: (blas-vector-like) { object object object float-complex-blas-vector }
-    drop <float-complex-blas-vector> ;
-METHOD: (blas-vector-like) { object object object double-complex-blas-vector }
-    drop <double-complex-blas-vector> ;
+GENERIC: (blas-direct-array) ( blas-vector -- direct-array )
 
-: (prepare-copy) ( v element-size -- length v-data v-inc v-dest-data v-dest-inc )
-    [ [ length>> ] [ data>> ] [ inc>> ] tri ] dip
-    4 npick * <byte-array>
-    1 ;
+: shorter-length ( v1 v2 -- length )
+    [ length>> ] bi@ min ; inline
+: data-and-inc ( v -- data inc )
+    [ underlying>> ] [ inc>> ] bi ; inline
+: datas-and-incs ( v1 v2 -- v1-data v1-inc v2-data v2-inc )
+    [ data-and-inc ] bi@ ; inline
 
-MACRO: (do-copy) ( copy make-vector -- )
-    '[ over 6 npick _ 2dip 1 @ ] ;
+:: (prepare-copy)
+    ( v element-size -- length v-data v-inc v-dest-data v-dest-inc
+                        copy-data copy-length copy-inc )
+    v [ length>> ] [ data-and-inc ] bi
+    v length>> element-size * <byte-array>
+    1 
+    over v length>> 1 ;
 
-: (prepare-swap) ( v1 v2 -- length v1-data v1-inc v2-data v2-inc v1 v2 )
-    [
-        [ [ length>> ] bi@ min ]
-        [ [ [ data>> ] [ inc>> ] bi ] bi@ ] 2bi
-    ] 2keep ;
+: (prepare-swap)
+    ( v1 v2 -- length v1-data v1-inc v2-data v2-inc
+               v1 v2 )
+    [ shorter-length ] [ datas-and-incs ] [ ] 2tri ;
 
-: (prepare-axpy) ( n v1 v2 -- length n v1-data v1-inc v2-data v2-inc v2 )
-    [
-        [ [ length>> ] bi@ min swap ]
-        [ [ [ data>> ] [ inc>> ] bi ] bi@ ] 2bi
-    ] keep ;
+:: (prepare-axpy)
+    ( n v1 v2 -- length n v1-data v1-inc v2-data v2-inc
+                 v2 )
+    v1 v2 shorter-length
+    n
+    v1 v2 datas-and-incs
+    v2 ;
 
-: (prepare-scal) ( n v -- length n v-data v-inc v )
-    [ [ length>> swap ] [ data>> ] [ inc>> ] tri ] keep ;
+:: (prepare-scal)
+    ( n v -- length n v-data v-inc
+             v )
+    v length>>
+    n
+    v data-and-inc
+    v ;
 
 : (prepare-dot) ( v1 v2 -- length v1-data v1-inc v2-data v2-inc )
-    [ [ length>> ] bi@ min ]
-    [ [ [ data>> ] [ inc>> ] bi ] bi@ ] 2bi ;
+    [ shorter-length ] [ datas-and-incs ] 2bi ;
 
-: (prepare-nrm2) ( v -- length v1-data v1-inc )
-    [ length>> ] [ data>> ] [ inc>> ] tri ;
-
-: (flatten-complex-sequence) ( seq -- seq' )
-    [ [ real-part ] [ imaginary-part ] bi 2array ] map concat ;
-
-: (>c-complex) ( complex -- alien )
-    [ real-part ] [ imaginary-part ] bi float-array{ } 2sequence underlying>> ;
-: (>z-complex) ( complex -- alien )
-    [ real-part ] [ imaginary-part ] bi double-array{ } 2sequence underlying>> ;
-
-: (c-complex>) ( alien -- complex )
-    2 <direct-float-array> first2 rect> ;
-: (z-complex>) ( alien -- complex )
-    2 <direct-double-array> first2 rect> ;
-
-: (prepare-nth) ( n v -- n*inc v-data )
-    [ inc>> ] [ data>> ] bi [ * ] dip ;
-
-MACRO: (complex-nth) ( nth-quot -- )
-    '[ 
-        [ 2 * dup 1+ ] dip
-        _ curry bi@ rect>
-    ] ;
-
-: (c-complex-nth) ( n alien -- complex )
-    [ float-nth ] (complex-nth) ;
-: (z-complex-nth) ( n alien -- complex )
-    [ double-nth ] (complex-nth) ;
-
-MACRO: (set-complex-nth) ( set-nth-quot -- )
-    '[
-        [
-            [ [ real-part ] [ imaginary-part ] bi ]
-            [ 2 * dup 1+ ] bi*
-            swapd
-        ] dip
-        _ curry 2bi@ 
-    ] ;
-
-: (set-c-complex-nth) ( complex n alien -- )
-    [ set-float-nth ] (set-complex-nth) ;
-: (set-z-complex-nth) ( complex n alien -- )
-    [ set-double-nth ] (set-complex-nth) ;
+: (prepare-nrm2) ( v -- length data inc )
+    [ length>> ] [ data-and-inc ] bi ;
 
 PRIVATE>
-
-: <zero-vector> ( exemplar -- zero )
-    [ element-type <c-object> ]
-    [ length>> 0 ]
-    [ (blas-vector-like) ] tri ;
-
-: <empty-vector> ( length exemplar -- vector )
-    [ element-type <c-array> ]
-    [ 1 swap ] 2bi
-    (blas-vector-like) ;
-
-syntax:M: blas-vector-base length
-    length>> ;
-
-syntax:M: float-blas-vector nth-unsafe
-    (prepare-nth) float-nth ;
-syntax:M: float-blas-vector set-nth-unsafe
-    (prepare-nth) set-float-nth ;
-
-syntax:M: double-blas-vector nth-unsafe
-    (prepare-nth) double-nth ;
-syntax:M: double-blas-vector set-nth-unsafe
-    (prepare-nth) set-double-nth ;
-
-syntax:M: float-complex-blas-vector nth-unsafe
-    (prepare-nth) (c-complex-nth) ;
-syntax:M: float-complex-blas-vector set-nth-unsafe
-    (prepare-nth) (set-c-complex-nth) ;
-
-syntax:M: double-complex-blas-vector nth-unsafe
-    (prepare-nth) (z-complex-nth) ;
-syntax:M: double-complex-blas-vector set-nth-unsafe
-    (prepare-nth) (set-z-complex-nth) ;
-
-syntax:M: blas-vector-base equal?
-    {
-        [ [ length ] bi@ = ]
-        [ [ = ] 2all? ]
-    } 2&& ;
-
-: >float-blas-vector ( seq -- v )
-    [ >float-array underlying>> ] [ length ] bi 1 <float-blas-vector> ;
-: >double-blas-vector ( seq -- v )
-    [ >double-array underlying>> ] [ length ] bi 1 <double-blas-vector> ;
-: >float-complex-blas-vector ( seq -- v )
-    [ (flatten-complex-sequence) >float-array underlying>> ] [ length ] bi
-    1 <float-complex-blas-vector> ;
-: >double-complex-blas-vector ( seq -- v )
-    [ (flatten-complex-sequence) >double-array underlying>> ] [ length ] bi
-    1 <double-complex-blas-vector> ;
-
-syntax:M: float-blas-vector clone
-    "float" heap-size (prepare-copy)
-    [ cblas_scopy ] [ <float-blas-vector> ] (do-copy) ;
-syntax:M: double-blas-vector clone
-    "double" heap-size (prepare-copy)
-    [ cblas_dcopy ] [ <double-blas-vector> ] (do-copy) ;
-syntax:M: float-complex-blas-vector clone
-    "CBLAS_C" heap-size (prepare-copy)
-    [ cblas_ccopy ] [ <float-complex-blas-vector> ] (do-copy) ;
-syntax:M: double-complex-blas-vector clone
-    "CBLAS_Z" heap-size (prepare-copy)
-    [ cblas_zcopy ] [ <double-complex-blas-vector> ] (do-copy) ;
-
-METHOD: Vswap { float-blas-vector float-blas-vector }
-    (prepare-swap) [ cblas_sswap ] 2dip ;
-METHOD: Vswap { double-blas-vector double-blas-vector }
-    (prepare-swap) [ cblas_dswap ] 2dip ;
-METHOD: Vswap { float-complex-blas-vector float-complex-blas-vector }
-    (prepare-swap) [ cblas_cswap ] 2dip ;
-METHOD: Vswap { double-complex-blas-vector double-complex-blas-vector }
-    (prepare-swap) [ cblas_zswap ] 2dip ;
-
-METHOD: n*V+V! { real float-blas-vector float-blas-vector }
-    (prepare-axpy) [ cblas_saxpy ] dip ;
-METHOD: n*V+V! { real double-blas-vector double-blas-vector }
-    (prepare-axpy) [ cblas_daxpy ] dip ;
-METHOD: n*V+V! { number float-complex-blas-vector float-complex-blas-vector }
-    [ (>c-complex) ] 2dip
-    (prepare-axpy) [ cblas_caxpy ] dip ;
-METHOD: n*V+V! { number double-complex-blas-vector double-complex-blas-vector }
-    [ (>z-complex) ] 2dip
-    (prepare-axpy) [ cblas_zaxpy ] dip ;
-
-METHOD: n*V! { real float-blas-vector }
-    (prepare-scal) [ cblas_sscal ] dip ;
-METHOD: n*V! { real double-blas-vector }
-    (prepare-scal) [ cblas_dscal ] dip ;
-METHOD: n*V! { number float-complex-blas-vector }
-    [ (>c-complex) ] dip
-    (prepare-scal) [ cblas_cscal ] dip ;
-METHOD: n*V! { number double-complex-blas-vector }
-    [ (>z-complex) ] dip
-    (prepare-scal) [ cblas_zscal ] dip ;
 
 : n*V+V ( alpha x y -- alpha*x+y ) clone n*V+V! ; inline
 : n*V ( alpha x -- alpha*x ) clone n*V! ; inline
@@ -242,62 +88,185 @@ METHOD: n*V! { number double-complex-blas-vector }
 : V/n ( x alpha -- x/alpha )
     recip swap n*V ; inline
 
-METHOD: V. { float-blas-vector float-blas-vector }
-    (prepare-dot) cblas_sdot ;
-METHOD: V. { double-blas-vector double-blas-vector }
-    (prepare-dot) cblas_ddot ;
-METHOD: V. { float-complex-blas-vector float-complex-blas-vector }
-    (prepare-dot)
-    "CBLAS_C" <c-object> [ cblas_cdotu_sub ] keep (c-complex>) ;
-METHOD: V. { double-complex-blas-vector double-complex-blas-vector }
-    (prepare-dot)
-    "CBLAS_Z" <c-object> [ cblas_zdotu_sub ] keep (z-complex>) ;
-
-METHOD: V.conj { float-blas-vector float-blas-vector }
-    (prepare-dot) cblas_sdot ;
-METHOD: V.conj { double-blas-vector double-blas-vector }
-    (prepare-dot) cblas_ddot ;
-METHOD: V.conj { float-complex-blas-vector float-complex-blas-vector }
-    (prepare-dot)
-    "CBLAS_C" <c-object> [ cblas_cdotc_sub ] keep (c-complex>) ;
-METHOD: V.conj { double-complex-blas-vector double-complex-blas-vector }
-    (prepare-dot)
-    "CBLAS_Z" <c-object> [ cblas_zdotc_sub ] keep (z-complex>) ;
-
-METHOD: Vnorm { float-blas-vector }
-    (prepare-nrm2) cblas_snrm2 ;
-METHOD: Vnorm { double-blas-vector }
-    (prepare-nrm2) cblas_dnrm2 ;
-METHOD: Vnorm { float-complex-blas-vector }
-    (prepare-nrm2) cblas_scnrm2 ;
-METHOD: Vnorm { double-complex-blas-vector }
-    (prepare-nrm2) cblas_dznrm2 ;
-
-METHOD: Vasum { float-blas-vector }
-    (prepare-nrm2) cblas_sasum ;
-METHOD: Vasum { double-blas-vector }
-    (prepare-nrm2) cblas_dasum ;
-METHOD: Vasum { float-complex-blas-vector }
-    (prepare-nrm2) cblas_scasum ;
-METHOD: Vasum { double-complex-blas-vector }
-    (prepare-nrm2) cblas_dzasum ;
-
-METHOD: Viamax { float-blas-vector }
-    (prepare-nrm2) cblas_isamax ;
-METHOD: Viamax { double-blas-vector }
-    (prepare-nrm2) cblas_idamax ;
-METHOD: Viamax { float-complex-blas-vector }
-    (prepare-nrm2) cblas_icamax ;
-METHOD: Viamax { double-complex-blas-vector }
-    (prepare-nrm2) cblas_izamax ;
-
 : Vamax ( x -- max )
     [ Viamax ] keep nth ; inline
 
-: Vsub ( v start length -- sub )
-    rot [
-        [
-            nip [ inc>> ] [ element-type heap-size ] [ data>> ] tri
-            [ * * ] dip <displaced-alien>
-        ] [ swap 2nip ] [ 2nip inc>> ] 3tri
-    ] keep (blas-vector-like) ;
+:: Vsub ( v start length -- sub )
+    v inc>> start * v element-type heap-size *
+    v underlying>> <displaced-alien>
+    length v inc>> v (blas-vector-like) ;
+
+: <zero-vector> ( exemplar -- zero )
+    [ element-type <c-object> ]
+    [ length>> 0 ]
+    [ (blas-vector-like) ] tri ;
+
+: <empty-vector> ( length exemplar -- vector )
+    [ element-type <c-array> ]
+    [ 1 swap ] 2bi
+    (blas-vector-like) ;
+
+M: blas-vector-base equal?
+    {
+        [ [ length ] bi@ = ]
+        [ [ = ] 2all? ]
+    } 2&& ;
+
+M: blas-vector-base length
+    length>> ;
+M: blas-vector-base virtual-seq
+    (blas-direct-array) ;
+M: blas-vector-base virtual@
+    [ inc>> * ] [ nip (blas-direct-array) ] 2bi ;
+
+: float>arg ( f -- f ) ; inline
+: double>arg ( f -- f ) ; inline
+: arg>float ( f -- f ) ; inline
+: arg>double ( f -- f ) ; inline
+
+<<
+
+FUNCTOR: (define-blas-vector) ( TYPE T -- )
+
+<DIRECT-ARRAY> IS <direct-${TYPE}-array>
+>ARRAY         IS >${TYPE}-array
+XCOPY          IS cblas_${T}copy
+XSWAP          IS cblas_${T}swap
+IXAMAX         IS cblas_i${T}amax
+
+VECTOR         DEFINES ${TYPE}-blas-vector
+<VECTOR>       DEFINES <${TYPE}-blas-vector>
+>VECTOR        DEFINES >${TYPE}-blas-vector
+
+WHERE
+
+TUPLE: VECTOR < blas-vector-base ;
+: <VECTOR> ( underlying length inc -- vector ) VECTOR boa ; inline
+
+: >VECTOR ( seq -- v )
+    [ >ARRAY execute underlying>> ] [ length ] bi 1 <VECTOR> execute ;
+
+M: VECTOR clone
+    TYPE heap-size (prepare-copy)
+    [ XCOPY execute ] 3dip <VECTOR> execute ;
+
+M: VECTOR element-type
+    drop TYPE ;
+M: VECTOR Vswap
+    (prepare-swap) [ XSWAP execute ] 2dip ;
+M: VECTOR Viamax
+    (prepare-nrm2) IXAMAX execute ;
+
+M: VECTOR (blas-vector-like)
+    drop <VECTOR> execute ;
+
+M: VECTOR (blas-direct-array)
+    [ underlying>> ]
+    [ [ length>> ] [ inc>> ] bi * ] bi
+    <DIRECT-ARRAY> execute ;
+
+;FUNCTOR
+
+
+FUNCTOR: (define-real-blas-vector) ( TYPE T -- )
+
+VECTOR         IS ${TYPE}-blas-vector
+XDOT           IS cblas_${T}dot
+XNRM2          IS cblas_${T}nrm2
+XASUM          IS cblas_${T}asum
+XAXPY          IS cblas_${T}axpy
+XSCAL          IS cblas_${T}scal
+
+WHERE
+
+M: VECTOR V.
+    (prepare-dot) XDOT execute ;
+M: VECTOR V.conj
+    (prepare-dot) XDOT execute ;
+M: VECTOR Vnorm
+    (prepare-nrm2) XNRM2 execute ;
+M: VECTOR Vasum
+    (prepare-nrm2) XASUM execute ;
+M: VECTOR n*V+V!
+    (prepare-axpy) [ XAXPY execute ] dip ;
+M: VECTOR n*V!
+    (prepare-scal) [ XSCAL execute ] dip ;
+
+;FUNCTOR
+
+
+FUNCTOR: (define-complex-helpers) ( TYPE -- )
+
+<DIRECT-COMPLEX-ARRAY> DEFINES <direct-${TYPE}-complex-array>
+>COMPLEX-ARRAY         DEFINES >${TYPE}-complex-array
+ARG>COMPLEX            DEFINES arg>${TYPE}-complex
+COMPLEX>ARG            DEFINES ${TYPE}-complex>arg
+<DIRECT-ARRAY>         IS      <direct-${TYPE}-array>
+>ARRAY                 IS      >${TYPE}-array
+
+WHERE
+
+: <DIRECT-COMPLEX-ARRAY> ( alien len -- sequence )
+    1 shift <DIRECT-ARRAY> execute <complex-sequence> ;
+: >COMPLEX-ARRAY ( sequence -- sequence )
+    <complex-components> >ARRAY execute ;
+: COMPLEX>ARG ( complex -- alien )
+    >rect 2array >ARRAY execute underlying>> ;
+: ARG>COMPLEX ( alien -- complex )
+    2 <DIRECT-ARRAY> execute first2 rect> ;
+
+;FUNCTOR
+
+
+FUNCTOR: (define-complex-blas-vector) ( TYPE C S -- )
+
+VECTOR         IS ${TYPE}-blas-vector
+XDOTU_SUB      IS cblas_${C}dotu_sub
+XDOTC_SUB      IS cblas_${C}dotc_sub
+XXNRM2         IS cblas_${S}${C}nrm2
+XXASUM         IS cblas_${S}${C}asum
+XAXPY          IS cblas_${C}axpy
+XSCAL          IS cblas_${C}scal
+TYPE>ARG       IS ${TYPE}>arg
+ARG>TYPE       IS arg>${TYPE}
+
+WHERE
+
+M: VECTOR V.
+    (prepare-dot) TYPE <c-object>
+    [ XDOTU_SUB execute ] keep
+    ARG>TYPE execute ;
+M: VECTOR V.conj
+    (prepare-dot) TYPE <c-object>
+    [ XDOTC_SUB execute ] keep
+    ARG>TYPE execute ;
+M: VECTOR Vnorm
+    (prepare-nrm2) XXNRM2 execute ;
+M: VECTOR Vasum
+    (prepare-nrm2) XXASUM execute ;
+M: VECTOR n*V+V!
+    [ TYPE>ARG execute ] 2dip
+    (prepare-axpy) [ XAXPY execute ] dip ;
+M: VECTOR n*V!
+    [ TYPE>ARG execute ] dip
+    (prepare-scal) [ XSCAL execute ] dip ;
+
+;FUNCTOR
+
+
+: define-real-blas-vector ( TYPE T -- )
+    [ (define-blas-vector) ]
+    [ (define-real-blas-vector) ] 2bi ;
+:: define-complex-blas-vector ( TYPE C S -- )
+    TYPE (define-complex-helpers)
+    TYPE "-complex" append
+    [ C (define-blas-vector) ]
+    [ C S (define-complex-blas-vector) ] bi ;
+
+"float"  "s" define-real-blas-vector
+"double" "d" define-real-blas-vector
+"float"  "c" "s" define-complex-blas-vector
+"double" "z" "d" define-complex-blas-vector
+
+>>
+

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel opengl.gl alien.c-types continuations namespaces
 assocs alien alien.strings libc opengl math sequences combinators
-combinators.lib macros arrays io.encodings.ascii fry ;
+combinators.lib macros arrays io.encodings.ascii fry
+specialized-arrays.uint destructors accessors ;
 IN: opengl.shaders
 
 : with-gl-shader-source-ptr ( string quot -- )
@@ -93,9 +94,9 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 
 : gl-program-shaders ( program -- shaders )
     dup gl-program-shaders-length
-    dup <uint-array>
-    0 <int> swap
-    [ underlying>> glGetAttachedShaders ] { 3 1 } multikeep ;
+    0 <int>
+    over <uint-array>
+    [ underlying>> glGetAttachedShaders ] keep ;
 
 : delete-gl-program-only ( program -- )
     glDeleteProgram ; inline

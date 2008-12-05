@@ -45,6 +45,7 @@ IN: compiler.cfg.intrinsics
     slots.private:slot
     slots.private:set-slot
     strings.private:string-nth
+    strings.private:set-string-nth-fast
     classes.tuple.private:<tuple-boa>
     arrays:<array>
     byte-arrays:<byte-array>
@@ -126,6 +127,7 @@ IN: compiler.cfg.intrinsics
         { \ slots.private:slot [ emit-slot iterate-next ] }
         { \ slots.private:set-slot [ emit-set-slot iterate-next ] }
         { \ strings.private:string-nth [ drop emit-string-nth iterate-next ] }
+        { \ strings.private:set-string-nth-fast [ drop emit-set-string-nth-fast iterate-next ] }
         { \ classes.tuple.private:<tuple-boa> [ emit-<tuple-boa> iterate-next ] }
         { \ arrays:<array> [ emit-<array> iterate-next ] }
         { \ byte-arrays:<byte-array> [ emit-<byte-array> iterate-next ] }

@@ -351,7 +351,12 @@ M: wrapper '
 : pad-bytes ( seq -- newseq )
     dup length bootstrap-cell align 0 pad-right ;
 
+: check-string ( string -- )
+    [ 127 > ] contains?
+    [ "Bootstrap cannot emit non-ASCII strings" throw ] when ;
+
 : emit-string ( string -- ptr )
+    dup check-string
     string type-number object tag-number [
         dup length emit-fixnum
         f ' emit

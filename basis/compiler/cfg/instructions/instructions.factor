@@ -73,6 +73,7 @@ INSN: ##set-slot-imm < ##write { obj vreg } { slot integer } { tag integer } ;
 
 ! String element access
 INSN: ##string-nth < ##flushable { obj vreg } { index vreg } { temp vreg } ;
+INSN: ##set-string-nth-fast < ##effect { obj vreg } { index vreg } { temp vreg } ;
 
 ! Integer arithmetic
 INSN: ##add < ##commutative ;

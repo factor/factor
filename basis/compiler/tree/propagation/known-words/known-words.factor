@@ -144,10 +144,9 @@ most-negative-fixnum most-positive-fixnum [a,b]
 comparison-ops
 [ dup '[ _ define-comparison-constraints ] each-derived-op ] each
 
-generic-comparison-ops [
-    dup specific-comparison
-    '[ _ _ define-comparison-constraints ] each-derived-op
-] each
+! generic-comparison-ops [
+!     dup specific-comparison define-comparison-constraints
+! ] each
 
 ! Remove redundant comparisons
 : fold-comparison ( info1 info2 word -- info )

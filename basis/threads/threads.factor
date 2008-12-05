@@ -36,7 +36,7 @@ sleep-entry ;
 : tchange ( key quot -- )
     tnamespace swap change-at ; inline
 
-: threads 64 getenv ;
+: threads ( -- assoc ) 64 getenv ;
 
 : thread ( id -- thread ) threads at ;
 
@@ -73,9 +73,9 @@ PRIVATE>
 : <thread> ( quot name -- thread )
     \ thread new-thread ;
 
-: run-queue 65 getenv ;
+: run-queue ( -- dlist ) 65 getenv ;
 
-: sleep-queue 66 getenv ;
+: sleep-queue ( -- heap ) 66 getenv ;
 
 : resume ( thread -- )
     f >>state

@@ -1,6 +1,7 @@
 USING: alien alien.c-types alien.strings
 kernel libc math namespaces hardware-info.backend
-windows windows.advapi32 windows.kernel32 system ;
+hardware-info.windows windows windows.advapi32
+windows.kernel32 system byte-arrays ;
 IN: hardware-info.windows.nt
 
 M: winnt cpus ( -- n )

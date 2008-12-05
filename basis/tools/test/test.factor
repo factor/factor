@@ -88,7 +88,7 @@ SYMBOL: this-test
 : test ( prefix -- )
     run-tests test-failures. ;
 
-: run-all-tests ( prefix -- failures )
+: run-all-tests ( -- failures )
     "" run-tests ;
 
 : test-all ( -- )

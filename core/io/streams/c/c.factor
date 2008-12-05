@@ -56,9 +56,9 @@ M: c-reader dispose*
 
 M: c-io-backend init-io ;
 
-: stdin-handle 11 getenv ;
-: stdout-handle 12 getenv ;
-: stderr-handle 61 getenv ;
+: stdin-handle ( -- alien ) 11 getenv ;
+: stdout-handle ( -- alien ) 12 getenv ;
+: stderr-handle ( -- alien ) 61 getenv ;
 
 : init-c-stdio ( -- stdin stdout stderr )
     stdin-handle <c-reader>

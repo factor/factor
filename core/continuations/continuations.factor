@@ -114,6 +114,9 @@ SYMBOL: return-continuation
         ] 3 (throw)
     ] callcc1 2nip ;
 
+: assert-depth ( quot -- )
+    { } swap with-datastack { } assert= ; inline
+
 GENERIC: compute-restarts ( error -- seq )
 
 <PRIVATE
