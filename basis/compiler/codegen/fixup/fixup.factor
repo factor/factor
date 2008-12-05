@@ -9,7 +9,7 @@ IN: compiler.codegen.fixup
 
 GENERIC: fixup* ( obj -- )
 
-: code-format 22 getenv ;
+: code-format ( -- n ) 22 getenv ;
 
 : compiled-offset ( -- n ) building get length code-format * ;
 
