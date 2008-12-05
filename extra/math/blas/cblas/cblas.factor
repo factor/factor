@@ -34,10 +34,10 @@ TYPEDEF: int CBLAS_SIDE
 
 TYPEDEF: int CBLAS_INDEX
 
-C-STRUCT: CBLAS_C
+C-STRUCT: float-complex
     { "float" "real" }
     { "float" "imag" } ;
-C-STRUCT: CBLAS_Z
+C-STRUCT: double-complex
     { "double" "real" }
     { "double" "imag" } ;
 
@@ -53,14 +53,14 @@ FUNCTION: double cblas_ddot
     ( int N,                 double*  X, int incX, double*  Y, int incY ) ;
 
 FUNCTION: void   cblas_cdotu_sub
-    ( int N,                 CBLAS_C* X, int incX, CBLAS_C* Y, int incY, CBLAS_C* dotu ) ;
+    ( int N,                 void*    X, int incX, void*    Y, int incY, void*    dotu ) ;
 FUNCTION: void   cblas_cdotc_sub
-    ( int N,                 CBLAS_C* X, int incX, CBLAS_C* Y, int incY, CBLAS_C* dotc ) ;
+    ( int N,                 void*    X, int incX, void*    Y, int incY, void*    dotc ) ;
 
 FUNCTION: void   cblas_zdotu_sub
-    ( int N,                 CBLAS_Z* X, int incX, CBLAS_Z* Y, int incY, CBLAS_Z* dotu ) ;
+    ( int N,                 void*    X, int incX, void*    Y, int incY, void*    dotu ) ;
 FUNCTION: void   cblas_zdotc_sub
-    ( int N,                 CBLAS_Z* X, int incX, CBLAS_Z* Y, int incY, CBLAS_Z* dotc ) ;
+    ( int N,                 void*    X, int incX, void*    Y, int incY, void*    dotc ) ;
 
 FUNCTION: float  cblas_snrm2
     ( int N,                 float*   X, int incX ) ;
@@ -73,23 +73,23 @@ FUNCTION: double cblas_dasum
     ( int N,                 double*  X, int incX ) ;
 
 FUNCTION: float  cblas_scnrm2
-    ( int N,                 CBLAS_C* X, int incX ) ;
+    ( int N,                 void*    X, int incX ) ;
 FUNCTION: float  cblas_scasum
-    ( int N,                 CBLAS_C* X, int incX ) ;
+    ( int N,                 void*    X, int incX ) ;
 
 FUNCTION: double cblas_dznrm2
-    ( int N,                 CBLAS_Z* X, int incX ) ;
+    ( int N,                 void*    X, int incX ) ;
 FUNCTION: double cblas_dzasum
-    ( int N,                 CBLAS_Z* X, int incX ) ;
+    ( int N,                 void*    X, int incX ) ;
 
 FUNCTION: CBLAS_INDEX cblas_isamax
     ( int N,                 float*   X, int incX ) ;
 FUNCTION: CBLAS_INDEX cblas_idamax
     ( int N,                 double*  X, int incX ) ;
 FUNCTION: CBLAS_INDEX cblas_icamax
-    ( int N,                 CBLAS_C* X, int incX ) ;
+    ( int N,                 void*    X, int incX ) ;
 FUNCTION: CBLAS_INDEX cblas_izamax
-    ( int N,                 CBLAS_Z* X, int incX ) ;
+    ( int N,                 void*    X, int incX ) ;
 
 FUNCTION: void cblas_sswap
     ( int N,                 float*   X, int incX, float*   Y, int incY ) ;
@@ -106,31 +106,31 @@ FUNCTION: void cblas_daxpy
     ( int N, double   alpha, double*  X, int incX, double*  Y, int incY ) ;
 
 FUNCTION: void cblas_cswap
-    ( int N,                 CBLAS_C* X, int incX, CBLAS_C* Y, int incY ) ;
+    ( int N,                 void*    X, int incX, void*    Y, int incY ) ;
 FUNCTION: void cblas_ccopy
-    ( int N,                 CBLAS_C* X, int incX, CBLAS_C* Y, int incY ) ;
+    ( int N,                 void*    X, int incX, void*    Y, int incY ) ;
 FUNCTION: void cblas_caxpy
-    ( int N, CBLAS_C* alpha, CBLAS_C* X, int incX, CBLAS_C* Y, int incY ) ;
+    ( int N, void*    alpha, void*    X, int incX, void*    Y, int incY ) ;
 
 FUNCTION: void cblas_zswap
-    ( int N,                 CBLAS_Z* X, int incX, CBLAS_Z* Y, int incY ) ;
+    ( int N,                 void*    X, int incX, void*    Y, int incY ) ;
 FUNCTION: void cblas_zcopy
-    ( int N,                 CBLAS_Z* X, int incX, CBLAS_Z* Y, int incY ) ;
+    ( int N,                 void*    X, int incX, void*    Y, int incY ) ;
 FUNCTION: void cblas_zaxpy
-    ( int N, CBLAS_Z* alpha, CBLAS_Z* X, int incX, CBLAS_Z* Y, int incY ) ;
+    ( int N, void*    alpha, void*    X, int incX, void*    Y, int incY ) ;
 
 FUNCTION: void cblas_sscal
     ( int N, float    alpha, float*   X, int incX ) ;
 FUNCTION: void cblas_dscal
     ( int N, double   alpha, double*  X, int incX ) ;
 FUNCTION: void cblas_cscal
-    ( int N, CBLAS_C* alpha, CBLAS_C* X, int incX ) ;
+    ( int N, void*    alpha, void*    X, int incX ) ;
 FUNCTION: void cblas_zscal
-    ( int N, CBLAS_Z* alpha, CBLAS_Z* X, int incX ) ;
+    ( int N, void*    alpha, void*    X, int incX ) ;
 FUNCTION: void cblas_csscal
-    ( int N, float    alpha, CBLAS_C* X, int incX ) ;
+    ( int N, float    alpha, void*    X, int incX ) ;
 FUNCTION: void cblas_zdscal
-    ( int N, double   alpha, CBLAS_Z* X, int incX ) ;
+    ( int N, double   alpha, void*    X, int incX ) ;
 
 FUNCTION: void cblas_srotg
     ( float* a, float* b, float* c, float* s ) ;

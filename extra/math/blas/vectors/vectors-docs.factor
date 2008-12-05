@@ -37,7 +37,7 @@ HELP: blas-vector-base
 }
 "All of these subclasses share the same tuple layout:"
 { $list
-    { { $snippet "data" } " contains an alien pointer referencing or byte-array containing a packed array of float, double, float complex, or double complex values;" }
+    { { $snippet "underlying" } " contains an alien pointer referencing or byte-array containing a packed array of float, double, float complex, or double complex values;" }
     { { $snippet "length" } " indicates the length of the vector;" }
     { "and " { $snippet "inc" } " indicates the distance, in elements, between elements." }
 } } ;

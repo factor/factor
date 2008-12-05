@@ -63,7 +63,9 @@ IN: stack-checker.known-words
 
 GENERIC: infer-call* ( value known -- )
 
-: infer-call ( value -- ) dup known infer-call* ;
+: (infer-call) ( value -- ) dup known infer-call* ;
+
+: infer-call ( -- ) pop-d (infer-call) ;
 
 M: literal infer-call*
     [ 1array #drop, ] [ infer-literal-quot ] bi* ;
@@ -73,7 +75,7 @@ M: curried infer-call*
     [ uncurry ] infer-quot-here
     [ quot>> known pop-d [ set-known ] keep ]
     [ obj>> known pop-d [ set-known ] keep ] bi
-    push-d infer-call ;
+    push-d (infer-call) ;
 
 M: composed infer-call*
     swap push-d
@@ -81,20 +83,41 @@ M: composed infer-call*
     [ quot2>> known pop-d [ set-known ] keep ]
     [ quot1>> known pop-d [ set-known ] keep ] bi
     push-d push-d
-    1 infer->r pop-d infer-call
-    terminated? get [ 1 infer-r> pop-d infer-call ] unless ;
+    1 infer->r infer-call
+    terminated? get [ 1 infer-r> infer-call ] unless ;
 
 M: object infer-call*
     \ literal-expected inference-warning ;
 
 : infer-slip ( -- )
-    1 infer->r pop-d infer-call 1 infer-r> ;
+    1 infer->r infer-call 1 infer-r> ;
 
 : infer-2slip ( -- )
-    2 infer->r pop-d infer-call 2 infer-r> ;
+    2 infer->r infer-call 2 infer-r> ;
 
 : infer-3slip ( -- )
-    3 infer->r pop-d infer-call 3 infer-r> ;
+    3 infer->r infer-call 3 infer-r> ;
+
+: infer-dip ( -- )
+    commit-literals
+    literals get
+    [ \ dip def>> infer-quot-here ]
+    [ pop 1 infer->r infer-quot-here 1 infer-r>  ]
+    if-empty ;
+
+: infer-2dip ( -- )
+    commit-literals
+    literals get
+    [ \ 2dip def>> infer-quot-here ]
+    [ pop 2 infer->r infer-quot-here 2 infer-r>  ]
+    if-empty ;
+
+: infer-3dip ( -- )
+    commit-literals
+    literals get
+    [ \ 3dip def>> infer-quot-here ]
+    [ pop 3 infer->r infer-quot-here 3 infer-r>  ]
+    if-empty ;
 
 : infer-curry ( -- )
     2 consume-d
@@ -157,11 +180,14 @@ M: object infer-call*
         { \ >r [ 1 infer->r ] }
         { \ r> [ 1 infer-r> ] }
         { \ declare [ infer-declare ] }
-        { \ call [ pop-d infer-call ] }
-        { \ (call) [ pop-d infer-call ] }
+        { \ call [ infer-call ] }
+        { \ (call) [ infer-call ] }
         { \ slip [ infer-slip ] }
         { \ 2slip [ infer-2slip ] }
         { \ 3slip [ infer-3slip ] }
+        { \ dip [ infer-dip ] }
+        { \ 2dip [ infer-2dip ] }
+        { \ 3dip [ infer-3dip ] }
         { \ curry [ infer-curry ] }
         { \ compose [ infer-compose ] }
         { \ execute [ infer-execute ] }
@@ -190,10 +216,10 @@ M: object infer-call*
     "local-word-def" word-prop infer-quot-here ;
 
 {
-    >r r> declare call (call) slip 2slip 3slip curry compose
-    execute (execute) if dispatch <tuple-boa> (throw)
-    load-locals get-local drop-locals do-primitive alien-invoke
-    alien-indirect alien-callback
+    >r r> declare call (call) slip 2slip 3slip dip 2dip 3dip
+    curry compose execute (execute) if dispatch <tuple-boa>
+    (throw) load-locals get-local drop-locals do-primitive
+    alien-invoke alien-indirect alien-callback
 } [ t "special" set-word-prop ] each
 
 { call execute dispatch load-locals get-local drop-locals }

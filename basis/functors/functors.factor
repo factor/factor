@@ -17,7 +17,7 @@ IN: functors
     scan-param parsed
     scan {
         { ";" [ tuple parsed f parsed ] }
-        { "<" [ scan-param [ parse-tuple-slots ] { } make parsed ] }
+        { "<" [ scan-param parsed [ parse-tuple-slots ] { } make parsed ] }
         [
             [ tuple parsed ] dip
             [ parse-slot-name [ parse-tuple-slots ] when ] { }

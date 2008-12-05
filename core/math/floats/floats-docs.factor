@@ -6,7 +6,7 @@ ARTICLE: "floats" "Floats"
 "Rational numbers represent " { $emphasis "exact" } " quantities. On the other hand, a floating point number is an " { $emphasis "approximation" } ". While rationals can grow to any required precision, floating point numbers are fixed-width, and manipulating them is usually faster than manipulating ratios or bignums (but slower than manipulating fixnums). Floating point numbers are often used to represent irrational numbers, which have no exact representation as a ratio of two integers."
 $nl
 "Introducing a floating point number in a computation forces the result to be expressed in floating point."
-{ $example "5/4 1/2 + ." "7/4" }
+{ $example "5/4 1/2 + ." "1+3/4" }
 { $example "5/4 0.5 + ." "1.75" }
 "Integers and rationals can be converted to floats:"
 { $subsection >float }
