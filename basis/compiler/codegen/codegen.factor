@@ -131,6 +131,14 @@ M: ##string-nth generate-insn
         [ temp>> register ]
     } cleave %string-nth ;
 
+M: ##set-string-nth-fast generate-insn
+    {
+        [ src>> register ]
+        [ obj>> register ]
+        [ index>> register ]
+        [ temp>> register ]
+    } cleave %set-string-nth-fast ;
+
 : dst/src ( insn -- dst src )
     [ dst>> register ] [ src>> register ] bi ; inline
 

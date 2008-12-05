@@ -152,7 +152,8 @@ CELL string_nth(F_STRING* string, CELL index);
 void set_string_nth(F_STRING* string, CELL index, CELL value);
 
 void primitive_string_nth(void);
-void primitive_set_string_nth(void);
+void primitive_set_string_nth_slow(void);
+void primitive_set_string_nth_fast(void);
 
 F_WORD *allot_word(CELL vocab, CELL name);
 void primitive_word(void);

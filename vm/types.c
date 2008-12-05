@@ -328,43 +328,62 @@ void primitive_tuple_boa(void)
 /* Strings */
 CELL string_nth(F_STRING* string, CELL index)
 {
+	/* If high bit is set, the most significant 16 bits of the char
+	come from the aux vector. The least significant bit of the
+	corresponding aux vector entry is negated, so that we can
+	XOR the two components together and get the original code point
+	back. */
 	CELL ch = bget(SREF(string,index));
-	if(string->aux == F)
+	if((ch & 0x80) == 0)
 		return ch;
 	else
 	{
 		F_BYTE_ARRAY *aux = untag_object(string->aux);
-		return (cget(BREF(aux,index * sizeof(u16))) << 8) | ch;
+		return (cget(BREF(aux,index * sizeof(u16))) << 7) ^ ch;
 	}
 }
 
-/* allocates memory */
-void set_string_nth(F_STRING* string, CELL index, CELL value)
+void set_string_nth_fast(F_STRING* string, CELL index, CELL ch)
 {
-	bput(SREF(string,index),value & 0xff);
+	bput(SREF(string,index),ch);
+}
 
+void set_string_nth_slow(F_STRING* string, CELL index, CELL ch)
+{
 	F_BYTE_ARRAY *aux;
+
+	bput(SREF(string,index),(ch & 0x7f) | 0x80);
 
 	if(string->aux == F)
 	{
-		if(value <= 0xff)
-			return;
-		else
-		{
-			REGISTER_UNTAGGED(string);
-			aux = allot_byte_array(
-				untag_fixnum_fast(string->length)
-				* sizeof(u16));
-			UNREGISTER_UNTAGGED(string);
+		REGISTER_UNTAGGED(string);
+		/* We don't need to pre-initialize the
+		byte array with any data, since we
+		only ever read from the aux vector
+		if the most significant bit of a
+		character is set. Initially all of
+		the bits are clear. */
+		aux = allot_byte_array_internal(
+			untag_fixnum_fast(string->length)
+			* sizeof(u16));
+		UNREGISTER_UNTAGGED(string);
 
-			write_barrier((CELL)string);
-			string->aux = tag_object(aux);
-		}
+		write_barrier((CELL)string);
+		string->aux = tag_object(aux);
 	}
 	else
 		aux = untag_object(string->aux);
 
-	cput(BREF(aux,index * sizeof(u16)),value >> 8);
+	cput(BREF(aux,index * sizeof(u16)),(ch >> 7) ^ 1);
+}
+
+/* allocates memory */
+void set_string_nth(F_STRING* string, CELL index, CELL ch)
+{
+	if(ch <= 0x7f)
+		set_string_nth_fast(string,index,ch);
+	else
+		set_string_nth_slow(string,index,ch);
 }
 
 /* untagged */
@@ -382,17 +401,8 @@ F_STRING* allot_string_internal(CELL capacity)
 /* allocates memory */
 void fill_string(F_STRING *string, CELL start, CELL capacity, CELL fill)
 {
-	if(fill == 0)
-	{
-		memset((void *)SREF(string,start),'\0',capacity - start);
-
-		if(string->aux != F)
-		{
-			F_BYTE_ARRAY *aux = untag_object(string->aux);
-			memset((void *)BREF(aux,start * sizeof(u16)),'\0',
-				(capacity - start) * sizeof(u16));
-		}
-	}
+	if(fill <= 0x7f)
+		memset((void *)SREF(string,start),fill,capacity - start);
 	else
 	{
 		CELL i;
@@ -571,4 +581,20 @@ void primitive_set_string_nth(void)
 	CELL index = untag_fixnum_fast(dpop());
 	CELL value = untag_fixnum_fast(dpop());
 	set_string_nth(string,index,value);
+}
+
+void primitive_set_string_nth_fast(void)
+{
+	F_STRING *string = untag_object(dpop());
+	CELL index = untag_fixnum_fast(dpop());
+	CELL value = untag_fixnum_fast(dpop());
+	set_string_nth_fast(string,index,value);
+}
+
+void primitive_set_string_nth_slow(void)
+{
+	F_STRING *string = untag_object(dpop());
+	CELL index = untag_fixnum_fast(dpop());
+	CELL value = untag_fixnum_fast(dpop());
+	set_string_nth_slow(string,index,value);
 }

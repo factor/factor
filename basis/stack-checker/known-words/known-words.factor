@@ -562,7 +562,8 @@ M: object infer-call*
 \ string-nth { fixnum string } { fixnum } define-primitive
 \ string-nth make-flushable
 
-\ set-string-nth { fixnum fixnum string } { } define-primitive
+\ set-string-nth-slow { fixnum fixnum string } { } define-primitive
+\ set-string-nth-fast { fixnum fixnum string } { } define-primitive
 
 \ resize-array { integer array } { array } define-primitive
 \ resize-array make-flushable

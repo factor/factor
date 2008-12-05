@@ -365,21 +365,36 @@ M:: x86 %box-alien ( dst src temp -- )
 M:: x86 %string-nth ( dst src index temp -- )
     "end" define-label
     dst { src index temp } [| new-dst |
+        ! Load the least significant 7 bits into new-dst.
+        ! 8th bit indicates whether we have to load from
+        ! the aux vector or not.
         temp src index [+] LEA
         new-dst 1 small-reg temp string-offset [+] MOV
         new-dst new-dst 1 small-reg MOVZX
+        ! Do we have to look at the aux vector?
+        new-dst HEX: 80 CMP
+        "end" get JL
+        ! Yes, this is a non-ASCII character. Load aux vector
         temp src string-aux-offset [+] MOV
-        temp \ f tag-number CMP
-        "end" get JE
         new-dst temp XCHG
+        ! Compute index
         new-dst index ADD
         new-dst index ADD
+        ! Load high 16 bits
         new-dst 2 small-reg new-dst byte-array-offset [+] MOV
         new-dst new-dst 2 small-reg MOVZX
-        new-dst 8 SHL
-        new-dst temp OR
+        new-dst 7 SHL
+        ! Compute code point
+        new-dst temp XOR
         "end" resolve-label
         dst new-dst ?MOV
+    ] with-small-register ;
+
+M:: x86 %set-string-nth-fast ( ch str index temp -- )
+    ch { index str } [| new-ch |
+        new-ch ch ?MOV
+        temp str index [+] LEA
+        temp string-offset [+] new-ch 1 small-reg MOV
     ] with-small-register ;
 
 :: %alien-integer-getter ( dst src size quot -- )

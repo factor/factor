@@ -499,7 +499,8 @@ tuple
     { "alien-address" "alien" }
     { "set-slot" "slots.private" }
     { "string-nth" "strings.private" }
-    { "set-string-nth" "strings.private" }
+    { "set-string-nth-fast" "strings.private" }
+    { "set-string-nth-slow" "strings.private" }
     { "resize-array" "arrays" }
     { "resize-string" "strings" }
     { "<array>" "arrays" }
