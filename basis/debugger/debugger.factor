@@ -72,12 +72,6 @@ M: string error. print ;
 : try ( quot -- )
     [ print-error-and-restarts ] recover ;
 
-M: relative-underflow summary
-    drop "Too many items removed from data stack" ;
-
-M: relative-overflow summary
-    drop "Superfluous items pushed to data stack" ;
-
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write third . ;
 
