@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings arrays assocs
-combinators compiler compiler.alien kernel math namespaces make
-parser prettyprint prettyprint.sections quotations sequences
-strings words cocoa.runtime io macros memoize debugger
-io.encodings.ascii effects libc libc.private parser lexer init
-core-foundation fry generalizations
+continuations combinators compiler compiler.alien kernel math
+namespaces make parser prettyprint prettyprint.sections
+quotations sequences strings words cocoa.runtime io macros
+memoize debugger io.encodings.ascii effects libc libc.private
+parser lexer init core-foundation fry generalizations
 specialized-arrays.direct.alien ;
 IN: cocoa.messages
 
