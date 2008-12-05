@@ -166,15 +166,17 @@ HELP: log2
 HELP: 1+
 { $values { "x" number } { "y" number } }
 { $description
-    "Increments a number by 1. The following two lines are equivalent, but the first is more efficient:"
+    "Increments a number by 1. The following two lines are equivalent:"
     { $code "1+" "1 +" }
+    "There is no difference in behavior or efficiency."
 } ;
 
 HELP: 1-
 { $values { "x" number } { "y" number } }
 { $description
-    "Decrements a number by 1. The following two lines are equivalent, but the first is more efficient:"
+    "Decrements a number by 1. The following two lines are equivalent:"
     { $code "1-" "1 -" }
+    "There is no difference in behavior or efficiency."
 } ;
 
 HELP: ?1+
