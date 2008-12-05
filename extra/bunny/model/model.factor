@@ -3,7 +3,7 @@ http.client io io.encodings.ascii io.files kernel math
 math.matrices math.parser math.vectors opengl
 opengl.capabilities opengl.gl opengl.demo-support sequences
 sequences.lib splitting vectors words
-specialized-arrays.double specialized-arrays.uint ;
+specialized-arrays.float specialized-arrays.uint ;
 IN: bunny.model
 
 : numbers ( str -- seq )
@@ -66,7 +66,7 @@ TUPLE: bunny-buffers array element-array nv ni ;
     {
         [
             [ first concat ] [ second concat ] bi
-            append >double-array underlying>>
+            append >float-array underlying>>
             GL_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
         ]
         [
