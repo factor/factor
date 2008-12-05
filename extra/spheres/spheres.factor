@@ -225,8 +225,8 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
         plane-program>> [
             {
                 [ "checker_size_inv" glGetUniformLocation 0.125 glUniform1f ]
-                [ "checker_color_1"  glGetUniformLocation 1.0 0.5 0.0 1.0 glUniform4f ]
-                [ "checker_color_2"  glGetUniformLocation 0.0 0.0 0.0 1.0 glUniform4f ]
+                [ "checker_color_1"  glGetUniformLocation 1.0 0.0 0.0 1.0 glUniform4f ]
+                [ "checker_color_2"  glGetUniformLocation 1.0 1.0 1.0 1.0 glUniform4f ]
             } cleave
             GL_QUADS [
                 -1000.0 -30.0  1000.0 glVertex3f
