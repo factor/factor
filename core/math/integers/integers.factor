@@ -40,11 +40,13 @@ M: fixnum bitnot fixnum-bitnot ;
 
 M: fixnum bit? neg shift 1 bitand 0 > ;
 
-: (fixnum-log2) ( accum n -- accum )
-    dup 1 number= [ drop ] [ [ 1+ ] [ 2/ ] bi* (fixnum-log2) ] if ;
-    inline recursive
+: fixnum-log2 ( x -- n )
+    0 swap [ dup 1 number= not ] [ [ 1+ ] [ 2/ ] bi* ] [ ] while drop ;
 
-M: fixnum (log2) 0 swap (fixnum-log2) ;
+M: fixnum (log2) fixnum-log2 ;
+
+M: integer next-power-of-2
+    dup 2 <= [ drop 2 ] [ 1- log2 1+ 2^ ] if ;
 
 M: bignum >fixnum bignum>fixnum ;
 M: bignum >bignum ;

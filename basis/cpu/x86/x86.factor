@@ -5,9 +5,11 @@ cpu.x86.assembler cpu.x86.assembler.private cpu.architecture
 kernel kernel.private math memory namespaces make sequences
 words system layouts combinators math.order fry locals
 compiler.constants compiler.cfg.registers
-compiler.cfg.instructions compiler.codegen
-compiler.codegen.fixup ;
+compiler.cfg.instructions compiler.cfg.intrinsics
+compiler.codegen compiler.codegen.fixup ;
 IN: cpu.x86
+
+<< enable-fixnum-log2 >>
 
 M: x86 two-operand? t ;
 
@@ -92,6 +94,7 @@ M: x86 %shl-imm nip SHL ;
 M: x86 %shr-imm nip SHR ;
 M: x86 %sar-imm nip SAR ;
 M: x86 %not     drop NOT ;
+M: x86 %log2    BSR ;
 
 : ?MOV ( dst src -- )
     2dup = [ 2drop ] [ MOV ] if ; inline
