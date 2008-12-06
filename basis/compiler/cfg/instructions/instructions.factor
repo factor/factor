@@ -92,6 +92,7 @@ INSN: ##shl-imm < ##binary-imm ;
 INSN: ##shr-imm < ##binary-imm ;
 INSN: ##sar-imm < ##binary-imm ;
 INSN: ##not < ##unary ;
+INSN: ##log2 < ##unary ;
 
 ! Overflowing arithmetic
 TUPLE: ##fixnum-overflow < insn src1 src2 ;

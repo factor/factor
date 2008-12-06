@@ -99,21 +99,18 @@ M: object infer-call*
     3 infer->r infer-call 3 infer-r> ;
 
 : infer-dip ( -- )
-    commit-literals
     literals get
     [ \ dip def>> infer-quot-here ]
     [ pop 1 infer->r infer-quot-here 1 infer-r>  ]
     if-empty ;
 
 : infer-2dip ( -- )
-    commit-literals
     literals get
     [ \ 2dip def>> infer-quot-here ]
     [ pop 2 infer->r infer-quot-here 2 infer-r>  ]
     if-empty ;
 
 : infer-3dip ( -- )
-    commit-literals
     literals get
     [ \ 3dip def>> infer-quot-here ]
     [ pop 3 infer->r infer-quot-here 3 infer-r>  ]

@@ -40,7 +40,7 @@ TUPLE: hashtable
     0 >>count 0 >>deleted drop ; inline
 
 : reset-hash ( n hash -- )
-    swap <hash-array> >>array init-hash ;
+    swap <hash-array> >>array init-hash ; inline
 
 : (new-key@) ( key keys i -- keys n empty? )
     3dup swap array-nth dup ((empty)) eq? [
