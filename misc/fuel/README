@@ -50,7 +50,11 @@ Quick key reference
  - C-cz : switch to listener
  - C-co : cycle between code, tests and docs factor files
 
- - C-M-x, C-cC-ed : eval definition around point
+ - M-. : edit word at point in Emacs
+
+ - C-C-r, C-cC-er : eval region
+ - C-M-r, C-cC-ee : eval region, extending it to definition boundaries
+ - C-M-x, C-cC-ex : eval definition around point
 
  - C-cC-da : toggle autodoc mode
  - C-cC-dd : help for word at point
