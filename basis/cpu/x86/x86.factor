@@ -391,7 +391,7 @@ M:: x86 %string-nth ( dst src index temp -- )
     ] with-small-register ;
 
 M:: x86 %set-string-nth-fast ( ch str index temp -- )
-    ch { index str } [| new-ch |
+    ch { index str temp } [| new-ch |
         new-ch ch ?MOV
         temp str index [+] LEA
         temp string-offset [+] new-ch 1 small-reg MOV
