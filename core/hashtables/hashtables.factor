@@ -133,7 +133,7 @@ M: hashtable set-at ( value key hash -- )
 : push-unsafe ( elt seq -- )
     [ length ] keep
     [ underlying>> set-array-nth ]
-    [ [ 1+ ] dip (>>length) ]
+    [ [ 1 fixnum+fast { array-capacity } declare ] dip (>>length) ]
     2bi ; inline
 
 PRIVATE>

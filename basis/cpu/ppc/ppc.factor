@@ -139,9 +139,9 @@ M:: ppc %string-nth ( dst src index temp -- )
         "end" define-label
         temp src index ADD
         dst temp string-offset LBZ
+        0 dst HEX: 80 CMPI
+        "end" get BLT
         temp src string-aux-offset LWZ
-        0 temp \ f tag-number CMPI
-        "end" get BEQ
         temp temp index ADD
         temp temp index ADD
         temp temp byte-array-offset LHZ
@@ -149,6 +149,10 @@ M:: ppc %string-nth ( dst src index temp -- )
         dst dst temp OR
         "end" resolve-label
     ] with-scope ;
+
+M:: ppc %set-string-nth-fast ( ch obj index temp -- )
+    temp obj index ADD
+    ch temp string-offset STB ;
 
 M: ppc %add     ADD ;
 M: ppc %add-imm ADDI ;

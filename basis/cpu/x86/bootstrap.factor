@@ -381,8 +381,8 @@ big-endian off
 
 [
     arg0 ds-reg [] MOV
-    arg0 ds-reg bootstrap-cell neg [+] OR
-    ds-reg bootstrap-cell ADD
+    ds-reg bootstrap-cell SUB
+    arg0 ds-reg [] OR
     arg0 tag-mask get AND
     arg0 \ f tag-number MOV
     arg1 1 tag-fixnum MOV

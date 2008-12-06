@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences words memoize classes.builtin
+USING: kernel accessors sequences words memoize combinators
+classes classes.builtin classes.tuple math.partial-dispatch
 fry assocs
 compiler.tree
 compiler.tree.combinators
@@ -12,7 +13,7 @@ IN: compiler.tree.finalization
 ! See the comment in compiler.tree.late-optimizations.
 
 ! This pass runs after propagation, so that it can expand
-! built-in type predicates; these cannot be expanded before
+! type predicates; these cannot be expanded before
 ! propagation since we need to see 'fixnum?' instead of
 ! 'tag 0 eq?' and so on, for semantic reasoning.
 
@@ -33,16 +34,24 @@ M: #shuffle finalize*
     [ [ in-r>> ] [ out-r>> ] [ mapping>> ] tri '[ _ at ] map sequence= ]
     bi and [ drop f ] when ;
 
-: builtin-predicate? ( #call -- ? )
-    word>> "predicating" word-prop builtin-class? ;
-
-MEMO: builtin-predicate-expansion ( word -- nodes )
+MEMO: cached-expansion ( word -- nodes )
     def>> splice-final ;
 
-: expand-builtin-predicate ( #call -- nodes )
-    word>> builtin-predicate-expansion ;
+GENERIC: finalize-word ( #call word -- nodes )
+
+M: predicate finalize-word
+    "predicating" word-prop {
+        { [ dup builtin-class? ] [ drop word>> cached-expansion ] }
+        { [ dup tuple-class? ] [ drop word>> def>> splice-final ] }
+        [ drop ]
+    } cond ;
+
+! M: math-partial finalize-word
+!     dup primitive? [ drop ] [ nip cached-expansion ] if ;
+
+M: word finalize-word drop ;
 
 M: #call finalize*
-    dup builtin-predicate? [ expand-builtin-predicate ] when ;
+    dup word>> finalize-word ;
 
 M: node finalize* ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors classes classes.algebra words kernel
 kernel.private namespaces sequences math math.private
-combinators assocs ;
+combinators assocs quotations ;
 IN: classes.builtin
 
 SYMBOL: builtins
@@ -10,9 +10,13 @@ SYMBOL: builtins
 PREDICATE: builtin-class < class
     "metaclass" word-prop builtin-class eq? ;
 
-: type>class ( n -- class ) builtins get-global nth ;
-
 : class>type ( class -- n ) "type" word-prop ; foldable
+
+PREDICATE: lo-tag-class < builtin-class class>type 7 <= ;
+
+PREDICATE: hi-tag-class < builtin-class class>type 7 > ;
+
+: type>class ( n -- class ) builtins get-global nth ;
 
 : bootstrap-type>class ( n -- class ) builtins get nth ;
 
@@ -22,16 +26,20 @@ M: object class tag type>class ;
 
 M: builtin-class rank-class drop 0 ;
 
-: builtin-instance? ( object n -- ? )
-    #! 7 == tag-mask get
-    #! 3 == hi-tag tag-number
-    dup 7 fixnum<= [ swap tag eq? ] [
-        swap dup tag 3 eq?
-        [ hi-tag eq? ] [ 2drop f ] if
-    ] if ; inline
+GENERIC: define-builtin-predicate ( class -- )
 
-M: builtin-class instance?
-    class>type builtin-instance? ;
+M: lo-tag-class define-builtin-predicate
+    dup class>type [ eq? ] curry [ tag ] prepend define-predicate ;
+
+M: hi-tag-class define-builtin-predicate
+    dup class>type [ eq? ] curry [ hi-tag ] prepend 1quotation
+    [ dup tag 3 eq? ] [ [ drop f ] if ] surround
+    define-predicate ;
+
+M: lo-tag-class instance? [ tag ] [ class>type ] bi* eq? ;
+
+M: hi-tag-class instance?
+    over tag 3 eq? [ [ hi-tag ] [ class>type ] bi* eq? ] [ 2drop f ] if ;
 
 M: builtin-class (flatten-class) dup set ;
 

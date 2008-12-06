@@ -9,6 +9,7 @@ compiler.cfg.intrinsics.allot
 compiler.cfg.intrinsics.fixnum
 compiler.cfg.intrinsics.float
 compiler.cfg.intrinsics.slots
+compiler.cfg.intrinsics.misc
 compiler.cfg.iterator ;
 QUALIFIED: kernel
 QUALIFIED: arrays
@@ -23,6 +24,7 @@ IN: compiler.cfg.intrinsics
 
 {
     kernel.private:tag
+    kernel.private:getenv
     math.private:both-fixnums?
     math.private:fixnum+
     math.private:fixnum-
@@ -94,6 +96,7 @@ IN: compiler.cfg.intrinsics
 : emit-intrinsic ( node word -- node/f )
     {
         { \ kernel.private:tag [ drop emit-tag iterate-next ] }
+        { \ kernel.private:getenv [ emit-getenv iterate-next ] }
         { \ math.private:both-fixnums? [ drop emit-both-fixnums? iterate-next ] }
         { \ math.private:fixnum+ [ drop [ ##fixnum-add ] [ ##fixnum-add-tail ] emit-fixnum-overflow-op ] }
         { \ math.private:fixnum- [ drop [ ##fixnum-sub ] [ ##fixnum-sub-tail ] emit-fixnum-overflow-op ] }

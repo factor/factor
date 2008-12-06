@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel words parser io summary quotations
-sequences prettyprint continuations effects definitions
-compiler.units namespaces assocs tools.walker generic
-inspector fry ;
+USING: accessors kernel math sorting words parser io summary
+quotations sequences prettyprint continuations effects
+definitions compiler.units namespaces assocs tools.walker
+tools.time generic inspector fry ;
 IN: tools.annotations
 
 GENERIC: reset ( word -- )
@@ -20,9 +20,11 @@ M: word reset
         f "unannotated-def" set-word-prop
     ] [ drop ] if ;
 
+ERROR: cannot-annotate-twice word ;
+
 : annotate ( word quot -- )
     over "unannotated-def" word-prop [
-        "Cannot annotate a word twice" throw
+        over cannot-annotate-twice
     ] when
     [
         over dup def>> "unannotated-def" set-word-prop
@@ -82,3 +84,21 @@ M: word annotate-methods
 
 : breakpoint-if ( word quot -- )
     '[ [ _ [ [ break ] when ] ] dip 3append ] annotate-methods ;
+
+SYMBOL: word-timing
+
+word-timing global [ H{ } clone or ] change-at
+
+: reset-word-timing ( -- )
+    word-timing get clear-assoc ;
+
+: (add-timing) ( def word -- def' )
+    '[ _ benchmark _ word-timing get at+ ] ;
+
+: add-timing ( word -- )
+    dup '[ _ (add-timing) ] annotate ;
+
+: word-timing. ( -- )
+    word-timing get
+    >alist [ 1000000 /f ] assoc-map sort-values
+    simple-table. ;

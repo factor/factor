@@ -4,9 +4,17 @@ IN: tools.annotations
 
 ARTICLE: "tools.annotations" "Word annotations"
 "The word annotation feature modifies word definitions to add debugging code. You can restore the old definition by calling " { $link reset } " on the word in question."
+$nl
+"Printing messages when a word is called or returns:"
 { $subsection watch }
+{ $subsection watch-vars }
+"Starting the walker when a word is called:"
 { $subsection breakpoint }
 { $subsection breakpoint-if }
+"Timing words:"
+{ $subsection reset-word-timing }
+{ $subsection add-timing }
+{ $subsection word-timing. }
 "All of the above words are implemented using a single combinator which applies a quotation to a word definition to yield a new definition:"
 { $subsection annotate } ;
 
@@ -63,3 +71,13 @@ HELP: word-inputs
      { "seq" sequence } }
 { $description "Makes a sequence of the inputs to a word by counting the number of inputs in the stack effect and saving that many items from the datastack." } ;
 
+HELP: add-timing
+{ $values { "word" word } }
+{ $description "Adds timing code to a word, which records its total running time, including that of words it calls, on every invocation." }
+{ $see-also "timing" "profiling" } ;
+
+HELP: reset-word-timing
+{ $description "Resets the word timing table." } ;
+
+HELP: word-timing.
+{ $description "Prints the word timing table." } ;

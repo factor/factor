@@ -5,7 +5,7 @@ math.partial-dispatch math.intervals math.parser math.order
 layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private slots.private
-definitions
+definitions strings.private vectors hashtables
 stack-checker.state
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -194,6 +194,11 @@ generic-comparison-ops [
     2bi and maybe-or-never
 ] "outputs" set-word-prop
 
+\ both-fixnums? [
+    [ class>> fixnum classes-intersect? not ] either?
+    f <literal-info> object-info ?
+] "outputs" set-word-prop
+
 {
     { >fixnum fixnum }
     { bignum>fixnum fixnum }
@@ -242,6 +247,10 @@ generic-comparison-ops [
     ] "custom-inlining" set-word-prop
 ] each
 
+\ string-nth [
+    2drop fixnum 0 23 2^ [a,b] <class/interval-info>
+] "outputs" set-word-prop
+
 {
     alien-signed-1
     alien-unsigned-1
@@ -282,6 +291,15 @@ generic-comparison-ops [
     [ clone f >>literal f >>literal? ]
     "outputs" set-word-prop
 ] each
+
+! Generate more efficient code for common idiom
+\ clone [
+    in-d>> first value-info literal>> {
+        { V{ } [ [ drop { } 0 vector boa ] ] }
+        { H{ } [ [ drop hashtable new ] ] }
+        [ drop f ]
+    } case
+] "custom-inlining" set-word-prop
 
 \ slot [
     dup literal?>>

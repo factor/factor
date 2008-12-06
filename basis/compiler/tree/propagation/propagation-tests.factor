@@ -8,7 +8,8 @@ math.functions math.private strings layouts
 compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
-specialized-arrays.double system sorting math.libm ;
+specialized-arrays.double system sorting math.libm
+math.intervals ;
 IN: compiler.tree.propagation.tests
 
 \ propagate must-infer
@@ -598,6 +599,10 @@ MIXIN: empty-mixin
 [ V{ float } ] [ [ fsqrt ] final-classes ] unit-test
 
 [ V{ t } ] [ [ { fixnum } declare 10 mod >float -20 > ] final-literals ] unit-test
+
+[ T{ interval f { 0 t } { 127 t } } ] [
+    [ { integer } declare 127 bitand ] final-info first interval>>
+] unit-test
 
 ! [ V{ string } ] [
 !     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes

@@ -6,9 +6,6 @@ compiler.cfg.stacks compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.utilities ;
 IN: compiler.cfg.intrinsics.slots
 
-: emit-tag ( -- )
-    ds-pop tag-mask get ^^and-imm ^^tag-fixnum ds-push ;
-
 : value-tag ( info -- n ) class>> class-tag ; inline
 
 : (emit-slot) ( infos -- dst )

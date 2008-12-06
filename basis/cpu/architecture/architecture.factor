@@ -120,6 +120,8 @@ HOOK: %set-alien-cell      cpu ( ptr value -- )
 HOOK: %set-alien-float     cpu ( ptr value -- )
 HOOK: %set-alien-double    cpu ( ptr value -- )
 
+HOOK: %alien-global cpu ( dst symbol library -- )
+
 HOOK: %allot cpu ( dst size class temp -- )
 HOOK: %write-barrier cpu ( src card# table -- )
 HOOK: %gc cpu ( -- )

@@ -236,6 +236,10 @@ M: _gc generate-insn drop %gc ;
 
 M: ##loop-entry generate-insn drop %loop-entry ;
 
+M: ##alien-global generate-insn
+    [ dst>> register ] [ symbol>> ] [ library>> ] tri
+    %alien-global ;
+
 ! ##alien-invoke
 GENERIC: reg-size ( register-class -- n )
 
@@ -451,7 +455,7 @@ M: ##alien-indirect generate-insn
 
 TUPLE: callback-context ;
 
-: current-callback 2 getenv ;
+: current-callback ( -- id ) 2 getenv ;
 
 : wait-to-return ( token -- )
     dup current-callback eq? [
