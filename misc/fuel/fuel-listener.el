@@ -113,7 +113,11 @@ buffer."
 \\{fuel-listener-mode-map}"
   (set (make-local-variable 'comint-prompt-regexp)
        fuel-listener--prompt-regex)
+  (set (make-local-variable 'comint-prompt-read-only) t)
   (fuel-listener--startup))
+
+;; (define-key fuel-listener-mode-map "\C-w" 'comint-kill-region)
+;; (define-key fuel-listener-mode-map "\C-k" 'comint-kill-whole-line)
 
 
 (provide 'fuel-listener)

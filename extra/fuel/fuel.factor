@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays classes.tuple compiler.units continuations debugger
-eval io io.streams.string kernel listener listener.private
+definitions eval io io.files io.streams.string kernel listener listener.private
 make math namespaces parser prettyprint quotations sequences strings
 vectors vocabs.loader ;
 

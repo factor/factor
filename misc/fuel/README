@@ -52,7 +52,7 @@ Quick key reference
 
  - M-. : edit word at point in Emacs
 
- - C-C-r, C-cC-er : eval region
+ - C-cr, C-cC-er : eval region
  - C-M-r, C-cC-ee : eval region, extending it to definition boundaries
  - C-M-x, C-cC-ex : eval definition around point
 
