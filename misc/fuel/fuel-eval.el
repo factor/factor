@@ -38,7 +38,7 @@
         (when (and (> fuel-eval-log-max-length 0)
                    (> (point) fuel-eval-log-max-length))
           (erase-buffer))
-        (when fuel-eval--log (insert "\n>> " (fuel--shorten-str str 75) "\n"))
+        (when fuel-eval--log (insert "\n>> " (fuel--shorten-str str 256) "\n"))
         (let ((beg (point)))
           (comint-redirect-send-command-to-process str (current-buffer) proc nil t)
           (with-current-buffer (process-buffer proc)

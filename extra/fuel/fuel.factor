@@ -112,6 +112,8 @@ M: continuation fuel-pprint drop "~continuation~" write ;
 : fuel-end-eval ( -- )
     [ ] (fuel-end-eval) ;
 
+: fuel-get-edit-location ( defspec -- )
+    where [ first2 [ (normalize-path) ] dip 2array fuel-eval-set-result ] when* ;
 
 : fuel-startup ( -- )
     "listener" run ;

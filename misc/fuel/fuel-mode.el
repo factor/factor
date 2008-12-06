@@ -37,21 +37,56 @@
 
 ;;; User commands
 
+(defun fuel-eval-region (begin end &optional arg)
+  "Sends region to Fuel's listener for evaluation.
+With prefix, switchs to the listener's buffer afterwards."
+  (interactive "r\nP")
+  (let* ((ret (fuel-eval--eval-region/context begin end))
+         (err (fuel-eval--retort-error ret)))
+    (message "%s" (or err (fuel--shorten-region begin end 70))))
+  (when arg (pop-to-buffer fuel-listener-buffer)))
+
+(defun fuel-eval-extended-region (begin end &optional arg)
+  "Sends region extended outwards to nearest definitions,
+to Fuel's listener for evaluation. With prefix, switchs to the
+listener's buffer afterwards."
+  (interactive "r\nP")
+  (fuel-eval-region (save-excursion (goto-char begin) (mark-defun) (point))
+                    (save-excursion (goto-char end) (mark-defun) (mark))))
+
 (defun fuel-eval-definition (&optional arg)
   "Sends definition around point to Fuel's listener for evaluation.
-With prefix, switchs the the listener's buffer."
+With prefix, switchs to the listener's buffer afterwards."
   (interactive "P")
   (save-excursion
     (mark-defun)
     (let* ((begin (point))
            (end (mark)))
       (unless (< begin end) (error "No evaluable definition around point"))
-      (let* ((msg (match-string 0))
-             (ret (fuel-eval--eval-region/context begin end))
-             (err (fuel-eval--retort-error ret)))
-        (when err (error "%s" err))
-        (message "%s" (fuel--shorten-region begin end 70)))))
-  (when arg (pop-to-buffer fuel-listener-buffer)))
+      (fuel-eval-region begin end))))
+
+(defun fuel-edit-word-at-point (&optional arg)
+  "Opens a new window visiting the definition of the word at point.
+With prefix, asks for the word to edit."
+  (interactive "P")
+  (let* ((word (fuel-syntax-symbol-at-point))
+         (ask (or arg (not word)))
+         (word (if ask
+                   (read-string nil
+                                (format "Edit word%s: "
+                                        (if word (format " (%s)" word) ""))
+                                word)
+                 word)))
+    (let* ((ret (fuel-eval--eval-string/context
+                 (format "\\ %s fuel-get-edit-location" word)))
+           (err (fuel-eval--retort-error ret))
+           (loc (fuel-eval--retort-result ret)))
+      (when (or err (not loc) (not (listp loc)) (not (stringp (car loc))))
+        (error "Couldn't find edit location for '%s'" word))
+      (unless (file-readable-p (car loc))
+        (error "Couldn't open '%s' for read" (car loc)))
+      (find-file-other-window (car loc))
+      (goto-line (if (numberp (cadr loc)) (cadr loc) 1)))))
 
 
 ;;; Minor mode definition:
@@ -94,8 +129,15 @@ interacting with a factor listener is at your disposal.
 (fuel-mode--key-1 ?z 'run-factor)
 
 (define-key fuel-mode-map "\C-\M-x" 'fuel-eval-definition)
+(fuel-mode--key ?e ?x 'fuel-eval-definition)
 
-(fuel-mode--key ?e ?d 'fuel-eval-definition)
+(fuel-mode--key-1 ?r 'fuel-eval-region)
+(fuel-mode--key ?e ?r 'fuel-eval-region)
+
+(define-key fuel-mode-map "\C-\M-r" 'fuel-eval-extended-region)
+(fuel-mode--key ?e ?e 'fuel-eval-extended-region)
+
+(define-key fuel-mode-map "\M-." 'fuel-edit-word-at-point)
 
 (fuel-mode--key ?d ?a 'fuel-autodoc-mode)
 (fuel-mode--key ?d ?d 'fuel-help)
