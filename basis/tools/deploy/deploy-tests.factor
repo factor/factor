@@ -14,34 +14,22 @@ urls math.parser ;
 : small-enough? ( n -- ? )
     [ "test.image" temp-file file-info size>> ] [ cell 4 / * ] bi* <= ;
 
-[ ] [ "hello-world" shake-and-bake ] unit-test
+[ t ] [ "hello-world" shake-and-bake 500000 small-enough? ] unit-test
 
-[ t ] [ 500000 small-enough? ] unit-test
+[ t ] [ "sudoku" shake-and-bake 800000 small-enough? ] unit-test
 
-[ ] [ "sudoku" shake-and-bake ] unit-test
-
-[ t ] [ 800000 small-enough? ] unit-test
-
-[ ] [ "hello-ui" shake-and-bake ] unit-test
-
-[ t ] [ 1300000 small-enough? ] unit-test
+[ t ] [ "hello-ui" shake-and-bake 1300000 small-enough? ] unit-test
 
 [ "staging.math-compiler-threads-ui-strip.image" ] [
     "hello-ui" deploy-config
     [ bootstrap-profile staging-image-name file-name ] bind
 ] unit-test
 
-[ ] [ "maze" shake-and-bake ] unit-test
+[ t ] [ "maze" shake-and-bake 1200000 small-enough? ] unit-test
 
-[ t ] [ 1200000 small-enough? ] unit-test
+[ t ] [ "tetris" shake-and-bake 1500000 small-enough? ] unit-test
 
-[ ] [ "tetris" shake-and-bake ] unit-test
-
-[ t ] [ 1500000 small-enough? ] unit-test
-
-! [ ] [ "bunny" shake-and-bake ] unit-test
-
-! [ t ] [ 2500000 small-enough? ] unit-test
+[ t ] [ "bunny" shake-and-bake 2500000 small-enough? ] unit-test
 
 : run-temp-image ( -- )
     vm
@@ -108,5 +96,10 @@ M: quit-responder call-responder*
 
 [ ] [
     "tools.deploy.test.7" shake-and-bake
+    run-temp-image
+] unit-test
+
+[ ] [
+    "tools.deploy.test.8" shake-and-bake
     run-temp-image
 ] unit-test
