@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private math math.private words
-sequences parser namespaces make assocs quotations arrays locals
+sequences parser namespaces make assocs quotations arrays
 generic generic.math hashtables effects compiler.units
 classes.algebra fry combinators ;
 IN: math.partial-dispatch
@@ -45,29 +45,29 @@ M: word integer-op-input-classes
         { bitnot fixnum-bitnot }
     } at swap or ;
 
-:: integer-fixnum-op-quot ( fix-word big-word -- quot )
+: integer-fixnum-op-quot ( fix-word big-word -- quot )
     [
         [ over fixnum? ] %
-        fix-word '[ _ execute ] ,
-        big-word '[ fixnum>bignum _ execute ] ,
+        [ '[ _ execute ] , ]
+        [ '[ fixnum>bignum _ execute ] , ] bi*
         \ if ,
     ] [ ] make ;
 
-:: fixnum-integer-op-quot ( fix-word big-word -- quot )
+: fixnum-integer-op-quot ( fix-word big-word -- quot )
     [
         [ dup fixnum? ] %
-        fix-word '[ _ execute ] ,
-        big-word '[ [ fixnum>bignum ] dip _ execute ] ,
+        [ '[ _ execute ] , ]
+        [ '[ [ fixnum>bignum ] dip _ execute ] , ] bi*
         \ if ,
     ] [ ] make ;
 
-:: integer-integer-op-quot ( fix-word big-word -- quot )
+: integer-integer-op-quot ( fix-word big-word -- quot )
     [
         [ dup fixnum? ] %
-        fix-word big-word integer-fixnum-op-quot ,
+        2dup integer-fixnum-op-quot ,
         [
             [ over fixnum? [ [ fixnum>bignum ] dip ] when ] %
-            big-word ,
+            nip ,
         ] [ ] make ,
         \ if ,
     ] [ ] make ;
