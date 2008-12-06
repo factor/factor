@@ -74,7 +74,7 @@ HELP: word-inputs
 HELP: add-timing
 { $values { "word" word } }
 { $description "Adds timing code to a word, which records its total running time, including that of words it calls, on every invocation." }
-{ $see-also "tools.time" } ;
+{ $see-also "timing" "profiling" } ;
 
 HELP: reset-word-timing
 { $description "Resets the word timing table." } ;
