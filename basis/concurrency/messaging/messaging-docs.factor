@@ -74,9 +74,9 @@ ARTICLE: { "concurrency" "exceptions" } "Linked exceptions"
 "Exceptions are only raised in the parent when the parent does a " { $link receive } " or " { $link receive-if } ". This is because the exception is sent from the child to the parent as a message." ;
 
 ARTICLE: "concurrency.messaging" "Message-passing concurrency"
-"The " { $vocab-link "concurrency.messaging" } " vocabulary is based upon the style of concurrency used in systems like Erlang and Termite. It is built on top of the standard Factor lightweight thread system."
+"The " { $vocab-link "concurrency.messaging" } " vocabulary is based upon the style of concurrency used in systems like Erlang and Termite. It is built on top of " { $link "threads" } "."
 $nl
-"A concurrency oriented program is one in which multiple threades run simultaneously in a single Factor image or across multiple running Factor instances. The threades can communicate with each other by asynchronous message sends."
+"A concurrency-oriented program is one in which multiple threads run simultaneously in a single Factor image or across multiple running Factor instances. The threades can communicate with each other by asynchronous message sends."
 $nl
 "Although threades can share data via Factor's mutable data structures it is not recommended to mix shared state with message passing as it can lead to confusing code."
 { $subsection { "concurrency" "messaging" } }
