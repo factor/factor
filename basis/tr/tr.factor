@@ -1,13 +1,25 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays strings sequences sequences.private
-fry kernel words parser lexer assocs math.order ;
+fry kernel words parser lexer assocs math math.order summary ;
 IN: tr
+
+ERROR: bad-tr ;
+
+M: bad-tr summary
+    drop "TR: can only be used with ASCII characters" ;
 
 <PRIVATE
 
+: ascii? ( ch -- ? ) 0 127 between? ; inline
+
+: tr-nth ( n mapping -- ch ) nth-unsafe 127 bitand ; inline
+
+: check-tr ( from to -- )
+    [ [ ascii? ] all? ] both? [ bad-tr ] unless ;
+
 : compute-tr ( quot from to -- mapping )
-    zip [ 256 ] 2dip '[ [ @ _ at ] keep or ] B{ } map-as ; inline
+    zip [ 128 ] 2dip '[ [ @ _ at ] keep or ] B{ } map-as ; inline
 
 : tr-hints ( word -- )
     { { byte-array } { string } } "specializer" set-word-prop ;
@@ -16,13 +28,13 @@ IN: tr
     create-in dup tr-hints ;
 
 : tr-quot ( mapping -- quot )
-    '[ [ dup 0 255 between? [ _ nth-unsafe ] when ] map ] ;
+    '[ [ dup ascii? [ _ tr-nth ] when ] map ] ;
 
 : define-tr ( word mapping -- )
     tr-quot (( seq -- translated )) define-declared ;
 
 : fast-tr-quot ( mapping -- quot )
-    '[ [ _ nth-unsafe ] change-each ] ;
+    '[ [ _ tr-nth ] change-each ] ;
 
 : define-fast-tr ( word mapping -- )
     fast-tr-quot (( seq -- )) define-declared ;
@@ -32,6 +44,7 @@ PRIVATE>
 : TR:
     scan parse-definition
     unclip-last [ unclip-last ] dip compute-tr
+    [ check-tr ]
     [ [ create-tr ] dip define-tr ]
-    [ [ "-fast" append create-tr ] dip define-fast-tr ] 2bi ;
+    [ [ "-fast" append create-tr ] dip define-fast-tr ] 2tri ;
     parsing
