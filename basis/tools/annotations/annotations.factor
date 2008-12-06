@@ -87,7 +87,7 @@ M: word annotate-methods
 
 SYMBOL: word-timing
 
-H{ } clone word-timing set-global
+word-timing global [ H{ } clone or ] change-at
 
 : reset-word-timing ( -- )
     word-timing get clear-assoc ;
