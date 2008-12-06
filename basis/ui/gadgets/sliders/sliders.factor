@@ -36,8 +36,9 @@ TUPLE: slider < frame elevator thumb saved line ;
     #! A scaling factor such that if x is a slider co-ordinate,
     #! x*n is the screen position of the thumb, and conversely
     #! for x/n. The '1 max' calls avoid division by zero.
-    dup elevator-length over thumb-dim - 1 max
-    swap slider-max* 1 max / ;
+    [ [ elevator-length ] [ thumb-dim ] bi - 1 max ]
+    [ slider-max* 1 max ]
+    bi / ;
 
 : slider>screen ( m scale -- n ) slider-scale * ;
 : screen>slider ( m scale -- n ) slider-scale / ;
