@@ -154,8 +154,11 @@ TUPLE: identity-tuple ;
 
 M: identity-tuple equal? 2drop f ;
 
+USE: math.private
 : = ( obj1 obj2 -- ? )
-    2dup eq? [ 2drop t ] [ equal? ] if ; inline
+    2dup eq? [ 2drop t ] [
+        2dup both-fixnums? [ 2drop f ] [ equal? ] if
+    ] if ; inline
 
 GENERIC: clone ( obj -- cloned )
 

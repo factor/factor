@@ -65,6 +65,7 @@ IN: compiler.cfg.hats
 : ^^alien-cell ( src -- dst ) ^^i1 ##alien-cell ; inline
 : ^^alien-float ( src -- dst ) ^^d1 ##alien-float ; inline
 : ^^alien-double ( src -- dst ) ^^d1 ##alien-double ; inline
+: ^^alien-global ( symbol library -- dst ) ^^i2 ##alien-global ; inline
 : ^^compare ( src1 src2 cc -- dst ) ^^i3 i ##compare ; inline
 : ^^compare-imm ( src1 src2 cc -- dst ) ^^i3 i ##compare-imm ; inline
 : ^^compare-float ( src1 src2 cc -- dst ) ^^i3 i ##compare-float ; inline

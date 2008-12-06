@@ -161,6 +161,8 @@ INSN: ##set-alien-double < ##alien-setter ;
 INSN: ##allot < ##flushable size class { temp vreg } ;
 INSN: ##write-barrier < ##effect card# table ;
 
+INSN: ##alien-global < ##read symbol library ;
+
 ! FFI
 INSN: ##alien-invoke params ;
 INSN: ##alien-indirect params ;

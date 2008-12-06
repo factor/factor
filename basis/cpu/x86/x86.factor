@@ -458,19 +458,19 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
     dst class store-tagged
     nursery-ptr size inc-allot-ptr ;
 
-HOOK: %alien-global cpu ( symbol dll register -- )
-
 M:: x86 %write-barrier ( src card# table -- )
     #! Mark the card pointed to by vreg.
     ! Mark the card
     card# src MOV
     card# card-bits SHR
-    "cards_offset" f table %alien-global
+    table "cards_offset" f %alien-global
+    table table [] MOV
     table card# [+] card-mark <byte> MOV
 
     ! Mark the card deck
     card# deck-bits card-bits - SHR
-    "decks_offset" f table %alien-global
+    table "decks_offset" f %alien-global
+    table table [] MOV
     table card# [+] card-mark <byte> MOV ;
 
 M: x86 %gc ( -- )
@@ -484,6 +484,9 @@ M: x86 %gc ( -- )
     %prepare-alien-invoke
     "minor_gc" f %alien-invoke
     "end" resolve-label ;
+
+M: x86 %alien-global
+    [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
 
 HOOK: stack-reg cpu ( -- reg )
 
@@ -595,7 +598,8 @@ M: x86 %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    "stack_chain" f temp-reg-1 %alien-global
+    temp-reg-1 "stack_chain" f %alien-global
+    temp-reg-1 temp-reg-1 [] MOV
     temp-reg-1 [] stack-reg MOV
     temp-reg-1 [] cell SUB
     temp-reg-1 2 cells [+] ds-reg MOV

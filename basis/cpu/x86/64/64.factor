@@ -158,9 +158,6 @@ M: x86.64 %prepare-box-struct ( -- )
 
 M: x86.64 %prepare-var-args RAX RAX XOR ;
 
-M: x86.64 %alien-global
-    [ 0 MOV rc-absolute-cell rel-dlsym ] [ dup [] MOV ] bi ;
-
 M: x86.64 %alien-invoke
     R11 0 MOV
     rc-absolute-cell rel-dlsym

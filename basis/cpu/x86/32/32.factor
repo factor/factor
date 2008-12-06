@@ -44,8 +44,6 @@ M: x86.32 param-reg-2 EDX ;
 
 M: x86.32 reserved-area-size 0 ;
 
-M: x86.32 %alien-global 0 [] MOV rc-absolute-cell rel-dlsym ;
-
 M: x86.32 %alien-invoke (CALL) rel-dlsym ;
 
 M: x86.32 %alien-invoke-tail (JMP) rel-dlsym ;

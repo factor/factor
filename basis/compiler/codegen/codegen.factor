@@ -236,6 +236,10 @@ M: _gc generate-insn drop %gc ;
 
 M: ##loop-entry generate-insn drop %loop-entry ;
 
+M: ##alien-global generate-insn
+    [ dst>> register ] [ symbol>> ] [ library>> ] tri
+    %alien-global ;
+
 ! ##alien-invoke
 GENERIC: reg-size ( register-class -- n )
 

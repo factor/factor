@@ -12,8 +12,7 @@ compiler.cfg.registers ;
 IN: compiler.cfg.intrinsics.fixnum
 
 : emit-both-fixnums? ( -- )
-    D 0 ^^peek
-    D 1 ^^peek
+    2inputs
     ^^or
     tag-mask get ^^and-imm
     0 cc= ^^compare-imm

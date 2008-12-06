@@ -193,13 +193,14 @@ SYMBOL: history
     #! of bounds value. This case comes up if a parsing word
     #! calls the compiler at parse time (doing so is
     #! discouraged, but it should still work.)
-    {
-        { [ dup deferred? ] [ 2drop f ] }
-        { [ dup custom-inlining? ] [ inline-custom ] }
-        { [ dup \ instance? eq? ] [ inline-instance-check ] }
-        { [ dup always-inline-word? ] [ inline-word ] }
-        { [ dup standard-generic? ] [ inline-standard-method ] }
-        { [ dup math-generic? ] [ inline-math-method ] }
-        { [ dup method-body? ] [ inline-method-body ] }
-        [ 2drop f ]
-    } cond ;
+    dup custom-inlining? [ 2dup inline-custom ] [ f ] if [ 2drop f ] [
+        {
+            { [ dup deferred? ] [ 2drop f ] }
+            { [ dup \ instance? eq? ] [ inline-instance-check ] }
+            { [ dup always-inline-word? ] [ inline-word ] }
+            { [ dup standard-generic? ] [ inline-standard-method ] }
+            { [ dup math-generic? ] [ inline-math-method ] }
+            { [ dup method-body? ] [ inline-method-body ] }
+            [ 2drop f ]
+        } cond
+    ] if ;

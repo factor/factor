@@ -83,7 +83,7 @@ M: math-combination perform-combination
     drop
     dup
     [
-        \ both-fixnums? ,
+        [ 2dup both-fixnums? ] %
         dup fixnum bootstrap-word dup math-method ,
         \ over [
             dup math-class? [
