@@ -451,7 +451,7 @@ M: ##alien-indirect generate-insn
 
 TUPLE: callback-context ;
 
-: current-callback 2 getenv ;
+: current-callback ( -- id ) 2 getenv ;
 
 : wait-to-return ( token -- )
     dup current-callback eq? [
