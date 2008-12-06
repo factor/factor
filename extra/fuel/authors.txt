@@ -1,2 +1,2 @@
-Jose Antonio Ortega Ruiz <jao@gnu.org>
-Eduardo Cavazos <wayo.cavazos@gmail.com>
+Jose Antonio Ortega Ruiz
+Eduardo Cavazos
