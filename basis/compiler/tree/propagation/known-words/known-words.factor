@@ -5,7 +5,7 @@ math.partial-dispatch math.intervals math.parser math.order
 layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private slots.private
-definitions
+definitions strings.private
 stack-checker.state
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -241,6 +241,10 @@ generic-comparison-ops [
         ] when
     ] "custom-inlining" set-word-prop
 ] each
+
+\ string-nth [
+    2drop fixnum 0 23 2^ [a,b] <class/interval-info>
+] "outputs" set-word-prop
 
 {
     alien-signed-1
