@@ -73,6 +73,7 @@ INSN: ##set-slot-imm < ##write { obj vreg } { slot integer } { tag integer } ;
 
 ! String element access
 INSN: ##string-nth < ##flushable { obj vreg } { index vreg } { temp vreg } ;
+INSN: ##set-string-nth-fast < ##effect { obj vreg } { index vreg } { temp vreg } ;
 
 ! Integer arithmetic
 INSN: ##add < ##commutative ;
@@ -91,6 +92,16 @@ INSN: ##shl-imm < ##binary-imm ;
 INSN: ##shr-imm < ##binary-imm ;
 INSN: ##sar-imm < ##binary-imm ;
 INSN: ##not < ##unary ;
+INSN: ##log2 < ##unary ;
+
+! Overflowing arithmetic
+TUPLE: ##fixnum-overflow < insn src1 src2 ;
+INSN: ##fixnum-add < ##fixnum-overflow ;
+INSN: ##fixnum-add-tail < ##fixnum-overflow ;
+INSN: ##fixnum-sub < ##fixnum-overflow ;
+INSN: ##fixnum-sub-tail < ##fixnum-overflow ;
+INSN: ##fixnum-mul < ##fixnum-overflow temp1 temp2 ;
+INSN: ##fixnum-mul-tail < ##fixnum-overflow temp1 temp2 ;
 
 : ##tag-fixnum ( dst src -- ) tag-bits get ##shl-imm ; inline
 : ##untag-fixnum ( dst src -- ) tag-bits get ##sar-imm ; inline
@@ -151,6 +162,8 @@ INSN: ##set-alien-double < ##alien-setter ;
 INSN: ##allot < ##flushable size class { temp vreg } ;
 INSN: ##write-barrier < ##effect card# table ;
 
+INSN: ##alien-global < ##read symbol library ;
+
 ! FFI
 INSN: ##alien-invoke params ;
 INSN: ##alien-indirect params ;
@@ -198,11 +211,11 @@ TUPLE: ##conditional-branch < insn { src1 vreg } { src2 vreg } cc ;
 INSN: ##compare-branch < ##conditional-branch ;
 INSN: ##compare-imm-branch { src1 vreg } { src2 integer } cc ;
 
-INSN: ##compare < ##binary cc ;
-INSN: ##compare-imm < ##binary-imm cc ;
+INSN: ##compare < ##binary cc temp ;
+INSN: ##compare-imm < ##binary-imm cc temp ;
 
 INSN: ##compare-float-branch < ##conditional-branch ;
-INSN: ##compare-float < ##binary cc ;
+INSN: ##compare-float < ##binary cc temp ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;

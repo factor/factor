@@ -4,14 +4,21 @@ IN: qualified
 HELP: QUALIFIED:
 { $syntax "QUALIFIED: vocab" }
 { $description "Similar to " { $link POSTPONE: USE: } " but loads vocabulary with prefix." }
-{ $examples { $code
-    "QUALIFIED: math\n1 2 math:+ ! ==> 3" } } ;
+{ $examples { $example
+    "USING: prettyprint qualified ;"
+    "QUALIFIED: math"
+    "1 2 math:+ ." "3"
+} } ;
 
 HELP: QUALIFIED-WITH:
 { $syntax "QUALIFIED-WITH: vocab word-prefix" }
 { $description "Works like " { $link POSTPONE: QUALIFIED: } " but uses " { $snippet "word-prefix" } " as prefix." }
 { $examples { $code
-    "QUALIFIED-WITH: math m\n1 2 m:+ ! ==> 3" } } ;
+    "USING: prettyprint qualified ;"
+    "QUALIFIED-WITH: math m"
+    "1 2 m:+ ."
+    "3"
+} } ;
 
 HELP: FROM:
 { $syntax "FROM: vocab => words ... ;" }
@@ -28,9 +35,12 @@ HELP: EXCLUDE:
 HELP: RENAME:
 { $syntax "RENAME: word vocab => newname " }
 { $description "Imports " { $snippet "word" } " from " { $snippet "vocab" } ", but renamed to " { $snippet "newname" } "." }
-{ $examples { $code
+{ $examples { $example
+    "USING: prettyprint qualified ;"
     "RENAME: + math => -"
-    "2 3 - ! => 5" } } ;
+    "2 3 - ."
+    "5"
+} } ;
 
 ARTICLE: "qualified" "Qualified word lookup"
 "The " { $vocab-link "qualified" } " vocabulary provides a handful of parsing words which give more control over word lookup than is offered by " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } "."

@@ -1,20 +1,20 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences prettyprint math.parser io
-math.functions ;
+math.functions math.bitwise combinators.short-circuit ;
 IN: math.floating-point
 
 : (double-sign) ( bits -- n ) -63 shift ; inline
 : double-sign ( double -- n ) double>bits (double-sign) ;
 
 : (double-exponent-bits) ( bits -- n )
-    -52 shift 11 2^ 1- bitand ; inline
+    -52 shift 11 on-bits mask ; inline
 
 : double-exponent-bits ( double -- n )
     double>bits (double-exponent-bits) ;
 
 : (double-mantissa-bits) ( double -- n )
-    52 2^ 1- bitand ;
+    52 on-bits mask ;
 
 : double-mantissa-bits ( double -- n )
     double>bits (double-mantissa-bits) ;
@@ -38,3 +38,9 @@ IN: math.floating-point
         11 [ bl ] times print
     ] tri ;
 
+: infinity? ( double -- ? )
+    double>bits
+    {
+        [ (double-exponent-bits) 11 on-bits = ]
+        [ (double-mantissa-bits) 0 = ]
+    } 1&& ;

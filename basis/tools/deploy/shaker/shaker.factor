@@ -23,10 +23,8 @@ IN: tools.deploy.shaker
 
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
-    "cpu.x86" init-hooks get delete-at
-    "command-line" init-hooks get delete-at
-    "libc" init-hooks get delete-at
-    "system" init-hooks get delete-at
+    { "cpu.x86" "command-line" "libc" "system" "environment" }
+    [ init-hooks get delete-at ] each
     deploy-threads? get [
         "threads" init-hooks get delete-at
     ] unless
@@ -111,6 +109,7 @@ IN: tools.deploy.shaker
                 "default-method"
                 "default-output-classes"
                 "derived-from"
+                "ebnf-parser"
                 "engines"
                 "forgotten"
                 "identities"
@@ -271,8 +270,8 @@ IN: tools.deploy.shaker
             } %
 
             { } { "math.partial-dispatch" } strip-vocab-globals %
-            
-            "peg-cache" "peg" lookup ,
+
+            { } { "peg" } strip-vocab-globals %
         ] when
 
         strip-prettyprint? [
@@ -321,24 +320,34 @@ IN: tools.deploy.shaker
         ] with-compilation-unit
     ] unless ;
 
-: compress ( pred string -- )
+: compress ( pred post-process string -- )
     "Compressing " prepend show
-    instances
-    dup H{ } clone [ [ ] cache ] curry map
+    [ instances dup H{ } clone [ [ ] cache ] curry map ] dip call
     become ; inline
 
 : compress-byte-arrays ( -- )
-    [ byte-array? ] "byte arrays" compress ;
+    [ byte-array? ] [ ] "byte arrays" compress ;
+
+: remain-compiled ( old new -- old new )
+    #! Quotations which were formerly compiled must remain
+    #! compiled.
+    2dup [
+        2dup [ compiled>> ] [ compiled>> not ] bi* and
+        [ nip jit-compile ] [ 2drop ] if
+    ] 2each ;
 
 : compress-quotations ( -- )
-    [ quotation? ] "quotations" compress ;
+    [ quotation? ] [ remain-compiled ] "quotations" compress ;
 
 : compress-strings ( -- )
-    [ string? ] "strings" compress ;
+    [ string? ] [ ] "strings" compress ;
+
+: compress-wrappers ( -- )
+    [ wrapper? ] [ ] "wrappers" compress ;
 
 : finish-deploy ( final-image -- )
     "Finishing up" show
-    >r { } set-datastack r>
+    [ { } set-datastack ] dip
     { } set-retainstack
     V{ } set-namestack
     V{ } set-catchstack
@@ -379,12 +388,13 @@ SYMBOL: deploy-vocab
     strip-c-io
     f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
     deploy-vocab get vocab-main set-boot-quot*
-    stripped-word-props >r
+    stripped-word-props
     stripped-globals strip-globals
-    r> strip-words
+    strip-words
     compress-byte-arrays
     compress-quotations
-    compress-strings ;
+    compress-strings
+    compress-wrappers ;
 
 : (deploy) ( final-image vocab config -- )
     #! Does the actual work of a deployment in the slave

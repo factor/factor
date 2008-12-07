@@ -33,8 +33,8 @@ IN: tools.completion
     {
         { [ over zero? ] [ 2drop 10 ] }
         { [ 2dup length 1- number= ] [ 2drop 4 ] }
-        { [ 2dup >r 1- r> nth Letter? not ] [ 2drop 10 ] }
-        { [ 2dup >r 1+ r> nth Letter? not ] [ 2drop 4 ] }
+        { [ 2dup [ 1- ] dip nth Letter? not ] [ 2drop 10 ] }
+        { [ 2dup [ 1+ ] dip nth Letter? not ] [ 2drop 4 ] }
         [ 2drop 1 ]
     } cond ;
 
@@ -67,7 +67,7 @@ IN: tools.completion
     over empty? [
         nip [ first ] map
     ] [
-        >r >lower r> [ completion ] with map
+        [ >lower ] dip [ completion ] with map
         rank-completions
     ] if ;
 

@@ -3,7 +3,7 @@
 USING: accessors kernel arrays sequences math math.order
 math.partial-dispatch generic generic.standard generic.math
 classes.algebra classes.union sets quotations assocs combinators
-words namespaces continuations
+words namespaces continuations classes fry
 compiler.tree
 compiler.tree.builder
 compiler.tree.recursive
@@ -20,13 +20,17 @@ SYMBOL: node-count
 : count-nodes ( nodes -- )
     0 swap [ drop 1+ ] each-node node-count set ;
 
+! We try not to inline the same word too many times, to avoid
+! combinatorial explosion
+SYMBOL: inlining-count
+
 ! Splicing nodes
 GENERIC: splicing-nodes ( #call word/quot/f -- nodes )
 
 M: word splicing-nodes
     [ [ in-d>> ] [ out-d>> ] bi ] dip #call 1array ;
 
-M: quotation splicing-nodes
+M: callable splicing-nodes
     build-sub-tree analyze-recursive normalize ;
 
 : propagate-body ( #call -- )
@@ -85,6 +89,8 @@ DEFER: (flat-length)
 
 : word-flat-length ( word -- n )
     {
+        ! special-case
+        { [ dup { dip 2dip 3dip } memq? ] [ drop 1 ] }
         ! not inline
         { [ dup inline? not ] [ drop 1 ] }
         ! recursive and inline
@@ -118,17 +124,25 @@ DEFER: (flat-length)
         bi and
     ] contains? ;
 
+: node-count-bias ( -- n )
+    45 node-count get [-] 8 /i ;
+
+: body-length-bias ( word -- n )
+    [ flat-length ] [ inlining-count get at 0 or ] bi
+    over 2 <= [ drop ] [ 2/ 1+ * ] if 24 swap [-] 4 /i ;
+
 : inlining-rank ( #call word -- n )
     [ classes-known? 2 0 ? ]
     [
         {
-            [ drop node-count get 45 swap [-] 8 /i ]
-            [ flat-length 24 swap [-] 4 /i ]
+            [ body-length-bias ]
             [ "default" word-prop -4 0 ? ]
             [ "specializer" word-prop 1 0 ? ]
             [ method-body? 1 0 ? ]
         } cleave
-    ] bi* + + + + + ;
+        node-count-bias
+        loop-nesting get 0 or 2 *
+    ] bi* + + + + + + ;
 
 : should-inline? ( #call word -- ? )
     dup "inline" word-prop [ 2drop t ] [ inlining-rank 5 >= ] if ;
@@ -136,19 +150,22 @@ DEFER: (flat-length)
 SYMBOL: history
 
 : remember-inlining ( word -- )
-    history [ swap suffix ] change ;
+    [ [ 1 ] dip inlining-count get at+ ]
+    [ history [ swap suffix ] change ]
+    bi ;
 
-: inline-word ( #call word -- ? )
-    dup history get memq? [
-        2drop f
-    ] [
+: inline-word-def ( #call word quot -- ? )
+    over history get memq? [ 3drop f ] [
         [
-            dup remember-inlining
-            dupd def>> splicing-nodes >>body
+            swap remember-inlining
+            dupd splicing-nodes >>body
             propagate-body
         ] with-scope
         t
     ] if ;
+
+: inline-word ( #call word -- ? )
+    dup def>> inline-word-def ;
 
 : inline-method-body ( #call word -- ? )
     2dup should-inline? [ inline-word ] [ 2drop f ] if ;
@@ -163,7 +180,11 @@ SYMBOL: history
     [ dup 1array ] [ "custom-inlining" word-prop ] bi* with-datastack
     first object swap eliminate-dispatch ;
 
-: do-inlining ( #call word -- ? )
+: inline-instance-check ( #call word -- ? )
+    over in-d>> second value-info literal>> dup class?
+    [ "predicate" word-prop '[ drop @ ] inline-word-def ] [ 3drop f ] if ;
+
+: (do-inlining) ( #call word -- ? )
     #! If the generic was defined in an outer compilation unit,
     #! then it doesn't have a definition yet; the definition
     #! is built at the end of the compilation unit. We do not
@@ -174,10 +195,17 @@ SYMBOL: history
     #! discouraged, but it should still work.)
     {
         { [ dup deferred? ] [ 2drop f ] }
-        { [ dup custom-inlining? ] [ inline-custom ] }
+        { [ dup \ instance? eq? ] [ inline-instance-check ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
         { [ dup method-body? ] [ inline-method-body ] }
         [ 2drop f ]
     } cond ;
+
+: do-inlining ( #call word -- ? )
+    #! Note the logic here: if there's a custom inlining hook,
+    #! it is permitted to return f, which means that we try the
+    #! normal inlining heuristic.
+    dup custom-inlining? [ 2dup inline-custom ] [ f ] if
+    [ 2drop t ] [ (do-inlining) ] if ;

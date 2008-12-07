@@ -34,7 +34,7 @@ M: method-body (profile.)
 
 : counter. ( obj n -- )
     [
-        >r [ (profile.) ] with-cell r>
+        [ [ (profile.) ] with-cell ] dip
         [ number>string write ] with-cell
     ] with-row ;
 

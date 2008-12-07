@@ -20,21 +20,21 @@ M: win32-socket dispose ( stream -- )
     <win32-socket> |dispose dup add-completion ;
 
 : open-socket ( addrspec type -- win32-socket )
-    >r protocol-family r>
+    [ protocol-family ] dip
     0 f 0 WSASocket-flags WSASocket
     dup socket-error
     opened-socket ;
 
 M: object (get-local-address) ( socket addrspec -- sockaddr )
-    >r handle>> r> empty-sockaddr/size <int>
+    [ handle>> ] dip empty-sockaddr/size <int>
     [ getsockname socket-error ] 2keep drop ;
 
 M: object (get-remote-address) ( socket addrspec -- sockaddr )
-    >r handle>> r> empty-sockaddr/size <int>
+    [ handle>> ] dip empty-sockaddr/size <int>
     [ getpeername socket-error ] 2keep drop ;
 
 : bind-socket ( win32-socket sockaddr len -- )
-    >r >r handle>> r> r> bind socket-error ;
+    [ handle>> ] 2dip bind socket-error ;
 
 M: object ((client)) ( addrspec -- handle )
     [ SOCK_STREAM open-socket ] keep

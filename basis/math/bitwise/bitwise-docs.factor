@@ -204,8 +204,25 @@ HELP: on-bits
         "64 on-bits .h"
         "ffffffffffffffff"
     }
+} ;
+
+HELP: toggle-bit
+{ $values
+     { "m" integer }
+     { "n" integer }
+     { "m'" integer }
 }
-;
+{ $description "Toggles the nth bit of an integer." }
+{ $examples
+    { $example "USING: math.bitwise kernel prettyprint ;"
+        "0 3 toggle-bit .b"
+        "1000"
+    }
+    { $example "USING: math.bitwise kernel prettyprint ;"
+        "BIN: 1000 3 toggle-bit .b"
+        "0"
+    }
+} ;
 
 HELP: set-bit
 { $values

@@ -386,7 +386,7 @@ INLINE void* allot_object(CELL type, CELL a)
 	return object;
 }
 
-CELL collect_next(CELL scan);
+void collect_next_loop(CELL scan, CELL *end);
 
 void primitive_gc(void);
 void primitive_gc_stats(void);

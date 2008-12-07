@@ -6,7 +6,7 @@ math.bitwise byte-arrays alien combinators calendar
 io.encodings.binary accessors sequences strings system
 io.files.private destructors vocabs.loader calendar.unix
 unix.stat alien.c-types arrays unix.users unix.groups
-environment fry io.encodings.utf8 alien.strings unix.statfs
+environment fry io.encodings.utf8 alien.strings
 combinators.short-circuit ;
 IN: io.unix.files
 
@@ -76,14 +76,64 @@ M: unix copy-file ( from to -- )
     [ swap file-info permissions>> chmod io-error ]
     2bi ;
 
-HOOK: stat>file-info os ( stat -- file-info )
+TUPLE: unix-file-system-info < file-system-info
+block-size preferred-block-size
+blocks blocks-free blocks-available
+files files-free files-available
+name-max flags id ;
 
-HOOK: stat>type os ( stat -- file-info )
+HOOK: new-file-system-info os ( --  file-system-info )
 
-HOOK: new-file-info os ( -- class )
+M: unix new-file-system-info ( -- ) unix-file-system-info new ;
+
+HOOK: file-system-statfs os ( path -- statfs )
+
+M: unix file-system-statfs drop f ;
+
+HOOK: file-system-statvfs os ( path -- statvfs )
+
+M: unix file-system-statvfs drop f ;
+
+HOOK: statfs>file-system-info os ( file-system-info statfs -- file-system-info' )
+
+M: unix statfs>file-system-info drop ;
+
+HOOK: statvfs>file-system-info os ( file-system-info statvfs -- file-system-info' )
+
+M: unix statvfs>file-system-info drop ;
+
+: file-system-calculations ( file-system-info -- file-system-info' )
+    {
+        [ dup [ blocks-available>> ] [ block-size>> ] bi * >>available-space drop ]
+        [ dup [ blocks-free>> ] [ block-size>> ] bi * >>free-space drop ]
+        [ dup [ blocks>> ] [ block-size>> ] bi * >>total-space drop ]
+        [ dup [ total-space>> ] [ free-space>> ] bi - >>used-space drop ]
+        [ ]
+    } cleave ;
+
+M: unix file-system-info
+    normalize-path
+    [ new-file-system-info ] dip
+    [ file-system-statfs statfs>file-system-info ]
+    [ file-system-statvfs statvfs>file-system-info ] bi
+    file-system-calculations ;
+
+os {
+    { linux   [ "io.unix.files.linux"   require ] }
+    { macosx  [ "io.unix.files.macosx"  require ] }
+    { freebsd [ "io.unix.files.freebsd" require ] }
+    { netbsd  [ "io.unix.files.netbsd"  require ] }
+    { openbsd [ "io.unix.files.openbsd" require ] }
+} case
 
 TUPLE: unix-file-info < file-info uid gid dev ino
 nlink rdev blocks blocksize ;
+
+HOOK: new-file-info os ( -- file-info )
+
+HOOK: stat>file-info os ( stat -- file-info )
+
+HOOK: stat>type os ( stat -- file-info )
 
 M: unix file-info ( path -- info )
     normalize-path file-status stat>file-info ;
@@ -167,19 +217,23 @@ M: unix (directory-entries) ( path -- seq )
 
 : stat-mode ( path -- mode )
     normalize-path file-status stat-st_mode ;
-    
-: chmod-set-bit ( path mask ? -- ) 
-    [ dup stat-mode ] 2dip 
+
+: chmod-set-bit ( path mask ? -- )
+    [ dup stat-mode ] 2dip
     [ bitor ] [ unmask ] if chmod io-error ;
 
-: file-mode? ( path mask -- ? ) [ stat-mode ] dip mask? ;
+GENERIC# file-mode? 1 ( obj mask -- ? )
+
+M: integer file-mode? mask? ;
+M: string file-mode? [ stat-mode ] dip mask? ;
+M: file-info file-mode? [ permissions>> ] dip mask? ;
 
 PRIVATE>
 
 : ch>file-type ( ch -- type )
     {
         { CHAR: b [ +block-device+ ] }
-        { CHAR: c [ +character-device+ ] }   
+        { CHAR: c [ +character-device+ ] }
         { CHAR: d [ +directory+ ] }
         { CHAR: l [ +symbolic-link+ ] }
         { CHAR: s [ +socket+ ] }
@@ -205,29 +259,29 @@ PRIVATE>
 : STICKY        OCT: 0001000 ; inline
 : USER-ALL      OCT: 0000700 ; inline
 : USER-READ     OCT: 0000400 ; inline
-: USER-WRITE    OCT: 0000200 ; inline 
-: USER-EXECUTE  OCT: 0000100 ; inline   
+: USER-WRITE    OCT: 0000200 ; inline
+: USER-EXECUTE  OCT: 0000100 ; inline
 : GROUP-ALL     OCT: 0000070 ; inline
-: GROUP-READ    OCT: 0000040 ; inline 
-: GROUP-WRITE   OCT: 0000020 ; inline  
-: GROUP-EXECUTE OCT: 0000010 ; inline    
+: GROUP-READ    OCT: 0000040 ; inline
+: GROUP-WRITE   OCT: 0000020 ; inline
+: GROUP-EXECUTE OCT: 0000010 ; inline
 : OTHER-ALL     OCT: 0000007 ; inline
 : OTHER-READ    OCT: 0000004 ; inline
-: OTHER-WRITE   OCT: 0000002 ; inline  
-: OTHER-EXECUTE OCT: 0000001 ; inline    
+: OTHER-WRITE   OCT: 0000002 ; inline
+: OTHER-EXECUTE OCT: 0000001 ; inline
 
-GENERIC: uid? ( obj -- ? )
-GENERIC: gid? ( obj -- ? )
-GENERIC: sticky? ( obj -- ? )
-GENERIC: user-read? ( obj -- ? )
-GENERIC: user-write? ( obj -- ? )
-GENERIC: user-execute? ( obj -- ? )
-GENERIC: group-read? ( obj -- ? )
-GENERIC: group-write? ( obj -- ? )
-GENERIC: group-execute? ( obj -- ? )
-GENERIC: other-read? ( obj -- ? )
-GENERIC: other-write? ( obj -- ? )
-GENERIC: other-execute? ( obj -- ? )
+: uid? ( obj -- ? ) UID file-mode? ;
+: gid? ( obj -- ? ) GID file-mode? ;
+: sticky? ( obj -- ? ) STICKY file-mode? ;
+: user-read? ( obj -- ? ) USER-READ file-mode? ;
+: user-write? ( obj -- ? ) USER-WRITE file-mode? ;
+: user-execute? ( obj -- ? ) USER-EXECUTE file-mode? ;
+: group-read? ( obj -- ? ) GROUP-READ file-mode? ;
+: group-write? ( obj -- ? ) GROUP-WRITE file-mode? ;
+: group-execute? ( obj -- ? ) GROUP-EXECUTE file-mode? ;
+: other-read? ( obj -- ? ) OTHER-READ file-mode? ;
+: other-write? ( obj -- ? ) OTHER-WRITE file-mode? ;
+: other-execute? ( obj -- ? ) OTHER-EXECUTE file-mode? ;
 
 : any-read? ( obj -- ? )
     { [ user-read? ] [ group-read? ] [ other-read? ] } 1|| ;
@@ -238,56 +292,17 @@ GENERIC: other-execute? ( obj -- ? )
 : any-execute? ( obj -- ? )
     { [ user-execute? ] [ group-execute? ] [ other-execute? ] } 1|| ;
 
-M: integer uid? ( integer -- ? ) UID mask? ;
-M: integer gid? ( integer -- ? ) GID mask? ;
-M: integer sticky? ( integer -- ? ) STICKY mask? ;
-M: integer user-read? ( integer -- ? ) USER-READ mask? ;
-M: integer user-write? ( integer -- ? ) USER-WRITE mask? ;
-M: integer user-execute? ( integer -- ? ) USER-EXECUTE mask? ;
-M: integer group-read? ( integer -- ? ) GROUP-READ mask? ;
-M: integer group-write? ( integer -- ? ) GROUP-WRITE mask? ;
-M: integer group-execute? ( integer -- ? ) GROUP-EXECUTE mask? ;
-M: integer other-read? ( integer -- ? ) OTHER-READ mask? ;
-M: integer other-write? ( integer -- ? ) OTHER-WRITE mask? ; 
-M: integer other-execute? ( integer -- ? ) OTHER-EXECUTE mask? ;
-
-M: file-info uid? ( file-info -- ? ) permissions>> uid? ;
-M: file-info gid? ( file-info -- ? ) permissions>> gid? ;
-M: file-info sticky? ( file-info -- ? ) permissions>> sticky? ;
-M: file-info user-read? ( file-info -- ? ) permissions>> user-read? ;
-M: file-info user-write? ( file-info -- ? ) permissions>> user-write? ;
-M: file-info user-execute? ( file-info -- ? ) permissions>> user-execute? ;
-M: file-info group-read? ( file-info -- ? ) permissions>> group-read? ;
-M: file-info group-write? ( file-info -- ? ) permissions>> group-write? ;
-M: file-info group-execute? ( file-info -- ? ) permissions>> group-execute? ;
-M: file-info other-read? ( file-info -- ? ) permissions>> other-read? ;
-M: file-info other-write? ( file-info -- ? ) permissions>> other-write? ;
-M: file-info other-execute? ( file-info -- ? ) permissions>> other-execute? ;
-
-M: string uid? ( path -- ? ) UID file-mode? ;
-M: string gid? ( path -- ? ) GID file-mode? ;
-M: string sticky? ( path -- ? ) STICKY file-mode? ;
-M: string user-read? ( path -- ? ) USER-READ file-mode? ;
-M: string user-write? ( path -- ? ) USER-WRITE file-mode? ;
-M: string user-execute? ( path -- ? ) USER-EXECUTE file-mode? ;
-M: string group-read? ( path -- ? ) GROUP-READ file-mode? ;
-M: string group-write? ( path -- ? ) GROUP-WRITE file-mode? ;
-M: string group-execute? ( path -- ? ) GROUP-EXECUTE file-mode? ;
-M: string other-read? ( path -- ? ) OTHER-READ file-mode? ;
-M: string other-write? ( path -- ? ) OTHER-WRITE file-mode? ; 
-M: string other-execute? ( path -- ? ) OTHER-EXECUTE file-mode? ;
-
 : set-uid ( path ? -- ) UID swap chmod-set-bit ;
 : set-gid ( path ? -- ) GID swap chmod-set-bit ;
 : set-sticky ( path ? -- ) STICKY swap chmod-set-bit ;
 : set-user-read ( path ? -- ) USER-READ swap chmod-set-bit ;
-: set-user-write ( path ? -- ) USER-WRITE swap chmod-set-bit ; 
+: set-user-write ( path ? -- ) USER-WRITE swap chmod-set-bit ;
 : set-user-execute ( path ? -- ) USER-EXECUTE swap chmod-set-bit ;
 : set-group-read ( path ? -- ) GROUP-READ swap chmod-set-bit ;
-: set-group-write ( path ? -- ) GROUP-WRITE swap chmod-set-bit ; 
+: set-group-write ( path ? -- ) GROUP-WRITE swap chmod-set-bit ;
 : set-group-execute ( path ? -- ) GROUP-EXECUTE swap chmod-set-bit ;
 : set-other-read ( path ? -- ) OTHER-READ swap chmod-set-bit ;
-: set-other-write ( path ? -- ) OTHER-WRITE swap chmod-set-bit ; 
+: set-other-write ( path ? -- ) OTHER-WRITE swap chmod-set-bit ;
 : set-other-execute ( path ? -- ) OTHER-EXECUTE swap chmod-set-bit ;
 
 : set-file-permissions ( path n -- )
@@ -299,8 +314,7 @@ M: string other-execute? ( path -- ? ) OTHER-EXECUTE file-mode? ;
 <PRIVATE
 
 : make-timeval-array ( array -- byte-array )
-    [ length "timeval" <c-array> ] keep
-    dup length [ over [ pick set-timeval-nth ] [ 2drop ] if ] 2each ;
+    [ [ "timeval" <c-object> ] unless* ] map concat ;
 
 : timestamp>timeval ( timestamp -- timeval )
     unix-1970 time- duration>microseconds make-timeval ;
@@ -334,10 +348,10 @@ M: integer set-file-user ( path uid -- )
 
 M: string set-file-user ( path string -- )
     user-id f set-file-ids ;
-    
+
 M: integer set-file-group ( path gid -- )
     f swap set-file-ids ;
-    
+
 M: string set-file-group ( path string -- )
     group-id
     f swap set-file-ids ;

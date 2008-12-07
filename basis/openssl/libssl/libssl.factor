@@ -234,13 +234,13 @@ FUNCTION: void SSL_CTX_set_tmp_rsa_callback ( SSL_CTX* ctx, void* rsa ) ;
 FUNCTION: void* BIO_f_ssl (  ) ;
 
 : SSL_CTX_set_tmp_rsa ( ctx rsa -- n )
-    >r SSL_CTRL_SET_TMP_RSA 0 r> SSL_CTX_ctrl ;
+    [ SSL_CTRL_SET_TMP_RSA 0 ] dip SSL_CTX_ctrl ;
 
 : SSL_CTX_set_tmp_dh ( ctx dh -- n )
-    >r SSL_CTRL_SET_TMP_DH 0 r> SSL_CTX_ctrl ;
+    [ SSL_CTRL_SET_TMP_DH 0 ] dip SSL_CTX_ctrl ;
 
 : SSL_CTX_set_session_cache_mode ( ctx mode -- n )
-    >r SSL_CTRL_SET_SESS_CACHE_MODE r> f SSL_CTX_ctrl ;
+    [ SSL_CTRL_SET_SESS_CACHE_MODE ] dip f SSL_CTX_ctrl ;
 
 : SSL_SESS_CACHE_OFF                      HEX: 0000 ; inline
 : SSL_SESS_CACHE_CLIENT                   HEX: 0001 ; inline

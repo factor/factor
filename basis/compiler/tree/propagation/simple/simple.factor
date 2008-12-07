@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors kernel sequences sequences.private assocs words
 namespaces classes.algebra combinators classes classes.tuple
-classes.tuple.private continuations arrays
+classes.tuple.private continuations arrays alien.c-types
 math math.private slots generic definitions
 stack-checker.state
 compiler.tree
@@ -137,11 +137,12 @@ M: #call propagate-after
     dup word>> "input-classes" word-prop dup
     [ propagate-input-classes ] [ 2drop ] if ;
 
-M: #alien-invoke propagate-before
-    out-d>> [ object-info swap set-value-info ] each ;
+: propagate-alien-invoke ( node -- )
+    [ out-d>> ] [ params>> return>> ] bi
+    [ drop ] [ c-type-class <class-info> swap first set-value-info ] if-void ;
 
-M: #alien-indirect propagate-before
-    out-d>> [ object-info swap set-value-info ] each ;
+M: #alien-invoke propagate-before propagate-alien-invoke ;
 
-M: #return annotate-node
-    dup in-d>> (annotate-node) ;
+M: #alien-indirect propagate-before propagate-alien-invoke ;
+
+M: #return annotate-node dup in-d>> (annotate-node) ;

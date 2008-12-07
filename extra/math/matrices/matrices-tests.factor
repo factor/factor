@@ -102,3 +102,5 @@ USING: math.matrices math.vectors tools.test math ;
 [ { 0 0 -1 } ] [ { 1 0 0 } { 0 1 0 } cross ] unit-test
 [ { 1 0 0 } ] [ { 0 1 0 } { 0 0 1 } cross ] unit-test
 [ { 0 1 0 } ] [ { 0 0 1 } { 1 0 0 } cross ] unit-test
+
+[ { 1 0 0 } ] [ { 1 1 0 } { 1 0 0 } proj ] unit-test

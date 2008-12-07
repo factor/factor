@@ -142,16 +142,15 @@ PEG: parse-header-line ( string -- pair )
         'space' ,
         'attr' ,
         'space' ,
-            [ "=" token , 'space' , 'value' , ] seq* [ peek ] action
-            epsilon [ drop f ] action
-        2choice ,
+        [ "=" token , 'space' , 'value' , ] seq* [ peek ] action optional ,
         'space' ,
     ] seq* ;
 
 : 'av-pairs' ( -- parser )
     'av-pair' ";" token list-of optional ;
 
-PEG: (parse-set-cookie) ( string -- alist ) 'av-pairs' just ;
+PEG: (parse-set-cookie) ( string -- alist )
+    'av-pairs' just [ sift ] action ;
 
 : 'cookie-value' ( -- parser )
     [
@@ -162,7 +161,10 @@ PEG: (parse-set-cookie) ( string -- alist ) 'av-pairs' just ;
         'space' ,
         'value' ,
         'space' ,
-    ] seq* ;
+    ] seq*
+    [ ";,=" member? not ] satisfy repeat1 [ drop f ] action
+    2choice ;
 
 PEG: (parse-cookie) ( string -- alist )
-    'cookie-value' [ ";," member? ] satisfy list-of optional just ;
+    'cookie-value' [ ";," member? ] satisfy list-of
+    optional just [ sift ] action ;

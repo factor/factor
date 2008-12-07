@@ -139,18 +139,6 @@ CELL allot_array_1(CELL obj)
 	return tag_object(a);
 }
 
-CELL allot_array_2(CELL v1, CELL v2)
-{
-	REGISTER_ROOT(v1);
-	REGISTER_ROOT(v2);
-	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,2);
-	UNREGISTER_ROOT(v2);
-	UNREGISTER_ROOT(v1);
-	set_array_nth(a,0,v1);
-	set_array_nth(a,1,v2);
-	return tag_object(a);
-}
-
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 {
 	REGISTER_ROOT(v1);
@@ -169,27 +157,18 @@ CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 	return tag_object(a);
 }
 
-F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill)
+F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity)
 {
-	int i;
-	F_ARRAY* new_array;
-
 	CELL to_copy = array_capacity(array);
 	if(capacity < to_copy)
 		to_copy = capacity;
 
 	REGISTER_UNTAGGED(array);
-	REGISTER_ROOT(fill);
-
-	new_array = allot_array_internal(untag_header(array->header),capacity);
-
-	UNREGISTER_ROOT(fill);
+	F_ARRAY* new_array = allot_array_internal(untag_header(array->header),capacity);
 	UNREGISTER_UNTAGGED(array);
 
 	memcpy(new_array + 1,array + 1,to_copy * CELLS);
-
-	for(i = to_copy; i < capacity; i++)
-		put(AREF(new_array,i),fill);
+	memset((char *)AREF(new_array,to_copy),'\0',(capacity - to_copy) * CELLS);
 
 	return new_array;
 }
@@ -198,7 +177,7 @@ void primitive_resize_array(void)
 {
 	F_ARRAY* array = untag_array(dpop());
 	CELL capacity = unbox_array_size();
-	dpush(tag_object(reallot_array(array,capacity,F)));
+	dpush(tag_object(reallot_array(array,capacity)));
 }
 
 F_ARRAY *growable_array_add(F_ARRAY *result, CELL elt, CELL *result_count)
@@ -207,8 +186,7 @@ F_ARRAY *growable_array_add(F_ARRAY *result, CELL elt, CELL *result_count)
 
 	if(*result_count == array_capacity(result))
 	{
-		result = reallot_array(result,
-			*result_count * 2,F);
+		result = reallot_array(result,*result_count * 2);
 	}
 
 	UNREGISTER_ROOT(elt);
@@ -226,7 +204,7 @@ F_ARRAY *growable_array_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_coun
 	CELL new_size = *result_count + elts_size;
 
 	if(new_size >= array_capacity(result))
-		result = reallot_array(result,new_size * 2,F);
+		result = reallot_array(result,new_size * 2);
 
 	UNREGISTER_UNTAGGED(elts);
 
@@ -331,58 +309,71 @@ void primitive_tuple_boa(void)
 {
 	F_TUPLE_LAYOUT *layout = untag_object(dpop());
 	F_FIXNUM size = untag_fixnum_fast(layout->size);
-
-	REGISTER_UNTAGGED(layout);
 	F_TUPLE *tuple = allot_tuple(layout);
-	UNREGISTER_UNTAGGED(layout);
-
-	F_FIXNUM i;
-	for(i = size - 1; i >= 0; i--)
-		put(AREF(tuple,i),dpop());
-
+	memcpy(tuple + 1,(CELL *)(ds - CELLS * (size - 1)),CELLS * size);
+	ds -= CELLS * size;
 	dpush(tag_tuple(tuple));
 }
 
 /* Strings */
 CELL string_nth(F_STRING* string, CELL index)
 {
+	/* If high bit is set, the most significant 16 bits of the char
+	come from the aux vector. The least significant bit of the
+	corresponding aux vector entry is negated, so that we can
+	XOR the two components together and get the original code point
+	back. */
 	CELL ch = bget(SREF(string,index));
-	if(string->aux == F)
+	if((ch & 0x80) == 0)
 		return ch;
 	else
 	{
 		F_BYTE_ARRAY *aux = untag_object(string->aux);
-		return (cget(BREF(aux,index * sizeof(u16))) << 8) | ch;
+		return (cget(BREF(aux,index * sizeof(u16))) << 7) ^ ch;
 	}
 }
 
-/* allocates memory */
-void set_string_nth(F_STRING* string, CELL index, CELL value)
+void set_string_nth_fast(F_STRING* string, CELL index, CELL ch)
 {
-	bput(SREF(string,index),value & 0xff);
+	bput(SREF(string,index),ch);
+}
 
+void set_string_nth_slow(F_STRING* string, CELL index, CELL ch)
+{
 	F_BYTE_ARRAY *aux;
+
+	bput(SREF(string,index),(ch & 0x7f) | 0x80);
 
 	if(string->aux == F)
 	{
-		if(value <= 0xff)
-			return;
-		else
-		{
-			REGISTER_UNTAGGED(string);
-			aux = allot_byte_array(
-				untag_fixnum_fast(string->length)
-				* sizeof(u16));
-			UNREGISTER_UNTAGGED(string);
+		REGISTER_UNTAGGED(string);
+		/* We don't need to pre-initialize the
+		byte array with any data, since we
+		only ever read from the aux vector
+		if the most significant bit of a
+		character is set. Initially all of
+		the bits are clear. */
+		aux = allot_byte_array_internal(
+			untag_fixnum_fast(string->length)
+			* sizeof(u16));
+		UNREGISTER_UNTAGGED(string);
 
-			write_barrier((CELL)string);
-			string->aux = tag_object(aux);
-		}
+		write_barrier((CELL)string);
+		string->aux = tag_object(aux);
 	}
 	else
 		aux = untag_object(string->aux);
 
-	cput(BREF(aux,index * sizeof(u16)),value >> 8);
+	cput(BREF(aux,index * sizeof(u16)),(ch >> 7) ^ 1);
+}
+
+/* allocates memory */
+void set_string_nth(F_STRING* string, CELL index, CELL ch)
+{
+	if(ch <= 0x7f)
+		set_string_nth_fast(string,index,ch);
+	else
+		set_string_nth_slow(string,index,ch);
 }
 
 /* untagged */
@@ -400,17 +391,8 @@ F_STRING* allot_string_internal(CELL capacity)
 /* allocates memory */
 void fill_string(F_STRING *string, CELL start, CELL capacity, CELL fill)
 {
-	if(fill == 0)
-	{
-		memset((void *)SREF(string,start),'\0',capacity - start);
-
-		if(string->aux != F)
-		{
-			F_BYTE_ARRAY *aux = untag_object(string->aux);
-			memset((void *)BREF(aux,start * sizeof(u16)),'\0',
-				(capacity - start) * sizeof(u16));
-		}
-	}
+	if(fill <= 0x7f)
+		memset((void *)SREF(string,start),fill,capacity - start);
 	else
 	{
 		CELL i;
@@ -441,7 +423,7 @@ void primitive_string(void)
 	dpush(tag_object(allot_string(length,initial)));
 }
 
-F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)
+F_STRING* reallot_string(F_STRING* string, CELL capacity)
 {
 	CELL to_copy = string_capacity(string);
 	if(capacity < to_copy)
@@ -470,7 +452,7 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)
 
 	REGISTER_UNTAGGED(string);
 	REGISTER_UNTAGGED(new_string);
-	fill_string(new_string,to_copy,capacity,fill);
+	fill_string(new_string,to_copy,capacity,'\0');
 	UNREGISTER_UNTAGGED(new_string);
 	UNREGISTER_UNTAGGED(string);
 
@@ -481,7 +463,7 @@ void primitive_resize_string(void)
 {
 	F_STRING* string = untag_string(dpop());
 	CELL capacity = unbox_array_size();
-	dpush(tag_object(reallot_string(string,capacity,0)));
+	dpush(tag_object(reallot_string(string,capacity)));
 }
 
 /* Some ugly macros to prevent a 2x code duplication */
@@ -589,4 +571,20 @@ void primitive_set_string_nth(void)
 	CELL index = untag_fixnum_fast(dpop());
 	CELL value = untag_fixnum_fast(dpop());
 	set_string_nth(string,index,value);
+}
+
+void primitive_set_string_nth_fast(void)
+{
+	F_STRING *string = untag_object(dpop());
+	CELL index = untag_fixnum_fast(dpop());
+	CELL value = untag_fixnum_fast(dpop());
+	set_string_nth_fast(string,index,value);
+}
+
+void primitive_set_string_nth_slow(void)
+{
+	F_STRING *string = untag_object(dpop());
+	CELL index = untag_fixnum_fast(dpop());
+	CELL value = untag_fixnum_fast(dpop());
+	set_string_nth_slow(string,index,value);
 }

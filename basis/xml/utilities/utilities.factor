@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces sequences words io assocs
 quotations strings parser lexer arrays xml.data xml.writer debugger
-splitting vectors sequences.deep combinators ;
+splitting vectors sequences.deep combinators fry ;
 IN: xml.utilities
 
 ! * System for words specialized on tag names
@@ -16,30 +16,30 @@ M: process-missing error.
 
 : run-process ( tag word -- )
     2dup "xtable" word-prop
-    >r dup main>> r> at* [ 2nip call ] [
+    [ dup main>> ] dip at* [ 2nip call ] [
         drop \ process-missing boa throw
     ] if ;
 
 : PROCESS:
     CREATE
     dup H{ } clone "xtable" set-word-prop
-    dup [ run-process ] curry define ; parsing
+    dup '[ _ run-process ] define ; parsing
 
 : TAG:
     scan scan-word
     parse-definition
     swap "xtable" word-prop
-    rot "/" split [ >r 2dup r> swap set-at ] each 2drop ;
+    rot "/" split [ [ 2dup ] dip swap set-at ] each 2drop ;
     parsing
 
 
 ! * Common utility functions
 
 : build-tag* ( items name -- tag )
-    assure-name swap >r f r> <tag> ;
+    assure-name swap f swap <tag> ;
 
 : build-tag ( item name -- tag )
-    >r 1array r> build-tag* ;
+    [ 1array ] dip build-tag* ;
 
 : standard-prolog ( -- prolog )
     T{ prolog f "1.0" "UTF-8" f } ;
@@ -69,13 +69,13 @@ M: process-missing error.
     dup tag? [ names-match? ] [ 2drop f ] if ;
 
 : tags@ ( tag name -- children name )
-    >r { } like r> assure-name ;
+    [ { } like ] dip assure-name ;
 
 : deep-tag-named ( tag name/string -- matching-tag )
-    assure-name [ swap tag-named? ] curry deep-find ;
+    assure-name '[ _ swap tag-named? ] deep-find ;
 
 : deep-tags-named ( tag name/string -- tags-seq )
-    tags@ [ swap tag-named? ] curry deep-filter ;
+    tags@ '[ _ swap tag-named? ] deep-filter ;
 
 : tag-named ( tag name/string -- matching-tag )
     ! like get-name-tag but only looks at direct children,
@@ -89,22 +89,22 @@ M: process-missing error.
     rot dup tag? [ at = ] [ 3drop f ] if ;
 
 : tag-with-attr ( tag attr-value attr-name -- matching-tag )
-    assure-name [ tag-with-attr? ] 2curry find nip ;
+    assure-name '[ _ _ tag-with-attr? ] find nip ;
 
 : tags-with-attr ( tag attr-value attr-name -- tags-seq )
-    tags@ [ tag-with-attr? ] 2curry filter children>> ;
+    tags@ '[ _ _ tag-with-attr? ] filter children>> ;
 
 : deep-tag-with-attr ( tag attr-value attr-name -- matching-tag )
-    assure-name [ tag-with-attr? ] 2curry deep-find ;
+    assure-name '[ _ _ tag-with-attr? ] deep-find ;
 
 : deep-tags-with-attr ( tag attr-value attr-name -- tags-seq )
-    tags@ [ tag-with-attr? ] 2curry deep-filter ;
+    tags@ '[ _ _ tag-with-attr? ] deep-filter ;
 
 : get-id ( tag id -- elem ) ! elem=tag.getElementById(id)
     "id" deep-tag-with-attr ;
 
 : deep-tags-named-with-attr ( tag tag-name attr-value attr-name -- tags )
-    >r >r deep-tags-named r> r> tags-with-attr ;
+    [ deep-tags-named ] 2dip tags-with-attr ;
 
 : assert-tag ( name name -- )
     names-match? [ "Unexpected XML tag found" throw ] unless ;
@@ -114,4 +114,4 @@ M: process-missing error.
     [ swap V{ } like >>children drop ] if ;
 
 : insert-child ( child tag -- )
-    >r 1vector r> insert-children ;
+    [ 1vector ] dip insert-children ;

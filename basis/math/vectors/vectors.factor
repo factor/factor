@@ -24,6 +24,8 @@ IN: math.vectors
 : norm ( v -- x ) norm-sq sqrt ;
 : normalize ( u -- v ) dup norm v/n ;
 
+: distance ( u v -- x ) [ - absq ] [ + ] 2map-reduce sqrt ;
+
 : set-axis ( u v axis -- w )
     [ [ zero? 2over ? ] dip swap nth ] map-index 2nip ;
 
@@ -31,6 +33,7 @@ HINTS: vneg { array } ;
 HINTS: norm-sq { array } ;
 HINTS: norm { array } ;
 HINTS: normalize { array } ;
+HINTS: distance { array array } ;
 
 HINTS: n*v { object array } ;
 HINTS: v*n { array object } ;

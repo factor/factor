@@ -5,7 +5,8 @@ quotations sequences db.postgresql.ffi alien alien.c-types
 db.types tools.walker ascii splitting math.parser combinators
 libc shuffle calendar.format byte-arrays destructors prettyprint
 accessors strings serialize io.encodings.binary io.encodings.utf8
-alien.strings io.streams.byte-array summary present urls ;
+alien.strings io.streams.byte-array summary present urls
+specialized-arrays.uint specialized-arrays.alien ;
 IN: db.postgresql.lib
 
 : postgresql-result-error-message ( res -- str/f )
@@ -64,7 +65,7 @@ M: postgresql-result-null summary ( obj -- str )
     } case ;
 
 : param-types ( statement -- seq )
-    in-params>> [ type>> type>oid ] map >c-uint-array ;
+    in-params>> [ type>> type>oid ] uint-array{ } map-as underlying>> ;
 
 : malloc-byte-array/length ( byte-array -- alien length )
     [ malloc-byte-array &free ] [ length ] bi ;
@@ -75,7 +76,7 @@ M: postgresql-result-null summary ( obj -- str )
 : param-values ( statement -- seq seq2 )
     [ bind-params>> ] [ in-params>> ] bi
     [
-        >r value>> r> type>> {
+        [ value>> ] [ type>> ] bi* {
             { FACTOR-BLOB [
                 dup [ object>bytes malloc-byte-array/length ] [ 0 ] if
             ] }
@@ -90,15 +91,15 @@ M: postgresql-result-null summary ( obj -- str )
     ] 2map flip [
         f f
     ] [
-        first2 [ >c-void*-array ] [ >c-uint-array ] bi*
+        first2 [ >void*-array underlying>> ] [ >uint-array underlying>> ] bi*
     ] if-empty ;
 
 : param-formats ( statement -- seq )
-    in-params>> [ type>> type>param-format ] map >c-uint-array ;
+    in-params>> [ type>> type>param-format ] uint-array{ } map-as underlying>> ;
 
 : do-postgresql-bound-statement ( statement -- res )
     [
-        >r db get handle>> r>
+        [ db get handle>> ] dip
         {
             [ sql>> ]
             [ bind-params>> length ]
@@ -116,7 +117,7 @@ M: postgresql-result-null summary ( obj -- str )
 
 : pq-get-string ( handle row column -- obj )
     3dup PQgetvalue utf8 alien>string
-    dup empty? [ >r pq-get-is-null f r> ? ] [ 3nip ] if ;
+    dup empty? [ [ pq-get-is-null f ] dip ? ] [ 3nip ] if ;
 
 : pq-get-number ( handle row column -- obj )
     pq-get-string dup [ string>number ] when ;

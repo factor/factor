@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel opengl.gl alien.c-types continuations namespaces
 assocs alien alien.strings libc opengl math sequences combinators
-combinators.lib macros arrays io.encodings.ascii fry ;
+combinators.lib macros arrays io.encodings.ascii fry
+specialized-arrays.uint destructors accessors ;
 IN: opengl.shaders
 
 : with-gl-shader-source-ptr ( string quot -- )
@@ -44,9 +45,10 @@ IN: opengl.shaders
 
 : gl-shader-info-log ( shader -- log )
     dup gl-shader-info-log-length dup [
+        1 calloc &free
         [ 0 <int> swap glGetShaderInfoLog ] keep
         ascii alien>string
-    ] with-malloc ;
+    ] with-destructors ;
 
 : check-gl-shader ( shader -- shader )
     dup gl-shader-ok? [ dup gl-shader-info-log throw ] unless ;
@@ -79,9 +81,10 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 
 : gl-program-info-log ( program -- log )
     dup gl-program-info-log-length dup [
+        1 calloc &free
         [ 0 <int> swap glGetProgramInfoLog ] keep
         ascii alien>string
-    ] with-malloc ;
+    ] with-destructors ;
 
 : check-gl-program ( program -- program )
     dup gl-program-ok? [ dup gl-program-info-log throw ] unless ;
@@ -91,10 +94,9 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 
 : gl-program-shaders ( program -- shaders )
     dup gl-program-shaders-length
-    dup "GLuint" <c-array>
-    0 <int> swap
-    [ glGetAttachedShaders ] { 3 1 } multikeep
-    c-uint-array> ;
+    0 <int>
+    over <uint-array>
+    [ underlying>> glGetAttachedShaders ] keep ;
 
 : delete-gl-program-only ( program -- )
     glDeleteProgram ; inline

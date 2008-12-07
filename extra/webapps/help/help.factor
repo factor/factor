@@ -2,10 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors http.server.dispatchers
 http.server.static furnace.actions furnace.redirection urls
-validators locals io.files html.forms help.html ;
+validators locals io.files html.forms html.components help.html ;
 IN: webapps.help
 
 TUPLE: help-webapp < dispatcher ;
+
+M: result link-title title>> ;
+
+M: result link-href href>> ;
 
 :: <search-action> ( help-dir -- action )
     <page-action>

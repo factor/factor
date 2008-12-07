@@ -5,7 +5,7 @@
 ! http://cairographics.org/samples/
 USING: cairo cairo.ffi locals math.constants math
 io.backend kernel alien.c-types libc namespaces
-cairo.gadgets ui.gadgets accessors ;
+cairo.gadgets ui.gadgets accessors specialized-arrays.double ;
 
 IN: cairo.samples
 
@@ -69,7 +69,7 @@ M:: clip-image-gadget render-cairo* ( gadget -- )
 
 TUPLE: dash-gadget < cairo-gadget ;
 M:: dash-gadget render-cairo* ( gadget -- )
-    [let | dashes [ { 50 10 10 10 } >c-double-array ]
+    [let | dashes [ double-array{ 50 10 10 10 } underlying>> ]
            ndash [ 4 ] |
         cr dashes ndash -50 cairo_set_dash
         cr 10 cairo_set_line_width

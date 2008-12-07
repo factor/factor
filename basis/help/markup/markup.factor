@@ -97,7 +97,7 @@ ALIAS: $slot $snippet
     [
         snippet-style get [
             last-element off
-            >r ($code-style) r> with-nesting
+            [ ($code-style) ] dip with-nesting
         ] with-style
     ] ($block) ; inline
 
@@ -285,15 +285,16 @@ M: f ($instance)
 
 : $see ( element -- ) first [ see ] ($see) ;
 
-: $see-methods ( element -- ) first [ see-methods ] ($see) ;
-
 : $synopsis ( element -- ) first [ synopsis write ] ($see) ;
 
 : $definition ( element -- )
     "Definition" $heading $see ;
 
 : $methods ( element -- )
-    "Methods" $heading $see-methods ;
+    first methods [
+        "Methods" $heading
+        [ see-all ] ($see)
+    ] unless-empty ;
 
 : $value ( object -- )
     "Variable value" $heading

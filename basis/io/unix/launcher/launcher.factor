@@ -16,7 +16,7 @@ USE: unix
     command>> dup string? [ tokenize-command ] when ;
 
 : assoc>env ( assoc -- env )
-    [ "=" swap 3append ] { } assoc>map ;
+    [ "=" glue ] { } assoc>map ;
 
 : setup-priority ( process -- process )
     dup priority>> [
@@ -40,14 +40,13 @@ USE: unix
     3drop ;
 
 : redirect-file ( obj mode fd -- )
-    >r >r normalize-path r> file-mode
-    open-file r> redirect-fd ;
+    [ [ normalize-path ] dip file-mode open-file ] dip redirect-fd ;
 
 : redirect-file-append ( obj mode fd -- )
-    >r drop path>> normalize-path open-append r> redirect-fd ;
+    [ drop path>> normalize-path open-append ] dip redirect-fd ;
 
 : redirect-closed ( obj mode fd -- )
-    >r >r drop "/dev/null" r> r> redirect-file ;
+    [ drop "/dev/null" ] 2dip redirect-file ;
 
 : redirect ( obj mode fd -- )
     {
@@ -55,8 +54,8 @@ USE: unix
         { [ pick string? ] [ redirect-file ] }
         { [ pick appender? ] [ redirect-file-append ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
-        { [ pick fd? ] [ >r drop fd>> dup reset-fd r> redirect-fd ] }
-        [ >r >r underlying-handle r> r> redirect ]
+        { [ pick fd? ] [ [ drop fd>> dup reset-fd ] dip redirect-fd ] }
+        [ [ underlying-handle ] 2dip redirect ]
     } cond ;
 
 : ?closed ( obj -- obj' )

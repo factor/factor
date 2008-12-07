@@ -12,6 +12,7 @@ ARTICLE: "system" "System interface"
 { $subsection image }
 "Getting the current time:"
 { $subsection micros }
+{ $subsection millis }
 "Exiting the Factor VM:"
 { $subsection exit } ;
 
@@ -70,7 +71,7 @@ HELP: micros ( -- us )
 { $notes "This is a low-level word. The " { $vocab-link "calendar" } " vocabulary provides features for date/time arithmetic and formatting." } ;
 
 HELP: millis ( -- ms )
-{ $values { "us" integer } }
+{ $values { "ms" integer } }
 { $description "Outputs the number of milliseconds ellapsed since midnight January 1, 1970." }
 { $notes "This is a low-level word. The " { $vocab-link "calendar" } " vocabulary provides features for date/time arithmetic and formatting." } ;
 

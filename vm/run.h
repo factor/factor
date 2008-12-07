@@ -39,9 +39,9 @@ typedef enum {
 	JIT_PRIMITIVE,
 	JIT_WORD_JUMP,
 	JIT_WORD_CALL,
-	JIT_PUSH_LITERAL,
 	JIT_IF_WORD,
-	JIT_IF_JUMP,
+	JIT_IF_1,
+	JIT_IF_2,
 	JIT_DISPATCH_WORD,
 	JIT_DISPATCH,
 	JIT_EPILOG,
@@ -247,5 +247,6 @@ void primitive_set_os_envs(void);
 void primitive_micros(void);
 void primitive_sleep(void);
 void primitive_set_slot(void);
+void primitive_load_locals(void);
 
 bool stage2;

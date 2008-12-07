@@ -1,16 +1,17 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors hashtables kernel math state-tables vectors ;
+USING: accessors hashtables kernel math vectors ;
 IN: regexp.backend
 
 TUPLE: regexp
     raw
-    { stack vector }
-    parse-tree
     { options hashtable }
+    stack
+    parse-tree
     nfa-table
     dfa-table
     minimized-table
+    matchers
     { nfa-traversal-flags hashtable }
     { dfa-traversal-flags hashtable }
     { state integer }

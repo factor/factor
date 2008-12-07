@@ -14,6 +14,7 @@ USING: mason.release.branch mason.config tools.test namespaces ;
 
 [ { "scp" "boot.unix-x86.64.image" "joe@blah.com:/stuff/clean/netbsd-x86-64" } ] [
     [
+        "scp" scp-command set
         "joe" image-username set
         "blah.com" image-host set
         "/stuff/clean" image-directory set

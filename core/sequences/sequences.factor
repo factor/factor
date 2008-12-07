@@ -101,14 +101,17 @@ M: integer nth-unsafe drop ;
 
 INSTANCE: integer immutable-sequence
 
+: first-unsafe
+    0 swap nth-unsafe ; inline
+
 : first2-unsafe
-    [ 0 swap nth-unsafe 1 ] [ nth-unsafe ] bi ; inline
+    [ first-unsafe ] [ 1 swap nth-unsafe ] bi ; inline
 
 : first3-unsafe
-    [ first2-unsafe 2 ] [ nth-unsafe ] bi ; inline
+    [ first2-unsafe ] [ 2 swap nth-unsafe ] bi ; inline
 
 : first4-unsafe
-    [ first3-unsafe 3 ] [ nth-unsafe ] bi ; inline
+    [ first3-unsafe ] [ 3 swap nth-unsafe ] bi ; inline
 
 : exchange-unsafe ( m n seq -- )
     [ tuck [ nth-unsafe ] 2bi@ ]
@@ -313,6 +316,10 @@ PRIVATE>
 : prepend ( seq1 seq2 -- newseq ) swap append ; inline
 
 : 3append ( seq1 seq2 seq3 -- newseq ) pick 3append-as ;
+
+: surround ( seq1 seq2 seq3 -- newseq ) swapd 3append ; inline
+
+: glue ( seq1 seq2 seq3 -- newseq ) swap 3append ; inline
 
 : change-nth ( i seq quot -- )
     [ [ nth ] dip call ] 3keep drop set-nth ; inline
@@ -774,13 +781,13 @@ PRIVATE>
     tuck [ tail-slice ] 2bi@ ;
 
 : unclip ( seq -- rest first )
-    [ rest ] [ first ] bi ;
+    [ rest ] [ first-unsafe ] bi ;
 
 : unclip-last ( seq -- butlast last )
     [ but-last ] [ peek ] bi ;
 
 : unclip-slice ( seq -- rest-slice first )
-    [ rest-slice ] [ first ] bi ; inline
+    [ rest-slice ] [ first-unsafe ] bi ; inline
 
 : 2unclip-slice ( seq1 seq2 -- rest-slice1 rest-slice2 first1 first2 )
     [ unclip-slice ] bi@ swapd ; inline
@@ -828,12 +835,35 @@ PRIVATE>
 
 : supremum ( seq -- n ) dup first [ max ] reduce ;
 
-: flip ( matrix -- newmatrix )
-    dup empty? [
-        dup [ length ] map infimum
-        swap [ [ nth-unsafe ] with { } map-as ] curry { } map-as
-    ] unless ;
-
 : sigma ( seq quot -- n ) [ + ] compose 0 swap reduce ; inline
 
 : count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
+
+! We hand-optimize flip to such a degree because type hints
+! cannot express that an array is an array of arrays yet, and
+! this word happens to be performance-critical since the compiler
+! itself uses it. Optimizing it like this reduced compile time.
+<PRIVATE
+
+: generic-flip ( matrix -- newmatrix )
+    [ dup first length [ length min ] reduce ] keep
+    [ [ nth-unsafe ] with { } map-as ] curry { } map-as ; inline
+
+USE: arrays
+
+: array-length ( array -- len )
+    { array } declare length>> ;
+
+: array-flip ( matrix -- newmatrix )
+    [ dup first array-length [ array-length min ] reduce ] keep
+    [ [ array-nth ] with { } map-as ] curry { } map-as ;
+
+PRIVATE>
+
+: flip ( matrix -- newmatrix )
+    dup empty? [
+        dup array? [
+            dup [ array? ] all?
+            [ array-flip ] [ generic-flip ] if
+        ] [ generic-flip ] if
+    ] unless ;

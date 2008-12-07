@@ -154,9 +154,6 @@ forget-junk
 
 [ ] [ [ "vocabs.loader.test.e" forget-vocab ] with-compilation-unit ] unit-test
 
-[ "vocabs.loader.test.e" require ]
-[ relative-overflow? ] must-fail-with
-
 0 "vocabs.loader.test.g" set-global
 
 [

@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences layouts accessors combinators namespaces
 math fry
+compiler.cfg.hats
 compiler.cfg.instructions
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.simplify
@@ -63,7 +64,7 @@ M: ##compare-imm-branch rewrite-tagged-comparison
 
 M: ##compare-imm rewrite-tagged-comparison
     [ dst>> ] [ (rewrite-tagged-comparison) ] bi
-    f \ ##compare-imm boa ;
+    i f \ ##compare-imm boa ;
 
 M: ##compare-imm-branch rewrite
     dup rewrite-boolean-comparison? [ rewrite-boolean-comparison ] when
@@ -78,7 +79,7 @@ M: ##compare-imm-branch rewrite
     [ dst>> ]
     [ src2>> ]
     [ src1>> vreg>vn vn>constant ] tri
-    cc= f \ ##compare-imm boa ;
+    cc= f i \ ##compare-imm boa ;
 
 M: ##compare rewrite
     dup flip-comparison? [
@@ -95,9 +96,9 @@ M: ##compare rewrite
 
 : rewrite-redundant-comparison ( insn -- insn' )
     [ cc>> ] [ dst>> ] [ src1>> vreg>expr dup op>> ] tri {
-        { \ ##compare [ >compare-expr< f \ ##compare boa ] }
-        { \ ##compare-imm [ >compare-imm-expr< f \ ##compare-imm boa ] }
-        { \ ##compare-float [ >compare-expr< f \ ##compare-float boa ] }
+        { \ ##compare [ >compare-expr< i f \ ##compare boa ] }
+        { \ ##compare-imm [ >compare-imm-expr< i f \ ##compare-imm boa ] }
+        { \ ##compare-float [ >compare-expr< i f \ ##compare-float boa ] }
     } case
     swap cc= eq? [ [ negate-cc ] change-cc ] when ;
 

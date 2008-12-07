@@ -190,3 +190,11 @@ void primitive_set_slot(void)
 	CELL value = dpop();
 	set_slot(obj,slot,value);
 }
+
+void primitive_load_locals(void)
+{
+	F_FIXNUM count = untag_fixnum_fast(dpop());
+	memcpy((CELL *)(rs + CELLS),(CELL *)(ds - CELLS * (count - 1)),CELLS * count);
+	ds -= CELLS * count;
+	rs += CELLS * count;
+}

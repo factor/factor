@@ -95,7 +95,7 @@ M: random-id-generator eval-generator ( singleton -- obj )
         3drop
     ] [
         pick column-name>> 0%
-        >r first2 r> interval-comparison 0%
+        [ first2 ] dip interval-comparison 0%
         bind#
     ] if ;
 
@@ -162,22 +162,19 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         where-clause
     ] query-make ;
 
-: splice ( string1 string2 string3 -- string )
-    swap 3append ;
-
 : do-group ( tuple groups -- )
     dup string? [ 1array ] when
-    [ ", " join " group by " splice ] curry change-sql drop ;
+    [ ", " join " group by " glue ] curry change-sql drop ;
 
 : do-order ( tuple order -- )
     dup string? [ 1array ] when
-    [ ", " join " order by " splice ] curry change-sql drop ;
+    [ ", " join " order by " glue ] curry change-sql drop ;
 
 : do-offset ( tuple n -- )
-    [ number>string " offset " splice ] curry change-sql drop ;
+    [ number>string " offset " glue ] curry change-sql drop ;
 
 : do-limit ( tuple n -- )
-    [ number>string " limit " splice ] curry change-sql drop ;
+    [ number>string " limit " glue ] curry change-sql drop ;
 
 : make-query* ( tuple query -- tuple' )
     dupd
@@ -201,7 +198,7 @@ M: db <count-statement> ( query -- statement )
 
 : create-index ( index-name table-name columns -- )
     [
-        >r >r "create index " % % r> " on " % % r> "(" %
+        [ [ "create index " % % ] dip " on " % % ] dip "(" %
         "," join % ")" %
     ] "" make sql-command ;
 

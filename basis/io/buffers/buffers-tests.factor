@@ -5,7 +5,7 @@ destructors ;
 
 : buffer-set ( string buffer -- )
     over >byte-array over ptr>> byte-array>memory
-    >r length r> buffer-reset ;
+    [ length ] dip buffer-reset ;
 
 : string>buffer ( string -- buffer )
     dup length <buffer> tuck buffer-set ;

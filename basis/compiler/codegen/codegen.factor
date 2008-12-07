@@ -131,6 +131,14 @@ M: ##string-nth generate-insn
         [ temp>> register ]
     } cleave %string-nth ;
 
+M: ##set-string-nth-fast generate-insn
+    {
+        [ src>> register ]
+        [ obj>> register ]
+        [ index>> register ]
+        [ temp>> register ]
+    } cleave %set-string-nth-fast ;
+
 : dst/src ( insn -- dst src )
     [ dst>> register ] [ src>> register ] bi ; inline
 
@@ -155,6 +163,20 @@ M: ##shl-imm generate-insn dst/src1/src2 %shl-imm ;
 M: ##shr-imm generate-insn dst/src1/src2 %shr-imm ;
 M: ##sar-imm generate-insn dst/src1/src2 %sar-imm ;
 M: ##not     generate-insn dst/src       %not     ;
+M: ##log2    generate-insn dst/src       %log2    ;
+
+: src1/src2 ( insn -- src1 src2 )
+    [ src1>> register ] [ src2>> register ] bi ; inline
+
+: src1/src2/temp1/temp2 ( insn -- src1 src2 temp1 temp2 )
+    [ src1/src2 ] [ temp1>> register ] [ temp2>> register ] tri ; inline
+
+M: ##fixnum-add generate-insn src1/src2 %fixnum-add ;
+M: ##fixnum-add-tail generate-insn src1/src2 %fixnum-add-tail ;
+M: ##fixnum-sub generate-insn src1/src2 %fixnum-sub ;
+M: ##fixnum-sub-tail generate-insn src1/src2 %fixnum-sub-tail ;
+M: ##fixnum-mul generate-insn src1/src2/temp1/temp2 %fixnum-mul ;
+M: ##fixnum-mul-tail generate-insn src1/src2/temp1/temp2 %fixnum-mul-tail ;
 
 : dst/src/temp ( insn -- dst src temp )
     [ dst/src ] [ temp>> register ] bi ; inline
@@ -215,6 +237,10 @@ M: _gc generate-insn drop %gc ;
 
 M: ##loop-entry generate-insn drop %loop-entry ;
 
+M: ##alien-global generate-insn
+    [ dst>> register ] [ symbol>> ] [ library>> ] tri
+    %alien-global ;
+
 ! ##alien-invoke
 GENERIC: reg-size ( register-class -- n )
 
@@ -264,7 +290,7 @@ M: object reg-class-full?
 
 : spill-param ( reg-class -- n reg-class )
     stack-params get
-    >r reg-size cell align stack-params +@ r>
+    [ reg-size cell align stack-params +@ ] dip
     stack-params ;
 
 : fastcall-param ( reg-class -- n reg-class )
@@ -300,10 +326,10 @@ M: long-long-type flatten-value-type ( type -- types )
     ] { } make ;
 
 : each-parameter ( parameters quot -- )
-    >r [ parameter-sizes nip ] keep r> 2each ; inline
+    [ [ parameter-sizes nip ] keep ] dip 2each ; inline
 
 : reverse-each-parameter ( parameters quot -- )
-    >r [ parameter-sizes nip ] keep r> 2reverse-each ; inline
+    [ [ parameter-sizes nip ] keep ] dip 2reverse-each ; inline
 
 : reset-freg-counts ( -- )
     { int-regs float-regs stack-params } [ 0 swap set ] each ;
@@ -316,15 +342,13 @@ M: long-long-type flatten-value-type ( type -- types )
     #! Moves values from C stack to registers (if word is
     #! %load-param-reg) and registers to C stack (if word is
     #! %save-param-reg).
-    >r
-    alien-parameters
-    flatten-value-types
-    r> '[ alloc-parameter _ execute ] each-parameter ;
-    inline
+    [ alien-parameters flatten-value-types ]
+    [ '[ alloc-parameter _ execute ] ]
+    bi* each-parameter ; inline
 
 : unbox-parameters ( offset node -- )
     parameters>> [
-        %prepare-unbox >r over + r> unbox-parameter
+        %prepare-unbox [ over + ] dip unbox-parameter
     ] reverse-each-parameter drop ;
 
 : prepare-box-struct ( node -- offset )
@@ -432,7 +456,7 @@ M: ##alien-indirect generate-insn
 
 TUPLE: callback-context ;
 
-: current-callback 2 getenv ;
+: current-callback ( -- id ) 2 getenv ;
 
 : wait-to-return ( token -- )
     dup current-callback eq? [
@@ -491,9 +515,10 @@ M: _label generate-insn
 M: _branch generate-insn
     label>> lookup-label %jump-label ;
 
-: >compare< ( insn -- label cc src1 src2 )
+: >compare< ( insn -- dst temp cc src1 src2 )
     {
         [ dst>> register ]
+        [ temp>> register ]
         [ cc>> ]
         [ src1>> register ]
         [ src2>> ?register ]

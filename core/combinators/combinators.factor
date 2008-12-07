@@ -45,7 +45,7 @@ ERROR: no-cond ;
     [ rot \ if 3array append [ ] like ] assoc-each ;
 
 : cond>quot ( assoc -- quot )
-    [ dup callable? [ [ t ] swap 2array ] when ] map
+    [ dup pair? [ [ t ] swap 2array ] unless ] map
     reverse [ no-cond ] swap alist>quot ;
 
 ! case
@@ -133,22 +133,6 @@ ERROR: no-case ;
         { [ dup [ wrapper? ] all? ] [ drop [ [ wrapped>> ] dip ] assoc-map hash-case-quot ] }
         [ drop linear-case-quot ]
     } cond ;
-
-! assert-depth
-: trim-datastacks ( seq1 seq2 -- seq1' seq2' )
-    2dup [ length ] bi@ min tuck [ tail ] 2bi@ ;
-
-ERROR: relative-underflow stack ;
-
-ERROR: relative-overflow stack ;
-
-: assert-depth ( quot -- )
-    [ datastack ] dip dip [ datastack ] dip
-    2dup [ length ] compare {
-        { +lt+ [ trim-datastacks nip relative-underflow ] }
-        { +eq+ [ 2drop ] }
-        { +gt+ [ trim-datastacks drop relative-overflow ] }
-    } case ; inline
 
 ! recursive-hashcode
 : recursive-hashcode ( n obj quot -- code )

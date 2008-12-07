@@ -66,11 +66,11 @@ ARTICLE: "io.servers.connection" "Threaded servers"
 "Stopping the server:"
 { $subsection stop-server }
 "From within the dynamic scope of a client handler, several words can be used to interact with the threaded server:"
-{ $subsection remote-address }
 { $subsection stop-this-server }
 { $subsection secure-port }
 { $subsection insecure-port }
-"Additionally, the " { $link local-address } " variable is set, as in " { $link with-client } "." ;
+"Additionally, the " { $link local-address } " and "
+{ $subsection remote-address } " variables are set, as in " { $link with-client } "." ;
 
 ABOUT: "io.servers.connection"
 

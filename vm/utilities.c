@@ -44,7 +44,7 @@ void print_cell_hex_pad(CELL x)
 
 void print_fixnum(F_FIXNUM x)
 {
-	printf(CELL_FORMAT,x);
+	printf(FIXNUM_FORMAT,x);
 }
 
 CELL read_cell_hex(void)

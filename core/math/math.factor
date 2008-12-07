@@ -53,7 +53,7 @@ PRIVATE>
         "log2 expects positive inputs" throw
     ] [
         (log2)
-    ] if ; foldable
+    ] if ; inline
 
 : zero? ( x -- ? ) 0 number= ; inline
 : 1+ ( x -- y ) 1 + ; inline
@@ -103,14 +103,9 @@ M: float fp-infinity? ( float -- ? )
         drop f
     ] if ;
 
-: (next-power-of-2) ( i n -- n )
-    2dup >= [
-        drop
-    ] [
-        [ 1 shift ] dip (next-power-of-2)
-    ] if ;
+GENERIC: next-power-of-2 ( m -- n ) foldable
 
-: next-power-of-2 ( m -- n ) 2 swap (next-power-of-2) ; foldable
+M: real next-power-of-2 1+ >integer next-power-of-2 ;
 
 : power-of-2? ( n -- ? )
     dup 0 <= [ drop f ] [ dup 1- bitand zero? ] if ; foldable

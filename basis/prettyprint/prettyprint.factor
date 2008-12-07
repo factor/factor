@@ -129,7 +129,7 @@ SYMBOL: ->
 : remove-breakpoints ( quot pos -- quot' )
     over quotation? [
         1+ cut [ (remove-breakpoints) ] bi@
-        [ -> ] swap 3append
+        [ -> ] glue 
     ] [
         drop
     ] if ;
@@ -370,9 +370,12 @@ M: word see
 : (see-methods) ( generic -- seq )
     "methods" word-prop values natural-sort ;
 
-: see-methods ( word -- )
+: methods ( word -- seq )
     [
         dup class? [ dup (see-implementors) % ] when
         dup generic? [ dup (see-methods) % ] when
         drop
-    ] { } make prune see-all ;
+    ] { } make prune ;
+
+: see-methods ( word -- )
+    methods see-all ;

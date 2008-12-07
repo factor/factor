@@ -6,9 +6,9 @@ listener debugger threads boxes concurrency.flags math arrays
 generic accessors combinators assocs fry ui.commands ui.gadgets
 ui.gadgets.editors ui.gadgets.labelled ui.gadgets.panes
 ui.gadgets.buttons ui.gadgets.scrollers ui.gadgets.packs
-ui.gadgets.tracks ui.gadgets.borders ui.gestures ui.operations
-ui.tools.browser ui.tools.interactor ui.tools.inspector
-ui.tools.workspace ;
+ui.gadgets.tracks ui.gadgets.borders ui.gadgets.frames
+ui.gadgets.grids ui.gestures ui.operations ui.tools.browser
+ui.tools.interactor ui.tools.inspector ui.tools.workspace ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget < track input output ;
@@ -28,7 +28,7 @@ M: listener-gadget focusable-child*
     input>> ;
 
 M: listener-gadget call-tool* ( input listener -- )
-    >r string>> r> input>> set-editor-string ;
+    [ string>> ] dip input>> set-editor-string ;
 
 M: listener-gadget tool-scroller
     output>> find-scroller ;
@@ -95,13 +95,13 @@ M: engine-word word-completion-string
 : use-if-necessary ( word seq -- )
     over vocabulary>> over and [
         2dup [ assoc-stack ] keep = [ 2drop ] [
-            >r vocabulary>> vocab-words r> push
+            [ vocabulary>> vocab-words ] dip push
         ] if
     ] [ 2drop ] if ;
 
 : insert-word ( word -- )
     get-workspace listener>> input>>
-    [ >r word-completion-string r> user-input* drop ]
+    [ [ word-completion-string ] dip user-input* drop ]
     [ interactor-use use-if-necessary ]
     2bi ;
 
@@ -153,9 +153,9 @@ M: engine-word word-completion-string
     dup <listener-input> >>input ;
 
 : <listener-scroller> ( listener -- scroller )
-    <filled-pile>
-        over output>> add-gadget
-        swap input>> add-gadget
+    <frame>
+        over output>> @top grid-add
+        swap input>> @center grid-add
     <scroller> ;
 
 : <listener-gadget> ( -- gadget )

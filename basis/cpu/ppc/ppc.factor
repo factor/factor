@@ -34,10 +34,11 @@ M: ppc two-operand? f ;
 
 M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
-M:: ppc %load-indirect ( reg obj -- )
-    0 reg LOAD32
-    obj rc-absolute-ppc-2/2 rel-literal
-    reg reg 0 LWZ ;
+M: ppc %load-indirect ( reg obj -- )
+    [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-immediate ] bi* ;
+
+M: ppc %alien-global ( register symbol dll -- )
+    [ 0 swap LOAD32 ] 2dip rc-absolute-ppc-2/2 rel-dlsym ;
 
 : ds-reg 29 ; inline
 : rs-reg 30 ; inline
@@ -138,16 +139,20 @@ M:: ppc %string-nth ( dst src index temp -- )
         "end" define-label
         temp src index ADD
         dst temp string-offset LBZ
+        0 dst HEX: 80 CMPI
+        "end" get BLT
         temp src string-aux-offset LWZ
-        0 temp \ f tag-number CMPI
-        "end" get BEQ
         temp temp index ADD
         temp temp index ADD
         temp temp byte-array-offset LHZ
-        temp temp 8 SLWI
-        dst dst temp OR
+        temp temp 7 SLWI
+        dst dst temp XOR
         "end" resolve-label
     ] with-scope ;
+
+M:: ppc %set-string-nth-fast ( ch obj index temp -- )
+    temp obj index ADD
+    ch temp string-offset STB ;
 
 M: ppc %add     ADD ;
 M: ppc %add-imm ADDI ;
@@ -165,6 +170,91 @@ M: ppc %shl-imm swapd SLWI ;
 M: ppc %shr-imm swapd SRWI ;
 M: ppc %sar-imm SRAWI ;
 M: ppc %not     NOT ;
+
+: %alien-invoke-tail ( func dll -- )
+    [ scratch-reg ] 2dip %alien-global scratch-reg MTCTR BCTR ;
+
+:: exchange-regs ( r1 r2 -- )
+    scratch-reg r1 MR
+    r1 r2 MR
+    r2 scratch-reg MR ;
+
+: ?MR ( r1 r2 -- ) 2dup = [ 2drop ] [ MR ] if ;
+
+:: move>args ( src1 src2 -- )
+    {
+        { [ src1 4 = ] [ 3 src2 ?MR 3 4 exchange-regs ] }
+        { [ src1 3 = ] [ 4 src2 ?MR ] }
+        { [ src2 3 = ] [ 4 src1 ?MR 3 4 exchange-regs ] }
+        { [ src2 4 = ] [ 3 src1 ?MR ] }
+        [ 3 src1 MR 4 src2 MR ]
+    } cond ;
+
+: clear-xer ( -- )
+    0 0 LI
+    0 MTXER ; inline
+
+:: overflow-template ( src1 src2 insn func -- )
+    "no-overflow" define-label
+    clear-xer
+    scratch-reg src2 src1 insn call
+    scratch-reg ds-reg 0 STW
+    "no-overflow" get BNO
+    src1 src2 move>args
+    %prepare-alien-invoke
+    func f %alien-invoke
+    "no-overflow" resolve-label ; inline
+
+:: overflow-template-tail ( src1 src2 insn func -- )
+    "overflow" define-label
+    clear-xer
+    scratch-reg src2 src1 insn call
+    "overflow" get BO
+    scratch-reg ds-reg 0 STW
+    BLR
+    "overflow" resolve-label
+    src1 src2 move>args
+    %prepare-alien-invoke
+    func f %alien-invoke-tail ; inline
+
+M: ppc %fixnum-add ( src1 src2 -- )
+    [ ADDO. ] "overflow_fixnum_add" overflow-template ;
+
+M: ppc %fixnum-add-tail ( src1 src2 -- )
+    [ ADDO. ] "overflow_fixnum_add" overflow-template-tail ;
+
+M: ppc %fixnum-sub ( src1 src2 -- )
+    [ SUBFO. ] "overflow_fixnum_subtract" overflow-template ;
+
+M: ppc %fixnum-sub-tail ( src1 src2 -- )
+    [ SUBFO. ] "overflow_fixnum_subtract" overflow-template-tail ;
+
+M:: ppc %fixnum-mul ( src1 src2 temp1 temp2 -- )
+    "no-overflow" define-label
+    clear-xer
+    temp1 src1 tag-bits get SRAWI
+    temp2 temp1 src2 MULLWO.
+    temp2 ds-reg 0 STW
+    "no-overflow" get BNO
+    src2 src2 tag-bits get SRAWI
+    temp1 src2 move>args
+    %prepare-alien-invoke
+    "overflow_fixnum_multiply" f %alien-invoke
+    "no-overflow" resolve-label ;
+
+M:: ppc %fixnum-mul-tail ( src1 src2 temp1 temp2 -- )
+    "overflow" define-label
+    clear-xer
+    temp1 src1 tag-bits get SRAWI
+    temp2 temp1 src2 MULLWO.
+    "overflow" get BO
+    temp2 ds-reg 0 STW
+    BLR
+    "overflow" resolve-label
+    src2 src2 tag-bits get SRAWI
+    temp1 src2 move>args
+    %prepare-alien-invoke
+    "overflow_fixnum_multiply" f %alien-invoke-tail ;
 
 : bignum@ ( n -- offset ) cells bignum tag-number - ; inline
 
@@ -320,11 +410,8 @@ M: ppc %set-alien-cell swap 0 STW ;
 M: ppc %set-alien-float swap 0 STFS ;
 M: ppc %set-alien-double swap 0 STFD ;
 
-: %load-dlsym ( symbol dll register -- )
-    0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
-
 : load-zone-ptr ( reg -- )
-    [ "nursery" f ] dip %load-dlsym ;
+    "nursery" f %alien-global ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop load-zone-ptr ] [ swap 4 LWZ ] 2bi ;
@@ -346,14 +433,11 @@ M:: ppc %allot ( dst size class nursery-ptr -- )
     dst class store-header
     dst class store-tagged ;
 
-: %alien-global ( dst name -- )
-    [ f rot %load-dlsym ] [ drop dup 0 LWZ ] 2bi ;
-
 : load-cards-offset ( dst -- )
-    "cards_offset" %alien-global ;
+    [ "cards_offset" f %alien-global ] [ dup 0 LWZ ] bi ;
 
 : load-decks-offset ( dst -- )
-    "decks_offset" %alien-global ;
+    [ "decks_offset" f %alien-global ] [ dup 0 LWZ ] bi  ;
 
 M:: ppc %write-barrier ( src card# table -- )
     card-mark scratch-reg LI
@@ -398,14 +482,14 @@ M: ppc %epilogue ( n -- )
     1 1 rot ADDI
     0 MTLR ;
 
-:: (%boolean) ( dst word -- )
+:: (%boolean) ( dst temp word -- )
     "end" define-label
     dst \ f tag-number %load-immediate
     "end" get word execute
     dst \ t %load-indirect
     "end" get resolve-label ; inline
 
-: %boolean ( dst cc -- )
+: %boolean ( dst temp cc -- )
     negate-cc {
         { cc< [ \ BLT (%boolean) ] }
         { cc<= [ \ BLE (%boolean) ] }
@@ -540,14 +624,14 @@ M: ppc %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    "stack_chain" f 11 %load-dlsym
-    11 11 0 LWZ
-    1 11 0 STW
-    ds-reg 11 8 STW
-    rs-reg 11 12 STW ;
+    scratch-reg "stack_chain" f %alien-global
+    scratch-reg scratch-reg 0 LWZ
+    1 scratch-reg 0 STW
+    ds-reg scratch-reg 8 STW
+    rs-reg scratch-reg 12 STW ;
 
 M: ppc %alien-invoke ( symbol dll -- )
-    11 %load-dlsym 11 MTLR BLRL ;
+    [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
 
 M: ppc %alien-callback ( quot -- )
     3 swap %load-indirect "c_to_factor" f %alien-invoke ;

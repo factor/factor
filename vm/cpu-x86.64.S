@@ -9,6 +9,10 @@
 
 #define NV_TEMP_REG %rbp
 
+#define ARITH_TEMP_1 %r8
+#define ARITH_TEMP_2 %r9
+#define DIV_RESULT %rax
+
 #ifdef WINDOWS
 
 	#define ARG0 %rcx

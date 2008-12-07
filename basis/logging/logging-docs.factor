@@ -117,7 +117,6 @@ ARTICLE: "logging" "Logging framework"
 { $subsection "logging.rotation" }
 { $subsection "logging.parser" }
 { $subsection "logging.analysis" }
-{ $subsection "logging.insomniac" }
 { $subsection "logging.server" } ;
 
 ABOUT: "logging"

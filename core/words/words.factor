@@ -221,7 +221,7 @@ M: word subwords drop f ;
     "( gensym )" f <word> ;
 
 : define-temp ( quot -- word )
-    gensym dup rot define ;
+    [ gensym dup ] dip define ;
 
 : reveal ( word -- )
     dup [ name>> ] [ vocabulary>> ] bi dup vocab-words
@@ -242,6 +242,8 @@ ERROR: bad-create name vocab ;
     [ "<" swap ">" 3append ] dip create ;
 
 PREDICATE: parsing-word < word "parsing" word-prop ;
+
+: make-parsing ( word -- ) t "parsing" set-word-prop ;
 
 : delimiter? ( obj -- ? )
     dup word? [ "delimiter" word-prop ] [ drop f ] if ;

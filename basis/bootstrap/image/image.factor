@@ -72,7 +72,7 @@ SYMBOL: objects
 : put-object ( n obj -- ) (objects) set-at ;
 
 : cache-object ( obj quot -- value )
-    >r (objects) r> [ obj>> ] prepose cache ; inline
+    [ (objects) ] dip [ obj>> ] prepose cache ; inline
 
 ! Constants
 
@@ -97,10 +97,10 @@ SYMBOL: sub-primitives
     { [ { } make ] [ ] [ ] [ ] } spread 4array ; inline
 
 : jit-define ( quot rc rt offset name -- )
-    >r make-jit r> set ; inline
+    [ make-jit ] dip set ; inline
 
 : define-sub-primitive ( quot rc rt offset word -- )
-    >r make-jit r> sub-primitives get set-at ;
+    [ make-jit ] dip sub-primitives get set-at ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -124,10 +124,10 @@ SYMBOL: jit-primitive-word
 SYMBOL: jit-primitive
 SYMBOL: jit-word-jump
 SYMBOL: jit-word-call
-SYMBOL: jit-push-literal
 SYMBOL: jit-push-immediate
 SYMBOL: jit-if-word
-SYMBOL: jit-if-jump
+SYMBOL: jit-if-1
+SYMBOL: jit-if-2
 SYMBOL: jit-dispatch-word
 SYMBOL: jit-dispatch
 SYMBOL: jit-dip-word
@@ -155,9 +155,9 @@ SYMBOL: undefined-quot
         { jit-primitive 25 }
         { jit-word-jump 26 }
         { jit-word-call 27 }
-        { jit-push-literal 28 }
-        { jit-if-word 29 }
-        { jit-if-jump 30 }
+        { jit-if-word 28 }
+        { jit-if-1 29 }
+        { jit-if-2 30 }
         { jit-dispatch-word 31 }
         { jit-dispatch 32 }
         { jit-epilog 33 }
@@ -205,7 +205,7 @@ SYMBOL: undefined-quot
 : emit-fixnum ( n -- ) tag-fixnum emit ;
 
 : emit-object ( header tag quot -- addr )
-    swap here-as >r swap tag-fixnum emit call align-here r> ;
+    swap here-as [ swap tag-fixnum emit call align-here ] dip ;
     inline
 
 ! Write an object to the image.
@@ -351,7 +351,12 @@ M: wrapper '
 : pad-bytes ( seq -- newseq )
     dup length bootstrap-cell align 0 pad-right ;
 
+: check-string ( string -- )
+    [ 127 > ] contains?
+    [ "Bootstrap cannot emit non-ASCII strings" throw ] when ;
+
 : emit-string ( string -- ptr )
+    dup check-string
     string type-number object tag-number [
         dup length emit-fixnum
         f ' emit
@@ -469,10 +474,10 @@ M: quotation '
         jit-primitive
         jit-word-jump
         jit-word-call
-        jit-push-literal
         jit-push-immediate
         jit-if-word
-        jit-if-jump
+        jit-if-1
+        jit-if-2
         jit-dispatch-word
         jit-dispatch
         jit-dip-word

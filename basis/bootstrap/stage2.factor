@@ -32,8 +32,8 @@ SYMBOL: bootstrap-time
 : count-words ( pred -- )
     all-words swap count number>string write ;
 
-: print-time ( us -- )
-    1000000 /i
+: print-time ( ms -- )
+    1000 /i
     60 /mod swap
     number>string write
     " minutes and " write number>string write " seconds." print ;
@@ -52,16 +52,16 @@ SYMBOL: bootstrap-time
 
 [
     ! We time bootstrap
-    micros
+    millis
 
     default-image-name "output-image" set-global
 
     "math compiler threads help io tools ui ui.tools unicode handbook" "include" set-global
     "" "exclude" set-global
 
-    parse-command-line
+    (command-line) parse-command-line
 
-    "-no-crossref" cli-args member? [ do-crossref ] unless
+    do-crossref
 
     ! Set dll paths
     os wince? [ "windows.ce" require ] when
@@ -77,7 +77,7 @@ SYMBOL: bootstrap-time
     [
         load-components
 
-        micros over - core-bootstrap-time set-global
+        millis over - core-bootstrap-time set-global
 
         run-bootstrap-init
     ] with-compiler-errors
@@ -92,15 +92,10 @@ SYMBOL: bootstrap-time
         [
             boot
             do-init-hooks
-            [
-                parse-command-line
-                run-user-init
-                "run" get run
-                output-stream get [ stream-flush ] when*
-            ] [ print-error 1 exit ] recover
+            handle-command-line
         ] set-boot-quot
 
-        micros swap - bootstrap-time set-global
+        millis swap - bootstrap-time set-global
         print-report
 
         "output-image" get save-image-and-exit

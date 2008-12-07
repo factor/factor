@@ -9,7 +9,7 @@ IN: compiler.codegen.fixup
 
 GENERIC: fixup* ( obj -- )
 
-: code-format 22 getenv ;
+: code-format ( -- n ) 22 getenv ;
 
 : compiled-offset ( -- n ) building get length code-format * ;
 
@@ -46,28 +46,27 @@ M: integer fixup* , ;
 : indq ( elt seq -- n ) [ eq? ] with find drop ;
 
 : adjoin* ( obj table -- n )
-    2dup indq [ 2nip ] [ dup length >r push r> ] if* ;
+    2dup indq [ 2nip ] [ dup length [ push ] dip ] if* ;
 
 SYMBOL: literal-table
 
 : add-literal ( obj -- n ) literal-table get adjoin* ;
 
 : add-dlsym-literals ( symbol dll -- )
-    >r string>symbol r> 2array literal-table get push-all ;
+    [ string>symbol ] dip 2array literal-table get push-all ;
 
 : rel-dlsym ( name dll class -- )
-    >r literal-table get length >r
-    add-dlsym-literals
-    r> r> rt-dlsym rel-fixup ;
+    [ literal-table get length [ add-dlsym-literals ] dip ] dip
+    rt-dlsym rel-fixup ;
 
 : rel-word ( word class -- )
-    >r add-literal r> rt-xt rel-fixup ;
+    [ add-literal ] dip rt-xt rel-fixup ;
 
 : rel-primitive ( word class -- )
-    >r def>> first r> rt-primitive rel-fixup ;
+    [ def>> first ] dip rt-primitive rel-fixup ;
 
-: rel-literal ( literal class -- )
-    >r add-literal r> rt-literal rel-fixup ;
+: rel-immediate ( literal class -- )
+    [ add-literal ] dip rt-immediate rel-fixup ;
 
 : rel-this ( class -- )
     0 swap rt-label rel-fixup ;

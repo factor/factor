@@ -19,7 +19,7 @@ M: mb-reader stream-readln ( mb-reader -- str/f ) lines>> mailbox-get ;
 M: mb-writer stream-nl ( mb-writer -- )
     [ [ last-line>> concat ] [ lines>> ] bi push ] keep
     V{ } clone >>last-line drop ;
-M: mb-reader dispose drop ;
+M: mb-reader dispose f swap push-line ;
 M: mb-writer dispose drop ;
 
 : spawn-client ( -- irc-client )
@@ -39,7 +39,7 @@ M: mb-writer dispose drop ;
     [ in-messages>> 0.1 seconds ] dip mailbox-get-timeout? ;
 
 : with-irc ( quot: ( -- ) -- )
-    [ spawn-client ] dip [ f %push-line ] compose with-irc-client ; inline
+    [ spawn-client ] dip [ irc> terminate-irc ] compose with-irc-client ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                       TESTS
@@ -60,17 +60,16 @@ M: mb-writer dispose drop ;
 
 ! Test login and nickname set
 [ { "factorbot2" } [
-     ":some.where 001 factorbot2 :Welcome factorbot2" %push-line
-      irc> nick>>
+    ":some.where 001 factorbot2 :Welcome factorbot2" %push-line
+    irc> nick>>
   ] unit-test
 ] with-irc
 
 ! Test connect
 { V{ "NICK factorbot" "USER factorbot hostname servername :irc.factor" } } [
-   "someserver" irc-port "factorbot" f <irc-profile> <irc-client>
+    "someserver" irc-port "factorbot" f <irc-profile> <irc-client>
     [ 2drop <test-stream> t ] >>connect
-    [ connect-irc ] keep
-    stream>> [ in>> [ f ] dip push-line ] [ out>> lines>> ] bi
+    [ connect-irc ] [ stream>> out>> lines>> ] [ terminate-irc ] tri
 ] unit-test
 
 ! Test join

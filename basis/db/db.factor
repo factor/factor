@@ -48,7 +48,7 @@ GENERIC: more-rows? ( result-set -- ? )
 : new-result-set ( query handle class -- result-set )
     new
         swap >>handle
-        >r [ sql>> ] [ in-params>> ] [ out-params>> ] tri r>
+        [ [ sql>> ] [ in-params>> ] [ out-params>> ] tri ] dip
         swap >>out-params
         swap >>in-params
         swap >>sql ;

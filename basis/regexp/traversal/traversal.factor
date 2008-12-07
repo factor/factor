@@ -17,6 +17,7 @@ TUPLE: dfa-traverser
     capture-group-index
     last-state current-state
     text
+    match-failed?
     start-index current-index
     matches ;
 
@@ -37,14 +38,20 @@ TUPLE: dfa-traverser
         H{ } clone >>captured-groups ;
 
 : final-state? ( dfa-traverser -- ? )
-    [ current-state>> ] [ dfa-table>> final-states>> ] bi
-    key? ;
+    [ current-state>> ]
+    [ dfa-table>> final-states>> ] bi key? ;
+
+: beginning-of-text? ( dfa-traverser -- ? )
+    current-index>> 0 <= ; inline
+
+: end-of-text? ( dfa-traverser -- ? )
+    [ current-index>> ] [ text>> length ] bi >= ; inline
 
 : text-finished? ( dfa-traverser -- ? )
     {
         [ current-state>> empty? ]
-        [ [ current-index>> ] [ text>> length ] bi >= ]
-        ! [ current-index>> 0 < ]
+        [ end-of-text? ]
+        [ match-failed?>> ]
     } 1|| ;
 
 : save-final-state ( dfa-straverser -- )
@@ -55,7 +62,49 @@ TUPLE: dfa-traverser
         dup save-final-state
     ] when text-finished? ;
 
+: previous-text-character ( dfa-traverser -- ch )
+    [ text>> ] [ current-index>> 1- ] bi nth ;
+
+: current-text-character ( dfa-traverser -- ch )
+    [ text>> ] [ current-index>> ] bi nth ;
+
+: next-text-character ( dfa-traverser -- ch )
+    [ text>> ] [ current-index>> 1+ ] bi nth ;
+
 GENERIC: flag-action ( dfa-traverser flag -- )
+
+
+M: beginning-of-input flag-action ( dfa-traverser flag -- )
+    drop
+    dup beginning-of-text? [ t >>match-failed? ] unless drop ;
+
+M: end-of-input flag-action ( dfa-traverser flag -- )
+    drop
+    dup end-of-text? [ t >>match-failed? ] unless drop ;
+
+
+M: beginning-of-line flag-action ( dfa-traverser flag -- )
+    drop
+    dup {
+        [ beginning-of-text? ]
+        [ previous-text-character terminator-class class-member? ]
+    } 1|| [ t >>match-failed? ] unless drop ;
+
+M: end-of-line flag-action ( dfa-traverser flag -- )
+    drop
+    dup {
+        [ end-of-text? ]
+        [ next-text-character terminator-class class-member? ]
+    } 1|| [ t >>match-failed? ] unless drop ;
+
+
+M: word-boundary flag-action ( dfa-traverser flag -- )
+    drop
+    dup {
+        [ end-of-text? ]
+        [ current-text-character terminator-class class-member? ]
+    } 1|| [ t >>match-failed? ] unless drop ;
+
 
 M: lookahead-on flag-action ( dfa-traverser flag -- )
     drop
@@ -110,11 +159,7 @@ M: capture-group-off flag-action ( dfa-traverser flag -- )
         [ [ 1+ ] change-current-index ]
         [ [ 1- ] change-current-index ] if
         dup current-state>> >>last-state
-    ] dip
-    first >>current-state ;
-
-: match-failed ( dfa-traverser -- dfa-traverser )
-    V{ } clone >>matches ;
+    ] [ first ] bi* >>current-state ;
 
 : match-literal ( transition from-state table -- to-state/f )
     transitions>> at at ;
@@ -131,11 +176,9 @@ M: capture-group-off flag-action ( dfa-traverser flag -- )
     { [ match-literal ] [ match-class ] [ match-default ] } 3|| ;
 
 : setup-match ( match -- obj state dfa-table )
-    {
-        [ current-index>> ] [ text>> ]
-        [ current-state>> ] [ dfa-table>> ]
-    } cleave
-    [ nth ] 2dip ;
+    [ [ current-index>> ] [ text>> ] bi nth ]
+    [ current-state>> ]
+    [ dfa-table>> ] tri ;
 
 : do-match ( dfa-traverser -- dfa-traverser )
     dup process-flags

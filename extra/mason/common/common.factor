@@ -15,9 +15,11 @@ IN: mason.common
 
 :: upload-safely ( local username host remote -- )
     [let* | temp [ remote ".incomplete" append ]
-            scp-remote [ { username "@" host ":" temp } concat ] |
-        { "scp" local scp-remote } short-running-process
-        { "ssh" host "-l" username "mv" temp remote } short-running-process
+            scp-remote [ { username "@" host ":" temp } concat ]
+            scp [ scp-command get ]
+            ssh [ ssh-command get ] |
+        { scp local scp-remote } short-running-process
+        { ssh host "-l" username "mv" temp remote } short-running-process
     ] ;
 
 : eval-file ( file -- obj )

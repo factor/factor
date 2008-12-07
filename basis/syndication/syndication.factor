@@ -81,7 +81,7 @@ TUPLE: entry title url description date ;
         [
             { "content" "summary" } any-tag-named
             dup children>> [ string? not ] contains?
-            [ children>> [ write-chunk ] with-string-writer ]
+            [ children>> [ write-xml-chunk ] with-string-writer ]
             [ children>string ] if >>description
         ]
         [

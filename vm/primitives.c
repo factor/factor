@@ -105,7 +105,8 @@ void *primitives[] = {
 	primitive_alien_address,
 	primitive_set_slot,
 	primitive_string_nth,
-	primitive_set_string_nth,
+	primitive_set_string_nth_fast,
+	primitive_set_string_nth_slow,
 	primitive_resize_array,
 	primitive_resize_string,
 	primitive_array,
@@ -140,4 +141,6 @@ void *primitives[] = {
 	primitive_dll_validp,
 	primitive_unimplemented,
 	primitive_gc_reset,
+	primitive_jit_compile,
+	primitive_load_locals,
 };

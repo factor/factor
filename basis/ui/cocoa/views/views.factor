@@ -8,7 +8,7 @@ core-foundation threads combinators math.geometry.rect ;
 IN: ui.cocoa.views
 
 : send-mouse-moved ( view event -- )
-    over >r mouse-location r> window move-hand fire-motion ;
+    [ mouse-location ] [ drop window ] 2bi move-hand fire-motion ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
@@ -77,46 +77,48 @@ IN: ui.cocoa.views
     dup event-modifiers swap button ;
 
 : send-button-down$ ( view event -- )
-    [ mouse-event>gesture <button-down> ]
-    [ mouse-location rot window send-button-down ] 2bi ;
+    [ nip mouse-event>gesture <button-down> ]
+    [ mouse-location ]
+    [ drop window ]
+    2tri send-button-down ;
 
 : send-button-up$ ( view event -- )
-    [ mouse-event>gesture <button-up> ] 2keep
-    mouse-location rot window send-button-up ;
+    [ nip mouse-event>gesture <button-up> ]
+    [ mouse-location ]
+    [ drop window ]
+    2tri send-button-up ;
 
 : send-wheel$ ( view event -- )
-    over >r
-    dup -> deltaX sgn neg over -> deltaY sgn neg 2array -rot
-    mouse-location
-    r> window send-wheel ;
+    [ nip [ -> deltaX ] [ -> deltaY ] bi [ sgn neg ] bi@ 2array ]
+    [ mouse-location ]
+    [ drop window ]
+    2tri send-wheel ;
 
 : send-action$ ( view event gesture -- junk )
-    >r drop window r> send-action f ;
+    [ drop window ] dip send-action f ;
 
 : add-resize-observer ( observer object -- )
-    >r "updateFactorGadgetSize:"
-    "NSViewFrameDidChangeNotification" <NSString>
-    r> add-observer ;
+    [
+        "updateFactorGadgetSize:"
+        "NSViewFrameDidChangeNotification" <NSString>
+    ] dip add-observer ;
 
 : string-or-nil? ( NSString -- ? )
     [ CF>string NSStringPboardType = ] [ t ] if* ;
 
 : valid-service? ( gadget send-type return-type -- ? )
-    over string-or-nil? over string-or-nil? and [
-        drop [ gadget-selection? ] [ drop t ] if
-    ] [
-        3drop f
-    ] if ;
+    over string-or-nil? over string-or-nil? and
+    [ drop [ gadget-selection? ] [ drop t ] if ] [ 3drop f ] if ;
 
 : NSRect>rect ( NSRect world -- rect )
-    >r dup NSRect-x over NSRect-y r>
-    rect-dim second swap - 2array
-    over NSRect-w rot NSRect-h 2array
-    <rect> ;
+    [ [ [ NSRect-x ] [ NSRect-y ] bi ] [ dim>> second ] bi* swap - 2array ]
+    [ drop [ NSRect-w ] [ NSRect-h ] bi 2array ]
+    2bi <rect> ;
 
 : rect>NSRect ( rect world -- NSRect )
-    over rect-loc first2 rot rect-dim second swap -
-    rot rect-dim first2 <NSRect> ;
+    [ [ rect-loc first2 ] [ dim>> second ] bi* swap - ]
+    [ drop rect-dim first2 ]
+    2bi <NSRect> ;
 
 CLASS: {
     { +superclass+ "NSOpenGLView" }
@@ -256,7 +258,7 @@ CLASS: {
 { "validRequestorForSendType:returnType:" "id" { "id" "SEL" "id" "id" }
     [
         ! We return either self or nil
-        >r >r over window-focus r> r>
+        [ over window-focus ] 2dip
         valid-service? [ drop ] [ 2drop f ] if
     ]
 }
@@ -278,7 +280,7 @@ CLASS: {
 { "readSelectionFromPasteboard:" "char" { "id" "SEL" "id" }
     [
         pasteboard-string dup [
-            >r drop window-focus r> swap user-input 1
+            [ drop window-focus ] dip swap user-input 1
         ] [
             3drop 0
         ] if
@@ -341,7 +343,7 @@ CLASS: {
 
 { "initWithFrame:pixelFormat:" "id" { "id" "SEL" "NSRect" "id" }
     [
-        rot drop
+        [ drop ] 2dip
         SUPER-> initWithFrame:pixelFormat:
         dup dup add-resize-observer
     ]
@@ -350,9 +352,10 @@ CLASS: {
 { "dealloc" "void" { "id" "SEL" }
     [
         drop
-        dup unregister-window
-        dup remove-observer
-        SUPER-> dealloc
+        [ unregister-window ]
+        [ remove-observer ]
+        [ SUPER-> dealloc ]
+        tri
     ]
 } ;
 

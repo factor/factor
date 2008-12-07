@@ -1,16 +1,31 @@
 ! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels,
 ! Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays namespaces make io io.timeouts kernel logging
-io.sockets sequences combinators splitting assocs strings
-math.parser random system calendar io.encodings.ascii summary
-calendar.format accessors sets hashtables ;
+USING: arrays namespaces make io io.encodings.string
+io.encodings.utf8 io.timeouts io.sockets io.sockets.secure
+io.encodings.ascii kernel logging sequences combinators
+splitting assocs strings math.order math.parser random system
+calendar summary calendar.format accessors sets hashtables
+base64 debugger classes prettyprint ;
 IN: smtp
 
 SYMBOL: smtp-domain
-SYMBOL: smtp-server     "localhost" 25 <inet> smtp-server set-global
-SYMBOL: smtp-read-timeout    1 minutes smtp-read-timeout set-global
-SYMBOL: esmtp?           t esmtp? set-global
+
+SYMBOL: smtp-server
+"localhost" 25 <inet> smtp-server set-global
+
+SYMBOL: smtp-tls?
+
+SYMBOL: smtp-read-timeout
+1 minutes smtp-read-timeout set-global
+
+SINGLETON: no-auth
+
+TUPLE: plain-auth username password ;
+C: <plain-auth> plain-auth
+
+SYMBOL: smtp-auth
+no-auth smtp-auth set-global
 
 LOG: log-smtp-connection NOTICE ( addrspec -- )
 
@@ -31,15 +46,23 @@ TUPLE: email
     { subject string }
     { body string } ;
 
-: <email> ( -- email ) email new ;
+: <email> ( -- email ) email new ; inline
 
 <PRIVATE
+
 : crlf ( -- ) "\r\n" write ;
+
+: read-crlf ( -- bytes )
+    "\r" read-until
+    [ CHAR: \r assert= read1 CHAR: \n assert= ] when* ;
 
 : command ( string -- ) write crlf flush ;
 
-: helo ( -- )
-    esmtp? get "EHLO " "HELO " ? host-name append command ;
+\ command DEBUG add-input-logging
+
+: helo ( -- ) "EHLO " host-name append command ;
+
+: start-tls ( -- ) "STARTTLS" command ;
 
 ERROR: bad-email-address email ;
 
@@ -60,8 +83,7 @@ ERROR: bad-email-address email ;
 ERROR: message-contains-dot message ;
 
 M: message-contains-dot summary ( obj -- string )
-    drop
-    "Message cannot contain . on a line by itself" ;
+    drop "Message cannot contain . on a line by itself" ;
 
 : validate-message ( msg -- msg' )
     "." over member?
@@ -78,7 +100,30 @@ M: message-contains-dot summary ( obj -- string )
 
 LOG: smtp-response DEBUG
 
-ERROR: smtp-error message ;
+: multiline? ( response -- boolean )
+    3 swap ?nth CHAR: - = ;
+
+: (receive-response) ( -- )
+    read-crlf
+    [ , ]
+    [ smtp-response ]
+    [ multiline? [ (receive-response) ] when ]
+    tri ;
+
+TUPLE: response code messages ;
+
+: <response> ( lines -- response )
+    [ first 3 head string>number ] keep response boa ;
+
+: receive-response ( -- response )
+    [ (receive-response) ] { } make <response> ;
+
+ERROR: smtp-error response ;
+
+M: smtp-error error.
+    "SMTP error (" write dup class pprint ")" print
+    response>> messages>> [ print ] each ;
+
 ERROR: smtp-server-busy < smtp-error ;
 ERROR: smtp-syntax-error < smtp-error ;
 ERROR: smtp-command-not-implemented < smtp-error ;
@@ -90,42 +135,35 @@ ERROR: smtp-bad-mailbox-name < smtp-error ;
 ERROR: smtp-transaction-failed < smtp-error ;
 
 : check-response ( response -- )
-    dup smtp-response
-    {
-        { [ dup "bye" head? ] [ drop ] }
-        { [ dup "220" head? ] [ drop ] }
-        { [ dup "235" swap subseq? ] [ drop ] }
-        { [ dup "250" head? ] [ drop ] }
-        { [ dup "221" head? ] [ drop ] }
-        { [ dup "354" head? ] [ drop ] }
-        { [ dup "4" head? ] [ smtp-server-busy ] }
-        { [ dup "500" head? ] [ smtp-syntax-error ] }
-        { [ dup "501" head? ] [ smtp-command-not-implemented ] }
-        { [ dup "50" head? ] [ smtp-syntax-error ] }
-        { [ dup "53" head? ] [ smtp-bad-authentication ] }
-        { [ dup "550" head? ] [ smtp-mailbox-unavailable ] }
-        { [ dup "551" head? ] [ smtp-user-not-local ] }
-        { [ dup "552" head? ] [ smtp-exceeded-storage-allocation ] }
-        { [ dup "553" head? ] [ smtp-bad-mailbox-name ] }
-        { [ dup "554" head? ] [ smtp-transaction-failed ] }
-        [ smtp-error ]
+    dup code>> {
+        { [ dup { 220 235 250 221 354 } member? ] [ 2drop ] }
+        { [ dup 400 499 between? ] [ drop smtp-server-busy ] }
+        { [ dup 500 = ] [ drop smtp-syntax-error ] }
+        { [ dup 501 = ] [ drop smtp-command-not-implemented ] }
+        { [ dup 500 509 between? ] [ drop smtp-syntax-error ] }
+        { [ dup 530 539 between? ] [ drop smtp-bad-authentication ] }
+        { [ dup 550 = ] [ drop smtp-mailbox-unavailable ] }
+        { [ dup 551 = ] [ drop smtp-user-not-local ] }
+        { [ dup 552 = ] [ drop smtp-exceeded-storage-allocation ] }
+        { [ dup 553 = ] [ drop smtp-bad-mailbox-name ] }
+        { [ dup 554 = ] [ drop smtp-transaction-failed ] }
+        [ drop smtp-error ]
     } cond ;
 
-: multiline? ( response -- boolean )
-    3 swap ?nth CHAR: - = ;
-
-: process-multiline ( multiline -- response )
-    >r readln r> 2dup " " append head? [
-        drop dup smtp-response
-    ] [
-        swap check-response process-multiline
-    ] if ;
-
-: receive-response ( -- response )
-    readln
-    dup multiline? [ 3 head process-multiline ] when ;
-
 : get-ok ( -- ) receive-response check-response ;
+
+GENERIC: send-auth ( auth -- )
+
+M: no-auth send-auth drop ;
+
+: plain-auth-string ( username password -- string )
+    [ "\0" prepend ] bi@ append utf8 encode >base64 ;
+
+M: plain-auth send-auth
+    [ username>> ] [ password>> ] bi plain-auth-string
+    "AUTH PLAIN " prepend command get-ok ;
+
+: auth ( -- ) smtp-auth get send-auth ;
 
 ERROR: invalid-header-string string ;
 
@@ -169,7 +207,10 @@ ERROR: invalid-header-string string ;
 
 : (send-email) ( headers email -- )
     [
+        get-ok
         helo get-ok
+        smtp-tls? get [ start-tls get-ok send-secure-handshake ] when
+        auth
         dup from>> extract-email mail-from get-ok
         dup to>> [ extract-email rcpt-to get-ok ] each
         dup cc>> [ extract-email rcpt-to get-ok ] each
@@ -180,6 +221,7 @@ ERROR: invalid-header-string string ;
         body>> send-body get-ok
         quit get-ok
     ] with-smtp-connection ;
+
 PRIVATE>
 
 : send-email ( email -- )

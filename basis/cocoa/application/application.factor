@@ -27,35 +27,31 @@ IN: cocoa.application
 
 : NSApp ( -- app ) NSApplication -> sharedApplication ;
 
+: NSAnyEventMask ( -- mask ) HEX: ffffffff ; inline
+
 FUNCTION: void NSBeep ( ) ;
 
 : with-cocoa ( quot -- )
     [ NSApp drop call ] with-autorelease-pool ; inline
 
 : next-event ( app -- event )
-    0 f CFRunLoopDefaultMode 1
+    NSAnyEventMask f CFRunLoopDefaultMode 1
     -> nextEventMatchingMask:untilDate:inMode:dequeue: ;
 
 : do-event ( app -- ? )
-    dup next-event [ -> sendEvent: t ] [ drop f ] if* ;
+    dup next-event [ dupd -> sendEvent: -> updateWindows t ] [ drop f ] if* ;
 
 : add-observer ( observer selector name object -- )
-    >r >r >r >r NSNotificationCenter -> defaultCenter
-    r> r> sel_registerName
-    r> r> -> addObserver:selector:name:object: ;
+    [
+        [ NSNotificationCenter -> defaultCenter ] 2dip
+        sel_registerName
+    ] 2dip -> addObserver:selector:name:object: ;
 
 : remove-observer ( observer -- )
-    >r NSNotificationCenter -> defaultCenter r>
+    [ NSNotificationCenter -> defaultCenter ] dip
     -> removeObserver: ;
 
-: finish-launching ( -- ) NSApp -> finishLaunching ;
-
-: cocoa-app ( quot -- )
-    [
-        call
-        finish-launching
-        NSApp -> run
-    ] with-cocoa ; inline
+: cocoa-app ( quot -- ) [ call NSApp -> run ] with-cocoa ; inline
 
 : install-delegate ( receiver delegate -- )
     -> alloc -> init -> setDelegate: ;
@@ -80,6 +76,6 @@ M: objc-error summary ( error -- )
     running.app? [
         drop
     ] [
-        "The " swap " requires you to run Factor from an application bundle."
-        3append throw
+        "The " " requires you to run Factor from an application bundle."
+        surround throw
     ] if ;

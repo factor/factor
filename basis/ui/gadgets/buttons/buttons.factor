@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math models namespaces sequences
 strings quotations assocs combinators classes colors
-classes.tuple locals alien.c-types fry opengl opengl.gl
-math.vectors ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.labels ui.gadgets.theme ui.gadgets.tracks
-ui.gadgets.packs ui.gadgets.worlds ui.gestures ui.render
-math.geometry.rect ;
+classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
+ui.gadgets.borders ui.gadgets.labels ui.gadgets.theme
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
+ui.render math.geometry.rect locals alien.c-types
+specialized-arrays.float fry ;
 IN: ui.gadgets.buttons
 
 TUPLE: button < border pressed? selected? quot ;
@@ -119,7 +119,7 @@ TUPLE: checkmark-paint < caching-pen color last-vertices ;
     } cleave 4array ;
 
 : checkmark-vertices ( dim -- vertices )
-    checkmark-points concat >c-float-array ;
+    checkmark-points concat >float-array ;
 
 PRIVATE>
 
@@ -177,7 +177,7 @@ PRIVATE>
 
 M: radio-paint recompute-pen
     swap dim>>
-    [ { 4 4 } swap { 9 9 } v- circle-steps circle-vertices >>interior-vertices ]
+    [ { 4 4 } swap { 9 9 } v- circle-steps fill-circle-vertices >>interior-vertices ]
     [ { 1 1 } swap { 3 3 } v- circle-steps circle-vertices >>boundary-vertices ] bi
     drop ;
 
@@ -194,7 +194,7 @@ M: radio-paint draw-interior
 
 M: radio-paint draw-boundary
     [ (radio-paint) ] [ boundary-vertices>> gl-vertex-pointer ] bi
-    GL_LINE_LOOP 0 circle-steps glDrawArrays ;
+    GL_LINE_STRIP 0 circle-steps 1+ glDrawArrays ;
 
 :: radio-knob-theme ( gadget -- gadget )
     [let | radio-paint [ black <radio-paint> ] |

@@ -6,7 +6,7 @@ io arrays math boxes splitting urls
 xml.entities
 http.server
 http.server.responses
-furnace
+furnace.utilities
 furnace.redirection
 furnace.conversations
 html.forms

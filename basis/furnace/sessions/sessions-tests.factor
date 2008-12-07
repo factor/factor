@@ -3,7 +3,8 @@ USING: tools.test http furnace.sessions furnace.actions
 http.server http.server.responses math namespaces make kernel
 accessors io.sockets io.servers.connection prettyprint
 io.streams.string io.files splitting destructors sequences db
-db.tuples db.sqlite continuations urls math.parser furnace ;
+db.tuples db.sqlite continuations urls math.parser furnace
+furnace.utilities ;
 
 : with-session
     [

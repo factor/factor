@@ -398,7 +398,7 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 
 [ ] [ [ { integer lambda-method-forget-test } forget ] with-compilation-unit ] unit-test
 
-[ { [ 10 ] } ] [ 10 [| A | { [ A ] } ] call ] unit-test
+[ 10 ] [ 10 [| A | { [ A ] } ] call first call ] unit-test
 
 [
     "USING: locals fry math ; [ 0 '[ [let | A [ 10 ] | A _ + ] ] ]" eval
@@ -418,14 +418,66 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 [ "USE: locals [let | a" eval ] [ error>> unexpected-eof? ] must-fail-with
 [ "USE: locals [|" eval ] [ error>> unexpected-eof? ] must-fail-with
 
-! :: wlet-&&-test ( a -- ? )
-!     [wlet | is-integer? [ a integer? ]
-!             is-even? [ a even? ]
-!             >10? [ a 10 > ] |
-!         { [ is-integer? ] [ is-even? ] [ >10? ] } &&
-!     ] ;
+[ 25 ] [ 5 [| a | { [ a sq ] } cond ] call ] unit-test
+[ 25 ] [ 5 [| | { [| a | a sq ] } ] call first call ] unit-test
 
-! [ f ] [ 1.5 wlet-&&-test ] unit-test
-! [ f ] [ 3 wlet-&&-test ] unit-test
-! [ f ] [ 8 wlet-&&-test ] unit-test
-! [ t ] [ 12 wlet-&&-test ] unit-test
+:: FAILdog-1 ( -- b ) { [| c | c ] } ;
+
+\ FAILdog-1 must-infer
+
+:: FAILdog-2 ( a -- b ) a { [| c | c ] } cond ;
+
+\ FAILdog-2 must-infer
+
+[ 3 ] [ 3 [| a | \ a ] call ] unit-test
+
+[ "USE: locals [| | { [let | a [ 0 ] | a ] } ]" eval ] must-fail
+
+[ "USE: locals [| | { [wlet | a [ 0 ] | a ] } ]" eval ] must-fail
+
+[ "USE: locals [| | { [let* | a [ 0 ] | a ] } ]" eval ] must-fail
+
+[ "USE: locals [| | [let | a! [ 0 ] | { a! } ] ]" eval ] must-fail
+
+[ "USE: locals [| | [wlet | a [ 0 ] | { a } ] ]" eval ] must-fail
+
+:: wlet-&&-test ( a -- ? )
+    [wlet | is-integer? [ a integer? ]
+            is-even? [ a even? ]
+            >10? [ a 10 > ] |
+        { [ is-integer? ] [ is-even? ] [ >10? ] } &&
+    ] ;
+
+\ wlet-&&-test must-infer
+[ f ] [ 1.5 wlet-&&-test ] unit-test
+[ f ] [ 3 wlet-&&-test ] unit-test
+[ f ] [ 8 wlet-&&-test ] unit-test
+[ t ] [ 12 wlet-&&-test ] unit-test
+
+: fry-locals-test-1 ( -- n )
+    [let | | 6 '[ [let | A [ 4 ] | A _ + ] ] call ] ;
+
+\ fry-locals-test-1 must-infer
+[ 10 ] [ fry-locals-test-1 ] unit-test
+
+:: fry-locals-test-2 ( -- n )
+    [let | | 6 '[ [let | A [ 4 ] | A _ + ] ] call ] ;
+
+\ fry-locals-test-2 must-infer
+[ 10 ] [ fry-locals-test-2 ] unit-test
+
+[ 1 ] [ 3 4 [| | '[ [ _ swap - ] call ] call ] call ] unit-test
+[ -1 ] [ 3 4 [| | [| a | a - ] call ] call ] unit-test
+[ -1 ] [ 3 4 [| | [| a | a - ] curry call ] call ] unit-test
+[ -1 ] [ 3 4 [| a | a - ] curry call ] unit-test
+[ 1 ] [ 3 4 [| | '[ [| a | _ a - ] call ] call ] call ] unit-test
+[ -1 ] [ 3 4 [| | '[ [| a | a _ - ] call ] call ] call ] unit-test
+
+[ { 1 2 3 4 } ] [
+    1 3 2 4
+    [| | '[ [| a b | a _ b _ 4array ] call ] call ] call
+] unit-test
+
+[ 10 ] [
+    [| | 0 '[ [let | A [ 10 ] | A _ + ] ] call ] call
+] unit-test

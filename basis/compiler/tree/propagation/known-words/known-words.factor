@@ -5,7 +5,7 @@ math.partial-dispatch math.intervals math.parser math.order
 layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private slots.private
-definitions
+definitions strings.private vectors hashtables
 stack-checker.state
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -36,31 +36,6 @@ most-negative-fixnum most-positive-fixnum [a,b]
 [ { integer integer } "input-classes" set-word-prop ] each
 
 \ bitnot { integer } "input-classes" set-word-prop
-
-{
-    fcosh
-    flog
-    fsinh
-    fexp
-    fasin
-    facosh
-    fasinh
-    ftanh
-    fatanh
-    facos
-    fpow
-    fatan
-    fatan2
-    fcos
-    ftan
-    fsin
-    fsqrt
-} [
-    dup stack-effect
-    [ in>> length real <repetition> "input-classes" set-word-prop ]
-    [ out>> length float <repetition> "default-output-classes" set-word-prop ]
-    2bi
-] each
 
 : ?change-interval ( info quot -- quot' )
     over interval>> [ [ clone ] dip change-interval ] [ 2drop ] if ; inline
@@ -169,10 +144,9 @@ most-negative-fixnum most-positive-fixnum [a,b]
 comparison-ops
 [ dup '[ _ define-comparison-constraints ] each-derived-op ] each
 
-generic-comparison-ops [
-    dup specific-comparison
-    '[ _ _ define-comparison-constraints ] each-derived-op
-] each
+! generic-comparison-ops [
+!     dup specific-comparison define-comparison-constraints
+! ] each
 
 ! Remove redundant comparisons
 : fold-comparison ( info1 info2 word -- info )
@@ -220,10 +194,22 @@ generic-comparison-ops [
     2bi and maybe-or-never
 ] "outputs" set-word-prop
 
+\ both-fixnums? [
+    [ class>> fixnum classes-intersect? not ] either?
+    f <literal-info> object-info ?
+] "outputs" set-word-prop
+
 {
     { >fixnum fixnum }
+    { bignum>fixnum fixnum }
+
     { >bignum bignum }
+    { fixnum>bignum bignum }
+    { float>bignum bignum }
+
     { >float float }
+    { fixnum>float float }
+    { bignum>float float }
 } [
     '[
         _
@@ -260,6 +246,10 @@ generic-comparison-ops [
         ] when
     ] "custom-inlining" set-word-prop
 ] each
+
+\ string-nth [
+    2drop fixnum 0 23 2^ [a,b] <class/interval-info>
+] "outputs" set-word-prop
 
 {
     alien-signed-1
@@ -301,6 +291,15 @@ generic-comparison-ops [
     [ clone f >>literal f >>literal? ]
     "outputs" set-word-prop
 ] each
+
+! Generate more efficient code for common idiom
+\ clone [
+    in-d>> first value-info literal>> {
+        { V{ } [ [ drop { } 0 vector boa ] ] }
+        { H{ } [ [ drop hashtable new ] ] }
+        [ drop f ]
+    } case
+] "custom-inlining" set-word-prop
 
 \ slot [
     dup literal?>>

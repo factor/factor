@@ -11,9 +11,10 @@ IN: help.syntax
     \ ; parse-until >array swap set-word-help ; parsing
 
 : ARTICLE:
-    location >r
-    \ ; parse-until >array [ first2 ] keep 2 tail <article>
-    over add-article >link r> remember-definition ; parsing
+    location [
+        \ ; parse-until >array [ first2 ] keep 2 tail <article>
+        over add-article >link
+    ] dip remember-definition ; parsing
 
 : ABOUT:
     in get vocab

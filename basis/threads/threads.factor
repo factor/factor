@@ -4,7 +4,7 @@
 USING: arrays hashtables heaps kernel kernel.private math
 namespaces sequences vectors continuations continuations.private
 dlists assocs system combinators init boxes accessors
-math.order deques strings quotations ;
+math.order deques strings quotations fry ;
 IN: threads
 
 SYMBOL: initial-thread
@@ -36,7 +36,7 @@ sleep-entry ;
 : tchange ( key quot -- )
     tnamespace swap change-at ; inline
 
-: threads 64 getenv ;
+: threads ( -- assoc ) 64 getenv ;
 
 : thread ( id -- thread ) threads at ;
 
@@ -73,9 +73,9 @@ PRIVATE>
 : <thread> ( quot name -- thread )
     \ thread new-thread ;
 
-: run-queue 65 getenv ;
+: run-queue ( -- dlist ) 65 getenv ;
 
-: sleep-queue 66 getenv ;
+: sleep-queue ( -- heap ) 66 getenv ;
 
 : resume ( thread -- )
     f >>state
@@ -89,7 +89,7 @@ PRIVATE>
     f >>state
     check-registered 2array run-queue push-front ;
 
-: sleep-time ( -- ms/f )
+: sleep-time ( -- us/f )
     {
         { [ run-queue deque-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
@@ -101,7 +101,7 @@ DEFER: stop
 <PRIVATE
 
 : schedule-sleep ( thread dt -- )
-    >r check-registered dup r> sleep-queue heap-push*
+    [ check-registered dup ] dip sleep-queue heap-push*
     >>sleep-entry drop ;
 
 : expire-sleep? ( heap -- ? )
@@ -164,10 +164,8 @@ PRIVATE>
 
 : suspend ( quot state -- obj )
     [
-        >r
-        >r self swap call
-        r> self (>>state)
-        r> self continuation>> >box
+        [ [ self swap call ] dip self (>>state) ] dip
+        self continuation>> >box
         next
     ] callcc1 2nip ; inline
 
@@ -176,7 +174,7 @@ PRIVATE>
 GENERIC: sleep-until ( time/f -- )
 
 M: integer sleep-until
-    [ schedule-sleep ] curry "sleep" suspend drop ;
+    '[ _ schedule-sleep ] "sleep" suspend drop ;
 
 M: f sleep-until
     drop [ drop ] "interrupt" suspend drop ;
@@ -200,11 +198,11 @@ M: real sleep
     <thread> [ (spawn) ] keep ;
 
 : spawn-server ( quot name -- thread )
-    >r [ loop ] curry r> spawn ;
+    [ '[ _ loop ] ] dip spawn ;
 
 : in-thread ( quot -- )
-    >r datastack r>
-    [ >r set-datastack r> call ] 2curry
+    [ datastack ] dip
+    '[ _ set-datastack _ call ]
     "Thread" spawn drop ;
 
 GENERIC: error-in-thread ( error thread -- )

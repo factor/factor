@@ -16,13 +16,17 @@ TYPEDEF: void* CFStringRef
 TYPEDEF: void* CFURLRef
 TYPEDEF: void* CFUUIDRef
 TYPEDEF: void* CFTypeRef
+TYPEDEF: void* CFFileDescriptorRef
 TYPEDEF: bool Boolean
 TYPEDEF: long CFIndex
 TYPEDEF: int SInt32
 TYPEDEF: uint UInt32
 TYPEDEF: ulong CFTypeID
+TYPEDEF: UInt32 CFOptionFlags
 TYPEDEF: double CFTimeInterval
 TYPEDEF: double CFAbsoluteTime
+TYPEDEF: int CFFileDescriptorNativeDescriptor
+TYPEDEF: void* CFFileDescriptorCallBack
 
 TYPEDEF: int CFNumberType
 : kCFNumberSInt8Type 1 ; inline
@@ -90,25 +94,25 @@ FUNCTION: CFTypeID CFGetTypeID ( CFTypeRef cf ) ;
 : <CFArray> ( seq -- alien )
     [ f swap length f CFArrayCreateMutable ] keep
     [ length ] keep
-    [ >r dupd r> CFArraySetValueAtIndex ] 2each ;
+    [ [ dupd ] dip CFArraySetValueAtIndex ] 2each ;
 
 : <CFString> ( string -- alien )
     f swap dup length CFStringCreateWithCharacters ;
 
 : CF>string ( alien -- string )
     dup CFStringGetLength 1+ "ushort" <c-array> [
-        >r 0 over CFStringGetLength r> CFStringGetCharacters
+        [ 0 over CFStringGetLength ] dip CFStringGetCharacters
     ] keep utf16n alien>string ;
 
 : CF>string-array ( alien -- seq )
     CF>array [ CF>string ] map ;
 
 : <CFStringArray> ( seq -- alien )
-    [ <CFString> ] map dup <CFArray> swap [ CFRelease ] each ;
+    [ <CFString> ] map [ <CFArray> ] [ [ CFRelease ] each ] bi ;
 
 : <CFFileSystemURL> ( string dir? -- url )
-    >r <CFString> f over kCFURLPOSIXPathStyle
-    r> CFURLCreateWithFileSystemPath swap CFRelease ;
+    [ <CFString> f over kCFURLPOSIXPathStyle ] dip
+    CFURLCreateWithFileSystemPath swap CFRelease ;
 
 : <CFURL> ( string -- url )
     <CFString>
@@ -121,17 +125,34 @@ FUNCTION: CFTypeID CFGetTypeID ( CFTypeRef cf ) ;
     ] keep CFRelease ;
 
 GENERIC: <CFNumber> ( number -- alien )
+
 M: integer <CFNumber>
     [ f kCFNumberLongLongType ] dip <longlong> CFNumberCreate ;
+
 M: float <CFNumber>
     [ f kCFNumberDoubleType ] dip <double> CFNumberCreate ;
+
 M: t <CFNumber>
     drop f kCFNumberIntType 1 <int> CFNumberCreate ;
+
 M: f <CFNumber>
     drop f kCFNumberIntType 0 <int> CFNumberCreate ;
 
 : <CFData> ( byte-array -- alien )
     [ f ] dip dup length CFDataCreate ;
+
+FUNCTION: CFFileDescriptorRef CFFileDescriptorCreate (
+    CFAllocatorRef allocator,
+    CFFileDescriptorNativeDescriptor fd,
+    Boolean closeOnInvalidate,
+    CFFileDescriptorCallBack callout, 
+    CFFileDescriptorContext* context
+) ;
+
+FUNCTION: void CFFileDescriptorEnableCallBacks (
+    CFFileDescriptorRef f,
+    CFOptionFlags callBackTypes
+) ;
 
 : load-framework ( name -- )
     dup <CFBundle> [
@@ -141,8 +162,11 @@ M: f <CFNumber>
     ] ?if ;
 
 TUPLE: CFRelease-destructor alien disposed ;
+
 M: CFRelease-destructor dispose* alien>> CFRelease ;
+
 : &CFRelease ( alien -- alien )
     dup f CFRelease-destructor boa &dispose drop ; inline
+
 : |CFRelease ( alien -- alien )
     dup f CFRelease-destructor boa |dispose drop ; inline

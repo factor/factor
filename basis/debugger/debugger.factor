@@ -3,13 +3,13 @@
 USING: slots arrays definitions generic hashtables summary io
 kernel math namespaces make prettyprint prettyprint.config
 sequences assocs sequences.private strings io.styles io.files
-vectors words system splitting math.parser classes.tuple
-continuations continuations.private combinators generic.math
-classes.builtin classes compiler.units generic.standard vocabs
-init kernel.private io.encodings accessors math.order
-destructors source-files parser classes.tuple.parser
-effects.parser lexer compiler.errors generic.parser
-strings.parser ;
+vectors words system splitting math.parser classes.mixin
+classes.tuple continuations continuations.private combinators
+generic.math classes.builtin classes compiler.units
+generic.standard vocabs init kernel.private io.encodings
+accessors math.order destructors source-files parser
+classes.tuple.parser effects.parser lexer compiler.errors
+generic.parser strings.parser ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -71,12 +71,6 @@ M: string error. print ;
 
 : try ( quot -- )
     [ print-error-and-restarts ] recover ;
-
-M: relative-underflow summary
-    drop "Too many items removed from data stack" ;
-
-M: relative-overflow summary
-    drop "Superfluous items pushed to data stack" ;
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write third . ;
@@ -327,3 +321,5 @@ M: bad-effect summary
 M: bad-escape summary drop "Bad escape code" ;
 
 M: bad-literal-tuple summary drop "Bad literal tuple" ;
+
+M: check-mixin-class summary drop "Not a mixin class" ;

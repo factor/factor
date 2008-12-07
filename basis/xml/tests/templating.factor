@@ -20,7 +20,7 @@ M: object (r-ref) drop ;
 
 ! Example
 
-: sample-doc
+: sample-doc ( -- string )
     {
         "<html xmlns:f='http://littledan.onigirihouse.com/namespaces/replace'>"
         "<body>"

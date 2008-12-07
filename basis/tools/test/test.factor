@@ -3,7 +3,7 @@
 USING: accessors namespaces arrays prettyprint sequences kernel
 vectors quotations words parser assocs combinators continuations
 debugger io io.styles io.files vocabs vocabs.loader source-files
-compiler.units summary stack-checker effects tools.vocabs ;
+compiler.units summary stack-checker effects tools.vocabs fry ;
 IN: tools.test
 
 SYMBOL: failures
@@ -26,24 +26,22 @@ SYMBOL: this-test
     ] if ;
 
 : unit-test ( output input -- )
-    [ 2array ] 2keep [
-        { } swap with-datastack swap >array assert=
-    ] 2curry (unit-test) ;
+    [ 2array ] 2keep '[
+        _ { } _ with-datastack swap >array assert=
+    ] (unit-test) ;
 
 : short-effect ( effect -- pair )
     [ in>> length ] [ out>> length ] bi 2array ;
 
 : must-infer-as ( effect quot -- )
-    >r 1quotation r> [ infer short-effect ] curry unit-test ;
+    [ 1quotation ] dip '[ _ infer short-effect ] unit-test ;
 
 : must-infer ( word/quot -- )
     dup word? [ 1quotation ] when
-    [ infer drop ] curry [ ] swap unit-test ;
+    '[ _ infer drop ] [ ] swap unit-test ;
 
 : must-fail-with ( quot pred -- )
-    >r [ f ] compose r>
-    [ recover ] 2curry
-    [ t ] swap unit-test ;
+    [ '[ @ f ] ] dip '[ _ _ recover ] [ t ] swap unit-test ;
 
 : must-fail ( quot -- )
     [ drop t ] must-fail-with ;
@@ -90,7 +88,7 @@ SYMBOL: this-test
 : test ( prefix -- )
     run-tests test-failures. ;
 
-: run-all-tests ( prefix -- failures )
+: run-all-tests ( -- failures )
     "" run-tests ;
 
 : test-all ( -- )

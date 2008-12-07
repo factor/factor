@@ -3,8 +3,6 @@ typedef enum {
 	RT_PRIMITIVE,
 	/* arg is a literal table index, holding an array pair (symbol/dll) */
 	RT_DLSYM,
-	/* an indirect literal from the word's literal table */
-	RT_LITERAL,
 	/* a pointer to a compiled word reference */
 	RT_DISPATCH,
 	/* a compiled word reference */
@@ -56,6 +54,10 @@ typedef struct {
 	unsigned int type;
 	unsigned int offset;
 } F_REL;
+
+#define CREF(array,i) ((CELL)(array) + CELLS * (i))
+
+void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value);
 
 void relocate_code_block(F_COMPILED *relocating, CELL code_start, CELL literals_start);
 

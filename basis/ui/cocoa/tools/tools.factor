@@ -20,12 +20,12 @@ IN: ui.cocoa.tools
 
 ! Handle Open events from the Finder
 CLASS: {
-    { +superclass+ "NSObject" }
-    { +name+ "FactorApplicationDelegate" }
+    { +superclass+ "FactorApplicationDelegate" }
+    { +name+ "FactorWorkspaceApplicationDelegate" }
 }
 
 { "application:openFiles:" "void" { "id" "SEL" "id" "id" }
-    [ >r 3drop r> finder-run-files ]
+    [ [ 3drop ] dip finder-run-files ]
 }
 
 { "newFactorWorkspace:" "id" { "id" "SEL" "id" }
@@ -49,7 +49,7 @@ CLASS: {
 } ;
 
 : install-app-delegate ( -- )
-    NSApp FactorApplicationDelegate install-delegate ;
+    NSApp FactorWorkspaceApplicationDelegate install-delegate ;
 
 ! Service support; evaluate Factor code from other apps
 :: do-service ( pboard error quot -- )

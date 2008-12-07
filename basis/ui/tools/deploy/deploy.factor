@@ -1,12 +1,11 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.gadgets colors kernel ui.render namespaces
-       models models.mapping sequences ui.gadgets.buttons
-       ui.gadgets.packs ui.gadgets.labels tools.deploy.config
-       namespaces ui.gadgets.editors ui.gadgets.borders ui.gestures
-       ui.commands assocs ui.gadgets.tracks ui ui.tools.listener
-       tools.deploy vocabs ui.tools.workspace system accessors ;
-
+USING: ui.gadgets colors kernel ui.render namespaces models
+models.mapping sequences ui.gadgets.buttons ui.gadgets.packs
+ui.gadgets.labels tools.deploy.config namespaces
+ui.gadgets.editors ui.gadgets.borders ui.gestures ui.commands
+assocs ui.gadgets.tracks ui ui.tools.listener tools.deploy
+vocabs ui.tools.workspace system accessors fry ;
 IN: ui.tools.deploy
 
 TUPLE: deploy-gadget < pack vocab settings ;
@@ -83,7 +82,7 @@ TUPLE: deploy-gadget < pack vocab settings ;
 
 : com-deploy ( gadget -- )
     dup com-save
-    dup find-deploy-vocab [ deploy ] curry call-listener
+    dup find-deploy-vocab '[ _ deploy ] call-listener
     close-window ;
 
 : com-help ( -- )
@@ -118,5 +117,7 @@ deploy-gadget "toolbar" f {
     dup com-revert ;
     
 : deploy-tool ( vocab -- )
-    vocab-name dup <deploy-gadget> 10 <border>
-    "Deploying \"" rot "\"" 3append open-window ;
+    vocab-name
+    [ <deploy-gadget> 10 <border> ]
+    [ "Deploying \"" swap "\"" 3append ] bi
+    open-window ;

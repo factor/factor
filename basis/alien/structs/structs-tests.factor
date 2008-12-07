@@ -38,7 +38,7 @@ C-UNION: barx
 [ 120 ] [ "barx" heap-size ] unit-test
 
 "help" vocab [
-    "help" "help" lookup "help" set
+    "print-topic" "help" lookup "help" set
     [ ] [ \ foox-x "help" get execute ] unit-test
     [ ] [ \ set-foox-x "help" get execute ] unit-test
 ] when

@@ -286,9 +286,7 @@ HINTS: recursive-inline-hang-2 array ;
 HINTS: recursive-inline-hang-3 array ;
 
 ! Regression
-USE: sequences.private
-
-[ ] [ { (3append) } compile ] unit-test
+[ ] [ { 3append-as } compile ] unit-test
 
 ! Wow
 : counter-example ( a b c d -- a' b' c' d' )

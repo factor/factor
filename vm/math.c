@@ -1,7 +1,6 @@
 #include "master.h"
 
 /* Fixnums */
-
 F_FIXNUM to_fixnum(CELL tagged)
 {
 	switch(TAG(tagged))
@@ -31,50 +30,35 @@ void primitive_float_to_fixnum(void)
 	drepl(tag_fixnum(float_to_fixnum(dpeek())));
 }
 
-#define POP_FIXNUMS(x,y) \
-	F_FIXNUM y = untag_fixnum_fast(dpop()); \
-	F_FIXNUM x = untag_fixnum_fast(dpeek());
-
-void primitive_fixnum_add(void)
+/* The fixnum+, fixnum- and fixnum* primitives are defined in cpu_*.S. On
+overflow, they call these functions. */
+F_FASTCALL void overflow_fixnum_add(F_FIXNUM x, F_FIXNUM y)
 {
-	POP_FIXNUMS(x,y)
-	drepl(allot_integer(x + y));
+	drepl(tag_bignum(fixnum_to_bignum(
+		untag_fixnum_fast(x) + untag_fixnum_fast(y))));
 }
 
-void primitive_fixnum_subtract(void)
+F_FASTCALL void overflow_fixnum_subtract(F_FIXNUM x, F_FIXNUM y)
 {
-	POP_FIXNUMS(x,y)
-	drepl(allot_integer(x - y));
+	drepl(tag_bignum(fixnum_to_bignum(
+		untag_fixnum_fast(x) - untag_fixnum_fast(y))));
 }
 
-/* Multiply two integers, and trap overflow.
-Thanks to David Blaikie (The_Vulture from freenode #java) for the hint. */
-void primitive_fixnum_multiply(void)
+F_FASTCALL void overflow_fixnum_multiply(F_FIXNUM x, F_FIXNUM y)
 {
-	POP_FIXNUMS(x,y)
-
-	if(x == 0 || y == 0)
-		drepl(tag_fixnum(0));
-	else
-	{
-		F_FIXNUM prod = x * y;
-		/* if this is not equal, we have overflow */
-		if(prod / x == y)
-			drepl(allot_integer(prod));
-		else
-		{
-			F_ARRAY *bx = fixnum_to_bignum(x);
-			REGISTER_BIGNUM(bx);
-			F_ARRAY *by = fixnum_to_bignum(y);
-			UNREGISTER_BIGNUM(bx);
-			drepl(tag_bignum(bignum_multiply(bx,by)));
-		}
-	}
+	F_ARRAY *bx = fixnum_to_bignum(x);
+	REGISTER_BIGNUM(bx);
+	F_ARRAY *by = fixnum_to_bignum(y);
+	UNREGISTER_BIGNUM(bx);
+	drepl(tag_bignum(bignum_multiply(bx,by)));
 }
 
+/* Division can only overflow when we are dividing the most negative fixnum
+by -1. */
 void primitive_fixnum_divint(void)
 {
-	POP_FIXNUMS(x,y)
+	F_FIXNUM y = untag_fixnum_fast(dpop()); \
+	F_FIXNUM x = untag_fixnum_fast(dpeek());
 	F_FIXNUM result = x / y;
 	if(result == -FIXNUM_MIN)
 		drepl(allot_integer(-FIXNUM_MIN));
@@ -99,31 +83,30 @@ void primitive_fixnum_divmod(void)
 }
 
 /*
- * Note the hairy overflow check.
  * If we're shifting right by n bits, we won't overflow as long as none of the
  * high WORD_SIZE-TAG_BITS-n bits are set.
  */
+#define SIGN_MASK(x) ((x) >> (WORD_SIZE - 1))
+#define BRANCHLESS_MAX(x,y) ((x) - (((x) - (y)) & SIGN_MASK((x) - (y))))
+#define BRANCHLESS_ABS(x) ((x ^ SIGN_MASK(x)) - SIGN_MASK(x))
+
 void primitive_fixnum_shift(void)
 {
-	POP_FIXNUMS(x,y)
+	F_FIXNUM y = untag_fixnum_fast(dpop()); \
+	F_FIXNUM x = untag_fixnum_fast(dpeek());
 
-	if(x == 0 || y == 0)
-	{
-		drepl(tag_fixnum(x));
+	if(x == 0)
 		return;
-	}
 	else if(y < 0)
 	{
-		if(y <= -WORD_SIZE)
-			drepl(x < 0 ? tag_fixnum(-1) : tag_fixnum(0));
-		else
-			drepl(tag_fixnum(x >> -y));
+		y = BRANCHLESS_MAX(y,-WORD_SIZE + 1);
+		drepl(tag_fixnum(x >> -y));
 		return;
 	}
 	else if(y < WORD_SIZE - TAG_BITS)
 	{
 		F_FIXNUM mask = -((F_FIXNUM)1 << (WORD_SIZE - 1 - TAG_BITS - y));
-		if((x > 0 && (x & mask) == 0) || (x & mask) == mask)
+		if(!(BRANCHLESS_ABS(x) & mask))
 		{
 			drepl(tag_fixnum(x << y));
 			return;

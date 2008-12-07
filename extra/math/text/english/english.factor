@@ -56,7 +56,7 @@ SYMBOL: and-needed?
 
 : text-with-scale ( index seq -- str )
     [ nth 3digits>text ] [ drop scale-numbers ] 2bi
-    [ " " swap 3append ] unless-empty ;
+    [ " " glue ] unless-empty ;
 
 : append-with-conjunction ( str1 str2 -- newstr )
     over length zero? [

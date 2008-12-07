@@ -3,7 +3,7 @@
 USING: kernel namespaces assocs io.files io.encodings.utf8
 prettyprint help.lint benchmark tools.time bootstrap.stage2
 tools.test tools.vocabs help.html mason.common words generic
-accessors compiler.errors sequences sets sorting ;
+accessors compiler.errors sequences sets sorting math ;
 IN: mason.test
 
 : do-load ( -- )
@@ -47,7 +47,7 @@ M: method-body word-vocabulary "method-generic" word-prop word-vocabulary ;
     ".." [
         bootstrap-time get boot-time-file to-file
         [ do-load do-compile-errors ] benchmark-ms load-time-file to-file
-        [ generate-help ]  html-help-time-file to-file
+        [ generate-help ] benchmark-ms html-help-time-file to-file
         [ do-tests ] benchmark-ms test-time-file to-file
         [ do-help-lint ] benchmark-ms help-lint-time-file to-file
         [ do-benchmarks ] benchmark-ms benchmark-time-file to-file

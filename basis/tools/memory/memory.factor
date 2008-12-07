@@ -3,14 +3,14 @@
 USING: kernel sequences vectors arrays generic assocs io math
 namespaces parser prettyprint strings io.styles vectors words
 system sorting splitting grouping math.parser classes memory
-combinators ;
+combinators fry ;
 IN: tools.memory
 
 <PRIVATE
 
 : write-size ( n -- )
     number>string
-    dup length 4 > [ 3 cut* "," swap 3append ] when
+    dup length 4 > [ 3 cut* "," glue ] when
     " KB" append write-cell ;
 
 : write-total/used/free ( free total str -- )
@@ -51,9 +51,10 @@ IN: tools.memory
         [ "Largest free block:" write-labelled-size ]
     } spread ;
 
-: heap-stat-step ( counts sizes obj -- )
-    [ dup size swap class rot at+ ] keep
-    1 swap class rot at+ ;
+: heap-stat-step ( obj counts sizes -- )
+    [ over ] dip
+    [ [ [ drop 1 ] [ class ] bi ] dip at+ ]
+    [ [ [ size ] [ class ] bi ] dip at+ ] 2bi* ;
 
 PRIVATE>
 
@@ -71,7 +72,7 @@ PRIVATE>
 
 : heap-stats ( -- counts sizes )
     H{ } clone H{ } clone
-    [ >r 2dup r> heap-stat-step ] each-object ;
+    2dup '[ _ _ heap-stat-step ] each-object ;
 
 : heap-stats. ( -- )
     heap-stats dup keys natural-sort standard-table-style [

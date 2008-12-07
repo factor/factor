@@ -46,7 +46,7 @@ yield
 
         "Receive 1" print
 
-        "d" get receive >r reverse r>
+        "d" get receive [ reverse ] dip
         
         "Send 1" print
         dup .
@@ -55,7 +55,7 @@ yield
 
         "Receive 2" print
 
-        "d" get receive >r " world" append r>
+        "d" get receive [ " world" append ] dip
         
         "Send 1" print
         dup .
@@ -86,7 +86,7 @@ datagram-client <local> <datagram>
 [ "olleh" t ] [
     "d" get receive
     datagram-server <local> =
-    >r >string r>
+    [ >string ] dip
 ] unit-test
 
 [ ] [
@@ -98,7 +98,7 @@ datagram-client <local> <datagram>
 [ "hello world" t ] [
     "d" get receive
     datagram-server <local> =
-    >r >string r>
+    [ >string ] dip
 ] unit-test
 
 [ ] [ "d" get dispose ] unit-test

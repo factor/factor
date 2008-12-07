@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations destructors io io.encodings
-io.encodings.private io.timeouts debugger summary listener
-accessors delegate delegate.protocols ;
+io.encodings.private io.timeouts io.ports debugger summary
+listener accessors delegate delegate.protocols ;
 IN: io.streams.duplex
 
 TUPLE: duplex-stream in out ;
@@ -27,10 +27,18 @@ M: duplex-stream dispose
     ] with-destructors ;
 
 : <encoder-duplex> ( stream-in stream-out encoding -- duplex )
-    tuck re-encode >r re-decode r> <duplex-stream> ;
+    tuck [ re-decode ] [ re-encode ] 2bi* <duplex-stream> ;
 
 : with-stream* ( stream quot -- )
-    >r [ in>> ] [ out>> ] bi r> with-streams* ; inline
+    [ [ in>> ] [ out>> ] bi ] dip with-streams* ; inline
 
 : with-stream ( stream quot -- )
-    >r [ in>> ] [ out>> ] bi r> with-streams ; inline
+    [ [ in>> ] [ out>> ] bi ] dip with-streams ; inline
+
+ERROR: invalid-duplex-stream ;
+
+M: duplex-stream underlying-handle
+    [ in>> underlying-handle ]
+    [ out>> underlying-handle ] bi
+    [ = [ invalid-duplex-stream ] when ] keep ;
+

@@ -205,18 +205,18 @@ HELP: 3slip
 { $description "Calls a quotation while hiding the top three stack elements." } ;
 
 HELP: keep
-{ $values { "quot" { $quotation "( x -- )" } } { "x" object } }
+{ $values { "quot" { $quotation "( x -- ... )" } } { "x" object } }
 { $description "Call a quotation with a value on the stack, restoring the value when the quotation returns." }
 { $examples
     { $example "USING: arrays kernel prettyprint ;" "2 \"greetings\" [ <array> ] keep 2array ." "{ { \"greetings\" \"greetings\" } \"greetings\" }" }
 } ;
 
 HELP: 2keep
-{ $values { "quot" { $quotation "( x y -- )" } } { "x" object } { "y" object } }
+{ $values { "quot" { $quotation "( x y -- ... )" } } { "x" object } { "y" object } }
 { $description "Call a quotation with two values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: 3keep
-{ $values { "quot" { $quotation "( x y z -- )" } } { "x" object } { "y" object } { "z" object } }
+{ $values { "quot" { $quotation "( x y z -- ... )" } } { "x" object } { "y" object } { "z" object } }
 { $description "Call a quotation with three values on the stack, restoring the values when the quotation returns." } ;
 
 HELP: bi
@@ -371,7 +371,7 @@ HELP: tri*
 } ;
 
 HELP: bi@
-{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- )" } } }
+{ $values { "x" object } { "y" object } { "quot" { $quotation "( obj -- ... )" } } }
 { $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -387,7 +387,7 @@ HELP: bi@
 } ;
 
 HELP: 2bi@
-{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj1 obj2 -- )" } } }
+{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj1 obj2 -- ... )" } } }
 { $description "Applies the quotation to " { $snippet "w" } " and " { $snippet "x" } ", then to " { $snippet "y" } " and " { $snippet "z" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -403,7 +403,7 @@ HELP: 2bi@
 } ;
 
 HELP: tri@
-{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj -- )" } } }
+{ $values { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj -- ... )" } } }
 { $description "Applies the quotation to " { $snippet "x" } ", then to " { $snippet "y" } ", and finally to " { $snippet "z" } "." }
 { $examples
     "The following two lines are equivalent:"
@@ -437,7 +437,7 @@ $nl
 "The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
 
 HELP: if*
-{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- )" } } { "false" quotation } }
+{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } { "false" quotation } }
 { $description "Alternative conditional form that preserves the " { $snippet "cond" } " value if it is true."
 $nl
 "If the condition is true, it is retained on the stack before the " { $snippet "true" } " quotation is called. Otherwise, the condition is removed from the stack and the " { $snippet "false" } " quotation is called."
@@ -446,7 +446,7 @@ $nl
 { $code "X [ Y ] [ Z ] if*" "X dup [ Y ] [ drop Z ] if" } } ;
 
 HELP: when*
-{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- )" } } }
+{ $values { "?" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } }
 { $description "Variant of " { $link if* } " with no false quotation."
 $nl
 "The following two lines are equivalent:"
@@ -460,7 +460,7 @@ HELP: unless*
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
 HELP: ?if
-{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation "( cond -- )" } } { "false" { $quotation "( default -- )" } } }
+{ $values { "default" object } { "cond" "a generalized boolean" } { "true" { $quotation "( cond -- ... )" } } { "false" { $quotation "( default -- ... )" } } }
 { $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack." }
 { $notes
 "The following two lines are equivalent:"
@@ -578,18 +578,6 @@ HELP: prepose
 
 { compose prepose } related-words
 
-HELP: 3compose
-{ $values { "quot1" callable } { "quot2" callable } { "quot3" callable } { "compose" compose } }
-{ $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } ", " { $snippet "quot2" } " and then " { $snippet "quot3" } "." }
-{ $notes
-    "The following two lines are equivalent:"
-    { $code
-        "3compose call"
-        "3append call"
-    }
-    "However, " { $link 3compose } " runs in constant time, and the compiler is able to compile code which calls composed quotations."
-} ;
-
 HELP: dip
 { $values { "x" object } { "quot" quotation } }
 { $description "Calls " { $snippet "quot" } " with " { $snippet "obj" } " hidden on the retain stack." }
@@ -599,7 +587,7 @@ HELP: dip
 
 HELP: 2dip
 { $values { "x" object } { "y" object } { "quot" quotation } }
-{ $description "Calls " { $snippet "quot" } " with " { $snippet "obj1" } " and " { $snippet "obj2" } " hidden on the retain stack." }
+{ $description "Calls " { $snippet "quot" } " with " { $snippet "x" } " and " { $snippet "y" } " hidden on the retain stack." }
 { $notes "The following are equivalent:"
     { $code "[ [ foo bar ] dip ] dip" }
     { $code "[ foo bar ] 2dip" }
@@ -770,12 +758,10 @@ $nl
 "Technically, the spread combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on three related values can be written in one of two ways:"
 { $code
     "! First alternative; uses dip"
-    "[ [ 1 + ] dip 1 - dip ] 2 *"
+    "[ [ 1 + ] dip 1 - ] dip 2 *"
     "! Second alternative: uses tri*"
     "[ 1 + ] [ 1 - ] [ 2 * ] tri*"
 }
-
-$nl
 "A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
 { $subsection "spread-shuffle-equivalence" } ;
 
@@ -814,7 +800,6 @@ ARTICLE: "compositional-combinators" "Compositional combinators"
 { $subsection 3curry }
 { $subsection with }
 { $subsection compose }
-{ $subsection 3compose }
 { $subsection prepose }
 "Quotations also implement the sequence protocol, and can be manipulated with sequence words; see " { $link "quotations" } "." ;
 
@@ -902,6 +887,11 @@ $nl
 "An object can be cloned; the clone has distinct identity but equal value:"
 { $subsection clone } ;
 
+ARTICLE: "assertions" "Assertions"
+"Some words to make assertions easier to enforce:"
+{ $subsection assert }
+{ $subsection assert= } ;
+
 ARTICLE: "dataflow" "Data and control flow"
 { $subsection "evaluator" }
 { $subsection "words" }
@@ -917,6 +907,7 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "compositional-combinators" }
 { $subsection "combinators" }
 "Advanced topics:"
+{ $subsection "assertions" }
 { $subsection "implementing-combinators" }
 { $subsection "errors" }
 { $subsection "continuations" } ;

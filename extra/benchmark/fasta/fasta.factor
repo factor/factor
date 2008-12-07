@@ -1,7 +1,7 @@
 ! Based on http://shootout.alioth.debian.org/gp4/benchmark.php?test=fasta&lang=java&id=2
 USING: math kernel io io.files locals multiline assocs sequences
 sequences.private benchmark.reverse-complement hints io.encodings.ascii
-byte-arrays float-arrays ;
+byte-arrays specialized-arrays.double ;
 IN: benchmark.fasta
 
 : IM 139968 ; inline
@@ -49,7 +49,7 @@ HINTS: random fixnum ;
 
 : make-cumulative ( freq -- chars floats )
     dup keys >byte-array
-    swap values >float-array unclip [ + ] accumulate swap suffix ;
+    swap values >double-array unclip [ + ] accumulate swap suffix ;
 
 :: select-random ( seed chars floats -- seed elt )
     floats seed random -rot

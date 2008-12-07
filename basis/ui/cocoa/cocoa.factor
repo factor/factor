@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors math arrays cocoa cocoa.application
+USING: accessors math arrays assocs cocoa cocoa.application
 command-line kernel memory namespaces cocoa.messages
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
 cocoa.windows cocoa.classes cocoa.application sequences system
 ui ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
-ui.cocoa.views core-foundation threads math.geometry.rect ;
+ui.cocoa.views core-foundation threads math.geometry.rect fry ;
 IN: ui.cocoa
 
 TUPLE: handle view window ;
@@ -15,7 +15,7 @@ C: <handle> handle
 SINGLETON: cocoa-ui-backend
 
 M: cocoa-ui-backend do-events ( -- )
-    [ NSApp [ do-event ] curry loop ui-wait ] with-autorelease-pool ;
+    [ NSApp '[ _ do-event ] loop ui-wait ] with-autorelease-pool ;
 
 TUPLE: pasteboard handle ;
 
@@ -33,16 +33,13 @@ M: pasteboard set-clipboard-contents
     <clipboard> selection set-global ;
 
 : world>NSRect ( world -- NSRect )
-    dup window-loc>> first2 rot rect-dim first2 <NSRect> ;
+    [ window-loc>> ] [ dim>> ] bi [ first2 ] bi@ <NSRect> ;
 
 : gadget-window ( world -- )
-    [
-        dup <FactorView>
-        dup rot world>NSRect <ViewWindow>
-        dup install-window-delegate
-        over -> release
-        <handle>
-    ] keep (>>handle) ;
+    dup <FactorView>
+    2dup swap world>NSRect <ViewWindow>
+    [ [ -> release ] [ install-window-delegate ] bi* ] [ <handle> ] 2bi
+    >>handle drop ;
 
 M: cocoa-ui-backend set-title ( string world -- )
     handle>> window>> swap <NSString> -> setTitle: ;
@@ -99,16 +96,29 @@ M: cocoa-ui-backend flush-gl-context ( handle -- )
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;
 
+CLASS: {
+    { +superclass+ "NSObject" }
+    { +name+ "FactorApplicationDelegate" }
+}
+
+{ "applicationDidFinishLaunching:" "void" { "id" "SEL" "id" }
+    [ 3drop event-loop ]
+} ;
+
+: install-app-delegate ( -- )
+    NSApp FactorApplicationDelegate install-delegate ;
+
 SYMBOL: cocoa-init-hook
+
+cocoa-init-hook global [ [ install-app-delegate ] or ] change-at
 
 M: cocoa-ui-backend ui
     "UI" assert.app [
         [
             init-clipboard
-            cocoa-init-hook get [ call ] when*
+            cocoa-init-hook get call
             start-ui
-            finish-launching
-            event-loop
+            NSApp -> run
         ] ui-running
     ] with-cocoa ;
 

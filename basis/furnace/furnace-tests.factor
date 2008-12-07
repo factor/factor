@@ -1,7 +1,7 @@
 IN: furnace.tests
 USING: http http.server.dispatchers http.server.responses
-http.server furnace tools.test kernel namespaces accessors
-io.streams.string urls ;
+http.server furnace furnace.utilities tools.test kernel
+namespaces accessors io.streams.string urls ;
 TUPLE: funny-dispatcher < dispatcher ;
 
 : <funny-dispatcher> funny-dispatcher new-dispatcher ;

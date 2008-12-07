@@ -52,7 +52,9 @@ DEFER: if
 : ?if ( default cond true false -- )
     pick [ roll 2drop call ] [ 2nip call ] if ; inline
 
-! Slippers
+! Slippers and dippers.
+! Not declared inline because the compiler special-cases them
+
 : slip ( quot x -- x )
     #! 'slip' and 'dip' can be defined in terms of each other
     #! because the JIT special-cases a 'dip' preceeded by
@@ -71,11 +73,11 @@ DEFER: if
     #! a literal quotation.
     [ call ] 3dip ;
 
-: dip ( x quot -- x ) swap slip ; inline
+: dip ( x quot -- x ) swap slip ;
 
-: 2dip ( x y quot -- x y ) -rot 2slip ; inline
+: 2dip ( x y quot -- x y ) -rot 2slip ;
 
-: 3dip ( x y z quot -- x y z ) -roll 3slip ; inline
+: 3dip ( x y z quot -- x y z ) -roll 3slip ;
 
 ! Keepers
 : keep ( x quot -- x ) over slip ; inline
@@ -152,8 +154,11 @@ TUPLE: identity-tuple ;
 
 M: identity-tuple equal? 2drop f ;
 
+USE: math.private
 : = ( obj1 obj2 -- ? )
-    2dup eq? [ 2drop t ] [ equal? ] if ; inline
+    2dup eq? [ 2drop t ] [
+        2dup both-fixnums? [ 2drop f ] [ equal? ] if
+    ] if ; inline
 
 GENERIC: clone ( obj -- cloned )
 
@@ -178,9 +183,6 @@ GENERIC: boa ( ... class -- tuple )
 
 : prepose ( quot1 quot2 -- compose )
     swap compose ; inline
-
-: 3compose ( quot1 quot2 quot3 -- compose )
-    compose compose ; inline
 
 ! Booleans
 : not ( obj -- ? ) [ f ] [ t ] if ; inline

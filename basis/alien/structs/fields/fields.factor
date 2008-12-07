@@ -29,10 +29,10 @@ PREDICATE: slot-writer < word "writing" word-prop >boolean ;
     writer>> swap "writing" set-word-prop ;
 
 : reader-word ( class name vocab -- word )
-    >r >r "-" r> 3append r> create ;
+    [ "-" glue ] dip create ;
 
 : writer-word ( class name vocab -- word )
-    >r [ swap "set-" % % "-" % % ] "" make r> create ;
+    [ [ swap "set-" % % "-" % % ] "" make ] dip create ;
 
 : <field-spec> ( struct-name vocab type field-name -- spec )
     field-spec new
@@ -52,25 +52,21 @@ PREDICATE: slot-writer < word "writing" word-prop >boolean ;
         [ (>>offset) ] [ type>> heap-size + ] 2bi
     ] reduce ;
 
-: define-struct-slot-word ( spec word quot -- )
-    rot offset>> prefix define-inline ;
+: define-struct-slot-word ( word quot spec -- )
+    offset>> prefix define-inline ;
 
 : define-getter ( type spec -- )
     [ set-reader-props ] keep
-    [ ]
     [ reader>> ]
     [
         type>>
         [ c-getter ] [ c-type-boxer-quot ] bi append
-    ] tri
-    define-struct-slot-word ;
+    ]
+    [ ] tri define-struct-slot-word ;
 
 : define-setter ( type spec -- )
     [ set-writer-props ] keep
-    [ ]
-    [ writer>> ]
-    [ type>> c-setter ] tri
-    define-struct-slot-word ;
+    [ writer>> ] [ type>> c-setter ] [ ] tri define-struct-slot-word ;
 
 : define-field ( type spec -- )
     [ define-getter ] [ define-setter ] 2bi ;

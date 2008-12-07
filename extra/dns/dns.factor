@@ -285,7 +285,7 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
           [ get-label ]
           [ skip-label get-name ]
           2bi
-          "." swap 3append
+          "." glue 
         ]
       }
     }

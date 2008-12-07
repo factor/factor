@@ -1,8 +1,9 @@
-USING: continuations xml xml.errors tools.test kernel arrays xml.data state-parser quotations ;
+USING: continuations xml xml.errors tools.test kernel arrays
+xml.data state-parser quotations fry ;
 IN: xml.errors.tests
 
 : xml-error-test ( expected-error xml-string -- )
-    [ string>xml ] curry swap [ = ] curry must-fail-with ;
+    '[ _ string>xml ] swap '[ _ = ] must-fail-with ;
 
 T{ no-entity f 1 10 "nbsp" } "<x>&nbsp;</x>" xml-error-test
 T{ mismatched f 1 8 T{ name f "" "x" "" } T{ name f "" "y" "" }
@@ -24,5 +25,3 @@ T{ pre/post-content f "x" t } "x<y/>" xml-error-test
 T{ versionless-prolog f 1 8 } "<?xml?><x/>" xml-error-test
 T{ bad-instruction f 1 11 T{ instruction f "xsl" }
 } "<x><?xsl?></x>" xml-error-test
-T{ bad-directive f 1 15 T{ directive f "DOCTYPE" }
-} "<x/><!DOCTYPE>" xml-error-test

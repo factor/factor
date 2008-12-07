@@ -76,17 +76,6 @@ $nl
 
 ;
 
-ARTICLE: "ui-tool-tutorial" "UI tool tutorial"
-"The following is an example of a typical session with the UI which should give you a taste of its power:"
-{ $list
-    { "You decide to refactor some code, and move a few words from a source file you have already loaded, into a new source file." }
-    { "You press " { $operation edit } " in the listener, which displays a gadget where you can type part of a loaded file's name, and then press " { $snippet "RET" } " when the correct completion is highlighted. This opens the file in your editor." } 
-    { "You refactor your words, move them to a new source file, and load the new file using " { $link run-file } "." }
-    { "Interactively testing the new code reveals a problem with one particular code snippet, so you enter it in the listener's input area, and press " { $operation walk } " to invoke the single stepper." }
-    { "Single stepping through the code makes the problem obvious, so you right-click on a presentation of the broken word in the stepper, and choose " { $strong "Edit" } " from the menu." }
-    { "After fixing the problem in the source editor, you right click on the word in the stepper and invoke " { $strong "Reload" } " from the menu." }
-} ;
-
 ARTICLE: "ui-completion-words" "Word completion popup"
 "Clicking a word in the word completion popup displays the word definition in the " { $link "ui-browser" } ". Pressing " { $snippet "RET" } " with a word selected inserts the word name in the listener, along with a " { $link POSTPONE: USE: } " declaration (if necessary)."
 { $operations \ $operations } ;
@@ -110,18 +99,16 @@ $nl
 { $subsection "ui-completion-sources" } ;
 
 ARTICLE: "ui-workspace-keys" "UI keyboard shortcuts"
+"See " { $link "gesture-differences" } " to find out how your platform's modifier keys map to modifiers in the Factor UI."
 { $command-map workspace "tool-switching" }
 { $command-map workspace "scrolling" }
 { $command-map workspace "workflow" }
-{ $command-map workspace "multi-touch" }
-{ $heading "Implementation" }
-"Workspaces are instances of " { $link workspace } "." ;
+{ $command-map workspace "multi-touch" } ;
 
 ARTICLE: "ui-tools" "UI developer tools"
 "The Factor development environment can seem rather different from what you are used to, because it is very simple and powerful.."
 $nl
 "To take full advantage of the UI, you should be using a supported text editor. See " { $link "editor" } "."
-{ $subsection "ui-tool-tutorial" }
 { $subsection "ui-workspace-keys" }
 { $subsection "ui-presentations" }
 { $subsection "ui-completion" }

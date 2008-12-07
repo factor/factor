@@ -39,8 +39,6 @@ ready ;
 : <threaded-server> ( -- threaded-server )
     threaded-server new-threaded-server ;
 
-SYMBOL: remote-address
-
 GENERIC: handle-client* ( threaded-server -- )
 
 <PRIVATE
@@ -81,7 +79,7 @@ M: threaded-server handle-client* handler>> call ;
 \ handle-client ERROR add-error-logging
 
 : thread-name ( server-name addrspec -- string )
-    unparse-short " connection from " swap 3append ;
+    unparse-short " connection from " glue ;
 
 : accept-connection ( threaded-server -- )
     [ accept ] [ addr>> ] bi

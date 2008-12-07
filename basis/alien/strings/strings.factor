@@ -3,13 +3,13 @@
 USING: arrays sequences kernel accessors math alien.accessors
 alien.c-types byte-arrays words io io.encodings
 io.streams.byte-array io.streams.memory io.encodings.utf8
-io.encodings.utf16 system alien strings cpu.architecture ;
+io.encodings.utf16 system alien strings cpu.architecture fry ;
 IN: alien.strings
 
 GENERIC# alien>string 1 ( c-ptr encoding -- string/f )
 
 M: c-ptr alien>string
-    >r <memory-stream> r> <decoder>
+    [ <memory-stream> ] [ <decoder> ] bi*
     "\0" swap stream-read-until drop ;
 
 M: f alien>string
@@ -39,6 +39,9 @@ PREDICATE: string-type < pair
     first2 [ "char*" = ] [ word? ] bi* and ;
 
 M: string-type c-type ;
+
+M: string-type c-type-class
+    drop object ;
 
 M: string-type heap-size
     drop "void*" heap-size ;
@@ -74,10 +77,10 @@ M: string-type c-type-unboxer
     drop "void*" c-type-unboxer ;
 
 M: string-type c-type-boxer-quot
-    second [ alien>string ] curry [ ] like ;
+    second '[ _ alien>string ] ;
 
 M: string-type c-type-unboxer-quot
-    second [ string>alien ] curry [ ] like ;
+    second '[ _ string>alien ] ;
 
 M: string-type c-type-getter
     drop [ alien-cell ] ;

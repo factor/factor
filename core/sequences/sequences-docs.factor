@@ -714,6 +714,26 @@ HELP: 3append
     }
 } ;
 
+HELP: surround
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence with " { $snippet "seq1" } " inserted between " { $snippet "seq2" } " and " { $snippet "seq3" } "." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+               "\"sssssh\" \"(\" \")\" surround ."
+               "\"(sssssh)\""
+    }
+} ;
+
+HELP: glue
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence with " { $snippet "seq3" } " inserted between " { $snippet "seq1" } " and " { $snippet "seq2" } "." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+               "\"a\" \"b\" \",\" glue ."
+               "\"a,b\""
+    }
+} ;
+
 HELP: subseq
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "subseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of all elements starting from and including " { $snippet "from" } ", and up to but not including " { $snippet "to" } "." }
@@ -1348,6 +1368,8 @@ ARTICLE: "sequences-appending" "Appending sequences"
 { $subsection append }
 { $subsection prepend }
 { $subsection 3append }
+{ $subsection surround }
+{ $subsection glue }
 { $subsection concat }
 { $subsection join }
 "A pair of words useful for aligning strings:"
