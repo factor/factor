@@ -540,8 +540,6 @@ ARTICLE: "calendar" "Calendar"
 { $subsection "years" }
 { $subsection "months" }
 { $subsection "days" }
-"Calculating amounts per period of time:"
-{ $subsection "time-period-calculations" }
 "Meta-data about the calendar:"
 { $subsection "calendar-facts" }
 ;
@@ -626,18 +624,6 @@ ARTICLE: "calendar-facts" "Calendar facts"
 { $subsection days-in-month }
 { $subsection day-of-year }
 { $subsection day-of-week }
-;
-
-ARTICLE: "time-period-calculations" "Calculations over periods of time"
-{ $subsection monthly }
-{ $subsection semimonthly }
-{ $subsection biweekly }
-{ $subsection weekly }
-{ $subsection daily-360 }
-{ $subsection daily-365 }
-{ $subsection biweekly }
-{ $subsection biweekly }
-{ $subsection biweekly }
 ;
 
 ARTICLE: "years" "Year operations"
