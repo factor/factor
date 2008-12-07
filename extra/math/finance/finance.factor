@@ -26,3 +26,14 @@ PRIVATE>
 : momentum ( seq n -- newseq )
     [ tail-slice ] 2keep [ dup length ] dip - head-slice v- ;
 
+: monthly ( x -- y ) 12 / ; inline
+
+: semimonthly ( x -- y ) 24 / ; inline
+
+: biweekly ( x -- y ) 26 / ; inline
+
+: weekly ( x -- y ) 52 / ; inline
+
+: daily-360 ( x -- y ) 360 / ; inline
+
+: daily-365 ( x -- y ) 365 / ; inline
