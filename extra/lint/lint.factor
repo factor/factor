@@ -25,7 +25,6 @@ SYMBOL: def-hash-keys
         { 2nip [ nip nip ] }
         { 2drop [ drop drop ] }
         { 3drop [ drop drop drop ] }
-        { zero? [ 0 = ] }
         { pop* [ pop drop ] }
         { when [ [ ] if ] }
         { >boolean [ f = not ] }
@@ -49,7 +48,6 @@ SYMBOL: def-hash-keys
         [ get ]
         [ t ] [ f ]
         [ { } ]
-        [ 0 = ]
         [ drop ] ! because of declare
         [ drop f ]
         [ "cdecl" ]
