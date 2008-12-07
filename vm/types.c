@@ -157,27 +157,18 @@ CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 	return tag_object(a);
 }
 
-F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill)
+F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity)
 {
-	int i;
-	F_ARRAY* new_array;
-
 	CELL to_copy = array_capacity(array);
 	if(capacity < to_copy)
 		to_copy = capacity;
 
 	REGISTER_UNTAGGED(array);
-	REGISTER_ROOT(fill);
-
-	new_array = allot_array_internal(untag_header(array->header),capacity);
-
-	UNREGISTER_ROOT(fill);
+	F_ARRAY* new_array = allot_array_internal(untag_header(array->header),capacity);
 	UNREGISTER_UNTAGGED(array);
 
 	memcpy(new_array + 1,array + 1,to_copy * CELLS);
-
-	for(i = to_copy; i < capacity; i++)
-		put(AREF(new_array,i),fill);
+	memset((char *)AREF(new_array,to_copy),'\0',(capacity - to_copy) * CELLS);
 
 	return new_array;
 }
@@ -186,7 +177,7 @@ void primitive_resize_array(void)
 {
 	F_ARRAY* array = untag_array(dpop());
 	CELL capacity = unbox_array_size();
-	dpush(tag_object(reallot_array(array,capacity,F)));
+	dpush(tag_object(reallot_array(array,capacity)));
 }
 
 F_ARRAY *growable_array_add(F_ARRAY *result, CELL elt, CELL *result_count)
@@ -195,8 +186,7 @@ F_ARRAY *growable_array_add(F_ARRAY *result, CELL elt, CELL *result_count)
 
 	if(*result_count == array_capacity(result))
 	{
-		result = reallot_array(result,
-			*result_count * 2,F);
+		result = reallot_array(result,*result_count * 2);
 	}
 
 	UNREGISTER_ROOT(elt);
@@ -214,7 +204,7 @@ F_ARRAY *growable_array_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_coun
 	CELL new_size = *result_count + elts_size;
 
 	if(new_size >= array_capacity(result))
-		result = reallot_array(result,new_size * 2,F);
+		result = reallot_array(result,new_size * 2);
 
 	UNREGISTER_UNTAGGED(elts);
 
@@ -433,7 +423,7 @@ void primitive_string(void)
 	dpush(tag_object(allot_string(length,initial)));
 }
 
-F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)
+F_STRING* reallot_string(F_STRING* string, CELL capacity)
 {
 	CELL to_copy = string_capacity(string);
 	if(capacity < to_copy)
@@ -462,7 +452,7 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)
 
 	REGISTER_UNTAGGED(string);
 	REGISTER_UNTAGGED(new_string);
-	fill_string(new_string,to_copy,capacity,fill);
+	fill_string(new_string,to_copy,capacity,'\0');
 	UNREGISTER_UNTAGGED(new_string);
 	UNREGISTER_UNTAGGED(string);
 
@@ -473,7 +463,7 @@ void primitive_resize_string(void)
 {
 	F_STRING* string = untag_string(dpop());
 	CELL capacity = unbox_array_size();
-	dpush(tag_object(reallot_string(string,capacity,0)));
+	dpush(tag_object(reallot_string(string,capacity)));
 }
 
 /* Some ugly macros to prevent a 2x code duplication */
