@@ -12,7 +12,7 @@ PREDICATE: intersection-class < class
         [ drop t ]
     ] [
         unclip "predicate" word-prop swap [
-            "predicate" word-prop [ dup ] swap [ not ] 3append
+            "predicate" word-prop [ dup ] [ not ] surround
             [ drop f ]
         ] { } map>assoc alist>quot
     ] if-empty ;
