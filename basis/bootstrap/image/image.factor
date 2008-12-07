@@ -23,7 +23,7 @@ IN: bootstrap.image
     os name>> cpu name>> arch ;
 
 : boot-image-name ( arch -- string )
-    "boot." swap ".image" 3append ;
+    "boot." ".image" surround ;
 
 : my-boot-image-name ( -- string )
     my-arch boot-image-name ;

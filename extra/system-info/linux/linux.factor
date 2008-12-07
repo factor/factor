@@ -1,6 +1,8 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: unix alien alien.c-types kernel math sequences strings
 io.unix.backend splitting ;
-IN: hardware-info.linux
+IN: system-info.linux
 
 : (uname) ( buf -- int )
     "int" f "uname" { "char*" } alien-invoke ;

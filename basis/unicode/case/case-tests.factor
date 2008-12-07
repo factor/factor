@@ -16,3 +16,9 @@ USING: unicode.case tools.test namespaces ;
     "lt" locale set
     ! Lithuanian casing tests
 ] with-scope
+
+[ t ] [ "asdf" lower? ] unit-test
+[ f ] [ "asdF" lower? ] unit-test
+
+[ t ] [ "ASDF" upper? ] unit-test
+[ f ] [ "ASDf" upper? ] unit-test

@@ -1,5 +1,7 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: system ;
-IN: hardware-info.backend
+IN: system-info.backend
 
 HOOK: cpus os ( -- n )
 HOOK: cpu-mhz os ( -- n )

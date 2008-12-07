@@ -102,7 +102,7 @@ SYMBOL: total
         { 0 [ [ dup ] ] }
         { 1 [ [ over ] ] }
         { 2 [ [ pick ] ] }
-        [ 1- picker [ >r ] swap [ r> swap ] 3append ]
+        [ 1- picker [ >r ] [ r> swap ] surround ]
     } case ;
 
 : (multi-predicate) ( class picker -- quot )

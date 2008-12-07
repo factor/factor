@@ -27,9 +27,6 @@ IN: project-euler.117
 
 <PRIVATE
 
-: short ( seq n -- seq n )
-    over length min ;
-
 : next ( seq -- )
     [ 4 short tail* sum ] keep push ;
 

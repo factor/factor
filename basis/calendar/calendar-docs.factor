@@ -99,48 +99,6 @@ HELP: seconds-per-year
 { $values { "integer" integer } }
 { $description "Returns the number of seconds in a year averaged over 400 years. Used internally for adding an arbitrary real number of seconds to a timestamp." } ;
 
-HELP: biweekly
-{ $values
-     { "x" number }
-     { "y" number }
-}
-{ $description "Divides a number by the number of two week periods in a year." } ;
-
-HELP: daily-360
-{ $values
-     { "x" number }
-     { "y" number }
-}
-{ $description "Divides a number by the number of days in a 360-day year." } ;
-
-HELP: daily-365
-{ $values
-     { "x" number }
-     { "y" number }
-}
-{ $description "Divides a number by the number of days in a 365-day year." } ;
-
-HELP: monthly
-{ $values
-     { "x" number }
-     { "y" number }
-}
-{ $description "Divides a number by the number of months in a year." } ;
-
-HELP: semimonthly
-{ $values
-     { "x" number }
-     { "y" number }
-}
-{ $description "Divides a number by the number of half-months in a year. Note that biweekly has two more periods than semimonthly." } ;
-
-HELP: weekly
-{ $values
-     { "x" number }
-     { "y" number }
-}
-{ $description "Divides a number by the number of weeks in a year." } ;
-
 HELP: julian-day-number
 { $values { "year" integer } { "month" integer } { "day" integer } { "n" integer } }
 { $description "Calculates the Julian day number from a year, month, and day.  The difference between two Julian day numbers is the number of days that have elapsed between the two corresponding dates." }
@@ -582,8 +540,6 @@ ARTICLE: "calendar" "Calendar"
 { $subsection "years" }
 { $subsection "months" }
 { $subsection "days" }
-"Calculating amounts per period of time:"
-{ $subsection "time-period-calculations" }
 "Meta-data about the calendar:"
 { $subsection "calendar-facts" }
 ;
@@ -668,18 +624,6 @@ ARTICLE: "calendar-facts" "Calendar facts"
 { $subsection days-in-month }
 { $subsection day-of-year }
 { $subsection day-of-week }
-;
-
-ARTICLE: "time-period-calculations" "Calculations over periods of time"
-{ $subsection monthly }
-{ $subsection semimonthly }
-{ $subsection biweekly }
-{ $subsection weekly }
-{ $subsection daily-360 }
-{ $subsection daily-365 }
-{ $subsection biweekly }
-{ $subsection biweekly }
-{ $subsection biweekly }
 ;
 
 ARTICLE: "years" "Year operations"
