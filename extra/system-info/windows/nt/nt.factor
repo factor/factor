@@ -1,8 +1,10 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings
-kernel libc math namespaces hardware-info.backend
-hardware-info.windows windows windows.advapi32
+kernel libc math namespaces system-info.backend
+system-info.windows windows windows.advapi32
 windows.kernel32 system byte-arrays ;
-IN: hardware-info.windows.nt
+IN: system-info.windows.nt
 
 M: winnt cpus ( -- n )
     system-info SYSTEM_INFO-dwNumberOfProcessors ;

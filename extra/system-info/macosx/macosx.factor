@@ -1,8 +1,9 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax
 byte-arrays kernel namespaces sequences unix
-hardware-info.backend system io.unix.backend io.encodings.ascii
-;
-IN: hardware-info.macosx
+system-info.backend system io.unix.backend io.encodings.utf8 ;
+IN: system-info.macosx
 
 ! See /usr/include/sys/sysctl.h for constants
 
@@ -20,7 +21,7 @@ FUNCTION: int sysctl ( int* name, uint namelen, void* oldp, size_t* oldlenp, voi
     [ <byte-array> ] [ <uint> ] bi (sysctl-query) ;
 
 : sysctl-query-string ( seq -- n )
-    4096 sysctl-query ascii malloc-string ;
+    4096 sysctl-query utf8 alien>string ;
 
 : sysctl-query-uint ( seq -- n )
     4 sysctl-query *uint ;
@@ -53,4 +54,3 @@ M: macosx cpu-mhz ( -- n ) { 6 15 } sysctl-query-uint ;
 : tb-frequency ( -- n ) { 6 23 } sysctl-query-uint ;
 : mem-size ( -- n ) { 6 24 } sysctl-query-ulonglong ;
 : available-cpus ( -- n ) { 6 25 } sysctl-query-uint ;
-
