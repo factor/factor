@@ -1,8 +1,6 @@
-! Copyright (C) 2008 John Benediktsson
+! Copyright (C) 2008 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license
-
-USING: help.markup help.syntax ;
-
+USING: help.markup help.syntax math ;
 IN: math.finance
 
 HELP: sma
@@ -73,3 +71,18 @@ HELP: weekly
      { "y" number }
 }
 { $description "Divides a number by the number of weeks in a year." } ;
+
+ARTICLE: "time-period-calculations" "Calculations over periods of time"
+{ $subsection monthly }
+{ $subsection semimonthly }
+{ $subsection biweekly }
+{ $subsection weekly }
+{ $subsection daily-360 }
+{ $subsection daily-365 } ;
+
+ARTICLE: "math.finance" "Financial math"
+"The " { $vocab-link "math.finance" } " vocabulary contains financial calculation words." $nl
+"Calculating payroll over periods of time:"
+{ $subsection "time-period-calculations" } ;
+
+ABOUT: "math.finance"

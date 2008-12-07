@@ -1,4 +1,4 @@
-! Copyright (C) 2008 John Benediktsson.
+! Copyright (C) 2008 John Benediktsson, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel grouping sequences shuffle
 math math.functions math.statistics math.vectors ;
