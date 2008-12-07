@@ -523,13 +523,6 @@ PRIVATE>
 : harvest ( seq -- newseq )
     [ empty? not ] filter ;
 
-: cache-nth ( i seq quot -- elt )
-    2over ?nth dup [
-        [ 3drop ] dip
-    ] [
-        drop swap [ over [ call dup ] dip ] dip set-nth
-    ] if ; inline
-
 : mismatch ( seq1 seq2 -- i )
     [ min-length ] 2keep
     [ 2nth-unsafe = not ] 2curry
