@@ -41,7 +41,7 @@ HELP: 'bold'
     "commonly used in markup languages to indicate bold "
     "faced text." }
 { $example "USING: parser-combinators parser-combinators.simple prettyprint ;" "\"*foo*\" 'bold' parse-1 ." "\"foo\"" }
-{ $example "USING: kernel parser-combinators parser-combinators.simple prettyprint sequences ;" "\"*foo*\" 'bold' [ \"<strong>\" swap \"</strong>\" 3append ] <@ parse-1 ." "\"<strong>foo</strong>\"" } ;
+{ $example "USING: kernel parser-combinators parser-combinators.simple prettyprint sequences ;" "\"*foo*\" 'bold' [ \"<strong>\" \"</strong>\" surround ] <@ parse-1 ." "\"<strong>foo</strong>\"" } ;
 
 HELP: 'italic'
 { $values 
@@ -53,7 +53,7 @@ HELP: 'italic'
     "faced text." }
 { $examples
 { $example "USING: parser-combinators parser-combinators.simple prettyprint ;" "\"_foo_\" 'italic' parse-1 ." "\"foo\"" }
-{ $example "USING: kernel parser-combinators parser-combinators.simple prettyprint sequences ;" "\"_foo_\" 'italic' [ \"<emphasis>\" swap \"</emphasis>\" 3append ] <@ parse-1 ." "\"<emphasis>foo</emphasis>\"" } } ;
+{ $example "USING: kernel parser-combinators parser-combinators.simple prettyprint sequences ;" "\"_foo_\" 'italic' [ \"<emphasis>\" \"</emphasis>\" surround ] <@ parse-1 ." "\"<emphasis>foo</emphasis>\"" } } ;
 HELP: comma-list
 { $values 
   { "element" "a parser object" } { "parser" "a parser object" } }

@@ -8,5 +8,3 @@ IN: crypto.barrett
     #! size = word size in bits (8, 16, 32, 64, ...)
     [ [ log2 1+ ] [ / 2 * ] bi* ]
     [ 2^ rot ^ swap /i ] 2bi ;
-
-

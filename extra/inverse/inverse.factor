@@ -9,14 +9,12 @@ combinators.short-circuit fry qualified ;
 RENAME: _ fry => __
 IN: inverse
 
-TUPLE: fail ;
-: fail ( -- * ) \ fail new throw ;
+ERROR: fail ;
 M: fail summary drop "Unification failed" ;
 
 : assure ( ? -- ) [ fail ] unless ;
 
-: =/fail ( obj1 obj2 -- )
-    = assure ;
+: =/fail ( obj1 obj2 -- ) = assure ;
 
 ! Inverse of a quotation
 
@@ -26,25 +24,26 @@ M: fail summary drop "Unification failed" ;
     pick 1quotation 3array "math-inverse" set-word-prop ;
 
 : define-pop-inverse ( word n quot -- )
-    >r dupd "pop-length" set-word-prop r>
+    [ dupd "pop-length" set-word-prop ] dip
     "pop-inverse" set-word-prop ;
 
-TUPLE: no-inverse word ;
-: no-inverse ( word -- * ) \ no-inverse new throw ;
+ERROR: no-inverse word ;
 M: no-inverse summary
     drop "The word cannot be used in pattern matching" ;
 
+ERROR: bad-math-inverse ;
+
 : next ( revquot -- revquot* first )
-    [ "Badly formed math inverse" throw ]
+    [ bad-math-inverse ]
     [ unclip-slice ] if-empty ;
 
 : constant-word? ( word -- ? )
     stack-effect
-    [ out>> length 1 = ] keep
-    in>> length 0 = and ;
+    [ out>> length 1 = ]
+    [ in>> empty? ] bi and ;
 
 : assure-constant ( constant -- quot )
-    dup word? [ "Badly formed math inverse" throw ] when 1quotation ;
+    dup word? [ bad-math-inverse ] when 1quotation ;
 
 : swap-inverse ( math-inverse revquot -- revquot* quot )
     next assure-constant rot second '[ @ swap @ ] ;
@@ -55,8 +54,7 @@ M: no-inverse summary
 : ?word-prop ( word/object name -- value/f )
     over word? [ word-prop ] [ 2drop f ] if ;
 
-: undo-literal ( object -- quot )
-    [ =/fail ] curry ;
+: undo-literal ( object -- quot ) [ =/fail ] curry ;
 
 PREDICATE: normal-inverse < word "inverse" word-prop ;
 PREDICATE: math-inverse < word "math-inverse" word-prop ;
@@ -65,13 +63,13 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
 : enough? ( stack word -- ? )
     dup deferred? [ 2drop f ] [
-        [ >r length r> 1quotation infer in>> >= ]
+        [ [ length ] dip 1quotation infer in>> >= ]
         [ 3drop f ] recover
     ] if ;
 
 : fold-word ( stack word -- stack )
     2dup enough?
-    [ 1quotation with-datastack ] [ >r % r> , { } ] if ;
+    [ 1quotation with-datastack ] [ [ % ] dip , { } ] if ;
 
 : fold ( quot -- folded-quot )
     [ { } swap [ fold-word ] each % ] [ ] make ; 
@@ -95,13 +93,15 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
         throw
     ] recover ;
 
+ERROR: undefined-inverse ;
+
 GENERIC: inverse ( revquot word -- revquot* quot )
 
 M: object inverse undo-literal ;
 
 M: symbol inverse undo-literal ;
 
-M: word inverse drop "Inverse is undefined" throw ;
+M: word inverse undefined-inverse ;
 
 M: normal-inverse inverse
     "inverse" word-prop ;
@@ -112,8 +112,8 @@ M: math-inverse inverse
     [ drop swap-inverse ] [ pull-inverse ] if ;
 
 M: pop-inverse inverse
-    [ "pop-length" word-prop cut-slice swap >quotation ] keep
-    "pop-inverse" word-prop compose call ;
+    [ "pop-length" word-prop cut-slice swap >quotation ]
+    [ "pop-inverse" word-prop ] bi compose call ;
 
 : (undo) ( revquot -- )
     [ unclip-slice inverse % (undo) ] unless-empty ;
@@ -129,7 +129,7 @@ MACRO: undo ( quot -- ) [undo] ;
 \ dup [ [ =/fail ] keep ] define-inverse
 \ 2dup [ over =/fail over =/fail ] define-inverse
 \ 3dup [ pick =/fail pick =/fail pick =/fail ] define-inverse
-\ pick [ >r pick r> =/fail ] define-inverse
+\ pick [ [ pick ] dip =/fail ] define-inverse
 \ tuck [ swapd [ =/fail ] keep ] define-inverse
 
 \ not [ not ] define-inverse
@@ -151,9 +151,12 @@ MACRO: undo ( quot -- ) [undo] ;
 \ sq [ sqrt ] define-inverse
 \ sqrt [ sq ] define-inverse
 
+ERROR: missing-literal ;
+
 : assert-literal ( n -- n )
-    dup [ word? ] keep symbol? not and
-    [ "Literal missing in pattern matching" throw ] when ;
+    dup
+    [ word? ] [ symbol? not ] bi and
+    [ missing-literal ] when ;
 \ + [ - ] [ - ] define-math-inverse
 \ - [ + ] [ - ] define-math-inverse
 \ * [ / ] [ / ] define-math-inverse
@@ -162,7 +165,7 @@ MACRO: undo ( quot -- ) [undo] ;
 
 \ ? 2 [
     [ assert-literal ] bi@
-    [ swap >r over = r> swap [ 2drop f ] [ = [ t ] [ fail ] if ] if ]
+    [ swap [ over = ] dip swap [ 2drop f ] [ = [ t ] [ fail ] if ] if ]
     2curry
 ] define-pop-inverse
 
@@ -217,7 +220,7 @@ DEFER: _
     dup wrapper? [ wrapped>> ] when ;
 
 : boa-inverse ( class -- quot )
-    [ deconstruct-pred ] keep slot-readers compose ;
+    [ deconstruct-pred ] [ slot-readers ] bi compose ;
 
 \ boa 1 [ ?wrapped boa-inverse ] define-pop-inverse
 
@@ -232,7 +235,7 @@ DEFER: _
 
 : recover-fail ( try fail -- )
     [ drop call ] [
-        >r nip r> dup fail?
+        [ nip ] dip dup fail?
         [ drop call ] [ nip throw ] if
     ] recover ; inline
 
@@ -243,12 +246,11 @@ DEFER: _
     in>> [ ndrop f ] curry [ recover-fail ] curry ;
 
 : [matches?] ( quot -- undoes?-quot )
-    [undo] dup infer [ true-out ] keep false-recover curry ;
+    [undo] dup infer [ true-out ] [ false-recover ] bi curry ;
 
 MACRO: matches? ( quot -- ? ) [matches?] ;
 
-TUPLE: no-match ;
-: no-match ( -- * ) \ no-match new throw ;
+ERROR: no-match ;
 M: no-match summary drop "Fall through in switch" ;
 
 : recover-chain ( seq -- quot )
@@ -256,7 +258,7 @@ M: no-match summary drop "Fall through in switch" ;
 
 : [switch]  ( quot-alist -- quot )
     [ dup quotation? [ [ ] swap 2array ] when ] map
-    reverse [ >r [undo] r> compose ] { } assoc>map
+    reverse [ [ [undo] ] dip compose ] { } assoc>map
     recover-chain ;
 
 MACRO: switch ( quot-alist -- ) [switch] ;

@@ -10,7 +10,7 @@ IN: prettyprint.backend
 
 GENERIC: pprint* ( obj -- )
 
-M: effect pprint* effect>string "(" swap ")" 3append text ;
+M: effect pprint* effect>string "(" ")" surround text ;
 
 : ?effect-height ( word -- n )
     stack-effect [ effect-height ] [ 0 ] if* ;

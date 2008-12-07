@@ -167,5 +167,3 @@ IN: calendar.tests
 [ t ] [ now 50 milliseconds sleep now before? ] unit-test
 [ t ] [ now 50 milliseconds sleep now swap after? ] unit-test
 [ t ] [ now 50 milliseconds sleep now 50 milliseconds sleep now swapd between? ] unit-test
-
-[ 4+1/6 ] [ 100 semimonthly ] unit-test
