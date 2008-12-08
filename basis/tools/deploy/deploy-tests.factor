@@ -31,6 +31,10 @@ urls math.parser ;
 
 [ t ] [ "bunny" shake-and-bake 2500000 small-enough? ] unit-test
 
+os macosx? [
+    [ t ] [ "webkit-demo" shake-and-bake 500000 small-enough? ] unit-test
+] when
+
 : run-temp-image ( -- )
     vm
     "-i=" "test.image" temp-file append

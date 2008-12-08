@@ -10,7 +10,7 @@ sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
-combinators locals locals.backend locals.private words.private
+combinators locals locals.backend locals.types words.private
 quotations.private stack-checker.values
 stack-checker.alien
 stack-checker.state

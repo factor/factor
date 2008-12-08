@@ -2,21 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings arrays assocs
 continuations combinators compiler compiler.alien kernel math
-namespaces make parser prettyprint prettyprint.sections
-quotations sequences strings words cocoa.runtime io macros
-memoize debugger io.encodings.ascii effects libc libc.private
-parser lexer init core-foundation fry generalizations
-specialized-arrays.direct.alien ;
+namespaces make parser quotations sequences strings words
+cocoa.runtime io macros memoize io.encodings.ascii
+effects libc libc.private parser lexer init core-foundation fry
+generalizations specialized-arrays.direct.alien ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
     [ over first , f , , second , \ alien-invoke , ] [ ] make ;
 
-: sender-stub-name ( method function -- string )
-    [ % "_" % unparse % ] "" make ;
-
 : sender-stub ( method function -- word )
-    [ sender-stub-name f <word> dup ] 2keep
+    [ "( sender-stub )" f <word> dup ] 2dip
     over first large-struct? [ "_stret" append ] when
     make-sender define ;
 
@@ -78,11 +74,7 @@ MACRO: (send) ( selector super? -- quot )
 
 : send ( receiver args... selector -- return... ) f (send) ; inline
 
-\ send soft "break-after" set-word-prop
-
 : super-send ( receiver args... selector -- return... ) t (send) ; inline
-
-\ super-send soft "break-after" set-word-prop
 
 ! Runtime introspection
 SYMBOL: class-init-hooks
@@ -216,17 +208,6 @@ assoc-union alien>objc-types set-global
 : register-objc-methods ( class -- )
     [ register-objc-method ] each-method-in-class ;
 
-: method. ( method -- )
-    {
-        [ method_getName sel_getName ]
-        [ method-return-type ]
-        [ method-arg-types ]
-        [ method_getImplementation ]
-    } cleave 4array . ;
-
-: methods. ( class -- )
-    [ method. ] each-method-in-class ;
-
 : class-exists? ( string -- class ) objc_getClass >boolean ;
 
 : define-objc-class-word ( quot name -- )
@@ -238,11 +219,8 @@ assoc-union alien>objc-types set-global
 
 : import-objc-class ( name quot -- )
     over define-objc-class-word
-    '[
-        _
-        [ objc-class register-objc-methods ]
-        [ objc-meta-class register-objc-methods ] bi
-    ] try ;
+    [ objc-class register-objc-methods ]
+    [ objc-meta-class register-objc-methods ] bi ;
 
 : root-class ( class -- root )
     dup class_getSuperclass [ root-class ] [ ] ?if ;

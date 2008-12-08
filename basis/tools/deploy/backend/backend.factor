@@ -89,7 +89,8 @@ DEFER: ?make-staging-image
     [ drop ] [ make-staging-image ] if ;
 
 : make-deploy-config ( vocab -- file )
-    [ deploy-config unparse-use ] [ "deploy-config-" prepend ] bi
+    [ deploy-config unparse-use ]
+    [ "deploy-config-" prepend temp-file ] bi
     [ utf8 set-file-contents ] keep ;
 
 : deploy-command-line ( image vocab config -- flags )

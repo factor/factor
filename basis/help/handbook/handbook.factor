@@ -1,7 +1,7 @@
 USING: help help.markup help.syntax help.definitions help.topics
 namespaces words sequences classes assocs vocabs kernel arrays
-prettyprint.backend kernel.private io generic math system
-strings sbufs vectors byte-arrays quotations
+prettyprint.backend prettyprint.custom kernel.private io generic
+math system strings sbufs vectors byte-arrays quotations
 io.streams.byte-array classes.builtin parser lexer
 classes.predicate classes.union classes.intersection
 classes.singleton classes.tuple tools.vocabs.browser math.parser
