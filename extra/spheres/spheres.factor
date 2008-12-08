@@ -113,7 +113,7 @@ main()
 TUPLE: spheres-gadget < demo-gadget
     plane-program solid-sphere-program texture-sphere-program
     reflection-framebuffer reflection-depthbuffer
-    reflection-texture ;
+    reflection-texture initialized? ;
 
 : <spheres-gadget> ( -- gadget )
     20.0 10.0 20.0 spheres-gadget new-demo-gadget ;
@@ -182,9 +182,11 @@ M: spheres-gadget graft* ( gadget -- )
     (make-reflection-texture) >>reflection-texture
     (make-reflection-depthbuffer) [ >>reflection-depthbuffer ] keep
     (make-reflection-framebuffer) >>reflection-framebuffer
+    t >>initialized?
     drop ;
 
 M: spheres-gadget ungraft* ( gadget -- )
+    f >>initialized?
     dup find-gl-context
     {
         [ reflection-framebuffer>> [ delete-framebuffer ] when* ]
@@ -238,9 +240,8 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
     ] bi ;
 
 : reflection-frustum ( gadget -- -x x -y y near far )
-    [ near-plane ] [ far-plane ] bi [
-        drop dup [ -+ ] bi@
-    ] 2keep ;
+    [ near-plane ] [ far-plane ] bi
+    [ drop dup [ -+ ] bi@ ] 2keep ;
 
 : (reflection-face) ( gadget face -- )
     swap reflection-texture>> >r >r
@@ -280,7 +281,7 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
         [ dim>> 0 0 rot first2 glViewport ]
     } cleave ] with-framebuffer ;
 
-M: spheres-gadget draw-gadget* ( gadget -- )
+: (draw-gadget) ( gadget -- )
     GL_DEPTH_TEST glEnable
     GL_SCISSOR_TEST glDisable
     0.15 0.15 1.0 1.0 glClearColor {
@@ -296,6 +297,9 @@ M: spheres-gadget draw-gadget* ( gadget -- )
             ] with-gl-program
         ]
     } cleave ;
+
+M: spheres-gadget draw-gadget* ( gadget -- )
+    dup initialized?>> [ (draw-gadget) ] [ drop ] if ;
 
 : spheres-window ( -- )
     [ <spheres-gadget> "Spheres" open-window ] with-ui ;
