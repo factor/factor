@@ -45,9 +45,6 @@ M: fixnum bit? neg shift 1 bitand 0 > ;
 
 M: fixnum (log2) fixnum-log2 ;
 
-M: integer next-power-of-2
-    dup 2 <= [ drop 2 ] [ 1- log2 1+ 2^ ] if ;
-
 M: bignum >fixnum bignum>fixnum ;
 M: bignum >bignum ;
 
@@ -76,7 +73,7 @@ M: bignum /mod bignum/mod ;
 M: bignum bitand bignum-bitand ;
 M: bignum bitor bignum-bitor ;
 M: bignum bitxor bignum-bitxor ;
-M: bignum shift bignum-shift ;
+M: bignum shift >fixnum bignum-shift ;
 
 M: bignum bitnot bignum-bitnot ;
 M: bignum bit? bignum-bit? ;

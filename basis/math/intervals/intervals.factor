@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
-combinators generic ;
+combinators generic layouts ;
 IN: math.intervals
 
 SYMBOL: empty-interval
@@ -365,13 +365,25 @@ SYMBOL: incomparable
         2dup [ interval-nonnegative? ] both?
         [
             [ interval>points [ first ] bi@ ] bi@
-            4array supremum 0 swap next-power-of-2 [a,b]
+            4array supremum 0 swap >integer next-power-of-2 [a,b]
         ] [ 2drop [-inf,inf] ] if
     ] do-empty-interval ;
 
 : interval-bitxor ( i1 i2 -- i3 )
     #! Inaccurate.
     interval-bitor ;
+
+: interval-log2 ( i1 -- i2 )
+    {
+        { empty-interval [ empty-interval ] }
+        { full-interval [ 0 [a,inf] ] }
+        [
+            to>> first 1 max dup most-positive-fixnum >
+            [ drop full-interval interval-log2 ]
+            [ 1+ >integer log2 0 swap [a,b] ]
+            if
+        ]
+    } case ;
 
 : assume< ( i1 i2 -- i3 )
     dup special-interval? [ drop ] [

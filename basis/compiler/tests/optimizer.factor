@@ -375,3 +375,9 @@ DEFER: loop-bbb
 : loop-ccc ( -- ) loop-bbb ;
 
 [ 0 ] [ 0 counter set loop-ccc counter get ] unit-test
+
+! Type inference issue
+[ 4 3 ] [
+    1 >bignum 2 >bignum
+    [ { bignum integer } declare [ shift ] keep 1+ ] compile-call
+] unit-test

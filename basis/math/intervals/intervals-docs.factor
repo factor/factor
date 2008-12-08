@@ -44,7 +44,8 @@ ARTICLE: "math-intervals-arithmetic" "Interval arithmetic"
 { $subsection interval-bitnot }
 { $subsection interval-recip }
 { $subsection interval-2/ }
-{ $subsection interval-abs } ;
+{ $subsection interval-abs }
+{ $subsection interval-log2 } ;
 
 ARTICLE: "math-intervals-sets" "Set-theoretic operations on intervals"
 { $subsection interval-contains? }
@@ -202,6 +203,10 @@ HELP: interval-neg
 HELP: interval-abs
 { $values { "i1" interval } { "i2" interval } }
 { $description "Absolute value of an interval." } ;
+
+HELP: interval-log2
+{ $values { "i1" interval } { "i2" interval } }
+{ $description "Integer-valued Base-2 logarithm of an interval." } ;
 
 HELP: interval-intersect
 { $values { "i1" interval } { "i2" interval } { "i3" "an " { $link interval  } " or " { $link f } } }
