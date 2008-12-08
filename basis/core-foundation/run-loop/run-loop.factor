@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel threads init namespaces alien
-core-foundation calendar ;
+USING: alien alien.syntax core-foundation kernel namespaces ;
 IN: core-foundation.run-loop
 
 : kCFRunLoopRunFinished 1 ; inline
@@ -40,11 +39,3 @@ FUNCTION: void CFRunLoopAddSource (
         "kCFRunLoopDefaultMode" <CFString>
         dup \ CFRunLoopDefaultMode set-global
     ] when ;
-
-: run-loop-thread ( -- )
-    CFRunLoopDefaultMode 0 f CFRunLoopRunInMode
-    kCFRunLoopRunHandledSource = [ 1 seconds sleep ] unless
-    run-loop-thread ;
-
-: start-run-loop-thread ( -- )
-    [ run-loop-thread t ] "CFRunLoop dispatcher" spawn-server drop ;
