@@ -5,7 +5,7 @@ IN: opengl.demo-support
 
 : FOV 2.0 sqrt 1+ ; inline
 : MOUSE-MOTION-SCALE 0.5 ; inline
-: KEY-ROTATE-STEP 1.0 ; inline
+: KEY-ROTATE-STEP 10.0 ; inline
 
 SYMBOL: last-drag-loc
 
