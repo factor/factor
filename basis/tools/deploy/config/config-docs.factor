@@ -2,16 +2,6 @@ USING: help.markup help.syntax words alien.c-types assocs
 kernel math ;
 IN: tools.deploy.config
 
-ARTICLE: "deploy-config" "Deployment configuration"
-"The deployment configuration is a key/value mapping stored in the " { $snippet "deploy.factor" } " file in the vocabulary's directory. If this file does not exist, the default deployment configuration is used:"
-{ $subsection default-config }
-"The deployment configuration can be read and written with a pair of words:"
-{ $subsection deploy-config }
-{ $subsection set-deploy-config }
-"A utility word is provided to load the configuration, change a flag, and store it back to disk:"
-{ $subsection set-deploy-flag }
-"The " { $link "ui.tools.deploy" } " provides a graphical way of editing the configuration." ;
-
 ARTICLE: "deploy-flags" "Deployment flags"
 "There are two sets of deployment flags. The first set controls the major subsystems which are to be included in the deployment image:"
 { $subsection deploy-math?     }
@@ -25,12 +15,7 @@ ARTICLE: "deploy-flags" "Deployment flags"
 { $subsection deploy-word-props? }
 { $subsection deploy-c-types?    } ;
 
-ARTICLE: "prepare-deploy" "Preparing to deploy an application"
-"In order to deploy an application as a stand-alone image, the application's vocabulary must first be given a " { $link POSTPONE: MAIN: } " hook. Then, a " { $emphasis "deployment configuration" } " must be created."
-{ $subsection "deploy-config" }
-{ $subsection "deploy-flags" } ;
-
-ABOUT: "prepare-deploy"
+ABOUT: "deploy-flags"
 
 HELP: deploy-name
 { $description "Deploy setting. The name of the executable."
@@ -114,15 +99,3 @@ HELP: deploy-reflection
 HELP: default-config
 { $values { "vocab" "a vocabulary specifier" } { "assoc" assoc } }
 { $description "Outputs the default deployment configuration for a vocabulary." } ;
-
-HELP: deploy-config
-{ $values { "vocab" "a vocabulary specifier" } { "assoc" assoc } }
-{ $description "Loads a vocabulary's deployment configuration from the " { $snippet "deploy.factor" } " file in the vocabulary's directory. If the file does not exist, the " { $link default-config } " is output." } ;
-
-HELP: set-deploy-config
-{ $values { "assoc" assoc } { "vocab" "a vocabulary specifier" } }
-{ $description "Stores a vocabulary's deployment configuration to the " { $snippet "deploy.factor" } " file in the vocabulary's directory." } ;
-
-HELP: set-deploy-flag
-{ $values { "value" object } { "key" object } { "vocab" "a vocabulary specifier" } }
-{ $description "Modifies an entry in a vocabulary's deployment configuration on disk." } ;

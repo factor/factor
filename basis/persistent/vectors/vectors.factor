@@ -1,7 +1,7 @@
 ! Based on Clojure's PersistentVector by Rich Hickey.
 
 USING: math accessors kernel sequences.private sequences arrays
-combinators combinators.short-circuit parser prettyprint.backend
+combinators combinators.short-circuit parser prettyprint.custom
 persistent.sequences ;
 IN: persistent.vectors
 

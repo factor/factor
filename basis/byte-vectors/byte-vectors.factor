@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private math sequences
 sequences.private growable byte-arrays accessors parser
-prettyprint.backend ;
+prettyprint.custom ;
 IN: byte-vectors
 
 TUPLE: byte-vector

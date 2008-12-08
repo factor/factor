@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel ascii combinators combinators.short-circuit
 sequences splitting fry namespaces make assocs arrays strings
-io.sockets io.encodings.string
-io.encodings.utf8 math math.parser accessors parser
-strings.parser lexer prettyprint.backend hashtables present
+io.sockets io.encodings.string io.encodings.utf8 math
+math.parser accessors parser strings.parser lexer
+prettyprint.backend prettyprint.custom hashtables present
 peg.ebnf urls.encoding ;
 IN: urls
 

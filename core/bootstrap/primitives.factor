@@ -68,7 +68,6 @@ bootstrapping? on
     "alien.accessors"
     "arrays"
     "byte-arrays"
-    "byte-vectors"
     "classes.private"
     "classes.tuple"
     "classes.tuple.private"

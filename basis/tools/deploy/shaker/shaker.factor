@@ -1,11 +1,11 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors qualified io.backend io.streams.c init fry
-namespaces make assocs kernel parser lexer strings.parser
-tools.deploy.config vocabs sequences words words.private memory
-kernel.private continuations io prettyprint vocabs.loader
-debugger system strings sets vectors quotations byte-arrays
-sorting compiler.units definitions generic generic.standard ;
+namespaces make assocs kernel parser lexer strings.parser vocabs
+sequences words words.private memory kernel.private
+continuations io vocabs.loader system strings sets
+vectors quotations byte-arrays sorting compiler.units
+definitions generic generic.standard tools.deploy.config ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line
@@ -14,7 +14,6 @@ QUALIFIED: continuations
 QUALIFIED: definitions
 QUALIFIED: init
 QUALIFIED: layouts
-QUALIFIED: prettyprint.config
 QUALIFIED: source-files
 QUALIFIED: vocabs
 IN: tools.deploy.shaker
@@ -41,7 +40,7 @@ IN: tools.deploy.shaker
     ] when ;
 
 : strip-debugger ( -- )
-    strip-debugger? [
+    strip-debugger? "debugger" vocab and [
         "Stripping debugger" show
         "resource:basis/tools/deploy/shaker/strip-debugger.factor"
         run-file
@@ -82,13 +81,10 @@ IN: tools.deploy.shaker
             ] change-props drop
         ] each
     ] [
-        "Remaining word properties:\n" show
-        [ props>> keys ] gather unparse show
-    ] [
         H{ } clone '[
             [ [ _ [ ] cache ] map ] change-props drop
         ] each
-    ] tri ;
+    ] bi ;
 
 : stripped-word-props ( -- seq )
     [
@@ -275,12 +271,7 @@ IN: tools.deploy.shaker
         ] when
 
         strip-prettyprint? [
-            {
-                prettyprint.config:margin
-                prettyprint.config:string-limit?
-                prettyprint.config:boa-tuples?
-                prettyprint.config:tab-size
-            } %
+            { } { "prettyprint.config" } strip-vocab-globals %
         ] when
 
         strip-debugger? [
@@ -308,7 +299,6 @@ IN: tools.deploy.shaker
         '[ drop _ member? not ] assoc-filter
         [ drop string? not ] assoc-filter ! strip CLI args
         sift-assoc
-        dup keys unparse show
         21 setenv
     ] [ drop ] if ;
 
@@ -362,7 +352,7 @@ SYMBOL: deploy-vocab
         init-hooks get values concat %
         ,
         strip-io? [ \ flush , ] unless
-    ] [ ] make "Boot quotation: " show dup unparse show
+    ] [ ] make
     set-boot-quot ;
 
 : init-stripper ( -- )
@@ -405,16 +395,14 @@ SYMBOL: deploy-vocab
             deploy-vocab get require
             strip
             finish-deploy
-        ] [
-            print-error flush 1 exit
-        ] recover
+        ] [ die 1 exit ] recover
     ] bind ;
 
 : do-deploy ( -- )
     "output-image" get
     "deploy-vocab" get
     "Deploying " write dup write "..." print
-    dup deploy-config dup .
+    "deploy-config" get parse-file first
     (deploy) ;
 
 MAIN: do-deploy

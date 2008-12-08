@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs match fry accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
-prettyprint prettyprint.backend prettyprint.sections math words
-combinators combinators.short-circuit io sorting hints qualified
+prettyprint prettyprint.backend prettyprint.custom
+prettyprint.sections math words combinators
+combinators.short-circuit io sorting hints qualified
 compiler.tree
 compiler.tree.recursive
 compiler.tree.normalization

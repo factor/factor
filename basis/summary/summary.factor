@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes sequences splitting kernel namespaces
-make words math math.parser io.styles prettyprint assocs ;
+USING: accessors classes sequences kernel namespaces
+make words math math.parser assocs ;
 IN: summary
 
 GENERIC: summary ( object -- string )
@@ -10,15 +10,6 @@ GENERIC: summary ( object -- string )
     class name>> " instance" append ;
 
 M: object summary object-summary ;
-
-M: input summary
-    [
-        "Input: " %
-        string>> "\n" split1 swap %
-        "..." "" ? %
-    ] "" make ;
-
-M: word summary synopsis ;
 
 M: sequence summary
     [
