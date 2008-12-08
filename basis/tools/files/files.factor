@@ -1,14 +1,15 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators io io.files kernel
-math.parser sequences system vocabs.loader calendar ;
+math.parser sequences system vocabs.loader calendar math
+symbols fry prettyprint ;
 IN: tools.files
 
 <PRIVATE
 
 : ls-time ( timestamp -- string )
     [ hour>> ] [ minute>> ] bi
-    [ number>string 2 CHAR: 0 pad-left ] bi@ ":" swap 3append ;
+    [ number>string 2 CHAR: 0 pad-left ] bi@ ":" glue ;
 
 : ls-timestamp ( timestamp -- string )
     [ month>> month-abbreviation ]
@@ -32,7 +33,37 @@ PRIVATE>
 : directory. ( path -- )
     [ (directory.) ] with-directory-files [ print ] each ;
 
+SYMBOLS: device-name mount-point type
+available-space free-space used-space total-space
+percent-used percent-free ;
+
+: percent ( real -- integer ) 100 * >integer ; inline
+
+: file-system-spec ( file-system-info obj -- str )
+    {
+        { device-name [ device-name>> ] }
+        { mount-point [ mount-point>> ] }
+        { type [ type>> ] }
+        { available-space [ available-space>> ] }
+        { free-space [ free-space>> ] }
+        { used-space [ used-space>> ] }
+        { total-space [ total-space>> ] }
+        { percent-used [
+            [ used-space>> ] [ total-space>> ] bi dup 0 =
+            [ 2drop 0 ] [ / percent ] if
+        ] }
+    } case ;
+
+: file-systems-info ( spec -- seq )
+    file-systems swap '[ _ [ file-system-spec ] with map ] map ;
+
+: file-systems. ( spec -- )
+    [ file-systems-info ]
+    [ [ unparse ] map ] bi prefix simple-table. ;
+
 {
     { [ os unix? ] [ "tools.files.unix" ] }
     { [ os windows? ] [ "tools.files.windows" ] }
 } cond require
+
+! { device-name free-space used-space total-space percent-used } file-systems.
