@@ -3,7 +3,7 @@
 USING: arrays ui.gadgets.buttons ui.gadgets.borders
 ui.gadgets.labels ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gadgets.theme ui.gadgets.frames
-ui.gadgets.grids io kernel math models namespaces prettyprint
+ui.gadgets.grids io kernel math models namespaces
 sequences sequences words classes.tuple ui.gadgets ui.render
 colors accessors ;
 IN: ui.gadgets.labelled

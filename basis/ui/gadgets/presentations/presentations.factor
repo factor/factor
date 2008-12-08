@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors definitions hashtables io kernel
-prettyprint sequences strings io.styles words help math models
+sequences strings io.styles words help math models
 namespaces quotations
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.menus ui.gadgets.worlds
