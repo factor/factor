@@ -103,9 +103,8 @@ M: float fp-infinity? ( float -- ? )
         drop f
     ] if ;
 
-GENERIC: next-power-of-2 ( m -- n ) foldable
-
-M: real next-power-of-2 1+ >integer next-power-of-2 ;
+: next-power-of-2 ( m -- n )
+    dup 2 <= [ drop 2 ] [ 1- log2 1+ 2^ ] if ; inline
 
 : power-of-2? ( n -- ? )
     dup 0 <= [ drop f ] [ dup 1- bitand zero? ] if ; foldable
