@@ -1,14 +1,15 @@
 USING: tools.deploy.config ;
 H{
-    { deploy-unicode? f }
-    { deploy-reflection 1 }
-    { deploy-word-props? f }
-    { deploy-math? f }
     { deploy-name "Hello world (console)" }
-    { deploy-word-defs? f }
-    { "stop-after-last-window?" t }
-    { deploy-ui? f }
-    { deploy-compiler? f }
-    { deploy-io 2 }
     { deploy-c-types? f }
+    { deploy-word-props? f }
+    { deploy-ui? f }
+    { deploy-reflection 1 }
+    { deploy-compiler? f }
+    { deploy-unicode? f }
+    { deploy-io 2 }
+    { deploy-word-defs? f }
+    { deploy-threads? f }
+    { "stop-after-last-window?" t }
+    { deploy-math? f }
 }
