@@ -248,12 +248,12 @@ M: x11-ui-backend raise-window* ( world -- )
         dpy get swap window>> XRaiseWindow drop
     ] when* ;
 
-M: x11-ui-backend select-gl-context ( handle -- )
+M: x11-handle select-gl-context ( handle -- )
     dpy get swap
     dup window>> swap glx>> glXMakeCurrent
     [ "Failed to set current GLX context" throw ] unless ;
 
-M: x11-ui-backend flush-gl-context ( handle -- )
+M: x11-handle flush-gl-context ( handle -- )
     dpy get swap window>> glXSwapBuffers ;
 
 M: x11-ui-backend ui ( -- )

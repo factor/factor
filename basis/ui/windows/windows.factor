@@ -498,10 +498,10 @@ M: windows-ui-backend (open-window) ( world -- )
     dupd (>>handle)
     hWnd>> show-window ;
 
-M: windows-ui-backend select-gl-context ( handle -- )
+M: win select-gl-context ( handle -- )
     [ hDC>> ] keep hRC>> wglMakeCurrent win32-error=0/f ;
 
-M: windows-ui-backend flush-gl-context ( handle -- )
+M: win flush-gl-context ( handle -- )
     hDC>> SwapBuffers win32-error=0/f ;
 
 ! Move window to front
