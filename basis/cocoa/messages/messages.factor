@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.strings arrays assocs
 continuations combinators compiler compiler.alien kernel math
 namespaces make parser quotations sequences strings words
-cocoa.runtime io macros memoize io.encodings.ascii
+cocoa.runtime io macros memoize io.encodings.utf8
 effects libc libc.private parser lexer init core-foundation fry
 generalizations specialized-arrays.direct.alien ;
 IN: cocoa.messages
@@ -180,7 +180,7 @@ assoc-union alien>objc-types set-global
 
 : method-arg-type ( method i -- type )
     method_copyArgumentType
-    [ ascii alien>string parse-objc-type ] keep
+    [ utf8 alien>string parse-objc-type ] keep
     (free) ;
 
 : method-arg-types ( method -- args )
@@ -189,7 +189,7 @@ assoc-union alien>objc-types set-global
 
 : method-return-type ( method -- ctype )
     method_copyReturnType
-    [ ascii alien>string parse-objc-type ] keep
+    [ utf8 alien>string parse-objc-type ] keep
     (free) ;
 
 : register-objc-method ( method -- )
