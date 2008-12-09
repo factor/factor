@@ -32,9 +32,7 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 	data_heap->gen_count = gens;
 
 	CELL total_size;
-	if(data_heap->gen_count == 1)
-		total_size = 2 * tenured_size;
-	else if(data_heap->gen_count == 2)
+	if(data_heap->gen_count == 2)
 		total_size = young_size + 2 * tenured_size;
 	else if(data_heap->gen_count == 3)
 		total_size = young_size + 2 * aging_size + 2 * tenured_size;
