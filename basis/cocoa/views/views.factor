@@ -55,8 +55,11 @@ PRIVATE>
 : with-multisample ( quot -- )
     t +multisample+ pick with-variable ; inline
 
-: <PixelFormat> ( -- pixelfmt )
+
+
+: <PixelFormat> ( attributes -- pixelfmt )
     NSOpenGLPixelFormat -> alloc [
+        %
         NSOpenGLPFAWindow ,
         NSOpenGLPFADoubleBuffer ,
         NSOpenGLPFADepthSize , 16 ,
@@ -74,7 +77,7 @@ PRIVATE>
     -> autorelease ;
 
 : <GLView> ( class dim -- view )
-    [ -> alloc 0 0 ] dip first2 <NSRect> <PixelFormat>
+    [ -> alloc 0 0 ] dip first2 <NSRect> { } <PixelFormat>
     -> initWithFrame:pixelFormat:
     dup 1 -> setPostsBoundsChangedNotifications:
     dup 1 -> setPostsFrameChangedNotifications: ;
