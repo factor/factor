@@ -1,4 +1,5 @@
-USING: accessors alien.c-type kernel io.streams.byte-array tools.test ;
+USING: accessors alien.c-types kernel
+io.encodings.utf16 io.streams.byte-array tools.test ;
 IN: io.encodings.utf16n
 
 : correct-endian
