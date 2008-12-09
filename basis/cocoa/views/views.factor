@@ -58,8 +58,6 @@ PRIVATE>
 : <PixelFormat> ( attributes -- pixelfmt )
     NSOpenGLPixelFormat -> alloc swap [
         %
-        NSOpenGLPFAWindow ,
-        NSOpenGLPFADoubleBuffer ,
         NSOpenGLPFADepthSize , 16 ,
         +software-renderer+ get [
             NSOpenGLPFARendererID , kCGLRendererGenericFloatID ,
@@ -75,7 +73,8 @@ PRIVATE>
     -> autorelease ;
 
 : <GLView> ( class dim -- view )
-    [ -> alloc 0 0 ] dip first2 <NSRect> { } <PixelFormat>
+    [ -> alloc 0 0 ] dip first2 <NSRect>
+    NSOpenGLPFAWindow NSOpenGLPFADoubleBuffer 2array <PixelFormat>
     -> initWithFrame:pixelFormat:
     dup 1 -> setPostsBoundsChangedNotifications:
     dup 1 -> setPostsFrameChangedNotifications: ;

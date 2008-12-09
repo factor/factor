@@ -23,6 +23,14 @@ TUPLE: bitmap magic size reserved offset header-length width
         swap [ >>array ] [ >>color-index ] bi
         24 >>bit-count ;
 
+: bgra>bitmap ( array height width -- bitmap )
+    bitmap new
+        2over * 4 * >>size-image
+        swap >>height
+        swap >>width
+        swap [ >>array ] [ >>color-index ] bi
+        32 >>bit-count ;
+
 : 8bit>array ( bitmap -- array )
     [ rgb-quads>> 4 <sliced-groups> [ 3 head-slice ] map ]
     [ color-index>> >array ] bi [ swap nth ] with map concat ;

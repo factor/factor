@@ -16,6 +16,7 @@ TUPLE: offscreen-handle < handle context buffer ;
 C: <window-handle> window-handle
 C: <offscreen-handle> offscreen-handle
 
+! XXX gross!
 M: offscreen-handle window>> drop f ;
 M: offscreen-handle view>>   drop f ;
 
@@ -104,9 +105,9 @@ M: cocoa-ui-backend raise-window* ( world -- )
     { [ * * malloc ] [ 2drop ] [ drop nip ] [ nip * ] } 3cleave ;
 
 : gadget-offscreen-context ( world -- context buffer )
-    { NSOpenGLPFAOffScreen } <PixelFormat>
-    [ NSOpenGLContext -> alloc swap f -> initWithFormat:shareContext: dup ]
-    [ offscreen-buffer ] bi
+    NSOpenGLPFAOffScreen 1array <PixelFormat>
+    [ nip NSOpenGLContext -> alloc swap f -> initWithFormat:shareContext: dup ]
+    [ offscreen-buffer ] 2bi
     4 npick [ -> setOffScreen:width:height:rowbytes: ] dip ;
 
 M: cocoa-ui-backend (open-offscreen-buffer) ( world -- )
