@@ -394,11 +394,11 @@ SYMBOL: deploy-vocab
     deploy-vocab get vocab-main set-boot-quot*
     stripped-word-props
     stripped-globals strip-globals
-    strip-words
     compress-byte-arrays
     compress-quotations
     compress-strings
-    compress-wrappers ;
+    compress-wrappers
+    strip-words ;
 
 : (deploy) ( final-image vocab config -- )
     #! Does the actual work of a deployment in the slave

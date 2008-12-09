@@ -985,7 +985,8 @@ void primitive_become(void)
 	}
 
 	gc();
-	iterate_code_heap(relocate_code_block);
+
+	compile_all_words();
 }
 
 CELL find_all_words(void)
