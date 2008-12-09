@@ -16,10 +16,6 @@ TUPLE: offscreen-handle < handle context buffer ;
 C: <window-handle> window-handle
 C: <offscreen-handle> offscreen-handle
 
-! XXX gross!
-M: offscreen-handle window>> drop f ;
-M: offscreen-handle view>>   drop f ;
-
 SINGLETON: cocoa-ui-backend
 
 M: cocoa-ui-backend do-events ( -- )
@@ -117,15 +113,18 @@ M: cocoa-ui-backend (close-offscreen-buffer) ( handle -- )
     [ context>> -> release ]
     [ buffer>> free ] bi ;
 
-GENERIC: gl-context ( handle -- context )
-M: window-handle gl-context view>> -> openGLContext ;
-M: offscreen-handle gl-context context>> ;
+GENERIC: (gl-context) ( handle -- context )
+M: window-handle (gl-context) view>> -> openGLContext ;
+M: offscreen-handle (gl-context) context>> ;
 
 M: handle select-gl-context ( handle -- )
-    gl-context -> makeCurrentContext ;
+    (gl-context) -> makeCurrentContext ;
 
 M: handle flush-gl-context ( handle -- )
-    gl-context -> flushBuffer ;
+    (gl-context) -> flushBuffer ;
+
+M: offscreen-handle offscreen-pixels ( handle -- alien )
+    buffer>> ;
 
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;

@@ -27,6 +27,8 @@ GENERIC: select-gl-context ( handle -- )
 
 GENERIC: flush-gl-context ( handle -- )
 
+GENERIC: offscreen-pixels ( handle -- alien )
+
 HOOK: beep ui-backend ( -- )
 
 : with-gl-context ( handle quot -- )

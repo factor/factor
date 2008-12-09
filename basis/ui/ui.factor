@@ -81,14 +81,6 @@ M: world ungraft*
     [ handle>> (close-window) ]
     [ reset-world ] tri ;
 
-M: offscreen-world graft*
-    (open-offscreen-buffer) ;
-
-M: offscreen-world ungraft*
-    [ (ungraft-world) ]
-    [ handle>> (close-offscreen-buffer) ]
-    [ reset-world ] tri ;
-
 : find-window ( quot -- world )
     windows get values
     [ gadget-child swap call ] with find-last nip ; inline
