@@ -1,11 +1,10 @@
 USING: editors io.files io.launcher kernel math.parser
-namespaces sequences windows.shell32 wne ;
+namespaces sequences io.paths.windows make ;
 IN: editors.ultraedit
 
 : ultraedit-path ( -- path )
     \ ultraedit-path get-global [
-        program-files
-        "IDM Computer Solutions\\UltraEdit-32\\uedit32.exe" append-path
+        "IDM Computer Solutions" t [ "uedit32.exe" tail? ] find-in-program-files
     ] unless* ;
 
 : ultraedit ( file line -- )
