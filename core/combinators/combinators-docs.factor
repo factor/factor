@@ -12,8 +12,6 @@ ARTICLE: "combinators-quot" "Quotation construction utilities"
 ARTICLE: "combinators" "Additional combinators"
 "The " { $vocab-link "combinators" } " vocabulary provides a few useful combinators."
 $nl
-"A looping combinator:"
-{ $subsection while }
 "Generalization of " { $link bi } " and " { $link tri } ":"
 { $subsection cleave }
 "Generalization of " { $link 2bi } " and " { $link 2tri } ":"

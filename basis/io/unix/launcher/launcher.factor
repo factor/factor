@@ -36,9 +36,6 @@ USE: unix
 : redirect-fd ( oldfd fd -- )
     2dup = [ 2drop ] [ dup2 io-error ] if ;
 
-: redirect-inherit ( obj mode fd -- )
-    3drop ;
-
 : redirect-file ( obj mode fd -- )
     [ [ normalize-path ] dip file-mode open-file ] dip redirect-fd ;
 
@@ -50,7 +47,7 @@ USE: unix
 
 : redirect ( obj mode fd -- )
     {
-        { [ pick not ] [ redirect-inherit ] }
+        { [ pick not ] [ 3drop ] }
         { [ pick string? ] [ redirect-file ] }
         { [ pick appender? ] [ redirect-file-append ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
