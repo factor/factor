@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.strings arrays byte-arrays
 hashtables io io.encodings.string kernel math namespaces
 sequences strings continuations x11.xlib specialized-arrays.uint
-accessors ;
+accessors io.encodings.utf16n ;
 IN: x11.xim
 
 SYMBOL: xim

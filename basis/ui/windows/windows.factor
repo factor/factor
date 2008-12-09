@@ -9,7 +9,8 @@ windows.user32 windows.opengl32 windows.messages windows.types
 windows.nt windows threads libc combinators
 combinators.short-circuit continuations command-line shuffle
 opengl ui.render ascii math.bitwise locals symbols accessors
-math.geometry.rect math.order ascii calendar ;
+math.geometry.rect math.order ascii calendar
+io.encodings.utf16n ;
 IN: ui.windows
 
 SINGLETON: windows-ui-backend
