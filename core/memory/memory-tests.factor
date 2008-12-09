@@ -1,7 +1,15 @@
 USING: generic kernel kernel.private math memory prettyprint io
 sequences tools.test words namespaces layouts classes
-classes.builtin arrays quotations ;
+classes.builtin arrays quotations io.launcher system ;
 IN: memory.tests
+
+! LOL
+[ ] [
+    vm
+    "-generations=2"
+    "-e=USING: memory io prettyprint system ; input-stream gc . 0 exit"
+    3array try-process
+] unit-test
 
 [ [ ] instances ] must-infer
 
