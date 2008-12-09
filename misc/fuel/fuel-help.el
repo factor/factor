@@ -68,10 +68,11 @@
 
 (defun fuel-help--word-synopsis (&optional word)
   (let ((word (or word (fuel-syntax-symbol-at-point)))
-        (fuel-eval--log nil))
+        (fuel-eval--log t))
     (when word
       (let ((ret (fuel-eval--eval-string/context
-                  (format "\\ %s synopsis fuel-eval-set-result" word))))
+                  (format "\\ %s synopsis fuel-eval-set-result" word)
+                  t)))
         (when (not (fuel-eval--retort-error ret))
           (if fuel-help-minibuffer-font-lock
               (fuel-help--font-lock-str (fuel-eval--retort-result ret))
@@ -170,7 +171,7 @@ displayed in the minibuffer."
          (def (if ask (read-string prompt nil 'fuel-help--history def) def))
          (cmd (format "\\ %s %s" def (if see "see" "help")))
          (fuel-eval--log nil)
-         (ret (fuel-eval--eval-string/context cmd))
+         (ret (fuel-eval--eval-string/context cmd t))
          (out (fuel-eval--retort-output ret)))
     (if (or (fuel-eval--retort-error ret) (empty-string-p out))
         (message "No help for '%s'" def)
