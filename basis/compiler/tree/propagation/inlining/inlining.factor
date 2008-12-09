@@ -152,7 +152,7 @@ DEFER: (flat-length)
 SYMBOL: history
 
 : remember-inlining ( word -- )
-    [ [ 1 ] dip inlining-count get at+ ]
+    [ inlining-count get inc-at ]
     [ history [ swap suffix ] change ]
     bi ;
 

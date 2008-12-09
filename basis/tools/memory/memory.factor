@@ -53,7 +53,7 @@ IN: tools.memory
 
 : heap-stat-step ( obj counts sizes -- )
     [ over ] dip
-    [ [ [ drop 1 ] [ class ] bi ] dip at+ ]
+    [ [ class ] dip inc-at ]
     [ [ [ size ] [ class ] bi ] dip at+ ] 2bi* ;
 
 PRIVATE>
