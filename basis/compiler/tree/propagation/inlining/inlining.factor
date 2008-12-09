@@ -48,9 +48,11 @@ M: callable splicing-nodes
     ] [ 2drop f >>method f >>body f >>class drop f ] if ;
 
 : inlining-standard-method ( #call word -- class/f method/f )
-    [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
-    [ swap nth value-info class>> dup ] dip
-    specific-method ;
+    dup "methods" word-prop assoc-empty? [ 2drop f f ] [
+        [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
+        [ swap nth value-info class>> dup ] dip
+        specific-method
+    ] if ;
 
 : inline-standard-method ( #call word -- ? )
     dupd inlining-standard-method eliminate-dispatch ;
