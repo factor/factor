@@ -520,7 +520,6 @@ tuple
     { "<wrapper>" "kernel" }
     { "(clone)" "kernel" }
     { "<string>" "strings" }
-    { "(string)" "strings.private" }
     { "array>quotation" "quotations.private" }
     { "quotation-xt" "quotations" }
     { "<tuple>" "classes.tuple.private" }

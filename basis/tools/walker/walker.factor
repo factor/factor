@@ -152,10 +152,6 @@ SYMBOL: +stopped+
     >n ndrop >c c>
     continue continue-with
     stop suspend (spawn)
-    ! Don't step into some sequence words since output of
-    ! (string) and new-sequence-unsafe may not print due to
-    ! memory safety issues
-    <sbuf> prepare-subseq subseq new-sequence-unsafe
 } [
     dup [ execute break ] curry
     "step-into" set-word-prop

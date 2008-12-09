@@ -81,15 +81,12 @@ GENERIC: resize ( n seq -- newseq ) flushable
 ! Unsafe sequence protocol for inner loops
 GENERIC: nth-unsafe ( n seq -- elt ) flushable
 GENERIC: set-nth-unsafe ( elt n seq -- )
-GENERIC: new-sequence-unsafe ( len seq -- newseq ) flushable
 
 M: sequence nth bounds-check nth-unsafe ;
 M: sequence set-nth bounds-check set-nth-unsafe ;
 
 M: sequence nth-unsafe nth ;
 M: sequence set-nth-unsafe set-nth ;
-
-M: sequence new-sequence-unsafe new-sequence ;
 
 ! The f object supports the sequence protocol trivially
 M: f length drop 0 ;
@@ -259,7 +256,7 @@ INSTANCE: repetition immutable-sequence
 
 : prepare-subseq ( from to seq -- dst i src j n )
     #! The check-length call forces partial dispatch
-    [ [ swap - ] dip new-sequence-unsafe dup 0 ] 3keep
+    [ [ swap - ] dip new-sequence dup 0 ] 3keep
     -rot drop roll length check-length ; inline
 
 : check-copy ( src n dst -- )

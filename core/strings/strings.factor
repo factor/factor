@@ -56,6 +56,4 @@ M: string resize resize-string ;
 
 M: string new-sequence drop 0 <string> ;
 
-M: string new-sequence-unsafe drop (string) ;
-
 INSTANCE: string sequence
