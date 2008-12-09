@@ -185,6 +185,19 @@ IN: tools.deploy.shaker
     strip-word-names? [ dup strip-word-names ] when
     2drop ;
 
+: strip-default-methods ( -- )
+    strip-debugger? [
+        "Stripping default methods" show
+        [
+            [ generic? ] instances
+            [ "No method" throw ] define-temp
+            dup t "default" set-word-prop
+            '[
+                [ _ "default-method" set-word-prop ] [ make-generic ] bi
+            ] each
+        ] with-compilation-unit
+    ] when ;
+
 : strip-vocab-globals ( except names -- words )
     [ child-vocabs [ words ] map concat ] map concat swap diff ;
 
@@ -370,6 +383,7 @@ SYMBOL: deploy-vocab
 
 : strip ( -- )
     init-stripper
+    strip-default-methods
     strip-libc
     strip-cocoa
     strip-debugger
@@ -395,7 +409,7 @@ SYMBOL: deploy-vocab
             deploy-vocab get require
             strip
             finish-deploy
-        ] [ die 1 exit ] recover
+        ] [ error-continuation get call>> callstack>array die 1 exit ] recover
     ] bind ;
 
 : do-deploy ( -- )
