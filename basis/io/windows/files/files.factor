@@ -284,7 +284,6 @@ TUPLE: win32-file-system-info < file-system-info max-component flags device-seri
 
 M: winnt file-system-info ( path -- file-system-info )
     normalize-path root-directory
-    ! volume-information ( normalized-path -- volume-name volume-serial max-component flags type )
     dup [ volume-information ] [ file-system-space ] bi
     \ win32-file-system-info new
         swap *ulonglong >>free-space
