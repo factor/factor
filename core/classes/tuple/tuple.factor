@@ -252,7 +252,7 @@ M: tuple-class update-class
 
 : tuple-class-unchanged? ( class superclass slots -- ? )
     [ over ] dip
-    [ [ superclass ] dip = ]
+    [ [ superclass ] [ bootstrap-word ] bi* = ]
     [ [ "slots" word-prop ] dip = ] 2bi* and ;
 
 : valid-superclass? ( class -- ? )
