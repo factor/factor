@@ -6,7 +6,7 @@ cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
 cocoa.windows cocoa.classes cocoa.application sequences system
 ui ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
 ui.cocoa.views core-foundation threads math.geometry.rect fry
-libc generalizations ;
+libc generalizations alien.c-types cocoa.views combinators ;
 IN: ui.cocoa
 
 TUPLE: handle ;
@@ -16,8 +16,8 @@ TUPLE: offscreen-handle < handle context buffer ;
 C: <window-handle> window-handle
 C: <offscreen-handle> offscreen-handle
 
-M: offscreen-handle window>> f ;
-M: offscreen-handle view>>   f ;
+M: offscreen-handle window>> drop f ;
+M: offscreen-handle view>>   drop f ;
 
 SINGLETON: cocoa-ui-backend
 
@@ -101,13 +101,13 @@ M: cocoa-ui-backend raise-window* ( world -- )
 
 : offscreen-buffer ( world pixel-format -- alien w h pitch )
     [ dim>> first2 ] [ pixel-size ] bi*
-    { [ * * malloc ] [ 2drop ] [ drop nip ] [ nip * ] } cleave ;
+    { [ * * malloc ] [ 2drop ] [ drop nip ] [ nip * ] } 3cleave ;
 
 : gadget-offscreen-context ( world -- context buffer )
-    { NSOpenGLPFAOffscreen } <PixelFormat>
-    [ NSOpenGLContext -> alloc swap f -> initWithFormat:shareContext: ]
+    { NSOpenGLPFAOffScreen } <PixelFormat>
+    [ NSOpenGLContext -> alloc swap f -> initWithFormat:shareContext: dup ]
     [ offscreen-buffer ] bi
-    4 npick [ setOffScreen:width:height:rowbytes: ] dip ;
+    4 npick [ -> setOffScreen:width:height:rowbytes: ] dip ;
 
 M: cocoa-ui-backend (open-offscreen-buffer) ( world -- )
     dup gadget-offscreen-context <offscreen-handle> >>handle drop ;

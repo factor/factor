@@ -55,10 +55,8 @@ PRIVATE>
 : with-multisample ( quot -- )
     t +multisample+ pick with-variable ; inline
 
-
-
 : <PixelFormat> ( attributes -- pixelfmt )
-    NSOpenGLPixelFormat -> alloc [
+    NSOpenGLPixelFormat -> alloc swap [
         %
         NSOpenGLPFAWindow ,
         NSOpenGLPFADoubleBuffer ,
