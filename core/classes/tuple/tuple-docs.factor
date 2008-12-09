@@ -197,7 +197,7 @@ ARTICLE: "tuple-introspection" "Tuple introspection"
 
 ARTICLE: "tuple-examples" "Tuple examples"
 "An example:"
-{ $code "TUPLE: employee name salary position ;" }
+{ $code "TUPLE: employee name position salary ;" }
 "This defines a class word named " { $snippet "employee" } ", a predicate " { $snippet "employee?" } ", and the following slot accessors:"
 { $table
     { "Reader" "Writer" "Setter" "Changer" }
@@ -237,7 +237,7 @@ ARTICLE: "tuple-examples" "Tuple examples"
     "    checks counter check boa ;"
     ""
     ": biweekly-paycheck ( employee -- check )"
-    "    dup name>> swap salary>> 26 / <check> ;"
+    "    [ name>> ] [ salary>> 26 / ] bi <check> ;"
 }
 "An example of using a changer:"
 { $code
