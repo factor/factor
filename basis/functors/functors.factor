@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel locals.private quotations classes.tuple make
-combinators generic words interpolate namespaces sequences
-io.streams.string fry classes.mixin effects lexer parser
-classes.tuple.parser effects.parser ;
+USING: kernel quotations classes.tuple make combinators generic
+words interpolate namespaces sequences io.streams.string fry
+classes.mixin effects lexer parser classes.tuple.parser
+effects.parser locals.types locals.parser locals.rewrite.closures ;
 IN: functors
 
 : scan-param ( -- obj )
@@ -99,8 +99,8 @@ DEFER: ;FUNCTOR delimiter
 
 : (FUNCTOR:) ( -- word def )
     CREATE
-    parse-locals
+    parse-locals dup push-locals
     parse-functor-body swap pop-locals <lambda>
-    lambda-rewrite first ;
+    rewrite-closures first ;
 
 : FUNCTOR: (FUNCTOR:) define ; parsing

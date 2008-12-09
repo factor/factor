@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private math sequences
-sequences.private growable byte-arrays accessors ;
+sequences.private growable byte-arrays accessors parser
+prettyprint.custom ;
 IN: byte-vectors
 
 TUPLE: byte-vector
@@ -40,5 +41,11 @@ M: byte-array like
     ] unless ;
 
 M: byte-array new-resizable drop <byte-vector> ;
+
+: BV{ \ } [ >byte-vector ] parse-literal ; parsing
+
+M: byte-vector pprint* pprint-object ;
+M: byte-vector pprint-delims drop \ BV{ \ } ;
+M: byte-vector >pprint-sequence ;
 
 INSTANCE: byte-vector growable

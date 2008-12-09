@@ -1,10 +1,10 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel libc
 sequences continuations byte-arrays strings math namespaces
 system combinators vocabs.loader qualified accessors
 stack-checker macros locals generalizations unix.types
-debugger io prettyprint io.files ;
+io io.files vocabs vocabs.loader ;
 IN: unix
 
 : PROT_NONE   0 ; inline
@@ -60,25 +60,11 @@ FUNCTION: char* strerror ( int errno ) ;
 
 ERROR: unix-error errno message ;
 
-M: unix-error error.
-    "Unix system call failed:" print
-    nl
-    dup message>> write " (" write errno>> pprint ")" print ;
-
 : (io-error) ( -- * ) err_no dup strerror unix-error ;
 
 : io-error ( n -- ) 0 < [ (io-error) ] when ;
 
 ERROR: unix-system-call-error args errno message word ;
-
-M: unix-system-call-error error.
-    "Unix system call ``" write dup word>> pprint "'' failed:" print
-    nl
-    dup message>> write " (" write dup errno>> pprint ")" print
-    nl
-    "It was called with the following arguments:" print
-    nl
-    args>> stack. ;
 
 MACRO:: unix-system-call ( quot -- )
     [let | n [ quot infer in>> ]
@@ -236,3 +222,7 @@ FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
     { [ os bsd? ] [ "unix.bsd" require ] }
     { [ os solaris? ] [ "unix.solaris" require ] }
 } cond
+
+"debugger" vocab [
+    "unix.debugger" require
+] when

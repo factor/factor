@@ -5,8 +5,8 @@ kernel math assocs namespaces make continuations sequences
 hashtables sorting arrays combinators math.bitwise strings
 system accessors threads splitting io.backend io.windows
 io.windows.nt.backend io.windows.nt.files io.monitors io.ports
-io.buffers io.files io.timeouts io.encodings.string io
-windows windows.kernel32 windows.types ;
+io.buffers io.files io.timeouts io.encodings.string
+io.encodings.utf16n io windows windows.kernel32 windows.types ;
 IN: io.windows.nt.monitors
 
 : open-directory ( path -- handle )

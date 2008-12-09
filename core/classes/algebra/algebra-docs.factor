@@ -4,6 +4,7 @@ IN: classes.algebra
 
 ARTICLE: "class-operations" "Class operations"
 "Set-theoretic operations on classes:"
+{ $subsection class= }
 { $subsection class< }
 { $subsection class<= }
 { $subsection class-and }

@@ -41,7 +41,7 @@ M: fixnum bitnot fixnum-bitnot ;
 M: fixnum bit? neg shift 1 bitand 0 > ;
 
 : fixnum-log2 ( x -- n )
-    0 swap [ dup 1 number= not ] [ [ 1+ ] [ 2/ ] bi* ] [ ] while drop ;
+    0 swap [ dup 1 eq? ] [ [ 1+ ] [ 2/ ] bi* ] [ ] until drop ;
 
 M: fixnum (log2) fixnum-log2 ;
 

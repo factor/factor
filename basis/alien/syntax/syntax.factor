@@ -3,8 +3,7 @@
 USING: accessors arrays alien alien.c-types alien.structs
 alien.arrays alien.strings kernel math namespaces parser
 sequences words quotations math.parser splitting grouping
-effects prettyprint prettyprint.sections prettyprint.backend
-assocs combinators lexer strings.parser alien.parser ;
+effects assocs combinators lexer strings.parser alien.parser ;
 IN: alien.syntax
 
 : DLL" lexer get skip-blank parse-string dlopen parsed ; parsing
@@ -34,12 +33,3 @@ IN: alien.syntax
     dup length
     [ [ create-in ] dip 1quotation define ] 2each ;
     parsing
-
-M: alien pprint*
-    {
-        { [ dup expired? ] [ drop \ BAD-ALIEN pprint-word ] }
-        { [ dup pinned-c-ptr? not ] [ drop "( displaced alien )" text ] }
-        [ \ ALIEN: [ alien-address pprint* ] pprint-prefix ]
-    } cond ;
-
-M: dll pprint* dll-path dup "DLL\" " "\"" pprint-string ;

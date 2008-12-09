@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations destructors io io.encodings
-io.encodings.private io.timeouts io.ports debugger summary
-listener accessors delegate delegate.protocols ;
+io.encodings.private io.timeouts io.ports summary
+accessors delegate delegate.protocols ;
 IN: io.streams.duplex
 
 TUPLE: duplex-stream in out ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types accessors math alien.accessors kernel
 kernel.private locals sequences sequences.private byte-arrays
-parser prettyprint.backend fry ;
+parser prettyprint.custom fry ;
 IN: bit-arrays
 
 TUPLE: bit-array
@@ -73,11 +73,11 @@ M: bit-array byte-length length 7 + -3 shift ;
 :: integer>bit-array ( n -- bit-array ) 
     n zero? [ 0 <bit-array> ] [
         [let | out [ n log2 1+ <bit-array> ] i! [ 0 ] n'! [ n ] |
-            [ n' zero? not ] [
+            [ n' zero? ] [
                 n' out underlying>> i set-alien-unsigned-1
                 n' -8 shift n'!
                 i 1+ i!
-            ] [ ] while
+            ] [ ] until
             out
         ]
     ] if ;

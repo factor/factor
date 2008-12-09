@@ -78,7 +78,7 @@ M: pathname forget*
 
 SYMBOL: file
 
-TUPLE: source-file-error file error ;
+TUPLE: source-file-error error file ;
 
 : <source-file-error> ( msg -- error )
     \ source-file-error new

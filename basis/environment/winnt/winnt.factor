@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.strings fry io.encodings.utf16 kernel
+USING: alien.strings fry io.encodings.utf16n kernel
 splitting windows windows.kernel32 system environment
 alien.c-types sequences windows.errors io.streams.memory
 io.encodings io ;

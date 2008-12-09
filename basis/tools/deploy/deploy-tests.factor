@@ -1,8 +1,8 @@
 IN: tools.deploy.tests
 USING: tools.test system io.files kernel tools.deploy.config
-tools.deploy.backend math sequences io.launcher arrays
-namespaces continuations layouts accessors io.encodings.ascii
-urls math.parser ;
+tools.deploy.config.editor tools.deploy.backend math sequences
+io.launcher arrays namespaces continuations layouts accessors
+io.encodings.ascii urls math.parser ;
 
 : shake-and-bake ( vocab -- )
     [ "test.image" temp-file delete-file ] ignore-errors
@@ -30,6 +30,10 @@ urls math.parser ;
 [ t ] [ "tetris" shake-and-bake 1500000 small-enough? ] unit-test
 
 [ t ] [ "bunny" shake-and-bake 2500000 small-enough? ] unit-test
+
+os macosx? [
+    [ t ] [ "webkit-demo" shake-and-bake 500000 small-enough? ] unit-test
+] when
 
 : run-temp-image ( -- )
     vm

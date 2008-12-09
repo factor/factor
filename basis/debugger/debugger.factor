@@ -22,9 +22,6 @@ M: tuple error-help class ;
 
 M: string error. print ;
 
-: :error ( -- )
-    error get error. ;
-
 : :s ( -- )
     error-continuation get data>> stack. ;
 
@@ -62,6 +59,9 @@ M: string error. print ;
     [ error. flush ] curry
     [ global [ "Error in print-error!" print drop ] bind ]
     recover ;
+
+: :error ( -- )
+    error get print-error ;
 
 : print-error-and-restarts ( error -- )
     print-error

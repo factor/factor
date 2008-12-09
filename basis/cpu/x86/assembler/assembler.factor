@@ -346,7 +346,7 @@ M: label JUMPcc (JUMPcc) label-fixup ;
 : LEAVE ( -- ) HEX: c9 , ;
 
 : RET ( n -- )
-    dup zero? [ drop HEX: c3 , ] [ HEX: C2 , 2, ] if ;
+    dup zero? [ drop HEX: c3 , ] [ HEX: c2 , 2, ] if ;
 
 ! Arithmetic
 

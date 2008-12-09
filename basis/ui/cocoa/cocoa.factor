@@ -3,9 +3,10 @@
 USING: accessors math arrays assocs cocoa cocoa.application
 command-line kernel memory namespaces cocoa.messages
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
-cocoa.windows cocoa.classes cocoa.application sequences system
-ui ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
-ui.cocoa.views core-foundation threads math.geometry.rect fry ;
+cocoa.windows cocoa.classes cocoa.application cocoa.nibs
+sequences system ui ui.backend ui.clipboards ui.gadgets
+ui.gadgets.worlds ui.cocoa.views core-foundation threads
+math.geometry.rect fry ;
 IN: ui.cocoa
 
 TUPLE: handle view window ;
@@ -110,7 +111,9 @@ CLASS: {
 
 SYMBOL: cocoa-init-hook
 
-cocoa-init-hook global [ [ install-app-delegate ] or ] change-at
+cocoa-init-hook global [
+    [ "MiniFactor.nib" load-nib install-app-delegate ] or
+] change-at
 
 M: cocoa-ui-backend ui
     "UI" assert.app [

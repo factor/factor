@@ -5,12 +5,12 @@ classes sequences.private continuations.private effects generic
 hashtables hashtables.private io io.backend io.files
 io.files.private io.streams.c kernel kernel.private math
 math.private memory namespaces namespaces.private parser
-prettyprint quotations quotations.private sbufs sbufs.private
+quotations quotations.private sbufs sbufs.private
 sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
-combinators locals locals.backend locals.private words.private
+combinators locals locals.backend locals.types words.private
 quotations.private stack-checker.values
 stack-checker.alien
 stack-checker.state

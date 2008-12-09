@@ -6,3 +6,6 @@ IN: tools.files.tests
 \ directory. must-infer
 
 [ ] [ "" directory. ] unit-test
+
+[ ]
+[ { device-name free-space used-space total-space percent-used } file-systems. ] unit-test

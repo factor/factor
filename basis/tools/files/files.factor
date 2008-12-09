@@ -44,12 +44,13 @@ percent-used percent-free ;
         { device-name [ device-name>> ] }
         { mount-point [ mount-point>> ] }
         { type [ type>> ] }
-        { available-space [ available-space>> ] }
-        { free-space [ free-space>> ] }
-        { used-space [ used-space>> ] }
-        { total-space [ total-space>> ] }
+        { available-space [ available-space>> [ 0 ] unless* ] }
+        { free-space [ free-space>> [ 0 ] unless* ] }
+        { used-space [ used-space>> [ 0 ] unless* ] }
+        { total-space [ total-space>> [ 0 ] unless* ] }
         { percent-used [
-            [ used-space>> ] [ total-space>> ] bi dup 0 =
+            [ used-space>> ] [ total-space>> ] bi
+            [ [ 0 ] unless* ] bi@ dup 0 =
             [ 2drop 0 ] [ / percent ] if
         ] }
     } case ;
@@ -65,5 +66,3 @@ percent-used percent-free ;
     { [ os unix? ] [ "tools.files.unix" ] }
     { [ os windows? ] [ "tools.files.windows" ] }
 } cond require
-
-! { device-name free-space used-space total-space percent-used } file-systems.
