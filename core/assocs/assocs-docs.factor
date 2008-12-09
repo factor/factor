@@ -214,7 +214,7 @@ HELP: assoc-map
 { $examples
     { $unchecked-example
         ": discount ( prices n -- newprices )"
-        "    [ - ] curry assoc-each ;"
+        "    [ - ] curry assoc-map ;"
         "H{ { \"bananas\" 5 } { \"apples\" 42 } { \"pears\" 17 } }"
         "2 discount ."
         "H{ { \"bananas\" 3 } { \"apples\" 39 } { \"pears\" 15 } }"
