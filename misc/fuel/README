@@ -47,18 +47,29 @@ M-x customize-group fuel will show you how many.
 Quick key reference
 -------------------
 
+(Chords ending in a single letter <x> accept also C-<x> (e.g. C-cC-z is
+the same as C-cz)).
+
+* In factor files:
+
  - C-cz : switch to listener
  - C-co : cycle between code, tests and docs factor files
 
- - M-. : edit word at point in Emacs
+ - M-. : edit word at point in Emacs (also in listener)
 
  - C-cr, C-cC-er : eval region
  - C-M-r, C-cC-ee : eval region, extending it to definition boundaries
  - C-M-x, C-cC-ex : eval definition around point
+ - C-ck, C-cC-ek : compile file
 
  - C-cC-da : toggle autodoc mode
  - C-cC-dd : help for word at point
  - C-cC-ds : short help word at point
 
-Chords ending in a single letter <x> accept also C-<x> (e.g. C-cC-z is
-the same as C-cz).
+* In the debugger (it pops up upon eval/compilation errors):
+
+ - g : go to error
+ - <digit> : invoke nth restart
+ - q : bury buffer
+
+

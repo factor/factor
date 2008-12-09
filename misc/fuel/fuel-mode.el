@@ -18,6 +18,7 @@
 (require 'fuel-base)
 (require 'fuel-syntax)
 (require 'fuel-font-lock)
+(require 'fuel-debug)
 (require 'fuel-help)
 (require 'fuel-eval)
 (require 'fuel-listener)
@@ -37,33 +38,58 @@
 
 ;;; User commands
 
+(defun fuel-run-file (&optional arg)
+  "Sends the current file to Factor for compilation.
+With prefix argument, ask for the file to run."
+  (interactive "P")
+  (let* ((file (or (and arg (read-file-name "File: " nil (buffer-file-name) t))
+                   (buffer-file-name)))
+         (file (expand-file-name file))
+         (buffer (find-file-noselect file))
+         (cmd (format "%S fuel-run-file" file)))
+    (when buffer
+      (with-current-buffer buffer
+        (fuel-debug--display-retort (fuel-eval--eval-string/context cmd)
+                                    (format "%s successfully compiled" file)
+                                    nil
+                                    file)))))
+
 (defun fuel-eval-region (begin end &optional arg)
   "Sends region to Fuel's listener for evaluation.
-With prefix, switchs to the listener's buffer afterwards."
+Unless called with a prefix, switchs to the compilation results
+buffer in case of errors."
   (interactive "r\nP")
-  (let* ((ret (fuel-eval--eval-region/context begin end))
-         (err (fuel-eval--retort-error ret)))
-    (message "%s" (or err (fuel--shorten-region begin end 70))))
-  (when arg (pop-to-buffer fuel-listener-buffer)))
+  (fuel-debug--display-retort
+   (fuel-eval--eval-region/context begin end)
+   (format "%s%s"
+           (if fuel-syntax--current-vocab
+               (format "IN: %s " fuel-syntax--current-vocab)
+             "")
+           (fuel--shorten-region begin end 70))
+   arg
+   (buffer-file-name)))
 
 (defun fuel-eval-extended-region (begin end &optional arg)
   "Sends region extended outwards to nearest definitions,
-to Fuel's listener for evaluation. With prefix, switchs to the
-listener's buffer afterwards."
+to Fuel's listener for evaluation.
+Unless called with a prefix, switchs to the compilation results
+buffer in case of errors."
   (interactive "r\nP")
   (fuel-eval-region (save-excursion (goto-char begin) (mark-defun) (point))
-                    (save-excursion (goto-char end) (mark-defun) (mark))))
+                    (save-excursion (goto-char end) (mark-defun) (mark))
+                    arg))
 
 (defun fuel-eval-definition (&optional arg)
   "Sends definition around point to Fuel's listener for evaluation.
-With prefix, switchs to the listener's buffer afterwards."
+Unless called with a prefix, switchs to the compilation results
+buffer in case of errors."
   (interactive "P")
   (save-excursion
     (mark-defun)
     (let* ((begin (point))
            (end (mark)))
       (unless (< begin end) (error "No evaluable definition around point"))
-      (fuel-eval-region begin end))))
+      (fuel-eval-region begin end arg))))
 
 (defun fuel-edit-word-at-point (&optional arg)
   "Opens a new window visiting the definition of the word at point.
@@ -127,6 +153,9 @@ interacting with a factor listener is at your disposal.
   (define-key fuel-mode-map (vector '(control ?c) `(control ,p) `(control ,k)) c))
 
 (fuel-mode--key-1 ?z 'run-factor)
+
+(fuel-mode--key-1 ?k 'fuel-run-file)
+(fuel-mode--key ?e ?k 'fuel-run-file)
 
 (define-key fuel-mode-map "\C-\M-x" 'fuel-eval-definition)
 (fuel-mode--key ?e ?x 'fuel-eval-definition)

@@ -38,7 +38,8 @@
         (when (and (> fuel-eval-log-max-length 0)
                    (> (point) fuel-eval-log-max-length))
           (erase-buffer))
-        (when fuel-eval--log (insert "\n>> " (fuel--shorten-str str 256) "\n"))
+        (when fuel-eval--log (insert "\n>> " (fuel--shorten-str str 256)))
+        (newline)
         (let ((beg (point)))
           (comint-redirect-send-command-to-process str (current-buffer) proc nil t)
           (with-current-buffer (process-buffer proc)
@@ -57,8 +58,6 @@
 (defsubst fuel-eval--retort-output (ret) (nth 2 ret))
 
 (defsubst fuel-eval--retort-p (ret) (listp ret))
-
-(defsubst fuel-eval--error-name (err) (car err))
 
 (defsubst fuel-eval--make-parse-error-retort (str)
   (fuel-eval--retort-make 'parse-retort-error nil str))
@@ -83,29 +82,60 @@
 (defsubst fuel-eval--factor-array (strs)
   (format "V{ %S }" (mapconcat 'identity strs " ")))
 
-(defsubst fuel-eval--eval-strings (strs)
-  (let ((str (format "%s fuel-eval" (fuel-eval--factor-array strs))))
+(defsubst fuel-eval--eval-strings (strs &optional no-restart)
+  (let ((str (format "fuel-eval-%s %s fuel-eval"
+                     (if no-restart "non-restartable" "restartable")
+                     (fuel-eval--factor-array strs))))
     (fuel-eval--send/retort str)))
 
-(defsubst fuel-eval--eval-string (str)
-  (fuel-eval--eval-strings (list str)))
+(defsubst fuel-eval--eval-string (str &optional no-restart)
+  (fuel-eval--eval-strings (list str) no-restart))
 
-(defun fuel-eval--eval-strings/context (strs)
+(defun fuel-eval--eval-strings/context (strs &optional no-restart)
   (let ((usings (fuel-syntax--usings-update)))
     (fuel-eval--send/retort
-     (format "%s %S %s fuel-eval-in-context"
+     (format "fuel-eval-%s %s %S %s fuel-eval-in-context"
+             (if no-restart "non-restartable" "restartable")
              (fuel-eval--factor-array strs)
              (or fuel-syntax--current-vocab "f")
              (if usings (fuel-eval--factor-array usings) "f")))))
 
-(defsubst fuel-eval--eval-string/context (str)
-  (fuel-eval--eval-strings/context (list str)))
+(defsubst fuel-eval--eval-string/context (str &optional no-restart)
+  (fuel-eval--eval-strings/context (list str) no-restart))
 
-(defun fuel-eval--eval-region/context (begin end)
+(defun fuel-eval--eval-region/context (begin end &optional no-restart)
   (let ((lines (split-string (buffer-substring-no-properties begin end)
                              "[\f\n\r\v]+" t)))
     (when (> (length lines) 0)
-      (fuel-eval--eval-strings/context lines))))
+      (fuel-eval--eval-strings/context lines no-restart))))
+
+
+;;; Error parsing
+
+(defsubst fuel-eval--error-name (err) (car err))
+
+(defsubst fuel-eval--error-restarts (err)
+  (cdr (assoc :restarts (fuel-eval--error-name-p err 'condition))))
+
+(defun fuel-eval--error-name-p (err name)
+  (unless (null err)
+    (or (and (eq (fuel-eval--error-name err) name) err)
+        (assoc name err))))
+
+(defsubst fuel-eval--error-file (err)
+  (nth 1 (fuel-eval--error-name-p err 'source-file-error)))
+
+(defsubst fuel-eval--error-lexer-p (err)
+  (or (fuel-eval--error-name-p err 'lexer-error)
+      (fuel-eval--error-name-p (fuel-eval--error-name-p err 'source-file-error)
+                               'lexer-error)))
+
+(defsubst fuel-eval--error-line/column (err)
+  (let ((err (fuel-eval--error-lexer-p err)))
+    (cons (nth 1 err) (nth 2 err))))
+
+(defsubst fuel-eval--error-line-text (err)
+  (nth 3 (fuel-eval--error-lexer-p err)))
 
 
 (provide 'fuel-eval)

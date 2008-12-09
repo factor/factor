@@ -1,32 +1,20 @@
 ! Copyright (C) 2008 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays classes.tuple compiler.units continuations debugger
-definitions eval io io.files io.streams.string kernel listener listener.private
-make math namespaces parser prettyprint quotations sequences strings
-vectors vocabs.loader ;
+USING: accessors arrays classes classes.tuple compiler.units
+combinators continuations debugger definitions eval help
+io io.files io.streams.string kernel lexer listener listener.private
+make math namespaces parser prettyprint prettyprint.config
+quotations sequences strings source-files vectors vocabs.loader ;
 
 IN: fuel
 
-! <PRIVATE
+! Evaluation status:
 
-TUPLE: fuel-status in use ds? ;
+TUPLE: fuel-status in use ds? restarts ;
 
 SYMBOL: fuel-status-stack
 V{ } clone fuel-status-stack set-global
-
-: push-fuel-status ( -- )
-    in get use get clone display-stacks? get
-    fuel-status boa
-    fuel-status-stack get push ;
-
-: pop-fuel-status ( -- )
-    fuel-status-stack get empty? [
-        fuel-status-stack get pop
-        [ in>> in set ]
-        [ use>> clone use set ]
-        [ ds?>> display-stacks? swap [ on ] [ off ] if ] tri
-    ] unless ;
 
 SYMBOL: fuel-eval-result
 f clone fuel-eval-result set-global
@@ -34,17 +22,49 @@ f clone fuel-eval-result set-global
 SYMBOL: fuel-eval-output
 f clone fuel-eval-result set-global
 
-! PRIVATE>
+SYMBOL: fuel-eval-res-flag
+t clone fuel-eval-res-flag set-global
+
+: fuel-eval-restartable? ( -- ? )
+    fuel-eval-res-flag get-global ; inline
+
+: fuel-eval-restartable ( -- )
+    t fuel-eval-res-flag set-global ; inline
+
+: fuel-eval-non-restartable ( -- )
+    f fuel-eval-res-flag set-global ; inline
+
+: push-fuel-status ( -- )
+    in get use get clone display-stacks? get restarts get-global clone
+    fuel-status boa
+    fuel-status-stack get push ;
+
+: pop-fuel-status ( -- )
+    fuel-status-stack get empty? [
+        fuel-status-stack get pop {
+            [ in>> in set ]
+            [ use>> clone use set ]
+            [ ds?>> display-stacks? swap [ on ] [ off ] if ]
+            [
+                restarts>> fuel-eval-restartable? [ drop ] [
+                    clone restarts set-global
+                ] if
+            ]
+        } cleave
+    ] unless ;
+
+
+! Lispy pretty printing
 
 GENERIC: fuel-pprint ( obj -- )
 
-M: object fuel-pprint pprint ;
+M: object fuel-pprint pprint ; inline
 
-M: f fuel-pprint drop "nil" write ;
+M: f fuel-pprint drop "nil" write ; inline
 
-M: integer fuel-pprint pprint ;
+M: integer fuel-pprint pprint ; inline
 
-M: string fuel-pprint pprint ;
+M: string fuel-pprint pprint ; inline
 
 M: sequence fuel-pprint
     dup empty? [ drop f fuel-pprint ] [
@@ -53,12 +73,30 @@ M: sequence fuel-pprint
         ")" write
     ] if ;
 
-M: tuple fuel-pprint tuple>array fuel-pprint ;
+M: tuple fuel-pprint tuple>array fuel-pprint ; inline
 
-M: continuation fuel-pprint drop "~continuation~" write ;
+M: continuation fuel-pprint drop ":continuation" write ; inline
+
+M: restart fuel-pprint name>> fuel-pprint ; inline
+
+SYMBOL: :restarts
+
+: fuel-restarts ( obj -- seq )
+    compute-restarts :restarts prefix ; inline
+
+M: condition fuel-pprint
+    [ error>> ] [ fuel-restarts ] bi 2array condition prefix fuel-pprint ;
+
+M: source-file-error fuel-pprint
+    [ file>> ] [ error>> ] bi 2array source-file-error prefix
+    fuel-pprint ;
+
+M: source-file fuel-pprint path>> fuel-pprint ;
+
+! Evaluation vocabulary
 
 : fuel-eval-set-result ( obj -- )
-    clone fuel-eval-result set-global ;
+    clone fuel-eval-result set-global ; inline
 
 : fuel-retort ( -- )
     error get
@@ -67,7 +105,7 @@ M: continuation fuel-pprint drop "~continuation~" write ;
     3array fuel-pprint ;
 
 : fuel-forget-error ( -- )
-    f error set-global ;
+    f error set-global ; inline
 
 : (fuel-begin-eval) ( -- )
     push-fuel-status
@@ -76,23 +114,25 @@ M: continuation fuel-pprint drop "~continuation~" write ;
     f fuel-eval-result set-global
     f fuel-eval-output set-global ;
 
+: fuel-run-with-output ( quot -- )
+    with-string-writer fuel-eval-output set-global ; inline
+
 : (fuel-end-eval) ( quot -- )
-    with-string-writer fuel-eval-output set-global
-    fuel-retort
-    pop-fuel-status ;
+    fuel-run-with-output fuel-retort pop-fuel-status ; inline
 
 : (fuel-eval) ( lines -- )
-    [ [ parse-lines ] with-compilation-unit call ] curry [ drop ] recover ;
+    [ [ parse-lines ] with-compilation-unit call ] curry
+    [ print-error ] recover ; inline
 
 : (fuel-eval-each) ( lines -- )
-    [ 1vector (fuel-eval) ] each ;
+    [ 1vector (fuel-eval) ] each ; inline
 
 : (fuel-eval-usings) ( usings -- )
     [ "USING: " prepend " ;" append ] map
     (fuel-eval-each) fuel-forget-error ;
 
 : (fuel-eval-in) ( in -- )
-    [ dup "IN: " prepend 1vector (fuel-eval) in set ] when* ;
+    [ dup "IN: " prepend 1vector (fuel-eval) in set ] when* ; inline
 
 : fuel-eval-in-context ( lines in usings -- )
     (fuel-begin-eval) [
@@ -107,15 +147,15 @@ M: continuation fuel-pprint drop "~continuation~" write ;
     fuel-retort ;
 
 : fuel-eval ( lines -- )
-    (fuel-begin-eval) [ (fuel-eval) ] (fuel-end-eval) ;
+    (fuel-begin-eval) [ (fuel-eval) ] (fuel-end-eval) ; inline
 
-: fuel-end-eval ( -- )
-    [ ] (fuel-end-eval) ;
+: fuel-end-eval ( -- ) [ ] (fuel-end-eval) ; inline
 
 : fuel-get-edit-location ( defspec -- )
     where [ first2 [ (normalize-path) ] dip 2array fuel-eval-set-result ] when* ;
 
-: fuel-startup ( -- )
-    "listener" run ;
+: fuel-run-file ( path -- ) run-file ; inline
+
+: fuel-startup ( -- ) "listener" run ; inline
 
 MAIN: fuel-startup

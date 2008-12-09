@@ -59,10 +59,15 @@ buffer."
       (error "Could not run factor: %s is not executable" factor))
     (unless (file-readable-p image)
       (error "Could not run factor: image file %s not readable" image))
-    (setq fuel-listener-buffer
-          (make-comint "fuel listener" factor nil "-run=fuel" (format "-i=%s" image)))
+    (setq fuel-listener-buffer (get-buffer-create "*fuel listener*"))
     (with-current-buffer fuel-listener-buffer
-      (fuel-listener-mode))))
+      (fuel-listener-mode)
+      (message "Starting FUEL listener ...")
+      (comint-exec fuel-listener-buffer "factor"
+                   factor nil `("-run=fuel" ,(format "-i=%s" image)))
+      (fuel-listener--wait-for-prompt 20)
+      (fuel-eval--send-string "USE: fuel")
+      (message "FUEL listener up and running!"))))
 
 (defun fuel-listener--process (&optional start)
   (or (and (buffer-live-p fuel-listener-buffer)
@@ -73,6 +78,23 @@ buffer."
         (fuel-listener--process))))
 
 (setq fuel-eval--default-proc-function 'fuel-listener--process)
+
+
+;;; Prompt chasing
+
+(defun fuel-listener--wait-for-prompt (&optional timeout)
+    (let ((proc (get-buffer-process fuel-listener-buffer))
+          (seen))
+      (with-current-buffer fuel-listener-buffer
+        (while (progn (goto-char comint-last-input-end)
+                      (not (or seen
+                               (setq seen
+                                     (re-search-forward comint-prompt-regexp nil t))
+                               (not (accept-process-output proc timeout))))))
+        (goto-char (point-max)))
+      (unless seen
+        (pop-to-buffer fuel-listener-buffer)
+        (error "No prompt found!"))))
 
 
 ;;; Interface: starting fuel listener
@@ -94,30 +116,17 @@ buffer."
 
 (defconst fuel-listener--prompt-regex "( [^)]* ) ")
 
-(defun fuel-listener--wait-for-prompt (&optional timeout)
-  (let ((proc (fuel-listener--process)))
-    (with-current-buffer fuel-listener-buffer
-      (goto-char comint-last-input-end)
-      (while (not (or (re-search-forward comint-prompt-regexp nil t)
-                      (not (accept-process-output proc timeout))))
-        (goto-char comint-last-input-end))
-      (goto-char (point-max)))))
-
-(defun fuel-listener--startup ()
-  (fuel-listener--wait-for-prompt)
-  (fuel-eval--send-string "USE: fuel")
-  (message "FUEL listener up and running!"))
-
 (define-derived-mode fuel-listener-mode comint-mode "Fuel Listener"
   "Major mode for interacting with an inferior Factor listener process.
 \\{fuel-listener-mode-map}"
   (set (make-local-variable 'comint-prompt-regexp)
        fuel-listener--prompt-regex)
   (set (make-local-variable 'comint-prompt-read-only) t)
-  (fuel-listener--startup))
+  (setq fuel-listener--compilation-begin nil))
 
-;; (define-key fuel-listener-mode-map "\C-w" 'comint-kill-region)
-;; (define-key fuel-listener-mode-map "\C-k" 'comint-kill-whole-line)
+(define-key fuel-listener-mode-map "\C-ch" 'fuel-help)
+(define-key fuel-listener-mode-map "\M-." 'fuel-edit-word-at-point)
+(define-key fuel-listener-mode-map "\C-ck" 'fuel-run-file)
 
 
 (provide 'fuel-listener)
