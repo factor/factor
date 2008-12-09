@@ -13,10 +13,10 @@ SYMBOL: message-histogram
 
 : analyze-entry ( entry -- )
     dup level>> { ERROR CRITICAL } memq? [ dup errors get push ] when
-    1 over word-name>> word-histogram get at+
+    dup word-name>> word-histogram get inc-at
     dup word-name>> word-names get member? [
-        1 over [ level>> ] [ word-name>> ] [ message>> ] tri 3array
-        message-histogram get at+
+        dup [ level>> ] [ word-name>> ] [ message>> ] tri 3array
+        message-histogram get inc-at
     ] when
     drop ;
 

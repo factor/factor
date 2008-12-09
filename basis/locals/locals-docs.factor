@@ -67,6 +67,8 @@ HELP: :>
 { $syntax ":> binding" }
 { $description "Introduces a new binding, lexically scoped to the enclosing quotation or definition." }
 { $notes
+    "This word can only be used inside a lambda word, lambda quotation or let binding form."
+    $nl
     "Lambda and let forms are really just syntax sugar for " { $link POSTPONE: :> } "."
     $nl
     "Lambdas desugar as follows:"

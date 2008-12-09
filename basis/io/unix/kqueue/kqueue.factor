@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types combinators io.unix.backend
 kernel math.bitwise sequences struct-arrays unix unix.kqueue
-unix.time ;
+unix.time assocs ;
 IN: io.unix.kqueue
 
-TUPLE: kqueue-mx < mx events monitors ;
+TUPLE: kqueue-mx < mx events ;
 
 : max-events ( -- n )
     #! We read up to 256 events at a time. This is an arbitrary
@@ -14,7 +14,6 @@ TUPLE: kqueue-mx < mx events monitors ;
 
 : <kqueue-mx> ( -- mx )
     kqueue-mx new-mx
-        H{ } clone >>monitors
         kqueue dup io-error >>fd
         max-events "kevent" <struct-array> >>events ;
 
@@ -35,30 +34,25 @@ M: kqueue-mx add-input-callback ( thread fd mx -- )
 
 M: kqueue-mx add-output-callback ( thread fd mx -- )
     [ call-next-method ] [
-        [ EVFILT_WRITE EV_DELETE make-kevent ] dip
+        [ EVFILT_WRITE { EV_ADD EV_ONESHOT } flags make-kevent ] dip
         register-kevent
     ] 2bi ;
 
-: cancel-input-callbacks ( fd mx -- seq )
-    [
-        [ EVFILT_READ EV_DELETE make-kevent ] dip
-        register-kevent
-    ] [ remove-input-callbacks ] 2bi ;
+M: kqueue-mx remove-input-callbacks ( fd mx -- seq )
+    2dup reads>> key? [
+        [ call-next-method ] [
+            [ EVFILT_READ EV_DELETE make-kevent ] dip
+            register-kevent
+        ] 2bi
+    ] [ 2drop f ] if ;
 
-: cancel-output-callbacks ( fd mx -- seq )
-    [
-        [ EVFILT_WRITE EV_DELETE make-kevent ] dip
-        register-kevent
-    ] [ remove-output-callbacks ] 2bi ;
-
-M: fd cancel-operation ( fd -- )
-    dup disposed>> [ drop ] [
-        fd>>
-        mx get-global
-        [ cancel-input-callbacks [ t swap resume-with ] each ]
-        [ cancel-output-callbacks [ t swap resume-with ] each ]
-        2bi
-    ] if ;
+M: kqueue-mx remove-output-callbacks ( fd mx -- seq )
+    2dup writes>> key? [
+        [
+            [ EVFILT_WRITE EV_DELETE make-kevent ] dip
+            register-kevent
+        ] [ call-next-method ] 2bi
+    ] [ 2drop f ] if ;
 
 : wait-kevent ( mx timespec -- n )
     [
