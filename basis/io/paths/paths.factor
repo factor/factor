@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays deques dlists io.files io.paths.private
+USING: accessors arrays deques dlists io.files
 kernel sequences system vocabs.loader fry continuations ;
 IN: io.paths
 

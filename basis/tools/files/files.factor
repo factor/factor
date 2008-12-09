@@ -65,5 +65,3 @@ percent-used percent-free ;
     { [ os unix? ] [ "tools.files.unix" ] }
     { [ os windows? ] [ "tools.files.windows" ] }
 } cond require
-
-! { device-name free-space used-space total-space percent-used } file-systems.
