@@ -9,7 +9,10 @@ IN: bootstrap.x86
 : shift-arg ( -- reg ) RCX ;
 : div-arg ( -- reg ) RAX ;
 : mod-arg ( -- reg ) RDX ;
-: temp-reg ( -- reg ) RBX ;
+: temp0 ( -- reg ) RDI ;
+: temp1 ( -- reg ) RSI ;
+: temp2 ( -- reg ) RDX ;
+: temp3 ( -- reg ) RBX ;
 : stack-reg ( -- reg ) RSP ;
 : ds-reg ( -- reg ) R14 ;
 : rs-reg ( -- reg ) R15 ;
@@ -17,14 +20,14 @@ IN: bootstrap.x86
 : rex-length ( -- n ) 1 ;
 
 [
-    arg0 0 MOV                                 ! load stack_chain
-    arg0 arg0 [] MOV
-    arg0 [] stack-reg MOV                      ! save stack pointer
+    temp0 0 MOV                                 ! load stack_chain
+    temp0 temp0 [] MOV
+    temp0 [] stack-reg MOV                      ! save stack pointer
 ] rc-absolute-cell rt-stack-chain 1 rex-length + jit-save-stack jit-define
 
 [
-    arg1 0 MOV                                 ! load XT
-    arg1 JMP                                   ! go
+    temp1 0 MOV                                 ! load XT
+    temp1 JMP                                   ! go
 ] rc-absolute-cell rt-primitive 1 rex-length + jit-primitive jit-define
 
 << "resource:basis/cpu/x86/bootstrap.factor" parse-file parsed >>
