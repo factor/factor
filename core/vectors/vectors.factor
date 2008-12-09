@@ -8,7 +8,7 @@ TUPLE: vector
 { underlying array }
 { length array-capacity } ;
 
-: <vector> ( n -- vector ) f <array> 0 vector boa ; inline
+: <vector> ( n -- vector ) 0 <array> 0 vector boa ; inline
 
 : >vector ( seq -- vector ) V{ } clone-like ;
 

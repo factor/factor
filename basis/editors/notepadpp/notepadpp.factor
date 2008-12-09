@@ -1,10 +1,10 @@
 USING: editors io.files io.launcher kernel math.parser
-namespaces sequences windows.shell32 make ;
+namespaces sequences io.paths.windows make ;
 IN: editors.notepadpp
 
-: notepadpp-path
+: notepadpp-path ( -- path )
     \ notepadpp-path get-global [
-        program-files "notepad++\\notepad++.exe" append-path
+        "notepad++" t [ "notepad++.exe" tail? ] find-in-program-files
     ] unless* ;
 
 : notepadpp ( file line -- )

@@ -10,6 +10,7 @@ IN: core-foundation.run-loop
 : kCFRunLoopRunHandledSource 4 ; inline
 
 TYPEDEF: void* CFRunLoopRef
+TYPEDEF: void* CFRunLoopSourceRef
 
 FUNCTION: CFRunLoopRef CFRunLoopGetMain ( ) ;
 FUNCTION: CFRunLoopRef CFRunLoopGetCurrent ( ) ;
@@ -18,6 +19,18 @@ FUNCTION: SInt32 CFRunLoopRunInMode (
    CFStringRef mode,
    CFTimeInterval seconds,
    Boolean returnAfterSourceHandled
+) ;
+
+FUNCTION: CFRunLoopSourceRef CFFileDescriptorCreateRunLoopSource (
+    CFAllocatorRef allocator,
+    CFFileDescriptorRef f,
+    CFIndex order
+) ;
+
+FUNCTION: void CFRunLoopAddSource (
+   CFRunLoopRef rl,
+   CFRunLoopSourceRef source,
+   CFStringRef mode
 ) ;
 
 : CFRunLoopDefaultMode ( -- alien )

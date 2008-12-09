@@ -32,8 +32,8 @@ SYMBOL: networking-hook
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: start-service ( name -- ) "/etc/init.d/" swap " start" 3append system drop ;
-: stop-service  ( name -- ) "/etc/init.d/" swap " stop"  3append system drop ;
+: start-service ( name -- ) "/etc/init.d/" " start" surround system drop ;
+: stop-service  ( name -- ) "/etc/init.d/" " stop"  surround system drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

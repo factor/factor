@@ -1,6 +1,8 @@
-USING: alien.c-types hardware-info kernel math namespaces
-windows windows.kernel32 hardware-info.backend system ;
-IN: hardware-info.windows.ce
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: alien.c-types system-info kernel math namespaces
+windows windows.kernel32 system-info.backend system ;
+IN: system-info.windows.ce
 
 : memory-status ( -- MEMORYSTATUS )
     "MEMORYSTATUS" <c-object>

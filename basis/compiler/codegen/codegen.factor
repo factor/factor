@@ -163,6 +163,7 @@ M: ##shl-imm generate-insn dst/src1/src2 %shl-imm ;
 M: ##shr-imm generate-insn dst/src1/src2 %shr-imm ;
 M: ##sar-imm generate-insn dst/src1/src2 %sar-imm ;
 M: ##not     generate-insn dst/src       %not     ;
+M: ##log2    generate-insn dst/src       %log2    ;
 
 : src1/src2 ( insn -- src1 src2 )
     [ src1>> register ] [ src2>> register ] bi ; inline

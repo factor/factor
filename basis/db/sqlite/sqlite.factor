@@ -164,7 +164,7 @@ M: sqlite-db <insert-user-assigned-statement> ( tuple -- statement )
 
 M: sqlite-db bind# ( spec obj -- )
     [
-        [ column-name>> ":" swap next-sql-counter 3append dup 0% ]
+        [ column-name>> ":" next-sql-counter surround dup 0% ]
         [ type>> ] bi
     ] dip <literal-bind> 1, ;
 

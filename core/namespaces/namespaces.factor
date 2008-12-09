@@ -12,12 +12,12 @@ IN: namespaces
 
 PRIVATE>
 
-: namespace ( -- namespace ) namestack* peek ;
+: namespace ( -- namespace ) namestack* peek ; inline
 : namestack ( -- namestack ) namestack* clone ;
 : set-namestack ( namestack -- ) >vector 0 setenv ;
 : global ( -- g ) 21 getenv { hashtable } declare ; inline
 : init-namespaces ( -- ) global 1array set-namestack ;
-: get ( variable -- value ) namestack* assoc-stack ; flushable
+: get ( variable -- value ) namestack* assoc-stack ; inline
 : set ( value variable -- ) namespace set-at ;
 : on ( variable -- ) t swap set ; inline
 : off ( variable -- ) f swap set ; inline
@@ -28,7 +28,7 @@ PRIVATE>
 : inc ( variable -- ) 1 swap +@ ; inline
 : dec ( variable -- ) -1 swap +@ ; inline
 : bind ( ns quot -- ) swap >n call ndrop ; inline
-: counter ( variable -- n ) global [ dup inc get ] bind ;
+: counter ( variable -- n ) global [ 0 or 1+ dup ] change-at ;
 
 : make-assoc ( quot exemplar -- hash )
     20 swap new-assoc [ >n call ndrop ] keep ; inline
