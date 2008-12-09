@@ -3,12 +3,12 @@
 USING: alien alien.c-types alien.strings arrays assocs
 combinators compiler hashtables kernel libc math namespaces
 parser sequences words cocoa.messages cocoa.runtime locals
-compiler.units io.encodings.ascii continuations make fry ;
+compiler.units io.encodings.utf8 continuations make fry ;
 IN: cocoa.subclassing
 
 : init-method ( method -- sel imp types )
     first3 swap
-    [ sel_registerName ] [ execute ] [ ascii string>alien ]
+    [ sel_registerName ] [ execute ] [ utf8 string>alien ]
     tri* ;
 
 : throw-if-false ( obj what -- )

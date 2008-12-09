@@ -1,9 +1,9 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel combinators math namespaces make
-assocs sequences splitting sorting sets debugger
-strings vectors hashtables quotations arrays byte-arrays
-math.parser calendar calendar.format present urls
+USING: accessors kernel combinators math namespaces make assocs
+sequences splitting sorting sets strings vectors hashtables
+quotations arrays byte-arrays math.parser calendar
+calendar.format present urls
 
 io io.encodings io.encodings.iana io.encodings.binary
 io.encodings.8-bit

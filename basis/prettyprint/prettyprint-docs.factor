@@ -1,4 +1,4 @@
-USING: prettyprint.backend prettyprint.config
+USING: prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections prettyprint.private help.markup help.syntax
 io kernel words definitions quotations strings generic classes ;
 IN: prettyprint

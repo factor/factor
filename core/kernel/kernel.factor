@@ -129,14 +129,6 @@ DEFER: if
 : 2bi@ ( w x y z quot -- )
     dup 2bi* ; inline
 
-: loop ( pred: ( -- ? ) -- )
-    dup slip swap [ loop ] [ drop ] if ; inline recursive
-
-: while ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
-    [ dup slip ] 2dip roll
-    [ [ tuck 2slip ] dip while ]
-    [ 2nip call ] if ; inline recursive
-
 ! Object protocol
 GENERIC: hashcode* ( depth obj -- code )
 
@@ -201,6 +193,19 @@ GENERIC: boa ( ... class -- tuple )
 
 : most ( x y quot -- z )
     [ 2dup ] dip call [ drop ] [ nip ] if ; inline
+
+! Loops
+: loop ( pred: ( -- ? ) -- )
+    dup slip swap [ loop ] [ drop ] if ; inline recursive
+
+: do ( pred body tail -- pred body tail )
+    over 3dip ; inline
+
+: while ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
+    [ pick 3dip [ do while ] 3curry ] keep if ; inline recursive
+
+: until ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
+    [ [ not ] compose ] 2dip while ; inline
 
 ! Error handling -- defined early so that other files can
 ! throw errors before continuations are loaded

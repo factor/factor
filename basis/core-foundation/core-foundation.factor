@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax kernel
-math sequences io.encodings.utf16 destructors accessors combinators ;
+math sequences io.encodings.utf8 destructors accessors
+combinators byte-arrays ;
 IN: core-foundation
 
 TYPEDEF: void* CFAllocatorRef
@@ -69,11 +70,52 @@ FUNCTION: CFURLRef CFURLCreateWithString ( CFAllocatorRef allocator, CFStringRef
 
 FUNCTION: CFURLRef CFURLCopyFileSystemPath ( CFURLRef url, int pathStyle ) ;
 
-FUNCTION: CFStringRef CFStringCreateWithCharacters ( CFAllocatorRef allocator, wchar_t* cStr, CFIndex numChars ) ;
+TYPEDEF: int CFStringEncoding
+: kCFStringEncodingMacRoman HEX: 0 ;
+: kCFStringEncodingWindowsLatin1 HEX: 0500 ;
+: kCFStringEncodingISOLatin1 HEX: 0201 ;
+: kCFStringEncodingNextStepLatin HEX: 0B01 ;
+: kCFStringEncodingASCII HEX: 0600 ;
+: kCFStringEncodingUnicode HEX: 0100 ;
+: kCFStringEncodingUTF8 HEX: 08000100 ;
+: kCFStringEncodingNonLossyASCII HEX: 0BFF ;
+: kCFStringEncodingUTF16 HEX: 0100 ;
+: kCFStringEncodingUTF16BE HEX: 10000100 ;
+: kCFStringEncodingUTF16LE HEX: 14000100 ;
+: kCFStringEncodingUTF32 HEX: 0c000100 ;
+: kCFStringEncodingUTF32BE HEX: 18000100 ;
+: kCFStringEncodingUTF32LE HEX: 1c000100 ;
+
+FUNCTION: CFStringRef CFStringCreateFromExternalRepresentation (
+   CFAllocatorRef alloc,
+   CFDataRef data,
+   CFStringEncoding encoding
+) ;
+
+FUNCTION: CFStringRef CFStringCreateWithBytes (
+   CFAllocatorRef alloc,
+   UInt8* bytes,
+   CFIndex numBytes,
+   CFStringEncoding encoding,
+   Boolean isExternalRepresentation
+) ;
 
 FUNCTION: CFIndex CFStringGetLength ( CFStringRef theString ) ;
 
 FUNCTION: void CFStringGetCharacters ( void* theString, CFIndex start, CFIndex length, void* buffer ) ;
+
+FUNCTION: Boolean CFStringGetCString (
+   CFStringRef theString,
+   char* buffer,
+   CFIndex bufferSize,
+   CFStringEncoding encoding
+) ;
+
+FUNCTION: CFStringRef CFStringCreateWithCString (
+   CFAllocatorRef alloc,
+   char* cStr,
+   CFStringEncoding encoding
+) ;
 
 FUNCTION: CFNumberRef CFNumberCreate ( CFAllocatorRef allocator, CFNumberType theType, void* valuePtr ) ;
 
@@ -97,12 +139,16 @@ FUNCTION: CFTypeID CFGetTypeID ( CFTypeRef cf ) ;
     [ [ dupd ] dip CFArraySetValueAtIndex ] 2each ;
 
 : <CFString> ( string -- alien )
-    f swap dup length CFStringCreateWithCharacters ;
+    f swap utf8 string>alien kCFStringEncodingUTF8 CFStringCreateWithCString
+    [ "CFStringCreateWithCString failed" throw ] unless* ;
 
 : CF>string ( alien -- string )
-    dup CFStringGetLength 1+ "ushort" <c-array> [
-        [ 0 over CFStringGetLength ] dip CFStringGetCharacters
-    ] keep utf16n alien>string ;
+    dup CFStringGetLength 4 * 1 + <byte-array> [
+        dup length
+        kCFStringEncodingUTF8
+        CFStringGetCString
+        [ "CFStringGetCString failed" throw ] unless
+    ] keep utf8 alien>string ;
 
 : CF>string-array ( alien -- seq )
     CF>array [ CF>string ] map ;

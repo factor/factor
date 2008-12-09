@@ -1,7 +1,7 @@
 ! Based on Clojure's PersistentHashMap by Rich Hickey.
 
 USING: kernel math accessors assocs fry combinators parser
-prettyprint.backend make
+prettyprint.custom make
 persistent.assocs
 persistent.hashtables.nodes
 persistent.hashtables.nodes.empty

@@ -150,7 +150,7 @@ M: help-error error.
     ] [
         [
             swap vocab-heading.
-            [ error. nl ] each
+            [ print-error nl ] each
         ] assoc-each
     ] if-empty ;
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.encodings math.order io.backend
-continuations debugger classes byte-arrays namespaces splitting
+continuations classes byte-arrays namespaces splitting
 grouping dlists assocs io.encodings.binary summary accessors
 destructors combinators ;
 IN: io.ports

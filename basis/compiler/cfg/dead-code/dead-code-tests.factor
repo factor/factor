@@ -1,5 +1,6 @@
 USING: compiler.cfg.dead-code compiler.cfg.instructions
-compiler.cfg.registers cpu.architecture tools.test ;
+compiler.cfg.registers compiler.cfg.debugger
+cpu.architecture tools.test ;
 IN: compiler.cfg.dead-code.tests
 
 [ { } ] [
