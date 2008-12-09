@@ -45,7 +45,42 @@
   (restart-name function-name "restart names")))
 
 
-;;; Compilation results buffer:
+;;; Font lock and other pattern matching:
+
+(defconst fuel-debug--compiler-info-alist
+  '((":warnings" . ?w) (":errors" . ?e) (":linkage" . ?l)))
+
+(defconst fuel-debug--error-file-regex "^P\" \\([^\"]+\\)\"")
+(defconst fuel-debug--error-line-regex "\\([0-9]+\\):")
+(defconst fuel-debug--error-cont-regex "^ +\\(\\^\\)$")
+
+(defconst fuel-debug--error-regex
+  (format "%s\n%s"
+          fuel-debug--error-file-regex
+          fuel-debug--error-line-regex))
+
+(defconst fuel-debug--compiler-info-regex
+  (format "^\\(%s\\) "
+          (regexp-opt (mapcar 'car fuel-debug--compiler-info-alist))))
+
+(defconst fuel-debug--restart-regex "^:\\([0-9]+\\) \\(.+\\)")
+
+(defconst fuel-debug--font-lock-keywords
+  `((,fuel-debug--error-file-regex . 'fuel-debug-font-lock-error)
+    (,fuel-debug--error-line-regex 1 'fuel-debug-font-lock-line)
+    (,fuel-debug--error-cont-regex 1 'fuel-debug-font-lock-column)
+    (,fuel-debug--restart-regex (1 'fuel-debug-font-lock-restart-number)
+                                (2 'fuel-debug-font-lock-restart-name))
+    (,fuel-debug--compiler-info-regex 1 'fuel-debug-font-lock-restart-number)
+    ("^\\(Restarts?\\|Loading\\) .+$" . 'fuel-debug-font-lock-info)
+    ("^Error: " . 'fuel-debug-font-lock-error)))
+
+(defun fuel-debug--font-lock-setup ()
+  (set (make-local-variable 'font-lock-defaults)
+       '(fuel-debug--font-lock-keywords t nil nil nil)))
+
+
+;;; Debug buffer:
 
 (defvar fuel-debug--buffer nil)
 
@@ -67,50 +102,63 @@
         (inhibit-read-only t))
     (with-current-buffer (fuel-debug--buffer)
       (erase-buffer)
-      (when err (insert (format "Error: %S\n\n" (fuel-eval--error-name err))))
-      (fuel-debug--display-output-1 ret)
+      (fuel-debug--display-output ret)
+      (delete-blank-lines)
+      (newline)
       (when (and (not err) success-msg)
         (message "%s" success-msg)
         (insert "\n" success-msg "\n"))
       (when err
         (fuel-debug--display-restarts err)
-        (let ((hstr (fuel-debug--help-string err)))
+        (delete-blank-lines)
+        (newline)
+        (let ((hstr (fuel-debug--help-string err file)))
           (if fuel-debug-show-short-help
               (insert "-----------\n" hstr "\n")
             (message "%s" hstr))))
       (setq fuel-debug--last-ret ret)
       (setq fuel-debug--file file)
-      (goto-char (point-max)))
-    (when (and err (not no-pop)) (pop-to-buffer fuel-debug--buffer))))
+      (goto-char (point-max))
+      (when (and err (not no-pop)) (pop-to-buffer fuel-debug--buffer))
+      (not err))))
 
-(defun fuel-debug--display-output-1 (ret)
+(defun fuel-debug--display-output (ret)
   (let* ((last (fuel-eval--retort-output fuel-debug--last-ret))
          (current (fuel-eval--retort-output ret))
          (llen (length last))
          (clen (length current))
          (trail (and last (substring-no-properties last (/ llen 2))))
+         (err (fuel-eval--retort-error ret))
          (p (point)))
     (save-excursion (insert current))
     (when (and (> clen llen) (> llen 0) (search-forward trail nil t))
       (delete-region p (point)))
-    (goto-char (point-max))))
+    (goto-char (point-max))
+    (when err
+      (insert (format "\nError: %S\n\n" (fuel-eval--error-name err))))))
 
 (defun fuel-debug--display-restarts (err)
   (let* ((rs (fuel-eval--error-restarts err))
          (rsn (length rs)))
     (when rs
-      (insert "\n\nRestarts:\n\n")
+      (insert "Restarts:\n\n")
       (dotimes (n rsn)
         (insert (format ":%s %s\n" (1+ n) (nth n rs))))
       (newline))))
 
-(defun fuel-debug--help-string (err)
-  (format "Press %s%s 'q' to bury buffer"
-          (if (fuel-eval--error-file err) "g to visit file, " "")
+(defun fuel-debug--help-string (err &optional file)
+  (format "Press %s%s%sq bury buffer"
+          (if (or file (fuel-eval--error-file err)) "g go to file, " "")
           (let ((rsn (length (fuel-eval--error-restarts err))))
             (cond ((zerop rsn) "")
-                  ((= 1 rsn) "1 to invoke restart, ")
-                  (t (format "1-%s to invoke restarts, " rsn))))))
+                  ((= 1 rsn) "1 invoke restart, ")
+                  (t (format "1-%s invoke restarts, " rsn))))
+          (let ((str ""))
+            (dolist (ci fuel-debug--compiler-info-alist str)
+              (save-excursion
+                (goto-char (point-min))
+                (when (search-forward (car ci) nil t)
+                  (setq str (format "%c %s, %s" (cdr ci) (car ci) str))))))))
 
 (defun fuel-debug--buffer-file ()
   (with-current-buffer (fuel-debug--buffer)
@@ -126,44 +174,13 @@
   (fuel-eval--error-restarts (fuel-debug--buffer-error)))
 
 
-;;; Font lock and other pattern matching:
-
-(defconst fuel-debug--error-file-regex "^P\" \\([^\"]+\\)\"")
-(defconst fuel-debug--error-line-regex "\\([0-9]+\\):")
-(defconst fuel-debug--error-cont-regex "^ +\\(\\^\\)$")
-
-(defconst fuel-debug--error-regex
-  (format "%s\n%s"
-          fuel-debug--error-file-regex
-          fuel-debug--error-line-regex))
-
-(defconst fuel-debug--named-restart-regex
-  (format "^\\(%s\\) " (regexp-opt '(":warnings" ":errors" ":linkage"))))
-
-(defconst fuel-debug--restart-regex
-  "^:\\([0-9]+\\) \\(.+\\)")
-
-(defconst fuel-debug--font-lock-keywords
-  `((,fuel-debug--error-file-regex . 'fuel-debug-font-lock-error)
-    (,fuel-debug--error-line-regex 1 'fuel-debug-font-lock-line)
-    (,fuel-debug--error-cont-regex 1 'fuel-debug-font-lock-column)
-    (,fuel-debug--restart-regex (1 'fuel-debug-font-lock-restart-number)
-                                (2 'fuel-debug-font-lock-restart-name))
-    (,fuel-debug--named-restart-regex 1 'fuel-debug-font-lock-restart-number)
-    ("^\\(Restarts?\\|Loading\\) .+$" . 'fuel-debug-font-lock-info)
-    ("^Error: " . 'fuel-debug-font-lock-error)))
-
-(defun fuel-debug--font-lock-setup ()
-  (set (make-local-variable 'font-lock-defaults)
-       '(fuel-debug--font-lock-keywords t nil nil nil)))
-
 ;;; Buffer navigation:
 
 (defun fuel-debug-goto-error ()
   (interactive)
   (let* ((err (or (fuel-debug--buffer-error)
                   (error "No errors reported")))
-         (file (or (fuel-eval--error-file err)
+         (file (or (fuel-debug--buffer-file)
                    (error "No file associated with error")))
          (l/c (fuel-eval--error-line/column err))
          (line (or (car l/c) 1))
@@ -200,6 +217,16 @@
            (fuel-eval--eval-string/context (format ":%s" n))
            (format "Restart %s (%s) successful" n (nth (1- n) rs))))))))
 
+(defun fuel-debug-show--compiler-info (info)
+  (save-excursion
+    (goto-char (point-min))
+    (unless (re-search-forward (format "^%s" info) nil t)
+      (error "%s information not available" info))
+    (message "Retrieving %s info ..." info)
+    (unless (fuel-debug--display-retort
+             (fuel-eval--eval-string info) "" (fuel-debug--buffer-file))
+      (error "Sorry, no %s info available" info))))
+
 
 ;;; Fuel Debug mode:
 
@@ -208,10 +235,15 @@
     (suppress-keymap map)
     (define-key map "g" 'fuel-debug-goto-error)
     (define-key map "\C-c\C-c" 'fuel-debug-goto-error)
+    (define-key map "n" 'next-line)
+    (define-key map "p" 'previous-line)
     (define-key map "q" 'bury-buffer)
     (dotimes (n 9)
       (define-key map (vector (+ ?1 n))
         `(lambda () (interactive) (fuel-debug-exec-restart ,(1+ n) t))))
+    (dolist (ci fuel-debug--compiler-info-alist)
+      (define-key map (vector (cdr ci))
+        `(lambda () (interactive) (fuel-debug-show--compiler-info ,(car ci)))))
     map))
 
 (defun fuel-debug-mode ()

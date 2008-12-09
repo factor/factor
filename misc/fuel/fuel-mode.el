@@ -49,10 +49,12 @@ With prefix argument, ask for the file to run."
          (cmd (format "%S fuel-run-file" file)))
     (when buffer
       (with-current-buffer buffer
-        (fuel-debug--display-retort (fuel-eval--eval-string/context cmd)
-                                    (format "%s successfully compiled" file)
-                                    nil
-                                    file)))))
+        (message "Compiling %s ..." file)
+        (let ((r (fuel-debug--display-retort (fuel-eval--eval-string/context cmd)
+                                             (format "%s successfully compiled" file)
+                                             nil
+                                             file)))
+          (if r (message "Compiling %s ... OK!" file) (message "")))))))
 
 (defun fuel-eval-region (begin end &optional arg)
   "Sends region to Fuel's listener for evaluation.

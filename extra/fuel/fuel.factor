@@ -104,21 +104,20 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     fuel-eval-output get-global
     3array fuel-pprint ;
 
-: fuel-forget-error ( -- )
-    f error set-global ; inline
+: fuel-forget-error ( -- ) f error set-global ; inline
+: fuel-forget-result ( -- ) f fuel-eval-result set-global ; inline
+: fuel-forget-output ( -- ) f fuel-eval-output set-global ; inline
 
 : (fuel-begin-eval) ( -- )
     push-fuel-status
     display-stacks? off
     fuel-forget-error
-    f fuel-eval-result set-global
-    f fuel-eval-output set-global ;
-
-: fuel-run-with-output ( quot -- )
-    with-string-writer fuel-eval-output set-global ; inline
+    fuel-forget-result
+    fuel-forget-output ;
 
 : (fuel-end-eval) ( quot -- )
-    fuel-run-with-output fuel-retort pop-fuel-status ; inline
+    with-string-writer fuel-eval-output set-global
+    fuel-retort pop-fuel-status ; inline
 
 : (fuel-eval) ( lines -- )
     [ [ parse-lines ] with-compilation-unit call ] curry
@@ -129,7 +128,7 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 
 : (fuel-eval-usings) ( usings -- )
     [ "USING: " prepend " ;" append ] map
-    (fuel-eval-each) fuel-forget-error ;
+    (fuel-eval-each) fuel-forget-error fuel-forget-output ;
 
 : (fuel-eval-in) ( in -- )
     [ dup "IN: " prepend 1vector (fuel-eval) in set ] when* ; inline
