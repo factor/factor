@@ -69,6 +69,10 @@ MACRO: ncurry ( n -- )
 MACRO: nwith ( n -- )
     [ with ] n*quot ;
 
+MACRO: ncleave ( quots n -- )
+    [ '[ _ '[ _ _ nkeep ] ] map [ ] join ] [ '[ _ ndrop ] ] bi
+    compose ;
+
 MACRO: napply ( n -- )
     2 [a,b]
     [ [ 1- ] [ ] bi '[ _ ntuck _ nslip ] ]
