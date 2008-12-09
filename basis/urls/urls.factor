@@ -4,8 +4,7 @@ USING: kernel ascii combinators combinators.short-circuit
 sequences splitting fry namespaces make assocs arrays strings
 io.sockets io.encodings.string io.encodings.utf8 math
 math.parser accessors parser strings.parser lexer
-prettyprint.backend prettyprint.custom hashtables present
-peg.ebnf urls.encoding ;
+hashtables present peg.ebnf urls.encoding ;
 IN: urls
 
 TUPLE: url protocol username password host port path query anchor ;
@@ -182,4 +181,8 @@ PRIVATE>
 ! Literal syntax
 : URL" lexer get skip-blank parse-string >url parsed ; parsing
 
-M: url pprint* dup present "URL\" " "\"" pprint-string ;
+USING: vocabs vocabs.loader ;
+
+"prettyprint" vocab [
+    "urls.prettyprint" require
+] when
