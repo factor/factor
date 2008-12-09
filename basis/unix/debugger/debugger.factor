@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: debugger prettyprint accessors io ;
+USING: debugger prettyprint accessors unix io kernel ;
 IN: unix.debugger
 
 M: unix-error error.
