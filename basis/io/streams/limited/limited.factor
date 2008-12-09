@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math io io.encodings destructors accessors
-sequences namespaces ;
+sequences namespaces byte-vectors ;
 IN: io.streams.limited
 
 TUPLE: limited-stream stream count limit ;

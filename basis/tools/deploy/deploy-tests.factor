@@ -1,8 +1,8 @@
 IN: tools.deploy.tests
 USING: tools.test system io.files kernel tools.deploy.config
-tools.deploy.backend math sequences io.launcher arrays
-namespaces continuations layouts accessors io.encodings.ascii
-urls math.parser ;
+tools.deploy.config.editor tools.deploy.backend math sequences
+io.launcher arrays namespaces continuations layouts accessors
+io.encodings.ascii urls math.parser ;
 
 : shake-and-bake ( vocab -- )
     [ "test.image" temp-file delete-file ] ignore-errors

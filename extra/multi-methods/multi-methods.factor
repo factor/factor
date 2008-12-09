@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences vectors classes classes.algebra
 combinators arrays words assocs parser namespaces make
-definitions prettyprint prettyprint.backend quotations
-generalizations debugger io compiler.units kernel.private
-effects accessors hashtables sorting shuffle math.order sets ;
+definitions prettyprint prettyprint.backend prettyprint.custom
+quotations generalizations debugger io compiler.units
+kernel.private effects accessors hashtables sorting shuffle
+math.order sets ;
 IN: multi-methods
 
 ! PART I: Converting hook specializers

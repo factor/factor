@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types io.encodings io.encodings.utf16 ;
+USING: alien.c-types io.encodings io.encodings.utf16 kernel ;
 IN: io.encodings.utf16n
 
 ! Native-order UTF-16
