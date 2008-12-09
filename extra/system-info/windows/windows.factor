@@ -1,8 +1,10 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types kernel libc math namespaces
 windows windows.kernel32 windows.advapi32
-words combinators vocabs.loader hardware-info.backend
+words combinators vocabs.loader system-info.backend
 system alien.strings ;
-IN: hardware-info.windows
+IN: system-info.windows
 
 : system-info ( -- SYSTEM_INFO )
     "SYSTEM_INFO" <c-object> [ GetSystemInfo ] keep ;
@@ -65,6 +67,6 @@ IN: hardware-info.windows
 
 <<
 {
-    { [ os wince? ] [ "hardware-info.windows.ce" ] }
-    { [ os winnt? ] [ "hardware-info.windows.nt" ] }
+    { [ os wince? ] [ "system-info.windows.ce" ] }
+    { [ os winnt? ] [ "system-info.windows.nt" ] }
 } cond require >>

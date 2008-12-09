@@ -60,7 +60,7 @@ nl
 "." write flush
 
 {
-    new-sequence nth push pop peek
+    new-sequence nth push pop peek flip
 } compile-uncompiled
 
 "." write flush

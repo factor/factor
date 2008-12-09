@@ -384,6 +384,8 @@ M: operand CMP OCT: 070 2-operand ;
 
 : XCHG ( dst src -- ) OCT: 207 2-operand ;
 
+: BSR ( dst src -- ) swap { HEX: 0f HEX: bd } (2-operand) ;
+
 : NOT  ( dst -- ) { BIN: 010 t HEX: f7 } 1-operand ;
 : NEG  ( dst -- ) { BIN: 011 t HEX: f7 } 1-operand ;
 : MUL  ( dst -- ) { BIN: 100 t HEX: f7 } 1-operand ;

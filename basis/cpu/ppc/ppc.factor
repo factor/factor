@@ -37,8 +37,8 @@ M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 M: ppc %load-indirect ( reg obj -- )
     [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-immediate ] bi* ;
 
-: %load-dlsym ( symbol dll register -- )
-    0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
+M: ppc %alien-global ( register symbol dll -- )
+    [ 0 swap LOAD32 ] 2dip rc-absolute-ppc-2/2 rel-dlsym ;
 
 : ds-reg 29 ; inline
 : rs-reg 30 ; inline
@@ -139,16 +139,20 @@ M:: ppc %string-nth ( dst src index temp -- )
         "end" define-label
         temp src index ADD
         dst temp string-offset LBZ
+        0 dst HEX: 80 CMPI
+        "end" get BLT
         temp src string-aux-offset LWZ
-        0 temp \ f tag-number CMPI
-        "end" get BEQ
         temp temp index ADD
         temp temp index ADD
         temp temp byte-array-offset LHZ
-        temp temp 8 SLWI
-        dst dst temp OR
+        temp temp 7 SLWI
+        dst dst temp XOR
         "end" resolve-label
     ] with-scope ;
+
+M:: ppc %set-string-nth-fast ( ch obj index temp -- )
+    temp obj index ADD
+    ch temp string-offset STB ;
 
 M: ppc %add     ADD ;
 M: ppc %add-imm ADDI ;
@@ -168,7 +172,7 @@ M: ppc %sar-imm SRAWI ;
 M: ppc %not     NOT ;
 
 : %alien-invoke-tail ( func dll -- )
-    scratch-reg %load-dlsym scratch-reg MTCTR BCTR ;
+    [ scratch-reg ] 2dip %alien-global scratch-reg MTCTR BCTR ;
 
 :: exchange-regs ( r1 r2 -- )
     scratch-reg r1 MR
@@ -407,7 +411,7 @@ M: ppc %set-alien-float swap 0 STFS ;
 M: ppc %set-alien-double swap 0 STFD ;
 
 : load-zone-ptr ( reg -- )
-    [ "nursery" f ] dip %load-dlsym ;
+    "nursery" f %alien-global ;
 
 : load-allot-ptr ( nursery-ptr allot-ptr -- )
     [ drop load-zone-ptr ] [ swap 4 LWZ ] 2bi ;
@@ -429,14 +433,11 @@ M:: ppc %allot ( dst size class nursery-ptr -- )
     dst class store-header
     dst class store-tagged ;
 
-: %alien-global ( dst name -- )
-    [ f rot %load-dlsym ] [ drop dup 0 LWZ ] 2bi ;
-
 : load-cards-offset ( dst -- )
-    "cards_offset" %alien-global ;
+    [ "cards_offset" f %alien-global ] [ dup 0 LWZ ] bi ;
 
 : load-decks-offset ( dst -- )
-    "decks_offset" %alien-global ;
+    [ "decks_offset" f %alien-global ] [ dup 0 LWZ ] bi  ;
 
 M:: ppc %write-barrier ( src card# table -- )
     card-mark scratch-reg LI
@@ -623,14 +624,14 @@ M: ppc %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    "stack_chain" f scratch-reg %load-dlsym
+    scratch-reg "stack_chain" f %alien-global
     scratch-reg scratch-reg 0 LWZ
     1 scratch-reg 0 STW
     ds-reg scratch-reg 8 STW
     rs-reg scratch-reg 12 STW ;
 
 M: ppc %alien-invoke ( symbol dll -- )
-    11 %load-dlsym 11 MTLR BLRL ;
+    [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
 
 M: ppc %alien-callback ( quot -- )
     3 swap %load-indirect "c_to_factor" f %alien-invoke ;

@@ -128,8 +128,8 @@ DEFER: (flat-length)
     45 node-count get [-] 8 /i ;
 
 : body-length-bias ( word -- n )
-    [ flat-length ] [ inlining-count get at 0 or 2/ 1+ ] bi *
-    24 swap [-] 4 /i ;
+    [ flat-length ] [ inlining-count get at 0 or ] bi
+    over 2 <= [ drop ] [ 2/ 1+ * ] if 24 swap [-] 4 /i ;
 
 : inlining-rank ( #call word -- n )
     [ classes-known? 2 0 ? ]
@@ -184,7 +184,7 @@ SYMBOL: history
     over in-d>> second value-info literal>> dup class?
     [ "predicate" word-prop '[ drop @ ] inline-word-def ] [ 3drop f ] if ;
 
-: do-inlining ( #call word -- ? )
+: (do-inlining) ( #call word -- ? )
     #! If the generic was defined in an outer compilation unit,
     #! then it doesn't have a definition yet; the definition
     #! is built at the end of the compilation unit. We do not
@@ -195,7 +195,6 @@ SYMBOL: history
     #! discouraged, but it should still work.)
     {
         { [ dup deferred? ] [ 2drop f ] }
-        { [ dup custom-inlining? ] [ inline-custom ] }
         { [ dup \ instance? eq? ] [ inline-instance-check ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
@@ -203,3 +202,10 @@ SYMBOL: history
         { [ dup method-body? ] [ inline-method-body ] }
         [ 2drop f ]
     } cond ;
+
+: do-inlining ( #call word -- ? )
+    #! Note the logic here: if there's a custom inlining hook,
+    #! it is permitted to return f, which means that we try the
+    #! normal inlining heuristic.
+    dup custom-inlining? [ 2dup inline-custom ] [ f ] if
+    [ 2drop t ] [ (do-inlining) ] if ;

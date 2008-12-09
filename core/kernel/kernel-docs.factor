@@ -887,6 +887,11 @@ $nl
 "An object can be cloned; the clone has distinct identity but equal value:"
 { $subsection clone } ;
 
+ARTICLE: "assertions" "Assertions"
+"Some words to make assertions easier to enforce:"
+{ $subsection assert }
+{ $subsection assert= } ;
+
 ARTICLE: "dataflow" "Data and control flow"
 { $subsection "evaluator" }
 { $subsection "words" }
@@ -902,6 +907,7 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "compositional-combinators" }
 { $subsection "combinators" }
 "Advanced topics:"
+{ $subsection "assertions" }
 { $subsection "implementing-combinators" }
 { $subsection "errors" }
 { $subsection "continuations" } ;

@@ -50,7 +50,7 @@ PREDICATE: writer < word "writer" word-prop ;
     define-typecheck ;
 
 : writer-word ( name -- word )
-    "(>>" swap ")" 3append (( value object -- )) create-accessor
+    "(>>" ")" surround (( value object -- )) create-accessor
     dup t "writer" set-word-prop ;
 
 ERROR: bad-slot-value value class ;

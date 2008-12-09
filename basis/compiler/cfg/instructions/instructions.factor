@@ -73,6 +73,7 @@ INSN: ##set-slot-imm < ##write { obj vreg } { slot integer } { tag integer } ;
 
 ! String element access
 INSN: ##string-nth < ##flushable { obj vreg } { index vreg } { temp vreg } ;
+INSN: ##set-string-nth-fast < ##effect { obj vreg } { index vreg } { temp vreg } ;
 
 ! Integer arithmetic
 INSN: ##add < ##commutative ;
@@ -91,6 +92,7 @@ INSN: ##shl-imm < ##binary-imm ;
 INSN: ##shr-imm < ##binary-imm ;
 INSN: ##sar-imm < ##binary-imm ;
 INSN: ##not < ##unary ;
+INSN: ##log2 < ##unary ;
 
 ! Overflowing arithmetic
 TUPLE: ##fixnum-overflow < insn src1 src2 ;
@@ -159,6 +161,8 @@ INSN: ##set-alien-double < ##alien-setter ;
 ! Memory allocation
 INSN: ##allot < ##flushable size class { temp vreg } ;
 INSN: ##write-barrier < ##effect card# table ;
+
+INSN: ##alien-global < ##read symbol library ;
 
 ! FFI
 INSN: ##alien-invoke params ;

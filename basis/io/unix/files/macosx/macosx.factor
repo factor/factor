@@ -13,7 +13,8 @@ M: macosx file-systems ( -- array )
     f <void*> dup 0 getmntinfo64 dup io-error
     [ *void* ] dip
     "statfs64" heap-size [ * memory>byte-array ] keep group
-    [ [ new-file-system-info ] dip statfs>file-system-info ] map ;
+    [ statfs64-f_mntonname utf8 alien>string file-system-info ] map ;
+    ! [ [ new-file-system-info ] dip statfs>file-system-info ] map ;
 
 M: macosx new-file-system-info macosx-file-system-info new ;
 

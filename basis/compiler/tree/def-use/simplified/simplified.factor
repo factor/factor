@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences sequences.deep kernel
+USING: sequences kernel fry vectors
 compiler.tree compiler.tree.def-use ;
 IN: compiler.tree.def-use.simplified
 
@@ -8,8 +8,6 @@ IN: compiler.tree.def-use.simplified
 
 ! A 'real' usage is a usage of a value that is not a #renaming.
 TUPLE: real-usage value node ;
-
-GENERIC: actually-used-by* ( value node -- real-usages )
 
 ! Def
 GENERIC: actually-defined-by* ( value node -- real-usage )
@@ -25,16 +23,18 @@ M: #return-recursive actually-defined-by* real-usage boa ;
 M: node actually-defined-by* real-usage boa ;
 
 ! Use
-: (actually-used-by) ( value -- real-usages )
-    dup used-by [ actually-used-by* ] with map ;
+GENERIC# actually-used-by* 1 ( value node accum -- )
+
+: (actually-used-by) ( value accum -- )
+    [ [ used-by ] keep ] dip '[ _ swap _ actually-used-by* ] each ;
 
 M: #renaming actually-used-by*
-    inputs/outputs [ indices ] dip nths
-    [ (actually-used-by) ] map ;
+    [ inputs/outputs [ indices ] dip nths ] dip
+    '[ _ (actually-used-by) ] each ;
 
-M: #return-recursive actually-used-by* real-usage boa ;
+M: #return-recursive actually-used-by* [ real-usage boa ] dip push ;
 
-M: node actually-used-by* real-usage boa ;
+M: node actually-used-by* [ real-usage boa ] dip push ;
 
 : actually-used-by ( value -- real-usages )
-    (actually-used-by) flatten ;
+    10 <vector> [ (actually-used-by) ] keep ;

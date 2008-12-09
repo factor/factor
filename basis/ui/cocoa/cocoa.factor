@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors math arrays cocoa cocoa.application
+USING: accessors math arrays assocs cocoa cocoa.application
 command-line kernel memory namespaces cocoa.messages
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
 cocoa.windows cocoa.classes cocoa.application sequences system
@@ -129,16 +129,29 @@ M: handle flush-gl-context ( handle -- )
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;
 
+CLASS: {
+    { +superclass+ "NSObject" }
+    { +name+ "FactorApplicationDelegate" }
+}
+
+{ "applicationDidFinishLaunching:" "void" { "id" "SEL" "id" }
+    [ 3drop event-loop ]
+} ;
+
+: install-app-delegate ( -- )
+    NSApp FactorApplicationDelegate install-delegate ;
+
 SYMBOL: cocoa-init-hook
+
+cocoa-init-hook global [ [ install-app-delegate ] or ] change-at
 
 M: cocoa-ui-backend ui
     "UI" assert.app [
         [
             init-clipboard
-            cocoa-init-hook get [ call ] when*
+            cocoa-init-hook get call
             start-ui
-            finish-launching
-            event-loop
+            NSApp -> run
         ] ui-running
     ] with-cocoa ;
 

@@ -99,21 +99,18 @@ M: object infer-call*
     3 infer->r infer-call 3 infer-r> ;
 
 : infer-dip ( -- )
-    commit-literals
     literals get
     [ \ dip def>> infer-quot-here ]
     [ pop 1 infer->r infer-quot-here 1 infer-r>  ]
     if-empty ;
 
 : infer-2dip ( -- )
-    commit-literals
     literals get
     [ \ 2dip def>> infer-quot-here ]
     [ pop 2 infer->r infer-quot-here 2 infer-r>  ]
     if-empty ;
 
 : infer-3dip ( -- )
-    commit-literals
     literals get
     [ \ 3dip def>> infer-quot-here ]
     [ pop 3 infer->r infer-quot-here 3 infer-r>  ]
@@ -307,7 +304,7 @@ M: object infer-call*
 \ <complex> { real real } { complex } define-primitive
 \ <complex> make-foldable
 
-\ both-fixnums? { object object } { object object object } define-primitive
+\ both-fixnums? { object object } { object } define-primitive
 
 \ fixnum+ { fixnum fixnum } { integer } define-primitive
 \ fixnum+ make-foldable
@@ -562,7 +559,8 @@ M: object infer-call*
 \ string-nth { fixnum string } { fixnum } define-primitive
 \ string-nth make-flushable
 
-\ set-string-nth { fixnum fixnum string } { } define-primitive
+\ set-string-nth-slow { fixnum fixnum string } { } define-primitive
+\ set-string-nth-fast { fixnum fixnum string } { } define-primitive
 
 \ resize-array { integer array } { array } define-primitive
 \ resize-array make-flushable

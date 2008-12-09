@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math namespaces assocs hashtables sequences
+USING: kernel math namespaces assocs hashtables sequences arrays
 accessors vectors combinators sets classes compiler.cfg
 compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.copy-prop ;
@@ -194,6 +194,7 @@ M: ##slot insn-slot# slot>> constant ;
 M: ##slot-imm insn-slot# slot>> ;
 M: ##set-slot insn-slot# slot>> constant ;
 M: ##set-slot-imm insn-slot# slot>> ;
+M: ##alien-global insn-slot# [ library>> ] [ symbol>> ] bi 2array ;
 
 M: ##peek insn-object loc>> class ;
 M: ##replace insn-object loc>> class ;
@@ -201,6 +202,7 @@ M: ##slot insn-object obj>> resolve ;
 M: ##slot-imm insn-object obj>> resolve ;
 M: ##set-slot insn-object obj>> resolve ;
 M: ##set-slot-imm insn-object obj>> resolve ;
+M: ##alien-global insn-object drop \ ##alien-global ;
 
 : init-alias-analysis ( -- )
     H{ } clone histories set
@@ -222,6 +224,9 @@ M: ##load-immediate analyze-aliases*
     dup [ val>> ] [ dst>> ] bi constants get set-at ;
 
 M: ##load-indirect analyze-aliases*
+    dup dst>> set-heap-ac ;
+
+M: ##alien-global analyze-aliases*
     dup dst>> set-heap-ac ;
 
 M: ##allot analyze-aliases*

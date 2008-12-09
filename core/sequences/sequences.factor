@@ -523,13 +523,6 @@ PRIVATE>
 : harvest ( seq -- newseq )
     [ empty? not ] filter ;
 
-: cache-nth ( i seq quot -- elt )
-    2over ?nth dup [
-        [ 3drop ] dip
-    ] [
-        drop swap [ over [ call dup ] dip ] dip set-nth
-    ] if ; inline
-
 : mismatch ( seq1 seq2 -- i )
     [ min-length ] 2keep
     [ 2nth-unsafe = not ] 2curry
@@ -835,12 +828,35 @@ PRIVATE>
 
 : supremum ( seq -- n ) dup first [ max ] reduce ;
 
-: flip ( matrix -- newmatrix )
-    dup empty? [
-        dup [ length ] map infimum
-        swap [ [ nth-unsafe ] with { } map-as ] curry { } map-as
-    ] unless ;
-
 : sigma ( seq quot -- n ) [ + ] compose 0 swap reduce ; inline
 
 : count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
+
+! We hand-optimize flip to such a degree because type hints
+! cannot express that an array is an array of arrays yet, and
+! this word happens to be performance-critical since the compiler
+! itself uses it. Optimizing it like this reduced compile time.
+<PRIVATE
+
+: generic-flip ( matrix -- newmatrix )
+    [ dup first length [ length min ] reduce ] keep
+    [ [ nth-unsafe ] with { } map-as ] curry { } map-as ; inline
+
+USE: arrays
+
+: array-length ( array -- len )
+    { array } declare length>> ;
+
+: array-flip ( matrix -- newmatrix )
+    [ dup first array-length [ array-length min ] reduce ] keep
+    [ [ array-nth ] with { } map-as ] curry { } map-as ;
+
+PRIVATE>
+
+: flip ( matrix -- newmatrix )
+    dup empty? [
+        dup array? [
+            dup [ array? ] all?
+            [ array-flip ] [ generic-flip ] if
+        ] [ generic-flip ] if
+    ] unless ;
