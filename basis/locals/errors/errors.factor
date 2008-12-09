@@ -24,8 +24,17 @@ ERROR: local-word-in-literal-error ;
 M: local-word-in-literal-error summary
     drop "Local words not permitted inside literals" ;
 
+ERROR: :>-outside-lambda-error ;
+
+M: :>-outside-lambda-error summary
+    drop ":> cannot be used outside of lambda expressions" ;
+
 ERROR: bad-lambda-rewrite output ;
 
 M: bad-lambda-rewrite summary
     drop "You have found a bug in locals. Please report." ;
 
+ERROR: bad-local args obj ;
+
+M: bad-local summary
+    drop "You have bound a bug in locals. Please report." ;

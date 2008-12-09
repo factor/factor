@@ -20,6 +20,8 @@ IN: locals.parser
     [ <local-word> [ dup name>> set ] [ ] [ ] tri ] dip
     "local-word-def" set-word-prop ;
 
+SYMBOL: locals
+
 : push-locals ( assoc -- )
     use get push ;
 
@@ -29,11 +31,16 @@ IN: locals.parser
 SYMBOL: in-lambda?
 
 : (parse-lambda) ( assoc end -- quot )
-    t in-lambda? [ parse-until ] with-variable
-    >quotation swap pop-locals ;
+    [
+        in-lambda? on
+        over locals set
+        over push-locals
+        parse-until >quotation
+        swap pop-locals
+    ] with-scope ;
 
 : parse-lambda ( -- lambda )
-    "|" parse-tokens make-locals dup push-locals
+    "|" parse-tokens make-locals
     \ ] (parse-lambda) <lambda> ;
 
 : parse-binding ( end -- pair/f )
@@ -52,15 +59,14 @@ SYMBOL: in-lambda?
 : parse-bindings ( end -- bindings vars )
     [
         [ (parse-bindings) ] H{ } make-assoc
-        dup push-locals
     ] { } make swap ;
 
 : parse-bindings* ( end -- words assoc )
     [
         [
             namespace push-locals
-
             (parse-bindings)
+            namespace pop-locals
         ] { } make-assoc
     ] { } make swap ;
 
@@ -73,13 +79,12 @@ SYMBOL: in-lambda?
 : parse-wbindings ( end -- bindings vars )
     [
         [ (parse-wbindings) ] H{ } make-assoc
-        dup push-locals
     ] { } make swap ;
 
 : parse-locals ( -- vars assoc )
     "(" expect ")" parse-effect
     word [ over "declared-effect" set-word-prop ] when*
-    in>> [ dup pair? [ first ] when ] map make-locals dup push-locals ;
+    in>> [ dup pair? [ first ] when ] map make-locals ;
 
 : parse-locals-definition ( word -- word quot )
     parse-locals \ ; (parse-lambda) <lambda>

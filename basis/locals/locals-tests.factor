@@ -441,6 +441,16 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 
 [ "USE: locals [| | [wlet | a [ 0 ] | { a } ] ]" eval ] must-fail
 
+[ "USE: locals [| | { :> a } ]" eval ] must-fail
+
+[ "USE: locals 3 :> a" eval ] must-fail
+
+[ 3 ] [ 3 [| | :> a a ] call ] unit-test
+
+[ 3 ] [ 3 [| | :> a! a ] call ] unit-test
+
+[ 3 ] [ 2 [| | :> a! a 1+ a! a ] call ] unit-test
+
 :: wlet-&&-test ( a -- ? )
     [wlet | is-integer? [ a integer? ]
             is-even? [ a even? ]

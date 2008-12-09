@@ -1,13 +1,12 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays fry kernel locals.backend locals.types
-math quotations sequences words combinators make ;
+USING: accessors arrays fry kernel math quotations sequences
+words combinators make locals.backend locals.types
+locals.errors ;
 IN: locals.rewrite.point-free
 
 ! Step 3: rewrite locals usage within a single quotation into
 ! retain stack manipulation
-
-ERROR: bad-local args obj ;
 
 : local-index ( args obj -- n )
     2dup '[ unquote _ eq? ] find drop

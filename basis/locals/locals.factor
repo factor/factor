@@ -1,10 +1,13 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lexer locals.parser locals.types macros memoize parser
-sequences vocabs vocabs.loader words kernel ;
+USING: lexer macros memoize parser sequences vocabs
+vocabs.loader words kernel namespaces locals.parser locals.types
+locals.errors ;
 IN: locals
 
-: :> scan <local> <def> parsed ; parsing
+: :>
+    scan locals get [ :>-outside-lambda-error ] unless*
+    [ make-local ] bind <def> parsed ; parsing
 
 : [| parse-lambda parsed-lambda ; parsing
 
