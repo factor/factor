@@ -64,10 +64,10 @@ M: mx remove-output-callbacks writes>> delete-at* drop ;
 GENERIC: wait-for-events ( ms mx -- )
 
 : input-available ( fd mx -- )
-    remove-input-callbacks [ resume ] each ;
+    reads>> delete-at* drop [ resume ] each ;
 
 : output-available ( fd mx -- )
-    remove-output-callbacks [ resume ] each ;
+    writes>> delete-at* drop [ resume ] each ;
 
 M: fd cancel-operation ( fd -- )
     dup disposed>> [ drop ] [
