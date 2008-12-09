@@ -58,9 +58,13 @@ percent-used percent-free ;
 : file-systems-info ( spec -- seq )
     file-systems swap '[ _ [ file-system-spec ] with map ] map ;
 
-: file-systems. ( spec -- )
+: print-file-systems ( spec -- )
     [ file-systems-info ]
     [ [ unparse ] map ] bi prefix simple-table. ;
+
+: file-systems. ( -- )
+    { device-name free-space used-space total-space percent-used }
+    print-file-systems ;
 
 {
     { [ os unix? ] [ "tools.files.unix" ] }
