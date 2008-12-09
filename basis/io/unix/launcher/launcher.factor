@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces math system sequences debugger
+USING: kernel namespaces math system sequences
 continuations arrays assocs combinators alien.c-types strings
 threads accessors environment
 io io.backend io.launcher io.ports io.files

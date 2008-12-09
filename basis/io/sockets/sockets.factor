@@ -4,7 +4,7 @@
 USING: generic kernel io.backend namespaces continuations
 sequences arrays io.encodings io.ports io.streams.duplex
 io.encodings.ascii alien.strings io.binary accessors destructors
-classes debugger byte-arrays system combinators parser
+classes byte-arrays system combinators parser
 alien.c-types math.parser splitting grouping math assocs summary
 system vocabs.loader combinators present fry ;
 IN: io.sockets
