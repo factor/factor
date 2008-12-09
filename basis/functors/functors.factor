@@ -99,7 +99,7 @@ DEFER: ;FUNCTOR delimiter
 
 : (FUNCTOR:) ( -- word def )
     CREATE
-    parse-locals
+    parse-locals dup push-locals
     parse-functor-body swap pop-locals <lambda>
     rewrite-closures first ;
 
