@@ -132,7 +132,7 @@ M: bitmap draw-image ( bitmap -- )
     [
         [ height>> abs ] keep
         bit-count>> {
-            ! { 32 [ GL_BGRA GL_UNSIGNED_INT_8_8_8_8 ] } ! broken
+            { 32 [ GL_BGRA GL_UNSIGNED_BYTE ] }
             { 24 [ GL_BGR GL_UNSIGNED_BYTE ] }
             { 8 [ GL_BGR GL_UNSIGNED_BYTE ] }
             { 4 [ GL_BGR GL_UNSIGNED_BYTE ] }
