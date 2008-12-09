@@ -1,10 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.bitwise math.parser
-random sequences continuations namespaces
-io.files io arrays io.files.unique.backend system
-combinators vocabs.loader fry ;
+USING: kernel math math.bitwise math.parser random sequences
+continuations namespaces io.files io arrays system
+combinators vocabs.loader fry io.backend ;
 IN: io.files.unique
+
+HOOK: touch-unique-file io-backend ( path -- )
+HOOK: temporary-path io-backend ( -- path )
 
 SYMBOL: unique-length
 SYMBOL: unique-retries
@@ -26,12 +28,17 @@ SYMBOL: unique-retries
 
 PRIVATE>
 
+: (make-unique-file) ( path prefix suffix -- path )
+    '[
+        _ _ _ unique-length get random-name glue append-path
+        dup touch-unique-file
+    ] unique-retries get retry ;
+
 : make-unique-file ( prefix suffix -- path )
-    temporary-path -rot
-    [
-        unique-length get random-name glue append-path
-        dup (make-unique-file)
-    ] 3curry unique-retries get retry ;
+    [ temporary-path ] 2dip (make-unique-file) ;
+
+: make-unique-file* ( prefix suffix -- path )
+    [ current-directory get ] 2dip (make-unique-file) ;
 
 : with-unique-file ( prefix suffix quot: ( path -- ) -- )
     [ make-unique-file ] dip [ delete-file ] bi ; inline

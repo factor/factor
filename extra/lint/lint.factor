@@ -44,11 +44,13 @@ SYMBOL: def-hash-keys
 
 : trivial-defs
     {
+        [ drop ] [ 2array ]
+        [ bitand ]
+
         [ . ]
         [ get ]
         [ t ] [ f ]
         [ { } ]
-        [ drop ] ! because of declare
         [ drop f ]
         [ "cdecl" ]
         [ first ] [ second ] [ third ] [ fourth ]
@@ -79,6 +81,12 @@ def-hash get-global [ drop empty? not ] assoc-filter
 
 ! Remove trivial defs
 [ drop trivial-defs member? not ] assoc-filter
+
+! Remove numbers only defs
+[ drop [ number? ] all? not ] assoc-filter
+
+! Remove curry only defs
+[ drop [ \ curry = ] all? not ] assoc-filter
 
 ! Remove tag defs
 [

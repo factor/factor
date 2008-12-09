@@ -139,7 +139,7 @@ M: not-enough-characters summary ( obj -- str )
 
 : expect ( ch -- )
     get-char 2dup = [ 2drop ] [
-        >r 1string r> 1string expected
+        [ 1string ] bi@ expected
     ] if next ;
 
 : expect-string ( string -- )
@@ -155,4 +155,4 @@ M: not-enough-characters summary ( obj -- str )
     swap [ init-parser call ] with-input-stream ; inline
 
 : string-parse ( input quot -- )
-    >r <string-reader> r> state-parse ; inline
+    [ <string-reader> ] dip state-parse ; inline
