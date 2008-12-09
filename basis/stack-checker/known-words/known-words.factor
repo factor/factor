@@ -5,12 +5,12 @@ classes sequences.private continuations.private effects generic
 hashtables hashtables.private io io.backend io.files
 io.files.private io.streams.c kernel kernel.private math
 math.private memory namespaces namespaces.private parser
-prettyprint quotations quotations.private sbufs sbufs.private
+quotations quotations.private sbufs sbufs.private
 sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
-combinators locals locals.backend locals.private words.private
+combinators locals locals.backend locals.types words.private
 quotations.private stack-checker.values
 stack-checker.alien
 stack-checker.state
@@ -99,21 +99,18 @@ M: object infer-call*
     3 infer->r infer-call 3 infer-r> ;
 
 : infer-dip ( -- )
-    commit-literals
     literals get
     [ \ dip def>> infer-quot-here ]
     [ pop 1 infer->r infer-quot-here 1 infer-r>  ]
     if-empty ;
 
 : infer-2dip ( -- )
-    commit-literals
     literals get
     [ \ 2dip def>> infer-quot-here ]
     [ pop 2 infer->r infer-quot-here 2 infer-r>  ]
     if-empty ;
 
 : infer-3dip ( -- )
-    commit-literals
     literals get
     [ \ 3dip def>> infer-quot-here ]
     [ pop 3 infer->r infer-quot-here 3 infer-r>  ]
@@ -307,7 +304,7 @@ M: object infer-call*
 \ <complex> { real real } { complex } define-primitive
 \ <complex> make-foldable
 
-\ both-fixnums? { object object } { object object object } define-primitive
+\ both-fixnums? { object object } { object } define-primitive
 
 \ fixnum+ { fixnum fixnum } { integer } define-primitive
 \ fixnum+ make-foldable

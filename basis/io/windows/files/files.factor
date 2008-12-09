@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types io.binary io.backend io.files io.buffers
-io.windows kernel math splitting fry alien.strings
-windows windows.kernel32 windows.time calendar combinators
-math.functions sequences namespaces make words symbols system
-io.ports destructors accessors math.bitwise continuations
+io.encodings.utf16n io.ports io.windows kernel math splitting
+fry alien.strings windows windows.kernel32 windows.time calendar
+combinators math.functions sequences namespaces make words
+symbols system destructors accessors math.bitwise continuations
 windows.errors arrays byte-arrays ;
 IN: io.windows.files
 

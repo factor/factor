@@ -241,7 +241,7 @@ SYMBOL: +stopped+
 
 : walker-loop ( -- )
     +running+ set-status
-    [ status +stopped+ eq? not ] [
+    [ status +stopped+ eq? ] [
         [
             {
                 ! ignore these commands while the thread is
@@ -260,7 +260,7 @@ SYMBOL: +stopped+
                 [ walker-suspended ]
             } case
         ] handle-synchronous
-    ] [ ] while ;
+    ] [ ] until ;
 
 : associate-thread ( walker -- )
     walker-thread tset

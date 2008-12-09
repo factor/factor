@@ -3,14 +3,14 @@
 USING: accessors assocs kernel math math.parser namespaces make
 sequences io io.sockets io.streams.string io.files io.timeouts
 strings splitting calendar continuations accessors vectors
-math.order hashtables byte-arrays prettyprint destructors
+math.order hashtables byte-arrays destructors
 io.encodings
 io.encodings.string
 io.encodings.ascii
 io.encodings.8-bit
 io.encodings.binary
 io.streams.duplex
-fry debugger summary ascii urls urls.encoding present
+fry ascii urls urls.encoding present
 http http.parsers ;
 IN: http.client
 
@@ -83,10 +83,6 @@ M: f >post-data ;
 : max-redirects 10 ;
 
 ERROR: too-many-redirects ;
-
-M: too-many-redirects summary
-    drop
-    [ "Redirection limit of " % max-redirects # " exceeded" % ] "" make ;
 
 <PRIVATE
 
@@ -161,10 +157,6 @@ PRIVATE>
 
 ERROR: download-failed response ;
 
-M: download-failed error.
-    "HTTP request failed:" print nl
-    response>> . ;
-
 : check-response ( response -- response )
     dup code>> success? [ download-failed ] unless ;
 
@@ -203,3 +195,7 @@ M: download-failed error.
 
 : http-post ( post-data url -- response data )
     <post-request> http-request ;
+
+USING: vocabs vocabs.loader ;
+
+"debugger" vocab [ "http.client.debugger" require ] when

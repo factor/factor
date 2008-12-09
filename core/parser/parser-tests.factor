@@ -5,6 +5,8 @@ sorting classes.tuple compiler.units debugger vocabs
 vocabs.loader accessors eval combinators lexer ;
 IN: parser.tests
 
+\ run-file must-infer
+
 [
     [ 1 [ 2 [ 3 ] 4 ] 5 ]
     [ "1\n[\n2\n[\n3\n]\n4\n]\n5" eval ]
@@ -400,7 +402,7 @@ IN: parser.tests
 ] times
 
 [ "resource:core/parser/test/assert-depth.factor" run-file ]
-[ stack>> { 1 2 3 } sequence= ]
+[ got>> { 1 2 3 } sequence= ]
 must-fail-with
 
 2 [

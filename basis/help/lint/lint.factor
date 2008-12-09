@@ -67,7 +67,7 @@ IN: help.lint
         vocab-exists? [ "$vocab-link to non-existent vocabulary" throw ] unless
     ] each ;
 
-: check-rendering ( word element -- )
+: check-rendering ( element -- )
     [ print-topic ] with-string-writer drop ;
 
 : all-word-help ( words -- seq )
@@ -87,13 +87,14 @@ M: help-error error.
 : check-word ( word -- )
     dup word-help [
         [
-            dup word-help [
-                2dup check-examples
-                2dup check-values
-                2dup check-see-also
-                2dup nip check-modules
-                2dup drop check-rendering
-            ] assert-depth 2drop
+            dup word-help '[
+                _ _ {
+                    [ check-examples ]
+                    [ check-values ]
+                    [ check-see-also ]
+                    [ [ check-rendering ] [ check-modules ] bi* ]
+                } 2cleave
+            ] assert-depth
         ] check-something
     ] [ drop ] if ;
 
@@ -101,9 +102,9 @@ M: help-error error.
 
 : check-article ( article -- )
     [
-        dup article-content [
-            2dup check-modules check-rendering
-        ] assert-depth 2drop
+        dup article-content
+        '[ _ check-rendering _ check-modules ]
+        assert-depth
     ] check-something ;
 
 : files>vocabs ( -- assoc )
@@ -149,7 +150,7 @@ M: help-error error.
     ] [
         [
             swap vocab-heading.
-            [ error. nl ] each
+            [ print-error nl ] each
         ] assoc-each
     ] if-empty ;
 

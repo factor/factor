@@ -63,6 +63,35 @@ HELP: [wlet
     }
 } ;
 
+HELP: :>
+{ $syntax ":> binding" }
+{ $description "Introduces a new binding, lexically scoped to the enclosing quotation or definition." }
+{ $notes
+    "This word can only be used inside a lambda word, lambda quotation or let binding form."
+    $nl
+    "Lambda and let forms are really just syntax sugar for " { $link POSTPONE: :> } "."
+    $nl
+    "Lambdas desugar as follows:"
+    { $code
+        "[| a b | a b + b / ]"
+        "[ :> b :> a a b + b / ]"
+    }
+    "Let forms desugar as follows:"
+    { $code
+        "[|let | x [ 10 random ] | { x x } ]"
+        "10 random :> x { x x }"
+    }
+}
+{ $examples
+    { $code
+        "USING: locals math kernel ;"
+        "IN: scratchpad"
+        ":: quadratic ( a b c -- x y )"
+        "    b sq 4 a c * * - sqrt :> disc"
+        "    b neg disc [ + ] [ - ] 2bi [ 2 a * / ] bi@ ;"
+    }
+} ;
+
 HELP: ::
 { $syntax ":: word ( bindings... -- outputs... ) body... ;" }
 { $description "Defines a word with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope." }
@@ -209,6 +238,8 @@ $nl
 { $subsection POSTPONE: [wlet }
 "Lambda abstractions:"
 { $subsection POSTPONE: [| }
+"Lightweight binding form:"
+{ $subsection POSTPONE: :> }
 "Additional topics:"
 { $subsection "locals-literals" }
 { $subsection "locals-mutable" }

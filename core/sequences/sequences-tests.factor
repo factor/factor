@@ -190,16 +190,6 @@ unit-test
 
 [ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] bi@ ] unit-test
 
-[ 1 4 9 16 16 V{ f 1 4 9 16 } ] [
-    V{ } clone "cache-test" set
-    1 "cache-test" get [ sq ] cache-nth
-    2 "cache-test" get [ sq ] cache-nth
-    3 "cache-test" get [ sq ] cache-nth
-    4 "cache-test" get [ sq ] cache-nth
-    4 "cache-test" get [ "wrong" ] cache-nth
-    "cache-test" get
-] unit-test
-
 [ 1 ] [ 0.5 { 1 2 3 } nth ] unit-test
 
 ! Pathological case

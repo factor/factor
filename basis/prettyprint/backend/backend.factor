@@ -1,16 +1,14 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays byte-vectors generic
-hashtables io assocs kernel math namespaces make sequences
-strings sbufs io.styles vectors words prettyprint.config
+USING: accessors arrays byte-arrays generic hashtables io assocs
+kernel math namespaces make sequences strings sbufs io.styles
+vectors words prettyprint.config prettyprint.custom
 prettyprint.sections quotations io io.files math.parser effects
 classes.tuple math.order classes.tuple.private classes
 combinators colors ;
 IN: prettyprint.backend
 
-GENERIC: pprint* ( obj -- )
-
-M: effect pprint* effect>string "(" swap ")" 3append text ;
+M: effect pprint* effect>string "(" ")" surround text ;
 
 : ?effect-height ( word -- n )
     stack-effect [ effect-height ] [ 0 ] if* ;
@@ -161,26 +159,19 @@ M: tuple pprint*
     [ [ pprint* ] each ] dip
     [ "~" swap number>string " more~" 3append text ] when* ;
 
-GENERIC: pprint-delims ( obj -- start end )
-
 M: quotation pprint-delims drop \ [ \ ] ;
 M: curry pprint-delims drop \ [ \ ] ;
 M: compose pprint-delims drop \ [ \ ] ;
 M: array pprint-delims drop \ { \ } ;
 M: byte-array pprint-delims drop \ B{ \ } ;
-M: byte-vector pprint-delims drop \ BV{ \ } ;
 M: vector pprint-delims drop \ V{ \ } ;
 M: hashtable pprint-delims drop \ H{ \ } ;
 M: tuple pprint-delims drop \ T{ \ } ;
 M: wrapper pprint-delims drop \ W{ \ } ;
 M: callstack pprint-delims drop \ CS{ \ } ;
 
-GENERIC: >pprint-sequence ( obj -- seq )
-
 M: object >pprint-sequence ;
-
 M: vector >pprint-sequence ;
-M: byte-vector >pprint-sequence ;
 M: curry >pprint-sequence ;
 M: compose >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
@@ -191,16 +182,13 @@ M: tuple >pprint-sequence
     [ class ] [ tuple-slots ] bi
     [ 1array ] [ [ f 2array ] dip append ] if-empty ;
 
-GENERIC: pprint-narrow? ( obj -- ? )
-
 M: object pprint-narrow? drop f ;
-
 M: array pprint-narrow? drop t ;
 M: vector pprint-narrow? drop t ;
 M: hashtable pprint-narrow? drop t ;
 M: tuple pprint-narrow? drop t ;
 
-: pprint-object ( obj -- )
+M: object pprint-object ( obj -- )
     [
         <flow
         dup pprint-delims [
@@ -213,7 +201,6 @@ M: tuple pprint-narrow? drop t ;
 
 M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
-M: byte-vector pprint* pprint-object ;
 M: hashtable pprint* pprint-object ;
 M: curry pprint* pprint-object ;
 M: compose pprint* pprint-object ;

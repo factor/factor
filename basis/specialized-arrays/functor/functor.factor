@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: functors sequences sequences.private prettyprint.backend
+USING: functors sequences sequences.private prettyprint.custom
 kernel words classes math parser alien.c-types byte-arrays
 accessors summary ;
 IN: specialized-arrays.functor

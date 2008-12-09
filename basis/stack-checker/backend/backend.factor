@@ -1,12 +1,12 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry arrays generic io io.streams.string kernel math
-namespaces parser prettyprint sequences strings vectors words
-quotations effects classes continuations debugger assocs
-combinators compiler.errors accessors math.order definitions
-sets generic.standard.engines.tuple hints stack-checker.state
-stack-checker.visitor stack-checker.errors
-stack-checker.values stack-checker.recursive-state ;
+namespaces parser sequences strings vectors words quotations
+effects classes continuations assocs combinators
+compiler.errors accessors math.order definitions sets
+generic.standard.engines.tuple hints stack-checker.state
+stack-checker.visitor stack-checker.errors stack-checker.values
+stack-checker.recursive-state ;
 IN: stack-checker.backend
 
 : push-d ( obj -- ) meta-d push ;
@@ -148,7 +148,7 @@ M: object apply-object push-literal ;
         { [ dup inline? ] [ drop f ] }
         { [ dup deferred? ] [ drop f ] }
         { [ dup crossref? not ] [ drop f ] }
-        [ def>> [ [ word? ] [ primitive? not ] bi and ] contains? ]
+        [ def>> [ word? ] contains? ]
     } cond ;
 
 : ?missing-effect ( word -- )

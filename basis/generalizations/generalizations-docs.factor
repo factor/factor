@@ -1,5 +1,5 @@
 USING: help.syntax help.markup kernel sequences quotations
-math arrays ;
+math arrays combinators ;
 IN: generalizations
 
 HELP: nsequence
@@ -234,6 +234,18 @@ HELP: napply
     }
 } ;
 
+HELP: ncleave
+{ $values { "quots" "a sequence of quotations" } { "n" integer } }
+{ $description "A generalization of " { $link cleave } " and " { $link 2cleave } " that can work for any quotation arity."
+} 
+{ $examples
+  "Some core words expressed in terms of " { $link ncleave } ":"
+    { $table
+        { { $link cleave } { $snippet "1 ncleave" } }
+        { { $link 2cleave } { $snippet "2 ncleave" } }
+    }
+} ;
+
 HELP: mnswap
 { $values { "m" integer } { "n" integer } }
 { $description "Swaps the top " { $snippet "m" } " stack elements with the " { $snippet "n" } " elements directly underneath." }
@@ -269,6 +281,7 @@ $nl
 { $subsection nslip }
 { $subsection nkeep }
 { $subsection napply }
+{ $subsection ncleave }
 "Generalized quotation construction:"
 { $subsection ncurry } 
 { $subsection nwith } ;

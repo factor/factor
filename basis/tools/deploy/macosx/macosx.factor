@@ -1,10 +1,11 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.files kernel namespaces make sequences
-system tools.deploy.backend tools.deploy.config assocs
-hashtables prettyprint io.unix.backend cocoa io.encodings.utf8
-io.backend cocoa.application cocoa.classes cocoa.plists
-qualified combinators ;
+USING: io io.files kernel namespaces make sequences system
+tools.deploy.backend tools.deploy.config
+tools.deploy.config.editor assocs hashtables prettyprint
+io.unix.backend cocoa io.encodings.utf8 io.backend
+cocoa.application cocoa.classes cocoa.plists qualified
+combinators ;
 IN: tools.deploy.macosx
 
 : bundle-dir ( -- dir )

@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors kernel math math.parser
-namespaces parser sequences strings prettyprint debugger
+namespaces parser sequences strings prettyprint
 quotations combinators logging calendar assocs present
 fry accessors arrays io io.sockets io.encodings.ascii
 io.sockets.secure io.files io.streams.duplex io.timeouts

@@ -1396,7 +1396,7 @@ allot_bignum_zeroed(bignum_length_type length, int negative_p)
 }
 
 #define BIGNUM_REDUCE_LENGTH(source, length) \
-     source = reallot_array(source,length + 1,0)
+     source = reallot_array(source,length + 1)
 
 /* allocates memory */
 bignum_type

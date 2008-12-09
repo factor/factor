@@ -90,10 +90,10 @@ ERROR: bad-superclass class ;
         2drop f
     ] if ; inline
 
-: tuple-instance-1? ( object class -- ? )
-    swap dup tuple? [
-        layout-of 7 slot eq?
-    ] [ 2drop f ] if ; inline
+: tuple-predicate-quot/1 ( class -- quot )
+    #! Fast path for tuples with no superclass
+    [ ] curry [ layout-of 7 slot ] [ eq? ] surround 1quotation
+    [ dup tuple? ] [ [ drop f ] if ] surround ;
 
 : tuple-instance? ( object class offset -- ? )
     rot dup tuple? [
@@ -105,13 +105,16 @@ ERROR: bad-superclass class ;
 : layout-class-offset ( echelon -- n )
     2 * 5 + ;
 
+: tuple-predicate-quot ( class echelon -- quot )
+    layout-class-offset [ tuple-instance? ] 2curry ;
+
 : echelon-of ( class -- n )
     tuple-layout third ;
 
 : define-tuple-predicate ( class -- )
     dup dup echelon-of {
-        { 1 [ [ tuple-instance-1? ] curry ] }
-        [ layout-class-offset [ tuple-instance? ] 2curry ]
+        { 1 [ tuple-predicate-quot/1 ] }
+        [ tuple-predicate-quot ]
     } case define-predicate ;
 
 : class-size ( class -- n )
@@ -249,7 +252,7 @@ M: tuple-class update-class
 
 : tuple-class-unchanged? ( class superclass slots -- ? )
     [ over ] dip
-    [ [ superclass ] dip = ]
+    [ [ superclass ] [ bootstrap-word ] bi* = ]
     [ [ "slots" word-prop ] dip = ] 2bi* and ;
 
 : valid-superclass? ( class -- ? )

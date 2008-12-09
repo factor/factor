@@ -4,7 +4,9 @@ USING: kernel continuations sequences vectors arrays system math ;
 IN: memory
 
 : (each-object) ( quot: ( obj -- ) -- )
-    [ next-object dup ] swap [ drop ] while ; inline
+    next-object dup [
+        swap [ call ] keep (each-object)
+    ] [ 2drop ] if ; inline recursive
 
 : each-object ( quot -- )
     begin-scan [ (each-object) ] [ end-scan ] [ ] cleanup ; inline

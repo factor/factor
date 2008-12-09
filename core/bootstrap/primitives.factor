@@ -68,7 +68,6 @@ bootstrapping? on
     "alien.accessors"
     "arrays"
     "byte-arrays"
-    "byte-vectors"
     "classes.private"
     "classes.tuple"
     "classes.tuple.private"
@@ -109,9 +108,6 @@ bootstrapping? on
 } [ create-vocab drop ] each
 
 ! Builtin classes
-: define-builtin-predicate ( class -- )
-    dup class>type [ builtin-instance? ] curry define-predicate ;
-
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
 
@@ -191,6 +187,10 @@ define-union-class
     [ [ drop f ] if ] %
 ] [ ] make
 define-predicate-class
+
+"array-capacity" "sequences.private" lookup
+[ >fixnum ] bootstrap-max-array-capacity <fake-bignum> [ fixnum-bitand ] curry append
+"coercer" set-word-prop
 
 ! Catch-all class for providing a default method.
 "object" "kernel" create

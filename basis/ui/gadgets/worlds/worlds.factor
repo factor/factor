@@ -3,7 +3,7 @@
 USING: accessors arrays assocs continuations kernel math models
 namespaces opengl sequences io combinators fry math.vectors
 ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-debugger math.geometry.rect ;
+math.geometry.rect ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < track
@@ -76,7 +76,7 @@ C: <world-error> world-error
 SYMBOL: ui-error-hook
 
 : ui-error ( error -- )
-    ui-error-hook get [ call ] [ print-error ] if* ;
+    ui-error-hook get [ call ] [ die ] if* ;
 
 ui-error-hook global [ [ rethrow ] or ] change-at
 

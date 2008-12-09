@@ -71,7 +71,7 @@ TUPLE: no-current-vocab ;
 
 : word-restarts ( name possibilities -- restarts )
     natural-sort
-    [ [ "Use the " swap vocabulary>> " vocabulary" 3append ] keep ] { } map>assoc
+    [ [ vocabulary>> "Use the " " vocabulary" surround ] keep ] { } map>assoc
     swap "Defer word in current vocabulary" swap 2array
     suffix ;
 
@@ -89,7 +89,7 @@ SYMBOL: auto-use?
         dup vocabulary>>
         [ (use+) ]
         [ amended-use get dup [ push ] [ 2drop ] if ]
-        [ "Added ``" swap "'' vocabulary to search path" 3append note. ]
+        [ "Added ``" "'' vocabulary to search path" surround note. ]
         tri
     ] [ create-in ] if ;
 
@@ -292,7 +292,7 @@ print-use-hook global [ [ ] or ] change-at
     ] with-compilation-unit ;
 
 : parse-file-restarts ( file -- restarts )
-    "Load " swap " again" 3append t 2array 1array ;
+    "Load " " again" surround t 2array 1array ;
 
 : parse-file ( file -- quot )
     [
@@ -307,7 +307,7 @@ print-use-hook global [ [ ] or ] change-at
     ] recover ;
 
 : run-file ( file -- )
-    [ dup parse-file call ] assert-depth drop ;
+    [ parse-file call ] curry assert-depth ;
 
 : ?run-file ( path -- )
     dup exists? [ run-file ] [ drop ] if ;

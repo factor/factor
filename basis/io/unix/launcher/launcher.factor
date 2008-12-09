@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces math system sequences debugger
+USING: kernel namespaces math system sequences
 continuations arrays assocs combinators alien.c-types strings
 threads accessors environment
 io io.backend io.launcher io.ports io.files
@@ -36,9 +36,6 @@ USE: unix
 : redirect-fd ( oldfd fd -- )
     2dup = [ 2drop ] [ dup2 io-error ] if ;
 
-: redirect-inherit ( obj mode fd -- )
-    3drop ;
-
 : redirect-file ( obj mode fd -- )
     [ [ normalize-path ] dip file-mode open-file ] dip redirect-fd ;
 
@@ -50,7 +47,7 @@ USE: unix
 
 : redirect ( obj mode fd -- )
     {
-        { [ pick not ] [ redirect-inherit ] }
+        { [ pick not ] [ 3drop ] }
         { [ pick string? ] [ redirect-file ] }
         { [ pick appender? ] [ redirect-file-append ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }

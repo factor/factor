@@ -1,11 +1,12 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel effects accessors math math.private math.libm
-math.partial-dispatch math.intervals math.parser math.order
-layouts words sequences sequences.private arrays assocs classes
-classes.algebra combinators generic.math splitting fry locals
-classes.tuple alien.accessors classes.tuple.private slots.private
-definitions
+USING: kernel effects accessors math math.private
+math.integers.private math.partial-dispatch math.intervals
+math.parser math.order layouts words sequences sequences.private
+arrays assocs classes classes.algebra combinators generic.math
+splitting fry locals classes.tuple alien.accessors
+classes.tuple.private slots.private definitions strings.private
+vectors hashtables
 stack-checker.state
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -76,14 +77,17 @@ most-negative-fixnum most-positive-fixnum [a,b]
         [ rational math-class-max ] dip
     ] unless ;
 
+: ensure-math-class ( class must-be -- class' )
+    [ class<= ] 2keep ? ;
+
 : number-valued ( class interval -- class' interval' )
-    [ number math-class-min ] dip ;
+    [ number ensure-math-class ] dip ;
 
 : integer-valued ( class interval -- class' interval' )
-    [ integer math-class-min ] dip ;
+    [ integer ensure-math-class ] dip ;
 
 : real-valued ( class interval -- class' interval' )
-    [ real math-class-min ] dip ;
+    [ real ensure-math-class ] dip ;
 
 : float-valued ( class interval -- class' interval' )
     over null-class? [
@@ -144,10 +148,9 @@ most-negative-fixnum most-positive-fixnum [a,b]
 comparison-ops
 [ dup '[ _ define-comparison-constraints ] each-derived-op ] each
 
-generic-comparison-ops [
-    dup specific-comparison
-    '[ _ _ define-comparison-constraints ] each-derived-op
-] each
+! generic-comparison-ops [
+!     dup specific-comparison define-comparison-constraints
+! ] each
 
 ! Remove redundant comparisons
 : fold-comparison ( info1 info2 word -- info )
@@ -195,6 +198,11 @@ generic-comparison-ops [
     2bi and maybe-or-never
 ] "outputs" set-word-prop
 
+\ both-fixnums? [
+    [ class>> fixnum classes-intersect? not ] either?
+    f <literal-info> object-info ?
+] "outputs" set-word-prop
+
 {
     { >fixnum fixnum }
     { bignum>fixnum fixnum }
@@ -226,7 +234,7 @@ generic-comparison-ops [
 } [
     [
         in-d>> second value-info >literal<
-        [ power-of-2? [ 1- bitand ] f ? ] when
+        [ dup integer? [ power-of-2? [ 1- bitand ] f ? ] [ drop f ] if ] when
     ] "custom-inlining" set-word-prop
 ] each
 
@@ -242,6 +250,19 @@ generic-comparison-ops [
         ] when
     ] "custom-inlining" set-word-prop
 ] each
+
+{ numerator denominator }
+[ [ drop integer <class-info> ] "outputs" set-word-prop ] each
+
+{ (log2) fixnum-log2 bignum-log2 } [
+    [
+        [ class>> ] [ interval>> interval-log2 ] bi <class/interval-info>
+    ] "outputs" set-word-prop
+] each
+
+\ string-nth [
+    2drop fixnum 0 23 2^ [a,b] <class/interval-info>
+] "outputs" set-word-prop
 
 {
     alien-signed-1
@@ -283,6 +304,15 @@ generic-comparison-ops [
     [ clone f >>literal f >>literal? ]
     "outputs" set-word-prop
 ] each
+
+! Generate more efficient code for common idiom
+\ clone [
+    in-d>> first value-info literal>> {
+        { V{ } [ [ drop { } 0 vector boa ] ] }
+        { H{ } [ [ drop hashtable new ] ] }
+        [ drop f ]
+    } case
+] "custom-inlining" set-word-prop
 
 \ slot [
     dup literal?>>

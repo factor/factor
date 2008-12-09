@@ -9,6 +9,7 @@ compiler.cfg.intrinsics.allot
 compiler.cfg.intrinsics.fixnum
 compiler.cfg.intrinsics.float
 compiler.cfg.intrinsics.slots
+compiler.cfg.intrinsics.misc
 compiler.cfg.iterator ;
 QUALIFIED: kernel
 QUALIFIED: arrays
@@ -18,11 +19,13 @@ QUALIFIED: slots.private
 QUALIFIED: strings.private
 QUALIFIED: classes.tuple.private
 QUALIFIED: math.private
+QUALIFIED: math.integers.private
 QUALIFIED: alien.accessors
 IN: compiler.cfg.intrinsics
 
 {
     kernel.private:tag
+    kernel.private:getenv
     math.private:both-fixnums?
     math.private:fixnum+
     math.private:fixnum-
@@ -92,9 +95,13 @@ IN: compiler.cfg.intrinsics
         alien.accessors:set-alien-double
     } [ t "intrinsic" set-word-prop ] each ;
 
+: enable-fixnum-log2 ( -- )
+    \ math.integers.private:fixnum-log2 t "intrinsic" set-word-prop ;
+
 : emit-intrinsic ( node word -- node/f )
     {
         { \ kernel.private:tag [ drop emit-tag iterate-next ] }
+        { \ kernel.private:getenv [ emit-getenv iterate-next ] }
         { \ math.private:both-fixnums? [ drop emit-both-fixnums? iterate-next ] }
         { \ math.private:fixnum+ [ drop [ ##fixnum-add ] [ ##fixnum-add-tail ] emit-fixnum-overflow-op ] }
         { \ math.private:fixnum- [ drop [ ##fixnum-sub ] [ ##fixnum-sub-tail ] emit-fixnum-overflow-op ] }
@@ -106,6 +113,7 @@ IN: compiler.cfg.intrinsics
         { \ math.private:fixnum-bitxor [ [ ^^xor ] [ ^^xor-imm ] emit-fixnum-op iterate-next ] }
         { \ math.private:fixnum-shift-fast [ emit-fixnum-shift-fast iterate-next ] }
         { \ math.private:fixnum-bitnot [ drop emit-fixnum-bitnot iterate-next ] }
+        { \ math.integers.private:fixnum-log2 [ drop emit-fixnum-log2 iterate-next ] }
         { \ math.private:fixnum*fast [ emit-fixnum*fast iterate-next ] }
         { \ math.private:fixnum< [ cc< emit-fixnum-comparison iterate-next ] }
         { \ math.private:fixnum<= [ cc<= emit-fixnum-comparison iterate-next ] }

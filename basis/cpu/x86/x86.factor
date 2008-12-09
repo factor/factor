@@ -5,9 +5,11 @@ cpu.x86.assembler cpu.x86.assembler.private cpu.architecture
 kernel kernel.private math memory namespaces make sequences
 words system layouts combinators math.order fry locals
 compiler.constants compiler.cfg.registers
-compiler.cfg.instructions compiler.codegen
-compiler.codegen.fixup ;
+compiler.cfg.instructions compiler.cfg.intrinsics
+compiler.codegen compiler.codegen.fixup ;
 IN: cpu.x86
+
+<< enable-fixnum-log2 >>
 
 M: x86 two-operand? t ;
 
@@ -92,6 +94,7 @@ M: x86 %shl-imm nip SHL ;
 M: x86 %shr-imm nip SHR ;
 M: x86 %sar-imm nip SAR ;
 M: x86 %not     drop NOT ;
+M: x86 %log2    BSR ;
 
 : ?MOV ( dst src -- )
     2dup = [ 2drop ] [ MOV ] if ; inline
@@ -391,7 +394,7 @@ M:: x86 %string-nth ( dst src index temp -- )
     ] with-small-register ;
 
 M:: x86 %set-string-nth-fast ( ch str index temp -- )
-    ch { index str } [| new-ch |
+    ch { index str temp } [| new-ch |
         new-ch ch ?MOV
         temp str index [+] LEA
         temp string-offset [+] new-ch 1 small-reg MOV
@@ -458,19 +461,19 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
     dst class store-tagged
     nursery-ptr size inc-allot-ptr ;
 
-HOOK: %alien-global cpu ( symbol dll register -- )
-
 M:: x86 %write-barrier ( src card# table -- )
     #! Mark the card pointed to by vreg.
     ! Mark the card
     card# src MOV
     card# card-bits SHR
-    "cards_offset" f table %alien-global
+    table "cards_offset" f %alien-global
+    table table [] MOV
     table card# [+] card-mark <byte> MOV
 
     ! Mark the card deck
     card# deck-bits card-bits - SHR
-    "decks_offset" f table %alien-global
+    table "decks_offset" f %alien-global
+    table table [] MOV
     table card# [+] card-mark <byte> MOV ;
 
 M: x86 %gc ( -- )
@@ -484,6 +487,9 @@ M: x86 %gc ( -- )
     %prepare-alien-invoke
     "minor_gc" f %alien-invoke
     "end" resolve-label ;
+
+M: x86 %alien-global
+    [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
 
 HOOK: stack-reg cpu ( -- reg )
 
@@ -595,7 +601,8 @@ M: x86 %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    "stack_chain" f temp-reg-1 %alien-global
+    temp-reg-1 "stack_chain" f %alien-global
+    temp-reg-1 temp-reg-1 [] MOV
     temp-reg-1 [] stack-reg MOV
     temp-reg-1 [] cell SUB
     temp-reg-1 2 cells [+] ds-reg MOV

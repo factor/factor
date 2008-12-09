@@ -1,15 +1,15 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays byte-arrays generic assocs hashtables io.binary
-kernel kernel.private math namespaces make sequences words
-quotations strings alien.accessors alien.strings layouts system
-combinators math.bitwise words.private math.order accessors
-growable cpu.architecture compiler.constants ;
+USING: arrays byte-arrays byte-vectors generic assocs hashtables
+io.binary kernel kernel.private math namespaces make sequences
+words quotations strings alien.accessors alien.strings layouts
+system combinators math.bitwise words.private math.order
+accessors growable cpu.architecture compiler.constants ;
 IN: compiler.codegen.fixup
 
 GENERIC: fixup* ( obj -- )
 
-: code-format 22 getenv ;
+: code-format ( -- n ) 22 getenv ;
 
 : compiled-offset ( -- n ) building get length code-format * ;
 

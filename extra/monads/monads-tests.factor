@@ -1,4 +1,4 @@
-USING: tools.test monads math kernel sequences lists promises ;
+USING: tools.test math kernel sequences lists promises monads ;
 IN: monads.tests
 
 [ 5 ] [ 1 identity-monad return [ 4 + ] fmap run-identity ] unit-test

@@ -48,9 +48,11 @@ M: callable splicing-nodes
     ] [ 2drop f >>method f >>body f >>class drop f ] if ;
 
 : inlining-standard-method ( #call word -- class/f method/f )
-    [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
-    [ swap nth value-info class>> dup ] dip
-    specific-method ;
+    dup "methods" word-prop assoc-empty? [ 2drop f f ] [
+        [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
+        [ swap nth value-info class>> dup ] dip
+        specific-method
+    ] if ;
 
 : inline-standard-method ( #call word -- ? )
     dupd inlining-standard-method eliminate-dispatch ;
@@ -150,7 +152,7 @@ DEFER: (flat-length)
 SYMBOL: history
 
 : remember-inlining ( word -- )
-    [ [ 1 ] dip inlining-count get at+ ]
+    [ inlining-count get inc-at ]
     [ history [ swap suffix ] change ]
     bi ;
 
@@ -184,7 +186,7 @@ SYMBOL: history
     over in-d>> second value-info literal>> dup class?
     [ "predicate" word-prop '[ drop @ ] inline-word-def ] [ 3drop f ] if ;
 
-: do-inlining ( #call word -- ? )
+: (do-inlining) ( #call word -- ? )
     #! If the generic was defined in an outer compilation unit,
     #! then it doesn't have a definition yet; the definition
     #! is built at the end of the compilation unit. We do not
@@ -195,7 +197,6 @@ SYMBOL: history
     #! discouraged, but it should still work.)
     {
         { [ dup deferred? ] [ 2drop f ] }
-        { [ dup custom-inlining? ] [ inline-custom ] }
         { [ dup \ instance? eq? ] [ inline-instance-check ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
@@ -203,3 +204,10 @@ SYMBOL: history
         { [ dup method-body? ] [ inline-method-body ] }
         [ 2drop f ]
     } cond ;
+
+: do-inlining ( #call word -- ? )
+    #! Note the logic here: if there's a custom inlining hook,
+    #! it is permitted to return f, which means that we try the
+    #! normal inlining heuristic.
+    dup custom-inlining? [ 2dup inline-custom ] [ f ] if
+    [ 2drop t ] [ (do-inlining) ] if ;

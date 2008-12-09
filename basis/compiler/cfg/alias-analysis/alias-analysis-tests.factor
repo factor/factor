@@ -1,6 +1,6 @@
 USING: compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.alias-analysis cpu.architecture tools.test
-kernel ;
+compiler.cfg.alias-analysis compiler.cfg.debugger
+cpu.architecture tools.test kernel ;
 IN: compiler.cfg.alias-analysis.tests
 
 [ ] [

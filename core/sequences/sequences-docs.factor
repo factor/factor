@@ -416,11 +416,6 @@ HELP: interleave
 { $description "Applies " { $snippet "quot" } " to each element in turn, also invoking " { $snippet "between" } " in-between each pair of elements." }
 { $example "USING: io sequences ;" "{ \"a\" \"b\" \"c\" } [ \"X\" write ] [ write ] interleave" "aXbXc" } ;
 
-HELP: cache-nth
-{ $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" { $quotation "( i -- elt )" } } { "elt" object } }
-{ $description "If the sequence does not contain at least " { $snippet "i" } " elements or if the " { $snippet "i" } "th element of the sequence is " { $link f } ", calls the quotation to produce a new value, and stores it back into the sequence. Otherwise, this word outputs the " { $snippet "i" } "th element of the sequence." }
-{ $side-effects "seq" } ;
-
 HELP: index
 { $values { "obj" object } { "seq" sequence } { "n" "an index" } }
 { $description "Outputs the index of the first element in the sequence equal to " { $snippet "obj" } ". If no element is found, outputs " { $link f } "." } ;
@@ -1497,7 +1492,6 @@ ARTICLE: "sequences-destructive" "Destructive operations"
 "Changing elements:"
 { $subsection change-each }
 { $subsection change-nth }
-{ $subsection cache-nth }
 "Deleting elements:"
 { $subsection delete }
 { $subsection delq }
