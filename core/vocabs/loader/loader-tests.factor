@@ -171,3 +171,11 @@ forget-junk
 ] with-compilation-unit
 
 [ ] [ "vocabs.loader.test.h" require ] unit-test
+
+
+[
+    "vocabs.loader.test.j" forget-vocab
+    "vocabs.loader.test.k" forget-vocab
+] with-compilation-unit
+
+[ ] [ [ "vocabs.loader.test.j" require ] [ drop :1 ] recover ] unit-test
