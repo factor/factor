@@ -3,7 +3,7 @@
 USING: accessors math arrays assocs cocoa cocoa.application
 command-line kernel memory namespaces cocoa.messages
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
-cocoa.windows cocoa.classes sequences system
+cocoa.windows cocoa.classes cocoa.nibs sequences system
 ui ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
 ui.cocoa.views core-foundation threads math.geometry.rect fry
 libc generalizations alien.c-types cocoa.views combinators ;
@@ -124,7 +124,7 @@ M: handle flush-gl-context ( handle -- )
     (gl-context) -> flushBuffer ;
 
 M: cocoa-ui-backend offscreen-pixels ( world -- alien w h )
-    [ handle>> buffer>> ] [ dim>> first2 neg ] ;
+    [ handle>> buffer>> ] [ dim>> first2 neg ] bi ;
 
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;
