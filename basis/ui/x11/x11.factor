@@ -137,7 +137,7 @@ M: world focus-out-event
 
 M: world selection-notify-event
     [ handle>> window>> selection-from-event ] keep
-    world user-input ;
+    user-input ;
 
 : supported-type? ( atom -- ? )
     { "UTF8_STRING" "STRING" "TEXT" }
