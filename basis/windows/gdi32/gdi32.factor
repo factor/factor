@@ -321,7 +321,7 @@ FUNCTION: BOOL DeleteObject ( HGDIOBJ hObject ) ;
 ! FUNCTION: GdiEntry8
 ! FUNCTION: GdiEntry9
 ! FUNCTION: GdiFixUpHandle
-! FUNCTION: GdiFlush
+FUNCTION: BOOL GdiFlush ( ) ;
 ! FUNCTION: GdiFullscreenControl
 ! FUNCTION: GdiGetBatchLimit
 ! FUNCTION: GdiGetCharDimensions

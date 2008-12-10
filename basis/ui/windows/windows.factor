@@ -502,7 +502,8 @@ M: windows-ui-backend (open-window) ( world -- )
     hWnd>> show-window ;
 
 M: win-base select-gl-context ( handle -- )
-    [ hDC>> ] keep hRC>> wglMakeCurrent win32-error=0/f ;
+    [ hDC>> ] keep hRC>> wglMakeCurrent win32-error=0/f
+    GdiFlush drop ;
 
 M: win-base flush-gl-context ( handle -- )
     hDC>> SwapBuffers win32-error=0/f ;
