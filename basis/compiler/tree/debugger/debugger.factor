@@ -151,14 +151,14 @@ SYMBOL: node-count
         H{ } clone intrinsics-called set
 
         0 swap [
-            >r 1+ r>
+            [ 1+ ] dip
             dup #call? [
                 word>> {
                     { [ dup "intrinsics" word-prop over "if-intrinsics" word-prop or ] [ intrinsics-called ] }
                     { [ dup generic? ] [ generics-called ] }
                     { [ dup method-body? ] [ methods-called ] }
                     [ words-called ]
-                } cond 1 -rot get at+
+                } cond inc-at
             ] [ drop ] if
         ] each-node
         node-count set

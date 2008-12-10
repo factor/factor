@@ -21,30 +21,23 @@
 
 ;;; Faces:
 
-(defmacro fuel-font-lock--face (face def doc)
-  (let ((face (intern (format "factor-font-lock-%s" (symbol-name face))))
-        (def (intern (format "font-lock-%s-face" (symbol-name def)))))
+(defmacro fuel-font-lock--make-face (prefix def-prefix group face def doc)
+  (let ((face (intern (format "%s-%s" prefix face)))
+        (def (intern (format "%s-%s-face" def-prefix def))))
     `(defface ,face (face-default-spec ,def)
        ,(format "Face for %s." doc)
-       :group 'factor-mode
+       :group ',group
        :group 'faces)))
 
-(defmacro fuel-font-lock--faces-setup ()
-  (cons 'progn
-        (mapcar (lambda (f) (cons 'fuel-font-lock--face f))
-                '((comment comment "comments")
-                  (constructor type  "constructors (<foo>)")
-                  (declaration keyword "declaration words")
-                  (parsing-word keyword  "parsing words")
-                  (setter-word function-name "setter words (>>foo)")
-                  (stack-effect comment "stack effect specifications")
-                  (string string "strings")
-                  (symbol variable-name "name of symbol being defined")
-                  (type-name type "type names")
-                  (vocabulary-name constant "vocabulary names")
-                  (word function-name "word, generic or method being defined")))))
-
-(fuel-font-lock--faces-setup)
+(defmacro fuel-font-lock--define-faces (prefix def-prefix group faces)
+  (let ((setup (make-symbol (format "%s--faces-setup" prefix))))
+  `(progn
+     (defmacro ,setup ()
+       (cons 'progn
+             (mapcar (lambda (f) (append '(fuel-font-lock--make-face
+                                      ,prefix ,def-prefix ,group) f))
+                     ',faces)))
+     (,setup))))
 
 
 ;;; Font lock:

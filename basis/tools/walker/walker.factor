@@ -4,7 +4,7 @@ USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
 sequences.private assocs models models.filter arrays accessors
-generic generic.standard definitions make ;
+generic generic.standard definitions make sbufs ;
 IN: tools.walker
 
 SYMBOL: show-walker-hook ! ( status continuation thread -- )
@@ -147,6 +147,7 @@ SYMBOL: +stopped+
     { (call-next-method) [ (step-into-call-next-method) ] }
 } [ "step-into" set-word-prop ] assoc-each
 
+! Never step into these words
 {
     >n ndrop >c c>
     continue continue-with

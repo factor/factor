@@ -41,9 +41,9 @@ percent-used percent-free ;
 
 : file-system-spec ( file-system-info obj -- str )
     {
-        { device-name [ device-name>> ] }
-        { mount-point [ mount-point>> ] }
-        { type [ type>> ] }
+        { device-name [ device-name>> [ "" ] unless* ] }
+        { mount-point [ mount-point>> [ "" ] unless* ] }
+        { type [ type>> [ "" ] unless* ] }
         { available-space [ available-space>> [ 0 ] unless* ] }
         { free-space [ free-space>> [ 0 ] unless* ] }
         { used-space [ used-space>> [ 0 ] unless* ] }
@@ -58,9 +58,13 @@ percent-used percent-free ;
 : file-systems-info ( spec -- seq )
     file-systems swap '[ _ [ file-system-spec ] with map ] map ;
 
-: file-systems. ( spec -- )
+: print-file-systems ( spec -- )
     [ file-systems-info ]
     [ [ unparse ] map ] bi prefix simple-table. ;
+
+: file-systems. ( -- )
+    { device-name free-space used-space total-space percent-used mount-point }
+    print-file-systems ;
 
 {
     { [ os unix? ] [ "tools.files.unix" ] }

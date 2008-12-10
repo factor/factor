@@ -74,6 +74,7 @@ void *primitives[] = {
 	primitive_dlsym,
 	primitive_dlclose,
 	primitive_byte_array,
+	primitive_uninitialized_byte_array,
 	primitive_displaced_alien,
 	primitive_alien_signed_cell,
 	primitive_set_alien_signed_cell,
