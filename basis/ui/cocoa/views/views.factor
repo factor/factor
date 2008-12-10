@@ -266,14 +266,9 @@ CLASS: {
 { "writeSelectionToPasteboard:types:" "char" { "id" "SEL" "id" "id" }
     [
         CF>string-array NSStringPboardType swap member? [
-            >r drop window-focus gadget-selection dup [
-                r> set-pasteboard-string 1
-            ] [
-                r> 2drop 0
-            ] if
-        ] [
-            3drop 0
-        ] if
+            [ drop window-focus gadget-selection ] dip over
+            [ set-pasteboard-string 1 ] [ 2drop 0 ] if
+        ] [ 3drop 0 ] if
     ]
 }
 
@@ -281,9 +276,7 @@ CLASS: {
     [
         pasteboard-string dup [
             [ drop window-focus ] dip swap user-input 1
-        ] [
-            3drop 0
-        ] if
+        ] [ 3drop 0 ] if
     ]
 }
 
