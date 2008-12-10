@@ -3,7 +3,8 @@
 USING: accessors alien.c-types alien.syntax combinators
 io.backend io.files io.unix.files kernel math system unix
 unix.statfs.freebsd unix.statvfs.freebsd unix.getfsstat.freebsd
-sequences grouping alien.strings io.encodings.utf8 ;
+sequences grouping alien.strings io.encodings.utf8
+specialized-arrays.direct.uint arrays ;
 IN: io.unix.files.freebsd
 
 TUPLE: freebsd-file-system-info < unix-file-system-info
@@ -32,7 +33,7 @@ M: freebsd statfs>file-system-info ( file-system-info statvfs -- file-system-inf
         [ statfs-f_asyncreads >>asyncreads ]
         [ statfs-f_namemax >>name-max ]
         [ statfs-f_owner >>owner ]
-        [ statfs-f_fsid >>id ]
+        [ statfs-f_fsid 2 <direct-uint-array> >array >>id ]
         [ statfs-f_fstypename utf8 alien>string >>type ]
         [ statfs-f_mntfromname utf8 alien>string >>device-name ]
         [ statfs-f_mntonname utf8 alien>string >>mount-point ]

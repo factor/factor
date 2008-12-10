@@ -3,7 +3,8 @@
 USING: accessors alien.c-types alien.strings alien.syntax
 combinators io.backend io.files io.unix.files kernel math
 sequences system unix unix.getfsstat.openbsd grouping
-unix.statfs.openbsd unix.statvfs.openbsd unix.types ;
+unix.statfs.openbsd unix.statvfs.openbsd unix.types
+specialized-arrays.direct.uint arrays ;
 IN: io.unix.files.openbsd
 
 TUPLE: freebsd-file-system-info < unix-file-system-info
@@ -30,7 +31,7 @@ M: openbsd statfs>file-system-info ( file-system-info statfs -- file-system-info
         [ statfs-f_syncreads >>sync-reads ]
         [ statfs-f_asyncwrites >>async-writes ]
         [ statfs-f_asyncreads >>async-reads ]
-        [ statfs-f_fsid >>id ]
+        [ statfs-f_fsid 2 <direct-uint-array> >array >>id ]
         [ statfs-f_namemax >>name-max ]
         [ statfs-f_owner >>owner ]
         ! [ statfs-f_spare >>spare ]
