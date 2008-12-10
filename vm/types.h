@@ -116,6 +116,7 @@ void primitive_tuple(void);
 void primitive_tuple_boa(void);
 void primitive_tuple_layout(void);
 void primitive_byte_array(void);
+void primitive_uninitialized_byte_array(void);
 void primitive_clone(void);
 
 F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity);
@@ -125,6 +126,7 @@ void primitive_resize_byte_array(void);
 
 F_STRING* allot_string_internal(CELL capacity);
 F_STRING* allot_string(CELL capacity, CELL fill);
+void primitive_uninitialized_string(void);
 void primitive_string(void);
 F_STRING *reallot_string(F_STRING *string, CELL capacity);
 void primitive_resize_string(void);

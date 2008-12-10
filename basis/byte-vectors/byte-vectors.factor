@@ -10,7 +10,7 @@ TUPLE: byte-vector
 { length array-capacity } ;
 
 : <byte-vector> ( n -- byte-vector )
-    <byte-array> 0 byte-vector boa ; inline
+    (byte-array) 0 byte-vector boa ; inline
 
 : >byte-vector ( seq -- byte-vector )
     T{ byte-vector f B{ } 0 } clone-like ;
@@ -22,7 +22,7 @@ M: byte-vector like
     ] unless ;
 
 M: byte-vector new-sequence
-    drop [ <byte-array> ] [ >fixnum ] bi byte-vector boa ;
+    drop [ (byte-array) ] [ >fixnum ] bi byte-vector boa ;
 
 M: byte-vector equal?
     over byte-vector? [ sequence= ] [ 2drop f ] if ;

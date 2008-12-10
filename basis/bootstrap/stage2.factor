@@ -100,4 +100,8 @@ SYMBOL: bootstrap-time
 
         "output-image" get save-image-and-exit
     ] if
-] [ drop "resource:basis/bootstrap/bootstrap-error.factor" run-file ] recover
+] [
+    drop
+    load-help? off
+    "resource:basis/bootstrap/bootstrap-error.factor" run-file
+] recover
