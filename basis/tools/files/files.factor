@@ -41,9 +41,9 @@ percent-used percent-free ;
 
 : file-system-spec ( file-system-info obj -- str )
     {
-        { device-name [ device-name>> ] }
-        { mount-point [ mount-point>> ] }
-        { type [ type>> ] }
+        { device-name [ device-name>> [ "" ] unless* ] }
+        { mount-point [ mount-point>> [ "" ] unless* ] }
+        { type [ type>> [ "" ] unless* ] }
         { available-space [ available-space>> [ 0 ] unless* ] }
         { free-space [ free-space>> [ 0 ] unless* ] }
         { used-space [ used-space>> [ 0 ] unless* ] }
