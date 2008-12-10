@@ -10,6 +10,7 @@ IN: bootstrap.x86
 : shift-arg ( -- reg ) ECX ;
 : div-arg ( -- reg ) EAX ;
 : mod-arg ( -- reg ) EDX ;
+: arg ( -- reg ) EAX ;
 : temp0 ( -- reg ) EAX ;
 : temp1 ( -- reg ) EDX ;
 : temp2 ( -- reg ) ECX ;
