@@ -60,23 +60,26 @@ SYMBOL: stop-after-last-window?
     focus-path f swap focus-gestures ;
 
 M: world graft*
-    dup (open-window)
-    dup title>> over set-title
-    request-focus ;
+    [ (open-window) ]
+    [ [ title>> ] keep set-title ]
+    [ request-focus ] tri ;
 
 : reset-world ( world -- )
     #! This is used when a window is being closed, but also
     #! when restoring saved worlds on image startup.
-    dup fonts>> clear-assoc
-    dup unfocus-world
-    f >>handle drop ;
+    [ fonts>> clear-assoc ]
+    [ unfocus-world ]
+    [ f >>handle drop ] tri ;
+
+: (ungraft-world) ( world -- )
+    [ free-fonts ]
+    [ hand-clicked close-global ]
+    [ hand-gadget close-global ] tri ;
 
 M: world ungraft*
-    dup free-fonts
-    dup hand-clicked close-global
-    dup hand-gadget close-global
-    dup handle>> (close-window)
-    reset-world ;
+    [ (ungraft-world) ]
+    [ handle>> (close-window) ]
+    [ reset-world ] tri ;
 
 : find-window ( quot -- world )
     windows get values

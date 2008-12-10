@@ -70,9 +70,11 @@ M: pasteboard set-clipboard-contents drop copy ;
     <pasteboard> clipboard set-global
     <clipboard> selection set-global ;
 
-! world-handle is a <win>
-TUPLE: win hWnd hDC hRC world title ;
+TUPLE: win-base hDC hRC ;
+TUPLE: win hWnd < win-base world title ;
+TUPLE: win-offscreen < win-base hBitmap bits ;
 C: <win> win
+C: <win-offscreen> win-offscreen
 
 SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
@@ -479,7 +481,7 @@ M: windows-ui-backend do-events
     f class-name-ptr set-global
     f msg-obj set-global ;
 
-: setup-pixel-format ( hdc -- )
+: setup-pixel-format ( hdc flags -- )
     16 make-pfd [ ChoosePixelFormat dup win32-error=0/f ] 2keep
     swapd SetPixelFormat win32-error=0/f ;
 
@@ -490,7 +492,7 @@ M: windows-ui-backend do-events
     [ wglMakeCurrent win32-error=0/f ] keep ;
 
 : setup-gl ( hwnd -- hDC hRC )
-    get-dc dup setup-pixel-format dup get-rc ;
+    get-dc dup windowed-pfd-dwFlags setup-pixel-format dup get-rc ;
 
 M: windows-ui-backend (open-window) ( world -- )
     [ create-window dup setup-gl ] keep
@@ -499,11 +501,50 @@ M: windows-ui-backend (open-window) ( world -- )
     dupd (>>handle)
     hWnd>> show-window ;
 
-M: windows-ui-backend select-gl-context ( handle -- )
+M: win-base select-gl-context ( handle -- )
     [ hDC>> ] keep hRC>> wglMakeCurrent win32-error=0/f ;
 
-M: windows-ui-backend flush-gl-context ( handle -- )
+M: win-base flush-gl-context ( handle -- )
     hDC>> SwapBuffers win32-error=0/f ;
+
+: (bitmap-info) ( dim -- BITMAPINFO )
+    "BITMAPINFO" <c-object> [
+        BITMAPINFO-bmiHeader {
+            [ nip "BITMAPINFOHEADER" heap-size swap set-BITMAPINFOHEADER-biSize ]
+            [ [ first ] dip set-BITMAPINFOHEADER-biWidth ]
+            [ [ second ] dip set-BITMAPINFOHEADER-biHeight ]
+            [ nip 1 swap set-BITMAPINFOHEADER-biPlanes ]
+            [ nip 32 swap set-BITMAPINFOHEADER-biBitCount ]
+            [ nip BI_RGB swap set-BITMAPINFOHEADER-biCompression ]
+            [ [ first2 * 4 * ] dip swap set-BITMAPINFOHEADER-biSizeImage ]
+            [ nip 72 swap set-BITMAPINFOHEADER-biXPelsPerMeter ]
+            [ nip 72 swap set-BITMAPINFOHEADER-biYPelsPerMeter ]
+            [ nip 0 swap set-BITMAPINFOHEADER-biClrUsed ]
+            [ nip 0 swap set-BITMAPINFOHEADER-biClrImportant ]
+        } 2cleave
+    ] keep ;
+
+: make-offscreen-dc-and-bitmap ( dim -- hDC hBitmap bits )
+    f CreateCompatibleDC
+    swap (bitmap-info) DIB_RGB_COLORS f <void*>
+    [ f 0 CreateDIBSection ] keep *void*
+    [ 2dup SelectObject drop ] dip ;
+
+: setup-offscreen-gl ( dim -- hDC hRC hBitmap bits )
+    make-offscreen-dc-and-bitmap [
+        [ dup offscreen-pfd-dwFlags setup-pixel-format ]
+        [ get-rc ] bi
+    ] 2dip ;
+
+M: windows-ui-backend (open-offscreen-buffer) ( world -- )
+    dup dim>> setup-offscreen-gl <win-offscreen>
+    >>handle drop ;
+M: windows-ui-backend (close-offscreen-buffer) ( handle -- )
+    [ hDC>> DeleteObject drop ]
+    [ hBitmap>> DeleteObject drop ] bi ;
+
+M: win-offscreen offscreen-pixels ( handle -- alien )
+    bits>> ;
 
 ! Move window to front
 M: windows-ui-backend raise-window* ( world -- )
