@@ -482,7 +482,7 @@ M: windows-ui-backend do-events
     f msg-obj set-global ;
 
 : setup-pixel-format ( hdc flags -- )
-    16 make-pfd [ ChoosePixelFormat dup win32-error=0/f ] 2keep
+    32 make-pfd [ ChoosePixelFormat dup win32-error=0/f ] 2keep
     swapd SetPixelFormat win32-error=0/f ;
 
 : get-dc ( hWnd -- hDC ) GetDC dup win32-error=0/f ;
@@ -516,7 +516,7 @@ M: win-base flush-gl-context ( handle -- )
             [ nip 1 swap set-BITMAPINFOHEADER-biPlanes ]
             [ nip 32 swap set-BITMAPINFOHEADER-biBitCount ]
             [ nip BI_RGB swap set-BITMAPINFOHEADER-biCompression ]
-            [ [ first2 * 4 * ] dip swap set-BITMAPINFOHEADER-biSizeImage ]
+            [ [ first2 * 4 * ] dip set-BITMAPINFOHEADER-biSizeImage ]
             [ nip 72 swap set-BITMAPINFOHEADER-biXPelsPerMeter ]
             [ nip 72 swap set-BITMAPINFOHEADER-biYPelsPerMeter ]
             [ nip 0 swap set-BITMAPINFOHEADER-biClrUsed ]
