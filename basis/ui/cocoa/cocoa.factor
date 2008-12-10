@@ -123,8 +123,8 @@ M: handle select-gl-context ( handle -- )
 M: handle flush-gl-context ( handle -- )
     (gl-context) -> flushBuffer ;
 
-M: offscreen-handle offscreen-pixels ( handle -- alien )
-    buffer>> ;
+M: cocoa-ui-backend offscreen-pixels ( world -- alien w h )
+    [ handle>> buffer>> ] [ dim>> first2 neg ] ;
 
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;

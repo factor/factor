@@ -23,9 +23,11 @@ M: offscreen-world ungraft*
     ungraft notify-queued ;
 
 : offscreen-world>bitmap ( world -- bitmap )
-    [ handle>> offscreen-pixels ] [ dim>> first2 neg ] bi
-    bgra>bitmap ;
+    offscreen-pixels bgra>bitmap ;
 
 : do-offscreen ( gadget quot: ( offscreen-world -- ) -- )
     [ open-offscreen ] dip
-    over [ slip ] [ close-offscreen ] [ ] cleanup ;
+    over [ slip ] [ close-offscreen ] [ ] cleanup ; inline
+
+: gadget>bitmap ( gadget -- bitmap )
+    [ offscreen-world>bitmap ] do-offscreen ;

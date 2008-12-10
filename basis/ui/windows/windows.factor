@@ -6,7 +6,7 @@ ui.gadgets ui.backend ui.clipboards ui.gadgets.worlds
 ui.gestures io kernel math math.vectors namespaces make
 sequences strings vectors words windows.kernel32 windows.gdi32
 windows.user32 windows.opengl32 windows.messages windows.types
-windows.nt windows threads libc combinators
+windows.nt windows threads libc combinators fry
 combinators.short-circuit continuations command-line shuffle
 opengl ui.render ascii math.bitwise locals symbols accessors
 math.geometry.rect math.order ascii calendar
@@ -544,8 +544,20 @@ M: windows-ui-backend (close-offscreen-buffer) ( handle -- )
     [ hDC>> DeleteDC drop ]
     [ hBitmap>> DeleteObject drop ] bi ;
 
-M: win-offscreen offscreen-pixels ( handle -- alien )
-    bits>> ;
+! Windows 32-bit bitmaps don't actually use the alpha byte of
+! each pixel; it's left as zero
+
+: (make-opaque) ( byte-array -- byte-array' )
+    [ length 4 / ]
+    [ '[ 255 swap 4 * 3 + _ set-nth ] each ]
+    [ ] tri ;
+
+: (opaque-pixels) ( world -- pixels )
+    [ handle>> bits>> ] [ dim>> first2 * 4 * ] bi
+    memory>byte-array (make-opaque) ;
+
+M: windows-ui-backend offscreen-pixels ( world -- alien w h )
+    [ (opaque-pixels) ] [ dim>> first2 ] bi ;
 
 M: windows-ui-backend raise-window* ( world -- )
     handle>> [
