@@ -256,7 +256,7 @@ F_BYTE_ARRAY *reallot_byte_array(F_BYTE_ARRAY *array, CELL capacity)
 		to_copy = capacity;
 
 	REGISTER_UNTAGGED(array);
-	F_BYTE_ARRAY *new_array = allot_byte_array(capacity);
+	F_BYTE_ARRAY *new_array = allot_byte_array_internal(capacity);
 	UNREGISTER_UNTAGGED(array);
 
 	memcpy(new_array + 1,array + 1,to_copy);

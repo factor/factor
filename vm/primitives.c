@@ -126,7 +126,6 @@ void *primitives[] = {
 	primitive_wrapper,
 	primitive_clone,
 	primitive_string,
-	primitive_uninitialized_string,
 	primitive_array_to_quotation,
 	primitive_quotation_xt,
 	primitive_tuple,

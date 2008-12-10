@@ -1,6 +1,6 @@
 USING: arrays help.markup help.syntax math
 sequences.private vectors strings kernel math.order layouts
-quotations ;
+quotations generic.standard ;
 IN: sequences
 
 HELP: sequence
@@ -14,8 +14,8 @@ HELP: length
 
 HELP: set-length
 { $values { "n" "a non-negative integer" } { "seq" "a resizable sequence" } }
-{ $contract "Resizes the sequence. Not all sequences are resizable." }
-{ $errors "Throws a " { $link bounds-error } " if the new length is negative." }
+{ $contract "Resizes a sequence. The initial contents of the new area is undefined." }
+{ $errors "Throws a " { $link no-method  } " error if the sequence is not resizable, and a " { $link bounds-error } " if the new length is negative." }
 { $side-effects "seq" } ;
 
 HELP: lengthen
