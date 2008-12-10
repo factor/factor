@@ -6,8 +6,10 @@ continuations debugger math ;
 IN: benchmark
 
 : run-benchmark ( vocab -- result )
-    [ [ require ] [ [ run ] benchmark ] bi ] curry
-    [ error. f ] recover ;
+    [ "=== " write vocab-name print flush ] [
+        [ [ require ] [ [ run ] benchmark ] bi ] curry
+        [ error. f ] recover
+    ] bi ;
 
 : run-benchmarks ( -- assoc )
     "benchmark" all-child-vocabs-seq
