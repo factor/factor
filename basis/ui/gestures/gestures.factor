@@ -41,13 +41,25 @@ M: propagate-gesture send-queued-gesture
 : propagate-gesture ( gesture gadget -- )
     \ propagate-gesture queue-gesture ;
 
-TUPLE: user-input string gadget ;
+TUPLE: propagate-key-gesture gesture world ;
+
+: world-focus ( world -- gadget )
+    dup focus>> [ world-focus ] [ ] ?if ;
+
+M: propagate-key-gesture send-queued-gesture
+    [ gesture>> ] [ world>> world-focus ] bi
+    [ handle-gesture ] with each-parent drop ;
+
+: propagate-key-gesture ( gesture world -- )
+    \ propagate-key-gesture queue-gesture ;
+
+TUPLE: user-input string world ;
 
 M: user-input send-queued-gesture
-    [ string>> ] [ gadget>> ] bi
+    [ string>> ] [ world>> world-focus ] bi
     [ user-input* ] with each-parent drop ;
 
-: user-input ( string gadget -- )
+: user-input ( string world -- )
     '[ _ \ user-input queue-gesture ] unless-empty ;
 
 ! Gesture objects
@@ -260,9 +272,6 @@ SYMBOL: drag-timer
     move-hand
     scroll-direction set-global
     T{ mouse-scroll } hand-gadget get-global propagate-gesture ;
-
-: world-focus ( world -- gadget )
-    dup focus>> [ world-focus ] [ ] ?if ;
 
 : send-action ( world gesture -- )
     swap world-focus propagate-gesture ;
