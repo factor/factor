@@ -845,9 +845,10 @@ PRIVATE>
 USE: arrays
 
 : array-length ( array -- len )
-    { array } declare length>> ;
+    { array } declare length>> ; inline
 
 : array-flip ( matrix -- newmatrix )
+    { array } declare
     [ dup first array-length [ array-length min ] reduce ] keep
     [ [ array-nth ] with { } map-as ] curry { } map-as ;
 
