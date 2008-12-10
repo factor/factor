@@ -7,5 +7,4 @@ IN: tools.files.tests
 
 [ ] [ "" directory. ] unit-test
 
-[ ]
-[ { device-name free-space used-space total-space percent-used } file-systems. ] unit-test
+[ ] [ file-systems. ] unit-test
