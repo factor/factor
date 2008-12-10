@@ -71,7 +71,7 @@ M: pasteboard set-clipboard-contents drop copy ;
     <clipboard> selection set-global ;
 
 TUPLE: win-base hDC hRC ;
-TUPLE: win hWnd < win-base world title ;
+TUPLE: win < win-base hWnd world title ;
 TUPLE: win-offscreen < win-base hBitmap bits ;
 C: <win> win
 C: <win-offscreen> win-offscreen
@@ -495,7 +495,7 @@ M: windows-ui-backend do-events
     get-dc dup windowed-pfd-dwFlags setup-pixel-format dup get-rc ;
 
 M: windows-ui-backend (open-window) ( world -- )
-    [ create-window dup setup-gl ] keep
+    [ create-window [ setup-gl ] keep ] keep
     [ f <win> ] keep
     [ swap hWnd>> register-window ] 2keep
     dupd (>>handle)
@@ -526,7 +526,7 @@ M: win-base flush-gl-context ( handle -- )
 
 : make-offscreen-dc-and-bitmap ( dim -- hDC hBitmap bits )
     f CreateCompatibleDC
-    swap (bitmap-info) DIB_RGB_COLORS f <void*>
+    dup rot (bitmap-info) DIB_RGB_COLORS f <void*>
     [ f 0 CreateDIBSection ] keep *void*
     [ 2dup SelectObject drop ] dip ;
 
@@ -540,13 +540,12 @@ M: windows-ui-backend (open-offscreen-buffer) ( world -- )
     dup dim>> setup-offscreen-gl <win-offscreen>
     >>handle drop ;
 M: windows-ui-backend (close-offscreen-buffer) ( handle -- )
-    [ hDC>> DeleteObject drop ]
+    [ hDC>> DeleteDC drop ]
     [ hBitmap>> DeleteObject drop ] bi ;
 
 M: win-offscreen offscreen-pixels ( handle -- alien )
     bits>> ;
 
-! Move window to front
 M: windows-ui-backend raise-window* ( world -- )
     handle>> [
         hWnd>> SetFocus drop
