@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.syntax combinators csv
 io.backend io.encodings.utf8 io.files io.streams.string
 io.unix.files kernel math.order namespaces sequences sorting
 system unix unix.statfs.linux unix.statvfs.linux
-specialized-arrays.direct.uint ;
+specialized-arrays.direct.uint arrays ;
 IN: io.unix.files.linux
 
 TUPLE: linux-file-system-info < unix-file-system-info

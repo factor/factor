@@ -4,7 +4,7 @@ USING: accessors alien.c-types alien.syntax combinators
 io.backend io.files io.unix.files kernel math system unix
 unix.statfs.freebsd unix.statvfs.freebsd unix.getfsstat.freebsd
 sequences grouping alien.strings io.encodings.utf8
-specialized-arrays.direct.uint ;
+specialized-arrays.direct.uint arrays ;
 IN: io.unix.files.freebsd
 
 TUPLE: freebsd-file-system-info < unix-file-system-info

@@ -3,7 +3,7 @@
 USING: alien.syntax kernel unix.stat math unix
 combinators system io.backend accessors alien.c-types
 io.encodings.utf8 alien.strings unix.types io.unix.files
-io.files unix.statvfs.netbsd unix.getfsstat.netbsd
+io.files unix.statvfs.netbsd unix.getfsstat.netbsd arrays
 grouping sequences io.encodings.utf8 specialized-arrays.direct.uint ;
 IN: io.unix.files.netbsd
 
