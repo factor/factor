@@ -611,9 +611,6 @@ M: object infer-call*
 \ <string> { integer integer } { string } define-primitive
 \ <string> make-flushable
 
-\ (string) { integer } { string } define-primitive
-\ (string) make-flushable
-
 \ array>quotation { array } { quotation } define-primitive
 \ array>quotation make-flushable
 
