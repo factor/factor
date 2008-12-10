@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types kernel io.ports io.unix.backend
-bit-arrays sequences assocs struct-arrays unix unix.linux.epoll
-math namespaces locals unix.time ;
+bit-arrays sequences assocs struct-arrays math namespaces locals
+fry unix unix.linux.epoll unix.time ;
 IN: io.unix.epoll
 
 TUPLE: epoll-mx < mx events ;
@@ -23,7 +23,7 @@ TUPLE: epoll-mx < mx events ;
     [ set-epoll-event-fd ] keep ;
 
 :: do-epoll-ctl ( fd mx what events -- )
-    mx fd>> what fd events make-event what epoll_ctl io-error ;
+    mx fd>> what fd fd events make-event epoll_ctl io-error ;
 
 : do-epoll-add ( fd mx events -- )
     EPOLL_CTL_ADD swap EPOLLONESHOT bitor do-epoll-ctl ;
@@ -48,14 +48,16 @@ M: epoll-mx remove-output-callbacks ( fd mx -- seq )
     ] [ 2drop f ] if ;
 
 : wait-event ( mx us -- n )
-    [ [ fd>> ] [ events>> ] bi max-events ] [ 1000 /i ] bi*
+    [ [ fd>> ] [ events>> ] bi [ underlying>> ] [ length ] bi ] [ 1000 /i ] bi*
     epoll_wait dup multiplexer-error ;
 
-: handle-event ( mx event -- )
-    epoll-event-fd [ input-available ] [ output-available ] 2bi ;
+: handle-event ( event mx -- )
+    [ epoll-event-fd ] dip
+    [ EPOLLIN EPOLLOUT bitor do-epoll-del ]
+    [ input-available ] [ output-available ] 2tri ;
 
 : handle-events ( mx n -- )
-    [ dup events>> ] dip head-slice [ handle-event ] with each ;
+    [ dup events>> ] dip head-slice swap '[ _ handle-event ] each ;
 
 M: epoll-mx wait-for-events ( us mx -- )
-    swap 60000 or dupd wait-event handle-events ;
+    swap 60000000 or dupd wait-event handle-events ;
