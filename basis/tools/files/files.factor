@@ -63,7 +63,7 @@ percent-used percent-free ;
     [ [ unparse ] map ] bi prefix simple-table. ;
 
 : file-systems. ( -- )
-    { device-name free-space used-space total-space percent-used }
+    { device-name free-space used-space total-space percent-used mount-point }
     print-file-systems ;
 
 {
