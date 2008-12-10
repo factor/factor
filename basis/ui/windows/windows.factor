@@ -181,7 +181,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
 : send-key-gesture ( sym action? quot hWnd -- )
     [ [ key-modifiers ] 3dip call ] dip
-    window-focus propagate-gesture ; inline
+    window propagate-key-gesture ; inline
 
 : send-key-down ( sym action? hWnd -- )
     [ [ <key-down> ] ] dip send-key-gesture ;
@@ -213,7 +213,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
         ctrl? alt? xor [
             wParam 1string
             [ f hWnd send-key-down ]
-            [ hWnd window-focus user-input ] bi
+            [ hWnd window user-input ] bi
         ] unless
     ] unless ;
 

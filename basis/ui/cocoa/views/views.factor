@@ -60,7 +60,7 @@ IN: ui.cocoa.views
     dup event-modifiers swap key-code ;
 
 : send-key-event ( view gesture -- )
-    swap window-focus propagate-gesture ;
+    swap window propagate-key-gesture ;
 
 : interpret-key-event ( view event -- )
     NSArray swap -> arrayWithObject: -> interpretKeyEvents: ;
@@ -275,14 +275,14 @@ CLASS: {
 { "readSelectionFromPasteboard:" "char" { "id" "SEL" "id" }
     [
         pasteboard-string dup [
-            [ drop window-focus ] dip swap user-input 1
+            [ drop window ] dip swap user-input 1
         ] [ 3drop 0 ] if
     ]
 }
 
 ! Text input
 { "insertText:" "void" { "id" "SEL" "id" }
-    [ nip CF>string swap window-focus user-input ]
+    [ nip CF>string swap window user-input ]
 }
 
 { "hasMarkedText" "char" { "id" "SEL" }
