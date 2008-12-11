@@ -1,5 +1,5 @@
-USING: ui.gadgets help.markup help.syntax hashtables
-strings kernel system ;
+USING: ui.gadgets ui.gadgets.worlds help.markup help.syntax
+hashtables strings kernel system ;
 IN: ui.gestures
 
 HELP: set-gestures
@@ -22,8 +22,8 @@ HELP: propagate-gesture
 { $description "Calls " { $link handle-gesture } " on every parent of " { $snippet "gadget" } "." } ;
 
 HELP: user-input
-{ $values { "string" string } { "gadget" gadget } }
-{ $description "Calls " { $link user-input* } " on every parent of the gadget." } ;
+{ $values { "string" string } { "world" world } }
+{ $description "Calls " { $link user-input* } " on every parent of the world's currently-focused child." } ;
 
 HELP: motion
 { $class-description "Mouse motion gesture." }
