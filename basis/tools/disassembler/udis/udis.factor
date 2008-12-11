@@ -5,8 +5,6 @@ alien alien.syntax alien.c-types lexer parser kernel
 sequences layouts math math.parser system make fry arrays ;
 IN: tools.disassembler.udis
 
-<< : & scan "c-library" get load-library dlsym parsed ; parsing >>
-
 <<
 "libudis86" {
     { [ os macosx? ] [ "libudis86.0.dylib" ] }
@@ -22,8 +20,8 @@ TYPEDEF: char[592] ud
 FUNCTION: void ud_translate_intel ( ud* u ) ;
 FUNCTION: void ud_translate_att ( ud* u ) ;
 
-: UD_SYN_INTEL    & ud_translate_intel ; inline
-: UD_SYN_ATT      & ud_translate_att ; inline
+: UD_SYN_INTEL    &: ud_translate_intel ; inline
+: UD_SYN_ATT      &: ud_translate_att ; inline
 : UD_EOI          -1 ; inline
 : UD_INP_CACHE_SZ 32 ; inline
 : UD_VENDOR_AMD   0 ; inline
