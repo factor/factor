@@ -21,10 +21,6 @@ HELP: propagate-gesture
 { $values { "gesture" "a gesture" } { "gadget" gadget } }
 { $description "Calls " { $link handle-gesture } " on every parent of " { $snippet "gadget" } "." } ;
 
-HELP: user-input
-{ $values { "string" string } { "world" world } }
-{ $description "Calls " { $link user-input* } " on every parent of the world's currently-focused child." } ;
-
 HELP: motion
 { $class-description "Mouse motion gesture." }
 { $examples { $code "T{ motion }" } } ;
