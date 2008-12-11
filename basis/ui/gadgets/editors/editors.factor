@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays documents kernel math models
-namespaces locals fry make opengl opengl.gl sequences strings
-io.styles math.vectors sorting colors combinators assocs
-math.order fry calendar alarms ui.clipboards ui.commands
+USING: accessors arrays documents kernel math models namespaces
+locals fry make opengl opengl.gl sequences strings io.styles
+math.vectors sorting colors combinators assocs math.order fry
+calendar alarms continuations ui.clipboards ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.theme
 ui.gadgets.menus ui.gadgets.wrappers ui.render ui.gestures
@@ -452,6 +452,10 @@ editor "caret-motion" f {
     { T{ key-down f { C+ } "END" } end-of-document }
 } define-command-map
 
+: clear-editor ( editor -- )
+    #! The with-datastack is a kludge to make it infer. Stupid.
+    model>> 1array [ clear-doc ] with-datastack drop ;
+
 : select-all ( editor -- ) T{ doc-elt } select-elt ;
 
 : select-line ( editor -- ) T{ one-line-elt } select-elt ;
@@ -537,8 +541,8 @@ TUPLE: source-editor < multiline-editor ;
 : <source-editor> ( -- editor )
     source-editor new-editor ;
 
-! Fields wrap an editor and edit an external model
-TUPLE: field < wrapper field-model editor ;
+! Fields wrap an editor
+TUPLE: field < wrapper editor min-width max-width ;
 
 : field-theme ( gadget -- gadget )
     gray <solid> >>boundary ; inline
@@ -548,18 +552,45 @@ TUPLE: field < wrapper field-model editor ;
         { 1 0 } >>fill
         field-theme ;
 
-: <field> ( model -- gadget )
-    <editor> dup <field-border> field new-wrapper
-        swap >>editor
-        swap >>field-model ;
+: new-field ( class -- gadget )
+    [ <editor> dup <field-border> ] dip new-wrapper swap >>editor ; inline
 
-M: field graft*
+: column-width ( editor n -- width )
+    [ editor>> editor-font* ] dip CHAR: \s <string> string-width ;
+
+M: field pref-dim*
+    [ call-next-method ]
+    [ dup min-width>> dup [ column-width 0 2array vmax ] [ 2drop ] if ]
+    [ dup max-width>> dup [ column-width 1/0. 2array vmin ] [ 2drop ] if ]
+    tri ;
+
+TUPLE: model-field < field field-model ;
+
+: <model-field> ( model -- gadget )
+    model-field new-field swap >>field-model ;
+
+M: model-field graft*
     [ [ field-model>> value>> ] [ editor>> ] bi set-editor-string ]
     [ dup editor>> model>> add-connection ]
     bi ;
 
-M: field ungraft*
+M: model-field ungraft*
     dup editor>> model>> remove-connection ;
 
-M: field model-changed
+M: model-field model-changed
     nip [ editor>> editor-string ] [ field-model>> ] bi set-model ;
+
+TUPLE: action-field < field quot ;
+
+: <action-field> ( quot -- gadget )
+    action-field new-field swap >>quot ;
+
+: invoke-action-field ( field -- )
+    [ editor>> editor-string ]
+    [ editor>> clear-editor ]
+    [ quot>> ]
+    tri call ;
+
+action-field H{
+    { T{ key-down f f "RET" } [ invoke-action-field ] }
+} set-gestures

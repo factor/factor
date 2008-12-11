@@ -43,7 +43,7 @@ IN: ui.gadgets.editors.tests
 
 \ <editor> must-infer
 
-"hello" <model> <field> "field" set
+"hello" <model> <model-field> "field" set
 
 "field" get [
     [ "hello" ] [ "field" get field-model>> value>> ] unit-test

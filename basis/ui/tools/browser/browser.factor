@@ -1,15 +1,16 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: debugger ui.tools.workspace help help.topics kernel
-models models.history ui.commands ui.gadgets ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
-ui.gadgets.buttons compiler.units assocs words vocabs
-accessors fry combinators.short-circuit ;
+models models.history tools.apropos ui.commands ui.gadgets
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks
+ui.gestures ui.gadgets.buttons ui.gadgets.packs
+ui.gadgets.editors ui.gadgets.labels models compiler.units
+assocs words vocabs accessors fry combinators.short-circuit ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < track pane history ;
 
-: show-help ( link help -- )
+: show-help ( link browser-gadget -- )
     history>> dup add-history
     [ >link ] dip set-model ;
 
@@ -19,10 +20,23 @@ TUPLE: browser-gadget < track pane history ;
 : init-history ( browser-gadget -- )
     "handbook" >link <history> >>history drop ;
 
+: search-browser ( string browser -- )
+    [ <apropos> ] dip show-help ;
+
+: <search-field> ( browser -- field )
+    '[ _ search-browser ] <action-field> 10 >>min-width 10 >>max-width ;
+
+: <browser-toolbar> ( browser -- toolbar )
+    <shelf>
+        { 5 5 } >>gap
+        over <toolbar> add-gadget
+        "Search:" <label> add-gadget
+        swap <search-field> add-gadget ;
+
 : <browser-gadget> ( -- gadget )
     { 0 1 } browser-gadget new-track
         dup init-history
-        add-toolbar
+        dup <browser-toolbar> f track-add
         dup <help-pane> >>pane
         dup pane>> <scroller> 1 track-add ;
 
@@ -60,8 +74,6 @@ M: browser-gadget definitions-changed ( assoc browser -- )
 
 : com-documentation ( browser -- ) "handbook" swap show-help ;
 
-: com-vocabularies ( browser -- ) "vocab-index" swap show-help ;
-
 : browser-help ( -- ) "ui-browser" help-window ;
 
 \ browser-help H{ { +nullary+ t } } define-command
@@ -70,7 +82,6 @@ browser-gadget "toolbar" f {
     { T{ key-down f { A+ } "LEFT" } com-back }
     { T{ key-down f { A+ } "RIGHT" } com-forward }
     { f com-documentation }
-    { f com-vocabularies }
     { T{ key-down f f "F1" } browser-help }
 } define-command-map
 

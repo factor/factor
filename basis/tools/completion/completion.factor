@@ -1,12 +1,12 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays sequences math namespaces strings io
+USING: kernel arrays sequences math namespaces strings io fry
 vectors words assocs combinators sorting unicode.case
 unicode.categories math.order ;
 IN: tools.completion
 
 : (fuzzy) ( accum ch i full -- accum i ? )
-    index-from 
+    index-from
     [
         [ swap push ] 2keep 1+ t
     ] [
@@ -61,18 +61,12 @@ IN: tools.completion
     dupd fuzzy score max ;
 
 : completion ( short candidate -- result )
-    [ second >lower swap complete ] keep first 2array ;
+    [ second >lower swap complete ] keep 2array ;
 
 : completions ( short candidates -- seq )
-    over empty? [
-        nip [ first ] map
-    ] [
-        [ >lower ] dip [ completion ] with map
-        rank-completions
-    ] if ;
-
-: string-completions ( short strs -- seq )
-    dup zip completions ;
+    [ '[ _ ] ]
+    [ '[ >lower _ [ completion ] with map rank-completions ] ] bi
+    if-empty ;
 
 : limited-completions ( short candidates -- seq )
     [ completions ] [ drop ] 2bi
