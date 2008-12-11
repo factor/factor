@@ -207,10 +207,10 @@ TUPLE: mx-port < port mx ;
 : <mx-port> ( mx -- port )
     dup fd>> mx-port <port> swap >>mx ;
 
-: multiplexer-error ( n -- )
-    0 < [
+: multiplexer-error ( n -- n )
+    dup 0 < [
         err_no [ EAGAIN = ] [ EINTR = ] bi or
-        [ (io-error) ] unless
+        [ drop 0 ] [ (io-error) ] if
     ] when ;
 
 : ?flag ( n mask symbol -- n )

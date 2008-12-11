@@ -58,8 +58,7 @@ M: kqueue-mx remove-output-callbacks ( fd mx -- seq )
     [
         [ fd>> f 0 ]
         [ events>> [ underlying>> ] [ length ] bi ] bi
-    ] dip kevent
-    dup multiplexer-error ;
+    ] dip kevent multiplexer-error ;
 
 : handle-kevent ( mx kevent -- )
     [ kevent-ident swap ] [ kevent-filter ] bi {
