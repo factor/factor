@@ -2,12 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic generic.standard assocs io kernel math
 namespaces make sequences strings io.styles io.streams.string
-vectors words prettyprint.backend prettyprint.sections
-prettyprint.config sorting splitting grouping math.parser vocabs
-definitions effects classes.builtin classes.tuple io.files
-classes continuations hashtables classes.mixin classes.union
-classes.intersection classes.predicate classes.singleton
-combinators quotations sets accessors colors ;
+vectors words prettyprint.backend prettyprint.custom
+prettyprint.sections prettyprint.config sorting splitting
+grouping math.parser vocabs definitions effects classes.builtin
+classes.tuple io.files classes continuations hashtables
+classes.mixin classes.union classes.intersection
+classes.predicate classes.singleton combinators quotations sets
+accessors colors parser summary ;
 IN: prettyprint
 
 : make-pprint ( obj quot -- block in use )
@@ -44,12 +45,28 @@ IN: prettyprint
         ] with-pprint nl
     ] unless-empty ;
 
-: vocabs. ( in use -- )
+: use/in. ( in use -- )
     dupd remove [ { "syntax" "scratchpad" } member? not ] filter
     use. in. ;
 
+: vocab-names ( words -- vocabs )
+    dictionary get
+    [ [ words>> eq? nip ] with assoc-find 2drop ] curry map sift ;
+
+: prelude. ( -- )
+    in get use get vocab-names use/in. ;
+
+[
+    nl
+    "Restarts were invoked adding vocabularies to the search path." print
+    "To avoid doing this in the future, add the following USING:" print
+    "and IN: forms at the top of the source file:" print nl
+    prelude.
+    nl
+] print-use-hook set-global
+
 : with-use ( obj quot -- )
-    make-pprint vocabs. do-pprint ; inline
+    make-pprint use/in. do-pprint ; inline
 
 : with-in ( obj quot -- )
     make-pprint drop [ write-in bl ] when* do-pprint ; inline
@@ -113,7 +130,7 @@ SYMBOL: ->
 : remove-breakpoints ( quot pos -- quot' )
     over quotation? [
         1+ cut [ (remove-breakpoints) ] bi@
-        [ -> ] swap 3append
+        [ -> ] glue 
     ] [
         drop
     ] if ;
@@ -215,6 +232,8 @@ M: pathname synopsis* pprint* ;
         [ synopsis* ] with-in
     ] with-string-writer ;
 
+M: word summary synopsis ;
+
 : synopsis-alist ( definitions -- alist )
     [ dup synopsis swap ] { } map>assoc ;
 
@@ -252,6 +271,9 @@ M: object see
         dup definer nip [ pprint-word ] when* declarations.
         block>
     ] with-use nl ;
+
+M: method-spec see
+    first2 method see ;
 
 GENERIC: see-class* ( word -- )
 
@@ -351,9 +373,12 @@ M: word see
 : (see-methods) ( generic -- seq )
     "methods" word-prop values natural-sort ;
 
-: see-methods ( word -- )
+: methods ( word -- seq )
     [
         dup class? [ dup (see-implementors) % ] when
         dup generic? [ dup (see-methods) % ] when
         drop
-    ] { } make prune see-all ;
+    ] { } make prune ;
+
+: see-methods ( word -- )
+    methods see-all ;

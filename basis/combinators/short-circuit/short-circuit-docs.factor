@@ -52,17 +52,17 @@ HELP: 3||
      { "quot" quotation } }
 { $description "Returns true if any quotation in the sequence returns true. Each quotation takes the same three elements from the datastack and must return a boolean." } ;
 
-HELP: n&&-rewrite
+HELP: n&&
 { $values
      { "quots" "a sequence of quotations" } { "N" integer }
      { "quot" quotation } }
-{ $description "A macro that reqrites the code to pass " { $snippet "N" } " parameters from the stack to each AND quotation." } ;
+{ $description "A macro that rewrites the code to pass " { $snippet "n" } " parameters from the stack to each AND quotation." } ;
 
-HELP: n||-rewrite
+HELP: n||
 { $values
-     { "quots" "a sequence of quotations" } { "N" integer }
+     { "quots" "a sequence of quotations" } { "n" integer }
      { "quot" quotation } }
-{ $description "A macro that reqrites the code to pass " { $snippet "N" } " parameters from the stack to each OR quotation." } ;
+{ $description "A macro that rewrites the code to pass " { $snippet "n" } " parameters from the stack to each OR quotation." } ;
 
 ARTICLE: "combinators.short-circuit" "Short-circuit combinators"
 "The " { $vocab-link "combinators.short-circuit" } " vocabulary stops a computation early once a condition is met." $nl
@@ -77,8 +77,8 @@ ARTICLE: "combinators.short-circuit" "Short-circuit combinators"
 { $subsection 2|| }
 { $subsection 3|| }
 "Generalized combinators:"
-{ $subsection n&&-rewrite }
-{ $subsection n||-rewrite }
+{ $subsection n&& }
+{ $subsection n|| }
 ;
 
 ABOUT: "combinators.short-circuit"

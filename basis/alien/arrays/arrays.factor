@@ -8,6 +8,8 @@ UNION: value-type array struct-type ;
 
 M: array c-type ;
 
+M: array c-type-class drop object ;
+
 M: array heap-size unclip heap-size [ * ] reduce ;
 
 M: array c-type-align first c-type-align ;

@@ -1,7 +1,8 @@
 USING: arrays bunny.model bunny.cel-shaded continuations
 destructors kernel math multiline opengl opengl.shaders
-opengl.framebuffers opengl.gl opengl.demo-support
-opengl.capabilities sequences ui.gadgets combinators accessors ;
+opengl.framebuffers opengl.gl opengl.demo-support fry
+opengl.capabilities sequences ui.gadgets combinators accessors
+macros ;
 IN: bunny.outlined
 
 STRING: outlined-pass1-fragment-shader-main-source
@@ -176,24 +177,30 @@ TUPLE: bunny-outlined
         } cleave
     ] [ drop ] if ;
 
+MACRO: (framebuffer-texture>>draw) ( iformat xformat setter -- )
+    '[ _ _ (framebuffer-texture) [ @ drop ] keep ] ;
+
+: (make-framebuffer-textures) ( draw dim -- draw color normal depth )
+    {
+        [ drop ]
+        [ GL_RGBA16F_ARB GL_RGBA [ >>color-texture  ] (framebuffer-texture>>draw) ]
+        [ GL_RGBA16F_ARB GL_RGBA [ >>normal-texture ] (framebuffer-texture>>draw) ]
+        [
+            GL_DEPTH_COMPONENT32 GL_DEPTH_COMPONENT
+            [ >>depth-texture ] (framebuffer-texture>>draw)
+        ]
+    } 2cleave ;
+
+: remake-framebuffer ( draw -- )
+    [ dispose-framebuffer ]
+    [ dup gadget>> dim>>
+        [ (make-framebuffer-textures) (make-framebuffer) >>framebuffer ]
+        [ >>framebuffer-dim drop ] bi
+    ] bi ;
+
 : remake-framebuffer-if-needed ( draw -- )
     dup [ gadget>> dim>> ] [ framebuffer-dim>> ] bi =
-    [ drop ] [
-        [ dispose-framebuffer ] [ dup ] [ gadget>> dim>> ] tri {
-            [
-                GL_RGBA16F_ARB GL_RGBA (framebuffer-texture)
-                [ >>color-texture drop ] keep
-            ] [
-                GL_RGBA16F_ARB GL_RGBA (framebuffer-texture)
-                [ >>normal-texture drop ] keep
-            ] [ 
-                GL_DEPTH_COMPONENT32 GL_DEPTH_COMPONENT (framebuffer-texture)
-                [ >>depth-texture drop ] keep
-            ]
-        } 2cleave
-        [ (make-framebuffer) >>framebuffer ] [ >>framebuffer-dim ] bi
-        drop
-    ] if ;
+    [ drop ] [ remake-framebuffer ] if ;
 
 : clear-framebuffer ( -- )
     GL_COLOR_ATTACHMENT0_EXT glDrawBuffer

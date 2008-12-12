@@ -3,14 +3,13 @@
 USING: arrays ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.paragraphs
 ui.gadgets.incremental ui.gadgets.packs ui.gadgets.theme
-ui.clipboards ui.gestures ui.traverse ui.render hashtables io
-kernel namespaces sequences io.styles strings quotations math
-opengl combinators math.vectors sorting splitting
-io.streams.nested assocs ui.gadgets.presentations
+ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
+hashtables io kernel namespaces sequences io.styles strings
+quotations math opengl combinators math.vectors sorting
+splitting io.streams.nested assocs ui.gadgets.presentations
 ui.gadgets.slots ui.gadgets.grids ui.gadgets.grid-lines
 classes.tuple models continuations destructors accessors
-math.geometry.rect ;
-
+math.geometry.rect fry ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < pack
@@ -60,7 +59,7 @@ M: pane gadget-selection ( pane -- string/f )
 GENERIC: draw-selection ( loc obj -- )
 
 : if-fits ( rect quot -- )
-    >r clip get over intersects? r> [ drop ] if ; inline
+    [ clip get over intersects? ] dip [ drop ] if ; inline
 
 M: gadget draw-selection ( loc gadget -- )
     swap offset-rect [
@@ -136,8 +135,8 @@ M: style-stream write-gadget
 
 : with-pane ( pane quot -- )
     over scroll>top
-    over pane-clear >r <pane-stream> r>
-    over >r with-output-stream* r> ?nl ; inline
+    over pane-clear [ <pane-stream> ] dip
+    over [ with-output-stream* ] dip ?nl ; inline
 
 : make-pane ( quot -- gadget )
     <pane> [ swap with-pane ] keep smash-pane ; inline
@@ -155,7 +154,7 @@ M: pane-control model-changed ( model pane-control -- )
         swap >>model ;
 
 : do-pane-stream ( pane-stream quot -- )
-    >r pane>> r> keep scroll-pane ; inline
+    [ pane>> ] dip keep scroll-pane ; inline
 
 M: pane-stream stream-nl
     [ pane-nl drop ] do-pane-stream ;
@@ -179,7 +178,7 @@ M: pane-stream make-span-stream
 ! Character styles
 
 : apply-style ( style gadget key quot -- style gadget )
-    >r pick at r> when* ; inline
+    [ pick at ] dip when* ; inline
 
 : apply-foreground-style ( style gadget -- style gadget )
     foreground [ >>color ] apply-style ;
@@ -229,7 +228,7 @@ M: pane-stream make-span-stream
     border-width [ <border> ] apply-style ;
 
 : apply-printer-style ( style gadget -- style gadget )
-    presented-printer [ [ make-pane ] curry >>printer ] apply-style ;
+    presented-printer [ '[ _ make-pane ] >>printer ] apply-style ;
 
 : style-pane ( style pane -- pane )
     apply-border-width-style
@@ -285,10 +284,10 @@ M: pane-stream make-cell-stream
     pane-cell-stream new-nested-pane-stream ;
 
 M: pane-stream stream-write-table
-    >r
-    swap [ [ pane>> smash-pane ] map ] map
-    styled-grid
-    r> print-gadget ;
+    [
+        swap [ [ pane>> smash-pane ] map ] map
+        styled-grid
+    ] dip print-gadget ;
 
 ! Stream utilities
 M: pack dispose drop ;
@@ -310,7 +309,7 @@ M: paragraph stream-write
     drop ;
 
 : gadget-write1 ( char gadget -- )
-    >r 1string r> stream-write ;
+    [ 1string ] dip stream-write ;
 
 M: pack stream-write1 gadget-write1 ;
 
@@ -363,7 +362,11 @@ M: f sloppy-pick-up*
     dup hand-rel over sloppy-pick-up >>caret
     dup relayout-1 ;
 
-: begin-selection ( pane -- ) move-caret f >>mark drop ;
+: begin-selection ( pane -- )
+    f >>selecting?
+    move-caret
+    f >>mark
+    drop ;
 
 : extend-selection ( pane -- )
     hand-moved? [
@@ -389,16 +392,20 @@ M: f sloppy-pick-up*
     ] if ;
 
 : select-to-caret ( pane -- )
+    t >>selecting?
     dup mark>> [ caret>mark ] unless
     move-caret
     dup request-focus
     com-copy-selection ;
 
+: pane-menu ( pane -- ) { com-copy } show-commands-menu ;
+
 pane H{
     { T{ button-down } [ begin-selection ] }
     { T{ button-down f { S+ } 1 } [ select-to-caret ] }
-    { T{ button-up f { S+ } 1 } [ drop ] }
+    { T{ button-up f { S+ } 1 } [ end-selection ] }
     { T{ button-up } [ end-selection ] }
     { T{ drag } [ extend-selection ] }
     { T{ copy-action } [ com-copy ] }
+    { T{ button-down f f 3 } [ pane-menu ] }
 } set-gestures

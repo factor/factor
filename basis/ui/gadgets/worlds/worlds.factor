@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations kernel math models
-namespaces opengl sequences io combinators math.vectors
+namespaces opengl sequences io combinators fry math.vectors
 ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-debugger math.geometry.rect ;
+math.geometry.rect ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < track
@@ -30,7 +30,7 @@ ERROR: no-world-found ;
 
 : (request-focus) ( child world ? -- )
     pick parent>> pick eq? [
-        >r >r dup parent>> dup r> r>
+        [ dup parent>> dup ] 2dip
         [ (request-focus) ] keep
     ] unless focus-child ;
 
@@ -38,8 +38,8 @@ M: world request-focus-on ( child gadget -- )
     2dup eq?
     [ 2drop ] [ dup focused?>> (request-focus) ] if ;
 
-: <world> ( gadget title status -- world )
-    { 0 1 } world new-track
+: new-world ( gadget title status class -- world )
+    { 0 1 } swap new-track
         t >>root?
         t >>active?
         H{ } clone >>fonts
@@ -49,10 +49,13 @@ M: world request-focus-on ( child gadget -- )
         swap 1 track-add
     dup request-focus ;
 
+: <world> ( gadget title status -- world )
+    world new-world ;
+
 M: world layout*
     dup call-next-method
     dup glass>> [
-        >r dup rect-dim r> (>>dim)
+        [ dup rect-dim ] dip (>>dim)
     ] when* drop ;
 
 M: world focusable-child* gadget-child ;
@@ -67,9 +70,7 @@ M: world children-on nip children>> ;
 : draw-world? ( world -- ? )
     #! We don't draw deactivated worlds, or those with 0 size.
     #! On Windows, the latter case results in GL errors.
-    dup active?>>
-    over handle>>
-    rot rect-dim [ 0 > ] all? and and ;
+    [ active?>> ] [ handle>> ] [ dim>> [ 0 > ] all? ] tri and and ;
 
 TUPLE: world-error error world ;
 
@@ -78,9 +79,9 @@ C: <world-error> world-error
 SYMBOL: ui-error-hook
 
 : ui-error ( error -- )
-    ui-error-hook get [ call ] [ print-error ] if* ;
+    ui-error-hook get [ call ] [ die ] if* ;
 
-[ rethrow ] ui-error-hook set-global
+ui-error-hook global [ [ rethrow ] or ] change-at
 
 : draw-world ( world -- )
     dup draw-world? [
@@ -103,10 +104,28 @@ world H{
     { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
     { T{ button-down f { C+ } 1 } [ drop T{ button-down f f 3 } button-gesture ] }
     { T{ button-down f { A+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
+    { T{ button-down f { M+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
     { T{ button-up f { C+ } 1 } [ drop T{ button-up f f 3 } button-gesture ] }
     { T{ button-up f { A+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
+    { T{ button-up f { M+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
 } set-gestures
 
+PREDICATE: specific-button-up < button-up #>> ;
+PREDICATE: specific-button-down < button-down #>> ;
+PREDICATE: specific-drag < drag #>> ;
+
+: generalize-gesture ( gesture -- )
+    clone f >># button-gesture ;
+
+M: world handle-gesture ( gesture gadget -- ? )
+    2dup call-next-method [
+        {
+            { [ over specific-button-up? ] [ drop generalize-gesture f ] }
+            { [ over specific-button-down? ] [ drop generalize-gesture f ] }
+            { [ over specific-drag? ] [ drop generalize-gesture f ] }
+            [ 2drop t ]
+        } cond
+    ] [ 2drop f ] if ;
+
 : close-global ( world global -- )
-    dup get-global find-world rot eq?
-    [ f swap set-global ] [ drop ] if ;
+    [ get-global find-world eq? ] keep '[ f _ set-global ] when ;

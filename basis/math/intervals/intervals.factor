@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
-combinators generic ;
+combinators generic layouts ;
 IN: math.intervals
 
 SYMBOL: empty-interval
@@ -12,10 +12,10 @@ SYMBOL: full-interval
 TUPLE: interval { from read-only } { to read-only } ;
 
 : <interval> ( from to -- int )
-    over first over first {
+    2dup [ first ] bi@ {
         { [ 2dup > ] [ 2drop 2drop empty-interval ] }
         { [ 2dup = ] [
-            2drop over second over second and
+            2drop 2dup [ second ] both?
             [ interval boa ] [ 2drop empty-interval ] if
         ] }
         [ 2drop interval boa ]
@@ -26,16 +26,16 @@ TUPLE: interval { from read-only } { to read-only } ;
 : closed-point ( n -- endpoint ) t 2array ;
 
 : [a,b] ( a b -- interval )
-    >r closed-point r> closed-point <interval> ; foldable
+    [ closed-point ] dip closed-point <interval> ; foldable
 
 : (a,b) ( a b -- interval )
-    >r open-point r> open-point <interval> ; foldable
+    [ open-point ] dip open-point <interval> ; foldable
 
 : [a,b) ( a b -- interval )
-    >r closed-point r> open-point <interval> ; foldable
+    [ closed-point ] dip open-point <interval> ; foldable
 
 : (a,b] ( a b -- interval )
-    >r open-point r> closed-point <interval> ; foldable
+    [ open-point ] dip closed-point <interval> ; foldable
 
 : [a,a] ( a -- interval )
     closed-point dup <interval> ; foldable
@@ -51,11 +51,11 @@ TUPLE: interval { from read-only } { to read-only } ;
 : [-inf,inf] ( -- interval ) full-interval ; inline
 
 : compare-endpoints ( p1 p2 quot -- ? )
-    >r over first over first r> call [
+    [ 2dup [ first ] bi@ ] dip call [
         2drop t
     ] [
-        over first over first = [
-            swap second swap second not or
+        2dup [ first ] bi@ = [
+            [ second ] bi@ not or
         ] [
             2drop f
         ] if
@@ -86,7 +86,7 @@ TUPLE: interval { from read-only } { to read-only } ;
     ] if ;
 
 : (interval-op) ( p1 p2 quot -- p3 )
-    [ [ first ] [ first ] [ ] tri* call ]
+    [ [ first ] [ first ] [ call ] tri* ]
     [ drop [ second ] both? ]
     3bi 2array ; inline
 
@@ -177,7 +177,7 @@ TUPLE: interval { from read-only } { to read-only } ;
         drop f
     ] [
         interval>points
-        2dup [ second ] bi@ and
+        2dup [ second ] both?
         [ [ first ] bi@ = ]
         [ 2drop f ] if
     ] if ;
@@ -193,9 +193,9 @@ TUPLE: interval { from read-only } { to read-only } ;
     dup [ interval>points [ first ] bi@ [a,b] ] when ;
 
 : interval-integer-op ( i1 i2 quot -- i3 )
-    >r 2dup
-    [ interval>points [ first integer? ] both? ] both?
-    r> [ 2drop [-inf,inf] ] if ; inline
+    [
+        2dup [ interval>points [ first integer? ] both? ] both?
+    ] dip [ 2drop [-inf,inf] ] if ; inline
 
 : interval-shift ( i1 i2 -- i3 )
     #! Inaccurate; could be tighter
@@ -302,7 +302,7 @@ SYMBOL: incomparable
     2tri and and ;
 
 : (interval<) ( i1 i2 -- i1 i2 ? )
-    over from>> over from>> endpoint< ;
+    2dup [ from>> ] bi@ endpoint< ;
 
 : interval< ( i1 i2 -- ? )
     {
@@ -314,10 +314,10 @@ SYMBOL: incomparable
     } cond 2nip ;
 
 : left-endpoint-<= ( i1 i2 -- ? )
-    >r from>> r> to>> = ;
+    [ from>> ] dip to>> = ;
 
 : right-endpoint-<= ( i1 i2 -- ? )
-    >r to>> r> from>> = ;
+    [ to>> ] dip from>> = ;
 
 : interval<= ( i1 i2 -- ? )
     {
@@ -365,13 +365,25 @@ SYMBOL: incomparable
         2dup [ interval-nonnegative? ] both?
         [
             [ interval>points [ first ] bi@ ] bi@
-            4array supremum 0 swap next-power-of-2 [a,b]
+            4array supremum 0 swap >integer next-power-of-2 [a,b]
         ] [ 2drop [-inf,inf] ] if
     ] do-empty-interval ;
 
 : interval-bitxor ( i1 i2 -- i3 )
     #! Inaccurate.
     interval-bitor ;
+
+: interval-log2 ( i1 -- i2 )
+    {
+        { empty-interval [ empty-interval ] }
+        { full-interval [ 0 [a,inf] ] }
+        [
+            to>> first 1 max dup most-positive-fixnum >
+            [ drop full-interval interval-log2 ]
+            [ 1+ >integer log2 0 swap [a,b] ]
+            if
+        ]
+    } case ;
 
 : assume< ( i1 i2 -- i3 )
     dup special-interval? [ drop ] [

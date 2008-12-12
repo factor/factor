@@ -4,7 +4,8 @@ USING: system kernel namespaces strings hashtables sequences
 assocs combinators vocabs.loader init threads continuations
 math accessors concurrency.flags destructors environment
 io io.backend io.timeouts io.pipes io.pipes.private io.encodings
-io.streams.duplex io.ports debugger prettyprint summary ;
+io.streams.duplex io.ports debugger prettyprint summary
+calendar ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -65,7 +66,7 @@ SYMBOL: wait-flag
 : wait-loop ( -- )
     processes get assoc-empty?
     [ wait-flag get-global lower-flag ]
-    [ wait-for-processes [ 100 sleep ] when ] if ;
+    [ wait-for-processes [ 100 milliseconds sleep ] when ] if ;
 
 : start-wait-thread ( -- )
     <flag> wait-flag set-global
@@ -156,7 +157,7 @@ M: process-failed error.
     process>> . ;
 
 : wait-for-success ( process -- )
-    dup wait-for-process dup zero?
+    dup wait-for-process dup 0 =
     [ 2drop ] [ process-failed ] if ;
 
 : try-process ( desc -- )
@@ -182,16 +183,18 @@ M: object run-pipeline-element
 
 : <process-reader*> ( desc encoding -- stream process )
     [
-        >r (pipe) {
-            [ |dispose drop ]
-            [
-                swap >process
-                    [ swap out>> or ] change-stdout
-                run-detached
-            ]
-            [ out>> dispose ]
-            [ in>> <input-port> ]
-        } cleave r> <decoder> swap
+        [
+            (pipe) {
+                [ |dispose drop ]
+                [
+                    swap >process
+                        [ swap out>> or ] change-stdout
+                    run-detached
+                ]
+                [ out>> dispose ]
+                [ in>> <input-port> ]
+            } cleave
+        ] dip <decoder> swap
     ] with-destructors ;
 
 : <process-reader> ( desc encoding -- stream )
@@ -204,16 +207,18 @@ M: object run-pipeline-element
 
 : <process-writer*> ( desc encoding -- stream process )
     [
-        >r (pipe) {
-            [ |dispose drop ]
-            [
-                swap >process
-                    [ swap in>> or ] change-stdin
-                run-detached
-            ]
-            [ in>> dispose ]
-            [ out>> <output-port> ]
-        } cleave r> <encoder> swap
+        [
+            (pipe) {
+                [ |dispose drop ]
+                [
+                    swap >process
+                        [ swap in>> or ] change-stdin
+                    run-detached
+                ]
+                [ in>> dispose ]
+                [ out>> <output-port> ]
+            } cleave
+        ] dip <encoder> swap
     ] with-destructors ;
 
 : <process-writer> ( desc encoding -- stream )
@@ -226,17 +231,19 @@ M: object run-pipeline-element
 
 : <process-stream*> ( desc encoding -- stream process )
     [
-        >r (pipe) (pipe) {
-            [ [ |dispose drop ] bi@ ]
-            [
-                rot >process
-                    [ swap in>> or ] change-stdin
-                    [ swap out>> or ] change-stdout
-                run-detached
-            ]
-            [ [ out>> dispose ] [ in>> dispose ] bi* ]
-            [ [ in>> <input-port> ] [ out>> <output-port> ] bi* ]
-        } 2cleave r> <encoder-duplex> swap
+        [
+            (pipe) (pipe) {
+                [ [ |dispose drop ] bi@ ]
+                [
+                    rot >process
+                        [ swap in>> or ] change-stdin
+                        [ swap out>> or ] change-stdout
+                    run-detached
+                ]
+                [ [ out>> dispose ] [ in>> dispose ] bi* ]
+                [ [ in>> <input-port> ] [ out>> <output-port> ] bi* ]
+            } 2cleave
+        ] dip <encoder-duplex> swap
     ] with-destructors ;
 
 : <process-stream> ( desc encoding -- stream )
@@ -252,23 +259,6 @@ M: object run-pipeline-element
     [ processes get delete-at* drop [ resume ] each ] keep
     f >>handle
     drop ;
-
-GENERIC: underlying-handle ( stream -- handle )
-
-M: port underlying-handle handle>> ;
-
-ERROR: invalid-duplex-stream ;
-
-M: duplex-stream underlying-handle
-    [ in>> underlying-handle ]
-    [ out>> underlying-handle ] bi
-    [ = [ invalid-duplex-stream ] when ] keep ;
-
-M: encoder underlying-handle
-    stream>> underlying-handle ;
-
-M: decoder underlying-handle
-    stream>> underlying-handle ;
 
 {
     { [ os unix? ] [ "io.unix.launcher" require ] }

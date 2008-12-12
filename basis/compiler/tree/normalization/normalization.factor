@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry namespaces sequences math accessors kernel arrays
-combinators sequences.deep assocs
+combinators compiler.utilities assocs
 stack-checker.backend
 stack-checker.branches
 stack-checker.inlining
+compiler.utilities
 compiler.tree
 compiler.tree.combinators
 compiler.tree.normalization.introductions
@@ -46,7 +47,7 @@ M: #branch normalize*
     [
         [
             [
-                [ normalize* ] map flatten
+                [ normalize* ] map-flat
                 introduction-stack get
                 2array
             ] with-scope
@@ -70,7 +71,7 @@ M: #phi normalize*
 
 : (normalize) ( nodes introductions -- nodes )
     introduction-stack [
-        [ normalize* ] map flatten
+        [ normalize* ] map-flat
     ] with-variable ;
 
 M: #recursive normalize*

@@ -6,17 +6,15 @@ IN: arrays
 
 M: array clone (clone) ;
 M: array length length>> ;
-M: array nth-unsafe >r >fixnum r> array-nth ;
-M: array set-nth-unsafe >r >fixnum r> set-array-nth ;
+M: array nth-unsafe [ >fixnum ] dip array-nth ;
+M: array set-nth-unsafe [ >fixnum ] dip set-array-nth ;
 M: array resize resize-array ;
 
 : >array ( seq -- array ) { } clone-like ;
 
-M: object new-sequence drop f <array> ;
+M: object new-sequence drop 0 <array> ;
 
-M: f new-sequence drop dup zero? [ drop f ] [ f <array> ] if ;
-
-M: array like drop dup array? [ >array ] unless ;
+M: f new-sequence drop dup zero? [ drop f ] [ 0 <array> ] if ;
 
 M: array equal?
     over array? [ sequence= ] [ 2drop f ] if ;

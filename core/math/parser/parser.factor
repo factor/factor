@@ -51,12 +51,12 @@ SYMBOL: negative?
 : (base>) ( str -- n ) radix get base> ;
 
 : whole-part ( str -- m n )
-    sign split1 >r (base>) r>
+    sign split1 [ (base>) ] dip
     dup [ (base>) ] [ drop 0 swap ] if ;
 
 : string>ratio ( str -- a/b )
     "-" ?head dup negative? set swap
-    "/" split1 (base>) >r whole-part r>
+    "/" split1 (base>) [ whole-part ] dip
     3dup and and [ / + swap [ neg ] when ] [ 2drop 2drop f ] if ;
 
 : valid-digits? ( seq -- ? )
@@ -128,7 +128,7 @@ M: ratio >base
         [
             [ numerator (>base) ]
             [ denominator (>base) ] bi
-            "/" swap 3append
+            "/" glue
         ] bi* append
         negative? get [ CHAR: - prefix ] when
     ] with-radix ;
@@ -137,7 +137,7 @@ M: ratio >base
     {
         {
             [ CHAR: e over member? ]
-            [ "e" split1 >r fix-float "e" r> 3append ]
+            [ "e" split1 [ fix-float "e" ] dip 3append ]
         } {
             [ CHAR: . over member? ]
             [ ]

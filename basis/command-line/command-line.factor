@@ -1,9 +1,14 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: init continuations debugger hashtables io kernel
-kernel.private namespaces parser sequences strings system
-splitting io.files eval ;
+USING: init continuations hashtables io io.encodings.utf8
+io.files kernel kernel.private namespaces parser sequences
+strings system splitting vocabs.loader ;
 IN: command-line
+
+SYMBOL: script
+SYMBOL: command-line
+
+: (command-line) ( -- args ) 10 getenv sift ;
 
 : rc-path ( name -- path )
     os windows? [ "." prepend ] unless
@@ -19,17 +24,29 @@ IN: command-line
         "factor-rc" rc-path ?run-file
     ] when ;
 
-: cli-var-param ( name value -- ) swap set-global ;
+: load-vocab-roots ( -- )
+    "user-init" get [
+        "factor-roots" rc-path dup exists? [
+            utf8 file-lines [ add-vocab-root ] each
+        ] [ drop ] if
+    ] when ;
 
-: cli-bool-param ( name -- ) "no-" ?head not cli-var-param ;
+: var-param ( name value -- ) swap set-global ;
 
-: cli-param ( param -- )
-    "=" split1 [ cli-var-param ] [ cli-bool-param ] if* ;
+: bool-param ( name -- ) "no-" ?head not var-param ;
 
-: cli-arg ( argument -- argument )
-    "-" ?head [ cli-param f ] when ;
+: param ( param -- )
+    "=" split1 [ var-param ] [ bool-param ] if* ;
 
-: cli-args ( -- args ) 10 getenv ;
+: run-script ( file -- )
+    t "quiet" set-global run-file ;
+
+: parse-command-line ( args -- )
+    [ command-line off script off ] [
+        unclip "-" ?head
+        [ param parse-command-line ]
+        [ script set command-line set ] if
+    ] if-empty ;
 
 SYMBOL: main-vocab-hook
 
@@ -53,14 +70,6 @@ SYMBOL: main-vocab-hook
 : ignore-cli-args? ( -- ? )
     os macosx? "run" get "ui" = and ;
 
-: script-mode ( -- )
-    t "quiet" set-global
-    "none" "run" set-global ;
-
-: parse-command-line ( -- )
-    cli-args [ cli-arg ] filter
-    "script" get [ script-mode ] when
-    ignore-cli-args? [ drop ] [ [ run-file ] each ] if
-    "e" get [ eval ] when* ;
+: script-mode ( -- ) ;
 
 [ default-cli-args ] "command-line" add-init-hook

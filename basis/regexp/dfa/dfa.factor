@@ -43,7 +43,8 @@ IN: regexp.dfa
         dupd pop dup pick find-transitions rot
         [
             [ [ find-closure ] 2keep nip dupd add-todo-state ] 3keep
-            >r swapd transition make-transition r> dfa-table>> add-transition 
+            [ swapd transition make-transition ] dip
+            dfa-table>> add-transition 
         ] curry with each
         new-transitions
     ] if-empty ;

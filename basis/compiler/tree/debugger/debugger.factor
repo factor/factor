@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs match fry accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
-prettyprint prettyprint.backend prettyprint.sections math words
-combinators combinators.short-circuit io sorting hints qualified
+prettyprint prettyprint.backend prettyprint.custom
+prettyprint.sections math words combinators
+combinators.short-circuit io sorting hints qualified
 compiler.tree
 compiler.tree.recursive
 compiler.tree.normalization
@@ -93,7 +94,7 @@ M: #shuffle node>quot
         [ drop "COMPLEX SHUFFLE" , ]
     } cond ;
 
-M: #push node>quot literal>> , ;
+M: #push node>quot literal>> literalize , ;
 
 M: #call node>quot word>> , ;
 
@@ -125,9 +126,13 @@ M: node node>quot drop ;
 : nodes>quot ( node -- quot )
     [ [ node>quot ] each ] [ ] make ;
 
-: optimized. ( quot/word -- )
-    dup word? [ specialized-def ] when
-    build-tree optimize-tree nodes>quot . ;
+GENERIC: optimized. ( quot/word -- )
+
+M: method-spec optimized. first2 method optimized. ;
+
+M: word optimized. specialized-def optimized. ;
+
+M: callable optimized. build-tree optimize-tree nodes>quot . ;
 
 SYMBOL: words-called
 SYMBOL: generics-called
@@ -146,14 +151,14 @@ SYMBOL: node-count
         H{ } clone intrinsics-called set
 
         0 swap [
-            >r 1+ r>
+            [ 1+ ] dip
             dup #call? [
                 word>> {
                     { [ dup "intrinsics" word-prop over "if-intrinsics" word-prop or ] [ intrinsics-called ] }
                     { [ dup generic? ] [ generics-called ] }
                     { [ dup method-body? ] [ methods-called ] }
                     [ words-called ]
-                } cond 1 -rot get at+
+                } cond inc-at
             ] [ drop ] if
         ] each-node
         node-count set

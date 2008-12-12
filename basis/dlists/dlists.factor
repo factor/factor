@@ -57,11 +57,11 @@ M: dlist-node node-value obj>> ;
 : (dlist-find-node) ( dlist-node quot: ( node -- ? ) -- node/f ? )
     over [
         [ call ] 2keep rot
-        [ drop t ] [ >r next>> r> (dlist-find-node) ] if
+        [ drop t ] [ [ next>> ] dip (dlist-find-node) ] if
     ] [ 2drop f f ] if ; inline recursive
 
 : dlist-find-node ( dlist quot -- node/f ? )
-    >r front>> r> (dlist-find-node) ; inline
+    [ front>> ] dip (dlist-find-node) ; inline
 
 : dlist-each-node ( dlist quot -- )
     [ f ] compose dlist-find-node 2drop ; inline
@@ -93,11 +93,11 @@ M: dlist peek-front ( dlist -- obj )
 
 M: dlist pop-front* ( dlist -- )
     [
-        dup front>> [ empty-dlist ] unless*
-        dup next>>
-        f rot (>>next)
-        f over set-prev-when
-        swap (>>front)
+        [
+            [ empty-dlist ] unless*
+            [ f ] change-next drop
+            f over set-prev-when
+        ] change-front drop
     ] keep
     normalize-back ;
 
@@ -106,11 +106,11 @@ M: dlist peek-back ( dlist -- obj )
 
 M: dlist pop-back* ( dlist -- )
     [
-        dup back>> [ empty-dlist ] unless*
-        dup prev>>
-        f rot (>>prev)
-        f over set-next-when
-        swap (>>back)
+        [
+            [ empty-dlist ] unless*
+            [ f ] change-prev drop
+            f over set-next-when
+        ] change-back drop
     ] keep
     normalize-front ;
 
@@ -154,7 +154,7 @@ M: dlist clear-deque ( dlist -- )
     [ obj>> ] prepose dlist-each-node ; inline
 
 : dlist>seq ( dlist -- seq )
-    [ ] pusher [ dlist-each ] dip ;
+    [ ] accumulator [ dlist-each ] dip ;
 
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
 

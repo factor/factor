@@ -259,13 +259,43 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 /* Copy all literals referenced from a code block to newspace */
 void collect_literals_step(F_COMPILED *compiled, CELL code_start, CELL literals_start)
 {
-	CELL scan;
-	CELL literal_end = literals_start + compiled->literals_length;
+	if(collecting_gen >= compiled->last_scan)
+	{
+		CELL scan;
+		CELL literal_end = literals_start + compiled->literals_length;
 
-	copy_handle(&compiled->relocation);
+		if(collecting_accumulation_gen_p())
+			compiled->last_scan = collecting_gen;
+		else
+			compiled->last_scan = collecting_gen + 1;
 
-	for(scan = literals_start; scan < literal_end; scan += CELLS)
-		copy_handle((CELL*)scan);
+		for(scan = literals_start; scan < literal_end; scan += CELLS)
+			copy_handle((CELL*)scan);
+
+		if(compiled->relocation != F)
+		{
+			copy_handle(&compiled->relocation);
+
+			F_BYTE_ARRAY *relocation = untag_object(compiled->relocation);
+
+			F_REL *rel = (F_REL *)(relocation + 1);
+			F_REL *rel_end = (F_REL *)((char *)rel + byte_array_capacity(relocation));
+
+			while(rel < rel_end)
+			{
+				if(REL_TYPE(rel) == RT_IMMEDIATE)
+				{
+					CELL offset = rel->offset + code_start;
+					F_FIXNUM absolute_value = get(CREF(literals_start,REL_ARGUMENT(rel)));
+					apply_relocation(REL_CLASS(rel),offset,absolute_value);
+				}
+
+				rel++;
+			}
+		}
+
+		flush_icache(code_start,literals_start - code_start);
+	}
 }
 
 /* Copy literals referenced from all code blocks to newspace */
@@ -333,12 +363,14 @@ void dump_heap(F_HEAP *heap)
 			break;
 		}
 
-		fprintf(stderr,"%lx %lx %s\n",(CELL)scan,scan->size,status);
+		print_cell_hex((CELL)scan); print_string(" ");
+		print_cell_hex(scan->size); print_string(" ");
+		print_string(status); print_string("\n");
 
 		scan = next_block(heap,scan);
 	}
 	
-	printf("%ld bytes of relocation data\n",size);
+	print_cell(size); print_string(" bytes of relocation data\n");
 }
 
 /* Compute where each block is going to go, after compaction */
@@ -459,9 +491,6 @@ void compact_code_heap(void)
 {
 	/* Free all unreachable code blocks */
 	gc();
-
-	fprintf(stderr,"*** Code heap compaction...\n");
-	fflush(stderr);
 
 	/* Figure out where the code heap blocks are going to end up */
 	CELL size = compute_heap_forwarding(&code_heap);

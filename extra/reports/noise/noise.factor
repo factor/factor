@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs math kernel shuffle generalizations
 words quotations arrays combinators sequences math.vectors
-io.styles prettyprint vocabs sorting io generic locals.private
-math.statistics math.order combinators.lib ;
+io.styles prettyprint vocabs sorting io generic
+math.statistics math.order combinators.lib locals.types
+locals.definitions ;
 IN: reports.noise
 
 : badness ( word -- n )

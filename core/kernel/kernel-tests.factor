@@ -1,7 +1,7 @@
 USING: arrays byte-arrays kernel kernel.private math memory
 namespaces sequences tools.test math.private quotations
 continuations prettyprint io.streams.string debugger assocs
-sequences.private ;
+sequences.private accessors ;
 IN: kernel.tests
 
 [ 0 ] [ f size ] unit-test
@@ -106,11 +106,11 @@ IN: kernel.tests
 
 ! Regression
 : (loop) ( a b c d -- )
-    >r pick r> swap >r pick r> swap
-    < [ >r >r >r 1+ r> r> r> (loop) ] [ 2drop 2drop ] if ; inline
+    [ pick ] dip swap [ pick ] dip swap
+    < [ [ 1+ ] 3dip (loop) ] [ 2drop 2drop ] if ; inline
 
 : loop ( obj obj -- )
-    H{ } values swap >r dup length swap r> 0 -roll (loop) ;
+    H{ } values swap [ dup length swap ] dip 0 -roll (loop) ;
 
 [ loop ] must-fail
 
@@ -124,3 +124,42 @@ IN: kernel.tests
 [ [ sq ] tri@ ] must-infer
 
 [ 4 ] [ 1 { [ 1 ] [ 2 ] } dispatch sq ] unit-test
+
+! Test traceback accuracy
+: last-frame ( -- pair )
+    error-continuation get call>> callstack>array 4 head* 2 tail* ;
+
+[
+    { [ 1 2 [ 3 throw ] call 4 ] 3 }
+] [
+    [ [ 1 2 [ 3 throw ] call 4 ] call ] ignore-errors
+    last-frame
+] unit-test
+
+[
+    { [ 1 2 [ 3 throw ] dip 4 ] 3 }
+] [
+    [ [ 1 2 [ 3 throw ] dip 4 ] call ] ignore-errors
+    last-frame
+] unit-test
+
+[
+    { [ 1 2 3 throw [ ] call 4 ] 3 }
+] [
+    [ [ 1 2 3 throw [ ] call 4 ] call ] ignore-errors
+    last-frame
+] unit-test
+
+[
+    { [ 1 2 3 throw [ ] dip 4 ] 3 }
+] [
+    [ [ 1 2 3 throw [ ] dip 4 ] call ] ignore-errors
+    last-frame
+] unit-test
+
+[
+    { [ 1 2 3 throw [ ] [ ] if 4 ] 3 }
+] [
+    [ [ 1 2 3 throw [ ] [ ] if 4 ] call ] ignore-errors
+    last-frame
+] unit-test

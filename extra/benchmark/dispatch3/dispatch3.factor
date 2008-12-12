@@ -1,6 +1,6 @@
 USING: sequences math mirrors splitting grouping
 kernel make assocs alien.syntax columns
-float-arrays bit-arrays ;
+specialized-arrays.double bit-arrays ;
 IN: benchmark.dispatch3
 
 GENERIC: g ( obj -- str )
@@ -26,7 +26,7 @@ M: object g drop "object" ;
         "hello world" ,
         SBUF" sbuf world" ,
         V{ "a" "b" "c" } ,
-        F{ 1.0 2.0 3.0 } ,
+        double-array{ 1.0 2.0 3.0 } ,
         "hello world" 4 tail-slice ,
         10 f <repetition> ,
         100 2 <sliced-groups> ,

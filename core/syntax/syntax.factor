@@ -1,14 +1,13 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien arrays byte-arrays byte-vectors
-definitions generic hashtables kernel math namespaces parser
-lexer sequences strings strings.parser sbufs vectors
-words quotations io assocs splitting classes.tuple
-generic.standard generic.math generic.parser classes io.files
-vocabs classes.parser classes.union
-classes.intersection classes.mixin classes.predicate
-classes.singleton classes.tuple.parser compiler.units
-combinators effects.parser slots ;
+USING: accessors alien arrays byte-arrays definitions generic
+hashtables kernel math namespaces parser lexer sequences strings
+strings.parser sbufs vectors words quotations io assocs
+splitting classes.tuple generic.standard generic.math
+generic.parser classes io.files vocabs classes.parser
+classes.union classes.intersection classes.mixin
+classes.predicate classes.singleton classes.tuple.parser
+compiler.units combinators effects.parser slots ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -23,7 +22,7 @@ IN: bootstrap.syntax
     "syntax" lookup t "delimiter" set-word-prop ;
 
 : define-syntax ( name quot -- )
-    >r "syntax" lookup dup r> define t "parsing" set-word-prop ;
+    [ "syntax" lookup dup ] dip define make-parsing ;
 
 [
     { "]" "}" ";" ">>" } [ define-delimiter ] each
@@ -62,7 +61,7 @@ IN: bootstrap.syntax
     "CHAR:" [
         scan {
             { [ dup length 1 = ] [ first ] }
-            { [ "\\" ?head ] [ next-escape drop ] }
+            { [ "\\" ?head ] [ next-escape >string "" assert= ] }
             [ name>char-hook get call ]
         } cond parsed
     ] define-syntax
@@ -81,7 +80,6 @@ IN: bootstrap.syntax
     "{" [ \ } [ >array ] parse-literal ] define-syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-syntax
-    "BV{" [ \ } [ >byte-vector ] parse-literal ] define-syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-syntax
     "T{" [ parse-tuple-literal parsed ] define-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax
@@ -93,7 +91,7 @@ IN: bootstrap.syntax
     "foldable" [ word make-foldable ] define-syntax
     "flushable" [ word make-flushable ] define-syntax
     "delimiter" [ word t "delimiter" set-word-prop ] define-syntax
-    "parsing" [ word t "parsing" set-word-prop ] define-syntax
+    "parsing" [ word make-parsing ] define-syntax
 
     "SYMBOL:" [
         CREATE-WORD define-symbol
@@ -145,9 +143,10 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "INSTANCE:" [
-        location >r
-        scan-word scan-word 2dup add-mixin-instance
-        <mixin-instance> r> remember-definition
+        location [
+            scan-word scan-word 2dup add-mixin-instance
+            <mixin-instance>
+        ] dip remember-definition
     ] define-syntax
 
     "PREDICATE:" [
@@ -202,13 +201,12 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "call-next-method" [
-        current-class get current-generic get
-        2dup [ word? ] both? [
-            [ literalize parsed ] bi@
+        current-method get [
+            literalize parsed
             \ (call-next-method) parsed
         ] [
             not-in-a-method-error
-        ] if
+        ] if*
     ] define-syntax
     
     "initial:" "syntax" lookup define-symbol

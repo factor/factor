@@ -7,8 +7,8 @@ syndication farkup
 html.components html.forms
 http.server
 http.server.dispatchers
-furnace
 furnace.actions
+furnace.utilities
 furnace.redirection
 furnace.auth
 furnace.auth.login
@@ -230,7 +230,7 @@ M: revision feed-entry-url id>> revision-url ;
         [ list-revisions ] >>entries ;
 
 : rollback-description ( description -- description' )
-    [ "Rollback of '" swap "'" 3append ] [ "Rollback" ] if* ;
+    [ "Rollback of '" "'" surround ] [ "Rollback" ] if* ;
 
 : <rollback-action> ( -- action )
     <action>

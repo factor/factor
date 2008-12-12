@@ -3,7 +3,7 @@
 USING: arrays byte-arrays kernel kernel.private math namespaces
 make sequences strings words effects generic generic.standard
 classes classes.algebra slots.private combinators accessors
-words sequences.private assocs alien ;
+words sequences.private assocs alien quotations ;
 IN: slots
 
 TUPLE: slot-spec name offset class initial read-only ;
@@ -23,7 +23,7 @@ PREDICATE: writer < word "writer" word-prop ;
     3bi ;
 
 : create-accessor ( name effect -- word )
-    >r "accessors" create dup r>
+    [ "accessors" create dup ] dip
     "declared-effect" set-word-prop ;
 
 : reader-quot ( slot-spec -- quot )
@@ -50,7 +50,7 @@ PREDICATE: writer < word "writer" word-prop ;
     define-typecheck ;
 
 : writer-word ( name -- word )
-    "(>>" swap ")" 3append (( value object -- )) create-accessor
+    "(>>" ")" surround (( value object -- )) create-accessor
     dup t "writer" set-word-prop ;
 
 ERROR: bad-slot-value value class ;
@@ -59,7 +59,7 @@ ERROR: bad-slot-value value class ;
     offset>> , \ set-slot , ;
 
 : writer-quot/coerce ( slot-spec -- )
-    [ \ >r , class>> "coercer" word-prop % \ r> , ]
+    [ class>> "coercer" word-prop [ dip ] curry % ]
     [ offset>> , \ set-slot , ]
     bi ;
 
@@ -75,7 +75,7 @@ ERROR: bad-slot-value value class ;
     bi ;
 
 : writer-quot/fixnum ( slot-spec -- )
-    [ >r >fixnum r> ] % writer-quot/check ;
+    [ [ >fixnum ] dip ] % writer-quot/check ;
 
 : writer-quot ( slot-spec -- quot )
     [
@@ -108,9 +108,9 @@ ERROR: bad-slot-value value class ;
 : define-changer ( name -- )
     dup changer-word dup deferred? [
         [
-            [ over >r >r ] %
-            over reader-word ,
-            [ r> call r> swap ] %
+            \ over ,
+            over reader-word 1quotation
+            [ dip call ] curry [ dip swap ] curry %
             swap setter-word ,
         ] [ ] make define-inline
     ] [ 2drop ] if ;
@@ -199,7 +199,7 @@ M: array make-slot
         swap
         peel-off-name
         peel-off-class
-        [ dup empty? not ] [ peel-off-attributes ] [ ] while drop
+        [ dup empty? ] [ peel-off-attributes ] [ ] until drop
     check-initial-value ;
 
 M: slot-spec make-slot

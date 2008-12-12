@@ -26,13 +26,13 @@ HOOK: (file-appender) io-backend ( path -- stream )
     <file-reader> lines ;
 
 : with-file-reader ( path encoding quot -- )
-    >r <file-reader> r> with-input-stream ; inline
+    [ <file-reader> ] dip with-input-stream ; inline
 
 : file-contents ( path encoding -- str )
     <file-reader> contents ;
 
 : with-file-writer ( path encoding quot -- )
-    >r <file-writer> r> with-output-stream ; inline
+    [ <file-writer> ] dip with-output-stream ; inline
 
 : set-file-lines ( seq path encoding -- )
     [ [ print ] each ] with-file-writer ;
@@ -41,7 +41,7 @@ HOOK: (file-appender) io-backend ( path -- stream )
     [ write ] with-file-writer ;
 
 : with-file-appender ( path encoding quot -- )
-    >r <file-appender> r> with-output-stream ; inline
+    [ <file-appender> ] dip with-output-stream ; inline
 
 ! Pathnames
 : path-separator? ( ch -- ? ) os windows? "/\\" "/" ? member? ;
@@ -127,13 +127,13 @@ PRIVATE>
         { [ dup head.? ] [ rest trim-left-separators append-path ] }
         { [ dup head..? ] [
             2 tail trim-left-separators
-            >r parent-directory r> append-path
+            [ parent-directory ] dip append-path
         ] }
         { [ over absolute-path? over first path-separator? and ] [
-            >r 2 head r> append
+            [ 2 head ] dip append
         ] }
         [
-            >r trim-right-separators "/" r>
+            [ trim-right-separators "/" ] dip
             trim-left-separators 3append
         ]
     } cond ;
@@ -150,7 +150,7 @@ PRIVATE>
     ] unless ;
 
 : file-extension ( filename -- extension )
-    "." last-split1 nip ;
+    "." split1-last nip ;
 
 ! File info
 TUPLE: file-info type size permissions created modified
@@ -166,7 +166,7 @@ HOOK: make-link io-backend ( target symlink -- )
 HOOK: read-link io-backend ( symlink -- path )
 
 : copy-link ( target symlink -- )
-    >r read-link r> make-link ;
+    [ read-link ] dip make-link ;
 
 SYMBOL: +regular-file+
 SYMBOL: +directory+
@@ -175,6 +175,7 @@ SYMBOL: +character-device+
 SYMBOL: +block-device+
 SYMBOL: +fifo+
 SYMBOL: +socket+
+SYMBOL: +whiteout+
 SYMBOL: +unknown+
 
 ! File metadata
@@ -186,7 +187,8 @@ SYMBOL: +unknown+
 
 HOOK: file-systems os ( -- array )
 
-TUPLE: file-system-info device-name mount-point type free-space ;
+TUPLE: file-system-info device-name mount-point type
+available-space free-space used-space total-space ;
 
 HOOK: file-system-info os ( path -- file-system-info )
 
@@ -227,7 +229,7 @@ M: object normalize-path ( path -- path' )
     (normalize-path) current-directory set ;
 
 : with-directory ( path quot -- )
-    >r (normalize-path) current-directory r> with-variable ; inline
+    [ (normalize-path) current-directory ] dip with-variable ; inline
 
 ! Creating directories
 HOOK: make-directory io-backend ( path -- )

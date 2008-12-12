@@ -34,8 +34,8 @@ sequences accessors tools.test kernel math ;
 [ ] [ [ [ 1 ] [ 2 ] if + * ] test-normalization ] unit-test
 
 DEFER: bbb
-: aaa ( x -- ) dup [ dup >r bbb r> aaa ] [ drop ] if ; inline recursive
-: bbb ( x -- ) >r drop 0 r> aaa ; inline recursive
+: aaa ( x -- ) dup [ dup [ bbb ] dip aaa ] [ drop ] if ; inline recursive
+: bbb ( x -- ) [ drop 0 ] dip aaa ; inline recursive
 
 [ ] [ [ bbb ] test-normalization ] unit-test
 

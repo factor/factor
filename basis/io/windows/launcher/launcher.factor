@@ -6,7 +6,8 @@ windows.types math windows.kernel32
 namespaces make io.launcher kernel sequences windows.errors
 splitting system threads init strings combinators
 io.backend accessors concurrency.flags io.files assocs
-io.files.private windows destructors ;
+io.files.private windows destructors specialized-arrays.ushort
+specialized-arrays.alien ;
 IN: io.windows.launcher
 
 TUPLE: CreateProcess-args
@@ -45,7 +46,7 @@ TUPLE: CreateProcess-args
     CreateProcess win32-error=0/f ;
 
 : count-trailing-backslashes ( str n -- str n )
-    >r "\\" ?tail r> swap [
+    [ "\\" ?tail ] dip swap [
         1+ count-trailing-backslashes
     ] when ;
 
@@ -55,7 +56,7 @@ TUPLE: CreateProcess-args
 
 : escape-argument ( str -- newstr )
     CHAR: \s over member? [
-        "\"" swap fix-trailing-backslashes "\"" 3append
+        fix-trailing-backslashes "\"" dup surround
     ] when ;
 
 : join-arguments ( args -- cmd-line )
@@ -84,8 +85,7 @@ TUPLE: CreateProcess-args
 
 : fill-lpApplicationName ( process args -- process args )
     over app-name/cmd-line
-    >r >>lpApplicationName
-    r> >>lpCommandLine ;
+    [ >>lpApplicationName ] [ >>lpCommandLine ] bi* ;
 
 : fill-lpCommandLine ( process args -- process args )
     over cmd-line >>lpCommandLine ;
@@ -103,7 +103,7 @@ TUPLE: CreateProcess-args
             over get-environment
             [ swap % "=" % % "\0" % ] assoc-each
             "\0" %
-        ] "" make >c-ushort-array
+        ] ushort-array{ } make underlying>>
         >>lpEnvironment
     ] when ;
 
@@ -157,8 +157,8 @@ M: windows kill-process* ( handle -- )
 
 M: windows wait-for-processes ( -- ? )
     processes get keys dup
-    [ handle>> PROCESS_INFORMATION-hProcess ] map
-    dup length swap >c-void*-array 0 0
+    [ handle>> PROCESS_INFORMATION-hProcess ] void*-array{ } map-as
+    [ length ] [ underlying>> ] bi 0 0
     WaitForMultipleObjects
     dup HEX: ffffffff = [ win32-error ] when
     dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth process-exited f ] if ;

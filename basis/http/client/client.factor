@@ -3,14 +3,15 @@
 USING: accessors assocs kernel math math.parser namespaces make
 sequences io io.sockets io.streams.string io.files io.timeouts
 strings splitting calendar continuations accessors vectors
-math.order hashtables byte-arrays prettyprint destructors
+math.order hashtables byte-arrays destructors
 io.encodings
 io.encodings.string
 io.encodings.ascii
+io.encodings.utf8
 io.encodings.8-bit
 io.encodings.binary
 io.streams.duplex
-fry debugger summary ascii urls urls.encoding present
+fry ascii urls urls.encoding present
 http http.parsers ;
 IN: http.client
 
@@ -40,11 +41,11 @@ GENERIC: >post-data ( object -- post-data )
 
 M: post-data >post-data ;
 
-M: string >post-data "application/octet-stream" <post-data> ;
+M: string >post-data utf8 encode "application/octet-stream" <post-data> ;
 
 M: byte-array >post-data "application/octet-stream" <post-data> ;
 
-M: assoc >post-data assoc>query "application/x-www-form-urlencoded" <post-data> ;
+M: assoc >post-data assoc>query ascii encode "application/x-www-form-urlencoded" <post-data> ;
 
 M: f >post-data ;
 
@@ -52,12 +53,13 @@ M: f >post-data ;
     [ >post-data ] change-post-data ;
 
 : write-post-data ( request -- request )
-    dup method>> "POST" = [ dup post-data>> raw>> write ] when ; 
+    dup method>> [ "POST" = ] [ "PUT" = ] bi or [ dup post-data>> raw>> write ] when ; 
 
 : write-request ( request -- )
     unparse-post-data
     write-request-line
     write-request-header
+    binary encode-output
     write-post-data
     flush
     drop ;
@@ -83,10 +85,6 @@ M: f >post-data ;
 : max-redirects 10 ;
 
 ERROR: too-many-redirects ;
-
-M: too-many-redirects summary
-    drop
-    [ "Redirection limit of " % max-redirects # " exceeded" % ] "" make ;
 
 <PRIVATE
 
@@ -157,13 +155,9 @@ SYMBOL: redirects
 
 PRIVATE>
 
-: success? ( code -- ? ) 200 = ;
+: success? ( code -- ? ) 200 299 between? ;
 
 ERROR: download-failed response ;
-
-M: download-failed error.
-    "HTTP request failed:" print nl
-    response>> . ;
 
 : check-response ( response -- response )
     dup code>> success? [ download-failed ] unless ;
@@ -203,3 +197,7 @@ M: download-failed error.
 
 : http-post ( post-data url -- response data )
     <post-request> http-request ;
+
+USING: vocabs vocabs.loader ;
+
+"debugger" vocab [ "http.client.debugger" require ] when

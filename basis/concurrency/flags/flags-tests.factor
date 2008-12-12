@@ -1,8 +1,8 @@
 IN: concurrency.flags.tests
 USING: tools.test concurrency.flags concurrency.combinators
-kernel threads locals accessors ;
+kernel threads locals accessors calendar ;
 
-:: flag-test-1 ( -- )
+:: flag-test-1 ( -- val )
     [let | f [ <flag> ] |
         [ f raise-flag ] "Flag test" spawn drop
         f lower-flag
@@ -13,14 +13,14 @@ kernel threads locals accessors ;
 
 :: flag-test-2 ( -- )
     [let | f [ <flag> ] |
-        [ 1000 sleep f raise-flag ] "Flag test" spawn drop
+        [ 1 seconds sleep f raise-flag ] "Flag test" spawn drop
         f lower-flag
         f value>>
     ] ;
 
 [ f ] [ flag-test-2 ] unit-test
 
-:: flag-test-3 ( -- )
+:: flag-test-3 ( -- val )
     [let | f [ <flag> ] |
         f raise-flag
         f value>>
@@ -28,7 +28,7 @@ kernel threads locals accessors ;
 
 [ t ] [ flag-test-3 ] unit-test
 
-:: flag-test-4 ( -- )
+:: flag-test-4 ( -- val )
     [let | f [ <flag> ] |
         [ f raise-flag ] "Flag test" spawn drop
         f wait-for-flag
@@ -37,9 +37,9 @@ kernel threads locals accessors ;
 
 [ t ] [ flag-test-4 ] unit-test
 
-:: flag-test-5 ( -- )
+:: flag-test-5 ( -- val )
     [let | f [ <flag> ] |
-        [ 1000 sleep f raise-flag ] "Flag test" spawn drop
+        [ 1 seconds sleep f raise-flag ] "Flag test" spawn drop
         f wait-for-flag
         f value>>
     ] ;
@@ -48,6 +48,6 @@ kernel threads locals accessors ;
 
 [ ] [
     { 1 2 } <flag>
-    [ [ 1000 sleep raise-flag ] curry "Flag test" spawn drop ]
+    [ [ 1 seconds sleep raise-flag ] curry "Flag test" spawn drop ]
     [ [ wait-for-flag drop ] curry parallel-each ] bi
 ] unit-test

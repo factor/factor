@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: dlists kernel math concurrency.promises
-concurrency.mailboxes debugger accessors ;
+concurrency.mailboxes debugger accessors fry ;
 IN: concurrency.count-downs
 
 ! http://java.sun.com/j2se/1.5.0/docs/api/java/util/concurrent/CountDownLatch.html
@@ -26,12 +26,12 @@ ERROR: count-down-already-done ;
     [ 1- >>n count-down-check ] if ;
 
 : await-timeout ( count-down timeout -- )
-    >r promise>> r> ?promise-timeout ?linked t assert= ;
+    [ promise>> ] dip ?promise-timeout ?linked t assert= ;
 
 : await ( count-down -- )
     f await-timeout ;
 
 : spawn-stage ( quot count-down -- )
-    [ [ count-down ] curry compose ] keep
+    [ '[ @ _ count-down ] ] keep
     "Count down stage"
     swap promise>> mailbox>> spawn-linked-to drop ;

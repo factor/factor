@@ -1,5 +1,5 @@
 IN: alien.syntax
-USING: alien alien.c-types alien.structs alien.syntax.private
+USING: alien alien.c-types alien.parser alien.structs
 help.markup help.syntax ;
 
 HELP: DLL"
@@ -54,12 +54,6 @@ HELP: TYPEDEF:
 { $description "Aliases the C type " { $snippet "old" } " under the name " { $snippet "new" } " if ." }
 { $notes "This word differs from " { $link typedef } " in that it runs at parse time, to ensure correct ordering of operations when loading source files. Words defined in source files are compiled before top-level forms are run, so if a source file defines C binding words and uses " { $link typedef } ", the type alias won't be available at compile time." } ;
 
-HELP: TYPEDEF-IF:
-{ $syntax "TYPEDEF-IF: word old new" }
-{ $values { "word" "a word with stack effect " { $snippet "( -- ? )" } } { "old" "a C type" } { "new" "a C type" } }
-{ $description "Aliases the C type " { $snippet "old" } " under the name " { $snippet "new" } " if " { $snippet "word" } " evaluates to a true value." }
-{ $notes "This word differs from " { $link typedef } " in that it runs at parse time, to ensure correct ordering of operations when loading source files. Words defined in source files are compiled before top-level forms are run, so if a source file defines C binding words and uses " { $link typedef } ", the type alias won't be available at compile time." } ;
-
 HELP: C-STRUCT:
 { $syntax "C-STRUCT: name pairs... ;" }
 { $values { "name" "a new C type name" } { "pairs" "C type / field name string pairs" } }
@@ -83,12 +77,17 @@ HELP: C-ENUM:
     { $code "C-ENUM: red green blue ;" ": red 0 ;  : green 1 ;  : blue 2 ;" }
 } ;
 
+HELP: &:
+{ $syntax "&: symbol" }
+{ $values { "symbol" "A C library symbol name" } }
+{ $description "Pushes the address of a symbol named " { $snippet "symbol" } " from the current library, set with " { $link POSTPONE: LIBRARY: } "." } ;
+
 HELP: typedef
 { $values { "old" "a string" } { "new" "a string" } }
 { $description "Alises the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }
 { $notes "Using this word in the same source file which defines C bindings can cause problems, because words are compiled before top-level forms are run. Use the " { $link POSTPONE: TYPEDEF: } " word instead." } ;
 
-{ POSTPONE: TYPEDEF-IF: POSTPONE: TYPEDEF: typedef } related-words
+{ POSTPONE: TYPEDEF: typedef } related-words
 
 HELP: c-struct?
 { $values { "type" "a string" } { "?" "a boolean" } }

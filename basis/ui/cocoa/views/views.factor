@@ -4,11 +4,11 @@ USING: accessors alien alien.c-types arrays assocs cocoa kernel
 math cocoa.messages cocoa.subclassing cocoa.classes cocoa.views
 cocoa.application cocoa.pasteboard cocoa.types cocoa.windows
 sequences ui ui.gadgets ui.gadgets.worlds ui.gestures
-core-foundation threads combinators math.geometry.rect ;
+core-foundation.strings threads combinators math.geometry.rect ;
 IN: ui.cocoa.views
 
 : send-mouse-moved ( view event -- )
-    over >r mouse-location r> window move-hand fire-motion ;
+    [ mouse-location ] [ drop window ] 2bi move-hand fire-motion ;
 
 : button ( event -- n )
     #! Cocoa -> Factor UI button mapping
@@ -18,8 +18,8 @@ IN: ui.cocoa.views
     {
         { S+ HEX: 20000 }
         { C+ HEX: 40000 }
-        { A+ HEX: 80000 }
-        { M+ HEX: 100000 }
+        { A+ HEX: 100000 }
+        { M+ HEX: 80000 }
     } ;
 
 : key-codes
@@ -59,67 +59,66 @@ IN: ui.cocoa.views
 : key-event>gesture ( event -- modifiers keycode action? )
     dup event-modifiers swap key-code ;
 
-: send-key-event ( view event quot -- ? )
-    >r key-event>gesture r> call swap window-focus
-    send-gesture ; inline
-
-: send-user-input ( view string -- )
-    CF>string swap window-focus user-input ;
+: send-key-event ( view gesture -- )
+    swap window propagate-key-gesture ;
 
 : interpret-key-event ( view event -- )
     NSArray swap -> arrayWithObject: -> interpretKeyEvents: ;
 
 : send-key-down-event ( view event -- )
-    2dup [ <key-down> ] send-key-event
-    [ interpret-key-event ] [ 2drop ] if ;
+    [ key-event>gesture <key-down> send-key-event ]
+    [ interpret-key-event ]
+    2bi ;
 
 : send-key-up-event ( view event -- )
-    [ <key-up> ] send-key-event drop ;
+    key-event>gesture <key-up> send-key-event ;
 
 : mouse-event>gesture ( event -- modifiers button )
     dup event-modifiers swap button ;
 
 : send-button-down$ ( view event -- )
-    [ mouse-event>gesture <button-down> ] 2keep
-    mouse-location rot window send-button-down ;
+    [ nip mouse-event>gesture <button-down> ]
+    [ mouse-location ]
+    [ drop window ]
+    2tri send-button-down ;
 
 : send-button-up$ ( view event -- )
-    [ mouse-event>gesture <button-up> ] 2keep
-    mouse-location rot window send-button-up ;
+    [ nip mouse-event>gesture <button-up> ]
+    [ mouse-location ]
+    [ drop window ]
+    2tri send-button-up ;
 
 : send-wheel$ ( view event -- )
-    over >r
-    dup -> deltaX sgn neg over -> deltaY sgn neg 2array -rot
-    mouse-location
-    r> window send-wheel ;
+    [ nip [ -> deltaX ] [ -> deltaY ] bi [ sgn neg ] bi@ 2array ]
+    [ mouse-location ]
+    [ drop window ]
+    2tri send-wheel ;
 
 : send-action$ ( view event gesture -- junk )
-    >r drop window r> send-action f ;
+    [ drop window ] dip send-action f ;
 
 : add-resize-observer ( observer object -- )
-    >r "updateFactorGadgetSize:"
-    "NSViewFrameDidChangeNotification" <NSString>
-    r> add-observer ;
+    [
+        "updateFactorGadgetSize:"
+        "NSViewFrameDidChangeNotification" <NSString>
+    ] dip add-observer ;
 
 : string-or-nil? ( NSString -- ? )
     [ CF>string NSStringPboardType = ] [ t ] if* ;
 
 : valid-service? ( gadget send-type return-type -- ? )
-    over string-or-nil? over string-or-nil? and [
-        drop [ gadget-selection? ] [ drop t ] if
-    ] [
-        3drop f
-    ] if ;
+    over string-or-nil? over string-or-nil? and
+    [ drop [ gadget-selection? ] [ drop t ] if ] [ 3drop f ] if ;
 
 : NSRect>rect ( NSRect world -- rect )
-    >r dup NSRect-x over NSRect-y r>
-    rect-dim second swap - 2array
-    over NSRect-w rot NSRect-h 2array
-    <rect> ;
+    [ [ [ NSRect-x ] [ NSRect-y ] bi ] [ dim>> second ] bi* swap - 2array ]
+    [ drop [ NSRect-w ] [ NSRect-h ] bi 2array ]
+    2bi <rect> ;
 
 : rect>NSRect ( rect world -- NSRect )
-    over rect-loc first2 rot rect-dim second swap -
-    rot rect-dim first2 <NSRect> ;
+    [ [ rect-loc first2 ] [ dim>> second ] bi* swap - ]
+    [ drop rect-dim first2 ]
+    2bi <NSRect> ;
 
 CLASS: {
     { +superclass+ "NSOpenGLView" }
@@ -138,83 +137,83 @@ CLASS: {
 }
 
 { "mouseEntered:" "void" { "id" "SEL" "id" }
-    [ [ nip send-mouse-moved ] ui-try ]
+    [ nip send-mouse-moved ]
 }
 
 { "mouseExited:" "void" { "id" "SEL" "id" }
-    [ [ 3drop forget-rollover ] ui-try ]
+    [ 3drop forget-rollover ]
 }
 
 { "mouseMoved:" "void" { "id" "SEL" "id" }
-    [ [ nip send-mouse-moved ] ui-try ]
+    [ nip send-mouse-moved ]
 }
 
 { "mouseDragged:" "void" { "id" "SEL" "id" }
-    [ [ nip send-mouse-moved ] ui-try ]
+    [ nip send-mouse-moved ]
 }
 
 { "rightMouseDragged:" "void" { "id" "SEL" "id" }
-    [ [ nip send-mouse-moved ] ui-try ]
+    [ nip send-mouse-moved ]
 }
 
 { "otherMouseDragged:" "void" { "id" "SEL" "id" }
-    [ [ nip send-mouse-moved ] ui-try ]
+    [ nip send-mouse-moved ]
 }
 
 { "mouseDown:" "void" { "id" "SEL" "id" }
-    [ [ nip send-button-down$ ] ui-try ]
+    [ nip send-button-down$ ]
 }
 
 { "mouseUp:" "void" { "id" "SEL" "id" }
-    [ [ nip send-button-up$ ] ui-try ]
+    [ nip send-button-up$ ]
 }
 
 { "rightMouseDown:" "void" { "id" "SEL" "id" }
-    [ [ nip send-button-down$ ] ui-try ]
+    [ nip send-button-down$ ]
 }
 
 { "rightMouseUp:" "void" { "id" "SEL" "id" }
-    [ [ nip send-button-up$ ] ui-try ]
+    [ nip send-button-up$ ]
 }
 
 { "otherMouseDown:" "void" { "id" "SEL" "id" }
-    [ [ nip send-button-down$ ] ui-try ]
+    [ nip send-button-down$ ]
 }
 
 { "otherMouseUp:" "void" { "id" "SEL" "id" }
-    [ [ nip send-button-up$ ] ui-try ]
+    [ nip send-button-up$ ]
 }
 
 { "scrollWheel:" "void" { "id" "SEL" "id" }
-    [ [ nip send-wheel$ ] ui-try ]
+    [ nip send-wheel$ ]
 }
 
 { "keyDown:" "void" { "id" "SEL" "id" }
-    [ [ nip send-key-down-event ] ui-try ]
+    [ nip send-key-down-event ]
 }
 
 { "keyUp:" "void" { "id" "SEL" "id" }
-    [ [ nip send-key-up-event ] ui-try ]
+    [ nip send-key-up-event ]
 }
 
 { "cut:" "id" { "id" "SEL" "id" }
-    [ [ nip T{ cut-action } send-action$ ] ui-try ]
+    [ nip T{ cut-action } send-action$ ]
 }
 
 { "copy:" "id" { "id" "SEL" "id" }
-    [ [ nip T{ copy-action } send-action$ ] ui-try ]
+    [ nip T{ copy-action } send-action$ ]
 }
 
 { "paste:" "id" { "id" "SEL" "id" }
-    [ [ nip T{ paste-action } send-action$ ] ui-try ]
+    [ nip T{ paste-action } send-action$ ]
 }
 
 { "delete:" "id" { "id" "SEL" "id" }
-    [ [ nip T{ delete-action } send-action$ ] ui-try ]
+    [ nip T{ delete-action } send-action$ ]
 }
 
 { "selectAll:" "id" { "id" "SEL" "id" }
-    [ [ nip T{ select-all-action } send-action$ ] ui-try ]
+    [ nip T{ select-all-action } send-action$ ]
 }
 
 ! Multi-touch gestures: this is undocumented.
@@ -259,7 +258,7 @@ CLASS: {
 { "validRequestorForSendType:returnType:" "id" { "id" "SEL" "id" "id" }
     [
         ! We return either self or nil
-        >r >r over window-focus r> r>
+        [ over window-focus ] 2dip
         valid-service? [ drop ] [ 2drop f ] if
     ]
 }
@@ -267,30 +266,23 @@ CLASS: {
 { "writeSelectionToPasteboard:types:" "char" { "id" "SEL" "id" "id" }
     [
         CF>string-array NSStringPboardType swap member? [
-            >r drop window-focus gadget-selection dup [
-                r> set-pasteboard-string 1
-            ] [
-                r> 2drop 0
-            ] if
-        ] [
-            3drop 0
-        ] if
+            [ drop window-focus gadget-selection ] dip over
+            [ set-pasteboard-string 1 ] [ 2drop 0 ] if
+        ] [ 3drop 0 ] if
     ]
 }
 
 { "readSelectionFromPasteboard:" "char" { "id" "SEL" "id" }
     [
         pasteboard-string dup [
-            >r drop window-focus r> swap user-input 1
-        ] [
-            3drop 0
-        ] if
+            [ drop window ] dip swap user-input 1
+        ] [ 3drop 0 ] if
     ]
 }
 
 ! Text input
 { "insertText:" "void" { "id" "SEL" "id" }
-    [ [ nip send-user-input ] ui-try ]
+    [ nip CF>string swap window user-input ]
 }
 
 { "hasMarkedText" "char" { "id" "SEL" }
@@ -335,16 +327,16 @@ CLASS: {
 
 ! Initialization
 { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
-    [
-        [
-            2drop dup view-dim swap window (>>dim) yield
-        ] ui-try
-    ]
+    [ 2drop dup view-dim swap window (>>dim) yield ]
+}
+
+{ "doCommandBySelector:" "void" { "id" "SEL" "SEL" }
+    [ 3drop ]
 }
 
 { "initWithFrame:pixelFormat:" "id" { "id" "SEL" "NSRect" "id" }
     [
-        rot drop
+        [ drop ] 2dip
         SUPER-> initWithFrame:pixelFormat:
         dup dup add-resize-observer
     ]
@@ -353,9 +345,10 @@ CLASS: {
 { "dealloc" "void" { "id" "SEL" }
     [
         drop
-        dup unregister-window
-        dup remove-observer
-        SUPER-> dealloc
+        [ unregister-window ]
+        [ remove-observer ]
+        [ SUPER-> dealloc ]
+        tri
     ]
 } ;
 

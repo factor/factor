@@ -12,69 +12,147 @@ big-endian off
 
 [
     ! Load word
-    temp-reg 0 MOV
-    temp-reg dup [] MOV
+    temp0 0 MOV
     ! Bump profiling counter
-    temp-reg profile-count-offset [+] 1 tag-fixnum ADD
+    temp0 profile-count-offset [+] 1 tag-fixnum ADD
     ! Load word->code
-    temp-reg temp-reg word-code-offset [+] MOV
+    temp0 temp0 word-code-offset [+] MOV
     ! Compute word XT
-    temp-reg compiled-header-size ADD
+    temp0 compiled-header-size ADD
     ! Jump to XT
-    temp-reg JMP
-] rc-absolute-cell rt-literal 1 rex-length + jit-profiling jit-define
+    temp0 JMP
+] rc-absolute-cell rt-immediate 1 rex-length + jit-profiling jit-define
 
 [
-    temp-reg 0 MOV                             ! load XT
-    stack-frame-size PUSH                      ! save stack frame size
-    temp-reg PUSH                              ! push XT
-    stack-reg stack-frame-size 3 bootstrap-cells - SUB   ! alignment
+    ! load XT
+    temp0 0 MOV
+    ! save stack frame size
+    stack-frame-size PUSH
+    ! push XT
+    temp0 PUSH
+    ! alignment
+    stack-reg stack-frame-size 3 bootstrap-cells - SUB
 ] rc-absolute-cell rt-label 1 rex-length + jit-prolog jit-define
 
 [
-    arg0 0 MOV                                 ! load literal
-    arg0 dup [] MOV
-    ds-reg bootstrap-cell ADD                  ! increment datastack pointer
-    ds-reg [] arg0 MOV                         ! store literal on datastack
-] rc-absolute-cell rt-literal 1 rex-length + jit-push-literal jit-define
-
-[
-    arg0 0 MOV                                 ! load literal
-    ds-reg bootstrap-cell ADD                  ! increment datastack pointer
-    ds-reg [] arg0 MOV                         ! store literal on datastack
+    ! load literal
+    temp0 0 MOV
+    ! increment datastack pointer
+    ds-reg bootstrap-cell ADD
+    ! store literal on datastack
+    ds-reg [] temp0 MOV
 ] rc-absolute-cell rt-immediate 1 rex-length + jit-push-immediate jit-define
 
 [
-    (JMP) drop
+    f JMP
 ] rc-relative rt-xt 1 jit-word-jump jit-define
 
 [
-    (CALL) drop
+    f CALL
 ] rc-relative rt-xt 1 jit-word-call jit-define
 
 [
-    arg1 0 MOV                                 ! load addr of true quotation
-    arg0 ds-reg [] MOV                         ! load boolean
-    ds-reg bootstrap-cell SUB                  ! pop boolean
-    arg0 \ f tag-number CMP                    ! compare it with f
-    arg0 arg1 [] CMOVNE                        ! load true branch if not equal
-    arg0 arg1 bootstrap-cell [+] CMOVE         ! load false branch if equal
-    arg0 quot-xt-offset [+] JMP                ! jump to quotation-xt
-] rc-absolute-cell rt-literal 1 rex-length + jit-if-jump jit-define
+    ! load boolean
+    temp0 ds-reg [] MOV
+    ! pop boolean
+    ds-reg bootstrap-cell SUB
+    ! compare boolean with f
+    temp0 \ f tag-number CMP
+    ! jump to true branch if not equal
+    f JNE
+] rc-relative rt-xt 10 rex-length 3 * + jit-if-1 jit-define
 
 [
-    arg1 0 MOV                                 ! load dispatch table
-    arg1 dup [] MOV
-    arg0 ds-reg [] MOV                         ! load index
-    fixnum>slot@                               ! turn it into an array offset
-    ds-reg bootstrap-cell SUB                  ! pop index
-    arg0 arg1 ADD                              ! compute quotation location
-    arg0 arg0 array-start-offset [+] MOV       ! load quotation
-    arg0 quot-xt-offset [+] JMP                ! execute branch
-] rc-absolute-cell rt-literal 1 rex-length + jit-dispatch jit-define
+    ! jump to false branch if equal
+    f JMP
+] rc-relative rt-xt 1 jit-if-2 jit-define
 
 [
-    stack-reg stack-frame-size bootstrap-cell - ADD ! unwind stack frame
+    ! load dispatch table
+    temp1 0 MOV
+    ! load index
+    temp0 ds-reg [] MOV
+    ! turn it into an array offset
+    fixnum>slot@
+    ! pop index
+    ds-reg bootstrap-cell SUB
+    ! compute quotation location
+    temp0 temp1 ADD
+    ! load quotation
+    temp0 temp0 array-start-offset [+] MOV
+    ! execute branch
+    temp0 quot-xt-offset [+] JMP
+] rc-absolute-cell rt-immediate 1 rex-length + jit-dispatch jit-define
+
+: jit->r ( -- )
+    rs-reg bootstrap-cell ADD
+    temp0 ds-reg [] MOV
+    ds-reg bootstrap-cell SUB
+    rs-reg [] temp0 MOV ;
+
+: jit-2>r ( -- )
+    rs-reg 2 bootstrap-cells ADD
+    temp0 ds-reg [] MOV
+    temp1 ds-reg -1 bootstrap-cells [+] MOV
+    ds-reg 2 bootstrap-cells SUB
+    rs-reg [] temp0 MOV
+    rs-reg -1 bootstrap-cells [+] temp1 MOV ;
+
+: jit-3>r ( -- )
+    rs-reg 3 bootstrap-cells ADD
+    temp0 ds-reg [] MOV
+    temp1 ds-reg -1 bootstrap-cells [+] MOV
+    temp2 ds-reg -2 bootstrap-cells [+] MOV
+    ds-reg 3 bootstrap-cells SUB
+    rs-reg [] temp0 MOV
+    rs-reg -1 bootstrap-cells [+] temp1 MOV
+    rs-reg -2 bootstrap-cells [+] temp2 MOV ;
+
+: jit-r> ( -- )
+    ds-reg bootstrap-cell ADD
+    temp0 rs-reg [] MOV
+    rs-reg bootstrap-cell SUB
+    ds-reg [] temp0 MOV ;
+
+: jit-2r> ( -- )
+    ds-reg 2 bootstrap-cells ADD
+    temp0 rs-reg [] MOV
+    temp1 rs-reg -1 bootstrap-cells [+] MOV
+    rs-reg 2 bootstrap-cells SUB
+    ds-reg [] temp0 MOV
+    ds-reg -1 bootstrap-cells [+] temp1 MOV ;
+
+: jit-3r> ( -- )
+    ds-reg 3 bootstrap-cells ADD
+    temp0 rs-reg [] MOV
+    temp1 rs-reg -1 bootstrap-cells [+] MOV
+    temp2 rs-reg -2 bootstrap-cells [+] MOV
+    rs-reg 3 bootstrap-cells SUB
+    ds-reg [] temp0 MOV
+    ds-reg -1 bootstrap-cells [+] temp1 MOV
+    ds-reg -2 bootstrap-cells [+] temp2 MOV ;
+
+[
+    jit->r
+    f CALL
+    jit-r>
+] rc-relative rt-xt 11 rex-length 4 * + jit-dip jit-define
+
+[
+    jit-2>r
+    f CALL
+    jit-2r>
+] rc-relative rt-xt 17 rex-length 6 * + jit-2dip jit-define
+
+[
+    jit-3>r
+    f CALL
+    jit-3r>
+] rc-relative rt-xt 23 rex-length 8 * + jit-3dip jit-define
+
+[
+    ! unwind stack frame
+    stack-reg stack-frame-size bootstrap-cell - ADD
 ] f f f jit-epilog jit-define
 
 [ 0 RET ] f f f jit-return jit-define
@@ -83,34 +161,51 @@ big-endian off
 
 ! Quotations and words
 [
-    arg0 ds-reg [] MOV                         ! load from stack
-    ds-reg bootstrap-cell SUB                  ! pop stack
-    arg0 quot-xt-offset [+] JMP                ! call quotation
+    ! load from stack
+    arg ds-reg [] MOV
+    ! pop stack
+    ds-reg bootstrap-cell SUB
+    ! call quotation
+    arg quot-xt-offset [+] JMP
 ] f f f \ (call) define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV                         ! load from stack
-    ds-reg bootstrap-cell SUB                  ! pop stack
-    arg0 word-xt-offset [+] JMP                ! execute word
+    ! load from stack
+    temp0 ds-reg [] MOV
+    ! pop stack
+    ds-reg bootstrap-cell SUB
+    ! execute word
+    temp0 word-xt-offset [+] JMP
 ] f f f \ (execute) define-sub-primitive
 
 ! Objects
 [
-    arg1 ds-reg [] MOV                         ! load from stack
-    arg1 tag-mask get AND                      ! compute tag
-    arg1 tag-bits get SHL                      ! tag the tag
-    ds-reg [] arg1 MOV                         ! push to stack
+    ! load from stack
+    temp0 ds-reg [] MOV
+    ! compute tag
+    temp0 tag-mask get AND
+    ! tag the tag
+    temp0 tag-bits get SHL
+    ! push to stack
+    ds-reg [] temp0 MOV
 ] f f f \ tag define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV                         ! load slot number
-    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
-    arg1 ds-reg [] MOV                         ! load object
-    fixnum>slot@                               ! turn slot number into offset
-    arg1 tag-bits get SHR                      ! mask off tag
-    arg1 tag-bits get SHL
-    arg0 arg1 arg0 [+] MOV                     ! load slot value
-    ds-reg [] arg0 MOV                         ! push to stack
+    ! load slot number
+    temp0 ds-reg [] MOV
+    ! adjust stack pointer
+    ds-reg bootstrap-cell SUB
+    ! load object
+    temp1 ds-reg [] MOV
+    ! turn slot number into offset
+    fixnum>slot@
+    ! mask off tag
+    temp1 tag-bits get SHR
+    temp1 tag-bits get SHL
+    ! load slot value
+    temp0 temp1 temp0 [+] MOV
+    ! push to stack
+    ds-reg [] temp0 MOV
 ] f f f \ slot define-sub-primitive
 
 ! Shufflers
@@ -127,156 +222,159 @@ big-endian off
 ] f f f \ 3drop define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV
+    temp0 ds-reg [] MOV
     ds-reg bootstrap-cell ADD
-    ds-reg [] arg0 MOV
+    ds-reg [] temp0 MOV
 ] f f f \ dup define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV
-    arg1 ds-reg bootstrap-cell neg [+] MOV
+    temp0 ds-reg [] MOV
+    temp1 ds-reg bootstrap-cell neg [+] MOV
     ds-reg 2 bootstrap-cells ADD
-    ds-reg [] arg0 MOV
-    ds-reg bootstrap-cell neg [+] arg1 MOV
+    ds-reg [] temp0 MOV
+    ds-reg bootstrap-cell neg [+] temp1 MOV
 ] f f f \ 2dup define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV
-    arg1 ds-reg -1 bootstrap-cells [+] MOV
-    temp-reg ds-reg -2 bootstrap-cells [+] MOV
+    temp0 ds-reg [] MOV
+    temp1 ds-reg -1 bootstrap-cells [+] MOV
+    temp3 ds-reg -2 bootstrap-cells [+] MOV
     ds-reg 3 bootstrap-cells ADD
-    ds-reg [] arg0 MOV
-    ds-reg -1 bootstrap-cells [+] arg1 MOV
-    ds-reg -2 bootstrap-cells [+] temp-reg MOV
+    ds-reg [] temp0 MOV
+    ds-reg -1 bootstrap-cells [+] temp1 MOV
+    ds-reg -2 bootstrap-cells [+] temp3 MOV
 ] f f f \ 3dup define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV
+    temp0 ds-reg [] MOV
     ds-reg bootstrap-cell SUB
-    ds-reg [] arg0 MOV
+    ds-reg [] temp0 MOV
 ] f f f \ nip define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV
+    temp0 ds-reg [] MOV
     ds-reg 2 bootstrap-cells SUB
-    ds-reg [] arg0 MOV
+    ds-reg [] temp0 MOV
 ] f f f \ 2nip define-sub-primitive
 
 [
-    arg0 ds-reg -1 bootstrap-cells [+] MOV
+    temp0 ds-reg -1 bootstrap-cells [+] MOV
     ds-reg bootstrap-cell ADD
-    ds-reg [] arg0 MOV
+    ds-reg [] temp0 MOV
 ] f f f \ over define-sub-primitive
 
 [
-    arg0 ds-reg -2 bootstrap-cells [+] MOV
+    temp0 ds-reg -2 bootstrap-cells [+] MOV
     ds-reg bootstrap-cell ADD
-    ds-reg [] arg0 MOV
+    ds-reg [] temp0 MOV
 ] f f f \ pick define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV
-    arg1 ds-reg -1 bootstrap-cells [+] MOV
-    ds-reg [] arg1 MOV
+    temp0 ds-reg [] MOV
+    temp1 ds-reg -1 bootstrap-cells [+] MOV
+    ds-reg [] temp1 MOV
     ds-reg bootstrap-cell ADD
-    ds-reg [] arg0 MOV
+    ds-reg [] temp0 MOV
 ] f f f \ dupd define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV
-    arg1 ds-reg -1 bootstrap-cells [+] MOV
+    temp0 ds-reg [] MOV
+    temp1 ds-reg -1 bootstrap-cells [+] MOV
     ds-reg bootstrap-cell ADD
-    ds-reg [] arg0 MOV
-    ds-reg -1 bootstrap-cells [+] arg1 MOV
-    ds-reg -2 bootstrap-cells [+] arg0 MOV
+    ds-reg [] temp0 MOV
+    ds-reg -1 bootstrap-cells [+] temp1 MOV
+    ds-reg -2 bootstrap-cells [+] temp0 MOV
 ] f f f \ tuck define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV
-    arg1 ds-reg bootstrap-cell neg [+] MOV
-    ds-reg bootstrap-cell neg [+] arg0 MOV
-    ds-reg [] arg1 MOV
+    temp0 ds-reg [] MOV
+    temp1 ds-reg bootstrap-cell neg [+] MOV
+    ds-reg bootstrap-cell neg [+] temp0 MOV
+    ds-reg [] temp1 MOV
 ] f f f \ swap define-sub-primitive
 
 [
-    arg0 ds-reg -1 bootstrap-cells [+] MOV
-    arg1 ds-reg -2 bootstrap-cells [+] MOV
-    ds-reg -2 bootstrap-cells [+] arg0 MOV
-    ds-reg -1 bootstrap-cells [+] arg1 MOV
+    temp0 ds-reg -1 bootstrap-cells [+] MOV
+    temp1 ds-reg -2 bootstrap-cells [+] MOV
+    ds-reg -2 bootstrap-cells [+] temp0 MOV
+    ds-reg -1 bootstrap-cells [+] temp1 MOV
 ] f f f \ swapd define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV
-    arg1 ds-reg -1 bootstrap-cells [+] MOV
-    temp-reg ds-reg -2 bootstrap-cells [+] MOV
-    ds-reg -2 bootstrap-cells [+] arg1 MOV
-    ds-reg -1 bootstrap-cells [+] arg0 MOV
-    ds-reg [] temp-reg MOV
+    temp0 ds-reg [] MOV
+    temp1 ds-reg -1 bootstrap-cells [+] MOV
+    temp3 ds-reg -2 bootstrap-cells [+] MOV
+    ds-reg -2 bootstrap-cells [+] temp1 MOV
+    ds-reg -1 bootstrap-cells [+] temp0 MOV
+    ds-reg [] temp3 MOV
 ] f f f \ rot define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV
-    arg1 ds-reg -1 bootstrap-cells [+] MOV
-    temp-reg ds-reg -2 bootstrap-cells [+] MOV
-    ds-reg -2 bootstrap-cells [+] arg0 MOV
-    ds-reg -1 bootstrap-cells [+] temp-reg MOV
-    ds-reg [] arg1 MOV
+    temp0 ds-reg [] MOV
+    temp1 ds-reg -1 bootstrap-cells [+] MOV
+    temp3 ds-reg -2 bootstrap-cells [+] MOV
+    ds-reg -2 bootstrap-cells [+] temp0 MOV
+    ds-reg -1 bootstrap-cells [+] temp3 MOV
+    ds-reg [] temp1 MOV
 ] f f f \ -rot define-sub-primitive
 
-[
-    rs-reg bootstrap-cell ADD
-    arg0 ds-reg [] MOV
-    ds-reg bootstrap-cell SUB
-    rs-reg [] arg0 MOV
-] f f f \ >r define-sub-primitive
+[ jit->r ] f f f \ >r define-sub-primitive
 
-[
-    ds-reg bootstrap-cell ADD
-    arg0 rs-reg [] MOV
-    rs-reg bootstrap-cell SUB
-    ds-reg [] arg0 MOV
-] f f f \ r> define-sub-primitive
+[ jit-r> ] f f f \ r> define-sub-primitive
 
 ! Comparisons
 : jit-compare ( insn -- )
-    arg1 0 MOV                                 ! load t
-    arg1 dup [] MOV
-    temp-reg \ f tag-number MOV                ! load f
-    arg0 ds-reg [] MOV                         ! load first value
-    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
-    ds-reg [] arg0 CMP                         ! compare with second value
-    [ arg1 temp-reg ] dip execute              ! move t if true
-    ds-reg [] arg1 MOV                         ! store
-    ;
+    ! load t
+    temp3 0 MOV
+    ! load f
+    temp1 \ f tag-number MOV
+    ! load first value
+    temp0 ds-reg [] MOV
+    ! adjust stack pointer
+    ds-reg bootstrap-cell SUB
+    ! compare with second value
+    ds-reg [] temp0 CMP
+    ! move t if true
+    [ temp1 temp3 ] dip execute
+    ! store
+    ds-reg [] temp1 MOV ;
 
 : define-jit-compare ( insn word -- )
-    [ [ jit-compare ] curry rc-absolute-cell rt-literal 1 rex-length + ] dip
+    [ [ jit-compare ] curry rc-absolute-cell rt-immediate 1 rex-length + ] dip
     define-sub-primitive ;
 
-\ CMOVNE \ eq? define-jit-compare
-\ CMOVL \ fixnum>= define-jit-compare
-\ CMOVG \ fixnum<= define-jit-compare
-\ CMOVLE \ fixnum> define-jit-compare
-\ CMOVGE \ fixnum< define-jit-compare
+\ CMOVE \ eq? define-jit-compare
+\ CMOVGE \ fixnum>= define-jit-compare
+\ CMOVLE \ fixnum<= define-jit-compare
+\ CMOVG \ fixnum> define-jit-compare
+\ CMOVL \ fixnum< define-jit-compare
 
 ! Math
 : jit-math ( insn -- )
-    arg0 ds-reg [] MOV                         ! load second input
-    ds-reg bootstrap-cell SUB                  ! pop stack
-    [ ds-reg [] arg0 ] dip execute             ! compute result
-    ;
+    ! load second input
+    temp0 ds-reg [] MOV
+    ! pop stack
+    ds-reg bootstrap-cell SUB
+    ! compute result
+    [ ds-reg [] temp0 ] dip execute ;
 
 [ \ ADD jit-math ] f f f \ fixnum+fast define-sub-primitive
 
 [ \ SUB jit-math ] f f f \ fixnum-fast define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV                         ! load second input
-    ds-reg bootstrap-cell SUB                  ! pop stack
-    arg1 ds-reg [] MOV                         ! load first input
-    arg0 tag-bits get SAR                      ! untag second input
-    arg0 arg1 IMUL2                            ! multiply
-    ds-reg [] arg1 MOV                         ! push result
+    ! load second input
+    temp0 ds-reg [] MOV
+    ! pop stack
+    ds-reg bootstrap-cell SUB
+    ! load first input
+    temp1 ds-reg [] MOV
+    ! untag second input
+    temp0 tag-bits get SAR
+    ! multiply
+    temp0 temp1 IMUL2
+    ! push result
+    ds-reg [] temp1 MOV
 ] f f f \ fixnum*fast define-sub-primitive
 
 [ \ AND jit-math ] f f f \ fixnum-bitand define-sub-primitive
@@ -286,49 +384,106 @@ big-endian off
 [ \ XOR jit-math ] f f f \ fixnum-bitxor define-sub-primitive
 
 [
-    ds-reg [] NOT                              ! complement
-    ds-reg [] tag-mask get XOR                 ! clear tag bits
+    ! complement
+    ds-reg [] NOT
+    ! clear tag bits
+    ds-reg [] tag-mask get XOR
 ] f f f \ fixnum-bitnot define-sub-primitive
 
 [
-    shift-arg ds-reg [] MOV                    ! load shift count
-    shift-arg tag-bits get SAR                 ! untag shift count
-    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
-    temp-reg ds-reg [] MOV                     ! load value
-    arg1 temp-reg MOV                          ! make a copy
-    arg1 CL SHL                                ! compute positive shift value in arg1
-    shift-arg NEG                              ! compute negative shift value in arg0
-    temp-reg CL SAR
-    temp-reg tag-mask get bitnot AND
-    shift-arg 0 CMP                            ! if shift count was negative, move arg0 to arg1
-    arg1 temp-reg CMOVGE
-    ds-reg [] arg1 MOV                         ! push to stack
+    ! load shift count
+    shift-arg ds-reg [] MOV
+    ! untag shift count
+    shift-arg tag-bits get SAR
+    ! adjust stack pointer
+    ds-reg bootstrap-cell SUB
+    ! load value
+    temp3 ds-reg [] MOV
+    ! make a copy
+    temp1 temp3 MOV
+    ! compute positive shift value in temp1
+    temp1 CL SHL
+    shift-arg NEG
+    ! compute negative shift value in temp3
+    temp3 CL SAR
+    temp3 tag-mask get bitnot AND
+    shift-arg 0 CMP
+    ! if shift count was negative, move temp0 to temp1
+    temp1 temp3 CMOVGE
+    ! push to stack
+    ds-reg [] temp1 MOV
 ] f f f \ fixnum-shift-fast define-sub-primitive
 
+: jit-fixnum-/mod ( -- )
+    ! load second parameter
+    temp3 ds-reg [] MOV
+    ! load first parameter
+    div-arg ds-reg bootstrap-cell neg [+] MOV
+    ! make a copy
+    mod-arg div-arg MOV
+    ! sign-extend
+    mod-arg bootstrap-cell-bits 1- SAR
+    ! divide
+    temp3 IDIV ;
+
 [
-    temp-reg ds-reg [] MOV                     ! load second parameter
-    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
-    div-arg ds-reg [] MOV                      ! load first parameter
-    mod-arg div-arg MOV                        ! make a copy
-    mod-arg bootstrap-cell-bits 1- SAR         ! sign-extend
-    temp-reg IDIV                              ! divide
-    ds-reg [] mod-arg MOV                      ! push to stack
+    jit-fixnum-/mod
+    ! adjust stack pointer
+    ds-reg bootstrap-cell SUB
+    ! push to stack
+    ds-reg [] mod-arg MOV
 ] f f f \ fixnum-mod define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV                         ! load local number
-    fixnum>slot@                               ! turn local number into offset
-    arg1 bootstrap-cell MOV                    ! load base
-    arg1 arg0 SUB                              ! turn it into a stack offset
-    arg0 rs-reg arg1 [+] MOV                   ! load local value
-    ds-reg [] arg0 MOV                         ! push to stack
+    jit-fixnum-/mod
+    ! adjust stack pointer
+    ds-reg bootstrap-cell SUB
+    ! tag it
+    div-arg tag-bits get SHL
+    ! push to stack
+    ds-reg [] div-arg MOV
+] f f f \ fixnum/i-fast define-sub-primitive
+
+[
+    jit-fixnum-/mod
+    ! tag it
+    div-arg tag-bits get SHL
+    ! push to stack
+    ds-reg [] mod-arg MOV
+    ds-reg bootstrap-cell neg [+] div-arg MOV
+] f f f \ fixnum/mod-fast define-sub-primitive
+
+[
+    temp0 ds-reg [] MOV
+    ds-reg bootstrap-cell SUB
+    temp0 ds-reg [] OR
+    temp0 tag-mask get AND
+    temp0 \ f tag-number MOV
+    temp1 1 tag-fixnum MOV
+    temp0 temp1 CMOVE
+    ds-reg [] temp0 MOV
+] f f f \ both-fixnums? define-sub-primitive
+
+[
+    ! load local number
+    temp0 ds-reg [] MOV
+    ! turn local number into offset
+    fixnum>slot@
+    ! load local value
+    temp0 rs-reg temp0 [+] MOV
+    ! push to stack
+    ds-reg [] temp0 MOV
 ] f f f \ get-local define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV                         ! load local count
-    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
-    fixnum>slot@                               ! turn local number into offset
-    rs-reg arg0 SUB                            ! decrement retain stack pointer
+    ! load local count
+    temp0 ds-reg [] MOV
+    ! adjust stack pointer
+    ds-reg bootstrap-cell SUB
+    ! turn local number into offset
+    fixnum>slot@
+    ! decrement retain stack pointer
+    rs-reg temp0 SUB
 ] f f f \ drop-locals define-sub-primitive
 
 [ "bootstrap.x86" forget-vocab ] with-compilation-unit

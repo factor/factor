@@ -18,4 +18,4 @@ SYMBOL: bytes-read
     ] "" make 64 group ;
 
 : update-old-new ( old new -- )
-    [ get >r get r> ] 2keep >r >r w+ dup r> set r> set ; inline
+    [ [ get ] bi@ w+ dup ] 2keep [ set ] bi@ ; inline

@@ -1,5 +1,5 @@
-USING: ui.gadgets help.markup help.syntax hashtables
-strings kernel system ;
+USING: ui.gadgets ui.gadgets.worlds help.markup help.syntax
+hashtables strings kernel system ;
 IN: ui.gestures
 
 HELP: set-gestures
@@ -15,15 +15,11 @@ $nl
 "The default implementation looks at the " { $snippet "\"gestures\"" } " word property of each superclass of the gadget's class." }
 { $notes "Methods should be defined on this word if you desire to handle an arbitrary set of gestures. To define handlers for a fixed set, it is easier to use " { $link set-gestures } "." } ;
 
-{ send-gesture handle-gesture set-gestures } related-words
+{ propagate-gesture handle-gesture set-gestures } related-words
 
-HELP: send-gesture
-{ $values { "gesture" "a gesture" } { "gadget" gadget } { "?" "a boolean" } }
-{ $description "Calls " { $link send-gesture } " on every parent of " { $snippet "gadget" } ". Outputs " { $link f } " if some parent handled the gesture, else outputs " { $link t } "." } ;
-
-HELP: user-input
-{ $values { "str" string } { "gadget" gadget } }
-{ $description "Calls " { $link user-input* } " on every parent of the gadget." } ;
+HELP: propagate-gesture
+{ $values { "gesture" "a gesture" } { "gadget" gadget } }
+{ $description "Calls " { $link handle-gesture } " on every parent of " { $snippet "gadget" } "." } ;
 
 HELP: motion
 { $class-description "Mouse motion gesture." }
@@ -90,10 +86,6 @@ HELP: select-all-action
 { $class-description "Gesture sent when the " { $emphasis "select all" } " standard window system action is invoked." }
 { $examples { $code "T{ select-all-action }" } } ;
 
-HELP: generalize-gesture
-{ $values { "gesture" "a gesture" } { "newgesture" "a new gesture" } }
-{ $description "Turns a " { $link button-down } ", " { $link button-up } " or " { $link drag } " action naming a specific mouse button into one which can apply regardless of which mouse button was pressed." } ;
-
 HELP: C+
 { $description "Control key modifier." } ;
 
@@ -147,7 +139,7 @@ HELP: hand-last-button
 { $var-description "Global variable. The mouse button most recently pressed." } ;
 
 HELP: hand-last-time
-{ $var-description "Global variable. The timestamp of the most recent mouse button click. This timestamp has the same format as the output value of " { $link millis } "." } ;
+{ $var-description "Global variable. The timestamp of the most recent mouse button click. This timestamp has the same format as the output value of " { $link micros } "." } ;
 
 HELP: hand-buttons
 { $var-description "Global variable. A vector of mouse buttons currently held down." } ;
@@ -195,6 +187,43 @@ HELP: gesture>string
     { $example "USING: io ui.gestures ;" "T{ key-down f { C+ } \"x\" } gesture>string print" "C+x" }
 } ;
 
+HELP: left-action
+{ $class-description "Gesture sent when the user performs a multi-touch three-finger swipe left." } ;
+
+HELP: right-action
+{ $class-description "Gesture sent when the user performs a multi-touch three-finger swipe right." } ;
+
+HELP: up-action
+{ $class-description "Gesture sent when the user performs a multi-touch three-finger swipe up." } ;
+
+HELP: down-action
+{ $class-description "Gesture sent when the user performs a multi-touch three-finger swipe down." } ;
+
+HELP: zoom-in-action
+{ $class-description "Gesture sent when the user performs a multi-touch two-finger pinch in." } ;
+
+HELP: zoom-out-action
+{ $class-description "Gesture sent when the user performs a multi-touch two-finger pinch out." } ;
+
+ARTICLE: "gesture-differences" "Gesture handling differences between platforms"
+"On Mac OS X, the modifier keys map as follows:"
+{ $table
+    { { $link S+ } "Shift" }
+    { { $link A+ } "Command (Apple)" }
+    { { $link C+ } "Control" }
+    { { $link M+ } "Option" }
+}
+"On Windows and X11:"
+{ $table
+    { { $link S+ } "Shift" }
+    { { $link A+ } "Alt" }
+    { { $link C+ } "Control" }
+    { { $link M+ } "Windows key" }
+}
+"On Windows, " { $link key-up } " gestures are not reported for all keyboard events."
+$nl
+{ $link "multitouch-gestures" } " are only supported on Mac OS X." ;
+
 ARTICLE: "ui-gestures" "UI gestures"
 "User actions such as keyboard input and mouse button clicks deliver " { $emphasis "gestures" } " to gadgets. If the direct receiver of the gesture does not handle it, the gesture is passed on to the receiver's parent, and this way it travels up the gadget hierarchy. Gestures which are not handled at some point are ignored."
 $nl
@@ -211,6 +240,9 @@ $nl
 { $subsection "ui-user-input" }
 "Mouse input:"
 { $subsection "mouse-gestures" }
+{ $subsection "multitouch-gestures" }
+"Guidelines for cross-platform applications:"
+{ $subsection "gesture-differences" }
 "Abstractions built on top of gestures:"
 { $subsection "ui-commands" }
 { $subsection "ui-operations" } ;
@@ -304,6 +336,18 @@ $nl
 { $subsection mouse-scroll }
 "Global variable set when a mouse scroll wheel gesture is sent:"
 { $subsection scroll-direction } ;
+
+ARTICLE: "multitouch-gestures" "Multi-touch gestures"
+"Multi-touch gestures are only supported on Mac OS X with newer MacBook and MacBook Pro models."
+$nl
+"Three-finger swipe:"
+{ $subsection left-action }
+{ $subsection right-action }
+{ $subsection up-action }
+{ $subsection down-action }
+"Two-finger pinch:"
+{ $subsection zoom-in-action }
+{ $subsection zoom-out-action } ;
 
 ARTICLE: "action-gestures" "Action gestures"
 "Action gestures exist to keep keyboard shortcuts for common clipboard operations consistent."

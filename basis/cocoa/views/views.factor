@@ -1,8 +1,8 @@
-! Copyright (C) 2006, 2007 Slava Pestov
+! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types arrays kernel math namespaces make cocoa
-cocoa.messages cocoa.classes cocoa.types sequences
-continuations ;
+USING: specialized-arrays.int arrays kernel math namespaces make
+cocoa cocoa.messages cocoa.classes cocoa.types sequences
+continuations accessors ;
 IN: cocoa.views
 
 : NSOpenGLPFAAllRenderers 1 ;
@@ -55,10 +55,9 @@ PRIVATE>
 : with-multisample ( quot -- )
     t +multisample+ pick with-variable ; inline
 
-: <PixelFormat> ( -- pixelfmt )
-    NSOpenGLPixelFormat -> alloc [
-        NSOpenGLPFAWindow ,
-        NSOpenGLPFADoubleBuffer ,
+: <PixelFormat> ( attributes -- pixelfmt )
+    NSOpenGLPixelFormat -> alloc swap [
+        %
         NSOpenGLPFADepthSize , 16 ,
         +software-renderer+ get [
             NSOpenGLPFARendererID , kCGLRendererGenericFloatID ,
@@ -69,12 +68,13 @@ PRIVATE>
             NSOpenGLPFASamples , 8 ,
         ] when
         0 ,
-    ] { } make >c-int-array
+    ] int-array{ } make underlying>>
     -> initWithAttributes:
     -> autorelease ;
 
 : <GLView> ( class dim -- view )
-    >r -> alloc 0 0 r> first2 <NSRect> <PixelFormat>
+    [ -> alloc 0 0 ] dip first2 <NSRect>
+    NSOpenGLPFAWindow NSOpenGLPFADoubleBuffer 2array <PixelFormat>
     -> initWithFrame:pixelFormat:
     dup 1 -> setPostsBoundsChangedNotifications:
     dup 1 -> setPostsFrameChangedNotifications: ;
@@ -85,10 +85,11 @@ PRIVATE>
     swap NSRect-h >fixnum 2array ;
 
 : mouse-location ( view event -- loc )
-    over >r
-    -> locationInWindow f -> convertPoint:fromView:
-    dup NSPoint-x swap NSPoint-y
-    r> -> frame NSRect-h swap - 2array ;
+    [
+        -> locationInWindow f -> convertPoint:fromView:
+        [ NSPoint-x ] [ NSPoint-y ] bi
+    ] [ drop -> frame NSRect-h ] 2bi
+    swap - 2array ;
 
 USE: opengl.gl
 USE: alien.syntax

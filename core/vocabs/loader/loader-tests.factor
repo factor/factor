@@ -51,7 +51,7 @@ IN: vocabs.loader.tests
 2 [
     [ "vocabs.loader.test.a" require ] must-fail
     
-    [ f ] [ "vocabs.loader.test.a" vocab-source-loaded? ] unit-test
+    [ f ] [ "vocabs.loader.test.a" vocab source-loaded?>> ] unit-test
     
     [ t ] [
         "resource:core/vocabs/loader/test/a/a.factor"
@@ -129,9 +129,9 @@ IN: vocabs.loader.tests
     ] with-compilation-unit
 ] unit-test
 
-[ t ] [
+[ +done+ ] [
     [ "vocabs.loader.test.d" require ] [ :1 ] recover
-    "vocabs.loader.test.d" vocab-source-loaded?
+    "vocabs.loader.test.d" vocab source-loaded?>>
 ] unit-test
 
 : forget-junk
@@ -154,5 +154,28 @@ forget-junk
 
 [ ] [ [ "vocabs.loader.test.e" forget-vocab ] with-compilation-unit ] unit-test
 
-[ "vocabs.loader.test.e" require ]
-[ relative-overflow? ] must-fail-with
+0 "vocabs.loader.test.g" set-global
+
+[
+    "vocabs.loader.test.f" forget-vocab
+    "vocabs.loader.test.g" forget-vocab
+] with-compilation-unit
+
+[ ] [ "vocabs.loader.test.g" require ] unit-test
+
+[ 1 ] [ "vocabs.loader.test.g" get-global ] unit-test
+
+[
+    "vocabs.loader.test.h" forget-vocab
+    "vocabs.loader.test.i" forget-vocab
+] with-compilation-unit
+
+[ ] [ "vocabs.loader.test.h" require ] unit-test
+
+
+[
+    "vocabs.loader.test.j" forget-vocab
+    "vocabs.loader.test.k" forget-vocab
+] with-compilation-unit
+
+[ ] [ [ "vocabs.loader.test.j" require ] [ drop :1 ] recover ] unit-test

@@ -43,12 +43,9 @@ Compilation will yield an executable named 'factor' on Unix,
 
 For X11 support, you need recent development libraries for libc,
 Freetype, X11, OpenGL and GLUT. On a Debian-derived Linux distribution
-(like Ubuntu), you can use the line
+(like Ubuntu), you can use the following line to grab everything:
 
     sudo apt-get install libc6-dev libfreetype6-dev libx11-dev glutg3-dev
-
-to grab everything (if you're on a non-debian-derived distro please tell
-us what the equivalent command is on there and it can be added).
 
 * Bootstrapping the Factor image
 

@@ -1,5 +1,6 @@
 USING: alien.c-types continuations destructors kernel
-opengl opengl.gl bunny.model ;
+opengl opengl.gl bunny.model specialized-arrays.float
+accessors ;
 IN: bunny.fixed-pipeline
 
 TUPLE: bunny-fixed-pipeline ;
@@ -13,7 +14,7 @@ M: bunny-fixed-pipeline draw-bunny
     GL_LIGHTING glEnable
     GL_LIGHT0 glEnable
     GL_COLOR_MATERIAL glEnable
-    GL_LIGHT0 GL_POSITION { 1.0 -1.0 1.0 1.0 } >c-float-array glLightfv
+    GL_LIGHT0 GL_POSITION float-array{ 1.0 -1.0 1.0 1.0 } underlying>> glLightfv
     GL_FRONT_AND_BACK GL_SHININESS 100.0 glMaterialf
     GL_FRONT_AND_BACK GL_SPECULAR glColorMaterial
     GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE glColorMaterial

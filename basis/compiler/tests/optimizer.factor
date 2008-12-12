@@ -286,9 +286,7 @@ HINTS: recursive-inline-hang-2 array ;
 HINTS: recursive-inline-hang-3 array ;
 
 ! Regression
-USE: sequences.private
-
-[ ] [ { (3append) } compile ] unit-test
+[ ] [ { 3append-as } compile ] unit-test
 
 ! Wow
 : counter-example ( a b c d -- a' b' c' d' )
@@ -377,3 +375,9 @@ DEFER: loop-bbb
 : loop-ccc ( -- ) loop-bbb ;
 
 [ 0 ] [ 0 counter set loop-ccc counter get ] unit-test
+
+! Type inference issue
+[ 4 3 ] [
+    1 >bignum 2 >bignum
+    [ { bignum integer } declare [ shift ] keep 1+ ] compile-call
+] unit-test

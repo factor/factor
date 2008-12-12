@@ -41,13 +41,15 @@ $nl
 }
 "The " { $vocab-link "qualified" } " vocabulary contains some tools for helping with shadowing." ;
 
-ARTICLE: "vocabulary-search-errors" "Word lookup errors"
-"If the parser cannot not find a word in the current vocabulary search path, it attempts to look for the word in all loaded vocabularies. Then, one of three things happen:"
-{ $list
-    { "If there are no words having this name at all, an error is thrown and parsing stops." }
-    { "If there are vocabularies which contain words with this name, a restartable error is thrown, with a restart for each vocabulary in question. The restarts add the vocabulary to the search path and continue parsing." }
-}
-"When writing a new vocabulary, one approach is to ignore " { $link POSTPONE: USING: } " declarations altogether, then to load the vocabulary and observe any parser notes and restarts and use this information to write the correct " { $link POSTPONE: USING: } " declaration." ;
+ARTICLE: "vocabulary-search-errors"  "Word lookup errors"
+"If the parser cannot not find a word in the current vocabulary search path, it attempts to look for the word in all loaded vocabularies."
+$nl
+"If " { $link auto-use? } " mode is off, a restartable error is thrown with a restart for each vocabulary in question, together with a restart which defers the word in the current vocabulary, as if " { $link POSTPONE: DEFER: } " was used."
+$nl
+"If " { $link auto-use? } " mode is on and only one vocabulary has a word with this name, the vocabulary is added to the search path and parsing continues."
+$nl
+"If any restarts were invoked, or if " { $link auto-use? } " is on, the parser will print the correct " { $link POSTPONE: USING: } " after parsing completes. This form can be copy and pasted back into the source file."
+{ $subsection auto-use? } ;
 
 ARTICLE: "vocabulary-search" "Vocabulary search path"
 "When the parser reads a token, it attempts to look up a word named by that token. The lookup is performed by searching each vocabulary in the search path, in order."
@@ -353,3 +355,7 @@ HELP: staging-violation
 { $description "Throws a " { $link staging-violation } " error." }
 { $error-description "Thrown by the parser if a parsing word is used in the same compilation unit as where it was defined; see " { $link "compilation-units" } "." }
 { $notes "One possible workaround is to use the " { $link POSTPONE: << } " word to execute code at parse time. However, executing words defined in the same source file at parse time is still prohibited." } ;
+
+HELP: auto-use?
+{ $var-description "If set to a true value, the behavior of the parser when encountering an unknown word name is changed. If only one loaded vocabulary has a word with this name, instead of throwing an error, the parser adds the vocabulary to the search path and prints a parse note. Off by default." }
+{ $notes "This feature is intended to help during development. To generate a " { $link POSTPONE: USING: } " form automatically, enable " { $link auto-use? } ", load the source file, and copy and paste the " { $link POSTPONE: USING: } " form printed by the parser back into the file, then disable " { $link auto-use? } ". See " { $link "vocabulary-search-errors" } "." } ;

@@ -25,6 +25,11 @@ IN: io.tests
 ! Make sure we use correct to_c_string form when writing
 [ ] [ "\0" write ] unit-test
 
+[ ] [
+    "It seems Jobs has lost his grasp on reality again.\n"
+    "separator-test.txt" temp-file latin1 set-file-contents
+] unit-test
+
 [
     {
         { "It seems " CHAR: J }
@@ -33,7 +38,7 @@ IN: io.tests
     }
 ] [
     [
-        "resource:core/io/test/separator-test.txt"
+        "separator-test.txt" temp-file
         latin1 <file-reader> [
             "J" read-until 2array ,
             "i" read-until 2array ,

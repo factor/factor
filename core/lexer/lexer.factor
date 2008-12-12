@@ -23,7 +23,7 @@ TUPLE: lexer text line line-text line-length column ;
     lexer new-lexer ;
 
 : skip ( i seq ? -- n )
-    >r tuck r>
+    [ tuck ] dip
     [ swap CHAR: \s eq? xor ] curry find-from drop
     [ ] [ length ] ?if ;
 
@@ -73,6 +73,12 @@ PREDICATE: unexpected-eof < unexpected
     got>> not ;
 
 : unexpected-eof ( word -- * ) f unexpected ;
+
+: expect ( token -- )
+    scan
+    [ 2dup = [ 2drop ] [ unexpected ] if ]
+    [ unexpected-eof ]
+    if* ;
 
 : (parse-tokens) ( accum end -- accum )
     scan 2dup = [

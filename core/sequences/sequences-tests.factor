@@ -190,16 +190,6 @@ unit-test
 
 [ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] bi@ ] unit-test
 
-[ 1 4 9 16 16 V{ f 1 4 9 16 } ] [
-    V{ } clone "cache-test" set
-    1 "cache-test" get [ sq ] cache-nth
-    2 "cache-test" get [ sq ] cache-nth
-    3 "cache-test" get [ sq ] cache-nth
-    4 "cache-test" get [ sq ] cache-nth
-    4 "cache-test" get [ "wrong" ] cache-nth
-    "cache-test" get
-] unit-test
-
 [ 1 ] [ 0.5 { 1 2 3 } nth ] unit-test
 
 ! Pathological case
@@ -268,3 +258,6 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 [ { 1 3 "X" 5 7 } ] [ "X" 2 { 1 3 5 7 } insert-nth ] unit-test
 
 [ V{ 0 2 } ] [ "a" { "a" "b" "a" } indices ] unit-test
+
+[ "a,b" ] [ "a" "b" "," glue ] unit-test
+[ "(abc)" ] [ "abc" "(" ")" surround ] unit-test

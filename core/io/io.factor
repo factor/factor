@@ -69,7 +69,7 @@ SYMBOL: error-stream
     [ ] cleanup ; inline
 
 : tabular-output ( style quot -- )
-    swap >r { } make r> output-stream get stream-write-table ; inline
+    swap [ { } make ] dip output-stream get stream-write-table ; inline
 
 : with-row ( quot -- )
     { } make , ; inline
@@ -89,8 +89,8 @@ SYMBOL: error-stream
     ] if ; inline
 
 : with-nesting ( style quot -- )
-    >r output-stream get make-block-stream
-    r> with-output-stream ; inline
+    [ output-stream get make-block-stream ] dip
+    with-output-stream ; inline
 
 : print ( string -- ) output-stream get stream-print ;
 
@@ -98,6 +98,9 @@ SYMBOL: error-stream
 
 : lines ( stream -- seq )
     [ [ readln dup ] [ ] [ drop ] produce ] with-input-stream ;
+
+: each-line ( quot -- )
+    [ [ readln dup ] ] dip [ drop ] while ; inline
 
 : contents ( stream -- str )
     [

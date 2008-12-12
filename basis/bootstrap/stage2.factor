@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors init namespaces words io
 kernel.private math memory continuations kernel io.files
-io.backend system parser vocabs sequences prettyprint
+io.backend system parser vocabs sequences
 vocabs.loader combinators splitting source-files strings
 definitions assocs compiler.errors compiler.units
-math.parser generic sets debugger command-line ;
+math.parser generic sets command-line ;
 IN: bootstrap.stage2
 
 SYMBOL: core-bootstrap-time
@@ -32,7 +32,7 @@ SYMBOL: bootstrap-time
 : count-words ( pred -- )
     all-words swap count number>string write ;
 
-: print-time ( time -- )
+: print-time ( ms -- )
     1000 /i
     60 /mod swap
     number>string write
@@ -59,15 +59,15 @@ SYMBOL: bootstrap-time
     "math compiler threads help io tools ui ui.tools unicode handbook" "include" set-global
     "" "exclude" set-global
 
-    parse-command-line
+    (command-line) parse-command-line
 
-    "-no-crossref" cli-args member? [ do-crossref ] unless
+    do-crossref
 
     ! Set dll paths
     os wince? [ "windows.ce" require ] when
     os winnt? [ "windows.nt" require ] when
 
-    "deploy-vocab" get [
+    "staging" get "deploy-vocab" get or [
         "stage2: deployment mode" print
     ] [
         "listener" require
@@ -86,30 +86,22 @@ SYMBOL: bootstrap-time
     f error set-global
     f error-continuation set-global
 
+    millis swap - bootstrap-time set-global
+    print-report
+
     "deploy-vocab" get [
         "tools.deploy.shaker" run
     ] [
-        [
-            boot
-            do-init-hooks
-            [
-                parse-command-line
-                run-user-init
-                "run" get run
-                output-stream get [ stream-flush ] when*
-            ] [ print-error 1 exit ] recover
-        ] set-boot-quot
-
-        millis swap - bootstrap-time set-global
-        print-report
+        "staging" get [
+            "resource:basis/bootstrap/finish-staging.factor" run-file
+        ] [
+            "resource:basis/bootstrap/finish-bootstrap.factor" run-file
+        ] if
 
         "output-image" get save-image-and-exit
     ] if
 ] [
-    :c
-    dup print-error flush
-    "listener" vocab
-    [ restarts. vocab-main execute ]
-    [ die ] if*
-    1 exit
+    drop
+    load-help? off
+    "resource:basis/bootstrap/bootstrap-error.factor" run-file
 ] recover

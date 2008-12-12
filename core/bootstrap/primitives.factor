@@ -1,13 +1,13 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays generic hashtables
-hashtables.private io kernel math math.order namespaces make
-parser sequences strings vectors words quotations assocs layouts
-classes classes.builtin classes.tuple classes.tuple.private
-kernel.private vocabs vocabs.loader source-files definitions
-slots classes.union classes.intersection classes.predicate
-compiler.units bootstrap.image.private io.files accessors
-combinators ;
+hashtables.private io kernel math math.private math.order
+namespaces make parser sequences strings vectors words
+quotations assocs layouts classes classes.builtin classes.tuple
+classes.tuple.private kernel.private vocabs vocabs.loader
+source-files definitions slots classes.union
+classes.intersection classes.predicate compiler.units
+bootstrap.image.private io.files accessors combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -68,7 +68,6 @@ bootstrapping? on
     "alien.accessors"
     "arrays"
     "byte-arrays"
-    "byte-vectors"
     "classes.private"
     "classes.tuple"
     "classes.tuple.private"
@@ -109,9 +108,6 @@ bootstrapping? on
 } [ create-vocab drop ] each
 
 ! Builtin classes
-: define-builtin-predicate ( class -- )
-    dup class>type [ builtin-instance? ] curry define-predicate ;
-
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
 
@@ -129,8 +125,7 @@ bootstrapping? on
     [ "slots" set-word-prop ] [ define-accessors ] 2bi ;
 
 : define-builtin ( symbol slotspec -- )
-    >r [ define-builtin-predicate ] keep
-    r> define-builtin-slots ;
+    [ [ define-builtin-predicate ] keep ] dip define-builtin-slots ;
 
 "fixnum" "math" create register-builtin
 "bignum" "math" create register-builtin
@@ -186,8 +181,16 @@ define-union-class
 ! A predicate class used for declarations
 "array-capacity" "sequences.private" create
 "fixnum" "math" lookup
-0 bootstrap-max-array-capacity <fake-bignum> [ between? ] 2curry
+[
+    [ dup 0 fixnum>= ] %
+    bootstrap-max-array-capacity <fake-bignum> [ fixnum<= ] curry ,
+    [ [ drop f ] if ] %
+] [ ] make
 define-predicate-class
+
+"array-capacity" "sequences.private" lookup
+[ >fixnum ] bootstrap-max-array-capacity <fake-bignum> [ fixnum-bitand ] curry append
+"coercer" set-word-prop
 
 ! Catch-all class for providing a default method.
 "object" "kernel" create
@@ -303,7 +306,13 @@ tuple
     [ f "inline" set-word-prop ]
     [ make-flushable ]
     [ ]
-    [ tuple-layout [ <tuple-boa> ] curry ]
+    [
+        [
+            callable instance-check-quot %
+            tuple-layout ,
+            \ <tuple-boa> ,
+        ] [ ] make
+    ]
 } cleave
 (( obj quot -- curry )) define-declared
 
@@ -319,7 +328,14 @@ tuple
     [ f "inline" set-word-prop ]
     [ make-flushable ]
     [ ]
-    [ tuple-layout [ <tuple-boa> ] curry ]
+    [
+        [
+            callable instance-check-quot [ dip ] curry %
+            callable instance-check-quot %
+            tuple-layout ,
+            \ <tuple-boa> ,
+        ] [ ] make
+    ]
 } cleave
 (( quot1 quot2 -- compose )) define-declared
 
@@ -332,6 +348,7 @@ tuple
 {
     { "(execute)" "words.private" }
     { "(call)" "kernel.private" }
+    { "both-fixnums?" "math.private" }
     { "fixnum+fast" "math.private" }
     { "fixnum-fast" "math.private" }
     { "fixnum*fast" "math.private" }
@@ -341,6 +358,8 @@ tuple
     { "fixnum-bitnot" "math.private" }
     { "fixnum-mod" "math.private" }
     { "fixnum-shift-fast" "math.private" }
+    { "fixnum/i-fast" "math.private" }
+    { "fixnum/mod-fast" "math.private" }
     { "fixnum<" "math.private" }
     { "fixnum<=" "math.private" }
     { "fixnum>" "math.private" }
@@ -372,7 +391,7 @@ tuple
 
 ! Primitive words
 : make-primitive ( word vocab n -- )
-    >r create dup reset-word r>
+    [ create dup reset-word ] dip
     [ do-primitive ] curry [ ] like define ;
 
 {
@@ -443,12 +462,13 @@ tuple
     { "exit" "system" }
     { "data-room" "memory" }
     { "code-room" "memory" }
-    { "millis" "system" }
+    { "micros" "system" }
     { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
     { "dlsym" "alien" }
     { "dlclose" "alien" }
     { "<byte-array>" "byte-arrays" }
+    { "(byte-array)" "byte-arrays" }
     { "<displaced-alien>" "alien" }
     { "alien-signed-cell" "alien.accessors" }
     { "set-alien-signed-cell" "alien.accessors" }
@@ -480,7 +500,8 @@ tuple
     { "alien-address" "alien" }
     { "set-slot" "slots.private" }
     { "string-nth" "strings.private" }
-    { "set-string-nth" "strings.private" }
+    { "set-string-nth-fast" "strings.private" }
+    { "set-string-nth-slow" "strings.private" }
     { "resize-array" "arrays" }
     { "resize-string" "strings" }
     { "<array>" "arrays" }
@@ -515,8 +536,10 @@ tuple
     { "dll-valid?" "alien" }
     { "unimplemented" "kernel.private" }
     { "gc-reset" "memory" }
+    { "jit-compile" "quotations" }
+    { "load-locals" "locals.backend" }
 }
-[ >r first2 r> make-primitive ] each-index
+[ [ first2 ] dip make-primitive ] each-index
 
 ! Bump build number
 "build" "kernel" create build 1+ 1quotation define

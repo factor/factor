@@ -39,9 +39,9 @@ typedef enum {
 	JIT_PRIMITIVE,
 	JIT_WORD_JUMP,
 	JIT_WORD_CALL,
-	JIT_PUSH_LITERAL,
 	JIT_IF_WORD,
-	JIT_IF_JUMP,
+	JIT_IF_1,
+	JIT_IF_2,
 	JIT_DISPATCH_WORD,
 	JIT_DISPATCH,
 	JIT_EPILOG,
@@ -50,6 +50,12 @@ typedef enum {
 	JIT_PUSH_IMMEDIATE,
 	JIT_DECLARE_WORD    = 42,
 	JIT_SAVE_STACK,
+	JIT_DIP_WORD,
+	JIT_DIP,
+	JIT_2DIP_WORD,
+	JIT_2DIP,
+	JIT_3DIP_WORD,
+	JIT_3DIP,
 
 	STACK_TRACES_ENV    = 59,
 
@@ -211,6 +217,8 @@ typedef struct _F_CONTEXT {
 
 DLLEXPORT F_CONTEXT *stack_chain;
 
+F_CONTEXT *unused_contexts;
+
 CELL ds_size, rs_size;
 
 #define ds_bot (stack_chain->datastack_region->start)
@@ -236,8 +244,9 @@ void primitive_os_envs(void);
 void primitive_set_os_env(void);
 void primitive_unset_os_env(void);
 void primitive_set_os_envs(void);
-void primitive_millis(void);
+void primitive_micros(void);
 void primitive_sleep(void);
 void primitive_set_slot(void);
+void primitive_load_locals(void);
 
 bool stage2;

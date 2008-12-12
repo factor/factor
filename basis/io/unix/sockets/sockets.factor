@@ -16,18 +16,18 @@ IN: io.unix.sockets
     0 socket dup io-error <fd> init-fd |dispose ;
 
 : set-socket-option ( fd level opt -- )
-    >r >r handle-fd r> r> 1 <int> "int" heap-size setsockopt io-error ;
+    [ handle-fd ] 2dip 1 <int> "int" heap-size setsockopt io-error ;
 
 M: unix addrinfo-error ( n -- )
     dup zero? [ drop ] [ gai_strerror throw ] if ;
 
 ! Client sockets - TCP and Unix domain
 M: object (get-local-address) ( handle remote -- sockaddr )
-    >r handle-fd r> empty-sockaddr/size <int>
+    [ handle-fd ] dip empty-sockaddr/size <int>
     [ getsockname io-error ] 2keep drop ;
 
 M: object (get-remote-address) ( handle local -- sockaddr )
-    >r handle-fd r> empty-sockaddr/size <int>
+    [ handle-fd ] dip empty-sockaddr/size <int>
     [ getpeername io-error ] 2keep drop ;
 
 : init-client-socket ( fd -- )
@@ -60,7 +60,7 @@ M: object ((client)) ( addrspec -- fd )
     SOL_SOCKET SO_REUSEADDR set-socket-option ;
 
 : server-socket-fd ( addrspec type -- fd )
-    >r dup protocol-family r> socket-fd
+    [ dup protocol-family ] dip socket-fd
     dup init-server-socket
     dup handle-fd rot make-sockaddr/size bind io-error ;
 
@@ -77,7 +77,7 @@ M: object (server) ( addrspec -- handle )
 M: object (accept) ( server addrspec -- fd sockaddr )
     2dup do-accept
     {
-        { [ over 0 >= ] [ >r 2nip <fd> init-fd r> ] }
+        { [ over 0 >= ] [ [ 2nip <fd> init-fd ] dip ] }
         { [ err_no EINTR = ] [ 2drop (accept) ] }
         { [ err_no EAGAIN = ] [
             2drop
@@ -114,7 +114,7 @@ SYMBOL: receive-buffer
     ] call ;
 
 M: unix (receive) ( datagram -- packet sockaddr )
-    dup do-receive dup [ rot drop ] [
+    dup do-receive dup [ [ drop ] 2dip ] [
         2drop [ +input+ wait-for-port ] [ (receive) ] bi
     ] if ;
 

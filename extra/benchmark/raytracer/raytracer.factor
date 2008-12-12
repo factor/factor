@@ -1,7 +1,7 @@
 ! Factor port of the raytracer benchmark from
 ! http://www.ffconsultancy.com/free/ray_tracer/languages.html
 
-USING: arrays accessors float-arrays io io.files
+USING: arrays accessors specialized-arrays.double io io.files
 io.encodings.binary kernel math math.functions math.vectors
 math.parser make sequences sequences.private words hints ;
 IN: benchmark.raytracer
@@ -9,7 +9,7 @@ IN: benchmark.raytracer
 ! parameters
 : light
     #! Normalized { -1 -3 2 }.
-    F{
+    double-array{
         -0.2672612419124244
         -0.8017837257372732
         0.5345224838248488
@@ -23,17 +23,17 @@ IN: benchmark.raytracer
 
 : delta 1.4901161193847656E-8 ; inline
 
-TUPLE: ray { orig float-array read-only } { dir float-array read-only } ;
+TUPLE: ray { orig double-array read-only } { dir double-array read-only } ;
 
 C: <ray> ray
 
-TUPLE: hit { normal float-array read-only } { lambda float read-only } ;
+TUPLE: hit { normal double-array read-only } { lambda float read-only } ;
 
 C: <hit> hit
 
 GENERIC: intersect-scene ( hit ray scene -- hit )
 
-TUPLE: sphere { center float-array read-only } { radius float read-only } ;
+TUPLE: sphere { center double-array read-only } { radius float read-only } ;
 
 C: <sphere> sphere
 
@@ -87,7 +87,7 @@ TUPLE: group < sphere { objs array read-only } ;
 M: group intersect-scene ( hit ray group -- hit )
     [ drop objs>> [ intersect-scene ] with each ] if-ray-sphere ;
 
-: initial-hit T{ hit f F{ 0.0 0.0 0.0 } 1/0. } ; inline
+: initial-hit T{ hit f double-array{ 0.0 0.0 0.0 } 1/0. } ; inline
 
 : initial-intersect ( ray scene -- hit )
     [ initial-hit ] 2dip intersect-scene ; inline
@@ -120,10 +120,10 @@ DEFER: create ( level c r -- scene )
 
 : create-offsets ( quot -- )
     {
-        F{ -1.0 1.0 -1.0 }
-        F{ 1.0 1.0 -1.0 }
-        F{ -1.0 1.0 1.0 }
-        F{ 1.0 1.0 1.0 }
+        double-array{ -1.0 1.0 -1.0 }
+        double-array{ 1.0 1.0 -1.0 }
+        double-array{ -1.0 1.0 1.0 }
+        double-array{ 1.0 1.0 1.0 }
     } swap each ; inline
 
 : create-bound ( c r -- sphere ) 3.0 * <sphere> ;
@@ -138,14 +138,14 @@ DEFER: create ( level c r -- scene )
     pick 1 = [ <sphere> nip ] [ create-group ] if ;
 
 : ss-point ( dx dy -- point )
-    [ oversampling /f ] bi@ 0.0 3float-array ;
+    [ oversampling /f ] bi@ 0.0 double-array{ } 3sequence ;
 
 : ss-grid ( -- ss-grid )
     oversampling [ oversampling [ ss-point ] with map ] map ;
 
 : ray-grid ( point ss-grid -- ray-grid )
     [
-        [ v+ normalize F{ 0.0 0.0 -4.0 } swap <ray> ] with map
+        [ v+ normalize double-array{ 0.0 0.0 -4.0 } swap <ray> ] with map
     ] with map ;
 
 : ray-pixel ( scene point -- n )
@@ -156,7 +156,7 @@ DEFER: create ( level c r -- scene )
     size reverse [
         size [
             [ size 0.5 * - ] bi@ swap size
-            3float-array
+            double-array{ } 3sequence
         ] with map
     ] map ;
 
@@ -169,7 +169,7 @@ DEFER: create ( level c r -- scene )
     pixel-grid [ [ ray-pixel ] with map ] with map ;
 
 : run ( -- string )
-    levels F{ 0.0 -1.0 0.0 } 1.0 create ray-trace [
+    levels double-array{ 0.0 -1.0 0.0 } 1.0 create ray-trace [
         size size pgm-header
         [ [ oversampling sq / pgm-pixel ] each ] each
     ] B{ } make ;

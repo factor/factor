@@ -4,8 +4,8 @@ USING: kernel words sequences lexer parser fry ;
 IN: cpu.x86.assembler.syntax
 
 : define-register ( name num size -- )
-    >r >r "cpu.x86.assembler" create dup define-symbol r> r>
-    >r dupd "register" set-word-prop r>
+    [ "cpu.x86.assembler" create dup define-symbol ] 2dip
+    [ dupd "register" set-word-prop ] dip
     "register-size" set-word-prop ;
 
 : define-registers ( names size -- )

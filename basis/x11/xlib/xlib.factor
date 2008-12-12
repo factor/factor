@@ -13,7 +13,7 @@
 
 USING: kernel arrays alien alien.c-types alien.strings
 alien.syntax math math.bitwise words sequences namespaces
-continuations io.encodings.ascii ;
+continuations io io.encodings.ascii ;
 IN: x11.xlib
 
 LIBRARY: xlib
@@ -272,6 +272,17 @@ FUNCTION: Window XGetSelectionOwner ( Display* display, Atom selection ) ;
 
 FUNCTION: int XConvertSelection ( Display* display, Atom selection, Atom target, Atom property, Window requestor, Time time ) ;
 
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 5 - Pixmap and Cursor Functions
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! 5.1 - Creating and Freeing Pixmaps
+
+FUNCTION: Pixmap XCreatePixmap ( Display* display, Drawable d, uint width, uint height, uint depth ) ;
+FUNCTION: int XFreePixmap ( Display* display, Pixmap pixmap ) ;
+
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 6 - Color Management Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -428,6 +439,49 @@ FUNCTION: Status XDrawString (
         int y,
         char* string,
         int length ) ;
+
+! 8.7 - Transferring Images between Client and Server
+
+: XYBitmap 0 ; inline
+: XYPixmap 1 ; inline
+: ZPixmap  2 ; inline
+: AllPlanes -1 ; inline
+
+C-STRUCT: XImage-funcs
+    { "void*" "create_image" }
+    { "void*" "destroy_image" }
+    { "void*" "get_pixel" }
+    { "void*" "put_pixel" }
+    { "void*" "sub_image" }
+    { "void*" "add_pixel" } ;
+
+C-STRUCT: XImage
+    { "int"          "width" }
+    { "int"          "height" }
+    { "int"          "xoffset" }
+    { "int"          "format" }
+    { "char*"        "data" }
+    { "int"          "byte_order" }
+    { "int"          "bitmap_unit" }
+    { "int"          "bitmap_bit_order" }
+    { "int"          "bitmap_pad" }
+    { "int"          "depth" }
+    { "int"          "bytes_per_line" }
+    { "int"          "bits_per_pixel" }
+    { "ulong"        "red_mask" }
+    { "ulong"        "green_mask" }
+    { "ulong"        "blue_mask" }
+    { "XPointer"     "obdata" }
+    { "XImage-funcs" "f" } ;
+
+FUNCTION: XImage* XGetImage ( Display* display, Drawable d, int x, int y, uint width, uint height, ulong plane_mask, int format ) ;
+FUNCTION: int XDestroyImage ( XImage *ximage ) ;
+
+: XImage-size ( ximage -- size )
+    [ XImage-height ] [ XImage-bytes_per_line ] bi * ;
+
+: XImage-pixels ( ximage -- byte-array )
+    [ XImage-data ] [ XImage-size ] bi memory>byte-array ;
 
 !
 ! 9 - Window and Session Manager Functions
@@ -1359,8 +1413,8 @@ SYMBOL: scr
 SYMBOL: root
 
 : init-locale ( -- )
-   LC_ALL "" setlocale [ "setlocale() failed" throw ] unless
-   XSupportsLocale [ "XSupportsLocale() failed" throw ] unless ;
+   LC_ALL "" setlocale [ "setlocale() failed" print flush ] unless
+   XSupportsLocale [ "XSupportsLocale() failed" print flush ] unless ;
 
 : flush-dpy ( -- ) dpy get XFlush drop ;
 
@@ -1381,4 +1435,4 @@ SYMBOL: root
 : close-x ( -- ) dpy get XCloseDisplay drop ;
 
 : with-x ( display-string quot -- )
-    >r initialize-x r> [ close-x ] [ ] cleanup ;
+    [ initialize-x ] dip [ close-x ] [ ] cleanup ;

@@ -1,15 +1,26 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman, Eduardo
 ! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private namespaces math
-math.ranges combinators macros quotations fry arrays ;
+USING: kernel sequences sequences.private math math.ranges
+combinators macros quotations fry ;
 IN: generalizations
 
-MACRO: nsequence ( n seq -- quot )
-    [ drop <reversed> ] [ '[ _ _ new-sequence ] ] 2bi
-    [ '[ @ [ _ swap set-nth-unsafe ] keep ] ] reduce ;
+<<
 
-MACRO: narray ( n -- quot )
+: n*quot ( n seq -- seq' ) <repetition> concat >quotation ;
+
+: repeat ( n obj quot -- ) swapd times ; inline
+
+>>
+
+MACRO: nsequence ( n seq -- )
+    [
+        [ drop <reversed> ] [ '[ _ _ new-sequence ] ] 2bi
+        [ '[ @ [ _ swap set-nth-unsafe ] keep ] ] reduce
+    ] keep
+    '[ @ _ like ] ;
+
+MACRO: narray ( n -- )
     '[ _ { } nsequence ] ;
 
 MACRO: firstn ( n -- )
@@ -20,38 +31,37 @@ MACRO: firstn ( n -- )
     ] if ;
 
 MACRO: npick ( n -- )
-    1- dup saver [ dup ] rot [ r> swap ] n*quot 3append ;
+    1- [ dup ] [ '[ _ dip swap ] ] repeat ;
 
 MACRO: ndup ( n -- )
     dup '[ _ npick ] n*quot ;
 
 MACRO: nrot ( n -- )
-    1- dup saver swap [ r> swap ] n*quot append ;
+    1- [ ] [ '[ _ dip swap ] ] repeat ;
 
 MACRO: -nrot ( n -- )
-    1- dup [ swap >r ] n*quot swap restorer append ;
+    1- [ ] [ '[ swap _ dip ] ] repeat ;
 
 MACRO: ndrop ( n -- )
     [ drop ] n*quot ;
 
-: nnip ( n -- )
-    swap >r ndrop r> ; inline
+MACRO: nnip ( n -- )
+    '[ [ _ ndrop ] dip ] ;
 
 MACRO: ntuck ( n -- )
-    2 + [ dupd -nrot ] curry ;
+    2 + '[ dup _ -nrot ] ;
 
-MACRO: nrev ( n -- quot )
+MACRO: nrev ( n -- )
     1 [a,b] [ ] [ '[ @ _ -nrot ] ] reduce ;
 
 MACRO: ndip ( quot n -- )
-    dup saver -rot restorer 3append ;
+    [ '[ _ dip ] ] times ;
 
 MACRO: nslip ( n -- )
-    dup saver [ call ] rot restorer 3append ;
+    '[ [ call ] _ ndip ] ;
 
-MACRO: nkeep ( n -- )
-    [ ] [ 1+ ] [ ] tri
-    '[ [ _ ndup ] dip _ -nrot _ nslip ] ;
+MACRO: nkeep ( quot n -- )
+    tuck '[ _ ndup _ _ ndip ] ;
 
 MACRO: ncurry ( n -- )
     [ curry ] n*quot ;
@@ -59,7 +69,14 @@ MACRO: ncurry ( n -- )
 MACRO: nwith ( n -- )
     [ with ] n*quot ;
 
+MACRO: ncleave ( quots n -- )
+    [ '[ _ '[ _ _ nkeep ] ] map [ ] join ] [ '[ _ ndrop ] ] bi
+    compose ;
+
 MACRO: napply ( n -- )
     2 [a,b]
-    [ [ 1- ] keep '[ _ ntuck _ nslip ] ]
+    [ [ 1- ] [ ] bi '[ _ ntuck _ nslip ] ]
     map concat >quotation [ call ] append ;
+
+MACRO: mnswap ( m n -- )
+    1+ '[ _ -nrot ] <repetition> spread>quot ;

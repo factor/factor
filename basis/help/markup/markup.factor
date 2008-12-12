@@ -97,7 +97,7 @@ ALIAS: $slot $snippet
     [
         snippet-style get [
             last-element off
-            >r ($code-style) r> with-nesting
+            [ ($code-style) ] dip with-nesting
         ] with-style
     ] ($block) ; inline
 
@@ -290,6 +290,12 @@ M: f ($instance)
 : $definition ( element -- )
     "Definition" $heading $see ;
 
+: $methods ( element -- )
+    first methods [
+        "Methods" $heading
+        [ see-all ] ($see)
+    ] unless-empty ;
+
 : $value ( object -- )
     "Variable value" $heading
     "Current value in global namespace:" print-element
@@ -348,3 +354,6 @@ M: array elements*
             ] each
         ] curry each
     ] H{ } make-assoc keys ;
+
+: <$link> ( topic -- element )
+    \ $link swap 2array ;

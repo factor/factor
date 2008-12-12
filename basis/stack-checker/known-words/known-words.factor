@@ -5,12 +5,12 @@ classes sequences.private continuations.private effects generic
 hashtables hashtables.private io io.backend io.files
 io.files.private io.streams.c kernel kernel.private math
 math.private memory namespaces namespaces.private parser
-prettyprint quotations quotations.private sbufs sbufs.private
+quotations quotations.private sbufs sbufs.private
 sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
-combinators locals locals.backend locals.private words.private
+combinators locals locals.backend locals.types words.private
 quotations.private stack-checker.values
 stack-checker.alien
 stack-checker.state
@@ -63,7 +63,9 @@ IN: stack-checker.known-words
 
 GENERIC: infer-call* ( value known -- )
 
-: infer-call ( value -- ) dup known infer-call* ;
+: (infer-call) ( value -- ) dup known infer-call* ;
+
+: infer-call ( -- ) pop-d (infer-call) ;
 
 M: literal infer-call*
     [ 1array #drop, ] [ infer-literal-quot ] bi* ;
@@ -73,7 +75,7 @@ M: curried infer-call*
     [ uncurry ] infer-quot-here
     [ quot>> known pop-d [ set-known ] keep ]
     [ obj>> known pop-d [ set-known ] keep ] bi
-    push-d infer-call ;
+    push-d (infer-call) ;
 
 M: composed infer-call*
     swap push-d
@@ -81,11 +83,38 @@ M: composed infer-call*
     [ quot2>> known pop-d [ set-known ] keep ]
     [ quot1>> known pop-d [ set-known ] keep ] bi
     push-d push-d
-    1 infer->r pop-d infer-call
-    terminated? get [ 1 infer-r> pop-d infer-call ] unless ;
+    1 infer->r infer-call
+    terminated? get [ 1 infer-r> infer-call ] unless ;
 
 M: object infer-call*
     \ literal-expected inference-warning ;
+
+: infer-slip ( -- )
+    1 infer->r infer-call 1 infer-r> ;
+
+: infer-2slip ( -- )
+    2 infer->r infer-call 2 infer-r> ;
+
+: infer-3slip ( -- )
+    3 infer->r infer-call 3 infer-r> ;
+
+: infer-dip ( -- )
+    literals get
+    [ \ dip def>> infer-quot-here ]
+    [ pop 1 infer->r infer-quot-here 1 infer-r>  ]
+    if-empty ;
+
+: infer-2dip ( -- )
+    literals get
+    [ \ 2dip def>> infer-quot-here ]
+    [ pop 2 infer->r infer-quot-here 2 infer-r>  ]
+    if-empty ;
+
+: infer-3dip ( -- )
+    literals get
+    [ \ 3dip def>> infer-quot-here ]
+    [ pop 3 infer->r infer-quot-here 3 infer-r>  ]
+    if-empty ;
 
 : infer-curry ( -- )
     2 consume-d
@@ -125,11 +154,11 @@ M: object infer-call*
 
 : infer-load-locals ( -- )
     pop-literal nip
-    consume-d dup reverse copy-values dup output-r
-    [ [ f f ] dip ] [ reverse swap zip ] 2bi #shuffle, ;
+    consume-d dup copy-values dup output-r
+    [ [ f f ] dip ] [ swap zip ] 2bi #shuffle, ;
 
 : infer-get-local ( -- )
-    [let* | n [ pop-literal nip ]
+    [let* | n [ pop-literal nip 1 swap - ]
             in-r [ n consume-r ]
             out-d [ in-r first copy-value 1array ]
             out-r [ in-r copy-values ] |
@@ -148,8 +177,14 @@ M: object infer-call*
         { \ >r [ 1 infer->r ] }
         { \ r> [ 1 infer-r> ] }
         { \ declare [ infer-declare ] }
-        { \ call [ pop-d infer-call ] }
-        { \ (call) [ pop-d infer-call ] }
+        { \ call [ infer-call ] }
+        { \ (call) [ infer-call ] }
+        { \ slip [ infer-slip ] }
+        { \ 2slip [ infer-2slip ] }
+        { \ 3slip [ infer-3slip ] }
+        { \ dip [ infer-dip ] }
+        { \ 2dip [ infer-2dip ] }
+        { \ 3dip [ infer-3dip ] }
         { \ curry [ infer-curry ] }
         { \ compose [ infer-compose ] }
         { \ execute [ infer-execute ] }
@@ -162,7 +197,7 @@ M: object infer-call*
         { \ load-locals [ infer-load-locals ] }
         { \ get-local [ infer-get-local ] }
         { \ drop-locals [ infer-drop-locals ] }
-        { \ do-primitive [ \ do-primitive cannot-infer-effect ] }
+        { \ do-primitive [ unknown-primitive-error inference-warning ] }
         { \ alien-invoke [ infer-alien-invoke ] }
         { \ alien-indirect [ infer-alien-indirect ] }
         { \ alien-callback [ infer-alien-callback ] }
@@ -174,10 +209,14 @@ M: object infer-call*
 : infer-local-writer ( word -- )
     (( value -- )) apply-word/effect ;
 
+: infer-local-word ( word -- )
+    "local-word-def" word-prop infer-quot-here ;
+
 {
-    >r r> declare call (call) curry compose execute (execute) if
-dispatch <tuple-boa> (throw) load-locals get-local drop-locals
-do-primitive alien-invoke alien-indirect alien-callback
+    >r r> declare call (call) slip 2slip 3slip dip 2dip 3dip
+    curry compose execute (execute) if dispatch <tuple-boa>
+    (throw) load-locals get-local drop-locals do-primitive
+    alien-invoke alien-indirect alien-callback
 } [ t "special" set-word-prop ] each
 
 { call execute dispatch load-locals get-local drop-locals }
@@ -196,6 +235,7 @@ do-primitive alien-invoke alien-indirect alien-callback
         { [ dup local? ] [ infer-local-reader ] }
         { [ dup local-reader? ] [ infer-local-reader ] }
         { [ dup local-writer? ] [ infer-local-writer ] }
+        { [ dup local-word? ] [ infer-local-word ] }
         { [ dup recursive-word? ] [ call-recursive-word ] }
         [ dup infer-word apply-word/effect ]
     } cond ;
@@ -263,6 +303,8 @@ do-primitive alien-invoke alien-indirect alien-callback
 
 \ <complex> { real real } { complex } define-primitive
 \ <complex> make-foldable
+
+\ both-fixnums? { object object } { object } define-primitive
 
 \ fixnum+ { fixnum fixnum } { integer } define-primitive
 \ fixnum+ make-foldable
@@ -423,8 +465,8 @@ do-primitive alien-invoke alien-indirect alien-callback
 \ code-room { } { integer integer integer integer } define-primitive
 \ code-room  make-flushable
 
-\ millis { } { integer } define-primitive
-\ millis make-flushable
+\ micros { } { integer } define-primitive
+\ micros make-flushable
 
 \ tag { object } { fixnum } define-primitive
 \ tag make-foldable
@@ -437,6 +479,9 @@ do-primitive alien-invoke alien-indirect alien-callback
 
 \ <byte-array> { integer } { byte-array } define-primitive
 \ <byte-array> make-flushable
+
+\ (byte-array) { integer } { byte-array } define-primitive
+\ (byte-array) make-flushable
 
 \ <displaced-alien> { integer c-ptr } { c-ptr } define-primitive
 \ <displaced-alien> make-flushable
@@ -517,7 +562,8 @@ do-primitive alien-invoke alien-indirect alien-callback
 \ string-nth { fixnum string } { fixnum } define-primitive
 \ string-nth make-flushable
 
-\ set-string-nth { fixnum fixnum string } { } define-primitive
+\ set-string-nth-slow { fixnum fixnum string } { } define-primitive
+\ set-string-nth-fast { fixnum fixnum string } { } define-primitive
 
 \ resize-array { integer array } { array } define-primitive
 \ resize-array make-flushable
@@ -601,3 +647,9 @@ do-primitive alien-invoke alien-indirect alien-callback
 \ modify-code-heap { array object } { } define-primitive
 
 \ unimplemented { } { } define-primitive
+
+\ gc-reset { } { } define-primitive
+
+\ gc-stats { } { array } define-primitive
+
+\ jit-compile { quotation } { } define-primitive

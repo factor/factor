@@ -1,10 +1,10 @@
 IN: generic.standard.tests
 USING: tools.test math math.functions math.constants
-generic.standard strings sequences arrays kernel accessors
-words float-arrays byte-arrays bit-arrays parser namespaces make
-quotations stack-checker vectors growable hashtables sbufs
-prettyprint byte-vectors bit-vectors float-vectors definitions
-generic sets graphs assocs ;
+generic.standard strings sequences arrays kernel accessors words
+specialized-arrays.double byte-arrays bit-arrays parser
+namespaces make quotations stack-checker vectors growable
+hashtables sbufs prettyprint byte-vectors bit-vectors
+specialized-vectors.double definitions generic sets graphs assocs ;
 
 GENERIC: lo-tag-test ( obj -- obj' )
 
@@ -110,14 +110,14 @@ M: circle big-mix-test drop "circle" ;
 [ "integer" ] [ 3 big-mix-test ] unit-test
 [ "float" ] [ 5.0 big-mix-test ] unit-test
 [ "complex" ] [ -1 sqrt big-mix-test ] unit-test
-[ "sequence" ] [ F{ 1.0 2.0 3.0 } big-mix-test ] unit-test
+[ "sequence" ] [ double-array{ 1.0 2.0 3.0 } big-mix-test ] unit-test
 [ "sequence" ] [ B{ 1 2 3 } big-mix-test ] unit-test
 [ "sequence" ] [ ?{ t f t } big-mix-test ] unit-test
 [ "sequence" ] [ SBUF" hello world" big-mix-test ] unit-test
 [ "sequence" ] [ V{ "a" "b" } big-mix-test ] unit-test
 [ "sequence" ] [ BV{ 1 2 } big-mix-test ] unit-test
 [ "sequence" ] [ ?V{ t t f f } big-mix-test ] unit-test
-[ "sequence" ] [ FV{ -0.3 4.6 } big-mix-test ] unit-test
+[ "sequence" ] [ double-vector{ -0.3 4.6 } big-mix-test ] unit-test
 [ "string" ] [ "hello" big-mix-test ] unit-test
 [ "rectangle" ] [ 1 2 <rectangle> big-mix-test ] unit-test
 [ "parallelogram" ] [ 10 4 3 <parallelogram> big-mix-test ] unit-test
@@ -133,13 +133,13 @@ M: string small-lo-tag drop "string" ;
 
 M: array small-lo-tag drop "array" ;
 
-M: float-array small-lo-tag drop "float-array" ;
+M: double-array small-lo-tag drop "double-array" ;
 
 M: byte-array small-lo-tag drop "byte-array" ;
 
 [ "fixnum" ] [ 3 small-lo-tag ] unit-test
 
-[ "float-array" ] [ F{ 1.0 } small-lo-tag ] unit-test
+[ "double-array" ] [ double-array{ 1.0 } small-lo-tag ] unit-test
 
 ! Testing next-method
 TUPLE: person ;
@@ -200,7 +200,7 @@ M: ceo salary
 [ T{ inconsistent-next-method f ceo salary } = ] must-fail-with
 
 [ intern boa salary ]
-[ T{ no-next-method f intern salary } = ] must-fail-with
+[ no-next-method? ] must-fail-with
 
 ! Weird shit
 TUPLE: a ;

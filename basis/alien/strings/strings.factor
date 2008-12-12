@@ -2,14 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays sequences kernel accessors math alien.accessors
 alien.c-types byte-arrays words io io.encodings
-io.streams.byte-array io.streams.memory io.encodings.utf8
-io.encodings.utf16 system alien strings cpu.architecture ;
+io.encodings.utf8 io.streams.byte-array io.streams.memory system
+alien strings cpu.architecture fry vocabs.loader combinators ;
 IN: alien.strings
 
 GENERIC# alien>string 1 ( c-ptr encoding -- string/f )
 
 M: c-ptr alien>string
-    >r <memory-stream> r> <decoder>
+    [ <memory-stream> ] [ <decoder> ] bi*
     "\0" swap stream-read-until drop ;
 
 M: f alien>string
@@ -39,6 +39,9 @@ PREDICATE: string-type < pair
     first2 [ "char*" = ] [ word? ] bi* and ;
 
 M: string-type c-type ;
+
+M: string-type c-type-class
+    drop object ;
 
 M: string-type heap-size
     drop "void*" heap-size ;
@@ -74,10 +77,10 @@ M: string-type c-type-unboxer
     drop "void*" c-type-unboxer ;
 
 M: string-type c-type-boxer-quot
-    second [ alien>string ] curry [ ] like ;
+    second '[ _ alien>string ] ;
 
 M: string-type c-type-unboxer-quot
-    second [ string>alien ] curry [ ] like ;
+    second '[ _ string>alien ] ;
 
 M: string-type c-type-getter
     drop [ alien-cell ] ;
@@ -85,27 +88,22 @@ M: string-type c-type-getter
 M: string-type c-type-setter
     drop [ set-alien-cell ] ;
 
-! Native-order UTF-16
+HOOK: alien>native-string os ( alien -- string )
 
-SINGLETON: utf16n
-
-: utf16n ( -- descriptor )
-    little-endian? utf16le utf16be ? ; foldable
-
-M: utf16n <decoder> drop utf16n <decoder> ;
-
-M: utf16n <encoder> drop utf16n <encoder> ;
-
-: alien>native-string ( alien -- string )
-    os windows? [ utf16n ] [ utf8 ] if alien>string ;
+HOOK: native-string>alien os ( string -- alien )
 
 : dll-path ( dll -- string )
     path>> alien>native-string ;
 
 : string>symbol ( str -- alien )
-    [ os wince? [ utf16n ] [ utf8 ] if string>alien ]
-    over string? [ call ] [ map ] if ;
+    dup string?
+    [ native-string>alien ]
+    [ [ native-string>alien ] map ] if ;
 
 { "char*" utf8 } "char*" typedef
-{ "char*" utf16n } "wchar_t*" typedef
 "char*" "uchar*" typedef
+
+{
+    { [ os windows? ] [ "alien.strings.windows" require ] }
+    { [ os unix? ] [ "alien.strings.unix" require ] }
+} cond

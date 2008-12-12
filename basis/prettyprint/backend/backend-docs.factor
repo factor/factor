@@ -1,13 +1,9 @@
 USING: help.markup help.syntax io kernel
-prettyprint.config prettyprint.sections words strings ;
+prettyprint.config prettyprint.sections prettyprint.custom
+words strings ;
 IN: prettyprint.backend
 
 ABOUT: "prettyprint-extension"
-
-HELP: pprint*
-{ $values { "obj" "an object" } }
-{ $contract "Adds sections to the current block corresponding to the prettyprinted representation of the object." }
-$prettyprinting-note ;
 
 HELP: pprint-word
 { $values { "word" "a word" } }

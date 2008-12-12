@@ -15,9 +15,12 @@ HELP: fry
 } ;
 
 HELP: '[
-{ $syntax "code... ]" }
+{ $syntax "'[ code... ]" }
 { $description "Literal fried quotation. Expands into code which takes values from the stack and substitutes them in place of the fry specifiers " { $link _ } " and " { $link @ } "." }
 { $examples "See " { $link "fry.examples" } "." } ;
+
+HELP: >r/r>-in-fry-error
+{ $error-description "Thrown by " { $link POSTPONE: '[ } " if the fried quotation contains calls to " { $link >r } " or " { $link r> } ". Explicit retain stack manipulation of this form does not work with fry; use " { $link dip } " instead." } ;
 
 ARTICLE: "fry.examples" "Examples of fried quotations"
 "The easiest way to understand fried quotations is to look at some examples."
@@ -43,12 +46,14 @@ $nl
     "{ 10 20 30 } [ sq ] [ . ] compose each"
     "{ 10 20 30 } [ sq . ] each"
 }
-"The " { $link _ } " and " { $link @ } " specifiers may be freely mixed:"
+"The " { $link _ } " and " { $link @ } " specifiers may be freely mixed, and the result is considerably more concise and readable than the version using " { $link curry } " and " { $link compose } " directly:"
 { $code
     "{ 8 13 14 27 } [ even? ] 5 '[ @ dup _ ? ] map"
-    "{ 8 13 14 27 } [ even? ] 5 [ dup ] swap [ ? ] curry 3compose map"
+    "{ 8 13 14 27 } [ even? ] 5 [ dup ] swap [ ? ] curry compose compose map"
     "{ 8 13 14 27 } [ even? dup 5 ? ] map"
 }
+"The following is a no-op:"
+{ $code "'[ @ ]" }
 "Here are some built-in combinators rewritten in terms of fried quotations:"
 { $table
     { { $link literalize } { $snippet ": literalize '[ _ ] ;" } }
@@ -70,22 +75,21 @@ ARTICLE: "fry.philosophy" "Fried quotation philosophy"
     "[let | a [ ] b [ ] | [ 3 a + 4 b / ] ]"
 } ;
 
-ARTICLE: "fry.limitations" "Fried quotation limitations"
-"As with " { $vocab-link "locals" } ", fried quotations cannot contain " { $link >r } " and " { $link r> } ". This is not a real limitation in practice, since " { $link dip } " can be used instead." ;
-
 ARTICLE: "fry" "Fried quotations"
-"A " { $emphasis "fried quotation" } " differs from a literal quotation in that when it is evaluated, instead of just pushing itself on the stack, it consumes zero or more stack values and inserts them into the quotation."
+"The " { $vocab-link "fry" } " vocabulary implements " { $emphasis "fried quotation" } ". Conceptually, fried quotations are quotations with ``holes'' (more formally, " { $emphasis "fry specifiers" } "), and the holes are filled in when the fried quotation is pushed on the stack."
 $nl
-"Fried quotations are denoted with a special parsing word:"
+"Fried quotations are started by a special parsing word:"
 { $subsection POSTPONE: '[ }
-"Fried quotations contain zero or more " { $emphasis "fry specifiers" } ":"
+"There are two types of fry specifiers; the first can hold a value, and the second ``splices'' a quotation, as if it were inserted without surrounding brackets:"
 { $subsection _ }
 { $subsection @ }
-"When a fried quotation is being evaluated, values are consumed from the stack and spliced into the quotation from right to left."
+"The holes are filled in with the top of stack going in the rightmost hole, the second item on the stack going in the second hole from the right, and so on."
 { $subsection "fry.examples" }
 { $subsection "fry.philosophy" }
-{ $subsection "fry.limitations" }
-"Quotations can also be fried without using a parsing word:"
-{ $subsection fry } ;
+"Fry is implemented as a parsing word which reads a quotation and scans for occurrences of " { $link _ } " and " { $link @ } "; these words are not actually executed, and doing so raises an error (this can happen if they're accidentally used outside of a fry)."
+$nl
+"Fried quotations can also be constructed without using a parsing word; this is useful when meta-programming:"
+{ $subsection fry }
+"Fried quotations are an abstraction on top of the " { $link "compositional-combinators" } "; their use is encouraged over the combinators, because often the fry form is shorter and clearer than the combinator form." ;
 
 ABOUT: "fry"

@@ -31,16 +31,16 @@ M: sbuf equal?
 M: string new-resizable drop <sbuf> ;
 
 M: string like
+    #! If we have a string, we're done.
+    #! If we have an sbuf, and it's at full capacity, we're done.
+    #! Otherwise, call resize-string, which is a relatively
+    #! fast primitive.
     drop dup string? [
         dup sbuf? [
-            dup length over underlying>> length eq? [
-                underlying>> dup reset-string-hashcode
-            ] [
-                >string
-            ] if
-        ] [
-            >string
-        ] if
+            [ length ] [ underlying>> ] bi
+            2dup length eq?
+            [ nip dup reset-string-hashcode ] [ resize-string ] if
+        ] [ >string ] if
     ] unless ;
 
 INSTANCE: sbuf growable

@@ -13,10 +13,10 @@ SYMBOL: message-histogram
 
 : analyze-entry ( entry -- )
     dup level>> { ERROR CRITICAL } memq? [ dup errors get push ] when
-    1 over word-name>> word-histogram get at+
+    dup word-name>> word-histogram get inc-at
     dup word-name>> word-names get member? [
-        1 over [ level>> ] [ word-name>> ] [ message>> ] tri 3array
-        message-histogram get at+
+        dup [ level>> ] [ word-name>> ] [ message>> ] tri 3array
+        message-histogram get inc-at
     ] when
     drop ;
 
@@ -38,8 +38,8 @@ SYMBOL: message-histogram
 
 : histogram. ( assoc quot -- )
     standard-table-style [
-        >r >alist sort-values <reversed> r> [
-            [ >r swap r> with-cell pprint-cell ] with-row
+        [ >alist sort-values <reversed> ] dip [
+            [ swapd with-cell pprint-cell ] with-row
         ] curry assoc-each
     ] tabular-output ;
 
@@ -69,7 +69,7 @@ SYMBOL: message-histogram
     errors. ;
 
 : analyze-log ( lines word-names -- )
-    >r parse-log r> analyze-entries analysis. ;
+    [ parse-log ] dip analyze-entries analysis. ;
 
 : analyze-log-file ( service word-names -- )
-    >r parse-log-file r> analyze-entries analysis. ;
+    [ parse-log-file ] dip analyze-entries analysis. ;

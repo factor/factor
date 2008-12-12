@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! based on glx.h from xfree86, and some of glxtokens.h
-USING: alien alien.c-types alien.syntax alien.syntax.private x11.xlib
-namespaces make kernel sequences parser words ;
+USING: alien alien.c-types alien.syntax x11.xlib namespaces make
+kernel sequences parser words specialized-arrays.int accessors ;
 IN: x11.glx
 
 LIBRARY: glx
@@ -84,21 +84,21 @@ FUNCTION: void* glXGetProcAddress ( char* procname ) ;
 FUNCTION: void* glXGetProcAddressARB ( char* procname ) ;
 
 ! GLX Events
-! (also skipped for now. only has GLXPbufferClobberEvent, the rest is handled by xlib methinks
+! (also skipped for now. only has GLXPbufferClobberEvent, the rest is handled by xlib methinks)
 
-: choose-visual ( -- XVisualInfo* )
-    dpy get scr get
+: choose-visual ( flags -- XVisualInfo* )
+    [ dpy get scr get ] dip
     [
+        %
         GLX_RGBA ,
-        GLX_DOUBLEBUFFER ,
         GLX_DEPTH_SIZE , 16 ,
         0 ,
-    ] { } make >c-int-array
+    ] int-array{ } make underlying>>
     glXChooseVisual
     [ "Could not get a double-buffered GLX RGBA visual" throw ] unless* ;
 
 : create-glx ( XVisualInfo* -- GLXContext )
-    >r dpy get r> f 1 glXCreateContext
+    [ dpy get ] dip f 1 glXCreateContext
     [ "Failed to create GLX context" throw ] unless* ;
 
 : destroy-glx ( GLXContext -- )

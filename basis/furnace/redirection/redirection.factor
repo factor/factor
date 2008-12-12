@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors combinators namespaces fry urls http
 http.server http.server.redirection http.server.responses
-http.server.remapping http.server.filters furnace ;
+http.server.remapping http.server.filters furnace.utilities ;
 IN: furnace.redirection
 
 : <redirect> ( url -- response )

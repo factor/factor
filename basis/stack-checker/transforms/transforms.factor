@@ -19,11 +19,8 @@ IN: stack-checker.transforms
     rot with-datastack first2
     dup [
         [
-            [ drop ] [
-                [ length meta-d get '[ _ pop* ] times ]
-                [ #drop, ]
-                bi
-            ] bi*
+            [ drop ]
+            [ [ length meta-d shorten-by ] [ #drop, ] bi ] bi*
         ] 2dip
         swap infer-quot
     ] [
@@ -90,8 +87,15 @@ IN: stack-checker.transforms
 \ spread [ spread>quot ] 1 define-transform
 
 \ (call-next-method) [
-    [ [ inlined-dependency depends-on ] bi@ ] [ next-method-quot ] 2bi
-] 2 define-transform
+    [
+        [ "method-class" word-prop ]
+        [ "method-generic" word-prop ] bi
+        [ inlined-dependency depends-on ] bi@
+    ] [
+        [ next-method-quot ]
+        [ '[ _ no-next-method ] ] bi or
+    ] bi
+] 1 define-transform
 
 ! Constructors
 \ boa [

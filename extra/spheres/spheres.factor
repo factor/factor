@@ -15,16 +15,26 @@ main()
 ;
 
 STRING: plane-fragment-shader
+uniform float checker_size_inv;
+uniform vec4 checker_color_1, checker_color_2;
 varying vec3 object_position;
+
+bool
+checker_color(vec3 p)
+{
+    vec3 pprime = checker_size_inv * object_position;
+    return fract((floor(pprime.x) + floor(pprime.z)) * 0.5) == 0.0;
+}
+
 void
 main()
 {
     float distance_factor = (gl_FragCoord.z * 0.5 + 0.5);
     distance_factor = pow(distance_factor, 500.0)*0.5;
     
-    gl_FragColor = fract((floor(0.125*object_position.x)+floor(0.125*object_position.z)) * 0.5) == 0.0
-        ? vec4(1.0, 1.0 - distance_factor, 1.0 - distance_factor, 1.0)
-        : vec4(1.0, distance_factor, distance_factor, 1.0);
+    gl_FragColor = checker_color(object_position)
+        ? mix(checker_color_1, checker_color_2, distance_factor)
+        : mix(checker_color_2, checker_color_1, distance_factor);
 }
 ;
 
@@ -103,7 +113,7 @@ main()
 TUPLE: spheres-gadget < demo-gadget
     plane-program solid-sphere-program texture-sphere-program
     reflection-framebuffer reflection-depthbuffer
-    reflection-texture ;
+    reflection-texture initialized? ;
 
 : <spheres-gadget> ( -- gadget )
     20.0 10.0 20.0 spheres-gadget new-demo-gadget ;
@@ -172,9 +182,11 @@ M: spheres-gadget graft* ( gadget -- )
     (make-reflection-texture) >>reflection-texture
     (make-reflection-depthbuffer) [ >>reflection-depthbuffer ] keep
     (make-reflection-framebuffer) >>reflection-framebuffer
+    t >>initialized?
     drop ;
 
 M: spheres-gadget ungraft* ( gadget -- )
+    f >>initialized?
     dup find-gl-context
     {
         [ reflection-framebuffer>> [ delete-framebuffer ] when* ]
@@ -213,7 +225,11 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
         ] with-gl-program
     ] [
         plane-program>> [
-            drop
+            {
+                [ "checker_size_inv" glGetUniformLocation 0.125 glUniform1f ]
+                [ "checker_color_1"  glGetUniformLocation 1.0 0.0 0.0 1.0 glUniform4f ]
+                [ "checker_color_2"  glGetUniformLocation 1.0 1.0 1.0 1.0 glUniform4f ]
+            } cleave
             GL_QUADS [
                 -1000.0 -30.0  1000.0 glVertex3f
                 -1000.0 -30.0 -1000.0 glVertex3f
@@ -224,9 +240,8 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
     ] bi ;
 
 : reflection-frustum ( gadget -- -x x -y y near far )
-    [ near-plane ] [ far-plane ] bi [
-        drop dup [ -+ ] bi@
-    ] 2keep ;
+    [ near-plane ] [ far-plane ] bi
+    [ drop dup [ -+ ] bi@ ] 2keep ;
 
 : (reflection-face) ( gadget face -- )
     swap reflection-texture>> >r >r
@@ -266,7 +281,7 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
         [ dim>> 0 0 rot first2 glViewport ]
     } cleave ] with-framebuffer ;
 
-M: spheres-gadget draw-gadget* ( gadget -- )
+: (draw-gadget) ( gadget -- )
     GL_DEPTH_TEST glEnable
     GL_SCISSOR_TEST glDisable
     0.15 0.15 1.0 1.0 glClearColor {
@@ -282,6 +297,9 @@ M: spheres-gadget draw-gadget* ( gadget -- )
             ] with-gl-program
         ]
     } cleave ;
+
+M: spheres-gadget draw-gadget* ( gadget -- )
+    dup initialized?>> [ (draw-gadget) ] [ drop ] if ;
 
 : spheres-window ( -- )
     [ <spheres-gadget> "Spheres" open-window ] with-ui ;

@@ -1,10 +1,10 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces make
-prettyprint dlists deques sequences threads sequences words
-debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
-ui.gestures ui.backend ui.render continuations init combinators
-hashtables concurrency.flags sets accessors ;
+dlists deques sequences threads sequences words ui.gadgets
+ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend
+ui.render continuations init combinators hashtables
+concurrency.flags sets accessors calendar ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -60,23 +60,26 @@ SYMBOL: stop-after-last-window?
     focus-path f swap focus-gestures ;
 
 M: world graft*
-    dup (open-window)
-    dup title>> over set-title
-    request-focus ;
+    [ (open-window) ]
+    [ [ title>> ] keep set-title ]
+    [ request-focus ] tri ;
 
 : reset-world ( world -- )
     #! This is used when a window is being closed, but also
     #! when restoring saved worlds on image startup.
-    dup fonts>> clear-assoc
-    dup unfocus-world
-    f >>handle drop ;
+    [ fonts>> clear-assoc ]
+    [ unfocus-world ]
+    [ f >>handle drop ] tri ;
+
+: (ungraft-world) ( world -- )
+    [ free-fonts ]
+    [ hand-clicked close-global ]
+    [ hand-gadget close-global ] tri ;
 
 M: world ungraft*
-    dup free-fonts
-    dup hand-clicked close-global
-    dup hand-gadget close-global
-    dup handle>> (close-window)
-    reset-world ;
+    [ (ungraft-world) ]
+    [ handle>> (close-window) ]
+    [ reset-world ] tri ;
 
 : find-window ( quot -- world )
     windows get values
@@ -87,6 +90,7 @@ SYMBOL: ui-hook
 : init-ui ( -- )
     <dlist> \ graft-queue set-global
     <dlist> \ layout-queue set-global
+    <dlist> \ gesture-queue set-global
     V{ } clone windows set-global ;
 
 : restore-gadget-later ( gadget -- )
@@ -129,8 +133,8 @@ SYMBOL: ui-hook
 
 : notify ( gadget -- )
     dup graft-state>>
-    dup first { f f } { t t } ?
-    pick (>>graft-state) {
+    [ first { f f } { t t } ? >>graft-state ] keep
+    {
         { { f t } [ dup activate-control graft* ] }
         { { t f } [ dup deactivate-control ungraft* ] }
     } case ;
@@ -138,13 +142,21 @@ SYMBOL: ui-hook
 : notify-queued ( -- )
     graft-queue [ notify ] slurp-deque ;
 
+: send-queued-gestures ( -- )
+    gesture-queue [ send-queued-gesture notify-queued ] slurp-deque ;
+
 : update-ui ( -- )
-    [ notify-queued layout-queued redraw-worlds ] assert-depth ;
+    [
+        [
+            notify-queued
+            layout-queued
+            redraw-worlds
+            send-queued-gestures
+        ] assert-depth
+    ] [ ui-error ] recover ;
 
 : ui-wait ( -- )
-    10 sleep ;
-
-: ui-try ( quot -- ) [ ui-error ] recover ;
+    10 milliseconds sleep ;
 
 SYMBOL: ui-thread
 
@@ -156,11 +168,9 @@ SYMBOL: ui-thread
     \ ui-running get-global ;
 
 : update-ui-loop ( -- )
-    ui-running? ui-thread get-global self eq? and [
-        ui-notify-flag get lower-flag
-        [ update-ui ] ui-try
-        update-ui-loop
-    ] when ;
+    [ ui-running? ui-thread get-global self eq? and ]
+    [ ui-notify-flag get lower-flag update-ui ]
+    [ ] while ;
 
 : start-ui-thread ( -- )
     [ self ui-thread set-global update-ui-loop ]

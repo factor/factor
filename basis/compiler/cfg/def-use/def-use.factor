@@ -12,9 +12,15 @@ M: ##write-barrier defs-vregs [ card#>> ] [ table>> ] bi 2array ;
 M: ##unary/temp defs-vregs dst/tmp-vregs ;
 M: ##allot defs-vregs dst/tmp-vregs ;
 M: ##dispatch defs-vregs temp>> 1array ;
-M: ##slot defs-vregs [ dst>> ] [ temp>> ] bi 2array ;
+M: ##slot defs-vregs dst/tmp-vregs ;
 M: ##set-slot defs-vregs temp>> 1array ;
-M: ##string-nth defs-vregs [ dst>> ] [ temp>> ] bi 2array ;
+M: ##string-nth defs-vregs dst/tmp-vregs ;
+M: ##set-string-nth-fast defs-vregs temp>> 1array ;
+M: ##compare defs-vregs dst/tmp-vregs ;
+M: ##compare-imm defs-vregs dst/tmp-vregs ;
+M: ##compare-float defs-vregs dst/tmp-vregs ;
+M: ##fixnum-mul defs-vregs [ temp1>> ] [ temp2>> ] bi 2array ;
+M: ##fixnum-mul-tail defs-vregs [ temp1>> ] [ temp2>> ] bi 2array ;
 M: insn defs-vregs drop f ;
 
 M: ##unary uses-vregs src>> 1array ;
@@ -26,11 +32,13 @@ M: ##slot-imm uses-vregs obj>> 1array ;
 M: ##set-slot uses-vregs [ src>> ] [ obj>> ] [ slot>> ] tri 3array ;
 M: ##set-slot-imm uses-vregs [ src>> ] [ obj>> ] bi 2array ;
 M: ##string-nth uses-vregs [ obj>> ] [ index>> ] bi 2array ;
+M: ##set-string-nth-fast uses-vregs [ src>> ] [ obj>> ] [ index>> ] tri 3array ;
 M: ##conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: ##compare-imm-branch uses-vregs src1>> 1array ;
 M: ##dispatch uses-vregs src>> 1array ;
 M: ##alien-getter uses-vregs src>> 1array ;
 M: ##alien-setter uses-vregs [ src>> ] [ value>> ] bi 2array ;
+M: ##fixnum-overflow uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
 M: _compare-imm-branch uses-vregs src1>> 1array ;
 M: insn uses-vregs drop f ;
@@ -40,6 +48,7 @@ UNION: vreg-insn
 ##write-barrier
 ##dispatch
 ##effect
+##fixnum-overflow
 ##conditional-branch
 ##compare-imm-branch
 _conditional-branch

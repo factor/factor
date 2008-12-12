@@ -1,11 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types generic assocs kernel kernel.private
-math io.ports sequences strings sbufs threads unix
-vectors io.buffers io.backend io.encodings math.parser
+USING: alien alien.c-types alien.syntax generic assocs kernel
+kernel.private math io.ports sequences strings sbufs threads
+unix vectors io.buffers io.backend io.encodings math.parser
 continuations system libc qualified namespaces make io.timeouts
 io.encodings.utf8 destructors accessors summary combinators
-locals unix.time ;
+locals unix.time fry io.unix.multiplexers ;
 QUALIFIED: io
 IN: io.unix.backend
 
@@ -37,38 +37,6 @@ M: fd dispose
 
 M: fd handle-fd dup check-disposed fd>> ;
 
-! I/O multiplexers
-TUPLE: mx fd reads writes ;
-
-: new-mx ( class -- obj )
-    new
-        H{ } clone >>reads
-        H{ } clone >>writes ; inline
-
-GENERIC: add-input-callback ( thread fd mx -- )
-
-M: mx add-input-callback reads>> push-at ;
-
-GENERIC: add-output-callback ( thread fd mx -- )
-
-M: mx add-output-callback writes>> push-at ;
-
-GENERIC: remove-input-callbacks ( fd mx -- callbacks )
-
-M: mx remove-input-callbacks reads>> delete-at* drop ;
-
-GENERIC: remove-output-callbacks ( fd mx -- callbacks )
-
-M: mx remove-output-callbacks writes>> delete-at* drop ;
-
-GENERIC: wait-for-events ( ms mx -- )
-
-: input-available ( fd mx -- )
-    remove-input-callbacks [ resume ] each ;
-
-: output-available ( fd mx -- )
-    remove-output-callbacks [ resume ] each ;
-
 M: fd cancel-operation ( fd -- )
     dup disposed>> [ drop ] [
         fd>>
@@ -88,19 +56,16 @@ M: io-timeout summary drop "I/O operation timed out" ;
 
 : wait-for-fd ( handle event -- )
     dup +retry+ eq? [ 2drop ] [
-        [
-            >r
-            swap handle-fd
-            mx get-global
-            r> {
+        '[
+            swap handle-fd mx get-global _ {
                 { +input+ [ add-input-callback ] }
                 { +output+ [ add-output-callback ] }
             } case
-        ] curry "I/O" suspend nip [ io-timeout ] when
+        ] "I/O" suspend nip [ io-timeout ] when
     ] if ;
 
 : wait-for-port ( port event -- )
-    [ >r handle>> r> wait-for-fd ] curry with-timeout ;
+    '[ handle>> _ wait-for-fd ] with-timeout ;
 
 ! Some general stuff
 : file-mode OCT: 0666 ;
@@ -187,11 +152,11 @@ M: stdin dispose*
 M: stdin refill
     [ buffer>> ] [ dup wait-for-stdin ] bi* refill-stdin f ;
 
-: control-write-fd ( -- fd ) "control_write" f dlsym *uint ;
+: control-write-fd ( -- fd ) &: control_write *uint ;
 
-: size-read-fd ( -- fd ) "size_read" f dlsym *uint ;
+: size-read-fd ( -- fd ) &: size_read *uint ;
 
-: data-read-fd ( -- fd ) "stdin_read" f dlsym *uint ;
+: data-read-fd ( -- fd ) &: stdin_read *uint ;
 
 : <stdin> ( -- stdin )
     stdin new
@@ -210,10 +175,10 @@ TUPLE: mx-port < port mx ;
 : <mx-port> ( mx -- port )
     dup fd>> mx-port <port> swap >>mx ;
 
-: multiplexer-error ( n -- )
-    0 < [
+: multiplexer-error ( n -- n )
+    dup 0 < [
         err_no [ EAGAIN = ] [ EINTR = ] bi or
-        [ (io-error) ] unless
+        [ drop 0 ] [ (io-error) ] if
     ] when ;
 
 : ?flag ( n mask symbol -- n )

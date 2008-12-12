@@ -130,7 +130,7 @@ M: register modifier drop BIN: 11 ;
 GENERIC# n, 1 ( value n -- )
 
 M: integer n, >le % ;
-M: byte n, >r value>> r> n, ;
+M: byte n, [ value>> ] dip n, ;
 : 1, ( n -- ) 1 n, ; inline
 : 4, ( n -- ) 4 n, ; inline
 : 2, ( n -- ) 2 n, ; inline
@@ -209,7 +209,7 @@ M: object operand-64? drop f ;
 : short-operand ( reg rex.w n -- )
     #! Some instructions encode their single operand as part of
     #! the opcode.
-    >r dupd prefix-1 reg-code r> + , ;
+    [ dupd prefix-1 reg-code ] dip + , ;
 
 : opcode, ( opcode -- ) dup array? [ % ] [ , ] if ;
 
@@ -224,7 +224,7 @@ M: object operand-64? drop f ;
 : 1-operand ( op reg,rex.w,opcode -- )
     #! The 'reg' is not really a register, but a value for the
     #! 'reg' field of the mod-r/m byte.
-    first3 >r >r over r> prefix-1 r> opcode, swap addressing ;
+    first3 [ [ over ] dip prefix-1 ] dip opcode, swap addressing ;
 
 : immediate-operand-size-bit ( imm dst reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
     pick integer? [ first3 BIN: 1 opcode-or 3array ] when ;
@@ -250,7 +250,7 @@ M: object operand-64? drop f ;
     ] if ;
 
 : (2-operand) ( dst src op -- )
-    >r 2dup t rex-prefix r> opcode,
+    [ 2dup t rex-prefix ] dip opcode,
     reg-code swap addressing ;
 
 : direction-bit ( dst src op -- dst' src' op' )
@@ -271,11 +271,11 @@ M: object operand-64? drop f ;
 PRIVATE>
 
 : [] ( reg/displacement -- indirect )
-    dup integer? [ >r f f f r> ] [ f f f ] if <indirect> ;
+    dup integer? [ [ f f f ] dip ] [ f f f ] if <indirect> ;
 
 : [+] ( reg displacement -- indirect )
     dup integer?
-    [ dup zero? [ drop f ] when >r f f r> ]
+    [ dup zero? [ drop f ] when [ f f ] dip ]
     [ f f ] if
     <indirect> ;
 
@@ -300,7 +300,7 @@ PREDICATE: callable < word register? not ;
 
 GENERIC: MOV ( dst src -- )
 M: immediate MOV swap (MOV-I) ;
-M: callable MOV 0 rot (MOV-I) rc-absolute-cell rel-word ;
+M: callable MOV [ 0 ] 2dip (MOV-I) rc-absolute-cell rel-word ;
 M: operand MOV HEX: 88 2-operand ;
 
 : LEA ( dst src -- ) swap HEX: 8d 2-operand ;
@@ -308,18 +308,21 @@ M: operand MOV HEX: 88 2-operand ;
 ! Control flow
 GENERIC: JMP ( op -- )
 : (JMP) ( -- rel-class ) HEX: e9 , 0 4, rc-relative ;
+M: f JMP (JMP) 2drop ;
 M: callable JMP (JMP) rel-word ;
 M: label JMP (JMP) label-fixup ;
 M: operand JMP { BIN: 100 t HEX: ff } 1-operand ;
 
 GENERIC: CALL ( op -- )
 : (CALL) ( -- rel-class ) HEX: e8 , 0 4, rc-relative ;
+M: f CALL (CALL) 2drop ;
 M: callable CALL (CALL) rel-word ;
 M: label CALL (CALL) label-fixup ;
 M: operand CALL { BIN: 010 t HEX: ff } 1-operand ;
 
 GENERIC# JUMPcc 1 ( addr opcode -- )
 : (JUMPcc) ( n -- rel-class ) extended-opcode, 0 4, rc-relative ;
+M: f JUMPcc nip (JUMPcc) drop ;
 M: callable JUMPcc (JUMPcc) rel-word ;
 M: label JUMPcc (JUMPcc) label-fixup ;
 
@@ -343,7 +346,7 @@ M: label JUMPcc (JUMPcc) label-fixup ;
 : LEAVE ( -- ) HEX: c9 , ;
 
 : RET ( n -- )
-    dup zero? [ drop HEX: c3 , ] [ HEX: C2 , 2, ] if ;
+    dup zero? [ drop HEX: c3 , ] [ HEX: c2 , 2, ] if ;
 
 ! Arithmetic
 
@@ -380,6 +383,8 @@ M: immediate CMP swap { BIN: 111 t HEX: 80 } immediate-1/4 ;
 M: operand CMP OCT: 070 2-operand ;
 
 : XCHG ( dst src -- ) OCT: 207 2-operand ;
+
+: BSR ( dst src -- ) swap { HEX: 0f HEX: bd } (2-operand) ;
 
 : NOT  ( dst -- ) { BIN: 010 t HEX: f7 } 1-operand ;
 : NEG  ( dst -- ) { BIN: 011 t HEX: f7 } 1-operand ;

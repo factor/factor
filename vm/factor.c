@@ -41,32 +41,14 @@ void default_parameters(F_PARAMETERS *p)
 /* Do some initialization that we do once only */
 void do_stage1_init(void)
 {
-	fprintf(stderr,"*** Stage 2 early init... ");
-	fflush(stderr);
+	print_string("*** Stage 2 early init... ");
+	fflush(stdout);
 
-	CELL words = find_all_words();
-
-	REGISTER_ROOT(words);
-
-	CELL i;
-	CELL length = array_capacity(untag_object(words));
-	for(i = 0; i < length; i++)
-	{
-		F_WORD *word = untag_word(array_nth(untag_array(words),i));
-		REGISTER_UNTAGGED(word);
-		default_word_code(word,false);
-		UNREGISTER_UNTAGGED(word);
-		update_word_xt(word);
-	}
-
-	UNREGISTER_ROOT(words);
-
-	iterate_code_heap(relocate_code_block);
-
+	compile_all_words();
 	userenv[STAGE2_ENV] = T;
 
-	fprintf(stderr,"done\n");
-	fflush(stderr);
+	print_string("done\n");
+	fflush(stdout);
 }
 
 /* Get things started */
@@ -91,7 +73,7 @@ void init_factor(F_PARAMETERS *p)
 	if(p->image == NULL)
 		p->image = default_image_path();
 
-	srand(current_millis());
+	srand(current_micros());
 	init_ffi();
 	init_stacks(p->ds_size,p->rs_size);
 	load_image(p);
@@ -216,8 +198,8 @@ void factor_yield(void)
 	callback();
 }
 
-void factor_sleep(long ms)
+void factor_sleep(long us)
 {
 	void (*callback)() = alien_offset(userenv[SLEEP_CALLBACK_ENV]);
-	callback(ms);
+	callback(us);
 }

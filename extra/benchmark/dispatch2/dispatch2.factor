@@ -1,5 +1,5 @@
 USING: make math sequences splitting grouping
-kernel columns float-arrays bit-arrays ;
+kernel columns specialized-arrays.double bit-arrays ;
 IN: benchmark.dispatch2
 
 : sequences ( -- seq )
@@ -10,7 +10,7 @@ IN: benchmark.dispatch2
         "hello world" ,
         SBUF" sbuf world" ,
         V{ "a" "b" "c" } ,
-        F{ 1.0 2.0 3.0 } ,
+        double-array{ 1.0 2.0 3.0 } ,
         "hello world" 4 tail-slice ,
         10 f <repetition> ,
         100 2 <sliced-groups> ,

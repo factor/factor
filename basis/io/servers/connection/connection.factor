@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors kernel math math.parser
-namespaces parser sequences strings prettyprint debugger
+namespaces parser sequences strings prettyprint
 quotations combinators logging calendar assocs present
 fry accessors arrays io io.sockets io.encodings.ascii
 io.sockets.secure io.files io.streams.duplex io.timeouts
@@ -38,8 +38,6 @@ ready ;
 
 : <threaded-server> ( -- threaded-server )
     threaded-server new-threaded-server ;
-
-SYMBOL: remote-address
 
 GENERIC: handle-client* ( threaded-server -- )
 
@@ -81,7 +79,7 @@ M: threaded-server handle-client* handler>> call ;
 \ handle-client ERROR add-error-logging
 
 : thread-name ( server-name addrspec -- string )
-    unparse-short " connection from " swap 3append ;
+    unparse-short " connection from " glue ;
 
 : accept-connection ( threaded-server -- )
     [ accept ] [ addr>> ] bi
@@ -114,19 +112,29 @@ M: threaded-server handle-client* handler>> call ;
         ] when*
     ] unless ;
 
+: (start-server) ( threaded-server -- )
+    init-server
+    dup threaded-server [
+        dup name>> [
+            [ listen-on [ start-accept-loop ] parallel-each ]
+            [ ready>> raise-flag ]
+            bi
+        ] with-logging
+    ] with-variable ;
+
 PRIVATE>
 
 : start-server ( threaded-server -- )
-    init-server
-    dup secure-config>> [
-        dup threaded-server [
-            dup name>> [
-                [ listen-on [ start-accept-loop ] parallel-each ]
-                [ ready>> raise-flag ]
-                bi
-            ] with-logging
-        ] with-variable
-    ] with-secure-context ;
+    #! Only create a secure-context if we want to listen on
+    #! a secure port, otherwise start-server won't work at
+    #! all if SSL is not available.
+    dup secure>> [
+        dup secure-config>> [
+            (start-server)
+        ] with-secure-context
+    ] [
+        (start-server)
+    ] if ;
 
 : wait-for-server ( threaded-server -- )
     ready>> wait-for-flag ;

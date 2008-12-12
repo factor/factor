@@ -15,20 +15,20 @@ void print_word(F_WORD* word, CELL nesting)
 	if(type_of(word->vocabulary) == STRING_TYPE)
 	{
 		print_chars(untag_string(word->vocabulary));
-		printf(":");
+		print_string(":");
 	}
 	
 	if(type_of(word->name) == STRING_TYPE)
 		print_chars(untag_string(word->name));
 	else
 	{
-		printf("#<not a string: ");
+		print_string("#<not a string: ");
 		print_nested_obj(word->name,nesting);
-		printf(">");
+		print_string(">");
 	}
 }
 
-void print_string(F_STRING* str)
+void print_factor_string(F_STRING* str)
 {
 	putchar('"');
 	print_chars(str);
@@ -51,12 +51,12 @@ void print_array(F_ARRAY* array, CELL nesting)
 
 	for(i = 0; i < length; i++)
 	{
-		printf(" ");
+		print_string(" ");
 		print_nested_obj(array_nth(array,i),nesting);
 	}
 
 	if(trimmed)
-		printf("...");
+		print_string("...");
 }
 
 void print_tuple(F_TUPLE* tuple, CELL nesting)
@@ -64,7 +64,7 @@ void print_tuple(F_TUPLE* tuple, CELL nesting)
 	F_TUPLE_LAYOUT *layout = untag_object(tuple->layout);
 	CELL length = to_fixnum(layout->size);
 
-	printf(" ");
+	print_string(" ");
 	print_nested_obj(layout->class,nesting);
 
 	CELL i;
@@ -80,19 +80,19 @@ void print_tuple(F_TUPLE* tuple, CELL nesting)
 
 	for(i = 0; i < length; i++)
 	{
-		printf(" ");
+		print_string(" ");
 		print_nested_obj(tuple_nth(tuple,i),nesting);
 	}
 
 	if(trimmed)
-		printf("...");
+		print_string("...");
 }
 
 void print_nested_obj(CELL obj, F_FIXNUM nesting)
 {
 	if(nesting <= 0 && !full_output)
 	{
-		printf(" ... ");
+		print_string(" ... ");
 		return;
 	}
 
@@ -101,35 +101,35 @@ void print_nested_obj(CELL obj, F_FIXNUM nesting)
 	switch(type_of(obj))
 	{
 	case FIXNUM_TYPE:
-		printf("%ld",untag_fixnum_fast(obj));
+		print_fixnum(untag_fixnum_fast(obj));
 		break;
 	case WORD_TYPE:
 		print_word(untag_word(obj),nesting - 1);
 		break;
 	case STRING_TYPE:
-		print_string(untag_string(obj));
+		print_factor_string(untag_string(obj));
 		break;
 	case F_TYPE:
-		printf("f");
+		print_string("f");
 		break;
 	case TUPLE_TYPE:
-		printf("T{");
+		print_string("T{");
 		print_tuple(untag_object(obj),nesting - 1);
-		printf(" }");
+		print_string(" }");
 		break;
 	case ARRAY_TYPE:
-		printf("{");
+		print_string("{");
 		print_array(untag_object(obj),nesting - 1);
-		printf(" }");
+		print_string(" }");
 		break;
 	case QUOTATION_TYPE:
-		printf("[");
+		print_string("[");
 		quot = untag_object(obj);
 		print_array(untag_object(quot->array),nesting - 1);
-		printf(" ]");
+		print_string(" ]");
 		break;
 	default:
-		printf("#<type %ld @ %lx>",type_of(obj),obj);
+		print_string("#<type "); print_cell(type_of(obj)); print_string(" @ "); print_cell_hex(obj); print_string(">");
 		break;
 	}
 }
@@ -144,35 +144,37 @@ void print_objects(CELL start, CELL end)
 	for(; start <= end; start += CELLS)
 	{
 		print_obj(get(start));
-		printf("\n");
+		nl();
 	}
 }
 
 void print_datastack(void)
 {
-	printf("==== DATA STACK:\n");
+	print_string("==== DATA STACK:\n");
 	print_objects(ds_bot,ds);
 }
 
 void print_retainstack(void)
 {
-	printf("==== RETAIN STACK:\n");
+	print_string("==== RETAIN STACK:\n");
 	print_objects(rs_bot,rs);
 }
 
 void print_stack_frame(F_STACK_FRAME *frame)
 {
 	print_obj(frame_executing(frame));
-	printf("\n");
+	print_string("\n");
 	print_obj(frame_scan(frame));
-	printf("\n");
-	printf("%lx\n",(CELL)frame_executing(frame));
-	printf("%lx\n",(CELL)frame->xt);
+	print_string("\n");
+	print_cell_hex((CELL)frame_executing(frame));
+	print_string(" ");
+	print_cell_hex((CELL)frame->xt);
+	print_string("\n");
 }
 
 void print_callstack(void)
 {
-	printf("==== CALL STACK:\n");
+	print_string("==== CALL STACK:\n");
 	CELL bottom = (CELL)stack_chain->callstack_bottom;
 	CELL top = (CELL)stack_chain->callstack_top;
 	iterate_callstack(top,bottom,print_stack_frame);
@@ -180,11 +182,11 @@ void print_callstack(void)
 
 void dump_cell(CELL cell)
 {
-	printf("%08lx: ",cell);
+	print_cell_hex_pad(cell); print_string(": ");
 
 	cell = get(cell);
 
-	printf("%08lx tag %ld",cell,TAG(cell));
+	print_cell_hex_pad(cell); print_string(" tag "); print_cell(TAG(cell));
 
 	switch(TAG(cell))
 	{
@@ -192,24 +194,29 @@ void dump_cell(CELL cell)
 	case BIGNUM_TYPE:
 	case FLOAT_TYPE:
 		if(cell == F)
-			printf(" -- F");
+			print_string(" -- F");
 		else if(cell < TYPE_COUNT<<TAG_BITS)
-			printf(" -- possible header: %ld",cell>>TAG_BITS);
+		{
+			print_string(" -- possible header: ");
+			print_cell(cell>>TAG_BITS);
+		}
 		else if(cell >= data_heap->segment->start
 			&& cell < data_heap->segment->end)
 		{
 			CELL header = get(UNTAG(cell));
 			CELL type = header>>TAG_BITS;
-			printf(" -- object; ");
+			print_string(" -- object; ");
 			if(TAG(header) == 0 && type < TYPE_COUNT)
-				printf(" type %ld",type);
+			{
+				print_string(" type "); print_cell(type);
+			}
 			else
-				printf(" header corrupt");
+				print_string(" header corrupt");
 		}
 		break;
 	}
 	
-	printf("\n");
+	nl();
 }
 
 void dump_memory(CELL from, CELL to)
@@ -222,32 +229,35 @@ void dump_memory(CELL from, CELL to)
 
 void dump_zone(F_ZONE *z)
 {
-	printf("start=%ld, size=%ld, here=%ld\n",
-		z->start,z->size,z->here - z->start);
+	print_string("Start="); print_cell(z->start);
+	print_string(", size="); print_cell(z->size);
+	print_string(", here="); print_cell(z->here - z->start); nl();
 }
 
 void dump_generations(void)
 {
-	int i;
+	CELL i;
 
-	printf("Nursery: ");
+	print_string("Nursery: ");
 	dump_zone(&nursery);
 	
 	for(i = 1; i < data_heap->gen_count; i++)
 	{
-		printf("Generation %d: ",i);
+		print_string("Generation "); print_cell(i); print_string(": ");
 		dump_zone(&data_heap->generations[i]);
 	}
 
 	for(i = 0; i < data_heap->gen_count; i++)
 	{
-		printf("Semispace %d: ",i);
+		print_string("Semispace "); print_cell(i); print_string(": ");
 		dump_zone(&data_heap->semispaces[i]);
 	}
 
-	printf("Cards: base=%lx, size=%lx\n",
-		(CELL)data_heap->cards,
-		(CELL)(data_heap->cards_end - data_heap->cards));
+	print_string("Cards: base=");
+	print_cell((CELL)data_heap->cards);
+	print_string(", size=");
+	print_cell((CELL)(data_heap->cards_end - data_heap->cards));
+	nl();
 }
 
 void dump_objects(F_FIXNUM type)
@@ -260,9 +270,10 @@ void dump_objects(F_FIXNUM type)
 	{
 		if(type == -1 || type_of(obj) == type)
 		{
-			printf("%lx ",obj);
+			print_cell_hex_pad(obj);
+			print_string(" ");
 			print_nested_obj(obj,2);
-			printf("\n");
+			nl();
 		}
 	}
 
@@ -277,9 +288,10 @@ void find_data_references_step(CELL *scan)
 {
 	if(look_for == *scan)
 	{
-		printf("%lx ",obj);
+		print_cell_hex_pad(obj);
+		print_string(" ");
 		print_nested_obj(obj,2);
-		printf("\n");
+		nl();
 	}
 }
 
@@ -312,9 +324,10 @@ void find_code_references_step(F_COMPILED *compiled, CELL code_start, CELL liter
 
 		if(look_for == get(scan))
 		{
-			printf("%lx ",obj);
+			print_cell_hex_pad(obj);
+			print_string(" ");
 			print_nested_obj(obj,2);
-			printf("\n");
+			nl();
 		}
 	}
 }
@@ -329,34 +342,34 @@ void factorbug(void)
 {
 	if(fep_disabled)
 	{
-		printf("Low level debugger disabled\n");
+		print_string("Low level debugger disabled\n");
 		exit(1);
 	}
 
-	open_console();
+	/* open_console(); */
 
-	printf("Starting low level debugger...\n");
-	printf("  Basic commands:\n");
-	printf("q                -- continue executing Factor - NOT SAFE\n");
-	printf("im               -- save image to fep.image\n");
-	printf("x                -- exit Factor\n");
-	printf("  Advanced commands:\n");
-	printf("d <addr> <count> -- dump memory\n");
-	printf("u <addr>         -- dump object at tagged <addr>\n");
-	printf(". <addr>         -- print object at tagged <addr>\n");
-	printf("t                -- toggle output trimming\n");
-	printf("s r              -- dump data, retain stacks\n");
-	printf(".s .r .c         -- print data, retain, call stacks\n");
-	printf("e                -- dump environment\n");
-	printf("g                -- dump generations\n");
-	printf("card <addr>      -- print card containing address\n");
-	printf("addr <card>      -- print address containing card\n");
-	printf("data             -- data heap dump\n");
-	printf("words            -- words dump\n");
-	printf("tuples           -- tuples dump\n");
-	printf("refs <addr>      -- find data heap references to object\n");
-	printf("push <addr>      -- push object on data stack - NOT SAFE\n");
-	printf("code             -- code heap dump\n");
+	print_string("Starting low level debugger...\n");
+	print_string("  Basic commands:\n");
+	print_string("q                -- continue executing Factor - NOT SAFE\n");
+	print_string("im               -- save image to fep.image\n");
+	print_string("x                -- exit Factor\n");
+	print_string("  Advanced commands:\n");
+	print_string("d <addr> <count> -- dump memory\n");
+	print_string("u <addr>         -- dump object at tagged <addr>\n");
+	print_string(". <addr>         -- print object at tagged <addr>\n");
+	print_string("t                -- toggle output trimming\n");
+	print_string("s r              -- dump data, retain stacks\n");
+	print_string(".s .r .c         -- print data, retain, call stacks\n");
+	print_string("e                -- dump environment\n");
+	print_string("g                -- dump generations\n");
+	print_string("card <addr>      -- print card containing address\n");
+	print_string("addr <card>      -- print address containing card\n");
+	print_string("data             -- data heap dump\n");
+	print_string("words            -- words dump\n");
+	print_string("tuples           -- tuples dump\n");
+	print_string("refs <addr>      -- find data heap references to object\n");
+	print_string("push <addr>      -- push object on data stack - NOT SAFE\n");
+	print_string("code             -- code heap dump\n");
 
 	bool seen_command = false;
 
@@ -364,7 +377,7 @@ void factorbug(void)
 	{
 		char cmd[1024];
 
-		printf("READY\n");
+		print_string("READY\n");
 		fflush(stdout);
 
 		if(scanf("%1000s",cmd) <= 0)
@@ -389,23 +402,22 @@ void factorbug(void)
 
 		if(strcmp(cmd,"d") == 0)
 		{
-			CELL addr, count;
-			scanf("%lx %lx",&addr,&count);
+			CELL addr = read_cell_hex();
+			scanf(" ");
+			CELL count = read_cell_hex();
 			dump_memory(addr,addr+count);
 		}
-		if(strcmp(cmd,"u") == 0)
+		else if(strcmp(cmd,"u") == 0)
 		{
-			CELL addr, count;
-			scanf("%lx",&addr);
-			count = object_size(addr);
+			CELL addr = read_cell_hex();
+			CELL count = object_size(addr);
 			dump_memory(addr,addr+count);
 		}
 		else if(strcmp(cmd,".") == 0)
 		{
-			CELL addr;
-			scanf("%lx",&addr);
+			CELL addr = read_cell_hex();
 			print_obj(addr);
-			printf("\n");
+			print_string("\n");
 		}
 		else if(strcmp(cmd,"t") == 0)
 			full_output = !full_output;
@@ -429,15 +441,15 @@ void factorbug(void)
 			dump_generations();
 		else if(strcmp(cmd,"card") == 0)
 		{
-			CELL addr;
-			scanf("%lx",&addr);
-			printf("%lx\n",(CELL)ADDR_TO_CARD(addr));
+			CELL addr = read_cell_hex();
+			print_cell_hex((CELL)ADDR_TO_CARD(addr));
+			nl();
 		}
 		else if(strcmp(cmd,"addr") == 0)
 		{
-			CELL card;
-			scanf("%lx",&card);
-			printf("%lx\n",(CELL)CARD_TO_ADDR(card));
+			CELL card = read_cell_hex();
+			print_cell_hex((CELL)CARD_TO_ADDR(card));
+			nl();
 		}
 		else if(strcmp(cmd,"q") == 0)
 			return;
@@ -449,13 +461,12 @@ void factorbug(void)
 			dump_objects(-1);
 		else if(strcmp(cmd,"refs") == 0)
 		{
-			CELL addr;
-			scanf("%lx",&addr);
-			printf("Data heap references:\n");
+			CELL addr = read_cell_hex();
+			print_string("Data heap references:\n");
 			find_data_references(addr);
-			printf("Code heap references:\n");
+			print_string("Code heap references:\n");
 			find_code_references(addr);
-			printf("\n");
+			nl();
 		}
 		else if(strcmp(cmd,"words") == 0)
 			dump_objects(WORD_TYPE);
@@ -463,20 +474,19 @@ void factorbug(void)
 			dump_objects(TUPLE_TYPE);
 		else if(strcmp(cmd,"push") == 0)
 		{
-			CELL addr;
-			scanf("%lx",&addr);
+			CELL addr = read_cell_hex();
 			dpush(addr);
 		}
 		else if(strcmp(cmd,"code") == 0)
 			dump_heap(&code_heap);
 		else
-			printf("unknown command\n");
+			print_string("unknown command\n");
 	}
 }
 
 void primitive_die(void)
 {
-	fprintf(stderr,"The die word was called by the library. Unless you called it yourself,\n");
-	fprintf(stderr,"you have triggered a bug in Factor. Please report.\n");
+	print_string("The die word was called by the library. Unless you called it yourself,\n");
+	print_string("you have triggered a bug in Factor. Please report.\n");
 	factorbug();
 }

@@ -5,9 +5,7 @@ namespaces regexp.backend sequences unicode.categories
 math.ranges fry combinators.short-circuit vectors ;
 IN: regexp.utils
 
-: (while-changes) ( obj quot pred pred-ret -- obj )
-    ! quot: ( obj -- obj' )
-    ! pred: ( obj -- <=> )
+: (while-changes) ( obj quot: ( obj -- obj' ) pred: ( obj -- <=> ) pred-ret -- obj )
     [ [ dup slip ] dip pick over call ] dip dupd =
     [ 3drop ] [ (while-changes) ] if ; inline recursive
 
@@ -27,23 +25,6 @@ IN: regexp.utils
 
 : ?insert-at ( value key hash/f -- hash )
     [ H{ } clone ] unless* [ insert-at ] keep ;
-
-: last-state ( regexp -- range ) stack>> peek first2 [a,b] ;
-: push1 ( obj -- ) input-stream get stream>> push ;
-: peek1 ( -- obj ) input-stream get stream>> [ f ] [ peek ] if-empty ;
-: pop3 ( seq -- obj1 obj2 obj3 ) [ pop ] [ pop ] [ pop ] tri spin ;
-: drop1 ( -- ) read1 drop ;
-
-: stack ( -- obj ) current-regexp get stack>> ;
-: change-whole-stack ( quot -- )
-    current-regexp get
-    [ stack>> swap call ] keep (>>stack) ; inline
-: push-stack ( obj -- ) stack push ;
-: pop-stack ( -- obj ) stack pop ;
-: cut-out ( vector n -- vector' vector ) cut rest ;
-ERROR: cut-stack-error ;
-: cut-stack ( obj vector -- vector' vector )
-    tuck last-index [ cut-stack-error ] unless* cut-out swap ;
 
 ERROR: bad-octal number ;
 ERROR: bad-hex number ;

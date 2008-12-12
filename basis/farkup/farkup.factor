@@ -36,7 +36,7 @@ TUPLE: line-break ;
     { "http://" "https://" "ftp://" } [ head? ] with contains? ;
 
 : simple-link-title ( string -- string' )
-    dup absolute-url? [ "/" last-split1 swap or ] unless ;
+    dup absolute-url? [ "/" split1-last swap or ] unless ;
 
 EBNF: parse-farkup
 nl               = ("\r\n" | "\r" | "\n") => [[ drop "\n" ]]
@@ -167,7 +167,7 @@ stand-alone
     } cond ;
 
 : escape-link ( href text -- href-esc text-esc )
-    >r check-url escape-quoted-string r> escape-string ;
+    [ check-url escape-quoted-string ] dip escape-string ;
 
 : write-link ( href text -- )
     escape-link
@@ -185,7 +185,7 @@ stand-alone
     ] if ;
 
 : render-code ( string mode -- string' )
-    >r string-lines r>
+    [ string-lines ] dip
     [
         <pre>
             htmlize-lines

@@ -4,7 +4,7 @@ USING: byte-arrays arrays assocs kernel kernel.private libc math
 namespaces make parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
 layouts system compiler.units io.files io.encodings.binary
-accessors combinators effects continuations ;
+accessors combinators effects continuations fry ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -13,13 +13,15 @@ DEFER: *char
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
 TUPLE: c-type
+class
 boxer boxer-quot unboxer unboxer-quot
 getter setter
 reg-class size align stack-align? ;
 
 : new-c-type ( class -- type )
     new
-        int-regs >>reg-class ;
+        int-regs >>reg-class
+        object >>class ; inline
 
 : <c-type> ( -- type )
     \ c-type new-c-type ;
@@ -50,7 +52,7 @@ GENERIC: c-type ( name -- type ) foldable
 
 : parse-array-type ( name -- array )
     "[" split unclip
-    >r [ "]" ?tail drop string>number ] map r> prefix ;
+    [ [ "]" ?tail drop string>number ] map ] dip prefix ;
 
 M: string c-type ( name -- type )
     CHAR: ] over member? [
@@ -62,6 +64,12 @@ M: string c-type ( name -- type )
             "*" ?tail [ resolve-pointer-type ] [ no-c-type ] if
         ] ?if
     ] if ;
+
+GENERIC: c-type-class ( name -- class )
+
+M: c-type c-type-class class>> ;
+
+M: string c-type-class c-type c-type-class ;
 
 GENERIC: c-type-boxer ( name -- boxer )
 
@@ -164,7 +172,7 @@ GENERIC: stack-size ( type -- size ) foldable
 
 M: string stack-size c-type stack-size ;
 
-M: c-type stack-size size>> ;
+M: c-type stack-size size>> cell align ;
 
 GENERIC: byte-length ( seq -- n ) flushable
 
@@ -172,12 +180,12 @@ M: byte-array byte-length length ;
 
 : c-getter ( name -- quot )
     c-type-getter [
-        [ "Cannot read struct fields with type" throw ]
+        [ "Cannot read struct fields with this type" throw ]
     ] unless* ;
 
 : c-setter ( name -- quot )
     c-type-setter [
-        [ "Cannot write struct fields with type" throw ]
+        [ "Cannot write struct fields with this type" throw ]
     ] unless* ;
 
 : <c-array> ( n type -- array )
@@ -193,35 +201,20 @@ M: byte-array byte-length length ;
     1 swap malloc-array ; inline
 
 : malloc-byte-array ( byte-array -- alien )
-    dup length dup malloc [ -rot memcpy ] keep ;
+    dup length [ nip malloc dup ] 2keep memcpy ;
 
 : memory>byte-array ( alien len -- byte-array )
-    dup <byte-array> [ -rot memcpy ] keep ;
+    [ nip (byte-array) dup ] 2keep memcpy ;
 
 : byte-array>memory ( byte-array base -- )
     swap dup length memcpy ;
 
-: (define-nth) ( word type quot -- )
+: array-accessor ( type quot -- def )
     [
         \ swap , [ heap-size , [ * >fixnum ] % ] [ % ] bi*
-    ] [ ] make define-inline ;
-
-: nth-word ( name vocab -- word )
-    >r "-nth" append r> create ;
-
-: define-nth ( name vocab -- )
-    dupd nth-word swap dup c-getter (define-nth) ;
-
-: set-nth-word ( name vocab -- word )
-    >r "set-" swap "-nth" 3append r> create ;
-
-: define-set-nth ( name vocab -- )
-    dupd set-nth-word swap dup c-setter (define-nth) ;
+    ] [ ] make ;
 
 : typedef ( old new -- ) c-types get set-at ;
-
-: define-c-type ( type name vocab -- )
-    >r tuck typedef r> [ define-nth ] 2keep define-set-nth ;
 
 TUPLE: long-long-type < c-type ;
 
@@ -240,62 +233,34 @@ M: long-long-type box-parameter ( n type -- )
 M: long-long-type box-return ( type -- )
     f swap box-parameter ;
 
-: define-deref ( name vocab -- )
-    >r dup CHAR: * prefix r> create
-    swap c-getter 0 prefix define-inline ;
+: define-deref ( name -- )
+    [ CHAR: * prefix "alien.c-types" create ]
+    [ c-getter 0 prefix ] bi
+    define-inline ;
 
-: define-out ( name vocab -- )
-    over [ <c-object> tuck 0 ] over c-setter append swap
-    >r >r constructor-word r> r> prefix define-inline ;
+: define-out ( name -- )
+    [ "alien.c-types" constructor-word ]
+    [ dup c-setter '[ _ <c-object> [ 0 @ ] keep ] ]
+    bi define-inline ;
 
 : c-bool> ( int -- ? )
     zero? not ;
 
-: >c-array ( seq type word -- byte-array )
-    [ [ dup length ] dip <c-array> ] dip
-    [ [ execute ] 2curry each-index ] 2keep drop ; inline
-
-: >c-array-quot ( type vocab -- quot )
-    dupd set-nth-word [ >c-array ] 2curry ;
-
-: to-array-word ( name vocab -- word )
-    >r ">c-" swap "-array" 3append r> create ;
-
-: define-to-array ( type vocab -- )
-    [ to-array-word ] 2keep >c-array-quot
-    (( array -- byte-array )) define-declared ;
-
-: c-array>quot ( type vocab -- quot )
-    [
-        \ swap ,
-        nth-word 1quotation ,
-        [ curry map ] %
-    ] [ ] make ;
-
-: from-array-word ( name vocab -- word )
-    >r "c-" swap "-array>" 3append r> create ;
-
-: define-from-array ( type vocab -- )
-    [ from-array-word ] 2keep c-array>quot
-    (( c-ptr n -- array )) define-declared ;
-
 : define-primitive-type ( type name -- )
-    "alien.c-types"
-    {
-        [ define-c-type ]
-        [ define-deref ]
-        [ define-to-array ]
-        [ define-from-array ]
-        [ define-out ]
-    } 2cleave ;
+    [ typedef ]
+    [ define-deref ]
+    [ define-out ]
+    tri ;
 
 : expand-constants ( c-type -- c-type' )
     dup array? [
-        unclip >r [
-            dup word? [
-                def>> { } swap with-datastack first
-            ] when
-        ] map r> prefix
+        unclip [
+            [
+                dup word? [
+                    def>> { } swap with-datastack first
+                ] when
+            ] map
+        ] dip prefix
     ] when ;
 
 : malloc-file-contents ( path -- alien len )
@@ -304,8 +269,20 @@ M: long-long-type box-return ( type -- )
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
 
+: primitive-types
+    {
+        "char" "uchar"
+        "short" "ushort"
+        "int" "uint"
+        "long" "ulong"
+        "longlong" "ulonglong"
+        "float" "double"
+        "void*" "bool"
+    } ;
+
 [
     <c-type>
+        c-ptr >>class
         [ alien-cell ] >>getter
         [ set-alien-cell ] >>setter
         bootstrap-cell >>size
@@ -315,6 +292,7 @@ M: long-long-type box-return ( type -- )
     "void*" define-primitive-type
 
     <long-long-type>
+        integer >>class
         [ alien-signed-8 ] >>getter
         [ set-alien-signed-8 ] >>setter
         8 >>size
@@ -324,6 +302,7 @@ M: long-long-type box-return ( type -- )
     "longlong" define-primitive-type
 
     <long-long-type>
+        integer >>class
         [ alien-unsigned-8 ] >>getter
         [ set-alien-unsigned-8 ] >>setter
         8 >>size
@@ -333,6 +312,7 @@ M: long-long-type box-return ( type -- )
     "ulonglong" define-primitive-type
 
     <c-type>
+        integer >>class
         [ alien-signed-cell ] >>getter
         [ set-alien-signed-cell ] >>setter
         bootstrap-cell >>size
@@ -342,6 +322,7 @@ M: long-long-type box-return ( type -- )
     "long" define-primitive-type
 
     <c-type>
+        integer >>class
         [ alien-unsigned-cell ] >>getter
         [ set-alien-unsigned-cell ] >>setter
         bootstrap-cell >>size
@@ -351,6 +332,7 @@ M: long-long-type box-return ( type -- )
     "ulong" define-primitive-type
 
     <c-type>
+        integer >>class
         [ alien-signed-4 ] >>getter
         [ set-alien-signed-4 ] >>setter
         4 >>size
@@ -360,6 +342,7 @@ M: long-long-type box-return ( type -- )
     "int" define-primitive-type
 
     <c-type>
+        integer >>class
         [ alien-unsigned-4 ] >>getter
         [ set-alien-unsigned-4 ] >>setter
         4 >>size
@@ -369,6 +352,7 @@ M: long-long-type box-return ( type -- )
     "uint" define-primitive-type
 
     <c-type>
+        fixnum >>class
         [ alien-signed-2 ] >>getter
         [ set-alien-signed-2 ] >>setter
         2 >>size
@@ -378,6 +362,7 @@ M: long-long-type box-return ( type -- )
     "short" define-primitive-type
 
     <c-type>
+        fixnum >>class
         [ alien-unsigned-2 ] >>getter
         [ set-alien-unsigned-2 ] >>setter
         2 >>size
@@ -387,6 +372,7 @@ M: long-long-type box-return ( type -- )
     "ushort" define-primitive-type
 
     <c-type>
+        fixnum >>class
         [ alien-signed-1 ] >>getter
         [ set-alien-signed-1 ] >>setter
         1 >>size
@@ -396,6 +382,7 @@ M: long-long-type box-return ( type -- )
     "char" define-primitive-type
 
     <c-type>
+        fixnum >>class
         [ alien-unsigned-1 ] >>getter
         [ set-alien-unsigned-1 ] >>setter
         1 >>size
@@ -414,6 +401,7 @@ M: long-long-type box-return ( type -- )
     "bool" define-primitive-type
 
     <c-type>
+        float >>class
         [ alien-float ] >>getter
         [ [ >float ] 2dip set-alien-float ] >>setter
         4 >>size
@@ -425,6 +413,7 @@ M: long-long-type box-return ( type -- )
     "float" define-primitive-type
 
     <c-type>
+        float >>class
         [ alien-double ] >>getter
         [ [ >float ] 2dip set-alien-double ] >>setter
         8 >>size
@@ -436,6 +425,6 @@ M: long-long-type box-return ( type -- )
     "double" define-primitive-type
 
     "long" "ptrdiff_t" typedef
-
+    "long" "intptr_t" typedef
     "ulong" "size_t" typedef
 ] with-compilation-unit

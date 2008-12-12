@@ -5,20 +5,23 @@ cpu.x86.assembler cpu.x86.assembler.private cpu.architecture
 kernel kernel.private math memory namespaces make sequences
 words system layouts combinators math.order fry locals
 compiler.constants compiler.cfg.registers
-compiler.cfg.instructions compiler.codegen
-compiler.codegen.fixup ;
+compiler.cfg.instructions compiler.cfg.intrinsics
+compiler.codegen compiler.codegen.fixup ;
 IN: cpu.x86
+
+<< enable-fixnum-log2 >>
 
 M: x86 two-operand? t ;
 
 HOOK: temp-reg-1 cpu ( -- reg )
 HOOK: temp-reg-2 cpu ( -- reg )
 
+HOOK: param-reg-1 cpu ( -- reg )
+HOOK: param-reg-2 cpu ( -- reg )
+
 M: x86 %load-immediate MOV ;
 
-HOOK: rel-literal-x86 cpu ( literal -- )
-
-M: x86 %load-indirect swap 0 [] MOV rel-literal-x86 ;
+M: x86 %load-indirect swap 0 MOV rc-absolute-cell rel-immediate ;
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
@@ -91,6 +94,88 @@ M: x86 %shl-imm nip SHL ;
 M: x86 %shr-imm nip SHR ;
 M: x86 %sar-imm nip SAR ;
 M: x86 %not     drop NOT ;
+M: x86 %log2    BSR ;
+
+: ?MOV ( dst src -- )
+    2dup = [ 2drop ] [ MOV ] if ; inline
+
+:: move>args ( src1 src2 -- )
+    {
+        { [ src1 param-reg-2 = ] [ param-reg-1 src2 ?MOV param-reg-1 param-reg-2 XCHG ] }
+        { [ src1 param-reg-1 = ] [ param-reg-2 src2 ?MOV ] }
+        { [ src2 param-reg-1 = ] [ param-reg-2 src1 ?MOV param-reg-1 param-reg-2 XCHG ] }
+        { [ src2 param-reg-2 = ] [ param-reg-1 src1 ?MOV ] }
+        [
+            param-reg-1 src1 MOV
+            param-reg-2 src2 MOV
+        ]
+    } cond ;
+
+HOOK: %alien-invoke-tail cpu ( func dll -- )
+
+:: overflow-template ( src1 src2 insn inverse func -- )
+    <label> "no-overflow" set
+    src1 src2 insn call
+    ds-reg [] src1 MOV
+    "no-overflow" get JNO
+    src1 src2 inverse call
+    src1 src2 move>args
+    %prepare-alien-invoke
+    func f %alien-invoke
+    "no-overflow" resolve-label ; inline
+
+:: overflow-template-tail ( src1 src2 insn inverse func -- )
+    <label> "no-overflow" set
+    src1 src2 insn call
+    "no-overflow" get JNO
+    src1 src2 inverse call
+    src1 src2 move>args
+    %prepare-alien-invoke
+    func f %alien-invoke-tail
+    "no-overflow" resolve-label
+    ds-reg [] src1 MOV
+    0 RET ; inline
+
+M: x86 %fixnum-add ( src1 src2 -- )
+    [ ADD ] [ SUB ] "overflow_fixnum_add" overflow-template ;
+
+M: x86 %fixnum-add-tail ( src1 src2 -- )
+    [ ADD ] [ SUB ] "overflow_fixnum_add" overflow-template-tail ;
+
+M: x86 %fixnum-sub ( src1 src2 -- )
+    [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template ;
+
+M: x86 %fixnum-sub-tail ( src1 src2 -- )
+    [ SUB ] [ ADD ] "overflow_fixnum_subtract" overflow-template-tail ;
+
+M:: x86 %fixnum-mul ( src1 src2 temp1 temp2 -- )
+    "no-overflow" define-label
+    temp1 src1 MOV
+    temp1 tag-bits get SAR
+    src2 temp1 IMUL2
+    ds-reg [] temp1 MOV
+    "no-overflow" get JNO
+    src1 src2 move>args
+    param-reg-1 tag-bits get SAR
+    param-reg-2 tag-bits get SAR
+    %prepare-alien-invoke
+    "overflow_fixnum_multiply" f %alien-invoke
+    "no-overflow" resolve-label ;
+
+M:: x86 %fixnum-mul-tail ( src1 src2 temp1 temp2 -- )
+    "overflow" define-label
+    temp1 src1 MOV
+    temp1 tag-bits get SAR
+    src2 temp1 IMUL2
+    "overflow" get JO
+    ds-reg [] temp1 MOV
+    0 RET
+    "overflow" resolve-label
+    src1 src2 move>args
+    param-reg-1 tag-bits get SAR
+    param-reg-2 tag-bits get SAR
+    %prepare-alien-invoke
+    "overflow_fixnum_multiply" f %alien-invoke-tail ;
 
 : bignum@ ( reg n -- op )
     cells bignum tag-number - [+] ; inline
@@ -159,9 +244,6 @@ M: x86 %div-float nip DIVSD ;
 
 M: x86 %integer>float CVTSI2SD ;
 M: x86 %float>integer CVTTSD2SI ;
-
-: ?MOV ( dst src -- )
-    2dup = [ 2drop ] [ MOV ] if ; inline
 
 M: x86 %copy ( dst src -- ) ?MOV ;
 
@@ -286,21 +368,36 @@ M:: x86 %box-alien ( dst src temp -- )
 M:: x86 %string-nth ( dst src index temp -- )
     "end" define-label
     dst { src index temp } [| new-dst |
+        ! Load the least significant 7 bits into new-dst.
+        ! 8th bit indicates whether we have to load from
+        ! the aux vector or not.
         temp src index [+] LEA
         new-dst 1 small-reg temp string-offset [+] MOV
         new-dst new-dst 1 small-reg MOVZX
+        ! Do we have to look at the aux vector?
+        new-dst HEX: 80 CMP
+        "end" get JL
+        ! Yes, this is a non-ASCII character. Load aux vector
         temp src string-aux-offset [+] MOV
-        temp \ f tag-number CMP
-        "end" get JE
         new-dst temp XCHG
+        ! Compute index
         new-dst index ADD
         new-dst index ADD
+        ! Load high 16 bits
         new-dst 2 small-reg new-dst byte-array-offset [+] MOV
         new-dst new-dst 2 small-reg MOVZX
-        new-dst 8 SHL
-        new-dst temp OR
+        new-dst 7 SHL
+        ! Compute code point
+        new-dst temp XOR
         "end" resolve-label
         dst new-dst ?MOV
+    ] with-small-register ;
+
+M:: x86 %set-string-nth-fast ( ch str index temp -- )
+    ch { index str temp } [| new-ch |
+        new-ch ch ?MOV
+        temp str index [+] LEA
+        temp string-offset [+] new-ch 1 small-reg MOV
     ] with-small-register ;
 
 :: %alien-integer-getter ( dst src size quot -- )
@@ -364,19 +461,19 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
     dst class store-tagged
     nursery-ptr size inc-allot-ptr ;
 
-HOOK: %alien-global cpu ( symbol dll register -- )
-
 M:: x86 %write-barrier ( src card# table -- )
     #! Mark the card pointed to by vreg.
     ! Mark the card
     card# src MOV
     card# card-bits SHR
-    "cards_offset" f table %alien-global
+    table "cards_offset" f %alien-global
+    table table [] MOV
     table card# [+] card-mark <byte> MOV
 
     ! Mark the card deck
     card# deck-bits card-bits - SHR
-    "decks_offset" f table %alien-global
+    table "decks_offset" f %alien-global
+    table table [] MOV
     table card# [+] card-mark <byte> MOV ;
 
 M: x86 %gc ( -- )
@@ -391,6 +488,9 @@ M: x86 %gc ( -- )
     "minor_gc" f %alien-invoke
     "end" resolve-label ;
 
+M: x86 %alien-global
+    [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
+
 HOOK: stack-reg cpu ( -- reg )
 
 : decr-stack-reg ( n -- )
@@ -401,12 +501,12 @@ HOOK: stack-reg cpu ( -- reg )
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
-: %boolean ( dst word -- )
-    over \ f tag-number MOV
-    0 [] swap execute
-    \ t rel-literal-x86 ; inline
+:: %boolean ( dst temp word -- )
+    dst \ f tag-number MOV
+    temp 0 MOV \ t rc-absolute-cell rel-immediate
+    dst temp word execute ; inline
 
-M: x86 %compare ( dst cc src1 src2 -- )
+M: x86 %compare ( dst temp cc src1 src2 -- )
     CMP {
         { cc< [ \ CMOVL %boolean ] }
         { cc<= [ \ CMOVLE %boolean ] }
@@ -416,10 +516,10 @@ M: x86 %compare ( dst cc src1 src2 -- )
         { cc/= [ \ CMOVNE %boolean ] }
     } case ;
 
-M: x86 %compare-imm ( dst cc src1 src2 -- )
+M: x86 %compare-imm ( dst temp cc src1 src2 -- )
     %compare ;
 
-M: x86 %compare-float ( dst cc src1 src2 -- )
+M: x86 %compare-float ( dst temp cc src1 src2 -- )
     UCOMISD {
         { cc< [ \ CMOVB %boolean ] }
         { cc<= [ \ CMOVBE %boolean ] }
@@ -482,7 +582,7 @@ M: x86 %reload-float ( dst n -- ) spill-float@ MOVSD ;
 
 M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
-M: int-regs %save-param-reg drop >r param@ r> MOV ;
+M: int-regs %save-param-reg drop [ param@ ] dip MOV ;
 M: int-regs %load-param-reg drop swap param@ MOV ;
 
 GENERIC: MOVSS/D ( dst src reg-class -- )
@@ -490,8 +590,8 @@ GENERIC: MOVSS/D ( dst src reg-class -- )
 M: single-float-regs MOVSS/D drop MOVSS ;
 M: double-float-regs MOVSS/D drop MOVSD ;
 
-M: float-regs %save-param-reg >r >r param@ r> r> MOVSS/D ;
-M: float-regs %load-param-reg >r swap param@ r> MOVSS/D ;
+M: float-regs %save-param-reg [ param@ ] 2dip MOVSS/D ;
+M: float-regs %load-param-reg [ swap param@ ] dip MOVSS/D ;
 
 GENERIC: push-return-reg ( reg-class -- )
 GENERIC: load-return-reg ( n reg-class -- )
@@ -501,13 +601,14 @@ M: x86 %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    "stack_chain" f temp-reg-1 %alien-global
+    temp-reg-1 "stack_chain" f %alien-global
+    temp-reg-1 temp-reg-1 [] MOV
     temp-reg-1 [] stack-reg MOV
     temp-reg-1 [] cell SUB
     temp-reg-1 2 cells [+] ds-reg MOV
     temp-reg-1 3 cells [+] rs-reg MOV ;
 
-M: x86 value-structs? t ;
+M: x86 value-struct? drop t ;
 
 M: x86 small-enough? ( n -- ? )
     HEX: -80000000 HEX: 7fffffff between? ;

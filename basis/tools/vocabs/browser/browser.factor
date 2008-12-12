@@ -1,9 +1,12 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel combinators vocabs vocabs.loader
-tools.vocabs io io.files io.styles help.markup help.stylesheet
-sequences assocs help.topics namespaces prettyprint words
-sorting definitions arrays summary sets generic ;
+USING: accessors arrays assocs classes classes.builtin
+classes.intersection classes.mixin classes.predicate
+classes.singleton classes.tuple classes.union combinators
+definitions effects fry generic help help.markup
+help.stylesheet help.topics io io.files io.styles kernel macros
+make namespaces prettyprint sequences sets sorting summary
+tools.vocabs vocabs vocabs.loader words ;
 IN: tools.vocabs.browser
 
 : vocab-status-string ( vocab -- string )
@@ -18,9 +21,9 @@ IN: tools.vocabs.browser
 
 : vocab. ( vocab -- )
     [
-        dup [ write-status ] with-cell
-        dup [ ($link) ] with-cell
-        [ vocab-summary write ] with-cell
+        [ [ write-status ] with-cell ]
+        [ [ ($link) ] with-cell ]
+        [ [ vocab-summary write ] with-cell ] tri
     ] with-row ;
 
 : vocab-headings. ( -- )
@@ -34,22 +37,17 @@ IN: tools.vocabs.browser
     [ "Children from " prepend ] [ "Children" ] if*
     $heading ;
 
-: vocabs. ( assoc -- )
+: $vocabs ( assoc -- )
     [
-        [
-            drop
-        ] [
-            swap root-heading.
-            standard-table-style [
-                vocab-headings. [ vocab. ] each
-            ] ($grid)
+        [ drop ] [
+            [ root-heading. ]
+            [
+                standard-table-style [
+                    vocab-headings. [ vocab. ] each
+                ] ($grid)
+            ] bi*
         ] if-empty
     ] assoc-each ;
-
-: describe-summary ( vocab -- )
-    vocab-summary [
-        "Summary" $heading print-element
-    ] when* ;
 
 TUPLE: vocab-tag name ;
 
@@ -57,12 +55,7 @@ INSTANCE: vocab-tag topic
 
 C: <vocab-tag> vocab-tag
 
-: tags. ( seq -- ) [ <vocab-tag> ] map $links ;
-
-: describe-tags ( vocab -- )
-    vocab-tags f like [
-        "Tags" $heading tags.
-    ] when* ;
+: $tags ( seq -- ) [ <vocab-tag> ] map $links ;
 
 TUPLE: vocab-author name ;
 
@@ -70,20 +63,18 @@ INSTANCE: vocab-author topic
 
 C: <vocab-author> vocab-author
 
-: authors. ( seq -- ) [ <vocab-author> ] map $links ;
-
-: describe-authors ( vocab -- )
-    vocab-authors f like [
-        "Authors" $heading authors.
-    ] when* ;
+: $authors ( seq -- ) [ <vocab-author> ] map $links ;
 
 : describe-help ( vocab -- )
-    vocab-help [
-        "Documentation" $heading ($link)
-    ] when* ;
+    [
+        dup vocab-help
+        [ "Documentation" $heading ($link) ]
+        [ "Summary" $heading vocab-summary print-element ]
+        ?if
+    ] unless-empty ;
 
 : describe-children ( vocab -- )
-    vocab-name all-child-vocabs vocabs. ;
+    vocab-name all-child-vocabs $vocabs ;
 
 : describe-files ( vocab -- )
     vocab-files [ <pathname> ] map [
@@ -95,56 +86,173 @@ C: <vocab-author> vocab-author
                 ] with-nesting
             ] with-style
         ] ($block)
-    ] when* ;
+    ] unless-empty ;
+
+: describe-tuple-classes ( classes -- )
+    [
+        "Tuple classes" $subheading
+        [
+            [ <$link> ]
+            [ superclass <$link> ]
+            [ "slots" word-prop [ name>> ] map " " join \ $snippet swap 2array ]
+            tri 3array
+        ] map
+        { { $strong "Class" } { $strong "Superclass" } { $strong "Slots" } } prefix
+        $table
+    ] unless-empty ;
+
+: describe-predicate-classes ( classes -- )
+    [
+        "Predicate classes" $subheading
+        [
+            [ <$link> ]
+            [ superclass <$link> ]
+            bi 2array
+        ] map
+        { { $strong "Class" } { $strong "Superclass" } } prefix
+        $table
+    ] unless-empty ;
+
+: (describe-classes) ( classes heading -- )
+    '[
+        _ $subheading
+        [ <$link> 1array ] map $table
+    ] unless-empty ;
+
+: describe-builtin-classes ( classes -- )
+    "Builtin classes" (describe-classes) ;
+
+: describe-singleton-classes ( classes -- )
+    "Singleton classes" (describe-classes) ;
+
+: describe-mixin-classes ( classes -- )
+    "Mixin classes" (describe-classes) ;
+
+: describe-union-classes ( classes -- )
+    "Union classes" (describe-classes) ;
+
+: describe-intersection-classes ( classes -- )
+    "Intersection classes" (describe-classes) ;
+
+: describe-classes ( classes -- )
+    [ builtin-class? ] partition
+    [ tuple-class? ] partition
+    [ singleton-class? ] partition
+    [ predicate-class? ] partition
+    [ mixin-class? ] partition
+    [ union-class? ] partition
+    [ intersection-class? ] filter
+    {
+        [ describe-builtin-classes ]
+        [ describe-tuple-classes ]
+        [ describe-singleton-classes ]
+        [ describe-predicate-classes ]
+        [ describe-mixin-classes ]
+        [ describe-union-classes ]
+        [ describe-intersection-classes ]
+    } spread ;
+
+: word-syntax ( word -- string/f )
+    \ $syntax swap word-help elements dup length 1 =
+    [ first second ] [ drop f ] if ;
+
+: describe-parsing ( words -- )
+    [
+        "Parsing words" $subheading
+        [
+            [ <$link> ]
+            [ word-syntax dup [ \ $snippet swap 2array ] when ]
+            bi 2array
+        ] map
+        { { $strong "Word" } { $strong "Syntax" } } prefix
+        $table
+    ] unless-empty ;
+
+: (describe-words) ( words heading -- )
+    '[
+        _ $subheading
+        [
+            [ <$link> ]
+            [ stack-effect dup [ effect>string \ $snippet swap 2array ] when ]
+            bi 2array
+        ] map
+        { { $strong "Word" } { $strong "Stack effect" } } prefix
+        $table
+    ] unless-empty ;
+
+: describe-generics ( words -- )
+    "Generic words" (describe-words) ;
+
+: describe-macros ( words -- )
+    "Macro words" (describe-words) ;
+
+: describe-primitives ( words -- )
+    "Primitives" (describe-words) ;
+
+: describe-compounds ( words -- )
+    "Ordinary words" (describe-words) ;
+
+: describe-predicates ( words -- )
+    "Class predicate words" (describe-words) ;
+
+: describe-symbols ( words -- )
+    [
+        "Symbol words" $subheading
+        [ <$link> 1array ] map $table
+    ] unless-empty ;
 
 : describe-words ( vocab -- )
     words [
         "Words" $heading
-        natural-sort $links
+
+        natural-sort
+        [ [ class? ] filter describe-classes ]
+        [
+            [ [ class? ] [ symbol? ] bi and not ] filter
+            [ parsing-word? ] partition
+            [ generic? ] partition
+            [ macro? ] partition
+            [ symbol? ] partition
+            [ primitive? ] partition
+            [ predicate? ] partition swap
+            {
+                [ describe-parsing ]
+                [ describe-generics ]
+                [ describe-macros ]
+                [ describe-symbols ]
+                [ describe-primitives ]
+                [ describe-compounds ]
+                [ describe-predicates ]
+            } spread
+        ] bi
     ] unless-empty ;
 
-: vocab-xref ( vocab quot -- vocabs )
-    >r dup vocab-name swap words [ generic? not ] filter r> map
-    [ [ word? ] filter [ vocabulary>> ] map ] gather natural-sort
-    remove sift ; inline
+: words. ( vocab -- )
+    last-element off
+    vocab-name describe-words ;
 
-: vocab-uses ( vocab -- vocabs ) [ uses ] vocab-xref ;
-
-: vocab-usage ( vocab -- vocabs ) [ usage ] vocab-xref ;
-
-: describe-uses ( vocab -- )
-    vocab-uses [
-        "Uses" $heading
-        $vocab-links
-    ] unless-empty ;
-
-: describe-usage ( vocab -- )
-    vocab-usage [
-        "Used by" $heading
-        $vocab-links
-    ] unless-empty ;
+: describe-metadata ( vocab -- )
+    [
+        [ vocab-tags [ "Tags:" swap \ $tags prefix 2array , ] unless-empty ]
+        [ vocab-authors [ "Authors:" swap \ $authors prefix 2array , ] unless-empty ]
+        bi
+    ] { } make
+    [ "Meta-data" $heading $table ] unless-empty ;
 
 : $describe-vocab ( element -- )
-    first
-    dup describe-children
-    dup find-vocab-root [
-        dup describe-summary
-        dup describe-tags
-        dup describe-authors
-        dup describe-files
-    ] when
-    dup vocab [
-        dup describe-help
-        dup describe-words
-        dup describe-uses
-        dup describe-usage
-    ] when drop ;
+    first {
+        [ describe-help ]
+        [ describe-metadata ]
+        [ describe-words ]
+        [ describe-files ]
+        [ describe-children ]
+    } cleave ;
 
 : keyed-vocabs ( str quot -- seq )
     all-vocabs [
-        swap >r
-        [ >r 2dup r> swap call member? ] filter
-        r> swap
+        swap [
+            [ [ 2dup ] dip swap call member? ] filter
+        ] dip swap
     ] assoc-map 2nip ; inline
 
 : tagged ( tag -- assoc )
@@ -154,16 +262,16 @@ C: <vocab-author> vocab-author
     [ vocab-authors ] keyed-vocabs ;
 
 : $tagged-vocabs ( element -- )
-    first tagged vocabs. ;
+    first tagged $vocabs ;
 
 : $authored-vocabs ( element -- )
-    first authored vocabs. ;
+    first authored $vocabs ;
 
-: $tags ( element -- )
-    drop "Tags" $heading all-tags tags. ;
+: $all-tags ( element -- )
+    drop "Tags" $heading all-tags $tags ;
 
-: $authors ( element -- )
-    drop "Authors" $heading all-authors authors. ;
+: $all-authors ( element -- )
+    drop "Authors" $heading all-authors $authors ;
 
 INSTANCE: vocab topic
 
@@ -181,7 +289,7 @@ M: vocab-spec article-parent drop "vocab-index" ;
 M: vocab-tag >link ;
 
 M: vocab-tag article-title
-    name>> "Vocabularies tagged ``" swap "''" 3append ;
+    name>> "Vocabularies tagged ``" "''" surround ;
 
 M: vocab-tag article-name name>> ;
 

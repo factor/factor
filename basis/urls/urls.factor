@@ -2,10 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel ascii combinators combinators.short-circuit
 sequences splitting fry namespaces make assocs arrays strings
-io.sockets io.encodings.string
-io.encodings.utf8 math math.parser accessors parser
-strings.parser lexer prettyprint.backend hashtables present
-peg.ebnf urls.encoding ;
+io.sockets io.encodings.string io.encodings.utf8 math
+math.parser accessors parser strings.parser lexer
+hashtables present peg.ebnf urls.encoding ;
 IN: urls
 
 TUPLE: url protocol username password host port path query anchor ;
@@ -132,7 +131,7 @@ M: url present
         { [ dup empty? ] [ drop ] }
         { [ over "/" tail? ] [ append ] }
         { [ "/" pick start not ] [ nip ] }
-        [ [ "/" last-split1 drop "/" ] dip 3append ]
+        [ [ "/" split1-last drop "/" ] dip 3append ]
     } cond ;
 
 PRIVATE>
@@ -182,4 +181,8 @@ PRIVATE>
 ! Literal syntax
 : URL" lexer get skip-blank parse-string >url parsed ; parsing
 
-M: url pprint* dup present "URL\" " "\"" pprint-string ;
+USING: vocabs vocabs.loader ;
+
+"prettyprint" vocab [
+    "urls.prettyprint" require
+] when

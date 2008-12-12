@@ -9,8 +9,7 @@ M: byte-array length length>> ;
 M: byte-array nth-unsafe swap >fixnum alien-unsigned-1 ;
 M: byte-array set-nth-unsafe swap >fixnum set-alien-unsigned-1 ;
 : >byte-array ( seq -- byte-array ) B{ } clone-like ; inline
-M: byte-array like drop dup byte-array? [ >byte-array ] unless ;
-M: byte-array new-sequence drop <byte-array> ;
+M: byte-array new-sequence drop (byte-array) ;
 
 M: byte-array equal?
     over byte-array? [ sequence= ] [ 2drop f ] if ;

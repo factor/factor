@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.encodings math.order io.backend
-continuations debugger classes byte-arrays namespaces splitting
+continuations classes byte-arrays namespaces splitting
 grouping dlists assocs io.encodings.binary summary accessors
 destructors combinators ;
 IN: io.ports
@@ -46,7 +46,7 @@ M: input-port stream-read1
 
 M: input-port stream-read-partial ( max stream -- byte-array/f )
     dup check-disposed
-    >r 0 max >integer r> read-step ;
+    [ 0 max >integer ] dip read-step ;
 
 : read-loop ( count port accum -- )
     pick over length - dup 0 > [
@@ -61,7 +61,7 @@ M: input-port stream-read-partial ( max stream -- byte-array/f )
 
 M: input-port stream-read
     dup check-disposed
-    >r 0 max >fixnum r>
+    [ 0 max >fixnum ] dip
     2dup read-step dup [
         pick over length > [
             pick <byte-vector>
@@ -76,21 +76,21 @@ M: input-port stream-read
 
 : read-until-loop ( seps port buf -- separator/f )
     2over read-until-step over [
-        >r over push-all r> dup [
-            >r 3drop r>
+        [ over push-all ] dip dup [
+            [ 3drop ] dip
         ] [
             drop read-until-loop
         ] if
     ] [
-        >r 2drop 2drop r>
+        [ 2drop 2drop ] dip
     ] if ;
 
 M: input-port stream-read-until ( seps port -- str/f sep/f )
-    2dup read-until-step dup [ >r 2nip r> ] [
+    2dup read-until-step dup [ [ 2drop ] 2dip ] [
         over [
             drop
             BV{ } like [ read-until-loop ] keep B{ } like swap
-        ] [ >r 2nip r> ] if
+        ] [ [ 2drop ] 2dip ] if
     ] if ;
 
 TUPLE: output-port < buffered-port ;
@@ -114,7 +114,7 @@ M: output-port stream-write
         [ [ stream-write ] curry ] bi
         each
     ] [
-        [ >r length r> wait-to-write ]
+        [ [ length ] dip wait-to-write ]
         [ buffer>> >buffer ] 2bi
     ] if ;
 
@@ -152,6 +152,18 @@ M: port dispose*
         [ handle>> shutdown ]
         bi
     ] with-destructors ;
+
+GENERIC: underlying-port ( stream -- port )
+
+M: port underlying-port ;
+
+M: encoder underlying-port stream>> underlying-port ;
+
+M: decoder underlying-port stream>> underlying-port ;
+
+GENERIC: underlying-handle ( stream -- handle )
+
+M: object underlying-handle underlying-port handle>> ;
 
 ! Fast-path optimization
 USING: hints strings io.encodings.utf8 io.encodings.ascii

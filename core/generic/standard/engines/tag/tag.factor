@@ -3,7 +3,7 @@
 USING: classes.private generic.standard.engines namespaces make
 arrays assocs sequences.private quotations kernel.private
 math slots.private math.private kernel accessors words
-layouts sorting sequences ;
+layouts sorting sequences combinators ;
 IN: generic.standard.engines.tag
 
 TUPLE: lo-tag-dispatch-engine methods ;
@@ -24,15 +24,21 @@ C: <lo-tag-dispatch-engine> lo-tag-dispatch-engine
 
 : sort-tags ( assoc -- alist ) >alist sort-keys reverse ;
 
+: tag-dispatch-test ( tag# -- quot )
+    picker [ tag ] append swap [ eq? ] curry append ;
+
+: tag-dispatch-quot ( alist -- quot )
+    [ default get ] dip
+    [ [ tag-dispatch-test ] dip ] assoc-map
+    alist>quot ;
+
 M: lo-tag-dispatch-engine engine>quot
     methods>> engines>quots*
-    [ >r lo-tag-number r> ] assoc-map
+    [ [ lo-tag-number ] dip ] assoc-map
     [
-        picker % [ tag ] % [
-            sort-tags linear-dispatch-quot
-        ] [
-            num-tags get direct-dispatch-quot
-        ] if-small? %
+        [ sort-tags tag-dispatch-quot ]
+        [ picker % [ tag ] % num-tags get direct-dispatch-quot ]
+        if-small? %
     ] [ ] make ;
 
 TUPLE: hi-tag-dispatch-engine methods ;
@@ -53,13 +59,13 @@ C: <hi-tag-dispatch-engine> hi-tag-dispatch-engine
 
 M: hi-tag-dispatch-engine engine>quot
     methods>> engines>quots*
-    [ >r hi-tag-number r> ] assoc-map
+    [ [ hi-tag-number ] dip ] assoc-map
     [
         picker % hi-tag-quot % [
             sort-tags linear-dispatch-quot
         ] [
             num-tags get , \ fixnum-fast ,
-            [ >r num-tags get - r> ] assoc-map
+            [ [ num-tags get - ] dip ] assoc-map
             num-hi-tags direct-dispatch-quot
         ] if-small? %
     ] [ ] make ;

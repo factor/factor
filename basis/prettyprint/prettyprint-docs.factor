@@ -1,4 +1,4 @@
-USING: prettyprint.backend prettyprint.config
+USING: prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections prettyprint.private help.markup help.syntax
 io kernel words definitions quotations strings generic classes ;
 IN: prettyprint
@@ -17,7 +17,8 @@ ARTICLE: "prettyprint-stacks" "Prettyprinting stacks"
 "Prettyprinting any stack:"
 { $subsection stack. }
 "Prettyprinting any call stack:"
-{ $subsection callstack. } ;
+{ $subsection callstack. }
+"Note that calls to " { $link .s } " can also be included inside words as a debugging aid, however a more convenient way to achieve this is to use the annotation facility. See " { $link "tools.annotations" } "." ;
 
 ARTICLE: "prettyprint-variables" "Prettyprint control variables"
 "The following variables affect the " { $link . } " and " { $link pprint } " words if set in the current dynamic scope:"

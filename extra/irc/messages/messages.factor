@@ -20,6 +20,7 @@ TUPLE: nick-in-use < irc-message name ;
 TUPLE: notice < irc-message type ;
 TUPLE: mode < irc-message name mode parameter ;
 TUPLE: names-reply < irc-message who channel ;
+TUPLE: end-of-names < irc-message who channel ;
 TUPLE: unhandled < irc-message ;
 
 : <irc-client-message> ( command parameters trailing -- irc-message )
@@ -85,12 +86,15 @@ M: nick-in-use >>command-parameters ( nick-in-use params -- nick-in-use )
 M: names-reply >>command-parameters ( names-reply params -- names-reply )
     first3 nip [ >>who ] [ >>channel ] bi* ;
 
+M: end-of-names >>command-parameters ( names-reply params -- names-reply )
+    first2 [ >>who ] [ >>channel ] bi* ;
+
 M: mode >>command-parameters ( mode params -- mode )
-    dup length 3 = [
-        first3 [ >>name ] [ >>mode ] [ >>parameter ] tri*
-    ] [
-        first2 [ >>name ] [ >>mode ] bi*
-    ] if ;
+    dup length {
+        { 3 [ first3 [ >>name ] [ >>mode ] [ >>parameter ] tri* ] }
+        { 2 [ first2 [ >>name ] [ >>mode ] bi* ] }
+        [ drop first >>name dup trailing>> >>mode ]
+    } case ;
 
 PRIVATE>
 
@@ -131,12 +135,12 @@ M: irc-message irc-message>server-line ( irc-message -- string )
 
 : copy-message-in ( command irc-message -- command )
     {
-        [ parameters>> [ >>parameters ] [ >>command-parameters ] bi ]
         [ line>>      >>line ]
         [ prefix>>    >>prefix ]
         [ command>>   >>command ]
         [ trailing>>  >>trailing ]
         [ timestamp>> >>timestamp ]
+        [ parameters>> [ >>parameters ] [ >>command-parameters ] bi ]
     } cleave ;
 
 PRIVATE>
@@ -159,6 +163,7 @@ M: sender-in-prefix irc-message-sender ( sender-in-prefix -- sender )
             { "001"     [ logged-in ] }
             { "433"     [ nick-in-use ] }
             { "353"     [ names-reply ] }
+            { "366"     [ end-of-names ] }
             { "JOIN"    [ join ] }
             { "PART"    [ part ] }
             { "NICK"    [ nick ] }

@@ -25,7 +25,7 @@ M: mixin-class rank-class drop 3 ;
         bi
     ] if ;
 
-TUPLE: check-mixin-class mixin ;
+TUPLE: check-mixin-class class ;
 
 : check-mixin-class ( mixin -- mixin )
     dup mixin-class? [

@@ -30,7 +30,7 @@ TYPEDEF: long*               LPLONG
 TYPEDEF: long                LONG_PTR
 TYPEDEF: long*               PLONG_PTR
 
-TYPEDEF: int                 ULONG
+TYPEDEF: uint                ULONG
 TYPEDEF: void*               ULONG_PTR
 TYPEDEF: void*               PULONG_PTR
 
@@ -40,10 +40,11 @@ TYPEDEF: void*               LPVOID
 TYPEDEF: void*               LPCVOID
 
 TYPEDEF: float               FLOAT
-TYPEDEF: short       HALF_PTR
-TYPEDEF: ushort      UHALF_PTR
-TYPEDEF: int         INT_PTR
-TYPEDEF: uint        UINT_PTR
+
+TYPEDEF: intptr_t    HALF_PTR
+TYPEDEF: intptr_t    UHALF_PTR
+TYPEDEF: intptr_t    INT_PTR
+TYPEDEF: intptr_t    UINT_PTR
 
 TYPEDEF: int         LONG_PTR
 TYPEDEF: ulong       ULONG_PTR
@@ -251,6 +252,29 @@ C-STRUCT: RECT
     ! { "BOOL" "fIncUpdate" }
     ! { "BYTE[32]" "rgbReserved" }
 ! ;
+
+C-STRUCT: BITMAPINFOHEADER
+    { "DWORD"  "biSize" }
+    { "LONG"   "biWidth" }
+    { "LONG"   "biHeight" }
+    { "WORD"   "biPlanes" }
+    { "WORD"   "biBitCount" }
+    { "DWORD"  "biCompression" }
+    { "DWORD"  "biSizeImage" }
+    { "LONG"   "biXPelsPerMeter" }
+    { "LONG"   "biYPelsPerMeter" }
+    { "DWORD"  "biClrUsed" }
+    { "DWORD"  "biClrImportant" } ;
+
+C-STRUCT: RGBQUAD
+    { "BYTE" "rgbBlue" }
+    { "BYTE" "rgbGreen" }
+    { "BYTE" "rgbRed" }
+    { "BYTE" "rgbReserved" } ;
+
+C-STRUCT: BITMAPINFO
+    { "BITMAPINFOHEADER" "bmiHeader" }
+    { "RGBQUAD[1]" "bmiColors" } ;
 
 TYPEDEF: void* LPPAINTSTRUCT
 TYPEDEF: void* PAINTSTRUCT

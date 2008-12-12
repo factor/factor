@@ -5,7 +5,7 @@ USING: combinators.lib kernel sequences math namespaces make
 assocs random sequences.private shuffle math.functions arrays
 math.parser math.private sorting strings ascii macros assocs.lib
 quotations hashtables math.order locals generalizations
-math.ranges random  ;
+math.ranges random fry ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -23,11 +23,11 @@ IN: sequences.lib
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : each-percent ( seq quot -- )
-  >r
-  dup length
-  dup [ / ] curry
-  [ 1+ ] prepose
-  r> compose
+  [
+    dup length
+    dup [ / ] curry
+    [ 1+ ] prepose
+  ] dip compose
   2each ;                       inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -68,7 +68,7 @@ IN: sequences.lib
 
 : minmax ( seq -- min max )
     #! find the min and max of a seq in one pass
-    1/0. -1/0. rot [ tuck max >r min r> ] each ;
+    1/0. -1/0. rot [ tuck max [ min ] dip ] each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -78,7 +78,7 @@ IN: sequences.lib
 
 : (monotonic-split) ( seq quot -- newseq )
     [
-        >r dup unclip suffix r>
+        [ dup unclip suffix ] dip
         v, [ pick ,, call [ v, ] unless ] curry 2each ,v
     ] { } make ;
 
@@ -88,14 +88,10 @@ IN: sequences.lib
 ERROR: element-not-found ;
 : split-around ( seq quot -- before elem after )
     dupd find over [ element-not-found ] unless
-    >r cut rest r> swap ; inline
-
-: (map-until) ( quot pred -- quot )
-    [ dup ] swap 3compose
-    [ [ drop t ] [ , f ] if ] compose [ find 2drop ] curry ;
+    [ cut rest ] dip swap ; inline
 
 : map-until ( seq quot pred -- newseq )
-    (map-until) { } make ;
+    '[ [ @ dup @ [ drop t ] [ , f ] if ] find 2drop ] { } make ;
 
 : take-while ( seq quot -- newseq )
     [ not ] compose
@@ -119,14 +115,14 @@ ERROR: element-not-found ;
 PRIVATE>
 
 : exact-strings ( alphabet length -- seqs )
-    >r dup length r> exact-number-strings map-alphabet ;
+    [ dup length ] dip exact-number-strings map-alphabet ;
 
 : strings ( alphabet length -- seqs )
-    >r dup length r> number-strings map-alphabet ;
+    [ dup length ] dip number-strings map-alphabet ;
 
 : switches ( seq1 seq -- subseq )
     ! seq1 is a sequence of ones and zeroes
-    >r [ length ] keep [ nth 1 = ] curry filter r>
+    [ [ length ] keep [ nth 1 = ] curry filter ] dip
     [ nth ] curry { } map-as ;
 
 : power-set ( seq -- subsets )
@@ -151,7 +147,3 @@ PRIVATE>
     dup length 1 (a,b] [ dup random pick exchange ] each ;
 
 : enumerate ( seq -- seq' ) <enum> >alist ;
-
-: splice ( left-seq right-seq seq -- newseq ) swap 3append ;
-
-: surround ( seq left-seq right-seq -- newseq ) swapd 3append ;

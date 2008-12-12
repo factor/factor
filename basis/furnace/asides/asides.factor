@@ -4,9 +4,9 @@ USING: namespaces assocs kernel sequences accessors hashtables
 urls db.types db.tuples math.parser fry logging combinators
 html.templates.chloe.syntax
 http http.server http.server.filters http.server.redirection
-furnace
 furnace.cache
 furnace.sessions
+furnace.utilities
 furnace.redirection ;
 IN: furnace.asides
 

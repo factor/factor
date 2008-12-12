@@ -199,11 +199,11 @@ TYPEDEF: FILE_NOTIFY_INFORMATION* PFILE_NOTIFY_INFORMATION
 : THREAD_PRIORITY_TIME_CRITICAL 15 ; inline
 
 C-STRUCT: OVERLAPPED
-    { "int" "internal" }
-    { "int" "internal-high" }
-    { "int" "offset" }
-    { "int" "offset-high" }
-    { "void*" "event" } ;
+    { "UINT_PTR" "internal" }
+    { "UINT_PTR" "internal-high" }
+    { "DWORD" "offset" }
+    { "DWORD" "offset-high" }
+    { "HANDLE" "event" } ;
 
 C-STRUCT: SYSTEMTIME
     { "WORD" "wYear" }
@@ -315,10 +315,10 @@ C-STRUCT: MEMORY_BASIC_INFORMATION
   { "DWORD" "type" } ;
 
 C-STRUCT: GUID
-    { "ulong" "Data1" }
-    { "ushort" "Data2" }
-    { "ushort" "Data3" }
-    { { "uchar" 8 } "Data4" } ;
+    { "ULONG" "Data1" }
+    { "WORD"  "Data2" }
+    { "WORD"  "Data3" }
+    { { "UCHAR" 8 } "Data4" } ;
 
 
 : SE_CREATE_TOKEN_NAME "SeCreateTokenPrivilege" ;

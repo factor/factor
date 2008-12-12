@@ -1,16 +1,14 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays byte-vectors generic
-hashtables io assocs kernel math namespaces make sequences
-strings sbufs io.styles vectors words prettyprint.config
+USING: accessors arrays byte-arrays generic hashtables io assocs
+kernel math namespaces make sequences strings sbufs io.styles
+vectors words prettyprint.config prettyprint.custom
 prettyprint.sections quotations io io.files math.parser effects
 classes.tuple math.order classes.tuple.private classes
 combinators colors ;
 IN: prettyprint.backend
 
-GENERIC: pprint* ( obj -- )
-
-M: effect pprint* effect>string "(" swap ")" 3append text ;
+M: effect pprint* effect>string "(" ")" surround text ;
 
 : ?effect-height ( word -- n )
     stack-effect [ effect-height ] [ 0 ] if* ;
@@ -20,9 +18,6 @@ M: effect pprint* effect>string "(" swap ")" 3append text ;
 
 : ?end-group ( word -- )
     ?effect-height 0 < [ end-group ] when ;
-
-\ >r hard "break-before" set-word-prop
-\ r> hard "break-after" set-word-prop
 
 ! Atoms
 : word-style ( word -- style )
@@ -93,7 +88,7 @@ M: f pprint* drop \ f pprint-word ;
     ] H{ } make-assoc ;
 
 : unparse-string ( str prefix suffix -- str )
-    [ >r % do-string-limit [ unparse-ch ] each r> % ] "" make ;
+    [ [ % do-string-limit [ unparse-ch ] each ] dip % ] "" make ;
 
 : pprint-string ( obj str prefix suffix -- )
     unparse-string swap string-style styled-text ;
@@ -156,34 +151,27 @@ M: tuple pprint*
 : do-length-limit ( seq -- trimmed n/f )
     length-limit get dup [
         over length over [-]
-        dup zero? [ 2drop f ] [ >r head r> ] if
+        dup zero? [ 2drop f ] [ [ head ] dip ] if
     ] when ;
 
 : pprint-elements ( seq -- )
-    do-length-limit >r
-    [ pprint* ] each
-    r> [ "~" swap number>string " more~" 3append text ] when* ;
-
-GENERIC: pprint-delims ( obj -- start end )
+    do-length-limit
+    [ [ pprint* ] each ] dip
+    [ "~" swap number>string " more~" 3append text ] when* ;
 
 M: quotation pprint-delims drop \ [ \ ] ;
 M: curry pprint-delims drop \ [ \ ] ;
 M: compose pprint-delims drop \ [ \ ] ;
 M: array pprint-delims drop \ { \ } ;
 M: byte-array pprint-delims drop \ B{ \ } ;
-M: byte-vector pprint-delims drop \ BV{ \ } ;
 M: vector pprint-delims drop \ V{ \ } ;
 M: hashtable pprint-delims drop \ H{ \ } ;
 M: tuple pprint-delims drop \ T{ \ } ;
 M: wrapper pprint-delims drop \ W{ \ } ;
 M: callstack pprint-delims drop \ CS{ \ } ;
 
-GENERIC: >pprint-sequence ( obj -- seq )
-
 M: object >pprint-sequence ;
-
 M: vector >pprint-sequence ;
-M: byte-vector >pprint-sequence ;
 M: curry >pprint-sequence ;
 M: compose >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
@@ -194,39 +182,28 @@ M: tuple >pprint-sequence
     [ class ] [ tuple-slots ] bi
     [ 1array ] [ [ f 2array ] dip append ] if-empty ;
 
-GENERIC: pprint-narrow? ( obj -- ? )
-
 M: object pprint-narrow? drop f ;
-
 M: array pprint-narrow? drop t ;
 M: vector pprint-narrow? drop t ;
 M: hashtable pprint-narrow? drop t ;
 M: tuple pprint-narrow? drop t ;
 
-: pprint-object ( obj -- )
+M: object pprint-object ( obj -- )
     [
         <flow
-        dup pprint-delims >r pprint-word
-        dup pprint-narrow? <inset
-        >pprint-sequence pprint-elements
-        block> r> pprint-word block>
+        dup pprint-delims [
+            pprint-word
+            dup pprint-narrow? <inset
+            >pprint-sequence pprint-elements
+            block>
+        ] dip pprint-word block>
     ] check-recursion ;
 
 M: object pprint* pprint-object ;
 M: vector pprint* pprint-object ;
-M: byte-vector pprint* pprint-object ;
 M: hashtable pprint* pprint-object ;
-
-M: curry pprint*
-    dup quot>> callable? [ pprint-object ] [
-        "( invalid curry )" swap present-text
-    ] if ;
-
-M: compose pprint*
-    dup [ first>> callable? ] [ second>> callable? ] bi and
-    [ pprint-object ] [
-        "( invalid compose )" swap present-text
-    ] if ;
+M: curry pprint* pprint-object ;
+M: compose pprint* pprint-object ;
 
 M: wrapper pprint*
     dup wrapped>> word? [

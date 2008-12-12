@@ -9,7 +9,7 @@ ui.gadgets.books ui.gadgets.buttons ui.gadgets.labelled
 ui.gadgets.scrollers ui.gadgets.tracks ui.gadgets.worlds
 ui.gadgets.presentations ui.gestures words vocabs.loader
 tools.test tools.vocabs ui.gadgets.buttons ui.gadgets.status-bar
-mirrors ;
+mirrors fry ;
 IN: ui.tools
 
 : <workspace-tabs> ( workspace -- tabs )
@@ -19,8 +19,7 @@ IN: ui.tools
     <toggle-buttons> ;
 
 : <workspace-book> ( workspace -- gadget )
-    dup
-        <stack-display>
+        <gadget>
         <browser-gadget>
         <inspector-gadget>
         <profiler-gadget>
@@ -34,14 +33,14 @@ IN: ui.tools
         dup <workspace-book> >>book
 
         dup <workspace-tabs> f track-add
-        dup book>> 1/5 track-add
-        dup listener>> 4/5 track-add
-        dup <toolbar> f track-add ;
+        dup book>> 0 track-add
+        dup listener>> 1 track-add
+        add-toolbar ;
 
 : resize-workspace ( workspace -- )
-    dup sizes>> over control-value zero? [
-        1/5 over set-second
-        4/5 swap set-third
+    dup sizes>> over control-value 0 = [
+        0 over set-second
+        1 swap set-third
     ] [
         2/3 over set-second
         1/3 swap set-third
@@ -55,13 +54,15 @@ M: workspace model-changed
 
 [ workspace-window ] ui-hook set-global
 
-: com-listener ( workspace -- ) stack-display select-tool ;
+: select-tool ( workspace n -- ) swap book>> model>> set-model ;
 
-: com-browser ( workspace -- ) browser-gadget select-tool ;
+: com-listener ( workspace -- ) 0 select-tool ;
 
-: com-inspector ( workspace -- ) inspector-gadget select-tool ;
+: com-browser ( workspace -- ) 1 select-tool ;
 
-: com-profiler ( workspace -- ) profiler-gadget select-tool ;
+: com-inspector ( workspace -- ) 2 select-tool ;
+
+: com-profiler ( workspace -- ) 3 select-tool ;
 
 workspace "tool-switching" f {
     { T{ key-down f { A+ } "1" } com-listener }
@@ -92,7 +93,7 @@ workspace "workflow" f {
 ] workspace-window-hook set-global
 
 : inspect-continuation ( traceback -- )
-    control-value [ inspect ] curry call-listener ;
+    control-value '[ _ inspect ] call-listener ;
 
 traceback-gadget "toolbar" f {
     { T{ key-down f f "v" } variables }

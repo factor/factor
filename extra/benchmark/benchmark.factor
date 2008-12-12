@@ -2,12 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel vocabs vocabs.loader tools.time tools.vocabs
 arrays assocs io.styles io help.markup prettyprint sequences
-continuations debugger ;
+continuations debugger math ;
 IN: benchmark
 
 : run-benchmark ( vocab -- result )
-    [ [ require ] [ [ run ] benchmark ] bi ] curry
-    [ error. f ] recover ;
+    [ "=== " write vocab-name print flush ] [
+        [ [ require ] [ [ run ] benchmark ] bi ] curry
+        [ error. f ] recover
+    ] bi ;
 
 : run-benchmarks ( -- assoc )
     "benchmark" all-child-vocabs-seq
@@ -17,12 +19,12 @@ IN: benchmark
     standard-table-style [
         [
             [ "Benchmark" write ] with-cell
-            [ "Time (ms)" write ] with-cell
+            [ "Time (seconds)" write ] with-cell
         ] with-row
         [
             [
                 [ [ 1array $vocab-link ] with-cell ]
-                [ pprint-cell ] bi*
+                [ [ 1000000 /f pprint-cell ] [ "failed" write ] if* ] bi*
             ] with-row
         ] assoc-each
     ] tabular-output ;

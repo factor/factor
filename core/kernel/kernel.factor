@@ -3,12 +3,16 @@
 USING: kernel.private slots.private classes.tuple.private ;
 IN: kernel
 
+DEFER: dip
+DEFER: 2dip
+DEFER: 3dip
+
 ! Stack stuff
 : spin ( x y z -- z y x ) swap rot ; inline
 
-: roll ( x y z t -- y z t x ) >r rot r> swap ; inline
+: roll ( x y z t -- y z t x ) [ rot ] dip swap ; inline
 
-: -roll ( x y z t -- t x y z ) swap >r -rot r> ; inline
+: -roll ( x y z t -- t x y z ) swap [ -rot ] dip ; inline
 
 : 2over ( x y z -- x y z x y ) pick pick ; inline
 
@@ -48,57 +52,71 @@ DEFER: if
 : ?if ( default cond true false -- )
     pick [ roll 2drop call ] [ 2nip call ] if ; inline
 
-! Slippers
-: slip ( quot x -- x ) >r call r> ; inline
+! Slippers and dippers.
+! Not declared inline because the compiler special-cases them
 
-: 2slip ( quot x y -- x y ) >r >r call r> r> ; inline
+: slip ( quot x -- x )
+    #! 'slip' and 'dip' can be defined in terms of each other
+    #! because the JIT special-cases a 'dip' preceeded by
+    #! a literal quotation.
+    [ call ] dip ;
 
-: 3slip ( quot x y z -- x y z ) >r >r >r call r> r> r> ; inline
+: 2slip ( quot x y -- x y )
+    #! '2slip' and '2dip' can be defined in terms of each other
+    #! because the JIT special-cases a '2dip' preceeded by
+    #! a literal quotation.
+    [ call ] 2dip ;
 
-: dip ( obj quot -- obj ) swap slip ; inline
+: 3slip ( quot x y z -- x y z )
+    #! '3slip' and '3dip' can be defined in terms of each other
+    #! because the JIT special-cases a '3dip' preceeded by
+    #! a literal quotation.
+    [ call ] 3dip ;
 
-: 2dip ( obj1 obj2 quot -- obj1 obj2 ) -rot 2slip ; inline
+: dip ( x quot -- x ) swap slip ;
 
-: 3dip ( obj1 obj2 obj3 quot -- obj1 obj2 obj3 ) -roll 3slip ; inline
+: 2dip ( x y quot -- x y ) -rot 2slip ;
+
+: 3dip ( x y z quot -- x y z ) -roll 3slip ;
 
 ! Keepers
 : keep ( x quot -- x ) over slip ; inline
 
-: 2keep ( x y quot -- x y ) 2over 2slip ; inline
+: 2keep ( x y quot -- x y ) [ 2dup ] dip 2dip ; inline
 
-: 3keep ( x y z quot -- x y z ) >r 3dup r> -roll 3slip ; inline
+: 3keep ( x y z quot -- x y z ) [ 3dup ] dip 3dip ; inline
 
 ! Cleavers
 : bi ( x p q -- )
-    >r keep r> call ; inline
+    [ keep ] dip call ; inline
 
 : tri ( x p q r -- )
-    >r >r keep r> keep r> call ; inline
+    [ [ keep ] dip keep ] dip call ; inline
 
 ! Double cleavers
 : 2bi ( x y p q -- )
-    >r 2keep r> call ; inline
+    [ 2keep ] dip call ; inline
 
 : 2tri ( x y p q r -- )
-    >r >r 2keep r> 2keep r> call ; inline
+    [ [ 2keep ] dip 2keep ] dip call ; inline
 
 ! Triple cleavers
 : 3bi ( x y z p q -- )
-    >r 3keep r> call ; inline
+    [ 3keep ] dip call ; inline
 
 : 3tri ( x y z p q r -- )
-    >r >r 3keep r> 3keep r> call ; inline
+    [ [ 3keep ] dip 3keep ] dip call ; inline
 
 ! Spreaders
 : bi* ( x y p q -- )
-    >r dip r> call ; inline
+    [ dip ] dip call ; inline
 
 : tri* ( x y z p q r -- )
-    >r >r 2dip r> dip r> call ; inline
+    [ [ 2dip ] dip dip ] dip call ; inline
 
 ! Double spreaders
 : 2bi* ( w x y z p q -- )
-    >r 2dip r> call ; inline
+    [ 2dip ] dip call ; inline
 
 ! Appliers
 : bi@ ( x y quot -- )
@@ -110,14 +128,6 @@ DEFER: if
 ! Double appliers
 : 2bi@ ( w x y z quot -- )
     dup 2bi* ; inline
-
-: loop ( pred: ( -- ? ) -- )
-    dup slip swap [ loop ] [ drop ] if ; inline recursive
-
-: while ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
-    >r >r dup slip r> r> roll
-    [ >r tuck 2slip r> while ]
-    [ 2nip call ] if ; inline recursive
 
 ! Object protocol
 GENERIC: hashcode* ( depth obj -- code )
@@ -136,8 +146,11 @@ TUPLE: identity-tuple ;
 
 M: identity-tuple equal? 2drop f ;
 
+USE: math.private
 : = ( obj1 obj2 -- ? )
-    2dup eq? [ 2drop t ] [ equal? ] if ; inline
+    2dup eq? [ 2drop t ] [
+        2dup both-fixnums? [ 2drop f ] [ equal? ] if
+    ] if ; inline
 
 GENERIC: clone ( obj -- cloned )
 
@@ -163,9 +176,6 @@ GENERIC: boa ( ... class -- tuple )
 : prepose ( quot1 quot2 -- compose )
     swap compose ; inline
 
-: 3compose ( quot1 quot2 quot3 -- compose )
-    compose compose ; inline
-
 ! Booleans
 : not ( obj -- ? ) [ f ] [ t ] if ; inline
 
@@ -182,7 +192,20 @@ GENERIC: boa ( ... class -- tuple )
 : either? ( x y quot -- ? ) bi@ or ; inline
 
 : most ( x y quot -- z )
-    >r 2dup r> call [ drop ] [ nip ] if ; inline
+    [ 2dup ] dip call [ drop ] [ nip ] if ; inline
+
+! Loops
+: loop ( pred: ( -- ? ) -- )
+    dup slip swap [ loop ] [ drop ] if ; inline recursive
+
+: do ( pred body tail -- pred body tail )
+    over 3dip ; inline
+
+: while ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
+    [ pick 3dip [ do while ] 3curry ] keep if ; inline recursive
+
+: until ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
+    [ [ not ] compose ] 2dip while ; inline
 
 ! Error handling -- defined early so that other files can
 ! throw errors before continuations are loaded

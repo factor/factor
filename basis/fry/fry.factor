@@ -1,33 +1,32 @@
 ! Copyright (C) 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences combinators parser splitting math
-quotations arrays make words ;
+quotations arrays make words locals.backend summary sets ;
 IN: fry
 
 : _ ( -- * ) "Only valid inside a fry" throw ;
 : @ ( -- * ) "Only valid inside a fry" throw ;
 
+ERROR: >r/r>-in-fry-error ;
+
 <PRIVATE
 
-DEFER: (shallow-fry)
-DEFER: shallow-fry
+: [ncurry] ( n -- quot )
+    {
+        { 0 [ [ ] ] }
+        { 1 [ [ curry ] ] }
+        { 2 [ [ 2curry ] ] }
+        { 3 [ [ 3curry ] ] }
+        [ \ curry <repetition> ]
+    } case ;
 
-: ((shallow-fry)) ( accum quot adder -- result )
-    >r shallow-fry r>
-    append swap [
-        [ prepose ] curry append
-    ] unless-empty ; inline
+M: >r/r>-in-fry-error summary
+    drop
+    "Explicit retain stack manipulation is not permitted in fried quotations" ;
 
-: (shallow-fry) ( accum quot -- result )
-    [ 1quotation ] [
-        unclip {
-            { \ _ [ [ curry ] ((shallow-fry)) ] }
-            { \ @ [ [ compose ] ((shallow-fry)) ] }
-            [ swap >r suffix r> (shallow-fry) ]
-        } case
-    ] if-empty ;
-
-: shallow-fry ( quot -- quot' ) [ ] swap (shallow-fry) ;
+: check-fry ( quot -- quot )
+    dup { >r r> load-locals get-local drop-locals } intersect
+    empty? [ >r/r>-in-fry-error ] unless ;
 
 PREDICATE: fry-specifier < word { _ @ } memq? ;
 
@@ -37,15 +36,21 @@ M: callable count-inputs [ count-inputs ] sigma ;
 M: fry-specifier count-inputs drop 1 ;
 M: object count-inputs drop 0 ;
 
+GENERIC: deep-fry ( obj -- )
+
+: shallow-fry ( quot -- quot' curry# )
+    check-fry
+    [ [ deep-fry ] each ] [ ] make
+    [ dup \ @ = [ drop [ _ call ] ] [ 1array ] if ] map concat
+    { _ } split [ spread>quot ] [ length 1- ] bi ;
+
 PRIVATE>
 
-: fry ( quot -- quot' )
-    [
-        [
-            dup callable? [
-                [ count-inputs \ _ <repetition> % ] [ fry % ] bi
-            ] [ , ] if
-        ] each
-    ] [ ] make shallow-fry ;
+: fry ( quot -- quot' ) shallow-fry [ncurry] swap prefix ;
+
+M: callable deep-fry
+    [ count-inputs \ _ <repetition> % ] [ fry % ] bi ;
+
+M: object deep-fry , ;
 
 : '[ \ ] parse-until fry over push-all ; parsing

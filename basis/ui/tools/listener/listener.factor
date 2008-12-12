@@ -1,20 +1,17 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: inspector ui.tools.interactor ui.tools.inspector
-ui.tools.workspace help.markup io io.styles
-kernel models namespaces parser quotations sequences ui.commands
-ui.gadgets ui.gadgets.editors ui.gadgets.labelled
-ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
-ui.gadgets.tracks ui.gestures ui.operations vocabs words
-prettyprint listener debugger threads boxes concurrency.flags
-math arrays generic accessors combinators assocs ;
+USING: inspector help help.markup io io.styles kernel models
+namespaces parser quotations sequences vocabs words prettyprint
+listener debugger threads boxes concurrency.flags math arrays
+generic accessors combinators assocs fry ui.commands ui.gadgets
+ui.gadgets.editors ui.gadgets.labelled ui.gadgets.panes
+ui.gadgets.buttons ui.gadgets.scrollers ui.gadgets.packs
+ui.gadgets.tracks ui.gadgets.borders ui.gadgets.frames
+ui.gadgets.grids ui.gestures ui.operations ui.tools.browser
+ui.tools.interactor ui.tools.inspector ui.tools.workspace ;
 IN: ui.tools.listener
 
-TUPLE: listener-gadget < track input output stack ;
-
-: listener-output, ( listener -- listener )
-    <scrolling-pane> >>output
-    dup output>> <scroller> "Output" <labelled-gadget> 1 track-add ;
+TUPLE: listener-gadget < track input output ;
 
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> ] bi ;
@@ -22,22 +19,16 @@ TUPLE: listener-gadget < track input output stack ;
 : <listener-input> ( listener -- gadget )
     output>> <pane-stream> <interactor> ;
 
-: listener-input, ( listener -- listener )
-    dup <listener-input> >>input
-    dup input>>
-        { 0 100 } <limited-scroller>
-        "Input" <labelled-gadget>
-    f track-add ;
-
 : welcome. ( -- )
     "If this is your first time with Factor, please read the " print
-    "handbook" ($link) "." print nl ;
+    "handbook" ($link) ". To see a list of keyboard shortcuts," print
+    "press F1." print nl ;
 
 M: listener-gadget focusable-child*
     input>> ;
 
 M: listener-gadget call-tool* ( input listener -- )
-    >r string>> r> input>> set-editor-string ;
+    [ string>> ] dip input>> set-editor-string ;
 
 M: listener-gadget tool-scroller
     output>> find-scroller ;
@@ -58,7 +49,7 @@ M: listener-gadget tool-scroller
 
 : call-listener ( quot -- )
     [ workspace-busy? not ] get-workspace* listener>>
-    [ dup wait-for-listener (call-listener) ] 2curry
+    '[ _ _ dup wait-for-listener (call-listener) ]
     "Listener call" spawn drop ;
 
 M: listener-command invoke-command ( target command -- )
@@ -74,7 +65,7 @@ M: listener-operation invoke-command ( target command -- )
 
 : listener-run-files ( seq -- )
     [
-        [ [ run-file ] each ] curry call-listener
+        '[ _ [ run-file ] each ] call-listener
     ] unless-empty ;
 
 : com-end ( listener -- )
@@ -104,13 +95,13 @@ M: engine-word word-completion-string
 : use-if-necessary ( word seq -- )
     over vocabulary>> over and [
         2dup [ assoc-stack ] keep = [ 2drop ] [
-            >r vocabulary>> vocab-words r> push
+            [ vocabulary>> vocab-words ] dip push
         ] if
     ] [ 2drop ] if ;
 
 : insert-word ( word -- )
     get-workspace listener>> input>>
-    [ >r word-completion-string r> user-input ]
+    [ [ word-completion-string ] dip user-input* drop ]
     [ interactor-use use-if-necessary ]
     2bi ;
 
@@ -120,20 +111,8 @@ M: engine-word word-completion-string
     [ select-all ]
     2bi ;
 
-TUPLE: stack-display < track ;
-
-: <stack-display> ( workspace -- gadget )
-    listener>>
-    { 0 1 } stack-display new-track
-    over <toolbar> f track-add
-    swap stack>> [ [ stack. ] curry try ] t "Data stack" <labelled-pane>
-    1 track-add ;
-
-M: stack-display tool-scroller
-    find-workspace listener>> tool-scroller ;
-
-: ui-listener-hook ( listener -- )
-    >r datastack r> stack>> set-model ;
+: ui-help-hook ( topic -- )
+    browser-gadget call-tool ;
 
 : ui-error-hook ( error listener -- )
     find-workspace debugger-popup ;
@@ -144,17 +123,20 @@ M: stack-display tool-scroller
 
 : listener-thread ( listener -- )
     dup listener-streams [
-        [ [ ui-listener-hook ] curry listener-hook set ]
-        [ [ ui-error-hook ] curry error-hook set ]
-        [ [ ui-inspector-hook ] curry inspector-hook set ] tri
+        [ ui-help-hook ] help-hook set
+        [ '[ _ ui-error-hook ] error-hook set ]
+        [ '[ _ ui-inspector-hook ] inspector-hook set ] bi
         welcome.
         listener
     ] with-streams* ;
 
 : start-listener-thread ( listener -- )
-    [
-        [ input>> register-self ] [ listener-thread ] bi
-    ] curry "Listener" spawn drop ;
+    '[
+        _
+        [ input>> register-self ]
+        [ listener-thread ]
+        bi
+    ] "Listener" spawn drop ;
 
 : restart-listener ( listener -- )
     #! Returns when listener is ready to receive input.
@@ -166,25 +148,41 @@ M: stack-display tool-scroller
         [ wait-for-listener ]
     } cleave ;
 
-: init-listener ( listener -- )
-    f <model> >>stack drop ;
+: init-listener ( listener -- listener )
+    <scrolling-pane> >>output
+    dup <listener-input> >>input ;
+
+: <listener-scroller> ( listener -- scroller )
+    <frame>
+        over output>> @top grid-add
+        swap input>> @center grid-add
+    <scroller> ;
 
 : <listener-gadget> ( -- gadget )
     { 0 1 } listener-gadget new-track
-        dup init-listener
-        listener-output,
-        listener-input, ;
+        add-toolbar
+        init-listener
+        dup <listener-scroller> 1 track-add ;
 
 : listener-help ( -- ) "ui-listener" help-window ;
 
 \ listener-help H{ { +nullary+ t } } define-command
 
+: com-auto-use ( -- )
+    auto-use? [ not ] change ;
+
+\ com-auto-use H{ { +nullary+ t } { +listener+ t } } define-command
+
+listener-gadget "misc" "Miscellaneous commands" {
+    { T{ key-down f f "F1" } listener-help }
+} define-command-map
+
 listener-gadget "toolbar" f {
     { f restart-listener }
-    { T{ key-down f f "CLEAR" } clear-output }
-    { T{ key-down f { C+ } "CLEAR" } clear-stack }
+    { T{ key-down f { A+ } "u" } com-auto-use }
+    { T{ key-down f { A+ } "k" } clear-output }
+    { T{ key-down f { A+ } "K" } clear-stack }
     { T{ key-down f { C+ } "d" } com-end }
-    { T{ key-down f f "F1" } listener-help }
 } define-command-map
 
 M: listener-gadget handle-gesture ( gesture gadget -- ? )

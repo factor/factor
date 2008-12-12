@@ -56,9 +56,9 @@ M: c-reader dispose*
 
 M: c-io-backend init-io ;
 
-: stdin-handle 11 getenv ;
-: stdout-handle 12 getenv ;
-: stderr-handle 61 getenv ;
+: stdin-handle ( -- alien ) 11 getenv ;
+: stdout-handle ( -- alien ) 12 getenv ;
+: stderr-handle ( -- alien ) 61 getenv ;
 
 : init-c-stdio ( -- stdin stdout stderr )
     stdin-handle <c-reader>
@@ -67,7 +67,7 @@ M: c-io-backend init-io ;
 
 M: c-io-backend (init-stdio) init-c-stdio ;
 
-M: c-io-backend io-multiplex 60 60 * 1000 * or (sleep) ;
+M: c-io-backend io-multiplex 60 60 * 1000 * 1000 * or (sleep) ;
 
 M: c-io-backend (file-reader)
     "rb" fopen <c-reader> ;
@@ -83,6 +83,6 @@ M: c-io-backend (file-appender)
     #! print stuff from contexts where the I/O system would
     #! otherwise not work (tools.deploy.shaker, the I/O
     #! multiplexer thread).
-    "\r\n" append >byte-array
+    "\n" append >byte-array
     stdout-handle fwrite
     stdout-handle fflush ;

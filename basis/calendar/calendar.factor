@@ -173,7 +173,7 @@ M: real +year ( timestamp n -- timestamp )
     12 /rem dup zero? [ drop 1- 12 ] when swap ; inline
 
 M: integer +month ( timestamp n -- timestamp )
-    [ over month>> + months/years >r >>month r> +year ] unless-zero ;
+    [ over month>> + months/years [ >>month ] dip +year ] unless-zero ;
 
 M: real +month ( timestamp n -- timestamp )
     [ float>whole-part swapd average-month * +day swap +month ] unless-zero ;
@@ -181,7 +181,7 @@ M: real +month ( timestamp n -- timestamp )
 M: integer +day ( timestamp n -- timestamp )
     [
         over >date< julian-day-number + julian-day-number>date
-        >r >r >>year r> >>month r> >>day
+        [ >>year ] [ >>month ] [ >>day ] tri*
     ] unless-zero ;
 
 M: real +day ( timestamp n -- timestamp )
@@ -191,7 +191,7 @@ M: real +day ( timestamp n -- timestamp )
     24 /rem swap ;
 
 M: integer +hour ( timestamp n -- timestamp )
-    [ over hour>> + hours/days >r >>hour r> +day ] unless-zero ;
+    [ over hour>> + hours/days [ >>hour ] dip +day ] unless-zero ;
 
 M: real +hour ( timestamp n -- timestamp )
     float>whole-part swapd 60 * +minute swap +hour ;
@@ -200,7 +200,7 @@ M: real +hour ( timestamp n -- timestamp )
     60 /rem swap ;
 
 M: integer +minute ( timestamp n -- timestamp )
-    [ over minute>> + minutes/hours >r >>minute r> +hour ] unless-zero ;
+    [ over minute>> + minutes/hours [ >>minute ] dip +hour ] unless-zero ;
 
 M: real +minute ( timestamp n -- timestamp )
     [ float>whole-part swapd 60 * +second swap +minute ] unless-zero ;
@@ -209,7 +209,7 @@ M: real +minute ( timestamp n -- timestamp )
     60 /rem swap >integer ;
 
 M: number +second ( timestamp n -- timestamp )
-    [ over second>> + seconds/minutes >r >>second r> +minute ] unless-zero ;
+    [ over second>> + seconds/minutes [ >>second ] dip +minute ] unless-zero ;
 
 : (time+)
     [ second>> +second ] keep
@@ -226,7 +226,7 @@ PRIVATE>
 GENERIC# time+ 1 ( time1 time2 -- time3 )
 
 M: timestamp time+
-    >r clone r> (time+) drop ;
+    [ clone ] dip (time+) drop ;
 
 M: duration time+
     dup timestamp? [
@@ -284,7 +284,7 @@ M: timestamp <=> ( ts1 ts2 -- n )
 : (time-) ( timestamp timestamp -- n )
     [ >gmt ] bi@
     [ [ >date< julian-day-number ] bi@ - 86400 * ] 2keep
-    [ >time< >r >r 3600 * r> 60 * r> + + ] bi@ - + ;
+    [ >time< [ [ 3600 * ] [ 60 * ] bi* ] dip + + ] bi@ - + ;
 
 M: timestamp time-
     #! Exact calendar-time difference
@@ -320,14 +320,20 @@ M: duration time-
     1970 1 1 0 0 0 instant <timestamp> ;
 
 : millis>timestamp ( x -- timestamp )
-    >r unix-1970 r> milliseconds time+ ;
+    [ unix-1970 ] dip milliseconds time+ ;
 
 : timestamp>millis ( timestamp -- n )
     unix-1970 (time-) 1000 * >integer ;
 
+: micros>timestamp ( x -- timestamp )
+    [ unix-1970 ] dip microseconds time+ ;
+
+: timestamp>micros ( timestamp -- n )
+    unix-1970 (time-) 1000000 * >integer ;
+
 : gmt ( -- timestamp )
     #! GMT time, right now
-    unix-1970 millis milliseconds time+ ;
+    unix-1970 micros microseconds time+ ;
 
 : now ( -- timestamp ) gmt >local-time ;
 : hence ( duration -- timestamp ) now swap time+ ;
@@ -337,10 +343,11 @@ M: duration time-
     #! Zeller Congruence
     #! http://web.textfiles.com/computers/formulas.txt
     #! good for any date since October 15, 1582
-    >r dup 2 <= [ 12 + >r 1- r> ] when
-    >r dup [ 4 /i + ] keep [ 100 /i - ] keep 400 /i + r>
-        [ 1+ 3 * 5 /i + ] keep 2 * + r>
-    1+ + 7 mod ;
+    [
+        dup 2 <= [ [ 1- ] [ 12 + ] bi* ] when
+        [ dup [ 4 /i + ] keep [ 100 /i - ] keep 400 /i + ] dip
+        [ 1+ 3 * 5 /i + ] keep 2 * +
+    ] dip 1+ + 7 mod ;
 
 GENERIC: days-in-year ( obj -- n )
 
@@ -404,7 +411,7 @@ PRIVATE>
 : since-1970 ( duration -- timestamp )
     unix-1970 time+ >local-time ;
 
-M: timestamp sleep-until timestamp>millis sleep-until ;
+M: timestamp sleep-until timestamp>micros sleep-until ;
 
 M: duration sleep hence sleep-until ;
 

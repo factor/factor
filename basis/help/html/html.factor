@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.encodings.utf8 io.encodings.ascii io.encodings.binary
-io.files html.streams html.elements html.components help kernel
+io.files html.streams html.elements help kernel
 assocs sequences make words accessors arrays help.topics vocabs
 tools.vocabs tools.vocabs.browser namespaces prettyprint io
 vocabs.loader serialize fry memoize unicode.case math.order
@@ -10,17 +10,15 @@ IN: help.html
 
 : escape-char ( ch -- )
     dup H{
-        { CHAR: " "__quote__" }
+        { CHAR: " "__quo__" }
         { CHAR: * "__star__" }
         { CHAR: : "__colon__" }
         { CHAR: < "__lt__" }
         { CHAR: > "__gt__" }
-        { CHAR: ? "__question__" }
-        { CHAR: \\ "__backslash__" }
+        { CHAR: ? "__que__" }
+        { CHAR: \\ "__back__" }
         { CHAR: | "__pipe__" }
-        { CHAR: _ "__underscore__" }
         { CHAR: / "__slash__" }
-        { CHAR: \\ "__backslash__" }
         { CHAR: , "__comma__" }
         { CHAR: @ "__at__" }
     } at [ % ] [ , ] ?if ;
@@ -106,10 +104,6 @@ MEMO: load-index ( name -- index )
 
 TUPLE: result title href ;
 
-M: result link-title title>> ;
-
-M: result link-href href>> ;
-
 : offline-apropos ( string index -- results )
     load-index swap >lower
     '[ [ drop _ ] dip >lower subseq? ] assoc-filter
@@ -117,10 +111,10 @@ M: result link-href href>> ;
     [ [ title>> ] compare ] sort ;
 
 : article-apropos ( string -- results )
-    "articles.idx" temp-file offline-apropos ;
+    "articles.idx" offline-apropos ;
 
 : word-apropos ( string -- results )
-    "words.idx" temp-file offline-apropos ;
+    "words.idx" offline-apropos ;
 
 : vocab-apropos ( string -- results )
-    "vocabs.idx" temp-file offline-apropos ;
+    "vocabs.idx" offline-apropos ;

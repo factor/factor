@@ -1,7 +1,10 @@
 IN: byte-arrays.tests
-USING: tools.test byte-arrays ;
+USING: tools.test byte-arrays sequences kernel ;
 
-[ B{ 1 2 3 0 0 0 } ] [ 6 B{ 1 2 3 } resize-byte-array ] unit-test
+[ 6 B{ 1 2 3 } ] [
+    6 B{ 1 2 3 } resize-byte-array
+    [ length ] [ 3 head ] bi
+] unit-test
 
 [ B{ 1 2 } ] [ 2 B{ 1 2 3 4 5 6 7 8 9 } resize-byte-array ] unit-test
 

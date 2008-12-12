@@ -73,7 +73,7 @@ MACRO: match-cond ( assoc -- )
     2dup [ length ] bi@ < [ 2drop f f ]
     [
         2dup length head over match
-        [ nip swap ?1-tail ] [ >r rest r> (match-first) ] if*
+        [ nip swap ?1-tail ] [ [ rest ] dip (match-first) ] if*
     ] if ;
     
 : match-first ( seq pattern-seq -- bindings )

@@ -12,7 +12,7 @@ PREDICATE: intersection-class < class
         [ drop t ]
     ] [
         unclip "predicate" word-prop swap [
-            "predicate" word-prop [ dup ] swap [ not ] 3append
+            "predicate" word-prop [ dup ] [ not ] surround
             [ drop f ]
         ] { } map>assoc alist>quot
     ] if-empty ;
@@ -23,7 +23,7 @@ PREDICATE: intersection-class < class
 M: intersection-class update-class define-intersection-predicate ;
 
 : define-intersection-class ( class participants -- )
-    [ f f rot intersection-class define-class ]
+    [ [ f f ] dip intersection-class define-class ]
     [ drop update-classes ]
     2bi ;
 

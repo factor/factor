@@ -1,6 +1,18 @@
 IN: compiler.cfg.value-numbering.tests
 USING: compiler.cfg.value-numbering compiler.cfg.instructions
-compiler.cfg.registers cpu.architecture tools.test kernel math ;
+compiler.cfg.registers compiler.cfg.debugger cpu.architecture
+tools.test kernel math combinators.short-circuit accessors
+sequences ;
+
+: trim-temps ( insns -- insns )
+    [
+        dup {
+            [ ##compare? ]
+            [ ##compare-imm? ]
+            [ ##compare-float? ]
+        } 1|| [ f >>temp ] when
+    ] map ;
+
 [
     {
         T{ ##peek f V int-regs 45 D 1 }
@@ -82,7 +94,7 @@ compiler.cfg.registers cpu.architecture tools.test kernel math ;
         T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc> }
         T{ ##compare-imm f V int-regs 6 V int-regs 4 7 cc/= }
         T{ ##replace f V int-regs 6 D 0 }
-    } value-numbering
+    } value-numbering trim-temps
 ] unit-test
 
 [
@@ -100,7 +112,7 @@ compiler.cfg.registers cpu.architecture tools.test kernel math ;
         T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc<= }
         T{ ##compare-imm f V int-regs 6 V int-regs 4 7 cc= }
         T{ ##replace f V int-regs 6 D 0 }
-    } value-numbering
+    } value-numbering trim-temps
 ] unit-test
 
 [
@@ -122,7 +134,7 @@ compiler.cfg.registers cpu.architecture tools.test kernel math ;
         T{ ##compare-float f V int-regs 12 V double-float-regs 10 V double-float-regs 11 cc< }
         T{ ##compare-imm f V int-regs 14 V int-regs 12 7 cc= }
         T{ ##replace f V int-regs 14 D 0 }
-    } value-numbering
+    } value-numbering trim-temps
 ] unit-test
 
 [
@@ -138,5 +150,5 @@ compiler.cfg.registers cpu.architecture tools.test kernel math ;
         T{ ##peek f V int-regs 30 D -2 }
         T{ ##compare f V int-regs 33 V int-regs 29 V int-regs 30 cc<= }
         T{ ##compare-imm-branch f V int-regs 33 7 cc/= }
-    } value-numbering
+    } value-numbering trim-temps
 ] unit-test

@@ -6,8 +6,10 @@ USING: kernel alien.c-types combinators namespaces make arrays
        vars colors self self.slots
        random-weighted colors.hsv cfdg.gl accessors
        ui.gadgets.handler ui.gestures assocs ui.gadgets macros
-       qualified ;
+       qualified specialized-arrays.double ;
+
 QUALIFIED: syntax
+
 IN: cfdg
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -53,7 +55,10 @@ VAR: color-stack
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: double-nth* ( c-array indices -- seq ) swap [ double-nth ] curry map ;
+! : double-nth* ( c-array indices -- seq ) swap [ double-nth ] curry map ;
+
+: double-nth* ( c-array indices -- seq )
+  swap byte-array>double-array [ nth ] curry map ;
 
 : check-size ( modelview -- num ) { 0 1 4 5 } double-nth* [ abs ] map biggest ;
 
@@ -75,7 +80,7 @@ VAR: threshold
     2 * sin ,   2 * cos neg ,   0 ,   0 ,
           0 ,             0 ,   1 ,   0 , 
           0 ,             0 ,   0 ,   1 , ]
-  { } make >c-double-array glMultMatrixd ;
+  double-array{ } make underlying>> glMultMatrixd ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -224,13 +229,13 @@ SYMBOL: dlist
 
 : delete-dlist ( -- ) dlist get [ dlist get 1 glDeleteLists dlist off ] when ;
 
-: cfdg-window* ( -- )
+: cfdg-window* ( -- slate )
   C[ display ] <slate>
     { 500 500 }       >>pdim
     C[ delete-dlist ] >>ungraft
   dup "CFDG" open-window ;
 
-: cfdg-window ( -- ) [ cfdg-window* ] with-ui ;
+: cfdg-window ( -- slate ) [ cfdg-window* ] with-ui ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

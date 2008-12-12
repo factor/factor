@@ -1,10 +1,10 @@
 IN: hints
-USING: help.markup help.syntax words quotations sequences ;
+USING: help.markup help.syntax words quotations sequences kernel ;
 
 ARTICLE: "hints" "Compiler specialization hints"
 "Specialization hints help the compiler generate efficient code."
 $nl
-"Specialization hints can help words which call a lot of generic words on the same object - perhaps in a loop - and in most cases, it is anticipated that this object is of a certain class. Using specialization hints, the compiler can be instructed to compile a branch at the beginning of the word; if the branch is taken, the input object has the assumed class, and inlining of generic methods can take place."
+"Specialization hints can help words which call a lot of generic words on the same object - perhaps in a loop - and in most cases, it is anticipated that this object is of a certain class, or even " { $link eq? } " to some literal. Using specialization hints, the compiler can be instructed to compile a branch at the beginning of the word; if the branch is taken, the input object has the assumed class or value, and inlining of generic methods can take place."
 $nl
 "Specialization hints are not declarations; if the inputs do not match what is specified, the word will still run, possibly slower if the compiled code cannot inline methods because of insufficient static type information."
 $nl
@@ -20,10 +20,10 @@ HELP: specialized-def
 { $description "Outputs the definition of a word after it has been split into specialized branches. This is the definition which will actually be compiled by the compiler." } ;
 
 HELP: HINTS:
-{ $values { "defspec" "a definition specifier" } { "hints..." "a list of sequences of classes" } }
+{ $values { "defspec" "a definition specifier" } { "hints..." "a list of sequences of classes or literals" } }
 { $description "Defines specialization hints for a word or a method."
 $nl
-"Each sequence of classes in the list will cause a specialized version of the word to be compiled." }
+"Each sequence in the list will cause a specialized version of the word to be compiled. Classes are tested for using their predicate, and literals are tested using " { $link eq? } "." }
 { $examples "The " { $link append } " word has a specializer for the very common case where two strings or two arrays are appended:"
 { $code "HINTS: append { string string } { array array } ;" }
 "Specializers can also be defined on methods:"

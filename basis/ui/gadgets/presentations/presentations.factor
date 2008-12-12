@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors definitions hashtables io kernel
-prettyprint sequences strings io.styles words help math models
+sequences strings io.styles words help math models
 namespaces quotations
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.menus ui.gadgets.worlds
@@ -12,7 +12,7 @@ TUPLE: presentation < button object hook ;
 
 : invoke-presentation ( presentation command -- )
     over dup hook>> call
-    >r object>> r> invoke-command ;
+    [ object>> ] dip invoke-command ;
 
 : invoke-primary ( presentation -- )
     dup object>> primary-operation
@@ -36,12 +36,13 @@ M: presentation ungraft*
     call-next-method ;
 
 : <operations-menu> ( presentation -- menu )
-    dup dup hook>> curry
-    swap object>>
-    dup object-operations <commands-menu> ;
+    [ object>> ]
+    [ dup hook>> curry ]
+    [ object>> object-operations ]
+    tri <commands-menu> ;
 
 : operations-menu ( presentation -- )
-    dup <operations-menu> swap show-menu ;
+    dup <operations-menu> show-menu ;
 
 presentation H{
     { T{ button-down f f 3 } [ operations-menu ] }

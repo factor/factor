@@ -1,27 +1,38 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: alien arrays byte-arrays combinators summary
-io.backend graphics.viewer io io.binary io.files kernel libc
-math math.functions namespaces opengl opengl.gl prettyprint
-sequences strings ui ui.gadgets.panes io.encodings.binary
-accessors grouping ;
+USING: alien arrays byte-arrays combinators summary io.backend
+graphics.viewer io io.binary io.files kernel libc math
+math.functions math.bitwise namespaces opengl opengl.gl
+prettyprint sequences strings ui ui.gadgets.panes fry
+io.encodings.binary accessors grouping macros alien.c-types ;
 IN: graphics.bitmap
 
-! Currently can only handle 24bit bitmaps.
+! Currently can only handle 24/32bit bitmaps.
 ! Handles row-reversed bitmaps (their height is negative)
 
 TUPLE: bitmap magic size reserved offset header-length width
     height planes bit-count compression size-image
     x-pels y-pels color-used color-important rgb-quads color-index array ;
 
+: (array-copy) ( bitmap array -- bitmap array' )
+    over size-image>> abs memory>byte-array ;
+
+MACRO: (nbits>bitmap) ( bits -- )
+    [ -3 shift ] keep '[
+        bitmap new
+            2over * _ * >>size-image
+            swap >>height
+            swap >>width
+            swap (array-copy) [ >>array ] [ >>color-index ] bi
+            _ >>bit-count
+    ] ;
+
 : bgr>bitmap ( array height width -- bitmap )
-    bitmap new
-        2over * 3 * >>size-image
-        swap >>height
-        swap >>width
-        swap [ >>array ] [ >>color-index ] bi
-        24 >>bit-count ;
+    24 (nbits>bitmap) ;
+
+: bgra>bitmap ( array height width -- bitmap )
+    32 (nbits>bitmap) ;
 
 : 8bit>array ( bitmap -- array )
     [ rgb-quads>> 4 <sliced-groups> [ 3 head-slice ] map ]
@@ -56,8 +67,8 @@ M: bitmap-magic summary
 
 : parse-bitmap-header ( bitmap -- )
     4 read le> >>header-length
-    4 read le> >>width
-    4 read le> >>height
+    4 read signed-le> >>width
+    4 read signed-le> >>height
     2 read le> >>planes
     2 read le> >>bit-count
     4 read le> >>compression
@@ -124,7 +135,7 @@ M: bitmap draw-image ( bitmap -- )
     [
         [ height>> abs ] keep
         bit-count>> {
-            ! { 32 [ GL_BGRA GL_UNSIGNED_INT_8_8_8_8 ] } ! broken
+            { 32 [ GL_BGRA GL_UNSIGNED_BYTE ] }
             { 24 [ GL_BGR GL_UNSIGNED_BYTE ] }
             { 8 [ GL_BGR GL_UNSIGNED_BYTE ] }
             { 4 [ GL_BGR GL_UNSIGNED_BYTE ] }

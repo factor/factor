@@ -1,6 +1,6 @@
 USING: arrays help.markup help.syntax math
 sequences.private vectors strings kernel math.order layouts
-quotations ;
+quotations generic.standard ;
 IN: sequences
 
 HELP: sequence
@@ -14,8 +14,8 @@ HELP: length
 
 HELP: set-length
 { $values { "n" "a non-negative integer" } { "seq" "a resizable sequence" } }
-{ $contract "Resizes the sequence. Not all sequences are resizable." }
-{ $errors "Throws a " { $link bounds-error } " if the new length is negative." }
+{ $contract "Resizes a sequence. The initial contents of the new area is undefined." }
+{ $errors "Throws a " { $link no-method  } " error if the sequence is not resizable, and a " { $link bounds-error } " if the new length is negative." }
 { $side-effects "seq" } ;
 
 HELP: lengthen
@@ -59,7 +59,7 @@ HELP: immutable
 
 HELP: new-sequence
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a mutable sequence" } }
-{ $contract "Outputs a mutable sequence of length " { $snippet "n" } " which can hold the elements of " { $snippet "seq" } "." } ;
+{ $contract "Outputs a mutable sequence of length " { $snippet "n" } " which can hold the elements of " { $snippet "seq" } ". The initial contents of the sequence are undefined." } ;
 
 HELP: new-resizable
 { $values { "len" "a non-negative integer" } { "seq" sequence } { "newseq" "a resizable mutable sequence" } }
@@ -416,11 +416,6 @@ HELP: interleave
 { $description "Applies " { $snippet "quot" } " to each element in turn, also invoking " { $snippet "between" } " in-between each pair of elements." }
 { $example "USING: io sequences ;" "{ \"a\" \"b\" \"c\" } [ \"X\" write ] [ write ] interleave" "aXbXc" } ;
 
-HELP: cache-nth
-{ $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" { $quotation "( i -- elt )" } } { "elt" object } }
-{ $description "If the sequence does not contain at least " { $snippet "i" } " elements or if the " { $snippet "i" } "th element of the sequence is " { $link f } ", calls the quotation to produce a new value, and stores it back into the sequence. Otherwise, this word outputs the " { $snippet "i" } "th element of the sequence." }
-{ $side-effects "seq" } ;
-
 HELP: index
 { $values { "obj" object } { "seq" sequence } { "n" "an index" } }
 { $description "Outputs the index of the first element in the sequence equal to " { $snippet "obj" } ". If no element is found, outputs " { $link f } "." } ;
@@ -711,6 +706,26 @@ HELP: 3append
     { $example "USING: prettyprint sequences ;"
         "\"a\" \"b\" \"c\" 3append ."
         "\"abc\""
+    }
+} ;
+
+HELP: surround
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence with " { $snippet "seq1" } " inserted between " { $snippet "seq2" } " and " { $snippet "seq3" } "." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+               "\"sssssh\" \"(\" \")\" surround ."
+               "\"(sssssh)\""
+    }
+} ;
+
+HELP: glue
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence with " { $snippet "seq3" } " inserted between " { $snippet "seq1" } " and " { $snippet "seq2" } "." }
+{ $examples
+    { $example "USING: sequences prettyprint ;"
+               "\"a\" \"b\" \",\" glue ."
+               "\"a,b\""
     }
 } ;
 
@@ -1348,6 +1363,8 @@ ARTICLE: "sequences-appending" "Appending sequences"
 { $subsection append }
 { $subsection prepend }
 { $subsection 3append }
+{ $subsection surround }
+{ $subsection glue }
 { $subsection concat }
 { $subsection join }
 "A pair of words useful for aligning strings:"
@@ -1475,7 +1492,6 @@ ARTICLE: "sequences-destructive" "Destructive operations"
 "Changing elements:"
 { $subsection change-each }
 { $subsection change-nth }
-{ $subsection cache-nth }
 "Deleting elements:"
 { $subsection delete }
 { $subsection delq }

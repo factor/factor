@@ -5,7 +5,7 @@ unicode.normalize math unicode.categories combinators
 assocs strings splitting kernel accessors ;
 IN: unicode.case
 
-: at-default ( key assoc -- value/key ) over >r at r> or ;
+: at-default ( key assoc -- value/key ) [ at ] [ drop ] 2bi or ;
 
 : ch>lower ( ch -- lower ) simple-lower at-default ;
 : ch>upper ( ch -- upper ) simple-upper at-default ;
@@ -100,11 +100,10 @@ SYMBOL: locale ! Just casing locale, or overall?
 : >case-fold ( string -- fold )
     >upper >lower ;
 
-: lower? ( string -- ? )
-    dup >lower = ;
-: upper? ( string -- ? )
-    dup >lower = ;
-: title? ( string -- ? )
-    dup >title = ;
-: case-fold? ( string -- ? )
-    dup >case-fold = ;
+: lower? ( string -- ? ) dup >lower = ;
+
+: upper? ( string -- ? ) dup >upper = ;
+
+: title? ( string -- ? ) dup >title = ;
+
+: case-fold? ( string -- ? ) dup >case-fold = ;

@@ -1,7 +1,7 @@
 USING: help help.markup help.syntax help.definitions help.topics
 namespaces words sequences classes assocs vocabs kernel arrays
-prettyprint.backend kernel.private io generic math system
-strings sbufs vectors byte-arrays quotations
+prettyprint.backend prettyprint.custom kernel.private io generic
+math system strings sbufs vectors byte-arrays quotations
 io.streams.byte-array classes.builtin parser lexer
 classes.predicate classes.union classes.intersection
 classes.singleton classes.tuple tools.vocabs.browser math.parser
@@ -65,6 +65,11 @@ $nl
     { "word"                  { "the basic unit of code, analogous to a function or procedure in other programming languages. See " { $link "words" } } }
 } ;
 
+ARTICLE: "tail-call-opt" "Tail-call optimization"
+"If the last action performed is the execution of a word, the current quotation is not saved on the call stack; this is known as " { $emphasis "tail-call optimization" } " and the Factor implementation guarantees that it will be performed."
+$nl
+"Tail-call optimization allows iterative algorithms to be implemented in an efficient manner using recursion, without the need for any kind of primitive looping construct in the language. However, in practice, most iteration is performed via combinators such as " { $link while } ", " { $link each } ", " { $link map } ", " { $link assoc-each } ", and so on. The definitions of these combinators do bottom-out in recursive words, however." ;
+
 ARTICLE: "evaluator" "Evaluation semantics"
 { $link "quotations" } " are evaluated sequentially from beginning to end. When the end is reached, the quotation returns to its caller. As each object in the quotation is evaluated in turn, an action is taken based on its type:"
 { $list
@@ -72,7 +77,7 @@ ARTICLE: "evaluator" "Evaluation semantics"
     { "a " { $link wrapper } " - the wrapped object is pushed on the data stack. Wrappers are used to push word objects directly on the stack when they would otherwise execute. See the " { $link POSTPONE: \ } " parsing word." }
     { "All other types of objects are pushed on the data stack." }
 }
-"If the last action performed is the execution of a word, the current quotation is not saved on the call stack; this is known as " { $snippet "tail-recursion" } " and allows iterative algorithms to execute without incurring unbounded call stack usage."
+{ $subsection "tail-call-opt" }
 { $see-also "compiler" } ;
 
 ARTICLE: "objects" "Objects"
