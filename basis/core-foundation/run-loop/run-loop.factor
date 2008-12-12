@@ -1,6 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax core-foundation kernel namespaces ;
+USING: alien alien.syntax kernel namespaces core-foundation
+core-foundation.strings core-foundation.file-descriptors
+core-foundation.timers ;
 IN: core-foundation.run-loop
 
 : kCFRunLoopRunFinished 1 ; inline
@@ -35,6 +37,18 @@ FUNCTION: void CFRunLoopAddSource (
 FUNCTION: void CFRunLoopRemoveSource (
    CFRunLoopRef rl,
    CFRunLoopSourceRef source,
+   CFStringRef mode
+) ;
+
+FUNCTION: void CFRunLoopAddTimer (
+   CFRunLoopRef rl,
+   CFRunLoopTimerRef timer,
+   CFStringRef mode
+) ;
+
+FUNCTION: void CFRunLoopRemoveTimer (
+   CFRunLoopRef rl,
+   CFRunLoopTimerRef timer,
    CFStringRef mode
 ) ;
 

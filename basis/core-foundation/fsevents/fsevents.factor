@@ -2,11 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax kernel
 math sequences namespaces make assocs init accessors
-continuations combinators core-foundation
-core-foundation.run-loop io.encodings.utf8 destructors locals
+continuations combinators io.encodings.utf8 destructors locals
 arrays specialized-arrays.direct.alien
 specialized-arrays.direct.int specialized-arrays.direct.longlong
-;
+core-foundation core-foundation.run-loop core-foundation.strings ;
 IN: core-foundation.fsevents
 
 : kFSEventStreamCreateFlagUseCFTypes 2 ; inline

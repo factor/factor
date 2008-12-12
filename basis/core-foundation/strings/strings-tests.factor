@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: core-foundation tools.test kernel ;
+USING: core-foundation.strings core-foundation tools.test kernel ;
 IN: core-foundation
 
 [ ] [ "Hello" <CFString> CFRelease ] unit-test
