@@ -71,15 +71,17 @@ IN: windows.opengl32
 : WGL_SWAP_UNDERLAY14     HEX: 20000000 ; inline
 : WGL_SWAP_UNDERLAY15     HEX: 40000000 ; inline
 
-: pfd-dwFlags ( -- n )
+: windowed-pfd-dwFlags ( -- n )
     { PFD_DRAW_TO_WINDOW PFD_SUPPORT_OPENGL PFD_DOUBLEBUFFER } flags ;
+: offscreen-pfd-dwFlags ( -- n )
+    { PFD_DRAW_TO_BITMAP PFD_SUPPORT_OPENGL } flags ;
 
 ! TODO: compare to http://www.nullterminator.net/opengl32.html
-: make-pfd ( bits -- pfd )
+: make-pfd ( flags bits -- pfd )
     "PIXELFORMATDESCRIPTOR" <c-object>
     "PIXELFORMATDESCRIPTOR" heap-size over set-PIXELFORMATDESCRIPTOR-nSize
     1 over set-PIXELFORMATDESCRIPTOR-nVersion
-    pfd-dwFlags over set-PIXELFORMATDESCRIPTOR-dwFlags
+    rot over set-PIXELFORMATDESCRIPTOR-dwFlags
     PFD_TYPE_RGBA over set-PIXELFORMATDESCRIPTOR-iPixelType
     [ set-PIXELFORMATDESCRIPTOR-cColorBits ] keep
     16 over set-PIXELFORMATDESCRIPTOR-cDepthBits

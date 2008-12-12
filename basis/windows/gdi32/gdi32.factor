@@ -26,6 +26,14 @@ IN: windows.gdi32
 : DC_BRUSH            18 ; inline
 : DC_PEN              19 ; inline
 
+: BI_RGB        0 ; inline
+: BI_RLE8       1 ; inline
+: BI_RLE4       2 ; inline
+: BI_BITFIELDS  3 ; inline
+
+: DIB_RGB_COLORS 0 ; inline
+: DIB_PAL_COLORS 1 ; inline
+
 LIBRARY: gdi32
 
 ! FUNCTION: AbortPath
@@ -75,13 +83,13 @@ FUNCTION: int ChoosePixelFormat ( HDC hDC, PFD* ppfd ) ;
 ! FUNCTION: CreateColorSpaceA
 ! FUNCTION: CreateColorSpaceW
 ! FUNCTION: CreateCompatibleBitmap
-! FUNCTION: CreateCompatibleDC
+FUNCTION: HDC CreateCompatibleDC ( HDC hdc ) ;
 ! FUNCTION: CreateDCA
 ! FUNCTION: CreateDCW
 ! FUNCTION: CreateDIBitmap
 ! FUNCTION: CreateDIBPatternBrush
 ! FUNCTION: CreateDIBPatternBrushPt
-! FUNCTION: CreateDIBSection
+FUNCTION: HBITMAP CreateDIBSection ( HDC hdc, BITMAPINFO* pbmi, UINT iUsage, void** ppvBits, HANDLE hSection, DWORD dwOffset ) ;
 ! FUNCTION: CreateDiscardableBitmap
 ! FUNCTION: CreateEllipticRgn
 ! FUNCTION: CreateEllipticRgnIndirect
@@ -169,7 +177,7 @@ FUNCTION: HRGN CreateRectRgn ( int x, int y, int w, int h ) ;
 ! FUNCTION: DdEntry8
 ! FUNCTION: DdEntry9
 ! FUNCTION: DeleteColorSpace
-! FUNCTION: DeleteDC
+FUNCTION: BOOL DeleteDC ( HDC hdc ) ;
 ! FUNCTION: DeleteEnhMetaFile
 ! FUNCTION: DeleteMetaFile
 FUNCTION: BOOL DeleteObject ( HGDIOBJ hObject ) ;
@@ -313,7 +321,7 @@ FUNCTION: BOOL DeleteObject ( HGDIOBJ hObject ) ;
 ! FUNCTION: GdiEntry8
 ! FUNCTION: GdiEntry9
 ! FUNCTION: GdiFixUpHandle
-! FUNCTION: GdiFlush
+FUNCTION: BOOL GdiFlush ( ) ;
 ! FUNCTION: GdiFullscreenControl
 ! FUNCTION: GdiGetBatchLimit
 ! FUNCTION: GdiGetCharDimensions
@@ -552,7 +560,7 @@ FUNCTION: HGDIOBJ GetStockObject ( int fnObject ) ;
 ! FUNCTION: SelectClipPath
 FUNCTION: int SelectClipRgn ( HDC hDC, HRGN hrgn ) ;
 ! FUNCTION: SelectFontLocal
-! FUNCTION: SelectObject
+FUNCTION: HGDIOBJ SelectObject ( HDC hdc, HGDIOBJ hgdiobj ) ;
 ! FUNCTION: SelectPalette
 ! FUNCTION: SetAbortProc
 ! FUNCTION: SetArcDirection
