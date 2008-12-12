@@ -1,5 +1,6 @@
 USING: accessors continuations graphics.bitmap kernel math
-sequences ui.gadgets ui.gadgets.worlds ui ui.backend ;
+sequences ui.gadgets ui.gadgets.worlds ui ui.backend
+destructors ;
 IN: ui.offscreen
 
 TUPLE: offscreen-world < world ;
@@ -22,6 +23,8 @@ M: offscreen-world ungraft*
 
 : close-offscreen ( world -- )
     ungraft notify-queued ;
+
+M: offscreen-world dispose close-offscreen ;
 
 : offscreen-world>bitmap ( world -- bitmap )
     offscreen-pixels bgra>bitmap ;
