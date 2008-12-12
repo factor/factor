@@ -1,3 +1,4 @@
+! (c) 2008 Joe Groff, see license for details
 USING: accessors continuations graphics.bitmap kernel math
 sequences ui.gadgets ui.gadgets.worlds ui ui.backend
 destructors ;
@@ -23,8 +24,6 @@ M: offscreen-world ungraft*
 
 : close-offscreen ( world -- )
     ungraft notify-queued ;
-
-M: offscreen-world dispose close-offscreen ;
 
 : offscreen-world>bitmap ( world -- bitmap )
     offscreen-pixels bgra>bitmap ;
