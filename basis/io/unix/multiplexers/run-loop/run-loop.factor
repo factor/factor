@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces math accessors threads alien locals
-destructors combinators core-foundation core-foundation.run-loop
-io.unix.multiplexers io.unix.multiplexers.kqueue ;
+destructors combinators io.unix.multiplexers
+io.unix.multiplexers.kqueue core-foundation
+core-foundation.run-loop core-foundation.file-descriptors ;
 IN: io.unix.multiplexers.run-loop
 
 TUPLE: run-loop-mx kqueue-mx fd source ;
