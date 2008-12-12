@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax ;
+USING: alien.syntax system math kernel ;
 IN: core-foundation.timers
 
 TYPEDEF: void* CFRunLoopTimerRef
@@ -17,9 +17,12 @@ FUNCTION: CFRunLoopTimerRef CFRunLoopTimerCreate (
    CFRunLoopTimerContext* context
 ) ;
 
+: <CFTimer> ( callback -- timer )
+    [ f millis 1000 /f 60 0 0 ] dip f CFRunLoopTimerCreate ;
+
 FUNCTION: void CFRunLoopTimerInvalidate (
    CFRunLoopTimerRef timer
-);
+) ;
 
 FUNCTION: void CFRunLoopTimerSetNextFireDate (
    CFRunLoopTimerRef timer,
