@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types combinators io.unix.backend
-kernel math.bitwise sequences struct-arrays unix unix.kqueue
-unix.time assocs ;
-IN: io.unix.kqueue
+USING: accessors alien.c-types combinators destructors
+io.unix.backend kernel math.bitwise sequences struct-arrays unix
+unix.kqueue unix.time assocs io.unix.multiplexers ;
+IN: io.unix.multiplexers.kqueue
 
 TUPLE: kqueue-mx < mx events ;
 
@@ -16,6 +16,8 @@ TUPLE: kqueue-mx < mx events ;
     kqueue-mx new-mx
         kqueue dup io-error >>fd
         max-events "kevent" <struct-array> >>events ;
+
+M: kqueue-mx dispose fd>> close-file ;
 
 : make-kevent ( fd filter flags -- event )
     "kevent" <c-object>

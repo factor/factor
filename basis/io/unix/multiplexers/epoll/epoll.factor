@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types kernel io.ports io.unix.backend
-bit-arrays sequences assocs struct-arrays math namespaces locals
-fry unix unix.linux.epoll unix.time ;
-IN: io.unix.epoll
+USING: accessors alien.c-types kernel destructors bit-arrays
+sequences assocs struct-arrays math namespaces locals fry unix
+unix.linux.epoll unix.time io.ports io.unix.backend
+io.unix.multiplexers ;
+IN: io.unix.multiplexers.epoll
 
 TUPLE: epoll-mx < mx events ;
 
@@ -16,6 +17,8 @@ TUPLE: epoll-mx < mx events ;
     epoll-mx new-mx
         max-events epoll_create dup io-error >>fd
         max-events "epoll-event" <struct-array> >>events ;
+
+M: epoll-mx dispose fd>> close-file ;
 
 : make-event ( fd events -- event )
     "epoll-event" <c-object>

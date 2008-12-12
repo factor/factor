@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax kernel
-math sequences io.encodings.utf8 destructors accessors
-combinators byte-arrays ;
+math math.bitwise sequences io.encodings.utf8 destructors
+accessors combinators byte-arrays ;
 IN: core-foundation
 
 TYPEDEF: void* CFAllocatorRef
@@ -195,10 +195,21 @@ FUNCTION: CFFileDescriptorRef CFFileDescriptorCreate (
     CFFileDescriptorContext* context
 ) ;
 
+: kCFFileDescriptorReadCallBack 1 ; inline
+: kCFFileDescriptorWriteCallBack 2 ; inline
+   
 FUNCTION: void CFFileDescriptorEnableCallBacks (
     CFFileDescriptorRef f,
     CFOptionFlags callBackTypes
 ) ;
+
+: enable-all-callbacks ( fd -- )
+    { kCFFileDescriptorReadCallBack kCFFileDescriptorWriteCallBack } flags
+    CFFileDescriptorEnableCallBacks ;
+
+: <CFFileDescriptor> ( fd callback -- handle )
+    [ f swap ] [ t swap ] bi* f CFFileDescriptorCreate
+    [ "CFFileDescriptorCreate failed" throw ] unless* ;
 
 : load-framework ( name -- )
     dup <CFBundle> [
