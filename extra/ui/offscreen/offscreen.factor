@@ -16,7 +16,8 @@ M: offscreen-world ungraft*
     [ reset-world ] tri ;
 
 : open-offscreen ( gadget -- world )
-    "" f <offscreen-world> [ open-world-window ] keep
+    "" f <offscreen-world>
+    [ open-world-window dup relayout-1 ] keep
     notify-queued ;
 
 : close-offscreen ( world -- )

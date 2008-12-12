@@ -13,8 +13,6 @@ title status
 fonts handle
 window-loc ;
 
-TUPLE: offscreen-world < world ;
-
 : find-world ( gadget -- world/f ) [ world? ] find-parent ;
 
 : show-status ( string/f gadget -- )
@@ -53,8 +51,6 @@ M: world request-focus-on ( child gadget -- )
 
 : <world> ( gadget title status -- world )
     world new-world ;
-: <offscreen-world> ( gadget title status -- world )
-    offscreen-world new-world ;
 
 M: world layout*
     dup call-next-method
