@@ -86,8 +86,7 @@ M: world configure-event
 
 M: world key-down-event
     [ key-down-event>gesture ] keep
-    world-focus
-    [ propagate-gesture drop ]
+    [ propagate-key-gesture drop ]
     [ 2over valid-input? [ nip user-input ] [ 3drop ] if ]
     3bi ;
 
@@ -95,7 +94,7 @@ M: world key-down-event
     dup event-modifiers swap 0 XLookupKeysym key-code <key-up> ;
 
 M: world key-up-event
-    [ key-up-event>gesture ] dip world-focus propagate-gesture ;
+    [ key-up-event>gesture ] dip propagate-key-gesture ;
 
 : mouse-event>gesture ( event -- modifiers button loc )
     [ event-modifiers ]
@@ -141,7 +140,7 @@ M: world focus-out-event
 
 M: world selection-notify-event
     [ handle>> window>> selection-from-event ] keep
-    world-focus user-input ;
+    user-input ;
 
 : supported-type? ( atom -- ? )
     { "UTF8_STRING" "STRING" "TEXT" }

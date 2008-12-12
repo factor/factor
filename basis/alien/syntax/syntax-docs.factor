@@ -77,6 +77,11 @@ HELP: C-ENUM:
     { $code "C-ENUM: red green blue ;" ": red 0 ;  : green 1 ;  : blue 2 ;" }
 } ;
 
+HELP: &:
+{ $syntax "&: symbol" }
+{ $values { "symbol" "A C library symbol name" } }
+{ $description "Pushes the address of a symbol named " { $snippet "symbol" } " from the current library, set with " { $link POSTPONE: LIBRARY: } "." } ;
+
 HELP: typedef
 { $values { "old" "a string" } { "new" "a string" } }
 { $description "Alises the C type " { $snippet "old" } " under the name " { $snippet "new" } "." }

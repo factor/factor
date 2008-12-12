@@ -7,6 +7,7 @@ math.order hashtables byte-arrays destructors
 io.encodings
 io.encodings.string
 io.encodings.ascii
+io.encodings.utf8
 io.encodings.8-bit
 io.encodings.binary
 io.streams.duplex
@@ -40,11 +41,11 @@ GENERIC: >post-data ( object -- post-data )
 
 M: post-data >post-data ;
 
-M: string >post-data "application/octet-stream" <post-data> ;
+M: string >post-data utf8 encode "application/octet-stream" <post-data> ;
 
 M: byte-array >post-data "application/octet-stream" <post-data> ;
 
-M: assoc >post-data assoc>query "application/x-www-form-urlencoded" <post-data> ;
+M: assoc >post-data assoc>query ascii encode "application/x-www-form-urlencoded" <post-data> ;
 
 M: f >post-data ;
 
@@ -52,12 +53,13 @@ M: f >post-data ;
     [ >post-data ] change-post-data ;
 
 : write-post-data ( request -- request )
-    dup method>> "POST" = [ dup post-data>> raw>> write ] when ; 
+    dup method>> [ "POST" = ] [ "PUT" = ] bi or [ dup post-data>> raw>> write ] when ; 
 
 : write-request ( request -- )
     unparse-post-data
     write-request-line
     write-request-header
+    binary encode-output
     write-post-data
     flush
     drop ;
@@ -153,7 +155,7 @@ SYMBOL: redirects
 
 PRIVATE>
 
-: success? ( code -- ? ) 200 = ;
+: success? ( code -- ? ) 200 299 between? ;
 
 ERROR: download-failed response ;
 

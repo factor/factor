@@ -92,14 +92,16 @@ M: unix kill-process* ( pid -- )
     processes get swap [ nip swap handle>> = ] curry
     assoc-find 2drop ;
 
+TUPLE: signal n ;
+
+: code>status ( code -- obj )
+    dup WIFEXITED [ WEXITSTATUS ] [ WTERMSIG signal boa ] if ;
+
 M: unix wait-for-processes ( -- ? )
     -1 0 <int> tuck WNOHANG waitpid
     dup 0 <= [
         2drop t
     ] [
-        find-process dup [
-            swap *int WEXITSTATUS notify-exit f
-        ] [
-            2drop f
-        ] if
+        find-process dup
+        [ swap *int code>status notify-exit f ] [ 2drop f ] if
     ] if ;

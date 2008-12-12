@@ -157,7 +157,7 @@ M: process-failed error.
     process>> . ;
 
 : wait-for-success ( process -- )
-    dup wait-for-process dup zero?
+    dup wait-for-process dup 0 =
     [ 2drop ] [ process-failed ] if ;
 
 : try-process ( desc -- )

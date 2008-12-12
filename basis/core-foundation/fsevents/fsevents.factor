@@ -118,7 +118,7 @@ FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef 
     FSEventStreamCreate ;
 
 : kCFRunLoopCommonModes ( -- string )
-    "kCFRunLoopCommonModes" f dlsym *void* ;
+    &: kCFRunLoopCommonModes *void* ;
 
 : schedule-event-stream ( event-stream -- )
     CFRunLoopGetMain

@@ -2,6 +2,7 @@
 USING: accessors arrays fry kernel math math.vectors sequences
        math.intervals
        multi-methods
+       combinators.short-circuit
        combinators.cleave.enhanced
        multi-method-syntax ;
 
@@ -218,3 +219,16 @@ USING: locals combinators ;
   cond
 
   2array ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+GENERIC: within? ( a b -- ? )
+
+METHOD: within? ( <pos> <rectangle> -- ? )
+  {
+    [ left   to-the-right-of? ]
+    [ right  to-the-left-of?  ]
+    [ bottom above?           ]
+    [ top    below?           ]
+  }
+  2&& ;

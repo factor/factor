@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types generic assocs kernel kernel.private
-math io.ports sequences strings sbufs threads unix
-vectors io.buffers io.backend io.encodings math.parser
+USING: alien alien.c-types alien.syntax generic assocs kernel
+kernel.private math io.ports sequences strings sbufs threads
+unix vectors io.buffers io.backend io.encodings math.parser
 continuations system libc qualified namespaces make io.timeouts
 io.encodings.utf8 destructors accessors summary combinators
 locals unix.time fry ;
@@ -184,11 +184,11 @@ M: stdin dispose*
 M: stdin refill
     [ buffer>> ] [ dup wait-for-stdin ] bi* refill-stdin f ;
 
-: control-write-fd ( -- fd ) "control_write" f dlsym *uint ;
+: control-write-fd ( -- fd ) &: control_write *uint ;
 
-: size-read-fd ( -- fd ) "size_read" f dlsym *uint ;
+: size-read-fd ( -- fd ) &: size_read *uint ;
 
-: data-read-fd ( -- fd ) "stdin_read" f dlsym *uint ;
+: data-read-fd ( -- fd ) &: stdin_read *uint ;
 
 : <stdin> ( -- stdin )
     stdin new
@@ -207,10 +207,10 @@ TUPLE: mx-port < port mx ;
 : <mx-port> ( mx -- port )
     dup fd>> mx-port <port> swap >>mx ;
 
-: multiplexer-error ( n -- )
-    0 < [
+: multiplexer-error ( n -- n )
+    dup 0 < [
         err_no [ EAGAIN = ] [ EINTR = ] bi or
-        [ (io-error) ] unless
+        [ drop 0 ] [ (io-error) ] if
     ] when ;
 
 : ?flag ( n mask symbol -- n )

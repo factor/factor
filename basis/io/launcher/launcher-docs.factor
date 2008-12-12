@@ -143,8 +143,9 @@ HELP: <process-stream>
 { $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream of the given encoding." } ;
 
 HELP: wait-for-process
-{ $values { "process" process } { "status" integer } }
-{ $description "If the process is still running, waits for it to exit, otherwise outputs the exit code immediately. Can be called multiple times on the same process." } ;
+{ $values { "process" process } { "status" object } }
+{ $description "If the process is still running, waits for it to exit, otherwise outputs the status code immediately. Can be called multiple times on the same process." }
+{ $notes "The status code is operating system specific; it may be an integer, or another object (the latter is the case on Unix if the process was killed by a signal). However, one cross-platform behavior code can rely on is that a status code of 0 indicates success." } ;
 
 ARTICLE: "io.launcher.descriptors" "Launch descriptors"
 "Words which launch processes can take either a command line string, a sequence of command line arguments, or a " { $link process } "."

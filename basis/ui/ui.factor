@@ -143,7 +143,7 @@ SYMBOL: ui-hook
     graft-queue [ notify ] slurp-deque ;
 
 : send-queued-gestures ( -- )
-    gesture-queue [ send-queued-gesture ] slurp-deque ;
+    gesture-queue [ send-queued-gesture notify-queued ] slurp-deque ;
 
 : update-ui ( -- )
     [
