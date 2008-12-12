@@ -1,5 +1,8 @@
-USING: cocoa.application cocoa.messages cocoa.classes cocoa.runtime 
-kernel cocoa core-foundation alien.c-types ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: cocoa.application cocoa.messages cocoa.classes
+cocoa.runtime kernel cocoa alien.c-types core-foundation
+core-foundation.arrays ;
 IN: cocoa.nibs
 
 : load-nib ( name -- )
