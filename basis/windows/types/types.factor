@@ -253,6 +253,29 @@ C-STRUCT: RECT
     ! { "BYTE[32]" "rgbReserved" }
 ! ;
 
+C-STRUCT: BITMAPINFOHEADER
+    { "DWORD"  "biSize" }
+    { "LONG"   "biWidth" }
+    { "LONG"   "biHeight" }
+    { "WORD"   "biPlanes" }
+    { "WORD"   "biBitCount" }
+    { "DWORD"  "biCompression" }
+    { "DWORD"  "biSizeImage" }
+    { "LONG"   "biXPelsPerMeter" }
+    { "LONG"   "biYPelsPerMeter" }
+    { "DWORD"  "biClrUsed" }
+    { "DWORD"  "biClrImportant" } ;
+
+C-STRUCT: RGBQUAD
+    { "BYTE" "rgbBlue" }
+    { "BYTE" "rgbGreen" }
+    { "BYTE" "rgbRed" }
+    { "BYTE" "rgbReserved" } ;
+
+C-STRUCT: BITMAPINFO
+    { "BITMAPINFOHEADER" "bmiHeader" }
+    { "RGBQUAD[1]" "bmiColors" } ;
+
 TYPEDEF: void* LPPAINTSTRUCT
 TYPEDEF: void* PAINTSTRUCT
 
