@@ -170,10 +170,10 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
         { 27 "ESC" }
     } ;
 
-: exclude-key-wm-keydown? ( n -- bool )
+: exclude-key-wm-keydown? ( n -- ? )
     exclude-keys-wm-keydown key? ;
 
-: exclude-key-wm-char? ( n -- bool )
+: exclude-key-wm-char? ( n -- ? )
     exclude-keys-wm-char key? ;
 
 : keystroke>gesture ( n -- mods sym )
