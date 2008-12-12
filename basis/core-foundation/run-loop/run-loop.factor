@@ -32,6 +32,12 @@ FUNCTION: void CFRunLoopAddSource (
    CFStringRef mode
 ) ;
 
+FUNCTION: void CFRunLoopRemoveSource (
+   CFRunLoopRef rl,
+   CFRunLoopSourceRef source,
+   CFStringRef mode
+) ;
+
 : CFRunLoopDefaultMode ( -- alien )
     #! Ugly, but we don't have static NSStrings
     \ CFRunLoopDefaultMode get-global dup expired? [

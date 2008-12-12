@@ -5,7 +5,7 @@ kernel.private math io.ports sequences strings sbufs threads
 unix vectors io.buffers io.backend io.encodings math.parser
 continuations system libc qualified namespaces make io.timeouts
 io.encodings.utf8 destructors accessors summary combinators
-locals unix.time fry ;
+locals unix.time fry io.unix.multiplexers ;
 QUALIFIED: io
 IN: io.unix.backend
 
@@ -36,38 +36,6 @@ M: fd dispose
     ] if ;
 
 M: fd handle-fd dup check-disposed fd>> ;
-
-! I/O multiplexers
-TUPLE: mx fd reads writes ;
-
-: new-mx ( class -- obj )
-    new
-        H{ } clone >>reads
-        H{ } clone >>writes ; inline
-
-GENERIC: add-input-callback ( thread fd mx -- )
-
-M: mx add-input-callback reads>> push-at ;
-
-GENERIC: add-output-callback ( thread fd mx -- )
-
-M: mx add-output-callback writes>> push-at ;
-
-GENERIC: remove-input-callbacks ( fd mx -- callbacks )
-
-M: mx remove-input-callbacks reads>> delete-at* drop ;
-
-GENERIC: remove-output-callbacks ( fd mx -- callbacks )
-
-M: mx remove-output-callbacks writes>> delete-at* drop ;
-
-GENERIC: wait-for-events ( ms mx -- )
-
-: input-available ( fd mx -- )
-    reads>> delete-at* drop [ resume ] each ;
-
-: output-available ( fd mx -- )
-    writes>> delete-at* drop [ resume ] each ;
 
 M: fd cancel-operation ( fd -- )
     dup disposed>> [ drop ] [
