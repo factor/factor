@@ -1,4 +1,4 @@
-USING: kernel literals tools.test ;
+USING: kernel literals math tools.test ;
 IN: literals.tests
 
 <<
@@ -10,3 +10,5 @@ IN: literals.tests
 [ { 5 } ] [ { $ five } ] unit-test
 [ { 7 11 } ] [ { $ seven-eleven } ] unit-test
 [ { 6 6 6 } ] [ { $ six-six-six } ] unit-test
+
+[ { 8 8 8 } ] [ { $[ six-six-six [ 2 + ] tri@ ] } ] unit-test
