@@ -83,4 +83,5 @@ M: object copy-file
 
 {
     { [ os unix? ] [ "io.directories.unix" require ] }
+    { [ os windows? ] [ "io.directories.windows" require ] }
 } cond

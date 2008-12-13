@@ -1,6 +1,18 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: system io.directories io.encodings.utf16n alien.strings
+io.pathnames io.backend io.files.windows destructors
+kernel accessors calendar windows windows.errors
+windows.kernel32 alien.c-types sequences splitting
+fry continuations ;
 IN: io.directories.windows
+
+M: windows touch-file ( path -- )
+    [
+        normalize-path
+        maybe-create-file [ &dispose ] dip
+        [ drop ] [ handle>> f now dup (set-file-times) ] if
+    ] with-destructors ;
 
 M: windows move-file ( from to -- )
     [ normalize-path ] bi@ MoveFile win32-error=0/f ;

@@ -6,7 +6,7 @@ windows.kernel32 windows namespaces make io.launcher kernel
 sequences windows.errors assocs splitting system strings
 io.launcher.windows io.files.windows io.backend io.files
 io.files.private combinators shuffle accessors locals ;
-IN: io.backend.windows.nt.launcher
+IN: io.launcher.windows.nt
 
 : duplicate-handle ( handle -- handle' )
     GetCurrentProcess ! source process

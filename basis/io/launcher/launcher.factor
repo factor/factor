@@ -262,7 +262,6 @@ M: object run-pipeline-element
 
 {
     { [ os unix? ] [ "io.launcher.unix" require ] }
-    { [ os winnt? ] [ "io.backend.windows.nt.launcher" require ] }
-    { [ os wince? ] [ "io.launcher.windows" require ] }
+    { [ os winnt? ] [ "io.launcher.windows.nt" require ] }
     [ ]
 } cond

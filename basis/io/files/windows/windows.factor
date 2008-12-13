@@ -1,11 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types io.binary io.backend io.files io.buffers
-io.encodings.utf16n io.ports io.backend.windows kernel math splitting
-fry alien.strings windows windows.kernel32 windows.time calendar
-combinators math.functions sequences namespaces make words
-symbols system destructors accessors math.bitwise continuations
-windows.errors arrays byte-arrays generalizations ;
+USING: alien.c-types io.binary io.backend io.files
+io.files.types io.buffers io.encodings.utf16n io.ports
+io.backend.windows kernel math splitting fry alien.strings
+windows windows.kernel32 windows.time calendar combinators
+math.functions sequences namespaces make words symbols system
+destructors accessors math.bitwise continuations windows.errors
+arrays byte-arrays generalizations ;
 IN: io.files.windows
 
 : open-file ( path access-mode create-mode flags -- handle )
@@ -130,10 +131,3 @@ SYMBOLS: +read-only+ +hidden+ +system+
 : (set-file-times) ( handle timestamp/f timestamp/f timestamp/f -- )
     [ timestamp>FILETIME ] tri@
     SetFileTime win32-error=0/f ;
-
-M: winnt touch-file ( path -- )
-    [
-        normalize-path
-        maybe-create-file [ &dispose ] dip
-        [ drop ] [ handle>> f now dup (set-file-times) ] if
-    ] with-destructors ;

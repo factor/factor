@@ -1,5 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: byte-arrays math io.backend io.files.info
+io.files.windows io.files.windows.nt kernel windows.kernel32
+windows.time windows accessors alien.c-types combinators
+generalizations system alien.strings io.encodings.utf16n
+sequences splitting windows.errors fry continuations destructors
+calendar ascii combinators.short-circuit ;
 IN: io.files.info.windows
 
 TUPLE: windows-file-info < file-info attributes ;
@@ -72,10 +78,10 @@ TUPLE: windows-file-info < file-info attributes ;
         get-file-information BY_HANDLE_FILE_INFORMATION>file-info
     ] if ;
 
-M: winnt file-info ( path -- info )
+M: windows file-info ( path -- info )
     normalize-path get-file-information-stat ;
 
-M: winnt link-info ( path -- info )
+M: windows link-info ( path -- info )
     file-info ;
 
 : volume-information ( normalized-path -- volume-name volume-serial max-component flags type )
@@ -103,7 +109,15 @@ M: winnt link-info ( path -- info )
 
 TUPLE: win32-file-system-info < file-system-info max-component flags device-serial ;
 
-HOOK: root-directory os ( string -- string' )
+ERROR: not-absolute-path ;
+
+: root-directory ( string -- string' )
+    unicode-prefix ?head drop
+    dup {
+        [ length 2 >= ]
+        [ second CHAR: : = ]
+        [ first Letter? ]
+    } 1&& [ 2 head "\\" append ] [ not-absolute-path ] if ;
 
 M: winnt file-system-info ( path -- file-system-info )
     normalize-path root-directory
