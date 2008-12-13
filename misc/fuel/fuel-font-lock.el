@@ -57,7 +57,7 @@
     (,fuel-syntax--type-definition-regex 2 'factor-font-lock-type-name)
     (,fuel-syntax--method-definition-regex (1 'factor-font-lock-type-name)
                                            (2 'factor-font-lock-word))
-    (,fuel-syntax--parent-type-regex 1 'factor-font-lock-type)
+    (,fuel-syntax--parent-type-regex 1 'factor-font-lock-type-name)
     (,fuel-syntax--constructor-regex . 'factor-font-lock-constructor)
     (,fuel-syntax--setter-regex . 'factor-font-lock-setter-word)
     (,fuel-syntax--symbol-definition-regex 2 'factor-font-lock-symbol)

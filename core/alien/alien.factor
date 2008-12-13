@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math namespaces sequences system
-kernel.private byte-arrays arrays ;
+kernel.private byte-arrays arrays init ;
 IN: alien
 
 ! Some predicate classes used by the compiler for optimization
@@ -72,3 +72,9 @@ ERROR: alien-invoke-error library symbol ;
 
 : alien-invoke ( ... return library function parameters -- ... )
     2over alien-invoke-error ;
+
+! Callbacks are registered in a global hashtable. If you clear
+! this hashtable, they will all be blown away by code GC, beware.
+SYMBOL: callbacks
+
+[ H{ } clone callbacks set-global ] "alien" add-init-hook
