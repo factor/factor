@@ -10,18 +10,6 @@ IN: ui
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
 
-SYMBOL: stop-after-last-window?
-
-: event-loop? ( -- ? )
-    {
-        { [ stop-after-last-window? get not ] [ t ] }
-        { [ graft-queue deque-empty? not ] [ t ] }
-        { [ windows get-global empty? not ] [ t ] }
-        [ f ]
-    } cond ;
-
-: event-loop ( -- ) [ event-loop? ] [ do-events ] [ ] while ;
-
 : window ( handle -- world ) windows get-global at ;
 
 : window-focus ( handle -- gadget ) window world-focus ;
@@ -60,23 +48,26 @@ SYMBOL: stop-after-last-window?
     focus-path f swap focus-gestures ;
 
 M: world graft*
-    dup (open-window)
-    dup title>> over set-title
-    request-focus ;
+    [ (open-window) ]
+    [ [ title>> ] keep set-title ]
+    [ request-focus ] tri ;
 
 : reset-world ( world -- )
     #! This is used when a window is being closed, but also
     #! when restoring saved worlds on image startup.
-    dup fonts>> clear-assoc
-    dup unfocus-world
-    f >>handle drop ;
+    [ fonts>> clear-assoc ]
+    [ unfocus-world ]
+    [ f >>handle drop ] tri ;
+
+: (ungraft-world) ( world -- )
+    [ free-fonts ]
+    [ hand-clicked close-global ]
+    [ hand-gadget close-global ] tri ;
 
 M: world ungraft*
-    dup free-fonts
-    dup hand-clicked close-global
-    dup hand-gadget close-global
-    dup handle>> (close-window)
-    reset-world ;
+    [ (ungraft-world) ]
+    [ handle>> (close-window) ]
+    [ reset-world ] tri ;
 
 : find-window ( quot -- world )
     windows get values
@@ -152,9 +143,6 @@ SYMBOL: ui-hook
         ] assert-depth
     ] [ ui-error ] recover ;
 
-: ui-wait ( -- )
-    10 milliseconds sleep ;
-
 SYMBOL: ui-thread
 
 : ui-running ( quot -- )
@@ -217,7 +205,6 @@ MAIN: ui
         f windows set-global
         [
             ui-hook set
-            stop-after-last-window? on
             ui
         ] with-scope
     ] if ;

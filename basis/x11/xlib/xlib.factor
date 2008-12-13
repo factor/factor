@@ -31,7 +31,6 @@ TYPEDEF: XID KeySym
 TYPEDEF: ulong Atom
 
 TYPEDEF: char* XPointer
-TYPEDEF: void* Display*
 TYPEDEF: void* Screen*
 TYPEDEF: void* GC
 TYPEDEF: void* Visual*
@@ -65,6 +64,12 @@ TYPEDEF: void* Atom**
 !
 ! 2 - Display Functions
 !
+
+! This struct is incomplete
+C-STRUCT: Display
+{ "void*" "ext_data" }
+{ "void*" "free_funcs" }
+{ "int" "fd" } ;
 
 FUNCTION: Display* XOpenDisplay ( void* display_name ) ;
 
@@ -272,6 +277,17 @@ FUNCTION: Window XGetSelectionOwner ( Display* display, Atom selection ) ;
 
 FUNCTION: int XConvertSelection ( Display* display, Atom selection, Atom target, Atom property, Window requestor, Time time ) ;
 
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 5 - Pixmap and Cursor Functions
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! 5.1 - Creating and Freeing Pixmaps
+
+FUNCTION: Pixmap XCreatePixmap ( Display* display, Drawable d, uint width, uint height, uint depth ) ;
+FUNCTION: int XFreePixmap ( Display* display, Pixmap pixmap ) ;
+
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 6 - Color Management Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -428,6 +444,49 @@ FUNCTION: Status XDrawString (
         int y,
         char* string,
         int length ) ;
+
+! 8.7 - Transferring Images between Client and Server
+
+: XYBitmap 0 ; inline
+: XYPixmap 1 ; inline
+: ZPixmap  2 ; inline
+: AllPlanes -1 ; inline
+
+C-STRUCT: XImage-funcs
+    { "void*" "create_image" }
+    { "void*" "destroy_image" }
+    { "void*" "get_pixel" }
+    { "void*" "put_pixel" }
+    { "void*" "sub_image" }
+    { "void*" "add_pixel" } ;
+
+C-STRUCT: XImage
+    { "int"          "width" }
+    { "int"          "height" }
+    { "int"          "xoffset" }
+    { "int"          "format" }
+    { "char*"        "data" }
+    { "int"          "byte_order" }
+    { "int"          "bitmap_unit" }
+    { "int"          "bitmap_bit_order" }
+    { "int"          "bitmap_pad" }
+    { "int"          "depth" }
+    { "int"          "bytes_per_line" }
+    { "int"          "bits_per_pixel" }
+    { "ulong"        "red_mask" }
+    { "ulong"        "green_mask" }
+    { "ulong"        "blue_mask" }
+    { "XPointer"     "obdata" }
+    { "XImage-funcs" "f" } ;
+
+FUNCTION: XImage* XGetImage ( Display* display, Drawable d, int x, int y, uint width, uint height, ulong plane_mask, int format ) ;
+FUNCTION: int XDestroyImage ( XImage *ximage ) ;
+
+: XImage-size ( ximage -- size )
+    [ XImage-height ] [ XImage-bytes_per_line ] bi * ;
+
+: XImage-pixels ( ximage -- byte-array )
+    [ XImage-data ] [ XImage-size ] bi memory>byte-array ;
 
 !
 ! 9 - Window and Session Manager Functions

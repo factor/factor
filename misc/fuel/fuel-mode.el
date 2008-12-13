@@ -45,16 +45,20 @@ With prefix argument, ask for the file to run."
   (let* ((file (or (and arg (read-file-name "File: " nil (buffer-file-name) t))
                    (buffer-file-name)))
          (file (expand-file-name file))
-         (buffer (find-file-noselect file))
-         (cmd (format "%S fuel-run-file" file)))
+         (buffer (find-file-noselect file)))
     (when buffer
       (with-current-buffer buffer
         (message "Compiling %s ..." file)
-        (let ((r (fuel-debug--display-retort (fuel-eval--eval-string/context cmd)
-                                             (format "%s successfully compiled" file)
-                                             nil
-                                             file)))
-          (if r (message "Compiling %s ... OK!" file) (message "")))))))
+        (fuel-eval--send (fuel-eval--cmd/string (format "%S fuel-run-file" file))
+                         `(lambda (r) (fuel--run-file-cont r ,file)))))))
+
+(defun fuel--run-file-cont (ret file)
+  (if (fuel-debug--display-retort ret
+                                  (format "%s successfully compiled" file)
+                                  nil
+                                  file)
+      (message "Compiling %s ... OK!" file)
+    (message "")))
 
 (defun fuel-eval-region (begin end &optional arg)
   "Sends region to Fuel's listener for evaluation.
@@ -62,7 +66,7 @@ Unless called with a prefix, switchs to the compilation results
 buffer in case of errors."
   (interactive "r\nP")
   (fuel-debug--display-retort
-   (fuel-eval--eval-region/context begin end)
+   (fuel-eval--send/wait (fuel-eval--cmd/region begin end) 10000)
    (format "%s%s"
            (if fuel-syntax--current-vocab
                (format "IN: %s " fuel-syntax--current-vocab)
@@ -105,8 +109,9 @@ With prefix, asks for the word to edit."
                                         (if word (format " (%s)" word) ""))
                                 word)
                  word)))
-    (let* ((ret (fuel-eval--eval-string/context
+    (let* ((str (fuel-eval--cmd/string
                  (format "\\ %s fuel-get-edit-location" word)))
+           (ret (fuel-eval--send/wait str))
            (err (fuel-eval--retort-error ret))
            (loc (fuel-eval--retort-result ret)))
       (when (or err (not loc) (not (listp loc)) (not (stringp (car loc))))

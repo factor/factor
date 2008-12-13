@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: init kernel system namespaces io io.encodings
-io.encodings.utf8 init assocs splitting ;
+io.encodings.utf8 init assocs splitting alien ;
 IN: io.backend
 
 SYMBOL: io-backend
@@ -32,5 +32,7 @@ M: object normalize-directory normalize-path ;
     io-backend set-global init-io init-stdio
     "io.files" init-hooks get at call ;
 
+! Note that we have 'alien' in our using list so that the alien
+! init hook runs before this one.
 [ init-io embedded? [ init-stdio ] unless ]
 "io.backend" add-init-hook

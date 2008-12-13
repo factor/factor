@@ -45,6 +45,11 @@
   :type 'hook
   :group 'fuel-help)
 
+(defcustom fuel-help-history-cache-size 50
+  "Maximum number of pages to keep in the help browser cache."
+  :type 'integer
+  :group 'fuel-help)
+
 (defface fuel-help-font-lock-headlines '((t (:bold t :weight bold)))
   "Face for headlines in help buffers."
   :group 'fuel-help
@@ -70,10 +75,10 @@
   (let ((word (or word (fuel-syntax-symbol-at-point)))
         (fuel-eval--log t))
     (when word
-      (let ((ret (fuel-eval--eval-string/context
-                  (format "\\ %s synopsis fuel-eval-set-result" word)
-                  t)))
-        (when (not (fuel-eval--retort-error ret))
+      (let* ((str (format "\\ %s synopsis fuel-eval-set-result" word))
+             (cmd (fuel-eval--cmd/string str t t))
+             (ret (fuel-eval--send/wait cmd 20)))
+        (when (and ret (not (fuel-eval--retort-error ret)))
           (if fuel-help-minibuffer-font-lock
               (fuel-help--font-lock-str (fuel-eval--retort-result ret))
             (fuel-eval--retort-result ret)))))))
@@ -101,92 +106,83 @@ displayed in the minibuffer."
   (message "Fuel Autodoc %s" (if fuel-autodoc-mode "enabled" "disabled")))
 
 
-;;;; Factor help mode:
+;;; Help browser history:
 
-(defvar fuel-help-mode-map (make-sparse-keymap)
-  "Keymap for Factor help mode.")
+(defvar fuel-help--history
+  (list nil
+        (make-ring fuel-help-history-cache-size)
+        (make-ring fuel-help-history-cache-size)))
 
-(define-key fuel-help-mode-map [(return)] 'fuel-help)
+(defvar fuel-help--history-idx 0)
 
-(defconst fuel-help--headlines
-  (regexp-opt '("Class description"
-                "Definition"
-                "Examples"
-                "Generic word contract"
-                "Inputs and outputs"
-                "Methods"
-                "Notes"
-                "Parent topics:"
-                "See also"
-                "Syntax"
-                "Vocabulary"
-                "Warning"
-                "Word description")
-              t))
+(defun fuel-help--history-push (term)
+  (when (car fuel-help--history)
+    (ring-insert (nth 1 fuel-help--history) (car fuel-help--history)))
+  (setcar fuel-help--history term))
 
-(defconst fuel-help--headlines-regexp (format "^%s" fuel-help--headlines))
+(defun fuel-help--history-next ()
+  (when (not (ring-empty-p (nth 2 fuel-help--history)))
+    (when (car fuel-help--history)
+      (ring-insert (nth 1 fuel-help--history) (car fuel-help--history)))
+    (setcar fuel-help--history (ring-remove (nth 2 fuel-help--history) 0))))
 
-(defconst fuel-help--font-lock-keywords
-  `(,@fuel-font-lock--font-lock-keywords
-    (,fuel-help--headlines-regexp . 'fuel-help-font-lock-headlines)))
+(defun fuel-help--history-previous ()
+  (when (not (ring-empty-p (nth 1 fuel-help--history)))
+    (when (car fuel-help--history)
+      (ring-insert (nth 2 fuel-help--history) (car fuel-help--history)))
+    (setcar fuel-help--history (ring-remove (nth 1 fuel-help--history) 0))))
 
-(defun fuel-help-mode ()
-  "Major mode for displaying Factor documentation.
-\\{fuel-help-mode-map}"
-  (interactive)
-  (kill-all-local-variables)
-  (use-local-map fuel-help-mode-map)
-  (setq mode-name "Factor Help")
-  (setq major-mode 'fuel-help-mode)
-
-  (fuel-font-lock--font-lock-setup fuel-help--font-lock-keywords t)
-
-  (set (make-local-variable 'view-no-disable-on-exit) t)
-  (view-mode)
-  (setq view-exit-action
-        (lambda (buffer)
-          ;; Use `with-current-buffer' to make sure that `bury-buffer'
-          ;; also removes BUFFER from the selected window.
-          (with-current-buffer buffer
-            (bury-buffer))))
-
-  (setq fuel-autodoc-mode-string "")
-  (fuel-autodoc-mode)
-  (run-mode-hooks 'fuel-help-mode-hook))
+
+;;; Fuel help buffer and internals:
 
 (defun fuel-help--help-buffer ()
   (with-current-buffer (get-buffer-create "*fuel-help*")
     (fuel-help-mode)
     (current-buffer)))
 
-(defvar fuel-help--history nil)
+(defvar fuel-help--prompt-history nil)
 
-(defun fuel-help--show-help (&optional see)
-  (let* ((def (fuel-syntax-symbol-at-point))
+(defun fuel-help--show-help (&optional see word)
+  (let* ((def (or word (fuel-syntax-symbol-at-point)))
          (prompt (format "See%s help on%s: " (if see " short" "")
                          (if def (format " (%s)" def) "")))
          (ask (or (not (memq major-mode '(factor-mode fuel-help-mode)))
                   (not def)
                   fuel-help-always-ask))
-         (def (if ask (read-string prompt nil 'fuel-help--history def) def))
-         (cmd (format "\\ %s %s" def (if see "see" "help")))
-         (fuel-eval--log nil)
-         (ret (fuel-eval--eval-string/context cmd t))
-         (out (fuel-eval--retort-output ret)))
+         (def (if ask (read-string prompt nil 'fuel-help--prompt-history def)
+                def))
+         (cmd (format "\\ %s %s" def (if see "see" "help"))))
+    (message "Looking up '%s' ..." def)
+    (fuel-eval--send (fuel-eval--cmd/string cmd t t)
+                     `(lambda (r) (fuel-help--show-help-cont ,def r)))))
+
+(defun fuel-help--show-help-cont (def ret)
+  (let ((out (fuel-eval--retort-output ret)))
     (if (or (fuel-eval--retort-error ret) (empty-string-p out))
         (message "No help for '%s'" def)
-      (let ((hb (fuel-help--help-buffer))
-            (inhibit-read-only t)
-            (font-lock-verbose nil))
-        (set-buffer hb)
-        (erase-buffer)
-        (insert out)
-        (set-buffer-modified-p nil)
-        (pop-to-buffer hb)
-        (goto-char (point-min))))))
+      (fuel-help--insert-contents def out))))
+
+(defun fuel-help--insert-contents (def str &optional nopush)
+  (let ((hb (fuel-help--help-buffer))
+        (inhibit-read-only t)
+        (font-lock-verbose nil))
+    (set-buffer hb)
+    (erase-buffer)
+    (insert str)
+    (goto-char (point-min))
+    (when (re-search-forward (format "^%s" def) nil t)
+      (beginning-of-line)
+      (kill-region (point-min) (point))
+      (next-line)
+      (open-line 1))
+    (set-buffer-modified-p nil)
+    (unless nopush (fuel-help--history-push (cons def str)))
+    (pop-to-buffer hb)
+    (goto-char (point-min))
+    (message "%s" def)))
 
 
-;;; Interface: see/help commands
+;;; Interactive help commands:
 
 (defun fuel-help-short (&optional arg)
   "See a help summary of symbol at point.
@@ -203,6 +199,79 @@ separate help buffer."
 buffer."
   (interactive)
   (fuel-help--show-help))
+
+(defun fuel-help-next ()
+  "Go to next page in help browser."
+  (interactive)
+  (let ((item (fuel-help--history-next))
+        (fuel-help-always-ask nil))
+    (unless item
+      (error "No next page"))
+    (fuel-help--insert-contents (car item) (cdr item) t)))
+
+(defun fuel-help-previous ()
+  "Go to next page in help browser."
+  (interactive)
+  (let ((item (fuel-help--history-previous))
+        (fuel-help-always-ask nil))
+    (unless item
+      (error "No previous page"))
+    (fuel-help--insert-contents (car item) (cdr item) t)))
+
+
+;;;; Factor help mode:
+
+(defvar fuel-help-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\C-m" 'fuel-help)
+    (define-key map "q" 'bury-buffer)
+    (define-key map "b" 'fuel-help-previous)
+    (define-key map "f" 'fuel-help-next)
+    (define-key map (kbd "SPC")  'scroll-up)
+    (define-key map (kbd "S-SPC") 'scroll-down)
+    map))
+
+(defconst fuel-help--headlines
+  (regexp-opt '("Class description"
+                "Definition"
+                "Errors"
+                "Examples"
+                "Generic word contract"
+                "Inputs and outputs"
+                "Methods"
+                "Notes"
+                "Parent topics:"
+                "See also"
+                "Syntax"
+                "Variable description"
+                "Variable value"
+                "Vocabulary"
+                "Warning"
+                "Word description")
+              t))
+
+(defconst fuel-help--headlines-regexp (format "^%s" fuel-help--headlines))
+
+(defconst fuel-help--font-lock-keywords
+  `(,@fuel-font-lock--font-lock-keywords
+    (,fuel-help--headlines-regexp . 'fuel-help-font-lock-headlines)))
+
+(defun fuel-help-mode ()
+  "Major mode for browsing Factor documentation.
+\\{fuel-help-mode-map}"
+  (interactive)
+  (kill-all-local-variables)
+  (use-local-map fuel-help-mode-map)
+  (setq mode-name "Factor Help")
+  (setq major-mode 'fuel-help-mode)
+
+  (fuel-font-lock--font-lock-setup fuel-help--font-lock-keywords t)
+
+  (setq fuel-autodoc-mode-string "")
+  (fuel-autodoc-mode)
+
+  (run-mode-hooks 'fuel-help-mode-hook)
+  (toggle-read-only 1))
 
 
 (provide 'fuel-help)

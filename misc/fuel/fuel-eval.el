@@ -1,4 +1,4 @@
-;;; fuel-eval.el --- utilities for communication with fuel-listener
+;;; fuel-eval.el --- evaluating Factor expressions
 
 ;; Copyright (C) 2008  Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
@@ -9,46 +9,16 @@
 
 ;;; Commentary:
 
-;; Protocols for handling communications via a comint buffer running a
-;; factor listener.
+;; Protocols for sending evaluations to the Factor listener.
 
 ;;; Code:
 
 (require 'fuel-base)
 (require 'fuel-syntax)
+(require 'fuel-connection)
 
 
-;;; Syncronous string sending:
-
-(defvar fuel-eval-log-max-length 16000)
-
-(defvar fuel-eval--default-proc-function nil)
-(defsubst fuel-eval--default-proc ()
-  (and fuel-eval--default-proc-function
-       (funcall fuel-eval--default-proc-function)))
-
-(defvar fuel-eval--proc nil)
-(defvar fuel-eval--log t)
-
-(defun fuel-eval--send-string (str)
-  (let ((proc (or fuel-eval--proc (fuel-eval--default-proc))))
-    (when proc
-      (with-current-buffer (get-buffer-create "*factor messages*")
-        (goto-char (point-max))
-        (when (and (> fuel-eval-log-max-length 0)
-                   (> (point) fuel-eval-log-max-length))
-          (erase-buffer))
-        (when fuel-eval--log (insert "\n>> " (fuel--shorten-str str 256)))
-        (newline)
-        (let ((beg (point)))
-          (comint-redirect-send-command-to-process str (current-buffer) proc nil t)
-          (with-current-buffer (process-buffer proc)
-            (while (not comint-redirect-completed) (sleep-for 0 1)))
-          (goto-char beg)
-          (current-buffer))))))
-
-
-;;; Evaluation protocol
+;;; Retort and retort-error datatypes:
 
 (defsubst fuel-eval--retort-make (err result &optional output)
   (list err result output))
@@ -60,57 +30,14 @@
 (defsubst fuel-eval--retort-p (ret) (listp ret))
 
 (defsubst fuel-eval--make-parse-error-retort (str)
-  (fuel-eval--retort-make 'parse-retort-error nil str))
+  (fuel-eval--retort-make (cons 'fuel-parse-retort-error str) nil))
 
-(defun fuel-eval--parse-retort (buffer)
+(defun fuel-eval--parse-retort (str)
   (save-current-buffer
-    (set-buffer buffer)
     (condition-case nil
-        (read (current-buffer))
-      (error (fuel-eval--make-parse-error-retort
-              (buffer-substring-no-properties (point) (point-max)))))))
-
-(defsubst fuel-eval--send/retort (str)
-  (fuel-eval--parse-retort (fuel-eval--send-string str)))
-
-(defsubst fuel-eval--eval-begin ()
-  (fuel-eval--send/retort "fuel-begin-eval"))
-
-(defsubst fuel-eval--eval-end ()
-  (fuel-eval--send/retort "fuel-begin-eval"))
-
-(defsubst fuel-eval--factor-array (strs)
-  (format "V{ %S }" (mapconcat 'identity strs " ")))
-
-(defsubst fuel-eval--eval-strings (strs &optional no-restart)
-  (let ((str (format "fuel-eval-%s %s fuel-eval"
-                     (if no-restart "non-restartable" "restartable")
-                     (fuel-eval--factor-array strs))))
-    (fuel-eval--send/retort str)))
-
-(defsubst fuel-eval--eval-string (str &optional no-restart)
-  (fuel-eval--eval-strings (list str) no-restart))
-
-(defun fuel-eval--eval-strings/context (strs &optional no-restart)
-  (let ((usings (fuel-syntax--usings-update)))
-    (fuel-eval--send/retort
-     (format "fuel-eval-%s %s %S %s fuel-eval-in-context"
-             (if no-restart "non-restartable" "restartable")
-             (fuel-eval--factor-array strs)
-             (or fuel-syntax--current-vocab "f")
-             (if usings (fuel-eval--factor-array usings) "f")))))
-
-(defsubst fuel-eval--eval-string/context (str &optional no-restart)
-  (fuel-eval--eval-strings/context (list str) no-restart))
-
-(defun fuel-eval--eval-region/context (begin end &optional no-restart)
-  (let ((lines (split-string (buffer-substring-no-properties begin end)
-                             "[\f\n\r\v]+" t)))
-    (when (> (length lines) 0)
-      (fuel-eval--eval-strings/context lines no-restart))))
-
-
-;;; Error parsing
+        (let ((ret (car (read-from-string str))))
+          (if (fuel-eval--retort-p ret) ret (error)))
+      (error (fuel-eval--make-parse-error-retort str)))))
 
 (defsubst fuel-eval--error-name (err) (car err))
 
@@ -136,6 +63,69 @@
 
 (defsubst fuel-eval--error-line-text (err)
   (nth 3 (fuel-eval--error-lexer-p err)))
+
+
+;;; String sending::
+
+(defvar fuel-eval-log-max-length 16000)
+
+(defvar fuel-eval--default-proc-function nil)
+(defsubst fuel-eval--default-proc ()
+  (and fuel-eval--default-proc-function
+       (funcall fuel-eval--default-proc-function)))
+
+(defvar fuel-eval--proc nil)
+
+(defvar fuel-eval--log t)
+
+(defvar fuel-eval--sync-retort nil)
+
+(defun fuel-eval--send/wait (str &optional timeout buffer)
+  (setq fuel-eval--sync-retort nil)
+  (fuel-con--send-string/wait (or fuel-eval--proc (fuel-eval--default-proc))
+                              str
+                              '(lambda (s)
+                                 (setq fuel-eval--sync-retort
+                                       (fuel-eval--parse-retort s)))
+                              timeout
+                              buffer)
+  fuel-eval--sync-retort)
+
+(defun fuel-eval--send (str cont &optional buffer)
+  (fuel-con--send-string (or fuel-eval--proc (fuel-eval--default-proc))
+                         str
+                         `(lambda (s) (,cont (fuel-eval--parse-retort s)))
+                         buffer))
+
+
+;;; Evaluation protocol
+
+(defsubst fuel-eval--factor-array (strs)
+  (format "V{ %S }" (mapconcat 'identity strs " ")))
+
+(defun fuel-eval--cmd/lines (strs &optional no-rs in usings)
+  (unless (and in usings) (fuel-syntax--usings-update))
+  (let* ((in (cond ((not in) (or fuel-syntax--current-vocab "f"))
+                   ((eq in t) "fuel-scratchpad")
+                   (in in)))
+         (usings (cond ((not usings) fuel-syntax--usings)
+                       ((eq usings t) nil)
+                       (usings usings))))
+    (format "fuel-eval-%srestartable %s %S %s fuel-eval-in-context"
+            (if no-rs "non-" "")
+            (fuel-eval--factor-array strs)
+            in
+            (fuel-eval--factor-array usings))))
+
+(defsubst fuel-eval--cmd/string (str &optional no-rs in usings)
+  (fuel-eval--cmd/lines (list str) no-rs in usings))
+
+(defun fuel-eval--cmd/region (begin end &optional no-rs in usings)
+  (let ((lines (split-string (buffer-substring-no-properties begin end)
+                             "[\f\n\r\v]+" t)))
+    (when (> (length lines) 0)
+      (fuel-eval--cmd/lines lines no-rs in usings))))
+
 
 
 (provide 'fuel-eval)

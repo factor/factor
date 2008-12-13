@@ -84,13 +84,13 @@ FUNCTION: void* glXGetProcAddress ( char* procname ) ;
 FUNCTION: void* glXGetProcAddressARB ( char* procname ) ;
 
 ! GLX Events
-! (also skipped for now. only has GLXPbufferClobberEvent, the rest is handled by xlib methinks
+! (also skipped for now. only has GLXPbufferClobberEvent, the rest is handled by xlib methinks)
 
-: choose-visual ( -- XVisualInfo* )
-    dpy get scr get
+: choose-visual ( flags -- XVisualInfo* )
+    [ dpy get scr get ] dip
     [
+        %
         GLX_RGBA ,
-        GLX_DOUBLEBUFFER ,
         GLX_DEPTH_SIZE , 16 ,
         0 ,
     ] int-array{ } make underlying>>
@@ -98,7 +98,7 @@ FUNCTION: void* glXGetProcAddressARB ( char* procname ) ;
     [ "Could not get a double-buffered GLX RGBA visual" throw ] unless* ;
 
 : create-glx ( XVisualInfo* -- GLXContext )
-    >r dpy get r> f 1 glXCreateContext
+    [ dpy get ] dip f 1 glXCreateContext
     [ "Failed to create GLX context" throw ] unless* ;
 
 : destroy-glx ( GLXContext -- )
