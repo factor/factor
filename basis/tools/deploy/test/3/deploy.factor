@@ -5,7 +5,7 @@ H{
     { deploy-ui? f }
     { "stop-after-last-window?" t }
     { deploy-word-defs? f }
-    { deploy-reflection 2 }
+    { deploy-reflection 1 }
     { deploy-compiler? t }
     { deploy-threads? t }
     { deploy-io 3 }
