@@ -19,12 +19,8 @@ IN: cocoa.application
 
 [ [ die ] 19 setenv ] "cocoa.application" add-init-hook
 
-"stop-after-last-window?" get
-
 H{ } clone \ pool [
     global [
-        "stop-after-last-window?" "ui" lookup set
-
         ! Only keeps those methods that we actually call
         sent-messages get super-sent-messages get assoc-union
         objc-methods [ assoc-intersect pool-values ] change
