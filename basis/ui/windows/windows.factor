@@ -3,14 +3,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings arrays assocs ui
 ui.gadgets ui.backend ui.clipboards ui.gadgets.worlds
-ui.gestures io kernel math math.vectors namespaces make
-sequences strings vectors words windows.kernel32 windows.gdi32
-windows.user32 windows.opengl32 windows.messages windows.types
-windows.nt windows threads libc combinators fry
+ui.gestures ui.event-loop io kernel math math.vectors namespaces
+make sequences strings vectors words windows.kernel32
+windows.gdi32 windows.user32 windows.opengl32 windows.messages
+windows.types windows.nt windows threads libc combinators fry
 combinators.short-circuit continuations command-line shuffle
 opengl ui.render ascii math.bitwise locals symbols accessors
-math.geometry.rect math.order ascii calendar
-io.encodings.utf16n ;
+math.geometry.rect math.order ascii calendar io.encodings.utf16n
+;
 IN: ui.windows
 
 SINGLETON: windows-ui-backend
@@ -574,7 +574,6 @@ M: windows-ui-backend set-title ( string world -- )
 M: windows-ui-backend ui
     [
         [
-            stop-after-last-window? on
             init-clipboard
             init-win32-ui
             start-ui

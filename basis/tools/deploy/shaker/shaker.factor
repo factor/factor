@@ -365,6 +365,7 @@ SYMBOL: deploy-vocab
         init-hooks get values concat %
         ,
         strip-io? [ \ flush , ] unless
+        [ 0 exit ] %
     ] [ ] make
     set-boot-quot ;
 

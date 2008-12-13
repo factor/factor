@@ -14,8 +14,6 @@ TYPEDEF: int SInt32
 TYPEDEF: uint UInt32
 TYPEDEF: ulong CFTypeID
 TYPEDEF: UInt32 CFOptionFlags
-TYPEDEF: double CFTimeInterval
-TYPEDEF: double CFAbsoluteTime
 
 FUNCTION: CFTypeRef CFRetain ( CFTypeRef cf ) ;
 
