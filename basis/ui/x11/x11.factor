@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays ui ui.gadgets
 ui.gestures ui.backend ui.clipboards ui.gadgets.worlds ui.render
-assocs kernel math namespaces opengl sequences strings x11.xlib
-x11.events x11.xim x11.glx x11.clipboard x11.constants
-x11.windows io.encodings.string io.encodings.ascii
+ui.event-loop assocs kernel math namespaces opengl sequences
+strings x11.xlib x11.events x11.xim x11.glx x11.clipboard
+x11.constants x11.windows io.encodings.string io.encodings.ascii
 io.encodings.utf8 combinators command-line qualified
 math.vectors classes.tuple opengl.gl threads math.geometry.rect
 environment ascii ;
