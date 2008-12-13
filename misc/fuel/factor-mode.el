@@ -112,13 +112,16 @@ code in the buffer."
   (save-excursion
     (beginning-of-line)
     (when (> (fuel-syntax--brackets-depth) 0)
-      (let ((op (fuel-syntax--brackets-start))
-            (cl (fuel-syntax--brackets-end))
-            (ln (line-number-at-pos)))
+      (let* ((op (fuel-syntax--brackets-start))
+             (cl (fuel-syntax--brackets-end))
+             (ln (line-number-at-pos))
+             (iop (fuel-syntax--indentation-at op)))
         (when (> ln (line-number-at-pos op))
-          (if (and (> cl 0) (= ln (line-number-at-pos cl)))
-              (fuel-syntax--indentation-at op)
-            (fuel-syntax--increased-indentation (fuel-syntax--indentation-at op))))))))
+          (if (and (> cl 0)
+                   (= (- cl (point)) (current-indentation))
+                   (= ln (line-number-at-pos cl)))
+              iop
+            (fuel-syntax--increased-indentation iop)))))))
 
 (defun factor-mode--indent-definition ()
   (save-excursion

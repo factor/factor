@@ -40,7 +40,8 @@
         (cons :id (random))
         (cons :string str)
         (cons :continuation cont)
-        (cons :buffer (or sender-buffer (current-buffer)))))
+        (cons :buffer (or sender-buffer (current-buffer)))
+        (cons :output "")))
 
 (defsubst fuel-con--request-p (req)
   (and (listp req) (eq (car req) :fuel-connection-request)))
@@ -56,6 +57,11 @@
 
 (defsubst fuel-con--request-buffer (req)
   (cdr (assoc :buffer req)))
+
+(defun fuel-con--request-output (req &optional suffix)
+  (let ((cell (assoc :output req)))
+    (when suffix (setcdr cell (concat (cdr cell) suffix)))
+    (cdr cell)))
 
 (defsubst fuel-con--request-deactivate (req)
   (setcdr (assoc :continuation req) nil))
@@ -99,7 +105,7 @@
     (if (and (cdr current)
              (fuel-con--request-deactivated-p (cdr current)))
         (fuel-con--connection-pop-request c)
-      current)))
+      (cdr current))))
 
 
 ;;; Connection setup:
@@ -112,7 +118,9 @@
 
 (defun fuel-con--setup-comint ()
   (add-hook 'comint-redirect-filter-functions
-            'fuel-con--comint-redirect-filter t t))
+            'fuel-con--comint-redirect-filter t t)
+  (add-hook 'comint-redirect-hook
+            'fuel-con--comint-redirect-hook))
 
 
 ;;; Logging:
@@ -143,8 +151,10 @@
         (factor-messages-mode)
         (current-buffer))))
 
-(defsubst fuel-con--log-msg (type &rest args)
-  (format "\n%s: %s\n" type (apply 'format args)))
+(defun fuel-con--log-msg (type &rest args)
+  (with-current-buffer (fuel-con--log-buffer)
+    (let ((inhibit-read-only t))
+      (insert (format "\n%s: %s\n" type (apply 'format args))))))
 
 (defsubst fuel-con--log-warn (&rest args)
   (apply 'fuel-con--log-msg 'WARNING args))
@@ -168,30 +178,41 @@
         (when fuel-con--log-verbose-p
           (with-current-buffer (fuel-con--log-buffer)
             (let ((inhibit-read-only t))
-              (insert (fuel-con--log-info "<%s>: %s"
-                                          (fuel-con--request-id req) str)))))
+              (fuel-con--log-info "<%s>: %s" (fuel-con--request-id req) str))))
         (comint-redirect-send-command str (fuel-con--log-buffer) nil t)))))
+
+(defun fuel-con--process-completed-request (req)
+  (let ((str (fuel-con--request-output req))
+        (cont (fuel-con--request-continuation req))
+        (id (fuel-con--request-id req))
+        (rstr (fuel-con--request-string req))
+        (buffer (fuel-con--request-buffer req)))
+    (if (not cont)
+        (fuel-con--log-warn "<%s> Droping result for request %S (%s)"
+                            id rstr str)
+      (condition-case cerr
+          (with-current-buffer (or buffer (current-buffer))
+            (funcall cont str)
+            (fuel-con--log-info "<%s>: processed\n\t%s" id str))
+        (error (fuel-con--log-error "<%s>: continuation failed %S \n\t%s"
+                                    id rstr cerr))))))
 
 (defun fuel-con--comint-redirect-filter (str)
   (if (not fuel-con--connection)
       (fuel-con--log-error "No connection in buffer (%s)" str)
     (let ((req (fuel-con--connection-current-request fuel-con--connection)))
       (if (not req) (fuel-con--log-error "No current request (%s)" str)
-        (let ((cont (fuel-con--request-continuation req))
-              (id (fuel-con--request-id req))
-              (rstr (fuel-con--request-string req))
-              (buffer (fuel-con--request-buffer req)))
-          (prog1
-              (if (not cont)
-                  (fuel-con--log-warn "<%s> Droping result for request %S (%s)"
-                                      id rstr str)
-                (condition-case cerr
-                    (with-current-buffer (or buffer (current-buffer))
-                      (funcall cont str)
-                      (fuel-con--log-info "<%s>: processed\n\t%s" id str))
-                  (error (fuel-con--log-error "<%s>: continuation failed %S \n\t%s"
-                                              id rstr cerr))))
-            (fuel-con--connection-clean-current-request fuel-con--connection)))))))
+        (fuel-con--request-output req str)
+        (fuel-con--log-info "<%s>: in progress" (fuel-con--request-id req)))))
+  ".\n")
+
+(defun fuel-con--comint-redirect-hook ()
+  (if (not fuel-con--connection)
+      (fuel-con--log-error "No connection in buffer")
+    (let ((req (fuel-con--connection-current-request fuel-con--connection)))
+      (if (not req) (fuel-con--log-error "No current request (%s)" str)
+        (fuel-con--process-completed-request req)
+        (fuel-con--connection-clean-current-request fuel-con--connection)))))
 
 
 ;;; Message sending interface:
