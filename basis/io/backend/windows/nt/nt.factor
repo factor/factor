@@ -118,3 +118,5 @@ M: winnt (wait-to-read) ( port -- )
     ] with-destructors ;
 
 M: winnt (init-stdio) init-c-stdio ;
+
+winnt set-io-backend
