@@ -1,10 +1,10 @@
 USING: continuations destructors io.buffers io.files io.backend
-io.timeouts io.ports io.pathnames io.files.private io.backend.windows
-io.files.windows io.backend.windows.nt io.encodings.utf16n
-windows windows.kernel32 kernel libc math threads system
-environment alien.c-types alien.arrays alien.strings sequences
-combinators combinators.short-circuit ascii splitting alien
-strings assocs namespaces make accessors tr ;
+io.timeouts io.ports io.pathnames io.files.private
+io.backend.windows io.files.windows io.encodings.utf16n windows
+windows.kernel32 kernel libc math threads system environment
+alien.c-types alien.arrays alien.strings sequences combinators
+combinators.short-circuit ascii splitting alien strings assocs
+namespaces make accessors tr ;
 IN: io.files.windows.nt
 
 M: winnt cwd
@@ -43,9 +43,6 @@ M: winnt normalize-path ( string -- string' )
 
 M: winnt CreateFile-flags ( DWORD -- DWORD )
     FILE_FLAG_OVERLAPPED bitor ;
-
-M: winnt FileArgs-overlapped ( port -- overlapped )
-    make-overlapped ;
 
 M: winnt open-append
     0 ! [ dup file-info size>> ] [ drop 0 ] recover

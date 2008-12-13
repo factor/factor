@@ -11,7 +11,7 @@ C: <grid-lines> grid-lines
 
 SYMBOL: grid-dim
 
-: half-gap grid get gap>> [ 2/ ] map ; inline
+: half-gap ( -- gap ) grid get gap>> [ 2/ ] map ; inline
 
 : grid-line-from/to ( orientation point -- from to )
     half-gap v-
