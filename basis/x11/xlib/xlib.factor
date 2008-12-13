@@ -31,7 +31,6 @@ TYPEDEF: XID KeySym
 TYPEDEF: ulong Atom
 
 TYPEDEF: char* XPointer
-TYPEDEF: void* Display*
 TYPEDEF: void* Screen*
 TYPEDEF: void* GC
 TYPEDEF: void* Visual*
@@ -65,6 +64,12 @@ TYPEDEF: void* Atom**
 !
 ! 2 - Display Functions
 !
+
+! This struct is incomplete
+C-STRUCT: Display
+{ "void*" "ext_data" }
+{ "void*" "free_funcs" }
+{ "int" "fd" } ;
 
 FUNCTION: Display* XOpenDisplay ( void* display_name ) ;
 
