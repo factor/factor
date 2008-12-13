@@ -50,7 +50,7 @@ Quick key reference
 (Chords ending in a single letter <x> accept also C-<x> (e.g. C-cC-z is
 the same as C-cz)).
 
-* In factor files:
+* In factor source files:
 
  - C-cz : switch to listener
  - C-co : cycle between code, tests and docs factor files
@@ -70,6 +70,13 @@ the same as C-cz)).
 
  - g : go to error
  - <digit> : invoke nth restart
+ - w/e/l : invoke :warnings, :errors, :linkage
  - q : bury buffer
 
+* In the Help browser:
+
+ - RET : help for word at point
+ - f/b : next/previous page
+ - SPC/S-SPC : scroll up/down
+ - q: bury buffer
 

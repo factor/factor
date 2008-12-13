@@ -59,5 +59,7 @@
                                 " ")
                      len))
 
+(defsubst empty-string-p (str) (equal str ""))
+
 (provide 'fuel-base)
 ;;; fuel-base.el ends here
