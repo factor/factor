@@ -162,11 +162,11 @@ big-endian off
 ! Quotations and words
 [
     ! load from stack
-    temp0 ds-reg [] MOV
+    arg ds-reg [] MOV
     ! pop stack
     ds-reg bootstrap-cell SUB
     ! call quotation
-    temp0 quot-xt-offset [+] JMP
+    arg quot-xt-offset [+] JMP
 ] f f f \ (call) define-sub-primitive
 
 [

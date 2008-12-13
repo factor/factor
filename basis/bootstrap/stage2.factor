@@ -102,6 +102,8 @@ SYMBOL: bootstrap-time
     ] if
 ] [
     drop
-    load-help? off
-    "resource:basis/bootstrap/bootstrap-error.factor" run-file
+    [
+        load-help? off
+        "resource:basis/bootstrap/bootstrap-error.factor" run-file
+    ] with-scope
 ] recover

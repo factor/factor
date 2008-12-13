@@ -49,7 +49,7 @@ M: epoll-mx remove-output-callbacks ( fd mx -- seq )
 
 : wait-event ( mx us -- n )
     [ [ fd>> ] [ events>> ] bi [ underlying>> ] [ length ] bi ] [ 1000 /i ] bi*
-    epoll_wait dup multiplexer-error ;
+    epoll_wait multiplexer-error ;
 
 : handle-event ( event mx -- )
     [ epoll-event-fd ] dip

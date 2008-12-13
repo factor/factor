@@ -3,8 +3,8 @@
 USING: alien.syntax kernel unix.stat math unix
 combinators system io.backend accessors alien.c-types
 io.encodings.utf8 alien.strings unix.types io.unix.files
-io.files unix.statvfs.netbsd unix.getfsstat.netbsd
-grouping sequences io.encodings.utf8 ;
+io.files unix.statvfs.netbsd unix.getfsstat.netbsd arrays
+grouping sequences io.encodings.utf8 specialized-arrays.direct.uint ;
 IN: io.unix.files.netbsd
 
 TUPLE: netbsd-file-system-info < unix-file-system-info
@@ -35,7 +35,7 @@ M: netbsd statvfs>file-system-info ( file-system-info statvfs -- file-system-inf
         [ statvfs-f_syncwrites >>sync-writes ]
         [ statvfs-f_asyncreads >>async-reads ]
         [ statvfs-f_asyncwrites >>async-writes ]
-        [ statvfs-f_fsidx >>idx ]
+        [ statvfs-f_fsidx 2 <direct-uint-array> >array >>idx ]
         [ statvfs-f_fsid >>id ]
         [ statvfs-f_namemax >>name-max ]
         [ statvfs-f_owner >>owner ]

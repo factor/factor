@@ -2,6 +2,10 @@ USING: ui.gadgets ui.render ui.gestures ui.backend help.markup
 help.syntax models opengl strings ;
 IN: ui.gadgets.worlds
 
+HELP: user-input
+{ $values { "string" string } { "world" world } }
+{ $description "Calls " { $link user-input* } " on every parent of the world's currently-focused child." } ;
+
 HELP: origin
 { $var-description "Within the dynamic extent of " { $link draw-world } ", holds the co-ordinate system origin for the gadget currently being drawn." } ;
 

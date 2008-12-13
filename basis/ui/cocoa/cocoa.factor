@@ -3,20 +3,21 @@
 USING: accessors math arrays assocs cocoa cocoa.application
 command-line kernel memory namespaces cocoa.messages
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
-cocoa.windows cocoa.classes cocoa.application cocoa.nibs
-sequences system ui ui.backend ui.clipboards ui.gadgets
-ui.gadgets.worlds ui.cocoa.views core-foundation threads
-math.geometry.rect fry ;
+cocoa.windows cocoa.classes cocoa.nibs sequences system ui
+ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
+ui.cocoa.views core-foundation core-foundation.run-loop threads
+math.geometry.rect fry libc generalizations alien.c-types
+cocoa.views combinators io.thread ;
 IN: ui.cocoa
 
-TUPLE: handle view window ;
+TUPLE: handle ;
+TUPLE: window-handle < handle view window ;
+TUPLE: offscreen-handle < handle context buffer ;
 
-C: <handle> handle
+C: <window-handle> window-handle
+C: <offscreen-handle> offscreen-handle
 
 SINGLETON: cocoa-ui-backend
-
-M: cocoa-ui-backend do-events ( -- )
-    [ NSApp '[ _ do-event ] loop ui-wait ] with-autorelease-pool ;
 
 TUPLE: pasteboard handle ;
 
@@ -39,7 +40,8 @@ M: pasteboard set-clipboard-contents
 : gadget-window ( world -- )
     dup <FactorView>
     2dup swap world>NSRect <ViewWindow>
-    [ [ -> release ] [ install-window-delegate ] bi* ] [ <handle> ] 2bi
+    [ [ -> release ] [ install-window-delegate ] bi* ]
+    [ <window-handle> ] 2bi
     >>handle drop ;
 
 M: cocoa-ui-backend set-title ( string world -- )
@@ -88,11 +90,39 @@ M: cocoa-ui-backend raise-window* ( world -- )
         NSApp 1 -> activateIgnoringOtherApps:
     ] when* ;
 
-M: cocoa-ui-backend select-gl-context ( handle -- )
-    view>> -> openGLContext -> makeCurrentContext ;
+: pixel-size ( pixel-format -- size )
+    0 <int> [ NSOpenGLPFAColorSize 0 -> getValues:forAttribute:forVirtualScreen: ]
+    keep *int -3 shift ;
 
-M: cocoa-ui-backend flush-gl-context ( handle -- )
-    view>> -> openGLContext -> flushBuffer ;
+: offscreen-buffer ( world pixel-format -- alien w h pitch )
+    [ dim>> first2 ] [ pixel-size ] bi*
+    { [ * * malloc ] [ 2drop ] [ drop nip ] [ nip * ] } 3cleave ;
+
+: gadget-offscreen-context ( world -- context buffer )
+    NSOpenGLPFAOffScreen 1array <PixelFormat>
+    [ nip NSOpenGLContext -> alloc swap f -> initWithFormat:shareContext: dup ]
+    [ offscreen-buffer ] 2bi
+    4 npick [ -> setOffScreen:width:height:rowbytes: ] dip ;
+
+M: cocoa-ui-backend (open-offscreen-buffer) ( world -- )
+    dup gadget-offscreen-context <offscreen-handle> >>handle drop ;
+
+M: cocoa-ui-backend (close-offscreen-buffer) ( handle -- )
+    [ context>> -> release ]
+    [ buffer>> free ] bi ;
+
+GENERIC: (gl-context) ( handle -- context )
+M: window-handle (gl-context) view>> -> openGLContext ;
+M: offscreen-handle (gl-context) context>> ;
+
+M: handle select-gl-context ( handle -- )
+    (gl-context) -> makeCurrentContext ;
+
+M: handle flush-gl-context ( handle -- )
+    (gl-context) -> flushBuffer ;
+
+M: cocoa-ui-backend offscreen-pixels ( world -- alien w h )
+    [ handle>> buffer>> ] [ dim>> first2 neg ] bi ;
 
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;
@@ -102,8 +132,8 @@ CLASS: {
     { +name+ "FactorApplicationDelegate" }
 }
 
-{ "applicationDidFinishLaunching:" "void" { "id" "SEL" "id" }
-    [ 3drop event-loop ]
+{  "applicationDidUpdate:" "void" { "id" "SEL" "id" }
+    [ 3drop reset-run-loop ]
 } ;
 
 : install-app-delegate ( -- )
@@ -121,6 +151,9 @@ M: cocoa-ui-backend ui
             init-clipboard
             cocoa-init-hook get call
             start-ui
+            f io-thread-running? set-global
+            init-thread-timer
+            reset-run-loop
             NSApp -> run
         ] ui-running
     ] with-cocoa ;

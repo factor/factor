@@ -151,7 +151,8 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 : fuel-end-eval ( -- ) [ ] (fuel-end-eval) ; inline
 
 : fuel-get-edit-location ( defspec -- )
-    where [ first2 [ (normalize-path) ] dip 2array fuel-eval-set-result ] when* ;
+    where [ first2 [ (normalize-path) ] dip 2array fuel-eval-set-result ]
+    when* ;
 
 : fuel-run-file ( path -- ) run-file ; inline
 

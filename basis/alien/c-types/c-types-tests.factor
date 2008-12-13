@@ -8,7 +8,7 @@ sequences system libc alien.strings io.encodings.utf8 ;
 
 [ { "blah" 123 } ] [ { "blah" xyz } expand-constants ] unit-test
 
-: foo ( -- n ) "fdafd" f dlsym [ 123 ] unless* ;
+: foo ( -- n ) &: fdafd [ 123 ] unless* ;
 
 [ 123 ] [ foo ] unit-test
 

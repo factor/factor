@@ -1,10 +1,10 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax cocoa cocoa.nibs cocoa.application
 cocoa.classes cocoa.dialogs cocoa.pasteboard cocoa.subclassing
-core-foundation help.topics kernel memory namespaces parser
-system ui ui.tools.browser ui.tools.listener ui.tools.workspace
-ui.cocoa eval locals ;
+core-foundation core-foundation.strings help.topics kernel
+memory namespaces parser system ui ui.tools.browser
+ui.tools.listener ui.tools.workspace ui.cocoa eval locals ;
 IN: ui.cocoa.tools
 
 : finder-run-files ( alien -- )

@@ -343,7 +343,7 @@ PRIVATE>
     [ (each) ] dip collect ; inline
 
 : 2nth-unsafe ( n seq1 seq2 -- elt1 elt2 )
-    [ over ] dip nth-unsafe [ nth-unsafe ] dip ; inline
+    [ over ] dip [ nth-unsafe ] 2bi@ ; inline
 
 : (2each) ( seq1 seq2 quot -- n quot' )
     [ [ min-length ] 2keep ] dip
@@ -538,12 +538,12 @@ M: sequence <=>
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
     >fixnum swap [
-        dup -2 fixnum-shift-fast swap 5 fixnum-shift-fast
+        [ -2 fixnum-shift-fast ] [ 5 fixnum-shift-fast ] bi
         fixnum+fast fixnum+fast
     ] keep fixnum-bitxor ; inline
 
 : sequence-hashcode ( n seq -- x )
-    0 -rot [ hashcode* sequence-hashcode-step ] with each ; inline
+    [ 0 ] 2dip [ hashcode* sequence-hashcode-step ] with each ; inline
 
 M: reversed equal? over reversed? [ sequence= ] [ 2drop f ] if ;
 
@@ -845,9 +845,10 @@ PRIVATE>
 USE: arrays
 
 : array-length ( array -- len )
-    { array } declare length>> ;
+    { array } declare length>> ; inline
 
 : array-flip ( matrix -- newmatrix )
+    { array } declare
     [ dup first array-length [ array-length min ] reduce ] keep
     [ [ array-nth ] with { } map-as ] curry { } map-as ;
 
