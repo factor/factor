@@ -574,7 +574,6 @@ M: windows-ui-backend set-title ( string world -- )
 M: windows-ui-backend ui
     [
         [
-            stop-after-last-window? on
             init-clipboard
             init-win32-ui
             start-ui

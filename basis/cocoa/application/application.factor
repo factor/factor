@@ -1,10 +1,10 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax io kernel namespaces core-foundation
-core-foundation.run-loop core-foundation.arrays
-core-foundation.data core-foundation.strings cocoa.messages
-cocoa cocoa.classes cocoa.runtime sequences threads init summary
-kernel.private assocs ;
+core-foundation.arrays core-foundation.data
+core-foundation.strings cocoa.messages cocoa cocoa.classes
+cocoa.runtime sequences threads init summary kernel.private
+assocs ;
 IN: cocoa.application
 
 : <NSString> ( str -- alien ) <CFString> -> autorelease ;
@@ -34,13 +34,6 @@ FUNCTION: void NSBeep ( ) ;
 
 : with-cocoa ( quot -- )
     [ NSApp drop call ] with-autorelease-pool ; inline
-
-: next-event ( app -- event )
-    NSAnyEventMask f CFRunLoopDefaultMode 1
-    -> nextEventMatchingMask:untilDate:inMode:dequeue: ;
-
-: do-event ( app -- ? )
-    dup next-event [ dupd -> sendEvent: -> updateWindows t ] [ drop f ] if* ;
 
 : add-observer ( observer selector name object -- )
     [

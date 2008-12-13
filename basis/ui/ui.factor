@@ -10,8 +10,6 @@ IN: ui
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
 
-SYMBOL: stop-after-last-window?
-
 : window ( handle -- world ) windows get-global at ;
 
 : window-focus ( handle -- gadget ) window world-focus ;
@@ -207,7 +205,6 @@ MAIN: ui
         f windows set-global
         [
             ui-hook set
-            stop-after-last-window? on
             ui
         ] with-scope
     ] if ;

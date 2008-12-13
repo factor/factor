@@ -5,7 +5,8 @@ math sequences namespaces make assocs init accessors
 continuations combinators io.encodings.utf8 destructors locals
 arrays specialized-arrays.direct.alien
 specialized-arrays.direct.int specialized-arrays.direct.longlong
-core-foundation core-foundation.run-loop core-foundation.strings ;
+core-foundation core-foundation.run-loop core-foundation.strings
+core-foundation.time ;
 IN: core-foundation.fsevents
 
 : kFSEventStreamCreateFlagUseCFTypes 2 ; inline

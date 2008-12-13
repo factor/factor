@@ -281,7 +281,6 @@ M: x11-ui-backend ui ( -- )
     [
         f [
             [
-                stop-after-last-window? on
                 init-clipboard
                 start-ui
                 event-loop
