@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.files io.files.info.unix io.backend kernel
-namespaces make sequences system tools.deploy.backend
-tools.deploy.config tools.deploy.config.editor assocs hashtables
-prettyprint ;
+USING: io io.pathnames io.directories io.files
+io.files.info.unix io.backend kernel namespaces make sequences
+system tools.deploy.backend tools.deploy.config
+tools.deploy.config.editor assocs hashtables prettyprint ;
 IN: tools.deploy.unix
 
 : create-app-dir ( vocab bundle-name -- vm )
