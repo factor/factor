@@ -40,8 +40,8 @@ SYMBOL: kqueue-run-loop-source
 M: run-loop-mx dispose
     [
         {
-            [ fd>> &dispose drop ]
-            [ source>> &dispose drop ]
+            [ fd>> &CFRelease drop ]
+            [ source>> &CFRelease drop ]
             [ remove-kqueue-from-run-loop ]
             [ kqueue-mx>> &dispose drop ]
         } cleave
