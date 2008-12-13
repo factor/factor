@@ -3,7 +3,8 @@
 USING: accessors alien alien.syntax kernel math namespaces
 sequences destructors combinators threads heaps deques calendar
 core-foundation core-foundation.strings
-core-foundation.file-descriptors core-foundation.timers ;
+core-foundation.file-descriptors core-foundation.timers
+core-foundation.time ;
 IN: core-foundation.run-loop
 
 : kCFRunLoopRunFinished 1 ; inline
