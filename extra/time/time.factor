@@ -1,18 +1,29 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays calendar io kernel fry macros math
-math.functions math.parser peg.ebnf sequences strings vectors ;
+USING: accessors arrays calendar combinators io kernel fry 
+macros math math.functions math.parser peg.ebnf sequences 
+strings vectors ;
 
 IN: time
 
+: zero-pad 2 CHAR: 0 pad-left ; inline
+
 : >timestring ( timestamp -- string ) 
-    [ hour>> ] keep [ minute>> ] keep second>> 3array
-    [ number>string 2 CHAR: 0 pad-left ] map ":" join ; inline
+    [ hour>> ] [ minute>> ] [ second>> floor ] tri 3array
+    [ number>string zero-pad ] map ":" join ; inline
 
 : >datestring ( timestamp -- string )
-    [ month>> ] keep [ day>> ] keep year>> 3array
-    [ number>string 2 CHAR: 0 pad-left ] map "/" join ; inline
+    [ month>> ] [ day>> ] [ year>> ] tri 3array
+    [ number>string zero-pad ] map "/" join ; inline
+
+: >datetimestring ( timestamp -- string ) 
+    { [ day-of-week day-abbreviation3 ]
+      [ month>> month-abbreviation ]
+      [ day>> number>string zero-pad ]
+      [ >timestring ]
+      [ year>> number>string ]
+    } cleave 3array [ 2array ] dip append " " join ; inline
 
 : (week-of-year) ( timestamp day -- n )
     [ dup clone 1 >>month 1 >>day day-of-week dup ] dip > [ 7 swap - ] when
@@ -32,15 +43,15 @@ fmt-a     = "a"                  => [[ [ dup day-of-week day-abbreviation3 ] ]]
 fmt-A     = "A"                  => [[ [ dup day-of-week day-name ] ]] 
 fmt-b     = "b"                  => [[ [ dup month>> month-abbreviation ] ]]
 fmt-B     = "B"                  => [[ [ dup month>> month-name ] ]] 
-fmt-c     = "c"                  => [[ [ "Not yet implemented" throw ] ]]
-fmt-d     = "d"                  => [[ [ dup day>> number>string 2 CHAR: 0 pad-left ] ]] 
-fmt-H     = "H"                  => [[ [ dup hour>> number>string 2 CHAR: 0 pad-left ] ]]
-fmt-I     = "I"                  => [[ [ dup hour>> 12 > [ 12 - ] when number>string 2 CHAR: 0 pad-left ] ]] 
+fmt-c     = "c"                  => [[ [ dup >datetimestring ] ]] 
+fmt-d     = "d"                  => [[ [ dup day>> number>string zero-pad ] ]] 
+fmt-H     = "H"                  => [[ [ dup hour>> number>string zero-pad ] ]]
+fmt-I     = "I"                  => [[ [ dup hour>> dup 12 > [ 12 - ] when number>string zero-pad ] ]] 
 fmt-j     = "j"                  => [[ [ dup day-of-year number>string ] ]] 
-fmt-m     = "m"                  => [[ [ dup month>> number>string 2 CHAR: 0 pad-left ] ]] 
-fmt-M     = "M"                  => [[ [ dup minute>> number>string 2 CHAR: 0 pad-left ] ]] 
-fmt-p     = "p"                  => [[ [ dup hour>> 12 < [ "AM" ] [ "PM" ] ? ] ]] 
-fmt-S     = "S"                  => [[ [ dup second>> round number>string 2 CHAR: 0 pad-left ] ]] 
+fmt-m     = "m"                  => [[ [ dup month>> number>string zero-pad ] ]] 
+fmt-M     = "M"                  => [[ [ dup minute>> number>string zero-pad ] ]] 
+fmt-p     = "p"                  => [[ [ dup hour>> 12 < "AM" "PM" ? ] ]] 
+fmt-S     = "S"                  => [[ [ dup second>> round number>string zero-pad ] ]] 
 fmt-U     = "U"                  => [[ [ dup week-of-year-sunday ] ]] 
 fmt-w     = "w"                  => [[ [ dup day-of-week number>string ] ]] 
 fmt-W     = "W"                  => [[ [ dup week-of-year-monday ] ]] 
