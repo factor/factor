@@ -28,8 +28,8 @@ IN: windows.time
 : windows-time>FILETIME ( n -- FILETIME )
     "FILETIME" <c-object>
     [
-        [ >r HEX: ffffffff bitand r> set-FILETIME-dwLowDateTime ] 2keep
-        >r -32 shift r> set-FILETIME-dwHighDateTime
+        [ 32 bits set-FILETIME-dwLowDateTime ] 2keep
+        [ -32 shift ] dip set-FILETIME-dwHighDateTime
     ] keep ;
 
 : timestamp>FILETIME ( timestamp -- FILETIME/f )
