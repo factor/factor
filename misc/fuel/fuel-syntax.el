@@ -101,7 +101,7 @@
           fuel-syntax--declaration-words-regex))
 
 (defconst fuel-syntax--single-liner-regex
-  (format "^%s" (regexp-opt '("DEFER:" "GENERIC:" "IN:"
+  (format "^%s" (regexp-opt '("C:" "DEFER:" "GENERIC:" "IN:"
                               "PRIVATE>" "<PRIVATE"
                               "SINGLETON:" "SYMBOL:" "USE:" "VAR:"))))
 
