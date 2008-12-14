@@ -253,13 +253,14 @@ invoking restarts as needed.
 \\{fuel-debug-mode-map}"
   (interactive)
   (kill-all-local-variables)
+  (buffer-disable-undo)
   (setq major-mode 'factor-mode)
   (setq mode-name "Fuel Debug")
   (use-local-map fuel-debug-mode-map)
   (fuel-debug--font-lock-setup)
   (setq fuel-debug--file nil)
   (setq fuel-debug--last-ret nil)
-  (toggle-read-only 1)
+  (setq buffer-read-only t)
   (run-hooks 'fuel-debug-mode-hook))
 
 

@@ -261,6 +261,7 @@ buffer."
 \\{fuel-help-mode-map}"
   (interactive)
   (kill-all-local-variables)
+  (buffer-disable-undo)
   (use-local-map fuel-help-mode-map)
   (setq mode-name "Factor Help")
   (setq major-mode 'fuel-help-mode)
@@ -271,7 +272,7 @@ buffer."
   (fuel-autodoc-mode)
 
   (run-mode-hooks 'fuel-help-mode-hook)
-  (toggle-read-only 1))
+  (setq buffer-read-only t))
 
 
 (provide 'fuel-help)
