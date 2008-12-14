@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays ui ui.gadgets
 ui.gestures ui.backend ui.clipboards ui.gadgets.worlds ui.render
-assocs kernel math namespaces opengl sequences strings x11.xlib
-x11.events x11.xim x11.glx x11.clipboard x11.constants
-x11.windows io.encodings.string io.encodings.ascii
+ui.event-loop assocs kernel math namespaces opengl sequences
+strings x11.xlib x11.events x11.xim x11.glx x11.clipboard
+x11.constants x11.windows io.encodings.string io.encodings.ascii
 io.encodings.utf8 combinators command-line qualified
 math.vectors classes.tuple opengl.gl threads math.geometry.rect
 environment ascii ;
@@ -14,9 +14,12 @@ SINGLETON: x11-ui-backend
 
 : XA_NET_WM_NAME ( -- atom ) "_NET_WM_NAME" x-atom ;
 
-TUPLE: x11-handle window glx xic ;
+TUPLE: x11-handle-base glx ;
+TUPLE: x11-handle < x11-handle-base xic window ;
+TUPLE: x11-pixmap-handle < x11-handle-base pixmap glx-pixmap ;
 
 C: <x11-handle> x11-handle
+C: <x11-pixmap-handle> x11-pixmap-handle
 
 M: world expose-event nip relayout ;
 
@@ -137,7 +140,7 @@ M: world focus-out-event
 
 M: world selection-notify-event
     [ handle>> window>> selection-from-event ] keep
-    world user-input ;
+    user-input ;
 
 : supported-type? ( atom -- ? )
     { "UTF8_STRING" "STRING" "TEXT" }
@@ -184,7 +187,7 @@ M: world client-event
 
 : gadget-window ( world -- )
     dup window-loc>> over rect-dim glx-window
-    over "Factor" create-xic <x11-handle>
+    over "Factor" create-xic rot <x11-handle>
     2dup window>> register-window
     >>handle drop ;
 
@@ -247,19 +250,37 @@ M: x11-ui-backend raise-window* ( world -- )
         dpy get swap window>> XRaiseWindow drop
     ] when* ;
 
-M: x11-ui-backend select-gl-context ( handle -- )
+M: x11-handle select-gl-context ( handle -- )
     dpy get swap
-    dup window>> swap glx>> glXMakeCurrent
+    [ window>> ] [ glx>> ] bi glXMakeCurrent
     [ "Failed to set current GLX context" throw ] unless ;
 
-M: x11-ui-backend flush-gl-context ( handle -- )
+M: x11-handle flush-gl-context ( handle -- )
     dpy get swap window>> glXSwapBuffers ;
+
+M: x11-pixmap-handle select-gl-context ( handle -- )
+    dpy get swap
+    [ glx-pixmap>> ] [ glx>> ] bi glXMakeCurrent
+    [ "Failed to set current GLX context" throw ] unless ;
+
+M: x11-pixmap-handle flush-gl-context ( handle -- )
+    drop ;
+
+M: x11-ui-backend (open-offscreen-buffer) ( world -- )
+    dup dim>> glx-pixmap <x11-pixmap-handle> >>handle drop ;
+M: x11-ui-backend (close-offscreen-buffer) ( handle -- )
+    dpy get swap
+    [ glx-pixmap>> glXDestroyGLXPixmap ]
+    [ pixmap>> XFreePixmap drop ]
+    [ glx>> glXDestroyContext ] 2tri ;
+
+M: x11-ui-backend offscreen-pixels ( world -- alien w h )
+    [ [ dim>> ] [ handle>> pixmap>> ] bi pixmap-bits ] [ dim>> first2 ] bi ;
 
 M: x11-ui-backend ui ( -- )
     [
         f [
             [
-                stop-after-last-window? on
                 init-clipboard
                 start-ui
                 event-loop

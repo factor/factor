@@ -66,7 +66,7 @@ buffer."
       (comint-exec fuel-listener-buffer "factor"
                    factor nil `("-run=fuel" ,(format "-i=%s" image)))
       (fuel-listener--wait-for-prompt 20)
-      (fuel-eval--send-string "USE: fuel")
+      (fuel-eval--send/wait "USE: fuel")
       (message "FUEL listener up and running!"))))
 
 (defun fuel-listener--process (&optional start)
@@ -83,18 +83,18 @@ buffer."
 ;;; Prompt chasing
 
 (defun fuel-listener--wait-for-prompt (&optional timeout)
-    (let ((proc (get-buffer-process fuel-listener-buffer))
-          (seen))
-      (with-current-buffer fuel-listener-buffer
-        (while (progn (goto-char comint-last-input-end)
-                      (not (or seen
-                               (setq seen
-                                     (re-search-forward comint-prompt-regexp nil t))
-                               (not (accept-process-output proc timeout))))))
-        (goto-char (point-max)))
-      (unless seen
+  (let ((proc (get-buffer-process fuel-listener-buffer)))
+    (with-current-buffer fuel-listener-buffer
+      (goto-char (or comint-last-input-end (point-min)))
+      (let ((seen (re-search-forward comint-prompt-regexp nil t)))
+        (while (and (not seen)
+                    (accept-process-output proc (or timeout 10) nil t))
+          (sleep-for 0 1)
+          (goto-char comint-last-input-end)
+          (setq seen (re-search-forward comint-prompt-regexp nil t)))
         (pop-to-buffer fuel-listener-buffer)
-        (error "No prompt found!"))))
+        (goto-char (point-max))
+        (unless seen (error "No prompt found!"))))))
 
 
 ;;; Interface: starting fuel listener
@@ -124,6 +124,8 @@ buffer."
   (set (make-local-variable 'comint-prompt-read-only) t)
   (setq fuel-listener--compilation-begin nil))
 
+(define-key fuel-listener-mode-map "\C-cz" 'run-factor)
+(define-key fuel-listener-mode-map "\C-c\C-z" 'run-factor)
 (define-key fuel-listener-mode-map "\C-ch" 'fuel-help)
 (define-key fuel-listener-mode-map "\M-." 'fuel-edit-word-at-point)
 (define-key fuel-listener-mode-map "\C-ck" 'fuel-run-file)

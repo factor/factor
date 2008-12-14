@@ -6,9 +6,10 @@ IN: memory.tests
 ! LOL
 [ ] [
     vm
+    "-i=" image append
     "-generations=2"
     "-e=USING: memory io prettyprint system ; input-stream gc . 0 exit"
-    3array try-process
+    4array try-process
 ] unit-test
 
 [ [ ] instances ] must-infer

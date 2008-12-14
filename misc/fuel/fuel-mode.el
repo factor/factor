@@ -45,16 +45,20 @@ With prefix argument, ask for the file to run."
   (let* ((file (or (and arg (read-file-name "File: " nil (buffer-file-name) t))
                    (buffer-file-name)))
          (file (expand-file-name file))
-         (buffer (find-file-noselect file))
-         (cmd (format "%S fuel-run-file" file)))
+         (buffer (find-file-noselect file)))
     (when buffer
       (with-current-buffer buffer
         (message "Compiling %s ..." file)
-        (let ((r (fuel-debug--display-retort (fuel-eval--eval-string/context cmd)
-                                             (format "%s successfully compiled" file)
-                                             nil
-                                             file)))
-          (if r (message "Compiling %s ... OK!" file) (message "")))))))
+        (fuel-eval--send (fuel-eval--cmd/string (format "%S fuel-run-file" file))
+                         `(lambda (r) (fuel--run-file-cont r ,file)))))))
+
+(defun fuel--run-file-cont (ret file)
+  (if (fuel-debug--display-retort ret
+                                  (format "%s successfully compiled" file)
+                                  nil
+                                  file)
+      (message "Compiling %s ... OK!" file)
+    (message "")))
 
 (defun fuel-eval-region (begin end &optional arg)
   "Sends region to Fuel's listener for evaluation.
@@ -62,7 +66,7 @@ Unless called with a prefix, switchs to the compilation results
 buffer in case of errors."
   (interactive "r\nP")
   (fuel-debug--display-retort
-   (fuel-eval--eval-region/context begin end)
+   (fuel-eval--send/wait (fuel-eval--cmd/region begin end) 10000)
    (format "%s%s"
            (if fuel-syntax--current-vocab
                (format "IN: %s " fuel-syntax--current-vocab)
@@ -93,6 +97,16 @@ buffer in case of errors."
       (unless (< begin end) (error "No evaluable definition around point"))
       (fuel-eval-region begin end arg))))
 
+(defun fuel--try-edit (ret)
+  (let* ((err (fuel-eval--retort-error ret))
+         (loc (fuel-eval--retort-result ret)))
+    (when (or err (not loc) (not (listp loc)) (not (stringp (car loc))))
+      (error "Couldn't find edit location for '%s'" word))
+    (unless (file-readable-p (car loc))
+      (error "Couldn't open '%s' for read" (car loc)))
+    (find-file-other-window (car loc))
+    (goto-line (if (numberp (cadr loc)) (cadr loc) 1))))
+
 (defun fuel-edit-word-at-point (&optional arg)
   "Opens a new window visiting the definition of the word at point.
 With prefix, asks for the word to edit."
@@ -105,16 +119,29 @@ With prefix, asks for the word to edit."
                                         (if word (format " (%s)" word) ""))
                                 word)
                  word)))
-    (let* ((ret (fuel-eval--eval-string/context
-                 (format "\\ %s fuel-get-edit-location" word)))
-           (err (fuel-eval--retort-error ret))
-           (loc (fuel-eval--retort-result ret)))
-      (when (or err (not loc) (not (listp loc)) (not (stringp (car loc))))
-        (error "Couldn't find edit location for '%s'" word))
-      (unless (file-readable-p (car loc))
-        (error "Couldn't open '%s' for read" (car loc)))
-      (find-file-other-window (car loc))
-      (goto-line (if (numberp (cadr loc)) (cadr loc) 1)))))
+    (let ((str (fuel-eval--cmd/string
+                (format "\\ %s fuel-get-edit-location" word))))
+      (condition-case nil
+          (fuel--try-edit (fuel-eval--send/wait str))
+        (error (fuel-edit-vocabulary word))))))
+
+(defvar fuel--vocabs-prompt-history nil)
+
+(defun fuel--read-vocabulary-name ()
+  (let* ((str (fuel-eval--cmd/string "fuel-get-vocabs" t "fuel" t))
+         (vocabs (fuel-eval--retort-result (fuel-eval--send/wait str)))
+         (prompt "Vocabulary name: "))
+    (if vocabs
+        (completing-read prompt vocabs nil t nil fuel--vocabs-prompt-history)
+      (read-string prompt nil fuel--vocabs-prompt-history))))
+
+(defun fuel-edit-vocabulary (vocab)
+  "Visits vocabulary file in Emacs.
+When called interactively, asks for vocabulary with completion."
+  (interactive (list (fuel--read-vocabulary-name)))
+  (let* ((str (fuel-eval--cmd/string
+               (format "%S fuel-get-vocab-location" vocab) t "fuel" t)))
+    (fuel--try-edit (fuel-eval--send/wait str))))
 
 
 ;;; Minor mode definition:
@@ -167,6 +194,8 @@ interacting with a factor listener is at your disposal.
 
 (define-key fuel-mode-map "\C-\M-r" 'fuel-eval-extended-region)
 (fuel-mode--key ?e ?e 'fuel-eval-extended-region)
+
+(fuel-mode--key ?e ?v 'fuel-edit-vocabulary)
 
 (define-key fuel-mode-map "\M-." 'fuel-edit-word-at-point)
 

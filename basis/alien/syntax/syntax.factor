@@ -3,7 +3,8 @@
 USING: accessors arrays alien alien.c-types alien.structs
 alien.arrays alien.strings kernel math namespaces parser
 sequences words quotations math.parser splitting grouping
-effects assocs combinators lexer strings.parser alien.parser ;
+effects assocs combinators lexer strings.parser alien.parser 
+fry ;
 IN: alien.syntax
 
 : DLL" lexer get skip-blank parse-string dlopen parsed ; parsing
@@ -33,3 +34,7 @@ IN: alien.syntax
     dup length
     [ [ create-in ] dip 1quotation define ] 2each ;
     parsing
+
+: &:
+    scan "c-library" get
+    '[ _ _ load-library dlsym ] over push-all ; parsing

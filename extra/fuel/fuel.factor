@@ -5,7 +5,7 @@ USING: accessors arrays classes classes.tuple compiler.units
 combinators continuations debugger definitions eval help
 io io.files io.streams.string kernel lexer listener listener.private
 make math namespaces parser prettyprint prettyprint.config
-quotations sequences strings source-files vectors vocabs.loader ;
+quotations sequences strings source-files vectors vocabs vocabs.loader ;
 
 IN: fuel
 
@@ -151,7 +151,17 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 : fuel-end-eval ( -- ) [ ] (fuel-end-eval) ; inline
 
 : fuel-get-edit-location ( defspec -- )
-    where [ first2 [ (normalize-path) ] dip 2array fuel-eval-set-result ] when* ;
+    where [
+       first2 [ (normalize-path) ] dip 2array fuel-eval-set-result
+    ] when* ;
+
+: fuel-get-vocab-location ( vocab -- )
+    vocab-source-path [
+        (normalize-path) 1 2array fuel-eval-set-result
+    ] when* ;
+
+: fuel-get-vocabs ( -- )
+    vocabs fuel-eval-set-result ; inline
 
 : fuel-run-file ( path -- ) run-file ; inline
 

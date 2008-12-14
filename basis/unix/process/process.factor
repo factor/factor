@@ -74,7 +74,7 @@ FUNCTION: int setpriority ( int which, int who, int prio ) ;
     HEX: 7f bitand ; inline
 
 : WIFEXITED ( status -- ? )
-    WTERMSIG zero? ; inline
+    WTERMSIG 0 = ; inline
 
 : WEXITSTATUS ( status -- value )
     HEX: ff00 bitand -8 shift ; inline
@@ -86,7 +86,7 @@ FUNCTION: int setpriority ( int which, int who, int prio ) ;
     HEX: 80 ; inline
 
 : WCOREDUMP ( status -- ? )
-    WCOREFLAG bitand zero? not ; inline
+    WCOREFLAG bitand 0 = not ; inline
 
 : WIFSTOPPED ( status -- ? )
     HEX: ff bitand HEX: 7f = ; inline

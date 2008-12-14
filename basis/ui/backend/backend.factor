@@ -5,8 +5,6 @@ IN: ui.backend
 
 SYMBOL: ui-backend
 
-HOOK: do-events ui-backend ( -- )
-
 HOOK: set-title ui-backend ( string world -- )
 
 HOOK: set-fullscreen* ui-backend ( ? world -- )
@@ -17,11 +15,17 @@ HOOK: (open-window) ui-backend ( world -- )
 
 HOOK: (close-window) ui-backend ( handle -- )
 
+HOOK: (open-offscreen-buffer) ui-backend ( world -- )
+
+HOOK: (close-offscreen-buffer) ui-backend ( handle -- )
+
 HOOK: raise-window* ui-backend ( world -- )
 
-HOOK: select-gl-context ui-backend ( handle -- )
+GENERIC: select-gl-context ( handle -- )
 
-HOOK: flush-gl-context ui-backend ( handle -- )
+GENERIC: flush-gl-context ( handle -- )
+
+HOOK: offscreen-pixels ui-backend ( world -- alien w h )
 
 HOOK: beep ui-backend ( -- )
 
