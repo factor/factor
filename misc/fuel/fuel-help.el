@@ -75,8 +75,7 @@
   (let ((word (or word (fuel-syntax-symbol-at-point)))
         (fuel-eval--log t))
     (when word
-      (let* ((str (format "\\ %s synopsis fuel-eval-set-result" word))
-             (cmd (fuel-eval--cmd/string str t t))
+      (let* ((cmd `(:fuel* (((:quote ,word) synopsis :get)) t))
              (ret (fuel-eval--send/wait cmd 20)))
         (when (and ret (not (fuel-eval--retort-error ret)))
           (if fuel-help-minibuffer-font-lock
@@ -151,10 +150,9 @@ displayed in the minibuffer."
                   fuel-help-always-ask))
          (def (if ask (read-string prompt nil 'fuel-help--prompt-history def)
                 def))
-         (cmd (format "\\ %s %s" def (if see "see" "help"))))
+         (cmd `(:fuel* ((:quote ,def) ,(if see 'see 'help)) t)))
     (message "Looking up '%s' ..." def)
-    (fuel-eval--send (fuel-eval--cmd/string cmd t t)
-                     `(lambda (r) (fuel-help--show-help-cont ,def r)))))
+    (fuel-eval--send cmd `(lambda (r) (fuel-help--show-help-cont ,def r)))))
 
 (defun fuel-help--show-help-cont (def ret)
   (let ((out (fuel-eval--retort-output ret)))
