@@ -26,7 +26,7 @@ ERROR: roman-range-error n ;
 
 : (>roman) ( n -- )
     roman-values roman-digits [
-        >r /mod swap r> <repetition> concat %
+        [ /mod swap ] dip <repetition> concat %
     ] 2each drop ;
 
 : (roman>) ( seq -- n )
@@ -56,7 +56,7 @@ PRIVATE>
     [ roman> ] bi@ ;
 
 : binary-roman-op ( str1 str2 quot -- str3 )
-    >r 2roman> r> call >roman ; inline
+    [ 2roman> ] dip call >roman ; inline
 
 PRIVATE>
 
@@ -73,6 +73,6 @@ PRIVATE>
     [ /i ] binary-roman-op ;
 
 : roman/mod ( str1 str2 -- str3 str4 )
-    [ /mod ] binary-roman-op >r >roman r> ;
+    [ /mod ] binary-roman-op [ >roman ] dip ;
 
 : ROMAN: scan roman> parsed ; parsing
