@@ -2,7 +2,7 @@ USING: help.syntax help.markup ;
 IN: cocoa.views
 
 HELP: <PixelFormat>
-{ $values { "pixelfmt" "an " { $snippet "NSOpenGLPixelFormat" } } }
+{ $values { "attributes" "a sequence of attributes" } { "pixelfmt" "an " { $snippet "NSOpenGLPixelFormat" } } }
 { $description "Creates an " { $snippet "NSOpenGLPixelFormat" } " with some reasonable defaults." } ;
 
 HELP: <GLView>
