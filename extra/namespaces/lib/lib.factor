@@ -6,7 +6,7 @@ IN: namespaces.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: save-namestack ( quot -- ) namestack >r call r> set-namestack ;
+: save-namestack ( quot -- ) namestack slip set-namestack ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

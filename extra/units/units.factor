@@ -81,7 +81,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
 : d= ( d d -- ? ) comparison-op number= ;
 
-: d~ ( d d delta -- ? ) >r comparison-op r> ~ ;
+: d~ ( d d delta -- ? ) [ comparison-op ] dip ~ ;
 
 : d-min ( d d -- d ) [ d< ] most ;
 

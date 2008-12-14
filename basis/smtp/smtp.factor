@@ -102,7 +102,7 @@ M: message-contains-dot summary ( obj -- string )
 
 LOG: smtp-response DEBUG
 
-: multiline? ( response -- boolean )
+: multiline? ( response -- ? )
     3 swap ?nth CHAR: - = ;
 
 : (receive-response) ( -- )
