@@ -1,12 +1,13 @@
 ! Copyright (C) 2008 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays classes classes.tuple compiler.units
-combinators continuations debugger definitions eval help io
-io.files io.pathnames io.streams.string kernel lexer listener
-listener.private make math namespaces parser prettyprint
-prettyprint.config quotations sequences strings source-files
-tools.vocabs vectors vocabs vocabs.loader ;
+USING: accessors arrays assocs classes classes.tuple
+combinators compiler.units continuations debugger definitions
+eval help io io.files io.pathnames io.streams.string kernel
+lexer listener listener.private make math memoize namespaces
+parser prettyprint prettyprint.config quotations sequences sets
+sorting source-files strings tools.vocabs vectors vocabs
+vocabs.loader ;
 
 IN: fuel
 
@@ -88,6 +89,14 @@ SYMBOL: :restarts
 M: condition fuel-pprint
     [ error>> ] [ fuel-restarts ] bi 2array condition prefix fuel-pprint ;
 
+M: lexer-error fuel-pprint
+    {
+        [ line>> ]
+        [ column>> ]
+        [ line-text>> ]
+        [ fuel-restarts ]
+    } cleave 4array lexer-error prefix fuel-pprint ;
+
 M: source-file-error fuel-pprint
     [ file>> ] [ error>> ] bi 2array source-file-error prefix
     fuel-pprint ;
@@ -159,8 +168,24 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 : fuel-get-vocab-location ( vocab -- )
     >vocab-link fuel-get-edit-location ;
 
+: (fuel-get-vocabs) ( -- seq )
+    all-vocabs-seq [ vocab-name ] map ; inline
+
 : fuel-get-vocabs ( -- )
-    all-vocabs-seq [ vocab-name ] map fuel-eval-set-result ; inline
+    (fuel-get-vocabs) fuel-eval-set-result ;
+
+MEMO: (fuel-vocab-words) ( name -- seq )
+    >vocab-link words [ name>> ] map ;
+
+: fuel-vocabs-words ( names/f -- seq )
+    [ (fuel-get-vocabs) ] unless* prune
+    [ (fuel-vocab-words) ] map concat natural-sort ;
+
+: (fuel-get-words) ( prefix names/f -- seq )
+    fuel-vocabs-words swap [ drop-prefix nip length 0 = ] curry filter ;
+
+: fuel-get-words ( prefix names -- )
+    (fuel-get-words) fuel-eval-set-result ; inline
 
 : fuel-run-file ( path -- ) run-file ; inline
 

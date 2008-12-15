@@ -73,7 +73,7 @@
 
 (defun fuel-help--word-synopsis (&optional word)
   (let ((word (or word (fuel-syntax-symbol-at-point)))
-        (fuel-eval--log t))
+        (fuel-log--inhibit-p t))
     (when word
       (let* ((cmd `(:fuel* (((:quote ,word) synopsis :get)) t))
              (ret (fuel-eval--send/wait cmd 20)))
@@ -157,7 +157,7 @@ displayed in the minibuffer."
 (defun fuel-help--show-help-cont (def ret)
   (let ((out (fuel-eval--retort-output ret)))
     (if (or (fuel-eval--retort-error ret) (empty-string-p out))
-        (message "No help for '%s'" def)
+        (message "No help for '%s'" ret)
       (fuel-help--insert-contents def out))))
 
 (defun fuel-help--insert-contents (def str &optional nopush)
@@ -225,6 +225,8 @@ buffer."
     (define-key map "q" 'bury-buffer)
     (define-key map "b" 'fuel-help-previous)
     (define-key map "f" 'fuel-help-next)
+    (define-key map "l" 'fuel-help-previous)
+    (define-key map "n" 'fuel-help-next)
     (define-key map (kbd "SPC")  'scroll-up)
     (define-key map (kbd "S-SPC") 'scroll-down)
     map))

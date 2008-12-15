@@ -119,6 +119,7 @@
       (setq fuel-debug--last-ret ret)
       (setq fuel-debug--file file)
       (goto-char (point-max))
+      (font-lock-fontify-buffer)
       (when (and err (not no-pop)) (pop-to-buffer fuel-debug--buffer))
       (not err))))
 
@@ -130,7 +131,7 @@
          (trail (and last (substring-no-properties last (/ llen 2))))
          (err (fuel-eval--retort-error ret))
          (p (point)))
-    (save-excursion (insert current))
+    (when current (save-excursion (insert current)))
     (when (and (> clen llen) (> llen 0) (search-forward trail nil t))
       (delete-region p (point)))
     (goto-char (point-max))

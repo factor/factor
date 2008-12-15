@@ -31,6 +31,9 @@
 (defvar fuel-log--verbose-p t
   "Log level for Factor messages")
 
+(defvar fuel-log--inhibit-p nil
+  "Set this to t to inhibit all log messages")
+
 (define-derived-mode factor-messages-mode fundamental-mode "FUEL Messages"
   "Simple mode to log interactions with the factor listener"
   (kill-all-local-variables)
@@ -52,11 +55,12 @@
         (current-buffer))))
 
 (defun fuel-log--msg (type &rest args)
-  (with-current-buffer (fuel-log--buffer)
-    (let ((inhibit-read-only t))
-      (insert
-       (fuel--shorten-str (format "\n%s: %s\n" type (apply 'format args))
-                          fuel-log--max-message-size)))))
+  (unless fuel-log--inhibit-p
+    (with-current-buffer (fuel-log--buffer)
+      (let ((inhibit-read-only t))
+        (insert
+         (fuel--shorten-str (format "\n%s: %s\n" type (apply 'format args))
+                            fuel-log--max-message-size))))))
 
 (defsubst fuel-log--warn (&rest args)
   (apply 'fuel-log--msg 'WARNING args))
@@ -65,7 +69,8 @@
   (apply 'fuel-log--msg 'ERROR args))
 
 (defsubst fuel-log--info (&rest args)
-  (if fuel-log--verbose-p (apply 'fuel-log--msg 'INFO args) ""))
+  (when fuel-log--verbose-p
+    (apply 'fuel-log--msg 'INFO args) ""))
 
 
 (provide 'fuel-log)
