@@ -29,16 +29,6 @@ M: winnt root-directory? ( path -- ? )
         [ drop f ]
     } cond ;
 
-ERROR: not-absolute-path ;
-
-M: winnt root-directory ( string -- string' )
-    unicode-prefix ?head drop
-    dup {
-        [ length 2 >= ]
-        [ second CHAR: : = ]
-        [ first Letter? ]
-    } 1&& [ 2 head "\\" append ] [ not-absolute-path ] if ;
-
 : prepend-prefix ( string -- string' )
     dup unicode-prefix head? [
         unicode-prefix prepend
