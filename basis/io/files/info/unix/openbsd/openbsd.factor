@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings alien.syntax
-combinators io.backend io.files io.files.unix kernel math
+combinators io.backend io.files io.files.info io.files.unix kernel math
 sequences system unix unix.getfsstat.openbsd grouping
 unix.statfs.openbsd unix.statvfs.openbsd unix.types
 specialized-arrays.direct.uint arrays io.files.info.unix ;

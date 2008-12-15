@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax combinators csv
-io.backend io.encodings.utf8 io.files io.streams.string
+io.backend io.encodings.utf8 io.files io.files.info io.streams.string
 io.files.unix kernel math.order namespaces sequences sorting
 system unix unix.statfs.linux unix.statvfs.linux
 specialized-arrays.direct.uint arrays io.files.info.unix ;
