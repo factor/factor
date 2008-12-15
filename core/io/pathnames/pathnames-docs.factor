@@ -65,7 +65,7 @@ HELP: home
 { $values { "dir" string } }
 { $description "Outputs the user's home directory." } ;
 
-ARTICLE: "pathnames" "Pathname manipulation"
+ARTICLE: "io.pathnames" "Pathname manipulation"
 "Pathname manipulation:"
 { $subsection parent-directory }
 { $subsection file-name }

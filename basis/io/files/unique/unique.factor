@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators continuations fry io io.backend
-io.directories io.files io.files.unique.private io.pathnames
+io.directories io.directories.hierarchy io.files io.pathnames
 kernel math math.bitwise math.parser namespaces random
 sequences system vocabs.loader ;
 IN: io.files.unique

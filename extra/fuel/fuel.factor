@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays classes classes.tuple compiler.units
-combinators continuations debugger definitions eval help
-io io.files io.streams.string kernel lexer listener listener.private
-make math namespaces parser prettyprint prettyprint.config
-quotations sequences strings source-files tools.vocabs
-vectors vocabs vocabs.loader ;
+combinators continuations debugger definitions eval help io
+io.files io.pathnames io.streams.string kernel lexer listener
+listener.private make math namespaces parser prettyprint
+prettyprint.config quotations sequences strings source-files
+tools.vocabs vectors vocabs vocabs.loader ;
 
 IN: fuel
 

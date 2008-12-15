@@ -1,6 +1,6 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer, Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: definitions io io.files kernel math math.parser
+USING: definitions io io.files io.pathnames kernel math math.parser
     prettyprint project-euler.ave-time sequences vocabs vocabs.loader
     project-euler.001 project-euler.002 project-euler.003 project-euler.004
     project-euler.005 project-euler.006 project-euler.007 project-euler.008

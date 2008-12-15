@@ -168,6 +168,11 @@ ARTICLE: "io" "Input and output"
 { $heading "Streams" }
 { $subsection "streams" }
 { $subsection "io.files" }
+{ $heading "The file system" }
+{ $subsection "io.pathnames" }
+{ $subsection "io.files.info" }
+{ $subsection "io.files.links" }
+{ $subsection "io.directories" }
 { $heading "Encodings" }
 { $subsection "encodings-introduction" }
 { $subsection "io.encodings" }

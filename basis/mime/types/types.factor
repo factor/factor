@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.encodings.ascii assocs sequences splitting
-kernel namespaces fry memoize ;
+USING: io.pathnames io.files io.encodings.ascii assocs sequences
+splitting kernel namespaces fry memoize ;
 IN: mime.types
 
 MEMO: mime-db ( -- seq )
