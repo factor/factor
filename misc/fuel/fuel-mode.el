@@ -21,6 +21,7 @@
 (require 'fuel-debug)
 (require 'fuel-help)
 (require 'fuel-eval)
+(require 'fuel-completion)
 (require 'fuel-listener)
 
 
@@ -67,13 +68,12 @@ buffer in case of errors."
   (interactive "r\nP")
   (let* ((lines (split-string (buffer-substring-no-properties begin end)
                               "[\f\n\r\v]+" t))
-         (cmd `(:fuel (,(mapcar (lambda (l) `(:factor ,l)) lines)))))
+         (cmd `(:fuel (,(mapcar (lambda (l) `(:factor ,l)) lines))))
+         (cv (fuel-syntax--current-vocab)))
     (fuel-debug--display-retort
      (fuel-eval--send/wait cmd 10000)
      (format "%s%s"
-             (if fuel-syntax--current-vocab
-                 (format "IN: %s " fuel-syntax--current-vocab)
-               "")
+             (if cv (format "IN: %s " cv) "")
              (fuel--shorten-region begin end 70))
      arg
      (buffer-file-name))))
@@ -125,23 +125,24 @@ With prefix, asks for the word to edit."
     (let ((cmd `(:fuel ((:quote ,word) fuel-get-edit-location))))
       (condition-case nil
           (fuel--try-edit (fuel-eval--send/wait cmd))
-        (error (fuel-edit-vocabulary word))))))
+        (error (fuel-edit-vocabulary nil word))))))
 
 (defvar fuel--vocabs-prompt-history nil)
 
-(defun fuel--read-vocabulary-name ()
-  (let* ((cmd '(:fuel* (fuel-get-vocabs) "fuel" t))
-         (vocabs (fuel-eval--retort-result (fuel-eval--send/wait cmd)))
+(defun fuel--read-vocabulary-name (refresh)
+  (let* ((vocabs (fuel-completion--vocabs refresh))
          (prompt "Vocabulary name: "))
     (if vocabs
         (completing-read prompt vocabs nil t nil fuel--vocabs-prompt-history)
       (read-string prompt nil fuel--vocabs-prompt-history))))
 
-(defun fuel-edit-vocabulary (vocab)
+(defun fuel-edit-vocabulary (&optional refresh vocab)
   "Visits vocabulary file in Emacs.
-When called interactively, asks for vocabulary with completion."
-  (interactive (list (fuel--read-vocabulary-name)))
-  (let* ((cmd `(:fuel* (,vocab fuel-get-vocab-location) "fuel" t)))
+When called interactively, asks for vocabulary with completion.
+With prefix argument, refreshes cached vocabulary list."
+  (interactive "P")
+  (let* ((vocab (or vocab (fuel--read-vocabulary-name refresh)))
+         (cmd `(:fuel* (,vocab fuel-get-vocab-location) "fuel" t)))
     (fuel--try-edit (fuel-eval--send/wait cmd))))
 
 
@@ -183,22 +184,19 @@ interacting with a factor listener is at your disposal.
   (define-key fuel-mode-map (vector '(control ?c) `(control ,p) `(control ,k)) c))
 
 (fuel-mode--key-1 ?z 'run-factor)
-
 (fuel-mode--key-1 ?k 'fuel-run-file)
-(fuel-mode--key ?e ?k 'fuel-run-file)
+(fuel-mode--key-1 ?r 'fuel-eval-region)
 
 (define-key fuel-mode-map "\C-\M-x" 'fuel-eval-definition)
-(fuel-mode--key ?e ?x 'fuel-eval-definition)
-
-(fuel-mode--key-1 ?r 'fuel-eval-region)
-(fuel-mode--key ?e ?r 'fuel-eval-region)
-
 (define-key fuel-mode-map "\C-\M-r" 'fuel-eval-extended-region)
-(fuel-mode--key ?e ?e 'fuel-eval-extended-region)
-
-(fuel-mode--key ?e ?v 'fuel-edit-vocabulary)
-
 (define-key fuel-mode-map "\M-." 'fuel-edit-word-at-point)
+(define-key fuel-mode-map (kbd "M-TAB") 'fuel-completion--complete-symbol)
+
+(fuel-mode--key ?e ?e 'fuel-eval-extended-region)
+(fuel-mode--key ?e ?r 'fuel-eval-region)
+(fuel-mode--key ?e ?v 'fuel-edit-vocabulary)
+(fuel-mode--key ?e ?w 'fuel-edit-word-at-point)
+(fuel-mode--key ?e ?x 'fuel-eval-definition)
 
 (fuel-mode--key ?d ?a 'fuel-autodoc-mode)
 (fuel-mode--key ?d ?d 'fuel-help)

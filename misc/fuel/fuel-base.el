@@ -61,5 +61,12 @@
 
 (defsubst empty-string-p (str) (equal str ""))
 
+(defun fuel--respecting-message (format &rest format-args)
+  "Display TEXT as a message, without hiding any minibuffer contents."
+  (let ((text (format " [%s]" (apply #'format format format-args))))
+    (if (minibuffer-window-active-p (minibuffer-window))
+        (minibuffer-message text)
+      (message "%s" text))))
+
 (provide 'fuel-base)
 ;;; fuel-base.el ends here
