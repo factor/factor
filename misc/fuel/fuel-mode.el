@@ -49,7 +49,7 @@ With prefix argument, ask for the file to run."
     (when buffer
       (with-current-buffer buffer
         (message "Compiling %s ..." file)
-        (fuel-eval--send (fuel-eval--cmd/string (format "%S fuel-run-file" file))
+        (fuel-eval--send `(:fuel (,file fuel-run-file))
                          `(lambda (r) (fuel--run-file-cont r ,file)))))))
 
 (defun fuel--run-file-cont (ret file)
@@ -65,15 +65,18 @@ With prefix argument, ask for the file to run."
 Unless called with a prefix, switchs to the compilation results
 buffer in case of errors."
   (interactive "r\nP")
-  (fuel-debug--display-retort
-   (fuel-eval--send/wait (fuel-eval--cmd/region begin end) 10000)
-   (format "%s%s"
-           (if fuel-syntax--current-vocab
-               (format "IN: %s " fuel-syntax--current-vocab)
-             "")
-           (fuel--shorten-region begin end 70))
-   arg
-   (buffer-file-name)))
+  (let* ((lines (split-string (buffer-substring-no-properties begin end)
+                              "[\f\n\r\v]+" t))
+         (cmd `(:fuel (,(mapcar (lambda (l) `(:factor ,l)) lines)))))
+    (fuel-debug--display-retort
+     (fuel-eval--send/wait cmd 10000)
+     (format "%s%s"
+             (if fuel-syntax--current-vocab
+                 (format "IN: %s " fuel-syntax--current-vocab)
+               "")
+             (fuel--shorten-region begin end 70))
+     arg
+     (buffer-file-name))))
 
 (defun fuel-eval-extended-region (begin end &optional arg)
   "Sends region extended outwards to nearest definitions,
@@ -119,17 +122,16 @@ With prefix, asks for the word to edit."
                                         (if word (format " (%s)" word) ""))
                                 word)
                  word)))
-    (let ((str (fuel-eval--cmd/string
-                (format "\\ %s fuel-get-edit-location" word))))
+    (let ((cmd `(:fuel ((:quote ,word) fuel-get-edit-location))))
       (condition-case nil
-          (fuel--try-edit (fuel-eval--send/wait str))
+          (fuel--try-edit (fuel-eval--send/wait cmd))
         (error (fuel-edit-vocabulary word))))))
 
 (defvar fuel--vocabs-prompt-history nil)
 
 (defun fuel--read-vocabulary-name ()
-  (let* ((str (fuel-eval--cmd/string "fuel-get-vocabs" t "fuel" t))
-         (vocabs (fuel-eval--retort-result (fuel-eval--send/wait str)))
+  (let* ((cmd '(:fuel* (fuel-get-vocabs) "fuel" t))
+         (vocabs (fuel-eval--retort-result (fuel-eval--send/wait cmd)))
          (prompt "Vocabulary name: "))
     (if vocabs
         (completing-read prompt vocabs nil t nil fuel--vocabs-prompt-history)
@@ -139,9 +141,8 @@ With prefix, asks for the word to edit."
   "Visits vocabulary file in Emacs.
 When called interactively, asks for vocabulary with completion."
   (interactive (list (fuel--read-vocabulary-name)))
-  (let* ((str (fuel-eval--cmd/string
-               (format "%S fuel-get-vocab-location" vocab) t "fuel" t)))
-    (fuel--try-edit (fuel-eval--send/wait str))))
+  (let* ((cmd `(:fuel* (,vocab fuel-get-vocab-location) "fuel" t)))
+    (fuel--try-edit (fuel-eval--send/wait cmd))))
 
 
 ;;; Minor mode definition:
