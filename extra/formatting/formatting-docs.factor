@@ -49,27 +49,27 @@ HELP: printf
 }
 { $examples 
     { $example
-        "USING: printf ;"
+        "USING: formatting ;"
         "123 \"%05d\" printf"
         "00123" }
     { $example
-        "USING: printf ;"
+        "USING: formatting ;"
         "HEX: ff \"%04X\" printf"
         "00FF" }
     { $example
-        "USING: printf ;"
+        "USING: formatting ;"
         "1.23456789 \"%.3f\" printf"
         "1.235" }
     { $example 
-        "USING: printf ;"
+        "USING: formatting ;"
         "1234567890 \"%.5e\" printf"
         "1.23457e+09" }
     { $example
-        "USING: printf ;"
+        "USING: formatting ;"
         "12 \"%'#4d\" printf"
         "##12" }
     { $example
-        "USING: printf ;"
+        "USING: formatting ;"
         "1234 \"%+d\" printf"
         "+1234" }
 } ;
@@ -109,6 +109,12 @@ HELP: strftime
         { "%Z"     "Time zone name (no characters if no time zone exists)." }
         { "%%"     "A literal '%' character." }
     } 
+} 
+{ $examples 
+    { $example
+        "USING: calendar formatting ;"
+        "now \"%c\" strftime"
+        "Mon Dec 15 14:40:43 2008" }
 } ;
 
 ARTICLE: "formatting" "Formatted printing"
