@@ -3,7 +3,7 @@ USING: tools.test system io.files io.files.temp kernel
 tools.deploy.config tools.deploy.config.editor
 tools.deploy.backend math sequences io.launcher arrays
 namespaces continuations layouts accessors io.encodings.ascii
-urls math.parser ;
+urls math.parser io.directories ;
 
 : shake-and-bake ( vocab -- )
     [ "test.image" temp-file delete-file ] ignore-errors

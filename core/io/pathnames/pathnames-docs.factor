@@ -6,20 +6,20 @@ HELP: path-separator?
 { $description "Tests if the code point is a platform-specific path separator." }
 { $examples
     "On Unix:"
-    { $example "USING: io.files prettyprint ;" "CHAR: / path-separator? ." "t" }
+    { $example "USING: io.pathnames prettyprint ;" "CHAR: / path-separator? ." "t" }
 } ;
 
 HELP: parent-directory
 { $values { "path" "a pathname string" } { "parent" "a pathname string" } }
 { $description "Strips the last component off a pathname." }
-{ $examples { $example "USING: io io.files ;" "\"/etc/passwd\" parent-directory print" "/etc/" } } ;
+{ $examples { $example "USING: io io.pathnames ;" "\"/etc/passwd\" parent-directory print" "/etc/" } } ;
 
 HELP: file-name
 { $values { "path" "a pathname string" } { "string" string } }
 { $description "Outputs the last component of a pathname string." }
 { $examples
-    { $example "USING: io.files prettyprint ;" "\"/usr/bin/gcc\" file-name ." "\"gcc\"" }
-    { $example "USING: io.files prettyprint ;" "\"/usr/libexec/awk/\" file-name ." "\"awk\"" }
+    { $example "USING: io.pathnames prettyprint ;" "\"/usr/bin/gcc\" file-name ." "\"gcc\"" }
+    { $example "USING: io.pathnames prettyprint ;" "\"/usr/libexec/awk/\" file-name ." "\"awk\"" }
 } ;
 
 HELP: append-path

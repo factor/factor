@@ -1,7 +1,8 @@
 USING: accessors checksums checksums.md5 io io.encodings.ascii
-io.encodings.binary io.files io.streams.byte-array
-io.streams.string kernel make mime.multipart
-mime.multipart.private multiline sequences strings tools.test ;
+io.encodings.binary io.files io.files.temp io.files.info
+io.streams.byte-array io.streams.string kernel make
+mime.multipart mime.multipart.private multiline sequences
+strings tools.test ;
 IN: mime.multipart.tests
 
 [ { "a" } ] [

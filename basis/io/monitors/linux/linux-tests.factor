@@ -1,7 +1,8 @@
 IN: io.monitors.linux.tests
-USING: io.monitors tools.test io.files system sequences
-continuations namespaces concurrency.count-downs kernel io
-threads calendar prettyprint destructors io.timeouts ;
+USING: io.monitors tools.test io.files io.files.temp
+io.directories system sequences continuations namespaces
+concurrency.count-downs kernel io threads calendar prettyprint
+destructors io.timeouts ;
 
 ! On Linux, a notification on the directory itself would report an invalid
 ! path name

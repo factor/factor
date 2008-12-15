@@ -2,13 +2,13 @@ USING: help.markup help.syntax ;
 IN: io.files.types
 
 HELP: +regular-file+
-{ $description "A regular file. This type exists on all platforms. See " { $link "file-streams" } " for words operating on files." } ;
+{ $description "A regular file. This type exists on all platforms. See " { $link "io.files" } " for words operating on files." } ;
 
 HELP: +directory+
-{ $description "A directory. This type exists on all platforms. See " { $link "directories" } " for words operating on directories." } ;
+{ $description "A directory. This type exists on all platforms. See " { $link "io.directories" } " for words operating on directories." } ;
 
 HELP: +symbolic-link+
-{ $description "A symbolic link file.  This type is currently implemented on Unix platforms only. See " { $link "symbolic-links" } " for words operating on symbolic links." } ;
+{ $description "A symbolic link file.  This type is currently implemented on Unix platforms only. See " { $link "io.files.links" } " for words operating on symbolic links." } ;
 
 HELP: +character-device+
 { $description "A Unix character device file. This type exists on Unix platforms only." } ;

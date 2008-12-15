@@ -5,7 +5,7 @@ furnace.auth.login
 furnace.auth.providers
 furnace.auth.providers.db tools.test
 namespaces db db.sqlite db.tuples continuations
-io.files accessors kernel ;
+io.files io.files.temp io.directories accessors kernel ;
 
 <action> "test" <login-realm> realm set
 
