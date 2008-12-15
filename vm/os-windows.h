@@ -20,17 +20,18 @@ typedef wchar_t F_CHAR;
 #define STRNCMP wcsncmp
 #define STRDUP _wcsdup
 
-#define FIXNUM_FORMAT "%Id"
 #define CELL_FORMAT "%lu"
-#define CELL_HEX_FORMAT "%Ix"
 
 #ifdef WIN64
+        #define CELL_HEX_FORMAT "%Ix"
 	#define CELL_HEX_PAD_FORMAT "%016Ix"
+        #define FIXNUM_FORMAT "%Id"
 #else
+        #define CELL_HEX_FORMAT "%lx"
 	#define CELL_HEX_PAD_FORMAT "%08lx"
+        #define FIXNUM_FORMAT "%ld"
 #endif
 
-#define FIXNUM_FORMAT "%Id"
 
 #define OPEN_READ(path) _wfopen(path,L"rb")
 #define OPEN_WRITE(path) _wfopen(path,L"wb")
@@ -49,7 +50,7 @@ void ffi_dlopen(F_DLL *dll);
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);
 void ffi_dlclose(F_DLL *dll);
 
-void sleep_micros(DWORD msec);
+void sleep_micros(u64 msec);
 
 INLINE void init_signals(void) {}
 INLINE void early_init(void) {}

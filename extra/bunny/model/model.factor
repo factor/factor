@@ -1,6 +1,6 @@
 USING: accessors alien.c-types arrays combinators destructors
-http.client io io.encodings.ascii io.files kernel math
-math.matrices math.parser math.vectors opengl
+http.client io io.encodings.ascii io.files io.files.temp kernel
+math math.matrices math.parser math.vectors opengl
 opengl.capabilities opengl.gl opengl.demo-support sequences
 splitting vectors words specialized-arrays.float
 specialized-arrays.uint ;

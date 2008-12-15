@@ -1,7 +1,8 @@
 IN: concurrency.distributed.tests
 USING: tools.test concurrency.distributed kernel io.files
-arrays io.sockets system combinators threads math sequences
-concurrency.messaging continuations accessors prettyprint ;
+io.files.temp io.directories arrays io.sockets system
+combinators threads math sequences concurrency.messaging
+continuations accessors prettyprint ;
 
 : test-node ( -- addrspec )
     {

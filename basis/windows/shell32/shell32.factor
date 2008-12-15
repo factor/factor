@@ -1,6 +1,9 @@
-USING: alien alien.c-types alien.strings alien.syntax combinators
-kernel windows windows.user32 windows.ole32
-windows.com windows.com.syntax io.files io.encodings.utf16n ;
+! Copyright (C) 2006, 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: alien alien.c-types alien.strings alien.syntax
+combinators io.encodings.utf16n io.files io.pathnames kernel
+windows windows.com windows.com.syntax windows.ole32
+windows.user32 ;
 IN: windows.shell32
 
 : CSIDL_DESKTOP HEX: 00 ; inline

@@ -318,7 +318,6 @@ M: inet (server)
     invalid-inet-server ;
 
 {
-    { [ os unix? ] [ "io.unix.sockets" require ] }
-    { [ os winnt? ] [ "io.windows.nt.sockets" require ] }
-    { [ os wince? ] [ "io.windows.ce.sockets" require ] }
+    { [ os unix? ] [ "io.sockets.unix" require ] }
+    { [ os winnt? ] [ "io.sockets.windows.nt" require ] }
 } cond

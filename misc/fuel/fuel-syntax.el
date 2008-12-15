@@ -101,7 +101,7 @@
           fuel-syntax--declaration-words-regex))
 
 (defconst fuel-syntax--single-liner-regex
-  (format "^%s" (regexp-opt '("DEFER:" "GENERIC:" "IN:"
+  (format "^%s" (regexp-opt '("C:" "DEFER:" "GENERIC:" "IN:"
                               "PRIVATE>" "<PRIVATE"
                               "SINGLETON:" "SYMBOL:" "USE:" "VAR:"))))
 
@@ -259,7 +259,8 @@
 
 (defun fuel-syntax--usings-update ()
   (save-excursion
-    (setq fuel-syntax--usings (list (fuel-syntax--current-vocab)))
+    (let ((in (fuel-syntax--current-vocab)))
+      (setq fuel-syntax--usings (and in (list in))))
     (while (re-search-backward fuel-syntax--using-lines-regex nil t)
       (dolist (u (split-string (match-string-no-properties 1) nil t))
         (push u fuel-syntax--usings)))

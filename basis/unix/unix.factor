@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.syntax kernel libc
 sequences continuations byte-arrays strings math namespaces
 system combinators vocabs.loader qualified accessors
 stack-checker macros locals generalizations unix.types
-io io.files vocabs vocabs.loader ;
+io vocabs vocabs.loader ;
 IN: unix
 
 : PROT_NONE   0 ; inline
@@ -29,19 +29,6 @@ IN: unix
 : DT_LNK      10 ; inline
 : DT_SOCK     12 ; inline
 : DT_WHT      14 ; inline
-
-: dirent-type>file-type ( ch -- type )
-    {
-        { DT_BLK  [ +block-device+ ] }
-        { DT_CHR  [ +character-device+ ] }
-        { DT_DIR  [ +directory+ ] }
-        { DT_LNK  [ +symbolic-link+ ] }
-        { DT_SOCK [ +socket+ ] }
-        { DT_FIFO [ +fifo+ ] }
-        { DT_REG  [ +regular-file+ ] }
-        { DT_WHT  [ +whiteout+ ] }
-        [ drop +unknown+ ]
-    } case ;
 
 C-STRUCT: group
     { "char*" "gr_name" }

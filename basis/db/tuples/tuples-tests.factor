@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files kernel tools.test db db.tuples classes
+USING: io.files io.files.temp kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
 prettyprint calendar sequences db.sqlite math.intervals
 db.postgresql accessors random math.bitwise system

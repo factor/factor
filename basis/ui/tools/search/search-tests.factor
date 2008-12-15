@@ -1,4 +1,4 @@
-USING: assocs ui.tools.search help.topics io.files io.styles
+USING: assocs ui.tools.search help.topics io.pathnames io.styles
 kernel namespaces sequences source-files threads
 tools.test ui.gadgets ui.gestures vocabs accessors
 vocabs.loader words tools.test.ui debugger calendar ;

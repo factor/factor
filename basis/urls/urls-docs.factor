@@ -1,6 +1,6 @@
 USING: assocs hashtables help.markup help.syntax
-io.streams.string io.files kernel strings present math multiline
-;
+io.streams.string io.files io.pathnames kernel strings present
+math multiline ;
 IN: urls
 
 HELP: url

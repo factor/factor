@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays classes classes.tuple compiler.units
-combinators continuations debugger definitions eval help
-io io.files io.streams.string kernel lexer listener listener.private
-make math namespaces parser prettyprint prettyprint.config
-quotations sequences strings source-files vectors vocabs vocabs.loader ;
+combinators continuations debugger definitions eval help io
+io.files io.pathnames io.streams.string kernel lexer listener
+listener.private make math namespaces parser prettyprint
+prettyprint.config quotations sequences strings source-files
+tools.vocabs vectors vocabs vocabs.loader ;
 
 IN: fuel
 
@@ -156,12 +157,10 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     ] when* ;
 
 : fuel-get-vocab-location ( vocab -- )
-    vocab-source-path [
-        (normalize-path) 1 2array fuel-eval-set-result
-    ] when* ;
+    >vocab-link fuel-get-edit-location ;
 
 : fuel-get-vocabs ( -- )
-    vocabs fuel-eval-set-result ; inline
+    all-vocabs-seq [ vocab-name ] map fuel-eval-set-result ; inline
 
 : fuel-run-file ( path -- ) run-file ; inline
 

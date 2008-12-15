@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.singleton combinators
 continuations io io.encodings.binary io.encodings.utf8
-io.files io.sockets kernel io.streams.duplex math
+io.files io.pathnames io.sockets kernel io.streams.duplex math
 math.parser sequences splitting namespaces strings fry ftp
 ftp.client.listing-parser urls ;
 IN: ftp.client
@@ -104,7 +104,3 @@ ERROR: ftp-error got expected ;
         [ nip parent-directory ftp-cwd drop ]
         [ file-name (ftp-get) ] 2bi
     ] with-ftp-client ;
-
-
-
-

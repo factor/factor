@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io io.ports kernel math
-io.files.unique.private math.parser io.files ;
+io.pathnames io.directories math.parser io.files ;
 IN: io.files.unique
 
 HELP: temporary-path

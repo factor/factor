@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.html sequences io.files io.launcher make namespaces
-kernel arrays mason.common mason.config ;
+USING: arrays help.html io.directories io.files io.launcher
+kernel make mason.common mason.config namespaces sequences ;
 IN: mason.help
 
 : make-help-archive ( -- )

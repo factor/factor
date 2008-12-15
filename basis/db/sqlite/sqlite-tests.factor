@@ -1,5 +1,5 @@
-USING: io io.files io.launcher kernel namespaces
-prettyprint tools.test db.sqlite db sequences
+USING: io io.files io.files.temp io.directories io.launcher
+kernel namespaces prettyprint tools.test db.sqlite db sequences
 continuations db.types db.tuples unicode.case ;
 IN: db.sqlite.tests
 
