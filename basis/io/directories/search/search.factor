@@ -1,7 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays deques dlists io.files
-kernel sequences system vocabs.loader fry continuations ;
+USING: accessors arrays continuations deques dlists fry
+io.directories io.directories.search.private io.files
+io.files.info io.pathnames kernel sequences system
+vocabs.loader ;
 IN: io.directories.search
 
 TUPLE: directory-iterator path bfs queue ;

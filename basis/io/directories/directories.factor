@@ -1,6 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: vocabs.loader combinators ;
+USING: accessors combinators destructors io io.backend
+io.encodings.binary io.files io.files.info io.files.links
+io.pathnames kernel namespaces sequences system vocabs.loader ;
 IN: io.directories
 
 : set-current-directory ( path -- )

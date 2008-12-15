@@ -1,8 +1,10 @@
+USING: tools.test io.files io.files.private io.files.temp
+io.directories io.encodings.8-bit arrays make system
+io.encodings.binary io
+threads kernel continuations io.encodings.ascii sequences
+strings accessors io.encodings.utf8 math destructors namespaces
+;
 IN: io.files.tests
-USING: tools.test io.files io.files.private io threads kernel
-continuations io.encodings.ascii sequences
-strings accessors io.encodings.utf8 math destructors
-namespaces ;
 
 \ exists? must-infer
 \ (exists?) must-infer
@@ -60,3 +62,17 @@ namespaces ;
         10 read length
     ] with-file-reader
 ] unit-test
+
+USE: debugger.threads
+
+[ ] [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
+
+[ ] [ "test-quux.txt" temp-file delete-file ] unit-test
+
+[ ] [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
+
+[ ] [ "test-quux.txt" "quux-test.txt" [ temp-file ] bi@ move-file ] unit-test
+
+[ t ] [ "quux-test.txt" temp-file exists? ] unit-test
+
+[ ] [ "quux-test.txt" temp-file delete-file ] unit-test

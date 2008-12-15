@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.bitwise io.backend kernel io.files unix
-io.backend.unix io.encodings.binary io.directories io destructors
-accessors io.files.info alien.c-types io.encodings.utf8 fry
-sequences system continuations alien.strings ;
+USING: accessors alien.c-types alien.strings combinators
+continuations destructors fry io io.backend io.backend.unix
+io.directories io.encodings.binary io.encodings.utf8 io.files
+io.files.info io.pathnames kernel math.bitwise sequences system
+unix unix.stat ;
 IN: io.directories.unix
 
 : touch-mode ( -- n )

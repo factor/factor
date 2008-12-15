@@ -1,4 +1,4 @@
-USING: io.files io.sockets io kernel threads
+USING: io.files io.files.temp io.directories io.sockets io kernel threads
 namespaces tools.test continuations strings byte-arrays
 sequences prettyprint system io.encodings.binary io.encodings.ascii
 io.streams.duplex destructors make ;

@@ -1,3 +1,6 @@
+USING: continuations destructors io io.directories
+io.encodings.ascii io.encodings.utf8 io.files io.files.info
+io.files.temp io.pathnames kernel sequences tools.test ;
 IN: io.directories.tests
 
 [ { "kernel" } ] [
@@ -126,20 +129,6 @@ IN: io.directories.tests
 [ ] [ "test-blah" temp-file delete-directory ] unit-test
 
 [ f ] [ "test-blah" temp-file exists? ] unit-test
-
-USE: debugger.threads
-
-[ ] [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
-
-[ ] [ "test-quux.txt" temp-file delete-file ] unit-test
-
-[ ] [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
-
-[ ] [ "test-quux.txt" "quux-test.txt" [ temp-file ] bi@ move-file ] unit-test
-
-[ t ] [ "quux-test.txt" temp-file exists? ] unit-test
-
-[ ] [ "quux-test.txt" temp-file delete-file ] unit-test
 
 [ ] [ "delete-tree-test/a/b/c" temp-file make-directories ] unit-test
 

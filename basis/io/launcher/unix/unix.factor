@@ -1,12 +1,11 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces math system sequences
-continuations arrays assocs combinators alien.c-types strings
-threads accessors environment
-io io.backend io.launcher io.ports io.files
-io.files.private io.files.unix io.backend.unix
-io.launcher.unix.parser
-unix unix.process ;
+USING: accessors alien.c-types arrays assocs combinators
+continuations environment io io.backend io.backend.unix
+io.files io.files.private io.files.unix io.launcher
+io.launcher.unix.parser io.pathnames io.ports kernel math
+namespaces sequences strings system threads unix unix
+unix.process ;
 IN: io.launcher.unix
 
 ! Search unix first

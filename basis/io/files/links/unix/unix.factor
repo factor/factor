@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.backend io.backend.unix system unix ;
+USING: io.backend io.files.links system unix ;
 IN: io.files.links.unix
 
 M: unix make-link ( path1 path2 -- )

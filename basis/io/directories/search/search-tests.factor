@@ -1,6 +1,6 @@
-USING: io.paths kernel tools.test io.files.unique sequences
-io.files namespaces sorting ;
-IN: io.paths.tests
+USING: io.directories.search io.files io.files.unique
+io.pathnames kernel namespaces sequences sorting tools.test ;
+IN: io.directories.search.tests
 
 [ t ] [
     [

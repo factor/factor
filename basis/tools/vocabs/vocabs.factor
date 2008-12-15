@@ -1,11 +1,11 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel io io.styles io.files io.encodings.utf8
-vocabs.loader vocabs sequences namespaces make math.parser
-arrays hashtables assocs memoize summary sorting splitting
-combinators source-files debugger continuations compiler.errors
-init checksums checksums.crc32 sets accessors generic
-definitions words ;
+USING: kernel io io.styles io.files io.files.info io.directories
+io.pathnames io.encodings.utf8 vocabs.loader vocabs sequences
+namespaces make math.parser arrays hashtables assocs memoize
+summary sorting splitting combinators source-files debugger
+continuations compiler.errors init checksums checksums.crc32
+sets accessors generic definitions words ;
 IN: tools.vocabs
 
 : vocab-xref ( vocab quot -- vocabs )

@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.strings generic kernel math
 namespaces threads sequences byte-arrays io.ports
 io.binary io.backend.unix io.streams.duplex
-io.backend io.ports io.files io.files.private
+io.backend io.ports io.pathnames io.files.private
 io.encodings.utf8 math.parser continuations libc combinators
 system accessors qualified destructors unix locals init ;
 
