@@ -4,7 +4,7 @@ USING: arrays definitions io kernel math
 namespaces parser prettyprint sequences strings words
 editors io.files io.sockets io.streams.byte-array io.binary
 math.parser io.encodings.ascii io.encodings.binary
-io.encodings.utf8 io.files.private ;
+io.encodings.utf8 io.files.private io.pathnames ;
 IN: editors.jedit
 
 : jedit-server-info ( -- port auth )

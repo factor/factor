@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes help.markup help.syntax io.streams.string
-strings math calendar io.files ;
+strings math calendar io.files.info io.files.info.unix ;
 IN: io.files.unix
 
 HELP: file-group-id
@@ -268,10 +268,10 @@ ARTICLE: "unix-file-ids" "Unix file user and group ids"
 { $subsection set-file-group } ;
 
 
-ARTICLE: "io.files.unix" "Unix file attributes"
-"The " { $vocab-link "io.files.unix" } " vocabulary implements the Unix backend for opening files and provides a high-level way to set permissions, timestamps, and user and group ids for files."
+ARTICLE: "io.files.info.unix" "Unix file attributes"
+"The " { $vocab-link "io.files.info.unix" } " vocabulary implements a high-level way to set Unix-specific permissions, timestamps, and user and group IDs for files."
 { $subsection "unix-file-permissions" }
 { $subsection "unix-file-timestamps" }
 { $subsection "unix-file-ids" } ;
 
-ABOUT: "io.files.unix"
+ABOUT: "io.files.info.unix"

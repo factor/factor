@@ -1,3 +1,4 @@
+USING: help.markup help.syntax io.files.info ;
 IN: io.files.links
 
 HELP: make-link

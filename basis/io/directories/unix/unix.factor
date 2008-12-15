@@ -3,7 +3,7 @@
 USING: accessors alien.c-types alien.strings combinators
 continuations destructors fry io io.backend io.backend.unix
 io.directories io.encodings.binary io.encodings.utf8 io.files
-io.files.info io.pathnames kernel math.bitwise sequences system
+io.pathnames io.files.types kernel math.bitwise sequences system
 unix unix.stat ;
 IN: io.directories.unix
 
@@ -36,10 +36,7 @@ M: unix delete-directory ( path -- )
     ] with-disposal ;
 
 M: unix copy-file ( from to -- )
-    [ normalize-path ] bi@
-    [ (copy-file) ]
-    [ swap file-info permissions>> chmod io-error ]
-    2bi ;
+    [ normalize-path ] bi@ (copy-file) ;
 
 : with-unix-directory ( path quot -- )
     [ opendir dup [ (io-error) ] unless ] dip

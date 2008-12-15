@@ -1,6 +1,7 @@
 USING: continuations destructors io io.directories
-io.encodings.ascii io.encodings.utf8 io.files io.files.info
-io.files.temp io.pathnames kernel sequences tools.test ;
+io.directories.hierarchy io.encodings.ascii io.encodings.utf8
+io.files io.files.info io.files.temp io.pathnames kernel
+sequences tools.test ;
 IN: io.directories.tests
 
 [ { "kernel" } ] [

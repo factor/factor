@@ -1,14 +1,15 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays generic assocs hashtables assocs
-hashtables.private io kernel kernel.private math namespaces make
-parser prettyprint sequences sequences.private strings sbufs
+hashtables.private io io.binary io.files io.encodings.binary
+io.pathnames kernel kernel.private math namespaces make parser
+prettyprint sequences sequences.private strings sbufs
 vectors words quotations assocs system layouts splitting
 grouping growable classes classes.builtin classes.tuple
-classes.tuple.private words.private io.binary io.files vocabs
+classes.tuple.private words.private vocabs
 vocabs.loader source-files definitions debugger
 quotations.private sequences.private combinators
-io.encodings.binary math.order math.private accessors
+math.order math.private accessors
 slots.private compiler.units ;
 IN: bootstrap.image
 

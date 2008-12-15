@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators destructors io io.backend
-io.encodings.binary io.files io.files.info io.files.links
-io.pathnames kernel namespaces sequences system vocabs.loader ;
+io.encodings.binary io.files io.pathnames kernel namespaces
+sequences system vocabs.loader fry ;
 IN: io.directories
 
 : set-current-directory ( path -- )
@@ -42,7 +42,7 @@ HOOK: (directory-entries) os ( path -- seq )
     directory-entries [ name>> ] map ;
 
 : with-directory-files ( path quot -- )
-    [ "" directory-files ] prepose with-directory ; inline
+    '[ "" directory-files @ ] with-directory ; inline
 
 ! Touching files
 HOOK: touch-file io-backend ( path -- )
@@ -51,13 +51,6 @@ HOOK: touch-file io-backend ( path -- )
 HOOK: delete-file io-backend ( path -- )
 
 HOOK: delete-directory io-backend ( path -- )
-
-: delete-tree ( path -- )
-    dup link-info type>> +directory+ = [
-        [ [ [ delete-tree ] each ] with-directory-files ]
-        [ delete-directory ]
-        bi
-    ] [ delete-file ] if ;
 
 : to-directory ( from to -- from to' )
     over file-name append-path ;
@@ -69,7 +62,7 @@ HOOK: move-file io-backend ( from to -- )
     to-directory move-file ;
 
 : move-files-into ( files to -- )
-    [ move-file-into ] curry each ;
+    '[ _ move-file-into ] each ;
 
 ! Copying files
 HOOK: copy-file io-backend ( from to -- )
@@ -86,28 +79,7 @@ M: object copy-file
     to-directory copy-file ;
 
 : copy-files-into ( files to -- )
-    [ copy-file-into ] curry each ;
-
-DEFER: copy-tree-into
-
-: copy-tree ( from to -- )
-    normalize-path
-    over link-info type>>
-    {
-        { +symbolic-link+ [ copy-link ] }
-        { +directory+ [
-            swap [
-                [ swap copy-tree-into ] with each
-            ] with-directory-files
-        ] }
-        [ drop copy-file ]
-    } case ;
-
-: copy-tree-into ( from to -- )
-    to-directory copy-tree ;
-
-: copy-trees-into ( files to -- )
-    [ copy-tree-into ] curry each ;
+    '[ _ copy-file-into ] each ;
 
 {
     { [ os unix? ] [ "io.directories.unix" require ] }

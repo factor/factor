@@ -1,3 +1,5 @@
+USING: help.markup help.syntax io.files.private io.pathnames
+quotations ;
 IN: io.directories
 
 HELP: cwd
@@ -73,12 +75,6 @@ HELP: touch-file
 { $description "Updates the modification time of a file or directory. If the file does not exist, creates a new, empty file." }
 { $errors "Throws an error if the file could not be touched." } ;
 
-HELP: delete-tree
-{ $values { "path" "a pathname string" } }
-{ $description "Deletes a file or directory, recursing into subdirectories." }
-{ $errors "Throws an error if the deletion fails." } 
-{ $warning "Misuse of this word can lead to catastrophic data loss." } ;
-
 HELP: move-file
 { $values { "from" "a pathname string" } { "to" "a pathname string" } }
 { $description "Moves or renames a file." }
@@ -109,22 +105,6 @@ HELP: copy-files-into
 { $values { "files" "a sequence of pathname strings" } { "to" "a directory pathname string" } }
 { $description "Copies a set of files to another directory." }
 { $errors "Throws an error if the file does not exist or if the copy operation fails." } ;
-
-HELP: copy-tree
-{ $values { "from" "a pathname string" } { "to" "a pathname string" } }
-{ $description "Copies a directory tree recursively." }
-{ $notes "This operation attempts to preserve original file attributes, however not all attributes may be preserved." }
-{ $errors "Throws an error if the copy operation fails." } ;
-
-HELP: copy-tree-into
-{ $values { "from" "a pathname string" } { "to" "a directory pathname string" } }
-{ $description "Copies a directory tree to another directory, recursively." }
-{ $errors "Throws an error if the copy operation fails." } ;
-
-HELP: copy-trees-into
-{ $values { "files" "a sequence of pathname strings" } { "to" "a directory pathname string" } }
-{ $description "Copies a set of directory trees to another directory, recursively." }
-{ $errors "Throws an error if the copy operation fails." } ;
 
 ARTICLE: "current-directory" "Current working directory"
 "File system I/O operations use the value of a variable to resolve relative pathnames:"
@@ -165,7 +145,6 @@ $nl
 "Deleting files:"
 { $subsection delete-file }
 { $subsection delete-directory }
-{ $subsection delete-tree }
 "Moving files:"
 { $subsection move-file }
 { $subsection move-file-into }
@@ -174,10 +153,6 @@ $nl
 { $subsection copy-file }
 { $subsection copy-file-into }
 { $subsection copy-files-into }
-"Copying directory trees recursively:"
-{ $subsection copy-tree }
-{ $subsection copy-tree-into }
-{ $subsection copy-trees-into }
 "On most operating systems, files can only be moved within the same file system. To move files between file systems, use " { $link copy-file } " followed by " { $link delete-file } " on the old name." ;
 
 ARTICLE: "io.directories" "Directory manipulation"

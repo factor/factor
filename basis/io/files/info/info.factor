@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel system sequences combinators
-vocabs.loader ;
+vocabs.loader io.files.types ;
 IN: io.files.info
 
 ! File info
@@ -11,16 +11,6 @@ accessed ;
 HOOK: file-info os ( path -- info )
 
 HOOK: link-info os ( path -- info )
-
-SYMBOL: +regular-file+
-SYMBOL: +directory+
-SYMBOL: +symbolic-link+
-SYMBOL: +character-device+
-SYMBOL: +block-device+
-SYMBOL: +fifo+
-SYMBOL: +socket+
-SYMBOL: +whiteout+
-SYMBOL: +unknown+
 
 : directory? ( file-info -- ? ) type>> +directory+ = ;
 

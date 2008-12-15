@@ -1,17 +1,12 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math math.parser namespaces make
-sequences io io.sockets io.streams.string io.files io.timeouts
-strings splitting calendar continuations accessors vectors
+sequences strings splitting calendar continuations accessors vectors
 math.order hashtables byte-arrays destructors
-io.encodings
-io.encodings.string
-io.encodings.ascii
-io.encodings.utf8
-io.encodings.8-bit
-io.encodings.binary
-io.streams.duplex
-fry ascii urls urls.encoding present
+io io.sockets io.streams.string io.files io.timeouts
+io.pathnames io.encodings io.encodings.string io.encodings.ascii
+io.encodings.utf8 io.encodings.8-bit io.encodings.binary
+io.streams.duplex fry ascii urls urls.encoding present
 http http.parsers ;
 IN: http.client
 

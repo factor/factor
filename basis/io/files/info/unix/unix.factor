@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel system math math.bitwise strings arrays
 sequences combinators combinators.short-circuit alien.c-types
-vocabs.loader calendar calendar.unix io.files.info io.backend
-unix unix.stat unix.time unix.users unix.groups ;
+vocabs.loader calendar calendar.unix io.files.info
+io.files.types io.backend unix unix.stat unix.time unix.users
+unix.groups ;
 IN: io.files.info.unix
 
 TUPLE: unix-file-system-info < file-system-info
