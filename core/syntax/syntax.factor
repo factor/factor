@@ -4,7 +4,7 @@ USING: accessors alien arrays byte-arrays definitions generic
 hashtables kernel math namespaces parser lexer sequences strings
 strings.parser sbufs vectors words quotations io assocs
 splitting classes.tuple generic.standard generic.math
-generic.parser classes io.files vocabs classes.parser
+generic.parser classes io.pathnames vocabs classes.parser
 classes.union classes.intersection classes.mixin
 classes.predicate classes.singleton classes.tuple.parser
 compiler.units combinators effects.parser slots ;

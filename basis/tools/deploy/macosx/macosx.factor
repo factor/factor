@@ -3,7 +3,7 @@
 USING: io io.files kernel namespaces make sequences system
 tools.deploy.backend tools.deploy.config
 tools.deploy.config.editor assocs hashtables prettyprint
-io.unix.backend cocoa io.encodings.utf8 io.backend
+io.backend.unix cocoa io.encodings.utf8 io.backend
 cocoa.application cocoa.classes cocoa.plists qualified
 combinators ;
 IN: tools.deploy.macosx

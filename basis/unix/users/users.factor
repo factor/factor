@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings io.encodings.utf8
-io.unix.backend kernel math sequences splitting unix strings
+io.backend.unix kernel math sequences splitting unix strings
 combinators.short-circuit grouping byte-arrays combinators
 accessors math.parser fry assocs namespaces continuations
 vocabs.loader system ;

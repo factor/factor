@@ -1,6 +1,6 @@
 USING: generic help.syntax help.markup kernel math parser words
 effects classes generic.standard classes.tuple generic.math
-generic.standard arrays io.files vocabs.loader io sequences
+generic.standard arrays io.pathnames vocabs.loader io sequences
 assocs ;
 IN: syntax
 

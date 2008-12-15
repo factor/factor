@@ -3,7 +3,7 @@
 USING: combinators.short-circuit accessors combinators io
 io.encodings.8-bit io.encodings io.encodings.binary
 io.encodings.utf8 io.files io.sockets kernel math.parser
-namespaces make sequences ftp io.unix.launcher.parser
+namespaces make sequences ftp io.launcher.unix.parser
 unicode.case splitting assocs classes io.servers.connection
 destructors calendar io.timeouts io.streams.duplex threads
 continuations math concurrency.promises byte-arrays

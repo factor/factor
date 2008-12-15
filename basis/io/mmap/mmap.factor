@@ -21,6 +21,6 @@ M: mapped-file dispose* ( mmap -- ) close-mapped-file ;
     [ <mapped-file> ] dip with-disposal ; inline
 
 {
-    { [ os unix? ] [ "io.unix.mmap" require ] }
-    { [ os winnt? ] [ "io.windows.mmap" require ] }
+    { [ os unix? ] [ "io.mmap.unix" require ] }
+    { [ os winnt? ] [ "io.mmap.windows" require ] }
 } cond

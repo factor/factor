@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel system unicode.case
-io.unix.files tools.files generalizations strings
+io.files.unix tools.files generalizations strings
 arrays sequences io.files math.parser unix.groups unix.users
 tools.files.private unix.stat math ;
 IN: tools.files.unix

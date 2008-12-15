@@ -97,6 +97,6 @@ HOOK: send-secure-handshake secure-socket-backend ( -- )
 HOOK: accept-secure-handshake secure-socket-backend ( -- )
 
 {
-    { [ os unix? ] [ "io.unix.sockets.secure" require ] }
+    { [ os unix? ] [ "io.sockets.secure.unix" require ] }
     { [ os windows? ] [ "openssl" require ] }
 } cond

@@ -54,6 +54,6 @@ PRIVATE>
     '[ _ with-directory ] [ delete-tree ] bi ; inline
 
 {
-    { [ os unix? ] [ "io.unix.files.unique" ] }
-    { [ os windows? ] [ "io.windows.files.unique" ] }
+    { [ os unix? ] [ "io.files.unique.unix" ] }
+    { [ os windows? ] [ "io.files.unique.windows" ] }
 } cond require
