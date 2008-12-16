@@ -67,7 +67,7 @@ DEFER: byte-bit-count
 256 [
     0 swap [ [ 1+ ] when ] each-bit
 ] B{ } map-as '[ HEX: ff bitand _ nth-unsafe ]
-(( -- table )) define-declared
+(( byte -- table )) define-declared
 
 \ byte-bit-count make-inline
 
