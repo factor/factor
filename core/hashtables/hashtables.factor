@@ -77,7 +77,7 @@ TUPLE: hashtable
     [ deleted>> 10 fixnum*fast ] [ count>> ] bi fixnum> ; inline
 
 : grow-hash ( hash -- )
-    [ dup >alist swap assoc-size 1+ ] keep
+    [ [ >alist ] [ assoc-size 1+ ] bi ] keep
     [ reset-hash ] keep
     swap (rehash) ; inline
 

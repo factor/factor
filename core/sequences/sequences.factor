@@ -331,7 +331,7 @@ PRIVATE>
 <PRIVATE
 
 : (each) ( seq quot -- n quot' )
-    [ dup length swap [ nth-unsafe ] curry ] dip compose ; inline
+    [ [ length ] keep [ nth-unsafe ] curry ] dip compose ; inline
 
 : (collect) ( quot into -- quot' )
     [ [ keep ] dip set-nth-unsafe ] 2curry ; inline
@@ -453,10 +453,10 @@ PRIVATE>
     over [ 2pusher [ each ] 2dip ] dip tuck [ like ] 2bi@ ; inline
 
 : monotonic? ( seq quot -- ? )
-    [ dup length 1- swap ] dip (monotonic) all? ; inline
+    [ [ length 1- ] keep ] dip (monotonic) all? ; inline
 
 : interleave ( seq between quot -- )
-    [ (interleave) ] 2curry [ dup length swap ] dip 2each ; inline
+    [ (interleave) ] 2curry [ [ length ] keep ] dip 2each ; inline
 
 : accumulator ( quot -- quot' vec )
     V{ } clone [ [ push ] curry compose ] keep ; inline
@@ -679,7 +679,7 @@ PRIVATE>
 <PRIVATE
 
 : joined-length ( seq glue -- n )
-    [ dup sum-lengths swap length 1 [-] ] dip length * + ;
+    [ [ sum-lengths ] [ length 1 [-] ] bi ] dip length * + ;
 
 PRIVATE>
 
