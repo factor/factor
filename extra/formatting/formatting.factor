@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: accessors arrays ascii calendar combinators fry kernel 
-io io.encodings.ascii io.files io.streams.string
+generalizations io io.encodings.ascii io.files io.streams.string
 macros math math.functions math.parser peg.ebnf quotations
 sequences splitting strings unicode.case vectors ;
 
@@ -32,10 +32,7 @@ IN: formatting
     [ "." split1 ] dip [ CHAR: 0 pad-right ] [ head-slice ] bi "." glue ;
 
 : max-digits ( n digits -- n' )
-    10 swap ^ [ * round ] keep / ;
-
-: max-width ( string length -- string' ) 
-    short head ;
+    10 swap ^ [ * round ] keep / ; inline
 
 : >exp ( x -- exp base )
     [ 
@@ -69,7 +66,7 @@ pad       = pad-align pad-char pad-width => [[ reverse >quotation dup first 0 = 
 
 sign      = ("+")?               => [[ [ dup CHAR: - swap index [ "+" prepend ] unless ] [ ] ? ]]
 
-width_    = "." ([0-9])*         => [[ second >digits '[ _ max-width ] ]]
+width_    = "." ([0-9])*         => [[ second >digits '[ _ short head ] ]]
 width     = (width_)?            => [[ [ ] or ]] 
 
 digits_   = "." ([0-9])*         => [[ second >digits ]]
@@ -113,23 +110,25 @@ MACRO: printf ( format-string -- )
 
 <PRIVATE
 
-: zero-pad ( str -- str' ) 2 CHAR: 0 pad-left ; inline
+: pad-00 ( n -- string ) number>string 2 CHAR: 0 pad-left ; inline
+
+: pad-000 ( n -- string ) number>string 3 CHAR: 0 pad-left ; inline
 
 : >time ( timestamp -- string )
     [ hour>> ] [ minute>> ] [ second>> floor ] tri 3array
-    [ number>string zero-pad ] map ":" join ; inline
+    [ pad-00 ] map ":" join ; inline
 
 : >date ( timestamp -- string )
     [ month>> ] [ day>> ] [ year>> ] tri 3array
-    [ number>string zero-pad ] map "/" join ; inline
+    [ pad-00 ] map "/" join ; inline
 
 : >datetime ( timestamp -- string )
     { [ day-of-week day-abbreviation3 ]
       [ month>> month-abbreviation ]
-      [ day>> number>string zero-pad ]
+      [ day>> pad-00 ]
       [ >time ]
       [ year>> number>string ]
-    } cleave 3array [ 2array ] dip append " " join ; inline
+    } cleave 5 narray " " join ; inline
 
 : (week-of-year) ( timestamp day -- n )
     [ dup clone 1 >>month 1 >>day day-of-week dup ] dip > [ 7 swap - ] when
@@ -147,20 +146,20 @@ fmt-A     = "A"                  => [[ [ dup day-of-week day-name ] ]]
 fmt-b     = "b"                  => [[ [ dup month>> month-abbreviation ] ]]
 fmt-B     = "B"                  => [[ [ dup month>> month-name ] ]]
 fmt-c     = "c"                  => [[ [ dup >datetime ] ]]
-fmt-d     = "d"                  => [[ [ dup day>> number>string zero-pad ] ]]
-fmt-H     = "H"                  => [[ [ dup hour>> number>string zero-pad ] ]]
-fmt-I     = "I"                  => [[ [ dup hour>> dup 12 > [ 12 - ] when number>string zero-pad ] ]]
-fmt-j     = "j"                  => [[ [ dup day-of-year number>string ] ]]
-fmt-m     = "m"                  => [[ [ dup month>> number>string zero-pad ] ]]
-fmt-M     = "M"                  => [[ [ dup minute>> number>string zero-pad ] ]]
+fmt-d     = "d"                  => [[ [ dup day>> pad-00 ] ]]
+fmt-H     = "H"                  => [[ [ dup hour>> pad-00 ] ]]
+fmt-I     = "I"                  => [[ [ dup hour>> dup 12 > [ 12 - ] when pad-00 ] ]]
+fmt-j     = "j"                  => [[ [ dup day-of-year pad-000 ] ]]
+fmt-m     = "m"                  => [[ [ dup month>> pad-00 ] ]]
+fmt-M     = "M"                  => [[ [ dup minute>> pad-00 ] ]]
 fmt-p     = "p"                  => [[ [ dup hour>> 12 < "AM" "PM" ? ] ]]
-fmt-S     = "S"                  => [[ [ dup second>> round number>string zero-pad ] ]]
-fmt-U     = "U"                  => [[ [ dup week-of-year-sunday ] ]]
+fmt-S     = "S"                  => [[ [ dup second>> floor pad-00 ] ]]
+fmt-U     = "U"                  => [[ [ dup week-of-year-sunday pad-00 ] ]]
 fmt-w     = "w"                  => [[ [ dup day-of-week number>string ] ]]
-fmt-W     = "W"                  => [[ [ dup week-of-year-monday ] ]]
+fmt-W     = "W"                  => [[ [ dup week-of-year-monday pad-00 ] ]]
 fmt-x     = "x"                  => [[ [ dup >date ] ]]
 fmt-X     = "X"                  => [[ [ dup >time ] ]]
-fmt-y     = "y"                  => [[ [ dup year>> 100 mod number>string ] ]]
+fmt-y     = "y"                  => [[ [ dup year>> 100 mod pad-00 ] ]]
 fmt-Y     = "Y"                  => [[ [ dup year>> number>string ] ]]
 fmt-Z     = "Z"                  => [[ [ "Not yet implemented" throw ] ]]
 unknown   = (.)*                 => [[ "Unknown directive" throw ]]
