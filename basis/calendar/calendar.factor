@@ -211,7 +211,7 @@ M: real +minute ( timestamp n -- timestamp )
 M: number +second ( timestamp n -- timestamp )
     [ over second>> + seconds/minutes [ >>second ] dip +minute ] unless-zero ;
 
-: (time+) ( timestamp duration -- timestamp' )
+: (time+) ( timestamp duration -- timestamp' duration )
     [ second>> +second ] keep
     [ minute>> +minute ] keep
     [ hour>>   +hour   ] keep
