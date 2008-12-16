@@ -3,11 +3,12 @@ kernel cocoa.enumeration destructors math.parser cocoa.application
 sequences locals combinators.short-circuit threads
 symbols namespaces assocs vectors arrays combinators
 core-foundation.run-loop accessors sequences.private
-alien.c-types math parser ;
-<< "game-input" (use+) >>
-IN: game-input.backend.iokit
+alien.c-types math parser game-input ;
+IN: game-input.iokit
 
 SINGLETON: iokit-game-input-backend
+
+iokit-game-input-backend game-input-backend set-global
 
 : hid-manager-matching ( matching-seq -- alien )
     f 0 IOHIDManagerCreate

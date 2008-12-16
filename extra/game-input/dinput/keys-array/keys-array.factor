@@ -1,6 +1,6 @@
 USING: sequences sequences.private math alien.c-types
 accessors ;
-IN: game-input.backend.dinput.keys-array
+IN: game-input.dinput.keys-array
 
 TUPLE: keys-array underlying ;
 C: <keys-array> keys-array

@@ -1,15 +1,15 @@
 USING: windows.dinput windows.dinput.constants parser symbols
 alien.c-types windows.ole32 namespaces assocs kernel arrays
 vectors windows.kernel32 windows.com windows.dinput shuffle
-windows.user32 windows.messages sequences combinators
+windows.user32 windows.messages sequences combinators locals
 math.geometry.rect ui.windows accessors math windows alien
 alien.strings io.encodings.utf16 io.encodings.utf16n
-continuations byte-arrays locals
-game-input.backend.dinput.keys-array ;
-<< "game-input" (use+) >>
-IN: game-input.backend.dinput
+continuations byte-arrays game-input.dinput.keys-array ;
+IN: game-input.dinput
 
 SINGLETON: dinput-game-input-backend
+
+dinput-game-input-backend game-input-backend set-global
 
 SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     +controller-devices+ +controller-guids+
