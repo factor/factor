@@ -64,7 +64,7 @@ PRIVATE>
 : recip ( x -- y ) 1 swap / ; inline
 : sgn ( x -- n ) dup 0 < [ drop -1 ] [ 0 > 1 0 ? ] if ; inline
 
-: ?1+ [ 1+ ] [ 0 ] if* ; inline
+: ?1+ ( x -- y ) [ 1+ ] [ 0 ] if* ; inline
 
 : rem ( x y -- z ) abs tuck mod over + swap mod ; foldable
 

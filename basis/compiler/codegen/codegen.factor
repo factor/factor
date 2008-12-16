@@ -95,7 +95,7 @@ M: ##dispatch-label generate-insn label>> %dispatch-label ;
 M: ##dispatch generate-insn
     [ src>> register ] [ temp>> register ] [ offset>> ] tri %dispatch ;
 
-: >slot<
+: >slot< ( insn -- dst obj slot tag )
     {
         [ dst>> register ]
         [ obj>> register ]

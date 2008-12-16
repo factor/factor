@@ -180,6 +180,7 @@ HELP: 1-
 } ;
 
 HELP: ?1+
+{ $values { "x" { $maybe number } } { "y" number } }
 { $description "If the input is not " { $link f } ", adds one. Otherwise, outputs a " { $snippet "0" } "." } ;
 
 HELP: sq
