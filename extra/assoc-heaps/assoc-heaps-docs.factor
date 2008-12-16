@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax io.streams.string ;
+USING: help.markup help.syntax io.streams.string assocs
+heaps.private ;
 IN: assoc-heaps
 
 HELP: <assoc-heap>
