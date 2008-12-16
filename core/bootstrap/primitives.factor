@@ -287,11 +287,11 @@ tuple
 
 "((empty))" "hashtables.private" create
 "tombstone" "hashtables.private" lookup f
-2array >tuple 1quotation define-inline
+2array >tuple 1quotation (( -- value )) define-inline
 
 "((tombstone))" "hashtables.private" create
 "tombstone" "hashtables.private" lookup t
-2array >tuple 1quotation define-inline
+2array >tuple 1quotation (( -- value )) define-inline
 
 ! Some tuple classes
 "curry" "kernel" create

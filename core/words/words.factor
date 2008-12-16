@@ -192,11 +192,11 @@ SYMBOL: visited
 : make-foldable ( word -- )
     dup make-flushable t "foldable" set-word-prop ;
 
-: define-inline ( word quot -- )
-    dupd define make-inline ;
+: define-inline ( word def effect -- )
+    [ define-declared ] [ 2drop make-inline ] 3bi ;
 
 : define-symbol ( word -- )
-    dup [ ] curry define-inline ;
+    dup [ ] curry (( -- word )) define-inline ;
 
 GENERIC: reset-word ( word -- )
 

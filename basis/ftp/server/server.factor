@@ -8,7 +8,7 @@ sequences ftp io.launcher.unix.parser unicode.case splitting
 assocs classes io.servers.connection destructors calendar
 io.timeouts io.streams.duplex threads continuations math
 concurrency.promises byte-arrays io.backend tools.hexdump
-tools.files io.streams.string ;
+tools.files io.streams.string math.bitwise ;
 IN: ftp.server
 
 TUPLE: ftp-client url mode state command-promise user password ;
@@ -49,7 +49,7 @@ C: <ftp-list> ftp-list
     [ >>raw ] [ tokenize-command >>tokenized ] bi ;
 
 : (send-response) ( n string separator -- )
-    rot number>string write write ftp-send ;
+    [ number>string write ] 2dip write ftp-send ;
 
 : send-response ( ftp-response -- )
     [ n>> ] [ strings>> ] bi
@@ -102,7 +102,7 @@ ERROR: type-error type ;
 : handle-TYPE ( obj -- )
     [
         tokenized>> second parse-type
-        200 "Switching to " rot " mode" 3append server-response
+        [ 200 ] dip "Switching to " " mode" surround server-response
     ] [
         2drop "TYPE is binary only" ftp-error
     ] recover ;
@@ -111,11 +111,11 @@ ERROR: type-error type ;
     remote-address get class new 0 >>port binary <server> ;
 
 : port>bytes ( port -- hi lo )
-    [ -8 shift ] keep [ HEX: ff bitand ] bi@ ;
+    [ -8 shift ] keep [ 8 bits ] bi@ ;
 
 : handle-PWD ( obj -- )
     drop
-    257 current-directory get "\"" "\"" surround server-response ;
+    257 current-directory get "\"" dup surround server-response ;
 
 : handle-SYST ( obj -- )
     drop
@@ -155,15 +155,19 @@ M: ftp-list service-command ( stream obj -- )
     finish-directory ;
 
 : transfer-outgoing-file ( path -- )
-    150 "Opening BINARY mode data connection for "
-    rot   
-    [ file-name ] [
-        " " swap  file-info size>> number>string
-        "(" " bytes)." surround append
-    ] bi 3append server-response ;
+    [
+        150
+        "Opening BINARY mode data connection for "
+    ] dip
+    [
+        file-name
+    ] [
+        file-info size>> number>string
+        "(" " bytes)." surround
+    ] bi " " glue append server-response ;
 
 : transfer-incoming-file ( path -- )
-    150 "Opening BINARY mode data connection for " rot append
+    [ 150 ] dip "Opening BINARY mode data connection for " prepend
     server-response ;
 
 : finish-file-transfer ( -- )
@@ -209,8 +213,9 @@ M: ftp-put service-command ( stream obj -- )
 
 : handle-SIZE ( obj -- )
     [
+        [ 213 ] dip
         tokenized>> second file-info size>>
-        213 swap number>string server-response
+        number>string server-response
     ] [
         2drop
         550 "Could not get file size" server-response
@@ -228,21 +233,20 @@ M: ftp-put service-command ( stream obj -- )
 
 : handle-PASV ( obj -- )
     drop client get passive >>mode drop
-    expect-connection
-    [
-        "Entering Passive Mode (127,0,0,1," %
-        port>bytes [ number>string ] bi@ "," glue %
-        ")" %
-    ] "" make 227 swap server-response ;
+    221
+    expect-connection port>bytes [ number>string ] bi@ "," glue
+    "Entering Passive Mode (127,0,0,1," ")" surround
+    server-response ;
 
 : handle-EPSV ( obj -- )
     drop
     client get command-promise>> [
         "You already have a passive stream" ftp-error
     ] [
-        229 "Entering Extended Passive Mode (|||"
+        229
         expect-connection number>string
-        "|)" 3append server-response
+        "Entering Extended Passive Mode (|||" "|)" surround
+        server-response
     ] if ;
 
 ! LPRT 6,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,242,186

@@ -163,32 +163,35 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 : fuel-get-edit-location ( defspec -- )
     where [
        first2 [ (normalize-path) ] dip 2array fuel-eval-set-result
-    ] when* ;
+    ] when* ; inline
 
 : fuel-get-vocab-location ( vocab -- )
-    >vocab-link fuel-get-edit-location ;
+    >vocab-link fuel-get-edit-location ; inline
 
 : (fuel-get-vocabs) ( -- seq )
     all-vocabs-seq [ vocab-name ] map ; inline
 
 : fuel-get-vocabs ( -- )
-    (fuel-get-vocabs) fuel-eval-set-result ;
+    (fuel-get-vocabs) fuel-eval-set-result ; inline
 
 MEMO: (fuel-vocab-words) ( name -- seq )
     >vocab-link words [ name>> ] map ;
 
-: fuel-vocabs-words ( names/f -- seq )
-    [ (fuel-get-vocabs) ] unless* prune
-    [ (fuel-vocab-words) ] map concat natural-sort ;
+: fuel-current-words ( -- seq )
+    use get [ keys ] map concat ; inline
+
+: fuel-vocabs-words ( names -- seq )
+    prune [ (fuel-vocab-words) ] map concat ; inline
 
 : (fuel-get-words) ( prefix names/f -- seq )
-    fuel-vocabs-words swap [ drop-prefix nip length 0 = ] curry filter ;
+    [ fuel-vocabs-words ] [ fuel-current-words ] if* natural-sort
+    swap [ drop-prefix nip length 0 = ] curry filter ;
 
 : fuel-get-words ( prefix names -- )
     (fuel-get-words) fuel-eval-set-result ; inline
 
 : fuel-run-file ( path -- ) run-file ; inline
 
-: fuel-startup ( -- ) "listener" run ; inline
+: fuel-startup ( -- ) "listener" run-file ; inline
 
 MAIN: fuel-startup

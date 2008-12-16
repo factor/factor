@@ -28,7 +28,8 @@ PRIVATE>
 
 : [future] ( quot -- quot' ) '[ _ curry future ] ; inline
 
-: future-values dup [ ?future ] change-each ; inline
+: future-values ( futures -- futures )
+    dup [ ?future ] change-each ; inline
 
 PRIVATE>
 

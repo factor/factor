@@ -20,13 +20,13 @@ ARTICLE: "io.streams.c" "ANSI C streams"
 
 ABOUT: "io.streams.c"
 
-HELP: <c-reader> ( in -- stream )
-{ $values { "in" "a C FILE* handle" } { "stream" "a new stream" } }
+HELP: <c-reader>
+{ $values { "handle" "a C FILE* handle" } { "stream" "a new stream" } }
 { $description "Creates a stream which reads data by calling C standard library functions." }
 { $notes "Usually C streams are only used during bootstrap, and non-blocking OS-specific I/O routines are used during normal operation." } ;
 
-HELP: <c-writer> ( out -- stream )
-{ $values { "out" "a C FILE* handle" } { "stream" "a new stream" } }
+HELP: <c-writer>
+{ $values { "handle" "a C FILE* handle" } { "stream" "a new stream" } }
 { $description "Creates a stream which writes data by calling C standard library functions." }
 { $notes "Usually C streams are only used during bootstrap, and non-blocking OS-specific I/O routines are used during normal operation." } ;
 

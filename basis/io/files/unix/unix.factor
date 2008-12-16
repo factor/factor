@@ -11,14 +11,15 @@ M: unix cwd ( -- path )
 
 M: unix cd ( path -- ) [ chdir ] unix-system-call drop ;
 
-: read-flags O_RDONLY ; inline
+: read-flags ( -- n ) O_RDONLY ; inline
 
 : open-read ( path -- fd ) O_RDONLY file-mode open-file ;
 
 M: unix (file-reader) ( path -- stream )
     open-read <fd> init-fd <input-port> ;
 
-: write-flags { O_WRONLY O_CREAT O_TRUNC } flags ; inline
+: write-flags ( -- n )
+    { O_WRONLY O_CREAT O_TRUNC } flags ; inline
 
 : open-write ( path -- fd )
     write-flags file-mode open-file ;
@@ -26,7 +27,8 @@ M: unix (file-reader) ( path -- stream )
 M: unix (file-writer) ( path -- stream )
     open-write <fd> init-fd <output-port> ;
 
-: append-flags { O_WRONLY O_APPEND O_CREAT } flags ; inline
+: append-flags ( -- n )
+    { O_WRONLY O_APPEND O_CREAT } flags ; inline
 
 : open-append ( path -- fd )
     [

@@ -4,8 +4,8 @@ html.templates html.templates.chloe.syntax
 html.templates.chloe.compiler html.templates.chloe.components
 math xml.data strings quotations namespaces ;
 
-HELP: <chloe> ( path -- template )
-{ $values { "path" "a pathname string without the trailing " { $snippet ".xml" } " extension" } { "template" chloe } }
+HELP: <chloe>
+{ $values { "path" "a pathname string without the trailing " { $snippet ".xml" } " extension" } { "chloe" chloe } }
 { $description "Creates a new Chloe template object which can be passed to " { $link call-template } "." } ;
 
 HELP: required-attr

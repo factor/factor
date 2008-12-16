@@ -90,7 +90,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     ] if ; inline recursive
 
 : assoc-stack ( key seq -- value )
-    dup length 1- swap (assoc-stack) ; flushable
+    [ length 1- ] keep (assoc-stack) ; flushable
 
 : assoc-subset? ( assoc1 assoc2 -- ? )
     [ swapd at* [ = ] [ 2drop f ] if ] curry assoc-all? ;
@@ -122,14 +122,14 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : remove-all ( assoc seq -- subseq )
     swap [ key? not ] curry filter ;
 
-: (substitute)
+: substituter ( assoc -- quot )
     [ dupd at* [ nip ] [ drop ] if ] curry ; inline
 
 : substitute-here ( seq assoc -- )
-    (substitute) change-each ;
+    substituter change-each ;
 
 : substitute ( seq assoc -- newseq )
-    (substitute) map ;
+    substituter map ;
 
 : cache ( key assoc quot -- value )
     2over at* [

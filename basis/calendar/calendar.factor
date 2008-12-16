@@ -211,7 +211,7 @@ M: real +minute ( timestamp n -- timestamp )
 M: number +second ( timestamp n -- timestamp )
     [ over second>> + seconds/minutes [ >>second ] dip +minute ] unless-zero ;
 
-: (time+)
+: (time+) ( timestamp duration -- timestamp' duration )
     [ second>> +second ] keep
     [ minute>> +minute ] keep
     [ hour>>   +hour   ] keep
@@ -219,7 +219,8 @@ M: number +second ( timestamp n -- timestamp )
     [ month>>  +month  ] keep
     [ year>>   +year   ] keep ; inline
 
-: +slots [ bi@ + ] curry 2keep ; inline
+: +slots ( obj1 obj2 quot -- n obj1 obj2 )
+    [ bi@ + ] curry 2keep ; inline
 
 PRIVATE>
 
