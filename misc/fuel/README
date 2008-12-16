@@ -47,8 +47,8 @@ M-x customize-group fuel will show you how many.
 Quick key reference
 -------------------
 
-(Chords ending in a single letter <x> accept also C-<x> (e.g. C-cC-z is
-the same as C-cz)).
+(Triple chords ending in a single letter <x> accept also C-<x> (e.g.
+C-cC-eC-r is the same as C-cC-er)).
 
 * In factor source files:
 

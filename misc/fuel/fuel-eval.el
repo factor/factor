@@ -76,7 +76,6 @@
         ((listp usings) `(:array ,@usings))
         (t (error "Invalid 'usings' (%s)" usings))))
 
-
 
 ;;; Code sending:
 

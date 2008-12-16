@@ -108,14 +108,15 @@ displayed in the minibuffer."
 ;;; Help browser history:
 
 (defvar fuel-help--history
-  (list nil
-        (make-ring fuel-help-history-cache-size)
-        (make-ring fuel-help-history-cache-size)))
+  (list nil                                        ; current
+        (make-ring fuel-help-history-cache-size)   ; previous
+        (make-ring fuel-help-history-cache-size))) ; next
 
 (defvar fuel-help--history-idx 0)
 
 (defun fuel-help--history-push (term)
-  (when (car fuel-help--history)
+  (when (and (car fuel-help--history)
+             (not (string= (caar fuel-help--history) (car term))))
     (ring-insert (nth 1 fuel-help--history) (car fuel-help--history)))
   (setcar fuel-help--history term))
 
@@ -135,7 +136,7 @@ displayed in the minibuffer."
 ;;; Fuel help buffer and internals:
 
 (defun fuel-help--help-buffer ()
-  (with-current-buffer (get-buffer-create "*fuel-help*")
+  (with-current-buffer (get-buffer-create "*fuel help*")
     (fuel-help-mode)
     (current-buffer)))
 
@@ -157,7 +158,7 @@ displayed in the minibuffer."
 (defun fuel-help--show-help-cont (def ret)
   (let ((out (fuel-eval--retort-output ret)))
     (if (or (fuel-eval--retort-error ret) (empty-string-p out))
-        (message "No help for '%s'" ret)
+        (message "No help for '%s'" def)
       (fuel-help--insert-contents def out))))
 
 (defun fuel-help--insert-contents (def str &optional nopush)
@@ -167,14 +168,15 @@ displayed in the minibuffer."
     (set-buffer hb)
     (erase-buffer)
     (insert str)
-    (goto-char (point-min))
-    (when (re-search-forward (format "^%s" def) nil t)
-      (beginning-of-line)
-      (kill-region (point-min) (point))
-      (next-line)
-      (open-line 1))
+    (unless nopush
+      (goto-char (point-min))
+      (when (re-search-forward (format "^%s" def) nil t)
+        (beginning-of-line)
+        (kill-region (point-min) (point))
+        (next-line)
+        (open-line 1)
+        (fuel-help--history-push (cons def (buffer-string)))))
     (set-buffer-modified-p nil)
-    (unless nopush (fuel-help--history-push (cons def str)))
     (pop-to-buffer hb)
     (goto-char (point-min))
     (message "%s" def)))
