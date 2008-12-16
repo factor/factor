@@ -1,5 +1,6 @@
 USING: editors.gvim io.files kernel namespaces sequences
-windows.shell32 io.paths.windows system ;
+windows.shell32 io.directories.search.windows system
+io.pathnames ;
 IN: editors.gvim.windows
 
 M: windows gvim-path
