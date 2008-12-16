@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax arrays
 byte-arrays kernel math sequences windows.types windows.kernel32
-windows.errors windows math.bitwise alias io.encodings.utf16n ;
+windows.errors windows math.bitwise alias io.encodings.utf16n
+alias ;
 IN: windows.winsock
 
 USE: libc
@@ -29,7 +30,7 @@ TYPEDEF: void* SOCKET
 : SO_USELOOPBACK HEX:  40 ; inline
 : SO_LINGER      HEX:  80 ; inline
 : SO_OOBINLINE   HEX: 100 ; inline
-: SO_DONTLINGER SO_LINGER bitnot ; inline
+: SO_DONTLINGER ( -- n ) SO_LINGER bitnot ; inline
 
 : SO_SNDBUF     HEX: 1001 ; inline
 : SO_RCVBUF     HEX: 1002 ; inline
@@ -50,7 +51,7 @@ TYPEDEF: void* SOCKET
 : AF_CHAOS       5 ; inline
 : AF_NS          6 ; inline
 : AF_ISO         7 ; inline
-: AF_OSI    AF_ISO ; inline
+ALIAS: AF_OSI    AF_ISO
 : AF_ECMA        8 ; inline
 : AF_DATAKIT     9 ; inline
 : AF_CCITT      10 ; inline
@@ -83,19 +84,19 @@ TYPEDEF: void* SOCKET
 : IPPROTO_UDP   17 ; inline
 : IPPROTO_RM   113 ; inline
 
-: WSA_FLAG_OVERLAPPED 1 ; inline
-: WSA_WAIT_EVENT_0 WAIT_OBJECT_0 ; inline
-: WSA_MAXIMUM_WAIT_EVENTS MAXIMUM_WAIT_OBJECTS ; inline
-: WSA_INVALID_EVENT f ; inline
-: WSA_WAIT_FAILED -1 ; inline
-: WSA_WAIT_IO_COMPLETION WAIT_IO_COMPLETION ; inline
-: WSA_WAIT_TIMEOUT WAIT_TIMEOUT ; inline
-: WSA_INFINITE INFINITE ; inline
-: WSA_IO_PENDING ERROR_IO_PENDING ; inline
+CONSTANT: WSA_FLAG_OVERLAPPED 1
+ALIAS: WSA_WAIT_EVENT_0 WAIT_OBJECT_0
+ALIAS: WSA_MAXIMUM_WAIT_EVENTS MAXIMUM_WAIT_OBJECTS
+CONSTANT: WSA_INVALID_EVENT f
+CONSTANT: WSA_WAIT_FAILED -1
+ALIAS: WSA_WAIT_IO_COMPLETION WAIT_IO_COMPLETION
+ALIAS: WSA_WAIT_TIMEOUT WAIT_TIMEOUT
+ALIAS: WSA_INFINITE INFINITE
+ALIAS: WSA_IO_PENDING ERROR_IO_PENDING
 
 : INADDR_ANY 0 ; inline
 
-: INVALID_SOCKET -1 <alien> ; inline
+: INVALID_SOCKET ( -- alien ) -1 <alien> ; inline
 : SOCKET_ERROR -1 ; inline
 
 : SD_RECV 0 ; inline

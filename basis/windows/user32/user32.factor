@@ -45,12 +45,12 @@ IN: windows.user32
 : WS_POPUPWINDOW ( -- n )
     { WS_POPUP WS_BORDER WS_SYSMENU } flags ; foldable
 
-: WS_CHILDWINDOW      WS_CHILD ; inline
+ALIAS: WS_CHILDWINDOW      WS_CHILD
 
-: WS_TILED            WS_OVERLAPPED ; inline
-: WS_ICONIC           WS_MINIMIZE ; inline
-: WS_SIZEBOX          WS_THICKFRAME ; inline
-: WS_TILEDWINDOW WS_OVERLAPPEDWINDOW ; inline
+ALIAS: WS_TILED            WS_OVERLAPPED
+ALIAS: WS_ICONIC           WS_MINIMIZE
+ALIAS: WS_SIZEBOX          WS_THICKFRAME
+ALIAS: WS_TILEDWINDOW WS_OVERLAPPEDWINDOW
 
 ! Extended window styles
 
@@ -503,7 +503,7 @@ IN: windows.user32
 : MB_ICONQUESTION    HEX: 00000020 ; inline
 : MB_OK              HEX: 00000000 ; inline
 
-: FVIRTKEY TRUE ; inline
+ALIAS: FVIRTKEY TRUE
 : FNOINVERT 2 ; inline
 : FSHIFT 4 ; inline
 : FCONTROL 8 ; inline
@@ -670,7 +670,7 @@ FUNCTION: HWND CreateWindowExW (
 
 ALIAS: CreateWindowEx CreateWindowExW
 
-: CreateWindow 0 12 -nrot CreateWindowEx ; inline
+: CreateWindow ( a b c d e f g h i j k -- hwnd ) 0 12 -nrot CreateWindowEx ; inline
 
 
 ! FUNCTION: CreateWindowStationA
@@ -1265,7 +1265,7 @@ FUNCTION: BOOL SetForegroundWindow ( HWND hWnd ) ;
 ! FUNCTION: SetKeyboardState
 ! type is ignored
 FUNCTION: void SetLastErrorEx ( DWORD dwErrCode, DWORD dwType ) ; 
-: SetLastError 0 SetLastErrorEx ; inline
+: SetLastError ( errcode -- ) 0 SetLastErrorEx ; inline
 ! FUNCTION: SetLayeredWindowAttributes
 ! FUNCTION: SetLogonNotifyWindow
 ! FUNCTION: SetMenu
