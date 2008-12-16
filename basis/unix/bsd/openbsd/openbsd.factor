@@ -1,4 +1,4 @@
-USING: alien.syntax constants ;
+USING: alien.syntax constants alias ;
 IN: unix
 
 CONSTANT: FD_SETSIZE 1024
