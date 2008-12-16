@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax ;
+USING: alien.syntax constants ;
 IN: unix.statvfs.freebsd
 
 C-STRUCT: statvfs
@@ -17,7 +17,7 @@ C-STRUCT: statvfs
     { "ulong"   "f_namemax" } ;
 
 ! Flags
-: ST_RDONLY   HEX: 1 ; inline ! Read-only file system
-: ST_NOSUID   HEX: 2 ; inline ! Does not honor setuid/setgid
+CONSTANT: ST_RDONLY   HEX: 1 ! Read-only file system
+CONSTANT: ST_NOSUID   HEX: 2 ! Does not honor setuid/setgid
 
 FUNCTION: int statvfs ( char* path, statvfs* buf ) ;

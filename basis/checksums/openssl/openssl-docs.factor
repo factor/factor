@@ -5,7 +5,7 @@ HELP: openssl-checksum
 { $class-description "The class of checksum algorithms implemented by OpenSSL. The exact set of algorithms supported depends on how the OpenSSL library was compiled; " { $snippet "md5" } " and " { $snippet "sha1" } " should be universally available." } ;
 
 HELP: <openssl-checksum>
-{ $values { "name" "an EVP message digest name" } { "checksum" openssl-checksum } }
+{ $values { "name" "an EVP message digest name" } { "openssl-checksum" openssl-checksum } }
 { $description "Creates a new OpenSSL checksum object." } ;
 
 HELP: openssl-md5

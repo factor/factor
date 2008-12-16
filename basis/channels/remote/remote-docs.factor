@@ -6,6 +6,7 @@ IN: channels.remote
 HELP: <remote-channel>
 { $values { "node" "a node object" }
           { "id" "the id of the published channel on the node" } 
+          { "remote-channel" remote-channel }
 }
 { $description "Create a remote channel that acts as a proxy for a "
 "channel on another node. The remote node's channel must have been "

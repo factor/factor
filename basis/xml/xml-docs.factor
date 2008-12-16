@@ -113,7 +113,7 @@ HELP: name
 { $see-also <name> tag } ;
 
 HELP: <name>
-{ $values { "space" "a string" } { "tag" "a string" } { "url" "a string" }
+{ $values { "space" "a string" } { "main" "a string" } { "url" "a string" }
     { "name" "an XML tag name" } }
 { $description "creates a name tuple with the name-space space and the tag-name tag and the tag-url url." }
 { $see-also name <tag> } ;
@@ -135,7 +135,7 @@ HELP: xml
 
 HELP: <xml>
 { $values { "prolog" "an XML prolog" } { "before" "a sequence of XML elements" }
-{ "main" tag } { "after" "a sequence of XML elements" } { "xml" "an XML document" } }
+{ "body" tag } { "after" "a sequence of XML elements" } { "xml" "an XML document" } }
 { $description "creates an XML document, delegating to the main tag, with the specified prolog, before, and after" }
 { $see-also xml <tag> } ;
 

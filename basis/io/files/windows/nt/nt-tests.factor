@@ -1,4 +1,4 @@
-USING: io.files kernel tools.test io.backend
+USING: io.files io.pathnames kernel tools.test io.backend
 io.files.windows.nt splitting sequences ;
 IN: io.files.windows.nt.tests
 

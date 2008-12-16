@@ -5,7 +5,7 @@ HELP: trivial-responder
 { $description "The class of trivial responders, which output the same response for every request. New instances are created by calling " { $link <trivial-responder> } "." } ;
 
 HELP: <trivial-responder>
-{ $values { "response" response } { "responder" trivial-responder } }
+{ $values { "response" response } { "trivial-responder" trivial-responder } }
 { $description "Creates a new trivial responder which outputs the same response for every request." } ;
 
 HELP: benchmark?

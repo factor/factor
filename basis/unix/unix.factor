@@ -168,7 +168,7 @@ FUNCTION: int readdir_r ( void* dirp, dirent* entry, dirent** result ) ;
 
 FUNCTION: ssize_t readlink ( char* path, char* buf, size_t bufsize ) ;
 
-: PATH_MAX 1024 ; inline
+CONSTANT: PATH_MAX 1024
 
 : read-symbolic-link ( path -- path )
     PATH_MAX <byte-array> dup [

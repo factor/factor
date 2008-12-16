@@ -191,6 +191,10 @@ HELP: exchange-unsafe
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
 { $description "Unsafe variant of " { $link exchange } " that does not perform bounds checks." } ;
 
+HELP: first-unsafe
+{ $values { "seq" sequence } { "first" "the first element" } }
+{ $contract "Unsafe variant of " { $link first } " that does not perform bounds checks." } ;
+
 HELP: first2-unsafe
 { $values { "seq" sequence } { "first" "the first element" } { "second" "the second element" } }
 { $contract "Unsafe variant of " { $link first2 } " that does not perform bounds checks." } ;
