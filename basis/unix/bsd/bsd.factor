@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax combinators system vocabs.loader ;
+USING: alien.syntax combinators system vocabs.loader alias ;
 IN: unix
 
 : MAXPATHLEN 1024 ; inline
@@ -14,7 +14,7 @@ IN: unix
 : O_TRUNC    HEX: 0400 ; inline
 : O_EXCL     HEX: 0800 ; inline
 : O_NOCTTY   HEX: 20000 ; inline
-: O_NDELAY O_NONBLOCK ; inline
+ALIAS: O_NDELAY O_NONBLOCK
 
 : SOL_SOCKET HEX: ffff ; inline
 : SO_REUSEADDR HEX: 4 ; inline
@@ -69,10 +69,10 @@ C-STRUCT: passwd
 : AF_INET 2 ; inline
 : AF_INET6 30 ; inline
 
-: PF_UNSPEC AF_UNSPEC ; inline
-: PF_UNIX AF_UNIX ; inline
-: PF_INET AF_INET ; inline
-: PF_INET6 AF_INET6 ; inline
+ALIAS: PF_UNSPEC AF_UNSPEC
+ALIAS: PF_UNIX AF_UNIX
+ALIAS: PF_INET AF_INET
+ALIAS: PF_INET6 AF_INET6
 
 : IPPROTO_TCP 6 ; inline
 : IPPROTO_UDP 17 ; inline

@@ -3,7 +3,7 @@ namespaces opengl opengl.gl sequences ui ui.gadgets ui.gestures
 ui.render accessors combinators ;
 IN: opengl.demo-support
 
-: FOV 2.0 sqrt 1+ ; inline
+: FOV ( -- x ) 2.0 sqrt 1+ ; inline
 : MOUSE-MOTION-SCALE 0.5 ; inline
 : KEY-ROTATE-STEP 10.0 ; inline
 

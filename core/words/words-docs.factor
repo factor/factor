@@ -344,6 +344,6 @@ HELP: make-inline
 { $side-effects "word" } ;
 
 HELP: define-inline
-{ $values { "word" word } { "quot" quotation } }
+{ $values { "word" word } { "quot" quotation } { "effect" effect } }
 { $description "Defines a word and makes it " { $link POSTPONE: inline } "." }
 { $side-effects "word" } ;

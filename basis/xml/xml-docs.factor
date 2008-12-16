@@ -112,7 +112,7 @@ HELP: name
 { $class-description "represents an XML name, with the fields space (a string representing the namespace, as written in the document, tag (a string of the actual name of the tag) and url (a string of the URL that the namespace points to)" }
 { $see-also <name> tag } ;
 
-HELP: <name> ( space tag url -- name )
+HELP: <name>
 { $values { "space" "a string" } { "tag" "a string" } { "url" "a string" }
     { "name" "an XML tag name" } }
 { $description "creates a name tuple with the name-space space and the tag-name tag and the tag-url url." }
@@ -143,7 +143,7 @@ HELP: prolog
 { $class-description "represents an XML prolog, with the tuple fields version (containing \"1.0\" or \"1.1\"), encoding (a string representing the encoding type), and standalone (t or f, whether the document is standalone without external entities)" }
 { $see-also <prolog> xml } ;
 
-HELP: <prolog> ( version encoding standalone -- prolog )
+HELP: <prolog>
 { $values { "version" "a string, 1.0 or 1.1" }
 { "encoding" "a string" } { "standalone" "a boolean" } { "prolog" "an XML prolog" } }
 { $description "creates an XML prolog tuple" }
@@ -153,7 +153,7 @@ HELP: comment
 { $class-description "represents a comment in XML. Has one slot, text, which contains the string of the comment" }
 { $see-also <comment> } ;
 
-HELP: <comment> ( text -- comment )
+HELP: <comment>
 { $values { "text" "a string" } { "comment" "a comment" } }
 { $description "creates an XML comment tuple" }
 { $see-also comment } ;
@@ -162,7 +162,7 @@ HELP: instruction
 { $class-description "represents an XML instruction, such as <?xsl stylesheet='foo.xml'?>. Contains one slot, text, which contains the string between the question marks." }
 { $see-also <instruction> } ;
 
-HELP: <instruction> ( text -- instruction )
+HELP: <instruction>
 { $values { "text" "a string" } { "instruction" "an XML instruction" } }
 { $description "creates an XML parsing instruction, such as <?xsl stylesheet='foo.xml'?>." }
 { $see-also instruction } ;

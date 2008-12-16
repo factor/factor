@@ -1,5 +1,6 @@
 USING: editors io.files io.launcher kernel math.parser
-namespaces sequences windows.shell32 make io.paths.windows ;
+namespaces sequences windows.shell32 make
+io.directories.search.windows ;
 IN: editors.editplus
 
 : editplus-path ( -- path )

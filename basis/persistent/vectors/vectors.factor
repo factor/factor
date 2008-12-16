@@ -22,9 +22,9 @@ M: persistent-vector length count>> ;
 
 : node-size 32 ; inline
 
-: node-mask node-size mod ; inline
+: node-mask ( m -- n ) node-size mod ; inline
 
-: node-shift -5 * shift ; inline
+: node-shift ( m n -- x ) -5 * shift ; inline
 
 : node-nth ( i node -- obj )
     [ node-mask ] [ children>> ] bi* nth ;

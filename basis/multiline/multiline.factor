@@ -22,7 +22,8 @@ PRIVATE>
 
 : STRING:
     CREATE-WORD
-    parse-here 1quotation define-inline ; parsing
+    parse-here 1quotation
+    (( -- string )) define-inline ; parsing
 
 <PRIVATE
 : (parse-multiline-string) ( start-index end-text -- end-index )

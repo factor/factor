@@ -5,7 +5,7 @@ math.constants math.functions math.vectors prettyprint
 sequences hints arrays ;
 IN: benchmark.nbody
 
-: solar-mass 4 pi sq * ; inline
+: solar-mass ( -- x ) 4 pi sq * ; inline
 : days-per-year 365.24 ; inline
 
 TUPLE: body

@@ -1,7 +1,7 @@
 IN: html.templates.fhtml
 USING: help.markup help.syntax ;
 
-HELP: <fhtml> ( path -- fhtml )
+HELP: <fhtml>
 { $values { "path" "a pathname string" } { "fhtml" fhtml } }
 { $description "Creates an FHTML template descriptor." } ;
 

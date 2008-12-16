@@ -1,5 +1,5 @@
 USING: editors io.files io.launcher kernel math.parser
-namespaces sequences io.paths.windows make ;
+namespaces sequences io.directories.search.windows make ;
 IN: editors.notepadpp
 
 : notepadpp-path ( -- path )

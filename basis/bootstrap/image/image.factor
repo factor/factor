@@ -66,7 +66,7 @@ M: id equal?
 
 SYMBOL: objects
 
-: (objects) <id> objects get ; inline
+: (objects) ( obj -- id assoc ) <id> objects get ; inline
 
 : lookup-object ( obj -- n/f ) (objects) at ;
 

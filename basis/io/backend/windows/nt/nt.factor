@@ -21,6 +21,9 @@ C: <io-callback> io-callback
     [ (make-overlapped) ] dip
     handle>> ptr>> [ over set-OVERLAPPED-offset ] when* ;
 
+M: winnt FileArgs-overlapped ( port -- overlapped )
+    make-overlapped ;
+
 : <completion-port> ( handle existing -- handle )
      f 1 CreateIoCompletionPort dup win32-error=0/f ;
 

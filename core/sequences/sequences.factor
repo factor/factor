@@ -101,16 +101,16 @@ M: integer nth-unsafe drop ;
 
 INSTANCE: integer immutable-sequence
 
-: first-unsafe
+: first-unsafe ( seq -- elt )
     0 swap nth-unsafe ; inline
 
-: first2-unsafe
+: first2-unsafe ( seq -- elt1 elt2 )
     [ first-unsafe ] [ 1 swap nth-unsafe ] bi ; inline
 
-: first3-unsafe
+: first3-unsafe ( seq -- elt1 elt2 elt3 )
     [ first2-unsafe ] [ 2 swap nth-unsafe ] bi ; inline
 
-: first4-unsafe
+: first4-unsafe ( seq -- elt1 elt2 elt3 elt4 )
     [ first3-unsafe ] [ 3 swap nth-unsafe ] bi ; inline
 
 : exchange-unsafe ( m n seq -- )
@@ -121,17 +121,17 @@ INSTANCE: integer immutable-sequence
 
 : (tail) ( seq n -- from to seq ) over length rot ; inline
 
-: from-end [ dup length ] dip - ; inline
+: from-end ( seq n -- seq n' ) [ dup length ] dip - ; inline
 
-: (2sequence)
+: (2sequence) ( obj1 obj2 seq -- seq )
     tuck 1 swap set-nth-unsafe
     tuck 0 swap set-nth-unsafe ; inline
 
-: (3sequence)
+: (3sequence) ( obj1 obj2 obj3 seq -- seq )
     tuck 2 swap set-nth-unsafe
     (2sequence) ; inline
 
-: (4sequence)
+: (4sequence) ( obj1 obj2 obj3 obj4 seq -- seq )
     tuck 3 swap set-nth-unsafe
     (3sequence) ; inline
 
@@ -331,7 +331,7 @@ PRIVATE>
 <PRIVATE
 
 : (each) ( seq quot -- n quot' )
-    [ dup length swap [ nth-unsafe ] curry ] dip compose ; inline
+    [ [ length ] keep [ nth-unsafe ] curry ] dip compose ; inline
 
 : (collect) ( quot into -- quot' )
     [ [ keep ] dip set-nth-unsafe ] 2curry ; inline
@@ -453,10 +453,10 @@ PRIVATE>
     over [ 2pusher [ each ] 2dip ] dip tuck [ like ] 2bi@ ; inline
 
 : monotonic? ( seq quot -- ? )
-    [ dup length 1- swap ] dip (monotonic) all? ; inline
+    [ [ length 1- ] keep ] dip (monotonic) all? ; inline
 
 : interleave ( seq between quot -- )
-    [ (interleave) ] 2curry [ dup length swap ] dip 2each ; inline
+    [ (interleave) ] 2curry [ [ length ] keep ] dip 2each ; inline
 
 : accumulator ( quot -- quot' vec )
     V{ } clone [ [ push ] curry compose ] keep ; inline
@@ -679,7 +679,7 @@ PRIVATE>
 <PRIVATE
 
 : joined-length ( seq glue -- n )
-    [ dup sum-lengths swap length 1 [-] ] dip length * + ;
+    [ [ sum-lengths ] [ length 1 [-] ] bi ] dip length * + ;
 
 PRIVATE>
 

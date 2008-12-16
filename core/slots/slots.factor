@@ -22,10 +22,6 @@ PREDICATE: writer < word "writer" word-prop ;
     [ drop define ]
     3bi ;
 
-: create-accessor ( name effect -- word )
-    [ "accessors" create dup ] dip
-    "declared-effect" set-word-prop ;
-
 : reader-quot ( slot-spec -- quot )
     [
         dup offset>> ,
@@ -35,7 +31,8 @@ PREDICATE: writer < word "writer" word-prop ;
     ] [ ] make ;
 
 : reader-word ( name -- word )
-    ">>" append (( object -- value )) create-accessor
+    ">>" append "accessors" create
+    dup (( object -- value )) "declared-effect" set-word-prop
     dup t "reader" set-word-prop ;
 
 : reader-props ( slot-spec -- assoc )
@@ -50,7 +47,8 @@ PREDICATE: writer < word "writer" word-prop ;
     define-typecheck ;
 
 : writer-word ( name -- word )
-    "(>>" ")" surround (( value object -- )) create-accessor
+    "(>>" ")" surround "accessors" create
+    dup (( value object -- )) "declared-effect" set-word-prop
     dup t "writer" set-word-prop ;
 
 ERROR: bad-slot-value value class ;
@@ -95,15 +93,16 @@ ERROR: bad-slot-value value class ;
     define-typecheck ;
 
 : setter-word ( name -- word )
-    ">>" prepend (( object value -- object )) create-accessor ;
+    ">>" prepend "accessors" create ;
 
 : define-setter ( name -- )
     dup setter-word dup deferred? [
-        [ \ over , swap writer-word , ] [ ] make define-inline
+        [ \ over , swap writer-word , ] [ ] make
+        (( object value -- object )) define-inline
     ] [ 2drop ] if ;
 
 : changer-word ( name -- word )
-    "change-" prepend (( object quot -- object )) create-accessor ;
+    "change-" prepend "accessors" create ;
 
 : define-changer ( name -- )
     dup changer-word dup deferred? [
@@ -112,7 +111,7 @@ ERROR: bad-slot-value value class ;
             over reader-word 1quotation
             [ dip call ] curry [ dip swap ] curry %
             swap setter-word ,
-        ] [ ] make define-inline
+        ] [ ] make (( object quot -- object )) define-inline
     ] [ 2drop ] if ;
 
 : define-slot-methods ( class slot-spec -- )

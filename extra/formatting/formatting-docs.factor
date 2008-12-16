@@ -111,9 +111,9 @@ HELP: strftime
     } 
 } 
 { $examples 
-    { $example
-        "USING: calendar formatting ;"
-        "now \"%c\" strftime"
+    { $unchecked-example
+        "USING: calendar formatting io ;"
+        "now \"%c\" strftime print"
         "Mon Dec 15 14:40:43 2008" }
 } ;
 

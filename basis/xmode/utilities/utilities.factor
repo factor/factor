@@ -2,7 +2,7 @@ USING: accessors sequences assocs kernel quotations namespaces
 xml.data xml.utilities combinators macros parser lexer words fry ;
 IN: xmode.utilities
 
-: implies [ not ] dip or ; inline
+: implies ( x y -- z ) [ not ] dip or ; inline
 
 : child-tags ( tag -- seq ) children>> [ tag? ] filter ;
 

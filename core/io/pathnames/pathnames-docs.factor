@@ -57,8 +57,8 @@ HELP: normalize-path
 { $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
 { $description "Called by words such as " { $link <file-reader> } " and " { $link <file-writer> } " to prepare a pathname before passing it to underlying code." } ;
 
-HELP: <pathname> ( str -- pathname )
-{ $values { "str" "a pathname string" } { "pathname" pathname } }
+HELP: <pathname>
+{ $values { "string" "a pathname string" } { "pathname" pathname } }
 { $description "Creates a new " { $link pathname } "." } ;
 
 HELP: home
