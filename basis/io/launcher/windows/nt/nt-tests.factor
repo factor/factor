@@ -41,8 +41,11 @@ IN: io.launcher.windows.nt.tests
     try-process
 ] unit-test
 
+: launcher-test-path ( -- str )
+    "resource:basis/io/launcher/windows/nt/test" ;
+
 [ ] [
-    "resource:basis/io/windows/nt/launcher/test" [
+    launcher-test-path [
         <process>
             vm "-script" "stderr.factor" 3array >>command
             "out.txt" temp-file >>stdout
@@ -60,7 +63,7 @@ IN: io.launcher.windows.nt.tests
 ] unit-test
 
 [ ] [
-    "resource:basis/io/windows/nt/launcher/test" [
+    launcher-test-path [
         <process>
             vm "-script" "stderr.factor" 3array >>command
             "out.txt" temp-file >>stdout
@@ -74,7 +77,7 @@ IN: io.launcher.windows.nt.tests
 ] unit-test
 
 [ "output" ] [
-    "resource:basis/io/windows/nt/launcher/test" [
+    launcher-test-path [
         <process>
             vm "-script" "stderr.factor" 3array >>command
             "err2.txt" temp-file >>stderr
@@ -87,7 +90,7 @@ IN: io.launcher.windows.nt.tests
 ] unit-test
 
 [ t ] [
-    "resource:basis/io/windows/nt/launcher/test" [
+    launcher-test-path [
         <process>
             vm "-script" "env.factor" 3array >>command
         ascii <process-reader> contents
@@ -97,7 +100,7 @@ IN: io.launcher.windows.nt.tests
 ] unit-test
 
 [ t ] [
-    "resource:basis/io/windows/nt/launcher/test" [
+    launcher-test-path [
         <process>
             vm "-script" "env.factor" 3array >>command
             +replace-environment+ >>environment-mode
@@ -109,7 +112,7 @@ IN: io.launcher.windows.nt.tests
 ] unit-test
 
 [ "B" ] [
-    "resource:basis/io/windows/nt/launcher/test" [
+    launcher-test-path [
         <process>
             vm "-script" "env.factor" 3array >>command
             { { "A" "B" } } >>environment
@@ -120,7 +123,7 @@ IN: io.launcher.windows.nt.tests
 ] unit-test
 
 [ f ] [
-    "resource:basis/io/windows/nt/launcher/test" [
+    launcher-test-path [
         <process>
             vm "-script" "env.factor" 3array >>command
             { { "USERPROFILE" "XXX" } } >>environment
@@ -146,7 +149,7 @@ IN: io.launcher.windows.nt.tests
 
 [ "Hello appender\r\nHello appender\r\n" ] [
     2 [
-        "resource:basis/io/windows/nt/launcher/test" [
+        launcher-test-path [
             <process>
                 vm "-script" "append.factor" 3array >>command
                 "append-test" temp-file <appender> >>stdout
