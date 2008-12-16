@@ -79,9 +79,10 @@ big-endian off
     ! compute quotation location
     temp0 temp1 ADD
     ! load quotation
-    temp0 temp0 array-start-offset [+] MOV
-    ! execute branch
-    temp0 quot-xt-offset [+] JMP
+    arg temp0 array-start-offset [+] MOV
+    ! execute branch. the quot must be in arg, since it might
+    ! not be compiled yet
+    arg quot-xt-offset [+] JMP
 ] rc-absolute-cell rt-immediate 1 rex-length + jit-dispatch jit-define
 
 : jit->r ( -- )
