@@ -105,7 +105,7 @@ FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFi
 : application-data ( -- str )
     CSIDL_APPDATA shell32-directory ;
 
-: windows ( -- str )
+: windows-directory ( -- str )
     CSIDL_WINDOWS shell32-directory ;
 
 : programs ( -- str )
