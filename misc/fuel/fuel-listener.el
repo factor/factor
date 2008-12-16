@@ -15,6 +15,8 @@
 
 (require 'fuel-eval)
 (require 'fuel-base)
+(require 'fuel-completion)
+(require 'fuel-syntax)
 (require 'comint)
 
 
@@ -68,10 +70,10 @@ buffer."
       (error "Could not run factor: image file %s not readable" image))
     (message "Starting FUEL listener ...")
     (comint-exec (fuel-listener--buffer) "factor"
-                 factor nil `("-run=fuel" ,(format "-i=%s" image)))
+                 factor nil `("-run=listener" ,(format "-i=%s" image)))
     (pop-to-buffer (fuel-listener--buffer))
     (goto-char (point-max))
-    (comint-send-string nil "USE: fuel \"\\nFUEL loaded\\n\" write\n")
+    (comint-send-string nil "USE: fuel \"FUEL loaded\\n\" write\n")
     (fuel-listener--wait-for-prompt 30)
     (message "FUEL listener up and running!")))
 
@@ -102,6 +104,17 @@ buffer."
       (unless seen (error "No prompt found!")))))
 
 
+;;; Completion support
+
+(defsubst fuel-listener--current-vocab () nil)
+(defsubst fuel-listener--usings () nil)
+
+(defun fuel-listener--setup-completion ()
+  (setq fuel-syntax--current-vocab-function 'fuel-listener--current-vocab)
+  (setq fuel-syntax--usings-function 'fuel-listener--usings)
+  (set-syntax-table fuel-syntax--syntax-table))
+
+
 ;;; Interface: starting fuel listener
 
 (defalias 'switch-to-factor 'run-factor)
@@ -126,13 +139,16 @@ buffer."
 \\{fuel-listener-mode-map}"
   (set (make-local-variable 'comint-prompt-regexp) fuel-listener--prompt-regex)
   (set (make-local-variable 'comint-prompt-read-only) t)
-  (setq fuel-listener--compilation-begin nil))
+  (fuel-listener--setup-completion))
 
 (define-key fuel-listener-mode-map "\C-cz" 'run-factor)
 (define-key fuel-listener-mode-map "\C-c\C-z" 'run-factor)
 (define-key fuel-listener-mode-map "\C-ch" 'fuel-help)
 (define-key fuel-listener-mode-map "\M-." 'fuel-edit-word-at-point)
+(define-key fuel-listener-mode-map "\C-cv" 'fuel-edit-vocabulary)
+(define-key fuel-listener-mode-map "\C-c\C-v" 'fuel-edit-vocabulary)
 (define-key fuel-listener-mode-map "\C-ck" 'fuel-run-file)
+(define-key fuel-listener-mode-map (kbd "TAB") 'fuel-completion--complete-symbol)
 
 
 (provide 'fuel-listener)

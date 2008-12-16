@@ -32,9 +32,11 @@
              (fuel-eval--send/wait '(:fuel* (fuel-get-vocabs) "fuel" (:array)))))))
   fuel-completion--vocabs)
 
-(defsubst fuel-completion--words (prefix vocabs)
-  (fuel-eval--retort-result
-   (fuel-eval--send/wait `(:fuel* (,prefix V{ ,@vocabs } fuel-get-words) t ,vocabs))))
+(defun fuel-completion--words (prefix vocabs)
+  (let ((vs (if vocabs (cons :array vocabs) 'f))
+        (us (or vocabs 't)))
+    (fuel-eval--retort-result
+     (fuel-eval--send/wait `(:fuel* (,prefix ,vs fuel-get-words) t ,us)))))
 
 
 ;;; Completions window handling, heavily inspired in slime's:
@@ -135,10 +137,11 @@ terminates a current completion."
 
 ;;; Completion functionality:
 
-(defsubst fuel-completion--word-list (prefix)
-  (let ((fuel-log--inhibit-p t))
-    (fuel-completion--words
-     prefix `("syntax" ,(fuel-syntax--current-vocab) ,@(fuel-syntax--usings)))))
+(defun fuel-completion--word-list (prefix)
+  (let* ((fuel-log--inhibit-p t)
+         (cv (fuel-syntax--current-vocab))
+         (vs (and cv `("syntax" ,cv ,@(fuel-syntax--usings)))))
+    (fuel-completion--words prefix vs)))
 
 (defun fuel-completion--complete (prefix)
   (let* ((words (fuel-completion--word-list prefix))

@@ -55,18 +55,26 @@ the same as C-cz)).
  - C-cz : switch to listener
  - C-co : cycle between code, tests and docs factor files
 
- - M-. : edit word at point in Emacs (also in listener)
+ - M-. : edit word at point in Emacs
  - M-TAB : complete word at point
  - C-cC-ev : edit vocabulary
 
  - C-cr, C-cC-er : eval region
  - C-M-r, C-cC-ee : eval region, extending it to definition boundaries
  - C-M-x, C-cC-ex : eval definition around point
- - C-ck, C-cC-ek : compile file
+ - C-ck, C-cC-ek : run file
 
  - C-cC-da : toggle autodoc mode
  - C-cC-dd : help for word at point
  - C-cC-ds : short help word at point
+
+* In the listener:
+
+ - TAB : complete word at point
+ - M-. : edit word at point in Emacs
+ - C-cv : edit vocabulary
+ - C-ch : help for word at point
+ - C-ck : run file
 
 * In the debugger (it pops up upon eval/compilation errors):
 
