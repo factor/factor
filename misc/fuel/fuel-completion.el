@@ -110,7 +110,7 @@ terminates a current completion."
 (defun fuel-completion--display-comp-list (completions base)
   (let ((savedp (fuel-completion--maybe-save-window-configuration)))
     (with-output-to-temp-buffer fuel-completion--comp-buffer
-      (display-completion-list completions)
+      (display-completion-list completions base)
       (let ((offset (- (point) 1 (length base))))
         (with-current-buffer standard-output
           (setq completion-base-size offset)

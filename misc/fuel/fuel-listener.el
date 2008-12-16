@@ -143,6 +143,7 @@ buffer."
 
 (define-key fuel-listener-mode-map "\C-cz" 'run-factor)
 (define-key fuel-listener-mode-map "\C-c\C-z" 'run-factor)
+(define-key fuel-listener-mode-map "\C-ca" 'fuel-autodoc-mode)
 (define-key fuel-listener-mode-map "\C-ch" 'fuel-help)
 (define-key fuel-listener-mode-map "\M-." 'fuel-edit-word-at-point)
 (define-key fuel-listener-mode-map "\C-cv" 'fuel-edit-vocabulary)
