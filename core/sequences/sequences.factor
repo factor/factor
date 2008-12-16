@@ -121,7 +121,7 @@ INSTANCE: integer immutable-sequence
 
 : (tail) ( seq n -- from to seq ) over length rot ; inline
 
-: from-end [ dup length ] dip - ; inline
+: from-end ( seq n -- seq n' ) [ dup length ] dip - ; inline
 
 : (2sequence) ( obj1 obj2 seq -- seq )
     tuck 1 swap set-nth-unsafe
