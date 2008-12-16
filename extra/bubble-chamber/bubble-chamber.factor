@@ -524,6 +524,24 @@ M:: <bubble-chamber> update-frame-buffer ( BUBBLE-CHAMBER -- )
     
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: hadron-chamber ( -- )
+  bubble-chamber-window
+  1000 [ hadron add-particle ] times
+  big-bang
+  drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Experimental
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: muon-chamber ( -- )
+  bubble-chamber-window
+  1000 [ muon add-particle ] times
+  dup particles>> [ collide randomize-collision-theta ] each
+  drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : original-big-bang ( -- )
   bubble-chamber
     { 1000 1000 } >>size
@@ -541,22 +559,6 @@ M:: <bubble-chamber> update-frame-buffer ( BUBBLE-CHAMBER -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: hadron-chamber ( -- )
-  bubble-chamber-window
-  1000 [ hadron add-particle ] times
-  big-bang
-  drop ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: muon-chamber ( -- )
-  bubble-chamber-window
-  1000 [ muon add-particle ] times
-  dup particles>> [ collide randomize-collision-theta ] each
-  drop ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : original-big-bang-variant ( -- )
   bubble-chamber-window
   1789 [ muon   add-particle ] times
@@ -565,4 +567,3 @@ M:: <bubble-chamber> update-frame-buffer ( BUBBLE-CHAMBER -- )
    111 [ axion  add-particle ] times
   dup particles>> [ collide randomize-collision-theta ] each
   drop ;
-
