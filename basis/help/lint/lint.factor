@@ -59,7 +59,7 @@ IN: help.lint
     ] each ;
 
 : vocab-exists? ( name -- ? )
-    dup vocab swap "all-vocabs" get member? or ;
+    [ vocab ] [ "all-vocabs" get member? ] bi or ;
 
 : check-modules ( element -- )
     \ $vocab-link swap elements [
