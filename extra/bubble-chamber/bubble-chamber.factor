@@ -550,6 +550,14 @@ M:: <bubble-chamber> update-frame-buffer ( BUBBLE-CHAMBER -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: quark-chamber ( -- )
+  bubble-chamber-window
+  100 [ quark add-particle ] times
+  big-bang
+  drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : small ( -- )
   <bubble-chamber> new-gadget
     { 200 200 } >>size
