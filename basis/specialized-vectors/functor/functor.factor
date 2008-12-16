@@ -18,7 +18,7 @@ WHERE
 
 TUPLE: V { underlying A } { length array-capacity } ;
 
-: <V> <A> execute 0 V boa ; inline
+: <V> ( capacity -- vector ) <A> execute 0 V boa ; inline
 
 M: V like
     drop dup V instance? [
@@ -31,7 +31,7 @@ M: A new-resizable drop <V> execute ;
 
 M: V equal? over V instance? [ sequence= ] [ 2drop f ] if ;
 
-: >V V new clone-like ; inline
+: >V ( seq -- vector ) V new clone-like ; inline
 
 M: V pprint-delims drop V{ \ } ;
 
