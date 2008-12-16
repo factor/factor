@@ -505,6 +505,16 @@ M:: <bubble-chamber> update-frame-buffer ( BUBBLE-CHAMBER -- )
   dup particles>> [ collide ] each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: collide-one-of-each ( bubble-chamber -- bubble-chamber )
+  dup
+  particles>>
+  [ [ <muon>?   ] filter random collide ]
+  [ [ <quark>?  ] filter random collide ]
+  [ [ <hadron>? ] filter random collide ]
+  tri ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Some initial configurations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -536,6 +546,68 @@ M:: <bubble-chamber> update-frame-buffer ( BUBBLE-CHAMBER -- )
   bubble-chamber-window
   1000 [ hadron add-particle ] times
   big-bang
+  drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: quark-chamber ( -- )
+  bubble-chamber-window
+  100 [ quark add-particle ] times
+  big-bang
+  drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: small ( -- )
+  <bubble-chamber> new-gadget
+    { 200 200 } >>size
+    randomize-collision-theta
+    dup start-bubble-chamber-thread
+    dup "Bubble Chamber" open-window
+
+    42 [ muon   add-particle ] times
+    30 [ quark  add-particle ] times
+    21 [ hadron add-particle ] times
+     7 [ axion  add-particle ] times
+
+    collide-one-of-each
+
+  drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: medium ( -- )
+  <bubble-chamber> new-gadget
+    { 400 400 } >>size
+    randomize-collision-theta
+    dup start-bubble-chamber-thread
+    dup "Bubble Chamber" open-window
+
+    100 [ muon   add-particle ] times
+     81 [ quark  add-particle ] times
+     60 [ hadron add-particle ] times
+      9 [ axion  add-particle ] times
+
+    collide-one-of-each
+
+  drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: large ( -- )
+  <bubble-chamber> new-gadget
+    { 600 600 } >>size
+    randomize-collision-theta
+    dup start-bubble-chamber-thread
+    dup "Bubble Chamber" open-window
+
+    550 [ muon   add-particle ] times
+    339 [ quark  add-particle ] times
+    100 [ hadron add-particle ] times
+     11 [ axion  add-particle ] times
+
+    collide-one-of-each
+
   drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -575,3 +647,6 @@ M:: <bubble-chamber> update-frame-buffer ( BUBBLE-CHAMBER -- )
    111 [ axion  add-particle ] times
   dup particles>> [ collide randomize-collision-theta ] each
   drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+

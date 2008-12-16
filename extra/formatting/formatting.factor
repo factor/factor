@@ -113,7 +113,7 @@ MACRO: printf ( format-string -- )
 
 <PRIVATE
 
-: zero-pad 2 CHAR: 0 pad-left ; inline
+: zero-pad ( str -- str' ) 2 CHAR: 0 pad-left ; inline
 
 : >time ( timestamp -- string )
     [ hour>> ] [ minute>> ] [ second>> floor ] tri 3array

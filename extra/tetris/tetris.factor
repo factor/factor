@@ -25,6 +25,7 @@ M: tetris-gadget draw-gadget* ( gadget -- )
     [ <new-tetris> ] change-tetris ;
 
 tetris-gadget H{
+    { T{ button-down f f 1 }     [ request-focus ] }
     { T{ key-down f f "UP" }     [ tetris>> rotate-right ] }
     { T{ key-down f f "d" }      [ tetris>> rotate-left ] }
     { T{ key-down f f "f" }      [ tetris>> rotate-right ] }

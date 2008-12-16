@@ -2,7 +2,7 @@ USING: math math.order kernel arrays byte-arrays sequences
 colors.hsv benchmark.mandel.params accessors colors ;
 IN: benchmark.mandel.colors
 
-: scale 255 * >fixnum ; inline
+: scale ( x -- y ) 255 * >fixnum ; inline
 
 : scale-rgb ( rgba -- n )
     [ red>> scale ] [ green>> scale ] [ blue>> scale ] tri 3byte-array ;

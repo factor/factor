@@ -7,11 +7,12 @@ IN: strings
 
 <PRIVATE
 
-: string-hashcode 3 slot ; inline
+: string-hashcode ( str -- n ) 3 slot ; inline
 
-: set-string-hashcode 3 set-slot ; inline
+: set-string-hashcode ( n str -- ) 3 set-slot ; inline
 
-: reset-string-hashcode f swap set-string-hashcode ; inline
+: reset-string-hashcode ( str -- )
+    f swap set-string-hashcode ; inline
 
 : rehash-string ( str -- )
     1 over sequence-hashcode swap set-string-hashcode ; inline

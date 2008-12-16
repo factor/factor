@@ -169,8 +169,7 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "C:" [
-        CREATE-WORD
-        scan-word [ boa ] curry define-inline
+        CREATE-WORD scan-word define-boa-word
     ] define-syntax
 
     "ERROR:" [

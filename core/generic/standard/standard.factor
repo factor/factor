@@ -33,7 +33,7 @@ ERROR: no-method object generic ;
     ] change-at ;
 
 : flatten-method ( class method assoc -- )
-    [ dup flatten-class keys swap ] 2dip [
+    [ [ flatten-class keys ] keep ] 2dip [
         [ spin ] dip push-method
     ] 3curry each ;
 

@@ -241,7 +241,13 @@
 
 ;;; USING/IN:
 
-(defun fuel-syntax--current-vocab ()
+(make-variable-buffer-local
+ (defvar fuel-syntax--current-vocab-function 'fuel-syntax--find-in))
+
+(defsubst fuel-syntax--current-vocab ()
+  (funcall fuel-syntax--current-vocab-function))
+
+(defun fuel-syntax--find-in ()
   (let* ((vocab)
          (ip
           (save-excursion
@@ -258,7 +264,13 @@
               (setq vocab (format "%s.%s" vocab (downcase sub))))))))
     vocab))
 
-(defun fuel-syntax--usings ()
+(make-variable-buffer-local
+ (defvar fuel-syntax--usings-function 'fuel-syntax--find-usings))
+
+(defsubst fuel-syntax--usings ()
+  (funcall fuel-syntax--usings-function))
+
+(defun fuel-syntax--find-usings ()
   (save-excursion
     (let ((usings)
           (in (fuel-syntax--current-vocab)))

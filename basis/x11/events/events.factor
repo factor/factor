@@ -36,12 +36,12 @@ GENERIC: selection-request-event ( event window -- )
 GENERIC: client-event ( event window -- )
 
 : next-event ( -- event )
-    dpy get "XEvent" <c-object> dup >r XNextEvent drop r> ;
+    dpy get "XEvent" <c-object> [ XNextEvent drop ] keep ;
 
 : mask-event ( mask -- event )
-    >r dpy get r> "XEvent" <c-object> dup >r XMaskEvent drop r> ;
+    [ dpy get ] dip "XEvent" <c-object> [ XMaskEvent drop ] keep ;
 
-: events-queued ( mode -- n ) >r dpy get r> XEventsQueued ;
+: events-queued ( mode -- n ) [ dpy get ] dip XEventsQueued ;
 
 : wheel? ( event -- ? ) XButtonEvent-button 4 7 between? ;
 
@@ -71,15 +71,15 @@ GENERIC: client-event ( event window -- )
     } case ;
 
 : configured-loc ( event -- dim )
-    dup XConfigureEvent-x swap XConfigureEvent-y 2array ;
+    [ XConfigureEvent-x ] [ XConfigureEvent-y ] bi 2array ;
 
 : configured-dim ( event -- dim )
-    dup XConfigureEvent-width swap XConfigureEvent-height 2array ;
+    [ XConfigureEvent-width ] [ XConfigureEvent-height ] bi 2array ;
 
 : mouse-event-loc ( event -- loc )
-    dup XButtonEvent-x swap XButtonEvent-y 2array ;
+    [ XButtonEvent-x ] [ XButtonEvent-y ] bi 2array ;
 
 : close-box? ( event -- ? )
-    dup XClientMessageEvent-message_type "WM_PROTOCOLS" x-atom =
-    swap XClientMessageEvent-data0 "WM_DELETE_WINDOW" x-atom =
-    and ;
+    [ XClientMessageEvent-message_type "WM_PROTOCOLS" x-atom = ]
+    [ XClientMessageEvent-data0 "WM_DELETE_WINDOW" x-atom = ]
+    bi and ;

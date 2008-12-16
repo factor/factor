@@ -56,4 +56,4 @@ PRIVATE>
 : find-in-directories ( directories bfs? quot -- path' )
     '[ _ _ find-file ] attempt-all ; inline
 
-os windows? [ "io.paths.windows" require ] when
+os windows? [ "io.directories.search.windows" require ] when

@@ -37,7 +37,7 @@ M:: x86.64 %dispatch ( src temp offset -- )
 
 M: x86.64 param-reg-1 int-regs param-regs first ;
 M: x86.64 param-reg-2 int-regs param-regs second ;
-: param-reg-3 int-regs param-regs third ; inline
+: param-reg-3 ( -- reg ) int-regs param-regs third ; inline
 
 M: int-regs return-reg drop RAX ;
 M: float-regs return-reg drop XMM0 ;

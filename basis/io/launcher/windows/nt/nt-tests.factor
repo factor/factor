@@ -1,6 +1,7 @@
 USING: io.launcher tools.test calendar accessors environment
 namespaces kernel system arrays io io.files io.encodings.ascii
-sequences parser assocs hashtables math continuations eval ;
+sequences parser assocs hashtables math continuations eval
+io.files.temp io.directories io.pathnames ;
 IN: io.launcher.windows.nt.tests
 
 [ ] [

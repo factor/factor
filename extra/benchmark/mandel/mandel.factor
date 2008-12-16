@@ -6,8 +6,8 @@ io.encodings.binary fry benchmark.mandel.params
 benchmark.mandel.colors ;
 IN: benchmark.mandel
 
-: x-inc width  200000 zoom-fact * / ; inline
-: y-inc height 150000 zoom-fact * / ; inline
+: x-inc ( -- x ) width  200000 zoom-fact * / ; inline
+: y-inc ( -- y ) height 150000 zoom-fact * / ; inline
 
 : c ( i j -- c )
     [ x-inc * center real-part x-inc width 2 / * - + >float ]

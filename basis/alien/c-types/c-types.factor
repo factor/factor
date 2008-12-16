@@ -234,17 +234,16 @@ M: long-long-type box-return ( type -- )
     f swap box-parameter ;
 
 : define-deref ( name -- )
-    [ CHAR: * prefix "alien.c-types" create ]
-    [ c-getter 0 prefix ] bi
-    define-inline ;
+    [ CHAR: * prefix "alien.c-types" create ] [ c-getter 0 prefix ] bi
+    (( c-ptr -- value )) define-inline ;
 
 : define-out ( name -- )
     [ "alien.c-types" constructor-word ]
-    [ dup c-setter '[ _ <c-object> [ 0 @ ] keep ] ]
-    bi define-inline ;
+    [ dup c-setter '[ _ <c-object> [ 0 @ ] keep ] ] bi
+    (( value -- c-ptr )) define-inline ;
 
 : c-bool> ( int -- ? )
-    zero? not ;
+    0 = not ; inline
 
 : define-primitive-type ( type name -- )
     [ typedef ]
