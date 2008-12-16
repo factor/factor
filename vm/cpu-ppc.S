@@ -5,44 +5,44 @@ in the public domain. */
 #define DS_REG r29
 
 DEF(void,primitive_fixnum_add,(void)):
-    lwz r3,0(DS_REG)
-    lwz r4,-4(DS_REG)
-    subi DS_REG,DS_REG,4
-    li r0,0
-    mtxer r0
-    addo. r5,r3,r4
-    bso add_overflow
-    stw r5,0(DS_REG)
-    blr
+	lwz r3,0(DS_REG)
+	lwz r4,-4(DS_REG)
+	subi DS_REG,DS_REG,4
+	li r0,0
+	mtxer r0
+	addo. r5,r3,r4
+	bso add_overflow
+	stw r5,0(DS_REG)
+	blr
 add_overflow:
 	b MANGLE(overflow_fixnum_add)
 
 DEF(void,primitive_fixnum_subtract,(void)):
-    lwz r3,-4(DS_REG)
-    lwz r4,0(DS_REG)
-    subi DS_REG,DS_REG,4
-    li r0,0
-    mtxer r0
-    subfo. r5,r4,r3
+	lwz r3,-4(DS_REG)
+	lwz r4,0(DS_REG)
+	subi DS_REG,DS_REG,4
+	li r0,0
+	mtxer r0
+	subfo. r5,r4,r3
 	bso sub_overflow
-    stw r5,0(DS_REG)
-    blr
+	stw r5,0(DS_REG)
+	blr
 sub_overflow:
-    b MANGLE(overflow_fixnum_subtract)
+	b MANGLE(overflow_fixnum_subtract)
 
 DEF(void,primitive_fixnum_multiply,(void)):
-    lwz r3,0(DS_REG)
-    lwz r4,-4(DS_REG)
-    subi DS_REG,DS_REG,4
-    srawi r3,r3,3
-    mullwo. r5,r3,r4
-    bso multiply_overflow
-    stw r5,0(DS_REG)
-    blr
+	lwz r3,0(DS_REG)
+	lwz r4,-4(DS_REG)
+	subi DS_REG,DS_REG,4
+	srawi r3,r3,3
+	mullwo. r5,r3,r4
+	bso multiply_overflow
+	stw r5,0(DS_REG)
+	blr
 multiply_overflow:
-    srawi r4,r4,3
-    b MANGLE(overflow_fixnum_multiply)
-    
+	srawi r4,r4,3
+	b MANGLE(overflow_fixnum_multiply)
+	
 /* Note that the XT is passed to the quotation in r11 */
 #define CALL_OR_JUMP_QUOT \
 	lwz r11,9(r3)	   /* load quotation-xt slot */ XX \
@@ -116,8 +116,9 @@ DEF(void,c_to_factor,(CELL quot)):
 	SAVE_INT(r26,13)
 	SAVE_INT(r27,14)
 	SAVE_INT(r28,15)
+	SAVE_INT(r31,16)
 
-	SAVE_FP(f14,20)    /* save FPRs */
+	SAVE_FP(f14,20)	/* save FPRs */
 	SAVE_FP(f15,22)
 	SAVE_FP(f16,24)
 	SAVE_FP(f17,26)
@@ -141,7 +142,7 @@ DEF(void,c_to_factor,(CELL quot)):
 	mr r3,r1	   /* pass call stack pointer as an argument */
 	bl MANGLE(save_callstack_bottom)
 
-	RESTORE_INT(r3,19)     /* restore quotation */
+	RESTORE_INT(r3,19)	 /* restore quotation */
 	CALL_QUOT
 
 	RESTORE_FP(f31,54)
@@ -161,9 +162,10 @@ DEF(void,c_to_factor,(CELL quot)):
 	RESTORE_FP(f17,26)
 	RESTORE_FP(f16,24)
 	RESTORE_FP(f15,22)
-	RESTORE_FP(f14,20)    /* save FPRs */
+	RESTORE_FP(f14,20)	/* save FPRs */
 
-	RESTORE_INT(r28,15)   /* restore GPRs */
+	RESTORE_INT(r31,16)   /* restore GPRs */
+	RESTORE_INT(r28,15)
 	RESTORE_INT(r27,14)
 	RESTORE_INT(r26,13)
 	RESTORE_INT(r25,12)
