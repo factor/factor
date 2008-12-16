@@ -1,34 +1,18 @@
 
-USING: accessors arrays calendar
-combinators.cleave combinators.short-circuit 
-kernel locals math math.constants math.functions math.libm
-math.order math.points math.vectors
- namespaces 
-random sequences threads ui ui.gadgets ui.gestures ;
-
-USING:
-
-       kernel
-
-       syntax
-
-       sequences
-
+USING: kernel syntax accessors sequences
+       arrays calendar
+       combinators.cleave combinators.short-circuit 
+       locals math math.constants math.functions math.libm
+       math.order math.points math.vectors
+       namespaces random sequences threads ui ui.gadgets ui.gestures
        math.ranges
-
        colors
        colors.gray
-
        vars
-
        multi-methods
        multi-method-syntax
-
        processing.shapes
-
-       frame-buffer
-
-       ;
+       frame-buffer ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
