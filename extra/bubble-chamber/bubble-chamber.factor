@@ -19,6 +19,14 @@ USING: kernel syntax accessors sequences
 IN: bubble-chamber
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! This is a Factor implementation of an art piece by Jared Tarbell:
+!
+!   http://complexification.net/gallery/machines/bubblechamber/
+!
+! Jared's version is written in Processing (Java)
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! processing
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
