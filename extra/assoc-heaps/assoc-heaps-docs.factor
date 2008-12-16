@@ -5,7 +5,7 @@ heaps.private ;
 IN: assoc-heaps
 
 HELP: <assoc-heap>
-{ $values { "assoc" assoc } { "heap" heap } }
+{ $values { "assoc" assoc } { "heap" heap } { "assoc-heap" assoc-heap } }
 { $description "Constructs a new " { $link assoc-heap } " from two existing data structures." } ;
 
 HELP: <unique-max-heap>

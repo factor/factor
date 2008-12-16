@@ -43,10 +43,9 @@ IN: help.lint
 
 : check-values ( word element -- )
     {
+        [ drop { [ symbol? ] [ macro? ] [ parsing-word? ] } 1|| ]
         [ drop "declared-effect" word-prop not ]
         [ nip contains-funky-elements? ]
-        [ drop symbol? ]
-        [ drop macro? ]
         [
             [ effect-values >array ]
             [ extract-values >array ]
