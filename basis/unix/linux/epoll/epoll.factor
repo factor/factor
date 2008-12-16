@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: unix.linux.epoll
-USING: alien.syntax math ;
+USING: alien.syntax math constants ;
 
 FUNCTION: int epoll_create ( int size ) ;
 
@@ -28,5 +28,5 @@ CONSTANT: EPOLLWRBAND  HEX: 200
 CONSTANT: EPOLLMSG     HEX: 400
 CONSTANT: EPOLLERR     HEX: 008
 CONSTANT: EPOLLHUP     HEX: 010
-CONSTANT: EPOLLONESHOT 30 2^
-CONSTANT: EPOLLET      31 2^
+: EPOLLONESHOT ( -- n ) 30 2^ ; inline
+: EPOLLET      ( -- n ) 31 2^ ; inline
