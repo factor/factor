@@ -22,10 +22,16 @@
   (while (eq (char-before) ?:) (backward-char))
   (skip-syntax-backward "w_"))
 
+(defsubst fuel-syntax--symbol-start ()
+  (save-excursion (fuel-syntax--beginning-of-symbol) (point)))
+
 (defun fuel-syntax--end-of-symbol ()
   "Move point to the end of the current symbol."
   (skip-syntax-forward "w_")
   (while (looking-at ":") (forward-char)))
+
+(defsubst fuel-syntax--symbol-end ()
+  (save-excursion (fuel-syntax--end-of-symbol) (point)))
 
 (put 'factor-symbol 'end-op 'fuel-syntax--end-of-symbol)
 (put 'factor-symbol 'beginning-op 'fuel-syntax--beginning-of-symbol)
@@ -33,6 +39,7 @@
 (defsubst fuel-syntax-symbol-at-point ()
   (let ((s (substring-no-properties (thing-at-point 'factor-symbol))))
     (and (> (length s) 0) s)))
+
 
 
 ;;; Regexps galore:
@@ -43,7 +50,7 @@
     "DEFER:" "ERROR:" "EXCLUDE:" "FORGET:"
     "GENERIC#" "GENERIC:" "HEX:" "HOOK:" "H{"
     "IN:" "INSTANCE:" "INTERSECTION:"
-    "M:" "MACRO:" "MACRO::" "MAIN:" "MATH:" "METHOD:" "MIXIN:"
+    "M:" "MACRO:" "MACRO::" "MAIN:" "MATH:" "MEMO:" "METHOD:" "MIXIN:"
     "OCT:" "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
     "REQUIRE:"  "REQUIRES:" "SINGLETON:" "SLOT:" "SYMBOL:" "SYMBOLS:"
     "TUPLE:" "T{" "t\\??" "TYPEDEF:"
@@ -91,7 +98,7 @@
 (defconst fuel-syntax--sub-vocab-regex "^<\\([^ \n]+\\) *$")
 
 (defconst fuel-syntax--definition-starters-regex
-  (regexp-opt '("VARS" "TUPLE" "MACRO" "MACRO:" "M" ":" "")))
+  (regexp-opt '("VARS" "TUPLE" "MACRO" "MACRO:" "M" "MEMO" "METHOD" ":" "")))
 
 (defconst fuel-syntax--definition-start-regex
   (format "^\\(%s:\\) " fuel-syntax--definition-starters-regex))
@@ -234,18 +241,13 @@
 
 ;;; USING/IN:
 
-(make-variable-buffer-local
- (defvar fuel-syntax--current-vocab nil))
-
-(make-variable-buffer-local
- (defvar fuel-syntax--usings nil))
-
 (defun fuel-syntax--current-vocab ()
-  (let ((ip
-         (save-excursion
-           (when (re-search-backward fuel-syntax--current-vocab-regex nil t)
-             (setq fuel-syntax--current-vocab (match-string-no-properties 1))
-             (point)))))
+  (let* ((vocab)
+         (ip
+          (save-excursion
+            (when (re-search-backward fuel-syntax--current-vocab-regex nil t)
+              (setq vocab (match-string-no-properties 1))
+              (point)))))
     (when ip
       (let ((pp (save-excursion
                   (when (re-search-backward fuel-syntax--sub-vocab-regex ip t)
@@ -253,29 +255,19 @@
         (when (and pp (> pp ip))
           (let ((sub (match-string-no-properties 1)))
             (unless (save-excursion (search-backward (format "%s>" sub) pp t))
-              (setq fuel-syntax--current-vocab
-                    (format "%s.%s" fuel-syntax--current-vocab (downcase sub)))))))))
-  fuel-syntax--current-vocab)
+              (setq vocab (format "%s.%s" vocab (downcase sub))))))))
+    vocab))
 
-(defun fuel-syntax--usings-update ()
+(defun fuel-syntax--usings ()
   (save-excursion
-    (let ((in (fuel-syntax--current-vocab)))
-      (setq fuel-syntax--usings (and in (list in))))
-    (while (re-search-backward fuel-syntax--using-lines-regex nil t)
-      (dolist (u (split-string (match-string-no-properties 1) nil t))
-        (push u fuel-syntax--usings)))
-    fuel-syntax--usings))
-
-(defsubst fuel-syntax--usings-update-hook ()
-  (fuel-syntax--usings-update)
-  nil)
-
-(defun fuel-syntax--enable-usings ()
-  (add-hook 'before-save-hook 'fuel-syntax--usings-update-hook nil t)
-  (fuel-syntax--usings-update))
-
-(defsubst fuel-syntax--usings ()
-  (or fuel-syntax--usings (fuel-syntax--usings-update)))
+    (let ((usings)
+          (in (fuel-syntax--current-vocab)))
+      (when in (setq usings (list in)))
+      (goto-char (point-max))
+      (while (re-search-backward fuel-syntax--using-lines-regex nil t)
+        (dolist (u (split-string (match-string-no-properties 1) nil t))
+          (push u usings)))
+      usings)))
 
 
 (provide 'fuel-syntax)

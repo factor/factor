@@ -56,6 +56,7 @@ the same as C-cz)).
  - C-co : cycle between code, tests and docs factor files
 
  - M-. : edit word at point in Emacs (also in listener)
+ - M-TAB : complete word at point
  - C-cC-ev : edit vocabulary
 
  - C-cr, C-cC-er : eval region

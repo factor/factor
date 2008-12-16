@@ -17,6 +17,8 @@
 (require 'fuel-syntax)
 (require 'fuel-connection)
 
+(eval-when-compile (require 'cl))
+
 
 ;;; Simple sexp-based representation of factor code
 
@@ -39,7 +41,7 @@
                    (:rs 'fuel-eval-restartable)
                    (:nrs 'fuel-eval-non-restartable)
                    (:in (fuel-syntax--current-vocab))
-                   (:usings `(:array ,@(fuel-syntax--usings-update)))
+                   (:usings `(:array ,@(fuel-syntax--usings)))
                    (:get 'fuel-eval-set-result)
                    (t `(:factor ,(symbol-name sexp))))))
         ((symbolp sexp) (symbol-name sexp))))
