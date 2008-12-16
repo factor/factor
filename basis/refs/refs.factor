@@ -5,7 +5,7 @@ IN: refs
 
 TUPLE: ref assoc key ;
 
-: >ref< [ key>> ] [ assoc>> ] bi ; inline
+: >ref< ( ref -- key value ) [ key>> ] [ assoc>> ] bi ; inline
 
 : delete-ref ( ref -- ) >ref< delete-at ;
 GENERIC: get-ref ( ref -- obj )

@@ -14,7 +14,7 @@ IN: cocoa.windows
 : NSBackingStoreNonretained 1 ; inline
 : NSBackingStoreBuffered    2 ; inline
 
-: standard-window-type
+: standard-window-type ( -- n )
     {
         NSTitledWindowMask
         NSClosableWindowMask

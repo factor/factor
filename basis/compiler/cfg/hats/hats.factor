@@ -5,17 +5,17 @@ sequences classes.tuple cpu.architecture compiler.cfg.registers
 compiler.cfg.instructions ;
 IN: compiler.cfg.hats
 
-: i int-regs next-vreg ; inline
-: ^^i i dup ; inline
-: ^^i1 [ ^^i ] dip ; inline
-: ^^i2 [ ^^i ] 2dip ; inline
-: ^^i3 [ ^^i ] 3dip ; inline
+: i ( -- vreg ) int-regs next-vreg ; inline
+: ^^i ( -- vreg vreg ) i dup ; inline
+: ^^i1 ( obj -- vreg vreg obj ) [ ^^i ] dip ; inline
+: ^^i2 ( obj obj -- vreg vreg obj obj ) [ ^^i ] 2dip ; inline
+: ^^i3 ( obj obj obj -- vreg vreg obj obj obj ) [ ^^i ] 3dip ; inline
 
-: d double-float-regs next-vreg ; inline
-: ^^d d dup ; inline
-: ^^d1 [ ^^d ] dip ; inline
-: ^^d2 [ ^^d ] 2dip ; inline
-: ^^d3 [ ^^d ] 3dip ; inline
+: d ( -- vreg ) double-float-regs next-vreg ; inline
+: ^^d  ( -- vreg vreg ) d dup ; inline
+: ^^d1 ( obj -- vreg vreg obj ) [ ^^d ] dip ; inline
+: ^^d2 ( obj obj -- vreg vreg obj obj ) [ ^^d ] 2dip ; inline
+: ^^d3 ( obj obj obj -- vreg vreg obj obj obj ) [ ^^d ] 3dip ; inline
 
 : ^^load-literal ( obj -- dst ) ^^i1 ##load-literal ; inline
 : ^^peek ( loc -- dst ) ^^i1 ##peek ; inline

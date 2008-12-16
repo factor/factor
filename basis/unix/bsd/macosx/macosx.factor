@@ -1,4 +1,4 @@
-USING: alien.syntax unix.time ;
+USING: alien.syntax unix.time alias ;
 IN: unix
 
 : FD_SETSIZE 1024 ; inline
@@ -74,7 +74,7 @@ C-STRUCT: dirent
 : EDOM 33 ; inline
 : ERANGE 34 ; inline
 : EAGAIN 35 ; inline
-: EWOULDBLOCK EAGAIN ; inline
+ALIAS: EWOULDBLOCK EAGAIN
 : EINPROGRESS 36 ; inline
 : EALREADY 37 ; inline
 : ENOTSOCK 38 ; inline

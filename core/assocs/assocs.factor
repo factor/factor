@@ -122,14 +122,14 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : remove-all ( assoc seq -- subseq )
     swap [ key? not ] curry filter ;
 
-: (substitute)
+: substituter ( assoc -- quot )
     [ dupd at* [ nip ] [ drop ] if ] curry ; inline
 
 : substitute-here ( seq assoc -- )
-    (substitute) change-each ;
+    substituter change-each ;
 
 : substitute ( seq assoc -- newseq )
-    (substitute) map ;
+    substituter map ;
 
 : cache ( key assoc quot -- value )
     2over at* [

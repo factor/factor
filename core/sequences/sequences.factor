@@ -101,16 +101,16 @@ M: integer nth-unsafe drop ;
 
 INSTANCE: integer immutable-sequence
 
-: first-unsafe
+: first-unsafe ( seq -- elt )
     0 swap nth-unsafe ; inline
 
-: first2-unsafe
+: first2-unsafe ( seq -- elt1 elt2 )
     [ first-unsafe ] [ 1 swap nth-unsafe ] bi ; inline
 
-: first3-unsafe
+: first3-unsafe ( seq -- elt1 elt2 elt3 )
     [ first2-unsafe ] [ 2 swap nth-unsafe ] bi ; inline
 
-: first4-unsafe
+: first4-unsafe ( seq -- elt1 elt2 elt3 elt4 )
     [ first3-unsafe ] [ 3 swap nth-unsafe ] bi ; inline
 
 : exchange-unsafe ( m n seq -- )
@@ -123,15 +123,15 @@ INSTANCE: integer immutable-sequence
 
 : from-end [ dup length ] dip - ; inline
 
-: (2sequence)
+: (2sequence) ( obj1 obj2 seq -- seq )
     tuck 1 swap set-nth-unsafe
     tuck 0 swap set-nth-unsafe ; inline
 
-: (3sequence)
+: (3sequence) ( obj1 obj2 obj3 seq -- seq )
     tuck 2 swap set-nth-unsafe
     (2sequence) ; inline
 
-: (4sequence)
+: (4sequence) ( obj1 obj2 obj3 obj4 seq -- seq )
     tuck 3 swap set-nth-unsafe
     (3sequence) ; inline
 
