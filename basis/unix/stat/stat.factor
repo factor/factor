@@ -4,7 +4,7 @@ IN: unix.stat
 
 ! File Types
 
-: S_IFMT   OCT: 170000 ; ! These bits determine file type.
+CONSTANT: S_IFMT   OCT: 170000   ! These bits determine file type.
 
 CONSTANT: S_IFDIR  OCT:  40000   ! Directory.
 CONSTANT: S_IFCHR  OCT:  20000   ! Character device.
@@ -22,8 +22,8 @@ FUNCTION: int mkdir ( char* path, mode_t mode ) ;
 C-STRUCT: fsid
     { { "int" 2 } "__val" } ;
 
-    TYPEDEF: fsid __fsid_t
-    TYPEDEF: fsid fsid_t
+TYPEDEF: fsid __fsid_t
+TYPEDEF: fsid fsid_t
 
 << os {
     { linux   [ "unix.stat.linux"   require ] }

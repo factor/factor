@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Patrick Mauritz.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: unix
-USING: alien.syntax system kernel ;
+USING: alien.syntax system kernel layouts constants ;
 
 ! Solaris.
 
@@ -16,15 +16,15 @@ CONSTANT: SEEK_END 2
 
 CONSTANT: SOL_SOCKET HEX: ffff
 
-CONSTANT: FD_SETSIZE cell 4 = 1024 65536 ?
+: FD_SETSIZE ( -- n ) cell 4 = 1024 65536 ? ;
 
 CONSTANT: SO_REUSEADDR 4
 CONSTANT: SO_OOBINLINE HEX: 0100
 CONSTANT: SO_SNDTIMEO HEX: 1005
 CONSTANT: SO_RCVTIMEO HEX: 1006
 
-: F_SETFL 4 ;    ! set file status flags
-: O_NONBLOCK HEX: 80 ; ! no delay
+CONSTANT: F_SETFL 4    ! set file status flags
+CONSTANT: O_NONBLOCK HEX: 80 ! no delay
 
 C-STRUCT: addrinfo
     { "int" "flags" }
@@ -70,10 +70,10 @@ CONSTANT: AF_UNIX 1
 CONSTANT: AF_INET 2
 CONSTANT: AF_INET6 26
 
-CONSTANT: PF_UNSPEC AF_UNSPEC
-CONSTANT: PF_UNIX AF_UNIX
-CONSTANT: PF_INET AF_INET
-CONSTANT: PF_INET6 AF_INET6
+ALIAS: PF_UNSPEC AF_UNSPEC
+ALIAS: PF_UNIX AF_UNIX
+ALIAS: PF_INET AF_INET
+ALIAS: PF_INET6 AF_INET6
 
 CONSTANT: IPPROTO_TCP 6
 CONSTANT: IPPROTO_UDP 17

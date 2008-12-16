@@ -25,5 +25,5 @@ C-STRUCT: stat
 FUNCTION: int __stat13 ( char* pathname, stat* buf ) ;
 FUNCTION: int __lstat13 ( char* pathname, stat* buf ) ;
 
-CONSTANT: stat ( pathname buf -- n ) __stat13
-CONSTANT: lstat ( pathname buf -- n ) __lstat13
+: stat ( pathname buf -- n ) __stat13 ;
+: lstat ( pathname buf -- n ) __lstat13 ;
