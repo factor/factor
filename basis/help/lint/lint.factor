@@ -45,6 +45,7 @@ IN: help.lint
     {
         [ drop "declared-effect" word-prop not ]
         [ nip contains-funky-elements? ]
+        [ drop symbol? ]
         [ drop macro? ]
         [
             [ effect-values >array ]
