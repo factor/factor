@@ -204,6 +204,6 @@ MTSPR: CTR 9
 : (SRWI) ( d a b -- d a b x y ) 32 over - swap 31 ; inline
 : SRWI ( d a b -- ) (SRWI) RLWINM ;
 : SRWI. ( d a b -- ) (SRWI) RLWINM. ;
-: LOAD32 ( n r -- ) >r w>h/h r> tuck LIS dup rot ORI ;
+: LOAD32 ( n r -- ) [ w>h/h ] dip tuck LIS dup rot ORI ;
 : immediate? ( n -- ? ) HEX: -8000 HEX: 7fff between? ;
 : LOAD ( n r -- ) over immediate? [ LI ] [ LOAD32 ] if ;
