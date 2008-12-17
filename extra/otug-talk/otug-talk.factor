@@ -105,11 +105,11 @@ M: png-gadget ungraft* ( gadget -- )
     }
     { $slide "Data flow combinators - cleave family"
         { { $link bi } ", " { $link tri } ", " { $link cleave } }
-        { $bitmap "resource:extra/otug-slides/bi.png" }
+        { $bitmap "resource:extra/otug-talk/bi.png" }
     }
     { $slide "Data flow combinators - cleave family"
         { { $link 2bi } ", " { $link 2tri } ", " { $link 2cleave } }
-        { $bitmap "resource:extra/otug-slides/2bi.png" }
+        { $bitmap "resource:extra/otug-talk/2bi.png" }
     }
     { $slide "Data flow combinators"
         "First, let's define a data type:"
@@ -128,19 +128,19 @@ M: png-gadget ungraft* ( gadget -- )
     }
     { $slide "Data flow combinators - spread family"
         { { $link bi* } ", " { $link tri* } ", " { $link spread } }
-        { $bitmap "resource:extra/otug-slides/bi_star.png" }
+        { $bitmap "resource:extra/otug-talk/bi_star.png" }
     }
     { $slide "Data flow combinators - spread family"
         { { $link 2bi* } }
-        { $bitmap "resource:extra/otug-slides/2bi_star.png" }
+        { $bitmap "resource:extra/otug-talk/2bi_star.png" }
     }
     { $slide "Data flow combinators - apply family"
         { { $link bi@ } ", " { $link tri@ } ", " { $link napply } }
-        { $bitmap "resource:extra/otug-slides/bi_at.png" }
+        { $bitmap "resource:extra/otug-talk/bi_at.png" }
     }
     { $slide "Data flow combinators - apply family"
         { { $link 2bi@ } }
-        { $bitmap "resource:extra/otug-slides/2bi_at.png" }
+        { $bitmap "resource:extra/otug-talk/2bi_at.png" }
     }
     { $slide "Shuffle words"
         "When data flow combinators are not enough"
