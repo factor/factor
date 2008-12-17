@@ -1,4 +1,4 @@
-! Copyright (c) 2007 Aaron Schaefer.
+! Copyright (c) 2007, 2008 Aaron Schaefer, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.ranges sequences ;
 IN: project-euler.001
@@ -50,5 +50,12 @@ PRIVATE>
 
 ! [ euler001b ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials
+
+
+: euler001c ( -- answer )
+    1000 [ { 3 5 } [ mod 0 = ] with contains? ] filter sum ;
+
+! [ euler001c ] 100 ave-time
+! 0 ms ave run time - 0.06 SD (100 trials)
 
 MAIN: euler001
