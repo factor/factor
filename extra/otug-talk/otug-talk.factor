@@ -164,7 +164,7 @@ M: png-gadget ungraft* ( gadget -- )
         }
     }
     { $slide "Previous example without locals"
-        "A bit unweildy..."
+        "A bit unwieldy..."
         { $code
             <" : area ( a b c -- x )
     [ ] [ + + 2 / ] 3bi
