@@ -143,12 +143,29 @@ terminates a current completion."
          (vs (and cv `("syntax" ,cv ,@(fuel-syntax--usings)))))
     (fuel-completion--words prefix vs)))
 
+(defsubst fuel-completion--all-words-list (prefix)
+  (fuel-completion--words prefix nil))
+
+(defvar fuel-completion--word-list-func
+  (completion-table-dynamic 'fuel-completion--word-list))
+
+(defvar fuel-completion--all-words-list-func
+  (completion-table-dynamic 'fuel-completion--all-words-list))
+
 (defun fuel-completion--complete (prefix)
   (let* ((words (fuel-completion--word-list prefix))
          (completions (all-completions prefix words))
          (partial (try-completion prefix words))
          (partial (if (eq partial t) prefix partial)))
     (cons completions partial)))
+
+(defsubst fuel-completion--read-word (prompt &optional default history all)
+  (completing-read prompt
+                   (if all fuel-completion--all-words-list-func
+                     fuel-completion--word-list-func)
+                   nil nil nil
+                   history
+                   (or default (fuel-syntax-symbol-at-point))))
 
 (defun fuel-completion--complete-symbol ()
   "Complete the symbol at point.

@@ -46,7 +46,7 @@ ARTICLE: "symbols" "Symbols"
 "Symbols are just compound definitions in disguise. The following two lines are equivalent:"
 { $code
     "SYMBOL: foo"
-    ": foo \\ foo ;"
+    ": foo ( -- value ) \\ foo ;"
 } ;
 
 ARTICLE: "primitives" "Primitives"

@@ -4,7 +4,7 @@ io.backend.windows io.files.windows io.encodings.utf16n windows
 windows.kernel32 kernel libc math threads system environment
 alien.c-types alien.arrays alien.strings sequences combinators
 combinators.short-circuit ascii splitting alien strings assocs
-namespaces make accessors tr ;
+namespaces make accessors tr windows.time ;
 IN: io.files.windows.nt
 
 M: winnt cwd
@@ -44,8 +44,18 @@ M: winnt normalize-path ( string -- string' )
 M: winnt CreateFile-flags ( DWORD -- DWORD )
     FILE_FLAG_OVERLAPPED bitor ;
 
+<PRIVATE
+
+: windows-file-size ( path -- size )
+    normalize-path 0 "WIN32_FILE_ATTRIBUTE_DATA" <c-object>
+    [ GetFileAttributesEx win32-error=0/f ] keep
+    [ WIN32_FILE_ATTRIBUTE_DATA-nFileSizeLow ]
+    [ WIN32_FILE_ATTRIBUTE_DATA-nFileSizeHigh ] bi >64bit ;
+
+PRIVATE>
+
 M: winnt open-append
-    0 ! [ dup file-info size>> ] [ drop 0 ] recover
+    [ dup windows-file-size ] [ drop 0 ] recover
     [ (open-append) ] dip >>ptr ;
 
 M: winnt home "USERPROFILE" os-env ;

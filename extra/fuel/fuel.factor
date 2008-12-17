@@ -112,7 +112,7 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     error get
     fuel-eval-result get-global
     fuel-eval-output get-global
-    3array fuel-pprint ;
+    3array fuel-pprint flush nl "EOT:" write ;
 
 : fuel-forget-error ( -- ) f error set-global ; inline
 : fuel-forget-result ( -- ) f fuel-eval-result set-global ; inline

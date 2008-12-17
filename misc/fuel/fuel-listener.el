@@ -14,9 +14,11 @@
 ;;; Code:
 
 (require 'fuel-eval)
-(require 'fuel-base)
 (require 'fuel-completion)
+(require 'fuel-connection)
 (require 'fuel-syntax)
+(require 'fuel-base)
+
 (require 'comint)
 
 
@@ -63,19 +65,21 @@ buffer."
 
 (defun fuel-listener--start-process ()
   (let ((factor (expand-file-name fuel-listener-factor-binary))
-        (image (expand-file-name fuel-listener-factor-image)))
+        (image (expand-file-name fuel-listener-factor-image))
+        (comint-redirect-perform-sanity-check nil))
     (unless (file-executable-p factor)
       (error "Could not run factor: %s is not executable" factor))
     (unless (file-readable-p image)
       (error "Could not run factor: image file %s not readable" image))
     (message "Starting FUEL listener ...")
-    (comint-exec (fuel-listener--buffer) "factor"
-                 factor nil `("-run=listener" ,(format "-i=%s" image)))
     (pop-to-buffer (fuel-listener--buffer))
-    (goto-char (point-max))
-    (comint-send-string nil "USE: fuel \"FUEL loaded\\n\" write\n")
-    (fuel-listener--wait-for-prompt 30)
-    (message "FUEL listener up and running!")))
+    (make-comint-in-buffer "fuel listener" (current-buffer) factor nil
+                           "-run=listener" (format "-i=%s" image))
+    (fuel-listener--wait-for-prompt 10000)
+    (fuel-con--send-string/wait (current-buffer)
+                                fuel-con--init-stanza
+                                '(lambda (s) (message "FUEL listener up and running!"))
+                                20000)))
 
 (defun fuel-listener--process (&optional start)
   (or (and (buffer-live-p (fuel-listener--buffer))
@@ -87,21 +91,15 @@ buffer."
 
 (setq fuel-eval--default-proc-function 'fuel-listener--process)
 
-
-;;; Prompt chasing
-
-(defun fuel-listener--wait-for-prompt (&optional timeout)
-  (let ((proc (get-buffer-process (fuel-listener--buffer)))
-        (seen))
-    (with-current-buffer (fuel-listener--buffer)
-      (goto-char (or comint-last-input-end (point-max)))
-      (while (and (not seen)
-                  (accept-process-output proc (or timeout 10) nil t))
-        (sleep-for 0 1)
-        (goto-char comint-last-input-end)
-        (setq seen (re-search-forward comint-prompt-regexp nil t)))
-      (goto-char (point-max))
-      (unless seen (error "No prompt found!")))))
+(defun fuel-listener--wait-for-prompt (timeout)
+  (let ((p (point)) (seen))
+    (while (and (not seen) (> timeout 0))
+      (sleep-for 0.1)
+      (setq timeout (- timeout 100))
+      (goto-char p)
+      (setq seen (re-search-forward comint-prompt-regexp nil t)))
+    (goto-char (point-max))
+    (unless seen (error "No prompt found!"))))
 
 
 ;;; Completion support
@@ -132,12 +130,10 @@ buffer."
 
 ;;; Fuel listener mode:
 
-(defconst fuel-listener--prompt-regex ".* ) ")
-
 (define-derived-mode fuel-listener-mode comint-mode "Fuel Listener"
   "Major mode for interacting with an inferior Factor listener process.
 \\{fuel-listener-mode-map}"
-  (set (make-local-variable 'comint-prompt-regexp) fuel-listener--prompt-regex)
+  (set (make-local-variable 'comint-prompt-regexp) fuel-con--prompt-regex)
   (set (make-local-variable 'comint-prompt-read-only) t)
   (fuel-listener--setup-completion))
 
