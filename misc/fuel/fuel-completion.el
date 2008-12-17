@@ -32,11 +32,24 @@
              (fuel-eval--send/wait '(:fuel* (fuel-get-vocabs) "fuel" (:array)))))))
   fuel-completion--vocabs)
 
+(defvar fuel-completion--words-last (cons nil nil))
+
+(defsubst fuel-completion--forget-words ()
+  (setq fuel-completion--words-last (cons nil nil)))
+
 (defun fuel-completion--words (prefix vocabs)
   (let ((vs (if vocabs (cons :array vocabs) 'f))
         (us (or vocabs 't)))
-    (fuel-eval--retort-result
-     (fuel-eval--send/wait `(:fuel* (,prefix ,vs fuel-get-words) t ,us)))))
+    (if (and (car fuel-completion--words-last)
+             (cdr fuel-completion--words-last)
+             (equal (caar fuel-completion--words-last) vs)
+             (fuel--string-prefix-p (cdar fuel-completion--words-last) prefix))
+        (cdr fuel-completion--words-last)
+      (setcar fuel-completion--words-last (cons vocabs prefix))
+      (setcdr fuel-completion--words-last
+              (fuel-eval--retort-result
+               (fuel-eval--send/wait
+                `(:fuel* (,prefix ,vs fuel-get-words) t ,us)))))))
 
 
 ;;; Completions window handling, heavily inspired in slime's:
@@ -159,7 +172,8 @@ terminates a current completion."
          (partial (if (eq partial t) prefix partial)))
     (cons completions partial)))
 
-(defsubst fuel-completion--read-word (prompt &optional default history all)
+(defun fuel-completion--read-word (prompt &optional default history all)
+  (fuel-completion--forget-words)
   (completing-read prompt
                    (if all fuel-completion--all-words-list-func
                      fuel-completion--word-list-func)
@@ -171,6 +185,7 @@ terminates a current completion."
   "Complete the symbol at point.
 Perform completion similar to Emacs' complete-symbol."
   (interactive)
+  (fuel-completion--forget-words)
   (let* ((end (point))
          (beg (fuel-syntax--symbol-start))
          (prefix (buffer-substring-no-properties beg end))

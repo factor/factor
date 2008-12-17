@@ -61,6 +61,11 @@
 
 (defsubst empty-string-p (str) (equal str ""))
 
+(defun fuel--string-prefix-p (prefix str)
+  (and (>= (length str) (length prefix))
+       (string= (substring-no-properties 0 (length prefix) str)
+                (substring-no-properties prefix))))
+
 (defun fuel--respecting-message (format &rest format-args)
   "Display TEXT as a message, without hiding any minibuffer contents."
   (let ((text (format " [%s]" (apply #'format format format-args))))

@@ -115,17 +115,15 @@
 (defsubst fuel-eval--retort-result (ret) (nth 1 ret))
 (defsubst fuel-eval--retort-output (ret) (nth 2 ret))
 
-(defsubst fuel-eval--retort-p (ret) (listp ret))
+(defsubst fuel-eval--retort-p (ret)
+  (and (listp ret) (= 3 (length ret))))
 
 (defsubst fuel-eval--make-parse-error-retort (str)
   (fuel-eval--retort-make (cons 'fuel-parse-retort-error str) nil))
 
-(defun fuel-eval--parse-retort (str)
-  (save-current-buffer
-    (condition-case nil
-        (let ((ret (car (read-from-string str))))
-          (if (fuel-eval--retort-p ret) ret (error)))
-      (error (fuel-eval--make-parse-error-retort str)))))
+(defun fuel-eval--parse-retort (ret)
+  (if (fuel-eval--retort-p ret) ret
+    (fuel-eval--make-parse-error-retort ret)))
 
 (defsubst fuel-eval--error-name (err) (car err))
 

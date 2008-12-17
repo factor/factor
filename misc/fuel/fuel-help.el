@@ -176,8 +176,6 @@ displayed in the minibuffer."
       (when (re-search-forward (format "^%s" def) nil t)
         (beginning-of-line)
         (kill-region (point-min) (point))
-        (next-line)
-        (open-line 1)
         (fuel-help--history-push (cons def (buffer-string)))))
     (set-buffer-modified-p nil)
     (pop-to-buffer hb)
