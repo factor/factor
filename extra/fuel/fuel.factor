@@ -168,11 +168,19 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 : fuel-get-vocab-location ( vocab -- )
     >vocab-link fuel-get-edit-location ; inline
 
+! Completion support
+
+: fuel-filter-prefix ( seq prefix -- seq )
+    [ drop-prefix nip length 0 = ] curry filter ; inline
+
 : (fuel-get-vocabs) ( -- seq )
     all-vocabs-seq [ vocab-name ] map ; inline
 
 : fuel-get-vocabs ( -- )
     (fuel-get-vocabs) fuel-eval-set-result ; inline
+
+: fuel-get-vocabs/prefix ( prefix -- )
+    (fuel-get-vocabs) swap fuel-filter-prefix fuel-eval-set-result ; inline
 
 MEMO: (fuel-vocab-words) ( name -- seq )
     >vocab-link words [ name>> ] map ;
@@ -185,7 +193,7 @@ MEMO: (fuel-vocab-words) ( name -- seq )
 
 : (fuel-get-words) ( prefix names/f -- seq )
     [ fuel-vocabs-words ] [ fuel-current-words ] if* natural-sort
-    swap [ drop-prefix nip length 0 = ] curry filter ;
+    swap  fuel-filter-prefix ;
 
 : fuel-get-words ( prefix names -- )
     (fuel-get-words) fuel-eval-set-result ; inline

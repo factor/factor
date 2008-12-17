@@ -152,7 +152,8 @@ displayed in the minibuffer."
                   fuel-help-always-ask))
          (def (if ask (fuel-completion--read-word prompt
                                                   def
-                                                  'fuel-help--prompt-history)
+                                                  'fuel-help--prompt-history
+                                                  t)
                 def))
          (cmd `(:fuel* ((:quote ,def) ,(if see 'see 'help)) t)))
     (message "Looking up '%s' ..." def)
@@ -229,6 +230,7 @@ buffer."
     (define-key map "b" 'fuel-help-previous)
     (define-key map "f" 'fuel-help-next)
     (define-key map "l" 'fuel-help-previous)
+    (define-key map "p" 'fuel-help-previous)
     (define-key map "n" 'fuel-help-next)
     (define-key map (kbd "SPC")  'scroll-up)
     (define-key map (kbd "S-SPC") 'scroll-down)

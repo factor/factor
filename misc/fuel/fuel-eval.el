@@ -66,7 +66,8 @@
 
 (defsubst factor--fuel-in (in)
   (cond ((null in) :in)
-        ((eq in t) "fuel-scratchpad")
+        ((eq in 'f) 'f)
+        ((eq in 't) "fuel-scratchpad")
         ((stringp in) in)
         (t (error "Invalid 'in' (%s)" in))))
 

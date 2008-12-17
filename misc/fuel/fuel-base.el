@@ -39,6 +39,15 @@
            (when (equal item (ring-ref ring ind))
              (throw 'found ind)))))))
 
+(when (not (fboundp 'completion-table-dynamic))
+  (defun completion-table-dynamic (fun)
+    (lexical-let ((fun fun))
+      (lambda (string pred action)
+        (with-current-buffer (let ((win (minibuffer-selected-window)))
+                               (if (window-live-p win) (window-buffer win)
+                                 (current-buffer)))
+          (complete-with-action action (funcall fun string) string pred))))))
+
 
 ;;; Utilities
 
