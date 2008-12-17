@@ -14,8 +14,11 @@
 
 ;;; Code:
 
-(require 'fuel-base)
 (require 'fuel-log)
+(require 'fuel-base)
+
+(require 'comint)
+(require 'advice)
 
 
 ;;; Default connection:
@@ -123,19 +126,34 @@
 
 ;;; Connection setup:
 
+(defun fuel-con--cleanup-connection (c)
+  (fuel-con--connection-cancel-timer c))
+
 (defun fuel-con--setup-connection (buffer)
   (set-buffer buffer)
+  (fuel-con--cleanup-connection fuel-con--connection)
   (let ((conn (fuel-con--make-connection buffer)))
     (fuel-con--setup-comint)
     (prog1
         (setq fuel-con--connection conn)
       (fuel-con--connection-start-timer conn))))
 
+(defconst fuel-con--prompt-regex "( .+ ) ")
+(defconst fuel-con--eot-marker "EOT:")
+(defconst fuel-con--init-stanza (format "USE: fuel %S write" fuel-con--eot-marker))
+
+(defconst fuel-con--comint-finished-regex
+  (format "%s%s" fuel-con--eot-marker fuel-con--prompt-regex))
+
 (defun fuel-con--setup-comint ()
+  (comint-redirect-cleanup)
   (add-hook 'comint-redirect-filter-functions
             'fuel-con--comint-redirect-filter t t)
   (add-hook 'comint-redirect-hook
-            'fuel-con--comint-redirect-hook))
+            'fuel-con--comint-redirect-hook nil t))
+
+(defadvice comint-redirect-setup (after fuel-con--advice activate)
+  (setq comint-redirect-finished-regexp fuel-con--comint-finished-regex))
 
 
 ;;; Requests handling:
@@ -169,6 +187,8 @@
         (error (fuel-log--error "<%s>: continuation failed %S \n\t%s"
                                 id rstr cerr))))))
 
+(defvar fuel-con--debug-comint-p nil)
+
 (defun fuel-con--comint-redirect-filter (str)
   (if (not fuel-con--connection)
       (fuel-log--error "No connection in buffer (%s)" str)
@@ -176,13 +196,13 @@
       (if (not req) (fuel-log--error "No current request (%s)" str)
         (fuel-con--request-output req str)
         (fuel-log--info "<%s>: in progress" (fuel-con--request-id req)))))
-  (fuel--shorten-str str 70))
+  (if fuel-con--debug-comint-p (fuel--shorten-str str 256) ""))
 
 (defun fuel-con--comint-redirect-hook ()
   (if (not fuel-con--connection)
       (fuel-log--error "No connection in buffer")
     (let ((req (fuel-con--connection-current-request fuel-con--connection)))
-      (if (not req) (fuel-log--error "No current request (%s)" str)
+      (if (not req) (fuel-log--error "No current request")
         (fuel-con--process-completed-request req)
         (fuel-con--connection-clean-current-request fuel-con--connection)))))
 

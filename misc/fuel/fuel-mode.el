@@ -114,18 +114,26 @@ buffer in case of errors."
   "Opens a new window visiting the definition of the word at point.
 With prefix, asks for the word to edit."
   (interactive "P")
-  (let* ((word (fuel-syntax-symbol-at-point))
-         (ask (or arg (not word)))
-         (word (if ask
-                   (read-string nil
-                                (format "Edit word%s: "
-                                        (if word (format " (%s)" word) ""))
-                                word)
-                 word)))
-    (let ((cmd `(:fuel ((:quote ,word) fuel-get-edit-location))))
-      (condition-case nil
-          (fuel--try-edit (fuel-eval--send/wait cmd))
-        (error (fuel-edit-vocabulary nil word))))))
+  (let* ((word (or (and (not arg) (fuel-syntax-symbol-at-point))
+                  (fuel-completion--read-word "Edit word: ")))
+         (cmd `(:fuel ((:quote ,word) fuel-get-edit-location))))
+    (condition-case nil
+        (fuel--try-edit (fuel-eval--send/wait cmd))
+      (error (fuel-edit-vocabulary nil word)))))
+
+(defvar fuel-mode--word-history nil)
+
+(defun fuel-edit-word (&optional arg)
+  "Asks for a word to edit, with completion.
+With prefix, only words visible in the current vocabulary are
+offered."
+  (interactive "P")
+  (let* ((word (fuel-completion--read-word "Edit word: "
+                                           nil
+                                           fuel-mode--word-history
+                                           arg))
+         (cmd `(:fuel ((:quote ,word) fuel-get-edit-location))))
+    (fuel--try-edit (fuel-eval--send/wait cmd))))
 
 (defvar fuel--vocabs-prompt-history nil)
 
@@ -195,7 +203,7 @@ interacting with a factor listener is at your disposal.
 (fuel-mode--key ?e ?e 'fuel-eval-extended-region)
 (fuel-mode--key ?e ?r 'fuel-eval-region)
 (fuel-mode--key ?e ?v 'fuel-edit-vocabulary)
-(fuel-mode--key ?e ?w 'fuel-edit-word-at-point)
+(fuel-mode--key ?e ?w 'fuel-edit-word)
 (fuel-mode--key ?e ?x 'fuel-eval-definition)
 
 (fuel-mode--key ?d ?a 'fuel-autodoc-mode)
