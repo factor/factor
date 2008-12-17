@@ -20,7 +20,7 @@ $nl
 $nl
 "Mirrors are created by calling " { $link <mirror> } " or " { $link make-mirror } "." } ;
 
-HELP: <mirror> ( object -- mirror )
+HELP: <mirror>
 { $values { "object" object } { "mirror" mirror } } 
 { $description "Creates a " { $link mirror } " reflecting an object." }
 { $examples

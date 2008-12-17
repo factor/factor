@@ -95,7 +95,7 @@ M: ##dispatch-label generate-insn label>> %dispatch-label ;
 M: ##dispatch generate-insn
     [ src>> register ] [ temp>> register ] [ offset>> ] tri %dispatch ;
 
-: >slot<
+: >slot< ( insn -- dst obj slot tag )
     {
         [ dst>> register ]
         [ obj>> register ]
@@ -109,7 +109,7 @@ M: ##slot generate-insn
 M: ##slot-imm generate-insn
     >slot< %slot-imm ;
 
-: >set-slot<
+: >set-slot< ( insn -- src obj slot tag )
     {
         [ src>> register ]
         [ obj>> register ]
@@ -209,7 +209,8 @@ M: ##alien-cell       generate-insn dst/src %alien-cell       ;
 M: ##alien-float      generate-insn dst/src %alien-float      ;
 M: ##alien-double     generate-insn dst/src %alien-double     ;
 
-: >alien-setter< [ src>> register ] [ value>> register ] bi ; inline
+: >alien-setter< ( insn -- src value )
+    [ src>> register ] [ value>> register ] bi ; inline
 
 M: ##set-alien-integer-1 generate-insn >alien-setter< %set-alien-integer-1 ;
 M: ##set-alien-integer-2 generate-insn >alien-setter< %set-alien-integer-2 ;

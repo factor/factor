@@ -221,10 +221,6 @@ HELP: assert-depth
 { $values { "quot" "a quotation" } }
 { $description "Runs a quotation. Throws an error if the quotation attempts to take input values from the stack, or leave outputs on the stack." } ;
 
-HELP: <continuation>
-{ $description "Constructs a new continuation." }
-{ $notes "User code should call " { $link continuation } " instead." } ;
-
 HELP: attempt-all
 { $values
      { "seq" sequence } { "quot" quotation }

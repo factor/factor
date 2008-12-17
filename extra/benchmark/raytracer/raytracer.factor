@@ -2,8 +2,9 @@
 ! http://www.ffconsultancy.com/free/ray_tracer/languages.html
 
 USING: arrays accessors specialized-arrays.double io io.files
-io.encodings.binary kernel math math.functions math.vectors
-math.parser make sequences sequences.private words hints ;
+io.files.temp io.encodings.binary kernel math math.functions
+math.vectors math.parser make sequences sequences.private words
+hints ;
 IN: benchmark.raytracer
 
 ! parameters

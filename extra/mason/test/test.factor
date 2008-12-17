@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces assocs io.files io.encodings.utf8
-prettyprint help.lint benchmark tools.time bootstrap.stage2
-tools.test tools.vocabs help.html mason.common words generic
-accessors compiler.errors sequences sets sorting math ;
+USING: accessors assocs benchmark bootstrap.stage2
+compiler.errors generic help.html help.lint io.directories
+io.encodings.utf8 io.files kernel mason.common math namespaces
+prettyprint sequences sets sorting tools.test tools.time
+tools.vocabs words ;
 IN: mason.test
 
 : do-load ( -- )

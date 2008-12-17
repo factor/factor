@@ -1,6 +1,6 @@
 USING: generic help.syntax help.markup kernel math parser words
 effects classes generic.standard classes.tuple generic.math
-generic.standard arrays io.files vocabs.loader io sequences
+generic.standard arrays io.pathnames vocabs.loader io sequences
 assocs ;
 IN: syntax
 
@@ -144,7 +144,7 @@ ARTICLE: "syntax-byte-arrays" "Byte array syntax"
 
 ARTICLE: "syntax-pathnames" "Pathname syntax"
 { $subsection POSTPONE: P" }
-"Pathnames are documented in " { $link "pathnames" } "." ;
+"Pathnames are documented in " { $link "io.pathnames" } "." ;
 
 ARTICLE: "syntax-literals" "Literals"
 "Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words."

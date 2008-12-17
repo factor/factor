@@ -84,8 +84,7 @@ code in the buffer."
   (set (make-local-variable 'beginning-of-defun-function)
        'fuel-syntax--beginning-of-defun)
   (set (make-local-variable 'end-of-defun-function) 'fuel-syntax--end-of-defun)
-  (set (make-local-variable 'open-paren-in-column-0-is-defun-start) nil)
-  (fuel-syntax--enable-usings))
+  (set (make-local-variable 'open-paren-in-column-0-is-defun-start) nil))
 
 
 ;;; Indentation:
@@ -112,13 +111,16 @@ code in the buffer."
   (save-excursion
     (beginning-of-line)
     (when (> (fuel-syntax--brackets-depth) 0)
-      (let ((op (fuel-syntax--brackets-start))
-            (cl (fuel-syntax--brackets-end))
-            (ln (line-number-at-pos)))
+      (let* ((op (fuel-syntax--brackets-start))
+             (cl (fuel-syntax--brackets-end))
+             (ln (line-number-at-pos))
+             (iop (fuel-syntax--indentation-at op)))
         (when (> ln (line-number-at-pos op))
-          (if (and (> cl 0) (= ln (line-number-at-pos cl)))
-              (fuel-syntax--indentation-at op)
-            (fuel-syntax--increased-indentation (fuel-syntax--indentation-at op))))))))
+          (if (and (> cl 0)
+                   (= (- cl (point)) (current-indentation))
+                   (= ln (line-number-at-pos cl)))
+              iop
+            (fuel-syntax--increased-indentation iop)))))))
 
 (defun factor-mode--indent-definition ()
   (save-excursion

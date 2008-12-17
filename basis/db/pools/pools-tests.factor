@@ -1,6 +1,6 @@
 IN: db.pools.tests
-USING: db.pools tools.test continuations io.files namespaces
-accessors kernel math destructors ;
+USING: db.pools tools.test continuations io.files io.files.temp
+io.directories namespaces accessors kernel math destructors ;
 
 \ <db-pool> must-infer
 

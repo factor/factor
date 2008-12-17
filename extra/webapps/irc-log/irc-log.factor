@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar kernel http.server.dispatchers prettyprint
-sequences printf furnace.actions html.forms accessors
+sequences formatting furnace.actions html.forms accessors
 furnace.redirection ;
 IN: webapps.irc-log
 

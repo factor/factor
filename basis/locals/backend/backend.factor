@@ -3,6 +3,6 @@
 USING: slots.private ;
 IN: locals.backend
 
-: local-value 2 slot ; inline
+: local-value ( box -- value ) 2 slot ; inline
 
-: set-local-value 2 set-slot ; inline
+: set-local-value ( value box -- ) 2 set-slot ; inline

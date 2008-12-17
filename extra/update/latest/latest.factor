@@ -1,7 +1,5 @@
-
-USING: kernel namespaces system io.files bootstrap.image http.client
-       update update.backup update.util ;
-
+USING: kernel namespaces system io.files io.pathnames io.directories
+bootstrap.image http.client update update.backup update.util ;
 IN: update.latest
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

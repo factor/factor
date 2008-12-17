@@ -25,7 +25,7 @@ HELP: no-auth
 HELP: plain-auth
 { $class-description "If the " { $link smtp-auth } " variable is set to this value, plain authentication will be performed, with the username and password stored in the " { $slot "username" } " and " { $slot "password" } " slots of the tuple sent to the server as plain-text." } ;
 
-HELP: <plain-auth> ( username password -- plain-auth )
+HELP: <plain-auth>
 { $values { "username" string } { "password" string } { "plain-auth" plain-auth } }
 { $description "Creates a new " { $link plain-auth } " instance." } ;
 

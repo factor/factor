@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.launcher io.encodings.utf8 prettyprint arrays
-calendar namespaces mason.common mason.child
-mason.release mason.report mason.email mason.cleanup
-mason.help ;
+USING: arrays calendar io.directories io.encodings.utf8
+io.files io.launcher mason.child mason.cleanup mason.common
+mason.email mason.help mason.release mason.report namespaces
+prettyprint ;
 IN: mason.build
 
 : create-build-dir ( -- )

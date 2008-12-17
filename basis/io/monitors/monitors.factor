@@ -56,8 +56,8 @@ SYMBOL: +rename-file+
     [ <monitor> ] dip with-disposal ; inline
 
 {
-    { [ os macosx? ] [ "io.unix.macosx.monitors" require ] }
-    { [ os linux? ] [ "io.unix.linux.monitors" require ] }
-    { [ os winnt? ] [ "io.windows.nt.monitors" require ] }
+    { [ os macosx? ] [ "io.monitors.macosx" require ] }
+    { [ os linux? ] [ "io.monitors.linux" require ] }
+    { [ os winnt? ] [ "io.monitors.windows.nt" require ] }
     [ ]
 } cond

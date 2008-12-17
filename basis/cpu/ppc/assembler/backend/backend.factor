@@ -79,8 +79,8 @@ M: label (B) 0 -rot (B) rc-relative-ppc-3 label-fixup ;
 
 GENERIC: BC ( a b c -- )
 M: integer BC 0 0 16 b-insn ;
-M: word BC >r 0 BC r> rc-relative-ppc-2 rel-word ;
-M: label BC >r 0 BC r> rc-relative-ppc-2 label-fixup ;
+M: word BC [ 0 BC ] dip rc-relative-ppc-2 rel-word ;
+M: label BC [ 0 BC ] dip rc-relative-ppc-2 label-fixup ;
 
 : CREATE-B ( -- word ) scan "B" prepend create-in ;
 

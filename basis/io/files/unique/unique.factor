@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.bitwise math.parser random sequences
-continuations namespaces io.files io arrays system
-combinators vocabs.loader fry io.backend ;
+USING: arrays combinators continuations fry io io.backend
+io.directories io.directories.hierarchy io.files io.pathnames
+kernel math math.bitwise math.parser namespaces random
+sequences system vocabs.loader ;
 IN: io.files.unique
 
 HOOK: touch-unique-file io-backend ( path -- )
@@ -54,6 +55,6 @@ PRIVATE>
     '[ _ with-directory ] [ delete-tree ] bi ; inline
 
 {
-    { [ os unix? ] [ "io.unix.files.unique" ] }
-    { [ os windows? ] [ "io.windows.files.unique" ] }
+    { [ os unix? ] [ "io.files.unique.unix" ] }
+    { [ os windows? ] [ "io.files.unique.windows" ] }
 } cond require

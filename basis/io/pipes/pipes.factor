@@ -53,7 +53,7 @@ PRIVATE>
     ] 2parallel-map ;
 
 {
-    { [ os unix? ] [ "io.unix.pipes" require ] }
-    { [ os winnt? ] [ "io.windows.nt.pipes" require ] }
+    { [ os unix? ] [ "io.pipes.unix" require ] }
+    { [ os winnt? ] [ "io.pipes.windows.nt" require ] }
     [ ]
 } cond

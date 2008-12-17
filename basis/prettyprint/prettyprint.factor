@@ -5,7 +5,7 @@ namespaces make sequences strings io.styles io.streams.string
 vectors words prettyprint.backend prettyprint.custom
 prettyprint.sections prettyprint.config sorting splitting
 grouping math.parser vocabs definitions effects classes.builtin
-classes.tuple io.files classes continuations hashtables
+classes.tuple io.pathnames classes continuations hashtables
 classes.mixin classes.union classes.intersection
 classes.predicate classes.singleton combinators quotations sets
 accessors colors parser summary ;

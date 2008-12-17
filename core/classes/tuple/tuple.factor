@@ -290,6 +290,12 @@ M: tuple-class (define-tuple-class)
         tri* define-declared
     ] 3tri ;
 
+: boa-effect ( class -- effect )
+    [ all-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
+
+: define-boa-word ( word class -- )
+    [ [ boa ] curry ] [ boa-effect ] bi define-inline ;
+
 M: tuple-class reset-class
     [
         dup "slots" word-prop [

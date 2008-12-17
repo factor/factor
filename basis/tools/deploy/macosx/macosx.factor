@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.files kernel namespaces make sequences system
-tools.deploy.backend tools.deploy.config
+USING: io io.files io.files.info.unix io.pathnames
+io.directories io.directories.hierarchy kernel namespaces make
+sequences system tools.deploy.backend tools.deploy.config
 tools.deploy.config.editor assocs hashtables prettyprint
-io.unix.backend cocoa io.encodings.utf8 io.backend
+io.backend.unix cocoa io.encodings.utf8 io.backend
 cocoa.application cocoa.classes cocoa.plists qualified
 combinators ;
 IN: tools.deploy.macosx
@@ -53,7 +54,8 @@ IN: tools.deploy.macosx
         } cleave
     ]
     [ create-app-plist ]
-    [ "Contents/MacOS/" append-path "" copy-vm ] 2tri ;
+    [ "Contents/MacOS/" append-path "" copy-vm ] 2tri
+    dup OCT: 755 set-file-permissions ;
 
 : deploy.app-image ( vocab bundle-name -- str )
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;

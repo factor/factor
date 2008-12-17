@@ -14,9 +14,10 @@
 
 ;;; Code:
 
-(require 'fuel-base)
-(require 'fuel-font-lock)
 (require 'fuel-eval)
+(require 'fuel-completion)
+(require 'fuel-font-lock)
+(require 'fuel-base)
 
 
 ;;; Customization:
@@ -73,10 +74,9 @@
 
 (defun fuel-help--word-synopsis (&optional word)
   (let ((word (or word (fuel-syntax-symbol-at-point)))
-        (fuel-eval--log t))
+        (fuel-log--inhibit-p t))
     (when word
-      (let* ((str (format "\\ %s synopsis fuel-eval-set-result" word))
-             (cmd (fuel-eval--cmd/string str t t))
+      (let* ((cmd `(:fuel* (((:quote ,word) synopsis :get)) t))
              (ret (fuel-eval--send/wait cmd 20)))
         (when (and ret (not (fuel-eval--retort-error ret)))
           (if fuel-help-minibuffer-font-lock
@@ -109,14 +109,15 @@ displayed in the minibuffer."
 ;;; Help browser history:
 
 (defvar fuel-help--history
-  (list nil
-        (make-ring fuel-help-history-cache-size)
-        (make-ring fuel-help-history-cache-size)))
+  (list nil                                        ; current
+        (make-ring fuel-help-history-cache-size)   ; previous
+        (make-ring fuel-help-history-cache-size))) ; next
 
 (defvar fuel-help--history-idx 0)
 
 (defun fuel-help--history-push (term)
-  (when (car fuel-help--history)
+  (when (and (car fuel-help--history)
+             (not (string= (caar fuel-help--history) (car term))))
     (ring-insert (nth 1 fuel-help--history) (car fuel-help--history)))
   (setcar fuel-help--history term))
 
@@ -136,7 +137,7 @@ displayed in the minibuffer."
 ;;; Fuel help buffer and internals:
 
 (defun fuel-help--help-buffer ()
-  (with-current-buffer (get-buffer-create "*fuel-help*")
+  (with-current-buffer (get-buffer-create "*fuel help*")
     (fuel-help-mode)
     (current-buffer)))
 
@@ -149,12 +150,13 @@ displayed in the minibuffer."
          (ask (or (not (memq major-mode '(factor-mode fuel-help-mode)))
                   (not def)
                   fuel-help-always-ask))
-         (def (if ask (read-string prompt nil 'fuel-help--prompt-history def)
+         (def (if ask (fuel-completion--read-word prompt
+                                                  def
+                                                  'fuel-help--prompt-history)
                 def))
-         (cmd (format "\\ %s %s" def (if see "see" "help"))))
+         (cmd `(:fuel* ((:quote ,def) ,(if see 'see 'help)) t)))
     (message "Looking up '%s' ..." def)
-    (fuel-eval--send (fuel-eval--cmd/string cmd t t)
-                     `(lambda (r) (fuel-help--show-help-cont ,def r)))))
+    (fuel-eval--send cmd `(lambda (r) (fuel-help--show-help-cont ,def r)))))
 
 (defun fuel-help--show-help-cont (def ret)
   (let ((out (fuel-eval--retort-output ret)))
@@ -169,14 +171,15 @@ displayed in the minibuffer."
     (set-buffer hb)
     (erase-buffer)
     (insert str)
-    (goto-char (point-min))
-    (when (re-search-forward (format "^%s" def) nil t)
-      (beginning-of-line)
-      (kill-region (point-min) (point))
-      (next-line)
-      (open-line 1))
+    (unless nopush
+      (goto-char (point-min))
+      (when (re-search-forward (format "^%s" def) nil t)
+        (beginning-of-line)
+        (kill-region (point-min) (point))
+        (next-line)
+        (open-line 1)
+        (fuel-help--history-push (cons def (buffer-string)))))
     (set-buffer-modified-p nil)
-    (unless nopush (fuel-help--history-push (cons def str)))
     (pop-to-buffer hb)
     (goto-char (point-min))
     (message "%s" def)))
@@ -227,6 +230,8 @@ buffer."
     (define-key map "q" 'bury-buffer)
     (define-key map "b" 'fuel-help-previous)
     (define-key map "f" 'fuel-help-next)
+    (define-key map "l" 'fuel-help-previous)
+    (define-key map "n" 'fuel-help-next)
     (define-key map (kbd "SPC")  'scroll-up)
     (define-key map (kbd "S-SPC") 'scroll-down)
     map))

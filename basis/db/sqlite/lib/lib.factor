@@ -166,7 +166,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
 : sqlite-row ( handle -- seq )
     dup sqlite-#columns [ sqlite-column ] with map ;
 
-: sqlite-step-has-more-rows? ( prepared -- bool )
+: sqlite-step-has-more-rows? ( prepared -- ? )
     {
         { SQLITE_ROW [ t ] }
         { SQLITE_DONE [ f ] }
