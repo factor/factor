@@ -160,6 +160,8 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 
 : fuel-end-eval ( -- ) [ ] (fuel-end-eval) ; inline
 
+! Edit locations
+
 : fuel-get-edit-location ( defspec -- )
     where [
        first2 [ (normalize-path) ] dip 2array fuel-eval-set-result
@@ -193,7 +195,7 @@ MEMO: (fuel-vocab-words) ( name -- seq )
 
 : (fuel-get-words) ( prefix names/f -- seq )
     [ fuel-vocabs-words ] [ fuel-current-words ] if* natural-sort
-    swap  fuel-filter-prefix ;
+    swap fuel-filter-prefix ;
 
 : fuel-get-words ( prefix names -- )
     (fuel-get-words) fuel-eval-set-result ; inline

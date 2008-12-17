@@ -32,6 +32,10 @@
              (fuel-eval--send/wait '(:fuel* (fuel-get-vocabs) "fuel" (:array)))))))
   fuel-completion--vocabs)
 
+(defsubst fuel-completion--vocab-list (prefix)
+  (fuel-eval--retort-result
+   (fuel-eval--send/wait `(:fuel* (,prefix fuel-get-vocabs/prefix) t t))))
+
 (defun fuel-completion--words (prefix vocabs)
   (let ((vs (if vocabs (cons :array vocabs) 'f))
         (us (or vocabs 't)))
@@ -152,8 +156,10 @@ terminates a current completion."
 (defvar fuel-completion--all-words-list-func
   (completion-table-dynamic 'fuel-completion--all-words-list))
 
-(defun fuel-completion--complete (prefix)
-  (let* ((words (fuel-completion--word-list prefix))
+(defun fuel-completion--complete (prefix vocabs)
+  (let* ((words (if vocabs
+                    (fuel-completion--vocabs)
+                    (fuel-completion--word-list prefix)))
          (completions (all-completions prefix words))
          (partial (try-completion prefix words))
          (partial (if (eq partial t) prefix partial)))
@@ -174,7 +180,7 @@ Perform completion similar to Emacs' complete-symbol."
   (let* ((end (point))
          (beg (fuel-syntax--symbol-start))
          (prefix (buffer-substring-no-properties beg end))
-         (result (fuel-completion--complete prefix))
+         (result (fuel-completion--complete prefix (fuel-syntax--in-using)))
          (completions (car result))
          (partial (cdr result)))
     (cond ((null completions)

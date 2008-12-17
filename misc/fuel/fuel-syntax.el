@@ -232,6 +232,13 @@
 (defsubst fuel-syntax--at-using ()
   (looking-at fuel-syntax--using-lines-regex))
 
+(defun fuel-syntax--in-using ()
+  (let ((p (point)))
+    (save-excursion
+      (and (re-search-backward "^USING: " nil t)
+           (re-search-forward " ;" nil t)
+           (< p (match-end 0))))))
+
 (defsubst fuel-syntax--beginning-of-defun (&optional times)
   (re-search-backward fuel-syntax--begin-of-def-regex nil t times))
 

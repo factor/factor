@@ -46,8 +46,7 @@
         (cons :id (random))
         (cons :string str)
         (cons :continuation cont)
-        (cons :buffer (or sender-buffer (current-buffer)))
-        (cons :output "")))
+        (cons :buffer (or sender-buffer (current-buffer)))))
 
 (defsubst fuel-con--request-p (req)
   (and (listp req) (eq (car req) :fuel-connection-request)))
@@ -63,11 +62,6 @@
 
 (defsubst fuel-con--request-buffer (req)
   (cdr (assoc :buffer req)))
-
-(defun fuel-con--request-output (req &optional suffix)
-  (let ((cell (assoc :output req)))
-    (when suffix (setcdr cell (concat (cdr cell) suffix)))
-    (cdr cell)))
 
 (defsubst fuel-con--request-deactivate (req)
   (setcdr (assoc :continuation req) nil))
