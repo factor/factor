@@ -14,9 +14,10 @@
 
 ;;; Code:
 
-(require 'fuel-base)
-(require 'fuel-font-lock)
 (require 'fuel-eval)
+(require 'fuel-completion)
+(require 'fuel-font-lock)
+(require 'fuel-base)
 
 
 ;;; Customization:
@@ -149,7 +150,9 @@ displayed in the minibuffer."
          (ask (or (not (memq major-mode '(factor-mode fuel-help-mode)))
                   (not def)
                   fuel-help-always-ask))
-         (def (if ask (read-string prompt nil 'fuel-help--prompt-history def)
+         (def (if ask (fuel-completion--read-word prompt
+                                                  def
+                                                  'fuel-help--prompt-history)
                 def))
          (cmd `(:fuel* ((:quote ,def) ,(if see 'see 'help)) t)))
     (message "Looking up '%s' ..." def)

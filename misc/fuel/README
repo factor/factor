@@ -57,7 +57,8 @@ C-cC-eC-r is the same as C-cC-er)).
 
  - M-. : edit word at point in Emacs
  - M-TAB : complete word at point
- - C-cC-ev : edit vocabulary
+ - C-cC-ev : edit vocabulary (M-x fuel-edit-vocabulary)
+ - C-cC-ew : edit word (M-x fuel-edit-word)
 
  - C-cr, C-cC-er : eval region
  - C-M-r, C-cC-ee : eval region, extending it to definition boundaries
