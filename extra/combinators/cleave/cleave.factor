@@ -1,6 +1,6 @@
 
 USING: kernel combinators words quotations arrays sequences locals macros
-       shuffle combinators.lib generalizations fry ;
+       shuffle generalizations fry ;
 
 IN: combinators.cleave
 
@@ -9,13 +9,6 @@ IN: combinators.cleave
 : >quot ( obj -- quot ) dup word? [ 1quotation ] when ;
 
 : >quots ( seq -- seq ) [ >quot ] map ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-:: [ncleave] ( SEQ N -- quot )
-   SEQ >quots [ [ N nkeep ] curry ] map concat [ N ndrop ] append >quotation ;
-
-MACRO: ncleave ( seq n -- quot ) [ncleave] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Cleave into array
