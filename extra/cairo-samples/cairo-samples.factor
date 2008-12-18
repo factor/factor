@@ -7,7 +7,7 @@ USING: cairo cairo.ffi locals math.constants math
 io.backend kernel alien.c-types libc namespaces
 cairo.gadgets ui.gadgets accessors specialized-arrays.double ;
 
-IN: cairo.samples
+IN: cairo-samples
 
 TUPLE: arc-gadget < cairo-gadget ;
 M:: arc-gadget render-cairo* ( gadget -- )

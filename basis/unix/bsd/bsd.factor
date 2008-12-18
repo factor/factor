@@ -1,7 +1,6 @@
 ! Copyright (C) 2005, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax combinators system vocabs.loader alias
-constants ;
+USING: alien.syntax combinators system vocabs.loader ;
 IN: unix
 
 CONSTANT: MAXPATHLEN 1024

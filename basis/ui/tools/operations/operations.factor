@@ -8,7 +8,8 @@ io.styles kernel namespaces parser prettyprint quotations
 tools.annotations editors tools.profiler tools.test tools.time
 tools.walker ui.commands ui.gadgets.editors ui.gestures
 ui.operations ui.tools.deploy vocabs vocabs.loader words
-sequences tools.vocabs classes compiler.units accessors ;
+sequences tools.vocabs classes compiler.units accessors
+vocabs.parser ;
 IN: ui.tools.operations
 
 V{ } clone operations set-global

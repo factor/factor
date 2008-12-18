@@ -26,7 +26,7 @@ M: cairo-gadget draw-gadget*
     [ dim>> ] [ render-cairo ] bi
     origin get first2 glRasterPos2i
     1.0 -1.0 glPixelZoom
-    >r first2 GL_BGRA GL_UNSIGNED_BYTE r>
+    [ first2 GL_BGRA GL_UNSIGNED_BYTE ] dip
     glDrawPixels ;
 
 : copy-surface ( surface -- )

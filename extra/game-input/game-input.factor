@@ -1,6 +1,5 @@
-USING: arrays accessors continuations kernel symbols system
-combinators.lib sequences namespaces init vocabs vocabs.loader
-combinators ;
+USING: arrays accessors continuations kernel system
+sequences namespaces init vocabs vocabs.loader combinators ;
 IN: game-input
 
 SYMBOLS: game-input-backend game-input-opened ;
@@ -59,9 +58,10 @@ HOOK: instance-id game-input-backend ( controller -- id )
     get-controllers [ product-id = ] with filter ;
 : find-controller-instance ( product-id instance-id -- controller/f )
     get-controllers [
+        tuck
         [ product-id  = ]
-        [ instance-id = ] bi, bi* and
-    ] 2with find nip ;
+        [ instance-id = ] 2bi* and
+    ] with with find nip ;
 
 HOOK: read-controller game-input-backend ( controller -- controller-state )
 HOOK: calibrate-controller game-input-backend ( controller -- )

@@ -7,7 +7,6 @@ USING: kernel byte-arrays combinators strings arrays sequences splitting
        accessors
        combinators.cleave
        newfx
-       symbols
        ;
 
 IN: dns

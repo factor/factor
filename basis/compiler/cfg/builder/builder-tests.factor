@@ -14,7 +14,7 @@ kernel.private math ;
     [ ]
     [ dup ]
     [ swap ]
-    [ >r r> ]
+    [ [ ] dip ]
     [ fixnum+ ]
     [ fixnum+fast ]
     [ 3 fixnum+fast ]

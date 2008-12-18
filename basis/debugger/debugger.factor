@@ -9,7 +9,7 @@ combinators generic.math classes.builtin classes compiler.units
 generic.standard vocabs init kernel.private io.encodings
 accessors math.order destructors source-files parser
 classes.tuple.parser effects.parser lexer compiler.errors
-generic.parser strings.parser ;
+generic.parser strings.parser vocabs.parser ;
 IN: debugger
 
 GENERIC: error. ( error -- )

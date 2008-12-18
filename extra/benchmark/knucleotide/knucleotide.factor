@@ -29,7 +29,7 @@ IN: benchmark.knucleotide
 : small-groups ( x n -- b )
     swap
     [ length swap - 1+ ] 2keep
-    [ >r over + r> subseq ] 2curry map ;
+    [ [ over + ] dip subseq ] 2curry map ;
 
 : handle-table ( inputs n -- )
     small-groups

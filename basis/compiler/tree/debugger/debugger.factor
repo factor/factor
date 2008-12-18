@@ -4,7 +4,7 @@ USING: kernel assocs match fry accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
 prettyprint prettyprint.backend prettyprint.custom
 prettyprint.sections math words combinators
-combinators.short-circuit io sorting hints qualified
+combinators.short-circuit io sorting hints
 compiler.tree
 compiler.tree.recursive
 compiler.tree.normalization
@@ -80,10 +80,12 @@ M: shuffle-node pprint* effect>> effect>string text ;
         [ out-d>> length 1 = ]
     } 1&& ;
 
+SYMBOLS: >R R> ;
+
 M: #shuffle node>quot
     {
-        { [ dup #>r? ] [ drop \ >r , ] }
-        { [ dup #r>? ] [ drop \ r> , ] }
+        { [ dup #>r? ] [ drop \ >R , ] }
+        { [ dup #r>? ] [ drop \ R> , ] }
         {
             [ dup [ in-r>> empty? ] [ out-r>> empty? ] bi and ]
             [

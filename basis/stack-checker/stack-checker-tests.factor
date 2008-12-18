@@ -218,7 +218,7 @@ DEFER: do-crap*
 MATH: xyz ( a b -- c )
 M: fixnum xyz 2array ;
 M: float xyz
-    [ 3 ] bi@ swapd >r 2array swap r> 2array swap ;
+    [ 3 ] bi@ swapd [ 2array swap ] dip 2array swap ;
 
 [ [ xyz ] infer ] [ inference-error? ] must-fail-with
 
@@ -480,7 +480,7 @@ DEFER: an-inline-word
     dup [ normal-word-2 ] when ;
 
 : an-inline-word ( obj quot -- )
-    >r normal-word r> call ; inline
+    [ normal-word ] dip call ; inline
 
 { 1 1 } [ [ 3 * ] an-inline-word ] must-infer-as
 
@@ -503,7 +503,7 @@ ERROR: custom-error ;
 ] unit-test
 
 [ T{ effect f 1 1 t } ] [
-    [ dup >r 3 throw r> ] infer
+    [ dup [ 3 throw ] dip ] infer
 ] unit-test
 
 ! This was a false trigger of the undecidable quotation
@@ -511,7 +511,7 @@ ERROR: custom-error ;
 { 2 1 } [ find-last-sep ] must-infer-as
 
 ! Regression
-: missing->r-check >r ;
+: missing->r-check 1 load-locals ;
 
 [ [ missing->r-check ] infer ] must-fail
 
@@ -548,7 +548,7 @@ M: object inference-invalidation-d inference-invalidation-c 2drop ;
 
 [ [ inference-invalidation-d ] infer ] must-fail
 
-: bad-recursion-3 ( -- ) dup [ >r bad-recursion-3 r> ] when ; inline
+: bad-recursion-3 ( -- ) dup [ [ bad-recursion-3 ] dip ] when ; inline
 [ [ bad-recursion-3 ] infer ] must-fail
 
 : bad-recursion-4 ( -- ) 4 [ dup call roll ] times ; inline
@@ -572,7 +572,7 @@ M: object inference-invalidation-d inference-invalidation-c 2drop ;
 
 DEFER: eee'
 : ddd' ( ? -- ) [ f eee' ] when ; inline recursive
-: eee' ( ? -- ) >r swap [ ] r> ddd' call ; inline recursive
+: eee' ( ? -- ) [ swap [ ] ] dip ddd' call ; inline recursive
 
 [ [ eee' ] infer ] [ inference-error? ] must-fail-with
 

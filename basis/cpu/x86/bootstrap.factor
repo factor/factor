@@ -319,9 +319,7 @@ big-endian off
     ds-reg [] temp1 MOV
 ] f f f \ -rot define-sub-primitive
 
-[ jit->r ] f f f \ >r define-sub-primitive
-
-[ jit-r> ] f f f \ r> define-sub-primitive
+[ jit->r ] f f f \ load-local define-sub-primitive
 
 ! Comparisons
 : jit-compare ( insn -- )

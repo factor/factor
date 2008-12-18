@@ -5,7 +5,7 @@ io.directories io.directories.hierarchy kernel namespaces make
 sequences system tools.deploy.backend tools.deploy.config
 tools.deploy.config.editor assocs hashtables prettyprint
 io.backend.unix cocoa io.encodings.utf8 io.backend
-cocoa.application cocoa.classes cocoa.plists qualified
+cocoa.application cocoa.classes cocoa.plists
 combinators ;
 IN: tools.deploy.macosx
 

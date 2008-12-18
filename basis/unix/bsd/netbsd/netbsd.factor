@@ -1,4 +1,4 @@
-USING: alien.syntax alien.c-types math vocabs.loader constants alias ;
+USING: alien.syntax alien.c-types math vocabs.loader ;
 IN: unix
 
 CONSTANT: FD_SETSIZE 256
