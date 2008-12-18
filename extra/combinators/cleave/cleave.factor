@@ -11,6 +11,13 @@ IN: combinators.cleave
 : >quots ( seq -- seq ) [ >quot ] map ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: [ncleave] ( SEQ N -- quot )
+   SEQ >quots [ [ N nkeep ] curry ] map concat [ N ndrop ] append >quotation ;
+
+MACRO: ncleave ( seq n -- quot ) [ncleave] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Cleave into array
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
