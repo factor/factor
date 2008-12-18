@@ -17,20 +17,21 @@ M: cairo-surface-t dispose ( alien -- ) alien>> cairo_surface_destroy ;
     [ cairo_status_to_string "Cairo error: " prepend throw ] if ;
 
 SYMBOL: cairo
-: cr ( -- cairo ) cairo get ;
+: cr ( -- cairo ) cairo get ; inline
 
 : (with-cairo) ( cairo-t quot -- )
-    >r alien>> cairo r> [ cr cairo_status check-cairo ]
-    compose with-variable ; inline
+    [ alien>> cairo ] dip
+    '[ @ cr cairo_status check-cairo ]
+    with-variable ; inline
     
 : with-cairo ( cairo quot -- )
-    >r <cairo-t> r> [ (with-cairo) ] curry with-disposal ; inline
+    [ <cairo-t> ] dip '[ _ (with-cairo) ] with-disposal ; inline
 
 : (with-surface) ( cairo-surface-t quot -- )
-    >r alien>> r> [ cairo_surface_status check-cairo ] bi ; inline
+    [ alien>> ] dip [ cairo_surface_status check-cairo ] bi ; inline
 
 : with-surface ( cairo_surface quot -- )
-    >r <cairo-surface-t> r> [ (with-surface) ] curry with-disposal ; inline
+    [ <cairo-surface-t> ] dip '[ _ (with-surface) ] with-disposal ; inline
 
 : with-cairo-from-surface ( cairo_surface quot -- )
     '[ cairo_create _ with-cairo ] with-surface ; inline
