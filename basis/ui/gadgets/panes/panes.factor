@@ -358,25 +358,25 @@ M: f sloppy-pick-up*
     [ 3drop { } ]
     if ;
 
-: move-caret ( pane -- pane )
-    dup hand-rel over sloppy-pick-up >>caret
+: move-caret ( pane loc -- pane )
+    over screen-loc v- over sloppy-pick-up >>caret
     dup relayout-1 ;
 
 : begin-selection ( pane -- )
     f >>selecting?
-    move-caret
+    hand-loc get move-caret
     f >>mark
     drop ;
 
 : extend-selection ( pane -- )
     hand-moved? [
         dup selecting?>> [
-            move-caret
+            hand-loc get move-caret
         ] [
             dup hand-clicked get child? [
                 t >>selecting?
                 dup hand-clicked set-global
-                move-caret
+                hand-click-loc get move-caret
                 caret>mark
             ] when
         ] if
@@ -394,7 +394,7 @@ M: f sloppy-pick-up*
 : select-to-caret ( pane -- )
     t >>selecting?
     dup mark>> [ caret>mark ] unless
-    move-caret
+    hand-loc get move-caret
     dup request-focus
     com-copy-selection ;
 
