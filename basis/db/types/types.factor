@@ -3,8 +3,8 @@
 USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep prettyprint
 words namespaces slots slots.private classes mirrors
-classes.tuple combinators calendar.format symbols
-classes.singleton accessors quotations random ;
+classes.tuple combinators calendar.format
+accessors quotations random ;
 IN: db.types
 
 HOOK: persistent-table db ( -- hash )
