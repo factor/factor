@@ -1,6 +1,6 @@
-! Copyright (C) 2007 Daniel Ehrenberg
+! Copyright (C) 2007, 2008 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel strings math ;
+USING: sequences kernel strings math fry ;
 IN: sequences.deep
 
 ! All traversal goes in postorder
@@ -37,6 +37,16 @@ M: object branch? drop f ;
 
 : deep-all? ( obj quot -- ? )
     [ not ] compose deep-contains? not ; inline
+
+: deep-member? ( obj seq -- ? )
+    swap '[
+        _ swap dup branch? [ member? ] [ 2drop f ] if
+    ] deep-find >boolean ;
+
+: deep-subseq? ( subseq seq -- ? )
+    swap '[
+        _ swap dup branch? [ subseq? ] [ 2drop f ] if
+    ] deep-find >boolean ;
 
 : deep-change-each ( obj quot: ( elt -- elt' ) -- )
     over branch? [

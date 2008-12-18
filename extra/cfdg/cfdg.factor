@@ -6,7 +6,7 @@ USING: kernel alien.c-types combinators namespaces make arrays
        vars colors self self.slots
        random-weighted colors.hsv cfdg.gl accessors
        ui.gadgets.handler ui.gestures assocs ui.gadgets macros
-       qualified specialized-arrays.double ;
+       specialized-arrays.double ;
 
 QUALIFIED: syntax
 

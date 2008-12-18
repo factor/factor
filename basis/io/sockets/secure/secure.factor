@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel symbols namespaces continuations
+USING: accessors kernel namespaces continuations
 destructors io debugger io.sockets sequences summary calendar
 delegate system vocabs.loader combinators present ;
 IN: io.sockets.secure
@@ -97,6 +97,6 @@ HOOK: send-secure-handshake secure-socket-backend ( -- )
 HOOK: accept-secure-handshake secure-socket-backend ( -- )
 
 {
-    { [ os unix? ] [ "io.unix.sockets.secure" require ] }
+    { [ os unix? ] [ "io.sockets.secure.unix" require ] }
     { [ os windows? ] [ "openssl" require ] }
 } cond

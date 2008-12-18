@@ -20,7 +20,7 @@ C: <transaction> transaction
 : balance>> ( account -- balance ) transactions>> total ;
 
 : open-account ( name interest-rate interest-payment-day opening-date opening-balance -- account )
-    >r [ <account> ] keep r> "Account Opened" <transaction> >>transaction ;
+    [ [ <account> ] keep ] dip "Account Opened" <transaction> >>transaction ;
 
 : daily-rate ( yearly-rate day -- daily-rate )
     days-in-year / ;
@@ -56,7 +56,7 @@ C: <transaction> transaction
 
 : each-day ( quot start end -- )
     2dup before? [
-        >r dup >r over >r swap call r> r> 1 days time+ r> each-day
+        [ dup [ over [ swap call ] dip ] dip 1 days time+ ] dip each-day
     ] [
         3drop
     ] if ;

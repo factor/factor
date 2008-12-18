@@ -7,7 +7,7 @@ quotations sequences strings threads listener classes.tuple
 ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.status-bar
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures
 definitions calendar concurrency.flags concurrency.mailboxes
-ui.tools.workspace accessors sets destructors fry ;
+ui.tools.workspace accessors sets destructors fry vocabs.parser ;
 IN: ui.tools.interactor
 
 ! If waiting is t, we're waiting for user input, and invoking

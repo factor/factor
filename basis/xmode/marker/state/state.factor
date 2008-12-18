@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: xmode.marker.context xmode.rules symbols accessors
+USING: xmode.marker.context xmode.rules accessors
 xmode.tokens namespaces make kernel sequences assocs math ;
 IN: xmode.marker.state
 

@@ -1,4 +1,4 @@
-USING: http help.markup help.syntax io.files io.streams.string
+USING: http help.markup help.syntax io.pathnames io.streams.string
 io.encodings.8-bit io.encodings.binary kernel strings urls
 urls.encoding byte-arrays strings assocs sequences ;
 IN: http.client

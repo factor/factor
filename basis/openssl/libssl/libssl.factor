@@ -13,64 +13,64 @@ IN: openssl.libssl
     { [ os unix? ] [ "libssl" "libssl.so" "cdecl" add-library ] }
 } cond >>
 
-: X509_FILETYPE_PEM       1 ; inline
-: X509_FILETYPE_ASN1      2 ; inline
-: X509_FILETYPE_DEFAULT   3 ; inline
+CONSTANT: X509_FILETYPE_PEM       1
+CONSTANT: X509_FILETYPE_ASN1      2
+CONSTANT: X509_FILETYPE_DEFAULT   3
 
-: SSL_FILETYPE_ASN1  X509_FILETYPE_ASN1 ; inline
-: SSL_FILETYPE_PEM   X509_FILETYPE_PEM ; inline
+ALIAS: SSL_FILETYPE_ASN1 X509_FILETYPE_ASN1
+ALIAS: SSL_FILETYPE_PEM  X509_FILETYPE_PEM
 
-: SSL_CTRL_NEED_TMP_RSA             1 ; inline
-: SSL_CTRL_SET_TMP_RSA              2 ; inline
-: SSL_CTRL_SET_TMP_DH               3 ; inline
-: SSL_CTRL_SET_TMP_RSA_CB           4 ; inline
-: SSL_CTRL_SET_TMP_DH_CB            5 ; inline
+CONSTANT: SSL_CTRL_NEED_TMP_RSA   1
+CONSTANT: SSL_CTRL_SET_TMP_RSA    2
+CONSTANT: SSL_CTRL_SET_TMP_DH     3
+CONSTANT: SSL_CTRL_SET_TMP_RSA_CB 4
+CONSTANT: SSL_CTRL_SET_TMP_DH_CB  5
 
-: SSL_CTRL_GET_SESSION_REUSED       6 ; inline
-: SSL_CTRL_GET_CLIENT_CERT_REQUEST  7 ; inline
-: SSL_CTRL_GET_NUM_RENEGOTIATIONS   8 ; inline
-: SSL_CTRL_CLEAR_NUM_RENEGOTIATIONS 9 ; inline
-: SSL_CTRL_GET_TOTAL_RENEGOTIATIONS 10 ; inline
-: SSL_CTRL_GET_FLAGS                11 ; inline
-: SSL_CTRL_EXTRA_CHAIN_CERT         12 ; inline
+CONSTANT: SSL_CTRL_GET_SESSION_REUSED       6 
+CONSTANT: SSL_CTRL_GET_CLIENT_CERT_REQUEST  7 
+CONSTANT: SSL_CTRL_GET_NUM_RENEGOTIATIONS   8 
+CONSTANT: SSL_CTRL_CLEAR_NUM_RENEGOTIATIONS 9 
+CONSTANT: SSL_CTRL_GET_TOTAL_RENEGOTIATIONS 10
+CONSTANT: SSL_CTRL_GET_FLAGS                11
+CONSTANT: SSL_CTRL_EXTRA_CHAIN_CERT         12
 
-: SSL_CTRL_SET_MSG_CALLBACK         13 ; inline
-: SSL_CTRL_SET_MSG_CALLBACK_ARG     14 ; inline
+CONSTANT: SSL_CTRL_SET_MSG_CALLBACK         13
+CONSTANT: SSL_CTRL_SET_MSG_CALLBACK_ARG     14
 
-: SSL_CTRL_SESS_NUMBER              20 ; inline
-: SSL_CTRL_SESS_CONNECT             21 ; inline
-: SSL_CTRL_SESS_CONNECT_GOOD        22 ; inline
-: SSL_CTRL_SESS_CONNECT_RENEGOTIATE 23 ; inline
-: SSL_CTRL_SESS_ACCEPT              24 ; inline
-: SSL_CTRL_SESS_ACCEPT_GOOD         25 ; inline
-: SSL_CTRL_SESS_ACCEPT_RENEGOTIATE  26 ; inline
-: SSL_CTRL_SESS_HIT                 27 ; inline
-: SSL_CTRL_SESS_CB_HIT              28 ; inline
-: SSL_CTRL_SESS_MISSES              29 ; inline
-: SSL_CTRL_SESS_TIMEOUTS            30 ; inline
-: SSL_CTRL_SESS_CACHE_FULL          31 ; inline
-: SSL_CTRL_OPTIONS                  32 ; inline
-: SSL_CTRL_MODE                     33 ; inline
+CONSTANT: SSL_CTRL_SESS_NUMBER              20
+CONSTANT: SSL_CTRL_SESS_CONNECT             21
+CONSTANT: SSL_CTRL_SESS_CONNECT_GOOD        22
+CONSTANT: SSL_CTRL_SESS_CONNECT_RENEGOTIATE 23
+CONSTANT: SSL_CTRL_SESS_ACCEPT              24
+CONSTANT: SSL_CTRL_SESS_ACCEPT_GOOD         25
+CONSTANT: SSL_CTRL_SESS_ACCEPT_RENEGOTIATE  26
+CONSTANT: SSL_CTRL_SESS_HIT                 27
+CONSTANT: SSL_CTRL_SESS_CB_HIT              28
+CONSTANT: SSL_CTRL_SESS_MISSES              29
+CONSTANT: SSL_CTRL_SESS_TIMEOUTS            30
+CONSTANT: SSL_CTRL_SESS_CACHE_FULL          31
+CONSTANT: SSL_CTRL_OPTIONS                  32
+CONSTANT: SSL_CTRL_MODE                     33
 
-: SSL_CTRL_GET_READ_AHEAD           40 ; inline
-: SSL_CTRL_SET_READ_AHEAD           41 ; inline
-: SSL_CTRL_SET_SESS_CACHE_SIZE      42 ; inline
-: SSL_CTRL_GET_SESS_CACHE_SIZE      43 ; inline
-: SSL_CTRL_SET_SESS_CACHE_MODE      44 ; inline
-: SSL_CTRL_GET_SESS_CACHE_MODE      45 ; inline
+CONSTANT: SSL_CTRL_GET_READ_AHEAD           40
+CONSTANT: SSL_CTRL_SET_READ_AHEAD           41
+CONSTANT: SSL_CTRL_SET_SESS_CACHE_SIZE      42
+CONSTANT: SSL_CTRL_GET_SESS_CACHE_SIZE      43
+CONSTANT: SSL_CTRL_SET_SESS_CACHE_MODE      44
+CONSTANT: SSL_CTRL_GET_SESS_CACHE_MODE      45
 
-: SSL_CTRL_GET_MAX_CERT_LIST        50 ; inline
-: SSL_CTRL_SET_MAX_CERT_LIST        51 ; inline
+CONSTANT: SSL_CTRL_GET_MAX_CERT_LIST        50
+CONSTANT: SSL_CTRL_SET_MAX_CERT_LIST        51
 
-: SSL_ERROR_NONE             0 ; inline
-: SSL_ERROR_SSL              1 ; inline
-: SSL_ERROR_WANT_READ        2 ; inline
-: SSL_ERROR_WANT_WRITE       3 ; inline
-: SSL_ERROR_WANT_X509_LOOKUP 4 ; inline
-: SSL_ERROR_SYSCALL          5 ; inline ! consult errno for details
-: SSL_ERROR_ZERO_RETURN      6 ; inline
-: SSL_ERROR_WANT_CONNECT     7 ; inline
-: SSL_ERROR_WANT_ACCEPT      8 ; inline
+CONSTANT: SSL_ERROR_NONE             0
+CONSTANT: SSL_ERROR_SSL              1
+CONSTANT: SSL_ERROR_WANT_READ        2
+CONSTANT: SSL_ERROR_WANT_WRITE       3
+CONSTANT: SSL_ERROR_WANT_X509_LOOKUP 4
+CONSTANT: SSL_ERROR_SYSCALL          5 ! consult errno for details
+CONSTANT: SSL_ERROR_ZERO_RETURN      6
+CONSTANT: SSL_ERROR_WANT_CONNECT     7
+CONSTANT: SSL_ERROR_WANT_ACCEPT      8
 
 ! Error messages table
 : error-messages ( -- hash )
@@ -157,8 +157,8 @@ FUNCTION: int SSL_read ( SSL* ssl, void* buf, int num ) ;
 
 FUNCTION: int SSL_shutdown ( SSL* ssl ) ;
 
-: SSL_SENT_SHUTDOWN 1 ;
-: SSL_RECEIVED_SHUTDOWN 2 ;
+CONSTANT: SSL_SENT_SHUTDOWN 1
+CONSTANT: SSL_RECEIVED_SHUTDOWN 2
 
 FUNCTION: int SSL_get_shutdown ( SSL* ssl ) ;
 
@@ -172,10 +172,10 @@ FUNCTION: void SSL_SESSION_free ( SSL_SESSION* ses ) ;
 
 FUNCTION: int SSL_want ( SSL* ssl ) ;
 
-: SSL_NOTHING 1 ; inline
-: SSL_WRITING 2 ; inline
-: SSL_READING 3 ; inline
-: SSL_X509_LOOKUP 4 ; inline
+CONSTANT: SSL_NOTHING 1
+CONSTANT: SSL_WRITING 2
+CONSTANT: SSL_READING 3
+CONSTANT: SSL_X509_LOOKUP 4
 
 FUNCTION: long SSL_get_verify_result ( SSL* ssl ) ;
 
@@ -199,10 +199,10 @@ FUNCTION: int SSL_CTX_load_verify_locations ( SSL_CTX* ctx, char* CAfile,
 
 FUNCTION: int SSL_CTX_set_default_verify_paths ( SSL_CTX* ctx ) ;
 
-: SSL_VERIFY_NONE 0 ; inline
-: SSL_VERIFY_PEER 1 ; inline
-: SSL_VERIFY_FAIL_IF_NO_PEER_CERT 2 ; inline
-: SSL_VERIFY_CLIENT_ONCE 4 ; inline
+CONSTANT: SSL_VERIFY_NONE 0
+CONSTANT: SSL_VERIFY_PEER 1
+CONSTANT: SSL_VERIFY_FAIL_IF_NO_PEER_CERT 2
+CONSTANT: SSL_VERIFY_CLIENT_ONCE 4
 
 FUNCTION: void SSL_CTX_set_verify ( SSL_CTX* ctx, int mode, void* callback ) ;
 
@@ -242,16 +242,16 @@ FUNCTION: void* BIO_f_ssl (  ) ;
 : SSL_CTX_set_session_cache_mode ( ctx mode -- n )
     [ SSL_CTRL_SET_SESS_CACHE_MODE ] dip f SSL_CTX_ctrl ;
 
-: SSL_SESS_CACHE_OFF                      HEX: 0000 ; inline
-: SSL_SESS_CACHE_CLIENT                   HEX: 0001 ; inline
-: SSL_SESS_CACHE_SERVER                   HEX: 0002 ; inline
+CONSTANT: SSL_SESS_CACHE_OFF    HEX: 0000
+CONSTANT: SSL_SESS_CACHE_CLIENT HEX: 0001
+CONSTANT: SSL_SESS_CACHE_SERVER HEX: 0002
 
 : SSL_SESS_CACHE_BOTH ( -- n )
     { SSL_SESS_CACHE_CLIENT SSL_SESS_CACHE_SERVER } flags ; inline
 
-: SSL_SESS_CACHE_NO_AUTO_CLEAR            HEX: 0080 ; inline
-: SSL_SESS_CACHE_NO_INTERNAL_LOOKUP       HEX: 0100 ; inline
-: SSL_SESS_CACHE_NO_INTERNAL_STORE        HEX: 0200 ; inline
+CONSTANT: SSL_SESS_CACHE_NO_AUTO_CLEAR      HEX: 0080
+CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_LOOKUP HEX: 0100
+CONSTANT: SSL_SESS_CACHE_NO_INTERNAL_STORE  HEX: 0200
 
 : SSL_SESS_CACHE_NO_INTERNAL ( -- n )
     { SSL_SESS_CACHE_NO_INTERNAL_LOOKUP SSL_SESS_CACHE_NO_INTERNAL_STORE } flags ; inline
@@ -282,8 +282,9 @@ H{ } clone verify-messages set-global
 : X509_V_:
     scan "X509_V_" prepend create-in
     scan-word
-    [ 1quotation define-inline ]
-    [ verify-messages get set-at ] 2bi ; parsing
+    [ 1quotation (( -- value )) define-inline ]
+    [ verify-messages get set-at ]
+    2bi ; parsing
 
 >>
 
@@ -333,4 +334,4 @@ X509_V_: ERR_APPLICATION_VERIFICATION 50
 ! obj_mac.h
 ! ===============================================
 
-: NID_commonName 13 ; inline
+CONSTANT: NID_commonName 13

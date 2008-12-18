@@ -245,7 +245,6 @@ M: no-method error.
     define ; parsing
 
 ! Definition protocol. We qualify core generics here
-USE: qualified
 QUALIFIED: syntax
 
 syntax:M: generic definer drop \ GENERIC: f ;

@@ -1,4 +1,4 @@
-USING: tools.test tools.vocabs.monitor io.files ;
+USING: tools.test tools.vocabs.monitor io.pathnames ;
 IN: tools.vocabs.monitor.tests
 
 [ "kernel" ] [ "core/kernel/kernel.factor" path>vocab ] unit-test

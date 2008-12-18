@@ -10,9 +10,8 @@ TUPLE: serial stream path baud
 
 ERROR: invalid-baud baud ;
 M: invalid-baud summary ( invalid-baud -- string )
-    "Baud rate "
-    swap baud>> number>string
-    " not supported" 3append ;
+    baud>> number>string
+    "Baud rate " " not supported" surround ;
 
 HOOK: lookup-baud os ( m -- n )
 HOOK: open-serial os ( serial -- stream )

@@ -46,7 +46,8 @@ M: real sqrt
 
 GENERIC# ^n 1 ( z w -- z^w )
 
-: (^n) 1 swap [ [ dupd * ] when [ sq ] dip ] each-bit nip ; inline
+: (^n) ( z w -- z^w )
+    1 swap [ [ dupd * ] when [ sq ] dip ] each-bit nip ; inline
 
 M: integer ^n
     [ factor-2s ] dip [ (^n) ] keep rot * shift ;

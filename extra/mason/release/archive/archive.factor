@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel combinators sequences make namespaces io.files
-io.launcher prettyprint arrays
-mason.common mason.platform mason.config ;
+USING: arrays combinators io.directories
+io.directories.hierarchy io.files io.launcher io.pathnames
+kernel make mason.common mason.config mason.platform namespaces
+prettyprint sequences ;
 IN: mason.release.archive
 
 : base-name ( -- string )

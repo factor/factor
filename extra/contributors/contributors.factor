@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.launcher io.styles io.encodings.ascii
-prettyprint io hashtables kernel sequences assocs system sorting
-math.parser sets ;
+USING: io.files io.launcher io.directories io.pathnames
+io.encodings.ascii io prettyprint hashtables kernel sequences
+assocs system sorting math.parser sets ;
 IN: contributors
 
 : changelog ( -- authors )

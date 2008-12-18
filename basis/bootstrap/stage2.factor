@@ -1,11 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors init namespaces words io
+USING: accessors init namespaces words words.symbol io
 kernel.private math memory continuations kernel io.files
-io.backend system parser vocabs sequences
+io.pathnames io.backend system parser vocabs sequences
 vocabs.loader combinators splitting source-files strings
-definitions assocs compiler.errors compiler.units
-math.parser generic sets command-line ;
+definitions assocs compiler.errors compiler.units math.parser
+generic sets command-line ;
 IN: bootstrap.stage2
 
 SYMBOL: core-bootstrap-time

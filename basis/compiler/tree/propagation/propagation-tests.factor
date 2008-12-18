@@ -640,6 +640,10 @@ MIXIN: empty-mixin
     [ { fixnum } declare log2 0 >= ] final-classes
 ] unit-test
 
+[ V{ POSTPONE: f } ] [
+    [ { word object } declare equal? ] final-classes
+] unit-test
+
 ! [ V{ string } ] [
 !     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
 ! ] unit-test

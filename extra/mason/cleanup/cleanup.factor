@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces arrays continuations io.files io.launcher
-mason.common mason.platform mason.config ;
+USING: arrays continuations io.directories
+io.directories.hierarchy io.files io.launcher kernel
+mason.common mason.config mason.platform namespaces ;
 IN: mason.cleanup
 
 : compress-image ( -- )

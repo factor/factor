@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences symbols fry words assocs linked-assocs tools.annotations
+USING: kernel sequences fry words assocs linked-assocs tools.annotations
 coroutines lexer parser quotations arrays namespaces continuations ;
 IN: advice
 

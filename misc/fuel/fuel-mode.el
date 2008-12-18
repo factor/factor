@@ -21,6 +21,7 @@
 (require 'fuel-debug)
 (require 'fuel-help)
 (require 'fuel-eval)
+(require 'fuel-completion)
 (require 'fuel-listener)
 
 
@@ -49,7 +50,7 @@ With prefix argument, ask for the file to run."
     (when buffer
       (with-current-buffer buffer
         (message "Compiling %s ..." file)
-        (fuel-eval--send (fuel-eval--cmd/string (format "%S fuel-run-file" file))
+        (fuel-eval--send `(:fuel (,file fuel-run-file))
                          `(lambda (r) (fuel--run-file-cont r ,file)))))))
 
 (defun fuel--run-file-cont (ret file)
@@ -65,15 +66,17 @@ With prefix argument, ask for the file to run."
 Unless called with a prefix, switchs to the compilation results
 buffer in case of errors."
   (interactive "r\nP")
-  (fuel-debug--display-retort
-   (fuel-eval--send/wait (fuel-eval--cmd/region begin end) 10000)
-   (format "%s%s"
-           (if fuel-syntax--current-vocab
-               (format "IN: %s " fuel-syntax--current-vocab)
-             "")
-           (fuel--shorten-region begin end 70))
-   arg
-   (buffer-file-name)))
+  (let* ((lines (split-string (buffer-substring-no-properties begin end)
+                              "[\f\n\r\v]+" t))
+         (cmd `(:fuel (,(mapcar (lambda (l) `(:factor ,l)) lines))))
+         (cv (fuel-syntax--current-vocab)))
+    (fuel-debug--display-retort
+     (fuel-eval--send/wait cmd 10000)
+     (format "%s%s"
+             (if cv (format "IN: %s " cv) "")
+             (fuel--shorten-region begin end 70))
+     arg
+     (buffer-file-name))))
 
 (defun fuel-eval-extended-region (begin end &optional arg)
   "Sends region extended outwards to nearest definitions,
@@ -97,29 +100,58 @@ buffer in case of errors."
       (unless (< begin end) (error "No evaluable definition around point"))
       (fuel-eval-region begin end arg))))
 
+(defun fuel--try-edit (ret)
+  (let* ((err (fuel-eval--retort-error ret))
+         (loc (fuel-eval--retort-result ret)))
+    (when (or err (not loc) (not (listp loc)) (not (stringp (car loc))))
+      (error "Couldn't find edit location for '%s'" word))
+    (unless (file-readable-p (car loc))
+      (error "Couldn't open '%s' for read" (car loc)))
+    (find-file-other-window (car loc))
+    (goto-line (if (numberp (cadr loc)) (cadr loc) 1))))
+
 (defun fuel-edit-word-at-point (&optional arg)
   "Opens a new window visiting the definition of the word at point.
 With prefix, asks for the word to edit."
   (interactive "P")
-  (let* ((word (fuel-syntax-symbol-at-point))
-         (ask (or arg (not word)))
-         (word (if ask
-                   (read-string nil
-                                (format "Edit word%s: "
-                                        (if word (format " (%s)" word) ""))
-                                word)
-                 word)))
-    (let* ((str (fuel-eval--cmd/string
-                 (format "\\ %s fuel-get-edit-location" word)))
-           (ret (fuel-eval--send/wait str))
-           (err (fuel-eval--retort-error ret))
-           (loc (fuel-eval--retort-result ret)))
-      (when (or err (not loc) (not (listp loc)) (not (stringp (car loc))))
-        (error "Couldn't find edit location for '%s'" word))
-      (unless (file-readable-p (car loc))
-        (error "Couldn't open '%s' for read" (car loc)))
-      (find-file-other-window (car loc))
-      (goto-line (if (numberp (cadr loc)) (cadr loc) 1)))))
+  (let* ((word (or (and (not arg) (fuel-syntax-symbol-at-point))
+                  (fuel-completion--read-word "Edit word: ")))
+         (cmd `(:fuel ((:quote ,word) fuel-get-edit-location))))
+    (condition-case nil
+        (fuel--try-edit (fuel-eval--send/wait cmd))
+      (error (fuel-edit-vocabulary nil word)))))
+
+(defvar fuel-mode--word-history nil)
+
+(defun fuel-edit-word (&optional arg)
+  "Asks for a word to edit, with completion.
+With prefix, only words visible in the current vocabulary are
+offered."
+  (interactive "P")
+  (let* ((word (fuel-completion--read-word "Edit word: "
+                                           nil
+                                           fuel-mode--word-history
+                                           arg))
+         (cmd `(:fuel ((:quote ,word) fuel-get-edit-location))))
+    (fuel--try-edit (fuel-eval--send/wait cmd))))
+
+(defvar fuel--vocabs-prompt-history nil)
+
+(defun fuel--read-vocabulary-name (refresh)
+  (let* ((vocabs (fuel-completion--vocabs refresh))
+         (prompt "Vocabulary name: "))
+    (if vocabs
+        (completing-read prompt vocabs nil t nil fuel--vocabs-prompt-history)
+      (read-string prompt nil fuel--vocabs-prompt-history))))
+
+(defun fuel-edit-vocabulary (&optional refresh vocab)
+  "Visits vocabulary file in Emacs.
+When called interactively, asks for vocabulary with completion.
+With prefix argument, refreshes cached vocabulary list."
+  (interactive "P")
+  (let* ((vocab (or vocab (fuel--read-vocabulary-name refresh)))
+         (cmd `(:fuel* (,vocab fuel-get-vocab-location) "fuel" t)))
+    (fuel--try-edit (fuel-eval--send/wait cmd))))
 
 
 ;;; Minor mode definition:
@@ -160,20 +192,19 @@ interacting with a factor listener is at your disposal.
   (define-key fuel-mode-map (vector '(control ?c) `(control ,p) `(control ,k)) c))
 
 (fuel-mode--key-1 ?z 'run-factor)
-
 (fuel-mode--key-1 ?k 'fuel-run-file)
-(fuel-mode--key ?e ?k 'fuel-run-file)
+(fuel-mode--key-1 ?r 'fuel-eval-region)
 
 (define-key fuel-mode-map "\C-\M-x" 'fuel-eval-definition)
-(fuel-mode--key ?e ?x 'fuel-eval-definition)
-
-(fuel-mode--key-1 ?r 'fuel-eval-region)
-(fuel-mode--key ?e ?r 'fuel-eval-region)
-
 (define-key fuel-mode-map "\C-\M-r" 'fuel-eval-extended-region)
-(fuel-mode--key ?e ?e 'fuel-eval-extended-region)
-
 (define-key fuel-mode-map "\M-." 'fuel-edit-word-at-point)
+(define-key fuel-mode-map (kbd "M-TAB") 'fuel-completion--complete-symbol)
+
+(fuel-mode--key ?e ?e 'fuel-eval-extended-region)
+(fuel-mode--key ?e ?r 'fuel-eval-region)
+(fuel-mode--key ?e ?v 'fuel-edit-vocabulary)
+(fuel-mode--key ?e ?w 'fuel-edit-word)
+(fuel-mode--key ?e ?x 'fuel-eval-definition)
 
 (fuel-mode--key ?d ?a 'fuel-autodoc-mode)
 (fuel-mode--key ?d ?d 'fuel-help)

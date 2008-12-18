@@ -1,11 +1,13 @@
 ! Copyright (C) 2008 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays classes classes.tuple compiler.units
-combinators continuations debugger definitions eval help
-io io.files io.streams.string kernel lexer listener listener.private
-make math namespaces parser prettyprint prettyprint.config
-quotations sequences strings source-files vectors vocabs.loader ;
+USING: accessors arrays assocs classes classes.tuple
+combinators compiler.units continuations debugger definitions
+eval help io io.files io.pathnames io.streams.string kernel
+lexer listener listener.private make math memoize namespaces
+parser prettyprint prettyprint.config quotations sequences sets
+sorting source-files strings tools.vocabs vectors vocabs
+vocabs.loader ;
 
 IN: fuel
 
@@ -87,6 +89,14 @@ SYMBOL: :restarts
 M: condition fuel-pprint
     [ error>> ] [ fuel-restarts ] bi 2array condition prefix fuel-pprint ;
 
+M: lexer-error fuel-pprint
+    {
+        [ line>> ]
+        [ column>> ]
+        [ line-text>> ]
+        [ fuel-restarts ]
+    } cleave 4array lexer-error prefix fuel-pprint ;
+
 M: source-file-error fuel-pprint
     [ file>> ] [ error>> ] bi 2array source-file-error prefix
     fuel-pprint ;
@@ -102,7 +112,7 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     error get
     fuel-eval-result get-global
     fuel-eval-output get-global
-    3array fuel-pprint ;
+    3array fuel-pprint flush nl "EOT:" write ;
 
 : fuel-forget-error ( -- ) f error set-global ; inline
 : fuel-forget-result ( -- ) f fuel-eval-result set-global ; inline
@@ -151,11 +161,37 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 : fuel-end-eval ( -- ) [ ] (fuel-end-eval) ; inline
 
 : fuel-get-edit-location ( defspec -- )
-    where [ first2 [ (normalize-path) ] dip 2array fuel-eval-set-result ]
-    when* ;
+    where [
+       first2 [ (normalize-path) ] dip 2array fuel-eval-set-result
+    ] when* ; inline
+
+: fuel-get-vocab-location ( vocab -- )
+    >vocab-link fuel-get-edit-location ; inline
+
+: (fuel-get-vocabs) ( -- seq )
+    all-vocabs-seq [ vocab-name ] map ; inline
+
+: fuel-get-vocabs ( -- )
+    (fuel-get-vocabs) fuel-eval-set-result ; inline
+
+MEMO: (fuel-vocab-words) ( name -- seq )
+    >vocab-link words [ name>> ] map ;
+
+: fuel-current-words ( -- seq )
+    use get [ keys ] map concat ; inline
+
+: fuel-vocabs-words ( names -- seq )
+    prune [ (fuel-vocab-words) ] map concat ; inline
+
+: (fuel-get-words) ( prefix names/f -- seq )
+    [ fuel-vocabs-words ] [ fuel-current-words ] if* natural-sort
+    swap [ drop-prefix nip length 0 = ] curry filter ;
+
+: fuel-get-words ( prefix names -- )
+    (fuel-get-words) fuel-eval-set-result ; inline
 
 : fuel-run-file ( path -- ) run-file ; inline
 
-: fuel-startup ( -- ) "listener" run ; inline
+: fuel-startup ( -- ) "listener" run-file ; inline
 
 MAIN: fuel-startup

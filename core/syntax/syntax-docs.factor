@@ -1,7 +1,7 @@
 USING: generic help.syntax help.markup kernel math parser words
 effects classes generic.standard classes.tuple generic.math
-generic.standard arrays io.files vocabs.loader io sequences
-assocs ;
+generic.standard arrays io.pathnames vocabs.loader io sequences
+assocs words.symbol words.alias words.constant ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
@@ -144,7 +144,7 @@ ARTICLE: "syntax-byte-arrays" "Byte array syntax"
 
 ARTICLE: "syntax-pathnames" "Pathname syntax"
 { $subsection POSTPONE: P" }
-"Pathnames are documented in " { $link "pathnames" } "." ;
+"Pathnames are documented in " { $link "io.pathnames" } "." ;
 
 ARTICLE: "syntax-literals" "Literals"
 "Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words."
@@ -344,7 +344,41 @@ HELP: SYMBOL:
 { $description "Defines a new symbol word in the current vocabulary. Symbols push themselves on the stack when executed, and are used to identify variables (see " { $link "namespaces" } ") as well as for storing crufties in word properties (see " { $link "word-props" } ")." }
 { $examples { $example "USE: prettyprint" "IN: scratchpad" "SYMBOL: foo\nfoo ." "foo" } } ;
 
-{ define-symbol POSTPONE: SYMBOL: } related-words
+{ define-symbol POSTPONE: SYMBOL: POSTPONE: SYMBOLS: } related-words
+
+HELP: SYMBOLS:
+{ $syntax "SYMBOLS: words... ;" }
+{ $values { "words" "a sequence of new words to define" } }
+{ $description "Creates a new symbol for every token until the " { $snippet ";" } "." }
+{ $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
+
+HELP: SINGLETONS:
+{ $syntax "SINGLETONS: words... ;" }
+{ $values { "words" "a sequence of new words to define" } }
+{ $description "Creates a new singleton for every token until the " { $snippet ";" } "." } ;
+
+HELP: ALIAS:
+{ $syntax "ALIAS: new-word existing-word" }
+{ $values { "new-word" word } { "existing-word" word } }
+{ $description "Creates a new inlined word that calls the existing word." }
+{ $examples
+    { $example "USING: prettyprint sequences ;"
+               "IN: alias.test"
+               "ALIAS: sequence-nth nth"
+               "0 { 10 20 30 } sequence-nth ."
+               "10"
+    }
+} ;
+
+{ define-alias POSTPONE: ALIAS: } related-words
+
+HELP: CONSTANT:
+{ $syntax "CONSTANT: word value" }
+{ $values { "word" word } { "value" object } }
+{ $description "Creates a word which pushes a value on the stack." }
+{ $examples { $code "CONSTANT: magic 1" "CONSTANT: science HEX: ff0f" } } ;
+
+{ define-constant POSTPONE: CONSTANT: } related-words
 
 HELP: \
 { $syntax "\\ word" }
@@ -375,6 +409,47 @@ HELP: USING:
 { $values { "vocabularies" "a list of vocabulary names" } }
 { $description "Adds a list of vocabularies to the front of the search path, with later vocabularies taking precedence." }
 { $errors "Throws an error if one of the vocabularies does not exist." } ;
+
+HELP: QUALIFIED:
+{ $syntax "QUALIFIED: vocab" }
+{ $description "Similar to " { $link POSTPONE: USE: } " but loads vocabulary with prefix." }
+{ $examples { $example
+    "USING: prettyprint qualified ;"
+    "QUALIFIED: math"
+    "1 2 math:+ ." "3"
+} } ;
+
+HELP: QUALIFIED-WITH:
+{ $syntax "QUALIFIED-WITH: vocab word-prefix" }
+{ $description "Works like " { $link POSTPONE: QUALIFIED: } " but uses " { $snippet "word-prefix" } " as prefix." }
+{ $examples { $code
+    "USING: prettyprint qualified ;"
+    "QUALIFIED-WITH: math m"
+    "1 2 m:+ ."
+    "3"
+} } ;
+
+HELP: FROM:
+{ $syntax "FROM: vocab => words ... ;" }
+{ $description "Imports " { $snippet "words" } " from " { $snippet "vocab" } "." }
+{ $examples { $code
+    "FROM: math.parser => bin> hex> ; ! imports only bin> and hex>" } } ;
+
+HELP: EXCLUDE:
+{ $syntax "EXCLUDE: vocab => words ... ;" }
+{ $description "Imports everything from " { $snippet "vocab" } " excluding " { $snippet "words" } "." }
+{ $examples { $code
+    "EXCLUDE: math.parser => bin> hex> ; ! imports everything but bin> and hex>" } } ;
+
+HELP: RENAME:
+{ $syntax "RENAME: word vocab => newname" }
+{ $description "Imports " { $snippet "word" } " from " { $snippet "vocab" } ", but renamed to " { $snippet "newname" } "." }
+{ $examples { $example
+    "USING: prettyprint qualified ;"
+    "RENAME: + math => -"
+    "2 3 - ."
+    "5"
+} } ;
 
 HELP: IN:
 { $syntax "IN: vocabulary" }

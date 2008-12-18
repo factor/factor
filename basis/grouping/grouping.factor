@@ -8,7 +8,8 @@ IN: grouping
 
 TUPLE: chunking-seq { seq read-only } { n read-only } ;
 
-: check-groups dup 0 <= [ "Invalid group count" throw ] when ; inline
+: check-groups ( n -- n )
+    dup 0 <= [ "Invalid group count" throw ] when ; inline
 
 : new-groups ( seq n class -- groups )
     [ check-groups ] dip boa ; inline

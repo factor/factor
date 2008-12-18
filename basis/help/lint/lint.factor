@@ -5,7 +5,8 @@ help.topics words strings classes tools.vocabs namespaces make
 io io.streams.string prettyprint definitions arrays vectors
 combinators combinators.short-circuit splitting debugger
 hashtables sorting effects vocabs vocabs.loader assocs editors
-continuations classes.predicate macros math sets eval ;
+continuations classes.predicate macros math sets eval
+vocabs.parser words.symbol ;
 IN: help.lint
 
 : check-example ( element -- )
@@ -43,9 +44,9 @@ IN: help.lint
 
 : check-values ( word element -- )
     {
+        [ drop { [ symbol? ] [ macro? ] [ parsing-word? ] } 1|| ]
         [ drop "declared-effect" word-prop not ]
         [ nip contains-funky-elements? ]
-        [ drop macro? ]
         [
             [ effect-values >array ]
             [ extract-values >array ]
@@ -59,7 +60,7 @@ IN: help.lint
     ] each ;
 
 : vocab-exists? ( name -- ? )
-    dup vocab swap "all-vocabs" get member? or ;
+    [ vocab ] [ "all-vocabs" get member? ] bi or ;
 
 : check-modules ( element -- )
     \ $vocab-link swap elements [

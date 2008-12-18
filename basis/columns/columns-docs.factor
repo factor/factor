@@ -4,8 +4,8 @@ IN: columns
 HELP: column
 { $class-description "A virtual sequence which presents a fixed column of a matrix represented as a sequence of rows. New instances can be created by calling " { $link <column> } "." } ;
 
-HELP: <column> ( seq n -- column )
-{ $values { "seq" sequence } { "n" "a non-negative integer" } { "column" column } }
+HELP: <column>
+{ $values { "seq" sequence } { "col" "a non-negative integer" } { "column" column } }
 { $description "Outputs a new virtual sequence which presents a fixed column of a matrix represented as a sequence of rows." "The " { $snippet "i" } "th element of a column is the " { $snippet "n" } "th element of the " { $snippet "i" } "th element of " { $snippet "seq" } ". Every element of " { $snippet "seq" } " must be a sequence, and all sequences must have equal length." }
 { $examples
     { $example

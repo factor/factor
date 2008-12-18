@@ -78,9 +78,9 @@ SYMBOL: dpi
 
 72 dpi set-global
 
-: ft-floor -6 shift ; inline
+: ft-floor ( m -- n ) -6 shift ; inline
 
-: ft-ceil 63 + -64 bitand -6 shift ; inline
+: ft-ceil ( m -- n ) 63 + -64 bitand -6 shift ; inline
 
 : font-units>pixels ( n font -- n )
     face-size face-size-y-scale FT_MulFix ;

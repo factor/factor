@@ -119,6 +119,7 @@
       (setq fuel-debug--last-ret ret)
       (setq fuel-debug--file file)
       (goto-char (point-max))
+      (font-lock-fontify-buffer)
       (when (and err (not no-pop)) (pop-to-buffer fuel-debug--buffer))
       (not err))))
 
@@ -130,7 +131,7 @@
          (trail (and last (substring-no-properties last (/ llen 2))))
          (err (fuel-eval--retort-error ret))
          (p (point)))
-    (save-excursion (insert current))
+    (when current (save-excursion (insert current)))
     (when (and (> clen llen) (> llen 0) (search-forward trail nil t))
       (delete-region p (point)))
     (goto-char (point-max))
@@ -214,7 +215,7 @@
              (buffer (if file (find-file-noselect file) (current-buffer))))
         (with-current-buffer buffer
           (fuel-debug--display-retort
-           (fuel-eval--send/wait (fuel-eval--cmd/string (format ":%s" n)))
+           (fuel-eval--send/wait `(:fuel ((:factor ,(format ":%s" n)))))
            (format "Restart %s (%s) successful" n (nth (1- n) rs))))))))
 
 (defun fuel-debug-show--compiler-info (info)
@@ -224,7 +225,7 @@
       (error "%s information not available" info))
     (message "Retrieving %s info ..." info)
     (unless (fuel-debug--display-retort
-             (fuel-eval--send/wait (fuel-eval--cmd/string info))
+             (fuel-eval--send/wait `(:fuel ((:factor ,info))))
              "" (fuel-debug--buffer-file))
       (error "Sorry, no %s info available" info))))
 
@@ -253,13 +254,14 @@ invoking restarts as needed.
 \\{fuel-debug-mode-map}"
   (interactive)
   (kill-all-local-variables)
+  (buffer-disable-undo)
   (setq major-mode 'factor-mode)
   (setq mode-name "Fuel Debug")
   (use-local-map fuel-debug-mode-map)
   (fuel-debug--font-lock-setup)
   (setq fuel-debug--file nil)
   (setq fuel-debug--last-ret nil)
-  (toggle-read-only 1)
+  (setq buffer-read-only t)
   (run-hooks 'fuel-debug-mode-hook))
 
 

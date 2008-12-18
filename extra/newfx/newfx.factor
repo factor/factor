@@ -1,5 +1,5 @@
 
-USING: kernel sequences assocs qualified circular sets fry sequences.lib ;
+USING: kernel sequences assocs circular sets fry sequences.lib ;
 
 USING: math multi-methods ;
 

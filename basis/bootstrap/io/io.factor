@@ -1,12 +1,11 @@
 USING: system vocabs vocabs.loader kernel combinators
-namespaces sequences io.backend ;
+namespaces sequences io.backend accessors ;
 IN: bootstrap.io
 
 "bootstrap.compiler" vocab [
-    "io." {
+    "io.backend." {
         { [ "io-backend" get ] [ "io-backend" get ] }
-        { [ os unix? ] [ "unix" ] }
+        { [ os unix? ] [ "unix." os name>> append ] }
         { [ os winnt? ] [ "windows.nt" ] }
-        { [ os wince? ] [ "windows.ce" ] }
     } cond append require
 ] when

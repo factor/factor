@@ -150,7 +150,7 @@ HELP: input
     { $code "\"2 3 + .\" dup <input> write-object nl" }
 } ;
 
-HELP: <input> ( string -- input )
+HELP: <input>
 { $values { "string" string } { "input" input } }
 { $description "Creates a new " { $link input } "." } ;
 

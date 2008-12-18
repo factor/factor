@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: checksums checksums.openssl splitting assocs
 kernel io.files bootstrap.image sequences io namespaces make
-io.launcher math io.encodings.ascii ;
+io.launcher math io.encodings.ascii io.files.temp io.pathnames
+io.directories ;
 IN: bootstrap.image.upload
 
 SYMBOL: upload-images-destination

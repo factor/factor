@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: serialize sequences concurrency.messaging threads io
 io.servers.connection io.encodings.binary
-qualified arrays namespaces kernel accessors ;
+arrays namespaces kernel accessors ;
 FROM: io.sockets => host-name <inet> with-client ;
 IN: concurrency.distributed
 

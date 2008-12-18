@@ -1,6 +1,6 @@
 ! Copyback (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors math qualified ;
+USING: kernel accessors math ;
 QUALIFIED: sequences
 IN: persistent.deques
 

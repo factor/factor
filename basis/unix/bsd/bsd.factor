@@ -3,28 +3,28 @@
 USING: alien.syntax combinators system vocabs.loader ;
 IN: unix
 
-: MAXPATHLEN 1024 ; inline
+CONSTANT: MAXPATHLEN 1024
 
-: O_RDONLY   HEX: 0000 ; inline
-: O_WRONLY   HEX: 0001 ; inline
-: O_RDWR     HEX: 0002 ; inline
-: O_NONBLOCK HEX: 0004 ; inline
-: O_APPEND   HEX: 0008 ; inline
-: O_CREAT    HEX: 0200 ; inline
-: O_TRUNC    HEX: 0400 ; inline
-: O_EXCL     HEX: 0800 ; inline
-: O_NOCTTY   HEX: 20000 ; inline
-: O_NDELAY O_NONBLOCK ; inline
+CONSTANT: O_RDONLY   HEX: 0000
+CONSTANT: O_WRONLY   HEX: 0001
+CONSTANT: O_RDWR     HEX: 0002
+CONSTANT: O_NONBLOCK HEX: 0004
+CONSTANT: O_APPEND   HEX: 0008
+CONSTANT: O_CREAT    HEX: 0200
+CONSTANT: O_TRUNC    HEX: 0400
+CONSTANT: O_EXCL     HEX: 0800
+CONSTANT: O_NOCTTY   HEX: 20000
+ALIAS: O_NDELAY O_NONBLOCK
 
-: SOL_SOCKET HEX: ffff ; inline
-: SO_REUSEADDR HEX: 4 ; inline
-: SO_OOBINLINE HEX: 100 ; inline
-: SO_SNDTIMEO HEX: 1005 ; inline
-: SO_RCVTIMEO HEX: 1006 ; inline
+CONSTANT: SOL_SOCKET HEX: ffff
+CONSTANT: SO_REUSEADDR HEX: 4
+CONSTANT: SO_OOBINLINE HEX: 100
+CONSTANT: SO_SNDTIMEO HEX: 1005
+CONSTANT: SO_RCVTIMEO HEX: 1006
 
-: F_SETFD 2 ; inline
-: F_SETFL 4 ; inline
-: FD_CLOEXEC 1 ; inline
+CONSTANT: F_SETFD 2
+CONSTANT: F_SETFL 4
+CONSTANT: FD_CLOEXEC 1
 
 C-STRUCT: sockaddr-in
     { "uchar" "len" }
@@ -59,29 +59,29 @@ C-STRUCT: passwd
     { "time_t" "pw_expire" }
     { "int"    "pw_fields" } ;
 
-: max-un-path 104 ; inline
+CONSTANT: max-un-path 104
 
-: SOCK_STREAM 1 ; inline
-: SOCK_DGRAM 2 ; inline
+CONSTANT: SOCK_STREAM 1
+CONSTANT: SOCK_DGRAM 2
 
-: AF_UNSPEC 0 ; inline
-: AF_UNIX 1 ; inline
-: AF_INET 2 ; inline
-: AF_INET6 30 ; inline
+CONSTANT: AF_UNSPEC 0
+CONSTANT: AF_UNIX 1
+CONSTANT: AF_INET 2
+CONSTANT: AF_INET6 30
 
-: PF_UNSPEC AF_UNSPEC ; inline
-: PF_UNIX AF_UNIX ; inline
-: PF_INET AF_INET ; inline
-: PF_INET6 AF_INET6 ; inline
+ALIAS: PF_UNSPEC AF_UNSPEC
+ALIAS: PF_UNIX AF_UNIX
+ALIAS: PF_INET AF_INET
+ALIAS: PF_INET6 AF_INET6
 
-: IPPROTO_TCP 6 ; inline
-: IPPROTO_UDP 17 ; inline
+CONSTANT: IPPROTO_TCP 6
+CONSTANT: IPPROTO_UDP 17
 
-: AI_PASSIVE 1 ; inline
+CONSTANT: AI_PASSIVE 1
 
-: SEEK_SET 0 ; inline
-: SEEK_CUR 1 ; inline
-: SEEK_END 2 ; inline
+CONSTANT: SEEK_SET 0
+CONSTANT: SEEK_CUR 1
+CONSTANT: SEEK_END 2
 
 os {
     { macosx  [ "unix.bsd.macosx"  require ] }

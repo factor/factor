@@ -3,8 +3,7 @@
 USING: accessors arrays definitions generic io kernel assocs
 hashtables namespaces make parser prettyprint sequences strings
 io.styles vectors words math sorting splitting classes slots
-vocabs help.stylesheet help.topics vocabs.loader alias
-quotations ;
+vocabs help.stylesheet help.topics vocabs.loader quotations ;
 IN: help.markup
 
 ! Simple markup language.

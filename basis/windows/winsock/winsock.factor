@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax arrays
 byte-arrays kernel math sequences windows.types windows.kernel32
-windows.errors windows math.bitwise alias io.encodings.utf16n ;
+windows.errors windows math.bitwise io.encodings.utf16n ;
 IN: windows.winsock
 
 USE: libc
@@ -14,95 +14,95 @@ TYPEDEF: void* SOCKET
 : <wsadata> ( -- byte-array )
     HEX: 190 <byte-array> ;
 
-: SOCK_STREAM    1 ; inline
-: SOCK_DGRAM     2 ; inline
-: SOCK_RAW       3 ; inline
-: SOCK_RDM       4 ; inline
-: SOCK_SEQPACKET 5 ; inline
+CONSTANT: SOCK_STREAM    1
+CONSTANT: SOCK_DGRAM     2
+CONSTANT: SOCK_RAW       3
+CONSTANT: SOCK_RDM       4
+CONSTANT: SOCK_SEQPACKET 5
 
-: SO_DEBUG       HEX:   1 ; inline
-: SO_ACCEPTCONN  HEX:   2 ; inline
-: SO_REUSEADDR   HEX:   4 ; inline
-: SO_KEEPALIVE   HEX:   8 ; inline
-: SO_DONTROUTE   HEX:  10 ; inline
-: SO_BROADCAST   HEX:  20 ; inline
-: SO_USELOOPBACK HEX:  40 ; inline
-: SO_LINGER      HEX:  80 ; inline
-: SO_OOBINLINE   HEX: 100 ; inline
-: SO_DONTLINGER SO_LINGER bitnot ; inline
+CONSTANT: SO_DEBUG       HEX:   1
+CONSTANT: SO_ACCEPTCONN  HEX:   2
+CONSTANT: SO_REUSEADDR   HEX:   4
+CONSTANT: SO_KEEPALIVE   HEX:   8
+CONSTANT: SO_DONTROUTE   HEX:  10
+CONSTANT: SO_BROADCAST   HEX:  20
+CONSTANT: SO_USELOOPBACK HEX:  40
+CONSTANT: SO_LINGER      HEX:  80
+CONSTANT: SO_OOBINLINE   HEX: 100
+: SO_DONTLINGER ( -- n ) SO_LINGER bitnot ; inline
 
-: SO_SNDBUF     HEX: 1001 ; inline
-: SO_RCVBUF     HEX: 1002 ; inline
-: SO_SNDLOWAT   HEX: 1003 ; inline
-: SO_RCVLOWAT   HEX: 1004 ; inline
-: SO_SNDTIMEO   HEX: 1005 ; inline
-: SO_RCVTIMEO   HEX: 1006 ; inline
-: SO_ERROR      HEX: 1007 ; inline
-: SO_TYPE       HEX: 1008 ; inline
+CONSTANT: SO_SNDBUF     HEX: 1001
+CONSTANT: SO_RCVBUF     HEX: 1002
+CONSTANT: SO_SNDLOWAT   HEX: 1003
+CONSTANT: SO_RCVLOWAT   HEX: 1004
+CONSTANT: SO_SNDTIMEO   HEX: 1005
+CONSTANT: SO_RCVTIMEO   HEX: 1006
+CONSTANT: SO_ERROR      HEX: 1007
+CONSTANT: SO_TYPE       HEX: 1008
 
-: TCP_NODELAY   HEX:    1 ; inline
+CONSTANT: TCP_NODELAY   HEX:    1
 
-: AF_UNSPEC      0 ; inline
-: AF_UNIX        1 ; inline
-: AF_INET        2 ; inline
-: AF_IMPLINK     3 ; inline
-: AF_PUP         4 ; inline
-: AF_CHAOS       5 ; inline
-: AF_NS          6 ; inline
-: AF_ISO         7 ; inline
-: AF_OSI    AF_ISO ; inline
-: AF_ECMA        8 ; inline
-: AF_DATAKIT     9 ; inline
-: AF_CCITT      10 ; inline
-: AF_SNA        11 ; inline
-: AF_DECnet     12 ; inline
-: AF_DLI        13 ; inline
-: AF_LAT        14 ; inline
-: AF_HYLINK     15 ; inline
-: AF_APPLETALK  16 ; inline
-: AF_NETBIOS    17 ; inline
-: AF_MAX        18 ; inline
-: AF_INET6      23 ; inline
-: AF_IRDA       26 ; inline
-: AF_BTM        32 ; inline
+CONSTANT: AF_UNSPEC      0
+CONSTANT: AF_UNIX        1
+CONSTANT: AF_INET        2
+CONSTANT: AF_IMPLINK     3
+CONSTANT: AF_PUP         4
+CONSTANT: AF_CHAOS       5
+CONSTANT: AF_NS          6
+CONSTANT: AF_ISO         7
+ALIAS: AF_OSI    AF_ISO
+CONSTANT: AF_ECMA        8
+CONSTANT: AF_DATAKIT     9
+CONSTANT: AF_CCITT      10
+CONSTANT: AF_SNA        11
+CONSTANT: AF_DECnet     12
+CONSTANT: AF_DLI        13
+CONSTANT: AF_LAT        14
+CONSTANT: AF_HYLINK     15
+CONSTANT: AF_APPLETALK  16
+CONSTANT: AF_NETBIOS    17
+CONSTANT: AF_MAX        18
+CONSTANT: AF_INET6      23
+CONSTANT: AF_IRDA       26
+CONSTANT: AF_BTM        32
 
-: PF_UNSPEC      0 ; inline
-: PF_LOCAL       1 ; inline
-: PF_INET        2 ; inline
-: PF_INET6      23 ; inline
+CONSTANT: PF_UNSPEC      0
+CONSTANT: PF_LOCAL       1
+CONSTANT: PF_INET        2
+CONSTANT: PF_INET6      23
 
-: AI_PASSIVE     1 ; inline
-: AI_CANONNAME   2 ; inline
-: AI_NUMERICHOST 4 ; inline
+CONSTANT: AI_PASSIVE     1
+CONSTANT: AI_CANONNAME   2
+CONSTANT: AI_NUMERICHOST 4
 : AI_MASK ( -- n ) { AI_PASSIVE AI_CANONNAME AI_NUMERICHOST } flags ;
 
-: NI_NUMERICHOST 1 ;
-: NI_NUMERICSERV 2 ;
+CONSTANT: NI_NUMERICHOST 1
+CONSTANT: NI_NUMERICSERV 2
 
-: IPPROTO_TCP    6 ; inline
-: IPPROTO_UDP   17 ; inline
-: IPPROTO_RM   113 ; inline
+CONSTANT: IPPROTO_TCP    6
+CONSTANT: IPPROTO_UDP   17
+CONSTANT: IPPROTO_RM   113
 
-: WSA_FLAG_OVERLAPPED 1 ; inline
-: WSA_WAIT_EVENT_0 WAIT_OBJECT_0 ; inline
-: WSA_MAXIMUM_WAIT_EVENTS MAXIMUM_WAIT_OBJECTS ; inline
-: WSA_INVALID_EVENT f ; inline
-: WSA_WAIT_FAILED -1 ; inline
-: WSA_WAIT_IO_COMPLETION WAIT_IO_COMPLETION ; inline
-: WSA_WAIT_TIMEOUT WAIT_TIMEOUT ; inline
-: WSA_INFINITE INFINITE ; inline
-: WSA_IO_PENDING ERROR_IO_PENDING ; inline
+CONSTANT: WSA_FLAG_OVERLAPPED 1
+ALIAS: WSA_WAIT_EVENT_0 WAIT_OBJECT_0
+ALIAS: WSA_MAXIMUM_WAIT_EVENTS MAXIMUM_WAIT_OBJECTS
+CONSTANT: WSA_INVALID_EVENT f
+CONSTANT: WSA_WAIT_FAILED -1
+ALIAS: WSA_WAIT_IO_COMPLETION WAIT_IO_COMPLETION
+ALIAS: WSA_WAIT_TIMEOUT WAIT_TIMEOUT
+ALIAS: WSA_INFINITE INFINITE
+ALIAS: WSA_IO_PENDING ERROR_IO_PENDING
 
-: INADDR_ANY 0 ; inline
+CONSTANT: INADDR_ANY 0
 
-: INVALID_SOCKET -1 <alien> ; inline
-: SOCKET_ERROR -1 ; inline
+: INVALID_SOCKET ( -- alien ) -1 <alien> ; inline
+CONSTANT: SOCKET_ERROR -1
 
-: SD_RECV 0 ; inline
-: SD_SEND 1 ; inline
-: SD_BOTH 2 ; inline
+CONSTANT: SD_RECV 0
+CONSTANT: SD_SEND 1
+CONSTANT: SD_BOTH 2
 
-: SOL_SOCKET HEX: ffff ; inline
+CONSTANT: SOL_SOCKET HEX: ffff
 
 ! TYPEDEF: uint in_addr_t
 ! C-STRUCT: in_addr
@@ -206,7 +206,7 @@ C-STRUCT: QOS
     { "WSABUF" "ProviderSpecific" } ;
 TYPEDEF: QOS* LPQOS
 
-: MAX_PROTOCOL_CHAIN 7 ; inline
+CONSTANT: MAX_PROTOCOL_CHAIN 7
 
 C-STRUCT: WSAPROTOCOLCHAIN
     { "int" "ChainLen" }
@@ -214,7 +214,7 @@ C-STRUCT: WSAPROTOCOLCHAIN
     { { "DWORD" 7 } "ChainEntries" } ;
 TYPEDEF: WSAPROTOCOLCHAIN* LPWSAPROTOCOLCHAIN
 
-: WSAPROTOCOL_LEN 255 ; inline
+CONSTANT: WSAPROTOCOL_LEN 255
 
 C-STRUCT: WSAPROTOCOL_INFOW
     { "DWORD" "dwServiceFlags1" }
@@ -386,7 +386,7 @@ LIBRARY: mswsock
 FUNCTION: int AcceptEx ( void* listen, void* accept, void* out-buf, int recv-len, int addr-len, int remote-len, void* out-len, void* overlapped ) ;
 FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, void* f, void* g, void* h ) ;
 
-: SIO_GET_EXTENSION_FUNCTION_POINTER -939524090 ; inline
+CONSTANT: SIO_GET_EXTENSION_FUNCTION_POINTER -939524090
 
 : WSAID_CONNECTEX ( -- GUID )
     "GUID" <c-object>

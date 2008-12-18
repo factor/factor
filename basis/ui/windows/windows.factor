@@ -8,7 +8,7 @@ make sequences strings vectors words windows.kernel32
 windows.gdi32 windows.user32 windows.opengl32 windows.messages
 windows.types windows.nt windows threads libc combinators fry
 combinators.short-circuit continuations command-line shuffle
-opengl ui.render ascii math.bitwise locals symbols accessors
+opengl ui.render ascii math.bitwise locals accessors
 math.geometry.rect math.order ascii calendar io.encodings.utf16n
 ;
 IN: ui.windows
@@ -172,10 +172,10 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
         { 27 "ESC" }
     } ;
 
-: exclude-key-wm-keydown? ( n -- bool )
+: exclude-key-wm-keydown? ( n -- ? )
     exclude-keys-wm-keydown key? ;
 
-: exclude-key-wm-char? ( n -- bool )
+: exclude-key-wm-char? ( n -- ? )
     exclude-keys-wm-char key? ;
 
 : keystroke>gesture ( n -- mods sym )
