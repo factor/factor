@@ -3,7 +3,7 @@
 USING: alien.c-types alien.syntax combinators continuations
 io.encodings.string io.encodings.utf8 kernel sequences strings
 unix calendar system accessors unix.time calendar.unix
-vocabs.loader constants ;
+vocabs.loader ;
 IN: unix.utmpx
 
 CONSTANT: EMPTY 0

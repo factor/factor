@@ -61,7 +61,7 @@ IN: heaps.tests
         random-alist
         <min-heap> [ heap-push-all ] keep
         dup data>> clone swap
-    ] keep 3 /i [ 2dup >r delete-random r> heap-delete ] times
+    ] keep 3 /i [ 2dup [ delete-random ] dip heap-delete ] times
     data>>
     [ [ key>> ] map ] bi@
     [ natural-sort ] bi@ ;

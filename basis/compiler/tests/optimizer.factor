@@ -248,12 +248,12 @@ USE: binary-search.private
 
 : lift-loop-tail-test-1 ( a quot -- )
     over even? [
-        [ >r 3 - r> call ] keep lift-loop-tail-test-1
+        [ [ 3 - ] dip call ] keep lift-loop-tail-test-1
     ] [
         over 0 < [
             2drop
         ] [
-            [ >r 2 - r> call ] keep lift-loop-tail-test-1
+            [ [ 2 - ] dip call ] keep lift-loop-tail-test-1
         ] if
     ] if ; inline
 
@@ -290,7 +290,7 @@ HINTS: recursive-inline-hang-3 array ;
 
 ! Wow
 : counter-example ( a b c d -- a' b' c' d' )
-    dup 0 > [ 1 - >r rot 2 * r> counter-example ] when ; inline
+    dup 0 > [ 1 - [ rot 2 * ] dip counter-example ] when ; inline
 
 : counter-example' ( -- a' b' c' d' )
     1 2 3.0 3 counter-example ;
@@ -330,7 +330,7 @@ PREDICATE: list < improper-list
 [ 0 5 ] [ 0 interval-inference-bug ] unit-test
 
 : aggressive-flush-regression ( a -- b )
-    f over >r <array> drop r> 1 + ;
+    f over [ <array> drop ] dip 1 + ;
 
 [ 1.0 aggressive-flush-regression drop ] must-fail
 

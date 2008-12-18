@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax constants ;
+USING: alien.syntax ;
 IN: unix.statfs.freebsd
 
 CONSTANT: MFSNAMELEN      16            ! length of type name including null */

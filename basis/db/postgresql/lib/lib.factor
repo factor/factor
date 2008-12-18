@@ -6,7 +6,7 @@ db.types tools.walker ascii splitting math.parser combinators
 libc shuffle calendar.format byte-arrays destructors prettyprint
 accessors strings serialize io.encodings.binary io.encodings.utf8
 alien.strings io.streams.byte-array summary present urls
-specialized-arrays.uint specialized-arrays.alien ;
+specialized-arrays.uint specialized-arrays.alien db.private ;
 IN: db.postgresql.lib
 
 : postgresql-result-error-message ( res -- str/f )
@@ -24,7 +24,7 @@ IN: db.postgresql.lib
     "\n" split [ [ blank? ] trim ] map "\n" join ;
 
 : postgresql-error-message ( -- str )
-    db get handle>> (postgresql-error-message) ;
+    db-connection get handle>> (postgresql-error-message) ;
 
 : postgresql-error ( res -- res )
     dup [ postgresql-error-message throw ] unless ;
@@ -44,7 +44,7 @@ M: postgresql-result-null summary ( obj -- str )
     dup PQstatus zero? [ (postgresql-error-message) throw ] unless ;
 
 : do-postgresql-statement ( statement -- res )
-    db get handle>> swap sql>> PQexec dup postgresql-result-ok? [
+    db-connection get handle>> swap sql>> PQexec dup postgresql-result-ok? [
         [ postgresql-result-error-message ] [ PQclear ] bi throw
     ] unless ;
 
@@ -99,7 +99,7 @@ M: postgresql-result-null summary ( obj -- str )
 
 : do-postgresql-bound-statement ( statement -- res )
     [
-        [ db get handle>> ] dip
+        [ db-connection get handle>> ] dip
         {
             [ sql>> ]
             [ bind-params>> length ]

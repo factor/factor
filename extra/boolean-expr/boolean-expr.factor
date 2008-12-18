@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes kernel sequences sets
-io prettyprint multi-methods symbols ;
+io prettyprint multi-methods ;
 IN: boolean-expr
 
 ! Demonstrates the use of Unicode symbols in source files, and

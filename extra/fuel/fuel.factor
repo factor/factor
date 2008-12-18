@@ -6,8 +6,8 @@ combinators compiler.units continuations debugger definitions
 eval help io io.files io.pathnames io.streams.string kernel
 lexer listener listener.private make math memoize namespaces
 parser prettyprint prettyprint.config quotations sequences sets
-sorting source-files strings summary tools.vocabs vectors
-vocabs vocabs.loader ;
+sorting source-files strings tools.vocabs vectors vocabs
+vocabs.loader vocabs.parser ;
 
 IN: fuel
 

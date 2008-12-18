@@ -3,20 +3,20 @@
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
 math.parser io prettyprint db.types continuations
-destructors mirrors sets db.types ;
+destructors mirrors sets db.types db.private ;
 IN: db.tuples
 
-HOOK: create-sql-statement db ( class -- object )
-HOOK: drop-sql-statement db ( class -- object )
+HOOK: create-sql-statement db-connection ( class -- object )
+HOOK: drop-sql-statement db-connection ( class -- object )
 
-HOOK: <insert-db-assigned-statement> db ( class -- object )
-HOOK: <insert-user-assigned-statement> db ( class -- object )
-HOOK: <update-tuple-statement> db ( class -- object )
-HOOK: <delete-tuples-statement> db ( tuple class -- object )
-HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
-HOOK: <count-statement> db ( query -- statement )
-HOOK: query>statement db ( query -- statement )
-HOOK: insert-tuple-set-key db ( tuple statement -- )
+HOOK: <insert-db-assigned-statement> db-connection ( class -- object )
+HOOK: <insert-user-assigned-statement> db-connection ( class -- object )
+HOOK: <update-tuple-statement> db-connection ( class -- object )
+HOOK: <delete-tuples-statement> db-connection ( tuple class -- object )
+HOOK: <select-by-slots-statement> db-connection ( tuple class -- tuple )
+HOOK: <count-statement> db-connection ( query -- statement )
+HOOK: query>statement db-connection ( query -- statement )
+HOOK: insert-tuple-set-key db-connection ( tuple statement -- )
 
 <PRIVATE
 
@@ -52,12 +52,14 @@ GENERIC: eval-generator ( singleton -- object )
 
 : insert-db-assigned-statement ( tuple -- )
     dup class
-    db get insert-statements>> [ <insert-db-assigned-statement> ] cache
+    db-connection get insert-statements>>
+    [ <insert-db-assigned-statement> ] cache
     [ bind-tuple ] 2keep insert-tuple-set-key ;
 
 : insert-user-assigned-statement ( tuple -- )
     dup class
-    db get insert-statements>> [ <insert-user-assigned-statement> ] cache
+    db-connection get insert-statements>>
+    [ <insert-user-assigned-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
 : do-select ( exemplar-tuple statement -- tuples )
@@ -117,7 +119,7 @@ M: tuple >query <query> swap >>tuple ;
 
 : update-tuple ( tuple -- )
     dup class
-    db get update-statements>> [ <update-tuple-statement> ] cache
+    db-connection get update-statements>> [ <update-tuple-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
 : delete-tuples ( tuple -- )

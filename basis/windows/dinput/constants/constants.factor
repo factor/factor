@@ -1,6 +1,6 @@
 USING: windows.dinput windows.kernel32 windows.ole32 windows.com
 windows.com.syntax alien alien.c-types alien.syntax kernel system namespaces
-combinators sequences symbols fry math accessors macros words quotations
+combinators sequences fry math accessors macros words quotations
 libc continuations generalizations splitting locals assocs init
 struct-arrays ;
 IN: windows.dinput.constants

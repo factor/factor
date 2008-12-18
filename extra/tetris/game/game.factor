@@ -88,7 +88,7 @@ TUPLE: tetris
 : tetris-move ( tetris move -- ? )
     #! moves the piece if possible, returns whether the piece was moved
     2dup can-move? [
-        >r current-piece r> move-piece drop t
+        [ current-piece ] dip move-piece drop t
     ] [
         2drop f
     ] if ;

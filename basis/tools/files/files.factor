@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators io io.files io.files.info
 io.directories kernel math.parser sequences system vocabs.loader
-calendar math symbols fry prettyprint ;
+calendar math fry prettyprint ;
 IN: tools.files
 
 <PRIVATE

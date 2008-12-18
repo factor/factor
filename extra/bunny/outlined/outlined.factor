@@ -2,7 +2,7 @@ USING: arrays bunny.model bunny.cel-shaded continuations
 destructors kernel math multiline opengl opengl.shaders
 opengl.framebuffers opengl.gl opengl.demo-support fry
 opengl.capabilities sequences ui.gadgets combinators accessors
-macros ;
+macros locals ;
 IN: bunny.outlined
 
 STRING: outlined-pass1-fragment-shader-main-source
@@ -143,19 +143,17 @@ TUPLE: bunny-outlined
         pass1-program pass2-program f f f f f bunny-outlined boa
     ] [ drop f ] if ;
 
-: (framebuffer-texture) ( dim iformat xformat -- texture )
-    swapd >r >r >r
+:: (framebuffer-texture) ( dim iformat xformat -- texture )
     GL_TEXTURE0 glActiveTexture
     gen-texture GL_TEXTURE_2D over glBindTexture
     GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP glTexParameteri
     GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP glTexParameteri
     GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_NEAREST glTexParameteri
     GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_NEAREST glTexParameteri
-    GL_TEXTURE_2D 0 r> r> first2 0 r> GL_UNSIGNED_BYTE f glTexImage2D ;
+    GL_TEXTURE_2D 0 iformat dim first2 0 xformat GL_UNSIGNED_BYTE f glTexImage2D ;
 
-: (attach-framebuffer-texture) ( texture attachment -- )
-    swap >r >r
-    GL_FRAMEBUFFER_EXT r> GL_TEXTURE_2D r> 0 glFramebufferTexture2DEXT
+:: (attach-framebuffer-texture) ( texture attachment -- )
+    GL_FRAMEBUFFER_EXT attachment GL_TEXTURE_2D texture 0 glFramebufferTexture2DEXT
     gl-error ;
 
 : (make-framebuffer) ( color-texture normal-texture depth-texture -- framebuffer )

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel math namespaces sequences
 io.backend io.binary combinators system vocabs.loader
-summary math.bitwise byte-vectors fry byte-arrays ;
+summary math.bitwise byte-vectors fry byte-arrays
+math.ranges ;
 IN: random
 
 SYMBOL: system-random-generator
@@ -50,6 +51,9 @@ PRIVATE>
     [ f ] [
         [ length random-integer ] keep nth
     ] if-empty ;
+
+: randomize ( seq -- seq' )
+    dup length 1 (a,b] [ dup random pick exchange ] each ;
 
 : delete-random ( seq -- elt )
     [ length random-integer ] keep [ nth ] 2keep delete-nth ;

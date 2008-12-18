@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax kernel windows.types alias constants ;
+USING: alien alien.syntax kernel windows.types ;
 IN: windows.kernel32
 
 CONSTANT: MAX_PATH 260
@@ -986,8 +986,6 @@ FUNCTION: DWORD GetFileType ( HANDLE hFile ) ;
 ! FUNCTION: GetFullPathNameA
 FUNCTION: DWORD GetFullPathNameW ( LPCTSTR lpFileName, DWORD nBufferLength, LPTSTR lpBuffer, LPTSTR* lpFilePart ) ;
 ALIAS: GetFullPathName GetFullPathNameW
-
-!  clear "license.txt" 32768 "char[32768]" <c-object> f over >r GetFullPathName r> swap 2 * head >string .
 
 ! FUNCTION: GetGeoInfoA
 ! FUNCTION: GetGeoInfoW

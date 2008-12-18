@@ -7,7 +7,6 @@ USING: kernel byte-arrays combinators strings arrays sequences splitting
        accessors
        combinators.cleave
        newfx
-       symbols
        ;
 
 IN: dns
@@ -414,11 +413,12 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
         [ 6 + get-double ]
       }
         2cleave
-      >r >r >r
-      get-question-section r>
-      get-rr-section       r>
-      get-rr-section       r>
-      get-rr-section
+      {
+        [ get-question-section ]
+        [ get-rr-section ]
+        [ get-rr-section ]
+        [ get-rr-section ]
+      } spread
       2drop
     ]
   }
@@ -426,7 +426,7 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 
 : ba->message ( ba -- message ) parse-message ;
 
-: with-message-bytes ( ba quot -- ) >r ba->message r> call message->ba ; inline
+: with-message-bytes ( ba quot -- ) [ ba->message ] dip call message->ba ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

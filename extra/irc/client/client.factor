@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Bruno Deferrari, Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: concurrency.mailboxes kernel io.sockets io.encodings.8-bit calendar
-       accessors destructors namespaces io assocs arrays qualified fry
+       accessors destructors namespaces io assocs arrays fry
        continuations threads strings classes combinators splitting hashtables
        ascii irc.messages ;
 RENAME: join sequences => sjoin

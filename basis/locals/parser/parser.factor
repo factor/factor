@@ -3,7 +3,7 @@
 USING: accessors arrays combinators effects.parser
 generic.parser kernel lexer locals.errors
 locals.rewrite.closures locals.types make namespaces parser
-quotations sequences splitting words ;
+quotations sequences splitting words vocabs.parser ;
 IN: locals.parser
 
 : make-local ( name -- word )

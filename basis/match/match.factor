@@ -47,7 +47,7 @@ MACRO: match-cond ( assoc -- )
     [ "Fall-through in match-cond" throw ]
     [
         first2
-        >r [ dupd match ] curry r>
+        [ [ dupd match ] curry ] dip
         [ bind ] curry rot
         [ ?if ] 2curry append
     ] reduce ;

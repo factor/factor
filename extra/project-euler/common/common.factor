@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make math math.functions math.matrices math.miller-rabin
     math.order math.parser math.primes.factors math.ranges math.ratios
-    sequences sequences.lib sorting strings unicode.case ;
+    sequences sorting strings unicode.case ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -42,7 +42,7 @@ IN: project-euler.common
     [ over rest rot first2 max rot + ] map nip ;
 
 : (sum-divisors) ( n -- sum )
-    dup sqrt >fixnum [1,b] [
+    dup sqrt >integer [1,b] [
         [ 2dup mod 0 = [ 2dup / + , ] [ drop ] if ] each
         dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
     ] { } make sum ;
@@ -56,7 +56,7 @@ PRIVATE>
     >lower [ CHAR: a - 1+ ] sigma ;
 
 : cartesian-product ( seq1 seq2 -- seq1xseq2 )
-    swap [ swap [ 2array ] map-with ] map-with concat ;
+    swap [ swap [ 2array ] with map ] with map concat ;
 
 : log10 ( m -- n )
     log 10 log / ;

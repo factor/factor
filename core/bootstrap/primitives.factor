@@ -380,12 +380,11 @@ tuple
     { "over" "kernel" }
     { "pick" "kernel" }
     { "swap" "kernel" }
-    { ">r" "kernel" }
-    { "r>" "kernel" }
     { "eq?" "kernel" }
     { "tag" "kernel.private" }
     { "slot" "slots.private" }
     { "get-local" "locals.backend" }
+    { "load-local" "locals.backend" }
     { "drop-locals" "locals.backend" }
 } [ make-sub-primitive ] assoc-each
 

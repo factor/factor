@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Patrick Mauritz.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: unix
-USING: alien.syntax system kernel layouts constants ;
+USING: alien.syntax system kernel layouts ;
 
 ! Solaris.
 

@@ -3,7 +3,7 @@
 USING: arrays combinators kernel io io.encodings.binary io.files
 io.streams.byte-array math.vectors strings sequences namespaces
 make math parser sequences assocs grouping vectors io.binary
-hashtables symbols math.bitwise checksums checksums.common
+hashtables math.bitwise checksums checksums.common
 checksums.stream ;
 IN: checksums.sha1
 

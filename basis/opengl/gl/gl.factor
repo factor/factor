@@ -4,7 +4,7 @@
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 
 USING: alien alien.syntax combinators kernel parser sequences
-system words opengl.gl.extensions alias constants ;
+system words opengl.gl.extensions ;
 
 IN: opengl.gl
 
