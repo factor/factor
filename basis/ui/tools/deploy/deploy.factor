@@ -11,7 +11,7 @@ IN: ui.tools.deploy
 TUPLE: deploy-gadget < pack vocab settings ;
 
 : bundle-name ( parent -- parent )
-    deploy-name get <field>
+    deploy-name get <model-field>
     "Executable name:" label-on-left add-gadget ;
 
 : deploy-ui ( parent -- parent )

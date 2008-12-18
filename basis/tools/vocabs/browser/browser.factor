@@ -11,42 +11,32 @@ IN: tools.vocabs.browser
 
 : vocab-status-string ( vocab -- string )
     {
-        { [ dup not ] [ drop "" ] }
+        { [ dup vocab not ] [ drop "" ] }
         { [ dup vocab-main ] [ drop "[Runnable]" ] }
         [ drop "[Loaded]" ]
     } cond ;
 
-: write-status ( vocab -- )
-    vocab vocab-status-string write ;
+: vocab-row ( vocab -- row )
+    [ <$link> ] [ vocab-status-string ] [ vocab-summary ] tri
+    3array ;
 
-: vocab. ( vocab -- )
-    [
-        [ [ write-status ] with-cell ]
-        [ [ ($link) ] with-cell ]
-        [ [ vocab-summary write ] with-cell ] tri
-    ] with-row ;
+: vocab-headings ( -- headings )
+    {
+        { $strong "Vocabulary" }
+        { $strong "State" }
+        { $strong "Summary" }
+    } ;
 
-: vocab-headings. ( -- )
-    [
-        [ "State" write ] with-cell
-        [ "Vocabulary" write ] with-cell
-        [ "Summary" write ] with-cell
-    ] with-row ;
-
-: root-heading. ( root -- )
+: root-heading ( root -- )
     [ "Children from " prepend ] [ "Children" ] if*
     $heading ;
 
-: $vocabs ( assoc -- )
+: $vocabs ( seq -- )
+    [ vocab-row ] map vocab-headings prefix $table ;
+
+: $vocab-roots ( assoc -- )
     [
-        [ drop ] [
-            [ root-heading. ]
-            [
-                standard-table-style [
-                    vocab-headings. [ vocab. ] each
-                ] ($grid)
-            ] bi*
-        ] if-empty
+        [ drop ] [ [ root-heading ] [ $vocabs ] bi* ] if-empty
     ] assoc-each ;
 
 TUPLE: vocab-tag name ;
@@ -74,7 +64,7 @@ C: <vocab-author> vocab-author
     ] unless-empty ;
 
 : describe-children ( vocab -- )
-    vocab-name all-child-vocabs $vocabs ;
+    vocab-name all-child-vocabs $vocab-roots ;
 
 : describe-files ( vocab -- )
     vocab-files [ <pathname> ] map [
@@ -94,7 +84,7 @@ C: <vocab-author> vocab-author
         [
             [ <$link> ]
             [ superclass <$link> ]
-            [ "slots" word-prop [ name>> ] map " " join \ $snippet swap 2array ]
+            [ "slots" word-prop [ name>> ] map " " join <$snippet> ]
             tri 3array
         ] map
         { { $strong "Class" } { $strong "Superclass" } { $strong "Slots" } } prefix
@@ -161,24 +151,24 @@ C: <vocab-author> vocab-author
         "Parsing words" $subheading
         [
             [ <$link> ]
-            [ word-syntax dup [ \ $snippet swap 2array ] when ]
+            [ word-syntax dup [ <$snippet> ] when ]
             bi 2array
         ] map
         { { $strong "Word" } { $strong "Syntax" } } prefix
         $table
     ] unless-empty ;
 
+: words-table ( words -- )
+    [
+        [ <$link> ]
+        [ stack-effect dup [ effect>string <$snippet> ] when ]
+        bi 2array
+    ] map
+    { { $strong "Word" } { $strong "Stack effect" } } prefix
+    $table ;
+
 : (describe-words) ( words heading -- )
-    '[
-        _ $subheading
-        [
-            [ <$link> ]
-            [ stack-effect dup [ effect>string \ $snippet swap 2array ] when ]
-            bi 2array
-        ] map
-        { { $strong "Word" } { $strong "Stack effect" } } prefix
-        $table
-    ] unless-empty ;
+    '[ _ $subheading words-table ] unless-empty ;
 
 : describe-generics ( words -- )
     "Generic words" (describe-words) ;
@@ -201,8 +191,8 @@ C: <vocab-author> vocab-author
         [ <$link> 1array ] map $table
     ] unless-empty ;
 
-: describe-words ( vocab -- )
-    words [
+: $words ( words -- )
+    [
         "Words" $heading
 
         natural-sort
@@ -229,7 +219,7 @@ C: <vocab-author> vocab-author
 
 : words. ( vocab -- )
     last-element off
-    vocab-name describe-words ;
+    words $words ;
 
 : describe-metadata ( vocab -- )
     [
@@ -239,11 +229,11 @@ C: <vocab-author> vocab-author
     ] { } make
     [ "Meta-data" $heading $table ] unless-empty ;
 
-: $describe-vocab ( element -- )
+: $vocab ( element -- )
     first {
         [ describe-help ]
         [ describe-metadata ]
-        [ describe-words ]
+        [ words $words ]
         [ describe-files ]
         [ describe-children ]
     } cleave ;
@@ -262,10 +252,10 @@ C: <vocab-author> vocab-author
     [ vocab-authors ] keyed-vocabs ;
 
 : $tagged-vocabs ( element -- )
-    first tagged $vocabs ;
+    first tagged $vocab-roots ;
 
 : $authored-vocabs ( element -- )
-    first authored $vocabs ;
+    first authored $vocab-roots ;
 
 : $all-tags ( element -- )
     drop "Tags" $heading all-tags $tags ;
@@ -282,7 +272,7 @@ M: vocab-spec article-title vocab-name " vocabulary" append ;
 M: vocab-spec article-name vocab-name ;
 
 M: vocab-spec article-content
-    vocab-name \ $describe-vocab swap 2array ;
+    vocab-name \ $vocab swap 2array ;
 
 M: vocab-spec article-parent drop "vocab-index" ;
 

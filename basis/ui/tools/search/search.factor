@@ -3,12 +3,12 @@
 USING: accessors assocs help help.topics io.pathnames io.styles
 kernel models models.delay models.filter namespaces prettyprint
 quotations sequences sorting source-files definitions strings
-tools.completion tools.crossref classes.tuple vocabs words
-vocabs.loader tools.vocabs unicode.case calendar locals
-ui.tools.interactor ui.tools.listener ui.tools.workspace
-ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.lists
-ui.gadgets.scrollers ui.gadgets.tracks ui.gadgets.borders
-ui.gestures ui.operations ui ;
+tools.completion tools.apropos tools.crossref classes.tuple
+vocabs words vocabs.loader tools.vocabs unicode.case calendar
+locals fry ui.tools.interactor ui.tools.listener
+ui.tools.workspace ui.commands ui.gadgets ui.gadgets.editors
+ui.gadgets.lists ui.gadgets.scrollers ui.gadgets.tracks
+ui.gadgets.borders ui.gestures ui.operations ui ;
 IN: ui.tools.search
 
 TUPLE: live-search < track field list ;
@@ -55,7 +55,10 @@ search-field H{
 
 : init-search-model ( live-search seq limited? -- live-search )
     [ 2drop ]
-    [ [ limited-completions ] [ completions ] ? curry <search-model> ] 3bi
+    [
+        [ limited-completions ] [ completions ] ?
+        '[ _ @ [ first ] map ] <search-model>
+    ] 3bi
     >>model ; inline
 
 : <search-list> ( presenter live-search -- list )
@@ -84,9 +87,6 @@ M: live-search pref-dim* drop { 400 200 } ;
 : <definition-search> ( string words limited? -- gadget )
     [ definition-candidates ] dip [ synopsis ] <live-search> ;
 
-: word-candidates ( words -- candidates )
-    [ dup name>> >lower ] { } map>assoc ;
-
 : <word-search> ( string words limited? -- gadget )
     [ word-candidates ] dip [ synopsis ] <live-search> ;
 
@@ -103,10 +103,6 @@ M: live-search pref-dim* drop { 400 200 } ;
     [ "" swap smart-usage f <definition-search> ]
     [ "Words and methods using " swap name>> append ]
     bi show-titled-popup ;
-
-: help-candidates ( seq -- candidates )
-    [ dup >link swap article-title >lower ] { } map>assoc
-    sort-values ;
 
 : <help-search> ( string -- gadget )
     all-articles help-candidates
@@ -134,9 +130,6 @@ M: live-search pref-dim* drop { 400 200 } ;
     [ "Source files in " swap vocab-name append ]
     bi show-titled-popup ;
 
-: vocab-candidates ( -- candidates )
-    all-vocabs-seq [ dup vocab-name >lower ] { } map>assoc ;
-
 : <vocab-search> ( string -- gadget )
     vocab-candidates f [ vocab-name ] <live-search> ;
 
@@ -145,7 +138,7 @@ M: live-search pref-dim* drop { 400 200 } ;
     "Vocabulary search" show-titled-popup ;
 
 : history-candidates ( seq -- candidates )
-    [ dup <input> swap >lower ] { } map>assoc ;
+    [ [ <input> ] [ >lower ] bi ] { } map>assoc ;
 
 : <history-search> ( string seq -- gadget )
     history-candidates

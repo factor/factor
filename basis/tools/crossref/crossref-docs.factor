@@ -3,7 +3,6 @@ IN: tools.crossref
 
 ARTICLE: "tools.crossref" "Cross-referencing tools" 
 { $subsection usage. }
-{ $subsection apropos }
 { $see-also "definitions" "words" see see-methods } ;
 
 ABOUT: "tools.crossref"
@@ -14,7 +13,3 @@ HELP: usage.
 { $examples { $code "\\ reverse usage." } } ;
 
 { usage usage. } related-words
-
-HELP: apropos
-{ $values { "str" "a string" } }
-{ $description "Lists all words whose name contains a subsequence equal to " { $snippet "str" } ". Results are ranked using a simple distance algorithm." } ;

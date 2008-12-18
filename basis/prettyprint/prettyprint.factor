@@ -234,15 +234,6 @@ M: pathname synopsis* pprint* ;
 
 M: word summary synopsis ;
 
-: synopsis-alist ( definitions -- alist )
-    [ dup synopsis swap ] { } map>assoc ;
-
-: definitions. ( alist -- )
-    [ write-object nl ] assoc-each ;
-
-: sorted-definitions. ( definitions -- )
-    synopsis-alist sort-keys definitions. ;
-
 GENERIC: declarations. ( obj -- )
 
 M: object declarations. drop ;

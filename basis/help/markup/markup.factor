@@ -355,4 +355,7 @@ M: array elements*
     ] H{ } make-assoc keys ;
 
 : <$link> ( topic -- element )
-    \ $link swap 2array ;
+    1array \ $link prefix ;
+
+: <$snippet> ( str -- element )
+    1array \ $snippet prefix ;

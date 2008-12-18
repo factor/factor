@@ -81,15 +81,11 @@ M: interactor model-changed
 : interactor-continue ( obj interactor -- )
     mailbox>> mailbox-put ;
 
-: clear-input ( interactor -- )
-    #! The with-datastack is a kludge to make it infer. Stupid.
-    model>> 1array [ clear-doc ] with-datastack drop ;
-
 : interactor-finish ( interactor -- )
     [ editor-string ] keep
     [ interactor-input. ] 2keep
     [ add-interactor-history ] keep
-    clear-input ;
+    clear-editor ;
 
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
@@ -181,5 +177,5 @@ M: interactor stream-read-quot
 
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }
-    { T{ key-down f { C+ } "k" } clear-input }
+    { T{ key-down f { C+ } "k" } clear-editor }
 } define-command-map

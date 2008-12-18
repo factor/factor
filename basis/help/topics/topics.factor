@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.x
 USING: accessors arrays definitions generic assocs
 io kernel namespaces make prettyprint prettyprint.sections
@@ -21,7 +21,7 @@ PREDICATE: word-link < link name>> word? ;
 M: link summary
     [
         "Link: " %
-        name>> dup word? [ summary ] [ unparse ] if %
+        name>> dup word? [ summary ] [ unparse-short ] if %
     ] "" make ;
 
 ! Help articles
