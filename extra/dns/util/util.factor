@@ -1,14 +1,12 @@
 
-USING: kernel sequences sorting math math.order macros bake bake.fry ;
+USING: kernel sequences sorting math math.order macros fry ;
 
 IN: dns.util
 
 : tri-chain ( obj p q r -- x y z )
-  >r >r call dup r> call dup r> call ; inline
+  [ [ call dup ] dip call dup ] dip call ; inline
 
-MACRO: 1if ( test then else -- ) '[ dup @ , , if ] ;
-
-! : 1if ( test then else -- ) >r >r >r dup r> call r> r> if ; inline ;
+MACRO: 1if ( test then else -- ) '[ dup @ _ _ if ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -1,8 +1,8 @@
 
 USING: kernel combinators sequences sets math threads namespaces continuations
        debugger io io.sockets unicode.case accessors destructors
-       combinators.cleave combinators.lib combinators.short-circuit 
-       newfx bake bake.fry
+       combinators.cleave combinators.short-circuit 
+       newfx fry
        dns dns.util dns.misc ;
 
 IN: dns.server
@@ -204,5 +204,5 @@ DEFER: query->rrs
   [ receive-packet handle-request ] [ receive-loop ] bi ;
 
 : loop ( addr-spec -- )
-  [ <datagram> '[ , [ receive-loop ] with-disposal ] try ] [ loop ] bi ;
+  [ <datagram> '[ _ [ receive-loop ] with-disposal ] try ] [ loop ] bi ;
 
