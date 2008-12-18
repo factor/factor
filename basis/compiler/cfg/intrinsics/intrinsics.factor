@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: qualified words sequences kernel combinators
-cpu.architecture
+USING: words sequences kernel combinators cpu.architecture
 compiler.cfg.hats
 compiler.cfg.instructions
 compiler.cfg.intrinsics.alien

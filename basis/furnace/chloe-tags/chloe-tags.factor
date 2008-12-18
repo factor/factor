@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel combinators assocs
 namespaces sequences splitting words
-fry urls multiline present qualified
+fry urls multiline present
 xml
 xml.data
 xml.entities

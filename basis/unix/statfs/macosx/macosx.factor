@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types io.encodings.utf8 io.encodings.string
 kernel sequences unix.stat accessors unix combinators math
-grouping system alien.strings math.bitwise alien.syntax
-alias constants ;
+grouping system alien.strings math.bitwise alien.syntax ;
 IN: unix.statfs.macosx
 
 CONSTANT: MNT_RDONLY  HEX: 00000001

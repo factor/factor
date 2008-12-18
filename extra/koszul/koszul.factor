@@ -3,7 +3,7 @@
 USING: accessors arrays assocs hashtables assocs io kernel math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
-splitting sorting shuffle symbols sets math.order ;
+splitting sorting shuffle sets math.order ;
 IN: koszul
 
 ! Utilities

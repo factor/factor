@@ -1,4 +1,3 @@
-USING: kernel constants ;
 IN: windows.errors 
 
 CONSTANT: ERROR_SUCCESS 0

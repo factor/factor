@@ -4,7 +4,7 @@ USING: kernel assocs match fry accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
 prettyprint prettyprint.backend prettyprint.custom
 prettyprint.sections math words combinators
-combinators.short-circuit io sorting hints qualified
+combinators.short-circuit io sorting hints
 compiler.tree
 compiler.tree.recursive
 compiler.tree.normalization

@@ -1,4 +1,4 @@
-USING: arrays accessors continuations kernel symbols system
+USING: arrays accessors continuations kernel system
 combinators.lib sequences namespaces init vocabs vocabs.loader
 combinators ;
 IN: game-input

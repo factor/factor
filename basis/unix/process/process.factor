@@ -1,6 +1,6 @@
 USING: kernel alien.c-types alien.strings sequences math alien.syntax unix
 vectors kernel namespaces continuations threads assocs vectors
-io.backend.unix io.encodings.utf8 unix.utilities constants ;
+io.backend.unix io.encodings.utf8 unix.utilities ;
 IN: unix.process
 
 ! Low-level Unix process launching utilities. These are used

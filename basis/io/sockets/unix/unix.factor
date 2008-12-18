@@ -5,7 +5,7 @@ namespaces threads sequences byte-arrays io.ports
 io.binary io.backend.unix io.streams.duplex
 io.backend io.ports io.pathnames io.files.private
 io.encodings.utf8 math.parser continuations libc combinators
-system accessors qualified destructors unix locals init ;
+system accessors destructors unix locals init ;
 
 EXCLUDE: io => read write close ;
 EXCLUDE: io.sockets => accept ;

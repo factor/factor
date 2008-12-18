@@ -502,3 +502,54 @@ DEFER: blah
 [ ] [ f lexer set f file set "Hello world" note. ] unit-test
 
 [ "CHAR: \\u9999999999999" eval ] must-fail
+
+SYMBOLS: a b c ;
+
+[ a ] [ a ] unit-test
+[ b ] [ b ] unit-test
+[ c ] [ c ] unit-test
+
+DEFER: blah
+
+[ ] [ "IN: symbols.tests GENERIC: blah" eval ] unit-test
+[ ] [ "IN: symbols.tests USE: symbols SYMBOLS: blah ;" eval ] unit-test
+
+[ f ] [ \ blah generic? ] unit-test
+[ t ] [ \ blah symbol? ] unit-test
+
+[ "IN: symbols.tests USE: symbols SINGLETONS: blah blah blah ;" eval ]
+[ error>> error>> def>> \ blah eq? ]
+must-fail-with
+
+IN: qualified.tests.foo
+: x 1 ;
+: y 5 ;
+IN: qualified.tests.bar
+: x 2 ;
+: y 4 ;
+IN: qualified.tests.baz
+: x 3 ;
+
+QUALIFIED: qualified.tests.foo
+QUALIFIED: qualified.tests.bar
+[ 1 2 3 ] [ qualified.tests.foo:x qualified.tests.bar:x x ] unit-test
+
+QUALIFIED-WITH: qualified.tests.bar p
+[ 2 ] [ p:x ] unit-test
+
+RENAME: x qualified.tests.baz => y
+[ 3 ] [ y ] unit-test
+
+FROM: qualified.tests.baz => x ;
+[ 3 ] [ x ] unit-test
+[ 3 ] [ y ] unit-test
+
+EXCLUDE: qualified.tests.bar => x ;
+[ 3 ] [ x ] unit-test
+[ 4 ] [ y ] unit-test
+
+[ "USE: qualified IN: qualified.tests FROM: qualified.tests => doesnotexist ;" eval ]
+[ error>> no-word-error? ] must-fail-with
+
+[ "USE: qualified IN: qualified.tests RENAME: doesnotexist qualified.tests => blah" eval ]
+[ error>> no-word-error? ] must-fail-with

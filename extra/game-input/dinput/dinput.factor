@@ -1,4 +1,4 @@
-USING: windows.dinput windows.dinput.constants parser symbols
+USING: windows.dinput windows.dinput.constants parser
 alien.c-types windows.ole32 namespaces assocs kernel arrays
 vectors windows.kernel32 windows.com windows.dinput shuffle
 windows.user32 windows.messages sequences combinators locals

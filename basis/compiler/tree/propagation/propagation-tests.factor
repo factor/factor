@@ -641,7 +641,7 @@ MIXIN: empty-mixin
 ] unit-test
 
 [ V{ POSTPONE: f } ] [
-    [ { word object } declare eq? ] final-classes
+    [ { word object } declare equal? ] final-classes
 ] unit-test
 
 ! [ V{ string } ] [

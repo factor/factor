@@ -2,7 +2,7 @@ USING: accessors alien alien.c-types arrays byte-arrays combinators
 combinators.short-circuit fry kernel locals macros
 math math.blas.cblas math.blas.vectors math.blas.vectors.private
 math.complex math.functions math.order functors words
-sequences sequences.merged sequences.private shuffle symbols
+sequences sequences.merged sequences.private shuffle
 specialized-arrays.direct.float specialized-arrays.direct.double
 specialized-arrays.float specialized-arrays.double ;
 IN: math.blas.matrices

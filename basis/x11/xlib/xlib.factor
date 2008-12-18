@@ -13,7 +13,7 @@
 
 USING: kernel arrays alien alien.c-types alien.strings
 alien.syntax math math.bitwise words sequences namespaces
-continuations io io.encodings.ascii alias ;
+continuations io io.encodings.ascii ;
 IN: x11.xlib
 
 LIBRARY: xlib

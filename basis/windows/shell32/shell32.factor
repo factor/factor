@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.strings alien.syntax
 combinators io.encodings.utf16n io.files io.pathnames kernel
 windows windows.com windows.com.syntax windows.ole32
-windows.user32 constants alias ;
+windows.user32 ;
 IN: windows.shell32
 
 CONSTANT: CSIDL_DESKTOP HEX: 00
