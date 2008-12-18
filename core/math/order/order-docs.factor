@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel math quotations
-math.private words ;
+math.private words words.symbol ;
 IN: math.order
 
 HELP: <=>

@@ -7,7 +7,7 @@ eval help io io.files io.pathnames io.streams.string kernel
 lexer listener listener.private make math memoize namespaces
 parser prettyprint prettyprint.config quotations sequences sets
 sorting source-files strings tools.vocabs vectors vocabs
-vocabs.loader ;
+vocabs.loader vocabs.parser ;
 
 IN: fuel
 

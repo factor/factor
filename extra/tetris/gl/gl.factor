@@ -20,7 +20,7 @@ IN: tetris.gl
 
 ! TODO: move implementation specific stuff into tetris-board
 : (draw-row) ( x y row -- )
-    >r over r> nth dup
+    [ over ] dip nth dup
     [ gl-color 2array draw-block ] [ 3drop ] if ;
 
 : draw-row ( y row -- )

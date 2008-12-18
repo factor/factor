@@ -1,4 +1,4 @@
-USING: alien.syntax constants ;
+USING: alien.syntax ;
 IN: unix.kqueue
 
 C-STRUCT: kevent

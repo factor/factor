@@ -8,7 +8,7 @@ make sequences strings vectors words windows.kernel32
 windows.gdi32 windows.user32 windows.opengl32 windows.messages
 windows.types windows.nt windows threads libc combinators fry
 combinators.short-circuit continuations command-line shuffle
-opengl ui.render ascii math.bitwise locals symbols accessors
+opengl ui.render ascii math.bitwise locals accessors
 math.geometry.rect math.order ascii calendar io.encodings.utf16n
 ;
 IN: ui.windows

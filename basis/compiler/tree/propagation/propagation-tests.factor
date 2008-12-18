@@ -18,7 +18,7 @@ IN: compiler.tree.propagation.tests
 
 [ V{ fixnum } ] [ [ 1 ] final-classes ] unit-test
 
-[ V{ fixnum } ] [ [ 1 >r r> ] final-classes ] unit-test
+[ V{ fixnum } ] [ [ 1 [ ] dip ] final-classes ] unit-test
 
 [ V{ fixnum object } ] [ [ 1 swap ] final-classes ] unit-test
 
@@ -198,7 +198,7 @@ IN: compiler.tree.propagation.tests
     [
         { fixnum byte-array } declare
         [ nth-unsafe ] 2keep [ nth-unsafe ] 2keep nth-unsafe
-        >r >r 298 * r> 100 * - r> 208 * - 128 + -8 shift
+        [ [ 298 * ] dip 100 * - ] dip 208 * - 128 + -8 shift
         255 min 0 max
     ] final-classes
 ] unit-test
@@ -641,7 +641,7 @@ MIXIN: empty-mixin
 ] unit-test
 
 [ V{ POSTPONE: f } ] [
-    [ { word object } declare eq? ] final-classes
+    [ { word object } declare equal? ] final-classes
 ] unit-test
 
 ! [ V{ string } ] [

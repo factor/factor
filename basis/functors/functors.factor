@@ -3,7 +3,8 @@
 USING: kernel quotations classes.tuple make combinators generic
 words interpolate namespaces sequences io.streams.string fry
 classes.mixin effects lexer parser classes.tuple.parser
-effects.parser locals.types locals.parser locals.rewrite.closures ;
+effects.parser locals.types locals.parser
+locals.rewrite.closures vocabs.parser ;
 IN: functors
 
 : scan-param ( -- obj )

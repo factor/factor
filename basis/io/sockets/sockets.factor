@@ -6,7 +6,7 @@ sequences arrays io.encodings io.ports io.streams.duplex
 io.encodings.ascii alien.strings io.binary accessors destructors
 classes byte-arrays system combinators parser
 alien.c-types math.parser splitting grouping math assocs summary
-system vocabs.loader combinators present fry ;
+system vocabs.loader combinators present fry vocabs.parser ;
 IN: io.sockets
 
 << {

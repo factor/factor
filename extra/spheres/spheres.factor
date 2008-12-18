@@ -154,8 +154,7 @@ M: spheres-gadget distance-step ( gadget -- dz )
 
 : (make-reflection-framebuffer) ( depthbuffer -- framebuffer )
     gen-framebuffer dup [
-        swap >r
-        GL_FRAMEBUFFER_EXT GL_DEPTH_ATTACHMENT_EXT GL_RENDERBUFFER_EXT r>
+        swap [ GL_FRAMEBUFFER_EXT GL_DEPTH_ATTACHMENT_EXT GL_RENDERBUFFER_EXT ] dip
         glFramebufferRenderbufferEXT
     ] with-framebuffer ;
 
@@ -244,10 +243,10 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
     [ drop dup [ -+ ] bi@ ] 2keep ;
 
 : (reflection-face) ( gadget face -- )
-    swap reflection-texture>> >r >r
-    GL_FRAMEBUFFER_EXT
-    GL_COLOR_ATTACHMENT0_EXT
-    r> r> 0 glFramebufferTexture2DEXT
+    swap reflection-texture>> [
+        GL_FRAMEBUFFER_EXT
+        GL_COLOR_ATTACHMENT0_EXT
+    ] 2dip 0 glFramebufferTexture2DEXT
     check-framebuffer ;
 
 : (draw-reflection-texture) ( gadget -- )

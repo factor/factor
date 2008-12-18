@@ -1,7 +1,7 @@
 USING: cocoa cocoa.plists core-foundation iokit iokit.hid
 kernel cocoa.enumeration destructors math.parser cocoa.application 
 sequences locals combinators.short-circuit threads
-symbols namespaces assocs vectors arrays combinators
+namespaces assocs vectors arrays combinators
 core-foundation.run-loop accessors sequences.private
 alien.c-types math parser game-input ;
 IN: game-input.iokit

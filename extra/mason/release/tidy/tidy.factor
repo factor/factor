@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image continuations debugger fry
 io.directories io.directories.hierarchy io.files io.launcher
-kernel mason.common namespaces qualified sequences ;
+kernel mason.common namespaces sequences ;
 FROM: mason.config => target-os ;
 IN: mason.release.tidy
 
