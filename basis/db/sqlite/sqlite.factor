@@ -42,7 +42,7 @@ M: sqlite-db-connection <prepared-statement> ( str in out -- obj )
 
 : sqlite-maybe-prepare ( statement -- statement )
     dup handle>> [
-        db get handle>> over sql>> sqlite-prepare
+        db-connection get handle>> over sql>> sqlite-prepare
         >>handle
     ] unless ;
 
@@ -99,7 +99,7 @@ M: sqlite-statement bind-tuple ( tuple statement -- )
 ERROR: sqlite-last-id-fail ;
 
 : last-insert-id ( -- id )
-    db get handle>> sqlite3_last_insert_rowid
+    db-connection get handle>> sqlite3_last_insert_rowid
     dup zero? [ sqlite-last-id-fail ] when ;
 
 M: sqlite-db-connection insert-tuple-set-key ( tuple statement -- )

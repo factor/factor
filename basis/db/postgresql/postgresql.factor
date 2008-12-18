@@ -38,8 +38,7 @@ M: postgresql-db db-open ( db -- db-connection )
         [ password>> ]
     } cleave connect-postgres <postgresql-db-connection> ;
 
-M: postgresql-db-connection db-close ( handle -- )
-    PQfinish ;
+M: postgresql-db-connection db-close ( handle -- ) PQfinish ;
 
 M: postgresql-statement bind-statement* ( statement -- ) drop ;
 
@@ -106,7 +105,7 @@ M: postgresql-result-set dispose ( result-set -- )
 
 M: postgresql-statement prepare-statement ( statement -- )
     dup
-    [ db get handle>> f ] dip
+    [ db-connection get handle>> f ] dip
     [ sql>> ] [ in-params>> ] bi
     length f PQprepare postgresql-error
     >>handle drop ;

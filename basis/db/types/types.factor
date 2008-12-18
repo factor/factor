@@ -4,11 +4,11 @@ USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep prettyprint
 words namespaces slots slots.private classes mirrors
 classes.tuple combinators calendar.format symbols
-classes.singleton accessors quotations random ;
+classes.singleton accessors quotations random db.private ;
 IN: db.types
 
-HOOK: persistent-table db ( -- hash )
-HOOK: compound db ( string obj -- hash )
+HOOK: persistent-table db-connection ( -- hash )
+HOOK: compound db-connection ( string obj -- hash )
 
 TUPLE: sql-spec class slot-name column-name type primary-key modifiers ;
 
@@ -158,8 +158,8 @@ ERROR: no-sql-type type ;
     modifiers>> [ lookup-modifier ] map " " join
     [ "" ] [ " " prepend ] if-empty ;
 
-HOOK: bind% db ( spec -- )
-HOOK: bind# db ( spec obj -- )
+HOOK: bind% db-connection ( spec -- )
+HOOK: bind# db-connection ( spec obj -- )
 
 ERROR: no-column column ;
 
