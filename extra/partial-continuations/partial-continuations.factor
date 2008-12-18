@@ -7,16 +7,16 @@ USING: kernel continuations arrays sequences quotations ;
     [ 1array swap keep first continue-with ] callcc1 nip ;
 
 : (bshift) ( v r k -- obj )
-    >r dup first -rot r>
+    [ dup first -rot ] dip
     [
         rot set-first
         continue-with
     ] callcc1
-    >r drop nip set-first r> ;
+    [ drop nip set-first ] dip ;
 
 : bshift ( r quot -- )
     swap [ ! quot r k
-        over >r
-        [ (bshift) ] 2curry swap call
-        r> first continue-with
+        over [
+            [ (bshift) ] 2curry swap call
+        ] dip first continue-with
     ] callcc1 2nip ; inline
