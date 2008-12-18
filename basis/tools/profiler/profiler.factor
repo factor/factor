@@ -3,7 +3,7 @@
 USING: accessors words sequences math prettyprint kernel arrays io
 io.styles namespaces assocs kernel.private strings combinators
 sorting math.parser vocabs definitions tools.profiler.private
-continuations generic ;
+continuations generic compiler.units sets ;
 IN: tools.profiler
 
 : profile ( quot -- )
@@ -19,7 +19,7 @@ TUPLE: usage-profile word ;
 C: <usage-profile> usage-profile
 
 M: word (profile.)
-    dup unparse swap <usage-profile> write-object ;
+    [ name>> "( no name )" or ] [ <usage-profile> ] bi write-object ;
 
 TUPLE: vocab-profile vocab ;
 
@@ -29,8 +29,8 @@ M: string (profile.)
     dup <vocab-profile> write-object ;
 
 M: method-body (profile.)
-    dup synopsis swap "method-generic" word-prop
-    <usage-profile> write-object ;
+    [ synopsis ] [ "method-generic" word-prop <usage-profile> ] bi
+    write-object ;
 
 : counter. ( obj n -- )
     [
@@ -58,7 +58,10 @@ M: method-body (profile.)
     "Call counts for words which call " write
     dup pprint
     ":" print
-    smart-usage [ word? ] filter counters counters. ;
+    [ smart-usage [ word? ] filter ]
+    [ compiled-generic-usage keys ]
+    [ compiled-usage keys ]
+    tri 3append prune counters counters. ;
 
 : vocabs-profile. ( -- )
     "Call counts for all vocabularies:" print
