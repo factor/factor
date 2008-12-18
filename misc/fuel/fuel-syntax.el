@@ -64,7 +64,8 @@
   '("flushable" "foldable" "inline" "parsing" "recursive"))
 
 (defconst fuel-syntax--declaration-words-regex
-  (regexp-opt fuel-syntax--declaration-words 'words))
+  (format "%s\\($\\| \\)"
+          (regexp-opt fuel-syntax--declaration-words 'words)))
 
 (defsubst fuel-syntax--second-word-regex (prefixes)
   (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
@@ -82,7 +83,8 @@
 
 (defconst fuel-syntax--constructor-regex "<[^ >]+>")
 
-(defconst fuel-syntax--setter-regex "\\W>>[^ ]+\\b")
+(defconst fuel-syntax--getter-regex "\\( \\|^\\)\\([^ ]+>>\\)\\( \\|$\\)")
+(defconst fuel-syntax--setter-regex "\\( \\|^\\)\\(>>[^ ]+\\)\\( \\|$\\)")
 
 (defconst fuel-syntax--symbol-definition-regex
   (fuel-syntax--second-word-regex '("SYMBOL:" "VAR:")))
