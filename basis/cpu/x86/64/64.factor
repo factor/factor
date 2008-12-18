@@ -50,8 +50,8 @@ M: x86.64 %prologue ( n -- )
 
 M: stack-params %load-param-reg
     drop
-    >r R11 swap param@ MOV
-    r> param@ R11 MOV ;
+    [ R11 swap param@ MOV ] dip
+    param@ R11 MOV ;
 
 M: stack-params %save-param-reg
     drop

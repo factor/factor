@@ -80,10 +80,12 @@ M: shuffle-node pprint* effect>> effect>string text ;
         [ out-d>> length 1 = ]
     } 1&& ;
 
+SYMBOLS: >R R> ;
+
 M: #shuffle node>quot
     {
-        { [ dup #>r? ] [ drop \ >r , ] }
-        { [ dup #r>? ] [ drop \ r> , ] }
+        { [ dup #>r? ] [ drop \ >R , ] }
+        { [ dup #r>? ] [ drop \ R> , ] }
         {
             [ dup [ in-r>> empty? ] [ out-r>> empty? ] bi and ]
             [

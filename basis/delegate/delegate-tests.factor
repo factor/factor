@@ -20,7 +20,7 @@ PROTOCOL: baz foo { bar 0 } { whoa 1 } ;
 CONSULT: baz goodbye these>> ;
 M: hello foo this>> ;
 M: hello bar hello-test ;
-M: hello whoa >r this>> r> + ;
+M: hello whoa [ this>> ] dip + ;
 
 GENERIC: bing ( c -- d )
 PROTOCOL: bee bing ;

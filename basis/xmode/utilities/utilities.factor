@@ -53,5 +53,5 @@ SYMBOL: tag-handler-word
 
 : TAGS>
     tag-handler-word get
-    tag-handlers get >alist [ >r dup main>> r> case ] curry
+    tag-handlers get >alist [ [ dup main>> ] dip case ] curry
     define ; parsing

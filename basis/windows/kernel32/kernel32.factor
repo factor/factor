@@ -987,8 +987,6 @@ FUNCTION: DWORD GetFileType ( HANDLE hFile ) ;
 FUNCTION: DWORD GetFullPathNameW ( LPCTSTR lpFileName, DWORD nBufferLength, LPTSTR lpBuffer, LPTSTR* lpFilePart ) ;
 ALIAS: GetFullPathName GetFullPathNameW
 
-!  clear "license.txt" 32768 "char[32768]" <c-object> f over >r GetFullPathName r> swap 2 * head >string .
-
 ! FUNCTION: GetGeoInfoA
 ! FUNCTION: GetGeoInfoW
 ! FUNCTION: GetHandleContext

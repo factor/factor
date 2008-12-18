@@ -101,4 +101,4 @@ TAGS>
 : init-eol-span-tag ( -- ) [ drop init-eol-span ] , ;
 
 : parse-keyword-tag ( tag keyword-map -- )
-    >r dup main>> string>token swap children>string r> set-at ;
+    [ dup main>> string>token swap children>string ] dip set-at ;

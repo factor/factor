@@ -55,7 +55,7 @@ M: base64 item>xml
     "params" build-tag* ;
 
 : method-call ( name seq -- xml )
-    params >r "methodName" build-tag r>
+    params [ "methodName" build-tag ] dip
     2array "methodCall" build-tag* build-xml ;
 
 : return-params ( seq -- xml )
@@ -117,7 +117,7 @@ TAG: boolean xml>item
 : unstruct-member ( tag -- )
     children-tags first2
     first-child-tag xml>item
-    >r children>string r> swap set ;
+    [ children>string ] dip swap set ;
 
 TAG: struct xml>item
     [
@@ -158,10 +158,10 @@ TAG: array xml>item
 
 : post-rpc ( rpc url -- rpc )
     ! This needs to do something in the event of an error
-    >r send-rpc r> http-post nip string>xml receive-rpc ;
+    [ send-rpc ] dip http-post nip string>xml receive-rpc ;
 
 : invoke-method ( params method url -- )
-    >r swap <rpc-method> r> post-rpc ;
+    [ swap <rpc-method> ] dip post-rpc ;
 
 : put-http-response ( string -- )
     "HTTP/1.1 200 OK\nConnection: close\nContent-Length: " write

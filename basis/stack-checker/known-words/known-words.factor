@@ -174,8 +174,6 @@ M: object infer-call*
 
 : infer-special ( word -- )
     {
-        { \ >r [ 1 infer->r ] }
-        { \ r> [ 1 infer-r> ] }
         { \ declare [ infer-declare ] }
         { \ call [ infer-call ] }
         { \ (call) [ infer-call ] }
@@ -213,7 +211,7 @@ M: object infer-call*
     "local-word-def" word-prop infer-quot-here ;
 
 {
-    >r r> declare call (call) slip 2slip 3slip dip 2dip 3dip
+    declare call (call) slip 2slip 3slip dip 2dip 3dip
     curry compose execute (execute) if dispatch <tuple-boa>
     (throw) load-locals get-local drop-locals do-primitive
     alien-invoke alien-indirect alien-callback

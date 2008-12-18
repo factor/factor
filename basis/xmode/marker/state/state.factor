@@ -20,14 +20,14 @@ SYMBOLS: line last-offset position context
     current-rule-set keywords>> ;
 
 : token, ( from to id -- )
-    2over = [ 3drop ] [ >r line get subseq r> <token> , ] if ;
+    2over = [ 3drop ] [ [ line get subseq ] dip <token> , ] if ;
 
 : prev-token, ( id -- )
-    >r last-offset get position get r> token,
+    [ last-offset get position get ] dip token,
     position get last-offset set ;
 
 : next-token, ( len id -- )
-    >r position get 2dup + r> token,
+    [ position get 2dup + ] dip token,
     position get + dup 1- position set last-offset set ;
 
 : push-context ( rules -- )

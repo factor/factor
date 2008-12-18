@@ -41,7 +41,7 @@ MEMO: standard-rule-set ( id -- ruleset )
 
 : ?push-all ( seq1 seq2 -- seq1+seq2 )
     [
-        over [ >r V{ } like r> over push-all ] [ nip ] if
+        over [ [ V{ } like ] dip over push-all ] [ nip ] if
     ] when* ;
 
 : rule-set-no-word-sep* ( ruleset -- str )
@@ -107,8 +107,7 @@ M: regexp text-hash-char drop f ;
     text-hash-char [ suffix ] when* ;
 
 : add-rule ( rule ruleset -- )
-    >r dup rule-chars* >upper swap
-    r> rules>> inverted-index ;
+    [ dup rule-chars* >upper swap ] dip rules>> inverted-index ;
 
 : add-escape-rule ( string ruleset -- )
     over [

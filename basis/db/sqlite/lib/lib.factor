@@ -42,7 +42,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
     sqlite3_bind_parameter_index ;
 
 : parameter-index ( handle name text -- handle name text )
-    >r dupd sqlite-bind-parameter-index r> ;
+    [ dupd sqlite-bind-parameter-index ] dip ;
 
 : sqlite-bind-text ( handle index text -- )
     utf8 encode dup length SQLITE_TRANSIENT
