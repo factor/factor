@@ -187,6 +187,35 @@ displayed in the minibuffer."
     (message "%s" def)))
 
 
+;;; Help mode font lock:
+
+(defconst fuel-help--headlines
+  (regexp-opt '("Class description"
+                "Definition"
+                "Errors"
+                "Examples"
+                "Generic word contract"
+                "Inputs and outputs"
+                "Methods"
+                "Notes"
+                "Parent topics:"
+                "See also"
+                "Syntax"
+                "Variable description"
+                "Variable value"
+                "Vocabulary"
+                "Warning"
+                "Word description")
+              t))
+
+(defconst fuel-help--headlines-regexp (format "^%s" fuel-help--headlines))
+
+(defconst fuel-help--font-lock-keywords
+  `(,@fuel-font-lock--font-lock-keywords
+    (,fuel-help--headlines-regexp . 'fuel-help-font-lock-headlines)))
+
+
+
 ;;; Interactive help commands:
 
 (defun fuel-help-short (&optional arg)
@@ -223,8 +252,18 @@ buffer."
       (error "No previous page"))
     (fuel-help--insert-contents (car item) (cdr item) t)))
 
+(defun fuel-help-next-headline (&optional count)
+  (interactive "P")
+  (end-of-line)
+  (when (re-search-forward fuel-help--headlines-regexp nil t (or count 1))
+    (beginning-of-line)))
+
+(defun fuel-help-previous-headline (&optional count)
+  (interactive "P")
+  (re-search-backward fuel-help--headlines-regexp nil t count))
+
 
-;;;; Factor help mode:
+;;;; Help mode map:
 
 (defvar fuel-help-mode-map
   (let ((map (make-sparse-keymap)))
@@ -235,36 +274,17 @@ buffer."
     (define-key map "l" 'fuel-help-previous)
     (define-key map "p" 'fuel-help-previous)
     (define-key map "n" 'fuel-help-next)
+    (define-key map (kbd "TAB") 'fuel-help-next-headline)
+    (define-key map (kbd "S-TAB") 'fuel-help-previous-headline)
+    (define-key map [(backtab)] 'fuel-help-previous-headline)
     (define-key map (kbd "SPC")  'scroll-up)
     (define-key map (kbd "S-SPC") 'scroll-down)
     (define-key map "\C-cz" 'run-factor)
     (define-key map "\C-c\C-z" 'run-factor)
     map))
 
-(defconst fuel-help--headlines
-  (regexp-opt '("Class description"
-                "Definition"
-                "Errors"
-                "Examples"
-                "Generic word contract"
-                "Inputs and outputs"
-                "Methods"
-                "Notes"
-                "Parent topics:"
-                "See also"
-                "Syntax"
-                "Variable description"
-                "Variable value"
-                "Vocabulary"
-                "Warning"
-                "Word description")
-              t))
-
-(defconst fuel-help--headlines-regexp (format "^%s" fuel-help--headlines))
-
-(defconst fuel-help--font-lock-keywords
-  `(,@fuel-font-lock--font-lock-keywords
-    (,fuel-help--headlines-regexp . 'fuel-help-font-lock-headlines)))
+
+;;; Help mode definition:
 
 (defun fuel-help-mode ()
   "Major mode for browsing Factor documentation.

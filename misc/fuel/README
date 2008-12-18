@@ -90,5 +90,7 @@ C-cC-eC-r is the same as C-cC-er)).
  - RET : help for word at point
  - f/b : next/previous page
  - SPC/S-SPC : scroll up/down
+ - TAB/S-TAB : next/previous headline
+ - C-cz : switch to listener
  - q: bury buffer
 
