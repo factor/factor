@@ -14,15 +14,14 @@
 
 ;;; Code:
 
-(require 'factor-mode)
-(require 'fuel-base)
-(require 'fuel-syntax)
-(require 'fuel-font-lock)
-(require 'fuel-debug)
-(require 'fuel-help)
-(require 'fuel-eval)
-(require 'fuel-completion)
 (require 'fuel-listener)
+(require 'fuel-completion)
+(require 'fuel-eval)
+(require 'fuel-help)
+(require 'fuel-debug)
+(require 'fuel-font-lock)
+(require 'fuel-syntax)
+(require 'fuel-base)
 
 
 ;;; Customization:
