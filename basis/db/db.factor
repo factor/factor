@@ -5,24 +5,30 @@ namespaces sequences classes.tuple words strings
 tools.walker accessors combinators fry ;
 IN: db
 
-TUPLE: db
+SYMBOL: db
+
+<PRIVATE
+
+TUPLE: db-connection
     handle
     insert-statements
     update-statements
     delete-statements ;
 
-: new-db ( class -- obj )
+: new-db-connection ( class -- obj )
     new
         H{ } clone >>insert-statements
         H{ } clone >>update-statements
         H{ } clone >>delete-statements ; inline
+
+PRIVATE>
 
 GENERIC: db-open ( db -- db )
 HOOK: db-close db ( handle -- )
 
 : dispose-statements ( assoc -- ) values dispose-each ;
 
-M: db dispose ( db -- ) 
+M: db-connection dispose ( db -- ) 
     dup db [
         [ dispose-statements H{ } clone ] change-insert-statements
         [ dispose-statements H{ } clone ] change-update-statements
@@ -130,9 +136,9 @@ HOOK: begin-transaction db ( -- )
 HOOK: commit-transaction db ( -- )
 HOOK: rollback-transaction db ( -- )
 
-M: db begin-transaction ( -- ) "BEGIN" sql-command ;
-M: db commit-transaction ( -- ) "COMMIT" sql-command ;
-M: db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
+M: db-connection begin-transaction ( -- ) "BEGIN" sql-command ;
+M: db-connection commit-transaction ( -- ) "COMMIT" sql-command ;
+M: db-connection rollback-transaction ( -- ) "ROLLBACK" sql-command ;
 
 : in-transaction? ( -- ? ) in-transaction get ;
 
