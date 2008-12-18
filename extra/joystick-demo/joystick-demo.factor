@@ -1,7 +1,7 @@
 USING: ui ui.gadgets sequences kernel arrays math colors
 ui.render math.vectors accessors fry ui.gadgets.packs game-input
 ui.gadgets.labels ui.gadgets.borders alarms
-calendar locals combinators.lib strings ui.gadgets.buttons
+calendar locals strings ui.gadgets.buttons
 combinators math.parser assocs threads ;
 IN: joystick-demo
 
@@ -51,9 +51,9 @@ M: axis-gadget pref-dim* drop SIZE ;
     [ (xy>loc) ] dip (z>loc) ;
 
 : move-axis ( gadget x y z -- )
-    (xyz>loc) rot
+    (xyz>loc) rot tuck
     [ indicator>>   (>>loc) ]
-    [ z-indicator>> (>>loc) ] bi, bi* ;
+    [ z-indicator>> (>>loc) ] 2bi* ;
 
 : move-pov ( gadget pov -- )
     swap pov>> [ interior>> -rot = [ gray ] [ white ] if >>color drop ]
@@ -82,10 +82,10 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
     [ >>controller ] [ product-string <label> add-gadget ] bi ;
 
 : add-axis-gadget ( gadget shelf -- gadget shelf )
-    <axis-gadget> [ >>axis ] [ add-gadget-with-border ] bi, bi* ;
+    <axis-gadget> tuck [ >>axis ] [ add-gadget-with-border ] 2bi* ;
 
 : add-raxis-gadget ( gadget shelf -- gadget shelf )
-    <axis-gadget> [ >>raxis ] [ add-gadget-with-border ] bi, bi* ;
+    <axis-gadget> tuck [ >>raxis ] [ add-gadget-with-border ] 2bi* ;
 
 :: (add-button-gadgets) ( gadget shelf -- )
     gadget controller>> read-controller buttons>> length [

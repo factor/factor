@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators combinators.lib io locals kernel math
-math.functions math.ranges namespaces random sequences
-hashtables sets ;
+USING: combinators io locals kernel math math.functions
+math.ranges namespaces random sequences hashtables sets ;
 IN: math.miller-rabin
 
 : >even ( n -- int ) dup even? [ 1- ] unless ; foldable
@@ -63,5 +62,7 @@ ERROR: too-few-primes ;
 
 : unique-primes ( numbits n -- seq )
     #! generate two primes
-    over 5 < [ too-few-primes ] when
-    [ [ drop random-prime ] with map ] [ all-unique? ] generate ;
+    swap
+    dup 5 < [ too-few-primes ] when
+    2dup [ random-prime ] curry replicate
+    dup all-unique? [ 2nip ] [ drop unique-primes ] if ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Michael Judge.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators kernel math math.analysis math.functions sequences
-    sequences.lib sorting ;
+USING: arrays combinators kernel math math.analysis
+math.functions math.order sequences sorting ;
 IN: math.statistics
 
 : mean ( seq -- n )
@@ -19,6 +19,10 @@ IN: math.statistics
     ] [
         [ midpoint@ ] keep nth
     ] if ;
+
+: minmax ( seq -- min max )
+    #! find the min and max of a seq in one pass
+    [ 1/0. -1/0. ] dip [ tuck [ min ] [ max ] 2bi* ] each ;
 
 : range ( seq -- n )
     minmax swap - ;
