@@ -1,5 +1,5 @@
 USING: assocs classes help.markup help.syntax kernel
-quotations strings words furnace.auth.providers.db
+quotations strings words words.symbol furnace.auth.providers.db
 checksums.sha2 furnace.auth.providers math byte-arrays
 http multiline ;
 IN: furnace.auth
