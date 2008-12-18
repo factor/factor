@@ -192,6 +192,7 @@ M: object infer-call*
         { \ <tuple-boa> [ infer-<tuple-boa> ] }
         { \ (throw) [ infer-(throw) ] }
         { \ exit [ infer-exit ] }
+        { \ load-local [ 1 infer->r ] }
         { \ load-locals [ infer-load-locals ] }
         { \ get-local [ infer-get-local ] }
         { \ drop-locals [ infer-drop-locals ] }
@@ -213,7 +214,7 @@ M: object infer-call*
 {
     declare call (call) slip 2slip 3slip dip 2dip 3dip
     curry compose execute (execute) if dispatch <tuple-boa>
-    (throw) load-locals get-local drop-locals do-primitive
+    (throw) load-local load-locals get-local drop-locals do-primitive
     alien-invoke alien-indirect alien-callback
 } [ t "special" set-word-prop ] each
 
