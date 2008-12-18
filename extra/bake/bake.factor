@@ -1,7 +1,7 @@
 
 USING: kernel parser namespaces sequences quotations arrays vectors splitting
        strings words math generalizations
-       macros combinators.lib combinators.conditional newfx ;
+       macros combinators.conditional newfx ;
 
 IN: bake
 
