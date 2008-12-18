@@ -414,7 +414,7 @@ HELP: QUALIFIED:
 { $syntax "QUALIFIED: vocab" }
 { $description "Similar to " { $link POSTPONE: USE: } " but loads vocabulary with prefix." }
 { $examples { $example
-    "USING: prettyprint qualified ;"
+    "USING: prettyprint ;"
     "QUALIFIED: math"
     "1 2 math:+ ." "3"
 } } ;
@@ -423,7 +423,7 @@ HELP: QUALIFIED-WITH:
 { $syntax "QUALIFIED-WITH: vocab word-prefix" }
 { $description "Works like " { $link POSTPONE: QUALIFIED: } " but uses " { $snippet "word-prefix" } " as prefix." }
 { $examples { $code
-    "USING: prettyprint qualified ;"
+    "USING: prettyprint ;"
     "QUALIFIED-WITH: math m"
     "1 2 m:+ ."
     "3"
@@ -445,7 +445,7 @@ HELP: RENAME:
 { $syntax "RENAME: word vocab => newname" }
 { $description "Imports " { $snippet "word" } " from " { $snippet "vocab" } ", but renamed to " { $snippet "newname" } "." }
 { $examples { $example
-    "USING: prettyprint qualified ;"
+    "USING: prettyprint ;"
     "RENAME: + math => -"
     "2 3 - ."
     "5"

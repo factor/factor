@@ -33,7 +33,7 @@ $nl
 { $subsection define-inline }
 "Word definitions should declare their stack effect, unless the definition is completely trivial. See " { $link "effect-declaration" } "."
 $nl
-"All other types of word definitions, such as " { $link "symbols" } " and " { $link "generic" } ", are just special cases of the above." ;
+"All other types of word definitions, such as " { $link "words.symbol" } " and " { $link "generic" } ", are just special cases of the above." ;
 
 ARTICLE: "primitives" "Primitives"
 "Primitives are words defined in the Factor VM. They provide the essential low-level services to the rest of the system."

@@ -7,7 +7,7 @@ USING: kernel math parser sequences combinators splitting ;
     ] [
         CHAR: y = [
             over zero?
-            [ 2drop t ] [ >r 1- r> consonant? not ] if
+            [ 2drop t ] [ [ 1- ] dip consonant? not ] if
         ] [
             2drop t
         ] if
@@ -15,18 +15,18 @@ USING: kernel math parser sequences combinators splitting ;
 
 : skip-vowels ( i str -- i str )
     2dup bounds-check? [
-        2dup consonant? [ >r 1+ r> skip-vowels ] unless
+        2dup consonant? [ [ 1+ ] dip skip-vowels ] unless
     ] when ;
 
 : skip-consonants ( i str -- i str )
     2dup bounds-check? [
-        2dup consonant? [ >r 1+ r> skip-consonants ] when
+        2dup consonant? [ [ 1+ ] dip skip-consonants ] when
     ] when ;
 
 : (consonant-seq) ( n i str -- n )
     skip-vowels
     2dup bounds-check? [
-        >r 1+ >r 1+ r> r> skip-consonants >r 1+ r>
+        [ 1+ ] [ 1+ ] [ ] tri* skip-consonants [ 1+ ] dip
         (consonant-seq)
     ] [
         2drop
@@ -42,7 +42,7 @@ USING: kernel math parser sequences combinators splitting ;
     over 1 < [
         2drop f
     ] [
-        2dup nth >r over 1- over nth r> = [
+        2dup nth [ over 1- over nth ] dip = [
             consonant?
         ] [
             2drop f
@@ -52,7 +52,7 @@ USING: kernel math parser sequences combinators splitting ;
 : consonant-end? ( n seq -- ? )
     [ length swap - ] keep consonant? ;
 
-: last-is? ( str possibilities -- ? ) >r peek r> member? ;
+: last-is? ( str possibilities -- ? ) [ peek ] dip member? ;
 
 : cvc? ( str -- ? )
     {

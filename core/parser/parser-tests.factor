@@ -2,7 +2,8 @@ USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files assocs
 sequences strings io.files io.pathnames definitions
 continuations sorting classes.tuple compiler.units debugger
-vocabs vocabs.loader accessors eval combinators lexer ;
+vocabs vocabs.loader accessors eval combinators lexer
+vocabs.parser words.symbol ;
 IN: parser.tests
 
 \ run-file must-infer
@@ -485,19 +486,19 @@ must-fail-with
 
 [ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
 
-[ "DEFER: blah" eval ] [ error>> error>> no-current-vocab? ] must-fail-with
+[ "DEFER: blahy" eval ] [ error>> error>> no-current-vocab? ] must-fail-with
 
 [
-    "IN: parser.tests : blah ; parsing FORGET: blah" eval
+    "IN: parser.tests : blahy ; parsing FORGET: blahy" eval
 ] [
     error>> staging-violation?
 ] must-fail-with
 
 ! Bogus error message
-DEFER: blah
+DEFER: blahy
 
-[ "IN: parser.tests USE: kernel TUPLE: blah < tuple ; : blah ; TUPLE: blah < tuple ; : blah ;" eval ]
-[ error>> error>> def>> \ blah eq? ] must-fail-with
+[ "IN: parser.tests USE: kernel TUPLE: blahy < tuple ; : blahy ; TUPLE: blahy < tuple ; : blahy ;" eval ]
+[ error>> error>> def>> \ blahy eq? ] must-fail-with
 
 [ ] [ f lexer set f file set "Hello world" note. ] unit-test
 
@@ -511,14 +512,16 @@ SYMBOLS: a b c ;
 
 DEFER: blah
 
-[ ] [ "IN: symbols.tests GENERIC: blah" eval ] unit-test
-[ ] [ "IN: symbols.tests USE: symbols SYMBOLS: blah ;" eval ] unit-test
+[ ] [ "IN: parser.tests GENERIC: blah" eval ] unit-test
+[ ] [ "IN: parser.tests SYMBOLS: blah ;" eval ] unit-test
 
 [ f ] [ \ blah generic? ] unit-test
 [ t ] [ \ blah symbol? ] unit-test
 
-[ "IN: symbols.tests USE: symbols SINGLETONS: blah blah blah ;" eval ]
-[ error>> error>> def>> \ blah eq? ]
+DEFER: blah1
+
+[ "IN: parser.tests SINGLETONS: blah1 blah1 blah1 ;" eval ]
+[ error>> error>> def>> \ blah1 eq? ]
 must-fail-with
 
 IN: qualified.tests.foo
@@ -548,8 +551,8 @@ EXCLUDE: qualified.tests.bar => x ;
 [ 3 ] [ x ] unit-test
 [ 4 ] [ y ] unit-test
 
-[ "USE: qualified IN: qualified.tests FROM: qualified.tests => doesnotexist ;" eval ]
+[ "IN: qualified.tests FROM: qualified.tests => doesnotexist ;" eval ]
 [ error>> no-word-error? ] must-fail-with
 
-[ "USE: qualified IN: qualified.tests RENAME: doesnotexist qualified.tests => blah" eval ]
+[ "IN: qualified.tests RENAME: doesnotexist qualified.tests => blahx" eval ]
 [ error>> no-word-error? ] must-fail-with

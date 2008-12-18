@@ -35,8 +35,7 @@ $nl
     "fee:append calls foe:append"
     "foe:append calls sequences:append"
     "12345678"
-}
-"The " { $vocab-link "qualified" } " vocabulary contains some tools for helping with shadowing." ;
+} ;
 
 ARTICLE: "vocabulary-search-errors"  "Word lookup errors"
 "If the parser cannot not find a word in the current vocabulary search path, it attempts to look for the word in all loaded vocabularies."

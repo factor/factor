@@ -6,7 +6,7 @@ quotations effects tools.test continuations generic.standard
 sorting assocs definitions prettyprint io inspector
 classes.tuple classes.union classes.predicate debugger
 threads.private io.streams.string io.timeouts io.thread
-sequences.private destructors combinators eval ;
+sequences.private destructors combinators eval locals.backend ;
 IN: stack-checker.tests
 
 \ infer. must-infer
@@ -320,7 +320,7 @@ DEFER: bar
 : bad-bin ( a b -- ) 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
 [ [ bad-bin ] infer ] must-fail
 
-[ [ r> ] infer ] [ inference-error? ] must-fail-with
+[ [ 1 drop-locals ] infer ] [ inference-error? ] must-fail-with
 
 ! Regression
 [ [ cleave ] infer ] [ inference-error? ] must-fail-with
@@ -502,7 +502,7 @@ ERROR: custom-error ;
     [ custom-error inference-error ] infer
 ] unit-test
 
-[ T{ effect f 1 1 t } ] [
+[ T{ effect f 1 2 t } ] [
     [ dup [ 3 throw ] dip ] infer
 ] unit-test
 
