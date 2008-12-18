@@ -76,12 +76,15 @@
   (let ((word (or word (fuel-syntax-symbol-at-point)))
         (fuel-log--inhibit-p t))
     (when word
-      (let* ((cmd `(:fuel* (((:quote ,word) synopsis :get)) t))
-             (ret (fuel-eval--send/wait cmd 20)))
-        (when (and ret (not (fuel-eval--retort-error ret)))
+      (let* ((cmd (if (fuel-syntax--in-using)
+                      `(:fuel* (,word fuel-vocab-summary) t t)
+                    `(:fuel* (((:quote ,word) synopsis :get)) t)))
+             (ret (fuel-eval--send/wait cmd 20))
+             (res (fuel-eval--retort-result ret)))
+        (when (and ret (not (fuel-eval--retort-error ret)) (stringp res))
           (if fuel-help-minibuffer-font-lock
-              (fuel-help--font-lock-str (fuel-eval--retort-result ret))
-            (fuel-eval--retort-result ret)))))))
+              (fuel-help--font-lock-str res)
+            res))))))
 
 (make-variable-buffer-local
  (defvar fuel-autodoc-mode-string " A"
@@ -234,6 +237,8 @@ buffer."
     (define-key map "n" 'fuel-help-next)
     (define-key map (kbd "SPC")  'scroll-up)
     (define-key map (kbd "S-SPC") 'scroll-down)
+    (define-key map "\C-cz" 'run-factor)
+    (define-key map "\C-c\C-z" 'run-factor)
     map))
 
 (defconst fuel-help--headlines

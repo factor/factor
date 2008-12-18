@@ -6,8 +6,8 @@ combinators compiler.units continuations debugger definitions
 eval help io io.files io.pathnames io.streams.string kernel
 lexer listener listener.private make math memoize namespaces
 parser prettyprint prettyprint.config quotations sequences sets
-sorting source-files strings tools.vocabs vectors vocabs
-vocabs.loader ;
+sorting source-files strings summary tools.vocabs vectors
+vocabs vocabs.loader ;
 
 IN: fuel
 
@@ -160,6 +160,8 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 
 : fuel-end-eval ( -- ) [ ] (fuel-end-eval) ; inline
 
+: fuel-run-file ( path -- ) run-file ; inline
+
 ! Edit locations
 
 : fuel-get-edit-location ( defspec -- )
@@ -173,7 +175,7 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 ! Completion support
 
 : fuel-filter-prefix ( seq prefix -- seq )
-    [ drop-prefix nip length 0 = ] curry filter ; inline
+    [ drop-prefix nip length 0 = ] curry filter prune ; inline
 
 : (fuel-get-vocabs) ( -- seq )
     all-vocabs-seq [ vocab-name ] map ; inline
@@ -183,6 +185,9 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 
 : fuel-get-vocabs/prefix ( prefix -- )
     (fuel-get-vocabs) swap fuel-filter-prefix fuel-eval-set-result ; inline
+
+: fuel-vocab-summary ( name -- )
+    >vocab-link summary fuel-eval-set-result ; inline
 
 MEMO: (fuel-vocab-words) ( name -- seq )
     >vocab-link words [ name>> ] map ;
@@ -200,7 +205,8 @@ MEMO: (fuel-vocab-words) ( name -- seq )
 : fuel-get-words ( prefix names -- )
     (fuel-get-words) fuel-eval-set-result ; inline
 
-: fuel-run-file ( path -- ) run-file ; inline
+
+! -run=fuel support
 
 : fuel-startup ( -- ) "listener" run-file ; inline
 
