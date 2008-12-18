@@ -3,7 +3,7 @@ IN: furnace.db
 
 HELP: <db-persistence>
 { $values
-     { "responder" "a responder" } { "db" db }
+     { "responder" "a responder" } { "db" "a database descriptor" }
      { "responder'" db-persistence }
 }
 { $description "Wraps a responder with database persistence support. The responder's " { $link call-responder* } " method will run in a " { $link with-db } " scope." } ;
