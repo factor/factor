@@ -1,5 +1,5 @@
 
-USING: kernel accessors locals namespaces sequences threads
+USING: kernel accessors locals namespaces sequences sequences.lib threads
        math math.order math.vectors
        calendar
        colors opengl ui ui.gadgets ui.gestures ui.render
