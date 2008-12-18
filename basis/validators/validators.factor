@@ -51,7 +51,7 @@ IN: validators
     ] if ;
 
 : v-regexp ( str what regexp -- str )
-    >r over r> matches?
+    [ over ] dip matches?
     [ drop ] [ "invalid " prepend throw ] if ;
 
 : v-email ( str -- str )

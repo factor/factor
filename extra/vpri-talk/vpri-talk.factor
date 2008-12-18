@@ -80,19 +80,19 @@ IN: vpri-talk
     { $slide "Object system"
         "New operation, existing types:"
         { $code
-            "GENERIC: perimiter ( shape -- n )"
+            "GENERIC: perimeter ( shape -- n )"
             ""
-            "M: rectangle perimiter"
+            "M: rectangle perimeter"
             "    [ width>> ] [ height>> ] bi + 2 * ;"
             ""
-            "M: circle perimiter"
+            "M: circle perimeter"
             "    radius>> 2 * pi * ;"
         }
     }
     { $slide "Object system"
         "We can compute perimiters now."
-        { $code "100 20 <rectangle> perimiter ." }
-        { $code "3 <circle> perimiter ." }
+        { $code "100 20 <rectangle> perimeter ." }
+        { $code "3 <circle> perimeter ." }
     }
     { $slide "Object system"
         "New type, extending existing operations:"
@@ -110,7 +110,7 @@ IN: vpri-talk
         { $code
             ": hypotenuse ( x y -- z ) [ sq ] bi@ + sqrt ;"
             ""
-            "M: triangle perimiter"
+            "M: triangle perimeter"
             "    [ base>> ] [ height>> ] bi"
             "    [ + ] [ hypotenuse ] 2bi + ;"
         }
@@ -151,10 +151,10 @@ IN: vpri-talk
         "Libraries can define new parsing words"
     }
     { $slide "Example: float arrays"
-        { $vocab-link "float-arrays" }
+        { $vocab-link "specialized-arrays.float" }
         "Avoids boxing and unboxing overhead"
         "Implemented with library code"
-        { $code "F{ 3.14 7.6 10.3 }" }
+        { $code "float-array{ 3.14 7.6 10.3 }" }
     }
     { $slide "Example: memoization"
         { "Memoization with " { $link POSTPONE: MEMO: } }

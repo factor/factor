@@ -12,7 +12,7 @@ TUPLE: nibble-array
 
 : nibble BIN: 1111 ; inline
 
-: nibbles>bytes 1 + 2/ ; inline
+: nibbles>bytes ( m -- n ) 1 + 2/ ; inline
 
 : byte/nibble ( n -- shift n' )
     [ 1 bitand 2 shift ] [ -1 shift ] bi ; inline

@@ -5,7 +5,7 @@ sequences assocs math arrays stack-checker effects generalizations
 continuations debugger classes.tuple namespaces make vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
 sequences.private combinators mirrors
-combinators.short-circuit fry qualified ;
+combinators.short-circuit fry words.symbol ;
 RENAME: _ fry => __
 IN: inverse
 
@@ -134,9 +134,6 @@ MACRO: undo ( quot -- ) [undo] ;
 
 \ not [ not ] define-inverse
 \ >boolean [ { t f } memq? assure ] define-inverse
-
-\ >r [ r> ] define-inverse
-\ r> [ >r ] define-inverse
 
 \ tuple>array [ >tuple ] define-inverse
 \ >tuple [ tuple>array ] define-inverse

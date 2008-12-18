@@ -15,7 +15,7 @@ USING: kernel namespaces math quotations arrays hashtables sequences threads
        ui.gadgets.theme
        ui.gadgets.handler
        accessors
-       namespaces.lib assocs.lib vars
+       vars fry
        rewrite-closures automata math.geometry.rect newfx ;
 
 IN: automata.ui
@@ -24,9 +24,9 @@ IN: automata.ui
 
 : draw-point ( y x value -- ) 1 = [ swap glVertex2i ] [ 2drop ] if ;
 
-: draw-line ( y line -- ) 0 swap [ >r 2dup r> draw-point 1+ ] each 2drop ;
+: draw-line ( y line -- ) 0 swap [ [ 2dup ] dip draw-point 1+ ] each 2drop ;
 
-: (draw-bitmap) ( bitmap -- ) 0 swap [ >r dup r> draw-line 1+ ] each drop ;
+: (draw-bitmap) ( bitmap -- ) 0 swap [ [ dup ] dip draw-line 1+ ] each drop ;
 
 : draw-bitmap ( bitmap -- ) GL_POINTS glBegin (draw-bitmap) glEnd ;
 
@@ -46,9 +46,9 @@ VAR: slate
 
 ! Create a quotation that is appropriate for buttons and gesture handler.
 
-: view-action ( quot -- quot ) [ drop [ ] with-view ] make* closed-quot ;
+: view-action ( quot -- quot ) '[ drop _ with-view ] closed-quot ;
 
-: view-button ( label quot -- ) >r <label> r> view-action <bevel-button> ;
+: view-button ( label quot -- button ) [ <label> ] dip view-action <bevel-button> ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -1,6 +1,6 @@
 USING: definitions kernel parser words sequences math.parser
 namespaces editors io.launcher windows.shell32 io.files
-io.paths.windows strings unicode.case make ;
+io.directories.search.windows strings unicode.case make ;
 IN: editors.editpadlite
 
 : editpadlite-path ( -- path )

@@ -1,4 +1,4 @@
-USING: kernel tools.test accessors arrays qualified
+USING: kernel tools.test accessors arrays
        irc.messages irc.messages.private ;
 EXCLUDE: sequences => join ;
 IN: irc.messages.tests

@@ -6,7 +6,7 @@ sequences arrays io.encodings io.ports io.streams.duplex
 io.encodings.ascii alien.strings io.binary accessors destructors
 classes byte-arrays system combinators parser
 alien.c-types math.parser splitting grouping math assocs summary
-system vocabs.loader combinators present fry ;
+system vocabs.loader combinators present fry vocabs.parser ;
 IN: io.sockets
 
 << {
@@ -318,7 +318,6 @@ M: inet (server)
     invalid-inet-server ;
 
 {
-    { [ os unix? ] [ "io.unix.sockets" require ] }
-    { [ os winnt? ] [ "io.windows.nt.sockets" require ] }
-    { [ os wince? ] [ "io.windows.ce.sockets" require ] }
+    { [ os unix? ] [ "io.sockets.unix" require ] }
+    { [ os winnt? ] [ "io.sockets.windows.nt" require ] }
 } cond

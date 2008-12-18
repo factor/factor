@@ -5,7 +5,7 @@ HELP: init-furnace-tables
 { $description "Initializes database tables used by asides, conversations and session management. This word must be invoked inside a " { $link with-db } " scope." } ;
 
 HELP: <alloy>
-{ $values { "responder" "a responder" } { "db" db } { "responder'" "an alloy responder" } }
+{ $values { "responder" "a responder" } { "db" "a database descriptor" } { "responder'" "an alloy responder" } }
 { $description "Wraps the responder with support for asides, conversations, sessions and database persistence." }
 { $examples
     "The " { $vocab-link "webapps.counter" } " vocabulary uses an alloy to configure the counter:"
@@ -21,7 +21,7 @@ HELP: <alloy>
 } ;
 
 HELP: start-expiring
-{ $values { "db" db } }
+{ $values { "db" "a database descriptor" } }
 { $description "Starts a timer which expires old session state from the given database." } ;
 
 ARTICLE: "furnace.alloy" "Furnace alloy responder"

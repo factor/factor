@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io io.files ;
+USING: help.markup help.syntax io io.files io.pathnames ;
 IN: bootstrap.image
 
 ARTICLE: "bootstrap.image" "Bootstrapping new images"

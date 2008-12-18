@@ -8,7 +8,7 @@ calendar.format present urls
 io io.encodings io.encodings.iana io.encodings.binary
 io.encodings.8-bit
 
-unicode.case unicode.categories qualified
+unicode.case unicode.categories
 
 http.parsers ;
 

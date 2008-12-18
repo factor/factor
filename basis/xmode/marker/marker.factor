@@ -69,7 +69,7 @@ M: string-matcher text-matches?
     ] keep string>> length and ;
 
 M: regexp text-matches?
-    >r >string r> match-head ;
+    [ >string ] dip match-head ;
 
 : rule-start-matches? ( rule -- match-count/f )
     dup start>> tuck swap can-match-here? [
@@ -97,7 +97,7 @@ DEFER: get-rules
     f swap rules>> at ?push-all ;
 
 : get-char-rules ( vector/f char ruleset -- vector/f )
-    >r ch>upper r> rules>> at ?push-all ;
+    [ ch>upper ] dip rules>> at ?push-all ;
 
 : get-rules ( char ruleset -- seq )
     f -rot [ get-char-rules ] keep get-always-rules ;

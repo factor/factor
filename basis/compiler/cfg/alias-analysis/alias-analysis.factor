@@ -68,7 +68,8 @@ IN: compiler.cfg.alias-analysis
 ! Map vregs -> alias classes
 SYMBOL: vregs>acs
 
-: check [ "BUG: static type error detected" throw ] unless* ; inline
+: check ( obj -- obj )
+    [ "BUG: static type error detected" throw ] unless* ; inline
  
 : vreg>ac ( vreg -- ac )
     #! Only vregs produced by ##allot, ##peek and ##slot can

@@ -2,14 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: slots arrays definitions generic hashtables summary io
 kernel math namespaces make prettyprint prettyprint.config
-sequences assocs sequences.private strings io.styles io.files
-vectors words system splitting math.parser classes.mixin
-classes.tuple continuations continuations.private combinators
-generic.math classes.builtin classes compiler.units
+sequences assocs sequences.private strings io.styles
+io.pathnames vectors words system splitting math.parser
+classes.mixin classes.tuple continuations continuations.private
+combinators generic.math classes.builtin classes compiler.units
 generic.standard vocabs init kernel.private io.encodings
 accessors math.order destructors source-files parser
 classes.tuple.parser effects.parser lexer compiler.errors
-generic.parser strings.parser ;
+generic.parser strings.parser vocabs.parser ;
 IN: debugger
 
 GENERIC: error. ( error -- )

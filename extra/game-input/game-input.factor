@@ -1,5 +1,5 @@
-USING: arrays accessors continuations kernel symbols
-combinators.lib sequences namespaces init vocabs ;
+USING: arrays accessors continuations kernel system
+sequences namespaces init vocabs vocabs.loader combinators ;
 IN: game-input
 
 SYMBOLS: game-input-backend game-input-opened ;
@@ -18,10 +18,6 @@ M: f (reset-game-input) ;
 : reset-game-input ( -- )
     game-input-opened off
     (reset-game-input) ;
-
-: load-game-input-backend ( -- )
-    game-input-backend get
-    [ "game-input.backend" load-vocab drop ] unless ;
 
 [ reset-game-input ] "game-input" add-init-hook
 
@@ -62,9 +58,10 @@ HOOK: instance-id game-input-backend ( controller -- id )
     get-controllers [ product-id = ] with filter ;
 : find-controller-instance ( product-id instance-id -- controller/f )
     get-controllers [
+        tuck
         [ product-id  = ]
-        [ instance-id = ] bi, bi* and
-    ] 2with find nip ;
+        [ instance-id = ] 2bi* and
+    ] with with find nip ;
 
 HOOK: read-controller game-input-backend ( controller -- controller-state )
 HOOK: calibrate-controller game-input-backend ( controller -- )
@@ -76,5 +73,8 @@ M: keyboard-state clone
 
 HOOK: read-keyboard game-input-backend ( -- keyboard-state )
 
-load-game-input-backend
-
+{
+    { [ os windows? ] [ "game-input.dinput" require ] }
+    { [ os macosx? ] [ "game-input.iokit" require ] }
+    { [ t ] [ ] }
+} cond

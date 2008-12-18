@@ -15,7 +15,7 @@ HELP: duplex-stream
 { $class-description "A bidirectional stream wrapping an input and output stream." } ;
 
 HELP: <duplex-stream>
-{ $values { "in" "an input stream" } { "out" "an output stream" } { "stream" " a duplex stream" } }
+{ $values { "in" "an input stream" } { "out" "an output stream" } { "duplex-stream" duplex-stream } }
 { $description "Creates a duplex stream. Writing to a duplex stream will write to " { $snippet "out" } ", and reading from a duplex stream will read from " { $snippet "in" } ". Closing a duplex stream closes both the input and output streams." } ;
 
 HELP: with-stream

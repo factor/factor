@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces make debugger sequences io.files
-io.launcher arrays accessors calendar continuations
-combinators.short-circuit mason.common mason.report
-mason.platform mason.config http.client ;
+USING: accessors arrays calendar combinators.short-circuit
+continuations debugger http.client io.directories io.files
+io.launcher io.pathnames kernel make mason.common mason.config
+mason.platform mason.report namespaces sequences ;
 IN: mason.child
 
 : make-cmd ( -- args )

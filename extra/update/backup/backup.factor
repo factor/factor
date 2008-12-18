@@ -1,6 +1,5 @@
-
-USING: namespaces debugger io.files bootstrap.image update.util ;
-
+USING: namespaces debugger io.files io.directories
+bootstrap.image update.util ;
 IN: update.backup
 
 : backup-boot-image ( -- )

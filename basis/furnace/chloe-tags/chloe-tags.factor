@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel combinators assocs
 namespaces sequences splitting words
-fry urls multiline present qualified
+fry urls multiline present
 xml
 xml.data
 xml.entities
@@ -32,7 +32,7 @@ IN: furnace.chloe-tags
     [ [ "/" ?tail drop "/" ] dip present 3append ] when* ;
 
 : a-url ( href rest query value-name -- url )
-    dup [ >r 3drop r> value ] [
+    dup [ [ 3drop ] dip value ] [
         drop
         <url>
             swap parse-query-attr >>query

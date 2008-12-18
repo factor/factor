@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: threads io.files io.monitors init kernel
+USING: threads io.files io.pathnames io.monitors init kernel
 vocabs vocabs.loader tools.vocabs namespaces continuations
 sequences splitting assocs command-line concurrency.messaging
 io.backend sets tr ;

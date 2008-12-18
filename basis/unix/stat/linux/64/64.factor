@@ -26,5 +26,5 @@ C-STRUCT: stat
 FUNCTION: int __xstat  ( int ver, char* pathname, stat* buf ) ;
 FUNCTION: int __lxstat ( int ver, char* pathname, stat* buf ) ;
 
-:  stat ( pathname buf -- int ) 1 -rot __xstat ;
-: lstat ( pathname buf -- int ) 1 -rot __lxstat ;
+:  stat ( pathname buf -- int ) [ 1 ] 2dip __xstat ;
+: lstat ( pathname buf -- int ) [ 1 ] 2dip __lxstat ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Clemens F. Hofreither.
 ! See http://factorcode.org/license.txt for BSD license.
 ! clemens.hofreither@gmx.net
-USING: io.files io.launcher kernel namespaces io.paths.windows
+USING: io.files io.launcher kernel namespaces io.directories.search.windows
 math math.parser editors sequences make unicode.case ;
 IN: editors.scite
 

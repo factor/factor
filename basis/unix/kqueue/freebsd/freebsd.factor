@@ -1,4 +1,4 @@
-USE: alien.syntax
+USING: alien.syntax ;
 IN: unix.kqueue
 
 C-STRUCT: kevent
@@ -12,12 +12,12 @@ C-STRUCT: kevent
 
 FUNCTION: int kevent ( int kq, kevent* changelist, int nchanges, kevent* eventlist, int nevents, timespec* timeout ) ;
 
-: EVFILT_READ     -1 ; inline
-: EVFILT_WRITE    -2 ; inline
-: EVFILT_AIO      -3 ; inline ! attached to aio requests
-: EVFILT_VNODE    -4 ; inline ! attached to vnodes
-: EVFILT_PROC     -5 ; inline ! attached to struct proc
-: EVFILT_SIGNAL   -6 ; inline ! attached to struct proc
-: EVFILT_TIMER    -7 ; inline ! timers
-: EVFILT_NETDEV   -8 ; inline ! Mach ports
-: EVFILT_FS       -9 ; inline ! Filesystem events
+CONSTANT: EVFILT_READ     -1
+CONSTANT: EVFILT_WRITE    -2
+CONSTANT: EVFILT_AIO      -3 ! attached to aio requests
+CONSTANT: EVFILT_VNODE    -4 ! attached to vnodes
+CONSTANT: EVFILT_PROC     -5 ! attached to struct proc
+CONSTANT: EVFILT_SIGNAL   -6 ! attached to struct proc
+CONSTANT: EVFILT_TIMER    -7 ! timers
+CONSTANT: EVFILT_NETDEV   -8 ! Mach ports
+CONSTANT: EVFILT_FS       -9 ! Filesystem events

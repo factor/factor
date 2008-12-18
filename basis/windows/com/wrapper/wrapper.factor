@@ -123,7 +123,7 @@ unless
 
 : (make-callbacks) ( implementations -- sequence )
     dup [ first ] map (make-iunknown-methods)
-    [ >r >r first2 r> r> swap (make-interface-callbacks) ]
+    [ [ first2 ] 2dip swap (make-interface-callbacks) ]
     curry map-index ;
 
 : (malloc-wrapped-object) ( wrapper -- wrapped-object )

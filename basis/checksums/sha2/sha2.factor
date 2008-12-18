@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel splitting grouping math sequences namespaces make
-io.binary symbols math.bitwise checksums checksums.common
+io.binary math.bitwise checksums checksums.common
 sbufs strings ;
 IN: checksums.sha2
 

@@ -191,6 +191,10 @@ HELP: exchange-unsafe
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
 { $description "Unsafe variant of " { $link exchange } " that does not perform bounds checks." } ;
 
+HELP: first-unsafe
+{ $values { "seq" sequence } { "first" "the first element" } }
+{ $contract "Unsafe variant of " { $link first } " that does not perform bounds checks." } ;
+
 HELP: first2-unsafe
 { $values { "seq" sequence } { "first" "the first element" } { "second" "the second element" } }
 { $contract "Unsafe variant of " { $link first2 } " that does not perform bounds checks." } ;
@@ -602,7 +606,7 @@ HELP: reverse
 
 { reverse <reversed> reverse-here } related-words
 
-HELP: <reversed> ( seq -- reversed )
+HELP: <reversed>
 { $values { "seq" sequence } { "reversed" "a new sequence" } }
 { $description "Creates an instance of the " { $link reversed } " class." }
 { $see-also "virtual-sequences" } ;
@@ -649,7 +653,7 @@ HELP: <slice>
 HELP: repetition
 { $class-description "A virtual sequence consisting of " { $snippet "elt" } " repeated " { $snippet "len" } " times. Repetitions are created by calling " { $link <repetition> } "." } ;
 
-HELP: <repetition> ( len elt -- repetition )
+HELP: <repetition>
 { $values { "len" "a non-negative integer" } { "elt" object } { "repetition" repetition } }
 { $description "Creates a new " { $link repetition } "." }
 { $examples

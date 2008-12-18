@@ -21,14 +21,14 @@ M: missing-state error.
     ! quot is ( state string -- output-string )
     [ missing-state ] <array> dup
     [
-        [ >r dup [ data>> ] [ place>> ] bi r> ] %
+        [ [ dup [ data>> ] [ place>> ] bi ] dip ] %
         [ swapd bounds-check dispatch ] curry ,
         [ each pick (>>place) swap (>>date) ] %
     ] [ ] make [ over make ] curry ;
 
 : define-machine ( word state-class -- )
     execute make-machine
-    >r over r> define
+    [ over ] dip define
     "state-table" set-word-prop ;
 
 : MACHINE:

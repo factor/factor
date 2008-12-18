@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors qualified io.backend io.streams.c init fry
+USING: accessors io.backend io.streams.c init fry
 namespaces make assocs kernel parser lexer strings.parser vocabs
 sequences words words.private memory kernel.private
 continuations io vocabs.loader system strings sets
@@ -365,6 +365,7 @@ SYMBOL: deploy-vocab
         init-hooks get values concat %
         ,
         strip-io? [ \ flush , ] unless
+        [ 0 exit ] %
     ] [ ] make
     set-boot-quot ;
 

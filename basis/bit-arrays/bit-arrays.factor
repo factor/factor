@@ -11,7 +11,7 @@ TUPLE: bit-array
 
 <PRIVATE
 
-: n>byte -3 shift ; inline
+: n>byte ( m -- n ) -3 shift ; inline
 
 : byte/bit ( n alien -- byte bit )
     over n>byte alien-unsigned-1 swap 7 bitand ; inline
@@ -19,9 +19,9 @@ TUPLE: bit-array
 : set-bit ( ? byte bit -- byte )
     2^ rot [ bitor ] [ bitnot bitand ] if ; inline
 
-: bits>cells 31 + -5 shift ; inline
+: bits>cells ( m -- n ) 31 + -5 shift ; inline
 
-: bits>bytes 7 + n>byte ; inline
+: bits>bytes ( m -- n ) 7 + n>byte ; inline
 
 : (set-bits) ( bit-array n -- )
     [ [ length bits>cells ] keep ] dip swap underlying>>

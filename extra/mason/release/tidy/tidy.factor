@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces continuations debugger sequences fry
-io.files io.launcher bootstrap.image qualified mason.common
-mason.config ;
+USING: bootstrap.image continuations debugger fry
+io.directories io.directories.hierarchy io.files io.launcher
+kernel mason.common namespaces sequences ;
 FROM: mason.config => target-os ;
 IN: mason.release.tidy
 

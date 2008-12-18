@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators io io.files kernel
-math.parser sequences system vocabs.loader calendar math
-symbols fry prettyprint ;
+USING: accessors arrays combinators io io.files io.files.info
+io.directories kernel math.parser sequences system vocabs.loader
+calendar math fry prettyprint ;
 IN: tools.files
 
 <PRIVATE

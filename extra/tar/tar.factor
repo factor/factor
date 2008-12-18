@@ -1,7 +1,8 @@
-USING: combinators io io.files io.streams.string kernel math
-math.parser continuations namespaces pack prettyprint sequences
-strings system tools.hexdump io.encodings.binary summary accessors
-io.backend symbols byte-arrays ;
+USING: combinators io io.files io.files.links io.directories
+io.pathnames io.streams.string kernel math math.parser
+continuations namespaces pack prettyprint sequences strings
+system tools.hexdump io.encodings.binary summary accessors
+io.backend byte-arrays ;
 IN: tar
 
 : zero-checksum 256 ; inline

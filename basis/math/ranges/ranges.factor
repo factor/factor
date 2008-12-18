@@ -20,11 +20,11 @@ M: range nth-unsafe ( n range -- obj )
 
 INSTANCE: range immutable-sequence
 
-: twiddle 2dup > -1 1 ? ; inline
+: twiddle ( a b -- a b step ) 2dup > -1 1 ? ; inline
 
-: (a, dup [ + ] curry 2dip ; inline
+: (a, ( a b step -- a' b' step ) dup [ + ] curry 2dip ; inline
 
-: ,b) dup [ - ] curry dip ; inline
+: ,b) ( a b step -- a' b' step ) dup [ - ] curry dip ; inline
 
 : [a,b] ( a b -- range ) twiddle <range> ; inline
 

@@ -1,4 +1,4 @@
-USING: kernel io io.files io.monitors io.encodings.utf8 ;
+USING: kernel io io.files io.pathnames io.monitors io.encodings.utf8 ;
 IN: log-viewer
 
 : read-lines ( stream -- )

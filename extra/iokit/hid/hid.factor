@@ -53,7 +53,7 @@ IN: iokit.hid
 : kIOHIDElementDuplicateIndexKey              "DuplicateIndex" ; inline
 : kIOHIDElementParentCollectionKey            "ParentCollection" ; inline
 
-: kIOHIDElementVendorSpecificKey
+: kIOHIDElementVendorSpecificKey ( -- str )
     cpu ppc? "VendorSpecifc" "VendorSpecific" ? ; inline
 
 : kIOHIDElementCookieMinKey           "ElementCookieMin" ; inline

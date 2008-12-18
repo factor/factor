@@ -11,7 +11,7 @@ HELP: rect
     "Rectangles are constructed by calling " { $link <rect> } " and " { $link <extent-rect> } "."
 } ;
 
-HELP: <rect> ( loc dim -- rect )
+HELP: <rect>
 { $values { "loc" "a pair of integers" } { "dim" "a pair of integers" } { "rect" "a new " { $link rect } } }
 { $description "Creates a new rectangle with the specified top-left location and dimensions." } ;
 
@@ -23,7 +23,7 @@ HELP: rect-bounds
 
 { rect-bounds rect-extent } related-words
 
-HELP: <extent-rect> ( loc ext -- rect )
+HELP: <extent-rect>
 { $values { "loc" "a pair of integers" } { "ext" "a pair of integers" } { "rect" "a new " { $link rect } } }
 { $description "Creates a new rectangle with the specified top-left and bottom-right corner locations." } ;
 

@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel cocoa cocoa.messages cocoa.classes
-cocoa.application sequences splitting core-foundation ;
+cocoa.application sequences splitting core-foundation
+core-foundation.strings ;
 IN: cocoa.dialogs
 
 : <NSOpenPanel> ( -- panel )
