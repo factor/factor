@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io.backend io.files.info io.files.types
-io.pathnames kernel math namespaces system unix vocabs.loader ;
+io.pathnames kernel math namespaces system vocabs.loader ;
 IN: io.files.links
 
 HOOK: make-link os ( target symlink -- )
@@ -14,7 +14,7 @@ HOOK: read-link os ( symlink -- path )
 os unix? [ "io.files.links.unix" require ] when
 
 : follow-link ( path -- path' )
-    [ parent-directory ] [ read-symbolic-link ] bi append-path ;
+    [ parent-directory ] [ read-link ] bi append-path ;
 
 SYMBOL: symlink-depth
 10 symlink-depth set-global
