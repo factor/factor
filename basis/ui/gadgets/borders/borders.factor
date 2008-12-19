@@ -16,6 +16,9 @@ TUPLE: border < gadget
     swap border new-border
         swap dup 2array >>size ;
 
+: <filled-border> ( child gap -- border )
+    <border> { 1 1 } >>fill ;
+
 M: border pref-dim*
     [ size>> 2 v*n ] keep
     gadget-child pref-dim v+ ;
