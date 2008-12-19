@@ -23,7 +23,11 @@ IN: mongodb.bson.constants
 : T_JSTypeMax ( -- type ) 16 ; inline
 : T_MaxKey ( -- type ) 127 ; inline
 
+: T_Binary_Bytes ( -- subtype ) 2 ; inline
+: T_Binary_Function ( -- subtype ) 1 ; inline 
 
+: S_Name ( -- name ) "__t_name" ; inline
+: S_Vocab ( -- name ) "__t_vocab" ; inline
 
 ! todo Move to mongo vocab 
 
