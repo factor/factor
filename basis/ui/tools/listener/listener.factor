@@ -143,7 +143,7 @@ M: engine-word word-completion-string
     {
         [ com-end ]
         [ clear-output ]
-        [ input>> clear-input ]
+        [ input>> clear-editor ]
         [ start-listener-thread ]
         [ wait-for-listener ]
     } cleave ;
