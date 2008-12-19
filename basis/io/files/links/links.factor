@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors io.backend io.files.info
-io.files.links.private io.files.types io.pathnames kernel math
-namespaces system unix vocabs.loader ;
+USING: accessors io.backend io.files.info io.files.types
+io.pathnames kernel math namespaces system unix vocabs.loader ;
 IN: io.files.links
 
 HOOK: make-link os ( target symlink -- )
