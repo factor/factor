@@ -2,7 +2,7 @@ USING: ui.tools ui.tools.interactor ui.tools.listener
 ui.tools.search ui.tools.workspace kernel models namespaces
 sequences tools.test ui.gadgets ui.gadgets.buttons
 ui.gadgets.labelled ui.gadgets.presentations
-ui.gadgets.scrollers vocabs tools.test.ui ui accessors ;
+ui.gadgets.menus ui.gadgets.scrollers vocabs tools.test.ui ui accessors ;
 IN: ui.tools.tests
 
 [ f ]
@@ -40,7 +40,10 @@ IN: ui.tools.tests
 
     [ t ] [ "p" get presentation? ] unit-test
 
-    [ ] [ "p" get <operations-menu> gadget-child gadget-child "c" set ] unit-test
+    [ ] [
+        "p" get [ object>> ] [ dup hook>> curry ] bi
+        <operations-menu> gadget-child gadget-child "c" set
+    ] unit-test
 
     [ ] [ notify-queued ] unit-test
 

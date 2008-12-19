@@ -112,7 +112,7 @@ M: system-id write-xml-chunk
 M: public-id write-xml-chunk
     "PUBLIC '" write
     [ pubid-literal>> write "' '" write ]
-    [ system-literal>> write "'>" write ] bi ;
+    [ system-literal>> write "'" write ] bi ;
 
 M: doctype-decl write-xml-chunk
     "<!DOCTYPE " write
