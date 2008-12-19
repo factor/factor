@@ -58,6 +58,8 @@ IN: http.server.cgi
         ] with-stream
     ] >>body ;
 
+SLOT: special
+
 : enable-cgi ( responder -- responder )
     [ serve-cgi ] "application/x-cgi-script"
     pick special>> set-at ;
