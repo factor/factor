@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io.files.info ;
+USING: help.markup help.syntax io.files.info math ;
 IN: io.files.links
 
 HELP: make-link
@@ -15,9 +15,38 @@ HELP: copy-link
 
 { make-link read-link copy-link } related-words
 
+HELP: follow-link
+{ $values
+     { "path" "a pathname string" }
+     { "path'" "a pathname string" }
+}
+{ $description "Returns an absolute path from " { $link read-link } "." } ;
+
+HELP: follow-links
+{ $values
+     { "path" "a pathname string" }
+     { "path'" "a pathname string" }
+}
+{ $description "Follows a chain of symlinks up to " { $link symlink-depth } "." } ;
+
+HELP: symlink-depth
+{ $values
+     { "value" integer }
+}
+{ $description "The number of redirections " { $link follow-links } " will follow." } ;
+
+HELP: too-many-symlinks
+{ $values
+     { "path" "a pathname string" } { "n" integer }
+}
+{ $description "An error thrown when the number of redirections in a chain of symlinks surpasses the value in the " { $link symlink-depth } " variable." } ;
+
 ARTICLE: "io.files.links" "Symbolic links"
-"Reading and creating links:"
+"Reading links:"
 { $subsection read-link }
+{ $subsection follow-link }
+{ $subsection follow-links }
+"Creating links:"
 { $subsection make-link }
 "Copying links:"
 { $subsection copy-link }
