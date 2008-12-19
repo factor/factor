@@ -13,8 +13,6 @@ HELP: copy-link
 { $values { "target" "a path to an existing symlink" } { "symlink" "a path to a new symbolic link" } }
 { $description "Copies a symbolic link without following the link." } ;
 
-{ make-link read-link copy-link } related-words
-
 HELP: follow-link
 { $values
      { "path" "a pathname string" }
@@ -28,6 +26,8 @@ HELP: follow-links
      { "path'" "a pathname string" }
 }
 { $description "Follows a chain of symlinks up to " { $link symlink-depth } "." } ;
+
+{ read-link follow-link follow-links } related-words
 
 HELP: symlink-depth
 { $values
