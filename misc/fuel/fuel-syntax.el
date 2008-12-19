@@ -19,16 +19,14 @@
 
 (defun fuel-syntax--beginning-of-symbol ()
   "Move point to the beginning of the current symbol."
-  (while (eq (char-before) ?:) (backward-char))
-  (skip-syntax-backward "w_"))
+  (skip-syntax-backward "w_()"))
 
 (defsubst fuel-syntax--symbol-start ()
   (save-excursion (fuel-syntax--beginning-of-symbol) (point)))
 
 (defun fuel-syntax--end-of-symbol ()
   "Move point to the end of the current symbol."
-  (skip-syntax-forward "w_")
-  (while (looking-at ":") (forward-char)))
+  (skip-syntax-forward "w_()"))
 
 (defsubst fuel-syntax--symbol-end ()
   (save-excursion (fuel-syntax--end-of-symbol) (point)))
@@ -239,10 +237,10 @@
 
 (defun fuel-syntax--beginning-of-block ()
   (save-excursion
-    (or (and (> (fuel-syntax--brackets-depth) 0)
-             (fuel-syntax--brackets-start))
-        (and (fuel-syntax--beginning-of-defun) (point))
-        (point))))
+    (if (> (fuel-syntax--brackets-depth) 0)
+        (fuel-syntax--brackets-start)
+      (fuel-syntax--beginning-of-defun)
+      (point))))
 
 (defun fuel-syntax--at-setter-line ()
   (save-excursion
