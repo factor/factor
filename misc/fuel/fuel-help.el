@@ -76,12 +76,15 @@
   (let ((word (or word (fuel-syntax-symbol-at-point)))
         (fuel-log--inhibit-p t))
     (when word
-      (let* ((cmd `(:fuel* (((:quote ,word) synopsis :get)) t))
-             (ret (fuel-eval--send/wait cmd 20)))
-        (when (and ret (not (fuel-eval--retort-error ret)))
+      (let* ((cmd (if (fuel-syntax--in-using)
+                      `(:fuel* (,word fuel-vocab-summary) t t)
+                    `(:fuel* (((:quote ,word) synopsis :get)) t)))
+             (ret (fuel-eval--send/wait cmd 20))
+             (res (fuel-eval--retort-result ret)))
+        (when (and ret (not (fuel-eval--retort-error ret)) (stringp res))
           (if fuel-help-minibuffer-font-lock
-              (fuel-help--font-lock-str (fuel-eval--retort-result ret))
-            (fuel-eval--retort-result ret)))))))
+              (fuel-help--font-lock-str res)
+            res))))))
 
 (make-variable-buffer-local
  (defvar fuel-autodoc-mode-string " A"
@@ -152,7 +155,8 @@ displayed in the minibuffer."
                   fuel-help-always-ask))
          (def (if ask (fuel-completion--read-word prompt
                                                   def
-                                                  'fuel-help--prompt-history)
+                                                  'fuel-help--prompt-history
+                                                  t)
                 def))
          (cmd `(:fuel* ((:quote ,def) ,(if see 'see 'help)) t)))
     (message "Looking up '%s' ..." def)
@@ -176,13 +180,40 @@ displayed in the minibuffer."
       (when (re-search-forward (format "^%s" def) nil t)
         (beginning-of-line)
         (kill-region (point-min) (point))
-        (next-line)
-        (open-line 1)
         (fuel-help--history-push (cons def (buffer-string)))))
     (set-buffer-modified-p nil)
     (pop-to-buffer hb)
     (goto-char (point-min))
     (message "%s" def)))
+
+
+;;; Help mode font lock:
+
+(defconst fuel-help--headlines
+  (regexp-opt '("Class description"
+                "Definition"
+                "Errors"
+                "Examples"
+                "Generic word contract"
+                "Inputs and outputs"
+                "Methods"
+                "Notes"
+                "Parent topics:"
+                "See also"
+                "Syntax"
+                "Variable description"
+                "Variable value"
+                "Vocabulary"
+                "Warning"
+                "Word description")
+              t))
+
+(defconst fuel-help--headlines-regexp (format "^%s" fuel-help--headlines))
+
+(defconst fuel-help--font-lock-keywords
+  `(,@fuel-font-lock--font-lock-keywords
+    (,fuel-help--headlines-regexp . 'fuel-help-font-lock-headlines)))
+
 
 
 ;;; Interactive help commands:
@@ -221,8 +252,18 @@ buffer."
       (error "No previous page"))
     (fuel-help--insert-contents (car item) (cdr item) t)))
 
+(defun fuel-help-next-headline (&optional count)
+  (interactive "P")
+  (end-of-line)
+  (when (re-search-forward fuel-help--headlines-regexp nil t (or count 1))
+    (beginning-of-line)))
+
+(defun fuel-help-previous-headline (&optional count)
+  (interactive "P")
+  (re-search-backward fuel-help--headlines-regexp nil t count))
+
 
-;;;; Factor help mode:
+;;;; Help mode map:
 
 (defvar fuel-help-mode-map
   (let ((map (make-sparse-keymap)))
@@ -231,35 +272,19 @@ buffer."
     (define-key map "b" 'fuel-help-previous)
     (define-key map "f" 'fuel-help-next)
     (define-key map "l" 'fuel-help-previous)
+    (define-key map "p" 'fuel-help-previous)
     (define-key map "n" 'fuel-help-next)
+    (define-key map (kbd "TAB") 'fuel-help-next-headline)
+    (define-key map (kbd "S-TAB") 'fuel-help-previous-headline)
+    (define-key map [(backtab)] 'fuel-help-previous-headline)
     (define-key map (kbd "SPC")  'scroll-up)
     (define-key map (kbd "S-SPC") 'scroll-down)
+    (define-key map "\C-cz" 'run-factor)
+    (define-key map "\C-c\C-z" 'run-factor)
     map))
 
-(defconst fuel-help--headlines
-  (regexp-opt '("Class description"
-                "Definition"
-                "Errors"
-                "Examples"
-                "Generic word contract"
-                "Inputs and outputs"
-                "Methods"
-                "Notes"
-                "Parent topics:"
-                "See also"
-                "Syntax"
-                "Variable description"
-                "Variable value"
-                "Vocabulary"
-                "Warning"
-                "Word description")
-              t))
-
-(defconst fuel-help--headlines-regexp (format "^%s" fuel-help--headlines))
-
-(defconst fuel-help--font-lock-keywords
-  `(,@fuel-font-lock--font-lock-keywords
-    (,fuel-help--headlines-regexp . 'fuel-help-font-lock-headlines)))
+
+;;; Help mode definition:
 
 (defun fuel-help-mode ()
   "Major mode for browsing Factor documentation.
