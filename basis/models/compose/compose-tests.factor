@@ -1,5 +1,5 @@
 USING: arrays generic kernel math models namespaces sequences assocs
-tools.test models.compose accessors ;
+tools.test models.compose accessors locals ;
 IN: models.compose.tests
 
 ! Test compose
@@ -22,3 +22,25 @@ IN: models.compose.tests
 [ { 4 5 } ] [ "c" get value>> ] unit-test
 
 [ ] [ "c" get deactivate-model ] unit-test
+
+TUPLE: an-observer { i integer } ;
+
+M: an-observer model-changed nip [ 1+ ] change-i drop ;
+
+[ 1 0 ] [
+    [let* | m1 [ 1 <model> ]
+            m2 [ 2 <model> ]
+            c [ { m1 m2 } <compose> ]
+            o1 [ an-observer new ]
+            o2 [ an-observer new ] |
+        
+        o1 m1 add-connection
+        o2 m2 add-connection
+
+        c activate-model
+    
+        "OH HAI" m1 set-model
+        o1 i>>
+        o2 i>>
+    ]
+] unit-test
