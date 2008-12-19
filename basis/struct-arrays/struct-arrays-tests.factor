@@ -1,6 +1,7 @@
 IN: struct-arrays.tests
 USING: struct-arrays tools.test kernel math sequences
-alien.syntax alien.c-types destructors libc accessors ;
+alien.syntax alien.c-types destructors libc accessors
+destructors ;
 
 C-STRUCT: test-struct
 { "int" "x" }
@@ -25,5 +26,14 @@ C-STRUCT: test-struct
         1 2 make-point over set-first
         3 4 make-point over set-second
         0 [ [ test-struct-x ] [ test-struct-y ] bi / + ] reduce
+    ] with-destructors
+] unit-test
+
+[ ] [ ALIEN: 123 10 "test-struct" <direct-struct-array> drop ] unit-test
+
+[ ] [
+    [
+        10 "test-struct" malloc-struct-array
+        underlying>> &free drop
     ] with-destructors
 ] unit-test

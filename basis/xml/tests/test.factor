@@ -61,3 +61,4 @@ SYMBOL: xml-file
 [ T{ doctype-decl f "foo" } ] [ "<!DOCTYPE foo >" string>xml-chunk second ] unit-test
 [ T{ doctype-decl f "foo" T{ system-id f "blah.dtd" } } ] [ "<!DOCTYPE foo SYSTEM 'blah.dtd'>" string>xml-chunk second ] unit-test
 [ T{ doctype-decl f "foo" T{ system-id f "blah.dtd" } } ] [ "<!DOCTYPE foo   SYSTEM \"blah.dtd\"   >" string>xml-chunk second ] unit-test
+[ t ] [ "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd' >" dup string>xml-chunk [ write-xml-chunk ] with-string-writer = ] unit-test
