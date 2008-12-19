@@ -107,7 +107,7 @@ M: editor ungraft*
     editor-font* "" string-height ;
 
 : y>line ( y editor -- line# )
-    line-height / >fixnum ;
+    line-height /i ;
 
 :: point>loc ( point editor -- loc )
     point second editor y>line {

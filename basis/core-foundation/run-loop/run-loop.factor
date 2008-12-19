@@ -19,9 +19,9 @@ FUNCTION: CFRunLoopRef CFRunLoopGetMain ( ) ;
 FUNCTION: CFRunLoopRef CFRunLoopGetCurrent ( ) ;
 
 FUNCTION: SInt32 CFRunLoopRunInMode (
-   CFStringRef mode,
-   CFTimeInterval seconds,
-   Boolean returnAfterSourceHandled
+    CFStringRef mode,
+    CFTimeInterval seconds,
+    Boolean returnAfterSourceHandled
 ) ;
 
 FUNCTION: CFRunLoopSourceRef CFFileDescriptorCreateRunLoopSource (
@@ -31,27 +31,27 @@ FUNCTION: CFRunLoopSourceRef CFFileDescriptorCreateRunLoopSource (
 ) ;
 
 FUNCTION: void CFRunLoopAddSource (
-   CFRunLoopRef rl,
-   CFRunLoopSourceRef source,
-   CFStringRef mode
+    CFRunLoopRef rl,
+    CFRunLoopSourceRef source,
+    CFStringRef mode
 ) ;
 
 FUNCTION: void CFRunLoopRemoveSource (
-   CFRunLoopRef rl,
-   CFRunLoopSourceRef source,
-   CFStringRef mode
+    CFRunLoopRef rl,
+    CFRunLoopSourceRef source,
+    CFStringRef mode
 ) ;
 
 FUNCTION: void CFRunLoopAddTimer (
-   CFRunLoopRef rl,
-   CFRunLoopTimerRef timer,
-   CFStringRef mode
+    CFRunLoopRef rl,
+    CFRunLoopTimerRef timer,
+    CFStringRef mode
 ) ;
 
 FUNCTION: void CFRunLoopRemoveTimer (
-   CFRunLoopRef rl,
-   CFRunLoopTimerRef timer,
-   CFStringRef mode
+    CFRunLoopRef rl,
+    CFRunLoopTimerRef timer,
+    CFStringRef mode
 ) ;
 
 : CFRunLoopDefaultMode ( -- alien )
