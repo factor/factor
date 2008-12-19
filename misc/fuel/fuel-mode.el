@@ -39,14 +39,24 @@
 
 ;;; User commands
 
-(defun fuel-run-file (&optional arg)
-  "Sends the current file to Factor for compilation.
-With prefix argument, ask for the file to run."
-  (interactive "P")
+(defun fuel-mode--read-file (arg)
   (let* ((file (or (and arg (read-file-name "File: " nil (buffer-file-name) t))
                    (buffer-file-name)))
          (file (expand-file-name file))
          (buffer (find-file-noselect file)))
+    (when (and  buffer
+                (buffer-modified-p buffer)
+                (y-or-n-p "Save file? "))
+      (save-buffer buffer))
+    (cons file buffer)))
+
+(defun fuel-run-file (&optional arg)
+  "Sends the current file to Factor for compilation.
+With prefix argument, ask for the file to run."
+  (interactive "P")
+  (let* ((f/b (fuel-mode--read-file arg))
+         (file (car f/b))
+         (buffer (cdr f/b)))
     (when buffer
       (with-current-buffer buffer
         (message "Compiling %s ..." file)
@@ -60,6 +70,7 @@ With prefix argument, ask for the file to run."
                                   file)
       (message "Compiling %s ... OK!" file)
     (message "")))
+
 
 (defun fuel-eval-region (begin end &optional arg)
   "Sends region to Fuel's listener for evaluation.
@@ -191,9 +202,10 @@ interacting with a factor listener is at your disposal.
   (define-key fuel-mode-map (vector '(control ?c) `(control ,p) k) c)
   (define-key fuel-mode-map (vector '(control ?c) `(control ,p) `(control ,k)) c))
 
-(fuel-mode--key-1 ?z 'run-factor)
 (fuel-mode--key-1 ?k 'fuel-run-file)
+(fuel-mode--key-1 ?l 'fuel-run-file)
 (fuel-mode--key-1 ?r 'fuel-eval-region)
+(fuel-mode--key-1 ?z 'run-factor)
 
 (define-key fuel-mode-map "\C-\M-x" 'fuel-eval-definition)
 (define-key fuel-mode-map "\C-\M-r" 'fuel-eval-extended-region)
@@ -201,6 +213,7 @@ interacting with a factor listener is at your disposal.
 (define-key fuel-mode-map (kbd "M-TAB") 'fuel-completion--complete-symbol)
 
 (fuel-mode--key ?e ?e 'fuel-eval-extended-region)
+(fuel-mode--key ?e ?l 'fuel-run-file)
 (fuel-mode--key ?e ?r 'fuel-eval-region)
 (fuel-mode--key ?e ?v 'fuel-edit-vocabulary)
 (fuel-mode--key ?e ?w 'fuel-edit-word)

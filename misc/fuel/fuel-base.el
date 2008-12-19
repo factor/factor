@@ -39,6 +39,15 @@
            (when (equal item (ring-ref ring ind))
              (throw 'found ind)))))))
 
+(when (not (fboundp 'completion-table-dynamic))
+  (defun completion-table-dynamic (fun)
+    (lexical-let ((fun fun))
+      (lambda (string pred action)
+        (with-current-buffer (let ((win (minibuffer-selected-window)))
+                               (if (window-live-p win) (window-buffer win)
+                                 (current-buffer)))
+          (complete-with-action action (funcall fun string) string pred))))))
+
 
 ;;; Utilities
 
@@ -60,6 +69,11 @@
                      len))
 
 (defsubst empty-string-p (str) (equal str ""))
+
+(defun fuel--string-prefix-p (prefix str)
+  (and (>= (length str) (length prefix))
+       (string= (substring-no-properties 0 (length prefix) str)
+                (substring-no-properties prefix))))
 
 (defun fuel--respecting-message (format &rest format-args)
   "Display TEXT as a message, without hiding any minibuffer contents."
