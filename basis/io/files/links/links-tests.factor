@@ -1,5 +1,5 @@
 USING: io.directories io.files.links tools.test
-io.files.unique tools.files ;
+io.files.unique tools.files fry ;
 IN: io.files.links.tests
 
 : make-test-links ( n path -- )
