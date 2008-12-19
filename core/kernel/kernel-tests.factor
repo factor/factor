@@ -17,7 +17,7 @@ IN: kernel.tests
 
 [ ] [ :c ] unit-test
 
-[ { } set-retainstack r> ] [ { "kernel-error" 13 f f } = ] must-fail-with
+[ 3 [ { } set-retainstack ] dip ] [ { "kernel-error" 13 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
@@ -35,7 +35,7 @@ IN: kernel.tests
 
 [ ] [ [ :c ] with-string-writer drop ] unit-test
 
-: overflow-r 3 >r overflow-r ;
+: overflow-r 3 [ overflow-r ] dip ;
 
 [ overflow-r ] [ { "kernel-error" 14 f f } = ] must-fail-with
 

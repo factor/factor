@@ -1,6 +1,6 @@
 
 USING: kernel namespaces arrays quotations sequences assocs combinators
-       mirrors math math.vectors random macros bake bake.fry ;
+       mirrors math math.vectors random macros fry ;
 
 IN: random-weighted
 
@@ -17,4 +17,4 @@ dup [ second ] map swap [ first ] map random-weighted swap nth ;
 
 MACRO: call-random-weighted ( exp -- )
   [ keys ] [ values <enum> >alist ] bi
-  '[ , random-weighted , case ] ;
+  '[ _ random-weighted _ case ] ;

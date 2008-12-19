@@ -47,8 +47,8 @@ M-x customize-group fuel will show you how many.
 Quick key reference
 -------------------
 
-(Chords ending in a single letter <x> accept also C-<x> (e.g. C-cC-z is
-the same as C-cz)).
+(Triple chords ending in a single letter <x> accept also C-<x> (e.g.
+C-cC-eC-r is the same as C-cC-er)).
 
 * In factor source files:
 
@@ -57,7 +57,8 @@ the same as C-cz)).
 
  - M-. : edit word at point in Emacs
  - M-TAB : complete word at point
- - C-cC-ev : edit vocabulary
+ - C-cC-ev : edit vocabulary (M-x fuel-edit-vocabulary)
+ - C-cC-ew : edit word (M-x fuel-edit-word)
 
  - C-cr, C-cC-er : eval region
  - C-M-r, C-cC-ee : eval region, extending it to definition boundaries
@@ -89,5 +90,7 @@ the same as C-cz)).
  - RET : help for word at point
  - f/b : next/previous page
  - SPC/S-SPC : scroll up/down
+ - TAB/S-TAB : next/previous headline
+ - C-cz : switch to listener
  - q: bury buffer
 

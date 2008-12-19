@@ -64,7 +64,8 @@
   '("flushable" "foldable" "inline" "parsing" "recursive"))
 
 (defconst fuel-syntax--declaration-words-regex
-  (regexp-opt fuel-syntax--declaration-words 'words))
+  (format "%s\\($\\| \\)"
+          (regexp-opt fuel-syntax--declaration-words 'words)))
 
 (defsubst fuel-syntax--second-word-regex (prefixes)
   (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
@@ -82,7 +83,8 @@
 
 (defconst fuel-syntax--constructor-regex "<[^ >]+>")
 
-(defconst fuel-syntax--setter-regex "\\W>>[^ ]+\\b")
+(defconst fuel-syntax--getter-regex "\\( \\|^\\)\\([^ ]+>>\\)\\( \\|$\\)")
+(defconst fuel-syntax--setter-regex "\\( \\|^\\)\\(>>[^ ]+\\)\\( \\|$\\)")
 
 (defconst fuel-syntax--symbol-definition-regex
   (fuel-syntax--second-word-regex '("SYMBOL:" "VAR:")))
@@ -231,6 +233,13 @@
 
 (defsubst fuel-syntax--at-using ()
   (looking-at fuel-syntax--using-lines-regex))
+
+(defun fuel-syntax--in-using ()
+  (let ((p (point)))
+    (save-excursion
+      (and (re-search-backward "^USING: " nil t)
+           (re-search-forward " ;" nil t)
+           (< p (match-end 0))))))
 
 (defsubst fuel-syntax--beginning-of-defun (&optional times)
   (re-search-backward fuel-syntax--begin-of-def-regex nil t times))

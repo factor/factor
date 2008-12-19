@@ -15,13 +15,13 @@ SYMBOL: def-hash-keys
 
 : more-defs ( hash -- )
     {
-        { -rot [ swap >r swap r> ] }
+        { -rot [ swap [ swap ] dip ] }
         { -rot [ swap swapd ] }
-        { rot [ >r swap r> swap ] }
+        { rot [ [ swap ] dip swap ] }
         { rot [ swapd swap ] }
         { over [ dup swap ] }
         { tuck [ dup -rot ] }
-        { swapd [ >r swap r> ] }
+        { swapd [ [ swap ] dip ] }
         { 2nip [ nip nip ] }
         { 2drop [ drop drop ] }
         { 3drop [ drop drop drop ] }

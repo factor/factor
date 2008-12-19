@@ -32,6 +32,10 @@
              (fuel-eval--send/wait '(:fuel* (fuel-get-vocabs) "fuel" (:array)))))))
   fuel-completion--vocabs)
 
+(defsubst fuel-completion--vocab-list (prefix)
+  (fuel-eval--retort-result
+   (fuel-eval--send/wait `(:fuel* (,prefix fuel-get-vocabs/prefix) t t))))
+
 (defun fuel-completion--words (prefix vocabs)
   (let ((vs (if vocabs (cons :array vocabs) 'f))
         (us (or vocabs 't)))
@@ -55,7 +59,7 @@ performed."))
 If this window is no longer active or displaying the completions
 buffer then we can ignore `fuel-completion--window-cfg'."))
 
-(defun fuel-completion--maybe-save-window-configuration ()
+(defun fuel-completion--save-window-cfg ()
   "Maybe save the current window configuration.
 Return true if the configuration was saved."
   (unless (or fuel-completion--window-cfg
@@ -66,17 +70,17 @@ Return true if the configuration was saved."
 
 (defun fuel-completion--delay-restoration ()
   (add-hook 'pre-command-hook
-            'fuel-completion--maybe-restore-window-configuration
+            'fuel-completion--maybe-restore-window-cfg
             nil t))
 
-(defun fuel-completion--forget-window-configuration ()
+(defun fuel-completion--forget-window-cfg ()
   (setq fuel-completion--window-cfg nil)
   (setq fuel-completion--completions-window nil))
 
-(defun fuel-completion--restore-window-configuration ()
+(defun fuel-completion--restore-window-cfg ()
   "Restore the window config if available."
   (remove-hook 'pre-command-hook
-               'fuel-completion--maybe-restore-window-configuration)
+               'fuel-completion--maybe-restore-window-cfg)
   (when (and fuel-completion--window-cfg
              (fuel-completion--window-active-p))
     (save-excursion
@@ -85,21 +89,21 @@ Return true if the configuration was saved."
     (when (buffer-live-p fuel-completion--comp-buffer)
       (kill-buffer fuel-completion--comp-buffer))))
 
-(defun fuel-completion--maybe-restore-window-configuration ()
+(defun fuel-completion--maybe-restore-window-cfg ()
   "Restore the window configuration, if the following command
 terminates a current completion."
   (remove-hook 'pre-command-hook
-               'fuel-completion--maybe-restore-window-configuration)
+               'fuel-completion--maybe-restore-window-cfg)
   (condition-case err
       (cond ((find last-command-char "()\"'`,# \r\n:")
-             (fuel-completion--restore-window-configuration))
+             (fuel-completion--restore-window-cfg))
             ((not (fuel-completion--window-active-p))
-             (fuel-completion--forget-window-configuration))
+             (fuel-completion--forget-window-cfg))
             (t (fuel-completion--delay-restoration)))
     (error
      ;; Because this is called on the pre-command-hook, we mustn't let
      ;; errors propagate.
-     (message "Error in fuel-completion--restore-window-configuration: %S" err))))
+     (message "Error in fuel-completion--restore-window-cfg: %S" err))))
 
 (defun fuel-completion--window-active-p ()
   "Is the completion window currently active?"
@@ -108,7 +112,7 @@ terminates a current completion."
               fuel-completion--comp-buffer)))
 
 (defun fuel-completion--display-comp-list (completions base)
-  (let ((savedp (fuel-completion--maybe-save-window-configuration)))
+  (let ((savedp (fuel-completion--save-window-cfg)))
     (with-output-to-temp-buffer fuel-completion--comp-buffer
       (display-completion-list completions base)
       (let ((offset (- (point) 1 (length base))))
@@ -143,12 +147,31 @@ terminates a current completion."
          (vs (and cv `("syntax" ,cv ,@(fuel-syntax--usings)))))
     (fuel-completion--words prefix vs)))
 
-(defun fuel-completion--complete (prefix)
-  (let* ((words (fuel-completion--word-list prefix))
+(defsubst fuel-completion--all-words-list (prefix)
+  (fuel-completion--words prefix nil))
+
+(defvar fuel-completion--word-list-func
+  (completion-table-dynamic 'fuel-completion--word-list))
+
+(defvar fuel-completion--all-words-list-func
+  (completion-table-dynamic 'fuel-completion--all-words-list))
+
+(defun fuel-completion--complete (prefix vocabs)
+  (let* ((words (if vocabs
+                    (fuel-completion--vocabs)
+                    (fuel-completion--word-list prefix)))
          (completions (all-completions prefix words))
          (partial (try-completion prefix words))
          (partial (if (eq partial t) prefix partial)))
     (cons completions partial)))
+
+(defun fuel-completion--read-word (prompt &optional default history all)
+  (completing-read prompt
+                   (if all fuel-completion--all-words-list-func
+                     fuel-completion--word-list-func)
+                   nil nil nil
+                   history
+                   (or default (fuel-syntax-symbol-at-point))))
 
 (defun fuel-completion--complete-symbol ()
   "Complete the symbol at point.
@@ -157,16 +180,16 @@ Perform completion similar to Emacs' complete-symbol."
   (let* ((end (point))
          (beg (fuel-syntax--symbol-start))
          (prefix (buffer-substring-no-properties beg end))
-         (result (fuel-completion--complete prefix))
+         (result (fuel-completion--complete prefix (fuel-syntax--in-using)))
          (completions (car result))
          (partial (cdr result)))
     (cond ((null completions)
            (fuel--respecting-message "Can't find completion for %S" prefix)
-           (fuel-completion--restore-window-configuration))
+           (fuel-completion--restore-window-cfg))
           (t (insert-and-inherit (substring partial (length prefix)))
              (cond ((= (length completions) 1)
                     (fuel--respecting-message "Sole completion")
-                    (fuel-completion--restore-window-configuration))
+                    (fuel-completion--restore-window-cfg))
                    (t (fuel--respecting-message "Complete but not unique")
                       (fuel-completion--display-or-scroll completions
                                                           partial)))))))

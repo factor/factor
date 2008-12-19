@@ -20,7 +20,7 @@ ARTICLE: "grouping" "Groups and clumps"
         { $unchecked-example "dup n groups concat sequence= ." "t" }
     }
     { "With clumps, collecting the first element of each subsequence but the last one, together with the last subseqence, yields the original sequence:"
-        { $unchecked-example "dup n clumps unclip-last >r [ first ] map r> append sequence= ." "t" }
+        { $unchecked-example "dup n clumps unclip-last [ [ first ] map ] dip append sequence= ." "t" }
     }
 } ;
 

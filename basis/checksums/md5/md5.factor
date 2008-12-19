@@ -3,7 +3,7 @@
 USING: kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting grouping strings
 sequences byte-arrays locals sequences.private
-io.encodings.binary symbols math.bitwise checksums
+io.encodings.binary math.bitwise checksums
 checksums.common checksums.stream ;
 IN: checksums.md5
 

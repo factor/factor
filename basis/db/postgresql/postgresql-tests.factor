@@ -1,5 +1,5 @@
 USING: kernel db.postgresql alien continuations io classes
-prettyprint sequences namespaces tools.test db
+prettyprint sequences namespaces tools.test db db.private
 db.tuples db.types unicode.case accessors system ;
 IN: db.postgresql.tests
 
@@ -92,7 +92,3 @@ os windows? cpu x86.64? and [
         ] with-db
     ] unit-test
 ] unless
-
-
-: with-dummy-db ( quot -- )
-    [ T{ postgresql-db } db ] dip with-variable ;

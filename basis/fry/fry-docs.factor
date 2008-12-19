@@ -20,7 +20,7 @@ HELP: '[
 { $examples "See " { $link "fry.examples" } "." } ;
 
 HELP: >r/r>-in-fry-error
-{ $error-description "Thrown by " { $link POSTPONE: '[ } " if the fried quotation contains calls to " { $link >r } " or " { $link r> } ". Explicit retain stack manipulation of this form does not work with fry; use " { $link dip } " instead." } ;
+{ $error-description "Thrown by " { $link POSTPONE: '[ } " if the fried quotation contains calls to retain stack manipulation primitives." } ;
 
 ARTICLE: "fry.examples" "Examples of fried quotations"
 "The easiest way to understand fried quotations is to look at some examples."

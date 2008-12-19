@@ -39,14 +39,24 @@
 
 ;;; User commands
 
-(defun fuel-run-file (&optional arg)
-  "Sends the current file to Factor for compilation.
-With prefix argument, ask for the file to run."
-  (interactive "P")
+(defun fuel-mode--read-file (arg)
   (let* ((file (or (and arg (read-file-name "File: " nil (buffer-file-name) t))
                    (buffer-file-name)))
          (file (expand-file-name file))
          (buffer (find-file-noselect file)))
+    (when (and  buffer
+                (buffer-modified-p buffer)
+                (y-or-n-p "Save file? "))
+      (save-buffer buffer))
+    (cons file buffer)))
+
+(defun fuel-run-file (&optional arg)
+  "Sends the current file to Factor for compilation.
+With prefix argument, ask for the file to run."
+  (interactive "P")
+  (let* ((f/b (fuel-mode--read-file arg))
+         (file (car f/b))
+         (buffer (cdr f/b)))
     (when buffer
       (with-current-buffer buffer
         (message "Compiling %s ..." file)
@@ -60,6 +70,7 @@ With prefix argument, ask for the file to run."
                                   file)
       (message "Compiling %s ... OK!" file)
     (message "")))
+
 
 (defun fuel-eval-region (begin end &optional arg)
   "Sends region to Fuel's listener for evaluation.
@@ -114,18 +125,26 @@ buffer in case of errors."
   "Opens a new window visiting the definition of the word at point.
 With prefix, asks for the word to edit."
   (interactive "P")
-  (let* ((word (fuel-syntax-symbol-at-point))
-         (ask (or arg (not word)))
-         (word (if ask
-                   (read-string nil
-                                (format "Edit word%s: "
-                                        (if word (format " (%s)" word) ""))
-                                word)
-                 word)))
-    (let ((cmd `(:fuel ((:quote ,word) fuel-get-edit-location))))
-      (condition-case nil
-          (fuel--try-edit (fuel-eval--send/wait cmd))
-        (error (fuel-edit-vocabulary nil word))))))
+  (let* ((word (or (and (not arg) (fuel-syntax-symbol-at-point))
+                  (fuel-completion--read-word "Edit word: ")))
+         (cmd `(:fuel ((:quote ,word) fuel-get-edit-location))))
+    (condition-case nil
+        (fuel--try-edit (fuel-eval--send/wait cmd))
+      (error (fuel-edit-vocabulary nil word)))))
+
+(defvar fuel-mode--word-history nil)
+
+(defun fuel-edit-word (&optional arg)
+  "Asks for a word to edit, with completion.
+With prefix, only words visible in the current vocabulary are
+offered."
+  (interactive "P")
+  (let* ((word (fuel-completion--read-word "Edit word: "
+                                           nil
+                                           fuel-mode--word-history
+                                           arg))
+         (cmd `(:fuel ((:quote ,word) fuel-get-edit-location))))
+    (fuel--try-edit (fuel-eval--send/wait cmd))))
 
 (defvar fuel--vocabs-prompt-history nil)
 
@@ -183,9 +202,10 @@ interacting with a factor listener is at your disposal.
   (define-key fuel-mode-map (vector '(control ?c) `(control ,p) k) c)
   (define-key fuel-mode-map (vector '(control ?c) `(control ,p) `(control ,k)) c))
 
-(fuel-mode--key-1 ?z 'run-factor)
 (fuel-mode--key-1 ?k 'fuel-run-file)
+(fuel-mode--key-1 ?l 'fuel-run-file)
 (fuel-mode--key-1 ?r 'fuel-eval-region)
+(fuel-mode--key-1 ?z 'run-factor)
 
 (define-key fuel-mode-map "\C-\M-x" 'fuel-eval-definition)
 (define-key fuel-mode-map "\C-\M-r" 'fuel-eval-extended-region)
@@ -193,9 +213,10 @@ interacting with a factor listener is at your disposal.
 (define-key fuel-mode-map (kbd "M-TAB") 'fuel-completion--complete-symbol)
 
 (fuel-mode--key ?e ?e 'fuel-eval-extended-region)
+(fuel-mode--key ?e ?l 'fuel-run-file)
 (fuel-mode--key ?e ?r 'fuel-eval-region)
 (fuel-mode--key ?e ?v 'fuel-edit-vocabulary)
-(fuel-mode--key ?e ?w 'fuel-edit-word-at-point)
+(fuel-mode--key ?e ?w 'fuel-edit-word)
 (fuel-mode--key ?e ?x 'fuel-eval-definition)
 
 (fuel-mode--key ?d ?a 'fuel-autodoc-mode)

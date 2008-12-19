@@ -25,7 +25,7 @@ M: >r/r>-in-fry-error summary
     "Explicit retain stack manipulation is not permitted in fried quotations" ;
 
 : check-fry ( quot -- quot )
-    dup { >r r> load-locals get-local drop-locals } intersect
+    dup { load-local load-locals get-local drop-locals } intersect
     empty? [ >r/r>-in-fry-error ] unless ;
 
 PREDICATE: fry-specifier < word { _ @ } memq? ;

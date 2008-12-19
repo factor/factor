@@ -60,23 +60,6 @@ code in the buffer."
   :group 'factor-mode)
 
 
-;;; Faces:
-
-(fuel-font-lock--define-faces
- factor-font-lock font-lock factor-mode
- ((comment comment "comments")
-  (constructor type  "constructors (<foo>)")
-  (declaration keyword "declaration words")
-  (parsing-word keyword  "parsing words")
-  (setter-word function-name "setter words (>>foo)")
-  (stack-effect comment "stack effect specifications")
-  (string string "strings")
-  (symbol variable-name "name of symbol being defined")
-  (type-name type "type names")
-  (vocabulary-name constant "vocabulary names")
-  (word function-name "word, generic or method being defined")))
-
-
 ;;; Syntax table:
 
 (defun factor-mode--syntax-setup ()

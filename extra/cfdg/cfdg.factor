@@ -1,12 +1,12 @@
 
 USING: kernel alien.c-types combinators namespaces make arrays
-       sequences sequences.lib namespaces.lib splitting
+       sequences splitting
        math math.functions math.vectors math.trig
        opengl.gl opengl.glu opengl ui ui.gadgets.slate
        vars colors self self.slots
        random-weighted colors.hsv cfdg.gl accessors
        ui.gadgets.handler ui.gestures assocs ui.gadgets macros
-       qualified specialized-arrays.double ;
+       specialized-arrays.double ;
 
 QUALIFIED: syntax
 
@@ -60,7 +60,7 @@ VAR: color-stack
 : double-nth* ( c-array indices -- seq )
   swap byte-array>double-array [ nth ] curry map ;
 
-: check-size ( modelview -- num ) { 0 1 4 5 } double-nth* [ abs ] map biggest ;
+: check-size ( modelview -- num ) { 0 1 4 5 } double-nth* [ abs ] map supremum ;
 
 VAR: threshold
 

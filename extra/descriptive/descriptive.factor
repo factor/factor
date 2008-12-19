@@ -11,7 +11,7 @@ M: descriptive-error summary
 
 <PRIVATE
 : rethrower ( word inputs -- quot )
-    [ length ] keep [ >r narray r> swap 2array flip ] 2curry
+    [ length ] keep [ [ narray ] dip swap 2array flip ] 2curry
     [ 2 ndip descriptive-error ] 2curry ;
 
 : [descriptive] ( word def -- newdef )

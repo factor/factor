@@ -1,4 +1,4 @@
-USING: alien.syntax unix.time alias constants ;
+USING: alien.syntax unix.time ;
 IN: unix
 
 CONSTANT: FD_SETSIZE 1024

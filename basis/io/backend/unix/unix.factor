@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.syntax generic assocs kernel
 kernel.private math io.ports sequences strings sbufs threads
 unix vectors io.buffers io.backend io.encodings math.parser
-continuations system libc qualified namespaces make io.timeouts
+continuations system libc namespaces make io.timeouts
 io.encodings.utf8 destructors accessors summary combinators
 locals unix.time fry io.backend.unix.multiplexers ;
 QUALIFIED: io

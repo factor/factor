@@ -23,8 +23,7 @@ textures init-cache
 refcounts init-cache
 
 : refcount-change ( gadget quot -- )
-    >r cache-key* refcounts get
-    [ [ 0 ] unless* ] r> compose change-at ;
+    [ cache-key* refcounts get [ [ 0 ] unless* ] ] dip compose change-at ;
 
 TUPLE: cache-entry tex dims ;
 C: <entry> cache-entry
@@ -86,7 +85,7 @@ M: texture-gadget ungraft* ( gadget -- )
     gen-texture [ (render-bytes) ] keep ;
 
 : render-bytes* ( dims bytes format -- texture dims )
-    pick >r render-bytes r> ;
+    pick [ render-bytes ] dip ;
 
 :: four-corners ( dim -- )
     [let* | w [ dim first ]

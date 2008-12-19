@@ -1,7 +1,5 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-
-! Some low-level code used by vectors and string buffers.
 USING: accessors kernel kernel.private math math.private
 sequences sequences.private ;
 IN: growable
@@ -22,7 +20,7 @@ M: growable set-nth-unsafe underlying>> set-nth-unsafe ;
 
 : contract ( len seq -- )
     [ length ] keep
-    [ 0 -rot set-nth-unsafe ] curry
+    [ [ 0 ] 2dip set-nth-unsafe ] curry
     (each-integer) ; inline
 
 : growable-check ( n seq -- n seq )

@@ -79,7 +79,7 @@ IN: compiler.tree.dead-code.tests
 
 [ [ read drop 1 2 ] ] [ [ read [ 1 2 ] dip drop ] optimize-quot ] unit-test
 
-[ [ over >r + r> ] ] [ [ [ + ] [ drop ] 2bi ] optimize-quot ] unit-test
+[ [ over >R + R> ] ] [ [ [ + ] [ drop ] 2bi ] optimize-quot ] unit-test
 
 [ [ [ ] [ ] if ] ] [ [ [ 1 ] [ 2 ] if drop ] optimize-quot ] unit-test
 

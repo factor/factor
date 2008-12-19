@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators io io.streams.string
-kernel math math.parser namespaces qualified sets
-quotations sequences splitting symbols vectors math.order
+kernel math math.parser namespaces sets
+quotations sequences splitting vectors math.order
 unicode.categories strings regexp.backend regexp.utils
 unicode.case words locals regexp.classes ;
 IN: regexp.parser

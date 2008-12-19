@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax math math.bitwise constants ;
+USING: alien.syntax math math.bitwise ;
 IN: unix.linux.inotify
 
 C-STRUCT: inotify-event

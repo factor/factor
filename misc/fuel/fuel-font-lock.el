@@ -13,8 +13,8 @@
 
 ;;; Code:
 
-(require 'fuel-base)
 (require 'fuel-syntax)
+(require 'fuel-base)
 
 (require 'font-lock)
 
@@ -39,6 +39,21 @@
                      ',faces)))
      (,setup))))
 
+(fuel-font-lock--define-faces
+ factor-font-lock font-lock factor-mode
+ ((comment comment "comments")
+  (constructor type  "constructors (<foo>)")
+  (declaration keyword "declaration words")
+  (parsing-word keyword  "parsing words")
+  (setter-word function-name "setter words (>>foo)")
+  (getter-word function-name "getter words (foo>>)")
+  (stack-effect comment "stack effect specifications")
+  (string string "strings")
+  (symbol variable-name "name of symbol being defined")
+  (type-name type "type names")
+  (vocabulary-name constant "vocabulary names")
+  (word function-name "word, generic or method being defined")))
+
 
 ;;; Font lock:
 
@@ -59,7 +74,8 @@
                                            (2 'factor-font-lock-word))
     (,fuel-syntax--parent-type-regex 1 'factor-font-lock-type-name)
     (,fuel-syntax--constructor-regex . 'factor-font-lock-constructor)
-    (,fuel-syntax--setter-regex . 'factor-font-lock-setter-word)
+    (,fuel-syntax--setter-regex 2 'factor-font-lock-setter-word)
+    (,fuel-syntax--getter-regex 2 'factor-font-lock-getter-word)
     (,fuel-syntax--symbol-definition-regex 2 'factor-font-lock-symbol)
     (,fuel-syntax--use-line-regex 1 'factor-font-lock-vocabulary-name))
   "Font lock keywords definition for Factor mode.")
