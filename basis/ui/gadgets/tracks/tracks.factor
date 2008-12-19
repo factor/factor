@@ -27,10 +27,15 @@ TUPLE: track < pack sizes ;
     [ children>> ] [ sizes>> ] bi { 0 0 }
     [ [ drop { 0 0 } ] [ pref-dim ] if v+ ] 2reduce ;
 
-: available-dim ( track -- dim ) [ dim>> ] [ alloted-dim ] bi v- ;
+: gap-dim ( track -- dim )
+    [ gap>> ] [ children>> length 1 [-] ] bi v*n ;
+
+: available-dim ( track -- dim )
+    [ dim>> ] [ alloted-dim ] bi v- ;
 
 : track-layout ( track -- sizes )
-    [ available-dim ] [ children>> ] [ normalized-sizes ] tri
+    [ [ available-dim ] [ gap-dim ] bi v- ]
+    [ children>> ] [ normalized-sizes ] tri
     [ [ over n*v ] [ pref-dim ] ?if ] 2map nip ;
 
 M: track layout* ( track -- ) dup track-layout pack-layout ;
@@ -41,11 +46,9 @@ M: track layout* ( track -- ) dup track-layout pack-layout ;
 : track-pref-dims-2 ( track -- dim )
     [
         [ children>> pref-dims ] [ normalized-sizes ] bi
-        [ dup { 0 f } memq? [ drop ] [ v/n ] if ] 2map
+        [ dup { 0 f } member? [ 2drop { 0 0 } ] [ v/n ] if ] 2map
         max-dim [ >fixnum ] map
-    ]
-    [ [ gap>> ] [ children>> length 1 [-] ] bi v*n ] bi
-    v+ ;
+    ] [ gap-dim ] bi v+ ;
 
 M: track pref-dim* ( gadget -- dim )
     [ track-pref-dims-1 ]
