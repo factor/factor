@@ -112,6 +112,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     ] with-style nl ;
 
 : print-topic ( topic -- )
+    >link
     last-element off dup $title
     article-content print-content nl ;
 
