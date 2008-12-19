@@ -180,6 +180,10 @@
     (" \\(!\\)" (1 "<"))
     ("^\\(!\\)" (1 "<"))
     ("\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
+    ("\\(\\[\\)\\(let\\|wlet\\|let\\*\\)\\( \\|$\\)" (1 "(]"))
+    ("\\(\\[\\)\\(|\\) +[^|]* \\(|\\)" (1 "(]") (2 "(|") (3 ")|"))
+    (" \\(|\\) " (1 "(|"))
+    (" \\(|\\)$" (1 ")"))
     ("\\([[({]\\)\\([^ \"\n]\\)" (1 "_") (2 "_"))
     ("\\([^ \"\n]\\)\\([])}]\\)" (1 "_") (2 "_"))))
 
@@ -215,16 +219,44 @@
   (looking-at fuel-syntax--end-of-def-regex))
 
 (defsubst fuel-syntax--looking-at-emptiness ()
-  (looking-at "^[ \t]*$"))
+  (looking-at "^[ ]*$\\|$"))
+
+(defsubst fuel-syntax--is-eol (pos)
+  (save-excursion
+    (goto-char (1+ pos))
+    (fuel-syntax--looking-at-emptiness)))
+
+(defsubst fuel-syntax--line-offset (pos)
+  (- pos (save-excursion
+           (goto-char pos)
+           (beginning-of-line)
+           (point))))
+
+(defun fuel-syntax--previous-non-blank ()
+  (forward-line -1)
+  (while (and (not (bobp)) (fuel-syntax--looking-at-emptiness))
+    (forward-line -1)))
+
+(defun fuel-syntax--beginning-of-block ()
+  (save-excursion
+    (or (and (> (fuel-syntax--brackets-depth) 0)
+             (fuel-syntax--brackets-start))
+        (and (fuel-syntax--beginning-of-defun) (point))
+        (point))))
 
 (defun fuel-syntax--at-setter-line ()
   (save-excursion
     (beginning-of-line)
-    (if (not (fuel-syntax--looking-at-emptiness))
-        (re-search-forward fuel-syntax--setter-regex (line-end-position) t)
-      (forward-line -1)
-      (or (fuel-syntax--at-constructor-line)
-          (fuel-syntax--at-setter-line)))))
+    (when (re-search-forward fuel-syntax--setter-regex
+                             (line-end-position)
+                             t)
+      (let* ((to (match-beginning 0))
+             (from (fuel-syntax--beginning-of-block)))
+        (goto-char from)
+        (let ((depth (fuel-syntax--brackets-depth)))
+          (and (or (re-search-forward fuel-syntax--constructor-regex to t)
+                   (re-search-forward fuel-syntax--setter-regex to t))
+               (= depth (fuel-syntax--brackets-depth))))))))
 
 (defun fuel-syntax--at-constructor-line ()
   (save-excursion
