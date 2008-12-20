@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions generic io kernel assocs
 hashtables namespaces make parser prettyprint sequences strings
-io.styles vectors words math sorting splitting classes slots
-vocabs help.stylesheet help.topics vocabs.loader quotations ;
+io.styles vectors words math sorting splitting classes slots fry
+sets vocabs help.stylesheet help.topics vocabs.loader quotations ;
 IN: help.markup
 
 ! Simple markup language.
@@ -157,6 +157,9 @@ ALIAS: $slot $snippet
 : ($long-link) ( object -- )
     [ article-title ] [ >link ] bi write-link ;
 
+: $long-link ( object -- )
+    first ($long-link) ;
+
 : ($subsection) ( element quot -- )
     [
         subsection-style get [
@@ -201,7 +204,7 @@ ALIAS: $slot $snippet
     "See also" $heading $links ;
 
 : related-words ( seq -- )
-    dup [ "related" set-word-prop ] curry each ;
+    dup '[ _ "related" set-word-prop ] each ;
 
 : $related ( element -- )
     first dup "related" word-prop remove
@@ -335,7 +338,8 @@ M: f ($instance)
 
 GENERIC: elements* ( elt-type element -- )
 
-M: simple-element elements* [ elements* ] with each ;
+M: simple-element elements*
+    [ elements* ] with each ;
 
 M: object elements* 2drop ;
 
@@ -346,13 +350,7 @@ M: array elements*
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
 
 : collect-elements ( element seq -- elements )
-    [
-        swap [
-            elements [
-                rest [ dup set ] each
-            ] each
-        ] curry each
-    ] H{ } make-assoc keys ;
+    swap '[ _ elements [ rest ] map concat ] map concat prune ;
 
 : <$link> ( topic -- element )
     1array \ $link prefix ;

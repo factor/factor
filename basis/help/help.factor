@@ -93,28 +93,32 @@ M: word article-parent "help-parent" word-prop ;
 
 M: word set-article-parent swap "help-parent" set-word-prop ;
 
-: $doc-path ( article -- )
-    help-path [
-        [
-            help-path-style get [
-                "Parent topics: " write $links
-            ] with-style
-        ] ($block)
-    ] unless-empty ;
+: ($title) ( topic -- )
+    [ [ article-title ] [ >link ] bi write-object ] ($block) ;
+
+: $navigation-row ( content element label -- )
+    [ prefix 1array ] dip prefix , ;
+
+: $navigation-table ( topic -- )
+    [
+        [ help-path [ \ $links "Up:" $navigation-row ] unless-empty ]
+        [ prev-article [ 1array \ $long-link "Prev:" $navigation-row ] when* ]
+        [ next-article [ 1array \ $long-link "Next:" $navigation-row ] when* ]
+        tri
+    ] { } make [ $table ] unless-empty ;
 
 : $title ( topic -- )
     title-style get [
         title-style get [
-            dup [
-                dup article-title swap >link write-object
-            ] ($block) $doc-path
+            [ ($title) ]
+            [ help-path-style get [ $navigation-table ] with-style ] bi
         ] with-nesting
     ] with-style nl ;
 
 : print-topic ( topic -- )
     >link
-    last-element off dup $title
-    article-content print-content nl ;
+    last-element off
+    [ $title ] [ article-content print-content nl ] bi ;
 
 SYMBOL: help-hook
 
@@ -125,12 +129,8 @@ help-hook global [ [ print-topic ] or ] change-at
 
 : about ( vocab -- )
     dup require
-    dup vocab [ ] [
-        "No such vocabulary: " prepend throw
-    ] ?if
-    dup vocab-help [
-        help
-    ] [
+    dup vocab [ ] [ no-vocab ] ?if
+    dup vocab-help [ help ] [
         "The " write vocab-name write
         " vocabulary does not define a main help article." print
         "To define one, refer to \\ ABOUT: help" print

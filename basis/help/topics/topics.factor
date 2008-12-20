@@ -15,6 +15,7 @@ GENERIC: >link ( obj -- obj )
 M: link >link ;
 M: vocab-spec >link ;
 M: object >link link boa ;
+M: f >link drop \ f >link ;
 
 PREDICATE: word-link < link name>> word? ;
 
