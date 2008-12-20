@@ -178,7 +178,7 @@ terminates a current completion."
 Perform completion similar to Emacs' complete-symbol."
   (interactive)
   (let* ((end (point))
-         (beg (fuel-syntax--symbol-start))
+         (beg (fuel-syntax--beginning-of-symbol-pos))
          (prefix (buffer-substring-no-properties beg end))
          (result (fuel-completion--complete prefix (fuel-syntax--in-using)))
          (completions (car result))

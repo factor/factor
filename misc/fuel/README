@@ -68,6 +68,7 @@ C-cC-eC-r is the same as C-cC-er)).
  - C-cC-da : toggle autodoc mode
  - C-cC-dd : help for word at point
  - C-cC-ds : short help word at point
+ - C-cC-de : show stack effect of current sexp (with prefix, region)
 
 * In the listener:
 

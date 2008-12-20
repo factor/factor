@@ -43,15 +43,14 @@ t clone fuel-eval-res-flag set-global
 
 : pop-fuel-status ( -- )
     fuel-status-stack get empty? [
-        fuel-status-stack get pop {
-            [ in>> in set ]
-            [ use>> clone use set ]
-            [
-                restarts>> fuel-eval-restartable? [ drop ] [
-                    clone restarts set-global
-                ] if
-            ]
-        } cleave
+        fuel-status-stack get pop
+        [ in>> in set ]
+        [ use>> clone use set ]
+        [
+            restarts>> fuel-eval-restartable? [ drop ] [
+                clone restarts set-global
+            ] if
+        ] tri
     ] unless ;
 
 
