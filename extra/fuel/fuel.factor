@@ -6,14 +6,14 @@ combinators compiler.units continuations debugger definitions
 eval help io io.files io.pathnames io.streams.string kernel
 lexer listener listener.private make math memoize namespaces
 parser prettyprint prettyprint.config quotations sequences sets
-sorting source-files strings tools.vocabs vectors vocabs
-vocabs.loader vocabs.parser summary ;
+sorting source-files strings summary tools.vocabs vectors
+vocabs vocabs.loader vocabs.parser ;
 
 IN: fuel
 
 ! Evaluation status:
 
-TUPLE: fuel-status in use ds? restarts ;
+TUPLE: fuel-status in use restarts ;
 
 SYMBOL: fuel-status-stack
 V{ } clone fuel-status-stack set-global
@@ -37,22 +37,20 @@ t clone fuel-eval-res-flag set-global
     f fuel-eval-res-flag set-global ; inline
 
 : push-fuel-status ( -- )
-    in get use get clone display-stacks? get restarts get-global clone
+    in get use get clone restarts get-global clone
     fuel-status boa
     fuel-status-stack get push ;
 
 : pop-fuel-status ( -- )
     fuel-status-stack get empty? [
-        fuel-status-stack get pop {
-            [ in>> in set ]
-            [ use>> clone use set ]
-            [ ds?>> display-stacks? swap [ on ] [ off ] if ]
-            [
-                restarts>> fuel-eval-restartable? [ drop ] [
-                    clone restarts set-global
-                ] if
-            ]
-        } cleave
+        fuel-status-stack get pop
+        [ in>> in set ]
+        [ use>> clone use set ]
+        [
+            restarts>> fuel-eval-restartable? [ drop ] [
+                clone restarts set-global
+            ] if
+        ] tri
     ] unless ;
 
 
@@ -112,7 +110,7 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     error get
     fuel-eval-result get-global
     fuel-eval-output get-global
-    3array fuel-pprint flush nl "EOT:" write ;
+    3array fuel-pprint flush nl "<~FUEL~>" write nl flush ;
 
 : fuel-forget-error ( -- ) f error set-global ; inline
 : fuel-forget-result ( -- ) f fuel-eval-result set-global ; inline
@@ -120,14 +118,13 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 
 : (fuel-begin-eval) ( -- )
     push-fuel-status
-    display-stacks? off
     fuel-forget-error
     fuel-forget-result
     fuel-forget-output ;
 
 : (fuel-end-eval) ( quot -- )
-    with-string-writer fuel-eval-output set-global
-    fuel-retort pop-fuel-status ; inline
+    with-string-writer fuel-eval-output set-global fuel-retort
+    pop-fuel-status ; inline
 
 : (fuel-eval) ( lines -- )
     [ [ parse-lines ] with-compilation-unit call ] curry
