@@ -18,6 +18,7 @@
 (require 'fuel-autodoc)
 (require 'fuel-completion)
 (require 'fuel-font-lock)
+(require 'fuel-popup)
 (require 'fuel-base)
 
 
@@ -81,10 +82,9 @@
 
 ;;; Fuel help buffer and internals:
 
-(defun fuel-help--help-buffer ()
-  (with-current-buffer (get-buffer-create "*fuel help*")
-    (fuel-help-mode)
-    (current-buffer)))
+(fuel-popup--define fuel-help--buffer
+  "*fuel help*" 'fuel-help-mode)
+
 
 (defvar fuel-help--prompt-history nil)
 
@@ -111,7 +111,7 @@
       (fuel-help--insert-contents def out))))
 
 (defun fuel-help--insert-contents (def str &optional nopush)
-  (let ((hb (fuel-help--help-buffer))
+  (let ((hb (fuel-help--buffer))
         (inhibit-read-only t)
         (font-lock-verbose nil))
     (set-buffer hb)
@@ -124,7 +124,7 @@
         (kill-region (point-min) (point))
         (fuel-help--history-push (cons def (buffer-string)))))
     (set-buffer-modified-p nil)
-    (pop-to-buffer hb)
+    (fuel-popup--display)
     (goto-char (point-min))
     (message "%s" def)))
 
@@ -211,7 +211,6 @@ buffer."
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map)
     (define-key map "\C-m" 'fuel-help)
-    (define-key map "q" 'bury-buffer)
     (define-key map "b" 'fuel-help-previous)
     (define-key map "f" 'fuel-help-next)
     (define-key map "l" 'fuel-help-previous)
@@ -245,6 +244,7 @@ buffer."
   (fuel-autodoc-mode)
 
   (run-mode-hooks 'fuel-help-mode-hook)
+
   (setq buffer-read-only t))
 
 

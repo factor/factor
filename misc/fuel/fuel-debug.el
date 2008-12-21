@@ -14,9 +14,10 @@
 
 ;;; Code:
 
-(require 'fuel-base)
 (require 'fuel-eval)
+(require 'fuel-popup)
 (require 'fuel-font-lock)
+(require 'fuel-base)
 
 
 ;;; Customization:
@@ -82,20 +83,14 @@
 
 ;;; Debug buffer:
 
-(defvar fuel-debug--buffer nil)
+(fuel-popup--define fuel-debug--buffer
+  "*fuel debug*" 'fuel-debug-mode)
 
 (make-variable-buffer-local
  (defvar fuel-debug--last-ret nil))
 
 (make-variable-buffer-local
  (defvar fuel-debug--file nil))
-
-(defun fuel-debug--buffer ()
-  (or (and (buffer-live-p fuel-debug--buffer) fuel-debug--buffer)
-      (with-current-buffer
-          (setq fuel-debug--buffer (get-buffer-create "*fuel dbg*"))
-        (fuel-debug-mode)
-        (current-buffer))))
 
 (defun fuel-debug--display-retort (ret &optional success-msg no-pop file)
   (let ((err (fuel-eval--retort-error ret))
@@ -120,7 +115,7 @@
       (setq fuel-debug--file file)
       (goto-char (point-max))
       (font-lock-fontify-buffer)
-      (when (and err (not no-pop)) (pop-to-buffer fuel-debug--buffer))
+      (when (and err (not no-pop)) (fuel-popup--display))
       (not err))))
 
 (defun fuel-debug--display-output (ret)

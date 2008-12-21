@@ -45,20 +45,14 @@
 
 ;;; The xref buffer:
 
-(defvar fuel-xref--buffer-name "*fuel xref*")
-
-(defun fuel-xref--get-buffer ()
-  (let ((buffer (get-buffer fuel-xref--buffer-name)))
-    (or (and (buffer-live-p buffer) buffer)
-        (prog1
-            (set-buffer (get-buffer-create fuel-xref--buffer-name))
-          (fuel-xref-mode)))))
+(fuel-popup--define fuel-xref--buffer
+  "*fuel xref*" 'fuel-xref-mode)
 
 (defvar fuel-xref--help-string "(Press RET or click to follow crossrefs)")
 
 (defun fuel-xref--fill-buffer (title refs)
   (let ((inhibit-read-only t))
-    (with-current-buffer (fuel-xref--get-buffer)
+    (with-current-buffer (fuel-xref--buffer)
       (erase-buffer)
       (insert title "\n\n")
       (dolist (ref refs)
@@ -74,7 +68,8 @@
           (newline)))
       (when refs
         (insert "\n\n" fuel-xref--help-string "\n"))
-      (goto-char (point-min)))))
+      (goto-char (point-min))
+      (current-buffer))))
 
 (defun fuel-xref--show-callers (word)
   (let* ((cmd `(:fuel* (((:quote ,word) fuel-callers-xref))))
@@ -82,8 +77,8 @@
          (title (format (if res "Callers of '%s':"
                           "No callers found for '%s'")
                         word)))
-    (fuel-xref--fill-buffer title res)
-    (pop-to-buffer (fuel-xref--get-buffer))))
+    (set-buffer (fuel-xref--fill-buffer title res))
+    (fuel-popup--display)))
 
 (defun fuel-xref--show-callees (word)
   (let* ((cmd `(:fuel* (((:quote ,word) fuel-callees-xref))))
@@ -91,8 +86,8 @@
          (title (format (if res "Words called by '%s':"
                           "No callees found for '%s'")
                         word)))
-    (fuel-xref--fill-buffer title res)
-    (pop-to-buffer (fuel-xref--get-buffer))))
+    (set-buffer (fuel-xref--fill-buffer title res))
+    (fuel-popup--display)))
 
 
 ;;; Xref mode:
