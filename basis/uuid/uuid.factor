@@ -51,10 +51,10 @@ IN: uuid
     [ CHAR: - = not ] filter 16 base> ;
 
 : uuid>byte-array ( n -- byte-array ) 
-    16 <byte-array> swap 15 -1 [a,b) [ 
-        rot [ dup HEX: ff bitand ] 2dip 
-        [ set-nth ] keep swap -8 shift 
-    ] each drop ;
+    16 <byte-array> 15 -1 [a,b) [ 
+        [ dup HEX: ff bitand ] 2dip swap
+        [ set-nth -8 shift ] keep 
+    ] each nip ;
 
 : byte-array>uuid ( byte-array -- n )
      0 swap [ [ 8 shift ] dip + ] each ;
