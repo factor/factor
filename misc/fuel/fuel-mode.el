@@ -19,6 +19,7 @@
 (require 'fuel-debug)
 (require 'fuel-eval)
 (require 'fuel-help)
+(require 'fuel-xref)
 (require 'fuel-stack)
 (require 'fuel-autodoc)
 (require 'fuel-font-lock)
@@ -35,11 +36,13 @@
 (defcustom fuel-mode-autodoc-p t
   "Whether `fuel-autodoc-mode' gets enabled by default in factor buffers."
   :group 'fuel-mode
+  :group 'fuel-autodoc
   :type 'boolean)
 
 (defcustom fuel-mode-stack-p nil
   "Whether `fuel-stack-mode' gets enabled by default in factor buffers."
   :group 'fuel-mode
+  :group 'fuel-stack
   :type 'boolean)
 
 
@@ -170,6 +173,32 @@ With prefix argument, refreshes cached vocabulary list."
          (cmd `(:fuel* (,vocab fuel-get-vocab-location) "fuel" t)))
     (fuel--try-edit (fuel-eval--send/wait cmd))))
 
+(defun fuel-show-callers (&optional arg)
+  "Show a list of callers of word at point.
+With prefix argument, ask for word."
+  (interactive "P")
+  (let ((word (if arg (fuel-completion--read-word "Find callers for: "
+                                                  (fuel-syntax-symbol-at-point)
+                                                  fuel-mode--word-history)
+                (fuel-syntax-symbol-at-point))))
+    (when word
+      (message "Looking up %s's callers ..." word)
+      (fuel-xref--show-callers word)
+      (message ""))))
+
+(defun fuel-show-callees (&optional arg)
+  "Show a list of callers of word at point.
+With prefix argument, ask for word."
+  (interactive "P")
+  (let ((word (if arg (fuel-completion--read-word "Find callees for: "
+                                                  (fuel-syntax-symbol-at-point)
+                                                  fuel-mode--word-history)
+                (fuel-syntax-symbol-at-point))))
+    (when word
+      (message "Looking up %s's callees ..." word)
+      (fuel-xref--show-callees word)
+      (message ""))))
+
 
 ;;; Minor mode definition:
 
@@ -219,6 +248,8 @@ interacting with a factor listener is at your disposal.
 (define-key fuel-mode-map "\C-\M-x" 'fuel-eval-definition)
 (define-key fuel-mode-map "\C-\M-r" 'fuel-eval-extended-region)
 (define-key fuel-mode-map "\M-." 'fuel-edit-word-at-point)
+(define-key fuel-mode-map "\C-c\M-<" 'fuel-show-callers)
+(define-key fuel-mode-map "\C-c\M->" 'fuel-show-callees)
 (define-key fuel-mode-map (kbd "M-TAB") 'fuel-completion--complete-symbol)
 
 (fuel-mode--key ?e ?e 'fuel-eval-extended-region)
@@ -228,6 +259,8 @@ interacting with a factor listener is at your disposal.
 (fuel-mode--key ?e ?w 'fuel-edit-word)
 (fuel-mode--key ?e ?x 'fuel-eval-definition)
 
+(fuel-mode--key ?d ?> 'fuel-show-callees)
+(fuel-mode--key ?d ?< 'fuel-show-callers)
 (fuel-mode--key ?d ?a 'fuel-autodoc-mode)
 (fuel-mode--key ?d ?d 'fuel-help)
 (fuel-mode--key ?d ?e 'fuel-stack-effect-sexp)

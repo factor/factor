@@ -209,6 +209,7 @@ buffer."
 
 (defvar fuel-help-mode-map
   (let ((map (make-sparse-keymap)))
+    (suppress-keymap map)
     (define-key map "\C-m" 'fuel-help)
     (define-key map "q" 'bury-buffer)
     (define-key map "b" 'fuel-help-previous)
@@ -235,7 +236,7 @@ buffer."
   (kill-all-local-variables)
   (buffer-disable-undo)
   (use-local-map fuel-help-mode-map)
-  (setq mode-name "Factor Help")
+  (setq mode-name "FUEL Help")
   (setq major-mode 'fuel-help-mode)
 
   (fuel-font-lock--font-lock-setup fuel-help--font-lock-keywords t)
