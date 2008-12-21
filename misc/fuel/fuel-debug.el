@@ -106,11 +106,11 @@
       (when err
         (fuel-debug--display-restarts err)
         (delete-blank-lines)
-        (newline)
-        (let ((hstr (fuel-debug--help-string err file)))
-          (if fuel-debug-show-short-help
-              (insert "-----------\n" hstr "\n")
-            (message "%s" hstr))))
+        (newline))
+      (let ((hstr (fuel-debug--help-string err file)))
+        (if fuel-debug-show-short-help
+            (insert "-----------\n" hstr "\n")
+          (message "%s" hstr)))
       (setq fuel-debug--last-ret ret)
       (setq fuel-debug--file file)
       (goto-char (point-max))
@@ -174,16 +174,16 @@
 
 (defun fuel-debug-goto-error ()
   (interactive)
-  (let* ((err (or (fuel-debug--buffer-error)
-                  (error "No errors reported")))
+  (let* ((err (fuel-debug--buffer-error))
          (file (or (fuel-debug--buffer-file)
-                   (error "No file associated with error")))
-         (l/c (fuel-eval--error-line/column err))
+                   (error "No file associated with compilation")))
+         (l/c (and err (fuel-eval--error-line/column err)))
          (line (or (car l/c) 1))
          (col (or (cdr l/c) 0)))
     (find-file-other-window file)
-    (goto-line line)
-    (forward-char col)))
+    (when line
+      (goto-line line)
+      (when col (forward-char col)))))
 
 (defun fuel-debug--read-restart-no ()
   (let ((rs (fuel-debug--buffer-restarts)))
@@ -219,9 +219,11 @@
     (unless (re-search-forward (format "^%s" info) nil t)
       (error "%s information not available" info))
     (message "Retrieving %s info ..." info)
-    (unless (fuel-debug--display-retort
-             (fuel-eval--send/wait `(:fuel ((:factor ,info))))
-             "" (fuel-debug--buffer-file))
+    (unless (fuel-debug--display-retort (fuel-eval--send/wait
+                                         `(:fuel ((:factor ,info))))
+                                        ""
+                                        nil
+                                        (fuel-debug--buffer-file))
       (error "Sorry, no %s info available" info))))
 
 

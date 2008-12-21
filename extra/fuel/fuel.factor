@@ -122,8 +122,8 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     fuel-forget-result
     fuel-forget-output ;
 
-: (fuel-end-eval) ( quot -- )
-    with-string-writer fuel-eval-output set-global fuel-retort
+: (fuel-end-eval) ( result -- )
+    fuel-eval-output set-global fuel-retort
     pop-fuel-status ; inline
 
 : (fuel-eval) ( lines -- )
@@ -141,11 +141,9 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     [ dup "IN: " prepend 1vector (fuel-eval) in set ] when* ; inline
 
 : fuel-eval-in-context ( lines in usings -- )
-    (fuel-begin-eval) [
-        (fuel-eval-usings)
-        (fuel-eval-in)
-        (fuel-eval)
-    ] (fuel-end-eval) ;
+    (fuel-begin-eval)
+    [ (fuel-eval-usings) (fuel-eval-in) (fuel-eval) ] with-string-writer
+    (fuel-end-eval) ;
 
 : fuel-run-file ( path -- ) run-file ; inline
 
