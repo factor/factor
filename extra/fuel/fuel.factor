@@ -166,14 +166,11 @@ M: source-file fuel-pprint path>> fuel-pprint ;
        first2 [ (normalize-path) ] dip 2array fuel-eval-set-result
     ] when* ; inline
 
-: fuel-xref-desc ( word -- str )
-    [ name>> ]
-    [ vocabulary>> [ " (" prepend ")" append ] [ "" ] if* ] bi append ; inline
-
 : fuel-format-xrefs ( seq -- seq )
     [ word? ] filter [
-        [ fuel-xref-desc ]
-        [ where [ first2 [ (normalize-path) ] dip ] [ f f ] if* ] bi 3array
+        [ name>> ]
+        [ vocabulary>> ]
+        [ where [ first2 [ (normalize-path) ] dip ] [ f f ] if* ] tri 4array
     ] map [ [ first ] dip first <=> ] sort ; inline
 
 : fuel-callers-xref ( word -- )

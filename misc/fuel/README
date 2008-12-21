@@ -96,5 +96,10 @@ C-cC-eC-r is the same as C-cC-er)).
  - SPC/S-SPC : scroll up/down
  - TAB/S-TAB : next/previous headline
  - C-cz : switch to listener
- - q: bury buffer
+ - q : bury buffer
 
+* In crossref buffers
+
+ - TAB/BACKTAB : navigate links
+ - RET/mouse click : follow link
+ - q : bury buffer
