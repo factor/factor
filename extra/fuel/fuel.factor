@@ -4,10 +4,10 @@
 USING: accessors arrays assocs classes classes.tuple
 combinators compiler.units continuations debugger definitions
 eval help io io.files io.pathnames io.streams.string kernel
-lexer listener listener.private make math memoize namespaces
-parser prettyprint prettyprint.config quotations sequences sets
-sorting source-files strings summary tools.vocabs vectors
-vocabs vocabs.loader vocabs.parser ;
+lexer listener listener.private make math math.order memoize
+namespaces parser prettyprint prettyprint.config quotations
+sequences sets sorting source-files strings summary tools.vocabs
+vectors vocabs vocabs.loader vocabs.parser words ;
 
 IN: fuel
 
@@ -165,6 +165,22 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     where [
        first2 [ (normalize-path) ] dip 2array fuel-eval-set-result
     ] when* ; inline
+
+: fuel-xref-desc ( word -- str )
+    [ name>> ]
+    [ vocabulary>> [ " (" prepend ")" append ] [ "" ] if* ] bi append ; inline
+
+: fuel-format-xrefs ( seq -- seq )
+    [ word? ] filter [
+        [ fuel-xref-desc ]
+        [ where [ first2 [ (normalize-path) ] dip ] [ f f ] if* ] bi 3array
+    ] map [ [ first ] dip first <=> ] sort ; inline
+
+: fuel-callers-xref ( word -- )
+    usage fuel-format-xrefs fuel-eval-set-result ; inline
+
+: fuel-callees-xref ( word -- )
+    uses fuel-format-xrefs fuel-eval-set-result ; inline
 
 : fuel-get-vocab-location ( vocab -- )
     >vocab-link fuel-get-edit-location ; inline

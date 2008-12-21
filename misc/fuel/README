@@ -70,6 +70,9 @@ C-cC-eC-r is the same as C-cC-er)).
  - C-cC-ds : short help word at point
  - C-cC-de : show stack effect of current sexp (with prefix, region)
 
+ - C-cM-<, C-cC-d< : show callers of word at point
+ - C-cM->, C-cC-d> : show callees of word at point
+
 * In the listener:
 
  - TAB : complete word at point
