@@ -96,13 +96,20 @@ With prefix argument, use current region instead"
  (defvar fuel-stack-mode-string " S"
    "Modeline indicator for fuel-stack-mode"))
 
+(make-variable-buffer-local
+ (defvar fuel-stack--region-function
+   '(lambda ()
+      (fuel--region-to-string (1+ (fuel-syntax--beginning-of-sexp-pos))))))
+
 (defun fuel-stack--eldoc ()
   (when (looking-at-p " \\|$")
-    (let* ((r (fuel--region-to-string (1+ (fuel-syntax--beginning-of-sexp-pos))))
-           (e (fuel-stack--infer-effect/prop r)))
+    (let* ((r (funcall fuel-stack--region-function))
+           (e (and r
+                   (not (string-match "^ *$" r))
+                   (fuel-stack--infer-effect/prop r))))
       (when e
         (if fuel-stack-mode-show-sexp-p
-            (concat (fuel--shorten-str r 30) ": " e)
+            (concat (fuel--shorten-str r 30) " -> " e)
           e)))))
 
 (define-minor-mode fuel-stack-mode

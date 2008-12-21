@@ -78,6 +78,7 @@ C-cC-eC-r is the same as C-cC-er)).
  - TAB : complete word at point
  - M-. : edit word at point in Emacs
  - C-ca : toggle autodoc mode
+ - C-cs : toggle stack mode
  - C-cv : edit vocabulary
  - C-ch : help for word at point
  - C-ck : run file

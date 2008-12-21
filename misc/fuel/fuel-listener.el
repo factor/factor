@@ -13,8 +13,9 @@
 
 ;;; Code:
 
-(require 'fuel-eval)
+(require 'fuel-stack)
 (require 'fuel-completion)
+(require 'fuel-eval)
 (require 'fuel-connection)
 (require 'fuel-syntax)
 (require 'fuel-base)
@@ -102,16 +103,9 @@ buffer."
     (goto-char (point-max))
     (unless seen (error "No prompt found!"))))
 
-
-;;; Completion support
-
-(defsubst fuel-listener--current-vocab () nil)
-(defsubst fuel-listener--usings () nil)
-
-(defun fuel-listener--setup-completion ()
-  (setq fuel-syntax--current-vocab-function 'fuel-listener--current-vocab)
-  (setq fuel-syntax--usings-function 'fuel-listener--usings)
-  (set-syntax-table fuel-syntax--syntax-table))
+(defun fuel-listener-nuke ()
+  (interactive)
+  (fuel-con--setup-connection fuel-listener--buffer))
 
 
 ;;; Interface: starting fuel listener
@@ -129,6 +123,28 @@ buffer."
       (switch-to-buffer buf))))
 
 
+;;; Completion support
+
+(defsubst fuel-listener--current-vocab () nil)
+(defsubst fuel-listener--usings () nil)
+
+(defun fuel-listener--setup-completion ()
+  (setq fuel-syntax--current-vocab-function 'fuel-listener--current-vocab)
+  (setq fuel-syntax--usings-function 'fuel-listener--usings)
+  (set-syntax-table fuel-syntax--syntax-table))
+
+
+;;; Stack mode support
+
+(defun fuel-listener--stack-region ()
+  (fuel--region-to-string (if (zerop (fuel-syntax--brackets-depth))
+                              (comint-line-beginning-position)
+                            (1+ (fuel-syntax--brackets-start)))))
+
+(defun fuel-listener--setup-stack-mode ()
+  (setq fuel-stack--region-function 'fuel-listener--stack-region))
+
+
 ;;; Fuel listener mode:
 
 ;;;###autoload
@@ -138,12 +154,15 @@ buffer."
   (set (make-local-variable 'comint-prompt-regexp) fuel-con--prompt-regex)
   (set (make-local-variable 'comint-use-prompt-regexp) t)
   (set (make-local-variable 'comint-prompt-read-only) t)
-  (fuel-listener--setup-completion))
+  (set-syntax-table fuel-syntax--syntax-table)
+  (fuel-listener--setup-completion)
+  (fuel-listener--setup-stack-mode))
 
 (define-key fuel-listener-mode-map "\C-cz" 'run-factor)
 (define-key fuel-listener-mode-map "\C-c\C-z" 'run-factor)
 (define-key fuel-listener-mode-map "\C-ca" 'fuel-autodoc-mode)
 (define-key fuel-listener-mode-map "\C-ch" 'fuel-help)
+(define-key fuel-listener-mode-map "\C-cs" 'fuel-stack-mode)
 (define-key fuel-listener-mode-map "\M-." 'fuel-edit-word-at-point)
 (define-key fuel-listener-mode-map "\C-cv" 'fuel-edit-vocabulary)
 (define-key fuel-listener-mode-map "\C-c\C-v" 'fuel-edit-vocabulary)

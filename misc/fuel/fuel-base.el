@@ -74,12 +74,14 @@
                      len))
 
 (defsubst fuel--region-to-string (begin &optional end)
-  (mapconcat 'identity
-             (split-string (buffer-substring-no-properties begin
-                                                           (or end (point)))
-                           nil
-                           t)
-             " "))
+  (let ((end (or end (point))))
+    (if (< begin end)
+        (mapconcat 'identity
+                   (split-string (buffer-substring-no-properties begin end)
+                                 nil
+                                 t)
+                   " ")
+      "")))
 
 (defsubst empty-string-p (str) (equal str ""))
 
