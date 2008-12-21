@@ -147,16 +147,6 @@ M: source-file fuel-pprint path>> fuel-pprint ;
         (fuel-eval)
     ] (fuel-end-eval) ;
 
-: fuel-begin-eval ( in -- )
-    (fuel-begin-eval)
-    (fuel-eval-in)
-    fuel-retort ;
-
-: fuel-eval ( lines -- )
-    (fuel-begin-eval) [ (fuel-eval) ] (fuel-end-eval) ; inline
-
-: fuel-end-eval ( -- ) [ ] (fuel-end-eval) ; inline
-
 : fuel-run-file ( path -- ) run-file ; inline
 
 ! Edit locations

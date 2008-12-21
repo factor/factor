@@ -183,8 +183,7 @@ With prefix argument, ask for word."
                 (fuel-syntax-symbol-at-point))))
     (when word
       (message "Looking up %s's callers ..." word)
-      (fuel-xref--show-callers word)
-      (message ""))))
+      (fuel-xref--show-callers word))))
 
 (defun fuel-show-callees (&optional arg)
   "Show a list of callers of word at point.
@@ -196,8 +195,7 @@ With prefix argument, ask for word."
                 (fuel-syntax-symbol-at-point))))
     (when word
       (message "Looking up %s's callees ..." word)
-      (fuel-xref--show-callees word)
-      (message ""))))
+      (fuel-xref--show-callees word))))
 
 
 ;;; Minor mode definition:

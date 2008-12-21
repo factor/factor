@@ -20,7 +20,8 @@
 (make-variable-buffer-local
  (defvar fuel-popup--selected-window nil))
 
-(defun fuel-popup--display ()
+(defun fuel-popup--display (&optional buffer)
+  (when buffer (set-buffer buffer))
   (let ((selected-window (selected-window))
         (buffer (current-buffer)))
     (unless (eq selected-window (get-buffer-window buffer))
