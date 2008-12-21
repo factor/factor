@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: alien.syntax alien.c-types byte-arrays 
-checksums checksums.md5 checksums.sha1 kernel 
-math math.parser math.ranges random unicode.case 
+USING: byte-arrays checksums checksums.md5 checksums.sha1 
+kernel math math.parser math.ranges random unicode.case 
 sequences strings system ;
 
 IN: uuid 
@@ -42,24 +41,23 @@ IN: uuid
     ] dip 76 shift bitor ;
 
 : uuid>string ( n -- string )
-    >hex 32 CHAR: 0 pad-left
-    CHAR: - 20 rot insert-nth
-    CHAR: - 16 rot insert-nth 
-    CHAR: - 12 rot insert-nth 
-    CHAR: - 8 rot insert-nth ;
-
+    >hex 32 CHAR: 0 pad-left 
+    [ CHAR: - 20 ] dip insert-nth
+    [ CHAR: - 16 ] dip insert-nth 
+    [ CHAR: - 12 ] dip insert-nth 
+    [ CHAR: - 8 ] dip insert-nth ;
+ 
 : string>uuid ( string -- n )
     [ CHAR: - = not ] filter 16 base> ;
 
 : uuid>byte-array ( n -- byte-array ) 
-    16 <byte-array> swap 0 15 1 <range> 
-    [ dup 8 * neg [ swap dup ] dip 
-      shift HEX: ff bitand rot roll
-      [ set-nth ] keep swap
-    ] each drop reverse ;
+    16 <byte-array> swap 15 -1 [a,b) [ 
+        rot [ dup HEX: ff bitand ] 2dip 
+        [ set-nth ] keep swap -8 shift 
+    ] each drop ;
 
 : byte-array>uuid ( byte-array -- n )
-    [ >hex 2 CHAR: 0 pad-left ] { } map-as "" join 16 base> ;
+     0 swap [ [ 8 shift ] dip + ] each ;
 
 PRIVATE>
 

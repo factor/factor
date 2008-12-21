@@ -27,3 +27,19 @@ HELP: uuid5
 } ;
 
 
+ARTICLE: "uuid" "UUID (Universally Unique Identifier)"
+"The " { $vocab-link "uuid" } " vocabulary is used to generate UUID's. "
+"The words uuid1, uuid3, uuid4, uuid5 can be used to generate version "
+"1, 3, 4, and 5 UUIDs as specified in RFC 4122.\n"
+"\n" 
+"If all you want is a unique ID, you should probably call uuid1 or uuid4."
+"\n"
+{ $subsection uuid1 }
+{ $subsection uuid3 }
+{ $subsection uuid4 }
+{ $subsection uuid5 }
+;
+
+ABOUT: "uuid"
+
+
