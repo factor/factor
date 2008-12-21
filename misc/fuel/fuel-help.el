@@ -15,6 +15,7 @@
 ;;; Code:
 
 (require 'fuel-eval)
+(require 'fuel-autodoc)
 (require 'fuel-completion)
 (require 'fuel-font-lock)
 (require 'fuel-base)
@@ -25,11 +26,6 @@
 (defgroup fuel-help nil
   "Options controlling FUEL's help system"
   :group 'fuel)
-
-(defcustom fuel-help-minibuffer-font-lock t
-  "Whether to use font lock for info messages in the minibuffer."
-  :group 'fuel-help
-  :type 'boolean)
 
 (defcustom fuel-help-always-ask t
   "When enabled, always ask for confirmation in help prompts."
@@ -57,66 +53,12 @@
   :group 'faces)
 
 
-;;; Autodoc mode:
-
-(defvar fuel-help--font-lock-buffer
-  (let ((buffer (get-buffer-create " *fuel help minibuffer messages*")))
-    (set-buffer buffer)
-    (fuel-font-lock--font-lock-setup)
-    buffer))
-
-(defun fuel-help--font-lock-str (str)
-  (set-buffer fuel-help--font-lock-buffer)
-  (erase-buffer)
-  (insert str)
-  (let ((font-lock-verbose nil)) (font-lock-fontify-buffer))
-  (buffer-string))
-
-(defun fuel-help--word-synopsis (&optional word)
-  (let ((word (or word (fuel-syntax-symbol-at-point)))
-        (fuel-log--inhibit-p t))
-    (when word
-      (let* ((cmd (if (fuel-syntax--in-using)
-                      `(:fuel* (,word fuel-vocab-summary) t t)
-                    `(:fuel* (((:quote ,word) synopsis :get)) t)))
-             (ret (fuel-eval--send/wait cmd 20))
-             (res (fuel-eval--retort-result ret)))
-        (when (and ret (not (fuel-eval--retort-error ret)) (stringp res))
-          (if fuel-help-minibuffer-font-lock
-              (fuel-help--font-lock-str res)
-            res))))))
-
-(make-variable-buffer-local
- (defvar fuel-autodoc-mode-string " A"
-   "Modeline indicator for fuel-autodoc-mode"))
-
-(define-minor-mode fuel-autodoc-mode
-  "Toggle Fuel's Autodoc mode.
-With no argument, this command toggles the mode.
-Non-null prefix argument turns on the mode.
-Null prefix argument turns off the mode.
-
-When Autodoc mode is enabled, a synopsis of the word at point is
-displayed in the minibuffer."
-  :init-value nil
-  :lighter fuel-autodoc-mode-string
-  :group 'fuel
-
-  (set (make-local-variable 'eldoc-documentation-function)
-       (when fuel-autodoc-mode 'fuel-help--word-synopsis))
-  (set (make-local-variable 'eldoc-minor-mode-string) nil)
-  (eldoc-mode fuel-autodoc-mode)
-  (message "Fuel Autodoc %s" (if fuel-autodoc-mode "enabled" "disabled")))
-
-
 ;;; Help browser history:
 
 (defvar fuel-help--history
   (list nil                                        ; current
         (make-ring fuel-help-history-cache-size)   ; previous
         (make-ring fuel-help-history-cache-size))) ; next
-
-(defvar fuel-help--history-idx 0)
 
 (defun fuel-help--history-push (term)
   (when (and (car fuel-help--history)

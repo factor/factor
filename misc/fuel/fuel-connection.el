@@ -133,20 +133,26 @@
       (fuel-con--connection-start-timer conn))))
 
 (defconst fuel-con--prompt-regex "( .+ ) ")
-(defconst fuel-con--eot-marker "EOT:")
-(defconst fuel-con--init-stanza (format "USE: fuel %S write" fuel-con--eot-marker))
+(defconst fuel-con--eot-marker "<~FUEL~>")
+(defconst fuel-con--init-stanza "USE: fuel f fuel-eval")
 
 (defconst fuel-con--comint-finished-regex
-  (format "^%s%s$" fuel-con--eot-marker fuel-con--prompt-regex))
+  (format "^%s$" fuel-con--eot-marker))
 
 (defun fuel-con--setup-comint ()
-  (comint-redirect-cleanup)
   (set (make-local-variable 'comint-redirect-insert-matching-regexp) t)
+  (add-hook 'comint-redirect-filter-functions
+            'fuel-con--comint-preoutput-filter nil t)
   (add-hook 'comint-redirect-hook
             'fuel-con--comint-redirect-hook nil t))
 
 (defadvice comint-redirect-setup (after fuel-con--advice activate)
   (setq comint-redirect-finished-regexp fuel-con--comint-finished-regex))
+
+(defun fuel-con--comint-preoutput-filter (str)
+  (when (string-match fuel-con--comint-finished-regex str)
+    (setq comint-redirect-finished-regexp fuel-con--prompt-regex))
+  str)
 
 
 ;;; Requests handling:

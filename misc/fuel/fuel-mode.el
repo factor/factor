@@ -14,15 +14,16 @@
 
 ;;; Code:
 
-(require 'factor-mode)
-(require 'fuel-base)
-(require 'fuel-syntax)
-(require 'fuel-font-lock)
-(require 'fuel-debug)
-(require 'fuel-help)
-(require 'fuel-eval)
-(require 'fuel-completion)
 (require 'fuel-listener)
+(require 'fuel-completion)
+(require 'fuel-debug)
+(require 'fuel-eval)
+(require 'fuel-help)
+(require 'fuel-stack)
+(require 'fuel-autodoc)
+(require 'fuel-font-lock)
+(require 'fuel-syntax)
+(require 'fuel-base)
 
 
 ;;; Customization:
@@ -32,7 +33,12 @@
   :group 'fuel)
 
 (defcustom fuel-mode-autodoc-p t
-  "Whether `fuel-autodoc-mode' gets enable by default in fuel buffers."
+  "Whether `fuel-autodoc-mode' gets enabled by default in factor buffers."
+  :group 'fuel-mode
+  :type 'boolean)
+
+(defcustom fuel-mode-stack-p nil
+  "Whether `fuel-stack-mode' gets enabled by default in factor buffers."
   :group 'fuel-mode
   :type 'boolean)
 
@@ -74,7 +80,7 @@ With prefix argument, ask for the file to run."
 
 (defun fuel-eval-region (begin end &optional arg)
   "Sends region to Fuel's listener for evaluation.
-Unless called with a prefix, switchs to the compilation results
+Unless called with a prefix, switches to the compilation results
 buffer in case of errors."
   (interactive "r\nP")
   (let* ((lines (split-string (buffer-substring-no-properties begin end)
@@ -90,9 +96,9 @@ buffer in case of errors."
      (buffer-file-name))))
 
 (defun fuel-eval-extended-region (begin end &optional arg)
-  "Sends region extended outwards to nearest definitions,
+  "Sends region, extended outwards to nearest definition,
 to Fuel's listener for evaluation.
-Unless called with a prefix, switchs to the compilation results
+Unless called with a prefix, switches to the compilation results
 buffer in case of errors."
   (interactive "r\nP")
   (fuel-eval-region (save-excursion (goto-char begin) (mark-defun) (point))
@@ -101,7 +107,7 @@ buffer in case of errors."
 
 (defun fuel-eval-definition (&optional arg)
   "Sends definition around point to Fuel's listener for evaluation.
-Unless called with a prefix, switchs to the compilation results
+Unless called with a prefix, switches to the compilation results
 buffer in case of errors."
   (interactive "P")
   (save-excursion
@@ -189,7 +195,10 @@ interacting with a factor listener is at your disposal.
   :keymap fuel-mode-map
 
   (setq fuel-autodoc-mode-string "/A")
-  (when fuel-mode-autodoc-p (fuel-autodoc-mode fuel-mode)))
+  (when fuel-mode-autodoc-p (fuel-autodoc-mode fuel-mode))
+
+  (setq fuel-stack-mode-string "/S")
+  (when fuel-mode-stack-p (fuel-stack-mode fuel-mode)))
 
 
 ;;; Keys:
@@ -221,6 +230,7 @@ interacting with a factor listener is at your disposal.
 
 (fuel-mode--key ?d ?a 'fuel-autodoc-mode)
 (fuel-mode--key ?d ?d 'fuel-help)
+(fuel-mode--key ?d ?e 'fuel-stack-effect-sexp)
 (fuel-mode--key ?d ?s 'fuel-help-short)
 
 

@@ -19,18 +19,16 @@
 
 (defun fuel-syntax--beginning-of-symbol ()
   "Move point to the beginning of the current symbol."
-  (while (eq (char-before) ?:) (backward-char))
-  (skip-syntax-backward "w_"))
+  (skip-syntax-backward "w_()"))
 
-(defsubst fuel-syntax--symbol-start ()
+(defsubst fuel-syntax--beginning-of-symbol-pos ()
   (save-excursion (fuel-syntax--beginning-of-symbol) (point)))
 
 (defun fuel-syntax--end-of-symbol ()
   "Move point to the end of the current symbol."
-  (skip-syntax-forward "w_")
-  (while (looking-at ":") (forward-char)))
+  (skip-syntax-forward "w_()"))
 
-(defsubst fuel-syntax--symbol-end ()
+(defsubst fuel-syntax--end-of-symbol-pos ()
   (save-excursion (fuel-syntax--end-of-symbol) (point)))
 
 (put 'factor-symbol 'end-op 'fuel-syntax--end-of-symbol)
@@ -180,6 +178,10 @@
     (" \\(!\\)" (1 "<"))
     ("^\\(!\\)" (1 "<"))
     ("\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
+    ("\\(\\[\\)\\(let\\|wlet\\|let\\*\\)\\( \\|$\\)" (1 "(]"))
+    ("\\(\\[\\)\\(|\\) +[^|]* \\(|\\)" (1 "(]") (2 "(|") (3 ")|"))
+    (" \\(|\\) " (1 "(|"))
+    (" \\(|\\)$" (1 ")"))
     ("\\([[({]\\)\\([^ \"\n]\\)" (1 "_") (2 "_"))
     ("\\([^ \"\n]\\)\\([])}]\\)" (1 "_") (2 "_"))))
 
@@ -215,16 +217,44 @@
   (looking-at fuel-syntax--end-of-def-regex))
 
 (defsubst fuel-syntax--looking-at-emptiness ()
-  (looking-at "^[ \t]*$"))
+  (looking-at "^[ ]*$\\|$"))
+
+(defsubst fuel-syntax--is-eol (pos)
+  (save-excursion
+    (goto-char (1+ pos))
+    (fuel-syntax--looking-at-emptiness)))
+
+(defsubst fuel-syntax--line-offset (pos)
+  (- pos (save-excursion
+           (goto-char pos)
+           (beginning-of-line)
+           (point))))
+
+(defun fuel-syntax--previous-non-blank ()
+  (forward-line -1)
+  (while (and (not (bobp)) (fuel-syntax--looking-at-emptiness))
+    (forward-line -1)))
+
+(defun fuel-syntax--beginning-of-block-pos ()
+  (save-excursion
+    (if (> (fuel-syntax--brackets-depth) 0)
+        (fuel-syntax--brackets-start)
+      (fuel-syntax--beginning-of-defun)
+      (point))))
 
 (defun fuel-syntax--at-setter-line ()
   (save-excursion
     (beginning-of-line)
-    (if (not (fuel-syntax--looking-at-emptiness))
-        (re-search-forward fuel-syntax--setter-regex (line-end-position) t)
-      (forward-line -1)
-      (or (fuel-syntax--at-constructor-line)
-          (fuel-syntax--at-setter-line)))))
+    (when (re-search-forward fuel-syntax--setter-regex
+                             (line-end-position)
+                             t)
+      (let* ((to (match-beginning 0))
+             (from (fuel-syntax--beginning-of-block-pos)))
+        (goto-char from)
+        (let ((depth (fuel-syntax--brackets-depth)))
+          (and (or (re-search-forward fuel-syntax--constructor-regex to t)
+                   (re-search-forward fuel-syntax--setter-regex to t))
+               (= depth (fuel-syntax--brackets-depth))))))))
 
 (defun fuel-syntax--at-constructor-line ()
   (save-excursion
@@ -246,6 +276,25 @@
 
 (defsubst fuel-syntax--end-of-defun ()
   (re-search-forward fuel-syntax--end-of-def-regex nil t))
+
+(defconst fuel-syntax--defun-signature-regex
+  (format "\\(%s\\|%s\\)"
+          (format ":[^ ]* [^ ]+\\(%s\\)*" fuel-syntax--stack-effect-regex)
+          "M[^:]*: [^ ]+ [^ ]+"))
+
+(defun fuel-syntax--beginning-of-body ()
+  (let ((p (point)))
+    (and (fuel-syntax--beginning-of-defun)
+         (re-search-forward fuel-syntax--defun-signature-regex p t)
+         (not (re-search-forward fuel-syntax--end-of-def-regex p t)))))
+
+(defun fuel-syntax--beginning-of-sexp ()
+  (if (> (fuel-syntax--brackets-depth) 0)
+      (goto-char (fuel-syntax--brackets-start))
+    (fuel-syntax--beginning-of-body)))
+
+(defsubst fuel-syntax--beginning-of-sexp-pos ()
+  (save-excursion (fuel-syntax--beginning-of-sexp) (point)))
 
 
 ;;; USING/IN:
