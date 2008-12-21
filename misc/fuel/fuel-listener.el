@@ -76,6 +76,7 @@ buffer."
     (make-comint-in-buffer "fuel listener" (current-buffer) factor nil
                            "-run=listener" (format "-i=%s" image))
     (fuel-listener--wait-for-prompt 10000)
+    (fuel-con--setup-connection (current-buffer))
     (fuel-con--send-string/wait (current-buffer)
                                 fuel-con--init-stanza
                                 '(lambda (s) (message "FUEL listener up and running!"))
@@ -130,10 +131,12 @@ buffer."
 
 ;;; Fuel listener mode:
 
+;;;###autoload
 (define-derived-mode fuel-listener-mode comint-mode "Fuel Listener"
   "Major mode for interacting with an inferior Factor listener process.
 \\{fuel-listener-mode-map}"
   (set (make-local-variable 'comint-prompt-regexp) fuel-con--prompt-regex)
+  (set (make-local-variable 'comint-use-prompt-regexp) t)
   (set (make-local-variable 'comint-prompt-read-only) t)
   (fuel-listener--setup-completion))
 

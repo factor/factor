@@ -1,6 +1,6 @@
 ! Copyback (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors math qualified ;
+USING: kernel accessors math ;
 QUALIFIED: sequences
 IN: persistent.deques
 
@@ -14,7 +14,7 @@ C: <cons> cons
 
 : each ( list quot: ( elt -- ) -- )
     over
-    [ [ >r car>> r> call ] [ >r cdr>> r> ] 2bi each ]
+    [ [ [ car>> ] dip call ] [ [ cdr>> ] dip ] 2bi each ]
     [ 2drop ] if ; inline recursive
 
 : reduce ( list start quot -- end )
@@ -27,7 +27,7 @@ C: <cons> cons
     0 [ drop 1+ ] reduce ;
 
 : cut ( list index -- back front-reversed )
-    f swap [ >r [ cdr>> ] [ car>> ] bi r> <cons> ] times ;
+    f swap [ [ [ cdr>> ] [ car>> ] bi ] dip <cons> ] times ;
 
 : split-reverse ( list -- back-reversed front )
     dup length 2/ cut [ reverse ] bi@ ;
@@ -41,7 +41,7 @@ TUPLE: deque { front read-only } { back read-only } ;
     [ back>> ] [ front>> ] bi deque boa ;
 
 : flipped ( deque quot -- newdeque )
-    >r flip r> call flip ;
+    [ flip ] dip call flip ;
 PRIVATE>
 
 : deque-empty? ( deque -- ? )

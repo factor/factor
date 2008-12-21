@@ -6,7 +6,7 @@ make math.parser io accessors ;
 IN: faq
 
 : find-after ( seq quot -- elem after )
-    over >r find r> rot 1+ tail ; inline
+    over [ find ] dip rot 1+ tail ; inline
 
 : tag-named*? ( tag name -- ? )
     assure-name swap tag-named? ;
@@ -18,7 +18,7 @@ C: <q/a> q/a
 : li>q/a ( li -- q/a )
     [ "br" tag-named*? not ] filter
     [ "strong" tag-named*? ] find-after
-    >r children>> r> <q/a> ;
+    [ children>> ] dip <q/a> ;
 
 : q/a>li ( q/a -- li )
     [ question>> "strong" build-tag* f "br" build-tag* 2array ] keep
@@ -48,7 +48,7 @@ C: <question-list> question-list
     title>> [ "title" pick set-at ] when* ;
 
 : html>question-list ( h3 ol -- question-list )
-    >r [ children>string ] [ f ] if* r>
+    [ [ children>string ] [ f ] if* ] dip
     children-tags [ li>q/a ] map <question-list> ;
 
 : question-list>h3 ( id question-list -- h3 )
@@ -58,8 +58,7 @@ C: <question-list> question-list
     ] [ drop f ] if* ;
 
 : question-list>html ( question-list start id -- h3/f ol )
-    -rot >r [ question-list>h3 ] keep
-    seq>> [ q/a>li ] map "ol" build-tag* r>
+    -rot [ [ question-list>h3 ] keep seq>> [ q/a>li ] map "ol" build-tag* ] dip
     number>string "start" pick set-at
     "margin-left: 5em" "style" pick set-at ;
 
@@ -69,7 +68,7 @@ C: <faq> faq
 
 : html>faq ( div -- faq )
     unclip swap { "h3" "ol" } [ tags-named ] with map
-    first2 >r f prefix r> [ html>question-list ] 2map <faq> ;
+    first2 [ f prefix ] dip [ html>question-list ] 2map <faq> ;
 
 : header, ( faq -- )
     dup header>> ,

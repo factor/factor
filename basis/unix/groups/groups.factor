@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings io.encodings.utf8
 io.backend.unix kernel math sequences splitting unix strings
-combinators.short-circuit byte-arrays combinators qualified
+combinators.short-circuit byte-arrays combinators
 accessors math.parser fry assocs namespaces continuations
 unix.users unix.utilities ;
 IN: unix.groups

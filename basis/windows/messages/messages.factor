@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs hashtables kernel math namespaces words
-windows.types vocabs sequences constants alias ;
+windows.types vocabs sequences ;
 IN: windows.messages
 
 SYMBOL: windows-messages

@@ -60,23 +60,6 @@ code in the buffer."
   :group 'factor-mode)
 
 
-;;; Faces:
-
-(fuel-font-lock--define-faces
- factor-font-lock font-lock factor-mode
- ((comment comment "comments")
-  (constructor type  "constructors (<foo>)")
-  (declaration keyword "declaration words")
-  (parsing-word keyword  "parsing words")
-  (setter-word function-name "setter words (>>foo)")
-  (stack-effect comment "stack effect specifications")
-  (string string "strings")
-  (symbol variable-name "name of symbol being defined")
-  (type-name type "type names")
-  (vocabulary-name constant "vocabulary names")
-  (word function-name "word, generic or method being defined")))
-
-
 ;;; Syntax table:
 
 (defun factor-mode--syntax-setup ()
@@ -111,16 +94,19 @@ code in the buffer."
   (save-excursion
     (beginning-of-line)
     (when (> (fuel-syntax--brackets-depth) 0)
-      (let* ((op (fuel-syntax--brackets-start))
-             (cl (fuel-syntax--brackets-end))
-             (ln (line-number-at-pos))
-             (iop (fuel-syntax--indentation-at op)))
-        (when (> ln (line-number-at-pos op))
-          (if (and (> cl 0)
-                   (= (- cl (point)) (current-indentation))
-                   (= ln (line-number-at-pos cl)))
-              iop
-            (fuel-syntax--increased-indentation iop)))))))
+      (let* ((bs (fuel-syntax--brackets-start))
+             (be (fuel-syntax--brackets-end))
+             (ln (line-number-at-pos)))
+        (when (> ln (line-number-at-pos bs))
+          (cond ((and (> be 0)
+                      (= (- be (point)) (current-indentation))
+                      (= ln (line-number-at-pos be)))
+                 (fuel-syntax--indentation-at bs))
+                ((or (fuel-syntax--is-eol bs)
+                     (not (eq ?\ (char-after (1+ bs)))))
+                 (fuel-syntax--increased-indentation
+                  (fuel-syntax--indentation-at bs)))
+                (t (+ 2 (fuel-syntax--line-offset bs)))))))))
 
 (defun factor-mode--indent-definition ()
   (save-excursion

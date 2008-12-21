@@ -23,7 +23,7 @@ IN: bunny.model
 
 : n ( vs triple -- n )
     swap [ nth ] curry map
-    dup third over first v- >r dup second swap first v- r> cross
+    [ [ second ] [ first ] bi v- ] [ [ third ] [ first ] bi v- ] bi cross
     vneg normalize ;
 
 : normal ( ns vs triple -- )
@@ -31,7 +31,7 @@ IN: bunny.model
 
 : normals ( vs is -- ns )
     over length { 0.0 0.0 0.0 } <array> -rot
-    [ >r 2dup r> normal ] each drop
+    [ [ 2dup ] dip normal ] each drop
     [ normalize ] map ;
 
 : read-model ( stream -- model )

@@ -3,7 +3,7 @@
 USING: accessors assocs math kernel shuffle generalizations
 words quotations arrays combinators sequences math.vectors
 io.styles prettyprint vocabs sorting io generic
-math.statistics math.order combinators.lib locals.types
+math.statistics math.order locals.types
 locals.definitions ;
 IN: reports.noise
 
@@ -21,19 +21,14 @@ IN: reports.noise
         { 2over 4 }
         { 2slip 2 }
         { 2swap 3 }
-        { 2with 2 }
-        { 2with* 3 }
         { 3curry 2 }
         { 3drop 1 }
         { 3dup 2 }
         { 3keep 3 }
         { 3nip 4 }
         { 3slip 3 }
-        { 3with 3 }
-        { 3with* 4 }
         { 4drop 2 }
         { 4dup 3 }
-        { 4slip 4 }
         { compose 1/2 }
         { curry 1/3 }
         { dip 1 }
@@ -74,9 +69,6 @@ IN: reports.noise
         { tuck 2 }
         { tuckd 4 }
         { with 1/2 }
-        { with* 2 }
-        { r> 1 }
-        { >r 1 }
 
         { bi 1/2 }
         { tri 1 }
@@ -113,18 +105,18 @@ M: array noise [ noise ] map vsum ;
     #! For very short words, noise doesn't count so much
     #! (so dup foo swap bar isn't penalized as badly).
     noise first2 {
-        { [ over 4 <= ] [ >r drop 0 r> ] }
-        { [ over 15 >= ] [ >r 2 * r> ] }
+        { [ over 4 <= ] [ [ drop 0 ] dip ] }
+        { [ over 15 >= ] [ [ 2 * ] dip ] }
         [ ]
     } cond
     {
         ! short words are easier to read
-        { [ dup 10 <= ] [ >r 2 / r> ] }
-        { [ dup 5 <= ] [ >r 3 / r> ] }
+        { [ dup 10 <= ] [ [ 2 / ] dip ] }
+        { [ dup 5 <= ] [ [ 3 / ] dip ] }
         ! long words are penalized even more
-        { [ dup 25 >= ] [ >r 2 * r> 20 max ] }
-        { [ dup 20 >= ] [ >r 5/3 * r> ] }
-        { [ dup 15 >= ] [ >r 3/2 * r> ] }
+        { [ dup 25 >= ] [ [ 2 * ] dip 20 max ] }
+        { [ dup 20 >= ] [ [ 5/3 * ] dip ] }
+        { [ dup 15 >= ] [ [ 3/2 * ] dip ] }
         [ ]
     } cond noise-factor ;
 

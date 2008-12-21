@@ -1,6 +1,5 @@
 
-USING: kernel parser math quotations namespaces sequences macros
-bake bake.fry ;
+USING: kernel parser math quotations namespaces sequences macros fry ;
 
 IN: rewrite-closures
 
@@ -12,12 +11,12 @@ MACRO: set-parameters ( seq -- quot ) [set-parameters] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: parametric-quot ( parameters quot -- quot ) '[ , set-parameters , call ] ;
+: parametric-quot ( parameters quot -- quot ) '[ _ set-parameters _ call ] ;
 
-: scoped-quot ( quot -- quot ) '[ , with-scope ] ;
+: scoped-quot ( quot -- quot ) '[ _ with-scope ] ;
 
 : closed-quot ( quot -- quot )
-  namestack swap '[ namestack [ , set-namestack @ ] dip set-namestack ] ;
+  namestack swap '[ namestack [ _ set-namestack @ ] dip set-namestack ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

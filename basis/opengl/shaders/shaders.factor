@@ -115,7 +115,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
 PREDICATE: gl-program < integer (gl-program?) ;
 
 : <simple-gl-program> ( vertex-shader-source fragment-shader-source -- program )
-    >r <vertex-shader> check-gl-shader
-    r> <fragment-shader> check-gl-shader
+    [ <vertex-shader> check-gl-shader ]
+    [ <fragment-shader> check-gl-shader ] bi*
     2array <gl-program> check-gl-program ;
 

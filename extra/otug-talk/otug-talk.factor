@@ -5,12 +5,12 @@ sequences kernel sequences parser memoize io.encodings.binary
 locals kernel.private tools.vocabs.browser assocs quotations
  tools.vocabs tools.annotations tools.crossref
 help.topics math.functions compiler.tree.optimizer
-compiler.cfg.optimizer fry graphics.bitmap graphics.viewer
+compiler.cfg.optimizer fry
 ui.gadgets.panes tetris tetris.game combinators generalizations
 multiline sequences.private ;
 IN: otug-talk
 
-USING: cairo cairo.samples cairo.ffi cairo.gadgets accessors
+USING: cairo cairo.ffi cairo.gadgets accessors
 io.backend ui.gadgets ;
 
 TUPLE: png-gadget < cairo-gadget surface ;

@@ -20,13 +20,13 @@ M: thread send ( message thread -- )
     my-mailbox mailbox-get ?linked ;
 
 : receive-timeout ( timeout -- message )
-    my-mailbox swap mailbox-get-timeout ?linked ;
+    [ my-mailbox ] dip mailbox-get-timeout ?linked ;
 
 : receive-if ( pred -- message )
-    my-mailbox swap mailbox-get? ?linked ; inline
+    [ my-mailbox ] dip mailbox-get? ?linked ; inline
 
 : receive-if-timeout ( timeout pred -- message )
-    my-mailbox -rot mailbox-get-timeout? ?linked ; inline
+    [ my-mailbox ] 2dip mailbox-get-timeout? ?linked ; inline
 
 : rethrow-linked ( error process supervisor -- )
     [ <linked-error> ] dip send ;

@@ -14,15 +14,17 @@
 
 ;;; Code:
 
-(require 'factor-mode)
-(require 'fuel-base)
-(require 'fuel-syntax)
-(require 'fuel-font-lock)
-(require 'fuel-debug)
-(require 'fuel-help)
-(require 'fuel-eval)
-(require 'fuel-completion)
 (require 'fuel-listener)
+(require 'fuel-completion)
+(require 'fuel-debug)
+(require 'fuel-eval)
+(require 'fuel-help)
+(require 'fuel-xref)
+(require 'fuel-stack)
+(require 'fuel-autodoc)
+(require 'fuel-font-lock)
+(require 'fuel-syntax)
+(require 'fuel-base)
 
 
 ;;; Customization:
@@ -32,21 +34,38 @@
   :group 'fuel)
 
 (defcustom fuel-mode-autodoc-p t
-  "Whether `fuel-autodoc-mode' gets enable by default in fuel buffers."
+  "Whether `fuel-autodoc-mode' gets enabled by default in factor buffers."
   :group 'fuel-mode
+  :group 'fuel-autodoc
+  :type 'boolean)
+
+(defcustom fuel-mode-stack-p nil
+  "Whether `fuel-stack-mode' gets enabled by default in factor buffers."
+  :group 'fuel-mode
+  :group 'fuel-stack
   :type 'boolean)
 
 
 ;;; User commands
 
-(defun fuel-run-file (&optional arg)
-  "Sends the current file to Factor for compilation.
-With prefix argument, ask for the file to run."
-  (interactive "P")
+(defun fuel-mode--read-file (arg)
   (let* ((file (or (and arg (read-file-name "File: " nil (buffer-file-name) t))
                    (buffer-file-name)))
          (file (expand-file-name file))
          (buffer (find-file-noselect file)))
+    (when (and  buffer
+                (buffer-modified-p buffer)
+                (y-or-n-p "Save file? "))
+      (save-buffer buffer))
+    (cons file buffer)))
+
+(defun fuel-run-file (&optional arg)
+  "Sends the current file to Factor for compilation.
+With prefix argument, ask for the file to run."
+  (interactive "P")
+  (let* ((f/b (fuel-mode--read-file arg))
+         (file (car f/b))
+         (buffer (cdr f/b)))
     (when buffer
       (with-current-buffer buffer
         (message "Compiling %s ..." file)
@@ -61,9 +80,10 @@ With prefix argument, ask for the file to run."
       (message "Compiling %s ... OK!" file)
     (message "")))
 
+
 (defun fuel-eval-region (begin end &optional arg)
   "Sends region to Fuel's listener for evaluation.
-Unless called with a prefix, switchs to the compilation results
+Unless called with a prefix, switches to the compilation results
 buffer in case of errors."
   (interactive "r\nP")
   (let* ((lines (split-string (buffer-substring-no-properties begin end)
@@ -79,9 +99,9 @@ buffer in case of errors."
      (buffer-file-name))))
 
 (defun fuel-eval-extended-region (begin end &optional arg)
-  "Sends region extended outwards to nearest definitions,
+  "Sends region, extended outwards to nearest definition,
 to Fuel's listener for evaluation.
-Unless called with a prefix, switchs to the compilation results
+Unless called with a prefix, switches to the compilation results
 buffer in case of errors."
   (interactive "r\nP")
   (fuel-eval-region (save-excursion (goto-char begin) (mark-defun) (point))
@@ -90,7 +110,7 @@ buffer in case of errors."
 
 (defun fuel-eval-definition (&optional arg)
   "Sends definition around point to Fuel's listener for evaluation.
-Unless called with a prefix, switchs to the compilation results
+Unless called with a prefix, switches to the compilation results
 buffer in case of errors."
   (interactive "P")
   (save-excursion
@@ -153,6 +173,32 @@ With prefix argument, refreshes cached vocabulary list."
          (cmd `(:fuel* (,vocab fuel-get-vocab-location) "fuel" t)))
     (fuel--try-edit (fuel-eval--send/wait cmd))))
 
+(defun fuel-show-callers (&optional arg)
+  "Show a list of callers of word at point.
+With prefix argument, ask for word."
+  (interactive "P")
+  (let ((word (if arg (fuel-completion--read-word "Find callers for: "
+                                                  (fuel-syntax-symbol-at-point)
+                                                  fuel-mode--word-history)
+                (fuel-syntax-symbol-at-point))))
+    (when word
+      (message "Looking up %s's callers ..." word)
+      (fuel-xref--show-callers word)
+      (message ""))))
+
+(defun fuel-show-callees (&optional arg)
+  "Show a list of callers of word at point.
+With prefix argument, ask for word."
+  (interactive "P")
+  (let ((word (if arg (fuel-completion--read-word "Find callees for: "
+                                                  (fuel-syntax-symbol-at-point)
+                                                  fuel-mode--word-history)
+                (fuel-syntax-symbol-at-point))))
+    (when word
+      (message "Looking up %s's callees ..." word)
+      (fuel-xref--show-callees word)
+      (message ""))))
+
 
 ;;; Minor mode definition:
 
@@ -178,7 +224,10 @@ interacting with a factor listener is at your disposal.
   :keymap fuel-mode-map
 
   (setq fuel-autodoc-mode-string "/A")
-  (when fuel-mode-autodoc-p (fuel-autodoc-mode fuel-mode)))
+  (when fuel-mode-autodoc-p (fuel-autodoc-mode fuel-mode))
+
+  (setq fuel-stack-mode-string "/S")
+  (when fuel-mode-stack-p (fuel-stack-mode fuel-mode)))
 
 
 ;;; Keys:
@@ -191,23 +240,30 @@ interacting with a factor listener is at your disposal.
   (define-key fuel-mode-map (vector '(control ?c) `(control ,p) k) c)
   (define-key fuel-mode-map (vector '(control ?c) `(control ,p) `(control ,k)) c))
 
-(fuel-mode--key-1 ?z 'run-factor)
 (fuel-mode--key-1 ?k 'fuel-run-file)
+(fuel-mode--key-1 ?l 'fuel-run-file)
 (fuel-mode--key-1 ?r 'fuel-eval-region)
+(fuel-mode--key-1 ?z 'run-factor)
 
 (define-key fuel-mode-map "\C-\M-x" 'fuel-eval-definition)
 (define-key fuel-mode-map "\C-\M-r" 'fuel-eval-extended-region)
 (define-key fuel-mode-map "\M-." 'fuel-edit-word-at-point)
+(define-key fuel-mode-map "\C-c\M-<" 'fuel-show-callers)
+(define-key fuel-mode-map "\C-c\M->" 'fuel-show-callees)
 (define-key fuel-mode-map (kbd "M-TAB") 'fuel-completion--complete-symbol)
 
 (fuel-mode--key ?e ?e 'fuel-eval-extended-region)
+(fuel-mode--key ?e ?l 'fuel-run-file)
 (fuel-mode--key ?e ?r 'fuel-eval-region)
 (fuel-mode--key ?e ?v 'fuel-edit-vocabulary)
 (fuel-mode--key ?e ?w 'fuel-edit-word)
 (fuel-mode--key ?e ?x 'fuel-eval-definition)
 
+(fuel-mode--key ?d ?> 'fuel-show-callees)
+(fuel-mode--key ?d ?< 'fuel-show-callers)
 (fuel-mode--key ?d ?a 'fuel-autodoc-mode)
 (fuel-mode--key ?d ?d 'fuel-help)
+(fuel-mode--key ?d ?e 'fuel-stack-effect-sexp)
 (fuel-mode--key ?d ?s 'fuel-help-short)
 
 

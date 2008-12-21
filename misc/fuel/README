@@ -68,6 +68,10 @@ C-cC-eC-r is the same as C-cC-er)).
  - C-cC-da : toggle autodoc mode
  - C-cC-dd : help for word at point
  - C-cC-ds : short help word at point
+ - C-cC-de : show stack effect of current sexp (with prefix, region)
+
+ - C-cM-<, C-cC-d< : show callers of word at point
+ - C-cM->, C-cC-d> : show callees of word at point
 
 * In the listener:
 
@@ -90,5 +94,7 @@ C-cC-eC-r is the same as C-cC-er)).
  - RET : help for word at point
  - f/b : next/previous page
  - SPC/S-SPC : scroll up/down
+ - TAB/S-TAB : next/previous headline
+ - C-cz : switch to listener
  - q: bury buffer
 

@@ -4,16 +4,16 @@
 USING: accessors arrays assocs classes classes.tuple
 combinators compiler.units continuations debugger definitions
 eval help io io.files io.pathnames io.streams.string kernel
-lexer listener listener.private make math memoize namespaces
-parser prettyprint prettyprint.config quotations sequences sets
-sorting source-files strings tools.vocabs vectors vocabs
-vocabs.loader ;
+lexer listener listener.private make math math.order memoize
+namespaces parser prettyprint prettyprint.config quotations
+sequences sets sorting source-files strings summary tools.vocabs
+vectors vocabs vocabs.loader vocabs.parser words ;
 
 IN: fuel
 
 ! Evaluation status:
 
-TUPLE: fuel-status in use ds? restarts ;
+TUPLE: fuel-status in use restarts ;
 
 SYMBOL: fuel-status-stack
 V{ } clone fuel-status-stack set-global
@@ -37,22 +37,20 @@ t clone fuel-eval-res-flag set-global
     f fuel-eval-res-flag set-global ; inline
 
 : push-fuel-status ( -- )
-    in get use get clone display-stacks? get restarts get-global clone
+    in get use get clone restarts get-global clone
     fuel-status boa
     fuel-status-stack get push ;
 
 : pop-fuel-status ( -- )
     fuel-status-stack get empty? [
-        fuel-status-stack get pop {
-            [ in>> in set ]
-            [ use>> clone use set ]
-            [ ds?>> display-stacks? swap [ on ] [ off ] if ]
-            [
-                restarts>> fuel-eval-restartable? [ drop ] [
-                    clone restarts set-global
-                ] if
-            ]
-        } cleave
+        fuel-status-stack get pop
+        [ in>> in set ]
+        [ use>> clone use set ]
+        [
+            restarts>> fuel-eval-restartable? [ drop ] [
+                clone restarts set-global
+            ] if
+        ] tri
     ] unless ;
 
 
@@ -112,7 +110,7 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     error get
     fuel-eval-result get-global
     fuel-eval-output get-global
-    3array fuel-pprint flush nl "EOT:" write ;
+    3array fuel-pprint flush nl "<~FUEL~>" write nl flush ;
 
 : fuel-forget-error ( -- ) f error set-global ; inline
 : fuel-forget-result ( -- ) f fuel-eval-result set-global ; inline
@@ -120,14 +118,13 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 
 : (fuel-begin-eval) ( -- )
     push-fuel-status
-    display-stacks? off
     fuel-forget-error
     fuel-forget-result
     fuel-forget-output ;
 
 : (fuel-end-eval) ( quot -- )
-    with-string-writer fuel-eval-output set-global
-    fuel-retort pop-fuel-status ; inline
+    with-string-writer fuel-eval-output set-global fuel-retort
+    pop-fuel-status ; inline
 
 : (fuel-eval) ( lines -- )
     [ [ parse-lines ] with-compilation-unit call ] curry
@@ -160,19 +157,50 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 
 : fuel-end-eval ( -- ) [ ] (fuel-end-eval) ; inline
 
+: fuel-run-file ( path -- ) run-file ; inline
+
+! Edit locations
+
 : fuel-get-edit-location ( defspec -- )
     where [
        first2 [ (normalize-path) ] dip 2array fuel-eval-set-result
     ] when* ; inline
 
+: fuel-xref-desc ( word -- str )
+    [ name>> ]
+    [ vocabulary>> [ " (" prepend ")" append ] [ "" ] if* ] bi append ; inline
+
+: fuel-format-xrefs ( seq -- seq )
+    [ word? ] filter [
+        [ fuel-xref-desc ]
+        [ where [ first2 [ (normalize-path) ] dip ] [ f f ] if* ] bi 3array
+    ] map [ [ first ] dip first <=> ] sort ; inline
+
+: fuel-callers-xref ( word -- )
+    usage fuel-format-xrefs fuel-eval-set-result ; inline
+
+: fuel-callees-xref ( word -- )
+    uses fuel-format-xrefs fuel-eval-set-result ; inline
+
 : fuel-get-vocab-location ( vocab -- )
     >vocab-link fuel-get-edit-location ; inline
+
+! Completion support
+
+: fuel-filter-prefix ( seq prefix -- seq )
+    [ drop-prefix nip length 0 = ] curry filter prune ; inline
 
 : (fuel-get-vocabs) ( -- seq )
     all-vocabs-seq [ vocab-name ] map ; inline
 
 : fuel-get-vocabs ( -- )
     (fuel-get-vocabs) fuel-eval-set-result ; inline
+
+: fuel-get-vocabs/prefix ( prefix -- )
+    (fuel-get-vocabs) swap fuel-filter-prefix fuel-eval-set-result ; inline
+
+: fuel-vocab-summary ( name -- )
+    >vocab-link summary fuel-eval-set-result ; inline
 
 MEMO: (fuel-vocab-words) ( name -- seq )
     >vocab-link words [ name>> ] map ;
@@ -185,12 +213,13 @@ MEMO: (fuel-vocab-words) ( name -- seq )
 
 : (fuel-get-words) ( prefix names/f -- seq )
     [ fuel-vocabs-words ] [ fuel-current-words ] if* natural-sort
-    swap [ drop-prefix nip length 0 = ] curry filter ;
+    swap fuel-filter-prefix ;
 
 : fuel-get-words ( prefix names -- )
     (fuel-get-words) fuel-eval-set-result ; inline
 
-: fuel-run-file ( path -- ) run-file ; inline
+
+! -run=fuel support
 
 : fuel-startup ( -- ) "listener" run-file ; inline
 

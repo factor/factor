@@ -28,11 +28,6 @@ PREDICATE: deferred < word ( obj -- ? )
 M: deferred definer drop \ DEFER: f ;
 M: deferred definition drop f ;
 
-PREDICATE: symbol < word ( obj -- ? )
-    [ def>> ] [ [ ] curry ] bi sequence= ;
-M: symbol definer drop \ SYMBOL: f ;
-M: symbol definition drop f ;
-
 PREDICATE: primitive < word ( obj -- ? )
     [ def>> [ do-primitive ] tail? ]
     [ sub-primitive>> >boolean ]
@@ -194,9 +189,6 @@ SYMBOL: visited
 
 : define-inline ( word def effect -- )
     [ define-declared ] [ 2drop make-inline ] 3bi ;
-
-: define-symbol ( word -- )
-    dup [ ] curry (( -- word )) define-inline ;
 
 GENERIC: reset-word ( word -- )
 

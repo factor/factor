@@ -83,7 +83,7 @@ DEFER: collision-theta
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: theta-dd-small? ( par limit -- par ? ) >r dup theta-dd>> abs r> < ;
+: theta-dd-small? ( par limit -- par ? ) [ dup theta-dd>> abs ] dip < ;
 
 : random-theta-dd  ( par a b -- par ) 2random >>theta-dd ;
 
@@ -149,8 +149,8 @@ METHOD: collide ( <axion> -- )
 : axion-white ( dy -- dy ) dup 1 swap dy>alpha gray boa \ stroke-color set ;
 : axion-black ( dy -- dy ) dup 0 swap dy>alpha gray boa \ stroke-color set ;
 
-: axion-point- ( particle dy -- particle ) >r dup pos>> r> v-y point ;
-: axion-point+ ( particle dy -- particle ) >r dup pos>> r> v+y point ;
+: axion-point- ( particle dy -- particle ) [ dup pos>> ] dip v-y point ;
+: axion-point+ ( particle dy -- particle ) [ dup pos>> ] dip v+y point ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

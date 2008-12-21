@@ -60,7 +60,7 @@ M: demo-gadget pref-dim* ( gadget -- dim )
     ] [
         GL_MODELVIEW glMatrixMode
         glLoadIdentity
-        [ >r 0.0 0.0 r> distance>> neg glTranslatef ]
+        [ [ 0.0 0.0 ] dip distance>> neg glTranslatef ]
         [ pitch>> 1.0 0.0 0.0 glRotatef ]
         [ yaw>>   0.0 1.0 0.0 glRotatef ]
         tri
