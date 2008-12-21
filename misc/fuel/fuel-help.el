@@ -48,10 +48,8 @@
   :type 'integer
   :group 'fuel-help)
 
-(defface fuel-help-font-lock-headlines '((t (:bold t :weight bold)))
-  "Face for headlines in help buffers."
-  :group 'fuel-help
-  :group 'faces)
+(fuel-font-lock--defface fuel-help-font-lock-headlines
+  'bold fuel-hep "headlines in help buffers")
 
 
 ;;; Help browser history:

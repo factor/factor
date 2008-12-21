@@ -17,6 +17,7 @@
 (require 'fuel-autodoc)
 (require 'fuel-syntax)
 (require 'fuel-eval)
+(require 'fuel-font-lock)
 (require 'fuel-base)
 
 
@@ -26,12 +27,10 @@
   "Customization for FUEL's stack inference engine"
   :group 'fuel)
 
-(defface fuel-font-lock-stack-region (face-user-default-spec 'highlight)
-  "Face used to highlight the region whose stack effect is shown"
-  :group 'fuel-stack
-  :group 'faces)
+(fuel-font-lock--defface fuel-font-lock-stack-region
+  'highlight fuel-stack "highlighting the stack effect region")
 
-(defcustom fuel-stack-highlight-period 2
+(defcustom fuel-stack-highlight-period 2.0
   "Time, in seconds, the region is highlighted when showing its
 stack effect.
 
