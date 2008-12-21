@@ -158,7 +158,7 @@ M: table model-changed
 : (select-row) ( table row -- )
     over validate-row
     [ [ thin-row-rect ] [ drop ] 2bi scroll>rect ]
-    [ >>selected-index relayout-1 ]
+    [ [ >>selected-index ] [ >>mouse-index ] bi relayout-1 ]
     2bi ;
 
 : mouse-row ( table -- n )
