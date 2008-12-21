@@ -76,9 +76,10 @@ cursor at the first ocurrence of the used word."
 
 (defun fuel-xref--title (word cc count)
   (let ((cc (if cc "using" "used by")))
-    (cond ((zerop count) (format "No known words %s '%s'" cc word))
-          ((= 1 count) (format "1 word %s '%s':" cc word))
-          (t (format "%s words %s '%s':" count cc word)))))
+    (put-text-property 0 (length word) 'font-lock-face 'bold word)
+    (cond ((zerop count) (format "No known words %s %s" cc word))
+          ((= 1 count) (format "1 word %s %s:" cc word))
+          (t (format "%s words %s %s:" count cc word)))))
 
 (defun fuel-xref--insert-ref (ref)
   (when (and (stringp (first ref))
