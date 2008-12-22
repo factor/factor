@@ -7,6 +7,22 @@ IN: ui.gadgets.plot
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! Examples:
+!
+!   <plot> [ sin ] add-function gadget.
+!
+!   <plot>
+!     [ sin ] red  function boa add-function
+!     [ cos ] blue function boa add-function
+!   gadget.
+!
+! 
+! Use the arrow keys to move around.
+!
+! Use 'a' and 'z' keys to zoom in and out.
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 TUPLE: plot < cartesian functions points ;
 
 : init-plot ( plot -- plot )
@@ -29,11 +45,11 @@ TUPLE: function function color ;
 GENERIC: plot-function ( plot object -- plot )
 
 M: callable plot-function ( plot quotation -- plot )
-  >r dup plot-range r> '[ dup @ 2array ] map line-strip ;
+  [ dup plot-range ] dip '[ dup @ 2array ] map line-strip ;
 
 M: function plot-function ( plot function -- plot )
    dup color>> dup [ >stroke-color ] [ drop ] if
-   >r dup plot-range r> function>> '[ dup @ 2array ] map line-strip ;
+   [ dup plot-range ] dip function>> '[ dup @ 2array ] map line-strip ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
