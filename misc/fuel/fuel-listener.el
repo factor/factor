@@ -105,6 +105,7 @@ buffer."
 
 (defun fuel-listener-nuke ()
   (interactive)
+  (comint-redirect-cleanup)
   (fuel-con--setup-connection fuel-listener--buffer))
 
 

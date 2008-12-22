@@ -92,7 +92,14 @@
 (make-variable-buffer-local
  (defvar fuel-debug--file nil))
 
-(defun fuel-debug--display-retort (ret &optional success-msg no-pop file)
+(defun fuel-debug--prepare-compilation (file msg)
+  (let ((inhibit-read-only t))
+    (with-current-buffer (fuel-debug--buffer)
+      (erase-buffer)
+      (insert msg)
+      (setq fuel-debug--file file))))
+
+(defun fuel-debug--display-retort (ret &optional success-msg no-pop)
   (let ((err (fuel-eval--retort-error ret))
         (inhibit-read-only t))
     (with-current-buffer (fuel-debug--buffer)
@@ -107,12 +114,11 @@
         (fuel-debug--display-restarts err)
         (delete-blank-lines)
         (newline))
-      (let ((hstr (fuel-debug--help-string err file)))
+      (let ((hstr (fuel-debug--help-string err fuel-debug--file)))
         (if fuel-debug-show-short-help
             (insert "-----------\n" hstr "\n")
           (message "%s" hstr)))
       (setq fuel-debug--last-ret ret)
-      (setq fuel-debug--file file)
       (goto-char (point-max))
       (font-lock-fontify-buffer)
       (when (and err (not no-pop)) (fuel-popup--display))
@@ -219,11 +225,8 @@
     (unless (re-search-forward (format "^%s" info) nil t)
       (error "%s information not available" info))
     (message "Retrieving %s info ..." info)
-    (unless (fuel-debug--display-retort (fuel-eval--send/wait
-                                         `(:fuel ((:factor ,info))))
-                                        ""
-                                        nil
-                                        (fuel-debug--buffer-file))
+    (unless (fuel-debug--display-retort
+             (fuel-eval--send/wait `(:fuel ((:factor ,info)))) "")
       (error "Sorry, no %s info available" info))))
 
 

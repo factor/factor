@@ -68,15 +68,14 @@ With prefix argument, ask for the file to run."
          (buffer (cdr f/b)))
     (when buffer
       (with-current-buffer buffer
-        (message "Compiling %s ..." file)
-        (fuel-eval--send `(:fuel (,file fuel-run-file))
-                         `(lambda (r) (fuel--run-file-cont r ,file)))))))
+        (let ((msg (format "Compiling %s ..." file)))
+          (fuel-debug--prepare-compilation file msg)
+          (message msg)
+          (fuel-eval--send `(:fuel (,file fuel-run-file))
+                           `(lambda (r) (fuel--run-file-cont r ,file))))))))
 
 (defun fuel--run-file-cont (ret file)
-  (if (fuel-debug--display-retort ret
-                                  (format "%s successfully compiled" file)
-                                  nil
-                                  file)
+  (if (fuel-debug--display-retort ret (format "%s successfully compiled" file))
       (message "Compiling %s ... OK!" file)
     (message "")))
 
@@ -86,17 +85,20 @@ With prefix argument, ask for the file to run."
 Unless called with a prefix, switches to the compilation results
 buffer in case of errors."
   (interactive "r\nP")
-  (let* ((lines (split-string (buffer-substring-no-properties begin end)
-                              "[\f\n\r\v]+" t))
+  (let* ((rstr (buffer-substring begin end))
+         (lines (split-string (substring-no-properties rstr)
+                              "[\f\n\r\v]+"
+                              t))
          (cmd `(:fuel (,(mapcar (lambda (l) `(:factor ,l)) lines))))
          (cv (fuel-syntax--current-vocab)))
+    (fuel-debug--prepare-compilation (buffer-file-name)
+                                     (format "Evaluating:\n\n%s" rstr))
     (fuel-debug--display-retort
      (fuel-eval--send/wait cmd 10000)
      (format "%s%s"
              (if cv (format "IN: %s " cv) "")
              (fuel--shorten-region begin end 70))
-     arg
-     (buffer-file-name))))
+     arg)))
 
 (defun fuel-eval-extended-region (begin end &optional arg)
   "Sends region, extended outwards to nearest definition,
