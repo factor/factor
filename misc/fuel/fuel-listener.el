@@ -147,6 +147,10 @@ buffer."
 
 ;;; Fuel listener mode:
 
+(defun fuel-listener--bol ()
+  (interactive)
+  (when (= (point) (comint-bol)) (beginning-of-line)))
+
 ;;;###autoload
 (define-derived-mode fuel-listener-mode comint-mode "Fuel Listener"
   "Major mode for interacting with an inferior Factor listener process.
@@ -160,6 +164,7 @@ buffer."
 
 (define-key fuel-listener-mode-map "\C-cz" 'run-factor)
 (define-key fuel-listener-mode-map "\C-c\C-z" 'run-factor)
+(define-key fuel-listener-mode-map "\C-a" 'fuel-listener--bol)
 (define-key fuel-listener-mode-map "\C-ca" 'fuel-autodoc-mode)
 (define-key fuel-listener-mode-map "\C-ch" 'fuel-help)
 (define-key fuel-listener-mode-map "\C-cs" 'fuel-stack-mode)

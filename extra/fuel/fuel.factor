@@ -36,23 +36,21 @@ t clone fuel-eval-res-flag set-global
 : fuel-eval-non-restartable ( -- )
     f fuel-eval-res-flag set-global ; inline
 
-: push-fuel-status ( -- )
+: fuel-push-status ( -- )
     in get use get clone restarts get-global clone
     fuel-status boa
     fuel-status-stack get push ;
 
-: pop-fuel-status ( -- )
+: fuel-pop-restarts ( restarts -- )
+    fuel-eval-restartable? [ drop ] [ clone restarts set-global ] if ; inline
+
+: fuel-pop-status ( -- )
     fuel-status-stack get empty? [
         fuel-status-stack get pop
         [ in>> in set ]
         [ use>> clone use set ]
-        [
-            restarts>> fuel-eval-restartable? [ drop ] [
-                clone restarts set-global
-            ] if
-        ] tri
+        [ restarts>> fuel-pop-restarts ] tri
     ] unless ;
-
 
 ! Lispy pretty printing
 
@@ -67,11 +65,7 @@ M: integer fuel-pprint pprint ; inline
 M: string fuel-pprint pprint ; inline
 
 M: sequence fuel-pprint
-    dup empty? [ drop f fuel-pprint ] [
-        "(" write
-        [ " " write ] [ fuel-pprint ] interleave
-        ")" write
-    ] if ;
+    "(" write [ " " write ] [ fuel-pprint ] interleave ")" write ; inline
 
 M: tuple fuel-pprint tuple>array fuel-pprint ; inline
 
@@ -117,14 +111,13 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 : fuel-forget-output ( -- ) f fuel-eval-output set-global ; inline
 
 : (fuel-begin-eval) ( -- )
-    push-fuel-status
+    fuel-push-status
     fuel-forget-error
     fuel-forget-result
     fuel-forget-output ;
 
-: (fuel-end-eval) ( result -- )
-    fuel-eval-output set-global fuel-retort
-    pop-fuel-status ; inline
+: (fuel-end-eval) ( output -- )
+    fuel-eval-output set-global fuel-retort fuel-pop-status ; inline
 
 : (fuel-eval) ( lines -- )
     [ [ parse-lines ] with-compilation-unit call ] curry
@@ -155,25 +148,29 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 : fuel-get-edit-location ( defspec -- )
     where fuel-normalize-loc 2array fuel-eval-set-result ; inline
 
+: fuel-get-vocab-location ( vocab -- )
+    >vocab-link fuel-get-edit-location ; inline
+
 : fuel-get-doc-location ( defspec -- )
     props>> "help-loc" swap at
     fuel-normalize-loc 2array fuel-eval-set-result ;
 
-: fuel-format-xrefs ( seq -- seq )
-    [ word? ] filter [
-        [ name>> ]
-        [ vocabulary>> ]
-        [ where fuel-normalize-loc ] tri 4array
-    ] map [ [ first ] dip first <=> ] sort ; inline
+! Cross-references
+
+: fuel-word>xref ( word -- xref )
+    [ name>> ] [ vocabulary>> ] [ where fuel-normalize-loc ] tri 4array ;
+
+: fuel-sort-xrefs ( seq -- seq' )
+    [ [ first ] dip first <=> ] sort ; inline
+
+: fuel-format-xrefs ( seq -- seq' )
+    [ word? ] filter [ fuel-word>xref ] map fuel-sort-xrefs ;
 
 : fuel-callers-xref ( word -- )
     usage fuel-format-xrefs fuel-eval-set-result ; inline
 
 : fuel-callees-xref ( word -- )
     uses fuel-format-xrefs fuel-eval-set-result ; inline
-
-: fuel-get-vocab-location ( vocab -- )
-    >vocab-link fuel-get-edit-location ; inline
 
 ! Completion support
 
