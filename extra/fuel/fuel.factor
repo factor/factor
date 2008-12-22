@@ -122,8 +122,8 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     fuel-forget-result
     fuel-forget-output ;
 
-: (fuel-end-eval) ( quot -- )
-    with-string-writer fuel-eval-output set-global fuel-retort
+: (fuel-end-eval) ( result -- )
+    fuel-eval-output set-global fuel-retort
     pop-fuel-status ; inline
 
 : (fuel-eval) ( lines -- )
@@ -141,39 +141,29 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     [ dup "IN: " prepend 1vector (fuel-eval) in set ] when* ; inline
 
 : fuel-eval-in-context ( lines in usings -- )
-    (fuel-begin-eval) [
-        (fuel-eval-usings)
-        (fuel-eval-in)
-        (fuel-eval)
-    ] (fuel-end-eval) ;
-
-: fuel-begin-eval ( in -- )
     (fuel-begin-eval)
-    (fuel-eval-in)
-    fuel-retort ;
-
-: fuel-eval ( lines -- )
-    (fuel-begin-eval) [ (fuel-eval) ] (fuel-end-eval) ; inline
-
-: fuel-end-eval ( -- ) [ ] (fuel-end-eval) ; inline
+    [ (fuel-eval-usings) (fuel-eval-in) (fuel-eval) ] with-string-writer
+    (fuel-end-eval) ;
 
 : fuel-run-file ( path -- ) run-file ; inline
 
 ! Edit locations
 
-: fuel-get-edit-location ( defspec -- )
-    where [
-       first2 [ (normalize-path) ] dip 2array fuel-eval-set-result
-    ] when* ; inline
+: fuel-normalize-loc ( seq -- path line )
+    dup length 1 > [ first2 [ (normalize-path) ] dip ] [ f ] if ; inline
 
-: fuel-xref-desc ( word -- str )
-    [ name>> ]
-    [ vocabulary>> [ " (" prepend ")" append ] [ "" ] if* ] bi append ; inline
+: fuel-get-edit-location ( defspec -- )
+    where fuel-normalize-loc 2array fuel-eval-set-result ; inline
+
+: fuel-get-doc-location ( defspec -- )
+    props>> "help-loc" swap at
+    fuel-normalize-loc 2array fuel-eval-set-result ;
 
 : fuel-format-xrefs ( seq -- seq )
     [ word? ] filter [
-        [ fuel-xref-desc ]
-        [ where [ first2 [ (normalize-path) ] dip ] [ f f ] if* ] bi 3array
+        [ name>> ]
+        [ vocabulary>> ]
+        [ where fuel-normalize-loc ] tri 4array
     ] map [ [ first ] dip first <=> ] sort ; inline
 
 : fuel-callers-xref ( word -- )

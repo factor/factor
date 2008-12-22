@@ -21,13 +21,24 @@
 
 ;;; Faces:
 
+(defgroup fuel-faces nil
+  "Faces used by FUEL."
+  :group 'fuel
+  :group 'faces)
+
+(defmacro fuel-font-lock--defface (face def group doc)
+  `(defface ,face (face-default-spec ,def)
+     ,(format "Face for %s." doc)
+     :group ',group
+     :group 'fuel-faces
+     :group 'faces))
+
+(put 'fuel-font-lock--defface 'lisp-indent-function 1)
+
 (defmacro fuel-font-lock--make-face (prefix def-prefix group face def doc)
   (let ((face (intern (format "%s-%s" prefix face)))
         (def (intern (format "%s-%s-face" def-prefix def))))
-    `(defface ,face (face-default-spec ,def)
-       ,(format "Face for %s." doc)
-       :group ',group
-       :group 'faces)))
+    `(fuel-font-lock--defface ,face ,def ,group ,doc)))
 
 (defmacro fuel-font-lock--define-faces (prefix def-prefix group faces)
   (let ((setup (make-symbol (format "%s--faces-setup" prefix))))

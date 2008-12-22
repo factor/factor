@@ -18,13 +18,14 @@
 (require 'fuel-autodoc)
 (require 'fuel-completion)
 (require 'fuel-font-lock)
+(require 'fuel-popup)
 (require 'fuel-base)
 
 
 ;;; Customization:
 
 (defgroup fuel-help nil
-  "Options controlling FUEL's help system"
+  "Options controlling FUEL's help system."
   :group 'fuel)
 
 (defcustom fuel-help-always-ask t
@@ -47,10 +48,8 @@
   :type 'integer
   :group 'fuel-help)
 
-(defface fuel-help-font-lock-headlines '((t (:bold t :weight bold)))
-  "Face for headlines in help buffers."
-  :group 'fuel-help
-  :group 'faces)
+(fuel-font-lock--defface fuel-font-lock-help-headlines
+  'bold fuel-hep "headlines in help buffers")
 
 
 ;;; Help browser history:
@@ -81,10 +80,9 @@
 
 ;;; Fuel help buffer and internals:
 
-(defun fuel-help--help-buffer ()
-  (with-current-buffer (get-buffer-create "*fuel help*")
-    (fuel-help-mode)
-    (current-buffer)))
+(fuel-popup--define fuel-help--buffer
+  "*fuel help*" 'fuel-help-mode)
+
 
 (defvar fuel-help--prompt-history nil)
 
@@ -111,7 +109,7 @@
       (fuel-help--insert-contents def out))))
 
 (defun fuel-help--insert-contents (def str &optional nopush)
-  (let ((hb (fuel-help--help-buffer))
+  (let ((hb (fuel-help--buffer))
         (inhibit-read-only t)
         (font-lock-verbose nil))
     (set-buffer hb)
@@ -124,7 +122,7 @@
         (kill-region (point-min) (point))
         (fuel-help--history-push (cons def (buffer-string)))))
     (set-buffer-modified-p nil)
-    (pop-to-buffer hb)
+    (fuel-popup--display)
     (goto-char (point-min))
     (message "%s" def)))
 
@@ -154,7 +152,7 @@
 
 (defconst fuel-help--font-lock-keywords
   `(,@fuel-font-lock--font-lock-keywords
-    (,fuel-help--headlines-regexp . 'fuel-help-font-lock-headlines)))
+    (,fuel-help--headlines-regexp . 'fuel-font-lock-help-headlines)))
 
 
 
@@ -211,7 +209,6 @@ buffer."
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map)
     (define-key map "\C-m" 'fuel-help)
-    (define-key map "q" 'bury-buffer)
     (define-key map "b" 'fuel-help-previous)
     (define-key map "f" 'fuel-help-next)
     (define-key map "l" 'fuel-help-previous)
@@ -222,6 +219,7 @@ buffer."
     (define-key map [(backtab)] 'fuel-help-previous-headline)
     (define-key map (kbd "SPC")  'scroll-up)
     (define-key map (kbd "S-SPC") 'scroll-down)
+    (define-key map "\M-." 'fuel-edit-word-at-point)
     (define-key map "\C-cz" 'run-factor)
     (define-key map "\C-c\C-z" 'run-factor)
     map))
@@ -245,6 +243,7 @@ buffer."
   (fuel-autodoc-mode)
 
   (run-mode-hooks 'fuel-help-mode-hook)
+
   (setq buffer-read-only t))
 
 
