@@ -62,8 +62,7 @@
   '("flushable" "foldable" "inline" "parsing" "recursive"))
 
 (defconst fuel-syntax--declaration-words-regex
-  (format "%s\\($\\| \\)"
-          (regexp-opt fuel-syntax--declaration-words 'words)))
+  (regexp-opt fuel-syntax--declaration-words 'words))
 
 (defsubst fuel-syntax--second-word-regex (prefixes)
   (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
@@ -81,8 +80,8 @@
 
 (defconst fuel-syntax--constructor-regex "<[^ >]+>")
 
-(defconst fuel-syntax--getter-regex "\\( \\|^\\)\\([^ ]+>>\\)\\( \\|$\\)")
-(defconst fuel-syntax--setter-regex "\\( \\|^\\)\\(>>[^ ]+\\)\\( \\|$\\)")
+(defconst fuel-syntax--getter-regex "\\(^\\|\\_<\\)[^ ]+?>>\\_>")
+(defconst fuel-syntax--setter-regex "\\_<>>.+?\\_>")
 
 (defconst fuel-syntax--symbol-definition-regex
   (fuel-syntax--second-word-regex '("SYMBOL:" "VAR:")))
@@ -104,7 +103,7 @@
   (format "^\\(%s:\\) " fuel-syntax--definition-starters-regex))
 
 (defconst fuel-syntax--definition-end-regex
-  (format "\\(\\(^\\| +\\);\\( +%s\\)*\\($\\| +\\)\\)"
+  (format "\\(\\(^\\| +\\);\\( *%s\\)*\\($\\| +\\)\\)"
           fuel-syntax--declaration-words-regex))
 
 (defconst fuel-syntax--single-liner-regex
@@ -128,41 +127,23 @@
 ;;; Factor syntax table
 
 (defvar fuel-syntax--syntax-table
-  (let ((i 0)
-        (table (make-syntax-table)))
-    ;; Default is atom-constituent
-    (while (< i 256)
-      (modify-syntax-entry i "_   " table)
-      (setq i (1+ i)))
-
-    ;; Word components.
-    (setq i ?0)
-    (while (<= i ?9)
-      (modify-syntax-entry i "w   " table)
-      (setq i (1+ i)))
-    (setq i ?A)
-    (while (<= i ?Z)
-      (modify-syntax-entry i "w   " table)
-      (setq i (1+ i)))
-    (setq i ?a)
-    (while (<= i ?z)
-      (modify-syntax-entry i "w   " table)
-      (setq i (1+ i)))
+  (let ((table (make-syntax-table)))
+    ;; Default is word constituent
+    (dotimes (i 256)
+      (modify-syntax-entry i "w" table))
 
     ;; Whitespace
     (modify-syntax-entry ?\t " " table)
     (modify-syntax-entry ?\f " " table)
     (modify-syntax-entry ?\r " " table)
-    (modify-syntax-entry ?  " " table)
-
-    ;; (end of) Comments
-    (modify-syntax-entry ?\n ">" table)
+    (modify-syntax-entry ?\  " " table)
+    (modify-syntax-entry ?\n " " table)
 
     ;; Parenthesis
-    (modify-syntax-entry ?\[ "(]  " table)
-    (modify-syntax-entry ?\] ")[  " table)
-    (modify-syntax-entry ?{ "(}  " table)
-    (modify-syntax-entry ?} "){  " table)
+    (modify-syntax-entry ?\[ "(]" table)
+    (modify-syntax-entry ?\] ")[" table)
+    (modify-syntax-entry ?{ "(}" table)
+    (modify-syntax-entry ?} "){" table)
 
     (modify-syntax-entry ?\( "()" table)
     (modify-syntax-entry ?\) ")(" table)
@@ -170,13 +151,11 @@
     ;; Strings
     (modify-syntax-entry ?\" "\"" table)
     (modify-syntax-entry ?\\ "/" table)
-    table)
-  "Syntax table used while in Factor mode.")
+    table))
 
 (defconst fuel-syntax--syntactic-keywords
-  `(("\\(#!\\)" (1 "<"))
-    (" \\(!\\)" (1 "<"))
-    ("^\\(!\\)" (1 "<"))
+  `(("\\(#!\\) .*\\(\n\\)" (1 "<") (2 ">"))
+    ("\\( \\|^\\)\\(!\\) .*\\(\n\\)" (2 "<") (3 ">"))
     ("\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
     ("\\(\\[\\)\\(let\\|wlet\\|let\\*\\)\\( \\|$\\)" (1 "(]"))
     ("\\(\\[\\)\\(|\\) +[^|]* \\(|\\)" (1 "(]") (2 "(|") (3 ")|"))
