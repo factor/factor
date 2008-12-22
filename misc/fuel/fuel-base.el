@@ -26,7 +26,7 @@
 ;;;###autoload
 (defgroup fuel nil
   "Factor's Ultimate Emacs Library."
-  :group 'language)
+  :group 'languages)
 
 
 ;;; Emacs compatibility:

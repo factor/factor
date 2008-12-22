@@ -149,16 +149,21 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 
 ! Edit locations
 
+: fuel-normalize-loc ( seq -- path line )
+    dup length 1 > [ first2 [ (normalize-path) ] dip ] [ f ] if ; inline
+
 : fuel-get-edit-location ( defspec -- )
-    where [
-       first2 [ (normalize-path) ] dip 2array fuel-eval-set-result
-    ] when* ; inline
+    where fuel-normalize-loc 2array fuel-eval-set-result ; inline
+
+: fuel-get-doc-location ( defspec -- )
+    props>> "help-loc" swap at
+    fuel-normalize-loc 2array fuel-eval-set-result ;
 
 : fuel-format-xrefs ( seq -- seq )
     [ word? ] filter [
         [ name>> ]
         [ vocabulary>> ]
-        [ where [ first2 [ (normalize-path) ] dip ] [ f f ] if* ] tri 4array
+        [ where fuel-normalize-loc ] tri 4array
     ] map [ [ first ] dip first <=> ] sort ; inline
 
 : fuel-callers-xref ( word -- )

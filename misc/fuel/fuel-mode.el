@@ -135,11 +135,27 @@ buffer in case of errors."
 With prefix, asks for the word to edit."
   (interactive "P")
   (let* ((word (or (and (not arg) (fuel-syntax-symbol-at-point))
-                  (fuel-completion--read-word "Edit word: ")))
-         (cmd `(:fuel ((:quote ,word) fuel-get-edit-location))))
+                   (fuel-completion--read-word "Edit word: ")))
+         (cmd `(:fuel* ((:quote ,word) fuel-get-edit-location))))
     (condition-case nil
         (fuel--try-edit (fuel-eval--send/wait cmd))
       (error (fuel-edit-vocabulary nil word)))))
+
+(defun fuel-edit-word-doc-at-point (&optional arg)
+  "Opens a new window visiting the documentation file for the word at point.
+With prefix, asks for the word to edit."
+  (interactive "P")
+  (let* ((word (or (and (not arg) (fuel-syntax-symbol-at-point))
+                   (fuel-completion--read-word "Edit word: ")))
+         (cmd `(:fuel* ((:quote ,word) fuel-get-doc-location))))
+    (condition-case nil
+        (fuel--try-edit (fuel-eval--send/wait cmd))
+      (error (when (y-or-n-p (concat "No documentation found. "
+                                     "Do you want to open the vocab's "
+                                     "doc file? "))
+               (find-file-other-window
+                (format "%s-docs.factor"
+                        (file-name-sans-extension (buffer-file-name)))))))))
 
 (defvar fuel-mode--word-history nil)
 
@@ -152,7 +168,7 @@ offered."
                                            nil
                                            fuel-mode--word-history
                                            arg))
-         (cmd `(:fuel ((:quote ,word) fuel-get-edit-location))))
+         (cmd `(:fuel* ((:quote ,word) fuel-get-edit-location))))
     (fuel--try-edit (fuel-eval--send/wait cmd))))
 
 (defvar fuel--vocabs-prompt-history nil)
@@ -250,6 +266,7 @@ interacting with a factor listener is at your disposal.
 (define-key fuel-mode-map "\C-c\M->" 'fuel-show-callees)
 (define-key fuel-mode-map (kbd "M-TAB") 'fuel-completion--complete-symbol)
 
+(fuel-mode--key ?e ?d 'fuel-edit-word-doc-at-point)
 (fuel-mode--key ?e ?e 'fuel-eval-extended-region)
 (fuel-mode--key ?e ?l 'fuel-run-file)
 (fuel-mode--key ?e ?r 'fuel-eval-region)
