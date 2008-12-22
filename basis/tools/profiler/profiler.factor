@@ -9,8 +9,11 @@ IN: tools.profiler
 : profile ( quot -- )
     [ t profiling call ] [ f profiling ] [ ] cleanup ;
 
+: filter-counts ( alist -- alist' )
+    [ second 0 > ] filter ;
+
 : counters ( words -- alist )
-    [ dup counter>> ] { } map>assoc [ second 0 > ] filter ;
+    [ dup counter>> ] { } map>assoc filter-counts ;
 
 : vocab-counters ( -- alist )
     vocabs [

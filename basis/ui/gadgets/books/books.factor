@@ -16,12 +16,15 @@ M: book model-changed ( model book -- )
     dup current-page show-gadget
     relayout ;
 
-: new-book ( pages model class -- book )
+: new-book ( model class -- book )
     new-gadget
-        swap >>model
-        swap add-gadgets ; inline
+        swap >>model ; inline
 
-: <book> ( pages model -- book ) book new-book ;
+: <book> ( pages model -- book )
+    book new-book swap add-gadgets ;
+
+: <empty-book> ( model -- book )
+    book new-book ;
 
 M: book pref-dim* ( book -- dim ) children>> pref-dims max-dim ;
 
