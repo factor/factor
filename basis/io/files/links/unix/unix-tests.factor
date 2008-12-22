@@ -1,7 +1,7 @@
 USING: io.directories io.files.links tools.test sequences
 io.files.unique tools.files fry math kernel math.parser
 io.pathnames namespaces ;
-IN: io.files.links.tests
+IN: io.files.links.unix.tests
 
 : make-test-links ( n path -- )
     [ '[ [ 1+ ] keep [ number>string _ prepend ] bi@ make-link ] each ]

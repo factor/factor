@@ -85,13 +85,13 @@ IN: formatting.tests
 
 [ t ] [ "12:03:15" testtime "%H:%M:%S" strftime = ] unit-test
 [ t ] [ "12:03:15" testtime "%X" strftime = ] unit-test
-
 [ t ] [ "10/09/2008" testtime "%m/%d/%Y" strftime = ] unit-test
 [ t ] [ "10/09/2008" testtime "%x" strftime = ] unit-test
-
+[ t ] [ "10/09/08" testtime "%m/%d/%y" strftime = ] unit-test
 [ t ] [ "Thu" testtime "%a" strftime = ] unit-test
 [ t ] [ "Thursday" testtime "%A" strftime = ] unit-test
-
 [ t ] [ "Oct" testtime "%b" strftime = ] unit-test
 [ t ] [ "October" testtime "%B" strftime = ] unit-test
+[ t ] [ "Thu Oct 09 12:03:15 2008" testtime "%c" strftime = ] unit-test
+[ t ] [ "PM" testtime "%p" strftime = ] unit-test
 

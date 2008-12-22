@@ -277,6 +277,11 @@
 (defsubst fuel-syntax--end-of-defun ()
   (re-search-forward fuel-syntax--end-of-def-regex nil t))
 
+(defsubst fuel-syntax--end-of-defun-pos ()
+  (save-excursion
+    (re-search-forward fuel-syntax--end-of-def-regex nil t)
+    (point)))
+
 (defconst fuel-syntax--defun-signature-regex
   (format "\\(%s\\|%s\\)"
           (format ":[^ ]* [^ ]+\\(%s\\)*" fuel-syntax--stack-effect-regex)
