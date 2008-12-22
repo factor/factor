@@ -50,11 +50,11 @@ M: ratio <= scale <= ;
 M: ratio > scale > ;
 M: ratio >= scale >= ;
 
-M: ratio + 2dup scale + -rot ratio+d / ;
-M: ratio - 2dup scale - -rot ratio+d / ;
-M: ratio * 2>fraction * [ * ] dip / ;
+M: ratio + [ scale + ] [ ratio+d ] 2bi / ;
+M: ratio - [ scale - ] [ ratio+d ] 2bi / ;
+M: ratio * 2>fraction [ * ] 2bi@ / ;
 M: ratio / scale / ;
 M: ratio /i scale /i ;
 M: ratio /f scale /f ;
-M: ratio mod [ /i ] 2keep rot * - ;
+M: ratio mod 2dup /i * - ;
 M: ratio /mod [ /i ] 2keep mod ;
