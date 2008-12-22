@@ -123,6 +123,12 @@
   (format "\\(%s\\)\\|\\(%s .*\\)"
           fuel-syntax--end-of-def-line-regex
           fuel-syntax--single-liner-regex))
+
+(defconst fuel-syntax--defun-signature-regex
+  (format "\\(%s\\|%s\\)"
+          (format ":[^ ]* [^ ]+\\(%s\\)*" fuel-syntax--stack-effect-regex)
+          "M[^:]*: [^ ]+ [^ ]+"))
+
 
 ;;; Factor syntax table
 
@@ -260,11 +266,6 @@
   (save-excursion
     (re-search-forward fuel-syntax--end-of-def-regex nil t)
     (point)))
-
-(defconst fuel-syntax--defun-signature-regex
-  (format "\\(%s\\|%s\\)"
-          (format ":[^ ]* [^ ]+\\(%s\\)*" fuel-syntax--stack-effect-regex)
-          "M[^:]*: [^ ]+ [^ ]+"))
 
 (defun fuel-syntax--beginning-of-body ()
   (let ((p (point)))
