@@ -114,7 +114,7 @@ M: float fp-infinity? ( float -- ? )
 
 <PRIVATE
 
-: iterate-prep ( n quot -- i n quot ) 0 -rot ; inline
+: iterate-prep ( n quot -- i n quot ) [ 0 ] 2dip ; inline
 
 : if-iterate? ( i n true false -- ) [ 2over < ] 2dip if ; inline
 
