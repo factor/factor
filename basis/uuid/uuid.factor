@@ -3,7 +3,7 @@
 
 USING: byte-arrays checksums checksums.md5 checksums.sha1 
 kernel math math.parser math.ranges random unicode.case 
-sequences strings system ;
+sequences strings system io.binary ;
 
 IN: uuid 
 
@@ -16,7 +16,8 @@ IN: uuid
     micros 10 * HEX: 01b21dd213814000 +
     [ -48 shift HEX: 0fff bitand ] 
     [ -32 shift HEX: ffff bitand ]
-    [ HEX: ffffffff bitand ] tri ;
+    [ HEX: ffffffff bitand ]
+    tri ;
 
 : (hardware) ( -- address ) 
     ! Choose a random 48-bit number with eighth bit 
@@ -35,9 +36,10 @@ IN: uuid
     bitor ;
 
 : (version) ( n version -- n' )
-    [ HEX: c000 48 shift bitnot bitand 
-      HEX: 8000 48 shift bitor 
-      HEX: f000 64 shift bitnot bitand
+    [
+        HEX: c000 48 shift bitnot bitand 
+        HEX: 8000 48 shift bitor 
+        HEX: f000 64 shift bitnot bitand
     ] dip 76 shift bitor ;
 
 : uuid>string ( n -- string )
@@ -51,13 +53,7 @@ IN: uuid
     [ CHAR: - = not ] filter 16 base> ;
 
 : uuid>byte-array ( n -- byte-array ) 
-    16 <byte-array> 15 -1 [a,b) [ 
-        [ dup HEX: ff bitand ] 2dip swap
-        [ set-nth -8 shift ] keep 
-    ] each nip ;
-
-: byte-array>uuid ( byte-array -- n )
-     0 swap [ [ 8 shift ] dip + ] each ;
+    16 >be ;
 
 PRIVATE>
 
@@ -65,15 +61,15 @@ PRIVATE>
     string>uuid uuid>byte-array ;
 
 : uuid-unparse ( byte-array -- string ) 
-    byte-array>uuid uuid>string ;
+    be> uuid>string ;
 
 : uuid1 ( -- string )
     (hardware) (clock) (timestamp) <uuid> 
     1 (version) uuid>string ;
 
 : uuid3 ( namespace name -- string )
-    [ uuid-parse ] dip >byte-array append 
-    md5 checksum-bytes 16 short head byte-array>uuid 
+    [ uuid-parse ] dip append 
+    md5 checksum-bytes 16 short head be> 
     3 (version) uuid>string ;
 
 : uuid4 ( -- string )
@@ -81,14 +77,13 @@ PRIVATE>
     4 (version) uuid>string ;
 
 : uuid5 ( namespace name -- string )
-   [ uuid-parse ] dip >byte-array append 
-    sha1 checksum-bytes 16 short head byte-array>uuid 
+    [ uuid-parse ] dip append 
+    sha1 checksum-bytes 16 short head be> 
     5 (version) uuid>string ;
 
-
-: NAMESPACE_DNS  "6ba7b810-9dad-11d1-80b4-00c04fd430c8" ; inline
-: NAMESPACE_URL  "6ba7b811-9dad-11d1-80b4-00c04fd430c8" ; inline
-: NAMESPACE_OID  "6ba7b812-9dad-11d1-80b4-00c04fd430c8" ; inline
-: NAMESPACE_X500 "6ba7b814-9dad-11d1-80b4-00c04fd430c8" ; inline
+CONSTANT: NAMESPACE_DNS  "6ba7b810-9dad-11d1-80b4-00c04fd430c8"
+CONSTANT: NAMESPACE_URL  "6ba7b811-9dad-11d1-80b4-00c04fd430c8"
+CONSTANT: NAMESPACE_OID  "6ba7b812-9dad-11d1-80b4-00c04fd430c8"
+CONSTANT: NAMESPACE_X500 "6ba7b814-9dad-11d1-80b4-00c04fd430c8"
 
 
