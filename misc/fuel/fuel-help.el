@@ -25,7 +25,7 @@
 ;;; Customization:
 
 (defgroup fuel-help nil
-  "Options controlling FUEL's help system"
+  "Options controlling FUEL's help system."
   :group 'fuel)
 
 (defcustom fuel-help-always-ask t

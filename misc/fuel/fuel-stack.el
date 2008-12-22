@@ -24,7 +24,7 @@
 ;;; Customization
 
 (defgroup fuel-stack nil
-  "Customization for FUEL's stack inference engine"
+  "Customization for FUEL's stack inference engine."
   :group 'fuel)
 
 (fuel-font-lock--defface fuel-font-lock-stack-region

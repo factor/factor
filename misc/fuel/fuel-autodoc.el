@@ -22,7 +22,7 @@
 ;;; Customization:
 
 (defgroup fuel-autodoc nil
-  "Options controlling FUEL's autodoc system"
+  "Options controlling FUEL's autodoc system."
   :group 'fuel)
 
 (defcustom fuel-autodoc-minibuffer-font-lock t

@@ -23,16 +23,16 @@
 ;;; Customization:
 
 (defgroup fuel-debug nil
-  "Major mode for interaction with the Factor debugger"
+  "Major mode for interaction with the Factor debugger."
   :group 'fuel)
 
 (defcustom fuel-debug-mode-hook nil
-  "Hook run after `fuel-debug-mode' activates"
+  "Hook run after `fuel-debug-mode' activates."
   :group 'fuel-debug
   :type 'hook)
 
 (defcustom fuel-debug-show-short-help t
-  "Whether to show short help on available keys in debugger"
+  "Whether to show short help on available keys in debugger."
   :group 'fuel-debug
   :type 'boolean)
 

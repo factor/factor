@@ -26,7 +26,7 @@
 ;;; Customization:
 
 (defgroup fuel-listener nil
-  "Interacting with a Factor listener inside Emacs"
+  "Interacting with a Factor listener inside Emacs."
   :group 'fuel)
 
 (defcustom fuel-listener-factor-binary "~/factor/factor"
