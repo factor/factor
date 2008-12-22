@@ -30,7 +30,7 @@ IN: bunny.model
     [ n ] keep [ rot [ v+ ] change-nth ] with with each ;
 
 : normals ( vs is -- ns )
-    over length { 0.0 0.0 0.0 } <array> -rot
+    [ [ length { 0.0 0.0 0.0 } <array> ] keep ] dip
     [ [ 2dup ] dip normal ] each drop
     [ normalize ] map ;
 

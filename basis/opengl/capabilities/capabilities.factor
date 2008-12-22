@@ -1,14 +1,11 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces make sequences splitting opengl.gl
-continuations math.parser math arrays sets math.order ;
+continuations math.parser math arrays sets math.order fry ;
 IN: opengl.capabilities
 
 : (require-gl) ( thing require-quot make-error-quot -- )
-    -rot dupd call
-    [ 2drop ]
-    [ swap " " make throw ]
-    if ; inline
+    [ dupd call [ drop ] ] dip '[ _ " " make throw ] if ; inline
 
 : gl-extensions ( -- seq )
     GL_EXTENSIONS glGetString " " split ;

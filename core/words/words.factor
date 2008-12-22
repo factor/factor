@@ -54,7 +54,7 @@ M: primitive definition drop f ;
 SYMBOL: bootstrapping?
 
 : if-bootstrapping ( true false -- )
-    bootstrapping? get -rot if ; inline
+    [ bootstrapping? get ] 2dip if ; inline
 
 : bootstrap-word ( word -- target )
     [ target-word ] [ ] if-bootstrapping ;
