@@ -167,19 +167,12 @@ M: word com-stack-effect def>> com-stack-effect ;
     { +listener+ t }
 } define-operation
 
-: com-show-profile ( workspace -- )
-    profiler-gadget call-tool ;
-
-: com-profile ( quot -- ) profile f com-show-profile ;
+: com-profile ( quot -- ) profile f profiler-window ;
 
 [ quotation? ] \ com-profile H{
     { +keyboard+ T{ key-down f { C+ } "r" } }
     { +listener+ t }
 } define-operation
-
-! Profiler presentations
-[ dup usage-profile? swap vocab-profile? or ]
-\ com-show-profile H{ { +primary+ t } } define-operation
 
 ! Operations -> commands
 source-editor

@@ -3,45 +3,26 @@
 USING: accessors words sequences math prettyprint kernel arrays io
 io.styles namespaces assocs kernel.private strings combinators
 sorting math.parser vocabs definitions tools.profiler.private
-continuations generic compiler.units sets ;
+continuations generic compiler.units sets classes ;
 IN: tools.profiler
 
 : profile ( quot -- )
     [ t profiling call ] [ f profiling ] [ ] cleanup ;
 
-: counters ( words -- assoc )
-    [ dup counter>> ] { } map>assoc ;
+: counters ( words -- alist )
+    [ dup counter>> ] { } map>assoc [ second 0 > ] filter ;
 
-GENERIC: (profile.) ( obj -- )
-
-TUPLE: usage-profile word ;
-
-C: <usage-profile> usage-profile
-
-M: word (profile.)
-    [ name>> "( no name )" or ] [ <usage-profile> ] bi write-object ;
-
-TUPLE: vocab-profile vocab ;
-
-C: <vocab-profile> vocab-profile
-
-M: string (profile.)
-    dup <vocab-profile> write-object ;
-
-M: method-body (profile.)
-    [ synopsis ] [ "method-generic" word-prop <usage-profile> ] bi
-    write-object ;
-
-: counter. ( obj n -- )
-    [
-        [ [ (profile.) ] with-cell ] dip
-        [ number>string write ] with-cell
-    ] with-row ;
+: vocab-counters ( -- alist )
+    vocabs [
+        dup
+        words
+        [ predicate? not ] filter
+        [ counter>> ] sigma
+    ] { } map>assoc ;
 
 : counters. ( assoc -- )
-    [ second 0 > ] filter sort-values
     standard-table-style [
-        [ counter. ] assoc-each
+        sort-values simple-table.
     ] tabular-output ;
 
 : profile. ( -- )
@@ -65,11 +46,7 @@ M: method-body (profile.)
 
 : vocabs-profile. ( -- )
     "Call counts for all vocabularies:" print
-    vocabs [
-        dup words
-        [ "predicating" word-prop not ] filter
-        [ counter>> ] map sum
-    ] { } map>assoc counters. ;
+    vocab-counters counters. ;
 
 : method-profile. ( -- )
     all-words [ subwords ] map concat

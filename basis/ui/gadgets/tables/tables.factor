@@ -41,7 +41,7 @@ CONSTANT: table-gap 5
 
 : column-widths ( font rows -- total widths )
     [ drop 0 { } ] [
-        tuck [ length 0 <repetition> ] 2dip [
+        tuck [ first length 0 <repetition> ] 2dip [
             [ string-width ] with map vmax
         ] with each
         0 [ table-gap + + ] accumulate

@@ -197,12 +197,11 @@ M: radio-paint draw-boundary
     GL_LINE_STRIP 0 circle-steps 1+ glDrawArrays ;
 
 :: radio-knob-theme ( gadget -- gadget )
-    [let | radio-paint [ black <radio-paint> ] |
-        gadget
-        f f radio-paint radio-paint <button-paint> >>interior
-        radio-paint >>boundary
-        { 16 16 } >>dim
-    ] ;
+    black <radio-paint> :> radio-paint
+    gadget
+    f f radio-paint radio-paint <button-paint> >>interior
+    radio-paint >>boundary
+    { 16 16 } >>dim ;
 
 : <radio-knob> ( -- gadget )
     <gadget> radio-knob-theme ;
@@ -221,8 +220,8 @@ M: radio-control model-changed
     over value>> = >>selected?
     relayout-1 ;
 
-: <radio-controls> ( assoc model parent quot: ( value model label -- ) -- parent )
-    '[ _ swap _ call add-gadget ] assoc-each ; inline
+: <radio-controls> ( assoc model parent quot: ( value model label -- gadget ) -- parent )
+    '[ _ swap @ add-gadget ] assoc-each ; inline
 
 : radio-button-theme ( gadget -- gadget )
     { 5 5 } >>gap

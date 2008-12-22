@@ -2,14 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs debugger ui.tools.workspace
 ui.tools.operations ui.tools.traceback ui.tools.browser
-ui.tools.inspector ui.tools.listener ui.tools.profiler
-ui.tools.operations inspector io kernel math models namespaces
-prettyprint quotations sequences ui ui.commands ui.gadgets
+ui.tools.inspector ui.tools.listener
+ui.tools.operations ui ui.commands ui.gadgets
 ui.gadgets.books ui.gadgets.buttons ui.gadgets.labelled
 ui.gadgets.scrollers ui.gadgets.tracks ui.gadgets.worlds
 ui.gadgets.presentations ui.gestures words vocabs.loader
 tools.test tools.vocabs ui.gadgets.buttons ui.gadgets.status-bar
-mirrors fry ;
+mirrors fry inspector io kernel math models namespaces
+prettyprint quotations sequences ;
 IN: ui.tools
 
 : <workspace-tabs> ( workspace -- tabs )
@@ -22,8 +22,7 @@ IN: ui.tools
         <gadget>
         <browser-gadget>
         <inspector-gadget>
-        <profiler-gadget>
-    4array
+    3array
     swap model>> <book> ;
   
 : <workspace> ( -- workspace )
@@ -62,13 +61,10 @@ M: workspace model-changed
 
 : com-inspector ( workspace -- ) 2 select-tool ;
 
-: com-profiler ( workspace -- ) 3 select-tool ;
-
 workspace "tool-switching" f {
     { T{ key-down f { A+ } "1" } com-listener }
     { T{ key-down f { A+ } "2" } com-browser }
     { T{ key-down f { A+ } "3" } com-inspector }
-    { T{ key-down f { A+ } "4" } com-profiler }
 } define-command-map
 
 workspace "multi-touch" f {

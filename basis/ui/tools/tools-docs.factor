@@ -62,7 +62,9 @@ ARTICLE: "ui-profiler" "UI profiler"
 $nl
 "To use the profiler, enter a piece of code in the listener input area and press " { $operation com-profile } "."
 $nl
-"Vocabulary and word presentations in the profiler pane can be clicked on to show profiler results pertaining to the object in question. Clicking a vocabulary in the profiler yields the same output as the " { $link vocab-profile. } " word, and clicking a word yields the same output as the " { $link usage-profile. } " word. Consult " { $link "profiling" } " for details."
+"Clicking on a vocabulary in the vocabulary list narrows down the word list to only include words from that vocabulary. The sorting options control the order of elements in the vocabulary and word lists. The search fields narrow down the list to only include words or vocabularies whose names contain a substring."
+$nl
+"Consult " { $link "profiling" } " for details about the profiler itself."
 { $command-map profiler-gadget "toolbar" } ;
 
 ARTICLE: "ui-cocoa" "Functionality specific to Mac OS X"

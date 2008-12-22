@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel delegate fry sequences
-models models.search locals
+models models.search models.delay calendar locals
 ui.gadgets.editors ui.gadgets.labels ui.gadgets.scrollers
 ui.gadgets.tables ui.gadgets.tracks ui.gadgets.borders
 ui.gadgets.buttons ;
@@ -38,7 +38,7 @@ CONSULT: table-protocol search-table table>> ;
         values >>model
         search <search-field> >>field
         dup field>> 2 <filled-border> f track-add
-        values search quot <search-model> <table> >>table
+        values search 500 milliseconds <delay> quot <search> <table> >>table
         dup table>> <scroller> 1 track-add ;
 
 M: search-table model-changed
