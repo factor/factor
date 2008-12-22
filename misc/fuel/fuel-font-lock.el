@@ -21,13 +21,24 @@
 
 ;;; Faces:
 
+(defgroup fuel-faces nil
+  "Faces used by FUEL."
+  :group 'fuel
+  :group 'faces)
+
+(defmacro fuel-font-lock--defface (face def group doc)
+  `(defface ,face (face-default-spec ,def)
+     ,(format "Face for %s." doc)
+     :group ',group
+     :group 'fuel-faces
+     :group 'faces))
+
+(put 'fuel-font-lock--defface 'lisp-indent-function 1)
+
 (defmacro fuel-font-lock--make-face (prefix def-prefix group face def doc)
   (let ((face (intern (format "%s-%s" prefix face)))
         (def (intern (format "%s-%s-face" def-prefix def))))
-    `(defface ,face (face-default-spec ,def)
-       ,(format "Face for %s." doc)
-       :group ',group
-       :group 'faces)))
+    `(fuel-font-lock--defface ,face ,def ,group ,doc)))
 
 (defmacro fuel-font-lock--define-faces (prefix def-prefix group faces)
   (let ((setup (make-symbol (format "%s--faces-setup" prefix))))
@@ -67,15 +78,15 @@
   `(,@fuel-font-lock--parsing-lock-keywords
     (,fuel-syntax--stack-effect-regex . 'factor-font-lock-stack-effect)
     (,fuel-syntax--parsing-words-ext-regex . 'factor-font-lock-parsing-word)
-    (,fuel-syntax--declaration-words-regex 1 'factor-font-lock-declaration)
+    (,fuel-syntax--declaration-words-regex . 'factor-font-lock-declaration)
     (,fuel-syntax--word-definition-regex 2 'factor-font-lock-word)
     (,fuel-syntax--type-definition-regex 2 'factor-font-lock-type-name)
     (,fuel-syntax--method-definition-regex (1 'factor-font-lock-type-name)
                                            (2 'factor-font-lock-word))
     (,fuel-syntax--parent-type-regex 1 'factor-font-lock-type-name)
     (,fuel-syntax--constructor-regex . 'factor-font-lock-constructor)
-    (,fuel-syntax--setter-regex 2 'factor-font-lock-setter-word)
-    (,fuel-syntax--getter-regex 2 'factor-font-lock-getter-word)
+    (,fuel-syntax--setter-regex . 'factor-font-lock-setter-word)
+    (,fuel-syntax--getter-regex . 'factor-font-lock-getter-word)
     (,fuel-syntax--symbol-definition-regex 2 'factor-font-lock-symbol)
     (,fuel-syntax--use-line-regex 1 'factor-font-lock-vocabulary-name))
   "Font lock keywords definition for Factor mode.")

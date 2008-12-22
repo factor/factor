@@ -134,7 +134,7 @@
 
 (defconst fuel-con--prompt-regex "( .+ ) ")
 (defconst fuel-con--eot-marker "<~FUEL~>")
-(defconst fuel-con--init-stanza "USE: fuel f fuel-eval")
+(defconst fuel-con--init-stanza "USE: fuel fuel-retort")
 
 (defconst fuel-con--comint-finished-regex
   (format "^%s$" fuel-con--eot-marker))

@@ -24,8 +24,9 @@
 ;;; Customization:
 
 (defgroup factor-mode nil
-  "Major mode for Factor source code"
-  :group 'fuel)
+  "Major mode for Factor source code."
+  :group 'fuel
+  :group 'languages)
 
 (defcustom factor-mode-use-fuel t
   "Whether to use the full FUEL facilities in factor mode.

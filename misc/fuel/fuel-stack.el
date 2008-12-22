@@ -17,21 +17,20 @@
 (require 'fuel-autodoc)
 (require 'fuel-syntax)
 (require 'fuel-eval)
+(require 'fuel-font-lock)
 (require 'fuel-base)
 
 
 ;;; Customization
 
 (defgroup fuel-stack nil
-  "Customization for FUEL's stack inference engine"
+  "Customization for FUEL's stack inference engine."
   :group 'fuel)
 
-(defface fuel-font-lock-stack-region (face-user-default-spec 'highlight)
-  "Face used to highlight the region whose stack effect is shown"
-  :group 'fuel-stack
-  :group 'faces)
+(fuel-font-lock--defface fuel-font-lock-stack-region
+  'highlight fuel-stack "highlighting the stack effect region")
 
-(defcustom fuel-stack-highlight-period 2
+(defcustom fuel-stack-highlight-period 2.0
   "Time, in seconds, the region is highlighted when showing its
 stack effect.
 
@@ -97,13 +96,20 @@ With prefix argument, use current region instead"
  (defvar fuel-stack-mode-string " S"
    "Modeline indicator for fuel-stack-mode"))
 
+(make-variable-buffer-local
+ (defvar fuel-stack--region-function
+   '(lambda ()
+      (fuel--region-to-string (1+ (fuel-syntax--beginning-of-sexp-pos))))))
+
 (defun fuel-stack--eldoc ()
   (when (looking-at-p " \\|$")
-    (let* ((r (fuel--region-to-string (1+ (fuel-syntax--beginning-of-sexp-pos))))
-           (e (fuel-stack--infer-effect/prop r)))
+    (let* ((r (funcall fuel-stack--region-function))
+           (e (and r
+                   (not (string-match "^ *$" r))
+                   (fuel-stack--infer-effect/prop r))))
       (when e
         (if fuel-stack-mode-show-sexp-p
-            (concat (fuel--shorten-str r 30) ": " e)
+            (concat (fuel--shorten-str r 30) " -> " e)
           e)))))
 
 (define-minor-mode fuel-stack-mode
