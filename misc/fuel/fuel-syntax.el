@@ -43,20 +43,26 @@
 ;;; Regexps galore:
 
 (defconst fuel-syntax--parsing-words
-  '("{" "}" "^:" "^::" ";" "<<" "<PRIVATE" ">>"
-    "BIN:" "BV{" "B{" "C:" "C-STRUCT:" "C-UNION:" "CHAR:" "CS{" "C{"
+  '(":" "::" ";" "<<" "<PRIVATE" ">>"
+    "B" "BIN:" "C:" "C-STRUCT:" "C-UNION:" "CHAR:"
     "DEFER:" "ERROR:" "EXCLUDE:" "FORGET:"
-    "GENERIC#" "GENERIC:" "HEX:" "HOOK:" "H{"
+    "GENERIC#" "GENERIC:" "HEX:" "HOOK:"
     "IN:" "INSTANCE:" "INTERSECTION:"
     "M:" "MACRO:" "MACRO::" "MAIN:" "MATH:" "MEMO:" "METHOD:" "MIXIN:"
     "OCT:" "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
     "REQUIRE:"  "REQUIRES:" "SINGLETON:" "SLOT:" "SYMBOL:" "SYMBOLS:"
-    "TUPLE:" "T{" "t\\??" "TYPEDEF:"
-    "UNION:" "USE:" "USING:" "V{" "VARS:" "W{"))
+    "TUPLE:" "t" "t?" "TYPEDEF:"
+    "UNION:" "USE:" "USING:" "VARS:"
+    "call-next-method" "delimiter" "f" "initial:" "read-only"))
 
-(defconst fuel-syntax--parsing-words-ext-regex
-  (regexp-opt '("B" "call-next-method" "delimiter" "f" "initial:" "read-only")
-              'words))
+(defconst fuel-syntax--bracers
+  '("B" "BV" "C" "CS" "H" "T" "V" "W"))
+
+(defconst fuel-syntax--parsing-words-regex
+  (regexp-opt fuel-syntax--parsing-words 'words))
+
+(defconst fuel-syntax--brace-words-regex
+  (format "%s{" (regexp-opt fuel-syntax--bracers t)))
 
 (defconst fuel-syntax--declaration-words
   '("flushable" "foldable" "inline" "parsing" "recursive"))
@@ -132,32 +138,26 @@
 
 ;;; Factor syntax table
 
-(defvar fuel-syntax--syntax-table
+(setq fuel-syntax--syntax-table
   (let ((table (make-syntax-table)))
     ;; Default is word constituent
     (dotimes (i 256)
       (modify-syntax-entry i "w" table))
 
-    ;; Whitespace
-    (modify-syntax-entry ?\t " " table)
+    ;; Whitespace (TAB is not whitespace)
     (modify-syntax-entry ?\f " " table)
     (modify-syntax-entry ?\r " " table)
     (modify-syntax-entry ?\  " " table)
     (modify-syntax-entry ?\n " " table)
 
-    ;; Parenthesis
-    (modify-syntax-entry ?\[ "(]" table)
-    (modify-syntax-entry ?\] ")[" table)
-    (modify-syntax-entry ?{ "(}" table)
-    (modify-syntax-entry ?} "){" table)
-
-    (modify-syntax-entry ?\( "()" table)
-    (modify-syntax-entry ?\) ")(" table)
-
     ;; Strings
     (modify-syntax-entry ?\" "\"" table)
     (modify-syntax-entry ?\\ "/" table)
+
     table))
+
+(defconst fuel-syntax--skw-obrx
+  (format "\\_<%s\\({\\)\\_>" (regexp-opt fuel-syntax--bracers)))
 
 (defconst fuel-syntax--syntactic-keywords
   `(("\\(#!\\) .*\\(\n\\)" (1 "<") (2 ">"))
@@ -167,8 +167,13 @@
     ("\\(\\[\\)\\(|\\) +[^|]* \\(|\\)" (1 "(]") (2 "(|") (3 ")|"))
     (" \\(|\\) " (1 "(|"))
     (" \\(|\\)$" (1 ")"))
-    ("\\([[({]\\)\\([^ \"\n]\\)" (1 "_") (2 "_"))
-    ("\\([^ \"\n]\\)\\([])}]\\)" (1 "_") (2 "_"))))
+    (,fuel-syntax--skw-obrx  (1 "(}"))
+    ("\\_<\\({\\)\\_>" (1 "(}"))
+    ("\\_<\\(}\\)\\_>" (1 "){"))
+    ("\\_<\\((\\)\\_>" (1 "()"))
+    ("\\_<\\()\\)\\_>" (1 ")("))
+    ("\\_<\\(\\[\\)\\_>" (1 "(]"))
+    ("\\_<\\(\\]\\)\\_>" (1 ")["))))
 
 
 ;;; Source code analysis:

@@ -68,16 +68,11 @@
 
 ;;; Font lock:
 
-(defconst fuel-font-lock--parsing-lock-keywords
-  (cons '("\\(P\\|SBUF\\)\"" 1 'factor-font-lock-parsing-word)
-        (mapcar (lambda (w) `(,(format "\\(^\\| \\)\\(%s\\)\\($\\| \\)" w)
-                         2 'factor-font-lock-parsing-word))
-                fuel-syntax--parsing-words)))
-
 (defconst fuel-font-lock--font-lock-keywords
-  `(,@fuel-font-lock--parsing-lock-keywords
+  `((,fuel-syntax--parsing-words-regex . 'factor-font-lock-parsing-word)
+    (,fuel-syntax--brace-words-regex 1 'factor-font-lock-parsing-word)
+    ("\\(P\\|SBUF\\)\"" 1 'factor-font-lock-parsing-word)
     (,fuel-syntax--stack-effect-regex . 'factor-font-lock-stack-effect)
-    (,fuel-syntax--parsing-words-ext-regex . 'factor-font-lock-parsing-word)
     (,fuel-syntax--declaration-words-regex . 'factor-font-lock-declaration)
     (,fuel-syntax--word-definition-regex 2 'factor-font-lock-word)
     (,fuel-syntax--type-definition-regex 2 'factor-font-lock-type-name)
