@@ -37,7 +37,7 @@
   :type 'boolean)
 
 (fuel-font-lock--define-faces
- fuel-debug-font-lock font-lock fuel-debug
+ fuel-font-lock-debug font-lock fuel-debug
  ((error warning "highlighting errors")
   (line variable-name "line numbers in errors/warnings")
   (column variable-name "column numbers in errors/warnings")
@@ -67,14 +67,14 @@
 (defconst fuel-debug--restart-regex "^:\\([0-9]+\\) \\(.+\\)")
 
 (defconst fuel-debug--font-lock-keywords
-  `((,fuel-debug--error-file-regex . 'fuel-debug-font-lock-error)
-    (,fuel-debug--error-line-regex 1 'fuel-debug-font-lock-line)
-    (,fuel-debug--error-cont-regex 1 'fuel-debug-font-lock-column)
-    (,fuel-debug--restart-regex (1 'fuel-debug-font-lock-restart-number)
-                                (2 'fuel-debug-font-lock-restart-name))
-    (,fuel-debug--compiler-info-regex 1 'fuel-debug-font-lock-restart-number)
-    ("^\\(Restarts?\\|Loading\\) .+$" . 'fuel-debug-font-lock-info)
-    ("^Error: " . 'fuel-debug-font-lock-error)))
+  `((,fuel-debug--error-file-regex . 'fuel-font-lock-debug-error)
+    (,fuel-debug--error-line-regex 1 'fuel-font-lock-debug-line)
+    (,fuel-debug--error-cont-regex 1 'fuel-font-lock-debug-column)
+    (,fuel-debug--restart-regex (1 'fuel-font-lock-debug-restart-number)
+                                (2 'fuel-font-lock-debug-restart-name))
+    (,fuel-debug--compiler-info-regex 1 'fuel-font-lock-debug-restart-number)
+    ("^\\(Restarts?\\|Loading\\) .+$" . 'fuel-font-lock-debug-info)
+    ("^Error: " . 'fuel-font-lock-debug-error)))
 
 (defun fuel-debug--font-lock-setup ()
   (set (make-local-variable 'font-lock-defaults)
