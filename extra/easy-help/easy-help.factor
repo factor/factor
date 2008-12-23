@@ -1,5 +1,5 @@
 
-USING: kernel multiline parser sequences splitting help.markup ;
+USING: kernel multiline parser sequences splitting grouping help.markup ;
 
 IN: easy-help
 
@@ -45,4 +45,17 @@ IN: easy-help
   { $heading "Summary" } prefix
   parsed
   
+  ; parsing
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: Values:
+
+  ".." parse-multiline-string
+  " \n" split
+  [ "" = not ] filter
+  2 group
+  \ $values prefix
+  parsed
+
   ; parsing
