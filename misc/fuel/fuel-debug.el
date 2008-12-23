@@ -239,7 +239,6 @@
     (define-key map "\C-c\C-c" 'fuel-debug-goto-error)
     (define-key map "n" 'next-line)
     (define-key map "p" 'previous-line)
-    (define-key map "q" 'bury-buffer)
     (dotimes (n 9)
       (define-key map (vector (+ ?1 n))
         `(lambda () (interactive) (fuel-debug-exec-restart ,(1+ n) t))))
@@ -255,14 +254,14 @@ invoking restarts as needed.
   (interactive)
   (kill-all-local-variables)
   (buffer-disable-undo)
-  (setq major-mode 'factor-mode)
+  (setq major-mode 'fuel-debug-mode)
   (setq mode-name "Fuel Debug")
   (use-local-map fuel-debug-mode-map)
   (fuel-debug--font-lock-setup)
   (setq fuel-debug--file nil)
   (setq fuel-debug--last-ret nil)
-  (setq buffer-read-only t)
   (run-hooks 'fuel-debug-mode-hook))
+
 
 
 (provide 'fuel-debug)

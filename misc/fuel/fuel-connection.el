@@ -235,7 +235,7 @@
                         (not (fuel-con--connection-completed-p con id)))
               (accept-process-output nil waitsecs)
               (setq time (- time step)))
-          (error (setq time 1)))
+          (error (setq time 0)))
         (or (> time 0)
             (fuel-con--request-deactivate req)
             nil)))))

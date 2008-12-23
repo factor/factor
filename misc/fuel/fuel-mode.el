@@ -17,6 +17,7 @@
 (require 'fuel-listener)
 (require 'fuel-completion)
 (require 'fuel-debug)
+(require 'fuel-debug-uses)
 (require 'fuel-eval)
 (require 'fuel-help)
 (require 'fuel-xref)
@@ -121,6 +122,14 @@ buffer in case of errors."
            (end (mark)))
       (unless (< begin end) (error "No evaluable definition around point"))
       (fuel-eval-region begin end arg))))
+
+(defun fuel-update-usings (&optional arg)
+  "Asks factor for the vocabularies needed by this file,
+optionally updating the its USING: line.
+With prefix argument, ask for the file name."
+  (interactive "P")
+  (let ((file (car (fuel-mode--read-file arg))))
+    (when file (fuel-debug--uses-for-file file))))
 
 (defun fuel--try-edit (ret)
   (let* ((err (fuel-eval--retort-error ret))
@@ -272,6 +281,7 @@ interacting with a factor listener is at your disposal.
 (fuel-mode--key ?e ?e 'fuel-eval-extended-region)
 (fuel-mode--key ?e ?l 'fuel-run-file)
 (fuel-mode--key ?e ?r 'fuel-eval-region)
+(fuel-mode--key ?e ?u 'fuel-update-usings)
 (fuel-mode--key ?e ?v 'fuel-edit-vocabulary)
 (fuel-mode--key ?e ?w 'fuel-edit-word)
 (fuel-mode--key ?e ?x 'fuel-eval-definition)
