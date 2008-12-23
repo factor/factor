@@ -1,19 +1,39 @@
 
 USING: io io.encodings.ascii io.files io.files.temp io.launcher
-       locals math.parser sequences sequences.deep ;
+       locals math.parser sequences sequences.deep
+       help.syntax
+       easy-help ;
 
 IN: size-of
 
-! Use 'size-of' to find out the size in bytes of a C type.
-!
-! The 'headers' argument is a list of header files to use. You may
-! pass 'f' to only use 'stdio.h'.
-!
-! Examples:
-! 
-!   f "int" size-of .
-! 
-!   { "X11/Xlib.h" } "XAnyEvent" size-of .
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+DEFER: size-of
+
+HELP: size-of
+
+Description:
+
+    Use 'size-of' to find out the size in bytes of a C type. 
+
+    The 'headers' argument is a list of header files to use. You may 
+    pass 'f' to only use 'stdio.h'. ..
+
+Example:
+
+    ! Find the size of 'int'
+
+    f "int" size-of .    ..
+
+Example:
+
+    ! Find the size of the 'XAnyEvent' struct from Xlib.h
+
+    { "X11/Xlib.h" } "XAnyEvent" size-of .    ..
+
+;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 :: size-of ( HEADERS TYPE -- n )
 

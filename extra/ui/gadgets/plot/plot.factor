@@ -1,25 +1,38 @@
 
 USING: kernel quotations arrays sequences math math.ranges fry
        opengl opengl.gl ui.render ui.gadgets.cartesian processing.shapes
-       accessors ;
+       accessors
+       help.syntax
+       easy-help ;
 
 IN: ui.gadgets.plot
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! Examples:
-!
-!   <plot> [ sin ] add-function gadget.
-!
-!   <plot>
-!     [ sin ] red  function boa add-function
-!     [ cos ] blue function boa add-function
-!   gadget.
-!
-! 
-! Use the arrow keys to move around.
-!
-! Use 'a' and 'z' keys to zoom in and out.
+ARTICLE: "ui.gadgets.plot" "Plot Gadget"
+
+Summary:
+
+    A simple gadget for ploting two dimentional functions.
+
+    Use the arrow keys to move around.
+
+    Use 'a' and 'z' keys to zoom in and out. ..
+
+Example:
+
+    <plot> [ sin ] add-function gadget.    ..
+
+Example:
+
+    <plot>
+      [ sin ] red  function boa add-function
+      [ cos ] blue function boa add-function
+    gadget.    ..
+
+;
+
+ABOUT: "ui.gadgets.plot"
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

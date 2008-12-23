@@ -1,9 +1,41 @@
 
 USING: kernel sequences math math.order
-       ui.gadgets ui.gadgets.tracks ui.gestures
-       bake.fry accessors ;
+       ui.gadgets ui.gadgets.tracks ui.gestures accessors fry
+       help.syntax
+       easy-help ;
 
 IN: ui.gadgets.tiling
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ARTICLE: "ui.gadgets.tiling" "Tiling Layout Gadgets"
+
+Summary:
+
+    A gadget which tiles it's children.
+
+    A tiling gadget may contain any number of children, but only a
+    fixed number is displayed at one time. How many are displayed can
+    be controlled via Control-[ and Control-].
+
+    The focus may be switched with Alt-Left and Alt-Right.
+
+    The focused child may be moved via Shift-Alt-Left and
+    Shift-Alt-Right. ..
+
+Example:
+
+    <tiling-shelf>
+      "resource:" directory-files
+        [ [ drop ] <bevel-button> tiling-add ]
+      each
+    "Files" open-window ..
+
+;
+
+ABOUT: "ui.gadgets.tiling"
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 TUPLE: tiling < track gadgets tiles first focused ;
 
