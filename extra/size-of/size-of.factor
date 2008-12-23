@@ -12,6 +12,8 @@ DEFER: size-of
 
 HELP: size-of
 
+Values: HEADERS sequence  TYPE string  n integer ..
+
 Description:
 
     Use 'size-of' to find out the size in bytes of a C type. 
