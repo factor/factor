@@ -35,9 +35,6 @@
 
 ;;; Utility functions:
 
-(defsubst fuel-debug--at-eou-p ()
-  (looking-at ".*\\_<;\\_>"))
-
 (defun fuel-debug--file-lines (file)
   (when (file-readable-p file)
     (with-current-buffer (find-file-noselect file)
@@ -46,12 +43,10 @@
         (let ((lines) (in-usings))
           (while (not (eobp))
             (when (looking-at "^USING: ") (setq in-usings t))
-            (unless in-usings
-              (let ((line (substring-no-properties (thing-at-point 'line) 0 -1)))
-                (unless (or (empty-string-p line)
-                            (fuel--string-prefix-p "! " line))
-                  (push line lines))))
-            (when (and in-usings (fuel-debug--at-eou-p)) (setq in-usings nil))
+            (let ((line (substring-no-properties (thing-at-point 'line) 0 -1)))
+              (when in-usings (setq line (concat "! " line)))
+              (push line lines))
+            (when (and in-usings (looking-at ".*\\_<;\\_>")) (setq in-usings nil))
             (forward-line))
           (reverse lines))))))
 
