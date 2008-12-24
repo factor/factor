@@ -25,8 +25,8 @@
 
 ;;;###autoload
 (defgroup fuel nil
-  "Factor's Ultimate Emacs Library"
-  :group 'language)
+  "Factor's Ultimate Emacs Library."
+  :group 'languages)
 
 
 ;;; Emacs compatibility:
@@ -38,6 +38,20 @@
          (dotimes (ind (ring-length ring) nil)
            (when (equal item (ring-ref ring ind))
              (throw 'found ind)))))))
+
+(when (not (fboundp 'completion-table-dynamic))
+  (defun completion-table-dynamic (fun)
+    (lexical-let ((fun fun))
+      (lambda (string pred action)
+        (with-current-buffer (let ((win (minibuffer-selected-window)))
+                               (if (window-live-p win) (window-buffer win)
+                                 (current-buffer)))
+          (complete-with-action action (funcall fun string) string pred))))))
+
+(when (not (fboundp 'looking-at-p))
+  (defsubst looking-at-p (regexp)
+    (let ((inhibit-changing-match-data t))
+      (looking-at regexp))))
 
 
 ;;; Utilities
@@ -59,7 +73,22 @@
                                 " ")
                      len))
 
+(defsubst fuel--region-to-string (begin &optional end)
+  (let ((end (or end (point))))
+    (if (< begin end)
+        (mapconcat 'identity
+                   (split-string (buffer-substring-no-properties begin end)
+                                 nil
+                                 t)
+                   " ")
+      "")))
+
 (defsubst empty-string-p (str) (equal str ""))
+
+(defun fuel--string-prefix-p (prefix str)
+  (and (>= (length str) (length prefix))
+       (string= (substring-no-properties str 0 (length prefix))
+                (substring-no-properties prefix))))
 
 (defun fuel--respecting-message (format &rest format-args)
   "Display TEXT as a message, without hiding any minibuffer contents."

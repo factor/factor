@@ -102,10 +102,7 @@ M: windows link-info ( path -- info )
     [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep ;
 
 : calculate-file-system-info ( file-system-info -- file-system-info' )
-    {
-        [ dup [ total-space>> ] [ free-space>> ] bi - >>used-space drop ]
-        [ ]
-    } cleave ;
+    [ dup [ total-space>> ] [ free-space>> ] bi - >>used-space drop ] keep ;
 
 TUPLE: win32-file-system-info < file-system-info max-component flags device-serial ;
 

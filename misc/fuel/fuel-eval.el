@@ -26,12 +26,13 @@
   (cond ((null sexp) "f")
         ((eq sexp t) "t")
         ((or (stringp sexp) (numberp sexp)) (format "%S" sexp))
-        ((vectorp sexp) (cons :quotation (append sexp nil)))
+        ((vectorp sexp) (factor (cons :quotation (append sexp nil))))
         ((listp sexp)
          (case (car sexp)
            (:array (factor--seq 'V{ '} (cdr sexp)))
            (:quote (format "\\ %s" (factor `(:factor ,(cadr sexp)))))
            (:quotation (factor--seq '\[ '\] (cdr sexp)))
+           (:using (factor `(USING: ,@(cdr sexp) :end)))
            (:factor (format "%s" (mapconcat 'identity (cdr sexp) " ")))
            (:fuel (factor--fuel-factor (cons :rs (cdr sexp))))
            (:fuel* (factor--fuel-factor (cons :nrs (cdr sexp))))
@@ -43,6 +44,7 @@
                    (:in (fuel-syntax--current-vocab))
                    (:usings `(:array ,@(fuel-syntax--usings)))
                    (:get 'fuel-eval-set-result)
+                   (:end '\;)
                    (t `(:factor ,(symbol-name sexp))))))
         ((symbolp sexp) (symbol-name sexp))))
 
@@ -66,7 +68,8 @@
 
 (defsubst factor--fuel-in (in)
   (cond ((null in) :in)
-        ((eq in t) "fuel-scratchpad")
+        ((eq in 'f) 'f)
+        ((eq in 't) "fuel-scratchpad")
         ((stringp in) in)
         (t (error "Invalid 'in' (%s)" in))))
 
@@ -115,27 +118,26 @@
 (defsubst fuel-eval--retort-result (ret) (nth 1 ret))
 (defsubst fuel-eval--retort-output (ret) (nth 2 ret))
 
-(defsubst fuel-eval--retort-p (ret) (listp ret))
+(defsubst fuel-eval--retort-p (ret)
+  (and (listp ret) (= 3 (length ret))))
 
 (defsubst fuel-eval--make-parse-error-retort (str)
   (fuel-eval--retort-make (cons 'fuel-parse-retort-error str) nil))
 
-(defun fuel-eval--parse-retort (str)
-  (save-current-buffer
-    (condition-case nil
-        (let ((ret (car (read-from-string str))))
-          (if (fuel-eval--retort-p ret) ret (error)))
-      (error (fuel-eval--make-parse-error-retort str)))))
+(defun fuel-eval--parse-retort (ret)
+  (if (fuel-eval--retort-p ret) ret
+    (fuel-eval--make-parse-error-retort ret)))
 
 (defsubst fuel-eval--error-name (err) (car err))
-
-(defsubst fuel-eval--error-restarts (err)
-  (cdr (assoc :restarts (fuel-eval--error-name-p err 'condition))))
 
 (defun fuel-eval--error-name-p (err name)
   (unless (null err)
     (or (and (eq (fuel-eval--error-name err) name) err)
         (assoc name err))))
+
+(defsubst fuel-eval--error-restarts (err)
+  (cdr (assoc :restarts (or (fuel-eval--error-name-p err 'condition)
+                            (fuel-eval--error-name-p err 'lexer-error)))))
 
 (defsubst fuel-eval--error-file (err)
   (nth 1 (fuel-eval--error-name-p err 'source-file-error)))

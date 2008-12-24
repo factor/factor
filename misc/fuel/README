@@ -57,8 +57,10 @@ C-cC-eC-r is the same as C-cC-er)).
 
  - M-. : edit word at point in Emacs
  - M-TAB : complete word at point
+ - C-cC-eu : update USING: line
  - C-cC-ev : edit vocabulary (M-x fuel-edit-vocabulary)
- - C-cC-ew : edit word (M-x fuel-edit-word)
+ - C-cC-ew : edit word (M-x fuel-edit-word-at-point)
+ - C-cC-ed : edit word's doc (M-x fuel-edit-word-at-point)
 
  - C-cr, C-cC-er : eval region
  - C-M-r, C-cC-ee : eval region, extending it to definition boundaries
@@ -68,12 +70,17 @@ C-cC-eC-r is the same as C-cC-er)).
  - C-cC-da : toggle autodoc mode
  - C-cC-dd : help for word at point
  - C-cC-ds : short help word at point
+ - C-cC-de : show stack effect of current sexp (with prefix, region)
+
+ - C-cM-<, C-cC-d< : show callers of word at point
+ - C-cM->, C-cC-d> : show callees of word at point
 
 * In the listener:
 
  - TAB : complete word at point
  - M-. : edit word at point in Emacs
  - C-ca : toggle autodoc mode
+ - C-cs : toggle stack mode
  - C-cv : edit vocabulary
  - C-ch : help for word at point
  - C-ck : run file
@@ -90,5 +97,12 @@ C-cC-eC-r is the same as C-cC-er)).
  - RET : help for word at point
  - f/b : next/previous page
  - SPC/S-SPC : scroll up/down
- - q: bury buffer
+ - TAB/S-TAB : next/previous headline
+ - C-cz : switch to listener
+ - q : bury buffer
 
+* In crossref buffers
+
+ - TAB/BACKTAB : navigate links
+ - RET/mouse click : follow link
+ - q : bury buffer

@@ -2,14 +2,18 @@ USING: tools.profiler.private tools.time help.markup help.syntax
 quotations io strings words definitions ;
 IN: tools.profiler
 
-ARTICLE: "profiling" "Profiling code" 
-"The " { $vocab-link "tools.profiler" } " vocabulary implements a simple call counting profiler. The profiler is completely accurate with words and methods which are compiled with the non-optimizing compiler. Some optimizations performed by the optimizing compiler can inhibit accurate call counting, however:"
+ARTICLE: "profiler-limitations" "Profiler limitations"
+"Certain optimizations performed by the compiler can inhibit accurate call counting:"
 { $list
-    "The optimizing compiler open-codes certain primitives with inline machine code, and in some cases optimizes them out altogether; this includes stack shuffling operations, conditionals, and many object allocation operations."
-    { "Calls to " { $link POSTPONE: inline } " words are not counted.." }
+    "Calls to open-coded intrinsics are not counted. Certain words are open-coded as inline machine code, and in some cases optimized out altogether; this includes stack shuffling operations, conditionals, and many object allocation operations."
+    { "Calls to " { $link POSTPONE: inline } " words are not counted." }
     { "Calls to methods which were inlined as a result of type inference are not counted." }
     "Tail-recursive loops will only count the initial invocation of the word, not every tail call."
-}
+} ;
+
+ARTICLE: "profiling" "Profiling code" 
+"The " { $vocab-link "tools.profiler" } " vocabulary implements a simple call counting profiler."
+$nl
 "Quotations can be passed to a combinator which calls them with the profiler enabled:"
 { $subsection profile }
 "After a quotation has been profiled, call counts can be presented in various ways:"
@@ -17,7 +21,9 @@ ARTICLE: "profiling" "Profiling code"
 { $subsection vocab-profile. }
 { $subsection usage-profile. }
 { $subsection vocabs-profile. }
-{ $subsection method-profile. } ;
+{ $subsection method-profile. }
+{ $subsection "profiler-limitations" }
+{ $see-also "ui-profiler" } ;
 
 ABOUT: "profiling"
 

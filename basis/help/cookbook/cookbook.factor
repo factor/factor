@@ -100,14 +100,12 @@ $nl
 { $code "10 [ \"Factor rocks!\" print ] times" }
 "Now we can look at a new data type, the array:"
 { $code "{ 1 2 3 }" }
-"An array looks like a quotation except it cannot be evaluated; it simply stores data."
+"An array differs from a quotation in that it cannot be evaluated; it simply stores data."
 $nl
 "You can perform an operation on each element of an array:"
 { $example
     "{ 1 2 3 } [ \"The number is \" write . ] each"
-    "The number is 1"
-    "The number is 2"
-    "The number is 3"
+    "The number is 1\nThe number is 2\nThe number is 3"
 }
 "You can transform each element, collecting the results in a new array:"
 { $example "{ 5 12 0 -12 -5 } [ sq ] map ." "{ 25 144 0 144 25 }" }

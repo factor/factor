@@ -13,21 +13,32 @@
 
 ;;; Code:
 
-(require 'fuel-base)
 (require 'fuel-syntax)
+(require 'fuel-base)
 
 (require 'font-lock)
 
 
 ;;; Faces:
 
+(defgroup fuel-faces nil
+  "Faces used by FUEL."
+  :group 'fuel
+  :group 'faces)
+
+(defmacro fuel-font-lock--defface (face def group doc)
+  `(defface ,face (face-default-spec ,def)
+     ,(format "Face for %s." doc)
+     :group ',group
+     :group 'fuel-faces
+     :group 'faces))
+
+(put 'fuel-font-lock--defface 'lisp-indent-function 1)
+
 (defmacro fuel-font-lock--make-face (prefix def-prefix group face def doc)
   (let ((face (intern (format "%s-%s" prefix face)))
         (def (intern (format "%s-%s-face" def-prefix def))))
-    `(defface ,face (face-default-spec ,def)
-       ,(format "Face for %s." doc)
-       :group ',group
-       :group 'faces)))
+    `(fuel-font-lock--defface ,face ,def ,group ,doc)))
 
 (defmacro fuel-font-lock--define-faces (prefix def-prefix group faces)
   (let ((setup (make-symbol (format "%s--faces-setup" prefix))))
@@ -39,20 +50,30 @@
                      ',faces)))
      (,setup))))
 
+(fuel-font-lock--define-faces
+ factor-font-lock font-lock factor-mode
+ ((comment comment "comments")
+  (constructor type  "constructors (<foo>)")
+  (declaration keyword "declaration words")
+  (parsing-word keyword  "parsing words")
+  (setter-word function-name "setter words (>>foo)")
+  (getter-word function-name "getter words (foo>>)")
+  (stack-effect comment "stack effect specifications")
+  (string string "strings")
+  (symbol variable-name "name of symbol being defined")
+  (type-name type "type names")
+  (vocabulary-name constant "vocabulary names")
+  (word function-name "word, generic or method being defined")))
+
 
 ;;; Font lock:
 
-(defconst fuel-font-lock--parsing-lock-keywords
-  (cons '("\\(P\\|SBUF\\)\"" 1 'factor-font-lock-parsing-word)
-        (mapcar (lambda (w) `(,(format "\\(^\\| \\)\\(%s\\)\\($\\| \\)" w)
-                         2 'factor-font-lock-parsing-word))
-                fuel-syntax--parsing-words)))
-
 (defconst fuel-font-lock--font-lock-keywords
-  `(,@fuel-font-lock--parsing-lock-keywords
+  `((,fuel-syntax--parsing-words-regex . 'factor-font-lock-parsing-word)
+    (,fuel-syntax--brace-words-regex 1 'factor-font-lock-parsing-word)
+    ("\\(P\\|SBUF\\)\"" 1 'factor-font-lock-parsing-word)
     (,fuel-syntax--stack-effect-regex . 'factor-font-lock-stack-effect)
-    (,fuel-syntax--parsing-words-ext-regex . 'factor-font-lock-parsing-word)
-    (,fuel-syntax--declaration-words-regex 1 'factor-font-lock-declaration)
+    (,fuel-syntax--declaration-words-regex . 'factor-font-lock-declaration)
     (,fuel-syntax--word-definition-regex 2 'factor-font-lock-word)
     (,fuel-syntax--type-definition-regex 2 'factor-font-lock-type-name)
     (,fuel-syntax--method-definition-regex (1 'factor-font-lock-type-name)
@@ -60,6 +81,7 @@
     (,fuel-syntax--parent-type-regex 1 'factor-font-lock-type-name)
     (,fuel-syntax--constructor-regex . 'factor-font-lock-constructor)
     (,fuel-syntax--setter-regex . 'factor-font-lock-setter-word)
+    (,fuel-syntax--getter-regex . 'factor-font-lock-getter-word)
     (,fuel-syntax--symbol-definition-regex 2 'factor-font-lock-symbol)
     (,fuel-syntax--use-line-regex 1 'factor-font-lock-vocabulary-name))
   "Font lock keywords definition for Factor mode.")

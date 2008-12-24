@@ -203,7 +203,7 @@ IN: google-tech-talk
         { $code "13 <circle> tell-me" }
         { $code "103 76 <rectangle> tell-me" }
         { $code "101 tell-me" }
-        { { $link integer } ", " { $link array } ", and others area built-in classes" }
+        { { $link integer } ", " { $link array } ", and others are built-in classes" }
     }
     { $slide "Object system"
         "Anyone can define new shapes..."

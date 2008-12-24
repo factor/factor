@@ -3,8 +3,9 @@
 USING: accessors alien.c-types alien.syntax combinators csv
 io.backend io.encodings.utf8 io.files io.files.info io.streams.string
 io.files.unix kernel math.order namespaces sequences sorting
-system unix unix.statfs.linux unix.statvfs.linux
-specialized-arrays.direct.uint arrays io.files.info.unix ;
+system unix unix.statfs.linux unix.statvfs.linux io.files.links
+specialized-arrays.direct.uint arrays io.files.info.unix assocs
+io.pathnames ;
 IN: io.files.info.unix.linux
 
 TUPLE: linux-file-system-info < unix-file-system-info
@@ -70,6 +71,16 @@ M: linux file-systems
         } cleave
     ] map ;
 
+: (find-mount-point) ( path mtab-paths -- mtab-entry )
+    [ follow-links ] dip 2dup at* [
+        2nip
+    ] [
+        drop [ parent-directory ] dip (find-mount-point)
+    ] if ;
+
+: find-mount-point ( path -- mtab-entry )
+    parse-mtab [ [ mount-point>> ] keep ] H{ } map>assoc (find-mount-point) ;
+
 ERROR: file-system-not-found ;
 
 M: linux file-system-info ( path -- )
@@ -80,9 +91,7 @@ M: linux file-system-info ( path -- )
         [ file-system-statvfs statvfs>file-system-info ] bi
         file-system-calculations
     ] keep
-    
-    parse-mtab [ [ mount-point>> ] bi@ <=> invert-comparison ] sort
-    [ mount-point>> head? ] with find nip [ file-system-not-found ] unless*
+    find-mount-point
     {
         [ file-system-name>> >>device-name drop ]
         [ mount-point>> >>mount-point drop ]
