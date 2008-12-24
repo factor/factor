@@ -62,5 +62,13 @@ IN: easy-help
 
   ; parsing
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: Word:
 
+  scan current-vocab create dup old-definitions get
+  [ delete-at ] with each dup set-word
+
+  bootstrap-word dup set-word
+  dup >link save-location
+  \ ; parse-until >array swap set-word-help ; parsing
