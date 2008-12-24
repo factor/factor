@@ -12,7 +12,11 @@ DEFER: size-of
 
 HELP: size-of
 
-Values: HEADERS sequence  TYPE string  n integer ..
+Values:
+
+    HEADERS sequence : List of header files
+    TYPE    string : C type
+    n       integer : Size in number of bytes ..
 
 Description:
 
