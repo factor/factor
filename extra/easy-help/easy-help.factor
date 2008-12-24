@@ -1,6 +1,8 @@
 
-USING: kernel multiline parser arrays
-       sequences splitting grouping help.markup ;
+USING: arrays assocs compiler.units 
+       grouping help help.markup help.topics kernel lexer multiline
+       namespaces parser sequences splitting words
+       easy-help.expand-markup ;
 
 IN: easy-help
 
@@ -72,3 +74,38 @@ IN: easy-help
   bootstrap-word dup set-word
   dup >link save-location
   \ ; parse-until >array swap set-word-help ; parsing
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: Contract:
+
+  ".." parse-multiline-string
+  string-lines
+  1 tail
+  [ dup "   " head? [ 4 tail     ] [ ] if ] map
+  [ expand-markup ] map
+  concat
+  [ dup ""    =     [ drop { $nl } ] [ ] if ] map
+  \ $contract prefix
+  parsed
+  
+  ; parsing
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: Notes:
+
+  ".." parse-multiline-string
+  string-lines
+  1 tail
+  [ dup "   " head? [ 4 tail     ] [ ] if ] map
+  [ expand-markup ] map
+  concat
+  [ dup ""    =     [ drop { $nl } ] [ ] if ] map
+  \ $notes prefix
+  parsed
+  
+  ; parsing
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
