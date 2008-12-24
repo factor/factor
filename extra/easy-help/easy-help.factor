@@ -1,5 +1,6 @@
 
-USING: kernel multiline parser sequences splitting grouping help.markup ;
+USING: kernel multiline parser arrays
+       sequences splitting grouping help.markup ;
 
 IN: easy-help
 
@@ -52,10 +53,14 @@ IN: easy-help
 : Values:
 
   ".." parse-multiline-string
-  " \n" split
-  [ "" = not ] filter
-  2 group
+  string-lines
+  1 tail
+  [ dup "   " head? [ 4 tail ] [ ] if ] map
+  [ " " split1 [ " " first = ] trim-left 2array ] map
   \ $values prefix
   parsed
 
   ; parsing
+
+
+
