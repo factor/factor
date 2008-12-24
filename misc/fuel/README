@@ -57,6 +57,7 @@ C-cC-eC-r is the same as C-cC-er)).
 
  - M-. : edit word at point in Emacs
  - M-TAB : complete word at point
+ - C-cC-eu : update USING: line
  - C-cC-ev : edit vocabulary (M-x fuel-edit-vocabulary)
  - C-cC-ew : edit word (M-x fuel-edit-word-at-point)
  - C-cC-ed : edit word's doc (M-x fuel-edit-word-at-point)

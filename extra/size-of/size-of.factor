@@ -8,11 +8,13 @@ IN: size-of
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-DEFER: size-of
+Word: size-of
 
-HELP: size-of
+Values:
 
-Values: HEADERS sequence  TYPE string  n integer ..
+    HEADERS sequence : List of header files
+    TYPE    string : A C type
+    n       integer : Size in number of bytes ..
 
 Description:
 
@@ -57,4 +59,3 @@ Example:
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
- 

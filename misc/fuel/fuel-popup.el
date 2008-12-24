@@ -44,7 +44,8 @@
 (define-minor-mode fuel-popup-mode
   "Mode for displaying read only stuff"
   nil nil
-  '(("q" . fuel-popup--quit)))
+  '(("q" . fuel-popup--quit))
+  (setq buffer-read-only t))
 
 (defmacro fuel-popup--define (fun name mode)
   `(defun ,fun ()
@@ -55,6 +56,14 @@
            (current-buffer)))))
 
 (put 'fuel-popup--define 'lisp-indent-function 1)
+
+(defmacro fuel--with-popup (buffer &rest body)
+  `(with-current-buffer ,buffer
+     (let ((inhibit-read-only t))
+       ,@body)))
+
+(put 'fuel--with-popup 'lisp-indent-function 1)
+
 
 (provide 'fuel-popup)
 ;;; fuel-popup.el ends here

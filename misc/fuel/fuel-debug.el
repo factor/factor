@@ -92,7 +92,14 @@
 (make-variable-buffer-local
  (defvar fuel-debug--file nil))
 
-(defun fuel-debug--display-retort (ret &optional success-msg no-pop file)
+(defun fuel-debug--prepare-compilation (file msg)
+  (let ((inhibit-read-only t))
+    (with-current-buffer (fuel-debug--buffer)
+      (erase-buffer)
+      (insert msg)
+      (setq fuel-debug--file file))))
+
+(defun fuel-debug--display-retort (ret &optional success-msg no-pop)
   (let ((err (fuel-eval--retort-error ret))
         (inhibit-read-only t))
     (with-current-buffer (fuel-debug--buffer)
@@ -107,12 +114,11 @@
         (fuel-debug--display-restarts err)
         (delete-blank-lines)
         (newline))
-      (let ((hstr (fuel-debug--help-string err file)))
+      (let ((hstr (fuel-debug--help-string err fuel-debug--file)))
         (if fuel-debug-show-short-help
             (insert "-----------\n" hstr "\n")
           (message "%s" hstr)))
       (setq fuel-debug--last-ret ret)
-      (setq fuel-debug--file file)
       (goto-char (point-max))
       (font-lock-fontify-buffer)
       (when (and err (not no-pop)) (fuel-popup--display))
@@ -219,11 +225,8 @@
     (unless (re-search-forward (format "^%s" info) nil t)
       (error "%s information not available" info))
     (message "Retrieving %s info ..." info)
-    (unless (fuel-debug--display-retort (fuel-eval--send/wait
-                                         `(:fuel ((:factor ,info))))
-                                        ""
-                                        nil
-                                        (fuel-debug--buffer-file))
+    (unless (fuel-debug--display-retort
+             (fuel-eval--send/wait `(:fuel ((:factor ,info)))) "")
       (error "Sorry, no %s info available" info))))
 
 
@@ -236,7 +239,6 @@
     (define-key map "\C-c\C-c" 'fuel-debug-goto-error)
     (define-key map "n" 'next-line)
     (define-key map "p" 'previous-line)
-    (define-key map "q" 'bury-buffer)
     (dotimes (n 9)
       (define-key map (vector (+ ?1 n))
         `(lambda () (interactive) (fuel-debug-exec-restart ,(1+ n) t))))
@@ -252,14 +254,14 @@ invoking restarts as needed.
   (interactive)
   (kill-all-local-variables)
   (buffer-disable-undo)
-  (setq major-mode 'factor-mode)
+  (setq major-mode 'fuel-debug-mode)
   (setq mode-name "Fuel Debug")
   (use-local-map fuel-debug-mode-map)
   (fuel-debug--font-lock-setup)
   (setq fuel-debug--file nil)
   (setq fuel-debug--last-ret nil)
-  (setq buffer-read-only t)
   (run-hooks 'fuel-debug-mode-hook))
+
 
 
 (provide 'fuel-debug)
