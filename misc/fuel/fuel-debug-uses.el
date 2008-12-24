@@ -71,8 +71,9 @@
     (beginning-of-line)
     (open-line 2)
     (insert "USING: "))
-  (insert (mapconcat 'identity uses " ") " ;")
-  (fill-paragraph nil))
+  (let ((start (point)))
+    (insert (mapconcat 'identity uses " ") " ;")
+    (fill-region start (point) nil)))
 
 (defun fuel-debug--uses-filter (restarts)
   (let ((result) (i 1) (rn 0))
