@@ -31,7 +31,19 @@ IN: easy-help
 : Contract:        { $contract    } parse-text-block append parsed ; parsing
 : Checked-Example: { $example     } parse-text-block append parsed ; parsing
 
+: Class-Description:
+  { $class-description } parse-text-block append parsed ; parsing
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: Code:
+  
+  { $code }
+  parse-text-block [ dup array? [ drop "" ] [ ] if ] map
+  append
+  parsed
+  
+  ; parsing
 
 : Example:
   { $heading "Example" }
