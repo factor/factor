@@ -8,47 +8,50 @@ IN: easy-help
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: Description:
-
+: parse-text-block ( -- array )
+  
   ".." parse-multiline-string
   string-lines
   1 tail
-  [ dup "   " head? [ 4 tail     ] [ ] if ] map
-  [ dup ""    =     [ drop { $nl } ] [ ] if ] map
-  \ $description prefix
-  parsed
-  
-  ; parsing
+  [ dup "    " head? [ 4 tail ] [ ] if ] map
+  [ expand-markup ] map
+  concat
+  [ dup "" = [ drop { $nl } ] [ ] if ] map ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: Text: parse-text-block parsed ; parsing
+
+: Block: scan-word 1array parse-text-block append parsed ; parsing
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: Notes:           { $notes       } parse-text-block append parsed ; parsing
+: Description:     { $description } parse-text-block append parsed ; parsing
+: Contract:        { $contract    } parse-text-block append parsed ; parsing
+: Checked-Example: { $example     } parse-text-block append parsed ; parsing
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : Example:
+  { $heading "Example" }
+  { $code }
+  parse-text-block
+  [ dup array? [ drop "" ] [ ] if ] map ! Each item in $code must be a string
+  append 
+  2array parsed ; parsing
 
-  { $heading "Example" } parsed
+: Introduction:
 
-  ".." parse-multiline-string
-  string-lines
-  [ dup "   " head? [ 4 tail ] [ ] if ] map
-  [ "" = not ] filter
-  ! \ $example prefix
-  \ $code prefix
-  parsed
-
-  ; parsing
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  { $heading "Introduction" }
+  parse-text-block
+  2array parsed ; parsing
 
 : Summary:
 
-  ".." parse-multiline-string
-  string-lines
-  1 tail
-  [ dup "   " head? [ 4 tail     ] [ ] if ] map
-  [ dup ""    =     [ drop { $nl } ] [ ] if ] map
-  { $heading "Summary" } prefix
-  parsed
-  
-  ; parsing
+  { $heading "Summary" }
+  parse-text-block
+  2array parsed ; parsing
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -57,7 +60,7 @@ IN: easy-help
   ".." parse-multiline-string
   string-lines
   1 tail
-  [ dup "   " head? [ 4 tail ] [ ] if ] map
+  [ dup "    " head? [ 4 tail ] [ ] if ] map
   [ " " split1 [ " " first = ] trim-left 2array ] map
   \ $values prefix
   parsed
@@ -77,35 +80,7 @@ IN: easy-help
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: Contract:
-
-  ".." parse-multiline-string
-  string-lines
-  1 tail
-  [ dup "   " head? [ 4 tail     ] [ ] if ] map
-  [ expand-markup ] map
-  concat
-  [ dup ""    =     [ drop { $nl } ] [ ] if ] map
-  \ $contract prefix
-  parsed
-  
-  ; parsing
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: Notes:
-
-  ".." parse-multiline-string
-  string-lines
-  1 tail
-  [ dup "   " head? [ 4 tail     ] [ ] if ] map
-  [ expand-markup ] map
-  concat
-  [ dup ""    =     [ drop { $nl } ] [ ] if ] map
-  \ $notes prefix
-  parsed
-  
-  ; parsing
+: Heading: { $heading } ".." parse-multiline-string suffix parsed ; parsing
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
