@@ -96,3 +96,16 @@ IN: easy-help
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: List:
+
+  { $list }
+
+  ".." parse-multiline-string
+  string-lines
+  1 tail
+  [ dup "    " head? [ 4 tail ] [ ] if ] map
+  [ expand-markup ] map
+
+  append parsed
+
+  ; parsing
