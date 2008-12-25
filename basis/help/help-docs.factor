@@ -327,7 +327,7 @@ HELP: $table
 
 HELP: $values
 { $values { "element" "an array of pairs of markup elements" } }
-{ $description "Prints the description of arguments and values found on every word help page. The first element of a pair is the argument name and is output with " { $link $snippet } ". The remainder is either a single class word, or an element. If it is a class word " { $snippet "class" } ", it is intereted as if it were shorthand for " { $snippet "{ $instance class }" } "." }
+{ $description "Prints the description of arguments and values found on every word help page. The first element of a pair is the argument name and is output with " { $link $snippet } ". The remainder is either a single class word, or an element. If it is a class word " { $snippet "class" } ", it is inserted as if it were shorthand for " { $snippet "{ $instance class }" } "." }
 { $see-also $maybe $instance $quotation } ;
 
 HELP: $instance
