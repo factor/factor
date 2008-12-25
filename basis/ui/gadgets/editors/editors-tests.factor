@@ -8,7 +8,7 @@ IN: ui.gadgets.editors.tests
     <editor> "editor" set
     "editor" get [
         "foo bar" "editor" get set-editor-string
-        "editor" get T{ one-line-elt } select-elt
+        "editor" get one-line-elt select-elt
         "editor" get gadget-selection
     ] with-grafted-gadget
 ] unit-test
@@ -17,7 +17,7 @@ IN: ui.gadgets.editors.tests
     <editor> "editor" set
     "editor" get [
         "foo bar\nbaz quux" "editor" get set-editor-string
-        "editor" get T{ one-line-elt } select-elt
+        "editor" get one-line-elt select-elt
         "editor" get gadget-selection
     ] with-grafted-gadget
 ] unit-test

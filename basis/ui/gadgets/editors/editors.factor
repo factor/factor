@@ -291,9 +291,9 @@ M: editor gadget-text* editor-string % ;
 
 : mouse-elt ( -- element )
     hand-click# get {
-        { 1 T{ one-char-elt } }
-        { 2 T{ one-word-elt } }
-    } at T{ one-line-elt } or ;
+        { 1 one-char-elt }
+        { 2 one-word-elt }
+    } at one-line-elt or ;
 
 : drag-direction? ( loc editor -- ? )
     editor-mark* before? ;
@@ -356,34 +356,34 @@ M: editor gadget-text* editor-string % ;
     [ [ [ editor-caret* ] [ model>> ] bi ] dip prev/next-elt ] [ drop ] 2bi
     editor-select ;
 
-: start-of-document ( editor -- ) T{ doc-elt } editor-prev ;
+: start-of-document ( editor -- ) doc-elt editor-prev ;
 
-: end-of-document ( editor -- ) T{ doc-elt } editor-next ;
+: end-of-document ( editor -- ) doc-elt editor-next ;
 
 : position-caret ( editor -- )
-    mouse-elt dup T{ one-char-elt } =
+    mouse-elt dup one-char-elt =
     [ drop dup extend-selection dup mark>> click-loc ]
     [ select-elt ] if ;
 
 : insert-newline ( editor -- ) "\n" swap user-input* drop ;
 
 : delete-next-character ( editor -- ) 
-    T{ char-elt } editor-delete ;
+    char-elt editor-delete ;
 
 : delete-previous-character ( editor -- ) 
-    T{ char-elt } editor-backspace ;
+    char-elt editor-backspace ;
 
 : delete-previous-word ( editor -- ) 
-    T{ word-elt } editor-delete ;
+    word-elt editor-delete ;
 
 : delete-next-word ( editor -- ) 
-    T{ word-elt } editor-backspace ;
+    word-elt editor-backspace ;
 
 : delete-to-start-of-line ( editor -- ) 
-    T{ one-line-elt } editor-delete ;
+    one-line-elt editor-delete ;
 
 : delete-to-end-of-line ( editor -- ) 
-    T{ one-line-elt } editor-backspace ;
+    one-line-elt editor-backspace ;
 
 editor "general" f {
     { T{ key-down f f "DELETE" } delete-next-character }
@@ -415,7 +415,7 @@ editor "clipboard" f {
         dup selection-start/end drop
         over set-caret mark>caret
     ] [
-        T{ char-elt } editor-prev
+        char-elt editor-prev
     ] if ;
 
 : next-character ( editor -- )
@@ -423,20 +423,20 @@ editor "clipboard" f {
         dup selection-start/end nip
         over set-caret mark>caret
     ] [
-        T{ char-elt } editor-next
+        char-elt editor-next
     ] if ;
 
-: previous-line ( editor -- ) T{ line-elt } editor-prev ;
+: previous-line ( editor -- ) line-elt editor-prev ;
 
-: next-line ( editor -- ) T{ line-elt } editor-next ;
+: next-line ( editor -- ) line-elt editor-next ;
 
-: previous-word ( editor -- ) T{ word-elt } editor-prev ;
+: previous-word ( editor -- ) word-elt editor-prev ;
 
-: next-word ( editor -- ) T{ word-elt } editor-next ;
+: next-word ( editor -- ) word-elt editor-next ;
 
-: start-of-line ( editor -- ) T{ one-line-elt } editor-prev ;
+: start-of-line ( editor -- ) one-line-elt editor-prev ;
 
-: end-of-line ( editor -- ) T{ one-line-elt } editor-next ;
+: end-of-line ( editor -- ) one-line-elt editor-next ;
 
 editor "caret-motion" f {
     { T{ button-down } position-caret }
@@ -456,11 +456,11 @@ editor "caret-motion" f {
     #! The with-datastack is a kludge to make it infer. Stupid.
     model>> 1array [ clear-doc ] with-datastack drop ;
 
-: select-all ( editor -- ) T{ doc-elt } select-elt ;
+: select-all ( editor -- ) doc-elt select-elt ;
 
-: select-line ( editor -- ) T{ one-line-elt } select-elt ;
+: select-line ( editor -- ) one-line-elt select-elt ;
 
-: select-word ( editor -- ) T{ one-word-elt } select-elt ;
+: select-word ( editor -- ) one-word-elt select-elt ;
 
 : selected-word ( editor -- string )
     dup gadget-selection?
@@ -468,34 +468,34 @@ editor "caret-motion" f {
     gadget-selection ;
 
 : select-previous-character ( editor -- ) 
-    T{ char-elt } editor-select-prev ;
+    char-elt editor-select-prev ;
 
 : select-next-character ( editor -- ) 
-    T{ char-elt } editor-select-next ;
+    char-elt editor-select-next ;
 
 : select-previous-line ( editor -- ) 
-    T{ line-elt } editor-select-prev ;
+    line-elt editor-select-prev ;
 
 : select-next-line ( editor -- ) 
-    T{ line-elt } editor-select-next ;
+    line-elt editor-select-next ;
 
 : select-previous-word ( editor -- ) 
-    T{ word-elt } editor-select-prev ;
+    word-elt editor-select-prev ;
 
 : select-next-word ( editor -- ) 
-    T{ word-elt } editor-select-next ;
+    word-elt editor-select-next ;
 
 : select-start-of-line ( editor -- ) 
-    T{ one-line-elt } editor-select-prev ;
+    one-line-elt editor-select-prev ;
 
 : select-end-of-line ( editor -- ) 
-    T{ one-line-elt } editor-select-next ;
+    one-line-elt editor-select-next ;
 
 : select-start-of-document ( editor -- ) 
-    T{ doc-elt } editor-select-prev ;
+    doc-elt editor-select-prev ;
 
 : select-end-of-document ( editor -- ) 
-    T{ doc-elt } editor-select-next ;
+    doc-elt editor-select-next ;
 
 editor "selection" f {
     { T{ button-down f { S+ } 1 } extend-selection }

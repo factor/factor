@@ -53,7 +53,7 @@ M: interactor ungraft*
 
 : word-at-loc ( loc interactor -- word )
     over [
-        [ model>> T{ one-word-elt } elt-string ] keep
+        [ model>> one-word-elt elt-string ] keep
         interactor-use assoc-stack
     ] [
         2drop f

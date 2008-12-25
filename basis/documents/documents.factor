@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io kernel math models namespaces make
 sequences strings splitting combinators unicode.categories
-math.order math.ranges ;
+math.order math.ranges fry ;
 IN: documents
 
 : +col ( loc n -- newloc ) [ first2 ] dip + 2array ;
@@ -150,7 +150,7 @@ GENERIC: next-elt ( loc document elt -- newloc )
 : elt-string ( loc document elt -- string )
     [ prev/next-elt ] [ drop ] 2bi doc-range ;
 
-TUPLE: char-elt ;
+SINGLETON: char-elt
 
 : (prev-char) ( loc document quot -- loc )
     {
@@ -172,7 +172,7 @@ M: char-elt prev-elt
 M: char-elt next-elt
     drop [ drop 1 +col ] (next-char) ;
 
-TUPLE: one-char-elt ;
+SINGLETON: one-char-elt
 
 M: one-char-elt prev-elt 2drop ;
 
@@ -186,7 +186,7 @@ M: one-char-elt next-elt 2drop ;
 : ((word-elt)) ( n seq -- ? n seq ) [ ?nth blank? ] 2keep ;
 
 : break-detector ( ? -- quot )
-    [ [ blank? ] dip xor ] curry ; inline
+    '[ blank? _ xor ] ; inline
 
 : (prev-word) ( ? col str -- col )
     rot break-detector find-last-from drop ?1+ ;
@@ -195,7 +195,7 @@ M: one-char-elt next-elt 2drop ;
     [ rot break-detector find-from drop ] keep
     over not [ nip length ] [ drop ] if ;
 
-TUPLE: one-word-elt ;
+SINGLETON: one-word-elt
 
 M: one-word-elt prev-elt
     drop
@@ -205,7 +205,7 @@ M: one-word-elt next-elt
     drop
     [ [ f ] 2dip (next-word) ] (word-elt) ;
 
-TUPLE: word-elt ;
+SINGLETON: word-elt
 
 M: word-elt prev-elt
     drop
@@ -217,7 +217,7 @@ M: word-elt next-elt
     [ [ ((word-elt)) (next-word) ] (word-elt) ]
     (next-char) ;
 
-TUPLE: one-line-elt ;
+SINGLETON: one-line-elt
 
 M: one-line-elt prev-elt
     2drop first 0 2array ;
@@ -225,7 +225,7 @@ M: one-line-elt prev-elt
 M: one-line-elt next-elt
     drop [ first dup ] dip doc-line length 2array ;
 
-TUPLE: line-elt ;
+SINGLETON: line-elt
 
 M: line-elt prev-elt
     2drop dup first zero? [ drop { 0 0 } ] [ -1 +line ] if ;
@@ -234,7 +234,7 @@ M: line-elt next-elt
     drop over first over last-line# number=
     [ nip doc-end ] [ drop 1 +line ] if ;
 
-TUPLE: doc-elt ;
+SINGLETON: doc-elt
 
 M: doc-elt prev-elt 3drop { 0 0 } ;
 
