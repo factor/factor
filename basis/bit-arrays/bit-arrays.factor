@@ -25,7 +25,7 @@ TUPLE: bit-array
 
 : (set-bits) ( bit-array n -- )
     [ [ length bits>cells ] keep ] dip swap underlying>>
-    '[ [ _ _ ] dip set-alien-unsigned-4 ] each ; inline
+    '[ 2 shift [ _ _ ] dip set-alien-unsigned-4 ] each ; inline
 
 PRIVATE>
 
