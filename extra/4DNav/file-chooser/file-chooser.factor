@@ -4,6 +4,9 @@ USING:
 kernel
 io.files
 io.backend
+io.directories
+io.files.info
+io.pathnames
 sequences
 models
 strings
@@ -23,7 +26,6 @@ prettyprint
 combinators
 rewrite-closures
 accessors
-namespaces.lib
 values
 tools.walker
 fry
