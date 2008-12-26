@@ -87,7 +87,7 @@
 
 (defun fuel--string-prefix-p (prefix str)
   (and (>= (length str) (length prefix))
-       (string= (substring-no-properties 0 (length prefix) str)
+       (string= (substring-no-properties str 0 (length prefix))
                 (substring-no-properties prefix))))
 
 (defun fuel--respecting-message (format &rest format-args)

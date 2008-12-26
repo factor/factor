@@ -130,13 +130,14 @@
 
 (defsubst fuel-eval--error-name (err) (car err))
 
-(defsubst fuel-eval--error-restarts (err)
-  (cdr (assoc :restarts (fuel-eval--error-name-p err 'condition))))
-
 (defun fuel-eval--error-name-p (err name)
   (unless (null err)
     (or (and (eq (fuel-eval--error-name err) name) err)
         (assoc name err))))
+
+(defsubst fuel-eval--error-restarts (err)
+  (cdr (assoc :restarts (or (fuel-eval--error-name-p err 'condition)
+                            (fuel-eval--error-name-p err 'lexer-error)))))
 
 (defsubst fuel-eval--error-file (err)
   (nth 1 (fuel-eval--error-name-p err 'source-file-error)))

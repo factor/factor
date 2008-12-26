@@ -1,13 +1,11 @@
 ! Copyright (C) 2008 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs classes classes.tuple
-combinators compiler.units continuations debugger definitions
-eval help io io.files io.pathnames io.streams.string kernel
-lexer listener listener.private make math math.order memoize
-namespaces parser prettyprint prettyprint.config quotations
-sequences sets sorting source-files strings summary tools.vocabs
-vectors vocabs vocabs.loader vocabs.parser words ;
+USING: accessors arrays assocs classes.tuple combinators
+compiler.units continuations debugger definitions io io.pathnames
+io.streams.string kernel lexer math math.order memoize namespaces
+parser prettyprint sequences sets sorting source-files strings summary
+tools.vocabs vectors vocabs vocabs.parser words ;
 
 IN: fuel
 
@@ -138,7 +136,22 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     [ (fuel-eval-usings) (fuel-eval-in) (fuel-eval) ] with-string-writer
     (fuel-end-eval) ;
 
+! Loading files
+
 : fuel-run-file ( path -- ) run-file ; inline
+
+: fuel-with-autouse ( quot -- )
+    [
+        auto-use? on
+        [ amended-use get clone fuel-eval-set-result ] print-use-hook set
+        call
+    ] curry with-scope ;
+
+: (fuel-get-uses) ( lines -- )
+    [ parse-fresh drop ] curry with-compilation-unit ; inline
+
+: fuel-get-uses ( lines -- )
+    [ (fuel-get-uses) ] curry fuel-with-autouse ;
 
 ! Edit locations
 

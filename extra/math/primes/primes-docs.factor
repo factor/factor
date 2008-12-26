@@ -4,7 +4,7 @@ IN: math.primes
 { next-prime prime? } related-words
 
 HELP: next-prime
-{ $values { "n" "a positive integer" } { "p" "a prime number" } }
+{ $values { "n" "an integer not smaller than 2" } { "p" "a prime number" } }
 { $description "Return the next prime number greater than " { $snippet "n" } "." } ;
 
 HELP: prime?

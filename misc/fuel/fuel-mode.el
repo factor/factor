@@ -17,6 +17,7 @@
 (require 'fuel-listener)
 (require 'fuel-completion)
 (require 'fuel-debug)
+(require 'fuel-debug-uses)
 (require 'fuel-eval)
 (require 'fuel-help)
 (require 'fuel-xref)
@@ -68,15 +69,14 @@ With prefix argument, ask for the file to run."
          (buffer (cdr f/b)))
     (when buffer
       (with-current-buffer buffer
-        (message "Compiling %s ..." file)
-        (fuel-eval--send `(:fuel (,file fuel-run-file))
-                         `(lambda (r) (fuel--run-file-cont r ,file)))))))
+        (let ((msg (format "Compiling %s ..." file)))
+          (fuel-debug--prepare-compilation file msg)
+          (message msg)
+          (fuel-eval--send `(:fuel (,file fuel-run-file))
+                           `(lambda (r) (fuel--run-file-cont r ,file))))))))
 
 (defun fuel--run-file-cont (ret file)
-  (if (fuel-debug--display-retort ret
-                                  (format "%s successfully compiled" file)
-                                  nil
-                                  file)
+  (if (fuel-debug--display-retort ret (format "%s successfully compiled" file))
       (message "Compiling %s ... OK!" file)
     (message "")))
 
@@ -86,17 +86,20 @@ With prefix argument, ask for the file to run."
 Unless called with a prefix, switches to the compilation results
 buffer in case of errors."
   (interactive "r\nP")
-  (let* ((lines (split-string (buffer-substring-no-properties begin end)
-                              "[\f\n\r\v]+" t))
+  (let* ((rstr (buffer-substring begin end))
+         (lines (split-string (substring-no-properties rstr)
+                              "[\f\n\r\v]+"
+                              t))
          (cmd `(:fuel (,(mapcar (lambda (l) `(:factor ,l)) lines))))
          (cv (fuel-syntax--current-vocab)))
+    (fuel-debug--prepare-compilation (buffer-file-name)
+                                     (format "Evaluating:\n\n%s" rstr))
     (fuel-debug--display-retort
      (fuel-eval--send/wait cmd 10000)
      (format "%s%s"
              (if cv (format "IN: %s " cv) "")
              (fuel--shorten-region begin end 70))
-     arg
-     (buffer-file-name))))
+     arg)))
 
 (defun fuel-eval-extended-region (begin end &optional arg)
   "Sends region, extended outwards to nearest definition,
@@ -119,6 +122,14 @@ buffer in case of errors."
            (end (mark)))
       (unless (< begin end) (error "No evaluable definition around point"))
       (fuel-eval-region begin end arg))))
+
+(defun fuel-update-usings (&optional arg)
+  "Asks factor for the vocabularies needed by this file,
+optionally updating the its USING: line.
+With prefix argument, ask for the file name."
+  (interactive "P")
+  (let ((file (car (fuel-mode--read-file arg))))
+    (when file (fuel-debug--uses-for-file file))))
 
 (defun fuel--try-edit (ret)
   (let* ((err (fuel-eval--retort-error ret))
@@ -270,6 +281,7 @@ interacting with a factor listener is at your disposal.
 (fuel-mode--key ?e ?e 'fuel-eval-extended-region)
 (fuel-mode--key ?e ?l 'fuel-run-file)
 (fuel-mode--key ?e ?r 'fuel-eval-region)
+(fuel-mode--key ?e ?u 'fuel-update-usings)
 (fuel-mode--key ?e ?v 'fuel-edit-vocabulary)
 (fuel-mode--key ?e ?w 'fuel-edit-word)
 (fuel-mode--key ?e ?x 'fuel-eval-definition)

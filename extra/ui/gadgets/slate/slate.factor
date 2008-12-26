@@ -1,7 +1,34 @@
 
-USING: kernel namespaces opengl ui.render ui.gadgets accessors ;
+USING: kernel namespaces opengl ui.render ui.gadgets accessors
+       help.syntax
+       easy-help ;
 
 IN: ui.gadgets.slate
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ARTICLE: "slate" "Slate Gadget"
+
+Summary:
+
+    A gadget with an 'action' slot which should be set to a callable.  ..
+
+Example:
+
+    ! Load the right vocabs for the examples
+
+    USING: processing.shapes ui.gadgets.slate ;    ..
+
+Example:
+
+    [ { { 10 10 } { 50 30 } { 10 50 } } polygon fill-mode ] <slate>
+    gadget.  ..
+
+;
+
+ABOUT: "slate"
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 TUPLE: slate < gadget action pdim graft ungraft ;
 
