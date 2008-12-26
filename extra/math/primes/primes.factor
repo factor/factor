@@ -7,7 +7,7 @@ IN: math.primes
 <PRIVATE
 
 : find-prime-miller-rabin ( n -- p )
-    dup miller-rabin [ 2 + find-prime-miller-rabin ] unless ; foldable
+    [ dup miller-rabin ] [ 2 + ] [ ] until ; foldable
 
 PRIVATE>
 
