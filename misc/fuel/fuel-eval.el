@@ -26,12 +26,13 @@
   (cond ((null sexp) "f")
         ((eq sexp t) "t")
         ((or (stringp sexp) (numberp sexp)) (format "%S" sexp))
-        ((vectorp sexp) (cons :quotation (append sexp nil)))
+        ((vectorp sexp) (factor (cons :quotation (append sexp nil))))
         ((listp sexp)
          (case (car sexp)
            (:array (factor--seq 'V{ '} (cdr sexp)))
            (:quote (format "\\ %s" (factor `(:factor ,(cadr sexp)))))
            (:quotation (factor--seq '\[ '\] (cdr sexp)))
+           (:using (factor `(USING: ,@(cdr sexp) :end)))
            (:factor (format "%s" (mapconcat 'identity (cdr sexp) " ")))
            (:fuel (factor--fuel-factor (cons :rs (cdr sexp))))
            (:fuel* (factor--fuel-factor (cons :nrs (cdr sexp))))
@@ -43,6 +44,7 @@
                    (:in (fuel-syntax--current-vocab))
                    (:usings `(:array ,@(fuel-syntax--usings)))
                    (:get 'fuel-eval-set-result)
+                   (:end '\;)
                    (t `(:factor ,(symbol-name sexp))))))
         ((symbolp sexp) (symbol-name sexp))))
 
@@ -128,13 +130,14 @@
 
 (defsubst fuel-eval--error-name (err) (car err))
 
-(defsubst fuel-eval--error-restarts (err)
-  (cdr (assoc :restarts (fuel-eval--error-name-p err 'condition))))
-
 (defun fuel-eval--error-name-p (err name)
   (unless (null err)
     (or (and (eq (fuel-eval--error-name err) name) err)
         (assoc name err))))
+
+(defsubst fuel-eval--error-restarts (err)
+  (cdr (assoc :restarts (or (fuel-eval--error-name-p err 'condition)
+                            (fuel-eval--error-name-p err 'lexer-error)))))
 
 (defsubst fuel-eval--error-file (err)
   (nth 1 (fuel-eval--error-name-p err 'source-file-error)))

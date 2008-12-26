@@ -1,9 +1,38 @@
 
 USING: kernel quotations arrays sequences math math.ranges fry
        opengl opengl.gl ui.render ui.gadgets.cartesian processing.shapes
-       accessors ;
+       accessors
+       help.syntax
+       easy-help ;
 
 IN: ui.gadgets.plot
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ARTICLE: "ui.gadgets.plot" "Plot Gadget"
+
+Summary:
+
+    A simple gadget for ploting two dimentional functions.
+
+    Use the arrow keys to move around.
+
+    Use 'a' and 'z' keys to zoom in and out. ..
+
+Example:
+
+    <plot> [ sin ] add-function gadget.    ..
+
+Example:
+
+    <plot>
+      [ sin ] red  function boa add-function
+      [ cos ] blue function boa add-function
+    gadget.    ..
+
+;
+
+ABOUT: "ui.gadgets.plot"
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -29,11 +58,11 @@ TUPLE: function function color ;
 GENERIC: plot-function ( plot object -- plot )
 
 M: callable plot-function ( plot quotation -- plot )
-  >r dup plot-range r> '[ dup @ 2array ] map line-strip ;
+  [ dup plot-range ] dip '[ dup @ 2array ] map line-strip ;
 
 M: function plot-function ( plot function -- plot )
    dup color>> dup [ >stroke-color ] [ drop ] if
-   >r dup plot-range r> function>> '[ dup @ 2array ] map line-strip ;
+   [ dup plot-range ] dip function>> '[ dup @ 2array ] map line-strip ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

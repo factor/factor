@@ -14,29 +14,30 @@
 
 ;;; Code:
 
-(require 'fuel-base)
 (require 'fuel-eval)
+(require 'fuel-popup)
 (require 'fuel-font-lock)
+(require 'fuel-base)
 
 
 ;;; Customization:
 
 (defgroup fuel-debug nil
-  "Major mode for interaction with the Factor debugger"
+  "Major mode for interaction with the Factor debugger."
   :group 'fuel)
 
 (defcustom fuel-debug-mode-hook nil
-  "Hook run after `fuel-debug-mode' activates"
+  "Hook run after `fuel-debug-mode' activates."
   :group 'fuel-debug
   :type 'hook)
 
 (defcustom fuel-debug-show-short-help t
-  "Whether to show short help on available keys in debugger"
+  "Whether to show short help on available keys in debugger."
   :group 'fuel-debug
   :type 'boolean)
 
 (fuel-font-lock--define-faces
- fuel-debug-font-lock font-lock fuel-debug
+ fuel-font-lock-debug font-lock fuel-debug
  ((error warning "highlighting errors")
   (line variable-name "line numbers in errors/warnings")
   (column variable-name "column numbers in errors/warnings")
@@ -66,14 +67,14 @@
 (defconst fuel-debug--restart-regex "^:\\([0-9]+\\) \\(.+\\)")
 
 (defconst fuel-debug--font-lock-keywords
-  `((,fuel-debug--error-file-regex . 'fuel-debug-font-lock-error)
-    (,fuel-debug--error-line-regex 1 'fuel-debug-font-lock-line)
-    (,fuel-debug--error-cont-regex 1 'fuel-debug-font-lock-column)
-    (,fuel-debug--restart-regex (1 'fuel-debug-font-lock-restart-number)
-                                (2 'fuel-debug-font-lock-restart-name))
-    (,fuel-debug--compiler-info-regex 1 'fuel-debug-font-lock-restart-number)
-    ("^\\(Restarts?\\|Loading\\) .+$" . 'fuel-debug-font-lock-info)
-    ("^Error: " . 'fuel-debug-font-lock-error)))
+  `((,fuel-debug--error-file-regex . 'fuel-font-lock-debug-error)
+    (,fuel-debug--error-line-regex 1 'fuel-font-lock-debug-line)
+    (,fuel-debug--error-cont-regex 1 'fuel-font-lock-debug-column)
+    (,fuel-debug--restart-regex (1 'fuel-font-lock-debug-restart-number)
+                                (2 'fuel-font-lock-debug-restart-name))
+    (,fuel-debug--compiler-info-regex 1 'fuel-font-lock-debug-restart-number)
+    ("^\\(Restarts?\\|Loading\\) .+$" . 'fuel-font-lock-debug-info)
+    ("^Error: " . 'fuel-font-lock-debug-error)))
 
 (defun fuel-debug--font-lock-setup ()
   (set (make-local-variable 'font-lock-defaults)
@@ -82,7 +83,8 @@
 
 ;;; Debug buffer:
 
-(defvar fuel-debug--buffer nil)
+(fuel-popup--define fuel-debug--buffer
+  "*fuel debug*" 'fuel-debug-mode)
 
 (make-variable-buffer-local
  (defvar fuel-debug--last-ret nil))
@@ -90,14 +92,14 @@
 (make-variable-buffer-local
  (defvar fuel-debug--file nil))
 
-(defun fuel-debug--buffer ()
-  (or (and (buffer-live-p fuel-debug--buffer) fuel-debug--buffer)
-      (with-current-buffer
-          (setq fuel-debug--buffer (get-buffer-create "*fuel dbg*"))
-        (fuel-debug-mode)
-        (current-buffer))))
+(defun fuel-debug--prepare-compilation (file msg)
+  (let ((inhibit-read-only t))
+    (with-current-buffer (fuel-debug--buffer)
+      (erase-buffer)
+      (insert msg)
+      (setq fuel-debug--file file))))
 
-(defun fuel-debug--display-retort (ret &optional success-msg no-pop file)
+(defun fuel-debug--display-retort (ret &optional success-msg no-pop)
   (let ((err (fuel-eval--retort-error ret))
         (inhibit-read-only t))
     (with-current-buffer (fuel-debug--buffer)
@@ -111,16 +113,15 @@
       (when err
         (fuel-debug--display-restarts err)
         (delete-blank-lines)
-        (newline)
-        (let ((hstr (fuel-debug--help-string err file)))
-          (if fuel-debug-show-short-help
-              (insert "-----------\n" hstr "\n")
-            (message "%s" hstr))))
+        (newline))
+      (let ((hstr (fuel-debug--help-string err fuel-debug--file)))
+        (if fuel-debug-show-short-help
+            (insert "-----------\n" hstr "\n")
+          (message "%s" hstr)))
       (setq fuel-debug--last-ret ret)
-      (setq fuel-debug--file file)
       (goto-char (point-max))
       (font-lock-fontify-buffer)
-      (when (and err (not no-pop)) (pop-to-buffer fuel-debug--buffer))
+      (when (and err (not no-pop)) (fuel-popup--display))
       (not err))))
 
 (defun fuel-debug--display-output (ret)
@@ -179,16 +180,16 @@
 
 (defun fuel-debug-goto-error ()
   (interactive)
-  (let* ((err (or (fuel-debug--buffer-error)
-                  (error "No errors reported")))
+  (let* ((err (fuel-debug--buffer-error))
          (file (or (fuel-debug--buffer-file)
-                   (error "No file associated with error")))
-         (l/c (fuel-eval--error-line/column err))
+                   (error "No file associated with compilation")))
+         (l/c (and err (fuel-eval--error-line/column err)))
          (line (or (car l/c) 1))
          (col (or (cdr l/c) 0)))
     (find-file-other-window file)
-    (goto-line line)
-    (forward-char col)))
+    (when line
+      (goto-line line)
+      (when col (forward-char col)))))
 
 (defun fuel-debug--read-restart-no ()
   (let ((rs (fuel-debug--buffer-restarts)))
@@ -225,8 +226,7 @@
       (error "%s information not available" info))
     (message "Retrieving %s info ..." info)
     (unless (fuel-debug--display-retort
-             (fuel-eval--send/wait `(:fuel ((:factor ,info))))
-             "" (fuel-debug--buffer-file))
+             (fuel-eval--send/wait `(:fuel ((:factor ,info)))) "")
       (error "Sorry, no %s info available" info))))
 
 
@@ -239,7 +239,6 @@
     (define-key map "\C-c\C-c" 'fuel-debug-goto-error)
     (define-key map "n" 'next-line)
     (define-key map "p" 'previous-line)
-    (define-key map "q" 'bury-buffer)
     (dotimes (n 9)
       (define-key map (vector (+ ?1 n))
         `(lambda () (interactive) (fuel-debug-exec-restart ,(1+ n) t))))
@@ -255,14 +254,14 @@ invoking restarts as needed.
   (interactive)
   (kill-all-local-variables)
   (buffer-disable-undo)
-  (setq major-mode 'factor-mode)
+  (setq major-mode 'fuel-debug-mode)
   (setq mode-name "Fuel Debug")
   (use-local-map fuel-debug-mode-map)
   (fuel-debug--font-lock-setup)
   (setq fuel-debug--file nil)
   (setq fuel-debug--last-ret nil)
-  (setq buffer-read-only t)
   (run-hooks 'fuel-debug-mode-hook))
+
 
 
 (provide 'fuel-debug)

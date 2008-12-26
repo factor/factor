@@ -13,7 +13,7 @@ IN: tools.deploy.macosx
     vm parent-directory parent-directory ;
 
 : copy-bundle-dir ( bundle-name dir -- )
-    bundle-dir over append-path -rot
+    [ bundle-dir prepend-path swap ] keep
     "Contents" prepend-path append-path copy-tree ;
 
 : app-plist ( executable bundle-name -- assoc )

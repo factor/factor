@@ -61,7 +61,7 @@ PRIVATE>
     [ dup ] 2dip 2curry annotate ;
 
 : call-logging-quot ( quot word level -- quot' )
-    "called" -rot [ log-message ] 3curry prepose ;
+    [ "called" ] 2dip [ log-message ] 3curry prepose ;
 
 : add-logging ( word level -- )
     [ call-logging-quot ] (define-logging) ;

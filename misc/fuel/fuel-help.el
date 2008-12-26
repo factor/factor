@@ -15,21 +15,18 @@
 ;;; Code:
 
 (require 'fuel-eval)
+(require 'fuel-autodoc)
 (require 'fuel-completion)
 (require 'fuel-font-lock)
+(require 'fuel-popup)
 (require 'fuel-base)
 
 
 ;;; Customization:
 
 (defgroup fuel-help nil
-  "Options controlling FUEL's help system"
+  "Options controlling FUEL's help system."
   :group 'fuel)
-
-(defcustom fuel-help-minibuffer-font-lock t
-  "Whether to use font lock for info messages in the minibuffer."
-  :group 'fuel-help
-  :type 'boolean)
 
 (defcustom fuel-help-always-ask t
   "When enabled, always ask for confirmation in help prompts."
@@ -51,62 +48,8 @@
   :type 'integer
   :group 'fuel-help)
 
-(defface fuel-help-font-lock-headlines '((t (:bold t :weight bold)))
-  "Face for headlines in help buffers."
-  :group 'fuel-help
-  :group 'faces)
-
-
-;;; Autodoc mode:
-
-(defvar fuel-help--font-lock-buffer
-  (let ((buffer (get-buffer-create " *fuel help minibuffer messages*")))
-    (set-buffer buffer)
-    (fuel-font-lock--font-lock-setup)
-    buffer))
-
-(defun fuel-help--font-lock-str (str)
-  (set-buffer fuel-help--font-lock-buffer)
-  (erase-buffer)
-  (insert str)
-  (let ((font-lock-verbose nil)) (font-lock-fontify-buffer))
-  (buffer-string))
-
-(defun fuel-help--word-synopsis (&optional word)
-  (let ((word (or word (fuel-syntax-symbol-at-point)))
-        (fuel-log--inhibit-p t))
-    (when word
-      (let* ((cmd (if (fuel-syntax--in-using)
-                      `(:fuel* (,word fuel-vocab-summary) t t)
-                    `(:fuel* (((:quote ,word) synopsis :get)) t)))
-             (ret (fuel-eval--send/wait cmd 20))
-             (res (fuel-eval--retort-result ret)))
-        (when (and ret (not (fuel-eval--retort-error ret)) (stringp res))
-          (if fuel-help-minibuffer-font-lock
-              (fuel-help--font-lock-str res)
-            res))))))
-
-(make-variable-buffer-local
- (defvar fuel-autodoc-mode-string " A"
-   "Modeline indicator for fuel-autodoc-mode"))
-
-(define-minor-mode fuel-autodoc-mode
-  "Toggle Fuel's Autodoc mode.
-With no argument, this command toggles the mode.
-Non-null prefix argument turns on the mode.
-Null prefix argument turns off the mode.
-
-When Autodoc mode is enabled, a synopsis of the word at point is
-displayed in the minibuffer."
-  :init-value nil
-  :lighter fuel-autodoc-mode-string
-  :group 'fuel
-
-  (set (make-local-variable 'eldoc-documentation-function)
-       (when fuel-autodoc-mode 'fuel-help--word-synopsis))
-  (set (make-local-variable 'eldoc-minor-mode-string) nil)
-  (eldoc-mode fuel-autodoc-mode)
-  (message "Fuel Autodoc %s" (if fuel-autodoc-mode "enabled" "disabled")))
+(fuel-font-lock--defface fuel-font-lock-help-headlines
+  'bold fuel-hep "headlines in help buffers")
 
 
 ;;; Help browser history:
@@ -115,8 +58,6 @@ displayed in the minibuffer."
   (list nil                                        ; current
         (make-ring fuel-help-history-cache-size)   ; previous
         (make-ring fuel-help-history-cache-size))) ; next
-
-(defvar fuel-help--history-idx 0)
 
 (defun fuel-help--history-push (term)
   (when (and (car fuel-help--history)
@@ -139,10 +80,9 @@ displayed in the minibuffer."
 
 ;;; Fuel help buffer and internals:
 
-(defun fuel-help--help-buffer ()
-  (with-current-buffer (get-buffer-create "*fuel help*")
-    (fuel-help-mode)
-    (current-buffer)))
+(fuel-popup--define fuel-help--buffer
+  "*fuel help*" 'fuel-help-mode)
+
 
 (defvar fuel-help--prompt-history nil)
 
@@ -169,7 +109,7 @@ displayed in the minibuffer."
       (fuel-help--insert-contents def out))))
 
 (defun fuel-help--insert-contents (def str &optional nopush)
-  (let ((hb (fuel-help--help-buffer))
+  (let ((hb (fuel-help--buffer))
         (inhibit-read-only t)
         (font-lock-verbose nil))
     (set-buffer hb)
@@ -182,7 +122,7 @@ displayed in the minibuffer."
         (kill-region (point-min) (point))
         (fuel-help--history-push (cons def (buffer-string)))))
     (set-buffer-modified-p nil)
-    (pop-to-buffer hb)
+    (fuel-popup--display)
     (goto-char (point-min))
     (message "%s" def)))
 
@@ -212,7 +152,7 @@ displayed in the minibuffer."
 
 (defconst fuel-help--font-lock-keywords
   `(,@fuel-font-lock--font-lock-keywords
-    (,fuel-help--headlines-regexp . 'fuel-help-font-lock-headlines)))
+    (,fuel-help--headlines-regexp . 'fuel-font-lock-help-headlines)))
 
 
 
@@ -267,8 +207,8 @@ buffer."
 
 (defvar fuel-help-mode-map
   (let ((map (make-sparse-keymap)))
+    (suppress-keymap map)
     (define-key map "\C-m" 'fuel-help)
-    (define-key map "q" 'bury-buffer)
     (define-key map "b" 'fuel-help-previous)
     (define-key map "f" 'fuel-help-next)
     (define-key map "l" 'fuel-help-previous)
@@ -279,6 +219,7 @@ buffer."
     (define-key map [(backtab)] 'fuel-help-previous-headline)
     (define-key map (kbd "SPC")  'scroll-up)
     (define-key map (kbd "S-SPC") 'scroll-down)
+    (define-key map "\M-." 'fuel-edit-word-at-point)
     (define-key map "\C-cz" 'run-factor)
     (define-key map "\C-c\C-z" 'run-factor)
     map))
@@ -293,7 +234,7 @@ buffer."
   (kill-all-local-variables)
   (buffer-disable-undo)
   (use-local-map fuel-help-mode-map)
-  (setq mode-name "Factor Help")
+  (setq mode-name "FUEL Help")
   (setq major-mode 'fuel-help-mode)
 
   (fuel-font-lock--font-lock-setup fuel-help--font-lock-keywords t)
@@ -302,6 +243,7 @@ buffer."
   (fuel-autodoc-mode)
 
   (run-mode-hooks 'fuel-help-mode-hook)
+
   (setq buffer-read-only t))
 
 

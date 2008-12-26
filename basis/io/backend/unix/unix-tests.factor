@@ -1,7 +1,7 @@
 USING: io.files io.files.temp io.directories io.sockets io kernel threads
 namespaces tools.test continuations strings byte-arrays
 sequences prettyprint system io.encodings.binary io.encodings.ascii
-io.streams.duplex destructors make ;
+io.streams.duplex destructors make io.launcher ;
 IN: io.backend.unix.tests
 
 ! Unix domain stream sockets
@@ -138,3 +138,13 @@ datagram-client delete-file
         input-stream get send
     ] with-file-reader
 ] must-fail
+
+! closing stdin caused some problems
+[ ] [
+    [
+        vm ,
+        "-i=" image append ,
+        "-run=none" ,
+        "-e=USING: destructors namespaces io calendar threads ; input-stream get dispose 1 seconds sleep" ,
+    ] { } make try-process
+] unit-test

@@ -216,18 +216,21 @@ void safe_write(int fd, void *data, size_t size)
 		fatal_error("error writing fd",errno);
 }
 
-void safe_read(int fd, void *data, size_t size)
+bool safe_read(int fd, void *data, size_t size)
 {
 	ssize_t bytes = read(fd,data,size);
 	if(bytes < 0)
 	{
 		if(errno == EINTR)
-			safe_read(fd,data,size);
+			return safe_read(fd,data,size);
 		else
+		{
 			fatal_error("error reading fd",errno);
+			return false;
+		}
 	}
-	else if(bytes != size)
-		fatal_error("unexpected eof on fd",bytes);
+	else
+		return (bytes == size);
 }
 
 void *stdin_loop(void *arg)
@@ -237,7 +240,9 @@ void *stdin_loop(void *arg)
 
 	while(loop_running)
 	{
-		safe_read(control_read,buf,1);
+		if(!safe_read(control_read,buf,1))
+			break;
+
 		if(buf[0] != 'X')
 			fatal_error("stdin_loop: bad data on control fd",buf[0]);
 
@@ -258,16 +263,15 @@ void *stdin_loop(void *arg)
 			{
 				safe_write(size_write,&bytes,sizeof(bytes));
 
-				if(write(stdin_write,buf,bytes) != bytes)
+				if(!check_write(stdin_write,buf,bytes))
 					loop_running = false;
 				break;
 			}
 		}
 	}
 
-
 	safe_close(stdin_write);
-	safe_close(control_write);
+	safe_close(control_read);
 
 	return NULL;
 }
