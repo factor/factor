@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: mongodb.bson mongodb.bson.constants accessors kernel io.streams.string
        io.encodings.binary classes byte-arrays quotations serialize
-       io.encodings.utf8 strings splitting math.parser
+       io.encodings.utf8 strings splitting math.parser locals
        sequences math assocs classes words make fry mongodb.persistent
        prettyprint hashtables mirrors alien.strings alien.c-types
        io.streams.byte-array io ;
@@ -41,10 +41,8 @@ M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ;
 : write-type ( obj -- obj ) [ bson-type? write-byte ] keep ;
 : write-pair ( name object -- ) write-type [ write-cstring ] dip bson-write ;
 
-: write-tuple-info ( object -- )
-    class  
-    [ [ S_Name ] dip name>> write-pair ]
-    [ [ S_Vocab ] dip vocabulary>> write-pair ] bi ;    
+:: write-tuple-info ( object -- )
+    P_SLOTS [ [ ] [ object at ] bi write-pair ] each ;    
 
 M: f bson-write ( f -- )
     drop 0 write-byte ;
@@ -87,27 +85,20 @@ M: sequence bson-write ( array -- )
         write
         write-eoo ;
 
+: check-p-field ( key value -- key value boolean )
+    [ [ "_p_" swap start 0 = ] keep ] dip rot ;
+    
 M: persistent-tuple bson-write ( persistent-tuple -- )
-    dup
-    <mirror> '[
-        _ write-tuple-info
-        _ [ write-pair ] assoc-each
-    ]
+    <mirror>
+    '[ _ [ write-tuple-info ]
+         [ [ check-p-field [ 2drop ] [ write-pair ] if ] assoc-each ] bi ]
     binary swap with-byte-writer
     [ length 5 + bson-write ] keep
     write
     write-eoo ;
 
 M: tuple bson-write ( tuple -- )
-    dup 
-    <mirror> '[
-        _ write-tuple-info
-        _ [ write-pair ] assoc-each
-    ]
-    binary swap with-byte-writer
-    [ length 5 + bson-write ] keep
-    write
-    write-eoo ;
+    make-persistent bson-write ;
     
 M: assoc bson-write ( hashtable -- )
     '[ _ [ write-pair ] assoc-each ]

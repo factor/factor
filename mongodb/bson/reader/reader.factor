@@ -1,7 +1,7 @@
 USING: mirrors io io.encodings.utf8 io.encodings.binary math match kernel sequences
        splitting accessors io.streams.byte-array namespaces prettyprint
        mongodb.bson.constants assocs alien.c-types alien.strings fry words
-       tools.walker serialize ;
+       tools.walker serialize mongodb.persistent ;
 
 IN: mongodb.bson.reader
 
@@ -47,6 +47,9 @@ GENERIC: element-binary-read ( length type -- object )
 : read-int32 ( -- int32 )
     4 [ read *int ] [ count-bytes ] bi  ; inline
 
+: read-longlong ( -- longlong )
+    8 [ read *longlong ] [ count-bytes ] bi ; inline
+
 : read-double ( -- double )
     8 [ read *double ] [ count-bytes ] bi ; inline
 
@@ -89,8 +92,7 @@ GENERIC: element-binary-read ( length type -- object )
     [ read-elements ] when ;
 
 : make-tuple ( assoc -- tuple )
-    [ [ S_Name swap at ] [ S_Vocab swap at ] bi ] keep ! name vocab assoc
-    [ lookup new ] dip                                 ! instance assoc
+    [ P_INFO swap at persistent-tuple-class new ] keep     ! instance assoc
     [ dup <mirror> [ keys ] keep ] dip                 ! instance array mirror assoc
     '[ dup _ [ _ at ] dip [ swap ] dip set-at ] each ;   
 
@@ -98,7 +100,7 @@ GENERIC: fix-result ( assoc type -- result )
 
 M: bson-object fix-result ( assoc type -- result )
     drop
-    [ ] [ S_Name swap key? ] bi
+    [ ] [ P_INFO swap key? ] bi
     [ make-tuple ] [ ] if ;
 
 M: bson-array fix-result ( assoc type -- result )
@@ -123,6 +125,13 @@ M: bson-not-eoo element-read ( type -- cont? )
     ] dip    
     set-at
     t ;
+
+M: bson-oid element-data-read ( type -- object )
+    drop
+    read-longlong
+    read-int32
+    oid boa
+    pop-element drop ;
 
 M: bson-object element-data-read ( type -- object )
     drop
