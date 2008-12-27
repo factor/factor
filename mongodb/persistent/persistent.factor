@@ -40,3 +40,13 @@ M: tuple-class persistent-tuple-class ( class -- class' )
     [ "%s_%s" sprintf ] dip swap dup   ! class new_name new_name
     P_VOCAB lookup dup                 ! class new_name vo/f vo/f
     [ [ drop drop ] dip ] [ drop define-persistent-tuple ] if ;
+
+
+GENERIC: make-persistent ( tuple -- 'tuple )
+
+M: tuple make-persistent ( tuple -- 'tuple )
+    [let* | tuple [ ] 
+            class [ tuple class ]
+            'tuple [ class persistent-tuple-class new ] |
+            
+            ] ; 
