@@ -293,7 +293,7 @@ VAR: present-space
  closed-quot  <roll-button> { 0 0 } >>align ;
 
 : <list-runner> ( -- gadget )
-    "extra/4DNav" 
+    "resource:extra/4DNav" 
   <pile> 1 >>fill 
     over dup directory-files  
     [ ".xml" tail? ] filter 
