@@ -10,7 +10,10 @@ SLOT: _p_info
 
 TUPLE: oid { a initial: 0 } { b initial: 0 } ;
 
-TUPLE: persistent-info type vocab collection dirty? mt ;
+: MDB_CLASS ( -- string ) "p_class" ; inline
+: MDB_VOCAB ( -- string ) "p_vocab" ; inline
+: MDB_MODIF ( -- string ) "p_mt" ; inline
+: MDB_CREAT ( -- string ) "p_ct" ; inline
 
 <PRIVATE
 
@@ -40,3 +43,13 @@ M: tuple-class persistent-tuple-class ( class -- class' )
     [ "%s_%s" sprintf ] dip swap dup   ! class new_name new_name
     P_VOCAB lookup dup                 ! class new_name vo/f vo/f
     [ [ drop drop ] dip ] [ drop define-persistent-tuple ] if ;
+
+
+GENERIC: make-persistent ( tuple -- 'tuple )
+
+! M: tuple make-persistent ( tuple -- 'tuple )
+!    [let* | tuple [ ] 
+!            class [ tuple class ]
+!            'tuple [ class persistent-tuple-class new ] |
+!            
+!            ] ; 
