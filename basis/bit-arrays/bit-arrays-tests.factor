@@ -76,3 +76,5 @@ IN: bit-arrays.tests
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
 } bit-array>integer ] unit-test
+
+[ 49 ] [ 49 <bit-array> dup set-bits [ ] count ] unit-test

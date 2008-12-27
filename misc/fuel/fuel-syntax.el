@@ -318,9 +318,7 @@
 
 (defun fuel-syntax--find-usings ()
   (save-excursion
-    (let ((usings)
-          (in (fuel-syntax--current-vocab)))
-      (when in (setq usings (list in)))
+    (let ((usings))
       (goto-char (point-max))
       (while (re-search-backward fuel-syntax--using-lines-regex nil t)
         (dolist (u (split-string (match-string-no-properties 1) nil t))
