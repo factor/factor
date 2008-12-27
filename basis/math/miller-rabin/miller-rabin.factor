@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators io locals kernel math math.functions
-math.ranges namespaces random sequences hashtables sets ;
+USING: combinators kernel locals math math.functions math.ranges
+random sequences sets ;
 IN: math.miller-rabin
 
 <PRIVATE
@@ -37,7 +37,7 @@ PRIVATE>
         { [ dup 1 <= ] [ 3drop f ] }
         { [ dup 2 = ] [ 3drop t ] }
         { [ dup even? ] [ 3drop f ] }
-        [ [ drop (miller-rabin) ] with-scope ]
+        [ drop (miller-rabin) ]
     } cond ;
 
 : miller-rabin ( n -- ? ) 10 miller-rabin* ;
