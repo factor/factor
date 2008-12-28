@@ -8,7 +8,7 @@ IN: math.primes.erato
     2 * 3 + ; inline
 
 : mark-multiples ( i arr -- )
-    [ dup index> [ + ] keep ] dip
+    [ index> [ sq >index ] keep ] dip
     [ length 1 - swap <range> f swap ] keep
     [ set-nth ] curry with each ;
 
