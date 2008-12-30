@@ -184,7 +184,7 @@
       (with-current-buffer (fuel-debug--uses-buffer)
         (insert "\nDone!")
         (fuel-debug--uses-clean)
-        (kill-buffer)))))
+        (kill-buffer (current-buffer))))))
 
 (defun fuel-debug--uses-restart (n)
   (when (and (> n 0) (<= n (length fuel-debug--uses-restarts)))
