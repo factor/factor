@@ -17,13 +17,13 @@ SYMBOL: fuel-status-stack
 V{ } clone fuel-status-stack set-global
 
 SYMBOL: fuel-eval-result
-f clone fuel-eval-result set-global
+f fuel-eval-result set-global
 
 SYMBOL: fuel-eval-output
-f clone fuel-eval-result set-global
+f fuel-eval-result set-global
 
 SYMBOL: fuel-eval-res-flag
-t clone fuel-eval-res-flag set-global
+t fuel-eval-res-flag set-global
 
 : fuel-eval-restartable? ( -- ? )
     fuel-eval-res-flag get-global ; inline
@@ -105,12 +105,11 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 : fuel-forget-error ( -- ) f error set-global ; inline
 : fuel-forget-result ( -- ) f fuel-eval-result set-global ; inline
 : fuel-forget-output ( -- ) f fuel-eval-output set-global ; inline
+: fuel-forget-status ( -- )
+    fuel-forget-error fuel-forget-result fuel-forget-output ; inline
 
 : (fuel-begin-eval) ( -- )
-    fuel-push-status
-    fuel-forget-error
-    fuel-forget-result
-    fuel-forget-output ;
+    fuel-push-status fuel-forget-status ; inline
 
 : (fuel-end-eval) ( output -- )
     fuel-eval-output set-global fuel-retort fuel-pop-status ; inline
