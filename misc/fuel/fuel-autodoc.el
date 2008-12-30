@@ -15,6 +15,7 @@
 ;;; Code:
 
 (require 'fuel-eval)
+(require 'fuel-font-lock)
 (require 'fuel-syntax)
 (require 'fuel-base)
 
@@ -36,6 +37,7 @@
 (defvar fuel-autodoc--font-lock-buffer
   (let ((buffer (get-buffer-create " *fuel help minibuffer messages*")))
     (set-buffer buffer)
+    (set-syntax-table fuel-syntax--syntax-table)
     (fuel-font-lock--font-lock-setup)
     buffer))
 
@@ -51,8 +53,8 @@
         (fuel-log--inhibit-p t))
     (when word
       (let* ((cmd (if (fuel-syntax--in-using)
-                      `(:fuel* (,word fuel-vocab-summary) t t)
-                    `(:fuel* (((:quote ,word) synopsis :get)) t)))
+                      `(:fuel* (,word fuel-vocab-summary) :in t)
+                    `(:fuel* (((:quote ,word) synopsis :get)) :in)))
              (ret (fuel-eval--send/wait cmd 20))
              (res (fuel-eval--retort-result ret)))
         (when (and ret (not (fuel-eval--retort-error ret)) (stringp res))
