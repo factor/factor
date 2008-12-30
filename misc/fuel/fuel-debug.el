@@ -31,6 +31,12 @@
   :group 'fuel-debug
   :type 'hook)
 
+(defcustom fuel-debug-confirm-restarts-p t
+  "Whether to ask for confimation before executing a restart in
+the debugger."
+  :group 'fuel-debug
+  :type 'boolean)
+
 (defcustom fuel-debug-show-short-help t
   "Whether to show short help on available keys in debugger."
   :group 'fuel-debug
@@ -241,7 +247,8 @@
     (define-key map "p" 'previous-line)
     (dotimes (n 9)
       (define-key map (vector (+ ?1 n))
-        `(lambda () (interactive) (fuel-debug-exec-restart ,(1+ n) t))))
+        `(lambda () (interactive)
+           (fuel-debug-exec-restart ,(1+ n) fuel-debug-confirm-restarts-p))))
     (dolist (ci fuel-debug--compiler-info-alist)
       (define-key map (vector (cdr ci))
         `(lambda () (interactive) (fuel-debug-show--compiler-info ,(car ci)))))
