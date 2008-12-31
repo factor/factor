@@ -135,14 +135,17 @@ M: source-file fuel-pprint path>> fuel-pprint ;
 
 ! Loading files
 
-: fuel-run-file ( path -- ) run-file ; inline
+SYMBOL: :uses
+
+: fuel-set-use-hook ( -- )
+    [ amended-use get clone :uses prefix fuel-eval-set-result ]
+    print-use-hook set ;
+
+: fuel-run-file ( path -- )
+    [ fuel-set-use-hook run-file ] curry with-scope ; inline
 
 : fuel-with-autouse ( quot -- )
-    [
-        auto-use? on
-        [ amended-use get clone fuel-eval-set-result ] print-use-hook set
-        call
-    ] curry with-scope ;
+    [ auto-use? on fuel-set-use-hook call ] curry with-scope ;
 
 : (fuel-get-uses) ( lines -- )
     [ parse-fresh drop ] curry with-compilation-unit ; inline

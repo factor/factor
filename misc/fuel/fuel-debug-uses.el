@@ -23,12 +23,6 @@
 
 ;;; Customization:
 
-(fuel-font-lock--defface fuel-font-lock-debug-missing-vocab
-  'font-lock-warning-face fuel-debug "missing vocabulary names")
-
-(fuel-font-lock--defface fuel-font-lock-debug-unneeded-vocab
-  'font-lock-warning-face fuel-debug "unneeded vocabulary names")
-
 (fuel-font-lock--defface fuel-font-lock-debug-uses-header
   'bold fuel-debug "headers in Uses buffers")
 
@@ -53,26 +47,6 @@
             (forward-line))
           (reverse lines))))))
 
-(defun fuel-debug--highlight-names (names ref face)
-  (dolist (n names)
-    (when (not (member n ref))
-      (put-text-property 0 (length n) 'font-lock-face face n))))
-
-(defun fuel-debug--uses-new-uses (file uses)
-  (pop-to-buffer (find-file-noselect file))
-  (goto-char (point-min))
-  (if (re-search-forward "^USING: " nil t)
-      (let ((begin (point))
-            (end (or (and (re-search-forward "\\_<;\\_>") (point)) (point))))
-        (kill-region begin end))
-    (re-search-forward "^IN: " nil t)
-    (beginning-of-line)
-    (open-line 2)
-    (insert "USING: "))
-  (let ((start (point)))
-    (insert (mapconcat 'substring-no-properties uses " ") " ;")
-    (fill-region start (point) nil)))
-
 (defun fuel-debug--uses-filter (restarts)
   (let ((result) (i 1) (rn 0))
     (dolist (r restarts (reverse result))
@@ -86,9 +60,6 @@
 
 (fuel-popup--define fuel-debug--uses-buffer
   "*fuel uses*" 'fuel-debug-uses-mode)
-
-(make-variable-buffer-local
- (defvar fuel-debug--uses nil))
 
 (make-variable-buffer-local
  (defvar fuel-debug--uses-file nil))
@@ -122,21 +93,10 @@
     (fuel-popup--display (fuel-debug--uses-buffer))))
 
 (defun fuel-debug--uses-cont (retort)
-  (let ((uses (fuel-eval--retort-result retort))
+  (let ((uses (fuel-debug--uses retort))
         (err (fuel-eval--retort-error retort)))
     (if uses (fuel-debug--uses-display uses)
       (fuel-debug--uses-display-err retort))))
-
-(defun fuel-debug--insert-vlist (title vlist)
-  (goto-char (point-max))
-  (insert title "\n\n  ")
-  (let ((i 0) (step 5))
-    (dolist (v vlist)
-      (setq i (1+ i))
-      (insert v)
-      (insert (if (zerop (mod i step)) "\n  " " ")))
-    (unless (zerop (mod i step)) (newline))
-    (newline)))
 
 (defun fuel-debug--uses-display (uses)
   (let* ((inhibit-read-only t)
@@ -176,14 +136,15 @@
 
 (defun fuel-debug--uses-update-usings ()
   (interactive)
-  (let ((inhibit-read-only t))
-    (when (and fuel-debug--uses-file fuel-debug--uses)
-      (fuel-debug--uses-new-uses fuel-debug--uses-file fuel-debug--uses)
-      (message "USING: updated!")
-      (with-current-buffer (fuel-debug--uses-buffer)
-        (insert "\nDone!")
-        (fuel-debug--uses-clean)
-        (kill-buffer (current-buffer))))))
+  (let ((inhibit-read-only t)
+        (file fuel-debug--uses-file)
+        (uses fuel-debug--uses))
+    (when (and uses file)
+      (insert "\nDone!")
+      (fuel-debug--uses-clean)
+      (fuel-popup--quit)
+      (fuel-debug--replace-usings file uses)
+      (message "USING: updated!"))))
 
 (defun fuel-debug--uses-restart (n)
   (when (and (> n 0) (<= n (length fuel-debug--uses-restarts)))
@@ -209,11 +170,11 @@
 
 (defconst fuel-debug--uses-header-regex
   (format "^%s.*$" (regexp-opt '("Infering USING: stanza for "
-                              "Current USING: is already fine!"
-                              "Current vocabulary list:"
-                              "Correct vocabulary list:"
-                              "Sorry, couldn't infer the vocabulary list."
-                              "Done!"))))
+                                 "Current USING: is already fine!"
+                                 "Current vocabulary list:"
+                                 "Correct vocabulary list:"
+                                 "Sorry, couldn't infer the vocabulary list."
+                                 "Done!"))))
 
 (defconst fuel-debug--uses-prompt-regex
   (format "^%s" (regexp-opt '("Asking Factor. Please, wait ..."
