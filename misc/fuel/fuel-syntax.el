@@ -157,19 +157,26 @@
     table))
 
 (defconst fuel-syntax--syntactic-keywords
-  `(("\\_<\\(#?!\\) .*\\(\n\\)" (1 "<") (2 ">"))
-    ("\\_<\\(#?!\\)\\(\n\\)" (1 "<") (2 ">"))
+  `(;; Comments:
+    ("\\_<\\(#?!\\) .*\\(\n\\|$\\)" (1 "<") (2 ">"))
+    ("\\_<\\(#?!\\)\\(\n\\|$\\)" (1 "<") (2 ">"))
+    ;; CHARs:
+    ("CHAR: \\(.\\)\\( \\|$\\)" (1 "w"))
+    ;; Let and lambda:
     ("\\_<\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
     ("\\(\\[\\)\\(let\\|wlet\\|let\\*\\)\\( \\|$\\)" (1 "(]"))
     ("\\(\\[\\)\\(|\\) +[^|]* \\(|\\)" (1 "(]") (2 "(|") (3 ")|"))
     (" \\(|\\) " (1 "(|"))
     (" \\(|\\)$" (1 ")"))
-    ("CHAR: \\(\"\\)\\( \\|$\\)" (1 "w"))
+    ;; Opening brace words:
     (,(format "\\_<%s\\({\\)\\_>" (regexp-opt fuel-syntax--bracers)) (1 "(}"))
     ("\\_<\\({\\)\\_>" (1 "(}"))
     ("\\_<\\(}\\)\\_>" (1 "){"))
+    ;; Parenthesis:
     ("\\_<\\((\\)\\_>" (1 "()"))
     ("\\_<\\()\\)\\_>" (1 ")("))
+    ;; Quotations:
+    ("\\_<'\\(\\[\\)\\_>" (1 "(]"))      ; fried
     ("\\_<\\(\\[\\)\\_>" (1 "(]"))
     ("\\_<\\(\\]\\)\\_>" (1 ")["))))
 
@@ -318,9 +325,7 @@
 
 (defun fuel-syntax--find-usings ()
   (save-excursion
-    (let ((usings)
-          (in (fuel-syntax--current-vocab)))
-      (when in (setq usings (list in)))
+    (let ((usings))
       (goto-char (point-max))
       (while (re-search-backward fuel-syntax--using-lines-regex nil t)
         (dolist (u (split-string (match-string-no-properties 1) nil t))

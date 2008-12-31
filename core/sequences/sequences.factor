@@ -828,7 +828,7 @@ PRIVATE>
 
 : supremum ( seq -- n ) dup first [ max ] reduce ;
 
-: sigma ( seq quot -- n ) [ + ] compose 0 swap reduce ; inline
+: sigma ( seq quot -- n ) 0 -rot [ rot slip + ] curry each ; inline
 
 : count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
 

@@ -99,9 +99,7 @@ M: source-file fuel-pprint path>> fuel-pprint ;
     clone fuel-eval-result set-global ; inline
 
 : fuel-retort ( -- )
-    error get
-    fuel-eval-result get-global
-    fuel-eval-output get-global
+    error get fuel-eval-result get-global fuel-eval-output get-global
     3array fuel-pprint flush nl "<~FUEL~>" write nl flush ;
 
 : fuel-forget-error ( -- ) f error set-global ; inline

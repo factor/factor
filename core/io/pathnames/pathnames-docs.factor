@@ -65,8 +65,15 @@ HELP: home
 { $values { "dir" string } }
 { $description "Outputs the user's home directory." } ;
 
+ARTICLE: "pathname-normalization" "Pathname normalization"
+"Words that take a pathname should normalize the pathname by calling " { $link normalize-path } ".When normalizing a pathname, the input pathname is either absolute or relative to the " { $link current-directory } ". If absolute, such as the root directories " { $snippet "/" } " or " { $snippet "c:\\" } ", the pathname is left alone, while if relative, the current directory is prepended to the pathname. If a pathname begins with the magic string " { $snippet "resource:" } ", this string is replaced with the Factor directory. On Windows, all pathnames, absolute and relative, are converted to Unicode pathamess." ;
+
 ARTICLE: "io.pathnames" "Pathname manipulation"
+{ $subsection "pathname-normalization" }
+"Literal pathnames:"
+{ $subsection POSTPONE: P" }
 "Pathname manipulation:"
+{ $subsection normalize-path }
 { $subsection parent-directory }
 { $subsection file-name }
 { $subsection last-path-separator }
