@@ -31,6 +31,12 @@
   :group 'fuel-debug
   :type 'hook)
 
+(defcustom fuel-debug-confirm-restarts-p t
+  "Whether to ask for confimation before executing a restart in
+the debugger."
+  :group 'fuel-debug
+  :type 'boolean)
+
 (defcustom fuel-debug-show-short-help t
   "Whether to show short help on available keys in debugger."
   :group 'fuel-debug
@@ -43,7 +49,9 @@
   (column variable-name "column numbers in errors/warnings")
   (info comment "information headers")
   (restart-number warning "restart numbers")
-  (restart-name function-name "restart names")))
+  (restart-name function-name "restart names")
+  (missing-vocab warning"missing vocabulary names")
+  (unneeded-vocab warning "unneeded vocabulary names")))
 
 
 ;;; Font lock and other pattern matching:
@@ -92,6 +100,9 @@
 (make-variable-buffer-local
  (defvar fuel-debug--file nil))
 
+(make-variable-buffer-local
+ (defvar fuel-debug--uses nil))
+
 (defun fuel-debug--prepare-compilation (file msg)
   (let ((inhibit-read-only t))
     (with-current-buffer (fuel-debug--buffer)
@@ -114,6 +125,7 @@
         (fuel-debug--display-restarts err)
         (delete-blank-lines)
         (newline))
+      (fuel-debug--display-uses ret)
       (let ((hstr (fuel-debug--help-string err fuel-debug--file)))
         (if fuel-debug-show-short-help
             (insert "-----------\n" hstr "\n")
@@ -123,6 +135,46 @@
       (font-lock-fontify-buffer)
       (when (and err (not no-pop)) (fuel-popup--display))
       (not err))))
+
+(defun fuel-debug--uses (ret)
+  (let ((uses (fuel-eval--retort-result ret)))
+    (and (eq :uses (car uses))
+         (cdr uses))))
+
+(defun fuel-debug--insert-vlist (title vlist)
+  (goto-char (point-max))
+  (insert title "\n\n  ")
+  (let ((i 0) (step 5))
+    (dolist (v vlist)
+      (setq i (1+ i))
+      (insert v)
+      (insert (if (zerop (mod i step)) "\n  " " ")))
+    (unless (zerop (mod i step)) (newline))
+    (newline)))
+
+(defun fuel-debug--highlight-names (names ref face)
+  (dolist (n names)
+    (when (not (member n ref))
+      (put-text-property 0 (length n) 'font-lock-face face n))))
+
+(defun fuel-debug--insert-uses (uses)
+  (let* ((file (or file fuel-debug--file))
+         (old (with-current-buffer (find-file-noselect file)
+                (sort (fuel-syntax--find-usings t) 'string<)))
+         (new (sort uses 'string<)))
+    (when (not (equalp old new))
+      (fuel-debug--highlight-names old new 'fuel-font-lock-debug-unneeded-vocab)
+      (newline)
+      (fuel-debug--insert-vlist "Correct vocabulary list:" new)
+      new)))
+
+(defun fuel-debug--display-uses (ret)
+  (when (setq fuel-debug--uses (fuel-debug--uses ret))
+    (newline)
+    (fuel-debug--highlight-names fuel-debug--uses
+                                 nil 'fuel-font-lock-debug-missing-vocab)
+    (fuel-debug--insert-vlist "Missing vocabularies:" fuel-debug--uses)
+    (newline)))
 
 (defun fuel-debug--display-output (ret)
   (let* ((last (fuel-eval--retort-output fuel-debug--last-ret))
@@ -149,7 +201,7 @@
       (newline))))
 
 (defun fuel-debug--help-string (err &optional file)
-  (format "Press %s%s%sq bury buffer"
+  (format "Press %s%s%s%sq bury buffer"
           (if (or file (fuel-eval--error-file err)) "g go to file, " "")
           (let ((rsn (length (fuel-eval--error-restarts err))))
             (cond ((zerop rsn) "")
@@ -160,7 +212,8 @@
               (save-excursion
                 (goto-char (point-min))
                 (when (search-forward (car ci) nil t)
-                  (setq str (format "%c %s, %s" (cdr ci) (car ci) str))))))))
+                  (setq str (format "%c %s, %s" (cdr ci) (car ci) str))))))
+          (if (and (not err) fuel-debug--uses) "u to update USING:, " "")))
 
 (defun fuel-debug--buffer-file ()
   (with-current-buffer (fuel-debug--buffer)
@@ -229,6 +282,31 @@
              (fuel-eval--send/wait `(:fuel ((:factor ,info)))) "")
       (error "Sorry, no %s info available" info))))
 
+(defun fuel-debug--replace-usings (file uses)
+  (pop-to-buffer (find-file-noselect file))
+  (goto-char (point-min))
+  (if (re-search-forward "^USING: " nil t)
+      (let ((begin (point))
+            (end (or (and (re-search-forward "\\_<;\\_>") (point)) (point))))
+        (kill-region begin end))
+    (re-search-forward "^IN: " nil t)
+    (beginning-of-line)
+    (open-line 2)
+    (insert "USING: "))
+  (let ((start (point)))
+    (insert (mapconcat 'substring-no-properties uses " ") " ;")
+    (fill-region start (point) nil)))
+
+(defun fuel-debug-update-usings ()
+  (interactive)
+  (when (and fuel-debug--file fuel-debug--uses)
+    (let* ((file fuel-debug--file)
+           (old (with-current-buffer (find-file-noselect file)
+                  (fuel-syntax--find-usings t)))
+           (uses (sort (append fuel-debug--uses old) 'string<)))
+      (fuel-popup--quit)
+      (fuel-debug--replace-usings file uses))))
+
 
 ;;; Fuel Debug mode:
 
@@ -239,9 +317,11 @@
     (define-key map "\C-c\C-c" 'fuel-debug-goto-error)
     (define-key map "n" 'next-line)
     (define-key map "p" 'previous-line)
+    (define-key map "u" 'fuel-debug-update-usings)
     (dotimes (n 9)
       (define-key map (vector (+ ?1 n))
-        `(lambda () (interactive) (fuel-debug-exec-restart ,(1+ n) t))))
+        `(lambda () (interactive)
+           (fuel-debug-exec-restart ,(1+ n) fuel-debug-confirm-restarts-p))))
     (dolist (ci fuel-debug--compiler-info-alist)
       (define-key map (vector (cdr ci))
         `(lambda () (interactive) (fuel-debug-show--compiler-info ,(car ci)))))

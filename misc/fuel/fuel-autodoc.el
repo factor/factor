@@ -31,8 +31,9 @@
   :group 'fuel-autodoc
   :type 'boolean)
 
+
 
-;;; Autodoc mode:
+;;; Highlighting for autodoc messages:
 
 (defvar fuel-autodoc--font-lock-buffer
   (let ((buffer (get-buffer-create " *fuel help minibuffer messages*")))
@@ -48,6 +49,11 @@
   (let ((font-lock-verbose nil)) (font-lock-fontify-buffer))
   (buffer-string))
 
+
+;;; Eldoc function:
+
+(defvar fuel-autodoc--timeout 200)
+
 (defun fuel-autodoc--word-synopsis (&optional word)
   (let ((word (or word (fuel-syntax-symbol-at-point)))
         (fuel-log--inhibit-p t))
@@ -55,7 +61,7 @@
       (let* ((cmd (if (fuel-syntax--in-using)
                       `(:fuel* (,word fuel-vocab-summary) :in t)
                     `(:fuel* (((:quote ,word) synopsis :get)) :in)))
-             (ret (fuel-eval--send/wait cmd 20))
+             (ret (fuel-eval--send/wait cmd fuel-autodoc--timeout))
              (res (fuel-eval--retort-result ret)))
         (when (and ret (not (fuel-eval--retort-error ret)) (stringp res))
           (if fuel-autodoc-minibuffer-font-lock
@@ -69,6 +75,9 @@
   (or (and fuel-autodoc--fallback-function
            (funcall fuel-autodoc--fallback-function))
       (fuel-autodoc--word-synopsis)))
+
+
+;;; Autodoc mode:
 
 (make-variable-buffer-local
  (defvar fuel-autodoc-mode-string " A"

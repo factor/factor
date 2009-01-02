@@ -140,6 +140,7 @@
                 "Notes"
                 "Parent topics:"
                 "See also"
+                "Side effects"
                 "Syntax"
                 "Variable description"
                 "Variable value"
