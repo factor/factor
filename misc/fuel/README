@@ -94,10 +94,12 @@ C-cC-eC-r is the same as C-cC-er)).
 
 * In the Help browser:
 
- - RET : help for word at point
+ - h : help for word at point
  - f/b : next/previous page
  - SPC/S-SPC : scroll up/down
- - TAB/S-TAB : next/previous headline
+ - TAB/S-TAB : next/previous link
+ - c : clean browsing history
+ - M-. : edit word at point in Emacs
  - C-cz : switch to listener
  - q : bury buffer
 
