@@ -60,10 +60,13 @@
   (message "Link %s pointing to %s named %s" label type link))
 
 (defun fuel-markup--insert-button (label link type)
-  (insert-text-button (format "%s" label)
-                      :type 'fuel-markup--button
-                      'markup-link (format "%s" link)
-                      'markup-link-type type))
+  (let ((label (format "%s" label))
+        (link (format "%s" link)))
+    (insert-text-button label
+                        :type 'fuel-markup--button
+                        'markup-link link
+                        'markup-link-type type
+                        'help-echo link)))
 
 (defun fuel-markup--article-title (name)
   (fuel-eval--retort-result
@@ -86,6 +89,7 @@
     ($example . fuel-markup--example)
     ($examples . fuel-markup--examples)
     ($heading . fuel-markup--heading)
+    ($index . fuel-markup--index)
     ($instance . fuel-markup--instance)
     ($io-error . fuel-markup--io-error)
     ($link . fuel-markup--link)
@@ -141,6 +145,11 @@
         ((listp e) (mapc 'fuel-markup--print e))
         ((symbolp e) (fuel-markup--print (list '$link e)))
         (t (insert (format "\n%S\n" e)))))
+
+(defun fuel-markup--print-str (e)
+  (with-temp-buffer
+    (fuel-markup--print e)
+    (buffer-string)))
 
 (defun fuel-markup--maybe-nl ()
   (setq fuel-markup--maybe-nl (point)))
@@ -214,10 +223,8 @@
     (insert (cadr e))))
 
 (defun fuel-markup--snippet (e)
-  (let ((snip (cadr e)))
-    (if (stringp snip)
-        (insert (fuel-font-lock--factor-str snip))
-      (fuel-markup--print snip))))
+  (let ((snip (fuel-markup--print-str (cdr e))))
+    (insert (fuel-font-lock--factor-str snip))))
 
 (defun fuel-markup--code (e)
   (fuel-markup--insert-nl-if-nb)
@@ -247,7 +254,8 @@
 (defun fuel-markup--link (e)
   (let* ((link (cadr e))
          (type (if (symbolp link) 'word 'article))
-         (label (or (and (eq type 'article)
+         (label (or (car (cddr e))
+                    (and (eq type 'article)
                          (fuel-markup--article-title link))
                     link)))
     (fuel-markup--insert-button label link type)))
@@ -258,8 +266,21 @@
     (fuel-markup--link (list '$link link))
     (insert " ")))
 
-(defun fuel-markup--vocab-subsection (e)
-  (insert (format " %S " e)))
+(defun fuel-markup--index-quotation (q)
+  (cond ((null q) null)
+        ((listp q) (vconcat (mapcar 'fuel-markup--index-quotation q)))
+        (t q)))
+
+(defun fuel-markup--index (e)
+  (let* ((q (fuel-markup--index-quotation (cadr e)))
+         (cmd `(:fuel* ((,q fuel-index)) "fuel"
+                       ("builtins" "help" "help.topics" "classes"
+                        "classes.builtin" "classes.tuple"
+                        "classes.singleton" "classes.union"
+                        "classes.intersection" "classes.predicate")))
+         (subs (fuel-eval--retort-result (fuel-eval--send/wait cmd 200))))
+    (when subs
+      (fuel-markup--print subs))))
 
 (defun fuel-markup--vocab-link (e)
   (fuel-markup--insert-button (cadr e) (cadr e) 'vocab))
@@ -343,7 +364,10 @@
 
 (defun fuel-markup--references (e)
   (fuel-markup--insert-heading "References")
-  (fuel-markup--links (cons '$links (cdr e))))
+  (dolist (ref (cdr e))
+    (if (listp ref)
+        (fuel-markup--print ref)
+      (fuel-markup--subsection (list '$subsection ref)))))
 
 (defun fuel-markup--see-also (e)
   (fuel-markup--insert-heading "See also")
@@ -410,6 +434,9 @@
   (insert (format " %S " e)))
 
 (defun fuel-markup--quotation (e)
+  (insert (format " %S " e)))
+
+(defun fuel-markup--vocab-subsection (e)
   (insert (format " %S " e)))
 
 

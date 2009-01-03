@@ -273,6 +273,12 @@ MEMO: fuel-article-title ( name -- title/f )
         } cleave
     ] { } make 3array ;
 
+: (fuel-index) ( seq -- seq )
+    [ [ >link name>> ] [ article-title ] bi 2array \ $subsection prefix ] map ;
+
+: fuel-index ( quot -- )
+    call (fuel-index) fuel-eval-set-result ; inline
+
 MEMO: fuel-find-word ( name -- word/f )
     [ [ name>> ] dip = ] curry all-words swap filter
     dup empty? not [ first ] [ drop f ] if ;

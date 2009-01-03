@@ -104,7 +104,7 @@
             (fuel-help--insert-contents def res)))))))
 
 (defun fuel-help--get-article (name label)
-  (message "Retriving article ...")
+  (message "Retrieving article ...")
   (let* ((cmd `(:fuel* ((,name fuel-get-article)) "fuel" t))
          (ret (fuel-eval--send/wait cmd 2000))
          (res (fuel-eval--retort-result ret)))
