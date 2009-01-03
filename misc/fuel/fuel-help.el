@@ -111,10 +111,21 @@
     (fuel-help--insert-contents label res)
     (message "")))
 
+(defun fuel-help--get-vocab (name)
+  (message "Retrieving vocabulary help ...")
+  (let* ((cmd `(:fuel* ((,name fuel-vocab-help)) "fuel" (,name)))
+         (ret (fuel-eval--send/wait cmd 2000))
+         (res (fuel-eval--retort-result ret)))
+    (if (not res)
+        (message "No help available for vocabulary %s" name)
+      (fuel-help--insert-contents label res)
+      (message ""))))
+
 (defun fuel-help--follow-link (label link type)
   (let ((fuel-help-always-ask nil))
     (cond ((eq type 'word) (fuel-help--word-help nil link))
           ((eq type 'article) (fuel-help--get-article link label))
+          ((eq type 'vocab) (fuel-help--get-vocab link))
           (t (message (format "Links of type %s not yet implemented" type))))))
 
 (defun fuel-help--insert-contents (def art &optional nopush)

@@ -273,6 +273,17 @@ MEMO: fuel-article-title ( name -- title/f )
         } cleave
     ] { } make 3array ;
 
+: (fuel-vocab-help) ( name -- element )
+    \ article swap dup >vocab-link
+    [
+        [ summary [ , ] [ "No summary available" , ] if* ]
+        [ drop \ $nl , ]
+        [ vocab-help article [ content>> % ] when* ] tri
+    ] { } make 3array ;
+
+: fuel-vocab-help ( name -- )
+    (fuel-vocab-help) fuel-eval-set-result ; inline
+
 : (fuel-index) ( seq -- seq )
     [ [ >link name>> ] [ article-title ] bi 2array \ $subsection prefix ] map ;
 

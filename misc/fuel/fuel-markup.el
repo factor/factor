@@ -102,6 +102,7 @@
     ($nl . fuel-markup--newline)
     ($notes . fuel-markup--notes)
     ($parsing-note . fuel-markup--parsing-note)
+    ($predicate . fuel-markup--predicate)
     ($prettyprinting-note . fuel-markup--prettyprinting-note)
     ($quotation . fuel-markup--quotation)
     ($references . fuel-markup--references)
@@ -199,6 +200,12 @@
   (fuel-markup--link (cons '$link (cdr e)))
   (fuel-markup--maybe-nl))
 
+(defun fuel-markup--vocab-subsection (e)
+  (fuel-markup--insert-nl-if-nb)
+  (insert "  - ")
+  (fuel-markup--vocab-link (cons '$vocab-link (cdr e)))
+  (fuel-markup--maybe-nl))
+
 (defun fuel-markup--newline (e)
   (fuel-markup--insert-newline)
   (newline))
@@ -292,8 +299,8 @@
     (insert " ")))
 
 (defun fuel-markup--vocabulary (e)
-  (fuel-markup--insert-heading "Vocabulary:" t)
-  (insert " " (cadr e))
+  (fuel-markup--insert-heading "Vocabulary: " t)
+  (fuel-markup--vocab-link (cons '$vocab-link (cdr e)))
   (newline))
 
 (defun fuel-markup--list (e)
@@ -334,6 +341,13 @@
     (insert " " (car val) " - ")
     (fuel-markup--print (cdr val))
     (newline)))
+
+(defun fuel-markup--predicate (e)
+  (fuel-markup--values '($values ("object" object) ("?" "a boolean")))
+  (let ((word (make-symbol (substring (format "%s" (cadr e)) 0 -1))))
+  (fuel-markup--description
+   `($description "Tests if the object is an instance of the "
+                  ($link ,word) " class."))))
 
 (defun fuel-markup--side-effects (e)
   (fuel-markup--insert-heading "Side effects")
@@ -434,9 +448,6 @@
   (insert (format " %S " e)))
 
 (defun fuel-markup--quotation (e)
-  (insert (format " %S " e)))
-
-(defun fuel-markup--vocab-subsection (e)
   (insert (format " %S " e)))
 
 
