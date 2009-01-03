@@ -1,6 +1,8 @@
 USING: alien.c-types ;
 
-IN: mongodb.bson.constants
+IN: bson.constants
+
+TUPLE: oid { a initial: 0 } { b initial: 0 } ;
 
 
 : T_EOO ( -- type ) 0 ; inline
@@ -26,32 +28,4 @@ IN: mongodb.bson.constants
 : T_Binary_Bytes ( -- subtype ) 2 ; inline
 : T_Binary_Function ( -- subtype ) 1 ; inline 
 
-: S_Name ( -- name ) "__t_name" ; inline
-: S_Vocab ( -- name ) "__t_vocab" ; inline
 
-! todo Move to mongo vocab 
-
-: OP_Reply ( -- const )
-    1 <int> ; inline
-
-: OP_Message ( -- const )
-    1000 <int> ; inline
-
-: OP_Update ( -- const )
-    2001 <int> ; inline
-
-: OP_Insert ( -- const )
-    2002 <int> ; inline
-
-: OP_Query ( -- const )
-    2004 <int> ; inline
-
-: OP_GetMore ( -- const )
-    2005 <int> ; inline
-
-: OP_Delete ( -- const )
-    2006 <int> ; inline
-
-: OP_KillCursors ( -- const )
-    2007 <int> ; inline
-    

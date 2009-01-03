@@ -1,21 +1,22 @@
 USING: mirrors io io.encodings.utf8 io.encodings.binary math match kernel sequences
        splitting accessors io.streams.byte-array namespaces prettyprint
-       mongodb.bson.constants assocs alien.c-types alien.strings fry words
-       tools.walker serialize mongodb.persistent ;
+       bson.constants assocs alien.c-types alien.strings fry words
+       tools.walker serialize locals byte-arrays ;
 
-IN: mongodb.bson.reader
+IN: bson.reader
 
 ERROR: size-mismatch actual declared ;
 
 <PRIVATE
 
 TUPLE: element { type integer } name ;
-TUPLE: state { size initial: -1 } { read initial: 0 } result scope element ;
+TUPLE: state { size initial: -1 } { read initial: 0 } exemplar result scope element ;
 
-: <state> ( -- state )
-    state new H{ } clone
-    [ >>result ] [ V{ } clone [ push ] keep >>scope ] bi
-    V{ } clone [ T_Object "" element boa swap push ] keep >>element ;
+:: <state> ( exemplar -- state )
+    state new  
+    exemplar clone >>exemplar
+    exemplar clone [ >>result ] [ V{ } clone [ push ] keep >>scope ] bi
+    V{ } clone [ T_Object "" element boa swap push ] keep >>element ; inline
 
 PREDICATE: bson-eoo     < integer T_EOO = ;
 PREDICATE: bson-not-eoo < integer T_EOO > ;
@@ -63,45 +64,38 @@ GENERIC: element-binary-read ( length type -- object )
     read-byte-raw dup
     B{ 0 } =
     [ append ]
-    [ append (read-cstring) ] if ; 
+    [ append (read-cstring) ] if ; inline recursive
 
 : read-cstring ( -- string )
     B{ } clone
-    (read-cstring) utf8 alien>string ;
+    (read-cstring) utf8 alien>string ; inline
 
 : read-sized-string ( length -- string )
     [ read ] [ count-bytes ] bi
-    utf8 alien>string ;
+    utf8 alien>string ; inline
 
 : read-element-type ( -- type )
-    read-byte ;
+    read-byte ; inline
 
 : push-element ( type name -- element )
     element boa
-    [ get-state element>> push ] keep ; 
+    [ get-state element>> push ] keep ; inline
 
 : pop-element ( -- element )
-    get-state element>> pop ;
+    get-state element>> pop ; inline
 
 : peek-scope ( -- ht )
-    get-state scope>> peek ; 
+    get-state scope>> peek ; inline
 
 : read-elements ( -- )
     read-element-type
     element-read 
-    [ read-elements ] when ;
-
-: make-tuple ( assoc -- tuple )
-    [ P_INFO swap at persistent-tuple-class new ] keep     ! instance assoc
-    [ dup <mirror> [ keys ] keep ] dip                 ! instance array mirror assoc
-    '[ dup _ [ _ at ] dip [ swap ] dip set-at ] each ;   
+    [ read-elements ] when ; inline recursive
 
 GENERIC: fix-result ( assoc type -- result )
 
 M: bson-object fix-result ( assoc type -- result )
-    drop
-    [ ] [ P_INFO swap key? ] bi
-    [ make-tuple ] [ ] if ;
+    drop ;
 
 M: bson-array fix-result ( assoc type -- result )
     drop
@@ -109,10 +103,10 @@ M: bson-array fix-result ( assoc type -- result )
 
 M: bson-eoo element-read ( type -- cont? )
     drop
-    get-state scope>> [ pop ] keep swap                ! vec assoc
-    pop-element [ type>> ] keep                        ! vec assoc type element
-    [ fix-result ] dip                                 ! vec result element 
-    rot length 0 >                                     ! result element 
+    get-state scope>> [ pop ] keep swap ! vec assoc
+    pop-element [ type>> ] keep       ! vec assoc element
+    [ fix-result ] dip
+    rot length 0 >                      ! assoc element 
     [ name>> peek-scope set-at t ]
     [ drop [ get-state ] dip >>result drop f ] if ;
 
@@ -133,19 +127,21 @@ M: bson-oid element-data-read ( type -- object )
     oid boa
     pop-element drop ;
 
-M: bson-object element-data-read ( type -- object )
-    drop
-    read-int32 drop
-    get-state 
-    [ [ [ H{ } clone ] dip push ] keep ] change-scope
-    scope>> peek ;
+: [scope-changer] ( state -- state quot )
+    dup exemplar>> '[ [ [ _ clone ] dip push ] keep ] ; inline
 
-M: bson-array element-data-read ( type -- object )
+: (object-data-read) ( type -- object )
     drop
     read-int32 drop
     get-state
-    [ [ [ H{ } clone ] dip push ] keep ] change-scope
-    scope>> peek ;
+    [scope-changer] change-scope
+    scope>> peek ; inline
+    
+M: bson-object element-data-read ( type -- object )
+    (object-data-read) ;
+
+M: bson-array element-data-read ( type -- object )
+    (object-data-read) ;
     
 M: bson-string element-data-read ( type -- object )
     drop
@@ -179,10 +175,18 @@ M: bson-binary-function element-binary-read ( size type -- quot )
     drop read bytes>object ;
 
 PRIVATE>
-    
-: bson> ( arr -- ht )
-    binary
-    [ <state> dup state
+
+GENERIC: stream>assoc ( exemplar -- assoc )
+
+M: assoc stream>assoc ( exemplar -- assoc )
+    <state> dup state
         [ read-int32 >>size read-elements ] with-variable 
-        result>>
-    ] with-byte-reader ;
+        result>> ;
+
+USING: multi-methods ;
+    
+GENERIC: array>assoc ( array exemplar -- assoc )
+    
+METHOD: array>assoc { byte-array assoc } ( array exemplar -- assoc )
+    [ binary ] dip '[ _ stream>assoc ] with-byte-reader ;
+
