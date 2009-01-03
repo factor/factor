@@ -1,11 +1,12 @@
-! Copyright (C) 2008 Jose Antonio Ortega Ruiz.
+! Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs classes.tuple combinators
-compiler.units continuations debugger definitions io io.pathnames
-io.streams.string kernel lexer math math.order memoize namespaces
-parser prettyprint sequences sets sorting source-files strings summary
-tools.vocabs vectors vocabs vocabs.parser words ;
+compiler.units continuations debugger definitions help help.crossref
+help.markup help.topics io io.pathnames io.streams.string kernel lexer
+make math math.order memoize namespaces parser prettyprint sequences
+sets sorting source-files strings summary tools.vocabs vectors vocabs
+vocabs.parser words ;
 
 IN: fuel
 
@@ -55,6 +56,12 @@ t fuel-eval-res-flag set-global
 GENERIC: fuel-pprint ( obj -- )
 
 M: object fuel-pprint pprint ; inline
+
+: fuel-maybe-scape ( ch -- seq )
+    dup "?#()[]'`" member? [ CHAR: \ swap 2array ] [ 1array ] if ;
+
+M: word fuel-pprint
+    name>> V{ } clone [ fuel-maybe-scape append ] reduce >string write ;
 
 M: f fuel-pprint drop "nil" write ; inline
 
@@ -144,8 +151,8 @@ SYMBOL: :uses
 : fuel-run-file ( path -- )
     [ fuel-set-use-hook run-file ] curry with-scope ; inline
 
-: fuel-with-autouse ( quot -- )
-    [ auto-use? on fuel-set-use-hook call ] curry with-scope ;
+: fuel-with-autouse ( quot --  )
+    [ auto-use? on fuel-set-use-hook call ] curry with-scope ; inline
 
 : (fuel-get-uses) ( lines -- )
     [ parse-fresh drop ] curry with-compilation-unit ; inline
@@ -218,6 +225,69 @@ MEMO: (fuel-vocab-words) ( name -- seq )
 : fuel-get-words ( prefix names -- )
     (fuel-get-words) fuel-eval-set-result ; inline
 
+! Help support
+
+MEMO: fuel-articles-seq ( -- seq )
+    articles get values ;
+
+: fuel-find-articles ( title -- seq )
+    [ [ article-title ] dip = ] curry fuel-articles-seq swap filter ;
+
+MEMO: fuel-find-article ( title -- article/f )
+    fuel-find-articles dup empty? [ drop f ] [ first ] if ;
+
+MEMO: fuel-article-title ( name -- title/f )
+    articles get at [ article-title ] [ f ] if* ;
+
+: fuel-get-article ( name -- )
+    article fuel-eval-set-result ;
+
+: fuel-value-str ( word -- str )
+    [ pprint-short ] with-string-writer ; inline
+
+: fuel-definition-str ( word -- str )
+    [ see ] with-string-writer ; inline
+
+: fuel-methods-str ( word -- str )
+    methods dup empty? not [
+        [ [ see nl ] each ] with-string-writer
+    ] [ drop f ] if ; inline
+
+: fuel-related-words ( word -- seq )
+    dup "related" word-prop remove ; inline
+
+: fuel-parent-topics ( word -- seq )
+    help-path [ dup article-title swap 2array ] map ; inline
+
+: (fuel-word-help) ( word -- element )
+    dup \ article swap article-title rot
+    [
+        {
+            [ fuel-parent-topics [ \ $doc-path prefix , ] unless-empty ]
+            [ \ $vocabulary swap vocabulary>> 2array , ]
+            [ word-help % ]
+            [ fuel-related-words [ \ $related swap 2array , ] unless-empty ]
+            [ get-global [ \ $value swap fuel-value-str 2array , ] when* ]
+            [ \ $definition swap fuel-definition-str 2array , ]
+            [ fuel-methods-str [ \ $methods swap 2array , ] when* ]
+        } cleave
+    ] { } make 3array ;
+
+MEMO: fuel-find-word ( name -- word/f )
+    [ [ name>> ] dip = ] curry all-words swap filter
+    dup empty? not [ first ] [ drop f ] if ;
+
+: fuel-word-help ( name -- )
+    fuel-find-word [ [ auto-use? on (fuel-word-help) ] with-scope ] [ f ] if*
+    fuel-eval-set-result ; inline
+
+: (fuel-word-see) ( word -- elem )
+    [ name>> \ article swap ]
+    [ [ see ] with-string-writer \ $code swap 2array ] bi 3array ; inline
+
+: fuel-word-see ( name -- )
+    fuel-find-word [ [ auto-use? on (fuel-word-see) ] with-scope ] [ f ] if*
+    fuel-eval-set-result ; inline
 
 ! -run=fuel support
 

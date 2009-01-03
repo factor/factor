@@ -1,6 +1,6 @@
 ;;; fuel-autodoc.el -- doc snippets in the echo area
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -33,23 +33,6 @@
 
 
 
-;;; Highlighting for autodoc messages:
-
-(defvar fuel-autodoc--font-lock-buffer
-  (let ((buffer (get-buffer-create " *fuel help minibuffer messages*")))
-    (set-buffer buffer)
-    (set-syntax-table fuel-syntax--syntax-table)
-    (fuel-font-lock--font-lock-setup)
-    buffer))
-
-(defun fuel-autodoc--font-lock-str (str)
-  (set-buffer fuel-autodoc--font-lock-buffer)
-  (erase-buffer)
-  (insert str)
-  (let ((font-lock-verbose nil)) (font-lock-fontify-buffer))
-  (buffer-string))
-
-
 ;;; Eldoc function:
 
 (defvar fuel-autodoc--timeout 200)
@@ -65,7 +48,7 @@
              (res (fuel-eval--retort-result ret)))
         (when (and ret (not (fuel-eval--retort-error ret)) (stringp res))
           (if fuel-autodoc-minibuffer-font-lock
-              (fuel-autodoc--font-lock-str res)
+              (fuel-font-lock--factor-str res)
             res))))))
 
 (make-variable-buffer-local

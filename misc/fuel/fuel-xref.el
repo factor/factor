@@ -1,6 +1,6 @@
 ;;; fuel-xref.el -- showing cross-reference info
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -138,7 +138,6 @@ cursor at the first ocurrence of the used word."
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map)
     (set-keymap-parent map button-buffer-map)
-    (define-key map "q" 'bury-buffer)
     map))
 
 (defun fuel-xref-mode ()
