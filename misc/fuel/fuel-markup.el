@@ -280,9 +280,9 @@
 
 (defun fuel-markup--links (e)
   (dolist (link (cdr e))
-    (insert " ")
     (fuel-markup--link (list '$link link))
-    (insert " ")))
+    (insert ", "))
+  (delete-backward-char 2))
 
 (defun fuel-markup--index-quotation (q)
   (cond ((null q) null)
@@ -398,6 +398,10 @@
   (fuel-markup--insert-heading "See also")
   (fuel-markup--links (cons '$links (cdr e))))
 
+(defun fuel-markup--related (e)
+  (fuel-markup--insert-heading "See also")
+  (fuel-markup--links (cons '$links (cadr e))))
+
 (defun fuel-markup--shuffle (e)
   (insert "\nShuffle word. Re-arranges the stack "
           "according to the stack effect pattern.")
@@ -442,9 +446,6 @@
 
 (defun fuel-markup--contract (e)
   (fuel-markup--elem-with-heading e "Generic word contract"))
-
-(defun fuel-markup--related (e)
-  (fuel-markup--elem-with-heading e "See also"))
 
 (defun fuel-markup--errors (e)
   (fuel-markup--elem-with-heading e "Errors"))

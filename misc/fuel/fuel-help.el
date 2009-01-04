@@ -59,9 +59,13 @@
   (car fuel-help--history))
 
 (defun fuel-help--history-push (link)
-  (when (and link (not (equal link (car fuel-help--history))))
-    (ring-insert (nth 1 fuel-help--history) (car fuel-help--history)))
-  (setcar fuel-help--history link))
+  (unless (equal link (car fuel-help--history))
+    (let ((next (fuel-help--history-next)))
+      (unless (equal link next)
+        (when next (fuel-help--history-previous))
+        (ring-insert (nth 1 fuel-help--history) (car fuel-help--history))
+        (setcar fuel-help--history link))))
+  link)
 
 (defun fuel-help--history-next ()
   (when (not (ring-empty-p (nth 2 fuel-help--history)))
