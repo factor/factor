@@ -87,7 +87,7 @@
 (defun fuel-help--history-current-content ()
   (fuel-help--cache-get (car fuel-help--history)))
 
-(defvar fuel-help--cache (make-hash-table :test 'equal))
+(defvar fuel-help--cache (make-hash-table :weakness 'key :test 'equal))
 
 (defsubst fuel-help--cache-get (name)
   (gethash name fuel-help--cache))

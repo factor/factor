@@ -53,7 +53,7 @@
   (when fuel-markup--follow-link-function
     (funcall fuel-markup--follow-link-function
              (button-get button 'markup-link)
-             (button-label button)
+             (button-get button 'markup-label)
              (button-get button 'markup-link-type))))
 
 (defun fuel-markup--echo-link (link label type)
@@ -65,8 +65,9 @@
     (insert-text-button label
                         :type 'fuel-markup--button
                         'markup-link link
+                        'markup-label label
                         'markup-link-type type
-                        'help-echo link)))
+                        'help-echo (format "%s (%s)" label type))))
 
 (defun fuel-markup--article-title (name)
   (fuel-eval--retort-result
@@ -76,7 +77,7 @@
   (let ((button (condition-case nil (forward-button 0) (error nil))))
     (when button
       (list (button-get button 'markup-link)
-            (button-label button)
+            (button-get button 'markup-label)
             (button-get button 'markup-link-type)))))
 
 
