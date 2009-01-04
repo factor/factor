@@ -3,7 +3,7 @@
 USING: accessors words sequences math prettyprint kernel arrays io
 io.styles namespaces assocs kernel.private strings combinators
 sorting math.parser vocabs definitions tools.profiler.private
-continuations generic compiler.units sets classes ;
+continuations generic compiler.units sets classes fry ;
 IN: tools.profiler
 
 : profile ( quot -- )
@@ -12,16 +12,38 @@ IN: tools.profiler
 : filter-counts ( alist -- alist' )
     [ second 0 > ] filter ;
 
+: map-counters ( obj quot -- alist )
+    { } map>assoc filter-counts ; inline
+
 : counters ( words -- alist )
-    [ dup counter>> ] { } map>assoc filter-counts ;
+    [ dup counter>> ] map-counters ;
+
+: cumulative-counters ( obj quot -- alist )
+    '[ dup @ [ counter>> ] sigma ] map-counters ; inline
 
 : vocab-counters ( -- alist )
-    vocabs [
-        dup
-        words
-        [ predicate? not ] filter
-        [ counter>> ] sigma
-    ] { } map>assoc ;
+    vocabs [ words [ predicate? not ] filter ] cumulative-counters ;
+
+: generic-counters ( -- alist )
+    all-words [ subwords ] cumulative-counters ;
+
+: methods-on ( class -- methods )
+    dup implementors [ method ] with map ;
+
+: class-counters ( -- alist )
+    classes [ methods-on ] cumulative-counters ;
+
+: method-counters ( -- alist )
+    all-words [ subwords ] map concat counters ;
+
+: profiler-usage ( word -- words )
+    [ smart-usage [ word? ] filter ]
+    [ compiled-generic-usage keys ]
+    [ compiled-usage keys ]
+    tri 3append prune ;
+
+: usage-counters ( word -- alist )
+    profiler-usage counters ;
 
 : counters. ( assoc -- )
     standard-table-style [
@@ -42,15 +64,20 @@ IN: tools.profiler
     "Call counts for words which call " write
     dup pprint
     ":" print
-    [ smart-usage [ word? ] filter ]
-    [ compiled-generic-usage keys ]
-    [ compiled-usage keys ]
-    tri 3append prune counters counters. ;
+    usage-counters counters. ;
 
 : vocabs-profile. ( -- )
     "Call counts for all vocabularies:" print
     vocab-counters counters. ;
 
+: generic-profile. ( -- )
+    "Call counts for methods on generic words:" print
+    generic-counters counters. ;
+
+: class-profile. ( -- )
+    "Call counts for methods on classes:" print
+    class-counters counters. ;
+
 : method-profile. ( -- )
-    all-words [ subwords ] map concat
-    counters counters. ;
+    "Call counts for all methods:" print
+    method-counters counters. ;

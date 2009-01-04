@@ -167,7 +167,7 @@ M: word com-stack-effect def>> com-stack-effect ;
     { +listener+ t }
 } define-operation
 
-: com-profile ( quot -- ) profile f profiler-window ;
+: com-profile ( quot -- ) profile profiler-window ;
 
 [ quotation? ] \ com-profile H{
     { +keyboard+ T{ key-down f { C+ } "r" } }

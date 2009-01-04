@@ -7,12 +7,17 @@ tools.profiler ui ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
 ui.gadgets.buttons ui.gadgets.tables ui.gadgets.search-tables
 ui.gadgets.labelled ui.gadgets.buttons ui.gadgets.packs
-ui.gadgets.labels ui.gadgets.tabbed ;
+ui.gadgets.labels ui.gadgets.tabbed words ;
 FROM: models.filter => <filter> ;
 FROM: models.compose => <compose> ;
 IN: ui.tools.profiler
 
-TUPLE: profiler-gadget < track sort vocabs vocab words ;
+TUPLE: profiler-gadget < track
+sort
+vocabs vocab
+words
+methods
+generic class ;
 
 SINGLETON: profile-renderer
 
@@ -35,9 +40,28 @@ M: profile-renderer row-columns
 : <profiler-table> ( model -- table )
     [ match? ] <search-table> profile-renderer >>renderer ;
 
-: <vocab-model> ( profiler -- model )
-    [ vocab-counters <model> ] dip
-    <profiler-model> [ f prefix ] <filter> ;
+: <profiler-filter-model> ( counts profiler -- model' )
+    [ <model> ] dip <profiler-model> [ f prefix ] <filter> ;
+
+: <vocabs-model> ( profiler -- model )
+    [ vocab-counters ] dip <profiler-filter-model> ;
+
+: <generic-model> ( profiler -- model )
+    [ generic-counters ] dip <profiler-filter-model> ;
+
+: <class-model> ( profiler -- model )
+    [ class-counters ] dip <profiler-filter-model> ;
+
+: method-matches? ( method generic class -- ? )
+    [ dup [ first ] when ] tri@
+    [ drop dup [ subwords memq? ] [ 2drop t ] if ]
+    [ nip dup [ swap "method-class" word-prop = ] [ 2drop t ] if ]
+    3bi and ;
+
+: <methods-model> ( profiler -- model )
+    [ method-counters <model> ] dip
+    [ generic>> ] [ class>> ] bi 3array <compose>
+    [ first3 '[ _ _ method-matches? ] filter ] <filter> ;
 
 : sort-options ( -- alist )
     {
@@ -67,18 +91,31 @@ M: profile-renderer row-columns
 
 :: <methods-tab> ( profiler -- gadget )
     { 0 1 } <track>
-    { 1 0 } <track>
-    f <model> <profiler-table> "Generic words" <labelled-gadget> 1/2 track-add
-    f <model> <profiler-table> "Classes" <labelled-gadget> 1/2 track-add
+        { 1 0 } <track>
+            profiler <generic-model> <profiler-table>
+                profiler generic>> >>selected-value
+            "Generic words" <labelled-gadget>
+        1/2 track-add
+            profiler <class-model> <profiler-table>
+                profiler class>> >>selected-value
+            "Classes" <labelled-gadget>
+        1/2 track-add
     1/2 track-add
-    f <model> <profiler-table> "Methods" <labelled-gadget> 1/2 track-add ;
+        profiler methods>> <profiler-table>
+        "Methods" <labelled-gadget>
+    1/2 track-add ;
+
+: <selection-model> ( -- model ) { f 0 } <model> ;
 
 : <profiler-gadget> ( -- profiler )
     { 0 1 } profiler-gadget new-track
         [ [ first ] compare ] <model> >>sort
         all-words counters <model> >>words
-        dup <vocab-model> >>vocabs
-        { f 0 } <model> >>vocab
+        <selection-model> >>vocab
+        dup <vocabs-model> >>vocabs
+        <selection-model> >>generic
+        <selection-model> >>class
+        dup <methods-model> >>methods
         dup <profiler-tool-bar> f track-add
         <tabbed-gadget>
             over <words-tab> "Words" add-tab
