@@ -72,6 +72,13 @@
   (fuel-eval--retort-result
    (fuel-eval--send/wait `(:fuel* ((,name fuel-article-title :get)) "fuel"))))
 
+(defun fuel-markup--link-at-point ()
+  (let ((button (condition-case nil (forward-button 0) (error nil))))
+    (when button
+      (list (button-get button 'markup-link)
+            (button-label button)
+            (button-get button 'markup-link-type)))))
+
 
 ;;; Markup printers:
 
@@ -259,9 +266,9 @@
   (fuel-markup--print (cons '$code (cdr e))))
 
 (defun fuel-markup--link (e)
-  (let* ((link (cadr e))
-         (type (if (symbolp link) 'word 'article))
-         (label (or (car (cddr e))
+  (let* ((link (nth 1 e))
+         (type (or (nth 3 e) (if (symbolp link) 'word 'article)))
+         (label (or (nth 2 e)
                     (and (eq type 'article)
                          (fuel-markup--article-title link))
                     link)))

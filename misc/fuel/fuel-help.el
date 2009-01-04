@@ -42,6 +42,10 @@
   :type 'integer
   :group 'fuel-help)
 
+(defcustom fuel-help-bookmarks nil
+  "Bookmars. Maintain this list using the help browser."
+  :type 'list
+  :group 'fuel-help)
 
 ;;; Help browser history:
 
@@ -68,6 +72,9 @@
     (ring-insert (nth 1 fuel-help--history) (car fuel-help--history)))
   (setcar fuel-help--history term))
 
+(defsubst fuel-help--history-current ()
+  (car fuel-help--history))
+
 (defun fuel-help--history-next ()
   (when (not (ring-empty-p (nth 2 fuel-help--history)))
     (when (car fuel-help--history)
@@ -91,6 +98,9 @@
 
 
 (defvar fuel-help--prompt-history nil)
+
+(make-local-variable
+ (defvar fuel-help--buffer-link nil))
 
 (defun fuel-help--read-word (see)
   (let* ((def (fuel-syntax-symbol-at-point))
@@ -118,7 +128,8 @@
                  (res (fuel-eval--retort-result ret)))
             (if (not res)
                 (message "No help for '%s'" def)
-              (fuel-help--insert-contents def res))))))))
+              (fuel-help--insert-contents def res))))))
+    (setq fuel-help--buffer-link (list def def 'word))))
 
 (defun fuel-help--get-article (name label)
   (let ((cached (fuel-help--cache-get name)))
@@ -129,7 +140,8 @@
              (ret (fuel-eval--send/wait cmd 2000))
              (res (fuel-eval--retort-result ret)))
         (fuel-help--insert-contents name res)
-        (message "")))))
+        (message "")))
+    (setq fuel-help--buffer-link (list name label 'article))))
 
 (defun fuel-help--get-vocab (name)
   (let ((cached (fuel-help--cache-get name)))
@@ -142,7 +154,8 @@
         (if (not res)
             (message "No help available for vocabulary %s" name)
           (fuel-help--insert-contents name res)
-          (message ""))))))
+          (message ""))))
+    (setq fuel-help--buffer-link (list name name 'vocab))))
 
 (defun fuel-help--follow-link (label link type)
   (let ((fuel-help-always-ask nil))
@@ -161,13 +174,43 @@
         (insert art)
       (fuel-markup--print art)
       (fuel-markup--insert-newline)
-      (fuel-help--cache-insert def (buffer-string)))
+      (when def (fuel-help--cache-insert def (buffer-string))))
     (unless nopush (fuel-help--history-push def))
     (set-buffer-modified-p nil)
     (fuel-popup--display)
     (goto-char (point-min))
     (message "")))
 
+
+;;; Bookmarks:
+
+(defun fuel-help-bookmark-page ()
+  "Add current help page to bookmarks."
+  (interactive)
+  (let ((link fuel-help--buffer-link))
+    (unless link (error "No link associated to this page"))
+    (add-to-list 'fuel-help-bookmarks link)
+    (customize-save-variable 'fuel-help-bookmarks fuel-help-bookmarks)
+    (message "Bookmark '%s' saved" (cadr link))))
+
+(defun fuel-help-delete-bookmark ()
+  "Delete link at point from bookmarks."
+  (interactive)
+  (let ((link (fuel-markup--link-at-point)))
+    (unless link (error "No link at point"))
+    (unless (member link fuel-help-bookmarks)
+      (error "'%s' is not bookmarked" (cadr link)))
+    (customize-save-variable 'fuel-help-bookmarks
+                             (remove link fuel-help-bookmarks))
+    (message "Bookmark '%s' delete" (cadr link))
+    (fuel-help-display-bookmarks)))
+
+(defun fuel-help-display-bookmarks ()
+  "Display bookmarked pages."
+  (interactive)
+  (let ((links (mapcar (lambda (l) (cons '$subsection l)) fuel-help-bookmarks)))
+    (unless links (error "No links to display"))
+    (fuel-help--insert-contents nil (list 'article "Bookmarks" links) t)))
 
 ;;; Interactive help commands:
 
@@ -216,9 +259,10 @@ buffer."
     (suppress-keymap map)
     (set-keymap-parent map button-buffer-map)
     (define-key map "a" 'fuel-apropos)
-    (define-key map "b" 'fuel-help-previous)
+    (define-key map "ba" 'fuel-help-bookmark-page)
+    (define-key map "bb" 'fuel-help-display-bookmarks)
+    (define-key map "bd" 'fuel-help-delete-bookmark)
     (define-key map "c" 'fuel-help-clean-history)
-    (define-key map "f" 'fuel-help-next)
     (define-key map "h" 'fuel-help)
     (define-key map "l" 'fuel-help-previous)
     (define-key map "p" 'fuel-help-previous)

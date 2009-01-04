@@ -98,7 +98,10 @@ C-cC-eC-r is the same as C-cC-er)).
 
  - h : help for word at point
  - a : find words containing given substring (M-x fuel-apropos)
- - f/b : next/previous page
+ - ba : bookmark current page
+ - bb : display bookmarks
+ - bd : delete bookmark at point
+ - n/p : next/previous page
  - SPC/S-SPC : scroll up/down
  - TAB/S-TAB : next/previous link
  - c : clean browsing history
