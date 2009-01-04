@@ -58,7 +58,7 @@ GENERIC: fuel-pprint ( obj -- )
 M: object fuel-pprint pprint ; inline
 
 : fuel-maybe-scape ( ch -- seq )
-    dup "?#()[]'`" member? [ CHAR: \ swap 2array ] [ 1array ] if ;
+    dup "\"?#()[]'`" member? [ CHAR: \ swap 2array ] [ 1array ] if ;
 
 M: word fuel-pprint
     name>> V{ } clone [ fuel-maybe-scape append ] reduce >string write ;
