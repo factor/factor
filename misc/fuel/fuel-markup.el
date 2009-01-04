@@ -52,11 +52,11 @@
 (defun fuel-markup--follow-link (button)
   (when fuel-markup--follow-link-function
     (funcall fuel-markup--follow-link-function
-             (button-label button)
              (button-get button 'markup-link)
+             (button-label button)
              (button-get button 'markup-link-type))))
 
-(defun fuel-markup--echo-link (label link type)
+(defun fuel-markup--echo-link (link label type)
   (message "Link %s pointing to %s named %s" label type link))
 
 (defun fuel-markup--insert-button (label link type)
@@ -85,6 +85,7 @@
 (defconst fuel-markup--printers
   '(($class-description . fuel-markup--class-description)
     ($code . fuel-markup--code)
+    ($command . fuel-markup--command)
     ($contract . fuel-markup--contract)
     ($curious . fuel-markup--curious)
     ($definition . fuel-markup--definition)
@@ -249,6 +250,9 @@
       (fuel-markup--print snip))
     (newline))
   (newline))
+
+(defun fuel-markup--command (e)
+  (fuel-markup--snippet (list '$snippet (nth 3 e))))
 
 (defun fuel-markup--syntax (e)
   (fuel-markup--insert-heading "Syntax")

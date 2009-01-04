@@ -92,7 +92,7 @@ beast.
     - w/e/l : invoke :warnings, :errors, :linkage
     - q : bury buffer
 
-*** In the Help browser:
+*** In the help browser:
 
     - h : help for word at point
     - a : find words containing given substring (M-x fuel-apropos)
@@ -102,6 +102,7 @@ beast.
     - n/p : next/previous page
     - SPC/S-SPC : scroll up/down
     - TAB/S-TAB : next/previous link
+    - r : refresh page
     - c : clean browsing history
     - M-. : edit word at point in Emacs
     - C-cz : switch to listener
