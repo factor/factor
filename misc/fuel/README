@@ -71,6 +71,7 @@ C-cC-eC-r is the same as C-cC-er)).
  - C-cC-dd : help for word at point
  - C-cC-ds : short help word at point
  - C-cC-de : show stack effect of current sexp (with prefix, region)
+ - C-cC-dp : find words containing given substring (M-x fuel-apropos)
 
  - C-cM-<, C-cC-d< : show callers of word at point
  - C-cM->, C-cC-d> : show callees of word at point
@@ -80,6 +81,7 @@ C-cC-eC-r is the same as C-cC-er)).
  - TAB : complete word at point
  - M-. : edit word at point in Emacs
  - C-ca : toggle autodoc mode
+ - C-cp : find words containing given substring (M-x fuel-apropos)
  - C-cs : toggle stack mode
  - C-cv : edit vocabulary
  - C-ch : help for word at point
@@ -95,6 +97,7 @@ C-cC-eC-r is the same as C-cC-er)).
 * In the Help browser:
 
  - h : help for word at point
+ - a : find words containing given substring (M-x fuel-apropos)
  - f/b : next/previous page
  - SPC/S-SPC : scroll up/down
  - TAB/S-TAB : next/previous link

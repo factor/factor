@@ -5,8 +5,8 @@ USING: accessors arrays assocs classes.tuple combinators
 compiler.units continuations debugger definitions help help.crossref
 help.markup help.topics io io.pathnames io.streams.string kernel lexer
 make math math.order memoize namespaces parser prettyprint sequences
-sets sorting source-files strings summary tools.vocabs vectors vocabs
-vocabs.parser words ;
+sets sorting source-files strings summary tools.crossref tools.vocabs
+vectors vocabs vocabs.parser words ;
 
 IN: fuel
 
@@ -151,7 +151,7 @@ SYMBOL: :uses
 : fuel-run-file ( path -- )
     [ fuel-set-use-hook run-file ] curry with-scope ; inline
 
-: fuel-with-autouse ( quot --  )
+: fuel-with-autouse ( ... quot: ( ... -- ... ) -- ... )
     [ auto-use? on fuel-set-use-hook call ] curry with-scope ; inline
 
 : (fuel-get-uses) ( lines -- )
@@ -184,13 +184,16 @@ SYMBOL: :uses
     [ [ first ] dip first <=> ] sort ; inline
 
 : fuel-format-xrefs ( seq -- seq' )
-    [ word? ] filter [ fuel-word>xref ] map fuel-sort-xrefs ;
+    [ word? ] filter [ fuel-word>xref ] map ; inline
 
 : fuel-callers-xref ( word -- )
-    usage fuel-format-xrefs fuel-eval-set-result ; inline
+    usage fuel-format-xrefs fuel-sort-xrefs fuel-eval-set-result ; inline
 
 : fuel-callees-xref ( word -- )
-    uses fuel-format-xrefs fuel-eval-set-result ; inline
+    uses fuel-format-xrefs fuel-sort-xrefs fuel-eval-set-result ; inline
+
+: fuel-apropos-xref ( str -- )
+    words-matching fuel-format-xrefs fuel-eval-set-result ; inline
 
 ! Completion support
 
@@ -273,23 +276,6 @@ MEMO: fuel-article-title ( name -- title/f )
         } cleave
     ] { } make 3array ;
 
-: (fuel-vocab-help) ( name -- element )
-    \ article swap dup >vocab-link
-    [
-        [ summary [ , ] [ "No summary available" , ] if* ]
-        [ drop \ $nl , ]
-        [ vocab-help article [ content>> % ] when* ] tri
-    ] { } make 3array ;
-
-: fuel-vocab-help ( name -- )
-    (fuel-vocab-help) fuel-eval-set-result ; inline
-
-: (fuel-index) ( seq -- seq )
-    [ [ >link name>> ] [ article-title ] bi 2array \ $subsection prefix ] map ;
-
-: fuel-index ( quot -- )
-    call (fuel-index) fuel-eval-set-result ; inline
-
 MEMO: fuel-find-word ( name -- word/f )
     [ [ name>> ] dip = ] curry all-words swap filter
     dup empty? not [ first ] [ drop f ] if ;
@@ -305,6 +291,23 @@ MEMO: fuel-find-word ( name -- word/f )
 : fuel-word-see ( name -- )
     fuel-find-word [ [ auto-use? on (fuel-word-see) ] with-scope ] [ f ] if*
     fuel-eval-set-result ; inline
+
+: (fuel-vocab-help) ( name -- element )
+    \ article swap dup >vocab-link
+    [
+        [ summary [ , ] [ "No summary available" , ] if* ]
+        [ drop \ $nl , ]
+        [ vocab-help article [ content>> % ] when* ] tri
+    ] { } make 3array ;
+
+: fuel-vocab-help ( name -- )
+    (fuel-vocab-help) fuel-eval-set-result ; inline
+
+: (fuel-index) ( seq -- seq )
+    [ [ >link name>> ] [ article-title ] bi 2array \ $subsection prefix ] map ;
+
+: fuel-index ( quot: ( -- seq ) -- )
+    call (fuel-index) fuel-eval-set-result ; inline
 
 ! -run=fuel support
 
