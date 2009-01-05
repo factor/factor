@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2005, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private slots.private math
 math.private math.order ;
@@ -117,9 +117,9 @@ INSTANCE: integer immutable-sequence
     [ tuck [ nth-unsafe ] 2bi@ ]
     [ tuck [ set-nth-unsafe ] 2bi@ ] 3bi ; inline
 
-: (head) ( seq n -- from to seq ) 0 spin ; inline
+: (head) ( seq n -- from to seq ) [ 0 ] 2dip swap ; inline
 
-: (tail) ( seq n -- from to seq ) over length rot ; inline
+: (tail) ( seq n -- from to seq ) swap [ length ] keep ; inline
 
 : from-end ( seq n -- seq n' ) [ dup length ] dip - ; inline
 
@@ -352,6 +352,10 @@ PRIVATE>
 : 2map-into ( seq1 seq2 quot into -- newseq )
     [ (2each) ] dip collect ; inline
 
+: (3each) ( seq1 seq2 seq3 quot -- n quot' )
+    [ [ [ length ] tri@ min min ] 3keep ] dip
+    [ [ [ [ nth-unsafe ] curry ] tri@ tri ] 3curry ] dip compose ; inline
+
 : finish-find ( i seq -- i elt )
     over [ dupd nth-unsafe ] [ drop f ] if ; inline
 
@@ -418,6 +422,12 @@ PRIVATE>
 
 : 2all? ( seq1 seq2 quot -- ? )
     (2each) all-integers? ; inline
+
+: 3each ( seq1 seq2 seq3 quot -- )
+    (3each) each ; inline
+
+: 3map ( seq1 seq2 seq3 quot -- newseq )
+    (3each) map ; inline
 
 : find-from ( n seq quot -- i elt )
     [ (find-integer) ] (find-from) ; inline
@@ -494,10 +504,12 @@ PRIVATE>
 : last-index-from ( obj i seq -- n )
     rot [ = ] curry find-last-from drop ;
 
+: (indices) ( elt i obj accum -- )
+    [ swap [ = ] dip ] dip [ push ] 2curry when ; inline
+
 : indices ( obj seq -- indices )
-    V{ } clone spin
-    [ rot = [ over push ] [ drop ] if ]
-    curry each-index ;
+    swap V{ } clone
+    [ [ (indices) ] 2curry each-index ] keep ;
 
 : nths ( indices seq -- seq' )
     [ nth ] curry map ;
@@ -566,7 +578,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 PRIVATE>
 
 : filter-here ( seq quot -- )
-    0 0 roll (filter-here) ; inline
+    swap [ 0 0 ] dip (filter-here) ; inline
 
 : delete ( elt seq -- )
     [ = not ] with filter-here ;
@@ -828,7 +840,7 @@ PRIVATE>
 
 : supremum ( seq -- n ) dup first [ max ] reduce ;
 
-: sigma ( seq quot -- n ) 0 -rot [ rot slip + ] curry each ; inline
+: sigma ( seq quot -- n ) [ 0 ] 2dip [ rot slip + ] curry each ; inline
 
 : count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
 
