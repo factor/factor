@@ -165,17 +165,21 @@ SYMBOL: :uses
 ! Edit locations
 
 : fuel-normalize-loc ( seq -- path line )
-    dup length 1 > [ first2 [ (normalize-path) ] dip ] [ f ] if ; inline
+    [ dup length 0 > [ first (normalize-path) ] [ drop f ] if ]
+    [ dup length 1 > [ second ] [ drop 1 ] if ] bi ;
 
-: fuel-get-edit-location ( defspec -- )
+: fuel-get-edit-location ( word -- )
     where fuel-normalize-loc 2array fuel-eval-set-result ; inline
 
 : fuel-get-vocab-location ( vocab -- )
     >vocab-link fuel-get-edit-location ; inline
 
-: fuel-get-doc-location ( defspec -- )
+: fuel-get-doc-location ( word -- )
     props>> "help-loc" swap at
     fuel-normalize-loc 2array fuel-eval-set-result ;
+
+: fuel-get-article-location ( name -- )
+    article loc>> fuel-normalize-loc 2array fuel-eval-set-result ;
 
 ! Cross-references
 

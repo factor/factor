@@ -14,6 +14,7 @@
 
 ;;; Code:
 
+(require 'fuel-edit)
 (require 'fuel-eval)
 (require 'fuel-markup)
 (require 'fuel-autodoc)
@@ -269,6 +270,15 @@ With prefix, the current page is deleted from history."
     (fuel-help-refresh))
   (message ""))
 
+(defun fuel-help-edit ()
+  "Edit the current article or word help."
+  (interactive)
+  (let ((link (car fuel-help--buffer-link))
+        (type (nth 2 fuel-help--buffer-link)))
+    (cond ((eq type 'word) (fuel-edit-word-doc-at-point nil link))
+          ((member type '(article vocab)) (fuel-edit--edit-article link))
+          (t (error "No document associated with this page")))))
+
 
 ;;;; Help mode map:
 
@@ -281,6 +291,7 @@ With prefix, the current page is deleted from history."
     (define-key map "bb" 'fuel-help-display-bookmarks)
     (define-key map "bd" 'fuel-help-delete-bookmark)
     (define-key map "c" 'fuel-help-clean-history)
+    (define-key map "e" 'fuel-help-edit)
     (define-key map "h" 'fuel-help)
     (define-key map "k" 'fuel-help-kill-page)
     (define-key map "n" 'fuel-help-next)
