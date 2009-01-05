@@ -180,6 +180,7 @@
 
 (defun fuel-markup--insert-heading (txt &optional no-nl)
   (fuel-markup--insert-nl-if-nb)
+  (delete-blank-lines)
   (unless (bobp) (newline))
   (fuel-markup--put-face txt 'fuel-font-lock-markup-heading)
   (fuel-markup--insert-string txt)
@@ -239,7 +240,7 @@
     (insert (cadr e))))
 
 (defun fuel-markup--snippet (e)
-  (let ((snip (format "%s" (cdr e))))
+  (let ((snip (format "%s" (cadr e))))
     (insert (fuel-font-lock--factor-str snip))))
 
 (defun fuel-markup--code (e)
@@ -260,17 +261,15 @@
   (fuel-markup--print (cons '$code (cdr e)))
   (newline))
 
-(defun fuel-markup--examples (e)
-  (fuel-markup--insert-heading "Examples")
-  (dolist (ex (cdr e))
-    (fuel-markup--print ex)
+(defun fuel-markup--example (e)
+  (fuel-markup--insert-newline)
+  (dolist (s (cdr e))
+    (fuel-markup--snippet (list '$snippet s))
     (newline)))
 
-(defun fuel-markup--example (e)
-  (fuel-markup--snippet (list '$snippet (cadr e))))
-
 (defun fuel-markup--markup-example (e)
-  (fuel-markup--snippet (cons '$snippet (cadr e))))
+  (fuel-markup--insert-newline)
+  (fuel-markup--snippet (cons '$snippet (cdr e))))
 
 (defun fuel-markup--link (e)
   (let* ((link (nth 1 e))
@@ -301,7 +300,10 @@
                         "classes.intersection" "classes.predicate")))
          (subs (fuel-eval--retort-result (fuel-eval--send/wait cmd 200))))
     (when subs
-      (fuel-markup--print subs))))
+      (let ((start (point))
+            (sort-fold-case nil))
+        (fuel-markup--print subs)
+        (sort-lines nil start (point))))))
 
 (defun fuel-markup--vocab-link (e)
   (fuel-markup--insert-button (cadr e) (cadr e) 'vocab))
@@ -458,6 +460,9 @@
 
 (defun fuel-markup--errors (e)
   (fuel-markup--elem-with-heading e "Errors"))
+
+(defun fuel-markup--examples (e)
+  (fuel-markup--elem-with-heading e "Examples"))
 
 (defun fuel-markup--notes (e)
   (fuel-markup--elem-with-heading e "Notes"))

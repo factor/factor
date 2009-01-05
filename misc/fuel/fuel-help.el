@@ -176,6 +176,7 @@
         (insert content)
       (fuel-markup--print content)
       (fuel-markup--insert-newline)
+      (delete-blank-lines)
       (fuel-help--cache-insert key (buffer-string)))
     (fuel-help--history-push key)
     (setq fuel-help--buffer-link key)
