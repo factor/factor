@@ -96,6 +96,7 @@ beast.
 
     - h : help for word at point
     - a : find words containing given substring (M-x fuel-apropos)
+    - e : edit current article
     - ba : bookmark current page
     - bb : display bookmarks
     - bd : delete bookmark at point
