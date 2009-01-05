@@ -1,6 +1,6 @@
 ;;; fuel-mode.el -- Minor mode enabling FUEL niceties
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -224,6 +224,11 @@ With prefix argument, ask for word."
       (message "Looking up %s's callees ..." word)
       (fuel-xref--show-callees word))))
 
+(defun fuel-apropos (str)
+  "Show a list of words containing the given substring."
+  (interactive "MFind words containing: ")
+  (message "Looking up %s's references ..." str)
+  (fuel-xref--apropos str))
 
 ;;; Minor mode definition:
 
@@ -289,6 +294,7 @@ interacting with a factor listener is at your disposal.
 (fuel-mode--key ?d ?> 'fuel-show-callees)
 (fuel-mode--key ?d ?< 'fuel-show-callers)
 (fuel-mode--key ?d ?a 'fuel-autodoc-mode)
+(fuel-mode--key ?d ?p 'fuel-apropos)
 (fuel-mode--key ?d ?d 'fuel-help)
 (fuel-mode--key ?d ?e 'fuel-stack-effect-sexp)
 (fuel-mode--key ?d ?s 'fuel-help-short)
