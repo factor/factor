@@ -102,6 +102,7 @@ beast.
     - n/p : next/previous page
     - SPC/S-SPC : scroll up/down
     - TAB/S-TAB : next/previous link
+    - k : kill current page and go to previous or next
     - r : refresh page
     - c : clean browsing history
     - M-. : edit word at point in Emacs

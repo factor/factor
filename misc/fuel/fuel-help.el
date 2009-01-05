@@ -67,15 +67,15 @@
         (setcar fuel-help--history link))))
   link)
 
-(defun fuel-help--history-next ()
+(defun fuel-help--history-next (&optional forget-current)
   (when (not (ring-empty-p (nth 2 fuel-help--history)))
-    (when (car fuel-help--history)
+    (when (and (car fuel-help--history) (not forget-current))
       (ring-insert (nth 1 fuel-help--history) (car fuel-help--history)))
     (setcar fuel-help--history (ring-remove (nth 2 fuel-help--history) 0))))
 
-(defun fuel-help--history-previous ()
+(defun fuel-help--history-previous (&optional forget-current)
   (when (not (ring-empty-p (nth 1 fuel-help--history)))
-    (when (car fuel-help--history)
+    (when (and (car fuel-help--history) (not forget-current))
       (ring-insert (nth 2 fuel-help--history) (car fuel-help--history)))
     (setcar fuel-help--history (ring-remove (nth 1 fuel-help--history) 0))))
 
@@ -231,19 +231,28 @@ buffer."
   (interactive)
   (fuel-help--word-help))
 
-(defun fuel-help-next ()
-  "Go to next page in help browser."
-  (interactive)
-  (let ((item (fuel-help--history-next)))
+(defun fuel-help-next (&optional forget-current)
+  "Go to next page in help browser.
+With prefix, the current page is deleted from history."
+  (interactive "P")
+  (let ((item (fuel-help--history-next forget-current)))
     (unless item (error "No next page"))
     (apply 'fuel-help--follow-link item)))
 
-(defun fuel-help-previous ()
-  "Go to previous page in help browser."
-  (interactive)
-  (let ((item (fuel-help--history-previous)))
+(defun fuel-help-previous (&optional forget-current)
+  "Go to previous page in help browser.
+With prefix, the current page is deleted from history."
+  (interactive "P")
+  (let ((item (fuel-help--history-previous forget-current)))
     (unless item (error "No previous page"))
     (apply 'fuel-help--follow-link item)))
+
+(defun fuel-help-kill-page ()
+  "Kill current page if a previous or next one exists."
+  (interactive)
+  (condition-case nil
+      (fuel-help-previous t)
+    (error (fuel-help-next t))))
 
 (defun fuel-help-refresh ()
   "Refresh the contents of current page."
@@ -273,6 +282,7 @@ buffer."
     (define-key map "bd" 'fuel-help-delete-bookmark)
     (define-key map "c" 'fuel-help-clean-history)
     (define-key map "h" 'fuel-help)
+    (define-key map "k" 'fuel-help-kill-page)
     (define-key map "n" 'fuel-help-next)
     (define-key map "p" 'fuel-help-previous)
     (define-key map "r" 'fuel-help-refresh)

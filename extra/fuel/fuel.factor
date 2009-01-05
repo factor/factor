@@ -4,9 +4,9 @@
 USING: accessors arrays assocs classes.tuple combinators
 compiler.units continuations debugger definitions help help.crossref
 help.markup help.topics io io.pathnames io.streams.string kernel lexer
-make math math.order memoize namespaces parser prettyprint sequences
-sets sorting source-files strings summary tools.crossref tools.vocabs
-vectors vocabs vocabs.parser words ;
+make math math.order memoize namespaces parser quotations prettyprint
+sequences sets sorting source-files strings summary tools.crossref
+tools.vocabs vectors vocabs vocabs.parser words ;
 
 IN: fuel
 
@@ -73,6 +73,8 @@ M: sequence fuel-pprint
     "(" write [ " " write ] [ fuel-pprint ] interleave ")" write ; inline
 
 M: tuple fuel-pprint tuple>array fuel-pprint ; inline
+
+M: quotation fuel-pprint pprint ; inline
 
 M: continuation fuel-pprint drop ":continuation" write ; inline
 
