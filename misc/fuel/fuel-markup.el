@@ -239,7 +239,7 @@
     (insert (cadr e))))
 
 (defun fuel-markup--snippet (e)
-  (let ((snip (fuel-markup--print-str (cdr e))))
+  (let ((snip (format "%s" (cdr e))))
     (insert (fuel-font-lock--factor-str snip))))
 
 (defun fuel-markup--code (e)
@@ -262,13 +262,15 @@
 
 (defun fuel-markup--examples (e)
   (fuel-markup--insert-heading "Examples")
-  (fuel-markup--print (cdr e)))
+  (dolist (ex (cdr e))
+    (fuel-markup--print ex)
+    (newline)))
 
 (defun fuel-markup--example (e)
-  (fuel-markup--print (cons '$code (cdr e))))
+  (fuel-markup--snippet (list '$snippet (cadr e))))
 
 (defun fuel-markup--markup-example (e)
-  (fuel-markup--print (cons '$code (cdr e))))
+  (fuel-markup--snippet (cons '$snippet (cadr e))))
 
 (defun fuel-markup--link (e)
   (let* ((link (nth 1 e))
@@ -430,6 +432,12 @@
   (fuel-markup--print (cdr elem))
   (fuel-markup--insert-newline))
 
+(defun fuel-markup--quotation (e)
+  (insert "a ")
+  (fuel-markup--link (list '$link 'quotation 'quotation 'word))
+  (insert " with stack effect ")
+  (fuel-markup--snippet (list '$snippet (nth 1 e))))
+
 (defun fuel-markup--warning (e)
   (fuel-markup--elem-with-heading e "Warning"))
 
@@ -455,12 +463,15 @@
   (fuel-markup--elem-with-heading e "Notes"))
 
 (defun fuel-markup--see (e)
-  (insert (format " %S " e)))
+  (let* ((word (nth 1 e))
+         (cmd (and word `(:fuel* (,(format "%s" word) fuel-word-see) "fuel" t)))
+         (res (and cmd
+                   (fuel-eval--retort-result (fuel-eval--send/wait cmd 100)))))
+    (if res
+        (fuel-markup--code (list '$code res))
+      (fuel-markup--snippet (list '$snippet word)))))
 
 (defun fuel-markup--synopsis (e)
-  (insert (format " %S " e)))
-
-(defun fuel-markup--quotation (e)
   (insert (format " %S " e)))
 
 

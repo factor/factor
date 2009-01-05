@@ -296,12 +296,7 @@ buffer."
   (set-syntax-table fuel-syntax--syntax-table)
   (setq mode-name "FUEL Help")
   (setq major-mode 'fuel-help-mode)
-
   (setq fuel-markup--follow-link-function 'fuel-help--follow-link)
-
-  (setq fuel-autodoc-mode-string "")
-  (fuel-autodoc-mode)
-
   (setq buffer-read-only t))
 
 
