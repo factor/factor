@@ -284,7 +284,7 @@ With prefix, the current page is deleted from history."
     (define-key map "h" 'fuel-help)
     (define-key map "k" 'fuel-help-kill-page)
     (define-key map "n" 'fuel-help-next)
-    (define-key map "l" 'fuel-help-last)
+    (define-key map "l" 'fuel-help-previous)
     (define-key map "p" 'fuel-help-previous)
     (define-key map "r" 'fuel-help-refresh)
     (define-key map (kbd "SPC")  'scroll-up)
