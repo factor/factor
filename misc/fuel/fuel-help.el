@@ -1,6 +1,6 @@
 ;;; fuel-help.el -- accessing Factor's help system
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -15,11 +15,15 @@
 ;;; Code:
 
 (require 'fuel-eval)
+(require 'fuel-markup)
 (require 'fuel-autodoc)
+(require 'fuel-xref)
 (require 'fuel-completion)
 (require 'fuel-font-lock)
 (require 'fuel-popup)
 (require 'fuel-base)
+
+(require 'button)
 
 
 ;;; Customization:
@@ -33,37 +37,35 @@
   :type 'boolean
   :group 'fuel-help)
 
-(defcustom fuel-help-use-minibuffer t
-  "When enabled, use the minibuffer for short help messages."
-  :type 'boolean
-  :group 'fuel-help)
-
-(defcustom fuel-help-mode-hook nil
-  "Hook run by `factor-help-mode'."
-  :type 'hook
-  :group 'fuel-help)
-
 (defcustom fuel-help-history-cache-size 50
   "Maximum number of pages to keep in the help browser cache."
   :type 'integer
   :group 'fuel-help)
 
-(fuel-font-lock--defface fuel-font-lock-help-headlines
-  'bold fuel-hep "headlines in help buffers")
+(defcustom fuel-help-bookmarks nil
+  "Bookmars. Maintain this list using the help browser."
+  :type 'list
+  :group 'fuel-help)
 
 
 ;;; Help browser history:
 
-(defvar fuel-help--history
+(defun fuel-help--make-history ()
   (list nil                                        ; current
         (make-ring fuel-help-history-cache-size)   ; previous
         (make-ring fuel-help-history-cache-size))) ; next
 
-(defun fuel-help--history-push (term)
-  (when (and (car fuel-help--history)
-             (not (string= (caar fuel-help--history) (car term))))
-    (ring-insert (nth 1 fuel-help--history) (car fuel-help--history)))
-  (setcar fuel-help--history term))
+(defsubst fuel-help--history-current ()
+  (car fuel-help--history))
+
+(defun fuel-help--history-push (link)
+  (unless (equal link (car fuel-help--history))
+    (let ((next (fuel-help--history-next)))
+      (unless (equal link next)
+        (when next (fuel-help--history-previous))
+        (ring-insert (nth 1 fuel-help--history) (car fuel-help--history))
+        (setcar fuel-help--history link))))
+  link)
 
 (defun fuel-help--history-next ()
   (when (not (ring-empty-p (nth 2 fuel-help--history)))
@@ -77,6 +79,25 @@
       (ring-insert (nth 2 fuel-help--history) (car fuel-help--history)))
     (setcar fuel-help--history (ring-remove (nth 1 fuel-help--history) 0))))
 
+(defvar fuel-help--history (fuel-help--make-history))
+
+
+;;; Page cache:
+
+(defun fuel-help--history-current-content ()
+  (fuel-help--cache-get (car fuel-help--history)))
+
+(defvar fuel-help--cache (make-hash-table :weakness 'key :test 'equal))
+
+(defsubst fuel-help--cache-get (name)
+  (gethash name fuel-help--cache))
+
+(defsubst fuel-help--cache-insert (name str)
+  (puthash name str fuel-help--cache))
+
+(defsubst fuel-help--cache-clear ()
+  (clrhash fuel-help--cache))
+
 
 ;;; Fuel help buffer and internals:
 
@@ -86,121 +107,158 @@
 
 (defvar fuel-help--prompt-history nil)
 
-(defun fuel-help--show-help (&optional see word)
-  (let* ((def (or word (fuel-syntax-symbol-at-point)))
+(make-local-variable
+ (defvar fuel-help--buffer-link nil))
+
+(defun fuel-help--read-word (see)
+  (let* ((def (fuel-syntax-symbol-at-point))
          (prompt (format "See%s help on%s: " (if see " short" "")
                          (if def (format " (%s)" def) "")))
          (ask (or (not (memq major-mode '(factor-mode fuel-help-mode)))
                   (not def)
-                  fuel-help-always-ask))
-         (def (if ask (fuel-completion--read-word prompt
-                                                  def
-                                                  'fuel-help--prompt-history
-                                                  t)
-                def))
-         (cmd `(:fuel* ((:quote ,def) ,(if see 'see 'help)) t)))
-    (message "Looking up '%s' ..." def)
-    (fuel-eval--send cmd `(lambda (r) (fuel-help--show-help-cont ,def r)))))
+                  fuel-help-always-ask)))
+    (if ask (fuel-completion--read-word prompt
+                                        def
+                                        'fuel-help--prompt-history
+                                        t)
+      def)))
 
-(defun fuel-help--show-help-cont (def ret)
-  (let ((out (fuel-eval--retort-output ret)))
-    (if (or (fuel-eval--retort-error ret) (empty-string-p out))
-        (message "No help for '%s'" def)
-      (fuel-help--insert-contents def out))))
+(defun fuel-help--word-help (&optional see word)
+  (let ((def (or word (fuel-help--read-word see))))
+    (when def
+      (let ((cmd `(:fuel* (,def ,(if see 'fuel-word-see 'fuel-word-help))
+                          "fuel" t)))
+        (message "Looking up '%s' ..." def)
+        (let* ((ret (fuel-eval--send/wait cmd 2000))
+               (res (fuel-eval--retort-result ret)))
+          (if (not res)
+              (message "No help for '%s'" def)
+            (fuel-help--insert-contents (list def def 'word) res)))))))
 
-(defun fuel-help--insert-contents (def str &optional nopush)
+(defun fuel-help--get-article (name label)
+  (message "Retrieving article ...")
+  (let* ((cmd `(:fuel* ((,name fuel-get-article)) "fuel" t))
+         (ret (fuel-eval--send/wait cmd 2000))
+         (res (fuel-eval--retort-result ret)))
+    (if (not res)
+        (message "Article '%s' not found" label)
+      (fuel-help--insert-contents (list name label 'article) res)
+      (message ""))))
+
+(defun fuel-help--get-vocab (name)
+  (message "Retrieving vocabulary help ...")
+  (let* ((cmd `(:fuel* ((,name fuel-vocab-help)) "fuel" (,name)))
+         (ret (fuel-eval--send/wait cmd 2000))
+         (res (fuel-eval--retort-result ret)))
+    (if (not res)
+        (message "No help available for vocabulary '%s'" name)
+      (fuel-help--insert-contents (list name name 'vocab) res)
+      (message ""))))
+
+(defun fuel-help--follow-link (link label type &optional no-cache)
+  (let* ((llink (list link label type))
+         (cached (and (not no-cache) (fuel-help--cache-get llink))))
+    (if (not cached)
+        (let ((fuel-help-always-ask nil))
+          (cond ((eq type 'word) (fuel-help--word-help nil link))
+                ((eq type 'article) (fuel-help--get-article link label))
+                ((eq type 'vocab) (fuel-help--get-vocab link))
+                ((eq type 'bookmarks) (fuel-help-display-bookmarks))
+                (t (error "Links of type %s not yet implemented" type))))
+      (fuel-help--insert-contents llink cached))))
+
+(defun fuel-help--insert-contents (key content)
   (let ((hb (fuel-help--buffer))
         (inhibit-read-only t)
         (font-lock-verbose nil))
     (set-buffer hb)
     (erase-buffer)
-    (insert str)
-    (unless nopush
-      (goto-char (point-min))
-      (when (re-search-forward (format "^%s" def) nil t)
-        (beginning-of-line)
-        (kill-region (point-min) (point))
-        (fuel-help--history-push (cons def (buffer-string)))))
+    (if (stringp content)
+        (insert content)
+      (fuel-markup--print content)
+      (fuel-markup--insert-newline)
+      (fuel-help--cache-insert key (buffer-string)))
+    (fuel-help--history-push key)
+    (setq fuel-help--buffer-link key)
     (set-buffer-modified-p nil)
     (fuel-popup--display)
     (goto-char (point-min))
-    (message "%s" def)))
+    (message "")))
 
 
-;;; Help mode font lock:
+;;; Bookmarks:
 
-(defconst fuel-help--headlines
-  (regexp-opt '("Class description"
-                "Definition"
-                "Errors"
-                "Examples"
-                "Generic word contract"
-                "Inputs and outputs"
-                "Methods"
-                "Notes"
-                "Parent topics:"
-                "See also"
-                "Syntax"
-                "Variable description"
-                "Variable value"
-                "Vocabulary"
-                "Warning"
-                "Word description")
-              t))
+(defun fuel-help-bookmark-page ()
+  "Add current help page to bookmarks."
+  (interactive)
+  (let ((link fuel-help--buffer-link))
+    (unless link (error "No link associated to this page"))
+    (add-to-list 'fuel-help-bookmarks link)
+    (customize-save-variable 'fuel-help-bookmarks fuel-help-bookmarks)
+    (message "Bookmark '%s' saved" (cadr link))))
 
-(defconst fuel-help--headlines-regexp (format "^%s" fuel-help--headlines))
+(defun fuel-help-delete-bookmark ()
+  "Delete link at point from bookmarks."
+  (interactive)
+  (let ((link (fuel-markup--link-at-point)))
+    (unless link (error "No link at point"))
+    (unless (member link fuel-help-bookmarks)
+      (error "'%s' is not bookmarked" (cadr link)))
+    (customize-save-variable 'fuel-help-bookmarks
+                             (remove link fuel-help-bookmarks))
+    (message "Bookmark '%s' delete" (cadr link))
+    (fuel-help-display-bookmarks)))
 
-(defconst fuel-help--font-lock-keywords
-  `(,@fuel-font-lock--font-lock-keywords
-    (,fuel-help--headlines-regexp . 'fuel-font-lock-help-headlines)))
-
+(defun fuel-help-display-bookmarks ()
+  "Display bookmarked pages."
+  (interactive)
+  (let ((links (mapcar (lambda (l) (cons '$subsection l)) fuel-help-bookmarks)))
+    (unless links (error "No links to display"))
+    (fuel-help--insert-contents '("bookmarks" "Bookmars" bookmarks)
+                                `(article "Bookmarks" ,links))))
 
 
 ;;; Interactive help commands:
 
-(defun fuel-help-short (&optional arg)
-  "See a help summary of symbol at point.
-By default, the information is shown in the minibuffer. When
-called with a prefix argument, the information is displayed in a
-separate help buffer."
-  (interactive "P")
-  (if (if fuel-help-use-minibuffer (not arg) arg)
-      (fuel-help--word-synopsis)
-    (fuel-help--show-help t)))
+(defun fuel-help-short ()
+  "See help summary of symbol at point."
+  (interactive)
+  (fuel-help--word-help t))
 
 (defun fuel-help ()
   "Show extended help about the symbol at point, using a help
 buffer."
   (interactive)
-  (fuel-help--show-help))
+  (fuel-help--word-help))
 
 (defun fuel-help-next ()
   "Go to next page in help browser."
   (interactive)
-  (let ((item (fuel-help--history-next))
-        (fuel-help-always-ask nil))
-    (unless item
-      (error "No next page"))
-    (fuel-help--insert-contents (car item) (cdr item) t)))
+  (let ((item (fuel-help--history-next)))
+    (unless item (error "No next page"))
+    (apply 'fuel-help--follow-link item)))
 
 (defun fuel-help-previous ()
-  "Go to next page in help browser."
+  "Go to previous page in help browser."
   (interactive)
-  (let ((item (fuel-help--history-previous))
-        (fuel-help-always-ask nil))
-    (unless item
-      (error "No previous page"))
-    (fuel-help--insert-contents (car item) (cdr item) t)))
+  (let ((item (fuel-help--history-previous)))
+    (unless item (error "No previous page"))
+    (apply 'fuel-help--follow-link item)))
 
-(defun fuel-help-next-headline (&optional count)
-  (interactive "P")
-  (end-of-line)
-  (when (re-search-forward fuel-help--headlines-regexp nil t (or count 1))
-    (beginning-of-line)))
+(defun fuel-help-refresh ()
+  "Refresh the contents of current page."
+  (interactive)
+  (when fuel-help--buffer-link
+    (apply 'fuel-help--follow-link (append fuel-help--buffer-link '(t)))))
 
-(defun fuel-help-previous-headline (&optional count)
-  (interactive "P")
-  (re-search-backward fuel-help--headlines-regexp nil t count))
+(defun fuel-help-clean-history ()
+  "Clean up the help browser cache of visited pages."
+  (interactive)
+  (when (y-or-n-p "Clean browsing history? ")
+    (fuel-help--cache-clear)
+    (setq fuel-help--history (fuel-help--make-history))
+    (fuel-help-refresh))
+  (message ""))
 
 
 ;;;; Help mode map:
@@ -208,15 +266,16 @@ buffer."
 (defvar fuel-help-mode-map
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map)
-    (define-key map "\C-m" 'fuel-help)
-    (define-key map "b" 'fuel-help-previous)
-    (define-key map "f" 'fuel-help-next)
-    (define-key map "l" 'fuel-help-previous)
-    (define-key map "p" 'fuel-help-previous)
+    (set-keymap-parent map button-buffer-map)
+    (define-key map "a" 'fuel-apropos)
+    (define-key map "ba" 'fuel-help-bookmark-page)
+    (define-key map "bb" 'fuel-help-display-bookmarks)
+    (define-key map "bd" 'fuel-help-delete-bookmark)
+    (define-key map "c" 'fuel-help-clean-history)
+    (define-key map "h" 'fuel-help)
     (define-key map "n" 'fuel-help-next)
-    (define-key map (kbd "TAB") 'fuel-help-next-headline)
-    (define-key map (kbd "S-TAB") 'fuel-help-previous-headline)
-    (define-key map [(backtab)] 'fuel-help-previous-headline)
+    (define-key map "p" 'fuel-help-previous)
+    (define-key map "r" 'fuel-help-refresh)
     (define-key map (kbd "SPC")  'scroll-up)
     (define-key map (kbd "S-SPC") 'scroll-down)
     (define-key map "\M-." 'fuel-edit-word-at-point)
@@ -234,16 +293,10 @@ buffer."
   (kill-all-local-variables)
   (buffer-disable-undo)
   (use-local-map fuel-help-mode-map)
+  (set-syntax-table fuel-syntax--syntax-table)
   (setq mode-name "FUEL Help")
   (setq major-mode 'fuel-help-mode)
-
-  (fuel-font-lock--font-lock-setup fuel-help--font-lock-keywords t)
-
-  (setq fuel-autodoc-mode-string "")
-  (fuel-autodoc-mode)
-
-  (run-mode-hooks 'fuel-help-mode-hook)
-
+  (setq fuel-markup--follow-link-function 'fuel-help--follow-link)
   (setq buffer-read-only t))
 
 

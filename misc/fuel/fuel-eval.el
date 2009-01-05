@@ -67,7 +67,7 @@
   (cons :array (mapcar 'factor lst)))
 
 (defsubst factor--fuel-in (in)
-  (cond ((null in) :in)
+  (cond ((or (eq in :in) (null in)) :in)
         ((eq in 'f) 'f)
         ((eq in 't) "fuel-scratchpad")
         ((stringp in) in)

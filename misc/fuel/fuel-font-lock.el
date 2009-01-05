@@ -1,6 +1,6 @@
 ;;; fuel-font-lock.el -- font lock for factor code
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -99,5 +99,24 @@
                          fuel-syntax--syntactic-keywords))))))
 
 
+
+;;; Fontify strings as Factor code:
+
+(defvar fuel-font-lock--font-lock-buffer
+  (let ((buffer (get-buffer-create " *fuel font lock*")))
+    (set-buffer buffer)
+    (set-syntax-table fuel-syntax--syntax-table)
+    (fuel-font-lock--font-lock-setup)
+    buffer))
+
+(defun fuel-font-lock--factor-str (str)
+  (save-current-buffer
+    (set-buffer fuel-font-lock--font-lock-buffer)
+    (erase-buffer)
+    (insert str)
+    (let ((font-lock-verbose nil)) (font-lock-fontify-buffer))
+    (buffer-string)))
+
+
 (provide 'fuel-font-lock)
 ;;; fuel-font-lock.el ends here

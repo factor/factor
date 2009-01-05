@@ -157,19 +157,26 @@
     table))
 
 (defconst fuel-syntax--syntactic-keywords
-  `(("\\_<\\(#?!\\) .*\\(\n\\)" (1 "<") (2 ">"))
-    ("\\_<\\(#?!\\)\\(\n\\)" (1 "<") (2 ">"))
+  `(;; Comments:
+    ("\\_<\\(#?!\\) .*\\(\n\\|$\\)" (1 "<") (2 ">"))
+    ("\\_<\\(#?!\\)\\(\n\\|$\\)" (1 "<") (2 ">"))
+    ;; CHARs:
+    ("CHAR: \\(.\\)\\( \\|$\\)" (1 "w"))
+    ;; Let and lambda:
     ("\\_<\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
     ("\\(\\[\\)\\(let\\|wlet\\|let\\*\\)\\( \\|$\\)" (1 "(]"))
     ("\\(\\[\\)\\(|\\) +[^|]* \\(|\\)" (1 "(]") (2 "(|") (3 ")|"))
     (" \\(|\\) " (1 "(|"))
     (" \\(|\\)$" (1 ")"))
-    ("CHAR: \\(\"\\)\\( \\|$\\)" (1 "w"))
+    ;; Opening brace words:
     (,(format "\\_<%s\\({\\)\\_>" (regexp-opt fuel-syntax--bracers)) (1 "(}"))
     ("\\_<\\({\\)\\_>" (1 "(}"))
     ("\\_<\\(}\\)\\_>" (1 "){"))
+    ;; Parenthesis:
     ("\\_<\\((\\)\\_>" (1 "()"))
     ("\\_<\\()\\)\\_>" (1 ")("))
+    ;; Quotations:
+    ("\\_<'\\(\\[\\)\\_>" (1 "(]"))      ; fried
     ("\\_<\\(\\[\\)\\_>" (1 "(]"))
     ("\\_<\\(\\]\\)\\_>" (1 ")["))))
 
@@ -294,21 +301,9 @@
   (funcall fuel-syntax--current-vocab-function))
 
 (defun fuel-syntax--find-in ()
-  (let* ((vocab)
-         (ip
-          (save-excursion
-            (when (re-search-backward fuel-syntax--current-vocab-regex nil t)
-              (setq vocab (match-string-no-properties 1))
-              (point)))))
-    (when ip
-      (let ((pp (save-excursion
-                  (when (re-search-backward fuel-syntax--sub-vocab-regex ip t)
-                    (point)))))
-        (when (and pp (> pp ip))
-          (let ((sub (match-string-no-properties 1)))
-            (unless (save-excursion (search-backward (format "%s>" sub) pp t))
-              (setq vocab (format "%s.%s" vocab (downcase sub))))))))
-    vocab))
+  (save-excursion
+    (when (re-search-backward fuel-syntax--current-vocab-regex nil t)
+      (match-string-no-properties 1))))
 
 (make-variable-buffer-local
  (defvar fuel-syntax--usings-function 'fuel-syntax--find-usings))
@@ -316,13 +311,19 @@
 (defsubst fuel-syntax--usings ()
   (funcall fuel-syntax--usings-function))
 
-(defun fuel-syntax--find-usings ()
+(defun fuel-syntax--find-usings (&optional no-private)
   (save-excursion
     (let ((usings))
       (goto-char (point-max))
       (while (re-search-backward fuel-syntax--using-lines-regex nil t)
         (dolist (u (split-string (match-string-no-properties 1) nil t))
           (push u usings)))
+      (goto-char (point-min))
+      (when (and (not no-private)
+                 (re-search-forward "\\_<<PRIVATE\\_>" nil t)
+                 (re-search-forward "\\_<PRIVATE>\\_>" nil t))
+        (goto-char (point-max))
+        (push (concat (fuel-syntax--find-in) ".private") usings))
       usings)))
 
 
