@@ -100,6 +100,7 @@ beast.
     - bb : display bookmarks
     - bd : delete bookmark at point
     - n/p : next/previous page
+    - l : previous page
     - SPC/S-SPC : scroll up/down
     - TAB/S-TAB : next/previous link
     - k : kill current page and go to previous or next
@@ -113,4 +114,5 @@ beast.
 
     - TAB/BACKTAB : navigate links
     - RET/mouse click : follow link
+    - h : show help for word at point
     - q : bury buffer

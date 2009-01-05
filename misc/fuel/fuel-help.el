@@ -17,8 +17,8 @@
 (require 'fuel-eval)
 (require 'fuel-markup)
 (require 'fuel-autodoc)
-(require 'fuel-xref)
 (require 'fuel-completion)
+(require 'fuel-syntax)
 (require 'fuel-font-lock)
 (require 'fuel-popup)
 (require 'fuel-base)
@@ -114,10 +114,9 @@
   (let* ((def (fuel-syntax-symbol-at-point))
          (prompt (format "See%s help on%s: " (if see " short" "")
                          (if def (format " (%s)" def) "")))
-         (ask (or (not (memq major-mode '(factor-mode fuel-help-mode)))
-                  (not def)
-                  fuel-help-always-ask)))
-    (if ask (fuel-completion--read-word prompt
+         (ask (or (not def) fuel-help-always-ask)))
+    (if ask
+        (fuel-completion--read-word prompt
                                         def
                                         'fuel-help--prompt-history
                                         t)
@@ -284,6 +283,7 @@ With prefix, the current page is deleted from history."
     (define-key map "h" 'fuel-help)
     (define-key map "k" 'fuel-help-kill-page)
     (define-key map "n" 'fuel-help-next)
+    (define-key map "l" 'fuel-help-last)
     (define-key map "p" 'fuel-help-previous)
     (define-key map "r" 'fuel-help-refresh)
     (define-key map (kbd "SPC")  'scroll-up)
@@ -292,6 +292,16 @@ With prefix, the current page is deleted from history."
     (define-key map "\C-cz" 'run-factor)
     (define-key map "\C-c\C-z" 'run-factor)
     map))
+
+
+;;; IN: support
+
+(defun fuel-help--find-in ()
+  (save-excursion
+    (or (fuel-syntax--find-in)
+        (and (goto-char (point-min))
+             (re-search-forward "Vocabulary: \\(.+\\)$" nil t)
+             (match-string-no-properties 1)))))
 
 
 ;;; Help mode definition:
@@ -306,6 +316,7 @@ With prefix, the current page is deleted from history."
   (set-syntax-table fuel-syntax--syntax-table)
   (setq mode-name "FUEL Help")
   (setq major-mode 'fuel-help-mode)
+  (setq fuel-syntax--current-vocab-function 'fuel-help--find-in)
   (setq fuel-markup--follow-link-function 'fuel-help--follow-link)
   (setq buffer-read-only t))
 
