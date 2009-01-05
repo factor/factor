@@ -154,4 +154,4 @@ SYMBOL: char
     nfd compose ;
 
 : nfkc ( string -- nfkc )
-    nfkc compose ;
+    nfkd compose ;
