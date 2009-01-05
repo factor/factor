@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov
+! Copyright (C) 2008, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel delegate fry sequences
 models models.search models.delay calendar locals
@@ -28,7 +28,9 @@ TUPLE: search-table < track table field ;
 ! We don't want to delegate all slots, just a few setters
 PROTOCOL: table-protocol
 renderer>> (>>renderer)
-selected-value>> (>>selected-value) ;
+filled-column>> (>>filled-column)
+selected-value>> (>>selected-value)
+column-alignment>> (>>column-alignment) ;
 
 CONSULT: table-protocol search-table table>> ;
 

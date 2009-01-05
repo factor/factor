@@ -1,13 +1,13 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ui.tools.workspace kernel quotations accessors fry
-assocs present math math.order math.vectors arrays locals
+assocs present math.order math.vectors arrays locals
 models.search models.sort models sequences vocabs
 tools.profiler ui ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
 ui.gadgets.buttons ui.gadgets.tables ui.gadgets.search-tables
 ui.gadgets.labelled ui.gadgets.buttons ui.gadgets.packs
-ui.gadgets.labels ui.gadgets.tabbed words ;
+ui.gadgets.labels ui.gadgets.tabbed words prettyprint ;
 FROM: models.filter => <filter> ;
 FROM: models.compose => <compose> ;
 IN: ui.tools.profiler
@@ -19,11 +19,17 @@ words
 methods
 generic class ;
 
-SINGLETON: profile-renderer
+SINGLETON: word-renderer
 
 ! Value is a { word count } pair
-M: profile-renderer row-columns
+M: word-renderer row-columns
     drop [ [ present ] map ] [ { "All" "" } ] if* ;
+
+SINGLETON: method-renderer
+
+! Value is a { method-body count } pair
+M: method-renderer row-columns
+    drop [ first synopsis ] [ second present ] bi 2array ;
 
 : <profiler-model> ( values profiler -- model )
     [ [ filter-counts ] <filter> ] [ sort>> ] bi* <sort> ;
@@ -38,7 +44,10 @@ M: profile-renderer row-columns
     swap dup [ first present subseq? ] [ 2drop t ] if ;
 
 : <profiler-table> ( model -- table )
-    [ match? ] <search-table> profile-renderer >>renderer ;
+    [ match? ] <search-table>
+        word-renderer >>renderer
+        { 0 1 } >>column-alignment
+        0 >>filled-column ;
 
 : <profiler-filter-model> ( counts profiler -- model' )
     [ <model> ] dip <profiler-model> [ f prefix ] <filter> ;
@@ -59,9 +68,11 @@ M: profile-renderer row-columns
     3bi and ;
 
 : <methods-model> ( profiler -- model )
-    [ method-counters <model> ] dip
-    [ generic>> ] [ class>> ] bi 3array <compose>
-    [ first3 '[ _ _ method-matches? ] filter ] <filter> ;
+    [
+        [ method-counters <model> ] dip
+        [ generic>> ] [ class>> ] bi 3array <compose>
+        [ first3 '[ _ _ method-matches? ] filter ] <filter>
+    ] keep <profiler-model> ;
 
 : sort-options ( -- alist )
     {
@@ -102,6 +113,7 @@ M: profile-renderer row-columns
         1/2 track-add
     1/2 track-add
         profiler methods>> <profiler-table>
+            method-renderer >>renderer
         "Methods" <labelled-gadget>
     1/2 track-add ;
 

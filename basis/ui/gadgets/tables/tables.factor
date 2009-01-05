@@ -1,6 +1,6 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors fry io.styles kernel locals math
+USING: accessors arrays colors fry io.styles kernel math
 math.geometry.rect math.order math.vectors namespaces opengl
 sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.worlds ui.gestures ui.render models math.ranges sequences
@@ -15,11 +15,12 @@ SINGLETON: trivial-renderer
 M: trivial-renderer row-columns drop ;
 
 TUPLE: table < gadget
-    renderer column-widths total-width
-    font text-color selection-color mouse-color
-    selected-index selected-value
-    mouse-index
-    focused? ;
+renderer filled-column column-alignment
+column-widths total-width
+font text-color selection-color mouse-color
+selected-index selected-value
+mouse-index
+focused? ;
 
 : <table> ( rows -- table )
     table new-gadget
@@ -31,6 +32,8 @@ TUPLE: table < gadget
         black >>mouse-color
         black >>text-color ;
 
+<PRIVATE
+
 : line-height ( table -- n )
     font>> open-font "" string-height ;
 
@@ -39,21 +42,36 @@ CONSTANT: table-gap 5
 : table-rows ( table -- rows )
     [ control-value ] [ renderer>> ] bi '[ _ row-columns ] map ;
 
-: column-widths ( font rows -- total widths )
+: column-offsets ( table -- xs )
+    0 [ table-gap + + ] accumulate nip ;
+
+: (compute-column-widths) ( font rows -- total widths )
     [ drop 0 { } ] [
-        tuck [ first length 0 <repetition> ] 2dip [
-            [ string-width ] with map vmax
-        ] with each
-        0 [ table-gap + + ] accumulate
-        [ table-gap - ] dip
+        tuck [ first length 0 <repetition> ] 2dip
+        [ [ string-width ] with map vmax ] with each
+        [ [ sum ] [ length 1 [-] table-gap * ] bi + ] keep
     ] if-empty ;
 
-: update-cached-widths ( table -- )
-    dup
-    [ font>> open-font ] [ table-rows ] bi column-widths
-    [ >>total-width ] [ >>column-widths ] bi* drop ;
+: compute-column-widths ( table -- total-width column-widths )
+    [ font>> open-font ] [ table-rows ] bi (compute-column-widths) ;
 
-M: table layout* update-cached-widths ;
+: update-cached-widths ( table -- )
+    dup compute-column-widths
+    [ >>total-width ] [ >>column-widths ] bi*
+    drop ;
+
+: filled-column-width ( table -- n )
+    [ dim>> first ] [ total-width>> ] bi [-] ;
+
+: update-filled-column ( table -- )
+    [ filled-column-width ]
+    [ filled-column>> ]
+    [ column-widths>> ] tri
+    2dup empty? not and
+    [ [ + ] change-nth ] [ 3drop ] if ;
+
+M: table layout*
+    [ update-cached-widths ] [ update-filled-column ] bi ;
 
 : row-rect ( table row -- rect )
     [ [ line-height ] dip * 0 swap 2array ]
@@ -97,25 +115,39 @@ M: table layout* update-cached-widths ;
         y>row
     ] keep validate-row 1+ ;
 
-: draw-row ( widths columns font -- )
-    '[ [ _ ] [ 0 2array ] [ ] tri* swap draw-string ] 2each ;
+: column-loc ( font column width align -- loc )
+    [ [ [ open-font ] dip string-width ] dip swap - ] dip
+    * 0 2array ;
+
+: draw-column ( font column width align -- )
+    over [
+        [ 2dup ] 2dip column-loc draw-string
+    ] dip table-gap + 0 2array gl-translate ;
+
+: draw-row ( columns widths align font -- )
+    '[ [ _ ] 3dip draw-column ] 3each ;
 
 : each-slice-index ( from to seq quot -- )
     [ [ <slice> ] [ drop [a,b) ] 3bi ] dip 2each ; inline
 
-:: draw-rows ( table -- )
-    table font>> :> font
-    table line-height :> line-height
-    table text-color>> gl-color
-    table
-    [ first-visible-row ]
-    [ last-visible-row ]
-    [ control-value ] tri [
-        line-height * 0 swap 2array [
-            table column-widths>>
-            swap
-            table renderer>> row-columns
-            font draw-row
+: column-alignment ( table -- seq )
+    dup column-alignment>>
+    [ ] [ column-widths>> length 0 <repetition> ] ?if ;
+
+: draw-rows ( table -- )
+    {
+        [ text-color>> gl-color ]
+        [ first-visible-row ]
+        [ last-visible-row ]
+        [ control-value ]
+        [ line-height ]
+        [ renderer>> ]
+        [ column-widths>> ]
+        [ column-alignment ]
+        [ font>> ]
+    } cleave '[
+        [ 0 ] dip _ * 2array [
+            _ row-columns _ _ _ draw-row
         ] with-translation
     ] each-slice-index ;
 
@@ -130,12 +162,10 @@ M: table draw-gadget*
     ] if ;
 
 M: table pref-dim*
-    dup update-cached-widths
-    [ total-width>> ] [
-        [ font>> open-font "" string-height ]
-        [ control-value length ]
-        bi *
-    ] bi 2array ;
+    [ compute-column-widths drop ] keep
+    [ font>> open-font "" string-height ]
+    [ control-value length ]
+    bi * 2array ;
 
 : nth-row ( row table -- value/f )
     over [ control-value nth ] [ 2drop f ] if ;
@@ -211,3 +241,5 @@ table H{
     { T{ key-down f f "HOME" } [ first-row ] }
     { T{ key-down f f "END" } [ last-row ] }
 } set-gestures
+
+PRIVATE>
