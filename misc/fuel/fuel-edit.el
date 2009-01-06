@@ -34,7 +34,7 @@
   (let* ((vocabs (fuel-completion--vocabs refresh))
          (prompt "Vocabulary name: "))
     (if vocabs
-        (completing-read prompt vocabs nil t nil fuel-edit--vocab-history)
+        (completing-read prompt vocabs nil nil nil fuel-edit--vocab-history)
       (read-string prompt nil fuel-edit--vocab-history))))
 
 (defun fuel-edit--edit-article (name)

@@ -6,7 +6,7 @@ compiler.units continuations debugger definitions help help.crossref
 help.markup help.topics io io.pathnames io.streams.string kernel lexer
 make math math.order memoize namespaces parser quotations prettyprint
 sequences sets sorting source-files strings summary tools.crossref
-tools.vocabs vectors vocabs vocabs.parser words ;
+tools.vocabs tools.vocabs.browser vectors vocabs vocabs.parser words ;
 
 IN: fuel
 
@@ -298,16 +298,45 @@ MEMO: fuel-find-word ( name -- word/f )
     fuel-find-word [ [ auto-use? on (fuel-word-see) ] with-scope ] [ f ] if*
     fuel-eval-set-result ; inline
 
+: fuel-vocab-help-row ( vocab -- element )
+    [ vocab-name ]
+    [ dup summary " " append swap vocab-status-string append ]
+    bi 2array ;
+
+: fuel-vocab-help-root-heading ( root -- element )
+    [ "Children from " prepend ] [ "Other children" ] if* \ $heading swap 2array ;
+
+SYMBOL: vocab-list
+
+: fuel-vocab-children-table ( vocabs -- element )
+    [ fuel-vocab-help-row ] map vocab-list prefix ;
+
+: fuel-vocab-children ( assoc -- seq )
+    [
+        [ drop f ] [
+            [ fuel-vocab-help-root-heading ]
+            [ fuel-vocab-children-table ] bi*
+            [ 2array ] [ drop f ] if*
+        ] if-empty
+    ] { } assoc>map [  ] filter ;
+
+: fuel-vocab-children-help ( name -- element )
+    all-child-vocabs fuel-vocab-children ;
+
 : (fuel-vocab-help) ( name -- element )
     \ article swap dup >vocab-link
     [
-        [ summary [ , ] [ "No summary available" , ] if* ]
-        [ drop \ $nl , ]
-        [ vocab-help article [ content>> % ] when* ] tri
+        {
+            [ summary [ , ] [ "No summary available" , ] if* ]
+            [ drop \ $nl , ]
+            [ vocab-help [ article content>> % ] when* ]
+            [ name>> fuel-vocab-children-help % ]
+        } cleave
     ] { } make 3array ;
 
 : fuel-vocab-help ( name -- )
-    (fuel-vocab-help) fuel-eval-set-result ; inline
+    dup empty? [ fuel-vocab-children-help ] [ (fuel-vocab-help) ] if
+    fuel-eval-set-result ; inline
 
 : (fuel-index) ( seq -- seq )
     [ [ >link name>> ] [ article-title ] bi 2array \ $subsection prefix ] map ;
