@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: inspector help help.markup io io.styles kernel models
 namespaces parser quotations sequences vocabs words prettyprint
@@ -111,9 +111,6 @@ M: engine-word word-completion-string
     [ select-all ]
     2bi ;
 
-: ui-help-hook ( topic -- )
-    browser-gadget call-tool ;
-
 : ui-error-hook ( error listener -- )
     find-workspace debugger-popup ;
 
@@ -123,7 +120,7 @@ M: engine-word word-completion-string
 
 : listener-thread ( listener -- )
     dup listener-streams [
-        [ ui-help-hook ] help-hook set
+        [ browser-window ] help-hook set
         [ '[ _ ui-error-hook ] error-hook set ]
         [ '[ _ ui-inspector-hook ] inspector-hook set ] bi
         welcome.
@@ -164,7 +161,7 @@ M: engine-word word-completion-string
         init-listener
         dup <listener-scroller> 1 track-add ;
 
-: listener-help ( -- ) "ui-listener" help-window ;
+: listener-help ( -- ) "ui-listener" browser-window ;
 
 \ listener-help H{ { +nullary+ t } } define-command
 

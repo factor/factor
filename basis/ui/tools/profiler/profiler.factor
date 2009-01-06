@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.tools.workspace kernel quotations accessors fry
+USING: ui.tools.browser kernel quotations accessors fry
 assocs present math.order math.vectors arrays locals
 models.search models.sort models sequences vocabs
 tools.profiler ui ui.commands ui.gadgets ui.gadgets.panes
@@ -136,7 +136,7 @@ M: method-renderer row-columns
 
 M: profiler-gadget pref-dim* call-next-method { 700 400 } vmax ;
 
-: profiler-help ( -- ) "ui-profiler" help-window ;
+: profiler-help ( -- ) "ui-profiler" browser-window ;
 
 \ profiler-help H{ { +nullary+ t } } define-command
 

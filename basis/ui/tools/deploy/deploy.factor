@@ -1,11 +1,12 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.gadgets colors kernel ui.render namespaces models
-models.mapping sequences ui.gadgets.buttons ui.gadgets.packs
-ui.gadgets.labels tools.deploy.config tools.deploy.config.editor
-namespaces ui.gadgets.editors ui.gadgets.borders ui.gestures
+USING: colors kernel namespaces models tools.deploy.config
+tools.deploy.config.editor tools.deploy vocabs
+namespaces models.mapping sequences system accessors fry
+ui.gadgets ui.render ui.gadgets.buttons ui.gadgets.packs
+ui.gadgets.labels ui.gadgets.editors ui.gadgets.borders ui.gestures
 ui.commands assocs ui.gadgets.tracks ui ui.tools.listener
-tools.deploy vocabs ui.tools.workspace system accessors fry ;
+ui.tools.browser ;
 IN: ui.tools.deploy
 
 TUPLE: deploy-gadget < pack vocab settings ;
@@ -81,7 +82,7 @@ TUPLE: deploy-gadget < pack vocab settings ;
     close-window ;
 
 : com-help ( -- )
-    "ui.tools.deploy" help-window ;
+    "ui.tools.deploy" browser-window ;
 
 \ com-help H{
     { +nullary+ t }

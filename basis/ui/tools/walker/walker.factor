@@ -1,9 +1,9 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel concurrency.messaging inspector
 ui.tools.listener ui.tools.traceback ui.gadgets.buttons
 ui.gadgets.status-bar ui.gadgets.tracks ui.commands ui.gadgets
-models models.filter ui.tools.workspace ui.gestures
+models models.filter ui.tools.browser ui.gestures
 ui.gadgets.labels ui threads namespaces make tools.walker assocs
 combinators fry ;
 IN: ui.tools.walker
@@ -66,7 +66,7 @@ M: walker-gadget focusable-child*
         dup status>> self <thread-status> f track-add
         dup traceback>> 1 track-add ;
     
-: walker-help ( -- ) "ui-walker" help-window ;
+: walker-help ( -- ) "ui-walker" browser-window ;
 
 \ walker-help H{ { +nullary+ t } } define-command
 

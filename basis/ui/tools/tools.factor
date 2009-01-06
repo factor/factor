@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs debugger ui.tools.workspace
 ui.tools.operations ui.tools.traceback ui.tools.browser
@@ -20,9 +20,8 @@ IN: ui.tools
 
 : <workspace-book> ( workspace -- gadget )
         <gadget>
-        <browser-gadget>
         <inspector-gadget>
-    3array
+    2array
     swap model>> <book> ;
   
 : <workspace> ( -- workspace )
@@ -57,14 +56,11 @@ M: workspace model-changed
 
 : com-listener ( workspace -- ) 0 select-tool ;
 
-: com-browser ( workspace -- ) 1 select-tool ;
-
-: com-inspector ( workspace -- ) 2 select-tool ;
+: com-inspector ( workspace -- ) 1 select-tool ;
 
 workspace "tool-switching" f {
     { T{ key-down f { A+ } "1" } com-listener }
-    { T{ key-down f { A+ } "2" } com-browser }
-    { T{ key-down f { A+ } "3" } com-inspector }
+    { T{ key-down f { A+ } "2" } com-inspector }
 } define-command-map
 
 workspace "multi-touch" f {

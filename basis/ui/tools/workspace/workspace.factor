@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes continuations help help.topics kernel models
 sequences assocs arrays namespaces accessors math.vectors fry ui
@@ -45,16 +45,6 @@ M: gadget tool-scroller drop f ;
 : get-tool ( class -- gadget )
     get-workspace find-tool nip ;
 
-: <help-pane> ( topic -- pane )
-    <pane> [ [ help ] with-pane ] keep ;
-
-: help-window ( topic -- )
-    [
-        <help-pane> <limited-scroller>
-            { 550 700 } >>max-dim
-    ] [ article-title ] bi
-    open-window ;
-
 : hide-popup ( workspace -- )
     dup popup>> track-remove
     f >>popup
@@ -90,15 +80,4 @@ M: workspace focusable-child*
 M: workspace tool-scroller ( workspace -- scroller )
     workspace-page tool-scroller ;
 
-: com-scroll-up ( workspace -- )
-    tool-scroller [ scroll-up-page ] when* ;
 
-: com-scroll-down ( workspace -- )
-    tool-scroller [ scroll-down-page ] when* ;
-
-workspace "scrolling"
-"The current tool's scroll pane can be scrolled from the keyboard."
-{
-    { T{ key-down f { C+ } "PAGE_UP" } com-scroll-up }
-    { T{ key-down f { C+ } "PAGE_DOWN" } com-scroll-down }
-} define-command-map
