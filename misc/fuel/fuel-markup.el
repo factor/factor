@@ -84,7 +84,11 @@
 ;;; Markup printers:
 
 (defconst fuel-markup--printers
-  '(($class-description . fuel-markup--class-description)
+  '(($all-tags . fuel-markup--all-tags)
+    ($all-authors . fuel-markup--all-authors)
+    ($author . fuel-markup--author)
+    ($authors . fuel-markup--authors)
+    ($class-description . fuel-markup--class-description)
     ($code . fuel-markup--code)
     ($command . fuel-markup--command)
     ($contract . fuel-markup--contract)
@@ -129,6 +133,8 @@
     ($synopsis . fuel-markup--synopsis)
     ($syntax . fuel-markup--syntax)
     ($table . fuel-markup--table)
+    ($tag . fuel-markup--tag)
+    ($tags . fuel-markup--tags)
     ($unchecked-example . fuel-markup--example)
     ($value . fuel-markup--value)
     ($values . fuel-markup--values)
@@ -335,6 +341,42 @@
   (fuel-markup--insert-heading "Vocabulary: " t)
   (fuel-markup--vocab-link (cons '$vocab-link (cdr e)))
   (newline))
+
+(defun fuel-markup--tag (e)
+  (fuel-markup--link (list '$link (cadr e) (cadr e) 'tag)))
+
+(defun fuel-markup--tags (e)
+  (when (cdr e)
+    (fuel-markup--insert-heading "Tags: " t)
+    (dolist (tag (cdr e))
+      (fuel-markup--tag (list '$tag tag))
+      (insert ", "))
+    (delete-backward-char 2)
+    (fuel-markup--insert-newline)))
+
+(defun fuel-markup--all-tags (e)
+  (let* ((cmd `(:fuel* (all-tags :get) "fuel" t))
+         (tags (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+    (fuel-markup--list
+     (cons '$list (mapcar (lambda (tag) (list '$link tag tag 'tag)) tags)))))
+
+(defun fuel-markup--author (e)
+  (fuel-markup--link (list '$link (cadr e) (cadr e) 'author)))
+
+(defun fuel-markup--authors (e)
+  (when (cdr e)
+    (fuel-markup--insert-heading "Authors: " t)
+    (dolist (a (cdr e))
+      (fuel-markup--author (list '$author a))
+      (insert ", "))
+    (delete-backward-char 2)
+    (fuel-markup--insert-newline)))
+
+(defun fuel-markup--all-authors (e)
+  (let* ((cmd `(:fuel* (all-authors :get) "fuel" t))
+         (authors (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+    (fuel-markup--list
+     (cons '$list (mapcar (lambda (a) (list '$link a a 'author)) authors)))))
 
 (defun fuel-markup--list (e)
   (fuel-markup--insert-nl-if-nb)

@@ -319,13 +319,15 @@ SYMBOL: vocab-list
     ] { } assoc>map [  ] filter ;
 
 : fuel-vocab-children-help ( name -- element )
-    all-child-vocabs fuel-vocab-children ;
+    all-child-vocabs fuel-vocab-children ; inline
 
 : (fuel-vocab-help) ( name -- element )
     \ article swap dup >vocab-link
     [
         {
-            [ summary [ , ] [ "No summary available" , ] if* ]
+            [ vocab-authors [ \ $authors prefix , ] when* ]
+            [ vocab-tags [ \ $tags prefix , ] when* ]
+            [ summary [ { $heading "Summary" } swap 2array , ] when* ]
             [ drop \ $nl , ]
             [ vocab-help [ article content>> % ] when* ]
             [ name>> fuel-vocab-children-help % ]
@@ -341,6 +343,21 @@ SYMBOL: vocab-list
 
 : fuel-index ( quot: ( -- seq ) -- )
     call (fuel-index) fuel-eval-set-result ; inline
+
+MEMO: (fuel-get-vocabs/author) ( author -- element )
+    [ "Vocabularies by " prepend \ $heading swap 2array ]
+    [ authored fuel-vocab-children ] bi 2array ;
+
+: fuel-get-vocabs/author ( author -- )
+    (fuel-get-vocabs/author) fuel-eval-set-result ;
+
+MEMO: (fuel-get-vocabs/tag ( tag -- element )
+    [ "Vocabularies tagged " prepend \ $heading swap 2array ]
+    [ tagged fuel-vocab-children ] bi 2array ;
+
+: fuel-get-vocabs/tag ( tag -- )
+    (fuel-get-vocabs/tag fuel-eval-set-result ;
+
 
 ! -run=fuel support
 
