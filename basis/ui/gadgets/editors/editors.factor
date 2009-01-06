@@ -442,8 +442,6 @@ editor "caret-motion" f {
     { T{ button-down } position-caret }
     { T{ key-down f f "LEFT" } previous-character }
     { T{ key-down f f "RIGHT" } next-character }
-    { T{ key-down f f "UP" } previous-line }
-    { T{ key-down f f "DOWN" } next-line }
     { T{ key-down f { C+ } "LEFT" } previous-word }
     { T{ key-down f { C+ } "RIGHT" } next-word }
     { T{ key-down f f "HOME" } start-of-line }
@@ -507,8 +505,6 @@ editor "selection" f {
     { T{ key-down f { C+ } "l" } select-line }
     { T{ key-down f { S+ } "LEFT" } select-previous-character }
     { T{ key-down f { S+ } "RIGHT" } select-next-character }
-    { T{ key-down f { S+ } "UP" } select-previous-line }
-    { T{ key-down f { S+ } "DOWN" } select-next-line }
     { T{ key-down f { S+ C+ } "LEFT" } select-previous-word }
     { T{ key-down f { S+ C+ } "RIGHT" } select-next-word }
     { T{ key-down f { S+ } "HOME" } select-start-of-line }
@@ -531,6 +527,10 @@ TUPLE: multiline-editor < editor ;
     multiline-editor new-editor ;
 
 multiline-editor "general" f {
+    { T{ key-down f f "UP" } previous-line }
+    { T{ key-down f f "DOWN" } next-line }
+    { T{ key-down f { S+ } "UP" } select-previous-line }
+    { T{ key-down f { S+ } "DOWN" } select-next-line }
     { T{ key-down f f "RET" } insert-newline }
     { T{ key-down f { S+ } "RET" } insert-newline }
     { T{ key-down f f "ENTER" } insert-newline }
