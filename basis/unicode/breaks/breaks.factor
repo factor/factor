@@ -7,11 +7,15 @@ io.encodings.ascii unicode.syntax unicode.data compiler.units
 alien.syntax sets ;
 IN: unicode.breaks
 
-C-ENUM: Any L V T Extend Control CR LF graphemes ;
+C-ENUM: Any L V T LV LVT Extend Control CR LF
+    SpacingMark Prepend graphemes ;
 
 : jamo-class ( ch -- class )
     dup initial? [ drop L ]
     [ dup medial? [ drop V ] [ final? T Any ? ] if ] if ;
+
+: hangul-class ( ch -- class )
+    hangul-base - HEX: 1C mod zero? LV LVT ? ;
 
 CATEGORY: grapheme-control Zl Zp Cc Cf ;
 : control-class ( ch -- class )
@@ -27,11 +31,19 @@ CATEGORY: (extend) Me Mn ;
 : extend? ( ch -- ? )
     { [ (extend)? ] [ "Other_Grapheme_Extend" property? ] } 1|| ;
 
+: loe? ( ch -- ? )
+    "Logical_Order_Exception" property? ;
+
+CATEGORY: spacing Mc ;
+
 : grapheme-class ( ch -- class )
     {
         { [ dup jamo? ] [ jamo-class ] }
+        { [ dup hangul? ] [ hangul-class ] }
         { [ dup grapheme-control? ] [ control-class ] }
-        { [ extend? ] [ Extend ] }
+        { [ dup extend? ] [ drop Extend ] }
+        { [ dup spacing? ] [ drop SpacingMark ] }
+        { [ loe? ] [ Prepend ] }
         [ Any ]
     } cond ;
 
@@ -61,10 +73,14 @@ SYMBOL: table
 : make-grapheme-table ( -- )
     CR LF connect
     Control CR LF 3array graphemes break-around
-    L L V 2array connect-before
+    L L V LV LVT 4array connect-before
     V V T 2array connect-before
+    LV V T 2array connect-before
     T T connect
-    graphemes Extend connect-after ;
+    LVT T connect
+    graphemes Extend connect-after
+    graphemes SpacingMark connect-after
+    Prepend graphemes connect-before ;
 
 VALUE: grapheme-table
 
