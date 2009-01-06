@@ -4,7 +4,7 @@ USING: combinators.short-circuit assocs math kernel sequences
 io.files hashtables quotations splitting grouping arrays
 math.parser hash2 math.order byte-arrays words namespaces words
 compiler.units parser io.encodings.ascii values interval-maps
-ascii sets combinators locals math.ranges sorting ;
+ascii sets combinators locals math.ranges sorting make ;
 IN: unicode.data
 
 VALUE: simple-lower
@@ -102,6 +102,7 @@ VALUE: properties
       "Cc" "Cf" "Cs" "Co" } ;
 
 : num-chars HEX: 2FA1E ;
+
 ! the maximum unicode char in the first 3 planes
 
 : ?set-nth ( val index seq -- )

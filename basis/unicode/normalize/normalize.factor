@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences namespaces make unicode.data kernel math arrays
-locals sorting.insertion accessors ;
+locals sorting.insertion accessors assocs ;
 IN: unicode.normalize
 
 ! Conjoining Jamo behavior
@@ -117,16 +117,17 @@ SYMBOL: char
 : pass-combining ( -- )
     current non-starter? [ current , to pass-combining ] when ;
 
-: try-compose ( last-class char current-class -- )
-    swapd = [ after get push ] [
-        char get over combine-chars
-        [ nip char set ] [ after get push ] if*
+:: try-compose ( last-class new-char current-class -- new-class )
+    last-class current-class = [ new-char after get push last-class ] [
+        char get new-char combine-chars
+        [ char set last-class ]
+        [ new-char after get push current-class ] if*
     ] if ;
 
-: compose-iter ( n -- )
+: compose-iter ( last-class -- )
     current [
         dup combining-class dup
-        [ [ try-compose ] keep to compose-iter ] [ 3drop ] if
+        [ try-compose to compose-iter ] [ 3drop ] if
     ] [ drop ] if* ;
 
 : ?new-after ( -- )
@@ -138,7 +139,6 @@ SYMBOL: char
             char set to ?new-after
             0 compose-iter
             char get , after get %
-            to
         ] if (compose)
     ] when* ;
 
