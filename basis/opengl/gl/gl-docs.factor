@@ -8,7 +8,7 @@ ARTICLE: "opengl-low-level" "OpenGL binding"
   { $subsection "opengl-geometric-primitives" }
   { $subsection "opengl-modeling-transformations" } ;
 
-ARTICLE: "opengl-specifying-vertices" "Specifying Vertices"
+ARTICLE: "opengl-specifying-vertices" "Specifying vertices"
 
   { $subsection glVertex2d }
   { $subsection glVertex2f }
@@ -35,7 +35,7 @@ ARTICLE: "opengl-specifying-vertices" "Specifying Vertices"
   { $subsection glVertex4iv }
   { $subsection glVertex4sv } ;
 
-ARTICLE: "opengl-geometric-primitives" "OpenGL Geometric Primitives"
+ARTICLE: "opengl-geometric-primitives" "OpenGL geometric primitives"
 
   { $table
       { { $link GL_POINTS         } "individual points" }
@@ -70,7 +70,7 @@ HELP: glPolygonMode
                          { $link GL_LINE }
                          { $link GL_FILL } } } } } ;
 
-ARTICLE: "opengl-modeling-transformations" "Modeling Transformations"
+ARTICLE: "opengl-modeling-transformations" "Modeling transformations"
   { $subsection glTranslatef }
   { $subsection glTranslated }
   { $subsection glRotatef }
