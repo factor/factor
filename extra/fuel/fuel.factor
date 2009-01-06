@@ -299,9 +299,7 @@ MEMO: fuel-find-word ( name -- word/f )
     fuel-eval-set-result ; inline
 
 : fuel-vocab-help-row ( vocab -- element )
-    [ vocab-name ]
-    [ dup summary " " append swap vocab-status-string append ]
-    bi 2array ;
+    [ vocab-status-string ] [ vocab-name ] [ summary ] tri 3array ;
 
 : fuel-vocab-help-root-heading ( root -- element )
     [ "Children from " prepend ] [ "Other children" ] if* \ $heading swap 2array ;

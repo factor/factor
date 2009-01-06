@@ -16,9 +16,9 @@
 (require 'fuel-eval)
 (require 'fuel-font-lock)
 (require 'fuel-base)
+(require 'fuel-table)
 
 (require 'button)
-(require 'table)
 
 
 ;;; Customization:
@@ -319,7 +319,9 @@
 
 (defun fuel-markup--vocab-list (e)
   (let ((rows (mapcar '(lambda (elem)
-                         (list (list '$vocab-link (car elem)) (cadr elem)))
+                         (list (car elem)
+                               (list '$vocab-link (cadr elem))
+                               (caddr elem)))
                       (cdr e))))
     (fuel-markup--table (cons '$table rows))))
 
@@ -345,27 +347,9 @@
   (fuel-markup--insert-newline)
   (delete-blank-lines)
   (newline)
-  (let* ((table-time-before-update 0)
-         (table-time-before-reformat 0)
-         (start (point))
-         (col-delim "<~end-of-col~>")
-         (col-no (length (cadr e)))
-         (width (/ (- (window-width) 10) col-no))
-         (step 100)
-         (count 0)
-         (inst '(lambda ()
-                  (table-capture start (point) col-delim nil nil width col-no)
-                  (goto-char (point-max))
-                  (table-recognize -1)
-                  (newline)
-                  (setq start (point)))))
-    (dolist (row (cdr e))
-      (dolist (col row)
-        (fuel-markup--print col)
-        (insert col-delim)
-        (setq count (1+ count))
-        (when (zerop (mod count step)) (funcall inst))))
-    (unless (zerop (mod count step)) (funcall inst))))
+  (fuel-table--insert
+   (mapcar '(lambda (row) (mapcar 'fuel-markup--print-str row)) (cdr e)))
+  (newline))
 
 (defun fuel-markup--instance (e)
   (insert " an instance of ")
