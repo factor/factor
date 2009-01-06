@@ -95,6 +95,7 @@ beast.
 *** In the help browser:
 
     - h : help for word at point
+    - v : help for a vocabulary
     - a : find words containing given substring (M-x fuel-apropos)
     - e : edit current article
     - ba : bookmark current page

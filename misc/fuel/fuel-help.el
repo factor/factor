@@ -232,6 +232,11 @@ buffer."
   (interactive)
   (fuel-help--word-help))
 
+(defun fuel-help-vocab (vocab)
+  "Ask for a vocabulary name and show its help page."
+  (interactive (list (fuel-edit--read-vocabulary-name nil)))
+  (fuel-help--get-vocab vocab))
+
 (defun fuel-help-next (&optional forget-current)
   "Go to next page in help browser.
 With prefix, the current page is deleted from history."
@@ -298,6 +303,7 @@ With prefix, the current page is deleted from history."
     (define-key map "l" 'fuel-help-previous)
     (define-key map "p" 'fuel-help-previous)
     (define-key map "r" 'fuel-help-refresh)
+    (define-key map "v" 'fuel-help-vocab)
     (define-key map (kbd "SPC")  'scroll-up)
     (define-key map (kbd "S-SPC") 'scroll-down)
     (define-key map "\M-." 'fuel-edit-word-at-point)
