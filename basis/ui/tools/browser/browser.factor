@@ -5,7 +5,7 @@ assocs words vocabs accessors fry combinators.short-circuit
 models models.history tools.apropos ui.tools.workspace
 ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.gadgets.buttons ui.gadgets.packs
-ui.gadgets.editors ui.gadgets.labels ui ;
+ui.gadgets.editors ui.gadgets.labels ui.gadgets.status-bar ui ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < track pane scroller search-field ;
@@ -34,8 +34,8 @@ TUPLE: browser-gadget < track pane scroller search-field ;
 
 : <help-pane-scroller> ( browser -- scroller )
     pane>> <limited-scroller>
-        { 550 700 } >>max-dim
-        { 550 700 } >>min-dim ;
+        { 550 400 } >>max-dim
+        { 550 400 } >>min-dim ;
 
 : <browser-gadget> ( link -- gadget )
     { 0 1 } browser-gadget new-track
@@ -65,15 +65,13 @@ M: browser-gadget definitions-changed ( assoc browser -- )
 
 M: browser-gadget focusable-child* search-field>> ;
 
-: open-browser-window ( link -- )
-    <browser-gadget> "Browser" open-window ;
-
-: browser-window ( link -- )
+: com-follow ( link -- )
     [ browser-gadget? ] find-window
     [ [ raise-window ] [ gadget-child show-help ] bi ]
-    [ open-browser-window ] if* ;
+    [ <browser-gadget> "Browser" open-status-window ] if* ;
 
-: com-follow ( link -- ) browser-window ;
+: browser-window ( -- )
+    "handbook" com-follow ;
 
 : com-back ( browser -- ) model>> go-back ;
 
@@ -81,7 +79,7 @@ M: browser-gadget focusable-child* search-field>> ;
 
 : com-documentation ( browser -- ) "handbook" swap show-help ;
 
-: browser-help ( -- ) "ui-browser" browser-window ;
+: browser-help ( -- ) "ui-browser" com-follow ;
 
 \ browser-help H{ { +nullary+ t } } define-command
 

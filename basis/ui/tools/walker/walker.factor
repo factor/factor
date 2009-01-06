@@ -66,7 +66,7 @@ M: walker-gadget focusable-child*
         dup status>> self <thread-status> f track-add
         dup traceback>> 1 track-add ;
     
-: walker-help ( -- ) "ui-walker" browser-window ;
+: walker-help ( -- ) "ui-walker" com-follow ;
 
 \ walker-help H{ { +nullary+ t } } define-command
 

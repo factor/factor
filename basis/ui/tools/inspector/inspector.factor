@@ -31,7 +31,7 @@ TUPLE: inspector-gadget < track object pane ;
 
 \ &globals H{ { +nullary+ t } { +listener+ t } } define-command
 
-: inspector-help ( -- ) "ui-inspector" browser-window ;
+: inspector-help ( -- ) "ui-inspector" com-follow ;
 
 \ inspector-help H{ { +nullary+ t } } define-command
 

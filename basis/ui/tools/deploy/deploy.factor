@@ -82,7 +82,7 @@ TUPLE: deploy-gadget < pack vocab settings ;
     close-window ;
 
 : com-help ( -- )
-    "ui.tools.deploy" browser-window ;
+    "ui.tools.deploy" com-follow ;
 
 \ com-help H{
     { +nullary+ t }

@@ -136,7 +136,7 @@ M: method-renderer row-columns
 
 M: profiler-gadget pref-dim* call-next-method { 700 400 } vmax ;
 
-: profiler-help ( -- ) "ui-profiler" browser-window ;
+: profiler-help ( -- ) "ui-profiler" com-follow ;
 
 \ profiler-help H{ { +nullary+ t } } define-command
 

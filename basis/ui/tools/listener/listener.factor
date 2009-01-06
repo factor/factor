@@ -120,7 +120,7 @@ M: engine-word word-completion-string
 
 : listener-thread ( listener -- )
     dup listener-streams [
-        [ browser-window ] help-hook set
+        [ com-follow ] help-hook set
         [ '[ _ ui-error-hook ] error-hook set ]
         [ '[ _ ui-inspector-hook ] inspector-hook set ] bi
         welcome.
@@ -161,7 +161,7 @@ M: engine-word word-completion-string
         init-listener
         dup <listener-scroller> 1 track-add ;
 
-: listener-help ( -- ) "ui-listener" browser-window ;
+: listener-help ( -- ) "ui-listener" com-follow ;
 
 \ listener-help H{ { +nullary+ t } } define-command
 
