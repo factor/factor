@@ -4,7 +4,7 @@ USING: combinators.short-circuit assocs math kernel sequences
 io.files hashtables quotations splitting grouping arrays
 math.parser hash2 math.order byte-arrays words namespaces words
 compiler.units parser io.encodings.ascii values interval-maps
-ascii sets combinators locals math.ranges sorting make ;
+ascii sets combinators locals math.ranges sorting make io.encodings.utf8 ;
 IN: unicode.data
 
 VALUE: simple-lower
@@ -70,10 +70,20 @@ VALUE: properties
     5 swap (process-data)
     [ " " split [ hex> ] map ] assoc-map ;
 
+: exclusions-file ( -- filename )
+    "resource:basis/unicode/data/CompositionExclusions.txt" ;
+
+: exclusions ( -- set )
+    exclusions-file utf8 file-lines
+    [ "#" split1 drop [ blank? ] trim-right hex> ] map harvest ;
+
+: remove-exclusions ( alist -- alist )
+    exclusions [ dup ] H{ } map>assoc assoc-diff ;
+
 : process-canonical ( data -- hash2 hash )
     (process-decomposed) [ first* ] filter
     [
-        [ second length 2 = ] filter
+        [ second length 2 = ] filter remove-exclusions
         ! using 1009 as the size, the maximum load is 4
         [ first2 first2 rot 3array ] map 1009 alist>hash2
     ] [ >hashtable chain-decomposed ] bi ;

@@ -107,12 +107,12 @@ SYMBOL: char
     current to current to current jamo>hangul , ;
 
 : im, ( -- )
-    current to current 0 jamo>hangul , ;
+    current to current final-base jamo>hangul , ;
 
 : compose-jamo ( -- )
     initial-medial? [
         --final? [ imf, ] [ im, ] if
-    ] when to current jamo? [ compose-jamo ] when ;
+    ] [ current , ] if to ;
 
 : pass-combining ( -- )
     current non-starter? [ current , to pass-combining ] when ;
@@ -124,10 +124,17 @@ SYMBOL: char
         [ new-char after get push current-class ] if*
     ] if ;
 
+DEFER: compose-iter
+
+: try-noncombining ( char -- )
+    char get swap combine-chars
+    [ char set to f compose-iter ] when* ;
+
 : compose-iter ( last-class -- )
     current [
-        dup combining-class dup
-        [ try-compose to compose-iter ] [ 3drop ] if
+        dup combining-class
+        [ try-compose to compose-iter ]
+        [ swap [ drop ] [ try-noncombining ] if ] if*
     ] [ drop ] if* ;
 
 : ?new-after ( -- )
@@ -137,7 +144,7 @@ SYMBOL: char
     current [
         dup jamo? [ drop compose-jamo ] [
             char set to ?new-after
-            0 compose-iter
+            f compose-iter
             char get , after get %
         ] if (compose)
     ] when* ;
