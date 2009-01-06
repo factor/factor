@@ -167,7 +167,7 @@ stand-alone
     } cond ;
 
 : escape-link ( href text -- href-esc text-esc )
-    [ check-url escape-quoted-string ] dip escape-string ;
+    [ check-url ] dip escape-string ;
 
 : write-link ( href text -- )
     escape-link
