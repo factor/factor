@@ -163,6 +163,7 @@ SYMBOL: interactive-vocabs
     "inspector"
     "io"
     "io.files"
+    "io.pathnames"
     "kernel"
     "listener"
     "math"
