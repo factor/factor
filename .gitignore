@@ -21,3 +21,4 @@ logs
 work
 build-support/wordsize
 *.bak
+.#*
