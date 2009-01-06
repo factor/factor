@@ -247,7 +247,7 @@ table H{
     { T{ gain-focus } [ t >>focused? drop ] }
     { T{ lose-focus } [ f >>focused? drop ] }
     { T{ drag } [ table-button-down ] }
-    { T{ key-down f f "ENTER" } [ row-action ] }
+    { T{ key-down f f "RET" } [ row-action ] }
     { T{ key-down f f "UP" } [ prev-row ] }
     { T{ key-down f f "DOWN" } [ next-row ] }
     { T{ key-down f f "HOME" } [ first-row ] }
