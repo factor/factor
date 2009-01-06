@@ -9,7 +9,7 @@ ui.gadgets.presentations ui.gadgets.status-bar ui.commands
 ui.gestures ;
 IN: ui.tools.workspace
 
-TUPLE: workspace < track book listener popup ;
+TUPLE: workspace < track listener popup ;
 
 : find-workspace ( gadget -- workspace ) [ workspace? ] find-parent ;
 
@@ -19,31 +19,12 @@ SYMBOL: workspace-window-hook
 
 : workspace-window ( -- ) workspace-window* drop ;
 
-GENERIC: call-tool* ( arg tool -- )
-
-GENERIC: tool-scroller ( tool -- scroller )
-
-M: gadget tool-scroller drop f ;
-
-: find-tool ( class workspace -- index tool )
-    book>> children>> [ class eq? ] with find ;
-
-: show-tool ( class workspace -- tool )
-    [ find-tool swap ] keep book>> model>>
-    set-model ;
-
 : get-workspace* ( quot -- workspace )
     '[ dup workspace? _ [ drop f ] if ] find-window
     [ dup raise-window gadget-child ]
     [ workspace-window* ] if* ; inline
 
 : get-workspace ( -- workspace ) [ drop t ] get-workspace* ;
-
-: call-tool ( arg class -- )
-    get-workspace show-tool call-tool* ;
-
-: get-tool ( class -- gadget )
-    get-workspace find-tool nip ;
 
 : hide-popup ( workspace -- )
     dup popup>> track-remove
@@ -72,12 +53,6 @@ SYMBOL: workspace-dim
 M: workspace pref-dim* call-next-method workspace-dim get vmax ;
 
 M: workspace focusable-child*
-    dup popup>> [ ] [ listener>> ] ?if ;
-
-: workspace-page ( workspace -- gadget )
-    book>> current-page ;
-
-M: workspace tool-scroller ( workspace -- scroller )
-    workspace-page tool-scroller ;
+    [ popup>> ] [ listener>> ] bi or ;
 
 

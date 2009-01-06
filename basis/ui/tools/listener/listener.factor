@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: inspector help help.markup io io.styles kernel models
+USING: inspector help help.markup io io.styles kernel models strings
 namespaces parser quotations sequences vocabs words prettyprint
 listener debugger threads boxes concurrency.flags math arrays
 generic accessors combinators assocs fry ui.commands ui.gadgets
@@ -27,12 +27,6 @@ TUPLE: listener-gadget < track input output ;
 M: listener-gadget focusable-child*
     input>> ;
 
-M: listener-gadget call-tool* ( input listener -- )
-    [ string>> ] dip input>> set-editor-string ;
-
-M: listener-gadget tool-scroller
-    output>> find-scroller ;
-
 : wait-for-listener ( listener -- )
     #! Wait for the listener to start.
     input>> flag>> wait-for-flag ;
@@ -40,7 +34,11 @@ M: listener-gadget tool-scroller
 : workspace-busy? ( workspace -- ? )
     listener>> input>> interactor-busy? ;
 
-: listener-input ( string -- )
+GENERIC: listener-input ( obj -- )
+
+M: input listener-input string>> listener-input ;
+
+M: string listener-input
     get-workspace listener>> input>>
     [ set-editor-string ] [ request-focus ] bi ;
 
@@ -114,15 +112,10 @@ M: engine-word word-completion-string
 : ui-error-hook ( error listener -- )
     find-workspace debugger-popup ;
 
-: ui-inspector-hook ( obj listener -- )
-    find-workspace inspector-gadget
-    swap show-tool inspect-object ;
-
 : listener-thread ( listener -- )
     dup listener-streams [
         [ com-follow ] help-hook set
-        [ '[ _ ui-error-hook ] error-hook set ]
-        [ '[ _ ui-inspector-hook ] inspector-hook set ] bi
+        '[ _ ui-error-hook ] error-hook set
         welcome.
         listener
     ] with-streams* ;
@@ -181,10 +174,6 @@ listener-gadget "toolbar" f {
     { T{ key-down f { A+ } "K" } clear-stack }
     { T{ key-down f { C+ } "d" } com-end }
 } define-command-map
-
-M: listener-gadget handle-gesture ( gesture gadget -- ? )
-    2dup find-workspace workspace-page handle-gesture
-    [ call-next-method ] [ 2drop f ] if ;
 
 M: listener-gadget graft*
     [ call-next-method ] [ restart-listener ] bi ;

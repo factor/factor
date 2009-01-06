@@ -1,12 +1,13 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations definitions ui.tools.browser
 ui.tools.interactor ui.tools.listener ui.tools.profiler
-ui.tools.search ui.tools.traceback ui.tools.workspace generic
-help.topics stack-checker summary inspector io.pathnames
-io.styles kernel namespaces parser prettyprint quotations
-tools.annotations editors tools.profiler tools.test tools.time
-tools.walker ui.commands ui.gadgets.editors ui.gestures
+ui.tools.inspector ui.tools.search ui.tools.traceback
+ui.tools.workspace generic help.topics stack-checker
+summary io.pathnames io.styles kernel namespaces parser
+prettyprint quotations tools.annotations editors
+tools.profiler tools.test tools.time tools.walker
+ui.commands ui.gadgets.editors ui.gestures
 ui.operations ui.tools.deploy vocabs vocabs.loader words
 sequences tools.vocabs classes compiler.units accessors
 vocabs.parser ;
@@ -15,7 +16,7 @@ IN: ui.tools.operations
 V{ } clone operations set-global
 
 ! Objects
-[ drop t ] \ inspect H{
+[ drop t ] \ inspector-window H{
     { +primary+ t }
     { +listener+ t }
 } define-operation
