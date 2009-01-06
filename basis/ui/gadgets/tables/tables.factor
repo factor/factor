@@ -3,8 +3,8 @@
 USING: accessors arrays colors fry io.styles kernel math
 math.geometry.rect math.order math.vectors namespaces opengl
 sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.worlds ui.gestures ui.render models math.ranges sequences
-combinators ;
+ui.gadgets.worlds ui.gadgets.theme ui.gestures ui.render models
+math.ranges sequences combinators ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -15,7 +15,7 @@ SINGLETON: trivial-renderer
 M: trivial-renderer row-columns drop ;
 
 TUPLE: table < gadget
-renderer filled-column column-alignment
+renderer filled-column column-alignment action
 column-widths total-width
 font text-color selection-color mouse-color
 selected-index selected-value
@@ -26,9 +26,10 @@ focused? ;
     table new-gadget
         swap >>model
         trivial-renderer >>renderer
+        [ drop ] >>action
         f <model> >>selected-value
-        { "sans-serif" plain 12 } >>font
-        T{ rgba f 0.8 0.8 1.0 1.0 } >>selection-color
+        sans-serif-font >>font
+        selection-color >>selection-color
         black >>mouse-color
         black >>text-color ;
 
@@ -103,17 +104,17 @@ M: table layout*
 : validate-row ( m table -- n )
     control-value length 1- min 0 max ;
 
-: first-visible-row ( table -- n )
-    [
-        [ clip get loc>> second origin get second - ] dip
+: visible-row ( table quot -- n )
+    '[
+        [ clip get @ origin get [ second ] bi@ - ] dip
         y>row
-    ] keep validate-row ;
+    ] keep validate-row ; inline
+
+: first-visible-row ( table -- n )
+    [ loc>> ] visible-row ;
 
 : last-visible-row ( table -- n )
-    [
-        [ clip get rect-extent nip second origin get second - ] dip
-        y>row
-    ] keep validate-row 1+ ;
+    [ rect-extent nip ] visible-row 1+ ;
 
 : column-loc ( font column width align -- loc )
     [ [ [ open-font ] dip string-width ] dip swap - ] dip
@@ -188,25 +189,35 @@ M: table model-changed
 : (select-row) ( table row -- )
     over validate-row
     [ [ thin-row-rect ] [ drop ] 2bi scroll>rect ]
-    [ [ >>selected-index ] [ >>mouse-index ] bi relayout-1 ]
+    [ >>selected-index relayout-1 ]
     2bi ;
 
 : mouse-row ( table -- n )
     [ hand-rel second ] keep y>row ;
 
-: click-row ( table -- )
+: table-button-down ( table -- )
     dup request-focus
-    dup control-value empty?
-    [ drop ] [ dup mouse-row (select-row) ] if ;
+    dup control-value empty? [ drop ] [
+        dup [ mouse-row ] keep validate-row
+        [ >>mouse-index ] [ (select-row) ] bi
+    ] if ;
+
+: row-action ( table -- )
+    dup selected-row dup
+    [ swap action>> call ] [ 2drop ] if ;
+
+: table-button-up ( table -- )
+    hand-click# get 2 =
+    [ row-action ] [ update-selected-value ] if ;
 
 : select-row ( table row -- )
     [ (select-row) ] [ drop update-selected-value ] 2bi ;
 
 : prev-row ( table -- )
-    dup selected-index>> 1- select-row ;
+    dup selected-index>> [ 1- ] [ 0 ] if* select-row ;
 
 : next-row ( table -- )
-    dup selected-index>> 1+ select-row ;
+    dup selected-index>> [ 1+ ] [ 0 ] if* select-row ;
 
 : first-row ( table -- )
     0 select-row ;
@@ -231,11 +242,12 @@ table H{
     { T{ mouse-enter } [ show-mouse-help ] }
     { T{ mouse-leave } [ hide-mouse-help ] }
     { T{ motion } [ show-mouse-help ] }
-    { T{ button-down } [ click-row ] }
-    { T{ button-up } [ update-selected-value ] }
+    { T{ button-down } [ table-button-down ] }
+    { T{ button-up } [ table-button-up ] }
     { T{ gain-focus } [ t >>focused? drop ] }
     { T{ lose-focus } [ f >>focused? drop ] }
-    { T{ drag } [ click-row ] }
+    { T{ drag } [ table-button-down ] }
+    { T{ key-down f f "ENTER" } [ row-action ] }
     { T{ key-down f f "UP" } [ prev-row ] }
     { T{ key-down f f "DOWN" } [ next-row ] }
     { T{ key-down f f "HOME" } [ first-row ] }
