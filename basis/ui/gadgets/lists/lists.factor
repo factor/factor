@@ -1,17 +1,17 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ui.commands ui.gestures ui.render ui.gadgets
-ui.gadgets.labels ui.gadgets.scrollers
+USING: accessors math.vectors classes.tuple math.geometry.rect colors
 kernel sequences models opengl math math.order namespaces
+ui.commands ui.gestures ui.render ui.gadgets
+ui.gadgets.labels ui.gadgets.scrollers
 ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.packs
-math.vectors classes.tuple math.geometry.rect colors ;
-
+ui.gadgets.theme ;
 IN: ui.gadgets.lists
 
 TUPLE: list < pack index presenter color hook ;
 
 : list-theme ( list -- list )
-    T{ rgba f 0.8 0.8 1.0 1.0 } >>color ; inline
+    selection-color >>color ; inline
 
 : <list> ( hook presenter model -- gadget )
     list new-gadget
@@ -81,23 +81,21 @@ M: list focusable-child* drop t ;
     dup list-empty? [
         2drop
     ] [
-        [ control-value length rem ] keep
-        swap >>index
-        dup relayout-1
-        scroll>selected
+        tuck control-value length rem >>index
+        [ relayout-1 ] [ scroll>selected ] bi
     ] if ;
 
 : select-previous ( list -- )
-    dup index>> 1- swap select-index ;
+    [ index>> 1- ] keep select-index ;
 
 : select-next ( list -- )
-    dup index>> 1+ swap select-index ;
+    [ index>> 1+ ] keep select-index ;
 
 : invoke-value-action ( list -- )
     dup list-empty? [
         dup hook>> call
     ] [
-        dup index>> swap nth-gadget invoke-secondary
+        [ index>> ] keep nth-gadget invoke-secondary
     ] if ;
 
 : select-gadget ( gadget list -- )
