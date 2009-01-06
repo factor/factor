@@ -254,9 +254,7 @@ DEFER: default-L-parser-values
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: <L-system> < gadget
-  camera display-list
-  commands axiom rules string ;
+TUPLE: <L-system> < gadget camera display-list commands axiom rules string ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -332,7 +330,7 @@ TUPLE: <L-system> < gadget
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 :: iterate-L-system-string ( L-SYSTEM -- )
-  L-SYSTEM string>>
+  L-SYSTEM string>> L-SYSTEM axiom>> or
   L-SYSTEM rules>>
   iterate-string
   L-SYSTEM (>>string) ;
@@ -357,7 +355,7 @@ TUPLE: <L-system> < gadget
   L-SYSTEM display-list>> GL_COMPILE glNewList
 
     turtle
-    L-SYSTEM string>>
+    L-SYSTEM string>> L-SYSTEM axiom>> or
     L-SYSTEM commands>>
     interpret-string
     drop
@@ -403,15 +401,11 @@ M:: <L-system> pref-dim* ( L-SYSTEM -- dim ) { 400 400 } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-:: camera-left ( L-SYSTEM -- )
-  L-SYSTEM camera>> 5 turn-left drop
-  L-SYSTEM relayout-1 ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 :: with-camera ( L-SYSTEM QUOT -- )
   L-SYSTEM camera>> QUOT call drop
   L-SYSTEM relayout-1 ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 <L-system>
 H{
