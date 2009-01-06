@@ -21,11 +21,3 @@ IN: compiler.utilities
 : map-flat ( seq quot -- seq' ) [ each ] flattening ; inline
 
 : 2map-flat ( seq quot -- seq' ) [ 2each ] flattening ; inline
-
-: (3each) ( seq1 seq2 seq3 quot -- n quot' )
-    [ [ [ length ] tri@ min min ] 3keep ] dip
-    '[ [ _ nth-unsafe ] [ _ nth-unsafe ] [ _ nth-unsafe ] tri @ ] ; inline
-
-: 3each ( seq1 seq2 seq3 quot -- seq ) (3each) each ; inline
-
-: 3map ( seq1 seq2 seq3 quot -- seq ) (3each) map ; inline
