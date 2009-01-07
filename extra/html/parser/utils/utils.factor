@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs circular combinators continuations hashtables
 hashtables.private io kernel math namespaces prettyprint
-quotations sequences splitting state-parser strings ;
+quotations sequences splitting state-parser strings
+combinators.short-circuit ;
 IN: html.parser.utils
 
 : string-parse-end? ( -- ? ) get-next not ;
@@ -13,26 +14,26 @@ IN: html.parser.utils
     dup length rot length 1- - head next* ;
 
 : trim1 ( seq ch -- newseq )
-    [ ?head drop ] [ ?tail drop ] bi ;
+    [ [ ?head-slice drop ] [ ?tail-slice drop ] bi ] 2keep drop like ;
 
-: single-quote ( str -- newstr )
-    "'" dup surround ;
+: quote? ( ch -- ? ) "'\"" member? ;
 
-: double-quote ( str -- newstr )
-    "\"" dup surround ;
+: single-quote ( str -- newstr ) "'" dup surround ;
+
+: double-quote ( str -- newstr ) "\"" dup surround ;
 
 : quote ( str -- newstr )
     CHAR: ' over member?
     [ double-quote ] [ single-quote ] if ;
 
 : quoted? ( str -- ? )
-    [ f ]
-    [ [ first ] [ peek ] bi [ = ] keep "'\"" member? and ] if-empty ;
+    {
+        [ length 1 > ]
+        [ first quote? ]
+        [ [ first ] [ peek ] bi = ]
+    } 1&& ;
 
-: ?quote ( str -- newstr )
-    dup quoted? [ quote ] unless ;
+: ?quote ( str -- newstr ) dup quoted? [ quote ] unless ;
 
 : unquote ( str -- newstr )
     dup quoted? [ but-last-slice rest-slice >string ] when ;
-
-: quote? ( ch -- ? ) "'\"" member? ;

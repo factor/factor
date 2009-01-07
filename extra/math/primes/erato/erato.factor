@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Samuel Tardieu.
+! See http://factorcode.org/license.txt for BSD license.
 USING: bit-arrays kernel math math.functions math.ranges sequences ;
 IN: math.primes.erato
 

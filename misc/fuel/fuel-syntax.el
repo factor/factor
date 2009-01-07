@@ -1,6 +1,6 @@
 ;;; fuel-syntax.el --- auxiliar definitions for factor code navigation.
 
-;; Copyright (C) 2008  Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009  Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -48,7 +48,7 @@
     "DEFER:" "ERROR:" "EXCLUDE:" "FORGET:"
     "GENERIC#" "GENERIC:" "HEX:" "HOOK:"
     "IN:" "INSTANCE:" "INTERSECTION:"
-    "M:" "MACRO:" "MACRO::" "MAIN:" "MATH:" "MEMO:" "METHOD:" "MIXIN:"
+    "M:" "MACRO:" "MACRO::" "MAIN:" "MATH:" "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
     "OCT:" "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
     "REQUIRE:"  "REQUIRES:" "SINGLETON:" "SLOT:" "SYMBOL:" "SYMBOLS:"
     "TUPLE:" "t" "t?" "TYPEDEF:"
@@ -103,7 +103,8 @@
 (defconst fuel-syntax--sub-vocab-regex "^<\\([^ \n]+\\) *$")
 
 (defconst fuel-syntax--definition-starters-regex
-  (regexp-opt '("VARS" "TUPLE" "MACRO" "MACRO:" "M" "MEMO" "METHOD" ":" "")))
+  (regexp-opt
+   '("VARS" "TUPLE" "MACRO" "MACRO:" "M" "MEMO" "MEMO:" "METHOD" ":" "")))
 
 (defconst fuel-syntax--definition-start-regex
   (format "^\\(%s:\\) " fuel-syntax--definition-starters-regex))
