@@ -1,6 +1,6 @@
 USING: tools.test unicode.breaks sequences math kernel splitting
 unicode.categories io.pathnames io.encodings.utf8 io.files
-strings quotations math.parser ;
+strings quotations math.parser locals ;
 IN: unicode.breaks.tests
 
 [ "\u001112\u001161\u0011abA\u000300a\r\r\n" ]
@@ -10,21 +10,30 @@ IN: unicode.breaks.tests
         dup last-grapheme head last-grapheme ] unit-test
 
 : grapheme-break-test ( -- filename )
-    "basis/unicode/breaks/GraphemeBreakTest.txt"
-    resource-path ;
+    "resource:basis/unicode/breaks/GraphemeBreakTest.txt" ;
 
-: parse-test-file ( -- tests )
-    grapheme-break-test utf8 file-lines
+: word-break-test ( -- filename )
+    "resource:basis/unicode/breaks/WordBreakTest.txt" ;
+
+: parse-test-file ( file-name -- tests )
+    utf8 file-lines
     [ "#" split1 drop ] map harvest [
         "÷" split
         [ "×" split [ [ blank? ] trim hex> ] map harvest >string ] map
         harvest
     ] map ;
 
-: test-graphemes ( tests -- )
+:: test ( tests quot -- )
+    tests [
+        [ 1quotation ]
+        [ concat [ quot call [ "" like ] map ] curry ] bi unit-test
+    ] each ;
+
+: grapheme-test ( tests quot -- )
     [
         [ 1quotation ]
         [ concat [ >graphemes [ "" like ] map ] curry ] bi unit-test
     ] each ;
 
-parse-test-file test-graphemes
+grapheme-break-test parse-test-file [ >graphemes ] test
+! word-break-test parse-test-file [ >words ] test

@@ -4,8 +4,10 @@ USING: combinators.short-circuit unicode.categories kernel math
 combinators splitting sequences math.parser io.files io assocs
 arrays namespaces make math.ranges unicode.normalize values
 io.encodings.ascii unicode.syntax unicode.data compiler.units
-alien.syntax sets ;
+alien.syntax sets accessors interval-maps memoize locals words ;
 IN: unicode.breaks
+
+! Grapheme breaks
 
 C-ENUM: Any L V T LV LVT Extend Control CR LF
     SpacingMark Prepend graphemes ;
@@ -47,8 +49,8 @@ CATEGORY: spacing Mc ;
         [ Any ]
     } cond ;
 
-: init-grapheme-table ( -- table )
-    graphemes [ graphemes f <array> ] replicate ;
+: init-table ( size -- table )
+    dup [ f <array> ] curry replicate ;
 
 SYMBOL: table
 
@@ -61,12 +63,18 @@ SYMBOL: table
 : connect ( class1 class2 -- ) 1 set-table ;
 : disconnect ( class1 class2 -- ) 0 set-table ;
 
+: check-before ( class classes value -- )
+    [ set-table ] curry with each ;
+
+: check-after ( classes class value -- )
+    [ set-table ] 2curry each ;
+
 : connect-before ( class classes -- )
-    [ connect ] with each ;
+    1 check-before ;
 
 : connect-after ( classes class -- )
-    [ connect ] curry each ;
-
+    1 check-after ;
+  
 : break-around ( classes1 classes2 -- )
     [ [ 2dup disconnect swap disconnect ] with each ] curry each ;
 
@@ -98,14 +106,17 @@ VALUE: grapheme-table
     [ grapheme-class tuck grapheme-break? ] find-index
     nip swap length or 1+ ;
 
-: (>graphemes) ( str -- )
-    [
-        dup first-grapheme cut-slice
-        swap , (>graphemes)
+:: (>pieces) ( str quot -- )
+    str [
+        dup quot call cut-slice
+        swap , quot (>pieces)
     ] unless-empty ;
 
+: >pieces ( str quot -- graphemes )
+    [ (>pieces) ] { } make ;
+
 : >graphemes ( str -- graphemes )
-    [ (>graphemes) ] { } make ;
+    [ first-grapheme ] >pieces ;
 
 : string-reverse ( str -- rts )
     >graphemes reverse concat ;
@@ -114,6 +125,82 @@ VALUE: grapheme-table
     unclip-last-slice grapheme-class swap
     [ grapheme-class dup rot grapheme-break? ] find-last-index ?1+ nip ;
 
-init-grapheme-table table
+graphemes init-table table
 [ make-grapheme-table finish-table ] with-variable
 to: grapheme-table
+
+! Word breaks
+
+VALUE: word-break-table
+
+"resource:basis/unicode/data/WordBreakProperty.txt" load-script
+to: word-break-table
+
+C-ENUM: wOther wCR wLF wNewline wExtend wFormat wKatakana wALetter wMidLetter
+wMidNum wMidNumLet wNumeric wExtendNumLet words ;
+
+MEMO: word-break-classes ( -- table )
+    H{
+        { "Other" wOther } { "CR" wCR } { "LF" wLF } { "Newline" wNewline }
+        { "Extend" wExtend } { "Format" wFormat } { "Katakana" wKatakana }
+        { "ALetter" wALetter } { "MidLetter" wMidLetter }
+        { "MidNum" wMidNum } { "MidNumLet" wMidNumLet } { "Numeric" wNumeric }
+        { "ExtendNumLet" wExtendNumLet }
+    } [ execute ] assoc-map ;
+
+: word-break-prop ( char -- word-break-prop )
+    word-break-table interval-at
+    word-break-classes at [ wOther ] unless* ;
+
+: e ( seq -- seq ) [ execute ] map ;
+
+SYMBOL: check-letter-before
+SYMBOL: check-letter-after
+SYMBOL: check-number-before
+SYMBOL: check-number-after
+
+: make-word-table ( -- )
+    wCR wLF connect
+    { wNewline wCR wLF } e words break-around
+    wALetter dup connect
+    wALetter { wMidLetter wMidNumLet } e check-letter-after check-before
+    { wMidLetter wMidNumLet } e wALetter check-letter-before check-after
+    wNumeric dup connect
+    wALetter wNumeric connect
+    wNumeric wALetter connect
+    wNumeric { wMidNum wMidNumLet } e check-number-after check-before
+    { wMidNum wMidNumLet } e wNumeric check-number-before check-after
+    wKatakana dup connect
+    { wALetter wNumeric wKatakana wExtendNumLet } e wExtendNumLet
+    [ connect-after ] [ swap connect-before ] 2bi ;
+
+VALUE: word-table
+
+: finish-word-table ( -- table )
+    table get [
+        [ { { 0 [ f ] } { 1 [ t ] } [ ] } case ] map
+    ] map ;
+
+words init-table table
+[ make-word-table finish-word-table ] with-variable
+to: word-table
+
+: word-break? ( class1 class2 -- ? )
+    word-table nth nth not ;
+
+: skip? ( char -- ? )
+    word-break-prop { 4 5 } member? ; ! wExtend or wFormat
+
+: word-break-next ( old-class new-char -- next-class ? )
+    word-break-prop dup { 4 5 } member?
+    [ drop f ] [ tuck word-break? ] if ;
+
+: first-word ( str -- i )
+    unclip-slice word-break-prop over
+    [ word-break-next ] find-index
+    nip swap length or 1+ ;
+! This must be changed to ignore format/extended chars and
+! handle symbols in the table specially
+
+: >words ( str -- words )
+    [ first-word ] >pieces ;
