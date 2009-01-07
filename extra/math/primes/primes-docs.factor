@@ -11,15 +11,7 @@ HELP: prime?
 { $values { "n" "an integer" } { "?" "a boolean" } }
 { $description "Test if an integer is a prime number." } ;
 
-{ lprimes lprimes-from primes-upto primes-between } related-words
-
-HELP: lprimes
-{ $values { "list" "a lazy list" } }
-{ $description "Return a sorted list containing all the prime numbers." } ;
-
-HELP: lprimes-from
-{ $values { "n" "an integer" } { "list" "a lazy list" } }
-{ $description "Return a sorted list containing all the prime numbers greater or equal to " { $snippet "n" } "." } ;
+{ primes-upto primes-between } related-words
 
 HELP: primes-upto
 { $values { "n" "an integer" } { "seq" "a sequence" } }
