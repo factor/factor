@@ -95,13 +95,17 @@ beast.
 *** In the help browser:
 
     - h : help for word at point
+    - v : help for a vocabulary
     - a : find words containing given substring (M-x fuel-apropos)
+    - e : edit current article
     - ba : bookmark current page
     - bb : display bookmarks
     - bd : delete bookmark at point
     - n/p : next/previous page
+    - l : previous page
     - SPC/S-SPC : scroll up/down
     - TAB/S-TAB : next/previous link
+    - k : kill current page and go to previous or next
     - r : refresh page
     - c : clean browsing history
     - M-. : edit word at point in Emacs
@@ -112,4 +116,5 @@ beast.
 
     - TAB/BACKTAB : navigate links
     - RET/mouse click : follow link
+    - h : show help for word at point
     - q : bury buffer

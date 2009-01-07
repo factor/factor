@@ -14,11 +14,12 @@
 
 ;;; Code:
 
+(require 'fuel-edit)
 (require 'fuel-eval)
 (require 'fuel-markup)
 (require 'fuel-autodoc)
-(require 'fuel-xref)
 (require 'fuel-completion)
+(require 'fuel-syntax)
 (require 'fuel-font-lock)
 (require 'fuel-popup)
 (require 'fuel-base)
@@ -67,15 +68,15 @@
         (setcar fuel-help--history link))))
   link)
 
-(defun fuel-help--history-next ()
+(defun fuel-help--history-next (&optional forget-current)
   (when (not (ring-empty-p (nth 2 fuel-help--history)))
-    (when (car fuel-help--history)
+    (when (and (car fuel-help--history) (not forget-current))
       (ring-insert (nth 1 fuel-help--history) (car fuel-help--history)))
     (setcar fuel-help--history (ring-remove (nth 2 fuel-help--history) 0))))
 
-(defun fuel-help--history-previous ()
+(defun fuel-help--history-previous (&optional forget-current)
   (when (not (ring-empty-p (nth 1 fuel-help--history)))
-    (when (car fuel-help--history)
+    (when (and (car fuel-help--history) (not forget-current))
       (ring-insert (nth 2 fuel-help--history) (car fuel-help--history)))
     (setcar fuel-help--history (ring-remove (nth 1 fuel-help--history) 0))))
 
@@ -114,10 +115,9 @@
   (let* ((def (fuel-syntax-symbol-at-point))
          (prompt (format "See%s help on%s: " (if see " short" "")
                          (if def (format " (%s)" def) "")))
-         (ask (or (not (memq major-mode '(factor-mode fuel-help-mode)))
-                  (not def)
-                  fuel-help-always-ask)))
-    (if ask (fuel-completion--read-word prompt
+         (ask (or (not def) fuel-help-always-ask)))
+    (if ask
+        (fuel-completion--read-word prompt
                                         def
                                         'fuel-help--prompt-history
                                         t)
@@ -129,7 +129,7 @@
       (let ((cmd `(:fuel* (,def ,(if see 'fuel-word-see 'fuel-word-help))
                           "fuel" t)))
         (message "Looking up '%s' ..." def)
-        (let* ((ret (fuel-eval--send/wait cmd 2000))
+        (let* ((ret (fuel-eval--send/wait cmd))
                (res (fuel-eval--retort-result ret)))
           (if (not res)
               (message "No help for '%s'" def)
@@ -138,7 +138,7 @@
 (defun fuel-help--get-article (name label)
   (message "Retrieving article ...")
   (let* ((cmd `(:fuel* ((,name fuel-get-article)) "fuel" t))
-         (ret (fuel-eval--send/wait cmd 2000))
+         (ret (fuel-eval--send/wait cmd))
          (res (fuel-eval--retort-result ret)))
     (if (not res)
         (message "Article '%s' not found" label)
@@ -146,13 +146,33 @@
       (message ""))))
 
 (defun fuel-help--get-vocab (name)
-  (message "Retrieving vocabulary help ...")
+  (message "Retrieving help vocabulary for vocabulary '%s' ..." name)
   (let* ((cmd `(:fuel* ((,name fuel-vocab-help)) "fuel" (,name)))
-         (ret (fuel-eval--send/wait cmd 2000))
+         (ret (fuel-eval--send/wait cmd))
          (res (fuel-eval--retort-result ret)))
     (if (not res)
         (message "No help available for vocabulary '%s'" name)
       (fuel-help--insert-contents (list name name 'vocab) res)
+      (message ""))))
+
+(defun fuel-help--get-vocab/author (author)
+  (message "Retrieving vocabularies by %s ..." author)
+  (let* ((cmd `(:fuel* ((,author fuel-get-vocabs/author)) "fuel" t))
+         (ret (fuel-eval--send/wait cmd))
+         (res (fuel-eval--retort-result ret)))
+    (if (not res)
+        (message "No vocabularies by %s" author)
+      (fuel-help--insert-contents (list author author 'author) res)
+      (message ""))))
+
+(defun fuel-help--get-vocab/tag (tag)
+  (message "Retrieving vocabularies tagged '%s' ..." tag)
+  (let* ((cmd `(:fuel* ((,tag fuel-get-vocabs/tag)) "fuel" t))
+         (ret (fuel-eval--send/wait cmd))
+         (res (fuel-eval--retort-result ret)))
+    (if (not res)
+        (message "No vocabularies tagged '%s'" tag)
+      (fuel-help--insert-contents (list tag tag 'tag) res)
       (message ""))))
 
 (defun fuel-help--follow-link (link label type &optional no-cache)
@@ -163,6 +183,8 @@
           (cond ((eq type 'word) (fuel-help--word-help nil link))
                 ((eq type 'article) (fuel-help--get-article link label))
                 ((eq type 'vocab) (fuel-help--get-vocab link))
+                ((eq type 'author) (fuel-help--get-vocab/author label))
+                ((eq type 'tag) (fuel-help--get-vocab/tag label))
                 ((eq type 'bookmarks) (fuel-help-display-bookmarks))
                 (t (error "Links of type %s not yet implemented" type))))
       (fuel-help--insert-contents llink cached))))
@@ -177,6 +199,7 @@
         (insert content)
       (fuel-markup--print content)
       (fuel-markup--insert-newline)
+      (delete-blank-lines)
       (fuel-help--cache-insert key (buffer-string)))
     (fuel-help--history-push key)
     (setq fuel-help--buffer-link key)
@@ -231,19 +254,33 @@ buffer."
   (interactive)
   (fuel-help--word-help))
 
-(defun fuel-help-next ()
-  "Go to next page in help browser."
-  (interactive)
-  (let ((item (fuel-help--history-next)))
+(defun fuel-help-vocab (vocab)
+  "Ask for a vocabulary name and show its help page."
+  (interactive (list (fuel-edit--read-vocabulary-name nil)))
+  (fuel-help--get-vocab vocab))
+
+(defun fuel-help-next (&optional forget-current)
+  "Go to next page in help browser.
+With prefix, the current page is deleted from history."
+  (interactive "P")
+  (let ((item (fuel-help--history-next forget-current)))
     (unless item (error "No next page"))
     (apply 'fuel-help--follow-link item)))
 
-(defun fuel-help-previous ()
-  "Go to previous page in help browser."
-  (interactive)
-  (let ((item (fuel-help--history-previous)))
+(defun fuel-help-previous (&optional forget-current)
+  "Go to previous page in help browser.
+With prefix, the current page is deleted from history."
+  (interactive "P")
+  (let ((item (fuel-help--history-previous forget-current)))
     (unless item (error "No previous page"))
     (apply 'fuel-help--follow-link item)))
+
+(defun fuel-help-kill-page ()
+  "Kill current page if a previous or next one exists."
+  (interactive)
+  (condition-case nil
+      (fuel-help-previous t)
+    (error (fuel-help-next t))))
 
 (defun fuel-help-refresh ()
   "Refresh the contents of current page."
@@ -260,6 +297,15 @@ buffer."
     (fuel-help-refresh))
   (message ""))
 
+(defun fuel-help-edit ()
+  "Edit the current article or word help."
+  (interactive)
+  (let ((link (car fuel-help--buffer-link))
+        (type (nth 2 fuel-help--buffer-link)))
+    (cond ((eq type 'word) (fuel-edit-word-doc-at-point nil link))
+          ((member type '(article vocab)) (fuel-edit--edit-article link))
+          (t (error "No document associated with this page")))))
+
 
 ;;;; Help mode map:
 
@@ -272,16 +318,30 @@ buffer."
     (define-key map "bb" 'fuel-help-display-bookmarks)
     (define-key map "bd" 'fuel-help-delete-bookmark)
     (define-key map "c" 'fuel-help-clean-history)
+    (define-key map "e" 'fuel-help-edit)
     (define-key map "h" 'fuel-help)
+    (define-key map "k" 'fuel-help-kill-page)
     (define-key map "n" 'fuel-help-next)
+    (define-key map "l" 'fuel-help-previous)
     (define-key map "p" 'fuel-help-previous)
     (define-key map "r" 'fuel-help-refresh)
+    (define-key map "v" 'fuel-help-vocab)
     (define-key map (kbd "SPC")  'scroll-up)
     (define-key map (kbd "S-SPC") 'scroll-down)
     (define-key map "\M-." 'fuel-edit-word-at-point)
     (define-key map "\C-cz" 'run-factor)
     (define-key map "\C-c\C-z" 'run-factor)
     map))
+
+
+;;; IN: support
+
+(defun fuel-help--find-in ()
+  (save-excursion
+    (or (fuel-syntax--find-in)
+        (and (goto-char (point-min))
+             (re-search-forward "Vocabulary: \\(.+\\)$" nil t)
+             (match-string-no-properties 1)))))
 
 
 ;;; Help mode definition:
@@ -296,6 +356,7 @@ buffer."
   (set-syntax-table fuel-syntax--syntax-table)
   (setq mode-name "FUEL Help")
   (setq major-mode 'fuel-help-mode)
+  (setq fuel-syntax--current-vocab-function 'fuel-help--find-in)
   (setq fuel-markup--follow-link-function 'fuel-help--follow-link)
   (setq buffer-read-only t))
 
