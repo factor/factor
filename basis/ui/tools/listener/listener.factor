@@ -15,7 +15,7 @@ IN: ui.tools.listener
 TUPLE: listener-gadget < track input output scroller ;
 
 : listener-streams ( listener -- input output )
-    [ input>> ] [ output>> <pane-stream> ] bi ;
+    [ input>> ] [ output>> ] bi <pane-stream> ;
 
 : <listener-input> ( listener -- gadget )
     output>> <pane-stream> <interactor> ;
@@ -80,14 +80,14 @@ M: listener-operation invoke-command ( target command -- )
 
 GENERIC: word-completion-string ( word -- string )
 
-M: word word-completion-string
-    name>> ;
+M: word word-completion-string name>> ;
 
-M: method-body word-completion-string
+: method-completion-string ( word -- string )
     "method-generic" word-prop word-completion-string ;
 
-M: engine-word word-completion-string
-    "engine-generic" word-prop word-completion-string ;
+M: method-body word-completion-string method-completion-string ;
+
+M: engine-word word-completion-string method-completion-string ;
 
 : use-if-necessary ( word seq -- )
     over vocabulary>> over and [
