@@ -4,9 +4,9 @@
 USING: accessors arrays assocs classes.tuple combinators
 compiler.units continuations debugger definitions help help.crossref
 help.markup help.topics io io.pathnames io.streams.string kernel lexer
-make math math.order memoize namespaces parser prettyprint sequences
-sets sorting source-files strings summary tools.crossref tools.vocabs
-vectors vocabs vocabs.parser words ;
+make math math.order memoize namespaces parser quotations prettyprint
+sequences sets sorting source-files strings summary tools.crossref
+tools.vocabs tools.vocabs.browser vectors vocabs vocabs.parser words ;
 
 IN: fuel
 
@@ -73,6 +73,8 @@ M: sequence fuel-pprint
     "(" write [ " " write ] [ fuel-pprint ] interleave ")" write ; inline
 
 M: tuple fuel-pprint tuple>array fuel-pprint ; inline
+
+M: quotation fuel-pprint pprint ; inline
 
 M: continuation fuel-pprint drop ":continuation" write ; inline
 
@@ -163,17 +165,21 @@ SYMBOL: :uses
 ! Edit locations
 
 : fuel-normalize-loc ( seq -- path line )
-    dup length 1 > [ first2 [ (normalize-path) ] dip ] [ f ] if ; inline
+    [ dup length 0 > [ first (normalize-path) ] [ drop f ] if ]
+    [ dup length 1 > [ second ] [ drop 1 ] if ] bi ;
 
-: fuel-get-edit-location ( defspec -- )
+: fuel-get-edit-location ( word -- )
     where fuel-normalize-loc 2array fuel-eval-set-result ; inline
 
 : fuel-get-vocab-location ( vocab -- )
     >vocab-link fuel-get-edit-location ; inline
 
-: fuel-get-doc-location ( defspec -- )
+: fuel-get-doc-location ( word -- )
     props>> "help-loc" swap at
     fuel-normalize-loc 2array fuel-eval-set-result ;
+
+: fuel-get-article-location ( name -- )
+    article loc>> fuel-normalize-loc 2array fuel-eval-set-result ;
 
 ! Cross-references
 
@@ -292,22 +298,70 @@ MEMO: fuel-find-word ( name -- word/f )
     fuel-find-word [ [ auto-use? on (fuel-word-see) ] with-scope ] [ f ] if*
     fuel-eval-set-result ; inline
 
+: fuel-vocab-help-row ( vocab -- element )
+    [ vocab-status-string ] [ vocab-name ] [ summary ] tri 3array ;
+
+: fuel-vocab-help-root-heading ( root -- element )
+    [ "Children from " prepend ] [ "Other children" ] if* \ $heading swap 2array ;
+
+SYMBOL: vocab-list
+
+: fuel-vocab-help-table ( vocabs -- element )
+    [ fuel-vocab-help-row ] map vocab-list prefix ;
+
+: fuel-vocab-list ( assoc -- seq )
+    [
+        [ drop f ] [
+            [ fuel-vocab-help-root-heading ]
+            [ fuel-vocab-help-table ] bi*
+            [ 2array ] [ drop f ] if*
+        ] if-empty
+    ] { } assoc>map [  ] filter ;
+
+: fuel-vocab-children-help ( name -- element )
+    all-child-vocabs fuel-vocab-list ; inline
+
+: fuel-vocab-describe-words ( name -- element )
+    [ describe-words ] with-string-writer \ describe-words swap 2array ; inline
+
 : (fuel-vocab-help) ( name -- element )
     \ article swap dup >vocab-link
     [
-        [ summary [ , ] [ "No summary available" , ] if* ]
-        [ drop \ $nl , ]
-        [ vocab-help article [ content>> % ] when* ] tri
+        {
+            [ vocab-authors [ \ $authors prefix , ] when* ]
+            [ vocab-tags [ \ $tags prefix , ] when* ]
+            [ summary [ { $heading "Summary" } swap 2array , ] when* ]
+            [ drop \ $nl , ]
+            [ vocab-help [ article content>> % ] when* ]
+            [ name>> fuel-vocab-describe-words , ]
+            [ name>> fuel-vocab-children-help % ]
+        } cleave
     ] { } make 3array ;
 
 : fuel-vocab-help ( name -- )
-    (fuel-vocab-help) fuel-eval-set-result ; inline
+    dup empty? [ fuel-vocab-children-help ] [ (fuel-vocab-help) ] if
+    fuel-eval-set-result ; inline
 
 : (fuel-index) ( seq -- seq )
     [ [ >link name>> ] [ article-title ] bi 2array \ $subsection prefix ] map ;
 
 : fuel-index ( quot: ( -- seq ) -- )
     call (fuel-index) fuel-eval-set-result ; inline
+
+MEMO: (fuel-get-vocabs/author) ( author -- element )
+    [ "Vocabularies by " prepend \ $heading swap 2array ]
+    [ authored fuel-vocab-list ] bi 2array ;
+
+: fuel-get-vocabs/author ( author -- )
+    (fuel-get-vocabs/author) fuel-eval-set-result ;
+
+MEMO: (fuel-get-vocabs/tag ( tag -- element )
+    [ "Vocabularies tagged " prepend \ $heading swap 2array ]
+    [ tagged fuel-vocab-list ] bi 2array ;
+
+: fuel-get-vocabs/tag ( tag -- )
+    (fuel-get-vocabs/tag fuel-eval-set-result ;
+
 
 ! -run=fuel support
 
