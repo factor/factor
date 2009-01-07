@@ -1,4 +1,4 @@
-USING: math.primes ;
+USING: math.primes memoize ;
 IN: math.primes.list
 
-: primes-under-million ( -- seq ) 1000000 primes-upto ;
+MEMO: primes-under-million ( -- seq ) 1000000 primes-upto ;

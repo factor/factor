@@ -1,6 +1,6 @@
 ;;; fuel-xref.el -- showing cross-reference info
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -13,6 +13,7 @@
 
 ;;; Code:
 
+(require 'fuel-help)
 (require 'fuel-eval)
 (require 'fuel-syntax)
 (require 'fuel-popup)
@@ -72,14 +73,14 @@ cursor at the first ocurrence of the used word."
 
 (make-local-variable (defvar fuel-xref--word nil))
 
-(defvar fuel-xref--help-string "(Press RET or click to follow crossrefs)")
+(defvar fuel-xref--help-string
+  "(Press RET or click to follow crossrefs, or h for help on word at point)")
 
 (defun fuel-xref--title (word cc count)
-  (let ((cc (if cc "using" "used by")))
-    (put-text-property 0 (length word) 'font-lock-face 'bold word)
-    (cond ((zerop count) (format "No known words %s %s" cc word))
-          ((= 1 count) (format "1 word %s %s:" cc word))
-          (t (format "%s words %s %s:" count cc word)))))
+  (put-text-property 0 (length word) 'font-lock-face 'bold word)
+  (cond ((zerop count) (format "No known words %s %s" cc word))
+        ((= 1 count) (format "1 word %s %s:" cc word))
+        (t (format "%s words %s %s:" count cc word))))
 
 (defun fuel-xref--insert-ref (ref)
   (when (and (stringp (first ref))
@@ -124,21 +125,31 @@ cursor at the first ocurrence of the used word."
 (defun fuel-xref--show-callers (word)
   (let* ((cmd `(:fuel* (((:quote ,word) fuel-callers-xref))))
          (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
-    (fuel-xref--fill-and-display word t res)))
+    (fuel-xref--fill-and-display word "using" res)))
 
 (defun fuel-xref--show-callees (word)
   (let* ((cmd `(:fuel* (((:quote ,word) fuel-callees-xref))))
          (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
-    (fuel-xref--fill-and-display word nil res)))
+    (fuel-xref--fill-and-display word "used by" res)))
+
+(defun fuel-xref--apropos (str)
+  (let* ((cmd `(:fuel* ((,str fuel-apropos-xref))))
+         (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+    (fuel-xref--fill-and-display str "containing" res)))
 
 
 ;;; Xref mode:
+
+(defun fuel-xref-show-help ()
+  (interactive)
+  (let ((fuel-help-always-ask nil))
+    (fuel-help)))
 
 (defvar fuel-xref-mode-map
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map)
     (set-keymap-parent map button-buffer-map)
-    (define-key map "q" 'bury-buffer)
+    (define-key map "h" 'fuel-xref-show-help)
     map))
 
 (defun fuel-xref-mode ()

@@ -1,6 +1,6 @@
 ;;; fuel-listener.el --- starting the fuel listener
 
-;; Copyright (C) 2008  Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009  Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -15,6 +15,7 @@
 
 (require 'fuel-stack)
 (require 'fuel-completion)
+(require 'fuel-xref)
 (require 'fuel-eval)
 (require 'fuel-connection)
 (require 'fuel-syntax)
@@ -169,6 +170,7 @@ buffer."
 (define-key fuel-listener-mode-map "\C-ca" 'fuel-autodoc-mode)
 (define-key fuel-listener-mode-map "\C-ch" 'fuel-help)
 (define-key fuel-listener-mode-map "\C-cs" 'fuel-stack-mode)
+(define-key fuel-listener-mode-map "\C-cp" 'fuel-apropos)
 (define-key fuel-listener-mode-map "\M-." 'fuel-edit-word-at-point)
 (define-key fuel-listener-mode-map "\C-cv" 'fuel-edit-vocabulary)
 (define-key fuel-listener-mode-map "\C-c\C-v" 'fuel-edit-vocabulary)

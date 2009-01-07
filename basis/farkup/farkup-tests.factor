@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: farkup kernel peg peg.ebnf tools.test namespaces ;
+USING: farkup kernel peg peg.ebnf tools.test namespaces xml
+urls.encoding assocs xml.utilities ;
 IN: farkup.tests
 
 relative-link-prefix off
@@ -157,3 +158,12 @@ link-no-follow? off
 
 [ "<p>hello_world how are you today?\n<ul><li> hello_world how are you today?</li></ul></p>" ]
 [ "hello_world how are you today?\n- hello_world how are you today?" convert-farkup ] unit-test
+
+: check-link-escaping ( string -- link )
+    convert-farkup string>xml-chunk
+    "a" deep-tag-named "href" swap at url-decode ;
+
+[ "Trader Joe's" ] [ "[[Trader Joe's]]" check-link-escaping ] unit-test
+[ "<foo>" ] [ "[[<foo>]]" check-link-escaping ] unit-test
+[ "&blah;" ] [ "[[&blah;]]" check-link-escaping ] unit-test
+[ "C++" ] [ "[[C++]]" check-link-escaping ] unit-test

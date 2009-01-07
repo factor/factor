@@ -29,8 +29,7 @@ ABOUT: "grouping"
 HELP: groups
 { $class-description "Instances are virtual sequences whose elements are disjoint fixed-length subsequences of an underlying sequence. Groups are mutable and resizable if the underlying sequence is mutable and resizable, respectively."
 $nl
-"New groups are created by calling " { $link <groups> } " and " { $link <sliced-groups> } "." }
-{ $see-also group } ;
+"New groups are created by calling " { $link <groups> } " and " { $link <sliced-groups> } "." } ;
 
 HELP: group
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "array" "a sequence of sequences" } }
@@ -48,17 +47,27 @@ HELP: <groups>
         "USING: arrays kernel prettyprint sequences grouping ;"
         "9 >array 3 <groups> dup reverse-here concat >array ." "{ 6 7 8 3 4 5 0 1 2 }"
     }
+    { $example
+        "USING: kernel prettyprint sequences grouping ;"
+        "{ 1 2 3 4 5 6 } 3 <groups> 0 swap nth ."
+        "{ 1 2 3 }"
+    }
 } ;
 
 HELP: <sliced-groups>
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "groups" groups } }
-{ $description "Outputs a virtual sequence whose elements are overlapping subsequences of " { $snippet "n" } " elements from the underlying sequence." }
+{ $description "Outputs a virtual sequence whose elements are slices of disjoint subsequences of " { $snippet "n" } " elements from the underlying sequence." }
 { $examples
     { $example
         "USING: arrays kernel prettyprint sequences grouping ;"
         "9 >array 3 <sliced-groups>"
         "dup [ reverse-here ] each concat >array ."
         "{ 2 1 0 5 4 3 8 7 6 }"
+    }
+    { $example
+        "USING: kernel prettyprint sequences grouping ;"
+        "{ 1 2 3 4 5 6 } 3 <sliced-groups> 1 swap nth ."
+        "T{ slice { from 3 } { to 6 } { seq { 1 2 3 4 5 6 } } }"
     }
 } ;
 
@@ -89,11 +98,23 @@ HELP: <clumps>
         "share-price 4 <clumps> [ [ sum ] [ length ] bi / ] map ."
         "{ 113/400 167/400 201/400 241/400 243/400 91/200 1/4 }"
     }
+    { $example
+        "USING: kernel sequences grouping prettyprint ;"
+        "{ 1 2 3 4 5 6 } 3 <clumps> 1 swap nth ."
+        "{ 2 3 4 }"
+    }
 } ;
 
 HELP: <sliced-clumps>
 { $values { "seq" "a sequence" } { "n" "a non-negative integer" } { "clumps" clumps } }
-{ $description "Outputs a virtual sequence whose elements are overlapping slices of " { $snippet "n" } " elements from the underlying sequence." } ;
+{ $description "Outputs a virtual sequence whose elements are overlapping slices of " { $snippet "n" } " elements from the underlying sequence." }
+{ $examples
+    { $example
+        "USING: kernel sequences grouping prettyprint ;"
+        "{ 1 2 3 4 5 6 } 3 <sliced-clumps> 1 swap nth ."
+        "T{ slice { from 1 } { to 4 } { seq { 1 2 3 4 5 6 } } }"
+    }
+} ;
 
 { clumps groups } related-words
 

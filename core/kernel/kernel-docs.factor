@@ -359,6 +359,17 @@ HELP: 2bi*
     }
 } ;
 
+HELP: 2tri*
+{ $values { "u" object } { "v" object } { "w" object } { "x" object } { "y" object } { "z" object } { "p" { $quotation "( u v -- ... )" } } { "q" { $quotation "( w x -- ... )" } } { "r" { $quotation "( y z -- ... )" } } }
+{ $description "Applies " { $snippet "p" } " to " { $snippet "u" } " and " { $snippet "v" } ", then applies " { $snippet "q" } " to " { $snippet "w" } " and " { $snippet "x" } ", and finally applies " { $snippet "r" } " to " { $snippet "y" } " and " { $snippet "z" } "." }
+{ $examples
+    "The following two lines are equivalent:"
+    { $code
+        "[ p ] [ q ] [ r ] 2tri*"
+        "[ [ p ] 2dip q ] 2dip r"
+    }
+} ;
+
 HELP: tri*
 { $values { "x" object } { "y" object } { "z" object } { "p" { $quotation "( x -- ... )" } } { "q" { $quotation "( y -- ... )" } } { "r" { $quotation "( z -- ... )" } } }
 { $description "Applies " { $snippet "p" } " to " { $snippet "x" } ", then applies " { $snippet "q" } " to " { $snippet "y" } ", and finally applies " { $snippet "r" } " to " { $snippet "z" } "." }
@@ -415,6 +426,22 @@ HELP: tri@
     { $code
         "[ p ] tri@"
         "[ p ] [ p ] [ p ] tri*"
+    }
+} ;
+
+HELP: 2tri@
+{ $values { "u" object } { "v" object } { "w" object } { "x" object } { "y" object } { "z" object } { "quot" { $quotation "( obj1 obj2 -- ... )" } } }
+{ $description "Applies the quotation to " { $snippet "u" } " and " { $snippet "v" } ", then to " { $snippet "w" } " and " { $snippet "x" } ", and then to " { $snippet "y" } " and " { $snippet "z" } "." }
+{ $examples
+    "The following two lines are equivalent:"
+    { $code
+        "[ p ] 2tri@"
+        "[ [ p ] 2dip p ] 2dip p"
+    }
+    "The following two lines are also equivalent:"
+    { $code
+        "[ p ] 2tri@"
+        "[ p ] [ p ] [ p ] 2tri*"
     }
 } ;
 
@@ -595,10 +622,18 @@ HELP: 2dip
 
 HELP: 3dip
 { $values { "x" object } { "y" object } { "z" object } { "quot" quotation } }
-{ $description "Calls " { $snippet "quot" } " with " { $snippet "obj1" } ", " { $snippet "obj2" } " and " { $snippet "obj3" } " hidden on the retain stack." }
+{ $description "Calls " { $snippet "quot" } " with " { $snippet "x" } ", " { $snippet "y" } " and " { $snippet "z" } " hidden on the retain stack." }
 { $notes "The following are equivalent:"
     { $code "[ [ [ foo bar ] dip ] dip ] dip" }
     { $code "[ foo bar ] 3dip" }
+} ;
+
+HELP: 4dip
+{ $values { "w" object } { "x" object } { "y" object } { "z" object } { "quot" quotation } }
+{ $description "Calls " { $snippet "quot" } " with " { $snippet "w" } ", " { $snippet "x" } ", " { $snippet "y" } " and " { $snippet "z" } " hidden on the retain stack." }
+{ $notes "The following are equivalent:"
+    { $code "[ [ [ [ foo bar ] dip ] dip ] dip ] dip" }
+    { $code "[ foo bar ] 4dip" }
 } ;
 
 HELP: while
@@ -735,7 +770,7 @@ $nl
 { $subsection "cleave-shuffle-equivalence" } ;
 
 ARTICLE: "spread-shuffle-equivalence" "Expressing shuffle words with spread combinators"
-"Spread combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to spread combinators are discussed in the documentation for " { $link bi* } ", " { $link 2bi* } ", and " { $link tri* } "."
+"Spread combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to spread combinators are discussed in the documentation for " { $link bi* } ", " { $link 2bi* } ", " { $link tri* } ", and " { $link 2tri* } "."
 $nl
 "Certain shuffle words can also be expressed in terms of the spread combinators. Internalizing such identities can help with understanding and writing code using spread combinators:"
 { $code
@@ -775,6 +810,7 @@ $nl
 { $subsection 2bi* }
 "Three quotations:"
 { $subsection tri* }
+{ $subsection 2tri* }
 "Technically, the spread combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on three related values can be written in one of two ways:"
 { $code
     "! First alternative; uses dip"
@@ -793,6 +829,7 @@ $nl
 { $subsection 2bi@ }
 "Three quotations:"
 { $subsection tri@ }
+{ $subsection 2tri@ }
 "A pair of utility words built from " { $link bi@ } ":"
 { $subsection both? }
 { $subsection either? } ;
@@ -804,6 +841,7 @@ $nl
 { $subsection dip }
 { $subsection 2dip }
 { $subsection 3dip }
+{ $subsection 4dip }
 "The slip combinators invoke a quotation further down on the stack. They are most useful for implementing other combinators:"
 { $subsection slip }
 { $subsection 2slip }
