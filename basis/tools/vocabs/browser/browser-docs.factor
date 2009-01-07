@@ -10,7 +10,7 @@ ARTICLE: "vocab-authors" "Vocabulary authors"
 ARTICLE: "vocab-index" "Vocabulary index"
 { $subsection "vocab-tags" }
 { $subsection "vocab-authors" }
-{ $describe-vocab "" } ;
+{ $vocab "" } ;
 
 HELP: words.
 { $values { "vocab" "a vocabulary name" } }

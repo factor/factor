@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations definitions ui.tools.browser
 ui.tools.listener ui.tools.profiler
-ui.tools.inspector ui.tools.search ui.tools.traceback
+ui.tools.inspector ui.tools.traceback
 generic help.topics stack-checker
 summary io.pathnames io.styles kernel namespaces parser
 prettyprint quotations tools.annotations editors

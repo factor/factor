@@ -1,7 +1,7 @@
 USING: help.markup help.syntax ui.commands ui.operations
-ui.tools.search ui.tools.workspace editors vocabs.loader
-kernel sequences prettyprint tools.test tools.vocabs strings
-unicode.categories unicode.case ui.tools.browser ;
+editors vocabs.loader kernel sequences prettyprint tools.test
+tools.vocabs strings unicode.categories unicode.case
+ui.tools.browser ui.tools.listener ;
 IN: help.tutorial
 
 ARTICLE: "first-program-start" "Creating a vocabulary for your first program"
@@ -36,7 +36,7 @@ $nl
 { $code ": palindrome? ( string -- ? ) dup reverse = ;" }
 "Place this definition at the end of your source file."
 $nl
-"Now we have changed the source file, we must reload it into Factor so that we can test the new definition. To do this, simply go to the Factor workspace and press " { $command workspace "workflow" refresh-all } ". This will find any previously-loaded source files which have changed on disk, and reload them."
+"Now we have changed the source file, we must reload it into Factor so that we can test the new definition. To do this, simply go to the Factor listener and press " { $command listener-gadget "workflow" refresh-all } ". This will find any previously-loaded source files which have changed on disk, and reload them."
 $nl
 "When you do this, you will get an error about the " { $link dup } " word not being found. This is because this word is part of the " { $vocab-link "kernel" } " vocabulary, but this vocabulary is not part of the source file's " { $link "vocabulary-search" } ". You must explicitly list dependencies in source files. This allows Factor to automatically load required vocabularies and makes larger programs easier to maintain."
 $nl
@@ -44,13 +44,13 @@ $nl
 $nl
 "So now, add the following at the start of the source file:"
 { $code "USING: kernel ;" }
-"Next, find out what vocabulary " { $link reverse } " lives in; type the word name " { $snippet "reverse" } " in the workspace listener's input area, and press " { $operation com-follow } "."
+"Next, find out what vocabulary " { $link reverse } " lives in; type the word name " { $snippet "reverse" } " in the listener's input area, and press " { $operation com-follow } "."
 $nl
 "It lives in the " { $vocab-link "sequences" } " vocabulary, so we add that to the search path:"
 { $code "USING: kernel sequences ;" }
 "Finally, check what vocabulary " { $link = } " lives in, and confirm that it's in the " { $vocab-link "kernel" } " vocabulary, which we've already added to the search path."
 $nl
-"Now press " { $command workspace "workflow" refresh-all } " again, and the source file should reload without any errors. You can now go on and learn about " { $link "first-program-test" } "." ;
+"Now press " { $command listener-gadget "workflow" refresh-all } " again, and the source file should reload without any errors. You can now go on and learn about " { $link "first-program-test" } "." ;
 
 ARTICLE: "first-program-test" "Testing your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
@@ -132,13 +132,13 @@ $nl
 $nl
 "We modify " { $snippet "palindrome?" } " to first apply " { $snippet "normalize" } " to its input:"
 { $code ": palindrome? ( str -- ? ) normalize dup reverse = ;" }
-"Now if you press " { $command workspace "workflow" refresh-all } ", the source file should reload without any errors. You can run unit tests again, and this time, they will all pass:"
+"Now if you press " { $command listener-gadget "workflow" refresh-all } ", the source file should reload without any errors. You can run unit tests again, and this time, they will all pass:"
 { $code "\"palindrome\" test" } ;
 
 ARTICLE: "first-program" "Your first program"
 "In this tutorial, we will write a simple Factor program which prompts the user to enter a word, and tests if it is a palindrome (that is, the word is spelled the same backwards and forwards)."
 $nl
-"In this tutorial, you will learn about basic Factor development tools. You may want to open a second workspace window by pressing " { $command workspace "workflow" workspace-window } "; this will allow you to read this tutorial and browse other documentation at the same time."
+"In this tutorial, you will learn about basic Factor development tools."
 { $subsection "first-program-start" }
 { $subsection "first-program-logic" }
 { $subsection "first-program-test" }

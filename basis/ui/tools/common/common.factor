@@ -3,6 +3,8 @@
 USING: accessors ui.gadgets.scrollers ;
 IN: ui.tools.common
 
+SLOT: scroller
+
 : com-page-up ( tool -- )
     scroller>> scroll-up-page ;
 
