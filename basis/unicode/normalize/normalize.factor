@@ -4,6 +4,7 @@ USING: sequences namespaces make unicode.data kernel math arrays
 locals sorting.insertion accessors assocs ;
 IN: unicode.normalize
 
+<PRIVATE
 ! Conjoining Jamo behavior
 
 : hangul-base HEX: ac00 ; inline
@@ -74,10 +75,12 @@ IN: unicode.normalize
         dup reorder
     ] if ; inline
 
-: nfd ( string -- string )
+PRIVATE>
+
+: nfd ( string -- nfd )
     [ canonical-entry ] decompose ;
 
-: nfkd ( string -- string )
+: nfkd ( string -- nfkd )
     [ compatibility-entry ] decompose ;
 
 : string-append ( s1 s2 -- string )
@@ -86,6 +89,8 @@ IN: unicode.normalize
     [ append ] keep
     0 over ?nth non-starter?
     [ length dupd reorder-back ] [ drop ] if ;
+
+<PRIVATE
 
 ! Normalization -- Composition
 SYMBOL: main-str
@@ -156,6 +161,8 @@ DEFER: compose-iter
         SBUF" " clone after set
         pass-combining (compose)
     ] "" make ;
+
+PRIVATE>
 
 : nfc ( string -- nfc )
     nfd compose ;

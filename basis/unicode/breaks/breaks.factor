@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit unicode.categories kernel math
 combinators splitting sequences math.parser io.files io assocs
-arrays namespaces make math.ranges unicode.normalize values
+arrays namespaces make math.ranges unicode.normalize.private values
 io.encodings.ascii unicode.syntax unicode.data compiler.units
 alien.syntax sets accessors interval-maps memoize locals words ;
 IN: unicode.breaks
 
+<PRIVATE
 ! Grapheme breaks
 
 C-ENUM: Any L V T LV LVT Extend Control CR LF
@@ -101,10 +102,14 @@ VALUE: grapheme-table
 : find-index ( seq quot -- i ) find drop ; inline
 : find-last-index ( seq quot -- i ) find-last drop ; inline
 
+PRIVATE>
+
 : first-grapheme ( str -- i )
     unclip-slice grapheme-class over
     [ grapheme-class tuck grapheme-break? ] find-index
     nip swap length or 1+ ;
+
+<PRIVATE
 
 :: (>pieces) ( str quot -- )
     str [
@@ -115,6 +120,8 @@ VALUE: grapheme-table
 : >pieces ( str quot -- graphemes )
     [ (>pieces) ] { } make ; inline
 
+PRIVATE>
+
 : >graphemes ( str -- graphemes )
     [ first-grapheme ] >pieces ;
 
@@ -124,6 +131,8 @@ VALUE: grapheme-table
 : last-grapheme ( str -- i )
     unclip-last-slice grapheme-class swap
     [ grapheme-class dup rot grapheme-break? ] find-last-index ?1+ nip ;
+
+<PRIVATE
 
 graphemes init-table table
 [ make-grapheme-table finish-table ] with-variable
@@ -223,6 +232,8 @@ to: word-table
     new-char word-break-prop dup { 4 5 } member?
     [ drop old-class dup { 1 2 3 } member? ]
     [ old-class over word-table-nth i str word-break? ] if ;
+
+PRIVATE>
 
 :: first-word ( str -- i )
     str unclip-slice word-break-prop over <enum>
