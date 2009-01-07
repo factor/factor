@@ -44,7 +44,7 @@ HELP: scroll>top
 { $description "Ensures that any scroller containing " { $snippet "gadget" } " is scrolled all the way up. If no parent of " { $snippet "scroller" } " is a gadget, does nothing." } ;
 
 ARTICLE: "ui.gadgets.scrollers" "Scroller gadgets"
-"A scroller displays a gadget which is larger than the visible area."
+"The " { $vocab-link "ui.gadgets.scrollers" } " vocabulary implements scroller gadgets. A scroller displays a gadget which is larger than the visible area."
 { $subsection scroller }
 { $subsection <scroller> }
 "Getting and setting the scroll position:"

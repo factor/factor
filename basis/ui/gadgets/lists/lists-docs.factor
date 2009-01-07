@@ -24,7 +24,7 @@ HELP: list-value
 { $description "Outputs the currently selected list value." } ;
 
 ARTICLE: "ui.gadgets.lists" "List gadgets"
-"A list displays a list of presentations."
+"The " { $vocab-link "ui.gadgets.lists" } " vocabulary implements lists, which displays a list of presentations (see " { $link "ui.gadgets.presentations" } ")."
 { $subsection list }
 { $subsection <list> }
 { $subsection list-value } ;

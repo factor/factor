@@ -56,7 +56,7 @@ HELP: <pane-stream>
 { with-pane make-pane } related-words
 
 ARTICLE: "ui.gadgets.panes" "Pane gadgets"
-"A pane displays formatted text."
+"The " { $vocab-link "ui.gadgets.panes" } " vocabulary implements panes, which display formatted text."
 { $subsection pane }
 { $subsection <pane> }
 { $subsection <scrolling-pane> }

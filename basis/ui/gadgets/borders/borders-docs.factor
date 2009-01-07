@@ -9,7 +9,7 @@ HELP: <border>
 { $description "Creates a new border around the child with the specified horizontal and vertical gap." } ;
 
 ARTICLE: "ui.gadgets.borders" "Border gadgets"
-"Border gadgets add empty space around a child gadget."
+"The " { $vocab-link "ui.gadgets.borders" } " vocabulary implements border gadgets, which add empty space around a child gadget."
 { $subsection border }
 { $subsection <border> } ;
 

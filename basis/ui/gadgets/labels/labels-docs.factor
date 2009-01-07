@@ -24,7 +24,7 @@ HELP: <label-control>
 { <label> <label-control> } related-words
 
 ARTICLE: "ui.gadgets.labels" "Label gadgets"
-"A label displays a piece of text, either a single line string or an array of line strings."
+"The " { $vocab-link "ui.gadgets.labels" } " vocabulary implements labels. A label displays a piece of text, either a single line string or an array of line strings."
 { $subsection label }
 { $subsection <label> }
 { $subsection <label-control> }

@@ -55,7 +55,7 @@ HELP: <toolbar>
 { $description "Creates a row of " { $link <command-button> } " gadgets invoking commands on " { $snippet "target" } ". The commands are taken from the " { $snippet "\"toolbar\"" } " command group of each class in " { $snippet "classes" } "." } ;
 
 ARTICLE: "ui.gadgets.buttons" "Button gadgets"
-"Buttons respond to mouse clicks by invoking a quotation."
+"The " { $vocab-link "ui.gadgets.buttons" } " vocabulary implements buttons. Buttons respond to mouse clicks by invoking a quotation."
 { $subsection button }
 "There are many ways to create a new button:"
 { $subsection <button> }

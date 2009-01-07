@@ -98,7 +98,8 @@ ARTICLE: "gadgets" "Pre-made UI gadgets"
 { $subsection "ui.gadgets.menus" }
 { $subsection "ui.gadgets.panes" }
 { $subsection "ui.gadgets.presentations" }
-{ $subsection "ui.gadgets.lists" } ;
+{ $subsection "ui.gadgets.lists" }
+{ $subsection "ui.gadgets.tables" } ;
 
 ARTICLE: "ui-geometry" "Gadget geometry"
 "The " { $link gadget } " class inherits from the " { $link rect } " class, and thus all gadgets have a bounding box:"

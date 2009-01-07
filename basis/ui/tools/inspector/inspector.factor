@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors inspector namespaces kernel models
 models.filter prettyprint sequences mirrors assocs classes
-io io.styles
+io io.styles arrays
 ui.tools.browser ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks
 ui.gestures ui.gadgets.buttons ui.gadgets.tables
@@ -11,10 +11,15 @@ IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < track table ;
 
+TUPLE: slot-description key key-string value value-string ;
+
+: <slot-description> ( key value -- slot-description )
+    [ dup unparse-short ] bi@ slot-description boa ;
+
 SINGLETON: inspector-renderer
 
 M: inspector-renderer row-columns
-    drop [ unparse-short ] map ;
+    drop [ key-string>> ] [ value-string>> ] bi 2array ;
 
 : <summary-gadget> ( model -- gadget )
     [
@@ -40,11 +45,14 @@ M: inspector-renderer row-columns
         ] tabular-output
     ] <pane-control> ;
 
-DEFER: inspector-window
+DEFER: inspector
+
+: make-slot-descriptions ( obj -- seq )
+    make-mirror [ <slot-description> ] { } assoc>map ;
 
 : <inspector-table> ( model -- table )
-    [ make-mirror >alist ] <filter> <table>
-        [ second inspector-window ] >>action
+    [ make-slot-descriptions ] <filter> <table>
+        [ value>> inspector ] >>action
         inspector-renderer >>renderer
         monospace-font >>font ;
 
@@ -80,5 +88,5 @@ inspector-gadget "toolbar" f {
     { T{ key-down f f "F1" } inspector-help }
 } define-command-map
 
-: inspector-window ( obj -- )
+: inspector ( obj -- )
     <inspector-gadget> "Inspector" open-status-window ;

@@ -81,13 +81,14 @@ ARTICLE: "gadgets-editors-selection" "The caret and mark"
 "Use " { $link user-input* } " to change selected text." ;
 
 ARTICLE: "gadgets-editors" "Editor gadgets"
-"An editor edits a multi-line passage of text."
+"The " { $vocab-link "ui.gadgets.editors" } " vocabulary implements editor gadgets. An editor edits a passage of text."
 { $command-map editor "general" }
 { $command-map editor "caret-motion" }
 { $command-map editor "selection" }
 { $heading "Editor words" }
 { $subsection editor }
 { $subsection <editor> }
+{ $subsection <multiline-editor> }
 { $subsection editor-string }
 { $subsection set-editor-string }
 { $subsection "gadgets-editors-selection" }

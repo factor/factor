@@ -16,9 +16,8 @@ IN: ui.tools.operations
 V{ } clone operations set-global
 
 ! Objects
-[ drop t ] \ inspector-window H{
+[ drop t ] \ inspector H{
     { +primary+ t }
-    { +listener+ t }
 } define-operation
 
 : com-prettyprint ( obj -- ) . ;

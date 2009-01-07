@@ -48,7 +48,7 @@ HELP: <y-slider>
 { <x-slider> <y-slider> } related-words
 
 ARTICLE: "ui.gadgets.sliders" "Slider gadgets"
-"A slider allows the user to graphically manipulate a value by moving a thumb back and forth."
+"The " { $vocab-link "ui.gadgets.sliders" } " vocabulary implements slider gadgets. A slider allows the user to graphically manipulate a value by moving a thumb back and forth."
 { $subsection slider }
 { $subsection <x-slider> }
 { $subsection <y-slider> }

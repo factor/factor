@@ -18,47 +18,6 @@ $nl
 $nl
 "Presentation gadgets can be constructed directly using the " { $link <presentation> } " word, and they can also be written to " { $link pane } " gadgets using the " { $link write-object } " word." ;
 
-ARTICLE: "ui-listener" "UI listener"
-"The graphical listener is based around the terminal listener (" { $link "listener" } ") and adds the following features:"
-{ $list
-    "Input history"
-    { "Completion (see " { $link "ui-completion" } ")" }
-    { "Clickable presentations (see " { $link "ui-presentations" } ")" }
-}
-{ $command-map listener-gadget "toolbar" }
-{ $command-map listener-gadget "scrolling" }
-{ $command-map interactor "interactor" }
-{ $command-map source-editor "word" }
-{ $command-map interactor "quotation" }
-{ $heading "Editing commands" }
-"The text editing commands are standard; see " { $link "gadgets-editors" } "."
-{ $heading "Implementation" }
-"Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } ") and an input area (instance of " { $link interactor } ")." ;
-
-ARTICLE: "ui-inspector" "UI inspector"
-"The graphical inspector builds on the terminal inspector (see " { $link "inspector" } ") and provides in-place editing of slot values."
-$nl
-"To display an object in the UI inspector, use the " { $link inspect } " word from the UI listener, or right-click a presentation and choose " { $strong "Inspect" } " from the menu that appears."
-$nl
-"When the UI inspector is running, all of the terminal inspector words are available, such as " { $link &at } " and " { $link &put } ". Changing slot values using terminal inspector words automatically updates the UI inspector display."
-$nl
-"Slots can also be edited graphically. Clicking the ellipsis to the left of the slot's textual representation displays a slot editor gadget. A text representation of the object can be edited in the slot editor. The parser is used to turn the text representation back into an object. Keep in mind that some structure is lost in the conversion; see " { $link "prettyprint-limitations" } "."
-$nl
-"The slot editor's text editing commands are standard; see " { $link "gadgets-editors" } "."
-$nl
-"The slot editor has a toolbar containing various commands."
-{ $command-map slot-editor "toolbar" }
-{ $command-map inspector-gadget "multi-touch" }
-"The following commands are also available."
-{ $command-map source-editor "word" } ;
-
-ARTICLE: "ui-browser" "UI browser"
-"The browser is used to display Factor code, documentation, and vocabularies."
-{ $command-map browser-gadget "toolbar" }
-{ $command-map browser-gadget "scrolling" }
-{ $command-map browser-gadget "multi-touch" }
-"Browsers are instances of " { $link browser-gadget } "." ;
-
 ARTICLE: "ui-profiler" "UI profiler" 
 "The graphical profiler is based on the terminal profiler (see " { $link "profiling" } ") and adds more convenient browsing of profiler results."
 $nl

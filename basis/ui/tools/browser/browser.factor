@@ -97,7 +97,7 @@ browser-gadget "multi-touch" f {
 } define-command-map
 
 browser-gadget "scrolling"
-"The browser's scroll pane can be scrolled from the keyboard."
+"The browser's scroller can be scrolled from the keyboard."
 {
     { T{ key-down f f "UP" } com-scroll-up }
     { T{ key-down f f "DOWN" } com-scroll-down }

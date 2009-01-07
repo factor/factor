@@ -24,7 +24,7 @@ HELP: <labelled-pane>
 { <labelled-pane> <pane-control> } related-words
 
 ARTICLE: "ui.gadgets.labelled" "Labelled gadgets"
-"It is possible to create a labelled border around a child gadget:"
+"The " { $vocab-link "ui.gadgets.labelled" } " vocabulary implements labelled borders around child gadgets."
 { $subsection labelled-gadget }
 { $subsection <labelled-gadget> }
 "Or a labelled border with a close box:"
