@@ -15,24 +15,26 @@
 
 (defun fuel-table--col-widths (rows)
   (let* ((col-no (length (car rows)))
-         (available (- (window-width) 10 (* 2 col-no)))
+         (available (- (window-width) 2 (* 2 col-no)))
          (widths)
          (c 0))
     (while (< c col-no)
       (let ((width 0)
-            (av-width (/ available (- col-no c))))
+            (av-width (- available (* 5 (- col-no c)))))
         (dolist (row rows)
-          (setq width (min av-width
-                           (max width (length (nth c row))))))
+          (setq width
+                (min av-width
+                     (max width (length (nth c row))))))
         (push width widths)
         (setq available (- available width)))
       (setq c (1+ c)))
     (reverse widths)))
 
-(defsubst fuel-table--pad-str (str width)
-  (if (>= (length str) width)
-      str
-    (concat str (make-string (- width (length str)) ?\ ))))
+(defun fuel-table--pad-str (str width)
+  (let ((len (length str)))
+    (cond ((= len width) str)
+          ((> len width) (concat (substring str 0 (- width 3)) "..."))
+          (t (concat str (make-string (- width (length str)) ?\ ))))))
 
 (defun fuel-table--str-lines (str width)
   (if (<= (length str) width)
