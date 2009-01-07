@@ -1,9 +1,10 @@
 
 USING: accessors arrays assocs calendar colors
-combinators.short-circuit kernel locals math math.functions
-math.matrices math.order math.parser math.trig math.vectors
-opengl opengl.demo-support opengl.gl sbufs sequences strings
-threads ui.gadgets ui.gadgets.worlds ui.gestures ui.render ;
+combinators.short-circuit help.markup help.syntax kernel locals
+math math.functions math.matrices math.order math.parser
+math.trig math.vectors opengl opengl.demo-support opengl.gl
+sbufs sequences strings threads ui.gadgets ui.gadgets.worlds
+ui.gestures ui.render ui.tools.workspace ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -455,6 +456,8 @@ H{
       drop
     ]
   }
+
+  { T{ key-down f f "F1" } [ drop "L-system" help-window ] }
     
 }
 set-gestures
@@ -477,3 +480,23 @@ set-gestures
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+ARTICLE: "L-system" "L-system"
+
+"Press 'x' to iterate the L-system." $nl
+
+"Camera control:"
+
+{ $table
+
+  { "a" "Forward" }
+  { "z" "Backward" }
+
+  { "LEFT" "Turn left" }
+  { "RIGHT" "Turn right" }
+  { "UP" "Pitch down" }
+  { "DOWN" "Pitch up" }
+
+  { "q" "Roll left" }
+  { "w" "Roll right" } } ;
+
+ABOUT: "L-system"
