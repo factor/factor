@@ -100,7 +100,7 @@ HELP: <clumps>
     }
     { $example
         "USING: kernel sequences grouping prettyprint ;"
-        "{ 1 2 3 4 5 6 } 3 <clumps> 1 swap nth ."
+        "{ 1 2 3 4 5 6 } 3 <clumps> second ."
         "{ 2 3 4 }"
     }
 } ;
@@ -111,7 +111,7 @@ HELP: <sliced-clumps>
 { $examples
     { $example
         "USING: kernel sequences grouping prettyprint ;"
-        "{ 1 2 3 4 5 6 } 3 <sliced-clumps> 1 swap nth ."
+        "{ 1 2 3 4 5 6 } 3 <sliced-clumps> second ."
         "T{ slice { from 1 } { to 4 } { seq { 1 2 3 4 5 6 } } }"
     }
 } ;
