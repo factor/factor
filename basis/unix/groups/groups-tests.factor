@@ -25,3 +25,5 @@ IN: unix.groups.tests
 [ ] [ [ ] with-group-cache ] unit-test
 
 [ ] [ real-group-id group-name drop ] unit-test
+
+[ "888888888888888" ] [ 888888888888888 group-name ] unit-test
