@@ -56,7 +56,7 @@ PRIVATE>
     >lower [ CHAR: a - 1+ ] sigma ;
 
 : cartesian-product ( seq1 seq2 -- seq1xseq2 )
-    swap [ swap [ 2array ] with map ] with map concat ;
+    [ [ 2array ] with map ] curry map concat ;
 
 : log10 ( m -- n )
     log 10 log / ;
@@ -73,6 +73,9 @@ PRIVATE>
 
 : number>digits ( n -- seq )
     [ dup 0 = not ] [ 10 /mod ] [ ] produce reverse nip ;
+
+: number-length ( n -- m )
+    log10 floor 1+ >integer ;
 
 : nth-triangle ( n -- n )
     dup 1+ * 2 / ;
