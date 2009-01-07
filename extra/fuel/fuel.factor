@@ -306,20 +306,23 @@ MEMO: fuel-find-word ( name -- word/f )
 
 SYMBOL: vocab-list
 
-: fuel-vocab-children-table ( vocabs -- element )
+: fuel-vocab-help-table ( vocabs -- element )
     [ fuel-vocab-help-row ] map vocab-list prefix ;
 
-: fuel-vocab-children ( assoc -- seq )
+: fuel-vocab-list ( assoc -- seq )
     [
         [ drop f ] [
             [ fuel-vocab-help-root-heading ]
-            [ fuel-vocab-children-table ] bi*
+            [ fuel-vocab-help-table ] bi*
             [ 2array ] [ drop f ] if*
         ] if-empty
     ] { } assoc>map [  ] filter ;
 
 : fuel-vocab-children-help ( name -- element )
-    all-child-vocabs fuel-vocab-children ; inline
+    all-child-vocabs fuel-vocab-list ; inline
+
+: fuel-vocab-describe-words ( name -- element )
+    [ describe-words ] with-string-writer \ describe-words swap 2array ; inline
 
 : (fuel-vocab-help) ( name -- element )
     \ article swap dup >vocab-link
@@ -328,7 +331,7 @@ SYMBOL: vocab-list
             [ vocab-authors [ \ $authors prefix , ] when* ]
             [ vocab-tags [ \ $tags prefix , ] when* ]
             [ summary [ { $heading "Summary" } swap 2array , ] when* ]
-            [ drop \ $nl , ]
+            [ name>> fuel-vocab-describe-words , ]
             [ vocab-help [ article content>> % ] when* ]
             [ name>> fuel-vocab-children-help % ]
         } cleave
@@ -346,14 +349,14 @@ SYMBOL: vocab-list
 
 MEMO: (fuel-get-vocabs/author) ( author -- element )
     [ "Vocabularies by " prepend \ $heading swap 2array ]
-    [ authored fuel-vocab-children ] bi 2array ;
+    [ authored fuel-vocab-list ] bi 2array ;
 
 : fuel-get-vocabs/author ( author -- )
     (fuel-get-vocabs/author) fuel-eval-set-result ;
 
 MEMO: (fuel-get-vocabs/tag ( tag -- element )
     [ "Vocabularies tagged " prepend \ $heading swap 2array ]
-    [ tagged fuel-vocab-children ] bi 2array ;
+    [ tagged fuel-vocab-list ] bi 2array ;
 
 : fuel-get-vocabs/tag ( tag -- )
     (fuel-get-vocabs/tag fuel-eval-set-result ;
