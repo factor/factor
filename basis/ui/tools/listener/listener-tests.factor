@@ -3,7 +3,7 @@ ui.tools.listener hashtables kernel namespaces parser sequences
 tools.test ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.panes vocabs words tools.test.ui slots.private
 threads arrays generic threads accessors listener math
-calendar ;
+calendar concurrency.promises io ui.tools.common ;
 IN: ui.tools.listener.tests
 
 \ <interactor> must-infer
@@ -137,3 +137,16 @@ IN: ui.tools.listener.tests
 ] with-grafted-gadget
 
 [ ] [ \ + <pane> <interactor> interactor-use use-if-necessary ] unit-test
+
+[ ] [ <listener-gadget> "l" set ] unit-test
+[ ] [ "l" get com-scroll-up ] unit-test
+[ ] [ "l" get com-scroll-down ] unit-test
+[ ] [ "l" get hide-popup ] unit-test
+[ ] [ <gadget> "l" get show-popup ] unit-test
+[ ] [ "l" get hide-popup ] unit-test
+
+[ ] [
+    <gadget> "l" get show-popup
+    <gadget> "l" get show-popup
+    "l" get hide-popup
+] unit-test
