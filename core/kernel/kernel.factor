@@ -79,6 +79,8 @@ DEFER: if
 
 : 3dip ( x y z quot -- x y z ) -roll 3slip ;
 
+: 4dip ( w x y z quot -- w x y z ) swap [ 3dip ] dip ; inline
+
 ! Keepers
 : keep ( x quot -- x ) over slip ; inline
 
@@ -118,6 +120,9 @@ DEFER: if
 : 2bi* ( w x y z p q -- )
     [ 2dip ] dip call ; inline
 
+: 2tri* ( u v w x y z p q r -- )
+    [ 4dip ] 2dip 2bi* ; inline
+
 ! Appliers
 : bi@ ( x y quot -- )
     dup bi* ; inline
@@ -128,6 +133,9 @@ DEFER: if
 ! Double appliers
 : 2bi@ ( w x y z quot -- )
     dup 2bi* ; inline
+
+: 2tri@ ( u v w y x z quot -- )
+    dup dup 2tri* ; inline
 
 ! Object protocol
 GENERIC: hashcode* ( depth obj -- code )

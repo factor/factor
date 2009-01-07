@@ -1112,15 +1112,6 @@ HELP: virtual@
      { "n'" integer } { "seq'" sequence } }
 { $description "Part of the sequence protocol, this word translates the input index " { $snippet "n" } " into an index into the underlying storage returned by " { $link virtual-seq } "." } ;
 
-HELP: 2change-each
-{ $values
-     { "seq1" sequence } { "seq2" sequence } { "quot" quotation } }
-{ $description "Calls the quotation on subsequent pairs of objects from the two input sequences. The resulting computation replaces the element in the first sequence." }
-{ $examples { $example "USING: kernel math sequences prettyprint ;"
-    "{ 10 20 30 } dup { 60 70 80 } [ + ] 2change-each ."
-    "{ 70 90 110 }"
-} } ;
-
 HELP: 2map-reduce
 { $values
      { "seq1" sequence } { "seq2" sequence } { "map-quot" quotation } { "reduce-quot" quotation }
