@@ -2,9 +2,9 @@ USING: editors help.markup help.syntax summary inspector io
 io.styles listener parser prettyprint tools.profiler
 tools.walker ui.commands ui.gadgets.editors ui.gadgets.panes
 ui.gadgets.presentations ui.gadgets.slots ui.operations
-ui.tools.browser ui.tools.interactor ui.tools.inspector
+ui.tools.browser ui.tools.inspector
 ui.tools.listener ui.tools.operations ui.tools.profiler
-ui.tools.walker ui.tools.workspace vocabs ;
+ui.tools.walker vocabs ;
 IN: ui.tools
 
 ARTICLE: "ui-presentations" "Presentations in the UI"
@@ -39,49 +39,15 @@ $nl
 
 ;
 
-ARTICLE: "ui-completion-words" "Word completion popup"
-"Clicking a word in the word completion popup displays the word definition in the " { $link "ui-browser" } ". Pressing " { $snippet "RET" } " with a word selected inserts the word name in the listener, along with a " { $link POSTPONE: USE: } " declaration (if necessary)."
-{ $operations \ $operations } ;
-
-ARTICLE: "ui-completion-vocabs" "Vocabulary completion popup"
-"Clicking a vocabulary in the vocabulary completion popup displays a list of words in the vocabulary in another " { $link "ui-completion-words" } ". Pressing " { $snippet "RET" } " adds the vocabulary to the current search path, just as if you invoked " { $link POSTPONE: USE: } "."
-{ $operations "kernel" vocab } ;
-
-ARTICLE: "ui-completion-sources" "Source file completion popup"
-"The source file completion popup lists all source files which have been previously loaded by " { $link run-file } ". Clicking a source file  or pressing " { $snippet "RET" } " opens the source file in your editor with " { $link edit } "."
-{ $operations P" " } ;
-
-ARTICLE: "ui-completion" "UI completion popups"
-"Completion popups allow fast access to aspects of the environment. Completion popups can be invoked by clicking the row of buttons along the bottom of the workspace, or via keyboard commands:"
-{ $command-map workspace "toolbar" }
-"A completion popup instantly updates the list of completions as keys are typed. The list of completions can be navigated from the keyboard with the " { $snippet "UP" } " and " { $snippet "DOWN" } " arrow keys. Every completion has a " { $emphasis "primary action" } " and " { $emphasis "secondary action" } ". The primary action is invoked when clicking a completion, and the secondary action is invoked on the currently-selected completion when pressing " { $snippet "RET" } "."
-$nl
-"The primary and secondary actions, along with additional keyboard shortcuts, are documented for some completion popups in the below sections."
-{ $subsection "ui-completion-words" }
-{ $subsection "ui-completion-vocabs" }
-{ $subsection "ui-completion-sources" } ;
-
-ARTICLE: "ui-workspace-keys" "UI keyboard shortcuts"
-"See " { $link "gesture-differences" } " to find out how your platform's modifier keys map to modifiers in the Factor UI."
-{ $command-map workspace "tool-switching" }
-{ $command-map workspace "scrolling" }
-{ $command-map workspace "workflow" }
-{ $command-map workspace "multi-touch" } ;
-
 ARTICLE: "ui-tools" "UI developer tools"
 "The Factor development environment can seem rather different from what you are used to, because it is very simple and powerful.."
 $nl
 "To take full advantage of the UI, you should be using a supported text editor. See " { $link "editor" } "."
-{ $subsection "ui-workspace-keys" }
 { $subsection "ui-presentations" }
-{ $subsection "ui-completion" }
-{ $heading "Tools" }
-"A single-window " { $emphasis "workspace" } " contains the most frequently-used tools:"
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }
 { $subsection "ui-inspector" }
 { $subsection "ui-profiler" }
-"Additional tools:"
 { $subsection "ui-walker" }
 { $subsection "ui.tools.deploy" }
 "Platform-specific features:"

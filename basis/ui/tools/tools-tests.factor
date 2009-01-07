@@ -1,8 +1,9 @@
 USING: ui.tools ui.tools.interactor ui.tools.listener
-ui.tools.search ui.tools.workspace kernel models namespaces
+ui.tools.search kernel models namespaces
 sequences tools.test ui.gadgets ui.gadgets.buttons
 ui.gadgets.labelled ui.gadgets.presentations
-ui.gadgets.menus ui.gadgets.scrollers vocabs tools.test.ui ui accessors ;
+ui.gadgets.menus ui.gadgets.scrollers vocabs
+tools.test.ui ui accessors ;
 IN: ui.tools.tests
 
 [ f ]

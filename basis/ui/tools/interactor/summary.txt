@@ -1,1 +1,0 @@
-Interactors are used to input Factor code

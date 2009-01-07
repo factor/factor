@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors inspector namespaces kernel models
 models.filter prettyprint sequences mirrors assocs classes
-io io.styles arrays
+io io.styles arrays hashtables math.order sorting
 ui.tools.browser ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks
 ui.gestures ui.gadgets.buttons ui.gadgets.tables
@@ -50,8 +50,13 @@ M: inspector-renderer row-value
 
 DEFER: inspector
 
-: make-slot-descriptions ( obj -- seq )
+GENERIC: make-slot-descriptions ( obj -- seq )
+
+M: object make-slot-descriptions
     make-mirror [ <slot-description> ] { } assoc>map ;
+
+M: hashtable make-slot-descriptions
+    call-next-method [ [ key-string>> ] compare ] sort ;
 
 : <inspector-table> ( model -- table )
     [ make-slot-descriptions ] <filter> <table>

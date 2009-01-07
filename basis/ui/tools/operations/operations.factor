@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations definitions ui.tools.browser
-ui.tools.interactor ui.tools.listener ui.tools.profiler
+ui.tools.listener ui.tools.profiler
 ui.tools.inspector ui.tools.search ui.tools.traceback
-ui.tools.workspace generic help.topics stack-checker
+generic help.topics stack-checker
 summary io.pathnames io.styles kernel namespaces parser
 prettyprint quotations tools.annotations editors
 tools.profiler tools.test tools.time tools.walker
@@ -90,12 +90,12 @@ UNION: definition word method-spec link vocab vocab-link ;
     { +primary+ t }
 } define-operation
 
-: com-usage ( word -- )
-    get-workspace swap show-word-usage ;
+! : com-usage ( word -- )
+!     get-workspace swap show-word-usage ;
 
-[ word? ] \ com-usage H{
-    { +keyboard+ T{ key-down f { C+ } "U" } }
-} define-operation
+! [ word? ] \ com-usage H{
+!     { +keyboard+ T{ key-down f { C+ } "U" } }
+! } define-operation
 
 [ word? ] \ fix H{
     { +keyboard+ T{ key-down f { C+ } "F" } }
@@ -117,13 +117,13 @@ M: word com-stack-effect def>> com-stack-effect ;
 } define-operation
 
 ! Vocabularies
-: com-vocab-words ( vocab -- )
-    get-workspace swap show-vocab-words ;
+! : com-vocab-words ( vocab -- )
+!     get-workspace swap show-vocab-words ;
 
-[ vocab? ] \ com-vocab-words H{
-    { +secondary+ t }
-    { +keyboard+ T{ key-down f { C+ } "B" } }
-} define-operation
+! [ vocab? ] \ com-vocab-words H{
+!     { +secondary+ t }
+!     { +keyboard+ T{ key-down f { C+ } "B" } }
+! } define-operation
 
 : com-enter-in ( vocab -- ) vocab-name set-in ;
 

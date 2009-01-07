@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: debugger help help.topics kernel models compiler.units
 assocs words vocabs accessors fry combinators.short-circuit
-models models.history tools.apropos ui.tools.workspace
+models models.history tools.apropos
 ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.gadgets.buttons ui.gadgets.packs
 ui.gadgets.editors ui.gadgets.labels ui.gadgets.status-bar
@@ -71,9 +71,6 @@ M: browser-gadget focusable-child* search-field>> ;
     [ [ raise-window ] [ gadget-child show-help ] bi ]
     [ <browser-gadget> "Browser" open-status-window ] if* ;
 
-: browser-window ( -- )
-    "handbook" com-follow ;
-
 : com-back ( browser -- ) model>> go-back ;
 
 : com-forward ( browser -- ) model>> go-forward ;
@@ -104,3 +101,8 @@ browser-gadget "scrolling"
     { T{ key-down f f "PAGE_UP" } com-page-up }
     { T{ key-down f f "PAGE_DOWN" } com-page-down }
 } define-command-map
+
+: browser-window ( -- )
+    [ "handbook" com-follow ] with-ui ;
+
+MAIN: browser-window
