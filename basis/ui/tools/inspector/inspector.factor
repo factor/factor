@@ -21,6 +21,9 @@ SINGLETON: inspector-renderer
 M: inspector-renderer row-columns
     drop [ key-string>> ] [ value-string>> ] bi 2array ;
 
+M: inspector-renderer row-value
+    drop value>> ;
+
 : <summary-gadget> ( model -- gadget )
     [
         standard-table-style [
@@ -52,7 +55,7 @@ DEFER: inspector
 
 : <inspector-table> ( model -- table )
     [ make-slot-descriptions ] <filter> <table>
-        [ value>> inspector ] >>action
+        [ inspector ] >>action
         inspector-renderer >>renderer
         monospace-font >>font ;
 
@@ -86,6 +89,10 @@ inspector-gadget "toolbar" f {
     { T{ update-object } com-refresh }
     { T{ key-down f f "p" } com-push }
     { T{ key-down f f "F1" } inspector-help }
+} define-command-map
+
+inspector-gadget "multi-touch" f {
+    { T{ up-action } com-refresh }
 } define-command-map
 
 : inspector ( obj -- )

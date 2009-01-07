@@ -1,13 +1,14 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.tools.browser kernel quotations accessors fry
+USING: kernel quotations accessors fry
 assocs present math.order math.vectors arrays locals
 models.search models.sort models sequences vocabs
-tools.profiler ui ui.commands ui.gadgets ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
+tools.profiler words prettyprint ui ui.commands ui.gadgets
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
 ui.gadgets.buttons ui.gadgets.tables ui.gadgets.search-tables
 ui.gadgets.labelled ui.gadgets.buttons ui.gadgets.packs
-ui.gadgets.labels ui.gadgets.tabbed words prettyprint ;
+ui.gadgets.labels ui.gadgets.tabbed ui.gadgets.status-bar
+ui.tools.browser ;
 FROM: models.filter => <filter> ;
 FROM: models.compose => <compose> ;
 IN: ui.tools.profiler
@@ -25,11 +26,15 @@ SINGLETON: word-renderer
 M: word-renderer row-columns
     drop [ [ present ] map ] [ { "All" "" } ] if* ;
 
+M: word-renderer row-value drop first ;
+
 SINGLETON: method-renderer
 
 ! Value is a { method-body count } pair
 M: method-renderer row-columns
     drop [ first synopsis ] [ second present ] bi 2array ;
+
+M: method-renderer row-value drop first ;
 
 : <profiler-model> ( values profiler -- model )
     [ [ filter-counts ] <filter> ] [ sort>> ] bi* <sort> ;
@@ -37,7 +42,7 @@ M: method-renderer row-columns
 : <words-model> ( profiler -- model )
     [
         [ words>> ] [ vocab>> ] bi
-        [ [ [ first vocabulary>> ] [ first ] bi* = ] when* ] <search>
+        [ [ [ first vocabulary>> ] dip = ] when* ] <search>
     ] keep <profiler-model> ;
 
 : match? ( pair/f str -- ? )
@@ -62,7 +67,7 @@ M: method-renderer row-columns
     [ class-counters ] dip <profiler-filter-model> ;
 
 : method-matches? ( method generic class -- ? )
-    [ dup [ first ] when ] tri@
+    [ first ] 2dip
     [ drop dup [ subwords memq? ] [ 2drop t ] if ]
     [ nip dup [ swap "method-class" word-prop = ] [ 2drop t ] if ]
     3bi and ;
@@ -145,6 +150,6 @@ profiler-gadget "toolbar" f {
 } define-command-map
 
 : profiler-window ( -- )
-    <profiler-gadget> "Profiling results" open-window ;
+    <profiler-gadget> "Profiling results" open-status-window ;
 
 MAIN: profiler-window

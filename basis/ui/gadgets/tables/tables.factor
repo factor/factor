@@ -3,16 +3,18 @@
 USING: accessors arrays colors fry io.styles kernel math
 math.geometry.rect math.order math.vectors namespaces opengl
 sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.worlds ui.gadgets.theme ui.gestures ui.render models
-math.ranges sequences combinators ;
+ui.gadgets.worlds ui.gadgets.theme ui.gestures ui.render
+ui.gadgets.menus models math.ranges sequences combinators ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
 GENERIC: row-columns ( row renderer -- columns )
+GENERIC: row-value ( row renderer -- object )
 
 SINGLETON: trivial-renderer
 
 M: trivial-renderer row-columns drop ;
+M: object row-value drop ;
 
 TUPLE: table < gadget
 renderer filled-column column-alignment action
@@ -172,10 +174,11 @@ M: table pref-dim*
     over [ control-value nth ] [ 2drop f ] if ;
 
 : selected-row ( table -- value/f )
-    [ selected-index>> ] keep nth-row ;
+    [ selected-index>> ] keep [ nth-row ] keep
+    over [ renderer>> row-value ] [ drop ] if ;
 
 : update-selected-value ( table -- )
-    [ selected-row ] keep selected-value>> set-model ;
+    [ selected-row ] [ selected-value>> ] bi set-model ;
 
 M: table model-changed
     nip
@@ -228,21 +231,37 @@ M: table model-changed
 : hide-mouse-help ( table -- )
     f >>mouse-index [ hide-status ] [ relayout-1 ] bi ;
 
+: valid-row? ( row table -- ? )
+    control-value length 1- 0 swap between? ;
+
+: show-row-summary ( row table -- )
+    [ renderer>> row-value ] keep show-summary ;
+
+: if-mouse-row ( table true false -- )
+    [ [ mouse-row ] keep 2dup valid-row? ]
+    [ ] [ '[ nip @ ] ] tri* if ; inline
+
 : show-mouse-help ( table -- )
-    [ mouse-row ] keep
-    2dup control-value length 1- 0 swap between? [
+    [
         [ swap >>mouse-index relayout-1 ]
         [
             [ nth-row ] keep
-            over [ show-summary ] [ 2drop ] if
+            over [ show-row-summary ] [ 2drop ] if
         ] 2bi
-    ] [ nip hide-mouse-help ] if ;
+    ] [ hide-mouse-help ] if-mouse-row ;
+
+: table-operations-menu ( table -- )
+    [
+        [ nth-row ] keep [ renderer>> row-value ] keep
+        swap show-operations-menu
+    ] [ drop ] if-mouse-row ;
 
 table H{
     { T{ mouse-enter } [ show-mouse-help ] }
     { T{ mouse-leave } [ hide-mouse-help ] }
     { T{ motion } [ show-mouse-help ] }
     { T{ button-down } [ table-button-down ] }
+    { T{ button-down f f 3 } [ table-operations-menu ] }
     { T{ button-up } [ table-button-up ] }
     { T{ gain-focus } [ t >>focused? drop ] }
     { T{ lose-focus } [ f >>focused? drop ] }
