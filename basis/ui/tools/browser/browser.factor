@@ -5,7 +5,8 @@ assocs words vocabs accessors fry combinators.short-circuit
 models models.history tools.apropos ui.tools.workspace
 ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.gadgets.buttons ui.gadgets.packs
-ui.gadgets.editors ui.gadgets.labels ui.gadgets.status-bar ui ;
+ui.gadgets.editors ui.gadgets.labels ui.gadgets.status-bar
+ui.tools.common ui ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < track pane scroller search-field ;
@@ -82,18 +83,6 @@ M: browser-gadget focusable-child* search-field>> ;
 : browser-help ( -- ) "ui-browser" com-follow ;
 
 \ browser-help H{ { +nullary+ t } } define-command
-
-: com-page-up ( browser -- )
-    scroller>> scroll-up-page ;
-
-: com-page-down ( browser -- )
-    scroller>> scroll-down-page ;
-
-: com-scroll-up ( browser -- )
-    scroller>> scroll-up-line ;
-
-: com-scroll-down ( browser -- )
-    scroller>> scroll-down-line ;
 
 browser-gadget "toolbar" f {
     { T{ key-down f { A+ } "LEFT" } com-back }

@@ -3,15 +3,16 @@
 USING: inspector help help.markup io io.styles kernel models strings
 namespaces parser quotations sequences vocabs words prettyprint
 listener debugger threads boxes concurrency.flags math arrays
-generic accessors combinators assocs fry ui.commands ui.gadgets
-ui.gadgets.editors ui.gadgets.labelled ui.gadgets.panes
-ui.gadgets.buttons ui.gadgets.scrollers ui.gadgets.packs
+generic accessors combinators assocs fry generic.standard.engines.tuple
+ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.labelled
+ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers ui.gadgets.packs
 ui.gadgets.tracks ui.gadgets.borders ui.gadgets.frames
 ui.gadgets.grids ui.gestures ui.operations ui.tools.browser
-ui.tools.interactor ui.tools.inspector ui.tools.workspace ;
+ui.tools.interactor ui.tools.inspector ui.tools.workspace
+ui.tools.common ;
 IN: ui.tools.listener
 
-TUPLE: listener-gadget < track input output ;
+TUPLE: listener-gadget < track input output scroller ;
 
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> ] bi ;
@@ -85,8 +86,6 @@ M: word word-completion-string
 M: method-body word-completion-string
     "method-generic" word-prop word-completion-string ;
 
-USE: generic.standard.engines.tuple
-
 M: engine-word word-completion-string
     "engine-generic" word-prop word-completion-string ;
 
@@ -152,7 +151,8 @@ M: engine-word word-completion-string
     { 0 1 } listener-gadget new-track
         add-toolbar
         init-listener
-        dup <listener-scroller> 1 track-add ;
+        dup <listener-scroller> >>scroller
+        dup scroller>> 1 track-add ;
 
 : listener-help ( -- ) "ui-listener" com-follow ;
 
@@ -173,6 +173,15 @@ listener-gadget "toolbar" f {
     { T{ key-down f { A+ } "k" } clear-output }
     { T{ key-down f { A+ } "K" } clear-stack }
     { T{ key-down f { C+ } "d" } com-end }
+} define-command-map
+
+listener-gadget "scrolling"
+"The listener's scroller can be scrolled from the keyboard."
+{
+    { T{ key-down f { A+ } "UP" } com-scroll-up }
+    { T{ key-down f { A+ } "DOWN" } com-scroll-down }
+    { T{ key-down f { A+ } "PAGE_UP" } com-page-up }
+    { T{ key-down f { A+ } "PAGE_DOWN" } com-page-down }
 } define-command-map
 
 M: listener-gadget graft*

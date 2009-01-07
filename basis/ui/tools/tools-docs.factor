@@ -26,6 +26,7 @@ ARTICLE: "ui-listener" "UI listener"
     { "Clickable presentations (see " { $link "ui-presentations" } ")" }
 }
 { $command-map listener-gadget "toolbar" }
+{ $command-map listener-gadget "scrolling" }
 { $command-map interactor "interactor" }
 { $command-map source-editor "word" }
 { $command-map interactor "quotation" }
