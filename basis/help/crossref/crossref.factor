@@ -27,11 +27,13 @@ M: link uses
 : unxref-article ( topic -- )
     >link unxref ;
 
+: prev/next ( obj seq n -- obj' )
+    [ [ index dup ] keep ] dip swap
+    '[ _ + _ ?nth ] when ;
+
 : prev/next-article ( article n -- article' )
     [ dup article-parent dup ] dip
-    '[ article-children [ index _ + ] keep ?nth ]
-    [ 2drop f ]
-    if ;
+    '[ article-children _ prev/next ] [ 2drop f ] if ;
 
 : prev-article ( article -- prev ) -1 prev/next-article ;
 
