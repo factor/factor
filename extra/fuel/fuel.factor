@@ -331,8 +331,9 @@ SYMBOL: vocab-list
             [ vocab-authors [ \ $authors prefix , ] when* ]
             [ vocab-tags [ \ $tags prefix , ] when* ]
             [ summary [ { $heading "Summary" } swap 2array , ] when* ]
-            [ name>> fuel-vocab-describe-words , ]
+            [ drop \ $nl , ]
             [ vocab-help [ article content>> % ] when* ]
+            [ name>> fuel-vocab-describe-words , ]
             [ name>> fuel-vocab-children-help % ]
         } cleave
     ] { } make 3array ;
