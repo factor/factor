@@ -4,13 +4,13 @@ USING: accessors kernel words summary slots quotations
 sequences assocs math arrays stack-checker effects generalizations
 continuations debugger classes.tuple namespaces make vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
-sequences.private combinators mirrors
+sequences.private combinators mirrors splitting
 combinators.short-circuit fry words.symbol ;
 RENAME: _ fry => __
 IN: inverse
 
 ERROR: fail ;
-M: fail summary drop "Unification failed" ;
+M: fail summary drop "Matching failed" ;
 
 : assure ( ? -- ) [ fail ] unless ;
 
@@ -207,6 +207,9 @@ DEFER: _
 \ prefix [ unclip ] define-inverse
 \ unclip [ prefix ] define-inverse
 \ suffix [ dup but-last swap peek ] define-inverse
+
+\ append 1 [ [ ?tail assure ] curry ] define-pop-inverse
+\ prepend 1 [ [ ?head assure ] curry ] define-pop-inverse
 
 ! Constructor inverse
 : deconstruct-pred ( class -- quot )

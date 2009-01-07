@@ -47,17 +47,18 @@ SYMBOL: user-cache
 : with-user-cache ( quot -- )
     [ <user-cache> user-cache ] dip with-variable ; inline
 
-GENERIC: user-passwd ( obj -- passwd )
+GENERIC: user-passwd ( obj -- passwd/f )
 
 M: integer user-passwd ( id -- passwd/f )
     user-cache get
-    [ at ] [ getpwuid passwd>new-passwd ] if* ;
+    [ at ] [ getpwuid [ passwd>new-passwd ] [ f ] if* ] if* ;
 
 M: string user-passwd ( string -- passwd/f )
     getpwnam dup [ passwd>new-passwd ] when ;
 
 : username ( id -- string )
-    user-passwd username>> ;
+    dup user-passwd
+    [ nip username>> ] [ number>string ] if* ;
 
 : user-id ( string -- id )
     user-passwd uid>> ;

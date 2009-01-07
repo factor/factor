@@ -50,7 +50,7 @@ HELP: set-real-user
 HELP: user-passwd
 { $values
      { "obj" object }
-     { "passwd" passwd } }
+     { "passwd/f" "passwd or f" } }
 { $description "Returns the passwd tuple given a username string or user id." } ;
 
 HELP: username

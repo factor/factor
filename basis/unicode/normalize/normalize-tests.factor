@@ -41,4 +41,4 @@ IN: unicode.normalize.tests
         [ { { 5 { 1 2 3 4 5 } } } [ nfkd ] assert= ]
     } cleave ;
 
-! parse-test [ run-line ] each
+parse-test [ run-line ] each
