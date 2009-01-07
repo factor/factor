@@ -13,6 +13,7 @@
 
 ;;; Code:
 
+(require 'fuel-help)
 (require 'fuel-eval)
 (require 'fuel-syntax)
 (require 'fuel-popup)
@@ -72,7 +73,8 @@ cursor at the first ocurrence of the used word."
 
 (make-local-variable (defvar fuel-xref--word nil))
 
-(defvar fuel-xref--help-string "(Press RET or click to follow crossrefs)")
+(defvar fuel-xref--help-string
+  "(Press RET or click to follow crossrefs, or h for help on word at point)")
 
 (defun fuel-xref--title (word cc count)
   (put-text-property 0 (length word) 'font-lock-face 'bold word)
@@ -138,10 +140,16 @@ cursor at the first ocurrence of the used word."
 
 ;;; Xref mode:
 
+(defun fuel-xref-show-help ()
+  (interactive)
+  (let ((fuel-help-always-ask nil))
+    (fuel-help)))
+
 (defvar fuel-xref-mode-map
   (let ((map (make-sparse-keymap)))
     (suppress-keymap map)
     (set-keymap-parent map button-buffer-map)
+    (define-key map "h" 'fuel-xref-show-help)
     map))
 
 (defun fuel-xref-mode ()
