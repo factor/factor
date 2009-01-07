@@ -24,3 +24,7 @@ IN: unix.users.tests
 [ ] [ effective-user-id [ ] with-effective-user ] unit-test
 
 [ ] [ [ ] with-user-cache ] unit-test
+
+[ "9999999999999999999" ] [ 9999999999999999999 username ] unit-test
+
+[ f ] [ 89898989898989898989898989898 user-passwd ] unit-test

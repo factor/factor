@@ -1,6 +1,6 @@
 ;;; fuel-eval.el --- evaluating Factor expressions
 
-;; Copyright (C) 2008  Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009  Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -13,9 +13,10 @@
 
 ;;; Code:
 
-(require 'fuel-base)
 (require 'fuel-syntax)
 (require 'fuel-connection)
+(require 'fuel-log)
+(require 'fuel-base)
 
 (eval-when-compile (require 'cl))
 
@@ -125,6 +126,7 @@
   (fuel-eval--retort-make (cons 'fuel-parse-retort-error str) nil))
 
 (defun fuel-eval--parse-retort (ret)
+  (fuel-log--info "RETORT: %S" ret)
   (if (fuel-eval--retort-p ret) ret
     (fuel-eval--make-parse-error-retort ret)))
 
