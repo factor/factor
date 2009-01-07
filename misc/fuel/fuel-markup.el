@@ -116,6 +116,7 @@
     ($methods . fuel-markup--methods)
     ($nl . fuel-markup--newline)
     ($notes . fuel-markup--notes)
+    ($operation . fuel-markup--link)
     ($parsing-note . fuel-markup--parsing-note)
     ($predicate . fuel-markup--predicate)
     ($prettyprinting-note . fuel-markup--prettyprinting-note)
