@@ -63,16 +63,20 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
 : enough? ( stack word -- ? )
     dup deferred? [ 2drop f ] [
-        [ [ length ] dip 1quotation infer in>> >= ]
+        [ [ length ] [ 1quotation infer in>> ] bi* >= ]
         [ 3drop f ] recover
     ] if ;
 
 : fold-word ( stack word -- stack )
     2dup enough?
-    [ 1quotation with-datastack ] [ [ % ] dip , { } ] if ;
+    [ 1quotation with-datastack ] [ [ % ] [ , ] bi* { } ] if ;
 
 : fold ( quot -- folded-quot )
-    [ { } swap [ fold-word ] each % ] [ ] make ; 
+    [ { } [ fold-word ] reduce % ] [ ] make ; 
+
+ERROR: no-recursive-inverse ;
+
+SYMBOL: visited
 
 : flattenable? ( object -- ? )
     { [ word? ] [ primitive? not ] [
@@ -80,18 +84,18 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
         [ word-prop ] with contains? not
     ] } 1&& ; 
 
-: (flatten) ( quot -- )
-    [ dup flattenable? [ def>> (flatten) ] [ , ] if ] each ;
-
- : retain-stack-overflow? ( error -- ? )
-    { "kernel-error" 14 f f } = ;
-
 : flatten ( quot -- expanded )
-    [ [ (flatten) ] [ ] make ] [
-        dup retain-stack-overflow?
-        [ drop "No inverse defined on recursive word" ] when
-        throw
-    ] recover ;
+    [
+        visited [ over suffix ] change
+        [
+            dup flattenable? [
+                def>>
+                [ visited get memq? [ no-recursive-inverse ] when ]
+                [ flatten ]
+                bi
+            ] [ 1quotation ] if
+        ] map concat
+    ] with-scope ;
 
 ERROR: undefined-inverse ;
 
