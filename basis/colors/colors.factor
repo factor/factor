@@ -22,6 +22,7 @@ M: color blue>>  ( color -- blue  ) >rgba blue>>  ;
 : blue         T{ rgba f 0.0   0.0   1.0   1.0  } ; inline
 : cyan         T{ rgba f 0     0.941 0.941 1    } ; inline
 : gray         T{ rgba f 0.6   0.6   0.6   1.0  } ; inline
+: dark-gray    T{ rgba f 0.8   0.8   0.8   1.0  } ; inline
 : green        T{ rgba f 0.0   1.0   0.0   1.0  } ; inline
 : light-gray   T{ rgba f 0.95  0.95  0.95  0.95 } ; inline
 : light-purple T{ rgba f 0.8   0.8   1.0   1.0  } ; inline

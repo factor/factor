@@ -19,7 +19,7 @@ M: object row-value drop ;
 TUPLE: table < gadget
 renderer filled-column column-alignment action
 column-widths total-width
-font text-color selection-color mouse-color
+font text-color selection-color mouse-color column-line-color
 selected-index selected-value
 mouse-index
 focused? ;
@@ -32,6 +32,7 @@ focused? ;
         f <model> >>selected-value
         sans-serif-font >>font
         selection-color >>selection-color
+        dark-gray >>column-line-color
         black >>mouse-color
         black >>text-color ;
 
@@ -100,6 +101,16 @@ M: table layout*
 : draw-moused ( table -- )
     [ ] [ mouse-index>> ] [ mouse-color>> ] tri f highlight-row ;
 
+: column-lines ( widths -- xs )
+    0 [ + ] accumulate nip rest-slice ; inline
+
+: draw-columns ( table -- )
+    [ column-line-color>> gl-color ]
+    [
+        [ column-widths>> column-lines ] [ dim>> second ] bi
+        '[ [ 0 2array ] [ _ 2array ] bi gl-line ] each
+    ] bi ;
+
 : y>row ( y table -- n )
     line-height /i ;
 
@@ -157,10 +168,12 @@ M: table layout*
 M: table draw-gadget*
     dup control-value empty? [ drop ] [
         origin get [
-            [ draw-selected ]
-            [ draw-moused ]
-            [ draw-rows ]
-            tri
+            {
+                [ draw-selected ]
+                [ draw-columns ]
+                [ draw-moused ]
+                [ draw-rows ]
+            } cleave
         ] with-translation
     ] if ;
 
