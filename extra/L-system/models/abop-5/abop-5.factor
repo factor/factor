@@ -11,7 +11,7 @@ IN: L-system.models.abop-5
 
   [ 5 >>angle ] >>turtle-values
 
-  "&(90)+(90)a" >>axiom
+  "a" >>axiom
 
   {
     { "a" "F[+(45)l][-(45)l]^;ca" }
