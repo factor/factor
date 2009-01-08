@@ -1,7 +1,7 @@
-! Copyright (C) 2007 Samuel Tardieu.
+! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel lists.lazy math math.functions
-math.miller-rabin math.order math.primes.erato math.ranges sequences ;
+USING: combinators kernel math math.functions math.miller-rabin
+math.order math.primes.erato math.ranges sequences ;
 IN: math.primes
 
 <PRIVATE
@@ -22,11 +22,6 @@ PRIVATE>
 
 : next-prime ( n -- p )
     next-odd [ dup really-prime? ] [ 2 + ] [ ] until ; foldable
-
-: lprimes ( -- list ) 2 [ next-prime ] lfrom-by ;
-
-: lprimes-from ( n -- list )
-    dup 3 < [ drop lprimes ] [ 1- next-prime [ next-prime ] lfrom-by ] if ;
 
 : primes-between ( low high -- seq )
     [ dup 3 max dup even? [ 1 + ] when ] dip
