@@ -24,6 +24,10 @@
   "Extracts current region as a separate word."
   (interactive "r")
   (let* ((word (read-string "New word name: "))
+         (begin (save-excursion
+                  (goto-char begin) (fuel-syntax--beginning-of-symbol-pos)))
+         (end (save-excursion
+                (goto-char end) (fuel-syntax--end-of-symbol-pos)))
          (code (buffer-substring begin end))
          (code-str (fuel--region-to-string begin end))
          (stack-effect (or (fuel-stack--infer-effect code-str)
