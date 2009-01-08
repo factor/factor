@@ -70,6 +70,7 @@ beast.
     - C-cC-ds : short help word at point
     - C-cC-de : show stack effect of current sexp (with prefix, region)
     - C-cC-dp : find words containing given substring (M-x fuel-apropos)
+    - C-cC-dv : show words in current file (with prefix, ask for vocab)
 
     - C-cM-<, C-cC-d< : show callers of word at point
     - C-cM->, C-cC-d> : show callees of word at point
