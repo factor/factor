@@ -7,12 +7,14 @@ IN: unicode.case
 
 <PRIVATE
 : at-default ( key assoc -- value/key ) [ at ] [ drop ] 2bi or ;
+PRIVATE>
 
 : ch>lower ( ch -- lower ) simple-lower at-default ;
 : ch>upper ( ch -- upper ) simple-upper at-default ;
 : ch>title ( ch -- title ) simple-title at-default ;
-PRIVATE>
+
 SYMBOL: locale ! Just casing locale, or overall?
+
 <PRIVATE
 : i-dot? ( -- ? )
     locale get { "tr" "az" } member? ;
