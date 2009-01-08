@@ -43,7 +43,7 @@ PRIVATE>
 
 : group-name ( id -- string )
     dup group-cache get [
-        at
+        dupd at* [ name>> nip ] [ drop number>string ] if
     ] [
         group-struct group-gr_name
     ] if*
@@ -71,7 +71,7 @@ M: string user-groups ( string -- seq )
     (user-groups) ; 
 
 M: integer user-groups ( id -- seq )
-    username (user-groups) ;
+    user-name (user-groups) ;
     
 : all-groups ( -- seq )
     [ getgrent dup ] [ group-struct>group ] [ drop ] produce ;
