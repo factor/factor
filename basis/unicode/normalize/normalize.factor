@@ -155,7 +155,7 @@ DEFER: compose-iter
         ] if (compose)
     ] when* ;
 
-: compose ( str -- comp )
+: combine ( str -- comp )
     [
         main-str set
         0 ind set
@@ -166,7 +166,7 @@ DEFER: compose-iter
 PRIVATE>
 
 : nfc ( string -- nfc )
-    nfd compose ;
+    nfd combine ;
 
 : nfkc ( string -- nfkc )
-    nfkd compose ;
+    nfkd combine ;

@@ -3,7 +3,7 @@
 USING: combinators.short-circuit unicode.categories kernel math
 combinators splitting sequences math.parser io.files io assocs
 arrays namespaces make math.ranges unicode.normalize.private values
-io.encodings.ascii unicode.syntax unicode.data compiler.units
+io.encodings.ascii unicode.syntax unicode.data compiler.units fry
 alien.syntax sets accessors interval-maps memoize locals words ;
 IN: unicode.breaks
 
@@ -111,14 +111,9 @@ PRIVATE>
 
 <PRIVATE
 
-:: (>pieces) ( str quot -- )
-    str [
-        dup quot call cut-slice
-        swap , quot (>pieces)
-    ] unless-empty ; inline recursive
-
-: >pieces ( str quot -- graphemes )
-    [ (>pieces) ] { } make ; inline
+: >pieces ( str quot: ( str -- i ) -- graphemes )
+    [ dup empty? not ] swap '[ dup @ cut-slice swap ]
+    [ ] produce nip ; inline
 
 PRIVATE>
 

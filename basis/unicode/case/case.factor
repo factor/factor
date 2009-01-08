@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unicode.data sequences sequences.next namespaces make
 unicode.normalize math unicode.categories combinators
-assocs strings splitting kernel accessors ;
+assocs strings splitting kernel accessors unicode.breaks ;
 IN: unicode.case
 
 <PRIVATE
@@ -82,23 +82,30 @@ SYMBOL: locale ! Just casing locale, or overall?
             [ [ % ] compose ] [ [ , ] compose ] bi* ?if
         ] 2curry each
     ] "" make ; inline
-PRIVATE>
-: >lower ( string -- lower )
-    i-dot? [ turk>lower ] when
-    final-sigma [ lower>> ] [ ch>lower ] map-case ;
 
-: >upper ( string -- upper )
-    i-dot? [ turk>upper ] when
+: (>lower) ( string -- lower )
+    [ lower>> ] [ ch>lower ] map-case ;
+
+: (>title) ( string -- title )
+    [ title>> ] [ ch>title ] map-case ;
+
+: (>upper) ( string -- upper )
     [ upper>> ] [ ch>upper ] map-case ;
 
+: title-word ( string -- title )
+    unclip 1string [ (>lower) ] [ (>title) ] bi* prepend ;
+
+PRIVATE>
+
+: >lower ( string -- lower )
+    i-dot? [ turk>lower ] when
+    final-sigma (>lower) ;
+
+: >upper ( string -- upper )
+    i-dot? [ turk>upper ] when (>upper) ;
+
 : >title ( string -- title )
-    final-sigma
-    CHAR: \s swap
-    [ tuck word-boundary swapd
-        [ title>> ] [ lower>> ] if ]
-    [ tuck word-boundary swapd 
-        [ ch>title ] [ ch>lower ] if ]
-    map-case nip ;
+    final-sigma >words [ title-word ] map concat ;
 
 : >case-fold ( string -- fold )
     >upper >lower ;
