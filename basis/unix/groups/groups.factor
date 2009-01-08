@@ -43,7 +43,7 @@ PRIVATE>
 
 : group-name ( id -- string )
     dup group-cache get [
-        at
+        dupd at* [ name>> nip ] [ drop number>string ] if
     ] [
         group-struct group-gr_name
     ] if*

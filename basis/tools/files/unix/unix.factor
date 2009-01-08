@@ -3,8 +3,11 @@
 USING: accessors combinators kernel system unicode.case io.files
 io.files.info io.files.info.unix tools.files generalizations
 strings arrays sequences math.parser unix.groups unix.users
-tools.files.private unix.stat math ;
+tools.files.private unix.stat math fry macros ;
 IN: tools.files.unix
+
+MACRO: cleave>array ( array -- quot )
+    dup length '[ _ cleave _ narray ] ;
 
 <PRIVATE
 
@@ -28,7 +31,7 @@ IN: tools.files.unix
         [ other-read? read>string ]
         [ other-write? write>string ]
         [ [ sticky? ] [ other-execute? ] bi 2array "t" unix-execute>string ]
-    } cleave 10 narray concat ;
+    } cleave>array concat ;
 
 : mode>symbol ( mode -- ch )
     S_IFMT bitand
@@ -49,11 +52,11 @@ M: unix (directory.) ( path -- lines )
             {
                 [ permissions-string ]
                 [ nlink>> number>string 3 CHAR: \s pad-left ]
-                ! [ uid>> ]
-                ! [ gid>> ]
+                [ uid>> user-name ]
+                [ gid>> group-name ]
                 [ size>> number>string 15 CHAR: \s pad-left ]
                 [ modified>> ls-timestamp ]
-            } cleave 4 narray swap suffix " " join
+            } cleave>array swap suffix " " join
         ] map
     ] with-group-cache ] with-user-cache ;
 

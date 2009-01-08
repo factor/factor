@@ -7,7 +7,7 @@ accessors math.parser fry assocs namespaces continuations
 vocabs.loader system ;
 IN: unix.users
 
-TUPLE: passwd username password uid gid gecos dir shell ;
+TUPLE: passwd user-name password uid gid gecos dir shell ;
 
 HOOK: new-passwd os ( -- passwd )
 HOOK: passwd>new-passwd os ( passwd -- new-passwd )
@@ -20,7 +20,7 @@ M: unix new-passwd ( -- passwd )
 M: unix passwd>new-passwd ( passwd -- seq )
     [ new-passwd ] dip
     {
-        [ passwd-pw_name >>username ]
+        [ passwd-pw_name >>user-name ]
         [ passwd-pw_passwd >>password ]
         [ passwd-pw_uid >>uid ]
         [ passwd-pw_gid >>gid ]
@@ -56,9 +56,9 @@ M: integer user-passwd ( id -- passwd/f )
 M: string user-passwd ( string -- passwd/f )
     getpwnam dup [ passwd>new-passwd ] when ;
 
-: username ( id -- string )
+: user-name ( id -- string )
     dup user-passwd
-    [ nip username>> ] [ number>string ] if* ;
+    [ nip user-name>> ] [ number>string ] if* ;
 
 : user-id ( string -- id )
     user-passwd uid>> ;
@@ -66,14 +66,14 @@ M: string user-passwd ( string -- passwd/f )
 : real-user-id ( -- id )
     getuid ; inline
 
-: real-username ( -- string )
-    real-user-id username ; inline
+: real-user-name ( -- string )
+    real-user-id user-name ; inline
 
 : effective-user-id ( -- id )
     geteuid ; inline
 
-: effective-username ( -- string )
-    effective-user-id username ; inline
+: effective-user-name ( -- string )
+    effective-user-id user-name ; inline
 
 GENERIC: set-real-user ( string/id -- )
 

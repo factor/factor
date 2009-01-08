@@ -35,7 +35,7 @@ HELP: >title
 { $description "Converts a string to title case." } ;
 
 HELP: >case-fold
-{ $values { "string" string } { "case-fold" string } }
+{ $values { "string" string } { "fold" string } }
 { $description "Converts a string to case-folded form." } ;
 
 HELP: upper?
