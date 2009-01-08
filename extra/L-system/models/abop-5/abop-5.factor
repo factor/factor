@@ -9,6 +9,8 @@ IN: L-system.models.abop-5
 
   L-parser-dialect >>commands
 
+  [ 5 >>angle ] >>turtle-values
+
   "&(90)+(90)a" >>axiom
 
   {
