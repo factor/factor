@@ -3,11 +3,8 @@
 USING: accessors combinators kernel system unicode.case io.files
 io.files.info io.files.info.unix tools.files generalizations
 strings arrays sequences math.parser unix.groups unix.users
-tools.files.private unix.stat math fry macros ;
+tools.files.private unix.stat math fry macros combinators.smart ;
 IN: tools.files.unix
-
-MACRO: cleave>array ( array -- quot )
-    dup length '[ _ cleave _ narray ] ;
 
 <PRIVATE
 
@@ -20,18 +17,20 @@ MACRO: cleave>array ( array -- quot )
     } case ;
 
 : permissions-string ( permissions -- str )
-    {
-        [ type>> file-type>ch 1string ]
-        [ user-read? read>string ]
-        [ user-write? write>string ]
-        [ [ uid? ] [ user-execute? ] bi 2array "s" unix-execute>string ]
-        [ group-read? read>string ]
-        [ group-write? write>string ]
-        [ [ gid? ] [ group-execute? ] bi 2array "s" unix-execute>string ]
-        [ other-read? read>string ]
-        [ other-write? write>string ]
-        [ [ sticky? ] [ other-execute? ] bi 2array "t" unix-execute>string ]
-    } cleave>array concat ;
+    [
+        {
+            [ type>> file-type>ch 1string ]
+            [ user-read? read>string ]
+            [ user-write? write>string ]
+            [ [ uid? ] [ user-execute? ] bi 2array "s" unix-execute>string ]
+            [ group-read? read>string ]
+            [ group-write? write>string ]
+            [ [ gid? ] [ group-execute? ] bi 2array "s" unix-execute>string ]
+            [ other-read? read>string ]
+            [ other-write? write>string ]
+            [ [ sticky? ] [ other-execute? ] bi 2array "t" unix-execute>string ]
+        } cleave
+    ] output>array concat ;
 
 : mode>symbol ( mode -- ch )
     S_IFMT bitand
@@ -48,15 +47,16 @@ MACRO: cleave>array ( array -- quot )
 M: unix (directory.) ( path -- lines )
     [ [
         [
-            dup file-info
-            {
-                [ permissions-string ]
-                [ nlink>> number>string 3 CHAR: \s pad-left ]
-                [ uid>> user-name ]
-                [ gid>> group-name ]
-                [ size>> number>string 15 CHAR: \s pad-left ]
-                [ modified>> ls-timestamp ]
-            } cleave>array swap suffix " " join
+            dup file-info [
+                {
+                    [ permissions-string ]
+                    [ nlink>> number>string 3 CHAR: \s pad-left ]
+                    [ uid>> user-name ]
+                    [ gid>> group-name ]
+                    [ size>> number>string 15 CHAR: \s pad-left ]
+                    [ modified>> ls-timestamp ]
+                } cleave
+            ] output>array swap suffix " " join
         ] map
     ] with-group-cache ] with-user-cache ;
 
