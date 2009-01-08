@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences namespaces make unicode.data kernel math arrays
-locals sorting.insertion accessors ;
+locals sorting.insertion accessors assocs ;
 IN: unicode.normalize
 
+<PRIVATE
 ! Conjoining Jamo behavior
 
 : hangul-base HEX: ac00 ; inline
@@ -74,10 +75,12 @@ IN: unicode.normalize
         dup reorder
     ] if ; inline
 
-: nfd ( string -- string )
+PRIVATE>
+
+: nfd ( string -- nfd )
     [ canonical-entry ] decompose ;
 
-: nfkd ( string -- string )
+: nfkd ( string -- nfkd )
     [ compatibility-entry ] decompose ;
 
 : string-append ( s1 s2 -- string )
@@ -86,6 +89,8 @@ IN: unicode.normalize
     [ append ] keep
     0 over ?nth non-starter?
     [ length dupd reorder-back ] [ drop ] if ;
+
+<PRIVATE
 
 ! Normalization -- Composition
 SYMBOL: main-str
@@ -107,26 +112,34 @@ SYMBOL: char
     current to current to current jamo>hangul , ;
 
 : im, ( -- )
-    current to current 0 jamo>hangul , ;
+    current to current final-base jamo>hangul , ;
 
 : compose-jamo ( -- )
     initial-medial? [
         --final? [ imf, ] [ im, ] if
-    ] when to current jamo? [ compose-jamo ] when ;
+    ] [ current , ] if to ;
 
 : pass-combining ( -- )
     current non-starter? [ current , to pass-combining ] when ;
 
-: try-compose ( last-class char current-class -- )
-    swapd = [ after get push ] [
-        char get over combine-chars
-        [ nip char set ] [ after get push ] if*
+:: try-compose ( last-class new-char current-class -- new-class )
+    last-class current-class = [ new-char after get push last-class ] [
+        char get new-char combine-chars
+        [ char set last-class ]
+        [ new-char after get push current-class ] if*
     ] if ;
 
-: compose-iter ( n -- )
+DEFER: compose-iter
+
+: try-noncombining ( char -- )
+    char get swap combine-chars
+    [ char set to f compose-iter ] when* ;
+
+: compose-iter ( last-class -- )
     current [
-        dup combining-class dup
-        [ [ try-compose ] keep to compose-iter ] [ 3drop ] if
+        dup combining-class
+        [ try-compose to compose-iter ]
+        [ swap [ drop ] [ try-noncombining ] if ] if*
     ] [ drop ] if* ;
 
 : ?new-after ( -- )
@@ -136,9 +149,8 @@ SYMBOL: char
     current [
         dup jamo? [ drop compose-jamo ] [
             char set to ?new-after
-            0 compose-iter
+            f compose-iter
             char get , after get %
-            to
         ] if (compose)
     ] when* ;
 
@@ -150,8 +162,10 @@ SYMBOL: char
         pass-combining (compose)
     ] "" make ;
 
+PRIVATE>
+
 : nfc ( string -- nfc )
     nfd compose ;
 
 : nfkc ( string -- nfkc )
-    nfkc compose ;
+    nfkd compose ;
