@@ -7,6 +7,16 @@ ui.tools.listener ui.tools.operations ui.tools.profiler
 ui.tools.walker vocabs ;
 IN: ui.tools
 
+ARTICLE: "starting-ui-tools" "Starting the UI tools"
+"The UI tools start automatically where possible:"
+{ $list
+    { "On Windows, the tools start when the Factor executable is run." }
+    { "On X11, the tools start if the " { $snippet "DISPLAY" } " environment variable is set." }
+    { "On Mac OS X, the tools start if the " { $snippet "Factor.app" } " application bundle is run." }
+}
+"In all cases, passing the " { $snippet "-run=listener" } " command line switch starts the terminal listener instead. The UI can be started from the terminal by issuing the following command:"
+{ $code "USE: threads" "[ \"ui.tools\" run ] in-thread" } ;
+
 ARTICLE: "ui-presentations" "Presentations in the UI"
 "A " { $emphasis "presentation" } " is a graphical view of an object which is directly linked to the object in some way. The help article links you see in the documentation browser are presentations; and if you " { $link see } " a word in the UI listener, all words in the definition will themselves be presentations."
 $nl
@@ -26,7 +36,8 @@ $nl
 "Clicking on a vocabulary in the vocabulary list narrows down the word list to only include words from that vocabulary. The sorting options control the order of elements in the vocabulary and word lists. The search fields narrow down the list to only include words or vocabularies whose names contain a substring."
 $nl
 "Consult " { $link "profiling" } " for details about the profiler itself."
-{ $command-map profiler-gadget "toolbar" } ;
+{ $command-map profiler-gadget "toolbar" }
+"The profiler is an instance of " { $link profiler-gadget } "." ;
 
 ARTICLE: "ui-cocoa" "Functionality specific to Mac OS X"
 "On Mac OS X, the Factor UI offers additional features which integrate with this operating system."
@@ -40,9 +51,9 @@ $nl
 ;
 
 ARTICLE: "ui-tools" "UI developer tools"
-"The Factor development environment can seem rather different from what you are used to, because it is very simple and powerful.."
+"The " { $vocab-link "ui.tools" } " vocabulary hierarchy implements a collection of simple developer tools."
 $nl
-"To take full advantage of the UI, you should be using a supported text editor. See " { $link "editor" } "."
+"To take full advantage of the UI tools, you should be using a supported text editor. See " { $link "editor" } "."
 { $subsection "ui-presentations" }
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }

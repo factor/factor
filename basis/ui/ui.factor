@@ -1,10 +1,10 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces make
-dlists deques sequences threads sequences words ui.gadgets
-ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend
-ui.render continuations init combinators hashtables
-concurrency.flags sets accessors calendar ;
+dlists deques sequences threads sequences words continuations
+init combinators hashtables concurrency.flags sets accessors
+calendar fry ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
+ui.gestures ui.backend ui.render ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -73,8 +73,6 @@ M: world ungraft*
     windows get values
     [ gadget-child swap call ] with find-last nip ; inline
 
-SYMBOL: ui-hook
-
 : init-ui ( -- )
     <dlist> \ graft-queue set-global
     <dlist> \ layout-queue set-global
@@ -95,14 +93,6 @@ SYMBOL: ui-hook
 
 : restore-world ( world -- )
     dup reset-world restore-gadget ;
-
-: restore-windows ( -- )
-    windows get [ values ] keep delete-all
-    [ restore-world ] each
-    forget-rollover ;
-
-: restore-windows? ( -- ? )
-    windows get empty? not ;
 
 : update-hand ( world -- )
     dup hand-world get-global eq?
@@ -181,30 +171,25 @@ HOOK: close-window ui-backend ( gadget -- )
 M: object close-window
     find-world [ ungraft ] when* ;
 
-: start-ui ( -- )
-    restore-windows? [
-        restore-windows
-    ] [
-        init-ui ui-hook get call
-    ] if
-    notify-ui-thread start-ui-thread ;
+: start-ui ( quot -- )
+    call notify-ui-thread start-ui-thread ;
 
 [
     f \ ui-running set-global
     <flag> ui-notify-flag set-global
 ] "ui" add-init-hook
 
-HOOK: ui ui-backend ( -- )
+HOOK: (with-ui) ui-backend ( quot -- )
 
-MAIN: ui
+: restore-windows ( -- )
+    [
+        windows get [ values ] [ delete-all ] bi
+        [ restore-world ] each
+        forget-rollover
+    ] (with-ui) ;
+
+: restore-windows? ( -- ? )
+    windows get empty? not ;
 
 : with-ui ( quot -- )
-    ui-running? [
-        call
-    ] [
-        f windows set-global
-        [
-            ui-hook set
-            ui
-        ] with-scope
-    ] if ;
+    ui-running? [ call ] [ '[ init-ui @ ] (with-ui) ] if ;

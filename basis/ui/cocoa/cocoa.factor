@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors math arrays assocs cocoa cocoa.application
 command-line kernel memory namespaces cocoa.messages
@@ -145,7 +145,7 @@ cocoa-init-hook global [
     [ "MiniFactor.nib" load-nib install-app-delegate ] or
 ] change-at
 
-M: cocoa-ui-backend ui
+M: cocoa-ui-backend (with-ui)
     "UI" assert.app [
         [
             init-clipboard
@@ -160,4 +160,4 @@ M: cocoa-ui-backend ui
 
 cocoa-ui-backend ui-backend set-global
 
-[ running.app? "ui" "listener" ? ] main-vocab-hook set-global
+[ running.app? "ui.tools" "listener" ? ] main-vocab-hook set-global

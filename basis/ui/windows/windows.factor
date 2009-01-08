@@ -1,5 +1,5 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
-! Portions copyright (C) 2007, 2008 Slava Pestov.
+! Portions copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings arrays assocs ui
 ui.gadgets ui.backend ui.clipboards ui.gadgets.worlds
@@ -540,6 +540,7 @@ M: win-base flush-gl-context ( handle -- )
 M: windows-ui-backend (open-offscreen-buffer) ( world -- )
     dup dim>> setup-offscreen-gl <win-offscreen>
     >>handle drop ;
+
 M: windows-ui-backend (close-offscreen-buffer) ( handle -- )
     [ hDC>> DeleteDC drop ]
     [ hBitmap>> DeleteObject drop ] bi ;
@@ -560,18 +561,16 @@ M: windows-ui-backend offscreen-pixels ( world -- alien w h )
     [ (opaque-pixels) ] [ dim>> first2 ] bi ;
 
 M: windows-ui-backend raise-window* ( world -- )
-    handle>> [
-        hWnd>> SetFocus drop
-    ] when* ;
+    handle>> [ hWnd>> SetFocus drop ] when* ;
 
 M: windows-ui-backend set-title ( string world -- )
     handle>>
     dup title>> [ free ] when*
-    [ utf16n malloc-string ] dip
-    2dup (>>title)
-    hWnd>> WM_SETTEXT 0 roll alien-address SendMessage drop ;
+    swap utf16n malloc-string
+    [ >>title ]
+    [ [ hWnd>> WM_SETTEXT 0 ] dip alien-address SendMessage drop ] bi ;
 
-M: windows-ui-backend ui
+M: windows-ui-backend (with-ui)
     [
         [
             init-clipboard
@@ -586,4 +585,4 @@ M: windows-ui-backend beep ( -- )
 
 windows-ui-backend ui-backend set-global
 
-[ "ui" ] main-vocab-hook set-global
+[ "ui.tools" ] main-vocab-hook set-global

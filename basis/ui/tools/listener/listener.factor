@@ -192,7 +192,7 @@ M: listener-gadget focusable-child*
     dup "Listener" open-status-window ;
 
 : listener-window ( -- )
-    listener-window* drop ;
+    [ listener-window* drop ] with-ui ;
 
 : (get-listener) ( quot -- listener )
     find-window

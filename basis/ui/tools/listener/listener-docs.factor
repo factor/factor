@@ -9,15 +9,21 @@ $nl
 $nl
 "Interactors implement the " { $link stream-readln } ", " { $link stream-read } " and " { $link read-quot } " generic words." } ;
 
+ARTICLE: "ui-listener-completion" "Word and vocabulary completion"
+"The listener is great"
+;
+
 ARTICLE: "ui-listener" "UI listener"
 "The graphical listener is based around the terminal listener (" { $link "listener" } ") and adds the following features:"
 { $list
     "Input history"
-    { "Completion (see " { $link "ui-completion" } ")" }
+    { "Completion (see " { $link "ui-listener-completion" } ")" }
     { "Clickable presentations (see " { $link "ui-presentations" } ")" }
 }
 { $command-map listener-gadget "toolbar" }
 { $command-map listener-gadget "scrolling" }
+{ $command-map listener-gadget "workflow" }
+{ $command-map listener-gadget "multi-touch" }
 { $command-map interactor "interactor" }
 { $command-map source-editor "word" }
 { $command-map interactor "quotation" }

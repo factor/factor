@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Eduardo Cavazos and Slava Pestov
+! Copyright (C) 2005, 2009 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays ui ui.gadgets
 ui.gestures ui.backend ui.clipboards ui.gadgets.worlds ui.render
@@ -277,7 +277,7 @@ M: x11-ui-backend (close-offscreen-buffer) ( handle -- )
 M: x11-ui-backend offscreen-pixels ( world -- alien w h )
     [ [ dim>> ] [ handle>> pixmap>> ] bi pixmap-bits ] [ dim>> first2 ] bi ;
 
-M: x11-ui-backend ui ( -- )
+M: x11-ui-backend (with-ui) ( quot -- )
     [
         f [
             [
@@ -293,5 +293,5 @@ M: x11-ui-backend beep ( -- )
 
 x11-ui-backend ui-backend set-global
 
-[ "DISPLAY" os-env "ui" "listener" ? ]
+[ "DISPLAY" os-env "ui.tools" "listener" ? ]
 main-vocab-hook set-global

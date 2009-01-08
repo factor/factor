@@ -36,8 +36,10 @@ HELP: unregister-window
 { $description "Removes a window from the global " { $link windows } " variable." }
 { $notes "This word should only be called only by the UI backend, and not user code." } ;
 
-HELP: ui
-{ $description "Starts the Factor UI." } ;
+HELP: (with-ui)
+{ $values { "quot" quotation } }
+{ $contract "Starts the Factor UI." }
+{ $notes "This is a low-level word; user code should call " { $link with-ui } " instead." } ;
 
 HELP: start-ui
 { $description "Called by the UI backend to initialize the platform-independent parts of UI. This word should be called after the backend is ready to start displaying new windows, and before the event loop starts." } ;
@@ -132,7 +134,7 @@ ARTICLE: "ui-backend" "Developing UI backends"
 "UI backends may implement the " { $link "clipboard-protocol" } "." ;
 
 ARTICLE: "ui-backend-init" "UI initialization and the event loop"
-"An UI backend is required to define a method on the " { $link ui } " word. This word should contain backend initialization, together with some boilerplate:"
+"An UI backend is required to define a method on the " { $link (with-ui) } " word. This word should contain backend initialization, together with some boilerplate:"
 { $code
     "IN: shells"
     ""
@@ -144,7 +146,7 @@ ARTICLE: "ui-backend-init" "UI initialization and the event loop"
 }
 "The above word must call the following:"
 { $subsection start-ui }
-"The " { $link ui } " word must not return until the event loop has stopped and the UI has been shut down." ;
+"The " { $link (with-ui) } " word must not return until the event loop has stopped and the UI has been shut down." ;
 
 ARTICLE: "ui-backend-windows" "UI backend window management"
 "The high-level " { $link open-window } " word eventually calls a low-level word which you must implement:"
@@ -236,16 +238,6 @@ $nl
 { $see-also "ui-layout-impl" } ;
 
 ARTICLE: "starting-ui" "Starting the UI"
-"The UI starts automatically where possible:"
-{ $list
-    { "On Windows, the UI starts when the Factor executable is run." }
-    { "On X11, the UI starts if the " { $snippet "DISPLAY" } " environment variable is set." }
-    { "On Mac OS X, the UI starts if the " { $snippet "Factor.app" } " application bundle is run." }
-}
-"In all cases, passing the " { $snippet "-run=listener" } " command line switch starts the terminal listener instead. The UI can be started from the terminal listener using a word:"
-{ $subsection ui }
-"To run the terminal listener and the UI simultaneously, start the UI in a new thread:"
-{ $code "USING: threads ui ;" "[ ui ] in-thread" }
 "The main word of a vocabulary implementing a UI application should use a combinator to ensure that the application works when run from the command line as well as in the UI listener:"
 { $subsection with-ui } ;
 
