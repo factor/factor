@@ -49,7 +49,7 @@ HELP: <groups>
     }
     { $example
         "USING: kernel prettyprint sequences grouping ;"
-        "{ 1 2 3 4 5 6 } 3 <groups> 0 swap nth ."
+        "{ 1 2 3 4 5 6 } 3 <groups> first ."
         "{ 1 2 3 }"
     }
 } ;
@@ -66,7 +66,7 @@ HELP: <sliced-groups>
     }
     { $example
         "USING: kernel prettyprint sequences grouping ;"
-        "{ 1 2 3 4 5 6 } 3 <sliced-groups> 1 swap nth ."
+        "{ 1 2 3 4 5 6 } 3 <sliced-groups> second ."
         "T{ slice { from 3 } { to 6 } { seq { 1 2 3 4 5 6 } } }"
     }
 } ;

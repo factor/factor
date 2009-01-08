@@ -24,8 +24,8 @@ VALUE: properties
 : compatibility-entry ( char -- seq ) compatibility-map at  ;
 : combining-class ( char -- n ) class-map at ;
 : non-starter? ( char -- ? ) class-map key? ;
-: name>char ( string -- char ) name-map at ;
-: char>name ( char -- string ) name-map value-at ;
+: name>char ( name -- char ) name-map at ;
+: char>name ( char -- name ) name-map value-at ;
 : property? ( char property -- ? ) properties at interval-key? ;
 
 ! Loading data from UnicodeData.txt
