@@ -1,9 +1,10 @@
 
-USING: accessors arrays assocs colors combinators.short-circuit
-kernel locals math math.functions math.matrices math.order
-math.parser math.trig math.vectors opengl opengl.demo-support
-opengl.gl sbufs sequences strings ui.gadgets ui.gadgets.worlds
-ui.gestures ui.render ;
+USING: accessors arrays assocs calendar colors
+combinators.short-circuit help.markup help.syntax kernel locals
+math math.functions math.matrices math.order math.parser
+math.trig math.vectors opengl opengl.demo-support opengl.gl
+sbufs sequences strings threads ui.gadgets ui.gadgets.worlds
+ui.gestures ui.render ui.tools.workspace ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -255,8 +256,26 @@ DEFER: default-L-parser-values
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 TUPLE: <L-system> < gadget
-  camera display-list
-  commands axiom rules string ;
+  camera display-list pedestal paused commands axiom rules string ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: iterate-system ( GADGET -- ) GADGET pedestal>> 0.5 + GADGET (>>pedestal) ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: start-rotation-thread ( GADGET -- )
+  GADGET f >>paused drop
+  [
+    [
+      GADGET paused>>
+        [ f ]
+        [ GADGET iterate-system GADGET relayout-1 25 milliseconds sleep t ]
+      if
+    ]
+    loop
+  ]
+  in-thread ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -332,7 +351,7 @@ TUPLE: <L-system> < gadget
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 :: iterate-L-system-string ( L-SYSTEM -- )
-  L-SYSTEM string>>
+  L-SYSTEM string>> L-SYSTEM axiom>> or
   L-SYSTEM rules>>
   iterate-string
   L-SYSTEM (>>string) ;
@@ -357,7 +376,7 @@ TUPLE: <L-system> < gadget
   L-SYSTEM display-list>> GL_COMPILE glNewList
 
     turtle
-    L-SYSTEM string>>
+    L-SYSTEM string>> L-SYSTEM axiom>> or
     L-SYSTEM commands>>
     interpret-string
     drop
@@ -387,6 +406,10 @@ M:: <L-system> draw-gadget* ( L-SYSTEM -- )
   ! draw axis
   white gl-color GL_LINES glBegin { 0 0 0 } gl-vertex { 0 0 1 } gl-vertex glEnd
 
+  ! rotate pedestal
+
+  L-SYSTEM pedestal>> 0 0 1 glRotated
+  
   L-SYSTEM display-list>> glCallList ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -403,15 +426,11 @@ M:: <L-system> pref-dim* ( L-SYSTEM -- dim ) { 400 400 } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-:: camera-left ( L-SYSTEM -- )
-  L-SYSTEM camera>> 5 turn-left drop
-  L-SYSTEM relayout-1 ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 :: with-camera ( L-SYSTEM QUOT -- )
   L-SYSTEM camera>> QUOT call drop
   L-SYSTEM relayout-1 ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 <L-system>
 H{
@@ -423,6 +442,11 @@ H{
   { T{ key-down f f "a"     } [ [  1 step-turtle ] with-camera ] }
   { T{ key-down f f "z"     } [ [ -1 step-turtle ] with-camera ] }
 
+  { T{ key-down f f "q"     } [ [ 5 roll-left    ] with-camera ] }
+  { T{ key-down f f "w"     } [ [ 5 roll-right   ] with-camera ] }
+
+  { T{ key-down f f "r"     } [ start-rotation-thread          ] }
+
   {
     T{ key-down f f "x" }
     [
@@ -432,6 +456,8 @@ H{
       drop
     ]
   }
+
+  { T{ key-down f f "F1" } [ drop "L-system" help-window ] }
     
 }
 set-gestures
@@ -441,8 +467,36 @@ set-gestures
 : L-system ( -- L-system )
 
   <L-system> new-gadget
+
+    0 >>pedestal
   
-    turtle 45 turn-left 45 pitch-up 5 step-turtle 180 turn-left >>camera ;
+    ! turtle 45 turn-left 45 pitch-up 5 step-turtle 180 turn-left >>camera ;
+
+    turtle 90 pitch-down -5 step-turtle 2 strafe-up >>camera
+
+    dup start-rotation-thread
+
+  ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+ARTICLE: "L-system" "L-system"
+
+"Press 'x' to iterate the L-system." $nl
+
+"Camera control:"
+
+{ $table
+
+  { "a" "Forward" }
+  { "z" "Backward" }
+
+  { "LEFT" "Turn left" }
+  { "RIGHT" "Turn right" }
+  { "UP" "Pitch down" }
+  { "DOWN" "Pitch up" }
+
+  { "q" "Roll left" }
+  { "w" "Roll right" } } ;
+
+ABOUT: "L-system"
