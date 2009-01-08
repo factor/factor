@@ -74,6 +74,8 @@ beast.
     - C-cM-<, C-cC-d< : show callers of word at point
     - C-cM->, C-cC-d> : show callees of word at point
 
+    - C-cC-xw : extract region as a separate word
+
 *** In the listener:
 
     - TAB : complete word at point

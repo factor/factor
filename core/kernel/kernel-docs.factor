@@ -691,11 +691,10 @@ HELP: assert=
 { $values { "a" object } { "b" object } }
 { $description "Throws an " { $link assert } " error if " { $snippet "a" } " does not equal " { $snippet "b" } "." } ;
 
-
 ARTICLE: "shuffle-words" "Shuffle words"
 "Shuffle words rearrange items at the top of the data stack. They control the flow of data between words that perform actions."
 $nl
-"The " { $link "cleave-combinators" } " and " { $link "spread-combinators" } " are closely related to shuffle words and should be used instead where possible because they can result in clearer code; also, see the advice in " { $link "cookbook-philosophy" } "."
+"The " { $link "cleave-combinators" } ", " { $link "spread-combinators" } " and " { $link "apply-combinators" } " are closely related to shuffle words and should be used instead where possible because they can result in clearer code; also, see the advice in " { $link "cookbook-philosophy" } "."
 $nl
 "Removing stack elements:"
 { $subsection drop }
