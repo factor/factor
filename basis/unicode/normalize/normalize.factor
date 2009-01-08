@@ -1,20 +1,24 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences namespaces make unicode.data kernel math arrays
-locals sorting.insertion accessors assocs ;
+locals sorting.insertion accessors assocs math.order ;
 IN: unicode.normalize
 
+<PRIVATE
 ! Conjoining Jamo behavior
 
-: hangul-base HEX: ac00 ; inline
-: hangul-end HEX: D7AF ; inline
-: initial-base HEX: 1100 ; inline
-: medial-base HEX: 1161 ; inline
-: final-base HEX: 11a7 ; inline
+CONSTANT: hangul-base HEX: ac00
+CONSTANT: hangul-end HEX: D7AF
+CONSTANT: initial-base HEX: 1100
+CONSTANT: medial-base HEX: 1161
+CONSTANT: final-base HEX: 11a7
 
-: initial-count 19 ; inline
-: medial-count 21 ; inline
-: final-count 28 ; inline
+CONSTANT: initial-count 19
+CONSTANT: medial-count 21
+CONSTANT: final-count 28
+
+: ?between? ( n/f from to -- ? )
+    pick [ between? ] [ 3drop f ] if ;
 
 : hangul? ( ch -- ? ) hangul-base hangul-end ?between? ;
 : jamo? ( ch -- ? ) HEX: 1100 HEX: 11FF ?between? ;
@@ -74,18 +78,20 @@ IN: unicode.normalize
         dup reorder
     ] if ; inline
 
-: nfd ( string -- string )
+PRIVATE>
+
+: nfd ( string -- nfd )
     [ canonical-entry ] decompose ;
 
-: nfkd ( string -- string )
+: nfkd ( string -- nfkd )
     [ compatibility-entry ] decompose ;
 
 : string-append ( s1 s2 -- string )
-    ! This could be more optimized,
-    ! but in practice, it'll almost always just be append
     [ append ] keep
     0 over ?nth non-starter?
     [ length dupd reorder-back ] [ drop ] if ;
+
+<PRIVATE
 
 ! Normalization -- Composition
 SYMBOL: main-str
@@ -149,7 +155,7 @@ DEFER: compose-iter
         ] if (compose)
     ] when* ;
 
-: compose ( str -- comp )
+: combine ( str -- comp )
     [
         main-str set
         0 ind set
@@ -157,8 +163,10 @@ DEFER: compose-iter
         pass-combining (compose)
     ] "" make ;
 
+PRIVATE>
+
 : nfc ( string -- nfc )
-    nfd compose ;
+    nfd combine ;
 
 : nfkc ( string -- nfkc )
-    nfkd compose ;
+    nfkd combine ;

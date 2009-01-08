@@ -201,6 +201,9 @@ SYMBOL: :uses
 : fuel-apropos-xref ( str -- )
     words-matching fuel-format-xrefs fuel-eval-set-result ; inline
 
+: fuel-vocab-xref ( vocab -- )
+    words fuel-format-xrefs fuel-eval-set-result ; inline
+
 ! Completion support
 
 : fuel-filter-prefix ( seq prefix -- seq )
@@ -269,7 +272,7 @@ MEMO: fuel-article-title ( name -- title/f )
     help-path [ dup article-title swap 2array ] map ; inline
 
 : (fuel-word-help) ( word -- element )
-    dup \ article swap article-title rot
+    \ article swap dup article-title swap
     [
         {
             [ fuel-parent-topics [ \ $doc-path prefix , ] unless-empty ]
