@@ -1,17 +1,15 @@
 
 USING: accessors ui L-system ;
 
-IN: L-system.models.abop-5
+IN: L-system.models.abop-5-angular
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: abop-5 ( <L-system> -- <L-system> )
+: abop-5-angular ( <L-system> -- <L-system> )
 
   L-parser-dialect >>commands
 
-  [ 5 >>angle ] >>turtle-values
-
-  "a" >>axiom
+  "&(90)+(90)a" >>axiom
 
   {
     { "a" "F[+(45)l][-(45)l]^;ca" }
@@ -29,7 +27,7 @@ IN: L-system.models.abop-5
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: main ( -- ) [ L-system abop-5 "L-system" open-window ] with-ui ;
+: main ( -- ) [ L-system abop-5-angular "L-system" open-window ] with-ui ;
 
 MAIN: main
   

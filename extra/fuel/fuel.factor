@@ -201,6 +201,9 @@ SYMBOL: :uses
 : fuel-apropos-xref ( str -- )
     words-matching fuel-format-xrefs fuel-eval-set-result ; inline
 
+: fuel-vocab-xref ( vocab -- )
+    words fuel-format-xrefs fuel-eval-set-result ; inline
+
 ! Completion support
 
 : fuel-filter-prefix ( seq prefix -- seq )

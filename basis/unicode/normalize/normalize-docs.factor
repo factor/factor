@@ -8,9 +8,7 @@ ARTICLE: "unicode.normalize" "Unicode normalization"
 { $subsection nfc }
 { $subsection nfd }
 { $subsection nfkc }
-{ $subsection nfkd }
-"If two strings in a normalization form are appended, the result may not be in that normalization form still. To append two strings in NFD and make sure the result is in NFD, the following procedure is supplied:"
-{ $subsection string-append } ;
+{ $subsection nfkd } ;
 
 HELP: nfc
 { $values { "string" string } { "nfc" "a string in NFC" } }
@@ -27,7 +25,3 @@ HELP: nfkc
 HELP: nfkd
 { $values { "string" string } { "nfc" "a string in NFKD" } }
 { $description "Converts a string to Normalization Form KD" } ;
-
-HELP: string-append
-{ $values { "s1" "a string in NFD" } { "s2" "a string in NFD" } { "string" "a string in NFD" } }
-{ $description "Appends two strings, putting the result in NFD." } ;

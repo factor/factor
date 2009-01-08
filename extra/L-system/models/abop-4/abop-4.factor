@@ -9,6 +9,8 @@ IN: L-system.models.abop-4
 
   L-parser-dialect >>commands
 
+  [ 18 >>angle ] >>turtle-values
+
   "c(12)&(20)N" >>axiom
 
   {

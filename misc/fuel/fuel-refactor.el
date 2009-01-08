@@ -20,23 +20,13 @@
 
 ;;; Extract word:
 
-(defun fuel-refactor-extract-word (begin end)
-  "Extracts current region as a separate word."
-  (interactive "r")
+(defun fuel-refactor--extract (begin end)
   (let* ((word (read-string "New word name: "))
-         (begin (save-excursion
-                  (goto-char begin)
-                  (when (zerop (skip-syntax-backward "w"))
-                    (skip-syntax-forward "-"))
-                  (point)))
-         (end (save-excursion
-                (goto-char end)
-                (skip-syntax-forward "w")
-                (point)))
          (code (buffer-substring begin end))
          (code-str (fuel--region-to-string begin end))
          (stack-effect (or (fuel-stack--infer-effect code-str)
                            (read-string "Stack effect: "))))
+    (unless (< begin end) (error "No proper region to extract"))
     (goto-char begin)
     (delete-region begin end)
     (insert word)
@@ -51,6 +41,29 @@
       (goto-char (mark))
       (sit-for fuel-stack-highlight-period)
       (delete-overlay fuel-stack--overlay))))
+
+(defun fuel-refactor-extract-region (begin end)
+  "Extracts current region as a separate word."
+  (interactive "r")
+  (let ((begin (save-excursion
+                 (goto-char begin)
+                 (when (zerop (skip-syntax-backward "w"))
+                   (skip-syntax-forward "-"))
+                 (point)))
+        (end (save-excursion
+               (goto-char end)
+               (skip-syntax-forward "w")
+               (point))))
+    (fuel-refactor--extract begin end)))
+
+(defun fuel-refactor-extract-sexp ()
+  "Extracts current innermost sexp (up to point) as a separate
+word."
+  (interactive)
+  (fuel-refactor-extract-region (1+ (fuel-syntax--beginning-of-sexp-pos))
+                                (if (looking-at-p ";") (point)
+                                  (fuel-syntax--end-of-symbol-pos))))
+
 
 
 (provide 'fuel-refactor)
