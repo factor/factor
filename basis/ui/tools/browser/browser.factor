@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: debugger help help.topics kernel models compiler.units
 assocs words vocabs accessors fry combinators.short-circuit
-models models.history tools.apropos
+sequences models models.history tools.apropos
 ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.gadgets.buttons ui.gadgets.packs
 ui.gadgets.editors ui.gadgets.labels ui.gadgets.status-bar
@@ -19,7 +19,7 @@ TUPLE: browser-gadget < track pane scroller search-field ;
     model>> [ '[ _ print-topic ] try ] <pane-control> ;
 
 : search-browser ( string browser -- )
-    [ <apropos> ] dip show-help ;
+    '[ <apropos> _ show-help ] unless-empty ;
 
 : <search-field> ( browser -- field )
     '[ _ search-browser ] <action-field>
