@@ -28,10 +28,6 @@ VALUE: properties
 : char>name ( char -- string ) name-map value-at ;
 : property? ( char property -- ? ) properties at interval-key? ;
 
-! Convenience functions
-: ?between? ( n/f from to -- ? )
-    pick [ between? ] [ 3drop f ] if ;
-
 ! Loading data from UnicodeData.txt
 
 : split-; ( line -- array )
@@ -206,9 +202,9 @@ SYMBOL: interned
 : expand-ranges ( assoc -- interval-map )
     [
         [
-            CHAR: . pick member? [
-                swap ".." split1 [ hex> ] bi@ 2array
-            ] [ swap hex> ] if range,
+            swap CHAR: . over member? [
+                ".." split1 [ hex> ] bi@ 2array
+            ] [ hex> ] if range,
         ] assoc-each
     ] { } make <interval-map> ;
 
