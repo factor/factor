@@ -21,6 +21,7 @@
 (require 'fuel-eval)
 (require 'fuel-help)
 (require 'fuel-xref)
+(require 'fuel-refactor)
 (require 'fuel-stack)
 (require 'fuel-autodoc)
 (require 'fuel-font-lock)
