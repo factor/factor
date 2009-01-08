@@ -183,15 +183,22 @@ M: table pref-dim*
     [ control-value length ]
     bi * 2array ;
 
-: nth-row ( row table -- value/f )
-    over [ control-value nth ] [ 2drop f ] if ;
+: nth-row ( row table -- value/f ? )
+    over [ control-value nth t ] [ 2drop f f ] if ;
 
-: selected-row ( table -- value/f )
-    [ selected-index>> ] keep [ nth-row ] keep
-    over [ renderer>> row-value ] [ drop ] if ;
+PRIVATE>
+
+: (selected-row) ( table -- value/f ? )
+    [ selected-index>> ] keep nth-row ;
+
+: selected-row ( table -- value/f ? )
+    [ (selected-row) ] keep
+    swap [ renderer>> row-value t ] [ 2drop f f ] if ;
+
+<PRIVATE
 
 : update-selected-value ( table -- )
-    [ selected-row ] [ selected-value>> ] bi set-model ;
+    [ selected-row drop ] [ selected-value>> ] bi set-model ;
 
 M: table model-changed
     nip
@@ -219,8 +226,7 @@ M: table model-changed
     ] if ;
 
 : row-action ( table -- )
-    dup selected-row dup
-    [ swap action>> call ] [ 2drop ] if ;
+    dup selected-row [ swap action>> call ] [ 2drop ] if ;
 
 : table-button-up ( table -- )
     hand-click# get 2 =
@@ -259,13 +265,13 @@ M: table model-changed
         [ swap >>mouse-index relayout-1 ]
         [
             [ nth-row ] keep
-            over [ show-row-summary ] [ 2drop ] if
+            swap [ show-row-summary ] [ 2drop ] if
         ] 2bi
     ] [ hide-mouse-help ] if-mouse-row ;
 
 : table-operations-menu ( table -- )
     [
-        [ nth-row ] keep [ renderer>> row-value ] keep
+        [ nth-row drop ] keep [ renderer>> row-value ] keep
         swap show-operations-menu
     ] [ drop ] if-mouse-row ;
 

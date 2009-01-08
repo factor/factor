@@ -106,12 +106,6 @@ HELP: font-style
 HELP: presented
 { $description "Character and paragraph style. An object associated with the text. In the Factor UI, this is shown as a clickable presentation of the object; left-clicking invokes a default command, and right-clicking shows a menu of commands." } ;
 
-HELP: presented-path
-{ $description "Character and paragraph style. An editable object associated with the text. In the Factor UI, this is shown as a clickable presentation of the object path together with an expander button which displays an object editor; left-clicking invokes a default command, and right-clicking shows a menu of commands." } ;
-
-HELP: presented-printer
-{ $description "Character and paragraph style. A quotation with stack effect " { $snippet "( obj -- )" } " which is applied to the value at the " { $link presented-path } " if the presentation needs to be re-displayed after the object has been edited." } ;
-
 HELP: page-color
 { $description "Paragraph style. Background color of the paragraph block, denoted by a sequence of four numbers between 0 and 1 (red, green, blue and alpha)." } 
 { $examples

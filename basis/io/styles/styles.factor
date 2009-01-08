@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables io colors summary make accessors splitting
 kernel ;
@@ -18,8 +18,6 @@ SYMBOL: font-style
 
 ! Presentation
 SYMBOL: presented
-SYMBOL: presented-path
-SYMBOL: presented-printer
 
 SYMBOL: href
 

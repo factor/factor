@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.paragraphs
@@ -7,7 +7,7 @@ ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 hashtables io kernel namespaces sequences io.styles strings
 quotations math opengl combinators math.vectors sorting
 splitting io.streams.nested assocs ui.gadgets.presentations
-ui.gadgets.slots ui.gadgets.grids ui.gadgets.grid-lines
+ui.gadgets.grids ui.gadgets.grid-lines
 classes.tuple models continuations destructors accessors
 math.geometry.rect fry ;
 IN: ui.gadgets.panes
@@ -221,22 +221,14 @@ M: pane-stream make-span-stream
 : apply-page-color-style ( style gadget -- style gadget )
     page-color [ solid-interior ] apply-style ;
 
-: apply-path-style ( style gadget -- style gadget )
-    presented-path [ <editable-slot> ] apply-style ;
-
 : apply-border-width-style ( style gadget -- style gadget )
     border-width [ <border> ] apply-style ;
-
-: apply-printer-style ( style gadget -- style gadget )
-    presented-printer [ '[ _ make-pane ] >>printer ] apply-style ;
 
 : style-pane ( style pane -- pane )
     apply-border-width-style
     apply-border-color-style
     apply-page-color-style
     apply-presentation-style
-    apply-path-style
-    apply-printer-style
     nip ;
 
 TUPLE: nested-pane-stream < pane-stream style parent ;

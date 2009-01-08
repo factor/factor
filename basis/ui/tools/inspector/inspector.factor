@@ -1,12 +1,12 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors inspector namespaces kernel models
+USING: accessors inspector namespaces kernel models fry
 models.filter prettyprint sequences mirrors assocs classes
-io io.styles arrays hashtables math.order sorting
+io io.styles arrays hashtables math.order sorting refs
 ui.tools.browser ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks
 ui.gestures ui.gadgets.buttons ui.gadgets.tables
-ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.labelled ;
+ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.labelled ui ;
 IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < track table ;
@@ -86,6 +86,19 @@ M: inspector-gadget pref-dim*
 
 \ com-push H{ { +listener+ t } } define-command
 
+: slot-editor-window ( close-hook update-hook assoc key key-string -- )
+    [ <value-ref> <slot-editor> ] [ "Slot editor: " prepend ] bi*
+    open-window ;
+
+: com-edit-slot ( inspector -- )
+    [ close-window ] swap
+    [ '[ _ com-refresh ] ]
+    [ control-value make-mirror ]
+    [ table>> (selected-row) ] tri [
+        [ key>> ] [ key-string>> ] bi
+        slot-editor-window
+    ] [ 2drop 2drop ] if ;
+
 : inspector-help ( -- ) "ui-inspector" com-follow ;
 
 \ inspector-help H{ { +nullary+ t } } define-command
@@ -93,6 +106,7 @@ M: inspector-gadget pref-dim*
 inspector-gadget "toolbar" f {
     { T{ update-object } com-refresh }
     { T{ key-down f f "p" } com-push }
+    { T{ key-down f f "e" } com-edit-slot }
     { T{ key-down f f "F1" } inspector-help }
 } define-command-map
 

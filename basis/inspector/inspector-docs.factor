@@ -1,4 +1,5 @@
-USING: help.markup help.syntax kernel classes io io.styles mirrors ;
+USING: help.markup help.syntax kernel classes io io.styles mirrors
+inspector.private ;
 IN: inspector
 
 ARTICLE: "inspector" "The inspector"
@@ -16,22 +17,10 @@ $nl
 { $subsection &delete }
 "A variable holding the current object:"
 { $subsection me }
-"A variable holding inspector history:"
-{ $subsection inspector-stack }
-"A customization hook:"
-{ $subsection inspector-hook }
 "A description of an object can be printed without starting the inspector:"
-{ $subsection describe }
-{ $subsection describe* } ;
+{ $subsection describe } ;
 
 ABOUT: "inspector"
-
-HELP: value-editor
-{ $values { "path" "a sequence of keys" } }
-{ $description "Prettyprints the value at a path, and if the output stream supports it, a graphical gadget for editing the object." }
-{ $notes "To learn about paths, see " { $link "mirrors" } "." } ;
-
-{ presented-path presented-printer value-editor } related-words
 
 HELP: describe
 { $values { "obj" object } }
@@ -39,11 +28,6 @@ HELP: describe
 $nl
 "For sequences and hashtables, this outputs the entries of the collection. For all other object types, slot names and values are shown." }
 { $examples { $code "global describe" } } ;
-
-HELP: describe*
-{ $values { "obj" object } { "mirror" mirror } { "keys" "a sequence of objects" } }
-{ $description "Print a tabular overview of the object." }
-{ $notes "This word is a factor of " { $link describe } " and " { $link inspect } "." } ;
 
 HELP: inspector-stack
 { $var-description "If the inspector is running, this variable holds previously-inspected objects." } ;
@@ -91,8 +75,3 @@ HELP: &back
 
 HELP: me
 { $var-description "The currently inspected object." } ;
-
-HELP: inspector-hook
-{ $var-description "A quotation with stack effect " { $snippet "( obj -- )" } ", called by the inspector to display an overview of an object."
-$nl
-"The default implementation calls " { $link describe } " which outputs on " { $link output-stream } ", but the graphical listener sets this variable so that calling " { $link inspect } " in the UI opens the graphical inspector." } ;

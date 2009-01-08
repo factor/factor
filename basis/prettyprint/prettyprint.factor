@@ -149,14 +149,16 @@ PRIVATE>
 
 : .c ( -- ) callstack callstack. ;
 
-: pprint-cell ( obj -- ) [ pprint ] with-cell ;
+: pprint-cell ( obj -- ) [ pprint-short ] with-cell ;
+
+SYMBOL: pprint-string-cells?
 
 : simple-table. ( values -- )
     standard-table-style [
         [
             [
                 [
-                    dup string?
+                    dup string? pprint-string-cells? get not and
                     [ [ write ] with-cell ]
                     [ pprint-cell ]
                     if

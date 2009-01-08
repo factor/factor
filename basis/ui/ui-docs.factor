@@ -59,6 +59,9 @@ HELP: with-ui
 { $notes "This combinator should be used in the " { $link POSTPONE: MAIN: } " word of a vocabulary, in order for the vocabulary to work when run from the UI listener (" { $snippet "\"my-app\" run" } " and the command line (" { $snippet "./factor -run=my-app" } ")." }
 { $examples "The " { $vocab-link "hello-ui" } " vocabulary implements a simple UI application which uses this combinator." } ;
 
+HELP: beep
+{ $description "Plays the system beep sound." } ;
+
 ARTICLE: "ui-glossary" "UI glossary"
 { $table
     { "color" { "an instance of " { $link color } } }

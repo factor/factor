@@ -193,3 +193,5 @@ HOOK: (with-ui) ui-backend ( quot -- )
 
 : with-ui ( quot -- )
     ui-running? [ call ] [ '[ init-ui @ ] (with-ui) ] if ;
+
+HOOK: beep ui-backend ( -- )
