@@ -5,7 +5,9 @@ unicode.normalize math unicode.categories combinators
 assocs strings splitting kernel accessors ;
 IN: unicode.case
 
+<PRIVATE
 : at-default ( key assoc -- value/key ) [ at ] [ drop ] 2bi or ;
+PRIVATE>
 
 : ch>lower ( ch -- lower ) simple-lower at-default ;
 : ch>upper ( ch -- upper ) simple-upper at-default ;
@@ -13,6 +15,7 @@ IN: unicode.case
 
 SYMBOL: locale ! Just casing locale, or overall?
 
+<PRIVATE
 : i-dot? ( -- ? )
     locale get { "tr" "az" } member? ;
 
@@ -79,7 +82,7 @@ SYMBOL: locale ! Just casing locale, or overall?
             [ [ % ] compose ] [ [ , ] compose ] bi* ?if
         ] 2curry each
     ] "" make ; inline
-
+PRIVATE>
 : >lower ( string -- lower )
     i-dot? [ turk>lower ] when
     final-sigma [ lower>> ] [ ch>lower ] map-case ;
