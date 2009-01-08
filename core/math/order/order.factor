@@ -13,6 +13,8 @@ SYMBOL: +gt+
 
 GENERIC: <=> ( obj1 obj2 -- <=> )
 
+: >=< ( obj1 obj2 -- >=< ) <=> invert-comparison ; inline
+
 M: real <=> 2dup < [ 2drop +lt+ ] [ number= +eq+ +gt+ ? ] if ;
 
 GENERIC: before? ( obj1 obj2 -- ? )
