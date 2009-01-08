@@ -9,6 +9,8 @@ IN: sorting.human
 
 : human-<=> ( obj1 obj2 -- <=> ) [ find-numbers ] bi@ <=> ;
 
+: human->=< ( obj1 obj2 -- >=< ) human-<=> invert-comparison ; inline
+
 : human-compare ( obj1 obj2 quot -- <=> ) bi@ human-<=> ;
 
 : human-sort ( seq -- seq' ) [ human-<=> ] sort ;
