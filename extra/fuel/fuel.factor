@@ -269,7 +269,7 @@ MEMO: fuel-article-title ( name -- title/f )
     help-path [ dup article-title swap 2array ] map ; inline
 
 : (fuel-word-help) ( word -- element )
-    dup \ article swap article-title rot
+    \ article swap dup article-title swap
     [
         {
             [ fuel-parent-topics [ \ $doc-path prefix , ] unless-empty ]
