@@ -1,7 +1,7 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs io.files io.streams.duplex
-combinators arrays io.launcher io.encodings.binary io
+combinators arrays io.launcher io.encodings io.encodings.binary io
 http.server.static http.server http accessors sequences strings
 math.parser fry urls urls.encoding calendar ;
 IN: http.server.cgi
@@ -52,6 +52,7 @@ IN: http.server.cgi
     200 >>code
     "CGI output follows" >>message
     swap '[
+        binary encode-output
         _ output-stream get swap <cgi-process> binary <process-stream> [
             post-request? [ request get post-data>> raw>> write flush ] when
             input-stream get swap (stream-copy)

@@ -36,4 +36,4 @@ IN: unicode.breaks.tests
     ] each ;
 
 grapheme-break-test parse-test-file [ >graphemes ] test
-! word-break-test parse-test-file [ >words ] test
+word-break-test parse-test-file [ >words ] test
