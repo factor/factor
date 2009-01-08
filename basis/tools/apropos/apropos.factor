@@ -17,9 +17,10 @@ IN: tools.apropos
 
 TUPLE: more-completions seq ;
 
-: max-completions 5 ;
+CONSTANT: max-completions 5
 
-M: more-completions article-title article-name ;
+M: more-completions article-title
+    seq>> length number>string " results" append ;
 
 M: more-completions article-name
     seq>> length max-completions - number>string " more results" append ;
@@ -34,7 +35,7 @@ M: more-completions summary article-title ;
         [ completions ] dip '[
             _ 1array \ $heading prefix ,
             [ max-completions short head keys \ $completions prefix , ]
-            [ dup length max-completions > [ more-completions boa 1array \ $link prefix , ] [ drop ] if ]
+            [ dup length max-completions > [ more-completions boa <$link> , ] [ drop ] if ]
             bi
         ] unless-empty
     ] { } make ;
@@ -46,7 +47,7 @@ M: more-completions summary article-title ;
     all-vocabs-seq [ dup vocab-name >lower ] { } map>assoc ;
 
 : help-candidates ( seq -- candidates )
-    [ dup >link swap article-title >lower ] { } map>assoc
+    [ [ >link ] [ article-title >lower ] bi ] { } map>assoc
     sort-values ;
 
 : $apropos ( str -- )
