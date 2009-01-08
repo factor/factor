@@ -25,9 +25,14 @@
   (interactive "r")
   (let* ((word (read-string "New word name: "))
          (begin (save-excursion
-                  (goto-char begin) (fuel-syntax--beginning-of-symbol-pos)))
+                  (goto-char begin)
+                  (when (zerop (skip-syntax-backward "w"))
+                    (skip-syntax-forward "-"))
+                  (point)))
          (end (save-excursion
-                (goto-char end) (fuel-syntax--end-of-symbol-pos)))
+                (goto-char end)
+                (skip-syntax-forward "w")
+                (point)))
          (code (buffer-substring begin end))
          (code-str (fuel--region-to-string begin end))
          (stack-effect (or (fuel-stack--infer-effect code-str)
