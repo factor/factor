@@ -256,7 +256,9 @@ DEFER: default-L-parser-values
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 TUPLE: <L-system> < gadget
-  camera display-list pedestal paused commands axiom rules string ;
+  camera display-list pedestal paused
+  turtle-values
+  commands axiom rules string ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -376,6 +378,7 @@ TUPLE: <L-system> < gadget
   L-SYSTEM display-list>> GL_COMPILE glNewList
 
     turtle
+    L-SYSTEM turtle-values>> [ ] or call
     L-SYSTEM string>> L-SYSTEM axiom>> or
     L-SYSTEM commands>>
     interpret-string
@@ -444,6 +447,11 @@ H{
 
   { T{ key-down f f "q"     } [ [ 5 roll-left    ] with-camera ] }
   { T{ key-down f f "w"     } [ [ 5 roll-right   ] with-camera ] }
+
+  { T{ key-down f { A+ } "LEFT"  } [ [ 1 strafe-left  ] with-camera ] }
+  { T{ key-down f { A+ } "RIGHT" } [ [ 1 strafe-right ] with-camera ] }
+  { T{ key-down f { A+ } "UP"    } [ [ 1 strafe-up    ] with-camera ] }
+  { T{ key-down f { A+ } "DOWN"  } [ [ 1 strafe-down  ] with-camera ] }
 
   { T{ key-down f f "r"     } [ start-rotation-thread          ] }
 
