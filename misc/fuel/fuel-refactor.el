@@ -37,8 +37,11 @@
     (open-line 1)
     (let ((start (point)))
       (insert ": " word " " stack-effect "\n" code " ;\n")
-      (indent-region start (point)))
-    (goto-char (mark))))
+      (indent-region start (point))
+      (move-overlay fuel-stack--overlay start (point))
+      (goto-char (mark))
+      (sit-for fuel-stack-highlight-period)
+      (delete-overlay fuel-stack--overlay))))
 
 
 (provide 'fuel-refactor)
