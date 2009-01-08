@@ -312,6 +312,12 @@
 (defsubst fuel-syntax--usings ()
   (funcall fuel-syntax--usings-function))
 
+(defun fuel-syntax--file-has-private ()
+  (save-excursion
+    (goto-char (point-min))
+    (and (re-search-forward "\\_<<PRIVATE\\_>" nil t)
+         (re-search-forward "\\_<PRIVATE>\\_>" nil t))))
+
 (defun fuel-syntax--find-usings (&optional no-private)
   (save-excursion
     (let ((usings))
@@ -319,10 +325,7 @@
       (while (re-search-backward fuel-syntax--using-lines-regex nil t)
         (dolist (u (split-string (match-string-no-properties 1) nil t))
           (push u usings)))
-      (goto-char (point-min))
-      (when (and (not no-private)
-                 (re-search-forward "\\_<<PRIVATE\\_>" nil t)
-                 (re-search-forward "\\_<PRIVATE>\\_>" nil t))
+      (when (and (not no-private) (fuel-syntax--file-has-private))
         (goto-char (point-max))
         (push (concat (fuel-syntax--find-in) ".private") usings))
       usings)))
