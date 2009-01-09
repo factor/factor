@@ -128,12 +128,9 @@ VALUE: properties
             cat categories index char table ?set-nth
         ] assoc-each table fill-ranges ] ;
 
-: ascii-lower ( string -- lower )
-    [ dup CHAR: A CHAR: Z between? [ HEX: 20 + ] when ] map ;
-
 : process-names ( data -- names-hash )
     1 swap (process-data) [
-        ascii-lower { { CHAR: \s CHAR: - } } substitute swap
+        >lower { { CHAR: \s CHAR: - } } substitute swap
     ] H{ } assoc-map-as ;
 
 : multihex ( hexstring -- string )

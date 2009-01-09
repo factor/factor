@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences namespaces make unicode.data kernel math arrays
-locals sorting.insertion accessors assocs math.order combinators ;
+locals sorting.insertion accessors assocs math.order combinators
+unicode.syntax ;
 IN: unicode.normalize
 
 <PRIVATE
