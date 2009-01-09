@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays sequences math namespaces strings io fry
-vectors words assocs combinators sorting unicode.case
-unicode.categories math.order ;
+USING: accessors kernel arrays sequences math namespaces
+strings io fry vectors words assocs combinators sorting
+unicode.case unicode.categories math.order vocabs ;
 IN: tools.completion
 
 : (fuzzy) ( accum ch i full -- accum i ? )
@@ -68,7 +68,8 @@ IN: tools.completion
     [ '[ >lower _ [ completion ] with map rank-completions ] ] bi
     if-empty ;
 
-: limited-completions ( short candidates -- seq )
-    [ completions ] [ drop ] 2bi
-    2dup [ length 50 > ] [ empty? ] bi* and
-    [ 2drop f ] [ drop 50 short head ] if ;
+: words-matching ( str -- seq )
+    all-words [ dup name>> ] { } map>assoc completions ;
+
+: vocabs-matching ( str -- seq )
+    vocabs [ dup name>> ] { } map>assoc completions ;
