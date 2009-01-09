@@ -192,22 +192,22 @@ to: word-table
 : word-table-nth ( class1 class2 -- ? )
     word-table nth nth ;
 
-: property-not= ( i str property -- ? )
-    pick [
-        [ ?nth ] dip swap
-        [ word-break-prop = not ] [ drop f ] if*
-    ] [ 3drop t ] if ;
+:: property-not= ( i str property -- ? )
+    i [
+        i str ?nth [ word-break-prop property = not ]
+        [ f ] if*
+    ] [ t ] if ;
 
 : format/extended? ( ch -- ? )
     word-break-prop { 4 5 } member? ;
 
 :: walk-up ( str i -- j )
     i 1 + str [ format/extended? not ] find-from drop
-    1+ str [ format/extended? not ] find-from drop ; ! possible bounds error?
+    [ 1+ str [ format/extended? not ] find-from drop ] [ f ] if* ;
 
 :: walk-down ( str i -- j )
     i str [ format/extended? not ] find-last-from drop
-    1- str [ format/extended? not ] find-last-from drop ; ! possible bounds error?
+    [ 1- str [ format/extended? not ] find-last-from drop ] [ f ] if* ;
 
 :: word-break? ( table-entry i str -- ? )
     table-entry {
@@ -224,9 +224,11 @@ to: word-table
     } case ;
 
 :: word-break-next ( old-class new-char i str -- next-class ? )
-    new-char word-break-prop dup { 4 5 } member?
-    [ drop old-class dup { 1 2 3 } member? ]
-    [ old-class over word-table-nth i str word-break? ] if ;
+    new-char dup format/extended?
+    [ drop old-class dup { 1 2 3 } member? ] [
+        word-break-prop old-class over word-table-nth
+        i str word-break?
+    ] if ;
 
 PRIVATE>
 

@@ -23,7 +23,7 @@ VALUE: properties
 : combine-chars ( a b -- char/f ) combine-map hash2 ;
 : compatibility-entry ( char -- seq ) compatibility-map at  ;
 : combining-class ( char -- n ) class-map at ;
-: non-starter? ( char -- ? ) class-map key? ;
+: non-starter? ( char -- ? ) combining-class { 0 f } member? not ;
 : name>char ( name -- char ) name-map at ;
 : char>name ( char -- name ) name-map value-at ;
 : property? ( char property -- ? ) properties at interval-key? ;
@@ -128,12 +128,9 @@ VALUE: properties
             cat categories index char table ?set-nth
         ] assoc-each table fill-ranges ] ;
 
-: ascii-lower ( string -- lower )
-    [ dup CHAR: A CHAR: Z between? [ HEX: 20 + ] when ] map ;
-
 : process-names ( data -- names-hash )
     1 swap (process-data) [
-        ascii-lower { { CHAR: \s CHAR: - } } substitute swap
+        >lower { { CHAR: \s CHAR: - } } substitute swap
     ] H{ } assoc-map-as ;
 
 : multihex ( hexstring -- string )
@@ -182,6 +179,13 @@ load-data {
     [ process-compatibility to: compatibility-map ]
     [ process-category to: category-map ]
 } cleave
+
+: postprocess-class ( -- )
+    combine-map [ [ second ] map ] map concat
+    [ combining-class not ] filter
+    [ 0 swap class-map set-at ] each ;
+
+postprocess-class
 
 load-special-casing to: special-casing
 

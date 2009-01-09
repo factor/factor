@@ -7,18 +7,18 @@ IN: unicode.case
 
 <PRIVATE
 : at-default ( key assoc -- value/key ) [ at ] [ drop ] 2bi or ;
-PRIVATE>
 
 : ch>lower ( ch -- lower ) simple-lower at-default ;
 : ch>upper ( ch -- upper ) simple-upper at-default ;
 : ch>title ( ch -- title ) simple-title at-default ;
+PRIVATE>
 
 SYMBOL: locale ! Just casing locale, or overall?
 
 <PRIVATE
 
 : split-subseq ( string sep -- strings )
-    [ dup ] swap '[ _ split1 swap ] [ ] produce nip ;
+    [ dup ] swap '[ _ split1-slice swap ] [ ] produce nip ;
 
 : replace ( old new str -- newstr )
     [ split-subseq ] dip join ;
