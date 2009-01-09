@@ -34,9 +34,11 @@ M: send-gesture send-queued-gesture
 
 TUPLE: propagate-gesture gesture gadget ;
 
+: resend-gesture ( gesture gadget -- ? )
+    [ handle-gesture ] with each-parent ;
+
 M: propagate-gesture send-queued-gesture
-    [ gesture>> ] [ gadget>> ] bi
-    [ handle-gesture ] with each-parent drop ;
+    [ gesture>> ] [ gadget>> ] bi resend-gesture drop ;
 
 : propagate-gesture ( gesture gadget -- )
     \ propagate-gesture queue-gesture ;

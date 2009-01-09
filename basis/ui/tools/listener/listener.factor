@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: inspector help help.markup io io.styles kernel models
+USING: inspector kernel help help.markup io io.styles models
 strings namespaces parser quotations sequences vocabs words
 continuations prettyprint listener debugger threads boxes
 concurrency.flags math arrays generic accessors combinators
@@ -11,14 +11,15 @@ ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.packs ui.gadgets.tracks ui.gadgets.borders
 ui.gadgets.frames ui.gadgets.grids ui.gadgets.status-bar
-ui.gestures ui.operations ui.tools.browser
+ui.gadgets.wrappers ui.gestures ui.operations ui.tools.browser
 ui.tools.debugger ui.tools.inspector ui.tools.common ui ;
 IN: ui.tools.listener
 
 ! If waiting is t, we're waiting for user input, and invoking
 ! evaluate-input resumes the thread.
 TUPLE: interactor < source-editor
-output history flag mailbox thread waiting help ;
+output history flag mailbox thread waiting help
+completion-popup ;
 
 : register-self ( interactor -- )
     <mailbox> >>mailbox
@@ -412,3 +413,68 @@ M: listener-gadget graft*
 
 M: listener-gadget ungraft*
     [ com-end ] [ call-next-method ] bi ;
+
+! Foo
+: <summary-gadget> ( model -- gadget )
+    [ summary ] <filter> <label-control> ;
+
+SINGLETON: completion-renderer
+M: completion-renderer row-columns drop name>> 1array ;
+M: completion-renderer row-value drop ;
+
+: <completion-table> ( interactor quot -- table )
+    [ one-word-elt <element-model> 1/3 seconds <delay> ] dip
+    '[ [ { } ] [ @ keys 20 short head ] if-empty ] <filter>
+    <table> completion-renderer >>renderer ;
+
+TUPLE: completion-popup < wrapper interactor ;
+
+: <completion-popup> ( interactor quot -- popup )
+    dupd
+    <completion-table>
+    <limited-scroller>
+        { 300 300 } >>min-dim
+        { 300 300 } >>max-dim
+    completion-popup new-wrapper
+        white <solid> >>interior
+        swap >>interactor ;
+
+: hide-completion-popup ( popup -- )
+    interactor>> f >>completion-popup find-world hide-glass ;
+
+completion-popup H{
+    { T{ key-down f f "ESC" } [ hide-completion-popup ] }
+} set-gestures
+
+: <word-completion-popup> ( interactor -- table )
+    [ words-matching ] <completion-popup> ;
+
+: <vocab-completion-popup> ( interactor -- table )
+    [ vocabs-matching ] <completion-popup> ;
+
+: show-completion-popup ( interactor popup -- )
+    [ >>completion-popup ] keep
+    [ find-world ] dip
+    { 0 0 } show-glass ;
+
+: word-completion-popup ( interactor -- )
+    dup <word-completion-popup> show-completion-popup ;
+
+: pass-to-popup? ( gesture interactor -- ? )
+    [ [ key-down? ] [ key-up? ] bi or ]
+    [ completion-popup>> ]
+    bi* and ;
+
+M: interactor handle-gesture
+    2dup pass-to-popup? [
+        2dup completion-popup>>
+        focusable-child resend-gesture
+        [ call-next-method ] [ 2drop f ] if
+    ] [ call-next-method ] if ;
+
+: test-it ( interactor -- )
+    dup <word-completion-popup> show-completion-popup ;
+
+interactor "completion" f {
+    { T{ key-down f f "TAB" } word-completion-popup }
+} define-command-map

@@ -22,14 +22,18 @@ generic class ;
 
 { 700 400 } profiler-gadget set-tool-dim
 
-SINGLETON: word-renderer
+SINGLETONS: word-renderer vocab-renderer ;
+UNION: profiler-renderer word-renderer vocab-renderer ;
 
 ! Value is a { word count } pair
-M: word-renderer row-columns
+M: profiler-renderer row-columns
     drop [ [ present ] map ] [ { "All" "" } ] if* ;
 
-M: word-renderer row-value
+M: profiler-renderer row-value
     drop dup [ first ] when ;
+
+M: vocab-renderer row-value
+    call-next-method dup [ vocab ] when ;
 
 SINGLETON: method-renderer
 
@@ -53,7 +57,6 @@ M: method-renderer row-value drop first ;
 
 : <profiler-table> ( model -- table )
     [ match? ] <search-table>
-        word-renderer >>renderer
         { 0 1 } >>column-alignment
         0 >>filled-column ;
 
@@ -102,9 +105,11 @@ M: method-renderer row-value drop first ;
     { 1 0 } <track>
         profiler vocabs>> <profiler-table>
             profiler vocab>> >>selected-value
+            vocab-renderer >>renderer
         "Vocabularies" <labelled-gadget>
     1/2 track-add
         profiler <words-model> <profiler-table>
+            word-renderer >>renderer
         "Words" <labelled-gadget>
     1/2 track-add ;
 
@@ -113,10 +118,12 @@ M: method-renderer row-value drop first ;
         { 1 0 } <track>
             profiler <generic-model> <profiler-table>
                 profiler generic>> >>selected-value
+                word-renderer >>renderer
             "Generic words" <labelled-gadget>
         1/2 track-add
             profiler <class-model> <profiler-table>
                 profiler class>> >>selected-value
+                word-renderer >>renderer
             "Classes" <labelled-gadget>
         1/2 track-add
     1/2 track-add

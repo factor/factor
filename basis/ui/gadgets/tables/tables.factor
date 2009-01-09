@@ -209,8 +209,7 @@ M: table model-changed
 : thin-row-rect ( table row -- rect )
     row-rect [ { 0 1 } v* ] change-dim ;
 
-: (select-row) ( table row -- )
-    over validate-row
+: (select-row) ( table n -- )
     [ [ thin-row-rect ] [ drop ] 2bi scroll>rect ]
     [ >>selected-index relayout-1 ]
     2bi ;
@@ -232,8 +231,14 @@ M: table model-changed
     hand-click# get 2 =
     [ row-action ] [ update-selected-value ] if ;
 
-: select-row ( table row -- )
-    [ (select-row) ] [ drop update-selected-value ] 2bi ;
+: show-row-summary ( row table -- )
+    [ renderer>> row-value ] keep show-summary ;
+
+: select-row ( table n -- )
+    over validate-row
+    [ (select-row) ]
+    [ drop update-selected-value ]
+    [ over nth-row drop swap show-row-summary ] 2tri ;
 
 : prev-row ( table -- )
     dup selected-index>> [ 1- ] [ 0 ] if* select-row ;
@@ -252,9 +257,6 @@ M: table model-changed
 
 : valid-row? ( row table -- ? )
     control-value length 1- 0 swap between? ;
-
-: show-row-summary ( row table -- )
-    [ renderer>> row-value ] keep show-summary ;
 
 : if-mouse-row ( table true false -- )
     [ [ mouse-row ] keep 2dup valid-row? ]
