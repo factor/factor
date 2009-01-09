@@ -241,7 +241,7 @@ code in the buffer."
 (defun factor-mode-insert-and-indent (n)
   (interactive "p")
   (self-insert-command n)
-  (indent-for-tab-command))
+  (indent-according-to-mode))
 
 (defvar factor-mode-map
   (let ((map (make-sparse-keymap)))

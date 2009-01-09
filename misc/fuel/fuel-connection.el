@@ -232,11 +232,12 @@
 
 ;;; Message sending interface:
 
+(defconst fuel-con--error-message "FUEL connection not active")
+
 (defun fuel-con--send-string (buffer/proc str cont &optional sender-buffer)
   (save-current-buffer
     (let ((con (fuel-con--get-connection buffer/proc)))
-      (unless con
-        (error "FUEL: no connection"))
+      (unless con (error fuel-con--error-message))
       (let ((req (fuel-con--make-request str cont sender-buffer)))
         (fuel-con--connection-queue-request con req)
         (fuel-con--process-next con)
@@ -248,8 +249,7 @@
 (defun fuel-con--send-string/wait (buffer/proc str cont &optional timeout sbuf)
   (save-current-buffer
     (let ((con (fuel-con--get-connection buffer/proc)))
-      (unless con
-        (error "FUEL: no connection"))
+      (unless con (error fuel-con--error-message))
       (let* ((req (fuel-con--send-string buffer/proc str cont sbuf))
              (id (and req (fuel-con--request-id req)))
              (time (or timeout fuel-connection-timeout))
