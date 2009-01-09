@@ -134,10 +134,10 @@ HINTS: string-append string string ;
 TUPLE: compose-state i str char after last-class ;
 
 : get-str ( state i -- ch )
-    swap [ i>> + ] [ str>> ] bi ?nth ;
-: current ( state -- ch ) 0 get-str ;
-: to ( state -- state ) [ 1+ ] change-i ;
-: push-after ( ch state -- state ) [ ?push ] change-after ;
+    swap [ i>> + ] [ str>> ] bi ?nth ; inline
+: current ( state -- ch ) 0 get-str ; inline
+: to ( state -- state ) [ 1+ ] change-i ; inline
+: push-after ( ch state -- state ) [ ?push ] change-after ; inline
 
 :: try-compose ( state new-char current-class -- state )
     state last-class>> current-class =
@@ -147,13 +147,13 @@ TUPLE: compose-state i str char after last-class ;
             new-char state push-after
             current-class >>last-class
         ] if*
-    ] if ;
+    ] if ; inline
 
 DEFER: compose-iter
 
 : try-noncombining ( char state -- state )
     tuck char>> swap combine-chars
-    [ >>char to f >>last-class compose-iter ] when* ;
+    [ >>char to f >>last-class compose-iter ] when* ; inline
 
 : compose-iter ( state -- state )
     dup current [
@@ -164,7 +164,7 @@ DEFER: compose-iter
                 [ drop ] [ swap try-noncombining ] if ] }
             [ try-compose to compose-iter ]
         } case
-    ] when* ;
+    ] when* ; inline recursive
 
 : compose-combining ( ch str i -- str i )
     compose-state new
@@ -172,7 +172,7 @@ DEFER: compose-iter
         swap >>str
         swap >>char
     compose-iter
-    { [ char>> , ] [ after>> % ] [ str>> ] [ i>> ] } cleave ;
+    { [ char>> , ] [ after>> % ] [ str>> ] [ i>> ] } cleave ; inline
 
 :: (compose) ( str i -- )
     i str ?nth [
@@ -180,10 +180,12 @@ DEFER: compose-iter
             i 1+ str ?nth combining-class
             [ str i 1+ compose-combining ] [ , str i 1+ ] if
         ] if (compose)
-    ] when* ;
+    ] when* ; inline recursive
 
 : combine ( str -- comp )
     [ pass-combining (compose) ] "" make ;
+
+HINTS: combine string ;
 
 PRIVATE>
 
