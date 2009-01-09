@@ -85,6 +85,7 @@ ARTICLE: "gadgets-editors" "Editor gadgets"
 { $command-map editor "general" }
 { $command-map editor "caret-motion" }
 { $command-map editor "selection" }
+{ $command-map multiline-editor "multiline" }
 { $heading "Editor words" }
 { $subsection editor }
 { $subsection <editor> }

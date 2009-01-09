@@ -526,7 +526,7 @@ TUPLE: multiline-editor < editor ;
 : <multiline-editor> ( -- editor )
     multiline-editor new-editor ;
 
-multiline-editor "general" f {
+multiline-editor "multiline" f {
     { T{ key-down f f "UP" } previous-line }
     { T{ key-down f f "DOWN" } next-line }
     { T{ key-down f { S+ } "UP" } select-previous-line }
