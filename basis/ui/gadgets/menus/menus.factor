@@ -1,40 +1,16 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals accessors arrays ui.commands ui.operations ui.gadgets
-ui.gadgets.buttons ui.gadgets.worlds ui.gestures generic
-hashtables kernel math models namespaces opengl sequences
-math.vectors ui.gadgets.theme ui.gadgets.packs
-ui.gadgets.borders colors math.geometry.rect ;
+USING: locals accessors kernel math namespaces sequences
+math.vectors colors math.geometry.rect ui.commands ui.operations ui.gadgets
+ui.gadgets.buttons ui.gadgets.worlds ui.gestures ui.gadgets.theme
+ui.gadgets.packs ui.gadgets.glass ui.gadgets.borders ;
 IN: ui.gadgets.menus
 
 : menu-loc ( world menu -- loc )
-    [ rect-dim ] [ pref-dim ] bi* [v-] hand-loc get-global vmin ;
-
-TUPLE: menu-glass < gadget ;
-
-: <menu-glass> ( world menu -- glass )
-    tuck menu-loc >>loc
-    menu-glass new-gadget
-    swap add-gadget ;
-
-M: menu-glass layout* gadget-child prefer ;
-
-: hide-glass ( world -- )
-    [ [ unparent ] when* f ] change-glass drop ;
-
-: show-glass ( world gadget -- )
-    [ [ hide-glass ] [ hand-clicked set-global ] bi* ]
-    [ add-gadget drop ]
-    [ >>glass drop ]
-    2tri ;
+    [ dim>> ] [ pref-dim ] bi* [v-] hand-loc get-global vmin ;
 
 : show-menu ( owner menu -- )
-    [ find-world dup ] dip <menu-glass> show-glass ;
-
-\ menu-glass H{
-    { T{ button-down } [ find-world [ hide-glass ] when* ] }
-    { T{ drag } [ update-clicked drop ] }
-} set-gestures
+    [ find-world dup ] dip tuck menu-loc show-glass ;
 
 :: <menu-item> ( target hook command -- button )
     command command-name [
