@@ -46,7 +46,6 @@ PRIVATE>
 
 : group-name ( id -- string )
     dup group-cache get [
-    "yo" print
         dupd at* [ name>> nip ] [ drop number>string ] if
     ] [
         group-struct [ group-gr_name ] [ f ] if*
