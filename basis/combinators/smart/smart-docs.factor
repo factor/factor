@@ -48,7 +48,7 @@ HELP: output>sequence
     }
 } ;
 
-HELP: reduce-output
+HELP: reduce-outputs
 { $values
      { "quot" quotation } { "operation" quotation }
      { "newquot" quotation }
@@ -57,7 +57,7 @@ HELP: reduce-output
 { $examples
     { $example
         "USING: combinators.smart kernel math prettyprint ;"
-        "3 [ [ 4 * ] [ 4 / ] [ 4 - ] tri ] [ * ] reduce-output ."
+        "3 [ [ 4 * ] [ 4 / ] [ 4 - ] tri ] [ * ] reduce-outputs ."
         "-9"
     }
 } ;
@@ -84,7 +84,7 @@ ARTICLE: "combinators.smart" "Smart combinators"
 { $subsection output>sequence }
 { $subsection output>array }
 "Reducing the output of a quotation:"
-{ $subsection reduce-output }
+{ $subsection reduce-outputs }
 "Summing the output of a quotation:"
 { $subsection sum-outputs } ;
 
