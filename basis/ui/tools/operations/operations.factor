@@ -62,7 +62,7 @@ V{ } clone operations set-global
 : edit-file ( pathname -- ) edit ;
 
 [ pathname? ] \ edit-file H{
-    { +keyboard+ T{ key-down f { C+ } "E" } }
+    { +keyboard+ T{ key-down f { C+ } "e" } }
     { +primary+ t }
     { +secondary+ t }
     { +listener+ t }
@@ -71,7 +71,7 @@ V{ } clone operations set-global
 UNION: definition word method-spec link vocab vocab-link ;
 
 [ definition? ] \ edit H{
-    { +keyboard+ T{ key-down f { C+ } "E" } }
+    { +keyboard+ T{ key-down f { C+ } "e" } }
     { +listener+ t }
 } define-operation
 
@@ -86,7 +86,7 @@ UNION: definition word method-spec link vocab vocab-link ;
 } define-operation
 
 [ topic? ] \ com-follow H{
-    { +keyboard+ T{ key-down f { C+ } "H" } }
+    { +keyboard+ T{ key-down f { C+ } "h" } }
     { +primary+ t }
 } define-operation
 
@@ -98,7 +98,7 @@ UNION: definition word method-spec link vocab vocab-link ;
 ! } define-operation
 
 [ word? ] \ fix H{
-    { +keyboard+ T{ key-down f { C+ } "F" } }
+    { +keyboard+ T{ key-down f { C+ } "f" } }
     { +listener+ t }
 } define-operation
 
@@ -128,7 +128,7 @@ M: word com-stack-effect def>> com-stack-effect ;
 : com-enter-in ( vocab -- ) vocab-name set-in ;
 
 [ vocab? ] \ com-enter-in H{
-    { +keyboard+ T{ key-down f { C+ } "I" } }
+    { +keyboard+ T{ key-down f { C+ } "i" } }
     { +listener+ t }
 } define-operation
 
@@ -140,12 +140,12 @@ M: word com-stack-effect def>> com-stack-effect ;
 } define-operation
 
 [ vocab-spec? ] \ run H{
-    { +keyboard+ T{ key-down f { C+ } "R" } }
+    { +keyboard+ T{ key-down f { C+ } "r" } }
     { +listener+ t }
 } define-operation
 
 [ vocab? ] \ test H{
-    { +keyboard+ T{ key-down f { C+ } "T" } }
+    { +keyboard+ T{ key-down f { C+ } "t" } }
     { +listener+ t }
 } define-operation
 

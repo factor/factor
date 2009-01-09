@@ -8,12 +8,12 @@ ui.gadgets.labels ui threads namespaces make tools.walker assocs
 combinators fry ;
 IN: ui.tools.walker
 
-TUPLE: walker-gadget < track
+TUPLE: walker-gadget < tool
 status continuation thread
 traceback
 closing? ;
 
-TOOL: walker-gadget { 620 620 }
+{ 620 620 } walker-gadget set-tool-dim
 
 : walker-command ( walker msg -- )
     swap

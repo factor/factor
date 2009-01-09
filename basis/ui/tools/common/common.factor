@@ -1,14 +1,14 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs classes classes.mixin kernel namespaces
-parser ui.gadgets ui.gadgets.scrollers ;
+parser ui.gadgets ui.gadgets.scrollers ui.gadgets.tracks ;
 IN: ui.tools.common
 
 SYMBOL: tool-dims
 
 tool-dims global [ H{ } clone or ] change-at
 
-MIXIN: tool
+TUPLE: tool < track ;
 
 M: tool pref-dim*
     class tool-dims get at ;
@@ -18,11 +18,7 @@ M: tool layout*
     [ [ dim>> ] [ class ] bi tool-dims get set-at ]
     bi ;
 
-: TOOL:
-    scan-word
-    [ tool add-mixin-instance ]
-    [ scan-object swap tool-dims get set-at ]
-    bi ; parsing
+: set-tool-dim ( dim class -- ) tool-dims get set-at ;
 
 SLOT: scroller
 

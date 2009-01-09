@@ -9,9 +9,9 @@ ui.gadgets.editors ui.gadgets.labels ui.gadgets.status-bar
 ui.tools.common ui ;
 IN: ui.tools.browser
 
-TUPLE: browser-gadget < track pane scroller search-field ;
+TUPLE: browser-gadget < tool pane scroller search-field ;
 
-TOOL: browser-gadget { 550 400 }
+{ 550 400 } browser-gadget set-tool-dim
 
 : show-help ( link browser-gadget -- )
     model>> dup add-history
@@ -63,10 +63,22 @@ M: browser-gadget definitions-changed ( assoc browser -- )
 
 M: browser-gadget focusable-child* search-field>> ;
 
+: (browser-window) ( topic -- )
+    <browser-gadget> "Browser" open-status-window ;
+
+: browser-window ( -- )
+    "handbook" (browser-window) ;
+
+\ browser-window H{ { +nullary+ t } } define-command
+
 : com-follow ( link -- )
     [ browser-gadget? ] find-window
     [ [ raise-window ] [ gadget-child show-help ] bi ]
-    [ <browser-gadget> "Browser" open-status-window ] if* ;
+    [ (browser-window) ] if* ;
+
+: show-browser ( -- ) "handbook" com-follow ;
+
+\ show-browser H{ { +nullary+ t } } define-command
 
 : com-back ( browser -- ) model>> go-back ;
 
@@ -98,8 +110,5 @@ browser-gadget "scrolling"
     { T{ key-down f f "PAGE_UP" } com-page-up }
     { T{ key-down f f "PAGE_DOWN" } com-page-down }
 } define-command-map
-
-: browser-window ( -- )
-    [ "handbook" com-follow ] with-ui ;
 
 MAIN: browser-window

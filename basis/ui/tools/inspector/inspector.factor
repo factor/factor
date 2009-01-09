@@ -10,9 +10,9 @@ ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.labelled
 ui.tools.common ui ;
 IN: ui.tools.inspector
 
-TUPLE: inspector-gadget < track table ;
+TUPLE: inspector-gadget < tool table ;
 
-TOOL: inspector-gadget { 500 300 }
+{ 500 300 } inspector-gadget set-tool-dim
 
 TUPLE: slot-description key key-string value value-string ;
 

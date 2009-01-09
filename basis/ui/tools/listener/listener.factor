@@ -149,9 +149,9 @@ M: interactor dispose drop ;
     over set-caret
     mark>caret ;
 
-TUPLE: listener-gadget < track input output scroller popup ;
+TUPLE: listener-gadget < tool input output scroller popup ;
 
-TOOL: listener-gadget { 550 700 }
+{ 550 700 } listener-gadget set-tool-dim
 
 : find-listener ( gadget -- listener )
     [ listener-gadget? ] find-parent ;
@@ -196,12 +196,20 @@ M: listener-gadget focusable-child*
 : listener-window ( -- )
     [ listener-window* drop ] with-ui ;
 
+\ listener-window H{ { +nullary+ t } } define-command
+
 : (get-listener) ( quot -- listener )
     find-window
-    [ gadget-child ] [ listener-window* ] if* ; inline
+    [ [ raise-window ] [ gadget-child ] bi ]
+    [ listener-window* ] if* ; inline
 
 : get-listener ( -- listener )
     [ listener-gadget? ] (get-listener) ;
+
+: show-listener ( -- )
+    get-listener drop ;
+
+\ show-listener H{ { +nullary+ t } } define-command
 
 : get-ready-listener ( -- listener )
     [
@@ -398,16 +406,12 @@ listener-gadget "scrolling"
     { T{ key-down f { A+ } "PAGE_DOWN" } com-page-down }
 } define-command-map
 
-\ refresh-all
-H{ { +nullary+ t } { +listener+ t } } define-command
-
 listener-gadget "multi-touch" f {
     { T{ up-action } refresh-all }
 } define-command-map
 
-listener-gadget "workflow" f {
+listener-gadget "other" f {
     { T{ key-down f f "ESC" } hide-popup }
-    { T{ key-down f f "F2" } refresh-all }
 } define-command-map
 
 M: listener-gadget graft*

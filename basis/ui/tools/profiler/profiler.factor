@@ -13,14 +13,14 @@ FROM: models.filter => <filter> ;
 FROM: models.compose => <compose> ;
 IN: ui.tools.profiler
 
-TUPLE: profiler-gadget < track
+TUPLE: profiler-gadget < tool
 sort
 vocabs vocab
 words
 methods
 generic class ;
 
-TOOL: profiler-gadget { 700 400 }
+{ 700 400 } profiler-gadget set-tool-dim
 
 SINGLETON: word-renderer
 
