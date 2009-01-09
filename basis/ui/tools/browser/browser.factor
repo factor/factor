@@ -11,6 +11,8 @@ IN: ui.tools.browser
 
 TUPLE: browser-gadget < track pane scroller search-field ;
 
+TOOL: browser-gadget { 550 400 }
+
 : show-help ( link browser-gadget -- )
     model>> dup add-history
     [ >link ] dip set-model ;
@@ -33,18 +35,13 @@ TUPLE: browser-gadget < track pane scroller search-field ;
         "Search:" <label> add-gadget
         swap search-field>> add-gadget ;
 
-: <help-pane-scroller> ( browser -- scroller )
-    pane>> <limited-scroller>
-        { 550 400 } >>max-dim
-        { 550 400 } >>min-dim ;
-
 : <browser-gadget> ( link -- gadget )
     { 0 1 } browser-gadget new-track
         swap <history> >>model
         dup <search-field> >>search-field
         dup <browser-toolbar> f track-add
         dup <help-pane> >>pane
-        dup <help-pane-scroller> >>scroller
+        dup pane>> <scroller> >>scroller
         dup scroller>> 1 track-add ;
 
 M: browser-gadget graft*

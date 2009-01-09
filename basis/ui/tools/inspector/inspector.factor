@@ -6,10 +6,13 @@ io io.styles arrays hashtables math.order sorting refs
 ui.tools.browser ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks
 ui.gestures ui.gadgets.buttons ui.gadgets.tables
-ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.labelled ui ;
+ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.labelled
+ui.tools.common ui ;
 IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < track table ;
+
+TOOL: inspector-gadget { 500 300 }
 
 TUPLE: slot-description key key-string value value-string ;
 
@@ -74,9 +77,6 @@ M: hashtable make-slot-descriptions
 
 M: inspector-gadget focusable-child*
     table>> ;
-
-M: inspector-gadget pref-dim*
-    drop { 500 300 } ;
 
 : com-refresh ( inspector -- )
     model>> notify-connections ;

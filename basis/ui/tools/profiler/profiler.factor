@@ -8,7 +8,7 @@ ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
 ui.gadgets.buttons ui.gadgets.tables ui.gadgets.search-tables
 ui.gadgets.labelled ui.gadgets.buttons ui.gadgets.packs
 ui.gadgets.labels ui.gadgets.tabbed ui.gadgets.status-bar
-ui.tools.browser ;
+ui.tools.browser ui.tools.common ;
 FROM: models.filter => <filter> ;
 FROM: models.compose => <compose> ;
 IN: ui.tools.profiler
@@ -19,6 +19,8 @@ vocabs vocab
 words
 methods
 generic class ;
+
+TOOL: profiler-gadget { 700 400 }
 
 SINGLETON: word-renderer
 
@@ -138,8 +140,6 @@ M: method-renderer row-value drop first ;
             over <words-tab> "Words" add-tab
             over <methods-tab> "Methods" add-tab
         1 track-add ;
-
-M: profiler-gadget pref-dim* call-next-method { 700 400 } vmax ;
 
 : profiler-help ( -- ) "ui-profiler" com-follow ;
 

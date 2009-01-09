@@ -151,6 +151,8 @@ M: interactor dispose drop ;
 
 TUPLE: listener-gadget < track input output scroller popup ;
 
+TOOL: listener-gadget { 550 700 }
+
 : find-listener ( gadget -- listener )
     [ listener-gadget? ] find-parent ;
 
@@ -413,6 +415,3 @@ M: listener-gadget graft*
 
 M: listener-gadget ungraft*
     [ com-end ] [ call-next-method ] bi ;
-
-M: listener-gadget pref-dim*
-    drop { 550 700 } ;

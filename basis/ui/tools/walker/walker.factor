@@ -3,7 +3,7 @@
 USING: accessors kernel concurrency.messaging inspector
 ui.tools.listener ui.tools.traceback ui.gadgets.buttons
 ui.gadgets.status-bar ui.gadgets.tracks ui.commands ui.gadgets
-models models.filter ui.tools.browser ui.gestures
+models models.filter ui.tools.browser ui.tools.common ui.gestures
 ui.gadgets.labels ui threads namespaces make tools.walker assocs
 combinators fry ;
 IN: ui.tools.walker
@@ -12,6 +12,8 @@ TUPLE: walker-gadget < track
 status continuation thread
 traceback
 closing? ;
+
+TOOL: walker-gadget { 620 620 }
 
 : walker-command ( walker msg -- )
     swap
