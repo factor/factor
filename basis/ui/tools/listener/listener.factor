@@ -6,7 +6,7 @@ continuations prettyprint listener debugger threads boxes
 concurrency.flags math arrays generic accessors combinators
 assocs fry generic.standard.engines.tuple combinators.short-circuit
 tools.vocabs concurrency.mailboxes vocabs.parser calendar
-models.delay documents hashtables sets destructors lexer
+models.delay models.filter documents hashtables sets destructors lexer
 ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.packs ui.gadgets.tracks ui.gadgets.borders
@@ -41,13 +41,15 @@ output history flag mailbox thread waiting help ;
         assoc-stack
     ] if ;
 
-: <help-model> ( interactor -- model ) caret>> 1/3 seconds <delay> ;
+: <word-model> ( interactor -- model )
+    [ one-word-elt <element-model> 1/3 seconds <delay> ] keep
+    '[ _ interactor-use assoc-stack ] <filter> ;
 
 : <interactor> ( output -- gadget )
     interactor new-editor
         V{ } clone >>history
         <flag> >>flag
-        dup <help-model> >>help
+        dup <word-model> >>help
         swap >>output ;
 
 M: interactor graft*
@@ -56,20 +58,11 @@ M: interactor graft*
 M: interactor ungraft*
     [ dup help>> remove-connection ] [ call-next-method ] bi ;
 
-: word-at-loc ( loc interactor -- word )
-    over [
-        [ model>> one-word-elt elt-string ] keep
-        interactor-use assoc-stack
-    ] [
-        2drop f
-    ] if ;
-
 M: interactor model-changed
-    2dup help>> eq? [
-        swap value>> over word-at-loc swap show-summary
-    ] [
-        call-next-method
-    ] if ;
+    2dup help>> eq?
+    [ [ value>> ] dip show-summary ]
+    [ call-next-method ]
+    if ;
 
 : write-input ( string input -- )
     <input> presented associate

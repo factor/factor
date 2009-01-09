@@ -1,7 +1,7 @@
-! Copyright (C) 2006, 2008 Slava Pestov
+! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays documents kernel math models namespaces
-locals fry make opengl opengl.gl sequences strings io.styles
+USING: accessors arrays documents kernel math models models.filter
+namespaces locals fry make opengl opengl.gl sequences strings io.styles
 math.vectors sorting colors combinators assocs math.order fry
 calendar alarms continuations ui.clipboards ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
@@ -540,6 +540,11 @@ TUPLE: source-editor < multiline-editor ;
 
 : <source-editor> ( -- editor )
     source-editor new-editor ;
+
+! A useful model
+: <element-model> ( editor element -- model )
+    [ [ caret>> ] [ model>> ] bi ] dip
+    '[ _ _ elt-string ] <filter> ;
 
 ! Fields wrap an editor
 TUPLE: field < wrapper editor min-width max-width ;
