@@ -4,7 +4,7 @@ USING: alien.syntax cocoa cocoa.nibs cocoa.application
 cocoa.classes cocoa.dialogs cocoa.pasteboard cocoa.subclassing
 core-foundation core-foundation.strings help.topics kernel
 memory namespaces parser system ui ui.tools.browser
-ui.tools.listener ui.cocoa eval locals ;
+ui.tools.listener ui.cocoa eval locals tools.vocabs ;
 IN: ui.cocoa.tools
 
 : finder-run-files ( alien -- )
@@ -28,8 +28,20 @@ CLASS: {
     [ [ 3drop ] dip finder-run-files ]
 }
 
-{ "newFactorWorkspace:" "id" { "id" "SEL" "id" }
+{ "factorListener:" "id" { "id" "SEL" "id" }
+    [ 3drop show-listener f ]
+}
+
+{ "factorBrowser:" "id" { "id" "SEL" "id" }
+    [ 3drop show-browser f ]
+}
+
+{ "newFactorListener:" "id" { "id" "SEL" "id" }
     [ 3drop listener-window f ]
+}
+
+{ "newFactorBrowser:" "id" { "id" "SEL" "id" }
+    [ 3drop browser-window f ]
 }
 
 { "runFactorFile:" "id" { "id" "SEL" "id" }
@@ -44,8 +56,8 @@ CLASS: {
     [ 3drop menu-save-image f ]
 }
 
-{ "showFactorHelp:" "id" { "id" "SEL" "id" }
-    [ 3drop "handbook" com-follow f ]
+{ "refreshAll:" "id" { "id" "SEL" "id" }
+    [ 3drop [ refresh-all ] call-listener f ]
 } ;
 
 : install-app-delegate ( -- )
