@@ -15,8 +15,8 @@ MACRO: input<sequence ( quot -- newquot )
     [ infer in>> ] keep
     '[ _ firstn @ ] ;
 
-MACRO: reduce-output ( quot operation -- newquot )
+MACRO: reduce-outputs ( quot operation -- newquot )
     [ dup infer out>> 1 [-] ] dip n*quot compose ;
 
 : sum-outputs ( quot -- n )
-    [ + ] reduce-output ; inline
+    [ + ] reduce-outputs ; inline

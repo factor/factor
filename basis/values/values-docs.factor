@@ -19,6 +19,7 @@ HELP: VALUE:
 { $examples
   { $example
     "USING: values math prettyprint ;"
+    "IN: scratchpad"
     "VALUE: x"
     "2 2 + to: x"
     "x ."
