@@ -1,6 +1,6 @@
 ;;; factor-mode.el -- mode for editing Factor source
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -27,6 +27,14 @@
   "Major mode for Factor source code."
   :group 'fuel
   :group 'languages)
+
+(defcustom factor-mode-cycle-always-ask-p t
+  "Whether to always ask for file creation when cycling to a
+source/docs/tests file.
+
+When set to false, you'll be asked only once."
+  :type 'boolean
+  :group 'factor-mode)
 
 (defcustom factor-mode-use-fuel t
   "Whether to use the full FUEL facilities in factor mode.
@@ -174,33 +182,58 @@ code in the buffer."
 (defconst factor-mode--cycle-endings
   '(".factor" "-tests.factor" "-docs.factor"))
 
-(defconst factor-mode--regex-cycle-endings
-  (format "\\(.*?\\)\\(%s\\)$"
-          (regexp-opt factor-mode--cycle-endings)))
+(make-local-variable
+ (defvar factor-mode--cycling-no-ask nil))
 
-(defconst factor-mode--cycle-endings-ring
+(defvar factor-mode--cycle-ring
   (let ((ring (make-ring (length factor-mode--cycle-endings))))
     (dolist (e factor-mode--cycle-endings ring)
-      (ring-insert ring e))))
+      (ring-insert ring e))
+    ring))
+
+(defconst factor-mode--cycle-basename-regex
+  (format "\\(.+?\\)\\(%s\\)$" (regexp-opt factor-mode--cycle-endings)))
+
+(defun factor-mode--cycle-split (basename)
+  (when (string-match factor-mode--cycle-basename-regex basename)
+    (cons (match-string 1 basename) (match-string 2 basename))))
 
 (defun factor-mode--cycle-next (file)
-  (let* ((match (string-match factor-mode--regex-cycle-endings file))
-         (base (and match (match-string-no-properties 1 file)))
-         (ending (and match (match-string-no-properties 2 file)))
-         (idx (and ending (ring-member factor-mode--cycle-endings-ring ending)))
-         (gfl (lambda (i) (concat base (ring-ref factor-mode--cycle-endings-ring i)))))
-    (if (not idx) file
-      (let ((l (length factor-mode--cycle-endings)) (i 1) next)
-        (while (and (not next) (< i l))
-          (when (file-exists-p (funcall gfl (+ idx i)))
-            (setq next (+ idx i)))
-          (setq i (1+ i)))
-        (funcall gfl (or next idx))))))
+  (let* ((dir (file-name-directory file))
+         (basename (file-name-nondirectory file))
+         (p/s (factor-mode--cycle-split basename))
+         (prefix (car p/s))
+         (ring factor-mode--cycle-ring)
+         (idx (or (ring-member ring (cdr p/s)) 0))
+         (len (ring-size ring))
+         (i 1)
+         (result nil))
+    (while (and (< i len) (not result))
+      (let* ((suffix (ring-ref ring (+ i idx)))
+             (path (expand-file-name (concat prefix suffix) dir)))
+        (when (or (file-exists-p path)
+                  (and (not (member suffix factor-mode--cycling-no-ask))
+                       (y-or-n-p (format "Create %s? " path))))
+          (setq result path))
+        (when (and (not factor-mode-cycle-always-ask-p)
+                   (not (member suffix factor-mode--cycling-no-ask)))
+          (setq factor-mode--cycling-no-ask
+                (cons name factor-mode--cycling-no-ask))))
+      (setq i (1+ i)))
+    result))
+
+(defsubst factor-mode--cycling-setup ()
+  (setq factor-mode--cycling-no-ask nil))
 
 (defun factor-mode-visit-other-file (&optional file)
   "Cycle between code, tests and docs factor files."
   (interactive)
-  (find-file (factor-mode--cycle-next (or file (buffer-file-name)))))
+  (let ((file (factor-mode--cycle-next (or file (buffer-file-name)))))
+    (unless file (error "No other file found"))
+    (find-file file)
+    (unless (file-exists-p file)
+      (set-buffer-modified-p t)
+      (save-buffer))))
 
 
 ;;; Keymap:
@@ -237,6 +270,7 @@ code in the buffer."
   (factor-mode--keymap-setup)
   (factor-mode--indentation-setup)
   (factor-mode--syntax-setup)
+  (factor-mode--cycling-setup)
   (when factor-mode-use-fuel (require 'fuel-mode) (fuel-mode))
   (run-hooks 'factor-mode-hook))
 

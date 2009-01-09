@@ -5,6 +5,8 @@ io.directories kernel math.parser sequences system vocabs.loader
 calendar math fry prettyprint ;
 IN: tools.files
 
+SYMBOLS: permissions file-name nlinks file-size date ;
+
 <PRIVATE
 
 : ls-time ( timestamp -- string )

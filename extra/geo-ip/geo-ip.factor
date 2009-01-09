@@ -4,7 +4,7 @@ USING: kernel sequences io.files io.files.temp io.launcher
 io.pathnames io.encodings.ascii io.streams.string http.client
 generalizations combinators math.parser math.vectors
 math.intervals interval-maps memoize csv accessors assocs
-strings math splitting grouping arrays ;
+strings math splitting grouping arrays combinators.smart ;
 IN: geo-ip
 
 : db-path ( -- path ) "IpToCountry.csv" temp-file ;
@@ -20,15 +20,17 @@ IN: geo-ip
 TUPLE: ip-entry from to registry assigned city cntry country ;
 
 : parse-ip-entry ( row -- ip-entry )
-    7 firstn {
-        [ string>number ]
-        [ string>number ]
-        [ ]
-        [ ]
-        [ ]
-        [ ]
-        [ ]
-    } spread ip-entry boa ;
+    [
+        {
+            [ string>number ]
+            [ string>number ]
+            [ ]
+            [ ]
+            [ ]
+            [ ]
+            [ ]
+        } spread
+    ] input<sequence ip-entry boa ;
 
 MEMO: ip-db ( -- seq )
     download-db ascii file-lines

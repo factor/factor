@@ -1,5 +1,5 @@
 IN: tr.tests
-USING: tr tools.test unicode.case ;
+USING: tr tools.test ascii ;
 
 TR: tr-test ch>upper "ABC" "XYZ" ;
 
