@@ -243,8 +243,8 @@ M: string set-file-group ( path string -- )
 : file-user-id ( path -- uid )
     normalize-path file-info uid>> ;
 
-: file-username ( path -- string )
-    file-user-id username ;
+: file-user-name ( path -- string )
+    file-user-id user-name ;
 
 : file-group-id ( path -- gid )
     normalize-path file-info gid>> ;
