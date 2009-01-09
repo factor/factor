@@ -117,12 +117,12 @@ prepare-test-file
 [ ] [ test-file f f 2array set-file-times ] unit-test
 
 
-[ ] [ test-file real-username set-file-user ] unit-test
+[ ] [ test-file real-user-name set-file-user ] unit-test
 [ ] [ test-file real-user-id set-file-user ] unit-test
 [ ] [ test-file real-group-name set-file-group ] unit-test
 [ ] [ test-file real-group-id set-file-group ] unit-test
 
-[ t ] [ test-file file-username real-username = ] unit-test
+[ t ] [ test-file file-user-name real-user-name = ] unit-test
 [ t ] [ test-file file-group-name real-group-name = ] unit-test
 
 [ ]
