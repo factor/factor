@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences namespaces make unicode.data kernel math arrays
 locals sorting.insertion accessors assocs math.order combinators
-unicode.syntax ;
+unicode.syntax strings sbufs ;
 IN: unicode.normalize
 
 <PRIVATE
@@ -66,13 +66,12 @@ CONSTANT: final-count 28
     over [ non-starter? not ] find-last-from drop ?1+ reorder-next 2drop ;
 
 :: decompose ( string quot -- decomposed )
-    [
+    [let | out [ string length <sbuf> ] |
         string [
-            dup hangul? [ hangul>jamo % ]
-            [ dup quot call [ % ] [ , ] ?if ] if
-        ] each
-    ] "" make
-    dup reorder ;
+            dup hangul? [ hangul>jamo out push-all ]
+            [ dup quot call [ out push-all ] [ out push ] ?if ] if
+        ] each out >string
+    ] dup reorder ;
 
 : with-string ( str quot -- str )
     over aux>> [ call ] [ drop ] if ; inline
