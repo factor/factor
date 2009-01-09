@@ -3,7 +3,7 @@
 USING: accessors alien.c-types alien.syntax combinators
 io.backend io.files io.files.info io.files.unix kernel math system unix
 unix.statfs.freebsd unix.statvfs.freebsd unix.getfsstat.freebsd
-sequences grouping alien.strings io.encodings.utf8
+sequences grouping alien.strings io.encodings.utf8 unix.types
 specialized-arrays.direct.uint arrays io.files.info.unix ;
 IN: io.files.info.unix.freebsd
 
