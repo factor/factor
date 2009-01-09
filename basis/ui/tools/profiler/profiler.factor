@@ -28,7 +28,8 @@ SINGLETON: word-renderer
 M: word-renderer row-columns
     drop [ [ present ] map ] [ { "All" "" } ] if* ;
 
-M: word-renderer row-value drop first ;
+M: word-renderer row-value
+    drop dup [ first ] when ;
 
 SINGLETON: method-renderer
 
