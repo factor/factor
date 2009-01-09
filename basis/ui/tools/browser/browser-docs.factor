@@ -7,6 +7,7 @@ ARTICLE: "ui-browser" "UI browser"
 { $subsection browser-window }
 { $command-map browser-gadget "toolbar" }
 { $command-map browser-gadget "scrolling" }
+{ $command-map browser-gadget "navigation" }
 { $command-map browser-gadget "multi-touch" }
 "Browsers are instances of " { $link browser-gadget } "." ;
 

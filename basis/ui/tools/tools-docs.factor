@@ -1,10 +1,9 @@
 USING: editors help.markup help.syntax summary inspector io
 io.styles listener parser prettyprint tools.profiler
-tools.walker ui.commands ui.gadgets.editors ui.gadgets.panes
-ui.gadgets.presentations ui.gadgets.slots ui.operations
-ui.tools.browser ui.tools.inspector
-ui.tools.listener ui.tools.operations ui.tools.profiler
-ui.tools.walker vocabs ;
+tools.walker ui.commands ui.gadgets.panes
+ui.gadgets.presentations ui.operations
+ ui.tools.operations ui.tools.profiler
+ui.tools.common vocabs ;
 IN: ui.tools
 
 ARTICLE: "starting-ui-tools" "Starting the UI tools"
@@ -17,6 +16,11 @@ ARTICLE: "starting-ui-tools" "Starting the UI tools"
 "In all cases, passing the " { $snippet "-run=listener" } " command line switch starts the terminal listener instead. The UI can be started from the terminal by issuing the following command:"
 { $code "USE: threads" "[ \"ui.tools\" run ] in-thread" } ;
 
+ARTICLE: "ui-shortcuts" "UI tool keyboard shortcuts"
+"Every UI tool has its own set of keyboard shortcuts; press " { $snippet "F1" } " inside a tool to see help. Some common shortcuts are also supported by all tools:"
+{ $command-map tool "tool-switching" }
+{ $command-map tool "common" } ;
+
 ARTICLE: "ui-presentations" "Presentations in the UI"
 "A " { $emphasis "presentation" } " is a graphical view of an object which is directly linked to the object in some way. The help article links you see in the documentation browser are presentations; and if you " { $link see } " a word in the UI listener, all words in the definition will themselves be presentations."
 $nl
@@ -26,7 +30,7 @@ $nl
 $nl
 "Clicking and holding the right mouse button on a presentation displays a popup menu listing available operations."
 $nl
-"Presentation gadgets can be constructed directly using the " { $link <presentation> } " word, and they can also be written to " { $link pane } " gadgets using the " { $link write-object } " word." ;
+"For more about presentation gadgets, see " { $link "ui.gadgets.presentations" } "." ;
 
 ARTICLE: "ui-profiler" "UI profiler" 
 "The graphical profiler is based on the terminal profiler (see " { $link "profiling" } ") and adds more convenient browsing of profiler results."
@@ -54,6 +58,7 @@ ARTICLE: "ui-tools" "UI developer tools"
 "The " { $vocab-link "ui.tools" } " vocabulary hierarchy implements a collection of simple developer tools."
 $nl
 "To take full advantage of the UI tools, you should be using a supported text editor. See " { $link "editor" } "."
+{ $subsection "ui-shortcuts" }
 { $subsection "ui-presentations" }
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }

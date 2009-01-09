@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: debugger help help.topics kernel models compiler.units
+USING: debugger help help.topics help.crossref kernel models compiler.units
 assocs words vocabs accessors fry combinators.short-circuit
 sequences models models.history tools.apropos
 ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
@@ -37,7 +37,7 @@ TUPLE: browser-gadget < tool pane scroller search-field ;
 
 : <browser-gadget> ( link -- gadget )
     { 0 1 } browser-gadget new-track
-        swap <history> >>model
+        swap >link <history> >>model
         dup <search-field> >>search-field
         dup <browser-toolbar> f track-add
         dup <help-pane> >>pane
@@ -95,6 +95,24 @@ browser-gadget "toolbar" f {
     { T{ key-down f { A+ } "RIGHT" } com-forward }
     { f com-documentation }
     { T{ key-down f f "F1" } browser-help }
+} define-command-map
+
+: ?show-help ( link browser -- )
+    over [ show-help ] [ 2drop ] if ;
+
+: navigate ( browser quot -- )
+    '[ control-value @ ] keep ?show-help ;
+
+: com-up ( browser -- ) [ article-parent ] navigate ;
+
+: com-prev ( browser -- ) [ prev-article ] navigate ;
+
+: com-next ( browser -- ) [ next-article ] navigate ;
+
+browser-gadget "navigation" "Commands for navigating in the article hierarchy" {
+    { T{ key-down f { A+ } "u" } com-up }
+    { T{ key-down f { A+ } "p" } com-prev }
+    { T{ key-down f { A+ } "n" } com-next }
 } define-command-map
 
 browser-gadget "multi-touch" f {
