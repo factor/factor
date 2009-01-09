@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences namespaces make unicode.data kernel math arrays
-locals sorting.insertion accessors assocs math.order ;
+locals sorting.insertion accessors assocs math.order combinators ;
 IN: unicode.normalize
 
 <PRIVATE
@@ -65,26 +65,30 @@ CONSTANT: final-count 28
     over [ non-starter? not ] find-last-from drop ?1+ reorder-next 2drop ;
 
 :: decompose ( string quot -- decomposed )
-    ! When there are 8 and 32-bit strings, this'll be
-    ! equivalent to clone on 8 and the contents of the last
-    ! main quotation on 32.
-    string [ 127 < ] all? [ string ] [
-        [
-            string [
-                dup hangul? [ hangul>jamo % ]
-                [ dup quot call [ % ] [ , ] ?if ] if
-            ] each
-        ] "" make
-        dup reorder
-    ] if ; inline
+    [
+        string [
+            dup hangul? [ hangul>jamo % ]
+            [ dup quot call [ % ] [ , ] ?if ] if
+        ] each
+    ] "" make
+    dup reorder ;
+
+: with-string ( str quot -- str )
+    over aux>> [ call ] [ drop ] if ; inline
+
+: (nfd) ( string -- nfd )
+    [ canonical-entry ] decompose ;
+
+: (nfkd) ( string -- nfkd )
+    [ compatibility-entry ] decompose ;
 
 PRIVATE>
 
 : nfd ( string -- nfd )
-    [ canonical-entry ] decompose ;
+    [ (nfd) ] with-string ;
 
 : nfkd ( string -- nfkd )
-    [ compatibility-entry ] decompose ;
+    [ (nfkd) ] with-string ;
 
 : string-append ( s1 s2 -- string )
     [ append ] keep
@@ -138,20 +142,26 @@ DEFER: compose-iter
 
 : compose-iter ( last-class -- )
     current [
-        dup combining-class
-        [ try-compose to compose-iter ]
-        [ swap [ drop ] [ try-noncombining ] if ] if*
+        dup combining-class {
+            { f [ 2drop ] }
+            { 0 [ swap [ drop ] [ try-noncombining ] if ] }
+            [ try-compose to compose-iter ]
+        } case
     ] [ drop ] if* ;
 
 : ?new-after ( -- )
     after [ dup empty? [ drop SBUF" " clone ] unless ] change ;
 
+: compose-combining ( ch -- )
+    char set to ?new-after
+    f compose-iter
+    char get , after get % ;
+
 : (compose) ( -- )
     current [
         dup jamo? [ drop compose-jamo ] [
-            char set to ?new-after
-            f compose-iter
-            char get , after get %
+            1 get-str combining-class
+            [ compose-combining ] [ , to ] if
         ] if (compose)
     ] when* ;
 
@@ -166,7 +176,7 @@ DEFER: compose-iter
 PRIVATE>
 
 : nfc ( string -- nfc )
-    nfd combine ;
+    [ (nfd) combine ] with-string ;
 
 : nfkc ( string -- nfkc )
-    nfkd combine ;
+    [ (nfkd) combine ] with-string ;
