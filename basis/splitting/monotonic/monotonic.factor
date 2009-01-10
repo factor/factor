@@ -24,13 +24,15 @@ PRIVATE>
 <PRIVATE
 
 : (monotonic-slice) ( seq quot class -- slices )
-    -rot
-    dupd '[
-        [ length ] [ ] [ <circular> 1 over change-circular-start ] tri
-        [ @ not [ , ] [ drop ] if ] 3each
-    ] { } make
-    dup empty? [ over length 1- prefix ] when -1 prefix 2 clump
-    [ first2 [ 1+ ] bi@ rot roll boa ] with with map ; inline
+    [
+        dupd '[
+            [ length ] [ ] [ <circular> 1 over change-circular-start ] tri
+            [ @ not [ , ] [ drop ] if ] 3each
+        ] { } make
+        dup empty? [ over length 1- prefix ] when -1 prefix 2 clump
+        swap
+    ] dip
+    '[ first2 [ 1+ ] bi@ _ _ boa ] map ; inline
 
 PRIVATE>
 
@@ -39,7 +41,7 @@ PRIVATE>
         { 0 [ 2drop ] }
         { 1 [ nip [ 0 1 rot ] dip boa 1array ] }
         [ drop (monotonic-slice) ]
-    } case ;
+    } case ; inline
 
 TUPLE: downward-slice < slice ;
 TUPLE: stable-slice < slice ;

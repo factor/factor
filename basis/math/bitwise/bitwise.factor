@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.functions sequences
 sequences.private words namespaces macros hints
-combinators fry io.binary ;
+combinators fry io.binary combinators.smart ;
 IN: math.bitwise
 
 ! utilities
@@ -76,12 +76,14 @@ DEFER: byte-bit-count
 GENERIC: (bit-count) ( x -- n )
 
 M: fixnum (bit-count)
-    {
-        [           byte-bit-count ]
-        [ -8  shift byte-bit-count ]
-        [ -16 shift byte-bit-count ]
-        [ -24 shift byte-bit-count ]
-    } cleave + + + ;
+    [
+        {
+            [           byte-bit-count ]
+            [ -8  shift byte-bit-count ]
+            [ -16 shift byte-bit-count ]
+            [ -24 shift byte-bit-count ]
+        } cleave
+    ] sum-outputs ;
 
 M: bignum (bit-count)
     dup 0 = [ drop 0 ] [

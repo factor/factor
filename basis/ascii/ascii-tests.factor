@@ -12,3 +12,8 @@ IN: ascii.tests
     0 "There are Four Upper Case characters"
     [ LETTER? [ 1+ ] when ] each
 ] unit-test
+
+[ t f ] [ CHAR: \s ascii? 400 ascii? ] unit-test
+
+[ "HELLO HOW ARE YOU?" ] [ "hellO hOw arE YOU?" >upper ] unit-test
+[ "i'm good thx bai" ] [ "I'm Good THX bai" >lower ] unit-test

@@ -3,8 +3,8 @@
 USING: accessors arrays assocs combinators io io.streams.string
 kernel math math.parser namespaces sets
 quotations sequences splitting vectors math.order
-unicode.categories strings regexp.backend regexp.utils
-unicode.case words locals regexp.classes ;
+strings regexp.backend regexp.utils
+unicode.case unicode.categories words locals regexp.classes ;
 IN: regexp.parser
 
 FROM: math.ranges => [a,b] ;
@@ -261,7 +261,7 @@ ERROR: bad-escaped-literals seq ;
     parse-til-E
     drop1
     [ epsilon ] [
-        [ quot call <constant> ] V{ } map-as
+        quot call [ <constant> ] V{ } map-as
         first|concatenation
     ] if-empty ; inline
 
@@ -269,10 +269,10 @@ ERROR: bad-escaped-literals seq ;
     [ ] (parse-escaped-literals) ;
 
 : lower-case-literals ( -- obj )
-    [ ch>lower ] (parse-escaped-literals) ;
+    [ >lower ] (parse-escaped-literals) ;
 
 : upper-case-literals ( -- obj )
-    [ ch>upper ] (parse-escaped-literals) ;
+    [ >upper ] (parse-escaped-literals) ;
 
 : parse-escaped ( -- obj )
     read1
