@@ -277,3 +277,7 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 { 3 0 } [ [ 3drop ] 3each ] must-infer-as
 
 [ V{ 0 3 } ] [ "A" { "A" "B" "C" "A" "D" } indices ] unit-test
+
+[ "asdf" iota ] must-fail
+[ T{ iota { n 10 } } ] [ 10 iota ] unit-test
+[ 0 ] [ 10 iota first ] unit-test
