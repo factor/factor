@@ -84,8 +84,14 @@
 (defconst fuel-syntax--method-definition-regex
   "^M: +\\([^ ]+\\) +\\([^ ]+\\)")
 
-(defconst fuel-syntax--number-regex
-  "\\_<\\(\\+\\|-\\)?\\([0-9]+\\.?[0-9]*\\|\\.[0-9]+\\)\\([eE]\\(\\+\\|-\\)?[0-9]+\\)?\\_>")
+(defconst fuel-syntax--integer-regex
+  "\\_<-?[0-9]+\\_>")
+
+(defconst fuel-syntax--ratio-regex
+  "\\_<-?\\([0-9]+\\+\\)?[0-9]+/-?[0-9]+\\_>")
+
+(defconst fuel-syntax--float-regex
+  "\\_<-?[0-9]+\\.[0-9]*\\([eE]-?[0-9]+\\)?\\_>")
 
 (defconst fuel-syntax--word-definition-regex
   (fuel-syntax--second-word-regex
