@@ -3,7 +3,7 @@
 USING: accessors kernel arrays sequences math math.order
 math.partial-dispatch generic generic.standard generic.math
 classes.algebra classes.union sets quotations assocs combinators
-words namespaces continuations classes fry
+words namespaces continuations classes fry combinators.smart
 compiler.tree
 compiler.tree.builder
 compiler.tree.recursive
@@ -134,17 +134,19 @@ DEFER: (flat-length)
     over 2 <= [ drop ] [ 2/ 1+ * ] if 24 swap [-] 4 /i ;
 
 : inlining-rank ( #call word -- n )
-    [ classes-known? 2 0 ? ]
     [
-        {
-            [ body-length-bias ]
-            [ "default" word-prop -4 0 ? ]
-            [ "specializer" word-prop 1 0 ? ]
-            [ method-body? 1 0 ? ]
-        } cleave
-        node-count-bias
-        loop-nesting get 0 or 2 *
-    ] bi* + + + + + + ;
+        [ classes-known? 2 0 ? ]
+        [
+            {
+                [ body-length-bias ]
+                [ "default" word-prop -4 0 ? ]
+                [ "specializer" word-prop 1 0 ? ]
+                [ method-body? 1 0 ? ]
+            } cleave
+            node-count-bias
+            loop-nesting get 0 or 2 *
+        ] bi*
+    ] sum-outputs ;
 
 : should-inline? ( #call word -- ? )
     dup "inline" word-prop [ 2drop t ] [ inlining-rank 5 >= ] if ;

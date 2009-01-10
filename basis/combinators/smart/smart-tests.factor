@@ -14,8 +14,8 @@ IN: combinators.smart.tests
 
 
 
-[ 6 ] [ [ 1 2 3 ] [ + ] reduce-output ] unit-test
+[ 6 ] [ [ 1 2 3 ] [ + ] reduce-outputs ] unit-test
 
-[ [ 1 2 3 ] [ + ] reduce-output ] must-infer
+[ [ 1 2 3 ] [ + ] reduce-outputs ] must-infer
 
 [ 6 ] [ [ 1 2 3 ] sum-outputs ] unit-test

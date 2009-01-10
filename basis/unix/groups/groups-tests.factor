@@ -27,3 +27,5 @@ IN: unix.groups.tests
 [ ] [ real-group-id group-name drop ] unit-test
 
 [ "888888888888888" ] [ 888888888888888 group-name ] unit-test
+[ f ]
+[ "please-oh-please-don't-have-a-group-named-this123lalala" group-struct ] unit-test

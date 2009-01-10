@@ -78,11 +78,7 @@ buffer."
     (make-comint-in-buffer "fuel listener" (current-buffer) factor nil
                            "-run=listener" (format "-i=%s" image))
     (fuel-listener--wait-for-prompt 10000)
-    (fuel-con--setup-connection (current-buffer))
-    (fuel-con--send-string/wait (current-buffer)
-                                fuel-con--init-stanza
-                                '(lambda (s) (message "FUEL listener up and running!"))
-                                20000)))
+    (fuel-con--setup-connection (current-buffer))))
 
 (defun fuel-listener--process (&optional start)
   (or (and (buffer-live-p (fuel-listener--buffer))

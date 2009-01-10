@@ -57,7 +57,10 @@
 (defun fuel-autodoc--eldoc-function ()
   (or (and fuel-autodoc--fallback-function
            (funcall fuel-autodoc--fallback-function))
-      (fuel-autodoc--word-synopsis)))
+      (condition-case e
+          (fuel-autodoc--word-synopsis)
+        (error (format "Autodoc not available (%s)"
+                       (error-message-string e))))))
 
 
 ;;; Autodoc mode:
