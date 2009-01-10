@@ -101,6 +101,16 @@ M: integer nth-unsafe drop ;
 
 INSTANCE: integer immutable-sequence
 
+! In the future, this will replace integer sequences
+TUPLE: iota { n read-only } ;
+
+: iota ( n -- iota ) \ iota boa ; inline
+
+M: iota length n>> ;
+M: iota nth-unsafe drop ;
+
+INSTANCE: iota immutable-sequence
+
 : first-unsafe ( seq -- first )
     0 swap nth-unsafe ; inline
 

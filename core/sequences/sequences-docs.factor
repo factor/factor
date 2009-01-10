@@ -1262,6 +1262,17 @@ HELP: shorten
     "V{ 1 2 3 }"
 } } ;
 
+HELP: iota
+{ $values { "n" integer } { "iota" iota } }
+{ $description "Creates an immutable virtual sequence containing the integers from 0 to " { $snippet "n-1" } "." }
+{ $examples
+  { $example
+    "USING: math.parser sequences ;"
+    "3 iota [ sq ] map ."
+    "{ \"0\" \"1\" \"2\" }"
+  }
+} ;
+
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
 "The " { $link nth-unsafe } " and " { $link set-nth-unsafe } " sequence protocol bypasses bounds checks for increased performance."
 $nl
