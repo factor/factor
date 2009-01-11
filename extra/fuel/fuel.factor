@@ -4,9 +4,10 @@
 USING: accessors arrays assocs classes.tuple combinators
 compiler.units continuations debugger definitions help help.crossref
 help.markup help.topics io io.pathnames io.streams.string kernel lexer
-make math math.order memoize namespaces parser quotations prettyprint
+make math math.order memoize namespaces parser prettyprint quotations
 sequences sets sorting source-files strings summary tools.crossref
-tools.vocabs tools.vocabs.browser vectors vocabs vocabs.parser words ;
+tools.scaffold tools.vocabs tools.vocabs.browser vectors vocabs
+vocabs.loader vocabs.parser words ;
 
 IN: fuel
 
@@ -330,7 +331,7 @@ SYMBOL: vocab-list
     [ describe-words ] with-string-writer \ describe-words swap 2array ; inline
 
 : (fuel-vocab-help) ( name -- element )
-    \ article swap dup >vocab-link
+    dup require \ article swap dup >vocab-link
     [
         {
             [ vocab-authors [ \ $authors prefix , ] when* ]
@@ -360,13 +361,24 @@ MEMO: (fuel-get-vocabs/author) ( author -- element )
 : fuel-get-vocabs/author ( author -- )
     (fuel-get-vocabs/author) fuel-eval-set-result ;
 
-MEMO: (fuel-get-vocabs/tag ( tag -- element )
+MEMO: (fuel-get-vocabs/tag) ( tag -- element )
     [ "Vocabularies tagged " prepend \ $heading swap 2array ]
     [ tagged fuel-vocab-list ] bi 2array ;
 
 : fuel-get-vocabs/tag ( tag -- )
-    (fuel-get-vocabs/tag fuel-eval-set-result ;
+    (fuel-get-vocabs/tag) fuel-eval-set-result ;
 
+! Scaffold support
+
+: fuel-scaffold-vocab ( root name devname -- )
+    developer-name set
+    [ scaffold-vocab ] 2keep [ (normalize-path) ] dip dup
+    append-path append-path ".factor" append fuel-eval-set-result ;
+
+: fuel-scaffold-help ( name devname -- )
+    developer-name set
+    dup require dup scaffold-help vocab-docs-path
+    (normalize-path) fuel-eval-set-result ;
 
 ! -run=fuel support
 

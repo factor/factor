@@ -108,7 +108,6 @@
                          fuel-syntax--syntactic-keywords))))))
 
 
-
 ;;; Fontify strings as Factor code:
 
 (defvar fuel-font-lock--font-lock-buffer

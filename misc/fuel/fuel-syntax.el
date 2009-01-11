@@ -44,14 +44,14 @@
 
 (defconst fuel-syntax--parsing-words
   '(":" "::" ";" "<<" "<PRIVATE" ">>"
-    "ALIAS:"
+    "ABOUT:" "ALIAS:" "ARTICLE:"
     "B" "BIN:"
     "C:" "C-STRUCT:" "C-UNION:" "CHAR:" "CONSTANT:" "call-next-method"
     "DEFER:"
     "ERROR:" "EXCLUDE:"
     "f" "FORGET:" "FROM:"
     "GENERIC#" "GENERIC:"
-    "HEX:" "HOOK:"
+    "HELP:" "HEX:" "HOOK:"
     "IN:" "initial:" "INSTANCE:" "INTERSECTION:"
     "M:" "MACRO:" "MACRO::" "MAIN:" "MATH:" "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
     "OCT:"
@@ -63,11 +63,11 @@
     "UNION:" "USE:" "USING:"
     "VARS:"))
 
-(defconst fuel-syntax--bracers
-  '("B" "BV" "C" "CS" "H" "T" "V" "W"))
-
 (defconst fuel-syntax--parsing-words-regex
   (regexp-opt fuel-syntax--parsing-words 'words))
+
+(defconst fuel-syntax--bracers
+  '("B" "BV" "C" "CS" "H" "T" "V" "W"))
 
 (defconst fuel-syntax--brace-words-regex
   (format "%s{" (regexp-opt fuel-syntax--bracers t)))
@@ -91,7 +91,7 @@
   "\\_<-?\\([0-9]+\\+\\)?[0-9]+/-?[0-9]+\\_>")
 
 (defconst fuel-syntax--float-regex
-  "\\_<-?[0-9]+\\.[0-9]*\\([eE]-?[0-9]+\\)?\\_>")
+  "\\_<-?[0-9]+\\.[0-9]*\\([eE][+-]?[0-9]+\\)?\\_>")
 
 (defconst fuel-syntax--word-definition-regex
   (fuel-syntax--second-word-regex
@@ -148,12 +148,14 @@
           fuel-syntax--declaration-words-regex))
 
 (defconst fuel-syntax--single-liner-regex
-  (format "^%s" (regexp-opt '("ALIAS:"
+  (format "^%s" (regexp-opt '("ABOUT:"
+                              "ARTICLE:"
+                              "ALIAS:"
                               "CONSTANT:" "C:"
                               "DEFER:"
                               "FORGET:"
                               "GENERIC:" "GENERIC#"
-                              "HEX:" "HOOK:"
+                              "HELP:" "HEX:" "HOOK:"
                               "IN:" "INSTANCE:"
                               "MAIN:" "MATH:" "MIXIN:"
                               "OCT:"
@@ -216,8 +218,7 @@
     (" \\(|\\) " (1 "(|"))
     (" \\(|\\)$" (1 ")"))
     ;; Opening brace words:
-    (,(format "\\_<%s\\({\\)\\_>" (regexp-opt fuel-syntax--bracers)) (1 "(}"))
-    ("\\_<\\({\\)\\_>" (1 "(}"))
+    ("\\_<\\w*\\({\\)\\_>" (1 "(}"))
     ("\\_<\\(}\\)\\_>" (1 "){"))
     ;; Parenthesis:
     ("\\_<\\((\\)\\_>" (1 "()"))
@@ -261,7 +262,7 @@
 (defsubst fuel-syntax--looking-at-emptiness ()
   (looking-at "^[ ]*$\\|$"))
 
-(defsubst fuel-syntax--is-eol (pos)
+(defsubst fuel-syntax--is-last-char (pos)
   (save-excursion
     (goto-char (1+ pos))
     (fuel-syntax--looking-at-emptiness)))
