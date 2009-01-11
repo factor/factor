@@ -65,11 +65,14 @@ You can configure `fuel-scaffold-developer-name' (set by default to
   "Creates, if it does not already exist, a help file with
 scaffolded help for each word in the current vocabulary.
 
-With prefix argument, ask for the vocabulary name."
+With prefix argument, ask for the vocabulary name.
+You can configure `fuel-scaffold-developer-name' (set by default to
+`user-full-name') for the name to be inserted in the generated file."
   (interactive "P")
   (let* ((vocab (or (and (not arg) (fuel-syntax--current-vocab))
                    (fuel-edit--read-vocabulary-name nil)))
-         (cmd `(:fuel* (,vocab fuel-scaffold-help) "fuel"))
+         (cmd `(:fuel* (,vocab ,fuel-scaffold-developer-name fuel-scaffold-help)
+                       "fuel"))
          (ret (fuel-eval--send/wait cmd))
          (file (fuel-eval--retort-result ret)))
         (unless file

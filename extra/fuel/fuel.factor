@@ -375,7 +375,8 @@ MEMO: (fuel-get-vocabs/tag) ( tag -- element )
     [ scaffold-vocab ] 2keep [ (normalize-path) ] dip dup
     append-path append-path ".factor" append fuel-eval-set-result ;
 
-: fuel-scaffold-help ( name -- )
+: fuel-scaffold-help ( name devname -- )
+    developer-name set
     dup require dup scaffold-help vocab-docs-path
     (normalize-path) fuel-eval-set-result ;
 
