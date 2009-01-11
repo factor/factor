@@ -1279,9 +1279,9 @@ HELP: iota
 { $description "Creates an immutable virtual sequence containing the integers from 0 to " { $snippet "n-1" } "." }
 { $examples
   { $example
-    "USING: math.parser sequences ;"
+    "USING: math sequences prettyprint ;"
     "3 iota [ sq ] map ."
-    "{ \"0\" \"1\" \"2\" }"
+    "{ 0 1 4 }"
   }
 } ;
 
