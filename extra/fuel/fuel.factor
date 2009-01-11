@@ -6,7 +6,8 @@ compiler.units continuations debugger definitions help help.crossref
 help.markup help.topics io io.pathnames io.streams.string kernel lexer
 make math math.order memoize namespaces parser quotations prettyprint
 sequences sets sorting source-files strings summary tools.crossref
-tools.vocabs tools.vocabs.browser vectors vocabs vocabs.parser words ;
+tools.vocabs tools.vocabs.browser vectors vocabs vocabs.parser
+vocabs.loader words ;
 
 IN: fuel
 
@@ -330,7 +331,7 @@ SYMBOL: vocab-list
     [ describe-words ] with-string-writer \ describe-words swap 2array ; inline
 
 : (fuel-vocab-help) ( name -- element )
-    \ article swap dup >vocab-link
+    dup require \ article swap dup >vocab-link
     [
         {
             [ vocab-authors [ \ $authors prefix , ] when* ]
@@ -360,12 +361,12 @@ MEMO: (fuel-get-vocabs/author) ( author -- element )
 : fuel-get-vocabs/author ( author -- )
     (fuel-get-vocabs/author) fuel-eval-set-result ;
 
-MEMO: (fuel-get-vocabs/tag ( tag -- element )
+MEMO: (fuel-get-vocabs/tag) ( tag -- element )
     [ "Vocabularies tagged " prepend \ $heading swap 2array ]
     [ tagged fuel-vocab-list ] bi 2array ;
 
 : fuel-get-vocabs/tag ( tag -- )
-    (fuel-get-vocabs/tag fuel-eval-set-result ;
+    (fuel-get-vocabs/tag) fuel-eval-set-result ;
 
 
 ! -run=fuel support

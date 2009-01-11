@@ -239,7 +239,7 @@ code in the buffer."
 ;;; Keymap:
 
 (defun factor-mode-insert-and-indent (n)
-  (interactive "p")
+  (interactive "*p")
   (self-insert-command n)
   (indent-according-to-mode))
 
