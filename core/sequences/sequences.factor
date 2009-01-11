@@ -101,10 +101,14 @@ M: integer nth-unsafe drop ;
 
 INSTANCE: integer immutable-sequence
 
+PRIVATE>
+
 ! In the future, this will replace integer sequences
-TUPLE: iota { n read-only } ;
+TUPLE: iota { n integer read-only } ;
 
 : iota ( n -- iota ) \ iota boa ; inline
+
+<PRIVATE
 
 M: iota length n>> ;
 M: iota nth-unsafe drop ;
