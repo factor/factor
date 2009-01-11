@@ -43,6 +43,26 @@ beast.
   Many aspects of the environment can be customized:
   M-x customize-group fuel will show you how many.
 
+*** Faster listener startup
+
+  On startup, run-factor loads the fuel vocabulary, which can take a
+  while. If you want to speedup the load process, type 'save' in the
+  listener prompt just after invoking run-factor. This will save a
+  factor image (overwriting the current one) with all the needed
+  vocabs.
+
+*** Vocabulary creation
+
+    FUEL offers a basic interface with Factor's scaffolding utilities.
+    To create a new vocabulary directory and associated files:
+
+       M-x fuel-scaffold-vocab
+
+    and when in a vocab file, to create a docs file with boilerplate
+    for each word:
+
+       M-x fuel-scaffold-help
+
 * Quick key reference
 
   (Triple chords ending in a single letter <x> accept also C-<x> (e.g.
