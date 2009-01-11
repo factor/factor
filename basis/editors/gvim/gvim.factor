@@ -8,7 +8,7 @@ SINGLETON: gvim
 HOOK: gvim-path io-backend ( -- path )
 
 M: gvim vim-command ( file line -- string )
-    [ gvim-path , swap , "+" swap number>string append , ] { } make ;
+    [ gvim-path , "+" swap number>string append , , ] { } make ;
 
 gvim vim-editor set-global
 
