@@ -102,6 +102,8 @@ buffer."
 
 (defun fuel-listener-nuke ()
   (interactive)
+  (goto-char (point-max))
+  (comint-kill-region comint-last-input-start (point))
   (comint-redirect-cleanup)
   (fuel-con--setup-connection fuel-listener--buffer))
 
