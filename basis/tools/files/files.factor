@@ -5,6 +5,8 @@ io.directories kernel math.parser sequences system vocabs.loader
 calendar math fry prettyprint ;
 IN: tools.files
 
+SYMBOLS: permissions file-name nlinks file-size date ;
+
 <PRIVATE
 
 : ls-time ( timestamp -- string )
@@ -63,7 +65,7 @@ percent-used percent-free ;
     [ [ unparse ] map ] bi prefix simple-table. ;
 
 : file-systems. ( -- )
-    { device-name free-space used-space total-space percent-used mount-point }
+    { device-name available-space free-space used-space total-space percent-used mount-point }
     print-file-systems ;
 
 {

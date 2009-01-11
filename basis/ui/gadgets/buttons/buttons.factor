@@ -6,7 +6,7 @@ classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.labels ui.gadgets.theme
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
 ui.render math.geometry.rect locals alien.c-types
-specialized-arrays.float fry ;
+specialized-arrays.float fry combinators.smart ;
 IN: ui.gadgets.buttons
 
 TUPLE: button < border pressed? selected? quot ;
@@ -111,12 +111,14 @@ TUPLE: checkmark-paint < caching-pen color last-vertices ;
 <PRIVATE
 
 : checkmark-points ( dim -- points )
-    {
-        [ { 0 0 } v* { 0.5 0.5 } v+ ]
-        [ { 1 1 } v* { 0.5 0.5 } v+ ]
-        [ { 1 0 } v* { -0.3 0.5 } v+ ]
-        [ { 0 1 } v* { -0.3 0.5 } v+ ]
-    } cleave 4array ;
+    [
+        {
+            [ { 0 0 } v* { 0.5 0.5 } v+ ]
+            [ { 1 1 } v* { 0.5 0.5 } v+ ]
+            [ { 1 0 } v* { -0.3 0.5 } v+ ]
+            [ { 0 1 } v* { -0.3 0.5 } v+ ]
+        } cleave
+    ] output>array ;
 
 : checkmark-vertices ( dim -- vertices )
     checkmark-points concat >float-array ;

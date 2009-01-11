@@ -338,6 +338,10 @@ HELP: 2each
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- )" } } }
 { $description "Applies the quotation to pairs of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } "." } ;
 
+HELP: 3each
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "quot" { $quotation "( elt1 elt2 elt3 -- )" } } }
+{ $description "Applies the quotation to triples of elements from " { $snippet "seq1" } ", " { $snippet "seq2" } " and " { $snippet "seq3" } "." } ;
+
 HELP: 2reduce
 { $values { "seq1" sequence }
           { "seq2" sequence }
@@ -350,9 +354,17 @@ HELP: 2map
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- new )" } } { "newseq" "a new sequence" } }
 { $description "Applies the quotation to each pair of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "seq1" } "." } ;
 
+HELP: 3map
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "quot" { $quotation "( elt1 elt2 elt3 -- new )" } } { "newseq" "a new sequence" } }
+{ $description "Applies the quotation to each triple of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "seq1" } "." } ;
+
 HELP: 2map-as
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- new )" } } { "exemplar" sequence } { "newseq" "a new sequence" } }
 { $description "Applies the quotation to each pair of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "exemplar" } "." } ;
+
+HELP: 3map-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "quot" { $quotation "( elt1 elt2 elt3 -- new )" } } { "exemplar" sequence } { "newseq" "a new sequence" } }
+{ $description "Applies the quotation to each triple of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: 2all?
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- ? )" } } { "?" "a boolean" } }
@@ -1262,6 +1274,17 @@ HELP: shorten
     "V{ 1 2 3 }"
 } } ;
 
+HELP: iota
+{ $values { "n" integer } { "iota" iota } }
+{ $description "Creates an immutable virtual sequence containing the integers from 0 to " { $snippet "n-1" } "." }
+{ $examples
+  { $example
+    "USING: math sequences prettyprint ;"
+    "3 iota [ sq ] map ."
+    "{ 0 1 4 }"
+  }
+} ;
+
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
 "The " { $link nth-unsafe } " and " { $link set-nth-unsafe } " sequence protocol bypasses bounds checks for increased performance."
 $nl
@@ -1422,15 +1445,22 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection all? }
 "Testing how elements are related:"
 { $subsection monotonic? }
-{ $subsection "sequence-2combinators" } ;
+{ $subsection "sequence-2combinators" }
+{ $subsection "sequence-3combinators" } ;
 
 ARTICLE: "sequence-2combinators" "Pair-wise sequence combinators"
-"There is a set of combinators which traverse two sequences pairwise. If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined."
+"There is a set of combinators which traverse two sequences pairwise. If one sequence is shorter than the other, then only the prefix having the length of the minimum of the two is examined."
 { $subsection 2each }
 { $subsection 2reduce }
 { $subsection 2map }
 { $subsection 2map-as }
 { $subsection 2all? } ;
+
+ARTICLE: "sequence-3combinators" "Triple-wise sequence combinators"
+"There is a set of combinators which traverse three sequences triple-wise. If one sequence is shorter than the others, then only the prefix having the length of the minimum of the three is examined."
+{ $subsection 3each }
+{ $subsection 3map }
+{ $subsection 3map-as } ;
 
 ARTICLE: "sequences-tests" "Testing sequences"
 "Testing for an empty sequence:"

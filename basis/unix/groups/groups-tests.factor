@@ -3,7 +3,6 @@
 USING: tools.test unix.groups kernel strings math ;
 IN: unix.groups.tests
 
-
 [ ] [ all-groups drop ] unit-test
 
 \ all-groups must-infer
@@ -24,3 +23,9 @@ IN: unix.groups.tests
 [ ] [ effective-group-id [ ] with-effective-group ] unit-test
 
 [ ] [ [ ] with-group-cache ] unit-test
+
+[ ] [ real-group-id group-name drop ] unit-test
+
+[ "888888888888888" ] [ 888888888888888 group-name ] unit-test
+[ f ]
+[ "please-oh-please-don't-have-a-group-named-this123lalala" group-struct ] unit-test
