@@ -32,6 +32,7 @@ beast.
   (require 'factor-mode)
 
 * Basic usage
+*** Running the listener
 
   If you're using the default factor binary and images locations inside
   the Factor's source tree, that should be enough to start using FUEL.
