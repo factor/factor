@@ -63,11 +63,11 @@
     "UNION:" "USE:" "USING:"
     "VARS:"))
 
-(defconst fuel-syntax--bracers
-  '("B" "BV" "C" "CS" "H" "T" "V" "W"))
-
 (defconst fuel-syntax--parsing-words-regex
   (regexp-opt fuel-syntax--parsing-words 'words))
+
+(defconst fuel-syntax--bracers
+  '("B" "BV" "C" "CS" "H" "T" "V" "W"))
 
 (defconst fuel-syntax--brace-words-regex
   (format "%s{" (regexp-opt fuel-syntax--bracers t)))
@@ -216,8 +216,7 @@
     (" \\(|\\) " (1 "(|"))
     (" \\(|\\)$" (1 ")"))
     ;; Opening brace words:
-    (,(format "\\_<%s\\({\\)\\_>" (regexp-opt fuel-syntax--bracers)) (1 "(}"))
-    ("\\_<\\({\\)\\_>" (1 "(}"))
+    ("\\_<\\w*\\({\\)\\_>" (1 "(}"))
     ("\\_<\\(}\\)\\_>" (1 "){"))
     ;; Parenthesis:
     ("\\_<\\((\\)\\_>" (1 "()"))
