@@ -2,7 +2,7 @@ USING: help.markup help.syntax io.streams.string quotations
 strings math regexp regexp.backend ;
 IN: validators
 
-HEPL: v-checkbox
+HELP: v-checkbox
 { $values { "str" string } }
 { $description "Converts the string value of a checkbox component (either \"on\" or \"off\") to a boolean value." } ;
 
