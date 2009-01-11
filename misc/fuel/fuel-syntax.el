@@ -260,7 +260,7 @@
 (defsubst fuel-syntax--looking-at-emptiness ()
   (looking-at "^[ ]*$\\|$"))
 
-(defsubst fuel-syntax--is-eol (pos)
+(defsubst fuel-syntax--is-last-char (pos)
   (save-excursion
     (goto-char (1+ pos))
     (fuel-syntax--looking-at-emptiness)))

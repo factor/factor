@@ -111,7 +111,7 @@ code in the buffer."
                       (= (- be (point)) (current-indentation))
                       (= ln (line-number-at-pos be)))
                  (fuel-syntax--indentation-at bs))
-                ((or (fuel-syntax--is-eol bs)
+                ((or (fuel-syntax--is-last-char bs)
                      (not (eq ?\ (char-after (1+ bs)))))
                  (fuel-syntax--increased-indentation
                   (fuel-syntax--indentation-at bs)))
@@ -238,15 +238,17 @@ code in the buffer."
 
 ;;; Keymap:
 
-(defun factor-mode-insert-and-indent (n)
+(defun factor-mode--insert-and-indent (n)
   (interactive "*p")
-  (self-insert-command n)
+  (let ((start (point)))
+    (self-insert-command n)
+    (save-excursion (font-lock-fontify-region start (point))))
   (indent-according-to-mode))
 
 (defvar factor-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map [?\]] 'factor-mode-insert-and-indent)
-    (define-key map [?}] 'factor-mode-insert-and-indent)
+    (define-key map [?\]] 'factor-mode--insert-and-indent)
+    (define-key map [?}] 'factor-mode--insert-and-indent)
     (define-key map "\C-m" 'newline-and-indent)
     (define-key map "\C-co" 'factor-mode-visit-other-file)
     (define-key map "\C-c\C-o" 'factor-mode-visit-other-file)
