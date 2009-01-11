@@ -437,4 +437,10 @@ TUPLE: <git-status>
     REPO            <pile> 1 >>fill tuck refresh-remotes-pile add-gadget
 
   "Git" open-window ;
-  
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: factor-git-tool ( -- ) "resource:" git-tool ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
