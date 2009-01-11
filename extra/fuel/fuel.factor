@@ -69,12 +69,14 @@ M: integer fuel-pprint pprint ; inline
 
 M: string fuel-pprint pprint ; inline
 
-M: sequence fuel-pprint
-    "(" write [ " " write ] [ fuel-pprint ] interleave ")" write ; inline
+: fuel-pprint-sequence ( seq open close -- )
+    [ write ] dip swap [ " " write ] [ fuel-pprint ] interleave write ; inline
+
+M: sequence fuel-pprint "(" ")" fuel-pprint-sequence ; inline
+
+M: quotation fuel-pprint "[" "]" fuel-pprint-sequence ; inline
 
 M: tuple fuel-pprint tuple>array fuel-pprint ; inline
-
-M: quotation fuel-pprint pprint ; inline
 
 M: continuation fuel-pprint drop ":continuation" write ; inline
 
