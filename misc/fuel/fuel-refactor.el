@@ -19,35 +19,105 @@
 (require 'fuel-base)
 
 
+;;; Word definitions in buffer
+
+(defconst fuel-refactor--next-defun-regex
+  (format "^\\(:\\|MEMO:\\|MACRO:\\):? +\\(\\w+\\)\\(%s\\)\\([^;]+?\\) ;\\_>"
+          fuel-syntax--stack-effect-regex))
+
+(defun fuel-refactor--previous-defun ()
+  (let ((pos) (result))
+    (while (and (not result)
+                (setq pos (fuel-syntax--beginning-of-defun)))
+      (setq result (looking-at fuel-refactor--next-defun-regex)))
+    (when (and result pos)
+      (let ((name (match-string-no-properties 2))
+            (body (match-string-no-properties 4))
+            (end (match-end 0)))
+        (list (split-string body nil t) name pos end)))))
+
+(defun fuel-refactor--find (code to)
+  (let ((candidate) (result))
+    (while (and (not result)
+                (setq candidate (fuel-refactor--previous-defun))
+                (> (point) to))
+      (when (equal (car candidate) code)
+        (setq result (cdr candidate))))
+    result))
+
+(defun fuel-refactor--reuse-p (word)
+  (save-excursion
+    (mark-defun)
+    (move-overlay fuel-stack--overlay (1+ (point)) (mark))
+    (unwind-protect
+        (and (y-or-n-p (format "Use existing word '%s'? " word)) word)
+      (delete-overlay fuel-stack--overlay))))
+
+(defun fuel-refactor--code-rx (code)
+  (let ((words (split-string code nil t)))
+    (mapconcat 'regexp-quote words "[ \n\f\r]+")))
+
+
 ;;; Extract word:
 
+(defun fuel-refactor--reuse-existing (code)
+  (save-excursion
+    (mark-defun)
+    (let ((code (split-string (substring-no-properties code) nil t))
+          (down (mark))
+          (found)
+          (result))
+      (while (and (not result)
+                  (setq found (fuel-refactor--find code (point-min))))
+        (when found (setq result (fuel-refactor--reuse-p (car found)))))
+      (goto-char (point-max))
+      (while (and (not result)
+                  (setq found (fuel-refactor--find code down)))
+        (when found (setq result (fuel-refactor--reuse-p (car found)))))
+      (and result found))))
+
+(defun fuel-refactor--insert-word (word stack-effect code)
+  (let ((beg (save-excursion (fuel-syntax--beginning-of-defun) (point)))
+        (end (save-excursion
+               (re-search-backward fuel-syntax--end-of-def-regex nil t)
+               (forward-line 1)
+               (skip-syntax-forward "-"))))
+    (let ((start (goto-char (max beg end))))
+      (open-line 1)
+      (insert ": " word " " stack-effect "\n" code " ;\n")
+      (indent-region start (point))
+      (move-overlay fuel-stack--overlay start (point)))))
+
+(defun fuel-refactor--extract-other (start end code)
+  (unwind-protect
+      (when (y-or-n-p "Apply refactoring to rest of buffer? ")
+        (save-excursion
+          (let ((rx (fuel-refactor--code-rx code))
+                (end (point)))
+            (query-replace-regexp rx word t (point-min) start)
+            (query-replace-regexp rx word t end (point-max)))))
+    (delete-overlay fuel-stack--overlay)))
+
 (defun fuel-refactor--extract (begin end)
-  (let* ((word (read-string "New word name: "))
-         (code (buffer-substring begin end))
-         (code-str (fuel--region-to-string begin end))
-         (stack-effect (or (fuel-stack--infer-effect code-str)
-                           (read-string "Stack effect: "))))
-    (unless (< begin end) (error "No proper region to extract"))
+  (unless (< begin end) (error "No proper region to extract"))
+  (let* ((code (buffer-substring begin end))
+         (existing (fuel-refactor--reuse-existing code))
+         (code-str (or existing (fuel--region-to-string begin end)))
+         (stack-effect (or existing
+                           (fuel-stack--infer-effect code-str)
+                           (read-string "Stack effect: ")))
+         (word (or (car existing) (read-string "New word name: "))))
     (goto-char begin)
     (delete-region begin end)
     (insert word)
     (indent-region begin (point))
-    (set-mark (point))
-    (let ((beg (save-excursion (fuel-syntax--beginning-of-defun) (point)))
-          (end (save-excursion
-                 (re-search-backward fuel-syntax--end-of-def-regex nil t)
-                 (forward-line 1)
-                 (skip-syntax-forward "-")
-                 (point))))
-      (goto-char (max beg end)))
-    (open-line 1)
-    (let ((start (point)))
-      (insert ": " word " " stack-effect "\n" code " ;\n")
-      (indent-region start (point))
-      (move-overlay fuel-stack--overlay start (point))
-      (goto-char (mark))
-      (sit-for fuel-stack-highlight-period)
-      (delete-overlay fuel-stack--overlay))))
+    (save-excursion
+      (let ((start (or (cadr existing) (point))))
+        (unless existing
+          (fuel-refactor--insert-word word stack-effect code))
+        (fuel-refactor--extract-other start
+                                      (or (car (cddr existing)) (point))
+                                      code)))))
 
 (defun fuel-refactor-extract-region (begin end)
   "Extracts current region as a separate word."
