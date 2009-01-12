@@ -8,7 +8,11 @@
 
 ;;; Code:
 
-(add-to-list 'load-path (file-name-directory load-file-name))
+(setq fuel-factor-fuel-dir (file-name-directory load-file-name))
+
+(setq fuel-factor-root-dir (expand-file-name "../../" fuel-factor-fuel-dir))
+
+(add-to-list 'load-path fuel-factor-fuel-dir)
 
 (add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))
 (autoload 'factor-mode "factor-mode.el"

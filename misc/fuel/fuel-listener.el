@@ -30,12 +30,14 @@
   "Interacting with a Factor listener inside Emacs."
   :group 'fuel)
 
-(defcustom fuel-listener-factor-binary "~/factor/factor"
+(defcustom fuel-listener-factor-binary
+  (expand-file-name "factor" fuel-factor-root-dir)
   "Full path to the factor executable to use when starting a listener."
   :type '(file :must-match t)
   :group 'fuel-listener)
 
-(defcustom fuel-listener-factor-image "~/factor/factor.image"
+(defcustom fuel-listener-factor-image
+  (expand-file-name "factor.image" fuel-factor-root-dir)
   "Full path to the factor image to use when starting a listener."
   :type '(file :must-match t)
   :group 'fuel-listener)

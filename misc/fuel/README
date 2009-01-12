@@ -41,6 +41,12 @@ beast.
 
   To start the listener, try M-x run-factor.
 
+  By default, FUEL will try to use the binary and image files in the
+  factor installation directory. You can customize them with:
+
+    (setq fuel-listener-factor-binary <full path to factor>)
+    (setq fuel-listener-factor-image <full path to factor image>)
+
   Many aspects of the environment can be customized:
   M-x customize-group fuel will show you how many.
 
