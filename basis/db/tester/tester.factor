@@ -46,12 +46,17 @@ test-2 "TEST2" {
 
 : db-tester2 ( test-db -- )
     [
-        [ test-1 recreate-table ] with-db
-    ] [
         [
-            2 [
-                    10 random 100 random 100 random 100 random test-1 boa
-                    insert-tuple yield
-            ] parallel-each
+            test-1 ensure-table
+            test-2 ensure-table
         ] with-db
+    ] [
+        <db-pool> [
+            10 [
+                10 [
+                    f 100 random 100 random 100 random test-1 boa
+                    insert-tuple yield
+                ] times
+            ] parallel-each
+        ] with-pooled-db
     ] bi ;
