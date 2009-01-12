@@ -416,7 +416,7 @@ M: listener-gadget ungraft*
 
 ! Foo
 USING: summary ui.gadgets.labels ui.gadgets.tables colors ui.render
-ui.gadgets.worlds ui.gadgets.glass tools.completion ui.gadgets ;
+ui.gadgets.worlds ui.gadgets.glass tools.completion ui.gadgets splitting ;
 USE: tools.completion
 
 : <summary-gadget> ( model -- gadget )
@@ -479,15 +479,15 @@ completion-popup H{
     [ find-world ] dip
     { 0 0 } show-glass ;
 
-: complete-IN:/USE:? ( object -- object )
+: complete-IN:/USE:? ( tokens -- ? )
     2 short tail* { "IN:" "USE:" } intersects? ;
+
+: complete-USING:? ( tokens -- ? )
+    { ";" } split1-last nip { "USING:" } intersects? ;
 
 : vocab-completion? ( interactor -- ? )
     [ editor-string ] [ editor-caret* ] bi head " " split
-    {
-        [ complete-IN:? ]
-        [ { ";" } last-split1 ]
-    } 1|| ;
+    { [ complete-IN:/USE:? ] [ complete-USING:? ] } 1|| ;
 
 : word-completion-popup ( interactor -- )
     dup <word-completion-popup> (show-completion-popup) ;
