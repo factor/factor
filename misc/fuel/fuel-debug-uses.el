@@ -72,7 +72,7 @@
  (defvar fuel-debug--uses-restarts nil))
 
 (defsubst fuel-debug--uses-insert-title ()
-  (insert "Infering USING: stanza for " fuel-debug--uses-file ".\n\n"))
+  (insert "Inferring USING: stanza for " fuel-debug--uses-file ".\n\n"))
 
 (defun fuel-debug--uses-prepare (file)
   (fuel--with-popup (fuel-debug--uses-buffer)
@@ -173,7 +173,7 @@
     map))
 
 (defconst fuel-debug--uses-header-regex
-  (format "^%s.*$" (regexp-opt '("Infering USING: stanza for "
+  (format "^%s.*$" (regexp-opt '("Inferring USING: stanza for "
                                  "Current USING: is already fine!"
                                  "Current vocabulary list:"
                                  "Correct vocabulary list:"
