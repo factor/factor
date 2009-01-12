@@ -40,7 +40,7 @@ PRIVATE>
 : intersect ( seq1 seq2 -- newseq )
     tester filter ;
 
-: intersects? ( seq1 seq2 -- newseq )
+: intersects? ( seq1 seq2 -- ? )
     tester contains? ;
 
 : diff ( seq1 seq2 -- newseq )
