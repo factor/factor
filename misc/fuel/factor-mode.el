@@ -144,8 +144,7 @@ code in the buffer."
     (cond ((or (fuel-syntax--at-end-of-def)
                (fuel-syntax--at-setter-line))
            (fuel-syntax--decreased-indentation))
-          ((and (fuel-syntax--at-begin-of-def)
-                (not (fuel-syntax--at-using)))
+          ((fuel-syntax--at-begin-of-indent-def)
            (fuel-syntax--increased-indentation))
           (t (current-indentation)))))
 

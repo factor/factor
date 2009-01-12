@@ -132,16 +132,28 @@
 
 (defconst fuel-syntax--sub-vocab-regex "^<\\([^ \n]+\\) *$")
 
+(defconst fuel-syntax--indent-def-starts '("" ":"
+                                           "FROM"
+                                           "INTERSECTION:"
+                                           "M" "MACRO" "MACRO:"
+                                           "MEMO" "MEMO:" "METHOD"
+                                           "PREDICATE" "PRIMITIVE"
+                                           "UNION"))
+
+(defconst fuel-syntax--no-indent-def-starts '("SINGLETONS"
+                                              "SYMBOLS"
+                                              "TUPLE"
+                                              "VARS"))
+
+(defconst fuel-syntax--indent-def-start-regex
+  (format "^\\(%s:\\) " (regexp-opt fuel-syntax--indent-def-starts)))
+
+(defconst fuel-syntax--no-indent-def-start-regex
+  (format "^\\(%s:\\) " (regexp-opt fuel-syntax--no-indent-def-starts)))
+
 (defconst fuel-syntax--definition-start-regex
-  (format "^\\(%s:\\) " (regexp-opt '("" ":"
-                                      "FROM"
-                                      "INTERSECTION:"
-                                      "MACRO" "MACRO:" "M" "MEMO" "MEMO:" "METHOD"
-                                      "PREDICATE" "PRIMITIVE"
-                                      "SINGLETONS" "SYMBOLS"
-                                      "TUPLE"
-                                      "UNION"
-                                      "VARS"))))
+  (format "^\\(%s:\\) " (regexp-opt (append fuel-syntax--no-indent-def-starts
+                                            fuel-syntax--indent-def-starts))))
 
 (defconst fuel-syntax--definition-end-regex
   (format "\\(\\(^\\| +\\);\\( *%s\\)*\\($\\| +\\)\\)"
@@ -255,6 +267,9 @@
 
 (defsubst fuel-syntax--at-begin-of-def ()
   (looking-at fuel-syntax--begin-of-def-regex))
+
+(defsubst fuel-syntax--at-begin-of-indent-def ()
+  (looking-at fuel-syntax--indent-def-start-regex))
 
 (defsubst fuel-syntax--at-end-of-def ()
   (looking-at fuel-syntax--end-of-def-regex))
