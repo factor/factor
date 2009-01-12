@@ -72,10 +72,10 @@
 ;;; Font lock:
 
 (defconst fuel-font-lock--font-lock-keywords
-  `((,fuel-syntax--parsing-words-regex . 'factor-font-lock-parsing-word)
+  `((,fuel-syntax--stack-effect-regex . 'factor-font-lock-stack-effect)
+    (,fuel-syntax--parsing-words-regex . 'factor-font-lock-parsing-word)
     (,fuel-syntax--brace-words-regex 1 'factor-font-lock-parsing-word)
     ("\\(P\\|SBUF\\)\"" 1 'factor-font-lock-parsing-word)
-    (,fuel-syntax--stack-effect-regex . 'factor-font-lock-stack-effect)
     (,fuel-syntax--vocab-ref-regexp  2 'factor-font-lock-vocabulary-name)
     (,fuel-syntax--declaration-words-regex . 'factor-font-lock-declaration)
     (,fuel-syntax--word-definition-regex 2 'factor-font-lock-word)
