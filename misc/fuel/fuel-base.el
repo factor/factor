@@ -1,6 +1,6 @@
 ;;; fuel-base.el --- Basic FUEL support code
 
-;; Copyright (C) 2008  Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
