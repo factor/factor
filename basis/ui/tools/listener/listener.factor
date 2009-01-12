@@ -194,7 +194,7 @@ M: listener-gadget focusable-child*
 
 : (get-listener) ( quot -- listener )
     find-window
-    [ [ raise-window ] [ gadget-child ] bi ]
+    [ [ raise-window ] [ gadget-child dup request-focus ] bi ]
     [ listener-window* ] if* ; inline
 
 : get-listener ( -- listener )
@@ -415,32 +415,54 @@ M: listener-gadget ungraft*
     [ com-end ] [ call-next-method ] bi ;
 
 ! Foo
+USING: summary ui.gadgets.labels ui.gadgets.tables colors ui.render
+ui.gadgets.worlds ui.gadgets.glass tools.completion ui.gadgets ;
+USE: tools.completion
+
 : <summary-gadget> ( model -- gadget )
     [ summary ] <filter> <label-control> ;
+
+TUPLE: completion-popup < wrapper table interactor ;
+
+: find-completion-popup ( gadget -- popup )
+    [ completion-popup? ] find-parent ;
 
 SINGLETON: completion-renderer
 M: completion-renderer row-columns drop name>> 1array ;
 M: completion-renderer row-value drop ;
 
-: <completion-table> ( interactor quot -- table )
+: <completion-model> ( object object -- object )
     [ one-word-elt <element-model> 1/3 seconds <delay> ] dip
-    '[ [ { } ] [ @ keys 20 short head ] if-empty ] <filter>
-    <table> completion-renderer >>renderer ;
-
-TUPLE: completion-popup < wrapper interactor ;
-
-: <completion-popup> ( interactor quot -- popup )
-    dupd
-    <completion-table>
-    <limited-scroller>
-        { 300 300 } >>min-dim
-        { 300 300 } >>max-dim
-    completion-popup new-wrapper
-        white <solid> >>interior
-        swap >>interactor ;
+    '[ [ { } ] [ @ keys 20 short head ] if-empty ] <filter> ;
 
 : hide-completion-popup ( popup -- )
     interactor>> f >>completion-popup find-world hide-glass ;
+
+: completion-loc/doc ( popup -- loc doc )
+    interactor>> [ editor-caret* ] [ model>> ] bi ;
+
+: accept-completion ( item table -- )
+    find-completion-popup
+    [
+        [ name>> ] [ completion-loc/doc ] bi*
+        one-word-elt set-elt-string
+    ] [ hide-completion-popup ] bi ;
+
+: <completion-table> ( interactor quot -- table )
+    <completion-model> <table>
+        completion-renderer >>renderer
+        dup '[ _ accept-completion ] >>action ;
+
+: <completion-scroller> ( object -- object )
+    <limited-scroller>
+        { 300 120 } >>min-dim
+        { 300 120 } >>max-dim ;
+
+: <completion-popup> ( interactor quot -- popup )
+    [ completion-popup new-gadget ] 2dip
+    [ drop >>interactor ] [ <completion-table> >>table ] 2bi
+    dup table>> <completion-scroller> add-gadget
+    white <solid> >>interior ;
 
 completion-popup H{
     { T{ key-down f f "ESC" } [ hide-completion-popup ] }
@@ -452,13 +474,23 @@ completion-popup H{
 : <vocab-completion-popup> ( interactor -- table )
     [ vocabs-matching ] <completion-popup> ;
 
-: show-completion-popup ( interactor popup -- )
+: (show-completion-popup) ( interactor popup -- )
     [ >>completion-popup ] keep
     [ find-world ] dip
     { 0 0 } show-glass ;
 
+: complete-IN:/USE:? ( object -- object )
+    2 short tail* { "IN:" "USE:" } intersects? ;
+
+: vocab-completion? ( interactor -- ? )
+    [ editor-string ] [ editor-caret* ] bi head " " split
+    {
+        [ complete-IN:? ]
+        [ { ";" } last-split1 ]
+    } 1|| ;
+
 : word-completion-popup ( interactor -- )
-    dup <word-completion-popup> show-completion-popup ;
+    dup <word-completion-popup> (show-completion-popup) ;
 
 : pass-to-popup? ( gesture interactor -- ? )
     [ [ key-down? ] [ key-up? ] bi or ]
@@ -471,9 +503,6 @@ M: interactor handle-gesture
         focusable-child resend-gesture
         [ call-next-method ] [ 2drop f ] if
     ] [ call-next-method ] if ;
-
-: test-it ( interactor -- )
-    dup <word-completion-popup> show-completion-popup ;
 
 interactor "completion" f {
     { T{ key-down f f "TAB" } word-completion-popup }
