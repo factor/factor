@@ -196,6 +196,7 @@ interacting with a factor listener is at your disposal.
 
 (fuel-mode--key ?x ?s 'fuel-refactor-extract-sexp)
 (fuel-mode--key ?x ?r 'fuel-refactor-extract-region)
+(fuel-mode--key ?x ?v 'fuel-refactor-extract-vocab)
 
 (fuel-mode--key ?d ?> 'fuel-show-callees)
 (fuel-mode--key ?d ?< 'fuel-show-callers)

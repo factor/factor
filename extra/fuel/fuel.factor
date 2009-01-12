@@ -169,3 +169,5 @@ MEMO: fuel-get-article-title ( name -- )
     developer-name set
     dup require dup scaffold-help vocab-docs-path
     (normalize-path) fuel-eval-set-result ;
+
+: fuel-scaffold-get-root ( name -- ) find-vocab-root fuel-eval-set-result ;
