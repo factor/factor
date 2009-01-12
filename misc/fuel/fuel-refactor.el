@@ -13,6 +13,7 @@
 
 ;;; Code:
 
+(require 'fuel-scaffold)
 (require 'fuel-stack)
 (require 'fuel-syntax)
 (require 'fuel-base)
@@ -70,7 +71,46 @@ word."
                                 (if (looking-at-p ";") (point)
                                   (fuel-syntax--end-of-symbol-pos))))
 
+
+;;; Extract vocab:
 
+(defun fuel-refactor--insert-using (vocab)
+  (save-excursion
+    (goto-char (point-min))
+    (let ((usings (sort (cons vocab (fuel-syntax--usings)) 'string<)))
+      (fuel-debug--replace-usings (buffer-file-name) usings))))
+
+(defun fuel-refactor--vocab-root (vocab)
+  (let ((cmd `(:fuel* (,vocab fuel-scaffold-get-root) "fuel")))
+    (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+
+(defun fuel-refactor--extract-vocab (begin end)
+  (when (< begin end)
+    (let* ((str (buffer-substring begin end))
+           (buffer (current-buffer))
+           (vocab (fuel-syntax--current-vocab))
+           (vocab-hint (and vocab (format "%s." vocab)))
+           (root-hint (fuel-refactor--vocab-root vocab))
+           (vocab (fuel-scaffold-vocab t vocab-hint root-hint)))
+      (with-current-buffer buffer
+        (delete-region begin end)
+        (fuel-refactor--insert-using vocab))
+      (newline)
+      (insert str)
+      (newline)
+      (save-buffer)
+      (fuel-update-usings))))
+
+(defun fuel-refactor-extract-vocab (begin end)
+  "Creates a new vocab with the words in current region.
+The region is extended to the closest definition boundaries."
+  (interactive "r")
+  (fuel-refactor--extract-vocab (save-excursion (goto-char begin)
+                                                (mark-defun)
+                                                (point))
+                                (save-excursion (goto-char end)
+                                                (mark-defun)
+                                                (mark))))
 
 (provide 'fuel-refactor)
 ;;; fuel-refactor.el ends here
