@@ -34,6 +34,7 @@ ARTICLE: "defining-words" "Defining words"
 { $see POSTPONE: SYMBOL: }
 "The key factor in the definition of " { $link POSTPONE: SYMBOL: } " is " { $link CREATE } ", which reads a token from the input and creates a word with that name. This word is then passed to " { $link define-symbol } "."
 { $subsection CREATE }
+{ $subsection CREATE-WORD }
 "Colon definitions are defined in a more elaborate way:"
 { $subsection POSTPONE: : }
 "The " { $link POSTPONE: : } " word first calls " { $link CREATE } ", and then reads input until reaching " { $link POSTPONE: ; } " using a utility word:"

@@ -42,7 +42,7 @@
          (factor (case sexp
                    (:rs 'fuel-eval-restartable)
                    (:nrs 'fuel-eval-non-restartable)
-                   (:in (fuel-syntax--current-vocab))
+                   (:in (or (fuel-syntax--current-vocab) "fuel"))
                    (:usings `(:array ,@(fuel-syntax--usings)))
                    (:get 'fuel-eval-set-result)
                    (:end '\;)
@@ -70,7 +70,7 @@
 (defsubst factor--fuel-in (in)
   (cond ((or (eq in :in) (null in)) :in)
         ((eq in 'f) 'f)
-        ((eq in 't) "fuel-scratchpad")
+        ((eq in 't) "fuel")
         ((stringp in) in)
         (t (error "Invalid 'in' (%s)" in))))
 

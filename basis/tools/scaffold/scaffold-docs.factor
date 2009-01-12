@@ -26,7 +26,7 @@ HELP: scaffold-undocumented
 HELP: scaffold-vocab
 { $values
      { "vocab-root" "a vocabulary root string" } { "string" string } }
-{ $description "Creates a direcory in the given root for a new vocabulary and adds a main .factor file, a tests file, and an authors.txt file." } ;
+{ $description "Creates a directory in the given root for a new vocabulary and adds a main .factor file, a tests file, and an authors.txt file." } ;
 
 HELP: using
 { $description "Stores the vocabularies that are pulled into the documentation file from looking up the stack effect types." } ;

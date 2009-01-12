@@ -20,7 +20,8 @@ ABOUT: "sequences-sorting"
 
 HELP: sort
 { $values { "seq" "a sequence" } { "quot" { $quotation "( obj1 obj2 -- <=> )" } } { "sortedseq" "a new sorted sequence" } }
-{ $description "Sorts the elements into a new array." } ;
+{ $description "Sorts the elements into a new array using a stable sort." }
+{ $notes "The algorithm used is the merge sort." } ;
 
 HELP: sort-keys
 { $values { "seq" "an alist" } { "sortedseq" "a new sorted sequence" } }
