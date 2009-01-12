@@ -76,10 +76,13 @@ DEFER: compile-element
         [ drop tag-stack get pop* ]
     } cleave ;
 
+ERROR: unknown-chloe-tag tag ;
+
 : compile-chloe-tag ( tag -- )
-    ! "Unknown chloe tag: " prepend throw
     dup main>> dup tags get at
-    [ curry assert-depth ] [ 2drop ] ?if ;
+    [ curry assert-depth ]
+    [ unknown-chloe-tag ]
+    ?if ;
 
 : compile-element ( element -- )
     {
