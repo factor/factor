@@ -3,12 +3,12 @@
 USING: combinators.short-circuit accessors combinators io
 io.encodings.8-bit io.encodings io.encodings.binary
 io.encodings.utf8 io.files io.files.info io.directories
-io.pathnames io.sockets kernel math.parser namespaces make
-sequences ftp io.launcher.unix.parser unicode.case splitting
+io.sockets kernel math.parser namespaces make sequences
+ftp io.launcher.unix.parser unicode.case splitting
 assocs classes io.servers.connection destructors calendar
 io.timeouts io.streams.duplex threads continuations math
 concurrency.promises byte-arrays io.backend tools.hexdump
-tools.files io.streams.string math.bitwise ;
+io.streams.string math.bitwise tools.files io.pathnames ;
 IN: ftp.server
 
 TUPLE: ftp-client url mode state command-promise user password ;
