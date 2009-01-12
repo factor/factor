@@ -4,8 +4,7 @@ USING: combinators.short-circuit unicode.categories kernel math
 combinators splitting sequences math.parser io.files io assocs
 arrays namespaces make math.ranges unicode.normalize.private values
 io.encodings.ascii unicode.syntax unicode.data compiler.units fry
-alien.syntax sets accessors interval-maps memoize locals words
-strings hints ;
+alien.syntax sets accessors interval-maps memoize locals words ;
 IN: unicode.breaks
 
 <PRIVATE
@@ -212,25 +211,21 @@ to: word-table
             [ dupd walk-up wNumeric property-not= ] }
         { check-number-before
             [ dupd walk-down wNumeric property-not= ] }
-    } case ; inline
+    } case ;
 
 :: word-break-next ( old-class new-char i str -- next-class ? )
     new-char dup format/extended?
     [ drop old-class dup { 1 2 3 } member? ] [
         word-break-prop old-class over word-table-nth
         i str word-break?
-    ] if ; inline
+    ] if ;
 
 PRIVATE>
 
 : first-word ( str -- i )
     [ unclip-slice word-break-prop over <enum> ] keep
     '[ swap _ word-break-next ] assoc-find 2drop
-    nip swap length or 1+ ; inline
-
-HINTS: first-word string ;
+    nip swap length or 1+ ;
 
 : >words ( str -- words )
     [ first-word ] >pieces ;
-
-HINTS: >words string ;

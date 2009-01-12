@@ -71,7 +71,7 @@
 
 (defun fuel-markup--article-title (name)
   (fuel-eval--retort-result
-   (fuel-eval--send/wait `(:fuel* ((,name fuel-article-title :get)) "fuel"))))
+   (fuel-eval--send/wait `(:fuel* ((,name fuel-get-article-title)) "fuel"))))
 
 (defun fuel-markup--link-at-point ()
   (let ((button (condition-case nil (forward-button 0) (error nil))))
@@ -373,10 +373,10 @@
       (let ((heading `($heading ,(match-string-no-properties 0)))
             (rows))
         (forward-line)
-        (when (looking-at "Word *Stack effect$")
-          (push '("Word" "Stack effect") rows)
+        (when (looking-at "Word *\\(Stack effect\\|Syntax\\)$")
+          (push (list "Word" (match-string-no-properties 1)) rows)
           (forward-line))
-        (while (looking-at "\\(.+?\\)\\( +\\(( .*\\)\\)?$")
+        (while (looking-at "\\(.+?\\)\\( +\\(.+\\)\\)?$")
           (let ((word `($link ,(match-string-no-properties 1)
                               ,(match-string-no-properties 1)
                               word))

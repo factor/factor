@@ -73,7 +73,7 @@ buffer."
       (error "Could not run factor: %s is not executable" factor))
     (unless (file-readable-p image)
       (error "Could not run factor: image file %s not readable" image))
-    (message "Starting FUEL listener ...")
+    (message "Starting FUEL listener (this may take a while) ...")
     (pop-to-buffer (fuel-listener--buffer))
     (make-comint-in-buffer "fuel listener" (current-buffer) factor nil
                            "-run=listener" (format "-i=%s" image))
@@ -102,6 +102,8 @@ buffer."
 
 (defun fuel-listener-nuke ()
   (interactive)
+  (goto-char (point-max))
+  (comint-kill-region comint-last-input-start (point))
   (comint-redirect-cleanup)
   (fuel-con--setup-connection fuel-listener--buffer))
 
