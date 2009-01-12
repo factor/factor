@@ -71,7 +71,7 @@
 
 (defun fuel-markup--article-title (name)
   (fuel-eval--retort-result
-   (fuel-eval--send/wait `(:fuel* ((,name fuel-article-title :get)) "fuel"))))
+   (fuel-eval--send/wait `(:fuel* ((,name fuel-get-article-title)) "fuel"))))
 
 (defun fuel-markup--link-at-point ()
   (let ((button (condition-case nil (forward-button 0) (error nil))))

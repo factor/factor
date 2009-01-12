@@ -41,25 +41,26 @@
 
 ;;; User interface:
 
-(defun fuel-scaffold-vocab ()
+(defun fuel-scaffold-vocab (&optional other-window name-hint root-hint)
   "Creates a directory in the given root for a new vocabulary and
 adds source, tests and authors.txt files.
 
 You can configure `fuel-scaffold-developer-name' (set by default to
 `user-full-name') for the name to be inserted in the generated files."
   (interactive)
-  (let* ((name (read-string "Vocab name: "))
+  (let* ((name (read-string "Vocab name: " name-hint))
          (root (completing-read "Vocab root: "
                                 (fuel-scaffold--vocab-roots)
-                                nil t "resource:"))
+                                nil t (or root-hint "resource:")))
          (cmd `(:fuel* ((,root ,name ,fuel-scaffold-developer-name)
                         (fuel-scaffold-vocab)) "fuel"))
          (ret (fuel-eval--send/wait cmd))
          (file (fuel-eval--retort-result ret)))
     (unless file
       (error "Error creating vocab (%s)" (car (fuel-eval--retort-error ret))))
-    (find-file file)
-    (goto-char (point-max))))
+    (if other-window (find-file-other-window file) (find-file file))
+    (goto-char (point-max))
+    name))
 
 (defun fuel-scaffold-help (&optional arg)
   "Creates, if it does not already exist, a help file with
