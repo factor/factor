@@ -150,6 +150,9 @@ GENERIC: next-elt ( loc document elt -- newloc )
 : elt-string ( loc document elt -- string )
     [ prev/next-elt ] [ drop ] 2bi doc-range ;
 
+: set-elt-string ( string loc document elt -- )
+    [ prev/next-elt ] [ drop ] 2bi set-doc-range ;
+
 SINGLETON: char-elt
 
 : (prev-char) ( loc document quot -- loc )
