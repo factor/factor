@@ -9,6 +9,10 @@ into ~/.vim/ or the equivalent path on other platforms (Open Vim and type
 
 The current set of files is as follows:
 
+    ftdetect/factor.vim
+	Teach Vim when to load Factor support files.
+    ftplugin/factor_settings.vim
+	Teach Vim to follow the Factor Coding Style guidelines.
     syntax/factor.vim
         Syntax highlighting for Factor code.
 
