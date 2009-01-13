@@ -19,7 +19,8 @@ M: object row-value drop ;
 TUPLE: table < gadget
 renderer filled-column column-alignment action
 column-widths total-width
-font text-color selection-color mouse-color column-line-color
+font text-color selection-color focus-border-color
+mouse-color column-line-color
 selected-index selected-value
 mouse-index
 focused? ;
@@ -32,6 +33,7 @@ focused? ;
         f <model> >>selected-value
         sans-serif-font >>font
         selection-color >>selection-color
+        focus-border-color >>focus-border-color
         dark-gray >>column-line-color
         black >>mouse-color
         black >>text-color ;
@@ -78,25 +80,28 @@ M: table layout*
     [ [ line-height ] dip * 0 swap 2array ]
     [ drop [ dim>> first ] [ line-height ] bi 2array ] 2bi <rect> ;
 
-: highlight-row ( table row color filled? -- )
-    [ dup ] 2dip '[
-        _ gl-color
-        row-rect rect-bounds swap [
-            _ [ gl-fill-rect ] [ gl-rect ] if
-        ] with-translation
+: highlight-row ( table row color quot -- )
+    [ [ row-rect rect-bounds ] dip gl-color ] dip
+    '[ _ @ ] with-translation ; inline
+
+: draw-selected-row ( table row -- )
+    over selection-color>> [ gl-fill-rect ] highlight-row ;
+
+: draw-focused-row ( table row -- )
+    over focused?>> [
+        over focus-border-color>> [ gl-rect ] highlight-row
     ] [ 2drop ] if ;
 
 : draw-selected ( table -- )
-    {
-        [ ]
-        [ selected-index>> ]
-        [ selection-color>> ]
-        [ focused?>> ]
-    } cleave
-    highlight-row ;
+    dup selected-index>> dup
+    [ [ draw-selected-row ] [ draw-focused-row ] 2bi ]
+    [ 2drop ]
+    if ;
 
 : draw-moused ( table -- )
-    [ ] [ mouse-index>> ] [ mouse-color>> ] tri f highlight-row ;
+    dup mouse-index>> dup [
+        over mouse-color>> [ gl-rect ] highlight-row
+    ] [ 2drop ] if ;
 
 : column-offsets ( table -- xs )
     0 [ table-gap + + ] accumulate nip ;

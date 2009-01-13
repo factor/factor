@@ -15,7 +15,9 @@ IN: ui.gadgets.theme
 : faint-boundary ( gadget -- gadget )
     colors:gray solid-boundary ; inline
 
-: selection-color ( -- color ) light-purple ;
+: selection-color ( -- color ) light-purple ; inline
+
+: focus-border-color ( -- color ) medium-purple ; inline
 
 : plain-gradient ( -- gradient )
     {
