@@ -229,8 +229,12 @@ M: table model-changed
         [ >>mouse-index ] [ (select-row) ] bi
     ] if ;
 
+PRIVATE>
+
 : row-action ( table -- )
     dup selected-row [ swap action>> call ] [ 2drop ] if ;
+
+<PRIVATE
 
 : table-button-up ( table -- )
     hand-click# get 2 =

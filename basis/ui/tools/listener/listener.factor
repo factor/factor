@@ -485,6 +485,8 @@ M: completion-renderer row-value drop ;
 
 completion-popup H{
     { T{ key-down f f "ESC" } [ hide-completion-popup ] }
+    { T{ key-down f f "TAB" } [ table>> row-action ] }
+    { T{ key-down f f " " } [ table>> row-action ] }
 } set-gestures
 
 : show-completion-popup ( interactor quot -- )
@@ -496,6 +498,10 @@ completion-popup H{
 : word-completion-popup ( interactor -- )
     dup vocab-completion?
     [ vocabs-matching ] [ words-matching ] ?
+    show-completion-popup ;
+
+: history-completion-popup ( interactor -- )
+    dup '[ _ history>> dup zip completions ]
     show-completion-popup ;
 
 : pass-to-popup? ( gesture interactor -- ? )
@@ -512,4 +518,5 @@ M: interactor handle-gesture
 
 interactor "completion" f {
     { T{ key-down f f "TAB" } word-completion-popup }
+    { T{ key-down f { C+ } "p" } history-completion-popup }
 } define-command-map
