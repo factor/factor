@@ -6,7 +6,7 @@ ui.gadgets.incremental ui.gadgets.packs ui.gadgets.theme
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 hashtables io kernel namespaces sequences io.styles strings
 quotations math opengl combinators math.vectors sorting
-splitting io.streams.nested assocs ui.gadgets.presentations
+splitting assocs ui.gadgets.presentations
 ui.gadgets.slots ui.gadgets.grids ui.gadgets.grid-lines
 classes.tuple models continuations destructors accessors
 math.geometry.rect fry ;
