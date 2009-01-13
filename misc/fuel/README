@@ -105,6 +105,7 @@ beast.
 
     - C-cC-xs : extract innermost sexp (up to point)  as a separate word
     - C-cC-xr : extract region as a separate word
+    - C-cC-xi : replace word at point by its definition
     - C-cC-xv : extract region as a separate vocabulary
 
 *** In the listener:

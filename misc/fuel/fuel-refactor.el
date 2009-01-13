@@ -142,6 +142,29 @@ word."
                                   (fuel-syntax--end-of-symbol-pos))))
 
 
+;;; Inline word:
+
+(defun fuel-refactor--word-def (word)
+  (let ((def (fuel-eval--retort-result
+              (fuel-eval--send/wait `(:fuel* (,word fuel-word-def) "fuel")))))
+    (when def
+      (substring (substring def 2) 0 -2))))
+
+(defun fuel-refactor-inline-word ()
+  "Inserts definition of word at point."
+  (interactive)
+  (let ((word (fuel-syntax-symbol-at-point)))
+    (unless word (error "No word at point"))
+    (let ((code (fuel-refactor--word-def word)))
+      (unless code (error "Word's definition not found"))
+      (fuel-syntax--beginning-of-symbol)
+      (kill-word 1)
+      (let ((start (point)))
+        (insert code)
+        (save-excursion (font-lock-fontify-region start (point)))
+        (indent-region start (point))))))
+
+
 ;;; Extract vocab:
 
 (defun fuel-refactor--insert-using (vocab)
