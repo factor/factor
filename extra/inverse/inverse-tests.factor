@@ -75,3 +75,6 @@ C: <nil> nil
 [ { 3 } ] [ { 1 2 3 } [ { 1 2 } prepend ] undo ] unit-test
 [ { 1 2 3 } [ { 1 2 } append ] undo ] must-fail
 [ { 1 2 3 } [ { 2 3 } prepend ] undo ] must-fail
+
+[ [ sq ] ] [ [ sqrt ] [undo] ] unit-test
+[ [ sqrt ] ] [ [ sq ] [undo] ] unit-test
