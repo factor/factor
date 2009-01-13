@@ -7,19 +7,16 @@ IN: tools.files.windows
 
 <PRIVATE
 
-: directory-or-size ( file-info -- str )
-    dup directory? [
-        drop "<DIR>" 20 CHAR: \s pad-right
-    ] [
-        size>> number>string 20 CHAR: \s pad-left
-    ] if ;
+M: windows file-spec>string ( file-listing spec -- string )
+    {
+        { listing-datetime [ modified>> timestamp>ymdhms ] }
+        [ call-next-method ]
+    } case ;
 
 M: windows (directory.) ( entries -- lines )
-    [
-        dup file-info {
-            [ modified>> timestamp>ymdhms ]
-            [ directory-or-size ]
-        } cleave 2 narray swap suffix " " join
-    ] map ;
+    <listing-tool>
+        { file-size file-datetime file-name } >>specs
+        { { directory-entry>> name>> <=> } } >>sort
+    list-files ;
 
 PRIVATE>
