@@ -3,6 +3,9 @@ namespaces sequences system combinators
 editors.vim vocabs.loader make ;
 IN: editors.gvim
 
+! This code builds on the code in editors.vim; see there for
+! more information.
+
 SINGLETON: gvim
 
 HOOK: gvim-path io-backend ( -- path )
