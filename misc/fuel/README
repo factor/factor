@@ -80,7 +80,8 @@ beast.
     - C-cz : switch to listener
     - C-co : cycle between code, tests and docs factor files
 
-    - M-. : edit word at point in Emacs
+    - M-. : edit word at point in Emacs (see fuel-edit-word-method custom var)
+    - M-, : go back to where M-. was last invoked
     - M-TAB : complete word at point
     - C-cC-eu : update USING: line
     - C-cC-ev : edit vocabulary (M-x fuel-edit-vocabulary)

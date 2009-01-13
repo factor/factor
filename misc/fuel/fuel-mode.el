@@ -181,6 +181,7 @@ interacting with a factor listener is at your disposal.
 (define-key fuel-mode-map "\C-\M-x" 'fuel-eval-definition)
 (define-key fuel-mode-map "\C-\M-r" 'fuel-eval-extended-region)
 (define-key fuel-mode-map "\M-." 'fuel-edit-word-at-point)
+(define-key fuel-mode-map "\M-," 'fuel-edit-pop-edit-word-stack)
 (define-key fuel-mode-map "\C-c\M-<" 'fuel-show-callers)
 (define-key fuel-mode-map "\C-c\M->" 'fuel-show-callees)
 (define-key fuel-mode-map (kbd "M-TAB") 'fuel-completion--complete-symbol)
