@@ -1,7 +1,7 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces make sequences words io
-io.streams.string math.vectors ui.gadgets columns accessors
+io.styles math.vectors ui.gadgets columns accessors
 math.geometry.rect locals fry ;
 IN: ui.gadgets.grids
 
