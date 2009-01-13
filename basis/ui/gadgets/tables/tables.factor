@@ -41,13 +41,10 @@ focused? ;
 : line-height ( table -- n )
     font>> open-font "" string-height ;
 
-CONSTANT: table-gap 5
+CONSTANT: table-gap 6
 
 : table-rows ( table -- rows )
     [ control-value ] [ renderer>> ] bi '[ _ row-columns ] map ;
-
-: column-offsets ( table -- xs )
-    0 [ table-gap + + ] accumulate nip ;
 
 : (compute-column-widths) ( font rows -- total widths )
     [ drop 0 { } ] [
@@ -101,13 +98,16 @@ M: table layout*
 : draw-moused ( table -- )
     [ ] [ mouse-index>> ] [ mouse-color>> ] tri f highlight-row ;
 
-: column-lines ( widths -- xs )
-    0 [ + ] accumulate nip rest-slice ; inline
+: column-offsets ( table -- xs )
+    0 [ table-gap + + ] accumulate nip ;
+
+: column-line-offsets ( table -- xs )
+    column-offsets rest-slice [ table-gap 2/ - ] map ;
 
 : draw-columns ( table -- )
     [ column-line-color>> gl-color ]
     [
-        [ column-widths>> column-lines ] [ dim>> second ] bi
+        [ column-widths>> column-line-offsets ] [ dim>> second ] bi
         '[ [ 0 2array ] [ _ 2array ] bi gl-line ] each
     ] bi ;
 
