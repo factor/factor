@@ -4,7 +4,7 @@ IN: editors.vim.generate-syntax
 
 : generate-vim-syntax ( -- )
     "misc/factor.vim.fgen" resource-path <fhtml>
-    "misc/factor.vim" resource-path
+    "misc/vim/syntax/factor.vim" resource-path
     template-convert ;
 
 MAIN: generate-vim-syntax
