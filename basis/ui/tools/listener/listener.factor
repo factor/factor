@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: inspector kernel help help.markup io io.styles models
-strings namespaces parser quotations sequences vocabs words
+strings splitting namespaces parser quotations sequences vocabs words
 continuations prettyprint listener debugger threads boxes
 concurrency.flags math arrays generic accessors combinators
 assocs fry generic.standard.engines.tuple combinators.short-circuit
@@ -42,9 +42,28 @@ completion-popup ;
         assoc-stack
     ] if ;
 
+: complete-IN:/USE:? ( tokens -- ? )
+    2 short tail* { "IN:" "USE:" } intersects? ;
+
+: chop-; ( seq -- seq' )
+    { ";" } split1-last [ ] [ ] ?if ;
+
+: complete-USING:? ( tokens -- ? )
+    chop-; { "USING:" } intersects? ;
+
+: up-to-caret ( caret document -- string )
+    [ { 0 0 } ] 2dip doc-range ;
+
+: vocab-completion? ( interactor -- ? )
+    [ editor-caret* ] [ model>> ] bi up-to-caret " \r\n" split
+    { [ complete-IN:/USE:? ] [ complete-USING:? ] } 1|| ;
+
 : <word-model> ( interactor -- model )
     [ one-word-elt <element-model> 1/3 seconds <delay> ] keep
-    '[ _ interactor-use assoc-stack ] <filter> ;
+    '[
+        _ dup vocab-completion?
+        [ drop vocab ] [ interactor-use assoc-stack ] if
+    ] <filter> ;
 
 : <interactor> ( output -- gadget )
     interactor new-editor
@@ -416,7 +435,7 @@ M: listener-gadget ungraft*
 
 ! Foo
 USING: summary ui.gadgets.labels ui.gadgets.tables colors ui.render
-ui.gadgets.worlds ui.gadgets.glass tools.completion ui.gadgets splitting ;
+ui.gadgets.worlds ui.gadgets.glass tools.completion ui.gadgets ;
 USE: tools.completion
 
 : <summary-gadget> ( model -- gadget )
@@ -468,29 +487,16 @@ completion-popup H{
     { T{ key-down f f "ESC" } [ hide-completion-popup ] }
 } set-gestures
 
-: <word-completion-popup> ( interactor -- table )
-    [ words-matching ] <completion-popup> ;
-
-: <vocab-completion-popup> ( interactor -- table )
-    [ vocabs-matching ] <completion-popup> ;
-
-: (show-completion-popup) ( interactor popup -- )
+: show-completion-popup ( interactor quot -- )
+    dupd <completion-popup>
     [ >>completion-popup ] keep
     [ find-world ] dip
     { 0 0 } show-glass ;
 
-: complete-IN:/USE:? ( tokens -- ? )
-    2 short tail* { "IN:" "USE:" } intersects? ;
-
-: complete-USING:? ( tokens -- ? )
-    { ";" } split1-last nip { "USING:" } intersects? ;
-
-: vocab-completion? ( interactor -- ? )
-    [ editor-string ] [ editor-caret* ] bi head " " split
-    { [ complete-IN:/USE:? ] [ complete-USING:? ] } 1|| ;
-
 : word-completion-popup ( interactor -- )
-    dup <word-completion-popup> (show-completion-popup) ;
+    dup vocab-completion?
+    [ vocabs-matching ] [ words-matching ] ?
+    show-completion-popup ;
 
 : pass-to-popup? ( gesture interactor -- ? )
     [ [ key-down? ] [ key-up? ] bi or ]

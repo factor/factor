@@ -150,3 +150,9 @@ IN: ui.tools.listener.tests
     <gadget> "l" get show-popup
     "l" get hide-popup
 ] unit-test
+
+[ t ] [ { "USING:" "A" "B" "C" } complete-USING:? ] unit-test
+
+[ f ] [ { "USING:" "A" "B" "C" ";" } complete-USING:? ] unit-test
+
+[ t ] [ { "X" ";" "USING:" "A" "B" "C" } complete-USING:? ] unit-test

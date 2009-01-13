@@ -68,8 +68,11 @@ IN: tools.completion
     [ '[ >lower _ [ completion ] with map rank-completions ] ] bi
     if-empty ;
 
+: name-completions ( str seq -- seq' )
+    [ dup name>> ] { } map>assoc completions ;
+
 : words-matching ( str -- seq )
-    all-words [ dup name>> ] { } map>assoc completions ;
+    all-words name-completions ;
 
 : vocabs-matching ( str -- seq )
-    vocabs [ dup name>> ] { } map>assoc completions ;
+    dictionary get values name-completions ;
