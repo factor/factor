@@ -49,7 +49,13 @@ M: method-renderer row-value drop first ;
 : <words-model> ( profiler -- model )
     [
         [ words>> ] [ vocab>> ] bi
-        [ [ [ first vocabulary>> ] dip = ] when* ] <search>
+        [
+            [
+                [ first vocabulary>> ]
+                [ vocab-name ]
+                bi* =
+            ] when*
+        ] <search>
     ] keep <profiler-model> ;
 
 : match? ( pair/f str -- ? )
