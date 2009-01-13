@@ -14,7 +14,17 @@ HELP: undo
 HELP: define-inverse
 { $values { "word" "a word" } { "quot" "the inverse" } }
 { $description "Defines the inverse of a given word, taking no arguments from the quotation, only the stack." }
-{ $see-also define-pop-inverse } ;
+{ $see-also define-dual define-involution define-pop-inverse } ;
+
+HELP: define-dual
+{ $values { "word1" "a word" } { "word2" "a word" } }
+{ $description "Defines the inverse of each word as being the other one." }
+{ $see-also define-inverse define-involution } ;
+
+HELP: define-involution
+{ $values { "word" "a word" } }
+{ $description "Defines a word as being its own inverse." }
+{ $see-also define-dual define-inverse } ;
 
 HELP: define-pop-inverse
 { $values { "word" "a word" } { "n" "number of arguments to be taken from the inverted quotation" } { "quot" "a quotation" } }
