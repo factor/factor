@@ -78,3 +78,5 @@ C: <nil> nil
 
 [ [ sq ] ] [ [ sqrt ] [undo] ] unit-test
 [ [ sqrt ] ] [ [ sq ] [undo] ] unit-test
+[ [ not ] ] [ [ not ] [undo] ] unit-test
+[ { 3 2 1 } ] [ { 1 2 3 } [ reverse ] undo ] unit-test
