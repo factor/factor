@@ -41,6 +41,12 @@ beast.
 
   To start the listener, try M-x run-factor.
 
+  By default, FUEL will try to use the binary and image files in the
+  factor installation directory. You can customize them with:
+
+    (setq fuel-listener-factor-binary <full path to factor>)
+    (setq fuel-listener-factor-image <full path to factor image>)
+
   Many aspects of the environment can be customized:
   M-x customize-group fuel will show you how many.
 
@@ -74,7 +80,8 @@ beast.
     - C-cz : switch to listener
     - C-co : cycle between code, tests and docs factor files
 
-    - M-. : edit word at point in Emacs
+    - M-. : edit word at point in Emacs (see fuel-edit-word-method custom var)
+    - M-, : go back to where M-. was last invoked
     - M-TAB : complete word at point
     - C-cC-eu : update USING: line
     - C-cC-ev : edit vocabulary (M-x fuel-edit-vocabulary)
@@ -98,6 +105,7 @@ beast.
 
     - C-cC-xs : extract innermost sexp (up to point)  as a separate word
     - C-cC-xr : extract region as a separate word
+    - C-cC-xi : replace word at point by its definition
     - C-cC-xv : extract region as a separate vocabulary
 
 *** In the listener:

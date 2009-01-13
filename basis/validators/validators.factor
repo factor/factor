@@ -69,8 +69,8 @@ IN: validators
 
 : v-one-line ( str -- str )
     v-required
-    dup "\r\n" intersect empty?
-    [ "must be a single line" throw ] unless ;
+    dup "\r\n" intersects?
+    [ "must be a single line" throw ] when ;
 
 : v-one-word ( str -- str )
     v-required

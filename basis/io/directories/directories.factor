@@ -41,6 +41,9 @@ HOOK: (directory-entries) os ( path -- seq )
 : directory-files ( path -- seq )
     directory-entries [ name>> ] map ;
 
+: with-directory-entries ( path quot -- )
+    '[ "" directory-entries @ ] with-directory ; inline
+
 : with-directory-files ( path quot -- )
     '[ "" directory-files @ ] with-directory ; inline
 

@@ -87,12 +87,15 @@ SYMBOL: vocab-list
 
 PRIVATE>
 
-: (fuel-word-help) ( object -- object )
+: (fuel-word-help) ( name -- elem )
     fuel-find-word [ [ auto-use? on (fuel-word-element) ] with-scope ] [ f ] if* ;
 
 : (fuel-word-see) ( word -- elem )
     [ name>> \ article swap ]
     [ [ see ] with-string-writer \ $code swap 2array ] bi 3array ; inline
+
+: (fuel-word-def) ( name -- str )
+    fuel-find-word [ [ def>> pprint ] with-string-writer ] when* ; inline
 
 : (fuel-vocab-summary) ( name -- str ) >vocab-link summary ; inline
 

@@ -21,3 +21,11 @@ IN: sets.tests
 
 [ V{ 1 2 3 } ]
 [ 3 V{ 1 3 2 } clone [ adjoin ] keep ] unit-test
+
+[ t ] [ { 1 2 } { 1 3 } intersects? ] unit-test
+
+[ f ] [ { 4 2 } { 1 3 } intersects? ] unit-test
+
+[ f ] [ { } { 1 } intersects? ] unit-test
+
+[ f ] [ { 1 } { } intersects? ] unit-test

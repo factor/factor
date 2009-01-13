@@ -68,8 +68,8 @@ ERROR: bad-email-address email ;
 
 : validate-address ( string -- string' )
     #! Make sure we send funky stuff to the server by accident.
-    dup "\r\n>" intersect empty?
-    [ bad-email-address ] unless ;
+    dup "\r\n>" intersects?
+    [ bad-email-address ] when ;
 
 : mail-from ( fromaddr -- )
     validate-address
@@ -170,8 +170,8 @@ M: plain-auth send-auth
 ERROR: invalid-header-string string ;
 
 : validate-header ( string -- string' )
-    dup "\r\n" intersect empty?
-    [ invalid-header-string ] unless ;
+    dup "\r\n" intersects?
+    [ invalid-header-string ] when ;
 
 : write-header ( key value -- )
     [ validate-header write ]

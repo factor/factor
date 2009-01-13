@@ -45,8 +45,8 @@ IN: http
 
 : check-header-string ( str -- str )
     #! http://en.wikipedia.org/wiki/HTTP_Header_Injection
-    dup "\r\n\"" intersect empty?
-    [ "Header injection attack" throw ] unless ;
+    dup "\r\n\"" intersects?
+    [ "Header injection attack" throw ] when ;
 
 : write-header ( assoc -- )
     >alist sort-keys [
@@ -97,8 +97,8 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
     ] { } make ;
 
 : check-cookie-string ( string -- string' )
-    dup "=;'\"\r\n" intersect empty?
-    [ "Bad cookie name or value" throw ] unless ;
+    dup "=;'\"\r\n" intersects?
+    [ "Bad cookie name or value" throw ] when ;
 
 : unparse-cookie-value ( key value -- )
     {

@@ -93,6 +93,9 @@
 (defconst fuel-syntax--float-regex
   "\\_<-?[0-9]+\\.[0-9]*\\([eE][+-]?[0-9]+\\)?\\_>")
 
+(defconst fuel-syntax--bad-string-regex
+  "\"[^\"]*$")
+
 (defconst fuel-syntax--word-definition-regex
   (fuel-syntax--second-word-regex
    '(":" "::" "GENERIC:" "DEFER:" "HOOK:" "MAIN:" "MATH:" "POSTPONE:"
@@ -132,16 +135,28 @@
 
 (defconst fuel-syntax--sub-vocab-regex "^<\\([^ \n]+\\) *$")
 
+(defconst fuel-syntax--indent-def-starts '("" ":"
+                                           "FROM"
+                                           "INTERSECTION:"
+                                           "M" "MACRO" "MACRO:"
+                                           "MEMO" "MEMO:" "METHOD"
+                                           "PREDICATE" "PRIMITIVE"
+                                           "UNION"))
+
+(defconst fuel-syntax--no-indent-def-starts '("SINGLETONS"
+                                              "SYMBOLS"
+                                              "TUPLE"
+                                              "VARS"))
+
+(defconst fuel-syntax--indent-def-start-regex
+  (format "^\\(%s:\\) " (regexp-opt fuel-syntax--indent-def-starts)))
+
+(defconst fuel-syntax--no-indent-def-start-regex
+  (format "^\\(%s:\\) " (regexp-opt fuel-syntax--no-indent-def-starts)))
+
 (defconst fuel-syntax--definition-start-regex
-  (format "^\\(%s:\\) " (regexp-opt '("" ":"
-                                      "FROM"
-                                      "INTERSECTION:"
-                                      "MACRO" "MACRO:" "M" "MEMO" "MEMO:" "METHOD"
-                                      "PREDICATE" "PRIMITIVE"
-                                      "SINGLETONS" "SYMBOLS"
-                                      "TUPLE"
-                                      "UNION"
-                                      "VARS"))))
+  (format "^\\(%s:\\) " (regexp-opt (append fuel-syntax--no-indent-def-starts
+                                            fuel-syntax--indent-def-starts))))
 
 (defconst fuel-syntax--definition-end-regex
   (format "\\(\\(^\\| +\\);\\( *%s\\)*\\($\\| +\\)\\)"
@@ -199,8 +214,7 @@
     (modify-syntax-entry ?\  " " table)
     (modify-syntax-entry ?\n " " table)
 
-    ;; Strings
-    (modify-syntax-entry ?\" "\"" table)
+    ;; Char quote
     (modify-syntax-entry ?\\ "/" table)
 
     table))
@@ -211,6 +225,8 @@
     ("\\_<\\(#?!\\)\\(\n\\|$\\)" (1 "<") (2 ">"))
     ;; CHARs:
     ("CHAR: \\(.\\)\\( \\|$\\)" (1 "w"))
+    ;; Strings
+    ("\\(\"\\)[^\n\r\f]*\\(\"\\)" (1 "\"") (2 "\""))
     ;; Let and lambda:
     ("\\_<\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
     ("\\(\\[\\)\\(let\\|wlet\\|let\\*\\)\\( \\|$\\)" (1 "(]"))
@@ -255,6 +271,9 @@
 
 (defsubst fuel-syntax--at-begin-of-def ()
   (looking-at fuel-syntax--begin-of-def-regex))
+
+(defsubst fuel-syntax--at-begin-of-indent-def ()
+  (looking-at fuel-syntax--indent-def-start-regex))
 
 (defsubst fuel-syntax--at-end-of-def ()
   (looking-at fuel-syntax--end-of-def-regex))
