@@ -20,6 +20,11 @@ M: fail summary drop "Matching failed" ;
 
 : define-inverse ( word quot -- ) "inverse" set-word-prop ;
 
+: define-dual ( word1 word2 -- )
+    2dup swap [ 1quotation define-inverse ] 2bi@ ;
+
+: define-involution ( word -- ) dup 1quotation define-inverse ;
+
 : define-math-inverse ( word quot1 quot2 -- )
     pick 1quotation 3array "math-inverse" set-word-prop ;
 
@@ -129,28 +134,24 @@ MACRO: undo ( quot -- ) [undo] ;
 
 ! Inverse of selected words
 
-\ swap [ swap ] define-inverse
+\ swap define-involution
 \ dup [ [ =/fail ] keep ] define-inverse
 \ 2dup [ over =/fail over =/fail ] define-inverse
 \ 3dup [ pick =/fail pick =/fail pick =/fail ] define-inverse
 \ pick [ [ pick ] dip =/fail ] define-inverse
 \ tuck [ swapd [ =/fail ] keep ] define-inverse
 
-\ not [ not ] define-inverse
+\ not define-involution
 \ >boolean [ { t f } memq? assure ] define-inverse
 
-\ tuple>array [ >tuple ] define-inverse
-\ >tuple [ tuple>array ] define-inverse
-\ reverse [ reverse ] define-inverse
+\ tuple>array \ >tuple define-dual
+\ reverse define-involution
 
 \ undo 1 [ [ call ] curry ] define-pop-inverse
 \ map 1 [ [undo] [ over sequence? assure map ] curry ] define-pop-inverse
 
-\ exp [ log ] define-inverse
-\ log [ exp ] define-inverse
-\ not [ not ] define-inverse
-\ sq [ sqrt ] define-inverse
-\ sqrt [ sq ] define-inverse
+\ exp \ log define-dual
+\ sq \ sqrt define-dual
 
 ERROR: missing-literal ;
 
@@ -204,8 +205,7 @@ DEFER: _
 \ first3 [ 3array ] define-inverse
 \ first4 [ 4array ] define-inverse
 
-\ prefix [ unclip ] define-inverse
-\ unclip [ prefix ] define-inverse
+\ prefix \ unclip define-dual
 \ suffix [ dup but-last swap peek ] define-inverse
 
 \ append 1 [ [ ?tail assure ] curry ] define-pop-inverse
