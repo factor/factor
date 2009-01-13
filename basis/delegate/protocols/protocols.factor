@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: delegate sequences.private sequences assocs
-io definitions kernel continuations ;
+io io.styles definitions kernel continuations ;
 IN: delegate.protocols
 
 PROTOCOL: sequence-protocol

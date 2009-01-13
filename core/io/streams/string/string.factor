@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io kernel math namespaces sequences sbufs
 strings generic splitting continuations destructors
@@ -17,20 +17,7 @@ SINGLETON: null-encoding
 
 M: null-encoding decode-char drop stream-read1 ;
 
-: format-column ( seq ? -- seq )
-    [
-        [ 0 [ length max ] reduce ] keep
-        swap [ CHAR: \s pad-right ] curry map
-    ] unless ;
-
-: map-last ( seq quot -- seq )
-    [ dup length <reversed> ] dip [ 0 = ] prepose 2map ; inline
-
 PRIVATE>
-
-: format-table ( table -- seq )
-    flip [ format-column ] map-last
-    flip [ " " join ] map ;
 
 M: growable dispose drop ;
 
@@ -78,8 +65,3 @@ M: growable stream-read-partial
     [ <string-reader> ] dip with-input-stream ; inline
 
 INSTANCE: growable plain-writer
-
-M: plain-writer stream-write-table
-    [ drop format-table [ print ] each ] with-output-stream* ;
-
-M: plain-writer make-cell-stream 2drop <string-writer> ;
