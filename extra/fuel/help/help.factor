@@ -95,7 +95,7 @@ PRIVATE>
     [ [ see ] with-string-writer \ $code swap 2array ] bi 3array ; inline
 
 : (fuel-word-def) ( name -- str )
-    fuel-find-word [ [ def>> pprint ] with-string-writer ] when* ; inline
+    fuel-find-word [ [ def>> pprint ] with-string-writer ] [ f ] if* ; inline
 
 : (fuel-vocab-summary) ( name -- str ) >vocab-link summary ; inline
 
