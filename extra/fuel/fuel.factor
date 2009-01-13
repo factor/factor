@@ -148,6 +148,8 @@ MEMO: fuel-get-article-title ( name -- )
 
 : fuel-word-see ( name -- ) (fuel-word-see) fuel-eval-set-result ;
 
+: fuel-word-def ( name -- ) (fuel-word-def) fuel-eval-set-result ;
+
 : fuel-vocab-help ( name -- ) (fuel-vocab-help) fuel-eval-set-result ;
 
 : fuel-vocab-summary ( name -- )
@@ -171,3 +173,4 @@ MEMO: fuel-get-article-title ( name -- )
     (normalize-path) fuel-eval-set-result ;
 
 : fuel-scaffold-get-root ( name -- ) find-vocab-root fuel-eval-set-result ;
+

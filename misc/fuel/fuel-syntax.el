@@ -93,6 +93,9 @@
 (defconst fuel-syntax--float-regex
   "\\_<-?[0-9]+\\.[0-9]*\\([eE][+-]?[0-9]+\\)?\\_>")
 
+(defconst fuel-syntax--bad-string-regex
+  "\"[^\"]*$")
+
 (defconst fuel-syntax--word-definition-regex
   (fuel-syntax--second-word-regex
    '(":" "::" "GENERIC:" "DEFER:" "HOOK:" "MAIN:" "MATH:" "POSTPONE:"
@@ -211,8 +214,7 @@
     (modify-syntax-entry ?\  " " table)
     (modify-syntax-entry ?\n " " table)
 
-    ;; Strings
-    (modify-syntax-entry ?\" "\"" table)
+    ;; Char quote
     (modify-syntax-entry ?\\ "/" table)
 
     table))
@@ -223,6 +225,8 @@
     ("\\_<\\(#?!\\)\\(\n\\|$\\)" (1 "<") (2 ">"))
     ;; CHARs:
     ("CHAR: \\(.\\)\\( \\|$\\)" (1 "w"))
+    ;; Strings
+    ("\\(\"\\)[^\n\r\f]*\\(\"\\)" (1 "\"") (2 "\""))
     ;; Let and lambda:
     ("\\_<\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
     ("\\(\\[\\)\\(let\\|wlet\\|let\\*\\)\\( \\|$\\)" (1 "(]"))

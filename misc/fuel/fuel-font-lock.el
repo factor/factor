@@ -66,7 +66,8 @@
   (symbol variable-name "name of symbol being defined")
   (type-name type "type names")
   (vocabulary-name constant "vocabulary names")
-  (word function-name "word, generic or method being defined")))
+  (word function-name "word, generic or method being defined")
+  (invalid-syntax warning "syntactically invalid constructs")))
 
 
 ;;; Font lock:
@@ -92,8 +93,8 @@
     (,fuel-syntax--constructor-regex . 'factor-font-lock-constructor)
     (,fuel-syntax--setter-regex . 'factor-font-lock-setter-word)
     (,fuel-syntax--getter-regex . 'factor-font-lock-getter-word)
-    (,fuel-syntax--symbol-definition-regex 2 'factor-font-lock-symbol))
-  "Font lock keywords definition for Factor mode.")
+    (,fuel-syntax--symbol-definition-regex 2 'factor-font-lock-symbol)
+    (,fuel-syntax--bad-string-regex . 'factor-font-lock-invalid-syntax)))
 
 (defun fuel-font-lock--font-lock-setup (&optional keywords no-syntax)
   (set (make-local-variable 'comment-start) "! ")
