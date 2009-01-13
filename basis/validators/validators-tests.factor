@@ -10,6 +10,9 @@ namespaces assocs ;
 [ "hello" ] [ "hello" v-one-word ] unit-test
 [ "hello world" v-one-word ] must-fail
 
+[ t ] [ "on" v-checkbox ] unit-test
+[ f ] [ "off" v-checkbox ] unit-test
+
 [ "foo" v-number ] must-fail
 [ 123 ] [ "123" v-number ] unit-test
 [ 123 ] [ "123" v-integer ] unit-test
