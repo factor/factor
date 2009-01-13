@@ -148,7 +148,6 @@ MACRO: undo ( quot -- ) [undo] ;
 
 \ exp [ log ] define-inverse
 \ log [ exp ] define-inverse
-\ not [ not ] define-inverse
 \ sq [ sqrt ] define-inverse
 \ sqrt [ sq ] define-inverse
 
