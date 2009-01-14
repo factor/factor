@@ -123,7 +123,7 @@
   (fuel-syntax--second-word-regex '("MIXIN:" "TUPLE:" "SINGLETON:" "UNION:")))
 
 (defconst fuel-syntax--tuple-decl-regex
-  "^TUPLE: +\\([^ ]+\\) +< +\\([^ ]+\\) ")
+  "^TUPLE: +\\([^ \n]+\\) +< +\\([^ \n]+\\)\\_>")
 
 (defconst fuel-syntax--constructor-regex "<[^ >]+>")
 
