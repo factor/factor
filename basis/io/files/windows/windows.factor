@@ -15,7 +15,7 @@ IN: io.files.windows
         CreateFile-flags f CreateFile opened-file
     ] with-destructors ;
 
-: open-pipe-r/w ( path -- win32-file )
+: open-r/w ( path -- win32-file )
     { GENERIC_READ GENERIC_WRITE } flags
     OPEN_EXISTING 0 open-file ;
 
