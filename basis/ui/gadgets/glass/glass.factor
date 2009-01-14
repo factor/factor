@@ -4,12 +4,18 @@ USING: accessors kernel namespaces ui.gadgets ui.gadgets.worlds
 ui.gestures ;
 IN: ui.gadgets.glass
 
+GENERIC: hide-glass-hook ( gadget -- )
+
+M: gadget hide-glass-hook drop ;
+
 TUPLE: glass < gadget ;
 
 : <glass> ( child loc -- glass )
     >>loc glass new-gadget swap add-gadget ;
 
 M: glass layout* gadget-child prefer ;
+
+M: glass ungraft* gadget-child hide-glass-hook ;
 
 : hide-glass ( world -- )
     [ [ unparent ] when* f ] change-glass drop ;
