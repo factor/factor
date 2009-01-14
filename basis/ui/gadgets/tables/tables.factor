@@ -20,7 +20,7 @@ TUPLE: table < gadget
 renderer filled-column column-alignment action
 column-widths total-width
 font text-color selection-color focus-border-color
-mouse-color column-line-color
+mouse-color column-line-color selection-required?
 selected-index selected-value
 mouse-index
 focused? ;
@@ -206,11 +206,12 @@ PRIVATE>
 : update-selected-value ( table -- )
     [ selected-row drop ] [ selected-value>> ] bi set-model ;
 
+: initial-selected-index ( model table -- n/f )
+    [ value>> length 1 >= ] [ selection-required?>> ] bi* and 0 f ? ;
+
 M: table model-changed
-    nip
-    [ f >>selected-index update-selected-value ]
-    [ relayout ]
-    bi ;
+    tuck initial-selected-index >>selected-index
+    [ update-selected-value ] [ relayout ] bi ;
 
 : thin-row-rect ( table row -- rect )
     row-rect [ { 0 1 } v* ] change-dim ;
