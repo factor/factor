@@ -122,8 +122,8 @@
 (defconst fuel-syntax--type-definition-regex
   (fuel-syntax--second-word-regex '("MIXIN:" "TUPLE:" "SINGLETON:" "UNION:")))
 
-(defconst fuel-syntax--parent-type-regex
-  "^\\(TUPLE\\|PREDICTE\\): +[^ ]+ +< +\\([^ ]+\\)")
+(defconst fuel-syntax--tuple-decl-regex
+  "^TUPLE: +\\([^ ]+\\) +< +\\([^ ]+\\) ")
 
 (defconst fuel-syntax--constructor-regex "<[^ >]+>")
 
@@ -133,7 +133,8 @@
 (defconst fuel-syntax--symbol-definition-regex
   (fuel-syntax--second-word-regex '("SYMBOL:" "VAR:")))
 
-(defconst fuel-syntax--stack-effect-regex " ( .* )")
+(defconst fuel-syntax--stack-effect-regex
+  "\\( ( .* )\\)\\|\\( (( .* ))\\)")
 
 (defconst fuel-syntax--using-lines-regex "^USING: +\\([^;]+\\);")
 
