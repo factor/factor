@@ -425,39 +425,6 @@ TUPLE: <git-status>
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! :: git-tool ( REPO -- )
-
-!   <pile> 1 >>fill
-
-!     "Repository: " REPO [ current-directory get ] with-directory append
-!     <label>
-!     add-gadget
-
-!     [let | STATUS [ REPO git-status ]
-!            PILE   [ <pile> 1 >>fill ] |
-
-!       [
-!         [
-!           [let | MONITOR [ REPO t <monitor> ] |
-!             [ MONITOR next-change 2drop STATUS PILE refresh-status-pile t ]
-!             loop
-!           ]
-!         ]
-!         with-monitors
-!       ]
-!       in-thread
-           
-!       STATUS PILE refresh-status-pile
-      
-!       PILE add-gadget ]
-
-!     ! REPO git-status <pile> 1 >>fill tuck refresh-status-pile  add-gadget
-!     REPO            <pile> 1 >>fill tuck refresh-remotes-pile add-gadget
-
-!   "Git" open-window ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 :: git-tool ( REPO -- )
 
   <pile> 1 >>fill
@@ -491,7 +458,6 @@ TUPLE: <git-status>
       
       PILE add-gadget ]
 
-    ! REPO git-status <pile> 1 >>fill tuck refresh-status-pile  add-gadget
     REPO            <pile> 1 >>fill tuck refresh-remotes-pile add-gadget
 
   "Git" open-window ;
