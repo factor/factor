@@ -442,7 +442,7 @@ USE: tools.completion
 : <summary-gadget> ( model -- gadget )
     [ summary ] <filter> <label-control> ;
 
-TUPLE: completion-popup < wrapper table interactor ;
+TUPLE: completion-popup < wrapper table interactor element ;
 
 : find-completion-popup ( gadget -- popup )
     [ completion-popup? ] find-parent ;
@@ -451,25 +451,28 @@ SINGLETON: completion-renderer
 M: completion-renderer row-columns drop present 1array ;
 M: completion-renderer row-value drop ;
 
-: <completion-model> ( object object -- object )
+: <completion-model> ( editor quot -- model )
     [ one-word-elt <element-model> 1/3 seconds <delay> ] dip
     '[ @ keys 1000 short head ] <filter> ;
 
-: hide-completion-popup ( popup -- )
-    interactor>> f >>completion-popup find-world hide-glass ;
+M: completion-popup hide-glass-hook
+    interactor>> f >>completion-popup drop ;
 
-: completion-loc/doc ( popup -- loc doc )
-    interactor>> [ editor-caret* ] [ model>> ] bi ;
+: hide-completion-popup ( popup -- )
+    find-world hide-glass ;
+
+: completion-loc/doc/elt ( popup -- loc doc elt )
+    [ interactor>> [ editor-caret* ] [ model>> ] bi ] [ element>> ] bi ;
 
 : accept-completion ( item table -- )
     find-completion-popup
-    [
-        [ name>> ] [ completion-loc/doc ] bi*
-        one-word-elt set-elt-string
-    ] [ hide-completion-popup ] bi ;
+    [ [ present ] [ completion-loc/doc/elt ] bi* set-elt-string ]
+    [ hide-completion-popup ]
+    bi ;
 
 : <completion-table> ( interactor quot -- table )
     <completion-model> <table>
+        t >>selection-required?
         completion-renderer >>renderer
         dup '[ _ accept-completion ] >>action ;
 
@@ -491,21 +494,23 @@ completion-popup H{
 } set-gestures
 
 : show-completion-popup ( interactor quot -- )
-    dupd <completion-popup>
     [ >>completion-popup ] keep
     [ find-world ] dip
     { 0 0 } show-glass ;
 
 : word-completion-popup ( interactor -- )
-    dup vocab-completion?
+    dup dup vocab-completion?
     [ vocabs-matching ] [ words-matching ] ?
+    <completion-popup> one-word-elt >>element
     show-completion-popup ;
 
 : history-matching ( string interactor -- alist )
     history>> <reversed> dup zip completions ;
 
 : history-completion-popup ( interactor -- )
-    dup '[ _ history-matching ] show-completion-popup ;
+    dup dup '[ _ history-matching ]
+    <completion-popup> one-line-elt >>element
+    show-completion-popup ;
 
 : pass-to-popup? ( gesture interactor -- ? )
     [ [ key-down? ] [ key-up? ] bi or ]
