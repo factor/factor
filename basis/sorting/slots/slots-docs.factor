@@ -6,17 +6,17 @@ IN: sorting.slots
 
 HELP: compare-slots
 { $values
-     { "sort-specs" "a sequence of accessor/comparator pairs" }
+     { "sort-specs" "a sequence of accessors ending with a comparator" }
      { "<=>" { $link +lt+ } " " { $link +eq+ } " or " { $link +gt+ } }
 }
 { $description "Compares two objects using a chain of intrinsic linear orders such that if two objects are " { $link +eq+ } ", then the next comparator is tried. The comparators are slot-name/comparator pairs." } ;
 
 HELP: sort-by-slots
 { $values
-     { "seq" sequence } { "sort-specs" "a sequence of accessor/comparator pairs" }
+     { "seq" sequence } { "sort-specs" "a sequence of accessors ending with a comparator" }
      { "seq'" sequence }
 }
-{ $description "Sorts a sequence of tuples by the sort-specs in " { $snippet "sort-spec" } ". A sort-spec is a slot accessor and a comparator." }
+{ $description "Sorts a sequence of tuples by the sort-specs in " { $snippet "sort-spec" } ". A sort-spec is a sequence of slot accessors ending in a comparator." }
 { $examples
     "Sort by slot c, then b descending:"
     { $example
@@ -31,6 +31,13 @@ HELP: sort-by-slots
         "{\n    T{ sort-me { a 2 } { b 3 } }\n    T{ sort-me { a 2 } { b 1 } }\n    T{ sort-me { a 3 } { b 2 } }\n    T{ sort-me { a 4 } { b 3 } }\n}"
     }
 } ;
+
+HELP: split-by-slots
+{ $values
+     { "accessor-seqs" "a sequence of sequences of tuple accessors" }
+     { "quot" quotation }
+}
+{ $description "Splits a sequence of tuples into a sequence of slices of tuples that have the same values in all slots in the accessor sequence. This word is only useful for splitting a sorted sequence, but is more efficient than partitioning in such a case." } ;
 
 ARTICLE: "sorting.slots" "Sorting by slots"
 "The " { $vocab-link "sorting.slots" } " vocabulary can sort tuples by slot in ascending or descending order, using subsequent slots as tie-breakers." $nl

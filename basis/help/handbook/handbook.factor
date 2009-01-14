@@ -183,7 +183,7 @@ ARTICLE: "io" "Input and output"
 { $subsection "io.streams.byte-array" }
 { $heading "Utilities" }
 { $subsection "stream-binary" }
-{ $subsection "styles" }
+{ $subsection "io.styles" }
 { $subsection "checksums" }
 { $heading "Implementation" }
 { $subsection "io.streams.c" }
