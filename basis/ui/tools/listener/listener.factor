@@ -435,7 +435,8 @@ M: listener-gadget ungraft*
 
 ! Foo
 USING: summary ui.gadgets.labels ui.gadgets.tables colors ui.render
-ui.gadgets.worlds ui.gadgets.glass tools.completion ui.gadgets ;
+ui.gadgets.worlds ui.gadgets.glass tools.completion ui.gadgets
+present ;
 USE: tools.completion
 
 : <summary-gadget> ( model -- gadget )
@@ -447,12 +448,12 @@ TUPLE: completion-popup < wrapper table interactor ;
     [ completion-popup? ] find-parent ;
 
 SINGLETON: completion-renderer
-M: completion-renderer row-columns drop name>> 1array ;
+M: completion-renderer row-columns drop present 1array ;
 M: completion-renderer row-value drop ;
 
 : <completion-model> ( object object -- object )
     [ one-word-elt <element-model> 1/3 seconds <delay> ] dip
-    '[ [ { } ] [ @ keys 20 short head ] if-empty ] <filter> ;
+    '[ @ keys 1000 short head ] <filter> ;
 
 : hide-completion-popup ( popup -- )
     interactor>> f >>completion-popup find-world hide-glass ;
@@ -500,9 +501,11 @@ completion-popup H{
     [ vocabs-matching ] [ words-matching ] ?
     show-completion-popup ;
 
+: history-matching ( string interactor -- alist )
+    history>> <reversed> dup zip completions ;
+
 : history-completion-popup ( interactor -- )
-    dup '[ _ history>> dup zip completions ]
-    show-completion-popup ;
+    dup '[ _ history-matching ] show-completion-popup ;
 
 : pass-to-popup? ( gesture interactor -- ? )
     [ [ key-down? ] [ key-up? ] bi or ]

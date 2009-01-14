@@ -107,7 +107,8 @@ M: table layout*
     0 [ table-gap + + ] accumulate nip ;
 
 : column-line-offsets ( table -- xs )
-    column-offsets rest-slice [ table-gap 2/ - ] map ;
+    column-offsets
+    [ f ] [ rest-slice [ table-gap 2/ - ] map ] if-empty ;
 
 : draw-columns ( table -- )
     [ column-line-color>> gl-color ]
