@@ -1,11 +1,11 @@
 
 USING: accessors combinators.cleave combinators.short-circuit
 concurrency.combinators destructors fry io io.directories
-io.encodings io.encodings.utf8 io.launcher io.pathnames
-io.pipes io.ports kernel locals math namespaces sequences
-splitting strings ui ui.gadgets ui.gadgets.buttons
-ui.gadgets.editors ui.gadgets.labels ui.gadgets.packs
-ui.gadgets.tracks ;
+io.encodings io.encodings.utf8 io.launcher io.monitors
+io.pathnames io.pipes io.ports kernel locals math namespaces
+sequences splitting strings threads ui ui.gadgets
+ui.gadgets.buttons ui.gadgets.editors ui.gadgets.labels
+ui.gadgets.packs ui.gadgets.tracks ;
 
 IN: git-tool
 
