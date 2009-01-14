@@ -458,7 +458,7 @@ TUPLE: <git-status>
       
       PILE add-gadget ]
 
-    REPO            <pile> 1 >>fill tuck refresh-remotes-pile add-gadget
+    REPO <pile> 1 >>fill tuck refresh-remotes-pile add-gadget
 
   "Git" open-window ;
 
