@@ -7,7 +7,7 @@ splitting strings ui ui.gadgets ui.gadgets.buttons
 ui.gadgets.editors ui.gadgets.labels ui.gadgets.packs
 ui.gadgets.tracks ;
 
-IN: git-status
+IN: git-tool
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
