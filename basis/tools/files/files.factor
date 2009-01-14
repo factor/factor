@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar combinators fry io io.directories
 io.files.info kernel math math.parser prettyprint sequences system
-vocabs.loader sorting.slots ;
+vocabs.loader sorting.slots calendar.format ;
 IN: tools.files
 
 <PRIVATE
@@ -18,7 +18,7 @@ IN: tools.files
     [ hour>> ] [ minute>> ] bi
     [ number>string 2 CHAR: 0 pad-left ] bi@ ":" glue ;
 
-: listing-timestamp ( timestamp -- string )
+: listing-date ( timestamp -- string )
     [ month>> month-abbreviation ]
     [ day>> number>string 2 CHAR: \s pad-left ]
     [
@@ -36,7 +36,7 @@ IN: tools.files
 PRIVATE>
 
 SYMBOLS: file-name file-name/type permissions file-type nlinks file-size
-file-datetime file-time uid gid user group link-target unix-datetime
+file-date file-time file-datetime uid gid user group link-target unix-datetime
 directory-or-size ;
 
 TUPLE: listing-tool path specs sort ;
@@ -61,6 +61,10 @@ M: object file-spec>string ( file-listing spec -- string )
     {
         { file-name [ directory-entry>> name>> ] }
         { directory-or-size [ file-info>> dir-or-size ] }
+        { file-size [ file-info>> size>> number>string ] }
+        { file-date [ file-info>> modified>> listing-date ] }
+        { file-time [ file-info>> modified>> listing-time ] }
+        { file-datetime [ file-info>> modified>> timestamp>ymdhms ] }
         [ unknown-file-spec ]
     } case ;
 

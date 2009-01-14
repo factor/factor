@@ -47,7 +47,7 @@ IN: tools.files.unix
 
 M: unix (directory.) ( path -- lines )
     <listing-tool>
-        { permissions nlinks user group file-size file-datetime file-name } >>specs
+        { permissions nlinks user group file-size file-date file-name } >>specs
         { { directory-entry>> name>> <=> } } >>sort
     [ [ list-files ] with-group-cache ] with-user-cache ;
 
@@ -58,13 +58,10 @@ M: unix file-spec>string ( file-listing spec -- string )
         ] }
         { permissions [ file-info>> permissions-string ] }
         { nlinks [ file-info>> nlink>> number>string ] }
-        { file-size [ file-info>> size>> number>string ] }
         { user [ file-info>> uid>> user-name ] }
         { group [ file-info>> gid>> group-name ] }
         { uid [ file-info>> uid>> number>string ] }
         { gid [ file-info>> gid>> number>string ] }
-        { file-datetime [ file-info>> modified>> listing-timestamp ] }
-        { file-time [ file-info>> modified>> listing-time ] }
         [ call-next-method ]
     } case ;
 
