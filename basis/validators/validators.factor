@@ -5,6 +5,9 @@ math.parser math.ranges assocs regexp unicode.categories arrays
 hashtables words classes quotations xmode.catalog ;
 IN: validators
 
+: v-checkbox ( str -- ? )
+    "on" = ;
+
 : v-default ( str def -- str/def )
     over empty? spin ? ;
 
