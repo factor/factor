@@ -1,5 +1,3 @@
-#WIN64_PATH=/k/MinGW/win64/bin
-#WIN64_PATH=/cygdrive/k/MinGW/win64/bin/x86_64-pc-mingw32
 CC=$(WIN64_PATH)-gcc.exe
 WINDRES=$(WIN64_PATH)-windres.exe
 include vm/Config.windows.nt
