@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private math math.private
 math.libm math.functions arrays math.functions.private sequences
@@ -47,3 +47,9 @@ M: complex sqrt >polar [ fsqrt ] [ 2.0 / ] bi* polar> ;
 IN: syntax
 
 : C{ \ } [ first2 rect> ] parse-literal ; parsing
+
+USE: prettyprint.custom
+
+M: complex pprint* pprint-object ;
+M: complex pprint-delims drop \ C{ \ } ;
+M: complex >pprint-sequence >rect 2array ;
