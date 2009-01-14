@@ -28,7 +28,7 @@ IN: ui.gadgets.scrollers.tests
 "v" get [
     [ { 10 20 } ] [ "v" get model>> range-value ] unit-test
 
-    [ { 10 20 } ] [ "g" get rect-loc vneg { 3 3 } v+ ] unit-test
+    [ { 10 20 } ] [ "g" get rect-loc vneg viewport-gap v+ scroller-border v+ ] unit-test
 ] with-grafted-gadget
 
 [ ] [
@@ -43,13 +43,13 @@ IN: ui.gadgets.scrollers.tests
 "s" get [
     [ { 34 34 } ] [ "s" get viewport>> rect-dim ] unit-test
 
-    [ { 106 106 } ] [ "s" get viewport>> viewport-dim ] unit-test
+    [ { 107 107 } ] [ "s" get viewport>> viewport-dim ] unit-test
 
     [ ] [ { 0 0 } "s" get scroll ] unit-test
 
     [ { 0 0 } ] [ "s" get model>> range-min-value ] unit-test
 
-    [ { 106 106 } ] [ "s" get model>> range-max-value ] unit-test
+    [ { 107 107 } ] [ "s" get model>> range-max-value ] unit-test
 
     [ ] [ { 10 20 } "s" get scroll ] unit-test
 
@@ -57,7 +57,7 @@ IN: ui.gadgets.scrollers.tests
 
     [ { 10 20 } ] [ "s" get viewport>> model>> range-value ] unit-test
 
-    [ { 10 20 } ] [ "g" get rect-loc vneg { 3 3 } v+ ] unit-test
+    [ { 10 20 } ] [ "g" get rect-loc vneg viewport-gap v+ scroller-border v+ ] unit-test
 ] with-grafted-gadget
 
 <gadget> { 600 400 } >>dim "g1" set
@@ -102,7 +102,7 @@ dup layout
     swap dup quot>> call
     dup layout
     model>> dependencies>> [ range-max value>> ] map
-    viewport-gap 2 v*n =
+    viewport-padding =
 ] unit-test
 
 \ <scroller> must-infer
