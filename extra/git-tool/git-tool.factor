@@ -116,11 +116,11 @@ TUPLE: <git-status>
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-:: refresh-git-status ( GIT-STATUS -- GIT-STATUS )
+:: refresh-git-status ( STATUS -- STATUS )
 
-  [let | LINES [ GIT-STATUS repository>> "git-status" git-process stdout>> ] |
+  [let | LINES [ STATUS repository>> { "git" "status" } git-process stdout>> ] |
 
-    GIT-STATUS
+    STATUS
     
       LINES "# Changes to be committed:" git-status-section
         [ "new file:" head? ] filter
@@ -269,7 +269,7 @@ TUPLE: <git-status>
         "Diff"
         [
           drop
-          STATUS repository>> { "git-diff" PATH } git-process
+          STATUS repository>> { "git" "diff" PATH } git-process
           popup-process-window
         ]
         <bevel-button> add-gadget
@@ -320,7 +320,7 @@ TUPLE: <git-status>
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 :: git-remote-branches ( REPO NAME -- seq )
-  REPO { "git-remote" "show" NAME } git-process stdout>>
+  REPO { "git" "remote" "show" NAME } git-process stdout>>
   "  Tracked remote branches" over index 1 + tail first " " split
   [ empty? not ] filter ;
 
@@ -334,7 +334,7 @@ TUPLE: <git-status>
   
   "Remotes" <label> reverse-video-theme add-gadget
 
-  REPO "git-remote" git-process stdout>> [ empty? not ] filter
+  REPO { "git" "remote" } git-process stdout>> [ empty? not ] filter
 
   [| NAME |
 
@@ -377,7 +377,7 @@ TUPLE: <git-status>
            1 track-add ]
   
         "Fetch"
-        [ drop REPO { "git-fetch" NAME } git-process popup-process-window ]
+        [ drop REPO { "git" "fetch" NAME } git-process popup-process-window ]
         <bevel-button>
         1 track-add
   
@@ -385,7 +385,7 @@ TUPLE: <git-status>
         [
           drop
           [let | ARG [ { ".." NAME "/" BRANCH } concat ] |
-            REPO { "git-log" ARG } git-process popup-process-window ]
+            REPO { "git" "log" ARG } git-process popup-process-window ]
         ]
         <bevel-button>
         1 track-add
@@ -394,7 +394,7 @@ TUPLE: <git-status>
         [
           drop
           [let | ARG [ { NAME "/" BRANCH } concat ] |
-            REPO { "git-merge" ARG } git-process popup-process-window ]
+            REPO { "git" "merge" ARG } git-process popup-process-window ]
         ]
         <bevel-button>
         1 track-add
@@ -403,7 +403,7 @@ TUPLE: <git-status>
         [
           drop
           [let | ARG [ { NAME "/" BRANCH ".." } concat ] |
-            REPO { "git-log" ARG } git-process popup-process-window ]
+            REPO { "git" "log" ARG } git-process popup-process-window ]
         ]
         <bevel-button>
         1 track-add
@@ -411,7 +411,7 @@ TUPLE: <git-status>
         "Push"
         [
           drop
-          REPO { "git-push" NAME "master" } git-process popup-process-window 
+          REPO { "git" "push" NAME "master" } git-process popup-process-window 
         ]
         <bevel-button>
         1 track-add
