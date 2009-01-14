@@ -132,8 +132,7 @@ buffer."
 
 (defun fuel-listener--setup-completion ()
   (setq fuel-syntax--current-vocab-function 'fuel-listener--current-vocab)
-  (setq fuel-syntax--usings-function 'fuel-listener--usings)
-  (set-syntax-table fuel-syntax--syntax-table))
+  (setq fuel-syntax--usings-function 'fuel-listener--usings))
 
 
 ;;; Stack mode support
@@ -160,7 +159,6 @@ buffer."
   (set (make-local-variable 'comint-prompt-regexp) fuel-con--prompt-regex)
   (set (make-local-variable 'comint-use-prompt-regexp) t)
   (set (make-local-variable 'comint-prompt-read-only) t)
-  (set-syntax-table fuel-syntax--syntax-table)
   (fuel-listener--setup-completion)
   (fuel-listener--setup-stack-mode))
 

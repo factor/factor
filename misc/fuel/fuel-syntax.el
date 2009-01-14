@@ -87,11 +87,19 @@
 (defconst fuel-syntax--integer-regex
   "\\_<-?[0-9]+\\_>")
 
-(defconst fuel-syntax--ratio-regex
-  "\\_<-?\\([0-9]+\\+\\)?[0-9]+/-?[0-9]+\\_>")
+(defconst fuel-syntax--raw-float-regex
+  "[0-9]*\\.[0-9]*\\([eE][+-]?[0-9]+\\)?")
 
 (defconst fuel-syntax--float-regex
-  "\\_<-?[0-9]+\\.[0-9]*\\([eE][+-]?[0-9]+\\)?\\_>")
+  (format "\\_<-?%s\\_>" fuel-syntax--raw-float-regex))
+
+(defconst fuel-syntax--number-regex
+  (format "\\([0-9]+\\|%s\\)" fuel-syntax--raw-float-regex))
+
+(defconst fuel-syntax--ratio-regex
+  (format "\\_<[+-]?%s/-?%s\\_>"
+          fuel-syntax--number-regex
+          fuel-syntax--number-regex))
 
 (defconst fuel-syntax--bad-string-regex
   "\"\\([^\"]\\|\\\\\"\\)*\n")
