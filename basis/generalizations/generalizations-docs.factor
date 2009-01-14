@@ -229,8 +229,9 @@ HELP: napply
 { $examples
   "Some core words expressed in terms of " { $link napply } ":"
     { $table
-        { { $link bi@ } { $snippet "1 napply" } }
-        { { $link tri@ } { $snippet "2 napply" } }
+        { { $link call } { $snippet "1 napply" } }
+        { { $link bi@ } { $snippet "2 napply" } }
+        { { $link tri@ } { $snippet "3 napply" } }
     }
 } ;
 
