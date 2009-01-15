@@ -68,7 +68,8 @@ buffer."
       (setq fuel-listener--buffer (current-buffer)))))
 
 (defun fuel-listener--start-process ()
-  (let ((factor (expand-file-name fuel-listener-factor-binary))
+  (let ((factor (locate-file (expand-file-name fuel-listener-factor-binary)
+                             '("") exec-suffixes))
         (image (expand-file-name fuel-listener-factor-image))
         (comint-redirect-perform-sanity-check nil))
     (unless (file-executable-p factor)

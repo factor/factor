@@ -81,7 +81,7 @@
            (cond ((looking-at "USING: ") 'factor-font-lock-vocabulary-name)
                  ((looking-at "\\(TUPLE\\|SYMBOLS\\|VARS\\): ")
                   'factor-font-lock-symbol)
-                 (t 'font-lock-warning-face))))
+                 (t 'default))))
         (t 'factor-font-lock-comment)))
 
 (defconst fuel-font-lock--font-lock-keywords
