@@ -61,7 +61,7 @@
 
 (defun fuel-markup--insert-button (label link type)
   (let ((label (format "%s" label))
-        (link (format "%s" link)))
+        (link (if (listp link) link (format "%s" link))))
     (insert-text-button label
                         :type 'fuel-markup--button
                         'markup-link link
@@ -70,8 +70,9 @@
                         'help-echo (format "%s (%s)" label type))))
 
 (defun fuel-markup--article-title (name)
-  (fuel-eval--retort-result
-   (fuel-eval--send/wait `(:fuel* ((,name fuel-get-article-title)) "fuel"))))
+  (let ((name (if (listp name) (cons :seq name) name)))
+    (fuel-eval--retort-result
+     (fuel-eval--send/wait `(:fuel* ((,name fuel-get-article-title)) "fuel")))))
 
 (defun fuel-markup--link-at-point ()
   (let ((button (condition-case nil (forward-button 0) (error nil))))
