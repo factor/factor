@@ -386,10 +386,6 @@ PRIVATE>
     [ 2drop f f ]
     if ; inline
 
-: (monotonic) ( seq quot -- ? )
-    [ 2dup nth-unsafe rot 1+ rot nth-unsafe ]
-    prepose curry ; inline
-
 : (interleave) ( n elt between quot -- )
     roll 0 = [ nip ] [ swapd 2slip ] if call ; inline
 
@@ -478,9 +474,6 @@ PRIVATE>
 
 : partition ( seq quot -- trueseq falseseq )
     over [ 2pusher [ each ] 2dip ] dip tuck [ like ] 2bi@ ; inline
-
-: monotonic? ( seq quot -- ? )
-    [ [ length 1- ] keep ] dip (monotonic) all? ; inline
 
 : interleave ( seq between quot -- )
     [ (interleave) ] 2curry [ [ length ] keep ] dip 2each ; inline
@@ -671,10 +664,6 @@ PRIVATE>
 : pop ( seq -- elt )
     [ length 1- ] [ [ nth ] [ shorten ] 2bi ] bi ;
 
-: all-equal? ( seq -- ? ) [ = ] monotonic? ;
-
-: all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
-
 : exchange ( m n seq -- )
     pick over bounds-check 2drop 2dup bounds-check 2drop
     exchange-unsafe ;
@@ -696,9 +685,7 @@ PRIVATE>
     0 [ length + ] reduce ;
 
 : concat ( seq -- newseq )
-    [
-        { }
-    ] [
+    [ { } ] [
         [ sum-lengths ] keep
         [ first new-resizable ] keep
         [ [ over push-all ] each ] keep
