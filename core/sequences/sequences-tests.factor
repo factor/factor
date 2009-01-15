@@ -73,13 +73,6 @@ unit-test
 [ { { 1 4 } { 2 5 } { 3 6 } } ]
 [ { { 1 2 3 } { 4 5 6 } } flip ] unit-test
 
-[ f ] [ [ { } { } "Hello" ] all-equal? ] unit-test
-[ f ] [ [ { 2 } { } { } ] all-equal? ] unit-test
-[ t ] [ [ ] all-equal? ] unit-test
-[ t ] [ [ 1234 ] all-equal? ] unit-test
-[ f ] [ [ 1.0 1 1 ] all-equal? ] unit-test
-[ t ] [ { 1 2 3 4 } [ < ] monotonic? ] unit-test
-[ f ] [ { 1 2 3 4 } [ > ] monotonic? ] unit-test
 [ [ 2 3 4 ] ] [ [ 1 2 3 ] 1 [ + ] curry map ] unit-test
 
 [ 1 ] [ 0 [ 1 2 ] nth ] unit-test
