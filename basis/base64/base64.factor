@@ -74,11 +74,11 @@ PRIVATE>
         [ malformed-base64 ]
     } case ;
 
-: >base64 ( str -- base64 )
+: >base64 ( seq -- base64 )
     binary [ [ encode-base64 ] with-string-reader ] with-byte-writer ;
 
-: base64> ( base64 -- str )
+: base64> ( base64 -- seq )
     [ binary [ decode-base64 ] with-byte-reader ] with-string-writer ;
 
-: >base64-lines ( str -- base64 )
+: >base64-lines ( seq -- base64 )
     binary [ [ encode-base64-lines ] with-string-reader ] with-byte-writer ;

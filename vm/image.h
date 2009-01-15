@@ -26,7 +26,8 @@ typedef struct {
 } F_HEADER;
 
 typedef struct {
-	const F_CHAR* image;
+	const F_CHAR *image_path;
+	const F_CHAR *executable_path;
 	CELL ds_size, rs_size;
 	CELL gen_count, young_size, aging_size, tenured_size;
 	CELL code_size;
