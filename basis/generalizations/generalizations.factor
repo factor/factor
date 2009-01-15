@@ -73,10 +73,8 @@ MACRO: ncleave ( quots n -- )
     [ '[ _ '[ _ _ nkeep ] ] map [ ] join ] [ '[ _ ndrop ] ] bi
     compose ;
 
-MACRO: napply ( n -- )
-    2 [a,b]
-    [ [ 1- ] [ ] bi '[ _ ntuck _ nslip ] ]
-    map concat >quotation [ call ] append ;
+MACRO: napply ( quot n -- )
+    swap <repetition> spread>quot ;
 
 MACRO: mnswap ( m n -- )
     1+ '[ _ -nrot ] <repetition> spread>quot ;

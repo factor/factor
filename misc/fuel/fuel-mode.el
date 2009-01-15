@@ -132,37 +132,6 @@ With prefix argument, ask for the file name."
   (let ((file (car (fuel-mode--read-file arg))))
     (when file (fuel-debug--uses-for-file file))))
 
-(defvar fuel-mode--word-history nil)
-
-(defun fuel-show-callers (&optional arg)
-  "Show a list of callers of word at point.
-With prefix argument, ask for word."
-  (interactive "P")
-  (let ((word (if arg (fuel-completion--read-word "Find callers for: "
-                                                  (fuel-syntax-symbol-at-point)
-                                                  fuel-mode--word-history)
-                (fuel-syntax-symbol-at-point))))
-    (when word
-      (message "Looking up %s's callers ..." word)
-      (fuel-xref--show-callers word))))
-
-(defun fuel-show-callees (&optional arg)
-  "Show a list of callers of word at point.
-With prefix argument, ask for word."
-  (interactive "P")
-  (let ((word (if arg (fuel-completion--read-word "Find callees for: "
-                                                  (fuel-syntax-symbol-at-point)
-                                                  fuel-mode--word-history)
-                (fuel-syntax-symbol-at-point))))
-    (when word
-      (message "Looking up %s's callees ..." word)
-      (fuel-xref--show-callees word))))
-
-(defun fuel-apropos (str)
-  "Show a list of words containing the given substring."
-  (interactive "MFind words containing: ")
-  (message "Looking up %s's references ..." str)
-  (fuel-xref--apropos str))
 
 ;;; Minor mode definition:
 
@@ -212,6 +181,7 @@ interacting with a factor listener is at your disposal.
 (define-key fuel-mode-map "\C-\M-x" 'fuel-eval-definition)
 (define-key fuel-mode-map "\C-\M-r" 'fuel-eval-extended-region)
 (define-key fuel-mode-map "\M-." 'fuel-edit-word-at-point)
+(define-key fuel-mode-map "\M-," 'fuel-edit-pop-edit-word-stack)
 (define-key fuel-mode-map "\C-c\M-<" 'fuel-show-callers)
 (define-key fuel-mode-map "\C-c\M->" 'fuel-show-callees)
 (define-key fuel-mode-map (kbd "M-TAB") 'fuel-completion--complete-symbol)
@@ -225,10 +195,14 @@ interacting with a factor listener is at your disposal.
 (fuel-mode--key ?e ?w 'fuel-edit-word)
 (fuel-mode--key ?e ?x 'fuel-eval-definition)
 
-(fuel-mode--key ?x ?w 'fuel-refactor-extract-word)
+(fuel-mode--key ?x ?s 'fuel-refactor-extract-sexp)
+(fuel-mode--key ?x ?r 'fuel-refactor-extract-region)
+(fuel-mode--key ?x ?v 'fuel-refactor-extract-vocab)
+(fuel-mode--key ?x ?i 'fuel-refactor-inline-word)
 
 (fuel-mode--key ?d ?> 'fuel-show-callees)
 (fuel-mode--key ?d ?< 'fuel-show-callers)
+(fuel-mode--key ?d ?v 'fuel-show-file-words)
 (fuel-mode--key ?d ?a 'fuel-autodoc-mode)
 (fuel-mode--key ?d ?p 'fuel-apropos)
 (fuel-mode--key ?d ?d 'fuel-help)

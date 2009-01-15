@@ -15,37 +15,37 @@ ARTICLE: "unicode.data" "Unicode data tables"
 { $subsection property? } ;
 
 HELP: load-script
-{ $value { "filename" string } { "table" "an interval map" } }
+{ $values { "filename" string } { "table" "an interval map" } }
 { $description "This loads a file that looks like Script.txt in the Unicode Character Database and converts it into an efficient interval map, where the keys are characters and the values are strings for the properties." } ;
 
 HELP: canonical-entry
-{ $value { "char" "a code point" } { "seq" string } }
+{ $values { "char" "a code point" } { "seq" string } }
 { $description "Finds the canonical decomposition (NFD) for a code point" } ;
 
 HELP: combine-chars
-{ $value { "a" "a code point" } { "b" "a code point" } { "char/f" "a code point" } }
+{ $values { "a" "a code point" } { "b" "a code point" } { "char/f" "a code point" } }
 { $description "If a followed by b can be combined in NFC, this returns the code point of their combination." } ;
 
 HELP: compatibility-entry
-{ $value { "char" "a code point" } { "seq" string } }
+{ $values { "char" "a code point" } { "seq" string } }
 { $description "This returns the compatibility decomposition (NFKD) for a code point" } ;
 
 HELP: combining-class
-{ $value { "char" "a code point" } { "n" "an integer" } }
+{ $values { "char" "a code point" } { "n" "an integer" } }
 { $description "Finds the combining class of a code point." } ;
 
 HELP: non-starter?
-{ $value { "char" "a code point" } { "?" "a boolean" } }
+{ $values { "char" "a code point" } { "?" "a boolean" } }
 { $description "Returns true if the code point has a combining class." } ;
 
 HELP: char>name
-{ $value { "char" "a code point" } { "name" string } }
+{ $values { "char" "a code point" } { "name" string } }
 { $description "Looks up the name of a given code point. Warning: this is not optimized for speed, to save space." } ;
 
 HELP: name>char
-{ $value { "name" string } { "char" "a code point" } }
+{ $values { "name" string } { "char" "a code point" } }
 { $description "Looks up the code point corresponding to a given name." } ;
 
 HELP: property?
-{ $value { "char" "a code point" } { "property" string } { "?" "a boolean" } }
+{ $values { "char" "a code point" } { "property" string } { "?" "a boolean" } }
 { $description "Tests whether the code point is listed under the given property in PropList.txt in the Unicode Character Database." } ;

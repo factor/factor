@@ -108,7 +108,7 @@ unit-test
             ] times
             .
         ] times
-    ] with-null-stream
+    ] with-null-writer
 ] unit-test
 
 [ t ] [

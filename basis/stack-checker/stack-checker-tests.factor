@@ -416,12 +416,7 @@ DEFER: bar
 \ stream-write must-infer
 \ stream-write1 must-infer
 \ stream-nl must-infer
-\ stream-format must-infer
-\ stream-write-table must-infer
 \ stream-flush must-infer
-\ make-span-stream must-infer
-\ make-block-stream must-infer
-\ make-cell-stream must-infer
 
 ! Test stream utilities
 \ lines must-infer

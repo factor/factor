@@ -1,9 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
-alien.strings alien.arrays sets threads libc continuations.private
+alien.strings alien.arrays sets libc continuations.private
 fry cpu.architecture
 compiler.errors
 compiler.alien
@@ -11,7 +11,8 @@ compiler.cfg
 compiler.cfg.instructions
 compiler.cfg.registers
 compiler.cfg.builder
-compiler.codegen.fixup ;
+compiler.codegen.fixup
+compiler.utilities ;
 IN: compiler.codegen
 
 GENERIC: generate-insn ( insn -- )
@@ -463,7 +464,7 @@ TUPLE: callback-context ;
     dup current-callback eq? [
         drop
     ] [
-        yield wait-to-return
+        yield-hook get call wait-to-return
     ] if ;
 
 : do-callback ( quot token -- )

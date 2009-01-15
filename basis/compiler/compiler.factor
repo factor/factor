@@ -1,14 +1,14 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io
 words fry continuations vocabs assocs dlists definitions math
-threads graphs generic combinators deques search-deques io
+graphs generic combinators deques search-deques io
 stack-checker stack-checker.state stack-checker.inlining
 compiler.errors compiler.units compiler.tree.builder
 compiler.tree.optimizer compiler.cfg.builder
 compiler.cfg.optimizer compiler.cfg.linearization
 compiler.cfg.two-operand compiler.cfg.linear-scan
-compiler.cfg.stack-frame compiler.codegen ;
+compiler.cfg.stack-frame compiler.codegen compiler.utilities ;
 IN: compiler
 
 SYMBOL: compile-queue
@@ -107,7 +107,7 @@ t compile-dependencies? set-global
     ] with-return ;
 
 : compile-loop ( deque -- )
-    [ (compile) yield ] slurp-deque ;
+    [ (compile) yield-hook get call ] slurp-deque ;
 
 : decompile ( word -- )
     f 2array 1array t modify-code-heap ;

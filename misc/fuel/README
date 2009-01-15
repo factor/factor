@@ -32,6 +32,7 @@ beast.
   (require 'factor-mode)
 
 * Basic usage
+*** Running the listener
 
   If you're using the default factor binary and images locations inside
   the Factor's source tree, that should be enough to start using FUEL.
@@ -40,8 +41,34 @@ beast.
 
   To start the listener, try M-x run-factor.
 
+  By default, FUEL will try to use the binary and image files in the
+  factor installation directory. You can customize them with:
+
+    (setq fuel-listener-factor-binary <full path to factor>)
+    (setq fuel-listener-factor-image <full path to factor image>)
+
   Many aspects of the environment can be customized:
   M-x customize-group fuel will show you how many.
+
+*** Faster listener startup
+
+  On startup, run-factor loads the fuel vocabulary, which can take a
+  while. If you want to speedup the load process, type 'save' in the
+  listener prompt just after invoking run-factor. This will save a
+  factor image (overwriting the current one) with all the needed
+  vocabs.
+
+*** Vocabulary creation
+
+    FUEL offers a basic interface with Factor's scaffolding utilities.
+    To create a new vocabulary directory and associated files:
+
+       M-x fuel-scaffold-vocab
+
+    and when in a vocab file, to create a docs file with boilerplate
+    for each word:
+
+       M-x fuel-scaffold-help
 
 * Quick key reference
 
@@ -53,7 +80,8 @@ beast.
     - C-cz : switch to listener
     - C-co : cycle between code, tests and docs factor files
 
-    - M-. : edit word at point in Emacs
+    - M-. : edit word at point in Emacs (see fuel-edit-word-method custom var)
+    - M-, : go back to where M-. was last invoked
     - M-TAB : complete word at point
     - C-cC-eu : update USING: line
     - C-cC-ev : edit vocabulary (M-x fuel-edit-vocabulary)
@@ -70,11 +98,15 @@ beast.
     - C-cC-ds : short help word at point
     - C-cC-de : show stack effect of current sexp (with prefix, region)
     - C-cC-dp : find words containing given substring (M-x fuel-apropos)
+    - C-cC-dv : show words in current file (with prefix, ask for vocab)
 
     - C-cM-<, C-cC-d< : show callers of word at point
     - C-cM->, C-cC-d> : show callees of word at point
 
-    - C-cC-xw : extract region as a separate word
+    - C-cC-xs : extract innermost sexp (up to point)  as a separate word
+    - C-cC-xr : extract region as a separate word
+    - C-cC-xi : replace word at point by its definition
+    - C-cC-xv : extract region as a separate vocabulary
 
 *** In the listener:
 

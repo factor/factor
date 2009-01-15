@@ -54,6 +54,9 @@
  factor-font-lock font-lock factor-mode
  ((comment comment "comments")
   (constructor type  "constructors (<foo>)")
+  (constant constant  "constants and literal values")
+  (number constant  "integers and floats")
+  (ratio constant  "ratios")
   (declaration keyword "declaration words")
   (parsing-word keyword  "parsing words")
   (setter-word function-name "setter words (>>foo)")
@@ -63,28 +66,35 @@
   (symbol variable-name "name of symbol being defined")
   (type-name type "type names")
   (vocabulary-name constant "vocabulary names")
-  (word function-name "word, generic or method being defined")))
+  (word function-name "word, generic or method being defined")
+  (invalid-syntax warning "syntactically invalid constructs")))
 
 
 ;;; Font lock:
 
 (defconst fuel-font-lock--font-lock-keywords
-  `((,fuel-syntax--parsing-words-regex . 'factor-font-lock-parsing-word)
+  `((,fuel-syntax--stack-effect-regex . 'factor-font-lock-stack-effect)
+    (,fuel-syntax--parsing-words-regex . 'factor-font-lock-parsing-word)
     (,fuel-syntax--brace-words-regex 1 'factor-font-lock-parsing-word)
     ("\\(P\\|SBUF\\)\"" 1 'factor-font-lock-parsing-word)
-    (,fuel-syntax--stack-effect-regex . 'factor-font-lock-stack-effect)
+    (,fuel-syntax--vocab-ref-regexp  2 'factor-font-lock-vocabulary-name)
     (,fuel-syntax--declaration-words-regex . 'factor-font-lock-declaration)
     (,fuel-syntax--word-definition-regex 2 'factor-font-lock-word)
+    (,fuel-syntax--alias-definition-regex (1 'factor-font-lock-word)
+                                          (2 'factor-font-lock-word))
+    (,fuel-syntax--int-constant-def-regex 2 'factor-font-lock-constant)
+    (,fuel-syntax--integer-regex . 'factor-font-lock-number)
+    (,fuel-syntax--float-regex . 'factor-font-lock-number)
+    (,fuel-syntax--ratio-regex . 'factor-font-lock-ratio)
     (,fuel-syntax--type-definition-regex 2 'factor-font-lock-type-name)
     (,fuel-syntax--method-definition-regex (1 'factor-font-lock-type-name)
                                            (2 'factor-font-lock-word))
-    (,fuel-syntax--parent-type-regex 1 'factor-font-lock-type-name)
+    (,fuel-syntax--parent-type-regex 2 'factor-font-lock-type-name)
     (,fuel-syntax--constructor-regex . 'factor-font-lock-constructor)
     (,fuel-syntax--setter-regex . 'factor-font-lock-setter-word)
     (,fuel-syntax--getter-regex . 'factor-font-lock-getter-word)
     (,fuel-syntax--symbol-definition-regex 2 'factor-font-lock-symbol)
-    (,fuel-syntax--use-line-regex 1 'factor-font-lock-vocabulary-name))
-  "Font lock keywords definition for Factor mode.")
+    (,fuel-syntax--bad-string-regex . 'factor-font-lock-invalid-syntax)))
 
 (defun fuel-font-lock--font-lock-setup (&optional keywords no-syntax)
   (set (make-local-variable 'comment-start) "! ")
@@ -98,7 +108,6 @@
              (list (cons 'font-lock-syntactic-keywords
                          fuel-syntax--syntactic-keywords))))))
 
-
 
 ;;; Fontify strings as Factor code:
 

@@ -3,7 +3,7 @@
 ! Copyright (C) 2004 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: io kernel namespaces prettyprint quotations
+USING: io io.styles kernel namespaces prettyprint quotations
 sequences strings words xml.entities compiler.units effects
 urls math math.parser combinators present fry ;
 

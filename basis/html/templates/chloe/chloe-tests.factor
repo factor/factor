@@ -1,7 +1,8 @@
 USING: html.templates html.templates.chloe
 tools.test io.streams.string kernel sequences ascii boxes
 namespaces xml html.components html.forms
-splitting unicode.categories furnace accessors ;
+splitting unicode.categories furnace accessors
+html.templates.chloe.compiler ;
 IN: html.templates.chloe.tests
 
 : run-template
@@ -163,3 +164,9 @@ TUPLE: person first-name last-name ;
         "test12" test-template call-template
     ] run-template
 ] unit-test
+
+[
+    [
+        "test13" test-template call-template
+    ] run-template
+] [ error>> T{ unknown-chloe-tag f "this-tag-does-not-exist" } = ] must-fail-with

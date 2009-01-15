@@ -3,7 +3,7 @@
 USING: combinators.short-circuit unicode.categories kernel math
 combinators splitting sequences math.parser io.files io assocs
 arrays namespaces make math.ranges unicode.normalize.private values
-io.encodings.ascii unicode.syntax unicode.data compiler.units
+io.encodings.ascii unicode.syntax unicode.data compiler.units fry
 alien.syntax sets accessors interval-maps memoize locals words ;
 IN: unicode.breaks
 
@@ -58,38 +58,31 @@ SYMBOL: table
 : finish-table ( -- table )
     table get [ [ 1 = ] map ] map ;
 
-: set-table ( class1 class2 val -- )
+: eval-seq ( seq -- seq ) [ dup word? [ execute ] when ] map ;
+
+: (set-table) ( class1 class2 val -- )
     -rot table get nth [ swap or ] change-nth ;
+
+: set-table ( classes1 classes2 val -- )
+    [ [ eval-seq ] bi@ ] dip
+    [ [ (set-table) ] curry with each ] 2curry each ;
 
 : connect ( class1 class2 -- ) 1 set-table ;
 : disconnect ( class1 class2 -- ) 0 set-table ;
-
-: check-before ( class classes value -- )
-    [ set-table ] curry with each ;
-
-: check-after ( classes class value -- )
-    [ set-table ] 2curry each ;
-
-: connect-before ( class classes -- )
-    1 check-before ;
-
-: connect-after ( classes class -- )
-    1 check-after ;
   
 : break-around ( classes1 classes2 -- )
-    [ [ 2dup disconnect swap disconnect ] with each ] curry each ;
+    [ disconnect ] [ swap disconnect ] 2bi ;
 
 : make-grapheme-table ( -- )
-    CR LF connect
-    Control CR LF 3array graphemes break-around
-    L L V LV LVT 4array connect-before
-    V V T 2array connect-before
-    LV V T 2array connect-before
-    T T connect
-    LVT T connect
-    graphemes Extend connect-after
-    graphemes SpacingMark connect-after
-    Prepend graphemes connect-before ;
+    { CR } { LF } connect
+    { Control CR LF } graphemes disconnect
+    graphemes { Control CR LF } disconnect
+    { L } { L V LV LVT } connect
+    { LV V } { V T } connect
+    { LVT T } { T } connect
+    graphemes { Extend } connect
+    graphemes { SpacingMark } connect
+    { Prepend } graphemes connect ;
 
 VALUE: grapheme-table
 
@@ -99,26 +92,18 @@ VALUE: grapheme-table
 : chars ( i str n -- str[i] str[i+n] )
     swap [ dupd + ] dip [ ?nth ] curry bi@ ;
 
-: find-index ( seq quot -- i ) find drop ; inline
-: find-last-index ( seq quot -- i ) find-last drop ; inline
-
 PRIVATE>
 
 : first-grapheme ( str -- i )
     unclip-slice grapheme-class over
-    [ grapheme-class tuck grapheme-break? ] find-index
+    [ grapheme-class tuck grapheme-break? ] find drop
     nip swap length or 1+ ;
 
 <PRIVATE
 
-:: (>pieces) ( str quot -- )
-    str [
-        dup quot call cut-slice
-        swap , quot (>pieces)
-    ] unless-empty ; inline recursive
-
-: >pieces ( str quot -- graphemes )
-    [ (>pieces) ] { } make ; inline
+: >pieces ( str quot: ( str -- i ) -- graphemes )
+    [ dup empty? not ] swap '[ dup @ cut-slice swap ]
+    [ ] produce nip ; inline
 
 PRIVATE>
 
@@ -130,7 +115,7 @@ PRIVATE>
 
 : last-grapheme ( str -- i )
     unclip-last-slice grapheme-class swap
-    [ grapheme-class dup rot grapheme-break? ] find-last-index ?1+ nip ;
+    [ grapheme-class dup rot grapheme-break? ] find-last drop ?1+ nip ;
 
 <PRIVATE
 
@@ -161,27 +146,23 @@ wMidNum wMidNumLet wNumeric wExtendNumLet words ;
     word-break-table interval-at
     word-break-classes at [ wOther ] unless* ;
 
-: e ( seq -- seq ) [ execute ] map ;
-
 SYMBOL: check-letter-before
 SYMBOL: check-letter-after
 SYMBOL: check-number-before
 SYMBOL: check-number-after
 
 : make-word-table ( -- )
-    wCR wLF connect
-    { wNewline wCR wLF } e words break-around
-    wALetter dup connect
-    wALetter { wMidLetter wMidNumLet } e check-letter-after check-before
-    { wMidLetter wMidNumLet } e wALetter check-letter-before check-after
-    wNumeric dup connect
-    wALetter wNumeric connect
-    wNumeric wALetter connect
-    wNumeric { wMidNum wMidNumLet } e check-number-after check-before
-    { wMidNum wMidNumLet } e wNumeric check-number-before check-after
-    wKatakana dup connect
-    { wALetter wNumeric wKatakana wExtendNumLet } e wExtendNumLet
-    [ connect-after ] [ swap connect-before ] 2bi ;
+    { wCR } { wLF } connect
+    { wNewline wCR wLF } words disconnect
+    words { wNewline wCR wLF } disconnect
+    { wALetter } { wMidLetter wMidNumLet } check-letter-after set-table
+    { wMidLetter wMidNumLet } { wALetter } check-letter-before set-table
+    { wNumeric wALetter } { wNumeric wALetter } connect
+    { wNumeric } { wMidNum wMidNumLet } check-number-after set-table
+    { wMidNum wMidNumLet } { wNumeric } check-number-before set-table
+    { wKatakana } { wKatakana } connect
+    { wALetter wNumeric wKatakana wExtendNumLet } { wExtendNumLet }
+    [ connect ] [ swap connect ] 2bi ;
 
 VALUE: word-table
 
@@ -197,47 +178,53 @@ to: word-table
 : word-table-nth ( class1 class2 -- ? )
     word-table nth nth ;
 
-: property-not= ( i str property -- ? )
-    pick [
-        [ ?nth ] dip swap
-        [ word-break-prop = not ] [ drop f ] if*
-    ] [ 3drop t ] if ;
+:: property-not= ( str i property -- ? )
+    i [
+        i str ?nth [ word-break-prop property = not ]
+        [ f ] if*
+    ] [ t ] if ;
 
 : format/extended? ( ch -- ? )
     word-break-prop { 4 5 } member? ;
 
-:: walk-up ( str i -- j )
-    i 1 + str [ format/extended? not ] find-from drop
-    1+ str [ format/extended? not ] find-from drop ; ! possible bounds error?
+: (walk-up) ( str i -- j )
+    swap [ format/extended? not ] find-from drop ;
 
-:: walk-down ( str i -- j )
-    i str [ format/extended? not ] find-last-from drop
-    1- str [ format/extended? not ] find-last-from drop ; ! possible bounds error?
+: walk-up ( str i -- j )
+    dupd 1+ (walk-up) [ 1+ (walk-up) ] [ drop f ] if* ;
 
-:: word-break? ( table-entry i str -- ? )
-    table-entry {
-        { t [ f ] }
-        { f [ t ] }
+: (walk-down) ( str i -- j )
+    swap [ format/extended? not ] find-last-from drop ;
+
+: walk-down ( str i -- j )
+    dupd (walk-down) [ 1- (walk-down) ] [ drop f ] if* ;
+
+: word-break? ( table-entry i str -- ? )
+    spin {
+        { t [ 2drop f ] }
+        { f [ 2drop t ] }
         { check-letter-after
-            [ str i walk-up str wALetter property-not= ] }
+            [ dupd walk-up wALetter property-not= ] }
         { check-letter-before
-            [ str i walk-down str wALetter property-not= ] }
+            [ dupd walk-down wALetter property-not= ] }
         { check-number-after
-            [ str i walk-up str wNumeric property-not= ] }
+            [ dupd walk-up wNumeric property-not= ] }
         { check-number-before
-            [ str i walk-down str wNumeric property-not= ] }
+            [ dupd walk-down wNumeric property-not= ] }
     } case ;
 
 :: word-break-next ( old-class new-char i str -- next-class ? )
-    new-char word-break-prop dup { 4 5 } member?
-    [ drop old-class dup { 1 2 3 } member? ]
-    [ old-class over word-table-nth i str word-break? ] if ;
+    new-char dup format/extended?
+    [ drop old-class dup { 1 2 3 } member? ] [
+        word-break-prop old-class over word-table-nth
+        i str word-break?
+    ] if ;
 
 PRIVATE>
 
-:: first-word ( str -- i )
-    str unclip-slice word-break-prop over <enum>
-    [ swap str word-break-next ] assoc-find 2drop
+: first-word ( str -- i )
+    [ unclip-slice word-break-prop over <enum> ] keep
+    '[ swap _ word-break-next ] assoc-find 2drop
     nip swap length or 1+ ;
 
 : >words ( str -- words )

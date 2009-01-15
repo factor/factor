@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io io.ports kernel math
-io.pathnames io.directories math.parser io.files ;
+io.pathnames io.directories math.parser io.files strings ;
 IN: io.files.unique
 
 HELP: temporary-path
@@ -30,7 +30,7 @@ HELP: make-unique-file ( prefix suffix -- path )
 
 HELP: make-unique-file*
 { $values
-     { "prefix" null } { "suffix" null }
+     { "prefix" string } { "suffix" string }
      { "path" "a pathname string" }
 }
 { $description "Creates a file that is guaranteed not to exist in the directory in the " { $link current-directory } " variable. The file name is composed of a prefix, a number of random digits and letters, and the suffix. Returns the full pathname." } ;
@@ -55,11 +55,11 @@ HELP: with-unique-directory ( quot -- )
 
 ARTICLE: "io.files.unique" "Temporary files"
 "The " { $vocab-link "io.files.unique" } " vocabulary implements cross-platform temporary file creation in a high-level and secure way." $nl
-"Files:"
+"Creating temporary files:"
 { $subsection make-unique-file }
 { $subsection make-unique-file* }
 { $subsection with-unique-file }
-"Directories:"
+"Creating temporary directories:"
 { $subsection make-unique-directory }
 { $subsection with-unique-directory } ;
 

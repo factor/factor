@@ -22,11 +22,11 @@ HELP: file-permissions
      { "n" integer } }
 { $description "Returns the Unix file permissions for a given file." } ;
 
-HELP: file-username
+HELP: file-user-name
 { $values
      { "path" "a pathname string" }
      { "string" string } }
-{ $description "Returns the username for a given file." } ;
+{ $description "Returns the user-name for a given file." } ;
 
 HELP: file-user-id
 { $values
@@ -110,7 +110,7 @@ HELP: set-file-times
 HELP: set-file-user
 { $values
      { "path" "a pathname string" } { "string/id" "a string or a user id" } }
-{ $description "Sets a file's user id from the given user id or username." } ;
+{ $description "Sets a file's user id from the given user id or user-name." } ;
 
 HELP: set-file-modified-time
 { $values
@@ -258,7 +258,7 @@ ARTICLE: "unix-file-timestamps" "Unix file timestamps"
 ARTICLE: "unix-file-ids" "Unix file user and group ids"
 "Reading file user data:"
 { $subsection file-user-id }
-{ $subsection file-username }
+{ $subsection file-user-name }
 "Setting file user data:"
 { $subsection set-file-user }
 "Reading file group data:"

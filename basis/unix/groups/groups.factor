@@ -13,7 +13,7 @@ TUPLE: group id name passwd members ;
 
 SYMBOL: group-cache
 
-GENERIC: group-struct ( obj -- group )
+GENERIC: group-struct ( obj -- group/f )
 
 <PRIVATE
 
@@ -24,11 +24,14 @@ GENERIC: group-struct ( obj -- group )
     "group" <c-object> tuck 4096
     [ <byte-array> ] keep f <void*> ;
 
-M: integer group-struct ( id -- group )
-    (group-struct) getgrgid_r io-error ;
+: check-group-struct ( group-struct ptr -- group-struct/f )
+    *void* [ drop f ] unless ;
 
-M: string group-struct ( string -- group )
-    (group-struct) getgrnam_r 0 = [ (io-error) ] unless ;
+M: integer group-struct ( id -- group/f )
+    (group-struct) [ getgrgid_r io-error ] keep check-group-struct ;
+
+M: string group-struct ( string -- group/f )
+    (group-struct) [ getgrnam_r io-error ] keep check-group-struct ;
 
 : group-struct>group ( group-struct -- group )
     [ \ group new ] dip
@@ -43,14 +46,14 @@ PRIVATE>
 
 : group-name ( id -- string )
     dup group-cache get [
-        at
+        dupd at* [ name>> nip ] [ drop number>string ] if
     ] [
-        group-struct group-gr_name
+        group-struct [ group-gr_name ] [ f ] if*
     ] if*
     [ nip ] [ number>string ] if* ;
 
-: group-id ( string -- id )
-    group-struct group-gr_gid ;
+: group-id ( string -- id/f )
+    group-struct [ group-gr_gid ] [ f ] if* ;
 
 <PRIVATE
 
@@ -71,7 +74,7 @@ M: string user-groups ( string -- seq )
     (user-groups) ; 
 
 M: integer user-groups ( id -- seq )
-    username (user-groups) ;
+    user-name (user-groups) ;
     
 : all-groups ( -- seq )
     [ getgrent dup ] [ group-struct>group ] [ drop ] produce ;

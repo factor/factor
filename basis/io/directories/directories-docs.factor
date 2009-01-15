@@ -50,6 +50,10 @@ HELP: with-directory-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
 { $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
 
+HELP: with-directory-entries
+{ $values { "path" "a pathname string" } { "quot" quotation } }
+{ $description "Calls the quotation with the directory entries on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
+
 HELP: delete-file
 { $values { "path" "a pathname string" } }
 { $description "Deletes a file." }
@@ -122,6 +126,7 @@ ARTICLE: "io.directories.listing" "Directory listing"
 "Directory listing:"
 { $subsection directory-entries }
 { $subsection directory-files }
+{ $subsection with-directory-entries }
 { $subsection with-directory-files } ;
 
 ARTICLE: "io.directories.create" "Creating directories"

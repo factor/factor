@@ -12,5 +12,6 @@ $nl
 "USE: vim"
 "\"c:\\\\program files\\\\vim\\\\vim70\\\\gvim\" vim-path set-global"
 }
-"On Unix, you may omit the last line if " { $snippet "\"vim\"" } " is in your " { $snippet "$PATH" } "." ;
-
+"On Unix, you may omit the last line if " { $snippet "\"vim\"" } " is in your " { $snippet "$PATH" } "." 
+$nl
+"You may also wish to install Vim support files to enable syntax hilighting and other features. These are in the " { $link resource-path } " in " { $snippet "misc/vim" } "." ; 

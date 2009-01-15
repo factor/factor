@@ -57,8 +57,6 @@ PRIVATE>
 
 SYMBOL: load-help?
 
-ERROR: circular-dependency name ;
-
 <PRIVATE
 
 : load-source ( vocab -- )

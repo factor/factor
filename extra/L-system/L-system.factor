@@ -207,7 +207,8 @@ DEFER: default-L-parser-values
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : save-turtle    ( turtle -- turtle ) dup clone over saved>> push ;
-: restore-turtle ( turtle -- turtle )                saved>> pop  ;
+
+: restore-turtle ( turtle -- turtle ) saved>> pop dup color>> set-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

@@ -23,5 +23,5 @@ HELP: nfkc
 { $description "Converts a string to Normalization Form KC" } ;
 
 HELP: nfkd
-{ $values { "string" string } { "nfc" "a string in NFKD" } }
+{ $values { "string" string } { "nfkd" "a string in NFKD" } }
 { $description "Converts a string to Normalization Form KD" } ;

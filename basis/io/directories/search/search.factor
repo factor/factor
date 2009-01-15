@@ -14,7 +14,7 @@ TUPLE: directory-iterator path bfs queue ;
 
 : push-directory ( path iter -- )
     [ qualified-directory ] dip [
-        dup queue>> swap bfs>>
+        [ queue>> ] [ bfs>> ] bi
         [ push-front ] [ push-back ] if
     ] curry each ;
 

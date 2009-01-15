@@ -30,12 +30,14 @@
   "Interacting with a Factor listener inside Emacs."
   :group 'fuel)
 
-(defcustom fuel-listener-factor-binary "~/factor/factor"
+(defcustom fuel-listener-factor-binary
+  (expand-file-name "factor" fuel-factor-root-dir)
   "Full path to the factor executable to use when starting a listener."
   :type '(file :must-match t)
   :group 'fuel-listener)
 
-(defcustom fuel-listener-factor-image "~/factor/factor.image"
+(defcustom fuel-listener-factor-image
+  (expand-file-name "factor.image" fuel-factor-root-dir)
   "Full path to the factor image to use when starting a listener."
   :type '(file :must-match t)
   :group 'fuel-listener)
@@ -73,16 +75,12 @@ buffer."
       (error "Could not run factor: %s is not executable" factor))
     (unless (file-readable-p image)
       (error "Could not run factor: image file %s not readable" image))
-    (message "Starting FUEL listener ...")
+    (message "Starting FUEL listener (this may take a while) ...")
     (pop-to-buffer (fuel-listener--buffer))
     (make-comint-in-buffer "fuel listener" (current-buffer) factor nil
                            "-run=listener" (format "-i=%s" image))
     (fuel-listener--wait-for-prompt 10000)
-    (fuel-con--setup-connection (current-buffer))
-    (fuel-con--send-string/wait (current-buffer)
-                                fuel-con--init-stanza
-                                '(lambda (s) (message "FUEL listener up and running!"))
-                                20000)))
+    (fuel-con--setup-connection (current-buffer))))
 
 (defun fuel-listener--process (&optional start)
   (or (and (buffer-live-p (fuel-listener--buffer))
@@ -106,6 +104,8 @@ buffer."
 
 (defun fuel-listener-nuke ()
   (interactive)
+  (goto-char (point-max))
+  (comint-kill-region comint-last-input-start (point))
   (comint-redirect-cleanup)
   (fuel-con--setup-connection fuel-listener--buffer))
 

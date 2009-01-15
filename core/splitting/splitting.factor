@@ -48,12 +48,12 @@ IN: splitting
 : split ( seq separators -- pieces ) [ split, ] { } make ;
 
 : string-lines ( str -- seq )
-    dup "\r\n" intersect empty? [
-        1array
-    ] [
+    dup "\r\n" intersects? [
         "\n" split [
             but-last-slice [
                 "\r" ?tail drop "\r" split
             ] map
         ] keep peek "\r" split suffix concat
+    ] [
+        1array
     ] if ;

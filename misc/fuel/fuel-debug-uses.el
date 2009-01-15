@@ -1,6 +1,6 @@
 ;;; fuel-debug-uses.el -- retrieving USING: stanzas
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -32,6 +32,9 @@
 
 ;;; Utility functions:
 
+(defsubst fuel-debug--chomp (s)
+  (replace-regexp-in-string "[\n\r\f]" "" s))
+
 (defun fuel-debug--file-lines (file)
   (when (file-readable-p file)
     (with-current-buffer (find-file-noselect file)
@@ -40,7 +43,8 @@
         (let ((lines) (in-usings))
           (while (not (eobp))
             (when (looking-at "^USING: ") (setq in-usings t))
-            (let ((line (substring-no-properties (thing-at-point 'line) 0 -1)))
+            (let ((line (fuel-debug--chomp
+                         (substring-no-properties (thing-at-point 'line)))))
               (when in-usings (setq line (concat "! " line)))
               (push line lines))
             (when (and in-usings (looking-at ".*\\_<;\\_>")) (setq in-usings nil))
@@ -68,7 +72,7 @@
  (defvar fuel-debug--uses-restarts nil))
 
 (defsubst fuel-debug--uses-insert-title ()
-  (insert "Infering USING: stanza for " fuel-debug--uses-file ".\n\n"))
+  (insert "Inferring USING: stanza for " fuel-debug--uses-file ".\n\n"))
 
 (defun fuel-debug--uses-prepare (file)
   (fuel--with-popup (fuel-debug--uses-buffer)
@@ -169,7 +173,7 @@
     map))
 
 (defconst fuel-debug--uses-header-regex
-  (format "^%s.*$" (regexp-opt '("Infering USING: stanza for "
+  (format "^%s.*$" (regexp-opt '("Inferring USING: stanza for "
                                  "Current USING: is already fine!"
                                  "Current vocabulary list:"
                                  "Correct vocabulary list:"
