@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: xml.errors xml.data xml.utilities xml.char-classes sets
-xml.entities kernel state-parser kernel namespaces make strings
-math math.parser sequences assocs arrays splitting combinators
-unicode.case accessors fry ascii ;
+USING: accessors arrays ascii assocs combinators fry io.encodings
+io.encodings.iana io.encodings.utf16 io.encodings.utf8 kernel
+make math.parser namespaces sequences sets splitting state-parser
+xml.char-classes xml.data xml.entities xml.errors strings ;
 IN: xml.tokenize
 
 ! XML namespace processing: ns = namespace
@@ -262,9 +262,15 @@ DEFER: direct
     [ yes/no>bool ] [ f ] if*
     <prolog> ;
 
+SYMBOL: string-input?
+: decode-input-if ( encoding -- )
+    string-input? get [ drop ] [ decode-input ] if ;
+
 : parse-prolog ( -- prolog )
     pass-blank middle-tag "?>" expect-string
     dup assure-no-extra prolog-attrs
+    dup encoding>> dup "UTF-16" =
+    [ drop ] [ name>encoding [ decode-input-if ] when* ] if
     dup prolog-data set ;
 
 : instruct ( -- instruction )
@@ -285,3 +291,50 @@ DEFER: direct
             CHAR: > expect
         ]
     } cond ;
+
+! Autodetecting encodings
+
+: start-utf16le ( -- tag )
+    utf16le decode-input-if
+    CHAR: ? expect
+    0 expect instruct ;
+
+: start< ( -- tag )
+    get-next {
+        { 0 [ next next start-utf16le ] }
+        { CHAR: ? [ next next instruct ] } ! XML prolog parsing sets the encoding
+        [ drop utf8 decode-input-if next make-tag ]
+        ! That is a hack. It fails if you have <nonascii
+    } case ;
+
+: skip-utf8-bom ( -- tag )
+    "\u0000bb\u0000bf" expect utf8 decode-input
+    CHAR: < expect make-tag ;
+
+: start-utf16be ( -- tag )
+    utf16be decode-input-if
+    next CHAR: < expect make-tag ;
+
+: skip-utf16le-bom ( -- tag )
+    utf16le decode-input-if
+    next HEX: FE expect
+    CHAR: < expect make-tag ;
+
+: skip-utf16be-bom ( -- tag )
+    utf16be decode-input-if
+    next HEX: FF expect
+    CHAR: < expect make-tag ;
+
+: start-document ( -- tag )
+    get-char {
+        { CHAR: < [ start< ] }
+        { 0 [ start-utf16be ] }
+        { HEX: EF [ skip-utf8-bom ] }
+        { HEX: FF [ skip-utf16le-bom ] }
+        { HEX: FE [ skip-utf16be-bom ] }
+        { f [ "" ] }
+        [ dup blank?
+          [ drop pass-blank utf8 decode-input-if CHAR: < expect make-tag ]
+          [ 1string ] if ! Replace with proper error
+        ]
+    } case ;
