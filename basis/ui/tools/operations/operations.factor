@@ -174,13 +174,15 @@ M: word com-stack-effect def>> com-stack-effect ;
     { +listener+ t }
 } define-operation
 
+USE: ui.gadgets.tables
+
 ! Operations -> commands
 source-editor
 "word"
 "These commands operate on the Factor word named by the token at the caret position."
 \ selected-word
 [ selected-word ]
-[ dup search [ ] [ no-word ] ?if ] 
+[ ]
 define-operation-map
 
 interactor

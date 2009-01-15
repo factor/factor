@@ -81,10 +81,10 @@ M: interactor ungraft*
     [ dup help>> remove-connection ] [ call-next-method ] bi ;
 
 M: interactor model-changed
-    2dup [ help>> eq? ] [ nip completion-popup>> not ] 2bi and
-    [ [ value>> ] dip show-summary ]
-    [ call-next-method ]
-    if ;
+    2dup help>> eq? [
+        dup completion-popup>>
+        [ 2drop ] [ [ value>> ] dip show-summary ] if
+    ] [ call-next-method ] if ;
 
 GENERIC: (print-input) ( object -- )
 
@@ -532,7 +532,7 @@ CONSTANT: completion-popup-offset { -4 0 }
 
 : word-completion-popup ( interactor -- )
     dup vocab-completion?
-    [ vocabs-matching ] [ words-matching ] ?
+    [ vocabs-matching ] [ words-matching ] ? '[ [ { } ] _ if-empty ]
     one-word-elt show-completion-popup ;
 
 : history-matching ( interactor -- alist )
@@ -554,6 +554,13 @@ M: interactor handle-gesture
         focusable-child resend-gesture
         [ call-next-method ] [ 2drop f ] if
     ] [ call-next-method ] if ;
+
+: selected-word ( editor -- word )
+    dup completion-popup>> [
+        [ table>> selected-row drop ] [ hide-completion-popup ] bi
+    ] [
+        selected-token dup search [ ] [ no-word ] ?if
+    ] ?if ;
 
 interactor "completion" f {
     { T{ key-down f f "TAB" } word-completion-popup }

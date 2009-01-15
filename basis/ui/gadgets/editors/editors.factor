@@ -462,7 +462,7 @@ editor "caret-motion" f {
 
 : select-word ( editor -- ) one-word-elt select-elt ;
 
-: selected-word ( editor -- string )
+: selected-token ( editor -- string )
     dup gadget-selection?
     [ dup select-word ] unless
     gadget-selection ;
