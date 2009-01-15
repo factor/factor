@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ascii assocs combinators fry io.encodings
-io.encodings.iana io.encodings.utf16 io.encodings.utf8 kernel
-make math.parser namespaces sequences sets splitting state-parser
-xml.char-classes xml.data xml.entities xml.errors strings ;
+USING: accessors arrays ascii assocs combinators
+combinators.short-circuit fry io.encodings io.encodings.iana
+io.encodings.string io.encodings.utf16 io.encodings.utf8 kernel make
+math math.parser namespaces sequences sets splitting state-parser
+strings xml.char-classes xml.data xml.entities xml.errors ;
 IN: xml.tokenize
 
 ! XML namespace processing: ns = namespace
@@ -53,17 +54,23 @@ SYMBOL: ns-stack
 
 ! version=1.0? is calculated once and passed around for efficiency
 
-: (parse-name) ( -- str )
-    version=1.0? dup
-    get-char name-start? [
-        [ dup get-char name-char? not ] take-until nip
-    ] [
-        "Malformed name" xml-string-error
-    ] if ;
+: assure-name ( str version=1.0? -- str )
+    over {
+        [ first name-start? ]
+        [ rest-slice [ name-char? ] with all? ]
+    } 2&& [ "Malformed name" xml-string-error ] unless ;
+
+: (parse-name) ( start -- str )
+    version=1.0?
+    [ [ get-char name-char? not ] curry take-until append ]
+    [ assure-name ] bi ;
+
+: parse-name-starting ( start -- name )
+    (parse-name) get-char CHAR: : =
+    [ next "" (parse-name) ] [ "" swap ] if f <name> ;
 
 : parse-name ( -- name )
-    (parse-name) get-char CHAR: : =
-    [ next (parse-name) ] [ "" swap ] if f <name> ;
+    "" parse-name-starting ;
 
 !   -- Parsing strings
 
@@ -99,7 +106,7 @@ SYMBOL: ns-stack
 
 : parse-text ( -- string )
     CHAR: < parse-char ;
-
+                                   
 ! Parsing tags
 
 : start-tag ( -- name ? )
@@ -274,7 +281,7 @@ SYMBOL: string-input?
     dup prolog-data set ;
 
 : instruct ( -- instruction )
-    (parse-name) dup "xml" =
+    "" (parse-name) dup "xml" =
     [ drop parse-prolog ] [
         dup >lower "xml" =
         [ capitalized-prolog ]
@@ -294,17 +301,33 @@ SYMBOL: string-input?
 
 ! Autodetecting encodings
 
+: continue-make-tag ( str -- tag )
+    parse-name-starting middle-tag end-tag CHAR: > expect ;
+
 : start-utf16le ( -- tag )
     utf16le decode-input-if
     CHAR: ? expect
     0 expect instruct ;
 
+: 10xxxxxx? ( ch -- ? )
+    -6 shift 3 bitand 2 = ;
+          
+: start<name ( ch -- tag )
+    ascii?
+    [ utf8 decode-input-if next make-tag ] [
+        next
+        [ get-next 10xxxxxx? not ] take-until
+        get-char suffix utf8 decode
+        utf8 decode-input-if next
+        continue-make-tag
+    ] if ;
+          
 : start< ( -- tag )
     get-next {
         { 0 [ next next start-utf16le ] }
         { CHAR: ? [ next next instruct ] } ! XML prolog parsing sets the encoding
-        [ drop utf8 decode-input-if next make-tag ]
-        ! That is a hack. It fails if you have <nonascii
+        { CHAR: ! [ utf8 decode-input next next direct ] }
+        [ start<name ]
     } case ;
 
 : skip-utf8-bom ( -- tag )
