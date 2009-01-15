@@ -130,6 +130,24 @@ M: string b, ( n string -- ) heap-size b, ;
         { CHAR: D read-double }
     } ;
 
+: packed-length-table ( -- hash )
+    H{
+        { CHAR: c 1 }
+        { CHAR: C 1 }
+        { CHAR: s 2 }
+        { CHAR: S 2 }
+        { CHAR: t 3 }
+        { CHAR: T 3 }
+        { CHAR: i 4 }
+        { CHAR: I 4 }
+        { CHAR: q 8 }
+        { CHAR: Q 8 }
+        { CHAR: f 4 }
+        { CHAR: F 4 }
+        { CHAR: d 8 }
+        { CHAR: D 8 }
+    } ;
+
 MACRO: (pack) ( seq str -- quot )
     [
         [
@@ -172,3 +190,22 @@ MACRO: (unpack) ( str -- quot )
 
 : unpack-le ( seq str -- seq )
     [ big-endian off (unpack) ] with-scope ;
+
+: packed-length ( str -- n )
+    [ packed-length-table at ] sigma ;
+
+ERROR: packed-read-fail str bytes ;
+
+: packed-read ( str -- bytes )
+    dup packed-length [ read dup length ] keep = [
+        nip
+    ] [
+        packed-read-fail
+    ] if ;
+
+: (read-packed) ( str quot -- seq )
+    [ packed-read ] swap bi ;
+
+: read-packed-le ( str -- seq ) [ unpack-le ] (read-packed) ;
+: read-packed-be ( str -- seq ) [ unpack-be ] (read-packed) ;
+: read-packed-native ( str -- seq ) [ unpack-native ] (read-packed) ;

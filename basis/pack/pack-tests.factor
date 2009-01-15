@@ -46,3 +46,5 @@ pack strings tools.test ;
 [ f ] [ "" [ read-c-string ] with-string-reader ] unit-test
 [ 5 ] [ "FRAM\0\u000005\0\0\0\0\0\0\0" [ read-c-string drop read-u64 ] with-string-reader ] unit-test
 
+[ 9 ]
+[ "iic" packed-length ] unit-test
