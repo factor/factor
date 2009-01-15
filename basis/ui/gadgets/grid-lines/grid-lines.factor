@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors math namespaces opengl opengl.gl
 sequences math.vectors ui.gadgets ui.gadgets.grids ui.render
@@ -14,9 +14,9 @@ SYMBOL: grid-dim
 : half-gap ( -- gap ) grid get gap>> [ 2/ ] map ; inline
 
 : grid-line-from/to ( orientation point -- from to )
-    half-gap v-
-    [ half-gap spin set-axis ] 2keep
-    grid-dim get spin set-axis ;
+    half-gap v- swap
+    [ [ half-gap ] 2dip set-axis ]
+    [ [ grid-dim get ] 2dip set-axis ] 2bi ;
 
 : draw-grid-lines ( gaps orientation -- )
     [ grid get swap grid-positions grid get rect-dim suffix ] dip
@@ -25,9 +25,9 @@ SYMBOL: grid-dim
 
 M: grid-lines draw-boundary
     color>> gl-color [
-        dup grid set
-        dup rect-dim half-gap v- grid-dim set
-        compute-grid
+        [ grid set ]
+        [ rect-dim half-gap v- grid-dim set ]
+        [ compute-grid ] tri
         [ { 1 0 } draw-grid-lines ]
         [ { 0 1 } draw-grid-lines ]
         bi*
