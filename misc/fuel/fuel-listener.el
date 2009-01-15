@@ -68,7 +68,8 @@ buffer."
       (setq fuel-listener--buffer (current-buffer)))))
 
 (defun fuel-listener--start-process ()
-  (let ((factor (expand-file-name fuel-listener-factor-binary))
+  (let ((factor (locate-file (expand-file-name fuel-listener-factor-binary)
+                             '("") exec-suffixes))
         (image (expand-file-name fuel-listener-factor-image))
         (comint-redirect-perform-sanity-check nil))
     (unless (file-executable-p factor)
@@ -132,8 +133,7 @@ buffer."
 
 (defun fuel-listener--setup-completion ()
   (setq fuel-syntax--current-vocab-function 'fuel-listener--current-vocab)
-  (setq fuel-syntax--usings-function 'fuel-listener--usings)
-  (set-syntax-table fuel-syntax--syntax-table))
+  (setq fuel-syntax--usings-function 'fuel-listener--usings))
 
 
 ;;; Stack mode support
@@ -160,7 +160,6 @@ buffer."
   (set (make-local-variable 'comint-prompt-regexp) fuel-con--prompt-regex)
   (set (make-local-variable 'comint-use-prompt-regexp) t)
   (set (make-local-variable 'comint-prompt-read-only) t)
-  (set-syntax-table fuel-syntax--syntax-table)
   (fuel-listener--setup-completion)
   (fuel-listener--setup-stack-mode))
 
