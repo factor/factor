@@ -257,7 +257,7 @@ M: listener-command invoke-command ( target command -- )
     command-quot call-listener ;
 
 M: listener-operation invoke-command ( target command -- )
-    [ hook>> call ] keep operation-quot call-listener ;
+    operation-quot call-listener ;
 
 : eval-listener ( string -- )
     get-listener input>> [ set-editor-string ] keep

@@ -181,7 +181,6 @@ source-editor
 "word"
 "These commands operate on the Factor word named by the token at the caret position."
 \ selected-word
-[ ]
 [ selected-word ]
 define-operation-map
 
@@ -189,6 +188,5 @@ interactor
 "quotation"
 "These commands operate on the entire contents of the input area."
 [ ]
-[ quot-action ]
-[ [ parse-lines ] with-compilation-unit ]
+[ quot-action [ parse-lines ] with-compilation-unit ]
 define-operation-map

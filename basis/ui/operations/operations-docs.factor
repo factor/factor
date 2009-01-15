@@ -61,8 +61,8 @@ HELP: define-operation
 } ;
 
 HELP: define-operation-map
-{ $values { "class" "a class word" } { "group" string } { "blurb" { $maybe string } } { "object" object } { "hook" { $quotation "( obj -- newobj )" } ", or " { $link f } } { "translator" { $quotation "( obj -- newobj )" } ", or " { $link f } } }
-{ $description "Defines a command map named " { $snippet "group" } " on " { $snippet "class" } " consisting of operations applicable to " { $snippet "object" } ". The hook quotation is applied to the target gadget; the translator quotation is applied to the result of the hook. Finally the result of the translator is passed to the operation. A distinction is drawn between the hook and the translator because for listener operations, the hook runs in the event loop and the translator runs in the listener. This avoids polluting the listener output with large prettyprinted gadgets and long quotations." } ;
+{ $values { "class" "a class word" } { "group" string } { "blurb" { $maybe string } } { "object" object } { "translator" { $quotation "( obj -- newobj )" } ", or " { $link f } } }
+{ $description "Defines a command map named " { $snippet "group" } " on " { $snippet "class" } " consisting of operations applicable to " { $snippet "object" } ". The translator quotation is applied to the target gadget, and the result of the translator is passed to the operation." } ;
 
 HELP: $operations
 { $values { "element" "a sequence" } }
