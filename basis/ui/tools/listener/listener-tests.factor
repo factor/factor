@@ -115,7 +115,7 @@ IN: ui.tools.listener.tests
     
     [ t ] [
         "i" get model>> doc-end
-        "i" get editor-caret* =
+        "i" get editor-caret =
     ] unit-test
 
     ! Race condition discovered by SimonRC

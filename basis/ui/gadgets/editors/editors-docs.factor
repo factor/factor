@@ -20,13 +20,13 @@ HELP: <editor>
 { $values { "editor" "a new " { $link editor } } }
 { $description "Creates a new " { $link editor } " with an empty document." } ;
 
-{ editor-caret* editor-mark* } related-words
+{ editor-caret editor-mark } related-words
 
-HELP: editor-caret*
+HELP: editor-caret
 { $values { "editor" editor } { "loc" "a pair of integers" } }
 { $description "Outputs the current caret location as a line/column number pair." } ;
 
-HELP: editor-mark*
+HELP: editor-mark
 { $values { "editor" editor } { "loc" "a pair of integers" } }
 { $description "Outputs the current mark location as a line/column number pair." } ;
 
@@ -66,8 +66,8 @@ HELP: set-editor-string
 
 ARTICLE: "gadgets-editors-selection" "The caret and mark"
 "If there is no selection, the caret and the mark are at the same location; otherwise the mark delimits the end-point of the selection opposite the caret."
-{ $subsection editor-caret* }
-{ $subsection editor-mark* }
+{ $subsection editor-caret }
+{ $subsection editor-mark }
 { $subsection change-caret }
 { $subsection change-caret&mark }
 { $subsection mark>caret }

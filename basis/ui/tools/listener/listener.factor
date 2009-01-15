@@ -57,7 +57,7 @@ completion-popup ;
     [ { 0 0 } ] 2dip doc-range ;
 
 : vocab-completion? ( interactor -- ? )
-    [ editor-caret* ] [ model>> ] bi up-to-caret " \r\n" split
+    [ editor-caret ] [ model>> ] bi up-to-caret " \r\n" split
     { [ complete-IN:/USE:? ] [ complete-USING:? ] } 1|| ;
 
 : <word-model> ( interactor -- model )
@@ -467,7 +467,7 @@ M: completion-popup hide-glass-hook
     find-world hide-glass ;
 
 : completion-loc/doc ( popup -- loc doc )
-    interactor>> [ editor-caret* ] [ model>> ] bi ;
+    interactor>> [ editor-caret ] [ model>> ] bi ;
 
 : accept-completion ( item table -- )
     find-completion-popup
@@ -503,7 +503,7 @@ CONSTANT: completion-popup-offset { -4 0 }
 
 : (completion-popup-loc) ( interactor element -- loc )
     [ drop screen-loc ] [
-        [ [ [ editor-caret* ] [ model>> ] bi ] dip prev-elt ] [ drop ] 2bi
+        [ [ [ editor-caret ] [ model>> ] bi ] dip prev-elt ] [ drop ] 2bi
         loc>point
     ] 2bi v+ completion-popup-offset v+ ;
 
