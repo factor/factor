@@ -22,7 +22,6 @@ ARTICLE: "ui-listener" "UI listener"
 }
 { $command-map listener-gadget "toolbar" }
 { $command-map listener-gadget "scrolling" }
-{ $command-map listener-gadget "workflow" }
 { $command-map listener-gadget "multi-touch" }
 { $command-map interactor "interactor" }
 { $command-map source-editor "word" }
