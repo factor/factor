@@ -72,6 +72,18 @@
 
 ;;; Font lock:
 
+(defun fuel-font-lock--syntactic-face (state)
+  (cond ((nth 3 state) 'factor-font-lock-string)
+        ((char-equal (char-after (nth 8 state)) ?\ )
+         (save-excursion
+           (goto-char (nth 8 state))
+           (beginning-of-line)
+           (cond ((looking-at "USING: ") 'factor-font-lock-vocabulary-name)
+                 ((looking-at "\\(TUPLE\\|SYMBOLS\\|VARS\\): ")
+                  'factor-font-lock-symbol)
+                 (t 'font-lock-warning-face))))
+        (t 'factor-font-lock-comment)))
+
 (defconst fuel-font-lock--font-lock-keywords
   `((,fuel-syntax--stack-effect-regex . 'factor-font-lock-stack-effect)
     (,fuel-syntax--brace-words-regex 1 'factor-font-lock-parsing-word)
@@ -99,14 +111,14 @@
 (defun fuel-font-lock--font-lock-setup (&optional keywords no-syntax)
   (set (make-local-variable 'comment-start) "! ")
   (set (make-local-variable 'parse-sexp-lookup-properties) t)
-  (set (make-local-variable 'font-lock-comment-face) 'factor-font-lock-comment)
-  (set (make-local-variable 'font-lock-string-face) 'factor-font-lock-string)
   (set (make-local-variable 'font-lock-defaults)
        `(,(or keywords 'fuel-font-lock--font-lock-keywords)
          nil nil nil nil
          ,@(if no-syntax nil
              (list (cons 'font-lock-syntactic-keywords
-                         fuel-syntax--syntactic-keywords))))))
+                         fuel-syntax--syntactic-keywords)
+                   (cons 'font-lock-syntactic-face-function
+                         'fuel-font-lock--syntactic-face))))))
 
 
 ;;; Fontify strings as Factor code:
