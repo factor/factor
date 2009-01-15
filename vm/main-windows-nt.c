@@ -19,7 +19,7 @@ int WINAPI WinMain(
 		return 1;
 	}
 
-	init_factor_from_args(NULL,nArgs,szArglist,false);
+	init_factor_from_args(nArgs,szArglist);
 
 	LocalFree(szArglist);
 
