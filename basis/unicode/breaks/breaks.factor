@@ -61,7 +61,7 @@ SYMBOL: table
 : eval-seq ( seq -- seq ) [ dup word? [ execute ] when ] map ;
 
 : (set-table) ( class1 class2 val -- )
-    -rot table get nth [ swap or ] change-nth ;
+    [ table get nth ] dip '[ _ or ] change-nth ;
 
 : set-table ( classes1 classes2 val -- )
     [ [ eval-seq ] bi@ ] dip
