@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables io io.streams.plain io.streams.string
 colors summary make accessors splitting math.order
-kernel namespaces assocs destructors strings sequences ;
+kernel namespaces assocs destructors strings sequences
+present ;
 IN: io.styles
 
 GENERIC: stream-format ( str style stream -- )
@@ -171,6 +172,8 @@ SYMBOL: table-border
 TUPLE: input string ;
 
 C: <input> input
+
+M: input present string>> ;
 
 M: input summary
     [

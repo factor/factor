@@ -1,18 +1,20 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: inspector kernel help help.markup io io.styles models
+USING: inspector kernel help help.markup io io.styles models math.vectors
 strings splitting namespaces parser quotations sequences vocabs words
 continuations prettyprint listener debugger threads boxes
 concurrency.flags math arrays generic accessors combinators
-assocs fry generic.standard.engines.tuple combinators.short-circuit
+combinators.short-circuit combinators.smart
+assocs fry generic.standard.engines.tuple
 tools.vocabs concurrency.mailboxes vocabs.parser calendar
 models.delay models.filter documents hashtables sets destructors lexer
 ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.packs ui.gadgets.tracks ui.gadgets.borders
 ui.gadgets.frames ui.gadgets.grids ui.gadgets.status-bar
-ui.gadgets.wrappers ui.gestures ui.operations ui.tools.browser
-ui.tools.debugger ui.tools.inspector ui.tools.common ui ;
+ui.gadgets.viewports ui.gadgets.wrappers ui.gestures ui.operations
+ui.tools.browser ui.tools.debugger ui.gadgets.theme
+ui.tools.inspector ui.tools.common ui ;
 IN: ui.tools.listener
 
 ! If waiting is t, we're waiting for user input, and invoking
@@ -79,31 +81,35 @@ M: interactor ungraft*
     [ dup help>> remove-connection ] [ call-next-method ] bi ;
 
 M: interactor model-changed
-    2dup help>> eq?
+    2dup [ help>> eq? ] [ nip completion-popup>> not ] 2bi and
     [ [ value>> ] dip show-summary ]
     [ call-next-method ]
     if ;
 
-: write-input ( string input -- )
-    <input> presented associate
-    [ H{ { font-style bold } } format ] with-nesting ;
+GENERIC: (print-input) ( object -- )
 
-: interactor-input. ( string interactor -- )
-    output>> [
-        dup string? [ dup write-input nl ] [ short. ] if
-    ] with-output-stream* ;
+M: input (print-input)
+    dup presented associate
+    [ string>> H{ { font-style bold } } format ] with-nesting nl ;
 
-: add-interactor-history ( str interactor -- )
-    over empty? [ 2drop ] [ history>> adjoin ] if ;
+M: object (print-input)
+    short. ;
+
+: print-input ( object interactor -- )
+    output>> [ (print-input) ] with-output-stream* ;
+
+: add-interactor-history ( input interactor -- )
+    over string>> empty? [ 2drop ] [ history>> adjoin ] if ;
 
 : interactor-continue ( obj interactor -- )
     mailbox>> mailbox-put ;
 
 : interactor-finish ( interactor -- )
-    [ editor-string ] keep
-    [ interactor-input. ] 2keep
-    [ add-interactor-history ] keep
-    clear-editor ;
+    [ editor-string <input> ] keep
+    [ print-input ]
+    [ add-interactor-history ]
+    [ clear-editor drop ]
+    2tri ;
 
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
@@ -111,9 +117,9 @@ M: interactor model-changed
     ] unless drop ;
 
 : evaluate-input ( interactor -- )
-    dup interactor-busy? [
-        dup control-value over interactor-continue
-    ] unless drop ;
+    dup interactor-busy? [ drop ] [
+        [ control-value ] keep interactor-continue
+    ] if ;
 
 : interactor-yield ( interactor -- obj )
     dup thread>> self eq? [
@@ -132,10 +138,9 @@ M: interactor stream-readln
     interactor-read dup [ first ] when ;
 
 : interactor-call ( quot interactor -- )
-    dup interactor-busy? [
-        2dup interactor-input.
-        2dup interactor-continue
-    ] unless 2drop ;
+    dup interactor-busy? [ 2drop ] [
+        [ print-input ] [ interactor-continue ] 2bi
+    ] if ;
 
 M: interactor stream-read
     swap dup zero? [
@@ -299,10 +304,10 @@ M: engine-word word-completion-string method-completion-string ;
     2bi ;
 
 : quot-action ( interactor -- lines )
-    [ control-value ] keep
-    [ [ "\n" join ] dip add-interactor-history ]
+    [ [ editor-string <input> ] keep add-interactor-history ]
+    [ control-value ]
     [ select-all ]
-    2bi ;
+    tri ;
 
 : hide-popup ( listener -- )
     dup popup>> track-remove
@@ -456,22 +461,23 @@ M: completion-renderer row-value drop ;
     '[ @ keys 1000 short head ] <filter> ;
 
 M: completion-popup hide-glass-hook
-    interactor>> f >>completion-popup drop ;
+    interactor>> f >>completion-popup request-focus ;
 
 : hide-completion-popup ( popup -- )
     find-world hide-glass ;
 
-: completion-loc/doc/elt ( popup -- loc doc elt )
-    [ interactor>> [ editor-caret* ] [ model>> ] bi ] [ element>> ] bi ;
+: completion-loc/doc ( popup -- loc doc )
+    interactor>> [ editor-caret* ] [ model>> ] bi ;
 
 : accept-completion ( item table -- )
     find-completion-popup
-    [ [ present ] [ completion-loc/doc/elt ] bi* set-elt-string ]
+    [ [ present ] [ completion-loc/doc ] bi* one-word-elt set-elt-string ]
     [ hide-completion-popup ]
     bi ;
 
 : <completion-table> ( interactor quot -- table )
     <completion-model> <table>
+        monospace-font >>font
         t >>selection-required?
         completion-renderer >>renderer
         dup '[ _ accept-completion ] >>action ;
@@ -493,24 +499,49 @@ completion-popup H{
     { T{ key-down f f " " } [ table>> row-action ] }
 } set-gestures
 
-: show-completion-popup ( interactor quot -- )
-    [ >>completion-popup ] keep
-    [ find-world ] dip
-    { 0 0 } show-glass ;
+CONSTANT: completion-popup-offset { -4 0 }
+
+: (completion-popup-loc) ( interactor element -- loc )
+    [ drop screen-loc ] [
+        [ [ [ editor-caret* ] [ model>> ] bi ] dip prev-elt ] [ drop ] 2bi
+        loc>point
+    ] 2bi v+ completion-popup-offset v+ ;
+
+: completion-popup-loc-1 ( interactor element -- loc )
+    [ (completion-popup-loc) ] [ drop caret-dim ] 2bi v+ ;
+
+: completion-popup-loc-2 ( interactor element popup -- loc )
+    [ (completion-popup-loc) ] dip pref-dim { 0 1 } v* v- ;
+
+: completion-popup-fits? ( interactor element popup -- ? )
+    [ [ completion-popup-loc-1 ] dip pref-dim v+ ]
+    [ 2drop find-world dim>> ]
+    3bi [ second ] bi@ <= ;
+
+: completion-popup-loc ( interactor element popup -- loc )
+    3dup completion-popup-fits?
+    [ drop completion-popup-loc-1 ]
+    [ completion-popup-loc-2 ]
+    if ;
+
+: show-completion-popup ( interactor quot element -- )
+    [ nip ] [ drop <completion-popup> ] 3bi
+    [ nip >>completion-popup drop ]
+    [ [ 2drop find-world ] [ 2nip ] [ completion-popup-loc ] 3tri ] 3bi
+    show-glass ;
 
 : word-completion-popup ( interactor -- )
-    dup dup vocab-completion?
+    dup vocab-completion?
     [ vocabs-matching ] [ words-matching ] ?
-    <completion-popup> one-word-elt >>element
-    show-completion-popup ;
+    one-word-elt show-completion-popup ;
 
-: history-matching ( string interactor -- alist )
-    history>> <reversed> dup zip completions ;
+: history-matching ( interactor -- alist )
+    history>>
+    [ dup string>> { { CHAR: \n CHAR: \s } } substitute ] { } map>assoc
+    <reversed> ;
 
 : history-completion-popup ( interactor -- )
-    dup dup '[ _ history-matching ]
-    <completion-popup> one-line-elt >>element
-    show-completion-popup ;
+    dup '[ drop _ history-matching ] one-line-elt show-completion-popup ;
 
 : pass-to-popup? ( gesture interactor -- ? )
     [ [ key-down? ] [ key-up? ] bi or ]

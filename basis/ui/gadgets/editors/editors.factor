@@ -146,9 +146,11 @@ M: editor ungraft*
 : line>y ( lines# editor -- y )
     line-height * ;
 
-: caret-loc ( editor -- loc )
-    [ editor-caret* ] keep
+: loc>point ( loc editor -- loc )
     [ loc>x ] [ [ first ] dip line>y ] 2bi 2array ;
+
+: caret-loc ( editor -- loc )
+    [ editor-caret* ] keep loc>point ;
 
 : caret-dim ( editor -- dim )
     line-height 0 swap 2array ;

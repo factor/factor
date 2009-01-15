@@ -209,9 +209,19 @@ PRIVATE>
 : initial-selected-index ( model table -- n/f )
     [ value>> length 1 >= ] [ selection-required?>> ] bi* and 0 f ? ;
 
+: show-row-summary ( table n -- )
+    over nth-row
+    [ swap [ renderer>> row-value ] keep show-summary ]
+    [ 2drop ]
+    if ;
+
 M: table model-changed
-    tuck initial-selected-index >>selected-index
-    [ update-selected-value ] [ relayout ] bi ;
+    tuck initial-selected-index {
+        [ >>selected-index drop ]
+        [ show-row-summary ]
+        [ drop update-selected-value ]
+        [ drop relayout ]
+    } 2cleave ;
 
 : thin-row-rect ( table row -- rect )
     row-rect [ { 0 1 } v* ] change-dim ;
@@ -242,14 +252,12 @@ PRIVATE>
     hand-click# get 2 =
     [ row-action ] [ update-selected-value ] if ;
 
-: show-row-summary ( row table -- )
-    [ renderer>> row-value ] keep show-summary ;
-
 : select-row ( table n -- )
     over validate-row
     [ (select-row) ]
     [ drop update-selected-value ]
-    [ over nth-row drop swap show-row-summary ] 2tri ;
+    [ show-row-summary ]
+    2tri ;
 
 : prev-row ( table -- )
     dup selected-index>> [ 1- ] [ 0 ] if* select-row ;
@@ -275,11 +283,10 @@ PRIVATE>
 
 : show-mouse-help ( table -- )
     [
-        [ swap >>mouse-index relayout-1 ]
-        [
-            [ nth-row ] keep
-            swap [ show-row-summary ] [ 2drop ] if
-        ] 2bi
+        swap
+        [ >>mouse-index relayout-1 ]
+        [ show-row-summary ]
+        2bi
     ] [ hide-mouse-help ] if-mouse-row ;
 
 : table-operations-menu ( table -- )
