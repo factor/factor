@@ -181,8 +181,8 @@ source-editor
 "word"
 "These commands operate on the Factor word named by the token at the caret position."
 \ selected-word
-[ selected-word ]
 [ ]
+[ selected-word ]
 define-operation-map
 
 interactor
