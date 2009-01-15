@@ -32,17 +32,6 @@ M: no-entity summary ( obj -- str )
         "Entity does not exist: &" write thing>> write ";" print
     ] with-string-writer ;
 
-TUPLE: xml-string-error < parsing-error string ; ! this should not exist
-
-: xml-string-error ( string -- * )
-    \ xml-string-error parsing-error swap >>string throw ;
-
-M: xml-string-error summary ( obj -- str )
-    [
-        dup call-next-method write
-        string>> print
-    ] with-string-writer ;
-
 TUPLE: mismatched < parsing-error open close ;
 
 : mismatched ( open close -- * )
@@ -233,7 +222,34 @@ M: misplaced-directive summary ( obj -- str )
         dir>> write-xml-chunk nl
     ] with-string-writer ;
 
+TUPLE: bad-name < parsing-error name ;
+
+: bad-name ( name -- * )
+    \ bad-name parsing-error swap >>name throw ;
+
+M: bad-name summary ( obj -- str )
+    [ call-next-method ]
+    [ "Invalid name: " swap name>> "\n" 3append ]
+    bi append ;
+
+TUPLE: unclosed-quote < parsing-error ;
+
+: unclosed-quote ( -- * )
+    \ unclosed-quote parsing-error throw ;
+
+M: unclosed-quote summary
+    call-next-method
+    "XML document ends with quote still open\n" append ;
+
+TUPLE: quoteless-attr < parsing-error ;
+
+: quoteless-attr ( -- * )
+    \ quoteless-attr parsing-error throw ;
+
+M: quoteless-attr summary
+    call-next-method "Attribute lacks quotes around value\n" append ;
+
 UNION: xml-parse-error multitags notags extra-attrs nonexist-ns
-       not-yes/no unclosed mismatched xml-string-error expected no-entity
+       not-yes/no unclosed mismatched expected no-entity
        bad-prolog versionless-prolog capitalized-prolog bad-instruction
-       bad-directive ;
+       bad-directive bad-name unclosed-quote quoteless-attr ;

@@ -58,7 +58,7 @@ SYMBOL: ns-stack
     over {
         [ first name-start? ]
         [ rest-slice [ name-char? ] with all? ]
-    } 2&& [ "Malformed name" xml-string-error ] unless ;
+    } 2&& [ bad-name ] unless ;
 
 : (parse-name) ( start -- str )
     version=1.0?
@@ -102,7 +102,7 @@ SYMBOL: ns-stack
 
 : parse-quot ( ch -- string )
     parse-char get-char
-    [ "XML file ends in a quote" xml-string-error ] unless ;
+    [ unclosed-quote ] unless ;
 
 : parse-text ( -- string )
     CHAR: < parse-char ;
@@ -115,11 +115,8 @@ SYMBOL: ns-stack
     parse-name swap ;
 
 : parse-attr-value ( -- seq )
-    get-char dup "'\"" member? [
-        next parse-quot
-    ] [
-        "Attribute lacks quote" xml-string-error
-    ] if ;
+    get-char dup "'\"" member?
+    [ next parse-quot ] [ quoteless-attr ] if ;
 
 : parse-attr ( -- )
     [ parse-name ] with-scope
@@ -358,6 +355,6 @@ SYMBOL: string-input?
         { f [ "" ] }
         [ dup blank?
           [ drop pass-blank utf8 decode-input-if CHAR: < expect make-tag ]
-          [ 1string ] if ! Replace with proper error
+          [ 1string ] if ! Replace with proper error?
         ]
     } case ;
