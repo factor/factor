@@ -10,7 +10,7 @@ tools.profiler tools.test tools.time tools.walker
 ui.commands ui.gadgets.editors ui.gestures
 ui.operations ui.tools.deploy vocabs vocabs.loader words
 sequences tools.vocabs classes compiler.units accessors
-vocabs.parser ;
+vocabs.parser macros.expander ;
 IN: ui.tools.operations
 
 V{ } clone operations set-global
@@ -169,6 +169,13 @@ M: word com-stack-effect def>> com-stack-effect ;
 
 [ quotation? ] \ com-profile H{
     { +keyboard+ T{ key-down f { C+ } "f" } }
+    { +listener+ t }
+} define-operation
+
+: com-expand-macros ( quot -- ) expand-macros . ;
+
+[ quotation? ] \ com-expand-macros H{
+    { +keyboard+ T{ key-down f { C+ } "m" } }
     { +listener+ t }
 } define-operation
 
