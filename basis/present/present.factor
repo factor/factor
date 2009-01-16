@@ -12,7 +12,7 @@ M: string present ;
 
 M: word present name>> ;
 
-M: vocab present name>> ;
+M: vocab-spec present name>> ;
 
 M: effect present effect>string ;
 
