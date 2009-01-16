@@ -35,12 +35,12 @@ M: presentation ungraft*
     dup hand-gadget get-global child? [ dup hide-status ] when
     call-next-method ;
 
-: show-operations-menu ( presentation -- )
+: show-presentation-menu ( presentation -- )
     [ ] [ object>> ] [ dup hook>> curry ] tri
-    <operations-menu> show-menu ;
+    show-operations-menu ;
 
 presentation H{
-    { T{ button-down f f 3 } [ show-operations-menu ] }
+    { T{ button-down f f 3 } [ show-presentation-menu ] }
     { T{ mouse-leave } [ [ hide-status ] [ button-update ] bi ] }
     { T{ mouse-enter } [ show-mouse-help ] }
     ! Responding to motion too allows nested presentations to

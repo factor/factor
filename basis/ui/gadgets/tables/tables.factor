@@ -17,7 +17,7 @@ M: trivial-renderer row-columns drop ;
 M: object row-value drop ;
 
 TUPLE: table < gadget
-renderer filled-column column-alignment action
+renderer filled-column column-alignment action hook
 column-widths total-width
 font text-color selection-color focus-border-color
 mouse-color column-line-color selection-required?
@@ -30,6 +30,7 @@ focused? ;
         swap >>model
         trivial-renderer >>renderer
         [ drop ] >>action
+        [ ] >>hook
         f <model> >>selected-value
         sans-serif-font >>font
         selection-color >>selection-color
@@ -289,10 +290,10 @@ PRIVATE>
         2bi
     ] [ hide-mouse-help ] if-mouse-row ;
 
-: table-operations-menu ( table -- )
+: show-table-menu ( table -- )
     [
-        [ nth-row drop ] keep [ renderer>> row-value ] keep
-        swap show-operations-menu
+        tuck [ nth-row drop ] [ renderer>> row-value ] [ hook>> ] tri
+        show-operations-menu
     ] [ drop ] if-mouse-row ;
 
 table H{
@@ -300,7 +301,7 @@ table H{
     { T{ mouse-leave } [ hide-mouse-help ] }
     { T{ motion } [ show-mouse-help ] }
     { T{ button-down } [ table-button-down ] }
-    { T{ button-down f f 3 } [ table-operations-menu ] }
+    { T{ button-down f f 3 } [ show-table-menu ] }
     { T{ button-up } [ table-button-up ] }
     { T{ gain-focus } [ t >>focused? drop ] }
     { T{ lose-focus } [ f >>focused? drop ] }

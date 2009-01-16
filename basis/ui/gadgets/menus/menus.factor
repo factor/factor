@@ -34,5 +34,5 @@ IN: ui.gadgets.menus
 : <operations-menu> ( target hook -- menu )
     over object-operations <commands-menu> ;
 
-: show-operations-menu ( gadget target -- )
-    [ ] <operations-menu> show-menu ;
+: show-operations-menu ( gadget target hook -- )
+    <operations-menu> show-menu ;

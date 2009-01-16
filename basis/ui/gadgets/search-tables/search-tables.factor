@@ -25,12 +25,21 @@ TUPLE: search-field < track field ;
 
 TUPLE: search-table < track table field ;
 
-! We don't want to delegate all slots, just a few setters
-PROTOCOL: table-protocol
-renderer>> (>>renderer)
-filled-column>> (>>filled-column)
-selected-value>> (>>selected-value)
-column-alignment>> (>>column-alignment) ;
+! A protocol with customizable slots
+SLOT-PROTOCOL: table-protocol
+renderer
+filled-column
+column-alignment
+action
+hook
+font
+text-color
+selection-color
+focus-border-color
+mouse-color
+column-line-color
+selection-required?
+selected-value ;
 
 CONSULT: table-protocol search-table table>> ;
 
