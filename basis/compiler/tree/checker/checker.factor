@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences kernel sets namespaces accessors assocs
 arrays combinators continuations columns math vectors
-stack-checker.branches
+grouping stack-checker.branches
 compiler.tree
 compiler.tree.def-use
 compiler.tree.combinators ;
