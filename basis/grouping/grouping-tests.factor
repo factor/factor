@@ -1,4 +1,5 @@
-USING: grouping tools.test kernel sequences arrays ;
+USING: grouping tools.test kernel sequences arrays
+math ;
 IN: grouping.tests
 
 [ { 1 2 3 } 0 group ] must-fail
