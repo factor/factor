@@ -27,7 +27,7 @@ TUPLE: label < gadget text font color ;
     label new-label ;
 
 M: label pref-dim*
-    [ font>> open-font ] [ text>> ] bi text-dim ;
+    [ font>> ] [ text>> ] bi text-dim ;
 
 M: label draw-gadget*
     [ color>> gl-color ]

@@ -213,31 +213,27 @@ HOOK: string-height font-renderer ( open-font string -- h )
 
 HOOK: draw-string font-renderer ( font string loc -- )
 
-HOOK: x>offset font-renderer ( x open-font string -- n )
+HOOK: x>offset font-renderer ( x font string -- n )
 
 HOOK: free-fonts font-renderer ( world -- )
 
 : text-height ( open-font text -- n )
-    dup string? [
-        string-height
-    ] [
-        [ string-height ] with map sum
+    [ open-font ] dip
+    dup string? [ string-height ] [
+        [ string-height ] with sigma
     ] if ;
 
 : text-width ( open-font text -- n )
-    dup string? [
-        string-width
-    ] [
+    [ open-font ] dip
+    dup string? [ string-width ] [
         [ 0 ] 2dip [ string-width max ] with each
     ] if ;
 
-: text-dim ( open-font text -- dim )
-    [ text-width ] 2keep text-height 2array ;
+: text-dim ( font text -- dim )
+    [ text-width ] [ text-height ] 2bi 2array ;
 
 : draw-text ( font text loc -- )
-    over string? [
-        draw-string
-    ] [
+    over string? [ draw-string ] [
         [
             [
                 2dup { 0 0 } draw-string

@@ -108,7 +108,9 @@ SYMBOL: dpi
         init-font ;
 
 M: freetype-renderer open-font ( font -- open-font )
-    freetype drop open-fonts get [ <font> ] cache ;
+    dup font? [
+        freetype drop open-fonts get [ <font> ] cache
+    ] unless ;
 
 : load-glyph ( font char -- glyph )
     [ handle>> dup ] dip 0 FT_Load_Char
@@ -215,7 +217,8 @@ M: freetype-renderer draw-string ( font string loc -- )
 : run-char-widths ( open-font string -- widths )
     char-widths [ scan-sums ] [ 2 v/n ] bi v+ ;
 
-M: freetype-renderer x>offset ( x open-font string -- n )
+M: freetype-renderer x>offset ( x font string -- n )
+    [ open-font ] dip
     [ run-char-widths [ <= ] with find drop ] keep swap
     [ ] [ length ] ?if ;
 

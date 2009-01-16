@@ -27,6 +27,7 @@ IN: ui.tools.listener.completion
 
 ! We don't directly depend on the listener tool but we use a couple
 ! of slots
+SLOT: completion-popup
 SLOT: interactor
 SLOT: history
 

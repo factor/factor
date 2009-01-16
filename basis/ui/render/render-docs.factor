@@ -1,6 +1,6 @@
 USING: ui.gadgets ui.gestures help.markup help.syntax
 kernel classes strings opengl opengl.gl models
-math.geometry.rect ;
+math.geometry.rect math ;
 IN: ui.render
 
 HELP: gadget
@@ -67,10 +67,24 @@ HELP: open-font
 
 HELP: string-width
 { $values { "open-font" "a value output by " { $link open-font } } { "string" string } { "w" "a positive integer" } }
-{ $description "Outputs the width of a string." } ;
+{ $description "Outputs the width of a string." }
+{ $notes "This is a low-level word; use " { $link text-width } " instead." } ;
+
+HELP: text-width
+{ $values { "font" "a font specifier" } { "text" "a string or sequence of strings" } { "w" "a positive integer" } }
+{ $description "Outputs the width of a piece of text." } ;
+
+HELP: string-height
+{ $values { "open-font" "a value output by " { $link open-font } } { "string" string } { "w" "a positive integer" } }
+{ $description "Outputs the height of a string." }
+{ $notes "This is a low-level word; use " { $link text-height } " instead." } ;
+
+HELP: text-height
+{ $values { "font" "a font specifier" } { "text" "a string or sequence of strings" } { "w" "a positive integer" } }
+{ $description "Outputs the height of a piece of text." } ;
 
 HELP: text-dim
-{ $values { "open-font" "a value output by " { $link open-font } } { "text" "a string or an array of strings" } { "dim" "a pair of integers" } }
+{ $values { "font" "a font specifier" } { "text" "a string or sequence of strings" } { "dim" "a pair of integers" } }
 { $description "Outputs the dimensions of a piece of text, which is either a single-line string or an array of lines." } ;
 
 HELP: draw-string
@@ -79,7 +93,11 @@ HELP: draw-string
 
 HELP: draw-text
 { $values { "font" "a font specifier" } { "text" "a string or an array of strings" } { "loc" "a pair of integers" } }
-{ $description "Draws text. Text is either a single-line string or an array of lines." } ;
+{ $description "Draws a piece of text." } ;
+
+HELP: x>offset
+{ $values { "x" real } { "font" "a font specifier" } { "string" string } { "n" integer } }
+{ $description "Outputs the string index closest to the given x co-ordinate." } ;
 
 ARTICLE: "gadgets-polygons" "Polygon gadgets"
 "A polygon gadget renders a simple shaded polygon."
@@ -119,15 +137,17 @@ $nl
 ARTICLE: "text-rendering" "Rendering text"
 "Unlike OpenGL, Factor's FreeType binding only includes the bare essentials, and there is rarely any need to directly call words in the " { $vocab-link "freetype" } " vocabulary directly. Instead, the UI provides high-level wrappers."
 $nl
-"Font objects are never constructed directly, and instead are obtained by calling a word:"
-{ $subsection open-font }
 "Measuring text:"
 { $subsection text-dim }
-{ $subsection text-height }
 { $subsection text-width }
+{ $subsection text-height }
 "Rendering text:"
-{ $subsection draw-string }
-{ $subsection draw-text } ;
+{ $subsection draw-text }
+"Low-level text protocol for UI backends:"
+{ $subsection open-font }
+{ $subsection string-width }
+{ $subsection string-height }
+{ $subsection draw-string } ;
 
 ARTICLE: "ui-paint-coord" "The UI co-ordinate system"
 "The UI uses a co-ordinate system where the y axis is oriented down. The OpenGL " { $link GL_MODELVIEW } " matrix is not saved or restored when rendering a gadget. Instead, the origin of the gadget relative to the OpenGL context is stored in a variable:"

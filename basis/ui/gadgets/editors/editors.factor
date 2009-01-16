@@ -101,10 +101,8 @@ M: editor ungraft*
 
 : editor-line ( n editor -- str ) control-value nth ;
 
-: editor-font* ( editor -- font ) font>> open-font ;
-
 : line-height ( editor -- n )
-    editor-font* "" string-height ;
+    font>> "" text-height ;
 
 : y>line ( y editor -- line# )
     line-height /i ;
@@ -116,7 +114,7 @@ M: editor ungraft*
         [| n |
             n
             point first
-            editor editor-font*
+            editor font>>
             n editor editor-line
             x>offset 2array
         ]
@@ -129,17 +127,13 @@ M: editor ungraft*
     [ clicked-loc ] dip set-model ;
 
 : focus-editor ( editor -- )
-    dup start-blinking
-    t >>focused?
-    relayout-1 ;
+    [ start-blinking ] [ t >>focused? relayout-1 ] bi ;
 
 : unfocus-editor ( editor -- )
-    dup stop-blinking
-    f >>focused?
-    relayout-1 ;
+    [ stop-blinking ] [ f >>focused? relayout-1 ] bi ;
 
 : offset>x ( col# line# editor -- x )
-    [ editor-line ] keep editor-font* spin head-slice string-width ;
+    [ editor-line ] keep font>> spin head text-width ;
 
 : loc>x ( loc editor -- x ) [ first2 swap ] dip offset>x ;
 
@@ -248,7 +242,7 @@ M: editor draw-gadget*
     [ draw-selection draw-lines draw-caret ] with-editor ;
 
 M: editor pref-dim*
-    dup editor-font* swap control-value text-dim ;
+    [ font>> ] [ control-value ] bi text-dim ;
 
 : contents-changed ( model editor -- )
     swap
@@ -563,7 +557,7 @@ TUPLE: field < wrapper editor min-width max-width ;
     [ <editor> dup <field-border> ] dip new-wrapper swap >>editor ; inline
 
 : column-width ( editor n -- width )
-    [ editor>> editor-font* ] dip CHAR: \s <string> string-width ;
+    [ editor>> font>> ] [ CHAR: \s <string> ] bi* text-width ;
 
 M: field pref-dim*
     [ call-next-method ]

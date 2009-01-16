@@ -41,7 +41,7 @@ focused? ;
 <PRIVATE
 
 : line-height ( table -- n )
-    font>> open-font "" string-height ;
+    font>> "" text-height ;
 
 CONSTANT: table-gap 6
 
@@ -51,12 +51,12 @@ CONSTANT: table-gap 6
 : (compute-column-widths) ( font rows -- total widths )
     [ drop 0 { } ] [
         tuck [ first length 0 <repetition> ] 2dip
-        [ [ string-width ] with map vmax ] with each
+        [ [ text-width ] with map vmax ] with each
         [ [ sum ] [ length 1 [-] table-gap * ] bi + ] keep
     ] if-empty ;
 
 : compute-column-widths ( table -- total-width column-widths )
-    [ font>> open-font ] [ table-rows ] bi (compute-column-widths) ;
+    [ font>> ] [ table-rows ] bi (compute-column-widths) ;
 
 : update-cached-widths ( table -- )
     dup compute-column-widths
@@ -136,7 +136,7 @@ M: table layout*
     [ rect-extent nip ] visible-row 1+ ;
 
 : column-loc ( font column width align -- loc )
-    [ [ [ open-font ] dip string-width ] dip swap - ] dip
+    [ [ text-width ] dip swap - ] dip
     * 0 2array ;
 
 : draw-column ( font column width align -- )
@@ -185,7 +185,7 @@ M: table draw-gadget*
 
 M: table pref-dim*
     [ compute-column-widths drop ] keep
-    [ font>> open-font "" string-height ]
+    [ font>> "" text-height ]
     [ control-value length ]
     bi * 2array ;
 
