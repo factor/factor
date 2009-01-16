@@ -208,6 +208,9 @@
           (format ":[^ ]* [^ ]+\\(%s\\)*" fuel-syntax--stack-effect-regex)
           "M[^:]*: [^ ]+ [^ ]+"))
 
+(defconst fuel-syntax--constructor-regex
+  "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+
 
 ;;; Factor syntax table
 
