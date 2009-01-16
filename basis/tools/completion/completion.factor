@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel arrays sequences math namespaces
 strings io fry vectors words assocs combinators sorting
-unicode.case unicode.categories math.order vocabs ;
+unicode.case unicode.categories math.order vocabs
+tools.vocabs ;
 IN: tools.completion
 
 : (fuzzy) ( accum ch i full -- accum i ? )
@@ -75,4 +76,4 @@ IN: tools.completion
     all-words name-completions ;
 
 : vocabs-matching ( str -- seq )
-    dictionary get values name-completions ;
+    all-vocabs-seq name-completions ;
