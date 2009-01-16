@@ -6,7 +6,7 @@ io io.streams.string prettyprint definitions arrays vectors
 combinators combinators.short-circuit splitting debugger
 hashtables sorting effects vocabs vocabs.loader assocs editors
 continuations classes.predicate macros math sets eval
-vocabs.parser words.symbol ;
+vocabs.parser words.symbol values ;
 IN: help.lint
 
 : check-example ( element -- )
@@ -42,12 +42,22 @@ IN: help.lint
         $error-description
     } swap '[ _ elements empty? not ] contains? ;
 
+: don't-check-word? ( word -- ? )
+    {
+        [ macro? ]
+        [ symbol? ]
+        [ value-word? ]
+        [ parsing-word? ]
+        [ "declared-effect" word-prop not ]
+    } 1|| ;
+
 : check-values ( word element -- )
     {
-        [ drop { [ symbol? ] [ macro? ] [ parsing-word? ] } 1|| ]
-        [ drop "declared-effect" word-prop not ]
-        [ nip contains-funky-elements? ]
         [
+            [ don't-check-word? ]
+            [ contains-funky-elements? ]
+            bi* or
+        ] [
             [ effect-values >array ]
             [ extract-values >array ]
             bi* =
