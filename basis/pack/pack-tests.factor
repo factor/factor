@@ -46,5 +46,8 @@ pack strings tools.test ;
 [ f ] [ "" [ read-c-string ] with-string-reader ] unit-test
 [ 5 ] [ "FRAM\0\u000005\0\0\0\0\0\0\0" [ read-c-string drop read-u64 ] with-string-reader ] unit-test
 
-[ 9 ]
-[ "iic" packed-length ] unit-test
+[ 9 ] [ "iic" packed-length ] unit-test
+[ "iii" read-packed-le ] must-infer
+[ "iii" unpack-le ] must-infer
+[ "iii" unpack-be ] must-infer
+[ "iii" unpack-native ] must-infer

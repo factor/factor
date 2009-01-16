@@ -9,6 +9,9 @@ SYMBOL: big-endian
 : big-endian? ( -- ? )
     1 <int> *char zero? ;
 
+: set-big-endian ( -- )
+    big-endian? big-endian set ; inline
+
 : >endian ( obj n -- str )
     big-endian get [ >be ] [ >le ] if ; inline
 
@@ -70,7 +73,7 @@ M: string b, ( n string -- ) heap-size b, ;
 : read-s32 ( -- n ) 4 read-signed ;
 : read-u32 ( -- n ) 4 read-unsigned ;
 : read-s64 ( -- n ) 8 read-signed ;
-: read-u64 ( -- n ) 8 read-signed ;
+: read-u64 ( -- n ) 8 read-unsigned ;
 : read-s128 ( -- n ) 16 read-signed ;
 : read-u128 ( -- n ) 16 read-unsigned ;
 
@@ -81,7 +84,7 @@ M: string b, ( n string -- ) heap-size b, ;
     8 read endian> bits>double ;
 
 : read-c-string ( -- str/f )
-    "\0" read-until [ drop f ] unless ;
+    "\0" read-until swap and ;
 
 : read-c-string* ( n -- str/f )
     read [ zero? ] trim-right [ f ] when-empty ;
@@ -94,7 +97,7 @@ M: string b, ( n string -- ) heap-size b, ;
 : read-128-ber ( -- n )
     0 (read-128-ber) ;
 
-: pack-table ( -- hash )
+CONSTANT: pack-table
     H{
         { CHAR: c s8, }
         { CHAR: C u8, }
@@ -110,9 +113,9 @@ M: string b, ( n string -- ) heap-size b, ;
         { CHAR: F float, }
         { CHAR: d double, }
         { CHAR: D double, }
-    } ;
+    }
 
-: unpack-table ( -- hash )
+CONSTANT: unpack-table
     H{
         { CHAR: c read-s8 }
         { CHAR: C read-u8 }
@@ -128,9 +131,9 @@ M: string b, ( n string -- ) heap-size b, ;
         { CHAR: F read-float }
         { CHAR: d read-double }
         { CHAR: D read-double }
-    } ;
+    }
 
-: packed-length-table ( -- hash )
+CONSTANT: packed-length-table
     H{
         { CHAR: c 1 }
         { CHAR: C 1 }
@@ -146,7 +149,7 @@ M: string b, ( n string -- ) heap-size b, ;
         { CHAR: F 4 }
         { CHAR: d 8 }
         { CHAR: D 8 }
-    } ;
+    }
 
 MACRO: (pack) ( seq str -- quot )
     [
@@ -159,16 +162,13 @@ MACRO: (pack) ( seq str -- quot )
     ] [ ] make ;
 
 : pack-native ( seq str -- seq )
-    [
-        big-endian? big-endian set (pack)
-    ] with-scope ;
+    [ set-big-endian (pack) ] with-scope ; inline
 
 : pack-be ( seq str -- seq )
-    [ big-endian on (pack) ] with-scope ;
+    [ big-endian on (pack) ] with-scope ; inline
 
 : pack-le ( seq str -- seq )
-    [ big-endian off (pack) ] with-scope ;
-
+    [ big-endian off (pack) ] with-scope ; inline
 
 MACRO: (unpack) ( str -- quot )
     [
@@ -181,31 +181,30 @@ MACRO: (unpack) ( str -- quot )
     ] [ ] make ;
 
 : unpack-native ( seq str -- seq )
-    [
-        big-endian? big-endian set (unpack)
-    ] with-scope ;
+    [ set-big-endian (unpack) ] with-scope ; inline
 
 : unpack-be ( seq str -- seq )
-    [ big-endian on (unpack) ] with-scope ;
+    [ big-endian on (unpack) ] with-scope ; inline
 
 : unpack-le ( seq str -- seq )
-    [ big-endian off (unpack) ] with-scope ;
+    [ big-endian off (unpack) ] with-scope ; inline
 
 : packed-length ( str -- n )
     [ packed-length-table at ] sigma ;
 
 ERROR: packed-read-fail str bytes ;
 
-: packed-read ( str -- bytes )
-    dup packed-length [ read dup length ] keep = [
-        nip
-    ] [
-        packed-read-fail
-    ] if ;
+<PRIVATE
 
-: (read-packed) ( str quot -- seq )
-    [ packed-read ] swap bi ;
+: read-packed-bytes ( str -- bytes )
+    dup packed-length [ read dup length ] keep =
+    [ nip ] [ packed-read-fail ] if ; inline
 
-: read-packed-le ( str -- seq ) [ unpack-le ] (read-packed) ;
-: read-packed-be ( str -- seq ) [ unpack-be ] (read-packed) ;
-: read-packed-native ( str -- seq ) [ unpack-native ] (read-packed) ;
+PRIVATE>
+
+: read-packed ( str quot -- seq )
+    [ read-packed-bytes ] swap bi ; inline
+
+: read-packed-le ( str -- seq ) [ unpack-le ] read-packed ; inline
+: read-packed-be ( str -- seq ) [ unpack-be ] read-packed ; inline
+: read-packed-native ( str -- seq ) [ unpack-native ] read-packed ; inline
