@@ -94,7 +94,7 @@ ALIAS: ShellExecute ShellExecuteW
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT
     MAX_UNICODE_PATH "ushort" <c-array>
-    [ SHGetFolderPath shell32-error ] keep utf16n alien>string ;
+    [ SHGetFolderPath drop ] keep utf16n alien>string ;
 
 : desktop ( -- str )
     CSIDL_DESKTOPDIRECTORY shell32-directory ;
