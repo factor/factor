@@ -14,6 +14,7 @@ IN: editors.scite
             "SciTE Source Code Editor" t
             [ >lower "scite.exe" tail? ] find-in-program-files
         ] unless*
+        [ "scite.exe" ] unless*
     ] unless* ;
 
 : scite-command ( file line -- cmd )

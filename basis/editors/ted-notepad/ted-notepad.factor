@@ -5,6 +5,7 @@ IN: editors.ted-notepad
 : ted-notepad-path ( -- path )
     \ ted-notepad-path get-global [
         "TED Notepad" t [ "TedNPad.exe" tail? ] find-in-program-files
+        [ "TedNPad.exe" ] unless*
     ] unless* ;
 
 : ted-notepad ( file line -- )

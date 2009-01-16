@@ -5,6 +5,7 @@ IN: editors.ultraedit
 : ultraedit-path ( -- path )
     \ ultraedit-path get-global [
         "IDM Computer Solutions" t [ "uedit32.exe" tail? ] find-in-program-files
+        [ "uedit32.exe" ] unless*
     ] unless* ;
 
 : ultraedit ( file line -- )
