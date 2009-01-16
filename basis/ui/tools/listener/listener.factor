@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar combinators
 combinators.short-circuit compiler.units concurrency.flags
-concurrency.mailboxes continuations destructors documents fry generic
-generic.standard.engines.tuple hashtables help help.markup io
+concurrency.mailboxes continuations destructors documents
+fry hashtables help help.markup io
 io.styles kernel lexer listener math models models.delay models.filter
 namespaces parser prettyprint quotations sequences strings threads
 tools.vocabs ui ui.commands ui.gadgets ui.gadgets.buttons
@@ -255,17 +255,6 @@ M: listener-operation invoke-command ( target command -- )
 : clear-stack ( listener -- )
     [ clear ] swap (call-listener) ;
 
-GENERIC: word-completion-string ( word -- string )
-
-M: word word-completion-string name>> ;
-
-: method-completion-string ( word -- string )
-    "method-generic" word-prop word-completion-string ;
-
-M: method-body word-completion-string method-completion-string ;
-
-M: engine-word word-completion-string method-completion-string ;
-
 : use-if-necessary ( word seq -- )
     2dup [ vocabulary>> ] dip and [
         2dup [ assoc-stack ] keep = [ 2drop ] [
@@ -273,11 +262,10 @@ M: engine-word word-completion-string method-completion-string ;
         ] if
     ] [ 2drop ] if ;
 
-: insert-word ( word -- )
-    get-listener input>>
-    [ [ word-completion-string ] dip user-input* drop ]
-    [ interactor-use use-if-necessary ]
-    2bi ;
+M: word accept-completion-hook
+    interactor>> interactor-use use-if-necessary ;
+
+M: object accept-completion-hook 2drop ;
 
 : quot-action ( interactor -- lines )
     [ history>> history-add drop ] [ control-value ] [ select-all ] tri

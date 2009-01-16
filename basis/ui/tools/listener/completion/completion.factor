@@ -1,11 +1,12 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar colors documents fry kernel
-sets splitting math math.vectors models.delay models.filter
+words sets splitting math math.vectors models.delay models.filter
 combinators.short-circuit parser present sequences tools.completion
+generic generic.standard.engines.tuple
 ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
-ui.gadgets.scrollers ui.gadgets.tables
-ui.gadgets.theme ui.gadgets.worlds ui.gadgets.wrappers ui.gestures
+ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.theme
+ui.gadgets.worlds ui.gadgets.wrappers ui.gestures
 ui.render ui.tools.listener.history ;
 IN: ui.tools.listener.completion
 
@@ -53,11 +54,29 @@ M: completion-popup hide-glass-hook
 : completion-loc/doc ( popup -- loc doc )
     interactor>> [ editor-caret ] [ model>> ] bi ;
 
+GENERIC: completion-string ( object -- string )
+
+M: object completion-string present ;
+
+: method-completion-string ( word -- string )
+    "method-generic" word-prop present ;
+
+M: method-body completion-string method-completion-string ;
+
+M: engine-word completion-string method-completion-string ;
+
+GENERIC# accept-completion-hook 1 ( item popup -- )
+
+: insert-completion ( item popup -- )
+    [ completion-string ] [ completion-loc/doc ] bi*
+    one-word-elt set-elt-string ;
+
 : accept-completion ( item table -- )
     find-completion-popup
-    [ [ present ] [ completion-loc/doc ] bi* one-word-elt set-elt-string ]
-    [ hide-completion-popup ]
-    bi ;
+    [ insert-completion ]
+    [ accept-completion-hook ]
+    [ nip hide-completion-popup ]
+    2tri ;
 
 : <completion-table> ( interactor quot -- table )
     <completion-model> <table>
