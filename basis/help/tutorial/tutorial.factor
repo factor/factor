@@ -1,7 +1,7 @@
 USING: help.markup help.syntax ui.commands ui.operations
 editors vocabs.loader kernel sequences prettyprint tools.test
 tools.vocabs strings unicode.categories unicode.case
-ui.tools.browser ui.tools.listener ;
+ui.tools.browser ui.tools.common ;
 IN: help.tutorial
 
 ARTICLE: "first-program-start" "Creating a vocabulary for your first program"
@@ -36,7 +36,7 @@ $nl
 { $code ": palindrome? ( string -- ? ) dup reverse = ;" }
 "Place this definition at the end of your source file."
 $nl
-"Now we have changed the source file, we must reload it into Factor so that we can test the new definition. To do this, simply go to the Factor listener and press " { $command listener-gadget "workflow" refresh-all } ". This will find any previously-loaded source files which have changed on disk, and reload them."
+"Now we have changed the source file, we must reload it into Factor so that we can test the new definition. To do this, simply go to the Factor listener and press " { $command tool "common" refresh-all } ". This will find any previously-loaded source files which have changed on disk, and reload them."
 $nl
 "When you do this, you will get an error about the " { $link dup } " word not being found. This is because this word is part of the " { $vocab-link "kernel" } " vocabulary, but this vocabulary is not part of the source file's " { $link "vocabulary-search" } ". You must explicitly list dependencies in source files. This allows Factor to automatically load required vocabularies and makes larger programs easier to maintain."
 $nl
@@ -50,7 +50,7 @@ $nl
 { $code "USING: kernel sequences ;" }
 "Finally, check what vocabulary " { $link = } " lives in, and confirm that it's in the " { $vocab-link "kernel" } " vocabulary, which we've already added to the search path."
 $nl
-"Now press " { $command listener-gadget "workflow" refresh-all } " again, and the source file should reload without any errors. You can now go on and learn about " { $link "first-program-test" } "." ;
+"Now press " { $command tool "common" refresh-all } " again, and the source file should reload without any errors. You can now go on and learn about " { $link "first-program-test" } "." ;
 
 ARTICLE: "first-program-test" "Testing your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
@@ -64,7 +64,7 @@ ARTICLE: "first-program-test" "Testing your first program"
 }
 "We will now test our new word in the listener. First, push a string on the stack:"
 { $code "\"hello\"" }
-"Note that the stack display at the top of the workspace now shows this string. Having supplied the input, we call our word:"
+"Note that the stack display in the listener now shows this string. Having supplied the input, we call our word:"
 { $code "palindrome?" }
 "The stack display should now have a boolean false - " { $link f } " - which is the word's output. Since ``hello'' is not a palindrome, this is what we expect. We can get rid of this boolean by calling " { $link drop } ". The stack should be empty after this is done."
 $nl
@@ -132,7 +132,7 @@ $nl
 $nl
 "We modify " { $snippet "palindrome?" } " to first apply " { $snippet "normalize" } " to its input:"
 { $code ": palindrome? ( str -- ? ) normalize dup reverse = ;" }
-"Now if you press " { $command listener-gadget "workflow" refresh-all } ", the source file should reload without any errors. You can run unit tests again, and this time, they will all pass:"
+"Now if you press " { $command tool "common" refresh-all } ", the source file should reload without any errors. You can run unit tests again, and this time, they will all pass:"
 { $code "\"palindrome\" test" } ;
 
 ARTICLE: "first-program" "Your first program"

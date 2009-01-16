@@ -42,6 +42,7 @@ HELP: (with-ui)
 { $notes "This is a low-level word; user code should call " { $link with-ui } " instead." } ;
 
 HELP: start-ui
+{ $values { "quot" quotation } }
 { $description "Called by the UI backend to initialize the platform-independent parts of UI. This word should be called after the backend is ready to start displaying new windows, and before the event loop starts." } ;
 
 HELP: (open-window)

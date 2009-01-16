@@ -75,12 +75,12 @@ HELP: text-width
 { $description "Outputs the width of a piece of text." } ;
 
 HELP: string-height
-{ $values { "open-font" "a value output by " { $link open-font } } { "string" string } { "w" "a positive integer" } }
+{ $values { "open-font" "a value output by " { $link open-font } } { "string" string } { "h" "a positive integer" } }
 { $description "Outputs the height of a string." }
 { $notes "This is a low-level word; use " { $link text-height } " instead." } ;
 
 HELP: text-height
-{ $values { "font" "a font specifier" } { "text" "a string or sequence of strings" } { "w" "a positive integer" } }
+{ $values { "font" "a font specifier" } { "text" "a string or sequence of strings" } { "h" "a positive integer" } }
 { $description "Outputs the height of a piece of text." } ;
 
 HELP: text-dim

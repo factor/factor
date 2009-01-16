@@ -217,13 +217,13 @@ HOOK: x>offset font-renderer ( x font string -- n )
 
 HOOK: free-fonts font-renderer ( world -- )
 
-: text-height ( open-font text -- n )
+: text-height ( font text -- h )
     [ open-font ] dip
     dup string? [ string-height ] [
         [ string-height ] with sigma
     ] if ;
 
-: text-width ( open-font text -- n )
+: text-width ( font text -- w )
     [ open-font ] dip
     dup string? [ string-width ] [
         [ 0 ] 2dip [ string-width max ] with each
