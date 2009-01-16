@@ -1,7 +1,7 @@
 USING: alien alien.c-types arrays assocs byte-arrays io
 io.binary io.streams.string kernel math math.parser namespaces
 make parser prettyprint quotations sequences strings vectors
-words macros math.functions math.bitwise ;
+words macros math.functions math.bitwise fry ;
 IN: pack
 
 SYMBOL: big-endian
@@ -152,15 +152,9 @@ CONSTANT: packed-length-table
     }
 
 MACRO: (pack) ( seq str -- quot )
-    [
-        [
-            [
-                swap , pack-table at ,
-            ] 2each
-        ] [ ] make 1quotation %
-       [ B{ } make ] %
-    ] [ ] make ;
-
+    [ pack-table at 1quotation '[ _ @ ] ] [ ] 2map-as concat
+    '[ _ B{ } make ] ;
+ 
 : pack-native ( seq str -- seq )
     [ set-big-endian (pack) ] with-scope ; inline
 
@@ -171,14 +165,8 @@ MACRO: (pack) ( seq str -- quot )
     [ big-endian off (pack) ] with-scope ; inline
 
 MACRO: (unpack) ( str -- quot )
-    [
-        [
-            [ unpack-table at , \ , , ] each
-        ] [ ] make
-        1quotation [ { } make ] append
-        1quotation %
-        \ with-string-reader ,
-    ] [ ] make ;
+    [ unpack-table at 1quotation '[ @ , ] ] { } map-as concat
+    '[ [ _ { } make ] with-string-reader ] ;
 
 : unpack-native ( seq str -- seq )
     [ set-big-endian (unpack) ] with-scope ; inline
@@ -205,6 +193,11 @@ PRIVATE>
 : read-packed ( str quot -- seq )
     [ read-packed-bytes ] swap bi ; inline
 
-: read-packed-le ( str -- seq ) [ unpack-le ] read-packed ; inline
-: read-packed-be ( str -- seq ) [ unpack-be ] read-packed ; inline
-: read-packed-native ( str -- seq ) [ unpack-native ] read-packed ; inline
+: read-packed-le ( str -- seq )
+    [ unpack-le ] read-packed ; inline
+
+: read-packed-be ( str -- seq )
+    [ unpack-be ] read-packed ; inline
+
+: read-packed-native ( str -- seq )
+    [ unpack-native ] read-packed ; inline
