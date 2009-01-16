@@ -187,6 +187,7 @@
                 "QUALIFIED-WITH:" "QUALIFIED:"
                 "RENAME:"
                 "SINGLETON:" "SLOT:" "SYMBOL:"
+                "TYPEDEF:"
                 "USE:"
                 "VAR:")))
 
@@ -210,6 +211,9 @@
 
 (defconst fuel-syntax--constructor-regex
   "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+
+(defconst fuel-syntax--typedef-regex
+  "\\_<TYPEDEF: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
 
 
 ;;; Factor syntax table
