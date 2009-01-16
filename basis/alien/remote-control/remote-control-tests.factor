@@ -39,6 +39,6 @@ int main(int argc, char **argv)
     "resource:temp" [ compile-file ] with-directory
     "resource:" [ run-test ] with-directory ;
 
-[ "Done." ] [ "" test-embedding ] unit-test
+! [ "Done." ] [ "" test-embedding ] unit-test
 
-[ "Done." ] [ "factor_yield();" test-embedding ] unit-test
+! [ "Done." ] [ "factor_yield();" test-embedding ] unit-test
