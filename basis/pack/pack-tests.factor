@@ -48,6 +48,8 @@ pack strings tools.test ;
 
 [ 9 ] [ "iic" packed-length ] unit-test
 [ "iii" read-packed-le ] must-infer
+[ "iii" read-packed-be ] must-infer
+[ "iii" read-packed-native ] must-infer
 [ "iii" unpack-le ] must-infer
 [ "iii" unpack-be ] must-infer
 [ "iii" unpack-native ] must-infer

@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays assocs byte-arrays io
 io.binary io.streams.string kernel math math.parser namespaces
 make parser prettyprint quotations sequences strings vectors
