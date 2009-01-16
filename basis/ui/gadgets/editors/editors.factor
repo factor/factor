@@ -217,8 +217,8 @@ M: editor ungraft*
     [ editor-mark ] [ editor-caret ] bi sort-pair ;
 
 : (draw-selection) ( x1 x2 -- )
-    over -
-    dup 0 = [ 2 + ] when
+    over - 1+
+    dup 0 = [ 1+ ] when
     [ 0.0 2array ] [ editor get line-height 2array ] bi*
     swap [ gl-fill-rect ] with-translation ;
 
