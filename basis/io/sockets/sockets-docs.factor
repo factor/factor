@@ -3,11 +3,20 @@ strings byte-arrays continuations destructors quotations ;
 IN: io.sockets
 
 ARTICLE: "network-addressing" "Address specifiers"
-"The networking words are quite general and work with " { $emphasis "address specifiers" } " rather than concrete concepts such as host names. There are four types of address specifiers:"
+"The networking words are quite general and work with " { $emphasis "address specifiers" } " rather than concrete concepts such as host names. There are four types of address specifiers."
+$nl
+"Unix domain sockets:"
 { $subsection local }
+{ $subsection <local> }
+"Internet host name/port number pairs; the host name is resolved to an IPv4 or IPv6 address using the operating system's resolver:"
 { $subsection inet }
+{ $subsection <inet> }
+"IPv4 addresses, with no host name resolution:"
 { $subsection inet4 }
+{ $subsection <inet4> }
+"IPv6 addresses, with no host name resolution:"
 { $subsection inet6 }
+{ $subsection <inet6> }
 "While the " { $link inet } " addressing specifier is capable of performing name lookups when passed to " { $link <client> } ", sometimes it is necessary to look up a host name without making a connection:"
 { $subsection resolve-host } ;
 
@@ -73,26 +82,34 @@ HELP: inet
     "This address specifier is only supported by " { $link <client> } ", which calls " { $link resolve-host }  " to obtain a list of IP addresses associated with the host name, and attempts a connection to each one in turn until one succeeds. Other network words do not accept this address specifier, and " { $link resolve-host } " must be called directly; it is then up to the application to pick the correct address from the (possibly several) addresses associated to the host name."
 }
 { $examples
-    { $code "\"www.apple.com\" \"http\" <inet>" }
-    { $code "\"localhost\" 8080 <inet>" }
+    { $code "\"www.apple.com\" 80 <inet>" }
 } ;
+
+HELP: <inet>
+{ $values { "host" "a host name" } { "port" "a port number" } }
+{ $description "Creates a new " { $link inet } " address specifier." } ;
 
 HELP: inet4
 { $class-description "IPv4 address/port number specifier for TCP/IP and UDP/IP connections. The " { $snippet "host" } " and " { $snippet "port" } " slots hold the IPv4 address and port number, respectively. New instances are created by calling " { $link <inet4> } "." }
-{ $notes
-"Most applications do not operate on IPv4 addresses directly, and instead should use " { $link resolve-host } " to look up the address associated to a host name. Also, try to support IPv6 where possible."
-}
+{ $notes "Most applications do not operate on IPv4 addresses directly, and instead should use the " { $link inet } " address specifier, or call " { $link resolve-host } "." }
 { $examples
     { $code "\"127.0.0.1\" 8080 <inet4>" }
 } ;
 
+HELP: <inet4>
+{ $values { "host" "an IPv4 address" } { "port" "a port number" } }
+{ $description "Creates a new " { $link inet4 } " address specifier." } ;
+
 HELP: inet6
 { $class-description "IPv6 address/port number specifier for TCP/IP and UDP/IP connections. The " { $snippet "host" } " and " { $snippet "port" } " slots hold the IPv6 address and port number, respectively. New instances are created by calling " { $link <inet6> } "." }
-{ $notes
-"Most applications do not operate on IPv6 addresses directly, and instead should use " { $link resolve-host } " to look up the address associated to a host name." }
+{ $notes "Most applications do not operate on IPv6 addresses directly, and instead should use the " { $link inet } " address specifier, or call " { $link resolve-host } "." }
 { $examples
     { $code "\"::1\" 8080 <inet6>" }
 } ;
+
+HELP: <inet6>
+{ $values { "host" "an IPv6 address" } { "port" "a port number" } }
+{ $description "Creates a new " { $link inet6 } " address specifier." } ;
 
 HELP: <client>
 { $values { "remote" "an address specifier" } { "encoding" "an encding descriptor" } { "stream" "a bidirectional stream" } { "local" "an address specifier" } }
@@ -100,7 +117,7 @@ HELP: <client>
 { $errors "Throws an error if the connection cannot be established." }
 { $notes "The " { $link with-client } " word is easier to use in most situations." }
 { $examples
-    { $code "\"www.apple.com\" \"http\" <inet> utf8 <client>" }
+    { $code "\"www.apple.com\" 80 <inet> utf8 <client>" }
 } ;
 
 HELP: with-client
