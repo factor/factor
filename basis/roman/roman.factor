@@ -39,16 +39,14 @@ ERROR: roman-range-error n ;
 PRIVATE>
 
 : >roman ( n -- str )
-    dup roman-range-check [
-        (>roman)
-    ] "" make ;
+    dup roman-range-check
+    [ (>roman) ] "" make ;
 
 : >ROMAN ( n -- str ) >roman >upper ;
 
 : roman> ( str -- n )
-    >lower [ roman<= ] monotonic-split [
-        (roman>)
-    ] map sum ;
+    >lower [ roman<= ] monotonic-split
+    [ (roman>) ] sigma ;
 
 <PRIVATE
 

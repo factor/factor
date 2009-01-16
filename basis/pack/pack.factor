@@ -1,13 +1,22 @@
+! Copyright (C) 2009 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays assocs byte-arrays io
 io.binary io.streams.string kernel math math.parser namespaces
 make parser prettyprint quotations sequences strings vectors
-words macros math.functions math.bitwise ;
+words macros math.functions math.bitwise fry ;
 IN: pack
 
 SYMBOL: big-endian
 
 : big-endian? ( -- ? )
     1 <int> *char zero? ;
+
+<PRIVATE
+
+: set-big-endian ( -- )
+    big-endian? big-endian set ; inline
+
+PRIVATE>
 
 : >endian ( obj n -- str )
     big-endian get [ >be ] [ >le ] if ; inline
@@ -39,6 +48,8 @@ M: string b, ( n string -- ) heap-size b, ;
 : double, ( n -- ) double>bits 8 b, ;
 : c-string, ( str -- ) % 0 u8, ;
 
+<PRIVATE
+
 : (>128-ber) ( n -- )
     dup 0 > [
         [ HEX: 7f bitand HEX: 80 bitor , ] keep -7 shift
@@ -46,6 +57,8 @@ M: string b, ( n string -- ) heap-size b, ;
     ] [
         drop
     ] if ;
+
+PRIVATE>
 
 : >128-ber ( n -- str )
     [
@@ -70,7 +83,7 @@ M: string b, ( n string -- ) heap-size b, ;
 : read-s32 ( -- n ) 4 read-signed ;
 : read-u32 ( -- n ) 4 read-unsigned ;
 : read-s64 ( -- n ) 8 read-signed ;
-: read-u64 ( -- n ) 8 read-signed ;
+: read-u64 ( -- n ) 8 read-unsigned ;
 : read-s128 ( -- n ) 16 read-signed ;
 : read-u128 ( -- n ) 16 read-unsigned ;
 
@@ -81,7 +94,7 @@ M: string b, ( n string -- ) heap-size b, ;
     8 read endian> bits>double ;
 
 : read-c-string ( -- str/f )
-    "\0" read-until [ drop f ] unless ;
+    "\0" read-until swap and ;
 
 : read-c-string* ( n -- str/f )
     read [ zero? ] trim-right [ f ] when-empty ;
@@ -94,7 +107,9 @@ M: string b, ( n string -- ) heap-size b, ;
 : read-128-ber ( -- n )
     0 (read-128-ber) ;
 
-: pack-table ( -- hash )
+<PRIVATE
+
+CONSTANT: pack-table
     H{
         { CHAR: c s8, }
         { CHAR: C u8, }
@@ -110,9 +125,9 @@ M: string b, ( n string -- ) heap-size b, ;
         { CHAR: F float, }
         { CHAR: d double, }
         { CHAR: D double, }
-    } ;
+    }
 
-: unpack-table ( -- hash )
+CONSTANT: unpack-table
     H{
         { CHAR: c read-s8 }
         { CHAR: C read-u8 }
@@ -128,47 +143,79 @@ M: string b, ( n string -- ) heap-size b, ;
         { CHAR: F read-float }
         { CHAR: d read-double }
         { CHAR: D read-double }
-    } ;
+    }
 
-MACRO: (pack) ( seq str -- quot )
-    [
-        [
-            [
-                swap , pack-table at ,
-            ] 2each
-        ] [ ] make 1quotation %
-       [ B{ } make ] %
-    ] [ ] make ;
+CONSTANT: packed-length-table
+    H{
+        { CHAR: c 1 }
+        { CHAR: C 1 }
+        { CHAR: s 2 }
+        { CHAR: S 2 }
+        { CHAR: t 3 }
+        { CHAR: T 3 }
+        { CHAR: i 4 }
+        { CHAR: I 4 }
+        { CHAR: q 8 }
+        { CHAR: Q 8 }
+        { CHAR: f 4 }
+        { CHAR: F 4 }
+        { CHAR: d 8 }
+        { CHAR: D 8 }
+    }
 
+MACRO: pack ( seq str -- quot )
+    [ pack-table at 1quotation '[ _ @ ] ] [ ] 2map-as concat
+    '[ _ B{ } make ] ;
+
+PRIVATE>
+ 
 : pack-native ( seq str -- seq )
-    [
-        big-endian? big-endian set (pack)
-    ] with-scope ;
+    [ set-big-endian pack ] with-scope ; inline
 
 : pack-be ( seq str -- seq )
-    [ big-endian on (pack) ] with-scope ;
+    [ big-endian on pack ] with-scope ; inline
 
 : pack-le ( seq str -- seq )
-    [ big-endian off (pack) ] with-scope ;
+    [ big-endian off pack ] with-scope ; inline
 
+<PRIVATE
 
-MACRO: (unpack) ( str -- quot )
-    [
-        [
-            [ unpack-table at , \ , , ] each
-        ] [ ] make
-        1quotation [ { } make ] append
-        1quotation %
-        \ with-string-reader ,
-    ] [ ] make ;
+MACRO: unpack ( str -- quot )
+    [ unpack-table at 1quotation '[ @ , ] ] { } map-as concat
+    '[ [ _ { } make ] with-string-reader ] ;
+
+PRIVATE>
 
 : unpack-native ( seq str -- seq )
-    [
-        big-endian? big-endian set (unpack)
-    ] with-scope ;
+    [ set-big-endian unpack ] with-scope ; inline
 
 : unpack-be ( seq str -- seq )
-    [ big-endian on (unpack) ] with-scope ;
+    [ big-endian on unpack ] with-scope ; inline
 
 : unpack-le ( seq str -- seq )
-    [ big-endian off (unpack) ] with-scope ;
+    [ big-endian off unpack ] with-scope ; inline
+
+: packed-length ( str -- n )
+    [ packed-length-table at ] sigma ;
+
+ERROR: packed-read-fail str bytes ;
+
+<PRIVATE
+
+: read-packed-bytes ( str -- bytes )
+    dup packed-length [ read dup length ] keep =
+    [ nip ] [ packed-read-fail ] if ; inline
+
+PRIVATE>
+
+: read-packed ( str quot -- seq )
+    [ read-packed-bytes ] swap bi ; inline
+
+: read-packed-le ( str -- seq )
+    [ unpack-le ] read-packed ; inline
+
+: read-packed-be ( str -- seq )
+    [ unpack-be ] read-packed ; inline
+
+: read-packed-native ( str -- seq )
+    [ unpack-native ] read-packed ; inline
