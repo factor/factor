@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel xml.data xml.errors
 xml.writer state-parser xml.tokenize xml.utilities xml.entities
-strings sequences io ;
+strings sequences io xml.entities.html ;
 IN: xml
 
 HELP: string>xml
