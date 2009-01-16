@@ -134,9 +134,9 @@ HELP: monotonic?
 { $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
 { $examples
     "Testing if a sequence is non-decreasing:"
-    { $example "USING: math prettyprint sequences ;" "{ 1 1 2 } [ <= ] monotonic? ." "t" }
+    { $example "USING: grouping math prettyprint ;" "{ 1 1 2 } [ <= ] monotonic? ." "t" }
     "Testing if a sequence is decreasing:"
-    { $example "USING: math prettyprint sequences ;" "{ 9 8 6 7 } [ < ] monotonic? ." "f" }
+    { $example "USING: grouping math prettyprint ;" "{ 9 8 6 7 } [ < ] monotonic? ." "f" }
 } ;
 
 HELP: all-equal?

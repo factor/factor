@@ -133,12 +133,12 @@ TUPLE: pull-xml scope ;
 : sax ( stream quot: ( xml-elem -- ) -- )
     swap [
         reset-prolog init-ns-stack
-        start-document call-under
+        start-document [ call-under ] when*
         sax-loop
     ] state-parse ; inline recursive
 
 : (read-xml) ( -- )
-    start-document process
+    start-document [ process ] when*
     [ process ] sax-loop ; inline
 
 : (read-xml-chunk) ( stream -- prolog seq )

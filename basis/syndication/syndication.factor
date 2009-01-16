@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml.utilities kernel assocs xml.generator math.order
     strings sequences xml.data xml.writer
-    io.streams.string combinators xml xml.entities io.files io
+    io.streams.string combinators xml xml.entities.html io.files io
     http.client namespaces make xml.generator hashtables
     calendar.format accessors continuations urls present ;
 IN: syndication

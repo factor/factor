@@ -32,21 +32,21 @@ HELP: find-file
 HELP: find-in-directories
 { $values
      { "directories" "a sequence of pathnames" } { "bfs?" "a boolean, breadth-first or depth-first" } { "quot" quotation }
-     { "path'" "a pathname string" }
+     { "path'/f" "a pathname string or f" }
 }
 { $description "Finds the first file in the input directories matching the predicate quotation in a breadth-first or depth-first traversal." } ;
 
 HELP: find-all-files
 { $values
      { "path" "a pathname string" } { "bfs?" "a boolean, breadth-first or depth-first" } { "quot" quotation }
-     { "paths" "a sequence of pathname strings" }
+     { "paths/f" "a sequence of pathname strings or f" }
 }
 { $description "Finds all files in the input directory matching the predicate quotation in a breadth-first or depth-first traversal." } ;
 
 HELP: find-all-in-directories
 { $values
      { "directories" "a sequence of directory paths" } { "bfs?" "a boolean, breadth-first or depth-first" } { "quot" quotation }
-     { "paths" "a sequence of pathname strings" }
+     { "paths/f" "a sequence of pathname strings or f" }
 }
 { $description "Finds all files in the input directories matching the predicate quotation in a breadth-first or depth-first traversal." } ;
 

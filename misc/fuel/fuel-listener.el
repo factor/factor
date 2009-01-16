@@ -31,7 +31,12 @@
   :group 'fuel)
 
 (defcustom fuel-listener-factor-binary
-  (expand-file-name "factor" fuel-factor-root-dir)
+  (expand-file-name (cond ((eq system-type 'windows-nt)
+                           "factor.exe")
+                          ((eq system-type 'darwin)
+                           "Factor.app/Contents/MacOS/factor")
+                          (t "factor"))
+                    fuel-factor-root-dir)
   "Full path to the factor executable to use when starting a listener."
   :type '(file :must-match t)
   :group 'fuel-listener)
@@ -68,8 +73,7 @@ buffer."
       (setq fuel-listener--buffer (current-buffer)))))
 
 (defun fuel-listener--start-process ()
-  (let ((factor (locate-file (expand-file-name fuel-listener-factor-binary)
-                             '("") exec-suffixes))
+  (let ((factor (expand-file-name fuel-listener-factor-binary))
         (image (expand-file-name fuel-listener-factor-image))
         (comint-redirect-perform-sanity-check nil))
     (unless (file-executable-p factor)
