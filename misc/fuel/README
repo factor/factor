@@ -18,16 +18,11 @@ beast.
 
   (load-file "<path/to/factor/installation>/misc/fuel/fu.el")
 
-  or
-
-  (add-to-list load-path "<path/to/factor/installation>/fuel")
-  (require 'fuel)
-
   If all you want is a major mode for editing Factor code with pretty
   font colors and indentation, without running the factor listener
   inside Emacs, you can use instead:
 
-  (add-to-list load-path "<path/to/factor/installation>/fuel")
+  (add-to-list 'load-path "<path/to/factor/installation>/fuel")
   (setq factor-mode-use-fuel nil)
   (require 'factor-mode)
 

@@ -79,7 +79,7 @@
   (regexp-opt fuel-syntax--declaration-words 'words))
 
 (defsubst fuel-syntax--second-word-regex (prefixes)
-  (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
+  (format "%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
 
 (defconst fuel-syntax--method-definition-regex
   "^M: +\\([^ ]+\\) +\\([^ ]+\\)")
@@ -172,26 +172,26 @@
           fuel-syntax--declaration-words-regex))
 
 (defconst fuel-syntax--single-liner-regex
-  (format "^%s" (regexp-opt '("ABOUT:"
-                              "ARTICLE:"
-                              "ALIAS:"
-                              "CONSTANT:" "C:"
-                              "DEFER:"
-                              "FORGET:"
-                              "GENERIC:" "GENERIC#"
-                              "HELP:" "HEX:" "HOOK:"
-                              "IN:" "INSTANCE:"
-                              "MAIN:" "MATH:" "MIXIN:"
-                              "OCT:"
-                              "POSTPONE:" "PRIVATE>" "<PRIVATE"
-                              "QUALIFIED-WITH:" "QUALIFIED:"
-                              "RENAME:"
-                              "SINGLETON:" "SLOT:" "SYMBOL:"
-                              "USE:"
-                              "VAR:"))))
+  (regexp-opt '("ABOUT:"
+                "ARTICLE:"
+                "ALIAS:"
+                "CONSTANT:" "C:"
+                "DEFER:"
+                "FORGET:"
+                "GENERIC:" "GENERIC#"
+                "HELP:" "HEX:" "HOOK:"
+                "IN:" "INSTANCE:"
+                "MAIN:" "MATH:" "MIXIN:"
+                "OCT:"
+                "POSTPONE:" "PRIVATE>" "<PRIVATE"
+                "QUALIFIED-WITH:" "QUALIFIED:"
+                "RENAME:"
+                "SINGLETON:" "SLOT:" "SYMBOL:"
+                "USE:"
+                "VAR:")))
 
 (defconst fuel-syntax--begin-of-def-regex
-  (format "^USING: \\|\\(%s\\)\\|\\(%s .*\\)"
+  (format "^USING: \\|\\(%s\\)\\|\\(^%s .*\\)"
           fuel-syntax--definition-start-regex
           fuel-syntax--single-liner-regex))
 
@@ -199,7 +199,7 @@
   (format "^.*%s" fuel-syntax--definition-end-regex))
 
 (defconst fuel-syntax--end-of-def-regex
-  (format "\\(%s\\)\\|\\(%s .*\\)"
+  (format "\\(%s\\)\\|\\(^%s .*\\)"
           fuel-syntax--end-of-def-line-regex
           fuel-syntax--single-liner-regex))
 
