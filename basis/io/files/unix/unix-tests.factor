@@ -1,7 +1,8 @@
 USING: tools.test io.files io.files.temp io.pathnames
 io.directories io.files.info io.files.info.unix continuations
 kernel io.files.unix math.bitwise calendar accessors
-math.functions math unix.users unix.groups arrays sequences ;
+math.functions math unix.users unix.groups arrays sequences
+grouping ;
 IN: io.files.unix.tests
 
 [ "/usr/libexec/" ] [ "/usr/libexec/awk/" parent-directory ] unit-test
