@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: xml.tests
 USING: kernel xml tools.test io namespaces make sequences
-xml.errors xml.entities parser strings xml.data io.files
+xml.errors xml.entities.html parser strings xml.data io.files
 xml.writer xml.utilities state-parser continuations assocs
 sequences.deep accessors io.streams.string ;
 
@@ -53,12 +53,15 @@ SYMBOL: xml-file
 [ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test
 [ "<!-- B+, B, or B--->" string>xml ] must-fail
 [ ] [ "<?xml version='1.0'?><!-- declarations for <head> & <body> --><foo/>" string>xml drop ] unit-test
-[ T{ element-decl f "br" "EMPTY" } ] [ "<!ELEMENT br EMPTY>" string>xml-chunk second ] unit-test
-[ T{ element-decl f "p" "(#PCDATA|emph)*" } ] [ "<!ELEMENT p (#PCDATA|emph)*>" string>xml-chunk second ] unit-test
-[ T{ element-decl f "%name.para;" "%content.para;" } ] [ "<!ELEMENT %name.para; %content.para;>" string>xml-chunk second ] unit-test
-[ T{ element-decl f "container" "ANY" } ] [ "<!ELEMENT container ANY>" string>xml-chunk second ] unit-test
-[ T{ doctype-decl f "foo" } ] [ "<!DOCTYPE foo>" string>xml-chunk second ] unit-test
-[ T{ doctype-decl f "foo" } ] [ "<!DOCTYPE foo >" string>xml-chunk second ] unit-test
-[ T{ doctype-decl f "foo" T{ system-id f "blah.dtd" } } ] [ "<!DOCTYPE foo SYSTEM 'blah.dtd'>" string>xml-chunk second ] unit-test
-[ T{ doctype-decl f "foo" T{ system-id f "blah.dtd" } } ] [ "<!DOCTYPE foo   SYSTEM \"blah.dtd\"   >" string>xml-chunk second ] unit-test
+[ T{ element-decl f "br" "EMPTY" } ] [ "<!ELEMENT br EMPTY>" string>xml-chunk first ] unit-test
+[ T{ element-decl f "p" "(#PCDATA|emph)*" } ] [ "<!ELEMENT p (#PCDATA|emph)*>" string>xml-chunk first ] unit-test
+[ T{ element-decl f "%name.para;" "%content.para;" } ] [ "<!ELEMENT %name.para; %content.para;>" string>xml-chunk first ] unit-test
+[ T{ element-decl f "container" "ANY" } ] [ "<!ELEMENT container ANY>" string>xml-chunk first ] unit-test
+[ T{ doctype-decl f "foo" } ] [ "<!DOCTYPE foo>" string>xml-chunk first ] unit-test
+[ T{ doctype-decl f "foo" } ] [ "<!DOCTYPE foo >" string>xml-chunk first ] unit-test
+[ T{ doctype-decl f "foo" T{ system-id f "blah.dtd" } } ] [ "<!DOCTYPE foo SYSTEM 'blah.dtd'>" string>xml-chunk first ] unit-test
+[ T{ doctype-decl f "foo" T{ system-id f "blah.dtd" } } ] [ "<!DOCTYPE foo   SYSTEM \"blah.dtd\"   >" string>xml-chunk first ] unit-test
 [ t ] [ "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd' >" dup string>xml-chunk [ write-xml-chunk ] with-string-writer = ] unit-test
+[ "foo" ] [ "<!ENTITY bar 'foo'><x>&bar;</x>" string>xml children>string ] unit-test
+[ V{ "hello" } ] [ "hello" string>xml-chunk ] unit-test
+[ 958 ] [ [ "&xi;" string>xml-chunk ] with-html-entities first first ] unit-test

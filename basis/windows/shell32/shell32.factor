@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax
 combinators io.encodings.utf16n io.files io.pathnames kernel
-windows windows.com windows.com.syntax windows.ole32
-windows.user32 ;
+windows windows.com windows.com.syntax windows.user32
+windows.ole32 ;
 IN: windows.shell32
 
 CONSTANT: CSIDL_DESKTOP HEX: 00
@@ -88,13 +88,10 @@ ALIAS: ShellExecute ShellExecuteW
 : open-in-explorer ( dir -- )
     f "open" rot (normalize-path) f f SW_SHOWNORMAL ShellExecute drop ;
 
-: shell32-error ( n -- )
-    ole32-error ; inline
-
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT
     MAX_UNICODE_PATH "ushort" <c-array>
-    [ SHGetFolderPath shell32-error ] keep utf16n alien>string ;
+    [ SHGetFolderPath drop ] keep utf16n alien>string ;
 
 : desktop ( -- str )
     CSIDL_DESKTOPDIRECTORY shell32-directory ;

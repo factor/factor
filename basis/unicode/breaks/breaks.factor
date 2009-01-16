@@ -61,7 +61,7 @@ SYMBOL: table
 : eval-seq ( seq -- seq ) [ dup word? [ execute ] when ] map ;
 
 : (set-table) ( class1 class2 val -- )
-    -rot table get nth [ swap or ] change-nth ;
+    [ table get nth ] dip '[ _ or ] change-nth ;
 
 : set-table ( classes1 classes2 val -- )
     [ [ eval-seq ] bi@ ] dip
@@ -199,8 +199,8 @@ to: word-table
 : walk-down ( str i -- j )
     dupd (walk-down) [ 1- (walk-down) ] [ drop f ] if* ;
 
-: word-break? ( table-entry i str -- ? )
-    spin {
+: word-break? ( str i table-entry -- ? )
+    {
         { t [ 2drop f ] }
         { f [ 2drop t ] }
         { check-letter-after
@@ -214,10 +214,10 @@ to: word-table
     } case ;
 
 :: word-break-next ( old-class new-char i str -- next-class ? )
-    new-char dup format/extended?
-    [ drop old-class dup { 1 2 3 } member? ] [
-        word-break-prop old-class over word-table-nth
-        i str word-break?
+    new-char format/extended?
+    [ old-class dup { 1 2 3 } member? ] [
+        new-char word-break-prop old-class over word-table-nth
+        [ str i ] dip word-break?
     ] if ;
 
 PRIVATE>

@@ -1,10 +1,9 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.streams.string io.files kernel math namespaces
-prettyprint sequences arrays generic strings vectors
-xml.char-classes xml.data xml.errors xml.tokenize xml.writer
-xml.utilities state-parser assocs ascii io.encodings.utf8
-accessors xml.backend ;
+USING: accessors arrays io io.encodings.binary io.files
+io.streams.string kernel namespaces sequences state-parser strings
+xml.backend xml.data xml.errors xml.tokenize ascii
+xml.writer ;
 IN: xml
 
 !   -- Overall parser with data tree
@@ -23,7 +22,7 @@ GENERIC: process ( object -- )
 M: object process add-child ;
 
 M: prolog process
-    xml-stack get V{ { f V{ "" } } } =
+    xml-stack get V{ { f V{ } } } =
     [ bad-prolog ] unless drop ;
 
 M: instruction process
@@ -101,6 +100,7 @@ TUPLE: pull-xml scope ;
         text-now? on
     ] H{ } make-assoc
     pull-xml boa ;
+! pull-xml needs to call start-document somewhere
 
 : pull-event ( pull -- xml-event/f )
     scope>> [
@@ -133,11 +133,12 @@ TUPLE: pull-xml scope ;
 : sax ( stream quot: ( xml-elem -- ) -- )
     swap [
         reset-prolog init-ns-stack
-        prolog-data get call-under
+        start-document [ call-under ] when*
         sax-loop
     ] state-parse ; inline recursive
 
 : (read-xml) ( -- )
+    start-document [ process ] when*
     [ process ] sax-loop ; inline
 
 : (read-xml-chunk) ( stream -- prolog seq )
@@ -159,11 +160,12 @@ TUPLE: pull-xml scope ;
     <string-reader> read-xml ;
 
 : string>xml-chunk ( string -- xml )
-    <string-reader> read-xml-chunk ;
+    t string-input?
+    [ <string-reader> read-xml-chunk ] with-variable ;
 
 : file>xml ( filename -- xml )
     ! Autodetect encoding!
-    utf8 <file-reader> read-xml ;
+    binary <file-reader> read-xml ;
 
 : xml-reprint ( string -- )
     string>xml print-xml ;
