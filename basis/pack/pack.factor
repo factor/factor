@@ -11,8 +11,12 @@ SYMBOL: big-endian
 : big-endian? ( -- ? )
     1 <int> *char zero? ;
 
+<PRIVATE
+
 : set-big-endian ( -- )
     big-endian? big-endian set ; inline
+
+PRIVATE>
 
 : >endian ( obj n -- str )
     big-endian get [ >be ] [ >le ] if ; inline
@@ -44,6 +48,8 @@ M: string b, ( n string -- ) heap-size b, ;
 : double, ( n -- ) double>bits 8 b, ;
 : c-string, ( str -- ) % 0 u8, ;
 
+<PRIVATE
+
 : (>128-ber) ( n -- )
     dup 0 > [
         [ HEX: 7f bitand HEX: 80 bitor , ] keep -7 shift
@@ -51,6 +57,8 @@ M: string b, ( n string -- ) heap-size b, ;
     ] [
         drop
     ] if ;
+
+PRIVATE>
 
 : >128-ber ( n -- str )
     [
@@ -98,6 +106,8 @@ M: string b, ( n string -- ) heap-size b, ;
     
 : read-128-ber ( -- n )
     0 (read-128-ber) ;
+
+<PRIVATE
 
 CONSTANT: pack-table
     H{
@@ -153,31 +163,37 @@ CONSTANT: packed-length-table
         { CHAR: D 8 }
     }
 
-MACRO: (pack) ( seq str -- quot )
+MACRO: pack ( seq str -- quot )
     [ pack-table at 1quotation '[ _ @ ] ] [ ] 2map-as concat
     '[ _ B{ } make ] ;
+
+PRIVATE>
  
 : pack-native ( seq str -- seq )
-    [ set-big-endian (pack) ] with-scope ; inline
+    [ set-big-endian pack ] with-scope ; inline
 
 : pack-be ( seq str -- seq )
-    [ big-endian on (pack) ] with-scope ; inline
+    [ big-endian on pack ] with-scope ; inline
 
 : pack-le ( seq str -- seq )
-    [ big-endian off (pack) ] with-scope ; inline
+    [ big-endian off pack ] with-scope ; inline
 
-MACRO: (unpack) ( str -- quot )
+<PRIVATE
+
+MACRO: unpack ( str -- quot )
     [ unpack-table at 1quotation '[ @ , ] ] { } map-as concat
     '[ [ _ { } make ] with-string-reader ] ;
 
+PRIVATE>
+
 : unpack-native ( seq str -- seq )
-    [ set-big-endian (unpack) ] with-scope ; inline
+    [ set-big-endian unpack ] with-scope ; inline
 
 : unpack-be ( seq str -- seq )
-    [ big-endian on (unpack) ] with-scope ; inline
+    [ big-endian on unpack ] with-scope ; inline
 
 : unpack-le ( seq str -- seq )
-    [ big-endian off (unpack) ] with-scope ; inline
+    [ big-endian off unpack ] with-scope ; inline
 
 : packed-length ( str -- n )
     [ packed-length-table at ] sigma ;
