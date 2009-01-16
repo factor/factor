@@ -6,6 +6,7 @@ IN: editors.editpadlite
 : editpadlite-path ( -- path )
     \ editpadlite-path get-global [
         "JGsoft" t [ >lower "editpadlite.exe" tail? ] find-in-program-files
+        [ "editpadlite.exe" ] unless*
     ] unless* ;
 
 : editpadlite ( file line -- )
