@@ -9,11 +9,17 @@ TUPLE: history document elements index ;
 : <history> ( document -- history )
     V{ } clone 0 history boa ;
 
+: history-add ( history -- input )
+    dup elements>> length 1+ >>index
+    [ document>> doc-string [ <input> ] [ empty? ] bi ] keep
+    '[ [ _ elements>> push ] keep ] unless ;
+
 <PRIVATE
 
-: save-history ( history -- input )
-    [ document>> doc-string [ <input> ] [ empty? ] bi ] keep
-    '[ [ _ [ index>> ] [ elements>> ] bi set-nth ] keep ] unless ;
+: save-history ( history -- )
+    [ document>> doc-string ] keep
+    '[ <input> _ [ index>> ] [ elements>> ] bi set-nth ]
+    unless-empty ;
 
 : update-document ( history -- )
     [ [ index>> ] [ elements>> ] bi nth string>> ]
@@ -27,17 +33,13 @@ TUPLE: history document elements index ;
 : history-recall ( history i -- )
     [ [ elements>> empty? ] keep ] dip '[
         _
-        [ save-history drop ]
+        [ save-history ]
         [ _ change-history-index ]
         [ update-document ]
         tri
     ] unless ;
 
 PRIVATE>
-
-: history-add ( history -- input )
-    dup elements>> length 1+ >>index
-    save-history ;
 
 : history-recall-previous ( history -- )
     -1 history-recall ;
