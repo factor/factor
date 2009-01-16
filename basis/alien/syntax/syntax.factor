@@ -1,10 +1,10 @@
-! Copyright (C) 2005, 2008 Slava Pestov, Alex Chapman.
+! Copyright (C) 2005, 2009 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays alien alien.c-types alien.structs
 alien.arrays alien.strings kernel math namespaces parser
 sequences words quotations math.parser splitting grouping
 effects assocs combinators lexer strings.parser alien.parser 
-fry vocabs.parser ;
+fry vocabs.parser words.constant ;
 IN: alien.syntax
 
 : DLL" lexer get skip-blank parse-string dlopen parsed ; parsing
@@ -31,8 +31,7 @@ IN: alien.syntax
 
 : C-ENUM:
     ";" parse-tokens
-    dup length
-    [ [ create-in ] dip 1quotation define ] 2each ;
+    [ [ create-in ] dip define-constant ] each-index ;
     parsing
 
 : &:
