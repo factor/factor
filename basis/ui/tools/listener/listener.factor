@@ -1,20 +1,18 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: inspector kernel help help.markup io io.styles models math.vectors
-strings splitting namespaces parser quotations sequences vocabs words
-continuations prettyprint listener debugger threads boxes
-concurrency.flags math arrays generic accessors combinators
-combinators.short-circuit combinators.smart
-assocs fry generic.standard.engines.tuple
-tools.vocabs concurrency.mailboxes vocabs.parser calendar
-models.delay models.filter documents hashtables sets destructors lexer
-ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.labelled
-ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
-ui.gadgets.packs ui.gadgets.tracks ui.gadgets.borders
-ui.gadgets.frames ui.gadgets.grids ui.gadgets.status-bar
-ui.gadgets.viewports ui.gadgets.wrappers ui.gestures ui.operations
-ui.tools.browser ui.tools.debugger ui.gadgets.theme
-ui.tools.inspector ui.tools.common ui ;
+USING: accessors arrays assocs calendar combinators
+combinators.short-circuit compiler.units concurrency.flags
+concurrency.mailboxes continuations destructors documents fry generic
+generic.standard.engines.tuple hashtables help help.markup io
+io.styles kernel lexer listener math models models.delay models.filter
+namespaces parser prettyprint quotations sequences strings threads
+tools.vocabs ui ui.commands ui.gadgets ui.gadgets.buttons
+ui.gadgets.editors ui.gadgets.frames ui.gadgets.grids
+ui.gadgets.labelled ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.tracks ui.gestures ui.operations
+ui.tools.browser ui.tools.common ui.tools.debugger
+ui.tools.listener.completion ui.tools.listener.history vocabs
+vocabs.parser words ;
 IN: ui.tools.listener
 
 ! If waiting is t, we're waiting for user input, and invoking
@@ -44,22 +42,6 @@ completion-popup ;
         assoc-stack
     ] if ;
 
-: complete-IN:/USE:? ( tokens -- ? )
-    2 short tail* { "IN:" "USE:" } intersects? ;
-
-: chop-; ( seq -- seq' )
-    { ";" } split1-last [ ] [ ] ?if ;
-
-: complete-USING:? ( tokens -- ? )
-    chop-; { "USING:" } intersects? ;
-
-: up-to-caret ( caret document -- string )
-    [ { 0 0 } ] 2dip doc-range ;
-
-: vocab-completion? ( interactor -- ? )
-    [ editor-caret ] [ model>> ] bi up-to-caret " \r\n" split
-    { [ complete-IN:/USE:? ] [ complete-USING:? ] } 1|| ;
-
 : <word-model> ( interactor -- model )
     [ one-word-elt <element-model> 1/3 seconds <delay> ] keep
     '[
@@ -69,9 +51,9 @@ completion-popup ;
 
 : <interactor> ( output -- gadget )
     interactor new-editor
-        V{ } clone >>history
         <flag> >>flag
         dup <word-model> >>help
+        dup model>> <history> >>history
         swap >>output ;
 
 M: interactor graft*
@@ -98,18 +80,12 @@ M: object (print-input)
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
 
-: add-interactor-history ( input interactor -- )
-    over string>> empty? [ 2drop ] [ history>> adjoin ] if ;
-
 : interactor-continue ( obj interactor -- )
     mailbox>> mailbox-put ;
 
 : interactor-finish ( interactor -- )
-    [ editor-string <input> ] keep
-    [ print-input ]
-    [ add-interactor-history ]
-    [ clear-editor drop ]
-    2tri ;
+    [ history>> history-add ] keep
+    [ print-input ] [ clear-editor drop ] 2bi ;
 
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
@@ -304,10 +280,8 @@ M: engine-word word-completion-string method-completion-string ;
     2bi ;
 
 : quot-action ( interactor -- lines )
-    [ [ editor-string <input> ] keep add-interactor-history ]
-    [ control-value ]
-    [ select-all ]
-    tri ;
+    [ history>> history-add drop ] [ control-value ] [ select-all ] tri
+    [ parse-lines ] with-compilation-unit ;
 
 : hide-popup ( listener -- )
     dup popup>> track-remove
@@ -358,9 +332,28 @@ M: interactor stream-read-quot
         ]
     } cond ;
 
+: pass-to-popup? ( gesture interactor -- ? )
+    [ [ key-down? ] [ key-up? ] bi or ]
+    [ completion-popup>> ]
+    bi* and ;
+
+M: interactor handle-gesture
+    2dup pass-to-popup? [
+        2dup completion-popup>>
+        focusable-child resend-gesture
+        [ call-next-method ] [ 2drop f ] if
+    ] [ call-next-method ] if ;
+
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }
     { T{ key-down f { C+ } "k" } clear-editor }
+} define-command-map
+
+interactor "completion" f {
+    { T{ key-down f f "TAB" } word-completion-popup }
+    { T{ key-down f { C+ } "p" } recall-previous }
+    { T{ key-down f { C+ } "n" } recall-next }
+    { T{ key-down f { C+ } "r" } history-completion-popup }
 } define-command-map
 
 : welcome. ( -- )
@@ -437,132 +430,3 @@ M: listener-gadget graft*
 
 M: listener-gadget ungraft*
     [ com-end ] [ call-next-method ] bi ;
-
-! Foo
-USING: summary ui.gadgets.labels ui.gadgets.tables colors ui.render
-ui.gadgets.worlds ui.gadgets.glass tools.completion ui.gadgets
-present ;
-USE: tools.completion
-
-: <summary-gadget> ( model -- gadget )
-    [ summary ] <filter> <label-control> ;
-
-TUPLE: completion-popup < wrapper table interactor element ;
-
-: find-completion-popup ( gadget -- popup )
-    [ completion-popup? ] find-parent ;
-
-SINGLETON: completion-renderer
-M: completion-renderer row-columns drop present 1array ;
-M: completion-renderer row-value drop ;
-
-: <completion-model> ( editor quot -- model )
-    [ one-word-elt <element-model> 1/3 seconds <delay> ] dip
-    '[ @ keys 1000 short head ] <filter> ;
-
-M: completion-popup hide-glass-hook
-    interactor>> f >>completion-popup request-focus ;
-
-: hide-completion-popup ( popup -- )
-    find-world hide-glass ;
-
-: completion-loc/doc ( popup -- loc doc )
-    interactor>> [ editor-caret ] [ model>> ] bi ;
-
-: accept-completion ( item table -- )
-    find-completion-popup
-    [ [ present ] [ completion-loc/doc ] bi* one-word-elt set-elt-string ]
-    [ hide-completion-popup ]
-    bi ;
-
-: <completion-table> ( interactor quot -- table )
-    <completion-model> <table>
-        monospace-font >>font
-        t >>selection-required?
-        completion-renderer >>renderer
-        dup '[ _ accept-completion ] >>action ;
-
-: <completion-scroller> ( object -- object )
-    <limited-scroller>
-        { 300 120 } >>min-dim
-        { 300 120 } >>max-dim ;
-
-: <completion-popup> ( interactor quot -- popup )
-    [ completion-popup new-gadget ] 2dip
-    [ drop >>interactor ] [ <completion-table> >>table ] 2bi
-    dup table>> <completion-scroller> add-gadget
-    white <solid> >>interior ;
-
-completion-popup H{
-    { T{ key-down f f "ESC" } [ hide-completion-popup ] }
-    { T{ key-down f f "TAB" } [ table>> row-action ] }
-    { T{ key-down f f " " } [ table>> row-action ] }
-} set-gestures
-
-CONSTANT: completion-popup-offset { -4 0 }
-
-: (completion-popup-loc) ( interactor element -- loc )
-    [ drop screen-loc ] [
-        [ [ [ editor-caret ] [ model>> ] bi ] dip prev-elt ] [ drop ] 2bi
-        loc>point
-    ] 2bi v+ completion-popup-offset v+ ;
-
-: completion-popup-loc-1 ( interactor element -- loc )
-    [ (completion-popup-loc) ] [ drop caret-dim ] 2bi v+ ;
-
-: completion-popup-loc-2 ( interactor element popup -- loc )
-    [ (completion-popup-loc) ] dip pref-dim { 0 1 } v* v- ;
-
-: completion-popup-fits? ( interactor element popup -- ? )
-    [ [ completion-popup-loc-1 ] dip pref-dim v+ ]
-    [ 2drop find-world dim>> ]
-    3bi [ second ] bi@ <= ;
-
-: completion-popup-loc ( interactor element popup -- loc )
-    3dup completion-popup-fits?
-    [ drop completion-popup-loc-1 ]
-    [ completion-popup-loc-2 ]
-    if ;
-
-: show-completion-popup ( interactor quot element -- )
-    [ nip ] [ drop <completion-popup> ] 3bi
-    [ nip >>completion-popup drop ]
-    [ [ 2drop find-world ] [ 2nip ] [ completion-popup-loc ] 3tri ] 3bi
-    show-glass ;
-
-: word-completion-popup ( interactor -- )
-    dup vocab-completion?
-    [ vocabs-matching ] [ words-matching ] ? '[ [ { } ] _ if-empty ]
-    one-word-elt show-completion-popup ;
-
-: history-matching ( interactor -- alist )
-    history>>
-    [ dup string>> { { CHAR: \n CHAR: \s } } substitute ] { } map>assoc
-    <reversed> ;
-
-: history-completion-popup ( interactor -- )
-    dup '[ drop _ history-matching ] one-line-elt show-completion-popup ;
-
-: pass-to-popup? ( gesture interactor -- ? )
-    [ [ key-down? ] [ key-up? ] bi or ]
-    [ completion-popup>> ]
-    bi* and ;
-
-M: interactor handle-gesture
-    2dup pass-to-popup? [
-        2dup completion-popup>>
-        focusable-child resend-gesture
-        [ call-next-method ] [ 2drop f ] if
-    ] [ call-next-method ] if ;
-
-: selected-word ( editor -- word )
-    dup completion-popup>> [
-        [ table>> selected-row drop ] [ hide-completion-popup ] bi
-    ] [
-        selected-token dup search [ ] [ no-word ] ?if
-    ] ?if ;
-
-interactor "completion" f {
-    { T{ key-down f f "TAB" } word-completion-popup }
-    { T{ key-down f { C+ } "p" } history-completion-popup }
-} define-command-map

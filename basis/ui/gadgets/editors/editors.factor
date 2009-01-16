@@ -81,20 +81,20 @@ M: editor ungraft*
     dup caret>> deactivate-editor-model
     dup mark>> deactivate-editor-model ;
 
-: editor-caret* ( editor -- loc ) caret>> value>> ;
+: editor-caret ( editor -- loc ) caret>> value>> ;
 
-: editor-mark* ( editor -- loc ) mark>> value>> ;
+: editor-mark ( editor -- loc ) mark>> value>> ;
 
 : set-caret ( loc editor -- )
     [ model>> validate-loc ] keep
     caret>> set-model ;
 
 : change-caret ( editor quot -- )
-    [ [ [ editor-caret* ] [ model>> ] bi ] dip call ] [ drop ] 2bi
+    [ [ [ editor-caret ] [ model>> ] bi ] dip call ] [ drop ] 2bi
     set-caret ; inline
 
 : mark>caret ( editor -- )
-    [ editor-caret* ] [ mark>> ] bi set-model ;
+    [ editor-caret ] [ mark>> ] bi set-model ;
 
 : change-caret&mark ( editor quot -- )
     [ change-caret ] [ drop mark>caret ] 2bi ; inline
@@ -150,7 +150,7 @@ M: editor ungraft*
     [ loc>x ] [ [ first ] dip line>y ] 2bi 2array ;
 
 : caret-loc ( editor -- loc )
-    [ editor-caret* ] keep loc>point ;
+    [ editor-caret ] keep loc>point ;
 
 : caret-dim ( editor -- dim )
     line-height 0 swap 2array ;
@@ -220,7 +220,7 @@ M: editor ungraft*
     ] with-editor-translation ;
 
 : selection-start/end ( editor -- start end )
-    [ editor-mark* ] [ editor-caret* ] bi sort-pair ;
+    [ editor-mark ] [ editor-caret ] bi sort-pair ;
 
 : (draw-selection) ( x1 x2 -- )
     over -
@@ -298,7 +298,7 @@ M: editor gadget-text* editor-string % ;
     } at one-line-elt or ;
 
 : drag-direction? ( loc editor -- ? )
-    editor-mark* before? ;
+    editor-mark before? ;
 
 : drag-selection-caret ( loc editor element -- loc )
     [
@@ -308,7 +308,7 @@ M: editor gadget-text* editor-string % ;
 : drag-selection-mark ( loc editor element -- loc )
     [
         [ drag-direction? not ] keep
-        [ editor-mark* ] [ model>> ] bi
+        [ editor-mark ] [ model>> ] bi
     ] dip prev/next-elt ? ;
 
 : drag-caret&mark ( editor -- caret mark )
@@ -328,7 +328,7 @@ M: editor gadget-text* editor-string % ;
     over gadget-selection? [
         drop remove-selection
     ] [
-        [ [ [ editor-caret* ] [ model>> ] bi ] dip call ]
+        [ [ [ editor-caret ] [ model>> ] bi ] dip call ]
         [ drop model>> ]
         2bi remove-doc-range
     ] if ; inline
@@ -355,7 +355,7 @@ M: editor gadget-text* editor-string % ;
     tuck caret>> set-model mark>> set-model ;
 
 : select-elt ( editor elt -- )
-    [ [ [ editor-caret* ] [ model>> ] bi ] dip prev/next-elt ] [ drop ] 2bi
+    [ [ [ editor-caret ] [ model>> ] bi ] dip prev/next-elt ] [ drop ] 2bi
     editor-select ;
 
 : start-of-document ( editor -- ) doc-elt editor-prev ;

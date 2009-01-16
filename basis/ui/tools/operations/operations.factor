@@ -140,12 +140,10 @@ M: word com-stack-effect def>> com-stack-effect ;
 } define-operation
 
 [ vocab-spec? ] \ run H{
-    { +keyboard+ T{ key-down f { C+ } "r" } }
     { +listener+ t }
 } define-operation
 
 [ vocab? ] \ test H{
-    { +keyboard+ T{ key-down f { C+ } "t" } }
     { +listener+ t }
 } define-operation
 
@@ -170,11 +168,9 @@ M: word com-stack-effect def>> com-stack-effect ;
 : com-profile ( quot -- ) profile profiler-window ;
 
 [ quotation? ] \ com-profile H{
-    { +keyboard+ T{ key-down f { C+ } "r" } }
+    { +keyboard+ T{ key-down f { C+ } "f" } }
     { +listener+ t }
 } define-operation
-
-USE: ui.gadgets.tables
 
 ! Operations -> commands
 source-editor
@@ -188,5 +184,5 @@ interactor
 "quotation"
 "These commands operate on the entire contents of the input area."
 [ ]
-[ quot-action [ parse-lines ] with-compilation-unit ]
+[ quot-action ]
 define-operation-map
