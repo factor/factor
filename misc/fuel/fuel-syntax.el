@@ -79,7 +79,7 @@
   (regexp-opt fuel-syntax--declaration-words 'words))
 
 (defsubst fuel-syntax--second-word-regex (prefixes)
-  (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
+  (format "%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
 
 (defconst fuel-syntax--method-definition-regex
   "^M: +\\([^ ]+\\) +\\([^ ]+\\)")
@@ -87,14 +87,22 @@
 (defconst fuel-syntax--integer-regex
   "\\_<-?[0-9]+\\_>")
 
-(defconst fuel-syntax--ratio-regex
-  "\\_<-?\\([0-9]+\\+\\)?[0-9]+/-?[0-9]+\\_>")
+(defconst fuel-syntax--raw-float-regex
+  "[0-9]*\\.[0-9]*\\([eE][+-]?[0-9]+\\)?")
 
 (defconst fuel-syntax--float-regex
-  "\\_<-?[0-9]+\\.[0-9]*\\([eE][+-]?[0-9]+\\)?\\_>")
+  (format "\\_<-?%s\\_>" fuel-syntax--raw-float-regex))
+
+(defconst fuel-syntax--number-regex
+  (format "\\([0-9]+\\|%s\\)" fuel-syntax--raw-float-regex))
+
+(defconst fuel-syntax--ratio-regex
+  (format "\\_<[+-]?%s/-?%s\\_>"
+          fuel-syntax--number-regex
+          fuel-syntax--number-regex))
 
 (defconst fuel-syntax--bad-string-regex
-  "\"\\([^\"]\\|\\\\\"\\)*\n")
+  "\\_<\"[^>]\\([^\"\n]\\|\\\\\"\\)*\n")
 
 (defconst fuel-syntax--word-definition-regex
   (fuel-syntax--second-word-regex
@@ -114,8 +122,8 @@
 (defconst fuel-syntax--type-definition-regex
   (fuel-syntax--second-word-regex '("MIXIN:" "TUPLE:" "SINGLETON:" "UNION:")))
 
-(defconst fuel-syntax--parent-type-regex
-  "^\\(TUPLE\\|PREDICTE\\): +[^ ]+ +< +\\([^ ]+\\)")
+(defconst fuel-syntax--tuple-decl-regex
+  "^TUPLE: +\\([^ \n]+\\) +< +\\([^ \n]+\\)\\_>")
 
 (defconst fuel-syntax--constructor-regex "<[^ >]+>")
 
@@ -125,7 +133,8 @@
 (defconst fuel-syntax--symbol-definition-regex
   (fuel-syntax--second-word-regex '("SYMBOL:" "VAR:")))
 
-(defconst fuel-syntax--stack-effect-regex " ( .* )")
+(defconst fuel-syntax--stack-effect-regex
+  "\\( ( .* )\\)\\|\\( (( .* ))\\)")
 
 (defconst fuel-syntax--using-lines-regex "^USING: +\\([^;]+\\);")
 
@@ -163,26 +172,26 @@
           fuel-syntax--declaration-words-regex))
 
 (defconst fuel-syntax--single-liner-regex
-  (format "^%s" (regexp-opt '("ABOUT:"
-                              "ARTICLE:"
-                              "ALIAS:"
-                              "CONSTANT:" "C:"
-                              "DEFER:"
-                              "FORGET:"
-                              "GENERIC:" "GENERIC#"
-                              "HELP:" "HEX:" "HOOK:"
-                              "IN:" "INSTANCE:"
-                              "MAIN:" "MATH:" "MIXIN:"
-                              "OCT:"
-                              "POSTPONE:" "PRIVATE>" "<PRIVATE"
-                              "QUALIFIED-WITH:" "QUALIFIED:"
-                              "RENAME:"
-                              "SINGLETON:" "SLOT:" "SYMBOL:"
-                              "USE:"
-                              "VAR:"))))
+  (regexp-opt '("ABOUT:"
+                "ARTICLE:"
+                "ALIAS:"
+                "CONSTANT:" "C:"
+                "DEFER:"
+                "FORGET:"
+                "GENERIC:" "GENERIC#"
+                "HELP:" "HEX:" "HOOK:"
+                "IN:" "INSTANCE:"
+                "MAIN:" "MATH:" "MIXIN:"
+                "OCT:"
+                "POSTPONE:" "PRIVATE>" "<PRIVATE"
+                "QUALIFIED-WITH:" "QUALIFIED:"
+                "RENAME:"
+                "SINGLETON:" "SLOT:" "SYMBOL:"
+                "USE:"
+                "VAR:")))
 
 (defconst fuel-syntax--begin-of-def-regex
-  (format "^USING: \\|\\(%s\\)\\|\\(%s .*\\)"
+  (format "^USING: \\|\\(%s\\)\\|\\(^%s .*\\)"
           fuel-syntax--definition-start-regex
           fuel-syntax--single-liner-regex))
 
@@ -190,7 +199,7 @@
   (format "^.*%s" fuel-syntax--definition-end-regex))
 
 (defconst fuel-syntax--end-of-def-regex
-  (format "\\(%s\\)\\|\\(%s .*\\)"
+  (format "\\(%s\\)\\|\\(^%s .*\\)"
           fuel-syntax--end-of-def-line-regex
           fuel-syntax--single-liner-regex))
 
@@ -220,13 +229,21 @@
     table))
 
 (defconst fuel-syntax--syntactic-keywords
-  `(;; Comments:
+  `(;; CHARs:
+    ("CHAR: \\(.\\)\\( \\|$\\)" (1 "w"))
+    ;; Comments:
     ("\\_<\\(#?!\\) .*\\(\n\\|$\\)" (1 "<") (2 ">"))
     ("\\_<\\(#?!\\)\\(\n\\|$\\)" (1 "<") (2 ">"))
-    ;; CHARs:
-    ("CHAR: \\(.\\)\\( \\|$\\)" (1 "w"))
     ;; Strings
-    ("\\(\"\\)\\([^\n\r\f\\\"]\\|\\\\\"?\\)*\\(\"\\)" (1 "\"") (3 "\""))
+    ("\\_<\\(\"\\)\\([^\n\r\f\"]\\|\\\\\"\\)*\\(\"\\)\\_>" (1 "\"") (3 "\""))
+    ("\\_<<\\(\"\\)\\_>" (1 "\""))
+    ("\\_<\\(\"\\)>\\_>" (1 "\""))
+    ;; Multiline constructs
+    ("\\_<USING:\\( \\)\\(;\\)" (1 "<b") (2 ">b"))
+    ("\\_<USING:\\( \\)" (1 "<b"))
+    ("\\_<TUPLE: +\\w+? +< +\\w+? *\\( \\)" (1 "<b"))
+    ("\\_<\\(TUPLE\\|SYMBOLS\\|VARS\\): +\\w+? *\\( \\)\\([^<]\\|\\_>\\)" (2 "<b"))
+    ("\\(\n\\| \\);\\_>" (1 ">b"))
     ;; Let and lambda:
     ("\\_<\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
     ("\\(\\[\\)\\(let\\|wlet\\|let\\*\\)\\( \\|$\\)" (1 "(]"))

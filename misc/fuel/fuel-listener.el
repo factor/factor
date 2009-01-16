@@ -31,7 +31,12 @@
   :group 'fuel)
 
 (defcustom fuel-listener-factor-binary
-  (expand-file-name "factor" fuel-factor-root-dir)
+  (expand-file-name (cond ((eq system-type 'windows-nt)
+                           "factor.exe")
+                          ((eq system-type 'darwin)
+                           "Factor.app/Contents/MacOS/factor")
+                          (t "factor"))
+                    fuel-factor-root-dir)
   "Full path to the factor executable to use when starting a listener."
   :type '(file :must-match t)
   :group 'fuel-listener)
@@ -132,8 +137,7 @@ buffer."
 
 (defun fuel-listener--setup-completion ()
   (setq fuel-syntax--current-vocab-function 'fuel-listener--current-vocab)
-  (setq fuel-syntax--usings-function 'fuel-listener--usings)
-  (set-syntax-table fuel-syntax--syntax-table))
+  (setq fuel-syntax--usings-function 'fuel-listener--usings))
 
 
 ;;; Stack mode support
@@ -160,7 +164,6 @@ buffer."
   (set (make-local-variable 'comint-prompt-regexp) fuel-con--prompt-regex)
   (set (make-local-variable 'comint-use-prompt-regexp) t)
   (set (make-local-variable 'comint-prompt-read-only) t)
-  (set-syntax-table fuel-syntax--syntax-table)
   (fuel-listener--setup-completion)
   (fuel-listener--setup-stack-mode))
 
