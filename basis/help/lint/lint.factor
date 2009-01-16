@@ -58,9 +58,9 @@ IN: help.lint
             [ contains-funky-elements? ]
             bi* or
         ] [
-            [ effect-values >array ]
-            [ extract-values >array ]
-            bi* =
+            [ effect-values ]
+            [ extract-values ]
+            bi* sequence=
         ]
     } 2|| [ "$values don't match stack effect" throw ] unless ;
 

@@ -86,7 +86,7 @@ HELP: inet
 } ;
 
 HELP: <inet>
-{ $values { "host" "a host name" } { "port" "a port number" } }
+{ $values { "host" "a host name" } { "port" "a port number" } { "inet" inet } }
 { $description "Creates a new " { $link inet } " address specifier." } ;
 
 HELP: inet4
@@ -97,7 +97,7 @@ HELP: inet4
 } ;
 
 HELP: <inet4>
-{ $values { "host" "an IPv4 address" } { "port" "a port number" } }
+{ $values { "host" "an IPv4 address" } { "port" "a port number" } { "inet4" inet4 } }
 { $description "Creates a new " { $link inet4 } " address specifier." } ;
 
 HELP: inet6
@@ -108,7 +108,7 @@ HELP: inet6
 } ;
 
 HELP: <inet6>
-{ $values { "host" "an IPv6 address" } { "port" "a port number" } }
+{ $values { "host" "an IPv6 address" } { "port" "a port number" } { "inet6" inet6 } }
 { $description "Creates a new " { $link inet6 } " address specifier." } ;
 
 HELP: <client>
