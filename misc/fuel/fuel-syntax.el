@@ -215,6 +215,9 @@
 (defconst fuel-syntax--typedef-regex
   "\\_<TYPEDEF: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
 
+(defconst fuel-syntax--rename-regex
+  "\\_<RENAME: +\\(\\w+\\) +\\(\\w+\\) +=> +\\(\\w+\\)\\( .*\\)?$")
+
 
 ;;; Factor syntax table
 
