@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test core-graphics kernel ;
+USING: tools.test core-graphics kernel byte-arrays ;
 IN: core-graphics.tests
 
-[ ] [ 100 200 [ drop ] with-bitmap-context ] unit-test
+[ t ] [ 100 200 [ drop ] with-bitmap-context byte-array? ] unit-test
