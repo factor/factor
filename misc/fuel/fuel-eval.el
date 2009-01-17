@@ -31,6 +31,7 @@
         ((listp sexp)
          (case (car sexp)
            (:array (factor--seq 'V{ '} (cdr sexp)))
+           (:seq (factor--seq '{ '} (cdr sexp)))
            (:quote (format "\\ %s" (factor `(:factor ,(cadr sexp)))))
            (:quotation (factor--seq '\[ '\] (cdr sexp)))
            (:using (factor `(USING: ,@(cdr sexp) :end)))

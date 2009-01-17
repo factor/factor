@@ -1,7 +1,7 @@
 USING: arrays byte-arrays kernel kernel.private math memory
 namespaces sequences tools.test math.private quotations
 continuations prettyprint io.streams.string debugger assocs
-sequences.private accessors locals.backend ;
+sequences.private accessors locals.backend grouping ;
 IN: kernel.tests
 
 [ 0 ] [ f size ] unit-test

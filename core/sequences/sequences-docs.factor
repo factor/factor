@@ -415,18 +415,6 @@ HELP: filter-here
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
 { $side-effects "seq" } ;
 
-HELP: monotonic?
-{ $values { "seq" sequence } { "quot" { $quotation "( elt elt -- ? )" } } { "?" "a boolean" } }
-{ $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
-{ $examples
-    "Testing if a sequence is non-decreasing:"
-    { $example "USING: math prettyprint sequences ;" "{ 1 1 2 } [ <= ] monotonic? ." "t" }
-    "Testing if a sequence is decreasing:"
-    { $example "USING: math prettyprint sequences ;" "{ 9 8 6 7 } [ < ] monotonic? ." "f" }
-} ;
-
-{ monotonic? all-eq? all-equal? } related-words
-
 HELP: interleave
 { $values { "seq" sequence } { "between" "a quotation" } { "quot" { $quotation "( elt -- )" } } }
 { $description "Applies " { $snippet "quot" } " to each element in turn, also invoking " { $snippet "between" } " in-between each pair of elements." }
@@ -564,14 +552,6 @@ HELP: pop
 { $description "Outputs the last element after removing it and shortening the sequence." }
 { $side-effects "seq" }
 { $errors "Throws an error if the sequence is empty." } ;
-
-HELP: all-equal?
-{ $values { "seq" sequence } { "?" "a boolean" } }
-{ $description "Tests if all elements in the sequence are equal. Yields true with an empty sequence." } ;
-
-HELP: all-eq?
-{ $values { "seq" sequence } { "?" "a boolean" } }
-{ $description "Tests if all elements in the sequence are the same identical object. Yields true with an empty sequence." } ;
 
 HELP: mismatch
 { $values { "seq1" sequence } { "seq2" sequence } { "i" "an index" } }
@@ -1443,8 +1423,6 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 "Testing if a sequence contains elements satisfying a predicate:"
 { $subsection contains? }
 { $subsection all? }
-"Testing how elements are related:"
-{ $subsection monotonic? }
 { $subsection "sequence-2combinators" }
 { $subsection "sequence-3combinators" } ;
 
@@ -1473,10 +1451,7 @@ ARTICLE: "sequences-tests" "Testing sequences"
 "Testing if a sequence contains a subsequence:"
 { $subsection head? }
 { $subsection tail? }
-{ $subsection subseq? }
-"Testing how elements are related:"
-{ $subsection all-eq? }
-{ $subsection all-equal? } ;
+{ $subsection subseq? } ;
 
 ARTICLE: "sequences-search" "Searching sequences"
 "Finding the index of an element:"

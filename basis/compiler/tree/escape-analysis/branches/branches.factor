@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces sequences sets fry columns
-stack-checker.branches
+grouping stack-checker.branches
 compiler.tree
 compiler.tree.propagation.branches
 compiler.tree.escape-analysis.nodes

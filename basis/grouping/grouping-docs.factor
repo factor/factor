@@ -22,7 +22,12 @@ ARTICLE: "grouping" "Groups and clumps"
     { "With clumps, collecting the first element of each subsequence but the last one, together with the last subseqence, yields the original sequence:"
         { $unchecked-example "dup n clumps unclip-last [ [ first ] map ] dip append sequence= ." "t" }
     }
-} ;
+}
+"A combinator built using clumps:"
+{ $subsection monotonic? }
+"Testing how elements are related:"
+{ $subsection all-eq? }
+{ $subsection all-equal? } ;
 
 ABOUT: "grouping"
 
@@ -123,3 +128,23 @@ HELP: <sliced-clumps>
 { <clumps> <groups> } related-words
 
 { <sliced-clumps> <sliced-groups> } related-words
+
+HELP: monotonic?
+{ $values { "seq" sequence } { "quot" { $quotation "( elt elt -- ? )" } } { "?" "a boolean" } }
+{ $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
+{ $examples
+    "Testing if a sequence is non-decreasing:"
+    { $example "USING: grouping math prettyprint ;" "{ 1 1 2 } [ <= ] monotonic? ." "t" }
+    "Testing if a sequence is decreasing:"
+    { $example "USING: grouping math prettyprint ;" "{ 9 8 6 7 } [ < ] monotonic? ." "f" }
+} ;
+
+HELP: all-equal?
+{ $values { "seq" sequence } { "?" "a boolean" } }
+{ $description "Tests if all elements in the sequence are equal. Yields true with an empty sequence." } ;
+
+HELP: all-eq?
+{ $values { "seq" sequence } { "?" "a boolean" } }
+{ $description "Tests if all elements in the sequence are the same identical object. Yields true with an empty sequence." } ;
+
+{ monotonic? all-eq? all-equal? } related-words

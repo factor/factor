@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ascii assocs combinators fry io.encodings
-io.encodings.iana io.encodings.utf16 io.encodings.utf8 kernel
-make math.parser namespaces sequences sets splitting state-parser
-xml.char-classes xml.data xml.entities xml.errors strings ;
+USING: accessors arrays ascii assocs combinators
+combinators.short-circuit fry io.encodings io.encodings.iana
+io.encodings.string io.encodings.utf16 io.encodings.utf8 kernel make
+math math.parser namespaces sequences sets splitting state-parser
+strings xml.char-classes xml.data xml.entities xml.errors hashtables ;
 IN: xml.tokenize
 
 ! XML namespace processing: ns = namespace
@@ -53,34 +54,37 @@ SYMBOL: ns-stack
 
 ! version=1.0? is calculated once and passed around for efficiency
 
-: (parse-name) ( -- str )
-    version=1.0? dup
-    get-char name-start? [
-        [ dup get-char name-char? not ] take-until nip
-    ] [
-        "Malformed name" xml-string-error
-    ] if ;
+: assure-name ( str version=1.0? -- str )
+    over {
+        [ first name-start? ]
+        [ rest-slice [ name-char? ] with all? ]
+    } 2&& [ bad-name ] unless ;
+
+: (parse-name) ( start -- str )
+    version=1.0?
+    [ [ get-char name-char? not ] curry take-until append ]
+    [ assure-name ] bi ;
+
+: parse-name-starting ( start -- name )
+    (parse-name) get-char CHAR: : =
+    [ next "" (parse-name) ] [ "" swap ] if f <name> ;
 
 : parse-name ( -- name )
-    (parse-name) get-char CHAR: : =
-    [ next (parse-name) ] [ "" swap ] if f <name> ;
+    "" parse-name-starting ;
 
 !   -- Parsing strings
 
-: (parse-entity) ( string -- )
+: parse-named-entity ( string -- )
     dup entities at [ , ] [ 
-        prolog-data get standalone>>
-        [ no-entity ] [
-            dup extra-entities get at
-            [ , ] [ no-entity ] ?if
-        ] if
+        dup extra-entities get at
+        [ dup number? [ , ] [ % ] if ] [ no-entity ] ?if ! Make less hackish
     ] ?if ;
 
 : parse-entity ( -- )
     next CHAR: ; take-char next
     "#" ?head [
         "x" ?head 16 10 ? base> ,
-    ] [ (parse-entity) ] if ;
+    ] [ parse-named-entity ] if ;
 
 : (parse-char) ( ch -- )
     get-char {
@@ -93,13 +97,9 @@ SYMBOL: ns-stack
 : parse-char ( ch -- string )
     [ (parse-char) ] "" make ;
 
-: parse-quot ( ch -- string )
-    parse-char get-char
-    [ "XML file ends in a quote" xml-string-error ] unless ;
-
 : parse-text ( -- string )
     CHAR: < parse-char ;
-
+                                   
 ! Parsing tags
 
 : start-tag ( -- name ? )
@@ -107,17 +107,18 @@ SYMBOL: ns-stack
     get-char CHAR: / = dup [ next ] when
     parse-name swap ;
 
-: parse-attr-value ( -- seq )
-    get-char dup "'\"" member? [
-        next parse-quot
-    ] [
-        "Attribute lacks quote" xml-string-error
-    ] if ;
+: (parse-quote) ( ch -- string )
+    parse-char get-char
+    [ unclosed-quote ] unless ;
+
+: parse-quote ( -- seq )
+    pass-blank get-char dup "'\"" member?
+    [ next (parse-quote) ] [ quoteless-attr ] if ;
 
 : parse-attr ( -- )
-    [ parse-name ] with-scope
-    pass-blank CHAR: = expect pass-blank
-    [ parse-attr-value ] with-scope
+    parse-name
+    pass-blank CHAR: = expect
+    parse-quote
     2array , ;
 
 : (middle-tag) ( -- )
@@ -153,7 +154,7 @@ SYMBOL: ns-stack
 : only-blanks ( str -- )
     [ blank? ] all? [ bad-doctype-decl ] unless ;
 
-: take-system-literal ( -- str )
+: take-system-literal ( -- str ) ! replace with parse-quote?
     pass-blank get-char next {
         { CHAR: ' [ "'" take-string ] }
         { CHAR: " [ "\"" take-string ] }
@@ -207,15 +208,18 @@ DEFER: direct
 
 : take-entity-def ( -- entity-name entity-def )
     " " take-string pass-blank get-char {
-        { CHAR: ' [ take-system-literal ] }
-        { CHAR: " [ take-system-literal ] }
+        { CHAR: ' [ parse-quote ] }
+        { CHAR: " [ parse-quote ] }
         [ drop take-external-id ]
     } case ;
+
+: associate-entity ( entity-name entity-def -- )
+    swap extra-entities [ ?set-at ] change ;
 
 : take-entity-decl ( -- entity-decl )
     pass-blank get-char {
         { CHAR: % [ next pass-blank take-entity-def ] }
-        [ drop take-entity-def ]
+        [ drop take-entity-def 2dup associate-entity ]
     } case
     ">" take-string only-blanks <entity-decl> ;
 
@@ -253,14 +257,22 @@ DEFER: direct
 : good-version ( version -- version )
     dup { "1.0" "1.1" } member? [ bad-version ] unless ;
 
-: prolog-attrs ( alist -- prolog )
-    [ T{ name f "" "version" f } swap at
-      [ good-version ] [ versionless-prolog ] if* ] keep
-    [ T{ name f "" "encoding" f } swap at
-      "UTF-8" or ] keep
+: prolog-version ( alist -- version )
+    T{ name f "" "version" f } swap at
+    [ good-version ] [ versionless-prolog ] if* ;
+
+: prolog-encoding ( alist -- encoding )
+    T{ name f "" "encoding" f } swap at "UTF-8" or ;
+
+: prolog-standalone ( alist -- version )
     T{ name f "" "standalone" f } swap at
-    [ yes/no>bool ] [ f ] if*
-    <prolog> ;
+    [ yes/no>bool ] [ f ] if* ;
+
+: prolog-attrs ( alist -- prolog )
+    [ prolog-version ]
+    [ prolog-encoding ]
+    [ prolog-standalone ]
+    tri <prolog> ;
 
 SYMBOL: string-input?
 : decode-input-if ( encoding -- )
@@ -274,7 +286,7 @@ SYMBOL: string-input?
     dup prolog-data set ;
 
 : instruct ( -- instruction )
-    (parse-name) dup "xml" =
+    "" (parse-name) dup "xml" =
     [ drop parse-prolog ] [
         dup >lower "xml" =
         [ capitalized-prolog ]
@@ -284,7 +296,7 @@ SYMBOL: string-input?
 : make-tag ( -- tag )
     {
         { [ get-char dup CHAR: ! = ] [ drop next direct ] }
-        { [ CHAR: ? = ] [ next instruct ] } 
+        { [ CHAR: ? = ] [ next instruct ] }
         [
             start-tag [ dup add-ns pop-ns <closer> ]
             [ middle-tag end-tag ] if
@@ -294,36 +306,50 @@ SYMBOL: string-input?
 
 ! Autodetecting encodings
 
+: continue-make-tag ( str -- tag )
+    parse-name-starting middle-tag end-tag CHAR: > expect ;
+
 : start-utf16le ( -- tag )
     utf16le decode-input-if
     CHAR: ? expect
     0 expect instruct ;
 
+: 10xxxxxx? ( ch -- ? )
+    -6 shift 3 bitand 2 = ;
+          
+: start<name ( ch -- tag )
+    ascii?
+    [ utf8 decode-input-if next make-tag ] [
+        next
+        [ get-next 10xxxxxx? not ] take-until
+        get-char suffix utf8 decode
+        utf8 decode-input-if next
+        continue-make-tag
+    ] if ;
+          
 : start< ( -- tag )
     get-next {
         { 0 [ next next start-utf16le ] }
         { CHAR: ? [ next next instruct ] } ! XML prolog parsing sets the encoding
-        [ drop utf8 decode-input-if next make-tag ]
-        ! That is a hack. It fails if you have <nonascii
+        { CHAR: ! [ utf8 decode-input next next direct ] }
+        [ start<name ]
     } case ;
 
 : skip-utf8-bom ( -- tag )
     "\u0000bb\u0000bf" expect utf8 decode-input
     CHAR: < expect make-tag ;
 
+: decode-expecting ( encoding string -- tag )
+    [ decode-input-if next ] [ expect-string ] bi* make-tag ;
+
 : start-utf16be ( -- tag )
-    utf16be decode-input-if
-    next CHAR: < expect make-tag ;
+    utf16be "<" decode-expecting ;
 
 : skip-utf16le-bom ( -- tag )
-    utf16le decode-input-if
-    next HEX: FE expect
-    CHAR: < expect make-tag ;
+    utf16le "\u0000fe<" decode-expecting ;
 
 : skip-utf16be-bom ( -- tag )
-    utf16be decode-input-if
-    next HEX: FF expect
-    CHAR: < expect make-tag ;
+    utf16be "\u0000ff<" decode-expecting ;
 
 : start-document ( -- tag )
     get-char {
@@ -333,8 +359,6 @@ SYMBOL: string-input?
         { HEX: FF [ skip-utf16le-bom ] }
         { HEX: FE [ skip-utf16be-bom ] }
         { f [ "" ] }
-        [ dup blank?
-          [ drop pass-blank utf8 decode-input-if CHAR: < expect make-tag ]
-          [ 1string ] if ! Replace with proper error
-        ]
+        [ drop utf8 decode-input-if f ]
+        ! Same problem as with <e`>, in the case of XML chunks?
     } case ;

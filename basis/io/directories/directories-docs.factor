@@ -6,7 +6,7 @@ HELP: cwd
 { $values { "path" "a pathname string" } }
 { $description "Outputs the current working directory of the Factor process." }
 { $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." }
-{ $notes "User code should use " { $link with-directory } " or " { $link set-current-directory } " instead." } ;
+{ $notes "User code should use the value of the " { $link current-directory } " variable instead." } ;
 
 HELP: cd
 { $values { "path" "a pathname string" } }

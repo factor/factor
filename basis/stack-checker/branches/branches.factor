@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry vectors sequences assocs math accessors kernel
-combinators quotations namespaces stack-checker.state
+combinators quotations namespaces grouping stack-checker.state
 stack-checker.backend stack-checker.errors stack-checker.visitor
 stack-checker.values stack-checker.recursive-state ;
 IN: stack-checker.branches

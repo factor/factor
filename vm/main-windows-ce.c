@@ -1,5 +1,3 @@
-#include <windows.h>
-#include <stdio.h>
 #include "master.h"
 
 /* 
@@ -8,7 +6,9 @@
 
 	This would not be necessary if Windows CE had CommandLineToArgvW.
 
-	Based on MinGW's public domain char** version.  */
+	Based on MinGW's public domain char** version.
+
+*/
 
 int __argc;
 wchar_t **__argv;
@@ -128,7 +128,7 @@ WinMain(
 	int nCmdShow)
 {
 	parse_args(&__argc, &__argv, lpCmdLine);
-	init_factor_from_args(NULL,__argc,(LPWSTR*)__argv,false);
+	start_standalone_factor(__argc,(LPWSTR*)__argv);
 	// memory leak from malloc, wcsdup
 	return 0;
 }

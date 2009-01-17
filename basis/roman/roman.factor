@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel math math.order math.vectors
 namespaces make quotations sequences splitting.monotonic
-sequences.private strings unicode.case lexer parser ;
+sequences.private strings unicode.case lexer parser
+grouping ;
 IN: roman
 
 <PRIVATE
@@ -39,16 +40,14 @@ ERROR: roman-range-error n ;
 PRIVATE>
 
 : >roman ( n -- str )
-    dup roman-range-check [
-        (>roman)
-    ] "" make ;
+    dup roman-range-check
+    [ (>roman) ] "" make ;
 
 : >ROMAN ( n -- str ) >roman >upper ;
 
 : roman> ( str -- n )
-    >lower [ roman<= ] monotonic-split [
-        (roman>)
-    ] map sum ;
+    >lower [ roman<= ] monotonic-split
+    [ (roman>) ] sigma ;
 
 <PRIVATE
 

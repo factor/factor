@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel xml.data xml.errors
 xml.writer state-parser xml.tokenize xml.utilities xml.entities
-strings sequences io ;
+strings sequences io xml.entities.html ;
 IN: xml
 
 HELP: string>xml
@@ -295,9 +295,6 @@ HELP: expected
 HELP: no-entity
 { $class-description "XML parsing error describing the use of an undefined entity in a case where standalone is marked yes. Delegates to " { $link parsing-error } ". Contains one slot, thing, containing a string representing the entity." } ;
 
-HELP: xml-string-error
-{ $class-description "XML parsing error that delegates to " { $link parsing-error } " and represents an other, unspecified error, which is represented by the slot string, containing a string describing the error." } ;
-
 HELP: open-tag
 { $class-description "represents a tag that does have children, ie is not a contained tag" }
 { $notes "the constructor used for this class is simply " { $link <tag> } "." }
@@ -323,6 +320,15 @@ HELP: state-parse
 
 HELP: pre/post-content
 { $class-description "describes the error where a non-whitespace string is used before or after the main tag in an XML document. Contains two slots: string contains the offending string, and pre? is t if it occured before the main tag and f if it occured after" } ;
+
+HELP: unclosed-quote
+{ $class-description "describes the error where a quotation for an attribute value is opened but not closed before the end of the document." } ;
+
+HELP: bad-name
+{ $class-description "describes the error where a name is used, for example in an XML tag or attribute key, which is invalid." } ;
+
+HELP: quoteless-attr
+{ $class-description "describes the error where an attribute of an XML tag is missing quotes around a value." } ;
 
 HELP: entities
 { $description "a hash table from default XML entity names (like &amp; and &lt;) to the characters they represent. This is automatically included when parsing any XML document." }
@@ -444,6 +450,9 @@ ARTICLE: { "xml" "errors" } "XML parsing errors"
     { $subsection expected }
     { $subsection no-entity }
     { $subsection pre/post-content }
+    { $subsection unclosed-quote }
+    { $subsection bad-name }
+    { $subsection quoteless-attr }
     "Additionally, most of these errors delegate to " { $link parsing-error } " in order to provide more information"
     $nl
     "Note that, in parsing an XML document, only the first error is reported." ;
@@ -456,7 +465,7 @@ ARTICLE: { "xml" "entities" } "XML entities"
     { $subsection with-html-entities } ;
 
 ARTICLE: "xml" "XML parser"
-"The " { $vocab-link "xml" } " vocabulary implements the XML 1.1 standard, converting strings of text into XML and vice versa."
+"The " { $vocab-link "xml" } " vocabulary implements the XML 1.0 and 1.1 standards, converting strings of text into XML and vice versa."
     { $subsection { "xml" "reading" } }
     { $subsection { "xml" "writing" } }
     { $subsection { "xml" "classes" } }

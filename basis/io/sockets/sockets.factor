@@ -109,7 +109,7 @@ M: invalid-inet6 summary drop "Invalid IPv6 address" ;
     [ f ] [
         ":" split [
             hex> [ "Component not a number" throw ] unless*
-        ] B{ } map-as
+        ] { } map-as
     ] if-empty ;
 
 : pad-inet6 ( string1 string2 -- seq )
