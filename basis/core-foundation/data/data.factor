@@ -4,34 +4,32 @@ USING: alien.syntax alien.c-types sequences kernel math ;
 IN: core-foundation.data
 
 TYPEDEF: void* CFDataRef
-TYPEDEF: void* CFDictionaryRef
-TYPEDEF: void* CFMutableDictionaryRef
 TYPEDEF: void* CFNumberRef
 TYPEDEF: void* CFSetRef
 
 TYPEDEF: int CFNumberType
-: kCFNumberSInt8Type 1 ; inline
-: kCFNumberSInt16Type 2 ; inline
-: kCFNumberSInt32Type 3 ; inline
-: kCFNumberSInt64Type 4 ; inline
-: kCFNumberFloat32Type 5 ; inline
-: kCFNumberFloat64Type 6 ; inline
-: kCFNumberCharType 7 ; inline
-: kCFNumberShortType 8 ; inline
-: kCFNumberIntType 9 ; inline
-: kCFNumberLongType 10 ; inline
-: kCFNumberLongLongType 11 ; inline
-: kCFNumberFloatType 12 ; inline
-: kCFNumberDoubleType 13 ; inline
-: kCFNumberCFIndexType 14 ; inline
-: kCFNumberNSIntegerType 15 ; inline
-: kCFNumberCGFloatType 16 ; inline
-: kCFNumberMaxType 16 ; inline
+CONSTANT: kCFNumberSInt8Type 1
+CONSTANT: kCFNumberSInt16Type 2
+CONSTANT: kCFNumberSInt32Type 3
+CONSTANT: kCFNumberSInt64Type 4
+CONSTANT: kCFNumberFloat32Type 5
+CONSTANT: kCFNumberFloat64Type 6
+CONSTANT: kCFNumberCharType 7
+CONSTANT: kCFNumberShortType 8
+CONSTANT: kCFNumberIntType 9
+CONSTANT: kCFNumberLongType 10
+CONSTANT: kCFNumberLongLongType 11
+CONSTANT: kCFNumberFloatType 12
+CONSTANT: kCFNumberDoubleType 13
+CONSTANT: kCFNumberCFIndexType 14
+CONSTANT: kCFNumberNSIntegerType 15
+CONSTANT: kCFNumberCGFloatType 16
+CONSTANT: kCFNumberMaxType 16
 
 TYPEDEF: int CFPropertyListMutabilityOptions
-: kCFPropertyListImmutable                  0 ; inline
-: kCFPropertyListMutableContainers          1 ; inline
-: kCFPropertyListMutableContainersAndLeaves 2 ; inline
+CONSTANT: kCFPropertyListImmutable 0
+CONSTANT: kCFPropertyListMutableContainers 1
+CONSTANT: kCFPropertyListMutableContainersAndLeaves 2
 
 FUNCTION: CFNumberRef CFNumberCreate ( CFAllocatorRef allocator, CFNumberType theType, void* valuePtr ) ;
 
