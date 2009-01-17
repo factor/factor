@@ -82,6 +82,8 @@
                  ((looking-at "\\(TUPLE\\|SYMBOLS\\|VARS\\): ")
                   'factor-font-lock-symbol)
                  (t 'default))))
+        ((char-equal (char-after (nth 8 state)) ?U)
+         'factor-font-lock-parsing-word)
         (t 'factor-font-lock-comment)))
 
 (defconst fuel-font-lock--font-lock-keywords
