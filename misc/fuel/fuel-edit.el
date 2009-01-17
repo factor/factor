@@ -33,6 +33,11 @@
 
 ;;; Auxiliar functions:
 
+(defun fuel-edit--looking-at-vocab ()
+  (save-excursion
+    (fuel-syntax--beginning-of-defun)
+    (looking-at "USING:\\|USE:")))
+
 (defun fuel-edit--try-edit (ret)
   (let* ((err (fuel-eval--retort-error ret))
          (loc (fuel-eval--retort-result ret)))
@@ -92,9 +97,9 @@ With prefix, asks for the word to edit."
                    (fuel-completion--read-word "Edit word: ")))
          (cmd `(:fuel* ((:quote ,word) fuel-get-edit-location)))
          (marker (and (not arg) (point-marker))))
-    (condition-case nil
-        (fuel-edit--try-edit (fuel-eval--send/wait cmd))
-      (error (fuel-edit-vocabulary nil word)))
+    (if (and (not arg) (fuel-edit--looking-at-vocab))
+        (fuel-edit-vocabulary nil word)
+      (fuel-edit--try-edit (fuel-eval--send/wait cmd)))
     (when marker (ring-insert find-tag-marker-ring marker))))
 
 (defun fuel-edit-word-doc-at-point (&optional arg word)
