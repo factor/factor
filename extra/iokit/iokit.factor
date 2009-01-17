@@ -1,6 +1,6 @@
 USING: alien.syntax alien.c-types core-foundation
-core-foundation.bundles system combinators kernel sequences
-debugger io accessors ;
+core-foundation.bundles core-foundation.dictionaries system
+combinators kernel sequences debugger io accessors ;
 IN: iokit
 
 <<
