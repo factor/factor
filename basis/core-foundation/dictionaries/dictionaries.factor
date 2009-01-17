@@ -21,8 +21,7 @@ FUNCTION: CFDictionaryRef CFDictionaryCreate (
 : <CFDictionary> ( alist -- dictionary )
     [ kCFAllocatorDefault ] dip
     unzip [ >void*-array ] bi@
-    dup length "void*" heap-size /i
-    [ [ underlying>> ] bi@ ] dip
+    [ [ underlying>> ] bi@ ] [ nip length "void*" heap-size /i ] 2bi
     &: kCFTypeDictionaryCallBacks
     &: kCFTypeDictionaryValueCallbacks
     CFDictionaryCreate ;
