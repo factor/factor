@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax math ;
+USING: alien.syntax alien.c-types alien.destructors math
+locals fry sequences destructors kernel ;
 IN: core-graphics
 
 TYPEDEF: void* CGColorSpaceRef
@@ -42,6 +43,12 @@ FUNCTION: CGContextRef CGBitmapContextCreate (
 
 FUNCTION: void CGColorSpaceRelease ( CGColorSpaceRef ref ) ;
 
+DESTRUCTOR: CGColorSpaceRelease
+
+FUNCTION: void CGContextRelease ( CGContextRef ref ) ;
+
+DESTRUCTOR: CGContextRelease
+
 FUNCTION: void CGContextSetRGBStrokeColor (
    CGContextRef c,
    CGFloat red,
@@ -63,3 +70,16 @@ FUNCTION: void CGContextSetTextPosition (
    CGFloat x,
    CGFloat y
 ) ;
+
+:: <CGBitmapContext> ( data w h -- context )
+    [
+        data w h 8 w 4 *
+        CGColorSpaceCreateDeviceRGB &CGColorSpaceRelease
+        kCGImageAlphaPremultipliedLast CGBitmapContextCreate
+    ] with-destructors ;
+
+: with-bitmap-context ( w h quot -- data )
+    '[
+        [ * "uint" <c-array> ] 2keep
+        [ <CGBitmapContext> &CGContextRelease @ ] [ 2drop ] 3bi
+    ] with-destructors ; inline

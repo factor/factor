@@ -1,0 +1,1 @@
+Functor for defining destructors which call a C function to dispose of resources

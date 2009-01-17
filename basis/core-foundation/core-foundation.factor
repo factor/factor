@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax destructors accessors kernel ;
+USING: alien.syntax alien.destructors accessors kernel ;
 IN: core-foundation
 
 TYPEDEF: void* CFTypeRef
@@ -20,12 +20,4 @@ FUNCTION: CFTypeRef CFRetain ( CFTypeRef cf ) ;
 
 FUNCTION: void CFRelease ( CFTypeRef cf ) ;
 
-TUPLE: CFRelease-destructor alien disposed ;
-
-M: CFRelease-destructor dispose* alien>> CFRelease ;
-
-: &CFRelease ( alien -- alien )
-    dup f CFRelease-destructor boa &dispose drop ; inline
-
-: |CFRelease ( alien -- alien )
-    dup f CFRelease-destructor boa |dispose drop ; inline
+DESTRUCTOR: CFRelease
