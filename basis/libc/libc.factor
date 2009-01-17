@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight
-! Copyright (C) 2007, 2008 Slava Pestov
+! Copyright (C) 2007, 2009 Slava Pestov
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien assocs continuations destructors kernel
+USING: alien assocs continuations alien.destructors kernel
 namespaces accessors sets summary ;
 IN: libc
 
@@ -90,17 +90,4 @@ PRIVATE>
 : strlen ( alien -- len )
     "size_t" "libc" "strlen" { "char*" } alien-invoke ;
 
-<PRIVATE
-
-! Memory allocations
-TUPLE: memory-destructor alien disposed ;
-
-M: memory-destructor dispose* alien>> free ;
-
-PRIVATE>
-
-: &free ( alien -- alien )
-    dup f memory-destructor boa &dispose drop ; inline
-
-: |free ( alien -- alien )
-    dup f memory-destructor boa |dispose drop ; inline
+DESTRUCTOR: free
