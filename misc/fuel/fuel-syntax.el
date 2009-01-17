@@ -187,6 +187,7 @@
                 "QUALIFIED-WITH:" "QUALIFIED:"
                 "RENAME:"
                 "SINGLETON:" "SLOT:" "SYMBOL:"
+                "TYPEDEF:"
                 "USE:"
                 "VAR:")))
 
@@ -207,6 +208,15 @@
   (format "\\(%s\\|%s\\)"
           (format ":[^ ]* [^ ]+\\(%s\\)*" fuel-syntax--stack-effect-regex)
           "M[^:]*: [^ ]+ [^ ]+"))
+
+(defconst fuel-syntax--constructor-regex
+  "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+
+(defconst fuel-syntax--typedef-regex
+  "\\_<TYPEDEF: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+
+(defconst fuel-syntax--rename-regex
+  "\\_<RENAME: +\\(\\w+\\) +\\(\\w+\\) +=> +\\(\\w+\\)\\( .*\\)?$")
 
 
 ;;; Factor syntax table
