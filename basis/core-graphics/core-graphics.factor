@@ -57,3 +57,9 @@ FUNCTION: void CGContextSetRGBFillColor (
    CGFloat blue,
    CGFloat alpha
 ) ;
+
+FUNCTION: void CGContextSetTextPosition (
+   CGContextRef c,
+   CGFloat x,
+   CGFloat y
+) ;
