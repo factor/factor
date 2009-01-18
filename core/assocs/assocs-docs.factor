@@ -115,6 +115,7 @@ $nl
 { $subsection assoc-map }
 { $subsection assoc-push-if }
 { $subsection assoc-filter }
+{ $subsection assoc-filter-as }
 { $subsection assoc-contains? }
 { $subsection assoc-all? }
 "Additional combinators:"
@@ -231,6 +232,12 @@ HELP: assoc-push-if
 HELP: assoc-filter
 { $values { "assoc" assoc } { "quot" { $quotation "( key value -- ? )" } } { "subassoc" "a new assoc" } }
 { $description "Outputs an assoc of the same type as " { $snippet "assoc" } " consisting of all entries for which the predicate quotation yields true." } ;
+
+HELP: assoc-filter-as
+{ $values { "assoc" assoc } { "quot" { $quotation "( key value -- ? )" } } { "exemplar" assoc } { "subassoc" "a new assoc" } }
+{ $description "Outputs an assoc of the same type as " { $snippet "exemplar" } " consisting of all entries for which the predicate quotation yields true." } ;
+
+{ assoc-filter assoc-filter-as } related-words
 
 HELP: assoc-contains?
 { $values { "assoc" assoc } { "quot" { $quotation "( key value -- ? )" } } { "?" "a boolean" } }
