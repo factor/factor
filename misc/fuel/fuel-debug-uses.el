@@ -47,7 +47,8 @@
                          (substring-no-properties (thing-at-point 'line)))))
               (when in-usings (setq line (concat "! " line)))
               (push line lines))
-            (when (and in-usings (looking-at ".*\\_<;\\_>")) (setq in-usings nil))
+            (when (and in-usings (looking-at "\\(^\\|.* \\);\\( \\|\n\\)"))
+              (setq in-usings nil))
             (forward-line))
           (reverse lines))))))
 

@@ -187,6 +187,7 @@
                 "QUALIFIED-WITH:" "QUALIFIED:"
                 "RENAME:"
                 "SINGLETON:" "SLOT:" "SYMBOL:"
+                "TYPEDEF:"
                 "USE:"
                 "VAR:")))
 
@@ -207,6 +208,15 @@
   (format "\\(%s\\|%s\\)"
           (format ":[^ ]* [^ ]+\\(%s\\)*" fuel-syntax--stack-effect-regex)
           "M[^:]*: [^ ]+ [^ ]+"))
+
+(defconst fuel-syntax--constructor-regex
+  "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+
+(defconst fuel-syntax--typedef-regex
+  "\\_<TYPEDEF: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+
+(defconst fuel-syntax--rename-regex
+  "\\_<RENAME: +\\(\\w+\\) +\\(\\w+\\) +=> +\\(\\w+\\)\\( .*\\)?$")
 
 
 ;;; Factor syntax table
@@ -239,10 +249,10 @@
     ("\\_<<\\(\"\\)\\_>" (1 "\""))
     ("\\_<\\(\"\\)>\\_>" (1 "\""))
     ;; Multiline constructs
-    ("\\_<USING:\\( \\)\\(;\\)" (1 "<b") (2 ">b"))
+    ("\\_<\\(U\\)SING: \\(;\\)" (1 "<b") (2 ">b"))
     ("\\_<USING:\\( \\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? +< +\\w+? *\\( \\)" (1 "<b"))
-    ("\\_<\\(TUPLE\\|SYMBOLS\\|VARS\\): +\\w+? *\\( \\)\\([^<]\\|\\_>\\)" (2 "<b"))
+    ("\\_<\\(TUPLE\\|SYMBOLS\\|VARS\\): +\\w+? *\\( \\)\\([^<\n]\\|\\_>\\)" (2 "<b"))
     ("\\(\n\\| \\);\\_>" (1 ">b"))
     ;; Let and lambda:
     ("\\_<\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
