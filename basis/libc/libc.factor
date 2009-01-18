@@ -52,13 +52,13 @@ M: realloc-error summary
 
 <PRIVATE
 
-: add-malloc ( alien -- )
-    mallocs conjoin ;
+: add-malloc ( alien -- alien )
+    dup mallocs conjoin ;
 
 : delete-malloc ( alien -- )
     [
         mallocs delete-at*
-        [ double-free ] unless drop
+        [ drop ] [ double-free ] if
     ] when* ;
 
 : malloc-exists? ( alien -- ? )
@@ -67,22 +67,18 @@ M: realloc-error summary
 PRIVATE>
 
 : malloc ( size -- alien )
-    (malloc) check-ptr
-    dup add-malloc ;
+    (malloc) check-ptr add-malloc ;
 
 : calloc ( count size -- alien )
-    (calloc) check-ptr
-    dup add-malloc ;
+    (calloc) check-ptr add-malloc ;
 
 : realloc ( alien size -- newalien )
     over malloc-exists? [ realloc-error ] unless
-    dupd (realloc) check-ptr
-    swap delete-malloc
-    dup add-malloc ;
+    [ drop ] [ (realloc) check-ptr ] 2bi
+    [ delete-malloc ] [ add-malloc ] bi* ;
 
 : free ( alien -- )
-    dup delete-malloc
-    (free) ;
+    [ delete-malloc ] [ (free) ] bi ;
 
 : memcpy ( dst src size -- )
     "void" "libc" "memcpy" { "void*" "void*" "ulong" } alien-invoke ;
