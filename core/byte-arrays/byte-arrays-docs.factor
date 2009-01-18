@@ -30,6 +30,10 @@ HELP: <byte-array> ( n -- byte-array )
 { $values { "n" "a non-negative integer" } { "byte-array" "a new byte array" } }
 { $description "Creates a new byte array holding " { $snippet "n" } " bytes." } ;
 
+HELP: (byte-array)
+{ $values { "n" "a non-negative integer" } { "byte-array" "a new byte array" } }
+{ $description "Creates a new byte array with unspecified contents of length " { $snippet "n" } " bytes." } ;
+
 HELP: >byte-array
 { $values { "seq" "a sequence" } { "byte-array" byte-array } }
 { $description
