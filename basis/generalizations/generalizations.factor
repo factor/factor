@@ -2,7 +2,8 @@
 ! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private math math.ranges
-combinators macros quotations fry ;
+combinators macros quotations fry macros locals datastack
+multiline ;
 IN: generalizations
 
 <<
@@ -78,3 +79,8 @@ MACRO: napply ( quot n -- )
 
 MACRO: mnswap ( m n -- )
     1+ '[ _ -nrot ] <repetition> spread>quot ;
+
+: nappend-as ( n exemplar -- seq )
+    [ narray concat ] dip like ; inline
+
+: nappend ( n -- seq ) narray concat ; inline
