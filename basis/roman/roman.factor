@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel math math.order math.vectors
 namespaces make quotations sequences splitting.monotonic
-sequences.private strings unicode.case lexer parser ;
+sequences.private strings unicode.case lexer parser
+grouping ;
 IN: roman
 
 <PRIVATE
