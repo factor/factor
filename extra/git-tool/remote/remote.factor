@@ -303,6 +303,8 @@ TUPLE: <git-remote-gadget> < pack
             
             REPO { "git" "fetch" REMOTE-BRANCH } git-process drop ]
 
+          GADGET refresh-git-remote-gadget
+
           GADGET fetch-period>> sleep
 
           t
