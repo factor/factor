@@ -1,9 +1,9 @@
-USING: help.markup help.syntax io kernel math quotations
-opengl.gl assocs vocabs.loader sequences accessors ;
+USING: alien help.markup help.syntax io kernel math quotations
+opengl.gl assocs vocabs.loader sequences accessors colors ;
 IN: opengl
 
 HELP: gl-color
-{ $values { "color" "a color specifier" } }
+{ $values { "color" color } }
 { $description "Wrapper for " { $link glColor4d } " taking a color specifier." } ;
 
 HELP: gl-error
@@ -60,21 +60,10 @@ HELP: do-attribs
 { $values { "bits" integer } { "quot" quotation } }
 { $description "Wraps a quotation in " { $link glPushAttrib } "/" { $link glPopAttrib } " calls." } ;
 
-HELP: sprite
-{ $class-description "A sprite is an OpenGL texture together with a display list which renders a textured quad. Sprites are used to draw text in the UI. Sprites have the following slots:"
-    { $list
-        { { $snippet "dlist" } " - an OpenGL display list ID" }
-        { { $snippet "texture" } " - an OpenGL texture ID" }
-        { { $snippet "loc" } " - top-left corner of the sprite" }
-        { { $snippet "dim" } " - dimensions of the sprite" }
-        { { $snippet "dim2" } " - dimensions of the sprite, rounded up to the nearest powers of two" }
-    }
-} ;
-
-HELP: gray-texture
-{ $values { "sprite" sprite } { "pixmap" "an alien or byte array" } { "id" "an OpenGL texture ID" } }
-{ $description "Creates a new OpenGL texture from a 1 byte per pixel image whose dimensions are equal to " { $snippet "dim2" } "." } ;
-
+HELP: make-texture
+  { $values { "dim" "a pair of integers" } { "pixmap" c-ptr } { "type" "an OpenGL texture type" } { "id" "an OpenGL texture ID" } }
+{ $description "Creates a new OpenGL texture from a pixmap image whose dimensions are equal to " { $snippet "dim" } "." } ;
+  
 HELP: gen-dlist
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenLists } " to handle the common case of generating a single display list ID." } ;
@@ -86,10 +75,6 @@ HELP: make-dlist
 HELP: gl-translate
 { $values { "point" "a pair of integers" } }
 { $description "Wrapper for " { $link glTranslated } " taking a point object." } ;
-
-HELP: free-sprites
-{ $values { "sprites" "a sequence of " { $link sprite } " instances" } }
-{ $description "Deallocates native resources associated toa  sequence of sprites." } ;
 
 HELP: with-translation
 { $values { "loc" "a pair of integers" } { "quot" quotation } }

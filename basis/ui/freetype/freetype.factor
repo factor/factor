@@ -1,7 +1,7 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.accessors alien.c-types arrays io kernel libc
-math math.vectors namespaces opengl opengl.gl assocs
+math math.vectors namespaces opengl opengl.gl opengl.sprites assocs
 sequences io.files io.styles continuations freetype
 ui.gadgets.worlds ui.render ui.backend byte-arrays accessors
 locals specialized-arrays.direct.uchar ;
@@ -128,8 +128,9 @@ M: freetype-renderer string-height ( open-font string -- h )
     drop height>> ;
 
 : glyph-size ( glyph -- dim )
-    dup glyph-hori-advance ft-ceil
-    swap glyph-height ft-ceil 2array ;
+    [ glyph-hori-advance ft-ceil ]
+    [ glyph-height ft-ceil ]
+    bi 2array ;
 
 : render-glyph ( font char -- bitmap )
     load-glyph dup
@@ -157,17 +158,17 @@ M: freetype-renderer string-height ( open-font string -- h )
             width [ glyph glyph-bitmap-width ]
             width2 [ width next-power-of-2 2 * ] |
         bitmap [
-            [let | bitmap' [ bitmap rows width * <direct-uchar-array> ] |
-                0 0
-                rows [ bitmap' texture width width2 copy-row ] times
-                2drop
-            ]
+            bitmap rows width * <direct-uchar-array> :> bitmap'
+            0 0
+            rows [ bitmap' texture width width2 copy-row ] times
+            2drop
         ] when
     ] ;
 
 : bitmap>texture ( glyph sprite -- id )
-    tuck sprite-size2 * 2 * <byte-array>
-    [ copy-bitmap ] keep gray-texture ;
+    tuck dim2>> product 2 * <byte-array>
+    [ copy-bitmap ] keep [ dim2>> ] dip
+    GL_LUMINANCE_ALPHA make-texture ;
 
 : glyph-texture-loc ( glyph font -- loc )
     [ drop glyph-hori-bearing-x ft-floor ]

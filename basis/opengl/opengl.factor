@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
@@ -188,31 +188,26 @@ MACRO: set-draw-buffers ( buffers -- )
 : gl-look-at ( eye focus up -- )
     [ first3 ] tri@ gluLookAt ;
 
-TUPLE: sprite loc dim dim2 dlist texture ;
-
-: <sprite> ( loc dim dim2 -- sprite )
-    f f sprite boa ;
-
-: sprite-size2 ( sprite -- w h ) dim2>> first2 ;
-
-: sprite-width ( sprite -- w ) dim>> first ;
-
-: gray-texture ( sprite pixmap -- id )
-    gen-texture [
+: make-texture ( dim pixmap type -- id )
+    [ gen-texture ] 3dip swap '[
         GL_TEXTURE_BIT [
             GL_TEXTURE_2D swap glBindTexture
-            [
-                [ GL_TEXTURE_2D 0 GL_RGBA ] dip
-                sprite-size2 0 GL_LUMINANCE_ALPHA
-                GL_UNSIGNED_BYTE
-            ] dip glTexImage2D
+            GL_TEXTURE_2D
+            0
+            GL_RGBA
+            _ first2
+            0
+            _
+            GL_UNSIGNED_BYTE
+            _
+            glTexImage2D
         ] do-attribs
     ] keep ;
-    
+
 : gen-dlist ( -- id ) 1 glGenLists ;
 
 : make-dlist ( type quot -- id )
-    gen-dlist [ rot glNewList call glEndList ] keep ; inline
+    [ gen-dlist ] 2dip '[ _ glNewList @ glEndList ] keep ; inline
 
 : init-texture ( -- )
     GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR glTexParameteri
@@ -225,33 +220,7 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 : rect-texture-coords ( -- )
     float-array{ 0 0 1 0 1 1 0 1 } gl-texture-coord-pointer ;
 
-: draw-sprite ( sprite -- )
-    GL_TEXTURE_COORD_ARRAY [
-        dup loc>> gl-translate
-        GL_TEXTURE_2D over texture>> glBindTexture
-        init-texture rect-texture-coords
-        dim2>> fill-rect-vertices
-        (gl-fill-rect)
-        GL_TEXTURE_2D 0 glBindTexture
-    ] do-enabled-client-state ;
-
-: make-sprite-dlist ( sprite -- id )
-    GL_MODELVIEW [
-        GL_COMPILE [ draw-sprite ] make-dlist
-    ] do-matrix ;
-
-: init-sprite ( texture sprite -- )
-    swap >>texture
-    dup make-sprite-dlist >>dlist drop ;
-
 : delete-dlist ( id -- ) 1 glDeleteLists ;
-
-: free-sprite ( sprite -- )
-    [ dlist>> delete-dlist ]
-    [ texture>> delete-texture ] bi ;
-
-: free-sprites ( sprites -- )
-    [ nip [ free-sprite ] when* ] assoc-each ;
 
 : with-translation ( loc quot -- )
     GL_MODELVIEW [ [ gl-translate ] dip call ] do-matrix ; inline
