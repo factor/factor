@@ -3,6 +3,8 @@
 USING: functors destructors accessors kernel parser words ;
 IN: alien.destructors
 
+SLOT: alien
+
 FUNCTOR: define-destructor ( F -- )
 
 F-destructor DEFINES ${F}-destructor
