@@ -73,20 +73,20 @@
 ;;; Font lock:
 
 (defun fuel-font-lock--syntactic-face (state)
-  (cond ((nth 3 state) 'factor-font-lock-string)
-        ((char-equal (char-after (nth 8 state)) ?\ )
-         (save-excursion
-           (goto-char (nth 8 state))
-           (beginning-of-line)
-           (cond ((looking-at "USING: ") 'factor-font-lock-vocabulary-name)
-                 ((looking-at "\\(TUPLE\\|SYMBOLS\\|VARS\\): ")
-                  'factor-font-lock-symbol)
-                 (t 'default))))
-        ((char-equal (char-after (nth 8 state)) ?U)
-         'factor-font-lock-parsing-word)
-        ((char-equal (char-after (nth 8 state)) ?\()
-         'factor-font-lock-stack-effect)
-        (t 'factor-font-lock-comment)))
+  (if (nth 3 state) 'factor-font-lock-string
+    (let ((c (char-after (nth 8 state))))
+      (cond ((char-equal c ?\ )
+             (save-excursion
+               (goto-char (nth 8 state))
+               (beginning-of-line)
+               (cond ((looking-at "USING: ") 'factor-font-lock-vocabulary-name)
+                     ((looking-at "\\(TUPLE\\|SYMBOLS\\|VARS\\): ")
+                      'factor-font-lock-symbol)
+                     (t 'default))))
+            ((char-equal c ?U) 'factor-font-lock-parsing-word)
+            ((char-equal c ?\() 'factor-font-lock-stack-effect)
+            ((char-equal c ?\") 'factor-font-lock-string)
+            (t 'factor-font-lock-comment)))))
 
 (defconst fuel-font-lock--font-lock-keywords
   `((,fuel-syntax--stack-effect-regex . 'factor-font-lock-stack-effect)
