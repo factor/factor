@@ -39,11 +39,12 @@ M: mirror fix-slot-names
     [ [ slot-name boa ] dip ] { } assoc-map-as ;
 
 : (describe) ( obj assoc -- keys )
-    pprint-string-cells? on
-    [ summary. ] [
-        dup hashtable? [ sort-unparsed-keys ] when
-        [ fix-slot-names add-numbers simple-table. ] [ keys ] bi
-    ] bi* ;
+    t pprint-string-cells? [
+        [ summary. ] [
+            dup hashtable? [ sort-unparsed-keys ] when
+            [ fix-slot-names add-numbers simple-table. ] [ keys ] bi
+        ] bi*
+    ] with-variable ;
 
 PRIVATE>
 
