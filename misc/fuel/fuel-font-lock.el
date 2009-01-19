@@ -84,6 +84,8 @@
                  (t 'default))))
         ((char-equal (char-after (nth 8 state)) ?U)
          'factor-font-lock-parsing-word)
+        ((char-equal (char-after (nth 8 state)) ?\()
+         'factor-font-lock-stack-effect)
         (t 'factor-font-lock-comment)))
 
 (defconst fuel-font-lock--font-lock-keywords
@@ -135,16 +137,18 @@
 
 ;;; Fontify strings as Factor code:
 
-(defvar fuel-font-lock--font-lock-buffer
-  (let ((buffer (get-buffer-create " *fuel font lock*")))
-    (set-buffer buffer)
-    (set-syntax-table fuel-syntax--syntax-table)
-    (fuel-font-lock--font-lock-setup)
-    buffer))
+(defun fuel-font-lock--font-lock-buffer ()
+  (let ((name " *fuel font lock*"))
+    (or (get-buffer name)
+        (let ((buffer (get-buffer-create name)))
+          (set-buffer buffer)
+          (set-syntax-table fuel-syntax--syntax-table)
+          (fuel-font-lock--font-lock-setup)
+          buffer))))
 
 (defun fuel-font-lock--factor-str (str)
   (save-current-buffer
-    (set-buffer fuel-font-lock--font-lock-buffer)
+    (set-buffer (fuel-font-lock--font-lock-buffer))
     (erase-buffer)
     (insert str)
     (let ((font-lock-verbose nil)) (font-lock-fontify-buffer))
