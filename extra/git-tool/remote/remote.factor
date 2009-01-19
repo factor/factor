@@ -62,15 +62,17 @@ TUPLE: <git-remote-gadget> < pack
 
   [let | REPO [ GADGET repository>> ] |
 
-    GADGET clear-gadget
+    ! GADGET clear-gadget
 
-    GADGET
+    ! GADGET
+
+    { }
 
     ! Repository label
 
     "Repository: " REPO [ current-directory get ] with-directory append
     <label>
-    add-gadget
+    suffix
 
     ! Branch button
     
@@ -103,7 +105,7 @@ TUPLE: <git-remote-gadget> < pack
       ]
       <bevel-button> add-gadget
 
-    add-gadget
+    suffix
 
     ! Remote button
 
@@ -138,7 +140,7 @@ TUPLE: <git-remote-gadget> < pack
       ]
       <bevel-button> add-gadget
 
-    add-gadget
+    suffix
 
     ! Remote branch button
 
@@ -172,7 +174,7 @@ TUPLE: <git-remote-gadget> < pack
       ]
       <bevel-button> add-gadget
 
-    add-gadget
+    suffix
 
     ! Fetch button
 
@@ -184,7 +186,7 @@ TUPLE: <git-remote-gadget> < pack
       
       GADGET refresh-git-remote-gadget
     ]
-    <bevel-button> add-gadget
+    <bevel-button> suffix
 
     ! Available changes
 
@@ -223,7 +225,7 @@ TUPLE: <git-remote-gadget> < pack
                 ]
                 <bevel-button> add-gadget
 
-              add-gadget
+              suffix
 
             ]
           when
@@ -266,12 +268,18 @@ TUPLE: <git-remote-gadget> < pack
                 ]
                 <bevel-button> add-gadget
 
-              add-gadget
+              suffix
 
             ]
           when
 
         ] ] ]
+
+    GADGET clear-gadget
+
+    GADGET swap
+
+    [ add-gadget ] each
     
     drop
 
