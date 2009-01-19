@@ -1,5 +1,6 @@
 USING: io io.streams.string kernel namespaces make
-pack strings tools.test ;
+pack strings tools.test pack.private ;
+IN: pack.tests
 
 [ B{ 1 0 2 0 0 3 0 0 0 4 0 0 0 0 0 0 0 5 } ] [
     { 1 2 3 4 5 }
@@ -37,15 +38,6 @@ pack strings tools.test ;
     "cstiq" [ pack-native ] keep unpack-native
 ] unit-test
 
-[ 2 ] [
-    [ 2 "int" b, ] B{ } make
-    <string-reader> [ "int" read-native ] with-input-stream
-] unit-test
-
-[ "FRAM" ] [ "FRAM\0" [ read-c-string ] with-string-reader ] unit-test
-[ f ] [ "" [ read-c-string ] with-string-reader ] unit-test
-[ 5 ] [ "FRAM\0\u000005\0\0\0\0\0\0\0" [ read-c-string drop read-u64 ] with-string-reader ] unit-test
-
 [ 9 ] [ "iic" packed-length ] unit-test
 [ "iii" read-packed-le ] must-infer
 [ "iii" read-packed-be ] must-infer
@@ -53,3 +45,10 @@ pack strings tools.test ;
 [ "iii" unpack-le ] must-infer
 [ "iii" unpack-be ] must-infer
 [ "iii" unpack-native ] must-infer
+[ "iii" pack ] must-infer
+[ "iii" unpack ] must-infer
+
+: test-pack ( str -- ba )
+    "iii" pack ;
+
+[ test-pack ] must-infer
