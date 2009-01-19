@@ -46,7 +46,7 @@ completion-popup ;
     [ one-word-elt <element-model> 1/3 seconds <delay> ] keep
     '[
         _ dup vocab-completion?
-        [ drop vocab ] [ interactor-use assoc-stack ] if
+        [ drop >vocab-link ] [ interactor-use assoc-stack ] if
     ] <filter> ;
 
 : <interactor> ( output -- gadget )
