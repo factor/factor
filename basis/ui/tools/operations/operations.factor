@@ -81,9 +81,9 @@ UNION: definition word method-spec link vocab vocab-link ;
 [ definition? ] \ com-forget H{ } define-operation
 
 ! Words
-[ word? ] \ insert-word H{
-    { +secondary+ t }
-} define-operation
+! [ word? ] \ insert-word H{
+!     { +secondary+ t }
+! } define-operation
 
 [ topic? ] \ com-follow H{
     { +keyboard+ T{ key-down f { C+ } "h" } }

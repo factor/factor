@@ -1,68 +1,72 @@
-! Copyright (C) 2006, 2008 Slava Pestov
+! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: specialized-arrays.int arrays kernel math namespaces make
-cocoa cocoa.messages cocoa.classes cocoa.types sequences
+cocoa cocoa.messages cocoa.classes core-graphics.types sequences
 continuations accessors ;
 IN: cocoa.views
 
-: NSOpenGLPFAAllRenderers 1 ;
-: NSOpenGLPFADoubleBuffer 5 ;
-: NSOpenGLPFAStereo 6 ;
-: NSOpenGLPFAAuxBuffers 7 ;
-: NSOpenGLPFAColorSize 8 ;
-: NSOpenGLPFAAlphaSize 11 ;
-: NSOpenGLPFADepthSize 12 ;
-: NSOpenGLPFAStencilSize 13 ;
-: NSOpenGLPFAAccumSize 14 ;
-: NSOpenGLPFAMinimumPolicy 51 ;
-: NSOpenGLPFAMaximumPolicy 52 ;
-: NSOpenGLPFAOffScreen 53 ;
-: NSOpenGLPFAFullScreen 54 ;
-: NSOpenGLPFASampleBuffers 55 ;
-: NSOpenGLPFASamples 56 ;
-: NSOpenGLPFAAuxDepthStencil 57 ;
-: NSOpenGLPFAColorFloat  58 ;
-: NSOpenGLPFAMultisample 59 ;
-: NSOpenGLPFASupersample 60 ;
-: NSOpenGLPFASampleAlpha 61 ;
-: NSOpenGLPFARendererID 70 ;
-: NSOpenGLPFASingleRenderer 71 ;
-: NSOpenGLPFANoRecovery 72 ;
-: NSOpenGLPFAAccelerated 73 ;
-: NSOpenGLPFAClosestPolicy 74 ;
-: NSOpenGLPFARobust 75 ;
-: NSOpenGLPFABackingStore 76 ;
-: NSOpenGLPFAMPSafe 78 ;
-: NSOpenGLPFAWindow 80 ;
-: NSOpenGLPFAMultiScreen 81 ;
-: NSOpenGLPFACompliant 83 ;
-: NSOpenGLPFAScreenMask 84 ;
-: NSOpenGLPFAPixelBuffer 90 ;
-: NSOpenGLPFAAllowOfflineRenderers 96 ;
-: NSOpenGLPFAVirtualScreenCount 128 ;
+CONSTANT: NSOpenGLPFAAllRenderers 1
+CONSTANT: NSOpenGLPFADoubleBuffer 5
+CONSTANT: NSOpenGLPFAStereo 6
+CONSTANT: NSOpenGLPFAAuxBuffers 7
+CONSTANT: NSOpenGLPFAColorSize 8
+CONSTANT: NSOpenGLPFAAlphaSize 11
+CONSTANT: NSOpenGLPFADepthSize 12
+CONSTANT: NSOpenGLPFAStencilSize 13
+CONSTANT: NSOpenGLPFAAccumSize 14
+CONSTANT: NSOpenGLPFAMinimumPolicy 51
+CONSTANT: NSOpenGLPFAMaximumPolicy 52
+CONSTANT: NSOpenGLPFAOffScreen 53
+CONSTANT: NSOpenGLPFAFullScreen 54
+CONSTANT: NSOpenGLPFASampleBuffers 55
+CONSTANT: NSOpenGLPFASamples 56
+CONSTANT: NSOpenGLPFAAuxDepthStencil 57
+CONSTANT: NSOpenGLPFAColorFloat  58
+CONSTANT: NSOpenGLPFAMultisample 59
+CONSTANT: NSOpenGLPFASupersample 60
+CONSTANT: NSOpenGLPFASampleAlpha 61
+CONSTANT: NSOpenGLPFARendererID 70
+CONSTANT: NSOpenGLPFASingleRenderer 71
+CONSTANT: NSOpenGLPFANoRecovery 72
+CONSTANT: NSOpenGLPFAAccelerated 73
+CONSTANT: NSOpenGLPFAClosestPolicy 74
+CONSTANT: NSOpenGLPFARobust 75
+CONSTANT: NSOpenGLPFABackingStore 76
+CONSTANT: NSOpenGLPFAMPSafe 78
+CONSTANT: NSOpenGLPFAWindow 80
+CONSTANT: NSOpenGLPFAMultiScreen 81
+CONSTANT: NSOpenGLPFACompliant 83
+CONSTANT: NSOpenGLPFAScreenMask 84
+CONSTANT: NSOpenGLPFAPixelBuffer 90
+CONSTANT: NSOpenGLPFAAllowOfflineRenderers 96
+CONSTANT: NSOpenGLPFAVirtualScreenCount 128
 
-: kCGLRendererGenericFloatID HEX: 00020400 ;
+CONSTANT: kCGLRendererGenericFloatID HEX: 00020400
+
+
+CONSTANT: NSOpenGLCPSwapInterval 222
 
 <PRIVATE
 
-SYMBOL: +software-renderer+
-SYMBOL: +multisample+
+SYMBOL: software-renderer?
+SYMBOL: multisample?
 
 PRIVATE>
 
 : with-software-renderer ( quot -- )
-    t +software-renderer+ pick with-variable ; inline
+    [ t software-renderer? ] dip with-variable ; inline
+
 : with-multisample ( quot -- )
-    t +multisample+ pick with-variable ; inline
+    [ t multisample? ] dip with-variable ; inline
 
 : <PixelFormat> ( attributes -- pixelfmt )
     NSOpenGLPixelFormat -> alloc swap [
         %
         NSOpenGLPFADepthSize , 16 ,
-        +software-renderer+ get [
+        software-renderer? get [
             NSOpenGLPFARendererID , kCGLRendererGenericFloatID ,
         ] when
-        +multisample+ get [
+        multisample? get [
             NSOpenGLPFASupersample ,
             NSOpenGLPFASampleBuffers , 1 ,
             NSOpenGLPFASamples , 8 ,
@@ -73,7 +77,7 @@ PRIVATE>
     -> autorelease ;
 
 : <GLView> ( class dim -- view )
-    [ -> alloc 0 0 ] dip first2 <NSRect>
+    [ -> alloc 0 0 ] dip first2 <CGRect>
     NSOpenGLPFAWindow NSOpenGLPFADoubleBuffer 2array <PixelFormat>
     -> initWithFrame:pixelFormat:
     dup 1 -> setPostsBoundsChangedNotifications:
@@ -81,26 +85,12 @@ PRIVATE>
 
 : view-dim ( view -- dim )
     -> bounds
-    dup NSRect-w >fixnum
-    swap NSRect-h >fixnum 2array ;
+    [ CGRect-w >fixnum ] [ CGRect-h >fixnum ] bi
+    2array ;
 
 : mouse-location ( view event -- loc )
     [
         -> locationInWindow f -> convertPoint:fromView:
-        [ NSPoint-x ] [ NSPoint-y ] bi
-    ] [ drop -> frame NSRect-h ] 2bi
+        [ CGPoint-x ] [ CGPoint-y ] bi
+    ] [ drop -> frame CGRect-h ] 2bi
     swap - 2array ;
-
-USE: opengl.gl
-USE: alien.syntax
-
-: NSOpenGLCPSwapInterval 222 ;
-
-LIBRARY: OpenGL
-
-TYPEDEF: int CGLError
-TYPEDEF: void* CGLContextObj
-TYPEDEF: int CGLContextParameter
-
-FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
-

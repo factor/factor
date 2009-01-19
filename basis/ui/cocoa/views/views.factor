@@ -4,7 +4,8 @@ USING: accessors alien alien.c-types arrays assocs cocoa kernel
 math cocoa.messages cocoa.subclassing cocoa.classes cocoa.views
 cocoa.application cocoa.pasteboard cocoa.types cocoa.windows
 sequences ui ui.gadgets ui.gadgets.worlds ui.gestures
-core-foundation.strings threads combinators math.geometry.rect ;
+core-foundation.strings core-graphics core-graphics.types
+threads combinators math.geometry.rect ;
 IN: ui.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -14,15 +15,15 @@ IN: ui.cocoa.views
     #! Cocoa -> Factor UI button mapping
     -> buttonNumber H{ { 0 1 } { 2 2 } { 1 3 } } at ;
 
-: modifiers
+CONSTANT: modifiers
     {
         { S+ HEX: 20000 }
         { C+ HEX: 40000 }
         { A+ HEX: 100000 }
         { M+ HEX: 80000 }
-    } ;
+    }
 
-: key-codes
+CONSTANT: key-codes
     H{
         { 71 "CLEAR" }
         { 36 "RET" }
@@ -47,7 +48,7 @@ IN: ui.cocoa.views
         { 126 "UP" }
         { 116 "PAGE_UP" }
         { 121 "PAGE_DOWN" }
-    } ;
+    }
 
 : key-code ( event -- string ? )
     dup -> keyCode key-codes at
@@ -57,7 +58,7 @@ IN: ui.cocoa.views
     -> modifierFlags modifiers modifier ;
 
 : key-event>gesture ( event -- modifiers keycode action? )
-    dup event-modifiers swap key-code ;
+    [ event-modifiers ] [ key-code ] bi ;
 
 : send-key-event ( view gesture -- )
     swap window propagate-key-gesture ;
@@ -74,7 +75,7 @@ IN: ui.cocoa.views
     key-event>gesture <key-up> send-key-event ;
 
 : mouse-event>gesture ( event -- modifiers button )
-    dup event-modifiers swap button ;
+    [ event-modifiers ] [ button ] bi ;
 
 : send-button-down$ ( view event -- )
     [ nip mouse-event>gesture <button-down> ]
@@ -107,18 +108,18 @@ IN: ui.cocoa.views
     [ CF>string NSStringPboardType = ] [ t ] if* ;
 
 : valid-service? ( gadget send-type return-type -- ? )
-    over string-or-nil? over string-or-nil? and
+    2dup [ string-or-nil? ] [ string-or-nil? ] bi* and
     [ drop [ gadget-selection? ] [ drop t ] if ] [ 3drop f ] if ;
 
 : NSRect>rect ( NSRect world -- rect )
-    [ [ [ NSRect-x ] [ NSRect-y ] bi ] [ dim>> second ] bi* swap - 2array ]
-    [ drop [ NSRect-w ] [ NSRect-h ] bi 2array ]
+    [ [ [ CGRect-x ] [ CGRect-y ] bi ] [ dim>> second ] bi* swap - 2array ]
+    [ drop [ CGRect-w ] [ CGRect-h ] bi 2array ]
     2bi <rect> ;
 
 : rect>NSRect ( rect world -- NSRect )
     [ [ rect-loc first2 ] [ dim>> second ] bi* swap - ]
     [ drop rect-dim first2 ]
-    2bi <NSRect> ;
+    2bi <CGRect> ;
 
 CLASS: {
     { +superclass+ "NSOpenGLView" }
@@ -318,7 +319,7 @@ CLASS: {
 }
 
 { "firstRectForCharacterRange:" "NSRect" { "id" "SEL" "NSRange" }
-    [ 3drop 0 0 0 0 <NSRect> ]
+    [ 3drop 0 0 0 0 <CGRect> ]
 }
 
 { "conversationIdentifier" "NSInteger" { "id" "SEL" }
@@ -369,8 +370,9 @@ CLASS: {
 { "windowDidMove:" "void" { "id" "SEL" "id" }
     [
         2nip -> object
-        dup window-content-rect NSRect-x-y 2array
-        swap -> contentView window (>>window-loc)
+        [ -> contentView window ]
+        [ window-content-rect CGRect-x-y 2array ] bi
+        >>window-loc drop
     ]
 }
 

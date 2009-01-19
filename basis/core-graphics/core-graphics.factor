@@ -1,11 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax alien.c-types alien.destructors math
-locals fry sequences destructors kernel ;
+USING: alien.c-types alien.destructors alien.syntax
+destructors fry kernel locals math sequences
+core-graphics.types ;
 IN: core-graphics
-
-TYPEDEF: void* CGColorSpaceRef
-TYPEDEF: void* CGContextRef
 
 ! CGImageAlphaInfo
 C-ENUM:
@@ -27,8 +25,6 @@ kCGImageAlphaNoneSkipFirst ;
 : kCGBitmapByteOrder16Big ( -- n ) 3 12 shift ; inline
 : kCGBitmapByteOrder32Big ( -- n ) 4 12 shift ; inline
 
-TYPEDEF: uint CGBitmapInfo
-    
 FUNCTION: CGColorSpaceRef CGColorSpaceCreateDeviceRGB ( ) ;
 
 FUNCTION: CGContextRef CGBitmapContextCreate (
@@ -70,6 +66,8 @@ FUNCTION: void CGContextSetTextPosition (
    CGFloat x,
    CGFloat y
 ) ;
+
+FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
 
 :: <CGBitmapContext> ( data w h -- context )
     [

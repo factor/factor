@@ -1,5 +1,5 @@
 USING: help.syntax help.markup strings kernel alien opengl
-quotations ui.render io.styles freetype ;
+opengl.sprites quotations ui.render io.styles freetype ;
 IN: ui.freetype
 
 HELP: freetype

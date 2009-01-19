@@ -1,5 +1,5 @@
 USING: ui.gadgets ui.render ui.gestures ui.backend help.markup
-help.syntax models opengl strings ;
+help.syntax models opengl opengl.sprites strings ;
 IN: ui.gadgets.worlds
 
 HELP: user-input

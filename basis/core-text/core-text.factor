@@ -41,3 +41,11 @@ C-GLOBAL: kCTGlyphInfoAttributeName
 FUNCTION: CTLineRef CTLineCreateWithAttributedString ( CFAttributedStringRef string ) ;
 
 FUNCTION: void CTLineDraw ( CTLineRef line, CGContextRef context ) ;
+
+FUNCTION: CGFloat CTLineGetOffsetForStringIndex ( CTLineRef line, CFIndex charIndex, CGFloat* secondaryOffset ) ;
+
+FUNCTION: CFIndex CTLineGetStringIndexForPosition ( CTLineRef line, CGPoint position ) ;
+
+FUNCTION: double CTLineGetTypographicBounds ( CTLineRef line, CGFloat* ascent, CGFloat* descent, CGFloat* leading ) ;
+
+FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context ) ;

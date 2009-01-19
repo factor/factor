@@ -44,7 +44,6 @@ $nl
 { $subsection "objc-calling" }
 { $subsection "objc-subclassing" }
 "A utility library is built to faciliate the development of Cocoa applications in Factor:"
-{ $subsection "cocoa-types" }
 { $subsection "cocoa-application-utils" }
 { $subsection "cocoa-dialogs" }
 { $subsection "cocoa-pasteboard-utils" }

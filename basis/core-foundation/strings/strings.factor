@@ -1,26 +1,27 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax alien.strings kernel sequences byte-arrays
-io.encodings.utf8 math core-foundation core-foundation.arrays ;
+io.encodings.utf8 math core-foundation core-foundation.arrays
+destructors ;
 IN: core-foundation.strings
 
 TYPEDEF: void* CFStringRef
 
 TYPEDEF: int CFStringEncoding
-: kCFStringEncodingMacRoman HEX: 0 ;
-: kCFStringEncodingWindowsLatin1 HEX: 0500 ;
-: kCFStringEncodingISOLatin1 HEX: 0201 ;
-: kCFStringEncodingNextStepLatin HEX: 0B01 ;
-: kCFStringEncodingASCII HEX: 0600 ;
-: kCFStringEncodingUnicode HEX: 0100 ;
-: kCFStringEncodingUTF8 HEX: 08000100 ;
-: kCFStringEncodingNonLossyASCII HEX: 0BFF ;
-: kCFStringEncodingUTF16 HEX: 0100 ;
-: kCFStringEncodingUTF16BE HEX: 10000100 ;
-: kCFStringEncodingUTF16LE HEX: 14000100 ;
-: kCFStringEncodingUTF32 HEX: 0c000100 ;
-: kCFStringEncodingUTF32BE HEX: 18000100 ;
-: kCFStringEncodingUTF32LE HEX: 1c000100 ;
+CONSTANT: kCFStringEncodingMacRoman HEX: 0
+CONSTANT: kCFStringEncodingWindowsLatin1 HEX: 0500
+CONSTANT: kCFStringEncodingISOLatin1 HEX: 0201
+CONSTANT: kCFStringEncodingNextStepLatin HEX: 0B01
+CONSTANT: kCFStringEncodingASCII HEX: 0600
+CONSTANT: kCFStringEncodingUnicode HEX: 0100
+CONSTANT: kCFStringEncodingUTF8 HEX: 08000100
+CONSTANT: kCFStringEncodingNonLossyASCII HEX: 0BFF
+CONSTANT: kCFStringEncodingUTF16 HEX: 0100
+CONSTANT: kCFStringEncodingUTF16BE HEX: 10000100
+CONSTANT: kCFStringEncodingUTF16LE HEX: 14000100
+CONSTANT: kCFStringEncodingUTF32 HEX: 0c000100
+CONSTANT: kCFStringEncodingUTF32BE HEX: 18000100
+CONSTANT: kCFStringEncodingUTF32LE HEX: 1c000100
 
 FUNCTION: CFStringRef CFStringCreateWithBytes (
     CFAllocatorRef alloc,
@@ -63,4 +64,4 @@ FUNCTION: CFStringRef CFStringCreateWithCString (
     CF>array [ CF>string ] map ;
 
 : <CFStringArray> ( seq -- alien )
-    [ <CFString> ] map [ <CFArray> ] [ [ CFRelease ] each ] bi ;
+    [ [ <CFString> &CFRelease ] map <CFArray> ] with-destructors ;
