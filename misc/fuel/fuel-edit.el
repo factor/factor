@@ -132,6 +132,32 @@ was last invoked."
       (pop-tag-mark)
     (error "No previous location for find word or vocab invokation")))
 
+(defvar fuel-edit--buffer-history nil)
+
+(defun fuel-switch-to-buffer (&optional method)
+  "Switch to any of the existing Factor buffers, with completion."
+  (interactive)
+  (let ((buffer (completing-read "Factor buffer: "
+                                 (remove (buffer-name)
+                                         (mapcar 'buffer-name (buffer-list)))
+                                 '(lambda (s) (string-match "\\.factor$" s))
+                                 t
+                                 nil
+                                 fuel-edit--buffer-history)))
+    (cond ((eq method 'window) (switch-to-buffer-other-window buffer))
+          ((eq method 'frame) (switch-to-buffer-other-frame buffer))
+          (t (switch-to-buffer buffer)))))
+
+(defun fuel-switch-to-buffer-other-window ()
+  "Switch to any of the existing Factor buffers, in other window."
+  (interactive)
+  (fuel-switch-to-buffer 'window))
+
+(defun fuel-switch-to-buffer-other-frame ()
+  "Switch to any of the existing Factor buffers, in other frame."
+  (interactive)
+  (fuel-switch-to-buffer 'frame))
+
 
 (provide 'fuel-edit)
 ;;; fuel-edit.el ends here
