@@ -3,7 +3,9 @@
 USING: alien alien.c-types arrays assocs byte-arrays io
 io.binary io.streams.string kernel math math.parser namespaces
 make parser prettyprint quotations sequences strings vectors
-words macros math.functions math.bitwise fry ;
+words macros math.functions math.bitwise fry generalizations
+combinators.smart io.streams.byte-array io.encodings.binary
+math.vectors combinators multiline ;
 IN: pack
 
 SYMBOL: big-endian
@@ -18,131 +20,77 @@ SYMBOL: big-endian
 
 PRIVATE>
 
-: >endian ( obj n -- str )
-    big-endian get [ >be ] [ >le ] if ; inline
-
-: endian> ( obj -- str )
-    big-endian get [ be> ] [ le> ] if ; inline
-
-GENERIC: b, ( n obj -- )
-M: integer b, ( m n -- ) >endian % ;
-
-! for doing native, platform-dependent sized values
-M: string b, ( n string -- ) heap-size b, ;
-: read-native ( string -- n ) heap-size read endian> ;
-
-! Portable
-: s8, ( n -- ) 1 b, ;
-: u8, ( n -- ) 1 b, ;
-: s16, ( n -- ) 2 b, ;
-: u16, ( n -- ) 2 b, ;
-: s24, ( n -- ) 3 b, ;
-: u24, ( n -- ) 3 b, ;
-: s32, ( n -- ) 4 b, ;
-: u32, ( n -- ) 4 b, ;
-: s64, ( n -- ) 8 b, ;
-: u64, ( n -- ) 8 b, ;
-: s128, ( n -- ) 16 b, ;
-: u128, ( n -- ) 16 b, ;
-: float, ( n -- ) float>bits 4 b, ;
-: double, ( n -- ) double>bits 8 b, ;
-: c-string, ( str -- ) % 0 u8, ;
-
-<PRIVATE
-
-: (>128-ber) ( n -- )
-    dup 0 > [
-        [ HEX: 7f bitand HEX: 80 bitor , ] keep -7 shift
-        (>128-ber)
-    ] [
-        drop
-    ] if ;
-
-PRIVATE>
-
-: >128-ber ( n -- str )
-    [
-        [ HEX: 7f bitand , ] keep -7 shift
-        (>128-ber)
-    ] { } make reverse ;
-
 : >signed ( x n -- y )
     2dup neg 1+ shift 1 = [ 2^ - ] [ drop ] if ;
 
-: read-signed ( n -- str )
-    dup read endian> swap 8 * >signed ;
+: >endian ( obj n -- str )
+    big-endian get [ >be ] [ >le ] if ; inline
 
-: read-unsigned ( n -- m ) read endian> ;
+: unsigned-endian> ( obj -- str )
+    big-endian get [ be> ] [ le> ] if ; inline
 
-: read-s8 ( -- n ) 1 read-signed ;
-: read-u8 ( -- n ) 1 read-unsigned ;
-: read-s16 ( -- n ) 2 read-signed ;
-: read-u16 ( -- n ) 2 read-unsigned ;
-: read-s24 ( -- n ) 3 read-signed ;
-: read-u24 ( -- n ) 3 read-unsigned ;
-: read-s32 ( -- n ) 4 read-signed ;
-: read-u32 ( -- n ) 4 read-unsigned ;
-: read-s64 ( -- n ) 8 read-signed ;
-: read-u64 ( -- n ) 8 read-unsigned ;
-: read-s128 ( -- n ) 16 read-signed ;
-: read-u128 ( -- n ) 16 read-unsigned ;
+: signed-endian> ( obj n -- str )
+    [ unsigned-endian> ] dip >signed ;
 
-: read-float ( -- n )
-    4 read endian> bits>float ;
+GENERIC: >n-byte-array ( obj n -- byte-array )
 
-: read-double ( -- n )
-    8 read endian> bits>double ;
+M: integer >n-byte-array ( m n -- byte-array ) >endian ;
 
-: read-c-string ( -- str/f )
-    "\0" read-until swap and ;
+! for doing native, platform-dependent sized values
+M: string >n-byte-array ( n string -- byte-array ) heap-size >n-byte-array ;
 
-: read-c-string* ( n -- str/f )
-    read [ zero? ] trim-right [ f ] when-empty ;
-
-: (read-128-ber) ( n -- n )
-    read1
-    [ [ 7 shift ] [ 7 clear-bit ] bi* bitor ] keep
-    7 bit? [ (read-128-ber) ] when ;
-    
-: read-128-ber ( -- n )
-    0 (read-128-ber) ;
+: s8>byte-array ( n -- byte-array ) 1 >n-byte-array ;
+: u8>byte-array ( n -- byte-array ) 1 >n-byte-array ;
+: s16>byte-array ( n -- byte-array ) 2 >n-byte-array ;
+: u16>byte-array ( n -- byte-array ) 2 >n-byte-array ;
+: s24>byte-array ( n -- byte-array ) 3 >n-byte-array ;
+: u24>byte-array ( n -- byte-array ) 3 >n-byte-array ;
+: s32>byte-array ( n -- byte-array ) 4 >n-byte-array ;
+: u32>byte-array ( n -- byte-array ) 4 >n-byte-array ;
+: s64>byte-array ( n -- byte-array ) 8 >n-byte-array ;
+: u64>byte-array ( n -- byte-array ) 8 >n-byte-array ;
+: s128>byte-array ( n -- byte-array ) 16 >n-byte-array ;
+: u128>byte-array ( n -- byte-array ) 16 >n-byte-array ;
+: write-float ( n -- byte-array ) float>bits 4 >n-byte-array ;
+: write-double ( n -- byte-array ) double>bits 8 >n-byte-array ;
+: write-c-string ( byte-array -- byte-array ) { 0 } B{ } append-as ;
 
 <PRIVATE
 
 CONSTANT: pack-table
     H{
-        { CHAR: c s8, }
-        { CHAR: C u8, }
-        { CHAR: s s16, }
-        { CHAR: S u16, }
-        { CHAR: t s24, }
-        { CHAR: T u24, }
-        { CHAR: i s32, }
-        { CHAR: I u32, }
-        { CHAR: q s64, }
-        { CHAR: Q u64, }
-        { CHAR: f float, }
-        { CHAR: F float, }
-        { CHAR: d double, }
-        { CHAR: D double, }
+        { CHAR: c s8>byte-array }
+        { CHAR: C u8>byte-array }
+        { CHAR: s s16>byte-array }
+        { CHAR: S u16>byte-array }
+        { CHAR: t s24>byte-array }
+        { CHAR: T u24>byte-array }
+        { CHAR: i s32>byte-array }
+        { CHAR: I u32>byte-array }
+        { CHAR: q s64>byte-array }
+        { CHAR: Q u64>byte-array }
+        { CHAR: f write-float }
+        { CHAR: F write-float }
+        { CHAR: d write-double }
+        { CHAR: D write-double }
     }
 
 CONSTANT: unpack-table
     H{
-        { CHAR: c read-s8 }
-        { CHAR: C read-u8 }
-        { CHAR: s read-s16 }
-        { CHAR: S read-u16 }
-        { CHAR: t read-s24 }
-        { CHAR: T read-u24 }
-        { CHAR: i read-s32 }
-        { CHAR: I read-u32 }
-        { CHAR: q read-s64 }
-        { CHAR: Q read-u64 }
-        { CHAR: f read-float }
-        { CHAR: F read-float }
-        { CHAR: d read-double }
-        { CHAR: D read-double }
+        { CHAR: c [ 8 signed-endian> ] }
+        { CHAR: C [ unsigned-endian> ] }
+        { CHAR: s [ 16 signed-endian> ] }
+        { CHAR: S [ unsigned-endian> ] }
+        { CHAR: t [ 24 signed-endian> ] }
+        { CHAR: T [ unsigned-endian> ] }
+        { CHAR: i [ 32 signed-endian> ] }
+        { CHAR: I [ unsigned-endian> ] }
+        { CHAR: q [ 64 signed-endian> ] }
+        { CHAR: Q [ unsigned-endian> ] }
+        { CHAR: f [ unsigned-endian> bits>float ] }
+        { CHAR: F [ unsigned-endian> bits>float ] }
+        { CHAR: d [ unsigned-endian> bits>double ] }
+        { CHAR: D [ unsigned-endian> bits>double ] }
     }
 
 CONSTANT: packed-length-table
@@ -163,11 +111,19 @@ CONSTANT: packed-length-table
         { CHAR: D 8 }
     }
 
-MACRO: pack ( seq str -- quot )
-    [ pack-table at 1quotation '[ _ @ ] ] [ ] 2map-as concat
-    '[ _ B{ } make ] ;
+MACRO: pack ( str -- quot )
+    [ pack-table at '[ _ execute ] ] { } map-as
+    '[ _ spread ]
+    '[ _ input<sequence ]
+    '[ _ B{ } append-outputs-as ] ;
 
 PRIVATE>
+
+: ch>packed-length ( ch -- n )
+    packed-length-table at ; inline
+
+: packed-length ( str -- n )
+    [ ch>packed-length ] sigma ;
  
 : pack-native ( seq str -- seq )
     [ set-big-endian pack ] with-scope ; inline
@@ -180,9 +136,14 @@ PRIVATE>
 
 <PRIVATE
 
+: start/end ( seq -- seq1 seq2 )
+    [ 0 [ + ] accumulate nip dup ] keep v+ ; inline
+
 MACRO: unpack ( str -- quot )
-    [ unpack-table at 1quotation '[ @ , ] ] { } map-as concat
-    '[ [ _ { } make ] with-string-reader ] ;
+    [ [ ch>packed-length ] { } map-as start/end ]
+    [ [ unpack-table at '[ @ ] ] { } map-as ] bi
+    [ '[ [ _ _ ] dip <slice> @ ] ] 3map
+    '[ _ cleave ] '[ _ output>array ] ;
 
 PRIVATE>
 
@@ -194,9 +155,6 @@ PRIVATE>
 
 : unpack-le ( seq str -- seq )
     [ big-endian off unpack ] with-scope ; inline
-
-: packed-length ( str -- n )
-    [ packed-length-table at ] sigma ;
 
 ERROR: packed-read-fail str bytes ;
 
