@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax core-foundation kernel assocs alien.c-types
+USING: alien.syntax core-foundation kernel assocs
 specialized-arrays.alien math sequences accessors ;
 IN: core-foundation.dictionaries
 
@@ -18,10 +18,15 @@ FUNCTION: CFDictionaryRef CFDictionaryCreate (
    CFDictionaryValueCallBacks* valueCallBacks
 ) ;
 
+FUNCTION: void* CFDictionaryGetValue (
+   CFDictionaryRef theDict,
+   void* key
+) ;
+
 : <CFDictionary> ( alist -- dictionary )
     [ kCFAllocatorDefault ] dip
     unzip [ >void*-array ] bi@
-    [ [ underlying>> ] bi@ ] [ nip length "void*" heap-size /i ] 2bi
+    [ [ underlying>> ] bi@ ] [ nip length ] 2bi
     &: kCFTypeDictionaryCallBacks
     &: kCFTypeDictionaryValueCallbacks
     CFDictionaryCreate ;
