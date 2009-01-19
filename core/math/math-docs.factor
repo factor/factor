@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel sequences quotations
-math.private ;
+math.private byte-arrays io.binary ;
 IN: math
 
 HELP: number=
@@ -305,6 +305,10 @@ HELP: find-last-integer
 { $values { "n" integer } { "quot" { $quotation "( i -- ? )" } } { "i" "an integer or " { $link f } } }
 { $description "Applies the quotation to each integer from " { $snippet "n" } " down to 0, inclusive. Iteration stops when the quotation outputs a true value or 0 is reached. If the quotation yields a true value for some integer, the word outputs that integer. Otherwise, the word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find-last } "." } ;
+
+HELP: byte-array>bignum
+{ $values { "byte-array" byte-array } { "n" integer } }
+{ $description "Converts a byte-array, interpreted as little-endian, into a bignum integer. User code should call " { $link >le } " or " { $link >be } " instead." } ;
 
 ARTICLE: "division-by-zero" "Division by zero"
 "Floating point division never raises an error if the denominator is zero. This means that if at least one of the two inputs to " { $link / } ", " { $link /f } " or " { $link mod } " is a float, the result will be a floating point infinity or not a number value."

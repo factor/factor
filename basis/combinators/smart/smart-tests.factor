@@ -12,10 +12,28 @@ IN: combinators.smart.tests
 [ { 9 11 } [ + ] input<sequence ] must-infer
 [ 20 ] [ { 9 11 } [ + ] input<sequence ] unit-test
 
-
-
 [ 6 ] [ [ 1 2 3 ] [ + ] reduce-outputs ] unit-test
 
 [ [ 1 2 3 ] [ + ] reduce-outputs ] must-infer
 
 [ 6 ] [ [ 1 2 3 ] sum-outputs ] unit-test
+
+[ "ab" ]
+[
+    [ "a" "b" ] "" append-outputs-as
+] unit-test
+
+[ "" ]
+[
+    [ ] "" append-outputs-as
+] unit-test
+
+[ { } ]
+[
+    [ ] append-outputs
+] unit-test
+
+[ B{ 1 2 3 } ]
+[
+    [ { 1 } { 2 } { 3 } ] B{ } append-outputs-as
+] unit-test
