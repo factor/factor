@@ -2,8 +2,7 @@
 ! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private math math.ranges
-combinators macros quotations fry macros locals datastack
-multiline ;
+combinators macros quotations fry macros locals ;
 IN: generalizations
 
 <<
