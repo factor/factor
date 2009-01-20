@@ -1,4 +1,5 @@
-! Copyright (C) 2008 Slava Pestov
+! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math io io.encodings destructors accessors
 sequences namespaces byte-vectors fry combinators ;
@@ -27,6 +28,8 @@ ERROR: limit-exceeded ;
 
 ERROR: bad-stream-mode mode ;
 
+<PRIVATE
+
 : adjust-limit ( n stream -- n' stream )
     2dup [ + ] change-count
     [ count>> ] [ limit>> ] bi >
@@ -45,6 +48,8 @@ ERROR: bad-stream-mode mode ;
     [ adjust-limit ] dip
     pick 0 <= [ 3drop f ] [ [ stream>> ] dip call ] if ; inline
 
+PRIVATE>
+
 M: limited-stream stream-read1
     1 swap 
     [ nip stream-read1 ] maybe-read ;
@@ -55,9 +60,13 @@ M: limited-stream stream-read
 M: limited-stream stream-read-partial
     [ stream-read-partial ] maybe-read ;
 
+<PRIVATE
+
 : (read-until) ( stream seps buf -- stream seps buf sep/f )
     3dup [ [ stream-read1 dup ] dip memq? ] dip
     swap [ drop ] [ push (read-until) ] if ;
+
+PRIVATE>
 
 M: limited-stream stream-read-until
     swap BV{ } clone (read-until) [ 2nip B{ } like ] dip ;
