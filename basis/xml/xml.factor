@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io io.encodings.binary io.files
 io.streams.string kernel namespaces sequences xml.state-parser strings
-xml.backend xml.data xml.errors xml.tokenize ascii
-xml.writer ;
+xml.backend xml.data xml.errors xml.tokenize ascii xml.entities
+xml.writer assocs ;
 IN: xml
 
 !   -- Overall parser with data tree
@@ -24,11 +24,6 @@ M: object process add-child ;
 M: prolog process
     xml-stack get V{ { f V{ } } } =
     [ bad-prolog ] unless drop ;
-
-M: instruction process
-    xml-stack get length 1 =
-    [ bad-instruction ] unless
-    add-child ;
 
 M: directive process
     xml-stack get dup length 1 =
@@ -53,7 +48,9 @@ M: closer process
     <tag> add-child ;
 
 : init-xml-stack ( -- )
-    V{ } clone xml-stack set f push-xml ;
+    V{ } clone xml-stack set
+    extra-entities [ H{ } assoc-like ] change
+    f push-xml ;
 
 : default-prolog ( -- prolog )
     "1.0" "UTF-8" f <prolog> ;
@@ -150,11 +147,12 @@ TUPLE: pull-xml scope ;
     ] state-parse ;
 
 : read-xml ( stream -- xml )
-    #! Produces a tree of XML nodes
-    (read-xml-chunk) make-xml-doc ;
+    0 depth
+    [ (read-xml-chunk) make-xml-doc ] with-variable ;
 
 : read-xml-chunk ( stream -- seq )
-    (read-xml-chunk) nip ;
+    1 depth
+    [ (read-xml-chunk) nip ] with-variable ;
 
 : string>xml ( string -- xml )
     <string-reader> read-xml ;

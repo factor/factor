@@ -25,11 +25,12 @@ T{ capitalized-prolog f 1 6 "XmL" } "<?XmL version='1.0'?><x/>"
     xml-error-test
 T{ pre/post-content f "x" t } "x<y/>" xml-error-test
 T{ versionless-prolog f 1 8 } "<?xml?><x/>" xml-error-test
-T{ bad-instruction f 1 11 T{ instruction f "xsl" } }
-    "<x><?xsl?></x>" xml-error-test
 T{ unclosed-quote f 1 13 } "<x value='/>" xml-error-test
 T{ bad-name f 1 3 "-" } "<-/>" xml-error-test
 T{ quoteless-attr f 1 10 } "<x value=3/>" xml-error-test
 T{ attr-w/< f 1 11 } "<x value='<'/>" xml-error-test
 T{ text-w/]]> f 1 6 } "<x>]]></x>" xml-error-test
 T{ duplicate-attr f 1 21 T{ name { space "" } { main "this" } } V{ "a" "b" } } "<x this='a' this='b'/>" xml-error-test
+T{ bad-cdata f 1 3 } "<![CDATA[]]><x/>" xml-error-test
+T{ bad-cdata f 1 7 } "<x/><![CDATA[]]>" xml-error-test
+T{ pre/post-content f "&" t } "&32;<x/>" xml-error-test

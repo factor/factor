@@ -1,12 +1,12 @@
 USING: accessors assocs combinators continuations fry generalizations
 io.pathnames kernel macros sequences stack-checker tools.test xml
-xml.utilities xml.writer ;
+xml.utilities xml.writer arrays ;
 IN: xml.tests.suite
 
-TUPLE: test id uri sections description type ;
+TUPLE: xml-test id uri sections description type ;
 
-: >test ( tag -- test )
-    test new swap {
+: >xml-test ( tag -- test )
+    xml-test new swap {
         [ "TYPE" swap at >>type ]
         [ "ID" swap at >>id ]
         [ "URI" swap at >>uri ]
@@ -15,7 +15,7 @@ TUPLE: test id uri sections description type ;
     } cleave ;
 
 : parse-tests ( xml -- tests )
-    "TEST" tags-named [ >test ] map ;
+    "TEST" tags-named [ >xml-test ] map ;
 
 : base "resource:basis/xml/tests/xmltest/" ;
 
@@ -32,11 +32,22 @@ MACRO: drop-input ( quot -- newquot )
 : well-formed? ( uri -- answer )
     [ file>xml ] fails? "not-wf" "valid" ? ;
 
-: run-test ( test -- )
+: test-quots ( test -- result quot )
     [ type>> '[ _ ] ]
-    [ '[ _ uri>> base swap append-path well-formed? ] ] bi
-    unit-test ;
+    [ '[ _ uri>> base swap append-path well-formed? ] ] bi ;
 
-: run-tests ( -- )
+: xml-tests ( -- tests )
     base "xmltest.xml" append-path file>xml
-    parse-tests [ run-test ] each ;
+    parse-tests [ test-quots 2array ] map ;
+
+: run-xml-tests ( -- )
+    xml-tests [ unit-test ] assoc-each ;
+
+: works? ( result quot -- ? )
+    [ first ] [ call ] bi* = ;
+
+: partition-xml-tests ( -- successes failures )
+    xml-tests [ first2 works? ] partition ;
+
+: failing-valids ( -- tests )
+    partition-xml-tests nip [ second first ] map [ type>> "valid" = ] filter ;

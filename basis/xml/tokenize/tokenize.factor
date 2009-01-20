@@ -13,6 +13,8 @@ IN: xml.tokenize
 ! A stack of hashtables
 SYMBOL: ns-stack
 
+SYMBOL: depth
+
 : attrs>ns ( attrs-alist -- hash )
     ! this should check to make sure URIs are valid
     [
@@ -50,25 +52,37 @@ SYMBOL: ns-stack
 
 ! Parsing names
 
-! version=1.0? is calculated once and passed around for efficiency
+: valid-name? ( str -- ? )
+    [ f ] [
+        version=1.0? swap {
+            [ first name-start? ]
+            [ rest-slice [ name-char? ] with all? ]
+        } 2&&
+    ] if-empty ;
 
-: assure-name ( str version=1.0? -- str )
-    over {
-        [ first name-start? ]
-        [ rest-slice [ name-char? ] with all? ]
-    } 2&& [ bad-name ] unless ;
+: prefixed-name ( str -- name/f )
+    ":" split dup length 2 = [
+        [ [ valid-name? ] all? ]
+        [ first2 f <name> ] bi and
+    ] [ drop f ] if ;
 
-: (parse-name) ( start -- str )
-    version=1.0?
-    [ [ get-char name-char? not ] curry take-until append ]
-    [ assure-name ] bi ;
+: interpret-name ( str -- name )
+    dup prefixed-name [ ] [
+        dup valid-name?
+        [ <simple-name> ] [ bad-name ] if
+    ] ?if ;
 
-: parse-name-starting ( start -- name )
-    (parse-name) get-char CHAR: : =
-    [ next "" (parse-name) ] [ "" swap ] if f <name> ;
+: take-name ( -- string )
+    version=1.0? '[ _ get-char name-char? not ] take-until ;
 
 : parse-name ( -- name )
-    "" parse-name-starting ;
+    take-name interpret-name ;
+
+: parse-name-starting ( string -- name )
+    take-name append interpret-name ;
+
+: parse-simple-name ( -- name )
+    take-name <simple-name> ;
 
 !   -- Parsing strings
 
@@ -99,11 +113,15 @@ SYMBOL: ns-stack
 : assure-no-]]> ( circular -- )
     "]]>" sequence= [ text-w/]]> ] when ;
 
-: parse-text ( -- string )
-    3 f <array> <circular> '[
-        _ [ push-circular ]
-        [ nip assure-no-]]> ]
-        [ drop CHAR: < = ] 2tri
+:: parse-text ( -- string )
+    3 f <array> <circular> :> circ
+    depth get zero? :> no-text [| char |
+        char circ push-circular
+        circ assure-no-]]>
+        no-text [ char blank? char CHAR: < = or [
+            char 1string t pre/post-content
+        ] unless ] when
+        char CHAR: < =
     ] parse-char ;
 
 ! Parsing tags
@@ -131,7 +149,7 @@ SYMBOL: ns-stack
     [ dup "\t\r\n" member? [ drop CHAR: \s ] when ] map ;
 
 : parse-attr ( -- )
-    parse-name CHAR: = expect
+    parse-name pass-blank CHAR: = expect pass-blank
     t parse-quote* normalize-quot 2array , ;
 
 : (middle-tag) ( -- )
@@ -148,9 +166,13 @@ SYMBOL: ns-stack
     [ (middle-tag) ] f make pass-blank
     assure-no-duplicates ;
 
+: close ( -- )
+    pass-blank CHAR: > expect ;
+
 : end-tag ( name attrs-alist -- tag )
     tag-ns pass-blank get-char CHAR: / =
-    [ pop-ns <contained> next ] [ <opener> ] if ;
+    [ pop-ns <contained> next CHAR: > expect ]
+    [ depth inc <opener> close ] if ;
 
 : take-comment ( -- comment )
     "--" expect-string
@@ -159,6 +181,7 @@ SYMBOL: ns-stack
     CHAR: > expect ;
 
 : take-cdata ( -- string )
+    depth get zero? [ bad-cdata ] when
     "[CDATA[" expect-string "]]>" take-string ;
 
 : take-word ( -- string )
@@ -173,19 +196,17 @@ SYMBOL: ns-stack
 : take-attlist-decl ( -- doctype-decl )
     take-decl-contents <attlist-decl> ;
 
+: take-notation-decl ( -- notation-decl )
+    take-decl-contents <notation-decl> ; 
+
 : take-until-one-of ( seps -- str sep )
     '[ get-char _ member? ] take-until get-char ;
 
-: expect-> ( -- )
-    pass-blank CHAR: > expect ;
-
 : take-system-id ( -- system-id )
-    parse-quote <system-id>
-    expect-> ;
+    parse-quote <system-id> close ;
 
 : take-public-id ( -- public-id )
-    parse-quote parse-quote <public-id>
-    expect-> ;
+    parse-quote parse-quote <public-id> close ;
 
 DEFER: direct
 
@@ -216,7 +237,7 @@ DEFER: direct
         { CHAR: \s [
             pass-blank get-char CHAR: [ = [
                 next take-internal-subset f swap
-                expect->
+                close
             ] [
                 " >" take-until-one-of {
                     { CHAR: \s [ (take-external-id) ] }
@@ -235,21 +256,22 @@ DEFER: direct
     } case ;
 
 : associate-entity ( entity-name entity-def -- )
-    swap extra-entities [ ?set-at ] change ;
+    swap extra-entities get set-at ;
 
 : take-entity-decl ( -- entity-decl )
     pass-blank get-char {
         { CHAR: % [ next pass-blank take-entity-def ] }
         [ drop take-entity-def 2dup associate-entity ]
     } case
-    expect-> <entity-decl> ;
+    close <entity-decl> ;
 
 : take-directive ( -- directive )
-    take-word {
+    take-name {
         { "ELEMENT" [ take-element-decl ] }
         { "ATTLIST" [ take-attlist-decl ] }
         { "DOCTYPE" [ take-doctype-decl ] }
         { "ENTITY" [ take-entity-decl ] }
+        { "NOTATION" [ take-notation-decl ] }
         [ bad-directive ]
     } case ;
 
@@ -307,28 +329,27 @@ SYMBOL: string-input?
     dup prolog-data set ;
 
 : instruct ( -- instruction )
-    "" (parse-name) dup "xml" =
-    [ drop parse-prolog ] [
-        dup >lower "xml" =
-        [ capitalized-prolog ]
-        [ "?>" take-string append <instruction> ] if
-    ] if ;
+    take-name {
+        { [ dup "xml" = ] [ drop parse-prolog ] }
+        { [ dup >lower "xml" = ] [ capitalized-prolog ] }
+        { [ dup valid-name? not ] [ bad-name ] }
+        [ "?>" take-string append <instruction> ]
+    } cond ;
 
 : make-tag ( -- tag )
     {
         { [ get-char dup CHAR: ! = ] [ drop next direct ] }
         { [ CHAR: ? = ] [ next instruct ] }
         [
-            start-tag [ dup add-ns pop-ns <closer> ]
+            start-tag [ dup add-ns pop-ns <closer> depth dec close ]
             [ middle-tag end-tag ] if
-            CHAR: > expect
         ]
     } cond ;
 
 ! Autodetecting encodings
 
 : continue-make-tag ( str -- tag )
-    parse-name-starting middle-tag end-tag CHAR: > expect ;
+    parse-name-starting middle-tag end-tag ;
 
 : start-utf16le ( -- tag )
     utf16le decode-input-if

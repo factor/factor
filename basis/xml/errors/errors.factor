@@ -170,18 +170,6 @@ M: versionless-prolog summary ( obj -- str )
         "XML prolog lacks a version declaration" print
     ] with-string-writer ;
 
-TUPLE: bad-instruction < parsing-error instruction ;
-
-: bad-instruction ( instruction -- * )
-    \ bad-instruction parsing-error swap >>instruction throw ;
-
-M: bad-instruction summary ( obj -- str )
-    [
-        dup call-next-method write
-        "Misplaced processor instruction:" print
-        instruction>> write-xml-chunk nl
-    ] with-string-writer ;
-
 TUPLE: bad-directive < parsing-error dir ;
 
 : bad-directive ( directive -- * )
@@ -286,9 +274,17 @@ TUPLE: duplicate-attr < parsing-error key values ;
 M: duplicate-attr summary
     call-next-method "\nDuplicate attribute" append ;
 
+TUPLE: bad-cdata < parsing-error ;
+
+: bad-cdata ( -- * )
+    \ bad-cdata parsing-error throw ;
+
+M: bad-cdata summary
+    call-next-method "\nCDATA occurs before or after main tag" append ;
+
 UNION: xml-parse-error
     multitags notags extra-attrs nonexist-ns bad-decl
     not-yes/no unclosed mismatched expected no-entity
-    bad-prolog versionless-prolog capitalized-prolog bad-instruction
+    bad-prolog versionless-prolog capitalized-prolog
     bad-directive bad-name unclosed-quote quoteless-attr
     attr-w/< text-w/]]> duplicate-attr ;
