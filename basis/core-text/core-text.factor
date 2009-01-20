@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien alien.c-types alien.syntax kernel destructors
-parser accessors fry words hashtables sequences math math.functions locals
+USING: arrays alien alien.c-types alien.syntax kernel destructors words
+parser accessors fry words hashtables sequences memoize
+assocs math math.functions locals init
 core-foundation core-foundation.strings
 core-foundation.attributed-strings
 core-graphics core-graphics.types ;
@@ -20,6 +21,8 @@ FUNCTION: CTFontRef CTFontCreateWithName (
     [
         [ <CFString> &CFRelease ] dip f CTFontCreateWithName
     ] with-destructors ;
+
+MEMO: cached-font ( name size -- font ) <CTFont> ;
 
 <<
 
@@ -64,7 +67,7 @@ TUPLE: typographic-bounds width ascent descent leading ;
     [ CTLineGetTypographicBounds ] 3keep [ *CGFloat ] tri@
     typographic-bounds boa ;
 
-TUPLE: line string font line bounds dim bitmap disposed ;
+TUPLE: line string font line bounds dim bitmap age disposed ;
 
 : bounds>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
@@ -81,7 +84,7 @@ TUPLE: line string font line bounds dim bitmap disposed ;
         2dup <CTLine> |CFRelease
         dup line-typographic-bounds
         dup bounds>dim 3dup [ draw-line ] with-bitmap-context
-        f line boa
+        0 f line boa
     ] with-destructors ;
 
 M: line dispose*
@@ -89,3 +92,29 @@ M: line dispose*
         [ font>> &CFRelease drop ]
         [ line>> &CFRelease drop ] bi
     ] with-destructors ;
+
+<PRIVATE
+
+MEMO: (cached-line) ( string font -- line ) <line> ;
+
+: cached-lines ( -- assoc )
+    \ (cached-line) "memoize" word-prop ;
+
+: set-cached-lines ( assoc -- )
+    \ (cached-line) "memoize" set-word-prop ;
+
+CONSTANT: max-line-age 5
+
+PRIVATE>
+
+: age-lines ( -- )
+    cached-lines
+    [ nip [ 1+ ] change-age age>> max-line-age <= ] assoc-filter
+    set-cached-lines ;
+
+: cached-line ( string font -- line ) (cached-line) 0 >>age ;
+
+[
+    \ cached-font reset-memoized
+    \ (cached-line) reset-memoized
+] "core-text" add-init-hook
