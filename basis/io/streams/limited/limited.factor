@@ -24,7 +24,7 @@ ERROR: limit-exceeded ;
 
 : check-limit ( n stream -- )
     [ + ] change-count
-    [ count>> ] [ limit>> ] bi >=
+    [ count>> ] [ limit>> ] bi >
     [ limit-exceeded ] when ; inline
 
 M: limited-stream stream-read1

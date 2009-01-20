@@ -38,3 +38,6 @@ namespaces tools.test strings kernel ;
         "l" read-until
     ] with-input-stream
 ] unit-test
+
+[ CHAR: a ]
+[ "a" <string-reader> 1 <limited-stream> stream-read1 ] unit-test
