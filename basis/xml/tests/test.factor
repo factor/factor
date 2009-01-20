@@ -3,7 +3,7 @@
 IN: xml.tests
 USING: kernel xml tools.test io namespaces make sequences
 xml.errors xml.entities.html parser strings xml.data io.files
-xml.writer xml.utilities state-parser continuations assocs
+xml.writer xml.utilities xml.state-parser continuations assocs
 sequences.deep accessors io.streams.string ;
 
 ! This is insufficient
@@ -65,3 +65,4 @@ SYMBOL: xml-file
 [ "foo" ] [ "<!ENTITY bar 'foo'><x>&bar;</x>" string>xml children>string ] unit-test
 [ V{ "hello" } ] [ "hello" string>xml-chunk ] unit-test
 [ 958 ] [ [ "&xi;" string>xml-chunk ] with-html-entities first first ] unit-test
+[ "x" "<" ] [ "<x value='&lt;'/>" string>xml [ name>> main>> ] [ "value" swap at ] bi ] unit-test

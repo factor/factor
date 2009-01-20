@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io io.encodings.binary io.files
-io.streams.string kernel namespaces sequences state-parser strings
+io.streams.string kernel namespaces sequences xml.state-parser strings
 xml.backend xml.data xml.errors xml.tokenize ascii
 xml.writer ;
 IN: xml
@@ -164,7 +164,6 @@ TUPLE: pull-xml scope ;
     [ <string-reader> read-xml-chunk ] with-variable ;
 
 : file>xml ( filename -- xml )
-    ! Autodetect encoding!
     binary <file-reader> read-xml ;
 
 : xml-reprint ( string -- )
