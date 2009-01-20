@@ -7,7 +7,7 @@ ui.gadgets.worlds ui.render ui.backend byte-arrays accessors
 locals specialized-arrays.direct.uchar ;
 IN: ui.freetype
 
-TUPLE: freetype-renderer ;
+SINGLETON: freetype-renderer
 
 SYMBOL: open-fonts
 
@@ -61,7 +61,7 @@ M: freetype-renderer free-fonts ( world -- )
     } at ;
 
 : ttf-path ( name -- string )
-    "resource:fonts/" ".ttf" surround ;
+    "resource:basis/bitstream-vera/" ".ttf" surround ;
 
 : (open-face) ( path length -- face )
     #! We use FT_New_Memory_Face, not FT_New_Face, since
@@ -223,4 +223,4 @@ M: freetype-renderer x>offset ( x font string -- n )
     [ run-char-widths [ <= ] with find drop ] keep swap
     [ ] [ length ] ?if ;
 
-T{ freetype-renderer } font-renderer set-global
+freetype-renderer font-renderer set-global

@@ -1,1 +1,1 @@
-UI text rendering implementation based on FreeType
+UI text rendering implementation using FreeType

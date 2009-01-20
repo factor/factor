@@ -142,7 +142,7 @@ M: table layout*
 
 : draw-column ( font column width align -- )
     over [
-        [ 2dup ] 2dip column-loc draw-string
+        [ 2dup ] 2dip column-loc draw-text
     ] dip table-gap + 0 2array gl-translate ;
 
 : draw-row ( columns widths align font -- )

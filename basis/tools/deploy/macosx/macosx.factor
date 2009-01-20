@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.files io.files.info.unix io.pathnames
 io.directories io.directories.hierarchy kernel namespaces make
@@ -35,9 +35,6 @@ IN: tools.deploy.macosx
 : copy-dll ( bundle-name -- )
     "Frameworks/libfactor.dylib" copy-bundle-dir ;
 
-: copy-freetype ( bundle-name -- )
-    deploy-ui? get [ "Frameworks" copy-bundle-dir ] [ drop ] if ;
-
 : copy-nib ( bundle-name -- )
     deploy-ui? get [
         "Resources/English.lproj/MiniFactor.nib" copy-bundle-dir
@@ -45,13 +42,11 @@ IN: tools.deploy.macosx
 
 : create-app-dir ( vocab bundle-name -- vm )
     [
-        nip {
-            [ copy-dll ]
-            [ copy-freetype ]
-            [ copy-nib ]
-            [ "Contents/Resources/" copy-fonts ]
-            [ "Contents/Resources" append-path make-directories ]
-        } cleave
+        nip
+        [ copy-dll ]
+        [ copy-nib ]
+        [ "Contents/Resources" append-path make-directories ]
+        tri
     ]
     [ create-app-plist ]
     [ "Contents/MacOS/" append-path "" copy-vm ] 2tri

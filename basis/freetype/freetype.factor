@@ -4,7 +4,7 @@ USING: alien alien.syntax kernel system combinators ;
 IN: freetype
 
 << "freetype" {
-    { [ os macosx? ] [ "@executable_path/../Frameworks/libfreetype.6.dylib" "cdecl" add-library ] }
+    { [ os macosx? ] [ "libfreetype.6.dylib" "cdecl" add-library ] }
     { [ os windows? ] [ "freetype6.dll" "cdecl" add-library ] }
     { [ t ] [ drop ] }
 } cond >>

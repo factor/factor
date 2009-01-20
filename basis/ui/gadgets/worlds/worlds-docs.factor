@@ -39,7 +39,7 @@ HELP: world
         { { $snippet "status" } " - a " { $link model } " holding a string to be displayed in the world's status bar." }
         { { $snippet "focus" } " - the current owner of the keyboard focus in the world." }
         { { $snippet "focused?" } " - a boolean indicating if the native window containing the world has keyboard focus." }
-        { { $snippet "fonts" } " - a hashtable mapping font instances to vectors of " { $link sprite } " instances." }
+        { { $snippet "fonts" } " - a hashtable used by the " { $link font-renderer } "." }
         { { $snippet "handle" } " - a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
         { { $snippet "window-loc" } " - the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
     }

@@ -10,6 +10,4 @@ IN: bootstrap.ui
             { [ os unix? ] [ "x11" ] }
         } cond
     ] unless* "ui." prepend require
-
-    "ui.freetype" require
 ] when

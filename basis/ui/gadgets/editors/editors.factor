@@ -174,7 +174,7 @@ M: editor ungraft*
     line-translation gl-translate ;
 
 : draw-line ( editor str -- )
-    [ font>> ] dip { 0 0 } draw-string ;
+    [ font>> ] dip { 0 0 } draw-text ;
 
 : first-visible-line ( editor -- n )
     [
