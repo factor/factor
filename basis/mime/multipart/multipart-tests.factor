@@ -20,10 +20,11 @@ IN: mime.multipart.tests
 
 [ t ] [
     mime-test-stream [ upload-separator parse-multipart ] with-input-stream
-    drop "\"up.txt\"" swap key?
+    nip "\"up.txt\"" swap key?
 ] unit-test
 
 [ t ] [
     mime-test-stream [ upload-separator parse-multipart ] with-input-stream
-    nip "\"text1\"" swap key?
+    drop "\"text1\"" swap key?
 ] unit-test
+
