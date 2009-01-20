@@ -42,17 +42,18 @@ ERROR: bad-stream-mode mode ;
     ] when ; inline
 
 : maybe-read ( n limited-stream quot: ( n stream -- seq/f ) -- seq/f )
+    [ adjust-limit ] dip
     pick 0 <= [ 3drop f ] [ [ stream>> ] dip call ] if ; inline
 
 M: limited-stream stream-read1
-    1 swap adjust-limit
+    1 swap 
     [ nip stream-read1 ] maybe-read ;
 
 M: limited-stream stream-read
-    adjust-limit [ stream-read ] maybe-read ;
+    [ stream-read ] maybe-read ;
 
 M: limited-stream stream-read-partial
-    adjust-limit [ stream-read-partial ] maybe-read ;
+    [ stream-read-partial ] maybe-read ;
 
 : (read-until) ( stream seps buf -- stream seps buf sep/f )
     3dup [ [ stream-read1 dup ] dip memq? ] dip
