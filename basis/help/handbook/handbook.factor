@@ -181,9 +181,10 @@ ARTICLE: "io" "Input and output"
 { $subsection "io.streams.plain" }
 { $subsection "io.streams.string" }
 { $subsection "io.streams.byte-array" }
+{ $subsection "io.streams.limited" }
 { $heading "Utilities" }
 { $subsection "stream-binary" }
-{ $subsection "styles" }
+{ $subsection "io.styles" }
 { $subsection "checksums" }
 { $heading "Implementation" }
 { $subsection "io.streams.c" }
@@ -209,7 +210,8 @@ ARTICLE: "tools" "Developer tools"
 { $subsection "timing" }
 { $subsection "tools.disassembler" }
 "Deployment tools:"
-{ $subsection "tools.deploy" } ;
+{ $subsection "tools.deploy" }
+{ $see-also "ui-tools" } ;
 
 ARTICLE: "article-index" "Article index"
 { $index [ articles get keys ] } ;

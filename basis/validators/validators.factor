@@ -2,8 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations sequences math namespaces make sets
 math.parser math.ranges assocs regexp unicode.categories arrays
-hashtables words classes quotations xmode.catalog ;
+hashtables words classes quotations xmode.catalog unicode.case ;
 IN: validators
+
+: v-checkbox ( str -- ? )
+    >lower "on" = ;
 
 : v-default ( str def -- str/def )
     over empty? spin ? ;
@@ -69,8 +72,8 @@ IN: validators
 
 : v-one-line ( str -- str )
     v-required
-    dup "\r\n" intersect empty?
-    [ "must be a single line" throw ] unless ;
+    dup "\r\n" intersects?
+    [ "must be a single line" throw ] when ;
 
 : v-one-word ( str -- str )
     v-required

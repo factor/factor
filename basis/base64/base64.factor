@@ -1,16 +1,22 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2008 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences io.binary splitting grouping
-accessors ;
+USING: combinators io io.binary io.encodings.binary
+io.streams.byte-array io.streams.string kernel math namespaces
+sequences strings ;
 IN: base64
 
 <PRIVATE
 
-: count-end ( seq quot -- n )
-    trim-right-slice [ seq>> length ] [ to>> ] bi - ; inline
+: read1-ignoring ( ignoring -- ch )
+    read1 2dup swap member? [ drop read1-ignoring ] [ nip ] if ;
+
+: read-ignoring ( ignoring n -- str )
+    [ drop read1-ignoring ] with map harvest
+    [ f ] [ >string ] if-empty ;
 
 : ch>base64 ( ch -- ch )
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" nth ;
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+    nth ; inline
 
 : base64>ch ( ch -- ch )
     {
@@ -19,32 +25,60 @@ IN: base64
         f 0 f f f 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
         22 23 24 25 f f f f f f 26 27 28 29 30 31 32 33 34 35 36 37 38 39
         40 41 42 43 44 45 46 47 48 49 50 51
-    } nth ;
+    } nth ; inline
 
-: encode3 ( seq -- seq )
+SYMBOL: column
+
+: write1-lines ( ch -- )
+    write1
+    column get [
+        1+ [ 76 = [ "\r\n" write ] when ]
+        [ 76 mod column set ] bi
+    ] when* ;
+
+: write-lines ( str -- )
+    [ write1-lines ] each ;
+
+: encode3 ( seq -- )
     be> 4 <reversed> [
-        -6 * shift HEX: 3f bitand ch>base64
-    ] with B{ } map-as ;
+        -6 * shift HEX: 3f bitand ch>base64 write1-lines
+    ] with each ; inline
 
-: decode4 ( str -- str )
-    0 [ base64>ch swap 6 shift bitor ] reduce 3 >be ;
+: encode-pad ( seq n -- )
+    [ 3 0 pad-right binary [ encode3 ] with-byte-writer ]
+    [ 1+ ] bi* head-slice 4 CHAR: = pad-right write-lines ; inline
 
-: >base64-rem ( str -- str )
-    [ 3 0 pad-right encode3 ] [ length 1+ ] bi
-    head-slice 4 CHAR: = pad-right ;
+ERROR: malformed-base64 ;
+
+: decode4 ( seq -- )
+    [ 0 [ base64>ch swap 6 shift bitor ] reduce 3 >be ]
+    [ [ CHAR: = = ] count ] bi head-slice*
+    [ write1 ] each ; inline
 
 PRIVATE>
 
+: encode-base64 ( -- )
+    3 read dup length {
+        { 0 [ drop ] }
+        { 3 [ encode3 encode-base64 ] }
+        [ encode-pad encode-base64 ]
+    } case ;
+
+: encode-base64-lines ( -- )
+    0 column [ encode-base64 ] with-variable ;
+
+: decode-base64 ( -- )
+    "\n\r" 4 read-ignoring dup length {
+        { 0 [ drop ] }
+        { 4 [ decode4 decode-base64 ] }
+        [ malformed-base64 ]
+    } case ;
+
 : >base64 ( seq -- base64 )
-    #! cut string into two pieces, convert 3 bytes at a time
-    #! pad string with = when not enough bits
-    dup length dup 3 mod - cut
-    [ 3 <groups> [ encode3 ] map concat ]
-    [ [ "" ] [ >base64-rem ] if-empty ]
-    bi* append ;
+    binary [ [ encode-base64 ] with-string-reader ] with-byte-writer ;
 
 : base64> ( base64 -- seq )
-    #! input length must be a multiple of 4
-    [ 4 <groups> [ decode4 ] map concat ]
-    [ [ CHAR: = = ] count-end ]
-    bi head* ;
+    [ binary [ decode-base64 ] with-byte-reader ] with-string-writer ;
+
+: >base64-lines ( seq -- base64 )
+    binary [ [ encode-base64-lines ] with-string-reader ] with-byte-writer ;

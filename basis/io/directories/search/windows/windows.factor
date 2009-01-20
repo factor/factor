@@ -5,7 +5,7 @@ io.directories.search ;
 IN: io.directories.search.windows
 
 : program-files-directories ( -- array )
-    program-files program-files-x86 2array ; inline
+    program-files program-files-x86 2array harvest ; inline
 
 : find-in-program-files ( base-directory bfs? quot -- path )
     [

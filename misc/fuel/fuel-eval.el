@@ -1,6 +1,6 @@
 ;;; fuel-eval.el --- evaluating Factor expressions
 
-;; Copyright (C) 2008  Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009  Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -13,9 +13,10 @@
 
 ;;; Code:
 
-(require 'fuel-base)
 (require 'fuel-syntax)
 (require 'fuel-connection)
+(require 'fuel-log)
+(require 'fuel-base)
 
 (eval-when-compile (require 'cl))
 
@@ -30,6 +31,7 @@
         ((listp sexp)
          (case (car sexp)
            (:array (factor--seq 'V{ '} (cdr sexp)))
+           (:seq (factor--seq '{ '} (cdr sexp)))
            (:quote (format "\\ %s" (factor `(:factor ,(cadr sexp)))))
            (:quotation (factor--seq '\[ '\] (cdr sexp)))
            (:using (factor `(USING: ,@(cdr sexp) :end)))
@@ -41,7 +43,7 @@
          (factor (case sexp
                    (:rs 'fuel-eval-restartable)
                    (:nrs 'fuel-eval-non-restartable)
-                   (:in (fuel-syntax--current-vocab))
+                   (:in (or (fuel-syntax--current-vocab) "fuel"))
                    (:usings `(:array ,@(fuel-syntax--usings)))
                    (:get 'fuel-eval-set-result)
                    (:end '\;)
@@ -67,9 +69,9 @@
   (cons :array (mapcar 'factor lst)))
 
 (defsubst factor--fuel-in (in)
-  (cond ((null in) :in)
+  (cond ((or (eq in :in) (null in)) :in)
         ((eq in 'f) 'f)
-        ((eq in 't) "fuel-scratchpad")
+        ((eq in 't) "fuel")
         ((stringp in) in)
         (t (error "Invalid 'in' (%s)" in))))
 
@@ -125,6 +127,7 @@
   (fuel-eval--retort-make (cons 'fuel-parse-retort-error str) nil))
 
 (defun fuel-eval--parse-retort (ret)
+  (fuel-log--info "RETORT: %S" ret)
   (if (fuel-eval--retort-p ret) ret
     (fuel-eval--make-parse-error-retort ret)))
 

@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators io locals kernel math math.functions
-math.ranges namespaces random sequences hashtables sets ;
+USING: combinators kernel locals math math.functions math.ranges
+random sequences sets ;
 IN: math.miller-rabin
 
-: >even ( n -- int ) dup even? [ 1- ] unless ; foldable
+<PRIVATE
+
 : >odd ( n -- int ) dup even? [ 1+ ] when ; foldable
-: next-odd ( m -- n ) dup even? [ 1+ ] [ 2 + ] if ;
 
 TUPLE: positive-even-expected n ;
 
@@ -28,12 +28,16 @@ TUPLE: positive-even-expected n ;
             ] unless drop
         ] each prime? ] ;
 
+PRIVATE>
+
+: next-odd ( m -- n ) dup even? [ 1+ ] [ 2 + ] if ;
+
 : miller-rabin* ( n numtrials -- ? )
     over {
         { [ dup 1 <= ] [ 3drop f ] }
         { [ dup 2 = ] [ 3drop t ] }
         { [ dup even? ] [ 3drop f ] }
-        [ [ drop (miller-rabin) ] with-scope ]
+        [ drop (miller-rabin) ]
     } cond ;
 
 : miller-rabin ( n -- ? ) 10 miller-rabin* ;
@@ -46,10 +50,14 @@ TUPLE: positive-even-expected n ;
 
 ERROR: no-relative-prime n ;
 
+<PRIVATE
+
 : (find-relative-prime) ( n guess -- p )
     over 1 <= [ over no-relative-prime ] when
     dup 1 <= [ drop 3 ] when
     2dup gcd nip 1 > [ 2 + (find-relative-prime) ] [ nip ] if ;
+
+PRIVATE>
 
 : find-relative-prime* ( n guess -- p )
     #! find a prime relative to n with initial guess

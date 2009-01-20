@@ -20,4 +20,5 @@ M: serial dispose ( serial -- ) stream>> dispose ;
 
 {
     { [ os unix? ] [ "serial.unix" ] } 
+    { [ os windows? ] [ "serial.windows" ] }
 } cond require

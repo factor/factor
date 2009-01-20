@@ -6,7 +6,7 @@ HELP: cwd
 { $values { "path" "a pathname string" } }
 { $description "Outputs the current working directory of the Factor process." }
 { $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." }
-{ $notes "User code should use " { $link with-directory } " or " { $link set-current-directory } " instead." } ;
+{ $notes "User code should use the value of the " { $link current-directory } " variable instead." } ;
 
 HELP: cd
 { $values { "path" "a pathname string" } }
@@ -49,6 +49,10 @@ HELP: directory-files
 HELP: with-directory-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
 { $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
+
+HELP: with-directory-entries
+{ $values { "path" "a pathname string" } { "quot" quotation } }
+{ $description "Calls the quotation with the directory entries on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
 
 HELP: delete-file
 { $values { "path" "a pathname string" } }
@@ -122,6 +126,7 @@ ARTICLE: "io.directories.listing" "Directory listing"
 "Directory listing:"
 { $subsection directory-entries }
 { $subsection directory-files }
+{ $subsection with-directory-entries }
 { $subsection with-directory-files } ;
 
 ARTICLE: "io.directories.create" "Creating directories"

@@ -7,13 +7,13 @@ HELP: all-users
 { $values { "seq" sequence } }
 { $description "Returns a sequence of high-level " { $link passwd } " tuples that are platform-dependent and field for field complete with the Unix " { $link passwd } " structure." } ;
 
-HELP: effective-username
+HELP: effective-user-name
 { $values { "string" string } }
-{ $description "Returns the effective username for the current user." } ;
+{ $description "Returns the effective user-name for the current user." } ;
 
 HELP: effective-user-id
 { $values { "id" integer } }
-{ $description "Returns the effective username id for the current user." } ;
+{ $description "Returns the effective user-name id for the current user." } ;
 
 HELP: new-passwd
 { $values { "passwd" passwd } }
@@ -31,9 +31,9 @@ HELP: passwd>new-passwd
      { "new-passwd" "a passwd tuple" } }
 { $description "A platform-specific conversion routine from a passwd structure to a passwd tuple." } ;
 
-HELP: real-username
+HELP: real-user-name
 { $values { "string" string } }
-{ $description "The real username of the current user." } ;
+{ $description "The real user-name of the current user." } ;
 
 HELP: real-user-id
 { $values { "id" integer } }
@@ -41,34 +41,34 @@ HELP: real-user-id
 
 HELP: set-effective-user
 { $values { "string/id" "a string or a user id" } }
-{ $description "Sets the current effective user given a username or a user id." } ;
+{ $description "Sets the current effective user given a user-name or a user id." } ;
 
 HELP: set-real-user
 { $values { "string/id" "a string or a user id" } }
-{ $description "Sets the current real user given a username or a user id." } ;
+{ $description "Sets the current real user given a user-name or a user id." } ;
 
 HELP: user-passwd
 { $values
      { "obj" object }
-     { "passwd" passwd } }
-{ $description "Returns the passwd tuple given a username string or user id." } ;
+     { "passwd/f" "passwd or f" } }
+{ $description "Returns the passwd tuple given a user-name string or user id." } ;
 
-HELP: username
+HELP: user-name
 { $values
      { "id" integer }
      { "string" string } }
-{ $description "Returns the username associated with the user id." } ;
+{ $description "Returns the user-name associated with the user id." } ;
 
 HELP: user-id
 { $values
      { "string" string }
      { "id" integer } }
-{ $description "Returns the user id associated with the username." } ;
+{ $description "Returns the user id associated with the user-name." } ;
 
 HELP: with-effective-user
 { $values
      { "string/id" "a string or a uid" } { "quot" quotation } }
-{ $description "Sets the effective username and calls the quotation. Restores the current username on success or on error after the call." } ;
+{ $description "Sets the effective user-name and calls the quotation. Restores the current user-name on success or on error after the call." } ;
 
 HELP: with-user-cache
 { $values
@@ -78,11 +78,11 @@ HELP: with-user-cache
 HELP: with-real-user
 { $values
      { "string/id" "a string or a uid" } { "quot" quotation } }
-{ $description "Sets the real username and calls the quotation. Restores the current username on success or on error after the call." } ;
+{ $description "Sets the real user-name and calls the quotation. Restores the current user-name on success or on error after the call." } ;
 
 {
-    real-username real-user-id set-real-user
-    effective-username effective-user-id          
+    real-user-name real-user-id set-real-user
+    effective-user-name effective-user-id          
     set-effective-user
 } related-words
 
@@ -93,11 +93,11 @@ $nl
 { $subsection all-users }
 "Returning a passwd tuple:"
 "Real user:"
-{ $subsection real-username }
+{ $subsection real-user-name }
 { $subsection real-user-id }
 { $subsection set-real-user }
 "Effective user:"
-{ $subsection effective-username }
+{ $subsection effective-user-name }
 { $subsection effective-user-id }
 { $subsection set-effective-user }
 "Combinators to change users:"

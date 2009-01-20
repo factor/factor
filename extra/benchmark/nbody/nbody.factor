@@ -1,7 +1,7 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors specialized-arrays.double fry kernel locals make math
-math.constants math.functions math.vectors prettyprint
+USING: accessors specialized-arrays.double fry kernel locals math
+math.constants math.functions math.vectors prettyprint combinators.smart
 sequences hints arrays ;
 IN: benchmark.nbody
 
@@ -53,7 +53,7 @@ TUPLE: nbody-system { bodies array read-only } ;
     offset-momentum drop ; inline
 
 : <nbody-system> ( -- system )
-    [ <sun> , <jupiter> , <saturn> , <uranus> , <neptune> , ] { } make nbody-system boa
+    [ <sun> <jupiter> <saturn> <uranus> <neptune> ] output>array nbody-system boa
     dup bodies>> init-bodies ; inline
 
 :: each-pair ( bodies pair-quot: ( other-body body -- ) each-quot: ( body -- ) -- )

@@ -1,7 +1,7 @@
 IN: compiler.cfg.linear-scan.tests
 USING: tools.test random sorting sequences sets hashtables assocs
 kernel fry arrays splitting namespaces math accessors vectors
-math.order
+math.order grouping
 cpu.architecture
 compiler.cfg.instructions
 compiler.cfg.registers

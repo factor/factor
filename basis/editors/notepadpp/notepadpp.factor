@@ -5,6 +5,7 @@ IN: editors.notepadpp
 : notepadpp-path ( -- path )
     \ notepadpp-path get-global [
         "notepad++" t [ "notepad++.exe" tail? ] find-in-program-files
+        [ "notepad++.exe" ] unless*
     ] unless* ;
 
 : notepadpp ( file line -- )

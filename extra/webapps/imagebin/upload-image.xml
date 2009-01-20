@@ -1,0 +1,17 @@
+<?xml version='1.0' ?>
+<html>
+<head><title>Upload</title></head>
+<body>
+<form action="upload-image" method="post" enctype="multipart/form-data" name="upload">
+
+		<table>
+		<tr><th class="field-label">Image: </th><td><input type="file" name="file1" /></td></tr>
+		<tr><th class="field-label">Image: </th><td><input type="file" name="file2" /></td></tr>
+		<tr><th class="field-label">Image: </th><td><input type="file" name="file3" /></td></tr>
+		<tr><th class="field-label">Text: </th><td><input type="text" name="text1" /></td></tr>
+		</table>
+
+		<p> <button type="submit">Submit</button> </p>
+</form>
+</body>
+</html>

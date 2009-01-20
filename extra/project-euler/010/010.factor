@@ -19,10 +19,7 @@ IN: project-euler.010
 : euler010 ( -- answer )
     2000000 primes-upto sum ;
 
-! [ euler010 ] time
-! 266425 ms run / 10001 ms GC time
-
-! TODO: this takes well over one minute now that they changed the problem to
-! two million instead of one. the primes vocab could use some improvements
+! [ euler010 ] 100 ave-time
+! 15 ms ave run time - 0.41 SD (100 trials)
 
 MAIN: euler010

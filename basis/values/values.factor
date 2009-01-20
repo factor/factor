@@ -1,6 +1,7 @@
-! Copyright (C) 2008 Daniel Ehrenberg.
+! Copyright (C) 2008, 2009 Daniel Ehrenberg, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel parser words sequences quotations ;
+USING: accessors kernel parser words sequences quotations
+combinators.short-circuit definitions ;
 IN: values
 
 ! Mutating literals in word definitions is not really allowed,
@@ -22,11 +23,22 @@ TUPLE: value-holder < identity-tuple obj ;
 
 PRIVATE>
 
+PREDICATE: value-word < word
+    def>> {
+        [ length 2 = ]
+        [ first value-holder? ]
+        [ second \ obj>> = ]
+    } 1&& ;
+
 : VALUE:
     CREATE-WORD
     dup t "no-def-strip" set-word-prop
     T{ value-holder } clone [ obj>> ] curry
     (( -- value )) define-declared ; parsing
+
+M: value-word definer drop \ VALUE: f ;
+
+M: value-word definition drop f ;
 
 : set-value ( value word -- )
     def>> first (>>obj) ;

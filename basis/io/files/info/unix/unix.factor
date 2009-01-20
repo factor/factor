@@ -114,30 +114,6 @@ M: file-info file-mode? [ permissions>> ] dip mask? ;
 
 PRIVATE>
 
-: ch>file-type ( ch -- type )
-    {
-        { CHAR: b [ +block-device+ ] }
-        { CHAR: c [ +character-device+ ] }
-        { CHAR: d [ +directory+ ] }
-        { CHAR: l [ +symbolic-link+ ] }
-        { CHAR: s [ +socket+ ] }
-        { CHAR: p [ +fifo+ ] }
-        { CHAR: - [ +regular-file+ ] }
-        [ drop +unknown+ ]
-    } case ;
-
-: file-type>ch ( type -- string )
-    {
-        { +block-device+ [ CHAR: b ] }
-        { +character-device+ [ CHAR: c ] }
-        { +directory+ [ CHAR: d ] }
-        { +symbolic-link+ [ CHAR: l ] }
-        { +socket+ [ CHAR: s ] }
-        { +fifo+ [ CHAR: p ] }
-        { +regular-file+ [ CHAR: - ] }
-        [ drop CHAR: - ]
-    } case ;
-
 : UID           OCT: 0004000 ; inline
 : GID           OCT: 0002000 ; inline
 : STICKY        OCT: 0001000 ; inline
@@ -243,11 +219,55 @@ M: string set-file-group ( path string -- )
 : file-user-id ( path -- uid )
     normalize-path file-info uid>> ;
 
-: file-username ( path -- string )
-    file-user-id username ;
+: file-user-name ( path -- string )
+    file-user-id user-name ;
 
 : file-group-id ( path -- gid )
     normalize-path file-info gid>> ;
 
 : file-group-name ( path -- string )
     file-group-id group-name ;
+
+: ch>file-type ( ch -- type )
+    {
+        { CHAR: b [ +block-device+ ] }
+        { CHAR: c [ +character-device+ ] }
+        { CHAR: d [ +directory+ ] }
+        { CHAR: l [ +symbolic-link+ ] }
+        { CHAR: s [ +socket+ ] }
+        { CHAR: p [ +fifo+ ] }
+        { CHAR: - [ +regular-file+ ] }
+        [ drop +unknown+ ]
+    } case ;
+
+: file-type>ch ( type -- ch )
+    {
+        { +block-device+ [ CHAR: b ] }
+        { +character-device+ [ CHAR: c ] }
+        { +directory+ [ CHAR: d ] }
+        { +symbolic-link+ [ CHAR: l ] }
+        { +socket+ [ CHAR: s ] }
+        { +fifo+ [ CHAR: p ] }
+        { +regular-file+ [ CHAR: - ] }
+        [ drop CHAR: - ]
+    } case ;
+
+<PRIVATE
+
+: file-type>executable ( directory-entry -- string )
+    name>> any-execute? "*" "" ? ;
+
+PRIVATE>
+
+: file-type>trailing ( directory-entry -- string )
+    dup type>>
+    {
+        { +directory+ [ drop "/" ] }
+        { +symbolic-link+ [ drop "@" ] }
+        { +fifo+ [ drop "|" ] }
+        { +socket+ [ drop "=" ] }
+        { +whiteout+ [ drop "%" ] }
+        { +unknown+ [ file-type>executable ] }
+        { +regular-file+ [ file-type>executable ] }
+        [ drop file-type>executable ]
+    } case ;

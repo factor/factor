@@ -57,45 +57,6 @@ HELP: stream-nl
 { $notes "Most code only works on one stream at a time and should instead use " { $link nl } "; see " { $link "stdio" } "." }
 $io-error ;
 
-HELP: stream-format
-{ $values { "str" string } { "style" "a hashtable" } { "stream" "an output stream" } }
-{ $contract "Writes formatted text to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output."
-$nl
-"The " { $snippet "style" } " hashtable holds character style information. See " { $link "character-styles" } "." }
-{ $notes "Most code only works on one stream at a time and should instead use " { $link format } "; see " { $link "stdio" } "." }
-$io-error ;
-
-HELP: make-block-stream
-{ $values { "style" "a hashtable" } { "stream" "an output stream" } { "stream'" "an output stream" } }
-{ $contract "Creates an output stream which wraps " { $snippet "stream" } " and adds " { $snippet "style" } " on calls to " { $link stream-write } " and " { $link stream-format } "."
-$nl
-"Unlike " { $link make-span-stream } ", this creates a new paragraph block in the output."
-$nl
-"The " { $snippet "style" } " hashtable holds paragraph style information. See " { $link "paragraph-styles" } "." }
-{ $notes "Most code only works on one stream at a time and should instead use " { $link with-nesting } "; see " { $link "stdio" } "." }
-$io-error ;
-
-HELP: stream-write-table
-{ $values { "table-cells" "a sequence of sequences of table cells" } { "style" "a hashtable" } { "stream" "an output stream" } }
-{ $contract "Prints a table of cells produced by " { $link with-cell } "."
-$nl
-"The " { $snippet "style" } " hashtable holds table style information. See " { $link "table-styles" } "." }
-{ $notes "Most code only works on one stream at a time and should instead use " { $link tabular-output } "; see " { $link "stdio" } "." }
-$io-error ;
-
-HELP: make-cell-stream
-{ $values { "style" hashtable } { "stream" "an output stream" } { "stream'" object } }
-{ $contract "Creates an output stream which writes to a table cell object." }
-{ $notes "Most code only works on one stream at a time and should instead use " { $link with-cell } "; see " { $link "stdio" } "." }
-$io-error ;
-
-HELP: make-span-stream
-{ $values { "style" "a hashtable" } { "stream" "an output stream" } { "stream'" "an output stream" } }
-{ $contract "Creates an output stream which wraps " { $snippet "stream" } " and adds " { $snippet "style" } " on calls to " { $link stream-write } " and " { $link stream-format } "."
-$nl
-"Unlike " { $link make-block-stream } ", the stream output is inline, and not nested in a paragraph block." }
-{ $notes "Most code only works on one stream at a time and should instead use " { $link with-style } "; see " { $link "stdio" } "." }
-$io-error ;
 
 HELP: stream-print
 { $values { "str" string } { "stream" "an output stream" } }
@@ -161,54 +122,6 @@ HELP: nl
 { $description "Writes a line terminator to " { $link output-stream } ". If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 $io-error ;
 
-HELP: format
-{ $values { "str" string } { "style" "a hashtable" } }
-{ $description "Writes formatted text to " { $link output-stream } ". If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
-{ $notes "Details are in the documentation for " { $link stream-format } "." }
-$io-error ;
-
-HELP: with-nesting
-{ $values { "style" "a hashtable" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope with " { $link output-stream } " rebound to a nested paragraph stream, with formatting information applied." }
-{ $notes "Details are in the documentation for " { $link make-block-stream } "." }
-$io-error ;
-
-HELP: tabular-output
-{ $values { "style" "a hashtable" } { "quot" quotation } }
-{ $description "Calls a quotation which emits a series of equal-length table rows using " { $link with-row } ". The results are laid out in a tabular fashion on " { $link output-stream } "."
-$nl
-"The " { $snippet "style" } " hashtable holds table style information. See " { $link "table-styles" } "." }
-{ $examples
-    { $code
-        "{ { 1 2 } { 3 4 } }"
-        "H{ { table-gap { 10 10 } } } ["
-        "    [ [ [ [ . ] with-cell ] each ] with-row ] each"
-        "] tabular-output"
-    }
-}
-$io-error ;
-
-HELP: with-row
-{ $values { "quot" quotation } }
-{ $description "Calls a quotation which emits a series of table cells using " { $link with-cell } ". This word can only be called inside the quotation given to " { $link tabular-output } "." }
-$io-error ;
-
-HELP: with-cell
-{ $values { "quot" quotation } }
-{ $description "Calls a quotation in a new scope with " { $link output-stream } " rebound. Output performed by the quotation is displayed in a table cell. This word can only be called inside the quotation given to " { $link with-row } "." }
-$io-error ;
-
-HELP: write-cell
-{ $values { "str" string } }
-{ $description "Outputs a table cell containing a single string. This word can only be called inside the quotation given to " { $link with-row } "." }
-$io-error ;
-
-HELP: with-style
-{ $values { "style" "a hashtable" } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope where calls to " { $link write } ", " { $link format } " and other stream output words automatically inherit style settings from " { $snippet "style" } "." }
-{ $notes "Details are in the documentation for " { $link make-span-stream } "." }
-$io-error ;
-
 HELP: print
 { $values { "string" string } }
 { $description "Writes a newline-terminated string to " { $link output-stream } "." }
@@ -255,7 +168,7 @@ HELP: lines
 
 HELP: each-line
 { $values { "quot" { $quotation "( str -- )" } } }
-{ $description "Calls the quotatin with successive lines of text, until the current " { $link input-stream } " is exhausted." } ;
+{ $description "Calls the quotation with successive lines of text, until the current " { $link input-stream } " is exhausted." } ;
 
 HELP: contents
 { $values { "stream" "an input stream" } { "str" string } }
@@ -279,12 +192,7 @@ $nl
 { $subsection stream-flush }
 { $subsection stream-write1 }
 { $subsection stream-write }
-{ $subsection stream-format }
 { $subsection stream-nl }
-{ $subsection make-span-stream }
-{ $subsection make-block-stream }
-{ $subsection make-cell-stream }
-{ $subsection stream-write-table }
 { $see-also "io.timeouts" } ;
 
 ARTICLE: "stdio" "Default input and output streams"
@@ -347,15 +255,6 @@ $nl
 { $subsection print }
 { $subsection nl }
 { $subsection bl }
-"Formatted output:"
-{ $subsection format }
-{ $subsection with-style }
-{ $subsection with-nesting }
-"Tabular output:"
-{ $subsection tabular-output }
-{ $subsection with-row }
-{ $subsection with-cell }
-{ $subsection write-cell }
 "A pair of combinators for rebinding the " { $link output-stream } " variable:"
 { $subsection with-output-stream }
 { $subsection with-output-stream* }

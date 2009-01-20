@@ -7,6 +7,24 @@ math.parser namespaces make pack strings sequences accessors ;
 
 IN: asn1
 
+<PRIVATE
+
+: (>128-ber) ( n -- )
+    dup 0 > [
+        [ HEX: 7f bitand HEX: 80 bitor , ] keep -7 shift
+        (>128-ber)
+    ] [
+        drop
+    ] if ;
+
+PRIVATE>
+
+: >128-ber ( n -- str )
+    [
+        [ HEX: 7f bitand , ] keep -7 shift
+        (>128-ber)
+    ] { } make reverse ;
+
 : tag-classes ( -- seq )
     { "universal" "application" "context_specific" "private" } ;
 
@@ -191,8 +209,7 @@ M: string >ber ( str -- byte-array )
 : >ber-application-string ( n str -- byte-array )
     [ HEX: 40 + set-tag ] dip >ber ;
 
-GENERIC: >ber-contextspecific ( n obj -- byte-array )
-M: string >ber-contextspecific ( n str -- byte-array )
+: >ber-contextspecific-string ( n str -- byte-array )
     [ HEX: 80 + set-tag ] dip >ber ;
 
 ! =========================================================
@@ -215,5 +232,5 @@ M: array >ber ( array -- byte-array )
 : >ber-appsequence ( array -- byte-array )
     HEX: 60 >ber-seq-internal ;
 
-M: array >ber-contextspecific ( array -- byte-array )
+: >ber-contextspecific-array ( array -- byte-array )
     HEX: A0 >ber-seq-internal ;

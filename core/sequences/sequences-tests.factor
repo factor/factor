@@ -32,8 +32,8 @@ IN: sequences.tests
 [ 4 CHAR: o ]
 [ 3 "hello world" "aeiou" [ member? ] curry find-from ] unit-test
 
-[ f         ] [ 3 [ ]     member? ] unit-test
-[ f         ] [ 3 [ 1 2 ] member? ] unit-test
+[ f ] [ 3 [ ]     member? ] unit-test
+[ f ] [ 3 [ 1 2 ] member? ] unit-test
 [ t ] [ 1 [ 1 2 ] member? ] unit-test
 [ t ] [ 2 [ 1 2 ] member? ] unit-test
 
@@ -55,6 +55,11 @@ IN: sequences.tests
 
 [ [ 3 ] ] [ [ 1 2 3 ] 2 [ swap < ] curry filter ] unit-test
 
+[ V{ 1 2 3 } ] [ V{ 1 4 2 5 3 6 } clone [ [ 4 < ] filter-here ] keep ] unit-test
+[ V{ 4 2 6 } ] [ V{ 1 4 2 5 3 6 } clone [ [ 2 mod 0 = ] filter-here ] keep ] unit-test
+
+[ V{ 3 } ] [ V{ 1 2 3 } clone [ 2 [ swap < ] curry filter-here ] keep ] unit-test
+
 [ "hello world how are you" ]
 [ { "hello" "world" "how" "are" "you" } " " join ]
 unit-test
@@ -68,13 +73,6 @@ unit-test
 [ { { 1 4 } { 2 5 } { 3 6 } } ]
 [ { { 1 2 3 } { 4 5 6 } } flip ] unit-test
 
-[ f ] [ [ { } { } "Hello" ] all-equal? ] unit-test
-[ f ] [ [ { 2 } { } { } ] all-equal? ] unit-test
-[ t ] [ [ ] all-equal? ] unit-test
-[ t ] [ [ 1234 ] all-equal? ] unit-test
-[ f ] [ [ 1.0 1 1 ] all-equal? ] unit-test
-[ t ] [ { 1 2 3 4 } [ < ] monotonic? ] unit-test
-[ f ] [ { 1 2 3 4 } [ > ] monotonic? ] unit-test
 [ [ 2 3 4 ] ] [ [ 1 2 3 ] 1 [ + ] curry map ] unit-test
 
 [ 1 ] [ 0 [ 1 2 ] nth ] unit-test
@@ -261,3 +259,18 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 
 [ "a,b" ] [ "a" "b" "," glue ] unit-test
 [ "(abc)" ] [ "abc" "(" ")" surround ] unit-test
+
+[ "HELLO" ] [
+    "HELLO" { -1 -1 -1 -1 -1 } { 2 2 2 2 2 2 }
+    [ * 2 + + ] 3map
+] unit-test
+
+{ 3 1 } [ [ 3array ] 3map ] must-infer-as
+
+{ 3 0 } [ [ 3drop ] 3each ] must-infer-as
+
+[ V{ 0 3 } ] [ "A" { "A" "B" "C" "A" "D" } indices ] unit-test
+
+[ "asdf" iota ] must-fail
+[ T{ iota { n 10 } } ] [ 10 iota ] unit-test
+[ 0 ] [ 10 iota first ] unit-test

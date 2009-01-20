@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2005, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private slots.private math
 math.private math.order ;
@@ -101,6 +101,20 @@ M: integer nth-unsafe drop ;
 
 INSTANCE: integer immutable-sequence
 
+PRIVATE>
+
+! In the future, this will replace integer sequences
+TUPLE: iota { n integer read-only } ;
+
+: iota ( n -- iota ) \ iota boa ; inline
+
+<PRIVATE
+
+M: iota length n>> ;
+M: iota nth-unsafe drop ;
+
+INSTANCE: iota immutable-sequence
+
 : first-unsafe ( seq -- first )
     0 swap nth-unsafe ; inline
 
@@ -117,9 +131,9 @@ INSTANCE: integer immutable-sequence
     [ tuck [ nth-unsafe ] 2bi@ ]
     [ tuck [ set-nth-unsafe ] 2bi@ ] 3bi ; inline
 
-: (head) ( seq n -- from to seq ) 0 spin ; inline
+: (head) ( seq n -- from to seq ) [ 0 ] 2dip swap ; inline
 
-: (tail) ( seq n -- from to seq ) over length rot ; inline
+: (tail) ( seq n -- from to seq ) swap [ length ] keep ; inline
 
 : from-end ( seq n -- seq n' ) [ dup length ] dip - ; inline
 
@@ -346,11 +360,19 @@ PRIVATE>
     [ over ] dip [ nth-unsafe ] 2bi@ ; inline
 
 : (2each) ( seq1 seq2 quot -- n quot' )
-    [ [ min-length ] 2keep ] dip
-    [ [ 2nth-unsafe ] dip call ] 3curry ; inline
+    [
+        [ min-length ] 2keep
+        [ 2nth-unsafe ] 2curry
+    ] dip compose ; inline
 
-: 2map-into ( seq1 seq2 quot into -- newseq )
-    [ (2each) ] dip collect ; inline
+: 3nth-unsafe ( n seq1 seq2 seq3 -- elt1 elt2 elt3 )
+    [ over ] 2dip [ over ] dip [ nth-unsafe ] 2tri@ ; inline
+
+: (3each) ( seq1 seq2 seq3 quot -- n quot' )
+    [
+        [ [ length ] tri@ min min ] 3keep
+        [ 3nth-unsafe ] 3curry
+    ] dip compose ; inline
 
 : finish-find ( i seq -- i elt )
     over [ dupd nth-unsafe ] [ drop f ] if ; inline
@@ -363,10 +385,6 @@ PRIVATE>
     [ (find) ] 2curry
     [ 2drop f f ]
     if ; inline
-
-: (monotonic) ( seq quot -- ? )
-    [ 2dup nth-unsafe rot 1+ rot nth-unsafe ]
-    prepose curry ; inline
 
 : (interleave) ( n elt between quot -- )
     roll 0 = [ nip ] [ swapd 2slip ] if call ; inline
@@ -407,17 +425,22 @@ PRIVATE>
     [ -rot ] dip 2each ; inline
 
 : 2map-as ( seq1 seq2 quot exemplar -- newseq )
-    [ 2over min-length ] dip
-    [ [ 2map-into ] keep ] new-like ; inline
+    [ (2each) ] dip map-as ; inline
 
 : 2map ( seq1 seq2 quot -- newseq )
     pick 2map-as ; inline
 
-: 2change-each ( seq1 seq2 quot -- )
-    pick 2map-into ; inline
-
 : 2all? ( seq1 seq2 quot -- ? )
     (2each) all-integers? ; inline
+
+: 3each ( seq1 seq2 seq3 quot -- )
+    (3each) each ; inline
+
+: 3map-as ( seq1 seq2 seq3 quot exemplar -- newseq )
+    [ (3each) ] dip map-as ; inline
+
+: 3map ( seq1 seq2 seq3 quot -- newseq )
+    [ pick ] dip swap 3map-as ; inline
 
 : find-from ( n seq quot -- i elt )
     [ (find-integer) ] (find-from) ; inline
@@ -451,9 +474,6 @@ PRIVATE>
 
 : partition ( seq quot -- trueseq falseseq )
     over [ 2pusher [ each ] 2dip ] dip tuck [ like ] 2bi@ ; inline
-
-: monotonic? ( seq quot -- ? )
-    [ [ length 1- ] keep ] dip (monotonic) all? ; inline
 
 : interleave ( seq between quot -- )
     [ (interleave) ] 2curry [ [ length ] keep ] dip 2each ; inline
@@ -494,10 +514,12 @@ PRIVATE>
 : last-index-from ( obj i seq -- n )
     rot [ = ] curry find-last-from drop ;
 
+: (indices) ( elt i obj accum -- )
+    [ swap [ = ] dip ] dip [ push ] 2curry when ; inline
+
 : indices ( obj seq -- indices )
-    V{ } clone spin
-    [ rot = [ over push ] [ drop ] if ]
-    curry each-index ;
+    swap V{ } clone
+    [ [ (indices) ] 2curry each-index ] keep ;
 
 : nths ( indices seq -- seq' )
     [ nth ] curry map ;
@@ -566,7 +588,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 PRIVATE>
 
 : filter-here ( seq quot -- )
-    0 0 roll (filter-here) ; inline
+    swap [ 0 0 ] dip (filter-here) ; inline
 
 : delete ( elt seq -- )
     [ = not ] with filter-here ;
@@ -642,10 +664,6 @@ PRIVATE>
 : pop ( seq -- elt )
     [ length 1- ] [ [ nth ] [ shorten ] 2bi ] bi ;
 
-: all-equal? ( seq -- ? ) [ = ] monotonic? ;
-
-: all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
-
 : exchange ( m n seq -- )
     pick over bounds-check 2drop 2dup bounds-check 2drop
     exchange-unsafe ;
@@ -667,9 +685,7 @@ PRIVATE>
     0 [ length + ] reduce ;
 
 : concat ( seq -- newseq )
-    [
-        { }
-    ] [
+    [ { } ] [
         [ sum-lengths ] keep
         [ first new-resizable ] keep
         [ [ over push-all ] each ] keep
@@ -828,7 +844,7 @@ PRIVATE>
 
 : supremum ( seq -- n ) dup first [ max ] reduce ;
 
-: sigma ( seq quot -- n ) [ + ] compose 0 swap reduce ; inline
+: sigma ( seq quot -- n ) [ 0 ] 2dip [ rot slip + ] curry each ; inline
 
 : count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
 

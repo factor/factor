@@ -9,6 +9,12 @@ IN: editors.scite
     \ scite-path get-global [
         "Scintilla Text Editor" t
         [ >lower "scite.exe" tail? ] find-in-program-files
+
+        [
+            "SciTE Source Code Editor" t
+            [ >lower "scite.exe" tail? ] find-in-program-files
+        ] unless*
+        [ "scite.exe" ] unless*
     ] unless* ;
 
 : scite-command ( file line -- cmd )

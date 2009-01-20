@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences assocs math kernel accessors fry
-combinators sets locals columns
+combinators sets locals columns grouping
 stack-checker.branches
 compiler.tree
 compiler.tree.def-use

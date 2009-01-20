@@ -1,17 +1,27 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: unicode.data sequences sequences.next namespaces make
-unicode.normalize math unicode.categories combinators
-assocs strings splitting kernel accessors ;
+USING: unicode.data sequences sequences.next namespaces
+sbufs make unicode.syntax unicode.normalize math hints
+unicode.categories combinators unicode.syntax assocs
+strings splitting kernel accessors unicode.breaks fry locals ;
+QUALIFIED: ascii
 IN: unicode.case
 
-: at-default ( key assoc -- value/key ) [ at ] [ drop ] 2bi or ;
-
-: ch>lower ( ch -- lower ) simple-lower at-default ;
-: ch>upper ( ch -- upper ) simple-upper at-default ;
-: ch>title ( ch -- title ) simple-title at-default ;
+<PRIVATE
+: ch>lower ( ch -- lower ) simple-lower at-default ; inline
+: ch>upper ( ch -- upper ) simple-upper at-default ; inline
+: ch>title ( ch -- title ) simple-title at-default ; inline
+PRIVATE>
 
 SYMBOL: locale ! Just casing locale, or overall?
+
+<PRIVATE
+
+: split-subseq ( string sep -- strings )
+    [ dup ] swap '[ _ split1-slice swap ] [ ] produce nip ;
+
+: replace ( old new str -- newstr )
+    [ split-subseq ] dip join ; inline
 
 : i-dot? ( -- ? )
     locale get { "tr" "az" } member? ;
@@ -20,82 +30,90 @@ SYMBOL: locale ! Just casing locale, or overall?
 
 : dot-over ( -- ch ) HEX: 307 ;
 
-: lithuanian-ch>upper ( ? next ch -- ? )
-    rot [ 2drop f ]
-    [ swap dot-over = over "ij" member? and swap , ] if ;
-
 : lithuanian>upper ( string -- lower )
-    [ f swap [ lithuanian-ch>upper ] each-next drop ] "" make ;
+    "i\u000307" "i" replace
+    "j\u000307" "j" replace ;
 
 : mark-above? ( ch -- ? )
     combining-class 230 = ;
 
-: lithuanian-ch>lower ( next ch -- )
-    ! This fails to add a dot above in certain edge cases
-    ! where there is a non-above combining mark before an above one
-    ! in Lithuanian
-    dup , "IJ" member? swap mark-above? and [ dot-over , ] when ;
+: with-rest ( seq quot: ( seq -- seq ) -- seq )
+    [ unclip ] dip swap slip prefix ; inline
+
+: add-dots ( seq -- seq )
+    [ [ "" ] [
+        dup first mark-above?
+        [ CHAR: combining-dot-above prefix ] when
+    ] if-empty ] with-rest ; inline
 
 : lithuanian>lower ( string -- lower )
-    [ [ lithuanian-ch>lower ] each-next ] "" make ;
-
-: turk-ch>upper ( ch -- )
-    dup CHAR: i = 
-    [ drop CHAR: I , dot-over , ] [ , ] if ;
+    "i" split add-dots "i" join
+    "j" split add-dots "i" join ; inline
 
 : turk>upper ( string -- upper-i )
-    [ [ turk-ch>upper ] each ] "" make ;
-
-: turk-ch>lower ( ? next ch -- ? )
-    {
-        { [ rot ] [ 2drop f ] }
-        { [ dup CHAR: I = ] [
-            drop dot-over =
-            dup CHAR: i HEX: 131 ? ,
-        ] }
-        [ , drop f ]
-    } cond ;
+    "i" "I\u000307" replace ; inline
 
 : turk>lower ( string -- lower-i )
-    [ f swap [ turk-ch>lower ] each-next drop ] "" make ;
+    "I\u000307" "i" replace
+    "I" "\u000131" replace ; inline
 
-: word-boundary ( prev char -- new ? )
-    dup non-starter? [ drop dup ] when
-    swap uncased? ;
+: fix-sigma-end ( string -- string )
+    [ "" ] [
+        dup peek CHAR: greek-small-letter-sigma =
+        [ 1 head* CHAR: greek-small-letter-final-sigma suffix ] when
+    ] if-empty ; inline
 
 : sigma-map ( string -- string )
-    [
-        swap [ uncased? ] keep not or
-        [ drop HEX: 3C2 ] when
-    ] map-next ;
+    { CHAR: greek-capital-letter-sigma } split [ [
+        [ { CHAR: greek-small-letter-sigma } ] [
+            dup first uncased?
+            CHAR: greek-small-letter-final-sigma
+            CHAR: greek-small-letter-sigma ? prefix
+        ] if-empty
+    ] map ] with-rest concat fix-sigma-end ; inline
 
 : final-sigma ( string -- string )
-    HEX: 3A3 over member? [ sigma-map ] when ;
+    CHAR: greek-capital-letter-sigma
+    over member? [ sigma-map ] when
+    "" like ; inline
 
-: map-case ( string string-quot char-quot -- case )
-    [
-        [
-            [ dup special-casing at ] 2dip
-            [ [ % ] compose ] [ [ , ] compose ] bi* ?if
-        ] 2curry each
-    ] "" make ; inline
+:: map-case ( string string-quot char-quot -- case )
+    string length <sbuf> :> out
+    string [
+        dup special-casing at
+        [ string-quot call out push-all ]
+        [ char-quot call out push ] ?if
+    ] each out "" like ; inline
+
+PRIVATE>
 
 : >lower ( string -- lower )
-    i-dot? [ turk>lower ] when
-    final-sigma [ lower>> ] [ ch>lower ] map-case ;
+    i-dot? [ turk>lower ] when final-sigma
+    [ lower>> ] [ ch>lower ] map-case ;
+
+HINTS: >lower string ;
 
 : >upper ( string -- upper )
     i-dot? [ turk>upper ] when
     [ upper>> ] [ ch>upper ] map-case ;
 
+HINTS: >upper string ;
+
+<PRIVATE
+
+: (>title) ( string -- title )
+    i-dot? [ turk>upper ] when
+    [ title>> ] [ ch>title ] map-case ; inline
+
+: title-word ( string -- title )
+    unclip 1string [ >lower ] [ (>title) ] bi* prepend ; inline
+
+PRIVATE>
+
 : >title ( string -- title )
-    final-sigma
-    CHAR: \s swap
-    [ tuck word-boundary swapd
-        [ title>> ] [ lower>> ] if ]
-    [ tuck word-boundary swapd 
-        [ ch>title ] [ ch>lower ] if ]
-    map-case nip ;
+    final-sigma >words [ title-word ] map concat ;
+
+HINTS: >title string ;
 
 : >case-fold ( string -- fold )
     >upper >lower ;

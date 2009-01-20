@@ -5,16 +5,16 @@ io.directories io.files io.files.info io.pathnames kernel
 sequences system vocabs.loader ;
 IN: io.directories.search
 
-TUPLE: directory-iterator path bfs queue ;
-
 <PRIVATE
+
+TUPLE: directory-iterator path bfs queue ;
 
 : qualified-directory ( path -- seq )
     dup directory-files [ append-path ] with map ;
 
 : push-directory ( path iter -- )
     [ qualified-directory ] dip [
-        dup queue>> swap bfs>>
+        [ queue>> ] [ bfs>> ] bi
         [ push-front ] [ push-back ] if
     ] curry each ;
 
@@ -38,22 +38,29 @@ TUPLE: directory-iterator path bfs queue ;
 
 PRIVATE>
 
-: find-file ( path bfs? quot: ( obj -- ? ) -- path/f )
-    [ <directory-iterator> ] dip
-    [ keep and ] curry iterate-directory ; inline
-
-: each-file ( path bfs? quot: ( obj -- ? ) -- )
+: each-file ( path bfs? quot: ( obj -- ) -- )
     [ <directory-iterator> ] dip
     [ f ] compose iterate-directory drop ; inline
-
-: find-all-files ( path bfs? quot: ( obj -- ? ) -- paths )
-    [ <directory-iterator> ] dip
-    pusher [ [ f ] compose iterate-directory drop ] dip ; inline
 
 : recursive-directory ( path bfs? -- paths )
     [ ] accumulator [ each-file ] dip ;
 
-: find-in-directories ( directories bfs? quot -- path' )
-    '[ _ _ find-file ] attempt-all ; inline
+: find-file ( path bfs? quot: ( obj -- ? ) -- path/f )
+    '[
+        _ _ _ [ <directory-iterator> ] dip
+        [ keep and ] curry iterate-directory
+    ] [ drop f ] recover ; inline
+
+: find-all-files ( path bfs? quot: ( obj -- ? ) -- paths/f )
+    '[
+        _ _ _ [ <directory-iterator> ] dip
+        pusher [ [ f ] compose iterate-directory drop ] dip
+    ] [ drop f ] recover ; inline
+
+: find-in-directories ( directories bfs? quot: ( obj -- ? ) -- path'/f )
+    '[ _ _ find-file ] attempt-all ;
+
+: find-all-in-directories ( directories bfs? quot: ( obj -- ? ) -- paths/f )
+    '[ _ _ find-all-files ] map concat ;
 
 os windows? [ "io.directories.search.windows" require ] when

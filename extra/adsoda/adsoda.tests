@@ -1,0 +1,147 @@
+! : init-4D-demo ( -- space )
+! OK
+! espace de dimension 4 et de couleur 0,3 0.3 0.3
+<space> 
+    4 >>dimension
+    { 0.3 0.3 0.3 } >>ambient-color
+    { 100 150 100  150 100 150 100 150 } "4cube1" 4cube suffix-solids
+   { 160 180  160 180 160 180 160 180 } "4cube2" 4cube suffix-solids
+    <light>
+        { -100 -100 -100 -100 } >>position
+        { 0.2 0.7 0.1 } >>color
+        suffix-lights
+! ;
+! : init-3D-demo ( -- space )
+! OK
+! espace de dimension 4 et de couleur 0,3 0.3 0.3
+<space> 
+    3 >>dimension
+    { 0.3 0.3 0.3 } >>ambient-color
+    { 100 150 100  150 100 150 } "3cube1" 3cube suffix-solids
+  !  { -150 -10  -150 -10 -150 -10 -150 -10 } "4cube2" 4cube suffix-solids
+    <light>
+        { -100 -100 -100 -100 } >>position
+        { 0.2 0.7 0.1 } >>color
+        suffix-lights
+! ;
+
+
+: s1 ( -- solid )
+    <solid> 
+    2 >>dimension
+    "s1" >>name
+    { 1 1 1 } >>color
+    { 1 -1 -5 } cut-solid 
+    { -1 -1 -21 } cut-solid 
+    { -1 0 -12 } cut-solid 
+    { 1 2 16 } cut-solid
+;
+: solid1 ( -- solid )
+    <solid> 
+    2 >>dimension
+    "solid1" >>name
+    { 1 -1 -5 } cut-solid 
+    { -1 -1 -21 } cut-solid 
+    { -1 0 -12 } cut-solid 
+    { 1 2 16 } cut-solid
+    ensure-adjacencies
+    
+;
+: solid2 ( -- solid )
+    <solid> 
+    2 >>dimension
+    "solid2" >>name
+    { -1 1 -10 } cut-solid 
+    { -1 -1 -28 } cut-solid 
+    { 1 0 13 } cut-solid 
+ !   { 1 2 16 } cut-solid
+    ensure-adjacencies
+    
+;
+
+: solid3 ( -- solid )
+      <solid> 
+    2 >>dimension
+    "solid3" >>name
+    { 1 1 1 } >>color
+    { 1 0 16 } cut-solid 
+    { -1 0 -36 } cut-solid 
+    { 0 1 1 } cut-solid 
+    { 0 -1  -17 } cut-solid 
+ !   { 1 2 16 } cut-solid
+    ensure-adjacencies
+    
+
+;
+
+: solid4 ( -- solid )
+      <solid> 
+    2 >>dimension
+    "solid4" >>name
+    { 1 1 1 } >>color
+    { 1 0 21 } cut-solid 
+    { -1 0 -36 } cut-solid 
+    { 0 1 1 } cut-solid 
+    { 0 -1  -17 } cut-solid 
+    ensure-adjacencies
+    
+;
+
+: solid5 ( -- solid )
+      <solid> 
+    2 >>dimension
+    "solid5" >>name
+    { 1 1 1 } >>color
+    { 1 0 6 } cut-solid 
+    { -1 0 -17 } cut-solid 
+    { 0 1 17 } cut-solid 
+    { 0 -1  -19 } cut-solid 
+    ensure-adjacencies
+    
+;
+
+: solid7 ( -- solid )
+      <solid> 
+    2 >>dimension
+    "solid7" >>name
+    { 1 1 1 } >>color
+    { 1 0 38 } cut-solid 
+    { 1 -5 -66 } cut-solid 
+    { -2 1 -75 } cut-solid
+    ensure-adjacencies
+    
+;
+
+: solid6s ( -- seq )
+  solid3 clone solid2 clone subtract
+;
+
+: space1 ( -- space )
+    <space>
+        2 >>dimension
+     !    solid3 suffix-solids
+        solid1 suffix-solids
+        solid2 suffix-solids
+    !   solid6s [ suffix-solids ] each 
+        solid4 suffix-solids
+     !   solid5 suffix-solids
+        solid7 suffix-solids
+        { 1 1 1 } >>ambient-color
+            <light>
+        { -100 -100 } >>position
+        { 0.2 0.7 0.1 } >>color
+        suffix-lights
+;
+
+: space2 ( -- space )
+    <space>
+        4 >>dimension
+       ! 4cube suffix-solids
+        { 1 1 1 } >>ambient-color
+            <light>
+        { -100 -100 } >>position
+        { 0.2 0.7 0.1 } >>color
+        suffix-lights
+
+       ;
+

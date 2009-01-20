@@ -1,6 +1,6 @@
 ;;; fuel-connection.el -- asynchronous comms with the fuel listener
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -29,10 +29,7 @@
 (defun fuel-con--get-connection (buffer/proc)
   (if (processp buffer/proc)
       (fuel-con--get-connection (process-buffer buffer/proc))
-    (with-current-buffer buffer/proc
-      (or fuel-con--connection
-          (setq fuel-con--connection
-                (fuel-con--setup-connection buffer/proc))))))
+    (with-current-buffer buffer/proc fuel-con--connection)))
 
 
 ;;; Request and connection datatypes:
@@ -126,18 +123,19 @@
 (defun fuel-con--setup-connection (buffer)
   (set-buffer buffer)
   (fuel-con--cleanup-connection fuel-con--connection)
+  (setq fuel-con--connection nil)
   (let ((conn (fuel-con--make-connection buffer)))
     (fuel-con--setup-comint)
-    (prog1
-        (setq fuel-con--connection conn)
-      (fuel-con--connection-start-timer conn))))
+    (fuel-con--establish-connection conn buffer)))
 
 (defconst fuel-con--prompt-regex "( .+ ) ")
 (defconst fuel-con--eot-marker "<~FUEL~>")
 (defconst fuel-con--init-stanza "USE: fuel fuel-retort")
 
-(defconst fuel-con--comint-finished-regex
+(defconst fuel-con--comint-finished-regex-connected
   (format "^%s$" fuel-con--eot-marker))
+
+(defvar fuel-con--comint-finished-regex fuel-con--prompt-regex)
 
 (defun fuel-con--setup-comint ()
   (set (make-local-variable 'comint-redirect-insert-matching-regexp) t)
@@ -154,17 +152,43 @@
     (setq comint-redirect-finished-regexp fuel-con--prompt-regex))
   str)
 
+(defun fuel-con--establish-connection (conn buffer)
+  (with-current-buffer (fuel-con--comint-buffer) (erase-buffer))
+  (with-current-buffer buffer
+    (setq fuel-con--connection conn)
+    (setq fuel-con--comint-finished-regex fuel-con--prompt-regex)
+    (fuel-con--send-string/wait buffer
+                                fuel-con--init-stanza
+                                'fuel-con--establish-connection-cont
+                                60000)
+    conn))
+
+(defun fuel-con--establish-connection-cont (ignore)
+  (let ((str (with-current-buffer (fuel-con--comint-buffer) (buffer-string))))
+    (if (string-match fuel-con--eot-marker str)
+        (progn
+          (setq fuel-con--comint-finished-regex
+                fuel-con--comint-finished-regex-connected)
+          (fuel-con--connection-start-timer conn)
+          (message "FUEL listener up and running!"))
+      (fuel-con--connection-clean-current-request fuel-con--connection)
+      (setq fuel-con--connection nil)
+      (message "An error occurred initialising FUEL's Factor library!")
+      (pop-to-buffer (fuel-con--comint-buffer)))))
+
 
 ;;; Requests handling:
 
 (defsubst fuel-con--comint-buffer ()
   (get-buffer-create " *fuel connection retort*"))
 
-(defsubst fuel-con--comint-buffer-form ()
+(defun fuel-con--comint-buffer-form ()
   (with-current-buffer (fuel-con--comint-buffer)
     (goto-char (point-min))
     (condition-case nil
-        (read (current-buffer))
+        (let ((form (read (current-buffer))))
+          (if (listp form) form
+            (list 'fuel-con-error (buffer-string))))
       (error (list 'fuel-con-error (buffer-string))))))
 
 (defun fuel-con--process-next (con)
@@ -193,7 +217,7 @@
       (condition-case cerr
           (with-current-buffer (or buffer (current-buffer))
             (funcall cont (fuel-con--comint-buffer-form))
-            (fuel-log--info "<%s>: processed\n\t%s" id req))
+            (fuel-log--info "<%s>: processed" id))
         (error (fuel-log--error
                 "<%s>: continuation failed %S \n\t%s" id rstr cerr))))))
 
@@ -208,11 +232,12 @@
 
 ;;; Message sending interface:
 
+(defconst fuel-con--error-message "FUEL connection not active")
+
 (defun fuel-con--send-string (buffer/proc str cont &optional sender-buffer)
   (save-current-buffer
     (let ((con (fuel-con--get-connection buffer/proc)))
-      (unless con
-        (error "FUEL: couldn't find connection"))
+      (unless con (error fuel-con--error-message))
       (let ((req (fuel-con--make-request str cont sender-buffer)))
         (fuel-con--connection-queue-request con req)
         (fuel-con--process-next con)
@@ -223,22 +248,23 @@
 
 (defun fuel-con--send-string/wait (buffer/proc str cont &optional timeout sbuf)
   (save-current-buffer
-    (let* ((con (fuel-con--get-connection buffer/proc))
-           (req (fuel-con--send-string buffer/proc str cont sbuf))
-           (id (and req (fuel-con--request-id req)))
-           (time (or timeout fuel-connection-timeout))
-           (step 100)
-           (waitsecs (/ step 1000.0)))
-      (when id
-        (condition-case nil
-            (while (and (> time 0)
-                        (not (fuel-con--connection-completed-p con id)))
-              (accept-process-output nil waitsecs)
-              (setq time (- time step)))
-          (error (setq time 0)))
-        (or (> time 0)
-            (fuel-con--request-deactivate req)
-            nil)))))
+    (let ((con (fuel-con--get-connection buffer/proc)))
+      (unless con (error fuel-con--error-message))
+      (let* ((req (fuel-con--send-string buffer/proc str cont sbuf))
+             (id (and req (fuel-con--request-id req)))
+             (time (or timeout fuel-connection-timeout))
+             (step 100)
+             (waitsecs (/ step 1000.0)))
+        (when id
+          (condition-case nil
+              (while (and (> time 0)
+                          (not (fuel-con--connection-completed-p con id)))
+                (accept-process-output nil waitsecs)
+                (setq time (- time step)))
+            (error (setq time 0)))
+          (or (> time 0)
+              (fuel-con--request-deactivate req)
+              nil))))))
 
 
 (provide 'fuel-connection)

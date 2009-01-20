@@ -4,6 +4,8 @@ USING: kernel math math.order sequences
 combinators.short-circuit ;
 IN: ascii
 
+: ascii? ( ch -- ? ) 0 127 between? ; inline
+
 : blank? ( ch -- ? ) " \t\n\r" member? ; inline
 
 : letter? ( ch -- ? ) CHAR: a CHAR: z between? ; inline
@@ -25,3 +27,15 @@ IN: ascii
 
 : alpha? ( ch -- ? )
     [ [ Letter? ] [ digit? ] ] 1|| ;
+
+: ch>lower ( ch -- lower )
+   dup CHAR: A CHAR: Z between? [ HEX: 20 + ] when ;
+
+: >lower ( str -- lower )
+   [ ch>lower ] map ;
+
+: ch>upper ( ch -- upper )
+    dup CHAR: a CHAR: z between? [ HEX: 20 - ] when ;
+
+: >upper ( str -- upper )
+    [ ch>upper ] map ;

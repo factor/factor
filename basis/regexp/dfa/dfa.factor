@@ -57,7 +57,7 @@ IN: regexp.dfa
     dup
     [ nfa-table>> final-states>> keys ]
     [ dfa-table>> transitions>> states ] bi
-    [ intersect empty? not ] with filter
+    [ intersects? ] with filter
 
     swap dfa-table>> final-states>>
     [ conjoin ] curry each ;

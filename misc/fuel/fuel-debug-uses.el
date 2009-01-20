@@ -1,6 +1,6 @@
 ;;; fuel-debug-uses.el -- retrieving USING: stanzas
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -23,20 +23,17 @@
 
 ;;; Customization:
 
-(fuel-font-lock--defface fuel-font-lock-debug-missing-vocab
-  'font-lock-warning-face fuel-debug "missing vocabulary names")
-
-(fuel-font-lock--defface fuel-font-lock-debug-unneeded-vocab
-  'font-lock-warning-face fuel-debug "unneeded vocabulary names")
-
 (fuel-font-lock--defface fuel-font-lock-debug-uses-header
   'bold fuel-debug "headers in Uses buffers")
+
+(fuel-font-lock--defface fuel-font-lock-debug-uses-prompt
+  'italic fuel-debug "prompts in Uses buffers")
 
 
 ;;; Utility functions:
 
-(defsubst fuel-debug--at-eou-p ()
-  (looking-at ".*\\_<;\\_>"))
+(defsubst fuel-debug--chomp (s)
+  (replace-regexp-in-string "[\n\r\f]" "" s))
 
 (defun fuel-debug--file-lines (file)
   (when (file-readable-p file)
@@ -46,34 +43,14 @@
         (let ((lines) (in-usings))
           (while (not (eobp))
             (when (looking-at "^USING: ") (setq in-usings t))
-            (unless in-usings
-              (let ((line (substring-no-properties (thing-at-point 'line) 0 -1)))
-                (unless (or (empty-string-p line)
-                            (fuel--string-prefix-p "! " line))
-                  (push line lines))))
-            (when (and in-usings (fuel-debug--at-eou-p)) (setq in-usings nil))
+            (let ((line (fuel-debug--chomp
+                         (substring-no-properties (thing-at-point 'line)))))
+              (when in-usings (setq line (concat "! " line)))
+              (push line lines))
+            (when (and in-usings (looking-at "\\(^\\|.* \\);\\( \\|\n\\)"))
+              (setq in-usings nil))
             (forward-line))
           (reverse lines))))))
-
-(defun fuel-debug--highlight-names (names ref face)
-  (dolist (n names)
-    (when (not (member n ref))
-      (put-text-property 0 (length n) 'face face n))))
-
-(defun fuel-debug--uses-new-uses (file uses)
-  (pop-to-buffer (find-file-noselect file))
-  (goto-char (point-min))
-  (if (re-search-forward "^USING: " nil t)
-      (let ((begin (point))
-            (end (or (and (re-search-forward "\\_<;\\_>") (point)) (point))))
-        (kill-region begin end))
-    (re-search-forward "^IN: " nil t)
-    (beginning-of-line)
-    (open-line 2)
-    (insert "USING: "))
-  (let ((start (point)))
-    (insert (mapconcat 'identity uses " ") " ;")
-    (fill-region start (point) nil)))
 
 (defun fuel-debug--uses-filter (restarts)
   (let ((result) (i 1) (rn 0))
@@ -90,16 +67,13 @@
   "*fuel uses*" 'fuel-debug-uses-mode)
 
 (make-variable-buffer-local
- (defvar fuel-debug--uses nil))
-
-(make-variable-buffer-local
  (defvar fuel-debug--uses-file nil))
 
 (make-variable-buffer-local
  (defvar fuel-debug--uses-restarts nil))
 
 (defsubst fuel-debug--uses-insert-title ()
-  (insert "Infering USING: stanza for " fuel-debug--uses-file ".\n\n"))
+  (insert "Inferring USING: stanza for " fuel-debug--uses-file ".\n\n"))
 
 (defun fuel-debug--uses-prepare (file)
   (fuel--with-popup (fuel-debug--uses-buffer)
@@ -124,27 +98,15 @@
     (fuel-popup--display (fuel-debug--uses-buffer))))
 
 (defun fuel-debug--uses-cont (retort)
-  (let ((uses (fuel-eval--retort-result retort))
+  (let ((uses (fuel-debug--uses retort))
         (err (fuel-eval--retort-error retort)))
     (if uses (fuel-debug--uses-display uses)
       (fuel-debug--uses-display-err retort))))
 
-(defun fuel-debug--insert-vlist (title vlist)
-  (goto-char (point-max))
-  (insert title "\n\n  ")
-  (let ((i 0) (step 5))
-    (dolist (v vlist)
-      (setq i (1+ i))
-      (insert v)
-      (insert (if (zerop (mod i step)) "\n  " " ")))
-    (unless (zerop (mod i step)) (newline))
-    (newline)))
-
 (defun fuel-debug--uses-display (uses)
   (let* ((inhibit-read-only t)
          (old (with-current-buffer (find-file-noselect fuel-debug--uses-file)
-                (fuel-syntax--usings)))
-         (old (sort old 'string<))
+                (sort (fuel-syntax--find-usings t) 'string<)))
          (new (sort uses 'string<)))
     (erase-buffer)
     (fuel-debug--uses-insert-title)
@@ -179,14 +141,15 @@
 
 (defun fuel-debug--uses-update-usings ()
   (interactive)
-  (let ((inhibit-read-only t))
-    (when (and fuel-debug--uses-file fuel-debug--uses)
-      (fuel-debug--uses-new-uses fuel-debug--uses-file fuel-debug--uses)
-      (message "USING: updated!")
-      (with-current-buffer (fuel-debug--uses-buffer)
-        (insert "\n Done!")
-        (fuel-debug--uses-clean)
-        (fuel-popup--quit)))))
+  (let ((inhibit-read-only t)
+        (file fuel-debug--uses-file)
+        (uses fuel-debug--uses))
+    (when (and uses file)
+      (insert "\nDone!")
+      (fuel-debug--uses-clean)
+      (fuel-popup--quit)
+      (fuel-debug--replace-usings file uses)
+      (message "USING: updated!"))))
 
 (defun fuel-debug--uses-restart (n)
   (when (and (> n 0) (<= n (length fuel-debug--uses-restarts)))
@@ -210,6 +173,25 @@
     (define-key map "\C-c\C-c" 'fuel-debug--uses-update-usings)
     map))
 
+(defconst fuel-debug--uses-header-regex
+  (format "^%s.*$" (regexp-opt '("Inferring USING: stanza for "
+                                 "Current USING: is already fine!"
+                                 "Current vocabulary list:"
+                                 "Correct vocabulary list:"
+                                 "Sorry, couldn't infer the vocabulary list."
+                                 "Done!"))))
+
+(defconst fuel-debug--uses-prompt-regex
+  (format "^%s" (regexp-opt '("Asking Factor. Please, wait ..."
+                              "Please, type the number of the desired vocabulary:"
+                              "Type 'y' to update your USING: to the new one."))))
+
+(defconst fuel-debug--uses-font-lock-keywords
+  `((,fuel-debug--uses-header-regex . 'fuel-font-lock-debug-uses-header)
+    (,fuel-debug--uses-prompt-regex . 'fuel-font-lock-debug-uses-prompt)
+    (,fuel-debug--restart-regex (1 'fuel-font-lock-debug-restart-number)
+                                (2 'fuel-font-lock-debug-restart-name))))
+
 (defun fuel-debug-uses-mode ()
   "A major mode for displaying Factor's USING: inference results."
   (interactive)
@@ -217,6 +199,8 @@
   (buffer-disable-undo)
   (setq major-mode 'fuel-debug-uses-mode)
   (setq mode-name "Fuel Uses:")
+  (set (make-local-variable 'font-lock-defaults)
+       '(fuel-debug--uses-font-lock-keywords t nil nil nil))
   (use-local-map fuel-debug-uses-mode-map))
 
 

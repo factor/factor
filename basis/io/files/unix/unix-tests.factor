@@ -1,7 +1,8 @@
 USING: tools.test io.files io.files.temp io.pathnames
 io.directories io.files.info io.files.info.unix continuations
 kernel io.files.unix math.bitwise calendar accessors
-math.functions math unix.users unix.groups arrays sequences ;
+math.functions math unix.users unix.groups arrays sequences
+grouping ;
 IN: io.files.unix.tests
 
 [ "/usr/libexec/" ] [ "/usr/libexec/awk/" parent-directory ] unit-test
@@ -117,12 +118,12 @@ prepare-test-file
 [ ] [ test-file f f 2array set-file-times ] unit-test
 
 
-[ ] [ test-file real-username set-file-user ] unit-test
+[ ] [ test-file real-user-name set-file-user ] unit-test
 [ ] [ test-file real-user-id set-file-user ] unit-test
 [ ] [ test-file real-group-name set-file-group ] unit-test
 [ ] [ test-file real-group-id set-file-group ] unit-test
 
-[ t ] [ test-file file-username real-username = ] unit-test
+[ t ] [ test-file file-user-name real-user-name = ] unit-test
 [ t ] [ test-file file-group-name real-group-name = ] unit-test
 
 [ ]

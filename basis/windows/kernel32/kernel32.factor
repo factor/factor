@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax kernel windows.types ;
+USING: alien alien.syntax kernel windows.types multiline ;
 IN: windows.kernel32
 
 CONSTANT: MAX_PATH 260
@@ -197,6 +197,19 @@ CONSTANT: THREAD_PRIORITY_LOWEST -2
 CONSTANT: THREAD_PRIORITY_NORMAL 0
 CONSTANT: THREAD_PRIORITY_TIME_CRITICAL 15
 
+C-ENUM:
+    ComputerNameNetBIOS
+    ComputerNameDnsHostname
+    ComputerNameDnsDomain
+    ComputerNameDnsFullyQualified
+    ComputerNamePhysicalNetBIOS
+    ComputerNamePhysicalDnsHostname
+    ComputerNamePhysicalDnsDomain
+    ComputerNamePhysicalDnsFullyQualified
+    ComputerNameMax ;
+
+TYPEDEF: uint COMPUTER_NAME_FORMAT
+
 C-STRUCT: OVERLAPPED
     { "UINT_PTR" "internal" }
     { "UINT_PTR" "internal-high" }
@@ -318,6 +331,249 @@ C-STRUCT: GUID
     { "WORD"  "Data2" }
     { "WORD"  "Data3" }
     { { "UCHAR" 8 } "Data4" } ;
+
+/*
+    fBinary  :1;
+    fParity  :1;
+    fOutxCtsFlow  :1;
+    fOutxDsrFlow  :1;
+    fDtrControl  :2;
+    fDsrSensitivity  :1;
+    fTXContinueOnXoff  :1;
+    fOutX  :1;
+    fInX  :1;
+    fErrorChar  :1;
+    fNull  :1;
+    fRtsControl  :2;
+    fAbortOnError  :1;
+    fDummy2  :17;
+*/
+
+CONSTANT: SP_SERIALCOMM   HEX: 1
+CONSTANT: BAUD_075        HEX: 1
+CONSTANT: BAUD_110        HEX: 2
+CONSTANT: BAUD_134_5      HEX: 4
+CONSTANT: BAUD_150        HEX: 8
+CONSTANT: BAUD_300        HEX: 10
+CONSTANT: BAUD_600        HEX: 20
+CONSTANT: BAUD_1200       HEX: 40
+CONSTANT: BAUD_1800       HEX: 80
+CONSTANT: BAUD_2400       HEX: 100
+CONSTANT: BAUD_4800       HEX: 200
+CONSTANT: BAUD_7200       HEX: 400
+CONSTANT: BAUD_9600       HEX: 800
+CONSTANT: BAUD_14400      HEX: 1000
+CONSTANT: BAUD_19200      HEX: 2000
+CONSTANT: BAUD_38400      HEX: 4000
+CONSTANT: BAUD_56K        HEX: 8000
+CONSTANT: BAUD_57600      HEX: 40000
+CONSTANT: BAUD_115200     HEX: 20000
+CONSTANT: BAUD_128K       HEX: 10000
+CONSTANT: BAUD_USER       HEX: 10000000
+CONSTANT: PST_FAX     HEX: 21
+CONSTANT: PST_LAT     HEX: 101
+CONSTANT: PST_MODEM       HEX: 6
+CONSTANT: PST_NETWORK_BRIDGE  HEX: 100
+CONSTANT: PST_PARALLELPORT    HEX: 2
+CONSTANT: PST_RS232       HEX: 1
+CONSTANT: PST_RS422       HEX: 3
+CONSTANT: PST_RS423       HEX: 4
+CONSTANT: PST_RS449       HEX: 5
+CONSTANT: PST_SCANNER     HEX: 22
+CONSTANT: PST_TCPIP_TELNET    HEX: 102
+CONSTANT: PST_UNSPECIFIED 0
+CONSTANT: PST_X25     HEX: 103
+CONSTANT: PCF_16BITMODE   HEX: 200
+CONSTANT: PCF_DTRDSR      HEX: 1
+CONSTANT: PCF_INTTIMEOUTS HEX: 80
+CONSTANT: PCF_PARITY_CHECK    HEX: 8
+CONSTANT: PCF_RLSD        HEX: 4
+CONSTANT: PCF_RTSCTS      HEX: 2
+CONSTANT: PCF_SETXCHAR    HEX: 20
+CONSTANT: PCF_SPECIALCHARS    HEX: 100
+CONSTANT: PCF_TOTALTIMEOUTS   HEX: 40
+CONSTANT: PCF_XONXOFF     HEX: 10
+CONSTANT: SP_BAUD     HEX: 2
+CONSTANT: SP_DATABITS     HEX: 4
+CONSTANT: SP_HANDSHAKING  HEX: 10
+CONSTANT: SP_PARITY       HEX: 1
+CONSTANT: SP_PARITY_CHECK HEX: 20
+CONSTANT: SP_RLSD     HEX: 40
+CONSTANT: SP_STOPBITS     HEX: 8
+CONSTANT: DATABITS_5      1
+CONSTANT: DATABITS_6      2
+CONSTANT: DATABITS_7      4
+CONSTANT: DATABITS_8      8
+CONSTANT: DATABITS_16     16
+CONSTANT: DATABITS_16X    32
+CONSTANT: STOPBITS_10     1
+CONSTANT: STOPBITS_15     2
+CONSTANT: STOPBITS_20     4
+CONSTANT: PARITY_NONE     256
+CONSTANT: PARITY_ODD      512
+CONSTANT: PARITY_EVEN     1024
+CONSTANT: PARITY_MARK     2048
+CONSTANT: PARITY_SPACE    4096
+CONSTANT: COMMPROP_INITIALIZED    HEX: e73cf52e
+
+CONSTANT: CBR_110         110
+CONSTANT: CBR_300         300
+CONSTANT: CBR_600         600
+CONSTANT: CBR_1200            1200
+CONSTANT: CBR_2400            2400
+CONSTANT: CBR_4800            4800
+CONSTANT: CBR_9600            9600
+CONSTANT: CBR_14400           14400
+CONSTANT: CBR_19200           19200
+CONSTANT: CBR_38400           38400
+CONSTANT: CBR_56000           56000
+CONSTANT: CBR_57600           57600
+CONSTANT: CBR_115200          115200
+CONSTANT: CBR_128000          128000
+CONSTANT: CBR_256000          256000
+CONSTANT: DTR_CONTROL_DISABLE     0
+CONSTANT: DTR_CONTROL_ENABLE      1
+CONSTANT: DTR_CONTROL_HANDSHAKE   2
+CONSTANT: RTS_CONTROL_DISABLE     0
+CONSTANT: RTS_CONTROL_ENABLE      1
+CONSTANT: RTS_CONTROL_HANDSHAKE   2
+CONSTANT: RTS_CONTROL_TOGGLE      3
+CONSTANT: EVENPARITY          2
+CONSTANT: MARKPARITY          3
+CONSTANT: NOPARITY            0
+CONSTANT: ODDPARITY           1
+CONSTANT: SPACEPARITY         4
+CONSTANT: ONESTOPBIT          0
+CONSTANT: ONE5STOPBITS        1
+CONSTANT: TWOSTOPBITS         2
+
+! Flowcontrol bit mask in DCB
+CONSTANT: FM_fBinary          HEX: 1
+CONSTANT: FM_fParity          HEX: 2
+CONSTANT: FM_fOutxCtsFlow     HEX: 4
+CONSTANT: FM_fOutxDsrFlow     HEX: 8
+CONSTANT: FM_fDtrControl      HEX: 30
+CONSTANT: FM_fDsrSensitivity      HEX: 40
+CONSTANT: FM_fTXContinueOnXoff    HEX: 80
+CONSTANT: FM_fOutX            HEX: 100
+CONSTANT: FM_fInX         HEX: 200
+CONSTANT: FM_fErrorChar       HEX: 400
+CONSTANT: FM_fNull            HEX: 800
+CONSTANT: FM_fRtsControl      HEX: 3000
+CONSTANT: FM_fAbortOnError        HEX: 4000
+CONSTANT: FM_fDummy2          HEX: ffff8000
+
+CONSTANT: BM_fCtsHold     HEX: 1
+CONSTANT: BM_fDsrHold     HEX: 2
+CONSTANT: BM_fRlsdHold    HEX: 4
+CONSTANT: BM_fXoffHold    HEX: 8
+CONSTANT: BM_fXoffSent    HEX: 10
+CONSTANT: BM_fEof     HEX: 20
+CONSTANT: BM_fTxim        HEX: 40
+CONSTANT: BM_AllBits      HEX: 7f
+
+! PurgeComm bit mask
+CONSTANT: PURGE_TXABORT   HEX: 1
+CONSTANT: PURGE_RXABORT   HEX: 2
+CONSTANT: PURGE_TXCLEAR   HEX: 4
+CONSTANT: PURGE_RXCLEAR   HEX: 8
+
+! GetCommModemStatus bit mask
+CONSTANT: MS_CTS_ON       HEX: 10
+CONSTANT: MS_DSR_ON       HEX: 20
+CONSTANT: MS_RING_ON      HEX: 40
+CONSTANT: MS_RLSD_ON      HEX: 80
+
+! EscapeCommFunction operations
+CONSTANT: SETXOFF     HEX: 1
+CONSTANT: SETXON      HEX: 2
+CONSTANT: SETRTS      HEX: 3
+CONSTANT: CLRRTS      HEX: 4
+CONSTANT: SETDTR      HEX: 5
+CONSTANT: CLRDTR      HEX: 6
+CONSTANT: SETBREAK        HEX: 8
+CONSTANT: CLRBREAK        HEX: 9
+
+! ClearCommError bit mask
+CONSTANT: CE_RXOVER       HEX: 1
+CONSTANT: CE_OVERRUN      HEX: 2
+CONSTANT: CE_RXPARITY     HEX: 4
+CONSTANT: CE_FRAME        HEX: 8
+CONSTANT: CE_BREAK        HEX: 10
+CONSTANT: CE_TXFULL       HEX: 100
+! LPT only
+CONSTANT: CE_PTO        HEX: 200
+CONSTANT: CE_IOE        HEX: 400
+CONSTANT: CE_DNS        HEX: 800
+CONSTANT: CE_OOP        HEX: 1000
+! LPT only
+CONSTANT: CE_MODE     HEX: 8000
+
+! GetCommMask bits
+CONSTANT: EV_RXCHAR       HEX: 1
+CONSTANT: EV_RXFLAG       HEX: 2
+CONSTANT: EV_TXEMPTY      HEX: 4
+CONSTANT: EV_CTS      HEX: 8
+CONSTANT: EV_DSR      HEX: 10
+CONSTANT: EV_RLSD     HEX: 20
+CONSTANT: EV_BREAK        HEX: 40
+CONSTANT: EV_ERR      HEX: 80
+CONSTANT: EV_RING     HEX: 100
+CONSTANT: EV_PERR     HEX: 200
+CONSTANT: EV_RX80FULL     HEX: 400
+CONSTANT: EV_EVENT1       HEX: 800
+CONSTANT: EV_EVENT2       HEX: 1000
+
+C-STRUCT: DCB
+    { "DWORD" "DCBlength" }
+    { "DWORD" "BaudRate" }
+    { "DWORD" "flags" }
+    { "WORD"  "wReserved" }
+    { "WORD"  "XonLim" }
+    { "WORD"  "XoffLim" }
+    { "BYTE"  "ByteSize" }
+    { "BYTE"  "Parity" }
+    { "BYTE"  "StopBits" }
+    { "char"  "XonChar" }
+    { "char"  "XoffChar" }
+    { "char"  "ErrorChar" }
+    { "char"  "EofChar" }
+    { "char"  "EvtChar" }
+    { "WORD"  "wReserved1" } ;
+TYPEDEF: DCB* PDCB
+TYPEDEF: DCB* LPDCB
+
+C-STRUCT: COMM_CONFIG
+    { "DWORD" "dwSize" }
+    { "WORD" "wVersion" }
+    { "WORD" "wReserved" }
+    { "DCB" "dcb" }
+    { "DWORD" "dwProviderSubType" }
+    { "DWORD" "dwProviderOffset" }
+    { "DWORD" "dwProviderSize" }
+    { { "WCHAR" 1 } "wcProviderData" } ;
+TYPEDEF: COMMCONFIG* LPCOMMCONFIG
+
+C-STRUCT: COMMPROP
+    { "WORD" "wPacketLength" }
+    { "WORD" "wPacketVersion" }
+    { "DWORD" "dwServiceMask" }
+    { "DWORD" "dwReserved1" }
+    { "DWORD" "dwMaxTxQueue" }
+    { "DWORD" "dwMaxRxQueue" }
+    { "DWORD" "dwMaxBaud" }
+    { "DWORD" "dwProvSubType" }
+    { "DWORD" "dwProvCapabilities" }
+    { "DWORD" "dwSettableParams" }
+    { "DWORD" "dwSettableBaud" }
+    { "WORD"  "wSettableData" }
+    { "WORD"  "wSettableStopParity" }
+    { "DWORD" "dwCurrentTxQueue" }
+    { "DWORD" "dwCurrentRxQueue" }
+    { "DWORD" "dwProvSpec1" }
+    { "DWORD" "dwProvSpec2" }
+    { { "WCHAR" 1 } "wcProvChar" } ;
+TYPEDEF: COMMPROP* LPCOMMPROP
 
 
 CONSTANT: SE_CREATE_TOKEN_NAME "SeCreateTokenPrivilege"
@@ -875,19 +1131,19 @@ ALIAS: FreeEnvironmentStrings FreeEnvironmentStringsW
 ! FUNCTION: GetCalendarInfoW
 ! FUNCTION: GetCommandLineA
 ! FUNCTION: GetCommandLineW
-! FUNCTION: GetCommConfig
-! FUNCTION: GetCommMask
-! FUNCTION: GetCommModemStatus
-! FUNCTION: GetCommProperties
-! FUNCTION: GetCommState
+FUNCTION: BOOL GetCommConfig ( HANDLE hCommDev, LPCOMMCONFIG lpCC, LPDWORD lpdwSize ) ;
+FUNCTION: BOOL GetCommMask ( HANDLE hFile, LPDWORD lpEvtMask ) ;
+FUNCTION: BOOL GetCommModemStatus ( HANDLE hFile, LPDWORD lpModemStat ) ;
+FUNCTION: BOOL GetCommProperties ( HANDLE hFile, LPCOMMPROP lpCommProp ) ;
+FUNCTION: BOOL GetCommState ( HANDLE hFile, LPDCB lpDCB ) ;
 ! FUNCTION: GetCommTimeouts
 ! FUNCTION: GetComPlusPackageInstallStatus
 ! FUNCTION: GetCompressedFileSizeA
 ! FUNCTION: GetCompressedFileSizeW
 FUNCTION: BOOL GetComputerNameW ( LPTSTR lpBuffer, LPDWORD lpnSize ) ;
-! FUNCTION: GetComputerNameExW
-! FUNCTION: GetComputerNameW
 ALIAS: GetComputerName GetComputerNameW
+FUNCTION: BOOL GetComputerNameExW ( COMPUTER_NAME_FORMAT NameType, LPTSTR lpBuffer, LPDWORD lpnSize ) ;
+ALIAS: GetComputerNameEx GetComputerNameExW
 ! FUNCTION: GetConsoleAliasA
 ! FUNCTION: GetConsoleAliasesA
 ! FUNCTION: GetConsoleAliasesLengthA
@@ -942,7 +1198,8 @@ FUNCTION: HANDLE GetCurrentThread ( ) ;
 ! FUNCTION: GetDateFormatA
 ! FUNCTION: GetDateFormatW
 ! FUNCTION: GetDefaultCommConfigA
-! FUNCTION: GetDefaultCommConfigW
+FUNCTION: BOOL GetDefaultCommConfigW ( LPCTSTR lpszName, LPCOMMCONFIG lpCC, LPDWORD lpdwSize ) ;
+ALIAS: GetDefaultCommConfig GetDefaultCommConfigW
 ! FUNCTION: GetDefaultSortkeySize
 ! FUNCTION: GetDevicePowerState
 ! FUNCTION: GetDiskFreeSpaceA
@@ -1400,10 +1657,10 @@ ALIAS: RemoveDirectory RemoveDirectoryW
 ! FUNCTION: SetCalendarInfoA
 ! FUNCTION: SetCalendarInfoW
 ! FUNCTION: SetClientTimeZoneInformation
-! FUNCTION: SetCommBreak
-! FUNCTION: SetCommConfig
-! FUNCTION: SetCommMask
-! FUNCTION: SetCommState
+FUNCTION: BOOL SetCommBreak ( HANDLE hFile ) ;
+FUNCTION: BOOL SetCommConfig ( HANDLE hCommDev, LPCOMMCONFIG lpCC, DWORD dwSize ) ;
+FUNCTION: BOOL SetCommMask ( HANDLE hFile, DWORD dwEvtMask ) ;
+FUNCTION: BOOL SetCommState ( HANDLE hFile, LPDCB lpDCB ) ;
 ! FUNCTION: SetCommTimeouts
 ! FUNCTION: SetComPlusPackageInstallStatus
 ! FUNCTION: SetComputerNameA
@@ -1446,7 +1703,8 @@ ALIAS: SetConsoleTitle SetConsoleTitleW
 FUNCTION: BOOL SetCurrentDirectoryW ( LPCWSTR lpDirectory ) ;
 ALIAS: SetCurrentDirectory SetCurrentDirectoryW
 ! FUNCTION: SetDefaultCommConfigA
-! FUNCTION: SetDefaultCommConfigW
+FUNCTION: BOOL SetDefaultCommConfigW ( LPCTSTR lpszName, LPCOMMCONFIG lpCC, LPDWORD lpdwSize ) ;
+ALIAS: SetDefaultCommConfig SetDefaultCommConfigW
 ! FUNCTION: SetDllDirectoryA
 ! FUNCTION: SetDllDirectoryW
 FUNCTION: BOOL SetEndOfFile ( HANDLE hFile ) ;
