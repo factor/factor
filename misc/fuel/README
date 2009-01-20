@@ -74,6 +74,9 @@ beast.
 
     - C-cz : switch to listener
     - C-co : cycle between code, tests and docs factor files
+    - C-cs : switch to other factor buffer (M-x fuel-switch-to-buffer)
+    - C-x4s : switch to other factor buffer in other window
+    - C-x5s : switch to other factor buffer in other frame
 
     - M-. : edit word at point in Emacs (see fuel-edit-word-method custom var)
     - M-, : go back to where M-. was last invoked
