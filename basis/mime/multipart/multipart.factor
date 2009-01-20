@@ -76,20 +76,7 @@ ERROR: end-of-stream multipart ;
         parse-headers >hashtable >>header
     ] if ;
 
-: quote? ( ch -- ? ) "'\"" member? ;
-
-: quoted? ( str -- ? )
-    {
-        [ length 1 > ]
-        [ first quote? ]
-        [ [ first ] [ peek ] bi = ]
-    } 1&& ;
-
-: unquote ( string -- string' )
-    dup quoted? [ but-last-slice rest-slice >string ] when ;
-
 : save-uploaded-file ( multipart -- )
-    [ unquote ] change-filename
     dup filename>> empty? [
         drop
     ] [
@@ -99,7 +86,6 @@ ERROR: end-of-stream multipart ;
     ] if ;
 
 : save-form-variable ( multipart -- )
-    [ unquote ] change-name
     [ [ header>> ] [ name>> ] [ name-content>> ] tri mime-variable boa ]
     [ name>> ]
     [ form-variables>> set-at ] tri ;
