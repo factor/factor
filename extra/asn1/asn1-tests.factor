@@ -30,7 +30,7 @@ USING: asn1 asn1.ldap io io.streams.string tools.test ;
     ] unit-test
 
     [ B{ 133 6 97 98 99 100 101 102 } ] [ 
-        5 "abcdef" >ber-contextspecific 
+        5 "abcdef" >ber-contextspecific-string 
     ] unit-test
 
     ! triggers array
@@ -45,7 +45,7 @@ USING: asn1 asn1.ldap io io.streams.string tools.test ;
     ] unit-test
 
     [ B{ 160 4 49 50 51 52 } ] [ 
-        { 1 2 3 4 } >ber-contextspecific 
+        { 1 2 3 4 } >ber-contextspecific-array
     ] unit-test
 
 ] with-ber
