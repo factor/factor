@@ -7,6 +7,24 @@ math.parser namespaces make pack strings sequences accessors ;
 
 IN: asn1
 
+<PRIVATE
+
+: (>128-ber) ( n -- )
+    dup 0 > [
+        [ HEX: 7f bitand HEX: 80 bitor , ] keep -7 shift
+        (>128-ber)
+    ] [
+        drop
+    ] if ;
+
+PRIVATE>
+
+: >128-ber ( n -- str )
+    [
+        [ HEX: 7f bitand , ] keep -7 shift
+        (>128-ber)
+    ] { } make reverse ;
+
 : tag-classes ( -- seq )
     { "universal" "application" "context_specific" "private" } ;
 
