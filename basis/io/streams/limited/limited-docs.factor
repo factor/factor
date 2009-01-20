@@ -5,16 +5,23 @@ IN: io.streams.limited
 
 HELP: <limited-stream>
 { $values
-     { "stream" "an input stream" } { "limit" integer }
+     { "stream" "an input stream" } { "limit" integer } { "mode" "a " { $link limited-stream } " mode singleton" }
      { "stream'" "an input stream" }
 }
-{ $description "Constructs a new " { $link limited-stream } " from an existing stream. Upon exhaustion, the stream will throw an error by default." }
+{ $description "Constructs a new " { $link limited-stream } " from an existing stream. User code should use " { $link limit } " or " { $link limit-input } "." } ;
+
+HELP: limit
+{ $values
+     { "stream" "an input stream" } { "limit" integer } { "mode" "a " { $link limited-stream } " mode singleton" }
+     { "stream'" "a stream" }
+}
+{ $description "Changes a decoder's stream to be a limited stream, or wraps " { $snippet "stream" } " in a " { $link limited-stream } "." }
 { $examples "Throwing an exception:"
     { $example
         "USING: continuations io io.streams.limited io.streams.string"
         "kernel prettyprint ;"
         "["
-        "    \"123456\" <string-reader> 3 <limited-stream>"
+        "    \"123456\" <string-reader> 3 stream-throws limit"
         "    100 swap stream-read ."
         "] [ ] recover ."
         "T{ limit-exceeded }"
@@ -23,31 +30,33 @@ HELP: <limited-stream>
     { $example
         "USING: accessors continuations io io.streams.limited"
         "io.streams.string kernel prettyprint ;"
-        "\"123456\" <string-reader> 3 <limited-stream>"
-        "stream-eofs >>mode"
+        "\"123456\" <string-reader> 3 stream-eofs limit"
         "100 swap stream-read ."
         "\"123\""
     }
 } ;
 
-HELP: limit
+HELP: unlimit
 { $values
-     { "stream" "a stream" } { "limit" integer }
+     { "stream" "an input stream" }
      { "stream'" "a stream" }
 }
-{ $description "Changes a decoder's stream to be a limited stream, or wraps " { $snippet "stream" } " in a " { $link limited-stream } "." } ;
+{ $description "Returns the underlying stream of a limited stream." } ;
 
 HELP: limited-stream
 { $values
     { "value" "a limited-stream class" }
 }
-{ $description "Limited streams wrap other streams, changing their behavior to throw an exception or return " { $link f } " upon exhaustion. The default behavior is to throw an exception." } ;
+{ $description "Limited streams wrap other streams, changing their behavior to throw an exception or return " { $link f } " upon exhaustion." } ;
 
 HELP: limit-input
 { $values
-     { "limit" integer }
+     { "limit" integer } { "mode" "a " { $link limited-stream } " mode singleton" }
 }
 { $description "Wraps the current " { $link input-stream } " in a " { $link limited-stream } "." } ;
+
+HELP: unlimit-input
+{ $description "Returns the underlying stream of the limited-stream stored in " { $link input-stream } "." } ;
 
 HELP: stream-eofs
 { $values
@@ -64,12 +73,14 @@ HELP: stream-throws
 { stream-eofs stream-throws } related-words
 
 ARTICLE: "io.streams.limited" "Limited input streams"
-"The " { $vocab-link "io.streams.limited" } " vocabulary wraps a stream to behave as if it had only a limited number of bytes, either throwing an error or returning " { $link f } " upon reaching the end. The default behavior is to throw an error." $nl
-"Wrap an existing stream in a limited stream:"
-{ $subsection <limited-stream> }
+"The " { $vocab-link "io.streams.limited" } " vocabulary wraps a stream to behave as if it had only a limited number of bytes, either throwing an error or returning " { $link f } " upon reaching the end." $nl
 "Wrap a stream in a limited stream:"
 { $subsection limit }
 "Wrap the current " { $link input-stream } " in a limited stream:"
+{ $subsection limit-input }
+"Unlimits a limited stream:"
+{ $subsection unlimit }
+"Unlimits the current " { $link input-stream } ":"
 { $subsection limit-input }
 "Make a limited stream throw an exception on exhaustion:"
 { $subsection stream-throws }
