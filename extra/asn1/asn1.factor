@@ -209,8 +209,7 @@ M: string >ber ( str -- byte-array )
 : >ber-application-string ( n str -- byte-array )
     [ HEX: 40 + set-tag ] dip >ber ;
 
-GENERIC: >ber-contextspecific ( n obj -- byte-array )
-M: string >ber-contextspecific ( n str -- byte-array )
+: >ber-contextspecific-string ( n str -- byte-array )
     [ HEX: 80 + set-tag ] dip >ber ;
 
 ! =========================================================
@@ -233,5 +232,5 @@ M: array >ber ( array -- byte-array )
 : >ber-appsequence ( array -- byte-array )
     HEX: 60 >ber-seq-internal ;
 
-M: array >ber-contextspecific ( array -- byte-array )
+: >ber-contextspecific-array ( array -- byte-array )
     HEX: A0 >ber-seq-internal ;
