@@ -139,13 +139,16 @@ ERROR: no-content-disposition multipart ;
         [ no-content-disposition ]
     } case ;
 
-: read-assert= ( string -- )
-    [ length read ] keep assert= ;
+: assert-sequence= ( a b -- )
+    2dup sequence= [ 2drop ] [ assert ] if ;
+
+: read-assert-sequence= ( sequence -- )
+    [ length read ] keep assert-sequence= ;
 
 : parse-beginning ( multipart -- multipart )
-    "--" read-assert=
+    "--" read-assert-sequence=
     dup mime-separator>>
-    [ read-assert= ]
+    [ read-assert-sequence= ]
     [ separator-prefix prepend >>mime-separator ] bi ;
 
 : parse-multipart-loop ( multipart -- multipart )
