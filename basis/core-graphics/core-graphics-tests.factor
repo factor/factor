@@ -3,4 +3,4 @@
 USING: tools.test core-graphics kernel byte-arrays ;
 IN: core-graphics.tests
 
-[ t ] [ 100 200 [ drop ] with-bitmap-context byte-array? ] unit-test
+[ t ] [ { 100 200 } [ drop ] with-bitmap-context byte-array? ] unit-test

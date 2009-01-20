@@ -8,6 +8,9 @@ IN: core-graphics.types
 : <CGFloat> ( x -- alien )
     cell 4 = [ <float> ] [ <double> ] if ; inline
 
+: *CGFloat ( alien -- x )
+    cell 4 = [ *float ] [ *double ] if ; inline
+
 C-STRUCT: CGPoint
     { "CGFloat" "x" }
     { "CGFloat" "y" } ;

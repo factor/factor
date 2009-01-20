@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.destructors alien.syntax
-destructors fry kernel locals math sequences
+destructors fry kernel math sequences
 core-graphics.types ;
 IN: core-graphics
 
@@ -69,15 +69,15 @@ FUNCTION: void CGContextSetTextPosition (
 
 FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
 
-:: <CGBitmapContext> ( data w h -- context )
+: <CGBitmapContext> ( data dim -- context )
     [
-        data w h 8 w 4 *
+        [ first2 8 ] keep first 4 *
         CGColorSpaceCreateDeviceRGB &CGColorSpaceRelease
         kCGImageAlphaPremultipliedLast CGBitmapContextCreate
     ] with-destructors ;
 
-: with-bitmap-context ( w h quot -- data )
+: with-bitmap-context ( dim quot -- data )
     '[
-        [ * "uint" <c-array> ] 2keep
-        [ <CGBitmapContext> &CGContextRelease @ ] [ 2drop ] 3bi
+        [ product "uint" <c-array> ] keep
+        [ <CGBitmapContext> &CGContextRelease @ ] [ drop ] 2bi
     ] with-destructors ; inline
