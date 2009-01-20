@@ -44,12 +44,12 @@ IN: io.streams.limited.tests
 
 [ "abc" ]
 [
-    "abc" <string-reader> 3 <limited-stream> t >>no-throw?
+    "abc" <string-reader> 3 <limited-stream> stream-eofs >>mode
     4 swap stream-read
 ] unit-test
 
 [ f ]
 [
-    "abc" <string-reader> 3 <limited-stream> t >>no-throw?
+    "abc" <string-reader> 3 <limited-stream> stream-eofs >>mode
     4 over stream-read drop 10 swap stream-read
 ] unit-test

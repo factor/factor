@@ -1,16 +1,19 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math io io.encodings destructors accessors
-sequences namespaces byte-vectors fry ;
+sequences namespaces byte-vectors fry combinators ;
 IN: io.streams.limited
 
-TUPLE: limited-stream stream count limit no-throw? ;
+TUPLE: limited-stream stream count limit mode ;
+
+SINGLETONS: stream-throws stream-eofs ;
 
 : <limited-stream> ( stream limit -- stream' )
     limited-stream new
         swap >>limit
         swap >>stream
-        0 >>count ;
+        0 >>count
+        stream-throws >>mode ;
 
 GENERIC# limit 1 ( stream limit -- stream' )
 
@@ -22,16 +25,20 @@ M: object limit <limited-stream> ;
 
 ERROR: limit-exceeded ;
 
+ERROR: bad-stream-mode mode ;
+
 : adjust-limit ( n stream -- n' stream )
     2dup [ + ] change-count
     [ count>> ] [ limit>> ] bi >
     [
-        dup no-throw?>> [
-            dup [ count>> ] [ limit>> ] bi -
-            '[ _ - ] dip
-        ] [
-            limit-exceeded
-        ] if
+        dup mode>> {
+            { stream-throws [ limit-exceeded ] }
+            { stream-eofs [ 
+                dup [ count>> ] [ limit>> ] bi -
+                '[ _ - ] dip
+            ] }
+            [ bad-stream-mode ]
+        } case
     ] when ; inline
 
 : maybe-read ( n limited-stream quot: ( n stream -- seq/f ) -- seq/f )
