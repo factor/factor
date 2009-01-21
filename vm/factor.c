@@ -53,8 +53,10 @@ INLINE bool factor_arg(const F_CHAR* str, const F_CHAR* arg, CELL* value)
 void init_parameters_from_args(F_PARAMETERS *p, int argc, F_CHAR **argv)
 {
 	default_parameters(p);
+	const F_CHAR *executable_path = vm_executable_path();
+	p->executable_path = executable_path ? executable_path : argv[0];
 
-	int i;
+	int i = 0;
 
 	for(i = 1; i < argc; i++)
 	{
@@ -106,10 +108,6 @@ void init_factor(F_PARAMETERS *p)
 
 	if(p->image_path == NULL)
 		p->image_path = default_image_path();
-
-	const F_CHAR *executable_path = vm_executable_path();
-	if(executable_path)
-		p->executable_path = executable_path;
 
 	srand(current_micros());
 	init_ffi();

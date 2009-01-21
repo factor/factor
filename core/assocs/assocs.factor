@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Daniel Ehrenberg, Slava Pestov
+! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences arrays math sequences.private vectors
 accessors ;
@@ -41,8 +41,7 @@ GENERIC: >alist ( assoc -- newassoc )
     over assoc-map-as ; inline
 
 : assoc-push-if ( key value quot accum -- )
-    [ 2keep rot ] dip swap
-    [ [ 2array ] dip push ] [ 3drop ] if ; inline
+    [ 2keep ] dip [ [ 2array ] dip push ] 3curry when ; inline
 
 : assoc-pusher ( quot -- quot' accum )
     V{ } clone [ [ assoc-push-if ] 2curry ] keep ; inline
@@ -62,9 +61,12 @@ GENERIC: >alist ( assoc -- newassoc )
 : at ( key assoc -- value/f )
     at* drop ; inline
 
+: at-default ( key assoc -- value/key )
+    2dup at* [ 2nip ] [ 2drop ] if ; inline
+
 M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     over assoc-size swap new-assoc
-    swap [ swap pick set-at ] assoc-each ;
+    [ [ swapd set-at ] curry assoc-each ] keep ;
 
 : keys ( assoc -- keys )
     [ drop ] { } assoc>map ;
@@ -76,7 +78,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ at* ] 2keep delete-at ;
 
 : rename-at ( newkey key assoc -- )
-    tuck delete-at* [ -rot set-at ] [ 3drop ] if ;
+    [ delete-at* ] keep [ swapd set-at ] curry [ 2drop ] if ;
 
 : assoc-empty? ( assoc -- ? )
     assoc-size zero? ;
@@ -132,14 +134,16 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     substituter map ;
 
 : cache ( key assoc quot -- value )
-    2over at* [
-        [ 3drop ] dip
-    ] [
-        drop pick rot [ call dup ] 2dip set-at
-    ] if ; inline
+    [ [ at* ] 2keep ] dip
+    [ [ nip call dup ] [ drop ] 3bi set-at ] 3curry
+    [ drop ] prepose
+    unless ; inline
+
+: 2cache ( key1 key2 assoc quot -- value )
+    [ 2array ] 2dip [ first2 ] prepose cache ; inline
 
 : change-at ( key assoc quot -- )
-    [ [ at ] dip call ] 3keep drop set-at ; inline
+    [ [ at ] dip call ] [ drop ] 3bi set-at ; inline
 
 : at+ ( n key assoc -- ) [ 0 or + ] change-at ; inline
 

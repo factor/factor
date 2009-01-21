@@ -15,6 +15,8 @@ io.streams.limited
 io.servers.connection
 io.timeouts
 fry logging logging.insomniac calendar urls urls.encoding
+mime.multipart
+unicode.categories
 http
 http.parsers
 http.server.responses
@@ -36,17 +38,35 @@ IN: http.server
 : read-request-header ( request -- request )
     read-header >>header ;
 
-: parse-post-data ( post-data -- post-data )
-    [ ] [ raw>> ] [ content-type>> ] tri
-    "application/x-www-form-urlencoded" = [ query>assoc ] when
-    >>content ;
+ERROR: no-boundary ;
+
+: parse-multipart-form-data ( string -- separator )
+    ";" split1 nip
+    "=" split1 nip [ no-boundary ] unless* ;
+
+: read-multipart-data ( request -- form-variables uploaded-files )
+    [ "content-type" header ]
+    [ "content-length" header string>number ] bi
+    unlimit-input
+    stream-eofs limit-input
+    binary decode-input
+    parse-multipart-form-data parse-multipart ;
+
+: read-content ( request -- bytes )
+    "content-length" header string>number read ;
+
+: parse-content ( request content-type -- form-variables uploaded-files raw )
+    {
+        { "multipart/form-data" [ read-multipart-data f ] }
+        { "application/x-www-form-urlencoded" [ read-content [ f f ] dip ] }
+        [ drop read-content [ f f ] dip ]
+    } case ;
 
 : read-post-data ( request -- request )
     dup method>> "POST" = [
-        [ ]
-        [ "content-length" header string>number read ]
-        [ "content-type" header ] tri
-        <post-data> parse-post-data >>post-data
+        dup dup "content-type" header
+        [ ";" split1 drop parse-content ] keep
+        <post-data> >>post-data
     ] when ;
 
 : extract-host ( request -- request )
@@ -80,7 +100,7 @@ GENERIC: write-full-response ( request response -- )
     [ content-type>> "application/octet-stream" or ]
     [ content-charset>> encoding>name ]
     bi
-    [ "; charset=" swap 3append ] when* ;
+    [ "; charset=" glue ] when* ;
 
 : ensure-domain ( cookie -- cookie )
     [
@@ -236,7 +256,7 @@ TUPLE: http-server < threaded-server ;
 M: http-server handle-client*
     drop
     [
-        64 1024 * limit-input
+        64 1024 * stream-throws limit-input
         ?refresh-all
         [ read-request ] ?benchmark
         [ do-request ] ?benchmark

@@ -8,8 +8,6 @@ QUALIFIED: ascii
 IN: unicode.case
 
 <PRIVATE
-: at-default ( key assoc -- value/key ) [ at ] [ drop ] 2bi or ; inline
-
 : ch>lower ( ch -- lower ) simple-lower at-default ; inline
 : ch>upper ( ch -- upper ) simple-upper at-default ; inline
 : ch>title ( ch -- title ) simple-title at-default ; inline

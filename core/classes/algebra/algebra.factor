@@ -17,9 +17,6 @@ TUPLE: anonymous-complement class ;
 
 C: <anonymous-complement> anonymous-complement
 
-: 2cache ( key1 key2 assoc quot -- value )
-    [ 2array ] 2dip [ first2 ] prepose cache ; inline
-
 GENERIC: valid-class? ( obj -- ? )
 
 M: class valid-class? drop t ;

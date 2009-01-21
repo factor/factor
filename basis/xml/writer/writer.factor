@@ -155,6 +155,9 @@ M: xml write-xml-chunk
 : xml>string ( xml -- string )
     [ write-xml ] with-string-writer ;
 
+: xml-chunk>string ( object -- string )
+    [ write-xml-chunk ] with-string-writer ;
+
 : with-xml-pprint ( sensitive-tags quot -- )
     [
         swap [ assure-name ] map sensitive-tags set
