@@ -75,7 +75,7 @@
 (defun fuel-font-lock--syntactic-face (state)
   (if (nth 3 state) 'factor-font-lock-string
     (let ((c (char-after (nth 8 state))))
-      (cond ((char-equal c ?\ )
+      (cond ((or (char-equal c ?\ ) (char-equal c ?\n))
              (save-excursion
                (goto-char (nth 8 state))
                (beginning-of-line)
