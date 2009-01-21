@@ -22,6 +22,8 @@ typedef char F_SYMBOL;
 #define STRCMP strcmp
 #define STRNCMP strncmp
 #define STRDUP strdup
+#define MOVE_FILE_FAILS(old,new) (rename((old),(new)) < 0)
+#define DELETE_FILE_FAILS(old) (unlink((old)) < 0)
 
 #define FIXNUM_FORMAT "%ld"
 #define CELL_FORMAT "%lu"
