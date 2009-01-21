@@ -8,7 +8,7 @@ IN: io.streams.limited.tests
     ascii encode binary <byte-reader> "data" set
 ] unit-test
 
-[ ] [ "data" get 24 <limited-stream> "limited" set ] unit-test
+[ ] [ "data" get 24 stream-throws <limited-stream> "limited" set ] unit-test
 
 [ CHAR: h ] [ "limited" get stream-read1 ] unit-test
 
@@ -25,7 +25,7 @@ IN: io.streams.limited.tests
     ascii encode binary <byte-reader> "data" set
 ] unit-test
 
-[ ] [ "data" get 7 <limited-stream> "limited" set ] unit-test
+[ ] [ "data" get 7 stream-throws <limited-stream> "limited" set ] unit-test
 
 [ "abc" CHAR: \n ] [ "\n" "limited" get stream-read-until [ >string ] dip ] unit-test
 
@@ -34,22 +34,28 @@ IN: io.streams.limited.tests
 [ "he" CHAR: l ] [
     B{ CHAR: h CHAR: e CHAR: l CHAR: l CHAR: o }
     ascii <byte-reader> [
-        5 limit-input
+        5 stream-throws limit-input
         "l" read-until
     ] with-input-stream
 ] unit-test
 
 [ CHAR: a ]
-[ "a" <string-reader> 1 <limited-stream> stream-read1 ] unit-test
+[ "a" <string-reader> 1 stream-eofs <limited-stream> stream-read1 ] unit-test
 
 [ "abc" ]
 [
-    "abc" <string-reader> 3 <limited-stream> stream-eofs >>mode
+    "abc" <string-reader> 3 stream-eofs <limited-stream>
     4 swap stream-read
 ] unit-test
 
 [ f ]
 [
-    "abc" <string-reader> 3 <limited-stream> stream-eofs >>mode
+    "abc" <string-reader> 3 stream-eofs <limited-stream>
     4 over stream-read drop 10 swap stream-read
+] unit-test
+
+[ t ]
+[
+    "abc" <string-reader> 3 stream-eofs limit unlimit
+    "abc" <string-reader> =
 ] unit-test

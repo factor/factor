@@ -213,12 +213,14 @@ body ;
     raw-response new
         "1.1" >>version ;
 
-TUPLE: post-data raw content content-type ;
+TUPLE: post-data raw content content-type form-variables uploaded-files ;
 
-: <post-data> ( raw content-type -- post-data )
+: <post-data> ( form-variables uploaded-files raw content-type -- post-data )
     post-data new
         swap >>content-type
-        swap >>raw ;
+        swap >>raw
+        swap >>uploaded-files
+        swap >>form-variables ;
 
 : parse-content-type-attributes ( string -- attributes )
     " " split harvest [ "=" split1 [ >lower ] dip ] { } map>assoc ;

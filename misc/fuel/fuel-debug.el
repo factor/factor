@@ -1,6 +1,6 @@
 ;;; fuel-debug.el -- debugging factor code
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -287,7 +287,8 @@ the debugger."
   (goto-char (point-min))
   (if (re-search-forward "^USING: " nil t)
       (let ((begin (point))
-            (end (or (and (re-search-forward "\\_<;\\_>") (point)) (point))))
+            (end (or (and (re-search-forward ";\\( \\|$\\)") (point))
+                     (point))))
         (kill-region begin end))
     (re-search-forward "^IN: " nil t)
     (beginning-of-line)

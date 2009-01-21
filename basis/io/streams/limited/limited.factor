@@ -9,20 +9,27 @@ TUPLE: limited-stream stream count limit mode ;
 
 SINGLETONS: stream-throws stream-eofs ;
 
-: <limited-stream> ( stream limit -- stream' )
+: <limited-stream> ( stream limit mode -- stream' )
     limited-stream new
+        swap >>mode
         swap >>limit
         swap >>stream
-        0 >>count
-        stream-throws >>mode ;
+        0 >>count ;
 
-GENERIC# limit 1 ( stream limit -- stream' )
+GENERIC# limit 2 ( stream limit mode -- stream' )
 
-M: decoder limit [ clone ] dip [ limit ] curry change-stream ;
+M: decoder limit ( stream limit mode -- stream' )
+    [ clone ] 2dip '[ _ _ limit ] change-stream ;
 
-M: object limit <limited-stream> ;
+M: object limit ( stream limit mode -- stream' )
+    <limited-stream> ;
 
-: limit-input ( limit -- ) input-stream [ swap limit ] change ;
+: unlimit ( stream -- stream' )
+    [ stream>> ] change-stream ;
+
+: limit-input ( limit mode -- ) input-stream [ -rot limit ] change ;
+
+: unlimit-input ( -- ) input-stream [ unlimit ] change ;
 
 ERROR: limit-exceeded ;
 

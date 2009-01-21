@@ -75,6 +75,7 @@ beast.
     - C-cz : switch to listener
     - C-co : cycle between code, tests and docs factor files
     - C-cs : switch to other factor buffer (M-x fuel-switch-to-buffer)
+    - C-cr : switch to listener and refresh all loaded vocabs
     - C-x4s : switch to other factor buffer in other window
     - C-x5s : switch to other factor buffer in other frame
 
@@ -86,7 +87,7 @@ beast.
     - C-cC-ew : edit word (M-x fuel-edit-word-at-point)
     - C-cC-ed : edit word's doc (M-x fuel-edit-word-at-point)
 
-    - C-cr, C-cC-er : eval region
+    - C-cC-er : eval region
     - C-M-r, C-cC-ee : eval region, extending it to definition boundaries
     - C-M-x, C-cC-ex : eval definition around point
     - C-ck, C-cC-ek : run file
@@ -110,6 +111,7 @@ beast.
 
     - TAB : complete word at point
     - M-. : edit word at point in Emacs
+    - C-cr : refresh all loaded vocabs
     - C-ca : toggle autodoc mode
     - C-cp : find words containing given substring (M-x fuel-apropos)
     - C-cs : toggle stack mode
