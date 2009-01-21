@@ -21,6 +21,15 @@ TYPEDEF: void* CTFontDescriptorRef
 
 >>
 
+! CTFontSymbolicTraits
+: kCTFontItalicTrait ( -- n ) 0 2^ ; inline
+: kCTFontBoldTrait ( -- n ) 1 2^ ; inline
+: kCTFontExpandedTrait ( -- n ) 5 2^ ; inline
+: kCTFontCondensedTrait ( -- n ) 6 2^ ; inline
+: kCTFontMonoSpaceTrait ( -- n ) 10 2^ ; inline
+: kCTFontVerticalTrait ( -- n ) 11 2^ ; inline
+: kCTFontUIOptimizedTrait ( -- n ) 12 2^ ; inline
+
 C-GLOBAL: kCTFontSymbolicTrait
 C-GLOBAL: kCTFontWeightTrait
 C-GLOBAL: kCTFontWidthTrait
@@ -87,6 +96,14 @@ FUNCTION: CFIndex CTLineGetStringIndexForPosition ( CTLineRef line, CGPoint posi
 FUNCTION: double CTLineGetTypographicBounds ( CTLineRef line, CGFloat* ascent, CGFloat* descent, CGFloat* leading ) ;
 
 FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context ) ;
+
+FUNCTION: CTFontRef CTFontCreateCopyWithSymbolicTraits (
+   CTFontRef font,
+   CGFloat size,
+   CGAffineTransform* matrix,
+   uint32_t symTraitValue,
+   uint32_t symTraitMask
+) ;
 
 : <CTLine> ( string font -- line )
     [

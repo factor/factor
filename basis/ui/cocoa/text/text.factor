@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors alien core-graphics.types core-text kernel
 hashtables namespaces sequences ui.gadgets.worlds ui.render
-opengl opengl.gl destructors combinators combinators.smart
-core-foundation core-foundation.dictionaries core-foundation.numbers
-core-foundation.strings io.styles memoize ;
+opengl opengl.gl destructors combinators core-foundation
+core-foundation.strings io.styles memoize math ;
 IN: ui.cocoa.text
 
 SINGLETON: core-text-renderer
@@ -16,43 +15,33 @@ CONSTANT: font-names
         { "serif" "Times" }
     }
 
-: (bold) ( -- ) 1.0 kCTFontWeightTrait set ;
+: font-name ( string -- string' )
+    font-names at-default ;
 
-: (italic) ( -- ) 1.0 kCTFontSlantTrait set ;
+: (bold) ( x -- y ) kCTFontBoldTrait bitor ; inline
 
-: font-traits ( style -- dictionary )
-    [
-        {
-            { plain [ ] }
-            { bold [ (bold) ] }
-            { italic [ (italic) ] }
-            { bold-italic [ (bold) (italic) ] }
-        } case
-    ] H{ } make-assoc ;
+: (italic) ( x -- y ) kCTFontItalicTrait bitor ; inline
 
-: font-name-attr ( name -- )
-    font-names at-default kCTFontNameAttribute set ;
+: font-traits ( style -- mask )
+    [ 0 ] dip {
+        { plain [ ] }
+        { bold [ (bold) ] }
+        { italic [ (italic) ] }
+        { bold-italic [ (bold) (italic) ] }
+    } case ;
 
-: font-traits-attr ( style -- )
-    font-traits kCTFontTraitsAttribute set ;
-
-: font-size-attr ( size -- )
-    kCTFontSizeAttribute set ;
-
-: font-attrs ( font -- dictionary )
+: apply-font-traits ( font style -- font' )
+    [ drop ] [ [ 0.0 f ] dip font-traits dup ] 2bi
+    CTFontCreateCopyWithSymbolicTraits
+    dup [ [ CFRelease ] dip ] [ drop ] if ;
+    
+MEMO: cache-font ( font -- open-font )
     [
         [
-            [
-                [ font-name-attr ]
-                [ font-traits-attr ]
-                [ font-size-attr ]
-                tri*
-            ] input<sequence
-        ] H{ } make-assoc
+            [ first font-name <CFString> &CFRelease ] [ third ] bi
+            f CTFontCreateWithName
+        ] [ second ] bi apply-font-traits
     ] with-destructors ;
-
-MEMO: cache-font ( font -- open-font )
-    font-attrs <CTFont> ;
 
 M: core-text-renderer open-font
     dup alien? [ cache-font ] unless ;

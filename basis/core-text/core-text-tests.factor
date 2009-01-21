@@ -6,19 +6,19 @@ arrays kernel generalizations math accessors
 combinators hashtables ;
 IN: core-text.tests
 
-: test-font ( -- object )
-    "Helvetica" kCTFontNameAttribute associate <CTFont> ;
+: test-font ( name -- object )
+    kCTFontFamilyNameAttribute associate <CTFont> ;
 
-[ ] [ test-font CFRelease ] unit-test
+[ ] [ "Helvetica" test-font CFRelease ] unit-test
 
 [ ] [
     [
-        kCTFontAttributeName test-font &CFRelease 2array 1array
+        kCTFontAttributeName "Helvetica" test-font &CFRelease 2array 1array
         <CFDictionary> &CFRelease drop
     ] with-destructors
 ] unit-test
 
-: test-typographic-bounds ( string -- ? )
+: test-typographic-bounds ( string font -- ? )
     [
         test-font &CFRelease <CTLine> &CFRelease
         line-typographic-bounds {
@@ -29,6 +29,8 @@ IN: core-text.tests
         } cleave and and and
     ] with-destructors ;
 
-[ t ] [ "Hello world" test-typographic-bounds ] unit-test
+[ t ] [ "Hello world" "Helvetica" test-typographic-bounds ] unit-test
 
-[ t ] [ "日本語" test-typographic-bounds ] unit-test
+[ t ] [ "Hello world" "Chicago" test-typographic-bounds ] unit-test
+
+[ t ] [ "日本語" "Helvetica" test-typographic-bounds ] unit-test
