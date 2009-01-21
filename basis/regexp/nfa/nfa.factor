@@ -9,6 +9,8 @@ regexp.transition-tables words sets regexp.classes unicode.case.private ;
 ! before processing starts
 IN: regexp.nfa
 
+ERROR: feature-is-broken feature ;
+
 SYMBOL: negation-mode
 : negated? ( -- ? ) negation-mode get 0 or odd? ; 
 
@@ -181,6 +183,7 @@ M: character-class-range nfa-node ( node -- )
     ] if ;
 
 M: capture-group nfa-node ( node -- )
+    "capture-groups" feature-is-broken
     eps literal-transition add-simple-entry
     capture-group-on add-traversal-flag
     term>> nfa-node
@@ -201,6 +204,7 @@ M: negation nfa-node ( node -- )
     negation-mode dec ;
 
 M: lookahead nfa-node ( node -- )
+    "lookahead" feature-is-broken
     eps literal-transition add-simple-entry
     lookahead-on add-traversal-flag
     term>> nfa-node
@@ -209,6 +213,7 @@ M: lookahead nfa-node ( node -- )
     2 [ concatenate-nodes ] times ;
 
 M: lookbehind nfa-node ( node -- )
+    "lookbehind" feature-is-broken
     eps literal-transition add-simple-entry
     lookbehind-on add-traversal-flag
     term>> nfa-node

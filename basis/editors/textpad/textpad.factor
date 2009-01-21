@@ -6,6 +6,7 @@ IN: editors.textpad
 : textpad-path ( -- path )
     \ textpad-path get-global [
         "TextPad 5" t [ "TextPad.exe" tail? ] find-in-program-files
+        [ "TextPad.exe" ] unless*
     ] unless* ;
 
 : textpad ( file line -- )

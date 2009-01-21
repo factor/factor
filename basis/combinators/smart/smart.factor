@@ -20,3 +20,9 @@ MACRO: reduce-outputs ( quot operation -- newquot )
 
 : sum-outputs ( quot -- n )
     [ + ] reduce-outputs ; inline
+
+MACRO: append-outputs-as ( quot exemplar -- newquot )
+    [ dup infer out>> ] dip '[ @ _ _ nappend-as ] ;
+
+: append-outputs ( quot -- seq )
+    { } append-outputs-as ; inline

@@ -65,7 +65,7 @@ IN: validators
     v-regexp ;
 
 : v-url ( str -- str )
-    "URL" R' (ftp|http|https)://\S+' v-regexp ;
+    "URL" R' (?:ftp|http|https)://\S+' v-regexp ;
 
 : v-captcha ( str -- str )
     dup empty? [ "must remain blank" throw ] unless ;

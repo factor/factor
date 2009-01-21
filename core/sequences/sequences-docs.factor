@@ -415,18 +415,6 @@ HELP: filter-here
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
 { $side-effects "seq" } ;
 
-HELP: monotonic?
-{ $values { "seq" sequence } { "quot" { $quotation "( elt elt -- ? )" } } { "?" "a boolean" } }
-{ $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
-{ $examples
-    "Testing if a sequence is non-decreasing:"
-    { $example "USING: math prettyprint sequences ;" "{ 1 1 2 } [ <= ] monotonic? ." "t" }
-    "Testing if a sequence is decreasing:"
-    { $example "USING: math prettyprint sequences ;" "{ 9 8 6 7 } [ < ] monotonic? ." "f" }
-} ;
-
-{ monotonic? all-eq? all-equal? } related-words
-
 HELP: interleave
 { $values { "seq" sequence } { "between" "a quotation" } { "quot" { $quotation "( elt -- )" } } }
 { $description "Applies " { $snippet "quot" } " to each element in turn, also invoking " { $snippet "between" } " in-between each pair of elements." }
@@ -565,14 +553,6 @@ HELP: pop
 { $side-effects "seq" }
 { $errors "Throws an error if the sequence is empty." } ;
 
-HELP: all-equal?
-{ $values { "seq" sequence } { "?" "a boolean" } }
-{ $description "Tests if all elements in the sequence are equal. Yields true with an empty sequence." } ;
-
-HELP: all-eq?
-{ $values { "seq" sequence } { "?" "a boolean" } }
-{ $description "Tests if all elements in the sequence are the same identical object. Yields true with an empty sequence." } ;
-
 HELP: mismatch
 { $values { "seq1" sequence } { "seq2" sequence } { "i" "an index" } }
 { $description "Compares pairs of elements up to the minimum of the sequences' lengths, outputting the first index where the two sequences have non-equal elements, or " { $link f } " if all tested elements were equal." } ;
@@ -699,12 +679,28 @@ HELP: append
     }
 } ;
 
+HELP: append-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence of the same type as " { $snippet "exemplar" } " consisting of the elements of " { $snippet "seq1" } " followed by " { $snippet "seq2" } "." }
+{ $errors "Throws an error if " { $snippet "seq1" } " or " { $snippet "seq2" } " contain elements not permitted in sequences of the same class as " { $snippet "exemplar" } "." }
+{ $examples 
+    { $example "USING: prettyprint sequences ;"
+        "{ 1 2 } B{ 3 4 } B{ } append-as ."
+        "B{ 1 2 3 4 }"
+    }
+    { $example "USING: prettyprint sequences strings ;"
+        "\"go\" \"ing\" SBUF\" \" append-as ."
+        "SBUF\" going\""
+    }
+} ;
+
+{ append append-as } related-words
+
 HELP: prepend
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
 { $description "Outputs a new sequence of the same type as " { $snippet "seq2" } " consisting of the elements of " { $snippet "seq2" } " followed by " { $snippet "seq1" } "." }
 { $errors "Throws an error if " { $snippet "seq1" } " contains elements not permitted in sequences of the same class as " { $snippet "seq2" } "." }
-{ $examples 
-    { $example "USING: prettyprint sequences ;"
+{ $examples { $example "USING: prettyprint sequences ;"
         "{ 1 2 } B{ 3 4 } prepend ."
         "B{ 3 4 1 2 }"
     }
@@ -724,6 +720,19 @@ HELP: 3append
         "\"abc\""
     }
 } ;
+
+HELP: 3append-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence consisting of the elements of " { $snippet "seq1" } ", " { $snippet "seq2" } " and " { $snippet "seq3" } " in turn of the same type as " { $snippet "exemplar" } "." }
+{ $errors "Throws an error if " { $snippet "seq1" } ", " { $snippet "seq2" } ", or " { $snippet "seq3" } " contain elements not permitted in sequences of the same class as " { $snippet "exemplar" } "." }
+{ $examples
+    { $example "USING: prettyprint sequences ;"
+        "\"a\" \"b\" \"c\" SBUF\" \" 3append-as ."
+        "SBUF\" abc\""
+    }
+} ;
+
+{ 3append 3append-as } related-words
 
 HELP: surround
 { $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "newseq" sequence } }
@@ -909,6 +918,16 @@ HELP: produce
     { $example "USING: kernel math prettyprint sequences ;" "1337 [ dup 0 > ] [ 2/ dup ] [ ] produce nip ." "{ 668 334 167 83 41 20 10 5 2 1 0 }" }
     "The " { $snippet "tail" } " quotation is used when the predicate produces more than one output value. In this case, we have to drop this value even if the predicate fails in order for stack inference to calculate a stack effect for the " { $link produce } " call:"
     { $unchecked-example "USING: kernel prettyprint random sequences ;" "[ 10 random dup 1 > ] [ ] [ drop ] produce ." "{ 8 2 2 9 }" }
+} ;
+
+HELP: produce-as
+{ $values { "pred" { $quotation "( -- ? )" } } { "quot" { $quotation "( -- obj )" } } { "tail" "a quotation" } { "exemplar" sequence } { "seq" "a sequence" } }
+{ $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence of type " { $snippet "exemplar" } " at the end." }
+{ $examples
+    "The following example divides a number by two until we reach zero, and accumulates intermediate results:"
+    { $example "USING: kernel math prettyprint sequences ;" "1337 [ dup 0 > ] [ 2/ dup ] [ ] V{ } produce-as nip ." "V{ 668 334 167 83 41 20 10 5 2 1 0 }" }
+    "The " { $snippet "tail" } " quotation is used when the predicate produces more than one output value. In this case, we have to drop this value even if the predicate fails in order for stack inference to calculate a stack effect for the " { $link produce } " call:"
+    { $unchecked-example "USING: kernel prettyprint random sequences ;" "[ 10 random dup 1 > ] [ ] [ drop ] B{ } produce-as ." "B{ 8 2 2 9 }" }
 } ;
 
 HELP: sigma
@@ -1379,8 +1398,10 @@ ARTICLE: "sequences-reshape" "Reshaping sequences"
 
 ARTICLE: "sequences-appending" "Appending sequences"
 { $subsection append }
+{ $subsection append-as }
 { $subsection prepend }
 { $subsection 3append }
+{ $subsection 3append-as }
 { $subsection surround }
 { $subsection glue }
 { $subsection concat }
@@ -1437,14 +1458,13 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection map-index }
 { $subsection accumulate }
 { $subsection produce }
+{ $subsection produce-as }
 "Filtering:"
 { $subsection push-if }
 { $subsection filter }
 "Testing if a sequence contains elements satisfying a predicate:"
 { $subsection contains? }
 { $subsection all? }
-"Testing how elements are related:"
-{ $subsection monotonic? }
 { $subsection "sequence-2combinators" }
 { $subsection "sequence-3combinators" } ;
 
@@ -1473,10 +1493,7 @@ ARTICLE: "sequences-tests" "Testing sequences"
 "Testing if a sequence contains a subsequence:"
 { $subsection head? }
 { $subsection tail? }
-{ $subsection subseq? }
-"Testing how elements are related:"
-{ $subsection all-eq? }
-{ $subsection all-equal? } ;
+{ $subsection subseq? } ;
 
 ARTICLE: "sequences-search" "Searching sequences"
 "Finding the index of an element:"

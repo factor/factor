@@ -16,6 +16,9 @@ SYMBOLS: base-dir filename ;
 
 : tar-trim ( seq -- newseq ) [ "\0 " member? ] trim ;
 
+: read-c-string* ( n -- str/f )
+    read [ zero? ] trim-right [ f ] when-empty ;
+
 : read-tar-header ( -- obj )
     \ tar-header new
     100 read-c-string* >>name

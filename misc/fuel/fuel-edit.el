@@ -33,6 +33,11 @@
 
 ;;; Auxiliar functions:
 
+(defun fuel-edit--looking-at-vocab ()
+  (save-excursion
+    (fuel-syntax--beginning-of-defun)
+    (looking-at "USING:\\|USE:")))
+
 (defun fuel-edit--try-edit (ret)
   (let* ((err (fuel-eval--retort-error ret))
          (loc (fuel-eval--retort-result ret)))
@@ -92,9 +97,9 @@ With prefix, asks for the word to edit."
                    (fuel-completion--read-word "Edit word: ")))
          (cmd `(:fuel* ((:quote ,word) fuel-get-edit-location)))
          (marker (and (not arg) (point-marker))))
-    (condition-case nil
-        (fuel-edit--try-edit (fuel-eval--send/wait cmd))
-      (error (fuel-edit-vocabulary nil word)))
+    (if (and (not arg) (fuel-edit--looking-at-vocab))
+        (fuel-edit-vocabulary nil word)
+      (fuel-edit--try-edit (fuel-eval--send/wait cmd)))
     (when marker (ring-insert find-tag-marker-ring marker))))
 
 (defun fuel-edit-word-doc-at-point (&optional arg word)
@@ -126,6 +131,32 @@ was last invoked."
   (condition-case nil
       (pop-tag-mark)
     (error "No previous location for find word or vocab invokation")))
+
+(defvar fuel-edit--buffer-history nil)
+
+(defun fuel-switch-to-buffer (&optional method)
+  "Switch to any of the existing Factor buffers, with completion."
+  (interactive)
+  (let ((buffer (completing-read "Factor buffer: "
+                                 (remove (buffer-name)
+                                         (mapcar 'buffer-name (buffer-list)))
+                                 '(lambda (s) (string-match "\\.factor$" s))
+                                 t
+                                 nil
+                                 fuel-edit--buffer-history)))
+    (cond ((eq method 'window) (switch-to-buffer-other-window buffer))
+          ((eq method 'frame) (switch-to-buffer-other-frame buffer))
+          (t (switch-to-buffer buffer)))))
+
+(defun fuel-switch-to-buffer-other-window ()
+  "Switch to any of the existing Factor buffers, in other window."
+  (interactive)
+  (fuel-switch-to-buffer 'window))
+
+(defun fuel-switch-to-buffer-other-frame ()
+  "Switch to any of the existing Factor buffers, in other frame."
+  (interactive)
+  (fuel-switch-to-buffer 'frame))
 
 
 (provide 'fuel-edit)

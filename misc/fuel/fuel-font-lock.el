@@ -73,21 +73,35 @@
 ;;; Font lock:
 
 (defun fuel-font-lock--syntactic-face (state)
-  (cond ((nth 3 state) 'factor-font-lock-string)
-        ((char-equal (char-after (nth 8 state)) ?\ )
-         (save-excursion
-           (goto-char (nth 8 state))
-           (beginning-of-line)
-           (cond ((looking-at "USING: ") 'factor-font-lock-vocabulary-name)
-                 ((looking-at "\\(TUPLE\\|SYMBOLS\\|VARS\\): ")
-                  'factor-font-lock-symbol)
-                 (t 'default))))
-        (t 'factor-font-lock-comment)))
+  (if (nth 3 state) 'factor-font-lock-string
+    (let ((c (char-after (nth 8 state))))
+      (cond ((or (char-equal c ?\ ) (char-equal c ?\n))
+             (save-excursion
+               (goto-char (nth 8 state))
+               (beginning-of-line)
+               (cond ((looking-at "USING: ") 'factor-font-lock-vocabulary-name)
+                     ((looking-at "\\(TUPLE\\|SYMBOLS\\|VARS\\): ")
+                      'factor-font-lock-symbol)
+                     (t 'default))))
+            ((char-equal c ?U) 'factor-font-lock-parsing-word)
+            ((char-equal c ?\() 'factor-font-lock-stack-effect)
+            ((char-equal c ?\") 'factor-font-lock-string)
+            (t 'factor-font-lock-comment)))))
 
 (defconst fuel-font-lock--font-lock-keywords
   `((,fuel-syntax--stack-effect-regex . 'factor-font-lock-stack-effect)
     (,fuel-syntax--brace-words-regex 1 'factor-font-lock-parsing-word)
     (,fuel-syntax--vocab-ref-regexp  2 'factor-font-lock-vocabulary-name)
+    (,fuel-syntax--constructor-regex (1 'factor-font-lock-word)
+                                     (2 'factor-font-lock-type-name)
+                                     (3 'factor-font-lock-invalid-syntax nil t))
+    (,fuel-syntax--typedef-regex (1 'factor-font-lock-type-name)
+                                 (2 'factor-font-lock-type-name)
+                                 (3 'factor-font-lock-invalid-syntax nil t))
+    (,fuel-syntax--rename-regex (1 'factor-font-lock-word)
+                                (2 'factor-font-lock-vocabulary-name)
+                                (3 'factor-font-lock-word)
+                                (4 'factor-font-lock-invalid-syntax nil t))
     (,fuel-syntax--declaration-words-regex . 'factor-font-lock-declaration)
     (,fuel-syntax--word-definition-regex 2 'factor-font-lock-word)
     (,fuel-syntax--alias-definition-regex (1 'factor-font-lock-word)
@@ -123,16 +137,18 @@
 
 ;;; Fontify strings as Factor code:
 
-(defvar fuel-font-lock--font-lock-buffer
-  (let ((buffer (get-buffer-create " *fuel font lock*")))
-    (set-buffer buffer)
-    (set-syntax-table fuel-syntax--syntax-table)
-    (fuel-font-lock--font-lock-setup)
-    buffer))
+(defun fuel-font-lock--font-lock-buffer ()
+  (let ((name " *fuel font lock*"))
+    (or (get-buffer name)
+        (let ((buffer (get-buffer-create name)))
+          (set-buffer buffer)
+          (set-syntax-table fuel-syntax--syntax-table)
+          (fuel-font-lock--font-lock-setup)
+          buffer))))
 
 (defun fuel-font-lock--factor-str (str)
   (save-current-buffer
-    (set-buffer fuel-font-lock--font-lock-buffer)
+    (set-buffer (fuel-font-lock--font-lock-buffer))
     (erase-buffer)
     (insert str)
     (let ((font-lock-verbose nil)) (font-lock-fontify-buffer))
