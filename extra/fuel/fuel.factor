@@ -177,9 +177,7 @@ PRIVATE>
 
 ! Remote connection
 
-: fuel-start-remote-listener ( port/f -- )
-    "Starting server. Connect with 'M-x connect-to-factor' in Emacs"
-    write nl flush number? [ 9000 ] unless*
+: fuel-start-server ( port -- )
     <threaded-server>
         "tty-server" >>name
         utf8 >>encoding
@@ -187,6 +185,10 @@ PRIVATE>
         [ listener ] >>handler
         f >>timeout
     start-server ;
+
+: fuel-start-remote-listener ( port/f -- )
+    "Starting server. Connect with 'M-x connect-to-factor' in Emacs"
+    write nl flush number? [ 9000 ] unless* fuel-start-server ;
 
 : fuel-start-remote-listener* ( -- ) f fuel-start-remote-listener ;
 
