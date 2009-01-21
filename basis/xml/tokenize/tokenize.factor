@@ -340,11 +340,13 @@ DEFER: direct
     } case <doctype-decl> ;
 
 : take-entity-def ( var -- entity-name entity-def )
-    take-word pass-blank get-char {
-        { CHAR: ' [ parse-quote ] }
-        { CHAR: " [ parse-quote ] }
-        [ drop take-external-id ]
-    } case [ spin [ ?set-at ] change ] 2keep ;
+    [
+        take-word pass-blank get-char {
+            { CHAR: ' [ parse-quote ] }
+            { CHAR: " [ parse-quote ] }
+            [ drop take-external-id ]
+        } case swap
+   ] dip [ [ ?set-at ] change ] 2keep swap ;
 
 : take-entity-decl ( -- entity-decl )
     pass-blank get-char {
