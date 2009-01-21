@@ -209,7 +209,7 @@
           (format ":[^ ]* [^ ]+\\(%s\\)*" fuel-syntax--stack-effect-regex)
           "M[^:]*: [^ ]+ [^ ]+"))
 
-(defconst fuel-syntax--constructor-regex
+(defconst fuel-syntax--constructor-decl-regex
   "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
 
 (defconst fuel-syntax--typedef-regex
