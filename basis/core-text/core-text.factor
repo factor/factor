@@ -1,28 +1,16 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien alien.c-types alien.syntax kernel destructors words
-parser accessors fry words hashtables sequences memoize
-assocs math math.functions locals init
+USING: arrays alien alien.c-types alien.syntax kernel
+destructors words parser accessors fry words hashtables
+sequences memoize assocs math math.functions locals init
 core-foundation core-foundation.strings
-core-foundation.attributed-strings
+core-foundation.attributed-strings core-foundation.utilities
 core-graphics core-graphics.types ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
 TYPEDEF: void* CTFontRef
-
-FUNCTION: CTFontRef CTFontCreateWithName (
-   CFStringRef name,
-   CGFloat size,
-   CGAffineTransform* matrix
-) ;
-
-: <CTFont> ( name size -- font )
-    [
-        [ <CFString> &CFRelease ] dip f CTFontCreateWithName
-    ] with-destructors ;
-
-MEMO: cached-font ( name size -- font ) <CTFont> ;
+TYPEDEF: void* CTFontDescriptorRef
 
 <<
 
@@ -32,6 +20,52 @@ MEMO: cached-font ( name size -- font ) <CTFont> ;
     (( -- value )) define-declared ; parsing
 
 >>
+
+C-GLOBAL: kCTFontSymbolicTrait
+C-GLOBAL: kCTFontWeightTrait
+C-GLOBAL: kCTFontWidthTrait
+C-GLOBAL: kCTFontSlantTrait
+
+C-GLOBAL: kCTFontNameAttribute
+C-GLOBAL: kCTFontDisplayNameAttribute
+C-GLOBAL: kCTFontFamilyNameAttribute
+C-GLOBAL: kCTFontStyleNameAttribute
+C-GLOBAL: kCTFontTraitsAttribute
+C-GLOBAL: kCTFontVariationAttribute
+C-GLOBAL: kCTFontSizeAttribute
+C-GLOBAL: kCTFontMatrixAttribute
+C-GLOBAL: kCTFontCascadeListAttribute
+C-GLOBAL: kCTFontCharacterSetAttribute
+C-GLOBAL: kCTFontLanguagesAttribute
+C-GLOBAL: kCTFontBaselineAdjustAttribute
+C-GLOBAL: kCTFontMacintoshEncodingsAttribute
+C-GLOBAL: kCTFontFeaturesAttribute
+C-GLOBAL: kCTFontFeatureSettingsAttribute
+C-GLOBAL: kCTFontFixedAdvanceAttribute
+C-GLOBAL: kCTFontOrientationAttribute
+
+FUNCTION: CTFontDescriptorRef CTFontDescriptorCreateWithAttributes (
+   CFDictionaryRef attributes
+) ;
+
+FUNCTION: CTFontRef CTFontCreateWithName (
+   CFStringRef name,
+   CGFloat size,
+   CGAffineTransform* matrix
+) ;
+
+FUNCTION: CTFontRef CTFontCreateWithFontDescriptor (
+   CTFontDescriptorRef descriptor,
+   CGFloat size,
+   CGAffineTransform* matrix
+) ;
+
+: <CTFont> ( attrs -- font )
+    [
+        >cf &CFRelease
+        CTFontDescriptorCreateWithAttributes &CFRelease
+        0.0 f CTFontCreateWithFontDescriptor
+    ] with-destructors ;
 
 C-GLOBAL: kCTFontAttributeName
 C-GLOBAL: kCTKernAttributeName
@@ -114,7 +148,4 @@ PRIVATE>
 
 : cached-line ( string font -- line ) (cached-line) 0 >>age ;
 
-[
-    \ cached-font reset-memoized
-    \ (cached-line) reset-memoized
-] "core-text" add-init-hook
+[ \ (cached-line) reset-memoized ] "core-text" add-init-hook

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.destructors alien.syntax
-destructors fry kernel math sequences
+destructors fry kernel math sequences libc
 core-graphics.types ;
 IN: core-graphics
 
@@ -69,15 +69,25 @@ FUNCTION: void CGContextSetTextPosition (
 
 FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
 
-: <CGBitmapContext> ( data dim -- context )
-    [
-        [ first2 8 ] keep first 4 *
-        CGColorSpaceCreateDeviceRGB &CGColorSpaceRelease
-        kCGImageAlphaPremultipliedLast CGBitmapContextCreate
-    ] with-destructors ;
+FUNCTION: void* CGBitmapContextGetData ( CGContextRef c ) ;
+
+<PRIVATE
+
+: <CGBitmapContext> ( dim -- context )
+    [ product "uint" malloc-array &free ] [ first2 8 ] [ first 4 * ] tri
+    CGColorSpaceCreateDeviceRGB &CGColorSpaceRelease
+    kCGImageAlphaPremultipliedLast CGBitmapContextCreate
+    [ "CGBitmapContextCreate failed" throw ] unless* ;
+
+: bitmap-data ( bitmap dim -- data )
+    [ CGBitmapContextGetData ]
+    [ product "uint" heap-size * ] bi*
+    memory>byte-array ;
+
+PRIVATE>
 
 : with-bitmap-context ( dim quot -- data )
-    '[
-        [ product "uint" <c-array> ] keep
-        [ <CGBitmapContext> &CGContextRelease @ ] [ drop ] 2bi
+    [
+        [ [ <CGBitmapContext> &CGContextRelease ] keep ] dip
+        [ nip call ] [ drop bitmap-data ] 3bi
     ] with-destructors ; inline

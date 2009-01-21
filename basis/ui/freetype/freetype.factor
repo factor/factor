@@ -41,8 +41,7 @@ M: font hashcode* drop font hashcode* ;
     ] bind ;
 
 M: freetype-renderer free-fonts ( world -- )
-    [ handle>> select-gl-context ]
-    [ fonts>> [ nip second free-sprites ] assoc-each ] bi ;
+    values [ second free-sprites ] each ;
 
 : ttf-name ( font style -- name )
     2array H{

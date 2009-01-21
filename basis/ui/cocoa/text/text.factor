@@ -1,7 +1,10 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors alien core-graphics.types core-text kernel
-namespaces sequences ui.gadgets.worlds ui.render opengl opengl.gl ;
+hashtables namespaces sequences ui.gadgets.worlds ui.render
+opengl opengl.gl destructors combinators combinators.smart
+core-foundation core-foundation.dictionaries core-foundation.numbers
+core-foundation.strings io.styles memoize ;
 IN: ui.cocoa.text
 
 SINGLETON: core-text-renderer
@@ -13,13 +16,46 @@ CONSTANT: font-names
         { "serif" "Times" }
     }
 
-USING: classes.algebra unicode.case.private ;
+: (bold) ( -- ) 1.0 kCTFontWeightTrait set ;
 
-: font-name/size ( font -- name size )
-    [ first font-names at-default ] [ third ] bi ;
+: (italic) ( -- ) 1.0 kCTFontSlantTrait set ;
+
+: font-traits ( style -- dictionary )
+    [
+        {
+            { plain [ ] }
+            { bold [ (bold) ] }
+            { italic [ (italic) ] }
+            { bold-italic [ (bold) (italic) ] }
+        } case
+    ] H{ } make-assoc ;
+
+: font-name-attr ( name -- )
+    font-names at-default kCTFontNameAttribute set ;
+
+: font-traits-attr ( style -- )
+    font-traits kCTFontTraitsAttribute set ;
+
+: font-size-attr ( size -- )
+    kCTFontSizeAttribute set ;
+
+: font-attrs ( font -- dictionary )
+    [
+        [
+            [
+                [ font-name-attr ]
+                [ font-traits-attr ]
+                [ font-size-attr ]
+                tri*
+            ] input<sequence
+        ] H{ } make-assoc
+    ] with-destructors ;
+
+MEMO: cache-font ( font -- open-font )
+    font-attrs <CTFont> ;
 
 M: core-text-renderer open-font
-    dup alien? [ font-name/size cached-font ] unless ;
+    dup alien? [ cache-font ] unless ;
 
 : string-dim ( open-font string -- dim )
     swap cached-line dim>> ;
@@ -30,11 +66,13 @@ M: core-text-renderer string-width ( open-font string -- w )
 M: core-text-renderer string-height ( open-font string -- h )
     [ " " ] when-empty string-dim second ;
 
-TUPLE: line-texture line texture age ;
+TUPLE: line-texture line texture age disposed ;
 
 : <line-texture> ( line -- texture )
     dup [ dim>> ] [ bitmap>> ] bi GL_RGBA make-texture
-    0 \ line-texture boa ;
+    0 f \ line-texture boa ;
+
+M: line-texture dispose* texture>> delete-texture ;
 
 : line-texture ( string open-font -- texture )
     world get fonts>> [ cached-line <line-texture> ] 2cache ;
@@ -55,6 +93,9 @@ M: core-text-renderer draw-string ( font string loc -- )
     [ swap open-font line-texture draw-line-texture ] with-translation ;
 
 M: core-text-renderer x>offset ( x font string -- n )
-    swap cached-line swap 0 <CGPoint> CTLineGetStringIndexForPosition ;
+    swap open-font cached-line line>> swap 0 <CGPoint> CTLineGetStringIndexForPosition ;
+
+M: core-text-renderer free-fonts ( fonts -- )
+    values dispose-each ;
 
 core-text-renderer font-renderer set-global

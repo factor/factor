@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.accessors arrays kernel cocoa.messages
 cocoa.classes cocoa.application sequences cocoa core-foundation
@@ -15,7 +15,7 @@ IN: cocoa.pasteboard
     dup [ CF>string ] when ;
 
 : set-pasteboard-types ( seq pasteboard -- )
-    swap <NSArray> f -> declareTypes:owner: drop ;
+    swap <CFArray> -> autorelease f -> declareTypes:owner: drop ;
 
 : set-pasteboard-string ( str pasteboard -- )
     NSStringPboardType <NSString>

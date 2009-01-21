@@ -3,11 +3,11 @@
 USING: tools.test core-text core-foundation
 core-foundation.dictionaries destructors
 arrays kernel generalizations math accessors
-combinators ;
+combinators hashtables ;
 IN: core-text.tests
 
 : test-font ( -- object )
-    "Helvetica" 12 <CTFont> ;
+    "Helvetica" kCTFontNameAttribute associate <CTFont> ;
 
 [ ] [ test-font CFRelease ] unit-test
 

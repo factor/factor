@@ -60,9 +60,12 @@ M: world graft*
     [ f >>handle drop ] tri ;
 
 : (ungraft-world) ( world -- )
-    [ free-fonts ]
-    [ hand-clicked close-global ]
-    [ hand-gadget close-global ] tri ;
+    {
+        [ handle>> select-gl-context ]
+        [ fonts>> free-fonts ]
+        [ hand-clicked close-global ]
+        [ hand-gadget close-global ]
+    } cleave ;
 
 M: world ungraft*
     [ (ungraft-world) ]
