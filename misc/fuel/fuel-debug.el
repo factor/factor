@@ -213,7 +213,7 @@ the debugger."
                 (goto-char (point-min))
                 (when (search-forward (car ci) nil t)
                   (setq str (format "%c %s, %s" (cdr ci) (car ci) str))))))
-          (if (and (not err) fuel-debug--uses) "u to update USING:, " "")))
+          (if fuel-debug--uses "u to update USING:, " "")))
 
 (defun fuel-debug--buffer-file ()
   (with-current-buffer (fuel-debug--buffer)
