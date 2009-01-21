@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs compiler.units definitions fuel.eval
-fuel.help help.markup help.topics io.pathnames kernel math math.order
-memoize namespaces parser sequences sets sorting tools.crossref
-tools.scaffold tools.vocabs vocabs vocabs.loader vocabs.parser words ;
+fuel.help help.markup help.topics io io.encodings.utf8 io.pathnames
+io.servers.connection kernel listener math math.order memoize
+namespaces parser sequences sets sorting tools.crossref tools.scaffold
+tools.vocabs vocabs vocabs.loader vocabs.parser words ;
 
 IN: fuel
 
@@ -174,3 +175,19 @@ PRIVATE>
 
 : fuel-scaffold-get-root ( name -- ) find-vocab-root fuel-eval-set-result ;
 
+! Remote connection
+
+: fuel-start-remote-listener ( port/f -- )
+    "Starting server. Connect with 'M-x connect-to-factor' in Emacs"
+    write nl flush number? [ 9000 ] unless*
+    <threaded-server>
+        "tty-server" >>name
+        utf8 >>encoding
+        swap local-server >>insecure
+        [ listener ] >>handler
+        f >>timeout
+    start-server ;
+
+: fuel-start-remote-listener* ( -- ) f fuel-start-remote-listener ;
+
+MAIN: fuel-start-remote-listener*
