@@ -1,5 +1,5 @@
 USING: continuations xml xml.errors tools.test kernel arrays
-xml.data state-parser quotations fry ;
+xml.data quotations fry ;
 IN: xml.errors.tests
 
 : xml-error-test ( expected-error xml-string -- )

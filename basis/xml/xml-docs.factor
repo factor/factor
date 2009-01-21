@@ -80,6 +80,4 @@ ARTICLE: "xml" "XML parser"
     { $vocab-subsection "XML entities" "xml.entities" }
     { $vocab-subsection "XML data types" "xml.data" } ;
 
-IN: xml
-
 ABOUT: "xml"
