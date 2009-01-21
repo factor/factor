@@ -14,3 +14,8 @@ bar
 
 [ "hello\nworld" ] [ <" hello
 world"> ] unit-test
+
+[ "hello" "world" ] [ <" hello"> <" world"> ] unit-test
+
+[ "\nhi" ] [ <"
+hi"> ] unit-test
