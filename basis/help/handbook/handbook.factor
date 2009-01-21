@@ -181,7 +181,6 @@ ARTICLE: "io" "Input and output"
 { $subsection "io.streams.plain" }
 { $subsection "io.streams.string" }
 { $subsection "io.streams.byte-array" }
-{ $subsection "io.streams.limited" }
 { $heading "Utilities" }
 { $subsection "stream-binary" }
 { $subsection "io.styles" }

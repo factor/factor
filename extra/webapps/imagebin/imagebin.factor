@@ -23,11 +23,12 @@ SYMBOL: my-post-data
     <page-action>
         { imagebin "upload-image" } >>template
         [
-            request get post-data>> my-post-data set-global
+            
+            ! request get post-data>> my-post-data set-global
             ! image new
             !    "file" value
                 ! insert-tuple
-            ! "uploaded-image" <redirect>
+            "uploaded-image" <redirect>
         ] >>submit ;
 
 : <imagebin> ( -- responder )

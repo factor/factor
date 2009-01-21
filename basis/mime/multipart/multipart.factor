@@ -33,8 +33,8 @@ ERROR: bad-header bytes ;
 : mime-write ( sequence -- )
     >byte-array write ;
 
-: parse-headers ( string -- sequence )
-    string-lines harvest [ parse-header-line ] map ;
+: parse-headers ( string -- hashtable )
+    string-lines harvest [ parse-header-line ] map >hashtable ;
 
 ERROR: end-of-stream multipart ;
 
@@ -73,11 +73,14 @@ ERROR: end-of-stream multipart ;
     "\r\n\r\n" dump-string dup "--\r" = [
         drop
     ] [
-        parse-headers >hashtable >>header
+        parse-headers >>header
     ] if ;
 
+: empty-name? ( string -- ? )
+    { "''" "\"\"" "" f } member? ;
+
 : save-uploaded-file ( multipart -- )
-    dup filename>> empty? [
+    dup filename>> empty-name? [
         drop
     ] [
         [ [ header>> ] [ filename>> ] [ temp-file>> ] tri mime-file boa ]
@@ -86,9 +89,13 @@ ERROR: end-of-stream multipart ;
     ] if ;
 
 : save-form-variable ( multipart -- )
-    [ [ header>> ] [ name>> ] [ name-content>> ] tri mime-variable boa ]
-    [ name>> ]
-    [ form-variables>> set-at ] tri ;
+    dup name>> empty-name? [
+        drop
+    ] [
+        [ [ header>> ] [ name>> ] [ name-content>> ] tri mime-variable boa ]
+        [ name>> ]
+        [ form-variables>> set-at ] tri
+    ] if ;
 
 : dump-mime-file ( multipart filename -- multipart )
     binary <file-writer> [
@@ -132,19 +139,22 @@ ERROR: no-content-disposition multipart ;
         [ no-content-disposition ]
     } case ;
 
-: read-assert= ( string -- )
-    [ length read ] keep assert= ;
+: assert-sequence= ( a b -- )
+    2dup sequence= [ 2drop ] [ assert ] if ;
+
+: read-assert-sequence= ( sequence -- )
+    [ length read ] keep assert-sequence= ;
 
 : parse-beginning ( multipart -- multipart )
-    "--" read-assert=
+    "--" read-assert-sequence=
     dup mime-separator>>
-    [ read-assert= ]
+    [ read-assert-sequence= ]
     [ separator-prefix prepend >>mime-separator ] bi ;
 
 : parse-multipart-loop ( multipart -- multipart )
     read-header
     dup end-of-stream?>> [ process-header parse-multipart-loop ] unless ;
 
-: parse-multipart ( sep -- uploaded-files form-variables )
+: parse-multipart ( separator -- form-variables uploaded-files )
     <multipart> parse-beginning parse-multipart-loop
-    [ uploaded-files>> ] [ form-variables>> ] bi ;
+    [ form-variables>> ] [ uploaded-files>> ] bi ;
