@@ -30,9 +30,10 @@ PRIVATE>
 :: (parse-multiline-string) ( i end -- j )
     lexer get line-text>> :> text
     text [
-        end text i start*
-        [| j | i j text subseq % j end length + ] [
-            text i tail % CHAR: \n ,
+        end text i start* [| j |
+            i j text subseq % j end length +
+        ] [
+            text i short tail % CHAR: \n ,
             lexer get next-line
             0 end (parse-multiline-string)
         ] if*
