@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io io.encodings.binary io.files
-io.streams.string kernel namespaces sequences xml.state-parser strings
+io.streams.string kernel namespaces sequences strings
 xml.backend xml.data xml.errors xml.tokenize ascii xml.entities
-xml.writer assocs ;
+xml.writer xml.state assocs ;
 IN: xml
 
 !   -- Overall parser with data tree
@@ -163,7 +163,3 @@ TUPLE: pull-xml scope ;
 
 : file>xml ( filename -- xml )
     binary <file-reader> read-xml ;
-
-: xml-reprint ( string -- )
-    string>xml print-xml ;
-

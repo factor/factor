@@ -1,9 +1,60 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml.data xml.writer kernel generic io prettyprint math 
-debugger sequences xml.state-parser accessors summary
+debugger sequences xml.state accessors summary
 namespaces io.streams.string xml.backend ;
 IN: xml.errors
+
+TUPLE: parsing-error line column ;
+
+: parsing-error ( class -- obj )
+    new
+        get-line >>line
+        get-column >>column ;
+M: parsing-error summary ( obj -- str )
+    [
+        "Parsing error" print
+        "Line: " write dup line>> .
+        "Column: " write column>> .
+    ] with-string-writer ;
+
+TUPLE: expected < parsing-error should-be was ;
+: expected ( should-be was -- * )
+    \ expected parsing-error
+        swap >>was
+        swap >>should-be throw ;
+M: expected summary ( obj -- str )
+    [
+        dup call-next-method write
+        "Token expected: " write dup should-be>> print
+        "Token present: " write was>> print
+    ] with-string-writer ;
+
+TUPLE: unexpected-end < parsing-error ;
+: unexpected-end ( -- * ) \ unexpected-end parsing-error throw ;
+M: unexpected-end summary ( obj -- str )
+    [
+        call-next-method write
+        "File unexpectedly ended." print
+    ] with-string-writer ;
+
+TUPLE: missing-close < parsing-error ;
+: missing-close ( -- * ) \ missing-close parsing-error throw ;
+M: missing-close summary ( obj -- str )
+    [
+        call-next-method write
+        "Missing closing token." print
+    ] with-string-writer ;
+
+TUPLE: disallowed-char < parsing-error char ;
+
+: disallowed-char ( char -- * )
+    \ disallowed-char parsing-error swap >>char throw ;
+
+M: disallowed-char summary
+    [ call-next-method ]
+    [ char>> "Disallowed character in XML document: " swap suffix ] bi
+    append ;
 
 ERROR: multitags ;
 
@@ -255,16 +306,6 @@ M: text-w/]]> summary
     call-next-method
     "Text node contains ']]>'" append ;
 
-TUPLE: disallowed-char < parsing-error char ;
-
-: disallowed-char ( char -- * )
-    \ disallowed-char parsing-error swap >>char throw ;
-
-M: disallowed-char summary
-    [ call-next-method ]
-    [ char>> "Disallowed character in XML document: " swap suffix ] bi
-    append ;
-
 TUPLE: duplicate-attr < parsing-error key values ;
 
 : duplicate-attr ( key values -- * )
@@ -281,6 +322,15 @@ TUPLE: bad-cdata < parsing-error ;
 
 M: bad-cdata summary
     call-next-method "\nCDATA occurs before or after main tag" append ;
+
+TUPLE: not-enough-characters < parsing-error ;
+: not-enough-characters ( -- * )
+    \ not-enough-characters parsing-error throw ;
+M: not-enough-characters summary ( obj -- str )
+    [
+        call-next-method write
+        "Not enough characters" print
+    ] with-string-writer ;
 
 UNION: xml-parse-error
     multitags notags extra-attrs nonexist-ns bad-decl

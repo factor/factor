@@ -3,10 +3,92 @@
 USING: accessors arrays ascii assocs combinators locals
 combinators.short-circuit fry io.encodings io.encodings.iana
 io.encodings.string io.encodings.utf16 io.encodings.utf8 kernel make
-math math.parser namespaces sequences sets splitting xml.state-parser
+math math.parser namespaces sequences sets splitting xml.state
 strings xml.char-classes xml.data xml.entities xml.errors hashtables
-circular ;
+circular io sbufs ;
 IN: xml.tokenize
+
+! Originally from state-parser
+
+SYMBOL: prolog-data
+
+: version=1.0? ( -- ? )
+    prolog-data get [ version>> "1.0" = ] [ t ] if* ;
+
+: assure-good-char ( ch -- ch )
+    [
+        version=1.0? over text? not get-check and
+        [ disallowed-char ] when
+    ] [ f ] if* ;
+
+! * Basic utility words
+
+: record ( char -- )
+    CHAR: \n =
+    [ 0 get-line 1+ set-line ] [ get-column 1+ ] if
+    set-column ;
+
+! (next) normalizes \r\n and \r
+: (next) ( -- char )
+    get-next read1
+    2dup swap CHAR: \r = [
+        CHAR: \n =
+        [ nip read1 ] [ nip CHAR: \n swap ] if
+    ] [ drop ] if
+    set-next dup set-char assure-good-char ;
+
+: next ( -- )
+    #! Increment spot.
+    get-char [ unexpected-end ] unless (next) record ;
+
+: skip-until ( quot: ( -- ? ) -- )
+    get-char [
+        [ call ] keep swap [ drop ] [
+            next skip-until
+        ] if
+    ] [ drop ] if ; inline recursive
+
+: take-until ( quot -- string )
+    #! Take the substring of a string starting at spot
+    #! from code until the quotation given is true and
+    #! advance spot to after the substring.
+    10 <sbuf> [
+        '[ @ [ t ] [ get-char _ push f ] if ] skip-until
+    ] keep >string ; inline
+
+: take-char ( ch -- string )
+    [ dup get-char = ] take-until nip ;
+
+: pass-blank ( -- )
+    #! Advance code past any whitespace, including newlines
+    [ get-char blank? not ] skip-until ;
+
+: string-matches? ( string circular -- ? )
+    get-char over push-circular
+    sequence= ;
+
+: take-string ( match -- string )
+    dup length <circular-string>
+    [ 2dup string-matches? ] take-until nip
+    dup length rot length 1- - head
+    get-char [ missing-close ] unless next ;
+
+: expect ( ch -- )
+    get-char 2dup = [ 2drop ] [
+        [ 1string ] bi@ expected
+    ] if next ;
+
+: expect-string ( string -- )
+    dup [ get-char next ] replicate 2dup =
+    [ 2drop ] [ expected ] if ;
+
+: init-parser ( -- )
+    0 1 0 f f <spot> spot set
+    read1 set-next next ;
+
+: state-parse ( stream quot -- )
+    ! with-input-stream implicitly creates a new scope which we use
+    swap [ init-parser call ] with-input-stream ; inline
 
 ! XML namespace processing: ns = namespace
 
@@ -81,9 +163,6 @@ SYMBOL: depth
 : parse-name-starting ( string -- name )
     take-name append interpret-name ;
 
-: parse-simple-name ( -- name )
-    take-name <simple-name> ;
-
 !   -- Parsing strings
 
 : parse-named-entity ( string -- )
@@ -98,12 +177,20 @@ SYMBOL: depth
         "x" ?head 16 10 ? base> ,
     ] [ parse-named-entity ] if ;
 
+SYMBOL: pe-table
+SYMBOL: in-dtd?
+
+: parse-pe ( -- )
+    next CHAR: ; take-char dup next
+    pe-table get at [ % ] [ no-entity ] ?if ;
+
 :: (parse-char) ( quot: ( ch -- ? ) -- )
     get-char :> char
     {
         { [ char not ] [ ] }
         { [ char quot call ] [ next ] }
         { [ char CHAR: & = ] [ parse-entity quot (parse-char) ] }
+        { [ in-dtd? get char CHAR: % = and ] [ parse-pe quot (parse-char) ] }
         [ char , next quot (parse-char) ]
     } cond ; inline recursive
 
@@ -131,11 +218,14 @@ SYMBOL: depth
     get-char CHAR: / = dup [ next ] when
     parse-name swap ;
 
+: normalize-quote ( str -- str )
+    [ dup "\t\r\n" member? [ drop CHAR: \s ] when ] map ;
+
 : (parse-quote) ( <-disallowed? ch -- string )
     swap '[
         dup _ = [ drop t ]
         [ CHAR: < = _ and [ attr-w/< ] [ f ] if ] if
-    ] parse-char get-char
+    ] parse-char normalize-quote get-char
     [ unclosed-quote ] unless ; inline
 
 : parse-quote* ( <-disallowed? -- seq )
@@ -145,12 +235,9 @@ SYMBOL: depth
 : parse-quote ( -- seq )
    f parse-quote* ;
 
-: normalize-quot ( str -- str )
-    [ dup "\t\r\n" member? [ drop CHAR: \s ] when ] map ;
-
 : parse-attr ( -- )
     parse-name pass-blank CHAR: = expect pass-blank
-    t parse-quote* normalize-quot 2array , ;
+    t parse-quote* 2array , ;
 
 : (middle-tag) ( -- )
     pass-blank version=1.0? get-char name-start?
@@ -193,7 +280,7 @@ SYMBOL: depth
 : take-element-decl ( -- element-decl )
     take-decl-contents <element-decl> ;
 
-: take-attlist-decl ( -- doctype-decl )
+: take-attlist-decl ( -- attlist-decl )
     take-decl-contents <attlist-decl> ;
 
 : take-notation-decl ( -- notation-decl )
@@ -217,7 +304,11 @@ DEFER: direct
     } case ;
 
 : take-internal-subset ( -- seq )
-    [ (take-internal-subset) ] { } make ;
+    [
+        H{ } pe-table set
+        t in-dtd? set
+        (take-internal-subset)
+    ] { } make ;
 
 : (take-external-id) ( token -- external-id )
     pass-blank {
@@ -232,36 +323,33 @@ DEFER: direct
 : only-blanks ( str -- )
     [ blank? ] all? [ bad-decl ] unless ;
 
+: nontrivial-doctype ( -- external-id internal-subset )
+    pass-blank get-char CHAR: [ = [
+        next take-internal-subset f swap close
+    ] [
+        " >" take-until-one-of {
+            { CHAR: \s [ (take-external-id) ] }
+            { CHAR: > [ only-blanks f ] }
+        } case f
+    ] if ;
+
 : take-doctype-decl ( -- doctype-decl )
     pass-blank " >" take-until-one-of {
-        { CHAR: \s [
-            pass-blank get-char CHAR: [ = [
-                next take-internal-subset f swap
-                close
-            ] [
-                " >" take-until-one-of {
-                    { CHAR: \s [ (take-external-id) ] }
-                    { CHAR: > [ only-blanks f ] }
-                } case f
-            ] if
-        ] }
+        { CHAR: \s [ nontrivial-doctype ] }
         { CHAR: > [ f f ] }
     } case <doctype-decl> ;
 
-: take-entity-def ( -- entity-name entity-def )
+: take-entity-def ( var -- entity-name entity-def )
     take-word pass-blank get-char {
         { CHAR: ' [ parse-quote ] }
         { CHAR: " [ parse-quote ] }
         [ drop take-external-id ]
-    } case ;
-
-: associate-entity ( entity-name entity-def -- )
-    swap extra-entities get set-at ;
+    } case [ spin [ ?set-at ] change ] 2keep ;
 
 : take-entity-decl ( -- entity-decl )
     pass-blank get-char {
-        { CHAR: % [ next pass-blank take-entity-def ] }
-        [ drop take-entity-def 2dup associate-entity ]
+        { CHAR: % [ next pass-blank pe-table take-entity-def ] }
+        [ drop extra-entities take-entity-def ]
     } case
     close <entity-decl> ;
 
@@ -282,13 +370,6 @@ DEFER: direct
         [ drop take-directive ]
     } case ;
 
-: yes/no>bool ( string -- t/f )
-    {
-        { "yes" [ t ] }
-        { "no" [ f ] }
-        [ not-yes/no ]
-    } case ;
-
 : assure-no-extra ( seq -- )
     [ first ] map {
         T{ name f "" "version" f }
@@ -306,6 +387,13 @@ DEFER: direct
 
 : prolog-encoding ( alist -- encoding )
     T{ name f "" "encoding" f } swap at "UTF-8" or ;
+
+: yes/no>bool ( string -- t/f )
+    {
+        { "yes" [ t ] }
+        { "no" [ f ] }
+        [ not-yes/no ]
+    } case ;
 
 : prolog-standalone ( alist -- version )
     T{ name f "" "standalone" f } swap at
