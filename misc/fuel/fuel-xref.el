@@ -37,6 +37,11 @@ cursor at the first ocurrence of the used word."
   :group 'fuel-xref
   :type 'boolean)
 
+(fuel-edit--define-custom-visit
+ fuel-xref-follow-link-method
+ fuel-xref
+ "How new buffers are opened when following a crossref link.")
+
 (fuel-font-lock--defface fuel-font-lock-xref-link
   'link fuel-xref "highlighting links in cross-reference buffers")
 
@@ -59,12 +64,12 @@ cursor at the first ocurrence of the used word."
     (when (not (file-readable-p file))
       (error "File '%s' is not readable" file))
     (let ((word fuel-xref--word))
-      (find-file-other-window file)
+      (fuel-edit--visit-file file fuel-xref-follow-link-method)
       (when (numberp line) (goto-line line))
       (when (and word fuel-xref-follow-link-to-word-p)
-        (and (search-forward word
-                             (fuel-syntax--end-of-defun-pos)
-                             t)
+        (and (re-search-forward (format "\\_<%s\\_>" word)
+                                (fuel-syntax--end-of-defun-pos)
+                                t)
              (goto-char (match-beginning 0)))))))
 
 
@@ -126,21 +131,25 @@ cursor at the first ocurrence of the used word."
 (defun fuel-xref--show-callers (word)
   (let* ((cmd `(:fuel* (((:quote ,word) fuel-callers-xref))))
          (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+    (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word word))
     (fuel-xref--fill-and-display word "using" res)))
 
 (defun fuel-xref--show-callees (word)
   (let* ((cmd `(:fuel* (((:quote ,word) fuel-callees-xref))))
          (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+    (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word nil))
     (fuel-xref--fill-and-display word "used by" res)))
 
 (defun fuel-xref--apropos (str)
   (let* ((cmd `(:fuel* ((,str fuel-apropos-xref))))
          (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+    (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word nil))
     (fuel-xref--fill-and-display str "containing" res)))
 
 (defun fuel-xref--show-vocab (vocab &optional app)
   (let* ((cmd `(:fuel* ((,vocab fuel-vocab-xref)) ,vocab))
          (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+    (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word nil))
     (fuel-xref--fill-buffer vocab "in vocabulary" res t app)))
 
 (defun fuel-xref--show-vocab-words (vocab &optional private)
