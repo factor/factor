@@ -32,10 +32,8 @@ IN: heaps.tests
 
 : random-alist ( n -- alist )
     [
-        [
-            32 random-bits dup number>string swap set
-        ] times
-    ] H{ } make-assoc ;
+        drop 32 random-bits dup number>string
+    ] H{ } map>assoc ;
 
 : test-heap-sort ( n -- ? )
     random-alist dup >alist sort-keys swap heap-sort = ;
