@@ -209,7 +209,7 @@
           (format ":[^ ]* [^ ]+\\(%s\\)*" fuel-syntax--stack-effect-regex)
           "M[^:]*: [^ ]+ [^ ]+"))
 
-(defconst fuel-syntax--constructor-regex
+(defconst fuel-syntax--constructor-decl-regex
   "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
 
 (defconst fuel-syntax--typedef-regex
@@ -246,7 +246,7 @@
     ("\\_<\\(#?!\\)\\(\n\\|$\\)" (1 "<") (2 ">"))
     ("\\_<\\((\\) \\([^)\n]*?\\) \\()\\)\\_>" (1 "<b") (2 "w") (3 ">b"))
     ;; Strings
-    ("\\_<\\(\"\\)\\([^\n\r\f\"]\\|\\\\\"\\)*\\(\"\\)\\_>" (1 "\"") (3 "\""))
+    ("\\( \\|^\\)\\(\"\\)[^\n\r\f]*\\(\"\\)\\( \\|\n\\)" (2 "\"") (3 "\""))
     ("\\_<<\\(\"\\)\\_>" (1 "<b"))
     ("\\_<\\(\"\\)>\\_>" (1 ">b"))
     ;; Multiline constructs

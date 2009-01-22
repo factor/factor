@@ -109,3 +109,6 @@ MEMO: (fuel-get-vocabs/author) ( author -- element )
 MEMO: (fuel-get-vocabs/tag) ( tag -- element )
     [ "Vocabularies tagged " prepend \ $heading swap 2array ]
     [ tagged fuel-vocab-list ] bi 2array ;
+
+: format-index ( seq -- seq )
+    [ [ >link name>> ] [ article-title ] bi 2array \ $subsection prefix ] map ;

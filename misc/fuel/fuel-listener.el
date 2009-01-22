@@ -87,6 +87,17 @@ buffer."
     (fuel-listener--wait-for-prompt 10000)
     (fuel-con--setup-connection (current-buffer))))
 
+(defun fuel-listener--connect-process (port)
+  (message "Connecting to remote listener ...")
+  (pop-to-buffer (fuel-listener--buffer))
+  (let ((process (get-buffer-process (current-buffer))))
+    (when (or (not process)
+              (y-or-n-p "Kill current listener? "))
+      (make-comint-in-buffer "fuel listener" (current-buffer)
+                             (cons "localhost" port))
+      (fuel-listener--wait-for-prompt 10000)
+      (fuel-con--setup-connection (current-buffer)))))
+
 (defun fuel-listener--process (&optional start)
   (or (and (buffer-live-p (fuel-listener--buffer))
            (get-buffer-process (fuel-listener--buffer)))
@@ -122,6 +133,17 @@ buffer."
     (if fuel-listener-use-other-window
         (pop-to-buffer buf)
       (switch-to-buffer buf))))
+
+(defun connect-to-factor (&optional arg)
+  "Connects to a remote listener running in the same host.
+Without prefix argument, the default port, 9000, is used.
+Otherwise, you'll be prompted for it. To make this work, in the
+remote listener you need to issue the words
+'fuel-start-remote-listener*' or 'port
+fuel-start-remote-listener', from the fuel vocabulary."
+  (interactive "P")
+  (let ((port (if (not arg) 9000 (read-number "Port: "))))
+    (fuel-listener--connect-process port)))
 
 (defun fuel-listener-nuke ()
   "Try this command if the listener becomes unresponsive."
