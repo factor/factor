@@ -9,7 +9,7 @@ IN: hello-unicode
             "Hello" print
             "Grüß dich" print
             "здравствуйте" print
-            "こんいちは" print
+            "こんにちは" print
             "안녕하세요" print
             "שָׁלוֹם " print
         ] with-style
