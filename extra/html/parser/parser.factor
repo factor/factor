@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays html.parser.utils hashtables io kernel
 namespaces make prettyprint quotations sequences splitting
-state-parser strings unicode.categories unicode.case ;
+html.parser.state strings unicode.categories unicode.case ;
 IN: html.parser
 
 TUPLE: tag name attributes text closing? ;
@@ -59,8 +59,8 @@ SYMBOL: tagstack
     [ get-char CHAR: " = ] take-until ;
 
 : read-quote ( -- string )
-    get-char next* CHAR: ' =
-    [ read-single-quote ] [ read-double-quote ] if next* ;
+    get-char next CHAR: ' =
+    [ read-single-quote ] [ read-double-quote ] if next ;
 
 : read-key ( -- string )
     read-whitespace*
@@ -68,7 +68,7 @@ SYMBOL: tagstack
 
 : read-= ( -- )
     read-whitespace*
-    [ get-char CHAR: = = ] take-until drop next* ;
+    [ get-char CHAR: = = ] take-until drop next ;
 
 : read-value ( -- string )
     read-whitespace*
@@ -76,14 +76,14 @@ SYMBOL: tagstack
     [ blank? ] trim ;
 
 : read-comment ( -- )
-    "-->" take-string* make-comment-tag push-tag ;
+    "-->" take-string make-comment-tag push-tag ;
 
 : read-dtd ( -- )
-    ">" take-string* make-dtd-tag push-tag ;
+    ">" take-string make-dtd-tag push-tag ;
 
 : read-bang ( -- )
-    next* get-char CHAR: - = get-next CHAR: - = and [
-        next* next*
+    next get-char CHAR: - = get-next CHAR: - = and [
+        next next
         read-comment
     ] [
         read-dtd
@@ -91,10 +91,10 @@ SYMBOL: tagstack
 
 : read-tag ( -- string )
     [ get-char CHAR: > = get-char CHAR: < = or ] take-until
-    get-char CHAR: < = [ next* ] unless ;
+    get-char CHAR: < = [ next ] unless ;
 
 : read-< ( -- string )
-    next* get-char CHAR: ! = [
+    next get-char CHAR: ! = [
         read-bang f
     ] [
         read-tag
