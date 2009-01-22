@@ -45,7 +45,7 @@ C: <element-decl> element-decl
 TUPLE: attlist-decl < directive name att-defs ;
 C: <attlist-decl> attlist-decl
 
-TUPLE: entity-decl < directive name def ;
+TUPLE: entity-decl < directive name def pe? ;
 C: <entity-decl> entity-decl
 
 TUPLE: system-id system-literal ;

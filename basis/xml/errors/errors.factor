@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml.data xml.writer kernel generic io prettyprint math 
 debugger sequences xml.state accessors summary
-namespaces io.streams.string xml.backend ;
+namespaces io.streams.string xml.backend xml.writer.private ;
 IN: xml.errors
 
 TUPLE: parsing-error line column ;
@@ -331,6 +331,12 @@ M: not-enough-characters summary ( obj -- str )
         call-next-method write
         "Not enough characters" print
     ] with-string-writer ;
+
+TUPLE: bad-doctype < parsing-error contents ;
+: bad-doctype ( contents -- * )
+    \ bad-doctype parsing-error swap >>contents throw ;
+M: bad-doctype summary
+    call-next-method "\nDTD contains invalid object" append ;
 
 UNION: xml-parse-error
     multitags notags extra-attrs nonexist-ns bad-decl

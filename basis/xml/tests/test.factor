@@ -3,11 +3,13 @@
 IN: xml.tests
 USING: kernel xml tools.test io namespaces make sequences
 xml.errors xml.entities.html parser strings xml.data io.files
-xml.writer xml.utilities continuations assocs
+xml.utilities continuations assocs
 sequences.deep accessors io.streams.string ;
 
 ! This is insufficient
 \ read-xml must-infer
+[ [ drop ] sax ] must-infer
+\ string>xml must-infer
 
 SYMBOL: xml-file
 [ ] [ "resource:basis/xml/tests/test.xml"
@@ -29,8 +31,6 @@ SYMBOL: xml-file
 ] unit-test
 [ V{ "fa&g" } ] [ xml-file get "x" get-id children>> ] unit-test
 [ "that" ] [ xml-file get "this" swap at ] unit-test
-[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b=\"c\"/>" ]
-    [ "<a b='c'/>" string>xml xml>string ] unit-test
 [ "abcd" ] [
     "<main>a<sub>bc</sub>d<nothing/></main>" string>xml
     [ [ dup string? [ % ] [ drop ] if ] deep-each ] "" make
@@ -47,10 +47,6 @@ SYMBOL: xml-file
     at swap "z" [ tuck ] dip swap set-at
     T{ name f "blah" "z" f } swap at ] unit-test
 [ "foo" ] [ "<boo><![CDATA[foo]]></boo>" string>xml children>string ] unit-test
-[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>bar baz</foo>" ]
-[ "<foo>bar</foo>" string>xml [ " baz" append ] map xml>string ] unit-test
-[ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  bar\n</foo>" ]
-[ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test
 [ "<!-- B+, B, or B--->" string>xml ] must-fail
 [ ] [ "<?xml version='1.0'?><!-- declarations for <head> & <body> --><foo/>" string>xml drop ] unit-test
 [ T{ element-decl f "br" "EMPTY" } ] [ "<!ELEMENT br EMPTY>" string>xml-chunk first ] unit-test
@@ -61,8 +57,5 @@ SYMBOL: xml-file
 [ T{ doctype-decl f "foo" } ] [ "<!DOCTYPE foo >" string>xml-chunk first ] unit-test
 [ T{ doctype-decl f "foo" T{ system-id f "blah.dtd" } } ] [ "<!DOCTYPE foo SYSTEM 'blah.dtd'>" string>xml-chunk first ] unit-test
 [ T{ doctype-decl f "foo" T{ system-id f "blah.dtd" } } ] [ "<!DOCTYPE foo   SYSTEM \"blah.dtd\"   >" string>xml-chunk first ] unit-test
-[ t ] [ "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd' >" dup string>xml-chunk [ write-xml-chunk ] with-string-writer = ] unit-test
-[ "foo" ] [ "<!ENTITY bar 'foo'><x>&bar;</x>" string>xml children>string ] unit-test
-[ V{ "hello" } ] [ "hello" string>xml-chunk ] unit-test
 [ 958 ] [ [ "&xi;" string>xml-chunk ] with-html-entities first first ] unit-test
 [ "x" "<" ] [ "<x value='&lt;'/>" string>xml [ name>> main>> ] [ "value" swap at ] bi ] unit-test
