@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make parser lexer kernel sequences words
-quotations math accessors ;
+quotations math accessors locals ;
 IN: multiline
 
 <PRIVATE
@@ -26,20 +26,27 @@ PRIVATE>
     (( -- string )) define-inline ; parsing
 
 <PRIVATE
-: (parse-multiline-string) ( start-index end-text -- end-index )
-    lexer get line-text>> [
-        2dup start
-        [ rot dupd [ swap subseq % ] 2dip length + ] [
-            rot tail % "\n" % 0
-            lexer get next-line swap (parse-multiline-string)
+
+:: (parse-multiline-string) ( i end -- j )
+    lexer get line-text>> :> text
+    text [
+        end text i start* [| j |
+            i j text subseq % j end length +
+        ] [
+            text i short tail % CHAR: \n ,
+            lexer get next-line
+            0 end (parse-multiline-string)
         ] if*
-    ] [ nip unexpected-eof ] if* ;
+    ] [ end unexpected-eof ] if ;
+        
 PRIVATE>
 
 : parse-multiline-string ( end-text -- str )
     [
-        lexer get [ swap (parse-multiline-string) ] change-column drop
-    ] "" make rest ;
+        lexer get
+        [ 1+ swap (parse-multiline-string) ]
+        change-column drop
+    ] "" make ;
 
 : <"
     "\">" parse-multiline-string parsed ; parsing

@@ -14,7 +14,7 @@ ARTICLE: "refs" "References to assoc entries"
 "References to values:"
 { $subsection value-ref }
 { $subsection <value-ref> }
-"References are used by the inspector." ;
+"References are used by the UI inspector." ;
 
 ABOUT: "refs"
 
