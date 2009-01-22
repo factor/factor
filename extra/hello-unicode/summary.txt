@@ -1,0 +1,1 @@
+Modern "Hello world" which demonstrates various Unicode scripts
