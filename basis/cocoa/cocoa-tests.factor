@@ -52,7 +52,7 @@ CLASS: {
     { +name+ "Bar" }
 } {
     "bar"
-    "CGRect"
+    "NSRect"
     { "id" "SEL" }
     [ 2drop test-foo "x" get ]
 } {
