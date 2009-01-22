@@ -19,8 +19,6 @@ typedef wchar_t F_CHAR;
 #define STRCMP wcscmp
 #define STRNCMP wcsncmp
 #define STRDUP _wcsdup
-#define MOVE_FILE_FAILS(old,new) (MoveFile((old),(new)) == 0)
-#define DELETE_FILE_FAILS(old) (DeleteFile((old)) == 0)
 
 #ifdef WIN64
 	#define CELL_FORMAT "%Iu"
