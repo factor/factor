@@ -34,3 +34,5 @@ T{ duplicate-attr f 1 21 T{ name { space "" } { main "this" } } V{ "a" "b" } } "
 T{ bad-cdata f 1 3 } "<![CDATA[]]><x/>" xml-error-test
 T{ bad-cdata f 1 7 } "<x/><![CDATA[]]>" xml-error-test
 T{ pre/post-content f "&" t } "&32;<x/>" xml-error-test
+T{ bad-doctype f 1 17 "a" } "<!DOCTYPE foo [ a ]><x/>" xml-error-test
+T{ bad-doctype f 1 22 T{ opener { name T{ name f "" "foo" "" } } { attrs T{ attrs } } } } "<!DOCTYPE foo [ <foo> ]><x/>" xml-error-test
