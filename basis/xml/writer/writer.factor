@@ -39,10 +39,10 @@ SYMBOL: indenter
         [ [ empty? ] [ string? ] bi and not ] filter
     ] when ;
 
+PRIVATE>
+
 : name>string ( name -- string )
     [ main>> ] [ space>> ] bi [ ":" rot 3append ] unless-empty ;
-
-PRIVATE>
 
 : print-name ( name -- )
     name>string write ;
@@ -158,13 +158,13 @@ M: instruction write-xml-chunk
 M: sequence write-xml-chunk
     [ write-xml-chunk ] each ;
 
+PRIVATE>
+
 : write-prolog ( xml -- )
     "<?xml version=\"" write dup version>> write
     "\" encoding=\"" write dup encoding>> write
     standalone>> [ "\" standalone=\"yes" write ] when
     "\"?>" write ;
-
-PRIVATE>
 
 : write-xml ( xml -- )
     {
