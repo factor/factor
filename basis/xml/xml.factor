@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io io.encodings.binary io.files
 io.streams.string kernel namespaces sequences strings io.encodings.utf8
-xml.backend xml.data xml.errors xml.elements ascii xml.entities
+xml.data xml.errors xml.elements ascii xml.entities
 xml.writer xml.state xml.autoencoding assocs xml.tokenize xml.name ;
 IN: xml
 

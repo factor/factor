@@ -6,10 +6,6 @@ circular xml.entities assocs make splitting math.parser
 locals combinators arrays ;
 IN: xml.tokenize
 
-SYMBOL: prolog-data
-
-SYMBOL: depth
-
 : version=1.0? ( -- ? )
     prolog-data get [ version>> "1.0" = ] [ t ] if* ;
 
