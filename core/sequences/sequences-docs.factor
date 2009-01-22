@@ -1096,7 +1096,7 @@ HELP: set-fourth
 
 HELP: replicate
 { $values
-     { "seq" sequence } { "quot" quotation }
+     { "seq" sequence } { "quot" { $quotation "( -- elt )" } }
      { "newseq" sequence } }
 { $description "Calls the quotation for every element of the sequence in order. However, the element is not passed to the quotation -- it is dropped, and the quotation produces an element of its own that is collected into a sequence of the same class as the input sequence." }
 { $examples 
