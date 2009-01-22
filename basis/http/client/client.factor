@@ -34,6 +34,8 @@ IN: http.client
 
 GENERIC: >post-data ( object -- post-data )
 
+M: f >post-data ;
+
 M: post-data >post-data ;
 
 M: string >post-data
@@ -41,15 +43,13 @@ M: string >post-data
     "application/octet-stream" <post-data>
         swap >>data ;
 
-M: byte-array >post-data
-    "application/octet-stream" <post-data>
-        swap >>data ;
-
 M: assoc >post-data
     "application/x-www-form-urlencoded" <post-data>
         swap >>params ;
 
-M: f >post-data ;
+M: object >post-data
+    "application/octet-stream" <post-data>
+        swap >>data ;
 
 : normalize-post-data ( request -- request )
     dup post-data>> [
@@ -63,8 +63,10 @@ M: f >post-data ;
     normalize-post-data ;
 
 : write-post-data ( request -- request )
-    dup method>> [ "POST" = ] [ "PUT" = ] bi or
-    [ dup post-data>> data>> write ] when ; 
+    dup method>> { "POST" "PUT" } member?  [
+        dup post-data>> data>> dup sequence?
+        [ write ] [ output-stream get stream-copy ] if
+    ] when ; 
 
 : write-request ( request -- )
     unparse-post-data
