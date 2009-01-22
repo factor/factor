@@ -34,6 +34,8 @@ IN: alien.syntax
     [ [ create-in ] dip define-constant ] each-index ;
     parsing
 
+: address-of ( name library -- value )
+    load-library dlsym [ "No such symbol" throw ] unless* ;
+
 : &:
-    scan "c-library" get
-    '[ _ _ load-library dlsym ] over push-all ; parsing
+    scan "c-library" get '[ _ _ address-of ] over push-all ; parsing
