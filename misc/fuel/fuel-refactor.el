@@ -103,10 +103,10 @@
   (let* ((code (buffer-substring begin end))
          (existing (fuel-refactor--reuse-existing code))
          (code-str (or existing (fuel--region-to-string begin end)))
+         (word (or (car existing) (read-string "New word name: ")))
          (stack-effect (or existing
                            (fuel-stack--infer-effect code-str)
-                           (read-string "Stack effect: ")))
-         (word (or (car existing) (read-string "New word name: "))))
+                           (read-string "Stack effect: "))))
     (goto-char begin)
     (delete-region begin end)
     (insert word)

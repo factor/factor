@@ -1,9 +1,9 @@
-! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io io.encodings.binary io.files
 io.streams.string kernel namespaces sequences strings
-xml.backend xml.data xml.errors xml.tokenize ascii xml.entities
-xml.writer xml.state assocs ;
+xml.backend xml.data xml.errors xml.elements ascii xml.entities
+xml.writer xml.state xml.autoencoding assocs xml.tokenize xml.name ;
 IN: xml
 
 !   -- Overall parser with data tree
@@ -132,7 +132,7 @@ TUPLE: pull-xml scope ;
         reset-prolog init-ns-stack
         start-document [ call-under ] when*
         sax-loop
-    ] state-parse ; inline recursive
+    ] with-state ; inline recursive
 
 : (read-xml) ( -- )
     start-document [ process ] when*
@@ -144,7 +144,7 @@ TUPLE: pull-xml scope ;
         done? [ unclosed ] unless
         xml-stack get first second
         prolog-data get swap
-    ] state-parse ;
+    ] with-state ;
 
 : read-xml ( stream -- xml )
     0 depth

@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs compiler.units definitions fuel.eval
-fuel.help help.markup help.topics io.pathnames kernel math math.order
-memoize namespaces parser sequences sets sorting tools.crossref
-tools.scaffold tools.vocabs vocabs vocabs.loader vocabs.parser words ;
+fuel.help fuel.remote help.markup help.topics io.pathnames kernel math
+math.order memoize namespaces parser sequences sets sorting
+tools.crossref tools.scaffold tools.vocabs vocabs vocabs.loader
+vocabs.parser words ;
 
 IN: fuel
 
@@ -174,3 +175,6 @@ PRIVATE>
 
 : fuel-scaffold-get-root ( name -- ) find-vocab-root fuel-eval-set-result ;
 
+! Remote connection
+
+MAIN: fuel-start-remote-listener*

@@ -22,16 +22,25 @@
 
 ;;; Customization
 
-(defcustom fuel-edit-word-method nil
-  "How the new buffer is opened when invoking
-\\[fuel-edit-word-at-point]."
-  :group 'fuel
-  :type '(choice (const :tag "Other window" window)
-                 (const :tag "Other frame" frame)
-                 (const :tag "Current window" nil)))
+(defmacro fuel-edit--define-custom-visit (var group doc)
+  `(defcustom ,var nil
+     ,doc
+     :group ',group
+     :type '(choice (const :tag "Other window" window)
+                    (const :tag "Other frame" frame)
+                    (const :tag "Current window" nil))))
+
+(fuel-edit--define-custom-visit
+ fuel-edit-word-method fuel
+ "How the new buffer is opened when invoking \\[fuel-edit-word-at-point]")
 
 
 ;;; Auxiliar functions:
+
+(defun fuel-edit--visit-file (file method)
+  (cond ((eq method 'window) (find-file-other-window file))
+        ((eq method 'frame) (find-file-other-frame file))
+        (t (find-file file))))
 
 (defun fuel-edit--looking-at-vocab ()
   (save-excursion
@@ -45,9 +54,7 @@
       (error "Couldn't find edit location"))
     (unless (file-readable-p (car loc))
       (error "Couldn't open '%s' for read" (car loc)))
-    (cond ((eq fuel-edit-word-method 'window) (find-file-other-window (car loc)))
-          ((eq fuel-edit-word-method 'frame) (find-file-other-frame (car loc)))
-          (t (find-file (car loc))))
+    (fuel-edit--visit-file (car loc) fuel-edit-word-method)
     (goto-line (if (numberp (cadr loc)) (cadr loc) 1))))
 
 (defun fuel-edit--read-vocabulary-name (refresh)

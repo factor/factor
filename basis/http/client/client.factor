@@ -25,7 +25,7 @@ IN: http.client
     dup header>> >hashtable
     over url>> host>> [ over url>> url-host "host" pick set-at ] when
     over post-data>> [
-        [ raw>> length "content-length" pick set-at ]
+        [ data>> length "content-length" pick set-at ]
         [ content-type>> "content-type" pick set-at ]
         bi
     ] when*
@@ -34,21 +34,39 @@ IN: http.client
 
 GENERIC: >post-data ( object -- post-data )
 
-M: post-data >post-data ;
-
-M: string >post-data utf8 encode "application/octet-stream" <post-data> ;
-
-M: byte-array >post-data "application/octet-stream" <post-data> ;
-
-M: assoc >post-data assoc>query ascii encode "application/x-www-form-urlencoded" <post-data> ;
-
 M: f >post-data ;
 
+M: post-data >post-data ;
+
+M: string >post-data
+    utf8 encode
+    "application/octet-stream" <post-data>
+        swap >>data ;
+
+M: assoc >post-data
+    "application/x-www-form-urlencoded" <post-data>
+        swap >>params ;
+
+M: object >post-data
+    "application/octet-stream" <post-data>
+        swap >>data ;
+
+: normalize-post-data ( request -- request )
+    dup post-data>> [
+        dup params>> [
+            assoc>query ascii encode >>data
+        ] when* drop
+    ] when* ;
+
 : unparse-post-data ( request -- request )
-    [ >post-data ] change-post-data ;
+    [ >post-data ] change-post-data
+    normalize-post-data ;
 
 : write-post-data ( request -- request )
-    dup method>> [ "POST" = ] [ "PUT" = ] bi or [ dup post-data>> raw>> write ] when ; 
+    dup method>> { "POST" "PUT" } member?  [
+        dup post-data>> data>> dup sequence?
+        [ write ] [ output-stream get stream-copy ] if
+    ] when ; 
 
 : write-request ( request -- )
     unparse-post-data

@@ -112,9 +112,7 @@ bool save_image(const F_CHAR *filename)
 	FILE* file;
 	F_HEADER h;
 
-	F_CHAR temporary_filename[] = "##saving-factor-image##";
-
-	file = OPEN_WRITE(temporary_filename);
+	file = OPEN_WRITE(filename);
 	if(file == NULL)
 	{
 		print_string("Cannot open image file: "); print_native_string(filename); nl();
@@ -162,14 +160,6 @@ bool save_image(const F_CHAR *filename)
 	if(fclose(file))
 	{
 		print_string("Failed to close image file: "); print_string(strerror(errno)); nl();
-		return false;
-	}
-
-	if(MOVE_FILE_FAILS(temporary_filename, filename))
-	{
-		print_string("Failed to rename tempoarary image file: "); print_string(strerror(errno)); nl();
-		if(DELETE_FILE_FAILS(temporary_filename))
-			print_string("Failed to clean up temporary image file: "); print_string(strerror(errno)); nl();
 		return false;
 	}
 
