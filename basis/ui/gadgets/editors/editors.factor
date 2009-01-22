@@ -6,8 +6,8 @@ math.vectors sorting colors combinators assocs math.order fry
 calendar alarms continuations ui.clipboards ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.theme
-ui.gadgets.menus ui.gadgets.wrappers ui.render ui.gestures
-math.geometry.rect ;
+ui.gadgets.menus ui.gadgets.wrappers ui.render ui.text
+ui.gestures math.geometry.rect ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget
@@ -132,10 +132,8 @@ M: editor ungraft*
 : unfocus-editor ( editor -- )
     [ stop-blinking ] [ f >>focused? relayout-1 ] bi ;
 
-: offset>x ( col# line# editor -- x )
-    [ editor-line ] keep font>> spin head text-width ;
-
-: loc>x ( loc editor -- x ) [ first2 swap ] dip offset>x ;
+: loc>x ( loc editor -- x )
+    [ first2 swap ] dip [ editor-line ] [ font>> ] bi swap offset>x ;
 
 : line>y ( lines# editor -- y )
     line-height * ;
@@ -224,7 +222,7 @@ M: editor ungraft*
 
 : draw-selected-line ( start end n -- )
     [ start/end-on-line ] keep
-    tuck [ editor get offset>x ] 2bi@
+    tuck [ swap 2array editor get loc>x ] 2bi@
     (draw-selection) ;
 
 : draw-selection ( -- )

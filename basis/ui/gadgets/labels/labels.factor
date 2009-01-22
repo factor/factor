@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables io kernel math namespaces
 make opengl sequences strings splitting ui.gadgets
-ui.gadgets.tracks ui.gadgets.theme ui.render colors models ;
+ui.gadgets.tracks ui.gadgets.theme ui.render
+ui.text colors models ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.

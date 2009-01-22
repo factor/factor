@@ -4,7 +4,7 @@ USING: arrays assocs io kernel math models namespaces make
 dlists deques sequences threads sequences words continuations
 init combinators hashtables concurrency.flags sets accessors
 calendar fry ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
-ui.gestures ui.backend ui.render ;
+ui.gestures ui.backend ui.render ui.text ui.text.private ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets

@@ -1,7 +1,7 @@
 IN: cocoa.tests
 USING: cocoa cocoa.messages cocoa.subclassing cocoa.types
 compiler kernel namespaces cocoa.classes tools.test memory
-compiler.units math ;
+compiler.units math core-graphics.types ;
 
 CLASS: {
     { +superclass+ "NSObject" }
@@ -15,15 +15,15 @@ CLASS: {
 
 : test-foo
     Foo -> alloc -> init
-    dup 1.0 2.0 101.0 102.0 <NSRect> -> foo:
+    dup 1.0 2.0 101.0 102.0 <CGRect> -> foo:
     -> release ;
 
 test-foo
 
-[ 1.0 ] [ "x" get NSRect-x ] unit-test
-[ 2.0 ] [ "x" get NSRect-y ] unit-test
-[ 101.0 ] [ "x" get NSRect-w ] unit-test
-[ 102.0 ] [ "x" get NSRect-h ] unit-test
+[ 1.0 ] [ "x" get CGRect-x ] unit-test
+[ 2.0 ] [ "x" get CGRect-y ] unit-test
+[ 101.0 ] [ "x" get CGRect-w ] unit-test
+[ 102.0 ] [ "x" get CGRect-h ] unit-test
 
 CLASS: {
     { +superclass+ "NSObject" }
@@ -41,10 +41,10 @@ Bar [
     -> release
 ] compile-call
 
-[ 1.0 ] [ "x" get NSRect-x ] unit-test
-[ 2.0 ] [ "x" get NSRect-y ] unit-test
-[ 101.0 ] [ "x" get NSRect-w ] unit-test
-[ 102.0 ] [ "x" get NSRect-h ] unit-test
+[ 1.0 ] [ "x" get CGRect-x ] unit-test
+[ 2.0 ] [ "x" get CGRect-y ] unit-test
+[ 101.0 ] [ "x" get CGRect-w ] unit-test
+[ 102.0 ] [ "x" get CGRect-h ] unit-test
 
 ! Make sure that we can add methods
 CLASS: {
@@ -52,7 +52,7 @@ CLASS: {
     { +name+ "Bar" }
 } {
     "bar"
-    "NSRect"
+    "CGRect"
     { "id" "SEL" }
     [ 2drop test-foo "x" get ]
 } {

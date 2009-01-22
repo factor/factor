@@ -29,10 +29,10 @@ DEFER: plist>
     dup -> length <byte-array> [ -> getBytes: ] keep ;
 
 : (plist-NSArray>) ( NSArray -- vector )
-    [ plist> ] NSFastEnumeration-map ;    
+    [ plist> ] NSFastEnumeration-map ;
 
 : (plist-NSDictionary>) ( NSDictionary -- hashtable )
-    dup [ [ -> valueForKey: ] keep swap [ plist> ] bi@ 2array ] with
+    dup [ tuck -> valueForKey: [ plist> ] bi@ 2array ] with
     NSFastEnumeration-map >hashtable ;
 
 : (read-plist) ( NSData -- id )

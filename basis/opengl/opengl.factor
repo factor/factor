@@ -10,12 +10,9 @@ generalizations locals fry specialized-arrays.float
 specialized-arrays.uint ;
 IN: opengl
 
-: color>raw ( object -- r g b a )
-    >rgba { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave ; inline
+: gl-color ( color -- ) >rgba-components glColor4d ; inline
 
-: gl-color ( color -- ) color>raw glColor4d ; inline
-
-: gl-clear-color ( color -- ) color>raw glClearColor ;
+: gl-clear-color ( color -- ) >rgba-components glClearColor ;
 
 : gl-clear ( color -- )
     gl-clear-color GL_COLOR_BUFFER_BIT glClear ;

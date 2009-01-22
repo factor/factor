@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays hashtables io kernel
 math namespaces opengl opengl.gl opengl.glu sequences strings
@@ -191,54 +191,13 @@ M: polygon draw-interior
     [ [ GL_POLYGON 0 ] dip interior-count>> glDrawArrays ]
     tri ;
 
-: arrow-up    { { 3 0 } { 6 6 } { 0 6 } } ;
-: arrow-right { { 0 0 } { 6 3 } { 0 6 } } ;
-: arrow-down  { { 0 0 } { 6 0 } { 3 6 } } ;
-: arrow-left  { { 0 3 } { 6 0 } { 6 6 } } ;
-: close-box   { { 0 0 } { 6 0 } { 6 6 } { 0 6 } } ;
+CONSTANT: arrow-up    { { 3 0 } { 6 6 } { 0 6 } }
+CONSTANT: arrow-right { { 0 0 } { 6 3 } { 0 6 } }
+CONSTANT: arrow-down  { { 0 0 } { 6 0 } { 3 6 } }
+CONSTANT: arrow-left  { { 0 3 } { 6 0 } { 6 6 } }
+CONSTANT: close-box   { { 0 0 } { 6 0 } { 6 6 } { 0 6 } }
 
 : <polygon-gadget> ( color points -- gadget )
     dup max-dim
     [ <polygon> <gadget> ] dip >>dim
     swap >>interior ;
-
-! Font rendering
-SYMBOL: font-renderer
-
-HOOK: open-font font-renderer ( font -- open-font )
-
-HOOK: string-width font-renderer ( open-font string -- w )
-
-HOOK: string-height font-renderer ( open-font string -- h )
-
-HOOK: draw-string font-renderer ( font string loc -- )
-
-HOOK: x>offset font-renderer ( x font string -- n )
-
-HOOK: free-fonts font-renderer ( world -- )
-
-: text-height ( font text -- h )
-    [ open-font ] dip
-    dup string? [ string-height ] [
-        [ string-height ] with sigma
-    ] if ;
-
-: text-width ( font text -- w )
-    [ open-font ] dip
-    dup string? [ string-width ] [
-        [ 0 ] 2dip [ string-width max ] with each
-    ] if ;
-
-: text-dim ( font text -- dim )
-    [ text-width ] [ text-height ] 2bi 2array ;
-
-: draw-text ( font text loc -- )
-    over string? [ draw-string ] [
-        [
-            [
-                2dup { 0 0 } draw-string
-                [ open-font ] dip string-height
-                0.0 swap 0.0 glTranslated
-            ] with each
-        ] with-translation
-    ] if ;

@@ -3,7 +3,7 @@
 USING: alien alien.accessors alien.c-types arrays io kernel libc
 math math.vectors namespaces opengl opengl.gl opengl.sprites assocs
 sequences io.files io.styles continuations freetype
-ui.gadgets.worlds ui.render ui.backend byte-arrays accessors
+ui.gadgets.worlds ui.text ui.text.private ui.backend byte-arrays accessors
 locals specialized-arrays.direct.uchar ;
 IN: ui.freetype
 
@@ -221,5 +221,8 @@ M: freetype-renderer x>offset ( x font string -- n )
     [ open-font ] dip
     [ run-char-widths [ <= ] with find drop ] keep swap
     [ ] [ length ] ?if ;
+
+M:: freetype-renderer offset>x ( n font string -- x )
+    font open-font string n head string-width ;
 
 freetype-renderer font-renderer set-global

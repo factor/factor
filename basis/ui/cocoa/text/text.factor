@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors alien core-graphics.types core-text kernel
-hashtables namespaces sequences ui.gadgets.worlds ui.render
-opengl opengl.gl destructors combinators core-foundation
-core-foundation.strings io.styles memoize math ;
+hashtables namespaces sequences ui.gadgets.worlds ui.text
+ui.text.private opengl opengl.gl destructors combinators core-foundation
+core-foundation.strings io.styles memoize math math.vectors ;
 IN: ui.cocoa.text
 
 SINGLETON: core-text-renderer
@@ -34,7 +34,7 @@ CONSTANT: font-names
     [ drop ] [ [ 0.0 f ] dip font-traits dup ] 2bi
     CTFontCreateCopyWithSymbolicTraits
     dup [ [ CFRelease ] dip ] [ drop ] if ;
-    
+
 MEMO: cache-font ( font -- open-font )
     [
         [
@@ -46,14 +46,8 @@ MEMO: cache-font ( font -- open-font )
 M: core-text-renderer open-font
     dup alien? [ cache-font ] unless ;
 
-: string-dim ( open-font string -- dim )
-    swap cached-line dim>> ;
-
-M: core-text-renderer string-width ( open-font string -- w )
-    string-dim first ;
- 
-M: core-text-renderer string-height ( open-font string -- h )
-    [ " " ] when-empty string-dim second ;
+M: core-text-renderer string-dim
+    [ " " string-dim { 0 1 } v* ] [ swap cached-line dim>> ] if-empty ;
 
 TUPLE: line-texture line texture age disposed ;
 
@@ -82,7 +76,13 @@ M: core-text-renderer draw-string ( font string loc -- )
     [ swap open-font line-texture draw-line-texture ] with-translation ;
 
 M: core-text-renderer x>offset ( x font string -- n )
-    swap open-font cached-line line>> swap 0 <CGPoint> CTLineGetStringIndexForPosition ;
+    [ 2drop 0 ] [
+        swap open-font cached-line line>>
+        swap 0 <CGPoint> CTLineGetStringIndexForPosition
+    ] if-empty ;
+
+M: core-text-renderer offset>x ( n font string -- x )
+    swap open-font cached-line line>> swap f CTLineGetOffsetForStringIndex ;
 
 M: core-text-renderer free-fonts ( fonts -- )
     values dispose-each ;

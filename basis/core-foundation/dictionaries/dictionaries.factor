@@ -27,6 +27,6 @@ FUNCTION: void* CFDictionaryGetValue (
     [ kCFAllocatorDefault ] dip
     unzip [ >void*-array ] bi@
     [ [ underlying>> ] bi@ ] [ nip length ] 2bi
-    &: kCFTypeDictionaryCallBacks
-    &: kCFTypeDictionaryValueCallbacks
+    &: kCFTypeDictionaryKeyCallBacks
+    &: kCFTypeDictionaryValueCallBacks
     CFDictionaryCreate ;

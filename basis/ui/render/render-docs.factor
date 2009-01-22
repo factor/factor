@@ -60,45 +60,6 @@ HELP: <polygon-gadget>
 { $values { "color" "a color specifier" } { "points" "a sequence of points" } { "gadget" "a new " { $link gadget } } }
 { $description "Creates a gadget which is drawn as a solid filled polygon. The gadget's size is the minimum bounding box containing all the points of the polygon." } ;
 
-HELP: open-font
-{ $values { "font" "a font specifier" } { "open-font" object } }
-{ $description "Loads a font if it has not already been loaded, otherwise outputs the existing font." }
-{ $errors "Throws an error if the font does not exist." } ;
-
-HELP: string-width
-{ $values { "open-font" "a value output by " { $link open-font } } { "string" string } { "w" "a positive integer" } }
-{ $description "Outputs the width of a string." }
-{ $notes "This is a low-level word; use " { $link text-width } " instead." } ;
-
-HELP: text-width
-{ $values { "font" "a font specifier" } { "text" "a string or sequence of strings" } { "w" "a positive integer" } }
-{ $description "Outputs the width of a piece of text." } ;
-
-HELP: string-height
-{ $values { "open-font" "a value output by " { $link open-font } } { "string" string } { "h" "a positive integer" } }
-{ $description "Outputs the height of a string." }
-{ $notes "This is a low-level word; use " { $link text-height } " instead." } ;
-
-HELP: text-height
-{ $values { "font" "a font specifier" } { "text" "a string or sequence of strings" } { "h" "a positive integer" } }
-{ $description "Outputs the height of a piece of text." } ;
-
-HELP: text-dim
-{ $values { "font" "a font specifier" } { "text" "a string or sequence of strings" } { "dim" "a pair of integers" } }
-{ $description "Outputs the dimensions of a piece of text, which is either a single-line string or an array of lines." } ;
-
-HELP: draw-string
-{ $values { "font" "a font specifier" } { "string" string } { "loc" "a pair of integers" } }
-{ $description "Draws a line of text." } ;
-
-HELP: draw-text
-{ $values { "font" "a font specifier" } { "text" "a string or an array of strings" } { "loc" "a pair of integers" } }
-{ $description "Draws a piece of text." } ;
-
-HELP: x>offset
-{ $values { "x" real } { "font" "a font specifier" } { "string" string } { "n" integer } }
-{ $description "Outputs the string index closest to the given x co-ordinate." } ;
-
 ARTICLE: "gadgets-polygons" "Polygon gadgets"
 "A polygon gadget renders a simple shaded polygon."
 { $subsection <polygon-gadget> }
@@ -133,21 +94,6 @@ $nl
 { $subsection gradient }
 { $subsection polygon }
 "Custom implementations must follow the guidelines set forth in " { $link "ui-paint-custom" } "." ;
-
-ARTICLE: "text-rendering" "Rendering text"
-"Unlike OpenGL, Factor's FreeType binding only includes the bare essentials, and there is rarely any need to directly call words in the " { $vocab-link "freetype" } " vocabulary directly. Instead, the UI provides high-level wrappers."
-$nl
-"Measuring text:"
-{ $subsection text-dim }
-{ $subsection text-width }
-{ $subsection text-height }
-"Rendering text:"
-{ $subsection draw-text }
-"Low-level text protocol for UI backends:"
-{ $subsection open-font }
-{ $subsection string-width }
-{ $subsection string-height }
-{ $subsection draw-string } ;
 
 ARTICLE: "ui-paint-coord" "The UI co-ordinate system"
 "The UI uses a co-ordinate system where the y axis is oriented down. The OpenGL " { $link GL_MODELVIEW } " matrix is not saved or restored when rendering a gadget. Instead, the origin of the gadget relative to the OpenGL context is stored in a variable:"

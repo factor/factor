@@ -3,11 +3,12 @@
 USING: tools.test core-text core-foundation
 core-foundation.dictionaries destructors
 arrays kernel generalizations math accessors
-combinators hashtables ;
+core-foundation.utilities
+combinators hashtables colors ;
 IN: core-text.tests
 
-: test-font ( name -- object )
-    kCTFontFamilyNameAttribute associate <CTFont> ;
+: test-font ( name -- font )
+    [ >cf &CFRelease 0.0 f CTFontCreateWithName ] with-destructors ;
 
 [ ] [ "Helvetica" test-font CFRelease ] unit-test
 
@@ -20,7 +21,7 @@ IN: core-text.tests
 
 : test-typographic-bounds ( string font -- ? )
     [
-        test-font &CFRelease <CTLine> &CFRelease
+        test-font &CFRelease white <CTLine> &CFRelease
         line-typographic-bounds {
             [ width>> float? ]
             [ ascent>> float? ]

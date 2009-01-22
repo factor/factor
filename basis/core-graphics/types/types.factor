@@ -69,6 +69,7 @@ C-STRUCT: CGAffineTransform
     { "CGFloat" "tx" }
     { "CGFloat" "ty" } ;
 
+TYPEDEF: void* CGColorRef
 TYPEDEF: void* CGColorSpaceRef
 TYPEDEF: void* CGContextRef
 TYPEDEF: uint CGBitmapInfo

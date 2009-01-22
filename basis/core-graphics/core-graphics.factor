@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.destructors alien.syntax
-destructors fry kernel math sequences libc
-core-graphics.types ;
+destructors fry kernel math sequences libc colors
+core-graphics.types core-foundation.utilities ;
 IN: core-graphics
 
 ! CGImageAlphaInfo
@@ -24,6 +24,18 @@ kCGImageAlphaNoneSkipFirst ;
 : kCGBitmapByteOrder32Little ( -- n ) 2 12 shift ; inline
 : kCGBitmapByteOrder16Big ( -- n ) 3 12 shift ; inline
 : kCGBitmapByteOrder32Big ( -- n ) 4 12 shift ; inline
+
+FUNCTION: CGColorRef CGColorCreateGenericRGB (
+   CGFloat red,
+   CGFloat green,
+   CGFloat blue,
+   CGFloat alpha
+) ;
+
+: <CGColor> ( color -- CGColor )
+    >rgba-components CGColorCreateGenericRGB ;
+
+M: color (>cf) <CGColor> ;
 
 FUNCTION: CGColorSpaceRef CGColorSpaceCreateDeviceRGB ( ) ;
 

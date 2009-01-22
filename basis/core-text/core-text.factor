@@ -3,7 +3,7 @@
 USING: arrays alien alien.c-types alien.syntax kernel
 destructors words parser accessors fry words hashtables
 sequences memoize assocs math math.functions locals init
-core-foundation core-foundation.strings
+namespaces colors core-foundation core-foundation.strings
 core-foundation.attributed-strings core-foundation.utilities
 core-graphics core-graphics.types ;
 IN: core-text
@@ -69,13 +69,6 @@ FUNCTION: CTFontRef CTFontCreateWithFontDescriptor (
    CGAffineTransform* matrix
 ) ;
 
-: <CTFont> ( attrs -- font )
-    [
-        >cf &CFRelease
-        CTFontDescriptorCreateWithAttributes &CFRelease
-        0.0 f CTFontCreateWithFontDescriptor
-    ] with-destructors ;
-
 C-GLOBAL: kCTFontAttributeName
 C-GLOBAL: kCTKernAttributeName
 C-GLOBAL: kCTLigatureAttributeName
@@ -105,9 +98,12 @@ FUNCTION: CTFontRef CTFontCreateCopyWithSymbolicTraits (
    uint32_t symTraitMask
 ) ;
 
-: <CTLine> ( string font -- line )
+: <CTLine> ( string font color -- line )
     [
-        kCTFontAttributeName associate <CFAttributedString> &CFRelease
+        [
+            kCTForegroundColorAttributeName set
+            kCTFontAttributeName set
+        ] H{ } make-assoc <CFAttributedString> &CFRelease
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
@@ -132,17 +128,14 @@ TUPLE: line string font line bounds dim bitmap age disposed ;
 : <line> ( string font -- line )
     [
         CFRetain |CFRelease
-        2dup <CTLine> |CFRelease
+        2dup white <CTLine> |CFRelease
         dup line-typographic-bounds
         dup bounds>dim 3dup [ draw-line ] with-bitmap-context
         0 f line boa
     ] with-destructors ;
 
 M: line dispose*
-    [
-        [ font>> &CFRelease drop ]
-        [ line>> &CFRelease drop ] bi
-    ] with-destructors ;
+    [ font>> ] [ line>> ] bi 2array dispose-each ;
 
 <PRIVATE
 
