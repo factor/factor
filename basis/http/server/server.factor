@@ -55,18 +55,17 @@ ERROR: no-boundary ;
 : read-content ( request -- bytes )
     "content-length" header string>number read ;
 
-: parse-content ( request content-type -- form-variables uploaded-files raw )
-    {
-        { "multipart/form-data" [ read-multipart-data f ] }
-        { "application/x-www-form-urlencoded" [ read-content [ f f ] dip ] }
-        [ drop read-content [ f f ] dip ]
+: parse-content ( request content-type -- post-data )
+    [ <post-data> swap ] keep {
+        { "multipart/form-data" [ read-multipart-data assoc-union >>params ] }
+        { "application/x-www-form-urlencoded" [ read-content query>assoc >>params ] }
+        [ drop read-content >>data ]
     } case ;
 
 : read-post-data ( request -- request )
     dup method>> "POST" = [
         dup dup "content-type" header
-        [ ";" split1 drop parse-content ] keep
-        <post-data> >>post-data
+        ";" split1 drop parse-content >>post-data
     ] when ;
 
 : extract-host ( request -- request )
