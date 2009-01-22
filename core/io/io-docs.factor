@@ -168,7 +168,7 @@ HELP: lines
 
 HELP: each-line
 { $values { "quot" { $quotation "( str -- )" } } }
-{ $description "Calls the quotatin with successive lines of text, until the current " { $link input-stream } " is exhausted." } ;
+{ $description "Calls the quotation with successive lines of text, until the current " { $link input-stream } " is exhausted." } ;
 
 HELP: contents
 { $values { "stream" "an input stream" } { "str" string } }

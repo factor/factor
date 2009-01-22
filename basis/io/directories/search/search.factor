@@ -46,17 +46,21 @@ PRIVATE>
     [ ] accumulator [ each-file ] dip ;
 
 : find-file ( path bfs? quot: ( obj -- ? ) -- path/f )
-    [ <directory-iterator> ] dip
-    [ keep and ] curry iterate-directory ; inline
+    '[
+        _ _ _ [ <directory-iterator> ] dip
+        [ keep and ] curry iterate-directory
+    ] [ drop f ] recover ; inline
 
-: find-all-files ( path bfs? quot: ( obj -- ? ) -- paths )
-    [ <directory-iterator> ] dip
-    pusher [ [ f ] compose iterate-directory drop ] dip ; inline
+: find-all-files ( path bfs? quot: ( obj -- ? ) -- paths/f )
+    '[
+        _ _ _ [ <directory-iterator> ] dip
+        pusher [ [ f ] compose iterate-directory drop ] dip
+    ] [ drop f ] recover ; inline
 
-: find-in-directories ( directories bfs? quot: ( obj -- ? ) -- path' )
+: find-in-directories ( directories bfs? quot: ( obj -- ? ) -- path'/f )
     '[ _ _ find-file ] attempt-all ;
 
-: find-all-in-directories ( directories bfs? quot: ( obj -- ? ) -- paths )
+: find-all-in-directories ( directories bfs? quot: ( obj -- ? ) -- paths/f )
     '[ _ _ find-all-files ] map concat ;
 
 os windows? [ "io.directories.search.windows" require ] when

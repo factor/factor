@@ -175,8 +175,11 @@ interacting with a factor listener is at your disposal.
 
 (fuel-mode--key-1 ?k 'fuel-run-file)
 (fuel-mode--key-1 ?l 'fuel-run-file)
-(fuel-mode--key-1 ?r 'fuel-eval-region)
+(fuel-mode--key-1 ?r 'fuel-refresh-all)
 (fuel-mode--key-1 ?z 'run-factor)
+(fuel-mode--key-1 ?s 'fuel-switch-to-buffer)
+(define-key fuel-mode-map "\C-x4s" 'fuel-switch-to-buffer-other-window)
+(define-key fuel-mode-map "\C-x5s" 'fuel-switch-to-buffer-other-frame)
 
 (define-key fuel-mode-map "\C-\M-x" 'fuel-eval-definition)
 (define-key fuel-mode-map "\C-\M-r" 'fuel-eval-extended-region)

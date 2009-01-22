@@ -75,10 +75,10 @@ INLINE void load_code_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 /* This function also initializes the data and code heaps */
 void load_image(F_PARAMETERS *p)
 {
-	FILE *file = OPEN_READ(p->image);
+	FILE *file = OPEN_READ(p->image_path);
 	if(file == NULL)
 	{
-		print_string("Cannot open image file: "); print_native_string(p->image); nl();
+		print_string("Cannot open image file: "); print_native_string(p->image_path); nl();
 		print_string(strerror(errno)); nl();
 		exit(1);
 	}
@@ -103,7 +103,7 @@ void load_image(F_PARAMETERS *p)
 	relocate_code();
 
 	/* Store image path name */
-	userenv[IMAGE_ENV] = tag_object(from_native_string(p->image));
+	userenv[IMAGE_ENV] = tag_object(from_native_string(p->image_path));
 }
 
 /* Save the current image to disk */

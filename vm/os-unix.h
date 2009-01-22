@@ -16,7 +16,7 @@ typedef char F_SYMBOL;
 #define string_to_native_alien(string) string_to_char_alien(string,true)
 #define unbox_symbol_string unbox_char_string
 
-#define STR_FORMAT(string) string
+#define STRING_LITERAL(string) string
 
 #define SSCANF sscanf
 #define STRCMP strcmp

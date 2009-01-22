@@ -76,6 +76,37 @@ HELP: sum-outputs
     }
 } ;
 
+HELP: append-outputs
+{ $values
+     { "quot" quotation }
+     { "seq" sequence }
+}
+{ $description "Infers the number of outputs from " { $snippet "quot" } " and returns a sequence of the outputs appended." }
+{ $examples
+    { $example
+        "USING: combinators.smart prettyprint ;"
+        "[ { 1 2 } { \"A\" \"b\" } ] append-outputs ."
+        "{ 1 2 \"A\" \"b\" }"
+    }
+} ;
+
+HELP: append-outputs-as
+{ $values
+     { "quot" quotation } { "exemplar" sequence }
+     { "seq" sequence }
+}
+{ $description "Infers the number of outputs from " { $snippet "quot" } " and returns a sequence of type " { $snippet "exemplar" } " of the outputs appended." }
+{ $examples
+    { $example
+        "USING: combinators.smart prettyprint ;"
+        "[ { 1 2 } { \"A\" \"b\" } ] V{ } append-outputs-as ."
+        "V{ 1 2 \"A\" \"b\" }"
+    }
+} ;
+
+{ append-outputs append-outputs-as } related-words
+
+
 ARTICLE: "combinators.smart" "Smart combinators"
 "The " { $vocab-link "combinators.smart" } " vocabulary implements " { $emphasis "smart combinators" } ". A smart combinator is one whose behavior depends on the static stack effect of an input quotation." $nl
 "Smart inputs from a sequence:"
@@ -86,6 +117,9 @@ ARTICLE: "combinators.smart" "Smart combinators"
 "Reducing the output of a quotation:"
 { $subsection reduce-outputs }
 "Summing the output of a quotation:"
-{ $subsection sum-outputs } ;
+{ $subsection sum-outputs }
+"Appending the results of a quotation:"
+{ $subsection append-outputs }
+{ $subsection append-outputs-as } ;
 
 ABOUT: "combinators.smart"

@@ -1,10 +1,9 @@
-! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.streams.string io.files kernel math namespaces
-prettyprint sequences arrays generic strings vectors
-xml.char-classes xml.data xml.errors xml.tokenize xml.writer
-xml.utilities state-parser assocs ascii io.encodings.utf8
-accessors xml.backend ;
+USING: accessors arrays io io.encodings.binary io.files
+io.streams.string kernel namespaces sequences strings
+xml.backend xml.data xml.errors xml.elements ascii xml.entities
+xml.writer xml.state xml.autoencoding assocs xml.tokenize xml.name ;
 IN: xml
 
 !   -- Overall parser with data tree
@@ -23,13 +22,8 @@ GENERIC: process ( object -- )
 M: object process add-child ;
 
 M: prolog process
-    xml-stack get V{ { f V{ "" } } } =
+    xml-stack get V{ { f V{ } } } =
     [ bad-prolog ] unless drop ;
-
-M: instruction process
-    xml-stack get length 1 =
-    [ bad-instruction ] unless
-    add-child ;
 
 M: directive process
     xml-stack get dup length 1 =
@@ -54,7 +48,9 @@ M: closer process
     <tag> add-child ;
 
 : init-xml-stack ( -- )
-    V{ } clone xml-stack set f push-xml ;
+    V{ } clone xml-stack set
+    extra-entities [ H{ } assoc-like ] change
+    f push-xml ;
 
 : default-prolog ( -- prolog )
     "1.0" "UTF-8" f <prolog> ;
@@ -101,6 +97,7 @@ TUPLE: pull-xml scope ;
         text-now? on
     ] H{ } make-assoc
     pull-xml boa ;
+! pull-xml needs to call start-document somewhere
 
 : pull-event ( pull -- xml-event/f )
     scope>> [
@@ -133,11 +130,12 @@ TUPLE: pull-xml scope ;
 : sax ( stream quot: ( xml-elem -- ) -- )
     swap [
         reset-prolog init-ns-stack
-        prolog-data get call-under
+        start-document [ call-under ] when*
         sax-loop
-    ] state-parse ; inline recursive
+    ] with-state ; inline recursive
 
 : (read-xml) ( -- )
+    start-document [ process ] when*
     [ process ] sax-loop ; inline
 
 : (read-xml-chunk) ( stream -- prolog seq )
@@ -146,25 +144,22 @@ TUPLE: pull-xml scope ;
         done? [ unclosed ] unless
         xml-stack get first second
         prolog-data get swap
-    ] state-parse ;
+    ] with-state ;
 
 : read-xml ( stream -- xml )
-    #! Produces a tree of XML nodes
-    (read-xml-chunk) make-xml-doc ;
+    0 depth
+    [ (read-xml-chunk) make-xml-doc ] with-variable ;
 
 : read-xml-chunk ( stream -- seq )
-    (read-xml-chunk) nip ;
+    1 depth
+    [ (read-xml-chunk) nip ] with-variable ;
 
 : string>xml ( string -- xml )
     <string-reader> read-xml ;
 
 : string>xml-chunk ( string -- xml )
-    <string-reader> read-xml-chunk ;
+    t string-input?
+    [ <string-reader> read-xml-chunk ] with-variable ;
 
 : file>xml ( filename -- xml )
-    ! Autodetect encoding!
-    utf8 <file-reader> read-xml ;
-
-: xml-reprint ( string -- )
-    string>xml print-xml ;
-
+    binary <file-reader> read-xml ;

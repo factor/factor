@@ -31,7 +31,12 @@
   :group 'fuel)
 
 (defcustom fuel-listener-factor-binary
-  (expand-file-name "factor" fuel-factor-root-dir)
+  (expand-file-name (cond ((eq system-type 'windows-nt)
+                           "factor.exe")
+                          ((eq system-type 'darwin)
+                           "Factor.app/Contents/MacOS/factor")
+                          (t "factor"))
+                    fuel-factor-root-dir)
   "Full path to the factor executable to use when starting a listener."
   :type '(file :must-match t)
   :group 'fuel-listener)
@@ -82,6 +87,17 @@ buffer."
     (fuel-listener--wait-for-prompt 10000)
     (fuel-con--setup-connection (current-buffer))))
 
+(defun fuel-listener--connect-process (port)
+  (message "Connecting to remote listener ...")
+  (pop-to-buffer (fuel-listener--buffer))
+  (let ((process (get-buffer-process (current-buffer))))
+    (when (or (not process)
+              (y-or-n-p "Kill current listener? "))
+      (make-comint-in-buffer "fuel listener" (current-buffer)
+                             (cons "localhost" port))
+      (fuel-listener--wait-for-prompt 10000)
+      (fuel-con--setup-connection (current-buffer)))))
+
 (defun fuel-listener--process (&optional start)
   (or (and (buffer-live-p (fuel-listener--buffer))
            (get-buffer-process (fuel-listener--buffer)))
@@ -102,15 +118,9 @@ buffer."
     (goto-char (point-max))
     (unless seen (error "No prompt found!"))))
 
-(defun fuel-listener-nuke ()
-  (interactive)
-  (goto-char (point-max))
-  (comint-kill-region comint-last-input-start (point))
-  (comint-redirect-cleanup)
-  (fuel-con--setup-connection fuel-listener--buffer))
 
 
-;;; Interface: starting fuel listener
+;;; Interface: starting and interacting with fuel listener:
 
 (defalias 'switch-to-factor 'run-factor)
 (defalias 'switch-to-fuel-listener 'run-factor)
@@ -124,6 +134,34 @@ buffer."
         (pop-to-buffer buf)
       (switch-to-buffer buf))))
 
+(defun connect-to-factor (&optional arg)
+  "Connects to a remote listener running in the same host.
+Without prefix argument, the default port, 9000, is used.
+Otherwise, you'll be prompted for it. To make this work, in the
+remote listener you need to issue the words
+'fuel-start-remote-listener*' or 'port
+fuel-start-remote-listener', from the fuel vocabulary."
+  (interactive "P")
+  (let ((port (if (not arg) 9000 (read-number "Port: "))))
+    (fuel-listener--connect-process port)))
+
+(defun fuel-listener-nuke ()
+  "Try this command if the listener becomes unresponsive."
+  (interactive)
+  (goto-char (point-max))
+  (comint-kill-region comint-last-input-start (point))
+  (comint-redirect-cleanup)
+  (fuel-con--setup-connection fuel-listener--buffer))
+
+(defun fuel-refresh-all ()
+  "Switch to the listener buffer and invokes Factor's refresh-all.
+With prefix, you're teletransported to the listener's buffer."
+  (interactive)
+  (let ((buf (process-buffer (fuel-listener--process))))
+    (pop-to-buffer buf)
+    (comint-send-string nil "\"Refreshing loaded vocabs...\" write nl flush")
+    (comint-send-string nil " refresh-all \"Done!\" write nl flush\n")))
+
 
 ;;; Completion support
 
@@ -132,8 +170,7 @@ buffer."
 
 (defun fuel-listener--setup-completion ()
   (setq fuel-syntax--current-vocab-function 'fuel-listener--current-vocab)
-  (setq fuel-syntax--usings-function 'fuel-listener--usings)
-  (set-syntax-table fuel-syntax--syntax-table))
+  (setq fuel-syntax--usings-function 'fuel-listener--usings))
 
 
 ;;; Stack mode support
@@ -160,7 +197,6 @@ buffer."
   (set (make-local-variable 'comint-prompt-regexp) fuel-con--prompt-regex)
   (set (make-local-variable 'comint-use-prompt-regexp) t)
   (set (make-local-variable 'comint-prompt-read-only) t)
-  (set-syntax-table fuel-syntax--syntax-table)
   (fuel-listener--setup-completion)
   (fuel-listener--setup-stack-mode))
 
@@ -169,6 +205,7 @@ buffer."
 (define-key fuel-listener-mode-map "\C-a" 'fuel-listener--bol)
 (define-key fuel-listener-mode-map "\C-ca" 'fuel-autodoc-mode)
 (define-key fuel-listener-mode-map "\C-ch" 'fuel-help)
+(define-key fuel-listener-mode-map "\C-cr" 'fuel-refresh-all)
 (define-key fuel-listener-mode-map "\C-cs" 'fuel-stack-mode)
 (define-key fuel-listener-mode-map "\C-cp" 'fuel-apropos)
 (define-key fuel-listener-mode-map "\M-." 'fuel-edit-word-at-point)

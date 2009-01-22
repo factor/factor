@@ -137,7 +137,8 @@
 
 (defun fuel-help--get-article (name label)
   (message "Retrieving article ...")
-  (let* ((cmd `(:fuel* ((,name fuel-get-article)) "fuel" t))
+  (let* ((name (if (listp name) (cons :seq name) name))
+         (cmd `(:fuel* ((,name fuel-get-article)) "fuel" t))
          (ret (fuel-eval--send/wait cmd))
          (res (fuel-eval--retort-result ret)))
     (if (not res)

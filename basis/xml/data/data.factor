@@ -17,10 +17,13 @@ C: <name> name
     [ [ main>> ] bi@ ?= ] 2tri and and ;
 
 : <simple-name> ( string -- name )
+    "" swap f <name> ;
+
+: <null-name> ( string -- name )
     f swap f <name> ;
 
 : assure-name ( string/name -- name )
-    dup name? [ <simple-name> ] unless ;
+    dup name? [ <null-name> ] unless ;
 
 TUPLE: opener name attrs ;
 C: <opener> opener
@@ -42,7 +45,7 @@ C: <element-decl> element-decl
 TUPLE: attlist-decl < directive name att-defs ;
 C: <attlist-decl> attlist-decl
 
-TUPLE: entity-decl < directive name def ;
+TUPLE: entity-decl < directive name def pe? ;
 C: <entity-decl> entity-decl
 
 TUPLE: system-id system-literal ;
@@ -53,6 +56,9 @@ C: <public-id> public-id
 
 TUPLE: doctype-decl < directive name external-id internal-subset ;
 C: <doctype-decl> doctype-decl
+
+TUPLE: notation-decl < directive name id ;
+C: <notation-decl> notation-decl
 
 TUPLE: instruction text ;
 C: <instruction> instruction

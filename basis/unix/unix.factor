@@ -1,4 +1,5 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2008 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel libc
 sequences continuations byte-arrays strings math namespaces
