@@ -51,4 +51,13 @@ PRIVATE>
 : <"
     "\">" parse-multiline-string parsed ; parsing
 
+: <'
+    "'>" parse-multiline-string parsed ; parsing
+
+: {'
+    "'}" parse-multiline-string parsed ; parsing
+
+: {"
+    "\"}" parse-multiline-string parsed ; parsing
+
 : /* "*/" parse-multiline-string drop ; parsing
