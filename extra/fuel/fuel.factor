@@ -1,11 +1,9 @@
 ! Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: accessors arrays assocs compiler.units definitions fuel.eval
-fuel.help fuel.remote help.markup help.topics io.pathnames kernel math
-math.order memoize namespaces parser sequences sets sorting
-tools.crossref tools.scaffold tools.vocabs vocabs vocabs.loader
-vocabs.parser words ;
+USING: assocs compiler.units fuel.eval fuel.help fuel.remote fuel.xref
+help.topics io.pathnames kernel namespaces parser sequences
+tools.scaffold vocabs.loader ;
 
 IN: fuel
 
@@ -51,92 +49,36 @@ PRIVATE>
 
 ! Edit locations
 
-<PRIVATE
-
-: fuel-normalize-loc ( seq -- path line )
-    [ dup length 0 > [ first (normalize-path) ] [ drop f ] if ]
-    [ dup length 1 > [ second ] [ drop 1 ] if ] bi ;
-
-: fuel-get-loc ( object -- )
-    fuel-normalize-loc 2array fuel-eval-set-result ;
-
-PRIVATE>
-
-: fuel-get-edit-location ( word -- ) where fuel-get-loc ; inline
+: fuel-get-word-location ( word -- )
+    word-location fuel-eval-set-result ;
 
 : fuel-get-vocab-location ( vocab -- )
-    >vocab-link fuel-get-edit-location ; inline
+    vocab-location fuel-eval-set-result ;
 
-: fuel-get-doc-location ( word -- ) props>> "help-loc" swap at fuel-get-loc ;
+: fuel-get-doc-location ( word -- )
+    doc-location fuel-eval-set-result ;
 
-: fuel-get-article-location ( name -- ) article loc>> fuel-get-loc ;
+: fuel-get-article-location ( name -- )
+    article-location fuel-eval-set-result ;
+
+: fuel-get-vocabs ( -- )
+    get-vocabs fuel-eval-set-result ;
+
+: fuel-get-vocabs/prefix ( prefix -- )
+    get-vocabs/prefix fuel-eval-set-result ;
+
+: fuel-get-words ( prefix names -- )
+    get-vocabs-words/prefix fuel-eval-set-result ;
 
 ! Cross-references
 
-<PRIVATE
+: fuel-callers-xref ( word -- ) callers-xref fuel-eval-set-result ;
 
-: fuel-word>xref ( word -- xref )
-    [ name>> ] [ vocabulary>> ] [ where fuel-normalize-loc ] tri 4array ;
+: fuel-callees-xref ( word -- ) callees-xref fuel-eval-set-result ;
 
-: fuel-sort-xrefs ( seq -- seq' )
-    [ [ first ] dip first <=> ] sort ; inline
+: fuel-apropos-xref ( str -- ) apropos-xref fuel-eval-set-result ;
 
-: fuel-format-xrefs ( seq -- seq' )
-    [ word? ] filter [ fuel-word>xref ] map ; inline
-
-: (fuel-index) ( seq -- seq )
-    [ [ >link name>> ] [ article-title ] bi 2array \ $subsection prefix ] map ;
-
-PRIVATE>
-
-: fuel-callers-xref ( word -- )
-    usage fuel-format-xrefs fuel-sort-xrefs fuel-eval-set-result ; inline
-
-: fuel-callees-xref ( word -- )
-    uses fuel-format-xrefs fuel-sort-xrefs fuel-eval-set-result ; inline
-
-: fuel-apropos-xref ( str -- )
-    words-matching fuel-format-xrefs fuel-eval-set-result ; inline
-
-: fuel-vocab-xref ( vocab -- )
-    words fuel-format-xrefs fuel-eval-set-result ; inline
-
-: fuel-index ( quot: ( -- seq ) -- )
-    call (fuel-index) fuel-eval-set-result ; inline
-
-! Completion support
-
-<PRIVATE
-
-: fuel-filter-prefix ( seq prefix -- seq )
-    [ drop-prefix nip length 0 = ] curry filter prune ; inline
-
-: (fuel-get-vocabs) ( -- seq )
-    all-vocabs-seq [ vocab-name ] map ; inline
-
-MEMO: (fuel-vocab-words) ( name -- seq )
-    >vocab-link words [ name>> ] map ;
-
-: fuel-current-words ( -- seq )
-    use get [ keys ] map concat ; inline
-
-: fuel-vocabs-words ( names -- seq )
-    prune [ (fuel-vocab-words) ] map concat ; inline
-
-: (fuel-get-words) ( prefix names/f -- seq )
-    [ fuel-vocabs-words ] [ fuel-current-words ] if* natural-sort
-    swap fuel-filter-prefix ;
-
-PRIVATE>
-
-: fuel-get-vocabs ( -- )
-    (fuel-get-vocabs) fuel-eval-set-result ;
-
-: fuel-get-vocabs/prefix ( prefix -- )
-    (fuel-get-vocabs) swap fuel-filter-prefix fuel-eval-set-result ;
-
-: fuel-get-words ( prefix names -- )
-    (fuel-get-words) fuel-eval-set-result ;
+: fuel-vocab-xref ( vocab -- ) vocab-xref fuel-eval-set-result ;
 
 ! Help support
 
@@ -155,6 +97,8 @@ PRIVATE>
 
 : fuel-vocab-summary ( name -- )
     (fuel-vocab-summary) fuel-eval-set-result ;
+
+: fuel-index ( quot -- ) call format-index fuel-eval-set-result ;
 
 : fuel-get-vocabs/tag ( tag -- )
     (fuel-get-vocabs/tag) fuel-eval-set-result ;
