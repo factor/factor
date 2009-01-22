@@ -80,6 +80,10 @@ PRIVATE>
 
 : fuel-vocab-xref ( vocab -- ) vocab-xref fuel-eval-set-result ;
 
+: fuel-vocab-uses-xref ( vocab -- ) vocab-uses-xref fuel-eval-set-result ;
+
+: fuel-vocab-usage-xref ( vocab -- ) vocab-usage-xref fuel-eval-set-result ;
+
 ! Help support
 
 : fuel-get-article ( name -- ) article fuel-eval-set-result ;

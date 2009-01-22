@@ -18,6 +18,9 @@ IN: fuel.xref
 : word>xref ( word -- xref )
     [ name>> ] [ vocabulary>> ] [ where normalize-loc ] tri 4array ;
 
+: vocab>xref ( vocab -- xref )
+    dup dup >vocab-link where normalize-loc 4array ;
+
 : sort-xrefs ( seq -- seq' )
     [ [ first ] dip first <=> ] sort ; inline
 
@@ -49,6 +52,10 @@ PRIVATE>
 : word-location ( word -- loc ) where get-loc ;
 
 : vocab-location ( vocab -- loc ) >vocab-link where get-loc ;
+
+: vocab-uses-xref ( vocab -- seq ) vocab-uses [ vocab>xref ] map ;
+
+: vocab-usage-xref ( vocab -- seq ) vocab-usage [ vocab>xref ] map ;
 
 : doc-location ( word -- loc ) props>> "help-loc" swap at get-loc ;
 

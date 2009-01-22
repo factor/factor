@@ -165,6 +165,11 @@ word."
         (indent-region start (point))))))
 
 
+;;; Rename word:
+
+
+
+
 ;;; Extract vocab:
 
 (defun fuel-refactor--insert-using (vocab)

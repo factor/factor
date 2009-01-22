@@ -45,7 +45,7 @@
 (defun fuel-edit--looking-at-vocab ()
   (save-excursion
     (fuel-syntax--beginning-of-defun)
-    (looking-at "USING:\\|USE:")))
+    (looking-at "USING:\\|USE:\\|IN:")))
 
 (defun fuel-edit--try-edit (ret)
   (let* ((err (fuel-eval--retort-error ret))
