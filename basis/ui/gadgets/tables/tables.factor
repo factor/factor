@@ -122,7 +122,7 @@ M: table layout*
     line-height /i ;
 
 : validate-row ( m table -- n )
-    control-value length 1- min 0 max ;
+    control-value [ drop f ] [ length 1- min 0 max ] if-empty ;
 
 : visible-row ( table quot -- n )
     '[
@@ -228,7 +228,7 @@ M: table model-changed
     row-rect [ { 0 1 } v* ] change-dim ;
 
 : (select-row) ( table n -- )
-    [ [ thin-row-rect ] [ drop ] 2bi scroll>rect ]
+    [ dup [ [ thin-row-rect ] [ drop ] 2bi scroll>rect ] [ 2drop ] if ]
     [ >>selected-index relayout-1 ]
     2bi ;
 
@@ -260,11 +260,14 @@ PRIVATE>
     [ show-row-summary ]
     2tri ;
 
+: prev/next-row ( table n -- )
+    [ dup selected-index>> ] dip '[ _ + ] [ 0 ] if* select-row ;
+    
 : prev-row ( table -- )
-    dup selected-index>> [ 1- ] [ 0 ] if* select-row ;
+    -1 prev/next-row ;
 
 : next-row ( table -- )
-    dup selected-index>> [ 1+ ] [ 0 ] if* select-row ;
+    1 prev/next-row ;
 
 : first-row ( table -- )
     0 select-row ;
