@@ -57,5 +57,13 @@ UNION: dtd-acceptable
     pass-blank get-char {
         { CHAR: % [ next pass-blank pe-table take-entity-def t ] }
         [ drop extra-entities take-entity-def f ]
-    } case
-    close <entity-decl> ;
+    } case close <entity-decl> ;
+
+: take-inner-directive ( string -- directive )
+    {
+        { "ELEMENT" [ take-element-decl ] }
+        { "ATTLIST" [ take-attlist-decl ] }
+        { "ENTITY" [ take-entity-decl ] }
+        { "NOTATION" [ take-notation-decl ] }
+        [ bad-directive ]
+    } case ;

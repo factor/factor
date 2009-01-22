@@ -136,16 +136,13 @@ DEFER: make-tag ! Is this unavoidable?
         { CHAR: > [ f f ] }
     } case <doctype-decl> ;
 
-
-: take-directive ( -- directive )
-    take-name {
-        { "ELEMENT" [ take-element-decl ] }
-        { "ATTLIST" [ take-attlist-decl ] }
-        { "DOCTYPE" [ take-doctype-decl ] }
-        { "ENTITY" [ take-entity-decl ] }
-        { "NOTATION" [ take-notation-decl ] }
-        [ bad-directive ]
-    } case ;
+: take-directive ( -- doctype )
+    take-name dup "DOCTYPE" =
+    [ drop take-doctype-decl ] [
+        in-dtd? get
+        [ take-inner-directive ]
+        [ misplaced-directive ] if
+    ] if ;
 
 : direct ( -- object )
     get-char {

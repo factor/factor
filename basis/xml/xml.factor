@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io io.encodings.binary io.files
-io.streams.string kernel namespaces sequences strings
+io.streams.string kernel namespaces sequences strings io.encodings.utf8
 xml.backend xml.data xml.errors xml.elements ascii xml.entities
 xml.writer xml.state xml.autoencoding assocs xml.tokenize xml.name ;
 IN: xml
@@ -163,3 +163,22 @@ TUPLE: pull-xml scope ;
 
 : file>xml ( filename -- xml )
     binary <file-reader> read-xml ;
+
+: (read-dtd) ( -- dtd )
+    ! should filter out blanks, throw error on non-dtd stuff
+    V{ } clone dup [ push ] curry sax-loop ;
+
+: read-dtd ( stream -- dtd entities )
+    [
+        t in-dtd? set
+        reset-prolog
+        H{ } clone extra-entities set
+        (read-dtd)
+        extra-entities get
+    ] with-state ;
+
+: file>dtd ( filename -- dtd entities )
+    utf8 <file-reader> read-dtd ;
+
+: string>dtd ( string -- dtd entities )
+    <string-reader> read-dtd ;

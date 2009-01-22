@@ -52,7 +52,6 @@ IN: xml.writer.tests
 <x>&foo;</x>"} pprint-reprints-as
 
 [ t ] [ "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd' >" dup string>xml-chunk xml-chunk>string = ] unit-test
-[ "foo" ] [ "<!ENTITY bar 'foo'><x>&bar;</x>" string>xml children>string ] unit-test
 [ V{ "hello" } ] [ "hello" string>xml-chunk ] unit-test
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b=\"c\"/>" ]
     [ "<a b='c'/>" string>xml xml>string ] unit-test

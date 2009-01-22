@@ -7,10 +7,7 @@ IN: xml.entities.html
 VALUE: html-entities
 
 : read-entities-file ( file -- table )
-    H{ } clone [ extra-entities [
-        binary <file-reader>
-        [ drop ] sax
-    ] with-variable ] keep ;
+    file>dtd nip ;
 
 : get-html ( -- table )
     { "lat1" "special" "symbol" } [
