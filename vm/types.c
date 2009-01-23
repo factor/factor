@@ -48,7 +48,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	word->def = userenv[UNDEFINED_ENV];
 	word->props = F;
 	word->counter = tag_fixnum(0);
-	word->compiledp = F;
+	word->optimizedp = F;
 	word->subprimitive = F;
 	word->profiling = NULL;
 	word->code = NULL;

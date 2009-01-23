@@ -315,7 +315,7 @@ void set_word_code(F_WORD *word, F_COMPILED *compiled)
 		critical_error("bad param to set_word_xt",(CELL)compiled);
 
 	word->code = compiled;
-	word->compiledp = T;
+	word->optimizedp = T;
 }
 
 /* Allocates memory */
@@ -326,7 +326,7 @@ void default_word_code(F_WORD *word, bool relocate)
 	UNREGISTER_UNTAGGED(word);
 
 	word->code = untag_quotation(word->def)->code;
-	word->compiledp = F;
+	word->optimizedp = F;
 }
 
 void primitive_modify_code_heap(void)
