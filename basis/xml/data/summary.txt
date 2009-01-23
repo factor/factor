@@ -1,0 +1,1 @@
+Contains XML data types and basic tools for manipulation
