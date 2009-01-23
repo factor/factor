@@ -122,6 +122,7 @@ beast.
     - C-cC-xr : extract region as a separate word
     - C-cC-xi : replace word at point by its definition
     - C-cC-xv : extract region as a separate vocabulary
+    - C-cC-xw : rename all uses of a word
 
 *** In the listener:
 

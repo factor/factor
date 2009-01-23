@@ -128,11 +128,17 @@ cursor at the first ocurrence of the used word."
       (message "")
       (fuel-popup--display (fuel-xref--buffer)))))
 
+(defun fuel-xref--callers (word)
+  (let ((cmd `(:fuel* (((:quote ,word) fuel-callers-xref)))))
+    (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+
 (defun fuel-xref--show-callers (word)
-  (let* ((cmd `(:fuel* (((:quote ,word) fuel-callers-xref))))
-         (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+  (let ((refs (fuel-xref--callers word)))
     (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word word))
-    (fuel-xref--fill-and-display word "using" res)))
+    (fuel-xref--fill-and-display word "using" refs)))
+
+(defun fuel-xref--word-callers-files (word)
+  (mapcar 'third (fuel-xref--callers word)))
 
 (defun fuel-xref--show-callees (word)
   (let* ((cmd `(:fuel* (((:quote ,word) fuel-callees-xref))))
