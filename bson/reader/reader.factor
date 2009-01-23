@@ -1,21 +1,21 @@
 USING: mirrors io io.encodings.utf8 io.encodings.binary math match kernel sequences
        splitting accessors io.streams.byte-array namespaces prettyprint
        bson.constants assocs alien.c-types alien.strings fry words
-       tools.walker serialize locals byte-arrays ;
+       serialize byte-arrays ;
 
 IN: bson.reader
-
-ERROR: size-mismatch actual declared ;
 
 <PRIVATE
 
 TUPLE: element { type integer } name ;
-TUPLE: state { size initial: -1 } { read initial: 0 } exemplar result scope element ;
+TUPLE: state
+    { size initial: -1 } { read initial: 0 } exemplar
+    result scope element ;
 
-:: <state> ( exemplar -- state )
-    state new  
-    exemplar clone >>exemplar
-    exemplar clone [ >>result ] [ V{ } clone [ push ] keep >>scope ] bi
+: <state> ( exemplar -- state )
+    [ state new ] dip
+    [ clone >>exemplar ] keep
+    clone [ >>result ] [ V{ } clone [ push ] keep >>scope ] bi
     V{ } clone [ T_Object "" element boa swap push ] keep >>element ; inline
 
 PREDICATE: bson-eoo     < integer T_EOO = ;
@@ -101,6 +101,18 @@ M: bson-array fix-result ( assoc type -- result )
     drop
     values ;
 
+GENERIC: end-element ( type -- )
+
+M: bson-object end-element ( type -- )
+    drop ;
+
+M: bson-array end-element ( type -- )
+    drop ;
+
+M: object end-element ( type -- )
+    drop
+    pop-element drop ;
+
 M: bson-eoo element-read ( type -- cont? )
     drop
     get-state scope>> [ pop ] keep swap ! vec assoc
@@ -113,9 +125,10 @@ M: bson-eoo element-read ( type -- cont? )
 M: bson-not-eoo element-read ( type -- cont? )
     [ peek-scope ] dip                                 ! scope type 
     '[  _ 
-        read-cstring push-element [ name>> ] [ type>> ] bi 
-        element-data-read 
-        swap
+       read-cstring push-element [ name>> ] [ type>> ] bi 
+       [ element-data-read ] keep
+       end-element
+       swap
     ] dip    
     set-at
     t ;
@@ -124,8 +137,7 @@ M: bson-oid element-data-read ( type -- object )
     drop
     read-longlong
     read-int32
-    oid boa
-    pop-element drop ;
+    oid boa ;
 
 : [scope-changer] ( state -- state quot )
     dup exemplar>> '[ [ [ _ clone ] dip push ] keep ] ; inline
@@ -145,28 +157,34 @@ M: bson-array element-data-read ( type -- object )
     
 M: bson-string element-data-read ( type -- object )
     drop
-    read-int32 read-sized-string
-    pop-element drop ;
+    read-int32 read-sized-string ;
 
 M: bson-integer element-data-read ( type -- object )
     drop
-    read-int32
-    pop-element drop ;
+    read-int32 ;
 
 M: bson-double element-data-read ( type -- double )
     drop
-    read-double
-    pop-element drop ;
+    read-double ;
 
 M: bson-boolean element-data-read ( type -- boolean )
     drop
-    read-byte t =
-    pop-element drop ;
+    read-byte t = ;
+
+M: bson-ref element-data-read ( type -- dbref )
+    drop
+    read-int32
+    read-sized-string
+    T_OID element-data-read
+    dbref boa ;
 
 M: bson-binary element-data-read ( type -- binary )
     drop
-    read-int32 read-byte element-binary-read
-    pop-element drop ;
+    read-int32 read-byte element-binary-read ;
+
+M: bson-null element-data-read ( type -- bf  )
+    drop
+    f ;
 
 M: bson-binary-bytes element-binary-read ( size type -- bytes )
     drop read ;
@@ -176,17 +194,13 @@ M: bson-binary-function element-binary-read ( size type -- quot )
 
 PRIVATE>
 
-GENERIC: stream>assoc ( exemplar -- assoc )
-
-M: assoc stream>assoc ( exemplar -- assoc )
+: stream>assoc ( exemplar -- assoc )
     <state> dup state
         [ read-int32 >>size read-elements ] with-variable 
         result>> ;
-
-USING: multi-methods ;
-    
-GENERIC: array>assoc ( array exemplar -- assoc )
-    
-METHOD: array>assoc { byte-array assoc } ( array exemplar -- assoc )
+        
+: array>assoc  ( array exemplar -- assoc )
     [ binary ] dip '[ _ stream>assoc ] with-byte-reader ;
 
+: array>hashtable ( array -- assoc )
+    H{ } array>assoc ;

@@ -1,31 +1,40 @@
-USING: alien.c-types ;
+USING: alien.c-types accessors kernel calendar random math.bitwise math unix ;
 
 IN: bson.constants
 
 TUPLE: oid { a initial: 0 } { b initial: 0 } ;
 
+: <oid> ( -- oid )
+    oid new
+    now timestamp>micros >>a
+    8 random-bits 16 shift HEX: FF0000 mask
+    getpid HEX: FFFF mask
+    bitor >>b ;
 
-: T_EOO ( -- type ) 0 ; inline
-: T_Double ( -- type ) 1 ; inline
-: T_Integer ( -- type ) 16 ; inline
-: T_Boolean ( -- type ) 8 ; inline
-: T_String ( -- type ) 2 ; inline
-: T_Object ( -- type ) 3 ; inline
-: T_Array ( -- type ) 4 ; inline
-: T_Binary ( -- type ) 5 ; inline
-: T_Undefined ( -- type ) 6 ; inline
-: T_OID ( -- type ) 7 ; inline
-: T_Date ( -- type ) 9 ; inline
-: T_NULL ( -- type ) 10 ; inline
-: T_Regexp ( -- type ) 11 ; inline
-: T_DBRef ( -- type ) 12 ; inline
-: T_Code ( -- type ) 13 ; inline
-: T_ScopedCode ( -- type ) 17 ; inline
-: T_Symbol ( -- type ) 14 ; inline
-: T_JSTypeMax ( -- type ) 16 ; inline
-: T_MaxKey ( -- type ) 127 ; inline
+TUPLE: dbref ns oid ;
 
-: T_Binary_Bytes ( -- subtype ) 2 ; inline
-: T_Binary_Function ( -- subtype ) 1 ; inline 
+
+CONSTANT: T_EOO  0  
+CONSTANT: T_Double  1  
+CONSTANT: T_Integer  16  
+CONSTANT: T_Boolean  8  
+CONSTANT: T_String  2  
+CONSTANT: T_Object  3  
+CONSTANT: T_Array  4  
+CONSTANT: T_Binary  5  
+CONSTANT: T_Undefined  6  
+CONSTANT: T_OID  7  
+CONSTANT: T_Date  9  
+CONSTANT: T_NULL  10  
+CONSTANT: T_Regexp  11  
+CONSTANT: T_DBRef  12  
+CONSTANT: T_Code  13  
+CONSTANT: T_ScopedCode  17  
+CONSTANT: T_Symbol  14  
+CONSTANT: T_JSTypeMax  16  
+CONSTANT: T_MaxKey  127  
+
+CONSTANT: T_Binary_Bytes 2  
+CONSTANT: T_Binary_Function 1   
 
 

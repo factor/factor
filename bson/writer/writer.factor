@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bson bson.constants accessors kernel io.streams.string
        io.encodings.binary classes byte-arrays quotations serialize
-       io.encodings.utf8 strings splitting math.parser locals
+       io.encodings.utf8 strings splitting math.parser 
        sequences math assocs classes words make fry 
        prettyprint hashtables mirrors alien.strings alien.c-types
        io.streams.byte-array io ;
@@ -19,7 +19,8 @@ GENERIC: bson-write ( obj -- )
 M: t bson-type? ( boolean -- type ) drop T_Boolean ; 
 M: f bson-type? ( boolean -- type ) drop T_Boolean ; 
 
-M: oid bson-type? ( word -- type ) drop T_OID ; 
+M: oid bson-type? ( word -- type ) drop T_OID ;
+M: dbref bson-type? ( dbref -- type ) drop T_DBRef ;
 M: real bson-type? ( real -- type ) drop T_Double ; 
 M: word bson-type? ( word -- type ) drop T_String ; 
 M: tuple bson-type? ( tuple -- type ) drop T_Object ;  
@@ -28,7 +29,6 @@ M: string bson-type? ( string -- type ) drop T_String ;
 M: integer bson-type? ( integer -- type ) drop T_Integer ; 
 M: sequence bson-type? ( seq -- type ) drop T_Array ; 
 M: quotation bson-type? ( quotation -- type ) drop T_Binary ; 
-M: bson-null bson-type? ( null -- type ) drop T_NULL ; 
 M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ; 
 
 : write-byte ( byte -- ) <char> write ; inline
@@ -47,9 +47,6 @@ M: f bson-write ( f -- )
 
 M: t bson-write ( t -- )
     drop 1 write-byte ;
-
-M: bson-null bson-write ( null -- )
-    drop ;
 
 M: string bson-write ( obj -- )
     utf8 string>alien 
@@ -74,6 +71,12 @@ M: quotation bson-write ( quotation -- )
 
 M: oid bson-write ( oid -- )
     [ a>> write-longlong ] [ b>> write-int32 ] bi ;
+
+M: dbref bson-write ( dbref -- )
+    [ ns>> utf8 string>alien 
+      [ length write-int32 ] keep write
+    ]
+    [ oid>> bson-write ] bi ;
     
 M: sequence bson-write ( array -- )
     '[ _ [ [ write-type ] dip number>string write-cstring bson-write ]

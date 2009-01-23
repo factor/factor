@@ -1,81 +1,129 @@
-USING: accessors classes classes.mixin classes.tuple compiler.units
-fry kernel words locals mirrors formatting assocs hashtables ;
+USING: accessors assocs classes fry kernel linked-assocs math mirrors
+namespaces sequences strings vectors words bson.constants 
+continuations ;
 
 IN: mongodb.persistent
 
-MIXIN: persistent-tuple
+MIXIN: mdb-persistent
 
-SLOT: _p_oid
-SLOT: _p_info
+SLOT: _id
 
-TUPLE: oid { a initial: 0 } { b initial: 0 } ;
+CONSTANT: MDB_P_SLOTS { "_id" } 
+CONSTANT: MDB_OID "_id"
 
-: MDB_CLASS ( -- string ) "p_class" ; inline
-: MDB_VOCAB ( -- string ) "p_vocab" ; inline
-: MDB_MT ( -- string ) "p_mt" ; inline
-: MDB_CT ( -- string ) "p_ct" ; inline
-: MDB_COL ( -- string ) "p_col" ; inline 
+SYMBOL: mdb-op-seq
 
-PREDICATE: pinfo-hashtable < hashtable  [ MDB_CLASS swap key? ] [ MDB_VOCAB swap key? ] bi and ;
+GENERIC# tuple>assoc 1 ( tuple exemplar -- assoc )
 
-: P_OID ( -- name ) "_p_oid" ; inline
-: P_INFO ( -- name ) "_p_info" ; inline
+: tuple>linked-assoc ( tuple -- linked-assoc )
+    <linked-hash> tuple>assoc ; inline
 
-: P_SLOTS ( -- array )
-    { "_p_oid" "_p_info" } ;
+GENERIC# tuple>query 1 ( tuple examplar -- query-assoc )
+
+GENERIC: mdb-collection>> ( tuple -- string )
+
+GENERIC: mdb-slot-definitions>> ( tuple -- string )
+
+
+DEFER: assoc>tuple
+DEFER: create-mdb-command
 
 <PRIVATE
 
-: P_VOCAB ( -- string )
-    "mongodb.persistent" ; inline
+CONSTANT: MDB_INFO "_mdb_info"
 
-:: define-persistent-tuple ( superclass name -- class )
-    [let | pclass [ name P_VOCAB create ] |
-        [ pclass pclass [  ] curry define ] with-compilation-unit
-        [ pclass superclass P_SLOTS define-tuple-class
-          pclass persistent-tuple add-mixin-instance ] with-compilation-unit
-        pclass ] ; 
+: <dbref> ( tuple -- dbref )
+    [ mdb-collection>> ] [ _id>> ] bi dbref boa ; inline
+
+: mdbinfo>tuple-class ( mdbinfo -- class )
+    [ first ] keep second lookup ; inline
+
+: make-tuple ( assoc -- tuple )
+    [ MDB_INFO swap at mdbinfo>tuple-class new ] keep ! instance assoc
+    [ dup <mirror> [ keys ] keep ] dip ! instance array mirror assoc
+    '[ dup _ [ _ at assoc>tuple ] dip [ swap ] dip set-at ] each ;  
+
+: persistent-info ( tuple -- pinfo )
+    class V{ } clone tuck  
+    [ [ name>> ] dip push ]
+    [ [ vocabulary>> ] dip push ] 2bi ; inline
+
+: id-or-f? ( key value -- key value boolean )
+    over "_id" = 
+    [ dup f = ] dip or ; inline
+
+: write-persistent-info ( mirror exemplar assoc -- )
+    [ drop ] dip 
+    2dup [ "_id" ] 2dip [ over [ at ] dip ] dip set-at
+    [ object>> persistent-info MDB_INFO ] dip set-at ;    
+
+: persistent-tuple? ( object -- object boolean )
+    dup mdb-persistent? ; inline
+
+: ensure-value-ht ( key ht -- vht )
+    2dup key?
+    [ at ]
+    [ [ H{ } clone dup ] 2dip set-at ] if ; inline
+
+: data-tuple? ( tuple -- ? )
+    dup tuple? [ assoc? [ f ] [ t ] if ] [ drop f ] if  ;
+
+: write-tuple-fields ( mirror exemplar assoc -- )
+    [ dup ] dip ! m e e a
+    '[ id-or-f?
+       [ 2drop ]
+       [ persistent-tuple?
+         [ _ keep
+           [ mdb-collection>> ] keep
+           [ create-mdb-command ] dip
+           <dbref> ]
+         [ dup data-tuple? _ [ ] if ] if
+         swap _ set-at
+       ] if
+    ] assoc-each ; 
+
+: prepare-assoc ( tuple exemplar -- assoc mirror exemplar assoc )
+    [ <mirror> ] dip dup clone swap [ tuck ] dip swap ; inline
     
-:: copy-slots ( tuple 'tuple -- 'tuple )
-    [let | tm1 [ tuple <mirror> ]
-           tm2 [ 'tuple <mirror> ] |
-        tm1 [ swap tm2 set-at ] assoc-each
-        tm2 object>> ] ;
-    
+: ensure-mdb-info ( tuple -- tuple )    
+    dup _id>> [ <oid> >>_id ] unless ; inline
+  
+: with-op-seq ( quot -- op-seq )
+    [
+        [ H{ } clone mdb-op-seq set ] dip call mdb-op-seq get
+    ] with-scope ; inline
+
 PRIVATE>
 
-GENERIC: persistent-tuple-class ( tuple -- class )
+: create-mdb-command ( assoc ns -- )
+    mdb-op-seq get
+    ensure-value-ht
+    [ dup [ MDB_OID ] dip at ] dip
+    set-at ; inline
 
-M: tuple persistent-tuple-class ( tuple -- class )
-    class persistent-tuple-class ;
+: prepare-store ( mdb-persistent -- op-seq )
+    '[ _ [ tuple>linked-assoc ] keep mdb-collection>> create-mdb-command ]
+    with-op-seq ; inline
 
-M: pinfo-hashtable persistent-tuple-class ( tuple -- class )
-    [ MDB_CLASS swap at ] [ MDB_VOCAB swap at ] bi lookup
-    persistent-tuple-class ;
+M: mdb-persistent tuple>assoc ( tuple exemplar -- assoc )
+    [ ensure-mdb-info ] dip ! tuple exemplar
+    prepare-assoc
+    [ write-persistent-info ]
+    [ [ '[ _ tuple>assoc ] ] dip write-tuple-fields ] 3bi ;
 
-M: tuple-class persistent-tuple-class ( class -- class' )
-    [ [ vocabulary>> ] [ name>> ] bi ] keep ! name vocab class
-    [ "%s_%s" sprintf ] dip swap dup   ! class new_name new_name
-    P_VOCAB lookup dup                 ! class new_name vo/f vo/f
-    [ [ drop drop ] dip ] [ drop define-persistent-tuple ] if ;
+M: tuple tuple>assoc ( tuple exemplar -- assoc )
+    [ drop persistent-info MDB_INFO ] 2keep
+    prepare-assoc [ '[ _ tuple>assoc ] ] write-tuple-fields
+    [ set-at ] keep ;
+
+M: tuple tuple>query ( tuple examplar -- assoc )
+    prepare-assoc [ '[ _ tuple>query ] ] dip write-tuple-fields ;
+
+: assoc>tuple ( assoc -- tuple )
+    dup assoc?
+    [ [ dup MDB_INFO swap key?
+        [ make-tuple ]
+        [ ] if ] [ drop ] recover
+    ] [ ] if ; inline
 
 
-GENERIC: make-persistent ( tuple -- 'tuple )
-
-M: tuple make-persistent ( tuple -- 'tuple )
-    [let* | tuple [  ]
-            tclass [ tuple class ]
-            'tuple [ tclass persistent-tuple-class new ]
-            pinfo  [ H{  } clone ] |
-        tuple 'tuple copy-slots
-        oid new >>_p_oid
-        tclass name>> MDB_CLASS pinfo set-at
-        tclass vocabulary>> MDB_VOCAB pinfo set-at
-        0 MDB_MT pinfo set-at
-        0 MDB_CT pinfo set-at
-        "" MDB_COL pinfo set-at
-         pinfo >>_p_info
-    ] ; 
-
-M: persistent-tuple make-persistent ( tuple -- tuple )
-    ;
