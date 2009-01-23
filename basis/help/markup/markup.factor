@@ -246,7 +246,7 @@ M: f ($instance)
 : $or ( element -- )
     dup length {
         { 1 [ first ($instance) ] }
-        { 2 [ first2 [ ($instance) " or " print-element ] [ ($instance) ] bi ] }
+        { 2 [ first2 [ ($instance) " or " print-element ] [ ($instance) ] bi* ] }
         [
             drop
             unclip-last
