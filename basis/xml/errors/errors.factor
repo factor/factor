@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml.data xml.writer kernel generic io prettyprint math 
 debugger sequences xml.state accessors summary
-namespaces io.streams.string xml.backend xml.writer.private ;
+namespaces io.streams.string ;
 IN: xml.errors
 
 TUPLE: parsing-error line column ;
