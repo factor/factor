@@ -74,7 +74,7 @@ HELP: replacement-char
 { $description "A code point that replaces input that could not be decoded. The presence of this character in the decoded data usually signifies an error." } ;
 
 ARTICLE: "encodings-descriptors" "Encoding descriptors"
-"An encoding descriptor is something which can be used for input or output streams to encode or decode bytes stored in a certain representation. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use are defined in the following vocabularies:"
+"An encoding descriptor is something which can be used with binary input or output streams to encode or decode bytes stored in a certain representation. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use are defined in the following vocabularies:"
 { $subsection "io.encodings.binary" }
 { $subsection "io.encodings.utf8" }
 { $subsection "io.encodings.utf16" }
@@ -99,7 +99,13 @@ ARTICLE: "encodings-constructors" "Manually constructing an encoded stream"
 { $subsection <decoder> } ;
 
 ARTICLE: "io.encodings" "I/O encodings"
-"The " { $vocab-link "io.encodings" } " vocabulary provides utilities for encoding and decoding bytes that represent text. Both strings and streams may be encoded."
+"The " { $vocab-link "io.encodings" } " vocabulary provides utilities for encoding and decoding bytes that represent text. Encodings can be used in the following situations:"
+{ $list
+  "With binary input streams, to convert bytes to characters"
+  "With binary output streams, to convert characters to bytes"
+  "With byte arrays, to convert bytes to characters"
+  "With strings, to convert characters to bytes"
+}
 { $subsection "encodings-descriptors" }
 { $subsection "encodings-constructors" }
 { $subsection "io.encodings.string" }
@@ -113,6 +119,7 @@ ARTICLE: "io.encodings" "I/O encodings"
 { $subsection re-decode }
 "Combinators to change the encoding:"
 { $subsection with-encoded-output }
-{ $subsection with-decoded-input } ;
+{ $subsection with-decoded-input }
+{ $see-also "encodings-introduction" "stream-elements" } ;
 
 ABOUT: "io.encodings"
