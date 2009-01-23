@@ -49,10 +49,10 @@ SYMBOL: xml-file
 [ "foo" ] [ "<boo><![CDATA[foo]]></boo>" string>xml children>string ] unit-test
 [ "<!-- B+, B, or B--->" string>xml ] must-fail
 [ ] [ "<?xml version='1.0'?><!-- declarations for <head> & <body> --><foo/>" string>xml drop ] unit-test
-[ T{ element-decl f "br" "EMPTY" } ] [ "<!ELEMENT br EMPTY>" string>dtd drop second ] unit-test
-[ T{ element-decl f "p" "(#PCDATA|emph)*" } ] [ "<!ELEMENT p (#PCDATA|emph)*>" string>dtd drop second ] unit-test
-[ T{ element-decl f "%name.para;" "%content.para;" } ] [ "<!ELEMENT %name.para; %content.para;>" string>dtd drop second ] unit-test
-[ T{ element-decl f "container" "ANY" } ] [ "<!ELEMENT container ANY>" string>dtd drop second ] unit-test
+[ T{ element-decl f "br" "EMPTY" } ] [ "<!ELEMENT br EMPTY>" string>dtd directives>> first ] unit-test
+[ T{ element-decl f "p" "(#PCDATA|emph)*" } ] [ "<!ELEMENT p (#PCDATA|emph)*>" string>dtd directives>> first ] unit-test
+[ T{ element-decl f "%name.para;" "%content.para;" } ] [ "<!ELEMENT %name.para; %content.para;>" string>dtd directives>> first ] unit-test
+[ T{ element-decl f "container" "ANY" } ] [ "<!ELEMENT container ANY>" string>dtd directives>> first ] unit-test
 [ T{ doctype-decl f "foo" } ] [ "<!DOCTYPE foo>" string>xml-chunk first ] unit-test
 [ T{ doctype-decl f "foo" } ] [ "<!DOCTYPE foo >" string>xml-chunk first ] unit-test
 [ T{ doctype-decl f "foo" T{ system-id f "blah.dtd" } } ] [ "<!DOCTYPE foo SYSTEM 'blah.dtd'>" string>xml-chunk first ] unit-test

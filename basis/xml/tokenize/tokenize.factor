@@ -75,12 +75,7 @@ IN: xml.tokenize
     dup length rot length 1- - head
     get-char [ missing-close ] unless next ;
 
-: expect ( ch -- )
-    get-char 2dup = [ 2drop ] [
-        [ 1string ] bi@ expected
-    ] if next ;
-
-: expect-string ( string -- )
+: expect ( string -- )
     dup [ get-char next ] replicate 2dup =
     [ 2drop ] [ expected ] if ;
 
@@ -95,9 +90,6 @@ IN: xml.tokenize
     "#" ?head [
         "x" ?head 16 10 ? base> ,
     ] [ parse-named-entity ] if ;
-
-SYMBOL: pe-table
-SYMBOL: in-dtd?
 
 : parse-pe ( -- )
     next CHAR: ; take-char dup next
@@ -131,7 +123,7 @@ SYMBOL: in-dtd?
     ] parse-char ;
 
 : close ( -- )
-    pass-blank CHAR: > expect ;
+    pass-blank ">" expect ;
 
 : normalize-quote ( str -- str )
     [ dup "\t\r\n" member? [ drop CHAR: \s ] when ] map ;

@@ -136,10 +136,10 @@ M: public-id write-xml-chunk
     [ pubid-literal>> write "' '" write ]
     [ system-literal>> write "'" write ] bi ;
 
-: write-internal-subset ( seq -- )
+: write-internal-subset ( dtd -- )
     [
         "[" write indent
-        [ ?indent write-xml-chunk ] each
+        directives>> [ ?indent write-xml-chunk ] each
         unindent ?indent "]" write
     ] when* ;
 
