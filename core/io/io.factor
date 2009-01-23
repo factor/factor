@@ -4,26 +4,18 @@ USING: hashtables generic kernel math namespaces make sequences
 continuations destructors assocs ;
 IN: io
 
+GENERIC: stream-read1 ( stream -- elt )
+GENERIC: stream-read ( n stream -- seq )
+GENERIC: stream-read-until ( seps stream -- seq sep/f )
+GENERIC: stream-read-partial ( n stream -- seq )
 GENERIC: stream-readln ( stream -- str/f )
-GENERIC: stream-read1 ( stream -- ch/f )
-GENERIC: stream-read ( n stream -- str/f )
-GENERIC: stream-read-until ( seps stream -- str/f sep/f )
-GENERIC: stream-read-partial ( n stream -- str/f )
-GENERIC: stream-write1 ( ch stream -- )
-GENERIC: stream-write ( str stream -- )
+
+GENERIC: stream-write1 ( elt stream -- )
+GENERIC: stream-write ( seq stream -- )
 GENERIC: stream-flush ( stream -- )
 GENERIC: stream-nl ( stream -- )
 
-: stream-print ( str stream -- )
-    [ stream-write ] keep stream-nl ;
-
-: (stream-copy) ( in out -- )
-    64 1024 * pick stream-read-partial
-    [ over stream-write (stream-copy) ] [ 2drop ] if* ;
-
-: stream-copy ( in out -- )
-    [ 2dup (stream-copy) ] [ dispose dispose ] [ ]
-    cleanup ;
+: stream-print ( str stream -- ) [ stream-write ] keep stream-nl ;
 
 ! Default streams
 SYMBOL: input-stream
@@ -31,13 +23,13 @@ SYMBOL: output-stream
 SYMBOL: error-stream
 
 : readln ( -- str/f ) input-stream get stream-readln ;
-: read1 ( -- ch/f ) input-stream get stream-read1 ;
-: read ( n -- str/f ) input-stream get stream-read ;
-: read-until ( seps -- str/f sep/f ) input-stream get stream-read-until ;
-: read-partial ( n -- str/f ) input-stream get stream-read-partial ;
+: read1 ( -- elt ) input-stream get stream-read1 ;
+: read ( n -- seq ) input-stream get stream-read ;
+: read-until ( seps -- seq sep/f ) input-stream get stream-read-until ;
+: read-partial ( n -- seq ) input-stream get stream-read-partial ;
 
-: write1 ( ch -- ) output-stream get stream-write1 ;
-: write ( str -- ) output-stream get stream-write ;
+: write1 ( elt -- ) output-stream get stream-write1 ;
+: write ( seq -- ) output-stream get stream-write ;
 : flush ( -- ) output-stream get stream-flush ;
 
 : nl ( -- ) output-stream get stream-nl ;
@@ -62,17 +54,32 @@ SYMBOL: error-stream
     [ [ drop dispose dispose ] 3curry ] 3bi
     [ ] cleanup ; inline
 
-: print ( string -- ) output-stream get stream-print ;
+: print ( str -- ) output-stream get stream-print ;
 
 : bl ( -- ) " " write ;
 
 : lines ( stream -- seq )
     [ [ readln dup ] [ ] [ drop ] produce ] with-input-stream ;
 
-: each-line ( quot -- )
-    [ [ readln dup ] ] dip [ drop ] while ; inline
+<PRIVATE
 
-: contents ( stream -- str )
+: each-morsel ( handler: ( data -- ) reader: ( -- data ) -- )
+    [ dup ] compose swap [ drop ] while ; inline
+
+PRIVATE>
+
+: each-line ( quot -- )
+    [ readln ] each-morsel ; inline
+
+: contents ( stream -- seq )
     [
-        [ 65536 read dup ] [ ] [ drop ] produce concat f like
+        [ 65536 read-partial dup ]
+        [ ] [ drop ] produce concat f like
     ] with-input-stream ;
+
+: each-block ( quot: ( block -- ) -- )
+    [ 8192 read-partial ] each-morsel ; inline
+
+: stream-copy ( in out -- )
+    [ [ [ write ] each-block ] with-output-stream ]
+    curry with-input-stream ;
