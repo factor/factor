@@ -59,7 +59,7 @@ typedef struct {
 
 void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value);
 
-void relocate_code_block(F_COMPILED *relocating, CELL code_start, CELL literals_start);
+void relocate_code_block(F_COMPILED *relocating);
 
 void default_word_code(F_WORD *word, bool relocate);
 
@@ -70,9 +70,12 @@ F_COMPILED *add_compiled_block(
 	F_ARRAY *code,
 	F_ARRAY *labels,
 	CELL relocation,
-	F_ARRAY *literals);
+	CELL literals);
 
 CELL compiled_code_format(void);
+
 bool stack_traces_p(void);
 
 void primitive_modify_code_heap(void);
+
+void flush_icache_for(F_COMPILED *compiled);

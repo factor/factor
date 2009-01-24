@@ -344,12 +344,12 @@ void jit_compile(CELL quot, bool relocate)
 		untag_object(code),
 		NULL,
 		relocation,
-		untag_object(literals));
+		literals);
 
 	set_quot_xt(untag_object(quot),compiled);
 
 	if(relocate)
-		iterate_code_heap_step(compiled,relocate_code_block);
+		relocate_code_block(compiled);
 
 	UNREGISTER_ROOT(literals);
 	UNREGISTER_ROOT(relocation);

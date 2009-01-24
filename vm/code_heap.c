@@ -7,17 +7,12 @@ void undefined_symbol(void)
 	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
 }
 
-INLINE CELL get_literal(CELL literals_start, CELL num)
-{
-	return get(CREF(literals_start,num));
-}
-
 /* Look up an external library symbol referenced by a compiled code block */
-void *get_rel_symbol(F_REL *rel, CELL literals_start)
+void *get_rel_symbol(F_REL *rel, F_ARRAY *literals)
 {
 	CELL arg = REL_ARGUMENT(rel);
-	CELL symbol = get_literal(literals_start,arg);
-	CELL library = get_literal(literals_start,arg + 1);
+	CELL symbol = array_nth(literals,arg);
+	CELL library = array_nth(literals,arg + 1);
 
 	F_DLL *dll = (library == F ? NULL : untag_dll(library));
 
@@ -50,9 +45,10 @@ void *get_rel_symbol(F_REL *rel, CELL literals_start)
 }
 
 /* Compute an address to store at a relocation */
-INLINE CELL compute_code_rel(F_REL *rel,
-	CELL code_start, CELL literals_start)
+INLINE CELL compute_code_rel(F_REL *rel, F_COMPILED *compiled)
 {
+	F_ARRAY *literals = untag_object(compiled->literals);
+
 	CELL obj;
 
 	switch(REL_TYPE(rel))
@@ -60,19 +56,19 @@ INLINE CELL compute_code_rel(F_REL *rel,
 	case RT_PRIMITIVE:
 		return (CELL)primitives[REL_ARGUMENT(rel)];
 	case RT_DLSYM:
-		return (CELL)get_rel_symbol(rel,literals_start);
+		return (CELL)get_rel_symbol(rel,literals);
 	case RT_IMMEDIATE:
-		return get(CREF(literals_start,REL_ARGUMENT(rel)));
+		return array_nth(literals,REL_ARGUMENT(rel));
 	case RT_XT:
-		obj = get(CREF(literals_start,REL_ARGUMENT(rel)));
+		obj = array_nth(literals,REL_ARGUMENT(rel));
 		if(type_of(obj) == WORD_TYPE)
 			return (CELL)untag_word(obj)->xt;
 		else
 			return (CELL)untag_quotation(obj)->xt;
 	case RT_HERE:
-		return rel->offset + code_start + (short)REL_ARGUMENT(rel);
+		return rel->offset + (CELL)(compiled + 1) + (short)REL_ARGUMENT(rel);
 	case RT_LABEL:
-		return code_start + REL_ARGUMENT(rel);
+		return (CELL)(compiled + 1) + REL_ARGUMENT(rel);
 	case RT_STACK_CHAIN:
 		return (CELL)&stack_chain;
 	default:
@@ -145,7 +141,7 @@ void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value)
 }
 
 /* Perform all fixups on a code block */
-void relocate_code_block(F_COMPILED *compiled, CELL code_start, CELL literals_start)
+void relocate_code_block(F_COMPILED *compiled)
 {
 	compiled->last_scan = NURSERY;
 
@@ -158,10 +154,9 @@ void relocate_code_block(F_COMPILED *compiled, CELL code_start, CELL literals_st
 
 		while(rel < rel_end)
 		{
-			CELL offset = rel->offset + code_start;
+			CELL offset = rel->offset + (CELL)(compiled + 1);
 
-			F_FIXNUM absolute_value = compute_code_rel(
-				rel,code_start,literals_start);
+			F_FIXNUM absolute_value = compute_code_rel(rel,compiled);
 
 			apply_relocation(REL_CLASS(rel),offset,absolute_value);
 
@@ -169,11 +164,11 @@ void relocate_code_block(F_COMPILED *compiled, CELL code_start, CELL literals_st
 		}
 	}
 
-	flush_icache(code_start,literals_start - code_start);
+	flush_icache_for(compiled);
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
-void fixup_labels(F_ARRAY *labels, CELL code_format, CELL code_start)
+void fixup_labels(F_ARRAY *labels, CELL code_format, F_COMPILED *compiled)
 {
 	CELL i;
 	CELL size = array_capacity(labels);
@@ -185,8 +180,8 @@ void fixup_labels(F_ARRAY *labels, CELL code_format, CELL code_start)
 		CELL target = to_fixnum(array_nth(labels,i + 2));
 
 		apply_relocation(class,
-			offset + code_start,
-			target + code_start);
+			offset + (CELL)(compiled + 1),
+			target + (CELL)(compiled + 1));
 	}
 }
 
@@ -210,12 +205,6 @@ void deposit_integers(CELL here, F_ARRAY *array, CELL format)
 	}
 }
 
-/* Write a sequence of tagged pointers to memory */
-void deposit_objects(CELL here, F_ARRAY *array)
-{
-	memcpy((void*)here,array + 1,array_capacity(array) * CELLS);
-}
-
 bool stack_traces_p(void)
 {
 	return to_boolean(userenv[STACK_TRACES_ENV]);
@@ -226,18 +215,18 @@ CELL compiled_code_format(void)
 	return untag_fixnum_fast(userenv[JIT_CODE_FORMAT]);
 }
 
-CELL allot_code_block(CELL size)
+void *allot_code_block(CELL size)
 {
-	CELL start = heap_allot(&code_heap,size);
+	void *start = heap_allot(&code_heap,size);
 
 	/* If allocation failed, do a code GC */
-	if(start == 0)
+	if(start == NULL)
 	{
 		gc();
 		start = heap_allot(&code_heap,size);
 
 		/* Insufficient room even after code GC, give up */
-		if(start == 0)
+		if(start == NULL)
 		{
 			CELL used, total_free, max_free;
 			heap_usage(&code_heap,&used,&total_free,&max_free);
@@ -259,54 +248,41 @@ F_COMPILED *add_compiled_block(
 	F_ARRAY *code,
 	F_ARRAY *labels,
 	CELL relocation,
-	F_ARRAY *literals)
+	CELL literals)
 {
 	CELL code_format = compiled_code_format();
-
 	CELL code_length = align8(array_capacity(code) * code_format);
-	CELL literals_length = array_capacity(literals) * CELLS;
 
+	REGISTER_ROOT(literals);
 	REGISTER_ROOT(relocation);
 	REGISTER_UNTAGGED(code);
 	REGISTER_UNTAGGED(labels);
-	REGISTER_UNTAGGED(literals);
 
-	CELL here = allot_code_block(sizeof(F_COMPILED) + code_length + literals_length);
+	F_COMPILED *compiled = allot_code_block(sizeof(F_COMPILED) + code_length);
 
-	UNREGISTER_UNTAGGED(literals);
 	UNREGISTER_UNTAGGED(labels);
 	UNREGISTER_UNTAGGED(code);
 	UNREGISTER_ROOT(relocation);
+	UNREGISTER_ROOT(literals);
 
 	/* compiled header */
-	F_COMPILED *header = (void *)here;
-	header->type = type;
-	header->last_scan = NURSERY;
-	header->code_length = code_length;
-	header->literals_length = literals_length;
-	header->relocation = relocation;
-
-	here += sizeof(F_COMPILED);
-
-	CELL code_start = here;
+	compiled->type = type;
+	compiled->last_scan = NURSERY;
+	compiled->code_length = code_length;
+	compiled->literals = literals;
+	compiled->relocation = relocation;
 
 	/* code */
-	deposit_integers(here,code,code_format);
-	here += code_length;
-
-	/* literals */
-	deposit_objects(here,literals);
-	here += literals_length;
+	deposit_integers((CELL)(compiled + 1),code,code_format);
 
 	/* fixup labels */
-	if(labels)
-		fixup_labels(labels,code_format,code_start);
+	if(labels) fixup_labels(labels,code_format,compiled);
 
 	/* next time we do a minor GC, we have to scan the code heap for
 	literals */
 	last_code_heap_scan = NURSERY;
 
-	return header;
+	return compiled;
 }
 
 void set_word_code(F_WORD *word, F_COMPILED *compiled)
@@ -369,7 +345,7 @@ void primitive_modify_code_heap(void)
 				code,
 				labels,
 				relocation,
-				literals);
+				tag_object(literals));
 
 			UNREGISTER_UNTAGGED(word);
 			UNREGISTER_UNTAGGED(alist);
@@ -396,7 +372,13 @@ void primitive_modify_code_heap(void)
 			F_ARRAY *pair = untag_array(array_nth(alist,i));
 			F_WORD *word = untag_word(array_nth(pair,0));
 
-			iterate_code_heap_step(word->code,relocate_code_block);
+			relocate_code_block(word->code);
 		}
 	}
+}
+
+void flush_icache_for(F_COMPILED *compiled)
+{
+	CELL start = (CELL)(compiled + 1);
+	flush_icache(start,compiled->code_length);
 }

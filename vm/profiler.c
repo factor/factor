@@ -26,7 +26,7 @@ F_COMPILED *compile_profiling_stub(F_WORD *word)
 		untag_object(code),
 		NULL, /* no labels */
 		tag_object(relocation),
-		untag_object(literals));
+		literals);
 }
 
 /* Allocates memory */

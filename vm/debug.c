@@ -308,36 +308,6 @@ void find_data_references(CELL look_for_)
 	gc_off = false;
 }
 
-CELL look_for;
-
-void find_code_references_step(F_COMPILED *compiled, CELL code_start, CELL literals_start)
-{
-	CELL scan;
-	CELL literal_end = literals_start + compiled->literals_length;
-
-	for(scan = literals_start; scan < literal_end; scan += CELLS)
-	{
-		CELL code_start = (CELL)(compiled + 1);
-		CELL literal_start = code_start + compiled->code_length;
-
-		CELL obj = get(literal_start);
-
-		if(look_for == get(scan))
-		{
-			print_cell_hex_pad(obj);
-			print_string(" ");
-			print_nested_obj(obj,2);
-			nl();
-		}
-	}
-}
-
-void find_code_references(CELL look_for_)
-{
-	look_for = look_for_;
-	iterate_code_heap(find_code_references_step);
-}
-
 void factorbug(void)
 {
 	if(fep_disabled)
@@ -464,8 +434,6 @@ void factorbug(void)
 			CELL addr = read_cell_hex();
 			print_string("Data heap references:\n");
 			find_data_references(addr);
-			print_string("Code heap references:\n");
-			find_code_references(addr);
 			nl();
 		}
 		else if(strcmp(cmd,"words") == 0)

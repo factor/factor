@@ -107,7 +107,7 @@ typedef struct
 	char type; /* this is WORD_TYPE or QUOTATION_TYPE */
 	char last_scan; /* the youngest generation in which this block's literals may live */
 	CELL code_length; /* # bytes */
-	CELL literals_length; /* # bytes */
+	CELL literals; /* # bytes */
 	CELL relocation; /* tagged pointer to byte-array or f */
 } F_COMPILED;
 

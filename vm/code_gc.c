@@ -92,7 +92,7 @@ void build_free_list(F_HEAP *heap, CELL size)
 }
 
 /* Allocate a block of memory from the mark and sweep GC heap */
-CELL heap_allot(F_HEAP *heap, CELL size)
+void *heap_allot(F_HEAP *heap, CELL size)
 {
 	F_BLOCK *prev = NULL;
 	F_BLOCK *scan = heap->free_list;
@@ -139,13 +139,13 @@ CELL heap_allot(F_HEAP *heap, CELL size)
 		/* this is our new block */
 		scan->status = B_ALLOCATED;
 
-		return (CELL)(scan + 1);
+		return scan + 1;
 	}
 
-	return 0;
+	return NULL;
 }
 
-/* If in the middle of code GC, we have to grow the heap, GC restarts from
+/* If in the middle of code GC, we have to grow the heap, data GC restarts from
 scratch, so we have to unmark any marked blocks. */
 void unmark_marked(F_HEAP *heap)
 {
@@ -251,61 +251,73 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 	while(scan)
 	{
 		if(scan->status != B_FREE)
-			iterate_code_heap_step(block_to_compiled(scan),iter);
+			iter(block_to_compiled(scan));
 		scan = next_block(&code_heap,scan);
 	}
 }
 
-/* Copy all literals referenced from a code block to newspace */
-void collect_literals_step(F_COMPILED *compiled, CELL code_start, CELL literals_start)
+/* Update pointers to literals from compiled code. */
+void update_literal_references(F_COMPILED *compiled)
+{
+	if(compiled->relocation != F)
+	{
+		F_ARRAY *literals = untag_object(compiled->literals);
+		F_BYTE_ARRAY *relocation = untag_object(compiled->relocation);
+
+		F_REL *rel = (F_REL *)(relocation + 1);
+		F_REL *rel_end = (F_REL *)((char *)rel + byte_array_capacity(relocation));
+
+		while(rel < rel_end)
+		{
+			if(REL_TYPE(rel) == RT_IMMEDIATE)
+			{
+				CELL offset = rel->offset + (CELL)(compiled + 1);
+				F_FIXNUM absolute_value = array_nth(literals,REL_ARGUMENT(rel));
+				apply_relocation(REL_CLASS(rel),offset,absolute_value);
+			}
+
+			rel++;
+		}
+	}
+
+	flush_icache_for(compiled);
+}
+
+/* Copy all literals referenced from a code block to newspace. Only for
+aging and nursery collections */
+void copy_literal_references(F_COMPILED *compiled)
 {
 	if(collecting_gen >= compiled->last_scan)
 	{
-		CELL scan;
-		CELL literal_end = literals_start + compiled->literals_length;
-
 		if(collecting_accumulation_gen_p())
 			compiled->last_scan = collecting_gen;
 		else
 			compiled->last_scan = collecting_gen + 1;
 
-		for(scan = literals_start; scan < literal_end; scan += CELLS)
-			copy_handle((CELL*)scan);
+		/* initialize chase pointer */
+		CELL scan = newspace->here;
 
-		if(compiled->relocation != F)
-		{
-			copy_handle(&compiled->relocation);
+		copy_handle(&compiled->literals);
+		copy_handle(&compiled->relocation);
 
-			F_BYTE_ARRAY *relocation = untag_object(compiled->relocation);
+		/* do some tracing so that all reachable literals are now
+		at their final address */
+		copy_reachable_objects(scan,&newspace->here);
 
-			F_REL *rel = (F_REL *)(relocation + 1);
-			F_REL *rel_end = (F_REL *)((char *)rel + byte_array_capacity(relocation));
-
-			while(rel < rel_end)
-			{
-				if(REL_TYPE(rel) == RT_IMMEDIATE)
-				{
-					CELL offset = rel->offset + code_start;
-					F_FIXNUM absolute_value = get(CREF(literals_start,REL_ARGUMENT(rel)));
-					apply_relocation(REL_CLASS(rel),offset,absolute_value);
-				}
-
-				rel++;
-			}
-		}
-
-		flush_icache(code_start,literals_start - code_start);
+		update_literal_references(compiled);
 	}
 }
 
-/* Copy literals referenced from all code blocks to newspace */
-void collect_literals(void)
+/* Copy literals referenced from all code blocks to newspace. Only for
+aging and nursery collections */
+void copy_code_heap_roots(void)
 {
-	iterate_code_heap(collect_literals_step);
+	iterate_code_heap(copy_literal_references);
 }
 
-/* Mark all XTs and literals referenced from a word XT */
-void recursive_mark(F_BLOCK *block)
+/* Mark all XTs and literals referenced from a word XT. Only for tenured
+collections */
+void mark_block(F_BLOCK *block)
 {
 	/* If already marked, do nothing */
 	switch(block->status)
@@ -321,7 +333,18 @@ void recursive_mark(F_BLOCK *block)
 	}
 
 	F_COMPILED *compiled = block_to_compiled(block);
-	iterate_code_heap_step(compiled,collect_literals_step);
+
+	copy_handle(&compiled->literals);
+	copy_handle(&compiled->relocation);
+
+	flush_icache_for(compiled);
+}
+
+/* Update literals referenced from all code blocks. Only for tenured
+collections, done at the end. */
+void update_code_heap_roots(void)
+{
+	iterate_code_heap(update_literal_references);
 }
 
 /* Push the free space and total size of the code heap */

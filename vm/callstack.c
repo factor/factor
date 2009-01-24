@@ -103,10 +103,13 @@ CELL frame_type(F_STACK_FRAME *frame)
 CELL frame_executing(F_STACK_FRAME *frame)
 {
 	F_COMPILED *compiled = frame_code(frame);
-	CELL code_start = (CELL)(compiled + 1);
-	CELL literal_start = code_start + compiled->code_length;
-
-	return get(literal_start);
+	if(compiled->literals == F)
+		return F;
+	else
+	{
+		F_ARRAY *array = untag_object(compiled->literals);
+		return array_nth(array,0);
+	}
 }
 
 F_STACK_FRAME *frame_successor(F_STACK_FRAME *frame)

@@ -62,7 +62,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	UNREGISTER_UNTAGGED(word);
 
 	if(profiling_p)
-		iterate_code_heap_step(word->profiling,relocate_code_block);
+		relocate_code_block(word->profiling);
 
 	return word;
 }
