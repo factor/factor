@@ -41,7 +41,7 @@ TUPLE: x-clipboard atom contents ;
     ] if ;
 
 : own-selection ( prop win -- )
-    dpy get -rot CurrentTime XSetSelectionOwner drop
+    [ dpy get ] 2dip CurrentTime XSetSelectionOwner drop
     flush-dpy ;
 
 : set-targets-prop ( evt -- )

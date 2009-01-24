@@ -13,7 +13,7 @@ version io-size owner syncreads syncwrites asyncreads asyncwrites ;
 M: freebsd new-file-system-info freebsd-file-system-info new ;
 
 M: freebsd file-system-statfs ( path -- byte-array )
-    "statfs" <c-object> tuck statfs io-error ;
+    "statfs" <c-object> [ statfs io-error ] keep ;
 
 M: freebsd statfs>file-system-info ( file-system-info statvfs -- file-system-info )
     {
@@ -40,7 +40,7 @@ M: freebsd statfs>file-system-info ( file-system-info statvfs -- file-system-inf
     } cleave ;
 
 M: freebsd file-system-statvfs ( path -- byte-array )
-    "statvfs" <c-object> tuck statvfs io-error ;
+    "statvfs" <c-object> [ statvfs io-error ] keep ;
 
 M: freebsd statvfs>file-system-info ( file-system-info statvfs -- file-system-info )
     {

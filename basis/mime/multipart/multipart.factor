@@ -54,7 +54,9 @@ ERROR: end-of-stream multipart ;
     ] if ;
 
 : dump-until-separator ( multipart -- multipart )
-    dup [ current-separator>> ] [ bytes>> ] bi tuck start [
+    dup
+    [ current-separator>> ] [ bytes>> ] bi
+    [ nip ] [ start ] 2bi [
         cut-slice
         [ mime-write ]
         [ over current-separator>> length tail-slice >>bytes ] bi*

@@ -6,7 +6,8 @@ persistent.hashtables.nodes ;
 IN: persistent.hashtables.nodes.leaf
 
 : matching-key? ( key hashcode leaf-node -- ? )
-    tuck hashcode>> eq? [ key>> = ] [ 2drop f ] if ; inline
+    [ nip ] [ hashcode>> eq? ] 2bi
+    [ key>> = ] [ 2drop f ] if ; inline
 
 M: leaf-node (entry-at) [ matching-key? ] keep and ;
 

@@ -6,7 +6,7 @@ libc math sequences threads system combinators accessors ;
 IN: io.sockets.windows.nt
 
 : malloc-int ( object -- object )
-    "int" heap-size malloc tuck 0 set-alien-signed-4 ; inline
+    "int" heap-size malloc [ nip ] [ 0 set-alien-signed-4 ] 2bi ; inline
 
 M: winnt WSASocket-flags ( -- DWORD )
     WSA_FLAG_OVERLAPPED ;

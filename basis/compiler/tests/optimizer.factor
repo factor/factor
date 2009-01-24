@@ -9,7 +9,7 @@ IN: optimizer.tests
 GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
 
-[ t ] [ \ xyz compiled>> ] unit-test
+[ t ] [ \ xyz optimized>> ] unit-test
 
 ! Test predicate inlining
 : pred-test-1
@@ -94,7 +94,7 @@ TUPLE: pred-test ;
 ! regression
 GENERIC: void-generic ( obj -- * )
 : breakage ( -- * ) "hi" void-generic ;
-[ t ] [ \ breakage compiled>> ] unit-test
+[ t ] [ \ breakage optimized>> ] unit-test
 [ breakage ] must-fail
 
 ! regression
@@ -119,7 +119,7 @@ GENERIC: void-generic ( obj -- * )
 ! compiling <tuple> with a non-literal class failed
 : <tuple>-regression ( class -- tuple ) <tuple> ;
 
-[ t ] [ \ <tuple>-regression compiled>> ] unit-test
+[ t ] [ \ <tuple>-regression optimized>> ] unit-test
 
 GENERIC: foozul ( a -- b )
 M: reversed foozul ;
@@ -228,7 +228,7 @@ USE: binary-search.private
 : node-successor-f-bug ( x -- * )
     [ 3 throw ] [ empty-compound ] compose [ 3 throw ] if ;
 
-[ t ] [ \ node-successor-f-bug compiled>> ] unit-test
+[ t ] [ \ node-successor-f-bug optimized>> ] unit-test
 
 [ ] [ [ new ] build-tree optimize-tree drop ] unit-test
 
@@ -242,7 +242,7 @@ USE: binary-search.private
         ] if
     ] if ;
 
-[ t ] [ \ lift-throw-tail-regression compiled>> ] unit-test
+[ t ] [ \ lift-throw-tail-regression optimized>> ] unit-test
 [ 3 "an integer" ] [ 3 lift-throw-tail-regression ] unit-test
 [ "hi" "a string" ] [ "hi" lift-throw-tail-regression ] unit-test
 
@@ -271,7 +271,7 @@ HINTS: recursive-inline-hang array ;
 : recursive-inline-hang-1 ( -- a )
     { } recursive-inline-hang ;
 
-[ t ] [ \ recursive-inline-hang-1 compiled>> ] unit-test
+[ t ] [ \ recursive-inline-hang-1 optimized>> ] unit-test
 
 DEFER: recursive-inline-hang-3
 
