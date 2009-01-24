@@ -42,7 +42,7 @@ SYMBOL: bootstrap-time
     "Core bootstrap completed in " write core-bootstrap-time get print-time
     "Bootstrap completed in "      write bootstrap-time      get print-time
 
-    [ compiled>> ] count-words " compiled words" print
+    [ optimized>> ] count-words " compiled words" print
     [ symbol? ] count-words " symbol words" print
     [ ] count-words " words total" print
 

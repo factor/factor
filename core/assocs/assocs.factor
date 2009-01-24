@@ -188,7 +188,7 @@ M: sequence new-assoc drop <vector> ;
 M: sequence clear-assoc delete-all ;
 
 M: sequence delete-at
-    tuck search-alist nip
+    [ nip ] [ search-alist nip ] 2bi
     [ swap delete-nth ] [ drop ] if* ;
 
 M: sequence assoc-size length ;

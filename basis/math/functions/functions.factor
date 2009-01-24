@@ -122,11 +122,9 @@ PRIVATE>
     [ * ] 2keep gcd nip /i ; foldable
 
 : mod-inv ( x n -- y )
-    tuck gcd 1 = [
-        dup 0 < [ + ] [ nip ] if
-    ] [
-        "Non-trivial divisor found" throw
-    ] if ; foldable
+    [ nip ] [ gcd 1 = ] 2bi
+    [ dup 0 < [ + ] [ nip ] if ]
+    [ "Non-trivial divisor found" throw ] if ; foldable
 
 : ^mod ( x y n -- z )
     over 0 < [

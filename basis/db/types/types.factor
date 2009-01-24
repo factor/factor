@@ -42,10 +42,10 @@ ERROR: no-slot ;
     slot-named dup [ no-slot ] unless offset>> ;
 
 : get-slot-named ( name tuple -- value )
-    tuck offset-of-slot slot ;
+    [ nip ] [ offset-of-slot ] 2bi slot ;
 
 : set-slot-named ( value name obj -- )
-    tuck offset-of-slot set-slot ;
+    [ nip ] [ offset-of-slot ] 2bi set-slot ;
 
 ERROR: not-persistent class ;
 

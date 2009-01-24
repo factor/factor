@@ -254,7 +254,7 @@ print-use-hook global [ [ ] or ] change-at
     [
         [
             lines dup parse-fresh
-            tuck finish-parsing
+            [ nip ] [ finish-parsing ] 2bi
             forget-smudged
         ] with-source-file
     ] with-compilation-unit ;

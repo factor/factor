@@ -535,7 +535,7 @@ void compile_all_words(void)
 	{
 		F_WORD *word = untag_word(array_nth(untag_array(words),i));
 		REGISTER_UNTAGGED(word);
-		if(word->compiledp == F)
+		if(word->optimizedp == F)
 			default_word_code(word,false);
 		UNREGISTER_UNTAGGED(word);
 		update_word_xt(word);

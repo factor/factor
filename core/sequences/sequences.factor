@@ -138,15 +138,15 @@ INSTANCE: iota immutable-sequence
 : from-end ( seq n -- seq n' ) [ dup length ] dip - ; inline
 
 : (2sequence) ( obj1 obj2 seq -- seq )
-    tuck 1 swap set-nth-unsafe
-    tuck 0 swap set-nth-unsafe ; inline
+    [ 1 swap set-nth-unsafe ] keep
+    [ 0 swap set-nth-unsafe ] keep ; inline
 
 : (3sequence) ( obj1 obj2 obj3 seq -- seq )
-    tuck 2 swap set-nth-unsafe
+    [ 2 swap set-nth-unsafe ] keep
     (2sequence) ; inline
 
 : (4sequence) ( obj1 obj2 obj3 obj4 seq -- seq )
-    tuck 3 swap set-nth-unsafe
+    [ 3 swap set-nth-unsafe ] keep
     (3sequence) ; inline
 
 PRIVATE>
@@ -723,14 +723,14 @@ PRIVATE>
     2dup shorter? [
         2drop f
     ] [
-        tuck length head-slice sequence=
+        [ nip ] [ length head-slice ] 2bi sequence=
     ] if ;
 
 : tail? ( seq end -- ? )
     2dup shorter? [
         2drop f
     ] [
-        tuck length tail-slice* sequence=
+        [ nip ] [ length tail-slice* ] 2bi sequence=
     ] if ;
 
 : cut-slice ( seq n -- before-slice after-slice )
