@@ -118,3 +118,15 @@ unit-test
         { "nachos" "cheese" }
     } extract-keys
 ] unit-test
+
+[ f ] [
+    "a" H{ { "a" f } } at-default
+] unit-test
+
+[ "b" ] [
+    "b" H{ { "a" f } } at-default
+] unit-test
+
+[ "x" ] [
+    "a" H{ { "a" "x" } } at-default
+] unit-test

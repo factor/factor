@@ -165,7 +165,9 @@ M: gadget dim-changed
     in-layout? get [ invalidate ] [ invalidate* ] if ;
 
 M: gadget (>>dim) ( dim gadget -- )
-    2dup dim>> = [ 2drop ] [ tuck call-next-method dim-changed ] if ;
+    2dup dim>> =
+    [ 2drop ]
+    [ [ nip ] [ call-next-method ] 2bi dim-changed ] if ;
 
 GENERIC: pref-dim* ( gadget -- dim )
 
@@ -250,7 +252,7 @@ M: gadget ungraft* drop ;
     f >>parent drop ;
 
 : unfocus-gadget ( child gadget -- )
-    tuck focus>> eq? [ f >>focus ] when drop ;
+    [ nip ] [ focus>> eq? ] 2bi [ f >>focus ] when drop ;
 
 SYMBOL: in-layout?
 
@@ -286,10 +288,7 @@ SYMBOL: in-layout?
     dup unparent
     over >>parent
     tuck ((add-gadget))
-    tuck graft-state>> second
-        [ graft ]
-        [ drop  ]
-    if ;
+    tuck graft-state>> second [ graft ] [ drop  ] if ;
 
 : add-gadget ( parent child -- parent )
     not-in-layout
@@ -316,7 +315,7 @@ SYMBOL: in-layout?
 : (screen-rect) ( gadget -- loc ext )
     dup parent>> [
         [ rect-extent ] dip (screen-rect)
-        [ tuck v+ ] dip vmin [ v+ ] dip
+        [ [ nip ] [ v+ ] 2bi ] dip [ vmin ] [ v+ ] 2bi*
     ] [
         rect-extent
     ] if* ;

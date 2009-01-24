@@ -63,7 +63,7 @@ left-parenthesis pipe caret dash ;
 : cut-out ( vector n -- vector' vector ) cut rest ;
 ERROR: cut-stack-error ;
 : cut-stack ( obj vector -- vector' vector )
-    tuck last-index [ cut-stack-error ] unless* cut-out swap ;
+    [ nip ] [ last-index ] 2bi [ cut-stack-error ] unless* cut-out swap ;
 
 : <possessive-kleene-star> ( obj -- kleene ) possessive-kleene-star boa ;
 : <reluctant-kleene-star> ( obj -- kleene ) reluctant-kleene-star boa ;

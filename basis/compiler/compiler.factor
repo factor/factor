@@ -24,7 +24,7 @@ SYMBOL: compiled
     } cond drop ;
 
 : maybe-compile ( word -- )
-    dup compiled>> [ drop ] [ queue-compile ] if ;
+    dup optimized>> [ drop ] [ queue-compile ] if ;
 
 SYMBOL: +failed+
 

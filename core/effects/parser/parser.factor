@@ -9,7 +9,7 @@ DEFER: parse-effect
 ERROR: bad-effect ;
 
 : parse-effect-token ( end -- token/f )
-    scan tuck = [ drop f ] [
+    scan [ nip ] [ = ] 2bi [ drop f ] [
         dup { f "(" "((" } member? [ bad-effect ] [
             ":" ?tail [
                 scan-word {

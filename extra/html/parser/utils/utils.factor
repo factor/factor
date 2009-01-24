@@ -2,16 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs circular combinators continuations hashtables
 hashtables.private io kernel math namespaces prettyprint
-quotations sequences splitting state-parser strings
+quotations sequences splitting html.parser.state strings
 combinators.short-circuit ;
 IN: html.parser.utils
 
 : string-parse-end? ( -- ? ) get-next not ;
-
-: take-string* ( match -- string )
-    dup length <circular-string>
-    [ 2dup string-matches? ] take-until nip
-    dup length rot length 1- - head next* ;
 
 : trim1 ( seq ch -- newseq )
     [ [ ?head-slice drop ] [ ?tail-slice drop ] bi ] 2keep drop like ;

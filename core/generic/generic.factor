@@ -36,7 +36,8 @@ PREDICATE: method-spec < pair
     "methods" word-prop keys sort-classes ;
 
 : specific-method ( class generic -- method/f )
-    tuck order min-class dup [ swap method ] [ 2drop f ] if ;
+    [ nip ] [ order min-class ] 2bi
+    dup [ swap method ] [ 2drop f ] if ;
 
 GENERIC: effective-method ( generic -- method )
 

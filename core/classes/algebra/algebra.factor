@@ -17,9 +17,6 @@ TUPLE: anonymous-complement class ;
 
 C: <anonymous-complement> anonymous-complement
 
-: 2cache ( key1 key2 assoc quot -- value )
-    [ 2array ] 2dip [ first2 ] prepose cache ; inline
-
 GENERIC: valid-class? ( obj -- ? )
 
 M: class valid-class? drop t ;
@@ -218,7 +215,7 @@ M: anonymous-complement (classes-intersect?)
 : min-class ( class seq -- class/f )
     over [ classes-intersect? ] curry filter
     [ drop f ] [
-        tuck [ class<= ] with all? [ peek ] [ drop f ] if
+        [ nip ] [ [ class<= ] with all? ] 2bi [ peek ] [ drop f ] if
     ] if-empty ;
 
 GENERIC: (flatten-class) ( class -- )

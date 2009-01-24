@@ -1,4 +1,4 @@
-USING: http http.server http.client tools.test multiline
+USING: http http.server http.client http.client.private tools.test multiline
 io.streams.string io.encodings.utf8 io.encodings.8-bit
 io.encodings.binary io.encodings.string kernel arrays splitting
 sequences assocs io.sockets db db.sqlite continuations urls
@@ -35,7 +35,7 @@ blah
         { method "POST" }
         { version "1.1" }
         { header H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } } }
-        { post-data T{ post-data { content "blah" } { raw "blah" } { content-type "application/octet-stream" } } }
+        { post-data T{ post-data { data "blah" } { content-type "application/octet-stream" } } }
         { cookies V{ } }
     }
 ] [

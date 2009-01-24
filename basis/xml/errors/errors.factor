@@ -1,9 +1,60 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml.data xml.writer kernel generic io prettyprint math 
-debugger sequences state-parser accessors summary
-namespaces io.streams.string xml.backend ;
+debugger sequences xml.state accessors summary
+namespaces io.streams.string ;
 IN: xml.errors
+
+TUPLE: parsing-error line column ;
+
+: parsing-error ( class -- obj )
+    new
+        get-line >>line
+        get-column >>column ;
+M: parsing-error summary ( obj -- str )
+    [
+        "Parsing error" print
+        "Line: " write dup line>> .
+        "Column: " write column>> .
+    ] with-string-writer ;
+
+TUPLE: expected < parsing-error should-be was ;
+: expected ( should-be was -- * )
+    \ expected parsing-error
+        swap >>was
+        swap >>should-be throw ;
+M: expected summary ( obj -- str )
+    [
+        dup call-next-method write
+        "Token expected: " write dup should-be>> print
+        "Token present: " write was>> print
+    ] with-string-writer ;
+
+TUPLE: unexpected-end < parsing-error ;
+: unexpected-end ( -- * ) \ unexpected-end parsing-error throw ;
+M: unexpected-end summary ( obj -- str )
+    [
+        call-next-method write
+        "File unexpectedly ended." print
+    ] with-string-writer ;
+
+TUPLE: missing-close < parsing-error ;
+: missing-close ( -- * ) \ missing-close parsing-error throw ;
+M: missing-close summary ( obj -- str )
+    [
+        call-next-method write
+        "Missing closing token." print
+    ] with-string-writer ;
+
+TUPLE: disallowed-char < parsing-error char ;
+
+: disallowed-char ( char -- * )
+    \ disallowed-char parsing-error swap >>char throw ;
+
+M: disallowed-char summary
+    [ call-next-method ]
+    [ char>> "Disallowed character in XML document: " swap suffix ] bi
+    append ;
 
 ERROR: multitags ;
 
@@ -170,18 +221,6 @@ M: versionless-prolog summary ( obj -- str )
         "XML prolog lacks a version declaration" print
     ] with-string-writer ;
 
-TUPLE: bad-instruction < parsing-error instruction ;
-
-: bad-instruction ( instruction -- * )
-    \ bad-instruction parsing-error swap >>instruction throw ;
-
-M: bad-instruction summary ( obj -- str )
-    [
-        dup call-next-method write
-        "Misplaced processor instruction:" print
-        instruction>> write-xml-chunk nl
-    ] with-string-writer ;
-
 TUPLE: bad-directive < parsing-error dir ;
 
 : bad-directive ( directive -- * )
@@ -194,13 +233,13 @@ M: bad-directive summary ( obj -- str )
         dir>> write
     ] with-string-writer ;
 
-TUPLE: bad-doctype-decl < parsing-error ;
+TUPLE: bad-decl < parsing-error ;
 
-: bad-doctype-decl ( -- * )
-    \ bad-doctype-decl parsing-error throw ;
+: bad-decl ( -- * )
+    \ bad-decl parsing-error throw ;
 
-M: bad-doctype-decl summary ( obj -- str )
-    call-next-method "\nBad DOCTYPE" append ;
+M: bad-decl summary ( obj -- str )
+    call-next-method "\nExtra content in directive" append ;
 
 TUPLE: bad-external-id < parsing-error ;
 
@@ -249,7 +288,59 @@ TUPLE: quoteless-attr < parsing-error ;
 M: quoteless-attr summary
     call-next-method "Attribute lacks quotes around value\n" append ;
 
-UNION: xml-parse-error multitags notags extra-attrs nonexist-ns
-       not-yes/no unclosed mismatched expected no-entity
-       bad-prolog versionless-prolog capitalized-prolog bad-instruction
-       bad-directive bad-name unclosed-quote quoteless-attr ;
+TUPLE: attr-w/< < parsing-error ;
+
+: attr-w/< ( value -- * )
+    \ attr-w/< parsing-error throw ;
+
+M: attr-w/< summary
+    call-next-method
+    "Attribute value contains literal <" append ;
+
+TUPLE: text-w/]]> < parsing-error ;
+
+: text-w/]]> ( text -- * )
+    \ text-w/]]> parsing-error throw ;
+
+M: text-w/]]> summary
+    call-next-method
+    "Text node contains ']]>'" append ;
+
+TUPLE: duplicate-attr < parsing-error key values ;
+
+: duplicate-attr ( key values -- * )
+    \ duplicate-attr parsing-error
+    swap >>values swap >>key throw ;
+
+M: duplicate-attr summary
+    call-next-method "\nDuplicate attribute" append ;
+
+TUPLE: bad-cdata < parsing-error ;
+
+: bad-cdata ( -- * )
+    \ bad-cdata parsing-error throw ;
+
+M: bad-cdata summary
+    call-next-method "\nCDATA occurs before or after main tag" append ;
+
+TUPLE: not-enough-characters < parsing-error ;
+: not-enough-characters ( -- * )
+    \ not-enough-characters parsing-error throw ;
+M: not-enough-characters summary ( obj -- str )
+    [
+        call-next-method write
+        "Not enough characters" print
+    ] with-string-writer ;
+
+TUPLE: bad-doctype < parsing-error contents ;
+: bad-doctype ( contents -- * )
+    \ bad-doctype parsing-error swap >>contents throw ;
+M: bad-doctype summary
+    call-next-method "\nDTD contains invalid object" append ;
+
+UNION: xml-parse-error
+    multitags notags extra-attrs nonexist-ns bad-decl
+    not-yes/no unclosed mismatched expected no-entity
+    bad-prolog versionless-prolog capitalized-prolog
+    bad-directive bad-name unclosed-quote quoteless-attr
+    attr-w/< text-w/]]> duplicate-attr ;

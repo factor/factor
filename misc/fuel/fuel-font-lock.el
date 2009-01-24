@@ -75,7 +75,7 @@
 (defun fuel-font-lock--syntactic-face (state)
   (if (nth 3 state) 'factor-font-lock-string
     (let ((c (char-after (nth 8 state))))
-      (cond ((char-equal c ?\ )
+      (cond ((or (char-equal c ?\ ) (char-equal c ?\n))
              (save-excursion
                (goto-char (nth 8 state))
                (beginning-of-line)
@@ -92,9 +92,9 @@
   `((,fuel-syntax--stack-effect-regex . 'factor-font-lock-stack-effect)
     (,fuel-syntax--brace-words-regex 1 'factor-font-lock-parsing-word)
     (,fuel-syntax--vocab-ref-regexp  2 'factor-font-lock-vocabulary-name)
-    (,fuel-syntax--constructor-regex (1 'factor-font-lock-word)
-                                     (2 'factor-font-lock-type-name)
-                                     (3 'factor-font-lock-invalid-syntax nil t))
+    (,fuel-syntax--constructor-decl-regex (1 'factor-font-lock-word)
+                                          (2 'factor-font-lock-type-name)
+                                          (3 'factor-font-lock-invalid-syntax nil t))
     (,fuel-syntax--typedef-regex (1 'factor-font-lock-type-name)
                                  (2 'factor-font-lock-type-name)
                                  (3 'factor-font-lock-invalid-syntax nil t))

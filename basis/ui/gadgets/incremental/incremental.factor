@@ -23,7 +23,7 @@ M: incremental pref-dim*
     ] keep orientation>> set-axis ;
 
 : update-cursor ( gadget incremental -- )
-    tuck next-cursor >>cursor drop ;
+    [ nip ] [ next-cursor ] 2bi >>cursor drop ;
 
 : incremental-loc ( gadget incremental -- )
     [ cursor>> ] [ orientation>> ] bi v*

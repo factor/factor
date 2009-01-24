@@ -125,8 +125,9 @@ typedef struct {
 	CELL def;
 	/* TAGGED property assoc for library code */
 	CELL props;
-	/* TAGGED t or f, depending on if the word is compiled or not */
-	CELL compiledp;
+	/* TAGGED t or f, t means its compiled with the optimizing compiler,
+	f means its compiled with the non-optimizing compiler */
+	CELL optimizedp;
 	/* TAGGED call count for profiling */
 	CELL counter;
 	/* TAGGED machine code for sub-primitive */

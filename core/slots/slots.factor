@@ -1,9 +1,9 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays kernel kernel.private math namespaces
 make sequences strings words effects generic generic.standard
 classes classes.algebra slots.private combinators accessors
-words sequences.private assocs alien quotations ;
+words sequences.private assocs alien quotations hashtables ;
 IN: slots
 
 TUPLE: slot-spec name offset class initial read-only ;
@@ -86,7 +86,7 @@ ERROR: bad-slot-value value class ;
     ] [ ] make ;
 
 : writer-props ( slot-spec -- assoc )
-    [ "writing" set ] H{ } make-assoc ;
+    "writing" associate ;
 
 : define-writer ( class slot-spec -- )
     [ name>> writer-word ] [ writer-quot ] [ writer-props ] tri

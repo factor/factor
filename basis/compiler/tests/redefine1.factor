@@ -23,36 +23,36 @@ M: integer method-redefine-test 3 + ;
 : hey ( -- ) ;
 : there ( -- ) hey ;
 
-[ t ] [ \ hey compiled>> ] unit-test
-[ t ] [ \ there compiled>> ] unit-test
+[ t ] [ \ hey optimized>> ] unit-test
+[ t ] [ \ there optimized>> ] unit-test
 [ ] [ "IN: compiler.tests : hey ( -- ) 3 ;" eval ] unit-test
-[ f ] [ \ hey compiled>> ] unit-test
-[ f ] [ \ there compiled>> ] unit-test
+[ f ] [ \ hey optimized>> ] unit-test
+[ f ] [ \ there optimized>> ] unit-test
 [ ] [ "IN: compiler.tests : hey ( -- ) ;" eval ] unit-test
-[ t ] [ \ there compiled>> ] unit-test
+[ t ] [ \ there optimized>> ] unit-test
 
 : good ( -- ) ;
 : bad ( -- ) good ;
 : ugly ( -- ) bad ;
 
-[ t ] [ \ good compiled>> ] unit-test
-[ t ] [ \ bad compiled>> ] unit-test
-[ t ] [ \ ugly compiled>> ] unit-test
+[ t ] [ \ good optimized>> ] unit-test
+[ t ] [ \ bad optimized>> ] unit-test
+[ t ] [ \ ugly optimized>> ] unit-test
 
 [ f ] [ \ good compiled-usage assoc-empty? ] unit-test
 
 [ ] [ "IN: compiler.tests : good ( -- ) 3 ;" eval ] unit-test
 
-[ f ] [ \ good compiled>> ] unit-test
-[ f ] [ \ bad compiled>> ] unit-test
-[ f ] [ \ ugly compiled>> ] unit-test
+[ f ] [ \ good optimized>> ] unit-test
+[ f ] [ \ bad optimized>> ] unit-test
+[ f ] [ \ ugly optimized>> ] unit-test
 
 [ t ] [ \ good compiled-usage assoc-empty? ] unit-test
 
 [ ] [ "IN: compiler.tests : good ( -- ) ;" eval ] unit-test
 
-[ t ] [ \ good compiled>> ] unit-test
-[ t ] [ \ bad compiled>> ] unit-test
-[ t ] [ \ ugly compiled>> ] unit-test
+[ t ] [ \ good optimized>> ] unit-test
+[ t ] [ \ bad optimized>> ] unit-test
+[ t ] [ \ ugly optimized>> ] unit-test
 
 [ f ] [ \ good compiled-usage assoc-empty? ] unit-test

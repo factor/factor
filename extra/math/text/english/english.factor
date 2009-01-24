@@ -1,7 +1,7 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit grouping kernel math math.parser namespaces
-    sequences ;
+USING: combinators.short-circuit grouping kernel math math.parser
+math.text.utils namespaces sequences ;
 IN: math.text.english
 
 <PRIVATE
@@ -30,9 +30,6 @@ SYMBOL: and-needed?
 
 : negative-text ( n -- str )
     0 < "Negative " "" ? ;
-
-: 3digit-groups ( n -- seq )
-    [ dup 0 > ] [ 1000 /mod ] [ ] produce nip ;
 
 : hundreds-place ( n -- str )
     100 /mod over 0 = [

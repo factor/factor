@@ -9,7 +9,7 @@ USING: xml.utilities kernel assocs xml.generator math.order
 IN: syndication
 
 : any-tag-named ( tag names -- tag-inside )
-    f -rot [ tag-named nip dup ] with find 2drop ;
+    [ f ] 2dip [ tag-named nip dup ] with find 2drop ;
 
 TUPLE: feed title url entries ;
 

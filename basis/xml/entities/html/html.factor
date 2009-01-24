@@ -7,8 +7,7 @@ IN: xml.entities.html
 VALUE: html-entities
 
 : read-entities-file ( file -- table )
-    f swap binary <file-reader>
-    [ 2drop extra-entities get ] sax ;
+    file>dtd nip ;
 
 : get-html ( -- table )
     { "lat1" "special" "symbol" } [
