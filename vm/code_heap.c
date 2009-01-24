@@ -140,11 +140,8 @@ void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value)
 	}
 }
 
-/* Perform all fixups on a code block */
-void relocate_code_block(F_COMPILED *compiled)
+void iterate_relocations(F_COMPILED *compiled, RELOCATION_ITERATOR iter)
 {
-	compiled->last_scan = NURSERY;
-
 	if(compiled->relocation != F)
 	{
 		F_BYTE_ARRAY *relocation = untag_object(compiled->relocation);
@@ -154,16 +151,24 @@ void relocate_code_block(F_COMPILED *compiled)
 
 		while(rel < rel_end)
 		{
-			CELL offset = rel->offset + (CELL)(compiled + 1);
-
-			F_FIXNUM absolute_value = compute_code_rel(rel,compiled);
-
-			apply_relocation(REL_CLASS(rel),offset,absolute_value);
-
+			iter(rel,compiled);
 			rel++;
 		}
 	}
+}
 
+void relocate_code_block_step(F_REL *rel, F_COMPILED *compiled)
+{
+	CELL offset = rel->offset + (CELL)(compiled + 1);
+	F_FIXNUM absolute_value = compute_code_rel(rel,compiled);
+	apply_relocation(REL_CLASS(rel),offset,absolute_value);
+}
+
+/* Perform all fixups on a code block */
+void relocate_code_block(F_COMPILED *compiled)
+{
+	compiled->last_scan = NURSERY;
+	iterate_relocations(compiled,relocate_code_block_step);
 	flush_icache_for(compiled);
 }
 

@@ -256,30 +256,21 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 	}
 }
 
+void update_literal_references_step(F_REL *rel, F_COMPILED *compiled)
+{
+	if(REL_TYPE(rel) == RT_IMMEDIATE)
+	{
+		CELL offset = rel->offset + (CELL)(compiled + 1);
+		F_ARRAY *literals = untag_object(compiled->literals);
+		F_FIXNUM absolute_value = array_nth(literals,REL_ARGUMENT(rel));
+		apply_relocation(REL_CLASS(rel),offset,absolute_value);
+	}
+}
+
 /* Update pointers to literals from compiled code. */
 void update_literal_references(F_COMPILED *compiled)
 {
-	if(compiled->relocation != F)
-	{
-		F_ARRAY *literals = untag_object(compiled->literals);
-		F_BYTE_ARRAY *relocation = untag_object(compiled->relocation);
-
-		F_REL *rel = (F_REL *)(relocation + 1);
-		F_REL *rel_end = (F_REL *)((char *)rel + byte_array_capacity(relocation));
-
-		while(rel < rel_end)
-		{
-			if(REL_TYPE(rel) == RT_IMMEDIATE)
-			{
-				CELL offset = rel->offset + (CELL)(compiled + 1);
-				F_FIXNUM absolute_value = array_nth(literals,REL_ARGUMENT(rel));
-				apply_relocation(REL_CLASS(rel),offset,absolute_value);
-			}
-
-			rel++;
-		}
-	}
-
+	iterate_relocations(compiled,update_literal_references_step);
 	flush_icache_for(compiled);
 }
 

@@ -79,3 +79,7 @@ bool stack_traces_p(void);
 void primitive_modify_code_heap(void);
 
 void flush_icache_for(F_COMPILED *compiled);
+
+typedef void (*RELOCATION_ITERATOR)(F_REL *rel, F_COMPILED *compiled);
+
+void iterate_relocations(F_COMPILED *compiled, RELOCATION_ITERATOR iter);
