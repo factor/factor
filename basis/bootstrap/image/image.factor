@@ -433,7 +433,7 @@ M: quotation '
         array>> '
         quotation type-number object tag-number [
             emit ! array
-            f ' emit ! compiled>>
+            f ' emit ! compiled
             0 emit ! xt
             0 emit ! code
         ] emit-object

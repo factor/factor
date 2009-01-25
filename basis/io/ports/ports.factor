@@ -99,7 +99,7 @@ TUPLE: output-port < buffered-port ;
     output-port <buffered-port> ;
 
 : wait-to-write ( len port -- )
-    tuck buffer>> buffer-capacity <=
+    [ nip ] [ buffer>> buffer-capacity <= ] 2bi
     [ drop ] [ stream-flush ] if ; inline
 
 M: output-port stream-write1

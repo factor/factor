@@ -113,13 +113,16 @@ beast.
     - C-cC-dp : find words containing given substring (M-x fuel-apropos)
     - C-cC-dv : show words in current file (with prefix, ask for vocab)
 
-    - C-cM-<, C-cC-d< : show callers of word at point
-    - C-cM->, C-cC-d> : show callees of word at point
+    - C-cM-<, C-cC-d< : show callers of word or vocabulary at point
+                        (M-x fuel-show-callers, M-x fuel-vocab-usage)
+    - C-cM->, C-cC-d> : show callees of word or vocabulary at point
+                        (M-x fuel-show-callees, M-x fuel-vocab-uses)
 
     - C-cC-xs : extract innermost sexp (up to point)  as a separate word
     - C-cC-xr : extract region as a separate word
     - C-cC-xi : replace word at point by its definition
     - C-cC-xv : extract region as a separate vocabulary
+    - C-cC-xw : rename all uses of a word
 
 *** In the listener:
 

@@ -241,7 +241,8 @@ GENERIC: declarations. ( obj -- )
 M: object declarations. drop ;
 
 : declaration. ( word prop -- )
-    tuck name>> word-prop [ pprint-word ] [ drop ] if ;
+    [ nip ] [ name>> word-prop ] 2bi
+    [ pprint-word ] [ drop ] if ;
 
 M: word declarations.
     {

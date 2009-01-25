@@ -55,7 +55,7 @@ IN: http.server.cgi
         binary encode-output
         _ output-stream get swap <cgi-process> binary <process-stream> [
             post-request? [ request get post-data>> data>> write flush ] when
-            input-stream get swap (stream-copy)
+            '[ _ write ] each-block
         ] with-stream
     ] >>body ;
 

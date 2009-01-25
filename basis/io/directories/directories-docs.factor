@@ -166,6 +166,7 @@ ARTICLE: "io.directories" "Directory manipulation"
 { $subsection "current-directory" }
 { $subsection "io.directories.listing" }
 { $subsection "io.directories.create" }
-{ $subsection "delete-move-copy" } ;
+{ $subsection "delete-move-copy" }
+{ $subsection "io.directories.hierarchy" } ;
 
 ABOUT: "io.directories"

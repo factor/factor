@@ -1,4 +1,4 @@
-USING: http http.server http.client tools.test multiline
+USING: http http.server http.client http.client.private tools.test multiline
 io.streams.string io.encodings.utf8 io.encodings.8-bit
 io.encodings.binary io.encodings.string kernel arrays splitting
 sequences assocs io.sockets db db.sqlite continuations urls

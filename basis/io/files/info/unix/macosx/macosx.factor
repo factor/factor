@@ -20,10 +20,10 @@ M: macosx file-systems ( -- array )
 M: macosx new-file-system-info macosx-file-system-info new ;
 
 M: macosx file-system-statfs ( normalized-path -- statfs )
-    "statfs64" <c-object> tuck statfs64 io-error ;
+    "statfs64" <c-object> [ statfs64 io-error ] keep ;
 
 M: macosx file-system-statvfs ( normalized-path -- statvfs )
-    "statvfs" <c-object> tuck statvfs io-error ;
+    "statvfs" <c-object> [ statvfs io-error ] keep ;
 
 M: macosx statfs>file-system-info ( file-system-info byte-array -- file-system-info' )
     {

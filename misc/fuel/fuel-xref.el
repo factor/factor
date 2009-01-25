@@ -83,11 +83,11 @@ cursor at the first ocurrence of the used word."
 (defvar fuel-xref--help-string
   "(Press RET or click to follow crossrefs, or h for help on word at point)")
 
-(defun fuel-xref--title (word cc count)
+(defun fuel-xref--title (word cc count thing)
   (put-text-property 0 (length word) 'font-lock-face 'bold word)
-  (cond ((zerop count) (format "No known words %s %s" cc word))
-        ((= 1 count) (format "1 word %s %s:" cc word))
-        (t (format "%s words %s %s:" count cc word))))
+  (cond ((zerop count) (format "No known %s %s %s" thing cc word))
+        ((= 1 count) (format "1 %s %s %s:" thing cc word))
+        (t (format "%s %ss %s %s:" count thing cc word))))
 
 (defun fuel-xref--insert-ref (ref &optional no-vocab)
   (when (and (stringp (first ref))
@@ -106,7 +106,7 @@ cursor at the first ocurrence of the used word."
     (newline)
     t))
 
-(defun fuel-xref--fill-buffer (word cc refs &optional no-vocab app)
+(defun fuel-xref--fill-buffer (word cc refs &optional no-vocab app thing)
   (let ((inhibit-read-only t)
         (count 0))
     (with-current-buffer (fuel-xref--buffer)
@@ -118,21 +118,27 @@ cursor at the first ocurrence of the used word."
         (newline)
         (goto-char start)
         (save-excursion
-          (insert (fuel-xref--title word cc count) "\n\n"))
+          (insert (fuel-xref--title word cc count (or thing "word")) "\n\n"))
         count))))
 
-(defun fuel-xref--fill-and-display (word cc refs &optional no-vocab)
-  (let ((count (fuel-xref--fill-buffer word cc refs no-vocab)))
+(defun fuel-xref--fill-and-display (word cc refs &optional no-vocab thing)
+  (let ((count (fuel-xref--fill-buffer word cc refs no-vocab nil (or thing "word"))))
     (if (zerop count)
-        (error (fuel-xref--title word cc 0))
+        (error (fuel-xref--title word cc 0 (or thing "word")))
       (message "")
       (fuel-popup--display (fuel-xref--buffer)))))
 
+(defun fuel-xref--callers (word)
+  (let ((cmd `(:fuel* (((:quote ,word) fuel-callers-xref)))))
+    (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+
 (defun fuel-xref--show-callers (word)
-  (let* ((cmd `(:fuel* (((:quote ,word) fuel-callers-xref))))
-         (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+  (let ((refs (fuel-xref--callers word)))
     (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word word))
-    (fuel-xref--fill-and-display word "using" res)))
+    (fuel-xref--fill-and-display word "using" refs)))
+
+(defun fuel-xref--word-callers-files (word)
+  (mapcar 'third (fuel-xref--callers word)))
 
 (defun fuel-xref--show-callees (word)
   (let* ((cmd `(:fuel* (((:quote ,word) fuel-callees-xref))))
@@ -160,13 +166,25 @@ cursor at the first ocurrence of the used word."
   (fuel-popup--display (fuel-xref--buffer))
   (goto-char (point-min)))
 
+(defun fuel-xref--show-vocab-usage (vocab)
+  (let* ((cmd `(:fuel* ((,vocab fuel-vocab-usage-xref))))
+         (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+    (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word nil))
+    (fuel-xref--fill-and-display vocab "using" res t "vocab")))
+
+(defun fuel-xref--show-vocab-uses (vocab)
+  (let* ((cmd `(:fuel* ((,vocab fuel-vocab-uses-xref))))
+         (res (fuel-eval--retort-result (fuel-eval--send/wait cmd))))
+    (with-current-buffer (fuel-xref--buffer) (setq fuel-xref--word nil))
+    (fuel-xref--fill-and-display vocab "used by" res t "vocab")))
+
 
 ;;; User commands:
 
 (defvar fuel-xref--word-history nil)
 
 (defun fuel-show-callers (&optional arg)
-  "Show a list of callers of word at point.
+  "Show a list of callers of word or vocabulary at point.
 With prefix argument, ask for word."
   (interactive "P")
   (let ((word (if arg (fuel-completion--read-word "Find callers for: "
@@ -174,11 +192,14 @@ With prefix argument, ask for word."
                                                   fuel-xref--word-history)
                 (fuel-syntax-symbol-at-point))))
     (when word
-      (message "Looking up %s's callers ..." word)
-      (fuel-xref--show-callers word))))
+      (message "Looking up %s's users ..." word)
+      (if (and (not arg)
+               (fuel-edit--looking-at-vocab))
+          (fuel-xref--show-vocab-usage word)
+        (fuel-xref--show-callers word)))))
 
 (defun fuel-show-callees (&optional arg)
-  "Show a list of callers of word at point.
+  "Show a list of callers of word or vocabulary at point.
 With prefix argument, ask for word."
   (interactive "P")
   (let ((word (if arg (fuel-completion--read-word "Find callees for: "
@@ -187,7 +208,30 @@ With prefix argument, ask for word."
                 (fuel-syntax-symbol-at-point))))
     (when word
       (message "Looking up %s's callees ..." word)
-      (fuel-xref--show-callees word))))
+      (if (and (not arg)
+               (fuel-edit--looking-at-vocab))
+          (fuel-xref--show-vocab-uses word)
+        (fuel-xref--show-callees word)))))
+
+(defvar fuel-xref--vocab-history nil)
+
+(defun fuel-vocab-uses (&optional arg)
+  "Show a list of vocabularies used by a given one.
+With prefix argument, force reload of vocabulary list."
+  (interactive "P")
+  (let ((vocab (fuel-completion--read-vocab arg
+                                            (fuel-syntax-symbol-at-point)
+                                            fuel-xref--vocab-history)))
+    (fuel-xref--show-vocab-uses vocab)))
+
+(defun fuel-vocab-usage (&optional arg)
+  "Show a list of vocabularies that use a given one.
+With prefix argument, force reload of vocabulary list."
+  (interactive "P")
+  (let ((vocab (fuel-completion--read-vocab arg
+                                            (fuel-syntax-symbol-at-point)
+                                            fuel-xref--vocab-history)))
+    (fuel-xref--show-vocab-usage vocab)))
 
 (defun fuel-apropos (str)
   "Show a list of words containing the given substring."

@@ -96,7 +96,7 @@ PRIVATE>
 
 : first-grapheme ( str -- i )
     unclip-slice grapheme-class over
-    [ grapheme-class tuck grapheme-break? ] find drop
+    [ grapheme-class [ nip ] [ grapheme-break? ] 2bi ] find drop
     nip swap length or 1+ ;
 
 <PRIVATE

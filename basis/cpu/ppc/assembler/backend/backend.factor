@@ -74,8 +74,8 @@ IN: cpu.ppc.assembler.backend
 
 GENERIC# (B) 2 ( dest aa lk -- )
 M: integer (B) 18 i-insn ;
-M: word (B) 0 -rot (B) rc-relative-ppc-3 rel-word ;
-M: label (B) 0 -rot (B) rc-relative-ppc-3 label-fixup ;
+M: word (B) [ 0 ] 2dip (B) rc-relative-ppc-3 rel-word ;
+M: label (B) [ 0 ] 2dip (B) rc-relative-ppc-3 label-fixup ;
 
 GENERIC: BC ( a b c -- )
 M: integer BC 0 0 16 b-insn ;

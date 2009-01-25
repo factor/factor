@@ -45,7 +45,7 @@
 (defun fuel-edit--looking-at-vocab ()
   (save-excursion
     (fuel-syntax--beginning-of-defun)
-    (looking-at "USING:\\|USE:")))
+    (looking-at "USING:\\|USE:\\|IN:")))
 
 (defun fuel-edit--try-edit (ret)
   (let* ((err (fuel-eval--retort-error ret))
@@ -93,7 +93,7 @@ offered."
                                            nil
                                            fuel-edit--word-history
                                            arg))
-         (cmd `(:fuel* ((:quote ,word) fuel-get-edit-location))))
+         (cmd `(:fuel* ((:quote ,word) fuel-get-word-location))))
     (fuel-edit--try-edit (fuel-eval--send/wait cmd))))
 
 (defun fuel-edit-word-at-point (&optional arg)
@@ -102,7 +102,7 @@ With prefix, asks for the word to edit."
   (interactive "P")
   (let* ((word (or (and (not arg) (fuel-syntax-symbol-at-point))
                    (fuel-completion--read-word "Edit word: ")))
-         (cmd `(:fuel* ((:quote ,word) fuel-get-edit-location)))
+         (cmd `(:fuel* ((:quote ,word) fuel-get-word-location)))
          (marker (and (not arg) (point-marker))))
     (if (and (not arg) (fuel-edit--looking-at-vocab))
         (fuel-edit-vocabulary nil word)

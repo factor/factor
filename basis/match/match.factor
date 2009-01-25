@@ -80,7 +80,7 @@ MACRO: match-cond ( assoc -- )
     (match-first) drop ;
 
 : (match-all) ( seq pattern-seq -- )
-    tuck (match-first) swap 
+    [ nip ] [ (match-first) swap ] 2bi
     [ 
         , [ swap (match-all) ] [ drop ] if* 
     ] [ 2drop ] if* ;

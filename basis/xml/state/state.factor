@@ -17,3 +17,9 @@ C: <spot> spot
 : set-next ( char -- ) spot get swap >>next drop ;
 : get-check ( -- ? ) spot get check>> ;
 : check ( -- ) spot get t >>check drop ;
+
+SYMBOL: xml-stack
+
+SYMBOL: prolog-data
+
+SYMBOL: depth

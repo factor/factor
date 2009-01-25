@@ -16,7 +16,7 @@ idx mount-from ;
 M: netbsd new-file-system-info netbsd-file-system-info new ;
 
 M: netbsd file-system-statvfs
-    "statvfs" <c-object> tuck statvfs io-error ;
+    "statvfs" <c-object> [ statvfs io-error ] keep ;
 
 M: netbsd statvfs>file-system-info ( file-system-info statvfs -- file-system-info' )
     {
