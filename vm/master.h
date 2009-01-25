@@ -32,6 +32,7 @@
 #include "float_bits.h"
 #include "io.h"
 #include "code_gc.h"
+#include "code_block.h"
 #include "code_heap.h"
 #include "image.h"
 #include "callstack.h"

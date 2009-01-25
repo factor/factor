@@ -126,7 +126,6 @@ INLINE void allot_barrier(CELL address)
 }
 
 void clear_cards(CELL from, CELL to);
-void collect_cards(void);
 
 /* the 0th generation is where new objects are allocated. */
 #define NURSERY 0
@@ -387,7 +386,7 @@ INLINE void* allot_object(CELL type, CELL a)
 	return object;
 }
 
-void collect_next_loop(CELL scan, CELL *end);
+void copy_reachable_objects(CELL scan, CELL *end);
 
 void primitive_gc(void);
 void primitive_gc_stats(void);

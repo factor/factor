@@ -296,7 +296,7 @@ void primitive_end_scan(void)
 }
 
 /* Scan all the objects in the card */
-void collect_card(F_CARD *ptr, CELL gen, CELL here)
+void copy_card(F_CARD *ptr, CELL gen, CELL here)
 {
 	CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + CARD_OFFSET(ptr);
 	CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
@@ -304,12 +304,12 @@ void collect_card(F_CARD *ptr, CELL gen, CELL here)
 	if(here < card_end)
 		card_end = here;
 
-	collect_next_loop(card_scan,&card_end);
+	copy_reachable_objects(card_scan,&card_end);
 
 	cards_scanned++;
 }
 
-void collect_card_deck(F_DECK *deck, CELL gen, F_CARD mask, F_CARD unmask)
+void copy_card_deck(F_DECK *deck, CELL gen, F_CARD mask, F_CARD unmask)
 {
 	F_CARD *first_card = DECK_TO_CARD(deck);
 	F_CARD *last_card = DECK_TO_CARD(deck + 1);
@@ -330,7 +330,7 @@ void collect_card_deck(F_DECK *deck, CELL gen, F_CARD mask, F_CARD unmask)
 			{
 				if(ptr[card] & mask)
 				{
-					collect_card(&ptr[card],gen,here);
+					copy_card(&ptr[card],gen,here);
 					ptr[card] &= ~unmask;
 				}
 			}
@@ -341,7 +341,7 @@ void collect_card_deck(F_DECK *deck, CELL gen, F_CARD mask, F_CARD unmask)
 }
 
 /* Copy all newspace objects referenced from marked cards to the destination */
-void collect_gen_cards(CELL gen)
+void copy_gen_cards(CELL gen)
 {
 	F_DECK *first_deck = ADDR_TO_DECK(data_heap->generations[gen].start);
 	F_DECK *last_deck = ADDR_TO_DECK(data_heap->generations[gen].end);
@@ -365,7 +365,7 @@ void collect_gen_cards(CELL gen)
 			unmask = CARD_MARK_MASK;
 		else
 		{
-			critical_error("bug in collect_gen_cards",gen);
+			critical_error("bug in copy_gen_cards",gen);
 			return;
 		}
 	}
@@ -390,7 +390,7 @@ void collect_gen_cards(CELL gen)
 	}
 	else
 	{
-		critical_error("bug in collect_gen_cards",gen);
+		critical_error("bug in copy_gen_cards",gen);
 		return;
 	}
 
@@ -400,7 +400,7 @@ void collect_gen_cards(CELL gen)
 	{
 		if(*ptr & mask)
 		{
-			collect_card_deck(ptr,gen,mask,unmask);
+			copy_card_deck(ptr,gen,mask,unmask);
 			*ptr &= ~unmask;
 		}
 	}
@@ -408,15 +408,15 @@ void collect_gen_cards(CELL gen)
 
 /* Scan cards in all generations older than the one being collected, copying
 old->new references */
-void collect_cards(void)
+void copy_cards(void)
 {
 	int i;
 	for(i = collecting_gen + 1; i < data_heap->gen_count; i++)
-		collect_gen_cards(i);
+		copy_gen_cards(i);
 }
 
 /* Copy all tagged pointers in a range of memory */
-void collect_stack(F_SEGMENT *region, CELL top)
+void copy_stack_elements(F_SEGMENT *region, CELL top)
 {
 	CELL ptr = region->start;
 
@@ -424,25 +424,23 @@ void collect_stack(F_SEGMENT *region, CELL top)
 		copy_handle((CELL*)ptr);
 }
 
-void collect_stack_frame(F_STACK_FRAME *frame)
+void copy_stack_frame_step(F_STACK_FRAME *frame)
 {
-	recursive_mark(compiled_to_block(frame_code(frame)));
+	mark_code_block(frame_code(frame));
 }
 
-/* The base parameter allows us to adjust for a heap-allocated
-callstack snapshot */
-void collect_callstack(F_CONTEXT *stacks)
+void copy_callstack_roots(F_CONTEXT *stacks)
 {
 	if(collecting_gen == TENURED)
 	{
 		CELL top = (CELL)stacks->callstack_top;
 		CELL bottom = (CELL)stacks->callstack_bottom;
 
-		iterate_callstack(top,bottom,collect_stack_frame);
+		iterate_callstack(top,bottom,copy_stack_frame_step);
 	}
 }
 
-void collect_gc_locals(void)
+void copy_registered_locals(void)
 {
 	CELL ptr = gc_locals_region->start;
 
@@ -452,28 +450,28 @@ void collect_gc_locals(void)
 
 /* Copy roots over at the start of GC, namely various constants, stacks,
 the user environment and extra roots registered with REGISTER_ROOT */
-void collect_roots(void)
+void copy_roots(void)
 {
 	copy_handle(&T);
 	copy_handle(&bignum_zero);
 	copy_handle(&bignum_pos_one);
 	copy_handle(&bignum_neg_one);
 
-	collect_gc_locals();
-	collect_stack(extra_roots_region,extra_roots);
+	copy_registered_locals();
+	copy_stack_elements(extra_roots_region,extra_roots);
 
 	save_stacks();
 	F_CONTEXT *stacks = stack_chain;
 
 	while(stacks)
 	{
-		collect_stack(stacks->datastack_region,stacks->datastack);
-		collect_stack(stacks->retainstack_region,stacks->retainstack);
+		copy_stack_elements(stacks->datastack_region,stacks->datastack);
+		copy_stack_elements(stacks->retainstack_region,stacks->retainstack);
 
 		copy_handle(&stacks->catchstack_save);
 		copy_handle(&stacks->current_callback_save);
 
-		collect_callstack(stacks);
+		copy_callstack_roots(stacks);
 
 		stacks = stacks->next;
 	}
@@ -610,23 +608,23 @@ void do_code_slots(CELL scan)
 	{
 	case WORD_TYPE:
 		word = (F_WORD *)scan;
-		recursive_mark(compiled_to_block(word->code));
+		mark_code_block(word->code);
 		if(word->profiling)
-			recursive_mark(compiled_to_block(word->profiling));
+			mark_code_block(word->profiling);
 		break;
 	case QUOTATION_TYPE:
 		quot = (F_QUOTATION *)scan;
 		if(quot->compiledp != F)
-			recursive_mark(compiled_to_block(quot->code));
+			mark_code_block(quot->code);
 		break;
 	case CALLSTACK_TYPE:
 		stack = (F_CALLSTACK *)scan;
-		iterate_callstack_object(stack,collect_stack_frame);
+		iterate_callstack_object(stack,copy_stack_frame_step);
 		break;
 	}
 }
 
-CELL collect_next_nursery(CELL scan)
+CELL copy_next_from_nursery(CELL scan)
 {
 	CELL *obj = (CELL *)scan;
 	CELL *end = (CELL *)(scan + binary_payload_start(scan));
@@ -651,7 +649,7 @@ CELL collect_next_nursery(CELL scan)
 	return scan + untagged_object_size(scan);
 }
 
-CELL collect_next_aging(CELL scan)
+CELL copy_next_from_aging(CELL scan)
 {
 	CELL *obj = (CELL *)scan;
 	CELL *end = (CELL *)(scan + binary_payload_start(scan));
@@ -680,8 +678,7 @@ CELL collect_next_aging(CELL scan)
 	return scan + untagged_object_size(scan);
 }
 
-/* This function is performance-critical */
-CELL collect_next_tenured(CELL scan)
+CELL copy_next_from_tenured(CELL scan)
 {
 	CELL *obj = (CELL *)scan;
 	CELL *end = (CELL *)(scan + binary_payload_start(scan));
@@ -707,22 +704,22 @@ CELL collect_next_tenured(CELL scan)
 	return scan + untagged_object_size(scan);
 }
 
-void collect_next_loop(CELL scan, CELL *end)
+void copy_reachable_objects(CELL scan, CELL *end)
 {
 	if(HAVE_NURSERY_P && collecting_gen == NURSERY)
 	{
 		while(scan < *end)
-			scan = collect_next_nursery(scan);
+			scan = copy_next_from_nursery(scan);
 	}
 	else if(HAVE_AGING_P && collecting_gen == AGING)
 	{
 		while(scan < *end)
-			scan = collect_next_aging(scan);
+			scan = copy_next_from_aging(scan);
 	}
 	else if(collecting_gen == TENURED)
 	{
 		while(scan < *end)
-			scan = collect_next_tenured(scan);
+			scan = copy_next_from_tenured(scan);
 	}
 }
 
@@ -879,33 +876,28 @@ void garbage_collection(CELL gen,
 	CELL scan = newspace->here;
 
 	/* collect objects referenced from stacks and environment */
-	collect_roots();
+	copy_roots();
 	/* collect objects referenced from older generations */
-	collect_cards();
+	copy_cards();
+	/* do some tracing */
+	copy_reachable_objects(scan,&newspace->here);
 
 	/* don't scan code heap unless it has pointers to this
 	generation or younger */
 	if(collecting_gen >= last_code_heap_scan)
 	{
-		if(collecting_gen != TENURED)
-		{
-		
-			/* if we are doing code GC, then we will copy over
-			literals from any code block which gets marked as live.
-			if we are not doing code GC, just consider all literals
-			as roots. */
-			code_heap_scans++;
+		code_heap_scans++;
 
-			collect_literals();
-		}
+		if(collecting_gen == TENURED)
+			update_code_heap_roots();
+		else
+			copy_code_heap_roots();
 
 		if(collecting_accumulation_gen_p())
 			last_code_heap_scan = collecting_gen;
 		else
 			last_code_heap_scan = collecting_gen + 1;
 	}
-
-	collect_next_loop(scan,&newspace->here);
 
 	CELL gc_elapsed = (current_micros() - start);
 
