@@ -90,9 +90,9 @@ void primitive_set_callstack(void)
 	critical_error("Bug in set_callstack()",0);
 }
 
-F_COMPILED *frame_code(F_STACK_FRAME *frame)
+F_CODE_BLOCK *frame_code(F_STACK_FRAME *frame)
 {
-	return (F_COMPILED *)frame->xt - 1;
+	return (F_CODE_BLOCK *)frame->xt - 1;
 }
 
 CELL frame_type(F_STACK_FRAME *frame)
@@ -102,7 +102,7 @@ CELL frame_type(F_STACK_FRAME *frame)
 
 CELL frame_executing(F_STACK_FRAME *frame)
 {
-	F_COMPILED *compiled = frame_code(frame);
+	F_CODE_BLOCK *compiled = frame_code(frame);
 	if(compiled->literals == F)
 		return F;
 	else

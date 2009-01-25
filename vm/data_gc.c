@@ -426,7 +426,7 @@ void copy_stack_elements(F_SEGMENT *region, CELL top)
 
 void copy_stack_frame_step(F_STACK_FRAME *frame)
 {
-	mark_block(compiled_to_block(frame_code(frame)));
+	mark_code_block(frame_code(frame));
 }
 
 void copy_callstack_roots(F_CONTEXT *stacks)
@@ -608,14 +608,14 @@ void do_code_slots(CELL scan)
 	{
 	case WORD_TYPE:
 		word = (F_WORD *)scan;
-		mark_block(compiled_to_block(word->code));
+		mark_code_block(word->code);
 		if(word->profiling)
-			mark_block(compiled_to_block(word->profiling));
+			mark_code_block(word->profiling);
 		break;
 	case QUOTATION_TYPE:
 		quot = (F_QUOTATION *)scan;
 		if(quot->compiledp != F)
-			mark_block(compiled_to_block(quot->code));
+			mark_code_block(quot->code);
 		break;
 	case CALLSTACK_TYPE:
 		stack = (F_CALLSTACK *)scan;

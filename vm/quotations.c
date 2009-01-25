@@ -155,7 +155,7 @@ bool jit_stack_frame_p(F_ARRAY *array)
 	return false;
 }
 
-void set_quot_xt(F_QUOTATION *quot, F_COMPILED *code)
+void set_quot_xt(F_QUOTATION *quot, F_CODE_BLOCK *code)
 {
 	if(code->type != QUOTATION_TYPE)
 		critical_error("bad param to set_quot_xt",(CELL)code);
@@ -339,7 +339,7 @@ void jit_compile(CELL quot, bool relocate)
 	GROWABLE_ARRAY_TRIM(literals);
 	GROWABLE_BYTE_ARRAY_TRIM(relocation);
 
-	F_COMPILED *compiled = add_compiled_block(
+	F_CODE_BLOCK *compiled = add_compiled_block(
 		QUOTATION_TYPE,
 		untag_object(code),
 		NULL,

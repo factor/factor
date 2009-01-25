@@ -308,6 +308,44 @@ void find_data_references(CELL look_for_)
 	gc_off = false;
 }
 
+/* Dump all code blocks for debugging */
+void dump_code_heap(void)
+{
+	CELL size = 0;
+
+	F_BLOCK *scan = first_block(&code_heap);
+
+	while(scan)
+	{
+		char *status;
+		switch(scan->status)
+		{
+		case B_FREE:
+			status = "free";
+			break;
+		case B_ALLOCATED:
+			size += object_size(block_to_compiled(scan)->relocation);
+			status = "allocated";
+			break;
+		case B_MARKED:
+			size += object_size(block_to_compiled(scan)->relocation);
+			status = "marked";
+			break;
+		default:
+			status = "invalid";
+			break;
+		}
+
+		print_cell_hex((CELL)scan); print_string(" ");
+		print_cell_hex(scan->size); print_string(" ");
+		print_string(status); print_string("\n");
+
+		scan = next_block(&code_heap,scan);
+	}
+	
+	print_cell(size); print_string(" bytes of relocation data\n");
+}
+
 void factorbug(void)
 {
 	if(fep_disabled)
@@ -446,7 +484,7 @@ void factorbug(void)
 			dpush(addr);
 		}
 		else if(strcmp(cmd,"code") == 0)
-			dump_heap(&code_heap);
+			dump_code_heap();
 		else
 			print_string("unknown command\n");
 	}

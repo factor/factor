@@ -25,23 +25,24 @@ ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
 DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/alien.o \
 	vm/bignum.o \
+	vm/callstack.o \
+	vm/code_block.o \
+	vm/code_gc.o \
 	vm/code_heap.o \
+	vm/data_gc.o \
 	vm/debug.o \
+	vm/errors.o \
 	vm/factor.o \
 	vm/ffi_test.o \
 	vm/image.o \
 	vm/io.o \
 	vm/math.o \
-	vm/data_gc.o \
-	vm/code_gc.o \
 	vm/primitives.o \
-	vm/run.o \
-	vm/callstack.o \
-	vm/types.o \
+	vm/profiler.o \
 	vm/quotations.o \
-	vm/utilities.o \
-	vm/errors.o \
-	vm/profiler.o
+	vm/run.o \
+	vm/types.o \
+	vm/utilities.o
 
 EXE_OBJS = $(PLAF_EXE_OBJS)
 

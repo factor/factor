@@ -1,296 +1,18 @@
 #include "master.h"
 
-/* References to undefined symbols are patched up to call this function on
-image load */
-void undefined_symbol(void)
+/* Allocate a code heap during startup */
+void init_code_heap(CELL size)
 {
-	general_error(ERROR_UNDEFINED_SYMBOL,F,F,NULL);
+	new_heap(&code_heap,size);
 }
 
-/* Look up an external library symbol referenced by a compiled code block */
-void *get_rel_symbol(F_REL *rel, F_ARRAY *literals)
+bool in_code_heap_p(CELL ptr)
 {
-	CELL arg = REL_ARGUMENT(rel);
-	CELL symbol = array_nth(literals,arg);
-	CELL library = array_nth(literals,arg + 1);
-
-	F_DLL *dll = (library == F ? NULL : untag_dll(library));
-
-	if(dll != NULL && !dll->dll)
-		return undefined_symbol;
-
-	if(type_of(symbol) == BYTE_ARRAY_TYPE)
-	{
-		F_SYMBOL *name = alien_offset(symbol);
-		void *sym = ffi_dlsym(dll,name);
-
-		if(sym)
-			return sym;
-	}
-	else if(type_of(symbol) == ARRAY_TYPE)
-	{
-		CELL i;
-		F_ARRAY *names = untag_object(symbol);
-		for(i = 0; i < array_capacity(names); i++)
-		{
-			F_SYMBOL *name = alien_offset(array_nth(names,i));
-			void *sym = ffi_dlsym(dll,name);
-
-			if(sym)
-				return sym;
-		}
-	}
-
-	return undefined_symbol;
+	return (ptr >= code_heap.segment->start
+		&& ptr <= code_heap.segment->end);
 }
 
-/* Compute an address to store at a relocation */
-INLINE CELL compute_code_rel(F_REL *rel, F_COMPILED *compiled)
-{
-	F_ARRAY *literals = untag_object(compiled->literals);
-
-	CELL obj;
-
-	switch(REL_TYPE(rel))
-	{
-	case RT_PRIMITIVE:
-		return (CELL)primitives[REL_ARGUMENT(rel)];
-	case RT_DLSYM:
-		return (CELL)get_rel_symbol(rel,literals);
-	case RT_IMMEDIATE:
-		return array_nth(literals,REL_ARGUMENT(rel));
-	case RT_XT:
-		obj = array_nth(literals,REL_ARGUMENT(rel));
-		if(type_of(obj) == WORD_TYPE)
-			return (CELL)untag_word(obj)->xt;
-		else
-			return (CELL)untag_quotation(obj)->xt;
-	case RT_HERE:
-		return rel->offset + (CELL)(compiled + 1) + (short)REL_ARGUMENT(rel);
-	case RT_LABEL:
-		return (CELL)(compiled + 1) + REL_ARGUMENT(rel);
-	case RT_STACK_CHAIN:
-		return (CELL)&stack_chain;
-	default:
-		critical_error("Bad rel type",rel->type);
-		return -1; /* Can't happen */
-	}
-}
-
-/* Store a 32-bit value into a PowerPC LIS/ORI sequence */
-INLINE void reloc_set_2_2(CELL cell, CELL value)
-{
-	put(cell - CELLS,((get(cell - CELLS) & ~0xffff) | ((value >> 16) & 0xffff)));
-	put(cell,((get(cell) & ~0xffff) | (value & 0xffff)));
-}
-
-/* Store a value into a bitfield of a PowerPC instruction */
-INLINE void reloc_set_masked(CELL cell, F_FIXNUM value, CELL mask, F_FIXNUM shift)
-{
-	/* This is unaccurate but good enough */
-	F_FIXNUM test = (F_FIXNUM)mask >> 1;
-	if(value <= -test || value >= test)
-		critical_error("Value does not fit inside relocation",0);
-
-	u32 original = *(u32*)cell;
-	original &= ~mask;
-	*(u32*)cell = (original | ((value >> shift) & mask));
-}
-
-/* Perform a fixup on a code block */
-void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value)
-{
-	F_FIXNUM relative_value = absolute_value - offset;
-
-	switch(class)
-	{
-	case RC_ABSOLUTE_CELL:
-		put(offset,absolute_value);
-		break;
-	case RC_ABSOLUTE:
-		*(u32*)offset = absolute_value;
-		break;
-	case RC_RELATIVE:
-		*(u32*)offset = relative_value - sizeof(u32);
-		break;
-	case RC_ABSOLUTE_PPC_2_2:
-		reloc_set_2_2(offset,absolute_value);
-		break;
-	case RC_RELATIVE_PPC_2:
-		reloc_set_masked(offset,relative_value,REL_RELATIVE_PPC_2_MASK,0);
-		break;
-	case RC_RELATIVE_PPC_3:
-		reloc_set_masked(offset,relative_value,REL_RELATIVE_PPC_3_MASK,0);
-		break;
-	case RC_RELATIVE_ARM_3:
-		reloc_set_masked(offset,relative_value - CELLS * 2,
-			REL_RELATIVE_ARM_3_MASK,2);
-		break;
-	case RC_INDIRECT_ARM:
-		reloc_set_masked(offset,relative_value - CELLS,
-			REL_INDIRECT_ARM_MASK,0);
-		break;
-	case RC_INDIRECT_ARM_PC:
-		reloc_set_masked(offset,relative_value - CELLS * 2,
-			REL_INDIRECT_ARM_MASK,0);
-		break;
-	default:
-		critical_error("Bad rel class",class);
-		break;
-	}
-}
-
-void iterate_relocations(F_COMPILED *compiled, RELOCATION_ITERATOR iter)
-{
-	if(compiled->relocation != F)
-	{
-		F_BYTE_ARRAY *relocation = untag_object(compiled->relocation);
-
-		F_REL *rel = (F_REL *)(relocation + 1);
-		F_REL *rel_end = (F_REL *)((char *)rel + byte_array_capacity(relocation));
-
-		while(rel < rel_end)
-		{
-			iter(rel,compiled);
-			rel++;
-		}
-	}
-}
-
-void relocate_code_block_step(F_REL *rel, F_COMPILED *compiled)
-{
-	CELL offset = rel->offset + (CELL)(compiled + 1);
-	F_FIXNUM absolute_value = compute_code_rel(rel,compiled);
-	apply_relocation(REL_CLASS(rel),offset,absolute_value);
-}
-
-/* Perform all fixups on a code block */
-void relocate_code_block(F_COMPILED *compiled)
-{
-	compiled->last_scan = NURSERY;
-	iterate_relocations(compiled,relocate_code_block_step);
-	flush_icache_for(compiled);
-}
-
-/* Fixup labels. This is done at compile time, not image load time */
-void fixup_labels(F_ARRAY *labels, CELL code_format, F_COMPILED *compiled)
-{
-	CELL i;
-	CELL size = array_capacity(labels);
-
-	for(i = 0; i < size; i += 3)
-	{
-		CELL class = to_fixnum(array_nth(labels,i));
-		CELL offset = to_fixnum(array_nth(labels,i + 1));
-		CELL target = to_fixnum(array_nth(labels,i + 2));
-
-		apply_relocation(class,
-			offset + (CELL)(compiled + 1),
-			target + (CELL)(compiled + 1));
-	}
-}
-
-/* Write a sequence of integers to memory, with 'format' bytes per integer */
-void deposit_integers(CELL here, F_ARRAY *array, CELL format)
-{
-	CELL count = array_capacity(array);
-	CELL i;
-
-	for(i = 0; i < count; i++)
-	{
-		F_FIXNUM value = to_fixnum(array_nth(array,i));
-		if(format == 1)
-			bput(here + i,value);
-		else if(format == sizeof(unsigned int))
-			*(unsigned int *)(here + format * i) = value;
-		else if(format == CELLS)
-			put(CREF(here,i),value);
-		else
-			critical_error("Bad format in deposit_integers()",format);
-	}
-}
-
-bool stack_traces_p(void)
-{
-	return to_boolean(userenv[STACK_TRACES_ENV]);
-}
-
-CELL compiled_code_format(void)
-{
-	return untag_fixnum_fast(userenv[JIT_CODE_FORMAT]);
-}
-
-void *allot_code_block(CELL size)
-{
-	void *start = heap_allot(&code_heap,size);
-
-	/* If allocation failed, do a code GC */
-	if(start == NULL)
-	{
-		gc();
-		start = heap_allot(&code_heap,size);
-
-		/* Insufficient room even after code GC, give up */
-		if(start == NULL)
-		{
-			CELL used, total_free, max_free;
-			heap_usage(&code_heap,&used,&total_free,&max_free);
-
-			print_string("Code heap stats:\n");
-			print_string("Used: "); print_cell(used); nl();
-			print_string("Total free space: "); print_cell(total_free); nl();
-			print_string("Largest free block: "); print_cell(max_free); nl();
-			fatal_error("Out of memory in add-compiled-block",0);
-		}
-	}
-
-	return start;
-}
-
-/* Might GC */
-F_COMPILED *add_compiled_block(
-	CELL type,
-	F_ARRAY *code,
-	F_ARRAY *labels,
-	CELL relocation,
-	CELL literals)
-{
-	CELL code_format = compiled_code_format();
-	CELL code_length = align8(array_capacity(code) * code_format);
-
-	REGISTER_ROOT(literals);
-	REGISTER_ROOT(relocation);
-	REGISTER_UNTAGGED(code);
-	REGISTER_UNTAGGED(labels);
-
-	F_COMPILED *compiled = allot_code_block(sizeof(F_COMPILED) + code_length);
-
-	UNREGISTER_UNTAGGED(labels);
-	UNREGISTER_UNTAGGED(code);
-	UNREGISTER_ROOT(relocation);
-	UNREGISTER_ROOT(literals);
-
-	/* compiled header */
-	compiled->type = type;
-	compiled->last_scan = NURSERY;
-	compiled->code_length = code_length;
-	compiled->literals = literals;
-	compiled->relocation = relocation;
-
-	/* code */
-	deposit_integers((CELL)(compiled + 1),code,code_format);
-
-	/* fixup labels */
-	if(labels) fixup_labels(labels,code_format,compiled);
-
-	/* next time we do a minor GC, we have to scan the code heap for
-	literals */
-	last_code_heap_scan = NURSERY;
-
-	return compiled;
-}
-
-void set_word_code(F_WORD *word, F_COMPILED *compiled)
+void set_word_code(F_WORD *word, F_CODE_BLOCK *compiled)
 {
 	if(compiled->type != WORD_TYPE)
 		critical_error("bad param to set_word_xt",(CELL)compiled);
@@ -310,12 +32,48 @@ void default_word_code(F_WORD *word, bool relocate)
 	word->optimizedp = F;
 }
 
+/* Apply a function to every code block */
+void iterate_code_heap(CODE_HEAP_ITERATOR iter)
+{
+	F_BLOCK *scan = first_block(&code_heap);
+
+	while(scan)
+	{
+		if(scan->status != B_FREE)
+			iter(block_to_compiled(scan));
+		scan = next_block(&code_heap,scan);
+	}
+}
+
+/* Copy literals referenced from all code blocks to newspace. Only for
+aging and nursery collections */
+void copy_code_heap_roots(void)
+{
+	iterate_code_heap(copy_literal_references);
+}
+
+/* Update literals referenced from all code blocks. Only for tenured
+collections, done at the end. */
+void update_code_heap_roots(void)
+{
+	iterate_code_heap(update_literal_references);
+}
+
+/* Update pointers to words referenced from all code blocks. Only after
+defining a new word. */
+void update_code_heap_words(void)
+{
+	iterate_code_heap(update_word_references);
+}
+
 void primitive_modify_code_heap(void)
 {
-	bool rescan_code_heap = to_boolean(dpop());
 	F_ARRAY *alist = untag_array(dpop());
 
 	CELL count = untag_fixnum_fast(alist->capacity);
+	if(count == 0)
+		return;
+
 	CELL i;
 	for(i = 0; i < count; i++)
 	{
@@ -345,7 +103,7 @@ void primitive_modify_code_heap(void)
 			REGISTER_UNTAGGED(alist);
 			REGISTER_UNTAGGED(word);
 
-			F_COMPILED *compiled = add_compiled_block(
+			F_CODE_BLOCK *compiled = add_compiled_block(
 				WORD_TYPE,
 				code,
 				labels,
@@ -363,27 +121,116 @@ void primitive_modify_code_heap(void)
 		UNREGISTER_UNTAGGED(alist);
 	}
 
-	/* If there were any interned words in the set, we relocate all XT
-	references in the entire code heap. But if all the words are
-	uninterned, it is impossible that other words reference them, so we
-	only have to relocate the new words. This makes compile-call much
-	more efficient */
-	if(rescan_code_heap)
-		iterate_code_heap(relocate_code_block);
-	else
-	{
-		for(i = 0; i < count; i++)
-		{
-			F_ARRAY *pair = untag_array(array_nth(alist,i));
-			F_WORD *word = untag_word(array_nth(pair,0));
-
-			relocate_code_block(word->code);
-		}
-	}
+	update_code_heap_words();
 }
 
-void flush_icache_for(F_COMPILED *compiled)
+/* Push the free space and total size of the code heap */
+void primitive_code_room(void)
 {
-	CELL start = (CELL)(compiled + 1);
-	flush_icache(start,compiled->code_length);
+	CELL used, total_free, max_free;
+	heap_usage(&code_heap,&used,&total_free,&max_free);
+	dpush(tag_fixnum((code_heap.segment->size) / 1024));
+	dpush(tag_fixnum(used / 1024));
+	dpush(tag_fixnum(total_free / 1024));
+	dpush(tag_fixnum(max_free / 1024));
+}
+
+F_CODE_BLOCK *forward_xt(F_CODE_BLOCK *compiled)
+{
+	return block_to_compiled(compiled_to_block(compiled)->forwarding);
+}
+
+void forward_frame_xt(F_STACK_FRAME *frame)
+{
+	CELL offset = (CELL)FRAME_RETURN_ADDRESS(frame) - (CELL)frame_code(frame);
+	F_CODE_BLOCK *forwarded = forward_xt(frame_code(frame));
+	frame->xt = (XT)(forwarded + 1);
+	FRAME_RETURN_ADDRESS(frame) = (XT)((CELL)forwarded + offset);
+}
+
+void forward_object_xts(void)
+{
+	begin_scan();
+
+	CELL obj;
+
+	while((obj = next_object()) != F)
+	{
+		if(type_of(obj) == WORD_TYPE)
+		{
+			F_WORD *word = untag_object(obj);
+
+			word->code = forward_xt(word->code);
+			if(word->profiling)
+				word->profiling = forward_xt(word->profiling);
+		}
+		else if(type_of(obj) == QUOTATION_TYPE)
+		{
+			F_QUOTATION *quot = untag_object(obj);
+
+			if(quot->compiledp != F)
+				quot->code = forward_xt(quot->code);
+		}
+		else if(type_of(obj) == CALLSTACK_TYPE)
+		{
+			F_CALLSTACK *stack = untag_object(obj);
+			iterate_callstack_object(stack,forward_frame_xt);
+		}
+	}
+
+	/* End the heap scan */
+	gc_off = false;
+}
+
+/* Set the XT fields now that the heap has been compacted */
+void fixup_object_xts(void)
+{
+	begin_scan();
+
+	CELL obj;
+
+	while((obj = next_object()) != F)
+	{
+		if(type_of(obj) == WORD_TYPE)
+		{
+			F_WORD *word = untag_object(obj);
+			update_word_xt(word);
+		}
+		else if(type_of(obj) == QUOTATION_TYPE)
+		{
+			F_QUOTATION *quot = untag_object(obj);
+
+			if(quot->compiledp != F)
+				set_quot_xt(quot,quot->code);
+		}
+	}
+
+	/* End the heap scan */
+	gc_off = false;
+}
+
+/* Move all free space to the end of the code heap. This is not very efficient,
+since it makes several passes over the code and data heaps, but we only ever
+do this before saving a deployed image and exiting, so performaance is not
+critical here */
+void compact_code_heap(void)
+{
+	/* Free all unreachable code blocks */
+	gc();
+
+	/* Figure out where the code heap blocks are going to end up */
+	CELL size = compute_heap_forwarding(&code_heap);
+
+	/* Update word and quotation code pointers */
+	forward_object_xts();
+
+	/* Actually perform the compaction */
+	compact_heap(&code_heap);
+
+	/* Update word and quotation XTs */
+	fixup_object_xts();
+
+	/* Now update the free list; there will be a single free block at
+	the end */
+	build_free_list(&code_heap,size);
 }

@@ -79,9 +79,9 @@ void primitive_word(void)
 void primitive_word_xt(void)
 {
 	F_WORD *word = untag_word(dpop());
-	F_COMPILED *code = (profiling_p ? word->profiling : word->code);
-	dpush(allot_cell((CELL)code + sizeof(F_COMPILED)));
-	dpush(allot_cell((CELL)code + sizeof(F_COMPILED) + code->code_length));
+	F_CODE_BLOCK *code = (profiling_p ? word->profiling : word->code);
+	dpush(allot_cell((CELL)code + sizeof(F_CODE_BLOCK)));
+	dpush(allot_cell((CELL)code + sizeof(F_CODE_BLOCK) + code->code_length));
 }
 
 void primitive_wrapper(void)

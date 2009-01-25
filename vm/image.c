@@ -311,7 +311,7 @@ void relocate_data()
 	}
 }
 
-void fixup_code_block(F_COMPILED *compiled)
+void fixup_code_block(F_CODE_BLOCK *compiled)
 {
 	/* relocate literal table data */
 	data_fixup(&compiled->relocation);

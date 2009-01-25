@@ -1,85 +1,34 @@
-typedef enum {
-	/* arg is a primitive number */
-	RT_PRIMITIVE,
-	/* arg is a literal table index, holding an array pair (symbol/dll) */
-	RT_DLSYM,
-	/* a pointer to a compiled word reference */
-	RT_DISPATCH,
-	/* a compiled word reference */
-	RT_XT,
-	/* current offset */
-	RT_HERE,
-	/* a local label */
-	RT_LABEL,
-	/* immediate literal */
-	RT_IMMEDIATE,
-	/* address of stack_chain var */
-	RT_STACK_CHAIN
-} F_RELTYPE;
+/* compiled code */
+F_HEAP code_heap;
 
-typedef enum {
-	/* absolute address in a 64-bit location */
-	RC_ABSOLUTE_CELL,
-	/* absolute address in a 32-bit location */
-	RC_ABSOLUTE,
-	/* relative address in a 32-bit location */
-	RC_RELATIVE,
-	/* relative address in a PowerPC LIS/ORI sequence */
-	RC_ABSOLUTE_PPC_2_2,
-	/* relative address in a PowerPC LWZ/STW/BC instruction */
-	RC_RELATIVE_PPC_2,
-	/* relative address in a PowerPC B/BL instruction */
-	RC_RELATIVE_PPC_3,
-	/* relative address in an ARM B/BL instruction */
-	RC_RELATIVE_ARM_3,
-	/* pointer to address in an ARM LDR/STR instruction */
-	RC_INDIRECT_ARM,
-	/* pointer to address in an ARM LDR/STR instruction offset by 8 bytes */
-	RC_INDIRECT_ARM_PC
-} F_RELCLASS;
+INLINE F_BLOCK *compiled_to_block(F_CODE_BLOCK *compiled)
+{
+	return (F_BLOCK *)compiled - 1;
+}
 
-#define REL_RELATIVE_PPC_2_MASK 0xfffc
-#define REL_RELATIVE_PPC_3_MASK 0x3fffffc
-#define REL_INDIRECT_ARM_MASK 0xfff
-#define REL_RELATIVE_ARM_3_MASK 0xffffff
+INLINE F_CODE_BLOCK *block_to_compiled(F_BLOCK *block)
+{
+	return (F_CODE_BLOCK *)(block + 1);
+}
 
-/* the rel type is built like a cell to avoid endian-specific code in
-the compiler */
-#define REL_TYPE(r) ((r)->type & 0x000000ff)
-#define REL_CLASS(r) (((r)->type & 0x0000ff00) >> 8)
-#define REL_ARGUMENT(r) (((r)->type & 0xffff0000) >> 16)
+void init_code_heap(CELL size);
 
-/* code relocation consists of a table of entries for each fixup */
-typedef struct {
-	unsigned int type;
-	unsigned int offset;
-} F_REL;
-
-#define CREF(array,i) ((CELL)(array) + CELLS * (i))
-
-void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value);
-
-void relocate_code_block(F_COMPILED *relocating);
+bool in_code_heap_p(CELL ptr);
 
 void default_word_code(F_WORD *word, bool relocate);
 
-void set_word_code(F_WORD *word, F_COMPILED *compiled);
+void set_word_code(F_WORD *word, F_CODE_BLOCK *compiled);
 
-F_COMPILED *add_compiled_block(
-	CELL type,
-	F_ARRAY *code,
-	F_ARRAY *labels,
-	CELL relocation,
-	CELL literals);
+typedef void (*CODE_HEAP_ITERATOR)(F_CODE_BLOCK *compiled);
 
-CELL compiled_code_format(void);
+void iterate_code_heap(CODE_HEAP_ITERATOR iter);
 
-bool stack_traces_p(void);
+void copy_code_heap_roots(void);
+
+void update_code_heap_roots(void);
 
 void primitive_modify_code_heap(void);
 
-void flush_icache_for(F_COMPILED *compiled);
+void primitive_code_room(void);
 
-typedef void (*RELOCATION_ITERATOR)(F_REL *rel, F_COMPILED *compiled);
-
-void iterate_relocations(F_COMPILED *compiled, RELOCATION_ITERATOR iter);
+void compact_code_heap(void);
