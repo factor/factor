@@ -156,7 +156,7 @@
  (defvar fuel-markup--maybe-nl nil))
 
 (defun fuel-markup--print (e)
-  (cond ((null e))
+  (cond ((null e) (insert "f"))
         ((stringp e) (fuel-markup--insert-string e))
         ((and (listp e) (symbolp (car e))
               (assoc (car e) fuel-markup--printers))
@@ -253,8 +253,12 @@
     (insert (cadr e))))
 
 (defun fuel-markup--snippet (e)
-  (let ((snip (format "%s" (cadr e))))
-    (insert (fuel-font-lock--factor-str snip))))
+  (insert (mapconcat '(lambda (s)
+                        (if (stringp s)
+                            (fuel-font-lock--factor-str s)
+                          (fuel-markup--print-str s)))
+                     (cdr e)
+                     " ")))
 
 (defun fuel-markup--code (e)
   (fuel-markup--insert-nl-if-nb)
