@@ -145,11 +145,10 @@ TUPLE: gradient < caching-pen colors last-vertices last-colors ;
     >float-array ;
 
 M: gradient recompute-pen ( gadget gradient -- )
-    tuck
-    [ [ orientation>> ] [ dim>> ] bi ] [ colors>> ] bi*
+    [ nip ] [ [ [ orientation>> ] [ dim>> ] bi ] [ colors>> ] bi* ] 2bi
     [ gradient-vertices >>last-vertices ]
-    [ gradient-colors >>last-colors ] bi
-    drop ;
+    [ gradient-colors >>last-colors ]
+    bi drop ;
 
 : draw-gradient ( colors -- )
     GL_COLOR_ARRAY [

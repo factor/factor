@@ -9,9 +9,9 @@ IN: ui.gestures
 GENERIC: handle-gesture ( gesture gadget -- ? )
 
 M: object handle-gesture
-    tuck class superclasses
-    [ "gestures" word-prop ] map
-    assoc-stack dup [ call f ] [ 2drop t ] if ;
+    [ nip ]
+    [ class superclasses [ "gestures" word-prop ] map assoc-stack ] 2bi
+    dup [ call f ] [ 2drop t ] if ;
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
 

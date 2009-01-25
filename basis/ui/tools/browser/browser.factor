@@ -58,8 +58,8 @@ M: browser-gadget ungraft*
     } 2|| ;
 
 M: browser-gadget definitions-changed ( assoc browser -- )
-    model>> tuck value>> swap showing-definition?
-    [ notify-connections ] [ drop ] if ;
+    model>> [ value>> swap showing-definition? ] keep
+    '[ _ notify-connections ] when ;
 
 M: browser-gadget focusable-child* search-field>> ;
 

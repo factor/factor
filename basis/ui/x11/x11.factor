@@ -231,7 +231,7 @@ M: x11-ui-backend set-title ( string world -- )
 
 M: x11-ui-backend set-fullscreen* ( ? world -- )
     handle>> window>> "XClientMessageEvent" <c-object>
-    tuck set-XClientMessageEvent-window
+    [ set-XClientMessageEvent-window ] keep
     swap _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ?
     over set-XClientMessageEvent-data0
     ClientMessage over set-XClientMessageEvent-type

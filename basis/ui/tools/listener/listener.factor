@@ -304,7 +304,7 @@ M: object accept-completion-hook 2drop ;
     ] recover ;
 
 : handle-interactive ( lines interactor -- quot/f ? )
-    tuck try-parse {
+    [ nip ] [ try-parse ] 2bi {
         { [ dup quotation? ] [ nip t ] }
         { [ dup not ] [ drop "\n" swap user-input* drop f f ] }
         [ handle-parse-error f f ]

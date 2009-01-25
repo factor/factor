@@ -10,7 +10,7 @@ IN: ui.gadgets.menus
     [ dim>> ] [ pref-dim ] bi* [v-] hand-loc get-global vmin ;
 
 : show-menu ( owner menu -- )
-    [ find-world dup ] dip tuck menu-loc show-glass ;
+    [ find-world ] dip 2dup menu-loc show-glass ;
 
 :: <menu-item> ( target hook command -- button )
     command command-name [

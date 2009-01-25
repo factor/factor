@@ -124,7 +124,7 @@ M: style-stream write-gadget
     stream>> write-gadget ;
 
 : print-gadget ( gadget stream -- )
-    tuck write-gadget stream-nl ;
+    [ write-gadget ] [ nip stream-nl ] 2bi ;
 
 : gadget. ( gadget -- )
     output-stream get print-gadget ;

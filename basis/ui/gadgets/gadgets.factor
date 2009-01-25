@@ -288,7 +288,7 @@ SYMBOL: in-layout?
     dup unparent
     over >>parent
     tuck ((add-gadget))
-    tuck graft-state>> second [ graft ] [ drop  ] if ;
+    tuck graft-state>> second [ graft ] [ drop ] if ;
 
 : add-gadget ( parent child -- parent )
     not-in-layout

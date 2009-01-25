@@ -51,7 +51,7 @@ CONSTANT: table-gap 6
 
 : (compute-column-widths) ( font rows -- total widths )
     [ drop 0 { } ] [
-        tuck [ first length 0 <repetition> ] 2dip
+        [ nip first length 0 <repetition> ] 2keep
         [ [ text-width ] with map vmax ] with each
         [ [ sum ] [ length 1 [-] table-gap * ] bi + ] keep
     ] if-empty ;
@@ -217,7 +217,7 @@ PRIVATE>
     if ;
 
 M: table model-changed
-    tuck initial-selected-index {
+    [ nip ] [ initial-selected-index ] 2bi {
         [ >>selected-index drop ]
         [ show-row-summary ]
         [ drop update-selected-value ]

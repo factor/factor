@@ -1,7 +1,7 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io kernel math namespaces math.vectors ui.gadgets
-ui.gadgets.packs accessors math.geometry.rect ;
+ui.gadgets.packs accessors math.geometry.rect combinators ;
 IN: ui.gadgets.incremental
 
 TUPLE: incremental < pack cursor ;
@@ -29,7 +29,7 @@ M: incremental pref-dim*
     [ cursor>> ] [ orientation>> ] bi v*
     >>loc drop ;
 
-: prefer-incremental ( gadget -- ) USE: slots.private
+: prefer-incremental ( gadget -- )
     dup forget-pref-dim dup pref-dim >>dim drop ;
 
 M: incremental dim-changed drop ;
@@ -38,17 +38,19 @@ M: incremental dim-changed drop ;
     not-in-layout
     2dup swap (add-gadget) drop
     t in-layout? [
-        over prefer-incremental
-        over layout-later
-        2dup incremental-loc
-        tuck update-cursor
-        dup prefer-incremental
-        parent>> [ invalidate* ] when*
+        {
+            [ drop prefer-incremental ]
+            [ drop layout-later ]
+            [ incremental-loc ]
+            [ update-cursor ]
+            [ nip prefer-incremental ]
+            [ nip parent>> [ invalidate* ] when* ]
+        } 2cleave
     ] with-variable ;
 
 : clear-incremental ( incremental -- )
     not-in-layout
-    dup (clear-gadget)
-    dup forget-pref-dim
-    { 0 0 } >>cursor
-    parent>> [ relayout ] when* ;
+    [ (clear-gadget) ]
+    [ forget-pref-dim ]
+    [ { 0 0 } >>cursor parent>> [ relayout ] when* ]
+    tri ;
