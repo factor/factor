@@ -29,7 +29,7 @@ M: object fuel-pprint pprint ; inline
 M: word fuel-pprint
     name>> V{ } clone [ fuel-maybe-scape append ] reduce >string write ;
 
-M: f fuel-pprint drop "f" write ; inline
+M: f fuel-pprint drop "nil" write ; inline
 
 M: integer fuel-pprint pprint ; inline
 

@@ -285,7 +285,7 @@
   (fuel-markup--snippet (cons '$snippet (cdr e))))
 
 (defun fuel-markup--link (e)
-  (let* ((link (nth 1 e))
+  (let* ((link (or (nth 1 e) 'f))
          (type (or (nth 3 e) (if (symbolp link) 'word 'article)))
          (label (or (nth 2 e)
                     (and (eq type 'article)

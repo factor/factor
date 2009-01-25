@@ -32,6 +32,7 @@
          (case (car sexp)
            (:array (factor--seq 'V{ '} (cdr sexp)))
            (:seq (factor--seq '{ '} (cdr sexp)))
+           (:tuple (factor--seq 'T{ '} (cdr sexp)))
            (:quote (format "\\ %s" (factor `(:factor ,(cadr sexp)))))
            (:quotation (factor--seq '\[ '\] (cdr sexp)))
            (:using (factor `(USING: ,@(cdr sexp) :end)))
@@ -116,8 +117,7 @@
 (defsubst fuel-eval--retort-make (err result &optional output)
   (list err result output))
 
-(defsubst fuel-eval--retort-error (ret)
-  (and (not (eq (nth 0 ret) 'f)) (nth 0 ret)))
+(defsubst fuel-eval--retort-error (ret) (nth 0 ret))
 (defsubst fuel-eval--retort-result (ret) (nth 1 ret))
 (defsubst fuel-eval--retort-output (ret) (nth 2 ret))
 
