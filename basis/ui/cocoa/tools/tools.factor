@@ -75,12 +75,12 @@ CLASS: {
 } {
     "evalInListener:userData:error:"
     "void"
-    { "id" "SEL" "id" "id" "void*" }
+    { "id" "SEL" "id" "id" "id" }
     [ nip [ eval-listener f ] do-service 2drop ]
 } {
     "evalToString:userData:error:"
     "void"
-    { "id" "SEL" "id" "id" "void*" }
+    { "id" "SEL" "id" "id" "id" }
     [ nip [ eval>string ] do-service 2drop ]
 } ;
 

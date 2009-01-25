@@ -141,7 +141,7 @@ TUPLE: gradient < caching-pen colors last-vertices last-colors ;
     concat concat >float-array ;
 
 : gradient-colors ( colors -- seq )
-    [ color>raw 4array dup 2array ] map concat concat
+    [ >rgba-components 4array dup 2array ] map concat concat
     >float-array ;
 
 M: gradient recompute-pen ( gadget gradient -- )

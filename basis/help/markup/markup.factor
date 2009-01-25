@@ -3,7 +3,8 @@
 USING: accessors arrays definitions generic io kernel assocs
 hashtables namespaces make parser prettyprint sequences strings
 io.styles vectors words math sorting splitting classes slots fry
-sets vocabs help.stylesheet help.topics vocabs.loader quotations ;
+sets vocabs help.stylesheet help.topics vocabs.loader quotations
+combinators ;
 IN: help.markup
 
 PREDICATE: simple-element < array
