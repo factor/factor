@@ -141,7 +141,7 @@ void *primitives[] = {
 	primitive_resize_byte_array,
 	primitive_dll_validp,
 	primitive_unimplemented,
-	primitive_gc_reset,
+	primitive_clear_gc_stats,
 	primitive_jit_compile,
 	primitive_load_locals,
 };

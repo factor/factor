@@ -26,6 +26,8 @@ INLINE void load_data_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 		p->tenured_size,
 		p->secure_gc);
 
+	clear_gc_stats();
+
 	F_ZONE *tenured = &data_heap->generations[TENURED];
 
 	F_FIXNUM bytes_read = fread((void*)tenured->start,1,h->data_size,file);

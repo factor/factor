@@ -9,7 +9,7 @@ IN: memory
     ] [ 2drop ] if ; inline recursive
 
 : each-object ( quot -- )
-    begin-scan [ (each-object) ] [ end-scan ] [ ] cleanup ; inline
+    gc begin-scan [ (each-object) ] [ end-scan ] [ ] cleanup ; inline
 
 : count-instances ( quot -- n )
     0 swap [ 1 0 ? + ] compose each-object ; inline
