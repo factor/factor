@@ -30,6 +30,7 @@ DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/code_gc.o \
 	vm/code_heap.o \
 	vm/data_gc.o \
+	vm/data_heap.o \
 	vm/debug.o \
 	vm/errors.o \
 	vm/factor.o \

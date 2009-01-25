@@ -178,6 +178,49 @@ void mark_code_block(F_CODE_BLOCK *compiled)
 	flush_icache_for(compiled);
 }
 
+void mark_stack_frame_step(F_STACK_FRAME *frame)
+{
+	mark_code_block(frame_code(frame));
+}
+
+/* Mark code blocks executing in currently active stack frames. */
+void mark_active_blocks(F_CONTEXT *stacks)
+{
+	if(collecting_gen == TENURED)
+	{
+		CELL top = (CELL)stacks->callstack_top;
+		CELL bottom = (CELL)stacks->callstack_bottom;
+
+		iterate_callstack(top,bottom,mark_stack_frame_step);
+	}
+}
+
+void mark_object_code_block(CELL scan)
+{
+	F_WORD *word;
+	F_QUOTATION *quot;
+	F_CALLSTACK *stack;
+
+	switch(object_type(scan))
+	{
+	case WORD_TYPE:
+		word = (F_WORD *)scan;
+		mark_code_block(word->code);
+		if(word->profiling)
+			mark_code_block(word->profiling);
+		break;
+	case QUOTATION_TYPE:
+		quot = (F_QUOTATION *)scan;
+		if(quot->compiledp != F)
+			mark_code_block(quot->code);
+		break;
+	case CALLSTACK_TYPE:
+		stack = (F_CALLSTACK *)scan;
+		iterate_callstack_object(stack,mark_stack_frame_step);
+		break;
+	}
+}
+
 /* References to undefined symbols are patched up to call this function on
 image load */
 void undefined_symbol(void)

@@ -73,6 +73,10 @@ void update_word_references(F_CODE_BLOCK *compiled);
 
 void mark_code_block(F_CODE_BLOCK *compiled);
 
+void mark_active_blocks(F_CONTEXT *stacks);
+
+void mark_object_code_block(CELL scan);
+
 void relocate_code_block(F_CODE_BLOCK *relocating);
 
 CELL compiled_code_format(void);
