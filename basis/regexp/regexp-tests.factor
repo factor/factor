@@ -302,6 +302,8 @@ IN: regexp-tests
 [ "1.2.3.4" ]
 [ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ "." re-replace ] unit-test
 
+[ "-- title --" ] [ "== title ==" "=" <regexp> "-" re-replace ] unit-test
+
 /*
 ! FIXME
 [ f ] [ "ab" "a(?!b)" <regexp> first-match ] unit-test
