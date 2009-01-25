@@ -116,7 +116,8 @@
 (defsubst fuel-eval--retort-make (err result &optional output)
   (list err result output))
 
-(defsubst fuel-eval--retort-error (ret) (nth 0 ret))
+(defsubst fuel-eval--retort-error (ret)
+  (and (not (eq (nth 0 ret) 'f)) (nth 0 ret)))
 (defsubst fuel-eval--retort-result (ret) (nth 1 ret))
 (defsubst fuel-eval--retort-output (ret) (nth 2 ret))
 
