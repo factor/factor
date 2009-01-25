@@ -110,7 +110,7 @@ t compile-dependencies? set-global
     [ (compile) yield-hook get call ] slurp-deque ;
 
 : decompile ( word -- )
-    f 2array 1array t modify-code-heap ;
+    f 2array 1array modify-code-heap ;
 
 : optimized-recompile-hook ( words -- alist )
     [
