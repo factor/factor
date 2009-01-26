@@ -3,7 +3,7 @@
 USING: multiline kernel sequences io splitting fry namespaces
 http.parsers hashtables assocs combinators ascii io.files.unique
 accessors io.encodings.binary io.files byte-arrays math
-io.streams.string combinators.short-circuit strings ;
+io.streams.string combinators.short-circuit strings math.order ;
 IN: mime.multipart
 
 CONSTANT: buffer-size 65536
@@ -45,11 +45,7 @@ ERROR: end-of-stream multipart ;
     dup bytes>> [ fill-bytes ] unless  ;
 
 : split-bytes ( bytes separator -- leftover-bytes safe-to-dump )
-    2dup [ length ] [ length 1- ] bi* < [
-        drop f
-    ] [
-        length 1- cut-slice swap
-    ] if ;
+    dupd [ length ] bi@ 1- - short cut-slice swap ;
 
 : dump-until-separator ( multipart -- multipart )
     dup
@@ -57,11 +53,10 @@ ERROR: end-of-stream multipart ;
     [ nip ] [ start ] 2bi [
         cut-slice
         [ mime-write ]
-        [ over current-separator>> length tail-slice >>bytes ] bi*
+        [ over current-separator>> length short tail-slice >>bytes ] bi*
     ] [
         drop
-        dup [ bytes>> ] [ current-separator>> ] bi split-bytes
-        [ mime-write ] when*
+        dup [ bytes>> ] [ current-separator>> ] bi split-bytes mime-write
         >>bytes fill-bytes dup end-of-stream?>> [ dump-until-separator ] unless
     ] if* ;
 
@@ -70,10 +65,10 @@ ERROR: end-of-stream multipart ;
     [ dump-until-separator ] with-string-writer ;
 
 : read-header ( multipart -- multipart )
-    "\r\n\r\n" dump-string dup "--\r" = [
-        drop
+    dup bytes>> "--\r\n" sequence= [
+        t >>end-of-stream?
     ] [
-        parse-headers >>header
+        "\r\n\r\n" dump-string parse-headers >>header
     ] if ;
 
 : empty-name? ( string -- ? )
@@ -156,5 +151,5 @@ ERROR: no-content-disposition multipart ;
     dup end-of-stream?>> [ process-header parse-multipart-loop ] unless ;
 
 : parse-multipart ( separator -- mime-parts )
-    <multipart> parse-beginning parse-multipart-loop
+    <multipart> parse-beginning fill-bytes parse-multipart-loop
     mime-parts>> ;
