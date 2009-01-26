@@ -14,7 +14,7 @@ owner ;
 M: openbsd new-file-system-info freebsd-file-system-info new ;
 
 M: openbsd file-system-statfs
-    "statfs" <c-object> tuck statfs io-error ;
+    "statfs" <c-object> [ statfs io-error ] keep ;
 
 M: openbsd statfs>file-system-info ( file-system-info statfs -- file-system-info' )
     {
@@ -41,7 +41,7 @@ M: openbsd statfs>file-system-info ( file-system-info statfs -- file-system-info
     } cleave ;
 
 M: openbsd file-system-statvfs ( normalized-path -- statvfs )
-    "statvfs" <c-object> tuck statvfs io-error ;
+    "statvfs" <c-object> [ statvfs io-error ] keep ;
 
 M: openbsd statvfs>file-system-info ( file-system-info statvfs -- file-system-info' )
     {

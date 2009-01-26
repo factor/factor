@@ -221,8 +221,7 @@ SYMBOL: deserialized
     (deserialize) (deserialize) 2dup lookup
     dup [ 2nip ] [
         drop
-        "Unknown word: " -rot
-        2array unparse append throw
+        2array unparse "Unknown word: " prepend throw
     ] if ;
 
 : deserialize-gensym ( -- word )

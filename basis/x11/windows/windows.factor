@@ -37,7 +37,7 @@ IN: x11.windows
 : set-size-hints ( window -- )
     "XSizeHints" <c-object>
     USPosition over set-XSizeHints-flags
-    dpy get -rot XSetWMNormalHints ;
+    [ dpy get ] 2dip XSetWMNormalHints ;
 
 : auto-position ( window loc -- )
     { 0 0 } = [ drop ] [ set-size-hints ] if ;

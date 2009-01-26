@@ -287,8 +287,12 @@ IN: regexp-tests
 [ { "1" "2" "3" "4" } ]
 [ "1ABC2DEF3GHI4" R/ [A-Z]+/ re-split [ >string ] map ] unit-test
 
-[ { "1" "2" "3" "4" } ]
+[ { "1" "2" "3" "4" "" } ]
 [ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ re-split [ >string ] map ] unit-test
+
+[ { "" } ] [ "" R/ =/ re-split [ >string ] map ] unit-test
+
+[ { "a" "" } ] [ "a=" R/ =/ re-split [ >string ] map ] unit-test
 
 [ { "ABC" "DEF" "GHI" } ]
 [ "1ABC2DEF3GHI4" R/ [A-Z]+/ all-matches [ >string ] map ] unit-test
@@ -299,14 +303,16 @@ IN: regexp-tests
 [ 0 ]
 [ "123" R/ [A-Z]+/ count-matches ] unit-test
 
-[ "1.2.3.4" ]
+[ "1.2.3.4." ]
 [ "1ABC2DEF3GHI4JK" R/ [A-Z]+/ "." re-replace ] unit-test
+  
+[ "-- title --" ] [ "== title ==" R/ =/ "-" re-replace ] unit-test
 
 /*
 ! FIXME
 [ f ] [ "ab" "a(?!b)" <regexp> first-match ] unit-test
 [ "a" ] [ "ac" "a(?!b)" <regexp> first-match >string ] unit-test
-! [ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
+[ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 [ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 [ "a" ] [ "ab" "a(?=b)(?=b)" <regexp> first-match >string ] unit-test
 [ "a" ] [ "ba" "a(?<=b)(?<=b)" <regexp> first-match >string ] unit-test
@@ -317,7 +323,7 @@ IN: regexp-tests
 */
 
 ! Bug in parsing word
-[ t ] [ "a" R' a' matches?  ] unit-test
+[ t ] [ "a" R' a' matches? ] unit-test
 
 ! Convert to lowercase until E
 [ f ] [ "AA" R/ \LAA\E/ matches? ] unit-test

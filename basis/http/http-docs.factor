@@ -90,7 +90,7 @@ HELP: put-cookie
 { $side-effects "request/response" } ;
 
 HELP: <post-data>
-{ $values { "raw" byte-array } { "content-type" "a MIME type string" } { "post-data" post-data } }
+{ $values { "content-type" "a MIME type string" } { "post-data" post-data } }
 { $description "Creates a new " { $link post-data } "." } ;
 
 HELP: header

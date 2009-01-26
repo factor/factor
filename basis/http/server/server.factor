@@ -196,8 +196,8 @@ LOG: httpd-hit NOTICE
 
 LOG: httpd-header NOTICE
 
-: log-header ( headers name -- )
-    tuck header 2array httpd-header ;
+: log-header ( request name -- )
+    [ nip ] [ header ] 2bi 2array httpd-header ;
 
 : log-request ( request -- )
     [ [ method>> ] [ url>> ] bi 2array httpd-hit ]

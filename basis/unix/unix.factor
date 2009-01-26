@@ -155,8 +155,8 @@ FUNCTION: int utime ( char* path, utimebuf* buf ) ;
 
 : change-file-times ( filename access modification -- )
     "utimebuf" <c-object>
-    tuck set-utimbuf-modtime
-    tuck set-utimbuf-actime
+    [ set-utimbuf-modtime ] keep
+    [ set-utimbuf-actime ] keep
     [ utime ] unix-system-call drop ;
 
 FUNCTION: int pclose ( void* file ) ;

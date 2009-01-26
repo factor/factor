@@ -7,7 +7,7 @@ io io.sockets io.streams.string io.files io.timeouts
 io.pathnames io.encodings io.encodings.string io.encodings.ascii
 io.encodings.utf8 io.encodings.8-bit io.encodings.binary
 io.streams.duplex fry ascii urls urls.encoding present
-http http.parsers ;
+http http.parsers http.client.post-data ;
 IN: http.client
 
 ERROR: too-many-redirects ;
@@ -27,14 +27,6 @@ CONSTANT: max-redirects 10
     [ host>> ] [ port>> ] bi dup "http" protocol-port =
     [ drop ] [ ":" swap number>string 3append ] if ;
 
-: set-post-data-headers ( header post-data -- header )
-    [
-        data>> dup sequence?
-        [ length "content-length" ]
-        [ drop "chunked" "transfer-encoding" ] if
-        pick set-at
-    ] [ content-type>> "content-type" pick set-at ] bi ;
-
 : set-host-header ( request header -- request header )
     over url>> url-host "host" pick set-at ;
 
@@ -47,53 +39,6 @@ CONSTANT: max-redirects 10
     over post-data>> [ set-post-data-headers ] when*
     over cookies>> [ set-cookie-header ] unless-empty
     write-header ;
-
-PRIVATE>
-
-GENERIC: >post-data ( object -- post-data )
-
-M: f >post-data ;
-
-M: post-data >post-data ;
-
-M: string >post-data
-    utf8 encode
-    "application/octet-stream" <post-data>
-        swap >>data ;
-
-M: assoc >post-data
-    "application/x-www-form-urlencoded" <post-data>
-        swap >>params ;
-
-M: object >post-data
-    "application/octet-stream" <post-data>
-        swap >>data ;
-
-<PRIVATE
-    
-: normalize-post-data ( request -- request )
-    dup post-data>> [
-        dup params>> [
-            assoc>query ascii encode >>data
-        ] when* drop
-    ] when* ;
-
-: unparse-post-data ( request -- request )
-    [ >post-data ] change-post-data
-    normalize-post-data ;
-
-: write-chunk ( chunk -- )
-    [ length >hex ";\r\n" append ascii encode write ] [ write ] bi ;
-
-: write-chunked ( stream -- )
-    [ [ write-chunk ] each-block ] with-input-stream
-    "0;\r\n" ascii encode write ;
-
-: write-post-data ( request -- request )
-    dup method>> { "POST" "PUT" } member?  [
-        dup post-data>> data>> dup sequence?
-        [ write ] [ write-chunked ] if
-    ] when ;
 
 : write-request ( request -- )
     unparse-post-data
@@ -197,7 +142,7 @@ ERROR: download-failed response ;
     dup code>> success? [ download-failed ] unless ;
 
 : with-http-request ( request quot -- response )
-    (with-http-request) check-response ; inline
+    [ (with-http-request) check-response ] with-destructors ; inline
 
 : http-request ( request -- response data )
     [ [ % ] with-http-request ] B{ } make

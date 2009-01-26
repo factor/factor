@@ -73,9 +73,10 @@ PRIVATE>
 ! High level
 ERROR: no-slots-named class seq ;
 : check-columns ( class columns -- )
-    tuck
-    [ [ first ] map ]
-    [ all-slots [ name>> ] map ] bi* diff
+    [ nip ] [
+        [ [ first ] map ]
+        [ all-slots [ name>> ] map ] bi* diff
+    ] 2bi
     [ drop ] [ no-slots-named ] if-empty ;
 
 : define-persistent ( class table columns -- )

@@ -2,8 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test strings namespaces make arrays sequences 
-       peg peg.private accessors words math accessors ;
+       peg peg.private peg.parsers accessors words math accessors ;
 IN: peg.tests
+
+[ ] [ reset-pegs ] unit-test
 
 [
   "endbegin" "begin" token parse
@@ -194,3 +196,15 @@ IN: peg.tests
 ] unit-test
 
 { f } [ \ + T{ parser f f f } equal? ] unit-test
+
+USE: compiler
+
+[ ] [ disable-compiler ] unit-test
+
+[ ] [ "" epsilon parse drop ] unit-test
+
+[ ] [ enable-compiler ] unit-test
+
+[ [ ] ] [ "" epsilon [ drop [ [ ] ] call ] action parse ] unit-test
+  
+[ [ ] ] [ "" epsilon [ drop [ [ ] ] ] action [ call ] action parse ] unit-test

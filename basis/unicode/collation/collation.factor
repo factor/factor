@@ -125,7 +125,7 @@ PRIVATE>
 
 : filter-ignorable ( weights -- weights' )
     f swap [
-        tuck primary>> zero? and
+        [ nip ] [ primary>> zero? and ] 2bi
         [ swap ignorable?>> or ]
         [ swap completely-ignorable? or not ] 2bi
     ] filter nip ;
