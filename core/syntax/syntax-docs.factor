@@ -604,7 +604,7 @@ HELP: MIXIN:
 
 HELP: INSTANCE:
 { $syntax "INSTANCE: instance mixin" }
-{ $values { "instance" "a class word" } { "instance" "a class word" } }
+{ $values { "instance" "a class word" } { "mixin" "a mixin class word" } }
 { $description "Makes " { $snippet "instance" } " an instance of " { $snippet "mixin" } "." } ;
 
 HELP: PREDICATE:
