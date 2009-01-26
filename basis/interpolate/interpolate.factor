@@ -30,13 +30,13 @@ TUPLE: interpolate-var name ;
         if
     ] map [ ] join ; inline
 
-: interpolate-locals ( string -- quot )
-    [ search [ ] ] (interpolate) ;
-
 PRIVATE>
 
 MACRO: interpolate ( string -- )
     [ [ get ] ] (interpolate) ;
+
+: interpolate-locals ( string -- quot )
+    [ search [ ] ] (interpolate) ;
 
 : I[
     "]I" parse-multiline-string
