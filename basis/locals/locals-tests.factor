@@ -491,3 +491,7 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 [ 10 ] [
     [| | 0 '[ [let | A [ 10 ] | A _ + ] ] call ] call
 ] unit-test
+
+! Discovered by littledan
+[ "bar" ] [ [let | a [ [let | foo [ "bar" ] | foo ] ] | a ] ] unit-test
+[ 10 ] [ [let | a [ 10 ] | [let | b [ a ] | b ] ] ] unit-test
