@@ -42,7 +42,7 @@ ERROR: no-boundary ;
     ";" split1 nip
     "=" split1 nip [ no-boundary ] unless* ;
 
-: read-multipart-data ( request -- form-variables uploaded-files )
+: read-multipart-data ( request -- mime-parts )
     [ "content-type" header ]
     [ "content-length" header string>number ] bi
     unlimit-input
@@ -55,7 +55,7 @@ ERROR: no-boundary ;
 
 : parse-content ( request content-type -- post-data )
     [ <post-data> swap ] keep {
-        { "multipart/form-data" [ read-multipart-data assoc-union >>params ] }
+        { "multipart/form-data" [ read-multipart-data >>params ] }
         { "application/x-www-form-urlencoded" [ read-content query>assoc >>params ] }
         [ drop read-content >>data ]
     } case ;

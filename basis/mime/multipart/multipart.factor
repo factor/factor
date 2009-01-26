@@ -16,8 +16,7 @@ header
 content-disposition bytes
 filename temp-file
 name name-content
-uploaded-files
-form-variables ;
+mime-parts ;
 
 TUPLE: mime-file headers filename temporary-path ;
 TUPLE: mime-variable headers key value ;
@@ -25,8 +24,7 @@ TUPLE: mime-variable headers key value ;
 : <multipart> ( mime-separator -- multipart )
     multipart new
         swap >>mime-separator
-        H{ } clone >>uploaded-files
-        H{ } clone >>form-variables ;
+        H{ } clone >>mime-parts ;
 
 ERROR: bad-header bytes ;
 
@@ -87,16 +85,16 @@ ERROR: end-of-stream multipart ;
     ] [
         [ [ header>> ] [ filename>> ] [ temp-file>> ] tri mime-file boa ]
         [ filename>> ]
-        [ uploaded-files>> set-at ] tri
+        [ mime-parts>> set-at ] tri
     ] if ;
 
-: save-form-variable ( multipart -- )
+: save-mime-part ( multipart -- )
     dup name>> empty-name? [
         drop
     ] [
         [ [ header>> ] [ name>> ] [ name-content>> ] tri mime-variable boa ]
         [ name>> ]
-        [ form-variables>> set-at ] tri
+        [ mime-parts>> set-at ] tri
     ] if ;
 
 : dump-mime-file ( multipart filename -- multipart )
@@ -124,7 +122,7 @@ ERROR: unknown-content-disposition multipart ;
     ] [
         "name" lookup-disposition [
             [ dup mime-separator>> dump-string >>name-content ] dip
-            >>name dup save-form-variable
+            >>name dup save-mime-part
         ] [
              unknown-content-disposition
         ] if*
@@ -157,6 +155,6 @@ ERROR: no-content-disposition multipart ;
     read-header
     dup end-of-stream?>> [ process-header parse-multipart-loop ] unless ;
 
-: parse-multipart ( separator -- form-variables uploaded-files )
+: parse-multipart ( separator -- mime-parts )
     <multipart> parse-beginning parse-multipart-loop
-    [ form-variables>> ] [ uploaded-files>> ] bi ;
+    mime-parts>> ;
