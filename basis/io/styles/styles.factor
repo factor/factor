@@ -3,7 +3,7 @@
 USING: hashtables io io.streams.plain io.streams.string
 colors summary make accessors splitting math.order
 kernel namespaces assocs destructors strings sequences
-present ;
+present fry ;
 IN: io.styles
 
 GENERIC: stream-format ( str style stream -- )
@@ -118,12 +118,12 @@ M: plain-writer make-block-stream
 
 : format-column ( seq ? -- seq )
     [
-        [ 0 [ length max ] reduce ] keep
-        swap [ CHAR: \s pad-right ] curry map
+        dup [ length ] map supremum
+        '[ _ CHAR: \s pad-right ] map
     ] unless ;
 
 : map-last ( seq quot -- seq )
-    [ dup length <reversed> ] dip [ 0 = ] prepose 2map ; inline
+    [ dup length <reversed> ] dip '[ 0 = @ ] 2map ; inline
 
 : format-table ( table -- seq )
     flip [ format-column ] map-last
@@ -178,8 +178,8 @@ M: input present string>> ;
 M: input summary
     [
         "Input: " %
-        string>> "\n" split1 swap %
-        "..." "" ? %
+        string>> "\n" split1
+        [ % ] [ "..." "" ? % ] bi*
     ] "" make ;
 
 : write-object ( str obj -- ) presented associate format ;
