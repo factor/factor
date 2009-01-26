@@ -8,7 +8,7 @@ vectors words quotations assocs system layouts splitting
 grouping growable classes classes.builtin classes.tuple
 classes.tuple.private words.private vocabs
 vocabs.loader source-files definitions debugger
-quotations.private sequences.private combinators combinators.smart
+quotations.private sequences.private combinators
 math.order math.private accessors
 slots.private compiler.units fry ;
 IN: bootstrap.image
@@ -95,7 +95,7 @@ SYMBOL: objects
 SYMBOL: sub-primitives
 
 : make-jit ( quot rc rt offset -- quad )
-    [ [ { } make ] 3dip ] output>array ; inline
+    [ { } make ] 3dip 4array ; inline
 
 : jit-define ( quot rc rt offset name -- )
     [ make-jit ] dip set ; inline
