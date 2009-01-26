@@ -74,12 +74,24 @@ ERROR: end-of-stream multipart ;
 : empty-name? ( string -- ? )
     { "''" "\"\"" "" f } member? ;
 
+: quote? ( ch -- ? ) "'\"" member? ;
+
+: quoted? ( str -- ? )
+    {
+        [ length 1 > ]
+        [ first quote? ]
+        [ [ first ] [ peek ] bi = ]
+    } 1&& ;
+
+: unquote ( str -- newstr )
+    dup quoted? [ but-last-slice rest-slice >string ] when ;
+
 : save-uploaded-file ( multipart -- )
     dup filename>> empty-name? [
         drop
     ] [
         [ [ header>> ] [ filename>> ] [ temp-file>> ] tri mime-file boa ]
-        [ content-disposition>> "name" swap at ]
+        [ content-disposition>> "name" swap at unquote ]
         [ mime-parts>> set-at ] tri
     ] if ;
 
@@ -88,7 +100,7 @@ ERROR: end-of-stream multipart ;
         drop
     ] [
         [ [ header>> ] [ name>> ] [ name-content>> ] tri mime-variable boa ]
-        [ name>> ]
+        [ name>> unquote ]
         [ mime-parts>> set-at ] tri
     ] if ;
 
@@ -112,6 +124,7 @@ ERROR: unknown-content-disposition multipart ;
 
 : parse-form-data ( multipart -- multipart )
     "filename" lookup-disposition [
+        unquote
         >>filename
         [ dump-file ] [ save-uploaded-file ] bi
     ] [

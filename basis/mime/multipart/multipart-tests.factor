@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.encodings.ascii io.files io.files.unique kernel
 mime.multipart tools.test io.streams.duplex io multiline
-assocs ;
+assocs accessors ;
 IN: mime.multipart.tests
 
 : upload-separator ( -- seq )
@@ -20,11 +20,16 @@ IN: mime.multipart.tests
 
 [ t ] [
     mime-test-stream [ upload-separator parse-multipart ] with-input-stream
-    "\"file1\"" swap key?
+    "file1" swap key?
 ] unit-test
 
 [ t ] [
     mime-test-stream [ upload-separator parse-multipart ] with-input-stream
-    "\"text1\"" swap key?
+    "file1" swap key?
+] unit-test
+
+[ t ] [
+    mime-test-stream [ upload-separator parse-multipart ] with-input-stream
+    "file1" swap at filename>> "up.txt" =
 ] unit-test
 
