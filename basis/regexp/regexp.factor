@@ -61,8 +61,11 @@ IN: regexp
     dupd first-match
     [ split1-slice swap ] [ "" like f swap ] if* ;
 
+: (re-split) ( string regexp -- )
+    over [ [ re-cut , ] keep (re-split) ] [ 2drop ] if ;
+
 : re-split ( string regexp -- seq )
-    [ dup length 0 > ] swap '[ _ re-cut ] [ ] produce nip ;
+    [ (re-split) ] { } make ;
 
 : re-replace ( string regexp replacement -- result )
     [ re-split ] dip join ;

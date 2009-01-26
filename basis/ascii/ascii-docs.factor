@@ -57,8 +57,10 @@ HELP: >upper
 { $values { "str" "a string" } { "upper" "a string" } }
 { $description "Converts an ASCII string to upper case." } ;
 
-ARTICLE: "ascii" "ASCII character classes"
-"The " { $vocab-link "ascii" } " vocabulary implements traditional ASCII character classes:"
+ARTICLE: "ascii" "ASCII"
+"The " { $vocab-link "ascii" } " vocabulary implements support for the legacy ASCII character set. Most applications should use " { $link "unicode" } " instead."
+$nl
+"ASCII character classes:"
 { $subsection blank? }
 { $subsection letter? }
 { $subsection LETTER? }
@@ -67,11 +69,10 @@ ARTICLE: "ascii" "ASCII character classes"
 { $subsection control? }
 { $subsection quotable? }
 { $subsection ascii? }
-"ASCII case conversion is also implemented:"
+"ASCII case conversion:"
 { $subsection ch>lower }
 { $subsection ch>upper }
 { $subsection >lower }
-{ $subsection >upper }
-"Modern applications should use Unicode 5.1 instead (" { $vocab-link "unicode.categories" } ")." ;
+{ $subsection >upper } ;
 
 ABOUT: "ascii"
