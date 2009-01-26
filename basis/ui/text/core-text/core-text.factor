@@ -24,8 +24,8 @@ CONSTANT: font-names
 
 : font-traits ( font -- n )
     [ 0 ] dip
-    [ bold>> [ (bold) ] when ]
-    [ italic>> [ (italic) ] when ] bi ;
+    [ bold?>> [ (bold) ] when ]
+    [ italic?>> [ (italic) ] when ] bi ;
 
 : apply-font-traits ( font style -- font' )
     [ drop ] [ [ 0.0 f ] dip font-traits dup ] 2bi

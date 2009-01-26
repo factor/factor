@@ -5,6 +5,8 @@ IN: ui.text
 
 TUPLE: font name size bold? italic? ;
 
+: <font> ( -- font ) font new ; inline
+
 <PRIVATE
 
 SYMBOL: font-renderer

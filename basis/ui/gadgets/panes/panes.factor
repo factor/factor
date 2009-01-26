@@ -1,15 +1,15 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+USING: arrays hashtables io kernel namespaces sequences
+io.styles strings quotations math opengl combinators
+math.vectors sorting splitting assocs classes.tuple models
+continuations destructors accessors math.geometry.rect fry
+ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.paragraphs
 ui.gadgets.incremental ui.gadgets.packs ui.gadgets.theme
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
-hashtables io kernel namespaces sequences io.styles strings
-quotations math opengl combinators math.vectors sorting
-splitting assocs ui.gadgets.presentations
-ui.gadgets.grids ui.gadgets.grid-lines
-classes.tuple models continuations destructors accessors
-math.geometry.rect fry ;
+ui.text ui.gadgets.presentations ui.gadgets.grids
+ui.gadgets.grid-lines ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < pack
@@ -192,10 +192,11 @@ M: pane-stream make-span-stream
         [ font swap at "monospace" or >>name ]
         [
             font-style swap at {
+                { f [ ] }
                 { plain [ ] }
-                { bold [ t >>bold ] }
-                { italic [ t >>italic ] }
-                { bold-italic [ t >>bold t >>italic ] }
+                { bold [ t >>bold? ] }
+                { italic [ t >>italic? ] }
+                { bold-italic [ t >>bold? t >>italic? ] }
             } case
         ]
         [ font-size swap at 12 or >>size ]

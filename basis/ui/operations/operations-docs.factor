@@ -5,7 +5,7 @@ IN: ui.operations
 
 : $operations ( element -- )
     >quotation call
-    f f operations>commands
+    f operations>commands
     command-map. ;
 
 : $operation ( element -- )

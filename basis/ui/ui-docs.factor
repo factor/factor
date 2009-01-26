@@ -1,7 +1,7 @@
 USING: help.markup help.syntax strings quotations debugger
 namespaces ui.backend ui.gadgets ui.gadgets.worlds
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids
-math.geometry.rect colors ;
+math.geometry.rect colors ui.text ;
 IN: ui
 
 HELP: windows
@@ -68,7 +68,7 @@ ARTICLE: "ui-glossary" "UI glossary"
 { $table
     { "color" { "an instance of " { $link color } } }
     { "dimension" "a pair of integers denoting pixel size on screen" }
-    { "font" { "an instance of " { link font } } }
+    { "font" { "an instance of " { $link font } } }
     { "gadget" { "a graphical element which responds to user input. Gadgets are tuples which (directly or indirectly) inherit from " { $link gadget } "." } }
     { "label specifier" { "a string, " { $link f } " or a gadget. See " { $link "ui.gadgets.buttons" } } }
     { "orientation specifier" { "one of " { $snippet "{ 0 1 }" } " or " { $snippet "{ 1 0 }" } ", with the former denoting vertical orientation and the latter denoting horizontal. Using a vector instead of symbolic constants allows these values to be directly useful in co-ordinate calculations" } }

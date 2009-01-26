@@ -96,13 +96,6 @@ IN: ui.tools.listener.tests
 [ ] [ <listener-gadget> "listener" set ] unit-test
 
 "listener" get [
-    [ "dup" ] [
-        \ dup word-completion-string
-    ] unit-test
-
-    [ "equal?" ]
-    [ \ array \ equal? method word-completion-string ] unit-test
-
     <pane> <interactor> "i" set
 
     [ t ] [ "i" get interactor? ] unit-test
@@ -150,9 +143,3 @@ IN: ui.tools.listener.tests
     <gadget> "l" get show-popup
     "l" get hide-popup
 ] unit-test
-
-[ t ] [ { "USING:" "A" "B" "C" } complete-USING:? ] unit-test
-
-[ f ] [ { "USING:" "A" "B" "C" ";" } complete-USING:? ] unit-test
-
-[ t ] [ { "X" ";" "USING:" "A" "B" "C" } complete-USING:? ] unit-test

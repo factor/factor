@@ -1,5 +1,6 @@
 USING: documents help.markup help.syntax ui.gadgets
-ui.gadgets.scrollers models strings ui.commands ;
+ui.gadgets.scrollers models strings ui.commands
+ui.text colors ;
 IN: ui.gadgets.editors
 
 HELP: editor
@@ -9,8 +10,8 @@ $nl
 { $list
     { { $snippet "font" } " - a " { $link font } "." }
     { { $snippet "color" } " - a " { $link color } "." }
-    { { $snippet "caret-color" } " - a " { $link color } ". }
-    { { $snippet "selection-color" } " - a " { $link color } ". }
+    { { $snippet "caret-color" } " - a " { $link color } "." }
+    { { $snippet "selection-color" } " - a " { $link color } "." }
     { { $snippet "caret" } " - a " { $link model } " storing a line/column pair." }
     { { $snippet "mark" } " - a " { $link model } " storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
     { { $snippet "focused?" } " - a boolean." }

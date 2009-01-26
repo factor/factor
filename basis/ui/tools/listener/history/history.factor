@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors documents kernel math math.order
-sequences fry ;
+sequences fry io.styles ;
 IN: ui.tools.listener.history
 
 TUPLE: history document elements index ;
