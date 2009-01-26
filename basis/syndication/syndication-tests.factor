@@ -43,4 +43,4 @@ IN: syndication.tests
         }
     }
 } ] [ "resource:basis/syndication/test/atom.xml" load-news-file ] unit-test
-[ ] [ "resource:basis/syndication/test/atom.xml" load-news-file xml>string drop ] unit-test
+[ ] [ "resource:basis/syndication/test/atom.xml" load-news-file feed>xml xml>string drop ] unit-test
