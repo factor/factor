@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double, Daniel Ehrenberg.
 ! Portions copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: xml.utilities kernel assocs xml.generator math.order
+USING: xml.utilities kernel assocs math.order
     strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities.html io.files io
     http.client namespaces make xml.interpolate hashtables
@@ -132,7 +132,9 @@ TUPLE: entry title url description date ;
     XML] ;
 
 : feed>xml ( feed -- xml )
-    [ title>> ] [ url>> present ] [ entries>> [ entry>xml ] map ] tri
+    [ title>> ]
+    [ url>> present ]
+    [ entries>> [ entry>xml ] map ] tri
     <XML
         <feed xmlns="http://www.w3.org/2005/Atom">
             <title><-></title>
