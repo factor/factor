@@ -7,7 +7,7 @@ calendar alarms continuations ui.clipboards ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.theme
 ui.gadgets.menus ui.gadgets.wrappers ui.render ui.text
-ui.gestures math.geometry.rect ;
+ui.gestures math.geometry.rect splitting unicode.categories ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget
@@ -359,8 +359,6 @@ M: editor gadget-text* editor-string % ;
     [ drop dup extend-selection dup mark>> click-loc ]
     [ select-elt ] if ;
 
-: insert-newline ( editor -- ) "\n" swap user-input* drop ;
-
 : delete-next-character ( editor -- ) 
     char-elt editor-delete ;
 
@@ -420,10 +418,6 @@ editor "clipboard" f {
         char-elt editor-next
     ] if ;
 
-: previous-line ( editor -- ) line-elt editor-prev ;
-
-: next-line ( editor -- ) line-elt editor-next ;
-
 : previous-word ( editor -- ) word-elt editor-prev ;
 
 : next-word ( editor -- ) word-elt editor-next ;
@@ -464,12 +458,6 @@ editor "caret-motion" f {
 
 : select-next-character ( editor -- ) 
     char-elt editor-select-next ;
-
-: select-previous-line ( editor -- ) 
-    line-elt editor-select-prev ;
-
-: select-next-line ( editor -- ) 
-    line-elt editor-select-next ;
 
 : select-previous-word ( editor -- ) 
     word-elt editor-select-prev ;
@@ -520,6 +508,47 @@ TUPLE: multiline-editor < editor ;
 : <multiline-editor> ( -- editor )
     multiline-editor new-editor ;
 
+: previous-line ( editor -- ) line-elt editor-prev ;
+
+: next-line ( editor -- ) line-elt editor-next ;
+
+: select-previous-line ( editor -- ) 
+    line-elt editor-select-prev ;
+
+: select-next-line ( editor -- ) 
+    line-elt editor-select-next ;
+
+: insert-newline ( editor -- )
+    "\n" swap user-input* drop ;
+
+: change-selection ( editor quot -- )
+    '[ gadget-selection @ ] keep user-input* drop ; inline
+
+: join-lines ( string -- string' )
+    "\n" split
+    [ rest-slice [ [ blank? ] trim-left-slice ] change-each ]
+    [ but-last-slice [ [ blank? ] trim-right-slice ] change-each ]
+    [ " " join ]
+    tri ;
+
+: this-line-and-next ( document line -- start end )
+    [ nip 0 swap 2array ]
+    [ [ nip 1+ ] [ 1+ swap doc-line length ] 2bi 2array ]
+    2bi ;
+
+: last-line? ( document line -- ? )
+    [ last-line# ] dip = ;
+
+: com-join-lines ( editor -- )
+    dup gadget-selection?
+    [ [ join-lines ] change-selection ] [
+        [ model>> ] [ editor-caret first ] bi
+        2dup last-line? [ 2drop ] [
+            [ this-line-and-next ] [ drop ] 2bi
+            [ join-lines ] change-doc-range
+        ] if
+    ] if ;
+
 multiline-editor "multiline" f {
     { T{ key-down f f "UP" } previous-line }
     { T{ key-down f f "DOWN" } next-line }
@@ -528,6 +557,7 @@ multiline-editor "multiline" f {
     { T{ key-down f f "RET" } insert-newline }
     { T{ key-down f { S+ } "RET" } insert-newline }
     { T{ key-down f f "ENTER" } insert-newline }
+    { T{ key-down f { C+ } "j" } com-join-lines }
 } define-command-map
 
 TUPLE: source-editor < multiline-editor ;

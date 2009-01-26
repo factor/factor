@@ -48,3 +48,11 @@ IN: ui.gadgets.editors.tests
 "field" get [
     [ "hello" ] [ "field" get field-model>> value>> ] unit-test
 ] with-grafted-gadget
+
+[ "Hello world." ] [ "Hello    \n    world." join-lines ] unit-test
+[ "  Hello world.  " ] [ "  Hello    \n    world.  " join-lines ] unit-test
+[ "  Hello world. Goodbye." ] [ "  Hello    \n    world.  \n  Goodbye." join-lines ] unit-test
+
+[ ] [ <editor> com-join-lines ] unit-test
+[ ] [ <editor> "A" over set-editor-string com-join-lines ] unit-test
+[ "A B" ] [ <editor> "A\nB" over set-editor-string [ com-join-lines ] [ editor-string ] bi ] unit-test
