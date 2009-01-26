@@ -150,3 +150,52 @@ HELP: assure-name
 HELP: <simple-name>
 { $values { "string" string } { "name" name } }
 { $description "Converts a string into an XML name with an empty prefix and URL." } ;
+
+HELP: element-decl
+{ $class-description "Describes the class of element declarations, like <!ELEMENT  greeting (#PCDATA)>." } ;
+
+HELP: <element-decl>
+{ $values { "name" name } { "content-spec" string } { "element-decl" entity-decl } }
+{ $description "Creates an element declaration object, of the class " { $link element-decl } } ;
+
+HELP: attlist-decl
+{ $class-description "Describes the class of element declarations, like <!ATTLIST pre xml:space (preserve) #FIXED 'preserve'>." } ;
+
+HELP: <attlist-decl>
+{ $values { "name" name } { "att-defs" string } { "attlist-decl" attlist-decl } }
+{ $description "Creates an element declaration object, of the class " { $link attlist-decl } } ;
+
+HELP: entity-decl
+{ $class-description "Describes the class of element declarations, like <!ENTITY foo 'bar'>." } ;
+
+HELP: <entity-decl>
+{ $values { "name" name } { "def" string } { "pe?" "t or f" } { "entity-decl" entity-decl } }
+{ $description "Creates an entity declaration object, of the class " { $link entity-decl } ". The pe? slot should be t if the object is a DTD-internal entity, like <!ENTITY % foo 'bar'> and f if the object is like <!ENTITY foo 'bar'>, that is, it can be used outside of the DTD." } ;
+
+HELP: system-id
+{ $class-description "Describes the class of system identifiers within an XML DTD directive, such as <!DOCTYPE greeting " { $emphasis "SYSTEM 'hello.dtd'" } ">" } ;
+
+HELP: <system-id>
+{ $values { "system-literal" string } { "system-id" system-id } }
+{ $description "Constructs a " { $link system-id } " tuple." } ;
+
+HELP: public-id
+{ $class-description "Describes the class of public identifiers within an XML DTD directive, such as <!DOCTYPE open-hatch " { $emphasis "PUBLIC '-//Textuality//TEXT Standard open-hatch boilerplate//EN' 'http://www.textuality.com/boilerplate/OpenHatch.xml'" } ">" } ;
+
+HELP: <public-id>
+{ $values { "pubid-literal" string } { "system-literal" string } { "public-id" public-id } }
+{ $description "Constructs a " { $link system-id } " tuple." } ;
+
+HELP: notation-decl
+{ $class-description "Describes the class of element declarations, like <!NOTATION jpg SYSTEM './jpgviewer'>." } ;
+
+HELP: <notation-decl>
+{ $values { "name" string } { "id" id } { "notation-decl" notation-decl } }
+{ $description "Creates an notation declaration object, of the class " { $link notation-decl } "." } ;
+
+HELP: doctype-decl
+{ $class-description "Describes the class of doctype declarations." } ;
+
+HELP: <doctype-decl>
+{ $values { "name" name } { "external-id" id } { "internal-subset" sequence } { "doctype-decl" doctype-decl } }
+{ $description "Creates a new doctype declaration object, of the class " { $link doctype-decl } ". Only one of external-id or internal-subset will be non-null." } ;

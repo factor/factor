@@ -5,6 +5,9 @@ delegate.protocols delegate vectors accessors multiline
 macros words quotations combinators slots fry strings ;
 IN: xml.data
 
+TUPLE: interpolated var ;
+C: <interpolated> interpolated
+
 UNION: nullable-string string POSTPONE: f ;
 
 TUPLE: name
@@ -85,11 +88,13 @@ C: <comment> comment
 TUPLE: directive ;
 
 TUPLE: element-decl < directive
-    { name string } { content-spec string } ;
+    { name string }
+    { content-spec string } ;
 C: <element-decl> element-decl
 
 TUPLE: attlist-decl < directive
-    { name string } { att-defs string } ;
+    { name string }
+    { att-defs string } ;
 C: <attlist-decl> attlist-decl
 
 UNION: boolean t POSTPONE: f ;
@@ -108,13 +113,23 @@ C: <public-id> public-id
 
 UNION: id system-id public-id POSTPONE: f ;
 
+TUPLE: dtd
+    { directives sequence }
+    { entities assoc }
+    { parameter-entities assoc } ;
+C: <dtd> dtd
+
+UNION: dtd/f dtd POSTPONE: f ;
+
 TUPLE: doctype-decl < directive
     { name string }
     { external-id id }
-    { internal-subset sequence } ;
+    { internal-subset dtd/f } ;
 C: <doctype-decl> doctype-decl
 
-TUPLE: notation-decl < directive name id ;
+TUPLE: notation-decl < directive
+    { name string }
+    { id string } ;
 C: <notation-decl> notation-decl
 
 TUPLE: instruction { text string } ;
