@@ -3,7 +3,8 @@
 USING: accessors arrays assocs kernel math math.order models
 namespaces make sequences words strings system hashtables
 math.parser math.vectors classes.tuple classes boxes calendar
-alarms combinators sets columns fry deques ui.gadgets ;
+alarms combinators sets columns fry deques ui.gadgets
+unicode.case combinators.short-circuit ;
 IN: ui.gestures
 
 GENERIC: handle-gesture ( gesture gadget -- ? )
@@ -280,12 +281,26 @@ SYMBOL: drag-timer
 
 GENERIC: gesture>string ( gesture -- string/f )
 
-: modifiers>string ( modifiers -- string )
-    [ name>> ] map concat >string ;
+HOOK: modifiers>string os ( modifiers -- string )
+
+M: macosx modifiers>string
+    [
+        {
+            { A+ [ "⌘" ] }
+            { M+ [ "⎇" ] }
+            { S+ [ "⇧" ] }
+            { C+ [ "⌃" ] }
+        } case
+    ] map "" join ;
+
+M: object modifiers>string
+    [ name>> ] map "" join ;
 
 M: key-down gesture>string
-    dup mods>> modifiers>string
-    swap sym>> append ;
+    [ mods>> ] [ sym>> ] bi
+    dup { [ length 1 = ] [ upper? ] } 1&&
+    [ [ S+ prefix ] dip ] [ >upper ] if
+    [ modifiers>string ] dip append ;
 
 M: button-up gesture>string
     [

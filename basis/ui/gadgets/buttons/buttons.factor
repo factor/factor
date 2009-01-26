@@ -218,12 +218,10 @@ TUPLE: radio-control < button value ;
         align-left ; inline
 
 M: radio-control model-changed
-    swap value>>
-    over value>> = >>selected?
-    relayout-1 ;
+    2dup [ value>> ] bi@ = >>selected? relayout-1 drop ;
 
-: <radio-controls> ( assoc model parent quot: ( value model label -- gadget ) -- parent )
-    '[ _ swap @ add-gadget ] assoc-each ; inline
+:: <radio-controls> ( parent model assoc quot: ( value model label -- gadget ) -- parent )
+    assoc model [ parent swap quot call add-gadget ] assoc-each ; inline
 
 : radio-button-theme ( gadget -- gadget )
     { 5 5 } >>gap
@@ -234,7 +232,7 @@ M: radio-control model-changed
 
 : <radio-buttons> ( model assoc -- gadget )
     <filled-pile>
-        spin [ <radio-button> ] <radio-controls>
+        [ <radio-button> ] <radio-controls>
         { 5 5 } >>gap ;
 
 : <toggle-button> ( value model label -- gadget )
@@ -242,7 +240,7 @@ M: radio-control model-changed
 
 : <toggle-buttons> ( model assoc -- gadget )
     <shelf>
-        spin [ <toggle-button> ] <radio-controls> ;
+        [ <toggle-button> ] <radio-controls> ;
 
 : command-button-quot ( target command -- quot )
     '[ _ _ invoke-command drop ] ;
@@ -252,8 +250,9 @@ M: radio-control model-changed
 
 : <toolbar> ( target -- toolbar )
     <shelf>
+        1 >>fill
         swap
-        "toolbar" over class command-map commands>> swap
+        [ [ "toolbar" ] dip class command-map commands>> ] keep
         '[ [ _ ] 2dip <command-button> add-gadget ] assoc-each ;
 
 : add-toolbar ( track -- track )
