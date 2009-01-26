@@ -3,7 +3,7 @@
 USING: assocs accessors alien core-graphics.types core-text kernel
 hashtables namespaces sequences ui.gadgets.worlds ui.text
 ui.text.private opengl opengl.gl destructors combinators core-foundation
-core-foundation.strings memoize math math.vectors ;
+core-foundation.strings memoize math math.vectors init ;
 IN: ui.text.core-text
 
 SINGLETON: core-text-renderer
@@ -39,6 +39,8 @@ MEMO: cache-font ( font -- open-font )
             f CTFontCreateWithName
         ] keep apply-font-traits
     ] with-destructors ;
+
+[ \ cache-font reset-memoized ] "ui.text.core-text" add-init-hook
 
 M: core-text-renderer open-font
     dup alien? [ cache-font ] unless ;
