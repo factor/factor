@@ -4,7 +4,7 @@
 USING: xml.utilities kernel assocs xml.generator math.order
     strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities.html io.files io
-    http.client namespaces make xml.generator hashtables
+    http.client namespaces make xml.interpolate hashtables
     calendar.format accessors continuations urls present ;
 IN: syndication
 
@@ -114,26 +114,29 @@ TUPLE: entry title url description date ;
     http-get nip string>feed ;
 
 ! Atom generation
-: simple-tag, ( content name -- )
-    [ , ] tag, ;
 
-: simple-tag*, ( content name attrs -- )
-    [ , ] tag*, ;
-
-: entry, ( entry -- )
-    "entry" [
-        {
-            [ title>> "title" { { "type" "html" } } simple-tag*, ]
-            [ url>> present "href" associate "link" swap contained*, ]
-            [ date>> timestamp>rfc3339 "published" simple-tag, ]
-            [ description>> [ "content" { { "type" "html" } } simple-tag*, ] when* ]
-        } cleave
-    ] tag, ;
+: entry>xml ( entry -- xml )
+    {
+        [ title>> ]
+        [ url>> present ]
+        [ date>> timestamp>rfc3339 ]
+        [ description>> ]
+    } cleave
+    [XML
+        <entry>
+            <title type="html"><-></title>
+            <link href=<-> />
+            <published><-></published>
+            <content type="html"><-></content>
+        </entry>
+    XML] ;
 
 : feed>xml ( feed -- xml )
-    "feed" { { "xmlns" "http://www.w3.org/2005/Atom" } } [
-        [ title>> "title" simple-tag, ]
-        [ url>> present "href" associate "link" swap contained*, ]
-        [ entries>> [ entry, ] each ]
-        tri
-    ] make-xml* ;
+    [ title>> ] [ url>> present ] [ entries>> [ entry>xml ] map ] tri
+    <XML
+        <feed xmlns="http://www.w3.org/2005/Atom">
+            <title><-></title>
+            <link href=<-> />
+            <->
+        </feed>
+    XML> ;
