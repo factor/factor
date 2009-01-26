@@ -1,5 +1,5 @@
-IN: ui.cocoa.views.tests
-USING: ui.cocoa.views tools.test kernel math.geometry.rect
+IN: ui.backend.cocoa.views.tests
+USING: ui.backend.cocoa.views tools.test kernel math.geometry.rect
 namespaces ;
 
 [ t ] [

@@ -5,11 +5,11 @@ command-line kernel memory namespaces cocoa.messages
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
 cocoa.windows cocoa.classes cocoa.nibs sequences system ui
 ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
-ui.cocoa.views core-foundation core-foundation.run-loop
+ui.backend.cocoa.views core-foundation core-foundation.run-loop
 core-graphics.types threads math.geometry.rect fry libc
-generalizations alien.c-types cocoa.views ui.cocoa.text
+generalizations alien.c-types cocoa.views
 combinators io.thread ;
-IN: ui.cocoa
+IN: ui.backend.cocoa
 
 TUPLE: handle ;
 TUPLE: window-handle < handle view window ;

@@ -2,7 +2,7 @@ IN: ui.text
 USING: help.markup help.syntax kernel ui.text.private strings math ;
 
 HELP: open-font
-{ $values { "font" "a font specifier" } { "open-font" object } }
+{ $values { "font" font } { "open-font" object } }
 { $contract "Loads a font if it has not already been loaded, otherwise outputs the existing font." }
 { $errors "Throws an error if the font does not exist." }
 { $notes "This word should not be called by user code. All high-level text rendering words will call " { $link open-font } " automatically." } ;
@@ -13,7 +13,7 @@ HELP: string-width
 { $notes "This is a low-level word; use " { $link text-width } " instead." } ;
 
 HELP: text-width
-{ $values { "font" "a font specifier" } { "text" "a string or sequence of strings" } { "w" "a positive integer" } }
+{ $values { "font" font } { "text" "a string or sequence of strings" } { "w" "a positive integer" } }
 { $description "Outputs the width of a piece of text." } ;
 
 HELP: string-height
@@ -22,7 +22,7 @@ HELP: string-height
 { $notes "This is a low-level word; use " { $link text-height } " instead." } ;
 
 HELP: text-height
-{ $values { "font" "a font specifier" } { "text" "a string or sequence of strings" } { "h" "a positive integer" } }
+{ $values { "font" font } { "text" "a string or sequence of strings" } { "h" "a positive integer" } }
 { $description "Outputs the height of a piece of text." } ;
 
 HELP: string-dim
@@ -31,23 +31,23 @@ HELP: string-dim
 { $notes "This is a low-level word; use " { $link text-dim } " instead." } ;
 
 HELP: text-dim
-{ $values { "font" "a font specifier" } { "text" "a string or sequence of strings" } { "dim" "a pair of integers" } }
+{ $values { "font" font } { "text" "a string or sequence of strings" } { "dim" "a pair of integers" } }
 { $description "Outputs the dimensions of a piece of text, which is either a single-line string or an array of lines." } ;
 
 HELP: draw-string
-{ $values { "font" "a font specifier" } { "string" string } { "loc" "a pair of integers" } }
+{ $values { "font" font } { "string" string } { "loc" "a pair of integers" } }
 { $contract "Draws a line of text." } ;
 
 HELP: draw-text
-{ $values { "font" "a font specifier" } { "text" "a string or an array of strings" } { "loc" "a pair of integers" } }
+{ $values { "font" font } { "text" "a string or an array of strings" } { "loc" "a pair of integers" } }
 { $description "Draws a piece of text." } ;
 
 HELP: x>offset
-{ $values { "x" real } { "font" "a font specifier" } { "string" string } { "n" integer } }
+{ $values { "x" real } { "font" font } { "string" string } { "n" integer } }
 { $contract "Outputs the string index closest to the given x co-ordinate." } ;
 
 HELP: offset>x
-{ $values { "n" integer } { "font" "a font specifier" } { "string" string } { "x" real } }
+{ $values { "n" integer } { "font" font } { "string" string } { "x" real } }
 { $contract "Outputs the x co-ordinate of the character at the given index." } ;
 
 ARTICLE: "text-rendering" "Rendering text"

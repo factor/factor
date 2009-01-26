@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! Copyright (C) 2006, 2007 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel sequences io.styles ui.gadgets ui.render
-colors colors.gray accessors ;
+USING: arrays kernel sequences ui.gadgets ui.render
+ui.text colors colors.gray accessors ;
 QUALIFIED: colors
 IN: ui.gadgets.theme
 
@@ -58,6 +58,6 @@ IN: ui.gadgets.theme
         T{ gray f 0.5  1.0 }
     } <gradient> ;
 
-: sans-serif-font { "sans-serif" plain 12 } ;
+CONSTANT: sans-serif-font T{ font { name "sans-serif" } { size 12 } }
 
-: monospace-font { "monospace" plain 12 } ;
+CONSTANT: monospace-font T{ font { name "monospace" } { size 12 } }

@@ -1,6 +1,7 @@
 USING: help.markup help.syntax strings quotations debugger
-io.styles namespaces ui.backend ui.gadgets ui.gadgets.worlds
-ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids math.geometry.rect colors ;
+namespaces ui.backend ui.gadgets ui.gadgets.worlds
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids
+math.geometry.rect colors ;
 IN: ui
 
 HELP: windows
@@ -67,15 +68,7 @@ ARTICLE: "ui-glossary" "UI glossary"
 { $table
     { "color" { "an instance of " { $link color } } }
     { "dimension" "a pair of integers denoting pixel size on screen" }
-    { "font specifier"
-        { "an array of three elements:"
-            { $list
-                { "font family - one of " { $snippet "serif" } ", " { $snippet "sans-serif" } " or " { $snippet "monospace" } }
-                { "font style - one of " { $link plain } ", " { $link bold } ", " { $link italic } " or " { $link bold-italic } }
-                "font size in points"
-            }
-        }
-    }
+    { "font" { "an instance of " { link font } } }
     { "gadget" { "a graphical element which responds to user input. Gadgets are tuples which (directly or indirectly) inherit from " { $link gadget } "." } }
     { "label specifier" { "a string, " { $link f } " or a gadget. See " { $link "ui.gadgets.buttons" } } }
     { "orientation specifier" { "one of " { $snippet "{ 0 1 }" } " or " { $snippet "{ 1 0 }" } ", with the former denoting vertical orientation and the latter denoting horizontal. Using a vector instead of symbolic constants allows these values to be directly useful in co-ordinate calculations" } }

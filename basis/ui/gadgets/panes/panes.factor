@@ -187,9 +187,19 @@ M: pane-stream make-span-stream
     background [ solid-interior ] apply-style ;
 
 : specified-font ( style -- font )
-    [ font swap at "monospace" or ] keep
-    [ font-style swap at plain or ] keep
-    font-size swap at 12 or 3array ;
+    <font>
+        swap
+        [ font swap at "monospace" or >>name ]
+        [
+            font-style swap at {
+                { plain [ ] }
+                { bold [ t >>bold ] }
+                { italic [ t >>italic ] }
+                { bold-italic [ t >>bold t >>italic ] }
+            } case
+        ]
+        [ font-size swap at 12 or >>size ]
+        tri ;
 
 : apply-font-style ( style gadget -- style gadget )
     over specified-font >>font ;

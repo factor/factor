@@ -9,5 +9,13 @@ IN: bootstrap.ui
             { [ os windows? ] [ "windows" ] }
             { [ os unix? ] [ "x11" ] }
         } cond
-    ] unless* "ui." prepend require
+    ] unless* "ui.backend." prepend require
+
+    "ui-text-backend" get [
+        {
+            { [ os macosx? ] [ "core-text" ] }
+            { [ os windows? ] [ "freetype" ] }
+            { [ os unix? ] [ "freetype" ] }
+        } cond
+    ] unless* "ui.text." prepend require
 ] when

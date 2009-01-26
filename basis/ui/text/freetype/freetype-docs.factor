@@ -1,6 +1,6 @@
 USING: help.syntax help.markup strings kernel alien opengl
-opengl.sprites quotations ui.render io.styles freetype ;
-IN: ui.freetype
+opengl.sprites quotations ui.render freetype ;
+IN: ui.text.freetype
 
 HELP: freetype
 { $values { "alien" alien } }

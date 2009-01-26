@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors fry io.styles kernel math
+USING: accessors arrays colors fry kernel math
 math.geometry.rect math.order math.vectors namespaces opengl
 sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.worlds ui.gadgets.theme ui.gestures ui.render ui.text

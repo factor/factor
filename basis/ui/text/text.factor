@@ -3,6 +3,8 @@
 USING: kernel arrays sequences math math.order opengl opengl.gl strings ;
 IN: ui.text
 
+TUPLE: font name size bold? italic? ;
+
 <PRIVATE
 
 SYMBOL: font-renderer

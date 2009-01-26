@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.accessors alien.c-types arrays io kernel libc
 math math.vectors namespaces opengl opengl.gl opengl.sprites assocs
-sequences io.files io.styles continuations freetype
-ui.gadgets.worlds ui.text ui.text.private ui.backend byte-arrays accessors
-locals specialized-arrays.direct.uchar ;
-IN: ui.freetype
+sequences io.files continuations freetype
+ui.gadgets.worlds ui.text ui.text.private ui.backend
+byte-arrays accessors locals specialized-arrays.direct.uchar
+combinators.smart ;
+IN: ui.text.freetype
 
 SINGLETON: freetype-renderer
 
@@ -27,10 +28,10 @@ DEFER: freetype
     \ freetype get-global expired? [ init-freetype ] when
     \ freetype get-global ;
 
-TUPLE: font < identity-tuple
+TUPLE: freetype-font < identity-tuple
 ascent descent height handle widths ;
 
-M: font hashcode* drop font hashcode* ;
+M: freetype-font hashcode* drop freetype-font hashcode* ;
 
 : close-font ( font -- ) handle>> FT_Done_Face ;
 
@@ -43,20 +44,20 @@ M: font hashcode* drop font hashcode* ;
 M: freetype-renderer free-fonts ( world -- )
     values [ second free-sprites ] each ;
 
-: ttf-name ( font style -- name )
-    2array H{
-        { { "monospace" plain        } "VeraMono" }
-        { { "monospace" bold         } "VeraMoBd" }
-        { { "monospace" bold-italic  } "VeraMoBI" }
-        { { "monospace" italic       } "VeraMoIt" }
-        { { "sans-serif" plain       } "Vera"     }
-        { { "sans-serif" bold        } "VeraBd"   }
-        { { "sans-serif" bold-italic } "VeraBI"   }
-        { { "sans-serif" italic      } "VeraIt"   }
-        { { "serif" plain            } "VeraSe"   }
-        { { "serif" bold             } "VeraSeBd" }
-        { { "serif" bold-italic      } "VeraBI"   }
-        { { "serif" italic           } "VeraIt"   }
+: ttf-name ( font -- name )
+    [ [ name>> ] [ bold>> ] [ italic>> ] tri ] output>array H{
+        { { "monospace" f f } "VeraMono" }
+        { { "monospace" t f } "VeraMoBd" }
+        { { "monospace" t t } "VeraMoBI" }
+        { { "monospace" f t } "VeraMoIt" }
+        { { "sans-serif" f f } "Vera" }
+        { { "sans-serif" t f } "VeraBd" }
+        { { "sans-serif" t t } "VeraBI" }
+        { { "sans-serif" f t } "VeraIt" }
+        { { "serif" f f } "VeraSe" }
+        { { "serif" t f } "VeraSeBd" }
+        { { "serif" t t } "VeraBI" }
+        { { "serif" f t } "VeraIt" }
     } at ;
 
 : ttf-path ( name -- string )
@@ -99,16 +100,16 @@ SYMBOL: dpi
     [ dup handle>> 0 ] dip
     6 shift dpi get-global dup FT_Set_Char_Size freetype-error ;
 
-: <font> ( font -- open-font )
-    font new
+: <freetype-font> ( font -- open-font )
+    freetype-font new
         H{ } clone >>widths
-        over first2 open-face >>handle
-        swap third set-char-size
+        over open-face >>handle
+        swap size>> set-char-size
         init-font ;
 
 M: freetype-renderer open-font ( font -- open-font )
     dup font? [
-        freetype drop open-fonts get [ <font> ] cache
+        freetype drop open-fonts get [ <freetype-font> ] cache
     ] unless ;
 
 : load-glyph ( font char -- glyph )

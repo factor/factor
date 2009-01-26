@@ -6,7 +6,7 @@ cocoa.application cocoa.pasteboard cocoa.types cocoa.windows
 sequences ui ui.gadgets ui.gadgets.worlds ui.gestures
 core-foundation.strings core-graphics core-graphics.types
 threads combinators math.geometry.rect ;
-IN: ui.cocoa.views
+IN: ui.backend.cocoa.views
 
 : send-mouse-moved ( view event -- )
     [ mouse-location ] [ drop window ] 2bi move-hand fire-motion ;

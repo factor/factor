@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays hashtables io kernel
 math namespaces opengl opengl.gl opengl.glu sequences strings
-io.styles vectors combinators math.vectors ui.gadgets colors
+vectors combinators math.vectors ui.gadgets colors
 math.order math.geometry.rect locals specialized-arrays.float ;
 IN: ui.render
 

@@ -7,12 +7,12 @@ HELP: editor
 $nl
 "Editors have the following slots:"
 { $list
-    { { $snippet "font" } " - a font specifier." }
-    { { $snippet "color" } " - text color specifier." }
-    { { $snippet "caret-color" } " - caret color specifier." }
-    { { $snippet "selection-color" } " - selection background color specifier." }
-    { { $snippet "caret" } " - a model storing a line/column pair." }
-    { { $snippet "mark" } " - a model storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
+    { { $snippet "font" } " - a " { $link font } "." }
+    { { $snippet "color" } " - a " { $link color } "." }
+    { { $snippet "caret-color" } " - a " { $link color } ". }
+    { { $snippet "selection-color" } " - a " { $link color } ". }
+    { { $snippet "caret" } " - a " { $link model } " storing a line/column pair." }
+    { { $snippet "mark" } " - a " { $link model } " storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
     { { $snippet "focused?" } " - a boolean." }
 } } ;
 

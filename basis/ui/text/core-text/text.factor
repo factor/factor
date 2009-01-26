@@ -3,8 +3,8 @@
 USING: assocs accessors alien core-graphics.types core-text kernel
 hashtables namespaces sequences ui.gadgets.worlds ui.text
 ui.text.private opengl opengl.gl destructors combinators core-foundation
-core-foundation.strings io.styles memoize math math.vectors ;
-IN: ui.cocoa.text
+core-foundation.strings memoize math math.vectors ;
+IN: ui.text.core-text
 
 SINGLETON: core-text-renderer
 
@@ -22,13 +22,10 @@ CONSTANT: font-names
 
 : (italic) ( x -- y ) kCTFontItalicTrait bitor ; inline
 
-: font-traits ( style -- mask )
-    [ 0 ] dip {
-        { plain [ ] }
-        { bold [ (bold) ] }
-        { italic [ (italic) ] }
-        { bold-italic [ (bold) (italic) ] }
-    } case ;
+: font-traits ( font -- n )
+    [ 0 ] dip
+    [ bold>> [ (bold) ] when ]
+    [ italic>> [ (italic) ] when ] bi ;
 
 : apply-font-traits ( font style -- font' )
     [ drop ] [ [ 0.0 f ] dip font-traits dup ] 2bi
@@ -38,9 +35,9 @@ CONSTANT: font-names
 MEMO: cache-font ( font -- open-font )
     [
         [
-            [ first font-name <CFString> &CFRelease ] [ third ] bi
+            [ name>> font-name <CFString> &CFRelease ] [ size>> ] bi
             f CTFontCreateWithName
-        ] [ second ] bi apply-font-traits
+        ] keep apply-font-traits
     ] with-destructors ;
 
 M: core-text-renderer open-font
