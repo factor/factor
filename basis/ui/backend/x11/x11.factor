@@ -177,27 +177,25 @@ M: world selection-request-event
     } cond ;
 
 M: x11-ui-backend (close-window) ( handle -- )
-    dup xic>> XDestroyIC
-    dup glx>> destroy-glx
-    window>> dup unregister-window
-    destroy-window ;
+    [ xic>> XDestroyIC ]
+    [ glx>> destroy-glx ]
+    [ window>> [ unregister-window ] [ destroy-window ] bi ]
+    tri ;
 
 M: world client-event
     swap close-box? [ ungraft ] [ drop ] if ;
 
 : gadget-window ( world -- )
-    dup window-loc>> over rect-dim glx-window
-    over "Factor" create-xic rot <x11-handle>
-    2dup window>> register-window
-    >>handle drop ;
+    [ [ window-loc>> ] [ dim>> ] bi glx-window ]
+    [ "Factor" create-xic ]
+    [ ] tri <x11-handle>
+    [ window>> register-window ] [ >>handle drop ] 2bi ;
 
 : wait-event ( -- event )
     QueuedAfterFlush events-queued 0 > [
         next-event dup
-        None XFilterEvent zero? [ drop wait-event ] unless
-    ] [
-        ui-wait wait-event
-    ] if ;
+        None XFilterEvent 0 = [ drop wait-event ] unless
+    ] [ ui-wait wait-event ] if ;
 
 M: x11-ui-backend do-events
     wait-event dup XAnyEvent-window window dup
