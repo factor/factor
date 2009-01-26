@@ -3,7 +3,7 @@
 USING: accessors kernel xml arrays math generic http.client
 combinators hashtables namespaces io base64 sequences strings
 calendar xml.data xml.writer xml.utilities assocs math.parser
-debugger calendar.format math.order ;
+debugger calendar.format math.order xml.interpolate ;
 IN: xml-rpc
 
 ! * Sending RPC requests
@@ -15,56 +15,70 @@ GENERIC: item>xml ( object -- xml )
 M: integer item>xml
     dup 31 2^ neg 31 2^ 1 - between?
     [ "Integers must fit in 32 bits" throw ] unless
-    number>string "i4" build-tag ;
+    number>string [XML <i4><-></i4> XML] ;
 
 UNION: boolean t POSTPONE: f ;
 
 M: boolean item>xml
-    "1" "0" ? "boolean" build-tag ;
+    "1" "0" ? [XML <boolean><-></boolean> XML] ;
 
 M: float item>xml
-    number>string "double" build-tag ;
+    number>string [XML <double><-></double> XML] ;
 
-M: string item>xml ! This should change < and &
-    "string" build-tag ;
+M: string item>xml
+    [XML <string><-></string> XML] ;
 
 : struct-member ( name value -- tag )
-    swap dup string?
-    [ "Struct member name must be string" throw ] unless
-    "name" build-tag swap
-    item>xml "value" build-tag
-    2array "member" build-tag* ;
+    over string? [ "Struct member name must be string" throw ] unless
+    item>xml
+    [XML
+        <member>
+            <name><-></name>
+            <value><-></value>
+        </member>
+    XML] ;
 
 M: hashtable item>xml
     [ struct-member ] { } assoc>map
-    "struct" build-tag* ;
+    [XML <struct><-></struct> XML] ;
 
 M: array item>xml
-    [ item>xml "value" build-tag ] map
-    "data" build-tag* "array" build-tag ;
+    [ item>xml [XML <value><-></value> XML] ] map
+    [XML <array><data><-></data></array> XML] ;
 
 TUPLE: base64 string ;
 
 C: <base64> base64
 
 M: base64 item>xml
-    string>> >base64 "base64" build-tag ;
+    string>> >base64
+    [XML <base64><-></base64> XML] ;
 
 : params ( seq -- xml )
-    [ item>xml "value" build-tag "param" build-tag ] map
-    "params" build-tag* ;
+    [ item>xml [XML <param><value><-></value></param> XML] ] map
+    [XML <params><-></params> XML] ;
 
 : method-call ( name seq -- xml )
-    params [ "methodName" build-tag ] dip
-    2array "methodCall" build-tag* build-xml ;
+    params
+    <XML
+        <methodCall>
+            <methodName><-></methodName>
+            <->
+        </methodCall>
+    XML> ;
 
 : return-params ( seq -- xml )
-    params "methodResponse" build-tag build-xml ;
+    params <XML <methodResponse><-></methodResponse> XML> ;
 
 : return-fault ( fault-code fault-string -- xml )
     [ "faultString" set "faultCode" set ] H{ } make-assoc item>xml
-    "value" build-tag "fault" build-tag "methodResponse" build-tag
-    build-xml ;
+    <XML
+        <methodResponse>
+            <fault>
+                <value><-></value>
+            </fault>
+        </methodResponse>
+    XML> ;
 
 TUPLE: rpc-method name params ;
 

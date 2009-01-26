@@ -3,7 +3,7 @@
 USING: xml xml.state kernel sequences fry assocs xml.data
 accessors strings make multiline parser namespaces macros
 sequences.deep generalizations locals words combinators
-math present ;
+math present arrays ;
 IN: xml.interpolate
 
 <PRIVATE
@@ -31,7 +31,8 @@ DEFER: interpolate-sequence
 GENERIC: push-item ( item -- )
 M: string push-item , ;
 M: object push-item , ;
-M: sequence push-item % ;
+M: sequence push-item
+    [ dup array? [ % ] [ , ] if ] each ;
 
 GENERIC: interpolate-item ( table item -- )
 M: object interpolate-item nip , ;
