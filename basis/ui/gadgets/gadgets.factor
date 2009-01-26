@@ -315,7 +315,7 @@ SYMBOL: in-layout?
 : (screen-rect) ( gadget -- loc ext )
     dup parent>> [
         [ rect-extent ] dip (screen-rect)
-        [ [ nip ] [ v+ ] 2bi ] dip [ vmin ] [ v+ ] 2bi*
+        [ [ nip ] [ v+ ] 2bi ] dip [ v+ ] [ vmin ] 2bi*
     ] [
         rect-extent
     ] if* ;

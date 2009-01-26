@@ -106,10 +106,11 @@ typedef struct
 {
 	char type; /* this is WORD_TYPE or QUOTATION_TYPE */
 	char last_scan; /* the youngest generation in which this block's literals may live */
+	char needs_fixup; /* is this a new block that needs full fixup? */
 	CELL code_length; /* # bytes */
-	CELL literals_length; /* # bytes */
+	CELL literals; /* # bytes */
 	CELL relocation; /* tagged pointer to byte-array or f */
-} F_COMPILED;
+} F_CODE_BLOCK;
 
 /* Assembly code makes assumptions about the layout of this struct */
 typedef struct {
@@ -135,9 +136,9 @@ typedef struct {
 	/* UNTAGGED execution token: jump here to execute word */
 	XT xt;
 	/* UNTAGGED compiled code block */
-	F_COMPILED *code;
+	F_CODE_BLOCK *code;
 	/* UNTAGGED profiler stub */
-	F_COMPILED *profiling;
+	F_CODE_BLOCK *profiling;
 } F_WORD;
 
 /* Assembly code makes assumptions about the layout of this struct */
@@ -174,7 +175,7 @@ typedef struct {
 	/* UNTAGGED */
 	XT xt;
 	/* UNTAGGED compiled code block */
-	F_COMPILED *code;
+	F_CODE_BLOCK *code;
 } F_QUOTATION;
 
 /* Assembly code makes assumptions about the layout of this struct */

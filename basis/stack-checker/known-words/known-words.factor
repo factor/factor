@@ -643,7 +643,7 @@ M: object infer-call*
 
 \ dll-valid? { object } { object } define-primitive
 
-\ modify-code-heap { array object } { } define-primitive
+\ modify-code-heap { array } { } define-primitive
 
 \ unimplemented { } { } define-primitive
 
