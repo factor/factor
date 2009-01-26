@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test xml.interpolate multiline kernel assocs
 sequences accessors xml.writer xml.interpolate.private
-locals ;
+locals splitting ;
 IN: xml.interpolate.tests
 
-[ "a" "c" { "a" "c" } ] [
-    "<?xml version='1.0'?><x><-a-><b val=<-c->/></x>"
+[ "a" "c" { "a" "c" f } ] [
+    "<?xml version='1.0'?><x><-a-><b val=<-c->/><-></x>"
     interpolated-doc
     [ second var>> ]
     [ fourth "val" swap at var>> ]
@@ -26,4 +26,21 @@ IN: xml.interpolate.tests
             <x> <-a-> <b val=<-c->/> <-d-> </x>
         XML> pprint-xml>string
     ]
+] unit-test
+
+[ {" <?xml version="1.0" encoding="UTF-8"?>
+<doc>
+  <item>
+    one
+  </item>
+  <item>
+    two
+  </item>
+  <item>
+    three
+  </item>
+</doc>"} ] [
+    "one two three" " " split
+    [ [XML <item><-></item> XML] ] map
+    <XML <doc><-></doc> XML> pprint-xml>string
 ] unit-test

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml xml.state kernel sequences fry assocs xml.data
 accessors strings make multiline parser namespaces macros
-sequences.deep ;
+sequences.deep generalizations locals words combinators
+math ;
 IN: xml.interpolate
 
 <PRIVATE
@@ -41,32 +42,48 @@ M: interpolated interpolate-item
 : interpolate-xml-doc ( table xml -- xml )
     (clone) [ interpolate-tag ] change-body ;
 
+GENERIC# (each-interpolated) 1 ( item quot -- ) inline
+M: interpolated (each-interpolated) call ;
+M: tag (each-interpolated)
+    swap attrs>> values
+    [ interpolated? ] filter
+    swap each ;
+M: object (each-interpolated) 2drop ;
+
+: each-interpolated ( xml quot -- )
+    '[ _ (each-interpolated) ] deep-each ; inline
+
+:: number<-> ( doc -- doc )
+    0 :> n! doc [
+        dup var>> [ n >>var n 1+ n! ] unless drop
+    ] each-interpolated doc ;
+
 MACRO: interpolate-xml ( string -- doc )
-    interpolated-doc '[ _ interpolate-xml-doc ] ;
+    interpolated-doc number<-> '[ _ interpolate-xml-doc ] ;
 
 MACRO: interpolate-chunk ( string -- chunk )
-    interpolated-chunk '[ _ interpolate-sequence ] ;
+    interpolated-chunk number<-> '[ _ interpolate-sequence ] ;
 
 : >search-hash ( seq -- hash )
     [ dup search ] H{ } map>assoc ;
 
-GENERIC: extract-item ( item -- )
-M: interpolated extract-item var>> , ;
-M: tag extract-item
-    attrs>> values
-    [ interpolated? ] filter
-    [ var>> , ] each ;
-M: object extract-item drop ;
-
 : extract-variables ( xml -- seq )
-    [ [ extract-item ] deep-each ] { } make ;
+    [ [ var>> , ] each-interpolated ] { } make ;
+
+: collect ( accum seq -- accum )
+    {
+        { [ dup [ ] all? ] [ >search-hash parsed ] } ! locals
+        { [ dup [ not ] all? ] [ ! fry
+            length parsed \ narray parsed \ <enum> parsed
+        ] }
+        [ drop "XML interpolation contains both fry and locals" throw ] ! mixed
+    } cond ;
 
 : parse-def ( accum delimiter word -- accum )
     [
-        parse-multiline-string [
-            interpolated-chunk extract-variables
-            >search-hash parsed
-        ] keep parsed
+        parse-multiline-string
+        [ interpolated-chunk extract-variables collect ] keep
+        parsed
     ] dip parsed ;
 
 PRIVATE>

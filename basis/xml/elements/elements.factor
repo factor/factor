@@ -8,9 +8,11 @@ IN: xml.elements
 
 : take-interpolated ( quot -- interpolated )
     interpolating? get [
-        drop pass-blank
-        " \t\r\n-" take-to <interpolated>
-        pass-blank "->" expect
+        drop get-char CHAR: > =
+        [ next f ] [
+            pass-blank " \t\r\n-" take-to
+            pass-blank "->" expect
+        ] if <interpolated>
     ] [ call ] if ; inline
 
 : interpolate-quote ( -- interpolated )
