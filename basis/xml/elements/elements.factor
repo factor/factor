@@ -6,9 +6,21 @@ math xml.errors sets combinators io.encodings io.encodings.iana
 unicode.case xml.dtd strings xml.entities ;
 IN: xml.elements
 
+: take-interpolated ( quot -- interpolated )
+    interpolating? get [
+        drop pass-blank
+        " \t\r\n-" take-to <interpolated>
+        pass-blank "->" expect
+    ] [ call ] if ; inline
+
+: interpolate-quote ( -- interpolated )
+    [ quoteless-attr ] take-interpolated ;
+
 : parse-attr ( -- )
     parse-name pass-blank "=" expect pass-blank
-    t parse-quote* 2array , ;
+    get-char CHAR: < =
+    [ "<-" expect interpolate-quote ]
+    [ t parse-quote* ] if 2array , ;
 
 : start-tag ( -- name ? )
     #! Outputs the name and whether this is a closing tag
@@ -151,12 +163,18 @@ DEFER: make-tag ! Is this unavoidable?
         [ drop take-directive ]
     } case ;
 
+: normal-tag ( -- tag )
+    start-tag
+    [ dup add-ns pop-ns <closer> depth dec close ]
+    [ middle-tag end-tag ] if ;
+
+: interpolate-tag ( -- interpolated )
+    [ "-" bad-name ] take-interpolated ;
+
 : make-tag ( -- tag )
     {
         { [ get-char dup CHAR: ! = ] [ drop next direct ] }
-        { [ CHAR: ? = ] [ next instruct ] }
-        [
-            start-tag [ dup add-ns pop-ns <closer> depth dec close ]
-            [ middle-tag end-tag ] if
-        ]
+        { [ dup CHAR: ? = ] [ drop next instruct ] }
+        { [ dup CHAR: - = ] [ drop next interpolate-tag ] }
+        [ drop normal-tag ]
     } cond ;

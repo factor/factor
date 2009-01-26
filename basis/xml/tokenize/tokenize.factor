@@ -58,8 +58,8 @@ IN: xml.tokenize
         '[ @ [ t ] [ get-char _ push f ] if ] skip-until
     ] keep >string ; inline
 
-: take-char ( ch -- string )
-    [ dup get-char = ] take-until nip ;
+: take-to ( seq -- string )
+    '[ get-char _ member? ] take-until ;
 
 : pass-blank ( -- )
     #! Advance code past any whitespace, including newlines
@@ -79,21 +79,25 @@ IN: xml.tokenize
     dup [ get-char next ] replicate 2dup =
     [ 2drop ] [ expected ] if ;
 
+! Suddenly XML-specific
+
 : parse-named-entity ( string -- )
     dup entities at [ , ] [
         dup extra-entities get at
         [ % ] [ no-entity ] ?if
     ] ?if ;
 
+: take-; ( -- string )
+    next ";" take-to next ;
+
 : parse-entity ( -- )
-    next CHAR: ; take-char next
-    "#" ?head [
+    take-; "#" ?head [
         "x" ?head 16 10 ? base> ,
     ] [ parse-named-entity ] if ;
 
 : parse-pe ( -- )
-    next CHAR: ; take-char dup next
-    pe-table get at [ % ] [ no-entity ] ?if ;
+    take-; dup pe-table get at
+    [ % ] [ no-entity ] ?if ;
 
 :: (parse-char) ( quot: ( ch -- ? ) -- )
     get-char :> char

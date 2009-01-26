@@ -5,6 +5,9 @@ delegate.protocols delegate vectors accessors multiline
 macros words quotations combinators slots fry strings ;
 IN: xml.data
 
+TUPLE: interpolated var ;
+C: <interpolated> interpolated
+
 UNION: nullable-string string POSTPONE: f ;
 
 TUPLE: name
