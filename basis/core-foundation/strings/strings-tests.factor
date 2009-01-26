@@ -7,3 +7,5 @@ IN: core-foundation
 [ "Hello" ] [ "Hello" <CFString> [ CF>string ] [ CFRelease ] bi ] unit-test
 [ "Hello\u003456" ] [ "Hello\u003456" <CFString> [ CF>string ] [ CFRelease ] bi ] unit-test
 [ "Hello\u013456" ] [ "Hello\u013456" <CFString> [ CF>string ] [ CFRelease ] bi ] unit-test
+[ ] [ "\0" <CFString> CFRelease ] unit-test
+[ "\0" ] [ "\0" <CFString> [ CF>string ] [ CFRelease ] bi ] unit-test

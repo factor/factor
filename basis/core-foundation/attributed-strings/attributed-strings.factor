@@ -12,7 +12,7 @@ FUNCTION: CFAttributedStringRef CFAttributedStringCreate (
    CFDictionaryRef attributes
 ) ;
 
-: <CFAttributedString> ( string alist -- alien )
+: <CFAttributedString> ( string assoc -- alien )
     [
         [ >cf &CFRelease ] bi@
         [ kCFAllocatorDefault ] 2dip CFAttributedStringCreate
