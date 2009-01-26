@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.order strings arrays vectors sequences
-sequences.private accessors ;
+sequences.private accessors fry ;
 IN: grouping
 
 <PRIVATE
@@ -94,7 +94,7 @@ INSTANCE: sliced-clumps slice-chunking
             [ first2-unsafe ] dip call
         ] [
             [ 2 <sliced-clumps> ] dip
-            [ first2-unsafe ] prepose all?
+            '[ first2-unsafe @ ] all?
         ] if
     ] if ; inline
 

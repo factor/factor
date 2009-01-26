@@ -1,6 +1,6 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences math ;
+USING: kernel sequences math fry ;
 IN: deques
 
 GENERIC: push-front* ( obj deque -- node )
@@ -34,7 +34,8 @@ GENERIC: deque-empty? ( deque -- ? )
     [ peek-back ] [ pop-back* ] bi ;
 
 : slurp-deque ( deque quot -- )
-    [ drop [ deque-empty? not ] curry ]
-    [ [ pop-back ] prepose curry ] 2bi [ ] while ; inline
+    [ drop '[ _ deque-empty? not ] ]
+    [ '[ _ pop-back @ ] ]
+    2bi [ ] while ; inline
 
 MIXIN: deque
