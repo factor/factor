@@ -99,6 +99,9 @@ TUPLE: document < model locs ;
         [ [ (set-doc-range) ] keep ] change-model
     ] keep update-locs ;
 
+: change-doc-range ( from to document quot -- )
+    '[ doc-range @ ] 3keep set-doc-range ; inline
+
 : remove-doc-range ( from to document -- )
     [ "" ] 3dip set-doc-range ;
 
