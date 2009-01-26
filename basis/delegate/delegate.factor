@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.tuple definitions
 generalizations generic hashtables kernel lexer make math parser
-sequences sets slots words words.symbol ;
+sequences sets slots words words.symbol fry ;
 IN: delegate
 
 : protocol-words ( protocol -- words )
@@ -29,14 +29,15 @@ M: tuple-class group-words
     define ;
 
 : change-word-prop ( word prop quot -- )
-    rot props>> swap change-at ; inline
+    [ swap props>> ] dip change-at ; inline
 
 : register-protocol ( group class quot -- )
-    rot \ protocol-consult [ swapd ?set-at ] change-word-prop ;
+    [ \ protocol-consult ] 2dip
+    '[ [ _ _ swap ] dip ?set-at ] change-word-prop ;
 
 : define-consult ( group class quot -- )
     [ register-protocol ]
-    [ [ group-words ] 2dip [ consult-method ] 2curry each ]
+    [ [ group-words ] 2dip '[ _ _ consult-method ] each ]
     3bi ;
 
 : CONSULT:

@@ -38,7 +38,7 @@ M: hello bing hello-test ;
 [ H{ { goodbye [ these>> ] } } ] [ baz protocol-consult ] unit-test
 [ H{ } ] [ bee protocol-consult ] unit-test
 
-[ "USING: delegate ;\nIN: delegate.tests\nPROTOCOL: baz foo bar { whoa 1 } ;\n" ] [ [ baz see ] with-string-writer ] unit-test
+[ "USING: delegate ;\nIN: delegate.tests\nPROTOCOL: baz foo bar { whoa 1 } ; inline\n" ] [ [ baz see ] with-string-writer ] unit-test
 
 GENERIC: one
 M: integer one ;
