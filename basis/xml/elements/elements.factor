@@ -3,12 +3,26 @@
 USING: kernel namespaces xml.tokenize xml.state xml.name
 xml.data accessors arrays make xml.char-classes fry assocs sequences
 math xml.errors sets combinators io.encodings io.encodings.iana
-unicode.case xml.dtd strings ;
+unicode.case xml.dtd strings xml.entities ;
 IN: xml.elements
 
+: take-interpolated ( quot -- interpolated )
+    interpolating? get [
+        drop get-char CHAR: > =
+        [ next f ] [
+            pass-blank " \t\r\n-" take-to
+            pass-blank "->" expect
+        ] if <interpolated>
+    ] [ call ] if ; inline
+
+: interpolate-quote ( -- interpolated )
+    [ quoteless-attr ] take-interpolated ;
+
 : parse-attr ( -- )
-    parse-name pass-blank CHAR: = expect pass-blank
-    t parse-quote* 2array , ;
+    parse-name pass-blank "=" expect pass-blank
+    get-char CHAR: < =
+    [ "<-" expect interpolate-quote ]
+    [ t parse-quote* ] if 2array , ;
 
 : start-tag ( -- name ? )
     #! Outputs the name and whether this is a closing tag
@@ -31,14 +45,14 @@ IN: xml.elements
 
 : end-tag ( name attrs-alist -- tag )
     tag-ns pass-blank get-char CHAR: / =
-    [ pop-ns <contained> next CHAR: > expect ]
+    [ pop-ns <contained> next ">" expect ]
     [ depth inc <opener> close ] if ;
 
 : take-comment ( -- comment )
-    "--" expect-string
+    "--" expect
     "--" take-string
     <comment>
-    CHAR: > expect ;
+    ">" expect ;
 
 : assure-no-extra ( seq -- )
     [ first ] map {
@@ -80,7 +94,7 @@ SYMBOL: string-input?
     string-input? get [ drop ] [ decode-input ] if ;
 
 : parse-prolog ( -- prolog )
-    pass-blank middle-tag "?>" expect-string
+    pass-blank middle-tag "?>" expect
     dup assure-no-extra prolog-attrs
     dup encoding>> dup "UTF-16" =
     [ drop ] [ name>encoding [ decode-input-if ] when* ] if
@@ -96,45 +110,45 @@ SYMBOL: string-input?
 
 : take-cdata ( -- string )
     depth get zero? [ bad-cdata ] when
-    "[CDATA[" expect-string "]]>" take-string ;
+    "[CDATA[" expect "]]>" take-string ;
 
 DEFER: make-tag ! Is this unavoidable?
 
 : expand-pe ( -- ) ; ! Make this run the contents of the pe within a DOCTYPE
 
-: (take-internal-subset) ( -- )
+: dtd-loop ( -- )
     pass-blank get-char {
         { CHAR: ] [ next ] }
         { CHAR: % [ expand-pe ] }
         { CHAR: < [
             next make-tag dup dtd-acceptable?
-            [ bad-doctype ] unless , (take-internal-subset)
+            [ bad-doctype ] unless , dtd-loop
         ] }
+        { f [ ] }
         [ 1string bad-doctype ]
     } case ;
 
-: take-internal-subset ( -- seq )
+: take-internal-subset ( -- dtd )
     [
-        H{ } pe-table set
+        H{ } clone pe-table set
         t in-dtd? set
-        (take-internal-subset)
-    ] { } make ;
+        dtd-loop
+        pe-table get
+    ] { } make swap extra-entities get swap <dtd> ;
 
-: nontrivial-doctype ( -- external-id internal-subset )
-    pass-blank get-char CHAR: [ = [
-        next take-internal-subset f swap close
-    ] [
-        " >" take-until-one-of {
-            { CHAR: \s [ (take-external-id) ] }
-            { CHAR: > [ only-blanks f ] }
-        } case f
-    ] if ;
+: take-optional-id ( -- id/f )
+    get-char "SP" member?
+    [ take-external-id ] [ f ] if ;
+
+: take-internal ( -- dtd/f )
+    get-char CHAR: [ =
+    [ next take-internal-subset ] [ f ] if ;
 
 : take-doctype-decl ( -- doctype-decl )
-    pass-blank " >" take-until-one-of {
-        { CHAR: \s [ nontrivial-doctype ] }
-        { CHAR: > [ f f ] }
-    } case <doctype-decl> ;
+    pass-blank take-name
+    pass-blank take-optional-id
+    pass-blank take-internal
+    <doctype-decl> close ;
 
 : take-directive ( -- doctype )
     take-name dup "DOCTYPE" =
@@ -151,12 +165,18 @@ DEFER: make-tag ! Is this unavoidable?
         [ drop take-directive ]
     } case ;
 
+: normal-tag ( -- tag )
+    start-tag
+    [ dup add-ns pop-ns <closer> depth dec close ]
+    [ middle-tag end-tag ] if ;
+
+: interpolate-tag ( -- interpolated )
+    [ "-" bad-name ] take-interpolated ;
+
 : make-tag ( -- tag )
     {
         { [ get-char dup CHAR: ! = ] [ drop next direct ] }
-        { [ CHAR: ? = ] [ next instruct ] }
-        [
-            start-tag [ dup add-ns pop-ns <closer> depth dec close ]
-            [ middle-tag end-tag ] if
-        ]
+        { [ dup CHAR: ? = ] [ drop next instruct ] }
+        { [ dup CHAR: - = ] [ drop next interpolate-tag ] }
+        [ drop normal-tag ]
     } cond ;

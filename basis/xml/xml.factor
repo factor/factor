@@ -164,21 +164,15 @@ TUPLE: pull-xml scope ;
 : file>xml ( filename -- xml )
     binary <file-reader> read-xml ;
 
-: (read-dtd) ( -- dtd )
-    ! should filter out blanks, throw error on non-dtd stuff
-    V{ } clone dup [ push ] curry sax-loop ;
-
-: read-dtd ( stream -- dtd entities )
+: read-dtd ( stream -- dtd )
     [
-        t in-dtd? set
         reset-prolog
         H{ } clone extra-entities set
-        (read-dtd)
-        extra-entities get
+        take-internal-subset
     ] with-state ;
 
-: file>dtd ( filename -- dtd entities )
+: file>dtd ( filename -- dtd )
     utf8 <file-reader> read-dtd ;
 
-: string>dtd ( string -- dtd entities )
+: string>dtd ( string -- dtd )
     <string-reader> read-dtd ;
