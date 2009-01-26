@@ -86,7 +86,7 @@ TUPLE: html-sub-stream < html-stream style parent ;
     [
         foreground [ fg-css,    ] apply-style
         background [ bg-css,    ] apply-style
-        font       [ font-css,  ] apply-style
+        font-name  [ font-css,  ] apply-style
         font-style [ style-css, ] apply-style
         font-size  [ size-css,  ] apply-style
     ] make-css ;

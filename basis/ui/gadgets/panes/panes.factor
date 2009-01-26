@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables io kernel namespaces sequences
-io.styles strings quotations math opengl combinators
+io.styles strings quotations math opengl combinators memoize
 math.vectors sorting splitting assocs classes.tuple models
 continuations destructors accessors math.geometry.rect fry
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons
@@ -19,15 +19,15 @@ selection-color caret mark selecting? ;
 : clear-selection ( pane -- pane )
     f >>caret f >>mark ;
 
-: add-output  ( pane current -- pane )
-    [ >>output  ] [ add-gadget ] bi ;
+: add-output ( pane current -- pane )
+    [ >>output ] [ add-gadget ] bi ;
 
 : add-current ( pane current -- pane )
     [ >>current ] [ add-gadget ] bi ;
 
-: prepare-line ( pane -- pane )
+: prepare-line ( pane -- )
     clear-selection
-    dup prototype>> clone add-current ;
+    dup prototype>> clone add-current drop ;
 
 : pane-caret&mark ( pane -- caret mark )
     [ caret>> ] [ mark>> ] bi ;
@@ -51,7 +51,7 @@ M: pane gadget-selection ( pane -- string/f )
         { 0 1 } >>orientation
         <shelf> >>prototype
         <incremental> add-output
-        prepare-line
+        dup prepare-line
         selection-color >>selection-color ;
 
 : <pane> ( -- pane ) pane new-pane ;
@@ -77,12 +77,12 @@ M: node draw-selection ( loc node -- )
 
 M: pane draw-gadget*
     dup gadget-selection? [
-        dup selection-color>> gl-color
-        origin get over rect-loc v- swap selected-children
-        [ draw-selection ] with each
-    ] [
-        drop
-    ] if ;
+        [ selection-color>> gl-color ]
+        [
+            [ [ origin get ] dip loc>> v- ] keep selected-children
+            [ draw-selection ] with each
+        ] bi
+    ] [ drop ] if ;
 
 : scroll-pane ( pane -- )
     dup scrolls?>> [ scroll>bottom ] [ drop ] if ;
@@ -100,20 +100,22 @@ C: <pane-stream> pane-stream
 
 : smash-pane ( pane -- gadget ) output>> smash-line ;
 
-: pane-nl ( pane -- pane )
-    dup current>> dup unparent smash-line
-    over output>> add-incremental
-    prepare-line ;
+: pane-nl ( pane -- )
+    [
+        [ current>> [ unparent ] [ smash-line ] bi ] [ output>> ] bi
+        add-incremental
+    ]
+    [ prepare-line ] bi ;
 
-: pane-write ( pane seq -- )
-    [ pane-nl ]
-    [ over current>> stream-write ]
-    interleave drop ;
+: pane-write ( seq pane -- )
+    [ '[ _ pane-nl ] ]
+    [ '[ _ current>> stream-write ] ] bi
+    interleave ;
 
-: pane-format ( style pane seq -- )
-    [ pane-nl ]
-    [ 2over current>> stream-format ]
-    interleave 2drop ;
+: pane-format ( seq style pane -- )
+    [ '[ _ drop _ pane-nl ] ]
+    [ '[ _ _ current>> stream-format ] ] 2bi
+    interleave ;
 
 GENERIC: write-gadget ( gadget stream -- )
 
@@ -157,16 +159,16 @@ M: pane-control model-changed ( model pane-control -- )
     [ pane>> ] dip keep scroll-pane ; inline
 
 M: pane-stream stream-nl
-    [ pane-nl drop ] do-pane-stream ;
+    [ pane-nl ] do-pane-stream ;
 
 M: pane-stream stream-write1
     [ current>> stream-write1 ] do-pane-stream ;
 
 M: pane-stream stream-write
-    [ swap string-lines pane-write ] do-pane-stream ;
+    [ [ string-lines ] dip pane-write ] do-pane-stream ;
 
 M: pane-stream stream-format
-    [ rot string-lines pane-format ] do-pane-stream ;
+    [ [ string-lines ] 2dip pane-format ] do-pane-stream ;
 
 M: pane-stream dispose drop ;
 
@@ -186,24 +188,28 @@ M: pane-stream make-span-stream
 : apply-background-style ( style gadget -- style gadget )
     background [ solid-interior ] apply-style ;
 
-: specified-font ( style -- font )
-    <font>
-        swap
-        [ font swap at "monospace" or >>name ]
-        [
-            font-style swap at {
-                { f [ ] }
-                { plain [ ] }
-                { bold [ t >>bold? ] }
-                { italic [ t >>italic? ] }
-                { bold-italic [ t >>bold? t >>italic? ] }
-            } case
-        ]
-        [ font-size swap at 12 or >>size ]
-        tri ;
+MEMO: specified-font ( font style size -- font )
+    #! We memoize here to avoid creating lots of duplicate font objects.
+    [ <font> ] 3dip
+    [ "monospace" or >>name ]
+    [
+        {
+            { f [ ] }
+            { plain [ ] }
+            { bold [ t >>bold? ] }
+            { italic [ t >>italic? ] }
+            { bold-italic [ t >>bold? t >>italic? ] }
+        } case
+    ]
+    [ 12 or >>size ]
+    tri* ;
 
 : apply-font-style ( style gadget -- style gadget )
-    over specified-font >>font ;
+    over
+    [ font-name swap at ]
+    [ font-style swap at ]
+    [ font-size swap at ]
+    tri specified-font >>font ;
 
 : apply-presentation-style ( style gadget -- style gadget )
     presented [ <presentation> ] apply-style ;
@@ -331,10 +337,10 @@ M: paragraph stream-format
     presented pick at [
         gadget-format
     ] [
-        rot " " split
-        [ 2dup gadget-bl ]
-        [ 2over gadget-format ] interleave
-        2drop
+        [ " " split ] 2dip
+        [ '[ _ _ gadget-bl ] ]
+        [ '[ _ _ gadget-format ] ] 2bi
+        interleave
     ] if ;
 
 : caret>mark ( pane -- pane )

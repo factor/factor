@@ -130,7 +130,7 @@ SYMBOL: bold-italic
 ! Character styles
 SYMBOL: foreground
 SYMBOL: background
-SYMBOL: font
+SYMBOL: font-name
 SYMBOL: font-size
 SYMBOL: font-style
 

@@ -115,7 +115,7 @@ ARTICLE: "character-styles" "Character styles"
 "Character styles for " { $link stream-format } " and " { $link with-style } ":"
 { $subsection foreground }
 { $subsection background }
-{ $subsection font }
+{ $subsection font-name }
 { $subsection font-size }
 { $subsection font-style }
 { $subsection presented } ;
@@ -195,11 +195,11 @@ HELP: background
     }
 } ;
 
-HELP: font
+HELP: font-name
 { $description "Character style. Font family named by a string." }
 { $examples
     "This example outputs some different font sizes:"
-    { $code "{ \"monospace\" \"serif\" \"sans-serif\" }\n[ dup font associate format nl ] each" }
+    { $code "{ \"monospace\" \"serif\" \"sans-serif\" }\n[ dup font-name associate format nl ] each" }
 } ;
 
 HELP: font-size

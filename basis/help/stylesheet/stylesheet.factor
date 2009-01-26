@@ -1,11 +1,11 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.styles namespaces colors ;
 IN: help.stylesheet
 
 SYMBOL: default-span-style
 H{
-    { font "sans-serif" }
+    { font-name "sans-serif" }
     { font-size 12 }
     { font-style plain }
 } default-span-style set-global
@@ -29,7 +29,7 @@ H{ { font-style bold } } strong-style set-global
 
 SYMBOL: title-style
 H{
-    { font "sans-serif" }
+    { font-name "sans-serif" }
     { font-size 18 }
     { font-style bold }
     { wrap-margin 500 }
@@ -42,21 +42,21 @@ H{ { font-size 10 } } help-path-style set-global
 
 SYMBOL: heading-style
 H{
-    { font "sans-serif" }
+    { font-name "sans-serif" }
     { font-size 16 }
     { font-style bold }
 } heading-style set-global
 
 SYMBOL: subsection-style
 H{
-    { font "sans-serif" }
+    { font-name "sans-serif" }
     { font-size 14 }
     { font-style bold }
 } subsection-style set-global
 
 SYMBOL: snippet-style
 H{
-    { font "monospace" }
+    { font-name "monospace" }
     { font-size 12 }
     { foreground T{ rgba f 0.1 0.1 0.4 1 } }
 } snippet-style set-global
@@ -73,7 +73,7 @@ H{ { font-style bold } } input-style set-global
 
 SYMBOL: url-style
 H{
-    { font "monospace" }
+    { font-name "monospace" }
     { foreground T{ rgba f 0.0 0.0 1.0 1.0 } }
 } url-style set-global
 
