@@ -10,8 +10,8 @@ IN: xml.autoencoding
 
 : start-utf16le ( -- tag )
     utf16le decode-input-if
-    CHAR: ? expect
-    0 expect check instruct ;
+    "?\0" expect
+    check instruct ;
 
 : 10xxxxxx? ( ch -- ? )
     -6 shift 3 bitand 2 = ;
@@ -36,10 +36,10 @@ IN: xml.autoencoding
 
 : skip-utf8-bom ( -- tag )
     "\u0000bb\u0000bf" expect utf8 decode-input
-    CHAR: < expect check make-tag ;
+    "<" expect check make-tag ;
 
 : decode-expecting ( encoding string -- tag )
-    [ decode-input-if next ] [ expect-string ] bi* check make-tag ;
+    [ decode-input-if next ] [ expect ] bi* check make-tag ;
 
 : start-utf16be ( -- tag )
     utf16be "<" decode-expecting ;

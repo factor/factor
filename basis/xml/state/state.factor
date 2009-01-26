@@ -23,3 +23,11 @@ SYMBOL: xml-stack
 SYMBOL: prolog-data
 
 SYMBOL: depth
+
+SYMBOL: interpolating?
+
+SYMBOL: in-dtd?
+
+SYMBOL: pe-table
+
+SYMBOL: extra-entities

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces accessors xml.tokenize xml.data assocs
 xml.errors xml.char-classes combinators.short-circuit splitting
-fry xml.state sequences ;
+fry xml.state sequences combinators ascii ;
 IN: xml.name
 
 ! XML namespace processing: ns = namespace
@@ -74,3 +74,21 @@ SYMBOL: ns-stack
 : parse-name-starting ( string -- name )
     take-name append interpret-name ;
 
+: take-system-id ( -- system-id )
+    parse-quote <system-id> ;
+
+: take-public-id ( -- public-id )
+    parse-quote parse-quote <public-id> ;
+
+: (take-external-id) ( token -- external-id )
+    pass-blank {
+        { "SYSTEM" [ take-system-id ] }
+        { "PUBLIC" [ take-public-id ] }
+        [ bad-external-id ]
+    } case ;
+
+: take-word ( -- string )
+    [ get-char blank? ] take-until ;
+
+: take-external-id ( -- external-id )
+    take-word (take-external-id) ;

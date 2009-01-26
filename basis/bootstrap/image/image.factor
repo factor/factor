@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays generic assocs hashtables assocs
 hashtables.private io io.binary io.files io.encodings.binary
@@ -10,7 +10,7 @@ classes.tuple.private words.private vocabs
 vocabs.loader source-files definitions debugger
 quotations.private sequences.private combinators
 math.order math.private accessors
-slots.private compiler.units ;
+slots.private compiler.units fry ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -73,7 +73,7 @@ SYMBOL: objects
 : put-object ( n obj -- ) (objects) set-at ;
 
 : cache-object ( obj quot -- value )
-    [ (objects) ] dip [ obj>> ] prepose cache ; inline
+    [ (objects) ] dip '[ obj>> @ ] cache ; inline
 
 ! Constants
 
@@ -95,7 +95,7 @@ SYMBOL: objects
 SYMBOL: sub-primitives
 
 : make-jit ( quot rc rt offset -- quad )
-    { [ { } make ] [ ] [ ] [ ] } spread 4array ; inline
+    [ { } make ] 3dip 4array ; inline
 
 : jit-define ( quot rc rt offset name -- )
     [ make-jit ] dip set ; inline
@@ -524,11 +524,9 @@ M: quotation '
 ! Image output
 
 : (write-image) ( image -- )
-    bootstrap-cell big-endian get [
-        [ >be write ] curry each
-    ] [
-        [ >le write ] curry each
-    ] if ;
+    bootstrap-cell big-endian get
+    [ '[ _ >be write ] each ]
+    [ '[ _ >le write ] each ] if ;
 
 : write-image ( image -- )
     "Writing image to " write
