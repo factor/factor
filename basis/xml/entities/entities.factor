@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make kernel assocs sequences fry values
-io.files io.encodings.binary ;
+io.files io.encodings.binary xml.state ;
 IN: xml.entities
 
 : entities-out
@@ -36,8 +36,6 @@ IN: xml.entities
         { "apos"  CHAR: '  }
         { "quot"  CHAR: "  }
     } ;
-
-SYMBOL: extra-entities
 
 : with-entities ( entities quot -- )
     [ swap extra-entities set call ] with-scope ; inline
