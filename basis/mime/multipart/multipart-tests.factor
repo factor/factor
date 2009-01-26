@@ -20,7 +20,7 @@ IN: mime.multipart.tests
 
 [ t ] [
     mime-test-stream [ upload-separator parse-multipart ] with-input-stream
-    "\"up.txt\"" swap key?
+    "\"file1\"" swap key?
 ] unit-test
 
 [ t ] [
