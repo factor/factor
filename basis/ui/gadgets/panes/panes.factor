@@ -327,8 +327,7 @@ M: paragraph stream-write1
     [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
 
 : gadget-format ( string style stream -- )
-    spin dup empty?
-    [ 3drop ] [ <styled-label> add-gadget drop ] if ;
+    '[ _ swap <styled-label> _ swap add-gadget drop ] unless-empty ;
 
 M: pack stream-format
     gadget-format ;
