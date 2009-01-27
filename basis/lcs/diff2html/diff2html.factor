@@ -17,7 +17,7 @@ M: retain diff-line
     dup [XML <tr><-><-></tr> XML] ;
 
 M: insert diff-line
-    [XML
+    item-string [XML
         <tr>
             <td> </td>
             <td class="insert"><-></td>
@@ -25,7 +25,7 @@ M: insert diff-line
     XML] ;
 
 M: delete diff-line
-    [XML
+    item-string [XML
         <tr>
             <td class="delete"><-></td>
             <td> </td>
