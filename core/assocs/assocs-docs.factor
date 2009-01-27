@@ -405,11 +405,12 @@ HELP: search-alist
 { $values
      { "key" object } { "alist" "an array of key/value pairs" }
      { "pair/f" "a key/value pair" } { "i/f" integer } }
-{ $description "Performs an in-order traversal of a " { $snippet "alist" } " and stops when the key is matched or the end of the " { $snippet "alist" } " has been reached. If there is no match, both outputs are " { $link f } "." }
-{ $examples { $example "USING: prettyprint assocs kernel ;"
+{ $description "Iterates over " { $snippet "alist" } " and stops when the key is matched or the end of the " { $snippet "alist" } " has been reached. If there is no match, both outputs are " { $link f } "." }
+{ $notes "This word is used to implement " { $link at* } " and " { $link set-at } " on sequences, and should not be called direclty." }
+{ $examples { $example "USING: prettyprint assocs.private kernel ;"
                         "3 { { 1 2 } { 3 4 } } search-alist [ . ] bi@"
                        "{ 3 4 }\n1"
-            } { $example "USING: prettyprint assocs kernel ;"
+            } { $example "USING: prettyprint assocs.private kernel ;"
                        "6 { { 1 2 } { 3 4 } } search-alist [ . ] bi@"
                        "f\nf"
             }
