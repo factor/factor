@@ -1,6 +1,7 @@
 USING: io io.streams.limited io.encodings io.encodings.string
 io.encodings.ascii io.encodings.binary io.streams.byte-array
-namespaces tools.test strings kernel io.streams.string accessors ;
+namespaces tools.test strings kernel io.streams.string accessors
+io.encodings.utf8 io.files destructors ;
 IN: io.streams.limited.tests
 
 [ ] [
@@ -58,4 +59,20 @@ IN: io.streams.limited.tests
 [
     "abc" <string-reader> 3 stream-eofs limit unlimit
     "abc" <string-reader> =
+] unit-test
+
+[ t ]
+[
+    "abc" <string-reader> 3 stream-eofs limit unlimit
+    "abc" <string-reader> =
+] unit-test
+
+[ t ]
+[
+    [
+        "resource:license.txt" utf8 <file-reader> &dispose
+        3 stream-eofs limit unlimit
+        "resource:license.txt" utf8 <file-reader> &dispose
+        [ decoder? ] both?
+    ] with-destructors
 ] unit-test

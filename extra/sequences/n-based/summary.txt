@@ -1,0 +1,1 @@
+Sequence adaptor to treat a sequence as an n-based assoc

@@ -5,7 +5,7 @@ USING: kernel math io io.encodings destructors accessors
 sequences namespaces byte-vectors fry combinators ;
 IN: io.streams.limited
 
-TUPLE: limited-stream stream count limit mode ;
+TUPLE: limited-stream stream count limit mode stack ;
 
 SINGLETONS: stream-throws stream-eofs ;
 
@@ -24,12 +24,23 @@ M: decoder limit ( stream limit mode -- stream' )
 M: object limit ( stream limit mode -- stream' )
     <limited-stream> ;
 
-: unlimit ( stream -- stream' )
+GENERIC: unlimit ( stream -- stream' )
+
+M: decoder unlimit ( stream -- stream' )
     [ stream>> ] change-stream ;
+
+M: object unlimit ( stream -- stream' )
+    stream>> stream>> ;
 
 : limit-input ( limit mode -- ) input-stream [ -rot limit ] change ;
 
 : unlimit-input ( -- ) input-stream [ unlimit ] change ;
+
+: with-unlimited-stream ( stream quot -- )
+    [ clone unlimit ] dip call ; inline
+
+: with-limited-stream ( stream limit mode quot -- )
+    [ limit ] dip call ; inline
 
 ERROR: limit-exceeded ;
 
