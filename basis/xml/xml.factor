@@ -6,7 +6,7 @@ xml.data xml.errors xml.elements ascii xml.entities
 xml.writer xml.state xml.autoencoding assocs xml.tokenize xml.name ;
 IN: xml
 
-!   -- Overall parser with data tree
+<PRIVATE
 
 : add-child ( object -- )
     xml-stack get peek second push ;
@@ -89,6 +89,8 @@ M: closer process
 
 SYMBOL: text-now?
 
+PRIVATE>
+
 TUPLE: pull-xml scope ;
 : <pull-xml> ( -- pull-xml )
     [
@@ -106,6 +108,8 @@ TUPLE: pull-xml scope ;
         ] if text-now? set
     ] bind ;
 
+<PRIVATE
+
 : done? ( -- ? )
     xml-stack get length 1 = ;
 
@@ -116,27 +120,33 @@ TUPLE: pull-xml scope ;
         [ (pull-elem) ] if
     ] if ;
 
+PRIVATE>
+
 : pull-elem ( pull -- xml-elem/f )
     [ init-xml-stack (pull-elem) ] with-scope ;
+
+<PRIVATE
 
 : call-under ( quot object -- quot )
     swap dup slip ; inline
 
-: sax-loop ( quot: ( xml-elem -- ) -- )
+: xml-loop ( quot: ( xml-elem -- ) -- )
     parse-text call-under
-    get-char [ make-tag call-under sax-loop ]
+    get-char [ make-tag call-under xml-loop ]
     [ drop ] if ; inline recursive
 
-: sax ( stream quot: ( xml-elem -- ) -- )
+PRIVATE>
+
+: each-element ( stream quot: ( xml-elem -- ) -- )
     swap [
         reset-prolog init-ns-stack
         start-document [ call-under ] when*
-        sax-loop
-    ] with-state ; inline recursive
+        xml-loop
+    ] with-state ; inline
 
 : (read-xml) ( -- )
     start-document [ process ] when*
-    [ process ] sax-loop ; inline
+    [ process ] xml-loop ; inline
 
 : (read-xml-chunk) ( stream -- prolog seq )
     [
@@ -155,7 +165,8 @@ TUPLE: pull-xml scope ;
     [ (read-xml-chunk) nip ] with-variable ;
 
 : string>xml ( string -- xml )
-    <string-reader> read-xml ;
+    t string-input?
+    [ <string-reader> read-xml ] with-variable ;
 
 : string>xml-chunk ( string -- xml )
     t string-input?

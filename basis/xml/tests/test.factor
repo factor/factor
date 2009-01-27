@@ -8,7 +8,7 @@ sequences.deep accessors io.streams.string ;
 
 ! This is insufficient
 \ read-xml must-infer
-[ [ drop ] sax ] must-infer
+[ [ drop ] each-element ] must-infer
 \ string>xml must-infer
 
 SYMBOL: xml-file
