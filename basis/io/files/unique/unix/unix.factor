@@ -7,7 +7,7 @@ IN: io.files.unique.unix
 : open-unique-flags ( -- flags )
     { O_RDWR O_CREAT O_EXCL } flags ;
 
-M: unix touch-unique-file ( path -- )
+M: unix (touch-unique-file) ( path -- )
     open-unique-flags file-mode open-file close-file ;
 
-M: unix temporary-path ( -- path ) "/tmp" ;
+M: unix default-temporary-directory ( -- path ) "/tmp" ;

@@ -16,7 +16,7 @@ destructors io.timeouts ;
     [ ] [ "monitor-test-self" temp-file touch-file ] unit-test
 
     [ t ] [
-        "m" get next-change drop
+        "m" get next-change path>>
         [ "" = ] [ "monitor-test-self" temp-file = ] bi or
     ] unit-test
 
@@ -29,7 +29,7 @@ destructors io.timeouts ;
     [ ] [ "monitor-test-self" temp-file touch-file ] unit-test
 
     [ t ] [
-        "m" get next-change drop
+        "m" get next-change path>>
         [ "" = ] [ "monitor-test-self" temp-file = ] bi or
     ] unit-test
 

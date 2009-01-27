@@ -5,7 +5,7 @@ assocs words.symbol words.alias words.constant ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
-"At the most abstract level, Factor syntax consists of whitespace-separated tokens. The parser tokenizes the input on whitespace boundaries.  The parser is case-sensitive and whitespace between tokens is significant, so the following three expressions tokenize differently:"
+"At the most abstract level, Factor syntax consists of whitespace-separated tokens. The parser tokenizes the input on whitespace boundaries. The parser is case-sensitive and whitespace between tokens is significant, so the following three expressions tokenize differently:"
 { $code "2X+\n2 X +\n2 x +" }
 "As the parser reads tokens it makes a distinction between numbers, ordinary words, and parsing words. Tokens are appended to the parse tree, the top level of which is a quotation returned by the original parser invocation. Nested levels of the parse tree are created by parsing words."
 $nl
@@ -69,7 +69,7 @@ ARTICLE: "syntax-floats" "Float syntax"
 "More information on floats can be found in " { $link "floats" } "." ;
 
 ARTICLE: "syntax-complex-numbers" "Complex number syntax"
-"A complex number is given by two components, a ``real'' part and ''imaginary'' part. The components must either be integers, ratios or floats."
+"A complex number is given by two components, a “real” part and “imaginary” part. The components must either be integers, ratios or floats."
 { $code
     "C{ 1/2 1/3 }   ! the complex number 1/2+1/3i"
     "C{ 0 1 }       ! the imaginary unit"
@@ -149,7 +149,7 @@ ARTICLE: "syntax-pathnames" "Pathname syntax"
 ARTICLE: "syntax-literals" "Literals"
 "Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words."
 $nl
-"If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are ``live''."
+"If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are “live”."
 $nl
 "Using mutable object literals in word definitions requires care, since if those objects are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Literals should be " { $link clone } "d before being passed to word which may potentially mutate them."
 { $subsection "syntax-numbers" }
@@ -352,6 +352,18 @@ HELP: SYMBOLS:
 { $description "Creates a new symbol for every token until the " { $snippet ";" } "." }
 { $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
 
+HELP: SINGLETON:
+{ $syntax "SINGLETON: class" }
+{ $values
+    { "class" "a new singleton to define" }
+}
+{ $description
+    "Defines a new singleton class. The class word itself is the sole instance of the singleton class."
+}
+{ $examples
+    { $example "USING: classes.singleton kernel io ;" "IN: singleton-demo" "USE: prettyprint SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
+} ;
+    
 HELP: SINGLETONS:
 { $syntax "SINGLETONS: words... ;" }
 { $values { "words" "a sequence of new words to define" } }
@@ -604,7 +616,7 @@ HELP: MIXIN:
 
 HELP: INSTANCE:
 { $syntax "INSTANCE: instance mixin" }
-{ $values { "instance" "a class word" } { "instance" "a class word" } }
+{ $values { "instance" "a class word" } { "mixin" "a mixin class word" } }
 { $description "Makes " { $snippet "instance" } " an instance of " { $snippet "mixin" } "." } ;
 
 HELP: PREDICATE:

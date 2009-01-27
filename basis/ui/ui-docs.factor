@@ -185,7 +185,9 @@ $nl
 { $subsection add-gadgets }
 { $subsection clear-gadget }
 "The children of a gadget are available via the "
-{ $snippet "children" } " slot. " "Working with gadget children:"
+{ $snippet "children" } " slot. "
+$nl
+"Working with gadget children:"
 { $subsection gadget-child }
 { $subsection nth-gadget }
 { $subsection each-child }
@@ -199,7 +201,7 @@ $nl
 { $subsection relayout-1 }
 "Gadgets implement a generic word to inform their parents of their preferred size:"
 { $subsection pref-dim* }
-"To get a gadget's preferred size, do not call the above word, instead use " { $link pref-dim  } ",  which caches the result." ;
+"To get a gadget's preferred size, do not call the above word, instead use " { $link pref-dim  } ", which caches the result." ;
 
 ARTICLE: "ui-null-layout" "Manual layouts"
 "When automatic layout is not appropriate, gadgets can be added to a parent with no layout policy, and then positioned and sized manually by setting the " { $snippet "loc" } " field." ;

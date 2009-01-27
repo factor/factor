@@ -81,7 +81,7 @@ ARTICLE: "io.streams.limited" "Limited input streams"
 "Unlimits a limited stream:"
 { $subsection unlimit }
 "Unlimits the current " { $link input-stream } ":"
-{ $subsection limit-input }
+{ $subsection unlimit-input }
 "Make a limited stream throw an exception on exhaustion:"
 { $subsection stream-throws }
 "Make a limited stream return " { $link f } " on exhaustion:"

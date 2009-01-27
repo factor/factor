@@ -1,7 +1,8 @@
-! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-IN: xml.tests
-USING: xml io kernel math sequences strings xml.utilities tools.test math.parser ;
+USING: xml io kernel math sequences strings xml.utilities
+tools.test math.parser xml.dispatch ;
+IN: xml.dispatch.tests
 
 PROCESS: calculate ( tag -- n )
 

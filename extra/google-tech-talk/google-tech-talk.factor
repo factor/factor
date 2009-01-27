@@ -354,7 +354,7 @@ IN: google-tech-talk
             ": forever ( quot -- ) '[ @ t ] loop ; inline"
             ""
             "\"/tmp\" t <monitor>"
-            "'[ _ next-change . . ] forever"
+            "'[ _ next-change . ] forever"
         }
     }
     { $slide "Example: time server"

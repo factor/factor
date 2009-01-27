@@ -121,7 +121,7 @@ $nl
 { $subsection "furnace.auth.providers.db" } ;
 
 ARTICLE: "furnace.auth.features" "Optional authentication features"
-"Vocabularies having names prefixed by " { $code "furnace.auth.features" } "  implement optional features which can be enabled by calling special words. These words define new actions on an authentication realm."
+"Vocabularies having names prefixed by " { $code "furnace.auth.features" } " implement optional features which can be enabled by calling special words. These words define new actions on an authentication realm."
 { $subsection "furnace.auth.features.deactivate-user" }
 { $subsection "furnace.auth.features.edit-profile" }
 { $subsection "furnace.auth.features.recover-password" }
@@ -148,7 +148,7 @@ ARTICLE: "furnace.auth.users" "User profiles"
 "User profile variables have the same restrictions on their values as session variables; see " { $link "furnace.sessions.serialize" } " for a discussion." ;
 
 ARTICLE: "furnace.auth.example" "Furnace authentication example"
-"The " { $vocab-link "webapps.todo" } " vocabulary wraps all of its responders in a protected responder. The " { $slot "description" } " slot is set so that the login page contains the message ``You must log in to view your todo list'':"
+"The " { $vocab-link "webapps.todo" } " vocabulary wraps all of its responders in a protected responder. The " { $slot "description" } " slot is set so that the login page contains the message “You must log in to view your todo list”:"
 { $code
     <" <protected>
     "view your todo list" >>description">

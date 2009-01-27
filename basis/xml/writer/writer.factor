@@ -155,6 +155,9 @@ M: directive write-xml-chunk
 M: instruction write-xml-chunk
     "<?" write text>> write "?>" write ;
 
+M: number write-xml-chunk
+    "Numbers are not allowed in XML" throw ;
+
 M: sequence write-xml-chunk
     [ write-xml-chunk ] each ;
 

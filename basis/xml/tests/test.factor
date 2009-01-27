@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 IN: xml.tests
 USING: kernel xml tools.test io namespaces make sequences
@@ -8,7 +8,7 @@ sequences.deep accessors io.streams.string ;
 
 ! This is insufficient
 \ read-xml must-infer
-[ [ drop ] sax ] must-infer
+[ [ drop ] each-element ] must-infer
 \ string>xml must-infer
 
 SYMBOL: xml-file
@@ -22,7 +22,7 @@ SYMBOL: xml-file
     xml-file get T{ name f "" "this" "http://d.de" } swap at
 ] unit-test
 [ t ] [ xml-file get children>> second contained-tag? ] unit-test
-[ "<a></b>" string>xml ] [ xml-parse-error? ] must-fail-with
+[ "<a></b>" string>xml ] [ xml-error? ] must-fail-with
 [ T{ comment f "This is where the fun begins!" } ] [
     xml-file get before>> [ comment? ] find nip
 ] unit-test

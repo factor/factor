@@ -344,25 +344,37 @@ M: wrapper '
     [ emit ] emit-object ;
 
 ! Strings
+: native> ( object -- object )
+    big-endian get [ [ be> ] map ] [ [ le> ] map ] if ;
+
 : emit-bytes ( seq -- )
-    bootstrap-cell <groups>
-    big-endian get [ [ be> ] map ] [ [ le> ] map ] if
-    emit-seq ;
+    bootstrap-cell <groups> native> emit-seq ;
 
 : pad-bytes ( seq -- newseq )
     dup length bootstrap-cell align 0 pad-right ;
 
-: check-string ( string -- )
-    [ 127 > ] contains?
-    [ "Bootstrap cannot emit non-ASCII strings" throw ] when ;
+: extended-part ( str -- str' )
+    dup [ 128 < ] all? [ drop f ] [
+        [ -7 shift 1 bitxor ] { } map-as
+        big-endian get
+        [ [ 2 >be ] { } map-as ]
+        [ [ 2 >le ] { } map-as ] if
+        B{ } join
+    ] if ;
+
+: ascii-part ( str -- str' )
+    [
+        [ 128 mod ] [ 128 >= ] bi
+        [ 128 bitor ] when
+    ] B{ } map-as ;
 
 : emit-string ( string -- ptr )
-    dup check-string
+    [ length ] [ extended-part ' ] [ ] tri
     string type-number object tag-number [
-        dup length emit-fixnum
-        f ' emit
-        f ' emit
-        pad-bytes emit-bytes
+        [ emit-fixnum ]
+        [ emit ]
+        [ f ' emit ascii-part pad-bytes emit-bytes ]
+        tri*
     ] emit-object ;
 
 M: string '

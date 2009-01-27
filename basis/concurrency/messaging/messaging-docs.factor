@@ -53,7 +53,8 @@ ARTICLE: { "concurrency" "synchronous-sends" } "Synchronous sends"
 { $subsection reply-synchronous }
 "An example:"
 { $example
-    "USING: concurrency.messaging kernel threads ;"
+    "USING: concurrency.messaging kernel prettyprint threads ;"
+    "IN: scratchpad"
     ": pong-server ( -- )"
     "    receive [ \"pong\" ] dip reply-synchronous ;"
     "[ pong-server t ] \"pong-server\" spawn-server"

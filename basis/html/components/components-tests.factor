@@ -31,7 +31,7 @@ TUPLE: color red green blue ;
     ] with-string-writer
 ] unit-test
 
-[ "<input type='hidden' name='red' value='<jimmy>'/>" ] [
+[ "<input value=\"&lt;jimmy>\" name=\"red\" type=\"hidden\"/>" ] [
     [
         "red" hidden render
     ] with-string-writer
@@ -39,13 +39,13 @@ TUPLE: color red green blue ;
 
 [ ] [ "'jimmy'" "red" set-value ] unit-test
 
-[ "<input type='text' size='5' name='red' value='&apos;jimmy&apos;'/>" ] [
+[ "<input value=\"&apos;jimmy&apos;\" name=\"red\" size=\"5\" type=\"text\"/>" ] [
     [
         "red" <field> 5 >>size render
     ] with-string-writer
 ] unit-test
 
-[ "<input type='password' size='5' name='red' value=''/>" ] [
+[ "<input value=\"\" name=\"red\" size=\"5\" type=\"password\"/>" ] [
     [
         "red" <password> 5 >>size render
     ] with-string-writer
@@ -105,7 +105,7 @@ TUPLE: color red green blue ;
 
 [ ] [ t "delivery" set-value ] unit-test
 
-[ "<input type='checkbox' name='delivery' checked='true'>Delivery</input>" ] [
+[ "<input type=\"checkbox\" checked=\"true\" name=\"delivery\">Delivery</input>" ] [
     [
         "delivery"
         <checkbox>
@@ -116,7 +116,7 @@ TUPLE: color red green blue ;
 
 [ ] [ f "delivery" set-value ] unit-test
 
-[ "<input type='checkbox' name='delivery'>Delivery</input>" ] [
+[ "<input type=\"checkbox\" name=\"delivery\">Delivery</input>" ] [
     [
         "delivery"
         <checkbox>
@@ -133,7 +133,7 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 
 [ ] [ link-test "link" set-value ] unit-test
 
-[ "<a href='http://www.apple.com/foo&amp;bar'>&lt;Link Title&gt;</a>" ] [
+[ "<a href=\"http://www.apple.com/foo&amp;bar\">&lt;Link Title&gt;</a>" ] [
     [ "link" link new render ] with-string-writer
 ] unit-test
 
@@ -149,7 +149,7 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 
 [ ] [ "java" "mode" set-value ] unit-test
 
-[ "<span class='KEYWORD3'>int</span> x <span class='OPERATOR'>=</span> <span class='DIGIT'>4</span>;\n" ] [
+[ "<span class=\"KEYWORD3\">int</span> x <span class=\"OPERATOR\">=</span> <span class=\"DIGIT\">4</span>;" ] [
     [ "code" <code> "mode" >>mode render ] with-string-writer
 ] unit-test
 
@@ -163,6 +163,8 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 
 [ t ] [
     [ "object" inspector render ] with-string-writer
+    USING: splitting sequences ;
+    "\"" split "'" join ! replace " with ' for now
     [ "object" value [ describe ] with-html-writer ] with-string-writer
     =
 ] unit-test
