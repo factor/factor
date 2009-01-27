@@ -17,9 +17,12 @@ HELP: (monitor)
 { $contract "Opens a file system change monitor which listens for changes on " { $snippet "path" } " and posts notifications to " { $snippet "mailbox" } " as triples with shape " { $snippet "{ path changed monitor } " } ". The boolean indicates whether changes in subdirectories should be reported." }
 { $errors "Throws an error if the pathname does not exist, if a monitor could not be created or if the platform does not support monitors." } ;
 
+HELP: file-change
+{ $class-description "A change notification output by " { $link next-change } ". The " { $snippet "path" } " slot holds a pathname string. The " { $snippet "changed" } " slots holds a sequence of symbols documented in " { $link "io.monitors.descriptors" } "." } ;
+
 HELP: next-change
-{ $values { "monitor" "a monitor" } { "path" "a pathname string" } { "changed" "a change descriptor" } }
-{ $contract "Waits for file system changes and outputs the pathname of the first changed file. The change descriptor is a sequence of symbols documented in " { $link "io.monitors.descriptors" } "." }
+{ $values { "monitor" "a monitor" } { "change" file-change } }
+{ $contract "Waits for file system changes and outputs a change descriptor for the first changed file." }
 { $errors "Throws an error if the monitor is closed from another thread." } ;
 
 HELP: with-monitor
@@ -46,7 +49,9 @@ HELP: +rename-file+
 { $description "Indicates that a file has been renamed." } ;
 
 ARTICLE: "io.monitors.descriptors" "File system change descriptors"
-"Change descriptors output by " { $link next-change } ":"
+"The " { $link next-change } " word outputs instances of a class:"
+{ $subsection file-change }
+"The " { $slot "changed" } " slot holds a sequence which may contain any of the following symbols:"
 { $subsection +add-file+ }
 { $subsection +remove-file+ }
 { $subsection +modify-file+ }
@@ -55,7 +60,7 @@ ARTICLE: "io.monitors.descriptors" "File system change descriptors"
 { $subsection +rename-file+ } ;
 
 ARTICLE: "io.monitors.platforms" "Monitors on different platforms"
-"Whether the " { $snippet "path" } " output value of " { $link next-change } " contains an absolute path or a path relative to the path given to " { $link <monitor> } " is unspecified, and may even vary on the same platform. User code should not assume either case."
+"Whether the " { $slot "path" } " slot of a " { $link file-change } " contains an absolute path or a path relative to the path given to " { $link <monitor> } " is unspecified, and may even vary on the same platform. User code should not assume either case."
 $nl
 "If the immediate path being monitored was changed, then " { $snippet "path" } " will equal " { $snippet "\"\"" } "; however this condition is not reported on all platforms. See below."
 { $heading "Mac OS X" }
@@ -63,7 +68,7 @@ $nl
 $nl
 { $snippet "FSEventStream" } "s always monitor directory hierarchies recursively, and the " { $snippet "recursive?" } " parameter to " { $link <monitor> } " has no effect."
 $nl
-"The " { $snippet "changed" } " output value of the " { $link next-change } " word always outputs " { $link +modify-file+ } " and the " { $snippet "path" } " output value is always the directory containing the file that changed. Unlike other platforms, fine-grained information is not available."
+"The " { $snippet "changed" } " slot of the " { $link file-change } " word tuple always contains " { $link +modify-file+ } " and the " { $snippet "path" } " slot is always the directory containing the file that changed. Unlike other platforms, fine-grained information is not available."
 $nl
 "Only directories may be monitored, not individual files. Changes to the directory itself (permissions, modification time, and so on) are not reported; only changes to children are reported."
 { $heading "Windows" }
@@ -107,7 +112,7 @@ $nl
 { $code
     "USE: io.monitors"
     ": watch-loop ( monitor -- )"
-    "    dup next-change . . nl nl flush watch-loop ;"
+    "    dup next-change . nl nl flush watch-loop ;"
     ""
     ": watch-directory ( path -- )"
     "    [ t [ watch-loop ] with-monitor ] with-monitors"

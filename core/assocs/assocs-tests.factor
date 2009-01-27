@@ -130,3 +130,12 @@ unit-test
 [ "x" ] [
     "a" H{ { "a" "x" } } at-default
 ] unit-test
+
+[ H{ { "b" [ 2 ] } { "d" [ 4 ] } } H{ { "a" [ 1 ] } { "c" [ 3 ] } } ] [
+    H{
+        { "a" [ 1 ] }
+        { "b" [ 2 ] }
+        { "c" [ 3 ] }
+        { "d" [ 4 ] }
+    } [ nip first even? ] assoc-partition
+] unit-test

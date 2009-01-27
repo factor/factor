@@ -1,7 +1,7 @@
-! Copyright (C) 2007 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
+! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel sequences
-sequences.private namespaces math quotations ;
+sequences.private namespaces math quotations assocs.private ;
 IN: assocs
 
 ARTICLE: "alists" "Association lists"
@@ -113,7 +113,6 @@ $nl
 { $subsection assoc-each }
 { $subsection assoc-find }
 { $subsection assoc-map }
-{ $subsection assoc-push-if }
 { $subsection assoc-filter }
 { $subsection assoc-filter-as }
 { $subsection assoc-contains? }
@@ -122,10 +121,7 @@ $nl
 { $subsection cache }
 { $subsection map>assoc }
 { $subsection assoc>map }
-{ $subsection assoc-map-as }
-{ $subsection search-alist }
-"Utility word:"
-{ $subsection assoc-pusher } ;
+{ $subsection assoc-map-as } ;
 
 ARTICLE: "assocs" "Associative mapping operations"
 "An " { $emphasis "associative mapping" } ", abbreviated " { $emphasis "assoc" } ", is a collection of key/value pairs which provides efficient lookup and storage indexed by key."
@@ -224,10 +220,6 @@ HELP: assoc-map
 } ;
 
 { assoc-map assoc-map-as } related-words
-
-HELP: assoc-push-if
-{ $values { "accum" "a resizable mutable sequence" } { "quot" { $quotation "( key value -- ? )" } } { "key" object } { "value" object } }
-{ $description "If the quotation yields true when applied to the key/value pair, adds the key/value pair at the end of " { $snippet "accum" } "." } ;
 
 HELP: assoc-filter
 { $values { "assoc" assoc } { "quot" { $quotation "( key value -- ? )" } } { "subassoc" "a new assoc" } }
@@ -387,18 +379,6 @@ HELP: assoc-map-as
      { "newassoc" assoc } }
 { $description "Applies the quotation to each entry in the input assoc and collects the results in a new assoc of the stame type as the exemplar." }
 { $examples { $example "USING: prettyprint assocs hashtables math ;" " H{ { 1 2 } { 3 4 } } [ sq ] { } assoc-map-as ." "{ { 1 4 } { 3 16 } }" } } ;
-
-HELP: assoc-pusher
-{ $values
-     { "quot" "a predicate quotation" }
-     { "quot'" quotation } { "accum" assoc } }
-{ $description "Creates a new " { $snippet "assoc" } " to accumulate the key/value pairs which return true for a predicate.  Returns a new quotation which accepts a pair of object to be tested and stored in the accumulator if the test yields true. The accumulator is left on the stack for convenience." }
-{ $example "! Find only the pairs that sum to 5:" "USING: prettyprint assocs math kernel ;"
-           "{ { 1 2 } { 2 3 } { 3 4 } } [ + 5 = ] assoc-pusher [ assoc-each ] dip ."
-           "V{ { 2 3 } }"
-}
-{ $notes "Used to implement the " { $link assoc-filter } " word." } ;
-
 
 HELP: extract-keys
 { $values

@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: init kernel system namespaces io io.encodings
 io.encodings.utf8 init assocs splitting alien ;
@@ -14,11 +14,15 @@ HOOK: init-io io-backend ( -- )
 
 HOOK: (init-stdio) io-backend ( -- stdin stdout stderr )
 
+HOOK: console-encoding os ( -- encoding )
+
+M: object console-encoding utf8 ;
+
 : init-stdio ( -- )
     (init-stdio)
-    [ utf8 <decoder> input-stream set-global ]
-    [ utf8 <encoder> output-stream set-global ]
-    [ utf8 <encoder> error-stream set-global ] tri* ;
+    [ console-encoding <decoder> input-stream set-global ]
+    [ console-encoding <encoder> output-stream set-global ]
+    [ console-encoding <encoder> error-stream set-global ] tri* ;
 
 HOOK: io-multiplex io-backend ( us -- )
 

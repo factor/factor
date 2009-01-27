@@ -69,18 +69,18 @@ ARTICLE: "fry.philosophy" "Fried quotation philosophy"
     "'[ [ _ key? ] all? ] filter"
     "[ [ key? ] curry all? ] curry filter"
 }
-"There is a mapping from fried quotations to lexical closures as defined in the " { $vocab-link "locals" } " vocabulary. Namely, a fried quotation is equivalent to a ``let'' form where each local binding is only used once, and bindings are used in the same order in which they are defined. The following two lines are equivalent:"
+"There is a mapping from fried quotations to lexical closures as defined in the " { $vocab-link "locals" } " vocabulary. Namely, a fried quotation is equivalent to a “let” form where each local binding is only used once, and bindings are used in the same order in which they are defined. The following two lines are equivalent:"
 { $code
     "'[ 3 _ + 4 _ / ]"
     "[let | a [ ] b [ ] | [ 3 a + 4 b / ] ]"
 } ;
 
 ARTICLE: "fry" "Fried quotations"
-"The " { $vocab-link "fry" } " vocabulary implements " { $emphasis "fried quotation" } ". Conceptually, fried quotations are quotations with ``holes'' (more formally, " { $emphasis "fry specifiers" } "), and the holes are filled in when the fried quotation is pushed on the stack."
+"The " { $vocab-link "fry" } " vocabulary implements " { $emphasis "fried quotation" } ". Conceptually, fried quotations are quotations with “holes” (more formally, " { $emphasis "fry specifiers" } "), and the holes are filled in when the fried quotation is pushed on the stack."
 $nl
 "Fried quotations are started by a special parsing word:"
 { $subsection POSTPONE: '[ }
-"There are two types of fry specifiers; the first can hold a value, and the second ``splices'' a quotation, as if it were inserted without surrounding brackets:"
+"There are two types of fry specifiers; the first can hold a value, and the second “splices” a quotation, as if it were inserted without surrounding brackets:"
 { $subsection _ }
 { $subsection @ }
 "The holes are filled in with the top of stack going in the rightmost hole, the second item on the stack going in the second hole from the right, and so on."

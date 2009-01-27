@@ -245,8 +245,9 @@ HELP: retry
 }
 { $description "Tries the quotation up to " { $snippet "n" } " times until it returns true. Retries the quotation if an exception is thrown or if the quotation returns " { $link f } ". The quotation is expected to have side effects that may fail, such as generating a random name for a new file until successful." }
 { $examples
+    "Try to get a 0 as a random number:"
     { $unchecked-example "USING: continuations math prettyprint ;"
-        "[ 5 random 0 = ] retry t"
+        "[ 5 random 0 = ] 5 retry t"
         "t"
     }
 } ;

@@ -7,13 +7,13 @@ IN: sorting.human
 : find-numbers ( string -- seq )
     [EBNF Result = ([0-9]+ => [[ string>number ]] | (!([0-9]) .)+)* EBNF] ;
 
-: human-<=> ( obj1 obj2 -- <=> ) [ find-numbers ] bi@ <=> ;
+: human<=> ( obj1 obj2 -- <=> ) [ find-numbers ] bi@ <=> ;
 
-: human->=< ( obj1 obj2 -- >=< ) human-<=> invert-comparison ; inline
+: human>=< ( obj1 obj2 -- >=< ) human<=> invert-comparison ; inline
 
-: human-compare ( obj1 obj2 quot -- <=> ) bi@ human-<=> ;
+: human-compare ( obj1 obj2 quot -- <=> ) bi@ human<=> ;
 
-: human-sort ( seq -- seq' ) [ human-<=> ] sort ;
+: human-sort ( seq -- seq' ) [ human<=> ] sort ;
 
 : human-sort-keys ( seq -- sortedseq )
     [ [ first ] human-compare ] sort ;
