@@ -20,13 +20,9 @@ GENERIC# tuple>assoc 1 ( tuple exemplar -- assoc )
 
 GENERIC# tuple>query 1 ( tuple examplar -- query-assoc )
 
-GENERIC: mdb-collection>> ( tuple -- string )
-
-GENERIC: mdb-slot-definitions>> ( tuple -- string )
-
-
 DEFER: assoc>tuple
 DEFER: create-mdb-command
+DEFER: mdb-collection>>
 
 <PRIVATE
 
