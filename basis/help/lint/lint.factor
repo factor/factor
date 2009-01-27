@@ -19,8 +19,8 @@ IN: help.lint
     ] keep
     peek assert= ;
 
-: check-examples ( word element -- )
-    nip \ $example swap elements [ check-example ] each ;
+: check-examples ( element -- )
+    \ $example swap elements [ check-example ] each ;
 
 : extract-values ( element -- seq )
     \ $values swap elements dup empty? [
@@ -64,8 +64,8 @@ IN: help.lint
         ]
     } 2|| [ "$values don't match stack effect" throw ] unless ;
 
-: check-see-also ( word element -- )
-    nip \ $see-also swap elements [
+: check-see-also ( element -- )
+    \ $see-also swap elements [
         rest dup prune [ length ] bi@ assert=
     ] each ;
 
@@ -100,9 +100,8 @@ M: help-error error.
         [
             dup word-help '[
                 _ _ {
-                    [ check-examples ]
                     [ check-values ]
-                    [ check-see-also ]
+                    [ nip [ check-examples ] [ check-see-also ] bi ]
                     [ [ check-rendering ] [ check-modules ] bi* ]
                 } 2cleave
             ] assert-depth
@@ -114,7 +113,10 @@ M: help-error error.
 : check-article ( article -- )
     [
         dup article-content
-        '[ _ check-rendering _ check-modules ]
+        '[
+            _ check-rendering
+            _ [ check-modules ] [ check-examples ] bi
+        ]
         assert-depth
     ] check-something ;
 
