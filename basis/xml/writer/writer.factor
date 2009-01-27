@@ -98,6 +98,9 @@ M: open-tag write-xml-chunk
         } cleave
     ] dip xml-pprint? set ;
 
+M: unescaped write-xml-chunk
+    string>> write ;
+
 M: comment write-xml-chunk
     "<!--" write text>> write "-->" write ;
 

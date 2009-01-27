@@ -15,7 +15,7 @@ IN: xmode.code2html
     tokenize-line htmlize-tokens ;
 
 : htmlize-lines ( lines mode -- xml )
-    f -rot load-mode [ htmlize-line ] curry map nip ;
+    [ f ] 2dip load-mode [ htmlize-line ] curry map nip ;
 
 : default-stylesheet ( -- xml )
     "resource:basis/xmode/code2html/stylesheet.css"
