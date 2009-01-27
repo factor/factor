@@ -114,7 +114,7 @@ TUPLE: typographic-bounds width ascent descent leading ;
     [ CTLineGetTypographicBounds ] 3keep [ *CGFloat ] tri@
     typographic-bounds boa ;
 
-TUPLE: line string font line bounds dim bitmap age disposed ;
+TUPLE: line string font line bounds dim bitmap age refs disposed ;
 
 : bounds>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
@@ -131,31 +131,36 @@ TUPLE: line string font line bounds dim bitmap age disposed ;
         2dup white <CTLine> |CFRelease
         dup line-typographic-bounds
         dup bounds>dim 3dup [ draw-line ] with-bitmap-context
-        0 f line boa
+        0 0 f line boa
     ] with-destructors ;
 
-M: line dispose*
-    [ font>> ] [ line>> ] bi 2array dispose-each ;
+M: line dispose* line>> CFRelease ;
 
-<PRIVATE
+: ref/unref-line ( line n -- )
+    '[ _ + ] change-refs 0 >>age drop ;
 
-MEMO: (cached-line) ( string font -- line ) <line> ;
+: ref-line ( line -- ) 1 ref/unref-line ;
+: unref-line ( line -- ) -1 ref/unref-line ;
 
-: cached-lines ( -- assoc )
-    \ (cached-line) "memoize" word-prop ;
+SYMBOL: cached-lines
 
-: set-cached-lines ( assoc -- )
-    \ (cached-line) "memoize" set-word-prop ;
+: cached-line ( string font -- line )
+    cached-lines get [ <line> ] 2cache ;
 
 CONSTANT: max-line-age 5
 
-PRIVATE>
+: age ( obj -- ? )
+    [ 1+ ] change-age age>> max-line-age >= ;
+
+: age-line ( line -- ? )
+    #! Outputs t whether the line is dead.
+    dup refs>> 0 = [ age ] [ drop f ] if ;
+
+: age-assoc ( assoc quot -- assoc' )
+    '[ nip @ ] assoc-partition
+    [ values dispose-each ] dip ;
 
 : age-lines ( -- )
-    cached-lines
-    [ nip [ 1+ ] change-age age>> max-line-age <= ] assoc-filter
-    set-cached-lines ;
+    cached-lines global [ [ age-line ] age-assoc ] change-at ;
 
-: cached-line ( string font -- line ) (cached-line) 0 >>age ;
-
-[ \ (cached-line) reset-memoized ] "core-text" add-init-hook
+[ H{ } clone cached-lines set-global ] "core-text" add-init-hook

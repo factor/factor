@@ -18,17 +18,19 @@ SYMBOL: viewport-translation
 
 : do-clip ( -- ) clip get flip-rect gl-set-clip ;
 
-: init-clip ( clip-rect rect -- )
-    GL_SCISSOR_TEST glEnable
-    [ rect-intersect ] keep
-    dim>> dup { 0 1 } v* viewport-translation set
-    { 0 0 } over gl-viewport
-    0 swap first2 0 gluOrtho2D
-    clip set
+: init-clip ( clip-rect -- )
+    [
+        dim>>
+        [ { 0 1 } v* viewport-translation set ]
+        [ [ { 0 0 } ] dip gl-viewport ]
+        [ [ 0 ] dip first2 0 gluOrtho2D ] tri
+    ]
+    [ clip set ] bi
     do-clip ;
 
-: init-gl ( clip-rect rect -- )
+: init-gl ( clip-rect -- )
     GL_SMOOTH glShadeModel
+    GL_SCISSOR_TEST glEnable
     GL_BLEND glEnable
     GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
     GL_VERTEX_ARRAY glEnableClientState

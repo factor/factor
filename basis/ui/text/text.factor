@@ -11,6 +11,10 @@ TUPLE: font name size bold? italic? ;
 
 SYMBOL: font-renderer
 
+HOOK: finish-text-rendering font-renderer ( world -- )
+
+M: object finish-text-rendering drop ;
+
 HOOK: open-font font-renderer ( font -- open-font )
 
 HOOK: string-dim font-renderer ( open-font string -- dim )

@@ -1,9 +1,9 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations kernel math models
-namespaces opengl sequences io combinators fry math.vectors
-ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-math.geometry.rect ;
+namespaces opengl sequences io combinators combinators.short-circuit
+fry math.vectors ui.gadgets ui.gestures ui.render ui.text ui.text.private
+ui.backend ui.gadgets.tracks math.geometry.rect ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < track
@@ -54,9 +54,7 @@ M: world request-focus-on ( child gadget -- )
 
 M: world layout*
     dup call-next-method
-    dup glass>> [
-        [ dup rect-dim ] dip (>>dim)
-    ] when* drop ;
+    dup glass>> dup [ swap dim>> >>dim drop ] [ 2drop ] if ;
 
 M: world focusable-child* gadget-child ;
 
@@ -64,13 +62,13 @@ M: world children-on nip children>> ;
 
 : (draw-world) ( world -- )
     dup handle>> [
-        [ dup init-gl ] keep draw-gadget
+        [ init-gl ] [ draw-gadget ] [ finish-text-rendering ] tri
     ] with-gl-context ;
 
 : draw-world? ( world -- ? )
     #! We don't draw deactivated worlds, or those with 0 size.
     #! On Windows, the latter case results in GL errors.
-    [ active?>> ] [ handle>> ] [ dim>> [ 0 > ] all? ] tri and and ;
+    { [ active?>> ] [ handle>> ] [ dim>> [ 0 > ] all? ] } 1&& ;
 
 TUPLE: world-error error world ;
 
@@ -86,16 +84,12 @@ ui-error-hook global [ [ rethrow ] or ] change-at
 : draw-world ( world -- )
     dup draw-world? [
         dup world [
-            [
-                (draw-world)
-            ] [
+            [ (draw-world) ] [
                 over <world-error> ui-error
                 f >>active? drop
             ] recover
         ] with-variable
-    ] [
-        drop
-    ] if ;
+    ] [ drop ] if ;
 
 world H{
     { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }

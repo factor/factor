@@ -51,13 +51,24 @@ M: core-text-renderer string-dim
 TUPLE: line-texture line texture age disposed ;
 
 : <line-texture> ( line -- texture )
-    dup [ dim>> ] [ bitmap>> ] bi GL_RGBA make-texture
-    0 f \ line-texture boa ;
+    #! Note: we only ref-line if make-texture succeeds
+    [
+        dup [ dim>> ] [ bitmap>> ] bi GL_RGBA make-texture
+        0 f \ line-texture boa
+    ] keep ref-line ;
 
-M: line-texture dispose* texture>> delete-texture ;
+M: line-texture dispose*
+    [ line>> unref-line ]
+    [ texture>> delete-texture ] bi ;
 
 : line-texture ( string open-font -- texture )
-    world get fonts>> [ cached-line <line-texture> ] 2cache ;
+    world get fonts>> [ cached-line <line-texture> ] 2cache 0 >>age ;
+
+: age-line-textures ( world -- )
+    [ [ age ] age-assoc ] change-fonts drop ;
+
+M: core-text-renderer finish-text-rendering
+    age-line-textures age-lines ;
 
 : draw-line-texture ( line-texture -- )
     GL_TEXTURE_2D [
