@@ -3,7 +3,7 @@
 USING: accessors inspector namespaces kernel models fry
 models.filter prettyprint sequences mirrors assocs classes
 io io.styles arrays hashtables math.order sorting refs
-ui.tools.browser ui.commands ui.gadgets ui.gadgets.panes
+ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks
 ui.gestures ui.gadgets.buttons ui.gadgets.tables
 ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.labelled
@@ -51,8 +51,6 @@ M: inspector-renderer row-value
         ] tabular-output
     ] <pane-control> ;
 
-DEFER: inspector
-
 GENERIC: make-slot-descriptions ( obj -- seq )
 
 M: object make-slot-descriptions
@@ -63,7 +61,7 @@ M: hashtable make-slot-descriptions
 
 : <inspector-table> ( model -- table )
     [ make-slot-descriptions ] <filter> <table>
-        [ inspector ] >>action
+        [ dup primary-operation invoke-command ] >>action
         inspector-renderer >>renderer
         monospace-font >>font ;
 
