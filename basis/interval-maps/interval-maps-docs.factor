@@ -18,7 +18,8 @@ HELP: <interval-map>
 { $description "From a specification, produce an interval tree. The specification is an assoc where the keys are intervals, or pairs of numbers to represent intervals, or individual numbers to represent singleton intervals. The values are the values int he interval map. Construction time is O(n log n)." } ;
 
 ARTICLE: "interval-maps" "Interval maps"
-"Interval maps are a mechanism, similar to assocs, where a set of closed intervals of keys are associated with values. As such, interval maps do not conform to the assoc protocol, because intervals of floats, for example, can be used, and it is impossible to get a list of keys in between."
+"The " { $vocab-link "interval-maps" } " vocabulary implements a data structure, similar to assocs, where a set of closed intervals of keys are associated with values. As such, interval maps do not conform to the assoc protocol, because intervals of floats, for example, can be used, and it is impossible to get a list of keys in between."
+$nl
 "The following operations are used to query interval maps:"
 { $subsection interval-at* }
 { $subsection interval-at }

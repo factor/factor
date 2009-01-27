@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private
 continuations.private vectors arrays namespaces
-assocs words quotations lexer sequences ;
+assocs words quotations lexer sequences math ;
 IN: continuations
 
 ARTICLE: "errors-restartable" "Restartable errors"
@@ -26,7 +26,7 @@ ARTICLE: "errors-anti-examples" "Common error handling pitfalls"
 $nl
 "In most other cases, " { $link cleanup } " should be used instead to handle an error and rethrow it automatically."
 { $heading "Anti-pattern #3: Dropping and rethrowing" }
-"Do not use " { $link recover } " to handle an error by dropping it and throwing a new error. By losing the original error message, you signal to the user that something failed without leaving any indication of what actually went wrong. Either wrap the error in a new error containing additional information, or rethrow the original error. A more subtle form of this is using  " { $link throw } " instead of " { $link rethrow } ". The " { $link throw } " word should only be used when throwing new errors, and never when rethrowing errors that have been caught."
+"Do not use " { $link recover } " to handle an error by dropping it and throwing a new error. By losing the original error message, you signal to the user that something failed without leaving any indication of what actually went wrong. Either wrap the error in a new error containing additional information, or rethrow the original error. A more subtle form of this is using " { $link throw } " instead of " { $link rethrow } ". The " { $link throw } " word should only be used when throwing new errors, and never when rethrowing errors that have been caught."
 { $heading "Anti-pattern #4: Logging and rethrowing" }
 "If you are going to rethrow an error, do not log a message. If you do so, the user will see two log messages for the same error, which will clutter logs without adding any useful information." ;
 
@@ -241,7 +241,7 @@ HELP: attempt-all
 
 HELP: retry
 { $values
-     { "quot" quotation } { "n" null }
+     { "quot" quotation } { "n" integer }
 }
 { $description "Tries the quotation up to " { $snippet "n" } " times until it returns true. Retries the quotation if an exception is thrown or if the quotation returns " { $link f } ". The quotation is expected to have side effects that may fail, such as generating a random name for a new file until successful." }
 { $examples

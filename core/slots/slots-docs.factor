@@ -84,10 +84,9 @@ $nl
 { $subsection initial-value } ;
 
 ARTICLE: "slots" "Slots"
-"A " { $emphasis "slot" } " is a component of an object which can store a value."
+"The " { $vocab-link "slots" } " vocabulary contains words for introspecting the slots of an object. A " { $emphasis "slot" } " is a component of an object which can store a value."
 $nl
 { $link "tuples" } " are composed entirely of slots, and instances of " { $link "builtin-classes" } " consist of slots together with intrinsic data."
-"The " { $vocab-link "slots" } " vocabulary contains words for introspecting the slots of an object."
 $nl
 "The " { $snippet "\"slots\"" } " word property of built-in and tuple classes holds an array of " { $emphasis "slot specifiers" } " describing the slot layout of each instance."
 { $subsection slot-spec }

@@ -5,7 +5,7 @@ assocs words.symbol words.alias words.constant ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
-"At the most abstract level, Factor syntax consists of whitespace-separated tokens. The parser tokenizes the input on whitespace boundaries.  The parser is case-sensitive and whitespace between tokens is significant, so the following three expressions tokenize differently:"
+"At the most abstract level, Factor syntax consists of whitespace-separated tokens. The parser tokenizes the input on whitespace boundaries. The parser is case-sensitive and whitespace between tokens is significant, so the following three expressions tokenize differently:"
 { $code "2X+\n2 X +\n2 x +" }
 "As the parser reads tokens it makes a distinction between numbers, ordinary words, and parsing words. Tokens are appended to the parse tree, the top level of which is a quotation returned by the original parser invocation. Nested levels of the parse tree are created by parsing words."
 $nl

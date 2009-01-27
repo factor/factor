@@ -12,9 +12,9 @@ HELP: bshift
 { $notes "It is important to note that even if the quotation discards items on the stack, the stack will be restored to the way it was before it is called (which is true of continuation usage in general)." } ;
 
 ARTICLE: "partial-continuations" "Partial continuations"
-"Based on Scheme code for bshift and breset from"
+"Based on Scheme code for bshift and breset from "
 { $url "http://groups.google.com/group/comp.lang.scheme/msg/9f0d61da01540816" } "."
-"See this blog entry for more details:"
+" See this blog entry for more details:"
 { $url "http://www.bluishcoder.co.nz/2006/03/factor-partial-continuation-updates.html" }
 { $subsection breset }
 { $subsection bshift } ;
