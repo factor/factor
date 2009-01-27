@@ -219,7 +219,7 @@ C: <vocab-author> vocab-author
 
 : words. ( vocab -- )
     last-element off
-    words $words ;
+    [ require ] [ words $words ] bi ;
 
 : describe-metadata ( vocab -- )
     [
