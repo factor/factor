@@ -888,9 +888,9 @@ $nl
 "Here is an array containing the " { $link f } " class:"
 { $example "{ POSTPONE: f } ." "{ POSTPONE: f }" }
 "The " { $link f } " object is an instance of the " { $link f } " class:"
-{ $example "f class ." "POSTPONE: f" }
+{ $example "USE: classes" "f class ." "POSTPONE: f" }
 "The " { $link f } " class is an instance of " { $link word } ":"
-{ $example "\\ f class ." "word" }
+{ $example "USE: classes" "\\ f class ." "word" }
 "On the other hand, " { $link t } " is just a word, and there is no class which it is a unique instance of."
 { $example "t \\ t eq? ." "t" }
 "Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;

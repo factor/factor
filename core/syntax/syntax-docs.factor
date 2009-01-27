@@ -352,6 +352,18 @@ HELP: SYMBOLS:
 { $description "Creates a new symbol for every token until the " { $snippet ";" } "." }
 { $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
 
+HELP: SINGLETON:
+{ $syntax "SINGLETON: class" }
+{ $values
+    { "class" "a new singleton to define" }
+}
+{ $description
+    "Defines a new singleton class. The class word itself is the sole instance of the singleton class."
+}
+{ $examples
+    { $example "USING: classes.singleton kernel io ;" "IN: singleton-demo" "USE: prettyprint SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
+} ;
+    
 HELP: SINGLETONS:
 { $syntax "SINGLETONS: words... ;" }
 { $values { "words" "a sequence of new words to define" } }
