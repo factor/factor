@@ -70,8 +70,8 @@ HELP: render
 { $description "Renders an HTML component to the " { $link output-stream } "." } ;
 
 HELP: render*
-{ $values { "value" "a value" } { "name" "a value name" } { "renderer" "a component renderer" } }
-{ $contract "Renders an HTML component to the " { $link output-stream } "." } ;
+{ $values { "value" "a value" } { "name" "a value name" } { "renderer" "a component renderer" } { "xml" "an XML chunk" } }
+{ $contract "Renders an HTML component, outputting an XHTML snippet." } ;
 
 ARTICLE: "html.components" "HTML components"
 "The " { $vocab-link "html.components" } " vocabulary provides various HTML form components."

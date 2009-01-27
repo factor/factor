@@ -30,7 +30,7 @@ ARTICLE: "first-program-logic" "Writing some logic in your first program"
     "! See http://factorcode.org/license.txt for BSD license."
     "IN: palindrome"
 }
-"We will now write our first word using " { $link POSTPONE: : } ". This word will test if a string is a palindrome; it will take a string as input, and give back a  boolean as output. We will call this word " { $snippet "palindrome?" } ", following a naming convention that words returning booleans have names ending with " { $snippet "?" } "."
+"We will now write our first word using " { $link POSTPONE: : } ". This word will test if a string is a palindrome; it will take a string as input, and give back a boolean as output. We will call this word " { $snippet "palindrome?" } ", following a naming convention that words returning booleans have names ending with " { $snippet "?" } "."
 $nl
 "Recall that a string is a palindrome if it is spelled the same forwards or backwards; that is, if the string is equal to its reverse. We can express this in Factor as follows:"
 { $code ": palindrome? ( string -- ? ) dup reverse = ;" }

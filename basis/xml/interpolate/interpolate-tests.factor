@@ -50,3 +50,10 @@ IN: xml.interpolate.tests
 [ 3 f URL" http://factorcode.org/" "hello" \ drop
   <XML <x number=<-> false=<-> url=<-> string=<-> word=<->/> XML>
   pprint-xml>string  ] unit-test
+
+[ "<x>3</x>" ] [ 3 [XML <x><-></x> XML] xml-chunk>string ] unit-test
+[ "<x></x>" ] [ f [XML <x><-></x> XML] xml-chunk>string ] unit-test
+
+\ parse-def must-infer
+[ "" interpolate-chunk ] must-infer
+[ [XML <foo><-></foo> <bar val=<->/> XML] ] must-infer

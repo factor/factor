@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml xml.state kernel sequences fry assocs xml.data
 accessors strings make multiline parser namespaces macros
-sequences.deep generalizations locals words combinators
+sequences.deep generalizations words combinators
 math present arrays ;
 IN: xml.interpolate
 
@@ -34,6 +34,7 @@ M: xml-data push-item , ;
 M: object push-item present , ;
 M: sequence push-item
     [ dup array? [ % ] [ , ] if ] each ;
+M: number push-item present , ;
 
 GENERIC: interpolate-item ( table item -- )
 M: object interpolate-item nip , ;
@@ -47,23 +48,23 @@ M: interpolated interpolate-item
 : interpolate-xml-doc ( table xml -- xml )
     (clone) [ interpolate-tag ] change-body ;
 
-GENERIC# (each-interpolated) 1 ( item quot -- ) inline
-M: interpolated (each-interpolated) call ;
-M: tag (each-interpolated)
-    swap attrs>> values
-    [ interpolated? ] filter
-    swap each ;
-M: xml (each-interpolated)
-    [ body>> ] dip (each-interpolated) ;
-M: object (each-interpolated) 2drop ;
+: (each-interpolated) ( item quot: ( interpolated -- ) -- )
+     {
+        { [ over interpolated? ] [ call ] }
+        { [ over tag? ] [
+            [ attrs>> values [ interpolated? ] filter ] dip each
+        ] }
+        { [ over xml? ] [ [ body>> ] dip (each-interpolated) ] }
+        [ 2drop ]
+     } cond ; inline recursive
 
 : each-interpolated ( xml quot -- )
     '[ _ (each-interpolated) ] deep-each ; inline
 
-:: number<-> ( doc -- doc )
-    0 :> n! doc [
-        dup var>> [ n >>var n 1+ n! ] unless drop
-    ] each-interpolated doc ;
+: number<-> ( doc -- dup )
+    0 over [
+        dup var>> [ over >>var [ 1+ ] dip ] unless drop
+    ] each-interpolated drop ;
 
 MACRO: interpolate-xml ( string -- doc )
     string>doc number<-> '[ _ interpolate-xml-doc ] ;

@@ -1,51 +1,9 @@
-! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces sequences words io assocs
 quotations strings parser lexer arrays xml.data xml.writer debugger
-splitting vectors sequences.deep combinators fry ;
+splitting vectors sequences.deep combinators fry memoize ;
 IN: xml.utilities
-
-! * System for words specialized on tag names
-
-TUPLE: process-missing process tag ;
-M: process-missing error.
-    "Tag <" write
-    dup tag>> print-name
-    "> not implemented on process process " write
-    name>> print ;
-
-: run-process ( tag word -- )
-    2dup "xtable" word-prop
-    [ dup main>> ] dip at* [ 2nip call ] [
-        drop \ process-missing boa throw
-    ] if ;
-
-: PROCESS:
-    CREATE
-    dup H{ } clone "xtable" set-word-prop
-    dup '[ _ run-process ] define ; parsing
-
-: TAG:
-    scan scan-word
-    parse-definition
-    swap "xtable" word-prop
-    rot "/" split [ [ 2dup ] dip swap set-at ] each 2drop ;
-    parsing
-
-
-! * Common utility functions
-
-: build-tag* ( items name -- tag )
-    assure-name swap f swap <tag> ;
-
-: build-tag ( item name -- tag )
-    [ 1array ] dip build-tag* ;
-
-: standard-prolog ( -- prolog )
-    T{ prolog f "1.0" "UTF-8" f } ;
-
-: build-xml ( tag -- xml )
-    standard-prolog { } rot { } <xml> ;
 
 : children>string ( tag -- string )
     children>> {
@@ -115,3 +73,7 @@ M: process-missing error.
 
 : insert-child ( child tag -- )
     [ 1vector ] dip insert-children ;
+
+: XML-NS:
+    CREATE-WORD (( string -- name )) over set-stack-effect
+    scan '[ f swap _ <name> ] define-memoized ; parsing

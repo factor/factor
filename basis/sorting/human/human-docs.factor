@@ -55,7 +55,7 @@ HELP: human-sort-values
 
 { <=> >=< human-compare human-sort human-sort-keys human-sort-values } related-words
 
-ARTICLE: "sorting.human" "sorting.human"
+ARTICLE: "sorting.human" "Human-friendly sorting"
 "The " { $vocab-link "sorting.human" } " vocabulary sorts by numbers as a human would -- by comparing their magnitudes -- rather than in a lexicographic way. For example, sorting a1, a10, a03, a2 with human sort returns a1, a2, a03, a10, while sorting with natural sort returns a03, a1, a10, a2." $nl
 "Comparing two objects:"
 { $subsection human<=> }
