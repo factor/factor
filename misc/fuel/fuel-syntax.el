@@ -233,16 +233,11 @@
     ;; Default is word constituent
     (dotimes (i 256)
       (modify-syntax-entry i "w" table))
-
     ;; Whitespace (TAB is not whitespace)
     (modify-syntax-entry ?\f " " table)
     (modify-syntax-entry ?\r " " table)
     (modify-syntax-entry ?\  " " table)
     (modify-syntax-entry ?\n " " table)
-
-    ;; Char quote
-    (modify-syntax-entry ?\\ "/" table)
-
     table))
 
 (defconst fuel-syntax--syntactic-keywords
@@ -254,9 +249,9 @@
     (" \\((\\)( \\([^\n]*\\) )\\()\\)\\( \\|\n\\)" (1 "<b") (2 "w") (3 ">b"))
     (" \\((\\) \\([^\n]*\\) \\()\\)\\( \\|\n\\)" (1 "<b") (2 "w") (3 ">b"))
     ;; Strings
-    ("\\( \\|^\\)\\(DLL\\|P\\|SBUF\\)\\(\"\\)[^\n\r\f]*?\\(\"\\)\\( \\|\n\\)"
-     (3 "\"") (4 "\""))
-    ("\\(\"\\)[^\n\r\f]*?\\(\"\\)\\( \\|\n\\|$\\)" (1 "\"") (2 "\""))
+    ("\\( \\|^\\)\\(DLL\\|P\\|SBUF\\)\\(\"\\)\\([^\n\r\f\\\"]\\|\\\\.\\)*?\\(\"\\)"
+     (3 "\"") (5 "\""))
+    ("\\(\"\\)\\([^\n\r\f\\\"]\\|\\\\.\\)*?\\(\"\\)" (1 "\"") (3 "\""))
     ("\\_<<\\(\"\\)\\_>" (1 "<b"))
     ("\\_<\\(\"\\)>\\_>" (1 ">b"))
     ;; Multiline constructs
