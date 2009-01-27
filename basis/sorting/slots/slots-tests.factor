@@ -41,7 +41,7 @@ TUPLE: tuple2 d ;
         T{ sort-test f 1 1 11 }
         T{ sort-test f 2 5 3 }
         T{ sort-test f 2 5 2 }
-    } { { a>> human-<=> } { b>> human->=< } { c>> <=> } } sort-by-slots
+    } { { a>> human<=> } { b>> human>=< } { c>> <=> } } sort-by-slots
 ] unit-test
 
 [
@@ -64,7 +64,7 @@ TUPLE: tuple2 d ;
         T{ sort-test f 2 5 3 }
         T{ sort-test f 2 5 2 }
     }
-    { { a>> human-<=> } { b>> <=> } } [ sort-by-slots ] keep
+    { { a>> human<=> } { b>> <=> } } [ sort-by-slots ] keep
     [ but-last-slice ] map split-by-slots [ >array ] map
 ] unit-test
 

@@ -143,7 +143,7 @@ HELP: bitxor
 
 HELP: shift
 { $values { "x" integer } { "n" integer } { "y" integer } }
-{ $description "Shifts " { $snippet "x" } " to the left by " { $snippet "n" } " bits if " { $snippet "n" } " is positive, or " { $snippet "-n" } " bits to the right if " { $snippet "n" } " is negative. A left shift of a fixnum may overflow, yielding a bignum. A right shift may result in bits ``falling off'' the right hand side and being discarded." }
+{ $description "Shifts " { $snippet "x" } " to the left by " { $snippet "n" } " bits if " { $snippet "n" } " is positive, or " { $snippet "-n" } " bits to the right if " { $snippet "n" } " is negative. A left shift of a fixnum may overflow, yielding a bignum. A right shift may result in bits “falling off” the right hand side and being discarded." }
 { $examples { $example "USING: math prettyprint ;" "BIN: 101 5 shift .b" "10100000" } { $example "USING: math prettyprint ;" "BIN: 11111 -2 shift .b" "111" } } ;
 
 HELP: bitnot
