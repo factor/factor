@@ -14,15 +14,11 @@ HOOK: init-io io-backend ( -- )
 
 HOOK: (init-stdio) io-backend ( -- stdin stdout stderr )
 
-HOOK: console-encoding os ( -- encoding )
-
-M: object console-encoding utf8 ;
-
 : init-stdio ( -- )
     (init-stdio)
-    [ console-encoding <decoder> input-stream set-global ]
-    [ console-encoding <encoder> output-stream set-global ]
-    [ console-encoding <encoder> error-stream set-global ] tri* ;
+    [ utf8 <decoder> input-stream set-global ]
+    [ utf8 <encoder> output-stream set-global ]
+    [ utf8 <encoder> error-stream set-global ] tri* ;
 
 HOOK: io-multiplex io-backend ( us -- )
 

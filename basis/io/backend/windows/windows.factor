@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Mackenzie Straight, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays destructors io io.backend io.buffers
-io.files io.ports io.binary io.timeouts io.encodings.8-bit
+USING: alien alien.c-types arrays destructors io io.backend
+io.buffers io.files io.ports io.binary io.timeouts
 windows.errors strings kernel math namespaces sequences windows
 windows.kernel32 windows.shell32 windows.types windows.winsock
 splitting continuations math.bitwise system accessors ;
@@ -52,5 +52,3 @@ HOOK: add-completion io-backend ( port -- )
     "SECURITY_ATTRIBUTES" <c-object>
     "SECURITY_ATTRIBUTES" heap-size
     over set-SECURITY_ATTRIBUTES-nLength ;
-
-M: windows console-encoding windows-1252 ;

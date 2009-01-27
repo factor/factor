@@ -134,6 +134,7 @@ $nl
 }
 "In a word with locals, literals expand into code which constructs the literal, and so every invocation pushes a new object:"
 { $example
+    "USE: locals"
     "IN: scratchpad"
     "TUPLE: person first-name last-name ;"
     ":: ordinary-word-test ( -- tuple )"

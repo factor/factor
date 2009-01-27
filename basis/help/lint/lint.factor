@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors sequences parser kernel help help.markup
 help.topics words strings classes tools.vocabs namespaces make
@@ -6,21 +6,24 @@ io io.streams.string prettyprint definitions arrays vectors
 combinators combinators.short-circuit splitting debugger
 hashtables sorting effects vocabs vocabs.loader assocs editors
 continuations classes.predicate macros math sets eval
-vocabs.parser words.symbol values ;
+vocabs.parser words.symbol values grouping unicode.categories
+sequences.deep ;
 IN: help.lint
 
-: check-example ( element -- )
-    rest [
-        but-last "\n" join 1vector
-        [
-            use [ clone ] change
-            [ eval>string ] with-datastack
-        ] with-scope peek "\n" ?tail drop
-    ] keep
-    peek assert= ;
+SYMBOL: vocabs-quot
 
-: check-examples ( word element -- )
-    nip \ $example swap elements [ check-example ] each ;
+: check-example ( element -- )
+    [
+        rest [
+            but-last "\n" join 1vector
+            [ (eval>string) ] with-datastack
+            peek "\n" ?tail drop
+        ] keep
+        peek assert=
+    ] vocabs-quot get call ;
+
+: check-examples ( element -- )
+    \ $example swap elements [ check-example ] each ;
 
 : extract-values ( element -- seq )
     \ $values swap elements dup empty? [
@@ -64,8 +67,13 @@ IN: help.lint
         ]
     } 2|| [ "$values don't match stack effect" throw ] unless ;
 
-: check-see-also ( word element -- )
-    nip \ $see-also swap elements [
+: check-nulls ( element -- )
+    \ $values swap elements
+    null swap deep-member?
+    [ "$values should not contain null" throw ] when ;
+
+: check-see-also ( element -- )
+    \ $see-also swap elements [
         rest dup prune [ length ] bi@ assert=
     ] each ;
 
@@ -79,43 +87,78 @@ IN: help.lint
     ] each ;
 
 : check-rendering ( element -- )
-    [ print-topic ] with-string-writer drop ;
+    [ print-content ] with-string-writer drop ;
+
+: check-strings ( str -- )
+    [
+        "\n\t" intersects?
+        [ "Paragraph text should not contain \\n or \\t" throw ] when
+    ] [
+        "  " swap subseq?
+        [ "Paragraph text should not contain double spaces" throw ] when
+    ] bi ;
+
+: check-whitespace ( str1 str2 -- )
+    [ " " tail? ] [ " " head? ] bi* or
+    [ "Missing whitespace between strings" throw ] unless ;
+
+: check-bogus-nl ( element -- )
+    { { $nl } { { $nl } } } [ head? ] with contains?
+    [ "Simple element should not begin with a paragraph break" throw ] when ;
+
+: check-elements ( element -- )
+    {
+        [ check-bogus-nl ]
+        [ [ string? ] filter [ check-strings ] each ]
+        [ [ simple-element? ] filter [ check-elements ] each ]
+        [ 2 <clumps> [ [ string? ] all? ] filter [ first2 check-whitespace ] each ]
+    } cleave ;
+
+: check-markup ( element -- )
+    {
+        [ check-elements ]
+        [ check-rendering ]
+        [ check-examples ]
+        [ check-modules ]
+    } cleave ;
 
 : all-word-help ( words -- seq )
     [ word-help ] filter ;
 
-TUPLE: help-error topic error ;
+TUPLE: help-error error topic ;
 
 C: <help-error> help-error
 
 M: help-error error.
-    "In " write dup topic>> pprint nl
-    error>> error. ;
+    [ "In " write topic>> pprint nl ]
+    [ error>> error. ]
+    bi ;
 
 : check-something ( obj quot -- )
-    flush [ <help-error> , ] recover ; inline
+    flush '[ _ assert-depth ] swap '[ _ <help-error> , ] recover ; inline
 
 : check-word ( word -- )
+    [ with-file-vocabs ] vocabs-quot set
     dup word-help [
-        [
-            dup word-help '[
-                _ _ {
-                    [ check-examples ]
-                    [ check-values ]
-                    [ check-see-also ]
-                    [ [ check-rendering ] [ check-modules ] bi* ]
-                } 2cleave
-            ] assert-depth
+        dup '[
+            _ dup word-help
+            [ check-values ]
+            [ nip [ check-nulls ] [ check-see-also ] [ check-markup ] tri ] 2bi
         ] check-something
     ] [ drop ] if ;
 
 : check-words ( words -- ) [ check-word ] each ;
 
+: check-article-title ( article -- )
+    article-title first LETTER?
+    [ "Article title must begin with a capital letter" throw ] unless ;
+
 : check-article ( article -- )
-    [
-        dup article-content
-        '[ _ check-rendering _ check-modules ]
-        assert-depth
+    [ with-interactive-vocabs ] vocabs-quot set
+    dup '[
+        _
+        [ check-article-title ]
+        [ article-content check-markup ] bi
     ] check-something ;
 
 : files>vocabs ( -- assoc )
@@ -135,7 +178,7 @@ M: help-error error.
     ] keep ;
 
 : check-about ( vocab -- )
-    [ vocab-help [ article drop ] when* ] check-something ;
+    dup '[ _ vocab-help [ article drop ] when* ] check-something ;
 
 : check-vocab ( vocab -- seq )
     "Checking " write dup write "..." print

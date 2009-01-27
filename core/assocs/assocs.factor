@@ -38,6 +38,9 @@ M: assoc assoc-like drop ;
 : substituter ( assoc -- quot )
     [ dupd at* [ nip ] [ drop ] if ] curry ; inline
 
+: with-assoc ( assoc quot: ( value key -- assoc ) -- quot: ( key value -- ) )
+    curry [ swap ] prepose ; inline
+
 PRIVATE>
 
 : assoc-find ( assoc quot -- key value ? )
@@ -81,7 +84,7 @@ PRIVATE>
 
 M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ dup assoc-size ] dip new-assoc
-    [ [ swapd set-at ] curry assoc-each ] keep ;
+    [ [ set-at ] with-assoc assoc-each ] keep ;
 
 : keys ( assoc -- keys )
     [ drop ] { } assoc>map ;
@@ -93,7 +96,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ at* ] 2keep delete-at ;
 
 : rename-at ( newkey key assoc -- )
-    [ delete-at* ] keep [ swapd set-at ] curry [ 2drop ] if ;
+    [ delete-at* ] keep [ set-at ] with-assoc [ 2drop ] if ;
 
 : assoc-empty? ( assoc -- ? )
     assoc-size 0 = ;
@@ -102,7 +105,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ length 1- ] keep (assoc-stack) ; flushable
 
 : assoc-subset? ( assoc1 assoc2 -- ? )
-    [ swapd at* [ = ] [ 2drop f ] if ] curry assoc-all? ;
+    [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;
 
 : assoc= ( assoc1 assoc2 -- ? )
     [ assoc-subset? ] [ swap assoc-subset? ] 2bi and ;
@@ -114,7 +117,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     swap [ nip key? ] curry assoc-filter ;
 
 : update ( assoc1 assoc2 -- )
-    swap [ swapd set-at ] curry assoc-each ;
+    swap [ set-at ] with-assoc assoc-each ;
 
 : assoc-union ( assoc1 assoc2 -- union )
     [ [ [ assoc-size ] bi@ + ] [ drop ] 2bi new-assoc ] 2keep

@@ -11,7 +11,7 @@ HELP: eval>string
 { $description "Evaluates the Factor code in " { $snippet "str" } " with " { $link output-stream } " rebound to a string output stream, then outputs the resulting string." } ;
 
 ARTICLE: "eval" "Evaluating strings at runtime"
-"Evaluating strings at runtime:"
+"The " { $vocab-link "eval" } " vocabulary implements support for evaluating strings at runtime."
 { $subsection eval }
 { $subsection eval>string } ;
 

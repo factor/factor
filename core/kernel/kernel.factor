@@ -1,6 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel.private slots.private classes.tuple.private ;
+USING: kernel.private slots.private math.private
+classes.tuple.private ;
 IN: kernel
 
 DEFER: dip
@@ -154,7 +155,6 @@ TUPLE: identity-tuple ;
 
 M: identity-tuple equal? 2drop f ;
 
-USE: math.private
 : = ( obj1 obj2 -- ? )
     2dup eq? [ 2drop t ] [
         2dup both-fixnums? [ 2drop f ] [ equal? ] if

@@ -57,7 +57,7 @@ SYMBOL: auto-use?
         dup vocabulary>>
         [ (use+) ]
         [ amended-use get dup [ push ] [ 2drop ] if ]
-        [ "Added “" "” vocabulary to search path" surround note. ]
+        [ "Added \"" "\" vocabulary to search path" surround note. ]
         tri
     ] [ create-in ] if ;
 
@@ -160,6 +160,7 @@ SYMBOL: interactive-vocabs
     "definitions"
     "editors"
     "help"
+    "help.lint"
     "inspector"
     "io"
     "io.files"
@@ -200,7 +201,7 @@ SYMBOL: interactive-vocabs
 SYMBOL: print-use-hook
 
 print-use-hook global [ [ ] or ] change-at
-!
+
 : parse-fresh ( lines -- quot )
     [
         V{ } clone amended-use set
