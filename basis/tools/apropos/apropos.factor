@@ -62,7 +62,7 @@ TUPLE: apropos search ;
 C: <apropos> apropos
 
 M: apropos article-title
-    search>> "Search results for ``" "''" surround ;
+    search>> "Search results for “" "”" surround ;
 
 M: apropos article-name article-title ;
 
