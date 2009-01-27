@@ -16,6 +16,7 @@ IN: xml.entities
         { CHAR: & "&amp;"  }
         { CHAR: ' "&apos;" }
         { CHAR: " "&quot;" }
+        { CHAR: < "&lt;"   }
     } ;
 
 : escape-string-by ( str table -- escaped )

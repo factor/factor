@@ -90,7 +90,7 @@ MACRO: interpolate-chunk ( string -- chunk )
 
 : parse-def ( accum delimiter word -- accum )
     [
-        parse-multiline-string
+        parse-multiline-string but-last
         [ string>chunk extract-variables collect ] keep
         parsed
     ] dip parsed ;
