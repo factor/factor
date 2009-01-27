@@ -321,8 +321,8 @@ ARTICLE: "number-protocol" "Number protocol"
 "Math operations obey certain numerical upgrade rules. If one of the inputs is a bignum and the other is a fixnum, the latter is first coerced to a bignum; if one of the inputs is a float, the other is coerced to a float."
 $nl
 "Two examples where you should note the types of the inputs and outputs:"
-{ $example "3 >fixnum 6 >bignum * class ." "bignum" }
-{ $example "1/2 2.0 + ." "4.5" }
+{ $example "USE: classes" "3 >fixnum 6 >bignum * class ." "bignum" }
+{ $example "1/2 2.0 + ." "2.5" }
 "The following usual operations are supported by all numbers."
 { $subsection + }
 { $subsection - }

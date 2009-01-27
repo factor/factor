@@ -11,7 +11,7 @@ name words
 main help
 source-loaded? docs-loaded? ;
 
-! sources-loaded? slot is one of these two
+! sources-loaded? slot is one of these three
 SYMBOL: +parsing+
 SYMBOL: +running+
 SYMBOL: +done+

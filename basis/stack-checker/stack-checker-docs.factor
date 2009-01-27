@@ -21,7 +21,7 @@ $nl
 
 ARTICLE: "inference-combinators" "Combinator stack effects"
 "Without further information, one cannot say what the stack effect of " { $link call } " is; it depends on the given quotation. If the inferencer encounters a " { $link call } " without further information, a " { $link literal-expected } " error is raised."
-{ $example "[ dup call ] infer." "... an error ..." }
+{ $example "[ dup call ] infer." "Literal value expected\n\nType :help for debugging help." }
 "On the other hand, the stack effect of applying " { $link call } " to a literal quotation or a " { $link curry } " of a literal quotation is easy to compute; it behaves as if the quotation was substituted at that point:"
 { $example "[ [ 2 + ] call ] infer." "( object -- object )" }
 "Consider a combinator such as " { $link keep } ". The combinator itself does not have a stack effect, because it applies " { $link call } " to a potentially arbitrary quotation. However, since the combinator is declared " { $link POSTPONE: inline } ", a given usage of it can have a stack effect:"
@@ -35,7 +35,15 @@ $nl
 "Here is an example where the stack effect cannot be inferred:"
 { $code ": foo 0 [ + ] ;" "[ foo reduce ] infer." }
 "However if " { $snippet "foo" } " was declared " { $link POSTPONE: inline } ", everything would work, since the " { $link reduce } " combinator is also " { $link POSTPONE: inline } ", and the inferencer can see the literal quotation value at the point it is passed to " { $link call } ":"
-{ $example ": foo 0 [ + ] ; inline" "[ foo reduce ] infer." "( object -- object )" } ;
+{ $example ": foo 0 [ + ] ; inline" "[ foo reduce ] infer." "( object -- object )" }
+"Passing a literal quotation on the data stack through an inlined recursive combinator nullifies its literal status. For example, the following will not infer:"
+{ $example
+  "[ [ reverse ] swap [ reverse ] map swap call ] infer." "Literal value expected\n\nType :help for debugging help."
+}
+"To make this work, pass the quotation on the retain stack instead:"
+{ $example
+  "[ [ reverse ] [ [ reverse ] map ] dip call ] infer." "( object -- object )"
+} ;
 
 ARTICLE: "inference-branches" "Branch stack effects"
 "Conditionals such as " { $link if } " and combinators built on " { $link if } " present a problem, in that if the two branches leave the stack at a different height, it is not clear what the stack effect should be. In this case, inference throws a " { $link unbalanced-branches-error } "."
@@ -58,12 +66,14 @@ $nl
 $nl
 "If a recursive word takes quotation parameters from the stack and calls them, it must be declared " { $link POSTPONE: inline } " (as documented in " { $link "inference-combinators" } ") as well as " { $link POSTPONE: recursive } "."
 $nl
-"Furthermore, the input parameters which are quotations must be annotated in the stack effect. For example,"
-{ $see loop }
-"An inline recursive word cannot pass a quotation through the recursive call. For example, the following will not infer:"
-{ $code ": foo ( a b c -- d e f ) [ f foo drop ] when 2dup call ; inline" "[ 1 [ 1+ ] foo ] infer." }
+"Furthermore, the input parameters which are quotations must be annotated in the stack effect. For example, the following will not infer:"
+{ $example ": bad ( quot -- ) [ call ] keep foo ; inline recursive" "[ [ ] bad ] infer." "Literal value expected\n\nType :help for debugging help." }
+"The following is correct:"
+{ $example ": good ( quot: ( -- ) -- ) [ call ] keep good ; inline recursive" "[ [ ] good ] infer." "( -- )" }
+"An inline recursive word cannot pass a quotation on the data stack through the recursive call. For example, the following will not infer:"
+{ $example ": bad ( ? quot: ( ? -- ) -- ) 2dup [ not ] dip bad call ; inline recursive" "[ [ drop ] bad ] infer." "Literal value expected\n\nType :help for debugging help." }
 "However a small change can be made:"
-{ $example ": foo ( a b c -- d ) [ 2dup f foo drop ] when call ; inline" "[ 1 [ 1+ ] t foo ] infer." "( -- object )" }
+{ $example ": good ( ? quot: ( ? -- ) -- ) [ good ] 2keep [ not ] dip call ; inline recursive" "[ [ drop ] good ] infer." "( object -- )" }
 "An inline recursive word must have a fixed stack effect in its base case. The following will not infer:"
 { $code
     ": foo ( quot ? -- ) [ f foo ] [ call ] if ; inline"

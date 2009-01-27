@@ -3,21 +3,24 @@
 USING: xml xml.state kernel sequences fry assocs xml.data
 accessors strings make multiline parser namespaces macros
 sequences.deep generalizations locals words combinators
-math ;
+math present arrays ;
 IN: xml.interpolate
 
 <PRIVATE
 
-: interpolated-chunk ( string -- chunk )
+: string>chunk ( string -- chunk )
     t interpolating? [ string>xml-chunk ] with-variable ;
 
-: interpolated-doc ( string -- xml )
+: string>doc ( string -- xml )
     t interpolating? [ string>xml ] with-variable ;
 
 DEFER: interpolate-sequence
 
 : interpolate-attrs ( table attrs -- attrs )
-    swap '[ dup interpolated? [ var>> _ at ] when ] assoc-map ;
+    swap '[
+        dup interpolated?
+        [ var>> _ at dup [ present ] when ] when
+    ] assoc-map [ nip ] assoc-filter ;
 
 : interpolate-tag ( table tag -- tag )
     [ nip name>> ]
@@ -27,8 +30,10 @@ DEFER: interpolate-sequence
 
 GENERIC: push-item ( item -- )
 M: string push-item , ;
-M: object push-item , ;
-M: sequence push-item % ;
+M: xml-data push-item , ;
+M: object push-item present , ;
+M: sequence push-item
+    [ dup array? [ % ] [ , ] if ] each ;
 
 GENERIC: interpolate-item ( table item -- )
 M: object interpolate-item nip , ;
@@ -48,6 +53,8 @@ M: tag (each-interpolated)
     swap attrs>> values
     [ interpolated? ] filter
     swap each ;
+M: xml (each-interpolated)
+    [ body>> ] dip (each-interpolated) ;
 M: object (each-interpolated) 2drop ;
 
 : each-interpolated ( xml quot -- )
@@ -59,10 +66,10 @@ M: object (each-interpolated) 2drop ;
     ] each-interpolated doc ;
 
 MACRO: interpolate-xml ( string -- doc )
-    interpolated-doc number<-> '[ _ interpolate-xml-doc ] ;
+    string>doc number<-> '[ _ interpolate-xml-doc ] ;
 
 MACRO: interpolate-chunk ( string -- chunk )
-    interpolated-chunk number<-> '[ _ interpolate-sequence ] ;
+    string>chunk number<-> '[ _ interpolate-sequence ] ;
 
 : >search-hash ( seq -- hash )
     [ dup search ] H{ } map>assoc ;
@@ -70,19 +77,22 @@ MACRO: interpolate-chunk ( string -- chunk )
 : extract-variables ( xml -- seq )
     [ [ var>> , ] each-interpolated ] { } make ;
 
+: nenum ( ... n -- assoc )
+    narray <enum> ; inline
+
 : collect ( accum seq -- accum )
     {
         { [ dup [ ] all? ] [ >search-hash parsed ] } ! locals
         { [ dup [ not ] all? ] [ ! fry
-            length parsed \ narray parsed \ <enum> parsed
+            length parsed \ nenum parsed
         ] }
         [ drop "XML interpolation contains both fry and locals" throw ] ! mixed
     } cond ;
 
 : parse-def ( accum delimiter word -- accum )
     [
-        parse-multiline-string
-        [ interpolated-chunk extract-variables collect ] keep
+        parse-multiline-string but-last
+        [ string>chunk extract-variables collect ] keep
         parsed
     ] dip parsed ;
 

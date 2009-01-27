@@ -94,7 +94,7 @@ $nl
 "For example, we'd like it to identify the following as a palindrome:"
 { $code "\"A man, a plan, a canal: Panama.\"" }
 "However, right now, the simplistic algorithm we use says this is not a palindrome:"
-{ $example "\"A man, a plan, a canal: Panama.\" palindrome?" "f" }
+{ $unchecked-example "\"A man, a plan, a canal: Panama.\" palindrome?" "f" }
 "We would like it to output " { $link t } " there. We can encode this requirement with a unit test that we add to " { $snippet "palindrome-tests.factor" } ":"
 { $code "[ t ] [ \"A man, a plan, a canal: Panama.\" palindrome? ] unit-test" }
 "If you now run unit tests, you will see a unit test failure:"
@@ -106,12 +106,12 @@ $nl
 "Start by pushing a character on the stack; notice that characters are really just integers:"
 { $code "CHAR: a" }
 "Now, use the " { $link Letter? } " word to test if it is an alphabetical character, upper or lower case:"
-{ $example "Letter? ." "t" }
+{ $unchecked-example "Letter? ." "t" }
 "This gives the expected result."
 $nl
 "Now try with a non-alphabetical character:"
 { $code "CHAR: #" }
-{ $example "Letter? ." "f" }
+{ $unchecked-example "Letter? ." "f" }
 "What we want to do is given a string, remove all characters which do not match the " { $link Letter? } " predicate. Let's push a string on the stack:"
 { $code "\"A man, a plan, a canal: Panama.\"" }
 "Now, place a quotation containing " { $link Letter? } " on the stack; quoting code places it on the stack instead of executing it immediately:"

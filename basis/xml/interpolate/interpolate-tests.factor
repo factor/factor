@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test xml.interpolate multiline kernel assocs
 sequences accessors xml.writer xml.interpolate.private
-locals splitting ;
+locals splitting urls ;
 IN: xml.interpolate.tests
 
 [ "a" "c" { "a" "c" f } ] [
     "<?xml version='1.0'?><x><-a-><b val=<-c->/><-></x>"
-    interpolated-doc
+    string>doc
     [ second var>> ]
     [ fourth "val" swap at var>> ]
     [ extract-variables ] tri
@@ -44,3 +44,9 @@ IN: xml.interpolate.tests
     [ [XML <item><-></item> XML] ] map
     <XML <doc><-></doc> XML> pprint-xml>string
 ] unit-test
+
+[ {" <?xml version="1.0" encoding="UTF-8"?>
+<x number="3" url="http://factorcode.org/" string="hello" word="drop"/>"} ]
+[ 3 f URL" http://factorcode.org/" "hello" \ drop
+  <XML <x number=<-> false=<-> url=<-> string=<-> word=<->/> XML>
+  pprint-xml>string  ] unit-test
