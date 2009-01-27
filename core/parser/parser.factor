@@ -57,7 +57,7 @@ SYMBOL: auto-use?
         dup vocabulary>>
         [ (use+) ]
         [ amended-use get dup [ push ] [ 2drop ] if ]
-        [ "Added ``" "'' vocabulary to search path" surround note. ]
+        [ "Added “" "” vocabulary to search path" surround note. ]
         tri
     ] [ create-in ] if ;
 
