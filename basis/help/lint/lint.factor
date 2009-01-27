@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors sequences parser kernel help help.markup
 help.topics words strings classes tools.vocabs namespaces make
@@ -6,7 +6,8 @@ io io.streams.string prettyprint definitions arrays vectors
 combinators combinators.short-circuit splitting debugger
 hashtables sorting effects vocabs vocabs.loader assocs editors
 continuations classes.predicate macros math sets eval
-vocabs.parser words.symbol values ;
+vocabs.parser words.symbol values grouping unicode.categories
+sequences.deep ;
 IN: help.lint
 
 SYMBOL: vocabs-quot
@@ -66,6 +67,11 @@ SYMBOL: vocabs-quot
         ]
     } 2|| [ "$values don't match stack effect" throw ] unless ;
 
+: check-nulls ( element -- )
+    \ $values swap elements
+    null swap deep-member?
+    [ "$values should not contain null" throw ] when ;
+
 : check-see-also ( element -- )
     \ $see-also swap elements [
         rest dup prune [ length ] bi@ assert=
@@ -83,11 +89,38 @@ SYMBOL: vocabs-quot
 : check-rendering ( element -- )
     [ print-content ] with-string-writer drop ;
 
+: check-strings ( str -- )
+    [
+        "\n\t" intersects?
+        [ "Paragraph text should not contain \\n or \\t" throw ] when
+    ] [
+        "  " swap subseq?
+        [ "Paragraph text should not contain double spaces" throw ] when
+    ] bi ;
+
+: check-whitespace ( str1 str2 -- )
+    [ " " tail? ] [ " " head? ] bi* or
+    [ "Missing whitespace between strings" throw ] unless ;
+
+: check-bogus-nl ( element -- )
+    { { $nl } { { $nl } } } [ head? ] with contains?
+    [ "Simple element should not begin with a paragraph break" throw ] when ;
+
+: check-elements ( element -- )
+    {
+        [ check-bogus-nl ]
+        [ [ string? ] filter [ check-strings ] each ]
+        [ [ simple-element? ] filter [ check-elements ] each ]
+        [ 2 <clumps> [ [ string? ] all? ] filter [ first2 check-whitespace ] each ]
+    } cleave ;
+
 : check-markup ( element -- )
-    [ check-rendering ]
-    [ check-examples ]
-    [ check-modules ]
-    tri ;
+    {
+        [ check-elements ]
+        [ check-rendering ]
+        [ check-examples ]
+        [ check-modules ]
+    } cleave ;
 
 : all-word-help ( words -- seq )
     [ word-help ] filter ;
@@ -110,15 +143,23 @@ M: help-error error.
         dup '[
             _ dup word-help
             [ check-values ]
-            [ nip [ check-see-also ] [ check-markup ] bi ] 2bi
+            [ nip [ check-nulls ] [ check-see-also ] [ check-markup ] tri ] 2bi
         ] check-something
     ] [ drop ] if ;
 
 : check-words ( words -- ) [ check-word ] each ;
 
+: check-article-title ( article -- )
+    article-title first LETTER?
+    [ "Article title must begin with a capital letter" throw ] unless ;
+
 : check-article ( article -- )
     [ with-interactive-vocabs ] vocabs-quot set
-    dup '[ _ article-content check-markup ] check-something ;
+    dup '[
+        _
+        [ check-article-title ]
+        [ article-content check-markup ] bi
+    ] check-something ;
 
 : files>vocabs ( -- assoc )
     vocabs
