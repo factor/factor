@@ -9,15 +9,17 @@ continuations classes.predicate macros math sets eval
 vocabs.parser words.symbol values ;
 IN: help.lint
 
+SYMBOL: vocabs-quot
+
 : check-example ( element -- )
-    rest [
-        but-last "\n" join 1vector
-        [
-            use [ clone ] change
-            [ eval>string ] with-datastack
-        ] with-scope peek "\n" ?tail drop
-    ] keep
-    peek assert= ;
+    [
+        rest [
+            but-last "\n" join 1vector
+            [ (eval>string) ] with-datastack
+            peek "\n" ?tail drop
+        ] keep
+        peek assert=
+    ] vocabs-quot get call ;
 
 : check-examples ( element -- )
     \ $example swap elements [ check-example ] each ;
@@ -79,46 +81,44 @@ IN: help.lint
     ] each ;
 
 : check-rendering ( element -- )
-    [ print-topic ] with-string-writer drop ;
+    [ print-content ] with-string-writer drop ;
+
+: check-markup ( element -- )
+    [ check-rendering ]
+    [ check-examples ]
+    [ check-modules ]
+    tri ;
 
 : all-word-help ( words -- seq )
     [ word-help ] filter ;
 
-TUPLE: help-error topic error ;
+TUPLE: help-error error topic ;
 
 C: <help-error> help-error
 
 M: help-error error.
-    "In " write dup topic>> pprint nl
-    error>> error. ;
+    [ "In " write topic>> pprint nl ]
+    [ error>> error. ]
+    bi ;
 
 : check-something ( obj quot -- )
-    flush [ <help-error> , ] recover ; inline
+    flush '[ _ assert-depth ] swap '[ _ <help-error> , ] recover ; inline
 
 : check-word ( word -- )
+    [ with-file-vocabs ] vocabs-quot set
     dup word-help [
-        [
-            dup word-help '[
-                _ _ {
-                    [ check-values ]
-                    [ nip [ check-examples ] [ check-see-also ] bi ]
-                    [ [ check-rendering ] [ check-modules ] bi* ]
-                } 2cleave
-            ] assert-depth
+        dup '[
+            _ dup word-help
+            [ check-values ]
+            [ nip [ check-see-also ] [ check-markup ] bi ] 2bi
         ] check-something
     ] [ drop ] if ;
 
 : check-words ( words -- ) [ check-word ] each ;
 
 : check-article ( article -- )
-    [
-        dup article-content
-        '[
-            _ check-rendering
-            _ [ check-modules ] [ check-examples ] bi
-        ]
-        assert-depth
-    ] check-something ;
+    [ with-interactive-vocabs ] vocabs-quot set
+    dup '[ _ article-content check-markup ] check-something ;
 
 : files>vocabs ( -- assoc )
     vocabs
@@ -137,7 +137,7 @@ M: help-error error.
     ] keep ;
 
 : check-about ( vocab -- )
-    [ vocab-help [ article drop ] when* ] check-something ;
+    dup '[ _ vocab-help [ article drop ] when* ] check-something ;
 
 : check-vocab ( vocab -- seq )
     "Checking " write dup write "..." print
