@@ -1,6 +1,6 @@
 USING: io.encodings.ascii sequences strings io io.files accessors
 tools.test kernel io.files.unique namespaces continuations
-io.files.info io.pathnames ;
+io.files.info io.pathnames io.directories ;
 IN: io.files.unique.tests
 
 [ 123 ] [
