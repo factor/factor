@@ -30,7 +30,7 @@ $nl
 { $table
     { { $slot "version" } { "The HTTP version. Default is " { $snippet "1.1" } " and should not be changed without good reason." } }
     { { $slot "code" } { "HTTP status code, an " { $link integer } ". Examples are 200 for success, 404 for file not found, and so on." } }
-    { { $slot "message" } { "HTTP status message, only displayed to the user. If the status code is 200, the status message might be ``Success'', for example." } }
+    { { $slot "message" } { "HTTP status message, only displayed to the user. If the status code is 200, the status message might be “Success”, for example." } }
     { { $slot "header" } { "An assoc of HTTP header values. See " { $link "http.headers" } } }
     { { $slot "cookies" } { "A sequence of HTTP cookies. See " { $link "http.cookies" } } }
     { { $slot "content-type" } { "an HTTP content type" } }
@@ -49,7 +49,7 @@ $nl
 { $table
     { { $slot "version" } { "The HTTP version. Default is " { $snippet "1.1" } " and should not be changed without good reason." } }
     { { $slot "code" } { "HTTP status code, an " { $link integer } ". Examples are 200 for success, 404 for file not found, and so on." } }
-    { { $slot "message" } { "HTTP status message, only displayed to the user. If the status code is 200, the status message might be ``Success'', for example." } }
+    { { $slot "message" } { "HTTP status message, only displayed to the user. If the status code is 200, the status message might be “Success”, for example." } }
     { { $slot "body" } { "an HTTP response body" } }
 } } ;
 
@@ -110,7 +110,7 @@ $nl
 HELP: set-header
 { $values { "request/response" "a " { $link request } " or a " { $link response } } { "value" object } { "key" string } }
 { $description "Stores a value into the HTTP header of a request or response. The value can be any object supported by " { $link present } "." }
-{ $notes "This word always returns the same object that was input. This allows for a ``pipeline'' coding style, where several header parameters are set in a row." }
+{ $notes "This word always returns the same object that was input. This allows for a “pipeline” coding style, where several header parameters are set in a row." }
 { $side-effects "request/response" } ;
 
 ARTICLE: "http.cookies" "HTTP cookies"
