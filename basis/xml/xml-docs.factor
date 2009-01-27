@@ -74,10 +74,11 @@ ARTICLE: "xml" "XML parser"
 "The " { $vocab-link "xml" } " vocabulary implements the XML 1.0 and 1.1 standards, converting strings of text into XML and vice versa."
     { $subsection { "xml" "reading" } }
     { $subsection { "xml" "events" } }
-    { $vocab-subsection "Utilities for processing XML" "xml.utilities" }
     { $vocab-subsection "Writing XML" "xml.writer" }
     { $vocab-subsection "XML parsing errors" "xml.errors" }
     { $vocab-subsection "XML entities" "xml.entities" }
-    { $vocab-subsection "XML data types" "xml.data" } ;
+    { $vocab-subsection "XML data types" "xml.data" }
+    { $vocab-subsection "Utilities for processing XML" "xml.utilities" }
+    { $vocab-subsection "Dispatch on XML tag names" "xml.dispatch" } ;
 
 ABOUT: "xml"

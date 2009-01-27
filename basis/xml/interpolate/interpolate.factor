@@ -34,6 +34,7 @@ M: xml-data push-item , ;
 M: object push-item present , ;
 M: sequence push-item
     [ dup array? [ % ] [ , ] if ] each ;
+M: number push-item present , ;
 
 GENERIC: interpolate-item ( table item -- )
 M: object interpolate-item nip , ;
