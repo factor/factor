@@ -6,7 +6,7 @@ IN: log-viewer
     [ print read-lines ] [ 2drop flush ] if ;
 
 : tail-file-loop ( stream monitor -- )
-    dup next-change 2drop over read-lines tail-file-loop ;
+    dup next-change drop over read-lines tail-file-loop ;
 
 : tail-file ( file -- )
     dup utf8 <file-reader> dup read-lines
