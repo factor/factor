@@ -232,8 +232,11 @@ M: vector (write-farkup) [ (write-farkup) ] map ;
 
 M: f (write-farkup) ;
 
+: farkup>xml ( string -- xml )
+    parse-farkup (write-farkup) ;
+
 : write-farkup ( string -- )
-    parse-farkup (write-farkup) write-xml-chunk ;
+    farkup>xml write-xml-chunk ;
 
 : convert-farkup ( string -- string' )
     [ write-farkup ] with-string-writer ;

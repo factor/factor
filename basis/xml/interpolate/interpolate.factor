@@ -30,7 +30,8 @@ DEFER: interpolate-sequence
 
 GENERIC: push-item ( item -- )
 M: string push-item , ;
-M: object push-item , ;
+M: xml-data push-item , ;
+M: object push-item present , ;
 M: sequence push-item
     [ dup array? [ % ] [ , ] if ] each ;
 

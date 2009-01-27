@@ -216,3 +216,6 @@ M: xml like
 
 PREDICATE: contained-tag < tag children>> not ;
 PREDICATE: open-tag < tag children>> ;
+
+UNION: xml-data
+    tag comment string directive instruction ;
