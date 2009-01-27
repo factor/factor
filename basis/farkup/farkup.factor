@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators html.elements io
 io.streams.string kernel math namespaces peg peg.ebnf
-sequences sequences.deep strings xml.entities
-vectors splitting xmode.code2html urls.encoding ;
+sequences sequences.deep strings xml.entities xml.interpolate
+vectors splitting xmode.code2html urls.encoding xml.data
+xml.writer ;
 IN: farkup
 
 SYMBOL: relative-link-prefix
@@ -74,6 +75,7 @@ inline-code   = "%" (!("%" | nl).)+ "%"
     => [[ second >string inline-code boa ]]
 
 link-content     = (!("|"|"]").)+
+                    => [[ >string ]]
 
 image-link       = "[[image:" link-content  "|" link-content "]]"
                     => [[ [ second >string ] [ fourth >string ] bi image boa ]]
@@ -146,7 +148,7 @@ named-code
 
 simple-code
            = "[{" (!("}]").)+ "}]"
-    => [[ second f swap code boa ]]
+    => [[ second >string f swap code boa ]]
 
 code = named-code | simple-code
 
@@ -163,66 +165,75 @@ stand-alone
         { [ dup [ 127 > ] contains? ] [ drop invalid-url ] }
         { [ dup first "/\\" member? ] [ drop invalid-url ] }
         { [ CHAR: : over member? ] [ dup absolute-url? [ drop invalid-url ] unless ] }
-        [ relative-link-prefix get prepend ]
-    } cond ;
+        [ relative-link-prefix get prepend "" like ]
+    } cond url-encode ;
 
-: escape-link ( href text -- href-esc text-esc )
-    [ check-url ] dip escape-string ;
+: write-link ( href text -- xml )
+    [ check-url link-no-follow? get "true" and ] dip
+    [XML <a href=<-> nofollow=<->><-></a> XML] ;
 
-: write-link ( href text -- )
-    escape-link
-    [ <a url-encode =href link-no-follow? get [ "true" =nofollow ] when a> ]
-    [ write </a> ]
-    bi* ;
-
-: write-image-link ( href text -- )
+: write-image-link ( href text -- xml )
     disable-images? get [
         2drop
-        <strong> "Images are not allowed" write </strong>
+        [XML <strong>Images are not allowed</strong> XML]
     ] [
-        escape-link
-        [ <img url-encode =src ] [ [ =alt ] unless-empty img/> ] bi*
+        [ check-url ] [ f like ] bi*
+        [XML <img src=<-> alt=<->/> XML]
     ] if ;
 
-: render-code ( string mode -- string' )
-    [ string-lines ] dip
-    [
-        <pre>
-            htmlize-lines
-        </pre>
-    ] with-string-writer write ;
+: render-code ( string mode -- xml )
+    [ string-lines ] dip htmlize-lines
+    [XML <pre><-></pre> XML] ;
 
-GENERIC: (write-farkup) ( farkup -- )
-: <foo.> ( string -- ) <foo> write ;
-: </foo.> ( string -- ) </foo> write ;
-: in-tag. ( obj quot string -- ) [ <foo.> call ] keep </foo.> ; inline
-M: heading1 (write-farkup) [ child>> (write-farkup) ] "h1" in-tag. ;
-M: heading2 (write-farkup) [ child>> (write-farkup) ] "h2" in-tag. ;
-M: heading3 (write-farkup) [ child>> (write-farkup) ] "h3" in-tag. ;
-M: heading4 (write-farkup) [ child>> (write-farkup) ] "h4" in-tag. ;
-M: strong (write-farkup) [ child>> (write-farkup) ] "strong" in-tag. ;
-M: emphasis (write-farkup) [ child>> (write-farkup) ] "em" in-tag. ;
-M: superscript (write-farkup) [ child>> (write-farkup) ] "sup" in-tag. ;
-M: subscript (write-farkup) [ child>> (write-farkup) ] "sub" in-tag. ;
-M: inline-code (write-farkup) [ child>> (write-farkup) ] "code" in-tag. ;
-M: list-item (write-farkup) [ child>> (write-farkup) ] "li" in-tag. ;
-M: unordered-list (write-farkup) [ child>> (write-farkup) ] "ul" in-tag. ;
-M: ordered-list (write-farkup) [ child>> (write-farkup) ] "ol" in-tag. ;
-M: paragraph (write-farkup) [ child>> (write-farkup) ] "p" in-tag. ;
-M: link (write-farkup) [ href>> ] [ text>> ] bi write-link ;
-M: image (write-farkup) [ href>> ] [ text>> ] bi write-image-link ;
-M: code (write-farkup) [ string>> ] [ mode>> ] bi render-code ;
-M: line (write-farkup) drop <hr/> ;
-M: line-break (write-farkup) drop <br/> nl ;
-M: table-row (write-farkup) ( obj -- )
-    child>> [ [ [ (write-farkup) ] "td" in-tag. ] each ] "tr" in-tag. ;
-M: table (write-farkup) [ child>> (write-farkup) ] "table" in-tag. ;
-M: string (write-farkup) escape-string write ;
-M: vector (write-farkup) [ (write-farkup) ] each ;
-M: f (write-farkup) drop ;
+GENERIC: (write-farkup) ( farkup -- xml )
+
+: farkup-inside ( farkup name -- xml )
+    <simple-name> swap T{ attrs } swap
+    child>> (write-farkup) 1array <tag> ;
+
+M: heading1 (write-farkup) "h1" farkup-inside ;
+M: heading2 (write-farkup) "h2" farkup-inside ;
+M: heading3 (write-farkup) "h3" farkup-inside ;
+M: heading4 (write-farkup) "h4" farkup-inside ;
+M: strong (write-farkup) "strong" farkup-inside ;
+M: emphasis (write-farkup) "em" farkup-inside ;
+M: superscript (write-farkup) "sup" farkup-inside ;
+M: subscript (write-farkup) "sub" farkup-inside ;
+M: inline-code (write-farkup) "code" farkup-inside ;
+M: list-item (write-farkup) "li" farkup-inside ;
+M: unordered-list (write-farkup) "ul" farkup-inside ;
+M: ordered-list (write-farkup) "ol" farkup-inside ;
+M: paragraph (write-farkup) "p" farkup-inside ;
+M: table (write-farkup) "table" farkup-inside ;
+
+M: link (write-farkup)
+    [ href>> ] [ text>> ] bi write-link ;
+
+M: image (write-farkup)
+    [ href>> ] [ text>> ] bi write-image-link ;
+
+M: code (write-farkup)
+    [ string>> ] [ mode>> ] bi render-code ;
+
+M: line (write-farkup)
+    drop [XML <hr/> XML] ;
+
+M: line-break (write-farkup)
+    drop [XML <br/> XML] ;
+
+M: table-row (write-farkup)
+    child>>
+    [ (write-farkup) [XML <td><-></td> XML] ] map
+    [XML <tr><-></tr> XML] ;
+
+M: string (write-farkup) ;
+
+M: vector (write-farkup) [ (write-farkup) ] map ;
+
+M: f (write-farkup) ;
 
 : write-farkup ( string -- )
-    parse-farkup (write-farkup) ;
+    parse-farkup (write-farkup) write-xml-chunk ;
 
 : convert-farkup ( string -- string' )
-    parse-farkup [ (write-farkup) ] with-string-writer ;
+    [ write-farkup ] with-string-writer ;
