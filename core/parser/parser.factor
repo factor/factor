@@ -160,6 +160,7 @@ SYMBOL: interactive-vocabs
     "definitions"
     "editors"
     "help"
+    "help.lint"
     "inspector"
     "io"
     "io.files"
@@ -200,7 +201,7 @@ SYMBOL: interactive-vocabs
 SYMBOL: print-use-hook
 
 print-use-hook global [ [ ] or ] change-at
-!
+
 : parse-fresh ( lines -- quot )
     [
         V{ } clone amended-use set
