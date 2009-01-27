@@ -4,7 +4,7 @@ IN: xml.data
 ABOUT: "xml.data"
 
 ARTICLE: "xml.data" "XML data types"
-{ $vocab-link "xml.data" } " defines a simple document object model for XML. Everything is simply a tuple and can be manipulated as such."
+"The " { $vocab-link "xml.data" } " vocabulary defines a simple document object model for XML. Everything is simply a tuple and can be manipulated as such."
 { $subsection { "xml.data" "classes" } }
 { $subsection { "xml.data" "constructors" } }
 "Simple words for manipulating names:"
@@ -49,7 +49,7 @@ ARTICLE: { "xml.data" "constructors" } "XML data constructors"
     { $subsection <notation-decl> } ;
 
 HELP: tag
-{ $class-description "tuple representing an XML tag, delegating to a " { $link
+{ $class-description "Tuple representing an XML tag, delegating to a " { $link
 name } ", containing the slots attrs (an alist of names to strings) and children (a sequence). Tags implement the sequence protocol by acting like a sequence of its chidren, and the assoc protocol by acting like its attributes." }
 { $see-also <tag> name contained-tag xml } ;
 
@@ -58,32 +58,32 @@ HELP: <tag>
     { "attrs" "an alist of names to strings" }
     { "children" sequence }
     { "tag" tag } }
-{ $description "constructs an XML " { $link tag } " with the name (not a string) and tag attributes specified in attrs and children specified" }
+{ $description "Constructs an XML " { $link tag } " with the name (not a string) and tag attributes specified in attrs and children specified." }
 { $see-also tag <contained-tag> } ;
 
 HELP: name
-{ $class-description "represents an XML name, with the fields space (a string representing the namespace, as written in the document, tag (a string of the actual name of the tag) and url (a string of the URL that the namespace points to)" }
+{ $class-description "Represents an XML name, with the fields space (a string representing the namespace, as written in the document, tag (a string of the actual name of the tag) and url (a string of the URL that the namespace points to)." }
 { $see-also <name> tag } ;
 
 HELP: <name>
 { $values { "space" "a string" } { "main" "a string" } { "url" "a string" }
     { "name" "an XML tag name" } }
-{ $description "creates a name tuple with the name-space space and the tag-name tag and the tag-url url." }
+{ $description "Creates a name tuple with the namespace prefix space, the the given main part of the name, and the namespace URL given by url." }
 { $see-also name <tag> } ;
 
 HELP: contained-tag
-{ $class-description "delegates to tag representing a tag like <a/> with no contents. The tag attributes are accessed with tag-attrs" }
+{ $class-description "This is a subclass of " { $link tag } " consisting of tags with no body, like " { $snippet "<a/>" } "." }
 { $see-also tag <contained-tag> } ;
 
 HELP: <contained-tag>
 { $values { "name" "an XML tag name" }
     { "attrs" "an alist from names to strings" }
     { "tag" tag } }
-{ $description "creates an empty tag (like <a/>) with the specified name and tag attributes. This delegates to tag" }
+{ $description "Creates an empty tag (like " { $snippet "<a/>" } ") with the specified name and tag attributes." }
 { $see-also contained-tag <tag> } ;
 
 HELP: xml
-{ $class-description "tuple representing an XML document, delegating to the main tag, containing the fields prolog (the header <?xml...?>), before (whatever comes between the prolog and the main tag) and after (whatever comes after the main tag)" }
+{ $class-description "Tuple representing an XML document, delegating to the main tag, containing the fields prolog (the header " { $snippet "<?xml...?>" } "), before (whatever comes between the prolog and the main tag) and after (whatever comes after the main tag)." }
 { $see-also <xml> tag prolog } ;
 
 HELP: <xml>
@@ -159,35 +159,35 @@ HELP: <element-decl>
 { $description "Creates an element declaration object, of the class " { $link element-decl } } ;
 
 HELP: attlist-decl
-{ $class-description "Describes the class of element declarations, like <!ATTLIST pre xml:space (preserve) #FIXED 'preserve'>." } ;
+{ $class-description "Describes the class of element declarations, like " { $snippet "<!ATTLIST pre xml:space (preserve) #FIXED 'preserve'>" } "." } ;
 
 HELP: <attlist-decl>
 { $values { "name" name } { "att-defs" string } { "attlist-decl" attlist-decl } }
 { $description "Creates an element declaration object, of the class " { $link attlist-decl } } ;
 
 HELP: entity-decl
-{ $class-description "Describes the class of element declarations, like <!ENTITY foo 'bar'>." } ;
+{ $class-description "Describes the class of element declarations, like " { $snippet "<!ENTITY foo 'bar'>" } "." } ;
 
 HELP: <entity-decl>
 { $values { "name" name } { "def" string } { "pe?" "t or f" } { "entity-decl" entity-decl } }
-{ $description "Creates an entity declaration object, of the class " { $link entity-decl } ". The pe? slot should be t if the object is a DTD-internal entity, like <!ENTITY % foo 'bar'> and f if the object is like <!ENTITY foo 'bar'>, that is, it can be used outside of the DTD." } ;
+{ $description "Creates an entity declaration object, of the class " { $link entity-decl } ". The pe? slot should be t if the object is a DTD-internal entity, like " { $snippet "<!ENTITY % foo 'bar'>" } " and f if the object is like " { $snippet "<!ENTITY foo 'bar'>" } ", that is, it can be used outside of the DTD." } ;
 
 HELP: system-id
-{ $class-description "Describes the class of system identifiers within an XML DTD directive, such as <!DOCTYPE greeting " { $emphasis "SYSTEM 'hello.dtd'" } ">" } ;
+{ $class-description "Describes the class of system identifiers within an XML DTD directive, such as " { $snippet "<!DOCTYPE greeting " { $emphasis "SYSTEM 'hello.dtd'" } ">" } } ;
 
 HELP: <system-id>
 { $values { "system-literal" string } { "system-id" system-id } }
 { $description "Constructs a " { $link system-id } " tuple." } ;
 
 HELP: public-id
-{ $class-description "Describes the class of public identifiers within an XML DTD directive, such as <!DOCTYPE open-hatch " { $emphasis "PUBLIC '-//Textuality//TEXT Standard open-hatch boilerplate//EN' 'http://www.textuality.com/boilerplate/OpenHatch.xml'" } ">" } ;
+{ $class-description "Describes the class of public identifiers within an XML DTD directive, such as " { $snippet "<!DOCTYPE open-hatch " { $emphasis "PUBLIC '-//Textuality//TEXT Standard open-hatch boilerplate//EN' 'http://www.textuality.com/boilerplate/OpenHatch.xml'" } ">" } } ;
 
 HELP: <public-id>
 { $values { "pubid-literal" string } { "system-literal" string } { "public-id" public-id } }
 { $description "Constructs a " { $link system-id } " tuple." } ;
 
 HELP: notation-decl
-{ $class-description "Describes the class of element declarations, like <!NOTATION jpg SYSTEM './jpgviewer'>." } ;
+{ $class-description "Describes the class of element declarations, like " { $snippet "<!NOTATION jpg SYSTEM './jpgviewer'>" } "." } ;
 
 HELP: <notation-decl>
 { $values { "name" string } { "id" id } { "notation-decl" notation-decl } }

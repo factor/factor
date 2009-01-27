@@ -22,7 +22,7 @@ SYMBOL: xml-file
     xml-file get T{ name f "" "this" "http://d.de" } swap at
 ] unit-test
 [ t ] [ xml-file get children>> second contained-tag? ] unit-test
-[ "<a></b>" string>xml ] [ xml-parse-error? ] must-fail-with
+[ "<a></b>" string>xml ] [ xml-error? ] must-fail-with
 [ T{ comment f "This is where the fun begins!" } ] [
     xml-file get before>> [ comment? ] find nip
 ] unit-test

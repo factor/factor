@@ -3,16 +3,15 @@
 USING: kernel namespaces xml.tokenize xml.state xml.name
 xml.data accessors arrays make xml.char-classes fry assocs sequences
 math xml.errors sets combinators io.encodings io.encodings.iana
-unicode.case xml.dtd strings xml.entities ;
+unicode.case xml.dtd strings xml.entities unicode.categories ;
 IN: xml.elements
 
 : take-interpolated ( quot -- interpolated )
     interpolating? get [
         drop get-char CHAR: > =
-        [ next f ] [
-            pass-blank " \t\r\n-" take-to
-            pass-blank "->" expect
-        ] if <interpolated>
+        [ next f ]
+        [ "->" take-string [ blank? ] trim ]
+        if <interpolated>
     ] [ call ] if ; inline
 
 : interpolate-quote ( -- interpolated )
