@@ -1,16 +1,15 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations definitions ui.tools.browser
-ui.tools.listener ui.tools.listener.completion
+USING: continuations definitions generic help.topics threads
+stack-checker summary io.pathnames io.styles kernel namespaces
+parser prettyprint quotations tools.crossref tools.annotations
+editors tools.profiler tools.test tools.time tools.walker vocabs
+vocabs.loader words sequences tools.vocabs classes
+compiler.units accessors vocabs.parser macros.expander ui
+ui.tools.browser ui.tools.listener ui.tools.listener.completion
 ui.tools.profiler ui.tools.inspector ui.tools.traceback
-generic help.topics stack-checker
-summary io.pathnames io.styles kernel namespaces parser
-prettyprint quotations tools.annotations editors
-tools.profiler tools.test tools.time tools.walker
-ui.commands ui.gadgets.editors ui.gestures
-ui.operations ui.tools.deploy vocabs vocabs.loader words
-sequences tools.vocabs classes compiler.units accessors
-vocabs.parser macros.expander ;
+ui.commands ui.gadgets.editors ui.gestures ui.operations
+ui.tools.deploy ;
 IN: ui.tools.operations
 
 V{ } clone operations set-global
@@ -58,6 +57,18 @@ V{ } clone operations set-global
     { +secondary+ t }
 } define-operation
 
+! Thread
+: com-thread-traceback-window ( thread -- )
+    continuation>> dup occupied>>
+    [ value>> traceback-window ]
+    [ drop beep ]
+    if ;
+
+[ thread? ] \ com-thread-traceback-window H{
+    { +primary+ t }
+    { +secondary+ t }
+} define-operation
+
 ! Pathnames
 : edit-file ( pathname -- ) edit ;
 
@@ -80,22 +91,14 @@ UNION: definition word method-spec link vocab vocab-link ;
 
 [ definition? ] \ com-forget H{ } define-operation
 
-! Words
-! [ word? ] \ insert-word H{
-!     { +secondary+ t }
-! } define-operation
-
 [ topic? ] \ com-follow H{
     { +keyboard+ T{ key-down f { C+ } "h" } }
     { +primary+ t }
 } define-operation
 
-! : com-usage ( word -- )
-!     get-workspace swap show-word-usage ;
-
-! [ word? ] \ com-usage H{
-!     { +keyboard+ T{ key-down f { C+ } "U" } }
-! } define-operation
+[ word? ] \ usage. H{
+    { +keyboard+ T{ key-down f { C+ } "u" } }
+} define-operation
 
 [ word? ] \ fix H{
     { +keyboard+ T{ key-down f { C+ } "f" } }
@@ -115,15 +118,6 @@ M: word com-stack-effect def>> com-stack-effect ;
 [ word? ] \ com-stack-effect H{
     { +listener+ t }
 } define-operation
-
-! Vocabularies
-! : com-vocab-words ( vocab -- )
-!     get-workspace swap show-vocab-words ;
-
-! [ vocab? ] \ com-vocab-words H{
-!     { +secondary+ t }
-!     { +keyboard+ T{ key-down f { C+ } "B" } }
-! } define-operation
 
 : com-enter-in ( vocab -- ) vocab-name set-in ;
 
