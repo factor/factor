@@ -53,3 +53,6 @@ IN: xml.interpolate.tests
 
 [ "<x>3</x>" ] [ 3 [XML <x><-></x> XML] xml-chunk>string ] unit-test
 [ "<x></x>" ] [ f [XML <x><-></x> XML] xml-chunk>string ] unit-test
+
+\ parse-def must-infer
+[ "" interpolate-chunk ] must-infer
