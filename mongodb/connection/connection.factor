@@ -1,5 +1,5 @@
 USING: accessors assocs fry io.sockets kernel math mongodb.msg
-mongodb.query namespaces sequences splitting math.parser ;
+namespaces sequences splitting math.parser io.encodings.binary ;
 
 IN: mongodb.connection
 
@@ -22,8 +22,9 @@ TUPLE: mdb name nodes collections ;
 <PRIVATE
 
 : ismaster-cmd ( node -- result )
-    "admin.$cmd" H{ { "ismaster" 1 } } <mdb-query-one-msg>
-    (find-one-raw) ; inline
+    binary "admin.$cmd" H{ { "ismaster" 1 } } <mdb-query-one-msg>
+    '[ _ write-request read-reply ] with-client
+    objects>> first ; 
 
 : -push ( seq elt -- )
     swap push ; inline
@@ -58,4 +59,4 @@ PRIVATE>
     check-nodes
     H{ } clone tuck
     '[ dup master?>> _ set-at ] each
-    V{ } mdb boa ;
+    H{ } clone mdb boa ;

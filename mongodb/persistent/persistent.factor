@@ -1,15 +1,8 @@
 USING: accessors assocs classes fry kernel linked-assocs math mirrors
 namespaces sequences strings vectors words bson.constants 
-continuations ;
+continuations mongodb.tuple ;
 
 IN: mongodb.persistent
-
-MIXIN: mdb-persistent
-
-SLOT: _id
-
-CONSTANT: MDB_P_SLOTS { "_id" } 
-CONSTANT: MDB_OID "_id"
 
 SYMBOL: mdb-op-seq
 
@@ -22,11 +15,12 @@ GENERIC# tuple>query 1 ( tuple examplar -- query-assoc )
 
 DEFER: assoc>tuple
 DEFER: create-mdb-command
-DEFER: mdb-collection>>
 
 <PRIVATE
 
 CONSTANT: MDB_INFO "_mdb_info"
+
+
 
 : <dbref> ( tuple -- dbref )
     [ mdb-collection>> ] [ _id>> ] bi dbref boa ; inline

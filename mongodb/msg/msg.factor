@@ -1,10 +1,8 @@
 USING: io io.encodings.utf8 io.encodings.binary alien.c-types alien.strings math
 bson.writer sequences kernel accessors io.streams.byte-array fry generalizations
-combinators bson.reader sequences tools.walker assocs strings mongodb.persistent ;
+combinators bson.reader sequences tools.walker assocs strings linked-assocs ;
 
 IN: mongodb.msg
-
-DEFER: tuple>linked-assoc
 
 <PRIVATE
 
@@ -53,15 +51,18 @@ TUPLE: mdb-reply-msg < mdb-msg
 : <mdb-query-one-msg> ( collection assoc -- mdb-query-msg )
     <mdb-query-msg> 1 >>return# ; inline
 
-GENERIC: <mdb-insert-msg> ( sequence -- mdb-insert-msg )
+GENERIC# <mdb-insert-msg> 1 ( collection objects -- mdb-insert-msg )
 
-M: tuple <mdb-insert-msg> ( tuple -- mdb-insert-msg )
-    [ mdb-insert-msg new ] dip
-    tuple>linked-assoc V{ } clone tuck push
+M: linked-assoc <mdb-insert-msg> ( collection linked-assoc -- mdb-insert-msg )
+    [ mdb-insert-msg new ] 2dip
+    [ >>collection ] dip
+    V{ } clone tuck push
     >>objects OP_Insert >>opcode ;
 
-M: sequence <mdb-insert-msg> ( sequence -- mdb-insert-msg )
-    [ mdb-insert-msg new ] dip >>objects OP_Insert >>opcode ;
+M: sequence <mdb-insert-msg> ( collection sequence -- mdb-insert-msg )
+    [ mdb-insert-msg new ] 2dip
+    [ >>collection ] dip
+    >>objects OP_Insert >>opcode ;
 
 
 : <mdb-reply-msg> ( -- mdb-reply-msg )

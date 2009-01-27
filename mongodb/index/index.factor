@@ -1,11 +1,12 @@
 USING: accessors assocs combinators formatting fry kernel memoize
-linked-assocs mongodb.persistent mongodb.msg 
-sequences sequences.deep io.encodings.binary
-io.sockets prettyprint sets ;
+linked-assocs mongodb.persistent mongodb.msg mongodb.connection
+sequences sequences.deep io.encodings.binary mongodb.tuple
+io.sockets prettyprint sets tools.walker math ;
 
 IN: mongodb.index
 
-DEFER: mdb-slot-definitions>> 
+: index-ns ( name -- ns )
+     "%s.system.indexes" sprintf ; inline
 
 TUPLE: index name ns key ;
 
@@ -24,6 +25,7 @@ SYMBOLS: +fieldindex+ +compoundindex+ +deepindex+ ;
      "%s-%s-%s-Idx" sprintf ;
 
 : build-index ( element slot -- assoc )
+    break
     swap [ <linked-hash> ] 2dip
     [ rest ] keep first ! assoc slot options itype
     { { +fieldindex+ [ drop [ 1 ] dip pick set-at  ] }
@@ -67,7 +69,7 @@ USE: mongodb.query
 
 : load-indices ( mdb-collection -- indexlist )
      [ mdb>> name>> ] dip name>> "%s.%s" sprintf
-     "ns" H{ } clone [ set-at ] keep [ index-ns ] dip <mdb-query-msg>
+     "ns" H{ } clone [ set-at ] keep [ mdb>> name>> index-ns ] dip <mdb-query-msg>
      '[ _ write-request read-reply ]
      [ mdb>> master>> binary ] dip with-client
      objects>> [ [ index new ] dip
@@ -91,9 +93,17 @@ USE: mongodb.query
      [ clean-indices ] keep
      V{ } clone tuck 
      '[ _  [ <linked-hash> tuple>query ] dip push ] each
-     <mdb-insert-msg> mdb>> name>> "%s.system.indexes" sprintf >>collection
-     [ mdb>> master>> binary ] dip '[ _ write-request ] with-client ;
-
+     dup length 0 > 
+     [ [ mdb>> name>> "%s.system.indexes" sprintf ] dip
+       <mdb-insert-msg>
+       [ mdb>> master>> binary ] dip '[ _ write-request ] with-client
+     ]
+     [ drop ] if ;
      
 : show-indices ( mdb-collection -- )
      load-indices . ;
+
+: show-all-indices ( -- )
+    mdb>> collections>> values
+    V{ } clone tuck 
+    '[ load-indices _ push ] each flatten . ;

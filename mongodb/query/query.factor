@@ -1,54 +1,29 @@
 USING: accessors combinators fry io.encodings.binary io.sockets kernel
-mongodb.msg mongodb.persistent sequences math namespaces assocs
-formatting ;
+mongodb.msg mongodb.persistent mongodb.connection sequences math namespaces assocs
+formatting splitting mongodb.tuple mongodb.index ;
 
 IN: mongodb.query
-
-TUPLE: mdb-node master? inet ;
-
-TUPLE: mdb name nodes collections ;
-
-: mdb>> ( -- mdb )
-    mdb get ; inline
-
-: with-db ( mdb quot -- * )
-    '[ _ mdb set _ call ] with-scope ; inline
-
-: master>> ( mdb -- inet )
-    nodes>> [ t ] dip at ;
-
-: slave>> ( mdb -- inet )
-    nodes>> [ f ] dip at ;
 
 TUPLE: mdb-result { cursor integer }
 { start# integer }
 { returned# integer }
 { objects sequence } ;
 
-: index-ns ( -- ns )
-    mdb>> name>> "%s.system.indexes" sprintf ; inline
+: namespaces-ns ( name -- ns )
+     "%s.system.namespaces" sprintf ; inline
 
-: namespaces-ns ( -- ns )
-    mdb>> name>> "%s.system.namespaces" sprintf ; inline
-    
 <PRIVATE
 
 : (execute-query) ( inet quot -- result )
-    [ binary ] dip with-client ; inline
+     [ binary ] dip with-client ; inline
 
 PRIVATE>
 
-: (find-raw) ( inet query -- result )
-    '[ _ write-request read-reply ] (execute-query) ; inline
+: (find) ( inet query -- result )
+     '[ _ write-request read-reply ] (execute-query) ; inline
 
-: (find-one-raw) ( inet query -- result )
-    (find-raw) objects>> first ; inline
-
-: (find) ( query -- result )
-    [ mdb>> master>> ] dip (find-raw) ;
-
-: (find-one) ( query -- result )
-    [ mdb>> master>> ] dip (find-one-raw) ;
+: (find-one) ( inet query -- result )
+     (find) objects>> first ; inline
 
 : build-result ( resultmsg -- mdb-result )
     [ mdb-result new ] dip
@@ -59,6 +34,34 @@ PRIVATE>
         [ objects>> [ assoc>tuple ] map >>objects ]
     } cleave ;
 
-: query-collections ( -- result )
-    namespaces-ns H{ } clone <mdb-query-msg> (find) ;
+: load-collections ( -- collections )
+    mdb>> [ master>> ] [ name>> namespaces-ns ] bi
+    H{ } clone <mdb-query-msg> (find)
+    objects>> [ [ "name" ] dip at "." split second <mdb-collection> ] map
+    H{ } clone tuck
+    '[ [ ensure-indices ] [ ] [ name>> ] tri _ set-at  ] each 
+        [ mdb>> ] dip >>collections collections>> ;
+    
+: check-ok ( result -- ? )
+     [ "ok" ] dip key? ; inline 
 
+: create-collection ( mdb-collection --  )
+     dup name>> "create" H{ } clone [ set-at ] keep 
+     [ mdb>> [ master>> ] [ name>> ] bi "%s.$cmd" sprintf ] dip
+     <mdb-query-one-msg> (find-one)
+     check-ok
+     [ [ ensure-indices ] keep dup name>> mdb>> collections>> set-at ]
+     [ "could not create collection" throw ] if ; 
+
+: get-collection-fqn ( mdb-collection -- fqdn )
+     mdb>> collections>>
+     dup keys length 0 =
+     [ drop load-collections ]
+     [ ] if
+     [ dup name>> ] dip
+     key?
+     [ ]
+     [ dup create-collection ] if
+     name>> [ mdb>> name>> ] dip "%s.%s" sprintf ;
+
+ 
