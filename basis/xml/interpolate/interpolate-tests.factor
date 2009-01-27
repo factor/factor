@@ -56,3 +56,4 @@ IN: xml.interpolate.tests
 
 \ parse-def must-infer
 [ "" interpolate-chunk ] must-infer
+[ [XML <foo><-></foo> <bar val=<->/> XML] ] must-infer
