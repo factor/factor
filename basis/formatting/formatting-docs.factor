@@ -7,7 +7,7 @@ HELP: printf
 { $values { "format-string" string } }
 { $description 
     "Writes the arguments (specified on the stack) formatted according to the format string.\n" 
-    "\n"
+    $nl
     "Several format specifications exist for handling arguments of different types, and "
     "specifying attributes for the result string, including such things as maximum width, "
     "padding, and decimals.\n"
@@ -24,10 +24,10 @@ HELP: printf
         { "%+Px"    "Hexadecimal"                "hex" }
         { "%+PX"    "Hexadecimal uppercase"      "hex" }
     }
-    "\n"
+    $nl
     "A plus sign ('+') is used to optionally specify that the number should be "
     "formatted with a '+' preceeding it if positive.\n"
-    "\n"
+    $nl
     "Padding ('P') is used to optionally specify the minimum width of the result "
     "string, the padding character, and the alignment.  By default, the padding "
     "character defaults to a space and the alignment defaults to right-aligned. "
@@ -38,7 +38,7 @@ HELP: printf
         "\"%'#5f\" formats a float padding with '#' up to 3 characters wide."
         "\"%-10d\" formats an integer to 10 characters wide and left-aligns." 
     }
-    "\n"
+    $nl
     "Digits ('D') is used to optionally specify the maximum digits in the result "
     "string. For example:\n"
     { $list 
@@ -83,7 +83,7 @@ HELP: strftime
 { $values { "format-string" string } }
 { $description 
     "Writes the timestamp (specified on the stack) formatted according to the format string.\n"
-    "\n"
+    $nl
     "Different attributes of the timestamp can be retrieved using format specifications.\n"
     { $table
         { "%a"     "Abbreviated weekday name." }
@@ -118,7 +118,7 @@ HELP: strftime
 } ;
 
 ARTICLE: "formatting" "Formatted printing"
-"The " { $vocab-link "formatting" } " vocabulary is used for formatted printing.\n"
+"The " { $vocab-link "formatting" } " vocabulary is used for formatted printing."
 { $subsection printf }
 { $subsection sprintf }
 { $subsection strftime }

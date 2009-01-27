@@ -121,7 +121,7 @@ $nl
 { $subsection "furnace.auth.providers.db" } ;
 
 ARTICLE: "furnace.auth.features" "Optional authentication features"
-"Vocabularies having names prefixed by " { $code "furnace.auth.features" } "  implement optional features which can be enabled by calling special words. These words define new actions on an authentication realm."
+"Vocabularies having names prefixed by " { $code "furnace.auth.features" } " implement optional features which can be enabled by calling special words. These words define new actions on an authentication realm."
 { $subsection "furnace.auth.features.deactivate-user" }
 { $subsection "furnace.auth.features.edit-profile" }
 { $subsection "furnace.auth.features.recover-password" }

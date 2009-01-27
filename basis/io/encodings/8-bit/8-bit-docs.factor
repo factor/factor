@@ -4,7 +4,7 @@ USING: help.syntax help.markup io.encodings.8-bit.private
 strings ;
 IN: io.encodings.8-bit
 
-ARTICLE: "io.encodings.8-bit" "8-bit encodings"
+ARTICLE: "io.encodings.8-bit" "Legacy 8-bit encodings"
 "Many encodings are a simple mapping of bytes onto characters. The " { $vocab-link "io.encodings.8-bit" } " vocabulary implements these generically using existing resource files. These encodings should be used with extreme caution, as fully general Unicode encodings like UTF-8 are nearly always more appropriate. The following 8-bit encodings are already defined:"
 { $subsection latin1 }
 { $subsection latin2 }
