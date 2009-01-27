@@ -3,7 +3,7 @@
 USING: accessors kernel xml arrays math generic http.client
 combinators hashtables namespaces io base64 sequences strings
 calendar xml.data xml.writer xml.utilities assocs math.parser
-debugger calendar.format math.order xml.interpolate ;
+debugger calendar.format math.order xml.interpolate xml.dispatch ;
 IN: xml-rpc
 
 ! * Sending RPC requests
@@ -15,7 +15,7 @@ GENERIC: item>xml ( object -- xml )
 M: integer item>xml
     dup 31 2^ neg 31 2^ 1 - between?
     [ "Integers must fit in 32 bits" throw ] unless
-    number>string [XML <i4><-></i4> XML] ;
+    [XML <i4><-></i4> XML] ;
 
 UNION: boolean t POSTPONE: f ;
 
@@ -176,10 +176,3 @@ TAG: array xml>item
 
 : invoke-method ( params method url -- )
     [ swap <rpc-method> ] dip post-rpc ;
-
-: put-http-response ( string -- )
-    "HTTP/1.1 200 OK\nConnection: close\nContent-Length: " write
-    dup length number>string write
-    "\nContent-Type: text/xml\nDate: " write
-    now timestamp>http-string write "\n\n" write
-    write ;
