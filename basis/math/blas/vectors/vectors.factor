@@ -144,26 +144,26 @@ TUPLE: VECTOR < blas-vector-base ;
 : <VECTOR> ( underlying length inc -- vector ) VECTOR boa ; inline
 
 : >VECTOR ( seq -- v )
-    [ >ARRAY execute underlying>> ] [ length ] bi 1 <VECTOR> execute ;
+    [ >ARRAY underlying>> ] [ length ] bi 1 <VECTOR> ;
 
 M: VECTOR clone
     TYPE heap-size (prepare-copy)
-    [ XCOPY execute ] 3dip <VECTOR> execute ;
+    [ XCOPY ] 3dip <VECTOR> ;
 
 M: VECTOR element-type
     drop TYPE ;
 M: VECTOR Vswap
-    (prepare-swap) [ XSWAP execute ] 2dip ;
+    (prepare-swap) [ XSWAP ] 2dip ;
 M: VECTOR Viamax
-    (prepare-nrm2) IXAMAX execute ;
+    (prepare-nrm2) IXAMAX ;
 
 M: VECTOR (blas-vector-like)
-    drop <VECTOR> execute ;
+    drop <VECTOR> ;
 
 M: VECTOR (blas-direct-array)
     [ underlying>> ]
     [ [ length>> ] [ inc>> ] bi * ] bi
-    <DIRECT-ARRAY> execute ;
+    <DIRECT-ARRAY> ;
 
 ;FUNCTOR
 
@@ -180,17 +180,17 @@ XSCAL          IS cblas_${T}scal
 WHERE
 
 M: VECTOR V.
-    (prepare-dot) XDOT execute ;
+    (prepare-dot) XDOT ;
 M: VECTOR V.conj
-    (prepare-dot) XDOT execute ;
+    (prepare-dot) XDOT ;
 M: VECTOR Vnorm
-    (prepare-nrm2) XNRM2 execute ;
+    (prepare-nrm2) XNRM2 ;
 M: VECTOR Vasum
-    (prepare-nrm2) XASUM execute ;
+    (prepare-nrm2) XASUM ;
 M: VECTOR n*V+V!
-    (prepare-axpy) [ XAXPY execute ] dip ;
+    (prepare-axpy) [ XAXPY ] dip ;
 M: VECTOR n*V!
-    (prepare-scal) [ XSCAL execute ] dip ;
+    (prepare-scal) [ XSCAL ] dip ;
 
 ;FUNCTOR
 
@@ -207,13 +207,13 @@ COMPLEX>ARG            DEFINES ${TYPE}-complex>arg
 WHERE
 
 : <DIRECT-COMPLEX-ARRAY> ( alien len -- sequence )
-    1 shift <DIRECT-ARRAY> execute <complex-sequence> ;
+    1 shift <DIRECT-ARRAY> <complex-sequence> ;
 : >COMPLEX-ARRAY ( sequence -- sequence )
-    <complex-components> >ARRAY execute ;
+    <complex-components> >ARRAY ;
 : COMPLEX>ARG ( complex -- alien )
-    >rect 2array >ARRAY execute underlying>> ;
+    >rect 2array >ARRAY underlying>> ;
 : ARG>COMPLEX ( alien -- complex )
-    2 <DIRECT-ARRAY> execute first2 rect> ;
+    2 <DIRECT-ARRAY> first2 rect> ;
 
 ;FUNCTOR
 
@@ -234,22 +234,22 @@ WHERE
 
 M: VECTOR V.
     (prepare-dot) TYPE <c-object>
-    [ XDOTU_SUB execute ] keep
-    ARG>TYPE execute ;
+    [ XDOTU_SUB ] keep
+    ARG>TYPE ;
 M: VECTOR V.conj
     (prepare-dot) TYPE <c-object>
-    [ XDOTC_SUB execute ] keep
-    ARG>TYPE execute ;
+    [ XDOTC_SUB ] keep
+    ARG>TYPE ;
 M: VECTOR Vnorm
-    (prepare-nrm2) XXNRM2 execute ;
+    (prepare-nrm2) XXNRM2 ;
 M: VECTOR Vasum
-    (prepare-nrm2) XXASUM execute ;
+    (prepare-nrm2) XXASUM ;
 M: VECTOR n*V+V!
-    [ TYPE>ARG execute ] 2dip
-    (prepare-axpy) [ XAXPY execute ] dip ;
+    [ TYPE>ARG ] 2dip
+    (prepare-axpy) [ XAXPY ] dip ;
 M: VECTOR n*V!
-    [ TYPE>ARG execute ] dip
-    (prepare-scal) [ XSCAL execute ] dip ;
+    [ TYPE>ARG ] dip
+    (prepare-scal) [ XSCAL ] dip ;
 
 ;FUNCTOR
 

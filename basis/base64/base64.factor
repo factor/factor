@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators io io.binary io.encodings.binary
 io.streams.byte-array io.streams.string kernel math namespaces
-sequences strings ;
+sequences strings io.crlf ;
 IN: base64
 
 <PRIVATE
@@ -32,7 +32,7 @@ SYMBOL: column
 : write1-lines ( ch -- )
     write1
     column get [
-        1+ [ 76 = [ "\r\n" write ] when ]
+        1+ [ 76 = [ crlf ] when ]
         [ 76 mod column set ] bi
     ] when* ;
 

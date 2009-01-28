@@ -268,28 +268,28 @@ TUPLE: MATRIX < blas-matrix-base ;
 M: MATRIX element-type
     drop TYPE ;
 M: MATRIX (blas-matrix-like)
-    drop <MATRIX> execute ;
+    drop <MATRIX> ;
 M: VECTOR (blas-matrix-like)
-    drop <MATRIX> execute ;
+    drop <MATRIX> ;
 M: MATRIX (blas-vector-like)
-    drop <VECTOR> execute ;
+    drop <VECTOR> ;
 
 : >MATRIX ( arrays -- matrix )
-    [ >ARRAY execute underlying>> ] (>matrix)
-    <MATRIX> execute ;
+    [ >ARRAY underlying>> ] (>matrix)
+    <MATRIX> ;
 
 M: VECTOR n*M.V+n*V!
-    [ TYPE>ARG execute ] (prepare-gemv)
-    [ XGEMV execute ] dip ;
+    [ TYPE>ARG ] (prepare-gemv)
+    [ XGEMV ] dip ;
 M: MATRIX n*M.M+n*M!
-    [ TYPE>ARG execute ] (prepare-gemm)
-    [ XGEMM execute ] dip ;
+    [ TYPE>ARG ] (prepare-gemm)
+    [ XGEMM ] dip ;
 M: MATRIX n*V(*)V+M!
-    [ TYPE>ARG execute ] (prepare-ger)
-    [ XGERU execute ] dip ;
+    [ TYPE>ARG ] (prepare-ger)
+    [ XGERU ] dip ;
 M: MATRIX n*V(*)Vconj+M!
-    [ TYPE>ARG execute ] (prepare-ger)
-    [ XGERC execute ] dip ;
+    [ TYPE>ARG ] (prepare-ger)
+    [ XGERC ] dip ;
 
 ;FUNCTOR
 

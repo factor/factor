@@ -49,9 +49,9 @@ M: A set-nth-unsafe underlying>> SET-NTH call ;
 
 : >A ( seq -- specialized-array ) A new clone-like ; inline
 
-M: A like drop dup A instance? [ >A execute ] unless ;
+M: A like drop dup A instance? [ >A ] unless ;
 
-M: A new-sequence drop (A) execute ;
+M: A new-sequence drop (A) ;
 
 M: A equal? over A instance? [ sequence= ] [ 2drop f ] if ;
 
@@ -70,7 +70,7 @@ M: A >pprint-sequence ;
 
 M: A pprint* pprint-object ;
 
-: A{ \ } [ >A execute ] parse-literal ; parsing
+: A{ \ } [ >A ] parse-literal ; parsing
 
 INSTANCE: A sequence
 

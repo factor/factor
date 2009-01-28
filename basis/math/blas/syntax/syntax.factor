@@ -1,5 +1,5 @@
 USING: kernel math.blas.vectors math.blas.matrices parser
-arrays prettyprint.backend sequences ;
+arrays prettyprint.backend prettyprint.custom sequences ;
 IN: math.blas.syntax
 
 : svector{
