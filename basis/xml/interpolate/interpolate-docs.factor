@@ -23,10 +23,11 @@ ARTICLE: { "xml.interpolate" "in-depth" } "XML interpolation syntax"
 $nl
 "These forms can be used where a tag might go, as in " { $snippet "[XML <foo><-></foo> XML]" } " or where an attribute might go, as in " { $snippet "[XML <foo bar=<->/> XML]" } ". When an attribute is spliced in, it is not included if the value is " { $snippet "f" } " and if the value is not a string, the value is put through " { $link present } ". Here is an example of the fry style of XML interpolation:"
 { $example 
-{" "one two three" " " split
+{" USING: splitting sequences xml.writer xml.interpolate ;
+"one two three" " " split
 [ [XML <item><-></item> XML] ] map
-<XML <doc><-></doc> XML> pprint-xml>string "}
-{" <' <?xml version="1.0" encoding="UTF-8"?>
+<XML <doc><-></doc> XML> pprint-xml"}
+{" <?xml version="1.0" encoding="UTF-8"?>
 <doc>
   <item>
     one
@@ -37,10 +38,11 @@ $nl
   <item>
     three
   </item>
-</doc>'> "} }
+</doc>"} }
 "Here is an example of the locals version:"
 { $example
-{" [let |
+{" USING: locals urls xml.interpolate xml.writer ;
+[let |
     number [ 3 ]
     false [ f ]
     url [ URL" http://factorcode.org/" ]
@@ -53,6 +55,6 @@ $nl
             url=<-url->
             string=<-string->
             word=<-word-> />
-    XML> pprint-xml>string ] "}
-{" <' <?xml version="1.0" encoding="UTF-8"?>
-<x number="3" url="http://factorcode.org/" string="hello" word="drop"/>'> "} } ;
+    XML> pprint-xml ] "}
+{" <?xml version="1.0" encoding="UTF-8"?>
+<x number="3" url="http://factorcode.org/" string="hello" word="drop"/>"} } ;

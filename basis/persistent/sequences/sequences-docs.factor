@@ -14,7 +14,7 @@ HELP: ppop
 { $contract "Persistent analogue of " { $link pop* } ". Outputs a new sequence with all elements of " { $snippet "seq" } " except for the final element." } ;
 
 ARTICLE: "persistent.sequences" "Persistent sequence protocol"
-"The persistent sequence protocol consists of the non-mutating sequence protocol words, such as  " { $link length } " and " { $link nth } ", together with the following operations:"
+"The persistent sequence protocol consists of the non-mutating sequence protocol words, such as " { $link length } " and " { $link nth } ", together with the following operations:"
 { $subsection new-nth }
 { $subsection ppush }
 { $subsection ppop }

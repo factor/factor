@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 IN: xml.tests
 USING: kernel xml tools.test io namespaces make sequences
@@ -8,7 +8,7 @@ sequences.deep accessors io.streams.string ;
 
 ! This is insufficient
 \ read-xml must-infer
-[ [ drop ] sax ] must-infer
+[ [ drop ] each-element ] must-infer
 \ string>xml must-infer
 
 SYMBOL: xml-file
