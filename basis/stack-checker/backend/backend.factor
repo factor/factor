@@ -1,18 +1,18 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry arrays generic io io.streams.string kernel math
-namespaces parser prettyprint sequences strings vectors words
-quotations effects classes continuations debugger assocs
-combinators compiler.errors accessors math.order definitions
-sets generic.standard.engines.tuple hints stack-checker.state
-stack-checker.visitor stack-checker.errors
-stack-checker.values stack-checker.recursive-state ;
+namespaces parser sequences strings vectors words quotations
+effects classes continuations assocs combinators
+compiler.errors accessors math.order definitions sets
+generic.standard.engines.tuple hints stack-checker.state
+stack-checker.visitor stack-checker.errors stack-checker.values
+stack-checker.recursive-state ;
 IN: stack-checker.backend
 
-: push-d ( obj -- ) meta-d get push ;
+: push-d ( obj -- ) meta-d push ;
 
 : pop-d  ( -- obj )
-    meta-d get [
+    meta-d [
         <value> dup 1array #introduce, d-in inc
     ] [ pop ] if-empty ;
 
@@ -22,46 +22,52 @@ IN: stack-checker.backend
     [ <value> ] replicate ;
 
 : ensure-d ( n -- values )
-    meta-d get 2dup length > [
+    meta-d 2dup length > [
         2dup
         [ nip >array ] [ length - make-values ] [ nip delete-all ] 2tri
-        [ length d-in +@ ] [ #introduce, ] [ meta-d get push-all ] tri
-        meta-d get push-all
+        [ length d-in +@ ] [ #introduce, ] [ meta-d push-all ] tri
+        meta-d push-all
     ] when swap tail* ;
 
 : shorten-by ( n seq -- )
     [ length swap - ] keep shorten ; inline
 
 : consume-d ( n -- seq )
-    [ ensure-d ] [ meta-d get shorten-by ] bi ;
+    [ ensure-d ] [ meta-d shorten-by ] bi ;
 
-: output-d ( values -- ) meta-d get push-all ;
+: output-d ( values -- ) meta-d push-all ;
 
 : produce-d ( n -- values )
-    make-values dup meta-d get push-all ;
+    make-values dup meta-d push-all ;
 
-: push-r ( obj -- ) meta-r get push ;
+: push-r ( obj -- ) meta-r push ;
 
-: pop-r  ( -- obj )
-    meta-r get dup empty?
+: pop-r ( -- obj )
+    meta-r dup empty?
     [ too-many-r> inference-error ] [ pop ] if ;
 
 : consume-r ( n -- seq )
-    meta-r get 2dup length >
+    meta-r 2dup length >
     [ too-many-r> inference-error ] when
     [ swap tail* ] [ shorten-by ] 2bi ;
 
-: output-r ( seq -- ) meta-r get push-all ;
-
-: pop-literal ( -- rstate obj )
-    pop-d
-    [ 1array #drop, ]
-    [ literal [ recursion>> ] [ value>> ] bi ] bi ;
-
-GENERIC: apply-object ( obj -- )
+: output-r ( seq -- ) meta-r push-all ;
 
 : push-literal ( obj -- )
-    dup <literal> make-known [ nip push-d ] [ #push, ] 2bi ;
+    literals get push ;
+
+: pop-literal ( -- rstate obj )
+    literals get [
+        pop-d
+        [ 1array #drop, ]
+        [ literal [ recursion>> ] [ value>> ] bi ] bi
+    ] [ pop recursive-state get swap ] if-empty ;
+
+: literals-available? ( n -- literals ? )
+    literals get 2dup length <=
+    [ [ swap tail* ] [ shorten-by ] 2bi t ] [ 2drop f f ] if ;
+
+GENERIC: apply-object ( obj -- )
 
 M: wrapper apply-object
     wrapped>>
@@ -72,10 +78,17 @@ M: wrapper apply-object
 M: object apply-object push-literal ;
 
 : terminate ( -- )
-    terminated? on meta-d get clone meta-r get clone #terminate, ;
+    terminated? on meta-d clone meta-r clone #terminate, ;
+
+: check->r ( -- )
+    meta-r empty? [ \ too-many->r inference-error ] unless ;
 
 : infer-quot-here ( quot -- )
-    [ apply-object terminated? get not ] all? drop ;
+    meta-r [
+        V{ } clone \ meta-r set
+        [ apply-object terminated? get not ] all?
+        [ commit-literals check->r ] [ literals get delete-all ] if
+    ] dip \ meta-r set ;
 
 : infer-quot ( quot rstate -- )
     recursive-state get [
@@ -103,10 +116,10 @@ M: object apply-object push-literal ;
     ] if ;
 
 : infer->r ( n -- )
-    consume-d dup copy-values [ #>r, ] [ nip output-r ] 2bi ;
+    consume-d dup copy-values [ nip output-r ] [ #>r, ] 2bi ;
 
 : infer-r> ( n -- )
-    consume-r dup copy-values [ #r>, ] [ nip output-d ] 2bi ;
+    consume-r dup copy-values [ nip output-d ] [ #r>, ] 2bi ;
 
 : undo-infer ( -- )
     recorded get [ f "inferred-effect" set-word-prop ] each ;
@@ -127,20 +140,15 @@ M: object apply-object push-literal ;
 : infer-word-def ( word -- )
     [ specialized-def ] [ add-recursive-state ] bi infer-quot ;
 
-: check->r ( -- )
-    meta-r get empty? terminated? get or
-    [ \ too-many->r inference-error ] unless ;
-
 : end-infer ( -- )
-    check->r
-    meta-d get clone #return, ;
+    meta-d clone #return, ;
 
 : effect-required? ( word -- ? )
     {
         { [ dup inline? ] [ drop f ] }
         { [ dup deferred? ] [ drop f ] }
         { [ dup crossref? not ] [ drop f ] }
-        [ def>> [ [ word? ] [ primitive? not ] bi and ] contains? ]
+        [ def>> [ word? ] contains? ]
     } cond ;
 
 : ?missing-effect ( word -- )

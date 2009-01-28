@@ -204,7 +204,7 @@ M: byte-array byte-length length ;
     dup length [ nip malloc dup ] 2keep memcpy ;
 
 : memory>byte-array ( alien len -- byte-array )
-    [ nip <byte-array> dup ] 2keep memcpy ;
+    [ nip (byte-array) dup ] 2keep memcpy ;
 
 : byte-array>memory ( byte-array base -- )
     swap dup length memcpy ;

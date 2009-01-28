@@ -3,7 +3,7 @@
 USING: accessors arrays assocs continuations kernel math models
 namespaces opengl sequences io combinators fry math.vectors
 ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-debugger math.geometry.rect ;
+math.geometry.rect ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < track
@@ -38,8 +38,8 @@ M: world request-focus-on ( child gadget -- )
     2dup eq?
     [ 2drop ] [ dup focused?>> (request-focus) ] if ;
 
-: <world> ( gadget title status -- world )
-    { 0 1 } world new-track
+: new-world ( gadget title status class -- world )
+    { 0 1 } swap new-track
         t >>root?
         t >>active?
         H{ } clone >>fonts
@@ -48,6 +48,9 @@ M: world request-focus-on ( child gadget -- )
         swap >>title
         swap 1 track-add
     dup request-focus ;
+
+: <world> ( gadget title status -- world )
+    world new-world ;
 
 M: world layout*
     dup call-next-method
@@ -76,7 +79,7 @@ C: <world-error> world-error
 SYMBOL: ui-error-hook
 
 : ui-error ( error -- )
-    ui-error-hook get [ call ] [ print-error ] if* ;
+    ui-error-hook get [ call ] [ die ] if* ;
 
 ui-error-hook global [ [ rethrow ] or ] change-at
 

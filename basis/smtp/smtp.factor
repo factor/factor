@@ -72,10 +72,12 @@ ERROR: bad-email-address email ;
     [ bad-email-address ] unless ;
 
 : mail-from ( fromaddr -- )
-    "MAIL FROM:<" swap validate-address ">" 3append command ;
+    validate-address
+    "MAIL FROM:<" ">" surround command ;
 
 : rcpt-to ( to -- )
-    "RCPT TO:<" swap validate-address ">" 3append command ;
+    validate-address
+    "RCPT TO:<" ">" surround command ;
 
 : data ( -- )
     "DATA" command ;

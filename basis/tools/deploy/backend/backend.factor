@@ -5,8 +5,8 @@ assocs kernel vocabs words sequences memory io system arrays
 continuations math definitions mirrors splitting parser classes
 summary layouts vocabs.loader prettyprint.config prettyprint
 debugger io.streams.c io.files io.backend quotations io.launcher
-words.private tools.deploy.config bootstrap.image
-io.encodings.utf8 destructors accessors ;
+words.private tools.deploy.config tools.deploy.config.editor
+bootstrap.image io.encodings.utf8 destructors accessors ;
 IN: tools.deploy.backend
 
 : copy-vm ( executable bundle-name extension -- vm )
@@ -88,6 +88,11 @@ DEFER: ?make-staging-image
     dup staging-image-name exists?
     [ drop ] [ make-staging-image ] if ;
 
+: make-deploy-config ( vocab -- file )
+    [ deploy-config unparse-use ]
+    [ "deploy-config-" prepend temp-file ] bi
+    [ utf8 set-file-contents ] keep ;
+
 : deploy-command-line ( image vocab config -- flags )
     [
         bootstrap-profile ?make-staging-image
@@ -99,7 +104,8 @@ DEFER: ?make-staging-image
 
             "-run=tools.deploy.shaker" ,
 
-            "-deploy-vocab=" prepend ,
+            [ "-deploy-vocab=" prepend , ]
+            [ make-deploy-config "-deploy-config=" prepend , ] bi
 
             "-output-image=" prepend ,
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel sequences sequences.deep
+USING: accessors arrays kernel sequences compiler.utilities
 compiler.cfg.instructions cpu.architecture ;
 IN: compiler.cfg.two-operand
 
@@ -55,6 +55,6 @@ M: insn convert-two-operand* ;
 : convert-two-operand ( mr -- mr' )
     [
         two-operand? [
-            [ convert-two-operand* ] map flatten
+            [ convert-two-operand* ] map-flat
         ] when
     ] change-instructions ;

@@ -51,14 +51,14 @@ SYMBOL: enter-out
 : prepare-stack ( word -- )
     required-stack-effect in>>
     [ length ensure-d drop ] [
-        meta-d get clone enter-in set
-        meta-d get swap make-copies enter-out set
+        meta-d clone enter-in set
+        meta-d swap make-copies enter-out set
     ] bi ;
 
 : emit-enter-recursive ( label -- )
     enter-out get >>enter-out
     enter-in get enter-out get #enter-recursive,
-    enter-out get >vector meta-d set ;
+    enter-out get >vector \ meta-d set ;
 
 : entry-stack-height ( label -- stack )
     enter-out>> length ;
@@ -77,7 +77,7 @@ SYMBOL: enter-out
 
 : end-recursive-word ( word label -- )
     [ check-return ]
-    [ meta-d get dup copy-values dup meta-d set #return-recursive, ]
+    [ meta-d dup copy-values dup \ meta-d set #return-recursive, ]
     bi ;
 
 : recursive-word-inputs ( label -- n )
@@ -95,10 +95,8 @@ SYMBOL: enter-out
         [ nip ]
         2tri
 
-        check->r
-
         dup recursive-word-inputs
-        meta-d get
+        meta-d
         stack-visitor get
         terminated? get
     ] with-scope ;
@@ -116,7 +114,7 @@ SYMBOL: enter-out
     swap word>> required-stack-effect in>> length tail* ;
 
 : call-site-stack ( label -- stack )
-    meta-d get trim-stack ;
+    meta-d trim-stack ;
 
 : trimmed-enter-out ( label -- stack )
     dup enter-out>> trim-stack ;
@@ -131,7 +129,7 @@ SYMBOL: enter-out
 
 : adjust-stack-effect ( effect -- effect' )
     [ in>> ] [ out>> ] bi
-    meta-d get length pick length [-]
+    meta-d length pick length [-]
     object <repetition> '[ _ prepend ] bi@
     <effect> ;
 
@@ -142,6 +140,7 @@ SYMBOL: enter-out
     ] [ drop undeclared-recursion-error inference-error ] if ;
 
 : inline-word ( word -- )
+    commit-literals
     [ inlined-dependency depends-on ]
     [
         dup inline-recursive-label [

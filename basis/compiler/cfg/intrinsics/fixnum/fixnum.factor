@@ -12,8 +12,7 @@ compiler.cfg.registers ;
 IN: compiler.cfg.intrinsics.fixnum
 
 : emit-both-fixnums? ( -- )
-    D 0 ^^peek
-    D 1 ^^peek
+    2inputs
     ^^or
     tag-mask get ^^and-imm
     0 cc= ^^compare-imm
@@ -53,6 +52,9 @@ IN: compiler.cfg.intrinsics.fixnum
 
 : emit-fixnum-bitnot ( -- )
     ds-pop ^^not tag-mask get ^^xor-imm ds-push ;
+
+: emit-fixnum-log2 ( -- )
+    ds-pop ^^log2 tag-bits get ^^sub-imm ^^tag-fixnum ds-push ;
 
 : (emit-fixnum*fast) ( -- dst )
     2inputs ^^untag-fixnum ^^mul ;

@@ -124,7 +124,7 @@ PRIVATE>
     [ zero? ] tri@ and and ;
 
 : filter-ignorable ( weights -- weights' )
-    >r f r> [
+    f swap [
         tuck primary>> zero? and
         [ swap ignorable?>> or ]
         [ swap completely-ignorable? or not ] 2bi

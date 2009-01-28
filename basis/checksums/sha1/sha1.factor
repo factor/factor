@@ -3,7 +3,8 @@
 USING: arrays combinators kernel io io.encodings.binary io.files
 io.streams.byte-array math.vectors strings sequences namespaces
 make math parser sequences assocs grouping vectors io.binary
-hashtables symbols math.bitwise checksums checksums.common ;
+hashtables symbols math.bitwise checksums checksums.common
+checksums.stream ;
 IN: checksums.sha1
 
 ! Implemented according to RFC 3174.
@@ -113,7 +114,7 @@ SYMBOLS: h0 h1 h2 h3 h4 A B C D E w K ;
 
 SINGLETON: sha1
 
-INSTANCE: sha1 checksum
+INSTANCE: sha1 stream-checksum
 
 M: sha1 checksum-stream ( stream -- sha1 )
     drop [ initialize-sha1 stream>sha1 get-sha1 ] with-input-stream ;

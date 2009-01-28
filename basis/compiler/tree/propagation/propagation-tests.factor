@@ -8,7 +8,8 @@ math.functions math.private strings layouts
 compiler.tree.propagation.info compiler.tree.def-use
 compiler.tree.debugger compiler.tree.checker
 slots.private words hashtables classes assocs locals
-specialized-arrays.double system sorting math.libm ;
+specialized-arrays.double system sorting math.libm
+math.intervals ;
 IN: compiler.tree.propagation.tests
 
 \ propagate must-infer
@@ -33,17 +34,57 @@ IN: compiler.tree.propagation.tests
 
 [ V{ fixnum } ] [ [ { fixnum } declare bitnot ] final-classes ] unit-test
 
-[ V{ number } ] [ [ + ] final-classes ] unit-test
+! Test type propagation for math ops
+: cleanup-math-class ( obj -- class )
+    { null fixnum bignum integer ratio rational float real complex number }
+    [ class= ] with find nip ;
 
-[ V{ float } ] [ [ { float integer } declare + ] final-classes ] unit-test
+: final-math-class ( quot -- class )
+    final-classes first cleanup-math-class ;
 
-[ V{ float } ] [ [ /f ] final-classes ] unit-test
+[ number ] [ [ + ] final-math-class ] unit-test
 
-[ V{ integer } ] [ [ /i ] final-classes ] unit-test
+[ bignum ] [ [ { fixnum bignum } declare + ] final-math-class ] unit-test
 
-[ V{ integer } ] [
-    [ { integer } declare bitnot ] final-classes
-] unit-test
+[ integer ] [ [ { fixnum integer } declare + ] final-math-class ] unit-test
+
+[ bignum ] [ [ { integer bignum } declare + ] final-math-class ] unit-test
+
+[ integer ] [ [ { fixnum fixnum } declare + ] final-math-class ] unit-test
+
+[ float ] [ [ { float integer } declare + ] final-math-class ] unit-test
+
+[ float ] [ [ { real float } declare + ] final-math-class ] unit-test
+
+[ float ] [ [ { float real } declare + ] final-math-class ] unit-test
+
+[ rational ] [ [ { ratio ratio } declare + ] final-math-class ] unit-test
+
+[ rational ] [ [ { rational ratio } declare + ] final-math-class ] unit-test
+
+[ number ] [ [ { complex complex } declare + ] final-math-class ] unit-test
+
+[ float ] [ [ /f ] final-math-class ] unit-test
+
+[ float ] [ [ { real real } declare /f ] final-math-class ] unit-test
+
+[ integer ] [ [ /i ] final-math-class ] unit-test
+
+[ integer ] [ [ { integer float } declare /i ] final-math-class ] unit-test
+
+[ integer ] [ [ { float float } declare /i ] final-math-class ] unit-test
+
+[ integer ] [ [ { integer } declare bitnot ] final-math-class ] unit-test
+
+[ null ] [ [ { null null } declare + ] final-math-class ] unit-test
+
+[ null ] [ [ { null fixnum } declare + ] final-math-class ] unit-test
+
+[ float ] [ [ { float fixnum } declare + ] final-math-class ] unit-test
+
+[ bignum ] [ [ { bignum bignum } declare bitxor ] final-math-class ] unit-test
+
+[ float ] [ [ { float float } declare mod ] final-math-class ] unit-test
 
 [ V{ integer } ] [ [ 255 bitand ] final-classes ] unit-test
 
@@ -63,18 +104,6 @@ IN: compiler.tree.propagation.tests
 
 [ V{ integer } ] [
     [ { fixnum } declare 615949 * ] final-classes
-] unit-test
-
-[ V{ null } ] [
-    [ { null null } declare + ] final-classes
-] unit-test
-
-[ V{ null } ] [
-    [ { null fixnum } declare + ] final-classes
-] unit-test
-
-[ V{ float } ] [
-    [ { float fixnum } declare + ] final-classes
 ] unit-test
 
 [ V{ fixnum } ] [
@@ -276,14 +305,6 @@ IN: compiler.tree.propagation.tests
     [
         2dup [ dup string? [ "Oops" throw ] unless ] bi@ 2drop
     ] final-classes
-] unit-test
-
-[ V{ float } ] [
-    [ { real float } declare + ] final-classes
-] unit-test
-
-[ V{ float } ] [
-    [ { float real } declare + ] final-classes
 ] unit-test
 
 [ V{ fixnum } ] [
@@ -598,6 +619,26 @@ MIXIN: empty-mixin
 [ V{ float } ] [ [ fsqrt ] final-classes ] unit-test
 
 [ V{ t } ] [ [ { fixnum } declare 10 mod >float -20 > ] final-literals ] unit-test
+
+[ T{ interval f { 0 t } { 127 t } } ] [
+    [ { integer } declare 127 bitand ] final-info first interval>>
+] unit-test
+
+[ V{ bignum } ] [
+    [ { bignum } declare dup 1- bitxor ] final-classes
+] unit-test
+
+[ V{ bignum integer } ] [
+    [ { bignum integer } declare [ shift ] keep ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ { fixnum } declare log2 ] final-classes
+] unit-test
+
+[ V{ word } ] [
+    [ { fixnum } declare log2 0 >= ] final-classes
+] unit-test
 
 ! [ V{ string } ] [
 !     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes

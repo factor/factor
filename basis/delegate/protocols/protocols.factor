@@ -1,8 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: delegate sequences.private sequences assocs
-prettyprint.sections io definitions kernel continuations
-listener ;
+io definitions kernel continuations ;
 IN: delegate.protocols
 
 PROTOCOL: sequence-protocol
@@ -16,7 +15,7 @@ PROTOCOL: assoc-protocol
 
 PROTOCOL: input-stream-protocol
     stream-read1 stream-read stream-read-partial stream-readln
-    stream-read-until stream-read-quot ;
+    stream-read-until ;
 
 PROTOCOL: output-stream-protocol
     stream-flush stream-write1 stream-write stream-format

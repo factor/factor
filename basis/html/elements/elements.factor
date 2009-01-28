@@ -26,7 +26,7 @@ SYMBOL: html
     #! dynamically creating words.
     [ elements-vocab create ] 2dip define-declared ;
 
-: <foo> ( str -- <str> ) "<" swap ">" 3append ;
+: <foo> ( str -- <str> ) "<" ">" surround ;
 
 : def-for-html-word-<foo> ( name -- )
     #! Return the name and code for the <foo> patterned
@@ -49,14 +49,14 @@ SYMBOL: html
     #! word.
     foo> [ ">" write-html ] (( -- )) html-word ;
 
-: </foo> ( str -- </str> ) "</" swap ">" 3append ;
+: </foo> ( str -- </str> ) "</" ">" surround ;
 
 : def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
     #! word.
     </foo> dup '[ _ write-html ] (( -- )) html-word ;
 
-: <foo/> ( str -- <str/> ) "<" swap "/>" 3append ;
+: <foo/> ( str -- <str/> ) "<" "/>" surround ;
 
 : def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned

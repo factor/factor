@@ -28,9 +28,6 @@ PREDICATE: math-class < class
 : math-class-max ( class1 class2 -- class )
     [ math-class<=> ] most ;
 
-: math-class-min ( class1 class2 -- class )
-    [ swap math-class<=> ] most ;
-
 : (math-upgrade) ( max class -- quot )
     dupd = [ drop [ ] ] [ "coercer" word-prop [ ] or ] if ;
 
@@ -83,7 +80,7 @@ M: math-combination perform-combination
     drop
     dup
     [
-        \ both-fixnums? ,
+        [ 2dup both-fixnums? ] %
         dup fixnum bootstrap-word dup math-method ,
         \ over [
             dup math-class? [

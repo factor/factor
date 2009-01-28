@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators checksums checksums.md5
 checksums.sha1 checksums.md5.private io io.binary io.files
 io.streams.byte-array kernel math math.vectors memoize sequences

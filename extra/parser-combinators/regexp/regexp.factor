@@ -1,8 +1,9 @@
 USING: arrays combinators kernel lists math math.parser
-namespaces parser lexer parser-combinators parser-combinators.simple
-promises quotations sequences strings math.order
-assocs prettyprint.backend memoize unicode.case unicode.categories
-combinators.short-circuit accessors make io ;
+namespaces parser lexer parser-combinators
+parser-combinators.simple promises quotations sequences strings
+math.order assocs prettyprint.backend prettyprint.custom memoize
+unicode.case unicode.categories combinators.short-circuit
+accessors make io ;
 IN: parser-combinators.regexp
 
 <PRIVATE

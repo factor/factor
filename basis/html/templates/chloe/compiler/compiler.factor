@@ -3,7 +3,7 @@
 USING: assocs namespaces make kernel sequences accessors
 combinators strings splitting io io.streams.string present
 xml.writer xml.data xml.entities html.forms
-html.templates html.templates.chloe.syntax ;
+html.templates html.templates.chloe.syntax continuations ;
 IN: html.templates.chloe.compiler
 
 : chloe-attrs-only ( assoc -- assoc' )

@@ -77,7 +77,7 @@ TUPLE: check-method class generic ;
     3tri ; inline
 
 : method-word-name ( class word -- string )
-    [ name>> ] bi@ "=>" swap 3append ;
+    [ name>> ] bi@ "=>" glue ;
 
 PREDICATE: method-body < word
     "method-generic" word-prop >boolean ;

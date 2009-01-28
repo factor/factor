@@ -8,5 +8,5 @@ IN: crypto.xor
 ERROR: empty-xor-key ;
 
 : xor-crypt ( seq key -- seq' )
-    dup empty? [ empty-xor-key ] when
+    [ empty-xor-key ] when-empty
     [ dup length ] dip '[ _ mod-nth bitxor ] 2map ;

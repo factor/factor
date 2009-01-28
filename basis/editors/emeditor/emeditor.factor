@@ -1,11 +1,10 @@
-USING: editors hardware-info.windows io.files io.launcher
-kernel math.parser namespaces sequences windows.shell32
-make ;
+USING: editors io.files io.launcher kernel math.parser
+namespaces sequences windows.shell32 make io.paths.windows ;
 IN: editors.emeditor
 
 : emeditor-path ( -- path )
     \ emeditor-path get-global [
-        program-files "\\EmEditor\\EmEditor.exe" append-path
+        "EmEditor" t [ "EmEditor.exe" tail? ] find-in-program-files
     ] unless* ;
 
 : emeditor ( file line -- )

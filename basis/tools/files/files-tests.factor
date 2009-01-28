@@ -6,3 +6,5 @@ IN: tools.files.tests
 \ directory. must-infer
 
 [ ] [ "" directory. ] unit-test
+
+[ ] [ file-systems. ] unit-test

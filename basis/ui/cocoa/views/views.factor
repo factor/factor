@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types arrays assocs cocoa kernel
 math cocoa.messages cocoa.subclassing cocoa.classes cocoa.views
 cocoa.application cocoa.pasteboard cocoa.types cocoa.windows
 sequences ui ui.gadgets ui.gadgets.worlds ui.gestures
-core-foundation threads combinators math.geometry.rect ;
+core-foundation.strings threads combinators math.geometry.rect ;
 IN: ui.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -60,7 +60,7 @@ IN: ui.cocoa.views
     dup event-modifiers swap key-code ;
 
 : send-key-event ( view gesture -- )
-    swap window-focus propagate-gesture ;
+    swap window propagate-key-gesture ;
 
 : interpret-key-event ( view event -- )
     NSArray swap -> arrayWithObject: -> interpretKeyEvents: ;
@@ -266,30 +266,23 @@ CLASS: {
 { "writeSelectionToPasteboard:types:" "char" { "id" "SEL" "id" "id" }
     [
         CF>string-array NSStringPboardType swap member? [
-            >r drop window-focus gadget-selection dup [
-                r> set-pasteboard-string 1
-            ] [
-                r> 2drop 0
-            ] if
-        ] [
-            3drop 0
-        ] if
+            [ drop window-focus gadget-selection ] dip over
+            [ set-pasteboard-string 1 ] [ 2drop 0 ] if
+        ] [ 3drop 0 ] if
     ]
 }
 
 { "readSelectionFromPasteboard:" "char" { "id" "SEL" "id" }
     [
         pasteboard-string dup [
-            [ drop window-focus ] dip swap user-input 1
-        ] [
-            3drop 0
-        ] if
+            [ drop window ] dip swap user-input 1
+        ] [ 3drop 0 ] if
     ]
 }
 
 ! Text input
 { "insertText:" "void" { "id" "SEL" "id" }
-    [ nip CF>string swap window-focus user-input ]
+    [ nip CF>string swap window user-input ]
 }
 
 { "hasMarkedText" "char" { "id" "SEL" }

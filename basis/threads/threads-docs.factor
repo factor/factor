@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private io
 threads.private continuations init quotations strings
-assocs heaps boxes namespaces deques ;
+assocs heaps boxes namespaces deques dlists ;
 IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"
@@ -82,7 +82,7 @@ $nl
 { $notes "In most cases, user code should call " { $link spawn } " instead, however for control over the error handler quotation, threads can be created with " { $link <thread> } " then passed to " { $link (spawn) } "." } ;
 
 HELP: run-queue
-{ $values { "queue" deque } }
+{ $values { "dlist" dlist } }
 { $var-description "Global variable holding the queue of runnable threads. Calls to " { $link yield } " switch to the thread which has been in the queue for the longest period of time."
 $nl
 "By convention, threads are queued with " { $link push-front } 
@@ -97,6 +97,7 @@ HELP: resume-with
 { $description "Adds a thread to the end of the run queue together with an object to pass to the thread. The thread must have previously been suspended by a call to " { $link suspend } "; the object is returned from the " { $link suspend } " call." } ;
 
 HELP: sleep-queue
+{ $values { "heap" min-heap } }
 { $var-description "A " { $link min-heap } " storing the queue of sleeping threads." } ;
 
 HELP: sleep-time

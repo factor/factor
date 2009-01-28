@@ -5,9 +5,11 @@ cpu.x86.assembler cpu.x86.assembler.private cpu.architecture
 kernel kernel.private math memory namespaces make sequences
 words system layouts combinators math.order fry locals
 compiler.constants compiler.cfg.registers
-compiler.cfg.instructions compiler.codegen
-compiler.codegen.fixup ;
+compiler.cfg.instructions compiler.cfg.intrinsics
+compiler.codegen compiler.codegen.fixup ;
 IN: cpu.x86
+
+<< enable-fixnum-log2 >>
 
 M: x86 two-operand? t ;
 
@@ -92,6 +94,7 @@ M: x86 %shl-imm nip SHL ;
 M: x86 %shr-imm nip SHR ;
 M: x86 %sar-imm nip SAR ;
 M: x86 %not     drop NOT ;
+M: x86 %log2    BSR ;
 
 : ?MOV ( dst src -- )
     2dup = [ 2drop ] [ MOV ] if ; inline
@@ -365,21 +368,36 @@ M:: x86 %box-alien ( dst src temp -- )
 M:: x86 %string-nth ( dst src index temp -- )
     "end" define-label
     dst { src index temp } [| new-dst |
+        ! Load the least significant 7 bits into new-dst.
+        ! 8th bit indicates whether we have to load from
+        ! the aux vector or not.
         temp src index [+] LEA
         new-dst 1 small-reg temp string-offset [+] MOV
         new-dst new-dst 1 small-reg MOVZX
+        ! Do we have to look at the aux vector?
+        new-dst HEX: 80 CMP
+        "end" get JL
+        ! Yes, this is a non-ASCII character. Load aux vector
         temp src string-aux-offset [+] MOV
-        temp \ f tag-number CMP
-        "end" get JE
         new-dst temp XCHG
+        ! Compute index
         new-dst index ADD
         new-dst index ADD
+        ! Load high 16 bits
         new-dst 2 small-reg new-dst byte-array-offset [+] MOV
         new-dst new-dst 2 small-reg MOVZX
-        new-dst 8 SHL
-        new-dst temp OR
+        new-dst 7 SHL
+        ! Compute code point
+        new-dst temp XOR
         "end" resolve-label
         dst new-dst ?MOV
+    ] with-small-register ;
+
+M:: x86 %set-string-nth-fast ( ch str index temp -- )
+    ch { index str temp } [| new-ch |
+        new-ch ch ?MOV
+        temp str index [+] LEA
+        temp string-offset [+] new-ch 1 small-reg MOV
     ] with-small-register ;
 
 :: %alien-integer-getter ( dst src size quot -- )
@@ -443,19 +461,19 @@ M:: x86 %allot ( dst size class nursery-ptr -- )
     dst class store-tagged
     nursery-ptr size inc-allot-ptr ;
 
-HOOK: %alien-global cpu ( symbol dll register -- )
-
 M:: x86 %write-barrier ( src card# table -- )
     #! Mark the card pointed to by vreg.
     ! Mark the card
     card# src MOV
     card# card-bits SHR
-    "cards_offset" f table %alien-global
+    table "cards_offset" f %alien-global
+    table table [] MOV
     table card# [+] card-mark <byte> MOV
 
     ! Mark the card deck
     card# deck-bits card-bits - SHR
-    "decks_offset" f table %alien-global
+    table "decks_offset" f %alien-global
+    table table [] MOV
     table card# [+] card-mark <byte> MOV ;
 
 M: x86 %gc ( -- )
@@ -469,6 +487,9 @@ M: x86 %gc ( -- )
     %prepare-alien-invoke
     "minor_gc" f %alien-invoke
     "end" resolve-label ;
+
+M: x86 %alien-global
+    [ 0 MOV ] 2dip rc-absolute-cell rel-dlsym ;
 
 HOOK: stack-reg cpu ( -- reg )
 
@@ -580,7 +601,8 @@ M: x86 %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    "stack_chain" f temp-reg-1 %alien-global
+    temp-reg-1 "stack_chain" f %alien-global
+    temp-reg-1 temp-reg-1 [] MOV
     temp-reg-1 [] stack-reg MOV
     temp-reg-1 [] cell SUB
     temp-reg-1 2 cells [+] ds-reg MOV

@@ -4,7 +4,7 @@ USING: kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting grouping strings
 sequences byte-arrays locals sequences.private
 io.encodings.binary symbols math.bitwise checksums
-checksums.common ;
+checksums.common checksums.stream ;
 IN: checksums.md5
 
 ! See http://www.faqs.org/rfcs/rfc1321.html
@@ -180,7 +180,7 @@ PRIVATE>
 
 SINGLETON: md5
 
-INSTANCE: md5 checksum
+INSTANCE: md5 stream-checksum
 
 M: md5 checksum-stream ( stream -- byte-array )
     drop [ initialize-md5 stream>md5 get-md5 ] with-input-stream ;

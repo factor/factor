@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays alien.c-types kernel continuations
-destructors sequences io openssl openssl.libcrypto checksums ;
+destructors sequences io openssl openssl.libcrypto checksums
+checksums.stream ;
 IN: checksums.openssl
 
 ERROR: unknown-digest name ;
@@ -12,7 +13,7 @@ TUPLE: openssl-checksum name ;
 
 : openssl-sha1 T{ openssl-checksum f "sha1" } ;
 
-INSTANCE: openssl-checksum checksum
+INSTANCE: openssl-checksum stream-checksum
 
 C: <openssl-checksum> openssl-checksum
 

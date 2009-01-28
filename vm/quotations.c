@@ -522,3 +522,26 @@ void primitive_quotation_xt(void)
 	F_QUOTATION *quot = untag_quotation(dpeek());
 	drepl(allot_cell((CELL)quot->xt));
 }
+
+void compile_all_words(void)
+{
+	CELL words = find_all_words();
+
+	REGISTER_ROOT(words);
+
+	CELL i;
+	CELL length = array_capacity(untag_object(words));
+	for(i = 0; i < length; i++)
+	{
+		F_WORD *word = untag_word(array_nth(untag_array(words),i));
+		REGISTER_UNTAGGED(word);
+		if(word->compiledp == F)
+			default_word_code(word,false);
+		UNREGISTER_UNTAGGED(word);
+		update_word_xt(word);
+	}
+
+	UNREGISTER_ROOT(words);
+
+	iterate_code_heap(relocate_code_block);
+}

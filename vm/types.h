@@ -116,17 +116,19 @@ void primitive_tuple(void);
 void primitive_tuple_boa(void);
 void primitive_tuple_layout(void);
 void primitive_byte_array(void);
+void primitive_uninitialized_byte_array(void);
 void primitive_clone(void);
 
-F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill);
+F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity);
 F_BYTE_ARRAY *reallot_byte_array(F_BYTE_ARRAY *array, CELL capacity);
 void primitive_resize_array(void);
 void primitive_resize_byte_array(void);
 
 F_STRING* allot_string_internal(CELL capacity);
 F_STRING* allot_string(CELL capacity, CELL fill);
+void primitive_uninitialized_string(void);
 void primitive_string(void);
-F_STRING *reallot_string(F_STRING *string, CELL capacity, CELL fill);
+F_STRING *reallot_string(F_STRING *string, CELL capacity);
 void primitive_resize_string(void);
 
 F_STRING *memory_to_char_string(const char *string, CELL length);
@@ -152,7 +154,8 @@ CELL string_nth(F_STRING* string, CELL index);
 void set_string_nth(F_STRING* string, CELL index, CELL value);
 
 void primitive_string_nth(void);
-void primitive_set_string_nth(void);
+void primitive_set_string_nth_slow(void);
+void primitive_set_string_nth_fast(void);
 
 F_WORD *allot_word(CELL vocab, CELL name);
 void primitive_word(void);
@@ -176,7 +179,7 @@ F_ARRAY *growable_array_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_coun
 	result = tag_object(growable_array_append(untag_object(result),elts,&result##_count))
 
 #define GROWABLE_ARRAY_TRIM(result) \
-	result = tag_object(reallot_array(untag_object(result),result##_count,F))
+	result = tag_object(reallot_array(untag_object(result),result##_count))
 
 /* Macros to simulate a byte vector in C */
 #define GROWABLE_BYTE_ARRAY(result) \

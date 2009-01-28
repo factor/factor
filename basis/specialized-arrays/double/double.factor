@@ -9,6 +9,8 @@ USING: hints math.vectors arrays kernel math accessors sequences ;
 
 HINTS: <double-array> { 2 } { 3 } ;
 
+HINTS: (double-array) { 2 } { 3 } ;
+
 HINTS: vneg { array } { double-array } ;
 HINTS: v*n { array object } { double-array float } ;
 HINTS: n*v { array object } { float double-array } ;

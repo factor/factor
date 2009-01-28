@@ -61,13 +61,13 @@ HELP: fread ( n alien -- str/f )
 { $errors "Throws an error if the input operation failed." } ;
 
 HELP: stdin-handle
-{ $values { "in" "a C FILE* handle" } }
+{ $values { "alien" "a C FILE* handle" } }
 { $description "Outputs the console standard input file handle." } ;
 
 HELP: stdout-handle
-{ $values { "out" "a C FILE* handle" } }
+{ $values { "alien" "a C FILE* handle" } }
 { $description "Outputs the console standard output file handle." } ;
 
 HELP: stderr-handle
-{ $values { "out" "a C FILE* handle" } }
+{ $values { "alien" "a C FILE* handle" } }
 { $description "Outputs the console standard error file handle." } ;

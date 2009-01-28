@@ -31,7 +31,7 @@ M: object handle-message drop ;
         "git-log" ,
         "--no-merges" ,
         "--pretty=format:%h %an: %s" ,
-        ".." swap 3append ,
+        ".." glue ,
     ] { } make
     latin1 [ input-stream get lines ] with-process-reader ;
 

@@ -1,4 +1,4 @@
-USING: tools.test tools.annotations math parser eval
+USING: tools.test tools.annotations tools.time math parser eval
 io.streams.string kernel ;
 IN: tools.annotations.tests
 

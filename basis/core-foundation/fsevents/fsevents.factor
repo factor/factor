@@ -2,11 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax kernel
 math sequences namespaces make assocs init accessors
-continuations combinators core-foundation
-core-foundation.run-loop core-foundation.run-loop.thread
-io.encodings.utf8 destructors locals arrays
-specialized-arrays.direct.alien specialized-arrays.direct.int
-specialized-arrays.direct.longlong ;
+continuations combinators io.encodings.utf8 destructors locals
+arrays specialized-arrays.direct.alien
+specialized-arrays.direct.int specialized-arrays.direct.longlong
+core-foundation core-foundation.run-loop core-foundation.strings ;
 IN: core-foundation.fsevents
 
 : kFSEventStreamCreateFlagUseCFTypes 2 ; inline
@@ -118,7 +117,7 @@ FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef 
     FSEventStreamCreate ;
 
 : kCFRunLoopCommonModes ( -- string )
-    "kCFRunLoopCommonModes" f dlsym *void* ;
+    &: kCFRunLoopCommonModes *void* ;
 
 : schedule-event-stream ( event-stream -- )
     CFRunLoopGetMain

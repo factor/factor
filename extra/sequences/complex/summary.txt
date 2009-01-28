@@ -1,0 +1,1 @@
+Virtual sequence wrapper to convert real pairs into complex values

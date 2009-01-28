@@ -39,6 +39,7 @@ IN: compiler.cfg.hats
 : ^^shr-imm ( src1 src2 -- dst ) ^^i2 ##shr-imm ; inline
 : ^^sar-imm ( src1 src2 -- dst ) ^^i2 ##sar-imm ; inline
 : ^^not ( src -- dst ) ^^i1 ##not ; inline
+: ^^log2 ( src -- dst ) ^^i1 ##log2 ; inline
 : ^^bignum>integer ( src -- dst ) ^^i1 i ##bignum>integer ; inline
 : ^^integer>bignum ( src -- dst ) ^^i1 i ##integer>bignum ; inline
 : ^^add-float ( src1 src2 -- dst ) ^^d2 ##add-float ; inline
@@ -65,6 +66,7 @@ IN: compiler.cfg.hats
 : ^^alien-cell ( src -- dst ) ^^i1 ##alien-cell ; inline
 : ^^alien-float ( src -- dst ) ^^d1 ##alien-float ; inline
 : ^^alien-double ( src -- dst ) ^^d1 ##alien-double ; inline
+: ^^alien-global ( symbol library -- dst ) ^^i2 ##alien-global ; inline
 : ^^compare ( src1 src2 cc -- dst ) ^^i3 i ##compare ; inline
 : ^^compare-imm ( src1 src2 cc -- dst ) ^^i3 i ##compare-imm ; inline
 : ^^compare-float ( src1 src2 cc -- dst ) ^^i3 i ##compare-float ; inline

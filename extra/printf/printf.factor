@@ -28,7 +28,7 @@ IN: printf
     [ 0 ] [ string>number ] if-empty ;
 
 : pad-digits ( string digits -- string' )
-    [ "." split1 ] dip [ CHAR: 0 pad-right ] [ head-slice ] bi "." swap 3append ;
+    [ "." split1 ] dip [ CHAR: 0 pad-right ] [ head-slice ] bi "." glue ;
 
 : max-digits ( n digits -- n' )
     10 swap ^ [ * round ] keep / ;

@@ -603,15 +603,15 @@ HELP: 3dip
 
 HELP: while
 { $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } { "tail" "a quotation" } }
-{ $description "Repeatedly calls " { $snippet "pred" } ". If it yields " { $link f } ", iteration stops, otherwise " { $snippet "body" } " is called. After iteration stops, " { $snippet "tail" } " is called." }
-{ $notes "In most cases, tail recursion should be used, because it is simpler both in terms of implementation and conceptually. However in some cases this combinator expresses intent better and should be used."
-$nl
-"Strictly speaking, the " { $snippet "tail" } " is not necessary, since the following are equivalent:"
-{ $code
-    "[ P ] [ Q ] [ T ] while"
-    "[ P ] [ Q ] [ ] while T"
-}
-"However, depending on the stack effects of " { $snippet "pred" } " and " { $snippet "quot" } ", the " { $snippet "tail" } " quotation might need to be non-empty in order to balance out the stack effect of branches for stack effect inference." } ;
+{ $description "Calls " { $snippet "body" } " until " { $snippet "pred" } " returns " { $link f } "." } ;
+
+HELP: until
+{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } { "tail" "a quotation" } }
+{ $description "Calls " { $snippet "body" } " until " { $snippet "pred" } " returns " { $link t } "." } ;
+
+HELP: do
+{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } { "tail" "a quotation" } }
+{ $description "Executes one iteration of a " { $link while } " or " { $link until } " loop." } ;
 
 HELP: loop
 { $values
@@ -626,6 +626,26 @@ HELP: loop
     "3 [ dup . 7 + 11 mod dup 3 = not ] loop"
     "3\n10\n6\n2\n9\n5\n1\n8\n4\n0\n7" }
 } ;
+
+ARTICLE: "looping-combinators" "Looping combinators"
+"In most cases, loops should be written using high-level combinators (such as " { $link "sequences-combinators" } ") or tail recursion. However, sometimes, the best way to express intent is with a loop."
+{ $subsection while }
+{ $subsection until }
+"The above two combinators take a " { $snippet "tail" } " quotation. Strictly speaking, the " { $snippet "tail" } " is not necessary, since the following are equivalent:"
+{ $code
+    "[ P ] [ Q ] [ T ] while"
+    "[ P ] [ Q ] [ ] while T"
+}
+"However, depending on the stack effects of " { $snippet "pred" } " and " { $snippet "quot" } ", the " { $snippet "tail" } " quotation might need to be non-empty in order to balance out the stack effect of branches for stack effect inference."
+$nl
+"To execute one iteration of a loop, use the following word:"
+{ $subsection do }
+"This word is intended as a modifier. The normal " { $link while } " loop never executes the body if the predicate returns first on the first iteration. To ensure the body executes at least once, use " { $link do } ":"
+{ $code
+    "[ P ] [ Q ] [ T ] do while"
+}
+"A simpler looping combinator which executes a single quotation until it returns " { $link f } ":"
+{ $subsection loop } ;
 
 HELP: assert
 { $values { "got" "the obtained value" } { "expect" "the expected value" } }
@@ -758,12 +778,10 @@ $nl
 "Technically, the spread combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on three related values can be written in one of two ways:"
 { $code
     "! First alternative; uses dip"
-    "[ [ 1 + ] dip 1 - dip ] 2 *"
+    "[ [ 1 + ] dip 1 - ] dip 2 *"
     "! Second alternative: uses tri*"
     "[ 1 + ] [ 1 - ] [ 2 * ] tri*"
 }
-
-$nl
 "A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
 { $subsection "spread-shuffle-equivalence" } ;
 
@@ -889,6 +907,11 @@ $nl
 "An object can be cloned; the clone has distinct identity but equal value:"
 { $subsection clone } ;
 
+ARTICLE: "assertions" "Assertions"
+"Some words to make assertions easier to enforce:"
+{ $subsection assert }
+{ $subsection assert= } ;
+
 ARTICLE: "dataflow" "Data and control flow"
 { $subsection "evaluator" }
 { $subsection "words" }
@@ -896,14 +919,22 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "booleans" }
 { $subsection "shuffle-words" }
 "A central concept in Factor is that of a " { $emphasis "combinator" } ", which is a word taking code as input."
+$nl
+"Data flow combinators:"
 { $subsection "slip-keep-combinators" }
 { $subsection "cleave-combinators" }
 { $subsection "spread-combinators" }
 { $subsection "apply-combinators" }
+"Control flow combinators:"
 { $subsection "conditionals" }
+{ $subsection "looping-combinators" }
+"Additional combinators:"
 { $subsection "compositional-combinators" }
 { $subsection "combinators" }
+"More combinators are defined for working on data structures, such as " { $link "sequences-combinators" } " and " { $link "assocs-combinators" } "."
+$nl
 "Advanced topics:"
+{ $subsection "assertions" }
 { $subsection "implementing-combinators" }
 { $subsection "errors" }
 { $subsection "continuations" } ;

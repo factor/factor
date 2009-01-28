@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs accessors kernel combinators
-classes.algebra sequences sequences.deep slots.private
+classes.algebra sequences slots.private fry vectors
 classes.tuple.private math math.private arrays
 stack-checker.branches
+compiler.utilities
 compiler.tree
 compiler.tree.combinators
 compiler.tree.propagation.info
@@ -21,7 +22,7 @@ GENERIC: unbox-tuples* ( node -- node/nodes )
 : (expand-#push) ( object value -- nodes )
     dup unboxed-allocation dup [
         [ object-slots ] [ drop ] [ ] tri*
-        [ (expand-#push) ] 2map
+        [ (expand-#push) ] 2map-flat
     ] [
         drop #push
     ] if ;
@@ -38,11 +39,16 @@ M: #push unbox-tuples* ( #push -- nodes )
 : unbox-<complex> ( #call -- nodes )
     dup unbox-output? [ drop { } ] when ;
 
-: (flatten-values) ( values -- values' )
-    [ dup unboxed-allocation [ (flatten-values) ] [ ] ?if ] map ;
+: (flatten-values) ( values accum -- )
+    dup '[
+        dup unboxed-allocation
+        [ _ (flatten-values) ] [ _ push ] ?if
+    ] each ;
 
 : flatten-values ( values -- values' )
-    dup empty? [ (flatten-values) flatten ] unless ;
+    dup empty? [
+        10 <vector> [ (flatten-values) ] keep
+    ] unless ;
 
 : prepare-slot-access ( #call -- tuple-values outputs slot-values )
     [ in-d>> flatten-values ]

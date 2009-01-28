@@ -54,15 +54,19 @@ IN: compiler.cfg.intrinsics.allot
 
 : bytes>cells ( m -- n ) cell align cell /i ;
 
-:: emit-<byte-array> ( node -- )
-    [let | len [ node node-input-infos first literal>> ] |
-        len expand-<byte-array>? [
-            [let | elt [ 0 ^^load-literal ]
-                   reg [ len ^^allot-byte-array ] |
-                ds-drop
-                len reg store-length
-                elt reg len bytes>cells store-initial-element
-                reg ds-push
-            ]
-        ] [ node emit-primitive ] if
-    ] ;
+: emit-allot-byte-array ( len -- dst )
+    ds-drop
+    dup ^^allot-byte-array
+    [ store-length ] [ ds-push ] [ ] tri ;
+
+: emit-(byte-array) ( node -- )
+    dup node-input-infos first literal>> dup expand-<byte-array>?
+    [ nip emit-allot-byte-array drop ] [ drop emit-primitive ] if ;
+
+: emit-<byte-array> ( node -- )
+    dup node-input-infos first literal>> dup expand-<byte-array>? [
+        nip
+        [ 0 ^^load-literal ] dip
+        [ emit-allot-byte-array ] keep
+        bytes>cells store-initial-element
+    ] [ drop emit-primitive ] if ;

@@ -31,10 +31,6 @@ HELP: string>symbol
 $nl
 "On Windows CE, symbols are represented as UCS2 strings, and on all other platforms they are ASCII strings." } ;
 
-HELP: utf16n
-{ $class-description "The encoding descriptor for UTF-16 without a byte order mark in native endian order. This is useful mostly for FFI calls which take input of strings of the type wchar_t*" }
-{ $see-also "encodings-introduction" } ;
-
 ARTICLE: "c-strings" "C strings"
 "C string types are arrays with shape " { $snippet "{ \"char*\" encoding }" } ", where " { $snippet "encoding" } " is an encoding descriptor. The type " { $snippet "\"char*\"" } " is an alias for " { $snippet "{ \"char*\" utf8 }" } ". See " { $link "encodings-descriptors" } " for information about encoding descriptors."
 $nl

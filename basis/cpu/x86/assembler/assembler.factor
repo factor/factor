@@ -346,7 +346,7 @@ M: label JUMPcc (JUMPcc) label-fixup ;
 : LEAVE ( -- ) HEX: c9 , ;
 
 : RET ( n -- )
-    dup zero? [ drop HEX: c3 , ] [ HEX: C2 , 2, ] if ;
+    dup zero? [ drop HEX: c3 , ] [ HEX: c2 , 2, ] if ;
 
 ! Arithmetic
 
@@ -383,6 +383,8 @@ M: immediate CMP swap { BIN: 111 t HEX: 80 } immediate-1/4 ;
 M: operand CMP OCT: 070 2-operand ;
 
 : XCHG ( dst src -- ) OCT: 207 2-operand ;
+
+: BSR ( dst src -- ) swap { HEX: 0f HEX: bd } (2-operand) ;
 
 : NOT  ( dst -- ) { BIN: 010 t HEX: f7 } 1-operand ;
 : NEG  ( dst -- ) { BIN: 011 t HEX: f7 } 1-operand ;

@@ -88,7 +88,7 @@ HELP: blas-matrix-base
 }
 "All of these subclasses share the same tuple layout:"
 { $list
-    { { $snippet "data" } " contains an alien pointer referencing or byte-array containing a packed, column-major array of float, double, float complex, or double complex values;" }
+    { { $snippet "underlying" } " contains an alien pointer referencing or byte-array containing a packed, column-major array of float, double, float complex, or double complex values;" }
     { { $snippet "ld" } " indicates the distance, in elements, between matrix columns;" }
     { { $snippet "rows" } " and " { $snippet "cols" } " indicate the number of significant rows and columns in the matrix;" }
     { "and " { $snippet "transpose" } ", if set to a true value, indicates that the matrix should be treated as transposed relative to its in-memory representation." }

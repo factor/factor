@@ -82,7 +82,6 @@ t display-stacks? set-global
 : stacks. ( -- )
     display-stacks? get [
         datastack [ nl "--- Data stack:" title. stack. ] unless-empty
-        retainstack [ nl "--- Retain stack:" title. stack. ] unless-empty
     ] when ;
 
 : prompt. ( -- )

@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io.backend io.monitors io.monitors.recursive
 io.files io.buffers io.monitors io.ports io.timeouts
-io.unix.backend io.unix.select io.encodings.utf8
-unix.linux.inotify assocs namespaces make threads continuations
-init math math.bitwise sets alien alien.strings alien.c-types
-vocabs.loader accessors system hashtables destructors unix ;
+io.unix.backend io.encodings.utf8 unix.linux.inotify assocs
+namespaces make threads continuations init math math.bitwise
+sets alien alien.strings alien.c-types vocabs.loader accessors
+system hashtables destructors unix ;
 IN: io.unix.linux.monitors
 
 SYMBOL: watches

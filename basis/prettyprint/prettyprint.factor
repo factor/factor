@@ -2,12 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic generic.standard assocs io kernel math
 namespaces make sequences strings io.styles io.streams.string
-vectors words prettyprint.backend prettyprint.sections
-prettyprint.config sorting splitting grouping math.parser vocabs
-definitions effects classes.builtin classes.tuple io.files
-classes continuations hashtables classes.mixin classes.union
-classes.intersection classes.predicate classes.singleton
-combinators quotations sets accessors colors parser ;
+vectors words prettyprint.backend prettyprint.custom
+prettyprint.sections prettyprint.config sorting splitting
+grouping math.parser vocabs definitions effects classes.builtin
+classes.tuple io.files classes continuations hashtables
+classes.mixin classes.union classes.intersection
+classes.predicate classes.singleton combinators quotations sets
+accessors colors parser summary ;
 IN: prettyprint
 
 : make-pprint ( obj quot -- block in use )
@@ -129,7 +130,7 @@ SYMBOL: ->
 : remove-breakpoints ( quot pos -- quot' )
     over quotation? [
         1+ cut [ (remove-breakpoints) ] bi@
-        [ -> ] swap 3append
+        [ -> ] glue 
     ] [
         drop
     ] if ;
@@ -230,6 +231,8 @@ M: pathname synopsis* pprint* ;
         1 line-limit set
         [ synopsis* ] with-in
     ] with-string-writer ;
+
+M: word summary synopsis ;
 
 : synopsis-alist ( definitions -- alist )
     [ dup synopsis swap ] { } map>assoc ;

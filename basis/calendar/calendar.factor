@@ -89,13 +89,6 @@ PRIVATE>
 : minutes-per-year ( -- ratio ) 5259492/10 ; inline
 : seconds-per-year ( -- integer ) 31556952 ; inline
 
-: monthly ( x -- y ) 12 / ; inline
-: semimonthly ( x -- y ) 24 / ; inline
-: biweekly ( x -- y ) 26 / ; inline
-: weekly ( x -- y ) 52 / ; inline
-: daily-360 ( x -- y ) 360 / ; inline
-: daily-365 ( x -- y ) 365 / ; inline
-
 :: julian-day-number ( year month day -- n )
     #! Returns a composite date number
     #! Not valid before year -4800

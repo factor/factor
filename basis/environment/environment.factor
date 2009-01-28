@@ -18,7 +18,7 @@ HOOK: (set-os-envs) os ( seq -- )
     (os-envs) [ "=" split1 ] H{ } map>assoc ;
 
 : set-os-envs ( assoc -- )
-    [ "=" swap 3append ] { } assoc>map (set-os-envs) ;
+    [ "=" glue ] { } assoc>map (set-os-envs) ;
 
 {
     { [ os unix? ] [ "environment.unix" require ] }

@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces math system sequences debugger
+USING: kernel namespaces math system sequences
 continuations arrays assocs combinators alien.c-types strings
 threads accessors environment
 io io.backend io.launcher io.ports io.files
@@ -16,7 +16,7 @@ USE: unix
     command>> dup string? [ tokenize-command ] when ;
 
 : assoc>env ( assoc -- env )
-    [ "=" swap 3append ] { } assoc>map ;
+    [ "=" glue ] { } assoc>map ;
 
 : setup-priority ( process -- process )
     dup priority>> [
@@ -36,9 +36,6 @@ USE: unix
 : redirect-fd ( oldfd fd -- )
     2dup = [ 2drop ] [ dup2 io-error ] if ;
 
-: redirect-inherit ( obj mode fd -- )
-    3drop ;
-
 : redirect-file ( obj mode fd -- )
     [ [ normalize-path ] dip file-mode open-file ] dip redirect-fd ;
 
@@ -50,7 +47,7 @@ USE: unix
 
 : redirect ( obj mode fd -- )
     {
-        { [ pick not ] [ redirect-inherit ] }
+        { [ pick not ] [ 3drop ] }
         { [ pick string? ] [ redirect-file ] }
         { [ pick appender? ] [ redirect-file-append ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
@@ -95,14 +92,16 @@ M: unix kill-process* ( pid -- )
     processes get swap [ nip swap handle>> = ] curry
     assoc-find 2drop ;
 
+TUPLE: signal n ;
+
+: code>status ( code -- obj )
+    dup WIFEXITED [ WEXITSTATUS ] [ WTERMSIG signal boa ] if ;
+
 M: unix wait-for-processes ( -- ? )
     -1 0 <int> tuck WNOHANG waitpid
     dup 0 <= [
         2drop t
     ] [
-        find-process dup [
-            swap *int WEXITSTATUS notify-exit f
-        ] [
-            2drop f
-        ] if
+        find-process dup
+        [ swap *int code>status notify-exit f ] [ 2drop f ] if
     ] if ;

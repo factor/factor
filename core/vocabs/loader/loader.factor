@@ -65,6 +65,7 @@ ERROR: circular-dependency name ;
     [
         +parsing+ >>source-loaded?
         dup vocab-source-path [ parse-file ] [ [ ] ] if*
+        [ +parsing+ >>source-loaded? ] dip
         [ % ] [ assert-depth ] if-bootstrapping
         +done+ >>source-loaded? drop
     ] [ ] [ f >>source-loaded? ] cleanup ;

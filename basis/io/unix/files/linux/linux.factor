@@ -3,7 +3,8 @@
 USING: accessors alien.c-types alien.syntax combinators csv
 io.backend io.encodings.utf8 io.files io.streams.string
 io.unix.files kernel math.order namespaces sequences sorting
-system unix unix.statfs.linux unix.statvfs.linux ;
+system unix unix.statfs.linux unix.statvfs.linux
+specialized-arrays.direct.uint arrays ;
 IN: io.unix.files.linux
 
 TUPLE: linux-file-system-info < unix-file-system-info
@@ -23,7 +24,7 @@ M: linux statfs>file-system-info ( struct -- statfs )
         [ statfs64-f_bavail >>blocks-available ]
         [ statfs64-f_files >>files ]
         [ statfs64-f_ffree >>files-free ]
-        [ statfs64-f_fsid >>id ]
+        [ statfs64-f_fsid 2 <direct-uint-array> >array >>id ]
         [ statfs64-f_namelen >>namelen ]
         [ statfs64-f_frsize >>preferred-block-size ]
         ! [ statfs64-f_spare >>spare ]

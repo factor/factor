@@ -25,11 +25,6 @@ H{ } clone \ pool [
     global [
         "stop-after-last-window?" "ui" lookup set
 
-        "ui.cocoa" vocab [
-            [ "MiniFactor.nib" load-nib ]
-            "cocoa-init-hook" "ui.cocoa" lookup set-global
-        ] when
-
         ! Only keeps those methods that we actually call
         sent-messages get super-sent-messages get assoc-union
         objc-methods [ assoc-intersect pool-values ] change

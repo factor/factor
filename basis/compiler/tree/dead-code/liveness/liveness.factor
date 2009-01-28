@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors namespaces assocs deques search-deques
-dlists kernel sequences sequences.deep words sets
+dlists kernel sequences compiler.utilities words sets
 stack-checker.branches compiler.tree compiler.tree.def-use
 compiler.tree.combinators ;
 IN: compiler.tree.dead-code.liveness
@@ -49,4 +49,4 @@ GENERIC: remove-dead-code* ( node -- node' )
 M: node remove-dead-code* ;
 
 : (remove-dead-code) ( nodes -- nodes' )
-    [ remove-dead-code* ] map flatten ;
+    [ remove-dead-code* ] map-flat ;

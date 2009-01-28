@@ -1,5 +1,6 @@
 USING: compiler.cfg.write-barrier compiler.cfg.instructions
-compiler.cfg.registers cpu.architecture arrays tools.test ;
+compiler.cfg.registers compiler.cfg.debugger cpu.architecture
+arrays tools.test ;
 IN: compiler.cfg.write-barrier.tests
 
 [

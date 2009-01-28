@@ -1,10 +1,10 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces make
-prettyprint dlists deques sequences threads sequences words
-debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
-ui.gestures ui.backend ui.render continuations init combinators
-hashtables concurrency.flags sets accessors calendar ;
+dlists deques sequences threads sequences words ui.gadgets
+ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend
+ui.render continuations init combinators hashtables
+concurrency.flags sets accessors calendar ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -60,23 +60,26 @@ SYMBOL: stop-after-last-window?
     focus-path f swap focus-gestures ;
 
 M: world graft*
-    dup (open-window)
-    dup title>> over set-title
-    request-focus ;
+    [ (open-window) ]
+    [ [ title>> ] keep set-title ]
+    [ request-focus ] tri ;
 
 : reset-world ( world -- )
     #! This is used when a window is being closed, but also
     #! when restoring saved worlds on image startup.
-    dup fonts>> clear-assoc
-    dup unfocus-world
-    f >>handle drop ;
+    [ fonts>> clear-assoc ]
+    [ unfocus-world ]
+    [ f >>handle drop ] tri ;
+
+: (ungraft-world) ( world -- )
+    [ free-fonts ]
+    [ hand-clicked close-global ]
+    [ hand-gadget close-global ] tri ;
 
 M: world ungraft*
-    dup free-fonts
-    dup hand-clicked close-global
-    dup hand-gadget close-global
-    dup handle>> (close-window)
-    reset-world ;
+    [ (ungraft-world) ]
+    [ handle>> (close-window) ]
+    [ reset-world ] tri ;
 
 : find-window ( quot -- world )
     windows get values
@@ -140,7 +143,7 @@ SYMBOL: ui-hook
     graft-queue [ notify ] slurp-deque ;
 
 : send-queued-gestures ( -- )
-    gesture-queue [ send-queued-gesture ] slurp-deque ;
+    gesture-queue [ send-queued-gesture notify-queued ] slurp-deque ;
 
 : update-ui ( -- )
     [

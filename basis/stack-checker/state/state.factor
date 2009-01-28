@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs arrays namespaces sequences kernel definitions
 math effects accessors words fry classes.algebra
-compiler.units ;
+compiler.units stack-checker.values stack-checker.visitor ;
 IN: stack-checker.state
 
 ! Did the current control-flow path throw an error?
@@ -11,23 +11,40 @@ SYMBOL: terminated?
 ! Number of inputs current word expects from the stack
 SYMBOL: d-in
 
+DEFER: commit-literals
+
 ! Compile-time data stack
-SYMBOL: meta-d
+: meta-d ( -- stack ) commit-literals \ meta-d get ;
 
 ! Compile-time retain stack
-SYMBOL: meta-r
+: meta-r ( -- stack ) \ meta-r get ;
 
-: current-stack-height ( -- n ) meta-d get length d-in get - ;
+! Uncommitted literals. This is a form of local dead-code
+! elimination; the goal is to reduce the number of IR nodes
+! which get constructed. Technically it is redundant since
+! we do global DCE later, but it speeds up compile time.
+SYMBOL: literals
+
+: (push-literal) ( obj -- )
+    dup <literal> make-known
+    [ nip \ meta-d get push ] [ #push, ] 2bi ;
+
+: commit-literals ( -- )
+    literals get [
+        [ [ (push-literal) ] each ] [ delete-all ] bi
+    ] unless-empty ;
+
+: current-stack-height ( -- n ) meta-d length d-in get - ;
 
 : current-effect ( -- effect )
     d-in get
-    meta-d get length <effect>
+    meta-d length <effect>
     terminated? get >>terminated? ;
 
 : init-inference ( -- )
     terminated? off
-    V{ } clone meta-d set
-    V{ } clone meta-r set
+    V{ } clone \ meta-d set
+    V{ } clone literals set
     0 d-in set ;
 
 ! Words that the current quotation depends on

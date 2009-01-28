@@ -11,46 +11,40 @@ IN: random.mersenne-twister
 
 TUPLE: mersenne-twister { seq uint-array } { i fixnum } ;
 
-: mt-n 624 ; inline
-: mt-m 397 ; inline
-: mt-a HEX: 9908b0df ; inline
+: n 624 ; inline
+: m 397 ; inline
+: a uint-array{ 0 HEX: 9908b0df } ; inline
 
-: wrap-nth ( n seq -- obj )
-    [ length mod ] keep nth-unsafe ; inline
+: y ( n seq -- y )
+    [ nth-unsafe 31 mask-bit ]
+    [ [ 1+ ] [ nth-unsafe ] bi* 31 bits ] 2bi bitor ; inline
 
-: set-wrap-nth ( obj n seq -- )
-    [ length mod ] keep set-nth-unsafe ; inline
-
-: calculate-y ( n seq -- y )
-    [ wrap-nth 31 mask-bit ]
-    [ [ 1+ ] [ wrap-nth ] bi* 31 bits ] 2bi bitor ; inline
-
-: (mt-generate) ( n seq -- next-mt )
+: mt[k] ( offset n seq -- )
     [
-        calculate-y
-        [ 2/ ] [ odd? mt-a 0 ? ] bi bitxor
-    ] [
-        [ mt-m + ] [ wrap-nth ] bi*
-    ] 2bi bitxor ; inline
+        [ [ + ] dip nth-unsafe ]
+        [ y [ 2/ ] [ 1 bitand a nth ] bi bitxor ] 2bi
+        bitxor
+    ] 2keep set-nth-unsafe ; inline
 
 : mt-generate ( mt -- )
     [
-        mt-n swap seq>> '[
-            _ [ (mt-generate) ] [ set-wrap-nth ] 2bi
-        ] each
+        seq>>
+        [ [ n m - ] dip '[ [ m ] dip _ mt[k] ] each ]
+        [ [ m 1- ] dip '[ [ m n - ] [ n m - + ] bi* _ mt[k] ] each ]
+        bi
     ] [ 0 >>i drop ] bi ; inline
 
 : init-mt-formula ( i seq -- f(seq[i]) )
-    dupd wrap-nth dup -30 shift bitxor 1812433253 * + 1+ 32 bits ; inline
+    dupd nth dup -30 shift bitxor 1812433253 * + 1+ 32 bits ; inline
 
 : init-mt-rest ( seq -- )
-    mt-n 1- swap '[
-        _ [ init-mt-formula ] [ [ 1+ ] dip set-wrap-nth ] 2bi
+    n 1- swap '[
+        _ [ init-mt-formula ] [ [ 1+ ] dip set-nth ] 2bi
     ] each ; inline
 
 : init-mt-seq ( seed -- seq )
-    32 bits mt-n <uint-array>
-    [ set-first ] [ init-mt-rest ] [ ] tri ;
+    32 bits n <uint-array>
+    [ set-first ] [ init-mt-rest ] [ ] tri ; inline
 
 : mt-temper ( y -- yt )
     dup -11 shift bitxor
@@ -59,7 +53,7 @@ TUPLE: mersenne-twister { seq uint-array } { i fixnum } ;
     dup -18 shift bitxor ; inline
 
 : next-index  ( mt -- i )
-    dup i>> dup mt-n < [ nip ] [ drop mt-generate 0 ] if ; inline
+    dup i>> dup n < [ nip ] [ drop mt-generate 0 ] if ; inline
 
 PRIVATE>
 
@@ -72,7 +66,7 @@ M: mersenne-twister seed-random ( mt seed -- )
 
 M: mersenne-twister random-32* ( mt -- r )
     [ next-index ]
-    [ seq>> wrap-nth mt-temper ]
+    [ seq>> nth-unsafe mt-temper ]
     [ [ 1+ ] change-i drop ] tri ;
 
 USE: init

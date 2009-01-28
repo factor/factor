@@ -230,7 +230,7 @@ M: revision feed-entry-url id>> revision-url ;
         [ list-revisions ] >>entries ;
 
 : rollback-description ( description -- description' )
-    [ "Rollback of '" swap "'" 3append ] [ "Rollback" ] if* ;
+    [ "Rollback of '" "'" surround ] [ "Rollback" ] if* ;
 
 : <rollback-action> ( -- action )
     <action>

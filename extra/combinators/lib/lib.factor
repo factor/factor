@@ -116,17 +116,8 @@ MACRO: construct-slots ( assoc tuple-class -- tuple )
         [ dip ] curry swap 1quotation [ keep ] curry compose
     ] { } assoc>map concat compose ;
 
-: either ( object first second -- ? )
-    >r keep swap [ r> drop ] [ r> call ] ?if ; inline
-
 : 2quot-with ( obj seq quot1 quot2 -- seq quot1 quot2 )
     >r pick >r with r> r> swapd with ;
-
-: or? ( obj quot1 quot2 -- ? )
-    [ keep ] dip rot [ 2nip ] [ call ] if* ; inline
-
-: and? ( obj quot1 quot2 -- ? )
-    [ keep ] dip rot [ call ] [ 2drop f ] if ; inline
 
 MACRO: multikeep ( word out-indexes -- ... )
     [
@@ -134,9 +125,6 @@ MACRO: multikeep ( word out-indexes -- ... )
         %
         r> [ drop \ r> , ] each
     ] [ ] make ;
-
-: retry ( quot n -- )
-    [ drop ] rot compose attempt-all ; inline
 
 : do-while ( pred body tail -- )
     [ tuck 2slip ] dip while ; inline

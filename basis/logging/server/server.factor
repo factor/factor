@@ -26,7 +26,7 @@ SYMBOL: log-files
 : log-stream ( service -- stream )
     log-files get [ open-log-stream ] cache ;
 
-: multiline-header 20 CHAR: - <string> ; foldable
+: multiline-header ( -- string ) 20 CHAR: - <string> ; foldable
 
 : (write-message) ( msg name>> level multi? -- )
     [

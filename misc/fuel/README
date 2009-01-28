@@ -1,0 +1,82 @@
+FUEL, Factor's Ultimate Emacs Library
+-------------------------------------
+
+FUEL provides a complete environment for your Factor coding pleasure
+inside Emacs, including source code edition and interaction with a
+Factor listener instance running within Emacs.
+
+FUEL was started by Jose A Ortega as an extension to Ed Cavazos'
+original factor.el code.
+
+Installation
+------------
+
+FUEL comes bundled with Factor's distribution. The folder misc/fuel
+contains Elisp code, and there's a fuel vocabulary in extras/fuel.
+
+To install FUEL, either add this line to your Emacs initialisation:
+
+  (load-file "<path/to/factor/installation>/misc/fuel/fu.el")
+
+or
+
+  (add-to-list load-path "<path/to/factor/installation>/fuel")
+  (require 'fuel)
+
+If all you want is a major mode for editing Factor code with pretty
+font colors and indentation, without running the factor listener
+inside Emacs, you can use instead:
+
+  (add-to-list load-path "<path/to/factor/installation>/fuel")
+  (setq factor-mode-use-fuel nil)
+  (require 'factor-mode)
+
+Basic usage
+-----------
+
+If you're using the default factor binary and images locations inside
+the Factor's source tree, that should be enough to start using FUEL.
+Editing any file with the extension .factor will put you in
+factor-mode; try C-hm for a summary of available commands.
+
+To start the listener, try M-x run-factor.
+
+Many aspects of the environment can be customized:
+M-x customize-group fuel will show you how many.
+
+Quick key reference
+-------------------
+
+(Chords ending in a single letter <x> accept also C-<x> (e.g. C-cC-z is
+the same as C-cz)).
+
+* In factor source files:
+
+ - C-cz : switch to listener
+ - C-co : cycle between code, tests and docs factor files
+
+ - M-. : edit word at point in Emacs (also in listener)
+
+ - C-cr, C-cC-er : eval region
+ - C-M-r, C-cC-ee : eval region, extending it to definition boundaries
+ - C-M-x, C-cC-ex : eval definition around point
+ - C-ck, C-cC-ek : compile file
+
+ - C-cC-da : toggle autodoc mode
+ - C-cC-dd : help for word at point
+ - C-cC-ds : short help word at point
+
+* In the debugger (it pops up upon eval/compilation errors):
+
+ - g : go to error
+ - <digit> : invoke nth restart
+ - w/e/l : invoke :warnings, :errors, :linkage
+ - q : bury buffer
+
+* In the Help browser:
+
+ - RET : help for word at point
+ - f/b : next/previous page
+ - SPC/S-SPC : scroll up/down
+ - q: bury buffer
+

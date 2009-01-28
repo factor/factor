@@ -86,7 +86,7 @@ HELP: test-all
 { $description "Runs unit tests for all loaded vocabularies." } ;
 
 HELP: run-all-tests
-{ $values { "prefix" "a vocabulary name" } { "failures" "an association list of unit test failures" } }
+{ $values { "failures" "an association list of unit test failures" } }
 { $description "Runs unit tests for all loaded vocabularies and outputs unit test failures as documented in " { $link "tools.test.failure" } "." } ;
 
 HELP: test-failures.

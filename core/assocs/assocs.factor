@@ -90,7 +90,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     ] if ; inline recursive
 
 : assoc-stack ( key seq -- value )
-    dup length 1- swap (assoc-stack) ;
+    dup length 1- swap (assoc-stack) ; flushable
 
 : assoc-subset? ( assoc1 assoc2 -- ? )
     [ swapd at* [ = ] [ 2drop f ] if ] curry assoc-all? ;
@@ -141,8 +141,9 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : change-at ( key assoc quot -- )
     [ [ at ] dip call ] 3keep drop set-at ; inline
 
-: at+ ( n key assoc -- )
-    [ 0 or + ] change-at ;
+: at+ ( n key assoc -- ) [ 0 or + ] change-at ; inline
+
+: inc-at ( key assoc -- ) [ 1 ] 2dip at+ ; inline
 
 : map>assoc ( seq quot exemplar -- assoc )
     [ [ 2array ] compose { } map-as ] dip assoc-like ; inline

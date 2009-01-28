@@ -5,7 +5,7 @@ sequences quotations vectors namespaces make math assocs
 continuations peg peg.parsers unicode.categories multiline
 splitting accessors effects sequences.deep peg.search
 combinators.short-circuit lexer io.streams.string stack-checker
-io prettyprint combinators parser ;
+io combinators parser ;
 IN: peg.ebnf
 
 : rule ( name word -- parser )
@@ -458,16 +458,13 @@ M: ebnf-var build-locals ( code ast -- )
 M: object build-locals ( code ast -- )
   drop ;
    
+ERROR: bad-effect quot effect ;
+
 : check-action-effect ( quot -- quot )
   dup infer {
     { [ dup (( a -- b )) effect<= ] [ drop ] }
     { [ dup (( -- b )) effect<= ] [ drop [ drop ] prepose ] }
-    [
-      [ 
-        "Bad effect: " write effect>string write 
-        " for quotation " write pprint
-      ] with-string-writer throw
-    ]
+    [ bad-effect ]
   } cond ;
  
 M: ebnf-action (transform) ( ast -- parser )

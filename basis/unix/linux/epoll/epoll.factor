@@ -18,14 +18,15 @@ FUNCTION: int epoll_wait ( int epfd, epoll_event* events, int maxevents, int tim
 : EPOLL_CTL_DEL 2 ; inline ! Remove a file decriptor from the interface.
 : EPOLL_CTL_MOD 3 ; inline ! Change file decriptor epoll_event structure.
 
-: EPOLLIN     HEX: 001 ; inline
-: EPOLLPRI    HEX: 002 ; inline
-: EPOLLOUT    HEX: 004 ; inline
-: EPOLLRDNORM HEX: 040 ; inline
-: EPOLLRDBAND HEX: 080 ; inline
-: EPOLLWRNORM HEX: 100 ; inline
-: EPOLLWRBAND HEX: 200 ; inline
-: EPOLLMSG    HEX: 400 ; inline
-: EPOLLERR    HEX: 008 ; inline
-: EPOLLHUP    HEX: 010 ; inline
-: EPOLLET     31 2^    ; inline
+: EPOLLIN      HEX: 001 ; inline
+: EPOLLPRI     HEX: 002 ; inline
+: EPOLLOUT     HEX: 004 ; inline
+: EPOLLRDNORM  HEX: 040 ; inline
+: EPOLLRDBAND  HEX: 080 ; inline
+: EPOLLWRNORM  HEX: 100 ; inline
+: EPOLLWRBAND  HEX: 200 ; inline
+: EPOLLMSG     HEX: 400 ; inline
+: EPOLLERR     HEX: 008 ; inline
+: EPOLLHUP     HEX: 010 ; inline
+: EPOLLONESHOT 30 2^    ; inline
+: EPOLLET      31 2^    ; inline

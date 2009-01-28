@@ -14,12 +14,13 @@ IN: compiler.tree.propagation.slots
 UNION: fixed-length-sequence array byte-array string ;
 
 : sequence-constructor? ( word -- ? )
-    { <array> <byte-array> <string> } memq? ;
+    { <array> <byte-array> (byte-array) <string> } memq? ;
 
 : constructor-output-class ( word -- class )
     {
         { <array> array }
         { <byte-array> byte-array }
+        { (byte-array) byte-array }
         { <string> string }
     } at ;
 

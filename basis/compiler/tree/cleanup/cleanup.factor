@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences sequences.deep combinators fry
+USING: kernel accessors sequences combinators fry
 classes.algebra namespaces assocs words math math.private
 math.partial-dispatch math.intervals classes classes.tuple
 classes.tuple.private layouts definitions stack-checker.state
 stack-checker.branches
+compiler.utilities
 compiler.tree
 compiler.tree.combinators
 compiler.tree.propagation.info
@@ -33,7 +34,7 @@ GENERIC: cleanup* ( node -- node/nodes )
 : cleanup ( nodes -- nodes' )
     #! We don't recurse into children here, instead the methods
     #! do it since the logic is a bit more involved
-    [ cleanup* ] map flatten ;
+    [ cleanup* ] map-flat ;
 
 : cleanup-folding? ( #call -- ? )
     node-output-infos

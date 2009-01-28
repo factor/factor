@@ -1,5 +1,5 @@
-USING: words kernel sequences locals
-locals.private accessors parser namespaces continuations
+USING: words kernel sequences locals locals.parser
+locals.definitions accessors parser namespaces continuations
 summary definitions generalizations arrays ;
 IN: descriptive
 

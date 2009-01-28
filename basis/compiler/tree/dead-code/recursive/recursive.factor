@@ -22,14 +22,11 @@ M: #call-recursive compute-live-values*
     [ out-d>> ] [ label>> return>> in-d>> ] bi look-at-mapping ;
 
 :: drop-dead-inputs ( inputs outputs -- #shuffle )
-    [let* | live-inputs [ inputs filter-live ]
-            new-live-inputs [ outputs inputs filter-corresponding make-values ] |
-        live-inputs
-        new-live-inputs
-        outputs
-        inputs
-        drop-values
-    ] ;
+    inputs filter-live
+    outputs inputs filter-corresponding make-values
+    outputs
+    inputs
+    drop-values ;
 
 M: #enter-recursive remove-dead-code*
     [ filter-live ] change-out-d ;
@@ -79,12 +76,12 @@ M: #call-recursive remove-dead-code*
         bi
     ] ;
 
-M:: #recursive remove-dead-code* ( node -- nodes )
-    [let* | drop-inputs [ node drop-recursive-inputs ]
-            drop-outputs [ node drop-recursive-outputs ] |
-         node [ (remove-dead-code) ] change-child drop
-         node label>> [ filter-live ] change-enter-out drop
-         { drop-inputs node drop-outputs }
-    ] ;
+M: #recursive remove-dead-code* ( node -- nodes )
+    [ drop-recursive-inputs ]
+    [
+        [ (remove-dead-code) ] change-child
+        dup label>> [ filter-live ] change-enter-out drop
+    ]
+    [ drop-recursive-outputs ] tri 3array ;
 
 M: #return-recursive remove-dead-code* ;

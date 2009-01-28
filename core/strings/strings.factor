@@ -16,6 +16,10 @@ IN: strings
 : rehash-string ( str -- )
     1 over sequence-hashcode swap set-string-hashcode ; inline
 
+: set-string-nth ( ch n str -- )
+    pick HEX: 7f fixnum<=
+    [ set-string-nth-fast ] [ set-string-nth-slow ] if ; inline
+
 PRIVATE>
 
 M: string equal?
@@ -27,8 +31,9 @@ M: string equal?
     ] if ;
 
 M: string hashcode*
-    nip dup string-hashcode [ ]
-    [ dup rehash-string string-hashcode ] ?if ;
+    nip
+    dup string-hashcode
+    [ ] [ dup rehash-string string-hashcode ] ?if ;
 
 M: string length
     length>> ;
@@ -38,7 +43,7 @@ M: string nth-unsafe
 
 M: string set-nth-unsafe
     dup reset-string-hashcode
-    [ [ >fixnum ] dip >fixnum ] dip set-string-nth ;
+    [ >fixnum ] [ >fixnum ] [ ] tri* set-string-nth ;
 
 M: string clone
     (clone) [ clone ] change-aux ;

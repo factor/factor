@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel math sequences strings
-sets assocs prettyprint.backend make lexer namespaces parser
-arrays fry regexp.backend regexp.utils regexp.parser regexp.nfa
-regexp.dfa regexp.traversal regexp.transition-tables splitting
-sorting ;
+USING: accessors combinators kernel math sequences strings sets
+assocs prettyprint.backend prettyprint.custom make lexer
+namespaces parser arrays fry regexp.backend regexp.utils
+regexp.parser regexp.nfa regexp.dfa regexp.traversal
+regexp.transition-tables splitting sorting ;
 IN: regexp
 
 : default-regexp ( string -- regexp )

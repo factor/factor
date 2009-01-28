@@ -3,7 +3,7 @@
 USING: strings arrays hashtables assocs sequences
 cocoa.messages cocoa.classes cocoa.application cocoa kernel
 namespaces io.backend math cocoa.enumeration byte-arrays
-combinators alien.c-types core-foundation ;
+combinators alien.c-types core-foundation core-foundation.data ;
 IN: cocoa.plists
 
 GENERIC: >plist ( value -- plist )

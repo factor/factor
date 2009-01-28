@@ -7,7 +7,7 @@ http.server.redirection http.server.remapping ;
 IN: furnace.utilities
 
 : word>string ( word -- string )
-    [ vocabulary>> ] [ name>> ] bi ":" swap 3append ;
+    [ vocabulary>> ] [ name>> ] bi ":" glue ;
 
 : words>strings ( seq -- seq' )
     [ word>string ] map ;

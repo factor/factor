@@ -6,10 +6,11 @@ ui.gadgets ui.backend ui.clipboards ui.gadgets.worlds
 ui.gestures io kernel math math.vectors namespaces make
 sequences strings vectors words windows.kernel32 windows.gdi32
 windows.user32 windows.opengl32 windows.messages windows.types
-windows.nt windows threads libc combinators
+windows.nt windows threads libc combinators fry
 combinators.short-circuit continuations command-line shuffle
 opengl ui.render ascii math.bitwise locals symbols accessors
-math.geometry.rect math.order ascii calendar ;
+math.geometry.rect math.order ascii calendar
+io.encodings.utf16n ;
 IN: ui.windows
 
 SINGLETON: windows-ui-backend
@@ -69,9 +70,11 @@ M: pasteboard set-clipboard-contents drop copy ;
     <pasteboard> clipboard set-global
     <clipboard> selection set-global ;
 
-! world-handle is a <win>
-TUPLE: win hWnd hDC hRC world title ;
+TUPLE: win-base hDC hRC ;
+TUPLE: win < win-base hWnd world title ;
+TUPLE: win-offscreen < win-base hBitmap bits ;
 C: <win> win
+C: <win-offscreen> win-offscreen
 
 SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
@@ -180,7 +183,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 
 : send-key-gesture ( sym action? quot hWnd -- )
     [ [ key-modifiers ] 3dip call ] dip
-    window-focus propagate-gesture ; inline
+    window propagate-key-gesture ; inline
 
 : send-key-down ( sym action? hWnd -- )
     [ [ <key-down> ] ] dip send-key-gesture ;
@@ -212,7 +215,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
         ctrl? alt? xor [
             wParam 1string
             [ f hWnd send-key-down ]
-            [ hWnd window-focus user-input ] bi
+            [ hWnd window user-input ] bi
         ] unless
     ] unless ;
 
@@ -478,8 +481,8 @@ M: windows-ui-backend do-events
     f class-name-ptr set-global
     f msg-obj set-global ;
 
-: setup-pixel-format ( hdc -- )
-    16 make-pfd [ ChoosePixelFormat dup win32-error=0/f ] 2keep
+: setup-pixel-format ( hdc flags -- )
+    32 make-pfd [ ChoosePixelFormat dup win32-error=0/f ] 2keep
     swapd SetPixelFormat win32-error=0/f ;
 
 : get-dc ( hWnd -- hDC ) GetDC dup win32-error=0/f ;
@@ -489,22 +492,73 @@ M: windows-ui-backend do-events
     [ wglMakeCurrent win32-error=0/f ] keep ;
 
 : setup-gl ( hwnd -- hDC hRC )
-    get-dc dup setup-pixel-format dup get-rc ;
+    get-dc dup windowed-pfd-dwFlags setup-pixel-format dup get-rc ;
 
 M: windows-ui-backend (open-window) ( world -- )
-    [ create-window dup setup-gl ] keep
+    [ create-window [ setup-gl ] keep ] keep
     [ f <win> ] keep
     [ swap hWnd>> register-window ] 2keep
     dupd (>>handle)
     hWnd>> show-window ;
 
-M: windows-ui-backend select-gl-context ( handle -- )
-    [ hDC>> ] keep hRC>> wglMakeCurrent win32-error=0/f ;
+M: win-base select-gl-context ( handle -- )
+    [ hDC>> ] keep hRC>> wglMakeCurrent win32-error=0/f
+    GdiFlush drop ;
 
-M: windows-ui-backend flush-gl-context ( handle -- )
+M: win-base flush-gl-context ( handle -- )
     hDC>> SwapBuffers win32-error=0/f ;
 
-! Move window to front
+: (bitmap-info) ( dim -- BITMAPINFO )
+    "BITMAPINFO" <c-object> [
+        BITMAPINFO-bmiHeader {
+            [ nip "BITMAPINFOHEADER" heap-size swap set-BITMAPINFOHEADER-biSize ]
+            [ [ first ] dip set-BITMAPINFOHEADER-biWidth ]
+            [ [ second ] dip set-BITMAPINFOHEADER-biHeight ]
+            [ nip 1 swap set-BITMAPINFOHEADER-biPlanes ]
+            [ nip 32 swap set-BITMAPINFOHEADER-biBitCount ]
+            [ nip BI_RGB swap set-BITMAPINFOHEADER-biCompression ]
+            [ [ first2 * 4 * ] dip set-BITMAPINFOHEADER-biSizeImage ]
+            [ nip 72 swap set-BITMAPINFOHEADER-biXPelsPerMeter ]
+            [ nip 72 swap set-BITMAPINFOHEADER-biYPelsPerMeter ]
+            [ nip 0 swap set-BITMAPINFOHEADER-biClrUsed ]
+            [ nip 0 swap set-BITMAPINFOHEADER-biClrImportant ]
+        } 2cleave
+    ] keep ;
+
+: make-offscreen-dc-and-bitmap ( dim -- hDC hBitmap bits )
+    f CreateCompatibleDC
+    dup rot (bitmap-info) DIB_RGB_COLORS f <void*>
+    [ f 0 CreateDIBSection ] keep *void*
+    [ 2dup SelectObject drop ] dip ;
+
+: setup-offscreen-gl ( dim -- hDC hRC hBitmap bits )
+    make-offscreen-dc-and-bitmap [
+        [ dup offscreen-pfd-dwFlags setup-pixel-format ]
+        [ get-rc ] bi
+    ] 2dip ;
+
+M: windows-ui-backend (open-offscreen-buffer) ( world -- )
+    dup dim>> setup-offscreen-gl <win-offscreen>
+    >>handle drop ;
+M: windows-ui-backend (close-offscreen-buffer) ( handle -- )
+    [ hDC>> DeleteDC drop ]
+    [ hBitmap>> DeleteObject drop ] bi ;
+
+! Windows 32-bit bitmaps don't actually use the alpha byte of
+! each pixel; it's left as zero
+
+: (make-opaque) ( byte-array -- byte-array' )
+    [ length 4 / ]
+    [ '[ 255 swap 4 * 3 + _ set-nth ] each ]
+    [ ] tri ;
+
+: (opaque-pixels) ( world -- pixels )
+    [ handle>> bits>> ] [ dim>> first2 * 4 * ] bi
+    memory>byte-array (make-opaque) ;
+
+M: windows-ui-backend offscreen-pixels ( world -- alien w h )
+    [ (opaque-pixels) ] [ dim>> first2 ] bi ;
+
 M: windows-ui-backend raise-window* ( world -- )
     handle>> [
         hWnd>> SetFocus drop

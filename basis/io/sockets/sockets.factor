@@ -4,7 +4,7 @@
 USING: generic kernel io.backend namespaces continuations
 sequences arrays io.encodings io.ports io.streams.duplex
 io.encodings.ascii alien.strings io.binary accessors destructors
-classes debugger byte-arrays system combinators parser
+classes byte-arrays system combinators parser
 alien.c-types math.parser splitting grouping math assocs summary
 system vocabs.loader combinators present fry ;
 IN: io.sockets
@@ -115,7 +115,7 @@ M: invalid-inet6 summary drop "Invalid IPv6 address" ;
 : pad-inet6 ( string1 string2 -- seq )
     2dup [ length ] bi@ + 8 swap -
     dup 0 < [ "More than 8 components" throw ] when
-    <byte-array> swap 3append ;
+    <byte-array> glue ;
 
 : inet6-bytes ( seq -- bytes )
     [ 2 >be ] { } map-as concat >byte-array ;

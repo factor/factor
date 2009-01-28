@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar combinators generic init
-kernel math namespaces sequences heaps boxes threads debugger
+kernel math namespaces sequences heaps boxes threads
 quotations assocs math.order ;
 IN: alarms
 

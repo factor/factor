@@ -1,14 +1,11 @@
 ! Copyright (C) 2007, 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings fry namespaces make math assocs
-debugger io vectors arrays math.parser math.order
-vectors combinators classes sets unicode.categories
-compiler.units parser words quotations effects memoize accessors
-locals effects splitting combinators.short-circuit
-combinators.short-circuit.smart generalizations ;
+io vectors arrays math.parser math.order vectors combinators
+classes sets unicode.categories compiler.units parser words
+quotations effects memoize accessors locals effects splitting
+combinators.short-circuit generalizations ;
 IN: peg
-
-USE: prettyprint
 
 TUPLE: parse-result remaining ast ;
 TUPLE: parse-error position messages ; 
@@ -19,10 +16,6 @@ M: parser hashcode* id>> hashcode* ;
 
 C: <parse-result> parse-result
 C: <parse-error>  parse-error
-
-M: parse-error error.
-  "Peg parsing error at character position " write dup position>> number>string write 
-  "." print "Expected " write messages>> [ " or " write ] [ write ] interleave nl ;
 
 SYMBOL: error-stack
 
@@ -239,8 +232,6 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     nip
   ] if ; 
 
-USE: prettyprint
-
 : apply-rule ( r p -- ast )
 !   2dup [ rule-id ] dip 2array "apply-rule: " write .
    2dup recall [
@@ -278,7 +269,8 @@ GENERIC: (compile) ( peg -- quot )
 : parser-body ( parser -- quot )
   #! Return the body of the word that is the compiled version
   #! of the parser.
-  gensym 2dup swap peg>> (compile) 0 1 <effect> define-declared swap dupd id>> "peg-id" set-word-prop
+  gensym 2dup swap peg>> (compile) (( -- result )) define-declared
+  swap dupd id>> "peg-id" set-word-prop
   [ execute-parser ] curry ;
 
 : preset-parser-word ( parser -- parser word )
@@ -306,7 +298,7 @@ SYMBOL: delayed
   #! Work through all delayed parsers and recompile their
   #! words to have the correct bodies.
   delayed get [
-    call compile-parser 1quotation 0 1 <effect> define-declared
+    call compile-parser 1quotation (( -- result )) define-declared
   ] assoc-each ;
 
 : compile ( parser -- word )
@@ -421,7 +413,7 @@ M: seq-parser (compile) ( peg -- quot )
     [
       parsers>> unclip compile-parser 1quotation [ parse-seq-element ] curry ,
       [ compile-parser 1quotation [ merge-errors ] compose [ parse-seq-element ] curry , ] each 
-    ] { } make , \ && , 
+    ] { } make , \ 1&& , 
   ] [ ] make ;
 
 TUPLE: choice-parser parsers ;
@@ -431,7 +423,7 @@ M: choice-parser (compile) ( peg -- quot )
     [
       parsers>> [ compile-parser ] map 
       unclip 1quotation , [ 1quotation [ merge-errors ] compose , ] each
-    ] { } make , \ || ,
+    ] { } make , \ 0|| ,
   ] [ ] make ;
 
 TUPLE: repeat0-parser p1 ;
@@ -624,10 +616,6 @@ PRIVATE>
 
 ERROR: parse-failed input word ;
 
-M: parse-failed error.
-  "The " write dup word>> pprint " word could not parse the following input:" print nl
-  input>> . ;
-
 : PEG:
   (:)
   [let | def [ ] word [ ] |
@@ -643,3 +631,9 @@ M: parse-failed error.
       ] with-compilation-unit
     ] over push-all
   ] ; parsing
+
+USING: vocabs vocabs.loader ;
+
+"debugger" vocab [
+    "peg.debugger" require
+] when

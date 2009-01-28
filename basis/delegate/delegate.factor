@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors parser generic kernel classes classes.tuple
 words slots assocs sequences arrays vectors definitions
-prettyprint math hashtables sets generalizations namespaces make ;
+math hashtables sets generalizations namespaces make ;
 IN: delegate
 
 : protocol-words ( protocol -- words )
@@ -99,7 +99,5 @@ M: protocol forget*
 M: protocol definition protocol-words show-words ;
 
 M: protocol definer drop \ PROTOCOL: \ ; ;
-
-M: protocol synopsis* word-synopsis ; ! Necessary?
 
 M: protocol group-words protocol-words ;

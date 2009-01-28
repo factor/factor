@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays accessors sequences sequences.private
 persistent.sequences assocs persistent.assocs kernel math
-vectors parser prettyprint.backend ;
+vectors parser prettyprint.custom ;
 IN: vlists
 
 TUPLE: vlist

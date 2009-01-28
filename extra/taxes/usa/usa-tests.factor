@@ -1,6 +1,6 @@
 USING: kernel money tools.test
 taxes.usa taxes.usa.federal taxes.usa.mn
-calendar taxes.usa.w4 usa-cities ;
+calendar taxes.usa.w4 usa-cities math.finance ;
 IN: taxes.usa.tests
 
 [

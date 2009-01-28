@@ -137,6 +137,7 @@ void collect_cards(void);
 /* the oldest generation */
 #define TENURED (data_heap->gen_count-1)
 
+#define MIN_GEN_COUNT 1
 #define MAX_GEN_COUNT 3
 
 /* used during garbage collection only */

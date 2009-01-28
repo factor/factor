@@ -16,10 +16,10 @@ IN: html.parser.utils
     [ ?head drop ] [ ?tail drop ] bi ;
 
 : single-quote ( str -- newstr )
-    "'" swap "'" 3append ;
+    "'" dup surround ;
 
 : double-quote ( str -- newstr )
-    "\"" swap "\"" 3append ;
+    "\"" dup surround ;
 
 : quote ( str -- newstr )
     CHAR: ' over member?

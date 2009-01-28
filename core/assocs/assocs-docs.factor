@@ -90,6 +90,7 @@ ARTICLE: "assocs-mutation" "Storing keys and values in assocs"
 { $subsection rename-at }
 { $subsection change-at }
 { $subsection at+ }
+{ $subsection inc-at }
 { $see-also set-at delete-at clear-assoc push-at } ;
 
 ARTICLE: "assocs-conversions" "Associative mapping conversions"
@@ -214,7 +215,7 @@ HELP: assoc-map
 { $examples
     { $unchecked-example
         ": discount ( prices n -- newprices )"
-        "    [ - ] curry assoc-each ;"
+        "    [ - ] curry assoc-map ;"
         "H{ { \"bananas\" 5 } { \"apples\" 42 } { \"pears\" 17 } }"
         "2 discount ."
         "H{ { \"bananas\" 3 } { \"apples\" 39 } { \"pears\" 15 } }"
@@ -347,6 +348,11 @@ HELP: change-at
 HELP: at+
 { $values { "n" number } { "key" object } { "assoc" assoc } }
 { $description "Adds " { $snippet "n" } " to the value associated with " { $snippet "key" } "; if there is no value, stores " { $snippet "n" } ", thus behaving as if the value was 0." }
+{ $side-effects "assoc" } ;
+
+HELP: inc-at
+{ $values { "key" object } { "assoc" assoc } }
+{ $description "Adds 1 to the value associated with " { $snippet "key" } "; if there is no value, stores 1." }
 { $side-effects "assoc" } ;
 
 HELP: >alist

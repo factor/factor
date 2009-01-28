@@ -22,7 +22,7 @@ PRIVATE>
     ] (parallel-each) ; inline
 
 : parallel-filter ( seq quot -- newseq )
-    over [ pusher [ each ] dip ] dip like ; inline
+    over [ pusher [ parallel-each ] dip ] dip like ; inline
 
 <PRIVATE
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.strings combinators
 grouping io.encodings.utf8 io.files kernel math sequences
-system unix io.unix.files
+system unix io.unix.files specialized-arrays.direct.uint arrays
 unix.statfs.macosx unix.statvfs.macosx unix.getfsstat.macosx ;
 IN: io.unix.files.macosx
 
@@ -13,7 +13,8 @@ M: macosx file-systems ( -- array )
     f <void*> dup 0 getmntinfo64 dup io-error
     [ *void* ] dip
     "statfs64" heap-size [ * memory>byte-array ] keep group
-    [ [ new-file-system-info ] dip statfs>file-system-info ] map ;
+    [ statfs64-f_mntonname utf8 alien>string file-system-info ] map ;
+    ! [ [ new-file-system-info ] dip statfs>file-system-info ] map ;
 
 M: macosx new-file-system-info macosx-file-system-info new ;
 
@@ -32,7 +33,7 @@ M: macosx statfs>file-system-info ( file-system-info byte-array -- file-system-i
         [ statfs64-f_bavail >>blocks-available ]
         [ statfs64-f_files >>files ]
         [ statfs64-f_ffree >>files-free ]
-        [ statfs64-f_fsid >>id ]
+        [ statfs64-f_fsid 2 <direct-uint-array> >array >>id ]
         [ statfs64-f_owner >>owner ]
         [ statfs64-f_type >>type-id ]
         [ statfs64-f_flags >>flags ]

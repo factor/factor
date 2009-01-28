@@ -2,10 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words sequences quotations namespaces io
 classes.tuple accessors prettyprint prettyprint.config
-compiler.tree.builder compiler.tree.optimizer
+prettyprint.backend prettyprint.custom prettyprint.sections
+parser compiler.tree.builder compiler.tree.optimizer
 compiler.cfg.builder compiler.cfg.linearization
-compiler.cfg.stack-frame compiler.cfg.linear-scan
-compiler.cfg.two-operand compiler.cfg.optimizer ;
+compiler.cfg.registers compiler.cfg.stack-frame
+compiler.cfg.linear-scan compiler.cfg.two-operand
+compiler.cfg.optimizer ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-cfg ( quot -- cfgs )
@@ -40,3 +42,15 @@ SYMBOL: allocate-registers?
         instructions>> [ insn. ] each
         nl
     ] each ;
+
+! Prettyprinting
+M: vreg pprint*
+    <block
+    \ V pprint-word [ reg-class>> pprint* ] [ n>> pprint* ] bi
+    block> ;
+
+: pprint-loc ( loc word -- ) <block pprint-word n>> pprint* block> ;
+
+M: ds-loc pprint* \ D pprint-loc ;
+
+M: rs-loc pprint* \ R pprint-loc ;

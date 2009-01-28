@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs fry kernel accessors sequences sequences.deep arrays
-stack-checker.inlining namespaces compiler.tree ;
+USING: assocs fry kernel accessors sequences compiler.utilities
+arrays stack-checker.inlining namespaces compiler.tree
+math.order ;
 IN: compiler.tree.combinators
 
 : each-node ( nodes quot: ( node -- ) -- )
@@ -27,7 +28,7 @@ IN: compiler.tree.combinators
                 [ _ map-nodes ] change-child
             ] when
         ] if
-    ] map flatten ; inline recursive
+    ] map-flat ; inline recursive
 
 : contains-node? ( nodes quot: ( node -- ? ) -- ? )
     dup dup '[
@@ -47,12 +48,6 @@ IN: compiler.tree.combinators
 
 : sift-children ( seq flags -- seq' )
     zip [ nip ] assoc-filter keys ;
-
-: (3each) [ 3array flip ] dip '[ first3 @ ] ; inline
-
-: 3each ( seq1 seq2 seq3 quot -- seq ) (3each) each ; inline
-
-: 3map ( seq1 seq2 seq3 quot -- seq ) (3each) map ; inline
 
 : until-fixed-point ( #recursive quot: ( node -- ) -- )
     over label>> t >>fixed-point drop

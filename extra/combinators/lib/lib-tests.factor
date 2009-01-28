@@ -16,7 +16,7 @@ IN: combinators.lib.tests
 
 [ { "foo" "xbarx" } ]
 [
-    { "oof" "bar" } { [ reverse ] [ "x" swap "x" 3append ] } parallel-call
+    { "oof" "bar" } { [ reverse ] [ "x" dup surround ] } parallel-call
 ] unit-test
 
 { 1 1 } [

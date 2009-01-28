@@ -2,12 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax kernel
 layouts sequences system unix environment io.encodings.utf8
-unix.utilities vocabs.loader combinators alien.accessors ;
+unix.utilities vocabs.loader combinators alien.accessors
+alien.syntax ;
 IN: environment.unix
 
 HOOK: environ os ( -- void* )
 
-M: unix environ ( -- void* ) "environ" f dlsym ;
+M: unix environ ( -- void* ) &: environ ;
 
 M: unix os-env ( key -- value ) getenv ;
 

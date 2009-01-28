@@ -128,7 +128,7 @@ M: ratio >base
         [
             [ numerator (>base) ]
             [ denominator (>base) ] bi
-            "/" swap 3append
+            "/" glue
         ] bi* append
         negative? get [ CHAR: - prefix ] when
     ] with-radix ;

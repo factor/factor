@@ -5,12 +5,12 @@ classes sequences.private continuations.private effects generic
 hashtables hashtables.private io io.backend io.files
 io.files.private io.streams.c kernel kernel.private math
 math.private memory namespaces namespaces.private parser
-prettyprint quotations quotations.private sbufs sbufs.private
+quotations quotations.private sbufs sbufs.private
 sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
-combinators locals locals.backend locals.private words.private
+combinators locals locals.backend locals.types words.private
 quotations.private stack-checker.values
 stack-checker.alien
 stack-checker.state
@@ -63,7 +63,9 @@ IN: stack-checker.known-words
 
 GENERIC: infer-call* ( value known -- )
 
-: infer-call ( value -- ) dup known infer-call* ;
+: (infer-call) ( value -- ) dup known infer-call* ;
+
+: infer-call ( -- ) pop-d (infer-call) ;
 
 M: literal infer-call*
     [ 1array #drop, ] [ infer-literal-quot ] bi* ;
@@ -73,7 +75,7 @@ M: curried infer-call*
     [ uncurry ] infer-quot-here
     [ quot>> known pop-d [ set-known ] keep ]
     [ obj>> known pop-d [ set-known ] keep ] bi
-    push-d infer-call ;
+    push-d (infer-call) ;
 
 M: composed infer-call*
     swap push-d
@@ -81,20 +83,38 @@ M: composed infer-call*
     [ quot2>> known pop-d [ set-known ] keep ]
     [ quot1>> known pop-d [ set-known ] keep ] bi
     push-d push-d
-    1 infer->r pop-d infer-call
-    terminated? get [ 1 infer-r> pop-d infer-call ] unless ;
+    1 infer->r infer-call
+    terminated? get [ 1 infer-r> infer-call ] unless ;
 
 M: object infer-call*
     \ literal-expected inference-warning ;
 
 : infer-slip ( -- )
-    1 infer->r pop-d infer-call 1 infer-r> ;
+    1 infer->r infer-call 1 infer-r> ;
 
 : infer-2slip ( -- )
-    2 infer->r pop-d infer-call 2 infer-r> ;
+    2 infer->r infer-call 2 infer-r> ;
 
 : infer-3slip ( -- )
-    3 infer->r pop-d infer-call 3 infer-r> ;
+    3 infer->r infer-call 3 infer-r> ;
+
+: infer-dip ( -- )
+    literals get
+    [ \ dip def>> infer-quot-here ]
+    [ pop 1 infer->r infer-quot-here 1 infer-r>  ]
+    if-empty ;
+
+: infer-2dip ( -- )
+    literals get
+    [ \ 2dip def>> infer-quot-here ]
+    [ pop 2 infer->r infer-quot-here 2 infer-r>  ]
+    if-empty ;
+
+: infer-3dip ( -- )
+    literals get
+    [ \ 3dip def>> infer-quot-here ]
+    [ pop 3 infer->r infer-quot-here 3 infer-r>  ]
+    if-empty ;
 
 : infer-curry ( -- )
     2 consume-d
@@ -157,11 +177,14 @@ M: object infer-call*
         { \ >r [ 1 infer->r ] }
         { \ r> [ 1 infer-r> ] }
         { \ declare [ infer-declare ] }
-        { \ call [ pop-d infer-call ] }
-        { \ (call) [ pop-d infer-call ] }
+        { \ call [ infer-call ] }
+        { \ (call) [ infer-call ] }
         { \ slip [ infer-slip ] }
         { \ 2slip [ infer-2slip ] }
         { \ 3slip [ infer-3slip ] }
+        { \ dip [ infer-dip ] }
+        { \ 2dip [ infer-2dip ] }
+        { \ 3dip [ infer-3dip ] }
         { \ curry [ infer-curry ] }
         { \ compose [ infer-compose ] }
         { \ execute [ infer-execute ] }
@@ -190,10 +213,10 @@ M: object infer-call*
     "local-word-def" word-prop infer-quot-here ;
 
 {
-    >r r> declare call (call) slip 2slip 3slip curry compose
-    execute (execute) if dispatch <tuple-boa> (throw)
-    load-locals get-local drop-locals do-primitive alien-invoke
-    alien-indirect alien-callback
+    >r r> declare call (call) slip 2slip 3slip dip 2dip 3dip
+    curry compose execute (execute) if dispatch <tuple-boa>
+    (throw) load-locals get-local drop-locals do-primitive
+    alien-invoke alien-indirect alien-callback
 } [ t "special" set-word-prop ] each
 
 { call execute dispatch load-locals get-local drop-locals }
@@ -281,7 +304,7 @@ M: object infer-call*
 \ <complex> { real real } { complex } define-primitive
 \ <complex> make-foldable
 
-\ both-fixnums? { object object } { object object object } define-primitive
+\ both-fixnums? { object object } { object } define-primitive
 
 \ fixnum+ { fixnum fixnum } { integer } define-primitive
 \ fixnum+ make-foldable
@@ -457,6 +480,9 @@ M: object infer-call*
 \ <byte-array> { integer } { byte-array } define-primitive
 \ <byte-array> make-flushable
 
+\ (byte-array) { integer } { byte-array } define-primitive
+\ (byte-array) make-flushable
+
 \ <displaced-alien> { integer c-ptr } { c-ptr } define-primitive
 \ <displaced-alien> make-flushable
 
@@ -536,7 +562,8 @@ M: object infer-call*
 \ string-nth { fixnum string } { fixnum } define-primitive
 \ string-nth make-flushable
 
-\ set-string-nth { fixnum fixnum string } { } define-primitive
+\ set-string-nth-slow { fixnum fixnum string } { } define-primitive
+\ set-string-nth-fast { fixnum fixnum string } { } define-primitive
 
 \ resize-array { integer array } { array } define-primitive
 \ resize-array make-flushable

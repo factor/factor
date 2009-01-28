@@ -1,4 +1,4 @@
-! Copyright (C) 2008 DoDoug Coleman.
+! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: crypto.barrett kernel math namespaces tools.test ;
 IN: crypto.barrett.tests

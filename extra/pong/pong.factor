@@ -16,6 +16,13 @@ USING: kernel accessors locals math math.intervals math.order
 IN: pong
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! 
+! Inspired by this Ruby/Shoes version by why: http://gist.github.com/26431
+!
+! Which was based on this Nodebox version: http://billmill.org/pong.html
+! by Bill Mill.
+! 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : clamp-to-interval ( x interval -- x )
   [ from>> first max ] [ to>> first min ] bi ;
@@ -95,28 +102,37 @@ METHOD: draw ( <ball>   -- ) [ pos>>       ] [ diameter>> 2 / ] bi circle    ;
 USE: syntax ! Switch back to core 'TUPLE:' instead of the one provided
             ! by multi-methods
 
-TUPLE: <pong> < gadget draw closed ;
+TUPLE: <pong> < gadget paused field ball player computer ;
 
-M: <pong> pref-dim*    ( <pong> -- dim ) drop { 400 400 } ;
-M: <pong> draw-gadget* ( <pong> --     ) draw>> call      ;
-M: <pong> ungraft*     ( <pong> --     ) t >>closed drop  ;
+: pong ( -- gadget )
+  <pong> new-gadget
+  T{ <play-field> { pos {   0   0 } } { dim { 400 400 } } } clone >>field
+  T{ <ball>       { pos {  50  50 } } { vel {   3   4 } } } clone >>ball
+  T{ <paddle>     { pos { 200 396 } } { dim {  75   4 } } } clone >>player
+  T{ <computer>   { pos { 200   0 } } { dim {  75   4 } } } clone >>computer ;
+
+M: <pong> pref-dim* ( <pong> -- dim ) drop { 400 400 } ;
+M: <pong> ungraft*  ( <pong> --     ) t >>paused drop  ;
+    
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M:: <pong> draw-gadget* ( PONG -- )
+
+  PONG computer>> draw
+  PONG player>>   draw
+  PONG ball>>     draw ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: make-draw-closure ( -- closure )
+:: iterate-system ( GADGET -- )
 
-  ! Establish some bindings
-
-  [let | PLAY-FIELD [ T{ <play-field> { pos {  0  0 } } { dim { 400 400 } } } ]
-         BALL       [ T{ <ball>       { pos { 50 50 } } { vel {   3   4 } } } ]
-
-         PLAYER   [ T{ <paddle>   { pos { 200 396 } } { dim { 75 4 } } } ]
-         COMPUTER [ T{ <computer> { pos { 200   0 } } { dim { 75 4 } } } ] |
-
-    ! Define some internal words in terms of those bindings ...
+  [let | FIELD    [ GADGET field>>    ]
+         BALL     [ GADGET ball>>     ]
+         PLAYER   [ GADGET player>>   ]
+         COMPUTER [ GADGET computer>> ] |
 
     [wlet | align-player-with-mouse [ ( -- )
-              PLAYER PLAY-FIELD align-paddle-with-mouse ]
+              PLAYER FIELD align-paddle-with-mouse ]
 
             move-ball [ ( -- ) BALL 1 move-for ]
 
@@ -127,69 +143,52 @@ M: <pong> ungraft*     ( <pong> --     ) t >>closed drop  ;
               BALL COMPUTER { [ below? ] [ in-between-horizontally? ] } && ]
 
             bounce-off-wall? [ ( -- ? )
-              BALL PLAY-FIELD in-between-horizontally? not ] |
+              BALL FIELD in-between-horizontally? not ]
 
-      ! Note, we're returning a quotation.
-      ! The quotation closes over the bindings established by the 'let'.
-      ! Thus the name of the word 'make-draw-closure'.
-      ! This closure is intended to be placed in the 'draw' slot of a
-      ! <pong> gadget.
-      
+            stop-game [ ( -- ) t GADGET (>>paused) ] |
+
+      BALL FIELD in-bounds?
       [
 
-        BALL PLAY-FIELD in-bounds?
-          [
-            align-player-with-mouse
-              
-            move-ball
-  
-            ! computer reaction
-  
-            BALL COMPUTER to-the-left-of?  [ COMPUTER computer-move-left  ] when
-            BALL COMPUTER to-the-right-of? [ COMPUTER computer-move-right ] when
+        align-player-with-mouse
 
-            ! check if ball bounced off something
-              
-            player-blocked-ball?   [ BALL PLAYER   bounce-off-paddle  ] when
-            computer-blocked-ball? [ BALL COMPUTER bounce-off-paddle  ] when
-            bounce-off-wall?       [ BALL reverse-horizontal-velocity ] when
+        move-ball
 
-            ! draw the objects
-              
-            COMPUTER draw
-            PLAYER   draw
-            BALL     draw
-  
-          ]
-        when
+        ! computer reaction
 
-      ] ] ] ( -- closure ) ; ! The trailing stack effect here is a workaround.
-                             ! The stack effects in the wlet expression throw
-                             ! off the effect for the whole word, so we reset
-                             ! it to the correct one here.
+        BALL COMPUTER to-the-left-of?  [ COMPUTER computer-move-left  ] when
+        BALL COMPUTER to-the-right-of? [ COMPUTER computer-move-right ] when
+
+        ! check if ball bounced off something
+              
+        player-blocked-ball?   [ BALL PLAYER   bounce-off-paddle  ] when
+        computer-blocked-ball? [ BALL COMPUTER bounce-off-paddle  ] when
+        bounce-off-wall?       [ BALL reverse-horizontal-velocity ] when
+      ]
+      [ stop-game ]
+      if
+
+  ] ] ( gadget -- ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-:: pong-loop-step ( PONG -- ? )
-  PONG closed>>
-    [ f ]
-    [ PONG relayout-1 25 milliseconds sleep t ]
-  if ;
-
-:: start-pong-thread ( PONG -- ) [ [ PONG pong-loop-step ] loop ] in-thread ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: play-pong ( -- )
-
-  <pong> new-gadget
-    make-draw-closure >>draw
-  dup "PONG" open-window
-    
-  start-pong-thread ;
+:: start-pong-thread ( GADGET -- )
+  f GADGET (>>paused)
+  [
+    [
+      GADGET paused>>
+      [ f ]
+      [ GADGET iterate-system GADGET relayout-1 25 milliseconds sleep t ]
+      if
+    ]
+    loop
+  ]
+  in-thread ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: play-pong-main ( -- ) [ play-pong ] with-ui ;
+: pong-window ( -- ) pong [ "PONG" open-window ] [ start-pong-thread ] bi ;
 
-MAIN: play-pong-main
+: pong-main ( -- ) [ pong-window ] with-ui ;
+
+MAIN: pong-window

@@ -1,10 +1,11 @@
-USING: windows.dinput windows.dinput.constants parser
-symbols alien.c-types windows.ole32 namespaces assocs kernel
-arrays vectors windows.kernel32 windows.com windows.dinput
-shuffle windows.user32 windows.messages sequences combinators
+USING: windows.dinput windows.dinput.constants parser symbols
+alien.c-types windows.ole32 namespaces assocs kernel arrays
+vectors windows.kernel32 windows.com windows.dinput shuffle
+windows.user32 windows.messages sequences combinators
 math.geometry.rect ui.windows accessors math windows alien
-alien.strings io.encodings.utf16 continuations byte-arrays
-locals game-input.backend.dinput.keys-array ;
+alien.strings io.encodings.utf16 io.encodings.utf16n
+continuations byte-arrays locals
+game-input.backend.dinput.keys-array ;
 << "game-input" (use+) >>
 IN: game-input.backend.dinput
 

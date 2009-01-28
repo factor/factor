@@ -56,7 +56,7 @@ TUPLE: CreateProcess-args
 
 : escape-argument ( str -- newstr )
     CHAR: \s over member? [
-        "\"" swap fix-trailing-backslashes "\"" 3append
+        fix-trailing-backslashes "\"" dup surround
     ] when ;
 
 : join-arguments ( args -- cmd-line )

@@ -1,22 +1,18 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types alien.strings arrays assocs
-combinators compiler compiler.alien kernel math namespaces make
-parser prettyprint prettyprint.sections quotations sequences
-strings words cocoa.runtime io macros memoize debugger
-io.encodings.ascii effects libc libc.private parser lexer init
-core-foundation fry generalizations
-specialized-arrays.direct.alien ;
+continuations combinators compiler compiler.alien kernel math
+namespaces make parser quotations sequences strings words
+cocoa.runtime io macros memoize io.encodings.utf8
+effects libc libc.private parser lexer init core-foundation fry
+generalizations specialized-arrays.direct.alien ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
     [ over first , f , , second , \ alien-invoke , ] [ ] make ;
 
-: sender-stub-name ( method function -- string )
-    [ % "_" % unparse % ] "" make ;
-
 : sender-stub ( method function -- word )
-    [ sender-stub-name f <word> dup ] 2keep
+    [ "( sender-stub )" f <word> dup ] 2dip
     over first large-struct? [ "_stret" append ] when
     make-sender define ;
 
@@ -78,16 +74,20 @@ MACRO: (send) ( selector super? -- quot )
 
 : send ( receiver args... selector -- return... ) f (send) ; inline
 
-\ send soft "break-after" set-word-prop
-
 : super-send ( receiver args... selector -- return... ) t (send) ; inline
 
-\ super-send soft "break-after" set-word-prop
-
 ! Runtime introspection
-: (objc-class) ( string word -- class )
-    dupd execute
-    [ ] [ "No such class: " prepend throw ] ?if ; inline
+SYMBOL: class-init-hooks
+
+class-init-hooks global [ H{ } clone or ] change-at
+
+: (objc-class) ( name word -- class )
+    2dup execute dup [ 2nip ] [
+        drop over class-init-hooks get at [ assert-depth ] when*
+        2dup execute dup [ 2nip ] [
+            2drop "No such class: " prepend throw
+        ] if
+    ] if ; inline
 
 : objc-class ( string -- class )
     \ objc_getClass (objc-class) ;
@@ -180,7 +180,7 @@ assoc-union alien>objc-types set-global
 
 : method-arg-type ( method i -- type )
     method_copyArgumentType
-    [ ascii alien>string parse-objc-type ] keep
+    [ utf8 alien>string parse-objc-type ] keep
     (free) ;
 
 : method-arg-types ( method -- args )
@@ -189,7 +189,7 @@ assoc-union alien>objc-types set-global
 
 : method-return-type ( method -- ctype )
     method_copyReturnType
-    [ ascii alien>string parse-objc-type ] keep
+    [ utf8 alien>string parse-objc-type ] keep
     (free) ;
 
 : register-objc-method ( method -- )
@@ -208,37 +208,19 @@ assoc-union alien>objc-types set-global
 : register-objc-methods ( class -- )
     [ register-objc-method ] each-method-in-class ;
 
-: method. ( method -- )
-    {
-        [ method_getName sel_getName ]
-        [ method-return-type ]
-        [ method-arg-types ]
-        [ method_getImplementation ]
-    } cleave 4array . ;
-
-: methods. ( class -- )
-    [ method. ] each-method-in-class ;
-
 : class-exists? ( string -- class ) objc_getClass >boolean ;
 
-: unless-defined ( class quot -- )
-    [ class-exists? ] dip unless ; inline
-
-: define-objc-class-word ( name quot -- )
+: define-objc-class-word ( quot name -- )
+    [ class-init-hooks get set-at ]
     [
-        over , , \ unless-defined , dup , \ objc-class ,
-    ] [ ] make [ "cocoa.classes" create ] dip
-    (( -- class )) define-declared ;
+        [ "cocoa.classes" create ] [ '[ _ objc-class ] ] bi
+        (( -- class )) define-declared
+    ] bi ;
 
 : import-objc-class ( name quot -- )
-    2dup unless-defined
-    dupd define-objc-class-word
-    '[
-        _
-        dup
-        objc-class register-objc-methods
-        objc-meta-class register-objc-methods
-    ] try ;
+    over define-objc-class-word
+    [ objc-class register-objc-methods ]
+    [ objc-meta-class register-objc-methods ] bi ;
 
 : root-class ( class -- root )
     dup class_getSuperclass [ root-class ] [ ] ?if ;

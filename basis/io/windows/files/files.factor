@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types io.binary io.backend io.files io.buffers
-io.windows kernel math splitting fry alien.strings
-windows windows.kernel32 windows.time calendar combinators
-math.functions sequences namespaces make words symbols system
-io.ports destructors accessors math.bitwise continuations
-windows.errors arrays byte-arrays ;
+io.encodings.utf16n io.ports io.windows kernel math splitting
+fry alien.strings windows windows.kernel32 windows.time calendar
+combinators math.functions sequences namespaces make words
+symbols system destructors accessors math.bitwise continuations
+windows.errors arrays byte-arrays generalizations ;
 IN: io.windows.files
 
 : open-file ( path access-mode create-mode flags -- handle )
@@ -117,7 +117,7 @@ M: windows delete-directory ( path -- )
 : find-first-file ( path -- WIN32_FIND_DATA handle )
     "WIN32_FIND_DATA" <c-object> tuck
     FindFirstFile
-    [ INVALID_HANDLE_VALUE = [ win32-error ] when ] keep ;
+    [ INVALID_HANDLE_VALUE = [ win32-error-string throw ] when ] keep ;
 
 : find-next-file ( path -- WIN32_FIND_DATA/f )
     "WIN32_FIND_DATA" <c-object> tuck
@@ -257,13 +257,15 @@ M: winnt link-info ( path -- info )
 
 HOOK: root-directory os ( string -- string' )
 
-: file-system-type ( normalized-path -- str )
-    MAX_PATH 1+ <byte-array>
-    MAX_PATH 1+
-    "DWORD" <c-object> "DWORD" <c-object> "DWORD" <c-object>
-    MAX_PATH 1+ <byte-array>
-    MAX_PATH 1+
-    [ GetVolumeInformation win32-error=0/f ] 2keep drop
+: volume-information ( normalized-path -- volume-name volume-serial max-component flags type )
+    MAX_PATH 1+ [ <byte-array> ] keep
+    "DWORD" <c-object>
+    "DWORD" <c-object>
+    "DWORD" <c-object>
+    MAX_PATH 1+ [ <byte-array> ] keep
+    [ GetVolumeInformation win32-error=0/f ] 7 nkeep
+    drop 5 nrot drop
+    [ utf16n alien>string ] 4 ndip
     utf16n alien>string ;
 
 : file-system-space ( normalized-path -- available-space total-space free-space )
@@ -278,14 +280,20 @@ HOOK: root-directory os ( string -- string' )
         [ ]
     } cleave ;
 
+TUPLE: win32-file-system-info < file-system-info max-component flags device-serial ;
+
 M: winnt file-system-info ( path -- file-system-info )
     normalize-path root-directory
-    dup [ file-system-type ] [ file-system-space ] bi
-    \ file-system-info new
+    dup [ volume-information ] [ file-system-space ] bi
+    \ win32-file-system-info new
         swap *ulonglong >>free-space
         swap *ulonglong >>total-space
         swap *ulonglong >>available-space
         swap >>type
+        swap *uint >>flags
+        swap *uint >>max-component
+        swap *uint >>device-serial
+        swap >>device-name
         swap >>mount-point
     calculate-file-system-info ;
 
@@ -299,16 +307,16 @@ M: winnt file-system-info ( path -- file-system-info )
     ] if ;
 
 : find-first-volume ( -- string handle )
-    MAX_PATH 1+ <byte-array> dup length
+    MAX_PATH 1+ [ <byte-array> ] keep
     dupd
     FindFirstVolume dup win32-error=0/f
     [ utf16n alien>string ] dip ;
 
 : find-next-volume ( handle -- string/f )
-    MAX_PATH 1+ <byte-array> dup length
-    over [ FindNextVolume ] dip swap 0 = [
+    MAX_PATH 1+ [ <byte-array> tuck ] keep
+    FindNextVolume 0 = [
         GetLastError ERROR_NO_MORE_FILES =
-        [ drop f ] [ win32-error ] if
+        [ drop f ] [ win32-error-string throw ] if
     ] [
         utf16n alien>string
     ] if ;

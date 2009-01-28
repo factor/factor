@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays sequences kernel accessors math alien.accessors
 alien.c-types byte-arrays words io io.encodings
-io.streams.byte-array io.streams.memory io.encodings.utf8
-io.encodings.utf16 system alien strings cpu.architecture fry ;
+io.encodings.utf8 io.streams.byte-array io.streams.memory system
+alien strings cpu.architecture fry vocabs.loader combinators ;
 IN: alien.strings
 
 GENERIC# alien>string 1 ( c-ptr encoding -- string/f )
@@ -88,27 +88,22 @@ M: string-type c-type-getter
 M: string-type c-type-setter
     drop [ set-alien-cell ] ;
 
-! Native-order UTF-16
+HOOK: alien>native-string os ( alien -- string )
 
-SINGLETON: utf16n
-
-: utf16n ( -- descriptor )
-    little-endian? utf16le utf16be ? ; foldable
-
-M: utf16n <decoder> drop utf16n <decoder> ;
-
-M: utf16n <encoder> drop utf16n <encoder> ;
-
-: alien>native-string ( alien -- string )
-    os windows? [ utf16n ] [ utf8 ] if alien>string ;
+HOOK: native-string>alien os ( string -- alien )
 
 : dll-path ( dll -- string )
     path>> alien>native-string ;
 
 : string>symbol ( str -- alien )
-    [ os wince? [ utf16n ] [ utf8 ] if string>alien ]
-    over string? [ call ] [ map ] if ;
+    dup string?
+    [ native-string>alien ]
+    [ [ native-string>alien ] map ] if ;
 
 { "char*" utf8 } "char*" typedef
-{ "char*" utf16n } "wchar_t*" typedef
 "char*" "uchar*" typedef
+
+{
+    { [ os windows? ] [ "alien.strings.windows" require ] }
+    { [ os unix? ] [ "alien.strings.unix" require ] }
+} cond

@@ -1,33 +1,35 @@
-! Copyright (C) 2006, 2008 Slava Pestov
+! Copyright (C) 2006, 2008 Slava Pestov, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings arrays assocs
 combinators compiler hashtables kernel libc math namespaces
-parser sequences words cocoa.messages cocoa.runtime
-compiler.units io.encodings.ascii generalizations
-continuations make ;
+parser sequences words cocoa.messages cocoa.runtime locals
+compiler.units io.encodings.utf8 continuations make fry ;
 IN: cocoa.subclassing
 
 : init-method ( method -- sel imp types )
     first3 swap
-    [ sel_registerName ] [ execute ] [ ascii string>alien ]
+    [ sel_registerName ] [ execute ] [ utf8 string>alien ]
     tri* ;
 
-: throw-if-false ( YES/NO -- )
-    zero? [ "Failed to add method or protocol to class" throw ]
-    when ;
+: throw-if-false ( obj what -- )
+    swap { f 0 } member?
+    [ "Failed to " prepend throw ] [ drop ] if ;
+
+: add-method ( class sel imp types -- )
+    class_addMethod "add method to class" throw-if-false ;
 
 : add-methods ( methods class -- )
-    swap
-    [ init-method class_addMethod throw-if-false ] with each ;
+    '[ [ _ ] dip init-method add-method ] each ;
+
+: add-protocol ( class protocol -- )
+    class_addProtocol "add protocol to class" throw-if-false ;
 
 : add-protocols ( protocols class -- )
-    swap [ objc-protocol class_addProtocol throw-if-false ]
-    with each ;
+    '[ [ _ ] dip objc-protocol add-protocol ] each ;
 
-: (define-objc-class) ( protocols superclass name imeth -- )
-    -rot
+: (define-objc-class) ( imeth protocols superclass name -- )
     [ objc-class ] dip 0 objc_allocateClassPair
-    [ add-methods ] [ add-protocols ] [ objc_registerClassPair ]
+    [ add-protocols ] [ add-methods ] [ objc_registerClassPair ]
     tri ;
 
 : encode-types ( return types -- encoding )
@@ -45,28 +47,19 @@ IN: cocoa.subclassing
         [ first4 prepare-method 3array ] map
     ] with-compilation-unit ;
 
-: types= ( a b -- ? )
-    [ ascii alien>string ] bi@ = ;
-
-: (verify-method-type) ( class sel types -- )
-    [ class_getInstanceMethod method_getTypeEncoding ]
-    dip types=
-    [ "Objective-C method types cannot be changed once defined" throw ]
-    unless ;
-: verify-method-type ( class sel imp types -- class sel imp types )
-    4 ndup nip (verify-method-type) ;
-
-: (redefine-objc-method) ( class method -- )
-    init-method ! verify-method-type
-    drop
-    [ class_getInstanceMethod ] dip method_setImplementation drop ;
+:: (redefine-objc-method) ( class method -- )
+    method init-method [| sel imp types |
+        class sel class_getInstanceMethod [
+            imp method_setImplementation drop
+        ] [
+            class sel imp types add-method
+        ] if*
+    ] call ;
     
 : redefine-objc-methods ( imeth name -- )
     dup class-exists? [
-        objc_getClass swap [ (redefine-objc-method) ] with each
-    ] [
-        2drop
-    ] if ;
+        objc_getClass '[ [ _ ] dip (redefine-objc-method) ] each
+    ] [ 2drop ] if ;
 
 SYMBOL: +name+
 SYMBOL: +protocols+
@@ -76,10 +69,10 @@ SYMBOL: +superclass+
     clone [
         prepare-methods
         +name+ get "cocoa.classes" create drop
-        +name+ get 2dup redefine-objc-methods swap [
-            +protocols+ get , +superclass+ get , +name+ get , ,
-            \ (define-objc-class) ,
-        ] [ ] make import-objc-class
+        +name+ get 2dup redefine-objc-methods swap
+        +protocols+ get +superclass+ get +name+ get
+        '[ _ _ _ _ (define-objc-class) ]
+        import-objc-class
     ] bind ;
 
 : CLASS:

@@ -100,11 +100,10 @@ SYMBOL: locale ! Just casing locale, or overall?
 : >case-fold ( string -- fold )
     >upper >lower ;
 
-: lower? ( string -- ? )
-    dup >lower = ;
-: upper? ( string -- ? )
-    dup >lower = ;
-: title? ( string -- ? )
-    dup >title = ;
-: case-fold? ( string -- ? )
-    dup >case-fold = ;
+: lower? ( string -- ? ) dup >lower = ;
+
+: upper? ( string -- ? ) dup >upper = ;
+
+: title? ( string -- ? ) dup >title = ;
+
+: case-fold? ( string -- ? ) dup >case-fold = ;

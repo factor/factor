@@ -3,6 +3,7 @@
 USING: fry kernel sequences assocs accessors namespaces
 math.intervals arrays classes.algebra combinators columns
 stack-checker.branches
+compiler.utilities
 compiler.tree
 compiler.tree.combinators
 compiler.tree.propagation.info
@@ -78,7 +79,7 @@ SYMBOL: condition-value
 
 M: #phi propagate-before ( #phi -- )
     [ annotate-phi-inputs ]
-    [ [ phi-info-d>> <flipped> ] [ out-d>> ] bi merge-value-infos ]
+    [ [ phi-info-d>> flip ] [ out-d>> ] bi merge-value-infos ]
     bi ;
 
 : branch-phi-constraints ( output values booleans -- )
@@ -137,8 +138,8 @@ M: #phi propagate-before ( #phi -- )
 M: #phi propagate-after ( #phi -- )
     condition-value get [
         [ out-d>> ]
-        [ phi-in-d>> <flipped> ]
-        [ phi-info-d>> <flipped> ] tri
+        [ phi-in-d>> flip ]
+        [ phi-info-d>> flip ] tri
         [
             [ possible-boolean-values ] map
             branch-phi-constraints

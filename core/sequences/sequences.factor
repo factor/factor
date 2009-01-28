@@ -317,6 +317,10 @@ PRIVATE>
 
 : 3append ( seq1 seq2 seq3 -- newseq ) pick 3append-as ;
 
+: surround ( seq1 seq2 seq3 -- newseq ) swapd 3append ; inline
+
+: glue ( seq1 seq2 seq3 -- newseq ) swap 3append ; inline
+
 : change-nth ( i seq quot -- )
     [ [ nth ] dip call ] 3keep drop set-nth ; inline
 
@@ -339,7 +343,7 @@ PRIVATE>
     [ (each) ] dip collect ; inline
 
 : 2nth-unsafe ( n seq1 seq2 -- elt1 elt2 )
-    [ over ] dip nth-unsafe [ nth-unsafe ] dip ; inline
+    [ over ] dip [ nth-unsafe ] 2bi@ ; inline
 
 : (2each) ( seq1 seq2 quot -- n quot' )
     [ [ min-length ] 2keep ] dip
@@ -519,13 +523,6 @@ PRIVATE>
 : harvest ( seq -- newseq )
     [ empty? not ] filter ;
 
-: cache-nth ( i seq quot -- elt )
-    2over ?nth dup [
-        [ 3drop ] dip
-    ] [
-        drop swap [ over [ call dup ] dip ] dip set-nth
-    ] if ; inline
-
 : mismatch ( seq1 seq2 -- i )
     [ min-length ] 2keep
     [ 2nth-unsafe = not ] 2curry
@@ -541,12 +538,12 @@ M: sequence <=>
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
     >fixnum swap [
-        dup -2 fixnum-shift-fast swap 5 fixnum-shift-fast
+        [ -2 fixnum-shift-fast ] [ 5 fixnum-shift-fast ] bi
         fixnum+fast fixnum+fast
     ] keep fixnum-bitxor ; inline
 
 : sequence-hashcode ( n seq -- x )
-    0 -rot [ hashcode* sequence-hashcode-step ] with each ; inline
+    [ 0 ] 2dip [ hashcode* sequence-hashcode-step ] with each ; inline
 
 M: reversed equal? over reversed? [ sequence= ] [ 2drop f ] if ;
 
@@ -831,12 +828,36 @@ PRIVATE>
 
 : supremum ( seq -- n ) dup first [ max ] reduce ;
 
-: flip ( matrix -- newmatrix )
-    dup empty? [
-        dup [ length ] map infimum
-        swap [ [ nth-unsafe ] with { } map-as ] curry { } map-as
-    ] unless ;
-
 : sigma ( seq quot -- n ) [ + ] compose 0 swap reduce ; inline
 
 : count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
+
+! We hand-optimize flip to such a degree because type hints
+! cannot express that an array is an array of arrays yet, and
+! this word happens to be performance-critical since the compiler
+! itself uses it. Optimizing it like this reduced compile time.
+<PRIVATE
+
+: generic-flip ( matrix -- newmatrix )
+    [ dup first length [ length min ] reduce ] keep
+    [ [ nth-unsafe ] with { } map-as ] curry { } map-as ; inline
+
+USE: arrays
+
+: array-length ( array -- len )
+    { array } declare length>> ; inline
+
+: array-flip ( matrix -- newmatrix )
+    { array } declare
+    [ dup first array-length [ array-length min ] reduce ] keep
+    [ [ array-nth ] with { } map-as ] curry { } map-as ;
+
+PRIVATE>
+
+: flip ( matrix -- newmatrix )
+    dup empty? [
+        dup array? [
+            dup [ array? ] all?
+            [ array-flip ] [ generic-flip ] if
+        ] [ generic-flip ] if
+    ] unless ;

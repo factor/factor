@@ -14,7 +14,7 @@ $nl
 }
 "The underlying sequence must implement a generic word:"
 { $subsection resize }
-{ $link "vectors" } ", " { $link "byte-vectors" } " and " { $link "sbufs" } " are implemented using the resizable sequence facility." ;
+{ $link "vectors" } " and " { $link "sbufs" } " are implemented using the resizable sequence facility." ;
 
 ABOUT: "growable"
 

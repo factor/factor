@@ -30,7 +30,7 @@ TYPEDEF: long*               LPLONG
 TYPEDEF: long                LONG_PTR
 TYPEDEF: long*               PLONG_PTR
 
-TYPEDEF: int                 ULONG
+TYPEDEF: uint                ULONG
 TYPEDEF: void*               ULONG_PTR
 TYPEDEF: void*               PULONG_PTR
 
@@ -252,6 +252,29 @@ C-STRUCT: RECT
     ! { "BOOL" "fIncUpdate" }
     ! { "BYTE[32]" "rgbReserved" }
 ! ;
+
+C-STRUCT: BITMAPINFOHEADER
+    { "DWORD"  "biSize" }
+    { "LONG"   "biWidth" }
+    { "LONG"   "biHeight" }
+    { "WORD"   "biPlanes" }
+    { "WORD"   "biBitCount" }
+    { "DWORD"  "biCompression" }
+    { "DWORD"  "biSizeImage" }
+    { "LONG"   "biXPelsPerMeter" }
+    { "LONG"   "biYPelsPerMeter" }
+    { "DWORD"  "biClrUsed" }
+    { "DWORD"  "biClrImportant" } ;
+
+C-STRUCT: RGBQUAD
+    { "BYTE" "rgbBlue" }
+    { "BYTE" "rgbGreen" }
+    { "BYTE" "rgbRed" }
+    { "BYTE" "rgbReserved" } ;
+
+C-STRUCT: BITMAPINFO
+    { "BITMAPINFOHEADER" "bmiHeader" }
+    { "RGBQUAD[1]" "bmiColors" } ;
 
 TYPEDEF: void* LPPAINTSTRUCT
 TYPEDEF: void* PAINTSTRUCT

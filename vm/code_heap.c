@@ -147,6 +147,8 @@ void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value)
 /* Perform all fixups on a code block */
 void relocate_code_block(F_COMPILED *compiled, CELL code_start, CELL literals_start)
 {
+	compiled->last_scan = NURSERY;
+
 	if(compiled->relocation != F)
 	{
 		F_BYTE_ARRAY *relocation = untag_object(compiled->relocation);

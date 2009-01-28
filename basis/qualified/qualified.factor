@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences assocs hashtables parser lexer
-vocabs words namespaces vocabs.loader debugger sets fry ;
+vocabs words namespaces vocabs.loader sets fry ;
 IN: qualified
 
 : define-qualified ( vocab-name prefix-name -- )

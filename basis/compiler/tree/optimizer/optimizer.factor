@@ -6,6 +6,7 @@ compiler.tree.normalization
 compiler.tree.propagation
 compiler.tree.cleanup
 compiler.tree.escape-analysis
+compiler.tree.escape-analysis.check
 compiler.tree.tuple-unboxing
 compiler.tree.identities
 compiler.tree.def-use
@@ -22,8 +23,10 @@ SYMBOL: check-optimizer?
     normalize
     propagate
     cleanup
-    escape-analysis
-    unbox-tuples
+    dup run-escape-analysis? [
+        escape-analysis
+        unbox-tuples
+    ] when
     apply-identities
     compute-def-use
     remove-dead-code

@@ -1,8 +1,9 @@
-! Copyright (C) 2006, 2007 Slava Pestov
+! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax io kernel namespaces core-foundation
-core-foundation.run-loop cocoa.messages cocoa cocoa.classes
-cocoa.runtime sequences threads debugger init summary
+core-foundation.run-loop core-foundation.arrays
+core-foundation.data core-foundation.strings cocoa.messages
+cocoa cocoa.classes cocoa.runtime sequences threads init summary
 kernel.private assocs ;
 IN: cocoa.application
 
@@ -27,17 +28,19 @@ IN: cocoa.application
 
 : NSApp ( -- app ) NSApplication -> sharedApplication ;
 
+: NSAnyEventMask ( -- mask ) HEX: ffffffff ; inline
+
 FUNCTION: void NSBeep ( ) ;
 
 : with-cocoa ( quot -- )
     [ NSApp drop call ] with-autorelease-pool ; inline
 
 : next-event ( app -- event )
-    0 f CFRunLoopDefaultMode 1
+    NSAnyEventMask f CFRunLoopDefaultMode 1
     -> nextEventMatchingMask:untilDate:inMode:dequeue: ;
 
 : do-event ( app -- ? )
-    dup next-event [ -> sendEvent: t ] [ drop f ] if* ;
+    dup next-event [ dupd -> sendEvent: -> updateWindows t ] [ drop f ] if* ;
 
 : add-observer ( observer selector name object -- )
     [
@@ -49,14 +52,7 @@ FUNCTION: void NSBeep ( ) ;
     [ NSNotificationCenter -> defaultCenter ] dip
     -> removeObserver: ;
 
-: finish-launching ( -- ) NSApp -> finishLaunching ;
-
-: cocoa-app ( quot -- )
-    [
-        call
-        finish-launching
-        NSApp -> run
-    ] with-cocoa ; inline
+: cocoa-app ( quot -- ) [ call NSApp -> run ] with-cocoa ; inline
 
 : install-delegate ( receiver delegate -- )
     -> alloc -> init -> setDelegate: ;
@@ -81,6 +77,6 @@ M: objc-error summary ( error -- )
     running.app? [
         drop
     ] [
-        "The " swap " requires you to run Factor from an application bundle."
-        3append throw
+        "The " " requires you to run Factor from an application bundle."
+        surround throw
     ] if ;

@@ -1,8 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: vocabs.loader io.files io kernel sequences assocs
-splitting parser prettyprint namespaces math vocabs
-hashtables tools.vocabs ;
+USING: io.files io kernel sequences assocs splitting parser
+namespaces math vocabs hashtables ;
 IN: tools.deploy.config
 
 SYMBOL: deploy-name
@@ -66,18 +65,3 @@ SYMBOL: deploy-image
         ! default value for deploy.macosx
         { "stop-after-last-window?" t }
     } assoc-union ;
-
-: deploy-config-path ( vocab -- string )
-    vocab-dir "deploy.factor" append-path ;
-
-: deploy-config ( vocab -- assoc )
-    dup default-config swap
-    dup deploy-config-path vocab-file-contents
-    parse-fresh [ first assoc-union ] unless-empty ;
-
-: set-deploy-config ( assoc vocab -- )
-    [ unparse-use string-lines ] dip
-    dup deploy-config-path set-vocab-file-contents ;
-
-: set-deploy-flag ( value key vocab -- )
-    [ deploy-config [ set-at ] keep ] keep set-deploy-config ;

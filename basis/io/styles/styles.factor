@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables io colors ;
+USING: hashtables io colors summary make accessors splitting
+kernel ;
 IN: io.styles
 
 SYMBOL: plain
@@ -42,5 +43,12 @@ SYMBOL: table-border
 TUPLE: input string ;
 
 C: <input> input
+
+M: input summary
+    [
+        "Input: " %
+        string>> "\n" split1 swap %
+        "..." "" ? %
+    ] "" make ;
 
 : write-object ( str obj -- ) presented associate format ;

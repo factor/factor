@@ -61,12 +61,6 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     ! Quotation which coerces return value to required type
     return-prep-quot infer-quot-here ;
 
-! Callbacks are registered in a global hashtable. If you clear
-! this hashtable, they will all be blown away by code GC, beware
-SYMBOL: callbacks
-
-[ H{ } clone callbacks set-global ] "alien.compiler" add-init-hook
-
 : register-callback ( word -- ) callbacks get conjoin ;
 
 : callback-bottom ( params -- )

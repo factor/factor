@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors kernel math math.parser
-namespaces parser sequences strings prettyprint debugger
+namespaces parser sequences strings prettyprint
 quotations combinators logging calendar assocs present
 fry accessors arrays io io.sockets io.encodings.ascii
 io.sockets.secure io.files io.streams.duplex io.timeouts
@@ -79,7 +79,7 @@ M: threaded-server handle-client* handler>> call ;
 \ handle-client ERROR add-error-logging
 
 : thread-name ( server-name addrspec -- string )
-    unparse-short " connection from " swap 3append ;
+    unparse-short " connection from " glue ;
 
 : accept-connection ( threaded-server -- )
     [ accept ] [ addr>> ] bi

@@ -197,7 +197,7 @@ void primitive_bignum_xor(void)
 
 void primitive_bignum_shift(void)
 {
-	F_FIXNUM y = to_fixnum(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
         F_ARRAY* x = untag_object(dpop());
 	dpush(tag_bignum(bignum_arithmetic_shift(x,y)));
 }

@@ -68,7 +68,6 @@ bootstrapping? on
     "alien.accessors"
     "arrays"
     "byte-arrays"
-    "byte-vectors"
     "classes.private"
     "classes.tuple"
     "classes.tuple.private"
@@ -109,9 +108,6 @@ bootstrapping? on
 } [ create-vocab drop ] each
 
 ! Builtin classes
-: define-builtin-predicate ( class -- )
-    dup class>type [ builtin-instance? ] curry define-predicate ;
-
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
 
@@ -191,6 +187,10 @@ define-union-class
     [ [ drop f ] if ] %
 ] [ ] make
 define-predicate-class
+
+"array-capacity" "sequences.private" lookup
+[ >fixnum ] bootstrap-max-array-capacity <fake-bignum> [ fixnum-bitand ] curry append
+"coercer" set-word-prop
 
 ! Catch-all class for providing a default method.
 "object" "kernel" create
@@ -468,6 +468,7 @@ tuple
     { "dlsym" "alien" }
     { "dlclose" "alien" }
     { "<byte-array>" "byte-arrays" }
+    { "(byte-array)" "byte-arrays" }
     { "<displaced-alien>" "alien" }
     { "alien-signed-cell" "alien.accessors" }
     { "set-alien-signed-cell" "alien.accessors" }
@@ -499,7 +500,8 @@ tuple
     { "alien-address" "alien" }
     { "set-slot" "slots.private" }
     { "string-nth" "strings.private" }
-    { "set-string-nth" "strings.private" }
+    { "set-string-nth-fast" "strings.private" }
+    { "set-string-nth-slow" "strings.private" }
     { "resize-array" "arrays" }
     { "resize-string" "strings" }
     { "<array>" "arrays" }

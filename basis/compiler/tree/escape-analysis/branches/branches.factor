@@ -33,4 +33,4 @@ M: #branch escape-analysis*
     2bi ;
 
 M: #phi escape-analysis*
-    [ phi-in-d>> <flipped> ] [ out-d>> ] bi merge-allocations ;
+    [ phi-in-d>> flip ] [ out-d>> ] bi merge-allocations ;

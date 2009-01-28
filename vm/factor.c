@@ -44,25 +44,7 @@ void do_stage1_init(void)
 	print_string("*** Stage 2 early init... ");
 	fflush(stdout);
 
-	CELL words = find_all_words();
-
-	REGISTER_ROOT(words);
-
-	CELL i;
-	CELL length = array_capacity(untag_object(words));
-	for(i = 0; i < length; i++)
-	{
-		F_WORD *word = untag_word(array_nth(untag_array(words),i));
-		REGISTER_UNTAGGED(word);
-		default_word_code(word,false);
-		UNREGISTER_UNTAGGED(word);
-		update_word_xt(word);
-	}
-
-	UNREGISTER_ROOT(words);
-
-	iterate_code_heap(relocate_code_block);
-
+	compile_all_words();
 	userenv[STAGE2_ENV] = T;
 
 	print_string("done\n");

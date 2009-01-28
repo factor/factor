@@ -59,6 +59,7 @@ HOOK: %set-slot cpu ( src obj slot tag temp -- )
 HOOK: %set-slot-imm cpu ( src obj slot tag -- )
 
 HOOK: %string-nth cpu ( dst obj index temp -- )
+HOOK: %set-string-nth-fast cpu ( ch obj index temp -- )
 
 HOOK: %add     cpu ( dst src1 src2 -- )
 HOOK: %add-imm cpu ( dst src1 src2 -- )
@@ -76,6 +77,7 @@ HOOK: %shl-imm cpu ( dst src1 src2 -- )
 HOOK: %shr-imm cpu ( dst src1 src2 -- )
 HOOK: %sar-imm cpu ( dst src1 src2 -- )
 HOOK: %not     cpu ( dst src -- )
+HOOK: %log2    cpu ( dst src -- )
 
 HOOK: %fixnum-add cpu ( src1 src2 -- )
 HOOK: %fixnum-add-tail cpu ( src1 src2 -- )
@@ -118,6 +120,8 @@ HOOK: %set-alien-integer-4 cpu ( ptr value -- )
 HOOK: %set-alien-cell      cpu ( ptr value -- )
 HOOK: %set-alien-float     cpu ( ptr value -- )
 HOOK: %set-alien-double    cpu ( ptr value -- )
+
+HOOK: %alien-global cpu ( dst symbol library -- )
 
 HOOK: %allot cpu ( dst size class temp -- )
 HOOK: %write-barrier cpu ( src card# table -- )

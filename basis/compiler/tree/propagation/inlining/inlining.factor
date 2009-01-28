@@ -20,6 +20,10 @@ SYMBOL: node-count
 : count-nodes ( nodes -- )
     0 swap [ drop 1+ ] each-node node-count set ;
 
+! We try not to inline the same word too many times, to avoid
+! combinatorial explosion
+SYMBOL: inlining-count
+
 ! Splicing nodes
 GENERIC: splicing-nodes ( #call word/quot/f -- nodes )
 
@@ -44,9 +48,11 @@ M: callable splicing-nodes
     ] [ 2drop f >>method f >>body f >>class drop f ] if ;
 
 : inlining-standard-method ( #call word -- class/f method/f )
-    [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
-    [ swap nth value-info class>> dup ] dip
-    specific-method ;
+    dup "methods" word-prop assoc-empty? [ 2drop f f ] [
+        [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
+        [ swap nth value-info class>> dup ] dip
+        specific-method
+    ] if ;
 
 : inline-standard-method ( #call word -- ? )
     dupd inlining-standard-method eliminate-dispatch ;
@@ -120,17 +126,25 @@ DEFER: (flat-length)
         bi and
     ] contains? ;
 
+: node-count-bias ( -- n )
+    45 node-count get [-] 8 /i ;
+
+: body-length-bias ( word -- n )
+    [ flat-length ] [ inlining-count get at 0 or ] bi
+    over 2 <= [ drop ] [ 2/ 1+ * ] if 24 swap [-] 4 /i ;
+
 : inlining-rank ( #call word -- n )
     [ classes-known? 2 0 ? ]
     [
         {
-            [ drop node-count get 45 swap [-] 8 /i ]
-            [ flat-length 24 swap [-] 4 /i ]
+            [ body-length-bias ]
             [ "default" word-prop -4 0 ? ]
             [ "specializer" word-prop 1 0 ? ]
             [ method-body? 1 0 ? ]
         } cleave
-    ] bi* + + + + + ;
+        node-count-bias
+        loop-nesting get 0 or 2 *
+    ] bi* + + + + + + ;
 
 : should-inline? ( #call word -- ? )
     dup "inline" word-prop [ 2drop t ] [ inlining-rank 5 >= ] if ;
@@ -138,12 +152,12 @@ DEFER: (flat-length)
 SYMBOL: history
 
 : remember-inlining ( word -- )
-    history [ swap suffix ] change ;
+    [ inlining-count get inc-at ]
+    [ history [ swap suffix ] change ]
+    bi ;
 
 : inline-word-def ( #call word quot -- ? )
-    over history get memq? [
-        3drop f
-    ] [
+    over history get memq? [ 3drop f ] [
         [
             swap remember-inlining
             dupd splicing-nodes >>body
@@ -172,7 +186,7 @@ SYMBOL: history
     over in-d>> second value-info literal>> dup class?
     [ "predicate" word-prop '[ drop @ ] inline-word-def ] [ 3drop f ] if ;
 
-: do-inlining ( #call word -- ? )
+: (do-inlining) ( #call word -- ? )
     #! If the generic was defined in an outer compilation unit,
     #! then it doesn't have a definition yet; the definition
     #! is built at the end of the compilation unit. We do not
@@ -183,7 +197,6 @@ SYMBOL: history
     #! discouraged, but it should still work.)
     {
         { [ dup deferred? ] [ 2drop f ] }
-        { [ dup custom-inlining? ] [ inline-custom ] }
         { [ dup \ instance? eq? ] [ inline-instance-check ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
@@ -191,3 +204,10 @@ SYMBOL: history
         { [ dup method-body? ] [ inline-method-body ] }
         [ 2drop f ]
     } cond ;
+
+: do-inlining ( #call word -- ? )
+    #! Note the logic here: if there's a custom inlining hook,
+    #! it is permitted to return f, which means that we try the
+    #! normal inlining heuristic.
+    dup custom-inlining? [ 2dup inline-custom ] [ f ] if
+    [ 2drop t ] [ (do-inlining) ] if ;

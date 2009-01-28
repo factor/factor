@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: functors sequences sequences.private growable
-prettyprint.backend kernel words classes math parser ;
+prettyprint.custom kernel words classes math parser ;
 IN: specialized-vectors.functor
 
 FUNCTOR: define-vector ( T -- )

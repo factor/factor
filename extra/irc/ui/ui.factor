@@ -9,7 +9,7 @@ USING: accessors kernel threads combinators concurrency.mailboxes
        ui.gadgets.tabs ui.gadgets.grids ui.gadgets.packs ui.gadgets.labels
        io io.styles namespaces calendar calendar.format models continuations
        irc.client irc.client.private irc.messages
-       irc.ui.commandparser irc.ui.load vocabs.loader ;
+       irc.ui.commandparser irc.ui.load vocabs.loader classes prettyprint ;
 
 RENAME: join sequences => sjoin
 
@@ -30,6 +30,7 @@ TUPLE: irc-tab < frame chat client window ;
     foreground associate format ;
 : dark-red T{ rgba f 0.5 0.0 0.0 1 } ;
 : dark-green T{ rgba f 0.0 0.5 0.0 1 } ;
+: dark-blue T{ rgba f 0.0 0.0 0.5 1 } ;
 
 : dot-or-parens ( string -- string )
     [ "." ]
@@ -41,14 +42,14 @@ M: ping write-irc
     drop "* Ping" blue write-color ;
 
 M: privmsg write-irc
-    "<" blue write-color
+    "<" dark-blue write-color
     [ irc-message-sender write ] keep
-    "> " blue write-color
+    "> " dark-blue write-color
     trailing>> write ;
 
 M: notice write-irc
-    [ type>> blue write-color ] keep
-    ": " blue write-color
+    [ type>> dark-blue write-color ] keep
+    ": " dark-blue write-color
     trailing>> write ;
 
 TUPLE: own-message message nick timestamp ;
@@ -57,9 +58,9 @@ TUPLE: own-message message nick timestamp ;
     now own-message boa ;
 
 M: own-message write-irc
-    "<" blue write-color
+    "<" dark-blue write-color
     [ nick>> bold font-style associate format ] keep
-    "> " blue write-color
+    "> " dark-blue write-color
     message>> write ;
 
 M: join write-irc
@@ -87,26 +88,23 @@ M: kick write-irc
     " from the channel" dark-red write-color
     trailing>> dot-or-parens dark-red write-color ;
 
-: full-mode ( message -- mode )
-    parameters>> rest " " sjoin ;
-
 M: mode write-irc
-    "* " blue write-color
-    [ irc-message-sender write ] keep
-    " has applied mode " blue write-color
-    [ full-mode write ] keep
-    " to " blue write-color
-    channel>> write ;
+    "* " dark-blue write-color
+    [ name>> write ] keep
+    " has applied mode " dark-blue write-color
+    [ mode>> write ] keep
+    " to " dark-blue write-color
+    parameter>> write ;
 
 M: nick write-irc
-    "* " blue write-color
+    "* " dark-blue write-color
     [ irc-message-sender write ] keep
     " is now known as " blue write-color
     trailing>> write ;
 
 M: unhandled write-irc
     "UNHANDLED: " write
-    line>> blue write-color ;
+    line>> dark-blue write-color ;
 
 M: irc-end write-irc
     drop "* You have left IRC" dark-red write-color ;
@@ -121,7 +119,10 @@ M: irc-chat-end write-irc
     drop ;
 
 M: irc-message write-irc
-    drop ; ! catch all unimplemented writes, THIS WILL CHANGE    
+    "UNIMPLEMENTED" write
+    [ class pprint ] keep
+    ": " write
+    line>> dark-blue write-color ;
 
 GENERIC: time-happened ( message -- timestamp )
 

@@ -1,10 +1,10 @@
 USING: editors io.files io.launcher kernel math.parser
-namespaces sequences windows.shell32 make ;
+namespaces sequences windows.shell32 make io.paths.windows ;
 IN: editors.editplus
 
 : editplus-path ( -- path )
     \ editplus-path get-global [
-        program-files "\\EditPlus 2\\editplus.exe" append-path
+        "EditPlus 2" t [ "editplus.exe" tail? ] find-in-program-files
     ] unless* ;
 
 : editplus ( file line -- )

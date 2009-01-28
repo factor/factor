@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax alien.c-types alien.strings arrays
 combinators kernel math namespaces parser prettyprint sequences
-windows.errors windows.types windows.kernel32 words ;
+windows.errors windows.types windows.kernel32 words
+io.encodings.utf16n ;
 IN: windows
 
 : lo-word ( wparam -- lo ) <short> *short ; inline

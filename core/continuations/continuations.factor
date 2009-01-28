@@ -114,6 +114,9 @@ SYMBOL: return-continuation
         ] 3 (throw)
     ] callcc1 2nip ;
 
+: assert-depth ( quot -- )
+    { } swap with-datastack { } assert= ; inline
+
 GENERIC: compute-restarts ( error -- seq )
 
 <PRIVATE
@@ -153,6 +156,8 @@ ERROR: attempt-all-error ;
             [ [ , f ] compose [ , drop t ] recover ] curry all?
         ] { } make peek swap [ rethrow ] when
     ] if ; inline
+
+: retry ( quot: ( -- ? )  n -- ) swap [ drop ] prepose attempt-all ; inline
 
 TUPLE: condition error restarts continuation ;
 

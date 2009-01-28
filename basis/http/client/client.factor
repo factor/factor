@@ -3,14 +3,15 @@
 USING: accessors assocs kernel math math.parser namespaces make
 sequences io io.sockets io.streams.string io.files io.timeouts
 strings splitting calendar continuations accessors vectors
-math.order hashtables byte-arrays prettyprint destructors
+math.order hashtables byte-arrays destructors
 io.encodings
 io.encodings.string
 io.encodings.ascii
+io.encodings.utf8
 io.encodings.8-bit
 io.encodings.binary
 io.streams.duplex
-fry debugger summary ascii urls urls.encoding present
+fry ascii urls urls.encoding present
 http http.parsers ;
 IN: http.client
 
@@ -40,11 +41,11 @@ GENERIC: >post-data ( object -- post-data )
 
 M: post-data >post-data ;
 
-M: string >post-data "application/octet-stream" <post-data> ;
+M: string >post-data utf8 encode "application/octet-stream" <post-data> ;
 
 M: byte-array >post-data "application/octet-stream" <post-data> ;
 
-M: assoc >post-data assoc>query "application/x-www-form-urlencoded" <post-data> ;
+M: assoc >post-data assoc>query ascii encode "application/x-www-form-urlencoded" <post-data> ;
 
 M: f >post-data ;
 
@@ -59,6 +60,7 @@ M: f >post-data ;
     unparse-post-data
     write-request-line
     write-request-header
+    binary encode-output
     write-post-data
     flush
     drop ;
@@ -223,3 +225,7 @@ M: download-failed error.
 
 : http-put ( data url -- response data )
     <put-request> http-request ;
+
+USING: vocabs vocabs.loader ;
+
+"debugger" vocab [ "http.client.debugger" require ] when

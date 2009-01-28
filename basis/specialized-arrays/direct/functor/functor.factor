@@ -20,7 +20,7 @@ SET-NTH [ T dup c-setter array-accessor ]
 WHERE
 
 TUPLE: A
-{ underlying alien read-only }
+{ underlying c-ptr read-only }
 { length fixnum read-only } ;
 
 : <A> ( alien len -- direct-array ) A boa ; inline

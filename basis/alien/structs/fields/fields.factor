@@ -29,7 +29,7 @@ PREDICATE: slot-writer < word "writing" word-prop >boolean ;
     writer>> swap "writing" set-word-prop ;
 
 : reader-word ( class name vocab -- word )
-    [ "-" swap 3append ] dip create ;
+    [ "-" glue ] dip create ;
 
 : writer-word ( class name vocab -- word )
     [ [ swap "set-" % % "-" % % ] "" make ] dip create ;

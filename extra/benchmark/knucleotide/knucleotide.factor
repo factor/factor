@@ -9,7 +9,7 @@ IN: benchmark.knucleotide
     "." split1 rot
     over length over <
     [ CHAR: 0 pad-right ] 
-    [ head ] if "." swap 3append ;
+    [ head ] if "." glue ;
 
 : discard-lines ( -- )
     readln

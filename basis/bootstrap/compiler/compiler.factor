@@ -5,16 +5,21 @@ sequences namespaces parser kernel kernel.private classes
 classes.private arrays hashtables vectors classes.tuple sbufs
 hashtables.private sequences.private math classes.tuple.private
 growable namespaces.private assocs words command-line vocabs io
-io.encodings.string prettyprint libc splitting math.parser
+io.encodings.string libc splitting math.parser
 compiler.units math.order compiler.tree.builder
 compiler.tree.optimizer compiler.cfg.optimizer ;
 IN: bootstrap.compiler
 
 ! Don't bring this in when deploying, since it will store a
 ! reference to 'eval' in a global variable
-"deploy-vocab" get [
+"deploy-vocab" get "staging" get or [
     "alien.remote-control" require
 ] unless
+
+"prettyprint" vocab [
+    "stack-checker.errors.prettyprint" require
+    "alien.prettyprint" require
+] when
 
 "cpu." cpu name>> append require
 
@@ -60,7 +65,7 @@ nl
 "." write flush
 
 {
-    new-sequence nth push pop peek
+    new-sequence nth push pop peek flip
 } compile-uncompiled
 
 "." write flush
@@ -86,7 +91,7 @@ nl
 "." write flush
 
 {
-    . malloc calloc free memcpy
+    malloc calloc free memcpy
 } compile-uncompiled
 
 "." write flush

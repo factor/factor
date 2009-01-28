@@ -1,5 +1,5 @@
 
-USING: kernel parser lexer locals.private ;
+USING: kernel parser lexer locals.parser locals.types ;
 
 IN: bind-in
 

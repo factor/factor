@@ -239,7 +239,7 @@ ERROR: bad-create name vocab ;
     dup [ 2nip ] [ drop <word> dup reveal ] if ;
 
 : constructor-word ( name vocab -- word )
-    [ "<" swap ">" 3append ] dip create ;
+    [ "<" ">" surround ] dip create ;
 
 PREDICATE: parsing-word < word "parsing" word-prop ;
 

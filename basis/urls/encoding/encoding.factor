@@ -115,6 +115,6 @@ PRIVATE>
     [
         [
             [ url-encode ] dip
-            [ url-encode "=" swap 3append , ] with each
+            [ url-encode "=" glue , ] with each
         ] assoc-each
     ] { } make "&" join ;

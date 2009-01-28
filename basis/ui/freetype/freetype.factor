@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.accessors alien.c-types arrays io kernel libc
-math math.vectors namespaces opengl opengl.gl prettyprint assocs
+math math.vectors namespaces opengl opengl.gl assocs
 sequences io.files io.styles continuations freetype
 ui.gadgets.worlds ui.render ui.backend byte-arrays accessors
 locals specialized-arrays.direct.uchar ;
@@ -61,7 +61,7 @@ M: freetype-renderer free-fonts ( world -- )
     } at ;
 
 : ttf-path ( name -- string )
-    "resource:fonts/" swap ".ttf" 3append ;
+    "resource:fonts/" ".ttf" surround ;
 
 : (open-face) ( path length -- face )
     #! We use FT_New_Memory_Face, not FT_New_Face, since

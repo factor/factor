@@ -57,9 +57,9 @@ SYMBOL: quotations
     branch-variable ;
 
 : datastack-phi ( seq -- phi-in phi-out )
-    [ d-in branch-variable ] [ meta-d active-variable ] bi
+    [ d-in branch-variable ] [ \ meta-d active-variable ] bi
     unify-branches
-    [ d-in set ] [ ] [ dup >vector meta-d set ] tri* ;
+    [ d-in set ] [ ] [ dup >vector \ meta-d set ] tri* ;
 
 : terminated-phi ( seq -- terminated )
     terminated? branch-variable ;
@@ -74,17 +74,25 @@ SYMBOL: quotations
     tri ;
 
 : copy-inference ( -- )
-    meta-d [ clone ] change
-    V{ } clone meta-r set
+    \ meta-d [ clone ] change
+    literals [ clone ] change
     d-in [ ] change ;
 
-: infer-branch ( literal -- namespace )
+GENERIC: infer-branch ( literal -- namespace )
+
+M: literal infer-branch
     [
         copy-inference
         nest-visitor
         [ value>> quotation set ] [ infer-literal-quot ] bi
-        check->r
-    ] H{ } make-assoc ; inline
+    ] H{ } make-assoc ;
+
+M: callable infer-branch
+    [
+        copy-inference
+        nest-visitor
+        [ quotation set ] [ infer-quot-here ] bi
+    ] H{ } make-assoc ;
 
 : infer-branches ( branches -- input children data )
     [ pop-d ] dip
@@ -96,16 +104,19 @@ SYMBOL: quotations
     [ first2 #if, ] dip compute-phi-function ;
 
 : infer-if ( -- )
-    2 consume-d
-    dup [ known [ curried? ] [ composed? ] bi or ] contains? [
-        output-d
-        [ rot [ drop call ] [ nip call ] if ]
-        infer-quot-here
+    2 literals-available? [
+        (infer-if)
     ] [
-        [ #drop, ] [ [ literal ] map (infer-if) ] bi
+        drop 2 consume-d
+        dup [ known [ curried? ] [ composed? ] bi or ] contains? [
+            output-d
+            [ rot [ drop call ] [ nip call ] if ]
+            infer-quot-here
+        ] [
+            [ #drop, ] [ [ literal ] map (infer-if) ] bi
+        ] if
     ] if ;
 
 : infer-dispatch ( -- )
-    pop-literal nip [ <literal> ] map
-    infer-branches
+    pop-literal nip infer-branches
     [ #dispatch, ] dip compute-phi-function ;

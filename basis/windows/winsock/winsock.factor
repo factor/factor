@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax arrays
 byte-arrays kernel math sequences windows.types windows.kernel32
-windows.errors windows math.bitwise alias ;
+windows.errors windows math.bitwise alias io.encodings.utf16n ;
 IN: windows.winsock
 
 USE: libc

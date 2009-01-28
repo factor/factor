@@ -5,7 +5,7 @@ IN: grouping.tests
 
 [ { "hell" "o wo" "rld" } ] [ "hello world" 4 group ] unit-test
 
-[ { V{ "a" "b" } V{ f f } } ] [
+[ { V{ "a" "b" } V{ 0 0 } } ] [
     V{ "a" "b" } clone 2 <groups>
     2 over set-length
     >array

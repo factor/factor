@@ -58,3 +58,15 @@ name>char-hook global [
     lexer get [
         [ swap tail-slice (parse-string) ] "" make swap
     ] change-lexer-column ;
+
+: (unescape-string) ( str -- str' )
+    dup [ CHAR: \\ = ] find [
+        cut-slice [ % ] dip rest-slice
+        next-escape [ , ] dip
+        (unescape-string)
+    ] [
+        drop %
+    ] if ;
+
+: unescape-string ( str -- str' )
+    [ (unescape-string) ] "" make ;

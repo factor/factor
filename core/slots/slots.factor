@@ -50,7 +50,7 @@ PREDICATE: writer < word "writer" word-prop ;
     define-typecheck ;
 
 : writer-word ( name -- word )
-    "(>>" swap ")" 3append (( value object -- )) create-accessor
+    "(>>" ")" surround (( value object -- )) create-accessor
     dup t "writer" set-word-prop ;
 
 ERROR: bad-slot-value value class ;
@@ -199,7 +199,7 @@ M: array make-slot
         swap
         peel-off-name
         peel-off-class
-        [ dup empty? not ] [ peel-off-attributes ] [ ] while drop
+        [ dup empty? ] [ peel-off-attributes ] [ ] until drop
     check-initial-value ;
 
 M: slot-spec make-slot

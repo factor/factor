@@ -10,7 +10,7 @@ SYMBOL: building-seq
 
 : n, ( obj n -- ) get-building-seq push ;
 : n% ( seq n -- ) get-building-seq push-all ;
-: n# ( num n -- ) >r number>string r> n% ;
+: n# ( num n -- ) [ number>string ] dip n% ;
 
 : 0, ( obj -- ) 0 n, ;
 : 0% ( seq -- ) 0 n% ;

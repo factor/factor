@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors definitions help help.topics help.syntax
-prettyprint.backend prettyprint words kernel effects ;
+prettyprint.backend prettyprint.custom prettyprint words kernel
+effects ;
 IN: help.definitions
 
 ! Definition protocol implementation

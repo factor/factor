@@ -23,7 +23,7 @@ IN: bootstrap.image
     os name>> cpu name>> arch ;
 
 : boot-image-name ( arch -- string )
-    "boot." swap ".image" 3append ;
+    "boot." ".image" surround ;
 
 : my-boot-image-name ( -- string )
     my-arch boot-image-name ;
@@ -351,7 +351,12 @@ M: wrapper '
 : pad-bytes ( seq -- newseq )
     dup length bootstrap-cell align 0 pad-right ;
 
+: check-string ( string -- )
+    [ 127 > ] contains?
+    [ "Bootstrap cannot emit non-ASCII strings" throw ] when ;
+
 : emit-string ( string -- ptr )
+    dup check-string
     string type-number object tag-number [
         dup length emit-fixnum
         f ' emit

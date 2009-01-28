@@ -49,7 +49,7 @@ M: #renaming compute-copy-equiv* inputs/outputs are-copies-of ;
     ] 2each ;
 
 M: #phi compute-copy-equiv*
-    [ phi-in-d>> <flipped> ] [ out-d>> ] bi compute-phi-equiv ;
+    [ phi-in-d>> flip ] [ out-d>> ] bi compute-phi-equiv ;
 
 M: node compute-copy-equiv* drop ;
 

@@ -5,3 +5,4 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset);
 void primitive_array_to_quotation(void);
 void primitive_quotation_xt(void);
 void primitive_jit_compile(void);
+void compile_all_words(void);

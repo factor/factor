@@ -131,6 +131,14 @@ M: ##string-nth generate-insn
         [ temp>> register ]
     } cleave %string-nth ;
 
+M: ##set-string-nth-fast generate-insn
+    {
+        [ src>> register ]
+        [ obj>> register ]
+        [ index>> register ]
+        [ temp>> register ]
+    } cleave %set-string-nth-fast ;
+
 : dst/src ( insn -- dst src )
     [ dst>> register ] [ src>> register ] bi ; inline
 
@@ -155,6 +163,7 @@ M: ##shl-imm generate-insn dst/src1/src2 %shl-imm ;
 M: ##shr-imm generate-insn dst/src1/src2 %shr-imm ;
 M: ##sar-imm generate-insn dst/src1/src2 %sar-imm ;
 M: ##not     generate-insn dst/src       %not     ;
+M: ##log2    generate-insn dst/src       %log2    ;
 
 : src1/src2 ( insn -- src1 src2 )
     [ src1>> register ] [ src2>> register ] bi ; inline
@@ -227,6 +236,10 @@ M: ##write-barrier generate-insn
 M: _gc generate-insn drop %gc ;
 
 M: ##loop-entry generate-insn drop %loop-entry ;
+
+M: ##alien-global generate-insn
+    [ dst>> register ] [ symbol>> ] [ library>> ] tri
+    %alien-global ;
 
 ! ##alien-invoke
 GENERIC: reg-size ( register-class -- n )
@@ -443,7 +456,7 @@ M: ##alien-indirect generate-insn
 
 TUPLE: callback-context ;
 
-: current-callback 2 getenv ;
+: current-callback ( -- id ) 2 getenv ;
 
 : wait-to-return ( token -- )
     dup current-callback eq? [

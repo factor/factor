@@ -3,8 +3,8 @@
 USING: alien.syntax kernel unix.stat math unix
 combinators system io.backend accessors alien.c-types
 io.encodings.utf8 alien.strings unix.types io.unix.files
-io.files unix.statvfs.netbsd unix.getfsstat.netbsd
-grouping sequences ;
+io.files unix.statvfs.netbsd unix.getfsstat.netbsd arrays
+grouping sequences io.encodings.utf8 specialized-arrays.direct.uint ;
 IN: io.unix.files.netbsd
 
 TUPLE: netbsd-file-system-info < unix-file-system-info
@@ -35,18 +35,18 @@ M: netbsd statvfs>file-system-info ( file-system-info statvfs -- file-system-inf
         [ statvfs-f_syncwrites >>sync-writes ]
         [ statvfs-f_asyncreads >>async-reads ]
         [ statvfs-f_asyncwrites >>async-writes ]
-        [ statvfs-f_fsidx >>idx ]
+        [ statvfs-f_fsidx 2 <direct-uint-array> >array >>idx ]
         [ statvfs-f_fsid >>id ]
         [ statvfs-f_namemax >>name-max ]
         [ statvfs-f_owner >>owner ]
         ! [ statvfs-f_spare >>spare ]
-        [ statvfs-f_fstypename alien>native-string >>type ]
-        [ statvfs-f_mntonname alien>native-string >>mount-point ]
-        [ statvfs-f_mntfromname alien>native-string >>device-name ]
+        [ statvfs-f_fstypename utf8 alien>string >>type ]
+        [ statvfs-f_mntonname utf8 alien>string >>mount-point ]
+        [ statvfs-f_mntfromname utf8 alien>string >>device-name ]
     } cleave ;
 
 M: netbsd file-systems ( -- array )
     f 0 0 getvfsstat dup io-error
     "statvfs" <c-array> dup dup length 0 getvfsstat io-error
     "statvfs" heap-size group
-    [ statvfs-f_mntonname alien>native-string file-system-info ] map ;
+    [ statvfs-f_mntonname utf8 alien>string file-system-info ] map ;

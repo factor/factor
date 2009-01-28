@@ -315,10 +315,10 @@ C-STRUCT: MEMORY_BASIC_INFORMATION
   { "DWORD" "type" } ;
 
 C-STRUCT: GUID
-    { "ulong" "Data1" }
-    { "ushort" "Data2" }
-    { "ushort" "Data3" }
-    { { "uchar" 8 } "Data4" } ;
+    { "ULONG" "Data1" }
+    { "WORD"  "Data2" }
+    { "WORD"  "Data3" }
+    { { "UCHAR" 8 } "Data4" } ;
 
 
 : SE_CREATE_TOKEN_NAME "SeCreateTokenPrivilege" ;

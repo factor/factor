@@ -164,7 +164,7 @@ M: sqlite-db <insert-user-assigned-statement> ( tuple -- statement )
 
 M: sqlite-db bind# ( spec obj -- )
     [
-        [ column-name>> ":" swap next-sql-counter 3append dup 0% ]
+        [ column-name>> ":" next-sql-counter surround dup 0% ]
         [ type>> ] bi
     ] dip <literal-bind> 1, ;
 
@@ -308,7 +308,7 @@ M: sqlite-db persistent-table ( -- assoc )
 
 M: sqlite-db compound ( string seq -- new-string )
     over {
-        { "default" [ first number>string join-space ] }
+        { "default" [ first number>string " " glue ] }
         { "references" [
             [ >reference-string ] keep
             first2 [ "foreign-table" set ]

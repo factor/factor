@@ -1,6 +1,6 @@
 USING: alien alien.c-types alien.strings alien.syntax combinators
 kernel windows windows.user32 windows.ole32
-windows.com windows.com.syntax io.files ;
+windows.com windows.com.syntax io.files io.encodings.utf16n ;
 IN: windows.shell32
 
 : CSIDL_DESKTOP HEX: 00 ; inline

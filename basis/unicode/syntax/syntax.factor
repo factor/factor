@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unicode.data kernel math sequences parser lexer
 bit-arrays namespaces make sequences.private arrays quotations
-assocs classes.predicate math.order eval ;
+assocs classes.predicate math.order strings.parser ;
 IN: unicode.syntax
 
 ! Character classes (categories)
@@ -26,7 +26,7 @@ IN: unicode.syntax
     categories [ swap member? ] with map >bit-array ;
 
 : as-string ( strings -- bit-array )
-    concat "\"" tuck 3append eval ;
+    concat unescape-string ;
 
 : [category] ( categories -- quot )
     [

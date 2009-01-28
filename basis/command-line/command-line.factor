@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: init continuations debugger hashtables io
-io.encodings.utf8 io.files kernel kernel.private namespaces
-parser sequences strings system splitting eval vocabs.loader ;
+USING: init continuations hashtables io io.encodings.utf8
+io.files kernel kernel.private namespaces parser sequences
+strings system splitting vocabs.loader ;
 IN: command-line
 
 SYMBOL: script
@@ -31,8 +31,6 @@ SYMBOL: command-line
         ] [ drop ] if
     ] when ;
 
-<PRIVATE
-
 : var-param ( name value -- ) swap set-global ;
 
 : bool-param ( name -- ) "no-" ?head not var-param ;
@@ -42,8 +40,6 @@ SYMBOL: command-line
 
 : run-script ( file -- )
     t "quiet" set-global run-file ;
-
-PRIVATE>
 
 : parse-command-line ( args -- )
     [ command-line off script off ] [
@@ -75,16 +71,5 @@ SYMBOL: main-vocab-hook
     os macosx? "run" get "ui" = and ;
 
 : script-mode ( -- ) ;
-
-: handle-command-line ( -- )
-    [
-        (command-line) parse-command-line
-        load-vocab-roots
-        run-user-init
-        "e" get [ eval ] when*
-        ignore-cli-args? not script get and
-        [ run-script ] [ "run" get run ] if*
-        output-stream get [ stream-flush ] when*
-    ] [ print-error 1 exit ] recover ;
 
 [ default-cli-args ] "command-line" add-init-hook

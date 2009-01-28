@@ -4,7 +4,7 @@ USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
 sequences.private assocs models models.filter arrays accessors
-generic generic.standard definitions make ;
+generic generic.standard definitions make sbufs ;
 IN: tools.walker
 
 SYMBOL: show-walker-hook ! ( status continuation thread -- )
@@ -126,7 +126,7 @@ SYMBOL: +stopped+
     [
         2dup length = [ nip [ break ] append ] [
             2dup nth \ break = [ nip ] [
-                swap 1+ cut [ break ] swap 3append
+                swap 1+ cut [ break ] glue 
             ] if
         ] if
     ] change-frame ;
@@ -147,6 +147,7 @@ SYMBOL: +stopped+
     { (call-next-method) [ (step-into-call-next-method) ] }
 } [ "step-into" set-word-prop ] assoc-each
 
+! Never step into these words
 {
     >n ndrop >c c>
     continue continue-with
@@ -236,7 +237,7 @@ SYMBOL: +stopped+
 
 : walker-loop ( -- )
     +running+ set-status
-    [ status +stopped+ eq? not ] [
+    [ status +stopped+ eq? ] [
         [
             {
                 ! ignore these commands while the thread is
@@ -255,7 +256,7 @@ SYMBOL: +stopped+
                 [ walker-suspended ]
             } case
         ] handle-synchronous
-    ] [ ] while ;
+    ] [ ] until ;
 
 : associate-thread ( walker -- )
     walker-thread tset

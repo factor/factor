@@ -2,7 +2,8 @@ IN: io.unix.launcher.tests
 USING: io.files tools.test io.launcher arrays io namespaces
 continuations math io.encodings.binary io.encodings.ascii
 accessors kernel sequences io.encodings.utf8 destructors
-io.streams.duplex ;
+io.streams.duplex locals concurrency.promises threads
+unix.process ;
 
 [ ] [
     [ "launcher-test-1" temp-file delete-file ] ignore-errors
@@ -120,4 +121,18 @@ io.streams.duplex ;
         output-stream get dispose
         input-stream get contents
     ] with-stream
+] unit-test
+
+! Killed processes were exiting with code 0 on FreeBSD
+[ f ] [
+    [let | p [ <promise> ]
+           s [ <promise> ] |
+       [
+           "sleep 1000" run-detached
+           [ p fulfill ] [ wait-for-process s fulfill ] bi
+       ] in-thread
+
+       p ?promise handle>> 9 kill drop
+       s ?promise 0 =
+    ]
 ] unit-test
