@@ -14,6 +14,10 @@ $nl
 "Quotations implement the " { $link "sequence-protocol" } ", and existing sequences can be converted into quotations:"
 { $subsection >quotation }
 { $subsection 1quotation }
+"Wrappers:"
+{ $subsection "wrappers" } ;
+
+ARTICLE: "wrappers" "Wrappers"
 "Wrappers are used to push words on the data stack; they evaluate to the object being wrapped:"
 { $subsection wrapper }
 { $subsection literalize }
