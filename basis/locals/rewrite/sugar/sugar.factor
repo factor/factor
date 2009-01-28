@@ -37,7 +37,7 @@ M: array rewrite-literal? [ rewrite-literal? ] contains? ;
 
 M: quotation rewrite-literal? [ rewrite-literal? ] contains? ;
 
-M: wrapper rewrite-literal? drop t ;
+M: wrapper rewrite-literal? wrapped>> rewrite-literal? ;
 
 M: hashtable rewrite-literal? drop t ;
 
@@ -53,7 +53,7 @@ GENERIC: rewrite-element ( obj -- )
     [ rewrite-element ] each ;
 
 : rewrite-sequence ( seq -- )
-    [ rewrite-elements ] [ length , ] [ 0 head , ] tri \ nsequence , ;
+    [ rewrite-elements ] [ length ] [ 0 head ] tri '[ _ _ nsequence ] % ;
 
 M: array rewrite-element
     dup rewrite-literal? [ rewrite-sequence ] [ , ] if ;
@@ -63,7 +63,7 @@ M: vector rewrite-element rewrite-sequence ;
 M: hashtable rewrite-element >alist rewrite-sequence \ >hashtable , ;
 
 M: tuple rewrite-element
-    [ tuple-slots rewrite-elements ] [ class literalize , ] bi \ boa , ;
+    [ tuple-slots rewrite-elements ] [ class ] bi '[ _ boa ] % ;
 
 M: quotation rewrite-element rewrite-sugar* ;
 
@@ -84,7 +84,7 @@ M: local-word rewrite-element
 M: word rewrite-element literalize , ;
 
 M: wrapper rewrite-element
-    dup rewrite-literal? [ wrapped>> rewrite-element ] [ , ] if ;
+    dup rewrite-literal? [ wrapped>> rewrite-element \ literalize , ] [ , ] if ;
 
 M: object rewrite-element , ;
 
@@ -98,7 +98,8 @@ M: def rewrite-sugar* , ;
 
 M: hashtable rewrite-sugar* rewrite-element ;
 
-M: wrapper rewrite-sugar* rewrite-element ;
+M: wrapper rewrite-sugar*
+    dup rewrite-literal? [ wrapped>> rewrite-element ] [ , ] if ;
 
 M: word rewrite-sugar*
     dup { load-locals get-local drop-locals } memq?
