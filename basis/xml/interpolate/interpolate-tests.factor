@@ -2,14 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test xml.interpolate multiline kernel assocs
 sequences accessors xml.writer xml.interpolate.private
-locals splitting urls ;
+locals splitting urls xml.data ;
 IN: xml.interpolate.tests
 
 [ "a" "c" { "a" "c" f } ] [
     "<?xml version='1.0'?><x><-a-><b val=<-c->/><-></x>"
     string>doc
     [ second var>> ]
-    [ fourth "val" swap at var>> ]
+    [ fourth "val" attr var>> ]
     [ extract-variables ] tri
 ] unit-test
 

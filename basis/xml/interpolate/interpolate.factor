@@ -33,8 +33,9 @@ M: string push-item , ;
 M: xml-data push-item , ;
 M: object push-item present , ;
 M: sequence push-item
-    [ dup array? [ % ] [ , ] if ] each ;
+    dup xml-data? [ , ] [ [ push-item ] each ] if ;
 M: number push-item present , ;
+M: xml-chunk push-item % ;
 
 GENERIC: interpolate-item ( table item -- )
 M: object interpolate-item nip , ;
