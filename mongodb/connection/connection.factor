@@ -23,7 +23,7 @@ TUPLE: mdb name nodes collections ;
 
 : ismaster-cmd ( node -- result )
     binary "admin.$cmd" H{ { "ismaster" 1 } } <mdb-query-one-msg>
-    '[ _ write-request read-reply ] with-client
+    '[ _ write-message read-message ] with-client
     objects>> first ; 
 
 : -push ( seq elt -- )

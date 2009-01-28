@@ -25,7 +25,6 @@ SYMBOLS: +fieldindex+ +compoundindex+ +deepindex+ ;
      "%s-%s-%s-Idx" sprintf ;
 
 : build-index ( element slot -- assoc )
-    break
     swap [ <linked-hash> ] 2dip
     [ rest ] keep first ! assoc slot options itype
     { { +fieldindex+ [ drop [ 1 ] dip pick set-at  ] }
@@ -70,7 +69,7 @@ USE: mongodb.query
 : load-indices ( mdb-collection -- indexlist )
      [ mdb>> name>> ] dip name>> "%s.%s" sprintf
      "ns" H{ } clone [ set-at ] keep [ mdb>> name>> index-ns ] dip <mdb-query-msg>
-     '[ _ write-request read-reply ]
+     '[ _ write-message read-message ]
      [ mdb>> master>> binary ] dip with-client
      objects>> [ [ index new ] dip
                  [ [ "ns" ] dip at >>ns ]
@@ -96,7 +95,7 @@ USE: mongodb.query
      dup length 0 > 
      [ [ mdb>> name>> "%s.system.indexes" sprintf ] dip
        <mdb-insert-msg>
-       [ mdb>> master>> binary ] dip '[ _ write-request ] with-client
+       [ mdb>> master>> binary ] dip '[ _ write-message ] with-client
      ]
      [ drop ] if ;
      

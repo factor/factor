@@ -20,7 +20,7 @@ TUPLE: mdb-result { cursor integer }
 PRIVATE>
 
 : (find) ( inet query -- result )
-     '[ _ write-request read-reply ] (execute-query) ; inline
+     '[ _ write-message read-message ] (execute-query) ; inline
 
 : (find-one) ( inet query -- result )
      (find) objects>> first ; inline

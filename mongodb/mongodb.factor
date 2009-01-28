@@ -27,7 +27,7 @@ M: mdb-persistent store ( tuple --  )
     prepare-store ! H { collection { ... values ... } 
     [ [ get-collection-fqn ] dip
       values <mdb-insert-msg>      
-      [ mdb>> master>> binary ] dip '[ _ write-request ] with-client   
+      [ mdb>> master>> binary ] dip '[ _ write-message ] with-client   
     ] assoc-each  ;
 
 M: mdb-persistent find ( example -- result )
