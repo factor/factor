@@ -53,6 +53,14 @@ beast.
     factor image (overwriting the current one) with all the needed
     vocabs.
 
+    Alternatively, you can add the following line to your
+    .factor-boot-rc file:
+
+       "fuel" require
+
+    This will ensure that the image generated while bootstrapping
+    Factor contains fuel and the vocabularies it depends on.
+
 *** Connecting to a running Factor
 
     'run-factor' starts a new factor listener process managed by Emacs.
