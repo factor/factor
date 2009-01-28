@@ -22,9 +22,8 @@ TUPLE: history document elements index ;
     unless-empty ;
 
 : update-document ( history -- )
-    [ [ index>> ] [ elements>> ] bi nth string>> ]
-    [ document>> ] bi
-    set-doc-string ;
+    [ [ index>> ] [ elements>> ] bi nth string>> ] [ document>> ] bi
+    [ set-doc-string ] [ clear-undo drop ] 2bi ;
 
 : change-history-index ( history i -- )
     over elements>> length 1-

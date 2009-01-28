@@ -85,7 +85,9 @@ M: object (print-input)
 
 : interactor-finish ( interactor -- )
     [ history>> history-add ] keep
-    [ print-input ] [ clear-editor drop ] 2bi ;
+    [ print-input ]
+    [ clear-editor drop ]
+    [ model>> clear-undo drop ] 2tri ;
 
 : interactor-eof ( interactor -- )
     dup interactor-busy? [
