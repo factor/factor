@@ -5,7 +5,7 @@ USING: kernel namespaces make xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators strings
 parser-combinators.regexp splitting parser-combinators ascii
-ascii combinators.short-circuit accessors xml.data ;
+ascii combinators.short-circuit accessors ;
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 
@@ -297,7 +297,7 @@ M: mark-previous-rule handle-rule-start
 
 : tokenize-line ( line-context line rules -- line-context' seq )
     [
-        "MAIN" attr -rot
+        "MAIN" swap at -rot
         init-token-marker
         mark-token-loop
         mark-remaining
