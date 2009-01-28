@@ -105,6 +105,7 @@ ARTICLE: "gadgets-editors" "Editor gadgets"
 "Fields:"
 { $subsection <model-field> }
 { $subsection <action-field> }
+"Editors edit " { $emphasis "documents" } ":"
 { $subsection "documents" } ;
 
 ABOUT: "gadgets-editors"

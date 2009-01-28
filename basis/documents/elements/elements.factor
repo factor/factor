@@ -18,6 +18,8 @@ GENERIC: next-elt ( loc document elt -- newloc )
 
 SINGLETON: char-elt
 
+<PRIVATE
+
 : (prev-char) ( loc document quot -- loc )
     {
         { [ pick { 0 0 } = ] [ 2drop ] }
@@ -32,6 +34,8 @@ SINGLETON: char-elt
         [ call ]
     } cond ; inline
 
+PRIVATE>
+
 M: char-elt prev-elt
     drop [ drop -1 +col ] (prev-char) ;
 
@@ -43,6 +47,8 @@ SINGLETON: one-char-elt
 M: one-char-elt prev-elt 2drop ;
 
 M: one-char-elt next-elt 2drop ;
+
+<PRIVATE
 
 : (word-elt) ( loc document quot -- loc )
     pick [
@@ -61,6 +67,8 @@ M: one-char-elt next-elt 2drop ;
 : (next-word) ( ? col str -- col )
     [ rot break-detector find-from drop ] keep
     over not [ nip length ] [ drop ] if ;
+
+PRIVATE>
 
 SINGLETON: one-word-elt
 

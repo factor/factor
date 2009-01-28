@@ -92,6 +92,7 @@ HELP: clear-doc
 { $side-effects "document" } ;
 
 ARTICLE: "documents" "Documents"
+"The " { $vocab-link "documents" } " vocabulary implements " { $emphasis "documents" } ", which are models storing a passage of text as a sequence of lines. Operations are defined for operating on subranges of the text, and " { $link "gadgets-editors" } " can display these models."
 { $subsection document }
 { $subsection <document> }
 "Getting and setting the contents of the entire document:"
