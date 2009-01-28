@@ -81,20 +81,30 @@ ARTICLE: "gadgets-editors-selection" "The caret and mark"
 { $subsection scroll>caret }
 "Use " { $link user-input* } " to change selected text." ;
 
-ARTICLE: "gadgets-editors" "Editor gadgets"
-"The " { $vocab-link "ui.gadgets.editors" } " vocabulary implements editor gadgets. An editor edits a passage of text."
-{ $command-map editor "general" }
-{ $command-map editor "caret-motion" }
-{ $command-map editor "selection" }
-{ $command-map multiline-editor "multiline" }
-{ $heading "Editor words" }
-{ $subsection editor }
-{ $subsection <editor> }
-{ $subsection <multiline-editor> }
+ARTICLE: "gadgets-editors-contents" "Getting and setting editor contents"
 { $subsection editor-string }
 { $subsection set-editor-string }
+{ $subsection clear-editor } ;
+
+ARTICLE: "gadgets-editors-commands" "Editor gadget commands"
+{ $command-map editor "editing" }
+{ $command-map editor "caret-motion" }
+{ $command-map editor "selection" }
+{ $command-map multiline-editor "multiline" } ;
+
+ARTICLE: "gadgets-editors" "Editor gadgets"
+"The " { $vocab-link "ui.gadgets.editors" } " vocabulary implements editor gadgets. An editor edits a passage of text."
+{ $subsection "gadgets-editors-commands" }
+"Editors:"
+{ $subsection editor }
+{ $subsection <editor> }
+{ $subsection "gadgets-editors-contents" }
 { $subsection "gadgets-editors-selection" }
-{ $subsection "documents" }
-{ $subsection "document-locs-elts" } ;
+"Multiline editors:"
+{ $subsection <multiline-editor> }
+"Fields:"
+{ $subsection <model-field> }
+{ $subsection <action-field> }
+{ $subsection "documents" } ;
 
 ABOUT: "gadgets-editors"
