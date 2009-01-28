@@ -133,7 +133,7 @@ CONSTANT: completion-popup-offset { -4 0 }
     [ [ 2drop find-world ] [ 2nip ] [ completion-popup-loc ] 3tri ] 3bi
     show-glass ;
 
-: word-completion-popup ( interactor -- )
+: code-completion-popup ( interactor -- )
     dup vocab-completion?
     [ vocabs-matching ] [ words-matching ] ? '[ [ { } ] _ if-empty ]
     one-word-elt show-completion-popup ;
