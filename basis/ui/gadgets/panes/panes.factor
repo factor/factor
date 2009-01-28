@@ -414,6 +414,6 @@ pane H{
     { T{ button-up f { S+ } 1 } [ end-selection ] }
     { T{ button-up } [ end-selection ] }
     { T{ drag } [ extend-selection ] }
-    { T{ copy-action } [ com-copy ] }
+    { copy-action [ com-copy ] }
     { T{ button-down f f 3 } [ pane-menu ] }
 } set-gestures

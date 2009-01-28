@@ -27,7 +27,7 @@ TUPLE: scroller < frame viewport x y follows ;
     2bi ;
 
 scroller H{
-    { T{ mouse-scroll } [ do-mouse-scroll ] }
+    { mouse-scroll [ do-mouse-scroll ] }
 } set-gestures
 
 : <scroller-model> ( -- model )

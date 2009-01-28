@@ -197,24 +197,32 @@ CLASS: {
     [ nip send-key-up-event ]
 }
 
+{ "undo:" "id" { "id" "SEL" "id" }
+    [ nip undo-action send-action$ ]
+}
+
+{ "redo:" "id" { "id" "SEL" "id" }
+    [ nip redo-action send-action$ ]
+}
+
 { "cut:" "id" { "id" "SEL" "id" }
-    [ nip T{ cut-action } send-action$ ]
+    [ nip cut-action send-action$ ]
 }
 
 { "copy:" "id" { "id" "SEL" "id" }
-    [ nip T{ copy-action } send-action$ ]
+    [ nip copy-action send-action$ ]
 }
 
 { "paste:" "id" { "id" "SEL" "id" }
-    [ nip T{ paste-action } send-action$ ]
+    [ nip paste-action send-action$ ]
 }
 
 { "delete:" "id" { "id" "SEL" "id" }
-    [ nip T{ delete-action } send-action$ ]
+    [ nip delete-action send-action$ ]
 }
 
 { "selectAll:" "id" { "id" "SEL" "id" }
-    [ nip T{ select-all-action } send-action$ ]
+    [ nip select-all-action send-action$ ]
 }
 
 ! Multi-touch gestures: this is undocumented.
@@ -223,8 +231,8 @@ CLASS: {
     [
         nip
         dup -> deltaZ sgn {
-            {  1 [ T{ zoom-in-action } send-action$ ] }
-            { -1 [ T{ zoom-out-action } send-action$ ] }
+            {  1 [ zoom-in-action send-action$ ] }
+            { -1 [ zoom-out-action send-action$ ] }
             {  0 [ 2drop ] }
         } case
     ]
@@ -234,13 +242,13 @@ CLASS: {
     [
         nip
         dup -> deltaX sgn {
-            {  1 [ T{ left-action } send-action$ ] }
-            { -1 [ T{ right-action } send-action$ ] }
+            {  1 [ left-action send-action$ ] }
+            { -1 [ right-action send-action$ ] }
             {  0
                 [
                     dup -> deltaY sgn {
-                        {  1 [ T{ up-action } send-action$ ] }
-                        { -1 [ T{ down-action } send-action$ ] }
+                        {  1 [ up-action send-action$ ] }
+                        { -1 [ down-action send-action$ ] }
                         {  0 [ 2drop ] }
                     } case
                 ]

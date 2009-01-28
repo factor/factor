@@ -40,11 +40,11 @@ M: presentation ungraft*
 
 presentation H{
     { T{ button-down f f 3 } [ show-presentation-menu ] }
-    { T{ mouse-leave } [ [ hide-status ] [ button-update ] bi ] }
-    { T{ mouse-enter } [ show-mouse-help ] }
+    { mouse-leave [ [ hide-status ] [ button-update ] bi ] }
+    { mouse-enter [ show-mouse-help ] }
     ! Responding to motion too allows nested presentations to
     ! display status help properly, when the mouse leaves a
     ! nested presentation and is still inside the parent, the
     ! parent doesn't receive a mouse-enter
-    { T{ motion } [ show-mouse-help ] }
+    { motion [ show-mouse-help ] }
 } set-gestures

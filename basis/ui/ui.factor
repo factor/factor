@@ -35,8 +35,8 @@ SYMBOL: windows
 
 : focus-gestures ( new old -- )
     drop-prefix <reversed>
-    T{ lose-focus } swap each-gesture
-    T{ gain-focus } swap each-gesture ;
+    lose-focus swap each-gesture
+    gain-focus swap each-gesture ;
 
 : focus-world ( world -- )
     t >>focused?

@@ -3,7 +3,7 @@
 USING: accessors arrays assocs calendar combinators
 combinators.short-circuit compiler.units concurrency.flags
 concurrency.mailboxes continuations destructors documents
-fry hashtables help help.markup io
+documents.elements fry hashtables help help.markup io
 io.styles kernel lexer listener math models models.delay models.filter
 namespaces parser prettyprint quotations sequences strings threads
 tools.vocabs ui ui.commands ui.gadgets ui.gadgets.buttons
@@ -406,7 +406,7 @@ listener-gadget "scrolling"
 } define-command-map
 
 listener-gadget "multi-touch" f {
-    { T{ up-action } refresh-all }
+    { up-action refresh-all }
 } define-command-map
 
 listener-gadget "other" f {

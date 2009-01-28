@@ -1,13 +1,13 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays documents kernel math models models.filter
-namespaces locals fry make opengl opengl.gl sequences strings
-math.vectors sorting colors combinators assocs math.order fry
-calendar alarms continuations ui.clipboards ui.commands
-ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.theme
-ui.gadgets.menus ui.gadgets.wrappers ui.render ui.text
-ui.gestures math.geometry.rect splitting unicode.categories ;
+USING: accessors arrays documents documents.elements kernel math
+models models.filter namespaces locals fry make opengl opengl.gl
+sequences strings math.vectors sorting colors combinators assocs
+math.order fry calendar alarms continuations ui.clipboards ui.commands
+ui.gadgets ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
+ui.gadgets.scrollers ui.gadgets.theme ui.gadgets.menus
+ui.gadgets.wrappers ui.render ui.text ui.gestures math.geometry.rect
+splitting unicode.categories ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget
@@ -377,7 +377,15 @@ M: editor gadget-text* editor-string % ;
 : delete-to-end-of-line ( editor -- ) 
     one-line-elt editor-backspace ;
 
-editor "general" f {
+: com-undo ( editor -- )
+    model>> undo ;
+
+: com-redo ( editor -- )
+    model>> redo ;
+
+editor "editing" f {
+    { undo-action com-undo }
+    { redo-action com-redo }
     { T{ key-down f f "DELETE" } delete-next-character }
     { T{ key-down f { S+ } "DELETE" } delete-next-character }
     { T{ key-down f f "BACKSPACE" } delete-previous-character }
@@ -395,11 +403,11 @@ editor "general" f {
 : cut ( editor -- ) clipboard get editor-cut ;
 
 editor "clipboard" f {
-    { T{ paste-action } paste }
+    { paste-action paste }
+    { copy-action com-copy }
+    { cut-action cut }
     { T{ button-up f f 2 } paste-selection }
-    { T{ copy-action } com-copy }
     { T{ button-up } com-copy-selection }
-    { T{ cut-action } cut }
 } define-command-map
 
 : previous-character ( editor -- )
@@ -480,10 +488,10 @@ editor "caret-motion" f {
 editor "selection" f {
     { T{ button-down f { S+ } 1 } extend-selection }
     { T{ drag } drag-selection }
-    { T{ gain-focus } focus-editor }
-    { T{ lose-focus } unfocus-editor }
-    { T{ delete-action } remove-selection }
-    { T{ select-all-action } select-all }
+    { gain-focus focus-editor }
+    { lose-focus unfocus-editor }
+    { delete-action remove-selection }
+    { select-all-action select-all }
     { T{ key-down f { C+ } "l" } select-line }
     { T{ key-down f { S+ } "LEFT" } select-previous-character }
     { T{ key-down f { S+ } "RIGHT" } select-next-character }

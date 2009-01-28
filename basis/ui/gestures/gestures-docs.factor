@@ -23,7 +23,7 @@ HELP: propagate-gesture
 
 HELP: motion
 { $class-description "Mouse motion gesture." }
-{ $examples { $code "T{ motion }" } } ;
+{ $examples { $code "motion" } } ;
 
 HELP: drag
 { $class-description "Mouse drag gesture. The " { $snippet "#" } " slot is either set to a mouse button number, or " { $link f } " indicating no specific button is expected." } ;
@@ -48,43 +48,43 @@ HELP: button-down
 
 HELP: mouse-scroll
 { $class-description "Scroll wheel motion gesture. When this gesture is sent, the " { $link scroll-direction } " global variable is set to a direction vector." }
-{ $examples { $code "T{ mouse-scroll }" } } ;
+{ $examples { $code "mouse-scroll" } } ;
 
 HELP: mouse-enter
 { $class-description "Gesture sent when the mouse enters the bounds of a gadget." }
-{ $examples { $code "T{ mouse-enter }" } } ;
+{ $examples { $code "mouse-enter" } } ;
 
 HELP: mouse-leave
 { $class-description "Gesture sent when the mouse leaves the bounds of a gadget." }
-{ $examples { $code "T{ mouse-leave }" } } ;
+{ $examples { $code "mouse-leave" } } ;
 
 HELP: gain-focus
 { $class-description "Gesture sent when a gadget gains keyboard focus." }
-{ $examples { $code "T{ gain-focus }" } } ;
+{ $examples { $code "gain-focus" } } ;
 
 HELP: lose-focus
 { $class-description "Gesture sent when a gadget loses keyboard focus." }
-{ $examples { $code "T{ lose-focus }" } } ;
+{ $examples { $code "lose-focus" } } ;
 
 HELP: cut-action
 { $class-description "Gesture sent when the " { $emphasis "cut" } " standard window system action is invoked." }
-{ $examples { $code "T{ cut-action }" } } ;
+{ $examples { $code "cut-action" } } ;
 
 HELP: copy-action
 { $class-description "Gesture sent when the " { $emphasis "copy" } " standard window system action is invoked." }
-{ $examples { $code "T{ copy-action }" } } ;
+{ $examples { $code "copy-action" } } ;
 
 HELP: paste-action
 { $class-description "Gesture sent when the " { $emphasis "paste" } " standard window system action is invoked." }
-{ $examples { $code "T{ paste-action }" } } ;
+{ $examples { $code "paste-action" } } ;
 
 HELP: delete-action
 { $class-description "Gesture sent when the " { $emphasis "delete" } " standard window system action is invoked." }
-{ $examples { $code "T{ delete-action }" } } ;
+{ $examples { $code "delete-action" } } ;
 
 HELP: select-all-action
 { $class-description "Gesture sent when the " { $emphasis "select all" } " standard window system action is invoked." }
-{ $examples { $code "T{ select-all-action }" } } ;
+{ $examples { $code "select-all-action" } } ;
 
 HELP: C+
 { $description "Control key modifier." } ;
@@ -359,10 +359,12 @@ ARTICLE: "action-gestures" "Action gestures"
 "The following keyboard gestures, if not handled directly, send action gestures:"
 { $table
     { { $strong "Keyboard gesture" } { $strong "Action gesture" } }
-    { { $snippet "T{ key-down f { C+ } \"x\" }" } { $snippet "T{ cut-action }" } }
-    { { $snippet "T{ key-down f { C+ } \"c\" }" } { $snippet "T{ copy-action }" } }
-    { { $snippet "T{ key-down f { C+ } \"v\" }" } { $snippet "T{ paste-action }" } }
-    { { $snippet "T{ key-down f { C+ } \"a\" }" } { $snippet "T{ select-all }" } }
+    { { $snippet "T{ key-down f { C+ } \"z\" }" } { $snippet "undo-action" } }
+    { { $snippet "T{ key-down f { C+ } \"Z\" }" } { $snippet "redo-action" } }
+    { { $snippet "T{ key-down f { C+ } \"x\" }" } { $snippet "cut-action" } }
+    { { $snippet "T{ key-down f { C+ } \"c\" }" } { $snippet "copy-action" } }
+    { { $snippet "T{ key-down f { C+ } \"v\" }" } { $snippet "paste-action" } }
+    { { $snippet "T{ key-down f { C+ } \"a\" }" } { $snippet "select-all-action" } }
 }
 "Action gestures should be used in place of the above keyboard gestures if possible. For example, on Mac OS X, the standard " { $strong "Edit" } " menu items send action gestures." ;
 

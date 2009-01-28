@@ -66,30 +66,23 @@ M: user-input send-queued-gesture
     '[ _ \ user-input queue-gesture ] unless-empty ;
 
 ! Gesture objects
-TUPLE: motion ;             C: <motion> motion
 TUPLE: drag # ;             C: <drag> drag
 TUPLE: button-up mods # ;   C: <button-up> button-up
 TUPLE: button-down mods # ; C: <button-down> button-down
-TUPLE: mouse-scroll ;       C: <mouse-scroll> mouse-scroll
-TUPLE: mouse-enter ;        C: <mouse-enter> mouse-enter
-TUPLE: mouse-leave ;        C: <mouse-leave> mouse-leave
-TUPLE: lose-focus ;         C: <lose-focus> lose-focus
-TUPLE: gain-focus ;         C: <gain-focus> gain-focus
+
+SYMBOLS:
+motion
+mouse-scroll
+mouse-enter mouse-leave
+lose-focus gain-focus ;
 
 ! Higher-level actions
-TUPLE: cut-action ;         C: <cut-action> cut-action
-TUPLE: copy-action ;        C: <copy-action> copy-action
-TUPLE: paste-action ;       C: <paste-action> paste-action
-TUPLE: delete-action ;      C: <delete-action> delete-action
-TUPLE: select-all-action ;  C: <select-all-action> select-all-action
-
-TUPLE: left-action ;        C: <left-action> left-action
-TUPLE: right-action ;       C: <right-action> right-action
-TUPLE: up-action ;          C: <up-action> up-action
-TUPLE: down-action ;        C: <down-action> down-action
-
-TUPLE: zoom-in-action ;     C: <zoom-in-action> zoom-in-action
-TUPLE: zoom-out-action ;    C: <zoom-out-action> zoom-out-action
+SYMBOLS:
+undo-action redo-action
+cut-action copy-action paste-action
+delete-action select-all-action
+left-action right-action up-action down-action
+zoom-in-action zoom-out-action ;
 
 ! Modifiers
 SYMBOLS: C+ A+ M+ S+ ;
@@ -165,15 +158,15 @@ SYMBOL: drag-timer
 
 : fire-motion ( -- )
     hand-buttons get-global empty? [
-        T{ motion } hand-gadget get-global propagate-gesture
+        motion hand-gadget get-global propagate-gesture
     ] [
         drag-gesture
     ] if ;
 
 : hand-gestures ( new old -- )
     drop-prefix <reversed>
-    T{ mouse-leave } swap each-gesture
-    T{ mouse-enter } swap each-gesture ;
+    mouse-leave swap each-gesture
+    mouse-enter swap each-gesture ;
 
 : forget-rollover ( -- )
     f hand-world set-global
@@ -182,10 +175,10 @@ SYMBOL: drag-timer
     parents hand-gestures ;
 
 : send-lose-focus ( gadget -- )
-    T{ lose-focus } swap send-gesture ;
+    lose-focus swap send-gesture ;
 
 : send-gain-focus ( gadget -- )
-    T{ gain-focus } swap send-gesture ;
+    gain-focus swap send-gesture ;
 
 : focus-child ( child gadget ? -- )
     [
@@ -274,7 +267,7 @@ SYMBOL: drag-timer
 : send-wheel ( direction loc world -- )
     move-hand
     scroll-direction set-global
-    T{ mouse-scroll } hand-gadget get-global propagate-gesture ;
+    mouse-scroll hand-gadget get-global propagate-gesture ;
 
 : send-action ( world gesture -- )
     swap world-focus propagate-gesture ;

@@ -300,14 +300,14 @@ PRIVATE>
     ] [ drop ] if-mouse-row ;
 
 table H{
-    { T{ mouse-enter } [ show-mouse-help ] }
-    { T{ mouse-leave } [ hide-mouse-help ] }
-    { T{ motion } [ show-mouse-help ] }
+    { mouse-enter [ show-mouse-help ] }
+    { mouse-leave [ hide-mouse-help ] }
+    { motion [ show-mouse-help ] }
     { T{ button-down } [ table-button-down ] }
     { T{ button-down f f 3 } [ show-table-menu ] }
     { T{ button-up } [ table-button-up ] }
-    { T{ gain-focus } [ t >>focused? drop ] }
-    { T{ lose-focus } [ f >>focused? drop ] }
+    { gain-focus [ t >>focused? drop ] }
+    { lose-focus [ f >>focused? drop ] }
     { T{ drag } [ table-button-down ] }
     { T{ key-down f f "RET" } [ row-action ] }
     { T{ key-down f f "UP" } [ prev-row ] }

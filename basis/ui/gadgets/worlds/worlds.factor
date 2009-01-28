@@ -92,10 +92,12 @@ ui-error-hook global [ [ rethrow ] or ] change-at
     ] [ drop ] if ;
 
 world H{
-    { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
-    { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
-    { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
-    { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
+    { T{ key-down f { C+ } "z" } [ undo-action send-action ] }
+    { T{ key-down f { C+ } "Z" } [ redo-action send-action ] }
+    { T{ key-down f { C+ } "x" } [ cut-action send-action ] }
+    { T{ key-down f { C+ } "c" } [ copy-action send-action ] }
+    { T{ key-down f { C+ } "v" } [ paste-action send-action ] }
+    { T{ key-down f { C+ } "a" } [ select-all-action send-action ] }
     { T{ button-down f { C+ } 1 } [ drop T{ button-down f f 3 } button-gesture ] }
     { T{ button-down f { A+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
     { T{ button-down f { M+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }

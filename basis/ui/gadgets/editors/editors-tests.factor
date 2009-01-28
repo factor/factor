@@ -1,7 +1,7 @@
 USING: accessors ui.gadgets.editors tools.test kernel io
 io.streams.plain definitions namespaces ui.gadgets
 ui.gadgets.grids prettyprint documents ui.gestures tools.test.ui
-models ;
+models documents.elements ;
 IN: ui.gadgets.editors.tests
 
 [ "foo bar" ] [

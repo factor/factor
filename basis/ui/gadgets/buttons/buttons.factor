@@ -35,8 +35,8 @@ TUPLE: button < border pressed? selected? quot ;
 button H{
     { T{ button-up } [ button-clicked ] }
     { T{ button-down } [ button-update ] }
-    { T{ mouse-leave } [ button-update ] }
-    { T{ mouse-enter } [ button-update ] }
+    { mouse-leave [ button-update ] }
+    { mouse-enter [ button-update ] }
 } set-gestures
 
 : new-button ( label quot class -- button )

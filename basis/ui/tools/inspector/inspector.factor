@@ -109,7 +109,7 @@ inspector-gadget "toolbar" f {
 } define-command-map
 
 inspector-gadget "multi-touch" f {
-    { T{ up-action } com-refresh }
+    { up-action com-refresh }
 } define-command-map
 
 : inspector ( obj -- )

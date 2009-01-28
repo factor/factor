@@ -116,8 +116,8 @@ browser-gadget "navigation" "Commands for navigating in the article hierarchy" {
 } define-command-map
 
 browser-gadget "multi-touch" f {
-    { T{ left-action } com-back }
-    { T{ right-action } com-forward }
+    { left-action com-back }
+    { right-action com-forward }
 } define-command-map
 
 browser-gadget "scrolling"
