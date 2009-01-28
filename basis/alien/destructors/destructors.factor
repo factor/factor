@@ -18,11 +18,11 @@ TUPLE: F-destructor alien disposed ;
 
 : <F-destructor> ( alien -- destructor ) f F-destructor boa ; inline
 
-M: F-destructor dispose* alien>> F execute ;
+M: F-destructor dispose* alien>> F ;
 
-: &F ( alien -- alien ) dup <F-destructor> execute &dispose drop ; inline
+: &F ( alien -- alien ) dup <F-destructor> &dispose drop ; inline
 
-: |F ( alien -- alien ) dup <F-destructor> execute |dispose drop ; inline
+: |F ( alien -- alien ) dup <F-destructor> |dispose drop ; inline
 
 ;FUNCTOR
 
