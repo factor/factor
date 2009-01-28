@@ -59,3 +59,4 @@ IN: xml.writer.tests
 [ "<foo>bar</foo>" string>xml [ " baz" append ] map xml>string ] unit-test
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  bar\n</foo>" ]
 [ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test
+[ "<foo'>" ] [ "<foo'>" <unescaped> xml-chunk>string ] unit-test
