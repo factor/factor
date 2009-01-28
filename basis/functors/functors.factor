@@ -1,16 +1,41 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel quotations classes.tuple make combinators generic
 words interpolate namespaces sequences io.streams.string fry
 classes.mixin effects lexer parser classes.tuple.parser
 effects.parser locals.types locals.parser
-locals.rewrite.closures vocabs.parser ;
+locals.rewrite.closures vocabs.parser arrays accessors ;
 IN: functors
+
+! This is a hack
 
 : scan-param ( -- obj )
     scan-object dup special? [ literalize ] unless ;
 
 : define* ( word def effect -- ) pick set-word define-declared ;
+
+TUPLE: fake-quotation seq ;
+
+GENERIC: >fake-quotations ( quot -- fake )
+
+M: callable >fake-quotations
+    >array >fake-quotations fake-quotation boa ;
+
+M: array >fake-quotations [ >fake-quotations ] { } map-as ;
+
+M: object >fake-quotations ;
+
+GENERIC: fake-quotations> ( fake -- quot )
+
+M: fake-quotation fake-quotations>
+    seq>> [ fake-quotations> ] map >quotation ;
+
+M: array fake-quotations> [ fake-quotations> ] map ;
+
+M: object fake-quotations> ;
+
+: parse-definition* ( -- )
+    parse-definition >fake-quotations parsed \ fake-quotations> parsed ;
 
 : DEFINE* ( accum -- accum ) effect get parsed \ define* parsed ;
 
@@ -32,7 +57,7 @@ IN: functors
     scan-param parsed
     scan-param parsed
     \ create-method parsed
-    parse-definition parsed
+    parse-definition*
     DEFINE* ; parsing
 
 : `C:
@@ -45,7 +70,7 @@ IN: functors
 : `:
     effect off
     scan-param parsed
-    parse-definition parsed
+    parse-definition*
     DEFINE* ; parsing
 
 : `INSTANCE:

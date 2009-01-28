@@ -34,7 +34,7 @@ WW DEFINES ${W}${W}
 
 WHERE
 
-: WW W twice ; inline
+: WW ( a -- b ) \ W twice ; inline
 
 ;FUNCTOR
 
