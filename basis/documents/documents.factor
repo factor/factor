@@ -1,8 +1,8 @@
-! Copyright (C) 2006, 2008 Slava Pestov
+! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io kernel math models namespaces make
 sequences strings splitting combinators unicode.categories
-math.order math.ranges fry ;
+math.order math.ranges fry locals ;
 IN: documents
 
 : +col ( loc n -- newloc ) [ first2 ] dip + 2array ;
@@ -15,11 +15,21 @@ IN: documents
 
 : lines-equal? ( loc1 loc2 -- ? ) [ first ] bi@ number= ;
 
-TUPLE: document < model locs ;
+TUPLE: edit old-string new-string from old-to new-to ;
+
+C: <edit> edit
+
+TUPLE: document < model locs undos redos inside-undo? ;
+
+: clear-undo ( document -- )
+    V{ } clone >>undos
+    V{ } clone >>redos
+    drop ;
 
 : <document> ( -- document )
     V{ "" } clone document new-model
-    V{ } clone >>locs ;
+    V{ } clone >>locs
+    dup clear-undo ;
 
 : add-loc ( loc document -- ) locs>> push ;
 
@@ -30,8 +40,11 @@ TUPLE: document < model locs ;
 
 : doc-line ( n document -- string ) value>> nth ;
 
+: line-end ( line# document -- loc )
+    [ drop ] [ doc-line length ] 2bi 2array ;
+
 : doc-lines ( from to document -- slice )
-    [ 1+ ] dip value>> <slice> ;
+    [ 1+ ] [ value>> ] bi* <slice> ;
 
 : start-on-line ( document from line# -- n1 )
     [ dup first ] dip = [ nip second ] [ 2drop 0 ] if ;
@@ -56,15 +69,18 @@ TUPLE: document < model locs ;
     [ [ document get ] 2dip end-on-line ]
     2bi* ;
 
+: last-line# ( document -- line )
+    value>> length 1- ;
+
+CONSTANT: doc-start { 0 0 }
+
+: doc-end ( document -- loc )
+    [ last-line# ] keep line-end ;
+
+<PRIVATE
+
 : (doc-range) ( from to line# -- )
     [ start/end-on-line ] keep document get doc-line <slice> , ;
-
-: doc-range ( from to document -- string )
-    [
-        document set 2dup [
-            [ 2dup ] dip (doc-range)
-        ] each-line 2drop
-    ] { } make "\n" join ;
 
 : text+loc ( lines loc -- loc )
     over [
@@ -84,20 +100,44 @@ TUPLE: document < model locs ;
 : loc-col/str ( loc document -- str col )
     [ first2 swap ] dip nth swap ;
 
-: prepare-insert ( newinput from to lines -- newinput )
+: prepare-insert ( new-lines from to lines -- new-lines )
     tuck [ loc-col/str head-slice ] [ loc-col/str tail-slice ] 2bi*
     pick append-last over prepend-first ;
 
-: (set-doc-range) ( newlines from to lines -- )
+: (set-doc-range) ( new-lines from to lines -- )
     [ prepare-insert ] 3keep
     [ [ first ] bi@ 1+ ] dip
     replace-slice ;
 
-: set-doc-range ( string from to document -- )
+: entire-doc ( document -- start end document )
+    [ [ doc-start ] dip doc-end ] keep ;
+
+: with-undo ( document quot: ( document -- ) -- )
+    [ t >>inside-undo? ] dip keep f >>inside-undo? drop ; inline
+
+PRIVATE>
+
+: doc-range ( from to document -- string )
     [
-        [ [ string-lines ] dip [ text+loc ] 2keep ] 2dip
-        [ [ (set-doc-range) ] keep ] change-model
-    ] keep update-locs ;
+        document set 2dup [
+            [ 2dup ] dip (doc-range)
+        ] each-line 2drop
+    ] { } make "\n" join ;
+
+: add-undo ( edit document -- )
+    dup inside-undo?>> [ 2drop ] [
+        [ undos>> push ] keep
+        redos>> delete-all
+    ] if ;
+
+:: set-doc-range ( string from to document -- )
+    string string-lines :> new-lines
+    new-lines from text+loc :> new-to
+    from to document doc-range :> old-string
+    old-string string from to new-to <edit> document add-undo
+    new-lines from to document value>> (set-doc-range)
+    document notify-connections
+    new-to document update-locs ;
 
 : change-doc-range ( from to document quot -- )
     '[ doc-range @ ] 3keep set-doc-range ; inline
@@ -105,26 +145,17 @@ TUPLE: document < model locs ;
 : remove-doc-range ( from to document -- )
     [ "" ] 3dip set-doc-range ;
 
-: last-line# ( document -- line )
-    value>> length 1- ;
-
 : validate-line ( line document -- line )
     last-line# min 0 max ;
 
 : validate-col ( col line document -- col )
     doc-line length min 0 max ;
 
-: line-end ( line# document -- loc )
-    dupd doc-line length 2array ;
-
 : line-end? ( loc document -- ? )
     [ first2 swap ] dip doc-line length = ;
 
-: doc-end ( document -- loc )
-    [ last-line# ] keep line-end ;
-
 : validate-loc ( loc document -- newloc )
-    over first over value>> length >= [
+    2dup [ first ] [ value>> length ] bi* >= [
         nip doc-end
     ] [
         over first 0 < [
@@ -135,113 +166,33 @@ TUPLE: document < model locs ;
     ] if ;
 
 : doc-string ( document -- str )
-    value>> "\n" join ;
+    entire-doc doc-range ;
 
 : set-doc-string ( string document -- )
-    [ string-lines V{ } like ] dip [ set-model ] keep
-    [ doc-end ] [ update-locs ] bi ;
+    entire-doc set-doc-range ;
 
 : clear-doc ( document -- )
-    "" swap set-doc-string ;
+    [ "" ] dip set-doc-string ;
 
-GENERIC: prev-elt ( loc document elt -- newloc )
-GENERIC: next-elt ( loc document elt -- newloc )
+<PRIVATE
 
-: prev/next-elt ( loc document elt -- start end )
-    [ prev-elt ] [ next-elt ] 3bi ;
+: undo/redo-edit ( edit document string-quot to-quot -- )
+    '[ [ _ [ from>> ] _ tri ] dip set-doc-range ] with-undo ; inline
 
-: elt-string ( loc document elt -- string )
-    [ prev/next-elt ] [ drop ] 2bi doc-range ;
+: undo-edit ( edit document -- )
+    [ old-string>> ] [ new-to>> ] undo/redo-edit ;
 
-: set-elt-string ( string loc document elt -- )
-    [ prev/next-elt ] [ drop ] 2bi set-doc-range ;
+: redo-edit ( edit document -- )
+    [ new-string>> ] [ old-to>> ] undo/redo-edit ;
 
-SINGLETON: char-elt
+: undo/redo ( document source-quot dest-quot do-quot -- )
+    [ dupd call [ drop ] ] 2dip
+    '[ pop swap [ @ push ] _ 2bi ] if-empty ; inline
 
-: (prev-char) ( loc document quot -- loc )
-    {
-        { [ pick { 0 0 } = ] [ 2drop ] }
-        { [ pick second zero? ] [ drop [ first 1- ] dip line-end ] }
-        [ call ]
-    } cond ; inline
+PRIVATE>
 
-: (next-char) ( loc document quot -- loc )
-    {
-        { [ 2over doc-end = ] [ 2drop ] }
-        { [ 2over line-end? ] [ 2drop first 1+ 0 2array ] }
-        [ call ]
-    } cond ; inline
+: undo ( document -- )
+    [ undos>> ] [ redos>> ] [ undo-edit ] undo/redo ;
 
-M: char-elt prev-elt
-    drop [ drop -1 +col ] (prev-char) ;
-
-M: char-elt next-elt
-    drop [ drop 1 +col ] (next-char) ;
-
-SINGLETON: one-char-elt
-
-M: one-char-elt prev-elt 2drop ;
-
-M: one-char-elt next-elt 2drop ;
-
-: (word-elt) ( loc document quot -- loc )
-    pick [
-        [ [ first2 swap ] dip doc-line ] dip call
-    ] dip =col ; inline
-
-: ((word-elt)) ( n seq -- ? n seq ) [ ?nth blank? ] 2keep ;
-
-: break-detector ( ? -- quot )
-    '[ blank? _ xor ] ; inline
-
-: (prev-word) ( ? col str -- col )
-    rot break-detector find-last-from drop ?1+ ;
-
-: (next-word) ( ? col str -- col )
-    [ rot break-detector find-from drop ] keep
-    over not [ nip length ] [ drop ] if ;
-
-SINGLETON: one-word-elt
-
-M: one-word-elt prev-elt
-    drop
-    [ [ [ f ] dip 1- ] dip (prev-word) ] (word-elt) ;
-
-M: one-word-elt next-elt
-    drop
-    [ [ f ] 2dip (next-word) ] (word-elt) ;
-
-SINGLETON: word-elt
-
-M: word-elt prev-elt
-    drop
-    [ [ [ 1- ] dip ((word-elt)) (prev-word) ] (word-elt) ]
-    (prev-char) ;
-
-M: word-elt next-elt
-    drop
-    [ [ ((word-elt)) (next-word) ] (word-elt) ]
-    (next-char) ;
-
-SINGLETON: one-line-elt
-
-M: one-line-elt prev-elt
-    2drop first 0 2array ;
-
-M: one-line-elt next-elt
-    drop [ first dup ] dip doc-line length 2array ;
-
-SINGLETON: line-elt
-
-M: line-elt prev-elt
-    2drop dup first zero? [ drop { 0 0 } ] [ -1 +line ] if ;
-
-M: line-elt next-elt
-    drop over first over last-line# number=
-    [ nip doc-end ] [ drop 1 +line ] if ;
-
-SINGLETON: doc-elt
-
-M: doc-elt prev-elt 3drop { 0 0 } ;
-
-M: doc-elt next-elt drop nip doc-end ;
+: redo ( document -- )
+    [ redos>> ] [ undos>> ] [ redo-edit ] undo/redo ;
