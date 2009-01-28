@@ -64,14 +64,18 @@ M: interpolated interpolate-item
 
 : number<-> ( doc -- dup )
     0 over [
-        dup var>> [ over >>var [ 1+ ] dip ] unless drop
+        dup var>> [
+            over >>var [ 1+ ] dip
+        ] unless drop
     ] each-interpolated drop ;
 
-MACRO: interpolate-xml ( string -- doc )
-    string>doc number<-> '[ _ interpolate-xml-doc ] ;
+GENERIC: interpolate-xml ( table xml -- xml )
 
-MACRO: interpolate-chunk ( string -- chunk )
-    string>chunk number<-> '[ _ interpolate-sequence ] ;
+M: xml interpolate-xml
+    interpolate-xml-doc ;
+
+M: xml-chunk interpolate-xml
+    interpolate-sequence <xml-chunk> ;
 
 : >search-hash ( seq -- hash )
     [ dup search ] H{ } map>assoc ;
@@ -82,26 +86,24 @@ MACRO: interpolate-chunk ( string -- chunk )
 : nenum ( ... n -- assoc )
     narray <enum> ; inline
 
-: collect ( accum seq -- accum )
+: collect ( accum variables -- accum ? )
     {
-        { [ dup [ ] all? ] [ >search-hash parsed ] } ! locals
-        { [ dup [ not ] all? ] [ ! fry
-            length parsed \ nenum parsed
-        ] }
+        { [ dup empty? ] [ drop f ] } ! Just a literal
+        { [ dup [ ] all? ] [ >search-hash parsed t ] } ! locals
+        { [ dup [ not ] all? ] [ length parsed \ nenum parsed t ] } ! fry
         [ drop "XML interpolation contains both fry and locals" throw ] ! mixed
     } cond ;
 
-: parse-def ( accum delimiter word -- accum )
-    [
-        parse-multiline-string but-last
-        [ string>chunk extract-variables collect ] keep
-        parsed
-    ] dip parsed ;
+: parse-def ( accum delimiter quot -- accum )
+    [ parse-multiline-string 1 short head* ] dip call
+    [ extract-variables collect ] keep swap
+    [ number<-> parsed ] dip
+    [ \ interpolate-xml parsed ] when ; inline
 
 PRIVATE>
 
 : <XML
-    "XML>" \ interpolate-xml parse-def ; parsing
+    "XML>" [ string>doc ] parse-def ; parsing
 
 : [XML
-    "XML]" \ interpolate-chunk parse-def ; parsing
+    "XML]" [ string>chunk ] parse-def ; parsing
