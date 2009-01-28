@@ -219,3 +219,6 @@ PREDICATE: open-tag < tag children>> ;
 
 UNION: xml-data
     tag comment string directive instruction ;
+
+TUPLE: unescaped string ;
+C: <unescaped> unescaped
