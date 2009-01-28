@@ -158,7 +158,9 @@
                                            "PREDICATE" "PRIMITIVE"
                                            "UNION"))
 
-(defconst fuel-syntax--no-indent-def-starts '("SINGLETONS"
+(defconst fuel-syntax--no-indent-def-starts '("ARTICLE"
+                                              "HELP"
+                                              "SINGLETONS"
                                               "SYMBOLS"
                                               "TUPLE"
                                               "VARS"))
@@ -179,13 +181,12 @@
 
 (defconst fuel-syntax--single-liner-regex
   (regexp-opt '("ABOUT:"
-                "ARTICLE:"
                 "ALIAS:"
                 "CONSTANT:" "C:"
                 "DEFER:"
                 "FORGET:"
                 "GENERIC:" "GENERIC#"
-                "HELP:" "HEX:" "HOOK:"
+                "HEX:" "HOOK:"
                 "IN:" "INSTANCE:"
                 "LIBRARY:"
                 "MAIN:" "MATH:" "MIXIN:"
