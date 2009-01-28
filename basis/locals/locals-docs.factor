@@ -113,7 +113,7 @@ HELP: MEMO::
 
 { POSTPONE: MEMO: POSTPONE: MEMO:: } related-words
 
-ARTICLE: "locals-literals" "Locals in array and hashtable literals"
+ARTICLE: "locals-literals" "Locals in literals"
 "Certain data type literals are permitted to contain free variables. Any such literals are written into code which constructs an instance of the type with the free variable values spliced in. Conceptually, this is similar to the transformation applied to quotations containing free variables."
 $nl
 "The data types which receive this special handling are the following:"
@@ -122,7 +122,9 @@ $nl
     { $link "hashtables" }
     { $link "vectors" }
     { $link "tuples" }
+    { $link "wrappers" }
 }
+{ $heading "Object identity" }
 "This feature changes the semantics of literal object identity. An ordinary word containing a literal pushes the same literal on the stack every time it is invoked:"
 { $example
     "IN: scratchpad"
@@ -143,7 +145,7 @@ $nl
     "f"
 }
 "One exception to the above rule is that array instances containing no free variables do retain identity. This allows macros such as " { $link cond } " to recognize that the array is constant and expand at compile-time."
-$nl
+{ $heading "Example" }
 "For example, here is an implementation of the " { $link 3array } " word which uses this feature:"
 { $code ":: 3array ( x y z -- array ) { x y z } ;" } ;
 

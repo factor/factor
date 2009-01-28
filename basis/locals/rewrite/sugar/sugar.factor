@@ -81,10 +81,14 @@ M: local-writer rewrite-element
 M: local-word rewrite-element
     local-word-in-literal-error ;
 
-M: word rewrite-element literalize , ;
+M: word rewrite-element <wrapper> , ;
+
+: rewrite-wrapper ( wrapper -- )
+    dup rewrite-literal?
+    [ wrapped>> rewrite-element ] [ , ] if ;
 
 M: wrapper rewrite-element
-    dup rewrite-literal? [ wrapped>> rewrite-element \ literalize , ] [ , ] if ;
+    rewrite-wrapper \ <wrapper> , ;
 
 M: object rewrite-element , ;
 
@@ -99,7 +103,7 @@ M: def rewrite-sugar* , ;
 M: hashtable rewrite-sugar* rewrite-element ;
 
 M: wrapper rewrite-sugar*
-    dup rewrite-literal? [ wrapped>> rewrite-element ] [ , ] if ;
+    rewrite-wrapper ;
 
 M: word rewrite-sugar*
     dup { load-locals get-local drop-locals } memq?
