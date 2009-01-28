@@ -11,7 +11,7 @@ tools.deploy.config.editor bootstrap.image io.encodings.utf8
 destructors accessors ;
 IN: tools.deploy.backend
 
-: copy-vm ( executable bundle-name extension -- vm )
+: copy-vm ( executable bundle-name -- vm )
     [ prepend-path ] dip append vm over copy-file ;
 
 : copy-fonts ( name dir -- )
