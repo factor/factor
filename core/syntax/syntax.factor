@@ -103,7 +103,7 @@ IN: bootstrap.syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax
 
     "POSTPONE:" [ scan-word parsed ] define-syntax
-    "\\" [ scan-word literalize parsed ] define-syntax
+    "\\" [ scan-word <wrapper> parsed ] define-syntax
     "inline" [ word make-inline ] define-syntax
     "recursive" [ word make-recursive ] define-syntax
     "foldable" [ word make-foldable ] define-syntax

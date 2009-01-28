@@ -497,3 +497,7 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 [ 10 ] [ [let | a [ 10 ] | [let | b [ a ] | b ] ] ] unit-test
 
 [ { \ + } ] [ [let | x [ \ + ] | { \ x } ] ] unit-test
+
+[ { \ + 3 } ] [ [let | a [ 3 ] | { \ + a } ] ] unit-test
+
+[ 3 ] [ [let | a [ \ + ] | 1 2 [ \ a execute ] ] call ] unit-test

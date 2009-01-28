@@ -9,8 +9,9 @@ IN: functors
 
 ! This is a hack
 
-: scan-param ( -- obj )
-    scan-object dup special? [ literalize ] unless ;
+<PRIVATE
+
+: scan-param ( -- obj ) scan-object literalize ;
 
 : define* ( word def effect -- ) pick set-word define-declared ;
 
@@ -89,11 +90,15 @@ M: object fake-quotations> ;
     [ scan interpolate-locals ] dip
     '[ _ with-string-writer @ ] parsed ;
 
+PRIVATE>
+
 : IS [ dup search [ ] [ no-word ] ?if ] (INTERPOLATE) ; parsing
 
 : DEFINES [ create-in ] (INTERPOLATE) ; parsing
 
 DEFER: ;FUNCTOR delimiter
+
+<PRIVATE
 
 : functor-words ( -- assoc )
     H{
@@ -128,5 +133,7 @@ DEFER: ;FUNCTOR delimiter
     parse-locals dup push-locals
     parse-functor-body swap pop-locals <lambda>
     rewrite-closures first ;
+
+PRIVATE>
 
 : FUNCTOR: (FUNCTOR:) define ; parsing

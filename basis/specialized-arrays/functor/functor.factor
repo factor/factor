@@ -64,7 +64,7 @@ M: A resize
 
 M: A byte-length underlying>> length ;
 
-M: A pprint-delims drop A{ \ } ;
+M: A pprint-delims drop \ A{ \ } ;
 
 M: A >pprint-sequence ;
 
