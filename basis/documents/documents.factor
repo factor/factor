@@ -131,13 +131,15 @@ PRIVATE>
     ] if ;
 
 :: set-doc-range ( string from to document -- )
-    string string-lines :> new-lines
-    new-lines from text+loc :> new-to
-    from to document doc-range :> old-string
-    old-string string from to new-to <edit> document add-undo
-    new-lines from to document value>> (set-doc-range)
-    document notify-connections
-    new-to document update-locs ;
+    from to = string empty? and [
+        string string-lines :> new-lines
+        new-lines from text+loc :> new-to
+        from to document doc-range :> old-string
+        old-string string from to new-to <edit> document add-undo
+        new-lines from to document value>> (set-doc-range)
+        document notify-connections
+        new-to document update-locs
+    ] unless ;
 
 : change-doc-range ( from to document quot -- )
     '[ doc-range @ ] 3keep set-doc-range ; inline
