@@ -1,9 +1,60 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml.data xml.writer kernel generic io prettyprint math 
-debugger sequences state-parser accessors summary
-namespaces io.streams.string xml.backend ;
+debugger sequences xml.state accessors summary
+namespaces io.streams.string ;
 IN: xml.errors
+
+TUPLE: xml-error-at line column ;
+
+: xml-error-at ( class -- obj )
+    new
+        get-line >>line
+        get-column >>column ;
+M: xml-error-at summary ( obj -- str )
+    [
+        "XML parsing error" print
+        "Line: " write dup line>> .
+        "Column: " write column>> .
+    ] with-string-writer ;
+
+TUPLE: expected < xml-error-at should-be was ;
+: expected ( should-be was -- * )
+    \ expected xml-error-at
+        swap >>was
+        swap >>should-be throw ;
+M: expected summary ( obj -- str )
+    [
+        dup call-next-method write
+        "Token expected: " write dup should-be>> print
+        "Token present: " write was>> print
+    ] with-string-writer ;
+
+TUPLE: unexpected-end < xml-error-at ;
+: unexpected-end ( -- * ) \ unexpected-end xml-error-at throw ;
+M: unexpected-end summary ( obj -- str )
+    [
+        call-next-method write
+        "File unexpectedly ended." print
+    ] with-string-writer ;
+
+TUPLE: missing-close < xml-error-at ;
+: missing-close ( -- * ) \ missing-close xml-error-at throw ;
+M: missing-close summary ( obj -- str )
+    [
+        call-next-method write
+        "Missing closing token." print
+    ] with-string-writer ;
+
+TUPLE: disallowed-char < xml-error-at char ;
+
+: disallowed-char ( char -- * )
+    \ disallowed-char xml-error-at swap >>char throw ;
+
+M: disallowed-char summary
+    [ call-next-method ]
+    [ char>> "Disallowed character in XML document: " swap suffix ] bi
+    append ;
 
 ERROR: multitags ;
 
@@ -21,10 +72,10 @@ M: pre/post-content summary ( obj -- str )
         " the main tag." print
     ] with-string-writer ;
 
-TUPLE: no-entity < parsing-error thing ;
+TUPLE: no-entity < xml-error-at thing ;
 
 : no-entity ( string -- * )
-    \ no-entity parsing-error swap >>thing throw ;
+    \ no-entity xml-error-at swap >>thing throw ;
 
 M: no-entity summary ( obj -- str )
     [
@@ -32,10 +83,10 @@ M: no-entity summary ( obj -- str )
         "Entity does not exist: &" write thing>> write ";" print
     ] with-string-writer ;
 
-TUPLE: mismatched < parsing-error open close ;
+TUPLE: mismatched < xml-error-at open close ;
 
 : mismatched ( open close -- * )
-    \ mismatched parsing-error swap >>close swap >>open throw ;
+    \ mismatched xml-error-at swap >>close swap >>open throw ;
 
 M: mismatched summary ( obj -- str )
     [
@@ -45,10 +96,10 @@ M: mismatched summary ( obj -- str )
         "Closing tag: </" write close>> print-name ">" print
     ] with-string-writer ;
 
-TUPLE: unclosed < parsing-error tags ;
+TUPLE: unclosed < xml-error-at tags ;
 
 : unclosed ( -- * )
-    \ unclosed parsing-error
+    \ unclosed xml-error-at
         xml-stack get rest-slice [ first name>> ] map >>tags
     throw ;
 
@@ -60,10 +111,10 @@ M: unclosed summary ( obj -- str )
         tags>> [ "  <" write print-name ">" print ] each
     ] with-string-writer ;
 
-TUPLE: bad-uri < parsing-error string ;
+TUPLE: bad-uri < xml-error-at string ;
 
 : bad-uri ( string -- * )
-    \ bad-uri parsing-error swap >>string throw ;
+    \ bad-uri xml-error-at swap >>string throw ;
 
 M: bad-uri summary ( obj -- str )
     [
@@ -71,10 +122,10 @@ M: bad-uri summary ( obj -- str )
         "Bad URI:" print string>> .
     ] with-string-writer ;
 
-TUPLE: nonexist-ns < parsing-error name ;
+TUPLE: nonexist-ns < xml-error-at name ;
 
 : nonexist-ns ( name-string -- * )
-    \ nonexist-ns parsing-error swap >>name throw ;
+    \ nonexist-ns xml-error-at swap >>name throw ;
 
 M: nonexist-ns summary ( obj -- str )
     [
@@ -82,10 +133,10 @@ M: nonexist-ns summary ( obj -- str )
         "Namespace " write name>> write " has not been declared" print
     ] with-string-writer ;
 
-TUPLE: unopened < parsing-error ; ! this should give which tag was unopened
+TUPLE: unopened < xml-error-at ; ! this should give which tag was unopened
 
 : unopened ( -- * )
-    \ unopened parsing-error throw ;
+    \ unopened xml-error-at throw ;
 
 M: unopened summary ( obj -- str )
     [
@@ -93,10 +144,10 @@ M: unopened summary ( obj -- str )
         "Closed an unopened tag" print
     ] with-string-writer ;
 
-TUPLE: not-yes/no < parsing-error text ;
+TUPLE: not-yes/no < xml-error-at text ;
 
 : not-yes/no ( text -- * )
-    \ not-yes/no parsing-error swap >>text throw ;
+    \ not-yes/no xml-error-at swap >>text throw ;
 
 M: not-yes/no summary ( obj -- str )
     [
@@ -106,10 +157,10 @@ M: not-yes/no summary ( obj -- str )
     ] with-string-writer ;
 
 ! this should actually print the names
-TUPLE: extra-attrs < parsing-error attrs ;
+TUPLE: extra-attrs < xml-error-at attrs ;
 
 : extra-attrs ( attrs -- * )
-    \ extra-attrs parsing-error swap >>attrs throw ;
+    \ extra-attrs xml-error-at swap >>attrs throw ;
 
 M: extra-attrs summary ( obj -- str )
     [
@@ -118,10 +169,10 @@ M: extra-attrs summary ( obj -- str )
         attrs>> .
     ] with-string-writer ;
 
-TUPLE: bad-version < parsing-error num ;
+TUPLE: bad-version < xml-error-at num ;
 
 : bad-version ( num -- * )
-    \ bad-version parsing-error swap >>num throw ;
+    \ bad-version xml-error-at swap >>num throw ;
 
 M: bad-version summary ( obj -- str )
     [
@@ -134,10 +185,10 @@ ERROR: notags ;
 M: notags summary ( obj -- str )
     drop "XML document lacks a main tag" ;
 
-TUPLE: bad-prolog < parsing-error prolog ;
+TUPLE: bad-prolog < xml-error-at prolog ;
 
 : bad-prolog ( prolog -- * )
-    \ bad-prolog parsing-error swap >>prolog throw ;
+    \ bad-prolog xml-error-at swap >>prolog throw ;
 
 M: bad-prolog summary ( obj -- str )
     [
@@ -146,10 +197,10 @@ M: bad-prolog summary ( obj -- str )
         prolog>> write-prolog nl
     ] with-string-writer ;
 
-TUPLE: capitalized-prolog < parsing-error name ;
+TUPLE: capitalized-prolog < xml-error-at name ;
 
 : capitalized-prolog ( name -- capitalized-prolog )
-    \ capitalized-prolog parsing-error swap >>name throw ;
+    \ capitalized-prolog xml-error-at swap >>name throw ;
 
 M: capitalized-prolog summary ( obj -- str )
     [
@@ -159,10 +210,10 @@ M: capitalized-prolog summary ( obj -- str )
         " instead of <?xml...?>" print
     ] with-string-writer ;
 
-TUPLE: versionless-prolog < parsing-error ;
+TUPLE: versionless-prolog < xml-error-at ;
 
 : versionless-prolog ( -- * )
-    \ versionless-prolog parsing-error throw ;
+    \ versionless-prolog xml-error-at throw ;
 
 M: versionless-prolog summary ( obj -- str )
     [
@@ -170,22 +221,10 @@ M: versionless-prolog summary ( obj -- str )
         "XML prolog lacks a version declaration" print
     ] with-string-writer ;
 
-TUPLE: bad-instruction < parsing-error instruction ;
-
-: bad-instruction ( instruction -- * )
-    \ bad-instruction parsing-error swap >>instruction throw ;
-
-M: bad-instruction summary ( obj -- str )
-    [
-        dup call-next-method write
-        "Misplaced processor instruction:" print
-        instruction>> write-xml-chunk nl
-    ] with-string-writer ;
-
-TUPLE: bad-directive < parsing-error dir ;
+TUPLE: bad-directive < xml-error-at dir ;
 
 : bad-directive ( directive -- * )
-    \ bad-directive parsing-error swap >>dir throw ;
+    \ bad-directive xml-error-at swap >>dir throw ;
 
 M: bad-directive summary ( obj -- str )
     [
@@ -194,26 +233,26 @@ M: bad-directive summary ( obj -- str )
         dir>> write
     ] with-string-writer ;
 
-TUPLE: bad-doctype-decl < parsing-error ;
+TUPLE: bad-decl < xml-error-at ;
 
-: bad-doctype-decl ( -- * )
-    \ bad-doctype-decl parsing-error throw ;
+: bad-decl ( -- * )
+    \ bad-decl xml-error-at throw ;
 
-M: bad-doctype-decl summary ( obj -- str )
-    call-next-method "\nBad DOCTYPE" append ;
+M: bad-decl summary ( obj -- str )
+    call-next-method "\nExtra content in directive" append ;
 
-TUPLE: bad-external-id < parsing-error ;
+TUPLE: bad-external-id < xml-error-at ;
 
 : bad-external-id ( -- * )
-    \ bad-external-id parsing-error throw ;
+    \ bad-external-id xml-error-at throw ;
 
 M: bad-external-id summary ( obj -- str )
     call-next-method "\nBad external ID" append ;
 
-TUPLE: misplaced-directive < parsing-error dir ;
+TUPLE: misplaced-directive < xml-error-at dir ;
 
 : misplaced-directive ( directive -- * )
-    \ misplaced-directive parsing-error swap >>dir throw ;
+    \ misplaced-directive xml-error-at swap >>dir throw ;
 
 M: misplaced-directive summary ( obj -- str )
     [
@@ -222,34 +261,82 @@ M: misplaced-directive summary ( obj -- str )
         dir>> write-xml-chunk nl
     ] with-string-writer ;
 
-TUPLE: bad-name < parsing-error name ;
+TUPLE: bad-name < xml-error-at name ;
 
 : bad-name ( name -- * )
-    \ bad-name parsing-error swap >>name throw ;
+    \ bad-name xml-error-at swap >>name throw ;
 
 M: bad-name summary ( obj -- str )
     [ call-next-method ]
     [ "Invalid name: " swap name>> "\n" 3append ]
     bi append ;
 
-TUPLE: unclosed-quote < parsing-error ;
+TUPLE: unclosed-quote < xml-error-at ;
 
 : unclosed-quote ( -- * )
-    \ unclosed-quote parsing-error throw ;
+    \ unclosed-quote xml-error-at throw ;
 
 M: unclosed-quote summary
     call-next-method
     "XML document ends with quote still open\n" append ;
 
-TUPLE: quoteless-attr < parsing-error ;
+TUPLE: quoteless-attr < xml-error-at ;
 
 : quoteless-attr ( -- * )
-    \ quoteless-attr parsing-error throw ;
+    \ quoteless-attr xml-error-at throw ;
 
 M: quoteless-attr summary
     call-next-method "Attribute lacks quotes around value\n" append ;
 
-UNION: xml-parse-error multitags notags extra-attrs nonexist-ns
-       not-yes/no unclosed mismatched expected no-entity
-       bad-prolog versionless-prolog capitalized-prolog bad-instruction
-       bad-directive bad-name unclosed-quote quoteless-attr ;
+TUPLE: attr-w/< < xml-error-at ;
+
+: attr-w/< ( value -- * )
+    \ attr-w/< xml-error-at throw ;
+
+M: attr-w/< summary
+    call-next-method
+    "Attribute value contains literal <" append ;
+
+TUPLE: text-w/]]> < xml-error-at ;
+
+: text-w/]]> ( text -- * )
+    \ text-w/]]> xml-error-at throw ;
+
+M: text-w/]]> summary
+    call-next-method
+    "Text node contains ']]>'" append ;
+
+TUPLE: duplicate-attr < xml-error-at key values ;
+
+: duplicate-attr ( key values -- * )
+    \ duplicate-attr xml-error-at
+    swap >>values swap >>key throw ;
+
+M: duplicate-attr summary
+    call-next-method "\nDuplicate attribute" append ;
+
+TUPLE: bad-cdata < xml-error-at ;
+
+: bad-cdata ( -- * )
+    \ bad-cdata xml-error-at throw ;
+
+M: bad-cdata summary
+    call-next-method "\nCDATA occurs before or after main tag" append ;
+
+TUPLE: not-enough-characters < xml-error-at ;
+: not-enough-characters ( -- * )
+    \ not-enough-characters xml-error-at throw ;
+M: not-enough-characters summary ( obj -- str )
+    [
+        call-next-method write
+        "Not enough characters" print
+    ] with-string-writer ;
+
+TUPLE: bad-doctype < xml-error-at contents ;
+: bad-doctype ( contents -- * )
+    \ bad-doctype xml-error-at swap >>contents throw ;
+M: bad-doctype summary
+    call-next-method "\nDTD contains invalid object" append ;
+
+UNION: xml-error
+    multitags notags pre/post-content xml-error-at ;

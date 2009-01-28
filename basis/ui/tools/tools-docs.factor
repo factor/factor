@@ -85,7 +85,7 @@ ARTICLE: "ui-completion-vocabs" "Vocabulary completion popup"
 { $operations "kernel" vocab } ;
 
 ARTICLE: "ui-completion-sources" "Source file completion popup"
-"The source file completion popup lists all source files which have been previously loaded by " { $link run-file } ". Clicking a source file  or pressing " { $snippet "RET" } " opens the source file in your editor with " { $link edit } "."
+"The source file completion popup lists all source files which have been previously loaded by " { $link run-file } ". Clicking a source file or pressing " { $snippet "RET" } " opens the source file in your editor with " { $link edit } "."
 { $operations P" " } ;
 
 ARTICLE: "ui-completion" "UI completion popups"

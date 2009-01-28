@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays generic assocs hashtables assocs
 hashtables.private io io.binary io.files io.encodings.binary
@@ -10,7 +10,7 @@ classes.tuple.private words.private vocabs
 vocabs.loader source-files definitions debugger
 quotations.private sequences.private combinators
 math.order math.private accessors
-slots.private compiler.units ;
+slots.private compiler.units fry ;
 IN: bootstrap.image
 
 : arch ( os cpu -- arch )
@@ -73,7 +73,7 @@ SYMBOL: objects
 : put-object ( n obj -- ) (objects) set-at ;
 
 : cache-object ( obj quot -- value )
-    [ (objects) ] dip [ obj>> ] prepose cache ; inline
+    [ (objects) ] dip '[ obj>> @ ] cache ; inline
 
 ! Constants
 
@@ -95,7 +95,7 @@ SYMBOL: objects
 SYMBOL: sub-primitives
 
 : make-jit ( quot rc rt offset -- quad )
-    { [ { } make ] [ ] [ ] [ ] } spread 4array ; inline
+    [ { } make ] 3dip 4array ; inline
 
 : jit-define ( quot rc rt offset name -- )
     [ make-jit ] dip set ; inline
@@ -344,25 +344,37 @@ M: wrapper '
     [ emit ] emit-object ;
 
 ! Strings
+: native> ( object -- object )
+    big-endian get [ [ be> ] map ] [ [ le> ] map ] if ;
+
 : emit-bytes ( seq -- )
-    bootstrap-cell <groups>
-    big-endian get [ [ be> ] map ] [ [ le> ] map ] if
-    emit-seq ;
+    bootstrap-cell <groups> native> emit-seq ;
 
 : pad-bytes ( seq -- newseq )
     dup length bootstrap-cell align 0 pad-right ;
 
-: check-string ( string -- )
-    [ 127 > ] contains?
-    [ "Bootstrap cannot emit non-ASCII strings" throw ] when ;
+: extended-part ( str -- str' )
+    dup [ 128 < ] all? [ drop f ] [
+        [ -7 shift 1 bitxor ] { } map-as
+        big-endian get
+        [ [ 2 >be ] { } map-as ]
+        [ [ 2 >le ] { } map-as ] if
+        B{ } join
+    ] if ;
+
+: ascii-part ( str -- str' )
+    [
+        [ 128 mod ] [ 128 >= ] bi
+        [ 128 bitor ] when
+    ] B{ } map-as ;
 
 : emit-string ( string -- ptr )
-    dup check-string
+    [ length ] [ extended-part ' ] [ ] tri
     string type-number object tag-number [
-        dup length emit-fixnum
-        f ' emit
-        f ' emit
-        pad-bytes emit-bytes
+        [ emit-fixnum ]
+        [ emit ]
+        [ f ' emit ascii-part pad-bytes emit-bytes ]
+        tri*
     ] emit-object ;
 
 M: string '
@@ -433,7 +445,7 @@ M: quotation '
         array>> '
         quotation type-number object tag-number [
             emit ! array
-            f ' emit ! compiled>>
+            f ' emit ! compiled
             0 emit ! xt
             0 emit ! code
         ] emit-object
@@ -524,11 +536,9 @@ M: quotation '
 ! Image output
 
 : (write-image) ( image -- )
-    bootstrap-cell big-endian get [
-        [ >be write ] curry each
-    ] [
-        [ >le write ] curry each
-    ] if ;
+    bootstrap-cell big-endian get
+    [ '[ _ >be write ] each ]
+    [ '[ _ >le write ] each ] if ;
 
 : write-image ( image -- )
     "Writing image to " write

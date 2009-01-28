@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors compiler cpu.architecture vocabs.loader system
 sequences namespaces parser kernel kernel.private classes
@@ -25,8 +25,8 @@ IN: bootstrap.compiler
 
 enable-compiler
 
-: compile-uncompiled ( words -- )
-    [ compiled>> not ] filter compile ;
+: compile-unoptimized ( words -- )
+    [ optimized>> not ] filter compile ;
 
 nl
 "Compiling..." write flush
@@ -48,70 +48,70 @@ nl
     wrap probe
 
     namestack*
-} compile-uncompiled
+} compile-unoptimized
 
 "." write flush
 
 {
     bitand bitor bitxor bitnot
-} compile-uncompiled
+} compile-unoptimized
 
 "." write flush
 
 {
     + 1+ 1- 2/ < <= > >= shift
-} compile-uncompiled
+} compile-unoptimized
 
 "." write flush
 
 {
     new-sequence nth push pop peek flip
-} compile-uncompiled
+} compile-unoptimized
 
 "." write flush
 
 {
     hashcode* = get set
-} compile-uncompiled
+} compile-unoptimized
 
 "." write flush
 
 {
     memq? split harvest sift cut cut-slice start index clone
     set-at reverse push-all class number>string string>number
-} compile-uncompiled
+} compile-unoptimized
 
 "." write flush
 
 {
     lines prefix suffix unclip new-assoc update
     word-prop set-word-prop 1array 2array 3array ?nth
-} compile-uncompiled
+} compile-unoptimized
 
 "." write flush
 
 {
     malloc calloc free memcpy
-} compile-uncompiled
+} compile-unoptimized
 
 "." write flush
 
-{ build-tree } compile-uncompiled
+{ build-tree } compile-unoptimized
 
 "." write flush
 
-{ optimize-tree } compile-uncompiled
+{ optimize-tree } compile-unoptimized
 
 "." write flush
 
-{ optimize-cfg } compile-uncompiled
+{ optimize-cfg } compile-unoptimized
 
 "." write flush
 
-{ (compile) } compile-uncompiled
+{ (compile) } compile-unoptimized
 
 "." write flush
 
-vocabs [ words compile-uncompiled "." write flush ] each
+vocabs [ words compile-unoptimized "." write flush ] each
 
 " done" print flush

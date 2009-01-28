@@ -134,6 +134,7 @@ $nl
 }
 "In a word with locals, literals expand into code which constructs the literal, and so every invocation pushes a new object:"
 { $example
+    "USE: locals"
     "IN: scratchpad"
     "TUPLE: person first-name last-name ;"
     ":: ordinary-word-test ( -- tuple )"
@@ -166,7 +167,7 @@ $nl
 "Recall that the following two code snippets are equivalent:"
 { $code "'[ sq _ + ]" }
 { $code "[ [ sq ] dip + ] curry" }
-"The semantics of " { $link dip } " and " { $link curry } " are such that the first example behaves as if the top of the stack as ``inserted'' in the ``hole'' in the quotation's second element."
+"The semantics of " { $link dip } " and " { $link curry } " are such that the first example behaves as if the top of the stack as “inserted” in the “hole” in the quotation's second element."
 $nl
 "Conceptually, " { $link curry } " is defined so that the following two code snippets are equivalent:"
 { $code "3 [ - ] curry" }
@@ -179,7 +180,7 @@ $nl
 { $code "'[ [| a | a - ] curry ] call" }
 "Instead, the first line above expands into something like the following:"
 { $code "[ [ swap [| a | a - ] ] curry call ]" }
-"This ensures that the fried value appears ``underneath'' the local variable " { $snippet "a" } " when the quotation calls."
+"This ensures that the fried value appears “underneath” the local variable " { $snippet "a" } " when the quotation calls."
 $nl
 "The precise behavior is the following. When frying a lambda, a stack shuffle (" { $link mnswap } ") is prepended to the lambda so that the " { $snippet "m" } " curried values, which start off at the top of the stack, are transposed with the " { $snippet "n" } " inputs to the lambda." ;
 

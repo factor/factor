@@ -24,6 +24,9 @@
 (autoload 'switch-to-factor "fuel-listener.el"
   "Start a Factor listener, or switch to a running one." t)
 
+(autoload 'connect-to-factor "fuel-listener.el"
+  "Connect to an external Factor listener." t)
+
 (autoload 'fuel-autodoc-mode "fuel-help.el"
   "Minor mode showing in the minibuffer a synopsis of Factor word at point."
   t)

@@ -159,7 +159,7 @@ TUPLE: person first-name last-name ;
     "true" "b" set-value
 ] unit-test
 
-[ "<input type='checkbox' name='a'>a</input><input type='checkbox' name='b' checked='true'>b</input>" ] [
+[ "<input type=\"checkbox\" name=\"a\">a</input><input type=\"checkbox\" checked=\"true\" name=\"b\">b</input>" ] [
     [
         "test12" test-template call-template
     ] run-template

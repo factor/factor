@@ -1,12 +1,12 @@
-! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io io.encodings.binary io.files
-io.streams.string kernel namespaces sequences state-parser strings
-xml.backend xml.data xml.errors xml.tokenize ascii
-xml.writer ;
+io.streams.string kernel namespaces sequences strings io.encodings.utf8
+xml.data xml.errors xml.elements ascii xml.entities
+xml.writer xml.state xml.autoencoding assocs xml.tokenize xml.name ;
 IN: xml
 
-!   -- Overall parser with data tree
+<PRIVATE
 
 : add-child ( object -- )
     xml-stack get peek second push ;
@@ -24,11 +24,6 @@ M: object process add-child ;
 M: prolog process
     xml-stack get V{ { f V{ } } } =
     [ bad-prolog ] unless drop ;
-
-M: instruction process
-    xml-stack get length 1 =
-    [ bad-instruction ] unless
-    add-child ;
 
 M: directive process
     xml-stack get dup length 1 =
@@ -53,7 +48,9 @@ M: closer process
     <tag> add-child ;
 
 : init-xml-stack ( -- )
-    V{ } clone xml-stack set f push-xml ;
+    V{ } clone xml-stack set
+    extra-entities [ H{ } assoc-like ] change
+    f push-xml ;
 
 : default-prolog ( -- prolog )
     "1.0" "UTF-8" f <prolog> ;
@@ -92,6 +89,8 @@ M: closer process
 
 SYMBOL: text-now?
 
+PRIVATE>
+
 TUPLE: pull-xml scope ;
 : <pull-xml> ( -- pull-xml )
     [
@@ -109,6 +108,8 @@ TUPLE: pull-xml scope ;
         ] if text-now? set
     ] bind ;
 
+<PRIVATE
+
 : done? ( -- ? )
     xml-stack get length 1 = ;
 
@@ -119,27 +120,33 @@ TUPLE: pull-xml scope ;
         [ (pull-elem) ] if
     ] if ;
 
+PRIVATE>
+
 : pull-elem ( pull -- xml-elem/f )
     [ init-xml-stack (pull-elem) ] with-scope ;
+
+<PRIVATE
 
 : call-under ( quot object -- quot )
     swap dup slip ; inline
 
-: sax-loop ( quot: ( xml-elem -- ) -- )
+: xml-loop ( quot: ( xml-elem -- ) -- )
     parse-text call-under
-    get-char [ make-tag call-under sax-loop ]
+    get-char [ make-tag call-under xml-loop ]
     [ drop ] if ; inline recursive
 
-: sax ( stream quot: ( xml-elem -- ) -- )
+PRIVATE>
+
+: each-element ( stream quot: ( xml-elem -- ) -- )
     swap [
         reset-prolog init-ns-stack
         start-document [ call-under ] when*
-        sax-loop
-    ] state-parse ; inline recursive
+        xml-loop
+    ] with-state ; inline
 
 : (read-xml) ( -- )
     start-document [ process ] when*
-    [ process ] sax-loop ; inline
+    [ process ] xml-loop ; inline
 
 : (read-xml-chunk) ( stream -- prolog seq )
     [
@@ -147,26 +154,36 @@ TUPLE: pull-xml scope ;
         done? [ unclosed ] unless
         xml-stack get first second
         prolog-data get swap
-    ] state-parse ;
+    ] with-state ;
 
 : read-xml ( stream -- xml )
-    #! Produces a tree of XML nodes
-    (read-xml-chunk) make-xml-doc ;
+    0 depth
+    [ (read-xml-chunk) make-xml-doc ] with-variable ;
 
 : read-xml-chunk ( stream -- seq )
-    (read-xml-chunk) nip ;
+    1 depth
+    [ (read-xml-chunk) nip ] with-variable ;
 
 : string>xml ( string -- xml )
-    <string-reader> read-xml ;
+    t string-input?
+    [ <string-reader> read-xml ] with-variable ;
 
 : string>xml-chunk ( string -- xml )
     t string-input?
     [ <string-reader> read-xml-chunk ] with-variable ;
 
 : file>xml ( filename -- xml )
-    ! Autodetect encoding!
     binary <file-reader> read-xml ;
 
-: xml-reprint ( string -- )
-    string>xml print-xml ;
+: read-dtd ( stream -- dtd )
+    [
+        reset-prolog
+        H{ } clone extra-entities set
+        take-internal-subset
+    ] with-state ;
 
+: file>dtd ( filename -- dtd )
+    utf8 <file-reader> read-dtd ;
+
+: string>dtd ( string -- dtd )
+    <string-reader> read-dtd ;

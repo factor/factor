@@ -104,7 +104,7 @@ M: hashtable clear-assoc ( hash -- )
     [ init-hash ] [ array>> [ drop ((empty)) ] change-each ] bi ;
 
 M: hashtable delete-at ( key hash -- )
-    tuck key@ [
+    [ nip ] [ key@ ] 2bi [
         [ ((tombstone)) dup ] 2dip set-nth-pair
         hash-deleted+
     ] [

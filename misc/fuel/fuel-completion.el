@@ -1,6 +1,6 @@
 ;;; fuel-completion.el -- completion utilities
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -31,6 +31,10 @@
             (fuel-eval--retort-result
              (fuel-eval--send/wait '(:fuel* (fuel-get-vocabs) "fuel" (:array)))))))
   fuel-completion--vocabs)
+
+(defun fuel-completion--read-vocab (&optional reload init-input history)
+  (let ((vocabs (fuel-completion--vocabs reload)))
+    (completing-read "Vocab name: " vocabs nil nil init-input history)))
 
 (defsubst fuel-completion--vocab-list (prefix)
   (fuel-eval--retort-result

@@ -68,7 +68,8 @@ PRIVATE>
     dup V{ 0 } clone p= [
         drop nip
     ] [
-        tuck p/mod [ pick p* swap [ swapd p- ] dip ] dip (pgcd)
+        [ nip ] [ p/mod ] 2bi
+        [ pick p* swap [ swapd p- ] dip ] dip (pgcd)
     ] if ;
 
 PRIVATE>

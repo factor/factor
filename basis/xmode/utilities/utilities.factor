@@ -7,7 +7,7 @@ IN: xmode.utilities
 : child-tags ( tag -- seq ) children>> [ tag? ] filter ;
 
 : map-find ( seq quot -- result elt )
-    f -rot
+    [ f ] 2dip
     '[ nip @ dup ] find
     [ [ drop f ] unless ] dip ; inline
 

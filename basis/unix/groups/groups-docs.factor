@@ -83,7 +83,6 @@ ARTICLE: "unix.groups" "Unix groups"
 $nl
 "Listing all groups:"
 { $subsection all-groups }
-"Returning a passwd tuple:"
 "Real groups:"
 { $subsection real-group-name }
 { $subsection real-group-id }

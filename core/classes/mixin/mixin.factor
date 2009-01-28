@@ -54,7 +54,7 @@ TUPLE: check-mixin-class class ;
     #! class-usages of the member, now that it's been added.
     [ 2drop ] [
         [ [ suffix ] change-mixin-class ] 2keep
-        tuck [ new-class? ] either? [
+        [ nip ] [ [ new-class? ] either? ] 2bi [
             update-classes/new
         ] [
             update-classes

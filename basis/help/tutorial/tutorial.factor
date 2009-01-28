@@ -30,7 +30,7 @@ ARTICLE: "first-program-logic" "Writing some logic in your first program"
     "! See http://factorcode.org/license.txt for BSD license."
     "IN: palindrome"
 }
-"We will now write our first word using " { $link POSTPONE: : } ". This word will test if a string is a palindrome; it will take a string as input, and give back a  boolean as output. We will call this word " { $snippet "palindrome?" } ", following a naming convention that words returning booleans have names ending with " { $snippet "?" } "."
+"We will now write our first word using " { $link POSTPONE: : } ". This word will test if a string is a palindrome; it will take a string as input, and give back a boolean as output. We will call this word " { $snippet "palindrome?" } ", following a naming convention that words returning booleans have names ending with " { $snippet "?" } "."
 $nl
 "Recall that a string is a palindrome if it is spelled the same forwards or backwards; that is, if the string is equal to its reverse. We can express this in Factor as follows:"
 { $code ": palindrome? ( string -- ? ) dup reverse = ;" }
@@ -94,7 +94,7 @@ $nl
 "For example, we'd like it to identify the following as a palindrome:"
 { $code "\"A man, a plan, a canal: Panama.\"" }
 "However, right now, the simplistic algorithm we use says this is not a palindrome:"
-{ $example "\"A man, a plan, a canal: Panama.\" palindrome?" "f" }
+{ $unchecked-example "\"A man, a plan, a canal: Panama.\" palindrome?" "f" }
 "We would like it to output " { $link t } " there. We can encode this requirement with a unit test that we add to " { $snippet "palindrome-tests.factor" } ":"
 { $code "[ t ] [ \"A man, a plan, a canal: Panama.\" palindrome? ] unit-test" }
 "If you now run unit tests, you will see a unit test failure:"
@@ -106,12 +106,12 @@ $nl
 "Start by pushing a character on the stack; notice that characters are really just integers:"
 { $code "CHAR: a" }
 "Now, use the " { $link Letter? } " word to test if it is an alphabetical character, upper or lower case:"
-{ $example "Letter? ." "t" }
+{ $unchecked-example "Letter? ." "t" }
 "This gives the expected result."
 $nl
 "Now try with a non-alphabetical character:"
 { $code "CHAR: #" }
-{ $example "Letter? ." "f" }
+{ $unchecked-example "Letter? ." "f" }
 "What we want to do is given a string, remove all characters which do not match the " { $link Letter? } " predicate. Let's push a string on the stack:"
 { $code "\"A man, a plan, a canal: Panama.\"" }
 "Now, place a quotation containing " { $link Letter? } " on the stack; quoting code places it on the stack instead of executing it immediately:"

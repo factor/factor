@@ -34,7 +34,7 @@ IN: http.server.cgi
         request get "accept" header "HTTP_ACCEPT" set
 
         post-request? [
-            request get post-data>> raw>>
+            request get post-data>> data>>
             [ "CONTENT_TYPE" set ]
             [ length number>string "CONTENT_LENGTH" set ]
             bi
@@ -54,8 +54,8 @@ IN: http.server.cgi
     swap '[
         binary encode-output
         _ output-stream get swap <cgi-process> binary <process-stream> [
-            post-request? [ request get post-data>> raw>> write flush ] when
-            input-stream get swap (stream-copy)
+            post-request? [ request get post-data>> data>> write flush ] when
+            '[ _ write ] each-block
         ] with-stream
     ] >>body ;
 

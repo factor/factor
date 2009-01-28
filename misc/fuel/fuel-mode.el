@@ -175,7 +175,7 @@ interacting with a factor listener is at your disposal.
 
 (fuel-mode--key-1 ?k 'fuel-run-file)
 (fuel-mode--key-1 ?l 'fuel-run-file)
-(fuel-mode--key-1 ?r 'fuel-eval-region)
+(fuel-mode--key-1 ?r 'fuel-refresh-all)
 (fuel-mode--key-1 ?z 'run-factor)
 (fuel-mode--key-1 ?s 'fuel-switch-to-buffer)
 (define-key fuel-mode-map "\C-x4s" 'fuel-switch-to-buffer-other-window)
@@ -198,10 +198,11 @@ interacting with a factor listener is at your disposal.
 (fuel-mode--key ?e ?w 'fuel-edit-word)
 (fuel-mode--key ?e ?x 'fuel-eval-definition)
 
-(fuel-mode--key ?x ?s 'fuel-refactor-extract-sexp)
-(fuel-mode--key ?x ?r 'fuel-refactor-extract-region)
-(fuel-mode--key ?x ?v 'fuel-refactor-extract-vocab)
 (fuel-mode--key ?x ?i 'fuel-refactor-inline-word)
+(fuel-mode--key ?x ?r 'fuel-refactor-extract-region)
+(fuel-mode--key ?x ?s 'fuel-refactor-extract-sexp)
+(fuel-mode--key ?x ?v 'fuel-refactor-extract-vocab)
+(fuel-mode--key ?x ?w 'fuel-refactor-rename-word)
 
 (fuel-mode--key ?d ?> 'fuel-show-callees)
 (fuel-mode--key ?d ?< 'fuel-show-callers)

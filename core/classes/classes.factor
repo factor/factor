@@ -162,7 +162,7 @@ GENERIC: update-methods ( class seq -- )
     dup "predicate" word-prop
     dup length 1 = [
         first
-        tuck "predicating" word-prop =
+        [ nip ] [ "predicating" word-prop = ] 2bi
         [ forget ] [ drop ] if
     ] [ 2drop ] if ;
 

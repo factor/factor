@@ -24,7 +24,7 @@ M: integer /
         "Division by zero" throw
     ] [
         dup 0 < [ [ neg ] bi@ ] when
-        2dup gcd nip tuck /i [ /i ] dip fraction>
+        2dup gcd nip tuck [ /i ] 2bi@ fraction>
     ] if ;
 
 M: ratio hashcode*

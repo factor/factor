@@ -24,7 +24,7 @@ SYMBOL: compiled
     } cond drop ;
 
 : maybe-compile ( word -- )
-    dup compiled>> [ drop ] [ queue-compile ] if ;
+    dup optimized>> [ drop ] [ queue-compile ] if ;
 
 SYMBOL: +failed+
 
@@ -110,7 +110,7 @@ t compile-dependencies? set-global
     [ (compile) yield-hook get call ] slurp-deque ;
 
 : decompile ( word -- )
-    f 2array 1array t modify-code-heap ;
+    f 2array 1array modify-code-heap ;
 
 : optimized-recompile-hook ( words -- alist )
     [

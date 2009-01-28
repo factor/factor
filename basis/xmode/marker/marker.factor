@@ -100,7 +100,7 @@ DEFER: get-rules
     [ ch>upper ] dip rules>> at ?push-all ;
 
 : get-rules ( char ruleset -- seq )
-    f -rot [ get-char-rules ] keep get-always-rules ;
+    [ f ] 2dip [ get-char-rules ] keep get-always-rules ;
 
 GENERIC: handle-rule-start ( match-count rule -- )
 

@@ -97,10 +97,10 @@ X: XOR 0 316 31
 X: XOR. 1 316 31
 X1: EXTSB 0 954 31
 X1: EXTSB. 1 954 31
-: FMR ( a s -- ) 0 -rot 72 0 63 x-insn ;
-: FMR. ( a s -- ) 0 -rot 72 1 63 x-insn ;
-: FCTIWZ ( a s -- ) 0 -rot 0 15 63 x-insn ;
-: FCTIWZ. ( a s -- ) 0 -rot 1 15 63 x-insn ;
+: FMR ( a s -- ) [ 0 ] 2dip 72 0 63 x-insn ;
+: FMR. ( a s -- ) [ 0 ] 2dip 72 1 63 x-insn ;
+: FCTIWZ ( a s -- ) [ 0 ] 2dip 0 15 63 x-insn ;
+: FCTIWZ. ( a s -- ) [ 0 ] 2dip 1 15 63 x-insn ;
 
 ! XO-form
 XO: ADD 0 0 266 31

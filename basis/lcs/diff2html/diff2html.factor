@@ -1,44 +1,42 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lcs html.elements kernel ;
+USING: lcs xml.interpolate xml.writer kernel strings ;
 FROM: accessors => item>> ;
 FROM: io => write ;
-FROM: sequences => each if-empty ;
-FROM: xml.entities => escape-string ;
+FROM: sequences => each if-empty when-empty map ;
 IN: lcs.diff2html
 
-GENERIC: diff-line ( obj -- )
+GENERIC: diff-line ( obj -- xml )
 
-: write-item ( item -- )
-    item>> [ "&nbsp;" ] [ escape-string ] if-empty write ;
+: item-string ( item -- string )
+    item>> [ CHAR: no-break-space 1string ] when-empty ;
 
 M: retain diff-line
-    <tr>
-        dup [
-            <td "retain" =class td>
-                write-item
-            </td>
-        ] bi@
-    </tr> ;
+    item-string
+    [XML <td class="retain"><-></td> XML]
+    dup [XML <tr><-><-></tr> XML] ;
 
 M: insert diff-line
-    <tr>
-        <td> </td>
-        <td "insert" =class td>
-            write-item
-        </td>
-    </tr> ;
+    item-string [XML
+        <tr>
+            <td> </td>
+            <td class="insert"><-></td>
+        </tr>
+    XML] ;
 
 M: delete diff-line
-    <tr>
-        <td "delete" =class td>
-            write-item
-        </td>
-        <td> </td>
-    </tr> ;
+    item-string [XML
+        <tr>
+            <td class="delete"><-></td>
+            <td> </td>
+        </tr>
+    XML] ;
 
-: htmlize-diff ( diff -- )
-    <table "100%" =width "comparison" =class table>
-        <tr> <th> "Old" write </th> <th> "New" write </th> </tr>
-        [ diff-line ] each
-    </table> ;
+: htmlize-diff ( diff -- xml )
+    [ diff-line ] map
+    [XML
+        <table width="100%" class="comparison">
+            <tr><th>Old</th><th>New</th></tr>
+            <->
+        </table>
+    XML] ;

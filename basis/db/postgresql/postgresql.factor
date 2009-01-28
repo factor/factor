@@ -55,8 +55,10 @@ M: generator-bind postgresql-bind-conversion ( tuple generate-bind -- object )
     [ swap slot-name>> rot set-slot-named ] [ <low-level-binding> ] bi ;
 
 M: postgresql-statement bind-tuple ( tuple statement -- )
-    tuck in-params>>
-    [ postgresql-bind-conversion ] with map
+    [ nip ] [
+        in-params>>
+        [ postgresql-bind-conversion ] with map
+    ] 2bi
     >>bind-params drop ;
 
 M: postgresql-result-set #rows ( result-set -- n )

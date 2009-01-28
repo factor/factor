@@ -18,6 +18,8 @@
 (require 'fuel-syntax)
 (require 'fuel-base)
 
+(require 'etags)
+
 
 ;;; Word definitions in buffer
 
@@ -103,10 +105,10 @@
   (let* ((code (buffer-substring begin end))
          (existing (fuel-refactor--reuse-existing code))
          (code-str (or existing (fuel--region-to-string begin end)))
+         (word (or (car existing) (read-string "New word name: ")))
          (stack-effect (or existing
                            (fuel-stack--infer-effect code-str)
-                           (read-string "Stack effect: ")))
-         (word (or (car existing) (read-string "New word name: "))))
+                           (read-string "Stack effect: "))))
     (goto-char begin)
     (delete-region begin end)
     (insert word)
@@ -163,6 +165,32 @@ word."
         (insert code)
         (save-excursion (font-lock-fontify-region start (point)))
         (indent-region start (point))))))
+
+
+;;; Rename word:
+
+(defsubst fuel-refactor--rename-word (from to file)
+  (let ((files (fuel-xref--word-callers-files from)))
+    (tags-query-replace from to t `(cons ,file ',files))
+    files))
+
+(defun fuel-refactor--def-word ()
+  (save-excursion
+    (fuel-syntax--beginning-of-defun)
+    (or (and (looking-at fuel-syntax--method-definition-regex)
+             (match-string-no-properties 2))
+        (and (looking-at fuel-syntax--word-definition-regex)
+             (match-string-no-properties 2)))))
+
+(defun fuel-refactor-rename-word (&optional arg)
+  "Rename globally the word whose definition point is at.
+With prefix argument, use word at point instead."
+  (interactive "P")
+  (let* ((from (if arg (fuel-syntax-symbol-at-point) (fuel-refactor--def-word)))
+         (from (read-string "Rename word: " from))
+         (to (read-string (format "Rename '%s' to: " from)))
+         (buffer (current-buffer)))
+    (fuel-refactor--rename-word from to (buffer-file-name))))
 
 
 ;;; Extract vocab:
