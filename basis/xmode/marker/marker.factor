@@ -5,7 +5,7 @@ USING: kernel namespaces make xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators strings
 parser-combinators.regexp splitting parser-combinators ascii
-ascii combinators.short-circuit accessors ;
+ascii combinators.short-circuit accessors xml.data ;
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 

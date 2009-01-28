@@ -150,10 +150,10 @@ TUPLE: tag
     [ assure-name ] [ T{ attrs } assoc-like ] [ ] tri*
     tag boa ;
 
-: attr ( tag name -- string )
+: attr ( tag/xml name -- string )
     swap attrs>> at ;
 
-: set-attr ( tag value name -- )
+: set-attr ( tag/xml value name -- )
     rot attrs>> set-at ;
 
 ! They also follow the sequence protocol (for children)
@@ -187,9 +187,6 @@ C: <xml> xml
 
 CONSULT: sequence-protocol xml body>> ;
 INSTANCE: xml sequence
-
-CONSULT: assoc-protocol xml body>> ;
-INSTANCE: xml assoc
 
 CONSULT: tag xml body>> ;
 
