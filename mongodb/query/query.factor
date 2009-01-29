@@ -23,7 +23,8 @@ PRIVATE>
      '[ _ write-message read-message ] (execute-query) ; inline
 
 : (find-one) ( inet query -- result )
-     (find) objects>> first ; inline
+    1 >>return#
+    (find) ; inline
 
 : build-result ( resultmsg -- mdb-result )
     [ mdb-result new ] dip
@@ -48,7 +49,7 @@ PRIVATE>
 : create-collection ( mdb-collection --  )
      dup name>> "create" H{ } clone [ set-at ] keep 
      [ mdb>> [ master>> ] [ name>> ] bi "%s.$cmd" sprintf ] dip
-     <mdb-query-one-msg> (find-one)
+     <mdb-query-msg> (find-one) objects>> first
      check-ok
      [ [ ensure-indices ] keep dup name>> mdb>> collections>> set-at ]
      [ "could not create collection" throw ] if ; 
