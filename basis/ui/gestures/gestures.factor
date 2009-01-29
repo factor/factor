@@ -70,14 +70,14 @@ TUPLE: drag # ;             C: <drag> drag
 TUPLE: button-up mods # ;   C: <button-up> button-up
 TUPLE: button-down mods # ; C: <button-down> button-down
 
-SYMBOLS:
+SINGLETONS:
 motion
 mouse-scroll
 mouse-enter mouse-leave
 lose-focus gain-focus ;
 
 ! Higher-level actions
-SYMBOLS:
+SINGLETONS:
 undo-action redo-action
 cut-action copy-action paste-action
 delete-action select-all-action
