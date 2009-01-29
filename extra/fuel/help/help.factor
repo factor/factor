@@ -2,15 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors arrays assocs combinators help help.crossref
-help.markup help.topics io io.streams.string kernel make memoize
-namespaces parser prettyprint sequences summary tools.vocabs
-tools.vocabs.browser vocabs vocabs.loader words ;
+help.markup help.topics io io.streams.string kernel make namespaces
+parser prettyprint sequences summary tools.vocabs tools.vocabs.browser
+vocabs vocabs.loader words ;
 
 IN: fuel.help
 
 <PRIVATE
 
-MEMO: fuel-find-word ( name -- word/f )
+: fuel-find-word ( name -- word/f )
     [ [ name>> ] dip = ] curry all-words swap filter
     dup empty? not [ first ] [ drop f ] if ;
 
@@ -102,11 +102,11 @@ PRIVATE>
 : (fuel-vocab-help) ( name -- str )
     dup empty? [ fuel-vocab-children-help ] [ (fuel-vocab-element) ] if ;
 
-MEMO: (fuel-get-vocabs/author) ( author -- element )
+: (fuel-get-vocabs/author) ( author -- element )
     [ "Vocabularies by " prepend \ $heading swap 2array ]
     [ authored fuel-vocab-list ] bi 2array ;
 
-MEMO: (fuel-get-vocabs/tag) ( tag -- element )
+: (fuel-get-vocabs/tag) ( tag -- element )
     [ "Vocabularies tagged " prepend \ $heading swap 2array ]
     [ tagged fuel-vocab-list ] bi 2array ;
 
