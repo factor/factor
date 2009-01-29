@@ -1,6 +1,7 @@
 USING: accessors fry io io.encodings.binary io.servers.connection
 io.sockets io.streams.byte-array kernel math mongodb.msg classes formatting
-mongodb.msg.private namespaces prettyprint tools.walker calendar calendar.format ;
+mongodb.msg.private namespaces prettyprint tools.walker calendar calendar.format
+json.writer ;
 
 IN: mongodb.mmm
 
@@ -48,22 +49,33 @@ GENERIC: dump-message ( message -- )
     [ mmm-dump-output get ] dip
     '[ _ binary [ read-message dump-message ] with-byte-reader ] with-output-stream ;
 
-: message-prefix ( message -- tst name message )
+: message-prefix ( message -- prefix message )
     [ now timestamp>http-string ] dip
-    [ class name>> ] keep ; inline
+    [ class name>> ] keep
+    [ "%s: %s" sprintf ] dip ; inline
 
 M: mdb-query-msg dump-message ( message -- )
     message-prefix
-    collection>> 
-    "%s: %s -> %s \n" printf ;
+    [ collection>> ] keep
+    query>> >json
+    "%s -> %s: %s \n" printf ;
 
 M: mdb-insert-msg dump-message ( message -- )
     message-prefix
-    collection>>
-    "%s: %s -> %s \n" printf ;
+    [ collection>> ] keep
+    objects>> >json
+    "%s -> %s : %s \n" printf ;
+
+M: mdb-reply-msg dump-message ( message -- )
+    message-prefix
+    [ cursor>> ] keep
+    [ start#>> ] keep
+    [ returned#>> ] keep
+    objects>> >json
+    "%s -> cursor: %d, start: %d, returned#: %d,  -> %s \n" printf ; 
 
 M: mdb-msg dump-message ( message -- )
-    message-prefix drop "%s: %s \n" printf ;
+    message-prefix drop "%s \n" printf ;
 
 : forward-reply ( binary -- )
     write flush ;
