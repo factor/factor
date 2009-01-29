@@ -194,13 +194,7 @@ M: bson-binary-function element-binary-read ( size type -- quot )
 
 PRIVATE>
 
-: stream>assoc ( exemplar -- assoc )
+: stream>assoc ( exemplar -- assoc bytes-read )
     <state> dup state
-        [ read-int32 >>size read-elements ] with-variable 
-        result>> ;
-        
-: array>assoc  ( array exemplar -- assoc )
-    [ binary ] dip '[ _ stream>assoc ] with-byte-reader ;
-
-: array>hashtable ( array -- assoc )
-    H{ } array>assoc ;
+    [ read-int32 >>size read-elements ] with-variable 
+    [ result>> ] [ read>> ] bi ;
