@@ -26,24 +26,27 @@ TUPLE: mdb name nodes collections ;
     '[ _ write-message read-message ] with-client
     objects>> first ; 
 
-: -push ( seq elt -- )
-    swap push ; inline
-
 : split-host-str ( hoststr -- host port )
     ":" split [ first ] keep
     second string>number ; inline
 
+: eval-ismaster-result ( node result -- node result )
+    [ [ "ismaster" ] dip at
+      >fixnum 1 =
+      [ t >>master? ] [ f >>master? ] if ] keep ;
+
+: check-node ( node -- node remote )
+    dup inet>> ismaster-cmd  
+    eval-ismaster-result
+    [ "remote" ] dip at ;
+
 : check-nodes ( node -- nodelist )
-    [ V{ } clone ] dip
-    [ -push ] 2keep 
-    dup inet>> ismaster-cmd ! vec node result
-    dup [ "ismaster" ] dip at 
-    >fixnum 1 =             ! vec node result
-    [ [ t >>master? drop ] dip f ]
-    [ [ f >>master? drop ] dip t ] if
-    [ "remote" ] 2dip [ at split-host-str <inet> ] dip
-    swap mdb-node boa swap
-    [ push ] keep ;
+    check-node
+    [ V{ } clone [ push ] keep ] dip
+    [ split-host-str <inet> [ f ] dip
+      mdb-node boa check-node drop
+      swap tuck push
+    ] when* ;
 
 : verify-nodes ( -- )
     mdb>> nodes>> [ t ] dip at
