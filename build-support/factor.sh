@@ -236,7 +236,7 @@ find_word_size() {
 
 set_factor_binary() {
     case $OS in
-        winnt) FACTOR_BINARY=factor.exe;;
+        winnt) FACTOR_BINARY=factor.com;;
         *) FACTOR_BINARY=factor;;
     esac
 }

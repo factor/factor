@@ -34,7 +34,7 @@ M: ppc two-operand? f ;
 
 M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
-M: ppc %load-indirect ( reg obj -- )
+M: ppc %load-reference ( reg obj -- )
     [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-immediate ] bi* ;
 
 M: ppc %alien-global ( register symbol dll -- )
@@ -261,7 +261,7 @@ M:: ppc %fixnum-mul-tail ( src1 src2 temp1 temp2 -- )
 M:: ppc %integer>bignum ( dst src temp -- )
     [
         "end" define-label
-        dst 0 >bignum %load-indirect
+        dst 0 >bignum %load-reference
         ! Is it zero? Then just go to the end and return this zero
         0 src 0 CMPI
         "end" get BEQ
@@ -321,7 +321,7 @@ M:: ppc %integer>float ( dst src -- )
     scratch-reg dup HEX: 8000 XORIS
     scratch-reg 1 4 scratch@ STW
     dst 1 0 scratch@ LFD
-    scratch-reg 4503601774854144.0 %load-indirect
+    scratch-reg 4503601774854144.0 %load-reference
     fp-scratch-reg scratch-reg float-offset LFD
     dst dst fp-scratch-reg FSUB ;
 
@@ -488,7 +488,7 @@ M: ppc %epilogue ( n -- )
     "end" define-label
     dst \ f tag-number %load-immediate
     "end" get word execute
-    dst \ t %load-indirect
+    dst \ t %load-reference
     "end" get resolve-label ; inline
 
 : %boolean ( dst temp cc -- )
@@ -637,7 +637,7 @@ M: ppc %alien-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
 
 M: ppc %alien-callback ( quot -- )
-    3 swap %load-indirect "c_to_factor" f %alien-invoke ;
+    3 swap %load-reference "c_to_factor" f %alien-invoke ;
 
 M: ppc %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke

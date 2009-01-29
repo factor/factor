@@ -792,7 +792,7 @@ LIBRARY: kernel32
 ! FUNCTION: AddRefActCtx
 ! FUNCTION: AddVectoredExceptionHandler
 ! FUNCTION: AllocateUserPhysicalPages
-! FUNCTION: AllocConsole
+FUNCTION: BOOL AllocConsole ( ) ;
 ! FUNCTION: AreFileApisANSI
 ! FUNCTION: AssignProcessToJobObject
 ! FUNCTION: AttachConsole
@@ -1111,7 +1111,7 @@ FUNCTION: BOOL FindVolumeMountPointClose ( HANDLE hFindVolumeMountPoint ) ;
 ! FUNCTION: FoldStringW
 ! FUNCTION: FormatMessageA
 ! FUNCTION: FormatMessageW
-! FUNCTION: FreeConsole
+FUNCTION: BOOL FreeConsole ( ) ;
 ! FUNCTION: FreeEnvironmentStringsA
 FUNCTION: BOOL FreeEnvironmentStringsW ( LPTCH lpszEnvironmentBlock ) ;
 ALIAS: FreeEnvironmentStrings FreeEnvironmentStringsW

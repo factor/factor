@@ -3,6 +3,7 @@ AR = ar
 LD = ld
 
 EXECUTABLE = factor
+CONSOLE_EXECUTABLE = factor_console
 VERSION = 0.92
 
 IMAGE = factor.image
@@ -138,9 +139,16 @@ zlib1.dll:
 
 winnt-x86-32: freetype6.dll zlib1.dll
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
+	$(MAKE) $(CONSOLE_EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
+	$(MAKE) winnt-finish
 
 winnt-x86-64:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.64
+	$(MAKE) $(CONSOLE_EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.64
+	$(MAKE) winnt-finish
+
+winnt-finish:
+	cp misc/factor-cygwin.sh ./factor
 
 wince-arm:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.arm
@@ -160,6 +168,11 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
+
+factor_console: $(DLL_OBJS) $(EXE_OBJS)
+	$(LINKER) $(ENGINE) $(DLL_OBJS)
+	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
+		$(CFLAGS) $(CFLAGS_CONSOLE) -o $(EXECUTABLE)$(EXE_SUFFIX)$(CONSOLE_EXE_EXTENSION) $(EXE_OBJS)
 
 clean:
 	rm -f vm/*.o
