@@ -1,9 +1,8 @@
 USING: tools.test io.files io.files.private io.files.temp
 io.directories io.encodings.8-bit arrays make system
-io.encodings.binary io
-threads kernel continuations io.encodings.ascii sequences
-strings accessors io.encodings.utf8 math destructors namespaces
-;
+io.encodings.binary io threads kernel continuations
+io.encodings.ascii sequences strings accessors
+io.encodings.utf8 math destructors namespaces ;
 IN: io.files.tests
 
 \ exists? must-infer
