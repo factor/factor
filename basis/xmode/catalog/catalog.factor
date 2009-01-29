@@ -1,6 +1,6 @@
 USING: xmode.loader xmode.utilities xmode.rules namespaces
 strings splitting assocs sequences kernel io.files xml memoize
-words globs combinators io.encodings.utf8 sorting accessors ;
+words globs combinators io.encodings.utf8 sorting accessors xml.data ;
 IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
@@ -8,7 +8,7 @@ TUPLE: mode file file-name-glob first-line-glob ;
 <TAGS: parse-mode-tag ( modes tag -- )
 
 TAG: MODE
-    "NAME" over at [
+    dup "NAME" attr [
         mode new {
             { "FILE" f (>>file) }
             { "FILE_NAME_GLOB" f (>>file-name-glob) }
