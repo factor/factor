@@ -81,7 +81,7 @@ sequences ;
 
 [
     {
-        T{ ##load-indirect f V int-regs 1 + }
+        T{ ##load-reference f V int-regs 1 + }
         T{ ##peek f V int-regs 2 D 0 }
         T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc> }
         T{ ##compare f V int-regs 6 V int-regs 2 V int-regs 1 cc> }
@@ -89,7 +89,7 @@ sequences ;
     }
 ] [
     {
-        T{ ##load-indirect f V int-regs 1 + }
+        T{ ##load-reference f V int-regs 1 + }
         T{ ##peek f V int-regs 2 D 0 }
         T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc> }
         T{ ##compare-imm f V int-regs 6 V int-regs 4 7 cc/= }
@@ -99,7 +99,7 @@ sequences ;
 
 [
     {
-        T{ ##load-indirect f V int-regs 1 + }
+        T{ ##load-reference f V int-regs 1 + }
         T{ ##peek f V int-regs 2 D 0 }
         T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc<= }
         T{ ##compare f V int-regs 6 V int-regs 2 V int-regs 1 cc> }
@@ -107,7 +107,7 @@ sequences ;
     }
 ] [
     {
-        T{ ##load-indirect f V int-regs 1 + }
+        T{ ##load-reference f V int-regs 1 + }
         T{ ##peek f V int-regs 2 D 0 }
         T{ ##compare f V int-regs 4 V int-regs 2 V int-regs 1 cc<= }
         T{ ##compare-imm f V int-regs 6 V int-regs 4 7 cc= }

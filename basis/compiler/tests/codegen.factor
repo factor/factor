@@ -277,7 +277,7 @@ TUPLE: id obj ;
 [ 4 ] [ 2 [ dup fixnum* ] compile-call ] unit-test
 [ 7 ] [ 2 [ dup fixnum* 3 fixnum+fast ] compile-call ] unit-test
 
-SINGLETON: cucumber
+TUPLE: cucumber ;
 
 M: cucumber equal? "The cucumber has no equal" throw ;
 
