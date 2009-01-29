@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ui.gadgets ui.gadgets.viewports
 ui.gadgets.frames ui.gadgets.grids ui.gadgets.theme
@@ -59,7 +59,7 @@ scroller H{
     [ [ loc>> ] [ dim>> ] bi ] dip vmin <rect> ;
 
 : (scroll>rect) ( rect scroller -- )
-    [ [ loc>> { 1 1 } v- ] [ dim>> { 1 1 } v+ ] bi <rect> ] dip
+    [ [ loc>> ] [ dim>> { 1 1 } v+ ] bi <rect> ] dip
     {
         [ scroller-value vneg offset-rect viewport-gap offset-rect ]
         [ viewport>> dim>> rect-min ]
@@ -88,7 +88,7 @@ scroller H{
 
 : (scroll>gadget) ( gadget scroller -- )
     2dup swap child? [
-        [ [ pref-dim { 0 0 } swap <rect> ] keep ] dip
+        [ [ [ { 0 0 } ] dip pref-dim <rect> ] keep ] dip
         [ relative-scroll-rect ] keep
         (scroll>rect)
     ] [ f >>follows (update-scroller) drop ] if ;
