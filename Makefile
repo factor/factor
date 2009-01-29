@@ -148,7 +148,7 @@ winnt-x86-64:
 	$(MAKE) winnt-finish
 
 winnt-finish:
-	cp misc/factor-cygwin.sh factor
+	cp misc/factor-cygwin.sh ./factor
 
 wince-arm:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.ce.arm
