@@ -120,6 +120,9 @@ void init_factor(F_PARAMETERS *p)
 	init_c_io();
 	init_signals();
 
+	if(p->console)
+		open_console();
+
 	stack_chain = NULL;
 	profiling_p = false;
 	performing_gc = false;
