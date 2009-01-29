@@ -90,7 +90,7 @@ ERROR: unknown-chloe-tag tag ;
         { [ dup [ tag? ] [ xml? ] bi or ] [ compile-tag ] }
         { [ dup string? ] [ escape-string [write] ] }
         { [ dup comment? ] [ drop ] }
-        [ [ write-xml-chunk ] [code-with] ]
+        [ [ write-xml ] [code-with] ]
     } cond ;
 
 : with-compiler ( quot -- quot' )
