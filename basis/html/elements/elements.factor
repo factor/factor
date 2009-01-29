@@ -144,7 +144,7 @@ SYMBOL: html
             </head>
             <body><-></body>
         </html>
-    XML> write-xml ;
+    XML> write-xml ; inline
 
 : render-error ( message -- )
     [XML <span class="error"><-></span> XML] write-xml ;

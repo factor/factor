@@ -61,7 +61,7 @@ PRIVATE>
 
 PRIVATE>
 
-GENERIC: write-xml ( object -- )
+GENERIC: write-xml ( xml -- )
 
 <PRIVATE
 
@@ -92,8 +92,8 @@ M: contained-tag write-xml
 M: open-tag write-xml
     xml-pprint? get [
         {
-            [ sensitive? not xml-pprint? get and xml-pprint? set ]
             [ write-start-tag ]
+            [ sensitive? not xml-pprint? get and xml-pprint? set ]
             [ write-children ]
             [ write-end-tag ]
         } cleave

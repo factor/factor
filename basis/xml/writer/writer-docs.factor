@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.syntax help.markup io strings xml.data ;
+USING: help.syntax help.markup io strings xml.data multiline ;
 IN: xml.writer
 
 ABOUT: "xml.writer"
@@ -39,3 +39,29 @@ HELP: pprint-xml
 
 { xml>string write-xml pprint-xml pprint-xml>string } related-words
 
+HELP: indenter
+{ $var-description "Contains the string which is used for indenting in the XML prettyprinter. For example, to print an XML document using " { $snippet "%%%%" } " for indentation, you can use the following:" }
+{ $example {" USING: xml.interpolate xml.writer namespaces ;
+[XML <foo>bar</foo> XML] "%%%%" indenter [ pprint-xml ] with-variable "} {"
+<foo>
+%%%%bar
+</foo>"} } ;
+
+HELP: sensitive-tags
+{ $var-description "Contains a sequence of " { $link name } "s where whitespace should be considered significant for prettyprinting purposes. The sequence can contain " { $link string } "s in place of names. For example, to preserve whitespace inside a " { $snippet "pre" } " tag:" }
+{ $example {" USING: xml.interpolate xml.writer namespaces ;
+[XML <html> <head>   <title> something</title></head><body><pre>bing
+bang
+   bong</pre></body></html> XML] { "pre" } sensitive-tags [ pprint-xml ] with-variable "} {"
+<html>
+  <head>
+    <title>
+      something
+    </title>
+  </head>
+  <body>
+    <pre>bing
+bang
+   bong</pre>
+  </body>
+</html>"} } ;
