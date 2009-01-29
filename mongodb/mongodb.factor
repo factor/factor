@@ -8,7 +8,7 @@ IN: mongodb
 ! generic methods
 GENERIC: store ( tuple/ht -- )
 GENERIC: find ( example -- tuple/ht )
-GENERIC: findOne ( exampe -- tuple/ht )
+GENERIC# nfind 1 ( example n -- tuple/ht )
 GENERIC: load ( object -- object ) 
 
 <PRIVATE
@@ -34,9 +34,9 @@ M: mdb-persistent find ( example -- result )
     prepare-find [ mdb>> master>> ] dip (find)
     build-result ;
 
-M: mdb-persistent findOne ( example -- result )
-    prepare-find [ mdb>> master>> ] dip (find-one)
-    dup returned#>> 1 = 
-    [ objects>> first ]
-    [ drop f ] if ;
+M: mdb-persistent nfind ( example n -- result )
+    [ prepare-find ] dip >>return#
+    [ mdb>> master>> ] dip (find)
+    build-result ;
+
 
