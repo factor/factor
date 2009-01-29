@@ -70,8 +70,8 @@ SYMBOL: labels
 M: ##load-immediate generate-insn
     [ dst>> register ] [ val>> ] bi %load-immediate ;
 
-M: ##load-indirect generate-insn
-    [ dst>> register ] [ obj>> ] bi %load-indirect ;
+M: ##load-reference generate-insn
+    [ dst>> register ] [ obj>> ] bi %load-reference ;
 
 M: ##peek generate-insn
     [ dst>> register ] [ loc>> ] bi %peek ;

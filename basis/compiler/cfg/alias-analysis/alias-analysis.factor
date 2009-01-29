@@ -224,7 +224,7 @@ GENERIC: analyze-aliases* ( insn -- insn' )
 M: ##load-immediate analyze-aliases*
     dup [ val>> ] [ dst>> ] bi constants get set-at ;
 
-M: ##load-indirect analyze-aliases*
+M: ##load-reference analyze-aliases*
     dup dst>> set-heap-ac ;
 
 M: ##alien-global analyze-aliases*
