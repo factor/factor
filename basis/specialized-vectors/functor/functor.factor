@@ -33,7 +33,7 @@ M: V equal? over V instance? [ sequence= ] [ 2drop f ] if ;
 
 : >V ( seq -- vector ) V new clone-like ; inline
 
-M: V pprint-delims drop V{ \ } ;
+M: V pprint-delims drop \ V{ \ } ;
 
 M: V >pprint-sequence ;
 

@@ -21,14 +21,14 @@ tags global [ H{ } clone or ] change-at
 
 : chloe-ns "http://factorcode.org/chloe/1.0" ; inline
 
-: chloe-name ( string -- name )
-    name new
-        swap >>main
-        chloe-ns >>url ;
+: chloe-name? ( name -- ? )
+    url>> chloe-ns = ;
+
+XML-NS: chloe-name http://factorcode.org/chloe/1.0
 
 : required-attr ( tag name -- value )
-    dup chloe-name rot at*
-    [ nip ] [ drop " attribute is required" append throw ] if ;
+    tuck chloe-name attr
+    [ nip ] [ " attribute is required" append throw ] if* ;
 
 : optional-attr ( tag name -- value )
-    chloe-name swap at ;
+    chloe-name attr ;

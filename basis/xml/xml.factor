@@ -162,7 +162,8 @@ PRIVATE>
 
 : read-xml-chunk ( stream -- seq )
     1 depth
-    [ (read-xml-chunk) nip ] with-variable ;
+    [ (read-xml-chunk) nip ] with-variable
+    <xml-chunk> ;
 
 : string>xml ( string -- xml )
     t string-input?

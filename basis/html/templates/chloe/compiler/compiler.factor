@@ -7,16 +7,16 @@ html.templates html.templates.chloe.syntax continuations ;
 IN: html.templates.chloe.compiler
 
 : chloe-attrs-only ( assoc -- assoc' )
-    [ drop url>> chloe-ns = ] assoc-filter ;
+    [ drop chloe-name? ] assoc-filter ;
 
 : non-chloe-attrs-only ( assoc -- assoc' )
-    [ drop url>> chloe-ns = not ] assoc-filter ;
+    [ drop chloe-name? not ] assoc-filter ;
 
 : chloe-tag? ( tag -- ? )
     dup xml? [ body>> ] when
     {
         { [ dup tag? not ] [ f ] }
-        { [ dup url>> chloe-ns = not ] [ f ] }
+        { [ dup chloe-name? not ] [ f ] }
         [ t ]
     } cond nip ;
 
@@ -49,7 +49,7 @@ DEFER: compile-element
     reset-buffer "@" ?head [ , [ value present ] % ] [ , ] if ;
 
 : compile-attrs ( assoc -- )
-    [
+    attrs>> [
         " " [write]
         swap name>string [write]
         "=\"" [write]
