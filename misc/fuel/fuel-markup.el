@@ -585,7 +585,7 @@
 
 (defun fuel-markup--see (e)
   (let* ((word (nth 1 e))
-         (cmd (and word `(:fuel* ((:quote ,(format "%S" word)) see) "fuel")))
+         (cmd (and word `(:fuel* ((:quote ,(format "%s" word)) see) "fuel")))
          (ret (and cmd (fuel-eval--send/wait cmd)))
          (res (and (not (fuel-eval--retort-error ret))
                    (fuel-eval--retort-output ret))))
