@@ -1,5 +1,6 @@
 USING: help.syntax help.markup strings kernel alien opengl
-opengl.sprites quotations ui.render freetype ;
+opengl.sprites quotations ui.render ui.text ui.text.private
+freetype ;
 IN: ui.text.freetype
 
 HELP: freetype
@@ -7,52 +8,21 @@ HELP: freetype
 { $description "Outputs a native handle used by the FreeType library, initializing FreeType first if necessary." } ;
 
 HELP: open-fonts
-{ $var-description "Global variable. Hashtable mapping font descriptors to " { $link font } " instances." } ;
-
-{ font open-fonts open-font char-width string-width text-dim draw-string draw-text } related-words
+{ $var-description "Global variable. Hashtable mapping font descriptors to " { $link freetype-font } " instances." } ;
 
 HELP: init-freetype
 { $description "Initializes the FreeType library." }
 { $notes "Do not call this word if you are using the UI." } ;
 
-HELP: font
-
-{ $class-description
-
-"A font which has been loaded by FreeType. Font instances have the following slots:"
-
-{
-  $list
-  {
-    { $snippet "ascent"  } ", "
-    { $snippet "descent" } ", "
-    { $snippet "height"  } " - metrics."
-  }
-
-  {
-    { $snippet "handle" }
-    " - alien pointer to an "
-    { $snippet "FT_Face" } "."
-  }
-
-  {
-    { $snippet "widths" }
-    " - sequence of character widths. Use "
-    { $snippet "width" }
-    " and "
-    { $snippet "width" }
-    " to compute string widths instead of reading this sequence directly."
-  }
-}
-
-} ;
+HELP: freetype-font
+{ $class-description "A font which has been loaded by FreeType." } ;
 
 HELP: close-freetype
 { $description "Closes the FreeType library." }
 { $notes "Do not call this word if you are using the UI." } ;
 
 HELP: open-face
-{ $values { "font" string } { "style" "one of " { $link plain } ", " { $link bold } ", " { $link italic } " or " { $link bold-italic } } { "face" "alien pointer to an " { $snippet "FT_Face" } } }
+{ $values { "font" font } { "face" "alien pointer to an " { $snippet "FT_Face" } } }
 { $description "Loads a TrueType font with the requested logical font name and style." }
 { $notes "This is a low-level word. Call " { $link open-font } " instead." } ;
 

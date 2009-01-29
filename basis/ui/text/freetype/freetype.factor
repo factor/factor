@@ -45,7 +45,7 @@ M: freetype-renderer free-fonts ( world -- )
     values [ second free-sprites ] each ;
 
 : ttf-name ( font -- name )
-    [ [ name>> ] [ bold>> ] [ italic>> ] tri ] output>array H{
+    [ [ name>> ] [ bold?>> ] [ italic?>> ] tri ] output>array H{
         { { "monospace" f f } "VeraMono" }
         { { "monospace" t f } "VeraMoBd" }
         { { "monospace" t t } "VeraMoBI" }
@@ -71,7 +71,7 @@ M: freetype-renderer free-fonts ( world -- )
         FT_New_Memory_Face freetype-error
     ] keep *void* ;
 
-: open-face ( font style -- face )
+: open-face ( font -- face )
     ttf-name ttf-path malloc-file-contents (open-face) ;
 
 SYMBOL: dpi
@@ -108,7 +108,7 @@ SYMBOL: dpi
         init-font ;
 
 M: freetype-renderer open-font ( font -- open-font )
-    dup font? [
+    dup freetype-font? [
         freetype drop open-fonts get [ <freetype-font> ] cache
     ] unless ;
 
@@ -122,7 +122,7 @@ M: freetype-renderer open-font ( font -- open-font )
     ] cache nip ;
 
 M: freetype-renderer string-width ( open-font string -- w )
-    [ 0 ] 2dip [ char-width + ] with each ;
+    [ [ 0 ] dip ] dip [ char-width + ] with each ;
 
 M: freetype-renderer string-height ( open-font string -- h )
     drop height>> ;
