@@ -27,7 +27,7 @@ TUPLE: document < model locs undos redos inside-undo? ;
     drop ;
 
 : <document> ( -- document )
-    V{ "" } clone document new-model
+    { "" } document new-model
     V{ } clone >>locs
     dup clear-undo ;
 
@@ -104,7 +104,7 @@ CONSTANT: doc-start { 0 0 }
     tuck [ loc-col/str head-slice ] [ loc-col/str tail-slice ] 2bi*
     pick append-last over prepend-first ;
 
-: (set-doc-range) ( new-lines from to lines -- )
+: (set-doc-range) ( doc-lines from to lines -- changed-lines )
     [ prepare-insert ] 3keep
     [ [ first ] bi@ 1+ ] dip
     replace-slice ;
@@ -136,8 +136,7 @@ PRIVATE>
         new-lines from text+loc :> new-to
         from to document doc-range :> old-string
         old-string string from to new-to <edit> document add-undo
-        new-lines from to document value>> (set-doc-range)
-        document notify-connections
+        new-lines from to document [ (set-doc-range) ] change-model
         new-to document update-locs
     ] unless ;
 

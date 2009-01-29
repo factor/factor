@@ -637,8 +637,6 @@ PRIVATE>
         [ over - ] 2dip move-backward
     ] if ;
 
-PRIVATE>
-
 : open-slice ( shift from seq -- )
     pick 0 = [
         3drop
@@ -648,18 +646,19 @@ PRIVATE>
         set-length
     ] if ;
 
+PRIVATE>
+
 : delete-slice ( from to seq -- )
     check-slice [ over [ - ] dip ] dip open-slice ;
 
 : delete-nth ( n seq -- )
     [ dup 1+ ] dip delete-slice ;
 
-: replace-slice ( new from to seq -- )
-    [ [ [ dup pick length + ] dip - over ] dip open-slice ] keep
-    copy ;
+: replace-slice ( new from to seq -- seq' )
+    tuck [ swap head-slice ] [ swap tail-slice ] 2bi* surround ;
 
 : remove-nth ( n seq -- seq' )
-    [ swap head-slice ] [ swap 1+ tail-slice ] 2bi append ;
+    [ [ { } ] dip dup 1+ ] dip replace-slice ;
 
 : pop ( seq -- elt )
     [ length 1- ] [ [ nth ] [ shorten ] 2bi ] bi ;

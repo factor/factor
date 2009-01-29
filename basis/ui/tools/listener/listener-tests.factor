@@ -34,6 +34,27 @@ IN: ui.tools.listener.tests
     [ [ [ 1 2 3 ] ] ] [ "promise" get 5 seconds ?promise-timeout ] unit-test
 ] with-interactive-vocabs
 
+[
+    [ ] [ <pane> <pane-stream> <interactor> "interactor" set ] unit-test
+
+    [ ] [ "interactor" get register-self ] unit-test
+
+    [ ] [ <promise> "promise" set ] unit-test
+
+    [
+        self "interactor" get (>>thread)
+        "interactor" get stream-readln "promise" get fulfill
+    ] "Interactor test" spawn drop
+
+    [ ] [ "hi" "interactor" get set-editor-string ] unit-test
+
+    [ ] [ [ "interactor" get interactor-busy? ] [ yield ] [ ] while ] unit-test
+
+    [ ] [ "interactor" get evaluate-input ] unit-test
+
+    [ "hi" ] [ "promise" get 5 seconds ?promise-timeout ] unit-test
+] with-interactive-vocabs
+
 ! Hang
 [ ] [ <pane> <pane-stream> <interactor> "interactor" set ] unit-test
 

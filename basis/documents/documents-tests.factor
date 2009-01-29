@@ -138,3 +138,11 @@ namespaces tools.test make arrays kernel fry ;
 [ ] [ "d" get clear-doc ] unit-test
 
 [ 0 ] [ "d" get undos>> length ] unit-test
+
+[ ] [ <document> "d" set ] unit-test
+
+[ ] [ "d" get value>> "value" set ] unit-test
+
+[ ] [ "Hello world" "d" get set-doc-string ] unit-test
+
+[ { "" } ] [ "value" get ] unit-test
