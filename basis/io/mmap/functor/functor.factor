@@ -20,9 +20,9 @@ with-mapped-A-file DEFINES with-mapped-${T}-file
 WHERE
 
 : <mapped-A> ( mapped-file -- direct-array )
-    T mapped-file>direct <A> execute ; inline
+    T mapped-file>direct <A> ; inline
 
 : with-mapped-A-file ( path length quot -- )
-    '[ <mapped-A> execute @ ] with-mapped-file ; inline
+    '[ <mapped-A> @ ] with-mapped-file ; inline
 
 ;FUNCTOR

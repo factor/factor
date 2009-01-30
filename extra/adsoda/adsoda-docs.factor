@@ -1,23 +1,19 @@
 ! Copyright (C) 2008 Jeff Bigot
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
-
+USING: help.markup help.syntax multiline ;
 IN: adsoda
-
-
 
 ! --------------------------------------------------------------
 ! faces
 ! --------------------------------------------------------------
-ARTICLE: "face-page" "face in ADSODA"
+ARTICLE: "face-page" "Face in ADSODA"
 "explanation of faces"
 $nl
-"link to functions"
-"what is an halfspace"
-"halfspace touching-corners adjacent-faces"
-"touching-corners list of pointers to the corners which touch this face\n"
-
-"adjacent-faces list of pointers to the faces which touch this face\n"
+"link to functions" $nl
+"what is an halfspace" $nl
+"halfspace touching-corners adjacent-faces" $nl
+"touching-corners list of pointers to the corners which touch this face" $nl
+"adjacent-faces list of pointers to the faces which touch this face"
 { $subsection face }
 { $subsection <face> }
 "test relative position"
@@ -65,7 +61,7 @@ HELP: face-transform
 ! --------------------------------
 ! solid
 ! --------------------------------------------------------------
-ARTICLE: "solid-page" "solid in ADSODA"
+ARTICLE: "solid-page" "Solid in ADSODA"
 "explanation of solids"
 $nl
 "link to functions"
@@ -133,13 +129,13 @@ $nl
 
 HELP: subtract 
 { $values { "solid1" "initial shape" } { "solid2" "shape to remove" } { "solids" "resulting shape" } }
-{ $description  " " } ;
+{ $description  "Substract solid2 from solid1" } ;
 
 
 ! --------------------------------------------------------------
 ! space 
 ! --------------------------------------------------------------
-ARTICLE: "space-page" "space in ADSODA"
+ARTICLE: "space-page" "Space in ADSODA"
 "A space is a collection of solids and lights."
 $nl
 "link to functions"
@@ -211,7 +207,7 @@ HELP: space-project
 ! --------------------------------------------------------------
 ! 3D rendering
 ! --------------------------------------------------------------
-ARTICLE: "3D-rendering-page" "3D rendering in ADSODA"
+ARTICLE: "3D-rendering-page" "The 3D rendering in ADSODA"
 "explanation of 3D rendering"
 $nl
 "link to functions"
@@ -223,58 +219,53 @@ $nl
 
 HELP: face->GL 
 { $values { "face" "a face" } { "color" "3 3 values array" } }
-{ $description "" } ;
+{ $description "display a face" } ;
 
 HELP: solid->GL 
 { $values { "solid" "a solid" } }
-{ $description "" } ;
+{ $description "display a solid" } ;
 
 HELP: space->GL 
 { $values { "space" "a space" } }
-{ $description "" } ;
+{ $description "display a space" } ;
 
 ! --------------------------------------------------------------
 ! light
 ! --------------------------------------------------------------
 
-ARTICLE: "light-page" "light in ADSODA"
+ARTICLE: "light-page" "Light in ADSODA"
 "explanation of light"
 $nl
 "link to functions"
 ;
 
 ARTICLE: { "adsoda" "light" } "ADSODA : lights"
-"! HELP: light position color" 
-"! <light> ( -- tuple ) light new ;"
-
-"! light est un vecteur avec 3 variables pour les couleurs\n"
-
-" void Light::Apply(Vector& normal, double &cRed, double &cGreen, double &cBlue)\n"
-" { \n"
-"   // Dot the light direction with the normalized normal of Face."
-"   register double intensity = -(normal * (*this));"
-
-"   // Face is a backface, from light's perspective"
-"   if (intensity < 0)"
-"     return;"
-"   "
-"   // Add the intensity componentwise"
-"   cRed += red * intensity;"
-"   cGreen += green * intensity;"
-"   cBlue += blue * intensity;"
-
-"   // Clip to unit range"
-"  if (cRed > 1.0) cRed = 1.0;"
-"   if (cGreen > 1.0) cGreen = 1.0;"
-"   if (cBlue > 1.0) cBlue = 1.0;"
-
-
+{ $code <"
+! HELP: light position color
+! <light> ( -- tuple ) light new ;
+! light est un vecteur avec 3 variables pour les couleurs\n
+ void Light::Apply(Vector& normal, double &cRed, double &cGreen, double &cBlue)\n
+ { \n
+   // Dot the light direction with the normalized normal of Face.
+   register double intensity = -(normal * (*this));
+   // Face is a backface, from light's perspective
+   if (intensity < 0)
+     return;
+   
+   // Add the intensity componentwise
+   cRed += red * intensity;
+   cGreen += green * intensity;
+   cBlue += blue * intensity;
+   // Clip to unit range
+  if (cRed > 1.0) cRed = 1.0;
+   if (cGreen > 1.0) cGreen = 1.0;
+   if (cBlue > 1.0) cBlue = 1.0;
+"> }
 ;
 
 
 
 ARTICLE: { "adsoda" "halfspace" } "ADSODA : halfspace"
-"! demi espace défini par un vecteur normal et une constante"
 " defined by the concatenation of the normal vector and a constant"  
  ;
 

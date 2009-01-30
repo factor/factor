@@ -4,7 +4,7 @@
 USING: xml.utilities kernel assocs math.order
     strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities.html io.files io
-    http.client namespaces make xml.interpolate hashtables
+    http.client namespaces make xml.literals hashtables
     calendar.format accessors continuations urls present ;
 IN: syndication
 
@@ -70,8 +70,8 @@ TUPLE: entry title url description date ;
     tri ;
 
 : atom-entry-link ( tag -- url/f )
-    "link" tags-named [ "rel" swap at "alternate" = ] find nip
-    dup [ "href" swap at >url ] when ;
+    "link" tags-named [ "rel" attr "alternate" = ] find nip
+    dup [ "href" attr >url ] when ;
 
 : atom1.0-entry ( tag -- entry )
     entry new
@@ -80,8 +80,8 @@ TUPLE: entry title url description date ;
         [ atom-entry-link >>url ]
         [
             { "content" "summary" } any-tag-named
-            dup children>> [ string? not ] contains?
-            [ children>> [ write-xml-chunk ] with-string-writer ]
+            dup children>> [ string? not ] any?
+            [ children>> xml>string ]
             [ children>string ] if >>description
         ]
         [
@@ -95,7 +95,7 @@ TUPLE: entry title url description date ;
     feed new
     swap
     [ "title" tag-named children>string >>title ]
-    [ "link" tag-named "href" swap at >url >>url ]
+    [ "link" tag-named "href" attr >url >>url ]
     [ "entry" tags-named [ atom1.0-entry ] map set-entries ]
     tri ;
 

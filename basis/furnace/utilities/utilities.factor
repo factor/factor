@@ -29,7 +29,7 @@ ERROR: no-such-word name vocab ;
 
 : base-path ( string -- pair )
     dup responder-nesting get
-    [ second class superclasses [ name>> = ] with contains? ] with find nip
+    [ second class superclasses [ name>> = ] with any? ] with find nip
     [ first ] [ "No such responder: " swap append throw ] ?if ;
 
 : resolve-base-path ( string -- string' )

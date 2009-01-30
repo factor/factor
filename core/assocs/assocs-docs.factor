@@ -82,7 +82,7 @@ ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 { $subsection substitute }
 { $subsection substitute-here }
 { $subsection extract-keys }
-{ $see-also key? assoc-contains? assoc-all? "sets" } ;
+{ $see-also key? assoc-any? assoc-all? "sets" } ;
 
 ARTICLE: "assocs-mutation" "Storing keys and values in assocs"
 "Utility operations built up from the " { $link "assocs-protocol" } ":"
@@ -115,7 +115,7 @@ $nl
 { $subsection assoc-map }
 { $subsection assoc-filter }
 { $subsection assoc-filter-as }
-{ $subsection assoc-contains? }
+{ $subsection assoc-any? }
 { $subsection assoc-all? }
 "Additional combinators:"
 { $subsection cache }
@@ -231,7 +231,7 @@ HELP: assoc-filter-as
 
 { assoc-filter assoc-filter-as } related-words
 
-HELP: assoc-contains?
+HELP: assoc-any?
 { $values { "assoc" assoc } { "quot" { $quotation "( key value -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the assoc contains an entry satisfying a predicate by applying the quotation to each entry in turn. Iteration stops if an entry is found for which the quotation outputs a true value." } ;
 

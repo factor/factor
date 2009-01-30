@@ -1,10 +1,10 @@
-! Copyright (C) 2008 Slava Pestov
+! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces io math.parser assocs classes
 classes.tuple words arrays sequences splitting mirrors
 hashtables combinators continuations math strings inspector
-fry locals calendar calendar.format xml.entities
-validators urls present xml.writer xml.interpolate xml
+fry locals calendar calendar.format xml.entities xml.data
+validators urls present xml.writer xml.literals xml
 xmode.code2html lcs.diff2html farkup io.streams.string
 html.elements html.streams html.forms ;
 IN: html.components
@@ -19,7 +19,7 @@ GENERIC: render* ( value name renderer -- xml )
         [ f swap ]
         if
     ] 2dip
-    render* write-xml-chunk
+    render* write-xml
     [ render-error ] when* ;
 
 <PRIVATE
@@ -65,12 +65,15 @@ TUPLE: textarea rows cols ;
 : <textarea> ( -- renderer )
     textarea new ;
 
-M: textarea render* ( value name area -- xml )
-    rot [ [ rows>> ] [ cols>> ] bi ] dip
-    [XML <textarea
-            name=<->
-            rows=<->
-            cols=<->><-></textarea> XML] ;
+M:: textarea render* ( value name area -- xml )
+    area rows>> :> rows
+    area cols>> :> cols
+    [XML
+         <textarea
+            name=<-name->
+            rows=<-rows->
+            cols=<-cols->><-value-></textarea>
+    XML] ;
 
 ! Choice
 TUPLE: choice size multiple choices ;
@@ -160,8 +163,9 @@ M: farkup render*
 SINGLETON: inspector
 
 M: inspector render*
-    2drop [ [ describe ] with-html-writer ] with-string-writer
-    string>xml-chunk ;
+    2drop [
+        [ describe ] with-html-writer
+    ] with-string-writer <unescaped> ;
 
 ! Diff component
 SINGLETON: comparison
@@ -172,4 +176,4 @@ M: comparison render*
 ! HTML component
 SINGLETON: html
 
-M: html render* 2drop string>xml-chunk ;
+M: html render* 2drop <unescaped> ;

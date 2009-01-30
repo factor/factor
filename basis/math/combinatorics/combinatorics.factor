@@ -25,7 +25,7 @@ IN: math.combinatorics
     reverse 1 cut [ (>permutation) ] each ;
 
 : permutation-indices ( n seq -- permutation )
-    length [ factoradic ] dip 0 pad-left >permutation ;
+    length [ factoradic ] dip 0 pad-head >permutation ;
 
 PRIVATE>
 

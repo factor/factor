@@ -39,7 +39,7 @@ name target ;
 
 : parse-list-11 ( lines -- seq )
     [
-        11 f pad-right
+        11 f pad-tail
         <remote-file> swap {
             [ 0 swap nth parse-permissions ]
             [ 1 swap nth string>number >>links ]

@@ -1,15 +1,15 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test xml.interpolate multiline kernel assocs
-sequences accessors xml.writer xml.interpolate.private
-locals splitting urls ;
-IN: xml.interpolate.tests
+USING: tools.test xml.literals multiline kernel assocs
+sequences accessors xml.writer xml.literals.private
+locals splitting urls xml.data classes ;
+IN: xml.literals.tests
 
 [ "a" "c" { "a" "c" f } ] [
     "<?xml version='1.0'?><x><-a-><b val=<-c->/><-></x>"
     string>doc
     [ second var>> ]
-    [ fourth "val" swap at var>> ]
+    [ fourth "val" attr var>> ]
     [ extract-variables ] tri
 ] unit-test
 
@@ -51,9 +51,18 @@ IN: xml.interpolate.tests
   <XML <x number=<-> false=<-> url=<-> string=<-> word=<->/> XML>
   pprint-xml>string  ] unit-test
 
-[ "<x>3</x>" ] [ 3 [XML <x><-></x> XML] xml-chunk>string ] unit-test
-[ "<x></x>" ] [ f [XML <x><-></x> XML] xml-chunk>string ] unit-test
+[ "<x>3</x>" ] [ 3 [XML <x><-></x> XML] xml>string ] unit-test
+[ "<x></x>" ] [ f [XML <x><-></x> XML] xml>string ] unit-test
 
-\ parse-def must-infer
-[ "" interpolate-chunk ] must-infer
+\ <XML must-infer
+[ { } "" interpolate-xml ] must-infer
 [ [XML <foo><-></foo> <bar val=<->/> XML] ] must-infer
+
+[ xml-chunk ] [ [ [XML <foo/> XML] ] first class ] unit-test
+[ xml ] [ [ <XML <foo/> XML> ] first class ] unit-test
+[ xml-chunk ] [ [ [XML <foo val=<->/> XML] ] third class ] unit-test
+[ xml ] [ [ <XML <foo val=<->/> XML> ] third class ] unit-test
+[ 1 ] [ [ [XML <foo/> XML] ] length ] unit-test
+[ 1 ] [ [ <XML <foo/> XML> ] length ] unit-test
+
+[ "" ] [ [XML XML] concat ] unit-test

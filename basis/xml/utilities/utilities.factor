@@ -8,7 +8,7 @@ IN: xml.utilities
 : children>string ( tag -- string )
     children>> {
         { [ dup empty? ] [ drop "" ] }
-        { [ dup [ string? not ] contains? ]
+        { [ dup [ string? not ] any? ]
           [ "XML tag unexpectedly contains non-text children" throw ] }
         [ concat ]
     } cond ;
@@ -18,10 +18,6 @@ IN: xml.utilities
 
 : first-child-tag ( tag -- tag )
     children>> [ tag? ] find nip ;
-
-! * Accessing part of an XML document
-! for tag- words, a start means that it searches all children
-! and no star searches only direct children
 
 : tag-named? ( name elem -- ? )
     dup tag? [ names-match? ] [ 2drop f ] if ;
@@ -36,15 +32,13 @@ IN: xml.utilities
     tags@ '[ _ swap tag-named? ] deep-filter ;
 
 : tag-named ( tag name/string -- matching-tag )
-    ! like get-name-tag but only looks at direct children,
-    ! not all the children down the tree.
     assure-name swap [ tag-named? ] with find nip ;
 
 : tags-named ( tag name/string -- tags-seq )
     tags@ swap [ tag-named? ] with filter ;
 
 : tag-with-attr? ( elem attr-value attr-name -- ? )
-    rot dup tag? [ at = ] [ 3drop f ] if ;
+    rot dup tag? [ swap attr = ] [ 3drop f ] if ;
 
 : tag-with-attr ( tag attr-value attr-name -- matching-tag )
     assure-name '[ _ _ tag-with-attr? ] find nip ;
@@ -58,7 +52,7 @@ IN: xml.utilities
 : deep-tags-with-attr ( tag attr-value attr-name -- tags-seq )
     tags@ '[ _ _ tag-with-attr? ] deep-filter ;
 
-: get-id ( tag id -- elem ) ! elem=tag.getElementById(id)
+: get-id ( tag id -- elem )
     "id" deep-tag-with-attr ;
 
 : deep-tags-named-with-attr ( tag tag-name attr-value attr-name -- tags )

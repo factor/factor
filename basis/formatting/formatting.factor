@@ -29,7 +29,7 @@ IN: formatting
     [ 0 ] [ string>number ] if-empty ;
 
 : pad-digits ( string digits -- string' )
-    [ "." split1 ] dip [ CHAR: 0 pad-right ] [ head-slice ] bi "." glue ;
+    [ "." split1 ] dip [ CHAR: 0 pad-tail ] [ head-slice ] bi "." glue ;
 
 : max-digits ( n digits -- n' )
     10 swap ^ [ * round ] keep / ; inline
@@ -48,7 +48,7 @@ IN: formatting
     [ max-digits ] keep -rot
     [
         [ 0 < "-" "+" ? ]
-        [ abs number>string 2 CHAR: 0 pad-left ] bi 
+        [ abs number>string 2 CHAR: 0 pad-head ] bi 
         "e" -rot 3append
     ]
     [ number>string ] bi*
@@ -60,7 +60,7 @@ zero      = "0"                  => [[ CHAR: 0 ]]
 char      = "'" (.)              => [[ second ]]
 
 pad-char  = (zero|char)?         => [[ CHAR: \s or ]]
-pad-align = ("-")?               => [[ \ pad-right \ pad-left ? ]] 
+pad-align = ("-")?               => [[ \ pad-tail \ pad-head ? ]] 
 pad-width = ([0-9])*             => [[ >digits ]]
 pad       = pad-align pad-char pad-width => [[ reverse >quotation dup first 0 = [ drop [ ] ] when ]]
 
@@ -110,9 +110,9 @@ MACRO: printf ( format-string -- )
 
 <PRIVATE
 
-: pad-00 ( n -- string ) number>string 2 CHAR: 0 pad-left ; inline
+: pad-00 ( n -- string ) number>string 2 CHAR: 0 pad-head ; inline
 
-: pad-000 ( n -- string ) number>string 3 CHAR: 0 pad-left ; inline
+: pad-000 ( n -- string ) number>string 3 CHAR: 0 pad-head ; inline
 
 : >time ( timestamp -- string )
     [ hour>> ] [ minute>> ] [ second>> floor ] tri 3array

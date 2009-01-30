@@ -5,7 +5,7 @@ sequences strings splitting calendar continuations accessors vectors
 math.order hashtables byte-arrays destructors
 io io.sockets io.streams.string io.files io.timeouts
 io.pathnames io.encodings io.encodings.string io.encodings.ascii
-io.encodings.utf8 io.encodings.8-bit io.encodings.binary
+io.encodings.utf8 io.encodings.8-bit io.encodings.binary io.crlf
 io.streams.duplex fry ascii urls urls.encoding present
 http http.parsers http.client.post-data ;
 IN: http.client
@@ -86,7 +86,7 @@ SYMBOL: redirects
     ] [ too-many-redirects ] if ; inline recursive
 
 : read-chunk-size ( -- n )
-    read-crlf ";" split1 drop [ blank? ] trim-right
+    read-crlf ";" split1 drop [ blank? ] trim-tail
     hex> [ "Bad chunk size" throw ] unless* ;
 
 : read-chunked ( quot: ( chunk -- ) -- )

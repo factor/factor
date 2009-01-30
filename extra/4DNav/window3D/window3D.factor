@@ -21,9 +21,9 @@ prettyprint
 
 IN: 4DNav.window3D
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! drawing functions 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 TUPLE: window3D  < gadget observer ; 
 
@@ -63,7 +63,8 @@ M: window3D draw-gadget* ( gadget -- )
             GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
             GL_LINE_SMOOTH_HINT GL_NICEST glHint
             1.25 glLineWidth
-            GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
+            GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor 
+                glClear
             glLoadIdentity
             GL_LIGHTING glEnable
             GL_LIGHT0 glEnable

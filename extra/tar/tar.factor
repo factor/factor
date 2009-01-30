@@ -17,7 +17,7 @@ SYMBOLS: base-dir filename ;
 : tar-trim ( seq -- newseq ) [ "\0 " member? ] trim ;
 
 : read-c-string* ( n -- str/f )
-    read [ zero? ] trim-right [ f ] when-empty ;
+    read [ zero? ] trim-tail [ f ] when-empty ;
 
 : read-tar-header ( -- obj )
     \ tar-header new
@@ -139,7 +139,7 @@ M: unknown-typeflag summary ( obj -- str )
 : typeflag-L ( header -- )
     drop ;
     ! <string-writer> [ read-data-blocks ] keep
-    ! >string [ zero? ] trim-right filename set
+    ! >string [ zero? ] trim-tail filename set
     ! filename get tar-prepend-path make-directories ;
 
 ! Multi volume continuation entry

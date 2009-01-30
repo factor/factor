@@ -150,9 +150,11 @@ TUPLE: tag
     [ assure-name ] [ T{ attrs } assoc-like ] [ ] tri*
     tag boa ;
 
-! For convenience, tags follow the assoc protocol too (for attrs)
-CONSULT: assoc-protocol tag attrs>> ;
-INSTANCE: tag assoc
+: attr ( tag/xml name -- string )
+    swap attrs>> at ;
+
+: set-attr ( tag/xml value name -- )
+    rot attrs>> set-at ;
 
 ! They also follow the sequence protocol (for children)
 CONSULT: sequence-protocol tag children>> ;
@@ -186,9 +188,6 @@ C: <xml> xml
 CONSULT: sequence-protocol xml body>> ;
 INSTANCE: xml sequence
 
-CONSULT: assoc-protocol xml body>> ;
-INSTANCE: xml assoc
-
 CONSULT: tag xml body>> ;
 
 CONSULT: name xml body>> ;
@@ -217,5 +216,14 @@ M: xml like
 PREDICATE: contained-tag < tag children>> not ;
 PREDICATE: open-tag < tag children>> ;
 
+TUPLE: unescaped string ;
+C: <unescaped> unescaped
+
 UNION: xml-data
-    tag comment string directive instruction ;
+    tag comment string directive instruction unescaped ;
+
+TUPLE: xml-chunk seq ;
+C: <xml-chunk> xml-chunk
+
+CONSULT: sequence-protocol xml-chunk seq>> ;
+INSTANCE: xml-chunk sequence

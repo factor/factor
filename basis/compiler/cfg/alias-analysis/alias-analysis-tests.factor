@@ -13,7 +13,7 @@ IN: compiler.cfg.alias-analysis.tests
 
 [ ] [
     {
-        T{ ##load-indirect f V int-regs 1 "hello" }
+        T{ ##load-reference f V int-regs 1 "hello" }
         T{ ##slot-imm f V int-regs 0 V int-regs 1 0 3 }
     } alias-analysis drop
 ] unit-test
