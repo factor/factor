@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test xml.interpolate multiline kernel assocs
-sequences accessors xml.writer xml.interpolate.private
+USING: tools.test xml.literals multiline kernel assocs
+sequences accessors xml.writer xml.literals.private
 locals splitting urls xml.data classes ;
-IN: xml.interpolate.tests
+IN: xml.literals.tests
 
 [ "a" "c" { "a" "c" f } ] [
     "<?xml version='1.0'?><x><-a-><b val=<-c->/><-></x>"

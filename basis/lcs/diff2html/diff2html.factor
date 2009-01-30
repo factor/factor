@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lcs xml.interpolate xml.writer kernel strings ;
+USING: lcs xml.literals xml.writer kernel strings ;
 FROM: accessors => item>> ;
 FROM: io => write ;
 FROM: sequences => each if-empty when-empty map ;

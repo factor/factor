@@ -4,7 +4,7 @@ USING: xml xml.state kernel sequences fry assocs xml.data
 accessors strings make multiline parser namespaces macros
 sequences.deep generalizations words combinators
 math present arrays unicode.categories ;
-IN: xml.interpolate
+IN: xml.literals
 
 <PRIVATE
 
