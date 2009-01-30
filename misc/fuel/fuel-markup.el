@@ -583,19 +583,23 @@
 (defun fuel-markup--notes (e)
   (fuel-markup--elem-with-heading e "Notes"))
 
-(defun fuel-markup--see (e)
+(defun fuel-markup--word-info (e s)
   (let* ((word (nth 1 e))
-         (cmd (and word `(:fuel* (,(format "%s" word) fuel-word-see) "fuel" t)))
-         (res (and cmd
-                   (fuel-eval--retort-result (fuel-eval--send/wait cmd 100)))))
+         (cmd (and word `(:fuel* ((:quote ,(format "%s" word)) ,s) "fuel")))
+         (ret (and cmd (fuel-eval--send/wait cmd)))
+         (res (and (not (fuel-eval--retort-error ret))
+                   (fuel-eval--retort-output ret))))
     (if res
         (fuel-markup--code (list '$code res))
-      (fuel-markup--snippet (list '$snippet word)))))
+      (fuel-markup--snippet (list '$snippet " " word)))))
 
-(defun fuel-markup--null (e))
+(defun fuel-markup--see (e)
+  (fuel-markup--word-info e 'see))
 
 (defun fuel-markup--synopsis (e)
-  (insert (format " %S " e)))
+  (fuel-markup--word-info e 'synopsis))
+
+(defun fuel-markup--null (e))
 
 
 (provide 'fuel-markup)
