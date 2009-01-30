@@ -198,6 +198,7 @@ interacting with a factor listener is at your disposal.
 (fuel-mode--key ?e ?w 'fuel-edit-word)
 (fuel-mode--key ?e ?x 'fuel-eval-definition)
 
+(fuel-mode--key ?x ?a 'fuel-refactor-extract-article)
 (fuel-mode--key ?x ?i 'fuel-refactor-inline-word)
 (fuel-mode--key ?x ?r 'fuel-refactor-extract-region)
 (fuel-mode--key ?x ?s 'fuel-refactor-extract-sexp)
