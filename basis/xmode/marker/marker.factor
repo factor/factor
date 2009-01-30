@@ -5,7 +5,7 @@ USING: kernel namespaces make xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators strings
 parser-combinators.regexp splitting parser-combinators ascii
-unicode.case combinators.short-circuit accessors ;
+ascii combinators.short-circuit accessors ;
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 
@@ -69,7 +69,7 @@ M: string-matcher text-matches?
     ] keep string>> length and ;
 
 M: regexp text-matches?
-    >r >string r> match-head ;
+    [ >string ] dip match-head ;
 
 : rule-start-matches? ( rule -- match-count/f )
     dup start>> tuck swap can-match-here? [
@@ -97,10 +97,10 @@ DEFER: get-rules
     f swap rules>> at ?push-all ;
 
 : get-char-rules ( vector/f char ruleset -- vector/f )
-    >r ch>upper r> rules>> at ?push-all ;
+    [ ch>upper ] dip rules>> at ?push-all ;
 
 : get-rules ( char ruleset -- seq )
-    f -rot [ get-char-rules ] keep get-always-rules ;
+    [ f ] 2dip [ get-char-rules ] keep get-always-rules ;
 
 GENERIC: handle-rule-start ( match-count rule -- )
 

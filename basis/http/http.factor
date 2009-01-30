@@ -6,21 +6,15 @@ quotations arrays byte-arrays math.parser calendar
 calendar.format present urls
 
 io io.encodings io.encodings.iana io.encodings.binary
-io.encodings.8-bit
+io.encodings.8-bit io.crlf
 
-unicode.case unicode.categories qualified
+unicode.case unicode.categories
 
 http.parsers ;
 
 EXCLUDE: fry => , ;
 
 IN: http
-
-: crlf ( -- ) "\r\n" write ;
-
-: read-crlf ( -- bytes )
-    "\r" read-until
-    [ CHAR: \r assert= read1 CHAR: \n assert= ] when* ;
 
 : (read-header) ( -- alist )
     [ read-crlf dup f like ] [ parse-header-line ] [ drop ] produce ;
@@ -45,8 +39,8 @@ IN: http
 
 : check-header-string ( str -- str )
     #! http://en.wikipedia.org/wiki/HTTP_Header_Injection
-    dup "\r\n\"" intersect empty?
-    [ "Header injection attack" throw ] unless ;
+    dup "\r\n\"" intersects?
+    [ "Header injection attack" throw ] when ;
 
 : write-header ( assoc -- )
     >alist sort-keys [
@@ -97,8 +91,8 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
     ] { } make ;
 
 : check-cookie-string ( string -- string' )
-    dup "=;'\"\r\n" intersect empty?
-    [ "Bad cookie name or value" throw ] unless ;
+    dup "=;'\"\r\n" intersects?
+    [ "Bad cookie name or value" throw ] when ;
 
 : unparse-cookie-value ( key value -- )
     {
@@ -213,12 +207,11 @@ body ;
     raw-response new
         "1.1" >>version ;
 
-TUPLE: post-data raw content content-type ;
+TUPLE: post-data data params content-type content-encoding ;
 
-: <post-data> ( raw content-type -- post-data )
+: <post-data> ( content-type -- post-data )
     post-data new
-        swap >>content-type
-        swap >>raw ;
+        swap >>content-type ;
 
 : parse-content-type-attributes ( string -- attributes )
     " " split harvest [ "=" split1 [ >lower ] dip ] { } map>assoc ;

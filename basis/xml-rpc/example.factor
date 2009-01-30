@@ -10,7 +10,7 @@ USING: kernel hashtables xml-rpc xml calendar sequences
        { "divide" [ / ] } } ;
 
 : apply-function ( name args -- {number} )
-    >r functions hash r> first2 rot call 1array ;
+    [ functions hash ] dip first2 rot call 1array ;
 
 : problem>solution ( xml-doc -- xml-doc )
     receive-rpc dup rpc-method-name swap rpc-method-params

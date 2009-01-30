@@ -2,13 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic generic.standard assocs io kernel math
 namespaces make sequences strings io.styles io.streams.string
-vectors words prettyprint.backend prettyprint.custom
+vectors words words.symbol prettyprint.backend prettyprint.custom
 prettyprint.sections prettyprint.config sorting splitting
 grouping math.parser vocabs definitions effects classes.builtin
-classes.tuple io.files classes continuations hashtables
+classes.tuple io.pathnames classes continuations hashtables
 classes.mixin classes.union classes.intersection
 classes.predicate classes.singleton combinators quotations sets
-accessors colors parser summary ;
+accessors colors parser summary vocabs.parser ;
 IN: prettyprint
 
 : make-pprint ( obj quot -- block in use )
@@ -248,7 +248,8 @@ GENERIC: declarations. ( obj -- )
 M: object declarations. drop ;
 
 : declaration. ( word prop -- )
-    tuck name>> word-prop [ pprint-word ] [ drop ] if ;
+    [ nip ] [ name>> word-prop ] 2bi
+    [ pprint-word ] [ drop ] if ;
 
 M: word declarations.
     {
@@ -357,12 +358,12 @@ M: builtin-class see-class*
     ] when drop ;
 
 M: word see
-    dup see-class
-    dup class? over symbol? not and [
-        nl
-    ] when
-    dup [ class? ] [ symbol? ] bi and
-    [ drop ] [ call-next-method ] if ;
+    [ see-class ]
+    [ [ class? ] [ symbol? not ] bi and [ nl ] when ]
+    [
+        dup [ class? ] [ symbol? ] bi and
+        [ drop ] [ call-next-method ] if
+    ] tri ;
 
 : see-all ( seq -- )
     natural-sort [ nl ] [ see ] interleave ;

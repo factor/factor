@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax ;
+USING: alien.syntax unix.types unix.stat ;
 IN: unix.statfs.openbsd
 
-: MFSNAMELEN 16 ; inline
-: MNAMELEN 90 ; inline
+CONSTANT: MFSNAMELEN 16
+CONSTANT: MNAMELEN 90
 
 C-STRUCT: statfs
     { "u_int32_t"       "f_flags" }

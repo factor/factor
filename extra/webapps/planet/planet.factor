@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sorting math math.order
 calendar alarms logging concurrency.combinators namespaces
-sequences.lib db.types db.tuples db fry locals hashtables
+db.types db.tuples db fry locals hashtables
 syndication urls xml.writer validators
 html.forms
 html.components

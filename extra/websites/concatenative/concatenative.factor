@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences assocs io.files io.sockets
-io.sockets.secure io.servers.connection
+USING: accessors kernel sequences assocs io.files io.pathnames
+io.sockets io.sockets.secure io.servers.connection
 namespaces db db.tuples db.sqlite smtp urls
 logging.insomniac
 html.templates.chloe

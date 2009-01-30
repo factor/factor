@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 William Schlieper
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: kernel io.files parser editors sequences ;
+USING: kernel io.files io.pathnames parser editors sequences ;
 
 IN: irc.ui.load
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: logging.analysis logging.server logging smtp kernel
 io.files io.streams.string namespaces make alarms assocs
-io.encodings.utf8 accessors calendar sequences qualified ;
+io.encodings.utf8 accessors calendar sequences ;
 QUALIFIED: io.sockets
 IN: logging.insomniac
 

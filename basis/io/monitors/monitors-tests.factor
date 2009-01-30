@@ -1,7 +1,9 @@
 IN: io.monitors.tests
 USING: io.monitors tools.test io.files system sequences
 continuations namespaces concurrency.count-downs kernel io
-threads calendar prettyprint destructors io.timeouts ;
+threads calendar prettyprint destructors io.timeouts
+io.files.temp io.directories io.directories.hierarchy
+io.pathnames accessors ;
 
 os { winnt linux macosx } member? [
     [
@@ -51,7 +53,7 @@ os { winnt linux macosx } member? [
                 "b" get count-down
 
                 [
-                    "m" get next-change drop
+                    "m" get next-change path>>
                     dup print flush
                     dup parent-directory
                     [ trim-right-separators "xyz" tail? ] either? not
@@ -60,7 +62,7 @@ os { winnt linux macosx } member? [
                 "c1" get count-down
                 
                 [
-                    "m" get next-change drop
+                    "m" get next-change path>>
                     dup print flush
                     dup parent-directory
                     [ trim-right-separators "yxy" tail? ] either? not
@@ -99,13 +101,13 @@ os { winnt linux macosx } member? [
         ! Non-recursive
         [ ] [ "monitor-timeout-test" temp-file f <monitor> "m" set ] unit-test
         [ ] [ 3 seconds "m" get set-timeout ] unit-test
-        [ [ t ] [ "m" get next-change 2drop ] [ ] while ] must-fail
+        [ [ t ] [ "m" get next-change drop ] [ ] while ] must-fail
         [ ] [ "m" get dispose ] unit-test
 
         ! Recursive
         [ ] [ "monitor-timeout-test" temp-file t <monitor> "m" set ] unit-test
         [ ] [ 3 seconds "m" get set-timeout ] unit-test
-        [ [ t ] [ "m" get next-change 2drop ] [ ] while ] must-fail
+        [ [ t ] [ "m" get next-change drop ] [ ] while ] must-fail
         [ ] [ "m" get dispose ] unit-test
     ] with-monitors
 ] when

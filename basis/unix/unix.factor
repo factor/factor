@@ -1,47 +1,35 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2008 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax kernel libc
 sequences continuations byte-arrays strings math namespaces
-system combinators vocabs.loader qualified accessors
+system combinators vocabs.loader accessors
 stack-checker macros locals generalizations unix.types
-io io.files vocabs vocabs.loader ;
+io vocabs vocabs.loader ;
 IN: unix
 
-: PROT_NONE   0 ; inline
-: PROT_READ   1 ; inline
-: PROT_WRITE  2 ; inline
-: PROT_EXEC   4 ; inline
+CONSTANT: PROT_NONE   0
+CONSTANT: PROT_READ   1
+CONSTANT: PROT_WRITE  2
+CONSTANT: PROT_EXEC   4
+                       
+CONSTANT: MAP_FILE    0
+CONSTANT: MAP_SHARED  1
+CONSTANT: MAP_PRIVATE 2
 
-: MAP_FILE    0 ; inline
-: MAP_SHARED  1 ; inline
-: MAP_PRIVATE 2 ; inline
+: MAP_FAILED ( -- alien ) -1 <alien> ; inline
 
-: MAP_FAILED -1 <alien> ; inline
+CONSTANT: NGROUPS_MAX 16
 
-: NGROUPS_MAX 16 ; inline
-
-: DT_UNKNOWN   0 ; inline
-: DT_FIFO      1 ; inline
-: DT_CHR       2 ; inline
-: DT_DIR       4 ; inline
-: DT_BLK       6 ; inline
-: DT_REG       8 ; inline
-: DT_LNK      10 ; inline
-: DT_SOCK     12 ; inline
-: DT_WHT      14 ; inline
-
-: dirent-type>file-type ( ch -- type )
-    {
-        { DT_BLK  [ +block-device+ ] }
-        { DT_CHR  [ +character-device+ ] }
-        { DT_DIR  [ +directory+ ] }
-        { DT_LNK  [ +symbolic-link+ ] }
-        { DT_SOCK [ +socket+ ] }
-        { DT_FIFO [ +fifo+ ] }
-        { DT_REG  [ +regular-file+ ] }
-        { DT_WHT  [ +whiteout+ ] }
-        [ drop +unknown+ ]
-    } case ;
+CONSTANT: DT_UNKNOWN   0
+CONSTANT: DT_FIFO      1
+CONSTANT: DT_CHR       2
+CONSTANT: DT_DIR       4
+CONSTANT: DT_BLK       6
+CONSTANT: DT_REG       8
+CONSTANT: DT_LNK      10
+CONSTANT: DT_SOCK     12
+CONSTANT: DT_WHT      14
 
 C-STRUCT: group
     { "char*" "gr_name" }
@@ -167,8 +155,8 @@ FUNCTION: int utime ( char* path, utimebuf* buf ) ;
 
 : change-file-times ( filename access modification -- )
     "utimebuf" <c-object>
-    tuck set-utimbuf-modtime
-    tuck set-utimbuf-actime
+    [ set-utimbuf-modtime ] keep
+    [ set-utimbuf-actime ] keep
     [ utime ] unix-system-call drop ;
 
 FUNCTION: int pclose ( void* file ) ;
@@ -181,7 +169,7 @@ FUNCTION: int readdir_r ( void* dirp, dirent* entry, dirent** result ) ;
 
 FUNCTION: ssize_t readlink ( char* path, char* buf, size_t bufsize ) ;
 
-: PATH_MAX 1024 ; inline
+CONSTANT: PATH_MAX 1024
 
 : read-symbolic-link ( path -- path )
     PATH_MAX <byte-array> dup [

@@ -24,8 +24,8 @@ HELP: group-cache
 HELP: group-id
 { $values
      { "string" string }
-     { "id" integer } }
-{ $description "Returns the group id given a group name." } ;
+     { "id/f" "an integer or f" } }
+{ $description "Returns the group id given a group name. Returns " { $link f } " if the group does not exist." } ;
 
 HELP: group-name
 { $values
@@ -36,7 +36,7 @@ HELP: group-name
 HELP: group-struct
 { $values
      { "obj" object }
-     { "group" "a group struct" } }
+     { "group/f" "a group struct or f" } }
 { $description "Returns an alien group struct to be turned into a group tuple by calling subsequent words." } ;
 
 HELP: real-group-id
@@ -83,7 +83,6 @@ ARTICLE: "unix.groups" "Unix groups"
 $nl
 "Listing all groups:"
 { $subsection all-groups }
-"Returning a passwd tuple:"
 "Real groups:"
 { $subsection real-group-name }
 { $subsection real-group-id }

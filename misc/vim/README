@@ -1,0 +1,29 @@
+Vim support for Factor
+----------------------
+
+This directory contains various support files that make editing Factor code
+more pleasant in Vim. The file-layout exactly matches the Vim runtime
+structure, so you can install them by copying the contents of this directory
+into ~/.vim/ or the equivalent path on other platforms (Open Vim and type
+":help 'runtimepath'" for details).
+
+The current set of files is as follows:
+
+    ftdetect/factor.vim
+	Teach Vim when to load Factor support files.
+    ftplugin/factor_settings.vim
+	Teach Vim to follow the Factor Coding Style guidelines.
+    syntax/factor.vim
+        Syntax highlighting for Factor code.
+
+Note: The syntax-highlighting file is automatically generated to include the
+names of all the vocabularies Factor knows about. To regenerate it manually,
+run the following code in the listener:
+
+    USE: editors.vim.generate-syntax
+
+    generate-vim-syntax
+
+...or run it from the command-line:
+
+    factor -run=editors.vim.generate-syntax

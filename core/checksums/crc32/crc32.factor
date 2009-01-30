@@ -24,9 +24,11 @@ SINGLETON: crc32
 
 INSTANCE: crc32 checksum
 
-: init-crc32 drop [ HEX: ffffffff dup ] dip ; inline
+: init-crc32 ( input checksum -- x y input )
+    drop [ HEX: ffffffff dup ] dip ; inline
 
-: finish-crc32 bitxor 4 >be ; inline
+: finish-crc32 ( x y -- bytes )
+    bitxor 4 >be ; inline
 
 M: crc32 checksum-bytes
     init-crc32

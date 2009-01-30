@@ -1,6 +1,6 @@
 ;;; fuel-syntax.el --- auxiliar definitions for factor code navigation.
 
-;; Copyright (C) 2008  Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009  Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -19,13 +19,17 @@
 
 (defun fuel-syntax--beginning-of-symbol ()
   "Move point to the beginning of the current symbol."
-  (while (eq (char-before) ?:) (backward-char))
-  (skip-syntax-backward "w_"))
+  (skip-syntax-backward "w_()"))
+
+(defsubst fuel-syntax--beginning-of-symbol-pos ()
+  (save-excursion (fuel-syntax--beginning-of-symbol) (point)))
 
 (defun fuel-syntax--end-of-symbol ()
   "Move point to the end of the current symbol."
-  (skip-syntax-forward "w_")
-  (while (looking-at ":") (forward-char)))
+  (skip-syntax-forward "w_()"))
+
+(defsubst fuel-syntax--end-of-symbol-pos ()
+  (save-excursion (fuel-syntax--end-of-symbol) (point)))
 
 (put 'factor-symbol 'end-op 'fuel-syntax--end-of-symbol)
 (put 'factor-symbol 'beginning-op 'fuel-syntax--beginning-of-symbol)
@@ -34,53 +38,105 @@
   (let ((s (substring-no-properties (thing-at-point 'factor-symbol))))
     (and (> (length s) 0) s)))
 
+
 
 ;;; Regexps galore:
 
 (defconst fuel-syntax--parsing-words
-  '("{" "}" "^:" "^::" ";" "<<" "<PRIVATE" ">>"
-    "BIN:" "BV{" "B{" "C:" "C-STRUCT:" "C-UNION:" "CHAR:" "CS{" "C{"
-    "DEFER:" "ERROR:" "EXCLUDE:" "FORGET:"
-    "GENERIC#" "GENERIC:" "HEX:" "HOOK:" "H{"
-    "IN:" "INSTANCE:" "INTERSECTION:"
-    "M:" "MACRO:" "MACRO::" "MAIN:" "MATH:" "METHOD:" "MIXIN:"
-    "OCT:" "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
-    "REQUIRE:"  "REQUIRES:" "SINGLETON:" "SLOT:" "SYMBOL:" "SYMBOLS:"
-    "TUPLE:" "T{" "t\\??" "TYPEDEF:"
-    "UNION:" "USE:" "USING:" "V{" "VARS:" "W{"))
+  '(":" "::" ";" "&:" "<<" "<PRIVATE" ">>"
+    "ABOUT:" "ALIAS:" "ALIEN:" "ARTICLE:"
+    "B" "BIN:"
+    "C:" "C-ENUM:" "C-STRUCT:" "C-UNION:" "CHAR:" "CONSTANT:" "call-next-method"
+    "DEFER:"
+    "ERROR:" "EXCLUDE:"
+    "f" "FORGET:" "FROM:" "FUNCTION:"
+    "GENERIC#" "GENERIC:"
+    "HELP:" "HEX:" "HOOK:"
+    "IN:" "initial:" "INSTANCE:" "INTERSECTION:"
+    "LIBRARY:"
+    "M:" "MACRO:" "MACRO::" "MAIN:" "MATH:" "MEMO:" "MEMO:" "METHOD:" "MIXIN:"
+    "OCT:"
+    "POSTPONE:" "PREDICATE:" "PRIMITIVE:" "PRIVATE>" "PROVIDE:"
+    "QUALIFIED-WITH:" "QUALIFIED:"
+    "read-only" "RENAME:" "REQUIRE:"  "REQUIRES:"
+    "SINGLETON:" "SINGLETONS:" "SLOT:" "SYMBOL:" "SYMBOLS:"
+    "TUPLE:" "t" "t?" "TYPEDEF:"
+    "UNION:" "USE:" "USING:"
+    "VARS:"))
 
-(defconst fuel-syntax--parsing-words-ext-regex
-  (regexp-opt '("B" "call-next-method" "delimiter" "f" "initial:" "read-only")
-              'words))
+(defconst fuel-syntax--parsing-words-regex
+  (regexp-opt fuel-syntax--parsing-words 'words))
+
+(defconst fuel-syntax--bracers
+  '("B" "BV" "C" "CS" "H" "T" "V" "W"))
+
+(defconst fuel-syntax--brace-words-regex
+  (format "%s{" (regexp-opt fuel-syntax--bracers t)))
 
 (defconst fuel-syntax--declaration-words
-  '("flushable" "foldable" "inline" "parsing" "recursive"))
+  '("flushable" "foldable" "inline" "parsing" "recursive" "delimiter"))
 
 (defconst fuel-syntax--declaration-words-regex
   (regexp-opt fuel-syntax--declaration-words 'words))
 
 (defsubst fuel-syntax--second-word-regex (prefixes)
-  (format "^%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
+  (format "%s +\\([^ \r\n]+\\)" (regexp-opt prefixes t)))
 
 (defconst fuel-syntax--method-definition-regex
   "^M: +\\([^ ]+\\) +\\([^ ]+\\)")
 
+(defconst fuel-syntax--integer-regex
+  "\\_<-?[0-9]+\\_>")
+
+(defconst fuel-syntax--raw-float-regex
+  "[0-9]*\\.[0-9]*\\([eE][+-]?[0-9]+\\)?")
+
+(defconst fuel-syntax--float-regex
+  (format "\\_<-?%s\\_>" fuel-syntax--raw-float-regex))
+
+(defconst fuel-syntax--number-regex
+  (format "\\([0-9]+\\|%s\\)" fuel-syntax--raw-float-regex))
+
+(defconst fuel-syntax--ratio-regex
+  (format "\\_<[+-]?%s/-?%s\\_>"
+          fuel-syntax--number-regex
+          fuel-syntax--number-regex))
+
+(defconst fuel-syntax--bad-string-regex
+  "\\_<\"[^>]\\([^\"\n]\\|\\\\\"\\)*\n")
+
 (defconst fuel-syntax--word-definition-regex
-  (fuel-syntax--second-word-regex '(":" "::" "GENERIC:")))
+  (fuel-syntax--second-word-regex
+   '(":" "::" "GENERIC:" "DEFER:" "HOOK:" "MAIN:" "MATH:" "POSTPONE:"
+     "SYMBOL:" "RENAME:")))
+
+(defconst fuel-syntax--alias-definition-regex
+  "^ALIAS: +\\(\\_<.+?\\_>\\) +\\(\\_<.+?\\_>\\)")
+
+(defconst fuel-syntax--vocab-ref-regexp
+  (fuel-syntax--second-word-regex
+   '("IN:" "USE:" "FROM:" "EXCLUDE:" "QUALIFIED:" "QUALIFIED-WITH:")))
+
+(defconst fuel-syntax--int-constant-def-regex
+  (fuel-syntax--second-word-regex '("ALIEN:" "CHAR:" "BIN:" "HEX:" "OCT:")))
 
 (defconst fuel-syntax--type-definition-regex
-  (fuel-syntax--second-word-regex '("TUPLE:" "SINGLETON:")))
+  (fuel-syntax--second-word-regex
+   '("C-STRUCT:" "C-UNION:" "MIXIN:" "TUPLE:" "SINGLETON:" "UNION:")))
 
-(defconst fuel-syntax--parent-type-regex "^TUPLE: +[^ ]+ +< +\\([^ ]+\\)")
+(defconst fuel-syntax--tuple-decl-regex
+  "^TUPLE: +\\([^ \n]+\\) +< +\\([^ \n]+\\)\\_>")
 
 (defconst fuel-syntax--constructor-regex "<[^ >]+>")
 
-(defconst fuel-syntax--setter-regex "\\W>>[^ ]+\\b")
+(defconst fuel-syntax--getter-regex "\\(^\\|\\_<\\)[^ ]+?>>\\_>")
+(defconst fuel-syntax--setter-regex "\\_<>>.+?\\_>")
 
 (defconst fuel-syntax--symbol-definition-regex
-  (fuel-syntax--second-word-regex '("SYMBOL:" "VAR:")))
+  (fuel-syntax--second-word-regex '("&:" "SYMBOL:" "VAR:")))
 
-(defconst fuel-syntax--stack-effect-regex " ( .* )")
+(defconst fuel-syntax--stack-effect-regex
+  "\\( ( .* )\\)\\|\\( (( .* ))\\)")
 
 (defconst fuel-syntax--using-lines-regex "^USING: +\\([^;]+\\);")
 
@@ -90,23 +146,60 @@
 
 (defconst fuel-syntax--sub-vocab-regex "^<\\([^ \n]+\\) *$")
 
-(defconst fuel-syntax--definition-starters-regex
-  (regexp-opt '("VARS" "TUPLE" "MACRO" "MACRO:" "M" ":" "")))
+(defconst fuel-syntax--alien-function-regex
+  "\\_<FUNCTION: \\(\\w+\\) \\(\\w+\\)")
+
+(defconst fuel-syntax--indent-def-starts '("" ":"
+                                           "C-ENUM" "C-STRUCT" "C-UNION"
+                                           "FROM" "FUNCTION:"
+                                           "INTERSECTION:"
+                                           "M" "MACRO" "MACRO:"
+                                           "MEMO" "MEMO:" "METHOD"
+                                           "PREDICATE" "PRIMITIVE"
+                                           "UNION"))
+
+(defconst fuel-syntax--no-indent-def-starts '("SINGLETONS"
+                                              "SYMBOLS"
+                                              "TUPLE"
+                                              "VARS"))
+
+(defconst fuel-syntax--indent-def-start-regex
+  (format "^\\(%s:\\)\\( \\|\n\\)" (regexp-opt fuel-syntax--indent-def-starts)))
+
+(defconst fuel-syntax--no-indent-def-start-regex
+  (format "^\\(%s:\\) " (regexp-opt fuel-syntax--no-indent-def-starts)))
 
 (defconst fuel-syntax--definition-start-regex
-  (format "^\\(%s:\\) " fuel-syntax--definition-starters-regex))
+  (format "^\\(%s:\\) " (regexp-opt (append fuel-syntax--no-indent-def-starts
+                                            fuel-syntax--indent-def-starts))))
 
 (defconst fuel-syntax--definition-end-regex
-  (format "\\(\\(^\\| +\\);\\( +%s\\)*\\($\\| +\\)\\)"
+  (format "\\(\\(^\\| +\\);\\( *%s\\)*\\($\\| +\\)\\)"
           fuel-syntax--declaration-words-regex))
 
 (defconst fuel-syntax--single-liner-regex
-  (format "^%s" (regexp-opt '("DEFER:" "GENERIC:" "IN:"
-                              "PRIVATE>" "<PRIVATE"
-                              "SINGLETON:" "SYMBOL:" "USE:" "VAR:"))))
+  (regexp-opt '("ABOUT:"
+                "ARTICLE:"
+                "ALIAS:"
+                "CONSTANT:" "C:"
+                "DEFER:"
+                "FORGET:"
+                "GENERIC:" "GENERIC#"
+                "HELP:" "HEX:" "HOOK:"
+                "IN:" "INSTANCE:"
+                "LIBRARY:"
+                "MAIN:" "MATH:" "MIXIN:"
+                "OCT:"
+                "POSTPONE:" "PRIVATE>" "<PRIVATE"
+                "QUALIFIED-WITH:" "QUALIFIED:"
+                "RENAME:"
+                "SINGLETON:" "SLOT:" "SYMBOL:"
+                "TYPEDEF:"
+                "USE:"
+                "VAR:")))
 
 (defconst fuel-syntax--begin-of-def-regex
-  (format "^USING: \\|\\(%s\\)\\|\\(%s .*\\)"
+  (format "^USING: \\|\\(%s\\)\\|\\(^%s .*\\)"
           fuel-syntax--definition-start-regex
           fuel-syntax--single-liner-regex))
 
@@ -114,65 +207,78 @@
   (format "^.*%s" fuel-syntax--definition-end-regex))
 
 (defconst fuel-syntax--end-of-def-regex
-  (format "\\(%s\\)\\|\\(%s .*\\)"
+  (format "\\(%s\\)\\|\\(^%s .*\\)"
           fuel-syntax--end-of-def-line-regex
           fuel-syntax--single-liner-regex))
+
+(defconst fuel-syntax--defun-signature-regex
+  (format "\\(%s\\|%s\\)"
+          (format ":[^ ]* [^ ]+\\(%s\\)*" fuel-syntax--stack-effect-regex)
+          "M[^:]*: [^ ]+ [^ ]+"))
+
+(defconst fuel-syntax--constructor-decl-regex
+  "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+
+(defconst fuel-syntax--typedef-regex
+  "\\_<TYPEDEF: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")
+
+(defconst fuel-syntax--rename-regex
+  "\\_<RENAME: +\\(\\w+\\) +\\(\\w+\\) +=> +\\(\\w+\\)\\( .*\\)?$")
+
 
 ;;; Factor syntax table
 
-(defvar fuel-syntax--syntax-table
-  (let ((i 0)
-        (table (make-syntax-table)))
-    ;; Default is atom-constituent
-    (while (< i 256)
-      (modify-syntax-entry i "_   " table)
-      (setq i (1+ i)))
-
-    ;; Word components.
-    (setq i ?0)
-    (while (<= i ?9)
-      (modify-syntax-entry i "w   " table)
-      (setq i (1+ i)))
-    (setq i ?A)
-    (while (<= i ?Z)
-      (modify-syntax-entry i "w   " table)
-      (setq i (1+ i)))
-    (setq i ?a)
-    (while (<= i ?z)
-      (modify-syntax-entry i "w   " table)
-      (setq i (1+ i)))
-
-    ;; Whitespace
-    (modify-syntax-entry ?\t " " table)
+(setq fuel-syntax--syntax-table
+  (let ((table (make-syntax-table)))
+    ;; Default is word constituent
+    (dotimes (i 256)
+      (modify-syntax-entry i "w" table))
+    ;; Whitespace (TAB is not whitespace)
     (modify-syntax-entry ?\f " " table)
     (modify-syntax-entry ?\r " " table)
-    (modify-syntax-entry ?  " " table)
-
-    ;; (end of) Comments
-    (modify-syntax-entry ?\n ">" table)
-
-    ;; Parenthesis
-    (modify-syntax-entry ?\[ "(]  " table)
-    (modify-syntax-entry ?\] ")[  " table)
-    (modify-syntax-entry ?{ "(}  " table)
-    (modify-syntax-entry ?} "){  " table)
-
-    (modify-syntax-entry ?\( "()" table)
-    (modify-syntax-entry ?\) ")(" table)
-
-    ;; Strings
-    (modify-syntax-entry ?\" "\"" table)
-    (modify-syntax-entry ?\\ "/" table)
-    table)
-  "Syntax table used while in Factor mode.")
+    (modify-syntax-entry ?\  " " table)
+    (modify-syntax-entry ?\n " " table)
+    table))
 
 (defconst fuel-syntax--syntactic-keywords
-  `(("\\(#!\\)" (1 "<"))
-    (" \\(!\\)" (1 "<"))
-    ("^\\(!\\)" (1 "<"))
-    ("\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
-    ("\\([[({]\\)\\([^ \"\n]\\)" (1 "_") (2 "_"))
-    ("\\([^ \"\n]\\)\\([])}]\\)" (1 "_") (2 "_"))))
+  `(;; CHARs:
+    ("\\(CHAR:\\|POSTPONE:\\|\\\\\\) \\(.\\)\\( \\|$\\)" (2 "w"))
+    ;; Comments:
+    ("\\_<\\(#?!\\) .*\\(\n\\|$\\)" (1 "<") (2 ">"))
+    ("\\_<\\(#?!\\)\\(\n\\|$\\)" (1 "<") (2 ">"))
+    (" \\((\\)( \\([^\n]*\\) )\\()\\)\\( \\|\n\\)" (1 "<b") (2 "w") (3 ">b"))
+    (" \\((\\) \\([^\n]*\\) \\()\\)\\( \\|\n\\)" (1 "<b") (2 "w") (3 ">b"))
+    ;; Strings
+    ("\\( \\|^\\)\\(DLL\\|P\\|SBUF\\)\\(\"\\)\\([^\n\r\f\\\"]\\|\\\\.\\)*?\\(\"\\)"
+     (3 "\"") (5 "\""))
+    ("\\(\"\\)\\([^\n\r\f\\\"]\\|\\\\.\\)*?\\(\"\\)" (1 "\"") (3 "\""))
+    ("\\_<<\\(\"\\)\\_>" (1 "<b"))
+    ("\\_<\\(\"\\)>\\_>" (1 ">b"))
+    ;; Multiline constructs
+    ("\\_<\\(U\\)SING: \\(;\\)" (1 "<b") (2 ">b"))
+    ("\\_<USING:\\( \\)" (1 "<b"))
+    ("\\_<\\(C\\)-ENUM: \\(;\\)" (1 "<b") (2 ">b"))
+    ("\\_<C-ENUM:\\( \\|\n\\)" (1 "<b"))
+    ("\\_<TUPLE: +\\w+? +< +\\w+? *\\( \\|\n\\)\\([^;]\\|$\\)" (1 "<b"))
+    ("\\_<\\(TUPLE\\|SYMBOLS\\|VARS\\): +\\w+? *\\( \\|\n\\)\\([^;<\n]\\|\\_>\\)"
+     (2 "<b"))
+    ("\\(\n\\| \\);\\_>" (1 ">b"))
+    ;; Let and lambda:
+    ("\\_<\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
+    ("\\(\\[\\)\\(let\\|wlet\\|let\\*\\)\\( \\|$\\)" (1 "(]"))
+    ("\\(\\[\\)\\(|\\) +[^|]* \\(|\\)" (1 "(]") (2 "(|") (3 ")|"))
+    (" \\(|\\) " (1 "(|"))
+    (" \\(|\\)$" (1 ")"))
+    ;; Opening brace words:
+    ("\\_<\\w*\\({\\)\\_>" (1 "(}"))
+    ("\\_<\\(}\\)\\_>" (1 "){"))
+    ;; Parenthesis:
+    ("\\_<\\((\\)\\_>" (1 "()"))
+    ("\\_<\\()\\)\\_>" (1 ")("))
+    ;; Quotations:
+    ("\\_<'\\(\\[\\)\\_>" (1 "(]"))      ; fried
+    ("\\_<\\(\\[\\)\\_>" (1 "(]"))
+    ("\\_<\\(\\]\\)\\_>" (1 ")["))))
 
 
 ;;; Source code analysis:
@@ -202,20 +308,51 @@
 (defsubst fuel-syntax--at-begin-of-def ()
   (looking-at fuel-syntax--begin-of-def-regex))
 
+(defsubst fuel-syntax--at-begin-of-indent-def ()
+  (looking-at fuel-syntax--indent-def-start-regex))
+
 (defsubst fuel-syntax--at-end-of-def ()
   (looking-at fuel-syntax--end-of-def-regex))
 
 (defsubst fuel-syntax--looking-at-emptiness ()
-  (looking-at "^[ \t]*$"))
+  (looking-at "^[ ]*$\\|$"))
+
+(defsubst fuel-syntax--is-last-char (pos)
+  (save-excursion
+    (goto-char (1+ pos))
+    (fuel-syntax--looking-at-emptiness)))
+
+(defsubst fuel-syntax--line-offset (pos)
+  (- pos (save-excursion
+           (goto-char pos)
+           (beginning-of-line)
+           (point))))
+
+(defun fuel-syntax--previous-non-blank ()
+  (forward-line -1)
+  (while (and (not (bobp)) (fuel-syntax--looking-at-emptiness))
+    (forward-line -1)))
+
+(defun fuel-syntax--beginning-of-block-pos ()
+  (save-excursion
+    (if (> (fuel-syntax--brackets-depth) 0)
+        (fuel-syntax--brackets-start)
+      (fuel-syntax--beginning-of-defun)
+      (point))))
 
 (defun fuel-syntax--at-setter-line ()
   (save-excursion
     (beginning-of-line)
-    (if (not (fuel-syntax--looking-at-emptiness))
-        (re-search-forward fuel-syntax--setter-regex (line-end-position) t)
-      (forward-line -1)
-      (or (fuel-syntax--at-constructor-line)
-          (fuel-syntax--at-setter-line)))))
+    (when (re-search-forward fuel-syntax--setter-regex
+                             (line-end-position)
+                             t)
+      (let* ((to (match-beginning 0))
+             (from (fuel-syntax--beginning-of-block-pos)))
+        (goto-char from)
+        (let ((depth (fuel-syntax--brackets-depth)))
+          (and (or (re-search-forward fuel-syntax--constructor-regex to t)
+                   (re-search-forward fuel-syntax--setter-regex to t))
+               (= depth (fuel-syntax--brackets-depth))))))))
 
 (defun fuel-syntax--at-constructor-line ()
   (save-excursion
@@ -225,56 +362,75 @@
 (defsubst fuel-syntax--at-using ()
   (looking-at fuel-syntax--using-lines-regex))
 
+(defun fuel-syntax--in-using ()
+  (let ((p (point)))
+    (save-excursion
+      (and (re-search-backward "^USING: " nil t)
+           (re-search-forward " ;" nil t)
+           (< p (match-end 0))))))
+
 (defsubst fuel-syntax--beginning-of-defun (&optional times)
   (re-search-backward fuel-syntax--begin-of-def-regex nil t times))
 
 (defsubst fuel-syntax--end-of-defun ()
   (re-search-forward fuel-syntax--end-of-def-regex nil t))
 
+(defsubst fuel-syntax--end-of-defun-pos ()
+  (save-excursion
+    (re-search-forward fuel-syntax--end-of-def-regex nil t)
+    (point)))
+
+(defun fuel-syntax--beginning-of-body ()
+  (let ((p (point)))
+    (and (fuel-syntax--beginning-of-defun)
+         (re-search-forward fuel-syntax--defun-signature-regex p t)
+         (not (re-search-forward fuel-syntax--end-of-def-regex p t)))))
+
+(defun fuel-syntax--beginning-of-sexp ()
+  (if (> (fuel-syntax--brackets-depth) 0)
+      (goto-char (fuel-syntax--brackets-start))
+    (fuel-syntax--beginning-of-body)))
+
+(defsubst fuel-syntax--beginning-of-sexp-pos ()
+  (save-excursion (fuel-syntax--beginning-of-sexp) (point)))
+
 
 ;;; USING/IN:
 
 (make-variable-buffer-local
- (defvar fuel-syntax--current-vocab nil))
+ (defvar fuel-syntax--current-vocab-function 'fuel-syntax--find-in))
+
+(defsubst fuel-syntax--current-vocab ()
+  (funcall fuel-syntax--current-vocab-function))
+
+(defun fuel-syntax--find-in ()
+  (save-excursion
+    (when (re-search-backward fuel-syntax--current-vocab-regex nil t)
+      (match-string-no-properties 1))))
 
 (make-variable-buffer-local
- (defvar fuel-syntax--usings nil))
-
-(defun fuel-syntax--current-vocab ()
-  (let ((ip
-         (save-excursion
-           (when (re-search-backward fuel-syntax--current-vocab-regex nil t)
-             (setq fuel-syntax--current-vocab (match-string-no-properties 1))
-             (point)))))
-    (when ip
-      (let ((pp (save-excursion
-                  (when (re-search-backward fuel-syntax--sub-vocab-regex ip t)
-                    (point)))))
-        (when (and pp (> pp ip))
-          (let ((sub (match-string-no-properties 1)))
-            (unless (save-excursion (search-backward (format "%s>" sub) pp t))
-              (setq fuel-syntax--current-vocab
-                    (format "%s.%s" fuel-syntax--current-vocab (downcase sub)))))))))
-  fuel-syntax--current-vocab)
-
-(defun fuel-syntax--usings-update ()
-  (save-excursion
-    (setq fuel-syntax--usings (list (fuel-syntax--current-vocab)))
-    (while (re-search-backward fuel-syntax--using-lines-regex nil t)
-      (dolist (u (split-string (match-string-no-properties 1) nil t))
-        (push u fuel-syntax--usings)))
-    fuel-syntax--usings))
-
-(defsubst fuel-syntax--usings-update-hook ()
-  (fuel-syntax--usings-update)
-  nil)
-
-(defun fuel-syntax--enable-usings ()
-  (add-hook 'before-save-hook 'fuel-syntax--usings-update-hook nil t)
-  (fuel-syntax--usings-update))
+ (defvar fuel-syntax--usings-function 'fuel-syntax--find-usings))
 
 (defsubst fuel-syntax--usings ()
-  (or fuel-syntax--usings (fuel-syntax--usings-update)))
+  (funcall fuel-syntax--usings-function))
+
+(defun fuel-syntax--file-has-private ()
+  (save-excursion
+    (goto-char (point-min))
+    (and (re-search-forward "\\_<<PRIVATE\\_>" nil t)
+         (re-search-forward "\\_<PRIVATE>\\_>" nil t))))
+
+(defun fuel-syntax--find-usings (&optional no-private)
+  (save-excursion
+    (let ((usings))
+      (goto-char (point-max))
+      (while (re-search-backward fuel-syntax--using-lines-regex nil t)
+        (dolist (u (split-string (match-string-no-properties 1) nil t))
+          (push u usings)))
+      (when (and (not no-private) (fuel-syntax--file-has-private))
+        (goto-char (point-max))
+        (push (concat (fuel-syntax--find-in) ".private") usings))
+      usings)))
 
 
 (provide 'fuel-syntax)

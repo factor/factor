@@ -1,15 +1,18 @@
-! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables kernel math namespaces sequences strings
 assocs combinators io io.streams.string accessors
 xml.data wrap xml.entities unicode.categories fry ;
 IN: xml.writer
 
-SYMBOL: xml-pprint?
 SYMBOL: sensitive-tags
-SYMBOL: indentation
 SYMBOL: indenter
 "  " indenter set-global
+
+<PRIVATE
+
+SYMBOL: xml-pprint?
+SYMBOL: indentation
 
 : sensitive? ( tag -- ? )
     sensitive-tags get swap '[ _ names-match? ] contains? ;
@@ -37,26 +40,37 @@ SYMBOL: indenter
         [ [ empty? ] [ string? ] bi and not ] filter
     ] when ;
 
+PRIVATE>
+
 : name>string ( name -- string )
     [ main>> ] [ space>> ] bi [ ":" rot 3append ] unless-empty ;
 
 : print-name ( name -- )
     name>string write ;
 
+<PRIVATE
+
+: write-quoted ( string -- )
+    CHAR: " write1 write CHAR: " write1 ;
+
 : print-attrs ( assoc -- )
     [
-        " " write
-        swap print-name
-        "=\"" write
-        escape-quoted-string write
-        "\"" write
+        [ bl print-name "=" write ]
+        [ escape-quoted-string write-quoted ] bi*
     ] assoc-each ;
 
-GENERIC: write-xml-chunk ( object -- )
+PRIVATE>
 
-M: string write-xml-chunk
-    escape-string dup empty? not xml-pprint? get and
-    [ nl 80 indent-string indented-break ] when write ;
+GENERIC: write-xml ( xml -- )
+
+<PRIVATE
+
+M: string write-xml
+    escape-string xml-pprint? get [
+        dup [ blank? ] all?
+        [ drop "" ]
+        [ nl 80 indent-string indented-break ] if
+    ] when write ;
 
 : write-tag ( tag -- )
     ?indent CHAR: < write1
@@ -65,112 +79,115 @@ M: string write-xml-chunk
 : write-start-tag ( tag -- )
     write-tag ">" write ;
 
-M: contained-tag write-xml-chunk
+M: contained-tag write-xml
     write-tag "/>" write ;
 
 : write-children ( tag -- )
     indent children>> ?filter-children
-    [ write-xml-chunk ] each unindent ;
+    [ write-xml ] each unindent ;
 
 : write-end-tag ( tag -- )
     ?indent "</" write print-name CHAR: > write1 ;
 
-M: open-tag write-xml-chunk
+M: open-tag write-xml
     xml-pprint? get [
         {
-            [ sensitive? not xml-pprint? get and xml-pprint? set ]
             [ write-start-tag ]
+            [ sensitive? not xml-pprint? get and xml-pprint? set ]
             [ write-children ]
             [ write-end-tag ]
         } cleave
     ] dip xml-pprint? set ;
 
-M: comment write-xml-chunk
+M: unescaped write-xml
+    string>> write ;
+
+M: comment write-xml
     "<!--" write text>> write "-->" write ;
 
-M: element-decl write-xml-chunk
-    "<!ELEMENT " write
-    [ name>> write " " write ]
-    [ content-spec>> write ">" write ]
-    bi ;
+: write-decl ( decl name quot: ( decl -- slot ) -- )
+    "<!" write swap write bl
+    [ name>> write bl ]
+    swap '[ @ write ">" write ] bi ; inline
 
-M: attlist-decl write-xml-chunk
-    "<!ATTLIST " write
-    [ name>> write " " write ]
-    [ att-defs>> write ">" write ]
-    bi ;
+M: element-decl write-xml
+    "ELEMENT" [ content-spec>> ] write-decl ;
 
-M: entity-decl write-xml-chunk
+M: attlist-decl write-xml
+    "ATTLIST" [ att-defs>> ] write-decl ;
+
+M: notation-decl write-xml
+    "NOTATION" [ id>> ] write-decl ;
+
+M: entity-decl write-xml
     "<!ENTITY " write
-    [ name>> write " " write ]
-    [ def>> write-xml-chunk ">" write ]
-    bi ;
-
-M: system-id write-xml-chunk
-    "SYSTEM '" write system-literal>> write "'" write ;
-
-M: public-id write-xml-chunk
-    "PUBLIC '" write
-    [ pubid-literal>> write "' '" write ]
-    [ system-literal>> write "'>" write ] bi ;
-
-M: doctype-decl write-xml-chunk
-    "<!DOCTYPE " write
-    [ name>> write " " write ]
-    [ external-id>> [ write-xml-chunk " " write ] when* ]
-    [
-        internal-subset>>
-        [ "[" write [ write-xml-chunk ] each "]" write ] when* ">" write
+    [ pe?>> [ " % " write ] when ]
+    [ name>> write " \"" write ] [
+        def>> f xml-pprint?
+        [ write-xml ] with-variable
+        "\">" write
     ] tri ;
 
-M: directive write-xml-chunk
-    "<!" write text>> write CHAR: > write1 ;
+M: system-id write-xml
+    "SYSTEM" write bl system-literal>> write-quoted ;
 
-M: instruction write-xml-chunk
+M: public-id write-xml
+    "PUBLIC" write bl
+    [ pubid-literal>> write-quoted bl ]
+    [ system-literal>> write-quoted ] bi ;
+
+: write-internal-subset ( dtd -- )
+    [
+        "[" write indent
+        directives>> [ ?indent write-xml ] each
+        unindent ?indent "]" write
+    ] when* ;
+
+M: doctype-decl write-xml
+    ?indent "<!DOCTYPE " write
+    [ name>> write " " write ]
+    [ external-id>> [ write-xml " " write ] when* ]
+    [ internal-subset>> write-internal-subset ">" write ] tri ;
+
+M: directive write-xml
+    "<!" write text>> write CHAR: > write1 nl ;
+
+M: instruction write-xml
     "<?" write text>> write "?>" write ;
 
-M: sequence write-xml-chunk
-    [ write-xml-chunk ] each ;
+M: number write-xml
+    "Numbers are not allowed in XML" throw ;
 
-: write-prolog ( xml -- )
-    "<?xml version=\"" write dup version>> write
-    "\" encoding=\"" write dup encoding>> write
-    standalone>> [ "\" standalone=\"yes" write ] when
-    "\"?>" write ;
+M: sequence write-xml
+    [ write-xml ] each ;
 
-: write-xml ( xml -- )
+M: prolog write-xml
+    "<?xml version=" write
+    [ version>> write-quoted ]
+    [ " encoding=" write encoding>> write-quoted ]
+    [ standalone>> [ " standalone=\"yes\"" write ] when ] tri
+    "?>" write ;
+
+M: xml write-xml
     {
-        [ prolog>> write-prolog ]
-        [ before>> write-xml-chunk ]
-        [ body>> write-xml-chunk ]
-        [ after>> write-xml-chunk ]
+        [ prolog>> write-xml ]
+        [ before>> write-xml ]
+        [ body>> write-xml ]
+        [ after>> write-xml ]
     } cleave ;
 
-M: xml write-xml-chunk
-    body>> write-xml-chunk ;
-
-: print-xml ( xml -- )
-    write-xml nl ;
+PRIVATE>
 
 : xml>string ( xml -- string )
     [ write-xml ] with-string-writer ;
 
-: with-xml-pprint ( sensitive-tags quot -- )
+: pprint-xml ( xml -- )
     [
-        swap [ assure-name ] map sensitive-tags set
+        sensitive-tags [ [ assure-name ] map ] change
         0 indentation set
         xml-pprint? on
-        call
-    ] with-scope ; inline
-
-: pprint-xml-but ( xml sensitive-tags -- )
-    [ print-xml ] with-xml-pprint ;
-
-: pprint-xml ( xml -- )
-    f pprint-xml-but ;
-
-: pprint-xml>string-but ( xml sensitive-tags -- string )
-    [ xml>string ] with-xml-pprint ;
+        write-xml
+    ] with-scope ;
 
 : pprint-xml>string ( xml -- string )
-    f pprint-xml>string-but ;
+    [ pprint-xml ] with-string-writer ;

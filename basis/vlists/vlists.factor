@@ -17,7 +17,8 @@ M: vlist nth-unsafe vector>> nth-unsafe ;
 
 <PRIVATE
 
-: >vlist< [ length>> ] [ vector>> ] bi ; inline
+: >vlist< ( vlist -- len vec )
+    [ length>> ] [ vector>> ] bi ; inline
 
 : unshare ( len vec -- len vec' )
     clone [ set-length ] 2keep ; inline

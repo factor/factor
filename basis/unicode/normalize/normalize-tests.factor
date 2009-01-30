@@ -1,7 +1,9 @@
 USING: unicode.normalize kernel tools.test sequences
 unicode.data io.encodings.utf8 io.files splitting math.parser
-locals math quotations assocs combinators ;
+locals math quotations assocs combinators unicode.normalize.private ;
 IN: unicode.normalize.tests
+
+{ nfc nfkc nfd nfkd } [ must-infer ] each
 
 [ "ab\u000323\u000302cd" ] [ "ab\u000302" "\u000323cd" string-append ] unit-test
 
@@ -41,4 +43,4 @@ IN: unicode.normalize.tests
         [ { { 5 { 1 2 3 4 5 } } } [ nfkd ] assert= ]
     } cleave ;
 
-! parse-test [ run-line ] each
+parse-test [ run-line ] each

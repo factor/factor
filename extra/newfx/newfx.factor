@@ -1,5 +1,5 @@
 
-USING: kernel sequences assocs qualified circular sets fry sequences.lib ;
+USING: kernel sequences assocs circular sets fry ;
 
 USING: math multi-methods ;
 
@@ -62,8 +62,8 @@ METHOD: as { sequence object  number }      pick set-nth ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-METHOD: is-of { number object  sequence } dup >r swapd set-nth r> ;
-METHOD: as-of { object  number sequence } dup >r       set-nth r> ;
+METHOD: is-of { number object  sequence } dup [ swapd set-nth ] dip ;
+METHOD: as-of { object  number sequence } dup [       set-nth ] dip ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -93,8 +93,8 @@ METHOD: as { assoc object object }      pick set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-METHOD: is-of { object object assoc } dup >r swapd set-at r> ;
-METHOD: as-of { object object assoc } dup >r       set-at r> ;
+METHOD: is-of { object object assoc } dup [ swapd set-at ] dip ;
+METHOD: as-of { object object assoc } dup [       set-at ] dip ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -213,7 +213,7 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: snip          ( seq a b -- seq ) >r over r> [ head ] [ tail ] 2bi* append ;
+: snip          ( seq a b -- seq ) [ over ] dip [ head ] [ tail ] 2bi* append ;
 : snip-this     ( a b seq -- seq ) -rot snip ;
 : snip!         ( seq a b -- seq )      pick delete-slice ;
 : snip-this!    ( a b seq -- seq ) -rot pick delete-slice ;
@@ -222,7 +222,7 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: invert-index ( seq i -- seq i ) >r dup length 1 - r> - ;
+: invert-index ( seq i -- seq i ) [ dup length 1 - ] dip - ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -236,9 +236,9 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: insert ( seq i obj -- seq ) >r cut r> prefix append ;
+: insert ( seq i obj -- seq ) [ cut ] dip prefix append ;
 
-: splice ( seq i seq -- seq ) >r cut r> prepend append ;
+: splice ( seq i seq -- seq ) [ cut ] dip prepend append ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

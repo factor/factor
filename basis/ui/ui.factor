@@ -10,18 +10,6 @@ IN: ui
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
 
-SYMBOL: stop-after-last-window?
-
-: event-loop? ( -- ? )
-    {
-        { [ stop-after-last-window? get not ] [ t ] }
-        { [ graft-queue deque-empty? not ] [ t ] }
-        { [ windows get-global empty? not ] [ t ] }
-        [ f ]
-    } cond ;
-
-: event-loop ( -- ) [ event-loop? ] [ do-events ] [ ] while ;
-
 : window ( handle -- world ) windows get-global at ;
 
 : window-focus ( handle -- gadget ) window world-focus ;
@@ -155,9 +143,6 @@ SYMBOL: ui-hook
         ] assert-depth
     ] [ ui-error ] recover ;
 
-: ui-wait ( -- )
-    10 milliseconds sleep ;
-
 SYMBOL: ui-thread
 
 : ui-running ( quot -- )
@@ -220,7 +205,6 @@ MAIN: ui
         f windows set-global
         [
             ui-hook set
-            stop-after-last-window? on
             ui
         ] with-scope
     ] if ;

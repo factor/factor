@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax ;
+USING: alien.syntax unix.types unix.stat ;
 IN: unix.statfs.freebsd
 
-: MFSNAMELEN      16            ; inline ! length of type name including null */
-: MNAMELEN        88            ; inline ! size of on/from name bufs
-: STATFS_VERSION  HEX: 20030518 ; inline ! current version number 
+CONSTANT: MFSNAMELEN      16            ! length of type name including null */
+CONSTANT: MNAMELEN        88            ! size of on/from name bufs
+CONSTANT: STATFS_VERSION  HEX: 20030518 ! current version number 
 
 C-STRUCT: statfs
     { "uint32_t" "f_version" }

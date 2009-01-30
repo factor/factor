@@ -4,6 +4,7 @@ parser vocabs.loader vocabs.loader.private accessors assocs ;
 IN: bootstrap.help
 
 : load-help ( -- )
+    "help.lint" require
     "alien.syntax" require
     "compiler" require
 

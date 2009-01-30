@@ -21,3 +21,20 @@ IN: ui.gadgets.tracks.tests
         <gadget> { 10 10 } >>dim 0 track-add
     pref-dim
 ] unit-test
+
+[ { 10 30 } ] [
+    { 0 1 } <track>
+        <gadget> { 10 10 } >>dim f track-add
+        <gadget> { 10 10 } >>dim f track-add
+        <gadget> { 10 10 } >>dim f track-add
+    pref-dim
+] unit-test
+
+[ { 10 40 } ] [
+    { 0 1 } <track>
+        { 5 5 } >>gap
+        <gadget> { 10 10 } >>dim f track-add
+        <gadget> { 10 10 } >>dim f track-add
+        <gadget> { 10 10 } >>dim f track-add
+    pref-dim
+] unit-test

@@ -3,10 +3,10 @@
 USING: accessors arrays assocs classes classes.builtin
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple classes.union combinators
-definitions effects fry generic help help.markup
-help.stylesheet help.topics io io.files io.styles kernel macros
+definitions effects fry generic help help.markup help.stylesheet
+help.topics io io.files io.pathnames io.styles kernel macros
 make namespaces prettyprint sequences sets sorting summary
-tools.vocabs vocabs vocabs.loader words ;
+tools.vocabs vocabs vocabs.loader words words.symbol ;
 IN: tools.vocabs.browser
 
 : vocab-status-string ( vocab -- string )

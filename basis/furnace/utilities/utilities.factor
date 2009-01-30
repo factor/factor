@@ -96,11 +96,7 @@ M: object modify-form drop ;
     dup method>> {
         { "GET" [ url>> query>> ] }
         { "HEAD" [ url>> query>> ] }
-        { "POST" [
-            post-data>>
-            dup content-type>> "application/x-www-form-urlencoded" =
-            [ content>> ] [ drop f ] if
-        ] }
+        { "POST" [ post-data>> params>> ] }
     } case ;
 
 : referrer ( -- referrer/f )

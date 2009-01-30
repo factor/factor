@@ -37,8 +37,30 @@ HELP: quotable?
 { $values { "ch" "a character" } { "?" "a boolean" } }
 { $description "Tests for characters which may appear in a Factor string literal without escaping." } ;
 
-ARTICLE: "ascii" "ASCII character classes"
-"The " { $vocab-link "ascii" } " vocabulary implements traditional ASCII character classes:"
+HELP: ascii?
+{ $values { "ch" "a character" } { "?" "a boolean" } }
+{ $description "Tests for whether a number is an ASCII character." } ;
+
+HELP: ch>lower
+{ $values { "ch" "a character" } { "lower" "a character" } }
+{ $description "Converts an ASCII character to lower case." } ;
+
+HELP: ch>upper
+{ $values { "ch" "a character" } { "upper" "a character" } }
+{ $description "Converts an ASCII character to upper case." } ;
+
+HELP: >lower
+{ $values { "str" "a string" } { "lower" "a string" } }
+{ $description "Converts an ASCII string to lower case." } ;
+
+HELP: >upper
+{ $values { "str" "a string" } { "upper" "a string" } }
+{ $description "Converts an ASCII string to upper case." } ;
+
+ARTICLE: "ascii" "ASCII"
+"The " { $vocab-link "ascii" } " vocabulary implements support for the legacy ASCII character set. Most applications should use " { $link "unicode" } " instead."
+$nl
+"ASCII character classes:"
 { $subsection blank? }
 { $subsection letter? }
 { $subsection LETTER? }
@@ -46,6 +68,11 @@ ARTICLE: "ascii" "ASCII character classes"
 { $subsection printable? }
 { $subsection control? }
 { $subsection quotable? }
-"Modern applications should use Unicode 5.0 instead (" { $vocab-link "unicode.categories" } ")." ;
+{ $subsection ascii? }
+"ASCII case conversion:"
+{ $subsection ch>lower }
+{ $subsection ch>upper }
+{ $subsection >lower }
+{ $subsection >upper } ;
 
 ABOUT: "ascii"

@@ -10,8 +10,8 @@ HELP: <redirect>
 { $values { "url" url } { "response" response } }
 { $description "Creates a response which redirects the client to the given URL." } ;
 
-HELP: <secure-only> ( responder -- responder' )
-{ $values { "responder" "a responder" } { "responder'" "a responder" } }
+HELP: <secure-only>
+{ $values { "responder" "a responder" } { "secure-only" "a responder" } }
 { $description "Creates a new responder which ensures that the client is connecting via HTTPS before delegating to the underlying responder. If the client is connecting via HTTP, a redirect is sent instead." } ;
 
 HELP: <secure-redirect>

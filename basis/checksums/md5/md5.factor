@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting grouping strings
-sequences byte-arrays locals sequences.private
-io.encodings.binary symbols math.bitwise checksums
-checksums.common checksums.stream ;
+sequences byte-arrays locals sequences.private macros fry
+io.encodings.binary math.bitwise checksums
+checksums.common checksums.stream combinators ;
 IN: checksums.md5
 
 ! See http://www.faqs.org/rfcs/rfc1321.html
@@ -29,7 +29,7 @@ SYMBOLS: a b c d old-a old-b old-c old-d ;
     old-c c update-old-new
     old-d d update-old-new ;
 
-:: (ABCD) ( x s i k func a b c d -- )
+:: (ABCD) ( x a b c d k s i func -- )
     #! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
     a [
         b get c get d get func call w+
@@ -38,11 +38,6 @@ SYMBOLS: a b c d old-a old-b old-c old-d ;
         s bitroll-32
         b get w+
     ] change ; inline
-
-: ABCD a b c d (ABCD) ; inline
-: BCDA b c d a (ABCD) ; inline
-: CDAB c d a b (ABCD) ; inline
-: DABC d a b c (ABCD) ; inline
 
 : F ( X Y Z -- FXYZ )
     #! F(X,Y,Z) = XY v not(X) Z
@@ -60,104 +55,113 @@ SYMBOLS: a b c d old-a old-b old-c old-d ;
     #! I(X,Y,Z) = Y xor (X v not(Z))
     rot swap bitnot bitor bitxor ;
 
-: S11 7  ; inline
-: S12 12 ; inline
-: S13 17 ; inline
-: S14 22 ; inline
-: S21 5  ; inline
-: S22 9  ; inline
-: S23 14 ; inline
-: S24 20 ; inline
-: S31 4 ;  inline
-: S32 11 ; inline
-: S33 16 ; inline
-: S34 23 ; inline
-: S41 6  ; inline
-: S42 10 ; inline
-: S43 15 ; inline
-: S44 21 ; inline
+CONSTANT: S11 7
+CONSTANT: S12 12
+CONSTANT: S13 17
+CONSTANT: S14 22
+CONSTANT: S21 5
+CONSTANT: S22 9
+CONSTANT: S23 14
+CONSTANT: S24 20
+CONSTANT: S31 4
+CONSTANT: S32 11
+CONSTANT: S33 16
+CONSTANT: S34 23
+CONSTANT: S41 6
+CONSTANT: S42 10
+CONSTANT: S43 15
+CONSTANT: S44 21
 
-: (process-md5-block-F) ( block -- block )
-    dup S11 1  0  [ F ] ABCD
-    dup S12 2  1  [ F ] DABC
-    dup S13 3  2  [ F ] CDAB
-    dup S14 4  3  [ F ] BCDA
-    dup S11 5  4  [ F ] ABCD
-    dup S12 6  5  [ F ] DABC
-    dup S13 7  6  [ F ] CDAB
-    dup S14 8  7  [ F ] BCDA
-    dup S11 9  8  [ F ] ABCD
-    dup S12 10 9  [ F ] DABC
-    dup S13 11 10 [ F ] CDAB
-    dup S14 12 11 [ F ] BCDA
-    dup S11 13 12 [ F ] ABCD
-    dup S12 14 13 [ F ] DABC
-    dup S13 15 14 [ F ] CDAB
-    dup S14 16 15 [ F ] BCDA ;
+MACRO: with-md5-round ( ops func -- )
+    '[ [ _ (ABCD) ] compose ] map '[ _ cleave ] ;
 
-: (process-md5-block-G) ( block -- block )
-    dup S21 17 1  [ G ] ABCD
-    dup S22 18 6  [ G ] DABC
-    dup S23 19 11 [ G ] CDAB
-    dup S24 20 0  [ G ] BCDA
-    dup S21 21 5  [ G ] ABCD
-    dup S22 22 10 [ G ] DABC
-    dup S23 23 15 [ G ] CDAB
-    dup S24 24 4  [ G ] BCDA
-    dup S21 25 9  [ G ] ABCD
-    dup S22 26 14 [ G ] DABC
-    dup S23 27 3  [ G ] CDAB
-    dup S24 28 8  [ G ] BCDA
-    dup S21 29 13 [ G ] ABCD
-    dup S22 30 2  [ G ] DABC
-    dup S23 31 7  [ G ] CDAB
-    dup S24 32 12 [ G ] BCDA ;
+: (process-md5-block-F) ( block -- )
+    {
+        [ a b c d 0  S11 1  ]
+        [ d a b c 1  S12 2  ]
+        [ c d a b 2  S13 3  ]
+        [ b c d a 3  S14 4  ]
+        [ a b c d 4  S11 5  ]
+        [ d a b c 5  S12 6  ]
+        [ c d a b 6  S13 7  ]
+        [ b c d a 7  S14 8  ]
+        [ a b c d 8  S11 9  ]
+        [ d a b c 9  S12 10 ]
+        [ c d a b 10 S13 11 ]
+        [ b c d a 11 S14 12 ]
+        [ a b c d 12 S11 13 ]
+        [ d a b c 13 S12 14 ]
+        [ c d a b 14 S13 15 ]
+        [ b c d a 15 S14 16 ]
+    } [ F ] with-md5-round ;
 
-: (process-md5-block-H) ( block -- block )
-    dup S31 33 5  [ H ] ABCD
-    dup S32 34 8  [ H ] DABC
-    dup S33 35 11 [ H ] CDAB
-    dup S34 36 14 [ H ] BCDA
-    dup S31 37 1  [ H ] ABCD
-    dup S32 38 4  [ H ] DABC
-    dup S33 39 7  [ H ] CDAB
-    dup S34 40 10 [ H ] BCDA
-    dup S31 41 13 [ H ] ABCD
-    dup S32 42 0  [ H ] DABC
-    dup S33 43 3  [ H ] CDAB
-    dup S34 44 6  [ H ] BCDA
-    dup S31 45 9  [ H ] ABCD
-    dup S32 46 12 [ H ] DABC
-    dup S33 47 15 [ H ] CDAB
-    dup S34 48 2  [ H ] BCDA ;
+: (process-md5-block-G) ( block -- )
+    {
+        [ a b c d 1  S21 17 ]
+        [ d a b c 6  S22 18 ]
+        [ c d a b 11 S23 19 ]
+        [ b c d a 0  S24 20 ]
+        [ a b c d 5  S21 21 ]
+        [ d a b c 10 S22 22 ]
+        [ c d a b 15 S23 23 ]
+        [ b c d a 4  S24 24 ]
+        [ a b c d 9  S21 25 ]
+        [ d a b c 14 S22 26 ]
+        [ c d a b 3  S23 27 ]
+        [ b c d a 8  S24 28 ]
+        [ a b c d 13 S21 29 ]
+        [ d a b c 2  S22 30 ]
+        [ c d a b 7  S23 31 ]
+        [ b c d a 12 S24 32 ]
+    } [ G ] with-md5-round ;
 
-: (process-md5-block-I) ( block -- block )
-    dup S41 49 0  [ I ] ABCD
-    dup S42 50 7  [ I ] DABC
-    dup S43 51 14 [ I ] CDAB
-    dup S44 52 5  [ I ] BCDA
-    dup S41 53 12 [ I ] ABCD
-    dup S42 54 3  [ I ] DABC
-    dup S43 55 10 [ I ] CDAB
-    dup S44 56 1  [ I ] BCDA
-    dup S41 57 8  [ I ] ABCD
-    dup S42 58 15 [ I ] DABC
-    dup S43 59 6  [ I ] CDAB
-    dup S44 60 13 [ I ] BCDA
-    dup S41 61 4  [ I ] ABCD
-    dup S42 62 11 [ I ] DABC
-    dup S43 63 2  [ I ] CDAB
-    dup S44 64 9  [ I ] BCDA ;
+: (process-md5-block-H) ( block -- )
+    {
+        [ a b c d 5  S31 33 ]
+        [ d a b c 8  S32 34 ]
+        [ c d a b 11 S33 35 ]
+        [ b c d a 14 S34 36 ]
+        [ a b c d 1  S31 37 ]
+        [ d a b c 4  S32 38 ]
+        [ c d a b 7  S33 39 ]
+        [ b c d a 10 S34 40 ]
+        [ a b c d 13 S31 41 ]
+        [ d a b c 0  S32 42 ]
+        [ c d a b 3  S33 43 ]
+        [ b c d a 6  S34 44 ]
+        [ a b c d 9  S31 45 ]
+        [ d a b c 12 S32 46 ]
+        [ c d a b 15 S33 47 ]
+        [ b c d a 2  S34 48 ]
+    } [ H ] with-md5-round ;
+
+: (process-md5-block-I) ( block -- )
+    {
+        [ a b c d 0  S41 49 ]
+        [ d a b c 7  S42 50 ]
+        [ c d a b 14 S43 51 ]
+        [ b c d a 5  S44 52 ]
+        [ a b c d 12 S41 53 ]
+        [ d a b c 3  S42 54 ]
+        [ c d a b 10 S43 55 ]
+        [ b c d a 1  S44 56 ]
+        [ a b c d 8  S41 57 ]
+        [ d a b c 15 S42 58 ]
+        [ c d a b 6  S43 59 ]
+        [ b c d a 13 S44 60 ]
+        [ a b c d 4  S41 61 ]
+        [ d a b c 11 S42 62 ]
+        [ c d a b 2  S43 63 ]
+        [ b c d a 9  S44 64 ]
+    } [ I ] with-md5-round ;
 
 : (process-md5-block) ( block -- )
-    4 <groups> [ le> ] map
-
-    (process-md5-block-F)
-    (process-md5-block-G)
-    (process-md5-block-H)
-    (process-md5-block-I)
-
-    drop
+    4 <groups> [ le> ] map {
+        [ (process-md5-block-F) ]
+        [ (process-md5-block-G) ]
+        [ (process-md5-block-H) ]
+        [ (process-md5-block-I) ]
+    } cleave
 
     update-md ;
 

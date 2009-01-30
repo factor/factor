@@ -88,7 +88,7 @@ TUPLE: slides < book ;
 : prev-page ( book -- ) -1 change-page ;
 
 : (strip-tease) ( data n -- data )
-    >r first3 r> head 3array ;
+    [ first3 ] dip head 3array ;
 
 : strip-tease ( data -- seq )
     dup third length 1- [

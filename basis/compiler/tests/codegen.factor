@@ -75,7 +75,7 @@ unit-test
     -12 -13 [ [ 0 swap fixnum-fast ] bi@ ] compile-call
 ] unit-test
 
-[ -1 2 ] [ 1 2 [ >r 0 swap fixnum- r> ] compile-call ] unit-test
+[ -1 2 ] [ 1 2 [ [ 0 swap fixnum- ] dip ] compile-call ] unit-test
 
 [ 12 13 ] [
     -12 -13 [ [ 0 swap fixnum- ] bi@ ] compile-call
@@ -88,13 +88,13 @@ unit-test
 ! Test slow shuffles
 [ 3 1 2 3 4 5 6 7 8 9 ] [
     1 2 3 4 5 6 7 8 9
-    [ >r >r >r >r >r >r >r >r >r 3 r> r> r> r> r> r> r> r> r> ]
+    [ [ [ [ [ [ [ [ [ [ 3 ] dip ] dip ] dip ] dip ] dip ] dip ] dip ] dip ] dip ]
     compile-call
 ] unit-test
 
 [ 2 2 2 2 2 2 2 2 2 2 1 ] [
     1 2
-    [ swap >r dup dup dup dup dup dup dup dup dup r> ] compile-call
+    [ swap [ dup dup dup dup dup dup dup dup dup ] dip ] compile-call
 ] unit-test
 
 [ ] [ [ 9 [ ] times ] compile-call ] unit-test
@@ -110,7 +110,7 @@ unit-test
     float+ swap { [ "hey" ] [ "bye" ] } dispatch ;
 
 : try-breaking-dispatch-2 ( -- ? )
-    1 1.0 2.5 try-breaking-dispatch "bye" = >r 3.5 = r> and ;
+    1 1.0 2.5 try-breaking-dispatch "bye" = [ 3.5 = ] dip and ;
 
 [ t ] [
     10000000 [ drop try-breaking-dispatch-2 ] all?
@@ -131,10 +131,10 @@ unit-test
     2dup 1 slot eq? [ 2drop ] [ 
         2dup array-nth tombstone? [ 
             [
-                [ array-nth ] 2keep >r 1 fixnum+fast r> array-nth
+                [ array-nth ] 2keep [ 1 fixnum+fast ] dip array-nth
                 pick 2dup hellish-bug-1 3drop
             ] 2keep
-        ] unless >r 2 fixnum+fast r> hellish-bug-2
+        ] unless [ 2 fixnum+fast ] dip hellish-bug-2
     ] if ; inline recursive
 
 : hellish-bug-3 ( hash array -- ) 
@@ -159,9 +159,9 @@ TUPLE: my-tuple ;
 [ 5 ] [ "hi" foox ] unit-test
 
 ! Making sure we don't needlessly unbox/rebox
-[ t 3.0 ] [ 1.0 dup [ dup 2.0 float+ >r eq? r> ] compile-call ] unit-test
+[ t 3.0 ] [ 1.0 dup [ dup 2.0 float+ [ eq? ] dip ] compile-call ] unit-test
 
-[ t 3.0 ] [ 1.0 dup [ dup 2.0 float+ ] compile-call >r eq? r> ] unit-test
+[ t 3.0 ] [ 1.0 dup [ dup 2.0 float+ ] compile-call [ eq? ] dip ] unit-test
 
 [ t ] [ 1.0 dup [ [ 2.0 float+ ] keep ] compile-call nip eq? ] unit-test
 
@@ -188,7 +188,7 @@ TUPLE: my-tuple ;
 
 [ 2 1 ] [
     2 1
-    [ 2dup fixnum< [ >r die r> ] when ] compile-call
+    [ 2dup fixnum< [ [ die ] dip ] when ] compile-call
 ] unit-test
 
 ! Regression
@@ -211,7 +211,7 @@ TUPLE: my-tuple ;
     { tuple vector } 3 slot { word } declare
     dup 1 slot 0 fixnum-bitand { [ ] } dispatch ;
 
-[ t ] [ \ dispatch-alignment-regression compiled>> ] unit-test
+[ t ] [ \ dispatch-alignment-regression optimized>> ] unit-test
 
 [ vector ] [ dispatch-alignment-regression ] unit-test
 
@@ -276,3 +276,9 @@ TUPLE: id obj ;
 
 [ 4 ] [ 2 [ dup fixnum* ] compile-call ] unit-test
 [ 7 ] [ 2 [ dup fixnum* 3 fixnum+fast ] compile-call ] unit-test
+
+TUPLE: cucumber ;
+
+M: cucumber equal? "The cucumber has no equal" throw ;
+
+[ t ] [ [ cucumber ] compile-call cucumber eq? ] unit-test

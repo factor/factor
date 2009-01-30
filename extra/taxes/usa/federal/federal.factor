@@ -56,4 +56,4 @@ M: federal withholding* ( salary w4 tax-table entity -- x )
     ] if ;
 
 : net ( salary w4 collector -- x )
-    >r dupd r> total-withholding - ;
+    [ dupd ] dip total-withholding - ;

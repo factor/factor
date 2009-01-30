@@ -107,7 +107,7 @@ M: editor ungraft*
     editor-font* "" string-height ;
 
 : y>line ( y editor -- line# )
-    line-height / >fixnum ;
+    line-height /i ;
 
 :: point>loc ( point editor -- loc )
     point second editor y>line {
@@ -350,7 +350,7 @@ M: editor gadget-text* editor-string % ;
     dupd editor-select-next mark>caret ;
 
 : editor-select ( from to editor -- )
-    tuck caret>> set-model mark>> set-model ;
+    tuck [ mark>> set-model ] [ caret>> set-model ] 2bi* ;
 
 : select-elt ( editor elt -- )
     [ [ [ editor-caret* ] [ model>> ] bi ] dip prev/next-elt ] [ drop ] 2bi

@@ -1,5 +1,5 @@
 
-USING: kernel accessors locals namespaces sequences sequences.lib threads
+USING: kernel accessors locals namespaces sequences threads
        math math.order math.vectors
        calendar
        colors opengl ui ui.gadgets ui.gestures ui.render
@@ -62,6 +62,16 @@ TUPLE: <trails-gadget> < gadget paused points ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 M: <trails-gadget> pref-dim* ( <trails-gadget> -- dim ) drop { 500 500 } ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: each-percent ( seq quot -- )
+  [
+    dup length
+    dup [ / ] curry
+    [ 1+ ] prepose
+  ] dip compose
+  2each ;                       inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

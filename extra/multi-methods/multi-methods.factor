@@ -31,32 +31,33 @@ SYMBOL: total
 
 : canonicalize-specializer-2 ( specializer -- specializer' )
     [
-        >r
-        {
-            { [ dup integer? ] [ ] }
-            { [ dup word? ] [ hooks get index ] }
-        } cond args get + r>
+        [
+            {
+                { [ dup integer? ] [ ] }
+                { [ dup word? ] [ hooks get index ] }
+            } cond args get +
+        ] dip
     ] assoc-map ;
 
 : canonicalize-specializer-3 ( specializer -- specializer' )
-    >r total get object <array> dup <enum> r> update ;
+    [ total get object <array> dup <enum> ] dip update ;
 
 : canonicalize-specializers ( methods -- methods' hooks )
     [
-        [ >r canonicalize-specializer-0 r> ] assoc-map
+        [ [ canonicalize-specializer-0 ] dip ] assoc-map
 
         0 args set
         V{ } clone hooks set
 
-        [ >r canonicalize-specializer-1 r> ] assoc-map
+        [ [ canonicalize-specializer-1 ] dip ] assoc-map
 
         hooks [ natural-sort ] change
 
-        [ >r canonicalize-specializer-2 r> ] assoc-map
+        [ [ canonicalize-specializer-2 ] dip ] assoc-map
 
         args get hooks get length + total set
 
-        [ >r canonicalize-specializer-3 r> ] assoc-map
+        [ [ canonicalize-specializer-3 ] dip ] assoc-map
 
         hooks get
     ] with-scope ;
@@ -79,8 +80,8 @@ SYMBOL: total
     inline
 
 : topological-sort ( seq quot -- newseq )
-    >r >vector [ dup empty? not ] r>
-    [ dupd maximal-element >r over delete-nth r> ] curry
+    [ >vector [ dup empty? not ] ] dip
+    [ dupd maximal-element [ over delete-nth ] dip ] curry
     [ ] produce nip ; inline
 
 : classes< ( seq1 seq2 -- lt/eq/gt )
@@ -103,7 +104,7 @@ SYMBOL: total
         { 0 [ [ dup ] ] }
         { 1 [ [ over ] ] }
         { 2 [ [ pick ] ] }
-        [ 1- picker [ >r ] [ r> swap ] surround ]
+        [ 1- picker [ dip swap ] curry ]
     } case ;
 
 : (multi-predicate) ( class picker -- quot )
@@ -124,11 +125,11 @@ SYMBOL: total
 ERROR: no-method arguments generic ;
 
 : make-default-method ( methods generic -- quot )
-    >r argument-count r> [ >r narray r> no-method ] 2curry ;
+    [ argument-count ] dip [ [ narray ] dip no-method ] 2curry ;
 
 : multi-dispatch-quot ( methods generic -- quot )
     [ make-default-method ]
-    [ drop [ >r multi-predicate r> ] assoc-map reverse ]
+    [ drop [ [ multi-predicate ] dip ] assoc-map reverse ]
     2bi alist>quot ;
 
 ! Generic words
@@ -172,8 +173,9 @@ M: method-body crossref?
     swap >>props ;
 
 : with-methods ( word quot -- )
-    over >r >r "multi-methods" word-prop
-    r> call r> update-generic ; inline
+    over [
+        [ "multi-methods" word-prop ] dip call
+    ] dip update-generic ; inline
 
 : reveal-method ( method classes generic -- )
     [ set-at ] with-methods ;
@@ -245,7 +247,6 @@ M: no-method error.
     define ; parsing
 
 ! Definition protocol. We qualify core generics here
-USE: qualified
 QUALIFIED: syntax
 
 syntax:M: generic definer drop \ GENERIC: f ;
@@ -253,7 +254,7 @@ syntax:M: generic definer drop \ GENERIC: f ;
 syntax:M: generic definition drop f ;
 
 PREDICATE: method-spec < array
-    unclip generic? >r [ class? ] all? r> and ;
+    unclip generic? [ [ class? ] all? ] dip and ;
 
 syntax:M: method-spec where
     dup unclip method [ ] [ first ] ?if where ;

@@ -1,6 +1,6 @@
-! Copyright (C) 2007 Daniel Ehrenberg
+! Copyright (C) 2007, 2008 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel strings math ;
+USING: sequences kernel strings math fry ;
 IN: sequences.deep
 
 ! All traversal goes in postorder
@@ -14,11 +14,11 @@ M: object branch? drop f ;
 
 : deep-each ( obj quot: ( elt -- ) -- )
     [ call ] 2keep over branch?
-    [ [ deep-each ] curry each ] [ 2drop ] if ; inline recursive
+    [ '[ _ deep-each ] each ] [ 2drop ] if ; inline recursive
 
 : deep-map ( obj quot: ( elt -- elt' ) -- newobj )
     [ call ] keep over branch?
-    [ [ deep-map ] curry map ] [ drop ] if ; inline recursive
+    [ '[ _ deep-map ] map ] [ drop ] if ; inline recursive
 
 : deep-filter ( obj quot: ( elt -- ? ) -- seq )
     over [ pusher [ deep-each ] dip ] dip
@@ -27,7 +27,7 @@ M: object branch? drop f ;
 : (deep-find) ( obj quot: ( elt -- ? ) -- elt ? )
     [ call ] 2keep rot [ drop t ] [
         over branch? [
-            f -rot [ [ nip ] dip (deep-find) ] curry find drop >boolean
+            [ f ] 2dip '[ nip _ (deep-find) ] find drop >boolean
         ] [ 2drop f f ] if  
     ] if ; inline recursive
 
@@ -36,11 +36,21 @@ M: object branch? drop f ;
 : deep-contains? ( obj quot -- ? ) (deep-find) nip ; inline
 
 : deep-all? ( obj quot -- ? )
-    [ not ] compose deep-contains? not ; inline
+    '[ @ not ] deep-contains? not ; inline
+
+: deep-member? ( obj seq -- ? )
+    swap '[
+        _ swap dup branch? [ member? ] [ 2drop f ] if
+    ] deep-find >boolean ;
+
+: deep-subseq? ( subseq seq -- ? )
+    swap '[
+        _ swap dup branch? [ subseq? ] [ 2drop f ] if
+    ] deep-find >boolean ;
 
 : deep-change-each ( obj quot: ( elt -- elt' ) -- )
     over branch? [
-        [ [ call ] keep over [ deep-change-each ] dip ] curry change-each
+        '[ _ [ call ] keep over [ deep-change-each ] dip ] change-each
     ] [ 2drop ] if ; inline recursive
 
 : flatten ( obj -- seq )

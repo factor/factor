@@ -1,11 +1,19 @@
-! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private assocs arrays
 delegate.protocols delegate vectors accessors multiline
-macros words quotations combinators slots fry ;
+macros words quotations combinators slots fry strings ;
 IN: xml.data
 
-TUPLE: name space main url ;
+TUPLE: interpolated var ;
+C: <interpolated> interpolated
+
+UNION: nullable-string string POSTPONE: f ;
+
+TUPLE: name
+    { space nullable-string }
+    { main string }
+    { url nullable-string } ;
 C: <name> name
 
 : ?= ( object/f object/f -- ? )
@@ -17,50 +25,15 @@ C: <name> name
     [ [ main>> ] bi@ ?= ] 2tri and and ;
 
 : <simple-name> ( string -- name )
+    "" swap f <name> ;
+
+: <null-name> ( string -- name )
     f swap f <name> ;
 
 : assure-name ( string/name -- name )
-    dup name? [ <simple-name> ] unless ;
+    dup name? [ <null-name> ] unless ;
 
-TUPLE: opener name attrs ;
-C: <opener> opener
-
-TUPLE: closer name ;
-C: <closer> closer
-
-TUPLE: contained name attrs ;
-C: <contained> contained
-
-TUPLE: comment text ;
-C: <comment> comment
-
-TUPLE: directive ;
-
-TUPLE: element-decl < directive name content-spec ;
-C: <element-decl> element-decl
-
-TUPLE: attlist-decl < directive name att-defs ;
-C: <attlist-decl> attlist-decl
-
-TUPLE: entity-decl < directive name def ;
-C: <entity-decl> entity-decl
-
-TUPLE: system-id system-literal ;
-C: <system-id> system-id
-
-TUPLE: public-id pubid-literal system-literal ;
-C: <public-id> public-id
-
-TUPLE: doctype-decl < directive name external-id internal-subset ;
-C: <doctype-decl> doctype-decl
-
-TUPLE: instruction text ;
-C: <instruction> instruction
-
-TUPLE: prolog version encoding standalone ;
-C: <prolog> prolog
-
-TUPLE: attrs alist ;
+TUPLE: attrs { alist sequence } ;
 C: <attrs> attrs
 
 : attr@ ( key alist -- index {key,value} )
@@ -92,22 +65,96 @@ M: attrs assoc-like
 M: attrs clear-assoc
     f >>alist drop ;
 M: attrs delete-at
-    tuck attr@ drop [ swap alist>> delete-nth ] [ drop ] if* ;
+    [ nip ] [ attr@ drop ] 2bi
+    [ swap alist>> delete-nth ] [ drop ] if* ;
 
 M: attrs clone
     alist>> clone <attrs> ;
 
 INSTANCE: attrs assoc
 
-TUPLE: tag name attrs children ;
+TUPLE: opener { name name } { attrs attrs } ;
+C: <opener> opener
+
+TUPLE: closer { name name } ;
+C: <closer> closer
+
+TUPLE: contained { name name } { attrs attrs } ;
+C: <contained> contained
+
+TUPLE: comment { text string } ;
+C: <comment> comment
+
+TUPLE: directive ;
+
+TUPLE: element-decl < directive
+    { name string }
+    { content-spec string } ;
+C: <element-decl> element-decl
+
+TUPLE: attlist-decl < directive
+    { name string }
+    { att-defs string } ;
+C: <attlist-decl> attlist-decl
+
+UNION: boolean t POSTPONE: f ;
+
+TUPLE: entity-decl < directive
+    { name string }
+    { def string }
+    { pe? boolean } ;
+C: <entity-decl> entity-decl
+
+TUPLE: system-id { system-literal string } ;
+C: <system-id> system-id
+
+TUPLE: public-id { pubid-literal string } { system-literal string } ;
+C: <public-id> public-id
+
+UNION: id system-id public-id POSTPONE: f ;
+
+TUPLE: dtd
+    { directives sequence }
+    { entities assoc }
+    { parameter-entities assoc } ;
+C: <dtd> dtd
+
+UNION: dtd/f dtd POSTPONE: f ;
+
+TUPLE: doctype-decl < directive
+    { name string }
+    { external-id id }
+    { internal-subset dtd/f } ;
+C: <doctype-decl> doctype-decl
+
+TUPLE: notation-decl < directive
+    { name string }
+    { id string } ;
+C: <notation-decl> notation-decl
+
+TUPLE: instruction { text string } ;
+C: <instruction> instruction
+
+TUPLE: prolog
+    { version string }
+    { encoding string }
+    { standalone boolean } ;
+C: <prolog> prolog
+
+TUPLE: tag
+    { name name }
+    { attrs attrs }
+    { children sequence } ;
 
 : <tag> ( name attrs children -- tag )
     [ assure-name ] [ T{ attrs } assoc-like ] [ ] tri*
     tag boa ;
 
-! For convenience, tags follow the assoc protocol too (for attrs)
-CONSULT: assoc-protocol tag attrs>> ;
-INSTANCE: tag assoc
+: attr ( tag/xml name -- string )
+    swap attrs>> at ;
+
+: set-attr ( tag/xml value name -- )
+    rot attrs>> set-at ;
 
 ! They also follow the sequence protocol (for children)
 CONSULT: sequence-protocol tag children>> ;
@@ -131,14 +178,15 @@ MACRO: clone-slots ( class -- tuple )
 M: tag clone
     tag clone-slots ;
 
-TUPLE: xml prolog before body after ;
+TUPLE: xml
+    { prolog prolog }
+    { before sequence }
+    { body tag }
+    { after sequence } ;
 C: <xml> xml
 
 CONSULT: sequence-protocol xml body>> ;
 INSTANCE: xml sequence
-
-CONSULT: assoc-protocol xml body>> ;
-INSTANCE: xml assoc
 
 CONSULT: tag xml body>> ;
 
@@ -167,3 +215,15 @@ M: xml like
 
 PREDICATE: contained-tag < tag children>> not ;
 PREDICATE: open-tag < tag children>> ;
+
+TUPLE: unescaped string ;
+C: <unescaped> unescaped
+
+UNION: xml-data
+    tag comment string directive instruction unescaped ;
+
+TUPLE: xml-chunk seq ;
+C: <xml-chunk> xml-chunk
+
+CONSULT: sequence-protocol xml-chunk seq>> ;
+INSTANCE: xml-chunk sequence

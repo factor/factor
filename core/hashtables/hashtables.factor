@@ -77,7 +77,7 @@ TUPLE: hashtable
     [ deleted>> 10 fixnum*fast ] [ count>> ] bi fixnum> ; inline
 
 : grow-hash ( hash -- )
-    [ dup >alist swap assoc-size 1+ ] keep
+    [ [ >alist ] [ assoc-size 1+ ] bi ] keep
     [ reset-hash ] keep
     swap (rehash) ; inline
 
@@ -104,7 +104,7 @@ M: hashtable clear-assoc ( hash -- )
     [ init-hash ] [ array>> [ drop ((empty)) ] change-each ] bi ;
 
 M: hashtable delete-at ( key hash -- )
-    tuck key@ [
+    [ nip ] [ key@ ] 2bi [
         [ ((tombstone)) dup ] 2dip set-nth-pair
         hash-deleted+
     ] [

@@ -97,10 +97,10 @@ X: XOR 0 316 31
 X: XOR. 1 316 31
 X1: EXTSB 0 954 31
 X1: EXTSB. 1 954 31
-: FMR ( a s -- ) 0 -rot 72 0 63 x-insn ;
-: FMR. ( a s -- ) 0 -rot 72 1 63 x-insn ;
-: FCTIWZ ( a s -- ) 0 -rot 0 15 63 x-insn ;
-: FCTIWZ. ( a s -- ) 0 -rot 1 15 63 x-insn ;
+: FMR ( a s -- ) [ 0 ] 2dip 72 0 63 x-insn ;
+: FMR. ( a s -- ) [ 0 ] 2dip 72 1 63 x-insn ;
+: FCTIWZ ( a s -- ) [ 0 ] 2dip 0 15 63 x-insn ;
+: FCTIWZ. ( a s -- ) [ 0 ] 2dip 1 15 63 x-insn ;
 
 ! XO-form
 XO: ADD 0 0 266 31
@@ -189,21 +189,21 @@ MTSPR: LR 8
 MTSPR: CTR 9
 
 ! Pseudo-instructions
-: LI 0 rot ADDI ; inline
-: SUBI neg ADDI ; inline
-: LIS 0 rot ADDIS ; inline
-: SUBIC neg ADDIC ; inline
-: SUBIC. neg ADDIC. ; inline
-: NOT dup NOR ; inline
-: NOT. dup NOR. ; inline
-: MR dup OR ; inline
-: MR. dup OR. ; inline
-: (SLWI) 0 31 pick - ; inline
+: LI ( value dst -- ) 0 rot ADDI ; inline
+: SUBI ( dst src1 src2 -- ) neg ADDI ; inline
+: LIS ( value dst -- ) 0 rot ADDIS ; inline
+: SUBIC ( dst src1 src2 -- ) neg ADDIC ; inline
+: SUBIC. ( dst src1 src2 -- ) neg ADDIC. ; inline
+: NOT ( dst src -- ) dup NOR ; inline
+: NOT. ( dst src -- ) dup NOR. ; inline
+: MR ( dst src -- ) dup OR ; inline
+: MR. ( dst src -- ) dup OR. ; inline
+: (SLWI) ( d a b -- d a b x y ) 0 31 pick - ; inline
 : SLWI ( d a b -- ) (SLWI) RLWINM ;
 : SLWI. ( d a b -- ) (SLWI) RLWINM. ;
-: (SRWI) 32 over - swap 31 ; inline
+: (SRWI) ( d a b -- d a b x y ) 32 over - swap 31 ; inline
 : SRWI ( d a b -- ) (SRWI) RLWINM ;
 : SRWI. ( d a b -- ) (SRWI) RLWINM. ;
-: LOAD32 ( n r -- ) >r w>h/h r> tuck LIS dup rot ORI ;
+: LOAD32 ( n r -- ) [ w>h/h ] dip tuck LIS dup rot ORI ;
 : immediate? ( n -- ? ) HEX: -8000 HEX: 7fff between? ;
 : LOAD ( n r -- ) over immediate? [ LI ] [ LOAD32 ] if ;

@@ -49,8 +49,8 @@ HELP: <pane-control>
 HELP: pane-stream
 { $class-description "Pane streams implement the portion of the " { $link "stream-protocol" } " responsible for output of text, including full support for " { $link "styles" } ". Pane streams also support direct output of gadgets via " { $link write-gadget } " and " { $link print-gadget } ". Pane streams are created by calling " { $link <pane-stream> } "." } ;
 
-HELP: <pane-stream> ( pane -- stream )
-{ $values { "pane" pane } { "stream" "a new " { $link pane-stream } } }
+HELP: <pane-stream>
+{ $values { "pane" pane } { "pane-stream" "a new " { $link pane-stream } } }
 { $description "Creates a new " { $link pane-stream } " for writing to " { $snippet "pane" } "." } ;
 
 { with-pane make-pane } related-words

@@ -3,9 +3,9 @@
 USING: alien.syntax ;
 IN: unix.getfsstat.freebsd
 
-: MNT_WAIT        1       ; inline ! synchronously wait for I/O to complete
-: MNT_NOWAIT      2       ; inline ! start all I/O, but do not wait for it 
-: MNT_LAZY        3       ; inline ! push data not written by filesystem syncer 
-: MNT_SUSPEND     4       ; inline ! Suspend file system after sync 
+CONSTANT: MNT_WAIT        1       ! synchronously wait for I/O to complete
+CONSTANT: MNT_NOWAIT      2       ! start all I/O, but do not wait for it 
+CONSTANT: MNT_LAZY        3       ! push data not written by filesystem syncer 
+CONSTANT: MNT_SUSPEND     4       ! Suspend file system after sync 
 
 FUNCTION: int getfsstat ( statfs* buf, int bufsize, int flags ) ;

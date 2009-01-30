@@ -41,12 +41,15 @@ HELP: +user-assigned-id+
 { $description "The user is responsible for choosing a primary key for tuples inserted with this database type. Keys must be unique or else the database will throw an error. Usually it is better to use a " { $link +db-assigned-id+ } "." } ;
 
 HELP: <generator-bind>
+{ $values { "slot-name" object } { "key" object } { "generator-singleton" object } { "type" object } { "generator-bind" generator-bind } }
 { $description "" } ;
 
 HELP: <literal-bind>
+{ $values { "key" object } { "type" object } { "value" object } { "literal-bind" literal-bind } }
 { $description "" } ;
 
 HELP: <low-level-binding>
+{ $values { "value" object } { "low-level-binding" low-level-binding } }
 { $description "" } ;
 
 HELP: BIG-INTEGER

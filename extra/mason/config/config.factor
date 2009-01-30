@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system io.files namespaces kernel accessors assocs ;
+USING: system io.files io.pathnames namespaces kernel accessors
+assocs ;
 IN: mason.config
 
 ! (Optional) Location for build directories

@@ -15,5 +15,5 @@ HELP: binpack*
 
 HELP: binpack!
 { $values { "items" sequence } { "quot" quotation } { "n" "number of bins" } { "bins" "packed bins" } } 
-{ $description "Packs a sequence of items into the specified number of bins, using the quotatino to determine the weight." } ;
+{ $description "Packs a sequence of items into the specified number of bins, using the quotation to determine the weight." } ;
 

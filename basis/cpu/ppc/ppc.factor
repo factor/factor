@@ -34,7 +34,7 @@ M: ppc two-operand? f ;
 
 M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
-M: ppc %load-indirect ( reg obj -- )
+M: ppc %load-reference ( reg obj -- )
     [ 0 swap LOAD32 ] [ rc-absolute-ppc-2/2 rel-immediate ] bi* ;
 
 M: ppc %alien-global ( register symbol dll -- )
@@ -261,7 +261,7 @@ M:: ppc %fixnum-mul-tail ( src1 src2 temp1 temp2 -- )
 M:: ppc %integer>bignum ( dst src temp -- )
     [
         "end" define-label
-        dst 0 >bignum %load-indirect
+        dst 0 >bignum %load-reference
         ! Is it zero? Then just go to the end and return this zero
         0 src 0 CMPI
         "end" get BEQ
@@ -321,7 +321,7 @@ M:: ppc %integer>float ( dst src -- )
     scratch-reg dup HEX: 8000 XORIS
     scratch-reg 1 4 scratch@ STW
     dst 1 0 scratch@ LFD
-    scratch-reg 4503601774854144.0 %load-indirect
+    scratch-reg 4503601774854144.0 %load-reference
     fp-scratch-reg scratch-reg float-offset LFD
     dst dst fp-scratch-reg FSUB ;
 
@@ -467,26 +467,28 @@ M: ppc %gc
 M: ppc %prologue ( n -- )
     0 11 LOAD32 rc-absolute-ppc-2/2 rel-this
     0 MFLR
-    1 1 pick neg ADDI
-    11 1 pick xt-save STW
-    dup 11 LI
-    11 1 pick next-save STW
-    0 1 rot lr-save + STW ;
+    {
+        [ [ 1 1 ] dip neg ADDI ]
+        [ [ 11 1 ] dip xt-save STW ]
+        [ 11 LI ]
+        [ [ 11 1 ] dip next-save STW ]
+        [ [ 0 1 ] dip lr-save + STW ]
+    } cleave ;
 
 M: ppc %epilogue ( n -- )
     #! At the end of each word that calls a subroutine, we store
     #! the previous link register value in r0 by popping it off
     #! the stack, set the link register to the contents of r0,
     #! and jump to the link register.
-    0 1 pick lr-save + LWZ
-    1 1 rot ADDI
+    [ [ 0 1 ] dip lr-save + LWZ ]
+    [ [ 1 1 ] dip ADDI ] bi
     0 MTLR ;
 
 :: (%boolean) ( dst temp word -- )
     "end" define-label
     dst \ f tag-number %load-immediate
     "end" get word execute
-    dst \ t %load-indirect
+    dst \ t %load-reference
     "end" get resolve-label ; inline
 
 : %boolean ( dst temp cc -- )
@@ -541,17 +543,17 @@ GENERIC: STF ( src dst off reg-class -- )
 M: single-float-regs STF drop STFS ;
 M: double-float-regs STF drop STFD ;
 
-M: float-regs %save-param-reg >r 1 rot local@ r> STF ;
+M: float-regs %save-param-reg [ 1 rot local@ ] dip STF ;
 
 GENERIC: LF ( dst src off reg-class -- )
 
 M: single-float-regs LF drop LFS ;
 M: double-float-regs LF drop LFD ;
 
-M: float-regs %load-param-reg >r 1 rot local@ r> LF ;
+M: float-regs %load-param-reg [ 1 rot local@ ] dip LF ;
 
 M: stack-params %load-param-reg ( stack reg reg-class -- )
-    drop >r 0 1 rot local@ LWZ 0 1 r> param@ STW ;
+    drop [ 0 1 rot local@ LWZ 0 1 ] dip param@ STW ;
 
 : next-param@ ( n -- x ) param@ stack-frame get total-size>> + ;
 
@@ -559,8 +561,8 @@ M: stack-params %save-param-reg ( stack reg reg-class -- )
     #! Funky. Read the parameter from the caller's stack frame.
     #! This word is used in callbacks
     drop
-    0 1 rot next-param@ LWZ
-    0 1 rot local@ STW ;
+    [ 0 1 ] dip next-param@ LWZ
+    [ 0 1 ] dip local@ STW ;
 
 M: ppc %prepare-unbox ( -- )
     ! First parameter is top of stack
@@ -580,14 +582,14 @@ M: ppc %unbox-long-long ( n func -- )
     f %alien-invoke
     ! Store the return value on the C stack
     [
-        3 1 pick local@ STW
-        4 1 rot cell + local@ STW
+        [ [ 3 1 ] dip local@ STW ]
+        [ [ 4 1 ] dip cell + local@ STW ] bi
     ] when* ;
 
 M: ppc %unbox-large-struct ( n c-type -- )
     ! Value must be in r3
     ! Compute destination address and load struct size
-    [ 4 1 rot local@ ADDI ] [ heap-size 5 LI ] bi*
+    [ [ 4 1 ] dip local@ ADDI ] [ heap-size 5 LI ] bi*
     ! Call the function
     "to_value_struct" f %alien-invoke ;
 
@@ -595,15 +597,16 @@ M: ppc %box ( n reg-class func -- )
     ! If the source is a stack location, load it into freg #0.
     ! If the source is f, then we assume the value is already in
     ! freg #0.
-    >r
-    over [ 0 over param-reg swap %load-param-reg ] [ 2drop ] if
-    r> f %alien-invoke ;
+    [ over [ 0 over param-reg swap %load-param-reg ] [ 2drop ] if ] dip
+    f %alien-invoke ;
 
 M: ppc %box-long-long ( n func -- )
-    >r [
-        3 1 pick local@ LWZ
-        4 1 rot cell + local@ LWZ
-    ] when* r> f %alien-invoke ;
+    [
+        [
+            [ [ 3 1 ] dip local@ LWZ ]
+            [ [ 4 1 ] dip cell + local@ LWZ ] bi
+        ] when*
+    ] dip f %alien-invoke ;
 
 : struct-return@ ( n -- n )
     [ stack-frame get params>> ] unless* local@ ;
@@ -616,7 +619,7 @@ M: ppc %prepare-box-struct ( -- )
 M: ppc %box-large-struct ( n c-type -- )
     ! If n = f, then we're boxing a returned struct
     ! Compute destination address and load struct size
-    [ 3 1 rot struct-return@ ADDI ] [ heap-size 4 LI ] bi*
+    [ [ 3 1 ] dip struct-return@ ADDI ] [ heap-size 4 LI ] bi*
     ! Call the function
     "box_value_struct" f %alien-invoke ;
 
@@ -634,7 +637,7 @@ M: ppc %alien-invoke ( symbol dll -- )
     [ 11 ] 2dip %alien-global 11 MTLR BLRL ;
 
 M: ppc %alien-callback ( quot -- )
-    3 swap %load-indirect "c_to_factor" f %alien-invoke ;
+    3 swap %load-reference "c_to_factor" f %alien-invoke ;
 
 M: ppc %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke

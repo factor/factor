@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces sequences prettyprint io.files
-io.launcher make mason.common mason.platform mason.config ;
+USING: io.directories io.files io.launcher kernel make
+mason.common mason.config mason.platform namespaces prettyprint
+sequences ;
 IN: mason.release.branch
 
 : branch-name ( -- string ) "clean-" platform append ;

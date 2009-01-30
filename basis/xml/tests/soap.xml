@@ -25,9 +25,9 @@
 <directoryTitle xsi:type="xsd:string"></directoryTitle>
 <hostName xsi:type="xsd:string"></hostName>
 <relatedInformationPresent xsi:type="xsd:boolean">true</relatedInformationPresent>
-<snippet xsi:type="xsd:string">The O$-1òùReilly &lt;b&gt;Factor&lt;/b&gt; with Bill OòùReilly on FOXNews.com. Bill OòùReilly hosts The &lt;br&gt;  OòùReilly &lt;b&gt;Factor&lt;/b&gt;, the most-watched program on cable news.</snippet>
+<snippet xsi:type="xsd:string">The O$-1òùReilly &lt;b&gt;Factor&lt;/b&gt; with Bill OòùReilly on FOXNews.com. Bill OòùReilly hosts The &lt;br&gt;  OòùReilly &lt;b&gt;Factor&lt;/b&gt;, the most-watched program on cable news.</snippet>
 <summary xsi:type="xsd:string"></summary>
-<title xsi:type="xsd:string">Bill O$-1òùReilly | The OòùReilly &lt;b&gt;Factor&lt;/b&gt; - FOXNews.com</title>
+<title xsi:type="xsd:string">Bill O$-1òùReilly | The OòùReilly &lt;b&gt;Factor&lt;/b&gt; - FOXNews.com</title>
 </item>
 <item xsi:type="ns1:ResultElement">
 <URL xsi:type="xsd:string">http://www.factor.ca/</URL>

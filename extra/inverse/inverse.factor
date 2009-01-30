@@ -4,13 +4,13 @@ USING: accessors kernel words summary slots quotations
 sequences assocs math arrays stack-checker effects generalizations
 continuations debugger classes.tuple namespaces make vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
-sequences.private combinators mirrors
-combinators.short-circuit fry qualified ;
+sequences.private combinators mirrors splitting
+combinators.short-circuit fry words.symbol ;
 RENAME: _ fry => __
 IN: inverse
 
 ERROR: fail ;
-M: fail summary drop "Unification failed" ;
+M: fail summary drop "Matching failed" ;
 
 : assure ( ? -- ) [ fail ] unless ;
 
@@ -19,6 +19,11 @@ M: fail summary drop "Unification failed" ;
 ! Inverse of a quotation
 
 : define-inverse ( word quot -- ) "inverse" set-word-prop ;
+
+: define-dual ( word1 word2 -- )
+    2dup swap [ 1quotation define-inverse ] 2bi@ ;
+
+: define-involution ( word -- ) dup 1quotation define-inverse ;
 
 : define-math-inverse ( word quot1 quot2 -- )
     pick 1quotation 3array "math-inverse" set-word-prop ;
@@ -63,16 +68,20 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
 : enough? ( stack word -- ? )
     dup deferred? [ 2drop f ] [
-        [ [ length ] dip 1quotation infer in>> >= ]
+        [ [ length ] [ 1quotation infer in>> ] bi* >= ]
         [ 3drop f ] recover
     ] if ;
 
 : fold-word ( stack word -- stack )
     2dup enough?
-    [ 1quotation with-datastack ] [ [ % ] dip , { } ] if ;
+    [ 1quotation with-datastack ] [ [ % ] [ , ] bi* { } ] if ;
 
 : fold ( quot -- folded-quot )
-    [ { } swap [ fold-word ] each % ] [ ] make ; 
+    [ { } [ fold-word ] reduce % ] [ ] make ; 
+
+ERROR: no-recursive-inverse ;
+
+SYMBOL: visited
 
 : flattenable? ( object -- ? )
     { [ word? ] [ primitive? not ] [
@@ -80,18 +89,18 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
         [ word-prop ] with contains? not
     ] } 1&& ; 
 
-: (flatten) ( quot -- )
-    [ dup flattenable? [ def>> (flatten) ] [ , ] if ] each ;
-
- : retain-stack-overflow? ( error -- ? )
-    { "kernel-error" 14 f f } = ;
-
 : flatten ( quot -- expanded )
-    [ [ (flatten) ] [ ] make ] [
-        dup retain-stack-overflow?
-        [ drop "No inverse defined on recursive word" ] when
-        throw
-    ] recover ;
+    [
+        visited [ over suffix ] change
+        [
+            dup flattenable? [
+                def>>
+                [ visited get memq? [ no-recursive-inverse ] when ]
+                [ flatten ]
+                bi
+            ] [ 1quotation ] if
+        ] map concat
+    ] with-scope ;
 
 ERROR: undefined-inverse ;
 
@@ -125,31 +134,24 @@ MACRO: undo ( quot -- ) [undo] ;
 
 ! Inverse of selected words
 
-\ swap [ swap ] define-inverse
+\ swap define-involution
 \ dup [ [ =/fail ] keep ] define-inverse
 \ 2dup [ over =/fail over =/fail ] define-inverse
 \ 3dup [ pick =/fail pick =/fail pick =/fail ] define-inverse
 \ pick [ [ pick ] dip =/fail ] define-inverse
 \ tuck [ swapd [ =/fail ] keep ] define-inverse
 
-\ not [ not ] define-inverse
+\ not define-involution
 \ >boolean [ { t f } memq? assure ] define-inverse
 
-\ >r [ r> ] define-inverse
-\ r> [ >r ] define-inverse
-
-\ tuple>array [ >tuple ] define-inverse
-\ >tuple [ tuple>array ] define-inverse
-\ reverse [ reverse ] define-inverse
+\ tuple>array \ >tuple define-dual
+\ reverse define-involution
 
 \ undo 1 [ [ call ] curry ] define-pop-inverse
 \ map 1 [ [undo] [ over sequence? assure map ] curry ] define-pop-inverse
 
-\ exp [ log ] define-inverse
-\ log [ exp ] define-inverse
-\ not [ not ] define-inverse
-\ sq [ sqrt ] define-inverse
-\ sqrt [ sq ] define-inverse
+\ exp \ log define-dual
+\ sq \ sqrt define-dual
 
 ERROR: missing-literal ;
 
@@ -203,9 +205,11 @@ DEFER: _
 \ first3 [ 3array ] define-inverse
 \ first4 [ 4array ] define-inverse
 
-\ prefix [ unclip ] define-inverse
-\ unclip [ prefix ] define-inverse
+\ prefix \ unclip define-dual
 \ suffix [ dup but-last swap peek ] define-inverse
+
+\ append 1 [ [ ?tail assure ] curry ] define-pop-inverse
+\ prepend 1 [ [ ?head assure ] curry ] define-pop-inverse
 
 ! Constructor inverse
 : deconstruct-pred ( class -- quot )

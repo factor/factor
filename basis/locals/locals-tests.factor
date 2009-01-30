@@ -2,7 +2,7 @@ USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
 accessors generic eval combinators combinators.short-circuit
 combinators.short-circuit.smart math.order math.functions
-definitions compiler.units fry lexer ;
+definitions compiler.units fry lexer words.symbol ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -491,3 +491,13 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 [ 10 ] [
     [| | 0 '[ [let | A [ 10 ] | A _ + ] ] call ] call
 ] unit-test
+
+! Discovered by littledan
+[ "bar" ] [ [let | a [ [let | foo [ "bar" ] | foo ] ] | a ] ] unit-test
+[ 10 ] [ [let | a [ 10 ] | [let | b [ a ] | b ] ] ] unit-test
+
+[ { \ + } ] [ [let | x [ \ + ] | { \ x } ] ] unit-test
+
+[ { \ + 3 } ] [ [let | a [ 3 ] | { \ + a } ] ] unit-test
+
+[ 3 ] [ [let | a [ \ + ] | 1 2 [ \ a execute ] ] call ] unit-test

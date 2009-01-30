@@ -136,7 +136,7 @@ ERROR: no-case ;
 
 ! recursive-hashcode
 : recursive-hashcode ( n obj quot -- code )
-    pick 0 <= [ 3drop 0 ] [ rot 1- -rot call ] if ; inline
+    pick 0 <= [ 3drop 0 ] [ [ 1- ] 2dip call ] if ; inline
 
 ! These go here, not in sequences and hashtables, since those
 ! two cannot depend on us

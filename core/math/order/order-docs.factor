@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel math quotations
-math.private words ;
+math.private words words.symbol ;
 IN: math.order
 
 HELP: <=>
@@ -14,6 +14,12 @@ HELP: <=>
         { { $link +gt+ } " - indicating that " { $snippet "obj1" } " follows " { $snippet "obj2" } }
     }
 } ;
+
+HELP: >=<
+{ $values { "obj1" object } { "obj2" object } { ">=<" "an ordering specifier" } }
+{ $description "Compares two objects using the " { $link <=> } " comparator and inverts the output." } ;
+
+{ <=> >=< } related-words
 
 HELP: +lt+
 { $description "Output by " { $link <=> } " when the first object is strictly less than the second object." } ;
@@ -85,6 +91,7 @@ ARTICLE: "order-specifiers" "Ordering specifiers"
 ARTICLE: "math.order" "Linear order protocol"
 "Some classes have an intrinsic order amongst instances:"
 { $subsection <=> }
+{ $subsection >=< }
 { $subsection compare }
 { $subsection invert-comparison }
 "The above words output order specifiers."

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math.parser arrays io.encodings sequences kernel assocs
 hashtables io.encodings.ascii generic parser classes.tuple words
-io io.files splitting namespaces math compiler.units accessors ;
+words.symbol io io.files splitting namespaces math
+compiler.units accessors ;
 IN: io.encodings.8-bit
 
 <PRIVATE

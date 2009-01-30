@@ -12,7 +12,7 @@ SYMBOL: delimiter
 
 CHAR: , delimiter set-global
 
-: delimiter> delimiter get ; inline
+: delimiter> ( -- delimiter ) delimiter get ; inline
     
 DEFER: quoted-field ( -- endchar )
     

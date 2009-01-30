@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions assocs kernel kernel.private
-slots.private namespaces make sequences strings words vectors
-math quotations combinators sorting effects graphs vocabs sets ;
+slots.private namespaces make sequences strings words words.symbol
+vectors math quotations combinators sorting effects graphs
+vocabs sets ;
 IN: classes
 
 SYMBOL: class<=-cache
@@ -161,7 +162,7 @@ GENERIC: update-methods ( class seq -- )
     dup "predicate" word-prop
     dup length 1 = [
         first
-        tuck "predicating" word-prop =
+        [ nip ] [ "predicating" word-prop = ] 2bi
         [ forget ] [ drop ] if
     ] [ 2drop ] if ;
 

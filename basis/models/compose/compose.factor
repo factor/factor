@@ -18,7 +18,8 @@ TUPLE: compose < model ;
 
 M: compose model-changed
     nip
-    [ [ value>> ] composed-value ] keep set-model ;
+    dup [ value>> ] composed-value >>value
+    notify-connections ;
 
 M: compose model-activated dup model-changed ;
 

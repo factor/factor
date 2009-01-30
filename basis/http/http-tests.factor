@@ -1,8 +1,8 @@
-USING: http http.server http.client tools.test multiline
+USING: http http.server http.client http.client.private tools.test multiline
 io.streams.string io.encodings.utf8 io.encodings.8-bit
 io.encodings.binary io.encodings.string kernel arrays splitting
 sequences assocs io.sockets db db.sqlite continuations urls
-hashtables accessors namespaces ;
+hashtables accessors namespaces xml.data ;
 IN: http.tests
 
 [ "text/plain" latin1 ] [ "text/plain" parse-content-type ] unit-test
@@ -35,7 +35,7 @@ blah
         { method "POST" }
         { version "1.1" }
         { header H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } } }
-        { post-data T{ post-data { content "blah" } { raw "blah" } { content-type "application/octet-stream" } } }
+        { post-data T{ post-data { data "blah" } { content-type "application/octet-stream" } } }
         { cookies V{ } }
     }
 ] [
@@ -179,7 +179,7 @@ Set-Cookie: oo="bar; a=b"; comment="your mom"; httponly=yes
 ! Live-fire exercise
 USING: http.server http.server.static furnace.sessions furnace.alloy
 furnace.actions furnace.auth furnace.auth.login furnace.db http.client
-io.servers.connection io.files io io.encodings.ascii
+io.servers.connection io.files io.files.temp io.directories io io.encodings.ascii
 accessors namespaces threads
 http.server.responses http.server.redirection furnace.redirection
 http.server.dispatchers db.tuples ;
@@ -322,7 +322,7 @@ SYMBOL: a
 
 3 a set-global
 
-: test-a string>xml "input" tag-named "value" swap at ;
+: test-a string>xml "input" tag-named "value" attr ;
 
 [ "3" ] [
     "http://localhost/" add-port http-get

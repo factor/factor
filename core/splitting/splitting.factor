@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math make strings arrays vectors sequences
 sets math.order accessors ;
@@ -16,19 +16,23 @@ IN: splitting
 : ?tail-slice ( seq end -- newseq ? )
     2dup tail? [ length head-slice* t ] [ drop f ] if ;
 
+: (split1) ( seq subseq -- start end ? )
+    tuck swap start dup
+    [ swap [ drop ] [ length + ] 2bi t ]
+    [ 2drop f f f ]
+    if ;
+
 : split1 ( seq subseq -- before after )
-    dup pick start dup [
-        [ [ over ] dip head -rot length ] keep + tail
-    ] [
-        2drop f
-    ] if ;
+    [ drop ] [ (split1) ] 2bi
+    [ [ over ] dip [ head ] [ tail ] 2bi* ]
+    [ 2drop f ]
+    if ;
 
 : split1-slice ( seq subseq -- before-slice after-slice )
-    dup pick start dup [
-        [ [ over ] dip head-slice -rot length ] keep + tail-slice
-    ] [
-        2drop f
-    ] if ;
+    [ drop ] [ (split1) ] 2bi
+    [ [ over ] dip [ head-slice ] [ tail-slice ] 2bi* ]
+    [ 2drop f ]
+    if ;
 
 : split1-last ( seq subseq -- before after )
     [ <reversed> ] bi@ split1 [ reverse ] bi@
@@ -48,12 +52,12 @@ IN: splitting
 : split ( seq separators -- pieces ) [ split, ] { } make ;
 
 : string-lines ( str -- seq )
-    dup "\r\n" intersect empty? [
-        1array
-    ] [
+    dup "\r\n" intersects? [
         "\n" split [
             but-last-slice [
                 "\r" ?tail drop "\r" split
             ] map
         ] keep peek "\r" split suffix concat
+    ] [
+        1array
     ] if ;

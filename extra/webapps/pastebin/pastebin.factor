@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs sorting sequences kernel accessors
-hashtables sequences.lib db.types db.tuples db combinators
+hashtables db.types db.tuples db combinators
 calendar calendar.format math.parser math.order syndication urls
 xml.writer xmode.catalog validators
 html.forms

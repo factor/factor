@@ -6,7 +6,7 @@ math.parser math.order layouts words sequences sequences.private
 arrays assocs classes classes.algebra combinators generic.math
 splitting fry locals classes.tuple alien.accessors
 classes.tuple.private slots.private definitions strings.private
-vectors hashtables
+vectors hashtables generic
 stack-checker.state
 compiler.tree.comparisons
 compiler.tree.propagation.info
@@ -337,3 +337,12 @@ generic-comparison-ops [
         bi
     ] [ 2drop object-info ] if
 ] "outputs" set-word-prop
+
+\ equal? [
+    ! If first input has a known type and second input is an
+    ! object, we convert this to [ swap equal? ].
+    in-d>> first2 value-info class>> object class= [
+        value-info class>> \ equal? specific-method
+        [ swap equal? ] f ?
+    ] [ drop f ] if
+] "custom-inlining" set-word-prop

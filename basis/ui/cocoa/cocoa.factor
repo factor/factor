@@ -3,10 +3,11 @@
 USING: accessors math arrays assocs cocoa cocoa.application
 command-line kernel memory namespaces cocoa.messages
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
-cocoa.windows cocoa.classes cocoa.nibs sequences system
-ui ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
-ui.cocoa.views core-foundation threads math.geometry.rect fry
-libc generalizations alien.c-types cocoa.views combinators ;
+cocoa.windows cocoa.classes cocoa.nibs sequences system ui
+ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
+ui.cocoa.views core-foundation core-foundation.run-loop threads
+math.geometry.rect fry libc generalizations alien.c-types
+cocoa.views combinators io.thread ;
 IN: ui.cocoa
 
 TUPLE: handle ;
@@ -17,9 +18,6 @@ C: <window-handle> window-handle
 C: <offscreen-handle> offscreen-handle
 
 SINGLETON: cocoa-ui-backend
-
-M: cocoa-ui-backend do-events ( -- )
-    [ NSApp '[ _ do-event ] loop ui-wait ] with-autorelease-pool ;
 
 TUPLE: pasteboard handle ;
 
@@ -134,8 +132,8 @@ CLASS: {
     { +name+ "FactorApplicationDelegate" }
 }
 
-{ "applicationDidFinishLaunching:" "void" { "id" "SEL" "id" }
-    [ 3drop event-loop ]
+{  "applicationDidUpdate:" "void" { "id" "SEL" "id" }
+    [ 3drop reset-run-loop ]
 } ;
 
 : install-app-delegate ( -- )
@@ -153,6 +151,9 @@ M: cocoa-ui-backend ui
             init-clipboard
             cocoa-init-hook get call
             start-ui
+            f io-thread-running? set-global
+            init-thread-timer
+            reset-run-loop
             NSApp -> run
         ] ui-running
     ] with-cocoa ;

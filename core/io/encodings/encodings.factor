@@ -32,9 +32,9 @@ M: object <decoder> f decoder boa ;
 
 <PRIVATE
 
-: cr+ t >>cr drop ; inline
+: cr+ ( stream -- ) t >>cr drop ; inline
 
-: cr- f >>cr drop ; inline
+: cr- ( stream -- ) f >>cr drop ; inline
 
 : >decoder< ( decoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ; inline

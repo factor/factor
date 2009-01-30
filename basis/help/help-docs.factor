@@ -36,6 +36,7 @@ ARTICLE: "block-elements" "Block elements"
 "Elements used in " { $link $values } " forms:"
 { $subsection $instance }
 { $subsection $maybe }
+{ $subsection $or }
 { $subsection $quotation }
 "Boilerplate paragraphs:"
 { $subsection $low-level-note }
@@ -88,6 +89,12 @@ $nl
     { "an array of markup elements," }
     { "or an array of the form " { $snippet "{ $directive content... }" } ", where " { $snippet "$directive" } " is a markup word whose name starts with " { $snippet "$" } ", and " { $snippet "content..." } " is a series of markup elements" }
 }
+"Here is a more formal schema for the help markup language:"
+{ $code
+"<element> ::== <string> | <simple-element> | <fancy-element>"
+"<simple-element> ::== { <element>* }"
+"<fancy-element> ::== { <type> <element> }"
+}
 { $subsection "element-types" }
 { $subsection "printing-elements" }
 "Related words can be cross-referenced:"
@@ -119,7 +126,7 @@ ARTICLE: "help" "Help system"
 "The help system maintains documentation written in a simple markup language, along with cross-referencing and search. Documentation can either exist as free-standing " { $emphasis "articles" } " or be associated with words."
 { $subsection "browsing-help" }
 { $subsection "writing-help" }
-{ $vocab-subsection "Help lint tool" "help.lint" }
+{ $subsection "help.lint" }
 { $subsection "help-impl" } ;
 
 IN: help
@@ -327,7 +334,7 @@ HELP: $table
 
 HELP: $values
 { $values { "element" "an array of pairs of markup elements" } }
-{ $description "Prints the description of arguments and values found on every word help page. The first element of a pair is the argument name and is output with " { $link $snippet } ". The remainder is either a single class word, or an element. If it is a class word " { $snippet "class" } ", it is intereted as if it were shorthand for " { $snippet "{ $instance class }" } "." }
+{ $description "Prints the description of arguments and values found on every word help page. The first element of a pair is the argument name and is output with " { $link $snippet } ". The remainder is either a single class word, or an element. If it is a class word " { $snippet "class" } ", it is inserted as if it were shorthand for " { $snippet "{ $instance class }" } "." }
 { $see-also $maybe $instance $quotation } ;
 
 HELP: $instance

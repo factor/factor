@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel system unicode.case
-io.unix.files tools.files generalizations strings
-arrays sequences io.files math.parser unix.groups unix.users
-tools.files.private unix.stat math ;
+USING: accessors combinators kernel system unicode.case io.files
+io.files.info io.files.info.unix generalizations
+strings arrays sequences math.parser unix.groups unix.users
+tools.files.private unix.stat math fry macros combinators.smart
+io.files.info.unix io tools.files math.order prettyprint ;
 IN: tools.files.unix
 
 <PRIVATE
@@ -17,18 +18,20 @@ IN: tools.files.unix
     } case ;
 
 : permissions-string ( permissions -- str )
-    {
-        [ type>> file-type>ch 1string ]
-        [ user-read? read>string ]
-        [ user-write? write>string ]
-        [ [ uid? ] [ user-execute? ] bi 2array "s" unix-execute>string ]
-        [ group-read? read>string ]
-        [ group-write? write>string ]
-        [ [ gid? ] [ group-execute? ] bi 2array "s" unix-execute>string ]
-        [ other-read? read>string ]
-        [ other-write? write>string ]
-        [ [ sticky? ] [ other-execute? ] bi 2array "t" unix-execute>string ]
-    } cleave 10 narray concat ;
+    [
+        {
+            [ type>> file-type>ch 1string ]
+            [ user-read? read>string ]
+            [ user-write? write>string ]
+            [ [ uid? ] [ user-execute? ] bi 2array "s" unix-execute>string ]
+            [ group-read? read>string ]
+            [ group-write? write>string ]
+            [ [ gid? ] [ group-execute? ] bi 2array "s" unix-execute>string ]
+            [ other-read? read>string ]
+            [ other-write? write>string ]
+            [ [ sticky? ] [ other-execute? ] bi 2array "t" unix-execute>string ]
+        } cleave
+    ] output>array concat ;
 
 : mode>symbol ( mode -- ch )
     S_IFMT bitand
@@ -43,18 +46,23 @@ IN: tools.files.unix
     } cond ;
 
 M: unix (directory.) ( path -- lines )
-    [ [
-        [
-            dup file-info
-            {
-                [ permissions-string ]
-                [ nlink>> number>string 3 CHAR: \s pad-left ]
-                ! [ uid>> ]
-                ! [ gid>> ]
-                [ size>> number>string 15 CHAR: \s pad-left ]
-                [ modified>> ls-timestamp ]
-            } cleave 4 narray swap suffix " " join
-        ] map
-    ] with-group-cache ] with-user-cache ;
+    <listing-tool>
+        { permissions nlinks user group file-size file-date file-name } >>specs
+        { { directory-entry>> name>> <=> } } >>sort
+    [ [ list-files ] with-group-cache ] with-user-cache ;
+
+M: unix file-spec>string ( file-listing spec -- string )
+    {
+        { file-name/type [
+            directory-entry>> [ name>> ] [ file-type>trailing ] bi append
+        ] }
+        { permissions [ file-info>> permissions-string ] }
+        { nlinks [ file-info>> nlink>> number>string ] }
+        { user [ file-info>> uid>> user-name ] }
+        { group [ file-info>> gid>> group-name ] }
+        { uid [ file-info>> uid>> number>string ] }
+        { gid [ file-info>> gid>> number>string ] }
+        [ call-next-method ]
+    } case ;
 
 PRIVATE>

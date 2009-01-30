@@ -3,7 +3,7 @@
 
 USING: accessors kernel threads combinators concurrency.mailboxes
        sequences strings hashtables splitting fry assocs hashtables colors
-       sorting qualified unicode.collation math.order
+       sorting unicode.collation math.order
        ui ui.gadgets ui.gadgets.panes ui.gadgets.editors
        ui.gadgets.scrollers ui.commands ui.gadgets.frames ui.gestures
        ui.gadgets.tabs ui.gadgets.grids ui.gadgets.packs ui.gadgets.labels

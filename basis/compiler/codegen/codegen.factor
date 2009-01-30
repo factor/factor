@@ -1,9 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
-alien.strings alien.arrays sets threads libc continuations.private
+alien.strings alien.arrays sets libc continuations.private
 fry cpu.architecture
 compiler.errors
 compiler.alien
@@ -11,7 +11,8 @@ compiler.cfg
 compiler.cfg.instructions
 compiler.cfg.registers
 compiler.cfg.builder
-compiler.codegen.fixup ;
+compiler.codegen.fixup
+compiler.utilities ;
 IN: compiler.codegen
 
 GENERIC: generate-insn ( insn -- )
@@ -69,8 +70,8 @@ SYMBOL: labels
 M: ##load-immediate generate-insn
     [ dst>> register ] [ val>> ] bi %load-immediate ;
 
-M: ##load-indirect generate-insn
-    [ dst>> register ] [ obj>> ] bi %load-indirect ;
+M: ##load-reference generate-insn
+    [ dst>> register ] [ obj>> ] bi %load-reference ;
 
 M: ##peek generate-insn
     [ dst>> register ] [ loc>> ] bi %peek ;
@@ -95,7 +96,7 @@ M: ##dispatch-label generate-insn label>> %dispatch-label ;
 M: ##dispatch generate-insn
     [ src>> register ] [ temp>> register ] [ offset>> ] tri %dispatch ;
 
-: >slot<
+: >slot< ( insn -- dst obj slot tag )
     {
         [ dst>> register ]
         [ obj>> register ]
@@ -109,7 +110,7 @@ M: ##slot generate-insn
 M: ##slot-imm generate-insn
     >slot< %slot-imm ;
 
-: >set-slot<
+: >set-slot< ( insn -- src obj slot tag )
     {
         [ src>> register ]
         [ obj>> register ]
@@ -209,7 +210,8 @@ M: ##alien-cell       generate-insn dst/src %alien-cell       ;
 M: ##alien-float      generate-insn dst/src %alien-float      ;
 M: ##alien-double     generate-insn dst/src %alien-double     ;
 
-: >alien-setter< [ src>> register ] [ value>> register ] bi ; inline
+: >alien-setter< ( insn -- src value )
+    [ src>> register ] [ value>> register ] bi ; inline
 
 M: ##set-alien-integer-1 generate-insn >alien-setter< %set-alien-integer-1 ;
 M: ##set-alien-integer-2 generate-insn >alien-setter< %set-alien-integer-2 ;
@@ -462,7 +464,7 @@ TUPLE: callback-context ;
     dup current-callback eq? [
         drop
     ] [
-        yield wait-to-return
+        yield-hook get call wait-to-return
     ] if ;
 
 : do-callback ( quot token -- )

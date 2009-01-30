@@ -22,14 +22,14 @@ TUPLE: x-clipboard atom contents ;
     "org.factorcode.Factor.SELECTION" x-atom ;
 
 : convert-selection ( win selection -- )
-    swap >r >r dpy get r> XA_UTF8_STRING selection-property r>
+    swap [ [ dpy get ] dip XA_UTF8_STRING selection-property ] dip
     CurrentTime XConvertSelection drop ;
 
 : snarf-property ( prop-return -- string )
     dup *void* [ *void* ascii alien>string ] [ drop f ] if ;
 
 : window-property ( win prop delete? -- string )
-    >r dpy get -rot 0 -1 r> AnyPropertyType
+    [ [ dpy get ] 2dip 0 -1 ] dip AnyPropertyType
     0 <Atom> 0 <int> 0 <ulong> 0 <ulong> f <void*>
     [ XGetWindowProperty drop ] keep snarf-property ;
 
@@ -41,7 +41,7 @@ TUPLE: x-clipboard atom contents ;
     ] if ;
 
 : own-selection ( prop win -- )
-    dpy get -rot CurrentTime XSetSelectionOwner drop
+    [ dpy get ] 2dip CurrentTime XSetSelectionOwner drop
     flush-dpy ;
 
 : set-targets-prop ( evt -- )
@@ -58,7 +58,7 @@ TUPLE: x-clipboard atom contents ;
     dpy get swap
     [ XSelectionRequestEvent-requestor ] keep
     [ XSelectionRequestEvent-property ] keep
-    >r "TIMESTAMP" x-atom 32 PropModeReplace r>
+    [ "TIMESTAMP" x-atom 32 PropModeReplace ] dip
     XSelectionRequestEvent-time <int>
     1 XChangeProperty drop ;
 
@@ -71,7 +71,7 @@ TUPLE: x-clipboard atom contents ;
     over XSelectionRequestEvent-selection over set-XSelectionEvent-selection
     over XSelectionRequestEvent-target    over set-XSelectionEvent-target
     over XSelectionRequestEvent-time      over set-XSelectionEvent-time
-    >r dpy get swap XSelectionRequestEvent-requestor 0 0 r>
+    [ dpy get swap XSelectionRequestEvent-requestor 0 0 ] dip
     XSendEvent drop
     flush-dpy ;
 

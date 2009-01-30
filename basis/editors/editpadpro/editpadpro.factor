@@ -1,11 +1,12 @@
 USING: definitions kernel parser words sequences math.parser
 namespaces editors io.launcher windows.shell32 io.files
-io.paths.windows strings unicode.case make ;
+io.directories.search.windows strings unicode.case make ;
 IN: editors.editpadpro
 
 : editpadpro-path ( -- path )
     \ editpadpro-path get-global [
         "JGsoft" t [ >lower "editpadpro.exe" tail? ] find-in-program-files
+        [ "editpadpro.exe" ] unless*
     ] unless* ;
 
 : editpadpro ( file line -- )

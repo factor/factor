@@ -373,7 +373,7 @@ TUPLE: range-parser min max ;
   pick empty? [ 
     3drop f 
   ] [
-    pick first -rot between? [
+    [ dup first ] 2dip between? [
       unclip-slice <parse-result>
     ] [ 
       drop f

@@ -32,7 +32,7 @@ PRIVATE>
     [ >branch< swap remove-left -rot [ <branch> ] 2dip rot ] if ;
 
 : both-with? ( obj a b quot -- ? )
-   swap >r with r> swap both? ; inline
+   swap [ with ] dip swap both? ; inline
 
 GENERIC: sift-down ( value prio left right -- heap )
 

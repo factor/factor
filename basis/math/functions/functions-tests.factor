@@ -97,7 +97,7 @@ IN: math.functions.tests
 
 : verify-gcd ( a b -- ? )
     2dup gcd
-    >r rot * swap rem r> = ; 
+    [ rot * swap rem ] dip = ; 
 
 [ t ] [ 123 124 verify-gcd ] unit-test
 [ t ] [ 50 120 verify-gcd ] unit-test

@@ -17,7 +17,7 @@ C: <ori> ori
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: make-matrix ( quot width -- matrix ) >r { } make r> group ; inline
+: make-matrix ( quot width -- matrix ) [ { } make ] dip group ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

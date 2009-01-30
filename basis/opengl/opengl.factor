@@ -6,7 +6,7 @@ USING: alien alien.c-types continuations kernel libc math macros
 namespaces math.vectors math.constants math.functions
 math.parser opengl.gl opengl.glu combinators arrays sequences
 splitting words byte-arrays assocs colors accessors
-generalizations locals specialized-arrays.float
+generalizations locals fry specialized-arrays.float
 specialized-arrays.uint ;
 IN: opengl
 
@@ -154,19 +154,21 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : delete-gl-buffer ( id -- )
     [ glDeleteBuffers ] (delete-gl-object) ;
 
-: with-gl-buffer ( binding id quot -- )
-    -rot dupd glBindBuffer
-    [ slip ] [ 0 glBindBuffer ] [ ] cleanup ; inline
+:: with-gl-buffer ( binding id quot -- )
+    binding id glBindBuffer
+    quot [ binding 0 glBindBuffer ] [ ] cleanup ; inline
 
 : with-array-element-buffers ( array-buffer element-buffer quot -- )
-    -rot GL_ELEMENT_ARRAY_BUFFER swap [
-        swap GL_ARRAY_BUFFER -rot with-gl-buffer
+    [ GL_ELEMENT_ARRAY_BUFFER ] 2dip '[
+        GL_ARRAY_BUFFER swap _ with-gl-buffer
     ] with-gl-buffer ; inline
 
 : <gl-buffer> ( target data hint -- id )
-    pick gen-gl-buffer [ [
-        [ dup byte-length swap ] dip glBufferData
-    ] with-gl-buffer ] keep ;
+    pick gen-gl-buffer [
+        [
+            [ [ byte-length ] keep ] dip glBufferData
+        ] with-gl-buffer
+    ] keep ;
 
 : buffer-offset ( int -- alien )
     <alien> ; inline

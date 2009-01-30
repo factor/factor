@@ -33,8 +33,8 @@ TUPLE: end { ways integer } ;
 
 C: <block> block
 C: <end> end
-: <failure> 0 <end> ; inline
-: <success> 1 <end> ; inline
+: <failure> ( -- end ) 0 <end> ; inline
+: <success> ( -- end ) 1 <end> ; inline
 
 : failure? ( t -- ? ) ways>> 0 = ; inline
 

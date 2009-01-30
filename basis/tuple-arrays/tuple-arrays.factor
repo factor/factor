@@ -16,7 +16,7 @@ M: tuple-array nth
     [ seq>> nth ] [ class>> ] bi prefix >tuple ;
 
 M: tuple-array set-nth ( elt n seq -- )
-    >r >r tuple>array 1 tail r> r> seq>> set-nth ;
+    [ tuple>array 1 tail ] 2dip seq>> set-nth ;
 
 M: tuple-array new-sequence
     class>> <tuple-array> ;

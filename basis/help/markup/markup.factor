@@ -1,19 +1,11 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions generic io kernel assocs
 hashtables namespaces make parser prettyprint sequences strings
 io.styles vectors words math sorting splitting classes slots
-vocabs help.stylesheet help.topics vocabs.loader alias
-quotations ;
+vocabs help.stylesheet help.topics vocabs.loader quotations
+combinators ;
 IN: help.markup
-
-! Simple markup language.
-
-! <element> ::== <string> | <simple-element> | <fancy-element>
-! <simple-element> ::== { <element>* }
-! <fancy-element> ::== { <type> <element> }
-
-! Element types are words whose name begins with $.
 
 PREDICATE: simple-element < array
     [ t ] [ first word? not ] if-empty ;
@@ -251,8 +243,21 @@ M: f ($instance)
 
 : $instance ( element -- ) first ($instance) ;
 
+: $or ( element -- )
+    dup length {
+        { 1 [ first ($instance) ] }
+        { 2 [ first2 [ ($instance) " or " print-element ] [ ($instance) ] bi* ] }
+        [
+            drop
+            unclip-last
+            [ [ ($instance) ", " print-element ] each ]
+            [ "or " print-element ($instance) ]
+            bi*
+        ]
+    } case ;
+
 : $maybe ( element -- )
-    $instance " or " print-element { f } $instance ;
+    f suffix $or ;
 
 : $quotation ( element -- )
     { "a " { $link quotation } " with stack effect " } print-element

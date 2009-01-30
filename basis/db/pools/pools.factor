@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel arrays namespaces sequences continuations
-io.pools db fry ;
+io.pools db fry db.private ;
 IN: db.pools
 
 TUPLE: db-pool < pool db ;
@@ -17,4 +17,4 @@ M: db-pool make-connection ( pool -- )
     db>> db-open ;
 
 : with-pooled-db ( pool quot -- )
-    '[ db _ with-variable ] with-pooled-connection ; inline
+    '[ db-connection _ with-variable ] with-pooled-connection ; inline

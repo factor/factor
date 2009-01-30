@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax
 byte-arrays kernel namespaces sequences unix
-system-info.backend system io.unix.backend io.encodings.utf8 ;
+system-info.backend system io.encodings.utf8 ;
 IN: system-info.macosx
 
 ! See /usr/include/sys/sysctl.h for constants

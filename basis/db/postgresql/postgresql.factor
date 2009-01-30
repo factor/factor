@@ -4,23 +4,31 @@ USING: arrays assocs alien alien.syntax continuations io
 kernel math math.parser namespaces make prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
 db.tuples db.types tools.annotations math.ranges
-combinators classes locals words tools.walker
+combinators classes locals words tools.walker db.private
 nmake accessors random db.queries destructors db.tuples.private ;
 USE: tools.walker
 IN: db.postgresql
 
-TUPLE: postgresql-db < db
-    host port pgopts pgtty database username password ;
+TUPLE: postgresql-db host port pgopts pgtty database username password ;
 
 : <postgresql-db> ( -- postgresql-db )
-    postgresql-db new-db ;
+    postgresql-db new ;
+
+<PRIVATE
+
+TUPLE: postgresql-db-connection < db-connection ;
+: <postgresql-db-connection> ( handle -- db-connection )
+    postgresql-db-connection new-db-connection
+        swap >>handle ;
+
+PRIVATE>
 
 TUPLE: postgresql-statement < statement ;
 
 TUPLE: postgresql-result-set < result-set ;
 
-M: postgresql-db db-open ( db -- db )
-    dup {
+M: postgresql-db db-open ( db -- db-connection )
+    {
         [ host>> ]
         [ port>> ]
         [ pgopts>> ]
@@ -28,10 +36,9 @@ M: postgresql-db db-open ( db -- db )
         [ database>> ]
         [ username>> ]
         [ password>> ]
-    } cleave connect-postgres >>handle ;
+    } cleave connect-postgres <postgresql-db-connection> ;
 
-M: postgresql-db db-close ( handle -- )
-    PQfinish ;
+M: postgresql-db-connection db-close ( handle -- ) PQfinish ;
 
 M: postgresql-statement bind-statement* ( statement -- ) drop ;
 
@@ -48,8 +55,10 @@ M: generator-bind postgresql-bind-conversion ( tuple generate-bind -- object )
     [ swap slot-name>> rot set-slot-named ] [ <low-level-binding> ] bi ;
 
 M: postgresql-statement bind-tuple ( tuple statement -- )
-    tuck in-params>>
-    [ postgresql-bind-conversion ] with map
+    [ nip ] [
+        in-params>>
+        [ postgresql-bind-conversion ] with map
+    ] 2bi
     >>bind-params drop ;
 
 M: postgresql-result-set #rows ( result-set -- n )
@@ -98,25 +107,25 @@ M: postgresql-result-set dispose ( result-set -- )
 
 M: postgresql-statement prepare-statement ( statement -- )
     dup
-    [ db get handle>> f ] dip
+    [ db-connection get handle>> f ] dip
     [ sql>> ] [ in-params>> ] bi
     length f PQprepare postgresql-error
     >>handle drop ;
 
-M: postgresql-db <simple-statement> ( sql in out -- statement )
+M: postgresql-db-connection <simple-statement> ( sql in out -- statement )
     postgresql-statement new-statement ;
 
-M: postgresql-db <prepared-statement> ( sql in out -- statement )
+M: postgresql-db-connection <prepared-statement> ( sql in out -- statement )
     <simple-statement> dup prepare-statement ;
 
 : bind-name% ( -- )
     CHAR: $ 0,
     sql-counter [ inc ] [ get 0# ] bi ;
 
-M: postgresql-db bind% ( spec -- )
+M: postgresql-db-connection bind% ( spec -- )
     bind-name% 1, ;
 
-M: postgresql-db bind# ( spec object -- )
+M: postgresql-db-connection bind# ( spec object -- )
     [ bind-name% f swap type>> ] dip
     <literal-bind> 1, ;
 
@@ -162,7 +171,7 @@ M: postgresql-db bind# ( spec object -- )
         "_seq'');' language sql;" 0%
     ] query-make ;
 
-M: postgresql-db create-sql-statement ( class -- seq )
+M: postgresql-db-connection create-sql-statement ( class -- seq )
     [
         [ create-table-sql , ] keep
         dup db-assigned? [ create-function-sql , ] [ drop ] if
@@ -182,13 +191,13 @@ M: postgresql-db create-sql-statement ( class -- seq )
         "drop table " 0% 0% drop
     ] query-make ;
 
-M: postgresql-db drop-sql-statement ( class -- seq )
+M: postgresql-db-connection drop-sql-statement ( class -- seq )
     [
         [ drop-table-sql , ] keep
         dup db-assigned? [ drop-function-sql , ] [ drop ] if
     ] { } make ;
 
-M: postgresql-db <insert-db-assigned-statement> ( class -- statement )
+M: postgresql-db-connection <insert-db-assigned-statement> ( class -- statement )
     [
         "select add_" 0% 0%
         "(" 0%
@@ -198,7 +207,7 @@ M: postgresql-db <insert-db-assigned-statement> ( class -- statement )
         ");" 0%
     ] query-make ;
 
-M: postgresql-db <insert-user-assigned-statement> ( class -- statement )
+M: postgresql-db-connection <insert-user-assigned-statement> ( class -- statement )
     [
         "insert into " 0% 0%
         "(" 0%
@@ -221,10 +230,10 @@ M: postgresql-db <insert-user-assigned-statement> ( class -- statement )
         ");" 0%
     ] query-make ;
 
-M: postgresql-db insert-tuple-set-key ( tuple statement -- )
+M: postgresql-db-connection insert-tuple-set-key ( tuple statement -- )
     query-modify-tuple ;
 
-M: postgresql-db persistent-table ( -- hashtable )
+M: postgresql-db-connection persistent-table ( -- hashtable )
     H{
         { +db-assigned-id+ { "integer" "serial" f } }
         { +user-assigned-id+ { f f f } }
@@ -264,7 +273,7 @@ M: postgresql-db persistent-table ( -- hashtable )
     } ;
 
 ERROR: no-compound-found string object ;
-M: postgresql-db compound ( string object -- string' )
+M: postgresql-db-connection compound ( string object -- string' )
     over {
         { "default" [ first number>string " " glue ] }
         { "varchar" [ first number>string "(" ")" surround append ] }

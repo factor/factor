@@ -6,7 +6,7 @@ bit-arrays make io ;
     2dup length >= [
         3drop
     ] [
-        f 2over set-nth-unsafe >r over + r> clear-flags
+        f 2over set-nth-unsafe [ over + ] dip clear-flags
     ] if ; inline recursive
 
 : (nsieve-bits) ( count i seq -- count )
@@ -14,7 +14,7 @@ bit-arrays make io ;
         2dup nth-unsafe [
             over dup 2 * pick clear-flags
             rot 1+ -rot ! increment count
-        ] when >r 1+ r> (nsieve-bits)
+        ] when [ 1+ ] dip (nsieve-bits)
     ] [
         2drop
     ] if ; inline recursive

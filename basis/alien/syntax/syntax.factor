@@ -4,7 +4,7 @@ USING: accessors arrays alien alien.c-types alien.structs
 alien.arrays alien.strings kernel math namespaces parser
 sequences words quotations math.parser splitting grouping
 effects assocs combinators lexer strings.parser alien.parser 
-fry ;
+fry vocabs.parser words.constant ;
 IN: alien.syntax
 
 : DLL" lexer get skip-blank parse-string dlopen parsed ; parsing
@@ -31,10 +31,11 @@ IN: alien.syntax
 
 : C-ENUM:
     ";" parse-tokens
-    dup length
-    [ [ create-in ] dip 1quotation define ] 2each ;
+    [ [ create-in ] dip define-constant ] each-index ;
     parsing
 
+: address-of ( name library -- value )
+    load-library dlsym [ "No such symbol" throw ] unless* ;
+
 : &:
-    scan "c-library" get
-    '[ _ _ load-library dlsym ] over push-all ; parsing
+    scan "c-library" get '[ _ _ address-of ] over push-all ; parsing

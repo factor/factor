@@ -79,16 +79,16 @@ M: tuple-class slots>tuple
 
 ERROR: bad-superclass class ;
 
-<PRIVATE
-
 : tuple= ( tuple1 tuple2 -- ? )
-    2dup [ layout-of ] bi@ eq? [
-        [ drop tuple-size ]
-        [ [ [ drop array-nth ] [ nip array-nth ] 3bi = ] 2curry ]
-        2bi all-integers?
-    ] [
-        2drop f
-    ] if ; inline
+    2dup [ tuple? ] both? [
+        2dup [ layout-of ] bi@ eq? [
+            [ drop tuple-size ]
+            [ [ [ drop array-nth ] [ nip array-nth ] 3bi = ] 2curry ]
+            2bi all-integers?
+        ] [ 2drop f ] if
+    ] [ 2drop f ] if ; inline
+
+<PRIVATE
 
 : tuple-predicate-quot/1 ( class -- quot )
     #! Fast path for tuples with no superclass
@@ -290,6 +290,12 @@ M: tuple-class (define-tuple-class)
         tri* define-declared
     ] 3tri ;
 
+: boa-effect ( class -- effect )
+    [ all-slots [ name>> ] map ] [ name>> 1array ] bi <effect> ;
+
+: define-boa-word ( word class -- )
+    [ [ boa ] curry ] [ boa-effect ] bi define-inline ;
+
 M: tuple-class reset-class
     [
         dup "slots" word-prop [
@@ -322,13 +328,17 @@ M: tuple clone (clone) ;
 
 M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
 
-M: tuple hashcode*
+GENERIC: tuple-hashcode ( n tuple -- x )
+
+M: tuple tuple-hashcode
     [
         [ class hashcode ] [ tuple-size ] [ ] tri
         [ rot ] dip [
             swapd array-nth hashcode* sequence-hashcode-step
         ] 2curry each
     ] recursive-hashcode ;
+
+M: tuple hashcode* tuple-hashcode ;
 
 M: tuple-class new
     dup "prototype" word-prop

@@ -5,7 +5,7 @@ io.encodings.ascii kernel values splitting accessors math.parser
 ascii io assocs strings math namespaces make sorting combinators
 math.order arrays unicode.normalize unicode.data locals
 unicode.syntax macros sequences.deep words unicode.breaks
-quotations ;
+quotations combinators.short-circuit ;
 IN: unicode.collation
 
 <PRIVATE
@@ -71,12 +71,12 @@ ducet insert-helpers
     building get empty? [ 0 ] [ building get peek peek ] if ;
 
 : blocked? ( char -- ? )
-    combining-class [
-        last combining-class =
-    ] [ last combining-class ] if* ;
+    combining-class dup { 0 f } member?
+    [ drop last non-starter? ]
+    [ last combining-class = ] if ;
 
 : possible-bases ( -- slice-of-building )
-    building get dup [ first combining-class not ] find-last
+    building get dup [ first non-starter? not ] find-last
     drop [ 0 ] unless* tail-slice ;
 
 :: ?combine ( char slice i -- ? )
@@ -125,7 +125,7 @@ PRIVATE>
 
 : filter-ignorable ( weights -- weights' )
     f swap [
-        tuck primary>> zero? and
+        [ nip ] [ primary>> zero? and ] 2bi
         [ swap ignorable?>> or ]
         [ swap completely-ignorable? or not ] 2bi
     ] filter nip ;

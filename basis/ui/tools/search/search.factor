@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs help help.topics io.files io.styles
+USING: accessors assocs help help.topics io.pathnames io.styles
 kernel models models.delay models.filter namespaces prettyprint
 quotations sequences sorting source-files definitions strings
 tools.completion tools.crossref classes.tuple vocabs words

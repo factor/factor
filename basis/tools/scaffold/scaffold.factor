@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs io.files hashtables kernel namespaces sequences
-vocabs.loader io combinators io.encodings.utf8 calendar accessors
-math.parser io.streams.string ui.tools.operations quotations
-strings arrays prettyprint words vocabs sorting sets
-classes math alien urls splitting ascii ;
+USING: assocs io.files io.pathnames io.directories
+io.encodings.utf8 hashtables kernel namespaces sequences
+vocabs.loader io combinators calendar accessors math.parser
+io.streams.string ui.tools.operations quotations strings arrays
+prettyprint words vocabs sorting sets classes math alien urls
+splitting ascii ;
 IN: tools.scaffold
 
 SYMBOL: developer-name

@@ -9,7 +9,7 @@ TUPLE: column seq col ;
 C: <column> column
 
 M: column virtual-seq seq>> ;
-M: column virtual@ dup col>> -rot seq>> nth bounds-check ;
+M: column virtual@ [ col>> swap ] [ seq>> ] bi nth bounds-check ;
 M: column length seq>> length ;
 
 INSTANCE: column virtual-sequence

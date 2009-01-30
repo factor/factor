@@ -255,8 +255,7 @@ IN: math.intervals.tests
     0 pick interval-contains? over first \ recip eq? and [
         2drop t
     ] [
-        [ >r random-element ! dup .
-        r> first execute ] 2keep
+        [ [ random-element ] dip first execute ] 2keep
         second execute interval-contains?
     ] if ;
 
@@ -287,8 +286,7 @@ IN: math.intervals.tests
     0 pick interval-contains? over first { / /i mod rem } member? and [
         3drop t
     ] [
-        [ >r [ random-element ] bi@ ! 2dup . .
-        r> first execute ] 3keep
+        [ [ [ random-element ] bi@ ] dip first execute ] 3keep
         second execute interval-contains?
     ] if ;
 
@@ -304,7 +302,7 @@ IN: math.intervals.tests
 
 : comparison-test ( -- ? )
     random-interval random-interval random-comparison
-    [ >r [ random-element ] bi@ r> first execute ] 3keep
+    [ [ [ random-element ] bi@ ] dip first execute ] 3keep
     second execute dup incomparable eq? [ 2drop t ] [ = ] if ;
 
 [ t ] [ 40000 [ drop comparison-test ] all? ] unit-test

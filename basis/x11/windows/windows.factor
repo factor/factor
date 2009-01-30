@@ -31,24 +31,25 @@ IN: x11.windows
     "XSetWindowAttributes" <c-object>
     0 over set-XSetWindowAttributes-background_pixel
     0 over set-XSetWindowAttributes-border_pixel
-    [ >r create-colormap r> set-XSetWindowAttributes-colormap ] keep
+    [ [ create-colormap ] dip set-XSetWindowAttributes-colormap ] keep
     event-mask over set-XSetWindowAttributes-event_mask ;
 
 : set-size-hints ( window -- )
     "XSizeHints" <c-object>
     USPosition over set-XSizeHints-flags
-    dpy get -rot XSetWMNormalHints ;
+    [ dpy get ] 2dip XSetWMNormalHints ;
 
 : auto-position ( window loc -- )
     { 0 0 } = [ drop ] [ set-size-hints ] if ;
 
 : create-window ( loc dim visinfo -- window )
-    pick >r
-    >r >r >r dpy get root get r> first2 r> { 1 1 } vmax first2 0 r>
-    [ XVisualInfo-depth InputOutput ] keep
-    [ XVisualInfo-visual create-window-mask ] keep
-    window-attributes XCreateWindow
-    dup r> auto-position ;
+    pick [
+        [ [ [ dpy get root get ] dip first2 ] dip { 1 1 } vmax first2 0 ] dip
+        [ XVisualInfo-depth InputOutput ] keep
+        [ XVisualInfo-visual create-window-mask ] keep
+        window-attributes XCreateWindow
+        dup
+    ] dip auto-position ;
 
 : glx-window ( loc dim -- window glx )
     GLX_DOUBLEBUFFER 1array choose-visual

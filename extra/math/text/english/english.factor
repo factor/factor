@@ -1,7 +1,7 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit grouping kernel math math.parser namespaces
-    sequences ;
+USING: combinators.short-circuit grouping kernel math math.parser
+math.text.utils namespaces sequences ;
 IN: math.text.english
 
 <PRIVATE
@@ -31,24 +31,20 @@ SYMBOL: and-needed?
 : negative-text ( n -- str )
     0 < "Negative " "" ? ;
 
-: 3digit-groups ( n -- seq )
-    number>string <reversed> 3 <groups>
-    [ reverse string>number ] map ;
-
 : hundreds-place ( n -- str )
-    100 /mod swap dup zero? [
+    100 /mod over 0 = [
         2drop ""
     ] [
-        small-numbers " Hundred" append
-        swap zero? [ " and " append ] unless
+        [ small-numbers " Hundred" append ] dip
+        0 = [ " and " append ] unless
     ] if ;
 
 : tens-place ( n -- str )
     100 mod dup 20 >= [
         10 /mod [ tens ] dip
-        dup zero? [ drop ] [ "-" swap small-numbers 3append ] if
+        dup 0 = [ drop ] [ small-numbers "-" glue ] if
     ] [
-        dup zero? [ drop "" ] [ small-numbers ] if
+        dup 0 = [ drop "" ] [ small-numbers ] if
     ] if ;
 
 : 3digits>text ( n -- str )
@@ -59,15 +55,15 @@ SYMBOL: and-needed?
     [ " " glue ] unless-empty ;
 
 : append-with-conjunction ( str1 str2 -- newstr )
-    over length zero? [
+    over length 0 = [
         nip
     ] [
-        and-needed? get " and " ", " ? rot 3append
-        and-needed? off
+        swap and-needed? get " and " ", " ?
+        glue and-needed? off
     ] if ;
 
 : (recombine) ( str index seq -- newstr )
-    2dup nth zero? [
+    2dup nth 0 = [
         2drop
     ] [
         text-with-scale append-with-conjunction

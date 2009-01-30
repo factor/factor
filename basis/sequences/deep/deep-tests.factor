@@ -24,3 +24,18 @@ IN: sequences.deep.tests
 [ "foo" ] [ "foo" [ string? ] deep-find ] unit-test
 
 [ { { 1 2 } 1 2 } ] [ [ { 1 2 } [ , ] deep-each ] { } make ] unit-test
+
+[ t ]
+[ { { 1 2 3 } 4 } { { { 1 { { 1 2 3 } 4 } } } 2 } deep-member? ] unit-test
+
+[ t ]
+[ { { 1 2 3 } 4 } { { { 1 2 3 } 4 } 2 } deep-member? ] unit-test
+
+[ f ]
+[ { 1 2 3 4 } { 1 2 3 { 4 } } deep-subseq? ] unit-test
+
+[ t ]
+[ { 1 2 3 4 } { 1 2 3 4 } deep-subseq? ] unit-test
+
+[ t ]
+[ { 1 2 3 4 } { { 1 2 3 4 } } deep-subseq? ] unit-test

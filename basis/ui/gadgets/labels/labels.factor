@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables io kernel math namespaces
 make opengl sequences strings splitting ui.gadgets
@@ -12,11 +12,7 @@ TUPLE: label < gadget text font color ;
     text>> dup string? [ "\n" join ] unless ; inline
 
 : set-label-string ( string label -- )
-    CHAR: \n pick memq? [
-        [ string-lines ] dip (>>text)
-    ] [
-        (>>text)
-    ] if ; inline
+    [ CHAR: \n over memq? [ string-lines ] when ] dip (>>text) ; inline
 
 : label-theme ( gadget -- gadget )
     sans-serif-font >>font

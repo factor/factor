@@ -12,5 +12,6 @@ namespaces eval kernel vocabs.loader io ;
         ignore-cli-args? not script get and
         [ run-script ] [ "run" get run ] if*
         output-stream get [ stream-flush ] when*
+        0 exit
     ] [ print-error 1 exit ] recover
 ] set-boot-quot

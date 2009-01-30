@@ -131,7 +131,7 @@ M: ole32-error error.
 : guid= ( a b -- ? )
     [ 16 memory>byte-array ] bi@ = ;
 
-: GUID-STRING-LENGTH
+: GUID-STRING-LENGTH ( -- n )
     "{01234567-89ab-cdef-0123-456789abcdef}" length ; inline
 
 :: (guid-section>guid) ( string guid start end quot -- )

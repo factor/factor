@@ -1,4 +1,4 @@
-USING: editors io.launcher kernel io.paths.windows
+USING: editors io.launcher kernel io.directories.search.windows
 math.parser namespaces sequences io.files arrays ;
 IN: editors.wordpad
 

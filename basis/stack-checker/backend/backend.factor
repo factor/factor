@@ -145,7 +145,6 @@ M: object apply-object push-literal ;
 
 : effect-required? ( word -- ? )
     {
-        { [ dup inline? ] [ drop f ] }
         { [ dup deferred? ] [ drop f ] }
         { [ dup crossref? not ] [ drop f ] }
         [ def>> [ word? ] contains? ]

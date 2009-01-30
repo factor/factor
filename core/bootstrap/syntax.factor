@@ -1,6 +1,6 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words sequences vocabs kernel ;
+USING: words words.symbol sequences vocabs kernel ;
 IN: bootstrap.syntax
 
 "syntax" create-vocab drop
@@ -40,7 +40,10 @@ IN: bootstrap.syntax
     "PRIVATE>"
     "SBUF\""
     "SINGLETON:"
+    "SINGLETONS:"
     "SYMBOL:"
+    "SYMBOLS:"
+    "CONSTANT:"
     "TUPLE:"
     "SLOT:"
     "T{"
@@ -48,6 +51,12 @@ IN: bootstrap.syntax
     "INTERSECTION:"
     "USE:"
     "USING:"
+    "QUALIFIED:"
+    "QUALIFIED-WITH:"
+    "FROM:"
+    "EXCLUDE:"
+    "RENAME:"
+    "ALIAS:"
     "V{"
     "W{"
     "["

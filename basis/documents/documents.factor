@@ -153,18 +153,18 @@ GENERIC: next-elt ( loc document elt -- newloc )
 TUPLE: char-elt ;
 
 : (prev-char) ( loc document quot -- loc )
-    -rot {
-        { [ over { 0 0 } = ] [ drop ] }
-        { [ over second zero? ] [ [ first 1- ] dip line-end ] }
-        [ pick call ]
-    } cond nip ; inline
+    {
+        { [ pick { 0 0 } = ] [ 2drop ] }
+        { [ pick second zero? ] [ drop [ first 1- ] dip line-end ] }
+        [ call ]
+    } cond ; inline
 
 : (next-char) ( loc document quot -- loc )
-    -rot {
-        { [ 2dup doc-end = ] [ drop ] }
-        { [ 2dup line-end? ] [ drop first 1+ 0 2array ] }
-        [ pick call ]
-    } cond nip ; inline
+    {
+        { [ 2over doc-end = ] [ 2drop ] }
+        { [ 2over line-end? ] [ 2drop first 1+ 0 2array ] }
+        [ call ]
+    } cond ; inline
 
 M: char-elt prev-elt
     drop [ drop -1 +col ] (prev-char) ;

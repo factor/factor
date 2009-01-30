@@ -1,7 +1,7 @@
 USING: arrays byte-arrays kernel kernel.private math memory
 namespaces sequences tools.test math.private quotations
 continuations prettyprint io.streams.string debugger assocs
-sequences.private accessors ;
+sequences.private accessors locals.backend grouping ;
 IN: kernel.tests
 
 [ 0 ] [ f size ] unit-test
@@ -17,7 +17,7 @@ IN: kernel.tests
 
 [ ] [ :c ] unit-test
 
-[ { } set-retainstack r> ] [ { "kernel-error" 13 f f } = ] must-fail-with
+[ 3 [ { } set-retainstack ] dip ] [ { "kernel-error" 13 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
@@ -35,7 +35,7 @@ IN: kernel.tests
 
 [ ] [ [ :c ] with-string-writer drop ] unit-test
 
-: overflow-r 3 >r overflow-r ;
+: overflow-r 3 load-local overflow-r ;
 
 [ overflow-r ] [ { "kernel-error" 14 f f } = ] must-fail-with
 
@@ -163,3 +163,9 @@ IN: kernel.tests
     [ [ 1 2 3 throw [ ] [ ] if 4 ] call ] ignore-errors
     last-frame
 ] unit-test
+
+[ 10 2 3 4 5 ] [ 1 2 3 4 5 [ 10 * ] 4dip ] unit-test
+
+[ 3 -1 5/6 ] [ 1 2 3 4 5 6 [ + ] [ - ] [ / ] 2tri* ] unit-test
+
+[ { 1 2 } { 3 4 } { 5 6 } ] [ 1 2 3 4 5 6 [ 2array ] 2tri@ ] unit-test

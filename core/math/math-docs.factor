@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel sequences quotations
-math.private ;
+math.private byte-arrays io.binary ;
 IN: math
 
 HELP: number=
@@ -143,7 +143,7 @@ HELP: bitxor
 
 HELP: shift
 { $values { "x" integer } { "n" integer } { "y" integer } }
-{ $description "Shifts " { $snippet "x" } " to the left by " { $snippet "n" } " bits if " { $snippet "n" } " is positive, or " { $snippet "-n" } " bits to the right if " { $snippet "n" } " is negative. A left shift of a fixnum may overflow, yielding a bignum. A right shift may result in bits ``falling off'' the right hand side and being discarded." }
+{ $description "Shifts " { $snippet "x" } " to the left by " { $snippet "n" } " bits if " { $snippet "n" } " is positive, or " { $snippet "-n" } " bits to the right if " { $snippet "n" } " is negative. A left shift of a fixnum may overflow, yielding a bignum. A right shift may result in bits “falling off” the right hand side and being discarded." }
 { $examples { $example "USING: math prettyprint ;" "BIN: 101 5 shift .b" "10100000" } { $example "USING: math prettyprint ;" "BIN: 11111 -2 shift .b" "111" } } ;
 
 HELP: bitnot
@@ -180,6 +180,7 @@ HELP: 1-
 } ;
 
 HELP: ?1+
+{ $values { "x" { $maybe number } } { "y" number } }
 { $description "If the input is not " { $link f } ", adds one. Otherwise, outputs a " { $snippet "0" } "." } ;
 
 HELP: sq
@@ -305,6 +306,10 @@ HELP: find-last-integer
 { $description "Applies the quotation to each integer from " { $snippet "n" } " down to 0, inclusive. Iteration stops when the quotation outputs a true value or 0 is reached. If the quotation yields a true value for some integer, the word outputs that integer. Otherwise, the word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find-last } "." } ;
 
+HELP: byte-array>bignum
+{ $values { "byte-array" byte-array } { "n" integer } }
+{ $description "Converts a byte-array, interpreted as little-endian, into a bignum integer. User code should call " { $link >le } " or " { $link >be } " instead." } ;
+
 ARTICLE: "division-by-zero" "Division by zero"
 "Floating point division never raises an error if the denominator is zero. This means that if at least one of the two inputs to " { $link / } ", " { $link /f } " or " { $link mod } " is a float, the result will be a floating point infinity or not a number value."
 $nl
@@ -316,8 +321,8 @@ ARTICLE: "number-protocol" "Number protocol"
 "Math operations obey certain numerical upgrade rules. If one of the inputs is a bignum and the other is a fixnum, the latter is first coerced to a bignum; if one of the inputs is a float, the other is coerced to a float."
 $nl
 "Two examples where you should note the types of the inputs and outputs:"
-{ $example "3 >fixnum 6 >bignum * class ." "bignum" }
-{ $example "1/2 2.0 + ." "4.5" }
+{ $example "USE: classes" "3 >fixnum 6 >bignum * class ." "bignum" }
+{ $example "1/2 2.0 + ." "2.5" }
 "The following usual operations are supported by all numbers."
 { $subsection + }
 { $subsection - }

@@ -3,7 +3,7 @@
 USING: accessors arrays generic hashtables io kernel assocs math
 namespaces prettyprint sequences strings io.styles vectors words
 quotations mirrors splitting math.parser classes vocabs refs
-sets sorting summary debugger continuations ;
+sets sorting summary debugger continuations fry ;
 IN: inspector
 
 : value-editor ( path -- )
@@ -53,7 +53,7 @@ SYMBOL: +editable+
     [ drop ] [
         dup enum? [ +sequence+ on ] when
         standard-table-style [
-            swap [ -rot describe-row ] curry each-index
+            swap '[ [ _ ] 2dip describe-row ] each-index
         ] tabular-output
     ] if-empty ;
 
@@ -64,7 +64,7 @@ M: tuple error. describe ;
 
 : namestack. ( seq -- )
     [ [ global eq? not ] filter [ keys ] gather ] keep
-    [ dupd assoc-stack ] curry H{ } map>assoc describe ;
+    '[ dup _ assoc-stack ] H{ } map>assoc describe ;
 
 : .vars ( -- )
     namestack namestack. ;

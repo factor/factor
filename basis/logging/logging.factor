@@ -4,7 +4,7 @@ USING: logging.server sequences namespaces concurrency.messaging
 words kernel arrays shuffle tools.annotations
 prettyprint.config prettyprint debugger io.streams.string
 splitting continuations effects generalizations parser strings
-quotations fry symbols accessors ;
+quotations fry accessors ;
 IN: logging
 
 SYMBOLS: DEBUG NOTICE WARNING ERROR CRITICAL ;
@@ -61,7 +61,7 @@ PRIVATE>
     [ dup ] 2dip 2curry annotate ;
 
 : call-logging-quot ( quot word level -- quot' )
-    "called" -rot [ log-message ] 3curry prepose ;
+    [ "called" ] 2dip [ log-message ] 3curry prepose ;
 
 : add-logging ( word level -- )
     [ call-logging-quot ] (define-logging) ;

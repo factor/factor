@@ -15,7 +15,7 @@ IN: smtp.tests
 
 [ { "hello" "." "world" } validate-message ] must-fail
 
-[ "hello\r\nworld\r\n.\r\n" ] [
+[ "aGVsbG8Kd29ybGQ=\r\n.\r\n" ] [
     "hello\nworld" [ send-body ] with-string-writer
 ] unit-test
 
@@ -50,7 +50,10 @@ IN: smtp.tests
 
 [
     {
+        { "Content-Transfer-Encoding" "base64" }
+        { "Content-Type" "Text/plain; charset=utf-8" }
         { "From" "Doug <erg@factorcode.org>" }
+        { "MIME-Version" "1.0" }
         { "Subject" "Factor rules" }
         { "To" "Slava <slava@factorcode.org>, Ed <dharmatech@factorcode.org>" }
     }

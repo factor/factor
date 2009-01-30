@@ -32,17 +32,14 @@ H{ } clone sub-primitives set
 ! Now we have ( syntax-quot arch-quot layouts-quot ) on the stack
 
 ! Bring up a bare cross-compiling vocabulary.
-"syntax" vocab vocab-words bootstrap-syntax set
-H{ } clone dictionary set
-H{ } clone new-classes set
-H{ } clone changed-definitions set
-H{ } clone changed-generics set
-H{ } clone remake-generics set
-H{ } clone forgotten-definitions set
-H{ } clone root-cache set
-H{ } clone source-files set
-H{ } clone update-map set
-H{ } clone implementors-map set
+"syntax" vocab vocab-words bootstrap-syntax set {
+    dictionary
+    new-classes
+    changed-definitions changed-generics
+    remake-generics forgotten-definitions
+    root-cache source-files update-map implementors-map
+} [ H{ } clone swap set ] each
+
 init-caches
 
 ! Vocabulary for slot accessors
@@ -264,7 +261,7 @@ bi
     "vocabulary"
     { "def" { "quotation" "quotations" } initial: [ ] }
     "props"
-    { "compiled" read-only }
+    { "optimized" read-only }
     { "counter" { "fixnum" "math" } }
     { "sub-primitive" read-only }
 } define-builtin
@@ -287,11 +284,11 @@ tuple
 
 "((empty))" "hashtables.private" create
 "tombstone" "hashtables.private" lookup f
-2array >tuple 1quotation define-inline
+2array >tuple 1quotation (( -- value )) define-inline
 
 "((tombstone))" "hashtables.private" create
 "tombstone" "hashtables.private" lookup t
-2array >tuple 1quotation define-inline
+2array >tuple 1quotation (( -- value )) define-inline
 
 ! Some tuple classes
 "curry" "kernel" create
@@ -380,12 +377,11 @@ tuple
     { "over" "kernel" }
     { "pick" "kernel" }
     { "swap" "kernel" }
-    { ">r" "kernel" }
-    { "r>" "kernel" }
     { "eq?" "kernel" }
     { "tag" "kernel.private" }
     { "slot" "slots.private" }
     { "get-local" "locals.backend" }
+    { "load-local" "locals.backend" }
     { "drop-locals" "locals.backend" }
 } [ make-sub-primitive ] assoc-each
 

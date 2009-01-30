@@ -1,11 +1,11 @@
 USING: generic help.syntax help.markup kernel math parser words
 effects classes generic.standard classes.tuple generic.math
-generic.standard arrays io.files vocabs.loader io sequences
-assocs ;
+generic.standard arrays io.pathnames vocabs.loader io sequences
+assocs words.symbol words.alias words.constant ;
 IN: syntax
 
 ARTICLE: "parser-algorithm" "Parser algorithm"
-"At the most abstract level, Factor syntax consists of whitespace-separated tokens. The parser tokenizes the input on whitespace boundaries.  The parser is case-sensitive and whitespace between tokens is significant, so the following three expressions tokenize differently:"
+"At the most abstract level, Factor syntax consists of whitespace-separated tokens. The parser tokenizes the input on whitespace boundaries. The parser is case-sensitive and whitespace between tokens is significant, so the following three expressions tokenize differently:"
 { $code "2X+\n2 X +\n2 x +" }
 "As the parser reads tokens it makes a distinction between numbers, ordinary words, and parsing words. Tokens are appended to the parse tree, the top level of which is a quotation returned by the original parser invocation. Nested levels of the parse tree are created by parsing words."
 $nl
@@ -69,7 +69,7 @@ ARTICLE: "syntax-floats" "Float syntax"
 "More information on floats can be found in " { $link "floats" } "." ;
 
 ARTICLE: "syntax-complex-numbers" "Complex number syntax"
-"A complex number is given by two components, a ``real'' part and ''imaginary'' part. The components must either be integers, ratios or floats."
+"A complex number is given by two components, a “real” part and “imaginary” part. The components must either be integers, ratios or floats."
 { $code
     "C{ 1/2 1/3 }   ! the complex number 1/2+1/3i"
     "C{ 0 1 }       ! the imaginary unit"
@@ -144,12 +144,12 @@ ARTICLE: "syntax-byte-arrays" "Byte array syntax"
 
 ARTICLE: "syntax-pathnames" "Pathname syntax"
 { $subsection POSTPONE: P" }
-"Pathnames are documented in " { $link "pathnames" } "." ;
+"Pathnames are documented in " { $link "io.pathnames" } "." ;
 
 ARTICLE: "syntax-literals" "Literals"
 "Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words."
 $nl
-"If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are ``live''."
+"If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are “live”."
 $nl
 "Using mutable object literals in word definitions requires care, since if those objects are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Literals should be " { $link clone } "d before being passed to word which may potentially mutate them."
 { $subsection "syntax-numbers" }
@@ -344,7 +344,53 @@ HELP: SYMBOL:
 { $description "Defines a new symbol word in the current vocabulary. Symbols push themselves on the stack when executed, and are used to identify variables (see " { $link "namespaces" } ") as well as for storing crufties in word properties (see " { $link "word-props" } ")." }
 { $examples { $example "USE: prettyprint" "IN: scratchpad" "SYMBOL: foo\nfoo ." "foo" } } ;
 
-{ define-symbol POSTPONE: SYMBOL: } related-words
+{ define-symbol POSTPONE: SYMBOL: POSTPONE: SYMBOLS: } related-words
+
+HELP: SYMBOLS:
+{ $syntax "SYMBOLS: words... ;" }
+{ $values { "words" "a sequence of new words to define" } }
+{ $description "Creates a new symbol for every token until the " { $snippet ";" } "." }
+{ $examples { $example "USING: prettyprint ;" "IN: scratchpad" "SYMBOLS: foo bar baz ;\nfoo . bar . baz ." "foo\nbar\nbaz" } } ;
+
+HELP: SINGLETON:
+{ $syntax "SINGLETON: class" }
+{ $values
+    { "class" "a new singleton to define" }
+}
+{ $description
+    "Defines a new singleton class. The class word itself is the sole instance of the singleton class."
+}
+{ $examples
+    { $example "USING: classes.singleton kernel io ;" "IN: singleton-demo" "USE: prettyprint SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
+} ;
+    
+HELP: SINGLETONS:
+{ $syntax "SINGLETONS: words... ;" }
+{ $values { "words" "a sequence of new words to define" } }
+{ $description "Creates a new singleton for every token until the " { $snippet ";" } "." } ;
+
+HELP: ALIAS:
+{ $syntax "ALIAS: new-word existing-word" }
+{ $values { "new-word" word } { "existing-word" word } }
+{ $description "Creates a new inlined word that calls the existing word." }
+{ $examples
+    { $example "USING: prettyprint sequences ;"
+               "IN: alias.test"
+               "ALIAS: sequence-nth nth"
+               "0 { 10 20 30 } sequence-nth ."
+               "10"
+    }
+} ;
+
+{ define-alias POSTPONE: ALIAS: } related-words
+
+HELP: CONSTANT:
+{ $syntax "CONSTANT: word value" }
+{ $values { "word" word } { "value" object } }
+{ $description "Creates a word which pushes a value on the stack." }
+{ $examples { $code "CONSTANT: magic 1" "CONSTANT: science HEX: ff0f" } } ;
+
+{ define-constant POSTPONE: CONSTANT: } related-words
 
 HELP: \
 { $syntax "\\ word" }
@@ -375,6 +421,47 @@ HELP: USING:
 { $values { "vocabularies" "a list of vocabulary names" } }
 { $description "Adds a list of vocabularies to the front of the search path, with later vocabularies taking precedence." }
 { $errors "Throws an error if one of the vocabularies does not exist." } ;
+
+HELP: QUALIFIED:
+{ $syntax "QUALIFIED: vocab" }
+{ $description "Similar to " { $link POSTPONE: USE: } " but loads vocabulary with prefix." }
+{ $examples { $example
+    "USING: prettyprint ;"
+    "QUALIFIED: math"
+    "1 2 math:+ ." "3"
+} } ;
+
+HELP: QUALIFIED-WITH:
+{ $syntax "QUALIFIED-WITH: vocab word-prefix" }
+{ $description "Works like " { $link POSTPONE: QUALIFIED: } " but uses " { $snippet "word-prefix" } " as prefix." }
+{ $examples { $code
+    "USING: prettyprint ;"
+    "QUALIFIED-WITH: math m"
+    "1 2 m:+ ."
+    "3"
+} } ;
+
+HELP: FROM:
+{ $syntax "FROM: vocab => words ... ;" }
+{ $description "Imports " { $snippet "words" } " from " { $snippet "vocab" } "." }
+{ $examples { $code
+    "FROM: math.parser => bin> hex> ; ! imports only bin> and hex>" } } ;
+
+HELP: EXCLUDE:
+{ $syntax "EXCLUDE: vocab => words ... ;" }
+{ $description "Imports everything from " { $snippet "vocab" } " excluding " { $snippet "words" } "." }
+{ $examples { $code
+    "EXCLUDE: math.parser => bin> hex> ; ! imports everything but bin> and hex>" } } ;
+
+HELP: RENAME:
+{ $syntax "RENAME: word vocab => newname" }
+{ $description "Imports " { $snippet "word" } " from " { $snippet "vocab" } ", but renamed to " { $snippet "newname" } "." }
+{ $examples { $example
+    "USING: prettyprint ;"
+    "RENAME: + math => -"
+    "2 3 - ."
+    "5"
+} } ;
 
 HELP: IN:
 { $syntax "IN: vocabulary" }
@@ -470,7 +557,7 @@ HELP: GENERIC:
 
 HELP: GENERIC#
 { $syntax "GENERIC# word n" }
-{ $values { "word" "a new word to define" } { "n" "the stack position to dispatch on, either 0, 1 or 2" } }
+{ $values { "word" "a new word to define" } { "n" "the stack position to dispatch on" } }
 { $description "Defines a new generic word which dispatches on the " { $snippet "n" } "th most element from the top of the stack in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." }
 { $notes
     "The following two definitions are equivalent:"
@@ -529,7 +616,7 @@ HELP: MIXIN:
 
 HELP: INSTANCE:
 { $syntax "INSTANCE: instance mixin" }
-{ $values { "instance" "a class word" } { "instance" "a class word" } }
+{ $values { "instance" "a class word" } { "mixin" "a mixin class word" } }
 { $description "Makes " { $snippet "instance" } " an instance of " { $snippet "mixin" } "." } ;
 
 HELP: PREDICATE:

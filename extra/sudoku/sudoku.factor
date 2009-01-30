@@ -6,7 +6,7 @@ IN: sudoku
 SYMBOL: solutions
 SYMBOL: board
 
-: pair+ ( a b c d -- a+b c+d ) swapd + >r + r> ;
+: pair+ ( a b c d -- a+b c+d ) swapd [ + ] 2bi@ ;
 
 : row ( n -- row ) board get nth ;
 : board> ( m n -- x ) row nth ;
@@ -19,13 +19,13 @@ SYMBOL: board
 
 : box-contains? ( n x y -- ? )
     [ 3 /i 3 * ] bi@
-    9 [ >r 3dup r> cell-contains? ] contains?
-    >r 3drop r> ;
+    9 [ [ 3dup ] dip cell-contains? ] contains?
+    [ 3drop ] dip ;
 
 DEFER: search
 
 : assume ( n x y -- )
-    [ >board ] 2keep [ >r 1+ r> search ] 2keep f>board ;
+    [ >board ] 2keep [ [ 1+ ] dip search ] 2keep f>board ;
 
 : attempt ( n x y -- )
     {
@@ -59,9 +59,9 @@ DEFER: search
 
 : search ( x y -- )
     {
-        { [ over 9 = ] [ >r drop 0 r> 1+ search ] }
+        { [ over 9 = ] [ [ drop 0 ] dip 1+ search ] }
         { [ over 0 = over 9 = and ] [ 2drop solution. ] }
-        { [ 2dup board> ] [ >r 1+ r> search ] }
+        { [ 2dup board> ] [ [ 1+ ] dip search ] }
         [ solve ]
     } cond ;
 

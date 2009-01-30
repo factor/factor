@@ -1,4 +1,5 @@
-USING: kernel math math.constants tools.test sequences ;
+USING: kernel math math.constants tools.test sequences
+grouping ;
 IN: math.floats.tests
 
 [ t ] [ 0.0 float? ] unit-test

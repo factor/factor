@@ -37,7 +37,7 @@ M: insn linearize-insn , drop ;
 M: ##branch linearize-insn
     drop dup successors>> first emit-branch ;
 
-: (binary-conditional)
+: (binary-conditional) ( basic-block insn -- basic-block successor1 successor2 src1 src2 cc )
     [ dup successors>> first2 ]
     [ [ src1>> ] [ src2>> ] [ cc>> ] tri ] bi* ; inline
 

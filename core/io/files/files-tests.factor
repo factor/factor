@@ -1,130 +1,66 @@
+USING: tools.test io.files io.files.private io.files.temp
+io.directories io.encodings.8-bit arrays make system
+io.encodings.binary io threads kernel continuations
+io.encodings.ascii sequences strings accessors
+io.encodings.utf8 math destructors namespaces ;
 IN: io.files.tests
-USING: tools.test io.files io.files.private io threads kernel
-continuations io.encodings.ascii sequences
-strings accessors io.encodings.utf8 math destructors
-namespaces ;
 
 \ exists? must-infer
 \ (exists?) must-infer
-\ file-info must-infer
-\ link-info must-infer
 
-[ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
-[ ] [ "blahblah" temp-file make-directory ] unit-test
-[ t ] [ "blahblah" temp-file file-info directory? ] unit-test
+[ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
 
-[ t ] [
-    [ temp-directory "loldir" append-path delete-directory ] ignore-errors
-    temp-directory [
-        "loldir" make-directory
-    ] with-directory
-    temp-directory "loldir" append-path exists?
+[ ] [ "append-test" temp-file ascii <file-appender> dispose ] unit-test
+
+[
+    "This is a line.\rThis is another line.\r"
+] [
+    "resource:core/io/test/mac-os-eol.txt" latin1 <file-reader>
+    [ 500 read ] with-input-stream
+] unit-test
+
+[
+    255
+] [
+    "resource:core/io/test/binary.txt" latin1 <file-reader>
+    [ read1 ] with-input-stream >fixnum
 ] unit-test
 
 [ ] [
-    [ temp-directory "loldir" append-path delete-directory ] ignore-errors
-    temp-directory [
-        "loldir" make-directory
-        "loldir" delete-directory
-    ] with-directory
+    "It seems Jobs has lost his grasp on reality again.\n"
+    "separator-test.txt" temp-file latin1 set-file-contents
 ] unit-test
 
-[ "file1 contents" ] [
-    [ temp-directory "loldir" append-path delete-directory ] ignore-errors
-    temp-directory [
-        "file1 contents" "file1" utf8 set-file-contents
-        "file1" "file2" copy-file
-        "file2" utf8 file-contents
-    ] with-directory
-    "file1" temp-file delete-file
-    "file2" temp-file delete-file
-] unit-test
-
-[ "file3 contents" ] [
-    temp-directory [
-        "file3 contents" "file3" utf8 set-file-contents
-        "file3" "file4" move-file
-        "file4" utf8 file-contents
-    ] with-directory
-    "file4" temp-file delete-file
-] unit-test
-
-[ "file5" temp-file delete-file ] ignore-errors
-
-[ ] [
-    temp-directory [
-        "file5" touch-file
-        "file5" delete-file
-    ] with-directory
-] unit-test
-
-[ "file6" temp-file delete-file ] ignore-errors
-
-[ ] [
-    temp-directory [
-        "file6" touch-file
-        "file6" link-info drop
-    ] with-directory
-] unit-test
-
-[ "passwd" ] [ "/etc/passwd" file-name ] unit-test
-[ "awk" ] [ "/usr/libexec/awk/" file-name ] unit-test
-[ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
-[ "" ] [ "" file-name ] unit-test
-
-[ "freetype6.dll" ] [ "resource:freetype6.dll" file-name ] unit-test
-[ "freetype6.dll" ] [ "resource:/freetype6.dll" file-name ] unit-test
-
-[ ] [
-    { "Hello world." }
-    "test-foo.txt" temp-file ascii set-file-lines
+[
+    {
+        { "It seems " CHAR: J }
+        { "obs has lost h" CHAR: i }
+        { "s grasp on reality again.\n" f }
+    }
+] [
+    [
+        "separator-test.txt" temp-file
+        latin1 <file-reader> [
+            "J" read-until 2array ,
+            "i" read-until 2array ,
+            "X" read-until 2array ,
+        ] with-input-stream
+    ] { } make
 ] unit-test
 
 [ ] [
-    "test-foo.txt" temp-file ascii [
-        "Hello appender." print
-    ] with-file-appender
+    image binary [
+        10 [ 65536 read drop ] times
+    ] with-file-reader
 ] unit-test
 
-[ ] [
-    "test-bar.txt" temp-file ascii [
-        "Hello appender." print
-    ] with-file-appender
+! Test EOF behavior
+[ 10 ] [
+    image binary [
+        0 read drop
+        10 read length
+    ] with-file-reader
 ] unit-test
-
-[ "Hello world.\nHello appender.\n" ] [
-    "test-foo.txt" temp-file ascii file-contents
-] unit-test
-
-[ "Hello appender.\n" ] [
-    "test-bar.txt" temp-file ascii file-contents
-] unit-test
-
-[ ] [ "test-foo.txt" temp-file delete-file ] unit-test
-
-[ ] [ "test-bar.txt" temp-file delete-file ] unit-test
-
-[ f ] [ "test-foo.txt" temp-file exists? ] unit-test
-
-[ f ] [ "test-bar.txt" temp-file exists? ] unit-test
-
-[ "test-blah" temp-file delete-tree ] ignore-errors
-
-[ ] [ "test-blah" temp-file make-directory ] unit-test
-
-[ ] [
-    "test-blah/fooz" temp-file ascii <file-writer> dispose
-] unit-test
-
-[ t ] [
-    "test-blah/fooz" temp-file exists?
-] unit-test
-
-[ ] [ "test-blah/fooz" temp-file delete-file ] unit-test
-
-[ ] [ "test-blah" temp-file delete-directory ] unit-test
-
-[ f ] [ "test-blah" temp-file exists? ] unit-test
 
 USE: debugger.threads
 
@@ -139,150 +75,3 @@ USE: debugger.threads
 [ t ] [ "quux-test.txt" temp-file exists? ] unit-test
 
 [ ] [ "quux-test.txt" temp-file delete-file ] unit-test
-
-[ ] [ "delete-tree-test/a/b/c" temp-file make-directories ] unit-test
-
-[ ] [
-    { "Hi" }
-    "delete-tree-test/a/b/c/d" temp-file ascii set-file-lines
-] unit-test
-
-[ ] [
-    "delete-tree-test" temp-file delete-tree
-] unit-test
-
-[ { "kernel" } ] [
-    "core" resource-path [
-        "." directory-files [ "kernel" = ] filter
-    ] with-directory
-] unit-test
-
-[ { "kernel" } ] [
-    "resource:core" [
-        "." directory-files [ "kernel" = ] filter
-    ] with-directory
-] unit-test
-
-[ { "kernel" } ] [
-    "resource:core" [
-        [ "kernel" = ] filter
-    ] with-directory-files
-] unit-test
-
-[ ] [
-    "copy-tree-test/a/b/c" temp-file make-directories
-] unit-test
-
-[ ] [
-    "Foobar"
-    "copy-tree-test/a/b/c/d" temp-file
-    ascii set-file-contents
-] unit-test
-
-[ ] [
-    "copy-tree-test" temp-file
-    "copy-destination" temp-file copy-tree
-] unit-test
-
-[ "Foobar" ] [
-    "copy-destination/a/b/c/d" temp-file ascii file-contents
-] unit-test
-
-[ ] [
-    "copy-destination" temp-file delete-tree
-] unit-test
-
-[ ] [
-    "copy-tree-test" temp-file
-    "copy-destination" temp-file copy-tree-into
-] unit-test
-
-[ "Foobar" ] [
-    "copy-destination/copy-tree-test/a/b/c/d" temp-file ascii file-contents
-] unit-test
-
-[ ] [
-    "copy-destination/copy-tree-test/a/b/c/d" temp-file "" temp-file copy-file-into
-] unit-test
-
-[ "Foobar" ] [
-    "d" temp-file ascii file-contents
-] unit-test
-
-[ ] [ "d" temp-file delete-file ] unit-test
-
-[ ] [ "copy-destination" temp-file delete-tree ] unit-test
-
-[ ] [ "copy-tree-test" temp-file delete-tree ] unit-test
-
-[ t ] [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
-
-[ t ] [
-    temp-directory [ "hi41" "test41" utf8 set-file-contents ] with-directory
-    temp-directory "test41" append-path utf8 file-contents "hi41" =
-] unit-test
-
-[ t ] [
-    temp-directory [ "test41" file-info size>> ] with-directory 4 =
-] unit-test
-
-[ ] [ "append-test" temp-file dup exists? [ delete-file ] [ drop ] if ] unit-test
-
-[ ] [ "append-test" temp-file ascii <file-appender> dispose ] unit-test
-
-[ "/usr/lib" ] [ "/usr" "lib" append-path ] unit-test
-[ "/usr/lib" ] [ "/usr/" "lib" append-path ] unit-test
-[ "/usr/lib" ] [ "/usr" "./lib" append-path ] unit-test
-[ "/usr/lib/" ] [ "/usr" "./lib/" append-path ] unit-test
-[ "/lib" ] [ "/usr" "../lib" append-path ] unit-test
-[ "/lib/" ] [ "/usr" "../lib/" append-path ] unit-test
-
-[ "" ] [ "" "." append-path ] unit-test
-[ "" ".." append-path ] must-fail
-
-[ "/" ] [ "/" "./." append-path ] unit-test
-[ "/" ] [ "/" "././" append-path ] unit-test
-[ "/a/b/lib" ] [ "/a/b/c/d/e/f/" "../../../../lib" append-path ] unit-test
-[ "/a/b/lib/" ] [ "/a/b/c/d/e/f/" "../../../../lib/" append-path ] unit-test
-
-[ "" "../lib/" append-path ] must-fail
-[ "lib" ] [ "" "lib" append-path ] unit-test
-[ "lib" ] [ "" "./lib" append-path ] unit-test
-
-[ "foo/bar/." parent-directory ] must-fail
-[ "foo/bar/./" parent-directory ] must-fail
-[ "foo/bar/baz/.." parent-directory ] must-fail
-[ "foo/bar/baz/../" parent-directory ] must-fail
-
-[ "." parent-directory ] must-fail
-[ "./" parent-directory ] must-fail
-[ ".." parent-directory ] must-fail
-[ "../" parent-directory ] must-fail
-[ "../../" parent-directory ] must-fail
-[ "foo/.." parent-directory ] must-fail
-[ "foo/../" parent-directory ] must-fail
-[ "" parent-directory ] must-fail
-[ "." ] [ "boot.x86.64.image" parent-directory ] unit-test
-
-[ "bar/foo" ] [ "bar/baz" "..///foo" append-path ] unit-test
-[ "bar/baz/foo" ] [ "bar/baz" ".///foo" append-path ] unit-test
-[ "bar/foo" ] [ "bar/baz" "./..//foo" append-path ] unit-test
-[ "bar/foo" ] [ "bar/baz" "./../././././././///foo" append-path ] unit-test
-
-[ t ] [ "resource:core" absolute-path? ] unit-test
-[ f ] [ "" absolute-path? ] unit-test
-
-[ "touch-twice-test" temp-file delete-file ] ignore-errors
-[ ] [ 2 [ "touch-twice-test" temp-file touch-file ] times ] unit-test
-
-! aum's bug
-[
-    "." current-directory set
-    ".." "resource-path" set
-    [ "../core/bootstrap/stage2.factor" ]
-    [ "resource:core/bootstrap/stage2.factor" (normalize-path) ]
-    unit-test
-] with-scope
-
-[ t ] [ "/" file-system-info file-system-info? ] unit-test
-[ t ] [ file-systems [ file-system-info? ] all? ] unit-test

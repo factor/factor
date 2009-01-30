@@ -199,7 +199,7 @@ ARTICLE: "db-tuples-protocol" "Tuple database protocol"
 { $subsection <count-statement> } ;
 
 ARTICLE: "db-tuples-tutorial" "Tuple database tutorial"
-"Let's make a tuple and store it in a database. To follow along, click on each code example and run it in the listener.  If you forget to run an example, just start at the top and run them all again in order." $nl
+"Let's make a tuple and store it in a database. To follow along, click on each code example and run it in the listener. If you forget to run an example, just start at the top and run them all again in order." $nl
 "We're going to store books in this tutorial."
 { $code "TUPLE: book id title author date-published edition cover-price condition ;" }
 "The title, author, and publisher should be strings; the date-published a timestamp; the edition an integer; the cover-price a float. These are the Factor types for which we will need to look up the corresponding " { $link "db.types" } ". " $nl
@@ -246,7 +246,7 @@ T{ book
 { $code <" [
     book get update-tuple
 ] with-book-tutorial "> }
-"And select it again.  You can query the database by any field -- just set it in the exemplar tuple you pass to " { $link select-tuples } "."
+"And select it again. You can query the database by any field -- just set it in the exemplar tuple you pass to " { $link select-tuples } "."
 { $code <" [
     T{ book { title "Factor for Sheeple" } } select-tuples
 ] with-book-tutorial "> }

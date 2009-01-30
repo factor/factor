@@ -30,7 +30,10 @@ M: local-writer localize
     read-local-quot [ set-local-value ] append ;
 
 M: def localize
-    local>> [ prefix ] [ local-reader? [ 1array >r ] [ >r ] ? ] bi ;
+    local>>
+    [ prefix ]
+    [ local-reader? [ 1array load-local ] [ load-local ] ? ]
+    bi ;
 
 M: object localize 1quotation ;
 

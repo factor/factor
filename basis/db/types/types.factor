@@ -3,12 +3,12 @@
 USING: arrays assocs db kernel math math.parser
 sequences continuations sequences.deep prettyprint
 words namespaces slots slots.private classes mirrors
-classes.tuple combinators calendar.format symbols
-classes.singleton accessors quotations random ;
+classes.tuple combinators calendar.format classes.singleton
+accessors quotations random db.private ;
 IN: db.types
 
-HOOK: persistent-table db ( -- hash )
-HOOK: compound db ( string obj -- hash )
+HOOK: persistent-table db-connection ( -- hash )
+HOOK: compound db-connection ( string obj -- hash )
 
 TUPLE: sql-spec class slot-name column-name type primary-key modifiers ;
 
@@ -42,10 +42,10 @@ ERROR: no-slot ;
     slot-named dup [ no-slot ] unless offset>> ;
 
 : get-slot-named ( name tuple -- value )
-    tuck offset-of-slot slot ;
+    [ nip ] [ offset-of-slot ] 2bi slot ;
 
 : set-slot-named ( value name obj -- )
-    tuck offset-of-slot set-slot ;
+    [ nip ] [ offset-of-slot ] 2bi set-slot ;
 
 ERROR: not-persistent class ;
 
@@ -158,8 +158,8 @@ ERROR: no-sql-type type ;
     modifiers>> [ lookup-modifier ] map " " join
     [ "" ] [ " " prepend ] if-empty ;
 
-HOOK: bind% db ( spec -- )
-HOOK: bind# db ( spec obj -- )
+HOOK: bind% db-connection ( spec -- )
+HOOK: bind# db-connection ( spec obj -- )
 
 ERROR: no-column column ;
 

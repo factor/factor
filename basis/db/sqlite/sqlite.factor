@@ -6,33 +6,43 @@ sequences strings classes.tuple alien.c-types continuations
 db.sqlite.lib db.sqlite.ffi db.tuples words db.types combinators
 math.intervals io nmake accessors vectors math.ranges random
 math.bitwise db.queries destructors db.tuples.private interpolate
-io.streams.string multiline make ;
+io.streams.string multiline make db.private ;
 IN: db.sqlite
 
-TUPLE: sqlite-db < db path ;
+TUPLE: sqlite-db path ;
 
 : <sqlite-db> ( path -- sqlite-db )
-    sqlite-db new-db
+    sqlite-db new
         swap >>path ;
 
-M: sqlite-db db-open ( db -- db )
-    dup path>> sqlite-open >>handle ;
+<PRIVATE
 
-M: sqlite-db db-close ( handle -- ) sqlite-close ;
+TUPLE: sqlite-db-connection < db-connection ;
+
+: <sqlite-db-connection> ( handle -- db-connection )
+    sqlite-db-connection new-db-connection
+        swap >>handle ;
+
+PRIVATE>
+
+M: sqlite-db db-open ( db -- db-connection )
+    path>> sqlite-open <sqlite-db-connection> ;
+
+M: sqlite-db-connection db-close ( handle -- ) sqlite-close ;
 
 TUPLE: sqlite-statement < statement ;
 
 TUPLE: sqlite-result-set < result-set has-more? ;
 
-M: sqlite-db <simple-statement> ( str in out -- obj )
+M: sqlite-db-connection <simple-statement> ( str in out -- obj )
     <prepared-statement> ;
 
-M: sqlite-db <prepared-statement> ( str in out -- obj )
+M: sqlite-db-connection <prepared-statement> ( str in out -- obj )
     sqlite-statement new-statement ;
 
 : sqlite-maybe-prepare ( statement -- statement )
     dup handle>> [
-        db get handle>> over sql>> sqlite-prepare
+        db-connection get handle>> over sql>> sqlite-prepare
         >>handle
     ] unless ;
 
@@ -89,10 +99,10 @@ M: sqlite-statement bind-tuple ( tuple statement -- )
 ERROR: sqlite-last-id-fail ;
 
 : last-insert-id ( -- id )
-    db get handle>> sqlite3_last_insert_rowid
+    db-connection get handle>> sqlite3_last_insert_rowid
     dup zero? [ sqlite-last-id-fail ] when ;
 
-M: sqlite-db insert-tuple-set-key ( tuple statement -- )
+M: sqlite-db-connection insert-tuple-set-key ( tuple statement -- )
     execute-statement last-insert-id swap set-primary-key ;
 
 M: sqlite-result-set #columns ( result-set -- n )
@@ -116,7 +126,7 @@ M: sqlite-statement query-results ( query -- result-set )
     dup handle>> sqlite-result-set new-result-set
     dup advance-row ;
 
-M: sqlite-db create-sql-statement ( class -- statement )
+M: sqlite-db-connection create-sql-statement ( class -- statement )
     [
         dupd
         "create table " 0% 0%
@@ -135,10 +145,10 @@ M: sqlite-db create-sql-statement ( class -- statement )
         "));" 0%
     ] query-make ;
 
-M: sqlite-db drop-sql-statement ( class -- statement )
+M: sqlite-db-connection drop-sql-statement ( class -- statement )
     [ "drop table " 0% 0% ";" 0% drop ] query-make ;
 
-M: sqlite-db <insert-db-assigned-statement> ( tuple -- statement )
+M: sqlite-db-connection <insert-db-assigned-statement> ( tuple -- statement )
     [
         "insert into " 0% 0%
         "(" 0%
@@ -159,19 +169,19 @@ M: sqlite-db <insert-db-assigned-statement> ( tuple -- statement )
         ");" 0%
     ] query-make ;
 
-M: sqlite-db <insert-user-assigned-statement> ( tuple -- statement )
+M: sqlite-db-connection <insert-user-assigned-statement> ( tuple -- statement )
     <insert-db-assigned-statement> ;
 
-M: sqlite-db bind# ( spec obj -- )
+M: sqlite-db-connection bind# ( spec obj -- )
     [
         [ column-name>> ":" next-sql-counter surround dup 0% ]
         [ type>> ] bi
     ] dip <literal-bind> 1, ;
 
-M: sqlite-db bind% ( spec -- )
+M: sqlite-db-connection bind% ( spec -- )
     dup 1, column-name>> ":" prepend 0% ;
 
-M: sqlite-db persistent-table ( -- assoc )
+M: sqlite-db-connection persistent-table ( -- assoc )
     H{
         { +db-assigned-id+ { "integer" "integer" f } }
         { +user-assigned-id+ { f f f } }
@@ -306,7 +316,7 @@ M: sqlite-db persistent-table ( -- assoc )
         delete-trigger-restrict sqlite-trigger,
     ] if ;
 
-M: sqlite-db compound ( string seq -- new-string )
+M: sqlite-db-connection compound ( string seq -- new-string )
     over {
         { "default" [ first number>string " " glue ] }
         { "references" [

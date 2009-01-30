@@ -174,8 +174,6 @@ M: object infer-call*
 
 : infer-special ( word -- )
     {
-        { \ >r [ 1 infer->r ] }
-        { \ r> [ 1 infer-r> ] }
         { \ declare [ infer-declare ] }
         { \ call [ infer-call ] }
         { \ (call) [ infer-call ] }
@@ -194,6 +192,7 @@ M: object infer-call*
         { \ <tuple-boa> [ infer-<tuple-boa> ] }
         { \ (throw) [ infer-(throw) ] }
         { \ exit [ infer-exit ] }
+        { \ load-local [ 1 infer->r ] }
         { \ load-locals [ infer-load-locals ] }
         { \ get-local [ infer-get-local ] }
         { \ drop-locals [ infer-drop-locals ] }
@@ -213,9 +212,9 @@ M: object infer-call*
     "local-word-def" word-prop infer-quot-here ;
 
 {
-    >r r> declare call (call) slip 2slip 3slip dip 2dip 3dip
+    declare call (call) slip 2slip 3slip dip 2dip 3dip
     curry compose execute (execute) if dispatch <tuple-boa>
-    (throw) load-locals get-local drop-locals do-primitive
+    (throw) load-local load-locals get-local drop-locals do-primitive
     alien-invoke alien-indirect alien-callback
 } [ t "special" set-word-prop ] each
 
@@ -644,7 +643,7 @@ M: object infer-call*
 
 \ dll-valid? { object } { object } define-primitive
 
-\ modify-code-heap { array object } { } define-primitive
+\ modify-code-heap { array } { } define-primitive
 
 \ unimplemented { } { } define-primitive
 

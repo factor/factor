@@ -1,10 +1,8 @@
-
 USING: kernel parser words continuations namespaces debugger
-       sequences combinators splitting prettyprint
-       system io io.files io.launcher io.encodings.utf8 io.pipes sequences.deep
-       accessors multi-methods newfx shell.parser
-       combinators.short-circuit eval environment ;
-
+sequences combinators splitting prettyprint system io io.files
+io.pathnames io.launcher io.directories io.encodings.utf8 io.pipes
+sequences.deep accessors multi-methods newfx shell.parser
+combinators.short-circuit eval environment ;
 IN: shell
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -1,6 +1,6 @@
 USING: io io.streams.string io.streams.duplex listener
 tools.test parser math namespaces continuations vocabs kernel
-compiler.units eval ;
+compiler.units eval vocabs.parser ;
 IN: listener.tests
 
 : hello "Hi" print ; parsing

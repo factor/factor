@@ -1,39 +1,61 @@
 
-USING: kernel namespaces sequences
-       io io.files io.launcher io.encodings.ascii
-       bake builder.util
-       accessors vars
-       math.parser ;
+USING: io io.encodings.ascii io.files io.files.temp io.launcher
+       locals math.parser sequences sequences.deep
+       help.syntax
+       easy-help ;
 
 IN: size-of
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-VAR: headers
+Word: size-of
 
-: include-headers ( -- seq )
-  headers> [ `{ "#include <" , ">" } to-string ] map ;
+Values:
 
-: size-of-c-program ( type -- lines )
-  `{
-    "#include <stdio.h>"
-    include-headers
-    { "main() { printf( \"%i\" , sizeof( " , " ) ) ; }" }
-  }
-  to-strings ;
+    HEADERS sequence : List of header files
+    TYPE    string : A C type
+    n       integer : Size in number of bytes ..
+
+Description:
+
+    Use 'size-of' to find out the size in bytes of a C type. 
+
+    The 'headers' argument is a list of header files to use. You may 
+    pass 'f' to only use 'stdio.h'. ..
+
+Example:
+
+    ! Find the size of 'int'
+
+    f "int" size-of .    ..
+
+Example:
+
+    ! Find the size of the 'XAnyEvent' struct from Xlib.h
+
+    { "X11/Xlib.h" } "XAnyEvent" size-of .    ..
+
+;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: c-file ( -- path ) "size-of.c" temp-file ;
+:: size-of ( HEADERS TYPE -- n )
 
-: exe ( -- path ) "size-of" temp-file ;
+  [let | C-FILE   [ "size-of.c" temp-file ]
+         EXE-FILE [ "size-of"   temp-file ]
+         INCLUDES [ HEADERS [| FILE | { "#include <" FILE ">" } concat ] map ] |
+
+    {
+      "#include <stdio.h>"
+      INCLUDES
+      "main() { printf( \"%i\" , sizeof( " TYPE " ) ) ; }"
+    }
+
+    flatten C-FILE  ascii  set-file-lines
+
+    { "gcc" C-FILE "-o" EXE-FILE } try-process
+
+    EXE-FILE ascii <process-reader> contents string>number ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: size-of ( type -- n )
-  size-of-c-program c-file ascii set-file-lines
-
-  { "gcc" c-file "-o" exe } to-strings
-  [ "Error compiling generated C program" print ] run-or-bail
-
-  exe ascii <process-reader> contents string>number ;

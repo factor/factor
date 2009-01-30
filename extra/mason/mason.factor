@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel debugger io io.files threads debugger continuations
-namespaces accessors calendar mason.common mason.updates
-mason.build mason.email ;
+USING: accessors calendar continuations debugger debugger io
+io.directories io.files kernel mason.build mason.common
+mason.email mason.updates namespaces threads ;
 IN: mason
 
 : build-loop-error ( error -- )

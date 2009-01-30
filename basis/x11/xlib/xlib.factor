@@ -31,7 +31,6 @@ TYPEDEF: XID KeySym
 TYPEDEF: ulong Atom
 
 TYPEDEF: char* XPointer
-TYPEDEF: void* Display*
 TYPEDEF: void* Screen*
 TYPEDEF: void* GC
 TYPEDEF: void* Visual*
@@ -51,20 +50,26 @@ TYPEDEF: ulong Time
 TYPEDEF: void* Window**
 TYPEDEF: void* Atom**
 
-: <XID> <ulong> ; inline
-: <Window> <XID> ; inline
-: <Drawable> <XID> ; inline
-: <KeySym> <XID> ; inline
-: <Atom> <ulong> ; inline
+ALIAS: <XID> <ulong>
+ALIAS: <Window> <XID>
+ALIAS: <Drawable> <XID>
+ALIAS: <KeySym> <XID>
+ALIAS: <Atom> <ulong>
 
-: *XID *ulong ; inline
-: *Window *XID ; inline
-: *Drawable *XID ; inline
-: *KeySym *XID ; inline
-: *Atom *ulong ; inline
+ALIAS: *XID *ulong
+ALIAS: *Window *XID
+ALIAS: *Drawable *XID
+ALIAS: *KeySym *XID
+ALIAS: *Atom *ulong
 !
 ! 2 - Display Functions
 !
+
+! This struct is incomplete
+C-STRUCT: Display
+{ "void*" "ext_data" }
+{ "void*" "free_funcs" }
+{ "int" "fd" } ;
 
 FUNCTION: Display* XOpenDisplay ( void* display_name ) ;
 
@@ -93,21 +98,21 @@ FUNCTION: int XCloseDisplay ( Display* display ) ;
 
 ! 3.2 - Window Attributes
 
-: CWBackPixmap          1 0 shift ; inline
-: CWBackPixel           1 1 shift ; inline
-: CWBorderPixmap        1 2 shift ; inline
-: CWBorderPixel         1 3 shift ; inline
-: CWBitGravity          1 4 shift ; inline
-: CWWinGravity          1 5 shift ; inline
-: CWBackingStore        1 6 shift ; inline
-: CWBackingPlanes       1 7 shift ; inline
-: CWBackingPixel        1 8 shift ; inline
-: CWOverrideRedirect    1 9 shift ; inline
-: CWSaveUnder           1 10 shift ; inline
-: CWEventMask           1 11 shift ; inline
-: CWDontPropagate       1 12 shift ; inline
-: CWColormap            1 13 shift ; inline
-: CWCursor              1 14 shift ; inline
+: CWBackPixmap       ( -- n ) 0 2^ ; inline
+: CWBackPixel        ( -- n ) 1 2^ ; inline
+: CWBorderPixmap     ( -- n ) 2 2^ ; inline
+: CWBorderPixel      ( -- n ) 3 2^ ; inline
+: CWBitGravity       ( -- n ) 4 2^ ; inline
+: CWWinGravity       ( -- n ) 5 2^ ; inline
+: CWBackingStore     ( -- n ) 6 2^ ; inline
+: CWBackingPlanes    ( -- n ) 7 2^ ; inline
+: CWBackingPixel     ( -- n ) 8 2^ ; inline
+: CWOverrideRedirect ( -- n ) 9 2^ ; inline
+: CWSaveUnder        ( -- n ) 10 2^ ; inline
+: CWEventMask        ( -- n ) 11 2^ ; inline
+: CWDontPropagate    ( -- n ) 12 2^ ; inline
+: CWColormap         ( -- n ) 13 2^ ; inline
+: CWCursor           ( -- n ) 14 2^ ; inline
 
 C-STRUCT: XSetWindowAttributes
         { "Pixmap" "background_pixmap" }
@@ -156,13 +161,13 @@ FUNCTION: int XMapRaised ( Display* display, Window w ) ;
 
 ! 3.7 - Configuring Windows
 
-: CWX                   1 0 shift ; inline
-: CWY                   1 1 shift ; inline
-: CWWidth               1 2 shift ; inline
-: CWHeight              1 3 shift ; inline
-: CWBorderWidth         1 4 shift ; inline
-: CWSibling             1 5 shift ; inline
-: CWStackMode           1 6 shift ; inline
+: CWX           ( -- n ) 0 2^ ; inline
+: CWY           ( -- n ) 1 2^ ; inline
+: CWWidth       ( -- n ) 2 2^ ; inline
+: CWHeight      ( -- n ) 3 2^ ; inline
+: CWBorderWidth ( -- n ) 4 2^ ; inline
+: CWSibling     ( -- n ) 5 2^ ; inline
+: CWStackMode   ( -- n ) 6 2^ ; inline
 
 C-STRUCT: XWindowChanges
         { "int" "x" }
@@ -307,29 +312,29 @@ FUNCTION: Colormap XCreateColormap ( Display* display, Window w, Visual* visual,
 ! 7 - Graphics Context Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: GCFunction            1 0 shift ; inline
-: GCPlaneMask           1 1 shift ; inline
-: GCForeground          1 2 shift ; inline
-: GCBackground          1 3 shift ; inline
-: GCLineWidth           1 4 shift ; inline
-: GCLineStyle           1 5 shift ; inline
-: GCCapStyle            1 6 shift ; inline
-: GCJoinStyle           1 7 shift ; inline
-: GCFillStyle           1 8 shift ; inline
-: GCFillRule            1 9 shift ; inline
-: GCTile                1 10 shift ; inline
-: GCStipple             1 11 shift ; inline
-: GCTileStipXOrigin     1 12 shift ; inline
-: GCTileStipYOrigin     1 13 shift ; inline
-: GCFont                1 14 shift ; inline
-: GCSubwindowMode       1 15 shift ; inline
-: GCGraphicsExposures   1 16 shift ; inline
-: GCClipXOrigin         1 17 shift ; inline
-: GCClipYOrigin         1 18 shift ; inline
-: GCClipMask            1 19 shift ; inline
-: GCDashOffset          1 20 shift ; inline
-: GCDashList            1 21 shift ; inline
-: GCArcMode             1 22 shift ; inline
+: GCFunction          ( -- n ) 0 2^ ; inline
+: GCPlaneMask         ( -- n ) 1 2^ ; inline
+: GCForeground        ( -- n ) 2 2^ ; inline
+: GCBackground        ( -- n ) 3 2^ ; inline
+: GCLineWidth         ( -- n ) 4 2^ ; inline
+: GCLineStyle         ( -- n ) 5 2^ ; inline
+: GCCapStyle          ( -- n ) 6 2^ ; inline
+: GCJoinStyle         ( -- n ) 7 2^ ; inline
+: GCFillStyle         ( -- n ) 8 2^ ; inline
+: GCFillRule          ( -- n ) 9 2^ ; inline
+: GCTile              ( -- n ) 10 2^ ; inline
+: GCStipple           ( -- n ) 11 2^ ; inline
+: GCTileStipXOrigin   ( -- n ) 12 2^ ; inline
+: GCTileStipYOrigin   ( -- n ) 13 2^ ; inline
+: GCFont              ( -- n ) 14 2^ ; inline
+: GCSubwindowMode     ( -- n ) 15 2^ ; inline
+: GCGraphicsExposures ( -- n ) 16 2^ ; inline
+: GCClipXOrigin       ( -- n ) 17 2^ ; inline
+: GCClipYOrigin       ( -- n ) 18 2^ ; inline
+: GCClipMask          ( -- n ) 19 2^ ; inline
+: GCDashOffset        ( -- n ) 20 2^ ; inline
+: GCDashList          ( -- n ) 21 2^ ; inline
+: GCArcMode           ( -- n ) 22 2^ ; inline
 
 : GXclear               HEX: 0 ; inline
 : GXand                 HEX: 1 ; inline
@@ -500,32 +505,32 @@ FUNCTION: Status XKillClient ( Display* display, XID resource ) ;
 
 ! 10.3 - Event Masks
 
-: NoEventMask                   0 ; inline
-: KeyPressMask                  1 0 shift ; inline
-: KeyReleaseMask                1 1 shift ; inline
-: ButtonPressMask               1 2 shift ; inline
-: ButtonReleaseMask             1 3 shift ; inline
-: EnterWindowMask               1 4 shift ; inline
-: LeaveWindowMask               1 5 shift ; inline
-: PointerMotionMask             1 6 shift ; inline
-: PointerMotionHintMask         1 7 shift ; inline
-: Button1MotionMask             1 8 shift ; inline
-: Button2MotionMask             1 9 shift ; inline
-: Button3MotionMask             1 10 shift ; inline
-: Button4MotionMask             1 11 shift ; inline
-: Button5MotionMask             1 12 shift ; inline
-: ButtonMotionMask              1 13 shift ; inline
-: KeymapStateMask               1 14 shift ; inline
-: ExposureMask                  1 15 shift ; inline
-: VisibilityChangeMask          1 16 shift ; inline
-: StructureNotifyMask           1 17 shift ; inline
-: ResizeRedirectMask            1 18 shift ; inline
-: SubstructureNotifyMask        1 19 shift ; inline
-: SubstructureRedirectMask      1 20 shift ; inline
-: FocusChangeMask               1 21 shift ; inline
-: PropertyChangeMask            1 22 shift ; inline
-: ColormapChangeMask            1 23 shift ; inline
-: OwnerGrabButtonMask           1 24 shift ; inline
+: NoEventMask              ( -- n ) 0 ; inline
+: KeyPressMask             ( -- n ) 0 2^ ; inline
+: KeyReleaseMask           ( -- n ) 1 2^ ; inline
+: ButtonPressMask          ( -- n ) 2 2^ ; inline
+: ButtonReleaseMask        ( -- n ) 3 2^ ; inline
+: EnterWindowMask          ( -- n ) 4 2^ ; inline
+: LeaveWindowMask          ( -- n ) 5 2^ ; inline
+: PointerMotionMask        ( -- n ) 6 2^ ; inline
+: PointerMotionHintMask    ( -- n ) 7 2^ ; inline
+: Button1MotionMask        ( -- n ) 8 2^ ; inline
+: Button2MotionMask        ( -- n ) 9 2^ ; inline
+: Button3MotionMask        ( -- n ) 10 2^ ; inline
+: Button4MotionMask        ( -- n ) 11 2^ ; inline
+: Button5MotionMask        ( -- n ) 12 2^ ; inline
+: ButtonMotionMask         ( -- n ) 13 2^ ; inline
+: KeymapStateMask          ( -- n ) 14 2^ ; inline
+: ExposureMask             ( -- n ) 15 2^ ; inline
+: VisibilityChangeMask     ( -- n ) 16 2^ ; inline
+: StructureNotifyMask      ( -- n ) 17 2^ ; inline
+: ResizeRedirectMask       ( -- n ) 18 2^ ; inline
+: SubstructureNotifyMask   ( -- n ) 19 2^ ; inline
+: SubstructureRedirectMask ( -- n ) 20 2^ ; inline
+: FocusChangeMask          ( -- n ) 21 2^ ; inline
+: PropertyChangeMask       ( -- n ) 22 2^ ; inline
+: ColormapChangeMask       ( -- n ) 23 2^ ; inline
+: OwnerGrabButtonMask      ( -- n ) 24 2^ ; inline
 
 : KeyPress              2 ; inline
 : KeyRelease            3 ; inline
@@ -579,20 +584,20 @@ C-STRUCT: XAnyEvent
 : Button4 4 ; inline
 : Button5 5 ; inline
 
-: Button1Mask           1 8  shift ; inline
-: Button2Mask           1 9  shift ; inline
-: Button3Mask           1 10 shift ; inline
-: Button4Mask           1 11 shift ; inline
-: Button5Mask           1 12 shift ; inline
+: Button1Mask ( -- n ) 1 8  shift ; inline
+: Button2Mask ( -- n ) 1 9  shift ; inline
+: Button3Mask ( -- n ) 1 10 shift ; inline
+: Button4Mask ( -- n ) 1 11 shift ; inline
+: Button5Mask ( -- n ) 1 12 shift ; inline
 
-: ShiftMask     1 0 shift ; inline
-: LockMask      1 1 shift ; inline
-: ControlMask   1 2 shift ; inline
-: Mod1Mask      1 3 shift ; inline
-: Mod2Mask      1 4 shift ; inline
-: Mod3Mask      1 5 shift ; inline
-: Mod4Mask      1 6 shift ; inline
-: Mod5Mask      1 7 shift ; inline
+: ShiftMask   ( -- n ) 1 0 shift ; inline
+: LockMask    ( -- n ) 1 1 shift ; inline
+: ControlMask ( -- n ) 1 2 shift ; inline
+: Mod1Mask    ( -- n ) 1 3 shift ; inline
+: Mod2Mask    ( -- n ) 1 4 shift ; inline
+: Mod3Mask    ( -- n ) 1 5 shift ; inline
+: Mod4Mask    ( -- n ) 1 6 shift ; inline
+: Mod5Mask    ( -- n ) 1 7 shift ; inline
 
 C-STRUCT: XButtonEvent
         { "int" "type" }
@@ -1316,15 +1321,15 @@ FUNCTION: int XBell ( Display* display, int percent ) ;
 
 ! !!! INPUT METHODS
 
-: XIMPreeditArea      HEX: 0001 ;
-: XIMPreeditCallbacks HEX: 0002 ;
-: XIMPreeditPosition  HEX: 0004 ;
-: XIMPreeditNothing   HEX: 0008 ;
-: XIMPreeditNone      HEX: 0010 ;
-: XIMStatusArea       HEX: 0100 ;
-: XIMStatusCallbacks  HEX: 0200 ;
-: XIMStatusNothing    HEX: 0400 ;
-: XIMStatusNone       HEX: 0800 ;
+: XIMPreeditArea      HEX: 0001 ; inline
+: XIMPreeditCallbacks HEX: 0002 ; inline
+: XIMPreeditPosition  HEX: 0004 ; inline
+: XIMPreeditNothing   HEX: 0008 ; inline
+: XIMPreeditNone      HEX: 0010 ; inline
+: XIMStatusArea       HEX: 0100 ; inline
+: XIMStatusCallbacks  HEX: 0200 ; inline
+: XIMStatusNothing    HEX: 0400 ; inline
+: XIMStatusNone       HEX: 0800 ; inline
 
 : XNVaNestedList "XNVaNestedList" ;
 : XNQueryInputStyle "queryInputStyle" ;

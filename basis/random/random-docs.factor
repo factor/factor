@@ -73,7 +73,7 @@ ARTICLE: "random-protocol" "Random protocol"
 ARTICLE: "random" "Generating random integers"
 "The " { $vocab-link "random" } " vocabulary contains a protocol for generating random or pseudorandom numbers."
 $nl
-"The ``Mersenne Twister'' pseudorandom number generator algorithm is the default generator stored in " { $link random-generator } "."
+"The “Mersenne Twister” pseudorandom number generator algorithm is the default generator stored in " { $link random-generator } "."
 $nl
 "Generate a random object:"
 { $subsection random }

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types kernel math windows windows.kernel32
-namespaces calendar ;
+namespaces calendar math.bitwise ;
 IN: windows.time
 
 : >64bit ( lo hi -- n )
@@ -11,8 +11,9 @@ IN: windows.time
     1601 1 1 0 0 0 instant <timestamp> ;
 
 : FILETIME>windows-time ( FILETIME -- n )
-    [ FILETIME-dwLowDateTime ] keep
-    FILETIME-dwHighDateTime >64bit ;
+    [ FILETIME-dwLowDateTime ]
+    [ FILETIME-dwHighDateTime ]
+    bi >64bit ;
 
 : windows-time>timestamp ( n -- timestamp )
     10000000 /i seconds windows-1601 swap time+ ;
@@ -28,12 +29,12 @@ IN: windows.time
 : windows-time>FILETIME ( n -- FILETIME )
     "FILETIME" <c-object>
     [
-        [ >r HEX: ffffffff bitand r> set-FILETIME-dwLowDateTime ] 2keep
-        >r -32 shift r> set-FILETIME-dwHighDateTime
+        [ [ 32 bits ] dip set-FILETIME-dwLowDateTime ]
+        [ [ -32 shift ] dip set-FILETIME-dwHighDateTime ] 2bi
     ] keep ;
 
 : timestamp>FILETIME ( timestamp -- FILETIME/f )
-    [ >gmt timestamp>windows-time windows-time>FILETIME ] [ f ] if* ;
+    dup [ >gmt timestamp>windows-time windows-time>FILETIME ] when ;
 
 : FILETIME>timestamp ( FILETIME -- timestamp/f )
     FILETIME>windows-time windows-time>timestamp ;

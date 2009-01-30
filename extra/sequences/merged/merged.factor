@@ -16,7 +16,7 @@ C: <merged> merged
     dupd <2merged> swap like ;
 
 : 3merge ( seq1 seq2 seq3 -- seq )
-    pick >r <3merged> r> like ;
+    pick [ <3merged> ] dip like ;
 
 M: merged length seqs>> [ length ] map sum ;
 

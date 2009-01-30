@@ -68,7 +68,8 @@ IN: compiler.cfg.alias-analysis
 ! Map vregs -> alias classes
 SYMBOL: vregs>acs
 
-: check [ "BUG: static type error detected" throw ] unless* ; inline
+: check ( obj -- obj )
+    [ "BUG: static type error detected" throw ] unless* ; inline
  
 : vreg>ac ( vreg -- ac )
     #! Only vregs produced by ##allot, ##peek and ##slot can
@@ -223,7 +224,7 @@ GENERIC: analyze-aliases* ( insn -- insn' )
 M: ##load-immediate analyze-aliases*
     dup [ val>> ] [ dst>> ] bi constants get set-at ;
 
-M: ##load-indirect analyze-aliases*
+M: ##load-reference analyze-aliases*
     dup dst>> set-heap-ac ;
 
 M: ##alien-global analyze-aliases*

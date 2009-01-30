@@ -14,8 +14,8 @@ HELP: parse-farkup ( string -- farkup )
 { $description "Parses Farkup and outputs a tree of " { $link "farkup-ast" } "." } ;
 
 HELP: (write-farkup)
-{ $values { "farkup" "a Farkup syntax tree node" } }
-{ $description "Writes a Farkup syntax tree as HTML on " { $link output-stream } "." } ;
+{ $values { "farkup" "a Farkup syntax tree node" } { "xml" "an XML chunk" } }
+{ $description "Converts a Farkup syntax tree node to XML." } ;
 
 ARTICLE: "farkup-ast" "Farkup syntax tree nodes"
 "The " { $link parse-farkup } " word outputs a tree of nodes corresponding to the Farkup syntax of the input string. This tree can be programatically traversed and mutated before being passed on to " { $link write-farkup } "."

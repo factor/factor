@@ -28,11 +28,6 @@ PREDICATE: deferred < word ( obj -- ? )
 M: deferred definer drop \ DEFER: f ;
 M: deferred definition drop f ;
 
-PREDICATE: symbol < word ( obj -- ? )
-    [ def>> ] [ [ ] curry ] bi sequence= ;
-M: symbol definer drop \ SYMBOL: f ;
-M: symbol definition drop f ;
-
 PREDICATE: primitive < word ( obj -- ? )
     [ def>> [ do-primitive ] tail? ]
     [ sub-primitive>> >boolean ]
@@ -59,7 +54,7 @@ M: primitive definition drop f ;
 SYMBOL: bootstrapping?
 
 : if-bootstrapping ( true false -- )
-    bootstrapping? get -rot if ; inline
+    [ bootstrapping? get ] 2dip if ; inline
 
 : bootstrap-word ( word -- target )
     [ target-word ] [ ] if-bootstrapping ;
@@ -192,11 +187,8 @@ SYMBOL: visited
 : make-foldable ( word -- )
     dup make-flushable t "foldable" set-word-prop ;
 
-: define-inline ( word quot -- )
-    dupd define make-inline ;
-
-: define-symbol ( word -- )
-    dup [ ] curry define-inline ;
+: define-inline ( word def effect -- )
+    [ define-declared ] [ 2drop make-inline ] 3bi ;
 
 GENERIC: reset-word ( word -- )
 
