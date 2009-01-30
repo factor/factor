@@ -4,7 +4,8 @@ IN: opengl
 
 HELP: gl-color
 { $values { "color" color } }
-{ $description "Wrapper for " { $link glColor4d } " taking a color specifier." } ;
+{ $description "Wrapper for " { $link glColor4d } " taking an instance of " { $link color } "." }
+{ $notes "See " { $link "colors" } "." } ;
 
 HELP: gl-error
 { $description "If the most recent OpenGL call resulted in an error, print the error to " { $link output-stream } "." } ;
