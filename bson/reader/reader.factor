@@ -1,4 +1,4 @@
-USING: mirrors io io.encodings.utf8 io.encodings.binary math match kernel sequences
+USING: mirrors io io.encodings.utf8 io.encodings.binary math kernel sequences
        splitting accessors io.streams.byte-array namespaces prettyprint
        bson.constants assocs alien.c-types alien.strings fry words
        serialize byte-arrays ;
