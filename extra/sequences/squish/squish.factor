@@ -10,4 +10,3 @@ IN: sequences.squish
 
 : squish-strings ( seq -- seq' )
     [ { [ sequence? ] [ integer? not ] } 1&& ] "" squish ;
-

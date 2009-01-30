@@ -2,7 +2,7 @@ USING: accessors alien alien.c-types arrays byte-arrays combinators
 combinators.short-circuit fry kernel math math.blas.cblas
 math.complex math.functions math.order sequences.complex
 sequences.complex-components sequences sequences.private
-functors words locals
+functors words locals parser prettyprint.backend prettyprint.custom
 specialized-arrays.float specialized-arrays.double
 specialized-arrays.direct.float specialized-arrays.direct.double ;
 IN: math.blas.vectors
@@ -138,6 +138,8 @@ VECTOR         DEFINES ${TYPE}-blas-vector
 <VECTOR>       DEFINES <${TYPE}-blas-vector>
 >VECTOR        DEFINES >${TYPE}-blas-vector
 
+XVECTOR{       DEFINES ${T}vector{
+
 WHERE
 
 TUPLE: VECTOR < blas-vector-base ;
@@ -164,6 +166,11 @@ M: VECTOR (blas-direct-array)
     [ underlying>> ]
     [ [ length>> ] [ inc>> ] bi * ] bi
     <DIRECT-ARRAY> ;
+
+: XVECTOR{ \ } [ >VECTOR ] parse-literal ; parsing
+
+M: VECTOR pprint-delims
+    drop \ XVECTOR{ \ } ;
 
 ;FUNCTOR
 
@@ -270,3 +277,5 @@ M: VECTOR n*V!
 
 >>
 
+M: blas-vector-base >pprint-sequence ;
+M: blas-vector-base pprint* pprint-object ;

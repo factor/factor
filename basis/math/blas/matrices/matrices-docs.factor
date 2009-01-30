@@ -1,4 +1,4 @@
-USING: alien byte-arrays help.markup help.syntax math math.blas.vectors sequences strings ;
+USING: alien byte-arrays help.markup help.syntax math math.blas.vectors sequences strings multiline ;
 IN: math.blas.matrices
 
 ARTICLE: "math.blas-summary" "Basic Linear Algebra Subroutines (BLAS) interface"
@@ -21,8 +21,6 @@ ARTICLE: "math.blas-types" "BLAS interface types"
 { $subsection double-blas-matrix }
 { $subsection float-complex-blas-matrix }
 { $subsection double-complex-blas-matrix } 
-"Syntax words are provided for constructing literal vectors and matrices in the " { $vocab-link "math.blas.syntax" } " vocabulary:"
-{ $subsection "math.blas.syntax" }
 "There are BOA constructors for all vector and matrix types, which provide the most flexibility in specifying memory layout:"
 { $subsection <float-blas-vector> }
 { $subsection <double-blas-vector> }
@@ -74,7 +72,13 @@ ARTICLE: "math.blas.matrices" "BLAS interface matrix operations"
 { $subsection n*M! }
 { $subsection n*M }
 { $subsection M*n }
-{ $subsection M/n } ;
+{ $subsection M/n }
+"Literal syntax:"
+{ $subsection POSTPONE: smatrix{ }
+{ $subsection POSTPONE: dmatrix{ }
+{ $subsection POSTPONE: cmatrix{ }
+{ $subsection POSTPONE: zmatrix{ } ;
+
 
 ABOUT: "math.blas.matrices"
 
@@ -243,3 +247,43 @@ HELP: <empty-vector>
 { $values { "length" "The length of the new vector" } { "exemplar" blas-vector-base blas-matrix-base } { "vector" blas-vector-base } }
 { $description "Return a vector of zeros with the given " { $snippet "length" } " and the same element type as " { $snippet "v" } "." } ;
 
+HELP: smatrix{
+{ $syntax <" smatrix{
+    { 1.0 0.0 0.0 1.0 }
+    { 0.0 1.0 0.0 2.0 }
+    { 0.0 0.0 1.0 3.0 }
+    { 0.0 0.0 0.0 1.0 }
+} "> }
+{ $description "Construct a literal " { $link float-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
+
+HELP: dmatrix{
+{ $syntax <" dmatrix{
+    { 1.0 0.0 0.0 1.0 }
+    { 0.0 1.0 0.0 2.0 }
+    { 0.0 0.0 1.0 3.0 }
+    { 0.0 0.0 0.0 1.0 }
+} "> }
+{ $description "Construct a literal " { $link double-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
+
+HELP: cmatrix{
+{ $syntax <" cmatrix{
+    { 1.0 0.0           0.0 1.0           }
+    { 0.0 C{ 0.0 1.0 }  0.0 2.0           }
+    { 0.0 0.0          -1.0 3.0           }
+    { 0.0 0.0           0.0 C{ 0.0 -1.0 } }
+} "> }
+{ $description "Construct a literal " { $link float-complex-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
+
+HELP: zmatrix{
+{ $syntax <" zmatrix{
+    { 1.0 0.0           0.0 1.0           }
+    { 0.0 C{ 0.0 1.0 }  0.0 2.0           }
+    { 0.0 0.0          -1.0 3.0           }
+    { 0.0 0.0           0.0 C{ 0.0 -1.0 } }
+} "> }
+{ $description "Construct a literal " { $link double-complex-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
+
+{
+    POSTPONE: smatrix{ POSTPONE: dmatrix{
+    POSTPONE: cmatrix{ POSTPONE: zmatrix{
+} related-words
