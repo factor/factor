@@ -74,7 +74,7 @@ METHOD: satisfiable? { ⊥ } drop f ;
     [ \ ¬ instance? ] partition [ x>> ] map intersect empty? ;
 
 METHOD: satisfiable? { □ }
-    cnf [ (satisfiable?) ] contains? ;
+    cnf [ (satisfiable?) ] any? ;
 
 GENERIC: (expr.) ( expr -- )
 

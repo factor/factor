@@ -124,7 +124,7 @@ DEFER: (flat-length)
         [ class-types length 1 = ]
         [ union-class? not ]
         bi and
-    ] contains? ;
+    ] any? ;
 
 : node-count-bias ( -- n )
     45 node-count get [-] 8 /i ;

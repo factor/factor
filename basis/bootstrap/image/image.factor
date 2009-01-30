@@ -351,7 +351,7 @@ M: wrapper '
     bootstrap-cell <groups> native> emit-seq ;
 
 : pad-bytes ( seq -- newseq )
-    dup length bootstrap-cell align 0 pad-right ;
+    dup length bootstrap-cell align 0 pad-tail ;
 
 : extended-part ( str -- str' )
     dup [ 128 < ] all? [ drop f ] [

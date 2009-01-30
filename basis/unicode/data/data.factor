@@ -72,7 +72,7 @@ VALUE: properties
 
 : exclusions ( -- set )
     exclusions-file utf8 file-lines
-    [ "#" split1 drop [ blank? ] trim-right hex> ] map harvest ;
+    [ "#" split1 drop [ blank? ] trim-tail hex> ] map harvest ;
 
 : remove-exclusions ( alist -- alist )
     exclusions [ dup ] H{ } map>assoc assoc-diff ;

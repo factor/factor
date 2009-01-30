@@ -2,7 +2,6 @@ CFLAGS += -DWINDOWS -mno-cygwin
 LIBS = -lm
 PLAF_DLL_OBJS += vm/os-windows.o
 EXE_EXTENSION=.exe
-CONSOLE_EXE_EXTENSION=.com
 DLL_EXTENSION=.dll
 LINKER = $(CC) -shared -mno-cygwin -o 
 LINK_WITH_ENGINE = -l$(DLL_PREFIX)factor$(DLL_SUFFIX)

@@ -11,7 +11,7 @@ TUPLE: xml-test id uri sections description type ;
         [ "ID" attr >>id ]
         [ "URI" attr >>uri ]
         [ "SECTIONS" attr >>sections ]
-        [ children>> xml-chunk>string >>description ]
+        [ children>> xml>string >>description ]
     } cleave ;
 
 : parse-tests ( xml -- tests )

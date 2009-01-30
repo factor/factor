@@ -63,7 +63,7 @@ M: ##compare-float-branch linearize-insn
             ##box-float
             ##box-alien
         } memq?
-    ] contains? ;
+    ] any? ;
 
 : linearize-basic-block ( bb -- )
     [ number>> _label ]

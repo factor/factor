@@ -4,7 +4,7 @@ USING: kernel arrays sequences fry math combinators ;
 
 IN: adsoda.combinators
 
-! : (combinations) ( seq -- seq ) [ 1 tail ] dip combinations ; 
+! : (combinations) ( seq -- seq ) [ 1 tail ] dip combinations ;
 
 ! : prefix-each [ prefix ] curry map ; inline
 
@@ -34,7 +34,8 @@ IN: adsoda.combinators
     } cond
 ;
 
-: concat-nth ( seq1 seq2 -- seq )  [ nth append ] curry map-index ;
+: concat-nth ( seq1 seq2 -- seq )  
+    [ nth append ] curry map-index ;
 
 : do-cycle   ( array -- array )   dup first suffix ;
 

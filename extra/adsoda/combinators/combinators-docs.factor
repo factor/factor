@@ -5,7 +5,7 @@ IN: adsoda.combinators
 
 HELP: among
 { $values
-     { "array" array } { "n" null }
+     { "array" array } { "n" "number of value to select" }
      { "array" array }
 }
 { $description "returns an array containings every possibilities of n choices among a given sequence" } ;
@@ -32,7 +32,7 @@ HELP: do-cycle
 { $description "Copy the first element at the end of the sequence in order to close the cycle." } ;
 
 
-ARTICLE: "adsoda.combinators" "adsoda.combinators"
+ARTICLE: "adsoda.combinators" "Combinators"
 { $vocab-link "adsoda.combinators" }
 ;
 

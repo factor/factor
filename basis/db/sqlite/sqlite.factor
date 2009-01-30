@@ -294,7 +294,7 @@ M: sqlite-db-connection persistent-table ( -- assoc )
     ] with-string-writer ;
 
 : can-be-null? ( -- ? )
-    "sql-spec" get modifiers>> [ +not-null+ = ] contains? not ;
+    "sql-spec" get modifiers>> [ +not-null+ = ] any? not ;
 
 : delete-cascade? ( -- ? )
     "sql-spec" get modifiers>> { +on-delete+ +cascade+ } swap subseq? ;

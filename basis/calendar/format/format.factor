@@ -5,11 +5,11 @@ sequences io accessors arrays io.streams.string splitting
 combinators accessors calendar calendar.format.macros present ;
 IN: calendar.format
 
-: pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-left ;
+: pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-head ;
 
-: pad-0000 ( n -- str ) number>string 4 CHAR: 0 pad-left ;
+: pad-0000 ( n -- str ) number>string 4 CHAR: 0 pad-head ;
 
-: pad-00000 ( n -- str ) number>string 5 CHAR: 0 pad-left ;
+: pad-00000 ( n -- str ) number>string 5 CHAR: 0 pad-head ;
 
 : write-00 ( n -- ) pad-00 write ;
 

@@ -175,7 +175,7 @@ M: #branch check-stack-flow*
     branch-out get [ ] find nip swap head* >vector datastack set ;
 
 M: #phi check-stack-flow*
-    branch-out get [ ] contains? [
+    branch-out get [ ] any? [
         [ check-phi-in ] [ set-phi-datastack ] [ check-out-d ] tri
     ] [ drop terminated? on ] if ;
 

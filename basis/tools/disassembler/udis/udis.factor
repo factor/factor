@@ -59,8 +59,8 @@ SINGLETON: udis-disassembler
     dup [ second length ] map supremum
     '[
         [
-            [ first >hex cell 2 * CHAR: 0 pad-left % ": " % ]
-            [ second _ CHAR: \s pad-right % "  " % ]
+            [ first >hex cell 2 * CHAR: 0 pad-head % ": " % ]
+            [ second _ CHAR: \s pad-tail % "  " % ]
             [ third % ]
             tri
         ] "" make
