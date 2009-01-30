@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types alien.destructors alien.syntax
-destructors fry kernel math sequences libc colors
+destructors fry kernel math math.bitwise sequences libc colors
 core-graphics.types core-foundation.utilities ;
 IN: core-graphics
 
@@ -24,6 +24,16 @@ kCGImageAlphaNoneSkipFirst ;
 : kCGBitmapByteOrder32Little ( -- n ) 2 12 shift ; inline
 : kCGBitmapByteOrder16Big ( -- n ) 3 12 shift ; inline
 : kCGBitmapByteOrder32Big ( -- n ) 4 12 shift ; inline
+
+: kCGBitmapByteOrder16Host ( -- n )
+    little-endian?
+    kCGBitmapByteOrder16Little
+    kCGBitmapByteOrder16Big ? ; foldable
+
+: kCGBitmapByteOrder32Host ( -- n )
+    little-endian?
+    kCGBitmapByteOrder32Little
+    kCGBitmapByteOrder32Big ? ; foldable
 
 FUNCTION: CGColorRef CGColorCreateGenericRGB (
    CGFloat red,
@@ -79,21 +89,41 @@ FUNCTION: void CGContextSetTextPosition (
    CGFloat y
 ) ;
 
+FUNCTION: void CGContextFillRect (
+   CGContextRef c,
+   CGRect rect
+) ;
+
+FUNCTION: void CGContextSetShouldSmoothFonts (
+   CGContextRef c,
+   bool shouldSmoothFonts
+) ;
+
 FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
 
 FUNCTION: void* CGBitmapContextGetData ( CGContextRef c ) ;
 
 <PRIVATE
 
+: bitmap-flags ( -- flags )
+    { kCGImageAlphaPremultipliedFirst kCGBitmapByteOrder32Host } flags ;
+
+: bitmap-size ( dim -- n )
+    product "uint" heap-size * ;
+
+: malloc-bitmap-data ( dim -- alien )
+    bitmap-size malloc &free ;
+
+: bitmap-color-space ( -- color-space )
+    CGColorSpaceCreateDeviceRGB &CGColorSpaceRelease ;
+
 : <CGBitmapContext> ( dim -- context )
-    [ product "uint" malloc-array &free ] [ first2 8 ] [ first 4 * ] tri
-    CGColorSpaceCreateDeviceRGB &CGColorSpaceRelease
-    kCGImageAlphaPremultipliedLast CGBitmapContextCreate
+    [ malloc-bitmap-data ] [ first2 8 ] [ first 4 * ] tri
+    bitmap-color-space bitmap-flags CGBitmapContextCreate
     [ "CGBitmapContextCreate failed" throw ] unless* ;
 
 : bitmap-data ( bitmap dim -- data )
-    [ CGBitmapContextGetData ]
-    [ product "uint" heap-size * ] bi*
+    [ CGBitmapContextGetData ] [ bitmap-size ] bi*
     memory>byte-array ;
 
 PRIVATE>

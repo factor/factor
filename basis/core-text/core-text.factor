@@ -3,9 +3,9 @@
 USING: arrays alien alien.c-types alien.syntax kernel
 destructors words parser accessors fry words hashtables
 sequences memoize assocs math math.functions locals init
-namespaces colors core-foundation core-foundation.strings
-core-foundation.attributed-strings core-foundation.utilities
-core-graphics core-graphics.types ;
+namespaces combinators colors core-foundation
+core-foundation.strings core-foundation.attributed-strings
+core-foundation.utilities core-graphics core-graphics.types ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
@@ -107,6 +107,8 @@ FUNCTION: CTFontRef CTFontCreateCopyWithSymbolicTraits (
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
+TUPLE: line font line bounds dim bitmap age refs disposed ;
+
 TUPLE: typographic-bounds width ascent descent leading ;
 
 : line-typographic-bounds ( line -- typographic-bounds )
@@ -114,27 +116,31 @@ TUPLE: typographic-bounds width ascent descent leading ;
     [ CTLineGetTypographicBounds ] 3keep [ *CGFloat ] tri@
     typographic-bounds boa ;
 
-TUPLE: line string font line bounds dim bitmap age refs disposed ;
-
 : bounds>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
     [ ceiling >fixnum ]
     bi@ 2array ;
 
-:: draw-line ( line bounds context -- )
-    context 0.0 bounds descent>> CGContextSetTextPosition
-    line context CTLineDraw ;
-
-: <line> ( string font -- line )
+:: <line> ( string font foreground background -- line )
     [
-        CFRetain |CFRelease
-        2dup white <CTLine> |CFRelease
-        dup line-typographic-bounds
-        dup bounds>dim 3dup [ draw-line ] with-bitmap-context
-        0 0 f line boa
+        [let* | font [ font CFRetain |CFRelease ]
+                line [ string font foreground <CTLine> |CFRelease ]
+                bounds [ line line-typographic-bounds ]
+                dim [ bounds bounds>dim ] |
+            dim [
+                {
+                    [ background >rgba-components CGContextSetRGBFillColor ]
+                    [ 0 0 dim first2 <CGRect> CGContextFillRect ]
+                    [ 0 bounds descent>> CGContextSetTextPosition ]
+                    [ line swap CTLineDraw ]
+                } cleave
+            ] with-bitmap-context
+            [ font line bounds dim ] dip 0 0 f
+        ]
+        line boa
     ] with-destructors ;
 
-M: line dispose* line>> CFRelease ;
+M: line dispose* [ font>> CFRelease ] [ line>> CFRelease ] bi ;
 
 : ref/unref-line ( line n -- )
     '[ _ + ] change-refs 0 >>age drop ;
@@ -145,9 +151,9 @@ M: line dispose* line>> CFRelease ;
 SYMBOL: cached-lines
 
 : cached-line ( string font -- line )
-    cached-lines get [ <line> ] 2cache ;
+    black white 4array cached-lines get [ first4 <line> ] cache ;
 
-CONSTANT: max-line-age 5
+CONSTANT: max-line-age 10
 
 : age ( obj -- ? )
     [ 1+ ] change-age age>> max-line-age >= ;

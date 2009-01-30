@@ -3,7 +3,7 @@
 USING: assocs accessors alien core-graphics.types core-text kernel
 hashtables namespaces sequences ui.gadgets.worlds ui.text
 ui.text.private opengl opengl.gl destructors combinators core-foundation
-core-foundation.strings memoize math math.vectors init ;
+core-foundation.strings memoize math math.vectors init colors ;
 IN: ui.text.core-text
 
 SINGLETON: core-text-renderer
@@ -48,42 +48,54 @@ M: core-text-renderer open-font
 M: core-text-renderer string-dim
     [ " " string-dim { 0 1 } v* ] [ swap cached-line dim>> ] if-empty ;
 
-TUPLE: line-texture line texture age disposed ;
+TUPLE: rendered-line line texture display-list age disposed ;
 
-: <line-texture> ( line -- texture )
-    #! Note: we only ref-line if make-texture succeeds
+: make-line-display-list ( rendered-line texture -- dlist )
+    GL_COMPILE [
+        GL_TEXTURE_2D [
+            GL_TEXTURE_BIT [
+                GL_TEXTURE_COORD_ARRAY [
+                    white gl-color
+                    GL_TEXTURE_2D swap glBindTexture
+                    init-texture rect-texture-coords
+                    dim>> fill-rect-vertices (gl-fill-rect)
+                    GL_TEXTURE_2D 0 glBindTexture
+                ] do-enabled-client-state
+            ] do-attribs
+        ] do-enabled
+    ] make-dlist ;
+
+: make-core-graphics-texture ( dim bitmap -- texture )
+    GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8_REV make-texture ;
+
+: <rendered-line> ( line -- texture )
+    #! Note: we only ref-line if make-texture and make-line-display-list
+    #! succeed
     [
-        dup [ dim>> ] [ bitmap>> ] bi GL_RGBA make-texture
-        0 f \ line-texture boa
+        dup [ dim>> ] [ bitmap>> ] bi make-core-graphics-texture
+        2dup make-line-display-list
+        0 f \ rendered-line boa
     ] keep ref-line ;
 
-M: line-texture dispose*
+M: rendered-line dispose*
     [ line>> unref-line ]
-    [ texture>> delete-texture ] bi ;
+    [ texture>> delete-texture ]
+    [ display-list>> delete-dlist ] tri ;
 
-: line-texture ( string open-font -- texture )
-    world get fonts>> [ cached-line <line-texture> ] 2cache 0 >>age ;
+: rendered-line ( string open-font -- line-display-list )
+    world get fonts>> [ cached-line <rendered-line> ] 2cache 0 >>age ;
 
-: age-line-textures ( world -- )
+: age-rendered-lines ( world -- )
     [ [ age ] age-assoc ] change-fonts drop ;
 
 M: core-text-renderer finish-text-rendering
-    age-line-textures age-lines ;
-
-: draw-line-texture ( line-texture -- )
-    GL_TEXTURE_2D [
-        GL_TEXTURE_BIT [
-            GL_TEXTURE_COORD_ARRAY [
-                GL_TEXTURE_2D over texture>> glBindTexture
-                init-texture rect-texture-coords
-                line>> dim>> fill-rect-vertices (gl-fill-rect)
-                GL_TEXTURE_2D 0 glBindTexture
-            ] do-enabled-client-state
-        ] do-attribs
-    ] do-enabled ;
+    age-rendered-lines age-lines ;
 
 M: core-text-renderer draw-string ( font string loc -- )
-    [ swap open-font line-texture draw-line-texture ] with-translation ;
+    [
+        swap open-font rendered-line
+        display-list>> glCallList
+    ] with-translation ;
 
 M: core-text-renderer x>offset ( x font string -- n )
     [ 2drop 0 ] [
@@ -92,7 +104,8 @@ M: core-text-renderer x>offset ( x font string -- n )
     ] if-empty ;
 
 M: core-text-renderer offset>x ( n font string -- x )
-    swap open-font cached-line line>> swap f CTLineGetOffsetForStringIndex ;
+    swap open-font cached-line line>> swap f
+    CTLineGetOffsetForStringIndex ;
 
 M: core-text-renderer free-fonts ( fonts -- )
     values dispose-each ;

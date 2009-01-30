@@ -168,7 +168,7 @@ M: freetype-renderer string-height ( open-font string -- h )
 : bitmap>texture ( glyph sprite -- id )
     tuck dim2>> product 2 * <byte-array>
     [ copy-bitmap ] keep [ dim2>> ] dip
-    GL_LUMINANCE_ALPHA make-texture ;
+    GL_LUMINANCE_ALPHA GL_UNSIGNED_BYTE make-texture ;
 
 : glyph-texture-loc ( glyph font -- loc )
     [ drop glyph-hori-bearing-x ft-floor ]
