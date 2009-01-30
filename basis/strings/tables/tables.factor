@@ -8,7 +8,7 @@ IN: strings.tables
 : format-column ( seq ? -- seq )
     [
         dup [ length ] map supremum
-        '[ _ CHAR: \s pad-right ] map
+        '[ _ CHAR: \s pad-tail ] map
     ] unless ;
 
 : map-last ( seq quot -- seq )
