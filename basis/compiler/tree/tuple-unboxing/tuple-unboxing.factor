@@ -118,7 +118,7 @@ M: #return-recursive unbox-tuples*
 ! These nodes never participate in unboxing
 : assert-not-unboxed ( values -- )
     dup array?
-    [ [ unboxed-allocation ] contains? ] [ unboxed-allocation ] if
+    [ [ unboxed-allocation ] any? ] [ unboxed-allocation ] if
     [ "Unboxing wrong value" throw ] when ;
 
 M: #branch unbox-tuples* dup in-d>> assert-not-unboxed ;

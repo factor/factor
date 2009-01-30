@@ -25,4 +25,4 @@ M: checksum checksum-lines
     [ normalize-path (file-reader) ] dip checksum-stream ;
 
 : hex-string ( seq -- str )
-    [ >hex 2 CHAR: 0 pad-left ] { } map-as concat ;
+    [ >hex 2 CHAR: 0 pad-head ] { } map-as concat ;

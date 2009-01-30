@@ -15,7 +15,7 @@ $nl
 "Iterating over elements:"
 { $subsection dlist-each }
 { $subsection dlist-find }
-{ $subsection dlist-contains? }
+{ $subsection dlist-any? }
 "Deleting a node matching a predicate:"
 { $subsection delete-node-if* }
 { $subsection delete-node-if }
@@ -40,7 +40,7 @@ HELP: dlist-find
     "This operation is O(n)."
 } ;
 
-HELP: dlist-contains?
+HELP: dlist-any?
 { $values { "dlist" { $link dlist } } { "quot" quotation } { "?" "a boolean" } }
 { $description "Just like " { $link dlist-find } " except it doesn't return the object." }
 { $notes "This operation is O(n)." } ;

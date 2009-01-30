@@ -86,7 +86,7 @@ SYMBOL: visited
 : flattenable? ( object -- ? )
     { [ word? ] [ primitive? not ] [
         { "inverse" "math-inverse" "pop-inverse" }
-        [ word-prop ] with contains? not
+        [ word-prop ] with any? not
     ] } 1&& ; 
 
 : flatten ( quot -- expanded )
@@ -230,7 +230,7 @@ DEFER: _
 
 : empty-inverse ( class -- quot )
     deconstruct-pred
-    [ tuple>array rest [ ] contains? [ fail ] when ]
+    [ tuple>array rest [ ] any? [ fail ] when ]
     compose ;
 
 \ new 1 [ ?wrapped empty-inverse ] define-pop-inverse

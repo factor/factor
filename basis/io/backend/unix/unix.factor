@@ -167,7 +167,7 @@ M: stdin refill
 M: unix (init-stdio)
     <stdin> <input-port>
     1 <fd> <output-port>
-    2 <fd> <output-port> ;
+    2 <fd> <output-port> t ;
 
 ! mx io-task for embedding an fd-based mx inside another mx
 TUPLE: mx-port < port mx ;

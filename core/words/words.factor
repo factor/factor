@@ -144,7 +144,7 @@ SYMBOL: visited
             crossref get at keys
             [ word? ] filter
             [
-                [ reset-on-redefine [ word-prop ] with contains? ]
+                [ reset-on-redefine [ word-prop ] with any? ]
                 [ inline? ]
                 bi or
             ] filter

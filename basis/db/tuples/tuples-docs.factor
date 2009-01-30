@@ -90,7 +90,7 @@ HELP: ensure-table
 
 HELP: ensure-tables
 { $values
-     { "classes" null } }
+     { "classes" "a sequence of classes" } }
 { $description "Creates a SQL table from a mapping defined by " { $link define-persistent } ". If a table already exists, the error is silently ignored." } ;
 
 HELP: recreate-table

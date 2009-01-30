@@ -33,10 +33,10 @@ M: object branch? drop f ;
 
 : deep-find ( obj quot -- elt ) (deep-find) drop ; inline
 
-: deep-contains? ( obj quot -- ? ) (deep-find) nip ; inline
+: deep-any? ( obj quot -- ? ) (deep-find) nip ; inline
 
 : deep-all? ( obj quot -- ? )
-    '[ @ not ] deep-contains? not ; inline
+    '[ @ not ] deep-any? not ; inline
 
 : deep-member? ( obj seq -- ? )
     swap '[

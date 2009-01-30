@@ -86,7 +86,7 @@ SYMBOL: redirects
     ] [ too-many-redirects ] if ; inline recursive
 
 : read-chunk-size ( -- n )
-    read-crlf ";" split1 drop [ blank? ] trim-right
+    read-crlf ";" split1 drop [ blank? ] trim-tail
     hex> [ "Bad chunk size" throw ] unless* ;
 
 : read-chunked ( quot: ( chunk -- ) -- )

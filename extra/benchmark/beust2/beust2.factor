@@ -26,10 +26,10 @@ IN: benchmark.beust2
                 ] if
             ] [ f ] if
         ]
-    ] contains? ; inline recursive
+    ] any? ; inline recursive
 
 :: count-numbers ( max listener -- )
-    10 [ 1+ 1 1 0 max listener (count-numbers) ] contains? drop ;
+    10 [ 1+ 1 1 0 max listener (count-numbers) ] any? drop ;
     inline
 
 :: beust ( -- )

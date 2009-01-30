@@ -33,7 +33,7 @@ IN: project-euler.046
     2 /i sqrt >integer [1,b] [ sq ] map ;
 
 : fits-conjecture? ( n -- ? )
-    dup perfect-squares [ 2 * - ] with map [ prime? ] contains? ;
+    dup perfect-squares [ 2 * - ] with map [ prime? ] any? ;
 
 : next-odd-composite ( n -- m )
     dup odd? [ 2 + ] [ 1+ ] if dup prime? [ next-odd-composite ] when ;
