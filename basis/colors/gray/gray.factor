@@ -9,3 +9,9 @@ C: <gray> gray
 
 M: gray >rgba ( gray -- rgba )
     [ gray>> dup dup ] [ alpha>> ] bi <rgba> ;
+
+M: gray red>> gray>> ;
+
+M: gray green>> gray>> ;
+
+M: gray blue>> gray>> ;
