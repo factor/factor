@@ -31,7 +31,7 @@ SYMBOL: ignore-case?
 
 ! PROP, PROPS
 : parse-prop-tag ( tag -- key value )
-    "NAME" over at "VALUE" rot at ;
+    [ "NAME" attr ] [ "VALUE" attr ] bi ;
 
 : parse-props-tag ( tag -- assoc )
     child-tags
@@ -40,7 +40,7 @@ SYMBOL: ignore-case?
 : position-attrs ( tag -- at-line-start? at-whitespace-end? at-word-start? )
     ! XXX Wrong logic!
     { "AT_LINE_START" "AT_WHITESPACE_END" "AT_WORD_START" }
-    swap [ at string>boolean ] curry map first3 ;
+    [ attr string>boolean ] with map first3 ;
 
 : parse-literal-matcher ( tag -- matcher )
     dup children>string

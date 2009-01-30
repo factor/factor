@@ -4,38 +4,23 @@ USING: classes hashtables help.markup help.syntax io.streams.string
 kernel sequences strings math ;
 IN: db.types
 
-HELP: +autoincrement+
-{ $description "" } ;
-
 HELP: +db-assigned-id+
 { $description "The database assigns a primary key to the object. The primary key is most likely a big integer, but is database-dependent." } ;
 
 HELP: +default+
-{ $description "" } ;
-
-HELP: +foreign-id+
-{ $description "" } ;
-
-HELP: +has-many+
-{ $description "" } ;
+{ $description "Allows a default value for a column to be provided." } ;
 
 HELP: +not-null+
-{ $description "" } ;
+{ $description "Ensures that a column is not null." } ;
 
 HELP: +null+
-{ $description "" } ;
+{ $description "Allows a column to be null." } ;
 
 HELP: +primary-key+
-{ $description "" } ;
+{ $description "Makes a column a primary key. Only one column may be a primary key." } ;
 
 HELP: +random-id+
 { $description "Factor chooses a random number and tries to insert the tuple into the database with this number as its primary key. The default number of retries to find a unique random number is 10, though in practice it will almost certainly succeed on the first try." } ;
-
-HELP: +serial+
-{ $description "" } ;
-
-HELP: +unique+
-{ $description "" } ;
 
 HELP: +user-assigned-id+
 { $description "The user is responsible for choosing a primary key for tuples inserted with this database type. Keys must be unique or else the database will throw an error. Usually it is better to use a " { $link +db-assigned-id+ } "." } ;
@@ -114,12 +99,12 @@ HELP: user-assigned-id-spec?
 
 HELP: bind#
 { $values
-     { "spec" null } { "obj" object } }
+     { "spec" "a sql spec" } { "obj" object } }
 { $description "" } ;
 
 HELP: bind%
 { $values
-     { "spec" null } }
+     { "spec" "a sql spec" } }
 { $description "" } ;
 
 HELP: compound
@@ -176,7 +161,7 @@ HELP: low-level-binding
 
 HELP: modifiers
 { $values
-     { "spec" null }
+     { "spec" "a sql spec" }
      { "string" string } }
 { $description "" } ;
 
@@ -187,7 +172,7 @@ HELP: no-sql-type
 
 HELP: normalize-spec
 { $values
-     { "spec" null } }
+     { "spec" "a sql spec" } }
 { $description "" } ;
 
 HELP: offset-of-slot
@@ -204,7 +189,7 @@ HELP: persistent-table
 
 HELP: primary-key?
 { $values
-     { "spec" null }
+     { "spec" "a sql spec" }
      { "?" "a boolean" } }
 { $description "" } ;
 
@@ -213,37 +198,31 @@ HELP: random-id-generator
 
 HELP: relation?
 { $values
-     { "spec" null }
+     { "spec" "a sql spec" }
      { "?" "a boolean" } }
 { $description "" } ;
 
 HELP: remove-db-assigned-id
 { $values
-     { "specs" null }
+     { "specs" "a sequence of sql specs" }
      { "obj" object } }
 { $description "" } ;
 
 HELP: remove-id
 { $values
-     { "specs" null }
+     { "specs" "a sequence of sql specs" }
      { "obj" object } }
-{ $description "" } ;
-
-HELP: remove-relations
-{ $values
-     { "specs" null }
-     { "newcolumns" null } }
 { $description "" } ;
 
 HELP: set-slot-named
 { $values
-     { "value" null } { "name" null } { "obj" object } }
+     { "value" object } { "name" string } { "obj" object } }
 { $description "" } ;
 
 HELP: spec>tuple
 { $values
-     { "class" class } { "spec" null }
-     { "tuple" null } }
+     { "class" class } { "spec" "a sql spec" }
+     { "tuple" tuple } }
 { $description "" } ;
 
 HELP: sql-spec

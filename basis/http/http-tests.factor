@@ -2,7 +2,7 @@ USING: http http.server http.client http.client.private tools.test multiline
 io.streams.string io.encodings.utf8 io.encodings.8-bit
 io.encodings.binary io.encodings.string kernel arrays splitting
 sequences assocs io.sockets db db.sqlite continuations urls
-hashtables accessors namespaces ;
+hashtables accessors namespaces xml.data ;
 IN: http.tests
 
 [ "text/plain" latin1 ] [ "text/plain" parse-content-type ] unit-test
@@ -322,7 +322,7 @@ SYMBOL: a
 
 3 a set-global
 
-: test-a string>xml "input" tag-named "value" swap at ;
+: test-a string>xml "input" tag-named "value" attr ;
 
 [ "3" ] [
     "http://localhost/" add-port http-get

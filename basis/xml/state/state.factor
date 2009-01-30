@@ -3,7 +3,7 @@
 USING: accessors kernel namespaces io ;
 IN: xml.state
 
-TUPLE: spot char line column next check ;
+TUPLE: spot char line column next check version-1.0? ;
 
 C: <spot> spot
 
@@ -17,10 +17,11 @@ C: <spot> spot
 : set-next ( char -- ) spot get swap >>next drop ;
 : get-check ( -- ? ) spot get check>> ;
 : check ( -- ) spot get t >>check drop ;
+: version-1.0? ( -- ? ) spot get version-1.0?>> ;
+: set-version ( string -- )
+    spot get swap "1.0" = >>version-1.0? drop ;
 
 SYMBOL: xml-stack
-
-SYMBOL: prolog-data
 
 SYMBOL: depth
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel calendar alarms io io.encodings accessors
-namespaces fry ;
+namespaces fry io.streams.null ;
 IN: io.timeouts
 
 GENERIC: timeout ( obj -- dt/f )
@@ -27,3 +27,5 @@ GENERIC: cancel-operation ( obj -- )
 : timeouts ( dt -- )
     [ input-stream get set-timeout ]
     [ output-stream get set-timeout ] bi ;
+
+M: null-stream set-timeout 2drop ;

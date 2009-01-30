@@ -236,7 +236,7 @@ M: f (write-farkup) ;
     parse-farkup (write-farkup) ;
 
 : write-farkup ( string -- )
-    farkup>xml write-xml-chunk ;
+    farkup>xml write-xml ;
 
 : convert-farkup ( string -- string' )
     [ write-farkup ] with-string-writer ;

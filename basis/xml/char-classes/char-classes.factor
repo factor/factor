@@ -26,7 +26,7 @@ CATEGORY: 1.1name-char Ll Lu Lo Lm Ln Nl Mc Mn Nd Pc Cf _-.\u0000b7: ;
     ! 1.1:
     ! [#x1-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
     {
-        { [ dup HEX: 20 < ] [ "\t\r\n" member? and ] }
+        { [ dup HEX: 20 < ] [ swap [ "\t\r\n" member? ] [ zero? not ] if ] }
         { [ nip dup HEX: D800 < ] [ drop t ] }
         { [ dup HEX: E000 < ] [ drop f ] }
         [ { HEX: FFFE HEX: FFFF } member? not ]
