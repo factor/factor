@@ -173,7 +173,7 @@ HELP: with-db
 HELP: with-transaction
 { $values
      { "quot" quotation } }
-{ $description "" } ;
+{ $description "Calls the quotation inside a database transaction and commits the result to the database after the quotation finishes. If the quotation throws an error, the transaction is aborted." } ;
 
 ARTICLE: "db" "Database library"
 "Accessing a database:"
