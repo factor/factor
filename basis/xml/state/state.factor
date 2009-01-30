@@ -1,9 +1,11 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces io ;
+USING: accessors kernel namespaces io math ;
 IN: xml.state
 
-TUPLE: spot char line column next check version-1.0? ;
+TUPLE: spot
+    char { line fixnum } { column fixnum }
+    next check version-1.0? ;
 
 C: <spot> spot
 
