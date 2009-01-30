@@ -41,7 +41,7 @@ DEFER: combinations
 VAR: pv
 
 
-! ---------------------------------------------------------------------
+! -------------------------------------------------------------
 ! global values
 VALUE: remove-hidden-solids?
 VALUE: VERY-SMALL-NUM
@@ -52,25 +52,26 @@ t to: remove-hidden-solids?
 0.0000001 to: VERY-SMALL-NUM
 0.0000001 to: ZERO-VALUE
 4 to: MAX-FACE-PER-CORNER
-! ---------------------------------------------------------------------
+! -------------------------------------------------------------
 ! sequence complement
 
 : with-pv ( i quot -- ) [ swap >pv call ] with-scope  ; inline
 
 : dimension ( array -- x )      length 1- ; inline 
-: last ( seq -- x )             [ dimension ] [ nth ] bi ; inline
-: change-last ( seq quot --  )  [ [ dimension ] keep ] dip change-nth  ; 
+: last ( seq -- x )           [ dimension ] [ nth ] bi ; inline
+: change-last ( seq quot -- ) 
+    [ [ dimension ] keep ] dip change-nth  ; 
 
-! --------------------------------------------------------------
+! -------------------------------------------------------------
 ! light
-! --------------------------------------------------------------
+! -------------------------------------------------------------
 
 TUPLE: light name { direction array } color ;
 : <light> ( -- tuple ) light new ;
 
-! -----------------------------------------------------------------------
+! -------------------------------------------------------------
 ! halfspace manipulation
-! -----------------------------------------------------------------------
+! -------------------------------------------------------------
 
 : constant+ ( v x -- w )  '[ [ _ + ] change-last ] keep ;
 : translate ( u v -- w )   dupd     v* sum     constant+ ; 
@@ -78,7 +79,8 @@ TUPLE: light name { direction array } color ;
 : transform ( u matrix -- w )
     [ swap m.v ] 2keep ! compute new normal vector    
     [
-        [ [ abs ZERO-VALUE > ] find ] keep ! find a point on the frontier
+        [ [ abs ZERO-VALUE > ] find ] keep 
+        ! find a point on the frontier
         ! be sure it's not null vector
         last ! get constant
         swap /f neg swap ! intercept value
@@ -97,8 +99,10 @@ TUPLE: light name { direction array } color ;
     position-point VERY-SMALL-NUM  > ; 
 : point-inside-or-on-halfspace? ( halfspace v -- ? ) 
     position-point VERY-SMALL-NUM neg > ;
-: project-vector (  seq -- seq )     pv> [ head ] [ 1+  tail ] 2bi append ; 
-: get-intersection ( matrice -- seq )     [ 1 tail* ] map     flip first ;
+: project-vector (  seq -- seq )     
+    pv> [ head ] [ 1+  tail ] 2bi append ; 
+: get-intersection ( matrice -- seq )     
+    [ 1 tail* ] map     flip first ;
 
 : islenght=? ( seq n -- seq n ? ) 2dup [ length ] [ = ] bi*  ;
 
@@ -117,29 +121,33 @@ TUPLE: light name { direction array } color ;
     [ solution dup ] [ first dimension ] bi
     valid-solution?     [ get-intersection ] [ drop f ] if ;
 
-! --------------------------------------------------------------
+! -------------------------------------------------------------
 ! faces
-! --------------------------------------------------------------
+! -------------------------------------------------------------
 
-TUPLE: face { halfspace array } touching-corners adjacent-faces ;
+TUPLE: face { halfspace array } 
+    touching-corners adjacent-faces ;
 : <face> ( v -- tuple )       face new swap >>halfspace ;
 : flip-face ( face -- face ) [ vneg ] change-halfspace ;
-: erase-face-touching-corners ( face -- face ) f >>touching-corners ;
-: erase-face-adjacent-faces ( face -- face )   f >>adjacent-faces ;
+: erase-face-touching-corners ( face -- face ) 
+    f >>touching-corners ;
+: erase-face-adjacent-faces ( face -- face )   
+    f >>adjacent-faces ;
 : faces-intersection ( faces -- v )  
     [ halfspace>> ] map intersect-hyperplanes ;
 : face-translate ( face v -- face ) 
     [ translate ] curry change-halfspace ; inline
 : face-transform ( face m -- face )
     [ transform ] curry change-halfspace ; inline
-: face-orientation ( face -- x )  pv> swap halfspace>> nth sgn ;
+: face-orientation ( face -- x ) pv> swap halfspace>> nth sgn ;
 : backface? ( face -- face ? )      dup face-orientation 0 <= ;
 : pv-factor ( face -- f face )     
     halfspace>> [ pv> swap nth [ * ] curry ] keep ; inline
 : suffix-touching-corner ( face corner -- face ) 
     [ suffix ] curry   change-touching-corners ; inline
 : real-face? ( face -- ? )
-    [ touching-corners>> length ] [ halfspace>> dimension ] bi >= ;
+    [ touching-corners>> length ] 
+    [ halfspace>> dimension ] bi >= ;
 
 : (add-to-adjacent-faces) ( face face -- face )
     over adjacent-faces>> 2dup member?
@@ -203,7 +211,8 @@ TUPLE: face { halfspace array } touching-corners adjacent-faces ;
     [ ] (intersection-into-face) ;
 
 : intersections-into-faces ( face -- faces )
-    clone dup  adjacent-faces>> [ intersection-into-face ] with map 
+    clone dup  
+    adjacent-faces>> [ intersection-into-face ] with map 
     [ ] filter ;
 
 : (face-silhouette) ( face -- faces )
@@ -219,30 +228,32 @@ TUPLE: face { halfspace array } touching-corners adjacent-faces ;
 
 ! --------------------------------
 ! solid
-! --------------------------------------------------------------
-TUPLE: solid dimension silhouettes faces corners adjacencies-valid color name ;
+! -------------------------------------------------------------
+TUPLE: solid dimension silhouettes 
+    faces corners adjacencies-valid color name ;
 
 : <solid> ( -- tuple ) solid new ;
 
 : suffix-silhouettes ( solid silhouette -- solid )  
     [ suffix ] curry change-silhouettes ;
 
-: suffix-face ( solid face -- solid )     [ suffix ] curry change-faces ;
-
-: suffix-corner ( solid corner -- solid ) [ suffix ] curry change-corners ; 
-
+: suffix-face ( solid face -- solid )     
+    [ suffix ] curry change-faces ;
+: suffix-corner ( solid corner -- solid ) 
+    [ suffix ] curry change-corners ; 
 : erase-solid-corners ( solid -- solid )  f >>corners ;
 
-: erase-silhouettes ( solid -- solid ) dup dimension>> f <array> >>silhouettes ;
-
-: filter-real-faces ( solid -- solid ) [ [ real-face? ] filter ] change-faces ;
-
+: erase-silhouettes ( solid -- solid ) 
+    dup dimension>> f <array> >>silhouettes ;
+: filter-real-faces ( solid -- solid ) 
+    [ [ real-face? ] filter ] change-faces ;
 : initiate-solid-from-face ( face -- solid ) 
     face-project-dim  <solid> swap >>dimension ;
 
 : erase-old-adjacencies ( solid -- solid )
     erase-solid-corners
-    [ dup [ erase-face-touching-corners erase-face-adjacent-faces drop ] each ]
+    [ dup [ erase-face-touching-corners 
+        erase-face-adjacent-faces drop ] each ]
     change-faces ;
 
 : point-inside-or-on-face? ( face v -- ? ) 
@@ -252,13 +263,15 @@ TUPLE: solid dimension silhouettes faces corners adjacencies-valid color name ;
     [ halfspace>> ] dip  point-inside-halfspace? ;
 
 : point-inside-solid? ( solid point -- ? )
-    [ faces>> ] dip [ point-inside-face? ] curry  all?   ; inline
+    [ faces>> ] dip [ point-inside-face? ] curry all? ; inline
 
 : point-inside-or-on-solid? ( solid point -- ? )
-    [ faces>> ] dip [ point-inside-or-on-face? ] curry  all?   ; inline
+    [ faces>> ] dip 
+    [ point-inside-or-on-face? ] curry  all?   ; inline
 
 : unvalid-adjacencies ( solid -- solid )  
-    erase-old-adjacencies f >>adjacencies-valid erase-silhouettes ;
+    erase-old-adjacencies f >>adjacencies-valid 
+    erase-silhouettes ;
 
 : add-face ( solid face -- solid ) 
     suffix-face unvalid-adjacencies ; 
@@ -338,8 +351,10 @@ TUPLE: solid dimension silhouettes faces corners adjacencies-valid color name ;
     ensure-silhouettes
     ;
 
-: (non-empty-solid?) ( solid -- ? ) [ dimension>> ] [ corners>> length ] bi < ;
-: non-empty-solid? ( solid -- ? )   ensure-adjacencies (non-empty-solid?) ;
+: (non-empty-solid?) ( solid -- ? ) 
+    [ dimension>> ] [ corners>> length ] bi < ;
+: non-empty-solid? ( solid -- ? )   
+    ensure-adjacencies (non-empty-solid?) ;
 
 : compare-corners-roughly ( corner corner -- ? )
     2drop t ;
@@ -367,8 +382,10 @@ TUPLE: solid dimension silhouettes faces corners adjacencies-valid color name ;
    [ dup faces>> ] dip call drop  
    unvalid-adjacencies ; inline
 
-: solid-translate ( solid v -- solid ) [ face-translate ] (solid-move) ; 
-: solid-transform ( solid m -- solid ) [ face-transform ] (solid-move) ; 
+: solid-translate ( solid v -- solid ) 
+    [ face-translate ] (solid-move) ; 
+: solid-transform ( solid m -- solid ) 
+    [ face-transform ] (solid-move) ; 
 
 : find-corner-in-silhouette ( s1 s2 -- elt bool )
     pv> swap silhouettes>> nth     
@@ -402,13 +419,15 @@ TUPLE: solid dimension silhouettes faces corners adjacencies-valid color name ;
     [ ensure-adjacencies ] map
 ; inline
 
-! --------------------------------------------------------------
+! -------------------------------------------------------------
 ! space 
-! --------------------------------------------------------------
+! -------------------------------------------------------------
 TUPLE: space name dimension solids ambient-color lights ;
 : <space> ( -- space )      space new ;
-: suffix-solids ( space solid -- space ) [ suffix ] curry change-solids ; inline
-: suffix-lights ( space light -- space ) [ suffix ] curry change-lights ; inline
+: suffix-solids ( space solid -- space ) 
+    [ suffix ] curry change-solids ; inline
+: suffix-lights ( space light -- space ) 
+    [ suffix ] curry change-lights ; inline
 : clear-space-solids ( space -- space )     f >>solids ;
 
 : space-ensure-solids ( space -- space ) 
@@ -417,19 +436,24 @@ TUPLE: space name dimension solids ambient-color lights ;
     [ [ non-empty-solid? ] filter ] change-solids ;
 
 : projected-space ( space solids -- space ) 
-   swap dimension>> 1-  <space>    swap >>dimension    swap  >>solids ;
+   swap dimension>> 1-  <space>    
+   swap >>dimension    swap  >>solids ;
 
-: get-silhouette ( solid -- silhouette )    silhouettes>> pv> swap nth ;
-: solid= ( solid solid -- ? )               [ corners>> ]  bi@ = ;
+: get-silhouette ( solid -- silhouette )    
+    silhouettes>> pv> swap nth ;
+: solid= ( solid solid -- ? )            [ corners>> ]  bi@ = ;
 
 : space-apply ( space m quot -- space ) 
         curry [ map ] curry [ dup solids>> ] dip
         [ call ] [ drop ] recover drop ;
-: space-transform ( space m -- space ) [ solid-transform ] space-apply ;
-: space-translate ( space v -- space ) [ solid-translate ] space-apply ; 
+: space-transform ( space m -- space ) 
+    [ solid-transform ] space-apply ;
+: space-translate ( space v -- space ) 
+    [ solid-translate ] space-apply ; 
 
 : describe-space ( space -- ) 
-    solids>>  [  [ corners>>  [ pprint ] each ] [ name>> . ] bi ] each ;
+    solids>>  
+    [  [ corners>>  [ pprint ] each ] [ name>> . ] bi ] each ;
 
 : clip-solid ( solid solid -- solids )
     [ ]
@@ -451,7 +475,8 @@ TUPLE: space name dimension solids ambient-color lights ;
 ; inline 
 
 : remove-hidden-solids ( space -- space ) 
-! We must include each solid in a sequence because during substration 
+! We must include each solid in a sequence because 
+! during substration 
 ! a solid can be divided in more than on solid
     [ 
         [ [ 1array ] map ] 
@@ -489,9 +514,9 @@ TUPLE: space name dimension solids ambient-color lights ;
     [ [ ] [ v+ ] map-reduce ] [ length ] bi v/n
 ;
 
-! --------------------------------------------------------------
+! -------------------------------------------------------------
 ! 3D rendering
-! --------------------------------------------------------------
+! -------------------------------------------------------------
 
 : face-reference ( face -- halfspace point vect )
        [ halfspace>> ] 
@@ -523,8 +548,10 @@ TUPLE: space name dimension solids ambient-color lights ;
 
 : face->GL ( face color -- )
    [ ordered-face-points ] dip
-   [ first3 1.0 glColor4d GL_POLYGON [ [ point->GL  ] each ] do-state ] curry
-   [  0 0 0 1 glColor4d GL_LINE_LOOP [ [ point->GL  ] each ] do-state ]
+   [ first3 1.0 glColor4d GL_POLYGON 
+        [ [ point->GL  ] each ] do-state ] curry
+   [  0 0 0 1 glColor4d GL_LINE_LOOP 
+        [ [ point->GL  ] each ] do-state ]
    bi
    ; inline
 

@@ -6,7 +6,7 @@ splitting grouping self math.trig
   sequences accessors 4DNav.deep models ;
 IN: 4DNav.turtle
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 TUPLE: turtle pos ori ;
 
@@ -32,7 +32,7 @@ TUPLE: observer < turtle projection-mode collision-mode ;
 : turtle-ori> ( -- val ) self> ori>> ;
 : >turtle-ori ( val -- ) self> (>>ori) ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! These rotation matrices are from
 ! `Computer Graphics: Principles and Practice'
@@ -74,15 +74,15 @@ TUPLE: observer < turtle projection-mode collision-mode ;
   0 ,           dup sin ,       dup cos , ] 3 make-matrix nip ;
 
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: apply-rotation ( rotation -- ) turtle-ori> swap m. >turtle-ori ;
-
+: apply-rotation ( rotation -- ) 
+    turtle-ori> swap m. >turtle-ori ;
 : rotate-x ( angle -- ) Rx apply-rotation ;
 : rotate-y ( angle -- ) Ry apply-rotation ;
 : rotate-z ( angle -- ) Rz apply-rotation ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : pitch-up   ( angle -- ) neg rotate-x ;
 : pitch-down ( angle -- )     rotate-x ;
@@ -93,9 +93,9 @@ TUPLE: observer < turtle projection-mode collision-mode ;
 : roll-left  ( angle -- ) neg rotate-z ;
 : roll-right ( angle -- )     rotate-z ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! roll-until-horizontal
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : V ( -- V ) { 0 1 0 } ;
 
@@ -111,25 +111,27 @@ TUPLE: observer < turtle projection-mode collision-mode ;
     V Z cross normalize set-X
     Z X cross normalize set-Y ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: distance ( turtle turtle -- n ) pos>> swap pos>> v- [ sq ] map sum sqrt ;
+: distance ( turtle turtle -- n ) 
+    pos>> swap pos>> v- [ sq ] map sum sqrt ;
 
 : move-by ( point -- ) turtle-pos> v+ >turtle-pos ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : reset-turtle ( -- ) 
     { 0 0 0 } clone >turtle-pos 3 identity-matrix >turtle-ori ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : step-vector ( length -- array ) { 0 0 1 } n*v ;
 
 : step-turtle ( length -- ) 
-    step-vector turtle-ori> swap m.v turtle-pos> v+ >turtle-pos ;
+    step-vector turtle-ori> swap m.v 
+    turtle-pos> v+ >turtle-pos ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : strafe-up ( length -- )
     90 pitch-up

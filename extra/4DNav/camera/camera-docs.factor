@@ -6,31 +6,31 @@ IN: 4DNav.camera
 HELP: camera-eye
 { $values
     
-     { "point" null }
+     { "point" "position" }
 }
 { $description "return the position of the camera" } ;
 
 HELP: camera-focus
 { $values
     
-     { "point" null }
+     { "point" "position" }
 }
 { $description "return the point the camera looks at" } ;
 
 HELP: camera-up
 { $values
     
-     { "dirvec" null }
+     { "dirvec" "upside direction" }
 }
 { $description "In order to precise the roling position of camera give an upward vector" } ;
 
 HELP: do-look-at
 { $values
-     { "camera" null }
+     { "camera" "direction" }
 }
 { $description "Word to use in replacement of gl-look-at when using a camera" } ;
 
-ARTICLE: "4DNav.camera" "4DNav.camera"
+ARTICLE: "4DNav.camera" "Camera"
 { $vocab-link "4DNav.camera" }
 "\n"
 "A camera is defined by:"

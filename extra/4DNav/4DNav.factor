@@ -109,34 +109,36 @@ VAR: present-space
 [ dup cos  , 0.0 , dup sin neg  , 0.0 ,
   0.0       , 1.0 , 0.0           , 0.0 ,
   dup sin  , 0.0 , dup cos     , 0.0 ,
-  0.0       , 0.0 , 0.0           , 1.0 ,  ] 4 make-matrix nip ;
+  0.0       , 0.0 , 0.0        , 1.0 ,  ] 4 make-matrix nip ;
 
 : 4D-Rzw ( angle -- Rz ) deg>rad
 [ dup cos  , dup sin neg  , 0.0 , 0.0 ,
   dup sin  , dup cos     , 0.0 , 0.0 ,
   0.0       , 0.0           , 1.0 , 0.0 ,
-  0.0       , 0.0           , 0.0 , 1.0 ,  ] 4 make-matrix nip ;
+  0.0       , 0.0          , 0.0 , 1.0 ,  ] 4 make-matrix nip ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! UI
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: button* ( string quot -- button ) closed-quot <repeat-button>  ;
+: button* ( string quot -- button ) 
+    closed-quot <repeat-button>  ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : model-projection-chooser ( -- gadget )
    observer3d> projection-mode>>
-   { { 1 "perspective" } { 0 "orthogonal" }  } <toggle-buttons> ;
+   { { 1 "perspective" } { 0 "orthogonal" } } 
+   <toggle-buttons> ;
 
 : collision-detection-chooser ( -- gadget )
    observer3d> collision-mode>>
-   { { t "on" } { f "off" }  } <toggle-buttons>
-;
+   { { t "on" } { f "off" }  } <toggle-buttons> ;
 
-: model-projection ( x -- space ) present-space>  swap space-project ;
+: model-projection ( x -- space ) 
+    present-space>  swap space-project ;
 
 : update-observer-projections (  -- )
     view1> relayout-1 
@@ -151,14 +153,16 @@ VAR: present-space
     3 model-projection <model> view4> (>>model) ;
 
 : camera-action ( quot -- quot ) 
-    [ drop [ ] observer3d>  with-self update-observer-projections ] 
+    [ drop [ ] observer3d>  
+    with-self update-observer-projections ] 
     make* closed-quot ;
 
-: win3D ( text gadget -- ) "navigateur 4D : " rot append open-window ;
+: win3D ( text gadget -- ) 
+    "navigateur 4D : " rot append open-window ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! 4D object manipulation
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : (mvt-4D) ( quot -- )   
     present-space>  
@@ -168,42 +172,55 @@ VAR: present-space
     update-observer-projections ;
 
 : rotation-4D ( m -- ) 
-    '[ _ [ [ middle-of-space dup vneg ] keep swap space-translate ] dip
+    '[ _ [ [ middle-of-space dup vneg ] keep 
+        swap space-translate ] dip
          space-transform 
          swap space-translate
     ] (mvt-4D) ;
 
 : translation-4D ( v -- ) '[ _ space-translate ] (mvt-4D) ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! menu
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : menu-rotations-4D ( -- gadget )
     <frame>
          <pile> 1 >>fill
-          "XY +" [ drop rotation-step 4D-Rxy rotation-4D ] button* add-gadget
-          "XY -" [ drop rotation-step neg 4D-Rxy rotation-4D ] button* add-gadget 
+          "XY +" [ drop rotation-step 4D-Rxy rotation-4D ] 
+                button* add-gadget
+          "XY -" [ drop rotation-step neg 4D-Rxy rotation-4D ] 
+                button* add-gadget 
        @top-left grid-add    
         <pile> 1 >>fill
-          "XZ +" [ drop rotation-step 4D-Rxz rotation-4D ] button* add-gadget
-          "XZ -" [ drop rotation-step neg 4D-Rxz rotation-4D ] button* add-gadget 
+          "XZ +" [ drop rotation-step 4D-Rxz rotation-4D ] 
+                button* add-gadget
+          "XZ -" [ drop rotation-step neg 4D-Rxz rotation-4D ] 
+                button* add-gadget 
        @top grid-add    
         <pile> 1 >>fill
-          "YZ +" [ drop rotation-step 4D-Ryz rotation-4D ] button* add-gadget
-          "YZ -" [ drop rotation-step neg 4D-Ryz rotation-4D ] button* add-gadget 
+          "YZ +" [ drop rotation-step 4D-Ryz rotation-4D ] 
+                button* add-gadget
+          "YZ -" [ drop rotation-step neg 4D-Ryz rotation-4D ] 
+                button* add-gadget 
         @center grid-add
          <pile> 1 >>fill
-          "XW +" [ drop rotation-step 4D-Rxw rotation-4D ] button* add-gadget
-          "XW -" [ drop rotation-step neg 4D-Rxw rotation-4D ] button* add-gadget 
+          "XW +" [ drop rotation-step 4D-Rxw rotation-4D ] 
+                button* add-gadget
+          "XW -" [ drop rotation-step neg 4D-Rxw rotation-4D ] 
+                button* add-gadget 
         @top-right grid-add   
          <pile> 1 >>fill
-          "YW +" [ drop rotation-step 4D-Ryw rotation-4D ] button* add-gadget
-          "YW -" [ drop rotation-step neg 4D-Ryw rotation-4D ] button* add-gadget 
+          "YW +" [ drop rotation-step 4D-Ryw rotation-4D ] 
+                button* add-gadget
+          "YW -" [ drop rotation-step neg 4D-Ryw rotation-4D ] 
+                button* add-gadget 
        @right grid-add    
          <pile> 1 >>fill
-          "ZW +" [ drop rotation-step 4D-Rzw rotation-4D ] button* add-gadget
-          "ZW -" [ drop rotation-step neg 4D-Rzw rotation-4D ] button* add-gadget 
+          "ZW +" [ drop rotation-step 4D-Rzw rotation-4D ] 
+                button* add-gadget
+          "ZW -" [ drop rotation-step neg 4D-Rzw rotation-4D ] 
+                button* add-gadget 
        @bottom-right grid-add    
 ;
 
@@ -211,9 +228,11 @@ VAR: present-space
     <frame> 
         <pile> 1 >>fill
             <shelf> 1 >>fill  
-                "X+" [ drop {  1 0 0 0 } translation-step v*n translation-4D ] 
+                "X+" [ drop {  1 0 0 0 } translation-step v*n 
+                    translation-4D ] 
                     button* add-gadget
-                "X-" [ drop { -1 0 0 0 } translation-step v*n translation-4D ] 
+                "X-" [ drop { -1 0 0 0 } translation-step v*n 
+                    translation-4D ] 
                     button* add-gadget 
             add-gadget
             "YZW" <label> add-gadget
@@ -221,26 +240,32 @@ VAR: present-space
          <pile> 1 >>fill
             "XZW" <label> add-gadget
             <shelf> 1 >>fill
-                "Y+" [ drop  { 0  1 0 0 } translation-step v*n translation-4D ] 
+                "Y+" [ drop  { 0  1 0 0 } translation-step v*n 
+                    translation-4D ] 
                     button* add-gadget
-                "Y-" [ drop  { 0 -1 0 0 } translation-step v*n translation-4D ] 
+                "Y-" [ drop  { 0 -1 0 0 } translation-step v*n 
+                    translation-4D ] 
                     button* add-gadget 
                 add-gadget
          @top-right grid-add
          <pile> 1 >>fill
             "XYW" <label> add-gadget
             <shelf> 1 >>fill
-                "Z+" [ drop { 0 0  1 0 } translation-step v*n translation-4D ] 
+                "Z+" [ drop { 0 0  1 0 } translation-step v*n 
+                    translation-4D ] 
                     button* add-gadget
-                "Z-" [ drop { 0 0 -1 0 } translation-step v*n translation-4D ] 
+                "Z-" [ drop { 0 0 -1 0 } translation-step v*n 
+                    translation-4D ] 
                     button* add-gadget 
                 add-gadget                 
         @top-left grid-add     
         <pile> 1 >>fill
             <shelf> 1 >>fill
-                "W+" [ drop { 0 0 0 1  } translation-step v*n translation-4D ] 
+                "W+" [ drop { 0 0 0 1  } translation-step v*n 
+                    translation-4D ] 
                     button* add-gadget
-                "W-" [ drop { 0 0 0 -1 } translation-step v*n translation-4D ] 
+                "W-" [ drop { 0 0 0 -1 } translation-step v*n 
+                    translation-4D ] 
                     button* add-gadget 
                 add-gadget
             "XYZ" <label> add-gadget
@@ -267,7 +292,8 @@ VAR: present-space
     update-observer-projections ;
 
 : load-model-file ( -- )
-  selected-file dup selected-file-model> set-model read-model-file 
+  selected-file dup selected-file-model> set-model 
+  read-model-file 
   redraw-model ;
 
 : mvt-3D-X ( turn pitch -- quot )
@@ -305,37 +331,38 @@ VAR: present-space
 
 : menu-rotations-3D ( -- gadget )
     <frame>
-        "Turn\n left"  [ rotation-step  turn-left  ] camera-button      
-            @left grid-add     
-        "Turn\n right" [ rotation-step turn-right ] camera-button      
-            @right grid-add     
-        "Pitch down"   [ rotation-step  pitch-down ] camera-button      
-            @bottom grid-add     
-        "Pitch up"     [ rotation-step  pitch-up   ] camera-button      
-            @top grid-add     
+        "Turn\n left"  [ rotation-step  turn-left  ] 
+            camera-button   @left grid-add     
+        "Turn\n right" [ rotation-step turn-right ] 
+            camera-button   @right grid-add     
+        "Pitch down"   [ rotation-step  pitch-down ] 
+            camera-button   @bottom grid-add     
+        "Pitch up"     [ rotation-step  pitch-up   ] 
+            camera-button   @top grid-add     
         <shelf>  1 >>fill
-            "Roll left\n (ctl)"  [ rotation-step  roll-left  ] camera-button
-                add-gadget  
-            "Roll right\n(ctl)"  [ rotation-step  roll-right ] camera-button 
-                add-gadget  
+            "Roll left\n (ctl)"  [ rotation-step  roll-left  ] 
+                camera-button   add-gadget  
+            "Roll right\n(ctl)"  [ rotation-step  roll-right ] 
+                camera-button   add-gadget  
         @center grid-add 
 ;
 
 : menu-translations-3D ( -- gadget )
     <frame>
-        "left\n(alt)"          [ translation-step  strafe-left  ] camera-button
-            @left grid-add  
-        "right\n(alt)"         [ translation-step  strafe-right ] camera-button
-            @right grid-add     
-        "Strafe up \n (alt)"   [ translation-step strafe-up    ] camera-button
-            @top grid-add
-        "Strafe down \n (alt)" [ translation-step strafe-down  ] camera-button
-            @bottom grid-add    
+        "left\n(alt)"        [ translation-step  strafe-left  ]
+            camera-button @left grid-add  
+        "right\n(alt)"       [ translation-step  strafe-right ]
+            camera-button @right grid-add     
+        "Strafe up \n (alt)" [ translation-step strafe-up    ] 
+            camera-button @top grid-add
+        "Strafe down\n (alt)" [ translation-step strafe-down  ]
+            camera-button @bottom grid-add    
         <pile>  1 >>fill
-            "Forward (ctl)"  [  translation-step step-turtle ] camera-button
-                add-gadget
-            "Backward (ctl)" [ translation-step neg step-turtle ] camera-button
-                add-gadget
+            "Forward (ctl)"  [  translation-step step-turtle ] 
+                camera-button add-gadget
+            "Backward (ctl)" 
+                [ translation-step neg step-turtle ] 
+                camera-button   add-gadget
         @center grid-add
 ;
 
@@ -370,22 +397,23 @@ VAR: present-space
             [ [ rotation-step pitch-up ] camera-action ] }
 
         { T{ key-down f { C+ } "UP" } 
-            [ [ translation-step step-turtle ] camera-action ] }
+           [ [ translation-step step-turtle ] camera-action ] }
         { T{ key-down f { C+ } "DOWN" } 
-            [ [ translation-step neg step-turtle ] camera-action ] }
+            [ [ translation-step neg step-turtle ] 
+                    camera-action ] }
         { T{ key-down f { C+ } "LEFT" } 
             [ [ rotation-step roll-left ] camera-action ] }
         { T{ key-down f { C+ } "RIGHT" } 
             [ [ rotation-step roll-right ] camera-action ] }
 
         { T{ key-down f { A+ } "LEFT" }  
-            [ [ translation-step strafe-left ] camera-action ] }
+           [ [ translation-step strafe-left ] camera-action ] }
         { T{ key-down f { A+ } "RIGHT" } 
-            [ [ translation-step strafe-right ] camera-action ] }
+          [ [ translation-step strafe-right ] camera-action ] }
         { T{ key-down f { A+ } "UP" }    
             [ [ translation-step strafe-up ] camera-action ] }
         { T{ key-down f { A+ } "DOWN" }  
-            [ [ translation-step strafe-down ] camera-action ] }
+           [ [ translation-step strafe-down ] camera-action ] }
 
 
         { T{ key-down f f "1" } [ mvt-3D-1 camera-action ] }
@@ -422,23 +450,26 @@ M: solid adsoda-display-model
         [ name>> "solid called : " pprint . ] 
         [ color>> "color : " pprint . ]
         [ dimension>> "dimension : " pprint . ]
-        [ faces>> "composed of faces : " pprint [ adsoda-display-model ] each ]
+        [ faces>> "composed of faces : " pprint 
+            [ adsoda-display-model ] each ]
     }   cleave
     ;
 M: space adsoda-display-model 
      {
         [ dimension>> "dimension : " pprint . ] 
         [ ambient-color>> "ambient-color : " pprint . ]
-        [ solids>> "composed of solids : " pprint [ adsoda-display-model ] each ]
-        [ lights>> "composed of lights : " pprint [ adsoda-display-model ] each ] 
+        [ solids>> "composed of solids : " pprint 
+            [ adsoda-display-model ] each ]
+        [ lights>> "composed of lights : " pprint 
+            [ adsoda-display-model ] each ] 
     }   cleave
     ;
 
 ! ----------------------------------------------
 : menu-bar ( -- gadget )
        <shelf>
-             "reinit" [ drop load-model-file ] button* add-gadget
-             selected-file-model> <label-control> add-gadget
+          "reinit" [ drop load-model-file ] button* add-gadget
+          selected-file-model> <label-control> add-gadget
     ;
 
 
@@ -454,7 +485,8 @@ M: space adsoda-display-model
             model-projection-chooser add-gadget
         f track-add
         <shelf>
-            "Collision detection (slow and buggy ) : " <label> add-gadget
+            "Collision detection (slow and buggy ) : " 
+                <label> add-gadget
             collision-detection-chooser add-gadget
         f track-add
         <pile>
