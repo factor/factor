@@ -7,12 +7,14 @@ HELP: (os-envs)
 { $values
     
      { "seq" sequence } }
-{ $description "" } ;
+{ $description "Returns a sequence of key/value pairs from the operating system." }
+{ $notes "In most cases, use " { $link os-envs } " instead." } ;
 
 HELP: (set-os-envs)
 { $values
      { "seq" sequence } }
-{ $description "" } ;
+{ $description "Low-level word for replacing the current set of environment variables." }
+{ $notes "In most cases, use " { $link set-os-envs } " instead." } ;
 
 
 HELP: os-env ( key -- value )
