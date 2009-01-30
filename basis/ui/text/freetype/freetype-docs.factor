@@ -22,25 +22,24 @@ HELP: close-freetype
 { $notes "Do not call this word if you are using the UI." } ;
 
 HELP: open-face
-{ $values { "font" font } { "face" "alien pointer to an " { $snippet "FT_Face" } } }
-{ $description "Loads a TrueType font with the requested logical font name and style." }
-{ $notes "This is a low-level word. Call " { $link open-font } " instead." } ;
+{ $values { "font" freetype-font } { "face" "alien pointer to an " { $snippet "FT_Face" } } }
+{ $description "Loads a TrueType font with the requested logical font name and style." } ;
 
 HELP: render-glyph
-{ $values  { "font" font } { "char" "a non-negative integer" } { "bitmap" alien } }
+{ $values  { "font" freetype-font } { "char" "a non-negative integer" } { "bitmap" alien } }
 { $description "Renders a character and outputs a pointer to the bitmap." } ;
 
 HELP: <char-sprite>
-{ $values { "open-font" font } { "char" "a non-negative integer" } { "sprite" sprite } }
+{ $values { "font" freetype-font } { "char" "a non-negative integer" } { "sprite" sprite } }
 { $description "Renders a character to an OpenGL texture and records a display list which draws a quad with this texture. This word allocates native resources which must be freed by " { $link free-sprites } "." } ;
 
 HELP: (draw-string)
-{ $values { "open-font" font } { "sprites" "a vector of " { $link sprite } " instances" } { "string" string } { "loc" "a pair of integers" } }
+{ $values { "font" freetype-font } { "sprites" "a vector of " { $link sprite } " instances" } { "string" string } { "loc" "a pair of integers" } }
 { $description "Draws a line of text." }
 { $notes "This is a low-level word, UI code should use " { $link draw-string } " or " { $link draw-text } " instead." }
 { $side-effects "sprites" } ;
 
 HELP: run-char-widths
-{ $values { "open-font" font } { "string" string } { "widths" "a sequence of integers" } }
+{ $values { "font" freetype-font } { "string" string } { "widths" "a sequence of integers" } }
 { $description "Outputs a sequence of x co-ordinates of the midpoint of each character in the string." }
 { $notes "This word is used to convert x offsets to document locations, for example when the user moves the caret by clicking the mouse." } ;

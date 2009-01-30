@@ -7,7 +7,7 @@ math.order fry calendar alarms continuations ui.clipboards ui.commands
 ui.gadgets ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
 ui.gadgets.scrollers ui.gadgets.theme ui.gadgets.menus
 ui.gadgets.wrappers ui.render ui.text ui.gestures math.geometry.rect
-splitting unicode.categories ;
+splitting unicode.categories fonts ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget
@@ -534,8 +534,8 @@ TUPLE: multiline-editor < editor ;
 
 : join-lines ( string -- string' )
     "\n" split
-    [ rest-slice [ [ blank? ] trim-left-slice ] change-each ]
-    [ but-last-slice [ [ blank? ] trim-right-slice ] change-each ]
+    [ rest-slice [ [ blank? ] trim-head-slice ] change-each ]
+    [ but-last-slice [ [ blank? ] trim-tail-slice ] change-each ]
     [ " " join ]
     tri ;
 

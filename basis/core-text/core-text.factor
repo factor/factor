@@ -1,73 +1,15 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien alien.c-types alien.syntax kernel
-destructors words parser accessors fry words hashtables
+destructors accessors fry words hashtables
 sequences memoize assocs math math.functions locals init
-namespaces combinators colors core-foundation
+namespaces combinators fonts colors core-foundation
 core-foundation.strings core-foundation.attributed-strings
-core-foundation.utilities core-graphics core-graphics.types ;
+core-foundation.utilities core-graphics core-graphics.types
+core-text.fonts core-text.utilities ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
-TYPEDEF: void* CTFontRef
-TYPEDEF: void* CTFontDescriptorRef
-
-<<
-
-: C-GLOBAL:
-    CREATE-WORD
-    dup name>> '[ _ f dlsym *void* ]
-    (( -- value )) define-declared ; parsing
-
->>
-
-! CTFontSymbolicTraits
-: kCTFontItalicTrait ( -- n ) 0 2^ ; inline
-: kCTFontBoldTrait ( -- n ) 1 2^ ; inline
-: kCTFontExpandedTrait ( -- n ) 5 2^ ; inline
-: kCTFontCondensedTrait ( -- n ) 6 2^ ; inline
-: kCTFontMonoSpaceTrait ( -- n ) 10 2^ ; inline
-: kCTFontVerticalTrait ( -- n ) 11 2^ ; inline
-: kCTFontUIOptimizedTrait ( -- n ) 12 2^ ; inline
-
-C-GLOBAL: kCTFontSymbolicTrait
-C-GLOBAL: kCTFontWeightTrait
-C-GLOBAL: kCTFontWidthTrait
-C-GLOBAL: kCTFontSlantTrait
-
-C-GLOBAL: kCTFontNameAttribute
-C-GLOBAL: kCTFontDisplayNameAttribute
-C-GLOBAL: kCTFontFamilyNameAttribute
-C-GLOBAL: kCTFontStyleNameAttribute
-C-GLOBAL: kCTFontTraitsAttribute
-C-GLOBAL: kCTFontVariationAttribute
-C-GLOBAL: kCTFontSizeAttribute
-C-GLOBAL: kCTFontMatrixAttribute
-C-GLOBAL: kCTFontCascadeListAttribute
-C-GLOBAL: kCTFontCharacterSetAttribute
-C-GLOBAL: kCTFontLanguagesAttribute
-C-GLOBAL: kCTFontBaselineAdjustAttribute
-C-GLOBAL: kCTFontMacintoshEncodingsAttribute
-C-GLOBAL: kCTFontFeaturesAttribute
-C-GLOBAL: kCTFontFeatureSettingsAttribute
-C-GLOBAL: kCTFontFixedAdvanceAttribute
-C-GLOBAL: kCTFontOrientationAttribute
-
-FUNCTION: CTFontDescriptorRef CTFontDescriptorCreateWithAttributes (
-   CFDictionaryRef attributes
-) ;
-
-FUNCTION: CTFontRef CTFontCreateWithName (
-   CFStringRef name,
-   CGFloat size,
-   CGAffineTransform* matrix
-) ;
-
-FUNCTION: CTFontRef CTFontCreateWithFontDescriptor (
-   CTFontDescriptorRef descriptor,
-   CGFloat size,
-   CGAffineTransform* matrix
-) ;
 
 C-GLOBAL: kCTFontAttributeName
 C-GLOBAL: kCTKernAttributeName
@@ -90,15 +32,7 @@ FUNCTION: double CTLineGetTypographicBounds ( CTLineRef line, CGFloat* ascent, C
 
 FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context ) ;
 
-FUNCTION: CTFontRef CTFontCreateCopyWithSymbolicTraits (
-   CTFontRef font,
-   CGFloat size,
-   CGAffineTransform* matrix,
-   uint32_t symTraitValue,
-   uint32_t symTraitMask
-) ;
-
-: <CTLine> ( string font color -- line )
+: <CTLine> ( string open-font color -- line )
     [
         [
             kCTForegroundColorAttributeName set
@@ -121,21 +55,21 @@ TUPLE: typographic-bounds width ascent descent leading ;
     [ ceiling >fixnum ]
     bi@ 2array ;
 
-:: <line> ( string font foreground background -- line )
+:: <line> ( string font -- line )
     [
-        [let* | font [ font CFRetain |CFRelease ]
-                line [ string font foreground <CTLine> |CFRelease ]
+        [let* | open-font [ font cache-font CFRetain |CFRelease ]
+                line [ string open-font font foreground>> <CTLine> |CFRelease ]
                 bounds [ line line-typographic-bounds ]
                 dim [ bounds bounds>dim ] |
             dim [
                 {
-                    [ background >rgba-components CGContextSetRGBFillColor ]
+                    [ font background>> >rgba-components CGContextSetRGBFillColor ]
                     [ 0 0 dim first2 <CGRect> CGContextFillRect ]
                     [ 0 bounds descent>> CGContextSetTextPosition ]
                     [ line swap CTLineDraw ]
                 } cleave
             ] with-bitmap-context
-            [ font line bounds dim ] dip 0 0 f
+            [ open-font line bounds dim ] dip 0 0 f
         ]
         line boa
     ] with-destructors ;
@@ -151,7 +85,7 @@ M: line dispose* [ font>> CFRelease ] [ line>> CFRelease ] bi ;
 SYMBOL: cached-lines
 
 : cached-line ( string font -- line )
-    black white 4array cached-lines get [ first4 <line> ] cache ;
+    cached-lines get [ <line> ] 2cache ;
 
 CONSTANT: max-line-age 10
 

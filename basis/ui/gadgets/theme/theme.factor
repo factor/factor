@@ -57,7 +57,3 @@ IN: ui.gadgets.theme
         T{ gray f 0.43 1.0 }
         T{ gray f 0.5  1.0 }
     } <gradient> ;
-
-CONSTANT: sans-serif-font T{ font { name "sans-serif" } { size 12 } }
-
-CONSTANT: monospace-font T{ font { name "monospace" } { size 12 } }

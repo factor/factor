@@ -1,6 +1,6 @@
 USING: ui.gadgets ui.gestures help.markup help.syntax
 kernel classes strings opengl opengl.gl models
-math.geometry.rect math ;
+math.geometry.rect math colors ;
 IN: ui.render
 
 HELP: gadget
@@ -39,25 +39,27 @@ HELP: draw-boundary
 { $contract "Draws the boundary of a gadget by making OpenGL calls. The " { $snippet "boundary" } " slot may be set to objects implementing this generic word." } ;
 
 HELP: solid
-{ $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " generic words to draw a solid outline or a solid fill, respectively. The " { $snippet "color" } " slot stores a color specifier." } ;
+{ $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " generic words to draw a solid outline or a solid fill, respectively. The " { $snippet "color" } " slot stores an instance of " { $link color } "." }
+{ $notes "See " { $link "colors" } "." } ;
 
 HELP: gradient
-{ $class-description "A class implementing the " { $link draw-interior } " generic word to draw a smoothly shaded transition between colors. The " { $snippet "colors" } " slot stores a sequence of color specifiers and the gradient is drawn in the direction given by the " { $snippet "orientation" } " slot of the gadget." } ;
+{ $class-description "A class implementing the " { $link draw-interior } " generic word to draw a smoothly shaded transition between colors. The " { $snippet "colors" } " slot stores a sequence of " { $link color } " instances, and the gradient is drawn in the direction given by the " { $snippet "orientation" } " slot of the gadget." }
+{ $notes "See " { $link "colors" } "." } ;
 
 HELP: polygon
 { $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " generic words to draw a solid outline or a solid filled polygon, respectively. Instances of " { $link polygon } " have two slots:"
     { $list
-        { { $snippet "color" } " - a color specifier" }
+        { { $snippet "color" } " - a " { $link color } }
         { { $snippet "points" } " - a sequence of points" }
     }
 } ;
 
 HELP: <polygon>
-{ $values { "color" "a color specifier" } { "points" "a sequence of points" } { "polygon" polygon } }
+{ $values { "color" color } { "points" "a sequence of points" } { "polygon" polygon } }
 { $description "Creates a new instance of " { $link polygon } "." } ;
 
 HELP: <polygon-gadget>
-{ $values { "color" "a color specifier" } { "points" "a sequence of points" } { "gadget" "a new " { $link gadget } } }
+{ $values { "color" color } { "points" "a sequence of points" } { "gadget" "a new " { $link gadget } } }
 { $description "Creates a gadget which is drawn as a solid filled polygon. The gadget's size is the minimum bounding box containing all the points of the polygon." } ;
 
 ARTICLE: "gadgets-polygons" "Polygon gadgets"
@@ -102,4 +104,4 @@ ARTICLE: "ui-paint-coord" "The UI co-ordinate system"
 $nl
 "Gadgets must not draw outside of their bounding box, however clipping is not enforced by default, for performance reasons. This can be changed by setting the " { $slot "clipped?" } " slot to " { $link t } " in the gadget's constructor." ;
 
-ABOUT: "ui-paint-custom"
+ABOUT: "ui-paint"

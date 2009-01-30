@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors inspector namespaces kernel models fry
 models.filter prettyprint sequences mirrors assocs classes
-io io.styles arrays hashtables math.order sorting refs
+io io.styles arrays hashtables math.order sorting refs fonts
 ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks
 ui.gestures ui.gadgets.buttons ui.gadgets.tables

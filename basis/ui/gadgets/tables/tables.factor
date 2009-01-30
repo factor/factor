@@ -4,7 +4,7 @@ USING: accessors arrays colors fry kernel math
 math.geometry.rect math.order math.vectors namespaces opengl
 sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.worlds ui.gadgets.theme ui.gestures ui.render ui.text
-ui.gadgets.menus models math.ranges sequences combinators ;
+ui.gadgets.menus models math.ranges sequences combinators fonts ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol

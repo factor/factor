@@ -4,7 +4,7 @@ USING: accessors arrays assocs calendar colors documents
 documents.elements fry kernel words sets splitting math math.vectors
 models.delay models.filter combinators.short-circuit parser present
 sequences tools.completion generic generic.standard.engines.tuple
-ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
+fonts ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
 ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.theme
 ui.gadgets.worlds ui.gadgets.wrappers ui.gestures ui.render
 ui.tools.listener.history ;

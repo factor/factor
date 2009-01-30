@@ -1,7 +1,7 @@
 USING: help.markup help.syntax strings quotations debugger
 namespaces ui.backend ui.gadgets ui.gadgets.worlds
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids
-math.geometry.rect colors ui.text ;
+math.geometry.rect colors ui.text fonts ;
 IN: ui
 
 HELP: windows

@@ -1,14 +1,8 @@
 IN: ui.text
-USING: help.markup help.syntax kernel ui.text.private strings math ;
-
-HELP: open-font
-{ $values { "font" font } { "open-font" object } }
-{ $contract "Loads a font if it has not already been loaded, otherwise outputs the existing font." }
-{ $errors "Throws an error if the font does not exist." }
-{ $notes "This word should not be called by user code. All high-level text rendering words will call " { $link open-font } " automatically." } ;
+USING: help.markup help.syntax kernel ui.text.private strings math fonts ;
 
 HELP: string-width
-{ $values { "open-font" "a value output by " { $link open-font } } { "string" string } { "w" "a positive integer" } }
+{ $values { "font" font } { "string" string } { "w" "a positive integer" } }
 { $contract "Outputs the width of a string." }
 { $notes "This is a low-level word; use " { $link text-width } " instead." } ;
 
@@ -17,7 +11,7 @@ HELP: text-width
 { $description "Outputs the width of a piece of text." } ;
 
 HELP: string-height
-{ $values { "open-font" "a value output by " { $link open-font } } { "string" string } { "h" "a positive integer" } }
+{ $values { "font" font } { "string" string } { "h" "a positive integer" } }
 { $contract "Outputs the height of a string." }
 { $notes "This is a low-level word; use " { $link text-height } " instead." } ;
 
@@ -26,7 +20,7 @@ HELP: text-height
 { $description "Outputs the height of a piece of text." } ;
 
 HELP: string-dim
-{ $values { "open-font" "a value output by " { $link open-font } } { "string" string } { "dim" "a pair of integers" } }
+{ $values { "font" font } { "string" string } { "dim" "a pair of integers" } }
 { $contract "Outputs the dimensions of a string." }
 { $notes "This is a low-level word; use " { $link text-dim } " instead." } ;
 
@@ -52,7 +46,7 @@ HELP: offset>x
 
 ARTICLE: "text-rendering" "Rendering text"
 "The " { $vocab-link "ui.text" } " vocabulary provides a cross-platform interface to the operating system's native font rendering engine. Currently, it uses Core Text on Mac OS X and FreeType on Windows and X11."
-$nl
+{ $subsection "fonts" }
 "Measuring text:"
 { $subsection text-dim }
 { $subsection text-width }
@@ -63,7 +57,6 @@ $nl
 "Rendering text:"
 { $subsection draw-text }
 "Low-level text protocol for UI backends:"
-{ $subsection open-font }
 { $subsection string-width }
 { $subsection string-height }
 { $subsection string-dim }

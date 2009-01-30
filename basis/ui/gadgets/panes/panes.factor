@@ -4,12 +4,12 @@ USING: arrays hashtables io kernel namespaces sequences
 io.styles strings quotations math opengl combinators memoize
 math.vectors sorting splitting assocs classes.tuple models
 continuations destructors accessors math.geometry.rect fry
-ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+fonts ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.paragraphs
 ui.gadgets.incremental ui.gadgets.packs ui.gadgets.theme
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 ui.text ui.gadgets.presentations ui.gadgets.grids
-ui.gadgets.grid-lines ;
+ui.gadgets.grid-lines colors ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < pack
@@ -179,44 +179,36 @@ M: pane-stream make-span-stream
 
 ! Character styles
 
-: apply-style ( style gadget key quot -- style gadget )
-    [ pick at ] dip when* ; inline
-
-: apply-foreground-style ( style gadget -- style gadget )
-    foreground [ >>color ] apply-style ;
-
-: apply-background-style ( style gadget -- style gadget )
-    background [ solid-interior ] apply-style ;
-
-MEMO: specified-font ( font style size -- font )
+MEMO: specified-font ( assoc -- font )
     #! We memoize here to avoid creating lots of duplicate font objects.
-    [ <font> ] 3dip
-    [ "monospace" or >>name ]
-    [
-        {
-            { f [ ] }
-            { plain [ ] }
-            { bold [ t >>bold? ] }
-            { italic [ t >>italic? ] }
-            { bold-italic [ t >>bold? t >>italic? ] }
-        } case
-    ]
-    [ 12 or >>size ]
-    tri* ;
+    [ <font> ] dip
+    {
+        [ font-name swap at "monospace" or >>name ]
+        [
+            font-style swap at {
+                { f [ ] }
+                { plain [ ] }
+                { bold [ t >>bold? ] }
+                { italic [ t >>italic? ] }
+                { bold-italic [ t >>bold? t >>italic? ] }
+            } case
+        ]
+        [ font-size swap at 12 or >>size ]
+        [ foreground swap at black or >>foreground ]
+        [ background swap at white or >>background ]
+    } cleave ;
 
 : apply-font-style ( style gadget -- style gadget )
-    over
-    [ font-name swap at ]
-    [ font-style swap at ]
-    [ font-size swap at ]
-    tri specified-font >>font ;
+    { font-name font-style font-size foreground background }
+    pick extract-keys specified-font >>font ;
+
+: apply-style ( style gadget key quot -- style gadget )
+    [ pick at ] dip when* ; inline
 
 : apply-presentation-style ( style gadget -- style gadget )
     presented [ <presentation> ] apply-style ;
 
 : style-label ( style gadget -- gadget )
-    apply-foreground-style
-    apply-background-style
     apply-font-style
     apply-presentation-style
     nip ; inline

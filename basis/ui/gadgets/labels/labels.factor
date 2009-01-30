@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables io kernel math namespaces
 make opengl sequences strings splitting ui.gadgets
-ui.gadgets.tracks ui.gadgets.theme ui.render
+ui.gadgets.tracks fonts ui.render
 ui.text colors models ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.
-TUPLE: label < gadget text font color ;
+TUPLE: label < gadget text font ;
 
 : label-string ( label -- string )
     text>> dup string? [ "\n" join ] unless ; inline
@@ -16,8 +16,7 @@ TUPLE: label < gadget text font color ;
     [ CHAR: \n over memq? [ string-lines ] when ] dip (>>text) ; inline
 
 : label-theme ( gadget -- gadget )
-    sans-serif-font >>font
-    black >>color ; inline
+    sans-serif-font >>font ; inline
 
 : new-label ( string class -- label )
     new-gadget
@@ -31,8 +30,7 @@ M: label pref-dim*
     [ font>> ] [ text>> ] bi text-dim ;
 
 M: label draw-gadget*
-    [ color>> gl-color ]
-    [ [ font>> ] [ text>> ] bi origin get draw-text ] bi ;
+    [ font>> ] [ text>> ] bi origin get draw-text ;
 
 M: label gadget-text* label-string % ;
 
@@ -46,12 +44,10 @@ M: label-control model-changed
         swap >>model ;
 
 : text-theme ( gadget -- gadget )
-    black >>color
     monospace-font >>font ;
 
 : reverse-video-theme ( label -- label )
-    white >>color
-    black solid-interior ;
+    sans-serif-font reverse-video-font >>font ;
 
 GENERIC: >label ( obj -- gadget )
 M: string >label <label> ;

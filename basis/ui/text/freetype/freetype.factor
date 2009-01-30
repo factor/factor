@@ -107,10 +107,8 @@ SYMBOL: dpi
         swap size>> set-char-size
         init-font ;
 
-M: freetype-renderer open-font ( font -- open-font )
-    dup freetype-font? [
-        freetype drop open-fonts get [ <freetype-font> ] cache
-    ] unless ;
+: open-font ( font -- open-font )
+    freetype drop open-fonts get [ <freetype-font> ] cache ;
 
 : load-glyph ( font char -- glyph )
     [ handle>> dup ] dip 0 FT_Load_Char
@@ -121,11 +119,11 @@ M: freetype-renderer open-font ( font -- open-font )
         dupd load-glyph glyph-hori-advance ft-ceil
     ] cache nip ;
 
-M: freetype-renderer string-width ( open-font string -- w )
-    [ [ 0 ] dip ] dip [ char-width + ] with each ;
+M: freetype-renderer string-width ( font string -- w )
+    [ [ 0 ] dip open-font ] dip [ char-width + ] with each ;
 
-M: freetype-renderer string-height ( open-font string -- h )
-    drop height>> ;
+M: freetype-renderer string-height ( font string -- h )
+    drop open-font height>> ;
 
 : glyph-size ( glyph -- dim )
     [ glyph-hori-advance ft-ceil ]

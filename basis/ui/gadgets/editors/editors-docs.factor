@@ -1,6 +1,6 @@
 USING: documents help.markup help.syntax ui.gadgets
 ui.gadgets.scrollers models strings ui.commands
-ui.text colors ;
+ui.text colors fonts ;
 IN: ui.gadgets.editors
 
 HELP: editor
