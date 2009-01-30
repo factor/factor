@@ -79,7 +79,7 @@ M: #alien-indirect compute-live-values* nip look-at-inputs ;
     dup out-d>> drop-dead-values tuck in-d>> >>out-d drop ;
 
 : some-outputs-dead? ( #call -- ? )
-    out-d>> [ live-value? not ] contains? ;
+    out-d>> [ live-value? not ] any? ;
 
 : maybe-drop-dead-outputs ( node -- nodes )
     dup some-outputs-dead? [

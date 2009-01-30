@@ -6,5 +6,5 @@ USING: tools.test words sequences kernel memory accessors ;
     [
         [ name>> "f?" = ]
         [ vocabulary>> "syntax" = ] bi and
-    ] contains?
+    ] any?
 ] unit-test

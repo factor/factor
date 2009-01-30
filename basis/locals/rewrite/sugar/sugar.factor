@@ -33,9 +33,9 @@ GENERIC: rewrite-literal? ( obj -- ? )
 
 M: special rewrite-literal? drop t ;
 
-M: array rewrite-literal? [ rewrite-literal? ] contains? ;
+M: array rewrite-literal? [ rewrite-literal? ] any? ;
 
-M: quotation rewrite-literal? [ rewrite-literal? ] contains? ;
+M: quotation rewrite-literal? [ rewrite-literal? ] any? ;
 
 M: wrapper rewrite-literal? wrapped>> rewrite-literal? ;
 

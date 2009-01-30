@@ -43,7 +43,7 @@ SYMBOL: vocabs-quot
         $predicate
         $class-description
         $error-description
-    } swap '[ _ elements empty? not ] contains? ;
+    } swap '[ _ elements empty? not ] any? ;
 
 : don't-check-word? ( word -- ? )
     {
@@ -103,7 +103,7 @@ SYMBOL: vocabs-quot
     [ "Missing whitespace between strings" throw ] unless ;
 
 : check-bogus-nl ( element -- )
-    { { $nl } { { $nl } } } [ head? ] with contains?
+    { { $nl } { { $nl } } } [ head? ] with any?
     [ "Simple element should not begin with a paragraph break" throw ] when ;
 
 : check-elements ( element -- )

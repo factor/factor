@@ -25,7 +25,7 @@ M: mailbox dispose* threads>> notify-all ;
 
 :: block-unless-pred ( mailbox timeout pred: ( message -- ? ) -- )
     mailbox check-disposed
-    mailbox data>> pred dlist-contains? [
+    mailbox data>> pred dlist-any? [
         mailbox timeout wait-for-mailbox
         mailbox timeout pred block-unless-pred
     ] unless ; inline recursive

@@ -498,7 +498,7 @@ cell-bits 32 = [
 
 [ t ] [
     [ { array-capacity } declare 1 fixnum+ ] cleaned-up-tree
-    [ { [ #call? ] [ node-input-infos second literal>> 1 = ] } 1&& ] contains?
+    [ { [ #call? ] [ node-input-infos second literal>> 1 = ] } 1&& ] any?
 ] unit-test
 
 [ ] [

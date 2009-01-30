@@ -70,11 +70,11 @@ PRIVATE>
     [ (assoc-each) partition ] [ drop ] 2bi
     tuck [ assoc-like ] 2bi@ ; inline
 
-: assoc-contains? ( assoc quot -- ? )
+: assoc-any? ( assoc quot -- ? )
     assoc-find 2nip ; inline
 
 : assoc-all? ( assoc quot -- ? )
-    [ not ] compose assoc-contains? not ; inline
+    [ not ] compose assoc-any? not ; inline
 
 : at ( key assoc -- value/f )
     at* drop ; inline

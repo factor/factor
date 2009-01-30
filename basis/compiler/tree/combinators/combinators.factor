@@ -34,14 +34,14 @@ IN: compiler.tree.combinators
     dup dup '[
         _ keep swap [ drop t ] [
             dup #branch? [
-                children>> [ _ contains-node? ] contains?
+                children>> [ _ contains-node? ] any?
             ] [
                 dup #recursive? [
                     child>> _ contains-node?
                 ] [ drop f ] if
             ] if
         ] if
-    ] contains? ; inline recursive
+    ] any? ; inline recursive
 
 : select-children ( seq flags -- seq' )
     [ [ drop f ] unless ] 2map ;

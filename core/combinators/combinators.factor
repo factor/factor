@@ -127,9 +127,9 @@ ERROR: no-case ;
 : case>quot ( default assoc -- quot )
     dup keys {
         { [ dup empty? ] [ 2drop ] }
-        { [ dup [ length 4 <= ] [ [ word? ] contains? ] bi or ] [ drop linear-case-quot ] }
+        { [ dup [ length 4 <= ] [ [ word? ] any? ] bi or ] [ drop linear-case-quot ] }
         { [ dup contiguous-range? ] [ drop dispatch-case-quot ] }
-        { [ dup [ wrapper? ] contains? not ] [ drop hash-case-quot ] }
+        { [ dup [ wrapper? ] any? not ] [ drop hash-case-quot ] }
         { [ dup [ wrapper? ] all? ] [ drop [ [ wrapped>> ] dip ] assoc-map hash-case-quot ] }
         [ drop linear-case-quot ]
     } cond ;
