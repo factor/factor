@@ -22,3 +22,4 @@ work
 build-support/wordsize
 *.bak
 .#*
+*.swo
