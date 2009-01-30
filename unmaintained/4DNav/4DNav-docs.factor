@@ -3,209 +3,61 @@
 USING: help.markup help.syntax kernel quotations strings ;
 IN: 4DNav
 
-HELP: (mvt-4D)
-{ $values
-     { "quot" quotation }
-}
-{ $description "" } ;
-
-HELP: 4D-Rxw
-{ $values
-     { "angle" null }
-     { "Rz" null }
-}
-{ $description "" } ;
-
-HELP: 4D-Rxy
-{ $values
-     { "angle" null }
-     { "Rx" null }
-}
-{ $description "" } ;
-
-HELP: 4D-Rxz
-{ $values
-     { "angle" null }
-     { "Ry" null }
-}
-{ $description "" } ;
-
-HELP: 4D-Ryw
-{ $values
-     { "angle" null }
-     { "Ry" null }
-}
-{ $description "" } ;
-
-HELP: 4D-Ryz
-{ $values
-     { "angle" null }
-     { "Rx" null }
-}
-{ $description "" } ;
-
-HELP: 4D-Rzw
-{ $values
-     { "angle" null }
-     { "Rz" null }
-}
-{ $description "" } ;
-
-HELP: 4DNav
-{ $description "" } ;
-
-HELP: >observer3d
-{ $values
-     { "value" null }
-}
-{ $description "" } ;
-
-HELP: >present-space
-{ $values
-     { "value" null }
-}
-{ $description "" } ;
-
-
-HELP: >view1
-{ $values
-     { "value" null }
-}
-{ $description "" } ;
-
-HELP: >view2
-{ $values
-     { "value" null }
-}
-{ $description "" } ;
-
-HELP: >view3
-{ $values
-     { "value" null }
-}
-{ $description "" } ;
-
-HELP: >view4
-{ $values
-     { "value" null }
-}
-{ $description "" } ;
-
-HELP: add-keyboard-delegate
-{ $values
-     { "obj" object }
-     { "obj" object }
-}
-{ $description "" } ;
-
-HELP: button*
-{ $values
-     { "string" string } { "quot" quotation }
-     { "button" null }
-}
-{ $description "" } ;
-
-HELP: camera-action
-{ $values
-     { "quot" quotation }
-     { "quot" quotation }
-}
-{ $description "" } ;
-
-HELP: camera-button
-{ $values
-     { "string" string } { "quot" quotation }
-     { "button" null }
-}
-{ $description "" } ;
-
-HELP: controller-window*
-{ $values
-     { "gadget" "a gadget" } 
-}
-{ $description "" } ;
-
-
-HELP: init-models
-{ $description "" } ;
-
-HELP: init-variables
-{ $description "" } ;
 
 HELP: menu-3D
 { $values
-     { "gadget" null }
+     { "gadget" "gadget" }
 }
 { $description "The menu dedicated to 3D movements of the camera" } ;
 
 HELP: menu-4D
 { $values
     
-     { "gadget" null }
+     { "gadget" "gadget" }
 }
 { $description "The menu dedicated to 4D movements of space" } ;
 
 HELP: menu-bar
 { $values
     
-     { "gadget" null }
+     { "gadget" "gadget" }
 }
 { $description "return gadget containing menu buttons" } ;
 
 HELP: model-projection
 { $values
-     { "x" null }
-     { "space" null }
+     { "x" "interger" }
+     { "space" "space" }
 }
 { $description "Project space following coordinate x" } ;
 
 HELP: mvt-3D-1
 { $values
     
-     { "quot" quotation }
+     { "quot" "quotation" }
 }
 { $description "return a quotation to orientate space to see it from first point of view" } ;
 
 HELP: mvt-3D-2
 { $values
     
-     { "quot" quotation }
+     { "quot" "quotation" }
 }
 { $description "return a quotation to orientate space to see it from second point of view" } ;
 
 HELP: mvt-3D-3
 { $values
     
-     { "quot" quotation }
+     { "quot" "quotation" }
 }
 { $description "return a quotation to orientate space to see it from third point of view" } ;
 
 HELP: mvt-3D-4
 { $values
     
-     { "quot" quotation }
+     { "quot" "quotation" }
 }
 { $description "return a quotation to orientate space to see it from first point of view" } ;
-
-HELP: observer3d
-{ $description "" } ;
-
-HELP: observer3d>
-{ $values
-    
-     { "value" null }
-}
-{ $description "" } ;
-
-HELP: present-space
-{ $description "" } ;
-
-HELP: present-space>
-{ $values
-    
-     { "value" null }
-}
-{ $description "" } ;
 
 HELP: load-model-file
 { $description "load space from file" } ;
@@ -218,70 +70,23 @@ HELP: rotation-4D
 
 HELP: translation-4D
 { $values
-     { "v" null }
+     { "v" "vector" }
 }
-{ $description "" } ;
+{ $description "Apply a 4D translation" } ;
 
-HELP: update-model-projections
-{ $description "" } ;
 
-HELP: update-observer-projections
-{ $description "" } ;
+ARTICLE: "implementation details" "How 4DNav is done"
+"4DNav is build using :"
 
-HELP: view1
-{ $description "" } ;
-
-HELP: view1>
-{ $values
-    
-     { "value" null }
-}
-{ $description "" } ;
-
-HELP: view2
-{ $description "" } ;
-
-HELP: view2>
-{ $values
-    
-     { "value" null }
-}
-{ $description "" } ;
-
-HELP: view3
-{ $description "" } ;
-
-HELP: view3>
-{ $values
-    
-     { "value" null }
-}
-{ $description "" } ;
-
-HELP: view4
-{ $description "" } ;
-
-HELP: view4>
-{ $values
-    
-     { "value" null }
-}
-{ $description "" } ;
-
-HELP: viewer-windows*
-{ $description "" } ;
-
-HELP: win3D
-{ $values
-     { "text" null } { "gadget" null }
-}
-{ $description "" } ;
-
-HELP: windows
-{ $description "" } ;
+{ $subsection "4DNav.camera" }
+{ $subsection "adsoda-main-page" }
+;
 
 ARTICLE: "Space file" "Create a new space file"
-"\nTo build a new space, create an XML file using " { $vocab-link "adsoda" } " model description. \nAn example is:"
+"To build a new space, create an XML file using " { $vocab-link "adsoda" } " model description. A solid is not caracterized by its corners but is defined as the intersection of hyperplanes."
+
+$nl
+"An example is:"
 $nl
 
 "\n<model>"
@@ -336,10 +141,8 @@ $nl
 
 
 ;
-
 ARTICLE: "TODO" "Todo"
 { $list 
-    "A file chooser"
     "A vocab to initialize parameters"
     "an editor mode" 
         { $list "add a face to a solid"
@@ -357,43 +160,41 @@ ARTICLE: "TODO" "Todo"
     "add a tool wich give an hyperplane normal vector with enought points. Will use adsoda.intersect-hyperplanes with { { 0 } { 0 } { 1 } } "
     "decorrelate 3D camera and activate them with select buttons"
 
-
-
 } ;
 
 
-ARTICLE: "4DNav" "4DNav"
+ARTICLE: "4DNav" "The 4DNav app"
 { $vocab-link "4DNav" }
 $nl
 { $heading "4D Navigator" }
 "4DNav is a simple tool to visualize 4 dimensionnal objects."
 "\n"
 "It uses " { $vocab-link "adsoda" } " library to display a 4D space and navigate thru it."
-
+$nl
 "It will display:"
 { $list
     { "a menu window" }
     {  "4 visualization windows" }
 }
-"Each window represents the projection of the 4D space on a particular 3D space."
-$nl
+"Each visualization window represents the projection of the 4D space on a particular 3D space."
 
-{ $heading "Initialization" }
-"put the space file " { $strong "space-exemple.xml" } "  in temp directory"
-" and then type:" { $code "\"4DNav\" run" } 
+{ $heading "Start" }
+"type:" { $code "\"4DNav\" run" } 
+
 { $heading "Navigation" }
-"4D submenu move the space in translations and rotation."
-"\n3D submenu move the camera in 3D space. Cameras in every 3D spaces are manipulated as a single one"
-$nl
-
-
-
+"Menu window is divided in 4 areas"
+{ $list
+    { "a space-file chooser to select the file to display" }
+    { "a parametrization area to select the projection mode" }
+    { "4D submenu to translate and rotate the 4D space" }
+    { "3D submenu to move the camera in 3D space. Cameras in every 3D spaces are manipulated as a single one" }
+    }
 
 { $heading "Links" }
 { $subsection "Space file" }
 
 { $subsection "TODO" }
-
+{ $subsection "implementation details" }
 
 ;
 

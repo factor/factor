@@ -9,7 +9,7 @@ IN: adsoda
 ! --------------------------------------------------------------
 ! faces
 ! --------------------------------------------------------------
-ARTICLE: "face-page" "face in ADSODA"
+ARTICLE: "face-page" "Face in ADSODA"
 "explanation of faces"
 $nl
 "link to functions"
@@ -65,7 +65,7 @@ HELP: face-transform
 ! --------------------------------
 ! solid
 ! --------------------------------------------------------------
-ARTICLE: "solid-page" "solid in ADSODA"
+ARTICLE: "solid-page" "Solid in ADSODA"
 "explanation of solids"
 $nl
 "link to functions"
@@ -133,13 +133,13 @@ $nl
 
 HELP: subtract 
 { $values { "solid1" "initial shape" } { "solid2" "shape to remove" } { "solids" "resulting shape" } }
-{ $description  " " } ;
+{ $description  "Substract solid2 from solid1" } ;
 
 
 ! --------------------------------------------------------------
 ! space 
 ! --------------------------------------------------------------
-ARTICLE: "space-page" "space in ADSODA"
+ARTICLE: "space-page" "Space in ADSODA"
 "A space is a collection of solids and lights."
 $nl
 "link to functions"
@@ -211,7 +211,7 @@ HELP: space-project
 ! --------------------------------------------------------------
 ! 3D rendering
 ! --------------------------------------------------------------
-ARTICLE: "3D-rendering-page" "3D rendering in ADSODA"
+ARTICLE: "3D-rendering-page" "The 3D rendering in ADSODA"
 "explanation of 3D rendering"
 $nl
 "link to functions"
@@ -223,21 +223,21 @@ $nl
 
 HELP: face->GL 
 { $values { "face" "a face" } { "color" "3 3 values array" } }
-{ $description "" } ;
+{ $description "display a face" } ;
 
 HELP: solid->GL 
 { $values { "solid" "a solid" } }
-{ $description "" } ;
+{ $description "display a solid" } ;
 
 HELP: space->GL 
 { $values { "space" "a space" } }
-{ $description "" } ;
+{ $description "display a space" } ;
 
 ! --------------------------------------------------------------
 ! light
 ! --------------------------------------------------------------
 
-ARTICLE: "light-page" "light in ADSODA"
+ARTICLE: "light-page" "Light in ADSODA"
 "explanation of light"
 $nl
 "link to functions"
@@ -274,7 +274,6 @@ ARTICLE: { "adsoda" "light" } "ADSODA : lights"
 
 
 ARTICLE: { "adsoda" "halfspace" } "ADSODA : halfspace"
-"! demi espace défini par un vecteur normal et une constante"
 " defined by the concatenation of the normal vector and a constant"  
  ;
 

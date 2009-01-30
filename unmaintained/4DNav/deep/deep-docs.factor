@@ -24,7 +24,7 @@ IN: 4DNav.deep
 ! } }
 ! ;
 
-ARTICLE: "4DNav.deep" "4DNav.deep"
+ARTICLE: "4DNav.deep" "Deep"
 { $vocab-link "4DNav.deep" }
 ;
 

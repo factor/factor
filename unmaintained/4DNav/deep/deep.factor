@@ -1,4 +1,5 @@
-USING: macros quotations math math.functions math.trig sequences.deep kernel make fry combinators grouping ;
+USING: macros quotations math math.functions math.trig 
+sequences.deep kernel make fry combinators grouping ;
 IN: 4DNav.deep
 
 ! USING: bake ;
@@ -7,5 +8,6 @@ IN: 4DNav.deep
 !    [ [ dup quotation? [ drop , ] when ] deep-map ]
 !    bi '[ _ cleave _ bake ] ;
 
-: make-matrix ( quot width -- matrix ) [ { } make ] dip group ; inline
+: make-matrix ( quot width -- matrix ) 
+    [ { } make ] dip group ; inline
 
