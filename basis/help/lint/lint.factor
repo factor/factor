@@ -114,12 +114,22 @@ SYMBOL: vocabs-quot
         [ 2 <clumps> [ [ string? ] all? ] filter [ first2 check-whitespace ] each ]
     } cleave ;
 
+: check-descriptions ( element -- )
+    { $description $class-description $var-description }
+    swap '[
+        _ elements [
+            rest { { } { "" } } member?
+            [ "Empty description" throw ] when
+        ] each
+    ] each ;
+
 : check-markup ( element -- )
     {
         [ check-elements ]
         [ check-rendering ]
         [ check-examples ]
         [ check-modules ]
+        [ check-descriptions ]
     } cleave ;
 
 : all-word-help ( words -- seq )
