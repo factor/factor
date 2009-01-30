@@ -45,8 +45,8 @@ SYMBOL: column
     ] with each ; inline
 
 : encode-pad ( seq n -- )
-    [ 3 0 pad-right binary [ encode3 ] with-byte-writer ]
-    [ 1+ ] bi* head-slice 4 CHAR: = pad-right write-lines ; inline
+    [ 3 0 pad-tail binary [ encode3 ] with-byte-writer ]
+    [ 1+ ] bi* head-slice 4 CHAR: = pad-tail write-lines ; inline
 
 ERROR: malformed-base64 ;
 

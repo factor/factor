@@ -8,7 +8,7 @@ IN: xml.utilities
 : children>string ( tag -- string )
     children>> {
         { [ dup empty? ] [ drop "" ] }
-        { [ dup [ string? not ] contains? ]
+        { [ dup [ string? not ] any? ]
           [ "XML tag unexpectedly contains non-text children" throw ] }
         [ concat ]
     } cond ;

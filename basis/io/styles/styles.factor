@@ -118,7 +118,7 @@ M: plain-writer make-block-stream
 : format-column ( seq ? -- seq )
     [
         [ 0 [ length max ] reduce ] keep
-        swap [ CHAR: \s pad-right ] curry map
+        swap [ CHAR: \s pad-tail ] curry map
     ] unless ;
 
 : map-last ( seq quot -- seq )

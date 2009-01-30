@@ -13,7 +13,7 @@ SYMBOL: core-bootstrap-time
 SYMBOL: bootstrap-time
 
 : default-image-name ( -- string )
-    vm file-name os windows? [ "." split1 drop ] when
+    vm file-name os windows? [ "." split1-last drop ] when
     ".image" append resource-path ;
 
 : do-crossref ( -- )

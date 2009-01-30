@@ -15,7 +15,7 @@ SYMBOL: xml-pprint?
 SYMBOL: indentation
 
 : sensitive? ( tag -- ? )
-    sensitive-tags get swap '[ _ names-match? ] contains? ;
+    sensitive-tags get swap '[ _ names-match? ] any? ;
 
 : indent-string ( -- string )
     xml-pprint? get

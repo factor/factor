@@ -73,7 +73,7 @@ PRIVATE>
 <PRIVATE
 
 : candidates ( n -- seq )
-    1000 over <range> [ number>digits 3 0 pad-left ] map [ all-unique? ] filter ;
+    1000 over <range> [ number>digits 3 0 pad-head ] map [ all-unique? ] filter ;
 
 : overlap? ( seq -- ? )
     [ first 2 tail* ] [ second 2 head ] bi = ;

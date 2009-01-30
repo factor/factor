@@ -22,7 +22,7 @@ ERROR: no-vocab vocab ;
 
 : contains-dot? ( string -- ? ) ".." swap subseq? ;
 
-: contains-separator? ( string -- ? ) [ path-separator? ] contains? ;
+: contains-separator? ( string -- ? ) [ path-separator? ] any? ;
 
 : check-vocab-name ( string -- string )
     dup contains-dot? [ vocab-name-contains-dot ] when
@@ -92,7 +92,7 @@ ERROR: no-vocab vocab ;
     ] if ;
 
 : lookup-type ( string -- object/string ? )
-    "new" ?head drop [ [ CHAR: ' = ] [ digit? ] bi or ] trim-right
+    "new" ?head drop [ [ CHAR: ' = ] [ digit? ] bi or ] trim-tail
     H{
         { "object" object } { "obj" object }
         { "quot" quotation }

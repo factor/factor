@@ -1179,7 +1179,7 @@ ALIAS: GetComputerNameEx GetComputerNameExW
 ! FUNCTION: GetConsoleSelectionInfo
 FUNCTION: DWORD GetConsoleTitleW ( LPWSTR lpConsoleTitle, DWORD nSize ) ;
 ALIAS: GetConsoleTitle GetConsoleTitleW
-! FUNCTION: GetConsoleWindow
+FUNCTION: HWND GetConsoleWindow ( ) ;
 ! FUNCTION: GetCPFileNameFromRegistry
 ! FUNCTION: GetCPInfo
 ! FUNCTION: GetCPInfoExA

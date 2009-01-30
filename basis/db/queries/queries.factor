@@ -19,7 +19,7 @@ SINGLETON: retryable
     ] if ;
 
 : maybe-make-retryable ( statement -- statement )
-    dup in-params>> [ generator-bind? ] contains?
+    dup in-params>> [ generator-bind? ] any?
     [ make-retryable ] when ;
 
 : regenerate-params ( statement -- statement )
