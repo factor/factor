@@ -98,8 +98,8 @@ def-hash get-global [ drop empty? not ] assoc-filter
 
 [
     drop {
-        [ [ wrapper? ] deep-contains? ]
-        [ [ hashtable? ] deep-contains? ]
+        [ [ wrapper? ] deep-any? ]
+        [ [ hashtable? ] deep-any? ]
     } 1|| not
 ] assoc-filter
 

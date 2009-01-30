@@ -17,7 +17,7 @@ SYMBOL: +bottom+
 : pad-with-bottom ( seq -- newseq )
     dup empty? [
         dup [ length ] map supremum
-        '[ _ +bottom+ pad-left ] map
+        '[ _ +bottom+ pad-head ] map
     ] unless ;
 
 : phi-inputs ( max-d-in pairs -- newseq )
@@ -108,7 +108,7 @@ M: callable infer-branch
         (infer-if)
     ] [
         drop 2 consume-d
-        dup [ known [ curried? ] [ composed? ] bi or ] contains? [
+        dup [ known [ curried? ] [ composed? ] bi or ] any? [
             output-d
             [ rot [ drop call ] [ nip call ] if ]
             infer-quot-here

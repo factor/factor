@@ -509,7 +509,7 @@ TUPLE: sp-parser p1 ;
 
 M: sp-parser (compile) ( peg -- quot )
   p1>> compile-parser 1quotation '[ 
-    input-slice [ blank? ] trim-left-slice input-from pos set @ 
+    input-slice [ blank? ] trim-head-slice input-from pos set @ 
   ] ;
 
 TUPLE: delay-parser quot ;

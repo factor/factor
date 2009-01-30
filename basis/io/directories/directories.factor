@@ -15,7 +15,7 @@ IN: io.directories
 HOOK: make-directory io-backend ( path -- )
 
 : make-directories ( path -- )
-    normalize-path trim-right-separators {
+    normalize-path trim-tail-separators {
         { [ dup "." = ] [ ] }
         { [ dup root-directory? ] [ ] }
         { [ dup empty? ] [ ] }

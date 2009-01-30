@@ -1,7 +1,7 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel layouts math math.order namespaces sequences
-sequences.private accessors ;
+sequences.private accessors classes.tuple arrays ;
 IN: math.ranges
 
 TUPLE: range
@@ -17,6 +17,12 @@ M: range length ( seq -- n )
 
 M: range nth-unsafe ( n range -- obj )
     [ step>> * ] keep from>> + ;
+
+! For ranges with many elements, the default element-wise methods
+! sequences define are unsuitable because they're O(n)
+M: range equal? over range? [ tuple= ] [ 2drop f ] if ;
+
+M: range hashcode* tuple-hashcode ;
 
 INSTANCE: range immutable-sequence
 

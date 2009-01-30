@@ -43,7 +43,7 @@ HELP: printf
     "string. For example:\n"
     { $list 
         "\"%.3s\" formats a string to truncate at 3 characters (from the left)."
-        "\"%.10f\" formats a float to pad-right with zeros up to 10 digits beyond the decimal point."
+        "\"%.10f\" formats a float to pad-tail with zeros up to 10 digits beyond the decimal point."
         "\"%.5E\" formats a float into scientific notation with zeros up to 5 digits beyond the decimal point, but before the exponent."
     }
 }

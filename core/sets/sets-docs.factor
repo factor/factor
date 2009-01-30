@@ -22,7 +22,7 @@ $nl
 "Adding elements to sets:"
 { $subsection adjoin }
 { $subsection conjoin }
-{ $see-also member? memq? contains? all? "assocs-sets" } ;
+{ $see-also member? memq? any? all? "assocs-sets" } ;
 
 ABOUT: "sets"
 

@@ -19,14 +19,14 @@ words splitting grouping sorting accessors ;
 
 : bleh ( seq -- seq' ) [ 3 + ] map [ 0 > ] filter ;
 
-: stack-trace-contains? ( word -- ? ) symbolic-stack-trace memq? ;
+: stack-trace-any? ( word -- ? ) symbolic-stack-trace memq? ;
 
 [ t ] [
-    [ { 1 "hi" } bleh ] ignore-errors \ + stack-trace-contains?
+    [ { 1 "hi" } bleh ] ignore-errors \ + stack-trace-any?
 ] unit-test
     
 [ t f ] [
     [ { "hi" } bleh ] ignore-errors
-    \ + stack-trace-contains?
-    \ > stack-trace-contains?
+    \ + stack-trace-any?
+    \ > stack-trace-any?
 ] unit-test

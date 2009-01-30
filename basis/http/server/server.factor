@@ -12,8 +12,10 @@ io.encodings.utf8
 io.encodings.ascii
 io.encodings.binary
 io.streams.limited
+io.streams.string
 io.servers.connection
 io.timeouts
+io.crlf
 fry logging logging.insomniac calendar urls urls.encoding
 mime.multipart
 unicode.categories

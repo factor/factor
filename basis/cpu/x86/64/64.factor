@@ -176,7 +176,7 @@ M: x86.64 %alien-indirect ( -- )
     RBP CALL ;
 
 M: x86.64 %alien-callback ( quot -- )
-    param-reg-1 swap %load-indirect
+    param-reg-1 swap %load-reference
     "c_to_factor" f %alien-invoke ;
 
 M: x86.64 %callback-value ( ctype -- )

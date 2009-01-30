@@ -147,7 +147,7 @@ M: object apply-object push-literal ;
     {
         { [ dup deferred? ] [ drop f ] }
         { [ dup crossref? not ] [ drop f ] }
-        [ def>> [ word? ] contains? ]
+        [ def>> [ word? ] any? ]
     } cond ;
 
 : ?missing-effect ( word -- )

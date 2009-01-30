@@ -13,10 +13,10 @@ TAG: PROPS
     parse-props-tag >>props drop ;
 
 TAG: IMPORT
-    "DELEGATE" swap at swap import-rule-set ;
+    "DELEGATE" attr swap import-rule-set ;
 
 TAG: TERMINATE
-    "AT_CHAR" swap at string>number >>terminate-char drop ;
+    "AT_CHAR" attr string>number >>terminate-char drop ;
 
 RULE: SEQ seq-rule
     shared-tag-attrs delegate-attr literal-start ;

@@ -393,7 +393,7 @@ HELP: find-last-from
 { $values { "n" "a starting index" } { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "i" "the index of the first match, or f" } { "elt" "the first matching element, or " { $link f } } }
 { $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of f and " { $link f } " as the element." } ;
 
-HELP: contains?
+HELP: any?
 { $values { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the sequence contains an element satisfying the predicate, by applying the predicate to each element in turn until a true value is found. If the sequence is empty or if the end of the sequence is reached, outputs " { $link f } "." } ;
 
@@ -575,15 +575,15 @@ HELP: padding
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "quot" { $quotation "( seq1 seq2 -- newseq )" } } { "newseq" "a new sequence" } }
 { $description "Outputs a new string sequence of " { $snippet "elt" } " repeated, that when appended to " { $snippet "seq" } ", yields a sequence of length " { $snippet "n" } ". If the length of " { $snippet "seq" } " is greater than " { $snippet "n" } ", this word outputs an empty sequence." } ;
 
-HELP: pad-left
+HELP: pad-head
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "padded" "a new sequence" } }
 { $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the left with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
-{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-left print ] each" "---ab\n-quux" } } ;
+{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-head print ] each" "---ab\n-quux" } } ;
 
-HELP: pad-right
+HELP: pad-tail
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "padded" "a new sequence" } }
 { $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the right with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
-{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-right print ] each" "ab---\nquux-" } } ;
+{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-tail print ] each" "ab---\nquux-" } } ;
 
 HELP: sequence=
 { $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
@@ -960,43 +960,43 @@ HELP: pusher
 }
 { $notes "Used to implement the " { $link filter } " word." } ;
 
-HELP: trim-left
+HELP: trim-head
 { $values
      { "seq" sequence } { "quot" quotation }
      { "newseq" sequence } }
 { $description "Removes elements starting from the left side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
 { $example "" "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-left ."
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-head ."
            "{ 1 2 3 0 0 }"
 } ;
 
-HELP: trim-left-slice
+HELP: trim-head-slice
 { $values
      { "seq" sequence } { "quot" quotation }
      { "slice" slice } }
 { $description "Removes elements starting from the left side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice" }
 { $example "" "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-left-slice ."
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-head-slice ."
            "T{ slice { from 2 } { to 7 } { seq { 0 0 1 2 3 0 0 } } }"
 } ;
 
-HELP: trim-right
+HELP: trim-tail
 { $values
      { "seq" sequence } { "quot" quotation }
      { "newseq" sequence } }
 { $description "Removes elements starting from the right side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
 { $example "" "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-right ."
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-tail ."
            "{ 0 0 1 2 3 }"
 } ;
 
-HELP: trim-right-slice
+HELP: trim-tail-slice
 { $values
      { "seq" sequence } { "quot" quotation }
      { "slice" slice } }
 { $description "Removes elements starting from the right side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice." }
 { $example "" "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-right-slice ."
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-tail-slice ."
            "T{ slice { from 0 } { to 5 } { seq { 0 0 1 2 3 0 0 } } }"
 } ;
 
@@ -1020,7 +1020,7 @@ HELP: trim-slice
            "T{ slice { from 2 } { to 5 } { seq { 0 0 1 2 3 0 0 } } }"
 } ;
 
-{ trim trim-slice trim-left trim-left-slice trim-right trim-right-slice } related-words
+{ trim trim-slice trim-head trim-head-slice trim-tail trim-tail-slice } related-words
 
 HELP: sift
 { $values
@@ -1407,8 +1407,8 @@ ARTICLE: "sequences-appending" "Appending sequences"
 { $subsection concat }
 { $subsection join }
 "A pair of words useful for aligning strings:"
-{ $subsection pad-left }
-{ $subsection pad-right } ;
+{ $subsection pad-head }
+{ $subsection pad-tail } ;
 
 ARTICLE: "sequences-slices" "Subsequences and slices"
 "Extracting a subsequence:"
@@ -1463,7 +1463,7 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection push-if }
 { $subsection filter }
 "Testing if a sequence contains elements satisfying a predicate:"
-{ $subsection contains? }
+{ $subsection any? }
 { $subsection all? }
 { $subsection "sequence-2combinators" }
 { $subsection "sequence-3combinators" } ;
@@ -1513,12 +1513,12 @@ ARTICLE: "sequences-search" "Searching sequences"
 ARTICLE: "sequences-trimming" "Trimming sequences"
 "Trimming words:"
 { $subsection trim }
-{ $subsection trim-left }
-{ $subsection trim-right }
+{ $subsection trim-head }
+{ $subsection trim-tail }
 "Potentially more efficient trim:"
 { $subsection trim-slice }
-{ $subsection trim-left-slice }
-{ $subsection trim-right-slice } ;
+{ $subsection trim-head-slice }
+{ $subsection trim-tail-slice } ;
 
 ARTICLE: "sequences-destructive-discussion" "When to use destructive operations"
 "Constructive (non-destructive) operations should be preferred where possible because code without side-effects is usually more re-usable and easier to reason about. There are two main reasons to use destructive operations:"

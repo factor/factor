@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: farkup kernel peg peg.ebnf tools.test namespaces xml
-urls.encoding assocs xml.utilities ;
+urls.encoding assocs xml.utilities xml.data ;
 IN: farkup.tests
 
 relative-link-prefix off
@@ -161,7 +161,7 @@ link-no-follow? off
 
 : check-link-escaping ( string -- link )
     convert-farkup string>xml-chunk
-    "a" deep-tag-named "href" swap at url-decode ;
+    "a" deep-tag-named "href" attr url-decode ;
 
 [ "Trader Joe\"s" ] [ "[[Trader Joe\"s]]" check-link-escaping ] unit-test
 [ "<foo>" ] [ "[[<foo>]]" check-link-escaping ] unit-test

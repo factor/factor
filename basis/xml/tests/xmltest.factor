@@ -1,17 +1,17 @@
 USING: accessors assocs combinators continuations fry generalizations
 io.pathnames kernel macros sequences stack-checker tools.test xml
-xml.utilities xml.writer arrays ;
+xml.utilities xml.writer arrays xml.data ; 
 IN: xml.tests.suite
 
 TUPLE: xml-test id uri sections description type ;
 
 : >xml-test ( tag -- test )
     xml-test new swap {
-        [ "TYPE" swap at >>type ]
-        [ "ID" swap at >>id ]
-        [ "URI" swap at >>uri ]
-        [ "SECTIONS" swap at >>sections ]
-        [ children>> xml-chunk>string >>description ]
+        [ "TYPE" attr >>type ]
+        [ "ID" attr >>id ]
+        [ "URI" attr >>uri ]
+        [ "SECTIONS" attr >>sections ]
+        [ children>> xml>string >>description ]
     } cleave ;
 
 : parse-tests ( xml -- tests )
@@ -51,3 +51,5 @@ MACRO: drop-input ( quot -- newquot )
 
 : failing-valids ( -- tests )
     partition-xml-tests nip [ second first ] map [ type>> "valid" = ] filter ;
+
+[ ] [ partition-xml-tests 2drop ] unit-test

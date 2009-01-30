@@ -557,7 +557,7 @@ HELP: GENERIC:
 
 HELP: GENERIC#
 { $syntax "GENERIC# word n" }
-{ $values { "word" "a new word to define" } { "n" "the stack position to dispatch on, either 0, 1 or 2" } }
+{ $values { "word" "a new word to define" } { "n" "the stack position to dispatch on" } }
 { $description "Defines a new generic word which dispatches on the " { $snippet "n" } "th most element from the top of the stack in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." }
 { $notes
     "The following two definitions are equivalent:"

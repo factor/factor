@@ -38,7 +38,7 @@ M: object param-reg param-regs nth ;
 HOOK: two-operand? cpu ( -- ? )
 
 HOOK: %load-immediate cpu ( reg obj -- )
-HOOK: %load-indirect cpu ( reg obj -- )
+HOOK: %load-reference cpu ( reg obj -- )
 
 HOOK: %peek cpu ( vreg loc -- )
 HOOK: %replace cpu ( vreg loc -- )

@@ -20,21 +20,20 @@ HELP: file>xml
 
 HELP: read-xml-chunk
 { $values { "stream" "an input stream" } { "seq" "a sequence of elements" } }
-{ $description "Rather than parse a document, as " { $link read-xml } " does, this word parses and returns a sequence of XML elements (tags, strings, etc), ie a document fragment. This is useful for pieces of XML which may have more than one main tag." }
+{ $description "Rather than parse a document, as " { $link read-xml } " does, this word parses and returns a sequence of XML elements (tags, strings, etc), ie a document fragment. This is useful for pieces of XML which may have more than one main tag. The encoding is not automatically detected, and a stream with an encoding (ie. one which returns strings from " { $link read } ") should be used as input." }
 { $see-also read-xml } ;
 
 HELP: each-element
 { $values { "stream" "an input stream" } { "quot" "a quotation ( xml-elem -- )" } }
-{ $description "Parses the XML document, and whenever an event is encountered (a tag piece, comment, parsing instruction, directive or string element), the quotation is called with that event on the stack. The quotation has all responsibility to deal with the event properly, and it is advised that generic words be used in dispatching on the event class." }
-{ $notes "It is important to note that this is not SAX, merely an event-based XML view" }
+{ $description "Parses the XML document, and whenever an event is encountered (a tag piece, comment, parsing instruction, directive or string element), the quotation is called with that event on the stack. The quotation has all responsibility to deal with the event properly. The encoding of the stream is automatically detected, so a binary input stream should be used." }
 { $see-also read-xml } ;
 
 HELP: pull-xml
-{ $class-description "Represents the state of a pull-parser for XML. Has one slot, scope, which is a namespace which contains all relevant state information." }
+{ $class-description "Represents the state of a pull-parser for XML. Has one slot, " { $snippet "scope" } ", which is a namespace which contains all relevant state information." }
 { $see-also <pull-xml> pull-event pull-elem } ;
 
 HELP: <pull-xml>
-{ $values { "pull-xml" "a pull-xml tuple" } }
+{ $values { "pull-xml" pull-xml } }
 { $description "Creates an XML pull-based parser which reads from " { $link input-stream } ", executing all initial XML commands to set up the parser." }
 { $see-also pull-xml pull-elem pull-event } ;
 
@@ -87,7 +86,7 @@ ARTICLE: { "xml" "events" } "Event-based XML parsing"
     { $subsection pull-elem } ;
 
 ARTICLE: "xml" "XML parser"
-"The " { $vocab-link "xml" } " vocabulary implements the XML 1.0 and 1.1 standards, converting strings of text into XML and vice versa."
+"The " { $vocab-link "xml" } " vocabulary implements the XML 1.0 and 1.1 standards, converting strings of text into XML and vice versa. The parser checks for well-formedness but is not validating. There is only partial support for processing DTDs."
     { $subsection { "xml" "reading" } }
     { $subsection { "xml" "events" } }
     { $vocab-subsection "Writing XML" "xml.writer" }

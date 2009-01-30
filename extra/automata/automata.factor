@@ -22,7 +22,7 @@ VAR: rule   VAR: rule-number
     { 0 0 1 }
     { 0 0 0 } } ;
 
-: rule-values ( n -- seq ) >bin 8 CHAR: 0 pad-left string>digits ;
+: rule-values ( n -- seq ) >bin 8 CHAR: 0 pad-head string>digits ;
 
 : set-rule ( n -- )
   dup >rule-number rule-values rule-keys [ rule> set-at ] 2each ;

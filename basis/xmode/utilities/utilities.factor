@@ -22,7 +22,7 @@ IN: xmode.utilities
         ] }
         { [ dup length 3 = ] [
             first3 '[
-                _ tag get at
+                tag get _ attr
                 _ [ execute ] when* object get _ execute
             ]
         ] }

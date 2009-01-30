@@ -7,16 +7,16 @@ html.templates html.templates.chloe.syntax continuations ;
 IN: html.templates.chloe.compiler
 
 : chloe-attrs-only ( assoc -- assoc' )
-    [ drop url>> chloe-ns = ] assoc-filter ;
+    [ drop chloe-name? ] assoc-filter ;
 
 : non-chloe-attrs-only ( assoc -- assoc' )
-    [ drop url>> chloe-ns = not ] assoc-filter ;
+    [ drop chloe-name? not ] assoc-filter ;
 
 : chloe-tag? ( tag -- ? )
     dup xml? [ body>> ] when
     {
         { [ dup tag? not ] [ f ] }
-        { [ dup url>> chloe-ns = not ] [ f ] }
+        { [ dup chloe-name? not ] [ f ] }
         [ t ]
     } cond nip ;
 
@@ -59,7 +59,7 @@ DEFER: compile-element
 
 : compile-start-tag ( tag -- )
     "<" [write]
-    [ name>string [write] ] [ compile-attrs ] bi
+    [ name>string [write] ] [ attrs>> compile-attrs ] bi
     ">" [write] ;
 
 : compile-end-tag ( tag -- )
@@ -90,7 +90,7 @@ ERROR: unknown-chloe-tag tag ;
         { [ dup [ tag? ] [ xml? ] bi or ] [ compile-tag ] }
         { [ dup string? ] [ escape-string [write] ] }
         { [ dup comment? ] [ drop ] }
-        [ [ write-xml-chunk ] [code-with] ]
+        [ [ write-xml ] [code-with] ]
     } cond ;
 
 : with-compiler ( quot -- quot' )
@@ -126,7 +126,7 @@ ERROR: unknown-chloe-tag tag ;
 
 : compile-prologue ( xml -- )
     [
-        [ prolog>> [ write-prolog ] [code-with] ]
+        [ prolog>> [ write-xml ] [code-with] ]
         [ before>> compile-chunk ]
         bi
     ] compile-quot

@@ -29,7 +29,7 @@ IN: xml.elements
     parse-name swap ;
 
 : (middle-tag) ( -- )
-    pass-blank version=1.0? get-char name-start?
+    pass-blank version-1.0? get-char name-start?
     [ parse-attr (middle-tag) ] when ;
 
 : assure-no-duplicates ( attrs-alist -- attrs-alist )
@@ -65,11 +65,13 @@ IN: xml.elements
     dup { "1.0" "1.1" } member? [ bad-version ] unless ;
 
 : prolog-version ( alist -- version )
-    T{ name f "" "version" f } swap at
-    [ good-version ] [ versionless-prolog ] if* ;
+    T{ name { space "" } { main "version" } } swap at
+    [ good-version ] [ versionless-prolog ] if*
+    dup set-version ;
 
 : prolog-encoding ( alist -- encoding )
-    T{ name f "" "encoding" f } swap at "UTF-8" or ;
+    T{ name { space "" } { main "encoding" } } swap at
+    "UTF-8" or ;
 
 : yes/no>bool ( string -- t/f )
     {
@@ -79,7 +81,7 @@ IN: xml.elements
     } case ;
 
 : prolog-standalone ( alist -- version )
-    T{ name f "" "standalone" f } swap at
+    T{ name { space "" } { main "standalone" } } swap at
     [ yes/no>bool ] [ f ] if* ;
 
 : prolog-attrs ( alist -- prolog )
@@ -88,16 +90,9 @@ IN: xml.elements
     [ prolog-standalone ]
     tri <prolog> ;
 
-SYMBOL: string-input?
-: decode-input-if ( encoding -- )
-    string-input? get [ drop ] [ decode-input ] if ;
-
 : parse-prolog ( -- prolog )
     pass-blank middle-tag "?>" expect
-    dup assure-no-extra prolog-attrs
-    dup encoding>> dup "UTF-16" =
-    [ drop ] [ name>encoding [ decode-input-if ] when* ] if
-    dup prolog-data set ;
+    dup assure-no-extra prolog-attrs ;
 
 : instruct ( -- instruction )
     take-name {

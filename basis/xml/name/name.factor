@@ -47,7 +47,7 @@ SYMBOL: ns-stack
 
 : valid-name? ( str -- ? )
     [ f ] [
-        version=1.0? swap {
+        version-1.0? swap {
             [ first name-start? ]
             [ rest-slice [ name-char? ] with all? ]
         } 2&&
@@ -66,7 +66,7 @@ SYMBOL: ns-stack
     ] ?if ;
 
 : take-name ( -- string )
-    version=1.0? '[ _ get-char name-char? not ] take-until ;
+    version-1.0? '[ _ get-char name-char? not ] take-until ;
 
 : parse-name ( -- name )
     take-name interpret-name ;
