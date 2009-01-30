@@ -1,10 +1,7 @@
 ! Copyright (C) 2008 Jeff Bigot
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
-
+USING: help.markup help.syntax multiline ;
 IN: adsoda
-
-
 
 ! --------------------------------------------------------------
 ! faces
@@ -12,12 +9,11 @@ IN: adsoda
 ARTICLE: "face-page" "Face in ADSODA"
 "explanation of faces"
 $nl
-"link to functions"
-"what is an halfspace"
-"halfspace touching-corners adjacent-faces"
-"touching-corners list of pointers to the corners which touch this face\n"
-
-"adjacent-faces list of pointers to the faces which touch this face\n"
+"link to functions" $nl
+"what is an halfspace" $nl
+"halfspace touching-corners adjacent-faces" $nl
+"touching-corners list of pointers to the corners which touch this face" $nl
+"adjacent-faces list of pointers to the faces which touch this face"
 { $subsection face }
 { $subsection <face> }
 "test relative position"
@@ -244,31 +240,27 @@ $nl
 ;
 
 ARTICLE: { "adsoda" "light" } "ADSODA : lights"
-"! HELP: light position color" 
-"! <light> ( -- tuple ) light new ;"
-
-"! light est un vecteur avec 3 variables pour les couleurs\n"
-
-" void Light::Apply(Vector& normal, double &cRed, double &cGreen, double &cBlue)\n"
-" { \n"
-"   // Dot the light direction with the normalized normal of Face."
-"   register double intensity = -(normal * (*this));"
-
-"   // Face is a backface, from light's perspective"
-"   if (intensity < 0)"
-"     return;"
-"   "
-"   // Add the intensity componentwise"
-"   cRed += red * intensity;"
-"   cGreen += green * intensity;"
-"   cBlue += blue * intensity;"
-
-"   // Clip to unit range"
-"  if (cRed > 1.0) cRed = 1.0;"
-"   if (cGreen > 1.0) cGreen = 1.0;"
-"   if (cBlue > 1.0) cBlue = 1.0;"
-
-
+{ $code <"
+! HELP: light position color
+! <light> ( -- tuple ) light new ;
+! light est un vecteur avec 3 variables pour les couleurs\n
+ void Light::Apply(Vector& normal, double &cRed, double &cGreen, double &cBlue)\n
+ { \n
+   // Dot the light direction with the normalized normal of Face.
+   register double intensity = -(normal * (*this));
+   // Face is a backface, from light's perspective
+   if (intensity < 0)
+     return;
+   
+   // Add the intensity componentwise
+   cRed += red * intensity;
+   cGreen += green * intensity;
+   cBlue += blue * intensity;
+   // Clip to unit range
+  if (cRed > 1.0) cRed = 1.0;
+   if (cGreen > 1.0) cGreen = 1.0;
+   if (cBlue > 1.0) cBlue = 1.0;
+"> }
 ;
 
 
