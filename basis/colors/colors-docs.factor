@@ -2,7 +2,7 @@ IN: colors
 USING: accessors help.markup help.syntax ;
 
 HELP: color
-{ $class-description "The class of colors. Implementations include " { $link rgba } ", " { $link "colors.gray" } " and " { $link "colors.hsv" } "." } ;
+{ $class-description "The class of colors. Implementations include " { $link rgba } ", " { $link "colors.gray" } " and " { $vocab-link "colors.hsv" } "." } ;
 
 HELP: rgba
 { $class-description "The class of colors with red, green, blue and alpha channel components. The slots store color components, which are real numbers in the range 0 to 1, inclusive." } ;

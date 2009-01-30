@@ -10,13 +10,13 @@ TUPLE: rgba < color red green blue alpha ;
 
 C: <rgba> rgba
 
-GENERIC: >rgba ( object -- rgba )
+GENERIC: >rgba ( color -- rgba )
 
 M: rgba >rgba ( rgba -- rgba ) ;
 
-M: color red>> ( color -- red   ) >rgba red>> ;
+M: color red>> ( color -- red ) >rgba red>> ;
 M: color green>> ( color -- green ) >rgba green>> ;
-M: color blue>> ( color -- blue  ) >rgba blue>> ;
+M: color blue>> ( color -- blue ) >rgba blue>> ;
 
 : >rgba-components ( object -- r g b a )
     >rgba { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave ; inline

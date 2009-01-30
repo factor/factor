@@ -62,7 +62,7 @@ HELP: do-attribs
 { $description "Wraps a quotation in " { $link glPushAttrib } "/" { $link glPopAttrib } " calls." } ;
 
 HELP: make-texture
-  { $values { "dim" "a pair of integers" } { "pixmap" c-ptr } { "type" "an OpenGL texture type" } { "id" "an OpenGL texture ID" } }
+{ $values { "dim" "a pair of integers" } { "pixmap" c-ptr } { "format" "an OpenGL texture format, for example " { $link GL_UNSIGNED_BYTE } } { "type" "an OpenGL texture type, for example " { $link GL_RGBA } } { "id" "an OpenGL texture ID" } }
 { $description "Creates a new OpenGL texture from a pixmap image whose dimensions are equal to " { $snippet "dim" } "." } ;
   
 HELP: gen-dlist
