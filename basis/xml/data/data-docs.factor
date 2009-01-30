@@ -13,15 +13,17 @@ ARTICLE: "xml.data" "XML data types"
 "For high-level tools for manipulating XML, see " { $vocab-link "xml.utilities" } ;
 
 ARTICLE: { "xml.data" "classes" } "XML data classes"
-    "Data types that XML documents are made of:"
-    { $subsection name }
+    "XML documents and chunks are made of the following classes:"
+    { $subsection xml }
+    { $subsection xml-chunk }
     { $subsection tag }
+    { $subsection name }
     { $subsection contained-tag }
     { $subsection open-tag }
-    { $subsection xml }
     { $subsection prolog }
     { $subsection comment }
     { $subsection instruction }
+    { $subsection unescaped }
     { $subsection element-decl }
     { $subsection attlist-decl }
     { $subsection entity-decl }
@@ -32,13 +34,15 @@ ARTICLE: { "xml.data" "classes" } "XML data classes"
 
 ARTICLE: { "xml.data" "constructors" } "XML data constructors"
     "These data types are constructed with:"
-    { $subsection <name> }
-    { $subsection <tag> }
-    { $subsection <contained-tag> }
     { $subsection <xml> }
+    { $subsection <xml-chunk> } 
+    { $subsection <tag> }
+    { $subsection <name> }
+    { $subsection <contained-tag> }
     { $subsection <prolog> }
     { $subsection <comment> }
     { $subsection <instruction> }
+    { $subsection <unescaped> }
     { $subsection <simple-name> }
     { $subsection <element-decl> }
     { $subsection <attlist-decl> }
@@ -198,3 +202,17 @@ HELP: doctype-decl
 HELP: <doctype-decl>
 { $values { "name" name } { "external-id" id } { "internal-subset" sequence } { "doctype-decl" doctype-decl } }
 { $description "Creates a new doctype declaration object, of the class " { $link doctype-decl } ". Only one of external-id or internal-subset will be non-null." } ;
+
+HELP: unescaped
+{ $class-description "When constructing XML documents to write to output, it can be useful to splice in a string which is already written. This tuple type allows for that. Printing an " { $snippet "unescaped" } " is the same is printing its " { $snippet "string" } " slot." } ;
+
+HELP: <unescaped>
+{ $values { "string" string } { "unescaped" unescaped } }
+{ $description "Constructs an " { $link unescaped } " tuple, given a string." } ;
+
+HELP: xml-chunk
+{ $class-description "Encapsulates a balanced fragment of an XML document. This is a sequence (following the sequence protocol) of XML data types, eg " { $link string } "s and " { $link tag } "s." } ;
+
+HELP: <xml-chunk>
+{ $values { "seq" sequence } { "xml-chunk" xml-chunk } }
+{ $description "Constructs an " { $link xml-chunk } " tuple, given a sequence to be its contents." } ;
