@@ -35,6 +35,19 @@ TUPLE: mdb-insert-msg < mdb-msg
 { collection string }
 { objects sequence } ;
 
+TUPLE: mdb-delete-msg < mdb-msg
+{ collection string }
+{ selector assoc } ;
+
+TUPLE: mdb-getmore-msg < mdb-msg
+{ collection string }
+{ return# integer initial: 0 }
+{ cursor integer initial: 0 } ;
+
+TUPLE: mdb-killcursors-msg < mdb-msg
+{ cursors# integer initial: 0 }
+{ cursors sequence } ;
+
 TUPLE: mdb-query-msg < mdb-msg
 { collection string }
 { skip# integer initial: 0 }
@@ -50,10 +63,30 @@ TUPLE: mdb-reply-msg < mdb-msg
 { objects sequence } ;
 
 
+: <mdb-getmore-msg> ( collection return# -- mdb-getmore-msg )
+    [ mdb-getmore-msg new ] 2dip
+    [ >>collection ] dip
+    >>return# OP_GetMore >>opcode ; inline
+
+: <mdb-delete-msg> ( collection assoc -- mdb-delete-msg )
+    [ mdb-delete-msg new ] 2dip
+    [ >>collection ] dip
+    >>selector OP_Delete >>opcode ; inline
+
 : <mdb-query-msg> ( collection assoc -- mdb-query-msg )
      [ mdb-query-msg new ] 2dip
      [ >>collection ] dip
      >>query OP_Query >>opcode ; inline
+
+GENERIC: <mdb-killcursors-msg> ( object -- mdb-killcursors-msg )
+
+M: sequence <mdb-killcursors-msg> ( sequences -- mdb-killcursors-msg )
+    [ mdb-killcursors-msg new ] dip
+    [ length >>cursors# ] keep
+    >>cursors OP_KillCursors >>opcode ; inline
+
+M: integer <mdb-killcursors-msg> ( integer -- mdb-killcursors-msg )
+    V{ } clone [ push ] keep <mdb-killcursors-msg> ;
 
 : <mdb-query-one-msg> ( collection assoc -- mdb-query-msg )
     <mdb-query-msg> 1 >>return# ; inline
@@ -70,7 +103,6 @@ M: sequence <mdb-insert-msg> ( collection sequence -- mdb-insert-msg )
     [ mdb-insert-msg new ] 2dip
     [ >>collection ] dip
     >>objects OP_Insert >>opcode ;
-
 
 : <mdb-reply-msg> ( -- mdb-reply-msg )
     mdb-reply-msg new ; inline
@@ -128,7 +160,7 @@ M: mdb-query-op (read-message) ( msg-stub opcode -- message )
     read-cstring >>collection
     read-int32 >>skip#
     read-int32 >>return#
-    H{ } stream>assoc change-bytes-read >>query ! message length
+    H{ } stream>assoc change-bytes-read >>query 
     dup length>> bytes-read> >
     [ H{ } stream>assoc change-bytes-read >>returnfields 
       dup length>> bytes-read> >
@@ -143,6 +175,27 @@ M: mdb-insert-op (read-message) ( msg-stub opcode -- message )
     [ '[ _ length>> bytes-read> > ] ] keep tuck
     '[ H{ } stream>assoc change-bytes-read _ objects>> push ]
     [ ] while ;
+
+M: mdb-delete-op (read-message) ( msg-stub opcode -- message )
+    drop
+    [ mdb-delete-msg new ] dip copy-header
+    read-cstring >>collection
+    H{ } stream>assoc change-bytes-read >>selector ;
+
+M: mdb-getmore-op (read-message) ( msg-stub opcode -- message )
+    drop
+    [ mdb-getmore-msg new ] dip copy-header
+    read-cstring >>collection
+    read-int32 >>return#
+    read-longlong >>cursor ;
+
+M: mdb-killcursors-op (read-message) ( msg-stub opcode -- message )
+    drop
+    [ mdb-killcursors-msg new ] dip copy-header
+    read-int32 >>cursors#
+    V{ } clone >>cursors
+    [ [ cursors#>> ] keep 
+      '[ read-longlong _ cursors>> push ] times ] keep ;
 
 M: mdb-reply-op (read-message) ( msg-stub opcode -- message )
     drop
@@ -185,7 +238,7 @@ PRIVATE>
 M: mdb-query-msg write-message ( message -- )
      dup
      '[ _ 
-        [ 4 write-int32 ] dip 
+        [ flags>> write-int32 ] keep 
         [ collection>> write-cstring ] keep
         [ skip#>> write-int32 ] keep
         [ return#>> write-int32 ] keep
@@ -195,8 +248,33 @@ M: mdb-query-msg write-message ( message -- )
 M: mdb-insert-msg write-message ( message -- )
     dup
     '[ _
-       [ 0 write-int32 ] dip
+       [ flags>> write-int32 ] keep
        [ collection>> write-cstring ] keep
        objects>> [ assoc>array write ] each
     ] (write-message) ;
 
+M: mdb-delete-msg write-message ( message -- )
+    dup
+    '[ _
+       [ flags>> write-int32 ] keep
+       [ collection>> write-cstring ] keep
+       0 write-int32
+       selector>> assoc>array write
+    ] (write-message) ;
+
+M: mdb-getmore-msg write-message ( message -- )
+    dup
+    '[ _
+       [ flags>> write-int32 ] keep
+       [ collection>> write-cstring ] keep
+       [ return#>> write-int32 ] keep
+       cursor>> write-longlong
+    ] (write-message) ;
+
+M: mdb-killcursors-msg write-message ( message -- )
+    dup
+    '[ _
+       [ flags>> write-int32 ] keep
+       [ cursors#>> write-int32 ] keep
+       cursors>> [ write-longlong ] each
+    ] (write-message) ;
