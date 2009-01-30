@@ -78,17 +78,19 @@
         (when found (setq result (fuel-refactor--reuse-p (car found)))))
       (and result found))))
 
+(defsubst fuel-refactor--insertion-point ()
+  (max (save-excursion (fuel-syntax--beginning-of-defun) (point))
+       (save-excursion
+         (re-search-backward fuel-syntax--end-of-def-regex nil t)
+         (forward-line 1)
+         (skip-syntax-forward "-"))))
+
 (defun fuel-refactor--insert-word (word stack-effect code)
-  (let ((beg (save-excursion (fuel-syntax--beginning-of-defun) (point)))
-        (end (save-excursion
-               (re-search-backward fuel-syntax--end-of-def-regex nil t)
-               (forward-line 1)
-               (skip-syntax-forward "-"))))
-    (let ((start (goto-char (max beg end))))
-      (open-line 1)
-      (insert ": " word " " stack-effect "\n" code " ;\n")
-      (indent-region start (point))
-      (move-overlay fuel-stack--overlay start (point)))))
+  (let ((start (goto-char (fuel-refactor--insertion-point))))
+    (open-line 1)
+    (insert ": " word " " stack-effect "\n" code " ;\n")
+    (indent-region start (point))
+    (move-overlay fuel-stack--overlay start (point))))
 
 (defun fuel-refactor--extract-other (start end code)
   (unwind-protect
@@ -232,6 +234,31 @@ The region is extended to the closest definition boundaries."
                                 (save-excursion (goto-char end)
                                                 (mark-defun)
                                                 (mark))))
+
+;;; Extract article:
+
+(defun fuel-refactor-extract-article (begin end)
+  "Extracts region as a new ARTICLE form."
+  (interactive "r")
+  (let ((topic (read-string "Article topic: "))
+        (title (read-string "Article title: ")))
+    (kill-region begin end)
+    (insert (format "{ $subsection %s }\n" topic))
+    (end-of-line 0)
+    (save-excursion
+      (goto-char (fuel-refactor--insertion-point))
+      (open-line 1)
+      (let ((start (point)))
+        (insert (format "ARTICLE: %S %S\n" topic title))
+        (yank)
+        (when (looking-at "^ *$") (end-of-line 0))
+        (insert " ;")
+        (unwind-protect
+            (progn
+              (move-overlay fuel-stack--overlay start (point))
+              (sit-for fuel-stack-highlight-period))
+          (delete-overlay fuel-stack--overlay))))))
+
 
 (provide 'fuel-refactor)
 ;;; fuel-refactor.el ends here
