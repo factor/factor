@@ -194,7 +194,7 @@ M: bad-prolog summary ( obj -- str )
     [
         dup call-next-method write
         "Misplaced XML prolog" print
-        prolog>> write-prolog nl
+        prolog>> write-xml nl
     ] with-string-writer ;
 
 TUPLE: capitalized-prolog < xml-error-at name ;
@@ -258,7 +258,7 @@ M: misplaced-directive summary ( obj -- str )
     [
         dup call-next-method write
         "Misplaced directive:" print
-        dir>> write-xml-chunk nl
+        dir>> write-xml nl
     ] with-string-writer ;
 
 TUPLE: bad-name < xml-error-at name ;
