@@ -2,112 +2,144 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces xml.state kernel sequences accessors
 xml.char-classes xml.errors math io sbufs fry strings ascii
-circular xml.entities assocs make splitting math.parser
-locals combinators arrays ;
+circular xml.entities assocs splitting math.parser
+locals combinators arrays hints ;
 IN: xml.tokenize
-
-: assure-good-char ( ch -- ch )
-    [
-        version-1.0? over text? not get-check and
-        [ disallowed-char ] when
-    ] [ f ] if* ;
 
 ! * Basic utility words
 
-: record ( char -- )
-    CHAR: \n =
-    [ 0 get-line 1+ set-line ] [ get-column 1+ ] if
-    set-column ;
+: assure-good-char ( spot ch -- )
+    [
+        swap
+        [ version-1.0?>> over text? not ]
+        [ check>> ] bi and [
+            spot get [ 1+ ] change-column drop
+            disallowed-char
+        ] [ drop ] if
+    ] [ drop ] if* ;
 
-! (next) normalizes \r\n and \r
-: (next) ( -- char )
-    get-next read1
-    2dup swap CHAR: \r = [
+HINTS: assure-good-char { spot fixnum } ;
+
+: record ( spot char -- spot )
+    over char>> [
         CHAR: \n =
-        [ nip read1 ] [ nip CHAR: \n swap ] if
-    ] [ drop ] if
-    set-next dup set-char assure-good-char ;
+        [ [ 1+ ] change-line -1 ] [ dup column>> 1+ ] if
+        >>column
+    ] [ drop ] if ;
+
+HINTS: record { spot fixnum } ;
+
+:: (next) ( spot -- spot char )
+    spot next>> :> old-next
+    spot stream>> stream-read1 :> new-next
+    old-next CHAR: \r = [
+        spot CHAR: \n >>char
+        new-next CHAR: \n =
+        [ spot stream>> stream-read1 >>next ]
+        [ new-next >>next ] if
+    ] [ spot old-next >>char new-next >>next ] if
+    spot next>> ; inline
+
+: next* ( spot -- )
+    dup char>> [ unexpected-end ] unless
+    (next) [ record ] keep assure-good-char ;
+
+HINTS: next* { spot } ;
 
 : next ( -- )
-    #! Increment spot.
-    get-char [ unexpected-end ] unless (next) record ;
+    spot get next* ;
 
 : init-parser ( -- )
-    0 1 0 f f t <spot> spot set
+    0 1 0 0 f t f <spot>
+        input-stream get >>stream
+    spot set
     read1 set-next next ;
 
 : with-state ( stream quot -- )
     ! with-input-stream implicitly creates a new scope which we use
     swap [ init-parser call ] with-input-stream ; inline
 
+:: (skip-until) ( quot: ( -- ? ) spot -- )
+    spot char>> [
+        quot call [
+            spot next* quot spot (skip-until)
+        ] unless
+    ] when ; inline recursive
+
 : skip-until ( quot: ( -- ? ) -- )
-    get-char [
-        [ call ] keep swap [ drop ] [
-            next skip-until
-        ] if
-    ] [ drop ] if ; inline recursive
+    spot get (skip-until) ; inline
 
 : take-until ( quot -- string )
     #! Take the substring of a string starting at spot
     #! from code until the quotation given is true and
     #! advance spot to after the substring.
     10 <sbuf> [
-        '[ @ [ t ] [ get-char _ push f ] if ] skip-until
+        spot get swap
+        '[ @ [ t ] [ _ char>> _ push f ] if ] skip-until
     ] keep >string ; inline
 
 : take-to ( seq -- string )
-    '[ get-char _ member? ] take-until ;
+    spot get swap '[ _ char>> _ member? ] take-until ;
 
 : pass-blank ( -- )
     #! Advance code past any whitespace, including newlines
-    [ get-char blank? not ] skip-until ;
+    spot get '[ _ char>> blank? not ] skip-until ;
 
-: string-matches? ( string circular -- ? )
-    get-char over push-circular
-    sequence= ;
+: string-matches? ( string circular spot -- ? )
+    char>> over push-circular sequence= ;
 
 : take-string ( match -- string )
     dup length <circular-string>
-    [ 2dup string-matches? ] take-until nip
+    spot get '[ 2dup _ string-matches? ] take-until nip
     dup length rot length 1- - head
     get-char [ missing-close ] unless next ;
 
 : expect ( string -- )
-    dup [ get-char next ] replicate 2dup =
-    [ 2drop ] [ expected ] if ;
+    dup spot get '[ _ [ char>> ] keep next* ] replicate
+    2dup = [ 2drop ] [ expected ] if ;
 
 ! Suddenly XML-specific
 
-: parse-named-entity ( string -- )
-    dup entities at [ , ] [
+: parse-named-entity ( accum string -- )
+    dup entities at [ swap push ] [
         dup extra-entities get at
-        [ % ] [ no-entity ] ?if
+        [ swap push-all ] [ no-entity ] ?if
     ] ?if ;
 
 : take-; ( -- string )
     next ";" take-to next ;
 
-: parse-entity ( -- )
+: parse-entity ( accum -- )
     take-; "#" ?head [
-        "x" ?head 16 10 ? base> ,
+        "x" ?head 16 10 ? base> swap push
     ] [ parse-named-entity ] if ;
 
-: parse-pe ( -- )
+: parse-pe ( accum -- )
     take-; dup pe-table get at
-    [ % ] [ no-entity ] ?if ;
+    [ swap push-all ] [ no-entity ] ?if ;
 
-:: (parse-char) ( quot: ( ch -- ? ) -- )
-    get-char :> char
+:: (parse-char) ( quot: ( ch -- ? ) accum spot -- )
+    spot char>> :> char
     {
         { [ char not ] [ ] }
-        { [ char quot call ] [ next ] }
-        { [ char CHAR: & = ] [ parse-entity quot (parse-char) ] }
-        { [ in-dtd? get char CHAR: % = and ] [ parse-pe quot (parse-char) ] }
-        [ char , next quot (parse-char) ]
+        { [ char quot call ] [ spot next* ] }
+        { [ char CHAR: & = ] [
+            accum parse-entity
+            quot accum spot (parse-char)
+        ] }
+        { [ in-dtd? get char CHAR: % = and ] [
+            accum parse-pe
+            quot accum spot (parse-char)
+        ] }
+        [
+            char accum push
+            spot next*
+            quot accum spot (parse-char)
+        ]
     } cond ; inline recursive
 
 : parse-char ( quot: ( ch -- ? ) -- seq )
-    [ (parse-char) ] "" make ; inline
+    1024 <sbuf> [ spot get (parse-char) ] keep >string ; inline
 
 : assure-no-]]> ( circular -- )
     "]]>" sequence= [ text-w/]]> ] when ;

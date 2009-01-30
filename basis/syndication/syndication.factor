@@ -4,7 +4,7 @@
 USING: xml.utilities kernel assocs math.order
     strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities.html io.files io
-    http.client namespaces make xml.interpolate hashtables
+    http.client namespaces make xml.literals hashtables
     calendar.format accessors continuations urls present ;
 IN: syndication
 
