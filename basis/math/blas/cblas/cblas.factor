@@ -3,13 +3,14 @@ IN: math.blas.cblas
 
 <<
 : load-atlas ( -- )
-    "atlas" "libatlas.so" "cdecl" add-library
-    "atlas" load-library drop ;
+    "atlas" "libatlas.so" "cdecl" add-library ;
+: load-blas ( -- )
+    "blas" "libblas.so" "cdecl" add-library ;
 
 "cblas" {
     { [ os macosx? ] [ "libblas.dylib" "cdecl" add-library ] }
     { [ os windows? ] [ "blas.dll" "cdecl" add-library ] }
-    { [ os openbsd? ] [ "libcblas.so" "cdecl" add-library ] }
+    { [ os openbsd? ] [ "libcblas.so" "cdecl" add-library load-blas ] }
     { [ os freebsd? ] [ "libcblas.so" "cdecl" add-library load-atlas ] }
     [ "libblas.so" "cdecl" add-library ]
 } cond
