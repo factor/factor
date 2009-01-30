@@ -19,25 +19,25 @@ IN: math.blas.cblas
 LIBRARY: cblas
 
 TYPEDEF: int CBLAS_ORDER
-: CblasRowMajor 101 ; inline
-: CblasColMajor 102 ; inline
+CONSTANT: CblasRowMajor 101
+CONSTANT: CblasColMajor 102
 
 TYPEDEF: int CBLAS_TRANSPOSE
-: CblasNoTrans   111 ; inline
-: CblasTrans     112 ; inline
-: CblasConjTrans 113 ; inline
+CONSTANT: CblasNoTrans   111
+CONSTANT: CblasTrans     112
+CONSTANT: CblasConjTrans 113
 
 TYPEDEF: int CBLAS_UPLO
-: CblasUpper 121 ; inline
-: CblasLower 122 ; inline
+CONSTANT: CblasUpper 121
+CONSTANT: CblasLower 122
 
 TYPEDEF: int CBLAS_DIAG
-: CblasNonUnit 131 ; inline
-: CblasUnit    132 ; inline
+CONSTANT: CblasNonUnit 131
+CONSTANT: CblasUnit    132
 
 TYPEDEF: int CBLAS_SIDE
-: CblasLeft  141 ; inline
-: CblasRight 142 ; inline
+CONSTANT: CblasLeft  141
+CONSTANT: CblasRight 142
 
 TYPEDEF: int CBLAS_INDEX
 
