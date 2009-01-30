@@ -4,8 +4,7 @@ USING: accessors kernel namespaces io math ;
 IN: xml.state
 
 TUPLE: spot
-    char { line fixnum } { column fixnum }
-    next check version-1.0? ;
+    char line column next check version-1.0? stream ;
 
 C: <spot> spot
 

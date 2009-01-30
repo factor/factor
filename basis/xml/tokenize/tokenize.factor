@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces xml.state kernel sequences accessors
 xml.char-classes xml.errors math io sbufs fry strings ascii
-circular xml.entities assocs make splitting math.parser
+circular xml.entities assocs splitting math.parser
 locals combinators arrays hints ;
 IN: xml.tokenize
 
@@ -31,11 +31,11 @@ HINTS: record { spot fixnum } ;
 
 :: (next) ( spot -- spot char )
     spot next>> :> old-next
-    read1 :> new-next
+    spot stream>> stream-read1 :> new-next
     old-next CHAR: \r = [
         spot CHAR: \n >>char
         new-next CHAR: \n =
-        [ read1 >>next ]
+        [ spot stream>> stream-read1 >>next ]
         [ new-next >>next ] if
     ] [ spot old-next >>char new-next >>next ] if
     spot next>> ; inline
@@ -50,7 +50,9 @@ HINTS: next* { spot } ;
     spot get next* ;
 
 : init-parser ( -- )
-    0 1 0 0 f t <spot> spot set
+    0 1 0 0 f t f <spot>
+        input-stream get >>stream
+    spot set
     read1 set-next next ;
 
 : with-state ( stream quot -- )
@@ -116,18 +118,28 @@ HINTS: next* { spot } ;
     take-; dup pe-table get at
     [ swap push-all ] [ no-entity ] ?if ;
 
-:: (parse-char) ( quot: ( ch -- ? ) accum -- )
-    get-char :> char
+:: (parse-char) ( quot: ( ch -- ? ) accum spot -- )
+    spot char>> :> char
     {
         { [ char not ] [ ] }
-        { [ char quot call ] [ next ] }
-        { [ char CHAR: & = ] [ accum parse-entity quot accum (parse-char) ] }
-        { [ in-dtd? get char CHAR: % = and ] [ accum parse-pe quot accum (parse-char) ] }
-        [ char accum push next quot accum (parse-char) ]
+        { [ char quot call ] [ spot next* ] }
+        { [ char CHAR: & = ] [
+            accum parse-entity
+            quot accum spot (parse-char)
+        ] }
+        { [ in-dtd? get char CHAR: % = and ] [
+            accum parse-pe
+            quot accum spot (parse-char)
+        ] }
+        [
+            char accum push
+            spot next*
+            quot accum spot (parse-char)
+        ]
     } cond ; inline recursive
 
 : parse-char ( quot: ( ch -- ? ) -- seq )
-    1024 <sbuf> [ (parse-char) ] keep >string ; inline
+    1024 <sbuf> [ spot get (parse-char) ] keep >string ; inline
 
 : assure-no-]]> ( circular -- )
     "]]>" sequence= [ text-w/]]> ] when ;
