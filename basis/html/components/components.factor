@@ -19,7 +19,7 @@ GENERIC: render* ( value name renderer -- xml )
         [ f swap ]
         if
     ] 2dip
-    render* write-xml-chunk
+    render* write-xml
     [ render-error ] when* ;
 
 <PRIVATE
@@ -176,4 +176,4 @@ M: comparison render*
 ! HTML component
 SINGLETON: html
 
-M: html render* 2drop string>xml-chunk ;
+M: html render* 2drop <unescaped> ;

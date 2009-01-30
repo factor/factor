@@ -7,7 +7,7 @@ IN: xml.writer.tests
 \ write-xml must-infer
 \ xml>string must-infer
 \ pprint-xml must-infer
-\ pprint-xml-but must-infer
+! Add a test for pprint-xml with sensitive-tags
 
 [ "foo" ] [ T{ name { main "foo" } } name>string ] unit-test
 [ "foo" ] [ T{ name { space "" } { main "foo" } } name>string ] unit-test
@@ -51,11 +51,11 @@ IN: xml.writer.tests
 ]>
 <x>&foo;</x>"} pprint-reprints-as
 
-[ t ] [ "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd' >" dup string>xml-chunk xml-chunk>string = ] unit-test
+[ t ] [ "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\" >" dup string>xml-chunk xml>string = ] unit-test
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b=\"c\"/>" ]
     [ "<a b='c'/>" string>xml xml>string ] unit-test
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><foo>bar baz</foo>" ]
 [ "<foo>bar</foo>" string>xml [ " baz" append ] map xml>string ] unit-test
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  bar\n</foo>" ]
 [ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test
-[ "<foo'>" ] [ "<foo'>" <unescaped> xml-chunk>string ] unit-test
+[ "<foo'>" ] [ "<foo'>" <unescaped> xml>string ] unit-test

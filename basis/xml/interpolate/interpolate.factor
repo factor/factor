@@ -3,7 +3,7 @@
 USING: xml xml.state kernel sequences fry assocs xml.data
 accessors strings make multiline parser namespaces macros
 sequences.deep generalizations words combinators
-math present arrays ;
+math present arrays unicode.categories ;
 IN: xml.interpolate
 
 <PRIVATE
@@ -95,7 +95,7 @@ M: xml-chunk interpolate-xml
     } cond ;
 
 : parse-def ( accum delimiter quot -- accum )
-    [ parse-multiline-string 1 short head* ] dip call
+    [ parse-multiline-string [ blank? ] trim ] dip call
     [ extract-variables collect ] keep swap
     [ number<-> parsed ] dip
     [ \ interpolate-xml parsed ] when ; inline

@@ -6,12 +6,9 @@ circular xml.entities assocs make splitting math.parser
 locals combinators arrays ;
 IN: xml.tokenize
 
-: version=1.0? ( -- ? )
-    prolog-data get [ version>> "1.0" = ] [ t ] if* ;
-
 : assure-good-char ( ch -- ch )
     [
-        version=1.0? over text? not get-check and
+        version-1.0? over text? not get-check and
         [ disallowed-char ] when
     ] [ f ] if* ;
 
@@ -36,7 +33,7 @@ IN: xml.tokenize
     get-char [ unexpected-end ] unless (next) record ;
 
 : init-parser ( -- )
-    0 1 0 f f <spot> spot set
+    0 1 0 f f t <spot> spot set
     read1 set-next next ;
 
 : with-state ( stream quot -- )
