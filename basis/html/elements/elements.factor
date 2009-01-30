@@ -1,11 +1,9 @@
-! cont-html v0.6
-!
-! Copyright (C) 2004 Chris Double.
+! Copyright (C) 2004, 2009 Chris Double, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: io io.styles kernel namespaces prettyprint quotations
 sequences strings words xml.entities compiler.units effects
-urls math math.parser combinators present fry ;
+xml.data xml.interpolate urls math math.parser combinators
+present fry io.streams.string xml.writer ;
 
 IN: html.elements
 
@@ -135,17 +133,18 @@ SYMBOL: html
     "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" write-html ;
 
 : simple-page ( title head-quot body-quot -- )
-    #! Call the quotation, with all output going to the
-    #! body of an html page with the given title.
-    spin
-    xhtml-preamble
-    <html "http://www.w3.org/1999/xhtml" =xmlns "en" =xml:lang "en" =lang html>
-        <head>
-            <title> write </title>
-            call
-        </head>
-        <body> call </body>
-    </html> ; inline
+    [ with-string-writer <unescaped> ] bi@
+    <XML
+        <?xml version="1.0"?>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+        <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+            <head>
+                <title><-></title>
+                <->
+            </head>
+            <body><-></body>
+        </html>
+    XML> write-xml ; inline
 
 : render-error ( message -- )
-    <span "error" =class span> escape-string write </span> ;
+    [XML <span class="error"><-></span> XML] write-xml ;

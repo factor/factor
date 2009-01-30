@@ -51,8 +51,8 @@ IN: xml.interpolate.tests
   <XML <x number=<-> false=<-> url=<-> string=<-> word=<->/> XML>
   pprint-xml>string  ] unit-test
 
-[ "<x>3</x>" ] [ 3 [XML <x><-></x> XML] xml-chunk>string ] unit-test
-[ "<x></x>" ] [ f [XML <x><-></x> XML] xml-chunk>string ] unit-test
+[ "<x>3</x>" ] [ 3 [XML <x><-></x> XML] xml>string ] unit-test
+[ "<x></x>" ] [ f [XML <x><-></x> XML] xml>string ] unit-test
 
 \ <XML must-infer
 [ { } "" interpolate-xml ] must-infer

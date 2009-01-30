@@ -5,14 +5,14 @@ IN: xml.entities.html
 
 ARTICLE: "xml.entities.html" "HTML entities"
 { $vocab-link "xml.entities.html" } " defines words for using entities defined in HTML/XHTML."
-    { $subsection html-entities }
-    { $subsection with-html-entities } ;
+{ $subsection html-entities }
+{ $subsection with-html-entities } ;
 
 HELP: html-entities
-{ $description "a hash table from HTML entity names to their character values" }
+{ $description "A hash table from HTML entity names to their character values." }
 { $see-also entities with-html-entities } ;
 
 HELP: with-html-entities
 { $values { "quot" "a quotation ( -- )" } }
-{ $description "calls the given quotation using HTML entity values" }
+{ $description "Calls the given quotation using HTML entity values." }
 { $see-also html-entities with-entities } ;

@@ -125,9 +125,9 @@ IN: stack-checker.transforms
     #! Can we use a fast byte array test here?
     {
         { [ dup length 8 < ] [ f ] }
-        { [ dup [ integer? not ] contains? ] [ f ] }
-        { [ dup [ 0 < ] contains? ] [ f ] }
-        { [ dup [ bit-member-n >= ] contains? ] [ f ] }
+        { [ dup [ integer? not ] any? ] [ f ] }
+        { [ dup [ 0 < ] any? ] [ f ] }
+        { [ dup [ bit-member-n >= ] any? ] [ f ] }
         [ t ]
     } cond nip ;
 

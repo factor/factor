@@ -34,7 +34,7 @@ TUPLE: line ;
 TUPLE: line-break ;
 
 : absolute-url? ( string -- ? )
-    { "http://" "https://" "ftp://" } [ head? ] with contains? ;
+    { "http://" "https://" "ftp://" } [ head? ] with any? ;
 
 : simple-link-title ( string -- string' )
     dup absolute-url? [ "/" split1-last swap or ] unless ;
@@ -162,7 +162,7 @@ stand-alone
 : check-url ( href -- href' )
     {
         { [ dup empty? ] [ drop invalid-url ] }
-        { [ dup [ 127 > ] contains? ] [ drop invalid-url ] }
+        { [ dup [ 127 > ] any? ] [ drop invalid-url ] }
         { [ dup first "/\\" member? ] [ drop invalid-url ] }
         { [ CHAR: : over member? ] [ dup absolute-url? [ drop invalid-url ] unless ] }
         [ relative-link-prefix get prepend "" like ]
@@ -236,7 +236,7 @@ M: f (write-farkup) ;
     parse-farkup (write-farkup) ;
 
 : write-farkup ( string -- )
-    farkup>xml write-xml-chunk ;
+    farkup>xml write-xml ;
 
 : convert-farkup ( string -- string' )
     [ write-farkup ] with-string-writer ;

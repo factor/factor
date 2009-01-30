@@ -16,7 +16,7 @@ IN: furnace.auth.login
 SYMBOL: permit-id
 
 : permit-id-key ( realm -- string )
-    [ >hex 2 CHAR: 0 pad-left ] { } map-as concat
+    [ >hex 2 CHAR: 0 pad-head ] { } map-as concat
     "__p_" prepend ;
 
 : client-permit-id ( realm -- id/f )

@@ -53,7 +53,7 @@ IN: project-euler.059
 
 : source-059 ( -- seq )
     "resource:extra/project-euler/059/cipher1.txt"
-    ascii file-contents [ blank? ] trim-right "," split
+    ascii file-contents [ blank? ] trim-tail "," split
     [ string>number ] map ;
 
 TUPLE: rollover seq n ;

@@ -8,7 +8,7 @@ IN: xml.utilities
 : children>string ( tag -- string )
     children>> {
         { [ dup empty? ] [ drop "" ] }
-        { [ dup [ string? not ] contains? ]
+        { [ dup [ string? not ] any? ]
           [ "XML tag unexpectedly contains non-text children" throw ] }
         [ concat ]
     } cond ;
@@ -38,7 +38,7 @@ IN: xml.utilities
     tags@ swap [ tag-named? ] with filter ;
 
 : tag-with-attr? ( elem attr-value attr-name -- ? )
-    rot dup tag? [ at = ] [ 3drop f ] if ;
+    rot dup tag? [ swap attr = ] [ 3drop f ] if ;
 
 : tag-with-attr ( tag attr-value attr-name -- matching-tag )
     assure-name '[ _ _ tag-with-attr? ] find nip ;

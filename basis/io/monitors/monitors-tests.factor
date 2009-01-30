@@ -56,7 +56,7 @@ os { winnt linux macosx } member? [
                     "m" get next-change path>>
                     dup print flush
                     dup parent-directory
-                    [ trim-right-separators "xyz" tail? ] either? not
+                    [ trim-tail-separators "xyz" tail? ] either? not
                 ] loop
 
                 "c1" get count-down
@@ -65,7 +65,7 @@ os { winnt linux macosx } member? [
                     "m" get next-change path>>
                     dup print flush
                     dup parent-directory
-                    [ trim-right-separators "yxy" tail? ] either? not
+                    [ trim-tail-separators "yxy" tail? ] either? not
                 ] loop
 
                 "c2" get count-down

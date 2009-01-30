@@ -52,7 +52,7 @@ HELP: find-all-in-directories
 
 { find-file find-all-files find-in-directories find-all-in-directories } related-words
 
-ARTICLE: "io.directories.search" "io.directories.search"
+ARTICLE: "io.directories.search" "Searching directories"
 "The " { $vocab-link "io.directories.search" } " vocabulary contains words used for recursively iterating over a directory and for finding files in a directory tree." $nl
 "Traversing directories:"
 { $subsection recursive-directory }

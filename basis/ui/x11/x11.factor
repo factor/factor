@@ -144,7 +144,7 @@ M: world selection-notify-event
 
 : supported-type? ( atom -- ? )
     { "UTF8_STRING" "STRING" "TEXT" }
-    [ x-atom = ] with contains? ;
+    [ x-atom = ] with any? ;
 
 : clipboard-for-atom ( atom -- clipboard )
     {

@@ -12,7 +12,7 @@ CHAR: $ \ currency-token set-global
 : (money>string) ( dollars cents -- string )
     [ number>string ] bi@
     [ <reversed> 3 group "," join <reversed> ]
-    [ 2 CHAR: 0 pad-left ] bi* "." glue ;
+    [ 2 CHAR: 0 pad-head ] bi* "." glue ;
 
 : money>string ( object -- string )
     dollars/cents (money>string) currency-token get prefix ;

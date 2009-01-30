@@ -33,7 +33,7 @@ HOOK: new-utmpx-record os ( -- utmpx-record )
 HOOK: utmpx>utmpx-record os ( utmpx -- utmpx-record )
 
 : memory>string ( alien n -- string )
-    memory>byte-array utf8 decode [ 0 = ] trim-right ;
+    memory>byte-array utf8 decode [ 0 = ] trim-tail ;
 
 M: unix new-utmpx-record
     utmpx-record new ;

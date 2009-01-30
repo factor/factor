@@ -31,7 +31,7 @@ IN: furnace.auth.features.edit-profile
             } validate-params
 
             { "password" "new-password" "verify-password" }
-            [ value empty? not ] contains? [
+            [ value empty? not ] any? [
                 "password" value username check-login
                 [ "incorrect password" validation-error ] unless
 

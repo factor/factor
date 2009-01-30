@@ -9,10 +9,10 @@ SYMBOL: ref-table
 
 GENERIC: (r-ref) ( xml -- )
 M: tag (r-ref)
-    sub-tag over at* [
+    dup sub-tag attr [
         ref-table get at
         >>children drop
-    ] [ 2drop ] if ;
+    ] [ drop ] if* ;
 M: object (r-ref) drop ;
 
 : template ( xml -- )
