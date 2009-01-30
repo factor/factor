@@ -1,13 +1,19 @@
 USING: alien alien.c-types alien.syntax kernel system combinators ;
 IN: math.blas.cblas
 
-<< "cblas" {
+<<
+: load-atlas ( -- )
+    "atlas" "libatlas.so" "cdecl" add-library
+    "atlas" load-library drop ;
+
+"cblas" {
     { [ os macosx? ] [ "libblas.dylib" "cdecl" add-library ] }
     { [ os windows? ] [ "blas.dll" "cdecl" add-library ] }
     { [ os openbsd? ] [ "libcblas.so" "cdecl" add-library ] }
-    { [ os freebsd? ] [ "libcblas.so" "cdecl" add-library ] }
+    { [ os freebsd? ] [ "libcblas.so" "cdecl" add-library load-atlas ] }
     [ "libblas.so" "cdecl" add-library ]
-} cond >>
+} cond
+>>
 
 LIBRARY: cblas
 
