@@ -120,9 +120,9 @@ M: winnt (wait-to-read) ( port -- )
         tri
     ] with-destructors ;
 
-: console-app? ( -- ? ) GetConsoleWindow ;
+: console-app? ( -- ? ) GetConsoleWindow >boolean ;
 
 M: winnt (init-stdio)
-    console-app? [ f f f f ] [ init-c-stdio t ] if ;
+    console-app? [ init-c-stdio t ] [ f f f f ] if ;
 
 winnt set-io-backend
