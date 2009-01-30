@@ -40,10 +40,10 @@ IN: opengl
     [ glDisableClientState ] each ; inline
 
 MACRO: all-enabled ( seq quot -- )
-    [ words>values ] dip [ (all-enabled) ] 2curry ;
+    [ words>values ] dip '[ _ _ (all-enabled) ] ;
 
 MACRO: all-enabled-client-state ( seq quot -- )
-    [ words>values ] dip [ (all-enabled-client-state) ] 2curry ;
+    [ words>values ] dip '[ _ (all-enabled-client-state) ] ;
 
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep
@@ -177,7 +177,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     [ length ] [ >uint-array underlying>> ] bi glDrawBuffers ;
 
 MACRO: set-draw-buffers ( buffers -- )
-    words>values [ (set-draw-buffers) ] curry ;
+    words>values '[ _ (set-draw-buffers) ] ;
 
 : do-attribs ( bits quot -- )
     swap glPushAttrib call glPopAttrib ; inline
@@ -185,18 +185,18 @@ MACRO: set-draw-buffers ( buffers -- )
 : gl-look-at ( eye focus up -- )
     [ first3 ] tri@ gluLookAt ;
 
-: make-texture ( dim pixmap type -- id )
-    [ gen-texture ] 3dip swap '[
+:: make-texture ( dim pixmap format type -- id )
+    gen-texture [
         GL_TEXTURE_BIT [
             GL_TEXTURE_2D swap glBindTexture
             GL_TEXTURE_2D
             0
             GL_RGBA
-            _ first2
+            dim first2
             0
-            _
-            GL_UNSIGNED_BYTE
-            _
+            format
+            type
+            pixmap
             glTexImage2D
         ] do-attribs
     ] keep ;
