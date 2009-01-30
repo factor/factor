@@ -13,7 +13,7 @@ MACRO: set-slots ( slots -- quot )
     [ new ] dip set-slots ; inline
 
 : define-constructor ( name class effect body -- )
-    [ [ in>> ] dip '[ _ _ construct @ ] ] [ drop ] 2bi
+    [ [ in>> '[ _ _ construct ] ] dip compose ] [ drop ] 2bi
     define-declared ;
 
 : CONSTRUCTOR:
