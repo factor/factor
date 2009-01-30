@@ -18,6 +18,7 @@ CONSTANT: OP_KillCursors 2007
 PREDICATE: mdb-reply-op < integer OP_Reply = ;
 PREDICATE: mdb-query-op < integer OP_Query = ;
 PREDICATE: mdb-insert-op < integer OP_Insert = ;
+PREDICATE: mdb-update-op < integer OP_Update = ;
 PREDICATE: mdb-delete-op < integer OP_Delete = ;
 PREDICATE: mdb-getmore-op < integer OP_GetMore = ;
 PREDICATE: mdb-killcursors-op < integer OP_KillCursors = ;
@@ -34,6 +35,12 @@ TUPLE: mdb-msg
 TUPLE: mdb-insert-msg < mdb-msg
 { collection string }
 { objects sequence } ;
+
+TUPLE: mdb-update-msg < mdb-msg
+{ collection string }
+{ upsert? integer initial: 1 }
+{ selector assoc }
+{ object assoc } ;
 
 TUPLE: mdb-delete-msg < mdb-msg
 { collection string }
@@ -104,6 +111,12 @@ M: sequence <mdb-insert-msg> ( collection sequence -- mdb-insert-msg )
     [ >>collection ] dip
     >>objects OP_Insert >>opcode ;
 
+: <mdb-update-msg> ( collection object -- mdb-update-msg )
+    [ mdb-update-msg new ] 2dip
+    [ >>collection ] dip
+    [ [ "_id" ] dip at "_id" H{ } clone [ set-at ] keep >>selector ] keep
+    >>object OP_Update >>opcode ;
+    
 : <mdb-reply-msg> ( -- mdb-reply-msg )
     mdb-reply-msg new ; inline
 
@@ -197,6 +210,14 @@ M: mdb-killcursors-op (read-message) ( msg-stub opcode -- message )
     [ [ cursors#>> ] keep 
       '[ read-longlong _ cursors>> push ] times ] keep ;
 
+M: mdb-update-op (read-message) ( msg-stub opcode -- message )
+    drop
+    [ mdb-update-msg new ] dip copy-header
+    read-cstring >>collection
+    read-int32 >>upsert?
+    H{ } stream>assoc change-bytes-read >>selector
+    H{ } stream>assoc change-bytes-read >>object ;
+
 M: mdb-reply-op (read-message) ( msg-stub opcode -- message )
     drop
     [ <mdb-reply-msg> ] dip copy-header
@@ -251,6 +272,16 @@ M: mdb-insert-msg write-message ( message -- )
        [ flags>> write-int32 ] keep
        [ collection>> write-cstring ] keep
        objects>> [ assoc>array write ] each
+    ] (write-message) ;
+
+M: mdb-update-msg write-message ( message -- )
+    dup
+    '[ _
+       [ flags>> write-int32 ] keep
+       [ collection>> write-cstring ] keep
+       [ upsert?>> write-int32 ] keep
+       [ selector>> assoc>array write ] keep
+       object>> assoc>array write
     ] (write-message) ;
 
 M: mdb-delete-msg write-message ( message -- )
