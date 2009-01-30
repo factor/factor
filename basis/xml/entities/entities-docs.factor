@@ -12,11 +12,10 @@ ARTICLE: "xml.entities" "XML entities"
 "For entities used in HTML/XHTML, see " { $vocab-link "xml.entities.html" } ;
 
 HELP: entities
-{ $description "a hash table from default XML entity names (like &amp; and &lt;) to the characters they represent. This is automatically included when parsing any XML document." }
+{ $description "A hash table from default XML entity names (like " { $snippet "&amp;" } " and " { $snippet "&lt;" } ") to the characters they represent. This is automatically included when parsing any XML document." }
 { $see-also with-entities } ;
 
 HELP: with-entities
-{ $values { "entities" "a hash table of strings to chars" }
-    { "quot" "a quotation ( -- )" } }
-{ $description "calls the quotation using the given table of entity values (symbolizing, eg, that &foo; represents CHAR: a) on top of the default XML entities" } ;
+{ $values { "entities" "a hash table of strings to strings" } { "quot" "a quotation ( -- )" } }
+{ $description "Calls the quotation using the given table of entity values (symbolizing, eg, that " { $snippet "&foo;" } " represents " { $snippet "\"a\"" } ") on top of the default XML entities" } ;
 

@@ -39,15 +39,15 @@ IN: xml.autoencoding
     [ prolog-encoding ]
     [ drop utf8 decode-input ] if ;
 
-: something ( -- )
+: go-utf8 ( -- )
     check utf8 decode-input next next ;
 
 : start< ( -- tag )
     ! What if first letter of processing instruction is non-ASCII?
     get-next {
         { 0 [ next next start-utf16le ] }
-        { CHAR: ? [ something instruct dup instruct-encoding ] }
-        { CHAR: ! [ something direct ] }
+        { CHAR: ? [ go-utf8 instruct dup instruct-encoding ] }
+        { CHAR: ! [ go-utf8 direct ] }
         [ check start<name ]
     } case ;
 

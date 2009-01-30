@@ -3,7 +3,8 @@
 USING: accessors arrays io io.encodings.binary io.files
 io.streams.string kernel namespaces sequences strings io.encodings.utf8
 xml.data xml.errors xml.elements ascii xml.entities
-xml.writer xml.state xml.autoencoding assocs xml.tokenize xml.name ;
+xml.writer xml.state xml.autoencoding assocs xml.tokenize
+combinators.short-circuit xml.name ;
 IN: xml
 
 <PRIVATE
@@ -22,14 +23,18 @@ GENERIC: process ( object -- )
 M: object process add-child ;
 
 M: prolog process
-    xml-stack get { V{ { f V{ "" } } } V{ { f V{ } } } } member?
+    xml-stack get
+    { V{ { f V{ "" } } } V{ { f V{ } } } } member?
     [ bad-prolog ] unless drop ;
 
+: before-main? ( -- ? )
+    xml-stack get {
+        [ length 1 = ]
+        [ first second [ tag? ] contains? not ]
+    } 1&& ;
+
 M: directive process
-    xml-stack get dup length 1 =
-    swap first second [ tag? ] contains? not and
-    [ misplaced-directive ] unless
-    add-child ;
+    before-main? [ misplaced-directive ] unless add-child ;
 
 M: contained process
     [ name>> ] [ attrs>> ] bi

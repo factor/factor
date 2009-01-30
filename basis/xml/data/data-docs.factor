@@ -89,7 +89,7 @@ HELP: xml
 HELP: <xml>
 { $values { "prolog" "an XML prolog" } { "before" "a sequence of XML elements" }
 { "body" tag } { "after" "a sequence of XML elements" } { "xml" "an XML document" } }
-{ $description "creates an XML document, delegating to the main tag, with the specified prolog, before, and after" }
+{ $description "Creates an XML document. The " { $snippet "before" } " and " { $snippet "after" } " slots store what comes before and after the main tag, and " { $snippet "body" } "contains the main tag itself." }
 { $see-also xml <tag> } ;
 
 HELP: prolog
@@ -99,47 +99,46 @@ HELP: prolog
 HELP: <prolog>
 { $values { "version" "a string, 1.0 or 1.1" }
 { "encoding" "a string" } { "standalone" "a boolean" } { "prolog" "an XML prolog" } }
-{ $description "creates an XML prolog tuple" }
+{ $description "Creates an XML prolog tuple." }
 { $see-also prolog <xml> } ;
 
 HELP: comment
-{ $class-description "represents a comment in XML. Has one slot, text, which contains the string of the comment" }
+{ $class-description "Represents a comment in XML. This tuple has one slot, " { $snippet "text" } ", which contains the string of the comment." }
 { $see-also <comment> } ;
 
 HELP: <comment>
-{ $values { "text" "a string" } { "comment" "a comment" } }
-{ $description "creates an XML comment tuple" }
+{ $values { "text" string } { "comment" comment } }
+{ $description "Creates an XML " { $link comment } " tuple." }
 { $see-also comment } ;
 
 HELP: instruction
-{ $class-description "represents an XML instruction, such as <?xsl stylesheet='foo.xml'?>. Contains one slot, text, which contains the string between the question marks." }
+{ $class-description "Represents an XML instruction, such as " { $snippet "<?xsl stylesheet='foo.xml'?>" } ". Contains one slot, " { $snippet "text" } ", which contains the string between the question marks." }
 { $see-also <instruction> } ;
 
 HELP: <instruction>
 { $values { "text" "a string" } { "instruction" "an XML instruction" } }
-{ $description "creates an XML parsing instruction, such as <?xsl stylesheet='foo.xml'?>." }
+{ $description "Creates an XML parsing instruction, like " { $snippet "<?xsl stylesheet='foo.xml'?>" } "." }
 { $see-also instruction } ;
 
 HELP: opener
-{ $class-description "describes an opening tag, like <a>. Contains two slots, name and attrs containing, respectively, the name of the tag and its attributes. Usually, the name-url will be f." }
-{ $see-also closer contained } ;
+{ $class-description "Describes an opening tag, like " { $snippet "<a>" } ". Contains two slots, " { $snippet "name" } " and " { $snippet "attrs" } " containing, respectively, the name of the tag and its attributes." } ;
 
 HELP: closer
-{ $class-description "describes a closing tag, like </a>. Contains one slot, name, containing the tag's name. Usually, the name-url will be f." }
-{ $see-also opener contained } ;
+{ $class-description "Describes a closing tag, like " { $snippet "</a>" } ". Contains one slot, " { $snippet "name" } ", containing the closer's name." } ;
 
 HELP: contained
-{ $class-description "represents a self-closing tag, like <a/>. Contains two slots, name and attrs containing, respectively, the name of the tag and its attributes. Usually, the name-url will be f." }
-{ $see-also opener closer } ;
+{ $class-description "Represents a self-closing tag, like " { $snippet "<a/>" } ". Contains two slots," { $snippet "name" } " and " { $snippet "attrs" } " containing, respectively, the name of the tag and its attributes." } ;
+
+{ opener closer contained } related-words
 
 HELP: open-tag
-{ $class-description "represents a tag that does have children, ie is not a contained tag" }
-{ $notes "the constructor used for this class is simply " { $link <tag> } "." }
+{ $class-description "Represents a tag that does have children, ie. is not a contained tag" }
+{ $notes "The constructor used for this class is simply " { $link <tag> } "." }
 { $see-also tag contained-tag } ;
 
 HELP: names-match?
 { $values { "name1" "a name" } { "name2" "a name" } { "?" "t or f" } }
-{ $description "checks to see if the two names match, that is, if all fields are equal, ignoring fields whose value is f in either name." }
+{ $description "Checks to see if the two names match, that is, if all fields are equal, ignoring fields whose value is f in either name." }
 { $example "USING: prettyprint xml.data ;" "T{ name f \"rpc\" \"methodCall\" f } T{ name f f \"methodCall\" \"http://www.xmlrpc.org/\" } names-match? ." "t" }
 { $see-also name } ;
 
@@ -173,7 +172,7 @@ HELP: <entity-decl>
 { $description "Creates an entity declaration object, of the class " { $link entity-decl } ". The pe? slot should be t if the object is a DTD-internal entity, like " { $snippet "<!ENTITY % foo 'bar'>" } " and f if the object is like " { $snippet "<!ENTITY foo 'bar'>" } ", that is, it can be used outside of the DTD." } ;
 
 HELP: system-id
-{ $class-description "Describes the class of system identifiers within an XML DTD directive, such as " { $snippet "<!DOCTYPE greeting " { $emphasis "SYSTEM 'hello.dtd'" } ">" } } ;
+{ $class-description "Describes the class of system identifiers within an XML DTD directive, such as " { $snippet "<!DOCTYPE greeting " { $emphasis "SYSTEM 'hello.dtd'" } ">" } "." } ;
 
 HELP: <system-id>
 { $values { "system-literal" string } { "system-id" system-id } }
