@@ -524,14 +524,14 @@ PRIVATE>
 : nths ( indices seq -- seq' )
     [ nth ] curry map ;
 
-: contains? ( seq quot -- ? )
+: any? ( seq quot -- ? )
     find drop >boolean ; inline
 
 : member? ( elt seq -- ? )
-    [ = ] with contains? ;
+    [ = ] with any? ;
 
 : memq? ( elt seq -- ? )
-    [ eq? ] with contains? ;
+    [ eq? ] with any? ;
 
 : remove ( elt seq -- newseq )
     [ = not ] with filter ;
@@ -710,10 +710,10 @@ PRIVATE>
         [ <repetition> ] curry
     ] dip compose if ; inline
 
-: pad-left ( seq n elt -- padded )
+: pad-head ( seq n elt -- padded )
     [ swap dup append-as ] padding ;
 
-: pad-right ( seq n elt -- padded )
+: pad-tail ( seq n elt -- padded )
     [ append ] padding ;
 
 : shorter? ( seq1 seq2 -- ? ) [ length ] bi@ < ;
@@ -815,22 +815,22 @@ PRIVATE>
     dup slice? [ { } like ] when 0 over length rot <slice> ;
     inline
 
-: trim-left-slice ( seq quot -- slice )
+: trim-head-slice ( seq quot -- slice )
     over [ [ not ] compose find drop ] dip swap
     [ tail-slice ] [ dup length tail-slice ] if* ; inline
     
-: trim-left ( seq quot -- newseq )
-    over [ trim-left-slice ] dip like ; inline
+: trim-head ( seq quot -- newseq )
+    over [ trim-head-slice ] dip like ; inline
 
-: trim-right-slice ( seq quot -- slice )
+: trim-tail-slice ( seq quot -- slice )
     over [ [ not ] compose find-last drop ] dip swap
     [ 1+ head-slice ] [ 0 head-slice ] if* ; inline
 
-: trim-right ( seq quot -- newseq )
-    over [ trim-right-slice ] dip like ; inline
+: trim-tail ( seq quot -- newseq )
+    over [ trim-tail-slice ] dip like ; inline
 
 : trim-slice ( seq quot -- slice )
-    [ trim-left-slice ] [ trim-right-slice ] bi ; inline
+    [ trim-head-slice ] [ trim-tail-slice ] bi ; inline
 
 : trim ( seq quot -- newseq )
     over [ trim-slice ] dip like ; inline

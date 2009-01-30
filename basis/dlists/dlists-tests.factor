@@ -46,8 +46,8 @@ IN: dlists.tests
 [ f f ] [ <dlist> [ 1 = ] dlist-find ] unit-test
 [ 1 t ] [ <dlist> 1 over push-back [ 1 = ] dlist-find ] unit-test
 [ f f ] [ <dlist> 1 over push-back [ 2 = ] dlist-find ] unit-test
-[ f ] [ <dlist> 1 over push-back [ 2 = ] dlist-contains? ] unit-test
-[ t ] [ <dlist> 1 over push-back [ 1 = ] dlist-contains? ] unit-test
+[ f ] [ <dlist> 1 over push-back [ 2 = ] dlist-any? ] unit-test
+[ t ] [ <dlist> 1 over push-back [ 1 = ] dlist-any? ] unit-test
 
 [ 1 ] [ <dlist> 1 over push-back [ 1 = ] delete-node-if ] unit-test
 [ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-empty? ] unit-test

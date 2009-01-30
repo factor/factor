@@ -8,7 +8,7 @@ IN: benchmark.knucleotide
     swap >float number>string
     "." split1 rot
     over length over <
-    [ CHAR: 0 pad-right ] 
+    [ CHAR: 0 pad-tail ] 
     [ head ] if "." glue ;
 
 : discard-lines ( -- )

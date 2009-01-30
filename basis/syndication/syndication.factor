@@ -80,7 +80,7 @@ TUPLE: entry title url description date ;
         [ atom-entry-link >>url ]
         [
             { "content" "summary" } any-tag-named
-            dup children>> [ string? not ] contains?
+            dup children>> [ string? not ] any?
             [ children>> xml>string ]
             [ children>string ] if >>description
         ]

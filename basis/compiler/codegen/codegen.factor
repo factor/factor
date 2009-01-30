@@ -400,7 +400,7 @@ M: no-such-symbol compiler-error-type
 
 : check-dlsym ( symbols dll -- )
     dup dll-valid? [
-        dupd '[ _ dlsym ] contains?
+        dupd '[ _ dlsym ] any?
         [ drop ] [ no-such-symbol ] if
     ] [
         dll-path no-such-library drop

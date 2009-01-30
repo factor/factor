@@ -148,7 +148,7 @@ ERROR: bad-superclass class ;
 
 : tuple-prototype ( class -- prototype )
     [ initial-values ] keep
-    over [ ] contains? [ slots>tuple ] [ 2drop f ] if ;
+    over [ ] any? [ slots>tuple ] [ 2drop f ] if ;
 
 : define-tuple-prototype ( class -- )
     dup tuple-prototype "prototype" set-word-prop ;

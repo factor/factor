@@ -14,7 +14,7 @@ TR: soundex-tr
     [ 2 <clumps> [ = not ] assoc-filter values ] [ first ] bi prefix ;
 
 : first>upper ( seq -- seq' ) 1 head >upper ;
-: trim-first ( seq -- seq' ) dup first [ = ] curry trim-left ;
+: trim-first ( seq -- seq' ) dup first [ = ] curry trim-head ;
 : remove-zeroes ( seq -- seq' ) CHAR: 0 swap remove ;
 : remove-non-alpha ( seq -- seq' ) [ alpha? ] filter ;
 : pad-4 ( first seq -- seq' ) "000" 3append 4 head ;

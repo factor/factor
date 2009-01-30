@@ -117,11 +117,11 @@ M: dlist pop-back* ( dlist -- )
 : dlist-find ( dlist quot -- obj/f ? )
     '[ obj>> @ ] dlist-find-node [ obj>> t ] [ drop f f ] if ; inline
 
-: dlist-contains? ( dlist quot -- ? )
+: dlist-any? ( dlist quot -- ? )
     dlist-find nip ; inline
 
 M: dlist deque-member? ( value dlist -- ? )
-    [ = ] with dlist-contains? ;
+    [ = ] with dlist-any? ;
 
 M: dlist delete-node ( dlist-node dlist -- )
     {

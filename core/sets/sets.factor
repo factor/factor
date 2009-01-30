@@ -41,7 +41,7 @@ PRIVATE>
     tester filter ;
 
 : intersects? ( seq1 seq2 -- ? )
-    tester contains? ;
+    tester any? ;
 
 : diff ( seq1 seq2 -- newseq )
     tester [ not ] compose filter ;

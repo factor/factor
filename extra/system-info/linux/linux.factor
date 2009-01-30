@@ -10,7 +10,7 @@ IN: system-info.linux
 : uname ( -- seq )
     65536 "char" <c-array> [ (uname) io-error ] keep
     "\0" split harvest [ >string ] map
-    6 "" pad-right ;
+    6 "" pad-tail ;
 
 : sysname ( -- string ) uname first ;
 : nodename ( -- string ) uname second ;
@@ -20,4 +20,4 @@ IN: system-info.linux
 : domainname ( -- string ) uname 5 swap nth ;
 
 : kernel-version ( -- seq )
-    release ".-" split harvest 5 "" pad-right ;
+    release ".-" split harvest 5 "" pad-tail ;

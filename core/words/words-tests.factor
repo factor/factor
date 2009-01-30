@@ -188,7 +188,7 @@ SYMBOL: quot-uses-b
 [
     all-words [
         "compiled-uses" word-prop
-        keys [ "forgotten" word-prop ] contains?
+        keys [ "forgotten" word-prop ] any?
     ] filter
 ] unit-test
 

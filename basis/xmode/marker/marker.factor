@@ -15,7 +15,7 @@ ascii combinators.short-circuit accessors ;
 : keyword-number? ( keyword -- ? )
     {
         [ current-rule-set highlight-digits?>> ]
-        [ dup [ digit? ] contains? ]
+        [ dup [ digit? ] any? ]
         [
             dup [ digit? ] all? [
                 current-rule-set digit-re>>

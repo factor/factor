@@ -8,4 +8,4 @@ compiler.tree ;
 
 : inline-recursive ( -- ) inline-recursive ; inline recursive
 
-[ t ] [ \ inline-recursive build-tree-from-word [ #recursive? ] contains? nip ] unit-test
+[ t ] [ \ inline-recursive build-tree-from-word [ #recursive? ] any? nip ] unit-test

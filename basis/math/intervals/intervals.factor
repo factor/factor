@@ -77,7 +77,7 @@ TUPLE: interval { from read-only } { to read-only } ;
     [ from>> ] [ to>> ] bi ;
 
 : points>interval ( seq -- interval )
-    dup [ first fp-nan? ] contains?
+    dup [ first fp-nan? ] any?
     [ drop [-inf,inf] ] [
         dup first
         [ [ endpoint-min ] reduce ]

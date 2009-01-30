@@ -30,7 +30,7 @@ M: prolog process
 : before-main? ( -- ? )
     xml-stack get {
         [ length 1 = ]
-        [ first second [ tag? ] contains? not ]
+        [ first second [ tag? ] any? not ]
     } 1&& ;
 
 M: directive process
@@ -76,7 +76,7 @@ M: closer process
 
 : no-post-tags ( post -- post/* )
     ! this does *not* affect the contents of the stack
-    dup [ tag? ] contains? [ multitags ] when ; 
+    dup [ tag? ] any? [ multitags ] when ; 
 
 : assure-tags ( seq -- seq )
     ! this does *not* affect the contents of the stack
