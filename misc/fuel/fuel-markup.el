@@ -323,7 +323,7 @@
         (sort-lines nil start (point))))))
 
 (defun fuel-markup--vocab-link (e)
-  (fuel-markup--insert-button (cadr e) (car (cddr e)) 'vocab))
+  (fuel-markup--insert-button (cadr e) (or (car (cddr e)) (cadr e)) 'vocab))
 
 (defun fuel-markup--vocab-links (e)
   (dolist (link (cdr e))
