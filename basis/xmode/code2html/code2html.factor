@@ -1,6 +1,6 @@
 USING: xmode.tokens xmode.marker xmode.catalog kernel locals
 html.elements io io.files sequences words io.encodings.utf8
-namespaces xml.entities accessors xml.interpolate locals xml.writer ;
+namespaces xml.entities accessors xml.literals locals xml.writer ;
 IN: xmode.code2html
 
 : htmlize-tokens ( tokens -- xml )

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.styles kernel namespaces prettyprint quotations
 sequences strings words xml.entities compiler.units effects
-xml.data xml.interpolate urls math math.parser combinators
+xml.data xml.literals urls math math.parser combinators
 present fry io.streams.string xml.writer ;
 
 IN: html.elements
