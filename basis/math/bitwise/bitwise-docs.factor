@@ -242,7 +242,7 @@ HELP: shift-mod
      { "n" integer } { "s" integer } { "w" integer }
      { "n" integer }
 }
-{ $description "" } ;
+{ $description "Calls " { $link shift } " on " { $snippet "n" } " and " { $snippet "s" } ", wrapping the result to " { $snippet "w" } " bits." } ;
 
 HELP: unmask
 { $values
