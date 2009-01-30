@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff, see BSD license
 USING: arrays literals math math.affine-transforms math.functions multiline
 svg tools.test ;
 IN: svg.tests

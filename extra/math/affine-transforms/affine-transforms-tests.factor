@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff, see BSD license
 USING: arrays kernel literals tools.test math math.affine-transforms
 math.constants math.functions ;
 IN: math.affine-transforms.tests

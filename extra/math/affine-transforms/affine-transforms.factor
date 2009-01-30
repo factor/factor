@@ -1,3 +1,4 @@
+! (c)2009 Joe Groff, see BSD license
 USING: accessors arrays combinators combinators.short-circuit kernel math math.vectors
 math.functions sequences ;
 IN: math.affine-transforms

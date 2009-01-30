@@ -1,3 +1,4 @@
+! (c)2009 Slava Pestov & Joe Groff, see BSD license
 USING: combinators.short-circuit fry make math kernel sequences ;
 IN: sequences.squish
 
