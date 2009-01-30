@@ -23,7 +23,12 @@ ARTICLE: "math.blas.vectors" "BLAS interface vector operations"
 { $subsection V- }
 "Vector inner products:"
 { $subsection V. }
-{ $subsection V.conj } ;
+{ $subsection V.conj }
+"Literal syntax:"
+{ $subsection POSTPONE: svector{ }
+{ $subsection POSTPONE: dvector{ }
+{ $subsection POSTPONE: cvector{ }
+{ $subsection POSTPONE: zvector{ } ;
 
 ABOUT: "math.blas.vectors"
 
@@ -129,3 +134,25 @@ HELP: V/n
 HELP: Vsub
 { $values { "v" blas-vector-base } { "start" integer } { "length" integer } { "sub" blas-vector-base } }
 { $description "Slice a subvector out of " { $snippet "v" } " starting at " { $snippet "start" } " with the given " { $snippet "length" } ". The subvector will share storage with the parent vector." } ;
+
+HELP: svector{
+{ $syntax "svector{ 1.0 -2.0 3.0 }" }
+{ $description "Construct a literal " { $link float-blas-vector } "." } ;
+
+HELP: dvector{
+{ $syntax "dvector{ 1.0 -2.0 3.0 }" }
+{ $description "Construct a literal " { $link double-blas-vector } "." } ;
+
+HELP: cvector{
+{ $syntax "cvector{ 1.0 -2.0 C{ 3.0 -1.0 } }" }
+{ $description "Construct a literal " { $link float-complex-blas-vector } "." } ;
+
+HELP: zvector{
+{ $syntax "dvector{ 1.0 -2.0 C{ 3.0 -1.0 } }" }
+{ $description "Construct a literal " { $link double-complex-blas-vector } "." } ;
+
+{
+    POSTPONE: svector{ POSTPONE: dvector{
+    POSTPONE: cvector{ POSTPONE: zvector{
+} related-words
+
