@@ -1,4 +1,5 @@
-USING: alien alien.c-types alien.syntax kernel system combinators ;
+USING: alien alien.c-types alien.syntax kernel system
+combinators combinators.short-circuit ;
 IN: math.blas.cblas
 
 <<
@@ -10,7 +11,10 @@ IN: math.blas.cblas
 "cblas" {
     { [ os macosx? ] [ "libblas.dylib" "cdecl" add-library ] }
     { [ os windows? ] [ "blas.dll" "cdecl" add-library ] }
-    { [ os openbsd? ] [ "libcblas.so" "cdecl" add-library load-blas ] }
+    {
+        [ os { [ openbsd? ] [ netbsd? ] } 1|| ]
+        [ "libcblas.so" "cdecl" add-library load-blas ]
+    }
     { [ os freebsd? ] [ "libcblas.so" "cdecl" add-library load-atlas ] }
     [ "libblas.so" "cdecl" add-library ]
 } cond

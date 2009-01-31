@@ -52,9 +52,15 @@ SYMBOL: rule-sets
     dup "::" split1 [ swap (load-mode) ] [ rule-sets get ] if*
     dup -roll at* [ nip ] [ drop no-such-rule-set ] if ;
 
+DEFER: finalize-rule-set
+
 : resolve-delegate ( rule -- )
-    dup delegate>> dup string?
-    [ get-rule-set nip swap (>>delegate) ] [ 2drop ] if ;
+    dup delegate>> dup string? [
+        get-rule-set
+        dup rule-set? [ "not a rule set" throw ] unless
+        swap rule-sets [ dup finalize-rule-set ] with-variable
+        >>delegate drop
+    ] [ 2drop ] if ;
 
 : each-rule ( rule-set quot -- )
     [ rules>> values concat ] dip each ; inline
@@ -74,26 +80,22 @@ SYMBOL: rule-sets
 : resolve-imports ( ruleset -- )
     dup imports>> [
         get-rule-set swap rule-sets [
-            dup resolve-delegates
-            2dup import-keywords
-            import-rules
+            [ nip resolve-delegates ]
+            [ import-keywords ]
+            [ import-rules ]
+            2tri
         ] with-variable
     ] with each ;
 
 ERROR: mutually-recursive-rulesets ruleset ;
+
 : finalize-rule-set ( ruleset -- )
-    dup finalized?>> {
-        { f [
-            {
-                [ 1 >>finalized? drop ]
-                [ resolve-imports ]
-                [ resolve-delegates ]
-                [ t >>finalized? drop ]
-            } cleave
-        ] }
-        { t [ drop ] }
-        { 1 [ mutually-recursive-rulesets ] }
-    } case ;
+    dup finalized?>> [ drop ] [
+        t >>finalized?
+        [ resolve-imports ]
+        [ resolve-delegates ]
+        bi
+    ] if ;
 
 : finalize-mode ( rulesets -- )
     rule-sets [
