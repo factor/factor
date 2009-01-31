@@ -1,4 +1,4 @@
-USING: help.markup help.syntax vocabs.loader io.files strings
+USING: help.markup help.syntax vocabs.loader io.pathnames strings
 definitions quotations compiler.units ;
 IN: source-files
 

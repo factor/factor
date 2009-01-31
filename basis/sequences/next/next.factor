@@ -3,7 +3,8 @@ IN: sequences.next
 
 <PRIVATE
 
-: iterate-seq [ dup length swap ] dip ; inline
+: iterate-seq ( seq quot -- i seq quot )
+    [ [ length ] keep ] dip ; inline
 
 : (map-next) ( i seq quot -- )
     ! this uses O(n) more bounds checks than is really necessary

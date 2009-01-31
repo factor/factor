@@ -1,6 +1,5 @@
 USING: kernel math sequences namespaces
-math.miller-rabin combinators.lib
-math.functions accessors random ;
+math.miller-rabin math.functions accessors random ;
 IN: random.blum-blum-shub
 
 ! Blum Blum Shub, n = pq, x_i+1 = x_i ^ 2 mod n
@@ -9,8 +8,12 @@ TUPLE: blum-blum-shub x n ;
 
 <PRIVATE
 
+: generate-bbs-prime ( numbits -- p )
+    dup random-prime dup 4 mod 3 =
+    [ nip ] [ drop generate-bbs-prime ] if ;
+
 : generate-bbs-primes ( numbits -- p q )
-    [ [ random-prime ] curry [ 4 mod 3 = ] generate ] dup bi ;
+    [ generate-bbs-prime ] [ generate-bbs-prime ] bi ;
 
 : next-bbs-bit ( bbs -- bit )
     dup [ x>> 2 ] [ n>> ] bi ^mod [ >>x drop ] [ 1 bitand ] bi ;

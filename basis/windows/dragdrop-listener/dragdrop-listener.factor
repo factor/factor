@@ -36,26 +36,30 @@ SYMBOL: +listener-dragdrop-wrapper+
 {
     { "IDropTarget" {
         [ ! DragEnter
-            >r 2drop
-            filenames-from-data-object
-            length 1 = [ DROPEFFECT_COPY ] [ DROPEFFECT_NONE ] if
-            dup 0 r> set-ulong-nth
+            [
+                2drop
+                filenames-from-data-object
+                length 1 = [ DROPEFFECT_COPY ] [ DROPEFFECT_NONE ] if
+                dup 0
+            ] dip set-ulong-nth
             >>last-drop-effect drop
             S_OK
         ] [ ! DragOver
-            >r 2drop last-drop-effect>> 0 r> set-ulong-nth
+            [ 2drop last-drop-effect>> 0 ] dip set-ulong-nth
             S_OK
         ] [ ! DragLeave
             drop S_OK
         ] [ ! Drop
-            >r 2drop nip
-            filenames-from-data-object
-            dup length 1 = [
-                first unparse [ "USE: parser " % % " run-file" % ] "" make
-                eval-listener
-                DROPEFFECT_COPY
-            ] [ 2drop DROPEFFECT_NONE ] if
-            0 r> set-ulong-nth
+            [
+                2drop nip
+                filenames-from-data-object
+                dup length 1 = [
+                    first unparse [ "USE: parser " % % " run-file" % ] "" make
+                    eval-listener
+                    DROPEFFECT_COPY
+                ] [ 2drop DROPEFFECT_NONE ] if
+                0
+            ] dip set-ulong-nth
             S_OK
         ]
     } }

@@ -47,13 +47,13 @@ TUPLE: packet link id kind a1 a2 ;
 : HOLDBIT 4 ; inline
 
 : S_RUN 0 ;  inline
-: S_RUNPKT { PKTBIT } flags ; inline
-: S_WAIT { WAITBIT } flags ; inline
-: S_WAITPKT { WAITBIT PKTBIT } flags ; inline
-: S_HOLD { HOLDBIT } flags ; inline
-: S_HOLDPKT { HOLDBIT PKTBIT } flags ; inline
-: S_HOLDWAIT { HOLDBIT WAITBIT } flags ; inline
-: S_HOLDWAITPKT { HOLDBIT WAITBIT PKTBIT } flags ; inline
+: S_RUNPKT ( -- n ) { PKTBIT } flags ; inline
+: S_WAIT ( -- n ) { WAITBIT } flags ; inline
+: S_WAITPKT ( -- n ) { WAITBIT PKTBIT } flags ; inline
+: S_HOLD ( -- n ) { HOLDBIT } flags ; inline
+: S_HOLDPKT ( -- n ) { HOLDBIT PKTBIT } flags ; inline
+: S_HOLDWAIT ( -- n ) { HOLDBIT WAITBIT } flags ; inline
+: S_HOLDWAITPKT ( -- n ) { HOLDBIT WAITBIT PKTBIT } flags ; inline
 
 : task-tab-size 10 ; inline
 

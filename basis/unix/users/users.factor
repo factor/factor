@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings io.encodings.utf8
-io.unix.backend kernel math sequences splitting unix strings
+io.backend.unix kernel math sequences splitting unix strings
 combinators.short-circuit grouping byte-arrays combinators
 accessors math.parser fry assocs namespaces continuations
 vocabs.loader system ;
 IN: unix.users
 
-TUPLE: passwd username password uid gid gecos dir shell ;
+TUPLE: passwd user-name password uid gid gecos dir shell ;
 
 HOOK: new-passwd os ( -- passwd )
 HOOK: passwd>new-passwd os ( passwd -- new-passwd )
@@ -20,7 +20,7 @@ M: unix new-passwd ( -- passwd )
 M: unix passwd>new-passwd ( passwd -- seq )
     [ new-passwd ] dip
     {
-        [ passwd-pw_name >>username ]
+        [ passwd-pw_name >>user-name ]
         [ passwd-pw_passwd >>password ]
         [ passwd-pw_uid >>uid ]
         [ passwd-pw_gid >>gid ]
@@ -47,17 +47,18 @@ SYMBOL: user-cache
 : with-user-cache ( quot -- )
     [ <user-cache> user-cache ] dip with-variable ; inline
 
-GENERIC: user-passwd ( obj -- passwd )
+GENERIC: user-passwd ( obj -- passwd/f )
 
 M: integer user-passwd ( id -- passwd/f )
     user-cache get
-    [ at ] [ getpwuid passwd>new-passwd ] if* ;
+    [ at ] [ getpwuid [ passwd>new-passwd ] [ f ] if* ] if* ;
 
 M: string user-passwd ( string -- passwd/f )
     getpwnam dup [ passwd>new-passwd ] when ;
 
-: username ( id -- string )
-    user-passwd username>> ;
+: user-name ( id -- string )
+    dup user-passwd
+    [ nip user-name>> ] [ number>string ] if* ;
 
 : user-id ( string -- id )
     user-passwd uid>> ;
@@ -65,14 +66,14 @@ M: string user-passwd ( string -- passwd/f )
 : real-user-id ( -- id )
     getuid ; inline
 
-: real-username ( -- string )
-    real-user-id username ; inline
+: real-user-name ( -- string )
+    real-user-id user-name ; inline
 
 : effective-user-id ( -- id )
     geteuid ; inline
 
-: effective-username ( -- string )
-    effective-user-id username ; inline
+: effective-user-name ( -- string )
+    effective-user-id user-name ; inline
 
 GENERIC: set-real-user ( string/id -- )
 

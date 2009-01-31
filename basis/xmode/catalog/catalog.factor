@@ -1,6 +1,6 @@
 USING: xmode.loader xmode.utilities xmode.rules namespaces
 strings splitting assocs sequences kernel io.files xml memoize
-words globs combinators io.encodings.utf8 sorting accessors ;
+words globs combinators io.encodings.utf8 sorting accessors xml.data ;
 IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
@@ -8,12 +8,13 @@ TUPLE: mode file file-name-glob first-line-glob ;
 <TAGS: parse-mode-tag ( modes tag -- )
 
 TAG: MODE
-    "NAME" over at >r
-    mode new {
-        { "FILE" f (>>file) }
-        { "FILE_NAME_GLOB" f (>>file-name-glob) }
-        { "FIRST_LINE_GLOB" f (>>first-line-glob) }
-    } init-from-tag r>
+    dup "NAME" attr [
+        mode new {
+            { "FILE" f (>>file) }
+            { "FILE_NAME_GLOB" f (>>file-name-glob) }
+            { "FIRST_LINE_GLOB" f (>>first-line-glob) }
+        } init-from-tag
+    ] dip
     rot set-at ;
 
 TAGS>
@@ -56,7 +57,7 @@ SYMBOL: rule-sets
     [ get-rule-set nip swap (>>delegate) ] [ 2drop ] if ;
 
 : each-rule ( rule-set quot -- )
-    >r rules>> values concat r> each ; inline
+    [ rules>> values concat ] dip each ; inline
 
 : resolve-delegates ( ruleset -- )
     [ resolve-delegate ] each-rule ;
@@ -65,8 +66,7 @@ SYMBOL: rule-sets
     over [ dupd update ] [ nip clone ] if ;
 
 : import-keywords ( parent child -- )
-    over >r [ keywords>> ] bi@ ?update
-    r> (>>keywords) ;
+    over [ [ keywords>> ] bi@ ?update ] dip (>>keywords) ;
 
 : import-rules ( parent child -- )
     swap [ add-rule ] curry each-rule ;
@@ -115,5 +115,5 @@ ERROR: mutually-recursive-rulesets ruleset ;
 
 : find-mode ( file-name first-line -- mode )
     modes
-    [ nip >r 2dup r> suitable-mode? ] assoc-find
-    2drop >r 2drop r> [ "text" ] unless* ;
+    [ nip [ 2dup ] dip suitable-mode? ] assoc-find
+    2drop [ 2drop ] dip [ "text" ] unless* ;

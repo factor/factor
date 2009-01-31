@@ -131,7 +131,7 @@ M: ole32-error error.
 : guid= ( a b -- ? )
     [ 16 memory>byte-array ] bi@ = ;
 
-: GUID-STRING-LENGTH
+: GUID-STRING-LENGTH ( -- n )
     "{01234567-89ab-cdef-0123-456789abcdef}" length ; inline
 
 :: (guid-section>guid) ( string guid start end quot -- )
@@ -163,10 +163,10 @@ M: ole32-error error.
     ] keep ;
 
 : (guid-section%) ( guid quot len -- )
-    [ call >hex ] dip CHAR: 0 pad-left % ; inline
+    [ call >hex ] dip CHAR: 0 pad-head % ; inline
 
 : (guid-byte%) ( guid byte -- )
-    swap nth >hex 2 CHAR: 0 pad-left % ; inline
+    swap nth >hex 2 CHAR: 0 pad-head % ; inline
 
 : guid>string ( guid -- string )
     [

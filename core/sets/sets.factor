@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov, Doug Coleman.
+! Copyright (C) 2008, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel sequences vectors ;
 IN: sets
@@ -31,17 +31,26 @@ IN: sets
 : all-unique? ( seq -- ? )
     dup length <hashtable> [ (all-unique?) ] curry all? ;
 
+<PRIVATE
+
+: tester ( seq -- quot ) unique [ key? ] curry ; inline
+
+PRIVATE>
+
 : intersect ( seq1 seq2 -- newseq )
-    unique [ key? ] curry filter ;
+    tester filter ;
+
+: intersects? ( seq1 seq2 -- ? )
+    tester any? ;
 
 : diff ( seq1 seq2 -- newseq )
-    unique [ key? not ] curry filter ;
+    tester [ not ] compose filter ;
 
 : union ( seq1 seq2 -- newseq )
     append prune ;
 
 : subset? ( seq1 seq2 -- ? )
-    unique [ key? ] curry all? ;
+    tester all? ;
 
 : set= ( seq1 seq2 -- ? )
     [ unique ] bi@ = ;

@@ -1,53 +1,37 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes hashtables help.markup help.syntax io.streams.string
-kernel sequences strings math ;
+kernel sequences strings math db.tuples db.tuples.private ;
 IN: db.types
-
-HELP: +autoincrement+
-{ $description "" } ;
 
 HELP: +db-assigned-id+
 { $description "The database assigns a primary key to the object. The primary key is most likely a big integer, but is database-dependent." } ;
 
 HELP: +default+
-{ $description "" } ;
-
-HELP: +foreign-id+
-{ $description "" } ;
-
-HELP: +has-many+
-{ $description "" } ;
+{ $description "Allows a default value for a column to be provided." } ;
 
 HELP: +not-null+
-{ $description "" } ;
+{ $description "Ensures that a column is not null." } ;
 
 HELP: +null+
-{ $description "" } ;
+{ $description "Allows a column to be null." } ;
 
 HELP: +primary-key+
-{ $description "" } ;
+{ $description "Makes a column a primary key. Only one column may be a primary key." } ;
 
 HELP: +random-id+
 { $description "Factor chooses a random number and tries to insert the tuple into the database with this number as its primary key. The default number of retries to find a unique random number is 10, though in practice it will almost certainly succeed on the first try." } ;
-
-HELP: +serial+
-{ $description "" } ;
-
-HELP: +unique+
-{ $description "" } ;
 
 HELP: +user-assigned-id+
 { $description "The user is responsible for choosing a primary key for tuples inserted with this database type. Keys must be unique or else the database will throw an error. Usually it is better to use a " { $link +db-assigned-id+ } "." } ;
 
 HELP: <generator-bind>
-{ $description "" } ;
+{ $values { "slot-name" object } { "key" object } { "generator-singleton" object } { "type" object } { "generator-bind" generator-bind } }
+{ $description "An internal constructor for creating objects containing parameters used for binding generated values to a tuple query." } ;
 
 HELP: <literal-bind>
-{ $description "" } ;
-
-HELP: <low-level-binding>
-{ $description "" } ;
+{ $values { "key" object } { "type" object } { "value" object } { "literal-bind" literal-bind } }
+{ $description "An internal constructor for creating objects containing parameters used for binding literal values to a tuple query." } ;
 
 HELP: BIG-INTEGER
 { $description "A 64-bit integer. Whether this number is signed or unsigned depends on the database backend." } ;
@@ -111,19 +95,13 @@ HELP: user-assigned-id-spec?
 
 HELP: bind#
 { $values
-     { "spec" null } { "obj" object } }
-{ $description "" } ;
+     { "spec" "a sql spec" } { "obj" object } }
+{ $description "A generic word that lets a database construct a literal binding." } ;
 
 HELP: bind%
 { $values
-     { "spec" null } }
-{ $description "" } ;
-
-HELP: compound
-{ $values
-     { "string" string } { "obj" object }
-     { "hash" hashtable } }
-{ $description "" } ;
+     { "spec" "a sql spec" } }
+{ $description "A generic word that lets a database output a binding." } ;
 
 HELP: db-assigned-id-spec?
 { $values
@@ -138,44 +116,11 @@ HELP: find-primary-key
 { $description "Returns the rows from the sql-specs array that are part of the primary key. Composite primary keys are supported, so this word must return a sequence." }
 { $notes "This is a low-level word." } ;
 
-HELP: generator-bind
-{ $description "" } ;
-
 HELP: get-slot-named
 { $values
      { "name" "a slot name" } { "tuple" tuple }
      { "value" "the value stored in the slot" } }
 { $description "Returns the value stored in a tuple slot, where the tuple slot is a string." } ;
-
-HELP: literal-bind
-{ $description "" } ;
-
-HELP: lookup-create-type
-{ $values
-     { "obj" object }
-     { "string" string } }
-{ $description "" } ;
-
-HELP: lookup-modifier
-{ $values
-     { "obj" object }
-     { "string" string } }
-{ $description "" } ;
-
-HELP: lookup-type
-{ $values
-     { "obj" object }
-     { "string" string } }
-{ $description "" } ;
-
-HELP: low-level-binding
-{ $description "" } ;
-
-HELP: modifiers
-{ $values
-     { "spec" null }
-     { "string" string } }
-{ $description "" } ;
 
 HELP: no-sql-type
 { $values
@@ -184,8 +129,8 @@ HELP: no-sql-type
 
 HELP: normalize-spec
 { $values
-     { "spec" null } }
-{ $description "" } ;
+     { "spec" "a sql spec" } }
+{ $description "Normalizes a sql spec." } ;
 
 HELP: offset-of-slot
 { $values
@@ -193,58 +138,20 @@ HELP: offset-of-slot
      { "n" integer } }
 { $description "Returns the offset of a tuple slot accessed by name." } ;
 
-HELP: persistent-table
-{ $values
-    
-     { "hash" hashtable } }
-{ $description "" } ;
-
 HELP: primary-key?
 { $values
-     { "spec" null }
+     { "spec" "a sql spec" }
      { "?" "a boolean" } }
-{ $description "" } ;
+{ $description "Returns true if a sql spec is a primary key." } ;
 
 HELP: random-id-generator
-{ $description "" } ;
+{ $description "Used to tell " { $link eval-generator } " to generate a random number for use as a key." } ;
 
 HELP: relation?
 { $values
-     { "spec" null }
+     { "spec" "a sql spec" }
      { "?" "a boolean" } }
-{ $description "" } ;
-
-HELP: remove-db-assigned-id
-{ $values
-     { "specs" null }
-     { "obj" object } }
-{ $description "" } ;
-
-HELP: remove-id
-{ $values
-     { "specs" null }
-     { "obj" object } }
-{ $description "" } ;
-
-HELP: remove-relations
-{ $values
-     { "specs" null }
-     { "newcolumns" null } }
-{ $description "" } ;
-
-HELP: set-slot-named
-{ $values
-     { "value" null } { "name" null } { "obj" object } }
-{ $description "" } ;
-
-HELP: spec>tuple
-{ $values
-     { "class" class } { "spec" null }
-     { "tuple" null } }
-{ $description "" } ;
-
-HELP: sql-spec
-{ $description "" } ;
+{ $description "Returns true if a sql spec is a relation." } ;
 
 HELP: unknown-modifier
 { $values { "modifier" string } }

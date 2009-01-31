@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences kernel sets namespaces accessors assocs
 arrays combinators continuations columns math vectors
-stack-checker.branches
+grouping stack-checker.branches
 compiler.tree
 compiler.tree.def-use
 compiler.tree.combinators ;
@@ -175,7 +175,7 @@ M: #branch check-stack-flow*
     branch-out get [ ] find nip swap head* >vector datastack set ;
 
 M: #phi check-stack-flow*
-    branch-out get [ ] contains? [
+    branch-out get [ ] any? [
         [ check-phi-in ] [ set-phi-datastack ] [ check-out-d ] tri
     ] [ drop terminated? on ] if ;
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators generic assocs help http io io.styles
+USING: combinators generic assocs io io.styles
 io.files continuations io.streams.string kernel math math.order
 math.parser namespaces make quotations assocs sequences strings
 words html.elements xml.entities sbufs continuations destructors
@@ -55,7 +55,7 @@ TUPLE: html-sub-stream < html-stream style parent ;
 
 : hex-color, ( color -- )
     [ red>> ] [ green>> ] [ blue>> ] tri
-    [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] tri@ ;
+    [ 255 * >fixnum >hex 2 CHAR: 0 pad-head % ] tri@ ;
 
 : fg-css, ( color -- )
     "color: #" % hex-color, "; " % ;

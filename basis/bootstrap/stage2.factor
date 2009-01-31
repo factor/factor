@@ -1,11 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors init namespaces words io
+USING: accessors init namespaces words words.symbol io
 kernel.private math memory continuations kernel io.files
-io.backend system parser vocabs sequences
+io.pathnames io.backend system parser vocabs sequences
 vocabs.loader combinators splitting source-files strings
-definitions assocs compiler.errors compiler.units
-math.parser generic sets command-line ;
+definitions assocs compiler.errors compiler.units math.parser
+generic sets command-line ;
 IN: bootstrap.stage2
 
 SYMBOL: core-bootstrap-time
@@ -13,7 +13,7 @@ SYMBOL: core-bootstrap-time
 SYMBOL: bootstrap-time
 
 : default-image-name ( -- string )
-    vm file-name os windows? [ "." split1 drop ] when
+    vm file-name os windows? [ "." split1-last drop ] when
     ".image" append resource-path ;
 
 : do-crossref ( -- )
@@ -42,7 +42,7 @@ SYMBOL: bootstrap-time
     "Core bootstrap completed in " write core-bootstrap-time get print-time
     "Bootstrap completed in "      write bootstrap-time      get print-time
 
-    [ compiled>> ] count-words " compiled words" print
+    [ optimized>> ] count-words " compiled words" print
     [ symbol? ] count-words " symbol words" print
     [ ] count-words " words total" print
 
@@ -102,6 +102,8 @@ SYMBOL: bootstrap-time
     ] if
 ] [
     drop
-    load-help? off
-    "resource:basis/bootstrap/bootstrap-error.factor" run-file
+    [
+        load-help? off
+        "resource:basis/bootstrap/bootstrap-error.factor" run-file
+    ] with-scope
 ] recover

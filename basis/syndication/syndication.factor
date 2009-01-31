@@ -1,15 +1,15 @@
 ! Copyright (C) 2006 Chris Double, Daniel Ehrenberg.
 ! Portions copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: xml.utilities kernel assocs xml.generator math.order
+USING: xml.utilities kernel assocs math.order
     strings sequences xml.data xml.writer
-    io.streams.string combinators xml xml.entities io.files io
-    http.client namespaces make xml.generator hashtables
+    io.streams.string combinators xml xml.entities.html io.files io
+    http.client namespaces make xml.literals hashtables
     calendar.format accessors continuations urls present ;
 IN: syndication
 
 : any-tag-named ( tag names -- tag-inside )
-    f -rot [ tag-named nip dup ] with find 2drop ;
+    [ f ] 2dip [ tag-named nip dup ] with find 2drop ;
 
 TUPLE: feed title url entries ;
 
@@ -70,8 +70,8 @@ TUPLE: entry title url description date ;
     tri ;
 
 : atom-entry-link ( tag -- url/f )
-    "link" tags-named [ "rel" swap at "alternate" = ] find nip
-    dup [ "href" swap at >url ] when ;
+    "link" tags-named [ "rel" attr "alternate" = ] find nip
+    dup [ "href" attr >url ] when ;
 
 : atom1.0-entry ( tag -- entry )
     entry new
@@ -80,8 +80,8 @@ TUPLE: entry title url description date ;
         [ atom-entry-link >>url ]
         [
             { "content" "summary" } any-tag-named
-            dup children>> [ string? not ] contains?
-            [ children>> [ write-xml-chunk ] with-string-writer ]
+            dup children>> [ string? not ] any?
+            [ children>> xml>string ]
             [ children>string ] if >>description
         ]
         [
@@ -95,7 +95,7 @@ TUPLE: entry title url description date ;
     feed new
     swap
     [ "title" tag-named children>string >>title ]
-    [ "link" tag-named "href" swap at >url >>url ]
+    [ "link" tag-named "href" attr >url >>url ]
     [ "entry" tags-named [ atom1.0-entry ] map set-entries ]
     tri ;
 
@@ -114,26 +114,31 @@ TUPLE: entry title url description date ;
     http-get nip string>feed ;
 
 ! Atom generation
-: simple-tag, ( content name -- )
-    [ , ] tag, ;
 
-: simple-tag*, ( content name attrs -- )
-    [ , ] tag*, ;
-
-: entry, ( entry -- )
-    "entry" [
-        {
-            [ title>> "title" { { "type" "html" } } simple-tag*, ]
-            [ url>> present "href" associate "link" swap contained*, ]
-            [ date>> timestamp>rfc3339 "published" simple-tag, ]
-            [ description>> [ "content" { { "type" "html" } } simple-tag*, ] when* ]
-        } cleave
-    ] tag, ;
+: entry>xml ( entry -- xml )
+    {
+        [ title>> ]
+        [ url>> present ]
+        [ date>> timestamp>rfc3339 ]
+        [ description>> ]
+    } cleave
+    [XML
+        <entry>
+            <title type="html"><-></title>
+            <link href=<-> />
+            <published><-></published>
+            <content type="html"><-></content>
+        </entry>
+    XML] ;
 
 : feed>xml ( feed -- xml )
-    "feed" { { "xmlns" "http://www.w3.org/2005/Atom" } } [
-        [ title>> "title" simple-tag, ]
-        [ url>> present "href" associate "link" swap contained*, ]
-        [ entries>> [ entry, ] each ]
-        tri
-    ] make-xml* ;
+    [ title>> ]
+    [ url>> present ]
+    [ entries>> [ entry>xml ] map ] tri
+    <XML
+        <feed xmlns="http://www.w3.org/2005/Atom">
+            <title><-></title>
+            <link href=<-> />
+            <->
+        </feed>
+    XML> ;

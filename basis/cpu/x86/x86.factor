@@ -21,7 +21,7 @@ HOOK: param-reg-2 cpu ( -- reg )
 
 M: x86 %load-immediate MOV ;
 
-M: x86 %load-indirect swap 0 MOV rc-absolute-cell rel-immediate ;
+M: x86 %load-reference swap 0 MOV rc-absolute-cell rel-immediate ;
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
@@ -188,7 +188,7 @@ M:: x86 %integer>bignum ( dst src temp -- )
     [
         "end" define-label
         ! Load cached zero value
-        dst 0 >bignum %load-indirect
+        dst 0 >bignum %load-reference
         src 0 CMP
         ! Is it zero? Then just go to the end and return this zero
         "end" get JE

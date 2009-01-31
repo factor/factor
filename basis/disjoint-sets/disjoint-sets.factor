@@ -60,8 +60,8 @@ GENERIC: add-atom ( a disjoint-set -- )
 
 M: disjoint-set add-atom
     [ dupd parents>> set-at ]
-    [ 0 -rot ranks>> set-at ]
-    [ 1 -rot counts>> set-at ]
+    [ [ 0 ] 2dip ranks>> set-at ]
+    [ [ 1 ] 2dip counts>> set-at ]
     2tri ;
 
 : add-atoms ( seq disjoint-set -- ) '[ _ add-atom ] each ;

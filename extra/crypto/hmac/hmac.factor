@@ -10,15 +10,15 @@ IN: crypto.hmac
     initialize-sha1 process-sha1-block
     stream>sha1 get-sha1
     initialize-sha1
-    >r process-sha1-block r>
-    process-sha1-block get-sha1 ;
+    [ process-sha1-block ]
+    [ process-sha1-block ] bi* get-sha1 ;
 
 : md5-hmac ( Ko Ki -- hmac )
     initialize-md5 process-md5-block
     stream>md5 get-md5
     initialize-md5
-    >r process-md5-block r>
-    process-md5-block get-md5 ;
+    [ process-md5-block ]
+    [ process-md5-block ] bi* get-md5 ;
 
 : seq-bitxor ( seq seq -- seq )
     [ bitxor ] 2map ;
@@ -27,7 +27,7 @@ MEMO: ipad ( -- seq ) 64 HEX: 36 <array> ;
 MEMO: opad ( -- seq ) 64 HEX: 5c <array> ;
 
 : init-hmac ( K -- o i )
-    64 0 pad-right 
+    64 0 pad-tail 
     [ opad seq-bitxor ] keep
     ipad seq-bitxor ;
 

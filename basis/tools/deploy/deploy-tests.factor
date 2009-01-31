@@ -1,18 +1,10 @@
 IN: tools.deploy.tests
-USING: tools.test system io.files kernel tools.deploy.config
+USING: tools.test system io.pathnames io.files io.files.info
+io.files.temp kernel tools.deploy.config
 tools.deploy.config.editor tools.deploy.backend math sequences
 io.launcher arrays namespaces continuations layouts accessors
-io.encodings.ascii urls math.parser ;
-
-: shake-and-bake ( vocab -- )
-    [ "test.image" temp-file delete-file ] ignore-errors
-    "resource:" [
-        [ vm "test.image" temp-file ] dip
-        dup deploy-config make-deploy-image
-    ] with-directory ;
-
-: small-enough? ( n -- ? )
-    [ "test.image" temp-file file-info size>> ] [ cell 4 / * ] bi* <= ;
+io.encodings.ascii urls math.parser io.directories
+tools.deploy.test ;
 
 [ t ] [ "hello-world" shake-and-bake 500000 small-enough? ] unit-test
 
@@ -34,11 +26,6 @@ io.encodings.ascii urls math.parser ;
 os macosx? [
     [ t ] [ "webkit-demo" shake-and-bake 500000 small-enough? ] unit-test
 ] when
-
-: run-temp-image ( -- )
-    vm
-    "-i=" "test.image" temp-file append
-    2array try-process ;
 
 {
     "tools.deploy.test.1"
@@ -105,5 +92,15 @@ M: quit-responder call-responder*
 
 [ ] [
     "tools.deploy.test.8" shake-and-bake
+    run-temp-image
+] unit-test
+
+[ ] [
+    "tools.deploy.test.9" shake-and-bake
+    run-temp-image
+] unit-test
+
+[ ] [
+    "tools.deploy.test.10" shake-and-bake
     run-temp-image
 ] unit-test

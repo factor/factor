@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: alien arrays byte-arrays combinators summary io.backend
+USING: alien arrays byte-arrays combinators summary
 graphics.viewer io io.binary io.files kernel libc math
 math.functions math.bitwise namespaces opengl opengl.gl
 prettyprint sequences strings ui ui.gadgets.panes fry
@@ -91,7 +91,7 @@ M: bitmap-magic summary
     dup color-index-length read >>color-index drop ;
 
 : load-bitmap ( path -- bitmap )
-    normalize-path binary [
+    binary [
         bitmap new
             dup parse-file-header
             dup parse-bitmap-header

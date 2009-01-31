@@ -10,8 +10,8 @@ C: <tree-node> tree-node
     dup 0 > [
         1 -
         [ drop ]
-        [ >r 2 * 1 - r> bottom-up-tree ]
-        [ >r 2 *     r> bottom-up-tree ] 2tri
+        [ [ 2 * 1 - ] dip bottom-up-tree ]
+        [ [ 2 *     ] dip bottom-up-tree ] 2tri
     ] [
         drop f f
     ] if <tree-node> ; inline recursive

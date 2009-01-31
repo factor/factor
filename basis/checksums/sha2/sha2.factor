@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel splitting grouping math sequences namespaces make
-io.binary symbols math.bitwise checksums checksums.common
+io.binary math.bitwise checksums checksums.common
 sbufs strings ;
 IN: checksums.sha2
 
@@ -62,7 +62,7 @@ SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
     [ + + w+ ] 2dip swap set-nth ; inline
 
 : prepare-message-schedule ( seq -- w-seq )
-    word-size get group [ be> ] map block-size get 0 pad-right
+    word-size get group [ be> ] map block-size get 0 pad-tail
     dup 16 64 dup <slice> [
         process-M-256
     ] with each ;

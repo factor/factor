@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io.encodings.ascii sequences generalizations
-math.parser combinators kernel memoize csv symbols summary
-words accessors math.order binary-search ;
+math.parser combinators kernel memoize csv summary
+words accessors math.order binary-search combinators.smart ;
 IN: usa-cities
 
 SINGLETONS: AK AL AR AS AZ CA CO CT DC DE FL GA HI IA ID IL IN
@@ -30,15 +30,17 @@ first-zip name state latitude longitude gmt-offset dst-offset ;
 MEMO: cities ( -- seq )
     "resource:extra/usa-cities/zipcode.csv" ascii <file-reader>
     csv rest-slice [
-        7 firstn {
-            [ string>number ]
-            [ ]
-            [ string>state ]
-            [ string>number ]
-            [ string>number ]
-            [ string>number ]
-            [ string>number ]
-        } spread city boa
+        [
+            {
+                [ string>number ]
+                [ ]
+                [ string>state ]
+                [ string>number ]
+                [ string>number ]
+                [ string>number ]
+                [ string>number ]
+            } spread
+        ] input<sequence city boa
     ] map ;
 
 MEMO: cities-named ( name -- cities )

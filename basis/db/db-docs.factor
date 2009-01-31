@@ -1,20 +1,20 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes kernel help.markup help.syntax sequences
-alien assocs strings math multiline quotations ;
+alien assocs strings math multiline quotations db.private ;
 IN: db
 
-HELP: db
-{ $description "The " { $snippet "db" } " class is the superclass of all other database classes. It stores a " { $snippet "handle" } " to the database as well as insert, update, and delete queries." } ;
+HELP: db-connection
+{ $description "The " { $snippet "db-connection" } " class is the superclass of all other database classes. It stores a " { $snippet "handle" } " to the database as well as insert, update, and delete queries. Stores the current database object as a dynamic variable." } ;
 
-HELP: new-db
-{ $values { "class" class } { "obj" object } }
+HELP: new-db-connection
+{ $values { "class" class } { "obj" db-connection } }
 { $description "Creates a new database object from a given class with caches for prepared statements. Does not actually connect to the database until " { $link db-open } " or " { $link with-db } " is called." }
 { $notes "User-defined databases must call this constructor word instead of " { $link new } "." } ;
 
 HELP: db-open
-{ $values { "db" db } { "db" db } }
-{ $description "Opens a database using the configuration data stored in a " { $link db } " tuple. The database object now references a database handle that must be cleaned up. Therefore, it is better to use the " { $link with-db } " combinator than calling this word directly." } ;
+{ $values { "db" "a database configuration object" } { "db-connection" db-connection } }
+{ $description "Opens a database using the configuration data stored in a " { $snippet "database configuration object" } "tuple. The database object now references a database handle that must be cleaned up. Therefore, it is better to use the " { $link with-db } " combinator than calling this word directly." } ;
 
 HELP: db-close
 { $values { "handle" alien } }
@@ -141,13 +141,13 @@ HELP: rollback-transaction
 HELP: sql-command
 { $values
      { "sql" string } }
-{ $description "Executes a SQL string using the databse in the " { $link db } " symbol." } ;
+{ $description "Executes a SQL string using the databse in the " { $link db-connection } " symbol." } ;
 
 HELP: sql-query
 { $values
      { "sql" string }
      { "rows" "an array of arrays of strings" } }
-{ $description "Runs a SQL query of raw text in the database in the " { $link db } " symbol. Each row is returned as an array of strings; no type-conversions are done on the resulting data." } ;
+{ $description "Runs a SQL query of raw text in the database in the " { $link db-connection } " symbol. Each row is returned as an array of strings; no type-conversions are done on the resulting data." } ;
 
 { sql-command sql-query } related-words
 
@@ -167,13 +167,13 @@ HELP: sql-row-typed
 
 HELP: with-db
 { $values
-     { "db" db } { "quot" quotation } }
-{ $description "Calls the quotation with a database bound to the " { $link db } " symbol. See " { $link "db-custom-database-combinators" } " for help setting up database access." } ;
+     { "db" "a database configuration object" } { "quot" quotation } }
+{ $description "Calls the quotation with a database bound to the " { $link db-connection } " symbol. See " { $link "db-custom-database-combinators" } " for help setting up database access." } ;
 
 HELP: with-transaction
 { $values
      { "quot" quotation } }
-{ $description "" } ;
+{ $description "Calls the quotation inside a database transaction and commits the result to the database after the quotation finishes. If the quotation throws an error, the transaction is aborted." } ;
 
 ARTICLE: "db" "Database library"
 "Accessing a database:"
@@ -244,13 +244,13 @@ ARTICLE: "db-protocol" "Low-level database protocol"
 ! { $subsection bind-tuple }
 
 ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
-"Although Factor makes integrating a database with its object system easy (see " { $vocab-link "db.tuples" } "), sometimes you may want to write SQL directly and get the results back as arrays of strings, for instance, when interfacing with a legacy database that doesn't easily map to " { $snippet "tuples" } "."
+"Although Factor makes integrating a database with its object system easy (see " { $vocab-link "db.tuples" } "), sometimes you may want to write SQL directly and get the results back as arrays of strings, for instance, when interfacing with a legacy database that doesn't easily map to " { $snippet "tuples" } "." $nl
 "Executing a SQL command:"
 { $subsection sql-command }
 "Executing a query directly:"
 { $subsection sql-query }
 "Here's an example usage where we'll make a book table, insert some objects, and query them." $nl
-"First, let's set up a custom combinator for using our database.  See " { $link "db-custom-database-combinators" } " for more details."
+"First, let's set up a custom combinator for using our database. See " { $link "db-custom-database-combinators" } " for more details."
 { $code <"
 USING: db.sqlite db io.files ;
 : with-book-db ( quot -- )

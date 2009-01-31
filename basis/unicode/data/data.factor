@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit assocs math kernel sequences
-io.files hashtables quotations splitting grouping arrays
+io.files hashtables quotations splitting grouping arrays io
 math.parser hash2 math.order byte-arrays words namespaces words
 compiler.units parser io.encodings.ascii values interval-maps
-ascii sets combinators locals math.ranges sorting ;
+ascii sets combinators locals math.ranges sorting make
+strings.parser io.encodings.utf8 ;
 IN: unicode.data
 
 VALUE: simple-lower
@@ -23,14 +24,10 @@ VALUE: properties
 : combine-chars ( a b -- char/f ) combine-map hash2 ;
 : compatibility-entry ( char -- seq ) compatibility-map at  ;
 : combining-class ( char -- n ) class-map at ;
-: non-starter? ( char -- ? ) class-map key? ;
-: name>char ( string -- char ) name-map at ;
-: char>name ( char -- string ) name-map value-at ;
+: non-starter? ( char -- ? ) combining-class { 0 f } member? not ;
+: name>char ( name -- char ) name-map at ;
+: char>name ( char -- name ) name-map value-at ;
 : property? ( char property -- ? ) properties at interval-key? ;
-
-! Convenience functions
-: ?between? ( n/f from to -- ? )
-    pick [ between? ] [ 3drop f ] if ;
 
 ! Loading data from UnicodeData.txt
 
@@ -70,10 +67,20 @@ VALUE: properties
     5 swap (process-data)
     [ " " split [ hex> ] map ] assoc-map ;
 
+: exclusions-file ( -- filename )
+    "resource:basis/unicode/data/CompositionExclusions.txt" ;
+
+: exclusions ( -- set )
+    exclusions-file utf8 file-lines
+    [ "#" split1 drop [ blank? ] trim-tail hex> ] map harvest ;
+
+: remove-exclusions ( alist -- alist )
+    exclusions [ dup ] H{ } map>assoc assoc-diff ;
+
 : process-canonical ( data -- hash2 hash )
     (process-decomposed) [ first* ] filter
     [
-        [ second length 2 = ] filter
+        [ second length 2 = ] filter remove-exclusions
         ! using 1009 as the size, the maximum load is 4
         [ first2 first2 rot 3array ] map 1009 alist>hash2
     ] [ >hashtable chain-decomposed ] bi ;
@@ -102,6 +109,7 @@ VALUE: properties
       "Cc" "Cf" "Cs" "Co" } ;
 
 : num-chars HEX: 2FA1E ;
+
 ! the maximum unicode char in the first 3 planes
 
 : ?set-nth ( val index seq -- )
@@ -121,12 +129,9 @@ VALUE: properties
             cat categories index char table ?set-nth
         ] assoc-each table fill-ranges ] ;
 
-: ascii-lower ( string -- lower )
-    [ dup CHAR: A CHAR: Z between? [ HEX: 20 + ] when ] map ;
-
 : process-names ( data -- names-hash )
     1 swap (process-data) [
-        ascii-lower { { CHAR: \s CHAR: - } } substitute swap
+        >lower { { CHAR: \s CHAR: - } } substitute swap
     ] H{ } assoc-map-as ;
 
 : multihex ( hexstring -- string )
@@ -176,6 +181,44 @@ load-data {
     [ process-category to: category-map ]
 } cleave
 
+: postprocess-class ( -- )
+    combine-map [ [ second ] map ] map concat
+    [ combining-class not ] filter
+    [ 0 swap class-map set-at ] each ;
+
+postprocess-class
+
 load-special-casing to: special-casing
 
 load-properties to: properties
+
+! Utility to load resource files that look like Scripts.txt
+
+SYMBOL: interned
+
+: parse-script ( stream -- assoc )
+    ! assoc is code point/range => name
+    lines filter-comments [ split-; ] map ;
+
+: range, ( value key -- )
+    swap interned get
+    [ = ] with find nip 2array , ;
+
+: expand-ranges ( assoc -- interval-map )
+    [
+        [
+            swap CHAR: . over member? [
+                ".." split1 [ hex> ] bi@ 2array
+            ] [ hex> ] if range,
+        ] assoc-each
+    ] { } make <interval-map> ;
+
+: process-script ( ranges -- table )
+    dup values prune interned
+    [ expand-ranges ] with-variable ;
+
+: load-script ( filename -- table )
+    ascii <file-reader> parse-script process-script ;
+
+[ name>char [ "Invalid character" throw ] unless* ]
+name>char-hook set-global

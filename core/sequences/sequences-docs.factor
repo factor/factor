@@ -191,6 +191,10 @@ HELP: exchange-unsafe
 { $values { "m" "a non-negative integer" } { "n" "a non-negative integer" } { "seq" "a mutable sequence" } }
 { $description "Unsafe variant of " { $link exchange } " that does not perform bounds checks." } ;
 
+HELP: first-unsafe
+{ $values { "seq" sequence } { "first" "the first element" } }
+{ $contract "Unsafe variant of " { $link first } " that does not perform bounds checks." } ;
+
 HELP: first2-unsafe
 { $values { "seq" sequence } { "first" "the first element" } { "second" "the second element" } }
 { $contract "Unsafe variant of " { $link first2 } " that does not perform bounds checks." } ;
@@ -334,6 +338,10 @@ HELP: 2each
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- )" } } }
 { $description "Applies the quotation to pairs of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } "." } ;
 
+HELP: 3each
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "quot" { $quotation "( elt1 elt2 elt3 -- )" } } }
+{ $description "Applies the quotation to triples of elements from " { $snippet "seq1" } ", " { $snippet "seq2" } " and " { $snippet "seq3" } "." } ;
+
 HELP: 2reduce
 { $values { "seq1" sequence }
           { "seq2" sequence }
@@ -346,9 +354,17 @@ HELP: 2map
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- new )" } } { "newseq" "a new sequence" } }
 { $description "Applies the quotation to each pair of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "seq1" } "." } ;
 
+HELP: 3map
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "quot" { $quotation "( elt1 elt2 elt3 -- new )" } } { "newseq" "a new sequence" } }
+{ $description "Applies the quotation to each triple of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "seq1" } "." } ;
+
 HELP: 2map-as
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- new )" } } { "exemplar" sequence } { "newseq" "a new sequence" } }
 { $description "Applies the quotation to each pair of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "exemplar" } "." } ;
+
+HELP: 3map-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "quot" { $quotation "( elt1 elt2 elt3 -- new )" } } { "exemplar" sequence } { "newseq" "a new sequence" } }
+{ $description "Applies the quotation to each triple of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: 2all?
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" { $quotation "( elt1 elt2 -- ? )" } } { "?" "a boolean" } }
@@ -377,7 +393,7 @@ HELP: find-last-from
 { $values { "n" "a starting index" } { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "i" "the index of the first match, or f" } { "elt" "the first matching element, or " { $link f } } }
 { $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of f and " { $link f } " as the element." } ;
 
-HELP: contains?
+HELP: any?
 { $values { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the sequence contains an element satisfying the predicate, by applying the predicate to each element in turn until a true value is found. If the sequence is empty or if the end of the sequence is reached, outputs " { $link f } "." } ;
 
@@ -398,18 +414,6 @@ HELP: filter-here
 { $values { "seq" "a resizable mutable sequence" } { "quot" { $quotation "( elt -- ? )" } } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
 { $side-effects "seq" } ;
-
-HELP: monotonic?
-{ $values { "seq" sequence } { "quot" { $quotation "( elt elt -- ? )" } } { "?" "a boolean" } }
-{ $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
-{ $examples
-    "Testing if a sequence is non-decreasing:"
-    { $example "USING: math prettyprint sequences ;" "{ 1 1 2 } [ <= ] monotonic? ." "t" }
-    "Testing if a sequence is decreasing:"
-    { $example "USING: math prettyprint sequences ;" "{ 9 8 6 7 } [ < ] monotonic? ." "f" }
-} ;
-
-{ monotonic? all-eq? all-equal? } related-words
 
 HELP: interleave
 { $values { "seq" sequence } { "between" "a quotation" } { "quot" { $quotation "( elt -- )" } } }
@@ -549,14 +553,6 @@ HELP: pop
 { $side-effects "seq" }
 { $errors "Throws an error if the sequence is empty." } ;
 
-HELP: all-equal?
-{ $values { "seq" sequence } { "?" "a boolean" } }
-{ $description "Tests if all elements in the sequence are equal. Yields true with an empty sequence." } ;
-
-HELP: all-eq?
-{ $values { "seq" sequence } { "?" "a boolean" } }
-{ $description "Tests if all elements in the sequence are the same identical object. Yields true with an empty sequence." } ;
-
 HELP: mismatch
 { $values { "seq1" sequence } { "seq2" sequence } { "i" "an index" } }
 { $description "Compares pairs of elements up to the minimum of the sequences' lengths, outputting the first index where the two sequences have non-equal elements, or " { $link f } " if all tested elements were equal." } ;
@@ -579,15 +575,15 @@ HELP: padding
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "quot" { $quotation "( seq1 seq2 -- newseq )" } } { "newseq" "a new sequence" } }
 { $description "Outputs a new string sequence of " { $snippet "elt" } " repeated, that when appended to " { $snippet "seq" } ", yields a sequence of length " { $snippet "n" } ". If the length of " { $snippet "seq" } " is greater than " { $snippet "n" } ", this word outputs an empty sequence." } ;
 
-HELP: pad-left
+HELP: pad-head
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "padded" "a new sequence" } }
 { $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the left with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
-{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-left print ] each" "---ab\n-quux" } } ;
+{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-head print ] each" "---ab\n-quux" } } ;
 
-HELP: pad-right
+HELP: pad-tail
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "padded" "a new sequence" } }
 { $description "Outputs a new sequence consisting of " { $snippet "seq" } " padded on the right with enough repetitions of " { $snippet "elt" } " to have the result be of length " { $snippet "n" } "." }
-{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-right print ] each" "ab---\nquux-" } } ;
+{ $examples { $example "USING: io sequences ;" "{ \"ab\" \"quux\" } [ 5 CHAR: - pad-tail print ] each" "ab---\nquux-" } } ;
 
 HELP: sequence=
 { $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
@@ -602,7 +598,7 @@ HELP: reverse
 
 { reverse <reversed> reverse-here } related-words
 
-HELP: <reversed> ( seq -- reversed )
+HELP: <reversed>
 { $values { "seq" sequence } { "reversed" "a new sequence" } }
 { $description "Creates an instance of the " { $link reversed } " class." }
 { $see-also "virtual-sequences" } ;
@@ -649,7 +645,7 @@ HELP: <slice>
 HELP: repetition
 { $class-description "A virtual sequence consisting of " { $snippet "elt" } " repeated " { $snippet "len" } " times. Repetitions are created by calling " { $link <repetition> } "." } ;
 
-HELP: <repetition> ( len elt -- repetition )
+HELP: <repetition>
 { $values { "len" "a non-negative integer" } { "elt" object } { "repetition" repetition } }
 { $description "Creates a new " { $link repetition } "." }
 { $examples
@@ -683,12 +679,28 @@ HELP: append
     }
 } ;
 
+HELP: append-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence of the same type as " { $snippet "exemplar" } " consisting of the elements of " { $snippet "seq1" } " followed by " { $snippet "seq2" } "." }
+{ $errors "Throws an error if " { $snippet "seq1" } " or " { $snippet "seq2" } " contain elements not permitted in sequences of the same class as " { $snippet "exemplar" } "." }
+{ $examples 
+    { $example "USING: prettyprint sequences ;"
+        "{ 1 2 } B{ 3 4 } B{ } append-as ."
+        "B{ 1 2 3 4 }"
+    }
+    { $example "USING: prettyprint sequences strings ;"
+        "\"go\" \"ing\" SBUF\" \" append-as ."
+        "SBUF\" going\""
+    }
+} ;
+
+{ append append-as } related-words
+
 HELP: prepend
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
 { $description "Outputs a new sequence of the same type as " { $snippet "seq2" } " consisting of the elements of " { $snippet "seq2" } " followed by " { $snippet "seq1" } "." }
 { $errors "Throws an error if " { $snippet "seq1" } " contains elements not permitted in sequences of the same class as " { $snippet "seq2" } "." }
-{ $examples 
-    { $example "USING: prettyprint sequences ;"
+{ $examples { $example "USING: prettyprint sequences ;"
         "{ 1 2 } B{ 3 4 } prepend ."
         "B{ 3 4 1 2 }"
     }
@@ -708,6 +720,19 @@ HELP: 3append
         "\"abc\""
     }
 } ;
+
+HELP: 3append-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "exemplar" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence consisting of the elements of " { $snippet "seq1" } ", " { $snippet "seq2" } " and " { $snippet "seq3" } " in turn of the same type as " { $snippet "exemplar" } "." }
+{ $errors "Throws an error if " { $snippet "seq1" } ", " { $snippet "seq2" } ", or " { $snippet "seq3" } " contain elements not permitted in sequences of the same class as " { $snippet "exemplar" } "." }
+{ $examples
+    { $example "USING: prettyprint sequences ;"
+        "\"a\" \"b\" \"c\" SBUF\" \" 3append-as ."
+        "SBUF\" abc\""
+    }
+} ;
+
+{ 3append 3append-as } related-words
 
 HELP: surround
 { $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "newseq" sequence } }
@@ -895,6 +920,16 @@ HELP: produce
     { $unchecked-example "USING: kernel prettyprint random sequences ;" "[ 10 random dup 1 > ] [ ] [ drop ] produce ." "{ 8 2 2 9 }" }
 } ;
 
+HELP: produce-as
+{ $values { "pred" { $quotation "( -- ? )" } } { "quot" { $quotation "( -- obj )" } } { "tail" "a quotation" } { "exemplar" sequence } { "seq" "a sequence" } }
+{ $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence of type " { $snippet "exemplar" } " at the end." }
+{ $examples
+    "The following example divides a number by two until we reach zero, and accumulates intermediate results:"
+    { $example "USING: kernel math prettyprint sequences ;" "1337 [ dup 0 > ] [ 2/ dup ] [ ] V{ } produce-as nip ." "V{ 668 334 167 83 41 20 10 5 2 1 0 }" }
+    "The " { $snippet "tail" } " quotation is used when the predicate produces more than one output value. In this case, we have to drop this value even if the predicate fails in order for stack inference to calculate a stack effect for the " { $link produce } " call:"
+    { $unchecked-example "USING: kernel prettyprint random sequences ;" "[ 10 random dup 1 > ] [ ] [ drop ] B{ } produce-as ." "B{ 8 2 2 9 }" }
+} ;
+
 HELP: sigma
 { $values { "seq" sequence } { "quot" quotation } { "n" number } }
 { $description "Like map sum, but without creating an intermediate sequence." }
@@ -925,43 +960,43 @@ HELP: pusher
 }
 { $notes "Used to implement the " { $link filter } " word." } ;
 
-HELP: trim-left
+HELP: trim-head
 { $values
      { "seq" sequence } { "quot" quotation }
      { "newseq" sequence } }
 { $description "Removes elements starting from the left side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
 { $example "" "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-left ."
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-head ."
            "{ 1 2 3 0 0 }"
 } ;
 
-HELP: trim-left-slice
+HELP: trim-head-slice
 { $values
      { "seq" sequence } { "quot" quotation }
      { "slice" slice } }
 { $description "Removes elements starting from the left side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice" }
 { $example "" "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-left-slice ."
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-head-slice ."
            "T{ slice { from 2 } { to 7 } { seq { 0 0 1 2 3 0 0 } } }"
 } ;
 
-HELP: trim-right
+HELP: trim-tail
 { $values
      { "seq" sequence } { "quot" quotation }
      { "newseq" sequence } }
 { $description "Removes elements starting from the right side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
 { $example "" "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-right ."
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-tail ."
            "{ 0 0 1 2 3 }"
 } ;
 
-HELP: trim-right-slice
+HELP: trim-tail-slice
 { $values
      { "seq" sequence } { "quot" quotation }
      { "slice" slice } }
 { $description "Removes elements starting from the right side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice." }
 { $example "" "USING: prettyprint math sequences ;"
-           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-right-slice ."
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-tail-slice ."
            "T{ slice { from 0 } { to 5 } { seq { 0 0 1 2 3 0 0 } } }"
 } ;
 
@@ -985,7 +1020,7 @@ HELP: trim-slice
            "T{ slice { from 2 } { to 5 } { seq { 0 0 1 2 3 0 0 } } }"
 } ;
 
-{ trim trim-slice trim-left trim-left-slice trim-right trim-right-slice } related-words
+{ trim trim-slice trim-head trim-head-slice trim-tail trim-tail-slice } related-words
 
 HELP: sift
 { $values
@@ -1061,7 +1096,7 @@ HELP: set-fourth
 
 HELP: replicate
 { $values
-     { "seq" sequence } { "quot" quotation }
+     { "seq" sequence } { "quot" { $quotation "( -- elt )" } }
      { "newseq" sequence } }
 { $description "Calls the quotation for every element of the sequence in order. However, the element is not passed to the quotation -- it is dropped, and the quotation produces an element of its own that is collected into a sequence of the same class as the input sequence." }
 { $examples 
@@ -1107,15 +1142,6 @@ HELP: virtual@
      { "n" integer } { "seq" sequence }
      { "n'" integer } { "seq'" sequence } }
 { $description "Part of the sequence protocol, this word translates the input index " { $snippet "n" } " into an index into the underlying storage returned by " { $link virtual-seq } "." } ;
-
-HELP: 2change-each
-{ $values
-     { "seq1" sequence } { "seq2" sequence } { "quot" quotation } }
-{ $description "Calls the quotation on subsequent pairs of objects from the two input sequences. The resulting computation replaces the element in the first sequence." }
-{ $examples { $example "USING: kernel math sequences prettyprint ;"
-    "{ 10 20 30 } dup { 60 70 80 } [ + ] 2change-each ."
-    "{ 70 90 110 }"
-} } ;
 
 HELP: 2map-reduce
 { $values
@@ -1267,6 +1293,17 @@ HELP: shorten
     "V{ 1 2 3 }"
 } } ;
 
+HELP: iota
+{ $values { "n" integer } { "iota" iota } }
+{ $description "Creates an immutable virtual sequence containing the integers from 0 to " { $snippet "n-1" } "." }
+{ $examples
+  { $example
+    "USING: math sequences prettyprint ;"
+    "3 iota [ sq ] map ."
+    "{ 0 1 4 }"
+  }
+} ;
+
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
 "The " { $link nth-unsafe } " and " { $link set-nth-unsafe } " sequence protocol bypasses bounds checks for increased performance."
 $nl
@@ -1361,15 +1398,17 @@ ARTICLE: "sequences-reshape" "Reshaping sequences"
 
 ARTICLE: "sequences-appending" "Appending sequences"
 { $subsection append }
+{ $subsection append-as }
 { $subsection prepend }
 { $subsection 3append }
+{ $subsection 3append-as }
 { $subsection surround }
 { $subsection glue }
 { $subsection concat }
 { $subsection join }
 "A pair of words useful for aligning strings:"
-{ $subsection pad-left }
-{ $subsection pad-right } ;
+{ $subsection pad-head }
+{ $subsection pad-tail } ;
 
 ARTICLE: "sequences-slices" "Subsequences and slices"
 "Extracting a subsequence:"
@@ -1419,23 +1458,29 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection map-index }
 { $subsection accumulate }
 { $subsection produce }
+{ $subsection produce-as }
 "Filtering:"
 { $subsection push-if }
 { $subsection filter }
 "Testing if a sequence contains elements satisfying a predicate:"
-{ $subsection contains? }
+{ $subsection any? }
 { $subsection all? }
-"Testing how elements are related:"
-{ $subsection monotonic? }
-{ $subsection "sequence-2combinators" } ;
+{ $subsection "sequence-2combinators" }
+{ $subsection "sequence-3combinators" } ;
 
 ARTICLE: "sequence-2combinators" "Pair-wise sequence combinators"
-"There is a set of combinators which traverse two sequences pairwise. If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined."
+"There is a set of combinators which traverse two sequences pairwise. If one sequence is shorter than the other, then only the prefix having the length of the minimum of the two is examined."
 { $subsection 2each }
 { $subsection 2reduce }
 { $subsection 2map }
 { $subsection 2map-as }
 { $subsection 2all? } ;
+
+ARTICLE: "sequence-3combinators" "Triple-wise sequence combinators"
+"There is a set of combinators which traverse three sequences triple-wise. If one sequence is shorter than the others, then only the prefix having the length of the minimum of the three is examined."
+{ $subsection 3each }
+{ $subsection 3map }
+{ $subsection 3map-as } ;
 
 ARTICLE: "sequences-tests" "Testing sequences"
 "Testing for an empty sequence:"
@@ -1448,10 +1493,7 @@ ARTICLE: "sequences-tests" "Testing sequences"
 "Testing if a sequence contains a subsequence:"
 { $subsection head? }
 { $subsection tail? }
-{ $subsection subseq? }
-"Testing how elements are related:"
-{ $subsection all-eq? }
-{ $subsection all-equal? } ;
+{ $subsection subseq? } ;
 
 ARTICLE: "sequences-search" "Searching sequences"
 "Finding the index of an element:"
@@ -1471,12 +1513,12 @@ ARTICLE: "sequences-search" "Searching sequences"
 ARTICLE: "sequences-trimming" "Trimming sequences"
 "Trimming words:"
 { $subsection trim }
-{ $subsection trim-left }
-{ $subsection trim-right }
+{ $subsection trim-head }
+{ $subsection trim-tail }
 "Potentially more efficient trim:"
 { $subsection trim-slice }
-{ $subsection trim-left-slice }
-{ $subsection trim-right-slice } ;
+{ $subsection trim-head-slice }
+{ $subsection trim-tail-slice } ;
 
 ARTICLE: "sequences-destructive-discussion" "When to use destructive operations"
 "Constructive (non-destructive) operations should be preferred where possible because code without side-effects is usually more re-usable and easier to reason about. There are two main reasons to use destructive operations:"

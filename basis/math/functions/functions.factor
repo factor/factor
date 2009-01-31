@@ -46,7 +46,8 @@ M: real sqrt
 
 GENERIC# ^n 1 ( z w -- z^w )
 
-: (^n) 1 swap [ [ dupd * ] when [ sq ] dip ] each-bit nip ; inline
+: (^n) ( z w -- z^w )
+    1 swap [ [ dupd * ] when [ sq ] dip ] each-bit nip ; inline
 
 M: integer ^n
     [ factor-2s ] dip [ (^n) ] keep rot * shift ;
@@ -121,11 +122,9 @@ PRIVATE>
     [ * ] 2keep gcd nip /i ; foldable
 
 : mod-inv ( x n -- y )
-    tuck gcd 1 = [
-        dup 0 < [ + ] [ nip ] if
-    ] [
-        "Non-trivial divisor found" throw
-    ] if ; foldable
+    [ nip ] [ gcd 1 = ] 2bi
+    [ dup 0 < [ + ] [ nip ] if ]
+    [ "Non-trivial divisor found" throw ] if ; foldable
 
 : ^mod ( x y n -- z )
     over 0 < [

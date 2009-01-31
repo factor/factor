@@ -86,7 +86,7 @@ ARTICLE: "ssl-contexts" "Secure socket contexts"
 HELP: secure
 { $class-description "The class of secure socket addresses." } ;
 
-HELP: <secure> ( addrspec -- secure )
+HELP: <secure>
 { $values { "addrspec" "an address specifier" } { "secure" secure } }
 { $description "Creates a new secure socket address, which can then be passed to " { $link <client> } " or " { $link <server> } "." } ;
 

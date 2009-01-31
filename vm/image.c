@@ -26,6 +26,8 @@ INLINE void load_data_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 		p->tenured_size,
 		p->secure_gc);
 
+	clear_gc_stats();
+
 	F_ZONE *tenured = &data_heap->generations[TENURED];
 
 	F_FIXNUM bytes_read = fread((void*)tenured->start,1,h->data_size,file);
@@ -75,10 +77,10 @@ INLINE void load_code_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 /* This function also initializes the data and code heaps */
 void load_image(F_PARAMETERS *p)
 {
-	FILE *file = OPEN_READ(p->image);
+	FILE *file = OPEN_READ(p->image_path);
 	if(file == NULL)
 	{
-		print_string("Cannot open image file: "); print_native_string(p->image); nl();
+		print_string("Cannot open image file: "); print_native_string(p->image_path); nl();
 		print_string(strerror(errno)); nl();
 		exit(1);
 	}
@@ -103,7 +105,7 @@ void load_image(F_PARAMETERS *p)
 	relocate_code();
 
 	/* Store image path name */
-	userenv[IMAGE_ENV] = tag_object(from_native_string(p->image));
+	userenv[IMAGE_ENV] = tag_object(from_native_string(p->image_path));
 }
 
 /* Save the current image to disk */
@@ -311,18 +313,13 @@ void relocate_data()
 	}
 }
 
-void fixup_code_block(F_COMPILED *compiled, CELL code_start, CELL literals_start)
+void fixup_code_block(F_CODE_BLOCK *compiled)
 {
 	/* relocate literal table data */
-	CELL scan;
-	CELL literal_end = literals_start + compiled->literals_length;
-
 	data_fixup(&compiled->relocation);
+	data_fixup(&compiled->literals);
 
-	for(scan = literals_start; scan < literal_end; scan += CELLS)
-		data_fixup((CELL*)scan);
-
-	relocate_code_block(compiled,code_start,literals_start);
+	relocate_code_block(compiled);
 }
 
 void relocate_code()

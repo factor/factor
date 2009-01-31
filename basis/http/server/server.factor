@@ -12,9 +12,13 @@ io.encodings.utf8
 io.encodings.ascii
 io.encodings.binary
 io.streams.limited
+io.streams.string
 io.servers.connection
 io.timeouts
+io.crlf
 fry logging logging.insomniac calendar urls urls.encoding
+mime.multipart
+unicode.categories
 http
 http.parsers
 http.server.responses
@@ -23,8 +27,6 @@ html.templates
 html.elements
 html.streams ;
 IN: http.server
-
-\ parse-cookie DEBUG add-input-logging
 
 : check-absolute ( url -- url )
     dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
@@ -36,17 +38,34 @@ IN: http.server
 : read-request-header ( request -- request )
     read-header >>header ;
 
-: parse-post-data ( post-data -- post-data )
-    [ ] [ raw>> ] [ content-type>> ] tri
-    "application/x-www-form-urlencoded" = [ query>assoc ] when
-    >>content ;
+ERROR: no-boundary ;
+
+: parse-multipart-form-data ( string -- separator )
+    ";" split1 nip
+    "=" split1 nip [ no-boundary ] unless* ;
+
+: read-multipart-data ( request -- mime-parts )
+    [ "content-type" header ]
+    [ "content-length" header string>number ] bi
+    unlimit-input
+    stream-eofs limit-input
+    binary decode-input
+    parse-multipart-form-data parse-multipart ;
+
+: read-content ( request -- bytes )
+    "content-length" header string>number read ;
+
+: parse-content ( request content-type -- post-data )
+    [ <post-data> swap ] keep {
+        { "multipart/form-data" [ read-multipart-data >>params ] }
+        { "application/x-www-form-urlencoded" [ read-content query>assoc >>params ] }
+        [ drop read-content >>data ]
+    } case ;
 
 : read-post-data ( request -- request )
     dup method>> "POST" = [
-        [ ]
-        [ "content-length" header string>number read ]
-        [ "content-type" header ] tri
-        <post-data> parse-post-data >>post-data
+        dup dup "content-type" header
+        ";" split1 drop parse-content >>post-data
     ] when ;
 
 : extract-host ( request -- request )
@@ -80,7 +99,7 @@ GENERIC: write-full-response ( request response -- )
     [ content-type>> "application/octet-stream" or ]
     [ content-charset>> encoding>name ]
     bi
-    [ "; charset=" swap 3append ] when* ;
+    [ "; charset=" glue ] when* ;
 
 : ensure-domain ( cookie -- cookie )
     [
@@ -179,8 +198,8 @@ LOG: httpd-hit NOTICE
 
 LOG: httpd-header NOTICE
 
-: log-header ( headers name -- )
-    tuck header 2array httpd-header ;
+: log-header ( request name -- )
+    [ nip ] [ header ] 2bi 2array httpd-header ;
 
 : log-request ( request -- )
     [ [ method>> ] [ url>> ] bi 2array httpd-hit ]
@@ -236,7 +255,7 @@ TUPLE: http-server < threaded-server ;
 M: http-server handle-client*
     drop
     [
-        64 1024 * limit-input
+        64 1024 * stream-throws limit-input
         ?refresh-all
         [ read-request ] ?benchmark
         [ do-request ] ?benchmark

@@ -8,7 +8,6 @@ TYPEDEF: void* CFDictionaryRef
 TYPEDEF: void* CFMutableDictionaryRef
 TYPEDEF: void* CFNumberRef
 TYPEDEF: void* CFSetRef
-TYPEDEF: void* CFUUIDRef
 
 TYPEDEF: int CFNumberType
 : kCFNumberSInt8Type 1 ; inline

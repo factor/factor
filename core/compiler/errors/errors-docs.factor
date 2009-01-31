@@ -1,19 +1,21 @@
 IN: compiler.errors
 USING: help.markup help.syntax vocabs.loader words io
-quotations ;
+quotations words.symbol ;
 
 ARTICLE: "compiler-errors" "Compiler warnings and errors"
-"The compiler saves various notifications in a global variable:"
+"The compiler saves " { $link "inference-errors" } " in a global variable:"
 { $subsection compiler-errors }
 "These notifications can be viewed later:"
 { $subsection :errors }
 { $subsection :warnings }
 { $subsection :linkage }
 "Words such as " { $link require } " use a combinator which counts errors and prints a report at the end:"
-{ $link with-compiler-errors } ;
+{ $subsection with-compiler-errors } ;
 
 HELP: compiler-errors
 { $var-description "Global variable holding an assoc mapping words to compiler errors. This variable is set by " { $link with-compiler-errors } "." } ;
+
+ABOUT: "compiler-errors"
 
 HELP: compiler-error
 { $values { "error" "an error" } { "word" word } }

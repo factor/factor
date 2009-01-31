@@ -1,65 +1,64 @@
-USING: alias alien.syntax kernel math windows.types math.bitwise ;
+USING: alien.syntax kernel math windows.types math.bitwise ;
 IN: windows.advapi32
 LIBRARY: advapi32
 
-: PROV_RSA_FULL       1 ; inline
-: PROV_RSA_SIG        2 ; inline
-: PROV_DSS            3 ; inline
-: PROV_FORTEZZA       4 ; inline
-: PROV_MS_EXCHANGE    5 ; inline
-: PROV_SSL            6 ; inline
-: PROV_RSA_SCHANNEL  12 ; inline
-: PROV_DSS_DH        13 ; inline
-: PROV_EC_ECDSA_SIG  14 ; inline
-: PROV_EC_ECNRA_SIG  15 ; inline
-: PROV_EC_ECDSA_FULL 16 ; inline
-: PROV_EC_ECNRA_FULL 17 ; inline
-: PROV_DH_SCHANNEL   18 ; inline
-: PROV_SPYRUS_LYNKS  20 ; inline
-: PROV_RNG           21 ; inline
-: PROV_INTEL_SEC     22 ; inline
-: PROV_REPLACE_OWF   23 ; inline
-: PROV_RSA_AES       24 ; inline
+CONSTANT: PROV_RSA_FULL       1
+CONSTANT: PROV_RSA_SIG        2
+CONSTANT: PROV_DSS            3
+CONSTANT: PROV_FORTEZZA       4
+CONSTANT: PROV_MS_EXCHANGE    5
+CONSTANT: PROV_SSL            6
+CONSTANT: PROV_RSA_SCHANNEL  12
+CONSTANT: PROV_DSS_DH        13
+CONSTANT: PROV_EC_ECDSA_SIG  14
+CONSTANT: PROV_EC_ECNRA_SIG  15
+CONSTANT: PROV_EC_ECDSA_FULL 16
+CONSTANT: PROV_EC_ECNRA_FULL 17
+CONSTANT: PROV_DH_SCHANNEL   18
+CONSTANT: PROV_SPYRUS_LYNKS  20
+CONSTANT: PROV_RNG           21
+CONSTANT: PROV_INTEL_SEC     22
+CONSTANT: PROV_REPLACE_OWF   23
+CONSTANT: PROV_RSA_AES       24
 
-: MS_DEF_DH_SCHANNEL_PROV
-    "Microsoft DH Schannel Cryptographic Provider" ; inline
+CONSTANT: MS_DEF_DH_SCHANNEL_PROV "Microsoft DH Schannel Cryptographic Provider"
 
-: MS_DEF_DSS_DH_PROV
-    "Microsoft Base DSS and Diffie-Hellman Cryptographic Provider" ; inline
+CONSTANT: MS_DEF_DSS_DH_PROV
+    "Microsoft Base DSS and Diffie-Hellman Cryptographic Provider"
 
-: MS_DEF_DSS_PROV
-    "Microsoft Base DSS Cryptographic Provider" ; inline
+CONSTANT: MS_DEF_DSS_PROV
+    "Microsoft Base DSS Cryptographic Provider"
 
-: MS_DEF_PROV
-    "Microsoft Base Cryptographic Provider v1.0" ; inline
+CONSTANT: MS_DEF_PROV
+    "Microsoft Base Cryptographic Provider v1.0"
 
-: MS_DEF_RSA_SCHANNEL_PROV
-    "Microsoft RSA Schannel Cryptographic Provider" ; inline
+CONSTANT: MS_DEF_RSA_SCHANNEL_PROV
+    "Microsoft RSA Schannel Cryptographic Provider"
 
 ! Unsupported (!)
-: MS_DEF_RSA_SIG_PROV
-    "Microsoft RSA Signature Cryptographic Provider" ; inline
+CONSTANT: MS_DEF_RSA_SIG_PROV
+    "Microsoft RSA Signature Cryptographic Provider"
 
-: MS_ENH_DSS_DH_PROV
-    "Microsoft Enhanced DSS and Diffie-Hellman Cryptographic Provider" ; inline
+CONSTANT: MS_ENH_DSS_DH_PROV
+    "Microsoft Enhanced DSS and Diffie-Hellman Cryptographic Provider"
 
-: MS_ENH_RSA_AES_PROV
-    "Microsoft Enhanced RSA and AES Cryptographic Provider" ; inline
+CONSTANT: MS_ENH_RSA_AES_PROV
+    "Microsoft Enhanced RSA and AES Cryptographic Provider"
 
-: MS_ENHANCED_PROV
-    "Microsoft Enhanced Cryptographic Provider v1.0" ; inline
+CONSTANT: MS_ENHANCED_PROV
+    "Microsoft Enhanced Cryptographic Provider v1.0"
 
-: MS_SCARD_PROV
-    "Microsoft Base Smart Card Crypto Provider" ; inline
+CONSTANT: MS_SCARD_PROV
+    "Microsoft Base Smart Card Crypto Provider"
 
-: MS_STRONG_PROV
-    "Microsoft Strong Cryptographic Provider" ; inline
+CONSTANT: MS_STRONG_PROV
+    "Microsoft Strong Cryptographic Provider"
 
-: CRYPT_VERIFYCONTEXT  HEX: F0000000 ; inline
-: CRYPT_NEWKEYSET      HEX: 8 ; inline
-: CRYPT_DELETEKEYSET   HEX: 10 ; inline
-: CRYPT_MACHINE_KEYSET HEX: 20 ; inline
-: CRYPT_SILENT         HEX: 40 ; inline
+CONSTANT: CRYPT_VERIFYCONTEXT  HEX: F0000000
+CONSTANT: CRYPT_NEWKEYSET      HEX: 8
+CONSTANT: CRYPT_DELETEKEYSET   HEX: 10
+CONSTANT: CRYPT_MACHINE_KEYSET HEX: 20
+CONSTANT: CRYPT_SILENT         HEX: 40
 
 C-STRUCT: ACL
     { "BYTE" "AclRevision" }
@@ -70,16 +69,16 @@ C-STRUCT: ACL
 
 TYPEDEF: ACL* PACL
 
-: ACCESS_ALLOWED_ACE_TYPE 0 ; inline
-: ACCESS_DENIED_ACE_TYPE 1 ; inline
-: SYSTEM_AUDIT_ACE_TYPE 2 ; inline
-: SYSTEM_ALARM_ACE_TYPE 3 ; inline
+CONSTANT: ACCESS_ALLOWED_ACE_TYPE 0
+CONSTANT: ACCESS_DENIED_ACE_TYPE 1
+CONSTANT: SYSTEM_AUDIT_ACE_TYPE 2
+CONSTANT: SYSTEM_ALARM_ACE_TYPE 3
 
-: OBJECT_INHERIT_ACE HEX: 1 ; inline
-: CONTAINER_INHERIT_ACE HEX: 2 ; inline
-: NO_PROPAGATE_INHERIT_ACE HEX: 4 ; inline
-: INHERIT_ONLY_ACE HEX: 8 ; inline
-: VALID_INHERIT_FLAGS HEX: f ; inline
+CONSTANT: OBJECT_INHERIT_ACE HEX: 1
+CONSTANT: CONTAINER_INHERIT_ACE HEX: 2
+CONSTANT: NO_PROPAGATE_INHERIT_ACE HEX: 4
+CONSTANT: INHERIT_ONLY_ACE HEX: 8
+CONSTANT: VALID_INHERIT_FLAGS HEX: f
 
 C-STRUCT: ACE_HEADER
     { "BYTE" "AceType" }
@@ -125,46 +124,46 @@ TYPEDEF: ACCESS_ALLOWED_CALLBACK_ACE* PACCESS_ALLOWED_CALLBACK_ACE
 
 
 ! typedef enum _TOKEN_INFORMATION_CLASS {
-: TokenUser 1 ; inline
-: TokenGroups 2 ; inline
-: TokenPrivileges 3 ; inline
-: TokenOwner 4 ; inline
-: TokenPrimaryGroup 5 ; inline
-: TokenDefaultDacl 6 ; inline
-: TokenSource 7 ; inline
-: TokenType 8 ; inline
-: TokenImpersonationLevel 9 ; inline
-: TokenStatistics 10 ; inline
-: TokenRestrictedSids 11 ; inline
-: TokenSessionId 12 ; inline
-: TokenGroupsAndPrivileges 13 ; inline
-: TokenSessionReference 14 ; inline
-: TokenSandBoxInert 15 ; inline
+CONSTANT: TokenUser 1
+CONSTANT: TokenGroups 2
+CONSTANT: TokenPrivileges 3
+CONSTANT: TokenOwner 4
+CONSTANT: TokenPrimaryGroup 5
+CONSTANT: TokenDefaultDacl 6
+CONSTANT: TokenSource 7
+CONSTANT: TokenType 8
+CONSTANT: TokenImpersonationLevel 9
+CONSTANT: TokenStatistics 10
+CONSTANT: TokenRestrictedSids 11
+CONSTANT: TokenSessionId 12
+CONSTANT: TokenGroupsAndPrivileges 13
+CONSTANT: TokenSessionReference 14
+CONSTANT: TokenSandBoxInert 15
 ! } TOKEN_INFORMATION_CLASS;
 
-: DELETE                     HEX: 00010000 ; inline
-: READ_CONTROL               HEX: 00020000 ; inline
-: WRITE_DAC                  HEX: 00040000 ; inline
-: WRITE_OWNER                HEX: 00080000 ; inline
-: SYNCHRONIZE                HEX: 00100000 ; inline
-: STANDARD_RIGHTS_REQUIRED   HEX: 000f0000 ; inline
+CONSTANT: DELETE                     HEX: 00010000
+CONSTANT: READ_CONTROL               HEX: 00020000
+CONSTANT: WRITE_DAC                  HEX: 00040000
+CONSTANT: WRITE_OWNER                HEX: 00080000
+CONSTANT: SYNCHRONIZE                HEX: 00100000
+CONSTANT: STANDARD_RIGHTS_REQUIRED   HEX: 000f0000
 
-: STANDARD_RIGHTS_READ       READ_CONTROL ; inline
-: STANDARD_RIGHTS_WRITE      READ_CONTROL ; inline
-: STANDARD_RIGHTS_EXECUTE    READ_CONTROL ; inline
+ALIAS: STANDARD_RIGHTS_READ       READ_CONTROL
+ALIAS: STANDARD_RIGHTS_WRITE      READ_CONTROL
+ALIAS: STANDARD_RIGHTS_EXECUTE    READ_CONTROL
 
-: TOKEN_TOKEN_ADJUST_DEFAULT   HEX: 0080 ; inline
-: TOKEN_ADJUST_GROUPS          HEX: 0040 ; inline
-: TOKEN_ADJUST_PRIVILEGES      HEX: 0020 ; inline
-: TOKEN_ADJUST_SESSIONID       HEX: 0100 ; inline
-: TOKEN_ASSIGN_PRIMARY         HEX: 0001 ; inline
-: TOKEN_DUPLICATE              HEX: 0002 ; inline
-: TOKEN_EXECUTE                STANDARD_RIGHTS_EXECUTE ; inline
-: TOKEN_IMPERSONATE            HEX: 0004 ; inline
-: TOKEN_QUERY                  HEX: 0008 ; inline
-: TOKEN_QUERY_SOURCE           HEX: 0010 ; inline
-: TOKEN_ADJUST_DEFAULT         HEX: 0080 ; inline
-: TOKEN_READ ( -- n ) STANDARD_RIGHTS_READ TOKEN_QUERY bitor ;
+CONSTANT: TOKEN_TOKEN_ADJUST_DEFAULT   HEX: 0080
+CONSTANT: TOKEN_ADJUST_GROUPS          HEX: 0040
+CONSTANT: TOKEN_ADJUST_PRIVILEGES      HEX: 0020
+CONSTANT: TOKEN_ADJUST_SESSIONID       HEX: 0100
+CONSTANT: TOKEN_ASSIGN_PRIMARY         HEX: 0001
+CONSTANT: TOKEN_DUPLICATE              HEX: 0002
+ALIAS: TOKEN_EXECUTE                STANDARD_RIGHTS_EXECUTE
+CONSTANT: TOKEN_IMPERSONATE            HEX: 0004
+CONSTANT: TOKEN_QUERY                  HEX: 0008
+CONSTANT: TOKEN_QUERY_SOURCE           HEX: 0010
+CONSTANT: TOKEN_ADJUST_DEFAULT         HEX: 0080
+: TOKEN_READ ( -- n ) { STANDARD_RIGHTS_READ TOKEN_QUERY } flags ;
 
 : TOKEN_WRITE ( -- n )
     {

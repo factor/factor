@@ -70,9 +70,10 @@ M: id equal? over id? [ [ obj>> ] bi@ eq? ] [ 2drop f ] if ;
     } cond ;
 
 : serialize-shared ( obj quot -- )
-    >r dup object-id
-    [ CHAR: o write1 serialize-cell drop ]
-    r> if* ; inline
+    [
+        dup object-id
+        [ CHAR: o write1 serialize-cell drop ]
+    ] dip if* ; inline
 
 M: f (serialize) ( obj -- )
     drop CHAR: n write1 ;
@@ -220,8 +221,7 @@ SYMBOL: deserialized
     (deserialize) (deserialize) 2dup lookup
     dup [ 2nip ] [
         drop
-        "Unknown word: " -rot
-        2array unparse append throw
+        2array unparse "Unknown word: " prepend throw
     ] if ;
 
 : deserialize-gensym ( -- word )
@@ -256,7 +256,7 @@ SYMBOL: deserialized
     [ ] tri ;
 
 : copy-seq-to-tuple ( seq tuple -- )
-    >r dup length r> [ set-array-nth ] curry 2each ;
+    [ dup length ] dip [ set-array-nth ] curry 2each ;
 
 : deserialize-tuple ( -- array )
     #! Ugly because we have to intern the tuple before reading

@@ -2,7 +2,7 @@
 ! Copyright (C) 2006, 2007 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences io.styles ui.gadgets ui.render
-colors colors.gray qualified accessors ;
+colors colors.gray accessors ;
 QUALIFIED: colors
 IN: ui.gadgets.theme
 

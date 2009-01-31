@@ -44,8 +44,6 @@ M: effect effect>string ( effect -- string )
 
 GENERIC: stack-effect ( word -- effect/f )
 
-M: symbol stack-effect drop (( -- symbol )) ;
-
 M: word stack-effect
     { "declared-effect" "inferred-effect" }
     swap props>> [ at ] curry map [ ] find nip ;

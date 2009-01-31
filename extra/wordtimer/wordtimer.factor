@@ -30,7 +30,7 @@ SYMBOL: *calling*
   *calling* get-global at ; inline
     
 : timed-call ( quot word -- )
-  [ calling ] [ >r benchmark r> register-time ] [ finished ] tri ; inline
+  [ calling ] [ [ benchmark ] dip register-time ] [ finished ] tri ; inline
 
 : time-unless-recursing ( quot word -- )
   dup called-recursively? not
@@ -71,9 +71,10 @@ SYMBOL: *calling*
 
 : wordtimer-call ( quot -- )
   reset-word-timer 
-  benchmark >r
-  correct-for-timing-overhead
-  "total time:" write r> pprint nl
+  benchmark [
+      correct-for-timing-overhead
+      "total time:" write
+  ] dip pprint nl
   print-word-timings nl ;
 
 : profile-vocab ( vocab quot -- )
@@ -81,9 +82,10 @@ SYMBOL: *calling*
   over [ reset-vocab ] [ add-timers ] bi
   reset-word-timer
   "executing quotation..." print flush
-  benchmark >r
-  "resetting annotations..." print flush
-  reset-vocab
-  correct-for-timing-overhead
-  "total time:" write r> pprint
+  benchmark [
+      "resetting annotations..." print flush
+      reset-vocab
+      correct-for-timing-overhead
+      "total time:" write
+  ] dip pprint
   print-word-timings ;

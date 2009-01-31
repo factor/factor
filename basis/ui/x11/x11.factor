@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays ui ui.gadgets
 ui.gestures ui.backend ui.clipboards ui.gadgets.worlds ui.render
-assocs kernel math namespaces opengl sequences strings x11.xlib
-x11.events x11.xim x11.glx x11.clipboard x11.constants
-x11.windows io.encodings.string io.encodings.ascii
-io.encodings.utf8 combinators command-line qualified
+ui.event-loop assocs kernel math namespaces opengl sequences
+strings x11.xlib x11.events x11.xim x11.glx x11.clipboard
+x11.constants x11.windows io.encodings.string io.encodings.ascii
+io.encodings.utf8 combinators command-line
 math.vectors classes.tuple opengl.gl threads math.geometry.rect
 environment ascii ;
 IN: ui.x11
@@ -144,7 +144,7 @@ M: world selection-notify-event
 
 : supported-type? ( atom -- ? )
     { "UTF8_STRING" "STRING" "TEXT" }
-    [ x-atom = ] with contains? ;
+    [ x-atom = ] with any? ;
 
 : clipboard-for-atom ( atom -- clipboard )
     {
@@ -281,7 +281,6 @@ M: x11-ui-backend ui ( -- )
     [
         f [
             [
-                stop-after-last-window? on
                 init-clipboard
                 start-ui
                 event-loop

@@ -51,8 +51,7 @@ PRIVATE>
   dup zero? [
     2drop epsilon
   ] [
-    2dup exactly-n
-    -rot 1- at-most-n 2choice
+    [ exactly-n ] [ 1- at-most-n ] 2bi 2choice
   ] if ;
 
 : at-least-n ( parser n -- parser' )

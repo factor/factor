@@ -2,6 +2,10 @@ USING: help.markup help.syntax io.streams.string quotations
 strings math regexp regexp.backend ;
 IN: validators
 
+HELP: v-checkbox
+{ $values { "str" string } {  "?" "a boolean" } }
+{ $description "Converts the string value of a checkbox component (either \"on\" or \"off\") to a boolean value." } ;
+
 HELP: v-captcha
 { $values { "str" string } }
 { $description "Throws a validation error if the string is non-empty. This is used to create bait fields for spam-bots to fill in." } ;
@@ -99,6 +103,7 @@ $nl
 { $subsection v-one-line    }
 { $subsection v-one-word    }
 { $subsection v-captcha     }
+{ $subsection v-checkbox    }
 "More complex validators:"
 { $subsection v-email       }
 { $subsection v-url         }

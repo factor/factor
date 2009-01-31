@@ -261,8 +261,7 @@ M: object run-pipeline-element
     drop ;
 
 {
-    { [ os unix? ] [ "io.unix.launcher" require ] }
-    { [ os winnt? ] [ "io.windows.nt.launcher" require ] }
-    { [ os wince? ] [ "io.windows.launcher" require ] }
+    { [ os unix? ] [ "io.launcher.unix" require ] }
+    { [ os winnt? ] [ "io.launcher.windows.nt" require ] }
     [ ]
 } cond

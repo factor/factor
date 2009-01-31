@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals accessors arrays ui.commands ui.gadgets
+USING: locals accessors arrays ui.commands ui.operations ui.gadgets
 ui.gadgets.buttons ui.gadgets.worlds ui.gestures generic
 hashtables kernel math models namespaces opengl sequences
 math.vectors ui.gadgets.theme ui.gadgets.packs
@@ -54,3 +54,9 @@ M: menu-glass layout* gadget-child prefer ;
 
 : show-commands-menu ( target commands -- )
     [ dup [ ] ] dip <commands-menu> show-menu ;
+
+: <operations-menu> ( target hook -- menu )
+    over object-operations <commands-menu> ;
+
+: show-operations-menu ( gadget target -- )
+    [ ] <operations-menu> show-menu ;

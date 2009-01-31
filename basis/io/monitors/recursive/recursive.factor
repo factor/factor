@@ -1,9 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors sequences assocs arrays continuations
 destructors combinators kernel threads concurrency.messaging
-concurrency.mailboxes concurrency.promises io.files io.monitors
-debugger fry ;
+concurrency.mailboxes concurrency.promises io.files io.files.info
+io.directories io.pathnames io.monitors debugger fry ;
 IN: io.monitors.recursive
 
 ! Simulate recursive monitors on platforms that don't have them
@@ -45,12 +45,11 @@ M: recursive-monitor dispose*
     bi ;
 
 : stop-pump ( -- )
-    monitor tget children>> [ nip dispose ] assoc-each ;
+    monitor tget children>> values dispose-each ;
 
 : pump-step ( msg -- )
-    first3 path>> swap [ prepend-path ] dip monitor tget 3array
-    monitor tget queue>>
-    mailbox-put ;
+    [ [ monitor>> path>> ] [ path>> ] bi append-path ] [ changed>> ] bi
+    monitor tget queue-change ;
 
 : child-added ( path monitor -- )
     path>> prepend-path add-child-monitor ;
@@ -59,7 +58,7 @@ M: recursive-monitor dispose*
     path>> prepend-path remove-child-monitor ;
 
 : update-hierarchy ( msg -- )
-    first3 swap [
+    [ path>> ] [ monitor>> ] [ changed>> ] tri [
         {
             { +add-file+ [ child-added ] }
             { +remove-file+ [ child-removed ] }

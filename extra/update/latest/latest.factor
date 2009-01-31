@@ -1,7 +1,5 @@
-
-USING: kernel namespaces system io.files bootstrap.image http.client
-       update update.backup update.util ;
-
+USING: kernel namespaces system io.files io.pathnames io.directories
+bootstrap.image http.client update update.backup update.util ;
 IN: update.latest
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -9,7 +7,7 @@ IN: update.latest
 : git-pull-master ( -- )
   image parent-directory
     [
-      { "git" "pull" "http://factorcode.org/git/factor.git" "master" }
+      { "git" "pull" "git://factorcode.org/git/factor.git" "master" }
       run-command
     ]
   with-directory ;

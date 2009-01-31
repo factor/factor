@@ -3,7 +3,8 @@
 USING: parser words definitions kernel sequences assocs arrays
 kernel.private fry combinators accessors vectors strings sbufs
 byte-arrays byte-vectors io.binary io.streams.string splitting
-math generic generic.standard generic.standard.engines classes ;
+math generic generic.standard generic.standard.engines classes
+hashtables ;
 IN: hints
 
 GENERIC: specializer-predicate ( spec -- quot )
@@ -50,14 +51,10 @@ M: object specializer-declaration class ;
     ] [ drop f ] if ;
 
 : specialized-def ( word -- quot )
-    dup def>> swap {
-        {
-            [ dup "specializer" word-prop ]
-            [ "specializer" word-prop specialize-quot ]
-        }
-        { [ dup standard-method? ] [ specialize-method ] }
-        [ drop ]
-    } cond ;
+    [ def>> ] keep
+    [ dup standard-method? [ specialize-method ] [ drop ] if ]
+    [ "specializer" word-prop [ specialize-quot ] when* ]
+    bi ;
 
 : specialized-length ( specializer -- n )
     dup [ array? ] all? [ first ] when length ;
@@ -120,3 +117,7 @@ M: object specializer-declaration class ;
 \ >le { { fixnum fixnum } { bignum fixnum } } "specializer" set-word-prop
 
 \ >be { { bignum fixnum } { fixnum fixnum } } "specializer" set-word-prop
+
+\ hashtable \ at* method { { fixnum hashtable } { word hashtable } } "specializer" set-word-prop
+
+\ hashtable \ set-at method { { object fixnum object } { object word object } } "specializer" set-word-prop

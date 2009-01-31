@@ -43,11 +43,11 @@ C: <parse-result> parse-result
     2over shorter? [
         3drop f
     ] [
-        >r [ length head-slice ] keep r> string=
+        [ [ length head-slice ] keep ] dip string=
     ] if ;
 
 : ?string-head ( str head ignore-case -- newstr ? )
-    >r 2dup r> string-head?
+    [ 2dup ] dip string-head?
     [ length tail-slice t ] [ drop f ] if ;
 
 TUPLE: token-parser string ignore-case? ;
@@ -60,7 +60,7 @@ C: <token-parser> token-parser
 
 M: token-parser parse ( input parser -- list )
     [ string>> ] [ ignore-case?>> ] bi
-    >r tuck r> ?string-head
+    [ tuck ] dip ?string-head
     [ <parse-results> ] [ 2drop nil ] if ;
 
 : 1token ( n -- parser ) 1string token ;
@@ -76,7 +76,7 @@ M: satisfy-parser parse ( input parser -- list )
     over empty? [
         2drop nil
     ] [
-        quot>> >r unclip-slice dup r> call
+        quot>> [ unclip-slice dup ] dip call
         [ swap <parse-results> ] [ 2drop nil ] if
     ] if ;
 
@@ -134,7 +134,7 @@ TUPLE: and-parser parsers ;
 
 : <&> ( parser1 parser2 -- parser )
     over and-parser? [
-        >r parsers>> r> suffix
+        [ parsers>> ] dip suffix
     ] [
         2array
     ] if and-parser boa ;
@@ -146,7 +146,7 @@ TUPLE: and-parser parsers ;
     swap [
         dup unparsed>> rot parse
         [
-            >r parsed>> r>
+            [ parsed>> ] dip
             [ parsed>> 2array ] keep
             unparsed>> <parse-result>
         ] lazy-map-with
@@ -175,11 +175,11 @@ M: or-parser parse ( input parser1 -- list )
     parsers>> 0 swap seq>list
     [ parse ] lazy-map-with lconcat ;
 
-: trim-left-slice ( string -- string )
+: trim-head-slice ( string -- string )
     #! Return a new string without any leading whitespace
     #! from the original string.
     dup empty? [
-        dup first blank? [ rest-slice trim-left-slice ] when
+        dup first blank? [ rest-slice trim-head-slice ] when
     ] unless ;
 
 TUPLE: sp-parser p1 ;
@@ -191,7 +191,7 @@ C: sp sp-parser ( p1 -- parser )
 M: sp-parser parse ( input parser -- list )
     #! Skip all leading whitespace from the input then call
     #! the parser on the remaining input.
-    >r trim-left-slice r> p1>> parse ;
+    [ trim-head-slice ] dip p1>> parse ;
 
 TUPLE: just-parser p1 ;
 
@@ -346,4 +346,4 @@ LAZY: surrounded-by ( parser start end -- parser' )
     dupd exactly-n swap <*> <&> ;
 
 : from-m-to-n ( parser m n -- parser' )
-    >r [ exactly-n ] 2keep r> swap - at-most-n <:&:> ;
+    [ [ exactly-n ] 2keep ] dip swap - at-most-n <:&:> ;

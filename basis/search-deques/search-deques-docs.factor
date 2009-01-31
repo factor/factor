@@ -10,6 +10,6 @@ $nl
 
 ABOUT: "search-deques"
 
-HELP: <search-deque> ( assoc deque -- search-deque )
+HELP: <search-deque>
 { $values { "assoc" assoc } { "deque" deque } { "search-deque" search-deque } }
 { $description "Creates a new " { $link search-deque } "." } ;

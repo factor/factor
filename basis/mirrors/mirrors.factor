@@ -32,7 +32,7 @@ M: mirror set-at ( val key mirror -- )
     swap set-slot ;
 
 M: mirror delete-at ( key mirror -- )
-    f -rot set-at ;
+    [ f ] 2dip set-at ;
 
 M: mirror clear-assoc ( mirror -- )
     [ object>> ] [ object-slots ] bi [

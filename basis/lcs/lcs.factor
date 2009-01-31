@@ -5,7 +5,7 @@ IN: lcs
 
 <PRIVATE
 : levenshtein-step ( insert delete change same? -- next )
-    0 1 ? + >r [ 1+ ] bi@ r> min min ;
+    0 1 ? + [ [ 1+ ] bi@ ] dip min min ;
 
 : lcs-step ( insert delete change same? -- next )
     1 -1./0. ? + max max ; ! -1./0. is -inf (float)

@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators io io.streams.string
-kernel math math.parser namespaces qualified sets
-quotations sequences splitting symbols vectors math.order
-unicode.categories strings regexp.backend regexp.utils
-unicode.case words locals regexp.classes ;
+kernel math math.parser namespaces sets
+quotations sequences splitting vectors math.order
+strings regexp.backend regexp.utils
+unicode.case unicode.categories words locals regexp.classes ;
 IN: regexp.parser
 
 FROM: math.ranges => [a,b] ;
@@ -63,7 +63,7 @@ left-parenthesis pipe caret dash ;
 : cut-out ( vector n -- vector' vector ) cut rest ;
 ERROR: cut-stack-error ;
 : cut-stack ( obj vector -- vector' vector )
-    tuck last-index [ cut-stack-error ] unless* cut-out swap ;
+    [ nip ] [ last-index ] 2bi [ cut-stack-error ] unless* cut-out swap ;
 
 : <possessive-kleene-star> ( obj -- kleene ) possessive-kleene-star boa ;
 : <reluctant-kleene-star> ( obj -- kleene ) reluctant-kleene-star boa ;
@@ -261,7 +261,7 @@ ERROR: bad-escaped-literals seq ;
     parse-til-E
     drop1
     [ epsilon ] [
-        [ quot call <constant> ] V{ } map-as
+        quot call [ <constant> ] V{ } map-as
         first|concatenation
     ] if-empty ; inline
 
@@ -269,10 +269,10 @@ ERROR: bad-escaped-literals seq ;
     [ ] (parse-escaped-literals) ;
 
 : lower-case-literals ( -- obj )
-    [ ch>lower ] (parse-escaped-literals) ;
+    [ >lower ] (parse-escaped-literals) ;
 
 : upper-case-literals ( -- obj )
-    [ ch>upper ] (parse-escaped-literals) ;
+    [ >upper ] (parse-escaped-literals) ;
 
 : parse-escaped ( -- obj )
     read1

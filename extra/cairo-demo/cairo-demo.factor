@@ -25,7 +25,7 @@ TUPLE: cairo-demo-gadget < gadget image-array cairo-t ;
 M: cairo-demo-gadget draw-gadget* ( gadget -- )
     0 0 glRasterPos2i
     1.0 -1.0 glPixelZoom
-    >r 384 256 GL_RGBA GL_UNSIGNED_BYTE r>
+    [ 384 256 GL_RGBA GL_UNSIGNED_BYTE ] dip
     image-array>> glDrawPixels ;
 
 : create-surface ( gadget -- cairo_surface_t )

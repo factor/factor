@@ -3,7 +3,7 @@
 USING: accessors arrays assocs kernel math math.order models
 namespaces make sequences words strings system hashtables
 math.parser math.vectors classes.tuple classes boxes calendar
-alarms symbols combinators sets columns fry deques ui.gadgets ;
+alarms combinators sets columns fry deques ui.gadgets ;
 IN: ui.gestures
 
 GENERIC: handle-gesture ( gesture gadget -- ? )

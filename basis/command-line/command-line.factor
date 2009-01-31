@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: init continuations hashtables io io.encodings.utf8
-io.files kernel kernel.private namespaces parser sequences
-strings system splitting vocabs.loader ;
+io.files io.pathnames kernel kernel.private namespaces parser
+sequences strings system splitting vocabs.loader ;
 IN: command-line
 
 SYMBOL: script

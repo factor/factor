@@ -1,10 +1,10 @@
-USING: io io.files io.launcher kernel namespaces
-prettyprint tools.test db.sqlite db sequences
+USING: io io.files io.files.temp io.directories io.launcher
+kernel namespaces prettyprint tools.test db.sqlite db sequences
 continuations db.types db.tuples unicode.case ;
 IN: db.sqlite.tests
 
-: db-path "test.db" temp-file ;
-: test.db db-path <sqlite-db> ;
+: db-path ( -- path ) "test.db" temp-file ;
+: test.db ( -- sqlite-db ) db-path <sqlite-db> ;
 
 [ ] [ [ db-path delete-file ] ignore-errors ] unit-test
 

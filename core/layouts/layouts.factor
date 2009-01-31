@@ -37,11 +37,11 @@ SYMBOL: type-numbers
 
 : cell-bits ( -- n ) 8 cells ; inline
 
-: bootstrap-cell \ cell get cell or ; inline
+: bootstrap-cell ( -- n ) \ cell get cell or ; inline
 
-: bootstrap-cells bootstrap-cell * ; inline
+: bootstrap-cells ( m -- n ) bootstrap-cell * ; inline
 
-: bootstrap-cell-bits 8 bootstrap-cells ; inline
+: bootstrap-cell-bits ( -- n ) 8 bootstrap-cells ; inline
 
 : first-bignum ( -- n )
     cell-bits (first-bignum) ; inline

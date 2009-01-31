@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs io.files hashtables kernel namespaces sequences
-vocabs.loader io combinators io.encodings.utf8 calendar accessors
-math.parser io.streams.string ui.tools.operations quotations
-strings arrays prettyprint words vocabs sorting sets
-classes math alien urls splitting ascii ;
+USING: assocs io.files io.pathnames io.directories
+io.encodings.utf8 hashtables kernel namespaces sequences
+vocabs.loader io combinators calendar accessors math.parser
+io.streams.string ui.tools.operations quotations strings arrays
+prettyprint words vocabs sorting sets classes math alien urls
+splitting ascii ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -21,7 +22,7 @@ ERROR: no-vocab vocab ;
 
 : contains-dot? ( string -- ? ) ".." swap subseq? ;
 
-: contains-separator? ( string -- ? ) [ path-separator? ] contains? ;
+: contains-separator? ( string -- ? ) [ path-separator? ] any? ;
 
 : check-vocab-name ( string -- string )
     dup contains-dot? [ vocab-name-contains-dot ] when
@@ -91,7 +92,7 @@ ERROR: no-vocab vocab ;
     ] if ;
 
 : lookup-type ( string -- object/string ? )
-    "new" ?head drop [ [ CHAR: ' = ] [ digit? ] bi or ] trim-right
+    "new" ?head drop [ [ CHAR: ' = ] [ digit? ] bi or ] trim-tail
     H{
         { "object" object } { "obj" object }
         { "quot" quotation }

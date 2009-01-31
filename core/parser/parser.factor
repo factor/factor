@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math namespaces
-sequences strings vectors words quotations io
+sequences strings vectors words words.symbol quotations io
 combinators sorting splitting math.parser effects continuations
 io.files io.streams.string vocabs io.encodings.utf8 source-files
 classes hashtables compiler.errors compiler.units accessors sets
-lexer ;
+lexer vocabs.parser ;
 IN: parser
 
 : location ( -- loc )
@@ -29,27 +29,6 @@ t parser-notes set-global
         "Note: " write dup print
     ] when drop ;
 
-SYMBOL: use
-SYMBOL: in
-
-: (use+) ( vocab -- )
-    vocab-words use get push ;
-
-: use+ ( vocab -- )
-    load-vocab (use+) ;
-
-: add-use ( seq -- ) [ use+ ] each ;
-
-: set-use ( seq -- )
-    [ vocab-words ] V{ } map-as sift use set ;
-
-: check-vocab-string ( name -- name )
-    dup string?
-    [ "Vocabulary name must be a string" throw ] unless ;
-
-: set-in ( name -- )
-    check-vocab-string dup in set create-vocab (use+) ;
-
 M: parsing-word stack-effect drop (( parsed -- parsed )) ;
 
 TUPLE: no-current-vocab ;
@@ -69,17 +48,6 @@ TUPLE: no-current-vocab ;
 
 : CREATE-WORD ( -- word ) CREATE dup reset-generic ;
 
-: word-restarts ( name possibilities -- restarts )
-    natural-sort
-    [ [ vocabulary>> "Use the " " vocabulary" surround ] keep ] { } map>assoc
-    swap "Defer word in current vocabulary" swap 2array
-    suffix ;
-
-ERROR: no-word-error name ;
-
-: <no-word-error> ( name possibilities -- error restarts )
-    [ drop \ no-word-error boa ] [ word-restarts ] 2bi ;
-
 SYMBOL: amended-use
 
 SYMBOL: auto-use?
@@ -89,7 +57,7 @@ SYMBOL: auto-use?
         dup vocabulary>>
         [ (use+) ]
         [ amended-use get dup [ push ] [ 2drop ] if ]
-        [ "Added ``" "'' vocabulary to search path" surround note. ]
+        [ "Added \"" "\" vocabulary to search path" surround note. ]
         tri
     ] [ create-in ] if ;
 
@@ -192,6 +160,7 @@ SYMBOL: interactive-vocabs
     "definitions"
     "editors"
     "help"
+    "help.lint"
     "inspector"
     "io"
     "io.files"
@@ -232,7 +201,7 @@ SYMBOL: interactive-vocabs
 SYMBOL: print-use-hook
 
 print-use-hook global [ [ ] or ] change-at
-!
+
 : parse-fresh ( lines -- quot )
     [
         V{ } clone amended-use set
@@ -286,7 +255,7 @@ print-use-hook global [ [ ] or ] change-at
     [
         [
             lines dup parse-fresh
-            tuck finish-parsing
+            [ nip ] [ finish-parsing ] 2bi
             forget-smudged
         ] with-source-file
     ] with-compilation-unit ;

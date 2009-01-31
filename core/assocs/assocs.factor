@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Daniel Ehrenberg, Slava Pestov
+! Copyright (C) 2007, 2009 Daniel Ehrenberg, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences arrays math sequences.private vectors
 accessors ;
@@ -7,21 +7,41 @@ IN: assocs
 MIXIN: assoc
 
 GENERIC: at* ( key assoc -- value/f ? )
+GENERIC: value-at* ( value assoc -- key/f ? )
 GENERIC: set-at ( value key assoc -- )
 GENERIC: new-assoc ( capacity exemplar -- newassoc )
 GENERIC: delete-at ( key assoc -- )
 GENERIC: clear-assoc ( assoc -- )
 GENERIC: assoc-size ( assoc -- n )
 GENERIC: assoc-like ( assoc exemplar -- newassoc )
+GENERIC: assoc-clone-like ( assoc exemplar -- newassoc )
+GENERIC: >alist ( assoc -- newassoc )
 
 M: assoc assoc-like drop ;
 
-GENERIC: assoc-clone-like ( assoc exemplar -- newassoc )
-
-GENERIC: >alist ( assoc -- newassoc )
+<PRIVATE
 
 : (assoc-each) ( assoc quot -- seq quot' )
     [ >alist ] dip [ first2 ] prepose ; inline
+
+: (assoc-stack) ( key i seq -- value )
+    over 0 < [
+        3drop f
+    ] [
+        3dup nth-unsafe at*
+        [ [ 3drop ] dip ] [ drop [ 1- ] dip (assoc-stack) ] if
+    ] if ; inline recursive
+
+: search-alist ( key alist -- pair/f i/f )
+    [ first = ] with find swap ; inline
+
+: substituter ( assoc -- quot )
+    [ dupd at* [ nip ] [ drop ] if ] curry ; inline
+
+: with-assoc ( assoc quot: ( value key -- assoc ) -- quot: ( key value -- ) )
+    curry [ swap ] prepose ; inline
+
+PRIVATE>
 
 : assoc-find ( assoc quot -- key value ? )
     (assoc-each) find swap [ first2 t ] [ drop f f f ] if ; inline
@@ -40,31 +60,31 @@ GENERIC: >alist ( assoc -- newassoc )
 : assoc-map ( assoc quot -- newassoc )
     over assoc-map-as ; inline
 
-: assoc-push-if ( key value quot accum -- )
-    [ 2keep rot ] dip swap
-    [ [ 2array ] dip push ] [ 3drop ] if ; inline
-
-: assoc-pusher ( quot -- quot' accum )
-    V{ } clone [ [ assoc-push-if ] 2curry ] keep ; inline
-
 : assoc-filter-as ( assoc quot exemplar -- subassoc )
-    [ assoc-pusher [ assoc-each ] dip ] dip assoc-like ; inline
+    [ (assoc-each) filter ] dip assoc-like ; inline
 
 : assoc-filter ( assoc quot -- subassoc )
     over assoc-filter-as ; inline
 
-: assoc-contains? ( assoc quot -- ? )
+: assoc-partition ( assoc quot -- true-assoc false-assoc )
+    [ (assoc-each) partition ] [ drop ] 2bi
+    tuck [ assoc-like ] 2bi@ ; inline
+
+: assoc-any? ( assoc quot -- ? )
     assoc-find 2nip ; inline
 
 : assoc-all? ( assoc quot -- ? )
-    [ not ] compose assoc-contains? not ; inline
+    [ not ] compose assoc-any? not ; inline
 
 : at ( key assoc -- value/f )
     at* drop ; inline
 
+: at-default ( key assoc -- value/key )
+    2dup at* [ 2nip ] [ 2drop ] if ; inline
+
 M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
-    over assoc-size swap new-assoc
-    swap [ swap pick set-at ] assoc-each ;
+    [ dup assoc-size ] dip new-assoc
+    [ [ set-at ] with-assoc assoc-each ] keep ;
 
 : keys ( assoc -- keys )
     [ drop ] { } assoc>map ;
@@ -76,38 +96,28 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ at* ] 2keep delete-at ;
 
 : rename-at ( newkey key assoc -- )
-    tuck delete-at* [ -rot set-at ] [ 3drop ] if ;
+    [ delete-at* ] keep [ set-at ] with-assoc [ 2drop ] if ;
 
 : assoc-empty? ( assoc -- ? )
-    assoc-size zero? ;
-
-: (assoc-stack) ( key i seq -- value )
-    over 0 < [
-        3drop f
-    ] [
-        3dup nth-unsafe at*
-        [ [ 3drop ] dip ] [ drop [ 1- ] dip (assoc-stack) ] if
-    ] if ; inline recursive
+    assoc-size 0 = ;
 
 : assoc-stack ( key seq -- value )
-    dup length 1- swap (assoc-stack) ; flushable
+    [ length 1- ] keep (assoc-stack) ; flushable
 
 : assoc-subset? ( assoc1 assoc2 -- ? )
-    [ swapd at* [ = ] [ 2drop f ] if ] curry assoc-all? ;
+    [ at* [ = ] [ 2drop f ] if ] with-assoc assoc-all? ;
 
 : assoc= ( assoc1 assoc2 -- ? )
     [ assoc-subset? ] [ swap assoc-subset? ] 2bi and ;
 
 : assoc-hashcode ( n assoc -- code )
-    [
-        [ over ] dip hashcode* 2/ [ dupd hashcode* ] dip bitxor
-    ] { } assoc>map hashcode* ;
+    >alist hashcode* ;
 
 : assoc-intersect ( assoc1 assoc2 -- intersection )
     swap [ nip key? ] curry assoc-filter ;
 
 : update ( assoc1 assoc2 -- )
-    swap [ swapd set-at ] curry assoc-each ;
+    swap [ set-at ] with-assoc assoc-each ;
 
 : assoc-union ( assoc1 assoc2 -- union )
     [ [ [ assoc-size ] bi@ + ] [ drop ] 2bi new-assoc ] 2keep
@@ -122,24 +132,23 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : remove-all ( assoc seq -- subseq )
     swap [ key? not ] curry filter ;
 
-: (substitute)
-    [ dupd at* [ nip ] [ drop ] if ] curry ; inline
-
 : substitute-here ( seq assoc -- )
-    (substitute) change-each ;
+    substituter change-each ;
 
 : substitute ( seq assoc -- newseq )
-    (substitute) map ;
+    substituter map ;
 
 : cache ( key assoc quot -- value )
-    2over at* [
-        [ 3drop ] dip
-    ] [
-        drop pick rot [ call dup ] 2dip set-at
-    ] if ; inline
+    [ [ at* ] 2keep ] dip
+    [ [ nip call dup ] [ drop ] 3bi set-at ] 3curry
+    [ drop ] prepose
+    unless ; inline
+
+: 2cache ( key1 key2 assoc quot -- value )
+    [ 2array ] 2dip [ first2 ] prepose cache ; inline
 
 : change-at ( key assoc quot -- )
-    [ [ at ] dip call ] 3keep drop set-at ; inline
+    [ [ at ] dip call ] [ drop ] 3bi set-at ; inline
 
 : at+ ( n key assoc -- ) [ 0 or + ] change-at ; inline
 
@@ -150,8 +159,6 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 
 : extract-keys ( seq assoc -- subassoc )
     [ [ dupd at ] curry ] keep map>assoc ;
-
-GENERIC: value-at* ( value assoc -- key/f ? )
 
 M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 
@@ -168,9 +175,6 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 : unzip ( assoc -- keys values )
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
 
-: search-alist ( key alist -- pair/f i/f )
-    [ first = ] with find swap ; inline
-
 M: sequence at*
     search-alist [ second t ] [ f ] if ;
 
@@ -184,7 +188,7 @@ M: sequence new-assoc drop <vector> ;
 M: sequence clear-assoc delete-all ;
 
 M: sequence delete-at
-    tuck search-alist nip
+    [ nip ] [ search-alist nip ] 2bi
     [ swap delete-nth ] [ drop ] if* ;
 
 M: sequence assoc-size length ;

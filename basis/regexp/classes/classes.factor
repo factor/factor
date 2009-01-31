@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.order symbols 
-words regexp.utils unicode.categories combinators.short-circuit ;
+USING: accessors kernel math math.order words regexp.utils
+unicode.categories combinators.short-circuit ;
 IN: regexp.classes
 
 SINGLETONS: any-char any-char-no-nl

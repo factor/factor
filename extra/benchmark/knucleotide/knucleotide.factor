@@ -8,7 +8,7 @@ IN: benchmark.knucleotide
     swap >float number>string
     "." split1 rot
     over length over <
-    [ CHAR: 0 pad-right ] 
+    [ CHAR: 0 pad-tail ] 
     [ head ] if "." glue ;
 
 : discard-lines ( -- )
@@ -29,7 +29,7 @@ IN: benchmark.knucleotide
 : small-groups ( x n -- b )
     swap
     [ length swap - 1+ ] 2keep
-    [ >r over + r> subseq ] 2curry map ;
+    [ [ over + ] dip subseq ] 2curry map ;
 
 : handle-table ( inputs n -- )
     small-groups
@@ -46,7 +46,7 @@ IN: benchmark.knucleotide
     tuck length
     small-groups H{ } tally
     at [ 0 ] unless*
-    number>string 8 CHAR: \s pad-right write ;
+    number>string 8 CHAR: \s pad-tail write ;
 
 : process-input ( input -- )
     dup 1 handle-table nl

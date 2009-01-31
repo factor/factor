@@ -373,7 +373,7 @@ TUPLE: range-parser min max ;
   pick empty? [ 
     3drop f 
   ] [
-    pick first -rot between? [
+    [ dup first ] 2dip between? [
       unclip-slice <parse-result>
     ] [ 
       drop f
@@ -509,7 +509,7 @@ TUPLE: sp-parser p1 ;
 
 M: sp-parser (compile) ( peg -- quot )
   p1>> compile-parser 1quotation '[ 
-    input-slice [ blank? ] trim-left-slice input-from pos set @ 
+    input-slice [ blank? ] trim-head-slice input-from pos set @ 
   ] ;
 
 TUPLE: delay-parser quot ;

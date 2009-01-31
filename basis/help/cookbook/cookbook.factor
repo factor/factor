@@ -100,14 +100,12 @@ $nl
 { $code "10 [ \"Factor rocks!\" print ] times" }
 "Now we can look at a new data type, the array:"
 { $code "{ 1 2 3 }" }
-"An array looks like a quotation except it cannot be evaluated; it simply stores data."
+"An array differs from a quotation in that it cannot be evaluated; it simply stores data."
 $nl
 "You can perform an operation on each element of an array:"
 { $example
     "{ 1 2 3 } [ \"The number is \" write . ] each"
-    "The number is 1"
-    "The number is 2"
-    "The number is 3"
+    "The number is 1\nThe number is 2\nThe number is 3"
 }
 "You can transform each element, collecting the results in a new array:"
 { $example "{ 5 12 0 -12 -5 } [ sq ] map ." "{ 25 144 0 144 25 }" }
@@ -269,8 +267,8 @@ $nl
 { $heading "Example: ls" }
 "Here is an example implementing a simplified version of the Unix " { $snippet "ls" } " command in Factor:"
 { $code
-    <" USING: command-line namespaces io io.files tools.files
-sequences kernel ;
+    <" USING: command-line namespaces io io.files
+io.pathnames tools.files sequences kernel ;
 
 command-line get [
     current-directory get directory.
@@ -360,7 +358,7 @@ ARTICLE: "cookbook-pitfalls" "Pitfalls to avoid"
 { $list
     "Factor only makes use of one native thread, and Factor threads are scheduled co-operatively. C library calls block the entire VM."
     "Factor does not hide anything from the programmer, all internals are exposed. It is your responsibility to avoid writing fragile code which depends too much on implementation detail."
-    { "When a source file uses two vocabularies which define words with the same name, the order of the vocabularies in the " { $link POSTPONE: USE: } " or " { $link POSTPONE: USING: } " forms is important. The parser prints warnings when vocabularies shadow words from other vocabularies; see " { $link "vocabulary-search-shadow" } ". The " { $vocab-link "qualified" } " vocabulary implements qualified naming, which can be used to resolve ambiguities." }
+    { "When a source file uses two vocabularies which define words with the same name, the order of the vocabularies in the " { $link POSTPONE: USE: } " or " { $link POSTPONE: USING: } " forms is important. The " { $link POSTPONE: QUALIFIED: } " word implements qualified naming, which can be used to resolve ambiguities." }
     { "If a literal object appears in a word definition, the object itself is pushed on the stack when the word executes, not a copy. If you intend to mutate this object, you must " { $link clone } " it first. See " { $link "syntax-literals" } "." }
     { "For a discussion of potential issues surrounding the " { $link f } " object, see " { $link "booleans" } "." }
     { "Factor's object system is quite flexible. Careless usage of union, mixin and predicate classes can lead to similar problems to those caused by ``multiple inheritance'' in other languages. In particular, it is possible to have two classes such that they have a non-empty intersection and yet neither is a subclass of the other. If a generic word defines methods on two such classes, various disambiguation rules are applied to ensure method dispatch remains deterministic, however they may not be what you expect. See " { $link "method-order" } " for details." }

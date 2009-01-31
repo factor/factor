@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors parser generic kernel classes classes.tuple
 words slots assocs sequences arrays vectors definitions
-math hashtables sets generalizations namespaces make ;
+math hashtables sets generalizations namespaces make
+words.symbol ;
 IN: delegate
 
 : protocol-words ( protocol -- words )

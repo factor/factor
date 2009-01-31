@@ -302,9 +302,7 @@ big-endian on
     4 ds-reg 0 STW
 ] f f f \ -rot define-sub-primitive
 
-[ jit->r ] f f f \ >r define-sub-primitive
-
-[ jit-r> ] f f f \ r> define-sub-primitive
+[ jit->r ] f f f \ load-local define-sub-primitive
 
 ! Comparisons
 : jit-compare ( insn -- )

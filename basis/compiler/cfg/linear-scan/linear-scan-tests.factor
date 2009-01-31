@@ -1,7 +1,7 @@
 IN: compiler.cfg.linear-scan.tests
 USING: tools.test random sorting sequences sets hashtables assocs
 kernel fry arrays splitting namespaces math accessors vectors
-math.order
+math.order grouping
 cpu.architecture
 compiler.cfg.instructions
 compiler.cfg.registers
@@ -249,7 +249,7 @@ SYMBOL: max-uses
     ] with-scope ;
 
 : random-test ( num-intervals max-uses max-registers max-insns -- )
-    over >r random-live-intervals r> int-regs associate check-linear-scan ;
+    over [ random-live-intervals ] dip int-regs associate check-linear-scan ;
 
 [ ] [ 30 2 1 60 random-test ] unit-test
 [ ] [ 60 2 2 60 random-test ] unit-test

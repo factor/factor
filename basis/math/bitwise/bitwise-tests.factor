@@ -32,3 +32,7 @@ IN: math.bitwise.tests
 
 [ 8 ] [ 0 3 toggle-bit ] unit-test
 [ 0 ] [ 8 3 toggle-bit ] unit-test
+
+[ 4 ] [ BIN: 1010101 bit-count ] unit-test
+[ 0 ] [ BIN: 0 bit-count ] unit-test
+[ 1 ] [ BIN: 1 bit-count ] unit-test

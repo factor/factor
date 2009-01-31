@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files kernel tools.test db db.tuples classes
+USING: io.files io.files.temp kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
 prettyprint calendar sequences db.sqlite math.intervals
 db.postgresql accessors random math.bitwise system
-math.ranges strings urls fry db.tuples.private ;
+math.ranges strings urls fry db.tuples.private db.private ;
 IN: db.tuples.tests
 
 : sqlite-db ( -- sqlite-db )
@@ -33,10 +33,10 @@ IN: db.tuples.tests
 
 ! These words leak resources, but are useful for interactivel testing 
 : sqlite-test-db ( -- )
-    sqlite-db db-open db set ;
+    sqlite-db db-open db-connection set ;
 
 : postgresql-test-db ( -- )
-    postgresql-db db-open db set ;
+    postgresql-db db-open db-connection set ;
 
 TUPLE: person the-id the-name the-number the-real
 ts date time blob factor-blob url ;

@@ -18,10 +18,6 @@ TUPLE: deploy-gadget < pack vocab settings ;
     deploy-ui? get
     "Include user interface framework" <checkbox> add-gadget ;
 
-: exit-when-windows-closed ( parent -- parent )
-    "stop-after-last-window?" get
-    "Exit when last UI window closed" <checkbox> add-gadget ;
-
 : io-settings ( parent -- parent )
     "Input/output support:" <label> add-gadget
     deploy-io get deploy-io-options <radio-buttons> add-gadget ;
@@ -50,7 +46,6 @@ TUPLE: deploy-gadget < pack vocab settings ;
             <pile>
             bundle-name
             deploy-ui
-            os macosx? [ exit-when-windows-closed ] when
             io-settings
             reflection-settings
             advanced-settings

@@ -1,9 +1,9 @@
 USING: accessors alien.c-types arrays combinators destructors
-http.client io io.encodings.ascii io.files kernel math
-math.matrices math.parser math.vectors opengl
+http.client io io.encodings.ascii io.files io.files.temp kernel
+math math.matrices math.parser math.vectors opengl
 opengl.capabilities opengl.gl opengl.demo-support sequences
-sequences.lib splitting vectors words
-specialized-arrays.float specialized-arrays.uint ;
+splitting vectors words specialized-arrays.float
+specialized-arrays.uint ;
 IN: bunny.model
 
 : numbers ( str -- seq )
@@ -23,15 +23,15 @@ IN: bunny.model
 
 : n ( vs triple -- n )
     swap [ nth ] curry map
-    dup third over first v- >r dup second swap first v- r> cross
+    [ [ second ] [ first ] bi v- ] [ [ third ] [ first ] bi v- ] bi cross
     vneg normalize ;
 
 : normal ( ns vs triple -- )
-    [ n ] keep [ rot [ v+ ] change-nth ] each-with2 ;
+    [ n ] keep [ rot [ v+ ] change-nth ] with with each ;
 
 : normals ( vs is -- ns )
-    over length { 0.0 0.0 0.0 } <array> -rot
-    [ >r 2dup r> normal ] each drop
+    [ [ length { 0.0 0.0 0.0 } <array> ] keep ] dip
+    [ [ 2dup ] dip normal ] each drop
     [ normalize ] map ;
 
 : read-model ( stream -- model )
@@ -50,10 +50,10 @@ IN: bunny.model
     ] unless ;
 
 : (draw-triangle) ( ns vs triple -- )
-    [ dup roll nth gl-normal swap nth gl-vertex ] each-with2 ;
+    [ dup roll nth gl-normal swap nth gl-vertex ] with with each ;
 
 : draw-triangles ( ns vs is -- )
-    GL_TRIANGLES [ [ (draw-triangle) ] each-with2 ] do-state ;
+    GL_TRIANGLES [ [ (draw-triangle) ] with with each ] do-state ;
 
 TUPLE: bunny-dlist list ;
 TUPLE: bunny-buffers array element-array nv ni ;

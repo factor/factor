@@ -3,7 +3,8 @@
 USING: accessors kernel math namespaces make sequences random
 strings math.parser math.intervals combinators math.bitwise
 nmake db db.tuples db.types classes words shuffle arrays
-destructors continuations db.tuples.private prettyprint ;
+destructors continuations db.tuples.private prettyprint
+db.private ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
@@ -18,7 +19,7 @@ SINGLETON: retryable
     ] if ;
 
 : maybe-make-retryable ( statement -- statement )
-    dup in-params>> [ generator-bind? ] contains?
+    dup in-params>> [ generator-bind? ] any?
     [ make-retryable ] when ;
 
 : regenerate-params ( statement -- statement )
@@ -62,7 +63,7 @@ M: retryable execute-statement* ( statement type -- )
         dup column-name>> 0% " = " 0% bind%
     ] interleave ;
 
-M: db <update-tuple-statement> ( class -- statement )
+M: db-connection <update-tuple-statement> ( class -- statement )
     [
         "update " 0% 0%
         " set " 0%
@@ -142,7 +143,7 @@ M: string where ( spec obj -- ) object-where ;
 : where-clause ( tuple specs -- )
     dupd filter-slots [ drop ] [ many-where ] if-empty ;
 
-M: db <delete-tuples-statement> ( tuple table -- sql )
+M: db-connection <delete-tuples-statement> ( tuple table -- sql )
     [
         "delete from " 0% 0%
         where-clause
@@ -150,7 +151,7 @@ M: db <delete-tuples-statement> ( tuple table -- sql )
 
 ERROR: all-slots-ignored class ;
 
-M: db <select-by-slots-statement> ( tuple class -- statement )
+M: db-connection <select-by-slots-statement> ( tuple class -- statement )
     [
         "select " 0%
         [ dupd filter-ignores ] dip
@@ -185,13 +186,13 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         [ offset>> [ do-offset ] [ drop ] if* ]
     } 2cleave ;
 
-M: db query>statement ( query -- tuple )
+M: db-connection query>statement ( query -- tuple )
     [ tuple>> dup class ] keep
     [ <select-by-slots-statement> ] dip make-query* ;
 
 ! select ID, NAME, SCORE from EXAM limit 1 offset 3
 
-M: db <count-statement> ( query -- statement )
+M: db-connection <count-statement> ( query -- statement )
     [ tuple>> dup class ] keep
     [ [ "select count(*) from " 0% 0% where-clause ] query-make ]
     dip make-query* ;

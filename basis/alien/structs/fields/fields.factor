@@ -52,8 +52,8 @@ PREDICATE: slot-writer < word "writing" word-prop >boolean ;
         [ (>>offset) ] [ type>> heap-size + ] 2bi
     ] reduce ;
 
-: define-struct-slot-word ( word quot spec -- )
-    offset>> prefix define-inline ;
+: define-struct-slot-word ( word quot spec effect -- )
+    [ offset>> prefix ] dip define-inline ;
 
 : define-getter ( type spec -- )
     [ set-reader-props ] keep
@@ -62,11 +62,13 @@ PREDICATE: slot-writer < word "writing" word-prop >boolean ;
         type>>
         [ c-getter ] [ c-type-boxer-quot ] bi append
     ]
-    [ ] tri define-struct-slot-word ;
+    [ ] tri
+    (( c-ptr -- value )) define-struct-slot-word ;
 
 : define-setter ( type spec -- )
     [ set-writer-props ] keep
-    [ writer>> ] [ type>> c-setter ] [ ] tri define-struct-slot-word ;
+    [ writer>> ] [ type>> c-setter ] [ ] tri
+    (( value c-ptr -- )) define-struct-slot-word ;
 
 : define-field ( type spec -- )
     [ define-getter ] [ define-setter ] 2bi ;

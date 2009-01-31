@@ -93,7 +93,7 @@ $nl
 $nl
 "Intervals are created by calling " { $link [a,b] } ", " { $link (a,b) } ", " { $link [a,b) } ", " { $link (a,b] } " or " { $link [a,a] } "." } ;
 
-HELP: <interval> ( from to -- interval )
+HELP: <interval>
 { $values { "from" "a " { $snippet "{ point included? }" } " pair" } { "to" "a " { $snippet "{ point included? }" } " pair" } { "interval" interval } }
 { $description "Creates a new interval. Usually it is more convenient to create intervals using one of the following words instead:"
     { $list

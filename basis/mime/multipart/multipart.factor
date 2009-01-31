@@ -1,105 +1,168 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators io kernel locals math multiline
-sequences splitting prettyprint namespaces http.parsers
-ascii assocs unicode.case io.files.unique io.files io.encodings.binary
-byte-arrays io.encodings make fry ;
+USING: multiline kernel sequences io splitting fry namespaces
+http.parsers hashtables assocs combinators ascii io.files.unique
+accessors io.encodings.binary io.files byte-arrays math
+io.streams.string combinators.short-circuit strings math.order ;
 IN: mime.multipart
 
-TUPLE: multipart-stream stream n leftover separator ;
+CONSTANT: buffer-size 65536
+CONSTANT: separator-prefix "\r\n--"
 
-: <multipart-stream> ( stream separator -- multipart-stream )
-    multipart-stream new
-        swap >>separator
-        swap >>stream
-        16 2^ >>n ;
+TUPLE: multipart
+end-of-stream?
+current-separator mime-separator
+header
+content-disposition bytes
+filename temp-file
+name name-content
+mime-parts ;
 
-<PRIVATE
+TUPLE: mime-file headers filename temporary-path ;
+TUPLE: mime-variable headers key value ;
 
-: ?append ( seq1 seq2 -- newseq/seq2 )
-    over [ append ] [ nip ] if ;
+: <multipart> ( mime-separator -- multipart )
+    multipart new
+        swap >>mime-separator
+        H{ } clone >>mime-parts ;
 
-: ?cut* ( seq n -- before after )
-    over length over <= [ drop f swap ] [ cut* ] if ;
-    
-: read-n ( stream -- bytes end-stream? )
-    [ f ] change-leftover
-    [ n>> ] [ stream>> ] bi stream-read [ ?append ] keep not ;
+ERROR: bad-header bytes ;
 
-: multipart-split ( bytes separator -- before after seq=? )
-    2dup sequence= [ 2drop f f t ] [ split1 f ] if ;
+: mime-write ( sequence -- )
+    >byte-array write ;
 
-:: multipart-step-found ( bytes stream quot: ( bytes -- ) -- ? )
-    bytes [ quot unless-empty ]
-    [ stream (>>leftover) quot unless-empty ] if-empty f ; inline
+: parse-headers ( string -- hashtable )
+    string-lines harvest [ parse-header-line ] map >hashtable ;
 
-:: multipart-step-not-found ( bytes stream end-stream? separator quot: ( bytes -- ) -- ? )
-    bytes end-stream? [
-        quot unless-empty f
+ERROR: end-of-stream multipart ;
+
+: fill-bytes ( multipart -- multipart )
+    buffer-size read
+    [ '[ _ append ] change-bytes ]
+    [ t >>end-of-stream? ] if* ;
+
+: maybe-fill-bytes ( multipart -- multipart )
+    dup bytes>> [ fill-bytes ] unless  ;
+
+: split-bytes ( bytes separator -- leftover-bytes safe-to-dump )
+    dupd [ length ] bi@ 1- - short cut-slice swap ;
+
+: dump-until-separator ( multipart -- multipart )
+    dup
+    [ current-separator>> ] [ bytes>> ] bi
+    [ nip ] [ start ] 2bi [
+        cut-slice
+        [ mime-write ]
+        [ over current-separator>> length short tail-slice >>bytes ] bi*
     ] [
-        separator length 1- ?cut* stream (>>leftover)
-        quot unless-empty t
-    ] if ; inline
+        drop
+        dup [ bytes>> ] [ current-separator>> ] bi split-bytes mime-write
+        >>bytes fill-bytes dup end-of-stream?>> [ dump-until-separator ] unless
+    ] if* ;
 
-:: multipart-step ( stream bytes end-stream? separator quot: ( bytes -- ) -- ? end-stream? )
-    #! return t to loop again
-    bytes separator multipart-split
-    [ 2drop f ]
-    [
-        [ stream quot multipart-step-found ]
-        [ stream end-stream? separator quot multipart-step-not-found ] if*
-    ] if stream leftover>> end-stream? not or >boolean ;
+: dump-string ( multipart separator -- multipart string )
+    >>current-separator
+    [ dump-until-separator ] with-string-writer ;
 
-
-:: multipart-step-loop ( stream quot1: ( bytes -- ) -- ? )
-    stream dup [ read-n ] [ separator>> ] bi quot1 multipart-step
-    swap [ drop stream quot1 multipart-step-loop ] when ; inline recursive
-
-SYMBOL: header
-SYMBOL: parsed-header
-SYMBOL: magic-separator
-
-: trim-blanks ( str -- str' ) [ blank? ] trim ;
-
-: trim-quotes ( str -- str' )
-    [ [ CHAR: " = ] [ CHAR: ' = ] bi or ] trim ;
-
-: parse-content-disposition ( str -- content-disposition hash )
-    ";" split [ first ] [ rest-slice ] bi [ "=" split ] map
-    [ [ trim-blanks ] [ trim-quotes ] bi* ] H{ } assoc-map-as ;
-
-: parse-multipart-header ( string -- headers )
-    "\r\n" split harvest
-    [ parse-header-line first2 ] H{ } map>assoc ;
-
-ERROR: expected-file ;
-
-TUPLE: uploaded-file path filename name ;
-
-: (parse-multipart) ( stream -- ? )
-    "\r\n\r\n" >>separator
-    header off
-    dup [ header [ prepend ] change ] multipart-step-loop drop
-    header get dup magic-separator get [ length ] bi@ < [
-        2drop f
+: read-header ( multipart -- multipart )
+    dup bytes>> "--\r\n" sequence= [
+        t >>end-of-stream?
     ] [
-        parse-multipart-header
-        parsed-header set
-        "\r\n" magic-separator get append >>separator
-        "factor-upload" "httpd" make-unique-file tuck
-        binary [ [ write ] multipart-step-loop ] with-file-writer swap
-        "content-disposition" parsed-header get at parse-content-disposition
-        nip [ "filename" swap at ] [ "name" swap at ] bi
-        uploaded-file boa ,
+        "\r\n\r\n" dump-string parse-headers >>header
     ] if ;
 
-PRIVATE>
+: empty-name? ( string -- ? )
+    { "''" "\"\"" "" f } member? ;
 
-: parse-multipart ( stream -- array )
-    [
-        "\r\n" <multipart-stream>
-        magic-separator off
-        dup [ magic-separator [ prepend ] change ]
-            multipart-step-loop drop
-        '[ [ _ (parse-multipart) ] loop ] { } make
-    ] with-scope ;
+: quote? ( ch -- ? ) "'\"" member? ;
+
+: quoted? ( str -- ? )
+    {
+        [ length 1 > ]
+        [ first quote? ]
+        [ [ first ] [ peek ] bi = ]
+    } 1&& ;
+
+: unquote ( str -- newstr )
+    dup quoted? [ but-last-slice rest-slice >string ] when ;
+
+: save-uploaded-file ( multipart -- )
+    dup filename>> empty-name? [
+        drop
+    ] [
+        [ [ header>> ] [ filename>> ] [ temp-file>> ] tri mime-file boa ]
+        [ content-disposition>> "name" swap at unquote ]
+        [ mime-parts>> set-at ] tri
+    ] if ;
+
+: save-mime-part ( multipart -- )
+    dup name>> empty-name? [
+        drop
+    ] [
+        [ [ header>> ] [ name>> unquote ] [ name-content>> ] tri mime-variable boa ]
+        [ name>> unquote ]
+        [ mime-parts>> set-at ] tri
+    ] if ;
+
+: dump-mime-file ( multipart filename -- multipart )
+    binary <file-writer> [
+        dup mime-separator>> >>current-separator dump-until-separator
+    ] with-output-stream ;
+
+: dump-file ( multipart -- multipart )
+    "factor-" "-upload" make-unique-file
+    [ >>temp-file ] [ dump-mime-file ] bi ;
+
+: parse-content-disposition-form-data ( string -- hashtable )
+    ";" split
+    [ "=" split1 [ [ blank? ] trim ] bi@ ] H{ } map>assoc ;
+
+: lookup-disposition ( multipart string -- multipart value/f )
+    over content-disposition>> at ;
+
+ERROR: unknown-content-disposition multipart ;
+
+: parse-form-data ( multipart -- multipart )
+    "filename" lookup-disposition [
+        unquote
+        >>filename
+        [ dump-file ] [ save-uploaded-file ] bi
+    ] [
+        "name" lookup-disposition [
+            [ dup mime-separator>> dump-string >>name-content ] dip
+            >>name dup save-mime-part
+        ] [
+             unknown-content-disposition
+        ] if*
+    ] if* ;
+
+ERROR: no-content-disposition multipart ;
+
+: process-header ( multipart -- multipart )
+    "content-disposition" over header>> at ";" split1 swap {
+        { "form-data" [
+            parse-content-disposition-form-data >>content-disposition
+            parse-form-data
+        ] }
+        [ no-content-disposition ]
+    } case ;
+
+: assert-sequence= ( a b -- )
+    2dup sequence= [ 2drop ] [ assert ] if ;
+
+: read-assert-sequence= ( sequence -- )
+    [ length read ] keep assert-sequence= ;
+
+: parse-beginning ( multipart -- multipart )
+    "--" read-assert-sequence=
+    dup mime-separator>>
+    [ read-assert-sequence= ]
+    [ separator-prefix prepend >>mime-separator ] bi ;
+
+: parse-multipart-loop ( multipart -- multipart )
+    read-header
+    dup end-of-stream?>> [ process-header parse-multipart-loop ] unless ;
+
+: parse-multipart ( separator -- mime-parts )
+    <multipart> parse-beginning fill-bytes parse-multipart-loop
+    mime-parts>> ;

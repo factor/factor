@@ -1,6 +1,6 @@
 USING: kernel alien.c-types alien.strings sequences math alien.syntax unix
 vectors kernel namespaces continuations threads assocs vectors
-io.unix.backend io.encodings.utf8 unix.utilities ;
+io.backend.unix io.encodings.utf8 unix.utilities fry ;
 IN: unix.process
 
 ! Low-level Unix process launching utilities. These are used
@@ -36,37 +36,37 @@ FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
     [ [ first ] [ ] bi ] dip exec-with-env ;
 
 : with-fork ( child parent -- )
-    [ [ fork-process dup zero? ] dip [ drop ] prepose ] dip
+    [ [ fork-process dup zero? ] dip '[ drop @ ] ] dip
     if ; inline
 
-: SIGKILL 9 ; inline
-: SIGTERM 15 ; inline
+CONSTANT: SIGKILL 9
+CONSTANT: SIGTERM 15
 
 FUNCTION: int kill ( pid_t pid, int sig ) ;
 
-: PRIO_PROCESS 0 ; inline
-: PRIO_PGRP 1 ; inline
-: PRIO_USER 2 ; inline
+CONSTANT: PRIO_PROCESS 0
+CONSTANT: PRIO_PGRP 1
+CONSTANT: PRIO_USER 2
 
-: PRIO_MIN -20 ; inline
-: PRIO_MAX 20 ; inline
+CONSTANT: PRIO_MIN -20
+CONSTANT: PRIO_MAX 20
 
 ! which/who = 0 for current process
 FUNCTION: int getpriority ( int which, int who ) ;
 FUNCTION: int setpriority ( int which, int who, int prio ) ;
 
 : set-priority ( n -- )
-    0 0 rot setpriority io-error ;
+    [ 0 0 ] dip setpriority io-error ;
 
 ! Flags for waitpid
 
-: WNOHANG   1 ; inline
-: WUNTRACED 2 ; inline
+CONSTANT: WNOHANG   1
+CONSTANT: WUNTRACED 2
 
-: WSTOPPED   2 ; inline
-: WEXITED    4 ; inline
-: WCONTINUED 8 ; inline
-: WNOWAIT    HEX: 1000000 ; inline
+CONSTANT: WSTOPPED   2
+CONSTANT: WEXITED    4
+CONSTANT: WCONTINUED 8
+CONSTANT: WNOWAIT    HEX: 1000000
 
 ! Examining status
 

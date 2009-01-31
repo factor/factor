@@ -17,9 +17,6 @@ TUPLE: anonymous-complement class ;
 
 C: <anonymous-complement> anonymous-complement
 
-: 2cache ( key1 key2 assoc quot -- value )
-    [ 2array ] 2dip [ first2 ] prepose cache ; inline
-
 GENERIC: valid-class? ( obj -- ? )
 
 M: class valid-class? drop t ;
@@ -69,10 +66,10 @@ DEFER: (class-or)
     [ members>> ] dip [ class<= ] curry all? ;
 
 : right-anonymous-union<= ( first second -- ? )
-    members>> [ class<= ] with contains? ;
+    members>> [ class<= ] with any? ;
 
 : left-anonymous-intersection<= ( first second -- ? )
-    [ participants>> ] dip [ class<= ] curry contains? ;
+    [ participants>> ] dip [ class<= ] curry any? ;
 
 : right-anonymous-intersection<= ( first second -- ? )
     participants>> [ class<= ] with all? ;
@@ -128,7 +125,7 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
     ] if ;
 
 M: anonymous-union (classes-intersect?)
-    members>> [ classes-intersect? ] with contains? ;
+    members>> [ classes-intersect? ] with any? ;
 
 M: anonymous-intersection (classes-intersect?)
     participants>> [ classes-intersect? ] with all? ;
@@ -206,7 +203,7 @@ M: anonymous-complement (classes-intersect?)
     [ class<= ] [ swap class<= ] 2bi and ;
 
 : largest-class ( seq -- n elt )
-    dup [ [ class< ] with contains? not ] curry find-last
+    dup [ [ class< ] with any? not ] curry find-last
     [ "Topological sort failed" throw ] unless* ;
 
 : sort-classes ( seq -- newseq )
@@ -218,7 +215,7 @@ M: anonymous-complement (classes-intersect?)
 : min-class ( class seq -- class/f )
     over [ classes-intersect? ] curry filter
     [ drop f ] [
-        tuck [ class<= ] with all? [ peek ] [ drop f ] if
+        [ nip ] [ [ class<= ] with all? ] 2bi [ peek ] [ drop f ] if
     ] if-empty ;
 
 GENERIC: (flatten-class) ( class -- )

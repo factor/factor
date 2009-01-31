@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io io.styles kernel namespaces make
-parser prettyprint sequences words assocs definitions generic
-quotations effects slots continuations classes.tuple debugger
-combinators vocabs help.stylesheet help.topics help.crossref
-help.markup sorting classes vocabs.loader ;
+parser prettyprint sequences words words.symbol assocs
+definitions generic quotations effects slots continuations
+classes.tuple debugger combinators vocabs help.stylesheet
+help.topics help.crossref help.markup sorting classes
+vocabs.loader ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
@@ -111,6 +112,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     ] with-style nl ;
 
 : print-topic ( topic -- )
+    >link
     last-element off dup $title
     article-content print-content nl ;
 

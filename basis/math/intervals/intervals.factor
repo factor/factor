@@ -11,7 +11,7 @@ SYMBOL: full-interval
 
 TUPLE: interval { from read-only } { to read-only } ;
 
-: <interval> ( from to -- int )
+: <interval> ( from to -- interval )
     2dup [ first ] bi@ {
         { [ 2dup > ] [ 2drop 2drop empty-interval ] }
         { [ 2dup = ] [
@@ -77,7 +77,7 @@ TUPLE: interval { from read-only } { to read-only } ;
     [ from>> ] [ to>> ] bi ;
 
 : points>interval ( seq -- interval )
-    dup [ first fp-nan? ] contains?
+    dup [ first fp-nan? ] any?
     [ drop [-inf,inf] ] [
         dup first
         [ [ endpoint-min ] reduce ]

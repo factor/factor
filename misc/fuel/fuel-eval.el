@@ -1,6 +1,6 @@
-;;; fuel-eval.el --- utilities for communication with fuel-listener
+;;; fuel-eval.el --- evaluating Factor expressions
 
-;; Copyright (C) 2008  Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009  Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -9,18 +9,81 @@
 
 ;;; Commentary:
 
-;; Protocols for handling communications via a comint buffer running a
-;; factor listener.
+;; Protocols for sending evaluations to the Factor listener.
 
 ;;; Code:
 
-(require 'fuel-base)
 (require 'fuel-syntax)
+(require 'fuel-connection)
+(require 'fuel-log)
+(require 'fuel-base)
+
+(eval-when-compile (require 'cl))
 
 
-;;; Syncronous string sending:
+;;; Simple sexp-based representation of factor code
 
-(defvar fuel-eval-log-max-length 16000)
+(defun factor (sexp)
+  (cond ((null sexp) "f")
+        ((eq sexp t) "t")
+        ((or (stringp sexp) (numberp sexp)) (format "%S" sexp))
+        ((vectorp sexp) (factor (cons :quotation (append sexp nil))))
+        ((listp sexp)
+         (case (car sexp)
+           (:array (factor--seq 'V{ '} (cdr sexp)))
+           (:seq (factor--seq '{ '} (cdr sexp)))
+           (:tuple (factor--seq 'T{ '} (cdr sexp)))
+           (:quote (format "\\ %s" (factor `(:factor ,(cadr sexp)))))
+           (:quotation (factor--seq '\[ '\] (cdr sexp)))
+           (:using (factor `(USING: ,@(cdr sexp) :end)))
+           (:factor (format "%s" (mapconcat 'identity (cdr sexp) " ")))
+           (:fuel (factor--fuel-factor (cons :rs (cdr sexp))))
+           (:fuel* (factor--fuel-factor (cons :nrs (cdr sexp))))
+           (t (mapconcat 'factor sexp " "))))
+        ((keywordp sexp)
+         (factor (case sexp
+                   (:rs 'fuel-eval-restartable)
+                   (:nrs 'fuel-eval-non-restartable)
+                   (:in (or (fuel-syntax--current-vocab) "fuel"))
+                   (:usings `(:array ,@(fuel-syntax--usings)))
+                   (:get 'fuel-eval-set-result)
+                   (:end '\;)
+                   (t `(:factor ,(symbol-name sexp))))))
+        ((symbolp sexp) (symbol-name sexp))))
+
+(defsubst factor--seq (begin end forms)
+  (format "%s %s %s" begin (if forms (factor forms) "") end))
+
+(defsubst factor--fuel-factor (sexp)
+  (factor `(,(factor--fuel-restart (nth 0 sexp))
+            ,(factor--fuel-lines (nth 1 sexp))
+            ,(factor--fuel-in (nth 2 sexp))
+            ,(factor--fuel-usings (nth 3 sexp))
+            fuel-eval-in-context)))
+
+(defsubst factor--fuel-restart (rs)
+  (unless (member rs '(:rs :nrs))
+    (error "Invalid restart spec (%s)" rs))
+  rs)
+
+(defsubst factor--fuel-lines (lst)
+  (cons :array (mapcar 'factor lst)))
+
+(defsubst factor--fuel-in (in)
+  (cond ((or (eq in :in) (null in)) :in)
+        ((eq in 'f) 'f)
+        ((eq in 't) "fuel")
+        ((stringp in) in)
+        (t (error "Invalid 'in' (%s)" in))))
+
+(defsubst factor--fuel-usings (usings)
+  (cond ((null usings) :usings)
+        ((eq usings t) nil)
+        ((listp usings) `(:array ,@usings))
+        (t (error "Invalid 'usings' (%s)" usings))))
+
+
+;;; Code sending:
 
 (defvar fuel-eval--default-proc-function nil)
 (defsubst fuel-eval--default-proc ()
@@ -28,27 +91,28 @@
        (funcall fuel-eval--default-proc-function)))
 
 (defvar fuel-eval--proc nil)
-(defvar fuel-eval--log t)
 
-(defun fuel-eval--send-string (str)
-  (let ((proc (or fuel-eval--proc (fuel-eval--default-proc))))
-    (when proc
-      (with-current-buffer (get-buffer-create "*factor messages*")
-        (goto-char (point-max))
-        (when (and (> fuel-eval-log-max-length 0)
-                   (> (point) fuel-eval-log-max-length))
-          (erase-buffer))
-        (when fuel-eval--log (insert "\n>> " (fuel--shorten-str str 256)))
-        (newline)
-        (let ((beg (point)))
-          (comint-redirect-send-command-to-process str (current-buffer) proc nil t)
-          (with-current-buffer (process-buffer proc)
-            (while (not comint-redirect-completed) (sleep-for 0 1)))
-          (goto-char beg)
-          (current-buffer))))))
+(defvar fuel-eval--sync-retort nil)
+
+(defun fuel-eval--send/wait (code &optional timeout buffer)
+  (setq fuel-eval--sync-retort nil)
+  (fuel-con--send-string/wait (or fuel-eval--proc (fuel-eval--default-proc))
+                              (if (stringp code) code (factor code))
+                              '(lambda (s)
+                                 (setq fuel-eval--sync-retort
+                                       (fuel-eval--parse-retort s)))
+                              timeout
+                              buffer)
+  fuel-eval--sync-retort)
+
+(defun fuel-eval--send (code cont &optional buffer)
+  (fuel-con--send-string (or fuel-eval--proc (fuel-eval--default-proc))
+                         (if (stringp code) code (factor code))
+                         `(lambda (s) (,cont (fuel-eval--parse-retort s)))
+                         buffer))
 
 
-;;; Evaluation protocol
+;;; Retort and retort-error datatypes:
 
 (defsubst fuel-eval--retort-make (err result &optional output)
   (list err result output))
@@ -57,70 +121,27 @@
 (defsubst fuel-eval--retort-result (ret) (nth 1 ret))
 (defsubst fuel-eval--retort-output (ret) (nth 2 ret))
 
-(defsubst fuel-eval--retort-p (ret) (listp ret))
+(defsubst fuel-eval--retort-p (ret)
+  (and (listp ret) (= 3 (length ret))))
 
 (defsubst fuel-eval--make-parse-error-retort (str)
-  (fuel-eval--retort-make 'parse-retort-error nil str))
+  (fuel-eval--retort-make (cons 'fuel-parse-retort-error str) nil))
 
-(defun fuel-eval--parse-retort (buffer)
-  (save-current-buffer
-    (set-buffer buffer)
-    (condition-case nil
-        (read (current-buffer))
-      (error (fuel-eval--make-parse-error-retort
-              (buffer-substring-no-properties (point) (point-max)))))))
-
-(defsubst fuel-eval--send/retort (str)
-  (fuel-eval--parse-retort (fuel-eval--send-string str)))
-
-(defsubst fuel-eval--eval-begin ()
-  (fuel-eval--send/retort "fuel-begin-eval"))
-
-(defsubst fuel-eval--eval-end ()
-  (fuel-eval--send/retort "fuel-begin-eval"))
-
-(defsubst fuel-eval--factor-array (strs)
-  (format "V{ %S }" (mapconcat 'identity strs " ")))
-
-(defsubst fuel-eval--eval-strings (strs &optional no-restart)
-  (let ((str (format "fuel-eval-%s %s fuel-eval"
-                     (if no-restart "non-restartable" "restartable")
-                     (fuel-eval--factor-array strs))))
-    (fuel-eval--send/retort str)))
-
-(defsubst fuel-eval--eval-string (str &optional no-restart)
-  (fuel-eval--eval-strings (list str) no-restart))
-
-(defun fuel-eval--eval-strings/context (strs &optional no-restart)
-  (let ((usings (fuel-syntax--usings-update)))
-    (fuel-eval--send/retort
-     (format "fuel-eval-%s %s %S %s fuel-eval-in-context"
-             (if no-restart "non-restartable" "restartable")
-             (fuel-eval--factor-array strs)
-             (or fuel-syntax--current-vocab "f")
-             (if usings (fuel-eval--factor-array usings) "f")))))
-
-(defsubst fuel-eval--eval-string/context (str &optional no-restart)
-  (fuel-eval--eval-strings/context (list str) no-restart))
-
-(defun fuel-eval--eval-region/context (begin end &optional no-restart)
-  (let ((lines (split-string (buffer-substring-no-properties begin end)
-                             "[\f\n\r\v]+" t)))
-    (when (> (length lines) 0)
-      (fuel-eval--eval-strings/context lines no-restart))))
-
-
-;;; Error parsing
+(defun fuel-eval--parse-retort (ret)
+  (fuel-log--info "RETORT: %S" ret)
+  (if (fuel-eval--retort-p ret) ret
+    (fuel-eval--make-parse-error-retort ret)))
 
 (defsubst fuel-eval--error-name (err) (car err))
-
-(defsubst fuel-eval--error-restarts (err)
-  (cdr (assoc :restarts (fuel-eval--error-name-p err 'condition))))
 
 (defun fuel-eval--error-name-p (err name)
   (unless (null err)
     (or (and (eq (fuel-eval--error-name err) name) err)
         (assoc name err))))
+
+(defsubst fuel-eval--error-restarts (err)
+  (cdr (assoc :restarts (or (fuel-eval--error-name-p err 'condition)
+                            (fuel-eval--error-name-p err 'lexer-error)))))
 
 (defsubst fuel-eval--error-file (err)
   (nth 1 (fuel-eval--error-name-p err 'source-file-error)))

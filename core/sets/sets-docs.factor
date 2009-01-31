@@ -13,6 +13,8 @@ $nl
 { $subsection diff }
 { $subsection intersect }
 { $subsection union }
+"Set-theoretic predicates:"
+{ $subsection intersects? }
 { $subsection subset? }
 { $subsection set= }
 "A word used to implement the above:"
@@ -20,7 +22,7 @@ $nl
 "Adding elements to sets:"
 { $subsection adjoin }
 { $subsection conjoin }
-{ $see-also member? memq? contains? all? "assocs-sets" } ;
+{ $see-also member? memq? any? all? "assocs-sets" } ;
 
 ABOUT: "sets"
 
@@ -104,9 +106,15 @@ HELP: union
 
 { diff intersect union } related-words
 
+HELP: intersects?
+{ $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "seq1" } " and " { $snippet "seq2" } " have any elements in common." }
+{ $notes "If one of the sequences is empty, the result is always " { $link f } "." } ;
+
 HELP: subset?
 { $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
-{ $description "Tests if every element of " { $snippet "seq1" } " is contained in " { $snippet "seq2" } "." } ;
+{ $description "Tests if every element of " { $snippet "seq1" } " is contained in " { $snippet "seq2" } "." }
+{ $notes "If " { $snippet "seq1" } " is empty, the result is always " { $link t } "." } ;
 
 HELP: set=
 { $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }

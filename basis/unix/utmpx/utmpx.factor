@@ -6,18 +6,18 @@ unix calendar system accessors unix.time calendar.unix
 vocabs.loader ;
 IN: unix.utmpx
 
-: EMPTY 0 ; inline
-: RUN_LVL 1 ; inline
-: BOOT_TIME 2 ; inline
-: OLD_TIME 3 ; inline
-: NEW_TIME 4 ; inline
-: INIT_PROCESS 5 ; inline
-: LOGIN_PROCESS 6 ; inline
-: USER_PROCESS 7 ; inline
-: DEAD_PROCESS 8 ; inline
-: ACCOUNTING 9 ; inline
-: SIGNATURE 10 ; inline
-: SHUTDOWN_TIME 11 ; inline
+CONSTANT: EMPTY 0
+CONSTANT: RUN_LVL 1
+CONSTANT: BOOT_TIME 2
+CONSTANT: OLD_TIME 3
+CONSTANT: NEW_TIME 4
+CONSTANT: INIT_PROCESS 5
+CONSTANT: LOGIN_PROCESS 6
+CONSTANT: USER_PROCESS 7
+CONSTANT: DEAD_PROCESS 8
+CONSTANT: ACCOUNTING 9
+CONSTANT: SIGNATURE 10
+CONSTANT: SHUTDOWN_TIME 11
 
 FUNCTION: void setutxent ( ) ;
 FUNCTION: void endutxent ( ) ;
@@ -33,7 +33,7 @@ HOOK: new-utmpx-record os ( -- utmpx-record )
 HOOK: utmpx>utmpx-record os ( utmpx -- utmpx-record )
 
 : memory>string ( alien n -- string )
-    memory>byte-array utf8 decode [ 0 = ] trim-right ;
+    memory>byte-array utf8 decode [ 0 = ] trim-tail ;
 
 M: unix new-utmpx-record
     utmpx-record new ;

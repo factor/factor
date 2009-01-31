@@ -64,7 +64,7 @@ PRIVATE>
 : recip ( x -- y ) 1 swap / ; inline
 : sgn ( x -- n ) dup 0 < [ drop -1 ] [ 0 > 1 0 ? ] if ; inline
 
-: ?1+ [ 1+ ] [ 0 ] if* ; inline
+: ?1+ ( x -- y ) [ 1+ ] [ 0 ] if* ; inline
 
 : rem ( x y -- z ) abs tuck mod over + swap mod ; foldable
 
@@ -114,15 +114,15 @@ M: float fp-infinity? ( float -- ? )
 
 <PRIVATE
 
-: iterate-prep 0 -rot ; inline
+: iterate-prep ( n quot -- i n quot ) [ 0 ] 2dip ; inline
 
-: if-iterate? [ 2over < ] 2dip if ; inline
+: if-iterate? ( i n true false -- ) [ 2over < ] 2dip if ; inline
 
 : iterate-step ( i n quot -- i n quot )
     #! Apply quot to i, keep i and quot, hide n.
     swap [ 2dup 2slip ] dip swap ; inline
 
-: iterate-next [ 1+ ] 2dip ; inline
+: iterate-next ( i n quot -- i' n quot ) [ 1+ ] 2dip ; inline
 
 PRIVATE>
 

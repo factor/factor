@@ -9,14 +9,14 @@ IN: x11.xim
 SYMBOL: xim
 
 : (init-xim) ( classname medifier -- im )
-   XSetLocaleModifiers [ "XSetLocaleModifiers() failed" throw ] unless
-   [ dpy get f ] dip dup XOpenIM ;
+    XSetLocaleModifiers [ "XSetLocaleModifiers() failed" throw ] unless
+    [ dpy get f ] dip dup XOpenIM ;
 
 : init-xim ( classname -- )
-   dup "" (init-xim)
-   [ nip ]
-   [ "@im=none" (init-xim) [ "XOpenIM() failed" throw ] unless* ] if*
-   xim set-global ;
+    dup "" (init-xim)
+    [ nip ]
+    [ "@im=none" (init-xim) [ "XOpenIM() failed" throw ] unless* ] if*
+    xim set-global ;
 
 : close-xim ( -- )
     xim get-global XCloseIM drop f xim set-global ;

@@ -28,22 +28,10 @@ $nl
 } ;
 
 HELP: too-many->r
-{ $error-description "Thrown if inference notices a quotation pushing elements on the retain stack without popping them at the end." }
-{ $examples
-    { $code
-        ": too-many->r-example ( a b -- )"
-        "    >r 3 + >r ;"
-    }
-} ;
+{ $error-description "Thrown if inference notices a quotation pushing elements on the retain stack without popping them at the end." } ;
 
 HELP: too-many-r>
-{ $error-description "Thrown if inference notices a quotation popping elements from the return stack it did not place there." }
-{ $examples
-    { $code
-        ": too-many-r>-example ( a b -- )"
-        "    r> 3 + >r ;"
-    }
-} ;
+{ $error-description "Thrown if inference notices a quotation popping elements from the return stack it did not place there." } ;
 
 HELP: missing-effect
 { $error-description "Thrown when inference encounters a word lacking a stack effect declaration. Stack effects of words must be declared, with the exception of words which only push literals on the stack." }

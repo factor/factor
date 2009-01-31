@@ -18,7 +18,7 @@ IN: urls.encoding
 
 : push-utf8 ( ch -- )
     1string utf8 encode
-    [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each ;
+    [ CHAR: % , >hex 2 CHAR: 0 pad-head % ] each ;
 
 PRIVATE>
 

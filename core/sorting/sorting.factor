@@ -42,15 +42,28 @@ TUPLE: merge
         ] if
     ] if ; inline
 
-: l-elt   [ from1>> ] [ seq>> ] bi nth-unsafe ; inline
-: r-elt   [ from2>> ] [ seq>> ] bi nth-unsafe ; inline
-: l-done? [ from1>> ] [ to1>> ] bi number= ; inline
-: r-done? [ from2>> ] [ to2>> ] bi number= ; inline
-: dump-l  [ [ from1>> ] [ to1>> ] [ seq>> ] tri ] [ accum>> ] bi dump ; inline
-: dump-r  [ [ from2>> ] [ to2>> ] [ seq>> ] tri ] [ accum>> ] bi dump ; inline
-: l-next  [ [ l-elt ] [ [ 1+ ] change-from1 drop ] bi ] [ accum>> ] bi push ; inline
-: r-next  [ [ r-elt ] [ [ 1+ ] change-from2 drop ] bi ] [ accum>> ] bi push ; inline
-: decide  [ [ l-elt ] [ r-elt ] bi ] dip call +gt+ eq? ; inline
+: l-elt ( merge -- elt ) [ from1>> ] [ seq>> ] bi nth-unsafe ; inline
+
+: r-elt ( merge -- elt ) [ from2>> ] [ seq>> ] bi nth-unsafe ; inline
+
+: l-done? ( merge -- ? ) [ from1>> ] [ to1>> ] bi eq? ; inline
+
+: r-done? ( merge -- ? ) [ from2>> ] [ to2>> ] bi eq? ; inline
+
+: dump-l ( merge -- )
+    [ [ from1>> ] [ to1>> ] [ seq>> ] tri ] [ accum>> ] bi dump ; inline
+
+: dump-r ( merge -- )
+    [ [ from2>> ] [ to2>> ] [ seq>> ] tri ] [ accum>> ] bi dump ; inline
+
+: l-next ( merge -- )
+    [ [ l-elt ] [ [ 1+ ] change-from1 drop ] bi ] [ accum>> ] bi push ; inline
+
+: r-next ( merge -- )
+    [ [ r-elt ] [ [ 1+ ] change-from2 drop ] bi ] [ accum>> ] bi push ; inline
+
+: decide ( merge -- ? )
+    [ [ l-elt ] [ r-elt ] bi ] dip call +gt+ eq? ; inline
 
 : (merge) ( merge quot: ( elt1 elt2 -- <=> ) -- )
     over r-done? [ drop dump-l ] [

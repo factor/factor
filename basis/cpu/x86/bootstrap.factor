@@ -79,9 +79,10 @@ big-endian off
     ! compute quotation location
     temp0 temp1 ADD
     ! load quotation
-    temp0 temp0 array-start-offset [+] MOV
-    ! execute branch
-    temp0 quot-xt-offset [+] JMP
+    arg temp0 array-start-offset [+] MOV
+    ! execute branch. the quot must be in arg, since it might
+    ! not be compiled yet
+    arg quot-xt-offset [+] JMP
 ] rc-absolute-cell rt-immediate 1 rex-length + jit-dispatch jit-define
 
 : jit->r ( -- )
@@ -318,9 +319,7 @@ big-endian off
     ds-reg [] temp1 MOV
 ] f f f \ -rot define-sub-primitive
 
-[ jit->r ] f f f \ >r define-sub-primitive
-
-[ jit-r> ] f f f \ r> define-sub-primitive
+[ jit->r ] f f f \ load-local define-sub-primitive
 
 ! Comparisons
 : jit-compare ( insn -- )

@@ -34,7 +34,7 @@ ARTICLE: "namespaces.private" "Namespace implementation details"
 ARTICLE: "namespaces" "Variables and namespaces"
 "The " { $vocab-link "namespaces" } " vocabulary implements simple dynamically-scoped variables."
 $nl
-"A variable is an entry in an assoc of bindings, where the assoc is implicit rather than passed on the stack. These assocs are termed " { $emphasis "namespaces" } ". Nesting of scopes is implemented with a search order on namespaces, defined by a " { $emphasis "namestack" } ". Since namespaces are just assoc, any object can be used as a variable, however by convention, variables are keyed by symbols (see " { $link "symbols" } ")."
+"A variable is an entry in an assoc of bindings, where the assoc is implicit rather than passed on the stack. These assocs are termed " { $emphasis "namespaces" } ". Nesting of scopes is implemented with a search order on namespaces, defined by a " { $emphasis "namestack" } ". Since namespaces are just assoc, any object can be used as a variable, however by convention, variables are keyed by symbols (see " { $link "words.symbol" } ")."
 $nl
 "The " { $link get } " and " { $link set } " words read and write variable values. The " { $link get } " word searches up the chain of nested namespaces, while " { $link set } " always sets variable values in the current namespace only. Namespaces are dynamically scoped; when a quotation is called from a nested scope, any words called by the quotation also execute in that scope."
 { $subsection get }

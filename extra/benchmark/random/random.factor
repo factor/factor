@@ -1,4 +1,5 @@
-USING: io.files io.encodings.ascii random math.parser io math ;
+USING: io io.files io.files.temp io.encodings.ascii random
+math.parser math ;
 IN: benchmark.random
 
 : random-numbers-path ( -- path )

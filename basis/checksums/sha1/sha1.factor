@@ -3,7 +3,7 @@
 USING: arrays combinators kernel io io.encodings.binary io.files
 io.streams.byte-array math.vectors strings sequences namespaces
 make math parser sequences assocs grouping vectors io.binary
-hashtables symbols math.bitwise checksums checksums.common
+hashtables math.bitwise checksums checksums.common
 checksums.stream ;
 IN: checksums.sha1
 
@@ -128,7 +128,7 @@ M: sha1 checksum-stream ( stream -- sha1 )
     [ zip concat ] keep like ;
 
 : sha1-interleave ( string -- seq )
-    [ zero? ] trim-left
+    [ zero? ] trim-head
     dup length odd? [ rest ] when
     seq>2seq [ sha1 checksum-bytes ] bi@
     2seq>seq ;

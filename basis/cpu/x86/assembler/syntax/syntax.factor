@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel words sequences lexer parser fry ;
+USING: kernel words words.symbol sequences lexer parser fry ;
 IN: cpu.x86.assembler.syntax
 
 : define-register ( name num size -- )

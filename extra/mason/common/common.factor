@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences splitting system accessors
-math.functions make io io.files io.launcher io.encodings.utf8
-prettyprint combinators.short-circuit parser combinators
-calendar calendar.format arrays mason.config locals ;
+math.functions make io io.files io.pathnames io.directories
+io.launcher io.encodings.utf8 prettyprint
+combinators.short-circuit parser combinators calendar
+calendar.format arrays mason.config locals ;
 IN: mason.common
 
 : short-running-process ( command -- )

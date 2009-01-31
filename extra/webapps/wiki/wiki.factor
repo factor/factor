@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel hashtables calendar random assocs
 namespaces make splitting sequences sorting math.order present
-io.files io.encodings.ascii
+io.files io.directories io.encodings.ascii
 syndication farkup
 html.components html.forms
 http.server

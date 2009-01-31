@@ -6,7 +6,7 @@ io.encodings.utf8 io.timeouts io.sockets io.sockets.secure
 io.encodings.ascii kernel logging sequences combinators
 splitting assocs strings math.order math.parser random system
 calendar summary calendar.format accessors sets hashtables
-base64 debugger classes prettyprint ;
+base64 debugger classes prettyprint io.crlf ;
 IN: smtp
 
 SYMBOL: smtp-domain
@@ -50,12 +50,6 @@ TUPLE: email
 
 <PRIVATE
 
-: crlf ( -- ) "\r\n" write ;
-
-: read-crlf ( -- bytes )
-    "\r" read-until
-    [ CHAR: \r assert= read1 CHAR: \n assert= ] when* ;
-
 : command ( string -- ) write crlf flush ;
 
 \ command DEBUG add-input-logging
@@ -68,8 +62,8 @@ ERROR: bad-email-address email ;
 
 : validate-address ( string -- string' )
     #! Make sure we send funky stuff to the server by accident.
-    dup "\r\n>" intersect empty?
-    [ bad-email-address ] unless ;
+    dup "\r\n>" intersects?
+    [ bad-email-address ] when ;
 
 : mail-from ( fromaddr -- )
     validate-address
@@ -92,9 +86,8 @@ M: message-contains-dot summary ( obj -- string )
     [ message-contains-dot ] when ;
 
 : send-body ( body -- )
-    string-lines
-    validate-message
-    [ write crlf ] each
+    utf8 encode
+    >base64-lines write crlf
     "." command ;
 
 : quit ( -- )
@@ -102,7 +95,7 @@ M: message-contains-dot summary ( obj -- string )
 
 LOG: smtp-response DEBUG
 
-: multiline? ( response -- boolean )
+: multiline? ( response -- ? )
     3 swap ?nth CHAR: - = ;
 
 : (receive-response) ( -- )
@@ -167,15 +160,22 @@ M: plain-auth send-auth
 
 : auth ( -- ) smtp-auth get send-auth ;
 
+: encode-header ( string -- string' )
+    dup aux>> [
+        "=?utf-8?B?"
+        swap utf8 encode >base64
+        "?=" 3append
+    ] when ;
+
 ERROR: invalid-header-string string ;
 
 : validate-header ( string -- string' )
-    dup "\r\n" intersect empty?
-    [ invalid-header-string ] unless ;
+    dup "\r\n" intersects?
+    [ invalid-header-string ] when ;
 
 : write-header ( key value -- )
     [ validate-header write ]
-    [ ": " write validate-header write ] bi* crlf ;
+    [ ": " write validate-header encode-header write ] bi* crlf ;
 
 : write-headers ( assoc -- )
     [ write-header ] assoc-each ;
@@ -195,6 +195,13 @@ ERROR: invalid-header-string string ;
     ! This could be much smarter.
     " " split1-last swap or "<" ?head drop ">" ?tail drop ;
 
+: utf8-mime-header ( -- alist )
+    {
+        { "MIME-Version" "1.0" }
+        { "Content-Transfer-Encoding" "base64" }
+        { "Content-Type" "Text/plain; charset=utf-8" }
+    } ;
+
 : email>headers ( email -- hashtable )
     [
         {
@@ -205,7 +212,7 @@ ERROR: invalid-header-string string ;
         } cleave
         now timestamp>rfc822 "Date" set
         message-id "Message-Id" set
-    ] { } make-assoc ;
+    ] { } make-assoc utf8-mime-header append ;
 
 : (send-email) ( headers email -- )
     [

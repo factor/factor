@@ -39,8 +39,6 @@ GENERIC: >expr ( insn -- expr )
 
 M: ##load-immediate >expr val>> <constant> ;
 
-M: ##load-indirect >expr obj>> <constant> ;
-
 M: ##unary >expr
     [ class ] [ src>> vreg>vn ] bi unary-expr boa ;
 

@@ -2,7 +2,7 @@
 ! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private math math.ranges
-combinators macros quotations fry ;
+combinators macros quotations fry macros locals ;
 IN: generalizations
 
 <<
@@ -73,10 +73,13 @@ MACRO: ncleave ( quots n -- )
     [ '[ _ '[ _ _ nkeep ] ] map [ ] join ] [ '[ _ ndrop ] ] bi
     compose ;
 
-MACRO: napply ( n -- )
-    2 [a,b]
-    [ [ 1- ] [ ] bi '[ _ ntuck _ nslip ] ]
-    map concat >quotation [ call ] append ;
+MACRO: napply ( quot n -- )
+    swap <repetition> spread>quot ;
 
 MACRO: mnswap ( m n -- )
     1+ '[ _ -nrot ] <repetition> spread>quot ;
+
+: nappend-as ( n exemplar -- seq )
+    [ narray concat ] dip like ; inline
+
+: nappend ( n -- seq ) narray concat ; inline

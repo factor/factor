@@ -33,21 +33,7 @@ $nl
 { $subsection define-inline }
 "Word definitions should declare their stack effect, unless the definition is completely trivial. See " { $link "effect-declaration" } "."
 $nl
-"All other types of word definitions, such as " { $link "symbols" } " and " { $link "generic" } ", are just special cases of the above." ;
-
-ARTICLE: "symbols" "Symbols"
-"A symbol pushes itself on the stack when executed. By convention, symbols are used as variable names (" { $link "namespaces" } ")."
-{ $subsection symbol }
-{ $subsection symbol? }
-"Defining symbols at parse time:"
-{ $subsection POSTPONE: SYMBOL: }
-"Defining symbols at run time:"
-{ $subsection define-symbol }
-"Symbols are just compound definitions in disguise. The following two lines are equivalent:"
-{ $code
-    "SYMBOL: foo"
-    ": foo \\ foo ;"
-} ;
+"All other types of word definitions, such as " { $link "words.symbol" } " and " { $link "generic" } ", are just special cases of the above." ;
 
 ARTICLE: "primitives" "Primitives"
 "Primitives are words defined in the Factor VM. They provide the essential low-level services to the rest of the system."
@@ -91,7 +77,8 @@ ARTICLE: "word-definition" "Defining words"
 }
 "The latter is a more dynamic feature that can be used to implement code generation and such, and in fact parse time defining words are implemented in terms of run time defining words."
 { $subsection "colon-definition" }
-{ $subsection "symbols" }
+{ $subsection "words.symbol" }
+{ $subsection "words.alias" }
 { $subsection "primitives" }
 { $subsection "deferred" }
 { $subsection "declarations" }
@@ -193,9 +180,6 @@ HELP: deferred
 HELP: primitive
 { $description "The class of primitive words." } ;
 
-HELP: symbol
-{ $description "The class of symbols created by " { $link POSTPONE: SYMBOL: } "." } ;
-
 HELP: word-prop
 { $values { "word" word } { "name" "a property name" } { "value" "a property value" } }
 { $description "Retrieves a word property. Word property names are conventionally strings." } ;
@@ -213,12 +197,6 @@ HELP: remove-word-prop
 HELP: word-xt ( word -- start end )
 { $values { "word" word } { "start" "the word's start address" } { "end" "the word's end address" } }
 { $description "Outputs the machine code address of the word's definition." } ;
-
-HELP: define-symbol
-{ $values { "word" word } }
-{ $description "Defines the word to push itself on the stack when executed. This is the run time equivalent of " { $link POSTPONE: SYMBOL: } "." }
-{ $notes "This word must be called from inside " { $link with-compilation-unit } "." }
-{ $side-effects "word" } ;
 
 HELP: define
 { $values { "word" word } { "def" quotation } }
@@ -344,6 +322,6 @@ HELP: make-inline
 { $side-effects "word" } ;
 
 HELP: define-inline
-{ $values { "word" word } { "quot" quotation } }
+{ $values { "word" word } { "def" quotation } { "effect" effect } }
 { $description "Defines a word and makes it " { $link POSTPONE: inline } "." }
 { $side-effects "word" } ;

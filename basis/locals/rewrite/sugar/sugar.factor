@@ -33,11 +33,11 @@ GENERIC: rewrite-literal? ( obj -- ? )
 
 M: special rewrite-literal? drop t ;
 
-M: array rewrite-literal? [ rewrite-literal? ] contains? ;
+M: array rewrite-literal? [ rewrite-literal? ] any? ;
 
-M: quotation rewrite-literal? [ rewrite-literal? ] contains? ;
+M: quotation rewrite-literal? [ rewrite-literal? ] any? ;
 
-M: wrapper rewrite-literal? drop t ;
+M: wrapper rewrite-literal? wrapped>> rewrite-literal? ;
 
 M: hashtable rewrite-literal? drop t ;
 
@@ -53,7 +53,7 @@ GENERIC: rewrite-element ( obj -- )
     [ rewrite-element ] each ;
 
 : rewrite-sequence ( seq -- )
-    [ rewrite-elements ] [ length , ] [ 0 head , ] tri \ nsequence , ;
+    [ rewrite-elements ] [ length ] [ 0 head ] tri '[ _ _ nsequence ] % ;
 
 M: array rewrite-element
     dup rewrite-literal? [ rewrite-sequence ] [ , ] if ;
@@ -63,7 +63,7 @@ M: vector rewrite-element rewrite-sequence ;
 M: hashtable rewrite-element >alist rewrite-sequence \ >hashtable , ;
 
 M: tuple rewrite-element
-    [ tuple-slots rewrite-elements ] [ class literalize , ] bi \ boa , ;
+    [ tuple-slots rewrite-elements ] [ class ] bi '[ _ boa ] % ;
 
 M: quotation rewrite-element rewrite-sugar* ;
 
@@ -81,10 +81,14 @@ M: local-writer rewrite-element
 M: local-word rewrite-element
     local-word-in-literal-error ;
 
-M: word rewrite-element literalize , ;
+M: word rewrite-element <wrapper> , ;
+
+: rewrite-wrapper ( wrapper -- )
+    dup rewrite-literal?
+    [ wrapped>> rewrite-element ] [ , ] if ;
 
 M: wrapper rewrite-element
-    dup rewrite-literal? [ wrapped>> rewrite-element ] [ , ] if ;
+    rewrite-wrapper \ <wrapper> , ;
 
 M: object rewrite-element , ;
 
@@ -98,10 +102,11 @@ M: def rewrite-sugar* , ;
 
 M: hashtable rewrite-sugar* rewrite-element ;
 
-M: wrapper rewrite-sugar* rewrite-element ;
+M: wrapper rewrite-sugar*
+    rewrite-wrapper ;
 
 M: word rewrite-sugar*
-    dup { >r r> load-locals get-local drop-locals } memq?
+    dup { load-locals get-local drop-locals } memq?
     [ >r/r>-in-lambda-error ] [ call-next-method ] if ;
 
 M: object rewrite-sugar* , ;

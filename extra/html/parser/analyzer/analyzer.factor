@@ -130,7 +130,7 @@ TUPLE: link attributes clickable ;
 
 : find-forms ( vector -- vector' )
     "form" over find-opening-tags-by-name
-    swap [ >r first2 r> find-between* ] curry map
+    swap [ [ first2 ] dip find-between* ] curry map
     [ [ name>> { "form" "input" } member? ] filter ] map ;
 
 : find-html-objects ( vector string -- vector' )

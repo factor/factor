@@ -1,287 +1,177 @@
-! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: xml.errors xml.data xml.utilities xml.char-classes sets
-xml.entities kernel state-parser kernel namespaces make strings
-math math.parser sequences assocs arrays splitting combinators
-unicode.case accessors fry ascii ;
+USING: namespaces xml.state kernel sequences accessors
+xml.char-classes xml.errors math io sbufs fry strings ascii
+circular xml.entities assocs splitting math.parser
+locals combinators arrays hints ;
 IN: xml.tokenize
 
-! XML namespace processing: ns = namespace
+! * Basic utility words
 
-! A stack of hashtables
-SYMBOL: ns-stack
-
-: attrs>ns ( attrs-alist -- hash )
-    ! this should check to make sure URIs are valid
+: assure-good-char ( spot ch -- )
     [
-        [
-            swap dup space>> "xmlns" =
-            [ main>> set ]
-            [
-                T{ name f "" "xmlns" f } names-match?
-                [ "" set ] [ drop ] if
-            ] if
-        ] assoc-each
-    ] { } make-assoc f like ;
+        swap
+        [ version-1.0?>> over text? not ]
+        [ check>> ] bi and [
+            spot get [ 1+ ] change-column drop
+            disallowed-char
+        ] [ drop ] if
+    ] [ drop ] if* ;
 
-: add-ns ( name -- )
-    dup space>> dup ns-stack get assoc-stack
-    [ nip ] [ nonexist-ns ] if* >>url drop ;
+HINTS: assure-good-char { spot fixnum } ;
 
-: push-ns ( hash -- )
-    ns-stack get push ;
+: record ( spot char -- spot )
+    over char>> [
+        CHAR: \n =
+        [ [ 1+ ] change-line -1 ] [ dup column>> 1+ ] if
+        >>column
+    ] [ drop ] if ;
 
-: pop-ns ( -- )
-    ns-stack get pop* ;
+HINTS: record { spot fixnum } ;
 
-: init-ns-stack ( -- )
-    V{ H{
-        { "xml" "http://www.w3.org/XML/1998/namespace" }
-        { "xmlns" "http://www.w3.org/2000/xmlns" }
-        { "" "" }
-    } } clone
-    ns-stack set ;
+:: (next) ( spot -- spot char )
+    spot next>> :> old-next
+    spot stream>> stream-read1 :> new-next
+    old-next CHAR: \r = [
+        spot CHAR: \n >>char
+        new-next CHAR: \n =
+        [ spot stream>> stream-read1 >>next ]
+        [ new-next >>next ] if
+    ] [ spot old-next >>char new-next >>next ] if
+    spot next>> ; inline
 
-: tag-ns ( name attrs-alist -- name attrs )
-    dup attrs>ns push-ns
-    [ dup add-ns ] dip dup [ drop add-ns ] assoc-each <attrs> ;
+: next* ( spot -- )
+    dup char>> [ unexpected-end ] unless
+    (next) [ record ] keep assure-good-char ;
 
-! Parsing names
+HINTS: next* { spot } ;
 
-: version=1.0? ( -- ? )
-    prolog-data get version>> "1.0" = ;
+: next ( -- )
+    spot get next* ;
 
-! version=1.0? is calculated once and passed around for efficiency
+: init-parser ( -- )
+    0 1 0 0 f t f <spot>
+        input-stream get >>stream
+    spot set
+    read1 set-next next ;
 
-: (parse-name) ( -- str )
-    version=1.0? dup
-    get-char name-start? [
-        [ dup get-char name-char? not ] take-until nip
-    ] [
-        "Malformed name" xml-string-error
-    ] if ;
+: with-state ( stream quot -- )
+    ! with-input-stream implicitly creates a new scope which we use
+    swap [ init-parser call ] with-input-stream ; inline
 
-: parse-name ( -- name )
-    (parse-name) get-char CHAR: : =
-    [ next (parse-name) ] [ "" swap ] if f <name> ;
+:: (skip-until) ( quot: ( -- ? ) spot -- )
+    spot char>> [
+        quot call [
+            spot next* quot spot (skip-until)
+        ] unless
+    ] when ; inline recursive
 
-!   -- Parsing strings
+: skip-until ( quot: ( -- ? ) -- )
+    spot get (skip-until) ; inline
 
-: (parse-entity) ( string -- )
-    dup entities at [ , ] [ 
-        prolog-data get standalone>>
-        [ no-entity ] [
-            dup extra-entities get at
-            [ , ] [ no-entity ] ?if
-        ] if
+: take-until ( quot -- string )
+    #! Take the substring of a string starting at spot
+    #! from code until the quotation given is true and
+    #! advance spot to after the substring.
+    10 <sbuf> [
+        spot get swap
+        '[ @ [ t ] [ _ char>> _ push f ] if ] skip-until
+    ] keep >string ; inline
+
+: take-to ( seq -- string )
+    spot get swap '[ _ char>> _ member? ] take-until ;
+
+: pass-blank ( -- )
+    #! Advance code past any whitespace, including newlines
+    spot get '[ _ char>> blank? not ] skip-until ;
+
+: string-matches? ( string circular spot -- ? )
+    char>> over push-circular sequence= ;
+
+: take-string ( match -- string )
+    dup length <circular-string>
+    spot get '[ 2dup _ string-matches? ] take-until nip
+    dup length rot length 1- - head
+    get-char [ missing-close ] unless next ;
+
+: expect ( string -- )
+    dup spot get '[ _ [ char>> ] keep next* ] replicate
+    2dup = [ 2drop ] [ expected ] if ;
+
+! Suddenly XML-specific
+
+: parse-named-entity ( accum string -- )
+    dup entities at [ swap push ] [
+        dup extra-entities get at
+        [ swap push-all ] [ no-entity ] ?if
     ] ?if ;
 
-: parse-entity ( -- )
-    next CHAR: ; take-char next
-    "#" ?head [
-        "x" ?head 16 10 ? base> ,
-    ] [ (parse-entity) ] if ;
+: take-; ( -- string )
+    next ";" take-to next ;
 
-: (parse-char) ( ch -- )
-    get-char {
-        { [ dup not ] [ 2drop ] }
-        { [ 2dup = ] [ 2drop next ] }
-        { [ dup CHAR: & = ] [ drop parse-entity (parse-char) ] }
-        [ , next (parse-char) ]
-    } cond ;
+: parse-entity ( accum -- )
+    take-; "#" ?head [
+        "x" ?head 16 10 ? base> swap push
+    ] [ parse-named-entity ] if ;
 
-: parse-char ( ch -- string )
-    [ (parse-char) ] "" make ;
+: parse-pe ( accum -- )
+    take-; dup pe-table get at
+    [ swap push-all ] [ no-entity ] ?if ;
 
-: parse-quot ( ch -- string )
-    parse-char get-char
-    [ "XML file ends in a quote" xml-string-error ] unless ;
-
-: parse-text ( -- string )
-    CHAR: < parse-char ;
-
-! Parsing tags
-
-: start-tag ( -- name ? )
-    #! Outputs the name and whether this is a closing tag
-    get-char CHAR: / = dup [ next ] when
-    parse-name swap ;
-
-: parse-attr-value ( -- seq )
-    get-char dup "'\"" member? [
-        next parse-quot
-    ] [
-        "Attribute lacks quote" xml-string-error
-    ] if ;
-
-: parse-attr ( -- )
-    [ parse-name ] with-scope
-    pass-blank CHAR: = expect pass-blank
-    [ parse-attr-value ] with-scope
-    2array , ;
-
-: (middle-tag) ( -- )
-    pass-blank version=1.0? get-char name-start?
-    [ parse-attr (middle-tag) ] when ;
-
-: middle-tag ( -- attrs-alist )
-    ! f make will make a vector if it has any elements
-    [ (middle-tag) ] f make pass-blank ;
-
-: end-tag ( name attrs-alist -- tag )
-    tag-ns pass-blank get-char CHAR: / =
-    [ pop-ns <contained> next ] [ <opener> ] if ;
-
-: take-comment ( -- comment )
-    "--" expect-string
-    "--" take-string
-    <comment>
-    CHAR: > expect ;
-
-: take-cdata ( -- string )
-    "[CDATA[" expect-string "]]>" take-string ;
-
-: take-element-decl ( -- element-decl )
-    pass-blank " " take-string pass-blank ">" take-string <element-decl> ;
-
-: take-attlist-decl ( -- doctype-decl )
-    pass-blank " " take-string pass-blank ">" take-string <attlist-decl> ;
-
-: take-until-one-of ( seps -- str sep )
-    '[ get-char _ member? ] take-until get-char ;
-
-: only-blanks ( str -- )
-    [ blank? ] all? [ bad-doctype-decl ] unless ;
-
-: take-system-literal ( -- str )
-    pass-blank get-char next {
-        { CHAR: ' [ "'" take-string ] }
-        { CHAR: " [ "\"" take-string ] }
-    } case ;
-
-: take-system-id ( -- system-id )
-    take-system-literal <system-id>
-    ">" take-string only-blanks ;
-
-: take-public-id ( -- public-id )
-    take-system-literal
-    take-system-literal <public-id>
-    ">" take-string only-blanks ;
-
-DEFER: direct
-
-: (take-internal-subset) ( -- )
-    pass-blank get-char {
-        { CHAR: ] [ next ] }
-        [ drop "<!" expect-string direct , (take-internal-subset) ]
-    } case ;
-
-: take-internal-subset ( -- seq )
-    [ (take-internal-subset) ] { } make ;
-
-: (take-external-id) ( token -- external-id )
-    pass-blank {
-        { "SYSTEM" [ take-system-id ] }
-        { "PUBLIC" [ take-public-id ] }
-        [ bad-external-id ]
-    } case ;
-
-: take-external-id ( -- external-id )
-    " " take-string (take-external-id) ;
-
-: take-doctype-decl ( -- doctype-decl )
-    pass-blank " >" take-until-one-of {
-        { CHAR: \s [
-            pass-blank get-char CHAR: [ = [
-                next take-internal-subset f swap
-                ">" take-string only-blanks
-            ] [
-                " >" take-until-one-of {
-                    { CHAR: \s [ (take-external-id) ] }
-                    { CHAR: > [ only-blanks f ] }
-                } case f
-            ] if
+:: (parse-char) ( quot: ( ch -- ? ) accum spot -- )
+    spot char>> :> char
+    {
+        { [ char not ] [ ] }
+        { [ char quot call ] [ spot next* ] }
+        { [ char CHAR: & = ] [
+            accum parse-entity
+            quot accum spot (parse-char)
         ] }
-        { CHAR: > [ f f ] }
-    } case <doctype-decl> ;
-
-: take-entity-def ( -- entity-name entity-def )
-    " " take-string pass-blank get-char {
-        { CHAR: ' [ take-system-literal ] }
-        { CHAR: " [ take-system-literal ] }
-        [ drop take-external-id ]
-    } case ;
-
-: take-entity-decl ( -- entity-decl )
-    pass-blank get-char {
-        { CHAR: % [ next pass-blank take-entity-def ] }
-        [ drop take-entity-def ]
-    } case
-    ">" take-string only-blanks <entity-decl> ;
-
-: take-directive ( -- directive )
-    " " take-string {
-        { "ELEMENT" [ take-element-decl ] }
-        { "ATTLIST" [ take-attlist-decl ] }
-        { "DOCTYPE" [ take-doctype-decl ] }
-        { "ENTITY" [ take-entity-decl ] }
-        [ bad-directive ]
-    } case ;
-
-: direct ( -- object )
-    get-char {
-        { CHAR: - [ take-comment ] }
-        { CHAR: [ [ take-cdata ] }
-        [ drop take-directive ]
-    } case ;
-
-: yes/no>bool ( string -- t/f )
-    {
-        { "yes" [ t ] }
-        { "no" [ f ] }
-        [ not-yes/no ]
-    } case ;
-
-: assure-no-extra ( seq -- )
-    [ first ] map {
-        T{ name f "" "version" f }
-        T{ name f "" "encoding" f }
-        T{ name f "" "standalone" f }
-    } diff
-    [ extra-attrs ] unless-empty ; 
-
-: good-version ( version -- version )
-    dup { "1.0" "1.1" } member? [ bad-version ] unless ;
-
-: prolog-attrs ( alist -- prolog )
-    [ T{ name f "" "version" f } swap at
-      [ good-version ] [ versionless-prolog ] if* ] keep
-    [ T{ name f "" "encoding" f } swap at
-      "UTF-8" or ] keep
-    T{ name f "" "standalone" f } swap at
-    [ yes/no>bool ] [ f ] if*
-    <prolog> ;
-
-: parse-prolog ( -- prolog )
-    pass-blank middle-tag "?>" expect-string
-    dup assure-no-extra prolog-attrs
-    dup prolog-data set ;
-
-: instruct ( -- instruction )
-    (parse-name) dup "xml" =
-    [ drop parse-prolog ] [
-        dup >lower "xml" =
-        [ capitalized-prolog ]
-        [ "?>" take-string append <instruction> ] if
-    ] if ;
-
-: make-tag ( -- tag )
-    {
-        { [ get-char dup CHAR: ! = ] [ drop next direct ] }
-        { [ CHAR: ? = ] [ next instruct ] } 
+        { [ in-dtd? get char CHAR: % = and ] [
+            accum parse-pe
+            quot accum spot (parse-char)
+        ] }
         [
-            start-tag [ dup add-ns pop-ns <closer> ]
-            [ middle-tag end-tag ] if
-            CHAR: > expect
+            char accum push
+            spot next*
+            quot accum spot (parse-char)
         ]
-    } cond ;
+    } cond ; inline recursive
+
+: parse-char ( quot: ( ch -- ? ) -- seq )
+    1024 <sbuf> [ spot get (parse-char) ] keep >string ; inline
+
+: assure-no-]]> ( circular -- )
+    "]]>" sequence= [ text-w/]]> ] when ;
+
+:: parse-text ( -- string )
+    3 f <array> <circular> :> circ
+    depth get zero? :> no-text [| char |
+        char circ push-circular
+        circ assure-no-]]>
+        no-text [ char blank? char CHAR: < = or [
+            char 1string t pre/post-content
+        ] unless ] when
+        char CHAR: < =
+    ] parse-char ;
+
+: close ( -- )
+    pass-blank ">" expect ;
+
+: normalize-quote ( str -- str )
+    [ dup "\t\r\n" member? [ drop CHAR: \s ] when ] map ;
+
+: (parse-quote) ( <-disallowed? ch -- string )
+    swap '[
+        dup _ = [ drop t ]
+        [ CHAR: < = _ and [ attr-w/< ] [ f ] if ] if
+    ] parse-char normalize-quote get-char
+    [ unclosed-quote ] unless ; inline
+
+: parse-quote* ( <-disallowed? -- seq )
+    pass-blank get-char dup "'\"" member?
+    [ next (parse-quote) ] [ quoteless-attr ] if ; inline
+
+: parse-quote ( -- seq )
+   f parse-quote* ;
+

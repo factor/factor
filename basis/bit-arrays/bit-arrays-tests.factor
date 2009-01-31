@@ -76,3 +76,7 @@ IN: bit-arrays.tests
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
 } bit-array>integer ] unit-test
+
+[ 49 ] [ 49 <bit-array> dup set-bits [ ] count ] unit-test
+
+[ HEX: 100 ] [ ?{ f f f f f f f f t } bit-array>integer ] unit-test

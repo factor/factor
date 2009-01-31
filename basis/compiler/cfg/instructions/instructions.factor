@@ -36,13 +36,13 @@ TUPLE: ##alien-setter < ##effect { value vreg } ;
 
 ! Stack operations
 INSN: ##load-immediate < ##pure { val integer } ;
-INSN: ##load-indirect < ##pure obj ;
+INSN: ##load-reference < ##pure obj ;
 
 GENERIC: ##load-literal ( dst value -- )
 
 M: fixnum ##load-literal tag-fixnum ##load-immediate ;
 M: f ##load-literal drop \ f tag-number ##load-immediate ;
-M: object ##load-literal ##load-indirect ;
+M: object ##load-literal ##load-reference ;
 
 INSN: ##peek < ##read { loc loc } ;
 INSN: ##replace < ##write { loc loc } ;

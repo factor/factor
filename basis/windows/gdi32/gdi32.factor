@@ -1,38 +1,38 @@
 ! FUNCTION: AbortDoc
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax kernel windows.types alias ;
+USING: alien alien.syntax kernel windows.types ;
 IN: windows.gdi32
 
 ! Stock Logical Objects
-: WHITE_BRUSH         0 ; inline
-: LTGRAY_BRUSH        1 ; inline
-: GRAY_BRUSH          2 ; inline
-: DKGRAY_BRUSH        3 ; inline
-: BLACK_BRUSH         4 ; inline
-: NULL_BRUSH          5 ; inline
-: HOLLOW_BRUSH        NULL_BRUSH ; inline
-: WHITE_PEN           6 ; inline
-: BLACK_PEN           7 ; inline
-: NULL_PEN            8 ; inline
-: OEM_FIXED_FONT      10 ; inline
-: ANSI_FIXED_FONT     11 ; inline
-: ANSI_VAR_FONT       12 ; inline
-: SYSTEM_FONT         13 ; inline
-: DEVICE_DEFAULT_FONT 14 ; inline
-: DEFAULT_PALETTE     15 ; inline
-: SYSTEM_FIXED_FONT   16 ; inline
-: DEFAULT_GUI_FONT    17 ; inline
-: DC_BRUSH            18 ; inline
-: DC_PEN              19 ; inline
+CONSTANT: WHITE_BRUSH         0
+CONSTANT: LTGRAY_BRUSH        1
+CONSTANT: GRAY_BRUSH          2
+CONSTANT: DKGRAY_BRUSH        3
+CONSTANT: BLACK_BRUSH         4
+CONSTANT: NULL_BRUSH          5
+ALIAS: HOLLOW_BRUSH        NULL_BRUSH
+CONSTANT: WHITE_PEN           6
+CONSTANT: BLACK_PEN           7
+CONSTANT: NULL_PEN            8
+CONSTANT: OEM_FIXED_FONT      10
+CONSTANT: ANSI_FIXED_FONT     11
+CONSTANT: ANSI_VAR_FONT       12
+CONSTANT: SYSTEM_FONT         13
+CONSTANT: DEVICE_DEFAULT_FONT 14
+CONSTANT: DEFAULT_PALETTE     15
+CONSTANT: SYSTEM_FIXED_FONT   16
+CONSTANT: DEFAULT_GUI_FONT    17
+CONSTANT: DC_BRUSH            18
+CONSTANT: DC_PEN              19
+                  
+CONSTANT: BI_RGB        0
+CONSTANT: BI_RLE8       1
+CONSTANT: BI_RLE4       2
+CONSTANT: BI_BITFIELDS  3
 
-: BI_RGB        0 ; inline
-: BI_RLE8       1 ; inline
-: BI_RLE4       2 ; inline
-: BI_BITFIELDS  3 ; inline
-
-: DIB_RGB_COLORS 0 ; inline
-: DIB_PAL_COLORS 1 ; inline
+CONSTANT: DIB_RGB_COLORS 0
+CONSTANT: DIB_PAL_COLORS 1
 
 LIBRARY: gdi32
 

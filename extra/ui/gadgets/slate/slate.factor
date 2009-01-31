@@ -1,7 +1,13 @@
-
+! Copyright (C) 2009 Eduardo Cavazos
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces opengl ui.render ui.gadgets accessors ;
 
 IN: ui.gadgets.slate
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 TUPLE: slate < gadget action pdim graft ungraft ;
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry vectors sequences assocs math accessors kernel
-combinators quotations namespaces stack-checker.state
+combinators quotations namespaces grouping stack-checker.state
 stack-checker.backend stack-checker.errors stack-checker.visitor
 stack-checker.values stack-checker.recursive-state ;
 IN: stack-checker.branches
@@ -17,7 +17,7 @@ SYMBOL: +bottom+
 : pad-with-bottom ( seq -- newseq )
     dup empty? [
         dup [ length ] map supremum
-        '[ _ +bottom+ pad-left ] map
+        '[ _ +bottom+ pad-head ] map
     ] unless ;
 
 : phi-inputs ( max-d-in pairs -- newseq )
@@ -108,7 +108,7 @@ M: callable infer-branch
         (infer-if)
     ] [
         drop 2 consume-d
-        dup [ known [ curried? ] [ composed? ] bi or ] contains? [
+        dup [ known [ curried? ] [ composed? ] bi or ] any? [
             output-d
             [ rot [ drop call ] [ nip call ] if ]
             infer-quot-here

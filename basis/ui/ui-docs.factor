@@ -143,9 +143,7 @@ ARTICLE: "ui-backend-init" "UI initialization and the event loop"
 }
 "The above word must call the following:"
 { $subsection start-ui }
-"The " { $link ui } " word must not return until the event loop has stopped and the UI has been shut down."
-$nl
-"The event loop must not block, since otherwise other Factor threads and I/O will not run. Instead, it should poll for pending events, then call " { $link ui-wait } "." ;
+"The " { $link ui } " word must not return until the event loop has stopped and the UI has been shut down." ;
 
 ARTICLE: "ui-backend-windows" "UI backend window management"
 "The high-level " { $link open-window } " word eventually calls a low-level word which you must implement:"
@@ -187,7 +185,9 @@ $nl
 { $subsection add-gadgets }
 { $subsection clear-gadget }
 "The children of a gadget are available via the "
-{ $snippet "children" } " slot. " "Working with gadget children:"
+{ $snippet "children" } " slot. "
+$nl
+"Working with gadget children:"
 { $subsection gadget-child }
 { $subsection nth-gadget }
 { $subsection each-child }
@@ -201,7 +201,7 @@ $nl
 { $subsection relayout-1 }
 "Gadgets implement a generic word to inform their parents of their preferred size:"
 { $subsection pref-dim* }
-"To get a gadget's preferred size, do not call the above word, instead use " { $link pref-dim  } ",  which caches the result." ;
+"To get a gadget's preferred size, do not call the above word, instead use " { $link pref-dim  } ", which caches the result." ;
 
 ARTICLE: "ui-null-layout" "Manual layouts"
 "When automatic layout is not appropriate, gadgets can be added to a parent with no layout policy, and then positioned and sized manually by setting the " { $snippet "loc" } " field." ;

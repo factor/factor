@@ -2,7 +2,7 @@ USING: arrays combinators kernel lists math math.parser
 namespaces parser lexer parser-combinators
 parser-combinators.simple promises quotations sequences strings
 math.order assocs prettyprint.backend prettyprint.custom memoize
-unicode.case unicode.categories combinators.short-circuit
+ascii unicode.categories combinators.short-circuit
 accessors make io ;
 IN: parser-combinators.regexp
 
@@ -17,7 +17,7 @@ SYMBOL: ignore-case?
 
 : char-between?-quot ( ch1 ch2 -- quot )
     ignore-case? get
-    [ [ ch>upper ] bi@ [ >r >r ch>upper r> r> between? ] ]
+    [ [ ch>upper ] bi@ [ [ ch>upper ] 2dip between? ] ]
     [ [ between? ] ]
     if 2curry ;
 
@@ -79,7 +79,7 @@ PRIVATE>
     [ hex> ] <@ ;
 
 : satisfy-tokens ( assoc -- parser )
-    [ >r token r> <@literal ] { } assoc>map <or-parser> ;
+    [ [ token ] dip <@literal ] { } assoc>map <or-parser> ;
 
 : 'simple-escape-char' ( -- parser )
     {
@@ -270,7 +270,7 @@ TUPLE: regexp source parser ignore-case? ;
     ] keep regexp boa ;
 
 : do-ignore-case ( string regexp -- string regexp )
-    dup ignore-case?>> [ >r >upper r> ] when ;
+    dup ignore-case?>> [ [ >upper ] dip ] when ;
 
 : matches? ( string regexp -- ? )
     do-ignore-case parser>> just parse nil? not ;

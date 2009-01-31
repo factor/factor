@@ -10,7 +10,7 @@ IN: math.quaternions
 
 <PRIVATE
 
-: ** conjugate * ; inline
+: ** ( x y -- z ) conjugate * ; inline
 
 : 2q ( u v -- u' u'' v' v'' ) [ first2 ] bi@ ; inline
 

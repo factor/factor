@@ -1,14 +1,15 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.order strings arrays vectors sequences
-sequences.private accessors ;
+sequences.private accessors fry ;
 IN: grouping
 
 <PRIVATE
 
 TUPLE: chunking-seq { seq read-only } { n read-only } ;
 
-: check-groups dup 0 <= [ "Invalid group count" throw ] when ; inline
+: check-groups ( n -- n )
+    dup 0 <= [ "Invalid group count" throw ] when ; inline
 
 : new-groups ( seq n class -- groups )
     [ check-groups ] dip boa ; inline
@@ -86,3 +87,17 @@ INSTANCE: sliced-clumps slice-chunking
 : group ( seq n -- array ) <groups> { } like ;
 
 : clump ( seq n -- array ) <clumps> { } like ;
+
+: monotonic? ( seq quot -- ? )
+    over length 2 < [ 2drop t ] [
+        over length 2 = [
+            [ first2-unsafe ] dip call
+        ] [
+            [ 2 <sliced-clumps> ] dip
+            '[ first2-unsafe @ ] all?
+        ] if
+    ] if ; inline
+
+: all-equal? ( seq -- ? ) [ = ] monotonic? ;
+
+: all-eq? ( seq -- ? ) [ eq? ] monotonic? ;

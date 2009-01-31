@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators io.files kernel math.parser
+USING: accessors combinators io.files.types kernel math.parser
 sequences splitting ;
 IN: ftp.client.listing-parser
 
@@ -39,7 +39,7 @@ name target ;
 
 : parse-list-11 ( lines -- seq )
     [
-        11 f pad-right
+        11 f pad-tail
         <remote-file> swap {
             [ 0 swap nth parse-permissions ]
             [ 1 swap nth string>number >>links ]

@@ -43,8 +43,8 @@ IN: strings.tests
 ]
 unit-test
 
-[ "05" ] [ "5" 2 CHAR: 0 pad-left ] unit-test
-[ "666" ] [ "666" 2 CHAR: 0 pad-left ] unit-test
+[ "05" ] [ "5" 2 CHAR: 0 pad-head ] unit-test
+[ "666" ] [ "666" 2 CHAR: 0 pad-head ] unit-test
 
 [ 1 "" nth ] must-fail
 [ -6 "hello" nth ] must-fail
@@ -108,7 +108,7 @@ unit-test
             ] times
             .
         ] times
-    ] with-null-stream
+    ] with-null-writer
 ] unit-test
 
 [ t ] [

@@ -1,4 +1,4 @@
-USING: math.ranges sequences tools.test arrays ;
+USING: math math.ranges sequences sets tools.test arrays ;
 IN: math.ranges.tests
 
 [ { } ] [ 1 1 (a,b) >array ] unit-test
@@ -11,7 +11,7 @@ IN: math.ranges.tests
 [ { 1 } ] [ 1 2 [a,b) >array ] unit-test
 [ { 1 2 } ] [ 1 2 [a,b] >array ] unit-test
 
-[ { }  ] [ 2 1 (a,b) >array ] unit-test
+[ { } ] [ 2 1 (a,b) >array ] unit-test
 [ { 1 } ] [ 2 1 (a,b] >array ] unit-test
 [ { 2 } ] [ 2 1 [a,b) >array ] unit-test
 [ { 2 1 } ] [ 2 1 [a,b] >array ] unit-test
@@ -32,3 +32,7 @@ IN: math.ranges.tests
 [ 0 ] [ -1 5 [0,b] clamp-to-range ] unit-test
 [ 5 ] [ 6 5 [0,b] clamp-to-range ] unit-test
 [ { 0 1 2 3 4 } ] [ 5 sequence-index-range >array ] unit-test
+
+[ 100 ] [
+    1 100 [a,b] [ 2^ [1,b] ] map prune length
+] unit-test

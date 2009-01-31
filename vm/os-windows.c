@@ -59,39 +59,9 @@ void ffi_dlclose(F_DLL *dll)
 	dll->dll = NULL;
 }
 
-/* You must free() this yourself. */
-const F_CHAR *default_image_path(void)
-{
-	F_CHAR full_path[MAX_UNICODE_PATH];
-	F_CHAR *ptr;
-	F_CHAR path_temp[MAX_UNICODE_PATH];
-
-	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
-		fatal_error("GetModuleFileName() failed", 0);
-
-	if((ptr = wcsrchr(full_path, '.')))
-		*ptr = 0;
-
-	snwprintf(path_temp, sizeof(path_temp)-1, L"%s.image", full_path); 
-	path_temp[sizeof(path_temp) - 1] = 0;
-
-	return safe_strdup(path_temp);
-}
-
-/* You must free() this yourself. */
-const F_CHAR *vm_executable_path(void)
-{
-	F_CHAR full_path[MAX_UNICODE_PATH];
-	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
-		fatal_error("GetModuleFileName() failed", 0);
-	return safe_strdup(full_path);
-}
-
-void primitive_existsp(void)
+bool windows_stat(F_CHAR *path)
 {
 	BY_HANDLE_FILE_INFORMATION bhfi;
-
-	F_CHAR *path = unbox_u16_string();
 	HANDLE h = CreateFileW(path,
 			GENERIC_READ,
 			FILE_SHARE_READ,
@@ -107,17 +77,67 @@ void primitive_existsp(void)
 		HANDLE h;
 
 		if(INVALID_HANDLE_VALUE == (h = FindFirstFile(path, &st)))
-			dpush(F);
-		else
-		{
-			FindClose(h);
-			dpush(T);
-		}
-		return;
+			return false;
+		FindClose(h);
+		return true;
+	}
+	bool ret;
+	ret = GetFileInformationByHandle(h, &bhfi);
+	CloseHandle(h);
+	return ret;
+}
+
+void windows_image_path(F_CHAR *full_path, F_CHAR *temp_path, unsigned int length)
+{
+	snwprintf(temp_path, length-1, L"%s.image", full_path); 
+	temp_path[sizeof(temp_path) - 1] = 0;
+}
+
+/* You must free() this yourself. */
+const F_CHAR *default_image_path(void)
+{
+	F_CHAR full_path[MAX_UNICODE_PATH];
+	F_CHAR *ptr;
+	F_CHAR temp_path[MAX_UNICODE_PATH];
+
+	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
+		fatal_error("GetModuleFileName() failed", 0);
+
+	if((ptr = wcsrchr(full_path, '.')))
+		*ptr = 0;
+
+	snwprintf(temp_path, sizeof(temp_path)-1, L"%s.image", full_path); 
+	temp_path[sizeof(temp_path) - 1] = 0;
+
+	if(!windows_stat(temp_path)) {
+		unsigned int len = wcslen(full_path);
+		F_CHAR magic[] = L"-console";
+		unsigned int magic_len = wcslen(magic);
+
+		if(!wcsncmp(full_path + len - magic_len, magic, MIN(len, magic_len)))
+			full_path[len - magic_len] = 0;
+		snwprintf(temp_path, sizeof(temp_path)-1, L"%s.image", full_path); 
+		temp_path[sizeof(temp_path) - 1] = 0;
 	}
 
-	box_boolean(GetFileInformationByHandle(h, &bhfi));
-	CloseHandle(h);
+	return safe_strdup(temp_path);
+}
+
+/* You must free() this yourself. */
+const F_CHAR *vm_executable_path(void)
+{
+	F_CHAR full_path[MAX_UNICODE_PATH];
+	if(!GetModuleFileName(NULL, full_path, MAX_UNICODE_PATH))
+		fatal_error("GetModuleFileName() failed", 0);
+	return safe_strdup(full_path);
+}
+
+
+void primitive_existsp(void)
+{
+
+	F_CHAR *path = unbox_u16_string();
+	box_boolean(windows_stat(path));
 }
 
 F_SEGMENT *alloc_segment(CELL size)
@@ -166,7 +186,7 @@ long getpagesize(void)
 	return g_pagesize;
 }
 
-void sleep_micros(DWORD usec)
+void sleep_micros(u64 usec)
 {
-	Sleep(usec);
+	Sleep((DWORD)(usec / 1000));
 }

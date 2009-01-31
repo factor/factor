@@ -229,8 +229,9 @@ HELP: napply
 { $examples
   "Some core words expressed in terms of " { $link napply } ":"
     { $table
-        { { $link bi@ } { $snippet "1 napply" } }
-        { { $link tri@ } { $snippet "2 napply" } }
+        { { $link call } { $snippet "1 napply" } }
+        { { $link bi@ } { $snippet "2 napply" } }
+        { { $link tri@ } { $snippet "3 napply" } }
     }
 } ;
 
@@ -258,6 +259,55 @@ HELP: mnswap
     }
 } ;
 
+HELP: n*quot
+{ $values
+     { "n" integer } { "seq" sequence }
+     { "seq'" sequence }
+}
+{ $examples
+    { $example "USING: generalizations prettyprint math ;"
+               "3 [ + ] n*quot ."
+               "[ + + + ]"
+    }
+}
+{ $description "Construct a quotation containing the contents of " { $snippet "seq" } " repeated " { $snippet "n"} " times." } ;
+
+HELP: nappend
+{ $values
+     { "n" integer }
+     { "seq" sequence }
+}
+{ $description "Outputs a new sequence consisting of the elements of the top " { $snippet "n" } " sequences from the datastack in turn." }
+{ $errors "Throws an error if any of the sequences contain elements that are not permitted in the sequence type of the first sequence." }
+{ $examples
+    { $example "USING: generalizations prettyprint math ;"
+               "{ 1 2 } { 3 4 } { 5 6 } { 7 8 } 4 nappend ."
+               "{ 1 2 3 4 5 6 7 8 }"
+    }
+} ;
+
+HELP: nappend-as
+{ $values
+     { "n" integer } { "exemplar" sequence }
+     { "seq" sequence }
+}
+{ $description "Outputs a new sequence of type " { $snippet "exemplar" } " consisting of the elements of the top " { $snippet "n" } " sequences from the datastack in turn." }
+{ $errors "Throws an error if any of the sequences contain elements that are not permitted in the sequence type of the first sequence." }
+{ $examples
+    { $example "USING: generalizations prettyprint math ;"
+               "{ 1 2 } { 3 4 } { 5 6 } { 7 8 } 4 V{ } nappend-as ."
+               "V{ 1 2 3 4 5 6 7 8 }"
+    }
+} ;
+
+{ nappend nappend-as } related-words
+
+HELP: ntuck
+{ $values
+     { "n" integer }
+}
+{ $description "A generalization of " { $link tuck } " that can work for any stack depth. The top item will be copied and placed " { $snippet "n" } " items down on the stack." } ;
+
 ARTICLE: "generalizations" "Generalized shuffle words and combinators"
 "The " { $vocab-link "generalizations" } " vocabulary defines a number of stack shuffling words and combinators for use in "
 "macros where the arity of the input quotations depends on an "
@@ -267,6 +317,8 @@ $nl
 { $subsection narray }
 { $subsection nsequence }
 { $subsection firstn }
+{ $subsection nappend }
+{ $subsection nappend-as }
 "Generated stack shuffle operations:"
 { $subsection ndup }
 { $subsection npick }
@@ -274,6 +326,7 @@ $nl
 { $subsection -nrot }
 { $subsection nnip }
 { $subsection ndrop }
+{ $subsection ntuck }
 { $subsection nrev }
 { $subsection mnswap }
 "Generalized combinators:"

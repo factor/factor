@@ -37,13 +37,14 @@ scroller H{
     new-frame
         t >>root?
         <scroller-model> >>model
-        faint-boundary
 
-        dup model>> dependencies>> first  <x-slider> >>x dup x>> @bottom grid-add
-        dup model>> dependencies>> second <y-slider> >>y dup y>> @right  grid-add
+        dup model>> dependencies>>
+        [ first <x-slider> [ >>x ] [ @bottom grid-add ] bi ]
+        [ second <y-slider> [ >>y ] [ @right grid-add ] bi ] bi
 
-        tuck model>> <viewport> >>viewport
-        dup viewport>> @center grid-add ; inline
+        tuck model>> <viewport> [ >>viewport ] [ @center grid-add ] bi
+
+        faint-boundary ; inline
 
 : <scroller> ( gadget -- scroller ) scroller new-scroller ;
 

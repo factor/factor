@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: byte-arrays strings sequences sequences.private
+USING: byte-arrays strings sequences sequences.private ascii
 fry kernel words parser lexer assocs math math.order summary ;
 IN: tr
 
@@ -10,8 +10,6 @@ M: bad-tr summary
     drop "TR: can only be used with ASCII characters" ;
 
 <PRIVATE
-
-: ascii? ( ch -- ? ) 0 127 between? ; inline
 
 : tr-nth ( n mapping -- ch ) nth-unsafe 127 bitand ; inline
 

@@ -87,7 +87,8 @@ M: heap heap-size ( heap -- n )
 
 GENERIC: heap-compare ( pair1 pair2 heap -- ? )
 
-: (heap-compare) drop [ key>> ] compare ; inline
+: (heap-compare) ( pair1 pair2 heap -- <=> )
+    drop [ key>> ] compare ; inline
 
 M: min-heap heap-compare (heap-compare) +gt+ eq? ;
 

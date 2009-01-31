@@ -23,11 +23,11 @@ TYPEDEF: int CFStringEncoding
 : kCFStringEncodingUTF32LE HEX: 1c000100 ;
 
 FUNCTION: CFStringRef CFStringCreateWithBytes (
-   CFAllocatorRef alloc,
-   UInt8* bytes,
-   CFIndex numBytes,
-   CFStringEncoding encoding,
-   Boolean isExternalRepresentation
+    CFAllocatorRef alloc,
+    UInt8* bytes,
+    CFIndex numBytes,
+    CFStringEncoding encoding,
+    Boolean isExternalRepresentation
 ) ;
 
 FUNCTION: CFIndex CFStringGetLength ( CFStringRef theString ) ;
@@ -35,16 +35,16 @@ FUNCTION: CFIndex CFStringGetLength ( CFStringRef theString ) ;
 FUNCTION: void CFStringGetCharacters ( void* theString, CFIndex start, CFIndex length, void* buffer ) ;
 
 FUNCTION: Boolean CFStringGetCString (
-   CFStringRef theString,
-   char* buffer,
-   CFIndex bufferSize,
-   CFStringEncoding encoding
+    CFStringRef theString,
+    char* buffer,
+    CFIndex bufferSize,
+    CFStringEncoding encoding
 ) ;
 
 FUNCTION: CFStringRef CFStringCreateWithCString (
-   CFAllocatorRef alloc,
-   char* cStr,
-   CFStringEncoding encoding
+    CFAllocatorRef alloc,
+    char* cStr,
+    CFStringEncoding encoding
 ) ;
 
 : <CFString> ( string -- alien )

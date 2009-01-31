@@ -2,12 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays byte-arrays definitions generic
 hashtables kernel math namespaces parser lexer sequences strings
-strings.parser sbufs vectors words quotations io assocs
-splitting classes.tuple generic.standard generic.math
-generic.parser classes io.files vocabs classes.parser
-classes.union classes.intersection classes.mixin
-classes.predicate classes.singleton classes.tuple.parser
-compiler.units combinators effects.parser slots ;
+strings.parser sbufs vectors words words.symbol words.constant
+words.alias quotations io assocs splitting classes.tuple
+generic.standard generic.math generic.parser classes
+io.pathnames vocabs vocabs.parser classes.parser classes.union
+classes.intersection classes.mixin classes.predicate
+classes.singleton classes.tuple.parser compiler.units
+combinators effects.parser slots ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -22,7 +23,8 @@ IN: bootstrap.syntax
     "syntax" lookup t "delimiter" set-word-prop ;
 
 : define-syntax ( name quot -- )
-    [ "syntax" lookup dup ] dip define make-parsing ;
+    [ dup "syntax" lookup [ dup ] [ no-word-error ] ?if ] dip
+    define make-parsing ;
 
 [
     { "]" "}" ";" ">>" } [ define-delimiter ] each
@@ -50,6 +52,22 @@ IN: bootstrap.syntax
     "USE:" [ scan use+ ] define-syntax
 
     "USING:" [ ";" parse-tokens add-use ] define-syntax
+
+    "QUALIFIED:" [ scan dup add-qualified ] define-syntax
+
+    "QUALIFIED-WITH:" [ scan scan add-qualified ] define-syntax
+
+    "FROM:" [
+        scan "=>" expect ";" parse-tokens swap add-words-from
+    ] define-syntax
+
+    "EXCLUDE:" [
+        scan "=>" expect ";" parse-tokens swap add-words-excluding
+    ] define-syntax
+
+    "RENAME:" [
+        scan scan "=>" expect scan add-renamed-word
+    ] define-syntax
 
     "HEX:" [ 16 parse-base ] define-syntax
     "OCT:" [ 8 parse-base ] define-syntax
@@ -85,7 +103,7 @@ IN: bootstrap.syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax
 
     "POSTPONE:" [ scan-word parsed ] define-syntax
-    "\\" [ scan-word literalize parsed ] define-syntax
+    "\\" [ scan-word <wrapper> parsed ] define-syntax
     "inline" [ word make-inline ] define-syntax
     "recursive" [ word make-recursive ] define-syntax
     "foldable" [ word make-foldable ] define-syntax
@@ -95,6 +113,24 @@ IN: bootstrap.syntax
 
     "SYMBOL:" [
         CREATE-WORD define-symbol
+    ] define-syntax
+
+    "SYMBOLS:" [
+        ";" parse-tokens
+        [ create-in dup reset-generic define-symbol ] each
+    ] define-syntax
+
+    "SINGLETONS:" [
+        ";" parse-tokens
+        [ create-class-in define-singleton-class ] each
+    ] define-syntax
+    
+    "ALIAS:" [
+        CREATE-WORD scan-word define-alias
+    ] define-syntax
+
+    "CONSTANT:" [
+        CREATE scan-object define-constant
     ] define-syntax
 
     "DEFER:" [
@@ -169,8 +205,7 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "C:" [
-        CREATE-WORD
-        scan-word [ boa ] curry define-inline
+        CREATE-WORD scan-word define-boa-word
     ] define-syntax
 
     "ERROR:" [

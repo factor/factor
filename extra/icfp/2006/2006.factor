@@ -46,19 +46,19 @@ SYMBOL: open-arrays
     get-cba rot reg-val zero? [
         2drop
     ] [
-        >r reg-val r> set-reg
+        [ reg-val ] dip set-reg
     ] if f ;
 
 : binary-op ( quot -- ? )
-    >r get-cba r>
-    swap >r >r [ reg-val ] bi@ swap r> call r>
+    [ get-cba ] dip
+    swap [ [ [ reg-val ] bi@ swap ] dip call ] dip
     set-reg f ; inline
 
 : op1 ( opcode -- ? )
     [ swap arr-val ] binary-op ;
 
 : op2 ( opcode -- ? )
-    get-cba >r [ reg-val ] bi@ r> reg-val set-arr f ;
+    get-cba [ [ reg-val ] bi@ ] dip reg-val set-arr f ;
 
 : op3 ( opcode -- ? )
     [ + >32bit ] binary-op ;
@@ -73,18 +73,18 @@ SYMBOL: open-arrays
     [ bitand HEX: ffffffff swap - ] binary-op ;
 
 : new-array ( size location -- )
-    >r 0 <array> r> arrays get set-nth ;
+    [ 0 <array> ] dip arrays get set-nth ;
 
 : ?grow-storage ( -- )
     open-arrays get dup empty? [
-        >r arrays get length r> push
+        [ arrays get length ] dip push
     ] [
         drop
     ] if ;
 
 : op8 ( opcode -- ? )
     ?grow-storage
-    get-cb >r reg-val open-arrays get pop [ new-array ] keep r>
+    get-cb [ reg-val open-arrays get pop [ new-array ] keep ] dip
     set-reg f ;
 
 : op9 ( opcode -- ? )

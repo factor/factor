@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel base64 checksums.md5 symbols sequences checksums
+USING: kernel base64 checksums.md5 sequences checksums
 locals prettyprint math math.bitwise grouping io combinators
 fry make combinators.short-circuit math.functions splitting ;
 IN: crypto.passwd-md5

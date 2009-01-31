@@ -30,14 +30,17 @@ M: local-writer localize
     read-local-quot [ set-local-value ] append ;
 
 M: def localize
-    local>> [ prefix ] [ local-reader? [ 1array >r ] [ >r ] ? ] bi ;
+    local>>
+    [ prefix ]
+    [ local-reader? [ 1array load-local ] [ load-local ] ? ]
+    bi ;
 
 M: object localize 1quotation ;
 
 ! We special-case all the :> at the start of a quotation
 : load-locals-quot ( args -- quot )
     [ [ ] ] [
-        dup [ local-reader? ] contains? [
+        dup [ local-reader? ] any? [
             dup [ local-reader? [ 1array ] [ ] ? ] map
             spread>quot
         ] [ [ ] ] if swap length [ load-locals ] curry append

@@ -3,7 +3,7 @@
 USING: accessors arrays assocs hashtables assocs io kernel math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
-splitting sorting shuffle symbols sets math.order ;
+splitting sorting shuffle sets math.order ;
 IN: koszul
 
 ! Utilities
@@ -108,7 +108,7 @@ SYMBOL: boundaries
 
 : ((d)) ( basis -- value ) boundaries get at ;
 
-: dx.y ( x y -- vec ) >r ((d)) r> wedge ;
+: dx.y ( x y -- vec ) [ ((d)) ] dip wedge ;
 
 DEFER: (d)
 
@@ -120,7 +120,7 @@ DEFER: (d)
 : linear-op ( vec quot -- vec )
         [
         [
-            -rot >r swap call r> alt*n (alt+)
+            -rot [ swap call ] dip alt*n (alt+)
         ] curry assoc-each
     ] with-terms ; inline
 
@@ -165,7 +165,7 @@ DEFER: (d)
     swap call [ at 0 or ] curry map ; inline
 
 : op-matrix ( domain range quot -- matrix )
-    rot [ >r 2dup r> (op-matrix) ] map 2nip ; inline
+    rot [ [ 2dup ] dip (op-matrix) ] map 2nip ; inline
 
 : d-matrix ( domain range -- matrix )
     [ (d) ] op-matrix ;
@@ -176,7 +176,7 @@ DEFER: (d)
 ! Graded by degree
 : (graded-ker/im-d) ( n seq -- null/rank )
     #! d: C(n) ---> C(n+1)
-    [ ?nth ] 2keep >r 1+ r> ?nth
+    [ ?nth ] [ [ 1+ ] dip ?nth ] 2bi
     dim-im/ker-d ;
 
 : graded-ker/im-d ( graded-basis -- seq )
@@ -188,13 +188,13 @@ DEFER: (d)
 ! Bi-graded for two-step complexes
 : (bigraded-ker/im-d) ( u-deg z-deg bigraded-basis -- null/rank )
     #! d: C(u,z) ---> C(u+2,z-1)
-    [ ?nth ?nth ] 3keep >r >r 2 + r> 1 - r> ?nth ?nth
+    [ ?nth ?nth ] 3keep [ [ 2 + ] dip 1 - ] dip ?nth ?nth
     dim-im/ker-d ;
 
 : bigraded-ker/im-d ( bigraded-basis -- seq )
     dup length [
         over first length [
-            >r 2dup r> spin (bigraded-ker/im-d)
+            [ 2dup ] dip spin (bigraded-ker/im-d)
         ] map 2nip
     ] with map ;
 
@@ -224,13 +224,13 @@ DEFER: (d)
     ] if ;
 
 : laplacian-matrix ( basis1 basis2 basis3 -- matrix )
-    dupd d-matrix m.m' >r d-matrix m'.m r> ?m+ ;
+    dupd d-matrix m.m' [ d-matrix m'.m ] dip ?m+ ;
 
 : laplacian-betti ( basis1 basis2 basis3 -- n )
     laplacian-matrix null/rank drop ;
 
 : laplacian-kernel ( basis1 basis2 basis3 -- basis )
-    >r tuck r>
+    [ tuck ] dip
     laplacian-matrix dup empty-matrix? [
         2drop f
     ] [
@@ -246,7 +246,7 @@ DEFER: (d)
     dup length [ graded-triple ] with map ;
 
 : graded-laplacian ( generators quot -- seq )
-    >r basis graded graded-triples [ first3 ] r> compose map ;
+    [ basis graded graded-triples [ first3 ] ] dip compose map ;
     inline
 
 : graded-laplacian-betti ( generators -- seq )
@@ -273,12 +273,12 @@ DEFER: (d)
 : bigraded-triples ( grid -- triples )
     dup length [
         over first length [
-            >r 2dup r> spin bigraded-triple
+            [ 2dup ] dip spin bigraded-triple
         ] map 2nip
     ] with map ;
 
 : bigraded-laplacian ( u-generators z-generators quot -- seq )
-    >r [ basis graded ] bi@ tensor bigraded-triples r>
+    [ [ basis graded ] bi@ tensor bigraded-triples ] dip
     [ [ first3 ] prepose map ] curry map ; inline
 
 : bigraded-laplacian-betti ( u-generators z-generators -- seq )

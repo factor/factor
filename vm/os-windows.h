@@ -11,7 +11,7 @@ typedef wchar_t F_CHAR;
 #define unbox_native_string unbox_u16_string
 #define string_to_native_alien(string) string_to_u16_alien(string,true)
 
-#define STR_FORMAT(string) L##string
+#define STRING_LITERAL(string) L##string
 
 #define MAX_UNICODE_PATH 32768
 #define DLLEXPORT __declspec(dllexport)
@@ -19,18 +19,19 @@ typedef wchar_t F_CHAR;
 #define STRCMP wcscmp
 #define STRNCMP wcsncmp
 #define STRDUP _wcsdup
-
-#define FIXNUM_FORMAT "%Id"
-#define CELL_FORMAT "%lu"
-#define CELL_HEX_FORMAT "%Ix"
+#define MIN(a,b) ((a)>(b)?(b):(a))
 
 #ifdef WIN64
+	#define CELL_FORMAT "%Iu"
+	#define CELL_HEX_FORMAT "%Ix"
 	#define CELL_HEX_PAD_FORMAT "%016Ix"
+	#define FIXNUM_FORMAT "%Id"
 #else
+	#define CELL_FORMAT "%lu"
+	#define CELL_HEX_FORMAT "%lx"
 	#define CELL_HEX_PAD_FORMAT "%08lx"
+	#define FIXNUM_FORMAT "%ld"
 #endif
-
-#define FIXNUM_FORMAT "%Id"
 
 #define OPEN_READ(path) _wfopen(path,L"rb")
 #define OPEN_WRITE(path) _wfopen(path,L"wb")
@@ -49,7 +50,7 @@ void ffi_dlopen(F_DLL *dll);
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);
 void ffi_dlclose(F_DLL *dll);
 
-void sleep_micros(DWORD msec);
+void sleep_micros(u64 msec);
 
 INLINE void init_signals(void) {}
 INLINE void early_init(void) {}

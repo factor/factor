@@ -1,13 +1,13 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations destructors io.files io.backend kernel
-quotations system alien alien.accessors accessors system
-vocabs.loader combinators alien.c-types ;
+USING: continuations destructors io.files io.files.info
+io.backend kernel quotations system alien alien.accessors
+accessors system vocabs.loader combinators alien.c-types ;
 IN: io.mmap
 
 TUPLE: mapped-file address handle length disposed ;
 
-HOOK: (mapped-file) io-backend ( path length -- address handle )
+HOOK: (mapped-file) os ( path length -- address handle )
 
 : <mapped-file> ( path -- mmap )
     [ normalize-path ] [ file-info size>> ] bi [ (mapped-file) ] keep
@@ -21,6 +21,6 @@ M: mapped-file dispose* ( mmap -- ) close-mapped-file ;
     [ <mapped-file> ] dip with-disposal ; inline
 
 {
-    { [ os unix? ] [ "io.unix.mmap" require ] }
-    { [ os winnt? ] [ "io.windows.mmap" require ] }
+    { [ os unix? ] [ "io.mmap.unix" require ] }
+    { [ os winnt? ] [ "io.mmap.windows" require ] }
 } cond

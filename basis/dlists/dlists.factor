@@ -1,8 +1,8 @@
-! Copyright (C) 2007, 2008 Mackenzie Straight, Doug Coleman,
+! Copyright (C) 2007, 2009 Mackenzie Straight, Doug Coleman,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel math sequences accessors deques
-search-deques summary hashtables ;
+search-deques summary hashtables fry ;
 IN: dlists
 
 <PRIVATE
@@ -64,7 +64,7 @@ M: dlist-node node-value obj>> ;
     [ front>> ] dip (dlist-find-node) ; inline
 
 : dlist-each-node ( dlist quot -- )
-    [ f ] compose dlist-find-node 2drop ; inline
+    '[ @ f ] dlist-find-node 2drop ; inline
 
 : unlink-node ( dlist-node -- )
     dup prev>> over next>> set-prev-when
@@ -115,14 +115,13 @@ M: dlist pop-back* ( dlist -- )
     normalize-front ;
 
 : dlist-find ( dlist quot -- obj/f ? )
-    [ obj>> ] prepose
-    dlist-find-node [ obj>> t ] [ drop f f ] if ; inline
+    '[ obj>> @ ] dlist-find-node [ obj>> t ] [ drop f f ] if ; inline
 
-: dlist-contains? ( dlist quot -- ? )
+: dlist-any? ( dlist quot -- ? )
     dlist-find nip ; inline
 
 M: dlist deque-member? ( value dlist -- ? )
-    [ = ] with dlist-contains? ;
+    [ = ] with dlist-any? ;
 
 M: dlist delete-node ( dlist-node dlist -- )
     {
@@ -143,7 +142,7 @@ M: dlist delete-node ( dlist-node dlist -- )
     ] if ; inline
 
 : delete-node-if ( dlist quot -- obj/f )
-    [ obj>> ] prepose delete-node-if* drop ; inline
+    '[ obj>> @ ] delete-node-if* drop ; inline
 
 M: dlist clear-deque ( dlist -- )
     f >>front
@@ -151,7 +150,7 @@ M: dlist clear-deque ( dlist -- )
     drop ;
 
 : dlist-each ( dlist quot -- )
-    [ obj>> ] prepose dlist-each-node ; inline
+    '[ obj>> @ ] dlist-each-node ; inline
 
 : dlist>seq ( dlist -- seq )
     [ ] accumulator [ dlist-each ] dip ;
@@ -159,8 +158,6 @@ M: dlist clear-deque ( dlist -- )
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
 
 M: dlist clone
-    <dlist> [
-        [ push-back ] curry dlist-each
-    ] keep ;
+    <dlist> [ '[ _ push-back ] dlist-each ] keep ;
 
 INSTANCE: dlist deque

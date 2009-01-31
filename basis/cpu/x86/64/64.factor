@@ -37,7 +37,7 @@ M:: x86.64 %dispatch ( src temp offset -- )
 
 M: x86.64 param-reg-1 int-regs param-regs first ;
 M: x86.64 param-reg-2 int-regs param-regs second ;
-: param-reg-3 int-regs param-regs third ; inline
+: param-reg-3 ( -- reg ) int-regs param-regs third ; inline
 
 M: int-regs return-reg drop RAX ;
 M: float-regs return-reg drop XMM0 ;
@@ -50,8 +50,8 @@ M: x86.64 %prologue ( n -- )
 
 M: stack-params %load-param-reg
     drop
-    >r R11 swap param@ MOV
-    r> param@ R11 MOV ;
+    [ R11 swap param@ MOV ] dip
+    param@ R11 MOV ;
 
 M: stack-params %save-param-reg
     drop
@@ -176,7 +176,7 @@ M: x86.64 %alien-indirect ( -- )
     RBP CALL ;
 
 M: x86.64 %alien-callback ( quot -- )
-    param-reg-1 swap %load-indirect
+    param-reg-1 swap %load-reference
     "c_to_factor" f %alien-invoke ;
 
 M: x86.64 %callback-value ( ctype -- )

@@ -6,10 +6,10 @@ IN: math.polynomials
 
 <PRIVATE
 
-: 2pad-left ( p q n -- p q ) [ 0 pad-left ] curry bi@ ;
-: 2pad-right ( p q n -- p q ) [ 0 pad-right ] curry bi@ ;
-: pextend ( p q -- p q ) 2dup [ length ] bi@ max 2pad-right ;
-: pextend-left ( p q -- p q ) 2dup [ length ] bi@ max 2pad-left ;
+: 2pad-head ( p q n -- p q ) [ 0 pad-head ] curry bi@ ;
+: 2pad-tail ( p q n -- p q ) [ 0 pad-tail ] curry bi@ ;
+: pextend ( p q -- p q ) 2dup [ length ] bi@ max 2pad-tail ;
+: pextend-left ( p q -- p q ) 2dup [ length ] bi@ max 2pad-head ;
 : unempty ( seq -- seq ) [ { 0 } ] when-empty ;
 : 2unempty ( seq seq -- seq seq ) [ unempty ] bi@ ;
 
@@ -21,7 +21,7 @@ PRIVATE>
 : p= ( p q -- ? ) pextend = ;
 
 : ptrim ( p -- p )
-    dup length 1 = [ [ zero? ] trim-right ] unless ;
+    dup length 1 = [ [ zero? ] trim-tail ] unless ;
 
 : 2ptrim ( p q -- p q ) [ ptrim ] bi@ ;
 : p+ ( p q -- r ) pextend v+ ;
@@ -29,7 +29,7 @@ PRIVATE>
 : n*p ( n p -- n*p ) n*v ;
 
 : pextend-conv ( p q -- p q )
-    2dup [ length ] bi@ + 1- 2pad-right [ >vector ] bi@ ;
+    2dup [ length ] bi@ + 1- 2pad-tail [ >vector ] bi@ ;
 
 : p* ( p q -- r )
     2unempty pextend-conv <reversed> dup length
@@ -44,7 +44,7 @@ PRIVATE>
     2ptrim
     2dup [ length ] bi@ -
     dup 1 < [ drop 1 ] when
-    [ over length + 0 pad-left pextend ] keep 1+ ;
+    [ over length + 0 pad-head pextend ] keep 1+ ;
 
 : /-last ( seq seq -- a )
     #! divide the last two numbers in the sequences
@@ -68,7 +68,8 @@ PRIVATE>
     dup V{ 0 } clone p= [
         drop nip
     ] [
-        tuck p/mod [ pick p* swap [ swapd p- ] dip ] dip (pgcd)
+        [ nip ] [ p/mod ] 2bi
+        [ pick p* swap [ swapd p- ] dip ] dip (pgcd)
     ] if ;
 
 PRIVATE>

@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces kernel io calendar sequences io.files
-io.sockets continuations destructors prettyprint assocs
-math.parser words debugger math combinators
-concurrency.messaging threads arrays init math.ranges strings
-calendar.format io.encodings.utf8 ;
+USING: namespaces kernel io io.files io.pathnames io.directories
+io.sockets io.encodings.utf8
+calendar calendar.format sequences continuations destructors
+prettyprint assocs math.parser words debugger math combinators
+concurrency.messaging threads arrays init math.ranges strings ;
 IN: logging.server
 
 : log-root ( -- string )
@@ -28,7 +28,7 @@ SYMBOL: log-files
 
 : multiline-header ( -- string ) 20 CHAR: - <string> ; foldable
 
-: (write-message) ( msg name>> level multi? -- )
+: (write-message) ( msg word-name level multi? -- )
     [
         "[" write multiline-header write "] " write
     ] [
@@ -36,18 +36,19 @@ SYMBOL: log-files
     ] if
     write bl write ": " write print ;
 
-: write-message ( msg name>> level -- )
-    rot harvest {
-        { [ dup empty? ] [ 3drop ] }
-        { [ dup length 1 = ] [ first -rot f (write-message) ] }
+: write-message ( msg word-name level -- )
+    [ harvest ] 2dip {
+        { [ pick empty? ] [ 3drop ] }
+        { [ pick length 1 = ] [ [ first ] 2dip f (write-message) ] }
         [
-            [ first -rot f (write-message) ] 3keep
-            rest -rot [ t (write-message) ] 2curry each
+            [ [ first ] 2dip f (write-message) ]
+            [ [ rest ] 2dip [ t (write-message) ] 2curry each ]
+            3bi
         ]
     } cond ;
 
 : (log-message) ( msg -- )
-    #! msg: { msg name>> level service }
+    #! msg: { msg word-name level service }
     first4 log-stream [ write-message flush ] with-output-stream* ;
 
 : try-dispose ( stream -- )

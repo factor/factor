@@ -20,8 +20,9 @@ TYPEDEF: char[592] ud
 FUNCTION: void ud_translate_intel ( ud* u ) ;
 FUNCTION: void ud_translate_att ( ud* u ) ;
 
-: UD_SYN_INTEL    &: ud_translate_intel ; inline
-: UD_SYN_ATT      &: ud_translate_att ; inline
+: UD_SYN_INTEL ( -- addr ) &: ud_translate_intel ; inline
+: UD_SYN_ATT ( -- addr ) &: ud_translate_att ; inline
+
 : UD_EOI          -1 ; inline
 : UD_INP_CACHE_SZ 32 ; inline
 : UD_VENDOR_AMD   0 ; inline
@@ -58,8 +59,8 @@ SINGLETON: udis-disassembler
     dup [ second length ] map supremum
     '[
         [
-            [ first >hex cell 2 * CHAR: 0 pad-left % ": " % ]
-            [ second _ CHAR: \s pad-right % "  " % ]
+            [ first >hex cell 2 * CHAR: 0 pad-head % ": " % ]
+            [ second _ CHAR: \s pad-tail % "  " % ]
             [ third % ]
             tri
         ] "" make

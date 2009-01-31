@@ -1,4 +1,4 @@
-USING: tools.test io.files io io.streams.c
+USING: tools.test io.files io.files.temp io io.streams.c
 io.encodings.ascii strings ;
 IN: io.streams.c.tests
 

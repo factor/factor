@@ -3,7 +3,7 @@
 USING: arrays generic hashtables io kernel math assocs
 namespaces make sequences strings io.styles vectors words
 prettyprint.config splitting classes continuations
-io.streams.nested accessors sets ;
+accessors sets ;
 IN: prettyprint.sections
 
 ! State

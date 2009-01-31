@@ -162,12 +162,18 @@ ARTICLE: "encodings-introduction" "An introduction to encodings"
 { $code "\"file.txt\" utf16 file-contents" }
 "Encoding descriptors are also used by " { $link "io.streams.byte-array" } " and taken by combinators like " { $link with-file-writer } " and " { $link with-byte-reader } " which deal with streams. It is " { $emphasis "not" } " used with " { $link "io.streams.string" } " because these deal with abstract text."
 $nl
-"When the " { $link binary } " encoding is used, a " { $link byte-array } " is expected for writing and returned for reading, since the stream deals with bytes. All other encodings deal with strings, since they are used to represent text." ;
+"When the " { $link binary } " encoding is used, a " { $link byte-array } " is expected for writing and returned for reading, since the stream deals with bytes. All other encodings deal with strings, since they are used to represent text."
+{ $see-also "stream-elements" } ;
 
 ARTICLE: "io" "Input and output"
 { $heading "Streams" }
 { $subsection "streams" }
 { $subsection "io.files" }
+{ $heading "The file system" }
+{ $subsection "io.pathnames" }
+{ $subsection "io.files.info" }
+{ $subsection "io.files.links" }
+{ $subsection "io.directories" }
 { $heading "Encodings" }
 { $subsection "encodings-introduction" }
 { $subsection "io.encodings" }
@@ -178,7 +184,7 @@ ARTICLE: "io" "Input and output"
 { $subsection "io.streams.byte-array" }
 { $heading "Utilities" }
 { $subsection "stream-binary" }
-{ $subsection "styles" }
+{ $subsection "io.styles" }
 { $subsection "checksums" }
 { $heading "Implementation" }
 { $subsection "io.streams.c" }
@@ -204,7 +210,8 @@ ARTICLE: "tools" "Developer tools"
 { $subsection "timing" }
 { $subsection "tools.disassembler" }
 "Deployment tools:"
-{ $subsection "tools.deploy" } ;
+{ $subsection "tools.deploy" }
+{ $see-also "ui-tools" } ;
 
 ARTICLE: "article-index" "Article index"
 { $index [ articles get keys ] } ;

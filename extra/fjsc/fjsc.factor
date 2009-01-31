@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel peg strings sequences math math.parser
 namespaces make words quotations arrays hashtables io
-io.streams.string assocs ascii peg.parsers accessors ;
+io.streams.string assocs ascii peg.parsers accessors
+words.symbol ;
 IN: fjsc
 
 TUPLE: ast-number value ;

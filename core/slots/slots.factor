@@ -1,9 +1,9 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays kernel kernel.private math namespaces
 make sequences strings words effects generic generic.standard
 classes classes.algebra slots.private combinators accessors
-words sequences.private assocs alien quotations ;
+words sequences.private assocs alien quotations hashtables ;
 IN: slots
 
 TUPLE: slot-spec name offset class initial read-only ;
@@ -22,10 +22,6 @@ PREDICATE: writer < word "writer" word-prop ;
     [ drop define ]
     3bi ;
 
-: create-accessor ( name effect -- word )
-    [ "accessors" create dup ] dip
-    "declared-effect" set-word-prop ;
-
 : reader-quot ( slot-spec -- quot )
     [
         dup offset>> ,
@@ -35,7 +31,8 @@ PREDICATE: writer < word "writer" word-prop ;
     ] [ ] make ;
 
 : reader-word ( name -- word )
-    ">>" append (( object -- value )) create-accessor
+    ">>" append "accessors" create
+    dup (( object -- value )) "declared-effect" set-word-prop
     dup t "reader" set-word-prop ;
 
 : reader-props ( slot-spec -- assoc )
@@ -50,7 +47,8 @@ PREDICATE: writer < word "writer" word-prop ;
     define-typecheck ;
 
 : writer-word ( name -- word )
-    "(>>" ")" surround (( value object -- )) create-accessor
+    "(>>" ")" surround "accessors" create
+    dup (( value object -- )) "declared-effect" set-word-prop
     dup t "writer" set-word-prop ;
 
 ERROR: bad-slot-value value class ;
@@ -88,22 +86,23 @@ ERROR: bad-slot-value value class ;
     ] [ ] make ;
 
 : writer-props ( slot-spec -- assoc )
-    [ "writing" set ] H{ } make-assoc ;
+    "writing" associate ;
 
 : define-writer ( class slot-spec -- )
     [ name>> writer-word ] [ writer-quot ] [ writer-props ] tri
     define-typecheck ;
 
 : setter-word ( name -- word )
-    ">>" prepend (( object value -- object )) create-accessor ;
+    ">>" prepend "accessors" create ;
 
 : define-setter ( name -- )
     dup setter-word dup deferred? [
-        [ \ over , swap writer-word , ] [ ] make define-inline
+        [ \ over , swap writer-word , ] [ ] make
+        (( object value -- object )) define-inline
     ] [ 2drop ] if ;
 
 : changer-word ( name -- word )
-    "change-" prepend (( object quot -- object )) create-accessor ;
+    "change-" prepend "accessors" create ;
 
 : define-changer ( name -- )
     dup changer-word dup deferred? [
@@ -112,7 +111,7 @@ ERROR: bad-slot-value value class ;
             over reader-word 1quotation
             [ dip call ] curry [ dip swap ] curry %
             swap setter-word ,
-        ] [ ] make define-inline
+        ] [ ] make (( object quot -- object )) define-inline
     ] [ 2drop ] if ;
 
 : define-slot-methods ( class slot-spec -- )

@@ -12,7 +12,7 @@ SYMBOL: delimiter
 
 CHAR: , delimiter set-global
 
-: delimiter> delimiter get ; inline
+: delimiter> ( -- delimiter ) delimiter get ; inline
     
 DEFER: quoted-field ( -- endchar )
     
@@ -71,7 +71,7 @@ DEFER: quoted-field ( -- endchar )
   delimiter swap with-variable ; inline
 
 : needs-escaping? ( cell -- ? )
-  [ [ "\n\"" member? ] [ delimiter get = ] bi or ] contains? ; inline ! "
+  [ [ "\n\"" member? ] [ delimiter get = ] bi or ] any? ; inline
 
 : escape-quotes ( cell -- cell' )
   [ [ dup , CHAR: " = [ CHAR: " , ] when ] each ] "" make ; inline

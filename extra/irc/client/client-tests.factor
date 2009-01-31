@@ -1,4 +1,4 @@
-USING: kernel tools.test accessors arrays sequences qualified
+USING: kernel tools.test accessors arrays sequences
        io io.streams.duplex namespaces threads destructors
        calendar irc.client.private irc.client irc.messages.private
        concurrency.mailboxes classes assocs combinators ;

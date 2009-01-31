@@ -1,6 +1,6 @@
 ;;; factor-mode.el -- mode for editing Factor source
 
-;; Copyright (C) 2008 Jose Antonio Ortega Ruiz
+;; Copyright (C) 2008, 2009 Jose Antonio Ortega Ruiz
 ;; See http://factorcode.org/license.txt for BSD license.
 
 ;; Author: Jose Antonio Ortega Ruiz <jao@gnu.org>
@@ -24,8 +24,17 @@
 ;;; Customization:
 
 (defgroup factor-mode nil
-  "Major mode for Factor source code"
-  :group 'fuel)
+  "Major mode for Factor source code."
+  :group 'fuel
+  :group 'languages)
+
+(defcustom factor-mode-cycle-always-ask-p t
+  "Whether to always ask for file creation when cycling to a
+source/docs/tests file.
+
+When set to false, you'll be asked only once."
+  :type 'boolean
+  :group 'factor-mode)
 
 (defcustom factor-mode-use-fuel t
   "Whether to use the full FUEL facilities in factor mode.
@@ -60,23 +69,6 @@ code in the buffer."
   :group 'factor-mode)
 
 
-;;; Faces:
-
-(fuel-font-lock--define-faces
- factor-font-lock font-lock factor-mode
- ((comment comment "comments")
-  (constructor type  "constructors (<foo>)")
-  (declaration keyword "declaration words")
-  (parsing-word keyword  "parsing words")
-  (setter-word function-name "setter words (>>foo)")
-  (stack-effect comment "stack effect specifications")
-  (string string "strings")
-  (symbol variable-name "name of symbol being defined")
-  (type-name type "type names")
-  (vocabulary-name constant "vocabulary names")
-  (word function-name "word, generic or method being defined")))
-
-
 ;;; Syntax table:
 
 (defun factor-mode--syntax-setup ()
@@ -84,8 +76,7 @@ code in the buffer."
   (set (make-local-variable 'beginning-of-defun-function)
        'fuel-syntax--beginning-of-defun)
   (set (make-local-variable 'end-of-defun-function) 'fuel-syntax--end-of-defun)
-  (set (make-local-variable 'open-paren-in-column-0-is-defun-start) nil)
-  (fuel-syntax--enable-usings))
+  (set (make-local-variable 'open-paren-in-column-0-is-defun-start) nil))
 
 
 ;;; Indentation:
@@ -112,13 +103,19 @@ code in the buffer."
   (save-excursion
     (beginning-of-line)
     (when (> (fuel-syntax--brackets-depth) 0)
-      (let ((op (fuel-syntax--brackets-start))
-            (cl (fuel-syntax--brackets-end))
-            (ln (line-number-at-pos)))
-        (when (> ln (line-number-at-pos op))
-          (if (and (> cl 0) (= ln (line-number-at-pos cl)))
-              (fuel-syntax--indentation-at op)
-            (fuel-syntax--increased-indentation (fuel-syntax--indentation-at op))))))))
+      (let* ((bs (fuel-syntax--brackets-start))
+             (be (fuel-syntax--brackets-end))
+             (ln (line-number-at-pos)))
+        (when (> ln (line-number-at-pos bs))
+          (cond ((and (> be 0)
+                      (= (- be (point)) (current-indentation))
+                      (= ln (line-number-at-pos be)))
+                 (fuel-syntax--indentation-at bs))
+                ((or (fuel-syntax--is-last-char bs)
+                     (not (eq ?\ (char-after (1+ bs)))))
+                 (fuel-syntax--increased-indentation
+                  (fuel-syntax--indentation-at bs)))
+                (t (+ 2 (fuel-syntax--line-offset bs)))))))))
 
 (defun factor-mode--indent-definition ()
   (save-excursion
@@ -147,8 +144,7 @@ code in the buffer."
     (cond ((or (fuel-syntax--at-end-of-def)
                (fuel-syntax--at-setter-line))
            (fuel-syntax--decreased-indentation))
-          ((and (fuel-syntax--at-begin-of-def)
-                (not (fuel-syntax--at-using)))
+          ((fuel-syntax--at-begin-of-indent-def)
            (fuel-syntax--increased-indentation))
           (t (current-indentation)))))
 
@@ -185,46 +181,73 @@ code in the buffer."
 (defconst factor-mode--cycle-endings
   '(".factor" "-tests.factor" "-docs.factor"))
 
-(defconst factor-mode--regex-cycle-endings
-  (format "\\(.*?\\)\\(%s\\)$"
-          (regexp-opt factor-mode--cycle-endings)))
+(make-local-variable
+ (defvar factor-mode--cycling-no-ask nil))
 
-(defconst factor-mode--cycle-endings-ring
+(defvar factor-mode--cycle-ring
   (let ((ring (make-ring (length factor-mode--cycle-endings))))
     (dolist (e factor-mode--cycle-endings ring)
-      (ring-insert ring e))))
+      (ring-insert ring e))
+    ring))
+
+(defconst factor-mode--cycle-basename-regex
+  (format "\\(.+?\\)\\(%s\\)$" (regexp-opt factor-mode--cycle-endings)))
+
+(defun factor-mode--cycle-split (basename)
+  (when (string-match factor-mode--cycle-basename-regex basename)
+    (cons (match-string 1 basename) (match-string 2 basename))))
 
 (defun factor-mode--cycle-next (file)
-  (let* ((match (string-match factor-mode--regex-cycle-endings file))
-         (base (and match (match-string-no-properties 1 file)))
-         (ending (and match (match-string-no-properties 2 file)))
-         (idx (and ending (ring-member factor-mode--cycle-endings-ring ending)))
-         (gfl (lambda (i) (concat base (ring-ref factor-mode--cycle-endings-ring i)))))
-    (if (not idx) file
-      (let ((l (length factor-mode--cycle-endings)) (i 1) next)
-        (while (and (not next) (< i l))
-          (when (file-exists-p (funcall gfl (+ idx i)))
-            (setq next (+ idx i)))
-          (setq i (1+ i)))
-        (funcall gfl (or next idx))))))
+  (let* ((dir (file-name-directory file))
+         (basename (file-name-nondirectory file))
+         (p/s (factor-mode--cycle-split basename))
+         (prefix (car p/s))
+         (ring factor-mode--cycle-ring)
+         (idx (or (ring-member ring (cdr p/s)) 0))
+         (len (ring-size ring))
+         (i 1)
+         (result nil))
+    (while (and (< i len) (not result))
+      (let* ((suffix (ring-ref ring (+ i idx)))
+             (path (expand-file-name (concat prefix suffix) dir)))
+        (when (or (file-exists-p path)
+                  (and (not (member suffix factor-mode--cycling-no-ask))
+                       (y-or-n-p (format "Create %s? " path))))
+          (setq result path))
+        (when (and (not factor-mode-cycle-always-ask-p)
+                   (not (member suffix factor-mode--cycling-no-ask)))
+          (setq factor-mode--cycling-no-ask
+                (cons name factor-mode--cycling-no-ask))))
+      (setq i (1+ i)))
+    result))
+
+(defsubst factor-mode--cycling-setup ()
+  (setq factor-mode--cycling-no-ask nil))
 
 (defun factor-mode-visit-other-file (&optional file)
   "Cycle between code, tests and docs factor files."
   (interactive)
-  (find-file (factor-mode--cycle-next (or file (buffer-file-name)))))
+  (let ((file (factor-mode--cycle-next (or file (buffer-file-name)))))
+    (unless file (error "No other file found"))
+    (find-file file)
+    (unless (file-exists-p file)
+      (set-buffer-modified-p t)
+      (save-buffer))))
 
 
 ;;; Keymap:
 
-(defun factor-mode-insert-and-indent (n)
-  (interactive "p")
-  (self-insert-command n)
-  (indent-for-tab-command))
+(defun factor-mode--insert-and-indent (n)
+  (interactive "*p")
+  (let ((start (point)))
+    (self-insert-command n)
+    (save-excursion (font-lock-fontify-region start (point))))
+  (indent-according-to-mode))
 
 (defvar factor-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map [?\]] 'factor-mode-insert-and-indent)
-    (define-key map [?}] 'factor-mode-insert-and-indent)
+    (define-key map [?\]] 'factor-mode--insert-and-indent)
+    (define-key map [?}] 'factor-mode--insert-and-indent)
     (define-key map "\C-m" 'newline-and-indent)
     (define-key map "\C-co" 'factor-mode-visit-other-file)
     (define-key map "\C-c\C-o" 'factor-mode-visit-other-file)
@@ -248,6 +271,7 @@ code in the buffer."
   (factor-mode--keymap-setup)
   (factor-mode--indentation-setup)
   (factor-mode--syntax-setup)
+  (factor-mode--cycling-setup)
   (when factor-mode-use-fuel (require 'fuel-mode) (fuel-mode))
   (run-hooks 'factor-mode-hook))
 

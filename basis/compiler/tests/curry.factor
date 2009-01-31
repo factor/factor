@@ -8,7 +8,7 @@ IN: compiler.tests
 [ 3 ] [ 5 [ 2 [ - ] 2curry call ] compile-call ] unit-test
 [ 3 ] [ 5 2 [ [ - ] 2curry call ] compile-call ] unit-test
 [ 3 ] [ 5 2 [ [ - ] 2curry 9 swap call /i ] compile-call ] unit-test
-[ 3 ] [ 5 2 [ [ - ] 2curry >r 9 r> call /i ] compile-call ] unit-test
+[ 3 ] [ 5 2 [ [ - ] 2curry [ 9 ] dip call /i ] compile-call ] unit-test
 
 [ -10 -20 ] [ 10 20 -1 [ [ * ] curry bi@ ] compile-call ] unit-test
 
@@ -21,14 +21,14 @@ IN: compiler.tests
 [ [ 6 2 + ] ]
 [
     2 5
-    [ >r [ + ] curry r> 0 < [ -2 ] [ 6 ] if swap curry ]
+    [ [ [ + ] curry ] dip 0 < [ -2 ] [ 6 ] if swap curry ]
     compile-call >quotation
 ] unit-test
 
 [ 8 ]
 [
     2 5
-    [ >r [ + ] curry r> 0 < [ -2 ] [ 6 ] if swap curry call ]
+    [ [ [ + ] curry ] dip 0 < [ -2 ] [ 6 ] if swap curry call ]
     compile-call
 ] unit-test
 

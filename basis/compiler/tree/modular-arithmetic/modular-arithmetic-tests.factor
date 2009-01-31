@@ -8,13 +8,13 @@ compiler.tree.debugger ;
 : test-modular-arithmetic ( quot -- quot' )
     build-tree optimize-tree nodes>quot ;
 
-[ [ >r >fixnum r> >fixnum fixnum+fast ] ]
+[ [ >R >fixnum R> >fixnum fixnum+fast ] ]
 [ [ { integer integer } declare + >fixnum ] test-modular-arithmetic ] unit-test
 
 [ [ +-integer-integer dup >fixnum ] ]
 [ [ { integer integer } declare + dup >fixnum ] test-modular-arithmetic ] unit-test
 
-[ [ >r >fixnum r> >fixnum fixnum+fast 4 fixnum*fast ] ]
+[ [ >R >fixnum R> >fixnum fixnum+fast 4 fixnum*fast ] ]
 [ [ { integer integer } declare + 4 * >fixnum ] test-modular-arithmetic ] unit-test
 
 TUPLE: declared-fixnum { x fixnum } ;

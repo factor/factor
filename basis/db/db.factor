@@ -5,25 +5,29 @@ namespaces sequences classes.tuple words strings
 tools.walker accessors combinators fry ;
 IN: db
 
-TUPLE: db
+<PRIVATE
+
+TUPLE: db-connection
     handle
     insert-statements
     update-statements
     delete-statements ;
 
-: new-db ( class -- obj )
+: new-db-connection ( class -- obj )
     new
         H{ } clone >>insert-statements
         H{ } clone >>update-statements
         H{ } clone >>delete-statements ; inline
 
-GENERIC: db-open ( db -- db )
-HOOK: db-close db ( handle -- )
+PRIVATE>
+
+GENERIC: db-open ( db -- db-connection )
+HOOK: db-close db-connection ( handle -- )
 
 : dispose-statements ( assoc -- ) values dispose-each ;
 
-M: db dispose ( db -- ) 
-    dup db [
+M: db-connection dispose ( db-connection -- ) 
+    dup db-connection [
         [ dispose-statements H{ } clone ] change-insert-statements
         [ dispose-statements H{ } clone ] change-update-statements
         [ dispose-statements H{ } clone ] change-delete-statements
@@ -63,8 +67,8 @@ TUPLE: prepared-statement < statement ;
         swap >>in-params
         swap >>sql ;
 
-HOOK: <simple-statement> db ( string in out -- statement )
-HOOK: <prepared-statement> db ( string in out -- statement )
+HOOK: <simple-statement> db-connection ( string in out -- statement )
+HOOK: <prepared-statement> db-connection ( string in out -- statement )
 GENERIC: prepare-statement ( statement -- )
 GENERIC: bind-statement* ( statement -- )
 GENERIC: low-level-bind ( statement -- )
@@ -107,8 +111,8 @@ M: object execute-statement* ( statement type -- )
     accumulator [ query-each ] dip { } like ; inline
 
 : with-db ( db quot -- )
-    [ db-open db ] dip
-    '[ db get [ drop @ ] with-disposal ] with-variable ; inline
+    [ db-open db-connection ] dip
+    '[ db-connection get [ drop @ ] with-disposal ] with-variable ; inline
 
 ! Words for working with raw SQL statements
 : default-query ( query -- result-set )
@@ -126,13 +130,13 @@ M: object execute-statement* ( statement type -- )
 ! Transactions
 SYMBOL: in-transaction
 
-HOOK: begin-transaction db ( -- )
-HOOK: commit-transaction db ( -- )
-HOOK: rollback-transaction db ( -- )
+HOOK: begin-transaction db-connection ( -- )
+HOOK: commit-transaction db-connection ( -- )
+HOOK: rollback-transaction db-connection ( -- )
 
-M: db begin-transaction ( -- ) "BEGIN" sql-command ;
-M: db commit-transaction ( -- ) "COMMIT" sql-command ;
-M: db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
+M: db-connection begin-transaction ( -- ) "BEGIN" sql-command ;
+M: db-connection commit-transaction ( -- ) "COMMIT" sql-command ;
+M: db-connection rollback-transaction ( -- ) "ROLLBACK" sql-command ;
 
 : in-transaction? ( -- ? ) in-transaction get ;
 

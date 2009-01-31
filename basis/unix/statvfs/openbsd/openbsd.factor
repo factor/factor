@@ -16,7 +16,7 @@ C-STRUCT: statvfs
     { "ulong" "f_flag" }
     { "ulong" "f_namemax" } ;
 
-: ST_RDONLY       1 ; inline
-: ST_NOSUID       2 ; inline
+CONSTANT: ST_RDONLY       1
+CONSTANT: ST_NOSUID       2
 
 FUNCTION: int statvfs ( char* path, statvfs* buf ) ;

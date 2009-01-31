@@ -1,8 +1,10 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io kernel macros make multiline namespaces parser
 present sequences strings splitting fry accessors ;
 IN: interpolate
+
+<PRIVATE
 
 TUPLE: interpolate-var name ;
 
@@ -20,21 +22,22 @@ TUPLE: interpolate-var name ;
 : parse-interpolate ( string -- seq )
     [ (parse-interpolate) ] { } make ;
 
-MACRO: interpolate ( string -- )
-    parse-interpolate [
+: (interpolate) ( string quot -- quot' )
+    [ parse-interpolate ] dip '[
         dup interpolate-var?
-        [ name>> '[ _ get present write ] ]
+        [ name>> @ '[ _ @ present write ] ]
         [ '[ _ write ] ]
         if
-    ] map [ ] join ;
+    ] map [ ] join ; inline
+
+PRIVATE>
+
+MACRO: interpolate ( string -- )
+    [ [ get ] ] (interpolate) ;
 
 : interpolate-locals ( string -- quot )
-    parse-interpolate [
-        dup interpolate-var?
-        [ name>> search '[ _ present write ] ]
-        [ '[ _ write ] ]
-        if
-    ] map [ ] join ;
+    [ search [ ] ] (interpolate) ;
 
-: I[ "]I" parse-multiline-string
-    interpolate-locals parsed \ call parsed ; parsing
+: I[
+    "]I" parse-multiline-string
+    interpolate-locals over push-all ; parsing
