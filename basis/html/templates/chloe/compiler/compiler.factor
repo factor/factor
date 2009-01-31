@@ -73,8 +73,8 @@ DEFER: compile-element
         [ compile-start-tag ]
         [ compile-children ]
         [ compile-end-tag ]
-        [ drop tag-stack get pop* ]
-    } cleave ;
+    } cleave
+    tag-stack get pop* ;
 
 ERROR: unknown-chloe-tag tag ;
 
@@ -116,7 +116,7 @@ ERROR: unknown-chloe-tag tag ;
     [ [ compile-children ] compile-quot ] [ % ] bi* ; inline
 
 : compile-children>string ( tag -- )
-     [ with-string-writer ] process-children ;
+    [ with-string-writer ] process-children ;
 
 : compile-with-scope ( quot -- )
     compile-quot [ with-scope ] [code] ; inline

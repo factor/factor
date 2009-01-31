@@ -16,7 +16,6 @@ html.templates.chloe.components
 html.templates.chloe.syntax ;
 IN: html.templates.chloe
 
-! Chloe is Ed's favorite web designer
 TUPLE: chloe path ;
 
 C: <chloe> chloe
