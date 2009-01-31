@@ -252,8 +252,8 @@ PRIVATE>
 <PRIVATE
 
 : (write-message) ( message quot -- )
-     [ binary ] dip with-byte-writer dup
-     [ length write-header ] dip 
+     [ binary ] dip with-byte-writer 
+     [ length write-header ] keep 
      write flush ; inline
 
 PRIVATE>
