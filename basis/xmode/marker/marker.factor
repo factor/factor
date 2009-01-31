@@ -157,7 +157,7 @@ M: seq-rule handle-rule-start
     mark-token
     add-remaining-token
     tuck body-token>> next-token,
-    delegate>> [ push-context ] when* ;
+    get-delegate [ push-context ] when* ;
 
 UNION: abstract-span-rule span-rule eol-span-rule ;
 
@@ -168,7 +168,7 @@ M: abstract-span-rule handle-rule-start
     tuck rule-match-token* next-token,
     ! ... end subst ...
     dup context get (>>in-rule)
-    delegate>> push-context ;
+    get-delegate push-context ;
 
 M: span-rule handle-rule-end
     2drop ;
