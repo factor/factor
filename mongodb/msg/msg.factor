@@ -1,6 +1,7 @@
 USING: io io.encodings.utf8 io.encodings.binary alien.c-types alien.strings math
 bson.writer sequences kernel accessors io.streams.byte-array fry generalizations
-combinators bson.reader sequences tools.walker assocs strings linked-assocs namespaces ;
+combinators bson.reader sequences tools.walker assocs strings linked-assocs namespaces
+byte-vectors byte-arrays ;
 
 IN: mongodb.msg
 
@@ -146,17 +147,18 @@ SYMBOL: msg-bytes-read
 : read-int32 ( -- int32 ) 4 [ read *int ] [ change-bytes-read ] bi ; inline
 : read-longlong ( -- longlong ) 8 [ read *longlong ] [ change-bytes-read ] bi ; inline
 : read-byte-raw ( -- byte-raw ) 1 [ read ] [ change-bytes-read ] bi ; inline
-: read-byte ( -- byte ) read-byte-raw *char ; inline
+: read-byte ( -- byte ) read-byte-raw first ; inline
 
-: (read-cstring) ( acc -- acc )
-    read-byte-raw dup
-    B{ 0 } =
-    [ append ]
-    [ append (read-cstring) ] if ; recursive inline
+: (read-cstring) ( acc -- )
+    [ read-byte ] dip ! b acc
+    2dup push             ! b acc
+    [ 0 = ] dip      ! bool acc
+    '[ _ (read-cstring) ] unless ; inline recursive
 
 : read-cstring ( -- string )
-    B{ } clone
-    (read-cstring) utf8 alien>string ; inline
+    BV{ } clone
+    [ (read-cstring) ] keep
+    >byte-array utf8 alien>string ; inline
 
 GENERIC: (read-message) ( message opcode -- message )
 

@@ -1,7 +1,7 @@
 USING: mirrors io io.encodings.utf8 io.encodings.binary math kernel sequences
        splitting accessors io.streams.byte-array namespaces prettyprint
        bson.constants assocs alien.c-types alien.strings fry words
-       serialize byte-arrays ;
+       serialize byte-arrays byte-vectors ;
 
 IN: bson.reader
 
@@ -60,15 +60,16 @@ GENERIC: element-binary-read ( length type -- object )
 : read-byte ( -- byte )
     read-byte-raw *char ; inline
 
-: (read-cstring) ( acc -- acc )
-    read-byte-raw dup
-    B{ 0 } =
-    [ append ]
-    [ append (read-cstring) ] if ; inline recursive
+: (read-cstring) ( acc -- )
+    [ read-byte-raw first ] dip ! b acc
+    2dup push             ! b acc
+    [ 0 = ] dip      ! bool acc
+    '[ _ (read-cstring) ] unless ; inline recursive
 
 : read-cstring ( -- string )
-    B{ } clone
-    (read-cstring) utf8 alien>string ; inline
+    BV{ } clone
+    [ (read-cstring) ] keep
+    >byte-array utf8 alien>string ; inline
 
 : read-sized-string ( length -- string )
     [ read ] [ count-bytes ] bi
