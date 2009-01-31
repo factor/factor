@@ -98,6 +98,7 @@ UNION: definition word method-spec link vocab vocab-link ;
 
 [ word? ] \ usage. H{
     { +keyboard+ T{ key-down f { C+ } "u" } }
+    { +listener+ t }
 } define-operation
 
 [ word? ] \ fix H{
