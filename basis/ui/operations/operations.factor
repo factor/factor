@@ -36,6 +36,9 @@ SYMBOL: operations
 : object-operations ( obj -- operations )
     operations get [ predicate>> call ] with filter ;
 
+: gesture>operation ( gesture object -- operation/f )
+    object-operations [ operation-gesture = ] with find nip ;
+
 : find-operation ( obj quot -- command )
     [ object-operations ] dip find-last nip ; inline
 
