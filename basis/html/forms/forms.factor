@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors strings namespaces assocs hashtables io
-mirrors math fry sequences words continuations html.elements
-xml.entities ;
+mirrors math fry sequences words continuations
+xml.entities xml.writer xml.literals ;
 IN: html.forms
 
 TUPLE: form errors values validation-failed ;
@@ -109,7 +109,6 @@ C: <validation-error> validation-error
 : render-validation-errors ( -- )
     form get errors>>
     [
-        <ul "errors" =class ul>
-            [ <li> escape-string write </li> ] each
-        </ul>
+        [ [XML <li><-></li> XML] ] map
+        [XML <ul class="errors"><-></ul> XML] write-xml
     ] unless-empty ;

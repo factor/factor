@@ -8,6 +8,7 @@ xml.data
 xml.entities
 xml.writer
 xml.utilities
+xml.literals
 html.components
 html.elements
 html.forms
@@ -20,7 +21,6 @@ http.server
 http.server.redirection
 http.server.responses
 furnace.utilities ;
-QUALIFIED-WITH: assocs a
 IN: furnace.chloe-tags
 
 ! Chloe tags
@@ -56,11 +56,11 @@ CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
 
 : compile-link-attrs ( tag -- )
     #! Side-effects current namespace.
-    attrs>> '[ [ [ _ ] dip link-attr ] each-responder ] [code] ;
+    '[ [ [ _ ] dip link-attr ] each-responder ] [code] ;
 
 : a-start-tag ( tag -- )
     [ <a ] [code]
-    [ non-chloe-attrs-only compile-attrs ]
+    [ attrs>> non-chloe-attrs-only compile-attrs ]
     [ compile-link-attrs ]
     [ compile-a-url ]
     tri
@@ -116,17 +116,18 @@ CHLOE: form
         } cleave
     ] compile-with-scope ;
 
-STRING: button-tag-markup
-<t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
-    <div style="display: inline;"><button type="submit"></button></div>
-</t:form>
-;
+: button-tag-markup ( -- xml )
+    <XML
+        <t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
+            <div style="display: inline;"><button type="submit"></button></div>
+        </t:form>
+    XML> ;
 
 : add-tag-attrs ( attrs tag -- )
     attrs>> swap update ;
 
 CHLOE: button
-    button-tag-markup string>xml body>>
+    button-tag-markup body>>
     {
         [ [ attrs>> chloe-attrs-only ] dip add-tag-attrs ]
         [ [ attrs>> non-chloe-attrs-only ] dip "button" deep-tag-named add-tag-attrs ]

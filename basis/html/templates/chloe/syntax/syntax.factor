@@ -6,7 +6,6 @@ classes.tuple assocs splitting words arrays memoize parser lexer
 io io.files io.encodings.utf8 io.streams.string
 unicode.case mirrors fry math urls
 multiline xml xml.data xml.writer xml.utilities
-html.elements
 html.components
 html.templates ;
 
