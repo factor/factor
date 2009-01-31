@@ -1,4 +1,4 @@
-USING: accessors kernel ;
+USING: accessors kernel xmode.rules ;
 IN: xmode.marker.context
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker.LineContext
@@ -10,7 +10,7 @@ end
 ;
 
 : <line-context> ( ruleset parent -- line-context )
-    over [ "no context" throw ] unless
+    over rule-set? [ "not a rule-set" throw ] unless
     line-context new
         swap >>parent
         swap >>in-rule-set ;
