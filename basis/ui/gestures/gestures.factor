@@ -87,18 +87,20 @@ zoom-in-action zoom-out-action ;
 ! Modifiers
 SYMBOLS: C+ A+ M+ S+ ;
 
-TUPLE: key-down mods sym ;
+TUPLE: key-gesture mods sym ;
 
-: <key-gesture> ( mods sym action? class -- mods' sym' )
+TUPLE: key-down < key-gesture ;
+
+: new-key-gesture ( mods sym action? class -- mods' sym' )
     [ [ [ S+ swap remove f like ] dip ] unless ] dip boa ; inline
 
 : <key-down> ( mods sym action? -- key-down )
-    key-down <key-gesture> ;
+    key-down new-key-gesture ;
 
-TUPLE: key-up mods sym ;
+TUPLE: key-up < key-gesture ;
 
 : <key-up> ( mods sym action? -- key-up )
-    key-up <key-gesture> ;
+    key-up new-key-gesture ;
 
 ! Hand state
 
