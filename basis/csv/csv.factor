@@ -51,12 +51,8 @@ DEFER: quoted-field ( -- endchar )
 : row ( -- eof? array[string] )
     [ (row) ] { } make ;
 
-: append-if-row-not-empty ( row -- )
-    dup { "" } = [ drop ] [ , ] if ;
-
 : (csv) ( -- )
-    row append-if-row-not-empty
-    [ (csv) ] when ;
+    row harvest [ , ] unless-empty [ (csv) ] when ;
   
 PRIVATE>
 
