@@ -1,5 +1,5 @@
-USING: help.markup help.syntax ui.commands
-ui.gadgets.editors ui.gadgets.panes listener io ;
+USING: help.markup help.syntax ui.commands ui.operations
+ui.gadgets.editors ui.gadgets.panes listener io words ;
 IN: ui.tools.listener
 
 HELP: interactor
@@ -14,10 +14,15 @@ ARTICLE: "ui-listener" "UI listener"
 { $command-map listener-gadget "toolbar" }
 { $command-map interactor "completion" }
 { $command-map interactor "interactor" }
-{ $command-map source-editor "word" }
-{ $command-map interactor "quotation" }
 { $command-map listener-gadget "scrolling" }
 { $command-map listener-gadget "multi-touch" }
+{ $heading "Word commands" }
+"These words operate on the word at the cursor."
+{ $operations \ word }
+{ $heading "Vocabulary commands" }
+"These words operate on the vocabulary at the cursor."
+{ $operations \ word }
+{ $command-map interactor "quotation" }
 { $heading "Editing commands" }
 "The text editing commands are standard; see " { $link "gadgets-editors" } "."
 { $heading "Implementation" }

@@ -18,7 +18,7 @@ IN: ui.tools.listener
 ! If waiting is t, we're waiting for user input, and invoking
 ! evaluate-input resumes the thread.
 TUPLE: interactor < source-editor
-output history flag mailbox thread waiting help
+output history flag mailbox thread waiting word-model
 completion-popup ;
 
 : register-self ( interactor -- )
@@ -52,18 +52,18 @@ completion-popup ;
 : <interactor> ( output -- gadget )
     interactor new-editor
         <flag> >>flag
-        dup <word-model> >>help
+        dup <word-model> >>word-model
         dup model>> <history> >>history
         swap >>output ;
 
 M: interactor graft*
-    [ call-next-method ] [ dup help>> add-connection ] bi ;
+    [ call-next-method ] [ dup word-model>> add-connection ] bi ;
 
 M: interactor ungraft*
-    [ dup help>> remove-connection ] [ call-next-method ] bi ;
+    [ dup word-model>> remove-connection ] [ call-next-method ] bi ;
 
 M: interactor model-changed
-    2dup help>> eq? [
+    2dup word-model>> eq? [
         dup completion-popup>>
         [ 2drop ] [ [ value>> ] dip show-summary ] if
     ] [ call-next-method ] if ;
@@ -195,9 +195,15 @@ M: listener-gadget focusable-child*
 \ listener-window H{ { +nullary+ t } } define-command
 
 : (get-listener) ( quot -- listener )
-    find-window
-    [ [ raise-window ] [ gadget-child dup request-focus ] bi ]
-    [ listener-window* ] if* ; inline
+    find-window [
+        [ raise-window ]
+        [
+            gadget-child
+            [ ]
+            [ input>> scroll>caret ]
+            [ input>> request-focus ] tri
+        ] bi
+    ] [ listener-window* ] if* ; inline
 
 : get-listener ( -- listener )
     [ listener-gadget? ] (get-listener) ;
@@ -322,17 +328,21 @@ M: interactor stream-read-quot
         ]
     } cond ;
 
-: pass-to-popup? ( gesture interactor -- ? )
-    [ [ key-down? ] [ key-up? ] bi or ]
-    [ completion-popup>> ]
-    bi* and ;
+: pass-to-popup ( gesture interactor -- ? )
+    completion-popup>> focusable-child resend-gesture ;
+
+: interactor-operation ( gesture interactor -- ? )
+    word-model>> value>>
+    [ nip ] [ gesture>operation ] 2bi
+    dup [ invoke-command f ] [ 2drop t ] if ;
 
 M: interactor handle-gesture
-    2dup pass-to-popup? [
-        2dup completion-popup>>
-        focusable-child resend-gesture
-        [ call-next-method ] [ 2drop f ] if
-    ] [ call-next-method ] if ;
+    {
+        { [ over key-gesture? not ] [ call-next-method ] }
+        { [ dup completion-popup>> ] [ { [ pass-to-popup ] [ call-next-method ] } 2&& ] }
+        { [ dup word-model>> value>> ] [ { [ interactor-operation ] [ call-next-method ] } 2&& ] }
+        [ call-next-method ]
+    } cond ;
 
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }

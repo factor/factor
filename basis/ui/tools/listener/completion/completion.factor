@@ -4,10 +4,10 @@ USING: accessors arrays assocs calendar colors documents
 documents.elements fry kernel words sets splitting math math.vectors
 models.delay models.filter combinators.short-circuit parser present
 sequences tools.completion generic generic.standard.engines.tuple
-fonts ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.glass
-ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.theme
-ui.gadgets.worlds ui.gadgets.wrappers ui.gestures ui.render
-ui.tools.listener.history ;
+fonts ui.commands ui.operations ui.gadgets ui.gadgets.editors
+ui.gadgets.glass ui.gadgets.scrollers ui.gadgets.tables
+ui.gadgets.theme ui.gadgets.worlds ui.gadgets.wrappers ui.gestures
+ui.render ui.tools.listener.history ;
 IN: ui.tools.listener.completion
 
 : complete-IN:/USE:? ( tokens -- ? )
@@ -26,8 +26,7 @@ IN: ui.tools.listener.completion
     [ editor-caret ] [ model>> ] bi up-to-caret " \r\n" split
     { [ complete-IN:/USE:? ] [ complete-USING:? ] } 1|| ;
 
-! We don't directly depend on the listener tool but we use a couple
-! of slots
+! We don't directly depend on the listener tool but we use a few slots
 SLOT: completion-popup
 SLOT: interactor
 SLOT: history
@@ -153,8 +152,16 @@ CONSTANT: completion-popup-offset { -4 0 }
     history>> history-recall-next ;
 
 : selected-word ( editor -- word )
-    dup completion-popup>> [
-        [ table>> selected-row drop ] [ hide-completion-popup ] bi
-    ] [
-        selected-token dup search [ ] [ no-word ] ?if
-    ] ?if ;
+    dup completion-popup>>
+    [ [ table>> selected-row drop ] [ hide-completion-popup ] bi ]
+    [ selected-token dup search [ ] [ no-word ] ?if ]
+    ?if ;
+
+: completion-gesture ( gesture completion -- value/f operation/f )
+    table>> selected-row [ tuck ] dip
+    [ gesture>operation ] [ 2drop f ] if ;
+
+M: completion-popup handle-gesture ( gesture completion -- ? )
+    2dup completion-gesture dup [
+        [ nip find-world hide-glass ] [ invoke-command ] 2bi* f
+    ] [ 2drop call-next-method ] if ;

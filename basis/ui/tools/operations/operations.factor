@@ -175,13 +175,6 @@ M: word com-stack-effect def>> com-stack-effect ;
 } define-operation
 
 ! Operations -> commands
-source-editor
-"word"
-"These commands operate on the Factor word named by the token at the caret position."
-\ selected-word
-[ selected-word ]
-define-operation-map
-
 interactor
 "quotation"
 "These commands operate on the entire contents of the input area."
