@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.accessors arrays assocs
-combinators.short-circuit fry hashtables html.elements io
+combinators.short-circuit fry hashtables html io
 kernel math namespaces prettyprint quotations sequences
 sequences.deep sets slots.private vectors vocabs words
 kernel.private ;
