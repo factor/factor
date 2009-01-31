@@ -1,7 +1,7 @@
-USING: io io.encodings.utf8 io.encodings.binary alien.c-types alien.strings math
-bson.writer sequences kernel accessors io.streams.byte-array fry generalizations
-combinators bson.reader sequences tools.walker assocs strings linked-assocs namespaces
-byte-vectors byte-arrays ;
+USING: accessors alien.c-types alien.strings assocs bson.reader
+bson.writer byte-arrays byte-vectors constructors fry io
+io.encodings.binary io.encodings.utf8 io.streams.byte-array kernel
+linked-assocs math namespaces sequences strings ;
 
 IN: mongodb.msg
 
@@ -71,20 +71,14 @@ TUPLE: mdb-reply-msg < mdb-msg
 { objects sequence } ;
 
 
-: <mdb-getmore-msg> ( collection return# -- mdb-getmore-msg )
-    [ mdb-getmore-msg new ] 2dip
-    [ >>collection ] dip
-    >>return# OP_GetMore >>opcode ; inline
+CONSTRUCTOR: mdb-getmore-msg ( collection return# -- mdb-getmore-msg )
+    OP_GetMore >>opcode ; inline
 
-: <mdb-delete-msg> ( collection assoc -- mdb-delete-msg )
-    [ mdb-delete-msg new ] 2dip
-    [ >>collection ] dip
-    >>selector OP_Delete >>opcode ; inline
+CONSTRUCTOR: mdb-delete-msg ( collection selector -- mdb-delete-msg )
+    OP_Delete >>opcode ; inline
 
-: <mdb-query-msg> ( collection assoc -- mdb-query-msg )
-     [ mdb-query-msg new ] 2dip
-     [ >>collection ] dip
-     >>query OP_Query >>opcode ; inline
+CONSTRUCTOR: mdb-query-msg ( collection query -- mdb-query-msg )
+    OP_Query >>opcode ; inline
 
 GENERIC: <mdb-killcursors-msg> ( object -- mdb-killcursors-msg )
 
@@ -95,9 +89,6 @@ M: sequence <mdb-killcursors-msg> ( sequences -- mdb-killcursors-msg )
 
 M: integer <mdb-killcursors-msg> ( integer -- mdb-killcursors-msg )
     V{ } clone [ push ] keep <mdb-killcursors-msg> ;
-
-: <mdb-query-one-msg> ( collection assoc -- mdb-query-msg )
-    <mdb-query-msg> 1 >>return# ; inline
 
 GENERIC# <mdb-insert-msg> 1 ( collection objects -- mdb-insert-msg )
 
@@ -112,14 +103,11 @@ M: sequence <mdb-insert-msg> ( collection sequence -- mdb-insert-msg )
     [ >>collection ] dip
     >>objects OP_Insert >>opcode ;
 
-: <mdb-update-msg> ( collection object -- mdb-update-msg )
-    [ mdb-update-msg new ] 2dip
-    [ >>collection ] dip
-    [ [ "_id" ] dip at "_id" H{ } clone [ set-at ] keep >>selector ] keep
-    >>object OP_Update >>opcode ;
+CONSTRUCTOR: mdb-update-msg ( collection object -- mdb-update-msg )
+    dup object>> [ "_id" ] dip at "_id" H{ } clone [ set-at ] keep >>selector 
+    OP_Update >>opcode ;
     
-: <mdb-reply-msg> ( -- mdb-reply-msg )
-    mdb-reply-msg new ; inline
+CONSTRUCTOR: mdb-reply-msg ( -- mdb-reply-msg ) ; inline
 
 GENERIC: write-message ( message -- )
 
