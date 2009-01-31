@@ -8,14 +8,14 @@ IN: xmode.code2html
         [ str>> ] [ id>> ] bi [
             name>> swap
             [XML <span class=<->><-></span> XML]
-        ] [ ] if*
+        ] when*
     ] map ;
 
 : htmlize-line ( line-context line rules -- line-context' xml )
     tokenize-line htmlize-tokens ;
 
 : htmlize-lines ( lines mode -- xml )
-    [ f ] 2dip load-mode [ htmlize-line ] curry map nip ;
+    [ f ] 2dip load-mode [ htmlize-line "\n" suffix ] curry map nip ;
 
 : default-stylesheet ( -- xml )
     "resource:basis/xmode/code2html/stylesheet.css"
@@ -24,7 +24,7 @@ IN: xmode.code2html
 
 :: htmlize-stream ( path stream -- xml )
     stream lines
-    [ "" ] [ first find-mode path swap htmlize-lines ]
+    [ "" ] [ path over first find-mode htmlize-lines ]
     if-empty :> input
     default-stylesheet :> stylesheet
     <XML <html>

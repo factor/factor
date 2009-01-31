@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: accessors arrays ascii calendar combinators fry kernel 
+USING: accessors arrays ascii assocs calendar combinators fry kernel 
 generalizations io io.encodings.ascii io.files io.streams.string
 macros math math.functions math.parser peg.ebnf quotations
 sequences splitting strings unicode.case vectors ;
@@ -75,8 +75,8 @@ digits    = (digits_)?           => [[ 6 or ]]
 fmt-%     = "%"                  => [[ [ "%" ] ]] 
 fmt-c     = "c"                  => [[ [ 1string ] ]]
 fmt-C     = "C"                  => [[ [ 1string >upper ] ]]
-fmt-s     = "s"                  => [[ [ ] ]]
-fmt-S     = "S"                  => [[ [ >upper ] ]]
+fmt-s     = "s"                  => [[ [ dup number? [ number>string ] when ] ]]
+fmt-S     = "S"                  => [[ [ dup number? [ number>string ] when >upper ] ]]
 fmt-d     = "d"                  => [[ [ >fixnum number>string ] ]]
 fmt-e     = digits "e"           => [[ first '[ >exp _ exp>string ] ]]
 fmt-E     = digits "E"           => [[ first '[ >exp _ exp>string >upper ] ]]
@@ -91,7 +91,13 @@ strings   = pad width strings_   => [[ reverse compose-all ]]
 numbers_  = fmt-d|fmt-e|fmt-E|fmt-f|fmt-x|fmt-X
 numbers   = sign pad numbers_    => [[ unclip-last prefix compose-all [ fix-sign ] append ]]
 
-formats   = "%" (strings|numbers|fmt-%|unknown) => [[ second '[ _ dip ] ]]
+types     = strings|numbers 
+
+lists     = "[%" types ", %]"    => [[ second '[ _ map ", " join "{ " prepend " }" append ] ]] 
+
+assocs    = "[%" types ": %" types " %]" => [[ [ second ] [ fourth ] bi '[ unzip [ _ map ] dip _ map zip [ ":" join ] map ", " join "{ " prepend " }" append ] ]]
+
+formats   = "%" (types|fmt-%|lists|assocs|unknown) => [[ second '[ _ dip ] ]]
 
 plain-text = (!("%").)+          => [[ >string '[ _ swap ] ]]
 
