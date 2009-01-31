@@ -22,8 +22,8 @@ TUPLE: mdb name nodes collections ;
 <PRIVATE
 
 : ismaster-cmd ( node -- result )
-    binary "admin.$cmd" H{ { "ismaster" 1 } } <mdb-query-one-msg>
-    '[ _ write-message read-message ] with-client
+    binary "admin.$cmd" H{ { "ismaster" 1 } } <mdb-query-msg>
+    1 >>return# '[ _ write-message read-message ] with-client
     objects>> first ; 
 
 : split-host-str ( hoststr -- host port )
