@@ -1,20 +1,24 @@
 USING: alien alien.c-types alien.syntax kernel system
-combinators combinators.short-circuit ;
+combinators ;
 IN: math.blas.cblas
 
 <<
 : load-atlas ( -- )
     "atlas" "libatlas.so" "cdecl" add-library ;
+: load-fortran ( -- )
+    "I77" "libI77.so" "cdecl" add-library
+    "F77" "libF77.so" "cdecl" add-library ;
 : load-blas ( -- )
     "blas" "libblas.so" "cdecl" add-library ;
 
 "cblas" {
     { [ os macosx? ] [ "libblas.dylib" "cdecl" add-library ] }
     { [ os windows? ] [ "blas.dll" "cdecl" add-library ] }
-    {
-        [ os { [ openbsd? ] [ netbsd? ] } 1|| ]
-        [ "libcblas.so" "cdecl" add-library load-blas ]
-    }
+    { [ os openbsd? ] [ "libcblas.so" "cdecl" add-library load-blas ] }
+    { [ os netbsd? ] [ 
+        load-fortran load-blas
+        "/usr/local/lib/libcblas.so" "cdecl" add-library
+    ] }
     { [ os freebsd? ] [ "libcblas.so" "cdecl" add-library load-atlas ] }
     [ "libblas.so" "cdecl" add-library ]
 } cond

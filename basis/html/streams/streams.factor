@@ -4,7 +4,7 @@ USING: combinators generic assocs io io.styles
 io.files continuations io.streams.string kernel math math.order
 math.parser namespaces make quotations assocs sequences strings
 words html.elements xml.entities sbufs continuations destructors
-accessors arrays urls.encoding ;
+accessors arrays urls.encoding html ;
 IN: html.streams
 
 GENERIC: browser-link-href ( presented -- href )

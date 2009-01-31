@@ -4,9 +4,9 @@ USING: calendar kernel math math.order math.parser namespaces
 parser sequences strings assocs hashtables debugger mime.types
 sorting logging calendar.format accessors splitting io io.files
 io.files.info io.directories io.pathnames io.encodings.binary
-fry xml.entities destructors urls html.elements
+fry xml.entities destructors urls html xml.literals
 html.templates.fhtml http http.server http.server.responses
-http.server.redirection ;
+http.server.redirection xml.writer ;
 IN: http.server.static
 
 TUPLE: file-responder root hook special allow-listings ;
@@ -56,18 +56,14 @@ TUPLE: file-responder root hook special allow-listings ;
 
 \ serve-file NOTICE add-input-logging
 
-: file. ( name -- )
+: file. ( name -- xml )
     dup link-info directory? [ "/" append ] when
-    dup <a =href a> escape-string write </a> ;
+    dup [XML <li><a href=<->><-></a></li> XML] ;
 
 : directory. ( path -- )
     dup file-name [ ] [
-        [ <h1> file-name escape-string write </h1> ]
-        [
-            <ul>
-                directory-files [ <li> file. </li> ] each
-            </ul>
-        ] bi
+        [ file-name ] [ directory-files [ file. ] map ] bi
+        [XML <h1><-></h1> <ul><-></ul> XML] write-xml
     ] simple-page ;
 
 : list-directory ( directory -- response )

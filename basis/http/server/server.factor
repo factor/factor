@@ -24,7 +24,7 @@ http.parsers
 http.server.responses
 http.server.remapping
 html.templates
-html.elements
+html
 html.streams ;
 IN: http.server
 
@@ -174,8 +174,9 @@ main-responder global [ <404> <trivial-responder> or ] change-at
     [ add-responder-nesting ] [ call-responder* ] 2bi ;
 
 : http-error. ( error -- )
-    "Internal server error" [ ] [
-        [ print-error nl :c ] with-html-writer
+    ! TODO: get rid of rot
+    "Internal server error" [ ] rot '[
+        [ _ print-error nl :c ] with-html-writer
     ] simple-page ;
 
 : <500> ( error -- response )

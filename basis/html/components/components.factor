@@ -6,7 +6,7 @@ hashtables combinators continuations math strings inspector
 fry locals calendar calendar.format xml.entities xml.data
 validators urls present xml.writer xml.literals xml
 xmode.code2html lcs.diff2html farkup io.streams.string
-html.elements html.streams html.forms ;
+html html.streams html.forms ;
 IN: html.components
 
 GENERIC: render* ( value name renderer -- xml )

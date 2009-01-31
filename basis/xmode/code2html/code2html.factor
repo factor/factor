@@ -1,5 +1,5 @@
 USING: xmode.tokens xmode.marker xmode.catalog kernel locals
-html.elements io io.files sequences words io.encodings.utf8
+io io.files sequences words io.encodings.utf8
 namespaces xml.entities accessors xml.literals locals xml.writer ;
 IN: xmode.code2html
 
@@ -15,7 +15,8 @@ IN: xmode.code2html
     tokenize-line htmlize-tokens ;
 
 : htmlize-lines ( lines mode -- xml )
-    [ f ] 2dip load-mode [ htmlize-line "\n" suffix ] curry map nip ;
+    [ f ] 2dip load-mode [ htmlize-line ] curry map nip
+    { "\n" } join ;
 
 : default-stylesheet ( -- xml )
     "resource:basis/xmode/code2html/stylesheet.css"
