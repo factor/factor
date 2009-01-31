@@ -10,7 +10,6 @@ furnace.utilities
 furnace.redirection
 furnace.conversations
 html.forms
-html.elements
 html.components
 html.components
 html.templates.chloe

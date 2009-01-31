@@ -1,5 +1,5 @@
+USING: help.markup help.syntax io present html ;
 IN: html.elements
-USING: help.markup help.syntax io present ;
 
 ARTICLE: "html.elements" "HTML elements"
 "The " { $vocab-link "html.elements" } " vocabulary provides words for writing HTML tags to the " { $link output-stream } " with a familiar look and feel in the code."

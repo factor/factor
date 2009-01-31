@@ -5,7 +5,7 @@ USING: continuations sequences kernel namespaces debugger
 combinators math quotations generic strings splitting
 accessors assocs fry vocabs.parser
 parser lexer io io.files io.streams.string io.encodings.utf8
-html.elements
+html
 html.templates ;
 IN: html.templates.fhtml
 

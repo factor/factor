@@ -5,8 +5,9 @@ namespaces make classes.tuple assocs splitting words arrays io
 io.files io.files.info io.encodings.utf8 io.streams.string
 unicode.case mirrors math urls present multiline quotations xml
 logging continuations
-xml.data
+xml.data xml.writer xml.literals strings
 html.forms
+html
 html.elements
 html.components
 html.templates
