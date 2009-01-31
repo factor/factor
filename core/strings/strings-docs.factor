@@ -4,7 +4,7 @@ sbufs math ;
 IN: strings
 
 ARTICLE: "strings" "Strings"
-"A string is a fixed-size mutable sequence of Unicode 5.0 code points."
+"A string is a fixed-size mutable sequence of Unicode 5.1 code points."
 $nl
 "Characters are not a first-class type; they are simply represented as integers between 0 and 16777216 (2^24). Only characters up to 2097152 (2^21) have a defined meaning in Unicode."
 $nl
