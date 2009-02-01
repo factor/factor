@@ -29,6 +29,8 @@ PREDICATE: bson-array   < integer T_Array = ;
 PREDICATE: bson-binary  < integer T_Binary = ;
 PREDICATE: bson-binary-bytes < integer T_Binary_Bytes = ;
 PREDICATE: bson-binary-function < integer T_Binary_Function = ;
+PREDICATE: bson-binary-uuid < integer T_Binary_UUID = ;
+PREDICATE: bson-binary-custom < integer T_Binary_Custom = ;
 PREDICATE: bson-oid     < integer T_OID = ;
 PREDICATE: bson-boolean < integer T_Boolean = ;
 PREDICATE: bson-date    < integer T_Date = ;
@@ -134,12 +136,6 @@ M: bson-not-eoo element-read ( type -- cont? )
     set-at
     t ;
 
-M: bson-oid element-data-read ( type -- object )
-    drop
-    read-longlong
-    read-int32
-    oid boa ;
-
 : [scope-changer] ( state -- state quot )
     dup exemplar>> '[ [ [ _ clone ] dip push ] keep ] ; inline
 
@@ -172,13 +168,6 @@ M: bson-boolean element-data-read ( type -- boolean )
     drop
     read-byte t = ;
 
-M: bson-ref element-data-read ( type -- dbref )
-    drop
-    read-int32
-    read-sized-string
-    T_OID element-data-read
-    dbref boa ;
-
 M: bson-binary element-data-read ( type -- binary )
     drop
     read-int32 read-byte element-binary-read ;
@@ -186,6 +175,17 @@ M: bson-binary element-data-read ( type -- binary )
 M: bson-null element-data-read ( type -- bf  )
     drop
     f ;
+
+M: bson-binary-custom element-binary-read ( size type -- dbref )
+    2drop
+    read-cstring
+    read-cstring objid boa
+    objref boa ;
+
+M: bson-binary-uuid element-binary-read ( size type -- object )
+    drop
+    read-sized-string
+    objid boa ;
 
 M: bson-binary-bytes element-binary-read ( size type -- bytes )
     drop read ;

@@ -20,10 +20,8 @@ DEFER: create-mdb-command
 
 CONSTANT: MDB_INFO "_mdb_info"
 
-
-
-: <dbref> ( tuple -- dbref )
-    [ mdb-collection>> ] [ _id>> ] bi dbref boa ; inline
+: <objref> ( tuple -- objref )
+    [ mdb-collection>> ] [ _id>> ] bi objref boa ; inline
 
 : mdbinfo>tuple-class ( mdbinfo -- class )
     [ first ] keep second lookup ; inline
@@ -66,7 +64,7 @@ CONSTANT: MDB_INFO "_mdb_info"
          [ _ keep
            [ mdb-collection>> ] keep
            [ create-mdb-command ] dip
-           <dbref> ]
+           <objref> ]
          [ dup data-tuple? _ [ ] if ] if
          swap _ set-at
        ] if
@@ -76,7 +74,7 @@ CONSTANT: MDB_INFO "_mdb_info"
     [ <mirror> ] dip dup clone swap [ tuck ] dip swap ; inline
     
 : ensure-mdb-info ( tuple -- tuple )    
-    dup _id>> [ <oid> >>_id ] unless ; inline
+    dup _id>> [ <objid> >>_id ] unless ; inline
   
 : with-op-seq ( quot -- op-seq )
     [

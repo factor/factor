@@ -5,7 +5,7 @@ USING: bson bson.constants accessors kernel io.streams.string
        io.encodings.utf8 strings splitting math.parser 
        sequences math assocs classes words make fry 
        prettyprint hashtables mirrors alien.strings alien.c-types
-       io.streams.byte-array io ;
+       io.streams.byte-array io alien.strings ;
 
 IN: bson.writer
 
@@ -19,15 +19,16 @@ GENERIC: bson-write ( obj -- )
 M: t bson-type? ( boolean -- type ) drop T_Boolean ; 
 M: f bson-type? ( boolean -- type ) drop T_Boolean ; 
 
-M: oid bson-type? ( word -- type ) drop T_OID ;
-M: dbref bson-type? ( dbref -- type ) drop T_DBRef ;
 M: real bson-type? ( real -- type ) drop T_Double ; 
 M: word bson-type? ( word -- type ) drop T_String ; 
 M: tuple bson-type? ( tuple -- type ) drop T_Object ;  
 M: assoc bson-type? ( hashtable -- type ) drop T_Object ; 
 M: string bson-type? ( string -- type ) drop T_String ; 
 M: integer bson-type? ( integer -- type ) drop T_Integer ; 
-M: sequence bson-type? ( seq -- type ) drop T_Array ; 
+M: sequence bson-type? ( seq -- type ) drop T_Array ;
+
+M: objid bson-type? ( objid -- type ) drop T_Binary ;
+M: objref bson-type? ( objref -- type ) drop T_Binary ;
 M: quotation bson-type? ( quotation -- type ) drop T_Binary ; 
 M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ; 
 
@@ -69,14 +70,19 @@ M: quotation bson-write ( quotation -- )
     T_Binary_Function write-byte
     write ; 
 
-M: oid bson-write ( oid -- )
-    [ a>> write-longlong ] [ b>> write-int32 ] bi ;
+M: objid bson-write ( oid -- )
+    id>> utf8 string>alien
+    [ length write-int32 ] keep
+    T_Binary_UUID write-byte
+    write ;
 
-M: dbref bson-write ( dbref -- )
-    [ ns>> utf8 string>alien 
-      [ length write-int32 ] keep write
-    ]
-    [ oid>> bson-write ] bi ;
+M: objref bson-write ( objref -- )
+    [ ns>> utf8 string>alien ]
+    [ objid>> id>> utf8 string>alien ] bi
+    append
+    [ length write-int32 ] keep
+    T_Binary_Custom write-byte
+    write ;
     
 M: sequence bson-write ( array -- )
     '[ _ [ [ write-type ] dip number>string write-cstring bson-write ]

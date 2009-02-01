@@ -1,18 +1,14 @@
-USING: alien.c-types accessors kernel calendar random math.bitwise math unix ;
+USING: alien.c-types accessors kernel calendar random math.bitwise math unix
+constructors uuid ;
 
 IN: bson.constants
 
-TUPLE: oid { a initial: 0 } { b initial: 0 } ;
+TUPLE: objid id ;
 
-: <oid> ( -- oid )
-    oid new
-    now timestamp>micros >>a
-    8 random-bits 16 shift HEX: FF0000 mask
-    getpid HEX: FFFF mask
-    bitor >>b ;
+CONSTRUCTOR: objid ( -- objid )
+   uuid1 >>id ; inline
 
-TUPLE: dbref ns oid ;
-
+TUPLE: objref ns objid ;
 
 CONSTANT: T_EOO  0  
 CONSTANT: T_Double  1  
@@ -34,7 +30,10 @@ CONSTANT: T_Symbol  14
 CONSTANT: T_JSTypeMax  16  
 CONSTANT: T_MaxKey  127  
 
-CONSTANT: T_Binary_Bytes 2  
 CONSTANT: T_Binary_Function 1   
+CONSTANT: T_Binary_Bytes 2
+CONSTANT: T_Binary_UUID 3
+CONSTANT: T_Binary_MD5 5
+CONSTANT: T_Binary_Custom 128
 
 
