@@ -105,10 +105,6 @@ M: utf16le encode-char ( char stream encoding -- )
 
 : bom-be B{ HEX: fe HEX: ff } ; inline
 
-: start-utf16le? ( seq1 -- seq2 ? ) bom-le ?head ;
-
-: start-utf16be? ( seq1 -- seq2 ? ) bom-be ?head ;
-
 : bom>le/be ( bom -- le/be )
     dup bom-le sequence= [ drop utf16le ] [
         bom-be sequence= [ utf16be ] [ missing-bom ] if
