@@ -114,16 +114,11 @@ GENERIC: com-stack-effect ( obj -- )
 
 M: quotation com-stack-effect infer. ;
 
-M: word com-stack-effect def>> com-stack-effect ;
-
-[ word? ] \ com-stack-effect H{
-    { +listener+ t }
-} define-operation
+M: word com-stack-effect 1quotation com-stack-effect ;
 
 : com-enter-in ( vocab -- ) vocab-name set-in ;
 
 [ vocab? ] \ com-enter-in H{
-    { +keyboard+ T{ key-down f { C+ } "i" } }
     { +listener+ t }
 } define-operation
 
