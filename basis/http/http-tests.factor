@@ -298,7 +298,7 @@ test-db [
 
 [ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
 
-USING: html.components html.elements html.forms
+USING: html.components html.forms
 xml xml.utilities validators
 furnace furnace.conversations ;
 
@@ -308,7 +308,7 @@ SYMBOL: a
     <dispatcher>
         <action>
             [ a get-global "a" set-value ] >>init
-            [ [ <html> "a" <field> render </html> ] "text/html" <content> ] >>display
+            [ [ "a" <field> render ] "text/html" <content> ] >>display
             [ { { "a" [ v-integer ] } } validate-params ] >>validate
             [ "a" value a set-global URL" " <redirect> ] >>submit
         <conversations>
@@ -322,7 +322,8 @@ SYMBOL: a
 
 3 a set-global
 
-: test-a string>xml "input" tag-named "value" attr ;
+: test-a ( xml -- value )
+    string>xml body>> "input" deep-tag-named "value" attr ;
 
 [ "3" ] [
     "http://localhost/" add-port http-get

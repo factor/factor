@@ -79,7 +79,7 @@ transform-list = wsp* transforms?:t wsp*
 ;EBNF
 
 : tag-transform ( tag -- transform )
-    "transform" svg-name swap at svg-transform>affine-transform ;
+    "transform" svg-name attr svg-transform>affine-transform ;
 
 TUPLE: moveto p relative? ;
 TUPLE: closepath ;
@@ -221,4 +221,4 @@ svg-path = wsp* moveto-drawto-command-groups?:x wsp* => [[ x ]]
 ;EBNF
 
 : tag-d ( tag -- d )
-    "d" svg-name swap at svg-path>array ;
+    "d" svg-name attr svg-path>array ;

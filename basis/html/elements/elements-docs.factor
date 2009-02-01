@@ -20,10 +20,6 @@ $nl
 $nl
 "Writing unescaped HTML to " { $vocab-link "html.streams" } ":"
 { $subsection write-html }
-{ $subsection print-html }
-"Writing some common HTML patterns:"
-{ $subsection xhtml-preamble }
-{ $subsection simple-page }
-{ $subsection render-error } ;
+{ $subsection print-html } ;
 
 ABOUT: "html.elements"
