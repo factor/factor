@@ -15,12 +15,12 @@ GENERIC: render* ( value name renderer -- xml )
     prepare-value
     [
         dup validation-error?
-        [ [ message>> ] [ value>> ] bi ]
+        [ [ message>> render-error ] [ value>> ] bi ]
         [ f swap ]
         if
     ] 2dip
-    render* write-xml
-    [ render-error ] when* ;
+    render*
+    swap 2array write-xml ;
 
 SINGLETON: label
 

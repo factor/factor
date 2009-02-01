@@ -37,6 +37,11 @@ TUPLE: color red green blue ;
         "red" hidden render
     ] with-string-writer
 ] unit-test
+[ "<input value=\"&lt;jimmy>\" name=\"red\" type=\"hidden\"/>" ] [
+    [
+        "red" hidden render
+    ] with-string-writer
+] unit-test
 
 [ ] [ "'jimmy'" "red" set-value ] unit-test
 
@@ -184,3 +189,9 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
         }
     }
 ] [ values ] unit-test
+
+[ ] [ "error" "blah" <validation-error> "error" set-value ] unit-test
+
+[ ] [
+    "error" hidden render
+] unit-test
