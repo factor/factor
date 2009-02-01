@@ -1,12 +1,10 @@
 ! Copyright (C) 2005 Alex Chapman
-! Copyright (C) 2006, 2008 Slava Pestov
+! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations sequences kernel namespaces debugger
-combinators math quotations generic strings splitting
-accessors assocs fry vocabs.parser
-parser lexer io io.files io.streams.string io.encodings.utf8
-html
-html.templates ;
+combinators math quotations generic strings splitting accessors
+assocs fry vocabs.parser parser lexer io io.files
+io.streams.string io.encodings.utf8 html.templates ;
 IN: html.templates.fhtml
 
 ! We use a custom lexer so that %> ends a token even if not
@@ -34,13 +32,13 @@ DEFER: <% delimiter
     [
         over line-text>>
         [ column>> ] 2dip subseq parsed
-        \ write-html parsed
+        \ write parsed
     ] 2keep 2 + >>column drop ;
 
 : still-looking ( accum lexer -- accum )
     [
         [ line-text>> ] [ column>> ] bi tail
-        parsed \ print-html parsed
+        parsed \ print parsed
     ] keep next-line ;
 
 : parse-%> ( accum lexer -- accum )

@@ -67,7 +67,7 @@ SYMBOL: nested-template?
 SYMBOL: next-template
 
 : call-next-template ( -- )
-    next-template get write-html ;
+    next-template get write ;
 
 M: f call-template* drop call-next-template ;
 

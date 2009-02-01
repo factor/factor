@@ -6,6 +6,14 @@ xml.data xml.literals urls math math.parser combinators
 present fry io.streams.string xml.writer html ;
 IN: html.elements
 
+SYMBOL: html
+
+: write-html ( str -- )
+    H{ { html t } } format ;
+
+: print-html ( str -- )
+    write-html "\n" write-html ;
+
 <<
 
 : elements-vocab ( -- vocab-name ) "html.elements" ;

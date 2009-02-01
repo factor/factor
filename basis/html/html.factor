@@ -1,23 +1,10 @@
-! Copyright (C) 2004, 2009 Chris Double, Daniel Ehrenberg.
+! Copyright (C) 2004, 2009 Chris Double, Daniel Ehrenberg,
+! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io kernel xml.data xml.writer io.streams.string
-xml.literals io.styles ;
+USING: kernel xml.data xml.writer xml.literals urls.encoding ;
 IN: html
 
-SYMBOL: html
-
-: write-html ( str -- )
-    H{ { html t } } format ;
-
-: print-html ( str -- )
-    write-html "\n" write-html ;
-
-: xhtml-preamble ( -- )
-    "<?xml version=\"1.0\"?>" write-html
-    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" write-html ;
-
-: simple-page ( title head-quot body-quot -- )
-    [ with-string-writer <unescaped> ] bi@
+: simple-page ( title head body -- xml )
     <XML
         <?xml version="1.0"?>
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
@@ -28,7 +15,10 @@ SYMBOL: html
             </head>
             <body><-></body>
         </html>
-    XML> write-xml ; inline
+    XML> ; inline
 
-: render-error ( message -- )
-    [XML <span class="error"><-></span> XML] write-xml ;
+: render-error ( message -- xml )
+    [XML <span class="error"><-></span> XML] ;
+
+: simple-link ( xml url -- xml' )
+    url-encode swap [XML <a href=<->><-></a> XML] ;
