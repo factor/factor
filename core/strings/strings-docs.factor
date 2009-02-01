@@ -4,7 +4,7 @@ sbufs math ;
 IN: strings
 
 ARTICLE: "strings" "Strings"
-"A string is a fixed-size mutable sequence of Unicode 5.0 code points."
+"A string is a fixed-size mutable sequence of Unicode 5.1 code points."
 $nl
 "Characters are not a first-class type; they are simply represented as integers between 0 and 16777216 (2^24). Only characters up to 2097152 (2^21) have a defined meaning in Unicode."
 $nl
@@ -22,9 +22,8 @@ $nl
 { $subsection 1string }
 "Since strings are sequences, basic string manipulation can be performed using sequence operations (" { $link "sequences" } "). More advanced functionality can be found in other vocabularies, including but not limited to:"
 { $list
-    { { $vocab-link "ascii" } " - traditional ASCII character classes" }
-    { { $vocab-link "unicode.categories" } " - Unicode character classes" }
-    { { $vocab-link "unicode.case" } " - Unicode case conversion" }
+    { { $link "ascii" } " - ASCII algorithms for interoperability with legacy applications" }
+    { { $link "unicode" } " - Unicode algorithms for modern multilingual applications" }
     { { $vocab-link "regexp" } " - regular expressions" }
     { { $vocab-link "peg" } " - parser expression grammars" }
 } ;

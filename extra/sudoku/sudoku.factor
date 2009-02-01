@@ -13,13 +13,13 @@ SYMBOL: board
 : >board ( row m n -- ) row set-nth ;
 : f>board ( m n -- ) f -rot >board ;
 
-: row-contains? ( n y -- ? ) row member? ;
-: col-contains? ( n x -- ? ) board get swap <column> member? ;
-: cell-contains? ( n x y i -- ? ) 3 /mod pair+ board> = ;
+: row-any? ( n y -- ? ) row member? ;
+: col-any? ( n x -- ? ) board get swap <column> member? ;
+: cell-any? ( n x y i -- ? ) 3 /mod pair+ board> = ;
 
-: box-contains? ( n x y -- ? )
+: box-any? ( n x y -- ? )
     [ 3 /i 3 * ] bi@
-    9 [ [ 3dup ] dip cell-contains? ] contains?
+    9 [ [ 3dup ] dip cell-any? ] any?
     [ 3drop ] dip ;
 
 DEFER: search
@@ -29,9 +29,9 @@ DEFER: search
 
 : attempt ( n x y -- )
     {
-        { [ 3dup nip row-contains? ] [ 3drop ] }
-        { [ 3dup drop col-contains? ] [ 3drop ] }
-        { [ 3dup box-contains? ] [ 3drop ] }
+        { [ 3dup nip row-any? ] [ 3drop ] }
+        { [ 3dup drop col-any? ] [ 3drop ] }
+        { [ 3dup box-any? ] [ 3drop ] }
         [ assume ]
     } cond ;
 

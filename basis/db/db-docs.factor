@@ -173,7 +173,7 @@ HELP: with-db
 HELP: with-transaction
 { $values
      { "quot" quotation } }
-{ $description "" } ;
+{ $description "Calls the quotation inside a database transaction and commits the result to the database after the quotation finishes. If the quotation throws an error, the transaction is aborted." } ;
 
 ARTICLE: "db" "Database library"
 "Accessing a database:"
@@ -244,13 +244,13 @@ ARTICLE: "db-protocol" "Low-level database protocol"
 ! { $subsection bind-tuple }
 
 ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
-"Although Factor makes integrating a database with its object system easy (see " { $vocab-link "db.tuples" } "), sometimes you may want to write SQL directly and get the results back as arrays of strings, for instance, when interfacing with a legacy database that doesn't easily map to " { $snippet "tuples" } "."
+"Although Factor makes integrating a database with its object system easy (see " { $vocab-link "db.tuples" } "), sometimes you may want to write SQL directly and get the results back as arrays of strings, for instance, when interfacing with a legacy database that doesn't easily map to " { $snippet "tuples" } "." $nl
 "Executing a SQL command:"
 { $subsection sql-command }
 "Executing a query directly:"
 { $subsection sql-query }
 "Here's an example usage where we'll make a book table, insert some objects, and query them." $nl
-"First, let's set up a custom combinator for using our database.  See " { $link "db-custom-database-combinators" } " for more details."
+"First, let's set up a custom combinator for using our database. See " { $link "db-custom-database-combinators" } " for more details."
 { $code <"
 USING: db.sqlite db io.files ;
 : with-book-db ( quot -- )

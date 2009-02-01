@@ -43,7 +43,7 @@ IN: uuid
     ] dip 76 shift bitor ;
 
 : uuid>string ( n -- string )
-    >hex 32 CHAR: 0 pad-left 
+    >hex 32 CHAR: 0 pad-head 
     [ CHAR: - 20 ] dip insert-nth
     [ CHAR: - 16 ] dip insert-nth 
     [ CHAR: - 12 ] dip insert-nth 
@@ -52,13 +52,10 @@ IN: uuid
 : string>uuid ( string -- n )
     [ CHAR: - = not ] filter 16 base> ;
 
-: uuid>byte-array ( n -- byte-array ) 
-    16 >be ;
-
 PRIVATE>
 
 : uuid-parse ( string -- byte-array ) 
-    string>uuid uuid>byte-array ;
+    string>uuid 16 >be ;
 
 : uuid-unparse ( byte-array -- string ) 
     be> uuid>string ;

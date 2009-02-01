@@ -1,16 +1,13 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs io.encodings.binary io.files kernel namespaces sequences
-values xml xml.entities ;
+values xml xml.entities accessors xml.state ;
 IN: xml.entities.html
 
 VALUE: html-entities
 
 : read-entities-file ( file -- table )
-    H{ } clone [ extra-entities [
-        binary <file-reader>
-        [ drop ] sax
-    ] with-variable ] keep ;
+    file>dtd entities>> ;
 
 : get-html ( -- table )
     { "lat1" "special" "symbol" } [

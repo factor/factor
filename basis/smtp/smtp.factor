@@ -6,7 +6,7 @@ io.encodings.utf8 io.timeouts io.sockets io.sockets.secure
 io.encodings.ascii kernel logging sequences combinators
 splitting assocs strings math.order math.parser random system
 calendar summary calendar.format accessors sets hashtables
-base64 debugger classes prettyprint ;
+base64 debugger classes prettyprint io.crlf ;
 IN: smtp
 
 SYMBOL: smtp-domain
@@ -49,12 +49,6 @@ TUPLE: email
 : <email> ( -- email ) email new ; inline
 
 <PRIVATE
-
-: crlf ( -- ) "\r\n" write ;
-
-: read-crlf ( -- bytes )
-    "\r" read-until
-    [ CHAR: \r assert= read1 CHAR: \n assert= ] when* ;
 
 : command ( string -- ) write crlf flush ;
 

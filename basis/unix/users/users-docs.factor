@@ -91,7 +91,6 @@ ARTICLE: "unix.users" "Unix users"
 $nl
 "Listing all users:"
 { $subsection all-users }
-"Returning a passwd tuple:"
 "Real user:"
 { $subsection real-user-name }
 { $subsection real-user-id }

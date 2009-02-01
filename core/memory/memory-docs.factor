@@ -3,7 +3,7 @@ quotations math ;
 IN: memory
 
 HELP: begin-scan ( -- )
-{ $description "Moves all objects to tenured space, disables the garbage collector, and resets the heap scan pointer to point at the first object in the heap. The " { $link next-object } " word can then be called to advance the heap scan pointer and return successive objects."
+{ $description "Disables the garbage collector and resets the heap scan pointer to point at the first object in the heap. The " { $link next-object } " word can then be called to advance the heap scan pointer and return successive objects."
 $nl
 "This word must always be paired with a call to " { $link end-scan } "." }
 { $notes "This is a low-level facility and can be dangerous. Use the " { $link each-object } " combinator instead." } ;

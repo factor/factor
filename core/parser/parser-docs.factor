@@ -41,7 +41,7 @@ ARTICLE: "defining-words" "Defining words"
 { $subsection parse-definition }
 "The " { $link POSTPONE: ; } " word is just a delimiter; an unpaired occurrence throws a parse error:"
 { $see POSTPONE: ; }
-"There are additional parsing words whose syntax is delimited by  " { $link POSTPONE: ; } ", and they are all implemented by calling " { $link parse-definition } "." ;
+"There are additional parsing words whose syntax is delimited by " { $link POSTPONE: ; } ", and they are all implemented by calling " { $link parse-definition } "." ;
 
 ARTICLE: "parsing-tokens" "Parsing raw tokens"
 "So far we have seen how to read individual tokens, or read a sequence of parsed objects until a delimiter. It is also possible to read raw tokens from the input and perform custom processing."

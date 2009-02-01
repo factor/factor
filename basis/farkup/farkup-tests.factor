@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: farkup kernel peg peg.ebnf tools.test namespaces xml
-urls.encoding assocs xml.utilities ;
+urls.encoding assocs xml.utilities xml.data ;
 IN: farkup.tests
 
 relative-link-prefix off
@@ -92,22 +92,22 @@ link-no-follow? off
 [ "<p>=</p><h2>foo</h2>" ] [ "===foo==" convert-farkup ] unit-test
 [ "<h1>foo</h1><p>=</p>" ] [ "=foo==" convert-farkup ] unit-test
 
-[ "<pre><span class='KEYWORD3'>int</span> <span class='FUNCTION'>main</span><span class='OPERATOR'>(</span><span class='OPERATOR'>)</span>\n</pre>" ]
+[ "<pre><span class=\"KEYWORD3\">int</span> <span class=\"FUNCTION\">main</span><span class=\"OPERATOR\">(</span><span class=\"OPERATOR\">)</span></pre>" ]
 [ "[c{int main()}]" convert-farkup ] unit-test
 
-[ "<p><img src='lol.jpg'/></p>" ] [ "[[image:lol.jpg]]" convert-farkup ] unit-test
-[ "<p><img src='lol.jpg' alt='teh lol'/></p>" ] [ "[[image:lol.jpg|teh lol]]" convert-farkup ] unit-test
-[ "<p><a href='http://lol.com'>http://lol.com</a></p>" ] [ "[[http://lol.com]]" convert-farkup ] unit-test
-[ "<p><a href='http://lol.com'>haha</a></p>" ] [ "[[http://lol.com|haha]]" convert-farkup ] unit-test
-[ "<p><a href='Foo/Bar'>Bar</a></p>" ] [ "[[Foo/Bar]]" convert-farkup ] unit-test
+[ "<p><img src=\"lol.jpg\"/></p>" ] [ "[[image:lol.jpg]]" convert-farkup ] unit-test
+[ "<p><img src=\"lol.jpg\" alt=\"teh lol\"/></p>" ] [ "[[image:lol.jpg|teh lol]]" convert-farkup ] unit-test
+[ "<p><a href=\"http://lol.com\">http://lol.com</a></p>" ] [ "[[http://lol.com]]" convert-farkup ] unit-test
+[ "<p><a href=\"http://lol.com\">haha</a></p>" ] [ "[[http://lol.com|haha]]" convert-farkup ] unit-test
+[ "<p><a href=\"Foo/Bar\">Bar</a></p>" ] [ "[[Foo/Bar]]" convert-farkup ] unit-test
 
 "/wiki/view/" relative-link-prefix [
-    [ "<p><a href='/wiki/view/Foo/Bar'>Bar</a></p>" ] [ "[[Foo/Bar]]" convert-farkup ] unit-test
+    [ "<p><a href=\"/wiki/view/Foo/Bar\">Bar</a></p>" ] [ "[[Foo/Bar]]" convert-farkup ] unit-test
 ] with-variable
 
 [ ] [ "[{}]" convert-farkup drop ] unit-test
 
-[ "<pre>hello\n</pre>" ] [ "[{hello}]" convert-farkup ] unit-test
+[ "<pre>hello</pre>" ] [ "[{hello}]" convert-farkup ] unit-test
 
 [
     "<p>Feature comparison:\n<table><tr><td>a</td><td>Factor</td><td>Java</td><td>Lisp</td></tr><tr><td>Coolness</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Badass</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Enterprise</td><td>Yes</td><td>Yes</td><td>No</td></tr><tr><td>Kosher</td><td>Yes</td><td>No</td><td>Yes</td></tr></table></p>"
@@ -118,15 +118,15 @@ link-no-follow? off
 ] [ "Feature comparison:\n\n|a|Factor|Java|Lisp|\n|Coolness|Yes|No|No|\n|Badass|Yes|No|No|\n|Enterprise|Yes|Yes|No|\n|Kosher|Yes|No|Yes|\n" convert-farkup ] unit-test
 
 [
-    "<p>This wiki is written in <a href='Factor'>Factor</a> and is hosted on a <a href='http://linode.com'>http://linode.com</a> virtual server.</p>"
+    "<p>This wiki is written in <a href=\"Factor\">Factor</a> and is hosted on a <a href=\"http://linode.com\">http://linode.com</a> virtual server.</p>"
 ] [
     "This wiki is written in [[Factor]] and is hosted on a [[http://linode.com|http://linode.com]] virtual server."
     convert-farkup
 ] unit-test
 
-[ "<p><a href='a'>a</a> <a href='b'>c</a></p>" ] [ "[[a]] [[b|c]]" convert-farkup ] unit-test
+[ "<p><a href=\"a\">a</a> <a href=\"b\">c</a></p>" ] [ "[[a]] [[b|c]]" convert-farkup ] unit-test
 
-[ "<p><a href='C%2b%2b'>C++</a></p>" ] [ "[[C++]]" convert-farkup ] unit-test
+[ "<p><a href=\"C%2b%2b\">C++</a></p>" ] [ "[[C++]]" convert-farkup ] unit-test
 
 [ "<p>&lt;foo&gt;</p>" ] [ "<foo>" convert-farkup ] unit-test
 
@@ -138,10 +138,10 @@ link-no-follow? off
 [ "<hr/>" ] [ "___" convert-farkup ] unit-test
 [ "<hr/>\n" ] [ "___\n" convert-farkup ] unit-test
 
-[ "<p>before:\n<pre><span class='OPERATOR'>{</span> <span class='DIGIT'>1</span> <span class='DIGIT'>2</span> <span class='DIGIT'>3</span> <span class='OPERATOR'>}</span> <span class='DIGIT'>1</span> tail\n</pre></p>" ] 
+[ "<p>before:\n<pre><span class=\"OPERATOR\">{</span> <span class=\"DIGIT\">1</span> <span class=\"DIGIT\">2</span> <span class=\"DIGIT\">3</span> <span class=\"OPERATOR\">}</span> <span class=\"DIGIT\">1</span> tail</pre></p>" ] 
 [ "before:\n[factor{{ 1 2 3 } 1 tail}]" convert-farkup ] unit-test
  
-[ "<p><a href='Factor'>Factor</a>-rific!</p>" ]
+[ "<p><a href=\"Factor\">Factor</a>-rific!</p>" ]
 [ "[[Factor]]-rific!" convert-farkup ] unit-test
 
 [ "<p>[ factor { 1 2 3 }]</p>" ]
@@ -161,9 +161,9 @@ link-no-follow? off
 
 : check-link-escaping ( string -- link )
     convert-farkup string>xml-chunk
-    "a" deep-tag-named "href" swap at url-decode ;
+    "a" deep-tag-named "href" attr url-decode ;
 
-[ "Trader Joe's" ] [ "[[Trader Joe's]]" check-link-escaping ] unit-test
+[ "Trader Joe\"s" ] [ "[[Trader Joe\"s]]" check-link-escaping ] unit-test
 [ "<foo>" ] [ "[[<foo>]]" check-link-escaping ] unit-test
 [ "&blah;" ] [ "[[&blah;]]" check-link-escaping ] unit-test
 [ "C++" ] [ "[[C++]]" check-link-escaping ] unit-test

@@ -156,7 +156,7 @@
  (defvar fuel-markup--maybe-nl nil))
 
 (defun fuel-markup--print (e)
-  (cond ((null e))
+  (cond ((null e) (insert "f"))
         ((stringp e) (fuel-markup--insert-string e))
         ((and (listp e) (symbolp (car e))
               (assoc (car e) fuel-markup--printers))
@@ -253,8 +253,12 @@
     (insert (cadr e))))
 
 (defun fuel-markup--snippet (e)
-  (let ((snip (format "%s" (cadr e))))
-    (insert (fuel-font-lock--factor-str snip))))
+  (insert (mapconcat '(lambda (s)
+                        (if (stringp s)
+                            (fuel-font-lock--factor-str s)
+                          (fuel-markup--print-str s)))
+                     (cdr e)
+                     " ")))
 
 (defun fuel-markup--code (e)
   (fuel-markup--insert-nl-if-nb)
@@ -285,7 +289,7 @@
   (fuel-markup--snippet (cons '$snippet (cdr e))))
 
 (defun fuel-markup--link (e)
-  (let* ((link (nth 1 e))
+  (let* ((link (or (nth 1 e) 'f))
          (type (or (nth 3 e) (if (symbolp link) 'word 'article)))
          (label (or (nth 2 e)
                     (and (eq type 'article)
@@ -319,7 +323,7 @@
         (sort-lines nil start (point))))))
 
 (defun fuel-markup--vocab-link (e)
-  (fuel-markup--insert-button (cadr e) (cadr e) 'vocab))
+  (fuel-markup--insert-button (cadr e) (or (car (cddr e)) (cadr e)) 'vocab))
 
 (defun fuel-markup--vocab-links (e)
   (dolist (link (cdr e))
@@ -579,19 +583,23 @@
 (defun fuel-markup--notes (e)
   (fuel-markup--elem-with-heading e "Notes"))
 
-(defun fuel-markup--see (e)
+(defun fuel-markup--word-info (e s)
   (let* ((word (nth 1 e))
-         (cmd (and word `(:fuel* (,(format "%s" word) fuel-word-see) "fuel" t)))
-         (res (and cmd
-                   (fuel-eval--retort-result (fuel-eval--send/wait cmd 100)))))
+         (cmd (and word `(:fuel* ((:quote ,(format "%s" word)) ,s) "fuel")))
+         (ret (and cmd (fuel-eval--send/wait cmd)))
+         (res (and (not (fuel-eval--retort-error ret))
+                   (fuel-eval--retort-output ret))))
     (if res
         (fuel-markup--code (list '$code res))
-      (fuel-markup--snippet (list '$snippet word)))))
+      (fuel-markup--snippet (list '$snippet " " word)))))
 
-(defun fuel-markup--null (e))
+(defun fuel-markup--see (e)
+  (fuel-markup--word-info e 'see))
 
 (defun fuel-markup--synopsis (e)
-  (insert (format " %S " e)))
+  (fuel-markup--word-info e 'synopsis))
+
+(defun fuel-markup--null (e))
 
 
 (provide 'fuel-markup)

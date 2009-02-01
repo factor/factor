@@ -1,5 +1,5 @@
 USING: help.markup help.syntax quotations hashtables kernel
-classes strings continuations destructors math ;
+classes strings continuations destructors math byte-arrays ;
 IN: io
 
 HELP: stream-readln
@@ -9,38 +9,38 @@ HELP: stream-readln
 $io-error ;
 
 HELP: stream-read1
-{ $values { "stream" "an input stream" } { "ch/f" "a character or " { $link f } } }
-{ $contract "Reads a character of input from the stream. Outputs " { $link f } " on stream exhaustion." }
+{ $values { "stream" "an input stream" } { "elt" "an element or " { $link f } } }
+{ $contract "Reads an element from the stream. Outputs " { $link f } " on stream exhaustion." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link read1 } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-read
-{ $values { "n" "a non-negative integer" } { "stream" "an input stream" } { "str/f" "a string or " { $link f } } }
-{ $contract "Reads " { $snippet "n" } " characters of input from the stream. Outputs a truncated string or " { $link f } " on stream exhaustion." }
+{ $values { "n" "a non-negative integer" } { "stream" "an input stream" } { "seq" { $or byte-array string f } } }
+{ $contract "Reads " { $snippet "n" } " elements from the stream. Outputs a truncated string or " { $link f } " on stream exhaustion." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link read } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-read-until
-{ $values { "seps" string } { "stream" "an input stream" } { "str/f" "a string or " { $link f } } { "sep/f" "a character or " { $link f } } }
-{ $contract "Reads characters from the stream, until the first occurrence of a separator character, or stream exhaustion. In the former case, the separator character is pushed on the stack, and is not part of the output string. In the latter case, the entire stream contents are output, along with " { $link f } "." }
+{ $values { "seps" string } { "stream" "an input stream" } { "seq" { $or byte-array string f } } { "sep/f" "a character or " { $link f } } }
+{ $contract "Reads elements from the stream, until the first occurrence of a separator character, or stream exhaustion. In the former case, the separator is pushed on the stack, and is not part of the output string. In the latter case, the entire stream contents are output, along with " { $link f } "." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link read-until } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-read-partial
 { $values
-     { "n" integer } { "stream" "an input stream" }
-     { "str/f" "a string or " { $link f } } }
-{ $description "Reads at most " { $snippet "n" } " characters from a stream and returns up to that many characters without blocking. If no characters are available, blocks until some are and returns them." } ;
+     { "n" "a non-negative integer" } { "stream" "an input stream" }
+     { "seq" { $or byte-array string f } } }
+{ $description "Reads at most " { $snippet "n" } " elements from a stream and returns up to that many characters without blocking. If no characters are available, blocks until some are and returns them." } ;
 
 HELP: stream-write1
-{ $values { "ch" "a character" } { "stream" "an output stream" } }
-{ $contract "Writes a character of output to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+{ $values { "elt" "an element" } { "stream" "an output stream" } }
+{ $contract "Writes an element to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link write1 } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-write
-{ $values { "str" string } { "stream" "an output stream" } }
-{ $contract "Writes a string of output to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
+{ $values { "seq" "a byte array or string" } { "stream" "an output stream" } }
+{ $contract "Writes a sequence of elements to the stream. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link write } "; see " { $link "stdio" } "." }
 $io-error ;
 
@@ -56,7 +56,6 @@ HELP: stream-nl
 { $contract "Writes a line terminator. If the stream does buffering, output may not be performed immediately; use " { $link stream-flush } " to force output." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link nl } "; see " { $link "stdio" } "." }
 $io-error ;
-
 
 HELP: stream-print
 { $values { "str" string } { "stream" "an output stream" } }
@@ -84,34 +83,32 @@ HELP: readln
 $io-error ;
 
 HELP: read1
-{ $values { "ch/f" "a character or " { $link f } } }
-{ $description "Reads a character of input from " { $link input-stream } ". Outputs " { $link f } " on stream exhaustion." }
+{ $values { "elt" "an element or " { $link f } } }
+{ $description "Reads an element from " { $link input-stream } ". Outputs " { $link f } " on stream exhaustion." }
 $io-error ;
 
 HELP: read
-{ $values { "n" "a non-negative integer" } { "str/f" "a string or " { $link f } } }
-{ $description "Reads " { $snippet "n" } " characters of input from " { $link input-stream } ". Outputs a truncated string or " { $link f } " on stream exhaustion." }
+{ $values { "n" "a non-negative integer" } { "seq" { $or byte-array string f } } }
+{ $description "Reads " { $snippet "n" } " elements from " { $link input-stream } ". If there is no input available, outputs " { $link f } ". If there are less than " { $snippet "n" } " elements available, outputs a sequence shorter than " { $snippet "n" } " in length." }
 $io-error ;
 
 HELP: read-until
-{ $values { "seps" string } { "str/f" "a string or " { $link f } } { "sep/f" "a character or " { $link f } } }
-{ $contract "Reads characters from " { $link input-stream } ". until the first occurrence of a separator character, or stream exhaustion. In the former case, the separator character is pushed on the stack, and is not part of the output string. In the latter case, the entire stream contents are output, along with " { $link f } "." }
+{ $values { "seps" string } { "seq" { $or byte-array string f } } { "sep/f" "a character or " { $link f } } }
+{ $contract "Reads elements from " { $link input-stream } ". until the first occurrence of a separator, or stream exhaustion. In the former case, the separator character is pushed on the stack, and is not part of the output. In the latter case, the entire stream contents are output, along with " { $link f } "." }
 $io-error ;
 
 HELP: read-partial
-{ $values
-     { "n" null }
-     { "str/f" null } }
-{ $description "Reads at most " { $snippet "n" } " characters from " { $link input-stream } " and returns up to that many characters without blocking. If no characters are available, blocks until some are and returns them." } ;
+{ $values { "n" integer } { "seq" { $or byte-array string f } } }
+{ $description "Reads at most " { $snippet "n" } " elements from " { $link input-stream } " and returns them in a sequence. This word should be used instead of " { $link read } " when processing the entire element a chunk at a time, since on some stream implementations it may be slightly faster." } ;
 
 HELP: write1
-{ $values { "ch" "a character" } }
-{ $contract "Writes a character of output to " { $link output-stream } ". If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
+{ $values { "elt" "an element" } }
+{ $contract "Writes an element to " { $link output-stream } ". If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 $io-error ;
 
 HELP: write
-{ $values { "str" string } }
-{ $description "Writes a string of output to " { $link output-stream } ". If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
+{ $values { "seq" { $or byte-array string f } } }
+{ $description "Writes a sequence of elements to " { $link output-stream } ". If the stream does buffering, output may not be performed immediately; use " { $link flush } " to force output." }
 $io-error ;
 
 HELP: flush
@@ -123,7 +120,7 @@ HELP: nl
 $io-error ;
 
 HELP: print
-{ $values { "string" string } }
+{ $values { "str" string } }
 { $description "Writes a newline-terminated string to " { $link output-stream } "." }
 $io-error ;
 
@@ -170,9 +167,13 @@ HELP: each-line
 { $values { "quot" { $quotation "( str -- )" } } }
 { $description "Calls the quotation with successive lines of text, until the current " { $link input-stream } " is exhausted." } ;
 
+HELP: each-block
+{ $values { "quot" { $quotation "( block -- )" } } }
+{ $description "Calls the quotation with successive blocks of data, until the current " { $link input-stream } " is exhausted." } ;
+
 HELP: contents
-{ $values { "stream" "an input stream" } { "str" string } }
-{ $description "Reads the entire contents of a stream into a string." }
+{ $values { "stream" "an input stream" } { "seq" "a string, byte array or " { $link f } } }
+{ $description "Reads the entire contents of a stream. If the stream is empty, outputs"  { $link f } "." }
 $io-error ;
 
 ARTICLE: "stream-protocol" "Stream protocol"
@@ -182,20 +183,23 @@ $nl
 $nl
 "All streams must implement the " { $link dispose } " word in addition to the stream protocol."
 $nl
-"These words are required for input streams:"
+"These words are required for binary and string input streams:"
 { $subsection stream-read1 }
 { $subsection stream-read }
 { $subsection stream-read-until }
-{ $subsection stream-readln }
 { $subsection stream-read-partial }
-"These words are required for output streams:"
+"This word is only required for string input streams:"
+{ $subsection stream-readln }
+"These words are required for binary and string output streams:"
 { $subsection stream-flush }
 { $subsection stream-write1 }
 { $subsection stream-write }
+"This word is only required for string output streams:"
 { $subsection stream-nl }
+"For a discussion of the distinction between binary and string streams, see " { $link "stream-elements" } "."
 { $see-also "io.timeouts" } ;
 
-ARTICLE: "stdio" "Default input and output streams"
+ARTICLE: "stdio-motivation" "Motivation for default streams"
 "Most I/O code only operates on one stream at a time. The " { $link input-stream } " and " { $link output-stream } " variables are implicit parameters used by many I/O words. Using this idiom improves code in three ways:"
 { $list
     { "Code becomes simpler because there is no need to keep a stream around on the stack." }
@@ -230,7 +234,10 @@ ARTICLE: "stdio" "Default input and output streams"
     "\"data.txt\" utf8 ["
     "    readln number>string read 16 group"
     "] with-file-reader"
-}
+} ;
+
+ARTICLE: "stdio" "Default input and output streams"
+{ $subsection "stdio-motivation" }
 "The default input stream is stored in a dynamically-scoped variable:"
 { $subsection input-stream }
 "Unless rebound in a child namespace, this variable will be set to a console stream for reading input from the user."
@@ -239,8 +246,9 @@ $nl
 { $subsection read1 }
 { $subsection read }
 { $subsection read-until }
-{ $subsection readln }
 { $subsection read-partial }
+"If the default input stream is a string stream (" { $link "stream-elements" } "), lines of text can be read:"
+{ $subsection readln }
 "A pair of combinators for rebinding the " { $link input-stream } " variable:"
 { $subsection with-input-stream }
 { $subsection with-input-stream* }
@@ -252,6 +260,8 @@ $nl
 { $subsection flush }
 { $subsection write1 }
 { $subsection write }
+"If the default output stream is a string stream (" { $link "stream-elements" } "), lines of text can be written:"
+{ $subsection readln }
 { $subsection print }
 { $subsection nl }
 { $subsection bl }
@@ -268,17 +278,26 @@ $nl
 "First, a simple composition of " { $link stream-write } " and " { $link stream-nl } ":"
 { $subsection stream-print }
 "Processing lines one by one:"
-{ $subsection each-line }
-"Sluring an entire stream into memory all at once:"
 { $subsection lines }
+{ $subsection each-line }
+"Processing blocks of data:"
 { $subsection contents }
+{ $subsection each-block }
 "Copying the contents of one stream to another:"
 { $subsection stream-copy } ;
 
+ARTICLE: "stream-elements" "Stream elements"
+"There are two types of streams:"
+{ $list
+  { { $strong "Binary streams" } " - the elements are integers between 0 and 255, inclusive; they represent bytes. Reading a sequence of elements produces a " { $link byte-array } "." }
+  { { $strong "String streams" } " - the elements are non-negative integers, representing Unicode code points. Reading a sequence of elements produces a " { $link string } "." }
+}
+"Most external streams are binary streams, and can be wrapped in string streams once a suitable encoding has been provided; see " { $link "io.encodings" } "." ;
+
 ARTICLE: "streams" "Streams"
-"Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of characters. Streams also support formatted output, which may be used to present styled text in a manner independent of output medium."
-$nl
-"A stream can either be passed around on the stack or bound to a dynamic variable and used as an implicit " { $emphasis "default stream" } "."
+"Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of elements."
+{ $subsection "stream-elements" }
+"A stream can either be passed around on the stack or bound to a dynamic variable and used as one of the two implicit " { $emphasis "default streams" } "."
 { $subsection "stream-protocol" }
 { $subsection "stdio" }
 { $subsection "stream-utils" }

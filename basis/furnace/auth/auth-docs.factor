@@ -105,9 +105,8 @@ ARTICLE: "furnace.auth.realm-config" "Authentication realm configuration"
 "Instances of subclasses of " { $link realm } " have the following slots which may be set:"
 { $table
     { { $slot "name" } "A string identifying the realm for user interface purposes" }
-    { { $slot "users" } { "An authentication provider (see " { $link "furnace.auth.providers" } ". By default, the " { $link users-in-db } " provider is used." } }
+    { { $slot "users" } { "An authentication provider (see " { $link "furnace.auth.providers" } "). By default, the " { $link users-in-db } " provider is used." } }
     { { $slot "checksum" } { "An implementation of the checksum protocol used for verifying passwords (see " { $link "checksums" } "). The " { $link sha-256 } " checksum is used by default." } }
-    { { $slot "users" } { "An authentication provider (see " { $link "furnace.auth.providers" } } }
     { { $slot "secure" } { "A boolean, that when set to a true value, forces the client to access the authentication realm via HTTPS. An attempt to access the realm via HTTP results in a redirect to the corresponding HTTPS URL. On by default." } }
 } ;
 
@@ -121,7 +120,7 @@ $nl
 { $subsection "furnace.auth.providers.db" } ;
 
 ARTICLE: "furnace.auth.features" "Optional authentication features"
-"Vocabularies having names prefixed by " { $code "furnace.auth.features" } "  implement optional features which can be enabled by calling special words. These words define new actions on an authentication realm."
+"Vocabularies having names prefixed by " { $code "furnace.auth.features" } " implement optional features which can be enabled by calling special words. These words define new actions on an authentication realm."
 { $subsection "furnace.auth.features.deactivate-user" }
 { $subsection "furnace.auth.features.edit-profile" }
 { $subsection "furnace.auth.features.recover-password" }
@@ -148,7 +147,7 @@ ARTICLE: "furnace.auth.users" "User profiles"
 "User profile variables have the same restrictions on their values as session variables; see " { $link "furnace.sessions.serialize" } " for a discussion." ;
 
 ARTICLE: "furnace.auth.example" "Furnace authentication example"
-"The " { $vocab-link "webapps.todo" } " vocabulary wraps all of its responders in a protected responder. The " { $slot "description" } " slot is set so that the login page contains the message ``You must log in to view your todo list'':"
+"The " { $vocab-link "webapps.todo" } " vocabulary wraps all of its responders in a protected responder. The " { $slot "description" } " slot is set so that the login page contains the message “You must log in to view your todo list”:"
 { $code
     <" <protected>
     "view your todo list" >>description">

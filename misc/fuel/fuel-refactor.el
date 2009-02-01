@@ -18,6 +18,8 @@
 (require 'fuel-syntax)
 (require 'fuel-base)
 
+(require 'etags)
+
 
 ;;; Word definitions in buffer
 
@@ -76,17 +78,19 @@
         (when found (setq result (fuel-refactor--reuse-p (car found)))))
       (and result found))))
 
+(defsubst fuel-refactor--insertion-point ()
+  (max (save-excursion (fuel-syntax--beginning-of-defun) (point))
+       (save-excursion
+         (re-search-backward fuel-syntax--end-of-def-regex nil t)
+         (forward-line 1)
+         (skip-syntax-forward "-"))))
+
 (defun fuel-refactor--insert-word (word stack-effect code)
-  (let ((beg (save-excursion (fuel-syntax--beginning-of-defun) (point)))
-        (end (save-excursion
-               (re-search-backward fuel-syntax--end-of-def-regex nil t)
-               (forward-line 1)
-               (skip-syntax-forward "-"))))
-    (let ((start (goto-char (max beg end))))
-      (open-line 1)
-      (insert ": " word " " stack-effect "\n" code " ;\n")
-      (indent-region start (point))
-      (move-overlay fuel-stack--overlay start (point)))))
+  (let ((start (goto-char (fuel-refactor--insertion-point))))
+    (open-line 1)
+    (insert ": " word " " stack-effect "\n" code " ;\n")
+    (indent-region start (point))
+    (move-overlay fuel-stack--overlay start (point))))
 
 (defun fuel-refactor--extract-other (start end code)
   (unwind-protect
@@ -167,7 +171,28 @@ word."
 
 ;;; Rename word:
 
+(defsubst fuel-refactor--rename-word (from to file)
+  (let ((files (fuel-xref--word-callers-files from)))
+    (tags-query-replace from to t `(cons ,file ',files))
+    files))
 
+(defun fuel-refactor--def-word ()
+  (save-excursion
+    (fuel-syntax--beginning-of-defun)
+    (or (and (looking-at fuel-syntax--method-definition-regex)
+             (match-string-no-properties 2))
+        (and (looking-at fuel-syntax--word-definition-regex)
+             (match-string-no-properties 2)))))
+
+(defun fuel-refactor-rename-word (&optional arg)
+  "Rename globally the word whose definition point is at.
+With prefix argument, use word at point instead."
+  (interactive "P")
+  (let* ((from (if arg (fuel-syntax-symbol-at-point) (fuel-refactor--def-word)))
+         (from (read-string "Rename word: " from))
+         (to (read-string (format "Rename '%s' to: " from)))
+         (buffer (current-buffer)))
+    (fuel-refactor--rename-word from to (buffer-file-name))))
 
 
 ;;; Extract vocab:
@@ -209,6 +234,31 @@ The region is extended to the closest definition boundaries."
                                 (save-excursion (goto-char end)
                                                 (mark-defun)
                                                 (mark))))
+
+;;; Extract article:
+
+(defun fuel-refactor-extract-article (begin end)
+  "Extracts region as a new ARTICLE form."
+  (interactive "r")
+  (let ((topic (read-string "Article topic: "))
+        (title (read-string "Article title: ")))
+    (kill-region begin end)
+    (insert (format "{ $subsection %s }\n" topic))
+    (end-of-line 0)
+    (save-excursion
+      (goto-char (fuel-refactor--insertion-point))
+      (open-line 1)
+      (let ((start (point)))
+        (insert (format "ARTICLE: %S %S\n" topic title))
+        (yank)
+        (when (looking-at "^ *$") (end-of-line 0))
+        (insert " ;")
+        (unwind-protect
+            (progn
+              (move-overlay fuel-stack--overlay start (point))
+              (sit-for fuel-stack-highlight-period))
+          (delete-overlay fuel-stack--overlay))))))
+
 
 (provide 'fuel-refactor)
 ;;; fuel-refactor.el ends here

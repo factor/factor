@@ -27,8 +27,8 @@ TUPLE: A
 M: A length length>> ;
 M: A nth-unsafe underlying>> NTH call ;
 M: A set-nth-unsafe underlying>> SET-NTH call ;
-M: A like drop dup A instance? [ >A' execute ] unless ;
-M: A new-sequence drop <A'> execute ;
+M: A like drop dup A instance? [ >A' ] unless ;
+M: A new-sequence drop <A'> ;
 
 INSTANCE: A sequence
 

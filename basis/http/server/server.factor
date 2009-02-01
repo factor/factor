@@ -12,8 +12,10 @@ io.encodings.utf8
 io.encodings.ascii
 io.encodings.binary
 io.streams.limited
+io.streams.string
 io.servers.connection
 io.timeouts
+io.crlf
 fry logging logging.insomniac calendar urls urls.encoding
 mime.multipart
 unicode.categories
@@ -22,11 +24,10 @@ http.parsers
 http.server.responses
 http.server.remapping
 html.templates
-html.elements
-html.streams ;
+html.streams
+html
+xml.writer ;
 IN: http.server
-
-\ parse-cookie DEBUG add-input-logging
 
 : check-absolute ( url -- url )
     dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
@@ -44,7 +45,7 @@ ERROR: no-boundary ;
     ";" split1 nip
     "=" split1 nip [ no-boundary ] unless* ;
 
-: read-multipart-data ( request -- form-variables uploaded-files )
+: read-multipart-data ( request -- mime-parts )
     [ "content-type" header ]
     [ "content-length" header string>number ] bi
     unlimit-input
@@ -57,7 +58,7 @@ ERROR: no-boundary ;
 
 : parse-content ( request content-type -- post-data )
     [ <post-data> swap ] keep {
-        { "multipart/form-data" [ read-multipart-data assoc-union >>params ] }
+        { "multipart/form-data" [ read-multipart-data >>params ] }
         { "application/x-www-form-urlencoded" [ read-content query>assoc >>params ] }
         [ drop read-content >>data ]
     } case ;
@@ -173,14 +174,14 @@ main-responder global [ <404> <trivial-responder> or ] change-at
 : call-responder ( path responder -- response )
     [ add-responder-nesting ] [ call-responder* ] 2bi ;
 
-: http-error. ( error -- )
-    "Internal server error" [ ] [
-        [ print-error nl :c ] with-html-writer
-    ] simple-page ;
+: make-http-error ( error -- xml )
+    [ "Internal server error" f ] dip
+    [ print-error nl :c ] with-html-writer
+    simple-page ;
 
 : <500> ( error -- response )
     500 "Internal server error" <trivial-response>
-    swap development? get [ '[ _ http-error. ] >>body ] [ drop ] if ;
+    swap development? get [ make-http-error >>body ] [ drop ] if ;
 
 : do-response ( response -- )
     [ request get swap write-full-response ]
@@ -189,7 +190,8 @@ main-responder global [ <404> <trivial-responder> or ] change-at
         [
             utf8 [
                 development? get
-                [ http-error. ] [ drop "Response error" write ] if
+                [ make-http-error ] [ drop "Response error" ] if
+                write-xml
             ] with-encoded-output
         ] bi
     ] recover ;
@@ -198,8 +200,8 @@ LOG: httpd-hit NOTICE
 
 LOG: httpd-header NOTICE
 
-: log-header ( headers name -- )
-    tuck header 2array httpd-header ;
+: log-header ( request name -- )
+    [ nip ] [ header ] 2bi 2array httpd-header ;
 
 : log-request ( request -- )
     [ [ method>> ] [ url>> ] bi 2array httpd-hit ]

@@ -42,10 +42,10 @@ ERROR: no-slot ;
     slot-named dup [ no-slot ] unless offset>> ;
 
 : get-slot-named ( name tuple -- value )
-    tuck offset-of-slot slot ;
+    [ nip ] [ offset-of-slot ] 2bi slot ;
 
 : set-slot-named ( value name obj -- )
-    tuck offset-of-slot set-slot ;
+    [ nip ] [ offset-of-slot ] 2bi set-slot ;
 
 ERROR: not-persistent class ;
 
@@ -71,10 +71,10 @@ ERROR: not-persistent class ;
     primary-key>> +primary-key+? ;
 
 : db-assigned-id-spec? ( specs -- ? )
-    [ primary-key>> +db-assigned-id+? ] contains? ;
+    [ primary-key>> +db-assigned-id+? ] any? ;
 
 : user-assigned-id-spec? ( specs -- ? )
-    [ primary-key>> +user-assigned-id+? ] contains? ;
+    [ primary-key>> +user-assigned-id+? ] any? ;
 
 : normalize-spec ( spec -- )
     dup type>> dup +primary-key+? [
@@ -105,7 +105,7 @@ FACTOR-BLOB NULL URL ;
         dup normalize-spec ;
 
 : spec>tuple ( class spec -- tuple )
-    3 f pad-right [ first3 ] keep 3 tail <sql-spec> ;
+    3 f pad-tail [ first3 ] keep 3 tail <sql-spec> ;
 
 : number>string* ( n/string -- string )
     dup number? [ number>string ] when ;

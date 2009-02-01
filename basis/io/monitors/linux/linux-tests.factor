@@ -2,7 +2,7 @@ IN: io.monitors.linux.tests
 USING: io.monitors tools.test io.files io.files.temp
 io.directories system sequences continuations namespaces
 concurrency.count-downs kernel io threads calendar prettyprint
-destructors io.timeouts ;
+destructors io.timeouts accessors ;
 
 ! On Linux, a notification on the directory itself would report an invalid
 ! path name
@@ -16,7 +16,7 @@ destructors io.timeouts ;
     [ ] [ "monitor-test-self" temp-file touch-file ] unit-test
 
     [ t ] [
-        "m" get next-change drop
+        "m" get next-change path>>
         [ "" = ] [ "monitor-test-self" temp-file = ] bi or
     ] unit-test
 
@@ -29,7 +29,7 @@ destructors io.timeouts ;
     [ ] [ "monitor-test-self" temp-file touch-file ] unit-test
 
     [ t ] [
-        "m" get next-change drop
+        "m" get next-change path>>
         [ "" = ] [ "monitor-test-self" temp-file = ] bi or
     ] unit-test
 

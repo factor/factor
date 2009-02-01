@@ -48,7 +48,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	word->def = userenv[UNDEFINED_ENV];
 	word->props = F;
 	word->counter = tag_fixnum(0);
-	word->compiledp = F;
+	word->optimizedp = F;
 	word->subprimitive = F;
 	word->profiling = NULL;
 	word->code = NULL;
@@ -62,7 +62,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	UNREGISTER_UNTAGGED(word);
 
 	if(profiling_p)
-		iterate_code_heap_step(word->profiling,relocate_code_block);
+		relocate_code_block(word->profiling);
 
 	return word;
 }
@@ -79,9 +79,9 @@ void primitive_word(void)
 void primitive_word_xt(void)
 {
 	F_WORD *word = untag_word(dpop());
-	F_COMPILED *code = (profiling_p ? word->profiling : word->code);
-	dpush(allot_cell((CELL)code + sizeof(F_COMPILED)));
-	dpush(allot_cell((CELL)code + sizeof(F_COMPILED) + code->code_length));
+	F_CODE_BLOCK *code = (profiling_p ? word->profiling : word->code);
+	dpush(allot_cell((CELL)code + sizeof(F_CODE_BLOCK)));
+	dpush(allot_cell((CELL)code + sizeof(F_CODE_BLOCK) + code->code_length));
 }
 
 void primitive_wrapper(void)

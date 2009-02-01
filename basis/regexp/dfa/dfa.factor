@@ -72,7 +72,7 @@ IN: regexp.dfa
     dup
     [ nfa-traversal-flags>> ]
     [ dfa-table>> transitions>> keys ] bi
-    [ tuck [ swap at ] with map concat ] with H{ } map>assoc
+    [ [ nip ] [ [ swap at ] with map concat ] 2bi ] with H{ } map>assoc
     >>dfa-traversal-flags drop ;
 
 : construct-dfa ( regexp -- )

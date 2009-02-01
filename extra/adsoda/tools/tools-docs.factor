@@ -9,7 +9,7 @@ HELP: 3cube
     { "solid" "solid" } 
 }
 { $description "array : xmin xmax ymin ymax zmin zmax" 
-"\n returns a 3D solid with given limits"
+"returns a 3D solid with given limits"
 } ;
 
 HELP: 4cube
@@ -18,23 +18,9 @@ HELP: 4cube
     { "solid" "solid" } 
 }
 { $description "array : xmin xmax ymin ymax zmin zmax wmin wmax"  
-"\n returns a 4D solid with given limits"
+"returns a 4D solid with given limits"
 } ;
 
-
-HELP: coord-max
-{ $values
-     { "x" null } { "array" array }
-     { "array" array }
-}
-{ $description "" } ;
-
-HELP: coord-min
-{ $values
-     { "x" null } { "array" array }
-     { "array" array }
-}
-{ $description "" } ;
 
 HELP: equation-system-for-normal
 { $values
@@ -51,8 +37,8 @@ HELP: normal-vector
      { "v" "a vector" }
 }
 { $description "From a list of points, returns the vector normal to the plan defined by the points" 
-"\nWith n points, creates n-1 vectors and then find a vector orthogonal to every others"
-"\n returns { f } if a normal vector can not be found" } 
+"With n points, creates n-1 vectors and then find a vector orthogonal to every others"
+"returns { f } if a normal vector can not be found" } 
 ;
 
 HELP: points-to-hyperplane
@@ -61,14 +47,14 @@ HELP: points-to-hyperplane
      { "hyperplane" "an hyperplane equation" }
 }
 { $description "From a list of points, returns the equation of the hyperplan"
-"\n Finds a normal vector and then translate it so that it includes one of the points"
+"Finds a normal vector and then translate it so that it includes one of the points"
 
 } 
 ;
 
-ARTICLE: "adsoda.tools" "adsoda.tools"
+ARTICLE: "adsoda.tools" "Tools"
 { $vocab-link "adsoda.tools" }
-"\nTools to help in building an " { $vocab-link "adsoda" } "-space"
+"Tools to help in building an " { $vocab-link "adsoda" } "-space"
 ;
 
 ABOUT: "adsoda.tools"

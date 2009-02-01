@@ -31,7 +31,7 @@ M: union-class update-class define-union-predicate ;
 M: union-class rank-class drop 2 ;
 
 M: union-class instance?
-    "members" word-prop [ instance? ] with contains? ;
+    "members" word-prop [ instance? ] with any? ;
 
 M: union-class (flatten-class)
     members <anonymous-union> (flatten-class) ;

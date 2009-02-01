@@ -14,7 +14,7 @@ namelen ;
 M: linux new-file-system-info linux-file-system-info new ;
 
 M: linux file-system-statfs ( path -- byte-array )
-    "statfs64" <c-object> tuck statfs64 io-error ;
+    "statfs64" <c-object> [ statfs64 io-error ] keep ;
 
 M: linux statfs>file-system-info ( struct -- statfs )
     {
@@ -32,7 +32,7 @@ M: linux statfs>file-system-info ( struct -- statfs )
     } cleave ;
 
 M: linux file-system-statvfs ( path -- byte-array )
-    "statvfs64" <c-object> tuck statvfs64 io-error ;
+    "statvfs64" <c-object> [ statvfs64 io-error ] keep ;
 
 M: linux statvfs>file-system-info ( struct -- statfs )
     {

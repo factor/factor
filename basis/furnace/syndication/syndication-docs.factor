@@ -29,7 +29,7 @@ HELP: feed-entry-date
 HELP: feed-entry-description
 { $values
      { "object" object }
-     { "description" null }
+     { "description" string }
 }
 { $contract "Outputs a feed entry description." } ;
 

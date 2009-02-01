@@ -1,6 +1,6 @@
 USING: kernel alien.c-types alien.strings sequences math alien.syntax unix
 vectors kernel namespaces continuations threads assocs vectors
-io.backend.unix io.encodings.utf8 unix.utilities ;
+io.backend.unix io.encodings.utf8 unix.utilities fry ;
 IN: unix.process
 
 ! Low-level Unix process launching utilities. These are used
@@ -36,7 +36,7 @@ FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
     [ [ first ] [ ] bi ] dip exec-with-env ;
 
 : with-fork ( child parent -- )
-    [ [ fork-process dup zero? ] dip [ drop ] prepose ] dip
+    [ [ fork-process dup zero? ] dip '[ drop @ ] ] dip
     if ; inline
 
 CONSTANT: SIGKILL 9

@@ -1,12 +1,10 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors xmode.tokens xmode.rules xmode.keyword-map
 xml.data xml.utilities xml assocs kernel combinators sequences
 math.parser namespaces make parser lexer xmode.utilities
-parser-combinators.regexp io.files ;
+parser-combinators.regexp io.files splitting arrays ;
 IN: xmode.loader.syntax
-
-SYMBOL: ignore-case?
 
 ! Rule tag parsing utilities
 : (parse-rule-tag) ( rule-set tag specs class -- )
@@ -31,7 +29,7 @@ SYMBOL: ignore-case?
 
 ! PROP, PROPS
 : parse-prop-tag ( tag -- key value )
-    "NAME" over at "VALUE" rot at ;
+    [ "NAME" attr ] [ "VALUE" attr ] bi ;
 
 : parse-props-tag ( tag -- assoc )
     child-tags
@@ -40,19 +38,22 @@ SYMBOL: ignore-case?
 : position-attrs ( tag -- at-line-start? at-whitespace-end? at-word-start? )
     ! XXX Wrong logic!
     { "AT_LINE_START" "AT_WHITESPACE_END" "AT_WORD_START" }
-    swap [ at string>boolean ] curry map first3 ;
+    [ attr string>boolean ] with map first3 ;
 
 : parse-literal-matcher ( tag -- matcher )
     dup children>string
-    ignore-case? get <string-matcher>
+    rule-set get ignore-case?>> <string-matcher>
     swap position-attrs <matcher> ;
 
 : parse-regexp-matcher ( tag -- matcher )
-    dup children>string ignore-case? get <regexp>
+    dup children>string rule-set get ignore-case?>> <regexp>
     swap position-attrs <matcher> ;
 
 : shared-tag-attrs ( -- )
     { "TYPE" string>token (>>body-token) } , ; inline
+
+: parse-delegate ( string -- pair )
+    "::" split1 [ rule-set get swap ] unless* 2array ;
 
 : delegate-attr ( -- )
     { "DELEGATE" f (>>delegate) } , ;

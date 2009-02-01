@@ -356,6 +356,10 @@ CONSTANT: GL_DITHER                         HEX: 0BD0
 CONSTANT: GL_RGB                            HEX: 1907
 CONSTANT: GL_RGBA                           HEX: 1908
 
+! GL_BGRA_ext: http://www.opengl.org/registry/specs/EXT/bgra.txt
+CONSTANT: GL_BGR_EXT                        HEX: 80E0
+CONSTANT: GL_BGRA_EXT                       HEX: 80E1
+
 ! Implementation limits
 CONSTANT: GL_MAX_LIST_NESTING               HEX: 0B31
 CONSTANT: GL_MAX_ATTRIB_STACK_DEPTH         HEX: 0D35

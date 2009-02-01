@@ -6,7 +6,7 @@ quotations arrays byte-arrays math.parser calendar
 calendar.format present urls
 
 io io.encodings io.encodings.iana io.encodings.binary
-io.encodings.8-bit
+io.encodings.8-bit io.crlf
 
 unicode.case unicode.categories
 
@@ -15,12 +15,6 @@ http.parsers ;
 EXCLUDE: fry => , ;
 
 IN: http
-
-: crlf ( -- ) "\r\n" write ;
-
-: read-crlf ( -- bytes )
-    "\r" read-until
-    [ CHAR: \r assert= read1 CHAR: \n assert= ] when* ;
 
 : (read-header) ( -- alist )
     [ read-crlf dup f like ] [ parse-header-line ] [ drop ] produce ;

@@ -1,16 +1,16 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: threads io.files io.pathnames io.monitors init kernel
 vocabs vocabs.loader tools.vocabs namespaces continuations
 sequences splitting assocs command-line concurrency.messaging
-io.backend sets tr ;
+io.backend sets tr accessors ;
 IN: tools.vocabs.monitor
 
 TR: convert-separators "/\\" ".." ;
 
 : vocab-dir>vocab-name ( path -- vocab )
-    trim-left-separators
-    trim-right-separators
+    trim-head-separators
+    trim-tail-separators
     convert-separators ;
 
 : path>vocab-name ( path -- vocab )
@@ -29,7 +29,7 @@ TR: convert-separators "/\\" ".." ;
 : monitor-loop ( -- )
     #! On OS X, monitors give us the full path, so we chop it
     #! off if its there.
-    receive first path>vocab changed-vocab
+    receive path>> path>vocab changed-vocab
     reset-cache
     monitor-loop ;
 

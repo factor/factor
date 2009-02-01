@@ -1,56 +1,47 @@
-! Copyright (C) 2008 Slava Pestov
+! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces io math.parser assocs classes
 classes.tuple words arrays sequences splitting mirrors
 hashtables combinators continuations math strings inspector
-fry locals calendar calendar.format xml.entities
-validators urls present
-xmode.code2html lcs.diff2html farkup
-html.elements html.streams html.forms ;
+fry locals calendar calendar.format xml.entities xml.data
+validators urls present xml.writer xml.literals xml
+xmode.code2html lcs.diff2html farkup io.streams.string
+html html.streams html.forms ;
 IN: html.components
 
-GENERIC: render* ( value name renderer -- )
+GENERIC: render* ( value name renderer -- xml )
 
 : render ( name renderer -- )
     prepare-value
     [
         dup validation-error?
-        [ [ message>> ] [ value>> ] bi ]
+        [ [ message>> render-error ] [ value>> ] bi ]
         [ f swap ]
         if
     ] 2dip
     render*
-    [ render-error ] when* ;
-
-<PRIVATE
-
-: render-input ( value name type -- )
-    <input =type =name present =value input/> ;
-
-PRIVATE>
+    swap 2array write-xml ;
 
 SINGLETON: label
 
-M: label render* 2drop present escape-string write ;
+M: label render*
+    2drop present ;
 
 SINGLETON: hidden
 
-M: hidden render* drop "hidden" render-input ;
+M: hidden render*
+    drop [XML <input value=<-> name=<-> type="hidden"/> XML] ;
 
-: render-field ( value name size type -- )
-    <input
-        =type
-        [ present =size ] when*
-        =name
-        present =value
-    input/> ;
+: render-field ( value name size type -- xml )
+    [XML <input value=<-> name=<-> size=<-> type=<->/> XML] ;
 
 TUPLE: field size ;
 
 : <field> ( -- field )
     field new ;
 
-M: field render* size>> "text" render-field ;
+M: field render*
+    size>> "text" render-field ;
 
 TUPLE: password size ;
 
@@ -67,14 +58,15 @@ TUPLE: textarea rows cols ;
 : <textarea> ( -- renderer )
     textarea new ;
 
-M: textarea render*
-    <textarea
-        [ rows>> [ present =rows ] when* ]
-        [ cols>> [ present =cols ] when* ] bi
-        =name
-    textarea>
-        present escape-string write
-    </textarea> ;
+M:: textarea render* ( value name area -- xml )
+    area rows>> :> rows
+    area cols>> :> cols
+    [XML
+         <textarea
+            name=<-name->
+            rows=<-rows->
+            cols=<-cols->><-value-></textarea>
+    XML] ;
 
 ! Choice
 TUPLE: choice size multiple choices ;
@@ -82,24 +74,23 @@ TUPLE: choice size multiple choices ;
 : <choice> ( -- choice )
     choice new ;
 
-: render-option ( text selected? -- )
-    <option [ "selected" =selected ] when option>
-        present escape-string write
-    </option> ;
+: render-option ( text selected? -- xml )
+    "selected" and swap
+    [XML <option selected=<->><-></option> XML] ;
 
-: render-options ( options selected -- )
-    '[ dup _ member? render-option ] each ;
+: render-options ( value choice -- xml )
+    [ choices>> value ] [ multiple>> ] bi
+    [ swap ] [ swap 1array ] if
+    '[ dup _ member? render-option ] map ;
 
-M: choice render*
-    <select
-        swap =name
-        dup size>> [ present =size ] when*
-        dup multiple>> [ "true" =multiple ] when
-    select>
-        [ choices>> value ] [ multiple>> ] bi
-        [ swap ] [ swap 1array ] if
-        render-options
-    </select> ;
+M:: choice render* ( value name choice -- xml )
+    choice size>> :> size
+    choice multiple>> "true" and :> multiple
+    value choice render-options :> contents
+    [XML <select
+        name=<-name->
+        size=<-size->
+        multiple=<-multiple->><-contents-></select> XML] ;
 
 ! Checkboxes
 TUPLE: checkbox label ;
@@ -108,13 +99,10 @@ TUPLE: checkbox label ;
     checkbox new ;
 
 M: checkbox render*
-    <input
-        "checkbox" =type
-        swap =name
-        swap [ "true" =checked ] when
-    input>
-        label>> escape-string write
-    </input> ;
+    [ "true" and ] [ ] [ label>> ] tri*
+    [XML <input
+        type="checkbox"
+        checked=<-> name=<->><-></input> XML] ;
 
 ! Link components
 GENERIC: link-title ( obj -- string )
@@ -129,10 +117,9 @@ M: url link-href ;
 TUPLE: link target ;
 
 M: link render*
-    nip
-    <a target>> [ =target ] when* dup link-href =href a>
-        link-title present escape-string write
-    </a> ;
+    nip swap
+    [ target>> ] [ [ link-href ] [ link-title ] bi ] bi*
+    [XML <a target=<-> href=<->><-></a> XML] ;
 
 ! XMode code component
 TUPLE: code mode ;
@@ -161,7 +148,7 @@ M: farkup render*
         nip
         [ no-follow>> [ string>boolean link-no-follow? set ] when* ]
         [ disable-images>> [ string>boolean disable-images? set ] when* ]
-        [ parsed>> string>boolean [ (write-farkup) ] [ write-farkup ] if ]
+        [ parsed>> string>boolean [ (write-farkup) ] [ farkup>xml ] if ]
         tri
     ] with-scope ;
 
@@ -180,4 +167,4 @@ M: comparison render*
 ! HTML component
 SINGLETON: html
 
-M: html render* 2drop write ;
+M: html render* 2drop <unescaped> ;

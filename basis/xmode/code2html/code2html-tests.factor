@@ -1,0 +1,19 @@
+IN: xmode.code2html.tests
+USING: xmode.code2html xmode.catalog
+tools.test multiline splitting memoize
+kernel io.streams.string xml.writer ;
+
+[ ] [ \ (load-mode) reset-memoized ] unit-test
+
+[ ] [
+    <" <style type="text/css" media="screen" >
+    *        {margin:0; padding:0; border:0;} ">
+    string-lines "html" htmlize-lines drop
+] unit-test
+
+[ ] [
+    "test.c"
+    <" int x = "hi";
+/* a comment */ "> <string-reader> htmlize-stream
+    write-xml
+] unit-test

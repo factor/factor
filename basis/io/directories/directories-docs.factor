@@ -5,13 +5,13 @@ IN: io.directories
 HELP: cwd
 { $values { "path" "a pathname string" } }
 { $description "Outputs the current working directory of the Factor process." }
-{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." }
+{ $errors "Windows CE has no concept of “current directory”, so this word throws an error there." }
 { $notes "User code should use the value of the " { $link current-directory } " variable instead." } ;
 
 HELP: cd
 { $values { "path" "a pathname string" } }
 { $description "Changes the current working directory of the Factor process." }
-{ $errors "Windows CE has no concept of ``current directory'', so this word throws an error there." }
+{ $errors "Windows CE has no concept of “current directory”, so this word throws an error there." }
 { $notes "User code should use " { $link with-directory } " or " { $link set-current-directory } " instead." } ;
 
 { cd cwd current-directory set-current-directory with-directory } related-words
@@ -116,7 +116,7 @@ ARTICLE: "current-directory" "Current working directory"
 "This variable can be changed with a pair of words:"
 { $subsection set-current-directory }
 { $subsection with-directory }
-"This variable is independent of the operating system notion of ``current working directory''. While all Factor I/O operations use the variable and not the operating system's value, care must be taken when making FFI calls which expect a pathname. The first option is to resolve relative paths:"
+"This variable is independent of the operating system notion of “current working directory”. While all Factor I/O operations use the variable and not the operating system's value, care must be taken when making FFI calls which expect a pathname. The first option is to resolve relative paths:"
 { $subsection (normalize-path) }
 "The second is to change the working directory of the current process:"
 { $subsection cd }
@@ -166,6 +166,7 @@ ARTICLE: "io.directories" "Directory manipulation"
 { $subsection "current-directory" }
 { $subsection "io.directories.listing" }
 { $subsection "io.directories.create" }
-{ $subsection "delete-move-copy" } ;
+{ $subsection "delete-move-copy" }
+{ $subsection "io.directories.hierarchy" } ;
 
 ABOUT: "io.directories"

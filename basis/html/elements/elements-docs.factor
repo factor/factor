@@ -1,5 +1,5 @@
+USING: help.markup help.syntax io present html ;
 IN: html.elements
-USING: help.markup help.syntax io present ;
 
 ARTICLE: "html.elements" "HTML elements"
 "The " { $vocab-link "html.elements" } " vocabulary provides words for writing HTML tags to the " { $link output-stream } " with a familiar look and feel in the code."
@@ -14,16 +14,12 @@ $nl
 { $code "<a =href a> \"Click me\" write </a>" }
 { $code "<a \"http://\" prepend =href a> \"click\" write </a>" }
 { $code "<a [ \"http://\" % % ] \"\" make =href a> \"click\" write </a>" }
-"Tags that have no ``closing'' equivalent have a trailing " { $snippet "tag/>" } " form:"
+"Tags that have no “closing” equivalent have a trailing " { $snippet "tag/>" } " form:"
 { $code "<input \"text\" =type \"name\" =name 20 =size input/>" }
 "For the full list of HTML tags and attributes, consult the word list for the " { $vocab-link "html.elements" } " vocabulary. In addition to HTML tag and attribute words, a few utilities are provided."
 $nl
 "Writing unescaped HTML to " { $vocab-link "html.streams" } ":"
 { $subsection write-html }
-{ $subsection print-html }
-"Writing some common HTML patterns:"
-{ $subsection xhtml-preamble }
-{ $subsection simple-page }
-{ $subsection render-error } ;
+{ $subsection print-html } ;
 
 ABOUT: "html.elements"

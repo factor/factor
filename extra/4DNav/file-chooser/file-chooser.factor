@@ -45,18 +45,26 @@ TUPLE: file-chooser < track
     [ file-chooser? ] find-parent list>> ;
 
 file-chooser H{
-    { T{ key-down f f "UP" } [ find-file-list select-previous ] }
-    { T{ key-down f f "DOWN" } [ find-file-list select-next ] }
-    { T{ key-down f f "PAGE_UP" } [ find-file-list list-page-up ] }
-    { T{ key-down f f "PAGE_DOWN" } [ find-file-list list-page-down ] }
-    { T{ key-down f f "RET" } [ find-file-list invoke-value-action ] }
-    { T{ button-down } request-focus }
-    { T{ button-down f 1 } [ find-file-list invoke-value-action ]  }
+    { T{ key-down f f "UP" } 
+        [ find-file-list select-previous ] }
+    { T{ key-down f f "DOWN" } 
+        [ find-file-list select-next ] }
+    { T{ key-down f f "PAGE_UP" } 
+        [ find-file-list list-page-up ] }
+    { T{ key-down f f "PAGE_DOWN" } 
+        [ find-file-list list-page-down ] }
+    { T{ key-down f f "RET" } 
+        [ find-file-list invoke-value-action ] }
+    { T{ button-down } 
+        request-focus }
+    { T{ button-down f 1 } 
+        [ find-file-list invoke-value-action ]  }
 } set-gestures
 
 : list-of-files ( file-chooser -- seq )
      [ path>> value>> directory-entries ] [ extension>> ] bi
-     '[ [ name>> _ [ tail? ] with contains? ] [ directory? ] bi or ]  filter
+     '[ [ name>> _ [ tail? ] with any? ] 
+     [ directory? ] bi or ]  filter
 ;
 
 : update-filelist-model ( file-chooser -- file-chooser )
@@ -123,15 +131,19 @@ file-chooser H{
     dup <file-list> >>list
     "choose a file in directory " <label> f track-add
     dup path>> <label-control> f track-add
-    dup extension>> ", " join "limited to : " prepend <label> f track-add
+    dup extension>> ", " join "limited to : " prepend 
+        <label> f track-add
     <shelf> 
         "selected file : " <label> add-gadget
         over selected-file>> <label-control> add-gadget
     f track-add
     <shelf> 
-        over [  swap fc-go-parent ] curry  "go up" swap <bevel-button> add-gadget
-        over [  swap fc-go-home ] curry  "go home" swap <bevel-button> add-gadget
-    !    over [ swap fc-ok-action ] curry "OK" swap <bevel-button> add-gadget
+        over [  swap fc-go-parent ] curry  "go up" 
+            swap <bevel-button> add-gadget
+        over [  swap fc-go-home ] curry  "go home" 
+            swap <bevel-button> add-gadget
+    !    over [ swap fc-ok-action ] curry "OK" 
+    !    swap <bevel-button> add-gadget
     !    [ drop ]  "Cancel" swap <bevel-button> add-gadget
     f track-add
     dup list>> <scroller> 1 track-add
@@ -140,5 +152,6 @@ file-chooser H{
 M: file-chooser pref-dim* drop { 400 200 } ;
 
 : file-chooser-window ( -- )
-[ . ] home { "xml" "txt" }   <file-chooser> "Choose a file" open-window ;
+    [ . ] home { "xml" "txt" }   <file-chooser> 
+    "Choose a file" open-window ;
 

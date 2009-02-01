@@ -13,10 +13,10 @@ TAG: PROPS
     parse-props-tag >>props drop ;
 
 TAG: IMPORT
-    "DELEGATE" swap at swap import-rule-set ;
+    "DELEGATE" attr swap import-rule-set ;
 
 TAG: TERMINATE
-    "AT_CHAR" swap at string>number >>terminate-char drop ;
+    "AT_CHAR" attr string>number >>terminate-char drop ;
 
 RULE: SEQ seq-rule
     shared-tag-attrs delegate-attr literal-start ;
@@ -43,17 +43,17 @@ RULE: MARK_PREVIOUS mark-previous-rule
     shared-tag-attrs match-type-attr literal-start ;
 
 TAG: KEYWORDS ( rule-set tag -- key value )
-    ignore-case? get <keyword-map>
+    rule-set get ignore-case?>> <keyword-map>
     swap child-tags [ over parse-keyword-tag ] each
     swap (>>keywords) ;
 
 TAGS>
 
 : ?<regexp> ( string/f -- regexp/f )
-    dup [ ignore-case? get <regexp> ] when ;
+    dup [ rule-set get ignore-case?>> <regexp> ] when ;
 
 : (parse-rules-tag) ( tag -- rule-set )
-    <rule-set>
+    <rule-set> dup rule-set set
     {
         { "SET" string>rule-set-name (>>name) }
         { "IGNORE_CASE" string>boolean (>>ignore-case?) }
@@ -65,11 +65,11 @@ TAGS>
     } init-from-tag ;
 
 : parse-rules-tag ( tag -- rule-set )
-    dup (parse-rules-tag) [
-        dup ignore-case?>> ignore-case? [
-            swap child-tags [ parse-rule-tag ] with each
-        ] with-variable
-    ] keep ;
+    [
+        [ (parse-rules-tag) ] [ child-tags ] bi
+        [ parse-rule-tag ] with each
+        rule-set get
+    ] with-scope ;
 
 : merge-rule-set-props ( props rule-set -- )
     [ assoc-union ] change-props drop ;

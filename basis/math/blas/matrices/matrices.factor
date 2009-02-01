@@ -4,7 +4,8 @@ math math.blas.cblas math.blas.vectors math.blas.vectors.private
 math.complex math.functions math.order functors words
 sequences sequences.merged sequences.private shuffle
 specialized-arrays.direct.float specialized-arrays.direct.double
-specialized-arrays.float specialized-arrays.double ;
+specialized-arrays.float specialized-arrays.double
+parser prettyprint.backend prettyprint.custom ;
 IN: math.blas.matrices
 
 TUPLE: blas-matrix-base underlying ld rows cols transpose ;
@@ -258,6 +259,7 @@ XGERC       IS cblas_${T}ger${C}
 MATRIX      DEFINES ${TYPE}-blas-matrix
 <MATRIX>    DEFINES <${TYPE}-blas-matrix>
 >MATRIX     DEFINES >${TYPE}-blas-matrix
+XMATRIX{    DEFINES ${T}matrix{
 
 WHERE
 
@@ -268,28 +270,33 @@ TUPLE: MATRIX < blas-matrix-base ;
 M: MATRIX element-type
     drop TYPE ;
 M: MATRIX (blas-matrix-like)
-    drop <MATRIX> execute ;
+    drop <MATRIX> ;
 M: VECTOR (blas-matrix-like)
-    drop <MATRIX> execute ;
+    drop <MATRIX> ;
 M: MATRIX (blas-vector-like)
-    drop <VECTOR> execute ;
+    drop <VECTOR> ;
 
 : >MATRIX ( arrays -- matrix )
-    [ >ARRAY execute underlying>> ] (>matrix)
-    <MATRIX> execute ;
+    [ >ARRAY underlying>> ] (>matrix)
+    <MATRIX> ;
 
 M: VECTOR n*M.V+n*V!
-    [ TYPE>ARG execute ] (prepare-gemv)
-    [ XGEMV execute ] dip ;
+    [ TYPE>ARG ] (prepare-gemv)
+    [ XGEMV ] dip ;
 M: MATRIX n*M.M+n*M!
-    [ TYPE>ARG execute ] (prepare-gemm)
-    [ XGEMM execute ] dip ;
+    [ TYPE>ARG ] (prepare-gemm)
+    [ XGEMM ] dip ;
 M: MATRIX n*V(*)V+M!
-    [ TYPE>ARG execute ] (prepare-ger)
-    [ XGERU execute ] dip ;
+    [ TYPE>ARG ] (prepare-ger)
+    [ XGERU ] dip ;
 M: MATRIX n*V(*)Vconj+M!
-    [ TYPE>ARG execute ] (prepare-ger)
-    [ XGERC execute ] dip ;
+    [ TYPE>ARG ] (prepare-ger)
+    [ XGERC ] dip ;
+
+: XMATRIX{ \ } [ >MATRIX ] parse-literal ; parsing
+
+M: MATRIX pprint-delims
+    drop \ XMATRIX{ \ } ;
 
 ;FUNCTOR
 
@@ -305,3 +312,6 @@ M: MATRIX n*V(*)Vconj+M!
 "double-complex" "z" define-complex-blas-matrix
 
 >>
+
+M: blas-matrix-base >pprint-sequence Mrows ;
+M: blas-matrix-base pprint* pprint-object ;

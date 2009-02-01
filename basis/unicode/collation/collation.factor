@@ -88,7 +88,7 @@ ducet insert-helpers
 : add ( char -- )
     dup blocked? [ 1string , ] [
         dup possible-bases dup length
-        [ ?combine ] with with contains?
+        [ ?combine ] with with any?
         [ drop ] [ 1string , ] if
     ] if ;
 
@@ -125,7 +125,7 @@ PRIVATE>
 
 : filter-ignorable ( weights -- weights' )
     f swap [
-        tuck primary>> zero? and
+        [ nip ] [ primary>> zero? and ] 2bi
         [ swap ignorable?>> or ]
         [ swap completely-ignorable? or not ] 2bi
     ] filter nip ;
@@ -138,7 +138,7 @@ PRIVATE>
 : insensitive= ( str1 str2 levels-removed -- ? )
     [
         [ collation-key ] dip
-        [ [ 0 = not ] trim-right but-last ] times
+        [ [ 0 = not ] trim-tail but-last ] times
     ] curry bi@ = ;
 PRIVATE>
 

@@ -35,7 +35,7 @@ TUPLE: transition-table transitions start-state final-states ;
         H{ } clone >>final-states ;
 
 : maybe-initialize-key ( key hashtable -- )
-    2dup key? [ 2drop ] [ H{ } clone -rot set-at ] if ;
+    2dup key? [ 2drop ] [ [ H{ } clone ] 2dip set-at ] if ;
 
 : set-transition ( transition hash -- )
     #! set the state as a key

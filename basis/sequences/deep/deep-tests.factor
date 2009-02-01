@@ -19,7 +19,7 @@ IN: sequences.deep.tests
 [ { { "heyhello" "hihello" } } ]
 [ "hey" 1array 1array [ [ change-something ] deep-change-each ] keep ] unit-test
 
-[ t ] [ "foo" [ string? ] deep-contains?  ] unit-test
+[ t ] [ "foo" [ string? ] deep-any?  ] unit-test
 
 [ "foo" ] [ "foo" [ string? ] deep-find ] unit-test
 

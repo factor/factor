@@ -34,7 +34,7 @@ WW DEFINES ${W}${W}
 
 WHERE
 
-: WW W twice ; inline
+: WW ( a -- b ) \ W twice ; inline
 
 ;FUNCTOR
 
@@ -45,3 +45,21 @@ WHERE
 \ sqsq must-infer
 
 [ 16 ] [ 2 sqsq ] unit-test
+
+<<
+
+FUNCTOR: wrapper-test-2 ( W -- )
+
+W DEFINES ${W}
+
+WHERE
+
+: W ( a b -- c ) \ + execute ;
+
+;FUNCTOR
+
+"blah" wrapper-test-2
+
+>>
+
+[ 4 ] [ 1 3 blah ] unit-test

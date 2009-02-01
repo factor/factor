@@ -113,7 +113,7 @@ HELP: MEMO::
 
 { POSTPONE: MEMO: POSTPONE: MEMO:: } related-words
 
-ARTICLE: "locals-literals" "Locals in array and hashtable literals"
+ARTICLE: "locals-literals" "Locals in literals"
 "Certain data type literals are permitted to contain free variables. Any such literals are written into code which constructs an instance of the type with the free variable values spliced in. Conceptually, this is similar to the transformation applied to quotations containing free variables."
 $nl
 "The data types which receive this special handling are the following:"
@@ -122,7 +122,9 @@ $nl
     { $link "hashtables" }
     { $link "vectors" }
     { $link "tuples" }
+    { $link "wrappers" }
 }
+{ $heading "Object identity" }
 "This feature changes the semantics of literal object identity. An ordinary word containing a literal pushes the same literal on the stack every time it is invoked:"
 { $example
     "IN: scratchpad"
@@ -134,6 +136,7 @@ $nl
 }
 "In a word with locals, literals expand into code which constructs the literal, and so every invocation pushes a new object:"
 { $example
+    "USE: locals"
     "IN: scratchpad"
     "TUPLE: person first-name last-name ;"
     ":: ordinary-word-test ( -- tuple )"
@@ -142,7 +145,7 @@ $nl
     "f"
 }
 "One exception to the above rule is that array instances containing no free variables do retain identity. This allows macros such as " { $link cond } " to recognize that the array is constant and expand at compile-time."
-$nl
+{ $heading "Example" }
 "For example, here is an implementation of the " { $link 3array } " word which uses this feature:"
 { $code ":: 3array ( x y z -- array ) { x y z } ;" } ;
 
@@ -166,7 +169,7 @@ $nl
 "Recall that the following two code snippets are equivalent:"
 { $code "'[ sq _ + ]" }
 { $code "[ [ sq ] dip + ] curry" }
-"The semantics of " { $link dip } " and " { $link curry } " are such that the first example behaves as if the top of the stack as ``inserted'' in the ``hole'' in the quotation's second element."
+"The semantics of " { $link dip } " and " { $link curry } " are such that the first example behaves as if the top of the stack as “inserted” in the “hole” in the quotation's second element."
 $nl
 "Conceptually, " { $link curry } " is defined so that the following two code snippets are equivalent:"
 { $code "3 [ - ] curry" }
@@ -179,7 +182,7 @@ $nl
 { $code "'[ [| a | a - ] curry ] call" }
 "Instead, the first line above expands into something like the following:"
 { $code "[ [ swap [| a | a - ] ] curry call ]" }
-"This ensures that the fried value appears ``underneath'' the local variable " { $snippet "a" } " when the quotation calls."
+"This ensures that the fried value appears “underneath” the local variable " { $snippet "a" } " when the quotation calls."
 $nl
 "The precise behavior is the following. When frying a lambda, a stack shuffle (" { $link mnswap } ") is prepended to the lambda so that the " { $snippet "m" } " curried values, which start off at the top of the stack, are transposed with the " { $snippet "n" } " inputs to the lambda." ;
 

@@ -3,7 +3,7 @@
 USING: multiline kernel sequences io splitting fry namespaces
 http.parsers hashtables assocs combinators ascii io.files.unique
 accessors io.encodings.binary io.files byte-arrays math
-io.streams.string combinators.short-circuit strings ;
+io.streams.string combinators.short-circuit strings math.order ;
 IN: mime.multipart
 
 CONSTANT: buffer-size 65536
@@ -16,8 +16,7 @@ header
 content-disposition bytes
 filename temp-file
 name name-content
-uploaded-files
-form-variables ;
+mime-parts ;
 
 TUPLE: mime-file headers filename temporary-path ;
 TUPLE: mime-variable headers key value ;
@@ -25,8 +24,7 @@ TUPLE: mime-variable headers key value ;
 : <multipart> ( mime-separator -- multipart )
     multipart new
         swap >>mime-separator
-        H{ } clone >>uploaded-files
-        H{ } clone >>form-variables ;
+        H{ } clone >>mime-parts ;
 
 ERROR: bad-header bytes ;
 
@@ -47,21 +45,18 @@ ERROR: end-of-stream multipart ;
     dup bytes>> [ fill-bytes ] unless  ;
 
 : split-bytes ( bytes separator -- leftover-bytes safe-to-dump )
-    2dup [ length ] [ length 1- ] bi* < [
-        drop f
-    ] [
-        length 1- cut-slice swap
-    ] if ;
+    dupd [ length ] bi@ 1- - short cut-slice swap ;
 
 : dump-until-separator ( multipart -- multipart )
-    dup [ current-separator>> ] [ bytes>> ] bi tuck start [
+    dup
+    [ current-separator>> ] [ bytes>> ] bi
+    [ nip ] [ start ] 2bi [
         cut-slice
         [ mime-write ]
-        [ over current-separator>> length tail-slice >>bytes ] bi*
+        [ over current-separator>> length short tail-slice >>bytes ] bi*
     ] [
         drop
-        dup [ bytes>> ] [ current-separator>> ] bi split-bytes
-        [ mime-write ] when*
+        dup [ bytes>> ] [ current-separator>> ] bi split-bytes mime-write
         >>bytes fill-bytes dup end-of-stream?>> [ dump-until-separator ] unless
     ] if* ;
 
@@ -70,31 +65,43 @@ ERROR: end-of-stream multipart ;
     [ dump-until-separator ] with-string-writer ;
 
 : read-header ( multipart -- multipart )
-    "\r\n\r\n" dump-string dup "--\r" = [
-        drop
+    dup bytes>> "--\r\n" sequence= [
+        t >>end-of-stream?
     ] [
-        parse-headers >>header
+        "\r\n\r\n" dump-string parse-headers >>header
     ] if ;
 
 : empty-name? ( string -- ? )
     { "''" "\"\"" "" f } member? ;
+
+: quote? ( ch -- ? ) "'\"" member? ;
+
+: quoted? ( str -- ? )
+    {
+        [ length 1 > ]
+        [ first quote? ]
+        [ [ first ] [ peek ] bi = ]
+    } 1&& ;
+
+: unquote ( str -- newstr )
+    dup quoted? [ but-last-slice rest-slice >string ] when ;
 
 : save-uploaded-file ( multipart -- )
     dup filename>> empty-name? [
         drop
     ] [
         [ [ header>> ] [ filename>> ] [ temp-file>> ] tri mime-file boa ]
-        [ filename>> ]
-        [ uploaded-files>> set-at ] tri
+        [ content-disposition>> "name" swap at unquote ]
+        [ mime-parts>> set-at ] tri
     ] if ;
 
-: save-form-variable ( multipart -- )
+: save-mime-part ( multipart -- )
     dup name>> empty-name? [
         drop
     ] [
-        [ [ header>> ] [ name>> ] [ name-content>> ] tri mime-variable boa ]
-        [ name>> ]
-        [ form-variables>> set-at ] tri
+        [ [ header>> ] [ name>> unquote ] [ name-content>> ] tri mime-variable boa ]
+        [ name>> unquote ]
+        [ mime-parts>> set-at ] tri
     ] if ;
 
 : dump-mime-file ( multipart filename -- multipart )
@@ -117,12 +124,13 @@ ERROR: unknown-content-disposition multipart ;
 
 : parse-form-data ( multipart -- multipart )
     "filename" lookup-disposition [
+        unquote
         >>filename
         [ dump-file ] [ save-uploaded-file ] bi
     ] [
         "name" lookup-disposition [
             [ dup mime-separator>> dump-string >>name-content ] dip
-            >>name dup save-form-variable
+            >>name dup save-mime-part
         ] [
              unknown-content-disposition
         ] if*
@@ -155,6 +163,6 @@ ERROR: no-content-disposition multipart ;
     read-header
     dup end-of-stream?>> [ process-header parse-multipart-loop ] unless ;
 
-: parse-multipart ( separator -- form-variables uploaded-files )
-    <multipart> parse-beginning parse-multipart-loop
-    [ form-variables>> ] [ uploaded-files>> ] bi ;
+: parse-multipart ( separator -- mime-parts )
+    <multipart> parse-beginning fill-bytes parse-multipart-loop
+    mime-parts>> ;

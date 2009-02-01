@@ -143,7 +143,7 @@ HELP: bitxor
 
 HELP: shift
 { $values { "x" integer } { "n" integer } { "y" integer } }
-{ $description "Shifts " { $snippet "x" } " to the left by " { $snippet "n" } " bits if " { $snippet "n" } " is positive, or " { $snippet "-n" } " bits to the right if " { $snippet "n" } " is negative. A left shift of a fixnum may overflow, yielding a bignum. A right shift may result in bits ``falling off'' the right hand side and being discarded." }
+{ $description "Shifts " { $snippet "x" } " to the left by " { $snippet "n" } " bits if " { $snippet "n" } " is positive, or " { $snippet "-n" } " bits to the right if " { $snippet "n" } " is negative. A left shift of a fixnum may overflow, yielding a bignum. A right shift may result in bits “falling off” the right hand side and being discarded." }
 { $examples { $example "USING: math prettyprint ;" "BIN: 101 5 shift .b" "10100000" } { $example "USING: math prettyprint ;" "BIN: 11111 -2 shift .b" "111" } } ;
 
 HELP: bitnot
@@ -321,8 +321,8 @@ ARTICLE: "number-protocol" "Number protocol"
 "Math operations obey certain numerical upgrade rules. If one of the inputs is a bignum and the other is a fixnum, the latter is first coerced to a bignum; if one of the inputs is a float, the other is coerced to a float."
 $nl
 "Two examples where you should note the types of the inputs and outputs:"
-{ $example "3 >fixnum 6 >bignum * class ." "bignum" }
-{ $example "1/2 2.0 + ." "4.5" }
+{ $example "USE: classes" "3 >fixnum 6 >bignum * class ." "bignum" }
+{ $example "1/2 2.0 + ." "2.5" }
 "The following usual operations are supported by all numbers."
 { $subsection + }
 { $subsection - }

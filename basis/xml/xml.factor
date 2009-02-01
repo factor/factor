@@ -1,12 +1,13 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io io.encodings.binary io.files
-io.streams.string kernel namespaces sequences strings
-xml.backend xml.data xml.errors xml.elements ascii xml.entities
-xml.writer xml.state xml.autoencoding assocs xml.tokenize xml.name ;
+io.streams.string kernel namespaces sequences strings io.encodings.utf8
+xml.data xml.errors xml.elements ascii xml.entities
+xml.writer xml.state xml.autoencoding assocs xml.tokenize
+combinators.short-circuit xml.name ;
 IN: xml
 
-!   -- Overall parser with data tree
+<PRIVATE
 
 : add-child ( object -- )
     xml-stack get peek second push ;
@@ -22,14 +23,18 @@ GENERIC: process ( object -- )
 M: object process add-child ;
 
 M: prolog process
-    xml-stack get V{ { f V{ } } } =
+    xml-stack get
+    { V{ { f V{ "" } } } V{ { f V{ } } } } member?
     [ bad-prolog ] unless drop ;
 
+: before-main? ( -- ? )
+    xml-stack get {
+        [ length 1 = ]
+        [ first second [ tag? ] any? not ]
+    } 1&& ;
+
 M: directive process
-    xml-stack get dup length 1 =
-    swap first second [ tag? ] contains? not and
-    [ misplaced-directive ] unless
-    add-child ;
+    before-main? [ misplaced-directive ] unless add-child ;
 
 M: contained process
     [ name>> ] [ attrs>> ] bi
@@ -49,17 +54,14 @@ M: closer process
 
 : init-xml-stack ( -- )
     V{ } clone xml-stack set
-    extra-entities [ H{ } assoc-like ] change
     f push-xml ;
 
 : default-prolog ( -- prolog )
     "1.0" "UTF-8" f <prolog> ;
 
-: reset-prolog ( -- )
-    default-prolog prolog-data set ;
-
 : init-xml ( -- )
-    reset-prolog init-xml-stack init-ns-stack ;
+    init-ns-stack
+    extra-entities [ H{ } assoc-like ] change ;
 
 : assert-blanks ( seq pre? -- )
     swap [ string? ] filter
@@ -74,13 +76,17 @@ M: closer process
 
 : no-post-tags ( post -- post/* )
     ! this does *not* affect the contents of the stack
-    dup [ tag? ] contains? [ multitags ] when ; 
+    dup [ tag? ] any? [ multitags ] when ; 
 
 : assure-tags ( seq -- seq )
     ! this does *not* affect the contents of the stack
     [ notags ] unless* ;
 
-: make-xml-doc ( prolog seq -- xml-doc )
+: get-prolog ( seq -- prolog )
+    first dup prolog? [ drop default-prolog ] unless ;
+
+: make-xml-doc ( seq -- xml-doc )
+    [ get-prolog ] keep
     dup [ tag? ] find
     [ assure-tags cut rest no-pre/post no-post-tags ] dip
     swap <xml> ;
@@ -89,12 +95,13 @@ M: closer process
 
 SYMBOL: text-now?
 
+PRIVATE>
+
 TUPLE: pull-xml scope ;
 : <pull-xml> ( -- pull-xml )
     [
         input-stream [ ] change ! bring var in this scope
-        init-parser reset-prolog init-ns-stack
-        text-now? on
+        init-xml text-now? on
     ] H{ } make-assoc
     pull-xml boa ;
 ! pull-xml needs to call start-document somewhere
@@ -106,6 +113,8 @@ TUPLE: pull-xml scope ;
         ] if text-now? set
     ] bind ;
 
+<PRIVATE
+
 : done? ( -- ? )
     xml-stack get length 1 = ;
 
@@ -116,50 +125,64 @@ TUPLE: pull-xml scope ;
         [ (pull-elem) ] if
     ] if ;
 
+PRIVATE>
+
 : pull-elem ( pull -- xml-elem/f )
     [ init-xml-stack (pull-elem) ] with-scope ;
+
+<PRIVATE
 
 : call-under ( quot object -- quot )
     swap dup slip ; inline
 
-: sax-loop ( quot: ( xml-elem -- ) -- )
+: xml-loop ( quot: ( xml-elem -- ) -- )
     parse-text call-under
-    get-char [ make-tag call-under sax-loop ]
+    get-char [ make-tag call-under xml-loop ]
     [ drop ] if ; inline recursive
 
-: sax ( stream quot: ( xml-elem -- ) -- )
-    swap [
-        reset-prolog init-ns-stack
-        start-document [ call-under ] when*
-        sax-loop
-    ] with-state ; inline recursive
-
-: (read-xml) ( -- )
-    start-document [ process ] when*
-    [ process ] sax-loop ; inline
-
-: (read-xml-chunk) ( stream -- prolog seq )
-    [
-        init-xml (read-xml)
+: read-seq ( stream quot n -- seq )
+    rot [
+        depth set
+        init-xml init-xml-stack
+        call
+        [ process ] xml-loop
         done? [ unclosed ] unless
         xml-stack get first second
-        prolog-data get swap
-    ] with-state ;
+    ] with-state ; inline
+
+PRIVATE>
+
+: each-element ( stream quot: ( xml-elem -- ) -- )
+    swap [
+        init-xml
+        start-document [ call-under ] when*
+        xml-loop
+    ] with-state ; inline
 
 : read-xml ( stream -- xml )
-    0 depth
-    [ (read-xml-chunk) make-xml-doc ] with-variable ;
+    [ start-document [ process ] when* ]
+    0 read-seq make-xml-doc ;
 
 : read-xml-chunk ( stream -- seq )
-    1 depth
-    [ (read-xml-chunk) nip ] with-variable ;
+    [ check ] 1 read-seq <xml-chunk> ;
 
 : string>xml ( string -- xml )
-    <string-reader> read-xml ;
+    <string-reader> [ check ] 0 read-seq make-xml-doc ;
 
 : string>xml-chunk ( string -- xml )
-    t string-input?
-    [ <string-reader> read-xml-chunk ] with-variable ;
+    <string-reader> read-xml-chunk ;
 
 : file>xml ( filename -- xml )
     binary <file-reader> read-xml ;
+
+: read-dtd ( stream -- dtd )
+    [
+        H{ } clone extra-entities set
+        take-internal-subset
+    ] with-state ;
+
+: file>dtd ( filename -- dtd )
+    utf8 <file-reader> read-dtd ;
+
+: string>dtd ( string -- dtd )
+    <string-reader> read-dtd ;

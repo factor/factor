@@ -1,4 +1,4 @@
-USING: kernel math.blas.vectors math.blas.syntax sequences tools.test ;
+USING: kernel math.blas.vectors sequences tools.test ;
 IN: math.blas.vectors.tests
 
 ! clone

@@ -33,13 +33,13 @@ M: windows delete-directory ( path -- )
     RemoveDirectory win32-error=0/f ;
 
 : find-first-file ( path -- WIN32_FIND_DATA handle )
-    "WIN32_FIND_DATA" <c-object> tuck
-    FindFirstFile
+    "WIN32_FIND_DATA" <c-object>
+    [ nip ] [ FindFirstFile ] 2bi
     [ INVALID_HANDLE_VALUE = [ win32-error-string throw ] when ] keep ;
 
 : find-next-file ( path -- WIN32_FIND_DATA/f )
-    "WIN32_FIND_DATA" <c-object> tuck
-    FindNextFile 0 = [
+    "WIN32_FIND_DATA" <c-object>
+    [ nip ] [ FindNextFile ] 2bi 0 = [
         GetLastError ERROR_NO_MORE_FILES = [
             win32-error
         ] unless drop f

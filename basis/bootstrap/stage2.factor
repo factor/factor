@@ -13,7 +13,7 @@ SYMBOL: core-bootstrap-time
 SYMBOL: bootstrap-time
 
 : default-image-name ( -- string )
-    vm file-name os windows? [ "." split1 drop ] when
+    vm file-name os windows? [ "." split1-last drop ] when
     ".image" append resource-path ;
 
 : do-crossref ( -- )
@@ -42,7 +42,7 @@ SYMBOL: bootstrap-time
     "Core bootstrap completed in " write core-bootstrap-time get print-time
     "Bootstrap completed in "      write bootstrap-time      get print-time
 
-    [ compiled>> ] count-words " compiled words" print
+    [ optimized>> ] count-words " compiled words" print
     [ symbol? ] count-words " symbol words" print
     [ ] count-words " words total" print
 

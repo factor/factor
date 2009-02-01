@@ -73,7 +73,7 @@ IN: easy-help
   string-lines
   1 tail
   [ dup "    " head? [ 4 tail ] [ ] if ] map
-  [ " " split1 [ " " first = ] trim-left 2array ] map
+  [ " " split1 [ " " first = ] trim-head 2array ] map
   \ $values prefix
   parsed
 

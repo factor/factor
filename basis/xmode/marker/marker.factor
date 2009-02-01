@@ -15,7 +15,7 @@ ascii combinators.short-circuit accessors ;
 : keyword-number? ( keyword -- ? )
     {
         [ current-rule-set highlight-digits?>> ]
-        [ dup [ digit? ] contains? ]
+        [ dup [ digit? ] any? ]
         [
             dup [ digit? ] all? [
                 current-rule-set digit-re>>
@@ -100,7 +100,7 @@ DEFER: get-rules
     [ ch>upper ] dip rules>> at ?push-all ;
 
 : get-rules ( char ruleset -- seq )
-    f -rot [ get-char-rules ] keep get-always-rules ;
+    [ f ] 2dip [ get-char-rules ] keep get-always-rules ;
 
 GENERIC: handle-rule-start ( match-count rule -- )
 

@@ -1,8 +1,8 @@
-USING: http http.server http.client tools.test multiline
+USING: http http.server http.client http.client.private tools.test multiline
 io.streams.string io.encodings.utf8 io.encodings.8-bit
 io.encodings.binary io.encodings.string kernel arrays splitting
 sequences assocs io.sockets db db.sqlite continuations urls
-hashtables accessors namespaces ;
+hashtables accessors namespaces xml.data ;
 IN: http.tests
 
 [ "text/plain" latin1 ] [ "text/plain" parse-content-type ] unit-test
@@ -298,7 +298,7 @@ test-db [
 
 [ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
 
-USING: html.components html.elements html.forms
+USING: html.components html.forms
 xml xml.utilities validators
 furnace furnace.conversations ;
 
@@ -308,7 +308,7 @@ SYMBOL: a
     <dispatcher>
         <action>
             [ a get-global "a" set-value ] >>init
-            [ [ <html> "a" <field> render </html> ] "text/html" <content> ] >>display
+            [ [ "<html>" write "a" <field> render "</html>" write ] "text/html" <content> ] >>display
             [ { { "a" [ v-integer ] } } validate-params ] >>validate
             [ "a" value a set-global URL" " <redirect> ] >>submit
         <conversations>
@@ -322,7 +322,8 @@ SYMBOL: a
 
 3 a set-global
 
-: test-a string>xml "input" tag-named "value" swap at ;
+: test-a ( xml -- value )
+    string>xml body>> "input" deep-tag-named "value" attr ;
 
 [ "3" ] [
     "http://localhost/" add-port http-get

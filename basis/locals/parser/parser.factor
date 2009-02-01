@@ -1,7 +1,7 @@
-! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
+! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators effects.parser
-generic.parser kernel lexer locals.errors
+generic.parser kernel lexer locals.errors fry
 locals.rewrite.closures locals.types make namespaces parser
 quotations sequences splitting words vocabs.parser ;
 IN: locals.parser
@@ -56,19 +56,21 @@ SYMBOL: in-lambda?
         (parse-bindings)
     ] [ 2drop ] if ;
 
+: with-bindings ( quot -- words assoc )
+    '[
+        in-lambda? on
+        _ H{ } make-assoc
+    ] { } make swap ; inline
+
 : parse-bindings ( end -- bindings vars )
-    [
-        [ (parse-bindings) ] H{ } make-assoc
-    ] { } make swap ;
+    [ (parse-bindings) ] with-bindings ;
 
 : parse-bindings* ( end -- words assoc )
     [
-        [
-            namespace push-locals
-            (parse-bindings)
-            namespace pop-locals
-        ] { } make-assoc
-    ] { } make swap ;
+        namespace push-locals
+        (parse-bindings)
+        namespace pop-locals
+    ] with-bindings ;
 
 : (parse-wbindings) ( end -- )
     dup parse-binding dup [
@@ -77,9 +79,7 @@ SYMBOL: in-lambda?
     ] [ 2drop ] if ;
 
 : parse-wbindings ( end -- bindings vars )
-    [
-        [ (parse-wbindings) ] H{ } make-assoc
-    ] { } make swap ;
+    [ (parse-wbindings) ] with-bindings ;
 
 : parse-locals ( -- vars assoc )
     "(" expect ")" parse-effect
@@ -88,8 +88,8 @@ SYMBOL: in-lambda?
 
 : parse-locals-definition ( word -- word quot )
     parse-locals \ ; (parse-lambda) <lambda>
-    2dup "lambda" set-word-prop
-    rewrite-closures dup length 1 = [ first ] [ bad-lambda-rewrite ] if ;
+    [ "lambda" set-word-prop ]
+    [ rewrite-closures dup length 1 = [ first ] [ bad-lambda-rewrite ] if ] 2bi ;
 
 : (::) ( -- word def ) CREATE-WORD parse-locals-definition ;
 

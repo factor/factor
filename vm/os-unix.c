@@ -36,7 +36,7 @@ void init_ffi(void)
 
 void ffi_dlopen(F_DLL *dll)
 {
-	dll->dll = dlopen(alien_offset(dll->path), RTLD_LAZY);
+	dll->dll = dlopen(alien_offset(dll->path), RTLD_LAZY|RTLD_GLOBAL);
 }
 
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol)

@@ -65,7 +65,7 @@ M: c-io-backend init-io ;
     stdout-handle <c-writer>
     stderr-handle <c-writer> ;
 
-M: c-io-backend (init-stdio) init-c-stdio ;
+M: c-io-backend (init-stdio) init-c-stdio t ;
 
 M: c-io-backend io-multiplex 60 60 * 1000 * 1000 * or (sleep) ;
 

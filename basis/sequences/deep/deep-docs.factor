@@ -21,10 +21,10 @@ HELP: deep-find
 { $description "Gets the first sub-node of the object, in preorder, which satisfies the quotation. If nothing satisifies it, it returns " { $link f } "." }
 { $see-also find }  ;
 
-HELP: deep-contains?
+HELP: deep-any?
 { $values { "obj" object } { "quot" { $quotation "( elt -- ? )" } } { "?" "a boolean" } }
 { $description "Tests whether the given object or any subnode satisfies the given quotation." }
-{ $see-also contains? } ;
+{ $see-also any? } ;
 
 HELP: flatten
 { $values { "obj" object } { "seq" "a sequence" } }
@@ -41,7 +41,7 @@ ARTICLE: "sequences.deep" "Deep sequence combinators"
 { $subsection deep-map }
 { $subsection deep-filter }
 { $subsection deep-find }
-{ $subsection deep-contains? }
+{ $subsection deep-any? }
 { $subsection deep-change-each }
 "A utility word to collapse nested subsequences:"
 { $subsection flatten } ;

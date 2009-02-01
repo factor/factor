@@ -31,7 +31,8 @@ PRIVATE>
 
 : interval-at* ( key map -- value ? )
     [ drop ] [ array>> find-interval ] 2bi
-    tuck interval-contains? [ third t ] [ drop f f ] if ;
+    [ nip ] [ interval-contains? ] 2bi
+    [ third t ] [ drop f f ] if ;
 
 : interval-at ( key map -- value ) interval-at* drop ;
 

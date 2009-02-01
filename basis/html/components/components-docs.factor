@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Your name.
+! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax io.streams.string kernel strings
 urls lcs inspector present io ;
@@ -70,8 +70,8 @@ HELP: render
 { $description "Renders an HTML component to the " { $link output-stream } "." } ;
 
 HELP: render*
-{ $values { "value" "a value" } { "name" "a value name" } { "renderer" "a component renderer" } }
-{ $contract "Renders an HTML component to the " { $link output-stream } "." } ;
+{ $values { "value" "a value" } { "name" "a value name" } { "renderer" "a component renderer" } { "xml" "an XML chunk" } }
+{ $contract "Renders an HTML component, outputting an XHTML snippet." } ;
 
 ARTICLE: "html.components" "HTML components"
 "The " { $vocab-link "html.components" } " vocabulary provides various HTML form components."
@@ -100,6 +100,6 @@ $nl
 { $subsection farkup }
 "Creating custom components:"
 { $subsection render* }
-"Custom components can emit HTML using the " { $vocab-link "html.elements" } " vocabulary." ;
+"Custom components can emit HTML using the " { $vocab-link "xml.literals" } " vocabulary." ;
 
 ABOUT: "html.components"

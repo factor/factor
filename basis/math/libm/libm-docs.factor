@@ -5,8 +5,8 @@ ARTICLE: "math.libm" "C standard library math functions"
 "The words in the " { $vocab-link "math.libm" } " vocabulary call C standard library math functions. They are used to implement words in the " { $vocab-link "math.functions" } " vocabulary."
 $nl
 "They can be called directly, however there is little reason to do so, since they only implement real-valued functions, and in some cases place restrictions on the domain:"
-{ $example "2 acos ." "C{ 0.0 1.316957896924817 }" }
-{ $example "2 facos ." "0.0/0.0" }
+{ $example "USE: math.functions" "2 acos ." "C{ 0.0 1.316957896924817 }" }
+{ $unchecked-example "USE: math.libm" "2 facos ." "0.0/0.0" }
 "Trigonometric functions:"
 { $subsection fcos }
 { $subsection fsin }
