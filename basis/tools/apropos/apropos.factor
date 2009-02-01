@@ -28,8 +28,6 @@ M: more-completions article-name
 M: more-completions article-content
     seq>> sort-values keys \ $completions prefix ;
 
-M: more-completions summary article-title ;
-
 : (apropos) ( str candidates title -- element )
     [
         [ completions ] dip '[

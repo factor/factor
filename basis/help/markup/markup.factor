@@ -147,6 +147,12 @@ ALIAS: $slot $snippet
 : $link ( element -- )
     first ($link) ;
 
+: ($word-link) ( word -- )
+    [ name>> ] keep write-link ;
+
+: $word-link ( element -- )
+    first ($word-link) ;
+
 : ($long-link) ( object -- )
     [ article-title ] [ >link ] bi write-link ;
 

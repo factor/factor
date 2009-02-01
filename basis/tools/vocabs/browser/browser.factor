@@ -160,7 +160,7 @@ C: <vocab-author> vocab-author
 
 : words-table ( words -- )
     [
-        [ <$link> ]
+        [ 1array \ $word-link prefix ]
         [ stack-effect dup [ effect>string <$snippet> ] when ]
         bi 2array
     ] map
