@@ -4,7 +4,6 @@ assocs arrays classes words urls ;
 IN: http.server.dispatchers.tests
 
 \ find-responder must-infer
-\ http-error. must-infer
 
 TUPLE: mock-responder path ;
 
