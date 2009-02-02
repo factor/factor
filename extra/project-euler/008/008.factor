@@ -1,6 +1,6 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: grouping math.parser sequences ;
+USING: grouping math.order math.parser sequences ;
 IN: project-euler.008
 
 ! http://projecteuler.net/index.php?section=problems&id=8
@@ -64,7 +64,7 @@ IN: project-euler.008
 PRIVATE>
 
 : euler008 ( -- answer )
-    source-008 5 clump [ string>digits product ] map supremum ;
+    source-008 5 clump [ string>digits product ] [ max ] map-reduce ;
 
 ! [ euler008 ] 100 ave-time
 ! 2 ms ave run time - 0.79 SD (100 trials)

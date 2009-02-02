@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.disassembler namespaces combinators
 alien alien.syntax alien.c-types lexer parser kernel
-sequences layouts math math.parser system make fry arrays ;
+sequences layouts math math.order
+math.parser system make fry arrays ;
 IN: tools.disassembler.udis
 
 <<
@@ -56,7 +57,7 @@ SINGLETON: udis-disassembler
 : buf/len ( from to -- buf len ) [ drop <alien> ] [ swap - ] 2bi ;
 
 : format-disassembly ( lines -- lines' )
-    dup [ second length ] map supremum
+    dup [ second length ] [ max ] map-reduce
     '[
         [
             [ first >hex cell 2 * CHAR: 0 pad-head % ": " % ]
