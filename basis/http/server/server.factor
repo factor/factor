@@ -24,8 +24,9 @@ http.parsers
 http.server.responses
 http.server.remapping
 html.templates
-html.elements
-html.streams ;
+html.streams
+html
+xml.writer ;
 IN: http.server
 
 : check-absolute ( url -- url )
@@ -173,14 +174,14 @@ main-responder global [ <404> <trivial-responder> or ] change-at
 : call-responder ( path responder -- response )
     [ add-responder-nesting ] [ call-responder* ] 2bi ;
 
-: http-error. ( error -- )
-    "Internal server error" [ ] [
-        [ print-error nl :c ] with-html-writer
-    ] simple-page ;
+: make-http-error ( error -- xml )
+    [ "Internal server error" f ] dip
+    [ print-error nl :c ] with-html-writer
+    simple-page ;
 
 : <500> ( error -- response )
     500 "Internal server error" <trivial-response>
-    swap development? get [ '[ _ http-error. ] >>body ] [ drop ] if ;
+    swap development? get [ make-http-error >>body ] [ drop ] if ;
 
 : do-response ( response -- )
     [ request get swap write-full-response ]
@@ -189,7 +190,8 @@ main-responder global [ <404> <trivial-responder> or ] change-at
         [
             utf8 [
                 development? get
-                [ http-error. ] [ drop "Response error" write ] if
+                [ make-http-error ] [ drop "Response error" ] if
+                write-xml
             ] with-encoded-output
         ] bi
     ] recover ;

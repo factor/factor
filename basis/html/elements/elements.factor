@@ -3,8 +3,7 @@
 USING: io io.styles kernel namespaces prettyprint quotations
 sequences strings words xml.entities compiler.units effects
 xml.data xml.literals urls math math.parser combinators
-present fry io.streams.string xml.writer ;
-
+present fry io.streams.string xml.writer html ;
 IN: html.elements
 
 SYMBOL: html
@@ -127,24 +126,3 @@ SYMBOL: html
 ] [ define-attribute-word ] each
 
 >>
-
-: xhtml-preamble ( -- )
-    "<?xml version=\"1.0\"?>" write-html
-    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" write-html ;
-
-: simple-page ( title head-quot body-quot -- )
-    [ with-string-writer <unescaped> ] bi@
-    <XML
-        <?xml version="1.0"?>
-        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-        <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-            <head>
-                <title><-></title>
-                <->
-            </head>
-            <body><-></body>
-        </html>
-    XML> write-xml ; inline
-
-: render-error ( message -- )
-    [XML <span class="error"><-></span> XML] write-xml ;

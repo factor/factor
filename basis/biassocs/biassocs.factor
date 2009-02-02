@@ -1,6 +1,6 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs accessors summary ;
+USING: kernel assocs accessors summary hashtables ;
 IN: biassocs
 
 TUPLE: biassoc from to ;
@@ -37,4 +37,10 @@ M: biassoc >alist
 M: biassoc clear-assoc
     [ from>> clear-assoc ] [ to>> clear-assoc ] bi ;
 
+M: biassoc new-assoc
+    drop [ <hashtable> ] [ <hashtable> ] bi biassoc boa ;
+
 INSTANCE: biassoc assoc
+
+: >biassoc ( assoc -- biassoc )
+    T{ biassoc } assoc-clone-like ;

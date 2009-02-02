@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators html.elements io
+USING: accessors arrays combinators io
 io.streams.string kernel math namespaces peg peg.ebnf
 sequences sequences.deep strings xml.entities xml.literals
 vectors splitting xmode.code2html urls.encoding xml.data

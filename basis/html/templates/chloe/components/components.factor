@@ -21,7 +21,8 @@ M: singleton-class component-tag ( tag class -- )
     bi ;
 
 M: tuple-class component-tag ( tag class -- )
-    [ drop "name" required-attr compile-attr ] [ compile-component-attrs ] 2bi
+    [ drop "name" required-attr compile-attr ]
+    [ compile-component-attrs ] 2bi
     [ render ] [code] ;
 
 : COMPONENT:

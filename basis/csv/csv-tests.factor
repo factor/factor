@@ -1,5 +1,7 @@
+USING: io.streams.string csv tools.test shuffle kernel strings
+io.pathnames io.files.unique io.encodings.utf8 io.files
+io.directories ;
 IN: csv.tests
-USING: io.streams.string csv tools.test shuffle kernel strings ;
 
 ! I like to name my unit tests
 : named-unit-test ( name output input -- ) 
@@ -76,3 +78,15 @@ USING: io.streams.string csv tools.test shuffle kernel strings ;
 "escapes quotes commas and newlines when writing"
 [ "\"fo\"\"o1\",bar1\n\"fo\no2\",\"b,ar2\"\n" ]
 [ { { "fo\"o1" "bar1" } { "fo\no2" "b,ar2" } } <string-writer> tuck write-csv >string ] named-unit-test ! "
+
+[ { { "writing" "some" "csv" "tests" } } ]
+[
+    "writing,some,csv,tests"
+    "csv-test1-" unique-file utf8
+    [ set-file-contents ] [ file>csv ] [ drop delete-file ] 2tri
+] unit-test
+
+[ t ] [
+    { { "writing,some,csv,tests" } } dup "csv-test2-"
+    unique-file utf8 [ csv>file ] [ file>csv ] 2bi =
+] unit-test

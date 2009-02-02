@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes hashtables help.markup help.syntax io.streams.string
-kernel sequences strings math db.tuples db.tuples.private ;
+kernel sequences strings math ;
 IN: db.types
 
 HELP: +db-assigned-id+
@@ -89,31 +89,31 @@ HELP: VARCHAR
 
 HELP: user-assigned-id-spec?
 { $values
-     { "specs" "a sequence of sql specs" }
+     { "specs" "a sequence of SQL specs" }
      { "?" "a boolean" } }
-{ $description "Tests if any of the sql specs has the type " { $link +user-assigned-id+ } "." } ;
+{ $description "Tests if any of the SQL specs has the type " { $link +user-assigned-id+ } "." } ;
 
 HELP: bind#
 { $values
-     { "spec" "a sql spec" } { "obj" object } }
+     { "spec" "a SQL spec" } { "obj" object } }
 { $description "A generic word that lets a database construct a literal binding." } ;
 
 HELP: bind%
 { $values
-     { "spec" "a sql spec" } }
+     { "spec" "a SQL spec" } }
 { $description "A generic word that lets a database output a binding." } ;
 
 HELP: db-assigned-id-spec?
 { $values
-     { "specs" "a sequence of sql specs" }
+     { "specs" "a sequence of SQL specs" }
      { "?" "a boolean" } }
-{ $description "Tests if any of the sql specs has the type " { $link +db-assigned-id+ } "." } ;
+{ $description "Tests if any of the SQL specs has the type " { $link +db-assigned-id+ } "." } ;
 
 HELP: find-primary-key
 { $values
-     { "specs" "a sequence of sql-specs" }
-     { "seq" "a sequence of sql-specs" } }
-{ $description "Returns the rows from the sql-specs array that are part of the primary key. Composite primary keys are supported, so this word must return a sequence." }
+     { "specs" "a sequence of SQL specs" }
+     { "seq" "a sequence of SQL specs" } }
+{ $description "Returns the rows from the SQL specs array that are part of the primary key. Composite primary keys are supported, so this word must return a sequence." }
 { $notes "This is a low-level word." } ;
 
 HELP: get-slot-named
@@ -124,13 +124,13 @@ HELP: get-slot-named
 
 HELP: no-sql-type
 { $values
-     { "type" "a sql type" } }
-{ $description "Throws an error containing a sql type that is unsupported or the result of a typo." } ;
+     { "type" "a SQL type" } }
+{ $description "Throws an error containing a SQL type that is unsupported or the result of a typo." } ;
 
 HELP: normalize-spec
 { $values
-     { "spec" "a sql spec" } }
-{ $description "Normalizes a sql spec." } ;
+     { "spec" "a SQL spec" } }
+{ $description "Normalizes a SQL spec." } ;
 
 HELP: offset-of-slot
 { $values
@@ -140,22 +140,19 @@ HELP: offset-of-slot
 
 HELP: primary-key?
 { $values
-     { "spec" "a sql spec" }
+     { "spec" "a SQL spec" }
      { "?" "a boolean" } }
-{ $description "Returns true if a sql spec is a primary key." } ;
-
-HELP: random-id-generator
-{ $description "Used to tell " { $link eval-generator } " to generate a random number for use as a key." } ;
+{ $description "Returns true if a SQL spec is a primary key." } ;
 
 HELP: relation?
 { $values
-     { "spec" "a sql spec" }
+     { "spec" "a SQL spec" }
      { "?" "a boolean" } }
-{ $description "Returns true if a sql spec is a relation." } ;
+{ $description "Returns true if a SQL spec is a relation." } ;
 
 HELP: unknown-modifier
 { $values { "modifier" string } }
-{ $description "Throws an error containing an unknown sql modifier." } ;
+{ $description "Throws an error containing an unknown SQL modifier." } ;
 
 ARTICLE: "db.types" "Database types"
 "The " { $vocab-link "db.types" } " vocabulary maps Factor types to database types." $nl
