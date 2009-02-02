@@ -196,11 +196,17 @@ GENERIC: baseline ( gadget -- y )
 
 M: gadget baseline pref-dim second ;
 
+: (baseline-align) ( baselines -- ys )
+    [ { } ] [ [ supremum ] keep [ - ] with map ] if-empty ;
+
 : baseline-align ( gadgets -- ys )
-    [ { } ] [
-        [ baseline ] map [ supremum ] keep
-        [ - ] with map
-    ] if-empty ;
+    [ baseline ] map (baseline-align) ;
+
+: (baseline-metrics) ( baselines sizes -- ascent descent )
+    { 0 0 } [ second over - 2array vmax ] 2reduce first2 ;
+
+: baseline-metrics ( children sizes -- ascent descent )
+    [ [ baseline ] map ] dip (baseline-metrics) ;
 
 GENERIC: layout* ( gadget -- )
 

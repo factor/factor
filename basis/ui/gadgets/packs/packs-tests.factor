@@ -1,8 +1,7 @@
+USING: ui.gadgets.packs ui.gadgets.packs.private ui.gadgets.labels
+ui.gadgets ui.gadgets.debug ui.render kernel namespaces tools.test
+math.parser sequences math.geometry.rect accessors ;
 IN: ui.gadgets.packs.tests
-USING: ui.gadgets.packs ui.gadgets.packs.private
-ui.gadgets.labels ui.gadgets ui.render
-kernel namespaces tools.test math.parser sequences math.geometry.rect
-accessors ;
 
 [ t ] [
     { 0 0 } { 100 100 } <rect> clip set
@@ -20,15 +19,6 @@ accessors ;
     <gadget> vertical >>orientation
     orient
 ] unit-test
-
-TUPLE: baseline-gadget < gadget baseline ;
-
-M: baseline-gadget baseline baseline>> ;
-
-: <baseline-gadget> ( baseline dim -- gadget )
-    baseline-gadget new-gadget
-    swap >>dim
-    swap >>baseline ;
 
 <shelf> +baseline+ >>align
     5 { 10 10 } <baseline-gadget> add-gadget

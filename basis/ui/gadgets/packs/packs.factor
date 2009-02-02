@@ -61,11 +61,15 @@ PRIVATE>
 
 <PRIVATE
 
-: gap-dims ( gadget sizes -- seeq )
+: gap-dims ( pack sizes -- seeq )
     [ gap>> ] [ [ length 1 [-] ] [ dim-sum ] bi ] bi* [ v*n ] dip v+ ;
 
-: pack-pref-dim ( gadget sizes -- dim )
-    [ nip max-dim ] [ gap-dims ] [ drop orientation>> ] 2tri set-axis ;
+: max-pack-dim ( pack sizes -- dim )
+    over align>> +baseline+ eq?
+    [ [ children>> ] dip baseline-metrics + 0 swap 2array ] [ nip max-dim ] if ;
+
+: pack-pref-dim ( pack sizes -- dim )
+    [ max-pack-dim ] [ gap-dims ] [ drop orientation>> ] 2tri set-axis ;
 
 M: pack pref-dim*
     dup children>> pref-dims pack-pref-dim ;
