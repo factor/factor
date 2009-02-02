@@ -840,9 +840,9 @@ PRIVATE>
 
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 
-: infimum ( seq -- n ) dup first [ min ] reduce ;
+: infimum ( seq -- n ) [ ] [ min ] map-reduce ;
 
-: supremum ( seq -- n ) dup first [ max ] reduce ;
+: supremum ( seq -- n ) [ ] [ max ] map-reduce ;
 
 : sigma ( seq quot -- n ) [ 0 ] 2dip [ rot slip + ] curry each ; inline
 
