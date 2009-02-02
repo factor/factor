@@ -110,8 +110,6 @@ IN: ui.tools.listener.tests
 
 [ CHAR: H ] [ "promise" get 2 seconds ?promise-timeout ] unit-test
 
-[ f ] [ "word" source-editor command-map commands>> empty? ] unit-test
-
 [ ] [ <listener-gadget> [ ] with-grafted-gadget ] unit-test
 
 [ ] [ <listener-gadget> "listener" set ] unit-test

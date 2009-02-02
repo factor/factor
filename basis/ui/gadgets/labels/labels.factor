@@ -9,10 +9,12 @@ IN: ui.gadgets.labels
 ! A label gadget draws a string.
 TUPLE: label < gadget text font ;
 
-: label-string ( label -- string )
+SLOT: string
+
+M: label string>> ( label -- string )
     text>> dup string? [ "\n" join ] unless ; inline
 
-: set-label-string ( string label -- )
+M: label (>>string) ( string label -- )
     [ CHAR: \n over memq? [ string-lines ] when ] dip (>>text) ; inline
 
 : label-theme ( gadget -- gadget )
@@ -20,24 +22,30 @@ TUPLE: label < gadget text font ;
 
 : new-label ( string class -- label )
     new-gadget
-    [ set-label-string ] keep
+    swap >>string
     label-theme ; inline
 
 : <label> ( string -- label )
     label new-label ;
 
+: >label< ( label -- font text )
+    [ font>> ] [ text>> ] bi ;
+
 M: label pref-dim*
-    [ font>> ] [ text>> ] bi text-dim ;
+    >label< text-dim ;
+
+M: label baseline
+    >label< line-metrics ascent>> ;
 
 M: label draw-gadget*
-    [ font>> ] [ text>> ] bi origin get draw-text ;
+    >label< origin get draw-text ;
 
-M: label gadget-text* label-string % ;
+M: label gadget-text* string>> % ;
 
 TUPLE: label-control < label ;
 
 M: label-control model-changed
-    swap value>> over set-label-string relayout ;
+    swap value>> >>string relayout ;
 
 : <label-control> ( model -- gadget )
     "" label-control new-label
@@ -47,7 +55,8 @@ M: label-control model-changed
     monospace-font >>font ;
 
 : reverse-video-theme ( label -- label )
-    sans-serif-font reverse-video-font >>font ;
+    sans-serif-font reverse-video-font >>font
+    black <solid> >>interior ;
 
 GENERIC: >label ( obj -- gadget )
 M: string >label <label> ;

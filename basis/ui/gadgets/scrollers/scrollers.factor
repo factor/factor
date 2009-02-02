@@ -50,7 +50,7 @@ scroller H{
 
 : scroll ( value scroller -- )
     [
-        viewport>> [ rect-dim { 0 0 } ] [ viewport-dim ] bi
+        viewport>> [ dim>> { 0 0 } ] [ viewport-dim ] bi
         4array flip
     ] keep
     2dup control-value = [ 2drop ] [ set-control-value ] if ;

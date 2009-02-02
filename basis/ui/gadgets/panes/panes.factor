@@ -4,7 +4,7 @@ USING: arrays hashtables io kernel namespaces sequences
 io.styles strings quotations math opengl combinators memoize
 math.vectors sorting splitting assocs classes.tuple models
 continuations destructors accessors math.geometry.rect fry
-fonts ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+fonts ui.gadgets ui.gadgets.private ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.paragraphs
 ui.gadgets.incremental ui.gadgets.packs ui.gadgets.theme
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
@@ -71,7 +71,7 @@ M: gadget draw-selection ( loc gadget -- )
 M: node draw-selection ( loc node -- )
     2dup value>> swap offset-rect [
         drop 2dup
-        [ value>> rect-loc v+ ] keep
+        [ value>> loc>> v+ ] keep
         children>> [ draw-selection ] with each
     ] if-fits 2drop ;
 
@@ -350,7 +350,7 @@ M: f sloppy-pick-up*
     2drop f ;
 
 : wet-and-sloppy ( loc gadget n -- newloc newgadget )
-    swap nth-gadget [ rect-loc v- ] keep ;
+    swap nth-gadget [ loc>> v- ] keep ;
 
 : sloppy-pick-up ( loc gadget -- path )
     2dup sloppy-pick-up* dup

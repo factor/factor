@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io kernel math namespaces math.vectors ui.gadgets
-ui.gadgets.packs accessors math.geometry.rect combinators ;
+ui.gadgets.private ui.gadgets.packs accessors
+math.geometry.rect combinators ;
 IN: ui.gadgets.incremental
 
 TUPLE: incremental < pack cursor ;
@@ -18,7 +19,7 @@ M: incremental pref-dim*
 
 : next-cursor ( gadget incremental -- cursor )
     [
-        [ rect-dim ] [ cursor>> ] bi*
+        [ dim>> ] [ cursor>> ] bi*
         [ vmax ] [ v+ ] 2bi
     ] keep orientation>> set-axis ;
 

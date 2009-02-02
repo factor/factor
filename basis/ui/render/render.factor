@@ -56,7 +56,7 @@ SYMBOL: origin
 : visible-children ( gadget -- seq )
     clip get origin get vneg offset-rect swap children-on ;
 
-: translate ( rect/point -- ) rect-loc origin [ v+ ] change ;
+: translate ( rect/point -- ) loc>> origin [ v+ ] change ;
 
 DEFER: draw-gadget
 

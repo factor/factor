@@ -1,14 +1,10 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables kernel models math namespaces
 make sequences quotations math.vectors combinators sorting
 binary-search vectors dlists deques models threads
 concurrency.flags math.order math.geometry.rect fry ;
 IN: ui.gadgets
-
-SYMBOL: ui-notify-flag
-
-: notify-ui-thread ( -- ) ui-notify-flag get-global raise-flag ;
 
 TUPLE: gadget < rect pref-dim parent children orientation focus
 visible? root? clipped? layout-state graft-state graft-node
@@ -35,17 +31,6 @@ M: gadget model-changed 2drop ;
 : <gadget> ( -- gadget )
     gadget new-gadget ;
 
-: activate-control ( gadget -- )
-    dup model>> dup [
-        2dup add-connection
-        swap model-changed
-    ] [
-        2drop
-    ] if ;
-
-: deactivate-control ( gadget -- )
-    dup model>> dup [ 2dup remove-connection ] when 2drop ;
-
 : control-value ( control -- value )
     model>> value>> ;
 
@@ -56,7 +41,7 @@ M: gadget model-changed 2drop ;
     2dup eq? [
         2drop { 0 0 }
     ] [
-        over rect-loc [ [ parent>> ] dip relative-loc ] dip v+
+        [ [ parent>> ] dip relative-loc ] [ drop loc>> ] 2bi v+
     ] if ;
 
 GENERIC: user-input* ( str gadget -- ? )
@@ -67,22 +52,30 @@ GENERIC: children-on ( rect/point gadget -- seq )
 
 M: gadget children-on nip children>> ;
 
+<PRIVATE
+
 : ((fast-children-on)) ( gadget dim axis -- <=> )
     [ swap loc>> v- ] dip v. 0 <=> ;
 
 : (fast-children-on) ( dim axis children -- i )
     -rot '[ _ _ ((fast-children-on)) ] search drop ;
 
+PRIVATE>
+
 : fast-children-on ( rect axis children -- from to )
     [ [ rect-loc ] 2dip (fast-children-on) 0 or ]
     [ [ rect-bounds v+ ] 2dip (fast-children-on) ?1+ ]
     3bi ;
+
+<PRIVATE
 
 : inside? ( bounds gadget -- ? )
     dup visible?>> [ intersects? ] [ 2drop f ] if ;
 
 : (pick-up) ( point gadget -- gadget )
     dupd children-on [ inside? ] with find-last nip ;
+
+PRIVATE>
 
 : pick-up ( point gadget -- child/f )
     2dup (pick-up) dup
@@ -124,6 +117,14 @@ M: array gadget-text*
 
 : gadget-text ( gadget -- string ) [ gadget-text* ] "" make ;
 
+DEFER: relayout
+
+<PRIVATE
+
+SYMBOL: ui-notify-flag
+
+: notify-ui-thread ( -- ) ui-notify-flag get-global raise-flag ;
+
 : invalidate ( gadget -- )
     \ invalidate >>layout-state drop ;
 
@@ -137,13 +138,13 @@ M: array gadget-text*
     #! invalidation requests.
     layout-queue [ push-front notify-ui-thread ] [ drop ] if* ;
 
-DEFER: relayout
-
 : invalidate* ( gadget -- )
     \ invalidate* >>layout-state
     dup forget-pref-dim
     dup root?>>
     [ layout-later ] [ parent>> [ relayout ] when* ] if ;
+
+PRIVATE>
 
 : relayout ( gadget -- )
     dup layout-state>> \ invalidate* eq?
@@ -157,12 +158,16 @@ DEFER: relayout
                               
 : hide-gadget ( gadget -- ) f >>visible? drop ;
 
-DEFER: in-layout?
+<PRIVATE
+
+SYMBOL: in-layout?
 
 GENERIC: dim-changed ( gadget -- )
 
 M: gadget dim-changed
     in-layout? get [ invalidate ] [ invalidate* ] if ;
+
+PRIVATE>
 
 M: gadget (>>dim) ( dim gadget -- )
     2dup dim>> =
@@ -171,18 +176,19 @@ M: gadget (>>dim) ( dim gadget -- )
 
 GENERIC: pref-dim* ( gadget -- dim )
 
-: ?set-gadget-pref-dim ( dim gadget -- )
-    dup layout-state>>
-    [ 2drop ] [ (>>pref-dim) ] if ;
-
 : pref-dim ( gadget -- dim )
     dup pref-dim>> [ ] [
-        [ pref-dim* dup ] keep ?set-gadget-pref-dim
+        [ pref-dim* ] keep dup layout-state>>
+        [ drop ] [ dupd (>>pref-dim) ] if
     ] ?if ;
 
 : pref-dims ( gadgets -- seq ) [ pref-dim ] map ;
 
-M: gadget pref-dim* rect-dim ;
+M: gadget pref-dim* dim>> ;
+
+GENERIC: baseline ( gadget -- y )
+
+M: gadget baseline pref-dim second ;
 
 GENERIC: layout* ( gadget -- )
 
@@ -190,14 +196,22 @@ M: gadget layout* drop ;
 
 : prefer ( gadget -- ) dup pref-dim >>dim drop ;
 
-: validate ( gadget -- ) f >>layout-state drop ;
-
 : layout ( gadget -- )
     dup layout-state>> [
-        dup validate
+        f >>layout-state
         dup layout*
         dup [ layout ] each-child
     ] when drop ;
+
+GENERIC: graft* ( gadget -- )
+
+M: gadget graft* drop ;
+
+GENERIC: ungraft* ( gadget -- )
+
+M: gadget ungraft* drop ;
+
+<PRIVATE
 
 : graft-queue ( -- dlist ) \ graft-queue get ;
 
@@ -224,6 +238,9 @@ M: gadget layout* drop ;
         { { f f } [ queue-graft ] }
     } case ;
 
+: graft ( gadget -- )
+    dup graft-later [ graft ] each-child ;
+
 : ungraft-later ( gadget -- )
     dup graft-state>> {
         { { f f } [ drop ] }
@@ -232,29 +249,44 @@ M: gadget layout* drop ;
         { { t t } [ queue-ungraft ] }
     } case ;
 
-GENERIC: graft* ( gadget -- )
-
-M: gadget graft* drop ;
-
-: graft ( gadget -- )
-    dup graft-later [ graft ] each-child ;
-
-GENERIC: ungraft* ( gadget -- )
-
-M: gadget ungraft* drop ;
-
 : ungraft ( gadget -- )
     dup [ ungraft ] each-child ungraft-later ;
+
+: activate-control ( gadget -- )
+    dup model>> dup [
+        2dup add-connection
+        swap model-changed
+    ] [
+        2drop
+    ] if ;
+
+: deactivate-control ( gadget -- )
+    dup model>> dup [ 2dup remove-connection ] when 2drop ;
+
+: notify ( gadget -- )
+    dup graft-state>>
+    [ first { f f } { t t } ? >>graft-state ] keep
+    {
+        { { f t } [ dup activate-control graft* ] }
+        { { t f } [ dup deactivate-control ungraft* ] }
+    } case ;
+
+: notify-queued ( -- )
+    graft-queue [ notify ] slurp-deque ;
 
 : (unparent) ( gadget -- )
     dup ungraft
     dup forget-pref-dim
     f >>parent drop ;
 
+: (clear-gadget) ( gadget -- )
+    dup [ (unparent) ] each-child
+    f >>focus f >>children drop ;
+
 : unfocus-gadget ( child gadget -- )
     [ nip ] [ focus>> eq? ] 2bi [ f >>focus ] when drop ;
 
-SYMBOL: in-layout?
+PRIVATE>
 
 : not-in-layout ( -- )
     in-layout? get
@@ -273,13 +305,11 @@ SYMBOL: in-layout?
         ] if
     ] when* ;
 
-: (clear-gadget) ( gadget -- )
-    dup [ (unparent) ] each-child
-    f >>focus f >>children drop ;
-
 : clear-gadget ( gadget -- )
     not-in-layout
     dup (clear-gadget) relayout ;
+
+<PRIVATE
 
 : ((add-gadget)) ( parent child -- parent )
     over children>> ?push >>children ;
@@ -289,6 +319,8 @@ SYMBOL: in-layout?
     over >>parent
     tuck ((add-gadget))
     tuck graft-state>> second [ graft ] [ drop ] if ;
+
+PRIVATE>
 
 : add-gadget ( parent child -- parent )
     not-in-layout
@@ -310,7 +342,9 @@ SYMBOL: in-layout?
     [ parents ] dip find nip ; inline
 
 : screen-loc ( gadget -- loc )
-    parents { 0 0 } [ rect-loc v+ ] reduce ;
+    parents { 0 0 } [ loc>> v+ ] reduce ;
+
+<PRIVATE
 
 : (screen-rect) ( gadget -- loc ext )
     dup parent>> [
@@ -319,6 +353,8 @@ SYMBOL: in-layout?
     ] [
         rect-extent
     ] if* ;
+
+PRIVATE>
 
 : screen-rect ( gadget -- rect )
     (screen-rect) <extent-rect> ;
@@ -347,5 +383,5 @@ M: f request-focus-on 2drop ;
 : request-focus ( gadget -- )
     [ focusable-child ] keep request-focus-on ;
 
-: focus-path ( world -- seq )
+: focus-path ( gadget -- seq )
     [ focus>> ] follow ;

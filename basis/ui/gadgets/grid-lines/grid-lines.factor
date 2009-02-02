@@ -19,14 +19,14 @@ SYMBOL: grid-dim
     [ [ grid-dim get ] 2dip set-axis ] 2bi ;
 
 : draw-grid-lines ( gaps orientation -- )
-    [ grid get swap grid-positions grid get rect-dim suffix ] dip
+    [ grid get swap grid-positions grid get dim>> suffix ] dip
     [ '[ _ v- ] map ] keep
     '[ _ swap grid-line-from/to gl-line ] each ;
 
 M: grid-lines draw-boundary
     color>> gl-color [
         [ grid set ]
-        [ rect-dim half-gap v- grid-dim set ]
+        [ dim>> half-gap v- grid-dim set ]
         [ compute-grid ] tri
         [ { 1 0 } draw-grid-lines ]
         [ { 0 1 } draw-grid-lines ]

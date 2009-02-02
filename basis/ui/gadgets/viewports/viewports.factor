@@ -55,4 +55,4 @@ M: viewport model-changed
 
 : visible-dim ( gadget -- dim )
     dup parent>> viewport?
-    [ parent>> rect-dim viewport-gap 2 v*n v- ] [ dim>> ] if ;
+    [ parent>> dim>> viewport-gap 2 v*n v- ] [ dim>> ] if ;

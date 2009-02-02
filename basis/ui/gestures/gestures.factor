@@ -4,7 +4,7 @@ USING: accessors arrays assocs kernel math math.order models
 namespaces make sequences words strings system hashtables
 math.parser math.vectors classes.tuple classes boxes calendar
 alarms combinators sets columns fry deques ui.gadgets
-unicode.case combinators.short-circuit ;
+ui.gadgets.private unicode.case combinators.short-circuit ;
 IN: ui.gestures
 
 GENERIC: handle-gesture ( gesture gadget -- ? )

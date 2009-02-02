@@ -75,7 +75,7 @@ dup layout
         "g2" get scroll>gadget
         "s" get layout
         "s" get scroller-value
-    ] map [ { 2 0 } = ] all?
+    ] map [ { 3 0 } = ] all?
 ] unit-test
 
 [ ] [ "Hi" <label> dup "l" set <scroller> "s" set ] unit-test

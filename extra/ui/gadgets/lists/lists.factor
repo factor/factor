@@ -106,7 +106,7 @@ M: list focusable-child* drop t ;
     vmin { 0 0 } vmax ;
 
 : select-at ( point list -- )
-    [ rect-dim clamp-loc ] keep
+    [ dim>> clamp-loc ] keep
     [ pick-up ] keep
     select-gadget ;
 

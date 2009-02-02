@@ -111,7 +111,7 @@ elevator H{
 : layout-thumb-dim ( slider -- )
     dup dup thumb-dim (layout-thumb)
     [
-        [ [ rect-dim ] dip ] [ drop orientation>> ] 2bi set-axis
+        [ [ dim>> ] dip ] [ drop orientation>> ] 2bi set-axis
         [ ceiling ] map
     ] dip (>>dim) ;
 

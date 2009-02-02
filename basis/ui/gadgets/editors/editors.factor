@@ -176,7 +176,7 @@ M: editor ungraft*
 
 : first-visible-line ( editor -- n )
     [
-        [ clip get rect-loc second origin get second - ] dip
+        [ clip get loc>> second origin get second - ] dip
         y>line
     ] keep model>> validate-line ;
 

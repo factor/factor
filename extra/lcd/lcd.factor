@@ -25,7 +25,7 @@ IN: lcd
 
 : <time-display> ( timestamp -- gadget )
     [ hh:mm:ss lcd ] <filter> <label-control>
-    "99:99:99" lcd over set-label-string
+    "99:99:99" lcd >>string
     monospace-font >>font ;
 
 : time-window ( -- )

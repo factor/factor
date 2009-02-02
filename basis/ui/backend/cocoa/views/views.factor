@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types arrays assocs cocoa kernel
 math cocoa.messages cocoa.subclassing cocoa.classes cocoa.views
 cocoa.application cocoa.pasteboard cocoa.types cocoa.windows
-sequences ui ui.gadgets ui.gadgets.worlds ui.gestures
+sequences ui ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
 core-foundation.strings core-graphics core-graphics.types
 threads combinators math.geometry.rect ;
 IN: ui.backend.cocoa.views
@@ -117,8 +117,8 @@ CONSTANT: key-codes
     2bi <rect> ;
 
 : rect>NSRect ( rect world -- NSRect )
-    [ [ rect-loc first2 ] [ dim>> second ] bi* swap - ]
-    [ drop rect-dim first2 ]
+    [ [ loc>> first2 ] [ dim>> second ] bi* swap - ]
+    [ drop dim>> first2 ]
     2bi <CGRect> ;
 
 CLASS: {
@@ -366,7 +366,7 @@ CLASS: {
     CGLSetParameter drop ;
 
 : <FactorView> ( world -- view )
-    FactorView over rect-dim <GLView>
+    FactorView over dim>> <GLView>
     [ sync-refresh-to-screen ] keep
     [ register-window ] keep ;
 
