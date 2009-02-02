@@ -13,8 +13,7 @@ align ;
 
 : new-grid ( children class -- grid )
     new-gadget
-        swap >>grid
-        dup grid>> concat add-gadgets ; inline
+        swap [ >>grid ] [ concat add-gadgets ] bi ; inline
 
 : <grid> ( children -- grid )
     grid new-grid ;
@@ -49,8 +48,7 @@ align ;
     dupd add-gaps dim-sum v+ ;
 
 M: grid pref-dim*
-    [ gap>> ] [ compute-grid ] bi
-    [ gap-sum ] bi-curry@ bi (pair-up) ;
+    [ gap>> ] [ compute-grid [ gap-sum ] bi-curry@ ] bi bi (pair-up) ;
 
 : do-grid ( dims grid quot -- )
     [ grid>> ] dip '[ _ 2each ] 2each ; inline
@@ -70,19 +68,16 @@ M: grid pref-dim*
     ] if ;
 
 : grid-layout ( grid horiz vert -- )
-    [ position-grid ] 3keep resize-grid ;
+    [ position-grid ] [ resize-grid ] 3bi ;
 
 M: grid layout* dup compute-grid grid-layout ;
 
 M: grid children-on ( rect gadget -- seq )
-    dup children>> empty?
-      [ 2drop f ]
-      [
+    dup children>> empty? [ 2drop f ] [
         { 0 1 } swap grid>>
         [ 0 <column> fast-children-on ] keep
         <slice> concat
-      ]
-    if ;
+    ] if ;
 
 M: grid gadget-text*
     grid>>
