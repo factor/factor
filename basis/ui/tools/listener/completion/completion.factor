@@ -158,8 +158,8 @@ CONSTANT: completion-popup-offset { -4 0 }
     ?if ;
 
 : completion-gesture ( gesture completion -- value/f operation/f )
-    table>> selected-row [ tuck ] dip
-    [ gesture>operation ] [ 2drop f ] if ;
+    table>> selected-row
+    [ [ nip ] [ gesture>operation ] 2bi ] [ drop f ] if ;
 
 M: completion-popup handle-gesture ( gesture completion -- ? )
     2dup completion-gesture dup [

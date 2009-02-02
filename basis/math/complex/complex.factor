@@ -38,7 +38,7 @@ M: complex * [ *re - ] [ *im + ] 2bi (rect>) ;
 : complex/ ( x y -- r i m )
     [ [ *re + ] [ *im - ] 2bi ] keep absq ; inline
 
-M: complex / complex/ tuck [ / ] 2bi@ (rect>) ;
+M: complex / complex/ [ / ] curry bi@ (rect>) ;
 
 M: complex abs absq >float fsqrt ;
 

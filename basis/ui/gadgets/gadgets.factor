@@ -190,9 +190,17 @@ GENERIC: pref-dim* ( gadget -- dim )
 
 M: gadget pref-dim* dim>> ;
 
+SYMBOL: +baseline+
+
 GENERIC: baseline ( gadget -- y )
 
 M: gadget baseline pref-dim second ;
+
+: baseline-align ( gadgets -- ys )
+    [ { } ] [
+        [ baseline ] map [ supremum ] keep
+        [ - ] with map
+    ] if-empty ;
 
 GENERIC: layout* ( gadget -- )
 
@@ -315,25 +323,24 @@ PRIVATE>
 
 <PRIVATE
 
-: ((add-gadget)) ( parent child -- parent )
-    over children>> ?push >>children ;
-
-: (add-gadget) ( parent child -- parent )
-    dup unparent
-    over >>parent
-    tuck ((add-gadget))
-    tuck graft-state>> second [ graft ] [ drop ] if ;
+: (add-gadget) ( child parent -- )
+    {
+        [ drop unparent ]
+        [ >>parent drop ]
+        [ [ ?push ] change-children drop ]
+        [ graft-state>> second [ graft ] [ drop ] if ]
+    } 2cleave ;
 
 PRIVATE>
 
 : add-gadget ( parent child -- parent )
     not-in-layout
-    (add-gadget)
+    over (add-gadget)
     dup relayout ;
 
 : add-gadgets ( parent children -- parent )
     not-in-layout
-    [ (add-gadget) ] each
+    [ over (add-gadget) ] each
     dup relayout ;
 
 : parents ( gadget -- seq )

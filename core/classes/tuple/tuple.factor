@@ -251,9 +251,9 @@ M: tuple-class update-class
     3bi ;
 
 : tuple-class-unchanged? ( class superclass slots -- ? )
-    [ over ] dip
     [ [ superclass ] [ bootstrap-word ] bi* = ]
-    [ [ "slots" word-prop ] dip = ] 2bi* and ;
+    [ [ "slots" word-prop ] dip = ]
+    bi-curry* bi and ;
 
 : valid-superclass? ( class -- ? )
     [ tuple-class? ] [ tuple eq? ] bi or ;

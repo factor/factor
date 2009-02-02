@@ -108,14 +108,12 @@ C: <pane-stream> pane-stream
     [ prepare-line ] bi ;
 
 : pane-write ( seq pane -- )
-    [ '[ _ pane-nl ] ]
-    [ '[ _ current>> stream-write ] ] bi
-    interleave ;
+    [ pane-nl ] [ current>> stream-write ]
+    bi-curry interleave ;
 
 : pane-format ( seq style pane -- )
-    [ '[ _ drop _ pane-nl ] ]
-    [ '[ _ _ current>> stream-format ] ] 2bi
-    interleave ;
+    [ nip pane-nl ] [ current>> stream-format ]
+    bi-curry bi-curry interleave ;
 
 GENERIC: write-gadget ( gadget stream -- )
 
@@ -329,8 +327,7 @@ M: paragraph stream-format
         gadget-format
     ] [
         [ " " split ] 2dip
-        [ '[ _ _ gadget-bl ] ]
-        [ '[ _ _ gadget-format ] ] 2bi
+        [ gadget-bl ] [ gadget-format ] bi-curry bi-curry
         interleave
     ] if ;
 

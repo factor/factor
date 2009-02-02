@@ -66,7 +66,7 @@ PRIVATE>
 
 : ?1+ ( x -- y ) [ 1+ ] [ 0 ] if* ; inline
 
-: rem ( x y -- z ) abs tuck mod over + swap mod ; foldable
+: rem ( x y -- z ) abs [ mod ] [ + ] [ mod ] tri ; foldable
 
 : 2^ ( n -- 2^n ) 1 swap shift ; inline
 

@@ -26,8 +26,7 @@ MACRO: drop-input ( quot -- newquot )
     infer in>> '[ _ ndrop ] ;
 
 : fails? ( quot -- ? )
-    [ '[ _ drop-output f ] ]
-    [ '[ drop _ drop-input t ] ] bi recover ; inline
+    [ drop-output f ] [ nip drop-input t ] bi-curry recover ; inline
 
 : well-formed? ( uri -- answer )
     [ file>xml ] fails? "not-wf" "valid" ? ;

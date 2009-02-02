@@ -184,6 +184,29 @@ GENERIC: boa ( ... class -- tuple )
 : prepose ( quot1 quot2 -- compose )
     swap compose ; inline
 
+! Curried cleavers
+<PRIVATE
+
+: schönfinkel ( quot -- quot' ) [ curry ] curry ; inline
+
+: bi-schönfinkel ( p q -- p' q' ) [ schönfinkel ] bi@ ; inline
+
+: tri-schönfinkel ( p q r -- p' q' r' ) [ schönfinkel ] tri@ ; inline
+
+PRIVATE>
+
+: bi-curry ( x p q -- p' q' ) bi-schönfinkel bi ; inline
+
+: tri-curry ( x p q r -- p' q' r' ) tri-schönfinkel tri ; inline
+
+: bi-curry* ( x y p q -- p' q' ) bi-schönfinkel bi* ; inline
+
+: tri-curry* ( x y z p q r -- p' q' r' ) tri-schönfinkel tri* ; inline
+
+: bi-curry@ ( x y q -- p' q' ) schönfinkel bi@ ; inline
+
+: tri-curry@ ( x y z q -- p' q' r' ) schönfinkel tri@ ; inline
+
 ! Booleans
 : not ( obj -- ? ) [ f ] [ t ] if ; inline
 

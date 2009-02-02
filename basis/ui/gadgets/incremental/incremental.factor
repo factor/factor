@@ -37,7 +37,7 @@ M: incremental dim-changed drop ;
 
 : add-incremental ( gadget incremental -- )
     not-in-layout
-    2dup swap (add-gadget) drop
+    2dup (add-gadget)
     t in-layout? [
         {
             [ drop prefer-incremental ]

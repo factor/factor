@@ -52,9 +52,8 @@ IN: tools.memory
     } spread ;
 
 : heap-stat-step ( obj counts sizes -- )
-    [ over ] dip
     [ [ class ] dip inc-at ]
-    [ [ [ size ] [ class ] bi ] dip at+ ] 2bi* ;
+    [ [ [ size ] [ class ] bi ] dip at+ ] bi-curry* bi ;
 
 PRIVATE>
 

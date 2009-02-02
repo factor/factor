@@ -64,10 +64,9 @@ TUPLE: document < model locs undos redos inside-undo? ;
     ] if ; inline
 
 : start/end-on-line ( from to line# -- n1 n2 )
-    tuck
     [ [ document get ] 2dip start-on-line ]
     [ [ document get ] 2dip end-on-line ]
-    2bi* ;
+    bi-curry bi* ;
 
 : last-line# ( document -- line )
     value>> length 1- ;
@@ -101,7 +100,7 @@ CONSTANT: doc-start { 0 0 }
     [ first2 swap ] dip nth swap ;
 
 : prepare-insert ( new-lines from to lines -- new-lines )
-    tuck [ loc-col/str head-slice ] [ loc-col/str tail-slice ] 2bi*
+    [ loc-col/str head-slice ] [ loc-col/str tail-slice ] bi-curry bi*
     pick append-last over prepend-first ;
 
 : (set-doc-range) ( doc-lines from to lines -- changed-lines )
@@ -162,7 +161,7 @@ PRIVATE>
         over first 0 < [
             2drop { 0 0 }
         ] [
-            [ first2 swap tuck ] dip validate-col 2array
+            [ first2 over ] dip validate-col 2array
         ] if
     ] if ;
 

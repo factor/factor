@@ -128,8 +128,8 @@ INSTANCE: iota immutable-sequence
     [ first3-unsafe ] [ 3 swap nth-unsafe ] bi ; inline
 
 : exchange-unsafe ( m n seq -- )
-    [ tuck [ nth-unsafe ] 2bi@ ]
-    [ tuck [ set-nth-unsafe ] 2bi@ ] 3bi ; inline
+    [ [ nth-unsafe ] curry bi@ ]
+    [ [ set-nth-unsafe ] curry bi@ ] 3bi ; inline
 
 : (head) ( seq n -- from to seq ) [ 0 ] 2dip swap ; inline
 
@@ -205,7 +205,7 @@ TUPLE: slice
 { seq read-only } ;
 
 : collapse-slice ( m n slice -- m' n' seq )
-    [ from>> ] [ seq>> ] bi [ tuck [ + ] 2bi@ ] dip ; inline
+    [ from>> ] [ seq>> ] bi [ [ + ] curry bi@ ] dip ; inline
 
 ERROR: slice-error from to seq reason ;
 
@@ -357,7 +357,7 @@ PRIVATE>
     [ (each) ] dip collect ; inline
 
 : 2nth-unsafe ( n seq1 seq2 -- elt1 elt2 )
-    [ over ] dip [ nth-unsafe ] 2bi@ ; inline
+    [ nth-unsafe ] bi-curry@ bi ; inline
 
 : (2each) ( seq1 seq2 quot -- n quot' )
     [
@@ -366,12 +366,12 @@ PRIVATE>
     ] dip compose ; inline
 
 : 3nth-unsafe ( n seq1 seq2 seq3 -- elt1 elt2 elt3 )
-    [ over ] 2dip [ over ] dip [ nth-unsafe ] 2tri@ ; inline
+    [ nth-unsafe ] tri-curry@ tri ; inline
 
 : (3each) ( seq1 seq2 seq3 quot -- n quot' )
     [
-        [ [ length ] tri@ min min ] 3keep
-        [ 3nth-unsafe ] 3curry
+        [ [ length ] tri@ min min ]
+        [ [ 3nth-unsafe ] 3curry ] 3bi
     ] dip compose ; inline
 
 : finish-find ( i seq -- i elt )
@@ -470,7 +470,7 @@ PRIVATE>
     V{ } clone V{ } clone [ [ push-either ] 3curry ] 2keep ; inline
 
 : partition ( seq quot -- trueseq falseseq )
-    over [ 2pusher [ each ] 2dip ] dip tuck [ like ] 2bi@ ; inline
+    over [ 2pusher [ each ] 2dip ] dip [ like ] curry bi@ ; inline
 
 : accumulator ( quot -- quot' vec )
     V{ } clone [ [ push ] curry compose ] keep ; inline
@@ -653,8 +653,14 @@ PRIVATE>
 : delete-nth ( n seq -- )
     [ dup 1+ ] dip delete-slice ;
 
+: snip ( from to seq -- head tail )
+    [ swap head ] [ swap tail ] bi-curry bi* ; inline
+
+: snip-slice ( from to seq -- head tail )
+    [ swap head-slice ] [ swap tail-slice ] bi-curry bi* ; inline
+
 : replace-slice ( new from to seq -- seq' )
-    tuck [ swap head-slice ] [ swap tail-slice ] 2bi* surround ;
+    snip-slice surround ;
 
 : remove-nth ( n seq -- seq' )
     [ [ { } ] dip dup 1+ ] dip replace-slice ;
@@ -663,14 +669,14 @@ PRIVATE>
     [ length 1- ] [ [ nth ] [ shorten ] 2bi ] bi ;
 
 : exchange ( m n seq -- )
-    pick over bounds-check 2drop 2dup bounds-check 2drop
-    exchange-unsafe ;
+    [ nip bounds-check 2drop ]
+    [ bounds-check 3drop ]
+    [ exchange-unsafe ]
+    3tri ;
 
 : reverse-here ( seq -- )
-    dup length dup 2/ [
-        [ 2dup ] dip
-        tuck - 1- rot exchange-unsafe
-    ] each 2drop ;
+    [ length 2/ ] [ length ] [ ] tri
+    [ [ over - 1- ] dip exchange-unsafe ] 2curry each ;
 
 : reverse ( seq -- newseq )
     [
@@ -787,7 +793,7 @@ PRIVATE>
 
 : drop-prefix ( seq1 seq2 -- slice1 slice2 )
     2dup mismatch [ 2dup min-length ] unless*
-    tuck [ tail-slice ] 2bi@ ;
+    [ tail-slice ] curry bi@ ;
 
 : unclip ( seq -- rest first )
     [ rest ] [ first-unsafe ] bi ;

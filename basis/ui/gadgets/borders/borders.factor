@@ -32,7 +32,7 @@ M: border baseline
     gadget-child pref-dim ;
 
 : scale ( a b s -- c )
-    tuck { 1 1 } swap v- [ v* ] 2bi@ v+ ;
+    [ v* ] [ { 1 1 } swap v- v* ] bi-curry bi* v+ ;
 
 : border-dim ( border -- dim )
     [ border-major-dim ] [ border-minor-dim ] [ fill>> ] tri scale ;
