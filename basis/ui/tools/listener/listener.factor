@@ -3,22 +3,22 @@
 USING: accessors arrays assocs calendar combinators
 combinators.short-circuit compiler.units concurrency.flags
 concurrency.mailboxes continuations destructors documents
-documents.elements fry hashtables help help.markup io
-io.styles kernel lexer listener math models models.delay models.filter
-namespaces parser prettyprint quotations sequences strings threads
-tools.vocabs ui ui.commands ui.gadgets ui.gadgets.buttons
-ui.gadgets.editors ui.gadgets.frames ui.gadgets.grids
-ui.gadgets.labelled ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.status-bar ui.gadgets.tracks ui.gestures ui.operations
-ui.tools.browser ui.tools.common ui.tools.debugger
-ui.tools.listener.completion ui.tools.listener.history vocabs
-vocabs.parser words ;
+documents.elements fry hashtables help help.markup io io.styles kernel
+lexer listener math models models.delay models.filter namespaces
+parser prettyprint quotations sequences strings threads tools.vocabs
+vocabs vocabs.loader vocabs.parser words ui ui.commands ui.gadgets
+ui.gadgets.buttons ui.gadgets.editors ui.gadgets.frames
+ui.gadgets.grids ui.gadgets.labelled ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks
+ui.gestures ui.operations ui.tools.browser ui.tools.common
+ui.tools.debugger ui.tools.listener.completion
+ui.tools.listener.history ;
 IN: ui.tools.listener
 
 ! If waiting is t, we're waiting for user input, and invoking
 ! evaluate-input resumes the thread.
 TUPLE: interactor < source-editor
-output history flag mailbox thread waiting word-model
+output history flag mailbox thread waiting token-model word-model
 completion-popup ;
 
 : register-self ( interactor -- )
@@ -42,16 +42,23 @@ completion-popup ;
         assoc-stack
     ] if ;
 
+: vocab-exists? ( name -- ? )
+    { [ vocab ] [ find-vocab-root ] } 1|| ;
+
+: word-at-caret ( token interactor -- word/vocab/f )
+    dup vocab-completion?
+    [ drop dup vocab-exists? [ >vocab-link ] [ drop f ] if ]
+    [ interactor-use assoc-stack ] if ;
+
 : <word-model> ( interactor -- model )
-    [ one-word-elt <element-model> 1/3 seconds <delay> ] keep
-    '[
-        _ dup vocab-completion?
-        [ drop >vocab-link ] [ interactor-use assoc-stack ] if
-    ] <filter> ;
+    [ token-model>> 1/3 seconds <delay> ]
+    [ '[ _ word-at-caret ] ] bi
+    <filter> ;
 
 : <interactor> ( output -- gadget )
     interactor new-editor
         <flag> >>flag
+        dup one-word-elt <element-model> >>token-model
         dup <word-model> >>word-model
         dup model>> <history> >>history
         swap >>output ;
@@ -332,15 +339,14 @@ M: interactor stream-read-quot
     completion-popup>> focusable-child resend-gesture ;
 
 : interactor-operation ( gesture interactor -- ? )
-    word-model>> value>>
-    [ nip ] [ gesture>operation ] 2bi
-    dup [ invoke-command f ] [ 2drop t ] if ;
+    [ token-model>> value>> ] keep word-at-caret
+    [ nip ] [ gesture>operation ] 2bi dup [ invoke-command f ] [ 2drop t ] if ;
 
 M: interactor handle-gesture
     {
         { [ over key-gesture? not ] [ call-next-method ] }
         { [ dup completion-popup>> ] [ { [ pass-to-popup ] [ call-next-method ] } 2&& ] }
-        { [ dup word-model>> value>> ] [ { [ interactor-operation ] [ call-next-method ] } 2&& ] }
+        { [ dup token-model>> value>> ] [ { [ interactor-operation ] [ call-next-method ] } 2&& ] }
         [ call-next-method ]
     } cond ;
 

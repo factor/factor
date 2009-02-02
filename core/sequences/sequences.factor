@@ -280,7 +280,7 @@ INSTANCE: repetition immutable-sequence
 PRIVATE>
 
 : subseq ( from to seq -- subseq )
-    [ check-slice prepare-subseq (copy) ] [ like ] bi ;
+    [ check-slice prepare-subseq (copy) ] keep like ;
 
 : head ( seq n -- headseq ) (head) subseq ;
 
@@ -386,9 +386,6 @@ PRIVATE>
     [ 2drop f f ]
     if ; inline
 
-: (interleave) ( n elt between quot -- )
-    roll 0 = [ nip ] [ swapd 2slip ] if call ; inline
-
 PRIVATE>
 
 : each ( seq quot -- )
@@ -475,9 +472,6 @@ PRIVATE>
 : partition ( seq quot -- trueseq falseseq )
     over [ 2pusher [ each ] 2dip ] dip tuck [ like ] 2bi@ ; inline
 
-: interleave ( seq between quot -- )
-    [ (interleave) ] 2curry [ [ length ] keep ] dip 2each ; inline
-
 : accumulator ( quot -- quot' vec )
     V{ } clone [ [ push ] curry compose ] keep ; inline
 
@@ -495,6 +489,11 @@ PRIVATE>
 
 : each-index ( seq quot -- )
     prepare-index 2each ; inline
+
+: interleave ( seq between quot -- )
+    swap [ drop ] [ [ 2dip call ] 2curry ] 2bi
+    [ [ 0 = ] 2dip if ] 2curry
+    each-index ; inline
 
 : map-index ( seq quot -- )
     prepare-index 2map ; inline
@@ -700,8 +699,10 @@ PRIVATE>
 
 : join ( seq glue -- newseq )
     [
-        2dup joined-length over new-resizable spin
-        [ dup pick push-all ] [ pick push-all ] interleave drop
+        2dup joined-length over new-resizable [
+            [ [ push-all ] 2curry ] [ [ nip push-all ] 2curry ] 2bi
+            interleave
+        ] keep
     ] keep like ;
 
 : padding ( seq n elt quot -- newseq )

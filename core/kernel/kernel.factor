@@ -51,7 +51,7 @@ DEFER: if
 
 ! Default
 : ?if ( default cond true false -- )
-    pick [ roll 2drop call ] [ 2nip call ] if ; inline
+    pick [ drop [ drop ] 2dip call ] [ 2nip call ] if ; inline
 
 ! Slippers and dippers.
 ! Not declared inline because the compiler special-cases them
