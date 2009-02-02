@@ -7,7 +7,7 @@ sequences tools.completion generic generic.standard.engines.tuple
 fonts ui.commands ui.operations ui.gadgets ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.scrollers ui.gadgets.tables
 ui.gadgets.theme ui.gadgets.worlds ui.gadgets.wrappers ui.gestures
-ui.render ui.tools.listener.history ;
+ui.render ui.tools.listener.history combinators ;
 IN: ui.tools.listener.completion
 
 : complete-IN:/USE:? ( tokens -- ? )
@@ -19,12 +19,21 @@ IN: ui.tools.listener.completion
 : complete-USING:? ( tokens -- ? )
     chop-; { "USING:" } intersects? ;
 
+: complete-CHAR:? ( tokens -- ? )
+    2 short tail* "CHAR:" swap member? ;
+
 : up-to-caret ( caret document -- string )
     [ { 0 0 } ] 2dip doc-range ;
 
-: vocab-completion? ( interactor -- ? )
+SINGLETONS: word-completion vocab-completion char-completion ;
+
+: completion-mode ( interactor -- symbol )
     [ editor-caret ] [ model>> ] bi up-to-caret " \r\n" split
-    { [ complete-IN:/USE:? ] [ complete-USING:? ] } 1|| ;
+    {
+        { [ dup { [ complete-IN:/USE:? ] [ complete-USING:? ] } 1|| ] [ drop vocab-completion ] }
+        { [ dup complete-CHAR:? ] [ drop char-completion ] }
+        [ drop word-completion ]
+    } cond ;
 
 ! We don't directly depend on the listener tool but we use a few slots
 SLOT: completion-popup
@@ -133,8 +142,11 @@ CONSTANT: completion-popup-offset { -4 0 }
     show-glass ;
 
 : code-completion-popup ( interactor -- )
-    dup vocab-completion?
-    [ vocabs-matching ] [ words-matching ] ? '[ [ { } ] _ if-empty ]
+    dup completion-mode {
+        { word-completion [ words-matching ] }
+        { vocab-completion [ vocabs-matching ] }
+        { char-completion [ chars-matching ] }
+    } at '[ [ { } ] _ if-empty ]
     one-word-elt show-completion-popup ;
 
 : history-matching ( interactor -- alist )

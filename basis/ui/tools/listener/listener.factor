@@ -46,9 +46,11 @@ completion-popup ;
     { [ vocab ] [ find-vocab-root ] } 1|| ;
 
 : word-at-caret ( token interactor -- word/vocab/f )
-    dup vocab-completion?
-    [ drop dup vocab-exists? [ >vocab-link ] [ drop f ] if ]
-    [ interactor-use assoc-stack ] if ;
+    dup completion-mode {
+        { vocab-completion [ drop dup vocab-exists? [ >vocab-link ] [ drop f ] if ] }
+        { word-completion [ interactor-use assoc-stack ] }
+        { char-completion [ 2drop f ] }
+    } case ;
 
 : <word-model> ( interactor -- model )
     [ token-model>> 1/3 seconds <delay> ]

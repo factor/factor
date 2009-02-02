@@ -3,7 +3,7 @@
 USING: accessors kernel arrays sequences math namespaces
 strings io fry vectors words assocs combinators sorting
 unicode.case unicode.categories math.order vocabs
-tools.vocabs ;
+tools.vocabs unicode.data ;
 IN: tools.completion
 
 : (fuzzy) ( accum ch i full -- accum i ? )
@@ -76,3 +76,6 @@ IN: tools.completion
 
 : vocabs-matching ( str -- seq )
     all-vocabs-seq name-completions ;
+
+: chars-matching ( str -- seq )
+    name-map keys dup zip completions ;
