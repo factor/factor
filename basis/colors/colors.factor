@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! Copyright (C) 2008 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors combinators ;
+USING: kernel accessors combinators math ;
 IN: colors
 
 TUPLE: color ;
@@ -21,6 +21,9 @@ M: color blue>> ( color -- blue ) >rgba blue>> ;
 : >rgba-components ( object -- r g b a )
     >rgba { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave ; inline
 
+: opaque? ( color -- ? ) alpha>> 1 number= ;
+
+CONSTANT: transparent T{ rgba f 0.0 0.0 0.0 0.0 }
 CONSTANT: black T{ rgba f 0.0 0.0 0.0 1.0 }
 CONSTANT: blue T{ rgba f 0.0 0.0 1.0 1.0 }
 CONSTANT: cyan T{ rgba f 0 0.941 0.941 1 }
