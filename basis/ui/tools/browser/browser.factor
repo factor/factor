@@ -30,13 +30,13 @@ TUPLE: browser-gadget < tool pane scroller search-field ;
 
 : <browser-toolbar> ( browser -- toolbar )
     <shelf>
+        +baseline+ >>align
         { 5 5 } >>gap
         over <toolbar> add-gadget
-        "Search:" <label> add-gadget
-        swap search-field>> add-gadget ;
+        swap search-field>> "Search:" label-on-left add-gadget ;
 
 : <browser-gadget> ( link -- gadget )
-    { 0 1 } browser-gadget new-track
+    vertical browser-gadget new-track
         swap >link <history> >>model
         dup <search-field> >>search-field
         dup <browser-toolbar> f track-add

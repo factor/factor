@@ -28,7 +28,7 @@ TUPLE: debugger < track error restarts restart-hook restart-list continuation ;
 PRIVATE>
 
 : <debugger> ( error restarts restart-hook -- gadget )
-    { 0 1 } debugger new-track
+    vertical debugger new-track
         add-toolbar
         swap >>restart-hook
         swap >>restarts

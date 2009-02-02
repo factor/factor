@@ -76,13 +76,14 @@ thumb H{
 : slide-by-page ( amount slider -- ) model>> move-by-page ;
 
 : compute-direction ( elevator -- -1/1 )
-    dup find-slider swap hand-click-rel
-    over orientation>> v.
-    over screen>slider
-    swap slider-value - sgn ;
+    [ hand-click-rel ] [ find-slider ] bi
+    [ orientation>> v. ]
+    [ screen>slider ]
+    [ slider-value - sgn ]
+    tri ;
 
 : elevator-hold ( elevator -- )
-    dup direction>> swap find-slider slide-by-page ;
+    [ direction>> ] [ find-slider ] bi slide-by-page ;
 
 : elevator-click ( elevator -- )
     dup compute-direction >>direction
@@ -94,15 +95,15 @@ elevator H{
 } set-gestures
 
 : <elevator> ( vector -- elevator )
-  elevator new-gadget
-    swap             >>orientation
-    lowered-gradient >>interior ;
+    elevator new-gadget
+        swap >>orientation
+        lowered-gradient >>interior ;
 
 : (layout-thumb) ( slider n -- n thumb )
     over orientation>> n*v swap thumb>> ;
 
 : thumb-loc ( slider -- loc )
-    dup slider-value swap slider>screen ;
+    [ slider-value ] keep slider>screen ;
 
 : layout-thumb-loc ( slider -- )
     dup thumb-loc (layout-thumb)
@@ -136,8 +137,8 @@ M: elevator layout*
 
 : <left-button>  ( -- button ) { 0 1 } arrow-left -1 <slide-button> ;
 : <right-button> ( -- button ) { 0 1 } arrow-right 1 <slide-button> ;
-: <up-button>    ( -- button ) { 1 0 } arrow-up   -1 <slide-button> ;
-: <down-button>  ( -- button ) { 1 0 } arrow-down  1 <slide-button> ;
+: <up-button>    ( -- button ) horizontal arrow-up   -1 <slide-button> ;
+: <down-button>  ( -- button ) horizontal arrow-down  1 <slide-button> ;
 
 : <slider> ( range orientation -- slider )
     slider new-frame
@@ -146,15 +147,15 @@ M: elevator layout*
         32 >>line ;
 
 : <x-slider> ( range -- slider )
-    { 1 0 } <slider>
+    horizontal <slider>
         <left-button> @left grid-add
-        { 0 1 } elevator,
+        vertical elevator,
         <right-button> @right grid-add ;
 
 : <y-slider> ( range -- slider )
-    { 0 1 } <slider>
+    vertical <slider>
         <up-button> @top grid-add
-        { 1 0 } elevator,
+        horizontal elevator,
         <down-button> @bottom grid-add ;
 
 M: slider pref-dim*

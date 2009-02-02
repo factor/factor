@@ -98,7 +98,7 @@ M: method-renderer row-value drop first ;
     } ;
 
 : <sort-options> ( model -- gadget )
-    sort-options <radio-buttons> { 1 0 } >>orientation ;
+    sort-options <radio-buttons> horizontal >>orientation ;
 
 : <profiler-tool-bar> ( profiler -- gadget )
     <shelf>
@@ -108,7 +108,7 @@ M: method-renderer row-value drop first ;
         swap sort>> <sort-options> add-gadget ;
 
 :: <words-tab> ( profiler -- gadget )
-    { 1 0 } <track>
+    horizontal <track>
         profiler vocabs>> <profiler-table>
             profiler vocab>> >>selected-value
             vocab-renderer >>renderer
@@ -120,8 +120,8 @@ M: method-renderer row-value drop first ;
     1/2 track-add ;
 
 :: <methods-tab> ( profiler -- gadget )
-    { 0 1 } <track>
-        { 1 0 } <track>
+    vertical <track>
+        horizontal <track>
             profiler <generic-model> <profiler-table>
                 profiler generic>> >>selected-value
                 word-renderer >>renderer
@@ -141,7 +141,7 @@ M: method-renderer row-value drop first ;
 : <selection-model> ( -- model ) { f 0 } <model> ;
 
 : <profiler-gadget> ( -- profiler )
-    { 0 1 } profiler-gadget new-track
+    vertical profiler-gadget new-track
         [ [ first ] compare ] <model> >>sort
         all-words counters <model> >>words
         <selection-model> >>vocab

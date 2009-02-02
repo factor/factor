@@ -48,8 +48,8 @@ grid
     dupd add-gaps dim-sum v+ ;
 
 M: grid pref-dim*
-    dup gap>> swap compute-grid [ over ] dip
-    [ gap-sum ] 2bi@ (pair-up) ;
+    [ gap>> ] [ compute-grid ] bi
+    [ over ] dip [ gap-sum ] 2bi@ (pair-up) ;
 
 : do-grid ( dims grid quot -- )
     [ grid>> ] dip '[ _ 2each ] 2each ; inline

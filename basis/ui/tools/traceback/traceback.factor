@@ -24,11 +24,11 @@ TUPLE: traceback-gadget < track ;
 M: traceback-gadget pref-dim* drop { 550 600 } ;
 
 : <traceback-gadget> ( model -- gadget )
-    { 0 1 } traceback-gadget new-track
+    vertical traceback-gadget new-track
         swap >>model
 
     dup model>>
-        { 1 0 } <track>
+        horizontal <track>
             over <datastack-display> 1/2 track-add
             swap <retainstack-display> 1/2 track-add
         1/3 track-add

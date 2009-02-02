@@ -71,7 +71,7 @@ ARTICLE: "ui-glossary" "UI glossary"
     { "font" { "an instance of " { $link font } } }
     { "gadget" { "a graphical element which responds to user input. Gadgets are tuples which (directly or indirectly) inherit from " { $link gadget } "." } }
     { "label specifier" { "a string, " { $link f } " or a gadget. See " { $link "ui.gadgets.buttons" } } }
-    { "orientation specifier" { "one of " { $snippet "{ 0 1 }" } " or " { $snippet "{ 1 0 }" } ", with the former denoting vertical orientation and the latter denoting horizontal. Using a vector instead of symbolic constants allows these values to be directly useful in co-ordinate calculations" } }
+    { "orientation specifier" { "one of " { $link horizontal } " or " { $link vertical } } }
     { "point" "a pair of integers denoting a pixel location on screen" }
 } ;
 

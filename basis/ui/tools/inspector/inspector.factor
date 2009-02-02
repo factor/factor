@@ -66,7 +66,7 @@ M: hashtable make-slot-descriptions
         monospace-font >>font ;
 
 : <inspector-gadget> ( obj -- gadget )
-    { 0 1 } inspector-gadget new-track
+    vertical inspector-gadget new-track
         add-toolbar
         swap <model> >>model
         dup model>> <inspector-table> >>table

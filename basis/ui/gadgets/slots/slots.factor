@@ -65,7 +65,7 @@ TUPLE: slot-editor < track ref close-hook update-hook text ;
 } define-command
 
 : <slot-editor> ( close-hook update-hook ref -- gadget )
-    { 0 1 } slot-editor new-track
+    vertical slot-editor new-track
         swap >>ref
         swap >>update-hook
         swap >>close-hook

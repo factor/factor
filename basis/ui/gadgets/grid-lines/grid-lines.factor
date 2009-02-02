@@ -28,7 +28,7 @@ M: grid-lines draw-boundary
         [ grid set ]
         [ dim>> half-gap v- grid-dim set ]
         [ compute-grid ] tri
-        [ { 1 0 } draw-grid-lines ]
-        [ { 0 1 } draw-grid-lines ]
+        [ horizontal draw-grid-lines ]
+        [ vertical draw-grid-lines ]
         bi*
     ] with-scope ;

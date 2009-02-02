@@ -1,5 +1,5 @@
 USING: ui.gadgets help.markup help.syntax generic kernel
-classes.tuple quotations ;
+classes.tuple quotations ui.gadgets.packs.private ;
 IN: ui.gadgets.packs
 
 ARTICLE: "ui-pack-layout" "Pack layouts"
@@ -38,7 +38,7 @@ HELP: pack-layout
 
 HELP: <pack>
 { $values { "orientation" "an orientation specifier" } { "pack" "a new " { $link pack } } }
-{ $description "Creates a new pack which lays out children along the given axis. Children are laid out vertically if the orientation is " { $snippet "{ 0 1 }" } " and horizontally if the orientation is " { $snippet "{ 1 0 }" } "." } ;
+{ $description "Creates a new pack which lays out children with the given orientation, either " { $link horizontal } " or " { $link vertical } "." } ;
 
 { <pack> <pile> <shelf> } related-words
 

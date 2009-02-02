@@ -11,7 +11,7 @@ IN: ui.gadgets.labelled
 TUPLE: labelled-gadget < track content ;
 
 : <labelled-gadget> ( gadget title -- newgadget )
-    { 0 1 } labelled-gadget new-track
+    vertical labelled-gadget new-track
         swap <label> reverse-video-theme f track-add
         swap >>content
         dup content>> 1 track-add ;

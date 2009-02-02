@@ -1,67 +1,95 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences ui.gadgets kernel math math.functions
 math.vectors math.order math.geometry.rect namespaces accessors
-fry ;
+fry combinators arrays ;
 IN: ui.gadgets.packs
+
+SYMBOL: +baseline+
 
 TUPLE: pack < gadget
 { align initial: 0 } { fill initial: 0 } { gap initial: { 0 0 } } ;
 
-: packed-dim-2 ( gadget sizes -- list )
+<PRIVATE
+
+: (packed-dims) ( gadget sizes -- list )
     swap [ dim>> ] [ fill>> ] bi '[ _ over v- _ v*n v+ ] map ;
 
 : orient ( seq1 seq2 gadget -- seq )
     orientation>> '[ _ set-axis ] 2map ;
 
 : packed-dims ( gadget sizes -- seq )
-    [ packed-dim-2 ] [ nip ] [ drop ] 2tri orient ;
+    [ (packed-dims) ] [ nip ] [ drop ] 2tri orient ;
 
-: gap-locs ( gap sizes -- seq )
-    { 0 0 } [ v+ over v+ ] accumulate 2nip ;
+: gap-locs ( sizes gap -- seq )
+    [ { 0 0 } ] dip '[ v+ _ v+ ] accumulate nip ;
 
-: aligned-locs ( gadget sizes -- seq )
-    [ [ [ align>> ] [ dim>> ] bi ] dip v- n*v ] with map ;
+: numerically-aligned-locs ( sizes pack -- seq )
+    [ align>> ] [ dim>> ] bi '[ [ _ _ ] dip v- n*v ] map ;
 
-: packed-locs ( gadget sizes -- seq )
-    [ aligned-locs ] [ [ gap>> ] dip gap-locs ] [ drop ] 2tri orient ;
+: baseline-aligned-locs ( pack -- seq )
+    children>> [ baseline ] map [ supremum ] keep
+    [ - 0 swap 2array ] with map ;
+
+: aligned-locs ( sizes pack -- seq )
+    dup align>> +baseline+ eq?
+    [ nip baseline-aligned-locs ]
+    [ numerically-aligned-locs ]
+    if ;
+
+: packed-locs ( sizes pack -- seq )
+    [ aligned-locs ] [ gap>> gap-locs ] [ nip ] 2tri orient ;
 
 : round-dims ( seq -- newseq )
-    { 0 0 } swap
+    [ { 0 0 } ] dip
     [ swap v- dup [ ceiling >fixnum ] map [ swap v- ] keep ] map
     nip ;
 
+PRIVATE>
+
 : pack-layout ( pack sizes -- )
-    round-dims over children>>
-    [ dupd packed-dims ] dip
-    [ [ (>>dim) ] 2each ]
-    [ [ packed-locs ] dip [ (>>loc) ] 2each ] 2bi ;
+    [ round-dims packed-dims ] [ drop ] 2bi
+    [ children>> [ (>>dim) ] 2each ]
+    [ [ packed-locs ] [ children>> ] bi [ (>>loc) ] 2each ] 2bi ;
 
 : <pack> ( orientation -- pack )
     pack new-gadget
         swap >>orientation ;
 
-: <pile> ( -- pack ) { 0 1 } <pack> ;
+: <pile> ( -- pack ) vertical <pack> ;
 
 : <filled-pile> ( -- pack ) <pile> 1 >>fill ;
 
-: <shelf> ( -- pack ) { 1 0 } <pack> ;
+: <shelf> ( -- pack ) horizontal <pack> ;
 
-: gap-dims ( sizes gadget -- seeq )
-    [ [ dim-sum ] [ length 1 [-] ] bi ] [ gap>> ] bi* n*v v+ ;
+<PRIVATE
+
+: gap-dims ( gadget sizes -- seeq )
+    [ gap>> ] [ [ length 1 [-] ] [ dim-sum ] bi ] bi* [ v*n ] dip v+ ;
 
 : pack-pref-dim ( gadget sizes -- dim )
-    [ nip max-dim ]
-    [ swap gap-dims ]
-    [ drop orientation>> ]
-    2tri set-axis ;
+    [ nip max-dim ] [ gap-dims ] [ drop orientation>> ] 2tri set-axis ;
 
 M: pack pref-dim*
     dup children>> pref-dims pack-pref-dim ;
+
+: vertical-baseline ( pack -- y )
+    children>> [ 0 ] [ first baseline ] if-empty ;
+
+: horizontal-baseline ( pack -- y )
+    children>> [ baseline ] map supremum ;
+
+PRIVATE>
+
+M: pack baseline
+    dup orientation>> {
+        { vertical [ vertical-baseline ] }
+        { horizontal [ horizontal-baseline ] }
+    } case ;
 
 M: pack layout*
     dup children>> pref-dims pack-layout ;
 
 M: pack children-on ( rect gadget -- seq )
-    dup orientation>> swap children>>
+    [ orientation>> ] [ children>> ] bi
     [ fast-children-on ] keep <slice> ;

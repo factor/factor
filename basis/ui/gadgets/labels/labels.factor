@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables io kernel math namespaces
-make opengl sequences strings splitting ui.gadgets
-ui.gadgets.tracks fonts ui.render
-ui.text colors models ;
+USING: accessors arrays hashtables io kernel math math.functions
+namespaces make opengl sequences strings splitting ui.gadgets
+ui.gadgets.tracks ui.gadgets.packs fonts ui.render ui.text
+colors models ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.
@@ -35,7 +35,8 @@ M: label pref-dim*
     >label< text-dim ;
 
 M: label baseline
-    >label< line-metrics ascent>> ;
+    >label< dup string? [ first ] unless
+    line-metrics ascent>> ceiling ;
 
 M: label draw-gadget*
     >label< origin get draw-text ;
@@ -64,12 +65,20 @@ M: array >label <label> ;
 M: object >label ;
 M: f >label drop <gadget> ;
 
+<PRIVATE
+
+: label-on-left/right ( -- track )
+    horizontal <track>
+        +baseline+ >>align
+        { 5 5 } >>gap ; inline
+PRIVATE>
+
 : label-on-left ( gadget label -- button )
-    { 1 0 } <track>
+    label-on-left/right
         swap >label f track-add
         swap 1 track-add ;
 
 : label-on-right ( label gadget -- button )
-    { 1 0 } <track>
+    label-on-left/right
         swap f track-add
         swap >label 1 track-add ;

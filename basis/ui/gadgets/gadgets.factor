@@ -6,6 +6,10 @@ binary-search vectors dlists deques models threads
 concurrency.flags math.order math.geometry.rect fry ;
 IN: ui.gadgets
 
+! Values for orientation slot
+CONSTANT: horizontal { 1 0 }
+CONSTANT: vertical { 0 1 }
+
 TUPLE: gadget < rect pref-dim parent children orientation focus
 visible? root? clipped? layout-state graft-state graft-node
 interior boundary model ;
@@ -103,14 +107,14 @@ GENERIC: gadget-text* ( gadget -- )
 GENERIC: gadget-text-separator ( gadget -- str )
 
 M: gadget gadget-text-separator
-    orientation>> { 0 1 } = "\n" "" ? ;
+    orientation>> vertical = "\n" "" ? ;
 
 : gadget-seq-text ( seq gadget -- )
     gadget-text-separator swap
     [ dup % ] [ gadget-text* ] interleave drop ;
 
 M: gadget gadget-text*
-    dup children>> swap gadget-seq-text ;
+    [ children>> ] keep gadget-seq-text ;
 
 M: array gadget-text*
     [ gadget-text* ] each ;

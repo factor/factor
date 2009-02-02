@@ -150,15 +150,10 @@ M: checkmark-paint draw-interior
 : toggle-model ( model -- )
     [ not ] change-model ;
 
-: checkbox-theme ( gadget -- gadget )
-    f >>interior
-    { 5 5 } >>gap
-    1/2 >>align ; inline
-
 TUPLE: checkbox < button ;
 
 : <checkbox> ( model label -- checkbox )
-    <checkmark> label-on-right checkbox-theme
+    <checkmark> label-on-right
     [ model>> toggle-model ]
     checkbox new-button
         swap >>model
@@ -173,7 +168,7 @@ TUPLE: radio-paint < caching-pen color interior-vertices boundary-vertices ;
 
 <PRIVATE
 
-: circle-steps 8 ;
+CONSTANT: circle-steps 8
 
 PRIVATE>
 
@@ -223,12 +218,8 @@ M: radio-control model-changed
 :: <radio-controls> ( parent model assoc quot: ( value model label -- gadget ) -- parent )
     assoc model [ parent swap quot call add-gadget ] assoc-each ; inline
 
-: radio-button-theme ( gadget -- gadget )
-    { 5 5 } >>gap
-    1/2 >>align ; inline
-
 : <radio-button> ( value model label -- gadget )
-    <radio-knob> label-on-right radio-button-theme <radio-control> ;
+    <radio-knob> label-on-right <radio-control> ;
 
 : <radio-buttons> ( model assoc -- gadget )
     <filled-pile>

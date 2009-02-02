@@ -10,8 +10,10 @@ TUPLE: wrapper < gadget ;
 
 : <wrapper> ( child -- wrapper ) wrapper new-wrapper ;
 
-M: wrapper pref-dim* ( wrapper -- dim ) gadget-child pref-dim ;
+M: wrapper pref-dim* gadget-child pref-dim ;
 
-M: wrapper layout* ( wrapper -- ) [ dim>> ] [ gadget-child ] bi (>>dim) ;
+M: wrapper baseline gadget-child baseline ;
 
-M: wrapper focusable-child* ( wrapper -- child/t ) gadget-child ;
+M: wrapper layout* [ gadget-child ] [ dim>> ] bi >>dim drop ;
+
+M: wrapper focusable-child* gadget-child ;

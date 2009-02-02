@@ -39,7 +39,7 @@ M: world request-focus-on ( child gadget -- )
     [ 2drop ] [ dup focused?>> (request-focus) ] if ;
 
 : new-world ( gadget title status class -- world )
-    { 0 1 } swap new-track
+    vertical swap new-track
         t >>root?
         t >>active?
         H{ } clone >>fonts

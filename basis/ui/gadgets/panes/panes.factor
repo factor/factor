@@ -48,8 +48,8 @@ M: pane gadget-selection ( pane -- string/f )
 
 : new-pane ( class -- pane )
     new-gadget
-        { 0 1 } >>orientation
-        <shelf> >>prototype
+        vertical >>orientation
+        <shelf> +baseline+ >>align >>prototype
         <incremental> add-output
         dup prepare-line
         selection-color >>selection-color ;
@@ -231,7 +231,7 @@ MEMO: specified-font ( assoc -- font )
     page-color [ solid-interior ] apply-style ;
 
 : apply-border-width-style ( style gadget -- style gadget )
-    border-width [ <border> ] apply-style ;
+    border-width [ dup 2array <border> ] apply-style ;
 
 : style-pane ( style pane -- pane )
     apply-border-width-style

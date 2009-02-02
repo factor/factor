@@ -176,7 +176,7 @@ TUPLE: listener-gadget < tool input output scroller popup ;
     <scroller> ;
 
 : <listener-gadget> ( -- gadget )
-    { 0 1 } listener-gadget new-track
+    vertical listener-gadget new-track
         add-toolbar
         init-listener
         dup <listener-scroller> >>scroller

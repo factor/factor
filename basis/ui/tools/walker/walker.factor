@@ -58,7 +58,7 @@ M: walker-gadget focusable-child*
     '[ _ walker-state-string ] <filter> <label-control> ;
 
 : <walker-gadget> ( status continuation thread -- gadget )
-    { 0 1 } walker-gadget new-track
+    vertical walker-gadget new-track
         swap >>thread
         swap >>continuation
         swap >>status

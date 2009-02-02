@@ -242,6 +242,9 @@ M: editor draw-gadget*
 M: editor pref-dim*
     [ font>> ] [ control-value ] bi text-dim ;
 
+M: editor baseline
+    font>> "" line-metrics ascent>> ;
+
 : contents-changed ( model editor -- )
     swap
     over caret>> [ over validate-loc ] (change-model)
@@ -585,7 +588,7 @@ TUPLE: field < wrapper editor min-width max-width ;
     gray <solid> >>boundary ; inline
 
 : <field-border> ( gadget -- border )
-    2 <border>
+    { 2 2 } <border>
         { 1 0 } >>fill
         field-theme ;
 

@@ -9,7 +9,7 @@ TUPLE: incremental < pack cursor ;
 
 : <incremental> ( -- incremental )
     incremental new-gadget
-        { 0 1 } >>orientation
+        vertical >>orientation
         { 0 0 } >>cursor ;
 
 M: incremental pref-dim*

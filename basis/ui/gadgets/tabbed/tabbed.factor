@@ -7,7 +7,7 @@ IN: ui.gadgets.tabbed
 TUPLE: tabbed-gadget < track tabs book ;
 
 : <tabbed-gadget> ( -- gadget )
-    { 0 1 } tabbed-gadget new-track
+    vertical tabbed-gadget new-track
         0 <model> >>model
         <shelf> >>tabs
         dup tabs>> f track-add
