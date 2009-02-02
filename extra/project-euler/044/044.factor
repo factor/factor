@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.ranges project-euler.common sequences ;
+USING: kernel math math.functions math.ranges math.order
+project-euler.common sequences ;
 IN: project-euler.044
 
 ! http://projecteuler.net/index.php?section=problems&id=44
@@ -37,7 +38,7 @@ PRIVATE>
 
 : euler044 ( -- answer )
     2500 [1,b] [ nth-pentagonal ] map dup cartesian-product
-    [ first2 sum-and-diff? ] filter [ first2 - abs ] map infimum ;
+    [ first2 sum-and-diff? ] filter [ first2 - abs ] [ min ] map-reduce ;
 
 ! [ euler044 ] 10 ave-time
 ! 4996 ms ave run time - 87.46 SD (10 trials)
