@@ -16,13 +16,22 @@ HELP: once-at
 { $values { "value" object } { "key" object } { "assoc" assoc } }
 { $description "If the assoc does not contain the given key, adds the key/value pair to the assoc, otherwise does nothing." } ;
 
+HELP: >biassoc
+{ $values { "assoc" assoc } { "biassoc" biassoc } }
+{ $description "Costructs a new biassoc with the same key/value pairs as the given assoc." } ;
+
 ARTICLE: "biassocs" "Bidirectional assocs"
 "A " { $emphasis "bidirectional assoc" } " combines a pair of assocs to form a data structure where both normal assoc opeartions (eg, " { $link at } "), as well as " { $link "assocs-values" } " (eg, " { $link value-at } ") run in sub-linear time."
 $nl
-"Bidirectional assocs implement the entire assoc protocol with the exception of " { $link delete-at } ". Duplicate values are allowed, however value lookups with " { $link value-at } " only return the first key that a given value was stored with."
+"Bidirectional assocs implement the entire " { $link "assoc-protocol" } " with the exception of " { $link delete-at } ". Duplicate values are allowed, however value lookups with " { $link value-at } " only return the first key that a given value was stored with."
+$nl
+"The class of biassocs:"
 { $subsection biassoc }
 { $subsection biassoc? }
+"Creating new biassocs:"
 { $subsection <biassoc> }
-{ $subsection <bihash> } ;
+{ $subsection <bihash> }
+"Converting existing assocs to biassocs:"
+{ $subsection >biassoc } ;
 
 ABOUT: "biassocs"

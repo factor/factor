@@ -45,7 +45,7 @@ IN: io.encodings.8-bit
 : ch>byte ( assoc -- newassoc )
     [ swap ] assoc-map >hashtable ;
 
-: parse-file ( path -- byte>ch ch>byte )
+: parse-file ( stream -- byte>ch ch>byte )
     lines process-contents
     [ byte>ch ] [ ch>byte ] bi ;
 
