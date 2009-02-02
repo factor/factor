@@ -57,7 +57,11 @@ M: paragraph pref-dim*
     [ key>> ] 2dip 2array >>loc prefer ;
 
 : layout-line ( wrapped-line y -- )
-    [ dup word-x-coordinates ] dip '[ _ layout-word ] 2each ;
+    [
+        [ ]
+        [ word-x-coordinates ]
+        [ [ key>> ] map baseline-align ] tri
+    ] dip '[ _ + layout-word ] 3each ;
 
 M: paragraph layout*
     wrap-paragraph dup line-y-coordinates

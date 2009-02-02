@@ -102,6 +102,7 @@ M: method-renderer row-value drop first ;
 
 : <profiler-tool-bar> ( profiler -- gadget )
     <shelf>
+        +baseline+ >>align
         { 5 5 } >>gap
         over <toolbar> add-gadget
         "Sort by:" <label> add-gadget
