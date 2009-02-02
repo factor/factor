@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays generic hashtables kernel kernel.private
 math namespaces parser sequences strings words libc fry
-alien.c-types alien.structs.fields cpu.architecture ;
+alien.c-types alien.structs.fields cpu.architecture math.order ;
 IN: alien.structs
 
 TUPLE: struct-type size align fields ;
@@ -47,7 +47,7 @@ M: struct-type stack-size
     [ first2 <field-spec> ] with with map ;
 
 : compute-struct-align ( types -- n )
-    [ c-type-align ] map supremum ;
+    [ c-type-align ] [ max ] map-reduce ;
 
 : define-struct ( name vocab fields -- )
     [
@@ -59,5 +59,5 @@ M: struct-type stack-size
 
 : define-union ( name members -- )
     [ expand-constants ] map
-    [ [ heap-size ] map supremum ] keep
+    [ [ heap-size ] [ max ] map-reduce ] keep
     compute-struct-align f (define-struct) ;

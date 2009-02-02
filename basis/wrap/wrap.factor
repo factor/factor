@@ -1,32 +1,60 @@
-USING: sequences kernel namespaces make splitting math math.order ;
+USING: sequences kernel namespaces make splitting
+math math.order fry assocs accessors ;
 IN: wrap
 
-! Very stupid word wrapping/line breaking
-! This will be replaced by a Unicode-aware method,
-! which works with variable-width fonts
+! Word wrapping/line breaking -- not Unicode-aware
+
+TUPLE: word key width break? ;
+
+C: <word> word
+
+<PRIVATE
 
 SYMBOL: width
 
-: line-chunks ( string -- words-lines )
-    "\n" split [ " \t" split harvest ] map ;
+: break-here? ( column word -- ? )
+    break?>> not [ width get > ] [ drop f ] if ;
 
-: (split-chunk) ( words -- )
-    -1 over [ length + 1+ dup width get > ] find drop nip
-    [ 1 max cut-slice swap , (split-chunk) ] [ , ] if* ;
+: find-optimal-break ( words -- n )
+    [ 0 ] dip [ [ width>> + dup ] keep break-here? ] find drop nip ;
 
-: split-chunk ( words -- lines )
-    [ (split-chunk) ] { } make ;
+: (wrap) ( words -- )
+    dup find-optimal-break
+    [ 1 max cut-slice [ , ] [ (wrap) ] bi* ] [ , ] if* ;
 
-: join-spaces ( words-seqs -- lines )
-    [ [ " " join ] map ] map concat ;
+: intersperse ( seq elt -- seq' )
+    [ '[ _ , ] [ , ] interleave ] { } make ;
 
-: broken-lines ( string width -- lines )
+: split-lines ( string -- words-lines )
+    string-lines [
+        " \t" split harvest
+        [ dup length f <word> ] map
+        " " 1 t <word> intersperse
+    ] map ;
+
+: join-words ( wrapped-lines -- lines )
+    [
+        [ break?>> ]
+        [ trim-head-slice ]
+        [ trim-tail-slice ] bi
+        [ key>> ] map concat
+    ] map ;
+
+: join-lines ( strings -- string )
+    "\n" join ;
+
+PRIVATE>
+
+: wrap ( words width -- lines )
     width [
-        line-chunks [ split-chunk ] map join-spaces
+        [ (wrap) ] { } make
     ] with-variable ;
 
-: line-break ( string width -- newstring )
-    broken-lines "\n" join ;
+: wrap-lines ( lines width -- newlines )
+    [ split-lines ] dip '[ _ wrap join-words ] map concat ;
 
-: indented-break ( string width indent -- newstring )
-    [ length - broken-lines ] keep [ prepend ] curry map "\n" join ;
+: wrap-string ( string width -- newstring )
+    wrap-lines join-lines ;
+
+: wrap-indented-string ( string width indent -- newstring )
+    [ length - wrap-lines ] keep '[ _ prepend ] map join-lines ;
