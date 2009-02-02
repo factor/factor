@@ -69,7 +69,7 @@ M: string write-xml
     escape-string xml-pprint? get [
         dup [ blank? ] all?
         [ drop "" ]
-        [ nl 80 indent-string indented-break ] if
+        [ nl 80 indent-string wrap-indented-string ] if
     ] when write ;
 
 : write-tag ( tag -- )
