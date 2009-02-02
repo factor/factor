@@ -2,11 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences kernel io io.files combinators.short-circuit
 math.order values assocs io.encodings io.binary fry strings
-math io.encodings.utf8 arrays accessors splitting math.parser ;
+math io.encodings.ascii arrays accessors splitting math.parser
+biassocs ;
 IN: io.encodings.japanese
-
-! The code page used is Microsoft Code Page 932, 
-! which is a set of extensions to JIS X 0208:1997
 
 VALUE: shift-jis
 
@@ -14,16 +12,14 @@ VALUE: windows-31j
 
 <PRIVATE
 
-TUPLE: jis jis>ch ch>jis ;
+TUPLE: jis assoc ;
 
 : <jis> ( assoc -- jis )
-    [ nip ] assoc-filter
-    [ H{ } assoc-like ]
-    [ [ swap ] H{ } assoc-map-as ] bi
-    jis boa ;
+    [ nip ] assoc-filter H{ } assoc-like
+    >biassoc jis boa ;
 
-: ch>jis ( ch tuple -- jis ) ch>jis>> at [ encode-error ] unless* ;
-: jis>ch ( jis tuple -- string ) jis>ch>> at replacement-char or ;
+: ch>jis ( ch tuple -- jis ) assoc>> value-at [ encode-error ] unless* ;
+: jis>ch ( jis tuple -- string ) assoc>> at replacement-char or ;
 
 : process-jis ( lines -- assoc )
     [ "#" split1 drop ] map harvest [
@@ -32,7 +28,7 @@ TUPLE: jis jis>ch ch>jis ;
     ] map ;
 
 : make-jis ( filename -- jis )
-    utf8 file-lines process-jis <jis> ;
+    ascii file-lines process-jis <jis> ;
 
 "resource:basis/io/encodings/japanese/CP932.txt"
 make-jis to: windows-31j
@@ -45,7 +41,7 @@ make-jis to: shift-jis
     { [ 0 HEX: 7F between? ] [ HEX: A1 HEX: DF between? ] } 1|| ;
 
 : write-halfword ( stream halfword -- )
-    h>b/b swap 2array >string swap stream-write ;
+    h>b/b swap B{ } 2sequence swap stream-write ;
 
 M: jis encode-char
     swapd ch>jis
