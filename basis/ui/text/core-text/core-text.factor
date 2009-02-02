@@ -10,7 +10,7 @@ IN: ui.text.core-text
 SINGLETON: core-text-renderer
 
 M: core-text-renderer string-dim
-    [ " " string-dim { 0 1 } v* ] [ swap cached-line dim>> ] if-empty ;
+    [ " " string-dim { 0 1 } v* ] [ cached-line dim>> ] if-empty ;
 
 TUPLE: rendered-line line texture display-list age disposed ;
 
@@ -46,7 +46,7 @@ M: rendered-line dispose*
     [ texture>> delete-texture ]
     [ display-list>> delete-dlist ] tri ;
 
-: rendered-line ( string font -- rendered-line )
+: rendered-line ( font string -- rendered-line )
     world get fonts>>
     [ cached-line <rendered-line> ] 2cache 0 >>age ;
 
@@ -58,19 +58,21 @@ M: core-text-renderer finish-text-rendering
 
 M: core-text-renderer draw-string ( font string loc -- )
     [
-        swap rendered-line
-        display-list>> glCallList
+        rendered-line display-list>> glCallList
     ] with-translation ;
 
 M: core-text-renderer x>offset ( x font string -- n )
     [ 2drop 0 ] [
-        swap cached-line line>>
+        cached-line line>>
         swap 0 <CGPoint> CTLineGetStringIndexForPosition
     ] if-empty ;
 
 M: core-text-renderer offset>x ( n font string -- x )
-    swap cached-line line>> swap f
+    cached-line line>> swap f
     CTLineGetOffsetForStringIndex ;
+
+M: core-text-renderer line-metrics ( font string -- metrics )
+    cached-line metrics>> ;
 
 M: core-text-renderer free-fonts ( fonts -- )
     values dispose-each ;

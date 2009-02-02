@@ -34,14 +34,16 @@ TUPLE: font name size bold? italic? foreground background ;
 : serif-font ( -- font )
     <font>
         "serif" >>name
-        12 >>size ; foldable
+        12 >>size ;
 
 : sans-serif-font ( -- font )
     <font>
         "sans-serif" >>name
-        12 >>size ; foldable
+        12 >>size ;
 
 : monospace-font ( -- font )
     <font>
         "monospace" >>name
-        12 >>size ; foldable
+        12 >>size ;
+
+TUPLE: line-metrics width ascent descent leading ;

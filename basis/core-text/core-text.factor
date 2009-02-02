@@ -41,31 +41,29 @@ FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context ) ;
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
-TUPLE: line font line bounds dim bitmap age refs disposed ;
+TUPLE: line font line metrics dim bitmap age refs disposed ;
 
-TUPLE: typographic-bounds width ascent descent leading ;
-
-: line-typographic-bounds ( line -- typographic-bounds )
+: compute-line-metrics ( line -- line-metrics )
     0 <CGFloat> 0 <CGFloat> 0 <CGFloat>
     [ CTLineGetTypographicBounds ] 3keep [ *CGFloat ] tri@
-    typographic-bounds boa ;
+    line-metrics boa ;
 
 : bounds>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
     [ ceiling >fixnum ]
     bi@ 2array ;
 
-:: <line> ( string font -- line )
+:: <line> ( font string -- line )
     [
         [let* | open-font [ font cache-font CFRetain |CFRelease ]
                 line [ string open-font font foreground>> <CTLine> |CFRelease ]
-                bounds [ line line-typographic-bounds ]
+                metrics [ line compute-line-metrics ]
                 dim [ bounds bounds>dim ] |
             dim [
                 {
                     [ font background>> >rgba-components CGContextSetRGBFillColor ]
                     [ 0 0 dim first2 <CGRect> CGContextFillRect ]
-                    [ 0 bounds descent>> CGContextSetTextPosition ]
+                    [ 0 metrics descent>> CGContextSetTextPosition ]
                     [ line swap CTLineDraw ]
                 } cleave
             ] with-bitmap-context
@@ -84,7 +82,7 @@ M: line dispose* [ font>> CFRelease ] [ line>> CFRelease ] bi ;
 
 SYMBOL: cached-lines
 
-: cached-line ( string font -- line )
+: cached-line ( font string -- line )
     cached-lines get [ <line> ] 2cache ;
 
 CONSTANT: max-line-age 10
