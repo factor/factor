@@ -2,12 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays documents documents.elements kernel math
 models models.filter namespaces locals fry make opengl opengl.gl
-sequences strings math.vectors sorting colors combinators assocs
-math.order fry calendar alarms continuations ui.clipboards ui.commands
-ui.gadgets ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.theme ui.gadgets.menus
-ui.gadgets.wrappers ui.render ui.text ui.gestures math.geometry.rect
-splitting unicode.categories fonts ;
+sequences strings math.vectors math.functions sorting colors
+combinators assocs math.order fry calendar alarms continuations
+ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
+ui.gadgets.theme ui.gadgets.menus ui.gadgets.wrappers ui.render
+ui.text ui.gestures math.geometry.rect splitting unicode.categories
+fonts ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget
@@ -133,7 +134,7 @@ M: editor ungraft*
     [ stop-blinking ] [ f >>focused? relayout-1 ] bi ;
 
 : loc>x ( loc editor -- x )
-    [ first2 swap ] dip [ editor-line ] [ font>> ] bi swap offset>x ;
+    [ first2 swap ] dip [ editor-line ] [ font>> ] bi swap offset>x round ;
 
 : line>y ( lines# editor -- y )
     line-height * ;
@@ -222,7 +223,7 @@ M: editor ungraft*
 
 : draw-selected-line ( start end n -- )
     [ start/end-on-line ] keep
-    tuck [ swap 2array editor get loc>x ] 2bi@
+    [ swap 2array editor get loc>x ] curry bi@
     (draw-selection) ;
 
 : draw-selection ( -- )
@@ -347,7 +348,7 @@ M: editor gadget-text* editor-string % ;
     dupd editor-select-next mark>caret ;
 
 : editor-select ( from to editor -- )
-    tuck [ mark>> set-model ] [ caret>> set-model ] 2bi* ;
+    [ mark>> set-model ] [ caret>> set-model ] bi-curry bi* ;
 
 : select-elt ( editor elt -- )
     [ [ [ editor-caret ] [ model>> ] bi ] dip prev/next-elt ] [ drop ] 2bi

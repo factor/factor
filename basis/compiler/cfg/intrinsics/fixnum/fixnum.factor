@@ -70,7 +70,7 @@ IN: compiler.cfg.intrinsics.fixnum
     ds-push ;
 
 : emit-fixnum-comparison ( node cc -- )
-    [ '[ _ ^^compare ] ] [ '[ _ ^^compare-imm ] ] bi
+    [  ^^compare ] [ ^^compare-imm ] bi-curry
     emit-fixnum-op ;
 
 : emit-bignum>fixnum ( -- )

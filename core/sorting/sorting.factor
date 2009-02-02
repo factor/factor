@@ -137,9 +137,9 @@ TUPLE: merge
         [ drop nip nth ] dip push
     ] [
         [
-            [ tuck [ nth-unsafe ] 2bi@ 2dup ] dip call +gt+ eq?
+            [ [ nth-unsafe ] curry bi@ 2dup ] dip call +gt+ eq?
             [ swap ] when
-        ] dip tuck [ push ] 2bi@
+        ] dip [ push ] curry bi@
     ] if ; inline
 
 : sort-pairs ( merge quot -- )

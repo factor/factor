@@ -36,7 +36,7 @@ TUPLE: frame < grid ;
     [ [ first ] [ third ] bi v+ [v-] ] keep set-second ;
 
 : fill-center ( dim horiz vert -- )
-    [ over ] dip [ (fill-center) ] 2bi@ ;
+    [ (fill-center) ] bi-curry@ bi ;
 
 M: frame layout*
     dup compute-grid

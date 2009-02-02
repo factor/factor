@@ -178,8 +178,8 @@ M: table draw-gadget*
             {
                 [ draw-selected ]
                 [ draw-columns ]
-                [ draw-moused ]
                 [ draw-rows ]
+                [ draw-moused ]
             } cleave
         ] with-translation
     ] if ;
@@ -295,7 +295,8 @@ PRIVATE>
 
 : show-table-menu ( table -- )
     [
-        tuck [ nth-row drop ] [ renderer>> row-value ] [ hook>> ] tri
+        [ nip ]
+        [ [ nth-row drop ] [ renderer>> row-value ] [ hook>> ] tri ] 2bi
         show-operations-menu
     ] [ drop ] if-mouse-row ;
 

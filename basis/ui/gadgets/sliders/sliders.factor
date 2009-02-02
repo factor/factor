@@ -129,16 +129,15 @@ M: elevator layout*
     '[ _ swap find-slider slide-by-line ] <repeat-button>
     swap >>orientation ;
 
-: elevator, ( gadget orientation -- gadget )
-    tuck <elevator> >>elevator
-    swap <thumb> >>thumb
-    dup elevator>> over thumb>> add-gadget
+: add-elevator ( gadget orientation -- gadget )
+    [ <elevator> >>elevator ] [ <thumb> >>thumb ] bi
+    dup [ elevator>> ] [ thumb>> ] bi add-gadget
     @center grid-add ;
 
-: <left-button>  ( -- button ) { 0 1 } arrow-left -1 <slide-button> ;
+: <left-button> ( -- button ) { 0 1 } arrow-left -1 <slide-button> ;
 : <right-button> ( -- button ) { 0 1 } arrow-right 1 <slide-button> ;
-: <up-button>    ( -- button ) horizontal arrow-up   -1 <slide-button> ;
-: <down-button>  ( -- button ) horizontal arrow-down  1 <slide-button> ;
+: <up-button> ( -- button ) horizontal arrow-up -1 <slide-button> ;
+: <down-button> ( -- button ) horizontal arrow-down  1 <slide-button> ;
 
 : <slider> ( range orientation -- slider )
     slider new-frame
@@ -149,16 +148,16 @@ M: elevator layout*
 : <x-slider> ( range -- slider )
     horizontal <slider>
         <left-button> @left grid-add
-        vertical elevator,
+        vertical add-elevator
         <right-button> @right grid-add ;
 
 : <y-slider> ( range -- slider )
     vertical <slider>
         <up-button> @top grid-add
-        horizontal elevator,
+        horizontal add-elevator
         <down-button> @bottom grid-add ;
 
 M: slider pref-dim*
-    dup call-next-method
-    swap orientation>> [ 40 v*n ] keep
+    [ call-next-method ] [ orientation>> ] bi
+    [ 40 v*n ] keep
     set-axis ;

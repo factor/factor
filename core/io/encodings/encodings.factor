@@ -74,7 +74,8 @@ M: decoder stream-read1
     } cond ; inline
 
 M: decoder stream-read
-    tuck >decoder< [ decode-char ] 2curry (read) finish-read fix-read ;
+    [ nip ] [ >decoder< [ decode-char ] 2curry (read) finish-read ] 2bi
+    fix-read ;
 
 M: decoder stream-read-partial stream-read ;
 

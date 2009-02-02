@@ -15,12 +15,12 @@ GENERIC: random-32* ( tuple -- r )
 GENERIC: random-bytes* ( n tuple -- byte-array )
 
 M: object random-bytes* ( n tuple -- byte-array )
-    [ [ <byte-vector> ] keep 4 /mod ] dip tuck
+    [ [ <byte-vector> ] keep 4 /mod ] dip
     [ pick '[ _ random-32* 4 >le _ push-all ] times ]
     [
         over zero?
         [ 2drop ] [ random-32* 4 >le swap head over push-all ] if
-    ] 2bi* ;
+    ] bi-curry bi* ;
 
 M: object random-32* ( tuple -- r ) 4 random-bytes* le> ;
 

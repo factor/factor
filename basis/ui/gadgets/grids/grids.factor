@@ -8,7 +8,8 @@ IN: ui.gadgets.grids
 TUPLE: grid < gadget
 grid
 { gap initial: { 0 0 } }
-{ fill? initial: t } ;
+{ fill? initial: t }
+align ;
 
 : new-grid ( children class -- grid )
     new-gadget
@@ -49,7 +50,7 @@ grid
 
 M: grid pref-dim*
     [ gap>> ] [ compute-grid ] bi
-    [ over ] dip [ gap-sum ] 2bi@ (pair-up) ;
+    [ gap-sum ] bi-curry@ bi (pair-up) ;
 
 : do-grid ( dims grid quot -- )
     [ grid>> ] dip '[ _ 2each ] 2each ; inline
@@ -58,7 +59,7 @@ M: grid pref-dim*
     [ gap>> dup ] dip add-gaps swap [ v+ ] accumulate nip ;
 
 : position-grid ( grid horiz vert -- )
-    pick [ [ over ] dip [ grid-positions ] 2bi@ pair-up ] dip
+    pick [ [ grid-positions ] bi-curry@ bi pair-up ] dip
     [ (>>loc) ] do-grid ;
 
 : resize-grid ( grid horiz vert -- )

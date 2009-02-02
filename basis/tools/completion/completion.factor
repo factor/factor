@@ -65,9 +65,8 @@ IN: tools.completion
     [ second >lower swap complete ] keep 2array ;
 
 : completions ( short candidates -- seq )
-    [ '[ _ ] ]
-    [ '[ >lower _ [ completion ] with map rank-completions ] ] bi
-    if-empty ;
+    [ ] [ [ >lower ] dip [ completion ] with map rank-completions ]
+    bi-curry if-empty ;
 
 : name-completions ( str seq -- seq' )
     [ dup name>> ] { } map>assoc completions ;
