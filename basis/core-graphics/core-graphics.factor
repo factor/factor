@@ -112,7 +112,7 @@ FUNCTION: void* CGBitmapContextGetData ( CGContextRef c ) ;
     product "uint" heap-size * ;
 
 : malloc-bitmap-data ( dim -- alien )
-    bitmap-size malloc &free ;
+    bitmap-size 1 calloc &free ;
 
 : bitmap-color-space ( -- color-space )
     CGColorSpaceCreateDeviceRGB &CGColorSpaceRelease ;
