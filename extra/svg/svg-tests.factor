@@ -1,6 +1,6 @@
 ! (c)2009 Joe Groff, see BSD license
-USING: arrays literals math math.affine-transforms math.functions multiline
-svg tools.test ;
+USING: accessors arrays literals math math.affine-transforms
+math.functions multiline sequences svg tools.test xml xml.utilities ;
 IN: svg.tests
 
 { 1.0 2.25 } { -3.0 4.0 } { 5.5 0.000001 } <affine-transform> 1array [
@@ -94,3 +94,18 @@ IN: svg.tests
     A 5 6 7 1 0 8 9
     "> svg-path>array
 ] unit-test
+
+STRING: test-svg-string
+<svg xmlns="http://www.w3.org/2000/svg">
+        <path transform="translate(1 2)" d="M -1 -1 l 2 2" />
+</svg>
+;
+
+: test-svg-path
+    test-svg-string string>xml body>> children-tags first ;
+
+[ { T{ moveto f { -1.0 -1.0 } f } T{ lineto f { 2.0 2.0 } t } } ]
+[ test-svg-path tag-d ] unit-test
+
+[ T{ affine-transform f { 1.0 0.0 } { 0.0 1.0 } { 1.0 2.0 } } ]
+[ test-svg-path tag-transform ] unit-test

@@ -8,8 +8,10 @@ IN: xml.utilities
 : children>string ( tag -- string )
     children>> {
         { [ dup empty? ] [ drop "" ] }
-        { [ dup [ string? not ] any? ]
-          [ "XML tag unexpectedly contains non-text children" throw ] }
+        {
+            [ dup [ string? not ] any? ]
+            [ "XML tag unexpectedly contains non-text children" throw ]
+        }
         [ concat ]
     } cond ;
 
@@ -22,20 +24,24 @@ IN: xml.utilities
 : tag-named? ( name elem -- ? )
     dup tag? [ names-match? ] [ 2drop f ] if ;
 
-: tags@ ( tag name -- children name )
-    [ { } like ] dip assure-name ;
-
-: deep-tag-named ( tag name/string -- matching-tag )
-    assure-name '[ _ swap tag-named? ] deep-find ;
-
-: deep-tags-named ( tag name/string -- tags-seq )
-    tags@ '[ _ swap tag-named? ] deep-filter ;
-
 : tag-named ( tag name/string -- matching-tag )
-    assure-name swap [ tag-named? ] with find nip ;
+    assure-name '[ _ swap tag-named? ] find nip ;
 
 : tags-named ( tag name/string -- tags-seq )
-    tags@ swap [ tag-named? ] with filter ;
+    assure-name '[ _ swap tag-named? ] filter { } like ;
+
+<PRIVATE
+
+: prepare-deep ( xml name/string -- tag name/string )
+    [ dup xml? [ body>> ] when ] [ assure-name ] bi* ;
+
+PRIVATE>
+
+: deep-tag-named ( tag name/string -- matching-tag )
+    prepare-deep '[ _ swap tag-named? ] deep-find ;
+
+: deep-tags-named ( tag name/string -- tags-seq )
+    prepare-deep '[ _ swap tag-named? ] deep-filter { } like ;
 
 : tag-with-attr? ( elem attr-value attr-name -- ? )
     rot dup tag? [ swap attr = ] [ 3drop f ] if ;
@@ -44,13 +50,13 @@ IN: xml.utilities
     assure-name '[ _ _ tag-with-attr? ] find nip ;
 
 : tags-with-attr ( tag attr-value attr-name -- tags-seq )
-    tags@ '[ _ _ tag-with-attr? ] filter children>> ;
+    assure-name '[ _ _ tag-with-attr? ] filter children>> ;
 
 : deep-tag-with-attr ( tag attr-value attr-name -- matching-tag )
     assure-name '[ _ _ tag-with-attr? ] deep-find ;
 
 : deep-tags-with-attr ( tag attr-value attr-name -- tags-seq )
-    tags@ '[ _ _ tag-with-attr? ] deep-filter ;
+    assure-name '[ _ _ tag-with-attr? ] deep-filter ;
 
 : get-id ( tag id -- elem )
     "id" deep-tag-with-attr ;
