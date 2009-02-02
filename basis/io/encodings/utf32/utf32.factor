@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel io.encodings combinators io io.encodings.utf16
-generalizations sequences ;
+sequences io.binary ;
 IN: io.encodings.utf32
 
 SINGLETON: utf32be
@@ -12,62 +12,31 @@ SINGLETON: utf32
 
 <PRIVATE
 
-: 4spin ( a b c d -- b c d a )
-    4 nrev ; inline
-
 ! Decoding
 
-: stream-read4 ( stream -- a b c d )
-    {
-        [ stream-read1 ]
-        [ stream-read1 ]
-        [ stream-read1 ]
-        [ stream-read1 ]
-    } cleave ;
-
-: with-replacement ( _ _ _ ch quot -- new-ch )
-    [ 3drop replacement-char ] if* ; inline
-
-: >char ( d c b a -- abcd )
-    [
-        24 shift -roll [
-            16 shift -rot [
-                8 shift swap [
-                    bitor bitor bitor
-                ] with-replacement
-            ] with-replacement
-        ] with-replacement
-    ] with-replacement ;
+: char> ( stream encoding quot -- ch )
+    nip swap 4 swap stream-read dup length {
+        { 0 [ 2drop f ] }
+        { 4 [ swap call ] }
+        [ 3drop replacement-char ]
+    } case ; inline
 
 M: utf32be decode-char
-    drop stream-read4 4spin
-    [ >char ] [ 3drop f ] if* ;
+    [ be> ] char> ;
 
 M: utf32le decode-char
-    drop stream-read4 4 npick
-    [ >char ] [ 2drop 2drop f ] if ;
+    [ le> ] char> ;
 
 ! Encoding
 
-: split-off ( ab -- b a )
-    [ HEX: FF bitand ] [ -8 shift ] bi ;
-
-: char> ( abcd -- d b c a )
-    split-off split-off split-off ;
-
-: stream-write4 ( d c b a stream -- )
-    {
-        [ stream-write1 ]
-        [ stream-write1 ]
-        [ stream-write1 ]
-        [ stream-write1 ]
-    } cleave ;
+: >char ( char stream encoding quot -- )
+    nip 4 swap curry dip stream-write ; inline
 
 M: utf32be encode-char
-    drop [ char> ] dip stream-write4 ;
+    [ >be ] >char ;
 
 M: utf32le encode-char
-    drop [ char> 4spin ] dip stream-write4 ;
+    [ >le ] >char ;
 
 ! UTF-32
 
