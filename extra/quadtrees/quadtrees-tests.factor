@@ -199,4 +199,3 @@ IN: quadtrees.tests
         >alist natural-sort
 ] unit-test
 
-

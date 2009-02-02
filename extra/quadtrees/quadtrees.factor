@@ -21,6 +21,7 @@ DEFER: insert
 DEFER: erase
 DEFER: at-point
 DEFER: quadtree>alist
+DEFER: quadtree-size
 DEFER: node-insert
 DEFER: in-rect*
 
@@ -144,6 +145,14 @@ DEFER: in-rect*
 : quadtree>alist ( tree -- assoc )
     dup leaf?>> [ leaf>alist ] [ node>alist ] if ;
 
+: leaf-size ( leaf -- count )
+    point>> [ 1 ] [ 0 ] if ;
+: node-size ( node -- count )
+    0 swap [ quadtree-size + ] each-quadrant ; 
+    
+: quadtree-size ( tree -- count )
+    dup leaf?>> [ leaf-size ] [ node-size ] if ;
+
 : leaf= ( a b -- ? ) [ [ point>> ] [ value>> ] bi 2array ] bi@ = ;
 
 : node= ( a b -- ? ) [ {quadrants} ] bi@ = ;
@@ -166,7 +175,7 @@ M: quadtree equal? ( a b -- ? )
 INSTANCE: quadtree assoc
 
 M: quadtree at* ( key assoc -- value/f ? ) at-point ;
-M: quadtree assoc-size ( assoc -- n ) quadtree>alist length ; ! XXX implement proper
+M: quadtree assoc-size ( assoc -- n ) quadtree-size ;
 M: quadtree >alist ( assoc -- alist ) quadtree>alist ;
 M: quadtree set-at ( value key assoc -- ) insert ;
 M: quadtree delete-at ( key assoc -- ) erase ;
