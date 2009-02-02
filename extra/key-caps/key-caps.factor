@@ -174,7 +174,7 @@ M: key-caps-gadget handle-gesture
 : key-caps ( -- )
     [
         open-game-input
-        <key-caps-gadget> 5 <border> "Key Caps" open-window
+        <key-caps-gadget> { 5 5 } <border> "Key Caps" open-window
     ] with-ui ;
 
 MAIN: key-caps

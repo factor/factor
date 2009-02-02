@@ -5,7 +5,7 @@ HELP: border
 { $class-description "A border gadget contains a single child and centers it, with a fixed-width border. Borders are created by calling " { $link <border> } "." } ;
 
 HELP: <border>
-{ $values { "child" gadget } { "gap" integer } { "border" "a new " { $link border } } }
+{ $values { "child" gadget } { "gap" "a pair of integers" } { "border" "a new " { $link border } } }
 { $description "Creates a new border around the child with the specified horizontal and vertical gap." } ;
 
 ARTICLE: "ui.gadgets.borders" "Border gadgets"

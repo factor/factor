@@ -26,7 +26,7 @@ IN: ui.gadgets.menus
 : <commands-menu> ( target hook commands -- menu )
     [ <filled-pile> ] 3dip
     [ <menu-item> add-gadget ] with with each
-    5 <border> menu-theme ;
+    { 5 5 } <border> menu-theme ;
 
 : show-commands-menu ( target commands -- )
     [ dup [ ] ] dip <commands-menu> show-menu ;

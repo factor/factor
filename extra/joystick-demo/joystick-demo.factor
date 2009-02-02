@@ -76,7 +76,7 @@ M: axis-gadget pref-dim* drop SIZE ;
 TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
 
 : add-gadget-with-border ( parent child -- parent )
-    2 <border> gray <solid> >>boundary add-gadget ;
+    { 2 2 } <border> gray <solid> >>boundary add-gadget ;
 
 : add-controller-label ( gadget controller -- gadget )
     [ >>controller ] [ product-string <label> add-gadget ] bi ;

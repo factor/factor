@@ -13,7 +13,7 @@ IN: hello-unicode
             "안녕하세요" print
             "שָׁלוֹם " print
         ] with-style
-    ] make-pane 10 <border> ;
+    ] make-pane { 10 10 } <border> ;
 
 : hello-unicode ( -- ) <hello-gadget> "გამარჯობა" open-window ;
 

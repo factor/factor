@@ -104,16 +104,16 @@ deploy-gadget "toolbar" f {
 
 : <deploy-gadget> ( vocab -- gadget )
     deploy-gadget new-gadget
-      over                           >>vocab
-      { 0 1 }                        >>orientation
-      swap <deploy-settings>         >>settings    
-      dup settings>>                 add-gadget
-      dup <toolbar> { 10 10 } >>gap  add-gadget
+      over >>vocab
+      vertical >>orientation
+      swap <deploy-settings> >>settings
+      dup settings>> add-gadget
+      dup <toolbar> { 10 10 } >>gap add-gadget
     deploy-settings-theme
     dup com-revert ;
     
 : deploy-tool ( vocab -- )
     vocab-name
-    [ <deploy-gadget> 10 <border> ]
+    [ <deploy-gadget> { 10 10 } <border> ]
     [ "Deploying \"" "\"" surround ] bi
     open-window ;

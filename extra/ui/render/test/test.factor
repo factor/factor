@@ -59,11 +59,11 @@ M: take-screenshot draw-boundary
         <gadget>
             black <solid> >>interior
             { 98 98 } >>dim
-        1 <border> add-gadget
+        { 1 1 } <border> add-gadget
         <gadget>
             gray <solid> >>boundary
             { 94 94 } >>dim
-        3 <border>
+        { 3 3 } <border>
             red <solid> >>boundary
         add-gadget
             <line-gadget> <line-gadget> <line-gadget> 3array
@@ -77,7 +77,7 @@ M: take-screenshot draw-boundary
             { 14 14 } >>dim
             black <checkmark-paint> >>interior
             black <solid> >>boundary
-        4 <border>
+        { 4 4 } <border>
         add-gadget ;
     
 : ui-render-test ( -- )
