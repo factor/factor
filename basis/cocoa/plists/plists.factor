@@ -32,7 +32,7 @@ DEFER: plist>
     [ plist> ] NSFastEnumeration-map ;
 
 : (plist-NSDictionary>) ( NSDictionary -- hashtable )
-    dup [ tuck -> valueForKey: [ plist> ] bi@ 2array ] with
+    dup [ [ nip ] [ -> valueForKey: ] 2bi [ plist> ] bi@ 2array ] with
     NSFastEnumeration-map >hashtable ;
 
 : (read-plist) ( NSData -- id )
