@@ -176,7 +176,16 @@ IN: quadtrees.tests
         assoc-size
 ] unit-test
 
-[ 8 ] [
+[ {
+    { { -0.75 -0.75 } "b" }
+    { { -0.75  0.75 } "d" }
+    { { -0.25 -0.25 } "a" }
+    { { -0.25  0.25 } "c" }
+    { {  0.25 -0.25 } "e" }
+    { {  0.25  0.25 } "g" }
+    { {  0.75 -0.75 } "f" }
+    { {  0.75  0.75 } "h" }
+} ] [
     unit-bounds <quadtree>
         "a" { -0.25 -0.25 } value>>key
         "b" { -0.75 -0.75 } value>>key
@@ -187,7 +196,7 @@ IN: quadtrees.tests
         "g" {  0.25  0.25 } value>>key
         "h" {  0.75  0.75 } value>>key
 
-        assoc-size
+        >alist natural-sort
 ] unit-test
 
 
