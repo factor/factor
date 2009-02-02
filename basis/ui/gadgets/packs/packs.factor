@@ -28,8 +28,10 @@ TUPLE: pack < gadget
     [ align>> ] [ dim>> ] bi '[ [ _ _ ] dip v- n*v ] map ;
 
 : baseline-aligned-locs ( pack -- seq )
-    children>> [ baseline ] map [ supremum ] keep
-    [ - 0 swap 2array ] with map ;
+    children>> [ { } ] [
+        [ baseline ] map [ supremum ] keep
+        [ - 0 swap 2array ] with map
+    ] if-empty ;
 
 : aligned-locs ( sizes pack -- seq )
     dup align>> +baseline+ eq?
@@ -77,7 +79,7 @@ M: pack pref-dim*
     children>> [ 0 ] [ first baseline ] if-empty ;
 
 : horizontal-baseline ( pack -- y )
-    children>> [ baseline ] map supremum ;
+    children>> [ baseline ] [ max ] map-reduce ;
 
 PRIVATE>
 
