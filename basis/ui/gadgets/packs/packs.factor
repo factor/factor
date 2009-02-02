@@ -5,8 +5,6 @@ math.vectors math.order math.geometry.rect namespaces accessors
 fry combinators arrays ;
 IN: ui.gadgets.packs
 
-SYMBOL: +baseline+
-
 TUPLE: pack < gadget
 { align initial: 0 } { fill initial: 0 } { gap initial: { 0 0 } } ;
 
@@ -28,10 +26,7 @@ TUPLE: pack < gadget
     [ align>> ] [ dim>> ] bi '[ [ _ _ ] dip v- n*v ] map ;
 
 : baseline-aligned-locs ( pack -- seq )
-    children>> [ { } ] [
-        [ baseline ] map [ supremum ] keep
-        [ - 0 swap 2array ] with map
-    ] if-empty ;
+    children>> baseline-align [ 0 swap 2array ] map ;
 
 : aligned-locs ( sizes pack -- seq )
     dup align>> +baseline+ eq?

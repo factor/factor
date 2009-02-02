@@ -30,7 +30,7 @@ TUPLE: browser-gadget < tool pane scroller search-field ;
 
 : <browser-toolbar> ( browser -- toolbar )
     <shelf>
-        +baseline+ >>align
+        1/2 >>align
         { 5 5 } >>gap
         over <toolbar> add-gadget
         swap search-field>> "Search:" label-on-left add-gadget ;

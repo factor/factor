@@ -18,9 +18,9 @@ TUPLE: search-field < track field ;
 : <search-field> ( model -- gadget )
     horizontal search-field new-track
         { 5 5 } >>gap
-        "Search:" <label> f track-add
+        +baseline+ >>align
         swap <model-field> 10 >>min-width >>field
-        dup field>> 1 track-add
+        dup field>> "Search:" label-on-left 1 track-add
         dup <clear-button> f track-add ;
 
 TUPLE: search-table < track table field ;

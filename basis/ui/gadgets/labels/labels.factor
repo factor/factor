@@ -36,7 +36,7 @@ M: label pref-dim*
 
 M: label baseline
     >label< dup string? [ first ] unless
-    line-metrics ascent>> ceiling ;
+    line-metrics ascent>> round ;
 
 M: label draw-gadget*
     >label< origin get draw-text ;
