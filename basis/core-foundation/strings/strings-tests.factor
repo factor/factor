@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: core-foundation.strings core-foundation tools.test kernel ;
+USING: core-foundation.strings core-foundation tools.test kernel
+strings ;
 IN: core-foundation
 
 [ ] [ "Hello" <CFString> CFRelease ] unit-test
@@ -9,3 +10,6 @@ IN: core-foundation
 [ "Hello\u013456" ] [ "Hello\u013456" <CFString> [ CF>string ] [ CFRelease ] bi ] unit-test
 [ ] [ "\0" <CFString> CFRelease ] unit-test
 [ "\0" ] [ "\0" <CFString> [ CF>string ] [ CFRelease ] bi ] unit-test
+
+! This shouldn't fail
+[ ] [ { HEX: 123456 } >string <CFString> CFRelease ] unit-test
