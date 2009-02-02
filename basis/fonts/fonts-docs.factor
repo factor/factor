@@ -34,6 +34,8 @@ ARTICLE: "fonts" "Fonts"
 "Useful constants:"
 { $subsection monospace-font }
 { $subsection sans-serif-font }
-{ $subsection serif-font } ;
+{ $subsection serif-font }
+"A data type for font metrics. The " { $vocab-link "fonts" } " vocabulary does not provide any means of computing font metrics, it simply defines a common data type that other vocabularies, such as " { $vocab-link "ui.text" } " may use:"
+{ $subsection metrics } ;
 
 ABOUT: "fonts"

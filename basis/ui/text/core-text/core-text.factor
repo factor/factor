@@ -72,7 +72,9 @@ M: core-text-renderer offset>x ( n font string -- x )
     CTLineGetOffsetForStringIndex ;
 
 M: core-text-renderer line-metrics ( font string -- metrics )
-    cached-line metrics>> ;
+    [ " " line-metrics clone 0 >>width ]
+    [ cached-line metrics>> ]
+    if-empty ;
 
 M: core-text-renderer free-fonts ( fonts -- )
     values dispose-each ;

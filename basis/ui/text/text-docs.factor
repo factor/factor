@@ -55,6 +55,7 @@ ARTICLE: "text-rendering" "Rendering text"
 { $subsection text-dim }
 { $subsection text-width }
 { $subsection text-height }
+{ $subsection line-metrics }
 "Converting screen locations to string offsets, and vice versa:"
 { $subsection x>offset }
 { $subsection offset>x }

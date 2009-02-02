@@ -50,7 +50,7 @@ M: sequence text-dim
 
 : text-height ( font text -- h ) text-dim second ;
 
-HOOK: text-metrics font-renderer ( font string -- metrics )
+HOOK: line-metrics font-renderer ( font string -- metrics )
 
 GENERIC# draw-text 1 ( font text loc -- )
 

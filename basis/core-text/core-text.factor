@@ -46,7 +46,7 @@ TUPLE: line font line metrics dim bitmap age refs disposed ;
 : compute-line-metrics ( line -- line-metrics )
     0 <CGFloat> 0 <CGFloat> 0 <CGFloat>
     [ CTLineGetTypographicBounds ] 3keep [ *CGFloat ] tri@
-    line-metrics boa ;
+    metrics boa ;
 
 : bounds>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
@@ -58,16 +58,16 @@ TUPLE: line font line metrics dim bitmap age refs disposed ;
         [let* | open-font [ font cache-font CFRetain |CFRelease ]
                 line [ string open-font font foreground>> <CTLine> |CFRelease ]
                 metrics [ line compute-line-metrics ]
-                dim [ bounds bounds>dim ] |
+                dim [ metrics bounds>dim ] |
             dim [
                 {
                     [ font background>> >rgba-components CGContextSetRGBFillColor ]
                     [ 0 0 dim first2 <CGRect> CGContextFillRect ]
-                    [ 0 metrics descent>> CGContextSetTextPosition ]
+                    [ 0 metrics descent>> ceiling CGContextSetTextPosition ]
                     [ line swap CTLineDraw ]
                 } cleave
             ] with-bitmap-context
-            [ open-font line bounds dim ] dip 0 0 f
+            [ open-font line metrics dim ] dip 0 0 f
         ]
         line boa
     ] with-destructors ;

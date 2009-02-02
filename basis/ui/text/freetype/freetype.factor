@@ -86,10 +86,10 @@ SYMBOL: dpi
     face-size face-size-y-scale FT_MulFix ;
 
 : init-ascent ( font face -- font )
-    dup face-y-max swap font-units>pixels >>ascent ; inline
+    [ face-y-max ] keep font-units>pixels >>ascent ; inline
 
 : init-descent ( font face -- font )
-    dup face-y-min swap font-units>pixels >>descent ; inline
+    [ face-y-min ] keep font-units>pixels >>descent ; inline
 
 : init-font ( font -- font )
     dup handle>> init-ascent

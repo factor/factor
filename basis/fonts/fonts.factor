@@ -16,6 +16,9 @@ TUPLE: font name size bold? italic? foreground background ;
 : font-with-background ( font color -- font' )
     [ clone ] dip >>background ; inline
 
+: font-with-size ( font size -- font' )
+    [ clone ] dip >>size ; inline
+
 : reverse-video-font ( font -- font )
     clone dup
     [ foreground>> ] [ background>> ] bi
@@ -46,4 +49,4 @@ TUPLE: font name size bold? italic? foreground background ;
         "monospace" >>name
         12 >>size ;
 
-TUPLE: line-metrics width ascent descent leading ;
+TUPLE: metrics width ascent descent leading ;
