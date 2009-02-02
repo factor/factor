@@ -1,3 +1,4 @@
+! (c) 2009 Joe Groff, see BSD license
 USING: assocs kernel math.geometry.rect combinators accessors
 math.vectors vectors sequences math math.points math.geometry
 combinators.short-circuit arrays fry locals ;
@@ -13,6 +14,25 @@ TUPLE: quadtree { bounds rect } point value ll lr ul ur leaf? ;
 : rect-ur ( rect -- point ) [ loc>> ] [ dim>>  ] bi v+  ;
 
 : rect-center ( rect -- point ) [ loc>> ] [ dim>> 0.5 v*n ] bi v+ ; inline
+
+: (quadrant) ( pt node -- quadrant )
+    swap [ first 0.0 < ] [ second 0.0 < ] bi
+    [ [ ll>> ] [ lr>> ] if ]
+    [ [ ul>> ] [ ur>> ] if ] if ;
+
+: quadrant ( pt node -- quadrant )
+    [ bounds>> rect-center v- ] keep (quadrant) ;
+
+: descend ( pt node -- pt subnode )
+    [ drop ] [ quadrant ] 2bi ; inline
+
+:: each-quadrant ( node quot -- )
+    node ll>> quot call
+    node lr>> quot call
+    node ul>> quot call
+    node ur>> quot call ; inline
+: map-quadrant ( node quot: ( child-node -- x ) -- array )
+    each-quadrant 4array ; inline
 
 <PRIVATE
 
@@ -35,27 +55,8 @@ DEFER: in-rect*
 : ur-bounds ( rect -- rect' )
     [ [ loc>> ] [ dim>> { 0.5 0.5 } v* ] bi v+ ] [ child-dim ] bi <rect> ;
 
-: (quadrant) ( pt node -- quadrant )
-    swap [ first 0.0 < ] [ second 0.0 < ] bi
-    [ [ ll>> ] [ lr>> ] if ]
-    [ [ ul>> ] [ ur>> ] if ] if ;
-
-: quadrant ( pt node -- quadrant )
-    [ bounds>> rect-center v- ] keep (quadrant) ;
-
-: descend ( pt node -- pt subnode )
-    [ drop ] [ quadrant ] 2bi ; inline
-
 : {quadrants} ( node -- quadrants )
     { [ ll>> ] [ lr>> ] [ ul>> ] [ ur>> ] } cleave 4array ;
-
-:: each-quadrant ( node quot -- array )
-    node ll>> quot call
-    node lr>> quot call
-    node ul>> quot call
-    node ur>> quot call ; inline
-: map-quadrant ( node quot: ( child-node -- x ) -- array )
-    each-quadrant 4array ; inline
 
 : add-subnodes ( node -- node )
     dup bounds>> {

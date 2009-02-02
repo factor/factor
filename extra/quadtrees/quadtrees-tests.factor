@@ -1,3 +1,4 @@
+! (c) 2009 Joe Groff, see BSD license
 USING: assocs kernel tools.test quadtrees math.geometry.rect sorting ;
 IN: quadtrees.tests
 
