@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax alien.strings io.encodings.string kernel
 sequences byte-arrays io.encodings.utf8 math core-foundation
-core-foundation.arrays destructors ;
+core-foundation.arrays destructors unicode.data ;
 IN: core-foundation.strings
 
 TYPEDEF: void* CFStringRef
@@ -59,8 +59,17 @@ FUNCTION: CFStringRef CFStringCreateWithCString (
     CFStringEncoding encoding
 ) ;
 
+: prepare-CFString ( string -- byte-array )
+    [
+        dup HEX: 10ffff >
+        [ drop CHAR: replacement-character ] when
+    ] map utf8 encode ;
+
 : <CFString> ( string -- alien )
-    [ f ] dip utf8 encode dup length kCFStringEncodingUTF8 f CFStringCreateWithBytes
+    [ f ] dip
+    prepare-CFString dup length
+    kCFStringEncodingUTF8 f
+    CFStringCreateWithBytes
     [ "CFStringCreateWithBytes failed" throw ] unless* ;
 
 : CF>string ( alien -- string )
