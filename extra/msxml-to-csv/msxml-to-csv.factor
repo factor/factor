@@ -3,7 +3,6 @@ io.encodings.ascii kernel ;
 IN: msxml-to-csv
 
 : (msxml>csv) ( xml -- table )
-    "Worksheet" tag-named
     "Table" tag-named
     "Row" tags-named [
         "Cell" tags-named [

@@ -23,7 +23,7 @@ IN: project-euler.056
 
 : euler056 ( -- answer )
     90 100 [a,b) dup cartesian-product
-    [ first2 ^ number>digits sum ] map supremum ;
+    [ first2 ^ number>digits sum ] [ max ] map-reduce ;
 
 ! [ euler056 ] 100 ave-time
 ! 22 ms ave run time - 2.13 SD (100 trials)

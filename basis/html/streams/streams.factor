@@ -1,17 +1,17 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators generic assocs io io.styles
-io.files continuations io.streams.string kernel math math.order
-math.parser namespaces make quotations assocs sequences strings
-words html.elements xml.entities sbufs continuations destructors
-accessors arrays urls.encoding html ;
+USING: accessors kernel assocs io io.styles math math.order math.parser
+sequences strings make words combinators macros xml.literals html fry
+destructors ;
 IN: html.streams
 
-GENERIC: browser-link-href ( presented -- href )
+GENERIC: url-of ( object -- url )
 
-M: object browser-link-href drop f ;
+M: object url-of drop f ;
 
-TUPLE: html-stream stream last-div ;
+TUPLE: html-writer data last-div ;
+
+<PRIVATE
 
 ! stream-nl after with-nesting or tabular-output is
 ! ignored, so that HTML stream output looks like
@@ -25,37 +25,28 @@ TUPLE: html-stream stream last-div ;
 : a-div ( stream -- stream )
     t >>last-div ; inline
 
-: <html-stream> ( stream -- html-stream )
-    f html-stream boa ;
+: new-html-writer ( class -- html-writer )
+    new V{ } clone >>data ; inline
 
-<PRIVATE
-
-TUPLE: html-sub-stream < html-stream style parent ;
+TUPLE: html-sub-stream < html-writer style parent ;
 
 : new-html-sub-stream ( style stream class -- stream )
-    new
-        512 <sbuf> >>stream
+    new-html-writer
         swap >>parent
         swap >>style ; inline
 
 : end-sub-stream ( substream -- string style stream )
-    [ stream>> >string ] [ style>> ] [ parent>> ] tri ;
+    [ data>> ] [ style>> ] [ parent>> ] tri ;
 
-: object-link-tag ( style quot -- )
-    presented pick at [
-        browser-link-href [
-            <a url-encode =href a> call </a>
-        ] [ call ] if*
-    ] [ call ] if* ; inline
+: object-link-tag ( xml style -- xml )
+    presented swap at [ url-of [ simple-link ] when* ] when* ;
 
-: href-link-tag ( style quot -- )
-    href pick at [
-        <a url-encode =href a> call </a>
-    ] [ call ] if* ; inline
+: href-link-tag ( xml style -- xml )
+    href swap at [ simple-link ] when* ;
 
 : hex-color, ( color -- )
     [ red>> ] [ green>> ] [ blue>> ] tri
-    [ 255 * >fixnum >hex 2 CHAR: 0 pad-head % ] tri@ ;
+    [ 255 * >integer >hex 2 CHAR: 0 pad-head % ] tri@ ;
 
 : fg-css, ( color -- )
     "color: #" % hex-color, "; " % ;
@@ -76,32 +67,29 @@ TUPLE: html-sub-stream < html-stream style parent ;
 : font-css, ( font -- )
     "font-family: " % % "; " % ;
 
-: apply-style ( style key quot -- style gadget )
-    [ over at ] dip when* ; inline
-
-: make-css ( style quot -- str )
-    "" make nip ; inline
+MACRO: make-css ( pairs -- str )
+    [ '[ _ swap at [ _ execute ] when* ] ] { } assoc>map
+    '[ [ _ cleave ] "" make ] ;
 
 : span-css-style ( style -- str )
-    [
-        foreground [ fg-css,    ] apply-style
-        background [ bg-css,    ] apply-style
-        font       [ font-css,  ] apply-style
-        font-style [ style-css, ] apply-style
-        font-size  [ size-css,  ] apply-style
-    ] make-css ;
+    {
+        { foreground fg-css, }
+        { background bg-css, }
+        { font font-css, }
+        { font-style style-css, }
+        { font-size size-css, }
+    } make-css ;
 
-: span-tag ( style quot -- )
-    over span-css-style [
-        call
-    ] [
-        <span =style span> call </span>
-    ] if-empty ; inline
+: span-tag ( xml style -- xml )
+    span-css-style
+    [ swap [XML <span style=<->><-></span> XML] ] unless-empty ; inline
+
+: emit-html ( quot stream -- )
+    dip data>> push ; inline
 
 : format-html-span ( string style stream -- )
-    stream>> [
-        [ [ [ drop write ] span-tag ] href-link-tag ] object-link-tag
-    ] with-output-stream* ;
+    [ [ span-tag ] [ href-link-tag ] [ object-link-tag ] tri ]
+    emit-html ;
 
 TUPLE: html-span-stream < html-sub-stream ;
 
@@ -113,28 +101,26 @@ M: html-span-stream dispose
 
 : padding-css, ( padding -- ) "padding: " % # "px; " % ;
 
-: pre-css, ( margin -- )
-    [ "white-space: pre; font-family: monospace; " % ] unless ;
+CONSTANT: pre-css "white-space: pre; font-family: monospace;"
 
 : div-css-style ( style -- str )
     [
-        page-color   [ bg-css,      ] apply-style
-        border-color [ border-css,  ] apply-style
-        border-width [ padding-css, ] apply-style
-        wrap-margin over at pre-css,
-    ] make-css ;
-
-: div-tag ( style quot -- )
-    swap div-css-style [
-        call
+        {
+            { page-color bg-css, }
+            { border-color border-css, }
+            { border-width padding-css, }
+        } make-css
     ] [
-        <div =style div> call </div>
-    ] if-empty ; inline
+        wrap-margin swap at
+        [ pre-css append ] unless
+    ] bi ;
+
+: div-tag ( xml style -- xml' )
+    div-css-style
+    [ swap [XML <div style=<->><-></div> XML] ] unless-empty ;
 
 : format-html-div ( string style stream -- )
-    stream>> [
-        [ [ write ] div-tag ] object-link-tag
-    ] with-output-stream* ;
+    [ [ div-tag ] [ object-link-tag ] bi ] emit-html ;
 
 TUPLE: html-block-stream < html-sub-stream ;
 
@@ -145,57 +131,51 @@ M: html-block-stream dispose ( quot style stream -- )
     "padding: " % first2 max 2 /i # "px; " % ;
 
 : table-style ( style -- str )
-    [
-        table-border [ border-css,         ] apply-style
-        table-gap    [ border-spacing-css, ] apply-style
-    ] make-css ;
-
-: table-attrs ( style -- )
-    table-style " border-collapse: collapse;" append =style ;
-
-: do-escaping ( string style -- string )
-    html swap at [ escape-string ] unless ;
+    {
+        { table-border border-css, }
+        { table-gap border-spacing-css, }
+    } make-css
+    " border-collapse: collapse;" append ;
 
 PRIVATE>
 
 ! Stream protocol
-M: html-stream stream-flush
-    stream>> stream-flush ;
+M: html-writer stream-flush drop ;
 
-M: html-stream stream-write1
-    [ 1string ] dip stream-write ;
+M: html-writer stream-write1
+    not-a-div [ 1string ] emit-html ;
 
-M: html-stream stream-write
-    not-a-div [ escape-string ] dip stream>> stream-write ;
+M: html-writer stream-write
+    not-a-div [ ] emit-html ;
 
-M: html-stream stream-format
-    [ html over at [ [ escape-string ] dip ] unless ] dip
+M: html-writer stream-format
     format-html-span ;
 
-M: html-stream stream-nl
-    dup last-div? [ drop ] [ [ <br/> ] with-output-stream* ] if ;
+M: html-writer stream-nl
+    dup last-div? [ drop ] [ [ [XML <br/> XML] ] emit-html ] if ;
 
-M: html-stream make-span-stream
+M: html-writer make-span-stream
     html-span-stream new-html-sub-stream ;
 
-M: html-stream make-block-stream
+M: html-writer make-block-stream
     html-block-stream new-html-sub-stream ;
 
-M: html-stream make-cell-stream
+M: html-writer make-cell-stream
     html-sub-stream new-html-sub-stream ;
 
-M: html-stream stream-write-table
-    a-div stream>> [
-        <table dup table-attrs table> swap [
-            <tr> [
-                <td "top" =valign swap table-style =style td>
-                    stream>> >string write
-                </td>
-            ] with each </tr>
-        ] with each </table>
-    ] with-output-stream* ;
+M: html-writer stream-write-table
+    a-div [
+        table-style swap [
+            [ data>> [XML <td valign="top" style=<->><-></td> XML] ] with map
+            [XML <tr><-></tr> XML]
+        ] with map
+        [XML <table><-></table> XML]
+    ] emit-html ;
 
-M: html-stream dispose stream>> dispose ;
+M: html-writer dispose drop ;
 
-: with-html-writer ( quot -- )
-    output-stream get <html-stream> swap with-output-stream* ; inline
+: <html-writer> ( -- html-writer )
+    html-writer new-html-writer ;
+
+: with-html-writer ( quot -- xml )
+    <html-writer> [ swap with-output-stream* ] keep data>> ; inline

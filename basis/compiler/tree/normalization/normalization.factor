@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry namespaces sequences math accessors kernel arrays
+USING: fry namespaces sequences math math.order accessors kernel arrays
 combinators compiler.utilities assocs
 stack-checker.backend
 stack-checker.branches
@@ -54,7 +54,7 @@ M: #branch normalize*
         ] map unzip swap
     ] change-children swap
     [ remaining-introductions set ]
-    [ [ length ] map infimum introduction-stack [ swap head ] change ]
+    [ [ length ] [ min ] map-reduce introduction-stack [ swap head ] change ]
     bi ;
 
 : eliminate-phi-introductions ( introductions seq terminated -- seq' )

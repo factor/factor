@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Your name.
+! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax io.streams.string kernel strings
 urls lcs inspector present io ;
@@ -100,6 +100,6 @@ $nl
 { $subsection farkup }
 "Creating custom components:"
 { $subsection render* }
-"Custom components can emit HTML using the " { $vocab-link "html.elements" } " vocabulary." ;
+"Custom components can emit HTML using the " { $vocab-link "xml.literals" } " vocabulary." ;
 
 ABOUT: "html.components"
