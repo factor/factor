@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry vectors sequences assocs math accessors kernel
+USING: fry vectors sequences assocs math math.order accessors kernel
 combinators quotations namespaces grouping stack-checker.state
 stack-checker.backend stack-checker.errors stack-checker.visitor
 stack-checker.values stack-checker.recursive-state ;
@@ -16,7 +16,7 @@ SYMBOL: +bottom+
 
 : pad-with-bottom ( seq -- newseq )
     dup empty? [
-        dup [ length ] map supremum
+        dup [ length ] [ max ] map-reduce
         '[ _ +bottom+ pad-head ] map
     ] unless ;
 

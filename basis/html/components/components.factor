@@ -15,19 +15,12 @@ GENERIC: render* ( value name renderer -- xml )
     prepare-value
     [
         dup validation-error?
-        [ [ message>> ] [ value>> ] bi ]
+        [ [ message>> render-error ] [ value>> ] bi ]
         [ f swap ]
         if
     ] 2dip
-    render* write-xml
-    [ render-error ] when* ;
-
-<PRIVATE
-
-: render-input ( value name type -- xml )
-    [XML <input value=<-> name=<-> type=<->/> XML] ;
-
-PRIVATE>
+    render*
+    swap 2array write-xml ;
 
 SINGLETON: label
 
@@ -37,7 +30,7 @@ M: label render*
 SINGLETON: hidden
 
 M: hidden render*
-    drop "hidden" render-input ;
+    drop [XML <input value=<-> name=<-> type="hidden"/> XML] ;
 
 : render-field ( value name size type -- xml )
     [XML <input value=<-> name=<-> size=<-> type=<->/> XML] ;
@@ -163,9 +156,7 @@ M: farkup render*
 SINGLETON: inspector
 
 M: inspector render*
-    2drop [
-        [ describe ] with-html-writer
-    ] with-string-writer <unescaped> ;
+    2drop [ describe ] with-html-writer ;
 
 ! Diff component
 SINGLETON: comparison

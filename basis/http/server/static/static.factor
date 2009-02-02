@@ -56,19 +56,22 @@ TUPLE: file-responder root hook special allow-listings ;
 
 \ serve-file NOTICE add-input-logging
 
-: file. ( name -- xml )
+: file>html ( name -- xml )
     dup link-info directory? [ "/" append ] when
     dup [XML <li><a href=<->><-></a></li> XML] ;
 
-: directory. ( path -- )
-    dup file-name [ ] [
-        [ file-name ] [ directory-files [ file. ] map ] bi
-        [XML <h1><-></h1> <ul><-></ul> XML] write-xml
-    ] simple-page ;
+: directory>html ( path -- xml )
+    [ file-name ]
+    [ drop f ]
+    [
+        [ file-name ] [ [ [ file>html ] map ] with-directory-files ] bi
+        [XML <h1><-></h1> <ul><-></ul> XML]
+    ] tri
+    simple-page ;
 
 : list-directory ( directory -- response )
     file-responder get allow-listings>> [
-        '[ _ directory. ] "text/html" <content>
+        directory>html "text/html" <content>
     ] [
         drop <403>
     ] if ;

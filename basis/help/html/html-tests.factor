@@ -1,5 +1,4 @@
 IN: help.html.tests
-USING: html.streams classes.predicate help.topics help.markup
-io.streams.string accessors prettyprint kernel tools.test ;
+USING: help.html tools.test help.topics kernel ;
 
-[ ] [ [ [ \ predicate-instance? def>> . ] with-html-writer ] with-string-writer drop ] unit-test
+[ ] [ "xml" >link help>html drop ] unit-test

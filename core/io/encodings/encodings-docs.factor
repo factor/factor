@@ -78,6 +78,7 @@ ARTICLE: "encodings-descriptors" "Encoding descriptors"
 { $subsection "io.encodings.binary" }
 { $subsection "io.encodings.utf8" }
 { $subsection "io.encodings.utf16" }
+{ $vocab-subsection "UTF-32 encoding" "io.encodings.utf32" }
 { $vocab-subsection "Strict encodings" "io.encodings.strict" }
 "Legacy encodings:"
 { $vocab-subsection "8-bit encodings" "io.encodings.8-bit" }
