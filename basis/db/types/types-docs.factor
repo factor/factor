@@ -27,15 +27,11 @@ HELP: +user-assigned-id+
 
 HELP: <generator-bind>
 { $values { "slot-name" object } { "key" object } { "generator-singleton" object } { "type" object } { "generator-bind" generator-bind } }
-{ $description "" } ;
+{ $description "An internal constructor for creating objects containing parameters used for binding generated values to a tuple query." } ;
 
 HELP: <literal-bind>
 { $values { "key" object } { "type" object } { "value" object } { "literal-bind" literal-bind } }
-{ $description "" } ;
-
-HELP: <low-level-binding>
-{ $values { "value" object } { "low-level-binding" low-level-binding } }
-{ $description "" } ;
+{ $description "An internal constructor for creating objects containing parameters used for binding literal values to a tuple query." } ;
 
 HELP: BIG-INTEGER
 { $description "A 64-bit integer. Whether this number is signed or unsigned depends on the database backend." } ;
@@ -93,41 +89,32 @@ HELP: VARCHAR
 
 HELP: user-assigned-id-spec?
 { $values
-     { "specs" "a sequence of sql specs" }
+     { "specs" "a sequence of SQL specs" }
      { "?" "a boolean" } }
-{ $description "Tests if any of the sql specs has the type " { $link +user-assigned-id+ } "." } ;
+{ $description "Tests if any of the SQL specs has the type " { $link +user-assigned-id+ } "." } ;
 
 HELP: bind#
 { $values
-     { "spec" "a sql spec" } { "obj" object } }
-{ $description "" } ;
+     { "spec" "a SQL spec" } { "obj" object } }
+{ $description "A generic word that lets a database construct a literal binding." } ;
 
 HELP: bind%
 { $values
-     { "spec" "a sql spec" } }
-{ $description "" } ;
-
-HELP: compound
-{ $values
-     { "string" string } { "obj" object }
-     { "hash" hashtable } }
-{ $description "" } ;
+     { "spec" "a SQL spec" } }
+{ $description "A generic word that lets a database output a binding." } ;
 
 HELP: db-assigned-id-spec?
 { $values
-     { "specs" "a sequence of sql specs" }
+     { "specs" "a sequence of SQL specs" }
      { "?" "a boolean" } }
-{ $description "Tests if any of the sql specs has the type " { $link +db-assigned-id+ } "." } ;
+{ $description "Tests if any of the SQL specs has the type " { $link +db-assigned-id+ } "." } ;
 
 HELP: find-primary-key
 { $values
-     { "specs" "a sequence of sql-specs" }
-     { "seq" "a sequence of sql-specs" } }
-{ $description "Returns the rows from the sql-specs array that are part of the primary key. Composite primary keys are supported, so this word must return a sequence." }
+     { "specs" "a sequence of SQL specs" }
+     { "seq" "a sequence of SQL specs" } }
+{ $description "Returns the rows from the SQL specs array that are part of the primary key. Composite primary keys are supported, so this word must return a sequence." }
 { $notes "This is a low-level word." } ;
-
-HELP: generator-bind
-{ $description "" } ;
 
 HELP: get-slot-named
 { $values
@@ -135,45 +122,15 @@ HELP: get-slot-named
      { "value" "the value stored in the slot" } }
 { $description "Returns the value stored in a tuple slot, where the tuple slot is a string." } ;
 
-HELP: literal-bind
-{ $description "" } ;
-
-HELP: lookup-create-type
-{ $values
-     { "obj" object }
-     { "string" string } }
-{ $description "" } ;
-
-HELP: lookup-modifier
-{ $values
-     { "obj" object }
-     { "string" string } }
-{ $description "" } ;
-
-HELP: lookup-type
-{ $values
-     { "obj" object }
-     { "string" string } }
-{ $description "" } ;
-
-HELP: low-level-binding
-{ $description "" } ;
-
-HELP: modifiers
-{ $values
-     { "spec" "a sql spec" }
-     { "string" string } }
-{ $description "" } ;
-
 HELP: no-sql-type
 { $values
-     { "type" "a sql type" } }
-{ $description "Throws an error containing a sql type that is unsupported or the result of a typo." } ;
+     { "type" "a SQL type" } }
+{ $description "Throws an error containing a SQL type that is unsupported or the result of a typo." } ;
 
 HELP: normalize-spec
 { $values
-     { "spec" "a sql spec" } }
-{ $description "" } ;
+     { "spec" "a SQL spec" } }
+{ $description "Normalizes a SQL spec." } ;
 
 HELP: offset-of-slot
 { $values
@@ -181,56 +138,21 @@ HELP: offset-of-slot
      { "n" integer } }
 { $description "Returns the offset of a tuple slot accessed by name." } ;
 
-HELP: persistent-table
-{ $values
-    
-     { "hash" hashtable } }
-{ $description "" } ;
-
 HELP: primary-key?
 { $values
-     { "spec" "a sql spec" }
+     { "spec" "a SQL spec" }
      { "?" "a boolean" } }
-{ $description "" } ;
-
-HELP: random-id-generator
-{ $description "" } ;
+{ $description "Returns true if a SQL spec is a primary key." } ;
 
 HELP: relation?
 { $values
-     { "spec" "a sql spec" }
+     { "spec" "a SQL spec" }
      { "?" "a boolean" } }
-{ $description "" } ;
-
-HELP: remove-db-assigned-id
-{ $values
-     { "specs" "a sequence of sql specs" }
-     { "obj" object } }
-{ $description "" } ;
-
-HELP: remove-id
-{ $values
-     { "specs" "a sequence of sql specs" }
-     { "obj" object } }
-{ $description "" } ;
-
-HELP: set-slot-named
-{ $values
-     { "value" object } { "name" string } { "obj" object } }
-{ $description "" } ;
-
-HELP: spec>tuple
-{ $values
-     { "class" class } { "spec" "a sql spec" }
-     { "tuple" tuple } }
-{ $description "" } ;
-
-HELP: sql-spec
-{ $description "" } ;
+{ $description "Returns true if a SQL spec is a relation." } ;
 
 HELP: unknown-modifier
 { $values { "modifier" string } }
-{ $description "Throws an error containing an unknown sql modifier." } ;
+{ $description "Throws an error containing an unknown SQL modifier." } ;
 
 ARTICLE: "db.types" "Database types"
 "The " { $vocab-link "db.types" } " vocabulary maps Factor types to database types." $nl

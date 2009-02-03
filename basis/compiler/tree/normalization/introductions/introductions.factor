@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences accessors math kernel
-compiler.tree ;
+compiler.tree math.order ;
 IN: compiler.tree.normalization.introductions
 
 SYMBOL: introductions
@@ -25,7 +25,7 @@ M: #introduce count-introductions*
 
 M: #branch count-introductions*
     children>>
-    [ count-introductions ] map supremum
+    [ count-introductions ] [ max ] map-reduce
     introductions+ ;
 
 M: #recursive count-introductions*

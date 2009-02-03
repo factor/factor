@@ -4,7 +4,8 @@ math math.blas.cblas math.blas.vectors math.blas.vectors.private
 math.complex math.functions math.order functors words
 sequences sequences.merged sequences.private shuffle
 specialized-arrays.direct.float specialized-arrays.direct.double
-specialized-arrays.float specialized-arrays.double ;
+specialized-arrays.float specialized-arrays.double
+parser prettyprint.backend prettyprint.custom ;
 IN: math.blas.matrices
 
 TUPLE: blas-matrix-base underlying ld rows cols transpose ;
@@ -258,6 +259,7 @@ XGERC       IS cblas_${T}ger${C}
 MATRIX      DEFINES ${TYPE}-blas-matrix
 <MATRIX>    DEFINES <${TYPE}-blas-matrix>
 >MATRIX     DEFINES >${TYPE}-blas-matrix
+XMATRIX{    DEFINES ${T}matrix{
 
 WHERE
 
@@ -291,6 +293,11 @@ M: MATRIX n*V(*)Vconj+M!
     [ TYPE>ARG ] (prepare-ger)
     [ XGERC ] dip ;
 
+: XMATRIX{ \ } [ >MATRIX ] parse-literal ; parsing
+
+M: MATRIX pprint-delims
+    drop \ XMATRIX{ \ } ;
+
 ;FUNCTOR
 
 
@@ -305,3 +312,6 @@ M: MATRIX n*V(*)Vconj+M!
 "double-complex" "z" define-complex-blas-matrix
 
 >>
+
+M: blas-matrix-base >pprint-sequence Mrows ;
+M: blas-matrix-base pprint* pprint-object ;

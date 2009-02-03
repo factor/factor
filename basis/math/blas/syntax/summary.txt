@@ -1,1 +1,0 @@
-Literal syntax for BLAS vectors and matrices

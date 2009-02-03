@@ -6,11 +6,14 @@ io.encodings.string io.encodings combinators accessors
 xml.data io.encodings.iana ;
 IN: xml.autoencoding
 
+: decode-stream ( encoding -- )
+    spot get [ swap re-decode ] change-stream drop ;
+
 : continue-make-tag ( str -- tag )
     parse-name-starting middle-tag end-tag ;
 
 : start-utf16le ( -- tag )
-    utf16le decode-input
+    utf16le decode-stream
     "?\0" expect
     check instruct ;
 
@@ -22,25 +25,25 @@ IN: xml.autoencoding
     ! that the first letter of the document is < and second is
     ! not ASCII
     ascii?
-    [ utf8 decode-input next make-tag ] [
+    [ utf8 decode-stream next make-tag ] [
         next
         [ get-next 10xxxxxx? not ] take-until
         get-char suffix utf8 decode
-        utf8 decode-input next
+        utf8 decode-stream next
         continue-make-tag
     ] if ;
 
 : prolog-encoding ( prolog -- )
     encoding>> dup "UTF-16" =
-    [ drop ] [ name>encoding [ decode-input ] when* ] if ;
+    [ drop ] [ name>encoding [ decode-stream ] when* ] if ;
 
 : instruct-encoding ( instruct/prolog -- )
     dup prolog?
     [ prolog-encoding ]
-    [ drop utf8 decode-input ] if ;
+    [ drop utf8 decode-stream ] if ;
 
 : go-utf8 ( -- )
-    check utf8 decode-input next next ;
+    check utf8 decode-stream next next ;
 
 : start< ( -- tag )
     ! What if first letter of processing instruction is non-ASCII?
@@ -52,11 +55,11 @@ IN: xml.autoencoding
     } case ;
 
 : skip-utf8-bom ( -- tag )
-    "\u0000bb\u0000bf" expect utf8 decode-input
+    "\u0000bb\u0000bf" expect utf8 decode-stream
     "<" expect check make-tag ;
 
 : decode-expecting ( encoding string -- tag )
-    [ decode-input next ] [ expect ] bi* check make-tag ;
+    [ decode-stream next ] [ expect ] bi* check make-tag ;
 
 : start-utf16be ( -- tag )
     utf16be "<" decode-expecting ;
@@ -74,6 +77,6 @@ IN: xml.autoencoding
         { HEX: EF [ skip-utf8-bom ] }
         { HEX: FF [ skip-utf16le-bom ] }
         { HEX: FE [ skip-utf16be-bom ] }
-        [ drop utf8 decode-input check f ]
+        [ drop utf8 decode-stream check f ]
     } case ;
 

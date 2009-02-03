@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel math sequences sequences.private shuffle ;
+USING: accessors arrays kernel math math.order
+sequences sequences.private shuffle ;
 IN: sequences.modified
 
 TUPLE: modified ;
@@ -50,7 +51,7 @@ M: offset modified-set-nth ( elt n seq -- )
 TUPLE: summed < modified seqs ;
 C: <summed> summed
 
-M: summed length seqs>> [ length ] map supremum ;
+M: summed length seqs>> [ length ] [ max ] map-reduce ;
 
 <PRIVATE
 : ?+ ( x/f y/f -- sum )

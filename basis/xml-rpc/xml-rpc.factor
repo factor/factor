@@ -1,9 +1,9 @@
-! Copyright (C) 2005, 2006 Daniel Ehrenberg
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel xml arrays math generic http.client
 combinators hashtables namespaces io base64 sequences strings
 calendar xml.data xml.writer xml.utilities assocs math.parser
-debugger calendar.format math.order xml.interpolate xml.dispatch ;
+debugger calendar.format math.order xml.literals xml.dispatch ;
 IN: xml-rpc
 
 ! * Sending RPC requests

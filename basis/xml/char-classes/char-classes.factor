@@ -1,6 +1,7 @@
-! Copyright (C) 2005, 2007 Daniel Ehrenberg
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences unicode.syntax math math.order combinators ;
+USING: kernel sequences unicode.syntax math math.order combinators
+hints ;
 IN: xml.char-classes
 
 CATEGORY: 1.0name-start* Ll Lu Lo Lt Nl \u000559\u0006E5\u0006E6_: ;
@@ -31,3 +32,5 @@ CATEGORY: 1.1name-char Ll Lu Lo Lm Ln Nl Mc Mn Nd Pc Cf _-.\u0000b7: ;
         { [ dup HEX: E000 < ] [ drop f ] }
         [ { HEX: FFFE HEX: FFFF } member? not ]
     } cond ;
+
+HINTS: text? { object fixnum } ;

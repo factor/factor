@@ -1,5 +1,5 @@
+USING: help.markup help.syntax io present html ;
 IN: html.elements
-USING: help.markup help.syntax io present ;
 
 ARTICLE: "html.elements" "HTML elements"
 "The " { $vocab-link "html.elements" } " vocabulary provides words for writing HTML tags to the " { $link output-stream } " with a familiar look and feel in the code."
@@ -20,10 +20,6 @@ $nl
 $nl
 "Writing unescaped HTML to " { $vocab-link "html.streams" } ":"
 { $subsection write-html }
-{ $subsection print-html }
-"Writing some common HTML patterns:"
-{ $subsection xhtml-preamble }
-{ $subsection simple-page }
-{ $subsection render-error } ;
+{ $subsection print-html } ;
 
 ABOUT: "html.elements"

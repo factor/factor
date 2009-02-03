@@ -12,17 +12,19 @@ HELP: printf
     "specifying attributes for the result string, including such things as maximum width, "
     "padding, and decimals.\n"
     { $table
-        { "%%"      "Single %"                   "" }
-        { "%P.Ds"   "String format"              "string" }
-        { "%P.DS"   "String format uppercase"    "string" }
-        { "%c"      "Character format"           "char" } 
-        { "%C"      "Character format uppercase" "char" } 
-        { "%+Pd"    "Integer format"             "fixnum" }
-        { "%+P.De"  "Scientific notation"        "fixnum, float" }
-        { "%+P.DE"  "Scientific notation"        "fixnum, float" }
-        { "%+P.Df"  "Fixed format"               "fixnum, float" }
-        { "%+Px"    "Hexadecimal"                "hex" }
-        { "%+PX"    "Hexadecimal uppercase"      "hex" }
+        { "%%"          "Single %"                   "" }
+        { "%P.Ds"       "String format"              "string" }
+        { "%P.DS"       "String format uppercase"    "string" }
+        { "%c"          "Character format"           "char" } 
+        { "%C"          "Character format uppercase" "char" } 
+        { "%+Pd"        "Integer format"             "fixnum" }
+        { "%+P.De"      "Scientific notation"        "fixnum, float" }
+        { "%+P.DE"      "Scientific notation"        "fixnum, float" }
+        { "%+P.Df"      "Fixed format"               "fixnum, float" }
+        { "%+Px"        "Hexadecimal"                "hex" }
+        { "%+PX"        "Hexadecimal uppercase"      "hex" }
+        { "%[%?, %]"    "Sequence format"            "sequence" }
+        { "%[%?: %? %]" "Assocs format"              "assocs" }
     }
     $nl
     "A plus sign ('+') is used to optionally specify that the number should be "
@@ -72,6 +74,14 @@ HELP: printf
         "USING: formatting ;"
         "1234 \"%+d\" printf"
         "+1234" }
+    { $example
+        "USING: formatting ;"
+        "{ 1 2 3 } \"%[%d, %]\" printf"
+        "{ 1, 2, 3 }" }
+    { $example
+        "USING: formatting ;"
+        "H{ { 1 2 } { 3 4 } } \"%[%d: %d %]\" printf"
+        "{ 1:2, 3:4 }" }
 } ;
 
 HELP: sprintf
