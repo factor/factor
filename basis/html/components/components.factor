@@ -1,12 +1,12 @@
-! Copyright (C) 2008 Slava Pestov
+! Copyright (C) 2008, 2009 Slava Pestov, Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces io math.parser assocs classes
 classes.tuple words arrays sequences splitting mirrors
 hashtables combinators continuations math strings inspector
 fry locals calendar calendar.format xml.entities xml.data
-validators urls present xml.writer xml.interpolate xml
+validators urls present xml.writer xml.literals xml
 xmode.code2html lcs.diff2html farkup io.streams.string
-html.elements html.streams html.forms ;
+html html.streams html.forms ;
 IN: html.components
 
 GENERIC: render* ( value name renderer -- xml )
@@ -15,19 +15,12 @@ GENERIC: render* ( value name renderer -- xml )
     prepare-value
     [
         dup validation-error?
-        [ [ message>> ] [ value>> ] bi ]
+        [ [ message>> render-error ] [ value>> ] bi ]
         [ f swap ]
         if
     ] 2dip
-    render* write-xml
-    [ render-error ] when* ;
-
-<PRIVATE
-
-: render-input ( value name type -- xml )
-    [XML <input value=<-> name=<-> type=<->/> XML] ;
-
-PRIVATE>
+    render*
+    swap 2array write-xml ;
 
 SINGLETON: label
 
@@ -37,7 +30,7 @@ M: label render*
 SINGLETON: hidden
 
 M: hidden render*
-    drop "hidden" render-input ;
+    drop [XML <input value=<-> name=<-> type="hidden"/> XML] ;
 
 : render-field ( value name size type -- xml )
     [XML <input value=<-> name=<-> size=<-> type=<->/> XML] ;
@@ -163,9 +156,7 @@ M: farkup render*
 SINGLETON: inspector
 
 M: inspector render*
-    2drop [
-        [ describe ] with-html-writer
-    ] with-string-writer <unescaped> ;
+    2drop [ describe ] with-html-writer ;
 
 ! Diff component
 SINGLETON: comparison

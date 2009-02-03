@@ -57,7 +57,7 @@ HELP: modify-redirect-query
 
 HELP: nested-responders
 { $values { "seq" "a sequence of responders" } }
-{ $description "" } ;
+{ $description "Outputs a sequence of responders which participated in the processing of the current request, with the main responder first and the innermost responder last." } ;
 
 HELP: referrer
 { $values { "referrer/f" { $maybe string } } }
@@ -69,11 +69,11 @@ HELP: request-params
 
 HELP: resolve-base-path
 { $values { "string" string } { "string'" string } }
-{ $description "" } ;
+{ $description "Resolves a responder-relative URL." } ;
 
 HELP: resolve-template-path
 { $values { "pair" "a pair with shape " { $snippet "{ class string }" } } { "path" "a pathname string" } }
-{ $description "" } ;
+{ $description "Resolves a responder-relative template path." } ;
 
 HELP: same-host?
 { $values { "url" url } { "?" "a boolean" } }
@@ -85,7 +85,7 @@ HELP: user-agent
 
 HELP: vocab-path
 { $values { "vocab" "a vocabulary specifier" } { "path" "a pathname string" } }
-{ $description "" } ;
+{ $description "Outputs the full pathname of the vocabulary's source directory." } ;
 
 HELP: exit-with
 { $values { "value" object } }

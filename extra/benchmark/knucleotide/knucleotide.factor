@@ -46,7 +46,7 @@ IN: benchmark.knucleotide
     tuck length
     small-groups H{ } tally
     at [ 0 ] unless*
-    number>string 8 CHAR: \s pad-right write ;
+    number>string 8 CHAR: \s pad-tail write ;
 
 : process-input ( input -- )
     dup 1 handle-table nl

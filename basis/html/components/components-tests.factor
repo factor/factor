@@ -1,7 +1,8 @@
 IN: html.components.tests
 USING: tools.test kernel io.streams.string
 io.streams.null accessors inspector html.streams
-html.elements html.components html.forms namespaces ;
+html.components html.forms namespaces
+xml.writer ;
 
 [ ] [ begin-form ] unit-test
 
@@ -31,6 +32,11 @@ TUPLE: color red green blue ;
     ] with-string-writer
 ] unit-test
 
+[ "<input value=\"&lt;jimmy>\" name=\"red\" type=\"hidden\"/>" ] [
+    [
+        "red" hidden render
+    ] with-string-writer
+] unit-test
 [ "<input value=\"&lt;jimmy>\" name=\"red\" type=\"hidden\"/>" ] [
     [
         "red" hidden render
@@ -163,9 +169,7 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 
 [ t ] [
     [ "object" inspector render ] with-string-writer
-    USING: splitting sequences ;
-    "\"" split "'" join ! replace " with ' for now
-    [ "object" value [ describe ] with-html-writer ] with-string-writer
+    "object" value [ describe ] with-html-writer xml>string
     =
 ] unit-test
 
@@ -185,3 +189,9 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
         }
     }
 ] [ values ] unit-test
+
+[ ] [ "error" "blah" <validation-error> "error" set-value ] unit-test
+
+[ ] [
+    "error" hidden render
+] unit-test

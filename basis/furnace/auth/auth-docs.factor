@@ -105,9 +105,8 @@ ARTICLE: "furnace.auth.realm-config" "Authentication realm configuration"
 "Instances of subclasses of " { $link realm } " have the following slots which may be set:"
 { $table
     { { $slot "name" } "A string identifying the realm for user interface purposes" }
-    { { $slot "users" } { "An authentication provider (see " { $link "furnace.auth.providers" } ". By default, the " { $link users-in-db } " provider is used." } }
+    { { $slot "users" } { "An authentication provider (see " { $link "furnace.auth.providers" } "). By default, the " { $link users-in-db } " provider is used." } }
     { { $slot "checksum" } { "An implementation of the checksum protocol used for verifying passwords (see " { $link "checksums" } "). The " { $link sha-256 } " checksum is used by default." } }
-    { { $slot "users" } { "An authentication provider (see " { $link "furnace.auth.providers" } } }
     { { $slot "secure" } { "A boolean, that when set to a true value, forces the client to access the authentication realm via HTTPS. An attempt to access the realm via HTTP results in a redirect to the corresponding HTTPS URL. On by default." } }
 } ;
 

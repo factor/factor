@@ -1,8 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes help.markup help.syntax io.streams.string kernel
-quotations sequences strings multiline math db.types db ;
+quotations sequences strings multiline math db.types
+db.tuples.private db ;
 IN: db.tuples
+
+HELP: random-id-generator
+{ $description "Used to tell " { $link eval-generator } " to generate a random number for use as a key." } ;
 
 HELP: create-sql-statement
 { $values

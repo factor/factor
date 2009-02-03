@@ -1,11 +1,11 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.encodings.utf8 io.encodings.ascii io.encodings.binary
-io.files io.files.temp io.directories html.streams html.elements help kernel
+io.files io.files.temp io.directories html.streams help kernel
 assocs sequences make words accessors arrays help.topics vocabs
 tools.vocabs tools.vocabs.browser namespaces prettyprint io
 vocabs.loader serialize fry memoize unicode.case math.order
-sorting debugger ;
+sorting debugger html xml.literals xml.writer ;
 IN: help.html
 
 : escape-char ( ch -- )
@@ -51,17 +51,21 @@ M: f topic>filename* drop \ f topic>filename* ;
         ] "" make
     ] [ 2drop f ] if ;
 
-M: topic browser-link-href topic>filename ;
+M: topic url-of topic>filename ;
 
-: help-stylesheet ( -- )
-    "resource:basis/help/html/stylesheet.css" ascii file-contents write ;
+: help-stylesheet ( -- string )
+    "resource:basis/help/html/stylesheet.css" ascii file-contents
+    [XML <style><-></style> XML] ;
 
-: help>html ( topic -- )
-    dup topic>filename utf8 [
-        dup article-title
-        [ <style> help-stylesheet </style> ]
-        [ [ help ] with-html-writer ] simple-page
-    ] with-file-writer ;
+: help>html ( topic -- xml )
+    [ article-title ]
+    [ drop help-stylesheet ]
+    [ [ help ] with-html-writer ]
+    tri simple-page ;
+          
+: generate-help-file ( topic -- )
+    dup .
+    dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
 : all-vocabs-really ( -- seq )
     #! Hack.
@@ -87,7 +91,7 @@ M: topic browser-link-href topic>filename ;
     all-vocabs-really [ dup vocab-name ] { } map>assoc "vocabs.idx" serialize-index ;
 
 : generate-help-files ( -- )
-    all-topics [ '[ _ help>html ] try ] each ;
+    all-topics [ '[ _ generate-help-file ] try ] each ;
 
 : generate-help ( -- )
     "docs" temp-file

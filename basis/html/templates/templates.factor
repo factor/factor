@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel fry io io.encodings.utf8 io.files
 debugger prettyprint continuations namespaces boxes sequences
-arrays strings html.elements io.streams.string
-quotations xml.data xml.writer ;
+arrays strings html io.streams.string
+quotations xml.data xml.writer xml.literals ;
 IN: html.templates
 
 MIXIN: template
@@ -53,9 +53,13 @@ SYMBOL: atom-feeds
 
 : write-atom-feeds ( -- )
     atom-feeds get [
-        <link "alternate" =rel "application/atom+xml" =type
-        first2 [ =title ] [ =href ] bi*
-        link/>
+        first2 [XML
+            <link
+                rel="alternate"
+                type="application/atom+xml"
+                title=<->
+                href=<->/>
+        XML] write-xml
     ] each ;
 
 SYMBOL: nested-template?
@@ -63,7 +67,7 @@ SYMBOL: nested-template?
 SYMBOL: next-template
 
 : call-next-template ( -- )
-    next-template get write-html ;
+    next-template get write ;
 
 M: f call-template* drop call-next-template ;
 

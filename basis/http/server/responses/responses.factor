@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: html.elements math.parser http accessors kernel
+USING: math.parser http accessors kernel xml.literals xml.writer
 io io.streams.string io.encodings.utf8 ;
 IN: http.server.responses
 
@@ -13,11 +13,13 @@ IN: http.server.responses
         swap >>body ;
     
 : trivial-response-body ( code message -- )
-    <html>
-        <body>
-            <h1> [ number>string write bl ] [ write ] bi* </h1>
-        </body>
-    </html> ;
+    <XML
+        <html>
+            <body>
+                <h1><-> <-></h1>
+            </body>
+        </html>
+    XML> write-xml ;
 
 : <trivial-response> ( code message -- response )
     2dup [ trivial-response-body ] with-string-writer

@@ -55,8 +55,6 @@ TUPLE: factor-website < dispatcher ;
 
 : <factor-website> ( -- responder )
     factor-website new-dispatcher
-        <wiki> "wiki" add-responder
-        <user-admin> "user-admin" add-responder
         URL" /wiki/view/Front Page" <redirect-responder> "" add-responder ;
 
 SYMBOL: key-password
@@ -76,8 +74,10 @@ SYMBOL: dh-file
     "password" key-password set-global
     common-configuration
     <factor-website>
-        <pastebin> <factor-boilerplate> <login-config> "pastebin" add-responder
-        <planet> <factor-boilerplate> <login-config> "planet" add-responder
+        <wiki> <login-config> <factor-boilerplate> "wiki" add-responder
+        <user-admin> <login-config> <factor-boilerplate> "user-admin" add-responder
+        <pastebin> <login-config> <factor-boilerplate> "pastebin" add-responder
+        <planet> <login-config> <factor-boilerplate> "planet" add-responder
         "/tmp/docs/" <help-webapp> "docs" add-responder
     test-db <alloy>
     main-responder set-global ;
@@ -90,7 +90,7 @@ SYMBOL: dh-file
 : init-production ( -- )
     common-configuration
     <vhost-dispatcher>
-        <factor-website> <login-config> <factor-boilerplate> test-db <alloy> "concatenative.org" add-responder
+        <factor-website> <wiki> <login-config> <factor-boilerplate> "wiki" add-responder test-db <alloy> "concatenative.org" add-responder
         <pastebin> <login-config> <factor-boilerplate> test-db <alloy> "paste.factorcode.org" add-responder
         <planet> <login-config> <factor-boilerplate> test-db <alloy> "planet.factorcode.org" add-responder
         home "docs" append-path <help-webapp> test-db <alloy> "docs.factorcode.org" add-responder
