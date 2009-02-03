@@ -83,6 +83,8 @@ ARTICLE: "encodings-descriptors" "Encoding descriptors"
 "Legacy encodings:"
 { $vocab-subsection "8-bit encodings" "io.encodings.8-bit" }
 { $vocab-subsection "ASCII" "io.encodings.ascii" }
+{ $vocab-subsection "Japanese encodings" "io.encodings.chinese" }
+{ $vocab-subsection "Chinese encodings" "io.encodings.japanese" }
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "encodings-protocol" "Encoding protocol"
