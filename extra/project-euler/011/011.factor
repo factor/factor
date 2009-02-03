@@ -1,6 +1,6 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: grouping kernel make sequences ;
+USING: grouping kernel make math.order sequences ;
 IN: project-euler.011
 
 ! http://projecteuler.net/index.php?section=problems&id=11
@@ -88,7 +88,7 @@ IN: project-euler.011
 
 : max-product ( matrix width -- n )
     [ clump ] curry map concat
-    [ product ] map supremum ; inline
+    [ product ] [ max ] map-reduce ; inline
 
 PRIVATE>
 
