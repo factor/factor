@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.functions math.ranges project-euler.common sequences ;
+USING: kernel math.functions math.ranges project-euler.common
+sequences math.order ;
 IN: project-euler.056
 
 ! http://projecteuler.net/index.php?section=problems&id=56
@@ -23,7 +24,7 @@ IN: project-euler.056
 
 : euler056 ( -- answer )
     90 100 [a,b) dup cartesian-product
-    [ first2 ^ number>digits sum ] map supremum ;
+    [ first2 ^ number>digits sum ] [ max ] map-reduce ;
 
 ! [ euler056 ] 100 ave-time
 ! 22 ms ave run time - 2.13 SD (100 trials)

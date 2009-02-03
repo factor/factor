@@ -23,7 +23,7 @@ HELP: >biassoc
 ARTICLE: "biassocs" "Bidirectional assocs"
 "A " { $emphasis "bidirectional assoc" } " combines a pair of assocs to form a data structure where both normal assoc opeartions (eg, " { $link at } "), as well as " { $link "assocs-values" } " (eg, " { $link value-at } ") run in sub-linear time."
 $nl
-"Bidirectional assocs implement the entire " { $link "assoc-protocol" } " with the exception of " { $link delete-at } ". Duplicate values are allowed, however value lookups with " { $link value-at } " only return the first key that a given value was stored with."
+"Bidirectional assocs implement the entire " { $link "assocs-protocol" } " with the exception of " { $link delete-at } ". Duplicate values are allowed, however value lookups with " { $link value-at } " only return the first key that a given value was stored with."
 $nl
 "The class of biassocs:"
 { $subsection biassoc }

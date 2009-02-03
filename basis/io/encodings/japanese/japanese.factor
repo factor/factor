@@ -15,7 +15,7 @@ VALUE: windows-31j
 TUPLE: jis assoc ;
 
 : <jis> ( assoc -- jis )
-    [ nip ] assoc-filter
+    [ nip ] assoc-filter H{ } assoc-like
     >biassoc jis boa ;
 
 : ch>jis ( ch tuple -- jis ) assoc>> value-at [ encode-error ] unless* ;
