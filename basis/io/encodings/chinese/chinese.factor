@@ -3,10 +3,12 @@
 USING: xml xml.data kernel io io.encodings interval-maps splitting fry
 math.parser sequences combinators assocs locals accessors math 
 arrays values io.encodings.ascii ascii io.files biassocs math.order
-combinators.short-circuit io.binary ;
+combinators.short-circuit io.binary io.encodings.iana ;
 IN: io.encodings.chinese
 
 SINGLETON: gb18030
+
+gb18030 "GB18030" register-encoding
 
 <PRIVATE
 
