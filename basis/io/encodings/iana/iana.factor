@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel strings values io.files assocs
 splitting sequences io namespaces sets io.encodings.8-bit
-io.encodings.ascii io.encodings.utf8 io.encodings.utf16  ;
+io.encodings.ascii io.encodings.utf8 io.encodings.utf16 
+io.encodings.chinese io.encodings.japanese ;
 IN: io.encodings.iana
 
 <PRIVATE
@@ -24,6 +25,9 @@ VALUE: n>e-table
     { latin/hebrew "ISO-8859-8" }
     { latin5 "ISO-8859-9" }
     { latin6 "ISO-8859-10" }
+    { shift-jis "Shift_JIS" }
+    { windows-31j "Windows-31J" }
+    { gb18030 "GB18030" }
 } ;
 PRIVATE>
 
