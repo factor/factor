@@ -1,14 +1,20 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel io.encodings combinators io io.encodings.utf16
-sequences io.binary ;
+sequences io.binary io.encodings.iana ;
 IN: io.encodings.utf32
 
 SINGLETON: utf32be
 
+utf32be "UTF-32BE" register-encoding
+
 SINGLETON: utf32le
 
+utf32le "UTF-32LE" register-encoding
+
 SINGLETON: utf32
+
+utf32 "UTF-32" register-encoding
 
 <PRIVATE
 

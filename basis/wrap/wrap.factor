@@ -1,3 +1,5 @@
+! Copyright (C) 2008, 2009 Daniel Ehrenberg, Slava Pestov
+! See http://factorcode.org/license.txt for BSD license.
 USING: sequences kernel namespaces make splitting
 math math.order fry assocs accessors ;
 IN: wrap
@@ -15,12 +17,25 @@ SYMBOL: width
 : break-here? ( column word -- ? )
     break?>> not [ width get > ] [ drop f ] if ;
 
+: walk ( n words -- n )
+    ! If on a break, take the rest of the breaks
+    ! If not on a break, go back until you hit a break
+    2dup bounds-check? [
+        2dup nth break?>>
+        [ [ break?>> not ] find-from drop ]
+        [ [ break?>> ] find-last-from drop 1+ ] if
+   ] [ drop ] if ;
+
 : find-optimal-break ( words -- n )
-    [ 0 ] dip [ [ width>> + dup ] keep break-here? ] find drop nip ;
+    [ 0 ] keep
+    [ [ width>> + dup ] keep break-here? ] find drop nip
+    [ 1 max swap walk ] [ drop f ] if* ;
 
 : (wrap) ( words -- )
-    dup find-optimal-break
-    [ 1 max cut-slice [ , ] [ (wrap) ] bi* ] [ , ] if* ;
+    [
+        dup find-optimal-break
+        [ cut-slice [ , ] [ (wrap) ] bi* ] [ , ] if*
+    ] unless-empty ;
 
 : intersperse ( seq elt -- seq' )
     [ '[ _ , ] [ , ] interleave ] { } make ;
@@ -34,9 +49,7 @@ SYMBOL: width
 
 : join-words ( wrapped-lines -- lines )
     [
-        [ break?>> ]
-        [ trim-head-slice ]
-        [ trim-tail-slice ] bi
+        [ break?>> ] trim-slice
         [ key>> ] map concat
     ] map ;
 
