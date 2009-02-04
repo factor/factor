@@ -97,10 +97,8 @@ GENERIC: write-full-response ( request response -- )
     tri ;
 
 : unparse-content-type ( request -- content-type )
-    [ content-type>> "application/octet-stream" or ]
-    [ content-charset>> encoding>name ]
-    bi
-    [ "; charset=" glue ] when* ;
+    [ content-type>> "application/octet-stream" or ] [ content-charset>> ] bi
+    dup binary eq? [ drop ] [ encoding>name "; charset=" glue ] if ;
 
 : ensure-domain ( cookie -- cookie )
     [
