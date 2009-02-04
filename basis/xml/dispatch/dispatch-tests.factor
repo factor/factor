@@ -4,7 +4,7 @@ USING: xml io kernel math sequences strings xml.utilities
 tools.test math.parser xml.dispatch ;
 IN: xml.dispatch.tests
 
-PROCESS: calculate ( tag -- n )
+TAGS: calculate ( tag -- n )
 
 : calc-2children ( tag -- n n )
     children-tags first2 [ calculate ] dip calculate ;
@@ -29,3 +29,5 @@ TAG: neg calculate
     "<math><times><add><number>1</number><number>3</number></add><neg><number>-8</number></neg></times></math>"
     calc-arith
 ] unit-test
+
+\ calc-arith must-infer
