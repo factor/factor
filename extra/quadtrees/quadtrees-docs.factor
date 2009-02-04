@@ -2,9 +2,11 @@ USING: arrays assocs help.markup help.syntax math.geometry.rect quadtrees quotat
 IN: quadtrees
 
 ARTICLE: "quadtrees" "Quadtrees"
-"The " { $snippet "quadtrees" } " vocabulary implements the quadtree structure in Factor. Quadtrees follow the " { $link "assocs-protocol" } " for insertion, deletion, and querying of exact points, using two-dimensional vectors as keys. Additional words are provided for spatial queries and pruning the tree structure:"
-{ $subsection prune }
+"The " { $snippet "quadtrees" } " vocabulary implements the quadtree data structure in Factor."
+{ $subsection <quadtree> }
+"Quadtrees follow the " { $link "assocs-protocol" } " for insertion, deletion, and querying of exact points, using two-dimensional vectors as keys. Additional words are provided for spatial queries and pruning the tree structure:"
 { $subsection in-rect }
+{ $subsection prune-quadtree }
 "The following words are provided to help write quadtree algorithms:"
 { $subsection descend }
 { $subsection each-quadrant }
@@ -12,7 +14,11 @@ ARTICLE: "quadtrees" "Quadtrees"
 
 ABOUT: "quadtrees"
 
-HELP: prune
+HELP: <quadtree>
+{ $values { "bounds" rect } { "quadtree" quadtree } }
+{ $description "Constructs an empty quadtree covering the axis-aligned rectangle indicated by " { $snippet "bounds" } ". All the keys of " { $snippet "quadtree" } " must be two-dimensional vectors lying inside " { $snippet "bounds" } "." } ;
+
+HELP: prune-quadtree
 { $values { "tree" quadtree } }
 { $description "Removes empty nodes from " { $snippet "tree" } "." } ;
 

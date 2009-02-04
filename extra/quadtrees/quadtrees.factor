@@ -6,7 +6,10 @@ IN: quadtrees
 
 TUPLE: quadtree { bounds rect } point value ll lr ul ur leaf? ;
 
-: <quadtree> ( bounds -- quadtree ) f f f f f f t quadtree boa ;
+: <quadtree> ( bounds -- quadtree )
+    quadtree new
+        swap >>bounds
+        t >>leaf? ;
 
 : rect-ll ( rect -- point ) loc>> ;
 : rect-lr ( rect -- point ) [ loc>> ] [ width  ] bi v+x ;
@@ -165,7 +168,7 @@ DEFER: in-rect*
 
 PRIVATE>
 
-: prune ( tree -- tree ) [ (prune) ] keep ;
+: prune-quadtree ( tree -- tree ) [ (prune) ] keep ;
 
 : in-rect ( tree rect -- values )
     [ 16 <vector> ] 2dip in-rect* ;
