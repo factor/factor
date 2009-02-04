@@ -9,7 +9,7 @@ M: no-tag summary
     drop "The tag-dispatching word has no method for the given tag name" ;
 
 : compile-tags ( word xtable -- quot )
-    >alist swap '[ _ no-tag boa throw ] [ ] like suffix
+    >alist swap '[ _ no-tag boa throw ] suffix
     '[ dup main>> _ case ] ;
 
 : define-tags ( word -- )
