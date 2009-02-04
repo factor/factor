@@ -1,27 +1,31 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words assocs kernel accessors parser sequences summary
-lexer splitting fry ;
+lexer splitting fry combinators ;
 IN: xml.dispatch
 
-TUPLE: process-missing process tag ;
-M: process-missing summary
-    drop "Tag not implemented on process" ;
+TUPLE: no-tag name word ;
+M: no-tag summary
+    drop "The tag-dispatching word has no method for the given tag name" ;
 
-: run-process ( tag word -- )
-    2dup "xtable" word-prop
-    [ dup main>> ] dip at* [ 2nip call ] [
-        drop \ process-missing boa throw
-    ] if ;
+: compile-tags ( word xtable -- quot )
+    >alist swap '[ _ no-tag boa throw ] [ ] like suffix
+    '[ dup main>> _ case ] ;
 
-: PROCESS:
+: define-tags ( word -- )
+    dup dup "xtable" word-prop compile-tags define ;
+
+: define-tag ( string word quot -- )
+    -rot [ "xtable" word-prop set-at ] [ define-tags ] bi ;
+
+:: define-tag ( string word quot -- )
+    quot string word "xtable" word-prop set-at
+    word define-tags ;
+
+: TAGS:
     CREATE
-    dup H{ } clone "xtable" set-word-prop
-    dup '[ _ run-process ] define ; parsing
+    [ H{ } clone "xtable" set-word-prop ]
+    [ define-tags ] bi ; parsing
 
 : TAG:
-    scan scan-word
-    parse-definition
-    swap "xtable" word-prop
-    rot "/" split [ [ 2dup ] dip swap set-at ] each 2drop ;
-    parsing
+    scan scan-word parse-definition define-tag ; parsing

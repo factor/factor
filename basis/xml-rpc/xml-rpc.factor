@@ -113,13 +113,17 @@ M: server-error error.
     "Description: " write dup message>> print
     "Tag: " write tag>> xml>string print ;
 
-PROCESS: xml>item ( tag -- object )
+TAGS: xml>item ( tag -- object )
 
 TAG: string xml>item
     children>string ;
 
-TAG: i4/int/double xml>item
+: children>number ( tag -- n )
     children>string string>number ;
+
+TAG: i4 xml>item children>number ;
+TAG: int xml>item children>number ;
+TAG: double xml>item children>number ;
 
 TAG: boolean xml>item
     dup children>string {
