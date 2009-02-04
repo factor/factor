@@ -3,10 +3,33 @@
 USING: xml xml.state kernel sequences fry assocs xml.data
 accessors strings make multiline parser namespaces macros
 sequences.deep generalizations words combinators
-math present arrays unicode.categories ;
+math present arrays unicode.categories locals.backend
+quotations ;
 IN: xml.literals
 
 <PRIVATE
+
+: each-attrs ( attrs quot -- )
+    [ values [ interpolated? ] filter ] dip each ; inline
+
+: (each-interpolated) ( item quot: ( interpolated -- ) -- )
+     {
+        { [ over interpolated? ] [ call ] }
+        { [ over tag? ] [ [ attrs>> ] dip each-attrs ] }
+        { [ over attrs? ] [ each-attrs ] }
+        { [ over xml? ] [ [ body>> ] dip (each-interpolated) ] }
+        [ 2drop ]
+     } cond ; inline recursive
+
+: each-interpolated ( xml quot -- )
+    '[ _ (each-interpolated) ] deep-each ; inline
+
+: has-interpolated? ( xml -- ? )
+    ! If this becomes a performance problem, it can be improved
+    f swap [ 2drop t ] each-interpolated ;
+
+: when-interpolated ( xml quot -- genquot )
+    [ dup has-interpolated? ] dip [ '[ _ swap ] ] if ; inline
 
 : string>chunk ( string -- chunk )
     t interpolating? [ string>xml-chunk ] with-variable ;
@@ -16,17 +39,34 @@ IN: xml.literals
 
 DEFER: interpolate-sequence
 
-: interpolate-attrs ( table attrs -- attrs )
-    swap '[
-        dup interpolated?
-        [ var>> _ at dup [ present ] when ] when
-    ] assoc-map [ nip ] assoc-filter ;
+: get-interpolated ( interpolated -- quot )
+    var>> '[ [ _ swap at ] keep ] ;
 
-: interpolate-tag ( table tag -- tag )
-    [ nip name>> ]
-    [ attrs>> interpolate-attrs ]
-    [ children>> [ interpolate-sequence ] [ drop f ] if* ] 2tri
-    <tag> ;
+: ?present ( object -- string )
+    dup [ present ] when ;
+
+: interpolate-attr ( key value -- quot )
+    dup interpolated?
+    [ get-interpolated '[ _ swap @ [ ?present 2array ] dip ] ]
+    [ 2array '[ _ swap ] ] if ;
+
+: filter-nulls ( assoc -- newassoc )
+    [ nip ] assoc-filter ;
+
+: interpolate-attrs ( attrs -- quot )
+    [
+        [ [ interpolate-attr ] { } assoc>map [ ] join ]
+        [ assoc-size ] bi
+        '[ @ _ swap [ narray filter-nulls <attrs> ] dip ]
+    ] when-interpolated ;
+
+: interpolate-tag ( tag -- quot )
+    [
+        [ name>> ]
+        [ attrs>> interpolate-attrs ]
+        [ children>> interpolate-sequence ] tri
+        '[ _ swap @ @ [ <tag> ] dip ]
+    ] when-interpolated ;
 
 GENERIC: push-item ( item -- )
 M: string push-item , ;
@@ -37,30 +77,33 @@ M: sequence push-item
 M: number push-item present , ;
 M: xml-chunk push-item % ;
 
-GENERIC: interpolate-item ( table item -- )
-M: object interpolate-item nip , ;
-M: tag interpolate-item interpolate-tag , ;
-M: interpolated interpolate-item
-    var>> swap at push-item ;
+: concat-interpolate ( array -- newarray )
+    [ [ push-item ] each ] { } make ;
 
-: interpolate-sequence ( table seq -- seq )
-    [ [ interpolate-item ] with each ] { } make ;
+GENERIC: interpolate-item ( item -- quot )
+M: object interpolate-item [ swap ] curry ;
+M: tag interpolate-item interpolate-tag ;
+M: interpolated interpolate-item get-interpolated ;
 
-: interpolate-xml-doc ( table xml -- xml )
-    (clone) [ interpolate-tag ] change-body ;
+: interpolate-sequence ( seq -- quot )
+    [
+        [ [ interpolate-item ] map concat ]
+        [ length ] bi
+        '[ @ _ swap [ narray concat-interpolate ] dip ]
+    ] when-interpolated ;
 
-: (each-interpolated) ( item quot: ( interpolated -- ) -- )
-     {
-        { [ over interpolated? ] [ call ] }
-        { [ over tag? ] [
-            [ attrs>> values [ interpolated? ] filter ] dip each
-        ] }
-        { [ over xml? ] [ [ body>> ] dip (each-interpolated) ] }
-        [ 2drop ]
-     } cond ; inline recursive
+GENERIC: [interpolate-xml] ( xml -- quot )
 
-: each-interpolated ( xml quot -- )
-    '[ _ (each-interpolated) ] deep-each ; inline
+M: xml [interpolate-xml]
+    dup body>> interpolate-tag
+    '[ _ (clone) swap @ drop >>body ] ;
+
+M: xml-chunk [interpolate-xml]
+    interpolate-sequence
+    '[ @ drop <xml-chunk> ] ;
+
+MACRO: interpolate-xml ( xml -- quot )
+    [interpolate-xml] ;
 
 : number<-> ( doc -- dup )
     0 over [
@@ -68,14 +111,6 @@ M: interpolated interpolate-item
             over >>var [ 1+ ] dip
         ] unless drop
     ] each-interpolated drop ;
-
-GENERIC: interpolate-xml ( table xml -- xml )
-
-M: xml interpolate-xml
-    interpolate-xml-doc ;
-
-M: xml-chunk interpolate-xml
-    interpolate-sequence <xml-chunk> ;
 
 : >search-hash ( seq -- hash )
     [ dup search ] H{ } map>assoc ;
