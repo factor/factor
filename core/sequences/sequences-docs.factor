@@ -207,6 +207,10 @@ HELP: first4-unsafe
 { $values { "seq" sequence } { "first" "the first element" } { "second" "the second element" } { "third" "the third element" } { "fourth" "the fourth element" } }
 { $contract "Unsafe variant of " { $link first4 } " that does not perform bounds checks." } ;
 
+HELP: 1sequence
+{ $values { "obj" object } { "exemplar" sequence } { "seq" sequence } }
+{ $description "Creates a one-element sequence of the same type as " { $snippet "exemplar" } "." } ;
+
 HELP: 2sequence
 { $values { "obj1" object } { "obj2" object } { "exemplar" sequence } { "seq" sequence } }
 { $description "Creates a two-element sequence of the same type as " { $snippet "exemplar" } "." } ;
