@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml xml.data kernel io io.encodings interval-maps splitting fry
-math.parser sequences combinators assocs locals accessors math 
-arrays values io.encodings.ascii ascii io.files biassocs math.order
-combinators.short-circuit io.binary io.encodings.iana ;
+math.parser sequences combinators assocs locals accessors math arrays
+byte-arrays values io.encodings.ascii ascii io.files biassocs
+math.order combinators.short-circuit io.binary io.encodings.iana ;
 IN: io.encodings.chinese
 
 SINGLETON: gb18030
@@ -65,7 +65,7 @@ TUPLE: range ufirst ulast bfirst blast ;
     126 /mod HEX: 81 + swap
     10 /mod HEX: 30 + swap
     HEX: 81 +
-    B{ } 4sequence dup reverse-here ;
+    4byte-array dup reverse-here ;
 
 : >interval-map-by ( start-quot end-quot value-quot seq -- interval-map )
     '[ _ [ @ 2array ] _ tri ] { } map>assoc <interval-map> ; inline
@@ -115,13 +115,13 @@ M: gb18030 encode-char ( char stream encoding -- )
 
 : four-byte ( stream byte1 byte2 -- char )
     rot 2 swap stream-read dup last-bytes?
-    [ first2 B{ } 4sequence decode-quad ]
+    [ first2 4byte-array decode-quad ]
     [ 3drop replacement-char ] if ;
 
 : two-byte ( stream byte -- char )
     over stream-read1 {
         { [ dup not ] [ 3drop replacement-char ] }
-        { [ dup second-byte? ] [ B{ } 2sequence mapping value-at nip ] }
+        { [ dup second-byte? ] [ 2byte-array mapping value-at nip ] }
         { [ dup quad-2/4? ] [ four-byte ] }
         [ 3drop replacement-char ]
     } cond ;
@@ -129,7 +129,7 @@ M: gb18030 encode-char ( char stream encoding -- )
 M: gb18030 decode-char ( stream encoding -- char )
     drop dup stream-read1 {
         { [ dup not ] [ 2drop f ] }
-        { [ dup ascii? ] [ nip 1array B{ } like mapping value-at ] }
+        { [ dup ascii? ] [ nip 1byte-array mapping value-at ] }
         { [ dup quad-1/3? ] [ two-byte ] }
         [ 2drop replacement-char ]
     } cond ;
