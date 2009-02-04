@@ -1,5 +1,5 @@
 USING: io.encodings.iana io.encodings.iana.private
-io.encodings.utf8 tools.test assocs ;
+io.encodings.utf8 tools.test assocs namespaces ;
 IN: io.encodings.iana.tests
 
 [ utf8 ] [ "UTF-8" name>encoding ] unit-test
@@ -15,9 +15,9 @@ ebcdic-fisea "EBCDIC-FI-SE-A" register-encoding
 
 ! Clean up after myself
 [ ] [
-    "EBCDIC-FI-SE-A" n>e-table delete-at
-    "csEBCDICFISEA" n>e-table delete-at
-    ebcdic-fisea e>n-table delete-at
+    "EBCDIC-FI-SE-A" n>e-table get delete-at
+    "csEBCDICFISEA" n>e-table get delete-at
+    ebcdic-fisea e>n-table get delete-at
 ] unit-test
 [ "EBCDIC-FI-SE-A" name>encoding ] must-fail
 [ "csEBCDICFISEA" name>encoding ] must-fail
