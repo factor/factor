@@ -98,7 +98,7 @@ IN: quadtrees.tests
         "d" {  0.75  0.25 } value>>key
 
         {  0.25  0.25 } delete>>key
-        prune
+        prune-quadtree
 ] unit-test
 
 [ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
@@ -116,7 +116,7 @@ IN: quadtrees.tests
 
         {  0.25  0.25 } delete>>key
         {  0.75  0.25 } delete>>key
-        prune
+        prune-quadtree
 ] unit-test
 
 [ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
@@ -160,7 +160,7 @@ IN: quadtrees.tests
         "g" {  0.25  0.25 } value>>key
         "h" {  0.75  0.75 } value>>key
 
-        prune
+        prune-quadtree
 ] unit-test
 
 [ 8 ] [
