@@ -55,7 +55,7 @@ IN: xml.literals.tests
 [ "<x></x>" ] [ f [XML <x><-></x> XML] xml>string ] unit-test
 
 \ <XML must-infer
-[ { } "" interpolate-xml ] must-infer
+[ [XML <-> XML] ] must-infer
 [ [XML <foo><-></foo> <bar val=<->/> XML] ] must-infer
 
 [ xml-chunk ] [ [ [XML <foo/> XML] ] first class ] unit-test
