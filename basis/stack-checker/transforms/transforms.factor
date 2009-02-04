@@ -70,7 +70,7 @@ IN: stack-checker.transforms
     [
         [ no-case ]
     ] [
-        dup peek quotation? [
+        dup peek callable? [
             dup peek swap but-last
         ] [
             [ no-case ] swap

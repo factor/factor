@@ -1,9 +1,9 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences kernel io io.files combinators.short-circuit
-math.order values assocs io.encodings io.binary fry strings
-math io.encodings.ascii arrays accessors splitting math.parser
-biassocs io.encodings.iana ;
+math.order values assocs io.encodings io.binary fry strings math
+io.encodings.ascii arrays byte-arrays accessors splitting
+math.parser biassocs io.encodings.iana ;
 IN: io.encodings.japanese
 
 SINGLETON: shift-jis
@@ -55,7 +55,7 @@ make-jis to: shift-jis-table
     { [ 0 HEX: 7F between? ] [ HEX: A1 HEX: DF between? ] } 1|| ;
 
 : write-halfword ( stream halfword -- )
-    h>b/b swap B{ } 2sequence swap stream-write ;
+    h>b/b swap 2byte-array swap stream-write ;
 
 M: jis encode-char
     swapd ch>jis
