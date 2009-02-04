@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math namespaces make sequences words io
+USING: arrays kernel math math.order namespaces make sequences words io
 math.vectors ui.gadgets columns accessors strings.tables
 math.geometry.rect locals fry ;
 IN: ui.gadgets.grids
@@ -8,8 +8,7 @@ IN: ui.gadgets.grids
 TUPLE: grid < gadget
 grid
 { gap initial: { 0 0 } }
-{ fill? initial: t }
-align ;
+{ fill? initial: t } ;
 
 : new-grid ( children class -- grid )
     new-gadget
@@ -27,50 +26,82 @@ align ;
 
 : grid-remove ( grid i j -- grid ) [ <gadget> ] 2dip grid-add ;
 
-: pref-dim-grid ( grid -- dims )
-    grid>> [ [ pref-dim ] map ] map ;
+<PRIVATE
 
-: (compute-grid) ( grid -- seq ) [ max-dim ] map ;
+: cross-zip ( seq1 seq2 -- seq1xseq2 )
+    [ [ 2array ] with map ] curry map ;
 
-: compute-grid ( grid -- horiz vert )
-    pref-dim-grid [ flip (compute-grid) ] [ (compute-grid) ] bi ;
+TUPLE: cell pref-dim baseline ;
 
-: (pair-up) ( horiz vert -- dim )
-    [ first ] [ second ] bi* 2array ;
+: <cell> ( gadget -- cell ) [ pref-dim ] [ baseline ] bi cell boa ;
 
-: pair-up ( horiz vert -- dims )
-    [ [ (pair-up) ] curry map ] with map ;
+M: cell baseline baseline>> ;
 
-: add-gaps ( gap seq -- newseq )
-    [ v+ ] with map ;
+TUPLE: grid-layout grid gap fill? row-heights column-widths ;
 
-: gap-sum ( gap seq -- newseq )
-    dupd add-gaps dim-sum v+ ;
+: iterate-cell-dims ( cells quot -- seq )
+    '[ [ pref-dim>> @ ] [ max ] map-reduce ] map ; inline
+
+: row-heights ( grid-layout -- heights )
+    [ grid>> ] [ fill?>> ] bi
+    [ [ second ] iterate-cell-dims ]
+    [ [ dup [ pref-dim>> ] map baseline-metrics + ] map ]
+    if ;
+
+: column-widths ( grid-layout -- widths )
+    grid>> flip [ first ] iterate-cell-dims ;
+
+: <grid-layout> ( grid -- grid-layout )
+    grid-layout new
+        swap
+        [ grid>> [ [ <cell> ] map ] map >>grid ]
+        [ fill?>> >>fill? ]
+        [ gap>> >>gap ]
+        tri
+        dup row-heights >>row-heights
+        dup column-widths >>column-widths ;
+
+: accumulate-cell-dims ( seq gap -- n ns )
+    dup '[ + _ + ] accumulate ;
+
+: accumulate-cell-xs ( grid-layout -- x xs )
+    [ column-widths>> ] [ gap>> first ] bi
+    accumulate-cell-dims ;
+
+: accumulate-cell-ys ( grid-layout -- y ys )
+    [ row-heights>> ] [ gap>> second ] bi
+    accumulate-cell-dims ;
 
 M: grid pref-dim*
-    [ gap>> ] [ compute-grid [ gap-sum ] bi-curry@ ] bi bi (pair-up) ;
+    <grid-layout>
+    [ accumulate-cell-xs drop ]
+    [ accumulate-cell-ys drop ]
+    bi 2array ;
 
-: do-grid ( dims grid quot -- )
-    [ grid>> ] dip '[ _ 2each ] 2each ; inline
+: (compute-cell-locs) ( grid-layout -- locs )
+    [ accumulate-cell-xs nip ]
+    [ accumulate-cell-ys nip ]
+    bi cross-zip flip ;
 
-: grid-positions ( grid dims -- locs )
-    [ gap>> dup ] dip add-gaps swap [ v+ ] accumulate nip ;
+: adjust-for-baseline ( row-locs row-cells -- row-locs' )
+    baseline-align [ 0 swap 2array v+ ] 2map ;
 
-: position-grid ( grid horiz vert -- )
-    pick [ [ grid-positions ] bi-curry@ bi pair-up ] dip
-    [ (>>loc) ] do-grid ;
-
-: resize-grid ( grid horiz vert -- )
-    pick fill?>> [
-        pair-up swap [ (>>dim) ] do-grid
-    ] [
-        2drop grid>> [ [ prefer ] each ] each
+: cell-locs ( grid-layout -- locs )
+    dup fill?>>
+    [ (compute-cell-locs) ] [
+        [ (compute-cell-locs) ] [ grid>> ] bi
+        [ adjust-for-baseline ] 2map
     ] if ;
 
-: grid-layout ( grid horiz vert -- )
-    [ position-grid ] [ resize-grid ] 3bi ;
+: cell-dims ( grid-layout -- dims )
+    dup fill?>>
+    [ [ column-widths>> ] [ row-heights>> ] bi cross-zip flip ]
+    [ grid>> [ [ pref-dim>> ] map ] map ]
+    if ;
 
-M: grid layout* dup compute-grid grid-layout ;
+M: grid layout*
+    [ grid>> ] [ <grid-layout> [ cell-locs ] [ cell-dims ] bi ] bi
+    [ [ [ >>loc ] [ >>dim ] bi* drop ] 3each ] 3each ;
 
 M: grid children-on ( rect gadget -- seq )
     dup children>> empty? [ 2drop f ] [
@@ -83,3 +114,5 @@ M: grid gadget-text*
     grid>>
     [ [ gadget-text ] map ] map format-table
     [ CHAR: \n , ] [ % ] interleave ;
+
+PRIVATE>

@@ -74,4 +74,9 @@ M: paragraph layout*
     wrap-paragraph dup line-y-coordinates
     [ layout-line ] 2each ;
 
+M: paragraph baseline
+    children>> [ 0 ] [
+        first [ loc>> second ] [ baseline ] bi +
+    ] if-empty ;
+
 PRIVATE>
