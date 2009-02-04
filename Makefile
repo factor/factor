@@ -130,18 +130,20 @@ solaris-x86-64:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.x86.64
 
 freetype6.dll:
-	wget http://factorcode.org/dlls/freetype6.dll
+	wget $(DLL_PATH)/freetype6.dll
 	chmod 755 freetype6.dll
 
 zlib1.dll:
-	wget http://factorcode.org/dlls/zlib1.dll
+	wget $(DLL_PATH)/zlib1.dll
 	chmod 755 zlib1.dll
 
-winnt-x86-32: freetype6.dll zlib1.dll
+windows-dlls: freetype6.dll zlib1.dll
+
+winnt-x86-32: windows-dlls
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
 	$(MAKE) $(CONSOLE_EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
 
-winnt-x86-64:
+winnt-x86-64: windows-dlls
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.64
 	$(MAKE) $(CONSOLE_EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.64
 
@@ -167,7 +169,7 @@ factor: $(DLL_OBJS) $(EXE_OBJS)
 factor-console: $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
-		$(CFLAGS) $(CFLAGS_CONSOLE) -o $@$(EXE_SUFFIX)$(EXE_EXTENSION) $(EXE_OBJS)
+		$(CFLAGS) $(CFLAGS_CONSOLE) -o factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION) $(EXE_OBJS)
 
 clean:
 	rm -f vm/*.o
