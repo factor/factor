@@ -137,9 +137,12 @@ INSTANCE: iota immutable-sequence
 
 : from-end ( seq n -- seq n' ) [ dup length ] dip - ; inline
 
+: (1sequence) ( obj seq -- seq )
+    [ 0 swap set-nth-unsafe ] keep ; inline
+
 : (2sequence) ( obj1 obj2 seq -- seq )
     [ 1 swap set-nth-unsafe ] keep
-    [ 0 swap set-nth-unsafe ] keep ; inline
+    (1sequence) ; inline
 
 : (3sequence) ( obj1 obj2 obj3 seq -- seq )
     [ 2 swap set-nth-unsafe ] keep
@@ -150,6 +153,9 @@ INSTANCE: iota immutable-sequence
     (3sequence) ; inline
 
 PRIVATE>
+
+: 1sequence ( obj exemplar -- seq )
+    1 swap [ (1sequence) ] new-like ; inline
 
 : 2sequence ( obj1 obj2 exemplar -- seq )
     2 swap [ (2sequence) ] new-like ; inline
