@@ -17,6 +17,14 @@ gb18030 "GB18030" register-encoding
 ! Resource file from:
 ! http://source.icu-project.org/repos/icu/data/trunk/charset/data/xml/gb-18030-2000.xml
 
+! Algorithms from:
+! http://www-128.ibm.com/developerworks/library/u-china.html
+
+: linear ( bytes -- num )
+    ! This hard-codes bMin and bMax
+    reverse first4
+    10 * + 126 * + 10 * + ; foldable
+
 TUPLE: range ufirst ulast bfirst blast ;
 
 : b>byte-array ( string -- byte-array )
@@ -27,8 +35,8 @@ TUPLE: range ufirst ulast bfirst blast ;
         {
             [ "uFirst" attr hex> ]
             [ "uLast" attr hex> ]
-            [ "bFirst" attr b>byte-array ]
-            [ "bLast" attr b>byte-array ]
+            [ "bFirst" attr b>byte-array linear ]
+            [ "bLast" attr b>byte-array linear ]
         } cleave range boa
     ] dip push ;
 
@@ -51,21 +59,13 @@ TUPLE: range ufirst ulast bfirst blast ;
         ] each-element mapping ranges 
     ] ;
 
-! Algorithms from:
-! http://www-128.ibm.com/developerworks/library/u-china.html
-
-: linear ( bytes -- num )
-    ! This hard-codes bMin and bMax
-    reverse first4
-    10 * + 126 * + 10 * + ;
-
 : unlinear ( num -- bytes )
     B{ HEX: 81 HEX: 30 HEX: 81 HEX: 30 } linear -
-    10 /mod swap [ HEX: 30 + ] dip
-    126 /mod swap [ HEX: 81 + ] dip
-    10 /mod swap [ HEX: 30 + ] dip
+    10 /mod HEX: 30 + swap
+    126 /mod HEX: 81 + swap
+    10 /mod HEX: 30 + swap
     HEX: 81 +
-    B{ } 4sequence reverse ;
+    B{ } 4sequence dup reverse-here ;
 
 : >interval-map-by ( start-quot end-quot value-quot seq -- interval-map )
     '[ _ [ @ 2array ] _ tri ] { } map>assoc <interval-map> ; inline
@@ -74,7 +74,7 @@ TUPLE: range ufirst ulast bfirst blast ;
     [ ufirst>> ] [ ulast>> ] [ ] >interval-map-by ;
 
 : ranges-gb>u ( ranges -- interval-map )
-    [ bfirst>> linear ] [ blast>> linear ] [ ] >interval-map-by ;
+    [ bfirst>> ] [ blast>> ] [ ] >interval-map-by ;
 
 VALUE: gb>u
 VALUE: u>gb
@@ -87,7 +87,7 @@ ascii <file-reader> xml>gb-data
 
 : lookup-range ( char -- byte-array )
     dup u>gb interval-at [
-        [ ufirst>> - ] [ bfirst>> linear ] bi + unlinear
+        [ ufirst>> - ] [ bfirst>> ] bi + unlinear
     ] [ encode-error ] if* ;
 
 M: gb18030 encode-char ( char stream encoding -- )
@@ -109,7 +109,7 @@ M: gb18030 encode-char ( char stream encoding -- )
 : decode-quad ( byte-array -- char )
     dup mapping value-at [ ] [
         linear dup gb>u interval-at [
-            [ bfirst>> linear - ] [ ufirst>> ] bi +
+            [ bfirst>> - ] [ ufirst>> ] bi +
         ] [ drop replacement-char ] if*
     ] ?if ;
 
