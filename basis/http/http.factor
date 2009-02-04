@@ -3,17 +3,11 @@
 USING: accessors kernel combinators math namespaces make assocs
 sequences splitting sorting sets strings vectors hashtables
 quotations arrays byte-arrays math.parser calendar
-calendar.format present urls
-
+calendar.format present urls fry
 io io.encodings io.encodings.iana io.encodings.binary
 io.encodings.8-bit io.crlf
-
 unicode.case unicode.categories
-
 http.parsers ;
-
-EXCLUDE: fry => , ;
-
 IN: http
 
 : (read-header) ( -- alist )
@@ -217,5 +211,7 @@ TUPLE: post-data data params content-type content-encoding ;
     " " split harvest [ "=" split1 [ >lower ] dip ] { } map>assoc ;
 
 : parse-content-type ( content-type -- type encoding )
-    ";" split1 parse-content-type-attributes "charset" swap at
-    name>encoding over "text/" head? latin1 binary ? or ;
+    ";" split1
+    parse-content-type-attributes "charset" swap at
+    [ name>encoding ]
+    [ dup "text/" head? latin1 binary ? ] if* ;

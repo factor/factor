@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.encodings kernel math io.encodings.private ;
+USING: io io.encodings kernel math io.encodings.private io.encodings.iana ;
 IN: io.encodings.ascii
 
 <PRIVATE
@@ -20,3 +20,5 @@ M: ascii encode-char
 
 M: ascii decode-char
     128 decode-if< ;
+
+ascii "ANSI_X3.4-1968" register-encoding
