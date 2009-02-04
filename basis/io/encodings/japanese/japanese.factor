@@ -3,19 +3,33 @@
 USING: sequences kernel io io.files combinators.short-circuit
 math.order values assocs io.encodings io.binary fry strings
 math io.encodings.ascii arrays accessors splitting math.parser
-biassocs ;
+biassocs io.encodings.iana ;
 IN: io.encodings.japanese
 
-VALUE: shift-jis
+SINGLETON: shift-jis
 
-VALUE: windows-31j
+shift-jis "Shift_JIS" register-encoding
+
+SINGLETON: windows-31j
+
+windows-31j "Windows-31J" register-encoding
 
 <PRIVATE
+
+VALUE: shift-jis-table
+
+M: shift-jis <encoder> drop shift-jis-table <encoder> ;
+M: shift-jis <decoder> drop shift-jis-table <decoder> ;
+
+VALUE: windows-31j-table
+
+M: windows-31j <encoder> drop windows-31j-table <encoder> ;
+M: windows-31j <decoder> drop windows-31j-table <decoder> ;
 
 TUPLE: jis assoc ;
 
 : <jis> ( assoc -- jis )
-    [ nip ] assoc-filter H{ } assoc-like
+    [ nip ] assoc-filter
     >biassoc jis boa ;
 
 : ch>jis ( ch tuple -- jis ) assoc>> value-at [ encode-error ] unless* ;
@@ -31,10 +45,10 @@ TUPLE: jis assoc ;
     ascii file-lines process-jis <jis> ;
 
 "resource:basis/io/encodings/japanese/CP932.txt"
-make-jis to: windows-31j
+make-jis to: windows-31j-table
 
 "resource:basis/io/encodings/japanese/sjis-0208-1997-std.txt"
-make-jis to: shift-jis
+make-jis to: shift-jis-table
 
 : small? ( char -- ? )
     ! ASCII range or single-byte halfwidth katakana
