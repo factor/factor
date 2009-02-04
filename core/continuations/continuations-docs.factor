@@ -247,7 +247,7 @@ HELP: retry
 { $examples
     "Try to get a 0 as a random number:"
     { $unchecked-example "USING: continuations math prettyprint random ;"
-        "[ 5 random 0 = ] 5 retry t"
+        "[ 5 random 0 = ] 5 retry"
         "t"
     }
 } ;
