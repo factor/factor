@@ -4,7 +4,7 @@ USING: accessors arrays ui.gadgets ui.gadgets.viewports
 ui.gadgets.frames ui.gadgets.grids ui.gadgets.theme
 ui.gadgets.sliders ui.gestures kernel math namespaces sequences
 models models.range models.compose combinators math.vectors
-classes.tuple math.geometry.rect combinators.short-circuit ;
+classes.tuple math.rectangles combinators.short-circuit ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller < frame viewport x y follows ;
@@ -63,7 +63,7 @@ scroller H{
     {
         [ scroller-value vneg offset-rect viewport-gap offset-rect ]
         [ viewport>> dim>> rect-min ]
-        [ viewport>> 2rect-extent [ v- { 0 0 } vmin ] [ v- { 0 0 } vmax ] 2bi* v+ ]
+        [ viewport>> [ v- { 0 0 } vmin ] [ v- { 0 0 } vmax ] with-rect-extents v+ ]
         [ scroller-value v+ ]
         [ scroll ]
     } cleave ;

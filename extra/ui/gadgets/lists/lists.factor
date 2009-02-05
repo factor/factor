@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors math.vectors classes.tuple math.geometry.rect colors
+USING: accessors math.vectors classes.tuple math.rectangles colors
 kernel sequences models opengl math math.order namespaces
 ui.commands ui.gestures ui.render ui.gadgets
 ui.gadgets.labels ui.gadgets.scrollers

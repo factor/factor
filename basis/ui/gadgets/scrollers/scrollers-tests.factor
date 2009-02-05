@@ -2,7 +2,7 @@ USING: ui.gadgets ui.gadgets.scrollers namespaces tools.test
 kernel models models.compose models.range ui.gadgets.viewports
 ui.gadgets.labels ui.gadgets.grids ui.gadgets.frames
 ui.gadgets.sliders math math.vectors arrays sequences
-tools.test.ui math.geometry.rect accessors ui.gadgets.buttons
+tools.test.ui math.rectangles accessors ui.gadgets.buttons
 ui.gadgets.packs ;
 IN: ui.gadgets.scrollers.tests
 
@@ -12,8 +12,8 @@ IN: ui.gadgets.scrollers.tests
 ] unit-test
 
 [ { 100 200 } ] [
-    { 100 200 } "g" get scroll>rect
-    "s" get follows>> rect-loc
+    { 100 200 } point>rect "g" get scroll>rect
+    "s" get follows>> loc>>
 ] unit-test
 
 [ ] [ "s" get scroll>bottom ] unit-test
@@ -28,7 +28,7 @@ IN: ui.gadgets.scrollers.tests
 "v" get [
     [ { 10 20 } ] [ "v" get model>> range-value ] unit-test
 
-    [ { 10 20 } ] [ "g" get rect-loc vneg viewport-gap v+ scroller-border v+ ] unit-test
+    [ { 10 20 } ] [ "g" get loc>> vneg viewport-gap v+ scroller-border v+ ] unit-test
 ] with-grafted-gadget
 
 [ ] [
@@ -41,7 +41,7 @@ IN: ui.gadgets.scrollers.tests
 [ ] [ "s" get layout ] unit-test
 
 "s" get [
-    [ { 34 34 } ] [ "s" get viewport>> rect-dim ] unit-test
+    [ { 34 34 } ] [ "s" get viewport>> dim>> ] unit-test
 
     [ { 107 107 } ] [ "s" get viewport>> viewport-dim ] unit-test
 
@@ -57,7 +57,7 @@ IN: ui.gadgets.scrollers.tests
 
     [ { 10 20 } ] [ "s" get viewport>> model>> range-value ] unit-test
 
-    [ { 10 20 } ] [ "g" get rect-loc vneg viewport-gap v+ scroller-border v+ ] unit-test
+    [ { 10 20 } ] [ "g" get loc>> vneg viewport-gap v+ scroller-border v+ ] unit-test
 ] with-grafted-gadget
 
 <gadget> { 600 400 } >>dim "g1" set

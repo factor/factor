@@ -1,7 +1,5 @@
-
-USING: tools.test math.geometry.rect ;
-
-IN: math.geometry.rect.tests
+USING: tools.test math.rectangles ;
+IN: math.rectangles.tests
 
 [ T{ rect f { 10 10 } { 20 20 } } ]
 [
@@ -20,18 +18,18 @@ IN: math.geometry.rect.tests
 [ f ] [
     T{ rect f { 100 100 } { 50 50 } }
     T{ rect f { 200 200 } { 40 40 } }
-    intersects?
+    contains-rect?
 ] unit-test
 
 [ t ] [
     T{ rect f { 100 100 } { 50 50 } }
     T{ rect f { 120 120 } { 40 40 } }
-    intersects?
+    contains-rect?
 ] unit-test
 
 [ f ] [
     T{ rect f { 1000 100 } { 50 50 } }
     T{ rect f { 120 120 } { 40 40 } }
-    intersects?
+    contains-rect?
 ] unit-test
 

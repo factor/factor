@@ -1,10 +1,11 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors fry kernel math
-math.geometry.rect math.order math.vectors namespaces opengl
+math.rectangles math.order math.vectors namespaces opengl
 sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.worlds ui.gadgets.theme ui.gestures ui.render ui.text
-ui.gadgets.menus models math.ranges sequences combinators fonts ;
+ui.gadgets.menus math.rectangles models math.ranges sequences
+combinators fonts ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol

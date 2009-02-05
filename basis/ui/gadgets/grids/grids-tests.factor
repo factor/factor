@@ -1,5 +1,5 @@
 USING: ui.gadgets ui.gadgets.grids tools.test kernel arrays
-namespaces math.geometry.rect accessors ui.gadgets.grids.private
+namespaces math.rectangles accessors ui.gadgets.grids.private
 ui.gadgets.debug sequences ;
 IN: ui.gadgets.grids.tests
 
@@ -45,9 +45,9 @@ IN: ui.gadgets.grids.tests
     { 10 10 } >>gap
     dup prefer
     dup layout
-    rect-dim
-    "a" get rect-dim
-    "b" get rect-dim
+    dim>>
+    "a" get dim>>
+    "b" get dim>>
 ] unit-test
 
 [ ] [

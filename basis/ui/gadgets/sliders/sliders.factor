@@ -4,7 +4,7 @@ USING: accessors arrays ui.gestures ui.gadgets ui.gadgets.buttons
 ui.gadgets.frames ui.gadgets.grids math.order
 ui.gadgets.theme ui.render kernel math namespaces sequences
 vectors models models.range math.vectors math.functions
-quotations colors math.geometry.rect fry ;
+quotations colors math.rectangles fry ;
 IN: ui.gadgets.sliders
 
 TUPLE: elevator < gadget direction ;

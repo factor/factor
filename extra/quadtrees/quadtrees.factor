@@ -1,5 +1,5 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: assocs kernel math.geometry.rect combinators accessors
+USING: assocs kernel math.rectangles combinators accessors
 math.vectors vectors sequences math math.points math.geometry
 combinators.short-circuit arrays fry locals ;
 IN: quadtrees
