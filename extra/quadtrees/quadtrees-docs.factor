@@ -10,7 +10,9 @@ ARTICLE: "quadtrees" "Quadtrees"
 "The following words are provided to help write quadtree algorithms:"
 { $subsection descend }
 { $subsection each-quadrant }
-{ $subsection map-quadrant } ;
+{ $subsection map-quadrant }
+"Quadtrees can be used to \"swizzle\" a sequence to improve the locality of spatial data in memory:"
+{ $subsection swizzle } ;
 
 ABOUT: "quadtrees"
 
@@ -38,3 +40,6 @@ HELP: map-quadrant
 { $values { "node" quadtree } { "quot" quotation } { "array" array } }
 { $description "Calls " { $snippet "quot" } " with each subnode of " { $snippet "node" } " on the top of the stack in turn, collecting the four results into " { $snippet "array" } "." } ;
 
+HELP: swizzle
+{ $values { "sequence" sequence } { "quot" quotation } { "sequence'" sequence } }
+{ $description "Swizzles " { $snippet "sequence" } " based on the two-dimensional vector values returned by calling " { $snippet "quot" } " on each element of " { $snippet "sequence" } "." } ;
