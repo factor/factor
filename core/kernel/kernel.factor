@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel.private slots.private math.private
 classes.tuple.private ;
@@ -227,7 +227,7 @@ PRIVATE>
 
 ! Loops
 : loop ( pred: ( -- ? ) -- )
-    dup slip swap [ loop ] [ drop ] if ; inline recursive
+    [ call ] keep [ loop ] curry when ; inline recursive
 
 : do ( pred body tail -- pred body tail )
     over 3dip ; inline

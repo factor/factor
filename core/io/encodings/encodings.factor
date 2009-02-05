@@ -61,9 +61,8 @@ M: decoder stream-read1
 : (read) ( n quot -- n string )
     over 0 <string> [
         [
-            slip over
-            [ swapd set-nth-unsafe f ] [ 3drop t ] if
-        ] 2curry find-integer
+            over [ swapd set-nth-unsafe f ] [ 3drop t ] if
+        ] curry compose find-integer
     ] keep ; inline
 
 : finish-read ( n string -- string/f )
