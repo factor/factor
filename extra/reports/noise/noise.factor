@@ -53,7 +53,6 @@ IN: reports.noise
         { nipd 3 }
         { nkeep 5 }
         { npick 6 }
-        { nrev 5 }
         { nrot 5 }
         { nslip 5 }
         { ntuck 6 }
