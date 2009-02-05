@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: locals accessors kernel math namespaces sequences
-math.vectors colors math.geometry.rect ui.commands ui.operations ui.gadgets
+math.vectors colors math.rectangles ui.commands ui.operations ui.gadgets
 ui.gadgets.buttons ui.gadgets.worlds ui.gestures ui.gadgets.theme
 ui.gadgets.packs ui.gadgets.glass ui.gadgets.borders ;
 IN: ui.gadgets.menus

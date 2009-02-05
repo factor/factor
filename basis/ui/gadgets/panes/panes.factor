@@ -3,7 +3,7 @@
 USING: arrays hashtables io kernel namespaces sequences
 io.styles strings quotations math opengl combinators memoize
 math.vectors sorting splitting assocs classes.tuple models
-continuations destructors accessors math.geometry.rect fry
+continuations destructors accessors math.rectangles fry
 fonts ui.gadgets ui.gadgets.private ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.paragraphs
 ui.gadgets.incremental ui.gadgets.packs ui.gadgets.theme
@@ -59,7 +59,7 @@ M: pane gadget-selection ( pane -- string/f )
 GENERIC: draw-selection ( loc obj -- )
 
 : if-fits ( rect quot -- )
-    [ clip get over intersects? ] dip [ drop ] if ; inline
+    [ clip get over contains-rect? ] dip [ drop ] if ; inline
 
 M: gadget draw-selection ( loc gadget -- )
     swap offset-rect [
@@ -341,7 +341,7 @@ M: pack sloppy-pick-up* ( loc gadget -- n )
     [ orientation>> ] [ children>> ] bi (fast-children-on) ;
 
 M: gadget sloppy-pick-up*
-    children>> [ inside? ] with find-last drop ;
+    children>> [ contains-point? ] with find-last drop ;
 
 M: f sloppy-pick-up*
     2drop f ;

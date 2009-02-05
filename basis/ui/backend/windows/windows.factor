@@ -9,7 +9,7 @@ windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
 windows.messages windows.types windows.nt windows threads libc
 combinators fry combinators.short-circuit continuations
 command-line shuffle opengl ui.render ascii math.bitwise locals
-accessors math.geometry.rect math.order ascii calendar
+accessors math.rectangles math.order ascii calendar
 io.encodings.utf16n ;
 IN: ui.backend.windows
 
@@ -434,7 +434,7 @@ M: windows-ui-backend do-events
     style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
 
 : make-RECT ( world -- RECT )
-    [ window-loc>> dup ] [ rect-dim ] bi v+
+    [ window-loc>> dup ] [ dim>> ] bi v+
     "RECT" <c-object>
     over first over set-RECT-right
     swap second over set-RECT-bottom

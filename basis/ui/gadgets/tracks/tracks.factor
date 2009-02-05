@@ -1,9 +1,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io kernel namespaces fry
-math math.vectors math.geometry.rect math.order
+math math.vectors math.rectangles math.order
 sequences words ui.gadgets ui.gadgets.packs ;
-
 IN: ui.gadgets.tracks
 
 TUPLE: track < pack sizes ;
@@ -12,14 +11,13 @@ TUPLE: track < pack sizes ;
     sizes>> dup sift sum '[ dup [ _ / ] when ] map ;
 
 : init-track ( track -- track )
-    init-gadget
     V{ } clone >>sizes
-    1 >>fill ;
+    1 >>fill ; inline
 
 : new-track ( orientation class -- track )
-    new
+    new-gadget
         init-track
-        swap >>orientation ;
+        swap >>orientation ; inline
 
 : <track> ( orientation -- track ) track new-track ;
 
@@ -67,4 +65,4 @@ M: track pref-dim* ( gadget -- dim )
         delete-nth 
     ] [ 2drop ] if ;
 
-: clear-track ( track -- ) V{ } clone >>sizes clear-gadget ;
+: clear-track ( track -- ) [ sizes>> delete-all ] [ clear-gadget ] bi ;

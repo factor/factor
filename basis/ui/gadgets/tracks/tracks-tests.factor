@@ -1,5 +1,5 @@
 USING: kernel ui.gadgets ui.gadgets.tracks tools.test
-       math.geometry.rect accessors ;
+       math.rectangles accessors ;
 IN: ui.gadgets.tracks.tests
 
 [ { 100 100 } ] [

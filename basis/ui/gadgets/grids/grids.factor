@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.order namespaces make sequences words io
 math.vectors ui.gadgets columns accessors strings.tables
-math.geometry.rect locals fry ;
+math.rectangles fry ;
 IN: ui.gadgets.grids
 
 TUPLE: grid < gadget
@@ -17,14 +17,19 @@ grid
 : <grid> ( children -- grid )
     grid new-grid ;
 
-:: grid-child ( grid i j -- gadget ) i j grid grid>> nth nth ;
+<PRIVATE
 
-:: grid-add ( grid child i j -- grid )
-    grid i j grid-child unparent
-    grid child add-gadget
-    child i j grid grid>> nth set-nth ;
+: grid@ ( grid pair -- col# row )
+    swap [ first2 ] [ grid>> ] bi* nth ;
 
-: grid-remove ( grid i j -- grid ) [ <gadget> ] 2dip grid-add ;
+PRIVATE>
+
+: grid-child ( grid pair -- gadget ) grid@ nth ;
+
+: grid-add ( grid child pair -- grid )
+    [ nip grid-child unparent ] [ drop add-gadget ] [ swapd grid@ set-nth ] 3tri ;
+
+: grid-remove ( grid pair -- grid ) [ <gadget> ] dip grid-add ;
 
 <PRIVATE
 
@@ -52,7 +57,7 @@ TUPLE: grid-layout grid gap fill? row-heights column-widths ;
     grid>> flip [ first ] iterate-cell-dims ;
 
 : <grid-layout> ( grid -- grid-layout )
-    grid-layout new
+    \ grid-layout new
         swap
         [ grid>> [ [ <cell> ] map ] map >>grid ]
         [ fill?>> >>fill? ]
@@ -72,11 +77,12 @@ TUPLE: grid-layout grid gap fill? row-heights column-widths ;
     [ row-heights>> ] [ gap>> second ] bi
     accumulate-cell-dims ;
 
-M: grid pref-dim*
-    <grid-layout>
+: grid-pref-dim ( grid-layout -- dim )
     [ accumulate-cell-xs drop ]
     [ accumulate-cell-ys drop ]
     bi 2array ;
+
+M: grid pref-dim* <grid-layout> grid-pref-dim ;
 
 : (compute-cell-locs) ( grid-layout -- locs )
     [ accumulate-cell-xs nip ]
@@ -99,9 +105,11 @@ M: grid pref-dim*
     [ grid>> [ [ pref-dim>> ] map ] map ]
     if ;
 
-M: grid layout*
-    [ grid>> ] [ <grid-layout> [ cell-locs ] [ cell-dims ] bi ] bi
+: grid-layout ( children grid-layout -- )
+    [ cell-locs ] [ cell-dims ] bi
     [ [ [ >>loc ] [ >>dim ] bi* drop ] 3each ] 3each ;
+
+M: grid layout* [ grid>> ] [ <grid-layout> ] bi grid-layout ;
 
 M: grid children-on ( rect gadget -- seq )
     dup children>> empty? [ 2drop f ] [

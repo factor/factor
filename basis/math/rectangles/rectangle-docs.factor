@@ -1,12 +1,11 @@
 USING: help.markup help.syntax ;
-
-IN: math.geometry.rect
+IN: math.rectangles
 
 HELP: rect
 { $class-description "A rectangle with the following slots:"
     { $list
-        { { $link rect-loc } " - the top-left corner of the rectangle as an x/y pair" }
-        { { $link rect-dim } " - the dimensions of the rectangle as a width/height pair" }
+        { { $slot "loc" } " - the top-left corner of the rectangle as an x/y pair" }
+        { { $slot "dim" } " - the dimensions of the rectangle as a width/height pair" }
     }
     "Rectangles are constructed by calling " { $link <rect> } " and " { $link <extent-rect> } "."
 } ;
@@ -47,12 +46,10 @@ HELP: <zero-rect>
 { $values { "rect" "a new " { $link rect } } }
 { $description "Creates a rectangle located at the origin with zero dimensions." } ;
 
-ARTICLE: "math.geometry.rect" "Rectangles"
-"The " { $vocab-link "math.geometry.rect" } " vocabulary defines a rectangle data type and operations on them."
+ARTICLE: "math.rectangles" "Rectangles"
+"The " { $vocab-link "math.rectangles" } " vocabulary defines a rectangle data type and operations on them."
 { $subsection rect }
 "Rectangles can be taken apart:"
-{ $subsection rect-loc }
-{ $subsection rect-dim }
 { $subsection rect-bounds }
 { $subsection rect-extent }
 "New rectangles can be created:"
@@ -64,4 +61,4 @@ ARTICLE: "math.geometry.rect" "Rectangles"
 { $subsection rect-intersect }
 { $subsection intersects? } ;
 
-ABOUT: "math.geometry.rect"
+ABOUT: "math.rectangles"

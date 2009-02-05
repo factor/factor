@@ -1,5 +1,5 @@
 USING: help.markup help.syntax opengl kernel strings
-classes.tuple classes quotations models math.geometry.rect
+classes.tuple classes quotations models math.rectangles
 ui.gadgets.private ;
 IN: ui.gadgets
 

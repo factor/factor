@@ -3,16 +3,28 @@
 USING: accessors arrays hashtables kernel models math namespaces
 make sequences quotations math.vectors combinators sorting
 binary-search vectors dlists deques models threads
-concurrency.flags math.order math.geometry.rect fry ;
+concurrency.flags math.order math.rectangles fry ;
 IN: ui.gadgets
 
 ! Values for orientation slot
 CONSTANT: horizontal { 1 0 }
 CONSTANT: vertical { 0 1 }
 
-TUPLE: gadget < rect pref-dim parent children orientation focus
-visible? root? clipped? layout-state graft-state graft-node
-interior boundary model ;
+TUPLE: gadget < rect
+pref-dim
+parent
+children
+{ orientation initial: { 0 1 } }
+focus
+{ visible? initial: t }
+root?
+clipped?
+layout-state
+{ graft-state initial: { f f } }
+graft-node
+interior
+boundary
+model ;
 
 M: gadget equal? 2drop f ;
 
@@ -24,13 +36,7 @@ M: gadget model-changed 2drop ;
 
 : nth-gadget ( n gadget -- child ) children>> nth ;
 
-: init-gadget ( gadget -- gadget )
-    init-rect
-    { 0 1 } >>orientation
-    t >>visible?
-    { f f } >>graft-state ; inline
-
-: new-gadget ( class -- gadget ) new init-gadget ; inline
+: new-gadget ( class -- gadget ) new ; inline
 
 : <gadget> ( -- gadget )
     gadget new-gadget ;
@@ -52,7 +58,7 @@ GENERIC: user-input* ( str gadget -- ? )
 
 M: gadget user-input* 2drop t ;
 
-GENERIC: children-on ( rect/point gadget -- seq )
+GENERIC: children-on ( rect gadget -- seq )
 
 M: gadget children-on nip children>> ;
 
@@ -67,23 +73,20 @@ M: gadget children-on nip children>> ;
 PRIVATE>
 
 : fast-children-on ( rect axis children -- from to )
-    [ [ rect-loc ] 2dip (fast-children-on) 0 or ]
+    [ [ loc>> ] 2dip (fast-children-on) 0 or ]
     [ [ rect-bounds v+ ] 2dip (fast-children-on) ?1+ ]
     3bi ;
 
-<PRIVATE
+M: gadget contains-rect? ( bounds gadget -- ? )
+    dup visible?>> [ call-next-method ] [ 2drop f ] if ;
 
-: inside? ( bounds gadget -- ? )
-    dup visible?>> [ intersects? ] [ 2drop f ] if ;
-
-: (pick-up) ( point gadget -- gadget )
-    dupd children-on [ inside? ] with find-last nip ;
-
-PRIVATE>
+M: gadget contains-point? ( loc gadget -- ? )
+    dup visible?>> [ call-next-method ] [ 2drop f ] if ;
 
 : pick-up ( point gadget -- child/f )
-    2dup (pick-up) dup
-    [ nip [ rect-loc v- ] keep pick-up ] [ drop nip ] if ;
+    2dup [ dup point>rect ] dip children-on
+    [ contains-point? ] with find-last nip
+    [ [ loc>> v- ] keep pick-up ] [ nip ] ?if ;
 
 : max-dim ( dims -- dim ) { 0 0 } [ vmax ] reduce ;
 

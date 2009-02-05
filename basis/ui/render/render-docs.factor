@@ -1,6 +1,6 @@
 USING: ui.gadgets ui.gestures help.markup help.syntax
 kernel classes strings opengl opengl.gl models
-math.geometry.rect math colors ;
+math.rectangles math colors ;
 IN: ui.render
 
 HELP: gadget

@@ -1,5 +1,5 @@
 USING: ui.gadgets help.markup help.syntax ui.gadgets.viewports
-ui.gadgets.sliders math.geometry.rect ;
+ui.gadgets.sliders math.rectangles ;
 IN: ui.gadgets.scrollers
 
 HELP: scroller

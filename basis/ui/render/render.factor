@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types arrays hashtables io kernel
 math namespaces opengl opengl.gl opengl.glu sequences strings
 vectors combinators math.vectors ui.gadgets colors
-math.order math.geometry.rect locals specialized-arrays.float ;
+math.order math.rectangles locals specialized-arrays.float ;
 IN: ui.render
 
 SYMBOL: clip

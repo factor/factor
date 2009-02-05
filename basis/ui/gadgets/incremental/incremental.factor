@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io kernel math namespaces math.vectors ui.gadgets
 ui.gadgets.private ui.gadgets.packs accessors
-math.geometry.rect combinators ;
+math.rectangles combinators ;
 IN: ui.gadgets.incremental
 
 TUPLE: incremental < pack cursor ;

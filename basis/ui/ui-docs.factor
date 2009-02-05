@@ -1,7 +1,7 @@
 USING: help.markup help.syntax strings quotations debugger
 namespaces ui.backend ui.gadgets ui.gadgets.worlds
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids
-ui.gadgets.private math.geometry.rect colors ui.text fonts ;
+ui.gadgets.private math.rectangles colors ui.text fonts ;
 IN: ui
 
 HELP: windows
@@ -102,7 +102,7 @@ ARTICLE: "gadgets" "Pre-made UI gadgets"
 
 ARTICLE: "ui-geometry" "Gadget geometry"
 "The " { $link gadget } " class inherits from the " { $link rect } " class, and thus all gadgets have a bounding box:"
-{ $subsection "math.geometry.rect" }
+{ $subsection "math.rectangles" }
 "Word for converting from a child gadget's co-ordinate system to a parent's:"
 { $subsection relative-loc }
 { $subsection screen-loc }
