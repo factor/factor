@@ -9,7 +9,9 @@ ARTICLE: "ui-grid-layout" "Grid layouts"
 "Managing children:"
 { $subsection grid-add }
 { $subsection grid-remove }
-{ $subsection grid-child } ;
+{ $subsection grid-child }
+"Grid lines:"
+{ $subsection "ui.gadgets.grid-lines" } ;
 
 HELP: grid
 { $class-description "A grid gadget lays out its children so that all gadgets in a column have equal width and all gadgets in a row have equal height."
