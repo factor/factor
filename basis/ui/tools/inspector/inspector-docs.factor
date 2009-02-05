@@ -8,9 +8,7 @@ $nl
 "The slot editor's text editing commands are standard; see " { $link "gadgets-editors" } "."
 $nl
 "The slot editor has a toolbar containing various commands."
-{ $command-map slot-editor "toolbar" }
-"The following commands are also available."
-{ $command-map source-editor "word" } ;
+{ $command-map slot-editor "toolbar" } ;
 
 ARTICLE: "ui-inspector" "UI inspector"
 "The graphical inspector provides functionality similar to the terminal inspector (see " { $link "inspector" } "), adding in-place editing of slot values."

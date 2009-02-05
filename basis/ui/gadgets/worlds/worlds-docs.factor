@@ -27,8 +27,8 @@ HELP: flush-gl-context
 { $description "Ensures all GL rendering calls made to an OpenGL context finish rendering to the screen. This word is called automatically by the UI after drawing a " { $link world } "." } ;
 
 HELP: focus-path
-{ $values { "world" world } { "seq" "a new sequence" } }
-{ $description "If the top-level window containing the world has focus, outputs a sequence of parents of the currently focused gadget, otherwise outputs " { $link f } "." }
+{ $values { "gadget" gadget } { "seq" "a new sequence" } }
+{ $description "If the gadget has focus, outputs a sequence of parents of the currently focused gadget, otherwise outputs " { $link f } "." }
 { $notes "This word is used to avoid sending " { $link gain-focus } " gestures to a gadget which requests focus on an unfocused top-level window, so that, for instance, a text editing caret does not appear in this case." } ;
 
 HELP: world

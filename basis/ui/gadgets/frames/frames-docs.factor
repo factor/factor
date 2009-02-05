@@ -1,5 +1,5 @@
 USING: help.syntax help.markup ui.gadgets kernel arrays
-quotations classes.tuple ui.gadgets.grids ;
+quotations classes.tuple ui.gadgets.grids parser ;
 IN: ui.gadgets.frames
 
 ARTICLE: "ui-frame-layout" "Frame layouts"
@@ -18,19 +18,24 @@ ARTICLE: "ui-frame-layout" "Frame layouts"
 { $subsection @bottom-left }
 { $subsection @bottom-right } ;
 
-: $ui-frame-constant ( element -- )
-    drop
-    { $description "Symbolic constant for a common input to " { $link grid-add } "." } print-element ;
+<<
 
-HELP: @center $ui-frame-constant ;
-HELP: @left $ui-frame-constant ;
-HELP: @right $ui-frame-constant ;
-HELP: @top $ui-frame-constant ;
-HELP: @bottom $ui-frame-constant ;
-HELP: @top-left $ui-frame-constant ;
-HELP: @top-right $ui-frame-constant ;
-HELP: @bottom-left $ui-frame-constant ;
-HELP: @bottom-right $ui-frame-constant ;
+: ui-frame-constant
+    { $values { "value" pair } } parsed
+    { $description "Symbolic constant for a common input to " { $link grid-add } "." } parsed ;
+    parsing
+
+>>
+
+HELP: @center ui-frame-constant ;
+HELP: @left ui-frame-constant ;
+HELP: @right ui-frame-constant ;
+HELP: @top ui-frame-constant ;
+HELP: @bottom ui-frame-constant ;
+HELP: @top-left ui-frame-constant ;
+HELP: @top-right ui-frame-constant ;
+HELP: @bottom-left ui-frame-constant ;
+HELP: @bottom-right ui-frame-constant ;
 
 HELP: frame
 { $class-description "A frame is a gadget which lays out its children in a 3x3 grid. If the frame is enlarged past its preferred size, the center gadget fills up available room."

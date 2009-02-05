@@ -184,7 +184,7 @@ HELP: gesture>string
 { $values { "gesture" "a gesture" } { "string/f" { $maybe string } } }
 { $contract "Creates a human-readable string from a gesture object, returning " { $link f } " if the gesture does not have a human-readable form." }
 { $examples
-    { $example "USING: io ui.gestures ;" "T{ key-down f { C+ } \"x\" } gesture>string print" "C+x" }
+    { $unchecked-example "USING: io ui.gestures ;" "T{ key-down f { C+ } \"x\" } gesture>string print" "C+x" }
 } ;
 
 HELP: left-action

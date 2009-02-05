@@ -29,17 +29,17 @@ HELP: <grid>
 { $description "Creates a new " { $link grid } " gadget with the given children." } ;
 
 HELP: grid-child
-{ $values { "grid" grid } { "i" "non-negative integer" } { "j" "non-negative integer" } { "gadget" gadget } }
+{ $values { "grid" grid } { "pair" "a pair with shape " { $snippet "{ i j }" } } { "gadget" gadget } }
 { $description "Outputs the child gadget at the " { $snippet "i" } "," { $snippet "j" } "th position of the grid." }
 { $errors "Throws an error if the indices are out of bounds." } ;
 
 HELP: grid-add
-{ $values { "grid" grid } { "child" gadget } { "i" "non-negative integer" } { "j" "non-negative integer" } }
+{ $values { "grid" grid } { "child" gadget } { "pair" "a pair with shape " { $snippet "{ i j }" } } }
 { $description "Adds a child gadget at the specified location." }
 { $side-effects "grid" } ;
 
 HELP: grid-remove
-{ $values { "grid" grid } { "i" "non-negative integer" } { "j" "non-negative integer" } }
+{ $values { "grid" grid } { "pair" "a pair with shape " { $snippet "{ i j }" } } }
 { $description "Removes a child gadget from the specified location." }
 { $side-effects "grid" } ;
 

@@ -51,7 +51,7 @@ HELP: <shelf>
 { $description "Creates a new " { $link pack } " which lays out its children horizontally." } ;
 
 HELP: pack-pref-dim
-{ $values { "gadget" gadget } { "sizes" "a sequence of pairs of integers" } { "dim" "a pair of integers" } }
+{ $values { "pack" pack } { "sizes" "a sequence of pairs of integers" } { "dim" "a pair of integers" } }
 { $description "Computes the preferred size of a pack, with each gadget receiving its size from the corresponding index of the " { $snippet "sizes" } " sequence." }
 { $notes
     "This word is useful if you are writing your own layout gadget which inherits from " { $link pack } ". This allows you to reuse layout logic while computing gadget sizes using a custom procedure."
