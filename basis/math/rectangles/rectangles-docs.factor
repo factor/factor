@@ -38,9 +38,13 @@ HELP: rect-intersect
 { $values { "rect1" rect } { "rect2" rect } { "newrect" "a new " { $link rect } } }
 { $description "Computes the intersection of two rectangles." } ;
 
-HELP: intersects?
-{ $values { "rect/point" "a " { $link rect } " or a pair of integers" } { "rect" rect } { "?" "a boolean" } }
-{ $description "Tests if two rectangles (or a point and a rectangle, respectively) have a non-empty intersection." } ;
+HELP: contains-rect?
+{ $values { "rect1" rect } { "rect2" rect } { "?" "a boolean" } }
+{ $description "Tests if two rectangles have a non-empty intersection." } ;
+
+HELP: contains-point?
+{ $values { "point" "a pair of integers" } { "rect" rect } { "?" "a boolean" } }
+{ $description "Tests if a rectangle contains a point." } ;
 
 HELP: <zero-rect>
 { $values { "rect" "a new " { $link rect } } }
@@ -56,9 +60,12 @@ ARTICLE: "math.rectangles" "Rectangles"
 { $subsection <zero-rect> }
 { $subsection <rect> }
 { $subsection <extent-rect> }
-"More utility words for working with rectangles:"
-{ $subsection offset-rect }
+"Set-theoretic operations on rectangles:"
 { $subsection rect-intersect }
-{ $subsection intersects? } ;
+{ $subsection rect-union }
+{ $subsection contains-rect? }
+{ $subsection contains-point? }
+"A utility word:"
+{ $subsection offset-rect } ;
 
 ABOUT: "math.rectangles"

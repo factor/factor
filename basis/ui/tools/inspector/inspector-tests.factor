@@ -1,6 +1,6 @@
 IN: ui.tools.inspector.tests
-USING: tools.test ui.tools.inspector math ;
+USING: tools.test ui.tools.inspector math models ;
 
 \ <inspector-gadget> must-infer
 
-[ ] [ \ + <inspector-gadget> com-edit-slot ] unit-test
+[ ] [ \ + <model> <inspector-gadget> com-edit-slot ] unit-test
