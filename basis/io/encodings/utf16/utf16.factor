@@ -1,14 +1,20 @@
-! Copyright (C) 2006, 2008 Daniel Ehrenberg.
+! Copyright (C) 2006, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces io.binary
-io.encodings combinators splitting io byte-arrays ;
+io.encodings combinators splitting io byte-arrays io.encodings.iana ;
 IN: io.encodings.utf16
 
 SINGLETON: utf16be
 
+utf16be "UTF-16BE" register-encoding
+
 SINGLETON: utf16le
 
+utf16le "UTF-16LE" register-encoding
+
 SINGLETON: utf16
+
+utf16 "UTF-16" register-encoding
 
 ERROR: missing-bom ;
 
@@ -101,13 +107,9 @@ M: utf16le encode-char ( char stream encoding -- )
 
 ! UTF-16
 
-: bom-le B{ HEX: ff HEX: fe } ; inline
+CONSTANT: bom-le B{ HEX: ff HEX: fe }
 
-: bom-be B{ HEX: fe HEX: ff } ; inline
-
-: start-utf16le? ( seq1 -- seq2 ? ) bom-le ?head ;
-
-: start-utf16be? ( seq1 -- seq2 ? ) bom-be ?head ;
+CONSTANT: bom-be B{ HEX: fe HEX: ff }
 
 : bom>le/be ( bom -- le/be )
     dup bom-le sequence= [ drop utf16le ] [

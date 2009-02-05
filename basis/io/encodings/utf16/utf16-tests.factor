@@ -1,6 +1,7 @@
+! Copyright (C) 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test io.encodings.utf16 arrays sbufs
 io.streams.byte-array sequences io.encodings io
-bootstrap.unicode
 io.encodings.string alien.c-types alien.strings accessors classes ;
 IN: io.encodings.utf16.tests
 
@@ -15,7 +16,6 @@ IN: io.encodings.utf16.tests
 [ { 119070 } ] [ { HEX: 34 HEX: D8 HEX: 1E HEX: DD } utf16le decode >array ] unit-test
 [ { CHAR: replacement-character } ] [ { 0 BIN: 11011111 } utf16le decode >array ] unit-test
 [ { CHAR: replacement-character } ] [ { 0 BIN: 11011011 0 0 } utf16le decode >array ] unit-test
-[ { 119070 } ] [ { HEX: 34 HEX: D8 HEX: 1E HEX: DD } utf16le decode >array ] unit-test
 
 [ { 120 0 52 216 30 221 } ] [ { CHAR: x HEX: 1d11e } utf16le encode >array ] unit-test
 
