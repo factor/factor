@@ -1,12 +1,15 @@
 ! (c) 2009 Joe Groff, see BSD license
 USING: assocs kernel math.geometry.rect combinators accessors
 math.vectors vectors sequences math math.points math.geometry
-combinators.short-circuit arrays fry locals ;
+combinators.short-circuit arrays fry ;
 IN: quadtrees
 
 TUPLE: quadtree { bounds rect } point value ll lr ul ur leaf? ;
 
-: <quadtree> ( bounds -- quadtree ) f f f f f f t quadtree boa ;
+: <quadtree> ( bounds -- quadtree )
+    quadtree new
+        swap >>bounds
+        t >>leaf? ;
 
 : rect-ll ( rect -- point ) loc>> ;
 : rect-lr ( rect -- point ) [ loc>> ] [ width  ] bi v+x ;
@@ -26,11 +29,13 @@ TUPLE: quadtree { bounds rect } point value ll lr ul ur leaf? ;
 : descend ( pt node -- pt subnode )
     [ drop ] [ quadrant ] 2bi ; inline
 
-:: each-quadrant ( node quot -- )
-    node ll>> quot call
-    node lr>> quot call
-    node ul>> quot call
-    node ur>> quot call ; inline
+: each-quadrant ( node quot -- )
+    {
+        [ [ ll>> ] [ call ] bi* ] 
+        [ [ lr>> ] [ call ] bi* ] 
+        [ [ ul>> ] [ call ] bi* ] 
+        [ [ ur>> ] [ call ] bi* ] 
+    } 2cleave ; inline
 : map-quadrant ( node quot: ( child-node -- x ) -- array )
     each-quadrant 4array ; inline
 
@@ -73,6 +78,7 @@ DEFER: in-rect*
     [ node-insert ] [ node-insert ] bi ;
 
 : leaf-replaceable? ( pt leaf -- ? ) point>> { [ nip not ] [ = ] } 2|| ;
+
 : leaf-insert ( value point leaf -- )
     2dup leaf-replaceable?
     [ [ (>>point) ] [ (>>value) ] bi ]
@@ -165,7 +171,7 @@ DEFER: in-rect*
 
 PRIVATE>
 
-: prune ( tree -- tree ) [ (prune) ] keep ;
+: prune-quadtree ( tree -- tree ) [ (prune) ] keep ;
 
 : in-rect ( tree rect -- values )
     [ 16 <vector> ] 2dip in-rect* ;
@@ -185,4 +191,9 @@ M: quadtree clear-assoc ( assoc -- )
     f >>point
     f >>value
     drop ;
+
+: swizzle ( sequence quot -- sequence' )
+    [ dup ] dip map
+    [ zip ] [ rect-containing <quadtree> ] bi
+    [ '[ first2 _ set-at ] each ] [ values ] bi ;
 
