@@ -236,7 +236,7 @@ find_word_size() {
 
 set_factor_binary() {
     case $OS in
-        winnt) FACTOR_BINARY=factor-console.exe;;
+        winnt) FACTOR_BINARY=factor.com;;
         *) FACTOR_BINARY=factor;;
     esac
 }
@@ -295,6 +295,9 @@ set_build_info() {
     elif [[ $OS == winnt && $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=winnt-x86.64
         MAKE_TARGET=winnt-x86-64
+    elif [[ $OS == winnt && $ARCH == x86 && $WORD == 32 ]] ; then
+        MAKE_IMAGE_TARGET=winnt-x86.32
+        MAKE_TARGET=winnt-x86-32
     elif [[ $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=unix-x86.64
         MAKE_TARGET=$OS-x86-64

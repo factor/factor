@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private alien.accessors sequences
 sequences.private math ;
@@ -19,7 +19,7 @@ M: byte-array resize
 
 INSTANCE: byte-array sequence
 
-: 1byte-array ( x -- byte-array ) 1 <byte-array> [ set-first ] keep ; inline
+: 1byte-array ( x -- byte-array ) B{ } 1sequence ; inline
 
 : 2byte-array ( x y -- byte-array ) B{ } 2sequence ; inline
 
