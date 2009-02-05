@@ -17,10 +17,11 @@ else
 	CFLAGS += -O3 $(SITE_CFLAGS)
 endif
 
-CONFIG = $(shell ./build-support/factor.sh config-target)
-include $(CONFIG)
-
 ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
+
+ifdef CONFIG
+	include $(CONFIG)
+endif
 
 DLL_OBJS = $(PLAF_DLL_OBJS) \
 	vm/alien.o \
@@ -128,21 +129,11 @@ solaris-x86-32:
 solaris-x86-64:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.solaris.x86.64
 
-freetype6.dll:
-	wget $(DLL_PATH)/freetype6.dll
-	chmod 755 freetype6.dll
-
-zlib1.dll:
-	wget $(DLL_PATH)/zlib1.dll
-	chmod 755 zlib1.dll
-
-windows-dlls: freetype6.dll zlib1.dll
-
-winnt-x86-32: windows-dlls
+winnt-x86-32:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
 	$(MAKE) $(CONSOLE_EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.32
 
-winnt-x86-64: windows-dlls
+winnt-x86-64:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.64
 	$(MAKE) $(CONSOLE_EXECUTABLE) CONFIG=vm/Config.windows.nt.x86.64
 
@@ -159,7 +150,7 @@ macosx.app: factor
 		-change libfactor.dylib \
 		@executable_path/../Frameworks/libfactor.dylib \
 		Factor.app/Contents/MacOS/factor
-        
+
 factor: $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
