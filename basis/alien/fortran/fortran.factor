@@ -123,13 +123,38 @@ GENERIC: added-c-args ( type -- args )
 M: fortran-type added-c-args drop { } ;
 M: character-type added-c-args drop { "long" } ;
 
+GENERIC: added-c-arg-values ( type -- arg-values )
+
+M: fortran-type added-c-arg-values drop { } ;
+M: character-type added-c-arg-values
+    fix-character-type dims>> first 1array ;
+
+GENERIC: returns-by-value? ( type -- ? )
+
+M: fortran-type returns-by-value? drop f ;
+M: number-type returns-by-value? dims>> not ;
+M: complex-type returns-by-value? drop f ;
+
+GENERIC: (fortran-ret-type>c-type) ( type -- c-type )
+
+M: fortran-type (fortran-ret-type>c-type) (fortran-type>c-type) ;
+M: real-type (fortran-ret-type>c-type) drop "double" ;
+
 PRIVATE>
 
 : fortran-type>c-type ( fortran-type -- c-type )
     parse-fortran-type (fortran-type>c-type) ;
 
-: fortran-arg-type>c-type ( fortran-type -- c-type added-args ) { } ;
-: fortran-ret-type>c-type ( fortran-type -- c-type added-args ) { } ;
+: fortran-arg-type>c-type ( fortran-type -- c-type added-args )
+    parse-fortran-type
+    [ (fortran-type>c-type) c-type>pointer ]
+    [ added-c-args ] bi ;
+: fortran-ret-type>c-type ( fortran-type -- c-type added-args )
+    parse-fortran-type dup returns-by-value?
+    [ (fortran-ret-type>c-type) { } ] [
+        "void" swap 
+        [ added-c-args ] [ (fortran-ret-type>c-type) c-type>pointer ] bi prefix
+    ] if ;
 
 : fortran-sig>c-sig ( fortran-return fortran-args -- c-return c-args ) ;
 
