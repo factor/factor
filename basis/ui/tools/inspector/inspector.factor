@@ -65,10 +65,10 @@ M: hashtable make-slot-descriptions
         inspector-renderer >>renderer
         monospace-font >>font ;
 
-: <inspector-gadget> ( obj -- gadget )
+: <inspector-gadget> ( model -- gadget )
     vertical inspector-gadget new-track
         add-toolbar
-        swap <model> >>model
+        swap >>model
         dup model>> <inspector-table> >>table
         dup model>> <summary-gadget> "Object" <labelled-gadget> f track-add
         dup table>> <scroller> "Contents" <labelled-gadget> 1 track-add ;
@@ -112,5 +112,8 @@ inspector-gadget "multi-touch" f {
     { up-action com-refresh }
 } define-command-map
 
-: inspector ( obj -- )
+: inspect-model ( model -- )
     <inspector-gadget> "Inspector" open-status-window ;
+
+: inspector ( obj -- )
+    <model> inspect-model ;
