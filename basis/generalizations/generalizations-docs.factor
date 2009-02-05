@@ -139,15 +139,6 @@ HELP: -nrot
     }
 } ;
 
-HELP: nrev
-{ $values { "n" integer } }
-{ $description "A generalization of " { $link spin } " that reverses any number of items at the top of the stack."
-}
-{ $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 4 nrev .s" "4\n3\n2\n1" }
-  "The " { $link spin } " word is equivalent to " { $snippet "3 nrev" } "."
-} ;
-
 HELP: ndip
 { $values { "quot" quotation } { "n" integer } }
 { $description "A generalization of " { $link dip } " that can work " 
@@ -327,7 +318,6 @@ $nl
 { $subsection nnip }
 { $subsection ndrop }
 { $subsection ntuck }
-{ $subsection nrev }
 { $subsection mnswap }
 "Generalized combinators:"
 { $subsection ndip }

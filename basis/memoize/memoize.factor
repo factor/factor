@@ -35,7 +35,7 @@ M: too-many-arguments summary
     drop "There must be no more than 4 input and 4 output arguments" ;
 
 : check-memoized ( word -- )
-    dup #in 4 > swap #out 4 > or [ too-many-arguments ] when ;
+    [ #in ] [ #out ] bi [ 4 > ] either? [ too-many-arguments ] when ;
 
 : define-memoized ( word quot -- )
     over check-memoized

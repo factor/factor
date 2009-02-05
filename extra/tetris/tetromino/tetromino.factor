@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays namespaces sequences math math.vectors
-colors random ;
+USING: kernel arrays namespaces sequences math math.order
+math.vectors colors random ;
 IN: tetris.tetromino
 
 TUPLE: tetromino states colour ;
@@ -104,7 +104,7 @@ SYMBOL: tetrominoes
     tetrominoes get random ;
 
 : blocks-max ( blocks quot -- max )
-    map [ 1+ ] map supremum ; inline
+    map [ 1+ ] [ max ] map-reduce ; inline
 
 : blocks-width ( blocks -- width )
     [ first ] blocks-max ;

@@ -1,3 +1,4 @@
+DLL_PATH=http://factorcode.org/dlls
 WINDRES=windres
 include vm/Config.windows.nt
 include vm/Config.x86.32

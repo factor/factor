@@ -14,13 +14,13 @@ IN: io.binary
 : >be ( x n -- byte-array ) >le dup reverse-here ;
 
 : d>w/w ( d -- w1 w2 )
-    dup HEX: ffffffff bitand
-    swap -32 shift HEX: ffffffff bitand ;
+    [ HEX: ffffffff bitand ]
+    [ -32 shift HEX: ffffffff bitand ] bi ;
 
 : w>h/h ( w -- h1 h2 )
-    dup HEX: ffff bitand
-    swap -16 shift HEX: ffff bitand ;
+    [ HEX: ffff bitand ]
+    [ -16 shift HEX: ffff bitand ] bi ;
 
 : h>b/b ( h -- b1 b2 )
-    dup mask-byte
-    swap -8 shift mask-byte ;
+    [ mask-byte ]
+    [ -8 shift mask-byte ] bi ;

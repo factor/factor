@@ -19,6 +19,9 @@ IN: math.vectors
 : vmax ( u v -- w ) [ max ] 2map ;
 : vmin ( u v -- w ) [ min ] 2map ;
 
+: vgreatest ( array -- vmax ) { -1.0/0.0 -1.0/0.0 } [ vmax ] reduce ; 
+: vleast    ( array -- vmax ) {  1.0/0.0  1.0/0.0 } [ vmin ] reduce ; 
+
 : v. ( u v -- x ) [ * ] [ + ] 2map-reduce ;
 : norm-sq ( v -- x ) [ absq ] [ + ] map-reduce ;
 : norm ( v -- x ) norm-sq sqrt ;
