@@ -1,3 +1,4 @@
+#error "lol"
 DLL_PATH=http://factorcode.org/dlls/64
 CC=$(WIN64_PATH)-gcc.exe
 WINDRES=$(WIN64_PATH)-windres.exe
