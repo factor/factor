@@ -1,9 +1,24 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays generic kernel math namespaces sequences
 words splitting grouping math.vectors ui.gadgets.grids
-ui.gadgets math.geometry.rect ;
+ui.gadgets.grids.private ui.gadgets math.order math.rectangles ;
 IN: ui.gadgets.frames
+
+CONSTANT: @center { 1 1 }
+CONSTANT: @left { 0 1 }
+CONSTANT: @right { 2 1 }
+CONSTANT: @top { 1 0 }
+CONSTANT: @bottom { 1 2 }
+
+CONSTANT: @top-left { 0 0 }
+CONSTANT: @top-right { 2 0 }
+CONSTANT: @bottom-left { 0 2 }
+CONSTANT: @bottom-right { 2 2 }
+
+TUPLE: frame < grid ;
+
+<PRIVATE
 
 TUPLE: glue < gadget ;
 
@@ -13,31 +28,22 @@ M: glue pref-dim* drop { 0 0 } ;
 
 : <frame-grid> ( -- grid ) 9 [ <glue> ] replicate 3 group ;
 
-: @center 1 1 ; inline
-: @left 0 1 ; inline
-: @right 2 1 ; inline
-: @top 1 0 ; inline
-: @bottom 1 2 ; inline
+: (fill-center) ( n seq -- )
+    [ [ first ] [ third ] bi + [-] ] keep set-second ;
 
-: @top-left 0 0 ; inline
-: @top-right 2 0 ; inline
-: @bottom-left 0 2 ; inline
-: @bottom-right 2 2 ; inline
+: fill-center ( dim grid-layout -- )
+    [ [ first ] [ column-widths>> ] bi* ]
+    [ [ second ] [ row-heights>> ] bi* ] 2bi
+    [ (fill-center) ] 2bi@ ;
 
-TUPLE: frame < grid ;
+PRIVATE>
+
+M: frame layout*
+    [ grid>> ] [ dim>> ] [ <grid-layout> ] tri
+    [ fill-center ] keep grid-layout ;
 
 : new-frame ( class -- frame )
     <frame-grid> swap new-grid ; inline
 
 : <frame> ( -- frame )
     frame new-frame ;
-
-: (fill-center) ( dim vec -- )
-    [ [ first ] [ third ] bi v+ [v-] ] keep set-second ;
-
-: fill-center ( dim horiz vert -- )
-    [ (fill-center) ] bi-curry@ bi ;
-
-M: frame layout*
-    dup compute-grid
-    [ [ dim>> ] 2dip fill-center ] [ grid-layout ] 3bi ;

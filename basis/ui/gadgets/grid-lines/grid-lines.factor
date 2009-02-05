@@ -1,34 +1,34 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors math namespaces opengl opengl.gl
-sequences math.vectors ui.gadgets ui.gadgets.grids ui.render
-math.geometry.rect fry ;
+sequences math.vectors ui.gadgets ui.gadgets.grids
+ui.gadgets.grids.private ui.render math.rectangles
+fry locals arrays ;
 IN: ui.gadgets.grid-lines
 
 TUPLE: grid-lines color ;
 
 C: <grid-lines> grid-lines
 
-SYMBOL: grid-dim
+<PRIVATE
 
-: half-gap ( -- gap ) grid get gap>> [ 2/ ] map ; inline
+: grid-line-offsets ( n ns orientation gap -- seq )
+    [ swap suffix ] [ v. 2/ ] 2bi* '[ _ + ] map ;
 
-: grid-line-from/to ( orientation point -- from to )
-    half-gap v- swap
-    [ [ half-gap ] 2dip set-axis ]
-    [ [ grid-dim get ] 2dip set-axis ] 2bi ;
+:: (compute-grid-lines) ( grid n ns orientation -- seq )
+    n ns orientation grid gap>> grid-line-offsets [
+        [ orientation n*v ]
+        [ dup 2array grid dim>> swap orientation set-axis ]
+        bi 2array
+    ] map ;
 
-: draw-grid-lines ( gaps orientation -- )
-    [ grid get swap grid-positions grid get dim>> suffix ] dip
-    [ '[ _ v- ] map ] keep
-    '[ _ swap grid-line-from/to gl-line ] each ;
+: compute-grid-lines ( grid -- lines )
+    dup <grid-layout>
+    [ accumulate-cell-xs horizontal (compute-grid-lines) ]
+    [ accumulate-cell-ys vertical (compute-grid-lines) ]
+    2bi append ;
+
+PRIVATE>
 
 M: grid-lines draw-boundary
-    color>> gl-color [
-        [ grid set ]
-        [ dim>> half-gap v- grid-dim set ]
-        [ compute-grid ] tri
-        [ horizontal draw-grid-lines ]
-        [ vertical draw-grid-lines ]
-        bi*
-    ] with-scope ;
+    color>> gl-color compute-grid-lines [ first2 gl-line ] each ;

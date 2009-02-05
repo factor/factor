@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences ui.gadgets kernel math math.functions
-math.vectors math.order math.geometry.rect namespaces accessors
+math.vectors math.order math.rectangles namespaces accessors
 fry combinators arrays ;
 IN: ui.gadgets.packs
 
