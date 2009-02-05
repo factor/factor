@@ -66,16 +66,26 @@ CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
     tri
     [ =href a> ] [code] ;
 
-: a-end-tag ( tag -- )
-    drop [ </a> ] [code] ;
+: process-attrs ( assoc -- newassoc )
+    [ "@" ?head [ value present ] when ] assoc-map ;
+
+: non-chloe-attrs ( tag -- )
+    attrs>> non-chloe-attrs-only [ process-attrs ] [code-with] ;
+
+: a-attrs ( tag -- )
+    [ non-chloe-attrs ]
+    [ compile-link-attrs ]
+    [ compile-a-url ] tri
+    [ swap "href" swap set-at ] [code] ;
 
 CHLOE: a
-    [
-        [ a-start-tag ] [ compile-children ] [ a-end-tag ] tri
-    ] compile-with-scope ;
+    [ a-attrs ]
+    [ compile-children>string ] bi
+    [ <unescaped> [XML <a><-></a> XML] swap >>attrs ]
+    [xml-code] ;
 
 CHLOE: base
-    compile-a-url [ <base =href base/> ] [code] ;
+    compile-a-url [ [XML <base href=<->/> XML] ] [xml-code] ;
 
 : compile-hidden-form-fields ( for -- )
     '[
@@ -121,13 +131,13 @@ CHLOE: form
         <t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
             <div style="display: inline;"><button type="submit"></button></div>
         </t:form>
-    XML> ;
+    XML> body>> clone ;
 
 : add-tag-attrs ( attrs tag -- )
     attrs>> swap update ;
 
 CHLOE: button
-    button-tag-markup body>>
+    button-tag-markup
     {
         [ [ attrs>> chloe-attrs-only ] dip add-tag-attrs ]
         [ [ attrs>> non-chloe-attrs-only ] dip "button" deep-tag-named add-tag-attrs ]
