@@ -2,17 +2,25 @@ USING: arrays assocs help.markup help.syntax math.geometry.rect quadtrees quotat
 IN: quadtrees
 
 ARTICLE: "quadtrees" "Quadtrees"
-"The " { $snippet "quadtrees" } " vocabulary implements the quadtree structure in Factor. Quadtrees follow the " { $link "assocs-protocol" } " for insertion, deletion, and querying of exact points, using two-dimensional vectors as keys. Additional words are provided for spatial queries and pruning the tree structure:"
-{ $subsection prune }
+"The " { $snippet "quadtrees" } " vocabulary implements the quadtree data structure in Factor."
+{ $subsection <quadtree> }
+"Quadtrees follow the " { $link "assocs-protocol" } " for insertion, deletion, and querying of exact points, using two-dimensional vectors as keys. Additional words are provided for spatial queries and pruning the tree structure:"
 { $subsection in-rect }
+{ $subsection prune-quadtree }
 "The following words are provided to help write quadtree algorithms:"
 { $subsection descend }
 { $subsection each-quadrant }
-{ $subsection map-quadrant } ;
+{ $subsection map-quadrant }
+"Quadtrees can be used to \"swizzle\" a sequence to improve the locality of spatial data in memory:"
+{ $subsection swizzle } ;
 
 ABOUT: "quadtrees"
 
-HELP: prune
+HELP: <quadtree>
+{ $values { "bounds" rect } { "quadtree" quadtree } }
+{ $description "Constructs an empty quadtree covering the axis-aligned rectangle indicated by " { $snippet "bounds" } ". All the keys of " { $snippet "quadtree" } " must be two-dimensional vectors lying inside " { $snippet "bounds" } "." } ;
+
+HELP: prune-quadtree
 { $values { "tree" quadtree } }
 { $description "Removes empty nodes from " { $snippet "tree" } "." } ;
 
@@ -32,3 +40,6 @@ HELP: map-quadrant
 { $values { "node" quadtree } { "quot" quotation } { "array" array } }
 { $description "Calls " { $snippet "quot" } " with each subnode of " { $snippet "node" } " on the top of the stack in turn, collecting the four results into " { $snippet "array" } "." } ;
 
+HELP: swizzle
+{ $values { "sequence" sequence } { "quot" quotation } { "sequence'" sequence } }
+{ $description "Swizzles " { $snippet "sequence" } " based on the two-dimensional vector values returned by calling " { $snippet "quot" } " on each element of " { $snippet "sequence" } "." } ;
