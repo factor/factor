@@ -416,7 +416,7 @@ PRIVATE>
     over map-into ; inline
 
 : accumulate ( seq identity quot -- final newseq )
-    swapd [ pick slip ] curry map ; inline
+    swapd [ [ call ] [ 2drop ] 3bi ] curry map ; inline
 
 : 2each ( seq1 seq2 quot -- )
     (2each) each-integer ; inline
@@ -825,7 +825,8 @@ PRIVATE>
     [ but-last-slice ] [ peek ] bi ; inline
 
 : <flat-slice> ( seq -- slice )
-    dup slice? [ { } like ] when 0 over length rot <slice> ;
+    dup slice? [ { } like ] when
+    [ drop 0 ] [ length ] [ ] tri <slice> ;
     inline
 
 <PRIVATE
@@ -866,7 +867,8 @@ PRIVATE>
 
 : supremum ( seq -- n ) [ ] [ max ] map-reduce ;
 
-: sigma ( seq quot -- n ) [ 0 ] 2dip [ rot slip + ] curry each ; inline
+: sigma ( seq quot -- n )
+    [ 0 ] 2dip [ dip + ] curry [ swap ] prepose each ; inline
 
 : count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
 
