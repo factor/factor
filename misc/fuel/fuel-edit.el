@@ -65,7 +65,6 @@
 ;;; Editing commands:
 
 (defvar fuel-edit--word-history nil)
-(defvar fuel-edit--vocab-history nil)
 (defvar fuel-edit--previous-location nil)
 
 (defun fuel-edit-vocabulary (&optional refresh vocab)
