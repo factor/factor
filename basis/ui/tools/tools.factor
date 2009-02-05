@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: memory system kernel tools.vocabs ui.tools.operations
-ui.tools.listener ui.tools.browser ui.tools.common ui.commands
-ui.gestures ui ;
+ui.tools.listener ui.tools.browser ui.tools.common
+ui.tools.walker ui.commands ui.gestures ui ;
 IN: ui.tools
 
 : main ( -- )

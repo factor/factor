@@ -52,15 +52,15 @@ PRIVATE>
 
 M: tuple error. describe ;
 
-: namestack. ( seq -- )
+: vars-in-scope ( seq -- alist )
     [ [ global eq? not ] filter [ keys ] gather ] keep
-    '[ dup _ assoc-stack ] H{ } map>assoc describe ;
+    '[ dup _ assoc-stack ] H{ } map>assoc ;
 
 : .vars ( -- )
-    namestack namestack. ;
+    namestack vars-in-scope describe ;
 
 : :vars ( -- )
-    error-continuation get name>> namestack. ;
+    error-continuation get name>> vars-in-scope describe ;
 
 SYMBOL: me
 

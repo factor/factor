@@ -9,7 +9,7 @@ compiler.units accessors vocabs.parser macros.expander ui
 ui.tools.browser ui.tools.listener ui.tools.listener.completion
 ui.tools.profiler ui.tools.inspector ui.tools.traceback
 ui.commands ui.gadgets.editors ui.gestures ui.operations
-ui.tools.deploy ;
+ui.tools.deploy models ;
 IN: ui.tools.operations
 
 V{ } clone operations set-global
@@ -35,8 +35,12 @@ V{ } clone operations set-global
 
 [ drop t ] \ com-unparse H{ } define-operation
 
-! Input
+! Models
+[ model? ] \ inspect-model H{
+    { +primary+ t }
+} define-operation
 
+! Input
 : com-input ( obj -- ) string>> listener-input ;
 
 [ input? ] \ com-input H{

@@ -3,8 +3,9 @@
 USING: accessors continuations kernel models namespaces
 prettyprint ui ui.commands ui.gadgets ui.gadgets.labelled assocs
 ui.gadgets.tracks ui.gadgets.buttons ui.gadgets.panes
-ui.gadgets.status-bar ui.gadgets.scrollers ui.tools.inspector
-ui.gestures sequences hashtables inspector ;
+ui.gadgets.status-bar ui.gadgets.scrollers
+ui.gestures sequences inspector models.filter ;
+QUALIFIED-WITH: ui.tools.inspector i
 IN: ui.tools.traceback
 
 : <callstack-display> ( model -- gadget )
@@ -37,25 +38,14 @@ M: traceback-gadget pref-dim* drop { 550 600 } ;
 
     add-toolbar ;
 
-: <namestack-display> ( model -- gadget )
-    [ [ name>> namestack. ] when* ]
-    <pane-control> ;
-
-: <variables-gadget> ( model -- gadget )
-    <namestack-display>
-    <limited-scroller>
-        { 400 400 } >>min-dim
-        { 400 400 } >>max-dim ;
-
 : variables ( traceback -- )
-    model>> <variables-gadget>
-    "Dynamic variables" open-status-window ;
+    model>> [ dup [ name>> vars-in-scope ] when ] <filter> i:inspect-model ;
 
 : traceback-window ( continuation -- )
     <model> <traceback-gadget> "Traceback" open-status-window ;
 
 : inspect-continuation ( traceback -- )
-    control-value inspector ;
+    control-value i:inspector ;
 
 traceback-gadget "toolbar" f {
     { T{ key-down f f "v" } variables }
