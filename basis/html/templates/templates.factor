@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel fry io io.encodings.utf8 io.files
 debugger prettyprint continuations namespaces boxes sequences
-arrays strings html io.streams.string
+arrays strings html io.streams.string assocs
 quotations xml.data xml.writer xml.literals ;
 IN: html.templates
 
@@ -34,8 +34,11 @@ SYMBOL: title
 : set-title ( string -- )
     title get >box ;
 
+: get-title ( -- string )
+    title get value>> ;
+
 : write-title ( -- )
-    title get value>> write ;
+    get-title write ;
 
 SYMBOL: style
 
@@ -43,24 +46,30 @@ SYMBOL: style
     "\n" style get push-all
          style get push-all ;
 
+: get-style ( -- string )
+    style get >string ;
+
 : write-style ( -- )
-    style get >string write ;
+    get-style write ;
 
 SYMBOL: atom-feeds
 
 : add-atom-feed ( title url -- )
     2array atom-feeds get push ;
 
-: write-atom-feeds ( -- )
+: get-atom-feeds ( -- xml )
     atom-feeds get [
-        first2 [XML
+        [XML
             <link
                 rel="alternate"
                 type="application/atom+xml"
                 title=<->
                 href=<->/>
-        XML] write-xml
-    ] each ;
+        XML]
+    ] { } assoc>map ;
+
+: write-atom-feeds ( -- )
+    get-atom-feeds write-xml ;
 
 SYMBOL: nested-template?
 

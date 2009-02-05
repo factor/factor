@@ -8,7 +8,6 @@ logging continuations
 xml.data xml.writer xml.literals strings
 html.forms
 html
-html.elements
 html.components
 html.templates
 html.templates.chloe.compiler
@@ -28,7 +27,9 @@ CHLOE: write-title
     drop
     "head" tag-stack get member?
     "title" tag-stack get member? not and
-    [ <title> write-title </title> ] [ write-title ] ? [code] ;
+    [ get-title [XML <title><-></title> XML] ]
+    [ get-title ] ?
+    [xml-code] ;
 
 CHLOE: style
     dup "include" optional-attr [
@@ -39,10 +40,9 @@ CHLOE: style
 
 CHLOE: write-style
     drop [
-        <style "text/css" =type style>
-            write-style
-        </style>
-    ] [code] ;
+        get-style
+        [XML <style type="text/css"> <-> </style> XML]
+    ] [xml-code] ;
 
 CHLOE: even
     [ "index" value even? swap when ] process-children ;
