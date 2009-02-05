@@ -109,17 +109,6 @@ const F_CHAR *default_image_path(void)
 	snwprintf(temp_path, sizeof(temp_path)-1, L"%s.image", full_path); 
 	temp_path[sizeof(temp_path) - 1] = 0;
 
-	if(!windows_stat(temp_path)) {
-		unsigned int len = wcslen(full_path);
-		F_CHAR magic[] = L"-console";
-		unsigned int magic_len = wcslen(magic);
-
-		if(!wcsncmp(full_path + len - magic_len, magic, MIN(len, magic_len)))
-			full_path[len - magic_len] = 0;
-		snwprintf(temp_path, sizeof(temp_path)-1, L"%s.image", full_path); 
-		temp_path[sizeof(temp_path) - 1] = 0;
-	}
-
 	return safe_strdup(temp_path);
 }
 

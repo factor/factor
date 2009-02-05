@@ -6,4 +6,5 @@ PLAF_EXE_OBJS += vm/resources.o
 PLAF_EXE_OBJS += vm/main-windows-nt.o
 CFLAGS += -mwindows
 CFLAGS_CONSOLE += -mconsole
+CONSOLE_EXTENSION = .com
 include vm/Config.windows
