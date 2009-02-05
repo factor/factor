@@ -3,7 +3,7 @@
 USING: kernel accessors math namespaces opengl opengl.gl
 sequences math.vectors ui.gadgets ui.gadgets.grids
 ui.gadgets.grids.private ui.render math.rectangles
-fry locals arrays ;
+fry locals arrays assocs ;
 IN: ui.gadgets.grid-lines
 
 TUPLE: grid-lines color ;
@@ -12,15 +12,11 @@ C: <grid-lines> grid-lines
 
 <PRIVATE
 
-: grid-line-offsets ( n ns orientation gap -- seq )
-    [ swap suffix ] [ v. 2/ ] 2bi* '[ _ + ] map ;
-
 :: (compute-grid-lines) ( grid n ns orientation -- seq )
-    n ns orientation grid gap>> grid-line-offsets [
-        [ orientation n*v ]
-        [ dup 2array grid dim>> swap orientation set-axis ]
-        bi 2array
-    ] map ;
+    grid gap>> :> gap
+    ns n suffix gap orientation v. '[ _ - orientation n*v ] map
+    dup grid dim>> gap v- orientation reverse v* '[ _ v+ ] map
+    [ [ gap [ 2/ ] map v+ ] map ] bi@ zip ;
 
 : compute-grid-lines ( grid -- lines )
     dup <grid-layout>
