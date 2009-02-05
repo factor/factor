@@ -17,9 +17,8 @@ else
 	CFLAGS += -O3 $(SITE_CFLAGS)
 endif
 
-ifdef CONFIG
-	include $(CONFIG)
-endif
+CONFIG = $(shell ./build-support/factor.sh config-target)
+include $(CONFIG)
 
 ENGINE = $(DLL_PREFIX)factor$(DLL_SUFFIX)$(DLL_EXTENSION)
 
