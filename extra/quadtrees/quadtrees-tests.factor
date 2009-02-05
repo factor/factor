@@ -1,5 +1,5 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: assocs kernel tools.test quadtrees math.geometry.rect sorting ;
+USING: accessors assocs kernel tools.test quadtrees math.geometry.rect sorting ;
 IN: quadtrees.tests
 
 : unit-bounds ( -- rect ) { -1.0 -1.0 } { 2.0 2.0 } <rect> ;
@@ -200,3 +200,42 @@ IN: quadtrees.tests
         >alist natural-sort
 ] unit-test
 
+TUPLE: pointy-thing center ;
+
+[ {
+    T{ pointy-thing f { 0 0 } }
+    T{ pointy-thing f { 1 0 } }
+    T{ pointy-thing f { 0 1 } }
+    T{ pointy-thing f { 1 1 } }
+    T{ pointy-thing f { 2 0 } }
+    T{ pointy-thing f { 3 0 } }
+    T{ pointy-thing f { 2 1 } }
+    T{ pointy-thing f { 3 1 } }
+    T{ pointy-thing f { 0 2 } }
+    T{ pointy-thing f { 1 2 } }
+    T{ pointy-thing f { 0 3 } }
+    T{ pointy-thing f { 1 3 } }
+    T{ pointy-thing f { 2 2 } }
+    T{ pointy-thing f { 3 2 } }
+    T{ pointy-thing f { 2 3 } }
+    T{ pointy-thing f { 3 3 } }
+} ] [
+    {
+        T{ pointy-thing f { 3 1 } }
+        T{ pointy-thing f { 2 3 } }
+        T{ pointy-thing f { 3 2 } }
+        T{ pointy-thing f { 0 1 } }
+        T{ pointy-thing f { 2 2 } }
+        T{ pointy-thing f { 1 1 } }
+        T{ pointy-thing f { 3 0 } }
+        T{ pointy-thing f { 3 3 } }
+        T{ pointy-thing f { 1 3 } }
+        T{ pointy-thing f { 2 1 } }
+        T{ pointy-thing f { 0 0 } }
+        T{ pointy-thing f { 2 0 } }
+        T{ pointy-thing f { 1 0 } }
+        T{ pointy-thing f { 0 2 } }
+        T{ pointy-thing f { 1 2 } }
+        T{ pointy-thing f { 0 3 } }
+    } [ center>> ] swizzle
+] unit-test
