@@ -59,13 +59,13 @@ ERROR: no-case ;
             ] [
                 dup wrapper? [ wrapped>> ] when
             ] if =
-        ] [ quotation? ] if
+        ] [ callable? ] if
     ] find nip ;
 
 : case ( obj assoc -- )
     case-find {
         { [ dup array? ] [ nip second call ] }
-        { [ dup quotation? ] [ call ] }
+        { [ dup callable? ] [ call ] }
         { [ dup not ] [ no-case ] }
     } cond ;
 
