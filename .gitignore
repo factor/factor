@@ -11,6 +11,7 @@ Factor/factor
 *.image
 *.dylib
 factor
+factor.com
 *#*#
 .DS_Store
 .gdb_history

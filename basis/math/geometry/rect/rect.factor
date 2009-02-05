@@ -60,9 +60,14 @@ M: rect set-height! ( rect height -- rect ) over dim>> set-second ;
 M: rect set-x! ( rect x -- rect ) over loc>> set-first  ;
 M: rect set-y! ( rect y -- rect ) over loc>> set-second ;
 
+: rect-containing ( points -- rect )
+    [ vleast ] [ vgreatest ] bi
+    [ drop ] [ swap v- ] 2bi <rect> ;
+
 ! Accessing corners
 
 : top-left     ( rect -- point ) loc>> ;
 : top-right    ( rect -- point ) [ loc>> ] [ width  1 - ] bi v+x ;
 : bottom-left  ( rect -- point ) [ loc>> ] [ height 1 - ] bi v+y ;
 : bottom-right ( rect -- point ) [ loc>> ] [ dim>> ] bi v+ { 1 1 } v- ;
+
