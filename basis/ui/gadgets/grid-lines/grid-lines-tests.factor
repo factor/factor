@@ -1,9 +1,6 @@
 IN: ui.gadgets.grid-lines.tests
-USING: tools.test ui.gadgets.grid-lines ui.gadgets.grid-lines.tests colors ;
-
-[ { 1 3 5 7 9 } ] [
-    8 { 0 2 4 6 } horizontal { 2 2 } grid-line-offsets
-] unit-test
+USING: tools.test ui.gadgets ui.gadgets.grid-lines ui.gadgets.grid-lines.private
+ui.gadgets.grids.private accessors arrays ui.gadgets.grids sorting kernel ;
 
 : 100x100 ( -- gadget ) <gadget> { 100 100 } >>dim ;
 
@@ -19,6 +16,22 @@ USING: tools.test ui.gadgets.grid-lines ui.gadgets.grid-lines.tests colors ;
     1array
     <grid>
     { 100 100 } >>dim
+    compute-grid-lines natural-sort
+] unit-test
+
+[
+    {
+        { { 5 5 } { 5 115 } }
+        { { 5 5 } { 115 5 } }
+        { { 5 115 } { 115 115 } }
+        { { 115 5 } { 115 115 } }
+    }
+] [
+    100x100 1array
+    1array
+    <grid>
+    { 10 10 } >>gap
+    dup prefer
     compute-grid-lines natural-sort
 ] unit-test
 
