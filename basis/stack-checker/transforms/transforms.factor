@@ -24,8 +24,10 @@ IN: stack-checker.transforms
         rstate infer-quot
     ] [ word give-up-transform ] if* ;
 
+: literals? ( values -- ? ) [ literal-value? ] all? ;
+
 : (apply-transform) ( word quot n -- )
-    ensure-d dup [ known literal? ] all? [
+    ensure-d dup literals? [
         dup empty? [ dup recursive-state get ] [
             [ ]
             [ [ literal value>> ] map ]
