@@ -558,3 +558,10 @@ FUNCTION: test_struct_14 ffi_test_44 ( ) ; inline
 : stack-frame-bustage ( -- a b ) ffi_test_44 gc 3 ;
 
 [ ] [ stack-frame-bustage 2drop ] unit-test
+
+FUNCTION: complex-float ffi_test_45 ( complex-float x, complex-double y ) ;
+
+[ C{ 4.0 4.0 } ] [
+    C{ 1.0 2.0 }
+    C{ 1.5 1.0 } ffi_test_45
+] unit-test
