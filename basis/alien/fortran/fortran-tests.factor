@@ -1,3 +1,4 @@
+! (c) 2009 Joe Groff, see BSD license
 USING: accessors alien alien.c-types alien.fortran alien.structs
 alien.syntax arrays assocs kernel namespaces sequences tools.test ;
 IN: alien.fortran.tests
@@ -11,6 +12,7 @@ F-RECORD: fortran_test_record
 
 [ "fun_" ] [ "FUN" fortran-name>symbol-name ] unit-test
 [ "fun_times__" ] [ "Fun_Times" fortran-name>symbol-name ] unit-test
+[ "funtimes___" ] [ "FunTimes_" fortran-name>symbol-name ] unit-test
 
 ! fortran-type>c-type
 
@@ -57,7 +59,7 @@ F-RECORD: fortran_test_record
 [ "real" fortran-type>c-type ] unit-test
 
 [ "double" ]
-[ "double precision" fortran-type>c-type ] unit-test
+[ "double-precision" fortran-type>c-type ] unit-test
 
 [ "float" ]
 [ "real*4" fortran-type>c-type ] unit-test
@@ -69,7 +71,7 @@ F-RECORD: fortran_test_record
 [ "complex" fortran-type>c-type ] unit-test
 
 [ "(fortran-double-complex)" ]
-[ "double complex" fortran-type>c-type ] unit-test
+[ "double-complex" fortran-type>c-type ] unit-test
 
 [ "(fortran-complex)" ]
 [ "complex*8" fortran-type>c-type ] unit-test
@@ -118,13 +120,13 @@ F-RECORD: fortran_test_record
 [ "real" fortran-ret-type>c-type ] unit-test
 
 [ "double" { } ]
-[ "double precision" fortran-ret-type>c-type ] unit-test
+[ "double-precision" fortran-ret-type>c-type ] unit-test
 
 [ "void" { "(fortran-complex)*" } ]
 [ "complex" fortran-ret-type>c-type ] unit-test
 
 [ "void" { "(fortran-double-complex)*" } ]
-[ "double complex" fortran-ret-type>c-type ] unit-test
+[ "double-complex" fortran-ret-type>c-type ] unit-test
 
 [ "void" { "int*" } ]
 [ "integer(*)" fortran-ret-type>c-type ] unit-test
@@ -155,7 +157,7 @@ unit-test
     { "char[20]" "woo" }
 } ] [
     {
-        { "DOUBLE PRECISION" "EX"  }
+        { "DOUBLE-PRECISION" "EX"  }
         { "REAL"             "WYE" }
         { "INTEGER"          "ZEE" }
         { "CHARACTER(20)"    "WOO" }
@@ -168,4 +170,38 @@ unit-test
 [  0 ] [ "foo" "fortran_test_record" offset-of ] unit-test
 [  4 ] [ "bar" "fortran_test_record" offset-of ] unit-test
 [  8 ] [ "bas" "fortran_test_record" offset-of ] unit-test
+
+! fortran-arg>c-args
+
+[ B{ 128 } { } ]
+[ 128 "integer*1" fortran-arg>c-args ] unit-test
+
+little-endian? [ B{ 128 0 } { } ] [ B{ 0 128 } { } ] ?
+[ 128 "integer*2" fortran-arg>c-args ] unit-test
+
+little-endian? [ B{ 128 0 0 0 } { } ] [ B{ 0 0 0 128 } { } ] ?
+[ 128 "integer*4" fortran-arg>c-args ] unit-test
+
+little-endian? [ B{ 128 0 0 0 0 0 0 0 } { } ] [ B{ 0 0 0 0 0 0 0 128 } { } ] ?
+[ 128 "integer*8" fortran-arg>c-args ] unit-test
+
+[ B{ CHAR: h CHAR: e CHAR: l CHAR: l CHAR: o } { 5 } ]
+[ "hello" "character*5" fortran-arg>c-args ] unit-test
+
+little-endian? [ B{ 0 0 128 63 } { } ] [ B{ 63 128 0 0 } { } ] ?
+[ 1.0 "real" fortran-arg>c-args ] unit-test
+
+little-endian? [ B{ 0 0 128 63 0 0 0 64 } { } ] [ B{ 63 128 0 0 64 0 0 0 } { } ] ?
+[ C{ 1.0 2.0 } "complex" fortran-arg>c-args ] unit-test
+
+little-endian? [ B{ 0 0 0 0 0 0 240 63 } { } ] [ B{ 63 240 0 0 0 0 0 0 } { } ] ?
+[ 1.0 "double-precision" fortran-arg>c-args ] unit-test
+
+little-endian?
+[ B{ 0 0 0 0 0 0 240 63 0 0 0 0 0 0 0 64 } { } ] 
+[ B{ 63 240 0 0 0 0 0 0 64 0 0 0 0 0 0 0 } { } ] ?
+[ C{ 1.0 2.0 } "double-complex" fortran-arg>c-args ] unit-test
+
+[ B{ 1 0 0 0 2 0 0 0 } { } ]
+[ B{ 1 0 0 0 2 0 0 0 } "integer(2)" fortran-arg>c-args ] unit-test
 
