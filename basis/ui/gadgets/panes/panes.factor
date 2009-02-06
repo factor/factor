@@ -179,9 +179,9 @@ M: pane-stream make-span-stream
 
 MEMO: specified-font ( assoc -- font )
     #! We memoize here to avoid creating lots of duplicate font objects.
-    [ <font> ] dip
+    [ monospace-font <font> ] dip
     {
-        [ font-name swap at "monospace" or >>name ]
+        [ font-name swap at >>name ]
         [
             font-style swap at {
                 { f [ ] }
@@ -191,10 +191,11 @@ MEMO: specified-font ( assoc -- font )
                 { bold-italic [ t >>bold? t >>italic? ] }
             } case
         ]
-        [ font-size swap at 12 or >>size ]
-        [ foreground swap at black or >>foreground ]
-        [ background swap at white or >>background ]
-    } cleave ;
+        [ font-size swap at >>size ]
+        [ foreground swap at >>foreground ]
+        [ background swap at >>background ]
+    } cleave
+    derive-font ;
 
 : apply-font-style ( style gadget -- style gadget )
     { font-name font-style font-size foreground background }
