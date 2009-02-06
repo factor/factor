@@ -1,11 +1,10 @@
-! Copyright (C) 2007 Doug Coleman.
+! Copyright (C) 2007, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: alien arrays byte-arrays combinators summary
-io io.binary io.files kernel libc math
-math.functions math.bitwise namespaces opengl opengl.gl
-prettyprint sequences strings ui ui.gadgets.panes fry
-io.encodings.binary accessors grouping macros alien.c-types ;
+USING: accessors alien alien.c-types arrays byte-arrays columns
+combinators fry grouping io io.binary io.encodings.binary
+io.files kernel libc macros math math.bitwise math.functions
+namespaces opengl opengl.gl prettyprint sequences strings
+summary ui ui.gadgets.panes ;
 IN: graphics.bitmap
 
 ! Currently can only handle 24/32bit bitmaps.
@@ -14,6 +13,7 @@ IN: graphics.bitmap
 TUPLE: bitmap magic size reserved offset header-length width
 height planes bit-count compression size-image
 x-pels y-pels color-used color-important rgb-quads color-index
+alpha-channel-zero?
 array ;
 
 : array-copy ( bitmap array -- bitmap array' )
@@ -97,12 +97,19 @@ M: bitmap-magic summary
     dup rgb-quads-length read >>rgb-quads
     dup color-index-length read >>color-index ;
 
-: load-bitmap ( path -- bitmap )
+: (load-bitmap) ( path -- bitmap )
     binary [
         bitmap new
         parse-file-header parse-bitmap-header parse-bitmap
-    ] with-file-reader
-    dup raw-bitmap>array >>array ;
+    ] with-file-reader ;
+
+: alpha-channel-zero? ( bitmap -- ? )
+    array>> 4 <sliced-groups> 3 <column> [ 0 = ] all? ;
+
+: load-bitmap ( path -- bitmap )
+    (load-bitmap)
+    dup raw-bitmap>array >>array
+    dup alpha-channel-zero? >>alpha-channel-zero? ;
 
 : write2 ( n -- ) 2 >le write ;
 : write4 ( n -- ) 4 >le write ;
