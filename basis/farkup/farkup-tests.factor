@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: farkup kernel peg peg.ebnf tools.test namespaces xml
-urls.encoding assocs xml.utilities xml.data ;
+urls.encoding assocs xml.traversal xml.data ;
 IN: farkup.tests
 
 relative-link-prefix off

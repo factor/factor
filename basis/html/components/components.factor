@@ -4,7 +4,7 @@ USING: accessors kernel namespaces io math.parser assocs classes
 classes.tuple words arrays sequences splitting mirrors
 hashtables combinators continuations math strings inspector
 fry locals calendar calendar.format xml.entities xml.data
-validators urls present xml.writer xml.literals xml
+validators urls present xml.writer xml.syntax xml
 xmode.code2html lcs.diff2html farkup io.streams.string
 html html.streams html.forms ;
 IN: html.components

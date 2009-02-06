@@ -3,7 +3,7 @@
 USING: accessors kernel namespaces sequences words io assocs
 quotations strings parser lexer arrays xml.data xml.writer debugger
 splitting vectors sequences.deep combinators fry memoize ;
-IN: xml.utilities
+IN: xml.traversal
 
 : children>string ( tag -- string )
     children>> {
@@ -66,14 +66,3 @@ PRIVATE>
 
 : assert-tag ( name name -- )
     names-match? [ "Unexpected XML tag found" throw ] unless ;
-
-: insert-children ( children tag -- )
-    dup children>> [ push-all ]
-    [ swap V{ } like >>children drop ] if ;
-
-: insert-child ( child tag -- )
-    [ 1vector ] dip insert-children ;
-
-: XML-NS:
-    CREATE-WORD (( string -- name )) over set-stack-effect
-    scan '[ f swap _ <name> ] define-memoized ; parsing
