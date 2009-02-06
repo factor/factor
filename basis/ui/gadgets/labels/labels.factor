@@ -3,7 +3,7 @@
 USING: accessors arrays hashtables io kernel math math.functions
 namespaces make opengl sequences strings splitting ui.gadgets
 ui.gadgets.tracks ui.gadgets.packs fonts ui.render ui.text
-colors models ;
+colors colors.constants models ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.
@@ -57,7 +57,7 @@ M: label-control model-changed
 
 : reverse-video-theme ( label -- label )
     sans-serif-font reverse-video-font >>font
-    black <solid> >>interior ;
+    COLOR: black <solid> >>interior ;
 
 GENERIC: >label ( obj -- gadget )
 M: string >label <label> ;

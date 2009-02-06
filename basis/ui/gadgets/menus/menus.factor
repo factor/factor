@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals accessors kernel math namespaces sequences
-math.vectors colors math.rectangles ui.commands ui.operations ui.gadgets
-ui.gadgets.buttons ui.gadgets.worlds ui.gestures ui.gadgets.theme
-ui.gadgets.packs ui.gadgets.glass ui.gadgets.borders ;
+USING: locals accessors kernel math namespaces sequences math.vectors
+colors colors.constants math.rectangles ui.commands ui.operations
+ui.gadgets ui.gadgets.buttons ui.gadgets.worlds ui.gestures
+ui.gadgets.theme ui.gadgets.packs ui.gadgets.glass ui.gadgets.borders ;
 IN: ui.gadgets.menus
 
 : menu-loc ( world menu -- loc )
@@ -20,7 +20,7 @@ IN: ui.gadgets.menus
     ] <roll-button> ;
 
 : menu-theme ( gadget -- gadget )
-    light-gray solid-interior
+    COLOR: light-gray solid-interior
     faint-boundary ;
 
 : <commands-menu> ( target hook commands -- menu )

@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.styles namespaces colors ;
+USING: io.styles namespaces colors colors.constants ;
 IN: help.stylesheet
 
 SYMBOL: default-span-style
@@ -17,7 +17,7 @@ H{
 
 SYMBOL: link-style
 H{
-    { foreground T{ rgba f 0 0 0.3 1 } }
+    { foreground COLOR: dark-blue }
     { font-style bold }
 } link-style set-global
 
@@ -33,7 +33,7 @@ H{
     { font-size 18 }
     { font-style bold }
     { wrap-margin 500 }
-    { page-color T{ rgba f 0.8 0.8 0.8 1 } }
+    { page-color COLOR: light-gray }
     { border-width 5 }
 } title-style set-global
 
@@ -63,7 +63,7 @@ H{
 
 SYMBOL: code-style
 H{
-    { page-color T{ rgba f 0.8 0.8 0.8 0.5 } }
+    { page-color COLOR: gray80 }
     { border-width 5 }
     { wrap-margin f }
 } code-style set-global
@@ -74,13 +74,13 @@ H{ { font-style bold } } input-style set-global
 SYMBOL: url-style
 H{
     { font-name "monospace" }
-    { foreground T{ rgba f 0.0 0.0 1.0 1.0 } }
+    { foreground COLOR: blue }
 } url-style set-global
 
 SYMBOL: warning-style
 H{
-    { page-color T{ rgba f 0.95 0.95 0.95 1 } }
-    { border-color T{ rgba f 1 0 0 1 } }
+    { page-color COLOR: gray90 }
+    { border-color COLOR: red }
     { border-width 5 }
     { wrap-margin 500 }
 } warning-style set-global
@@ -93,7 +93,7 @@ H{
 SYMBOL: table-style
 H{
     { table-gap { 5 5 } }
-    { table-border T{ rgba f 0.8 0.8 0.8 1.0 } }
+    { table-border COLOR: light-gray }
 } table-style set-global
 
 SYMBOL: list-style

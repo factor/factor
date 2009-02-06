@@ -5,7 +5,7 @@ ui.gadgets.labels ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gadgets.theme ui.gadgets.frames
 ui.gadgets.grids io kernel math models namespaces
 sequences sequences words classes.tuple ui.gadgets ui.render
-colors accessors ;
+colors colors.constants accessors ;
 IN: ui.gadgets.labelled
 
 TUPLE: labelled-gadget < track content ;
@@ -26,7 +26,7 @@ M: labelled-gadget focusable-child* content>> ;
     <labelled-scroller> ;
 
 : <close-box> ( quot -- button/f )
-    gray close-box <polygon-gadget> swap <bevel-button> ;
+    COLOR: gray close-box <polygon-gadget> swap <bevel-button> ;
 
 : title-theme ( gadget -- gadget )
     { 1 0 } >>orientation

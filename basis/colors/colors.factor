@@ -6,7 +6,7 @@ IN: colors
 
 TUPLE: color ;
 
-TUPLE: rgba < color red green blue alpha ;
+TUPLE: rgba < color { red read-only } { green read-only } { blue read-only } { alpha read-only } ;
 
 C: <rgba> rgba
 
@@ -24,18 +24,3 @@ M: color blue>> ( color -- blue ) >rgba blue>> ;
 : opaque? ( color -- ? ) alpha>> 1 number= ;
 
 CONSTANT: transparent T{ rgba f 0.0 0.0 0.0 0.0 }
-CONSTANT: black T{ rgba f 0.0 0.0 0.0 1.0 }
-CONSTANT: blue T{ rgba f 0.0 0.0 1.0 1.0 }
-CONSTANT: cyan T{ rgba f 0 0.941 0.941 1 }
-CONSTANT: gray T{ rgba f 0.6 0.6 0.6 1.0 }
-CONSTANT: dark-gray T{ rgba f 0.8 0.8 0.8 1.0 }
-CONSTANT: green T{ rgba f 0.0 1.0 0.0 1.0 }
-CONSTANT: light-gray T{ rgba f 0.95 0.95 0.95 0.95 }
-CONSTANT: light-purple T{ rgba f 0.8 0.8 1.0 1.0 }
-CONSTANT: medium-purple T{ rgba f 0.7 0.7 0.9 1.0 }
-CONSTANT: magenta T{ rgba f 0.941 0 0.941 1 }
-CONSTANT: orange T{ rgba f 0.941 0.627 0 1 }
-CONSTANT: purple T{ rgba f 0.627 0 0.941 1 }
-CONSTANT: red T{ rgba f 1.0 0.0 0.0 1.0 }
-CONSTANT: white T{ rgba f 1.0 1.0 1.0 1.0 }
-CONSTANT: yellow T{ rgba f 1.0 1.0 0.0 1.0 }

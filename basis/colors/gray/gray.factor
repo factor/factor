@@ -3,7 +3,7 @@
 USING: colors kernel accessors ;
 IN: colors.gray
 
-TUPLE: gray < color gray alpha ;
+TUPLE: gray < color { gray read-only } { alpha read-only } ;
 
 C: <gray> gray
 

@@ -3,12 +3,11 @@
 USING: accessors arrays documents documents.elements kernel math
 models models.filter namespaces locals fry make opengl opengl.gl
 sequences strings math.vectors math.functions sorting colors
-combinators assocs math.order fry calendar alarms continuations
-ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
+colors.constants combinators assocs math.order fry calendar alarms
+continuations ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
 ui.gadgets.theme ui.gadgets.menus ui.gadgets.wrappers ui.render
-ui.text ui.gestures math.rectangles splitting unicode.categories
-fonts ;
+ui.text ui.gestures math.rectangles splitting unicode.categories fonts ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget
@@ -23,8 +22,8 @@ focused? blink blink-alarm ;
     <loc> >>mark ; inline
 
 : editor-theme ( editor -- editor )
-    black >>color
-    red >>caret-color
+    COLOR: black >>color
+    COLOR: red >>caret-color
     selection-color >>selection-color
     monospace-font >>font ; inline
 
@@ -508,7 +507,7 @@ editor "selection" f {
 } define-command-map
 
 : editor-menu ( editor -- )
-    { cut com-copy paste } show-commands-menu ;
+    { com-undo com-redo cut com-copy paste } show-commands-menu ;
 
 editor "misc" f {
     { T{ button-down f f 3 } editor-menu }
@@ -586,7 +585,7 @@ TUPLE: source-editor < multiline-editor ;
 TUPLE: field < wrapper editor min-width max-width ;
 
 : field-theme ( gadget -- gadget )
-    gray <solid> >>boundary ; inline
+    COLOR: gray <solid> >>boundary ; inline
 
 : <field-border> ( gadget -- border )
     { 2 2 } <border>

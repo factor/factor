@@ -11,24 +11,6 @@ HELP: >rgba
 { $values { "color" color } { "rgba" rgba } }
 { $contract "Converts a color to an RGBA color." } ;
 
-ARTICLE: "colors.standard" "Standard colors"
-"A few useful constants:"
-{ $subsection black }
-{ $subsection blue } 
-{ $subsection cyan } 
-{ $subsection gray } 
-{ $subsection dark-gray } 
-{ $subsection green } 
-{ $subsection light-gray } 
-{ $subsection light-purple } 
-{ $subsection medium-purple } 
-{ $subsection magenta } 
-{ $subsection orange } 
-{ $subsection purple } 
-{ $subsection red } 
-{ $subsection white } 
-{ $subsection yellow } ;
-
 ARTICLE: "colors.protocol" "Color protocol"
 "Abstract superclass for colors:"
 { $subsection color }
@@ -50,7 +32,6 @@ $nl
 { $subsection >rgba-components }
 "Further topics:"
 { $subsection "colors.protocol" }
-{ $subsection "colors.standard" }
 { $subsection "colors.gray" }
 { $vocab-subsection "HSV colors" "colors.hsv" } ;
 
