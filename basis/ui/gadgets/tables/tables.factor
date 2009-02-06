@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays colors fry kernel math
+USING: accessors arrays colors colors.constants fry kernel math
 math.rectangles math.order math.vectors namespaces opengl
 sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.worlds ui.gadgets.theme ui.gestures ui.render ui.text
@@ -11,11 +11,17 @@ IN: ui.gadgets.tables
 ! Row rendererer protocol
 GENERIC: row-columns ( row renderer -- columns )
 GENERIC: row-value ( row renderer -- object )
+GENERIC: row-color ( row renderer -- color )
+GENERIC: row-font ( row renderer -- font )
 
 SINGLETON: trivial-renderer
 
 M: trivial-renderer row-columns drop ;
 M: object row-value drop ;
+M: object row-color 2drop f ;
+
+M: object row-font
+    row-color dup [ <font> swap >>foreground ] when ;
 
 TUPLE: table < gadget
 renderer filled-column column-alignment action hook
@@ -36,9 +42,9 @@ focused? ;
         sans-serif-font >>font
         selection-color >>selection-color
         focus-border-color >>focus-border-color
-        dark-gray >>column-line-color
-        black >>mouse-color
-        black >>text-color ;
+        COLOR: dark-gray >>column-line-color
+        COLOR: black >>mouse-color
+        COLOR: black >>text-color ;
 
 <PRIVATE
 
@@ -146,15 +152,17 @@ M: table layout*
         [ 2dup ] 2dip column-loc draw-text
     ] dip table-gap + 0 2array gl-translate ;
 
-: draw-row ( columns widths align font -- )
+: column-alignment ( table -- seq )
+    dup column-alignment>>
+    [ ] [ column-widths>> length 0 <repetition> ] ?if ;
+
+: draw-row ( index table -- )
+    [ [ renderer>> row-columns ] [ column-widths>> ] [ column-alignment ] tri ]
+    [ [ renderer>> row-font ] [ font>> swap derive-font ] bi ] 2bi
     '[ [ _ ] 3dip draw-column ] 3each ;
 
 : each-slice-index ( from to seq quot -- )
     [ [ <slice> ] [ drop [a,b) ] 3bi ] dip 2each ; inline
-
-: column-alignment ( table -- seq )
-    dup column-alignment>>
-    [ ] [ column-widths>> length 0 <repetition> ] ?if ;
 
 : draw-rows ( table -- )
     {
@@ -163,14 +171,10 @@ M: table layout*
         [ last-visible-row ]
         [ control-value ]
         [ line-height ]
-        [ renderer>> ]
-        [ column-widths>> ]
-        [ column-alignment ]
-        [ font>> ]
+        [ ]
     } cleave '[
-        [ 0 ] dip _ * 2array [
-            _ row-columns _ _ _ draw-row
-        ] with-translation
+        [ 0 ] dip _ * 2array
+        [ _ draw-row ] with-translation
     ] each-slice-index ;
 
 M: table draw-gadget*
