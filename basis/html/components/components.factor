@@ -11,7 +11,7 @@ IN: html.components
 
 GENERIC: render* ( value name renderer -- xml )
 
-: render ( name renderer -- )
+: render>xml ( name renderer -- xml )
     prepare-value
     [
         dup validation-error?
@@ -20,7 +20,10 @@ GENERIC: render* ( value name renderer -- xml )
         if
     ] 2dip
     render*
-    swap 2array write-xml ;
+    swap 2array ;
+
+: render ( name renderer -- )
+    render>xml write-xml ;
 
 SINGLETON: label
 
