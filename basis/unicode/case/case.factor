@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: unicode.data sequences sequences.next namespaces
+USING: unicode.data sequences namespaces
 sbufs make unicode.syntax unicode.normalize math hints
 unicode.categories combinators unicode.syntax assocs
 strings splitting kernel accessors unicode.breaks fry locals ;
