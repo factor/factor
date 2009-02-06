@@ -84,7 +84,17 @@ $nl
             word=<-word-> />
     XML> pprint-xml ] "}
 {" <?xml version="1.0" encoding="UTF-8"?>
-<x number="3" url="http://factorcode.org/" string="hello" word="drop"/>"} } ;
+<x number="3" url="http://factorcode.org/" string="hello" word="drop"/>"} }
+"XML interpolation can also be used, in conjunction with " { $vocab-link "inverse" } " in pattern matching. For example:"
+{ $example {" USING: sequences xml.syntax inverse ;
+: dispatch ( xml -- string )
+    {
+        { [ [XML <a><-></a> XML] ] [ "a" prepend ] }
+        { [ [XML <b><-></b> XML] ] [ "b" prepend ] }
+        { [ [XML <b val='yes'/> XML] ] [ "yes" ] }
+        { [ [XML <b val=<->/> XML] ] [ "no" prepend ] }
+    } switch ;
+[XML <a>pple</a> XML] dispatch write "} "apple" } ;
 
 HELP: XML-NS:
 { $syntax "XML-NS: name http://url" }
