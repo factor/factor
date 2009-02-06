@@ -1,11 +1,42 @@
-! Copyright (C) 2009 Daniel Ehrenberg.
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: xml xml.state kernel sequences fry assocs xml.data
-accessors strings make multiline parser namespaces macros
-sequences.deep generalizations words combinators
-math present arrays unicode.categories locals.backend
-quotations ;
-IN: xml.literals
+USING: words assocs kernel accessors parser sequences summary
+lexer splitting combinators locals xml.data memoize sequences.deep
+xml.data xml.state xml namespaces present arrays generalizations strings
+make math macros multiline inverse combinators.short-circuit 
+sorting fry unicode.categories ;
+IN: xml.syntax
+
+<PRIVATE
+
+TUPLE: no-tag name word ;
+M: no-tag summary
+    drop "The tag-dispatching word has no method for the given tag name" ;
+
+: compile-tags ( word xtable -- quot )
+    >alist swap '[ _ no-tag boa throw ] suffix
+    '[ dup main>> _ case ] ;
+
+: define-tags ( word -- )
+    dup dup "xtable" word-prop compile-tags define ;
+
+:: define-tag ( string word quot -- )
+    quot string word "xtable" word-prop set-at
+    word define-tags ;
+
+PRIVATE>
+
+: TAGS:
+    CREATE
+    [ H{ } clone "xtable" set-word-prop ]
+    [ define-tags ] bi ; parsing
+
+: TAG:
+    scan scan-word parse-definition define-tag ; parsing
+
+: XML-NS:
+    CREATE-WORD (( string -- name )) over set-stack-effect
+    scan '[ f swap _ <name> ] define-memoized ; parsing
 
 <PRIVATE
 
@@ -142,8 +173,6 @@ PRIVATE>
 
 : [XML
     "XML]" [ string>chunk ] parse-def ; parsing
-
-USING: inverse sorting fry combinators.short-circuit ;
 
 : remove-blanks ( seq -- newseq )
     [ { [ string? not ] [ [ blank? ] all? not ] } 1|| ] filter ;
