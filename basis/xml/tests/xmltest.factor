@@ -1,6 +1,6 @@
 USING: accessors assocs combinators continuations fry generalizations
 io.pathnames kernel macros sequences stack-checker tools.test xml
-xml.utilities xml.writer arrays xml.data ; 
+xml.traversal xml.writer arrays xml.data ; 
 IN: xml.tests.suite
 
 TUPLE: xml-test id uri sections description type ;

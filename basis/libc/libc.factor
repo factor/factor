@@ -73,12 +73,13 @@ PRIVATE>
     (calloc) check-ptr add-malloc ;
 
 : realloc ( alien size -- newalien )
+    [ >c-ptr ] dip
     over malloc-exists? [ realloc-error ] unless
     [ drop ] [ (realloc) check-ptr ] 2bi
     [ delete-malloc ] [ add-malloc ] bi* ;
 
 : free ( alien -- )
-    [ delete-malloc ] [ (free) ] bi ;
+    >c-ptr [ delete-malloc ] [ (free) ] bi ;
 
 : memcpy ( dst src size -- )
     "void" "libc" "memcpy" { "void*" "void*" "ulong" } alien-invoke ;

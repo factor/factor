@@ -1,9 +1,45 @@
-! Copyright (C) 2009 Daniel Ehrenberg.
+! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test xml.literals multiline kernel assocs
-sequences accessors xml.writer xml.literals.private
-locals splitting urls xml.data classes ;
-IN: xml.literals.tests
+USING: xml io kernel math sequences strings xml.traversal
+tools.test math.parser xml.syntax xml.data xml.syntax.private
+accessors multiline locals inverse xml.writer splitting classes ;
+IN: xml.syntax.tests
+
+! TAGS test
+
+TAGS: calculate ( tag -- n )
+
+: calc-2children ( tag -- n n )
+    children-tags first2 [ calculate ] dip calculate ;
+
+TAG: number calculate
+    children>string string>number ;
+TAG: add calculate
+    calc-2children + ;
+TAG: minus calculate
+    calc-2children - ;
+TAG: times calculate
+    calc-2children * ;
+TAG: divide calculate
+    calc-2children / ;
+TAG: neg calculate
+    children-tags first calculate neg ;
+
+: calc-arith ( string -- n )
+    string>xml first-child-tag calculate ;
+
+[ 32 ] [
+    "<math><times><add><number>1</number><number>3</number></add><neg><number>-8</number></neg></times></math>"
+    calc-arith
+] unit-test
+
+\ calc-arith must-infer
+
+XML-NS: foo http://blah.com
+
+[ T{ name { main "bling" } { url "http://blah.com" } } ] [ "bling" foo ] unit-test
+
+! XML literals
 
 [ "a" "c" { "a" "c" f } ] [
     "<?xml version='1.0'?><x><-a-><b val=<-c->/><-></x>"
@@ -47,7 +83,7 @@ IN: xml.literals.tests
 
 [ {" <?xml version="1.0" encoding="UTF-8"?>
 <x number="3" url="http://factorcode.org/" string="hello" word="drop"/>"} ]
-[ 3 f URL" http://factorcode.org/" "hello" \ drop
+[ 3 f "http://factorcode.org/" "hello" \ drop
   <XML <x number=<-> false=<-> url=<-> string=<-> word=<->/> XML>
   pprint-xml>string  ] unit-test
 

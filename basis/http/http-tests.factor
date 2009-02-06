@@ -299,7 +299,7 @@ test-db [
 [ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
 
 USING: html.components html.forms
-xml xml.utilities validators
+xml xml.traversal validators
 furnace furnace.conversations ;
 
 SYMBOL: a

@@ -72,7 +72,7 @@ PRIVATE>
             NSOpenGLPFASamples , 8 ,
         ] when
         0 ,
-    ] int-array{ } make underlying>>
+    ] int-array{ } make
     -> initWithAttributes:
     -> autorelease ;
 

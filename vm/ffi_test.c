@@ -1,6 +1,5 @@
 /* This file is linked into the runtime for the sole purpose
  * of testing FFI code. */
-#include <stdio.h>
 #include "master.h"
 #include "ffi_test.h"
 
@@ -302,4 +301,9 @@ struct test_struct_14 ffi_test_44(void)
 	retval.x1 = 1.0;
 	retval.x2 = 2.0;
 	return retval;
+}
+
+complex float ffi_test_45(complex float x, complex double y)
+{
+	return x + 2 * y;
 }

@@ -44,8 +44,8 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
 
 : init-fdsets ( mx -- nfds read write except )
     [ num-fds ]
-    [ read-fdset/tasks [ init-fdset ] [ underlying>> ] bi ]
-    [ write-fdset/tasks [ init-fdset ] [ underlying>> ] bi ] tri
+    [ read-fdset/tasks [ init-fdset ] keep ]
+    [ write-fdset/tasks [ init-fdset ] keep ] tri
     f ;
 
 M:: select-mx wait-for-events ( us mx -- )

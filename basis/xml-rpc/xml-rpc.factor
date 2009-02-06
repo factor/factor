@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel xml arrays math generic http.client
 combinators hashtables namespaces io base64 sequences strings
-calendar xml.data xml.writer xml.utilities assocs math.parser
-debugger calendar.format math.order xml.literals xml.dispatch ;
+calendar xml.data xml.writer xml.traversal assocs math.parser
+debugger calendar.format math.order xml.syntax ;
 IN: xml-rpc
 
 ! * Sending RPC requests
