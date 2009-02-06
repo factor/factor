@@ -3,8 +3,9 @@
 USING: kernel quotations classes.tuple make combinators generic
 words interpolate namespaces sequences io.streams.string fry
 classes.mixin effects lexer parser classes.tuple.parser
-effects.parser locals.types locals.parser
-locals.rewrite.closures vocabs.parser arrays accessors ;
+effects.parser locals.types locals.parser generic.parser
+locals.rewrite.closures vocabs.parser classes.parser
+arrays accessors ;
 IN: functors
 
 ! This is a hack
@@ -29,7 +30,7 @@ M: object >fake-quotations ;
 GENERIC: fake-quotations> ( fake -- quot )
 
 M: fake-quotation fake-quotations>
-    seq>> [ fake-quotations> ] map >quotation ;
+    seq>> [ fake-quotations> ] [ ] map-as ;
 
 M: array fake-quotations> [ fake-quotations> ] map ;
 
@@ -57,7 +58,7 @@ M: object fake-quotations> ;
     effect off
     scan-param parsed
     scan-param parsed
-    \ create-method parsed
+    \ create-method-in parsed
     parse-definition*
     DEFINE* ; parsing
 
@@ -95,6 +96,8 @@ PRIVATE>
 : IS [ dup search [ ] [ no-word ] ?if ] (INTERPOLATE) ; parsing
 
 : DEFINES [ create-in ] (INTERPOLATE) ; parsing
+
+: DEFINES-CLASS [ create-class-in ] (INTERPOLATE) ; parsing
 
 DEFER: ;FUNCTOR delimiter
 

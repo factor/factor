@@ -80,13 +80,6 @@ $nl
     "[ [ 5 ] t foo ] infer."
 } ;
 
-ARTICLE: "compiler-transforms" "Compiler transforms"
-"Compiler transforms can be used to allow words to compile which would otherwise not have a stack effect, and to expand combinators into more efficient code at compile time."
-{ $subsection define-transform }
-"An example is the " { $link cond } " word. If the association list of quotations it is given is literal, the entire form is expanded into a series of nested calls to " { $link if } "."
-$nl
-"The " { $vocab-link "macros" } " vocabulary defines some nice syntax sugar which makes compiler transforms easier to work with." ;
-
 ARTICLE: "inference" "Stack effect inference"
 "The stack effect inference tool is used to check correctness of code before it is run. It is also used by the optimizing compiler to build the high-level SSA representation on which optimizations can be performed. Only words for which a stack effect can be inferred will compile with the optimizing compiler; all other words will be compiled with the non-optimizing compiler (see " { $link "compiler" } ")."
 $nl
@@ -103,7 +96,6 @@ $nl
 { $subsection "inference-recursive-combinators" }
 { $subsection "inference-branches" }
 { $subsection "inference-errors" }
-{ $subsection "compiler-transforms" }
 { $see-also "effects" } ;
 
 ABOUT: "inference"

@@ -22,7 +22,7 @@ C-STRUCT: test-struct
 [ 5/4 ] [
     [
         2 "test-struct" malloc-struct-array
-        dup underlying>> &free drop
+        dup &free drop
         1 2 make-point over set-first
         3 4 make-point over set-second
         0 [ [ test-struct-x ] [ test-struct-y ] bi / + ] reduce
@@ -34,6 +34,6 @@ C-STRUCT: test-struct
 [ ] [
     [
         10 "test-struct" malloc-struct-array
-        underlying>> &free drop
+        &free drop
     ] with-destructors
 ] unit-test
