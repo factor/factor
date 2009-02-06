@@ -178,5 +178,5 @@ TAG: array xml>item
     ! This needs to do something in the event of an error
     [ send-rpc ] dip http-post nip string>xml receive-rpc ;
 
-: invoke-method ( params method url -- )
+: invoke-method ( params method url -- response )
     [ swap <rpc-method> ] dip post-rpc ;
