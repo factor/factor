@@ -1,1 +1,0 @@
-Iteration with access to next element
