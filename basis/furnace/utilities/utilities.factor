@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make assocs sequences kernel classes splitting
 words vocabs.loader accessors strings combinators arrays
-continuations present fry urls http http.server xml.literals xml.writer
+continuations present fry urls http http.server xml.syntax xml.writer
 http.server.redirection http.server.remapping ;
 IN: furnace.utilities
 
