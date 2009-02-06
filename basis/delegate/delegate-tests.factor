@@ -1,6 +1,6 @@
 USING: delegate kernel arrays tools.test words math definitions
 compiler.units parser generic prettyprint io.streams.string
-accessors eval ;
+accessors eval multiline ;
 IN: delegate.tests
 
 TUPLE: hello this that ;
@@ -91,3 +91,32 @@ CONSULT: slot-protocol-test-2 slot-protocol-test-3 d>> ;
     T{ slot-protocol-test-3 f T{ slot-protocol-test-2 f "a" "b" 5 } }
     [ a>> ] [ b>> ] [ c>> ] tri
 ] unit-test
+
+GENERIC: do-me ( x -- )
+
+M: f do-me drop ;
+
+[ ] [ f do-me ] unit-test
+
+TUPLE: a-tuple ;
+
+PROTOCOL: silly-protocol do-me ;
+
+! Replacing a method definition with a consultation would cause problems
+[ [ ] ] [
+    <" IN: delegate.tests
+    USE: kernel
+
+    M: a-tuple do-me drop ; "> <string-reader> "delegate-test" parse-stream
+] unit-test
+
+[ ] [ T{ a-tuple } do-me ] unit-test
+
+[ [ ] ] [
+    <" IN: delegate.tests
+    USE: kernel
+    USE: delegate
+    CONSULT: silly-protocol a-tuple drop f ; "> <string-reader> "delegate-test" parse-stream
+] unit-test
+
+[ ] [ T{ a-tuple } do-me ] unit-test
