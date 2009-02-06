@@ -3,7 +3,7 @@
 USING: arrays definitions generic assocs kernel math namespaces
 sequences strings vectors words words.symbol quotations io
 combinators sorting splitting math.parser effects continuations
-io.files io.streams.string vocabs io.encodings.utf8 source-files
+io.files vocabs io.encodings.utf8 source-files
 classes hashtables compiler.errors compiler.units accessors sets
 lexer vocabs.parser ;
 IN: parser
