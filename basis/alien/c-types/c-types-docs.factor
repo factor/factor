@@ -178,6 +178,8 @@ $nl
     { { $snippet "ulonglong" } { } }
     { { $snippet "float" } { } }
     { { $snippet "double" } { "same format as " { $link float } " objects" } }
+    { { $snippet "complex-float" } { "C99 " { $snippet "complex float" } " type, converted to and from " { $link complex } " values" } }
+    { { $snippet "complex-double" } { "C99 " { $snippet "complex double" } " type, converted to and from " { $link complex } " values" } }
 }
 "When making alien calls, Factor numbers are converted to and from the above types in a canonical way. Converting a Factor number to a C value may result in a loss of precision."
 $nl

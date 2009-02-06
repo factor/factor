@@ -530,8 +530,8 @@ void box_double(double flo)
 
 void primitive_from_rect(void)
 {
-	F_COMPLEX* complex = allot_object(COMPLEX_TYPE,sizeof(F_COMPLEX));
-	complex->imaginary = dpop();
-	complex->real = dpop();
-	dpush(RETAG(complex,COMPLEX_TYPE));
+	F_COMPLEX* z = allot_object(COMPLEX_TYPE,sizeof(F_COMPLEX));
+	z->imaginary = dpop();
+	z->real = dpop();
+	dpush(RETAG(z,COMPLEX_TYPE));
 }

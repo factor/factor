@@ -96,7 +96,7 @@ PREDICATE: fragment-shader < gl-shader (fragment-shader?) ;
     dup gl-program-shaders-length
     0 <int>
     over <uint-array>
-    [ underlying>> glGetAttachedShaders ] keep ;
+    [ glGetAttachedShaders ] keep ;
 
 : delete-gl-program-only ( program -- )
     glDeleteProgram ; inline

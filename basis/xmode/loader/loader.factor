@@ -1,5 +1,5 @@
 USING: xmode.loader.syntax xmode.tokens xmode.rules
-xmode.keyword-map xml.data xml.utilities xml assocs kernel
+xmode.keyword-map xml.data xml.traversal xml assocs kernel
 combinators sequences math.parser namespaces parser
 xmode.utilities parser-combinators.regexp io.files accessors ;
 IN: xmode.loader

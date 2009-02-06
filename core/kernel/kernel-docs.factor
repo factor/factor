@@ -949,6 +949,13 @@ ARTICLE: "assertions" "Assertions"
 { $subsection assert }
 { $subsection assert= } ;
 
+ARTICLE: "dataflow-combinators" "Data flow combinators"
+"Data flow combinators pass values between quotations:"
+{ $subsection "slip-keep-combinators" }
+{ $subsection "cleave-combinators" }
+{ $subsection "spread-combinators" }
+{ $subsection "apply-combinators" } ;
+
 ARTICLE: "dataflow" "Data and control flow"
 { $subsection "evaluator" }
 { $subsection "words" }
@@ -956,16 +963,9 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "booleans" }
 { $subsection "shuffle-words" }
 "A central concept in Factor is that of a " { $emphasis "combinator" } ", which is a word taking code as input."
-$nl
-"Data flow combinators:"
-{ $subsection "slip-keep-combinators" }
-{ $subsection "cleave-combinators" }
-{ $subsection "spread-combinators" }
-{ $subsection "apply-combinators" }
-"Control flow combinators:"
+{ $subsection "dataflow-combinators" }
 { $subsection "conditionals" }
 { $subsection "looping-combinators" }
-"Additional combinators:"
 { $subsection "compositional-combinators" }
 { $subsection "combinators" }
 "More combinators are defined for working on data structures, such as " { $link "sequences-combinators" } " and " { $link "assocs-combinators" } "."
@@ -973,6 +973,7 @@ $nl
 "Advanced topics:"
 { $subsection "assertions" }
 { $subsection "implementing-combinators" }
+{ $subsection "macros" }
 { $subsection "errors" }
 { $subsection "continuations" } ;
 
