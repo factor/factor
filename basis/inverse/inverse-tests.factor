@@ -71,6 +71,9 @@ C: <nil> nil
 [ 0.0 ] [ 0.0 pi + [ pi + ] undo ] unit-test
 [ ] [ 3 [ _ ] undo ] unit-test
 
+[ 2.0 ] [ 2 3 ^ [ 3 ^ ] undo ] unit-test
+[ 3.0 ] [ 2 3 ^ [ 2 swap ^ ] undo ] unit-test
+
 [ { 1 } ] [ { 1 2 3 } [ { 2 3 } append ] undo ] unit-test
 [ { 3 } ] [ { 1 2 3 } [ { 1 2 } prepend ] undo ] unit-test
 [ { 1 2 3 } [ { 1 2 } append ] undo ] must-fail

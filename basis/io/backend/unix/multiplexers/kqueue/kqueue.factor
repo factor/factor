@@ -59,7 +59,7 @@ M: kqueue-mx remove-output-callbacks ( fd mx -- seq )
 : wait-kevent ( mx timespec -- n )
     [
         [ fd>> f 0 ]
-        [ events>> [ underlying>> ] [ length ] bi ] bi
+        [ events>> dup length ] bi
     ] dip kevent multiplexer-error ;
 
 : handle-kevent ( mx kevent -- )

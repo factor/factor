@@ -260,7 +260,6 @@ echo_build_info() {
     $ECHO FACTOR_BINARY=$FACTOR_BINARY
     $ECHO FACTOR_LIBRARY=$FACTOR_LIBRARY
     $ECHO FACTOR_IMAGE=$FACTOR_IMAGE
-    $ECHO CONFIG_TARGET=$CONFIG_TARGET
     $ECHO MAKE_TARGET=$MAKE_TARGET
     $ECHO BOOT_IMAGE=$BOOT_IMAGE
     $ECHO MAKE_IMAGE_TARGET=$MAKE_IMAGE_TARGET
@@ -290,30 +289,20 @@ set_build_info() {
     if [[ $OS == macosx && $ARCH == ppc ]] ; then
         MAKE_IMAGE_TARGET=macosx-ppc
         MAKE_TARGET=macosx-ppc
-	CONFIG_TARGET=macosx.ppc
     elif [[ $OS == linux && $ARCH == ppc ]] ; then
         MAKE_IMAGE_TARGET=linux-ppc
         MAKE_TARGET=linux-ppc
-	CONFIG_TARGET=linux.ppc
     elif [[ $OS == winnt && $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=winnt-x86.64
         MAKE_TARGET=winnt-x86-64
-	CONFIG_TARGET=windows.nt.x86.64
-    elif [[ $OS == winnt && $ARCH == x86 && $WORD == 32 ]] ; then
-        MAKE_IMAGE_TARGET=winnt-x86.32
-        MAKE_TARGET=winnt-x86-32
-	CONFIG_TARGET=windows.nt.x86.32
     elif [[ $ARCH == x86 && $WORD == 64 ]] ; then
         MAKE_IMAGE_TARGET=unix-x86.64
         MAKE_TARGET=$OS-x86-64
-	CONFIG_TARGET=$OS.x86.64
     else
         MAKE_IMAGE_TARGET=$ARCH.$WORD
         MAKE_TARGET=$OS-$ARCH-$WORD
-        CONFIG_TARGET=$OS.$ARCH.$WORD
     fi
     BOOT_IMAGE=boot.$MAKE_IMAGE_TARGET.image
-    CONFIG_TARGET=vm/Config.$CONFIG_TARGET
 }
 
 parse_build_info() {
@@ -581,6 +570,5 @@ case "$1" in
     dlls) get_config_info; maybe_download_dlls;;
     net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
     make-target) ECHO=false; find_build_info; echo $MAKE_TARGET ;;
-    config-target) ECHO=false; find_build_info; echo $CONFIG_TARGET ;;
     *) usage ;;
 esac

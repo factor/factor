@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors strings namespaces assocs hashtables io
 mirrors math fry sequences words continuations
-xml.entities xml.writer xml.literals ;
+xml.entities xml.writer xml.syntax ;
 IN: html.forms
 
 TUPLE: form errors values validation-failed ;

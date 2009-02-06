@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Daniel Ehrenberg, Walton Chan
 ! See http://factorcode.org/license.txt for BSD license.
-USING: http.client xml xml.utilities kernel sequences
+USING: http.client xml xml.traversal kernel sequences
 math.parser urls accessors locals ;
 IN: yahoo
 
