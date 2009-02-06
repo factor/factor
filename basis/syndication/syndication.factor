@@ -1,10 +1,10 @@
 ! Copyright (C) 2006 Chris Double, Daniel Ehrenberg.
 ! Portions copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: xml.utilities kernel assocs math.order
+USING: xml.traversal kernel assocs math.order
     strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities.html io.files io
-    http.client namespaces make xml.literals hashtables
+    http.client namespaces make xml.syntax hashtables
     calendar.format accessors continuations urls present ;
 IN: syndication
 
