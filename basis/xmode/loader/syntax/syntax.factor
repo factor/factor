@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors xmode.tokens xmode.rules xmode.keyword-map
-xml.data xml.utilities xml assocs kernel combinators sequences
+xml.data xml.traversal xml assocs kernel combinators sequences
 math.parser namespaces make parser lexer xmode.utilities
 parser-combinators.regexp io.files splitting arrays ;
 IN: xmode.loader.syntax

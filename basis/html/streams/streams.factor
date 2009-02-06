@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel assocs io io.styles math math.order math.parser
-sequences strings make words combinators macros xml.literals html fry
+sequences strings make words combinators macros xml.syntax html fry
 destructors ;
 IN: html.streams
 

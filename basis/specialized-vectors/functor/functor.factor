@@ -9,7 +9,7 @@ FUNCTOR: define-vector ( T -- )
 A   IS      ${T}-array
 <A> IS      <${A}>
 
-V   DEFINES ${T}-vector
+V   DEFINES-CLASS ${T}-vector
 <V> DEFINES <${V}>
 >V  DEFINES >${V}
 V{  DEFINES ${V}{

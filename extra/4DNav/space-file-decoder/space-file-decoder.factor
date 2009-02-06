@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Jeff Bigot
 ! See http://factorcode.org/license.txt for BSD license.
-USING: adsoda xml xml.utilities xml.dispatch accessors 
+USING: adsoda xml xml.traversal xml.syntax accessors 
 combinators sequences math.parser kernel splitting values 
 continuations ;
 IN: 4DNav.space-file-decoder
