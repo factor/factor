@@ -10,7 +10,6 @@ xml.writer
 xml.traversal
 xml.syntax
 html.components
-html.elements
 html.forms
 html.templates
 html.templates.chloe
@@ -58,14 +57,6 @@ CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
     #! Side-effects current namespace.
     '[ [ [ _ ] dip link-attr ] each-responder ] [code] ;
 
-: a-start-tag ( tag -- )
-    [ <a ] [code]
-    [ attrs>> non-chloe-attrs-only compile-attrs ]
-    [ compile-link-attrs ]
-    [ compile-a-url ]
-    tri
-    [ =href a> ] [code] ;
-
 : process-attrs ( assoc -- newassoc )
     [ "@" ?head [ value present ] when ] assoc-map ;
 
@@ -76,54 +67,61 @@ CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
     [ non-chloe-attrs ]
     [ compile-link-attrs ]
     [ compile-a-url ] tri
-    [ swap "href" swap set-at ] [code] ;
+    [ present swap "href" swap [ set-at ] keep ] [code] ;
 
 CHLOE: a
-    [ a-attrs ]
-    [ compile-children>string ] bi
-    [ <unescaped> [XML <a><-></a> XML] swap >>attrs ]
-    [xml-code] ;
+    [
+        [ a-attrs ]
+        [ compile-children>string ] bi
+        [ <unescaped> [XML <a><-></a> XML] second swap >>attrs ]
+        [xml-code]
+    ] compile-with-scope ;
 
 CHLOE: base
     compile-a-url [ [XML <base href=<->/> XML] ] [xml-code] ;
 
+USE: io.streams.string
+
 : compile-hidden-form-fields ( for -- )
     '[
-        <div "display: none;" =style div>
+        [
             _ [ "," split [ hidden render ] each ] when*
             nested-forms get " " join f like nested-forms-key hidden-form-field
             [ modify-form ] each-responder
-        </div>
+        ] with-string-writer <unescaped>
+        [XML <div style="display:none;"><-></div> XML]
     ] [code] ;
 
-: compile-form-attrs ( method action attrs -- )
-    [ <form ] [code]
-    [ compile-attr [ =method ] [code] ]
-    [ compile-attr [ resolve-base-path =action ] [code] ]
-    [ compile-attrs ]
-    tri*
-    [ form> ] [code] ;
+: (compile-form-attrs) ( method action -- )
+    ! Leaves an assoc on the stack at runtime
+    [ compile-attr [ "method" pick set-at ] [code] ]
+    [ compile-attr [ resolve-base-path "action" pick set-at ] [code] ]
+    bi* ;
 
-: form-start-tag ( tag -- )
-    [
-        [ "method" optional-attr "post" or ]
-        [ "action" required-attr ]
-        [ attrs>> non-chloe-attrs-only ] tri
-        compile-form-attrs
-    ]
-    [ "for" optional-attr compile-hidden-form-fields ] bi ;
+: compile-method/action ( tag -- )
+    ! generated code is ( assoc -- assoc )
+    [ "method" optional-attr "post" or ]
+    [ "action" required-attr ] bi
+    (compile-form-attrs) ;
 
-: form-end-tag ( tag -- )
-    drop [ </form> ] [code] ;
+: compile-form-attrs ( tag -- )
+    [ non-chloe-attrs ]
+    [ compile-link-attrs ]
+    [ compile-method/action ] tri ;
+
+: hidden-fields ( tag -- )
+    "for" optional-attr compile-hidden-form-fields ;
 
 CHLOE: form
     [
-        {
-            [ compile-link-attrs ]
-            [ form-start-tag ]
-            [ compile-children ]
-            [ form-end-tag ]
-        } cleave
+        [ compile-form-attrs ]
+        [ hidden-fields ]
+        [ compile-children>string ] tri
+        [
+            <unescaped> [XML <form><-><-></form> XML] second
+                swap >>attrs
+            write-xml
+        ] [code]
     ] compile-with-scope ;
 
 : button-tag-markup ( -- xml )
