@@ -1,9 +1,9 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors arrays kernel words sequences generic math
 namespaces make quotations assocs combinators classes.tuple
 classes.tuple.private effects summary hashtables classes generic
-sets definitions generic.standard slots.private continuations
+sets definitions generic.standard slots.private continuations locals
 stack-checker.backend stack-checker.state stack-checker.visitor
 stack-checker.errors stack-checker.values
 stack-checker.recursive-state ;
@@ -15,48 +15,34 @@ IN: stack-checker.transforms
     [ dup infer-word apply-word/effect ]
     if ;
 
-: ((apply-transform)) ( word quot values stack -- )
-    rot with-datastack first2
-    dup [
-        [
-            [ drop ]
-            [ [ length meta-d shorten-by ] [ #drop, ] bi ] bi*
-        ] 2dip
-        swap infer-quot
-    ] [
-        3drop give-up-transform
-    ] if ; inline
+:: ((apply-transform)) ( word quot values stack rstate -- )
+    rstate recursive-state
+    [ stack quot with-datastack first ] with-variable
+    [
+        word inlined-dependency depends-on
+        values [ length meta-d shorten-by ] [ #drop, ] bi
+        rstate infer-quot
+    ] [ word give-up-transform ] if* ;
+
+: literals? ( values -- ? ) [ literal-value? ] all? ;
 
 : (apply-transform) ( word quot n -- )
-    ensure-d dup [ known literal? ] all? [
-        dup empty? [
-            recursive-state get 1array
-        ] [
+    ensure-d dup literals? [
+        dup empty? [ dup recursive-state get ] [
             [ ]
             [ [ literal value>> ] map ]
             [ first literal recursion>> ] tri
-            prefix
         ] if
         ((apply-transform))
     ] [ 2drop give-up-transform ] if ;
 
 : apply-transform ( word -- )
-    [ inlined-dependency depends-on ] [
-        [ ]
-        [ "transform-quot" word-prop ]
-        [ "transform-n" word-prop ]
-        tri
-        (apply-transform)
-    ] bi ;
+    [ ] [ "transform-quot" word-prop ] [ "transform-n" word-prop ] tri
+    (apply-transform) ;
 
 : apply-macro ( word -- )
-    [ inlined-dependency depends-on ] [
-        [ ]
-        [ "macro" word-prop ]
-        [ "declared-effect" word-prop in>> length ]
-        tri
-        (apply-transform)
-    ] bi ;
+    [ ] [ "macro" word-prop ] [ "declared-effect" word-prop in>> length ] tri
+    (apply-transform) ;
 
 : define-transform ( word quot n -- )
     [ drop "transform-quot" set-word-prop ]

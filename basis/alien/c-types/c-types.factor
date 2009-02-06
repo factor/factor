@@ -178,6 +178,8 @@ GENERIC: byte-length ( seq -- n ) flushable
 
 M: byte-array byte-length length ;
 
+M: f byte-length drop 0 ;
+
 : c-getter ( name -- quot )
     c-type-getter [
         [ "Cannot read struct fields with this type" throw ]
@@ -201,13 +203,13 @@ M: byte-array byte-length length ;
     1 swap malloc-array ; inline
 
 : malloc-byte-array ( byte-array -- alien )
-    dup length [ nip malloc dup ] 2keep memcpy ;
+    dup byte-length [ nip malloc dup ] 2keep memcpy ;
 
 : memory>byte-array ( alien len -- byte-array )
     [ nip (byte-array) dup ] 2keep memcpy ;
 
 : byte-array>memory ( byte-array base -- )
-    swap dup length memcpy ;
+    swap dup byte-length memcpy ;
 
 : array-accessor ( type quot -- def )
     [
@@ -263,7 +265,7 @@ M: long-long-type box-return ( type -- )
     ] when ;
 
 : malloc-file-contents ( path -- alien len )
-    binary file-contents dup malloc-byte-array swap length ;
+    binary file-contents [ malloc-byte-array ] [ length ] bi ;
 
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
@@ -283,9 +285,10 @@ M: long-long-type box-return ( type -- )
     <c-type>
         c-ptr >>class
         [ alien-cell ] >>getter
-        [ set-alien-cell ] >>setter
+        [ [ >c-ptr ] 2dip set-alien-cell ] >>setter
         bootstrap-cell >>size
         bootstrap-cell >>align
+        [ >c-ptr ] >>unboxer-quot
         "box_alien" >>boxer
         "alien_offset" >>unboxer
     "void*" define-primitive-type

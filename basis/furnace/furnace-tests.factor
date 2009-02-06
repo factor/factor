@@ -30,7 +30,7 @@ M: base-path-check-responder call-responder*
     "a/b/c" split-path main-responder get call-responder body>>
 ] unit-test
 
-[ "<input type='hidden' name='foo' value='&amp;&amp;&amp;'/>" ]
+[ "<input type=\"hidden\" value=\"&amp;&amp;&amp;\" name=\"foo\"/>" ]
 [ [ "&&&" "foo" hidden-form-field ] with-string-writer ]
 unit-test
 

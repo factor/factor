@@ -3,7 +3,6 @@
 USING: kernel sequences accessors namespaces combinators words
 assocs db.tuples arrays splitting strings validators urls
 html.forms
-html.elements
 html.components
 furnace
 furnace.boilerplate

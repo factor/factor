@@ -128,7 +128,7 @@ ARTICLE: "html.templates.chloe.tags.form" "Chloe link and form tags"
             "<a href=\"http://mysite.org/wiki/view/Factor\""
             "   class=\"small-link\">"
             "    View"
-            "s</a>"
+            "</a>"
         }
     } }
     { { $snippet "t:base" } { "Outputs an HTML " { $snippet "<base>" } " tag. The attributes are interpreted in the same manner as the attributes of " { $snippet "t:a" } "." } }
@@ -261,8 +261,8 @@ $nl
 ARTICLE: "html.templates.chloe.extend.components.example" "An example of a custom Chloe component"
 "As an example, let's develop a custom Chloe component which renders an image stored in a form value. Since the component does not require any configuration, we can define a singleton class:"
 { $code "SINGLETON: image" }
-"Now we define a method on the " { $link render* } " generic word which renders the image using " { $vocab-link "html.elements" } ":"
-{ $code "M: image render* 2drop <img =src img/> ;" }
+"Now we define a method on the " { $link render* } " generic word which renders the image using " { $vocab-link "xml.literals" } ":"
+{ $code "M: image render* 2drop [XML <img src=<-> /> XML] ;" }
 "Finally, we can define a Chloe component:"
 { $code "COMPONENT: image" }
 "We can use it as follows, assuming the current form has a value named " { $snippet "image" } ":"

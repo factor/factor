@@ -75,14 +75,14 @@ PRIVATE>
     dup add-malloc ;
 
 : realloc ( alien size -- newalien )
+    [ >c-ptr ] dip
     over malloc-exists? [ realloc-error ] unless
     dupd (realloc) check-ptr
     swap delete-malloc
     dup add-malloc ;
 
 : free ( alien -- )
-    dup delete-malloc
-    (free) ;
+    >c-ptr [ delete-malloc ] [ (free) ] bi ;
 
 : memcpy ( dst src size -- )
     "void" "libc" "memcpy" { "void*" "void*" "ulong" } alien-invoke ;

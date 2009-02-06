@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml.data xml.writer tools.test fry xml kernel multiline
-xml.writer.private io.streams.string xml.utilities sequences ;
+xml.writer.private io.streams.string xml.traversal sequences
+io.encodings.utf8 io.files accessors io.directories ;
 IN: xml.writer.tests
 
 \ write-xml must-infer
@@ -59,3 +60,9 @@ IN: xml.writer.tests
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<foo>\n  bar\n</foo>" ]
 [ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test
 [ "<foo'>" ] [ "<foo'>" <unescaped> xml>string ] unit-test
+
+: test-file "resource:basis/xml/writer/test.xml" ;
+
+[ ] [ "<?xml version='1.0' encoding='UTF-16BE'?><x/>" string>xml test-file utf8 [ write-xml ] with-file-writer ] unit-test
+[ "x" ] [ test-file file>xml body>> name>> main>> ] unit-test
+[ ] [ test-file delete-file ] unit-test

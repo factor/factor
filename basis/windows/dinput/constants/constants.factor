@@ -59,7 +59,7 @@ SYMBOLS:
             struct args <DIOBJECTDATAFORMAT>
             i alien set-nth
         ] each-index
-        alien underlying>>
+        alien
     ] ;
 
 : (DIDATAFORMAT) ( dwSize dwObjSize dwFlags dwDataSize dwNumObjs rgodf alien -- alien )
