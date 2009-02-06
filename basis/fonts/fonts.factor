@@ -1,14 +1,18 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel colors accessors combinators ;
+USING: kernel colors colors.constants accessors combinators ;
 IN: fonts
 
-TUPLE: font name size bold? italic? foreground background ;
+TUPLE: font
+name
+size
+bold?
+italic?
+{ foreground initial: COLOR: black }
+{ background initial: COLOR: white } ;
 
 : <font> ( -- font )
-    font new
-        black >>foreground
-        white >>background ; inline
+    font new ; inline
 
 : font-with-foreground ( font color -- font' )
     [ clone ] dip >>foreground ; inline
@@ -25,14 +29,16 @@ TUPLE: font name size bold? italic? foreground background ;
     [ >>background ] [ >>foreground ] bi* ;
 
 : derive-font ( base font -- font' )
-    [ clone ] dip over {
-        [ [ name>> ] either? >>name ]
-        [ [ size>> ] either? >>size ]
-        [ [ bold?>> ] either? >>bold? ]
-        [ [ italic?>> ] either? >>italic? ]
-        [ [ foreground>> ] either? >>foreground ]
-        [ [ background>> ] either? >>background ]
-    } 2cleave ;
+    [
+        [ clone ] dip over {
+            [ [ name>> ] either? >>name ]
+            [ [ size>> ] either? >>size ]
+            [ [ bold?>> ] either? >>bold? ]
+            [ [ italic?>> ] either? >>italic? ]
+            [ [ foreground>> ] either? >>foreground ]
+            [ [ background>> ] either? >>background ]
+        } 2cleave
+    ] when* ;
 
 : serif-font ( -- font )
     <font>
