@@ -99,7 +99,7 @@ ERROR: end-of-stream multipart ;
     dup name>> empty-name? [
         drop
     ] [
-        [ [ header>> ] [ name>> unquote ] [ name-content>> ] tri mime-variable boa ]
+        [ name-content>> ]
         [ name>> unquote ]
         [ mime-parts>> set-at ] tri
     ] if ;

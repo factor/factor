@@ -89,44 +89,37 @@ M: composed infer-call*
 M: object infer-call*
     \ literal-expected inference-warning ;
 
-: infer-slip ( -- )
-    1 infer->r infer-call 1 infer-r> ;
+: infer-nslip ( n -- )
+    [ infer->r infer-call ] [ infer-r> ] bi ;
 
-: infer-2slip ( -- )
-    2 infer->r infer-call 2 infer-r> ;
+: infer-slip ( -- ) 1 infer-nslip ;
 
-: infer-3slip ( -- )
-    3 infer->r infer-call 3 infer-r> ;
+: infer-2slip ( -- ) 2 infer-nslip ;
 
-: infer-dip ( -- )
-    literals get
-    [ \ dip def>> infer-quot-here ]
-    [ pop 1 infer->r infer-quot-here 1 infer-r>  ]
+: infer-3slip ( -- ) 3 infer-nslip ;
+
+: infer-ndip ( word n -- )
+    [ literals get ] 2dip
+    [ '[ _ def>> infer-quot-here ] ]
+    [ '[ _ [ pop ] dip [ infer->r infer-quot-here ] [ infer-r> ] bi ] ] bi*
     if-empty ;
 
-: infer-2dip ( -- )
-    literals get
-    [ \ 2dip def>> infer-quot-here ]
-    [ pop 2 infer->r infer-quot-here 2 infer-r>  ]
-    if-empty ;
+: infer-dip ( -- ) \ dip 1 infer-ndip ;
 
-: infer-3dip ( -- )
-    literals get
-    [ \ 3dip def>> infer-quot-here ]
-    [ pop 3 infer->r infer-quot-here 3 infer-r>  ]
-    if-empty ;
+: infer-2dip ( -- ) \ 2dip 2 infer-ndip ;
 
-: infer-curry ( -- )
-    2 consume-d
-    dup first2 <curried> make-known
-    [ push-d ] [ 1array ] bi
-    \ curry #call, ;
+: infer-3dip ( -- ) \ 3dip 3 infer-ndip ;
 
-: infer-compose ( -- )
-    2 consume-d
-    dup first2 <composed> make-known
-    [ push-d ] [ 1array ] bi
-    \ compose #call, ;
+: infer-builder ( quot word -- )
+    [
+        [ 2 consume-d ] dip
+        [ dup first2 ] dip call make-known
+        [ push-d ] [ 1array ] bi
+    ] dip #call, ; inline
+
+: infer-curry ( -- ) [ <curried> ] \ curry infer-builder ;
+
+: infer-compose ( -- ) [ <composed> ] \ compose infer-builder ;
 
 : infer-execute ( -- )
     pop-literal nip

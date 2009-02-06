@@ -15,7 +15,7 @@ M: bad-byte-array-length summary
 
 FUNCTOR: define-array ( T -- )
 
-A            DEFINES ${T}-array
+A            DEFINES-CLASS ${T}-array
 <A>          DEFINES <${A}>
 (A)          DEFINES (${A})
 >A           DEFINES >${A}
