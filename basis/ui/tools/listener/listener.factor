@@ -35,7 +35,9 @@ completion-popup ;
     [ thread>> dup [ thread-registered? ] when ]
     bi and not ;
 
-: interactor-use ( interactor -- seq )
+SLOT: vocabs
+
+M: interactor vocabs>>
     dup interactor-busy? [ drop f ] [
         use swap
         interactor-continuation name>>
@@ -45,12 +47,19 @@ completion-popup ;
 : vocab-exists? ( name -- ? )
     { [ vocab ] [ find-vocab-root ] } 1|| ;
 
-: word-at-caret ( token interactor -- word/vocab/f )
-    dup completion-mode {
-        { vocab-completion [ drop dup vocab-exists? [ >vocab-link ] [ drop f ] if ] }
-        { word-completion [ interactor-use assoc-stack ] }
-        { char-completion [ 2drop f ] }
-    } case ;
+GENERIC: (word-at-caret) ( token completion-mode -- obj )
+
+M: vocab-completion (word-at-caret)
+    drop dup vocab-exists? [ >vocab-link ] [ drop f ] if ;
+
+M: word-completion (word-at-caret)
+    vocabs>> assoc-stack ;
+
+M: char-completion (word-at-caret)
+    2drop f ;
+
+: word-at-caret ( token interactor -- obj )
+    completion-mode (word-at-caret) ;
 
 : <word-model> ( interactor -- model )
     [ token-model>> 1/3 seconds <delay> ]
@@ -280,7 +289,7 @@ M: listener-operation invoke-command ( target command -- )
     ] [ 2drop ] if ;
 
 M: word accept-completion-hook
-    interactor>> interactor-use use-if-necessary ;
+    interactor>> vocabs>> use-if-necessary ;
 
 M: object accept-completion-hook 2drop ;
 

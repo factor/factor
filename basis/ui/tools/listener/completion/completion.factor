@@ -1,14 +1,64 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors documents
+USING: accessors arrays assocs calendar colors colors.constants documents
 documents.elements fry kernel words sets splitting math math.vectors
 models.delay models.filter combinators.short-circuit parser present
-sequences tools.completion generic generic.standard.engines.tuple
-fonts ui.commands ui.operations ui.gadgets ui.gadgets.editors
-ui.gadgets.glass ui.gadgets.scrollers ui.gadgets.tables
+sequences tools.completion tools.vocabs.browser generic
+generic.standard.engines.tuple fonts ui.commands ui.operations
+ui.gadgets ui.gadgets.editors ui.gadgets.glass ui.gadgets.scrollers
+ui.gadgets.tables ui.gadgets.tracks ui.gadgets.labelled
 ui.gadgets.theme ui.gadgets.worlds ui.gadgets.wrappers ui.gestures
-ui.render ui.tools.listener.history combinators ;
+ui.render ui.tools.listener.history combinators vocabs ;
 IN: ui.tools.listener.completion
+
+! We don't directly depend on the listener tool but we use a few slots
+SLOT: completion-popup
+SLOT: interactor
+SLOT: history
+
+: history-list ( interactor -- alist )
+    history>> elements>>
+    [ dup string>> { { CHAR: \n CHAR: \s } } substitute ] { } map>assoc
+    <reversed> ;
+
+TUPLE: word-completion vocabs ;
+C: <word-completion> word-completion
+
+SINGLETONS: vocab-completion char-completion history-completion ;
+
+UNION: listener-completion word-completion vocab-completion char-completion history-completion ;
+
+GENERIC: completion-quot ( interactor completion-mode -- quot )
+
+M: word-completion completion-quot 2drop [ [ { } ] [ words-matching ] if-empty ] ;
+M: vocab-completion completion-quot 2drop [ [ { } ] [ vocabs-matching ] if-empty ] ;
+M: char-completion completion-quot 2drop [ [ { } ] [ chars-matching ] if-empty ] ;
+M: history-completion completion-quot drop '[ drop _ history-list ] ;
+
+GENERIC: completion-element ( completion-mode -- element )
+
+M: object completion-element drop one-word-elt ;
+M: history-completion completion-element drop one-line-elt ;
+
+GENERIC: completion-banner ( completion-mode -- string )
+
+M: word-completion completion-banner drop "Words:" ;
+M: vocab-completion completion-banner drop "Vocabularies:" ;
+M: char-completion completion-banner drop "Unicode code point names:" ;
+M: history-completion completion-banner drop "Input history:" ;
+
+! Completion modes also implement the row renderer protocol
+M: listener-completion row-columns drop present 1array ;
+
+M: word-completion row-color
+    [ vocabulary>> ] [ vocabs>> ] bi* {
+        { [ 2dup [ vocab-words ] dip memq? ] [ COLOR: black ] }
+        { [ over ".private" tail? ] [ COLOR: dark-red ] }
+        [ COLOR: dark-gray ]
+    } cond 2nip ;
+
+M: vocab-completion row-color
+    drop vocab? COLOR: black COLOR: dark-gray ? ;
 
 : complete-IN:/USE:? ( tokens -- ? )
     2 short tail* { "IN:" "USE:" } intersects? ;
@@ -25,33 +75,24 @@ IN: ui.tools.listener.completion
 : up-to-caret ( caret document -- string )
     [ { 0 0 } ] 2dip doc-range ;
 
-SINGLETONS: word-completion vocab-completion char-completion ;
-
 : completion-mode ( interactor -- symbol )
-    [ editor-caret ] [ model>> ] bi up-to-caret " \r\n" split
+    [ vocabs>> ] [ editor-caret ] [ model>> ] tri up-to-caret " \r\n" split
     {
-        { [ dup { [ complete-IN:/USE:? ] [ complete-USING:? ] } 1|| ] [ drop vocab-completion ] }
-        { [ dup complete-CHAR:? ] [ drop char-completion ] }
-        [ drop word-completion ]
+        { [ dup { [ complete-IN:/USE:? ] [ complete-USING:? ] } 1|| ] [ 2drop vocab-completion ] }
+        { [ dup complete-CHAR:? ] [ 2drop char-completion ] }
+        [ drop <word-completion> ]
     } cond ;
 
-! We don't directly depend on the listener tool but we use a few slots
-SLOT: completion-popup
-SLOT: interactor
-SLOT: history
-
-TUPLE: completion-popup < wrapper table interactor element ;
+TUPLE: completion-popup < track table interactor completion-mode ;
 
 : find-completion-popup ( gadget -- popup )
     [ completion-popup? ] find-parent ;
 
-SINGLETON: completion-renderer
-M: completion-renderer row-columns drop present 1array ;
-M: completion-renderer row-value drop ;
-
-: <completion-model> ( editor quot -- model )
-    [ one-word-elt <element-model> 1/3 seconds <delay> ] dip
+: <completion-model> ( editor element quot -- model )
+    [ <element-model> 1/3 seconds <delay> ] dip
     '[ @ keys 1000 short head ] <filter> ;
+
+M: completion-popup focusable-child* table>> ;
 
 M: completion-popup hide-glass-hook
     interactor>> f >>completion-popup request-focus ;
@@ -86,11 +127,12 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
     [ nip hide-completion-popup ]
     2tri ;
 
-: <completion-table> ( interactor quot -- table )
-    <completion-model> <table>
+: <completion-table> ( interactor completion-mode -- table )
+    [ completion-element ] [ completion-quot ] [ nip ] 2tri
+    [ <completion-model> <table> ] dip
+        >>renderer
         monospace-font >>font
         t >>selection-required?
-        completion-renderer >>renderer
         dup '[ _ accept-completion ] >>action ;
 
 : <completion-scroller> ( object -- object )
@@ -98,11 +140,12 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
         { 300 120 } >>min-dim
         { 300 120 } >>max-dim ;
 
-: <completion-popup> ( interactor quot -- popup )
-    [ completion-popup new-gadget ] 2dip
-    [ drop >>interactor ] [ <completion-table> >>table ] 2bi
-    dup table>> <completion-scroller> add-gadget
-    white <solid> >>interior ;
+: <completion-popup> ( interactor completion-mode -- popup )
+    [ vertical completion-popup new-track ] 2dip
+    [ [ >>interactor ] [ >>completion-mode ] bi* ] [ <completion-table> >>table ] 2bi
+    dup [ table>> <completion-scroller> ] [ completion-mode>> completion-banner ] bi
+    <labelled-gadget> 1 track-add
+    COLOR: white <solid> >>interior ;
 
 completion-popup H{
     { T{ key-down f f "ESC" } [ hide-completion-popup ] }
@@ -112,50 +155,43 @@ completion-popup H{
 
 CONSTANT: completion-popup-offset { -4 0 }
 
-: (completion-popup-loc) ( interactor element -- loc )
+: (completion-popup-loc) ( interactor completion-mode -- loc )
     [ drop screen-loc ] [
-        [ [ [ editor-caret ] [ model>> ] bi ] dip prev-elt ] [ drop ] 2bi
+        [
+            [ [ editor-caret ] [ model>> ] bi ] dip
+            completion-element prev-elt
+        ] [ drop ] 2bi
         loc>point
     ] 2bi v+ completion-popup-offset v+ ;
 
-: completion-popup-loc-1 ( interactor element -- loc )
+: completion-popup-loc-1 ( interactor completion-mode -- loc )
     [ (completion-popup-loc) ] [ drop caret-dim ] 2bi v+ ;
 
-: completion-popup-loc-2 ( interactor element popup -- loc )
+: completion-popup-loc-2 ( interactor completion-mode popup -- loc )
     [ (completion-popup-loc) ] dip pref-dim { 0 1 } v* v- ;
 
-: completion-popup-fits? ( interactor element popup -- ? )
+: completion-popup-fits? ( interactor completion-mode popup -- ? )
     [ [ completion-popup-loc-1 ] dip pref-dim v+ ]
     [ 2drop find-world dim>> ]
     3bi [ second ] bi@ <= ;
 
-: completion-popup-loc ( interactor element popup -- loc )
+: completion-popup-loc ( interactor completion-mode popup -- loc )
     3dup completion-popup-fits?
     [ drop completion-popup-loc-1 ]
     [ completion-popup-loc-2 ]
     if ;
 
-: show-completion-popup ( interactor quot element -- )
-    [ nip ] [ drop <completion-popup> ] 3bi
+: show-completion-popup ( interactor completion-mode -- )
+    2dup <completion-popup>
     [ nip >>completion-popup drop ]
     [ [ 2drop find-world ] [ 2nip ] [ completion-popup-loc ] 3tri ] 3bi
     show-glass ;
 
 : code-completion-popup ( interactor -- )
-    dup completion-mode {
-        { word-completion [ words-matching ] }
-        { vocab-completion [ vocabs-matching ] }
-        { char-completion [ chars-matching ] }
-    } at '[ [ { } ] _ if-empty ]
-    one-word-elt show-completion-popup ;
-
-: history-matching ( interactor -- alist )
-    history>> elements>>
-    [ dup string>> { { CHAR: \n CHAR: \s } } substitute ] { } map>assoc
-    <reversed> ;
+    dup completion-mode show-completion-popup ;
 
 : history-completion-popup ( interactor -- )
-    dup '[ drop _ history-matching ] one-line-elt show-completion-popup ;
+    history-completion show-completion-popup ;
 
 : recall-previous ( interactor -- )
     history>> history-recall-previous ;
