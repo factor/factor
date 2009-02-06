@@ -7,7 +7,7 @@ SLOT: alien
 
 FUNCTOR: define-destructor ( F -- )
 
-F-destructor DEFINES ${F}-destructor
+F-destructor DEFINES-CLASS ${F}-destructor
 <F-destructor> DEFINES <${F}-destructor>
 &F DEFINES &${F}
 |F DEFINES |${F}
