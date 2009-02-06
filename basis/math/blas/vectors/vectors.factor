@@ -134,7 +134,7 @@ XCOPY          IS cblas_${T}copy
 XSWAP          IS cblas_${T}swap
 IXAMAX         IS cblas_i${T}amax
 
-VECTOR         DEFINES ${TYPE}-blas-vector
+VECTOR         DEFINES-CLASS ${TYPE}-blas-vector
 <VECTOR>       DEFINES <${TYPE}-blas-vector>
 >VECTOR        DEFINES >${TYPE}-blas-vector
 

@@ -5,7 +5,7 @@ math namespaces parser sequences strings words libc fry
 alien.c-types alien.structs.fields cpu.architecture math.order ;
 IN: alien.structs
 
-TUPLE: struct-type size align fields ;
+TUPLE: struct-type size align fields boxer-quot unboxer-quot getter setter ;
 
 M: struct-type heap-size size>> ;
 
@@ -14,6 +14,10 @@ M: struct-type c-type-class drop object ;
 M: struct-type c-type-align align>> ;
 
 M: struct-type c-type-stack-align? drop f ;
+
+M: struct-type c-type-boxer-quot boxer-quot>> ;
+
+M: struct-type c-type-unboxer-quot unboxer-quot>> ;
 
 : if-value-struct ( ctype true false -- )
     [ dup value-struct? ] 2dip '[ drop "void*" @ ] if ; inline
@@ -40,7 +44,10 @@ M: struct-type stack-size
 
 : (define-struct) ( name size align fields -- )
     [ [ align ] keep ] dip
-    struct-type boa
+    struct-type new
+    swap >>fields
+    swap >>align
+    swap >>size
     swap typedef ;
 
 : make-fields ( name vocab fields -- fields )

@@ -1,7 +1,7 @@
 ! (c)2009 Joe Groff, see BSD license
 USING: accessors arrays assocs fry kernel math math.affine-transforms math.constants
 math.functions math.parser math.vectors memoize peg.ebnf sequences sequences.squish
-splitting strings xml.data xml.utilities ;
+splitting strings xml.data xml.syntax ;
 IN: svg
 
 XML-NS: svg-name http://www.w3.org/2000/svg

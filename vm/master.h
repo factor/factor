@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <math.h>
+#include <complex.h>
 #include <stdbool.h>
 #include <setjmp.h>
 

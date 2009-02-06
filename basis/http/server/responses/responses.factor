@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.parser http accessors kernel xml.literals xml.writer
+USING: math.parser http accessors kernel xml.syntax xml.writer
 io io.streams.string io.encodings.utf8 ;
 IN: http.server.responses
 
