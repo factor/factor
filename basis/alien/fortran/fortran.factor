@@ -1,6 +1,7 @@
+! (c) 2009 Joe Groff, see BSD license
 USING: accessors alien alien.c-types alien.structs alien.syntax
 arrays ascii assocs combinators fry kernel lexer macros math.parser
-namespaces parser sequences splitting vectors vocabs.parser ;
+namespaces parser sequences splitting vectors vocabs.parser locals ;
 IN: alien.fortran
 
 ! XXX this currently only supports the gfortran/f2c abi.
@@ -43,9 +44,9 @@ CONSTANT: fortran>c-types H{
     { "integer"          integer-type          }
     { "logical"          logical-type          }
     { "real"             real-type             }
-    { "double precision" double-precision-type }
+    { "double-precision" double-precision-type }
     { "complex"          real-complex-type     }
-    { "double complex"   double-complex-type   }
+    { "double-complex"   double-complex-type   }
 }
 
 : append-dimensions ( base-c-type type -- c-type )
@@ -82,7 +83,7 @@ M: real-type (fortran-type>c-type)
         { 4 [ "float"  ] }
         { 8 [ "double" ] }
     } size-case-type ;
-M: complex-type (fortran-type>c-type)
+M: real-complex-type (fortran-type>c-type)
     {
         {  f [ "(fortran-complex)"        ] }
         {  8 [ "(fortran-complex)"        ] }
@@ -127,12 +128,6 @@ GENERIC: added-c-args ( type -- args )
 M: fortran-type added-c-args drop { } ;
 M: character-type added-c-args drop { "long" } ;
 
-GENERIC: added-c-arg-values ( type -- arg-values )
-
-M: fortran-type added-c-arg-values drop { } ;
-M: character-type added-c-arg-values
-    fix-character-type dims>> first 1array ;
-
 GENERIC: returns-by-value? ( type -- ? )
 
 M: fortran-type returns-by-value? drop f ;
@@ -146,6 +141,56 @@ M: real-type (fortran-ret-type>c-type) drop "double" ;
 
 : suffix! ( seq   elt   -- seq   ) over push     ; inline
 : append! ( seq-a seq-b -- seq-a ) over push-all ; inline
+
+: <real-complex> ( complex -- byte-array )
+    "(fortran-complex)" c-object
+    [ [ real-part      ] dip set-(fortran-complex)-r ]
+    [ [ imaginary-part ] dip set-(fortran-complex)-i ]
+    [ ] tri ;
+
+: <double-complex> ( complex -- byte-array )
+    "(fortran-double-complex)" c-object
+    [ [ real-part      ] dip set-(fortran-complex)-r ]
+    [ [ imaginary-part ] dip set-(fortran-complex)-i ]
+    [ ] tri ;
+
+GENERIC: [fortran-arg>c-args] ( type -- main-quot added-quot )
+
+M: integer-type [fortran-arg>c-args]
+    size>> {
+        { f [ [ <int>      ] [ drop ] ] }
+        { 1 [ [ <char>     ] [ drop ] ] }
+        { 2 [ [ <short>    ] [ drop ] ] }
+        { 4 [ [ <int>      ] [ drop ] ] }
+        { 8 [ [ <longlong> ] [ drop ] ] }
+        [ invalid-fortran-type ]
+    } case ;
+
+M: real-type [fortran-arg>c-args]
+    size>> {
+        { f [ [ <float>  ] [ drop ] ] }
+        { 4 [ [ <float>  ] [ drop ] ] }
+        { 8 [ [ <double> ] [ drop ] ] }
+        [ invalid-fortran-type ]
+    } case ;
+
+M: real-complex-type [fortran-arg>c-args]
+    size>> {
+        {  f [ [ <real-complex>   ] [ drop ] ] }
+        {  8 [ [ <real-complex>   ] [ drop ] ] }
+        { 16 [ [ <double-complex> ] [ drop ] ] }
+        [ invalid-fortran-type ]
+    } case ;
+
+M: real-complex-type [fortran-arg>c-args]
+    size>> {
+        {  f [ [ <real-complex>   ] [ drop ] ] }
+        {  8 [ [ <real-complex>   ] [ drop ] ] }
+        { 16 [ [ <double-complex> ] [ drop ] ] }
+        [ invalid-fortran-type ]
+    } case ;
+
+M: 
 
 PRIVATE>
 
@@ -178,6 +223,13 @@ PRIVATE>
     [ >lower ] [ ] [ fortran-record>c-struct ] tri* define-struct ;
 
 : F-RECORD: scan in get parse-definition define-record ; parsing
+
+:: define-fortran-function ( return library function parameters -- )
+    ;    
+
+: F-SUBROUTINE:
+    
+
 ! : F-SUBROUTINE: ... ; parsing
 ! : F-FUNCTION: ... ; parsing
 
