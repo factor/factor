@@ -100,6 +100,6 @@ $nl
 { $subsection farkup }
 "Creating custom components:"
 { $subsection render* }
-"Custom components can emit HTML using the " { $vocab-link "xml.literals" } " vocabulary." ;
+"Custom components can emit HTML using the " { $vocab-link "xml.syntax" } " vocabulary." ;
 
 ABOUT: "html.components"

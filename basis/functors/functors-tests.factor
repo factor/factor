@@ -1,11 +1,12 @@
 IN: functors.tests
-USING: functors tools.test math words kernel ;
+USING: functors tools.test math words kernel multiline parser
+io.streams.string generic ;
 
 <<
 
 FUNCTOR: define-box ( T -- )
 
-B DEFINES ${T}-box
+B DEFINES-CLASS ${T}-box
 <B> DEFINES <${B}>
 
 WHERE
@@ -63,3 +64,47 @@ WHERE
 >>
 
 [ 4 ] [ 1 3 blah ] unit-test
+
+GENERIC: some-generic ( a -- b )
+
+! Does replacing an ordinary word with a functor-generated one work?
+[ [ ] ] [
+    <" IN: functors.tests
+
+    TUPLE: some-tuple ;
+    : some-word ( -- ) ;
+    M: some-tuple some-generic ;
+    "> <string-reader> "functors-test" parse-stream
+] unit-test
+
+: test-redefinition ( -- )
+    [ t ] [ "some-word" "functors.tests" lookup >boolean ] unit-test
+    [ t ] [ "some-tuple" "functors.tests" lookup >boolean ] unit-test
+    [ t ] [
+        "some-tuple" "functors.tests" lookup
+        "some-generic" "functors.tests" lookup method >boolean
+    ] unit-test ;
+
+test-redefinition
+
+FUNCTOR: redefine-test ( W -- )
+
+W-word DEFINES ${W}-word
+W-tuple DEFINES-CLASS ${W}-tuple
+W-generic IS ${W}-generic
+
+WHERE
+
+TUPLE: W-tuple ;
+: W-word ( -- ) ;
+M: W-tuple W-generic ;
+
+;FUNCTOR
+
+[ [ ] ] [
+    <" IN: functors.tests
+    << "some" redefine-test >>
+    "> <string-reader> "functors-test" parse-stream
+] unit-test
+
+test-redefinition

@@ -198,8 +198,8 @@ FUNCTION: int ffi_test_12 int a int b rect c int d int e int f ;
 FUNCTION: float ffi_test_23 ( float[3] x, float[3] y ) ;
 
 [ 32.0 ] [
-    { 1.0 2.0 3.0 } >float-array underlying>>
-    { 4.0 5.0 6.0 } >float-array underlying>>
+    { 1.0 2.0 3.0 } >float-array
+    { 4.0 5.0 6.0 } >float-array
     ffi_test_23
 ] unit-test
 
@@ -558,3 +558,18 @@ FUNCTION: test_struct_14 ffi_test_44 ( ) ; inline
 : stack-frame-bustage ( -- a b ) ffi_test_44 gc 3 ;
 
 [ ] [ stack-frame-bustage 2drop ] unit-test
+
+FUNCTION: complex-float ffi_test_45 ( int x ) ;
+
+[ C{ 3.0 0.0 } ] [ 3 ffi_test_45 ] unit-test
+
+FUNCTION: complex-double ffi_test_46 ( int x ) ;
+
+[ C{ 3.0 0.0 } ] [ 3 ffi_test_46 ] unit-test
+
+FUNCTION: complex-float ffi_test_47 ( complex-float x, complex-double y ) ;
+
+[ C{ 4.0 4.0 } ] [
+    C{ 1.0 2.0 }
+    C{ 1.5 1.0 } ffi_test_47
+] unit-test

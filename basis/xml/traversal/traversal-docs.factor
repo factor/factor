@@ -1,12 +1,12 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax xml.data sequences strings ;
-IN: xml.utilities
+IN: xml.traversal
 
-ABOUT: "xml.utilities"
+ABOUT: "xml.traversal"
 
-ARTICLE: "xml.utilities" "Utilities for processing XML"
-    "Getting parts of an XML document or tag:"
+ARTICLE: "xml.traversal" "Utilities for traversing XML"
+    "The " { $vocab-link "xml.traversal" } " vocabulary provides utilities for traversing an XML DOM tree and viewing the contents of a single tag. The following words are defined:"
     $nl
     "Note: the difference between deep-tag-named and tag-named is that the former searches recursively among all children and children of children of the tag, while the latter only looks at the direct children, and is therefore more efficient."
     { $subsection tag-named }

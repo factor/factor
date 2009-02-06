@@ -31,7 +31,7 @@ ERROR: roman-range-error n ;
     ] 2each drop ;
 
 : (roman>) ( seq -- n )
-    dup [ roman>n ] map swap all-eq? [
+    [ [ roman>n ] map ] [ all-eq? ] bi [
         sum
     ] [
         first2 swap -

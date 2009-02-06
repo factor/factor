@@ -4,8 +4,12 @@ USING: parser kernel sequences words effects combinators assocs
 definitions quotations namespaces memoize accessors ;
 IN: macros
 
+<PRIVATE
+
 : real-macro-effect ( word -- effect' )
     "declared-effect" word-prop in>> 1 <effect> ;
+
+PRIVATE>
 
 : define-macro ( word definition -- )
     [ "macro" set-word-prop ]
