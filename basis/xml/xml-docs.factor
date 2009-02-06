@@ -93,7 +93,7 @@ ARTICLE: "xml" "XML parser"
     { $vocab-subsection "XML parsing errors" "xml.errors" }
     { $vocab-subsection "XML entities" "xml.entities" }
     { $vocab-subsection "XML data types" "xml.data" }
-    { $vocab-subsection "Utilities for processing XML" "xml.utilities" }
-    { $vocab-subsection "Dispatch on XML tag names" "xml.dispatch" } ;
+    { $vocab-subsection "Utilities for traversing XML" "xml.traversal" }
+    { $vocab-subsection "Syntax extensions for XML" "xml.syntax" } ;
 
 ABOUT: "xml"

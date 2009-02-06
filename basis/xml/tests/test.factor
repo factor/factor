@@ -3,7 +3,7 @@
 IN: xml.tests
 USING: kernel xml tools.test io namespaces make sequences
 xml.errors xml.entities.html parser strings xml.data io.files
-xml.utilities continuations assocs
+xml.traversal continuations assocs
 sequences.deep accessors io.streams.string ;
 
 ! This is insufficient

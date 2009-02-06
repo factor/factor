@@ -1,5 +1,5 @@
 USING: kernel xml sequences assocs tools.test io arrays namespaces fry
-accessors xml.data xml.utilities xml.writer generic sequences.deep multiline ;
+accessors xml.data xml.traversal xml.writer generic sequences.deep multiline ;
 IN: xml.tests
 
 : sub-tag
