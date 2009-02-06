@@ -138,39 +138,6 @@ DEFER: if
 : 2tri@ ( u v w y x z quot -- )
     dup dup 2tri* ; inline
 
-! Object protocol
-GENERIC: hashcode* ( depth obj -- code )
-
-M: object hashcode* 2drop 0 ;
-
-M: f hashcode* 2drop 31337 ;
-
-: hashcode ( obj -- code ) 3 swap hashcode* ; inline
-
-GENERIC: equal? ( obj1 obj2 -- ? )
-
-M: object equal? 2drop f ;
-
-TUPLE: identity-tuple ;
-
-M: identity-tuple equal? 2drop f ;
-
-: = ( obj1 obj2 -- ? )
-    2dup eq? [ 2drop t ] [
-        2dup both-fixnums? [ 2drop f ] [ equal? ] if
-    ] if ; inline
-
-GENERIC: clone ( obj -- cloned )
-
-M: object clone ;
-
-M: callstack clone (clone) ;
-
-! Tuple construction
-GENERIC: new ( class -- tuple )
-
-GENERIC: boa ( ... class -- tuple )
-
 ! Quotation building
 : 2curry ( obj1 obj2 quot -- curry )
     curry curry ; inline
@@ -237,6 +204,39 @@ PRIVATE>
 
 : until ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
     [ [ not ] compose ] 2dip while ; inline
+
+! Object protocol
+GENERIC: hashcode* ( depth obj -- code )
+
+M: object hashcode* 2drop 0 ;
+
+M: f hashcode* 2drop 31337 ;
+
+: hashcode ( obj -- code ) 3 swap hashcode* ; inline
+
+GENERIC: equal? ( obj1 obj2 -- ? )
+
+M: object equal? 2drop f ;
+
+TUPLE: identity-tuple ;
+
+M: identity-tuple equal? 2drop f ;
+
+: = ( obj1 obj2 -- ? )
+    2dup eq? [ 2drop t ] [
+        2dup both-fixnums? [ 2drop f ] [ equal? ] if
+    ] if ; inline
+
+GENERIC: clone ( obj -- cloned )
+
+M: object clone ;
+
+M: callstack clone (clone) ;
+
+! Tuple construction
+GENERIC: new ( class -- tuple )
+
+GENERIC: boa ( ... class -- tuple )
 
 ! Error handling -- defined early so that other files can
 ! throw errors before continuations are loaded
