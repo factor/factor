@@ -10,7 +10,7 @@ ARTICLE: "xml.data" "XML data types"
 "Simple words for manipulating names:"
     { $subsection names-match? }
     { $subsection assure-name }
-"For high-level tools for manipulating XML, see " { $vocab-link "xml.utilities" } ;
+"For high-level tools for manipulating XML, see " { $vocab-link "xml.traversal" } ;
 
 ARTICLE: { "xml.data" "classes" } "XML data classes"
     "XML documents and chunks are made of the following classes:"
