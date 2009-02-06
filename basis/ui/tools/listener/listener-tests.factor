@@ -148,7 +148,7 @@ IN: ui.tools.listener.tests
     [ ] [ "listener" get com-end ] unit-test
 ] with-grafted-gadget
 
-[ ] [ \ + <pane> <interactor> interactor-use use-if-necessary ] unit-test
+[ ] [ \ + <pane> <interactor> vocabs>> use-if-necessary ] unit-test
 
 [ ] [ <listener-gadget> "l" set ] unit-test
 [ ] [ "l" get com-scroll-up ] unit-test
