@@ -256,7 +256,7 @@ XGEMM       IS cblas_${T}gemm
 XGERU       IS cblas_${T}ger${U}
 XGERC       IS cblas_${T}ger${C}
 
-MATRIX      DEFINES ${TYPE}-blas-matrix
+MATRIX      DEFINES-CLASS ${TYPE}-blas-matrix
 <MATRIX>    DEFINES <${TYPE}-blas-matrix>
 >MATRIX     DEFINES >${TYPE}-blas-matrix
 XMATRIX{    DEFINES ${T}matrix{
