@@ -19,6 +19,7 @@ http
 http.server
 http.server.redirection
 http.server.responses
+io.streams.string
 furnace.utilities ;
 IN: furnace.chloe-tags
 
@@ -80,16 +81,12 @@ CHLOE: a
 CHLOE: base
     compile-a-url [ [XML <base href=<->/> XML] ] [xml-code] ;
 
-USE: io.streams.string
-
 : compile-hidden-form-fields ( for -- )
     '[
-        [
-            _ [ "," split [ hidden render ] each ] when*
-            nested-forms get " " join f like nested-forms-key hidden-form-field
-            [ modify-form ] each-responder
-        ] with-string-writer <unescaped>
-        [XML <div style="display:none;"><-></div> XML]
+        _ [ "," split [ hidden render>xml ] map ] [ f ] if*
+        nested-forms get " " join f like nested-forms-key hidden-form-field>xml
+        [ [ modify-form ] each-responder ] with-string-writer <unescaped>
+        [XML <div style="display: none;"><-><-><-></div> XML]
     ] [code] ;
 
 : (compile-form-attrs) ( method action -- )

@@ -81,11 +81,13 @@ GENERIC: modify-form ( responder -- )
 
 M: object modify-form drop ;
 
-: hidden-form-field ( value name -- )
+: hidden-form-field>xml ( value name -- xml )
     over [
         [XML <input type="hidden" value=<-> name=<->/> XML]
-        write-xml
-    ] [ 2drop ] if ;
+    ] [ drop ] if ;
+
+: hidden-form-field ( value name -- )
+    hidden-form-field>xml write-xml ;
 
 : nested-forms-key "__n" ;
 
