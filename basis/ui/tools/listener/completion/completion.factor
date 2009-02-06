@@ -47,6 +47,11 @@ M: vocab-completion completion-banner drop "Vocabularies:" ;
 M: char-completion completion-banner drop "Unicode code point names:" ;
 M: history-completion completion-banner drop "Input history:" ;
 
+GENERIC: completion-popup-width ( interactor completion-mode -- x )
+
+M: object completion-popup-width 2drop 300 ;
+M: history-completion completion-popup-width drop dim>> first ;
+
 ! Completion modes also implement the row renderer protocol
 M: listener-completion row-columns drop present 1array ;
 
@@ -100,8 +105,10 @@ M: completion-popup hide-glass-hook
 : hide-completion-popup ( popup -- )
     find-world hide-glass ;
 
-: completion-loc/doc ( popup -- loc doc )
-    interactor>> [ editor-caret ] [ model>> ] bi ;
+: completion-loc/doc/elt ( popup -- loc doc elt )
+    [ interactor>> [ editor-caret ] [ model>> ] bi ]
+    [ completion-mode>> completion-element ]
+    bi ;
 
 GENERIC: completion-string ( object -- string )
 
@@ -117,8 +124,7 @@ M: engine-word completion-string method-completion-string ;
 GENERIC# accept-completion-hook 1 ( item popup -- )
 
 : insert-completion ( item popup -- )
-    [ completion-string ] [ completion-loc/doc ] bi*
-    one-word-elt set-elt-string ;
+    [ completion-string ] [ completion-loc/doc/elt ] bi* set-elt-string ;
 
 : accept-completion ( item table -- )
     find-completion-popup
@@ -135,15 +141,14 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
         t >>selection-required?
         dup '[ _ accept-completion ] >>action ;
 
-: <completion-scroller> ( object -- object )
-    <limited-scroller>
-        { 300 120 } >>min-dim
-        { 300 120 } >>max-dim ;
+: <completion-scroller> ( completion-popup -- scroller )
+    [ table>> ] [ interactor>> ] [ completion-mode>> ] tri completion-popup-width
+    [ <limited-scroller> ] [ 120 2array ] bi* [ >>min-dim ] [ >>max-dim ] bi ;
 
 : <completion-popup> ( interactor completion-mode -- popup )
     [ vertical completion-popup new-track ] 2dip
     [ [ >>interactor ] [ >>completion-mode ] bi* ] [ <completion-table> >>table ] 2bi
-    dup [ table>> <completion-scroller> ] [ completion-mode>> completion-banner ] bi
+    dup [ <completion-scroller> ] [ completion-mode>> completion-banner ] bi
     <labelled-gadget> 1 track-add
     COLOR: white <solid> >>interior ;
 
