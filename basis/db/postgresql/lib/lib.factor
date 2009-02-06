@@ -65,7 +65,7 @@ M: postgresql-result-null summary ( obj -- str )
     } case ;
 
 : param-types ( statement -- seq )
-    in-params>> [ type>> type>oid ] uint-array{ } map-as underlying>> ;
+    in-params>> [ type>> type>oid ] uint-array{ } map-as ;
 
 : malloc-byte-array/length ( byte-array -- alien length )
     [ malloc-byte-array &free ] [ length ] bi ;
@@ -91,11 +91,11 @@ M: postgresql-result-null summary ( obj -- str )
     ] 2map flip [
         f f
     ] [
-        first2 [ >void*-array underlying>> ] [ >uint-array underlying>> ] bi*
+        first2 [ >void*-array ] [ >uint-array ] bi*
     ] if-empty ;
 
 : param-formats ( statement -- seq )
-    in-params>> [ type>> type>param-format ] uint-array{ } map-as underlying>> ;
+    in-params>> [ type>> type>param-format ] uint-array{ } map-as ;
 
 : do-postgresql-bound-statement ( statement -- res )
     [

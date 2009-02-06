@@ -1,7 +1,8 @@
 IN: specialized-arrays.tests
 USING: tools.test specialized-arrays sequences
 specialized-arrays.int specialized-arrays.bool
-specialized-arrays.ushort alien.c-types accessors kernel ;
+specialized-arrays.ushort alien.c-types accessors kernel
+specialized-arrays.direct.int arrays ;
 
 [ t ] [ { 1 2 3 } >int-array int-array? ] unit-test
 
@@ -16,3 +17,7 @@ specialized-arrays.ushort alien.c-types accessors kernel ;
 ] unit-test
 
 [ B{ 210 4 1 } byte-array>ushort-array ] must-fail
+
+[ { 3 1 3 3 7 } ] [
+    int-array{ 3 1 3 3 7 } malloc-byte-array 5 <direct-int-array> >array
+] unit-test

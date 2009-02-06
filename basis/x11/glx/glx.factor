@@ -93,7 +93,7 @@ FUNCTION: void* glXGetProcAddressARB ( char* procname ) ;
         GLX_RGBA ,
         GLX_DEPTH_SIZE , 16 ,
         0 ,
-    ] int-array{ } make underlying>>
+    ] int-array{ } make
     glXChooseVisual
     [ "Could not get a double-buffered GLX RGBA visual" throw ] unless* ;
 

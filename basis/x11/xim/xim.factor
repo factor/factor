@@ -50,7 +50,7 @@ SYMBOL: keysym
 : lookup-string ( event xic -- string keysym )
     [
         prepare-lookup
-        swap keybuf get underlying>> buf-size keysym get 0 <int>
+        swap keybuf get buf-size keysym get 0 <int>
         XwcLookupString
         finish-lookup
     ] with-scope ;

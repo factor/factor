@@ -7,5 +7,5 @@ QUALIFIED: io.pipes
 
 M: unix io.pipes:(pipe) ( -- pair )
     2 <int-array>
-    [ underlying>> pipe io-error ]
+    [ pipe io-error ]
     [ first2 [ <fd> init-fd ] bi@ io.pipes:pipe boa ] bi ;

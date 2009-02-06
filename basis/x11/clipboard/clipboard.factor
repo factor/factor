@@ -51,7 +51,7 @@ TUPLE: x-clipboard atom contents ;
     "TARGETS" x-atom 32 PropModeReplace
     {
         "UTF8_STRING" "STRING" "TARGETS" "TIMESTAMP"
-    } [ x-atom ] int-array{ } map-as underlying>>
+    } [ x-atom ] int-array{ } map-as
     4 XChangeProperty drop ;
 
 : set-timestamp-prop ( evt -- )
