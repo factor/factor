@@ -56,6 +56,14 @@ SYMBOL: error-hook
 
 [ print-error-and-restarts ] error-hook set-global
 
+SYMBOL: display-stacks?
+
+t display-stacks? set-global
+
+SYMBOL: max-stack-items
+
+10 max-stack-items set-global
+
 <PRIVATE
 
 : title. ( string -- )
@@ -74,14 +82,19 @@ SYMBOL: error-hook
             ] each
         ] tabular-output
     ] unless-empty ;
-
-SYMBOL: display-stacks?
-
-t display-stacks? set-global
+    
+: trimmed-stack. ( seq -- )
+    dup length max-stack-items get > [
+        max-stack-items get cut*
+        [
+            [ length number>string "(" " more items)" surround ] keep
+            write-object nl
+        ] dip
+    ] when stack. ;
 
 : stacks. ( -- )
     display-stacks? get [
-        datastack [ nl "--- Data stack:" title. stack. ] unless-empty
+        datastack [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
     ] when ;
 
 : prompt. ( -- )
