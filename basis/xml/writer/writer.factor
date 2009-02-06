@@ -164,7 +164,7 @@ M: sequence write-xml
 M: prolog write-xml
     "<?xml version=" write
     [ version>> write-quoted ]
-    [ " encoding=" write encoding>> write-quoted ]
+    [ drop " encoding=\"UTF-8\"" write ]
     [ standalone>> [ " standalone=\"yes\"" write ] when ] tri
     "?>" write ;
 
