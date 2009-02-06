@@ -1,17 +1,19 @@
 ! (c) 2009 Joe Groff, see BSD license
 USING: assocs kernel math.rectangles combinators accessors
-math.vectors vectors sequences math math.points math.geometry
-combinators.short-circuit arrays fry locals ;
+math.vectors vectors sequences math combinators.short-circuit arrays fry ;
 IN: quadtrees
 
 TUPLE: quadtree { bounds rect } point value ll lr ul ur leaf? ;
 
-: <quadtree> ( bounds -- quadtree ) f f f f f f t quadtree boa ;
+: <quadtree> ( bounds -- quadtree )
+    quadtree new
+        swap >>bounds
+        t >>leaf? ;
 
 : rect-ll ( rect -- point ) loc>> ;
-: rect-lr ( rect -- point ) [ loc>> ] [ width  ] bi v+x ;
-: rect-ul ( rect -- point ) [ loc>> ] [ height ] bi v+y ;
-: rect-ur ( rect -- point ) [ loc>> ] [ dim>>  ] bi v+  ;
+: rect-lr ( rect -- point ) [ loc>> ] [ dim>> { 1 0 } v* ] bi v+ ;
+: rect-ul ( rect -- point ) [ loc>> ] [ dim>> { 0 1 } v* ] bi v+ ;
+: rect-ur ( rect -- point ) [ loc>> ] [ dim>>  ] bi v+ ;
 
 : rect-center ( rect -- point ) [ loc>> ] [ dim>> 0.5 v*n ] bi v+ ; inline
 
@@ -26,11 +28,13 @@ TUPLE: quadtree { bounds rect } point value ll lr ul ur leaf? ;
 : descend ( pt node -- pt subnode )
     [ drop ] [ quadrant ] 2bi ; inline
 
-:: each-quadrant ( node quot -- )
-    node ll>> quot call
-    node lr>> quot call
-    node ul>> quot call
-    node ur>> quot call ; inline
+: each-quadrant ( node quot -- )
+    {
+        [ [ ll>> ] [ call ] bi* ] 
+        [ [ lr>> ] [ call ] bi* ] 
+        [ [ ul>> ] [ call ] bi* ] 
+        [ [ ur>> ] [ call ] bi* ] 
+    } 2cleave ; inline
 : map-quadrant ( node quot: ( child-node -- x ) -- array )
     each-quadrant 4array ; inline
 
@@ -73,6 +77,7 @@ DEFER: in-rect*
     [ node-insert ] [ node-insert ] bi ;
 
 : leaf-replaceable? ( pt leaf -- ? ) point>> { [ nip not ] [ = ] } 2|| ;
+
 : leaf-insert ( value point leaf -- )
     2dup leaf-replaceable?
     [ [ (>>point) ] [ (>>value) ] bi ]
@@ -94,12 +99,12 @@ DEFER: in-rect*
     dup leaf?>> [ leaf-at-point ] [ node-at-point ] if ;
 
 : (node-in-rect*) ( values rect node -- values )
-    2dup bounds>> intersects? [ in-rect* ] [ 2drop ] if ;
+    2dup bounds>> contains-rect? [ in-rect* ] [ 2drop ] if ;
 : node-in-rect* ( values rect node -- values )
     [ (node-in-rect*) ] with each-quadrant ;
 
 : leaf-in-rect* ( values rect leaf -- values ) 
-    tuck { [ nip point>> ] [ point>> swap intersects? ] } 2&&
+    tuck { [ nip point>> ] [ point>> swap contains-point? ] } 2&&
     [ value>> over push ] [ drop ] if ;
 
 : in-rect* ( values rect tree -- values )
@@ -165,7 +170,7 @@ DEFER: in-rect*
 
 PRIVATE>
 
-: prune ( tree -- tree ) [ (prune) ] keep ;
+: prune-quadtree ( tree -- tree ) [ (prune) ] keep ;
 
 : in-rect ( tree rect -- values )
     [ 16 <vector> ] 2dip in-rect* ;
@@ -185,4 +190,9 @@ M: quadtree clear-assoc ( assoc -- )
     f >>point
     f >>value
     drop ;
+
+: swizzle ( sequence quot -- sequence' )
+    [ dup ] dip map
+    [ zip ] [ rect-containing <quadtree> ] bi
+    [ '[ first2 _ set-at ] each ] [ values ] bi ;
 

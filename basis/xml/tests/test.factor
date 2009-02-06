@@ -67,3 +67,4 @@ SYMBOL: xml-file
 [ "x" "<" ] [ "<x value='&lt;'/>" string>xml [ name>> main>> ] [ "value" attr ] bi ] unit-test
 [ "foo" ] [ "<!DOCTYPE foo [<!ENTITY bar 'foo'>]><x>&bar;</x>" string>xml children>string ] unit-test
 [ T{ xml-chunk f V{ "hello" } } ] [ "hello" string>xml-chunk ] unit-test
+[ "1.1" ] [ "<?xml version='1.1'?><x/>" string>xml prolog>> version>> ] unit-test

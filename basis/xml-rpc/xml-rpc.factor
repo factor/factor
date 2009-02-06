@@ -113,13 +113,17 @@ M: server-error error.
     "Description: " write dup message>> print
     "Tag: " write tag>> xml>string print ;
 
-PROCESS: xml>item ( tag -- object )
+TAGS: xml>item ( tag -- object )
 
 TAG: string xml>item
     children>string ;
 
-TAG: i4/int/double xml>item
+: children>number ( tag -- n )
     children>string string>number ;
+
+TAG: i4 xml>item children>number ;
+TAG: int xml>item children>number ;
+TAG: double xml>item children>number ;
 
 TAG: boolean xml>item
     dup children>string {
@@ -174,5 +178,5 @@ TAG: array xml>item
     ! This needs to do something in the event of an error
     [ send-rpc ] dip http-post nip string>xml receive-rpc ;
 
-: invoke-method ( params method url -- )
+: invoke-method ( params method url -- response )
     [ swap <rpc-method> ] dip post-rpc ;
