@@ -1,7 +1,7 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math models namespaces sequences
-strings quotations assocs combinators classes colors
+strings quotations assocs combinators classes colors colors.constants
 classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.labels ui.gadgets.theme
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
@@ -70,7 +70,7 @@ M: button-paint draw-boundary
     { 0 1/2 } >>align ; inline
 
 : roll-button-theme ( button -- button )
-    f black <solid> dup f <button-paint> >>boundary
+    f COLOR: black <solid> dup f <button-paint> >>boundary
     f f pressed-gradient f <button-paint> >>interior
     align-left ; inline
 
@@ -137,10 +137,10 @@ M: checkmark-paint draw-interior
 : checkmark-theme ( gadget -- gadget )
     f
     f
-    black <solid>
-    black <checkmark-paint>
+    COLOR: black <solid>
+    COLOR: black <checkmark-paint>
     <button-paint> >>interior
-    black <solid> >>boundary ;
+    COLOR: black <solid> >>boundary ;
 
 : <checkmark> ( -- gadget )
     <gadget>
@@ -194,7 +194,7 @@ M: radio-paint draw-boundary
     GL_LINE_STRIP 0 circle-steps 1+ glDrawArrays ;
 
 :: radio-knob-theme ( gadget -- gadget )
-    black <radio-paint> :> radio-paint
+    COLOR: black <radio-paint> :> radio-paint
     gadget
     f f radio-paint radio-paint <button-paint> >>interior
     radio-paint >>boundary

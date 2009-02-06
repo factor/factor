@@ -4,7 +4,7 @@ USING: assocs accessors alien core-graphics.types core-text
 core-text.fonts kernel hashtables namespaces sequences
 ui.gadgets.worlds ui.text ui.text.private opengl opengl.gl destructors
 combinators core-foundation core-foundation.strings memoize math
-math.vectors init colors ;
+math.vectors init colors colors.constants ;
 IN: ui.text.core-text
 
 SINGLETON: core-text-renderer
@@ -19,7 +19,7 @@ TUPLE: rendered-line line texture display-list age disposed ;
         GL_TEXTURE_2D [
             GL_TEXTURE_BIT [
                 GL_TEXTURE_COORD_ARRAY [
-                    white gl-color
+                    COLOR: white gl-color
                     GL_TEXTURE_2D swap glBindTexture
                     init-texture rect-texture-coords
                     dim>> fill-rect-vertices (gl-fill-rect)

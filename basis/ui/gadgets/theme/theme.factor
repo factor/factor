@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! Copyright (C) 2006, 2007 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences ui.gadgets ui.render
-ui.text colors colors.gray accessors ;
+ui.text colors colors.gray colors.constants accessors ;
 QUALIFIED: colors
 IN: ui.gadgets.theme
 
@@ -13,11 +13,11 @@ IN: ui.gadgets.theme
     <solid> >>boundary ; inline
 
 : faint-boundary ( gadget -- gadget )
-    colors:gray solid-boundary ; inline
+    COLOR: gray solid-boundary ; inline
 
-: selection-color ( -- color ) light-purple ; inline
+: selection-color ( -- color ) COLOR: lavender ; inline
 
-: focus-border-color ( -- color ) medium-purple ; inline
+: focus-border-color ( -- color ) COLOR: dark-gray ; inline
 
 : plain-gradient ( -- gradient )
     {

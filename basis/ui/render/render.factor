@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays hashtables io kernel
 math namespaces opengl opengl.gl opengl.glu sequences strings
-vectors combinators math.vectors ui.gadgets colors
+vectors combinators math.vectors ui.gadgets colors colors.constants
 math.order math.rectangles locals specialized-arrays.float ;
 IN: ui.render
 
@@ -38,7 +38,7 @@ SYMBOL: viewport-translation
     init-clip
     ! white gl-clear is broken w.r.t window resizing
     ! Linux/PPC Radeon 9200
-    white gl-color
+    COLOR: white gl-color
     clip get dim>> gl-fill-rect ;
 
 GENERIC: draw-gadget* ( gadget -- )

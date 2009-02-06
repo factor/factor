@@ -1,10 +1,10 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ui.gestures ui.gadgets ui.gadgets.buttons
 ui.gadgets.frames ui.gadgets.grids math.order
 ui.gadgets.theme ui.render kernel math namespaces sequences
 vectors models models.range math.vectors math.functions
-quotations colors math.rectangles fry ;
+quotations colors colors.constants math.rectangles fry ;
 IN: ui.gadgets.sliders
 
 TUPLE: elevator < gadget direction ;
@@ -125,7 +125,7 @@ M: elevator layout*
 : slide-by-line ( amount slider -- ) [ line>> * ] keep slide-by ;
 
 : <slide-button> ( vector polygon amount -- button )
-    [ gray swap <polygon-gadget> ] dip
+    [ COLOR: gray swap <polygon-gadget> ] dip
     '[ _ swap find-slider slide-by-line ] <repeat-button>
     swap >>orientation ;
 
