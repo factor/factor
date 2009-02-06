@@ -1,15 +1,11 @@
-USING: alien.fortran alien.syntax tools.test ;
+USING: accessors alien alien.c-types alien.fortran alien.structs
+alien.syntax arrays assocs kernel namespaces sequences tools.test ;
 IN: alien.fortran.tests
 
-C-STRUCT: fortran_test_struct
-    { "int" "foo" }
-    { "float" "bar" }
-    { "char[4]" "bas" } ;
-
-! F-RECORD: fortran_test_record
-!     { "integer" "foo" }
-!     { "real" "bar" }
-!     { "character*4" "bar" }
+F-RECORD: fortran_test_record
+    { "integer"     "foo" }
+    { "real"        "bar" }
+    { "character*4" "bas" } ;
 
 ! fortran-name>symbol-name
 
@@ -25,7 +21,7 @@ C-STRUCT: fortran_test_struct
 [ "integer*4" fortran-type>c-type ] unit-test
 
 [ "int" ]
-[ "integer" fortran-type>c-type ] unit-test
+[ "INTEGER" fortran-type>c-type ] unit-test
 
 [ "longlong" ]
 [ "iNteger*8" fortran-type>c-type ] unit-test
@@ -84,9 +80,6 @@ C-STRUCT: fortran_test_struct
 [ "(fortran-double-complex)" ]
 [ "complex*16" fortran-type>c-type ] unit-test
 
-[ "fortran_test_struct" ]
-[ "fortran_test_struct" fortran-type>c-type ] unit-test
-
 [ "fortran_test_record" ]
 [ "fortran_test_record" fortran-type>c-type ] unit-test
 
@@ -101,8 +94,8 @@ C-STRUCT: fortran_test_struct
 [ "int*" { } ]
 [ "integer(*)" fortran-arg-type>c-type ] unit-test
 
-[ "fortran_test_struct*" { } ]
-[ "fortran_test_struct" fortran-arg-type>c-type ] unit-test
+[ "fortran_test_record*" { } ]
+[ "fortran_test_record" fortran-arg-type>c-type ] unit-test
 
 [ "char*" { "long" } ]
 [ "character" fortran-arg-type>c-type ] unit-test
@@ -138,4 +131,41 @@ C-STRUCT: fortran_test_struct
 
 [ "void" { "fortran_test_record*" } ]
 [ "fortran_test_record" fortran-ret-type>c-type ] unit-test
+
+! fortran-sig>c-sig
+
+[ "double" { "int*" "char*" "float*" "double*" "long" } ]
+[ "real" { "integer" "character*17" "real" "real*8" } fortran-sig>c-sig ]
+unit-test
+
+[ "void" { "char*" "long" "char*" "char*" "int*" "long" "long" } ]
+[ "character*18" { "character*17" "character" "integer" } fortran-sig>c-sig ]
+unit-test
+
+[ "void" { "(fortran-complex)*" "char*" "char*" "int*" "long" "long" } ]
+[ "complex" { "character*17" "character" "integer" } fortran-sig>c-sig ]
+unit-test
+
+! fortran-record>c-struct
+
+[ {
+    { "double"   "ex"  }
+    { "float"    "wye" }
+    { "int"      "zee" }
+    { "char[20]" "woo" }
+} ] [
+    {
+        { "DOUBLE PRECISION" "EX"  }
+        { "REAL"             "WYE" }
+        { "INTEGER"          "ZEE" }
+        { "CHARACTER(20)"    "WOO" }
+    } fortran-record>c-struct
+] unit-test
+
+! F-RECORD:
+
+[ 12 ] [ "fortran_test_record" heap-size ] unit-test
+[  0 ] [ "foo" "fortran_test_record" offset-of ] unit-test
+[  4 ] [ "bar" "fortran_test_record" offset-of ] unit-test
+[  8 ] [ "bas" "fortran_test_record" offset-of ] unit-test
 

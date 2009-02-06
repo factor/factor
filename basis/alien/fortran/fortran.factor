@@ -1,5 +1,6 @@
-USING: accessors alien alien.c-types alien.syntax arrays ascii
-assocs combinators fry kernel macros math.parser sequences splitting ;
+USING: accessors alien alien.c-types alien.structs alien.syntax
+arrays ascii assocs combinators fry kernel lexer macros math.parser
+namespaces parser sequences splitting vectors vocabs.parser ;
 IN: alien.fortran
 
 ! XXX this currently only supports the gfortran/f2c abi.
@@ -65,9 +66,12 @@ MACRO: size-case-type ( cases -- )
 
 GENERIC: (fortran-type>c-type) ( type -- c-type )
 
+M: f (fortran-type>c-type) ;
+
 M: integer-type (fortran-type>c-type)
     {
         { f [ "int"      ] }
+        { 1 [ "char"     ] }
         { 2 [ "short"    ] }
         { 4 [ "int"      ] }
         { 8 [ "longlong" ] }
@@ -140,6 +144,9 @@ GENERIC: (fortran-ret-type>c-type) ( type -- c-type )
 M: fortran-type (fortran-ret-type>c-type) (fortran-type>c-type) ;
 M: real-type (fortran-ret-type>c-type) drop "double" ;
 
+: suffix! ( seq   elt   -- seq   ) over push     ; inline
+: append! ( seq-a seq-b -- seq-a ) over push-all ; inline
+
 PRIVATE>
 
 : fortran-type>c-type ( fortran-type -- c-type )
@@ -156,10 +163,21 @@ PRIVATE>
         [ added-c-args ] [ (fortran-ret-type>c-type) c-type>pointer ] bi prefix
     ] if ;
 
-: fortran-sig>c-sig ( fortran-return fortran-args -- c-return c-args ) ;
+: fortran-arg-types>c-types ( fortran-types -- c-types )
+    [ length <vector> 1 <vector> ] keep
+    [ fortran-arg-type>c-type swapd [ suffix! ] [ append! ] 2bi* ] each
+    append >array ;
 
-! : F-RECORD: ... ; parsing
-! : F-ABI: ... ; parsing
+: fortran-sig>c-sig ( fortran-return fortran-args -- c-return c-args )
+    [ fortran-ret-type>c-type ] [ fortran-arg-types>c-types ] bi* append ;
+
+: fortran-record>c-struct ( record -- struct )
+    [ first2 [ fortran-type>c-type ] [ >lower ] bi* 2array ] map ;
+
+: define-record ( name vocab fields -- )
+    [ >lower ] [ ] [ fortran-record>c-struct ] tri* define-struct ;
+
+: F-RECORD: scan in get parse-definition define-record ; parsing
 ! : F-SUBROUTINE: ... ; parsing
 ! : F-FUNCTION: ... ; parsing
 
