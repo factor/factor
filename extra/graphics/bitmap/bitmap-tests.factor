@@ -1,4 +1,4 @@
-USING: graphics.bitmap ;
+USING: graphics.bitmap graphics.viewer ;
 IN: graphics.bitmap.tests
 
 : test-bitmap24 ( -- )
