@@ -28,7 +28,7 @@ M: array stack-size drop "void*" stack-size ;
 
 M: array c-type-boxer-quot drop f ;
 
-M: array c-type-unboxer-quot drop f ;
+M: array c-type-unboxer-quot drop [ >c-ptr ] ;
 
 M: value-type c-type-reg-class drop int-regs ;
 
