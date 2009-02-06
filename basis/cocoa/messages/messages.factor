@@ -202,7 +202,7 @@ assoc-union alien>objc-types set-global
     [ 0 <uint> [ class_copyMethodList ] keep *uint ] dip
     over 0 = [ 3drop ] [
         [ <direct-void*-array> ] dip
-        [ each ] [ drop underlying>> (free) ] 2bi
+        [ each ] [ drop (free) ] 2bi
     ] if ; inline
 
 : register-objc-methods ( class -- )

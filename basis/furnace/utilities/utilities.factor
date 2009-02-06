@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make assocs sequences kernel classes splitting
 words vocabs.loader accessors strings combinators arrays
-continuations present fry urls html.elements http http.server
+continuations present fry urls http http.server xml.syntax xml.writer
 http.server.redirection http.server.remapping ;
 IN: furnace.utilities
 
@@ -81,14 +81,13 @@ GENERIC: modify-form ( responder -- )
 
 M: object modify-form drop ;
 
-: hidden-form-field ( value name -- )
+: hidden-form-field>xml ( value name -- xml )
     over [
-        <input
-            "hidden" =type
-            =name
-            present =value
-        input/>
-    ] [ 2drop ] if ;
+        [XML <input type="hidden" value=<-> name=<->/> XML]
+    ] [ drop ] if ;
+
+: hidden-form-field ( value name -- )
+    hidden-form-field>xml write-xml ;
 
 : nested-forms-key "__n" ;
 
