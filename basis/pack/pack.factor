@@ -113,9 +113,7 @@ CONSTANT: packed-length-table
 
 MACRO: pack ( str -- quot )
     [ pack-table at '[ _ execute ] ] { } map-as
-    '[ _ spread ]
-    '[ _ input<sequence ]
-    '[ _ B{ } append-outputs-as ] ;
+    '[ [ [ _ spread ] input<sequence ] B{ } append-outputs-as ] ;
 
 PRIVATE>
 
@@ -143,7 +141,7 @@ MACRO: unpack ( str -- quot )
     [ [ ch>packed-length ] { } map-as start/end ]
     [ [ unpack-table at '[ @ ] ] { } map-as ] bi
     [ '[ [ _ _ ] dip <slice> @ ] ] 3map
-    '[ _ cleave ] '[ _ output>array ] ;
+    '[ [ _ cleave ] output>array ] ;
 
 PRIVATE>
 
