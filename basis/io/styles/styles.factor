@@ -3,7 +3,7 @@
 USING: hashtables io io.streams.plain io.streams.string
 colors summary make accessors splitting math.order
 kernel namespaces assocs destructors strings sequences
-present fry strings.tables ;
+present fry strings.tables delegate delegate.protocols ;
 IN: io.styles
 
 GENERIC: stream-format ( str style stream -- )
@@ -11,6 +11,10 @@ GENERIC: make-span-stream ( style stream -- stream' )
 GENERIC: make-block-stream ( style stream -- stream' )
 GENERIC: make-cell-stream ( style stream -- stream' )
 GENERIC: stream-write-table ( table-cells style stream -- )
+
+PROTOCOL: formatted-output-stream-protocol
+stream-format make-span-stream make-block-stream
+make-cell-stream stream-write-table ;
 
 : format ( str style -- ) output-stream get stream-format ;
 
@@ -40,35 +44,11 @@ GENERIC: stream-write-table ( table-cells style stream -- )
 
 TUPLE: filter-writer stream ;
 
-M: filter-writer stream-format
-    stream>> stream-format ;
+CONSULT: output-stream-protocol filter-writer stream>> ;
 
-M: filter-writer stream-write
-    stream>> stream-write ;
+CONSULT: formatted-output-stream-protocol filter-writer stream>> ;
 
-M: filter-writer stream-write1
-    stream>> stream-write1 ;
-
-M: filter-writer make-span-stream
-    stream>> make-span-stream ;
-
-M: filter-writer make-block-stream
-    stream>> make-block-stream ;
-
-M: filter-writer make-cell-stream
-    stream>> make-cell-stream ;
-
-M: filter-writer stream-flush
-    stream>> stream-flush ;
-
-M: filter-writer stream-nl
-    stream>> stream-nl ;
-
-M: filter-writer stream-write-table
-    stream>> stream-write-table ;
-
-M: filter-writer dispose
-    stream>> dispose ;
+M: filter-writer dispose stream>> dispose ;
 
 TUPLE: ignore-close-stream < filter-writer ;
 
