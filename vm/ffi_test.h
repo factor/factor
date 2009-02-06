@@ -89,4 +89,4 @@ DLLEXPORT struct test_struct_16 ffi_test_43(float x, int a);
 
 DLLEXPORT struct test_struct_14 ffi_test_44();
 
-complex float ffi_test_45(complex float x, complex double y);
+DLLEXPORT _Complex float ffi_test_45(_Complex float x, _Complex double y);
