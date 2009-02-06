@@ -5,7 +5,7 @@ sequences assocs math arrays stack-checker effects generalizations
 continuations debugger classes.tuple namespaces make vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
 sequences.private combinators mirrors splitting
-combinators.short-circuit fry words.symbol ;
+combinators.short-circuit fry words.symbol generalizations ;
 RENAME: _ fry => __
 IN: inverse
 
@@ -163,7 +163,7 @@ ERROR: missing-literal ;
 \ - [ + ] [ - ] define-math-inverse
 \ * [ / ] [ / ] define-math-inverse
 \ / [ * ] [ / ] define-math-inverse
-\ ^ [ recip ^ ] [ [ log ] bi@ / ] define-math-inverse
+\ ^ [ recip ^ ] [ swap [ log ] bi@ / ] define-math-inverse
 
 \ ? 2 [
     [ assert-literal ] bi@
@@ -199,6 +199,7 @@ DEFER: _
 \ 2array [ 2 assure-length first2 ] define-inverse
 \ 3array [ 3 assure-length first3 ] define-inverse
 \ 4array [ 4 assure-length first4 ] define-inverse
+\ narray 1 [ [ firstn ] curry ] define-pop-inverse
 
 \ first [ 1array ] define-inverse
 \ first2 [ 2array ] define-inverse

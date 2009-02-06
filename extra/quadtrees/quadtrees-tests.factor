@@ -1,5 +1,5 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: assocs kernel tools.test quadtrees math.rectangles sorting ;
+USING: accessors assocs kernel tools.test quadtrees math.rectangles sorting ;
 IN: quadtrees.tests
 
 : unit-bounds ( -- rect ) { -1.0 -1.0 } { 2.0 2.0 } <rect> ;
@@ -98,7 +98,7 @@ IN: quadtrees.tests
         "d" {  0.75  0.25 } value>>key
 
         {  0.25  0.25 } delete>>key
-        prune
+        prune-quadtree
 ] unit-test
 
 [ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
@@ -116,7 +116,7 @@ IN: quadtrees.tests
 
         {  0.25  0.25 } delete>>key
         {  0.75  0.25 } delete>>key
-        prune
+        prune-quadtree
 ] unit-test
 
 [ T{ quadtree f T{ rect f { -1.0 -1.0 } { 2.0 2.0 } } f f
@@ -160,7 +160,7 @@ IN: quadtrees.tests
         "g" {  0.25  0.25 } value>>key
         "h" {  0.75  0.75 } value>>key
 
-        prune
+        prune-quadtree
 ] unit-test
 
 [ 8 ] [
@@ -200,3 +200,42 @@ IN: quadtrees.tests
         >alist natural-sort
 ] unit-test
 
+TUPLE: pointy-thing center ;
+
+[ {
+    T{ pointy-thing f { 0 0 } }
+    T{ pointy-thing f { 1 0 } }
+    T{ pointy-thing f { 0 1 } }
+    T{ pointy-thing f { 1 1 } }
+    T{ pointy-thing f { 2 0 } }
+    T{ pointy-thing f { 3 0 } }
+    T{ pointy-thing f { 2 1 } }
+    T{ pointy-thing f { 3 1 } }
+    T{ pointy-thing f { 0 2 } }
+    T{ pointy-thing f { 1 2 } }
+    T{ pointy-thing f { 0 3 } }
+    T{ pointy-thing f { 1 3 } }
+    T{ pointy-thing f { 2 2 } }
+    T{ pointy-thing f { 3 2 } }
+    T{ pointy-thing f { 2 3 } }
+    T{ pointy-thing f { 3 3 } }
+} ] [
+    {
+        T{ pointy-thing f { 3 1 } }
+        T{ pointy-thing f { 2 3 } }
+        T{ pointy-thing f { 3 2 } }
+        T{ pointy-thing f { 0 1 } }
+        T{ pointy-thing f { 2 2 } }
+        T{ pointy-thing f { 1 1 } }
+        T{ pointy-thing f { 3 0 } }
+        T{ pointy-thing f { 3 3 } }
+        T{ pointy-thing f { 1 3 } }
+        T{ pointy-thing f { 2 1 } }
+        T{ pointy-thing f { 0 0 } }
+        T{ pointy-thing f { 2 0 } }
+        T{ pointy-thing f { 1 0 } }
+        T{ pointy-thing f { 0 2 } }
+        T{ pointy-thing f { 1 2 } }
+        T{ pointy-thing f { 0 3 } }
+    } [ center>> ] swizzle
+] unit-test

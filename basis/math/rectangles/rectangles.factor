@@ -44,3 +44,7 @@ M: rect contains-point?
 
 : rect-union ( rect1 rect2 -- newrect )
     (rect-union) <extent-rect> ;
+
+: rect-containing ( points -- rect )
+    [ vsupremum ] [ vinfimum ] bi
+    [ nip ] [ v- ] 2bi <rect> ;

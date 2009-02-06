@@ -33,3 +33,10 @@ IN: math.rectangles.tests
     contains-rect?
 ] unit-test
 
+[ T{ rect f { 10 20 } { 20 20 } } ] [
+    {
+        { 20 20 }
+        { 10 40 }
+        { 30 30 }
+    } rect-containing
+] unit-test
