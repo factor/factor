@@ -561,11 +561,11 @@ FUNCTION: test_struct_14 ffi_test_44 ( ) ; inline
 
 FUNCTION: complex-float ffi_test_45 ( int x ) ;
 
-[ C{ 0.0 3.0 } ] [ 3 ffi_test_45 ] unit-test
+[ C{ 3.0 0.0 } ] [ 3 ffi_test_45 ] unit-test
 
 FUNCTION: complex-double ffi_test_46 ( int x ) ;
 
-[ C{ 0.0 3.0 } ] [ 3 ffi_test_46 ] unit-test
+[ C{ 3.0 0.0 } ] [ 3 ffi_test_46 ] unit-test
 
 FUNCTION: complex-float ffi_test_47 ( complex-float x, complex-double y ) ;
 
