@@ -3,7 +3,7 @@
 USING: accessors kernel fry io io.encodings.utf8 io.files
 debugger prettyprint continuations namespaces boxes sequences
 arrays strings html io.streams.string assocs
-quotations xml.data xml.writer xml.literals ;
+quotations xml.data xml.writer xml.syntax ;
 IN: html.templates
 
 MIXIN: template

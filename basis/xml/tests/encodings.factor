@@ -1,4 +1,4 @@
-USING: xml xml.data xml.utilities tools.test accessors kernel
+USING: xml xml.data xml.traversal tools.test accessors kernel
 io.encodings.8-bit ;
 
 [ "\u000131" ] [ "resource:basis/xml/tests/latin5.xml" file>xml children>string ] unit-test

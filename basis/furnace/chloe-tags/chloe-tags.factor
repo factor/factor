@@ -7,8 +7,8 @@ xml
 xml.data
 xml.entities
 xml.writer
-xml.utilities
-xml.literals
+xml.traversal
+xml.syntax
 html.components
 html.elements
 html.forms
