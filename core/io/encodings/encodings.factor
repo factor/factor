@@ -50,8 +50,6 @@ M: object <decoder> f decoder boa ;
 M: decoder stream-read1
     dup >decoder< decode-char fix-read1 ;
 
-M: decoder stream-seek stream>> stream-seek ;
-
 : fix-read ( stream string -- string )
     over cr>> [
         over cr-
