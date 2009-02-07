@@ -46,6 +46,9 @@ M: fd cancel-operation ( fd -- )
         2bi
     ] if ;
 
+M: unix (stream-seek)
+    handle>> fd>> swap SEEK_SET lseek io-error ;
+
 SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+
 SYMBOL: +output+

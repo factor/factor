@@ -4,7 +4,7 @@ USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.encodings math.order io.backend
 continuations classes byte-arrays namespaces splitting
 grouping dlists assocs io.encodings.binary summary accessors
-destructors combinators ;
+destructors combinators unix ;
 IN: io.ports
 
 SYMBOL: default-buffer-size
@@ -92,6 +92,12 @@ M: input-port stream-read-until ( seps port -- str/f sep/f )
             BV{ } like [ read-until-loop ] keep B{ } like swap
         ] [ [ 2drop ] 2dip ] if
     ] if ;
+
+HOOK: (stream-seek) os ( n stream -- )
+
+M: input-port stream-seek ( n stream -- )
+    dup check-disposed
+    2dup buffer>> buffer-seek (stream-seek) ;
 
 TUPLE: output-port < buffered-port ;
 
