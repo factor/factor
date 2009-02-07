@@ -82,6 +82,8 @@ M: winnt init-io ( -- )
     H{ } clone pending-overlapped set-global
     windows.winsock:init-winsock ;
 
+M: winnt (stream-seek) ( n stream -- ) 2drop ;
+
 : file-error? ( n -- eof? )
     zero? [
         GetLastError {
