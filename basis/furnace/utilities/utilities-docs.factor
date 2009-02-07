@@ -27,7 +27,7 @@ HELP: hidden-form-field
     { $example
         "USING: furnace.utilities io ;"
         "\"bar\" \"foo\" hidden-form-field nl"
-        "<input type=\"hidden\" name=\"foo\" value=\"bar\"/>"
+        "<input type=\"hidden\" value=\"bar\" name=\"foo\"/>"
     }
 } ;
 
