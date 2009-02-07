@@ -39,20 +39,18 @@ MACRO: (nbits>bitmap) ( bits -- )
     [ rgb-quads>> 4 <sliced-groups> [ 3 head-slice ] map ]
     [ color-index>> >array ] bi [ swap nth ] with map concat ;
 
-: 4bit>array ( bitmap -- array )
-    [ rgb-quads>> 4 <sliced-groups> [ 3 head-slice ] map ]
-    [ color-index>> >array ] bi [ swap nth ] with map concat ;
+ERROR: bmp-not-supported n ;
 
 : raw-bitmap>array ( bitmap -- array )
     dup bit-count>>
     {
         { 32 [ color-index>> ] }
         { 24 [ color-index>> ] }
-        { 16 [ "16bit" throw ] }
+        { 16 [ bmp-not-supported ] }
         { 8 [ 8bit>array ] }
-        { 4 [ 4bit>array ] }
-        { 2 [ "2bit" throw ] }
-        { 1 [ "1bit" throw ] }
+        { 4 [ bmp-not-supported ] }
+        { 2 [ bmp-not-supported ] }
+        { 1 [ bmp-not-supported ] }
     } case >byte-array ;
 
 ERROR: bitmap-magic ;

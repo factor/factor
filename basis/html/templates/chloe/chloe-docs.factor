@@ -261,7 +261,7 @@ $nl
 ARTICLE: "html.templates.chloe.extend.components.example" "An example of a custom Chloe component"
 "As an example, let's develop a custom Chloe component which renders an image stored in a form value. Since the component does not require any configuration, we can define a singleton class:"
 { $code "SINGLETON: image" }
-"Now we define a method on the " { $link render* } " generic word which renders the image using " { $vocab-link "xml.literals" } ":"
+"Now we define a method on the " { $link render* } " generic word which renders the image using " { $link { "xml.syntax" "literals" } } ":"
 { $code "M: image render* 2drop [XML <img src=<-> /> XML] ;" }
 "Finally, we can define a Chloe component:"
 { $code "COMPONENT: image" }
