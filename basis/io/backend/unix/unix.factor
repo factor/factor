@@ -51,6 +51,7 @@ M: unix (stream-seek) ( n seek-type stream -- )
         { io:seek-absolute [ SEEK_SET ] }
         { io:seek-relative [ SEEK_CUR ] }
         { io:seek-end [ SEEK_END ] }
+        [ io:bad-seek-type ]
     } case
     [ handle>> fd>> swap ] dip lseek io-error ;
 
