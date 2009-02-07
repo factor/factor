@@ -1,12 +1,13 @@
 ! (c) 2009 Joe Groff, see BSD license
 USING: accessors alien alien.c-types alien.fortran alien.structs
-alien.syntax arrays assocs kernel namespaces sequences tools.test ;
+alien.syntax arrays assocs kernel macros namespaces sequences
+tools.test fry ;
 IN: alien.fortran.tests
 
-F-RECORD: fortran_test_record
-    { "integer"     "foo" }
-    { "real"        "bar" }
-    { "character*4" "bas" } ;
+RECORD: FORTRAN_TEST_RECORD
+    { "INTEGER"     "FOO" }
+    { "REAL(2)"     "BAR" }
+    { "CHARACTER*4" "BAS" } ;
 
 ! fortran-name>symbol-name
 
@@ -67,19 +68,16 @@ F-RECORD: fortran_test_record
 [ "double" ]
 [ "real*8" fortran-type>c-type ] unit-test
 
-[ "(fortran-complex)" ]
+[ "complex-float" ]
 [ "complex" fortran-type>c-type ] unit-test
 
-[ "(fortran-double-complex)" ]
+[ "complex-double" ]
 [ "double-complex" fortran-type>c-type ] unit-test
 
-[ "(fortran-complex)" ]
+[ "complex-float" ]
 [ "complex*8" fortran-type>c-type ] unit-test
 
-[ "(fortran-double-complex)" ]
-[ "complex*16" fortran-type>c-type ] unit-test
-
-[ "(fortran-double-complex)" ]
+[ "complex-double" ]
 [ "complex*16" fortran-type>c-type ] unit-test
 
 [ "fortran_test_record" ]
@@ -122,10 +120,10 @@ F-RECORD: fortran_test_record
 [ "double" { } ]
 [ "double-precision" fortran-ret-type>c-type ] unit-test
 
-[ "void" { "(fortran-complex)*" } ]
+[ "void" { "complex-float*" } ]
 [ "complex" fortran-ret-type>c-type ] unit-test
 
-[ "void" { "(fortran-double-complex)*" } ]
+[ "void" { "complex-double*" } ]
 [ "double-complex" fortran-ret-type>c-type ] unit-test
 
 [ "void" { "int*" } ]
@@ -144,7 +142,7 @@ unit-test
 [ "character*18" { "character*17" "character" "integer" } fortran-sig>c-sig ]
 unit-test
 
-[ "void" { "(fortran-complex)*" "char*" "char*" "int*" "long" "long" } ]
+[ "void" { "complex-float*" "char*" "char*" "int*" "long" "long" } ]
 [ "complex" { "character*17" "character" "integer" } fortran-sig>c-sig ]
 unit-test
 
@@ -164,44 +162,126 @@ unit-test
     } fortran-record>c-struct
 ] unit-test
 
-! F-RECORD:
+! RECORD:
 
-[ 12 ] [ "fortran_test_record" heap-size ] unit-test
+[ 16 ] [ "fortran_test_record" heap-size ] unit-test
 [  0 ] [ "foo" "fortran_test_record" offset-of ] unit-test
 [  4 ] [ "bar" "fortran_test_record" offset-of ] unit-test
-[  8 ] [ "bas" "fortran_test_record" offset-of ] unit-test
+[ 12 ] [ "bas" "fortran_test_record" offset-of ] unit-test
 
-! fortran-arg>c-args
+! fortran-invoke
 
-[ B{ 128 } { } ]
-[ 128 "integer*1" fortran-arg>c-args ] unit-test
+: fortran-invoke-expansion ( return library function parameters -- quot )
+    '[ _ _ _ _ fortran-invoke ] expand-macros ; inline
 
-little-endian? [ B{ 128 0 } { } ] [ B{ 0 128 } { } ] ?
-[ 128 "integer*2" fortran-arg>c-args ] unit-test
+[ [
+    ! [fortran-args>c-args]
+    {
+        [ {
+            [ ascii string>alien ]
+            [ <int> ]
+            [ <float> ]
+            [ <complex-float> ]
+            [ 1 0 ? <short> ]
+        } spread ]
+        [ { [ length ] [ drop ] [ drop ] [ drop ] [ drop ] } spread ]
+    } 5 ncleave
+    ! [fortran-invoke]
+    [ 
+        "void" "foopack" "funtimes_"
+        { "char*" "int*" "float*" "complex-float*" "short*" "long" }
+        alien-invoke
+    ] 6 nkeep
+    ! [fortran-results>]
+    {
+        [ drop ]
+        [ drop ]
+        [ *float ]
+        [ drop ]
+        [ drop ]
+        [ drop ]
+    } spread
+] ] [
+    f "foopack" "FUNTIMES" { "CHARACTER*12" "INTEGER*8" "!REAL" "COMPLEX" "LOGICAL*2" }
+    fortran-invoke-expansion
+] unit-test
 
-little-endian? [ B{ 128 0 0 0 } { } ] [ B{ 0 0 0 128 } { } ] ?
-[ 128 "integer*4" fortran-arg>c-args ] unit-test
+[ [
+    ! [fortran-invoke]
+    "double" "foopack" "fun_times__"
+    { "float*" } 
+    alien-invoke
+] ] [
+    "REAL" "foopack" "FUN_TIMES" { "REAL(*)" }
+    fortran-invoke-expansion
+] unit-test
 
-little-endian? [ B{ 128 0 0 0 0 0 0 0 } { } ] [ B{ 0 0 0 0 0 0 0 128 } { } ] ?
-[ 128 "integer*8" fortran-arg>c-args ] unit-test
+[ [
+    ! [<fortran-result>]
+    [ "complex-float" <c-object> ] 1 ndip
+    ! [fortran-invoke]
+    [
+        "void" "foopack" "fun_times__"
+        { "complex-float*" "float*" } 
+        alien-invoke
+    ] 2 nkeep
+    ! [fortran-results>]
+    {
+        [ *complex-float ]
+        [ drop ]
+    } spread
+] ] [
+    "COMPLEX" "foopack" "FUN_TIMES" { "REAL(*)" }
+    fortran-invoke-expansion
+] unit-test
 
-[ B{ CHAR: h CHAR: e CHAR: l CHAR: l CHAR: o } { 5 } ]
-[ "hello" "character*5" fortran-arg>c-args ] unit-test
+[ [
+    ! [<fortran-result>]
+    [ 20 <byte-array> 20 ] 1 ndip
+    ! [fortran-invoke]
+    [
+        "void" "foopack" "fun_times__"
+        { "char*" "long" "float*" } 
+        alien-invoke
+    ] 3 nkeep
+    ! [fortran-results>]
+    {
+        [ ]
+        [ ascii alien>nstring ]
+        [ drop ]
+    } spread
+] ] [
+    "CHARACTER*20" "foopack" "FUN_TIMES" { }
+    fortran-invoke-expansion
+] unit-test
 
-little-endian? [ B{ 0 0 128 63 } { } ] [ B{ 63 128 0 0 } { } ] ?
-[ 1.0 "real" fortran-arg>c-args ] unit-test
-
-little-endian? [ B{ 0 0 128 63 0 0 0 64 } { } ] [ B{ 63 128 0 0 64 0 0 0 } { } ] ?
-[ C{ 1.0 2.0 } "complex" fortran-arg>c-args ] unit-test
-
-little-endian? [ B{ 0 0 0 0 0 0 240 63 } { } ] [ B{ 63 240 0 0 0 0 0 0 } { } ] ?
-[ 1.0 "double-precision" fortran-arg>c-args ] unit-test
-
-little-endian?
-[ B{ 0 0 0 0 0 0 240 63 0 0 0 0 0 0 0 64 } { } ] 
-[ B{ 63 240 0 0 0 0 0 0 64 0 0 0 0 0 0 0 } { } ] ?
-[ C{ 1.0 2.0 } "double-complex" fortran-arg>c-args ] unit-test
-
-[ B{ 1 0 0 0 2 0 0 0 } { } ]
-[ B{ 1 0 0 0 2 0 0 0 } "integer(2)" fortran-arg>c-args ] unit-test
+[ [
+    ! [<fortran-result>]
+    [ 10 <byte-array> 10 ] 2 ndip
+    ! [fortran-args>c-args]
+    {
+        [ {
+            [ ascii string>alien ]
+            [ <float> ]
+        } spread ]
+        [ { [ length ] [ drop ] } spread ]
+    } 2 ncleave
+    ! [fortran-invoke]
+    [
+        "void" "foopack" "fun_times__"
+        { "char*" "long" "char*" "float*" "long" } 
+        alien-invoke
+    ] 5 nkeep
+    ! [fortran-results>]
+    {
+        [ ]
+        [ ascii alien>nstring ]
+        [ ]
+        [ *float swap ]
+        [ ascii alien>nstring ]
+    } spread
+] ] [
+    "CHARACTER*10" "foopack" "FUN_TIMES" { "!CHARACTER*20" "!REAL" }
+    fortran-invoke-expansion
+] unit-test
 
