@@ -29,8 +29,6 @@ ERROR: zlib-failed n string ;
 : zlib-error ( n -- )
     dup zlib.ffi:Z_OK = [ drop ] [ dup zlib-error-message zlib-failed ] if ;
 
-! Compressed size is up to .001% larger plus 12
-
 : compressed-size ( byte-array -- n )
     length 1001/1000 * ceiling 12 + ;
 
