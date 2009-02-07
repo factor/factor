@@ -5,32 +5,8 @@ io.binary io.streams.string kernel math math.parser namespaces
 make parser prettyprint quotations sequences strings vectors
 words macros math.functions math.bitwise fry generalizations
 combinators.smart io.streams.byte-array io.encodings.binary
-math.vectors combinators multiline ;
+math.vectors combinators multiline endian ;
 IN: pack
-
-SYMBOL: big-endian
-
-: big-endian? ( -- ? )
-    1 <int> *char zero? ;
-
-<PRIVATE
-
-: set-big-endian ( -- )
-    big-endian? big-endian set ; inline
-
-PRIVATE>
-
-: >signed ( x n -- y )
-    2dup neg 1+ shift 1 = [ 2^ - ] [ drop ] if ;
-
-: >endian ( obj n -- str )
-    big-endian get [ >be ] [ >le ] if ; inline
-
-: unsigned-endian> ( obj -- str )
-    big-endian get [ be> ] [ le> ] if ; inline
-
-: signed-endian> ( obj n -- str )
-    [ unsigned-endian> ] dip >signed ;
 
 GENERIC: >n-byte-array ( obj n -- byte-array )
 
@@ -124,13 +100,13 @@ PRIVATE>
     [ ch>packed-length ] sigma ;
  
 : pack-native ( seq str -- seq )
-    [ set-big-endian pack ] with-scope ; inline
+    '[ _ _ pack ] with-native-endian ; inline
 
 : pack-be ( seq str -- seq )
-    [ big-endian on pack ] with-scope ; inline
+    '[ _ _ pack ] with-big-endian ; inline
 
 : pack-le ( seq str -- seq )
-    [ big-endian off pack ] with-scope ; inline
+    '[ _ _ pack ] with-little-endian ; inline
 
 <PRIVATE
 
@@ -146,13 +122,13 @@ MACRO: unpack ( str -- quot )
 PRIVATE>
 
 : unpack-native ( seq str -- seq )
-    [ set-big-endian unpack ] with-scope ; inline
+    '[ _ _ unpack ] with-native-endian ; inline
 
 : unpack-be ( seq str -- seq )
-    [ big-endian on unpack ] with-scope ; inline
+    '[ _ _ unpack ] with-big-endian ; inline
 
 : unpack-le ( seq str -- seq )
-    [ big-endian off unpack ] with-scope ; inline
+    '[ _ _ unpack ] with-little-endian ; inline
 
 ERROR: packed-read-fail str bytes ;
 
