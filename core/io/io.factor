@@ -15,6 +15,7 @@ GENERIC: stream-write ( seq stream -- )
 GENERIC: stream-flush ( stream -- )
 GENERIC: stream-nl ( stream -- )
 
+ERROR: bad-seek-type type ;
 SINGLETONS: seek-absolute seek-relative seek-end ;
 GENERIC: stream-seek ( n seek-type stream -- )
 
