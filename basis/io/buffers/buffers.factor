@@ -28,7 +28,7 @@ M: buffer dispose* ptr>> free ;
     fill>> zero? ; inline
 
 : buffer-seek ( n buffer -- )
-    (>>pos) ; inline
+    0 >>fill 0 >>pos 2drop ; inline
 
 : buffer-consume ( n buffer -- )
     [ + ] change-pos
