@@ -92,6 +92,7 @@ M: winnt (stream-seek) ( n seek-type stream -- )
         { seek-absolute [ handle>> (>>ptr) ] }
         { seek-relative [ handle>> [ + ] change-ptr drop ] }
         { seek-end [ handle>> [ handle>> handle>file-size + ] keep (>>ptr) ] }
+        [ bad-seek-type ]
     } case ;
 
 : file-error? ( n -- eof? )
