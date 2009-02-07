@@ -15,7 +15,8 @@ SYMBOL: commands
     { nop rot -rot swap spin swapd } amb-execute ;
 : makes-24? ( a b c d -- ? )
         [
-            2 [ some-rots do-something ] times
+            some-rots do-something
+            some-rots do-something
             maybe-swap do-something
             24 =
         ]

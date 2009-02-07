@@ -577,3 +577,8 @@ DEFER: eee'
 [ bogus-error ] must-infer
 
 [ [ clear ] infer. ] [ inference-error? ] must-fail-with
+
+: debugging-curry-folding ( quot -- )
+    [ debugging-curry-folding ] curry call ; inline recursive
+
+[ [ ] debugging-curry-folding ] must-infer

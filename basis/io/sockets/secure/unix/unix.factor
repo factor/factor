@@ -15,7 +15,7 @@ M: ssl-handle handle-fd file>> handle-fd ;
     ERR_get_error dup zero? [
         drop
         {
-            { -1 [ err_no ECONNRESET = [ premature-close ] [ (io-error) ] if ] }
+            { -1 [ errno ECONNRESET = [ premature-close ] [ (io-error) ] if ] }
             { 0 [ premature-close ] }
         } case
     ] [ nip (ssl-error) ] if ;

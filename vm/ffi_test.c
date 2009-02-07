@@ -303,7 +303,17 @@ struct test_struct_14 ffi_test_44(void)
 	return retval;
 }
 
-complex float ffi_test_45(complex float x, complex double y)
+_Complex float ffi_test_45(int x)
+{
+	return x;
+}
+
+_Complex double ffi_test_46(int x)
+{
+	return x;
+}
+
+_Complex float ffi_test_47(_Complex float x, _Complex double y)
 {
 	return x + 2 * y;
 }

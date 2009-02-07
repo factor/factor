@@ -178,6 +178,8 @@ GENERIC: byte-length ( seq -- n ) flushable
 
 M: byte-array byte-length length ;
 
+M: f byte-length drop 0 ;
+
 : c-getter ( name -- quot )
     c-type-getter [
         [ "Cannot read struct fields with this type" throw ]
