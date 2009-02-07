@@ -124,7 +124,7 @@ HOOK: (stream-seek) os ( n seek-type stream -- )
 
 M: port stream-seek ( n seek-type stream -- )
     dup check-disposed
-    [ nip buffer>> buffer-seek ] [ (stream-seek) ] 3bi ;
+    [ buffer>> buffer-reset-hard 2drop ] [ (stream-seek) ] 3bi ;
 
 
 GENERIC: shutdown ( handle -- )
