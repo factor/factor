@@ -93,12 +93,6 @@ M: input-port stream-read-until ( seps port -- str/f sep/f )
         ] [ [ 2drop ] 2dip ] if
     ] if ;
 
-HOOK: (stream-seek) os ( n stream -- )
-
-M: input-port stream-seek ( n stream -- )
-    dup check-disposed
-    2dup buffer>> buffer-seek (stream-seek) ;
-
 TUPLE: output-port < buffered-port ;
 
 : <output-port> ( handle -- output-port )
@@ -125,6 +119,13 @@ M: output-port stream-write
     ] if ;
 
 HOOK: (wait-to-write) io-backend ( port -- )
+
+HOOK: (stream-seek) os ( n seek-type stream -- )
+
+M: port stream-seek ( n seek-type stream -- )
+    dup check-disposed
+    [ nip buffer>> buffer-seek ] [ (stream-seek) ] 3bi ;
+
 
 GENERIC: shutdown ( handle -- )
 
