@@ -2,9 +2,17 @@
 ! Copyright (C) 2007, 2008 Slava Pestov
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien assocs continuations destructors kernel
-namespaces accessors sets summary ;
+USING: alien alien.syntax assocs continuations destructors
+kernel namespaces accessors sets summary ;
 IN: libc
+
+LIBRARY: factor
+
+: errno ( -- int )
+    "int" "factor" "err_no" { } alien-invoke ;
+
+: clear-errno ( -- )
+    "void" "factor" "clear_err_no" { } alien-invoke ;
 
 <PRIVATE
 
