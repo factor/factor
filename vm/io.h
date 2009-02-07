@@ -1,7 +1,7 @@
 void init_c_io(void);
 void io_error(void);
-int err_no(void);
-void clear_err_no(void);
+DLLEXPORT int err_no(void);
+DLLEXPORT void clear_err_no(void);
 
 void primitive_fopen(void);
 void primitive_fgetc(void);

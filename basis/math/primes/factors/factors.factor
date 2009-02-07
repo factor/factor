@@ -16,7 +16,11 @@ IN: math.primes.factors
 PRIVATE>
 
 : group-factors ( n -- seq )
-    [ 2 [ over 1 > ] [ write-factor next-prime ] [ ] while 2drop ] { } make ;
+    [
+        2
+        [ 2dup sq < ] [ write-factor next-prime ] [ ] until
+        drop dup 2 < [ drop ] [ 1 2array , ] if
+    ] { } make ;
 
 : unique-factors ( n -- seq ) group-factors [ first ] map ;
 
