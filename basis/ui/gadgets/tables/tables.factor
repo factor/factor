@@ -1,18 +1,17 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors colors.constants fry kernel math
-math.rectangles math.order math.vectors namespaces opengl
-sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
+math.rectangles math.order math.vectors namespaces opengl sequences
+ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.worlds ui.gadgets.theme ui.gestures ui.render ui.text
-ui.gadgets.menus math.rectangles models math.ranges sequences
-combinators fonts ;
+ui.gadgets.menus ui.gadgets.line-support math.rectangles models
+math.ranges sequences combinators fonts locals ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
 GENERIC: row-columns ( row renderer -- columns )
 GENERIC: row-value ( row renderer -- object )
 GENERIC: row-color ( row renderer -- color )
-GENERIC: row-font ( row renderer -- font )
 
 SINGLETON: trivial-renderer
 
@@ -20,13 +19,10 @@ M: trivial-renderer row-columns drop ;
 M: object row-value drop ;
 M: object row-color 2drop f ;
 
-M: object row-font
-    row-color dup [ <font> swap >>foreground ] when ;
-
 TUPLE: table < gadget
 renderer filled-column column-alignment action hook
 column-widths total-width
-font text-color selection-color focus-border-color
+font selection-color focus-border-color
 mouse-color column-line-color selection-required?
 selected-index selected-value
 mouse-index
@@ -43,13 +39,9 @@ focused? ;
         selection-color >>selection-color
         focus-border-color >>focus-border-color
         COLOR: dark-gray >>column-line-color
-        COLOR: black >>mouse-color
-        COLOR: black >>text-color ;
+        COLOR: black >>mouse-color ;
 
 <PRIVATE
-
-: line-height ( table -- n )
-    font>> "" text-height ;
 
 CONSTANT: table-gap 6
 
@@ -125,24 +117,6 @@ M: table layout*
         '[ [ 0 2array ] [ _ 2array ] bi gl-line ] each
     ] bi ;
 
-: y>row ( y table -- n )
-    line-height /i ;
-
-: validate-row ( m table -- n )
-    control-value [ drop f ] [ length 1- min 0 max ] if-empty ;
-
-: visible-row ( table quot -- n )
-    '[
-        [ clip get @ origin get [ second ] bi@ - ] dip
-        y>row
-    ] keep validate-row ; inline
-
-: first-visible-row ( table -- n )
-    [ loc>> ] visible-row ;
-
-: last-visible-row ( table -- n )
-    [ rect-extent nip ] visible-row 1+ ;
-
 : column-loc ( font column width align -- loc )
     [ [ text-width ] dip swap - ] dip
     * 0 2array ;
@@ -156,26 +130,20 @@ M: table layout*
     dup column-alignment>>
     [ ] [ column-widths>> length 0 <repetition> ] ?if ;
 
-: draw-row ( index table -- )
-    [ [ renderer>> row-columns ] [ column-widths>> ] [ column-alignment ] tri ]
-    [ [ renderer>> row-font ] [ font>> swap derive-font ] bi ] 2bi
+:: row-font ( row index table -- font )
+    table font>> clone
+    row table renderer>> row-color [ >>foreground ] when*
+    index table selected-index>> = [ table selection-color>> >>background ] when ;
+
+M: table draw-line ( row index table -- )
+    [
+        nip
+        [ renderer>> row-columns ]
+        [ column-widths>> ]
+        [ column-alignment ]
+        tri
+    ] [ row-font ] 3bi
     '[ [ _ ] 3dip draw-column ] 3each ;
-
-: each-slice-index ( from to seq quot -- )
-    [ [ <slice> ] [ drop [a,b) ] 3bi ] dip 2each ; inline
-
-: draw-rows ( table -- )
-    {
-        [ text-color>> gl-color ]
-        [ first-visible-row ]
-        [ last-visible-row ]
-        [ control-value ]
-        [ line-height ]
-        [ ]
-    } cleave '[
-        [ 0 ] dip _ * 2array
-        [ _ draw-row ] with-translation
-    ] each-slice-index ;
 
 M: table draw-gadget*
     dup control-value empty? [ drop ] [
@@ -183,7 +151,7 @@ M: table draw-gadget*
             {
                 [ draw-selected ]
                 [ draw-columns ]
-                [ draw-rows ]
+                [ draw-lines ]
                 [ draw-moused ]
             } cleave
         ] with-translation
@@ -238,12 +206,12 @@ M: table model-changed
     2bi ;
 
 : mouse-row ( table -- n )
-    [ hand-rel second ] keep y>row ;
+    [ hand-rel second ] keep y>line ;
 
 : table-button-down ( table -- )
     dup request-focus
     dup control-value empty? [ drop ] [
-        dup [ mouse-row ] keep validate-row
+        dup [ mouse-row ] keep validate-line
         [ >>mouse-index ] [ (select-row) ] bi
     ] if ;
 
@@ -259,7 +227,7 @@ PRIVATE>
     [ row-action ] [ update-selected-value ] if ;
 
 : select-row ( table n -- )
-    over validate-row
+    over validate-line
     [ (select-row) ]
     [ drop update-selected-value ]
     [ show-row-summary ]

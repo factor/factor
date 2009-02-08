@@ -1,17 +1,18 @@
 ! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays documents documents.elements kernel math
-models models.filter namespaces locals fry make opengl opengl.gl
-sequences strings math.vectors math.functions sorting colors
+math.ranges models models.filter namespaces locals fry make opengl
+opengl.gl sequences strings math.vectors math.functions sorting colors
 colors.constants combinators assocs math.order fry calendar alarms
 continuations ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
 ui.gadgets.theme ui.gadgets.menus ui.gadgets.wrappers ui.render
-ui.text ui.gestures math.rectangles splitting unicode.categories fonts ;
+ui.gadgets.line-support ui.text ui.gestures math.rectangles splitting
+unicode.categories fonts ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget
-font color caret-color selection-color
+font caret-color selection-color
 caret mark
 focused? blink blink-alarm ;
 
@@ -22,7 +23,6 @@ focused? blink blink-alarm ;
     <loc> >>mark ; inline
 
 : editor-theme ( editor -- editor )
-    COLOR: black >>color
     COLOR: red >>caret-color
     selection-color >>selection-color
     monospace-font >>font ; inline
@@ -101,12 +101,6 @@ M: editor ungraft*
 
 : editor-line ( n editor -- str ) control-value nth ;
 
-: line-height ( editor -- n )
-    font>> "" text-height ;
-
-: y>line ( y editor -- line# )
-    line-height /i ;
-
 :: point>loc ( point editor -- loc )
     point second editor y>line {
         { [ dup 0 < ] [ drop { 0 0 } ] }
@@ -135,9 +129,6 @@ M: editor ungraft*
 : loc>x ( loc editor -- x )
     [ first2 swap ] dip [ editor-line ] [ font>> ] bi swap offset>x round ;
 
-: line>y ( lines# editor -- y )
-    line-height * ;
-
 : loc>point ( loc editor -- loc )
     [ loc>x ] [ [ first ] dip line>y ] 2bi 2array ;
 
@@ -154,90 +145,42 @@ M: editor ungraft*
         ] keep scroll>rect
     ] [ drop ] if ;
 
-: draw-caret ( -- )
-    editor get [ focused?>> ] [ blink>> ] bi and [
-        editor get
+: draw-caret? ( editor -- ? )
+    [ focused?>> ] [ blink>> ] bi and ;
+
+: draw-caret ( editor -- )
+    dup draw-caret? [
         [ caret-color>> gl-color ]
         [
-            dup caret-loc origin get v+
-            swap caret-dim over v+
-            gl-line
+            [ caret-loc ] [ caret-dim ] bi
+            over v+ gl-line
         ] bi
-    ] when ;
-
-: line-translation ( n -- loc )
-    editor get line-height * 0.0 swap 2array ;
-
-: translate-lines ( n -- )
-    line-translation gl-translate ;
-
-: draw-line ( editor str -- )
-    [ font>> ] dip { 0 0 } draw-text ;
-
-: first-visible-line ( editor -- n )
-    [
-        [ clip get loc>> second origin get second - ] dip
-        y>line
-    ] keep model>> validate-line ;
-
-: last-visible-line ( editor -- n )
-    [
-        [ clip get rect-extent nip second origin get second - ] dip
-        y>line
-    ] keep model>> validate-line 1+ ;
-
-: with-editor ( editor quot -- )
-    [
-        swap
-        dup first-visible-line \ first-visible-line set
-        dup last-visible-line \ last-visible-line set
-        dup model>> document set
-        editor set
-        call
-    ] with-scope ; inline
-
-: visible-lines ( editor -- seq )
-    [ \ first-visible-line get \ last-visible-line get ] dip
-    control-value <slice> ;
-
-: with-editor-translation ( n quot -- )
-    [ line-translation origin get v+ ] dip with-translation ;
-    inline
-
-: draw-lines ( -- )
-    \ first-visible-line get [
-        editor get dup color>> gl-color
-        dup visible-lines
-        [ draw-line 1 translate-lines ] with each
-    ] with-editor-translation ;
+    ] [ drop ] if ;
 
 : selection-start/end ( editor -- start end )
     [ editor-mark ] [ editor-caret ] bi sort-pair ;
 
-: (draw-selection) ( x1 x2 -- )
-    over - 1+
-    dup 0 = [ 1+ ] when
-    [ 0.0 2array ] [ editor get line-height 2array ] bi*
-    swap [ gl-fill-rect ] with-translation ;
+SYMBOL: selected-lines
 
-: draw-selected-line ( start end n -- )
-    [ start/end-on-line ] keep
-    [ swap 2array editor get loc>x ] curry bi@
-    (draw-selection) ;
+TUPLE: selected-line start end first? last? ;
 
-: draw-selection ( -- )
-    editor get selection-color>> gl-color
-    editor get selection-start/end
-    over first [
-        2dup '[
-            [ _ _ ] dip
-            draw-selected-line
-            1 translate-lines
-        ] each-line
-    ] with-editor-translation ;
+: compute-selection ( editor -- assoc )
+    [ selection-start/end [ [ first ] bi@ [a,b] ] 2keep ] keep model>>
+    '[ [ _ _ ] keep _ start/end-on-line 2array ] H{ } map>assoc ;
+
+M: editor draw-line ( line index editor -- )
+    [
+        [ selected-lines get at ] dip
+        '[ first2 _ selection-color>> <selection> ] when*
+    ] keep font>> swap { 0 0 } draw-text ;
 
 M: editor draw-gadget*
-    [ draw-selection draw-lines draw-caret ] with-editor ;
+    origin get [
+        [ compute-selection selected-lines set ]
+        [ draw-lines ]
+        [ draw-caret ]
+        tri
+    ] with-translation ;
 
 M: editor pref-dim*
     [ font>> ] [ control-value ] bi text-dim ;
