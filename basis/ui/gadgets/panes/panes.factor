@@ -259,7 +259,9 @@ M: pane-block-stream dispose
     unnest-pane-stream write-gadget ;
 
 M: pane-stream make-block-stream
-    pane-block-stream new-nested-pane-stream ;
+    [ pane-block-stream new-nested-pane-stream ]
+    [ drop page-color swap at* [ background associate ] when ]
+    2bi [ <style-stream> ] when* ;
 
 ! Tables
 : apply-table-gap-style ( style grid -- style grid )
