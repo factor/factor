@@ -46,6 +46,15 @@ M: fd cancel-operation ( fd -- )
         2bi
     ] if ;
 
+M: unix (stream-seek) ( n seek-type stream -- )
+    swap {
+        { io:seek-absolute [ SEEK_SET ] }
+        { io:seek-relative [ SEEK_CUR ] }
+        { io:seek-end [ SEEK_END ] }
+        [ io:bad-seek-type ]
+    } case
+    [ handle>> fd>> swap ] dip lseek io-error ;
+
 SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+
 SYMBOL: +output+
@@ -84,8 +93,8 @@ M: fd refill
     fd>> over buffer>> [ buffer-end ] [ buffer-capacity ] bi read
     {
         { [ dup 0 >= ] [ swap buffer>> n>buffer f ] }
-        { [ err_no EINTR = ] [ 2drop +retry+ ] }
-        { [ err_no EAGAIN = ] [ 2drop +input+ ] }
+        { [ errno EINTR = ] [ 2drop +retry+ ] }
+        { [ errno EAGAIN = ] [ 2drop +input+ ] }
         [ (io-error) ]
     } cond ;
 
@@ -104,8 +113,8 @@ M: fd drain
             over buffer>> buffer-consume
             buffer>> buffer-empty? f +output+ ?
         ] }
-        { [ err_no EINTR = ] [ 2drop +retry+ ] }
-        { [ err_no EAGAIN = ] [ 2drop +output+ ] }
+        { [ errno EINTR = ] [ 2drop +retry+ ] }
+        { [ errno EAGAIN = ] [ 2drop +output+ ] }
         [ (io-error) ]
     } cond ;
 
@@ -143,7 +152,7 @@ M: stdin dispose*
     stdin data>> handle-fd buffer buffer-end size read
     dup 0 < [
         drop
-        err_no EINTR = [ buffer stdin size refill-stdin ] [ (io-error) ] if
+        errno EINTR = [ buffer stdin size refill-stdin ] [ (io-error) ] if
     ] [
         size = [ "Error reading stdin pipe" throw ] unless
         size buffer n>buffer
@@ -177,7 +186,7 @@ TUPLE: mx-port < port mx ;
 
 : multiplexer-error ( n -- n )
     dup 0 < [
-        err_no [ EAGAIN = ] [ EINTR = ] bi or
+        errno [ EAGAIN = ] [ EINTR = ] bi or
         [ drop 0 ] [ (io-error) ] if
     ] when ;
 
