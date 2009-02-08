@@ -16,7 +16,7 @@ IN: io.tests
     "seek-test1" unique-file binary
     [
         [
-            B{ 1 2 3 4 5 } write flush 0 seek-absolute seek-output
+            B{ 1 2 3 4 5 } write 0 seek-absolute seek-output
             B{ 3 } write
         ] with-file-writer
     ] [
@@ -29,7 +29,7 @@ IN: io.tests
     "seek-test2" unique-file binary
     [
         [
-            B{ 1 2 3 4 5 } write flush -1 seek-relative seek-output
+            B{ 1 2 3 4 5 } write -1 seek-relative seek-output
             B{ 3 } write
         ] with-file-writer
     ] [
@@ -42,7 +42,7 @@ IN: io.tests
     "seek-test3" unique-file binary
     [
         [
-            B{ 1 2 3 4 5 } write flush 1 seek-relative seek-output
+            B{ 1 2 3 4 5 } write 1 seek-relative seek-output
             B{ 3 } write
         ] with-file-writer
     ] [
