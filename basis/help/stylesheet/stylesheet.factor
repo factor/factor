@@ -58,7 +58,7 @@ SYMBOL: snippet-style
 H{
     { font-name "monospace" }
     { font-size 12 }
-    { foreground T{ rgba f 0.1 0.1 0.4 1 } }
+    { foreground COLOR: navy-blue }
 } snippet-style set-global
 
 SYMBOL: code-style
