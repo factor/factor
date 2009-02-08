@@ -34,6 +34,7 @@ FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context ) ;
 
 : <CTLine> ( string open-font color -- line )
     [
+        [ dup selection? [ string>> ] when ] 2dip
         [
             kCTForegroundColorAttributeName set
             kCTFontAttributeName set
@@ -53,6 +54,25 @@ TUPLE: line font line metrics dim bitmap age refs disposed ;
     [ ceiling >fixnum ]
     bi@ 2array ;
 
+: fill-background ( context font dim -- )
+    [ background>> >rgba-components CGContextSetRGBFillColor ]
+    [ [ 0 0 ] dip first2 <CGRect> CGContextFillRect ]
+    bi-curry* bi ;
+
+: selection-rect ( dim line selection -- rect )
+    [ start>> ] [ end>> ] bi
+    [ f CTLineGetOffsetForStringIndex ] bi-curry@ bi
+    [ drop nip 0 ] [ swap - swap second ] 3bi <CGRect> ;
+
+:: fill-selection-background ( context dim line string -- )
+    string selection? [
+        context string color>> >rgba-components CGContextSetRGBFillColor
+        context dim line string selection-rect CGContextFillRect
+    ] when ;
+
+: set-text-position ( context metrics -- )
+    [ 0 ] dip descent>> ceiling CGContextSetTextPosition ;
+
 :: <line> ( font string -- line )
     [
         [let* | open-font [ font cache-font CFRetain |CFRelease ]
@@ -61,10 +81,10 @@ TUPLE: line font line metrics dim bitmap age refs disposed ;
                 dim [ metrics bounds>dim ] |
             dim [
                 {
-                    [ font background>> >rgba-components CGContextSetRGBFillColor ]
-                    [ 0 0 dim first2 <CGRect> CGContextFillRect ]
-                    [ 0 metrics descent>> ceiling CGContextSetTextPosition ]
-                    [ line swap CTLineDraw ]
+                    [ font dim fill-background ]
+                    [ dim line string fill-selection-background ]
+                    [ metrics set-text-position ]
+                    [ [ line ] dip CTLineDraw ]
                 } cleave
             ] with-bitmap-context
             [ open-font line metrics dim ] dip 0 0 f
