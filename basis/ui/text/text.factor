@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays sequences math math.order opengl opengl.gl
-strings fonts colors ;
+strings fonts colors accessors ;
 IN: ui.text
 
 <PRIVATE
@@ -55,6 +55,8 @@ HOOK: line-metrics font-renderer ( font string -- metrics )
 GENERIC# draw-text 1 ( font text loc -- )
 
 M: string draw-text draw-string ;
+
+M: selection draw-text draw-string ;
 
 M: sequence draw-text
     [

@@ -56,3 +56,7 @@ italic?
         12 >>size ;
 
 TUPLE: metrics width ascent descent leading ;
+
+TUPLE: selection string start end color ;
+
+C: <selection> selection
