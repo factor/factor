@@ -33,7 +33,6 @@ column-alignment
 action
 hook
 font
-text-color
 selection-color
 focus-border-color
 mouse-color
