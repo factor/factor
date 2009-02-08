@@ -46,27 +46,24 @@ TUPLE: document < model locs undos redos inside-undo? ;
 : doc-lines ( from to document -- slice )
     [ 1+ ] [ value>> ] bi* <slice> ;
 
-: start-on-line ( document from line# -- n1 )
-    [ dup first ] dip = [ nip second ] [ 2drop 0 ] if ;
+: start-on-line ( from line# document -- n1 )
+    drop over first =
+    [ second ] [ drop 0 ] if ;
 
-: end-on-line ( document to line# -- n2 )
-    over first over = [
-        drop second nip
-    ] [
-        nip swap doc-line length
-    ] if ;
+:: end-on-line ( to line# document -- n2 )
+    to first line# =
+    [ to second ] [ line# document doc-line length ] if ;
 
 : each-line ( from to quot -- )
-    2over = [
-        3drop
-    ] [
+    2over = [ 3drop ] [
         [ [ first ] bi@ [a,b] ] dip each
     ] if ; inline
 
-: start/end-on-line ( from to line# -- n1 n2 )
-    [ [ document get ] 2dip start-on-line ]
-    [ [ document get ] 2dip end-on-line ]
-    bi-curry bi* ;
+: map-lines ( from to quot -- results )
+    accumulator [ each-line ] dip ; inline
+
+: start/end-on-line ( from to line# document -- n1 n2 )
+    [ start-on-line ] [ end-on-line ] bi-curry bi-curry bi* ;
 
 : last-line# ( document -- line )
     value>> length 1- ;
@@ -78,8 +75,8 @@ CONSTANT: doc-start { 0 0 }
 
 <PRIVATE
 
-: (doc-range) ( from to line# -- )
-    [ start/end-on-line ] keep document get doc-line <slice> , ;
+: (doc-range) ( from to line# document -- slice )
+    [ start/end-on-line ] 2keep doc-line <slice> ;
 
 : text+loc ( lines loc -- loc )
     over [
@@ -117,11 +114,9 @@ CONSTANT: doc-start { 0 0 }
 PRIVATE>
 
 : doc-range ( from to document -- string )
-    [
-        document set 2dup [
-            [ 2dup ] dip (doc-range)
-        ] each-line 2drop
-    ] { } make "\n" join ;
+    [ 2dup ] dip
+    '[ [ 2dup ] dip _ (doc-range) ] map-lines
+    2nip "\n" join ;
 
 : add-undo ( edit document -- )
     dup inside-undo?>> [ 2drop ] [
