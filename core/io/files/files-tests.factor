@@ -75,3 +75,68 @@ USE: debugger.threads
 [ t ] [ "quux-test.txt" temp-file exists? ] unit-test
 
 [ ] [ "quux-test.txt" temp-file delete-file ] unit-test
+
+! File seeking tests
+[ B{ 3 2 3 4 5 } ]
+[
+    "seek-test1" unique-file binary
+    [
+        [
+            B{ 1 2 3 4 5 } write 0 seek-absolute seek-output
+            B{ 3 } write
+        ] with-file-writer
+    ] [
+        file-contents
+    ] 2bi
+] unit-test
+
+[ B{ 1 2 3 4 3 } ]
+[
+    "seek-test2" unique-file binary
+    [
+        [
+            B{ 1 2 3 4 5 } write -1 seek-relative seek-output
+            B{ 3 } write
+        ] with-file-writer
+    ] [
+        file-contents
+    ] 2bi
+] unit-test
+
+[ B{ 1 2 3 4 5 0 3 } ]
+[
+    "seek-test3" unique-file binary
+    [
+        [
+            B{ 1 2 3 4 5 } write 1 seek-relative seek-output
+            B{ 3 } write
+        ] with-file-writer
+    ] [
+        file-contents
+    ] 2bi
+] unit-test
+
+[ B{ 3 } ]
+[
+    B{ 1 2 3 4 5 } "seek-test4" unique-file binary [
+        set-file-contents
+    ] [
+        [
+            -3 seek-end seek-input 1 read
+        ] with-file-reader
+    ] 2bi
+] unit-test
+
+[ B{ 2 } ]
+[
+    B{ 1 2 3 4 5 } "seek-test5" unique-file binary [
+        set-file-contents
+    ] [
+        [
+            3 seek-absolute seek-input
+            -2 seek-relative seek-input
+            1 read
+        ] with-file-reader
+    ] 2bi
+] unit-test
+
