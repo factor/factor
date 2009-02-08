@@ -6,6 +6,12 @@ USING: alien assocs continuations alien.destructors kernel
 namespaces accessors sets summary ;
 IN: libc
 
+: errno ( -- int )
+    "int" "factor" "err_no" { } alien-invoke ;
+
+: clear-errno ( -- )
+    "void" "factor" "clear_err_no" { } alien-invoke ;
+
 <PRIVATE
 
 : (malloc) ( size -- alien )

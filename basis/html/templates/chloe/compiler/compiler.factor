@@ -42,6 +42,9 @@ DEFER: compile-element
 : [code-with] ( obj quot -- )
     reset-buffer [ , ] [ % ] bi* ;
 
+: [xml-code] ( quot -- )
+    [ write-xml ] compose [code] ;
+
 : expand-attr ( value -- )
     [ value present write ] [code-with] ;
 

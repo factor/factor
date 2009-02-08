@@ -21,6 +21,9 @@ M: buffer dispose* ptr>> free ;
 : buffer-reset ( n buffer -- )
     swap >>fill 0 >>pos drop ;
 
+: buffer-reset-hard ( buffer -- )
+    0 >>fill 0 >>pos drop ;
+
 : buffer-capacity ( buffer -- n )
     [ size>> ] [ fill>> ] bi - ; inline
 

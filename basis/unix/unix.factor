@@ -17,6 +17,10 @@ CONSTANT: MAP_FILE    0
 CONSTANT: MAP_SHARED  1
 CONSTANT: MAP_PRIVATE 2
 
+CONSTANT: SEEK_SET 0
+CONSTANT: SEEK_CUR 1
+CONSTANT: SEEK_END 2
+
 : MAP_FAILED ( -- alien ) -1 <alien> ; inline
 
 CONSTANT: NGROUPS_MAX 16
@@ -37,18 +41,13 @@ C-STRUCT: group
     { "int" "gr_gid" }
     { "char**" "gr_mem" } ;
 
-LIBRARY: factor
-
-FUNCTION: void clear_err_no ( ) ;
-FUNCTION: int err_no ( ) ;
-
 LIBRARY: libc
 
 FUNCTION: char* strerror ( int errno ) ;
 
 ERROR: unix-error errno message ;
 
-: (io-error) ( -- * ) err_no dup strerror unix-error ;
+: (io-error) ( -- * ) errno dup strerror unix-error ;
 
 : io-error ( n -- ) 0 < [ (io-error) ] when ;
 
@@ -61,7 +60,7 @@ MACRO:: unix-system-call ( quot -- )
             n ndup quot call dup 0 < [
                 drop
                 n narray
-                err_no dup strerror
+                errno dup strerror
                 word unix-system-call-error
             ] [
                 n nnip

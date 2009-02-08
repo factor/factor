@@ -1235,7 +1235,7 @@ ALIAS: GetFileAttributesEx GetFileAttributesExW
 
 FUNCTION: BOOL GetFileInformationByHandle ( HANDLE hFile, LPBY_HANDLE_FILE_INFORMATION lpFileInformation ) ;
 FUNCTION: DWORD GetFileSize ( HANDLE hFile, LPDWORD lpFileSizeHigh ) ;
-! FUNCTION: GetFileSizeEx
+FUNCTION: BOOL GetFileSizeEx ( HANDLE hFile, PLARGE_INTEGER lpFileSize ) ;
 FUNCTION: BOOL GetFileTime ( HANDLE hFile, LPFILETIME lpCreationTime, LPFILETIME lpLastAccessTime, LPFILETIME lpLastWriteTime ) ;
 FUNCTION: DWORD GetFileType ( HANDLE hFile ) ;
 ! FUNCTION: GetFirmwareEnvironmentVariableA
