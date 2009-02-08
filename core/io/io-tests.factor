@@ -1,6 +1,6 @@
 USING: arrays io io.files kernel math parser strings system
 tools.test words namespaces make io.encodings.8-bit
-io.encodings.binary sequences ;
+io.encodings.binary sequences io.files.unique ;
 IN: io.tests
 
 [ f ] [
