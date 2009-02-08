@@ -37,8 +37,8 @@ M: object (get-remote-address) ( handle local -- sockaddr )
     dup handle>> handle-fd f 0 write
     {
         { [ 0 = ] [ drop ] }
-        { [ err_no EAGAIN = ] [ dup +output+ wait-for-port wait-to-connect ] }
-        { [ err_no EINTR = ] [ wait-to-connect ] }
+        { [ errno EAGAIN = ] [ dup +output+ wait-for-port wait-to-connect ] }
+        { [ errno EINTR = ] [ wait-to-connect ] }
         [ (io-error) ]
     } cond ;
 
@@ -46,7 +46,7 @@ M: object establish-connection ( client-out remote -- )
     [ drop ] [ [ handle>> handle-fd ] [ make-sockaddr/size ] bi* connect ] 2bi
     {
         { [ 0 = ] [ drop ] }
-        { [ err_no EINPROGRESS = ] [
+        { [ errno EINPROGRESS = ] [
             [ +output+ wait-for-port ] [ wait-to-connect ] bi
         ] }
         [ (io-error) ]
@@ -78,8 +78,8 @@ M: object (accept) ( server addrspec -- fd sockaddr )
     2dup do-accept
     {
         { [ over 0 >= ] [ [ 2nip <fd> init-fd ] dip ] }
-        { [ err_no EINTR = ] [ 2drop (accept) ] }
-        { [ err_no EAGAIN = ] [
+        { [ errno EINTR = ] [ 2drop (accept) ] }
+        { [ errno EAGAIN = ] [
             2drop
             [ drop +input+ wait-for-port ]
             [ (accept) ]
@@ -121,10 +121,10 @@ M: unix (receive) ( datagram -- packet sockaddr )
 :: do-send ( packet sockaddr len socket datagram -- )
     socket handle-fd packet dup length 0 sockaddr len sendto
     0 < [
-        err_no EINTR = [
+        errno EINTR = [
             packet sockaddr len socket datagram do-send
         ] [
-            err_no EAGAIN = [
+            errno EAGAIN = [
                 datagram +output+ wait-for-port
                 packet sockaddr len socket datagram do-send
             ] [

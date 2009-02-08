@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Daniel Ehrenberg.
+! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unicode.data sequences namespaces
 sbufs make unicode.syntax unicode.normalize math hints
-unicode.categories combinators unicode.syntax assocs
+unicode.categories combinators unicode.syntax assocs combinators.short-circuit
 strings splitting kernel accessors unicode.breaks fry locals ;
 QUALIFIED: ascii
 IN: unicode.case
@@ -26,6 +26,9 @@ SYMBOL: locale ! Just casing locale, or overall?
 : i-dot? ( -- ? )
     locale get { "tr" "az" } member? ;
 
+: lt? ( -- ? )
+    locale get "lt" = ;
+
 : lithuanian? ( -- ? ) locale get "lt" = ;
 
 : dot-over ( -- ch ) HEX: 307 ;
@@ -37,18 +40,21 @@ SYMBOL: locale ! Just casing locale, or overall?
 : mark-above? ( ch -- ? )
     combining-class 230 = ;
 
-: with-rest ( seq quot: ( seq -- seq ) -- seq )
-    [ unclip ] dip swap slip prefix ; inline
+:: with-rest ( seq quot: ( seq -- seq ) -- seq )
+    seq unclip quot dip prefix ; inline
 
 : add-dots ( seq -- seq )
-    [ [ "" ] [
-        dup first mark-above?
-        [ CHAR: combining-dot-above prefix ] when
+    [ [ { } ] [
+        [
+            dup first
+            { [ mark-above? ] [ CHAR: combining-ogonek = ] } 1||
+            [ CHAR: combining-dot-above prefix ] when
+        ] map
     ] if-empty ] with-rest ; inline
 
 : lithuanian>lower ( string -- lower )
-    "i" split add-dots "i" join
-    "j" split add-dots "i" join ; inline
+    "I" split add-dots "I" join
+    "J" split add-dots "J" join ; inline
 
 : turk>upper ( string -- upper-i )
     "i" "I\u000307" replace ; inline
@@ -88,13 +94,16 @@ SYMBOL: locale ! Just casing locale, or overall?
 PRIVATE>
 
 : >lower ( string -- lower )
-    i-dot? [ turk>lower ] when final-sigma
+    i-dot? [ turk>lower ] when
+    lt? [ lithuanian>lower ] when
+    final-sigma
     [ lower>> ] [ ch>lower ] map-case ;
 
 HINTS: >lower string ;
 
 : >upper ( string -- upper )
     i-dot? [ turk>upper ] when
+    lt? [ lithuanian>upper ] when
     [ upper>> ] [ ch>upper ] map-case ;
 
 HINTS: >upper string ;
@@ -103,6 +112,7 @@ HINTS: >upper string ;
 
 : (>title) ( string -- title )
     i-dot? [ turk>upper ] when
+    lt? [ lithuanian>upper ] when
     [ title>> ] [ ch>title ] map-case ; inline
 
 : title-word ( string -- title )

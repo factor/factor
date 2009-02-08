@@ -120,6 +120,13 @@ M: output-port stream-write
 
 HOOK: (wait-to-write) io-backend ( port -- )
 
+HOOK: (stream-seek) os ( n seek-type stream -- )
+
+M: port stream-seek ( n seek-type stream -- )
+    dup check-disposed
+    [ buffer>> buffer-reset-hard 2drop ] [ (stream-seek) ] 3bi ;
+
+
 GENERIC: shutdown ( handle -- )
 
 M: object shutdown drop ;
