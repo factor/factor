@@ -82,6 +82,19 @@ M: winnt init-io ( -- )
     H{ } clone pending-overlapped set-global
     windows.winsock:init-winsock ;
 
+ERROR: invalid-file-size n ;
+
+: handle>file-size ( handle -- n )
+    0 <ulonglong> [ GetFileSizeEx win32-error=0/f ] keep *ulonglong ;
+
+M: winnt (stream-seek) ( n seek-type stream -- )
+    swap {
+        { seek-absolute [ handle>> (>>ptr) ] }
+        { seek-relative [ handle>> [ + ] change-ptr drop ] }
+        { seek-end [ handle>> [ handle>> handle>file-size + ] keep (>>ptr) ] }
+        [ bad-seek-type ]
+    } case ;
+
 : file-error? ( n -- eof? )
     zero? [
         GetLastError {
