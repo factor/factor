@@ -68,6 +68,51 @@ HELP: stream-copy
 { $description "Copies the contents of one stream into another, closing both streams when done." } 
 $io-error ;
 
+
+HELP: stream-seek
+{ $values
+     { "n" integer } { "seek-type" "a seek singleton" } { "stream" "a stream" }
+}
+{ $description "Moves the pointer associated with a stream's handle to an offset " { $snippet "n" } " bytes from the seek type so that further reading or writing happens at the new location. For output streams, the buffer is flushed before seeking. Seeking past the end of an output stream will pad the difference with zeros once the stream is written to again." $nl
+    "Three methods of seeking are supported:"
+    { $list { $link seek-absolute } { $link seek-relative } { $link seek-end } }
+}
+{ $notes "Stream seeking is not supported on streams that do not have a known length, e.g. TCP/IP streams." } ;
+
+HELP: seek-absolute
+{ $values
+    
+     { "value" "a seek singleton" }
+}
+{ $description "Seeks to an offset from the beginning of the stream." } ;
+
+HELP: seek-end
+{ $values
+    
+     { "value" "a seek singleton" }
+}
+{ $description "Seeks to an offset from the end of the stream. If the offset puts the stream pointer past the end of the data on an output stream, writing to it will pad the difference with zeros." } ;
+
+HELP: seek-relative
+{ $values
+    
+     { "value" "a seek singleton" }
+}
+{ $description "Seeks to an offset from the current position of the stream pointer." } ;
+
+
+HELP: seek-input
+{ $values
+     { "n" integer } { "seek-type" "a seek singleton" }
+}
+{ $description "Calls " { $link stream-seek } " on the stream stored in " { $link input-stream } "." } ;
+
+HELP: seek-output
+{ $values
+     { "n" integer } { "seek-type" "a seek singleton" }
+}
+{ $description "Calls " { $link stream-seek } " on the stream stored in " { $link output-stream } "." } ;
+
 HELP: input-stream
 { $var-description "Holds an input stream for various implicit stream operations. Rebound using " { $link with-input-stream } " and " { $link with-input-stream* } "." } ;
 
@@ -196,6 +241,8 @@ $nl
 { $subsection stream-write }
 "This word is only required for string output streams:"
 { $subsection stream-nl }
+"This word is for streams that allow seeking:"
+{ $subsection stream-seek }
 "For a discussion of the distinction between binary and string streams, see " { $link "stream-elements" } "."
 { $see-also "io.timeouts" } ;
 
@@ -249,6 +296,8 @@ $nl
 { $subsection read-partial }
 "If the default input stream is a string stream (" { $link "stream-elements" } "), lines of text can be read:"
 { $subsection readln }
+"Seeking on the default input stream:"
+{ $subsection seek-input }
 "A pair of combinators for rebinding the " { $link input-stream } " variable:"
 { $subsection with-input-stream }
 { $subsection with-input-stream* }
@@ -256,7 +305,7 @@ $nl
 { $subsection output-stream }
 "Unless rebound in a child namespace, this variable will be set to a console stream for showing output to the user."
 $nl
-"Words writing to the default input stream:"
+"Words writing to the default output stream:"
 { $subsection flush }
 { $subsection write1 }
 { $subsection write }
@@ -265,6 +314,8 @@ $nl
 { $subsection print }
 { $subsection nl }
 { $subsection bl }
+"Seeking on the default output stream:"
+{ $subsection seek-output }
 "A pair of combinators for rebinding the " { $link output-stream } " variable:"
 { $subsection with-output-stream }
 { $subsection with-output-stream* }
