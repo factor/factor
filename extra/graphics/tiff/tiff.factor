@@ -169,7 +169,7 @@ ERROR: bad-tiff-magic bytes ;
 
 : read-ifds ( tiff -- tiff )
     [
-        dup ifd-offset>> seek-input
+        dup ifd-offset>> seek-absolute seek-input
         2 read endian>
         dup [ read-ifd ] replicate
         4 read endian>
@@ -184,7 +184,7 @@ ERROR: bad-tiff-magic bytes ;
     dup count>> 1 = [
         offset>>
     ] [
-        [ offset>> seek-input ] [ count>> read ] bi
+        [ offset>> seek-absolute seek-input ] [ count>> read ] bi
     ] if ;
 
 : process-ifd-entry ( ifd-entry -- object )
