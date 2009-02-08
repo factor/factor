@@ -53,3 +53,12 @@ IN: generalizations.tests
 
 [ 4 nappend ] must-infer
 [ 4 { } nappend-as ] must-infer
+
+[ 17 ] [ 3 1 3 3 7 5 nsum ] unit-test
+{ 4 1 } [ 4 nsum ] must-infer-as
+
+[ "e1" "o1" "o2" "e2" "o1" "o2" ] [ "e1" "e2" "o1" "o2" 2 nweave ] unit-test
+{ 3 5 } [ 2 nweave ] must-infer-as
+
+[ { 0 1 2 } { 3 5 4 } { 7 8 6 } ]
+[ 9 [ ] each { [ 3array ] [ swap 3array ] [ rot 3array ] } 3 nspread ] unit-test
