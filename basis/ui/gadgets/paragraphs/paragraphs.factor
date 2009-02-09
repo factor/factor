@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.order sequences wrap arrays fry
-ui.gadgets ui.gadgets.labels ui.render ;
+USING: accessors kernel math math.order sequences wrap wrap.words
+arrays fry ui.gadgets ui.gadgets.labels ui.render ;
 IN: ui.gadgets.paragraphs
 
 MIXIN: word-break
@@ -35,8 +35,8 @@ TUPLE: line words ascent descent ;
     dup [ key>> ] map dup pref-dims baseline-metrics line boa ;
 
 : wrap-paragraph ( paragraph -- wrapped-paragraph )
-    [ children>> [ gadget>word ] map ] [ margin>> ] bi wrap
-    [ <line> ] map ;
+    [ children>> [ gadget>word ] map ] [ margin>> ] bi
+    dup wrap-words [ <line> ] map ;
 
 : line-width ( wrapped-line -- n )
     [ break?>> ] trim-tail-slice [ width>> ] sigma ;
