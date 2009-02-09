@@ -15,7 +15,7 @@ IN: ui.gadgets.theme
 : faint-boundary ( gadget -- gadget )
     COLOR: gray solid-boundary ; inline
 
-: selection-color ( -- color ) COLOR: lavender ; inline
+: selection-color ( -- color ) T{ rgba f 0.8 0.8 1.0 1.0 } ; inline
 
 : focus-border-color ( -- color ) COLOR: dark-gray ; inline
 
