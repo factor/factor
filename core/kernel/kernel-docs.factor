@@ -658,7 +658,7 @@ HELP: loop
     "hi hi hi" }
     "A fun loop:"
     { $example "USING: kernel prettyprint math ; "
-    "3 [ dup . 7 + 11 mod dup 3 = not ] loop"
+    "3 [ dup . 7 + 11 mod dup 3 = not ] loop drop"
     "3\n10\n6\n2\n9\n5\n1\n8\n4\n0\n7" }
 } ;
 

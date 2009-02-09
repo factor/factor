@@ -39,7 +39,7 @@ IN: project-euler.134
 PRIVATE>
 
 : euler134 ( -- answer )
-    0 5 lprimes-from uncons swap [ 1000000 > ] luntil
+    0 5 lprimes-from uncons [ 1000000 > ] luntil
     [ [ s + ] keep ] leach drop ;
 
 ! [ euler134 ] 10 ave-time
