@@ -138,3 +138,9 @@ USE: debugger.threads
         ] with-file-reader
     ] 2bi
 ] unit-test
+
+[
+    "seek-test6" unique-file binary [
+        -10 seek-absolute seek-input
+    ] with-file-reader
+] must-fail
