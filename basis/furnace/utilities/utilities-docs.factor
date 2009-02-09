@@ -25,8 +25,8 @@ HELP: hidden-form-field
 { $notes "This word is used by session management, conversation scope and asides." }
 { $examples
     { $example
-        "USING: furnace.utilities io ;"
-        "\"bar\" \"foo\" hidden-form-field nl"
+        "USING: furnace.utilities io xml.writer ;"
+        "\"bar\" \"foo\" hidden-form-field write-xml nl"
         "<input type=\"hidden\" value=\"bar\" name=\"foo\"/>"
     }
 } ;
