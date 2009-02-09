@@ -83,7 +83,7 @@ ERROR: unknown-chloe-tag tag ;
 
 : compile-chloe-tag ( tag -- )
     dup main>> dup tags get at
-    [ curry call( -- ) ]
+    [ call( tag -- ) ]
     [ unknown-chloe-tag ]
     ?if ;
 
