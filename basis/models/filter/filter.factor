@@ -1,6 +1,6 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors models kernel ;
+USING: accessors models kernel call ;
 IN: models.filter
 
 TUPLE: filter < model model quot ;
@@ -12,6 +12,7 @@ TUPLE: filter < model model quot ;
         [ add-dependency ] keep ;
 
 M: filter model-changed
-    [ [ value>> ] [ quot>> ] bi* call ] [ nip ] 2bi set-model ;
+    [ [ value>> ] [ quot>> ] bi* call( old -- new ) ] [ nip ] 2bi
+    set-model ;
 
 M: filter model-activated [ model>> ] keep model-changed ;

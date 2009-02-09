@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel ui.commands
 ui.gestures sequences strings math words generic namespaces
-hashtables help.markup quotations assocs fry ;
+hashtables help.markup quotations assocs fry call ;
 IN: ui.operations
 
 SYMBOL: +keyboard+
@@ -34,7 +34,7 @@ M: operation command-word command>> command-word ;
 SYMBOL: operations
 
 : object-operations ( obj -- operations )
-    operations get [ predicate>> call ] with filter ;
+    operations get [ predicate>> call( obj -- ? ) ] with filter ;
 
 : gesture>operation ( gesture object -- operation/f )
     object-operations [ operation-gesture = ] with find nip ;
@@ -77,4 +77,4 @@ SYMBOL: operations
     [ translator>> ] [ command>> ] bi '[ _ @ _ execute ] ;
 
 M: operation invoke-command ( target command -- )
-    operation-quot call ;
+    operation-quot call( -- ) ;

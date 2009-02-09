@@ -117,12 +117,10 @@ M: world ungraft*
 
 : update-ui ( -- )
     [
-        [
-            notify-queued
-            layout-queued
-            redraw-worlds
-            send-queued-gestures
-        ] call( -- )
+        notify-queued
+        layout-queued
+        redraw-worlds
+        send-queued-gestures
     ] [ ui-error ] recover ;
 
 SYMBOL: ui-thread

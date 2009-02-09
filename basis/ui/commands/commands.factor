@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel sequences strings
 math assocs words generic namespaces make assocs quotations
-splitting ui.gestures unicode.case unicode.categories tr fry ;
+splitting ui.gestures unicode.case unicode.categories tr fry
+call ;
 IN: ui.commands
 
 SYMBOL: +nullary+
@@ -74,7 +75,7 @@ M: word command-description ( word -- str )
     [ nip ] [ curry ] if ;
 
 M: word invoke-command ( target command -- )
-    command-quot call ;
+    command-quot call( -- ) ;
 
 M: word command-word ;
 

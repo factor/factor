@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs continuations kernel math models
+USING: accessors arrays assocs continuations kernel math models call
 namespaces opengl sequences io combinators combinators.short-circuit
 fry math.vectors ui.gadgets ui.gestures ui.render ui.text ui.text.private
 ui.backend ui.gadgets.tracks math.rectangles ;
@@ -77,7 +77,7 @@ C: <world-error> world-error
 SYMBOL: ui-error-hook
 
 : ui-error ( error -- )
-    ui-error-hook get [ call ] [ die ] if* ;
+    ui-error-hook get [ call( error -- ) ] [ die drop ] if* ;
 
 ui-error-hook global [ [ rethrow ] or ] change-at
 

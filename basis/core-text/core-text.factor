@@ -121,7 +121,7 @@ CONSTANT: max-line-age 10
 
 : age-assoc ( assoc quot -- assoc' )
     '[ nip @ ] assoc-partition
-    [ values dispose-each ] dip ;
+    [ values dispose-each ] dip ; inline
 
 : age-lines ( -- )
     cached-lines global [ [ age-line ] age-assoc ] change-at ;

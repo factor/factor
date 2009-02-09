@@ -161,3 +161,6 @@ M: mock-gadget ungraft*
 \ relayout must-infer
 \ relayout-1 must-infer
 \ pref-dim must-infer
+
+\ graft* must-infer
+\ ungraft* must-infer

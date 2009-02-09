@@ -9,7 +9,7 @@ ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.paragraphs
 ui.gadgets.incremental ui.gadgets.packs ui.gadgets.theme
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 ui.text ui.gadgets.presentations ui.gadgets.grids
-ui.gadgets.grid-lines colors ;
+ui.gadgets.grid-lines colors call ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < pack
@@ -146,7 +146,8 @@ M: style-stream write-gadget
 TUPLE: pane-control < pane quot ;
 
 M: pane-control model-changed ( model pane-control -- )
-    [ value>> ] [ dup quot>> ] bi* with-pane ;
+    [ value>> ] [ dup quot>> ] bi*
+    '[ _ call( value -- ) ] with-pane ;
 
 : <pane-control> ( model quot -- pane )
     pane-control new-pane

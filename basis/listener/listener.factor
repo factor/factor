@@ -1,10 +1,10 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables io kernel math math.parser memory
 namespaces parser lexer sequences strings io.styles
 vectors words generic system combinators continuations debugger
 definitions compiler.units accessors colors prettyprint fry
-sets vocabs.parser ;
+sets vocabs.parser call ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
@@ -55,7 +55,8 @@ SYMBOL: visible-vars
 SYMBOL: error-hook
 
 : call-error-hook ( error -- )
-    error-continuation get error-hook get call ;
+    error-continuation get error-hook get
+    call( error continuation -- ) ;
 
 [ drop print-error-and-restarts ] error-hook set-global
 
