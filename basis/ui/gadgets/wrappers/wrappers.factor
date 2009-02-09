@@ -1,12 +1,12 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors ui.gadgets kernel ;
-
 IN: ui.gadgets.wrappers
 
 TUPLE: wrapper < gadget ;
 
-: new-wrapper ( child class -- wrapper ) new-gadget swap add-gadget ;
+: new-wrapper ( child class -- wrapper )
+    new-gadget swap add-gadget ; inline
 
 : <wrapper> ( child -- wrapper ) wrapper new-wrapper ;
 
