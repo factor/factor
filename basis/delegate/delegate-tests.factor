@@ -120,3 +120,27 @@ PROTOCOL: silly-protocol do-me ;
 ] unit-test
 
 [ ] [ T{ a-tuple } do-me ] unit-test
+
+! A slot protocol issue
+DEFER: slot-protocol-test-3
+SLOT: y
+
+[ f ] [ \ y>> \ slot-protocol-test-3 method >boolean ] unit-test
+
+[ [ ] ] [
+    <" IN: delegate.tests
+USING: accessors delegate ;
+TUPLE: slot-protocol-test-3 x ;
+CONSULT: y>> slot-protocol-test-3 x>> ;">
+    <string-reader> "delegate-test-1" parse-stream
+] unit-test
+
+[ t ] [ \ y>> \ slot-protocol-test-3 method >boolean ] unit-test
+
+[ [ ] ] [
+    <" IN: delegate.tests
+TUPLE: slot-protocol-test-3 x y ;">
+    <string-reader> "delegate-test-1" parse-stream
+] unit-test
+
+[ t ] [ \ y>> \ slot-protocol-test-3 method >boolean ] unit-test
