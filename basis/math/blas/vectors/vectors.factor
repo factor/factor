@@ -1,4 +1,4 @@
-USING: accessors alien alien.c-types arrays byte-arrays combinators
+USING: accessors alien alien.c-types arrays ascii byte-arrays combinators
 combinators.short-circuit fry kernel math math.blas.ffi
 math.complex math.functions math.order sequences.complex
 sequences.complex-components sequences sequences.private
@@ -141,7 +141,12 @@ VECTOR         DEFINES-CLASS ${TYPE}-blas-vector
 <VECTOR>       DEFINES <${TYPE}-blas-vector>
 >VECTOR        DEFINES >${TYPE}-blas-vector
 
-XVECTOR{       DEFINES ${T}vector{
+t              [ T >lower ]
+
+XVECTOR{       DEFINES ${t}vector{
+
+XAXPY          IS ${T}AXPY
+XSCAL          IS ${T}SCAL
 
 WHERE
 
@@ -170,6 +175,11 @@ M: VECTOR (blas-direct-array)
     [ [ length>> ] [ inc>> ] bi * ] bi
     <DIRECT-ARRAY> ;
 
+M: VECTOR n*V+V!
+    (prepare-axpy) [ XAXPY ] dip ;
+M: VECTOR n*V!
+    (prepare-scal) [ XSCAL ] dip ;
+
 : XVECTOR{ \ } [ >VECTOR ] parse-literal ; parsing
 
 M: VECTOR pprint-delims
@@ -181,11 +191,9 @@ M: VECTOR pprint-delims
 FUNCTOR: (define-real-blas-vector) ( TYPE T -- )
 
 VECTOR         IS ${TYPE}-blas-vector
-XDOT           IS cblas_${T}dot
-XNRM2          IS cblas_${T}nrm2
-XASUM          IS cblas_${T}asum
-XAXPY          IS cblas_${T}axpy
-XSCAL          IS cblas_${T}scal
+XDOT           IS ${T}DOT
+XNRM2          IS ${T}NRM2
+XASUM          IS ${T}ASUM
 
 WHERE
 
@@ -197,33 +205,6 @@ M: VECTOR Vnorm
     (prepare-nrm2) XNRM2 ;
 M: VECTOR Vasum
     (prepare-nrm2) XASUM ;
-M: VECTOR n*V+V!
-    (prepare-axpy) [ XAXPY ] dip ;
-M: VECTOR n*V!
-    (prepare-scal) [ XSCAL ] dip ;
-
-;FUNCTOR
-
-
-FUNCTOR: (define-complex-helpers) ( TYPE -- )
-
-<DIRECT-COMPLEX-ARRAY> DEFINES <direct-${TYPE}-complex-array>
->COMPLEX-ARRAY         DEFINES >${TYPE}-complex-array
-ARG>COMPLEX            DEFINES arg>${TYPE}-complex
-COMPLEX>ARG            DEFINES ${TYPE}-complex>arg
-<DIRECT-ARRAY>         IS      <direct-${TYPE}-array>
->ARRAY                 IS      >${TYPE}-array
-
-WHERE
-
-: <DIRECT-COMPLEX-ARRAY> ( alien len -- sequence )
-    1 shift <DIRECT-ARRAY> <complex-sequence> ;
-: >COMPLEX-ARRAY ( sequence -- sequence )
-    <complex-components> >ARRAY ;
-: COMPLEX>ARG ( complex -- alien )
-    >rect 2array >ARRAY underlying>> ;
-: ARG>COMPLEX ( alien -- complex )
-    2 <DIRECT-ARRAY> first2 rect> ;
 
 ;FUNCTOR
 
@@ -231,35 +212,21 @@ WHERE
 FUNCTOR: (define-complex-blas-vector) ( TYPE C S -- )
 
 VECTOR         IS ${TYPE}-blas-vector
-XDOTU_SUB      IS cblas_${C}dotu_sub
-XDOTC_SUB      IS cblas_${C}dotc_sub
-XXNRM2         IS cblas_${S}${C}nrm2
-XXASUM         IS cblas_${S}${C}asum
-XAXPY          IS cblas_${C}axpy
-XSCAL          IS cblas_${C}scal
-TYPE>ARG       IS ${TYPE}>arg
-ARG>TYPE       IS arg>${TYPE}
+XDOTU          IS ${C}DOTU
+XDOTC          IS ${C}DOTC
+XXNRM2         IS ${S}${C}NRM2
+XXASUM         IS ${S}${C}ASUM
 
 WHERE
 
 M: VECTOR V.
-    (prepare-dot) TYPE <c-object>
-    [ XDOTU_SUB ] keep
-    ARG>TYPE ;
+    (prepare-dot) XDOTU ;
 M: VECTOR V.conj
-    (prepare-dot) TYPE <c-object>
-    [ XDOTC_SUB ] keep
-    ARG>TYPE ;
+    (prepare-dot) XDOTC ;
 M: VECTOR Vnorm
     (prepare-nrm2) XXNRM2 ;
 M: VECTOR Vasum
     (prepare-nrm2) XXASUM ;
-M: VECTOR n*V+V!
-    [ TYPE>ARG ] 2dip
-    (prepare-axpy) [ XAXPY ] dip ;
-M: VECTOR n*V!
-    [ TYPE>ARG ] dip
-    (prepare-scal) [ XSCAL ] dip ;
 
 ;FUNCTOR
 
@@ -271,10 +238,10 @@ M: VECTOR n*V!
     [ drop (define-blas-vector) ]
     [ (define-complex-blas-vector) ] 3bi ;
 
-"float"  "s" define-real-blas-vector
-"double" "d" define-real-blas-vector
-"complex-float"  "c" "s" define-complex-blas-vector
-"complex-double" "z" "d" define-complex-blas-vector
+"float"  "S" define-real-blas-vector
+"double" "D" define-real-blas-vector
+"complex-float"  "C" "S" define-complex-blas-vector
+"complex-double" "Z" "D" define-complex-blas-vector
 
 >>
 
