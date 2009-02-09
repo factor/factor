@@ -1,10 +1,13 @@
 USING: accessors alien alien.c-types arrays byte-arrays combinators
-combinators.short-circuit fry kernel math math.blas.cblas
+combinators.short-circuit fry kernel math math.blas.ffi
 math.complex math.functions math.order sequences.complex
 sequences.complex-components sequences sequences.private
 functors words locals parser prettyprint.backend prettyprint.custom
 specialized-arrays.float specialized-arrays.double
-specialized-arrays.direct.float specialized-arrays.direct.double ;
+specialized-arrays.direct.float specialized-arrays.direct.double
+specialized-arrays.complex-float specialized-arrays.complex-double
+specialized-arrays.direct.complex-float
+specialized-arrays.direct.complex-double ;
 IN: math.blas.vectors
 
 TUPLE: blas-vector-base underlying length inc ;
@@ -130,9 +133,9 @@ FUNCTOR: (define-blas-vector) ( TYPE T -- )
 
 <DIRECT-ARRAY> IS <direct-${TYPE}-array>
 >ARRAY         IS >${TYPE}-array
-XCOPY          IS cblas_${T}copy
-XSWAP          IS cblas_${T}swap
-IXAMAX         IS cblas_i${T}amax
+XCOPY          IS ${T}COPY
+XSWAP          IS ${T}SWAP
+IXAMAX         IS I${T}AMAX
 
 VECTOR         DEFINES-CLASS ${TYPE}-blas-vector
 <VECTOR>       DEFINES <${TYPE}-blas-vector>
@@ -264,16 +267,14 @@ M: VECTOR n*V!
 : define-real-blas-vector ( TYPE T -- )
     [ (define-blas-vector) ]
     [ (define-real-blas-vector) ] 2bi ;
-:: define-complex-blas-vector ( TYPE C S -- )
-    TYPE (define-complex-helpers)
-    TYPE "-complex" append
-    [ C (define-blas-vector) ]
-    [ C S (define-complex-blas-vector) ] bi ;
+: define-complex-blas-vector ( TYPE C S -- )
+    [ drop (define-blas-vector) ]
+    [ (define-complex-blas-vector) ] 3bi ;
 
 "float"  "s" define-real-blas-vector
 "double" "d" define-real-blas-vector
-"float"  "c" "s" define-complex-blas-vector
-"double" "z" "d" define-complex-blas-vector
+"complex-float"  "c" "s" define-complex-blas-vector
+"complex-double" "z" "d" define-complex-blas-vector
 
 >>
 

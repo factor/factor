@@ -11,6 +11,14 @@ IN: alien.fortran
 ! XXX this currently only supports the gfortran/f2c abi.
 ! XXX we should also support ifort at some point for commercial BLASes
 
+<< 
+: add-f2c-libraries ( -- )
+    "I77" "libI77.so" "cdecl" add-library
+    "F77" "libF77.so" "cdecl" add-library ;
+
+os netbsd? [ add-f2c-libraries ] when
+>>
+
 : alien>nstring ( alien len encoding -- string )
     [ memory>byte-array ] dip decode ;
 
@@ -377,3 +385,5 @@ MACRO: fortran-invoke ( return library function parameters -- )
     scan "c-library" get scan ";" parse-tokens
     [ "()" subseq? not ] filter define-fortran-function ; parsing
 
+: LIBRARY:
+    scan "c-library" set ; parsing
