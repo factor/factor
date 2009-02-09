@@ -1,11 +1,11 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io io.styles kernel namespaces make
 parser prettyprint sequences words words.symbol assocs
 definitions generic quotations effects slots continuations
 classes.tuple debugger combinators vocabs help.stylesheet
 help.topics help.crossref help.markup sorting classes
-vocabs.loader ;
+vocabs.loader call ;
 IN: help
 
 GENERIC: word-help* ( word -- content )
@@ -125,7 +125,7 @@ SYMBOL: help-hook
 help-hook global [ [ print-topic ] or ] change-at
 
 : help ( topic -- )
-    help-hook get call ;
+    help-hook get call( topic -- ) ;
 
 : about ( vocab -- )
     dup require
