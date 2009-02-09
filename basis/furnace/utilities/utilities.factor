@@ -79,10 +79,10 @@ M: object link-attr 2drop ;
 
 GENERIC: modify-form ( responder -- xml/f )
 
-M: object modify-form f ;
+M: object modify-form drop f ;
 
 : form-modifications ( -- xml )
-    [ [ modify-form [ , ] when ] each-responder ] { } make ;
+    [ [ modify-form [ , ] when* ] each-responder ] { } make ;
 
 : hidden-form-field ( value name -- xml )
     over [
