@@ -8,3 +8,8 @@ IN: call.tests
 [ 1 2 [ + ] call( x y -- z a ) ] must-fail
 [ 1 2 3 { 4 } ] [ 1 2 3 4 [ datastack nip ] call( x -- y ) ] unit-test
 [ [ + ] call( x y -- z ) ] must-infer
+
+[ 3 ] [ 1 2 \ + execute( x y -- z ) ] unit-test
+[ 1 2 \ + execute( -- z ) ] must-fail
+[ 1 2 \ + execute( x y -- z a ) ] must-fail
+[ \ + execute( x y -- z ) ] must-infer

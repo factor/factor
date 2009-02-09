@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel macros fry summary sequences generalizations accessors
-continuations effects.parser parser ;
+continuations effects.parser parser words ;
 IN: call
 
 ERROR: wrong-values values quot length-required ;
@@ -22,3 +22,9 @@ MACRO: call-effect ( effect -- quot )
 
 : call(
     ")" parse-effect parsed \ call-effect parsed ; parsing
+
+: execute-effect ( word effect -- )
+    [ [ execute ] curry ] dip call-effect ; inline
+
+: execute(
+    ")" parse-effect parsed \ execute-effect parsed ; parsing

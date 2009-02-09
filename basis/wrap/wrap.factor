@@ -1,9 +1,9 @@
+! Copyright (C) 2009 Daniel Ehrenberg
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences math arrays locals fry accessors
 lists splitting call make combinators.short-circuit namespaces
 grouping splitting.monotonic ;
 IN: wrap
-
-<PRIVATE
 
 ! black is the text length, white is the whitespace length
 TUPLE: element contents black white ;
@@ -93,65 +93,3 @@ SYMBOL: line-ideal
         min-cost
         post-process
     ] with-scope ;
-
-PRIVATE>
-
-TUPLE: segment key width break? ;
-C: <segment> segment
-
-<PRIVATE
-
-: segments-length ( segments -- length )
-    [ width>> ] map sum ;
-
-: make-element ( whites blacks -- element )
-    [ append ] [ [ segments-length ] bi@ ] 2bi <element> ;
- 
-: ?first2 ( seq -- first/f second/f )
-    [ 0 swap ?nth ]
-    [ 1 swap ?nth ] bi ;
-
-: split-segments ( seq -- half-elements )
-    [ [ break?>> ] bi@ = ] monotonic-split ;
-
-: ?first-break ( seq -- newseq f/element )
-    dup first first break?>>
-    [ unclip-slice f swap make-element ]
-    [ f ] if ;
-
-: make-elements ( seq f/element -- elements )
-    [ 2 <groups> [ ?first2 make-element ] map ] dip
-    [ prefix ] when* ;
-
-: segments>elements ( seq -- newseq )
-    split-segments ?first-break make-elements ;
-
-PRIVATE>
-
-: wrap-segments ( segments line-max line-ideal -- lines )
-    [ segments>elements ] 2dip wrap [ concat ] map ;
-
-<PRIVATE
-
-: split-lines ( string -- elements-lines )
-    string-lines [
-        " \t" split harvest
-        [ dup length 1 <element> ] map
-    ] map ;
-
-: join-elements ( wrapped-lines -- lines )
-    [ " " join ] map ;
-
-: join-lines ( strings -- string )
-    "\n" join ;
-
-PRIVATE>
-
-: wrap-lines ( lines width -- newlines )
-    [ split-lines ] dip '[ _ dup wrap join-elements ] map concat ;
-
-: wrap-string ( string width -- newstring )
-    wrap-lines join-lines ;
-
-: wrap-indented-string ( string width indent -- newstring )
-    [ length - wrap-lines ] keep '[ _ prepend ] map join-lines ;
