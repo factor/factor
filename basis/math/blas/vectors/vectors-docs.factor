@@ -37,8 +37,8 @@ HELP: blas-vector-base
 { $list
     { { $link float-blas-vector } }
     { { $link double-blas-vector } }
-    { { $link float-complex-blas-vector } }
-    { { $link double-complex-blas-vector } }
+    { { $link complex-float-blas-vector } }
+    { { $link complex-double-blas-vector } }
 }
 "All of these subclasses share the same tuple layout:"
 { $list
@@ -51,10 +51,10 @@ HELP: float-blas-vector
 { $class-description "A vector of single-precision floating-point values. For details on the tuple layout, see " { $link blas-vector-base } "." } ;
 HELP: double-blas-vector
 { $class-description "A vector of double-precision floating-point values. For details on the tuple layout, see " { $link blas-vector-base } "." } ;
-HELP: float-complex-blas-vector
-{ $class-description "A vector of single-precision floating-point complex values. Complex values are stored in memory as two consecutive float values, real part then imaginary part. For details on the tuple layout, see " { $link blas-vector-base } "." } ;
-HELP: double-complex-blas-vector
-{ $class-description "A vector of single-precision floating-point complex values. Complex values are stored in memory as two consecutive float values, real part then imaginary part. For details on the tuple layout, see " { $link blas-vector-base } "." } ;
+HELP: complex-float-blas-vector
+{ $class-description "A vector of single-precision floating-point complex values. For details on the tuple layout, see " { $link blas-vector-base } "." } ;
+HELP: complex-double-blas-vector
+{ $class-description "A vector of double-precision floating-point complex values. For details on the tuple layout, see " { $link blas-vector-base } "." } ;
 
 HELP: n*V+V!
 { $values { "alpha" number } { "x" blas-vector-base } { "y" blas-vector-base } { "y=alpha*x+y" blas-vector-base } }
@@ -145,11 +145,11 @@ HELP: dvector{
 
 HELP: cvector{
 { $syntax "cvector{ 1.0 -2.0 C{ 3.0 -1.0 } }" }
-{ $description "Construct a literal " { $link float-complex-blas-vector } "." } ;
+{ $description "Construct a literal " { $link complex-float-blas-vector } "." } ;
 
 HELP: zvector{
 { $syntax "dvector{ 1.0 -2.0 C{ 3.0 -1.0 } }" }
-{ $description "Construct a literal " { $link double-complex-blas-vector } "." } ;
+{ $description "Construct a literal " { $link complex-double-blas-vector } "." } ;
 
 {
     POSTPONE: svector{ POSTPONE: dvector{

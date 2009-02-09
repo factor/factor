@@ -1,7 +1,6 @@
 USING: accessors alien alien.c-types arrays ascii byte-arrays combinators
 combinators.short-circuit fry kernel math math.blas.ffi
-math.complex math.functions math.order sequences.complex
-sequences.complex-components sequences sequences.private
+math.complex math.functions math.order sequences sequences.private
 functors words locals parser prettyprint.backend prettyprint.custom
 specialized-arrays.float specialized-arrays.double
 specialized-arrays.direct.float specialized-arrays.direct.double
@@ -165,7 +164,7 @@ M: VECTOR element-type
 M: VECTOR Vswap
     (prepare-swap) [ XSWAP ] 2dip ;
 M: VECTOR Viamax
-    (prepare-nrm2) IXAMAX ;
+    (prepare-nrm2) IXAMAX 1- ;
 
 M: VECTOR (blas-vector-like)
     drop <VECTOR> ;
