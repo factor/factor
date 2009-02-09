@@ -28,8 +28,8 @@ T in get
 define-struct
 
 T c-type
-<T> 1quotation >>boxer-quot
-*T 1quotation >>unboxer-quot
+<T> 1quotation >>unboxer-quot
+*T 1quotation >>boxer-quot
 drop
 
 ;FUNCTOR
