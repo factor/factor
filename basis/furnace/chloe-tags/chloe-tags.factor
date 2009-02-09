@@ -86,7 +86,7 @@ CHLOE: base
     hidden-form-field ;
 
 : render-hidden ( for -- xml )
-    "," split [ hidden render>xml ] map ;
+    [ "," split [ hidden render>xml ] map ] [ f ] if* ;
 
 : compile-hidden-form-fields ( for -- )
     '[
