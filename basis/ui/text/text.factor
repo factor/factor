@@ -43,7 +43,7 @@ GENERIC: text-dim ( font text -- dim )
 
 M: string text-dim string-dim ;
 
-M: sequence text-dim
+M: array text-dim
     [ { 0 0 } ] 2dip [ string-dim combine-text-dim ] with each ;
 
 : text-width ( font text -- w ) text-dim first ;
@@ -58,7 +58,7 @@ M: string draw-text draw-string ;
 
 M: selection draw-text draw-string ;
 
-M: sequence draw-text
+M: array draw-text
     [
         [
             2dup { 0 0 } draw-string
