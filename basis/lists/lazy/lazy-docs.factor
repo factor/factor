@@ -1,11 +1,54 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: help.markup help.syntax sequences strings lists ;
 IN: lists.lazy 
 
+ABOUT: "lists.lazy"
+
+ARTICLE: "lists.lazy" "Lazy lists"
+"The " { $vocab-link "lists.lazy" } " vocabulary implements lazy lists and standard operations to manipulate them."
+{ $subsection { "lists.lazy" "construction" } }
+{ $subsection { "lists.lazy" "manipulation" } }
+{ $subsection { "lists.lazy" "combinators" } }
+{ $subsection { "lists.lazy" "io" } } ;
+
+ARTICLE: { "lists.lazy" "combinators" } "Combinators for manipulating lazy lists"
+"The following combinators create lazy lists from other lazy lists:"
+{ $subsection lmap }
+{ $subsection lfilter }
+{ $subsection luntil }
+{ $subsection lwhile }
+{ $subsection lfrom-by }
+{ $subsection lcomp }
+{ $subsection lcomp* } ;
+
+ARTICLE: { "lists.lazy" "io" } "Lazy list I/O"
+"Input from a stream can be read through a lazy list, using the following words:"
+{ $subsection lcontents }
+{ $subsection llines } ;
+
+ARTICLE: { "lists.lazy" "construction" } "Constructing lazy lists"
+"Words for constructing lazy lists:"
+{ $subsection lazy-cons }
+{ $subsection 1lazy-list }
+{ $subsection 2lazy-list }
+{ $subsection 3lazy-list }
+{ $subsection seq>list }
+{ $subsection >list }
+{ $subsection lfrom } ;
+
+ARTICLE: { "lists.lazy" "manipulation" } "Manipulating lazy lists"
+"To make new lazy lists from old ones:"
+{ $subsection <memoized-cons> }
+{ $subsection lappend }
+{ $subsection lconcat }
+{ $subsection lcartesian-product }
+{ $subsection lcartesian-product* }
+{ $subsection lmerge }
+{ $subsection ltake } ;
+
 HELP: lazy-cons
-{ $values { "car" { $quotation "( -- X )" } } { "cdr" { $quotation "( -- cons )" } } { "promise" "the resulting cons object" } }
+{ $values { "car" { $quotation "( -- elt )" } } { "cdr" { $quotation "( -- cons )" } } { "promise" "the resulting cons object" } }
 { $description "Constructs a cons object for a lazy list from two quotations. The " { $snippet "car" } " quotation should return the head of the list, and the " { $snippet "cons" } " quotation the tail when called. When " { $link cons } " or " { $link cdr } " are called on the lazy-cons object then the appropriate quotation is called." } 
 { $see-also cons car cdr nil nil? } ;
 
@@ -28,15 +71,11 @@ HELP: <memoized-cons>
 { $description "Constructs a cons object that wraps an existing cons object. Requests for the car, cdr and nil? will be remembered after the first call, and the previous result returned on subsequent calls." } 
 { $see-also cons car cdr nil nil? } ;
 
-{ lazy-map lazy-map-with ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
+{ lazy-map ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
 
 HELP: lazy-map
 { $values { "list" "a cons object" } { "quot" { $quotation "( obj -- X )" } } { "result" "resulting cons object" } }
 { $description "Perform a similar functionality to that of the " { $link map } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-map> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
-
-HELP: lazy-map-with
-{ $values { "value" "an object" } { "list" "a cons object" } { "quot" { $quotation "( obj elt -- X )" } } { "result" "resulting cons object" } }
-{ $description "Variant of " { $link lazy-map } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: ltake
 { $values { "n" "a non negative integer" } { "list" "a cons object" } { "result" "resulting cons object" } }
@@ -86,7 +125,7 @@ HELP: >list
 { $description "Convert the object into a list. Existing lists are passed through intact, sequences are converted using " { $link seq>list } " and other objects cause an error to be thrown." } 
 { $see-also seq>list } ;
     
-{ leach foldl lazy-map lazy-map-with ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
+{ leach foldl lazy-map ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
 
 HELP: lconcat
 { $values { "list" "a list of lists" } { "result" "a list" } }

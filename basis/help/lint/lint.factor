@@ -7,7 +7,7 @@ combinators combinators.short-circuit splitting debugger
 hashtables sorting effects vocabs vocabs.loader assocs editors
 continuations classes.predicate macros math sets eval
 vocabs.parser words.symbol values grouping unicode.categories
-sequences.deep ;
+sequences.deep call ;
 IN: help.lint
 
 SYMBOL: vocabs-quot
@@ -15,9 +15,9 @@ SYMBOL: vocabs-quot
 : check-example ( element -- )
     [
         rest [
-            but-last "\n" join 1vector
-            [ (eval>string) ] with-datastack
-            peek "\n" ?tail drop
+            but-last "\n" join
+            [ (eval>string) ] call( code -- output )
+            "\n" ?tail drop
         ] keep
         peek assert=
     ] vocabs-quot get call ;
@@ -145,7 +145,7 @@ M: help-error error.
     bi ;
 
 : check-something ( obj quot -- )
-    flush '[ _ assert-depth ] swap '[ _ <help-error> , ] recover ; inline
+    flush '[ _ call( -- ) ] swap '[ _ <help-error> , ] recover ; inline
 
 : check-word ( word -- )
     [ with-file-vocabs ] vocabs-quot set
