@@ -90,9 +90,6 @@ M: lazy-map cdr ( lazy-map -- cdr )
 M: lazy-map nil? ( lazy-map -- bool )
     cons>> nil? ;
 
-: lazy-map-with ( value list quot -- result )
-    with lazy-map ;
-
 TUPLE: lazy-take n cons ;
 
 C: <lazy-take> lazy-take
@@ -301,14 +298,14 @@ M: lazy-concat nil? ( lazy-concat -- bool )
     ] if ;
 
 : lcartesian-product ( list1 list2 -- result )
-    swap [ swap [ 2array ] lazy-map-with  ] lazy-map-with  lconcat ;
+    swap [ swap [ 2array ] with lazy-map  ] with lazy-map  lconcat ;
 
 : lcartesian-product* ( lists -- result )
     dup nil? [
         drop nil
     ] [
         [ car ] keep cdr [ car lcartesian-product ] keep cdr list>array swap [
-            swap [ swap [ suffix ] lazy-map-with  ] lazy-map-with  lconcat
+            swap [ swap [ suffix ] with lazy-map  ] with lazy-map  lconcat
         ] reduce
     ] if ;
 

@@ -149,8 +149,8 @@ TUPLE: and-parser parsers ;
             [ parsed>> ] dip
             [ parsed>> 2array ] keep
             unparsed>> <parse-result>
-        ] lazy-map-with
-    ] lazy-map-with lconcat ;
+        ] with lazy-map
+    ] with lazy-map lconcat ;
 
 M: and-parser parse ( input parser -- list )
     #! Parse 'input' by sequentially combining the
@@ -173,7 +173,7 @@ M: or-parser parse ( input parser1 -- list )
     #! of parser1 and parser2 being applied to the same
     #! input. This implements the choice parsing operator.
     parsers>> 0 swap seq>list
-    [ parse ] lazy-map-with lconcat ;
+    [ parse ] with lazy-map lconcat ;
 
 : trim-head-slice ( string -- string )
     #! Return a new string without any leading whitespace
@@ -218,7 +218,7 @@ M: apply-parser parse ( input parser -- result )
     -rot parse [
         [ parsed>> swap call ] keep
         unparsed>> <parse-result>
-    ] lazy-map-with ;
+    ] with lazy-map ;
 
 TUPLE: some-parser p1 ;
 
