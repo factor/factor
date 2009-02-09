@@ -107,7 +107,7 @@ $nl
     
     { { { $snippet "\"help\"" } ", " { $snippet "\"help-loc\"" } ", " { $snippet "\"help-parent\"" } } { "Where word help is stored - " { $link "writing-help" } } }
 
-    { { $snippet "\"infer\"" } { $link "compiler-transforms" } }
+    { { $snippet "\"infer\"" } { $link "macros" } }
 
     { { { $snippet "\"inferred-effect\"" } } { $link "inference" } }
 

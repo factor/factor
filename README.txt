@@ -116,16 +116,22 @@ Now if $DISPLAY is set, running ./factor will start the UI.
 
 * Running Factor on Windows XP/Vista
 
+The Factor runtime is compiled into two binaries:
+
+  factor.com - a Windows console application
+  factor.exe - a Windows native application, without a console
+
 If you did not download the binary package, you can bootstrap Factor in
-the command prompt:
+the command prompt using the console application:
 
-  factor.exe -i=boot.<cpu>.image
+  factor.com -i=boot.<cpu>.image
 
-Once bootstrapped, double-clicking factor.exe starts the Factor UI.
+Once bootstrapped, double-clicking factor.exe or factor.com starts
+the Factor UI.
 
 To run the listener in the command prompt:
 
-  factor.exe -run=listener
+  factor.com -run=listener
 
 * The Factor FAQ
 
