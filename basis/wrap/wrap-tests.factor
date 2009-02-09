@@ -6,77 +6,77 @@ IN: wrap.tests
 [
     {
         {
-            T{ element f 1 10 f }
-            T{ element f 2 10 f }
-            T{ element f 3 2 t }
+            T{ segment f 1 10 f }
+            T{ segment f 2 10 f }
+            T{ segment f 3 2 t }
         }
         {
-            T{ element f 4 10 f }
-            T{ element f 5 10 f }
+            T{ segment f 4 10 f }
+            T{ segment f 5 10 f }
         }
     }
 ] [
     {
-        T{ element f 1 10 f }
-        T{ element f 2 10 f }
-        T{ element f 3 2 t }
-        T{ element f 4 10 f }
-        T{ element f 5 10 f }
-    } 35 35 wrap-elements [ { } like ] map
+        T{ segment f 1 10 f }
+        T{ segment f 2 10 f }
+        T{ segment f 3 2 t }
+        T{ segment f 4 10 f }
+        T{ segment f 5 10 f }
+    } 35 35 wrap-segments [ { } like ] map
 ] unit-test
 
 [
     {
         {
-            T{ element f 1 10 f }
-            T{ element f 2 10 f }
-            T{ element f 3 9 t }
-            T{ element f 3 9 t }
-            T{ element f 3 9 t }
+            T{ segment f 1 10 f }
+            T{ segment f 2 10 f }
+            T{ segment f 3 9 t }
+            T{ segment f 3 9 t }
+            T{ segment f 3 9 t }
         }
         {
-            T{ element f 4 10 f }
-            T{ element f 5 10 f }
+            T{ segment f 4 10 f }
+            T{ segment f 5 10 f }
         }
     }
 ] [
     {
-        T{ element f 1 10 f }
-        T{ element f 2 10 f }
-        T{ element f 3 9 t }
-        T{ element f 3 9 t }
-        T{ element f 3 9 t }
-        T{ element f 4 10 f }
-        T{ element f 5 10 f }
-    } 35 35 wrap-elements [ { } like ] map
+        T{ segment f 1 10 f }
+        T{ segment f 2 10 f }
+        T{ segment f 3 9 t }
+        T{ segment f 3 9 t }
+        T{ segment f 3 9 t }
+        T{ segment f 4 10 f }
+        T{ segment f 5 10 f }
+    } 35 35 wrap-segments [ { } like ] map
 ] unit-test
 
 [
     {
         {
-            T{ element f 1 10 t }
-            T{ element f 1 10 f }
-            T{ element f 3 9 t }
+            T{ segment f 1 10 t }
+            T{ segment f 1 10 f }
+            T{ segment f 3 9 t }
         }
         {
-            T{ element f 2 10 f }
-            T{ element f 3 9 t }
+            T{ segment f 2 10 f }
+            T{ segment f 3 9 t }
         }
         {
-            T{ element f 4 10 f }
-            T{ element f 5 10 f }
+            T{ segment f 4 10 f }
+            T{ segment f 5 10 f }
         }
     }
 ] [
     {
-        T{ element f 1 10 t }
-        T{ element f 1 10 f }
-        T{ element f 3 9 t }
-        T{ element f 2 10 f }
-        T{ element f 3 9 t }
-        T{ element f 4 10 f }
-        T{ element f 5 10 f }
-    } 35 35 wrap-elements [ { } like ] map
+        T{ segment f 1 10 t }
+        T{ segment f 1 10 f }
+        T{ segment f 3 9 t }
+        T{ segment f 2 10 f }
+        T{ segment f 3 9 t }
+        T{ segment f 4 10 f }
+        T{ segment f 5 10 f }
+    } 35 35 wrap-segments [ { } like ] map
 ] unit-test
 
 [
@@ -115,4 +115,4 @@ word wrap.">
 [ "aaa bb\nccccccc\nddddddd" ] [ "aaa bb ccccccc ddddddd" 6 wrap-string ] unit-test
 
 \ wrap-string must-infer
-\ wrap-elements must-infer
+\ wrap-segments must-infer

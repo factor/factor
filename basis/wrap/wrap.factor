@@ -1,39 +1,28 @@
-USING: kernel sequences math arrays locals fry accessors splitting
-make combinators.short-circuit namespaces grouping splitting.monotonic ;
+USING: kernel sequences math arrays locals fry accessors
+lists splitting call make combinators.short-circuit namespaces
+grouping splitting.monotonic ;
 IN: wrap
 
 <PRIVATE
 
 ! black is the text length, white is the whitespace length
-TUPLE: word contents black white ;
-C: <word> word
+TUPLE: element contents black white ;
+C: <element> element
 
-: word-length ( word -- n )
+: element-length ( element -- n )
     [ black>> ] [ white>> ] bi + ;
 
-TUPLE: cons cdr car ; ! This order works out better
-C: <cons> cons
+: swons ( cdr car -- cons )
+    swap cons ;
 
-: >cons< ( cons -- cdr car )
-    [ cdr>> ] [ car>> ] bi ;
+: unswons ( cons -- cdr car )
+    [ cdr ] [ car ] bi ;
 
-: list-each ( list quot -- )
-    over [
-        [ [ car>> ] dip call ]
-        [ [ cdr>> ] dip list-each ] 2bi
-    ] [ 2drop ] if ; inline recursive
-
-: singleton? ( list -- ? )
-    { [ ] [ cdr>> not ] } 1&& ;
-
-: <singleton> ( elt -- list )
-    f swap <cons> ;
-
-: list>array ( list -- array )
-    [ [ , ] list-each ] { } make ;
+: 1list? ( list -- ? )
+    { [ ] [ cdr +nil+ = ] } 1&& ;
 
 : lists>arrays ( lists -- arrays )
-    [ [ list>array , ] list-each ] { } make ;
+    [ list>seq ] lmap>array ;
 
 TUPLE: paragraph lines head-width tail-cost ;
 C: <paragraph> paragraph
@@ -46,11 +35,11 @@ SYMBOL: line-ideal
 
 : top-fits? ( paragraph -- ? )
     [ head-width>> ]
-    [ lines>> singleton? line-ideal line-max ? get ] bi <= ;
+    [ lines>> 1list? line-ideal line-max ? get ] bi <= ;
 
 : fits? ( paragraph -- ? )
     ! Make this not count spaces at end
-    { [ lines>> car>> singleton? ] [ top-fits? ] } 1|| ;
+    { [ lines>> car 1list? ] [ top-fits? ] } 1|| ;
 
 :: min-by ( seq quot -- elt )
     f 1.0/0.0 seq [| key value new |
@@ -65,26 +54,26 @@ SYMBOL: line-ideal
 : min-cost ( paragraphs -- paragraph )
     [ paragraph-cost ] min-by ;
 
-: new-line ( paragraph word -- paragraph )
-    [ [ lines>> ] [ <singleton> ] bi* <cons> ]
+: new-line ( paragraph element -- paragraph )
+    [ [ lines>> ] [ 1list ] bi* swons ]
     [ nip black>> ]
     [ drop paragraph-cost ] 2tri
     <paragraph> ;
 
-: glue ( paragraph word -- paragraph )
-    [ [ lines>> >cons< ] dip <cons> <cons> ]
-    [ [ head-width>> ] [ word-length ] bi* + ]
+: glue ( paragraph element -- paragraph )
+    [ [ lines>> unswons ] dip swons swons ]
+    [ [ head-width>> ] [ element-length ] bi* + ]
     [ drop tail-cost>> ] 2tri
     <paragraph> ;
 
-: wrap-step ( paragraphs word -- paragraphs )
+: wrap-step ( paragraphs element -- paragraphs )
     [ '[ _ glue ] map ]
     [ [ min-cost ] dip new-line ]
     2bi prefix
     [ fits? ] filter ;
 
-: 1paragraph ( word -- paragraph )
-    [ <singleton> <singleton> ]
+: 1paragraph ( element -- paragraph )
+    [ 1list 1list ]
     [ black>> ] bi
     0 <paragraph> ;
 
@@ -92,10 +81,10 @@ SYMBOL: line-ideal
     lines>> lists>arrays
     [ [ contents>> ] map ] map ;
 
-: initialize ( words -- words paragraph )
+: initialize ( elements -- elements paragraph )
     <reversed> unclip-slice 1paragraph 1array ;
 
-: wrap ( words line-max line-ideal -- paragraph )
+: wrap ( elements line-max line-ideal -- paragraph )
     [
         line-ideal set
         line-max set
@@ -107,50 +96,50 @@ SYMBOL: line-ideal
 
 PRIVATE>
 
-TUPLE: element key width break? ;
-C: <element> element
+TUPLE: segment key width break? ;
+C: <segment> segment
 
 <PRIVATE
 
-: elements-length ( elements -- length )
+: segments-length ( segments -- length )
     [ width>> ] map sum ;
 
-: make-word ( whites blacks -- word )
-    [ append ] [ [ elements-length ] bi@ ] 2bi <word> ;
+: make-element ( whites blacks -- element )
+    [ append ] [ [ segments-length ] bi@ ] 2bi <element> ;
  
 : ?first2 ( seq -- first/f second/f )
     [ 0 swap ?nth ]
     [ 1 swap ?nth ] bi ;
 
-: split-elements ( seq -- half-words )
+: split-segments ( seq -- half-elements )
     [ [ break?>> ] bi@ = ] monotonic-split ;
 
-: ?first-break ( seq -- newseq f/word )
+: ?first-break ( seq -- newseq f/element )
     dup first first break?>>
-    [ unclip-slice f swap make-word ]
+    [ unclip-slice f swap make-element ]
     [ f ] if ;
 
-: make-words ( seq f/word -- words )
-    [ 2 <groups> [ ?first2 make-word ] map ] dip
+: make-elements ( seq f/element -- elements )
+    [ 2 <groups> [ ?first2 make-element ] map ] dip
     [ prefix ] when* ;
 
-: elements>words ( seq -- newseq )
-    split-elements ?first-break make-words ;
+: segments>elements ( seq -- newseq )
+    split-segments ?first-break make-elements ;
 
 PRIVATE>
 
-: wrap-elements ( elements line-max line-ideal -- lines )
-    [ elements>words ] 2dip wrap [ concat ] map ;
+: wrap-segments ( segments line-max line-ideal -- lines )
+    [ segments>elements ] 2dip wrap [ concat ] map ;
 
 <PRIVATE
 
-: split-lines ( string -- words-lines )
+: split-lines ( string -- elements-lines )
     string-lines [
         " \t" split harvest
-        [ dup length 1 <word> ] map
+        [ dup length 1 <element> ] map
     ] map ;
 
-: join-words ( wrapped-lines -- lines )
+: join-elements ( wrapped-lines -- lines )
     [ " " join ] map ;
 
 : join-lines ( strings -- string )
@@ -159,7 +148,7 @@ PRIVATE>
 PRIVATE>
 
 : wrap-lines ( lines width -- newlines )
-    [ split-lines ] dip '[ _ dup wrap join-words ] map concat ;
+    [ split-lines ] dip '[ _ dup wrap join-elements ] map concat ;
 
 : wrap-string ( string width -- newstring )
     wrap-lines join-lines ;

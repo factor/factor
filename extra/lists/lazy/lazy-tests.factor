@@ -1,6 +1,5 @@
 ! Copyright (C) 2006 Matthew Willis and Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-!
 USING: lists lists.lazy tools.test kernel math io sequences ;
 IN: lists.lazy.tests
 
@@ -27,3 +26,10 @@ IN: lists.lazy.tests
 [ { 4 5 6 } ] [ 
     3 { 1 2 3 } >list [ + ] lazy-map-with list>array
 ] unit-test
+
+[ [ ] lmap ] must-infer
+[ [ ] lmap>array ] must-infer
+[ [ drop ] foldr ] must-infer
+[ [ drop ] foldl ] must-infer
+[ [ drop ] leach ] must-infer
+[ lnth ] must-infer
