@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors math arrays vectors classes words
-combinators.short-circuit combinators ;
+combinators.short-circuit combinators locals ;
 IN: lists
 
 ! List Protocol
@@ -25,7 +25,7 @@ M: +nil+ nil? drop t ;
 M: object nil? drop f ;
 
 : atom? ( obj -- ? )
-    { [ list? ] [ nil? ] } 1|| not ;
+    list? not ;
 
 : nil ( -- symbol ) +nil+ ; 
 
@@ -76,10 +76,10 @@ PRIVATE>
 : foldl ( list identity quot: ( obj1 obj2 -- obj ) -- result )
     swapd leach ; inline
 
-: foldr ( list identity quot: ( obj1 obj2 -- obj ) -- result )
-    pick nil? [ [ drop ] [ ] [ drop ] tri* ] [
-        [ [ cdr ] 2dip foldr ] [ nip [ car ] dip ] 3bi
-        call
+:: foldr ( list identity quot: ( obj1 obj2 -- obj ) -- result )
+    list nil? [ identity ] [
+        list cdr identity quot foldr
+        list car quot call
     ] if ; inline recursive
 
 : llength ( list -- n )
@@ -92,7 +92,7 @@ PRIVATE>
     [ lreverse ] dip [ swap cons ] foldl ;
 
 : lcut ( list index -- before after )
-    [ +nil+ ] dip
+    [ nil ] dip
     [ [ [ cdr ] [ car ] bi ] dip cons ] times
     lreverse swap ;
 
@@ -109,23 +109,27 @@ PRIVATE>
     [ tuck same? [ deep-sequence>cons ] when swons ] with reduce ;
 
 <PRIVATE
-: (lmap>array) ( acc cons quot: ( elt -- elt' ) -- newcons )
-    over nil? [ 2drop ]
-    [ [ unswons ] dip [ call ] keep swapd [ suffix ] 2dip (lmap>array) ] if ;
-    inline recursive
+:: (lmap>vector) ( acc list quot: ( elt -- elt' ) -- acc )
+    list nil? [ acc ] [
+        list car quot call acc push
+        acc list cdr quot (lmap>vector)
+    ] if ; inline recursive
+
+: lmap>vector ( list quot -- array )
+    [ V{ } clone ] 2dip (lmap>vector) ; inline
 PRIVATE>
 
-: lmap>array ( list quot -- array )
-    [ { } ] 2dip (lmap>array) ; inline
-
 : lmap-as ( list quot exemplar -- sequence )
-    [ lmap>array ] dip like ;
+    [ lmap>vector ] dip like ; inline
+
+: lmap>array ( list quot -- array )
+    { } lmap-as ; inline
 
 : deep-list>array ( list -- array )    
     [
         {
-            { [ dup list? ] [ deep-list>array ] }
             { [ dup nil? ] [ drop { } ] }
+            { [ dup list? ] [ deep-list>array ] }
             [ ]
         } cond
     ] lmap>array ;
@@ -133,10 +137,11 @@ PRIVATE>
 : list>array ( list -- array )    
     [ ] lmap>array ;
 
-: traverse ( list pred quot: ( list/elt -- result ) -- result )
-    [
-        2over call [ tuck [ call ] 2dip ] when
-        pick list? [ traverse ] [ 2drop ] if
-    ] 2curry lmap ; inline recursive
+:: traverse ( list pred quot: ( list/elt -- result ) -- result )
+    list [| elt |
+        elt dup pred call [ quot call ] when
+        dup list? [ pred quot traverse ] when
+    ] lmap ; inline recursive
 
 INSTANCE: cons list
+INSTANCE: +nil+ list
