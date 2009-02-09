@@ -97,7 +97,6 @@ ARTICLE: "gadgets" "Pre-made UI gadgets"
 { $subsection "ui.gadgets.menus" }
 { $subsection "ui.gadgets.panes" }
 { $subsection "ui.gadgets.presentations" }
-{ $subsection "ui.gadgets.lists" }
 { $subsection "ui.gadgets.tables" } ;
 
 ARTICLE: "ui-geometry" "Gadget geometry"

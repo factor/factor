@@ -1,10 +1,10 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel math math.order models
 namespaces make sequences words strings system hashtables
 math.parser math.vectors classes.tuple classes boxes calendar
 alarms combinators sets columns fry deques ui.gadgets
-ui.gadgets.private unicode.case combinators.short-circuit ;
+ui.gadgets.private unicode.case combinators.short-circuit call ;
 IN: ui.gestures
 
 GENERIC: handle-gesture ( gesture gadget -- ? )
@@ -12,7 +12,7 @@ GENERIC: handle-gesture ( gesture gadget -- ? )
 M: object handle-gesture
     [ nip ]
     [ class superclasses [ "gestures" word-prop ] map assoc-stack ] 2bi
-    dup [ call f ] [ 2drop t ] if ;
+    dup [ call( gadget -- ) f ] [ 2drop t ] if ;
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
 

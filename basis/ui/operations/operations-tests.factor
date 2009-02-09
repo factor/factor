@@ -26,3 +26,5 @@ io.streams.string math help help.markup accessors ;
 [ ] [
     [ { $operations \ + } print-element ] with-string-writer drop
 ] unit-test
+
+\ object-operations must-infer
