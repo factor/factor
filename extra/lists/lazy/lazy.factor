@@ -1,12 +1,7 @@
-! Copyright (C) 2004 Chris Double.
+! Copyright (C) 2004, 2008 Chris Double, Matthew Willis, James Cash.
 ! See http://factorcode.org/license.txt for BSD license.
-!
-! Updated by Matthew Willis, July 2006
-! Updated by Chris Double, September 2006
-! Updated by James Cash, June 2008
-!
 USING: kernel sequences math vectors arrays namespaces make
-quotations promises combinators io lists accessors ;
+quotations promises combinators io lists accessors call ;
 IN: lists.lazy
 
 M: promise car ( promise -- car )
@@ -86,7 +81,7 @@ C: <lazy-map> lazy-map
 
 M: lazy-map car ( lazy-map -- car )
     [ cons>> car ] keep
-    quot>> call ;
+    quot>> call( old -- new ) ;
 
 M: lazy-map cdr ( lazy-map -- cdr )
     [ cons>> cdr ] keep
@@ -130,7 +125,7 @@ M: lazy-until car ( lazy-until -- car )
      cons>> car ;
 
 M: lazy-until cdr ( lazy-until -- cdr )
-     [ cons>> uncons ] keep quot>> tuck call
+     [ cons>> uncons ] keep quot>> tuck call( elt -- ? )
      [ 2drop nil ] [ luntil ] if ;
 
 M: lazy-until nil? ( lazy-until -- bool )
@@ -150,7 +145,7 @@ M: lazy-while cdr ( lazy-while -- cdr )
      [ cons>> cdr ] keep quot>> lwhile ;
 
 M: lazy-while nil? ( lazy-while -- bool )
-     [ car ] keep quot>> call not ;
+     [ car ] keep quot>> call( elt -- ? ) not ;
 
 TUPLE: lazy-filter cons quot ;
 
@@ -160,7 +155,7 @@ C: <lazy-filter> lazy-filter
     over nil? [ 2drop nil ] [ <lazy-filter> <memoized-cons> ] if ;
 
 : car-filter? ( lazy-filter -- ? )
-    [ cons>> car ] [ quot>> ] bi call ;
+    [ cons>> car ] [ quot>> ] bi call( elt -- ? ) ;
 
 : skip ( lazy-filter -- )
     dup cons>> cdr >>cons drop ;
@@ -221,7 +216,7 @@ M: lazy-from-by car ( lazy-from-by -- car )
 
 M: lazy-from-by cdr ( lazy-from-by -- cdr )
     [ n>> ] keep
-    quot>> dup slip lfrom-by ;
+    quot>> [ call( old -- new ) ] keep lfrom-by ;
 
 M: lazy-from-by nil? ( lazy-from-by -- bool )
     drop f ;
@@ -355,7 +350,8 @@ M: lazy-io car ( lazy-io -- car )
     dup car>> dup [
         nip
     ] [
-        drop dup stream>> over quot>> call
+        drop dup stream>> over quot>>
+        call( stream -- value )
         >>car
     ] if ;
 
