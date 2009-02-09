@@ -1,70 +1,154 @@
-! Copyright (C) 2008, 2009 Daniel Ehrenberg, Slava Pestov
-! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel namespaces make splitting
-math math.order fry assocs accessors ;
+USING: kernel sequences math arrays locals fry accessors
+lists splitting call make combinators.short-circuit namespaces
+grouping splitting.monotonic ;
 IN: wrap
-
-! Word wrapping/line breaking -- not Unicode-aware
-
-TUPLE: word key width break? ;
-
-C: <word> word
 
 <PRIVATE
 
-SYMBOL: width
+! black is the text length, white is the whitespace length
+TUPLE: element contents black white ;
+C: <element> element
 
-: break-here? ( column word -- ? )
-    break?>> not [ width get > ] [ drop f ] if ;
+: element-length ( element -- n )
+    [ black>> ] [ white>> ] bi + ;
 
-: walk ( n words -- n )
-    ! If on a break, take the rest of the breaks
-    ! If not on a break, go back until you hit a break
-    2dup bounds-check? [
-        2dup nth break?>>
-        [ [ break?>> not ] find-from drop ]
-        [ [ break?>> ] find-last-from drop 1+ ] if
-   ] [ drop ] if ;
+: swons ( cdr car -- cons )
+    swap cons ;
 
-: find-optimal-break ( words -- n )
-    [ 0 ] keep
-    [ [ width>> + dup ] keep break-here? ] find drop nip
-    [ 1 max swap walk ] [ drop f ] if* ;
+: unswons ( cons -- cdr car )
+    [ cdr ] [ car ] bi ;
 
-: (wrap) ( words -- )
+: 1list? ( list -- ? )
+    { [ ] [ cdr +nil+ = ] } 1&& ;
+
+: lists>arrays ( lists -- arrays )
+    [ list>seq ] lmap>array ;
+
+TUPLE: paragraph lines head-width tail-cost ;
+C: <paragraph> paragraph
+
+SYMBOL: line-max
+SYMBOL: line-ideal
+
+: deviation ( length -- n )
+    line-ideal get - sq ;
+
+: top-fits? ( paragraph -- ? )
+    [ head-width>> ]
+    [ lines>> 1list? line-ideal line-max ? get ] bi <= ;
+
+: fits? ( paragraph -- ? )
+    ! Make this not count spaces at end
+    { [ lines>> car 1list? ] [ top-fits? ] } 1|| ;
+
+:: min-by ( seq quot -- elt )
+    f 1.0/0.0 seq [| key value new |
+        new quot call :> newvalue
+        newvalue value < [ new newvalue ] [ key value ] if
+    ] each drop ; inline
+
+: paragraph-cost ( paragraph -- cost )
+    [ head-width>> deviation ]
+    [ tail-cost>> ] bi + ;
+
+: min-cost ( paragraphs -- paragraph )
+    [ paragraph-cost ] min-by ;
+
+: new-line ( paragraph element -- paragraph )
+    [ [ lines>> ] [ 1list ] bi* swons ]
+    [ nip black>> ]
+    [ drop paragraph-cost ] 2tri
+    <paragraph> ;
+
+: glue ( paragraph element -- paragraph )
+    [ [ lines>> unswons ] dip swons swons ]
+    [ [ head-width>> ] [ element-length ] bi* + ]
+    [ drop tail-cost>> ] 2tri
+    <paragraph> ;
+
+: wrap-step ( paragraphs element -- paragraphs )
+    [ '[ _ glue ] map ]
+    [ [ min-cost ] dip new-line ]
+    2bi prefix
+    [ fits? ] filter ;
+
+: 1paragraph ( element -- paragraph )
+    [ 1list 1list ]
+    [ black>> ] bi
+    0 <paragraph> ;
+
+: post-process ( paragraph -- array )
+    lines>> lists>arrays
+    [ [ contents>> ] map ] map ;
+
+: initialize ( elements -- elements paragraph )
+    <reversed> unclip-slice 1paragraph 1array ;
+
+: wrap ( elements line-max line-ideal -- paragraph )
     [
-        dup find-optimal-break
-        [ cut-slice [ , ] [ (wrap) ] bi* ] [ , ] if*
-    ] unless-empty ;
+        line-ideal set
+        line-max set
+        initialize
+        [ wrap-step ] reduce
+        min-cost
+        post-process
+    ] with-scope ;
 
-: intersperse ( seq elt -- seq' )
-    [ '[ _ , ] [ , ] interleave ] { } make ;
+PRIVATE>
 
-: split-lines ( string -- words-lines )
+TUPLE: segment key width break? ;
+C: <segment> segment
+
+<PRIVATE
+
+: segments-length ( segments -- length )
+    [ width>> ] map sum ;
+
+: make-element ( whites blacks -- element )
+    [ append ] [ [ segments-length ] bi@ ] 2bi <element> ;
+ 
+: ?first2 ( seq -- first/f second/f )
+    [ 0 swap ?nth ]
+    [ 1 swap ?nth ] bi ;
+
+: split-segments ( seq -- half-elements )
+    [ [ break?>> ] bi@ = ] monotonic-split ;
+
+: ?first-break ( seq -- newseq f/element )
+    dup first first break?>>
+    [ unclip-slice f swap make-element ]
+    [ f ] if ;
+
+: make-elements ( seq f/element -- elements )
+    [ 2 <groups> [ ?first2 make-element ] map ] dip
+    [ prefix ] when* ;
+
+: segments>elements ( seq -- newseq )
+    split-segments ?first-break make-elements ;
+
+PRIVATE>
+
+: wrap-segments ( segments line-max line-ideal -- lines )
+    [ segments>elements ] 2dip wrap [ concat ] map ;
+
+<PRIVATE
+
+: split-lines ( string -- elements-lines )
     string-lines [
         " \t" split harvest
-        [ dup length f <word> ] map
-        " " 1 t <word> intersperse
+        [ dup length 1 <element> ] map
     ] map ;
 
-: join-words ( wrapped-lines -- lines )
-    [
-        [ break?>> ] trim-slice
-        [ key>> ] map concat
-    ] map ;
+: join-elements ( wrapped-lines -- lines )
+    [ " " join ] map ;
 
 : join-lines ( strings -- string )
     "\n" join ;
 
 PRIVATE>
 
-: wrap ( words width -- lines )
-    width [
-        [ (wrap) ] { } make
-    ] with-variable ;
-
 : wrap-lines ( lines width -- newlines )
-    [ split-lines ] dip '[ _ wrap join-words ] map concat ;
+    [ split-lines ] dip '[ _ dup wrap join-elements ] map concat ;
 
 : wrap-string ( string width -- newstring )
     wrap-lines join-lines ;

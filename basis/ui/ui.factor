@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces make dlists
-deques sequences threads sequences words continuations init
+deques sequences threads sequences words continuations init call
 combinators hashtables concurrency.flags sets accessors calendar fry
 ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gadgets.tracks
 ui.gestures ui.backend ui.render ui.text ui.text.private ;
@@ -122,7 +122,7 @@ M: world ungraft*
             layout-queued
             redraw-worlds
             send-queued-gestures
-        ] assert-depth
+        ] call( -- )
     ] [ ui-error ] recover ;
 
 SYMBOL: ui-thread
