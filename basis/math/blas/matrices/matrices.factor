@@ -1,11 +1,13 @@
 USING: accessors alien alien.c-types arrays byte-arrays combinators
 combinators.short-circuit fry kernel locals macros
-math math.blas.cblas math.blas.vectors math.blas.vectors.private
+math math.blas.ffi math.blas.vectors math.blas.vectors.private
 math.complex math.functions math.order functors words
 sequences sequences.merged sequences.private shuffle
 specialized-arrays.direct.float specialized-arrays.direct.double
 specialized-arrays.float specialized-arrays.double
-parser prettyprint.backend prettyprint.custom ;
+specialized-arrays.direct.complex-float specialized-arrays.direct.complex-double
+specialized-arrays.complex-float specialized-arrays.complex-double
+parser prettyprint.backend prettyprint.custom ascii ;
 IN: math.blas.matrices
 
 TUPLE: blas-matrix-base underlying ld rows cols transpose ;
@@ -25,7 +27,7 @@ GENERIC: n*M.M+n*M! ( alpha A B beta C -- C=alpha*A.B+beta*C )
 <PRIVATE
 
 : (blas-transpose) ( matrix -- integer )
-    transpose>> [ CblasTrans ] [ CblasNoTrans ] if ;
+    transpose>> [ "T" ] [ "N" ] if ;
 
 GENERIC: (blas-matrix-like) ( data ld rows cols transpose exemplar -- matrix )
 
@@ -38,19 +40,18 @@ GENERIC: (blas-matrix-like) ( data ld rows cols transpose exemplar -- matrix )
     unless ;
 
 :: (prepare-gemv)
-    ( alpha A x beta y >c-arg -- order A-trans m n alpha A-data A-ld x-data x-inc beta y-data y-inc
-                                 y )
+    ( alpha A x beta y -- A-trans m n alpha A-data A-ld x-data x-inc beta y-data y-inc
+                          y )
     A x y (validate-gemv)
-    CblasColMajor
     A (blas-transpose)
     A rows>>
     A cols>>
-    alpha >c-arg call
+    alpha
     A underlying>>
     A ld>>
     x underlying>>
     x inc>>
-    beta >c-arg call
+    beta
     y underlying>>
     y inc>>
     y ; inline
@@ -64,13 +65,12 @@ GENERIC: (blas-matrix-like) ( data ld rows cols transpose exemplar -- matrix )
     unless ;
 
 :: (prepare-ger)
-    ( alpha x y A >c-arg -- order m n alpha x-data x-inc y-data y-inc A-data A-ld
-                            A )
+    ( alpha x y A -- m n alpha x-data x-inc y-data y-inc A-data A-ld
+                     A )
     x y A (validate-ger)
-    CblasColMajor
     A rows>>
     A cols>>
-    alpha >c-arg call
+    alpha
     x underlying>>
     x inc>>
     y underlying>>
@@ -89,21 +89,20 @@ GENERIC: (blas-matrix-like) ( data ld rows cols transpose exemplar -- matrix )
     unless ;
 
 :: (prepare-gemm)
-    ( alpha A B beta C >c-arg -- order A-trans B-trans m n k alpha A-data A-ld B-data B-ld beta C-data C-ld
-                                 C )
+    ( alpha A B beta C -- A-trans B-trans m n k alpha A-data A-ld B-data B-ld beta C-data C-ld
+                          C )
     A B C (validate-gemm)
-    CblasColMajor
     A (blas-transpose)
     B (blas-transpose)
     C rows>>
     C cols>>
     A Mwidth
-    alpha >c-arg call
+    alpha
     A underlying>>
     A ld>>
     B underlying>>
     B ld>>
-    beta >c-arg call
+    beta
     C underlying>>
     C ld>>
     C f >>transpose ; inline
@@ -250,16 +249,18 @@ FUNCTOR: (define-blas-matrix) ( TYPE T U C -- )
 VECTOR      IS ${TYPE}-blas-vector
 <VECTOR>    IS <${TYPE}-blas-vector>
 >ARRAY      IS >${TYPE}-array
-TYPE>ARG    IS ${TYPE}>arg
-XGEMV       IS cblas_${T}gemv
-XGEMM       IS cblas_${T}gemm
-XGERU       IS cblas_${T}ger${U}
-XGERC       IS cblas_${T}ger${C}
+XGEMV       IS ${T}GEMV
+XGEMM       IS ${T}GEMM
+XGERU       IS ${T}GER${U}
+XGERC       IS ${T}GER${C}
 
 MATRIX      DEFINES-CLASS ${TYPE}-blas-matrix
 <MATRIX>    DEFINES <${TYPE}-blas-matrix>
 >MATRIX     DEFINES >${TYPE}-blas-matrix
-XMATRIX{    DEFINES ${T}matrix{
+
+t           [ T >lower ]
+
+XMATRIX{    DEFINES ${t}matrix{
 
 WHERE
 
@@ -277,21 +278,16 @@ M: MATRIX (blas-vector-like)
     drop <VECTOR> ;
 
 : >MATRIX ( arrays -- matrix )
-    [ >ARRAY underlying>> ] (>matrix)
-    <MATRIX> ;
+    [ >ARRAY underlying>> ] (>matrix) <MATRIX> ;
 
 M: VECTOR n*M.V+n*V!
-    [ TYPE>ARG ] (prepare-gemv)
-    [ XGEMV ] dip ;
+    (prepare-gemv) [ XGEMV ] dip ;
 M: MATRIX n*M.M+n*M!
-    [ TYPE>ARG ] (prepare-gemm)
-    [ XGEMM ] dip ;
+    (prepare-gemm) [ XGEMM ] dip ;
 M: MATRIX n*V(*)V+M!
-    [ TYPE>ARG ] (prepare-ger)
-    [ XGERU ] dip ;
+    (prepare-ger) [ XGERU ] dip ;
 M: MATRIX n*V(*)Vconj+M!
-    [ TYPE>ARG ] (prepare-ger)
-    [ XGERC ] dip ;
+    (prepare-ger) [ XGERC ] dip ;
 
 : XMATRIX{ \ } [ >MATRIX ] parse-literal ; parsing
 
@@ -304,12 +300,12 @@ M: MATRIX pprint-delims
 : define-real-blas-matrix ( TYPE T -- )
     "" "" (define-blas-matrix) ;
 : define-complex-blas-matrix ( TYPE T -- )
-    "u" "c" (define-blas-matrix) ;
+    "U" "C" (define-blas-matrix) ;
 
-"float"          "s" define-real-blas-matrix
-"double"         "d" define-real-blas-matrix
-"float-complex"  "c" define-complex-blas-matrix
-"double-complex" "z" define-complex-blas-matrix
+"float"          "S" define-real-blas-matrix
+"double"         "D" define-real-blas-matrix
+"complex-float"  "C" define-complex-blas-matrix
+"complex-double" "Z" define-complex-blas-matrix
 
 >>
 

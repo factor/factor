@@ -14,34 +14,34 @@ ARTICLE: "math.blas-types" "BLAS interface types"
 "BLAS vectors come in single- and double-precision, real and complex flavors:"
 { $subsection float-blas-vector }
 { $subsection double-blas-vector }
-{ $subsection float-complex-blas-vector }
-{ $subsection double-complex-blas-vector }
+{ $subsection complex-float-blas-vector }
+{ $subsection complex-double-blas-vector }
 "These vector types all follow the " { $link sequence } " protocol. In addition, there are corresponding types for matrix data:"
 { $subsection float-blas-matrix }
 { $subsection double-blas-matrix }
-{ $subsection float-complex-blas-matrix }
-{ $subsection double-complex-blas-matrix } 
+{ $subsection complex-float-blas-matrix }
+{ $subsection complex-double-blas-matrix } 
 "There are BOA constructors for all vector and matrix types, which provide the most flexibility in specifying memory layout:"
 { $subsection <float-blas-vector> }
 { $subsection <double-blas-vector> }
-{ $subsection <float-complex-blas-vector> }
-{ $subsection <double-complex-blas-vector> }
+{ $subsection <complex-float-blas-vector> }
+{ $subsection <complex-double-blas-vector> }
 { $subsection <float-blas-matrix> }
 { $subsection <double-blas-matrix> }
-{ $subsection <float-complex-blas-matrix> }
-{ $subsection <double-complex-blas-matrix> }
+{ $subsection <complex-float-blas-matrix> }
+{ $subsection <complex-double-blas-matrix> }
 "For the simple case of creating a dense, zero-filled vector or matrix, simple empty object constructors are provided:"
 { $subsection <empty-vector> }
 { $subsection <empty-matrix> }
 "BLAS vectors and matrices can also be constructed from other Factor sequences:"
 { $subsection >float-blas-vector }
 { $subsection >double-blas-vector }
-{ $subsection >float-complex-blas-vector }
-{ $subsection >double-complex-blas-vector }
+{ $subsection >complex-float-blas-vector }
+{ $subsection >complex-double-blas-vector }
 { $subsection >float-blas-matrix }
 { $subsection >double-blas-matrix }
-{ $subsection >float-complex-blas-matrix }
-{ $subsection >double-complex-blas-matrix } ;
+{ $subsection >complex-float-blas-matrix }
+{ $subsection >complex-double-blas-matrix } ;
 
 ARTICLE: "math.blas.matrices" "BLAS interface matrix operations"
 "Transposing and slicing matrices:"
@@ -87,8 +87,8 @@ HELP: blas-matrix-base
 { $list
     { { $link float-blas-matrix } }
     { { $link double-blas-matrix } }
-    { { $link float-complex-blas-matrix } }
-    { { $link double-complex-blas-matrix } }
+    { { $link complex-float-blas-matrix } }
+    { { $link complex-double-blas-matrix } }
 }
 "All of these subclasses share the same tuple layout:"
 { $list
@@ -104,14 +104,14 @@ HELP: float-blas-matrix
 { $class-description "A matrix of single-precision floating-point values. For details on the tuple layout, see " { $link blas-matrix-base } "." } ;
 HELP: double-blas-matrix
 { $class-description "A matrix of double-precision floating-point values. For details on the tuple layout, see " { $link blas-matrix-base } "." } ;
-HELP: float-complex-blas-matrix
+HELP: complex-float-blas-matrix
 { $class-description "A matrix of single-precision floating-point complex values. Complex values are stored in memory as two consecutive float values, real part then imaginary part. For details on the tuple layout, see " { $link blas-matrix-base } "." } ;
-HELP: double-complex-blas-matrix
+HELP: complex-double-blas-matrix
 { $class-description "A matrix of double-precision floating-point complex values. Complex values are stored in memory as two consecutive float values, real part then imaginary part. For details on the tuple layout, see " { $link blas-matrix-base } "." } ;
 
 {
-    float-blas-matrix double-blas-matrix float-complex-blas-matrix double-complex-blas-matrix
-    float-blas-vector double-blas-vector float-complex-blas-vector double-complex-blas-vector
+    float-blas-matrix double-blas-matrix complex-float-blas-matrix complex-double-blas-matrix
+    float-blas-vector double-blas-vector complex-float-blas-vector complex-double-blas-vector
 } related-words
 
 HELP: Mwidth
@@ -272,7 +272,7 @@ HELP: cmatrix{
     { 0.0 0.0          -1.0 3.0           }
     { 0.0 0.0           0.0 C{ 0.0 -1.0 } }
 } "> }
-{ $description "Construct a literal " { $link float-complex-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
+{ $description "Construct a literal " { $link complex-float-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
 
 HELP: zmatrix{
 { $syntax <" zmatrix{
@@ -281,7 +281,7 @@ HELP: zmatrix{
     { 0.0 0.0          -1.0 3.0           }
     { 0.0 0.0           0.0 C{ 0.0 -1.0 } }
 } "> }
-{ $description "Construct a literal " { $link double-complex-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
+{ $description "Construct a literal " { $link complex-double-blas-matrix } ". Note that although BLAS matrices are stored in column-major order, the literal is specified in row-major order." } ;
 
 {
     POSTPONE: smatrix{ POSTPONE: dmatrix{
