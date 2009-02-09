@@ -8,11 +8,11 @@ generic.standard.engines.tuple fonts ui.commands ui.operations
 ui.gadgets ui.gadgets.editors ui.gadgets.glass ui.gadgets.scrollers
 ui.gadgets.tables ui.gadgets.tracks ui.gadgets.labelled
 ui.gadgets.theme ui.gadgets.worlds ui.gadgets.wrappers ui.gestures
-ui.render ui.tools.listener.history combinators vocabs ;
+ui.render ui.tools.listener.history combinators vocabs
+ui.tools.listener.popups ;
 IN: ui.tools.listener.completion
 
 ! We don't directly depend on the listener tool but we use a few slots
-SLOT: completion-popup
 SLOT: interactor
 SLOT: history
 
@@ -88,7 +88,7 @@ M: vocab-completion row-color
         [ drop <word-completion> ]
     } cond ;
 
-TUPLE: completion-popup < track table interactor completion-mode ;
+TUPLE: completion-popup < track interactor table completion-mode ;
 
 : find-completion-popup ( gadget -- popup )
     [ completion-popup? ] find-parent ;
@@ -98,12 +98,6 @@ TUPLE: completion-popup < track table interactor completion-mode ;
     '[ @ keys 1000 short head ] <filter> ;
 
 M: completion-popup focusable-child* table>> ;
-
-M: completion-popup hide-glass-hook
-    interactor>> f >>completion-popup request-focus ;
-
-: hide-completion-popup ( popup -- )
-    find-world hide-glass ;
 
 : completion-loc/doc/elt ( popup -- loc doc elt )
     [ interactor>> [ editor-caret ] [ model>> ] bi ]
@@ -130,7 +124,7 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
     find-completion-popup
     [ insert-completion ]
     [ accept-completion-hook ]
-    [ nip hide-completion-popup ]
+    [ nip hide-popup ]
     2tri ;
 
 : <completion-table> ( interactor completion-mode -- table )
@@ -143,7 +137,8 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
 
 : <completion-scroller> ( completion-popup -- scroller )
     [ table>> ] [ interactor>> ] [ completion-mode>> ] tri completion-popup-width
-    [ <limited-scroller> ] [ 120 2array ] bi* [ >>min-dim ] [ >>max-dim ] bi ;
+    [ <limited-scroller> ] [ 120 2array ] bi*
+    [ >>min-dim ] [ >>max-dim ] bi ;
 
 : <completion-popup> ( interactor completion-mode -- popup )
     [ vertical completion-popup new-track ] 2dip
@@ -153,44 +148,13 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
     COLOR: white <solid> >>interior ;
 
 completion-popup H{
-    { T{ key-down f f "ESC" } [ hide-completion-popup ] }
     { T{ key-down f f "TAB" } [ table>> row-action ] }
     { T{ key-down f f " " } [ table>> row-action ] }
 } set-gestures
 
-CONSTANT: completion-popup-offset { -4 0 }
-
-: (completion-popup-loc) ( interactor completion-mode -- loc )
-    [ drop screen-loc ] [
-        [
-            [ [ editor-caret ] [ model>> ] bi ] dip
-            completion-element prev-elt
-        ] [ drop ] 2bi
-        loc>point
-    ] 2bi v+ completion-popup-offset v+ ;
-
-: completion-popup-loc-1 ( interactor completion-mode -- loc )
-    [ (completion-popup-loc) ] [ drop caret-dim ] 2bi v+ ;
-
-: completion-popup-loc-2 ( interactor completion-mode popup -- loc )
-    [ (completion-popup-loc) ] dip pref-dim { 0 1 } v* v- ;
-
-: completion-popup-fits? ( interactor completion-mode popup -- ? )
-    [ [ completion-popup-loc-1 ] dip pref-dim v+ ]
-    [ 2drop find-world dim>> ]
-    3bi [ second ] bi@ <= ;
-
-: completion-popup-loc ( interactor completion-mode popup -- loc )
-    3dup completion-popup-fits?
-    [ drop completion-popup-loc-1 ]
-    [ completion-popup-loc-2 ]
-    if ;
-
-: show-completion-popup ( interactor completion-mode -- )
-    2dup <completion-popup>
-    [ nip >>completion-popup drop ]
-    [ [ 2drop find-world ] [ 2nip ] [ completion-popup-loc ] 3tri ] 3bi
-    show-glass ;
+: show-completion-popup ( interactor mode -- )
+    [ completion-element ] [ <completion-popup> ] 2bi
+    show-popup ;
 
 : code-completion-popup ( interactor -- )
     dup completion-mode show-completion-popup ;
@@ -203,12 +167,6 @@ CONSTANT: completion-popup-offset { -4 0 }
 
 : recall-next ( interactor -- )
     history>> history-recall-next ;
-
-: selected-word ( editor -- word )
-    dup completion-popup>>
-    [ [ table>> selected-row drop ] [ hide-completion-popup ] bi ]
-    [ selected-token dup search [ ] [ no-word ] ?if ]
-    ?if ;
 
 : completion-gesture ( gesture completion -- value/f operation/f )
     table>> selected-row

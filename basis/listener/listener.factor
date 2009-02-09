@@ -54,7 +54,10 @@ SYMBOL: visible-vars
 
 SYMBOL: error-hook
 
-[ print-error-and-restarts ] error-hook set-global
+: call-error-hook ( error -- )
+    error-continuation get error-hook get call ;
+
+[ drop print-error-and-restarts ] error-hook set-global
 
 SYMBOL: display-stacks?
 
@@ -103,14 +106,8 @@ SYMBOL: max-stack-items
 
 : listen ( -- )
     visible-vars. stacks. prompt.
-    [ read-quot [ [ error-hook get call ] recover ] [ bye ] if* ]
-    [
-        dup lexer-error? [
-            error-hook get call
-        ] [
-            rethrow
-        ] if
-    ] recover ;
+    [ read-quot [ [ call-error-hook ] recover ] [ bye ] if* ]
+    [ dup lexer-error? [ call-error-hook ] [ rethrow ] if ] recover ;
 
 : until-quit ( -- )
     quit-flag get [ quit-flag off ] [ listen until-quit ] if ;
