@@ -3,7 +3,7 @@
 USING: accessors arrays hashtables io kernel math math.functions
 namespaces make opengl sequences strings splitting ui.gadgets
 ui.gadgets.tracks ui.gadgets.packs fonts ui.render ui.text
-colors colors.constants models ;
+colors colors.constants models combinators ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.
@@ -14,8 +14,25 @@ SLOT: string
 M: label string>> ( label -- string )
     text>> dup string? [ "\n" join ] unless ; inline
 
+<PRIVATE
+
+PREDICATE: string-array < array [ string? ] all? ;
+
+PRIVATE>
+
+: ?string-lines ( string -- string/array )
+    CHAR: \n over memq? [ string-lines ] when ;
+
+ERROR: not-a-string object ;
+
 M: label (>>string) ( string label -- )
-    [ CHAR: \n over memq? [ string-lines ] when ] dip (>>text) ; inline
+    [
+        {
+            { [ dup string-array? ] [ ] }
+            { [ dup string? ] [ ?string-lines ] }
+            [ not-a-string ]
+        } cond
+    ] dip (>>text) ; inline
 
 : label-theme ( gadget -- gadget )
     sans-serif-font >>font ; inline

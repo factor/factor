@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien alien.c-types alien.syntax kernel
-destructors accessors fry words hashtables
+destructors accessors fry words hashtables strings
 sequences memoize assocs math math.functions locals init
 namespaces combinators fonts colors core-foundation
 core-foundation.strings core-foundation.attributed-strings
@@ -32,9 +32,14 @@ FUNCTION: double CTLineGetTypographicBounds ( CTLineRef line, CGFloat* ascent, C
 
 FUNCTION: CGRect CTLineGetImageBounds ( CTLineRef line, CGContextRef context ) ;
 
+ERROR: not-a-string object ;
+
 : <CTLine> ( string open-font color -- line )
     [
-        [ dup selection? [ string>> ] when ] 2dip
+        [
+            dup selection? [ string>> ] when
+            dup string? [ not-a-string ] unless
+        ] 2dip
         [
             kCTForegroundColorAttributeName set
             kCTFontAttributeName set
