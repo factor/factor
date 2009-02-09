@@ -282,7 +282,8 @@
   (fuel-markup--insert-newline)
   (dolist (s (cdr e))
     (fuel-markup--snippet (list '$snippet s))
-    (newline)))
+    (newline))
+  (newline))
 
 (defun fuel-markup--markup-example (e)
   (fuel-markup--insert-newline)
