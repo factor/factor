@@ -144,8 +144,12 @@
   (add-hook 'comint-redirect-hook
             'fuel-con--comint-redirect-hook nil t))
 
-(defadvice comint-redirect-setup (after fuel-con--advice activate)
-  (setq comint-redirect-finished-regexp fuel-con--comint-finished-regex))
+(defadvice comint-redirect-setup
+  (after fuel-con--advice (output-buffer comint-buffer finished-regexp &optional echo))
+  (with-current-buffer comint-buffer
+    (when fuel-con--connection
+      (setq comint-redirect-finished-regexp fuel-con--comint-finished-regex))))
+(ad-activate 'comint-redirect-setup)
 
 (defun fuel-con--comint-preoutput-filter (str)
   (when (string-match fuel-con--comint-finished-regex str)
