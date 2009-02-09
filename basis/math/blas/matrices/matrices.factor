@@ -47,19 +47,19 @@ GENERIC: (blas-matrix-like) ( data ld rows cols transpose exemplar -- matrix )
     A rows>>
     A cols>>
     alpha
-    A underlying>>
+    A
     A ld>>
-    x underlying>>
+    x
     x inc>>
     beta
-    y underlying>>
+    y
     y inc>>
     y ; inline
 
 : (validate-ger) ( x y A -- )
     {
-        [ nip  [ length>> ] [ Mheight ] bi* = ]
-        [ nipd [ length>> ] [ Mwidth  ] bi* = ]
+        [ [ length>> ] [ drop     ] [ Mheight ] tri* = ]
+        [ [ drop     ] [ length>> ] [ Mwidth  ] tri* = ]
     } 3&&
     [ "Mismatched vertices and matrix in vector outer product" throw ]
     unless ;
@@ -71,19 +71,19 @@ GENERIC: (blas-matrix-like) ( data ld rows cols transpose exemplar -- matrix )
     A rows>>
     A cols>>
     alpha
-    x underlying>>
+    x
     x inc>>
-    y underlying>>
+    y
     y inc>>
-    A underlying>>
+    A
     A ld>>
     A f >>transpose ; inline
 
 : (validate-gemm) ( A B C -- )
     {
-        [ drop [ Mwidth  ] [ Mheight ] bi* = ]
-        [ nip  [ Mheight ] bi@ = ]
-        [ nipd [ Mwidth  ] bi@ = ]
+        [ [ Mwidth  ] [ Mheight ] [ drop    ] tri* = ]
+        [ [ Mheight ] [ drop    ] [ Mheight ] tri* = ]
+        [ [ drop    ] [ Mwidth  ] [ Mwidth  ] tri* = ]
     } 3&&
     [ "Mismatched matrices in matrix multiplication" throw ]
     unless ;
@@ -98,12 +98,12 @@ GENERIC: (blas-matrix-like) ( data ld rows cols transpose exemplar -- matrix )
     C cols>>
     A Mwidth
     alpha
-    A underlying>>
+    A
     A ld>>
-    B underlying>>
+    B
     B ld>>
     beta
-    C underlying>>
+    C
     C ld>>
     C f >>transpose ; inline
 
