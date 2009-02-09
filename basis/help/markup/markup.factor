@@ -4,7 +4,7 @@ USING: accessors arrays definitions generic io kernel assocs
 hashtables namespaces make parser prettyprint sequences strings
 io.styles vectors words math sorting splitting classes slots fry
 sets vocabs help.stylesheet help.topics vocabs.loader quotations
-combinators ;
+combinators call ;
 IN: help.markup
 
 PREDICATE: simple-element < array
@@ -27,8 +27,8 @@ GENERIC: print-element ( element -- )
 
 M: simple-element print-element [ print-element ] each ;
 M: string print-element [ write ] ($span) ;
-M: array print-element unclip execute ;
-M: word print-element { } swap execute ;
+M: array print-element unclip execute( arg -- ) ;
+M: word print-element { } swap execute( arg -- ) ;
 M: f print-element drop ;
 
 : print-element* ( element style -- )
