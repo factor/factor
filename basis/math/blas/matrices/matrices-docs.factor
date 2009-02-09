@@ -8,7 +8,7 @@ ARTICLE: "math.blas-summary" "Basic Linear Algebra Subroutines (BLAS) interface"
 { $subsection "math.blas.vectors" }
 "Vector-matrix and matrix-matrix operations are available in the " { $vocab-link "math.blas.matrices" } " vocabulary:"
 { $subsection "math.blas.matrices" }
-"The low-level BLAS C interface can be accessed directly through the " { $vocab-link "math.blas.cblas" } " vocabulary." ;
+"The low-level BLAS Fortran interface can be accessed directly through the " { $vocab-link "math.blas.ffi" } " vocabulary." ;
 
 ARTICLE: "math.blas-types" "BLAS interface types"
 "BLAS vectors come in single- and double-precision, real and complex flavors:"
