@@ -2,9 +2,15 @@
 ! Copyright (C) 2007, 2008 Slava Pestov
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien assocs continuations destructors kernel
-namespaces accessors sets summary ;
+USING: alien assocs continuations destructors
+kernel namespaces accessors sets summary ;
 IN: libc
+
+: errno ( -- int )
+    "int" "factor" "err_no" { } alien-invoke ;
+
+: clear-errno ( -- )
+    "void" "factor" "clear_err_no" { } alien-invoke ;
 
 <PRIVATE
 
@@ -75,14 +81,14 @@ PRIVATE>
     dup add-malloc ;
 
 : realloc ( alien size -- newalien )
+    [ >c-ptr ] dip
     over malloc-exists? [ realloc-error ] unless
     dupd (realloc) check-ptr
     swap delete-malloc
     dup add-malloc ;
 
 : free ( alien -- )
-    dup delete-malloc
-    (free) ;
+    >c-ptr [ delete-malloc ] [ (free) ] bi ;
 
 : memcpy ( dst src size -- )
     "void" "libc" "memcpy" { "void*" "void*" "ulong" } alien-invoke ;
