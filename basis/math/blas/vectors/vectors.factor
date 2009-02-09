@@ -33,7 +33,7 @@ GENERIC: (blas-direct-array) ( blas-vector -- direct-array )
 : shorter-length ( v1 v2 -- length )
     [ length>> ] bi@ min ; inline
 : data-and-inc ( v -- data inc )
-    [ underlying>> ] [ inc>> ] bi ; inline
+    [ ] [ inc>> ] bi ; inline
 : datas-and-incs ( v1 v2 -- v1-data v1-inc v2-data v2-inc )
     [ data-and-inc ] bi@ ; inline
 
