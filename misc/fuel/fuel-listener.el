@@ -32,7 +32,7 @@
 
 (defcustom fuel-listener-factor-binary
   (expand-file-name (cond ((eq system-type 'windows-nt)
-                           "factor.exe")
+                           "factor.com")
                           ((eq system-type 'darwin)
                            "Factor.app/Contents/MacOS/factor")
                           (t "factor"))
