@@ -5,7 +5,7 @@ byte-arrays combinators combinators.short-circuit fry generalizations
 kernel lexer macros math math.parser namespaces parser sequences
 splitting stack-checker vectors vocabs.parser words locals
 io.encodings.ascii io.encodings.string shuffle effects math.ranges
-math.order sorting ;
+math.order sorting system ;
 IN: alien.fortran
 
 ! XXX this currently only supports the gfortran/f2c abi.
