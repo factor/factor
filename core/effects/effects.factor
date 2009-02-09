@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.parser namespaces make sequences strings
 words assocs combinators accessors arrays ;
@@ -24,6 +24,7 @@ TUPLE: effect in out terminated? ;
 
 GENERIC: effect>string ( obj -- str )
 M: string effect>string ;
+M: object effect>string drop "object" ;
 M: word effect>string name>> ;
 M: integer effect>string number>string ;
 M: pair effect>string first2 [ effect>string ] bi@ ": " glue ;
@@ -45,8 +46,8 @@ M: effect effect>string ( effect -- string )
 GENERIC: stack-effect ( word -- effect/f )
 
 M: word stack-effect
-    { "declared-effect" "inferred-effect" }
-    swap props>> [ at ] curry map [ ] find nip ;
+    "inferred-effect" "declared-effect"
+    [ word-prop ] bi-curry@ bi or ;
 
 M: effect clone
     [ in>> clone ] [ out>> clone ] bi <effect> ;
@@ -57,11 +58,8 @@ M: effect clone
 : split-shuffle ( stack shuffle -- stack1 stack2 )
     in>> length cut* ;
 
-: load-shuffle ( stack shuffle -- )
-    in>> [ set ] 2each ;
-
-: shuffled-values ( shuffle -- values )
-    out>> [ get ] map ;
+: shuffle-mapping ( effect -- mapping )
+    [ out>> ] [ in>> ] bi [ index ] curry map ;
 
 : shuffle ( stack shuffle -- newstack )
-    [ [ load-shuffle ] keep shuffled-values ] with-scope ;
+    shuffle-mapping swap nths ;
