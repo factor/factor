@@ -1,7 +1,9 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: accessors alien alien.c-types alien.fortran alien.structs
-alien.syntax arrays assocs kernel macros namespaces sequences
-tools.test fry ;
+USING: accessors alien alien.c-types alien.complex
+alien.fortran alien.strings alien.structs alien.syntax arrays
+assocs byte-arrays combinators fry generalizations
+io.encodings.ascii kernel macros macros.expander namespaces
+sequences shuffle tools.test ;
 IN: alien.fortran.tests
 
 RECORD: FORTRAN_TEST_RECORD
@@ -169,17 +171,14 @@ unit-test
 [  4 ] [ "bar" "fortran_test_record" offset-of ] unit-test
 [ 12 ] [ "bas" "fortran_test_record" offset-of ] unit-test
 
-! fortran-invoke
-
-: fortran-invoke-expansion ( return library function parameters -- quot )
-    '[ _ _ _ _ fortran-invoke ] expand-macros ; inline
+! (fortran-invoke)
 
 [ [
     ! [fortran-args>c-args]
     {
         [ {
             [ ascii string>alien ]
-            [ <int> ]
+            [ <longlong> ]
             [ <float> ]
             [ <complex-float> ]
             [ 1 0 ? <short> ]
@@ -188,100 +187,109 @@ unit-test
     } 5 ncleave
     ! [fortran-invoke]
     [ 
-        "void" "foopack" "funtimes_"
-        { "char*" "int*" "float*" "complex-float*" "short*" "long" }
+        "void" "funpack" "funtimes_"
+        { "char*" "longlong*" "float*" "complex-float*" "short*" "long" }
         alien-invoke
     ] 6 nkeep
     ! [fortran-results>]
+    shuffle( aa ba ca da ea ab -- aa ab ba ca da ea ) 
     {
+        [ drop ]
         [ drop ]
         [ drop ]
         [ *float ]
         [ drop ]
         [ drop ]
-        [ drop ]
     } spread
 ] ] [
-    f "foopack" "FUNTIMES" { "CHARACTER*12" "INTEGER*8" "!REAL" "COMPLEX" "LOGICAL*2" }
-    fortran-invoke-expansion
+    f "funpack" "FUNTIMES" { "CHARACTER*12" "INTEGER*8" "!REAL" "COMPLEX" "LOGICAL*2" }
+    (fortran-invoke)
 ] unit-test
 
 [ [
+    ! [fortran-args>c-args]
+    {
+        [ { [ ] } spread ]
+        [ { [ drop ] } spread ]
+    } 1 ncleave
     ! [fortran-invoke]
-    "double" "foopack" "fun_times__"
-    { "float*" } 
-    alien-invoke
+    [ "double" "funpack" "fun_times__" { "float*" } alien-invoke ]
+    1 nkeep
+    ! [fortran-results>]
+    shuffle( reta aa -- reta aa ) 
+    { [ ] [ drop ] } spread
 ] ] [
-    "REAL" "foopack" "FUN_TIMES" { "REAL(*)" }
-    fortran-invoke-expansion
+    "REAL" "funpack" "FUN_TIMES" { "REAL(*)" }
+    (fortran-invoke)
 ] unit-test
 
 [ [
     ! [<fortran-result>]
     [ "complex-float" <c-object> ] 1 ndip
+    ! [fortran-args>c-args]
+    { [ { [ ] } spread ] [ { [ drop ] } spread ] } 1 ncleave
     ! [fortran-invoke]
     [
-        "void" "foopack" "fun_times__"
+        "void" "funpack" "fun_times__"
         { "complex-float*" "float*" } 
         alien-invoke
     ] 2 nkeep
     ! [fortran-results>]
-    {
-        [ *complex-float ]
-        [ drop ]
-    } spread
+    shuffle( reta aa -- reta aa )
+    { [ *complex-float ] [ drop ] } spread
 ] ] [
-    "COMPLEX" "foopack" "FUN_TIMES" { "REAL(*)" }
-    fortran-invoke-expansion
+    "COMPLEX" "funpack" "FUN_TIMES" { "REAL(*)" }
+    (fortran-invoke)
 ] unit-test
 
 [ [
     ! [<fortran-result>]
-    [ 20 <byte-array> 20 ] 1 ndip
+    [ 20 <byte-array> 20 ] 0 ndip
     ! [fortran-invoke]
     [
-        "void" "foopack" "fun_times__"
-        { "char*" "long" "float*" } 
+        "void" "funpack" "fun_times__"
+        { "char*" "long" } 
         alien-invoke
-    ] 3 nkeep
+    ] 2 nkeep
     ! [fortran-results>]
-    {
-        [ ]
-        [ ascii alien>nstring ]
-        [ drop ]
-    } spread
+    shuffle( reta retb -- reta retb ) 
+    { [ ] [ ascii alien>nstring ] } spread
 ] ] [
-    "CHARACTER*20" "foopack" "FUN_TIMES" { }
-    fortran-invoke-expansion
+    "CHARACTER*20" "funpack" "FUN_TIMES" { }
+    (fortran-invoke)
 ] unit-test
 
 [ [
     ! [<fortran-result>]
-    [ 10 <byte-array> 10 ] 2 ndip
+    [ 10 <byte-array> 10 ] 3 ndip
     ! [fortran-args>c-args]
     {
         [ {
             [ ascii string>alien ]
             [ <float> ]
+            [ ascii string>alien ]
         } spread ]
-        [ { [ length ] [ drop ] } spread ]
-    } 2 ncleave
+        [ { [ length ] [ drop ] [ length ] } spread ]
+    } 3 ncleave
     ! [fortran-invoke]
     [
-        "void" "foopack" "fun_times__"
-        { "char*" "long" "char*" "float*" "long" } 
+        "void" "funpack" "fun_times__"
+        { "char*" "long" "char*" "float*" "char*" "long" "long" } 
         alien-invoke
-    ] 5 nkeep
+    ] 7 nkeep
     ! [fortran-results>]
+    shuffle( reta retb aa ba ca ab cb -- reta retb aa ab ba ca cb ) 
     {
         [ ]
         [ ascii alien>nstring ]
         [ ]
-        [ *float swap ]
+        [ ascii alien>nstring ]
+        [ *float ]
+        [ ]
         [ ascii alien>nstring ]
     } spread
 ] ] [
-    "CHARACTER*10" "foopack" "FUN_TIMES" { "!CHARACTER*20" "!REAL" }
-    fortran-invoke-expansion
+    "CHARACTER*10" "funpack" "FUN_TIMES" { "!CHARACTER*20" "!REAL" "!CHARACTER*30" }
+    (fortran-invoke)
 ] unit-test
 

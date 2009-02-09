@@ -1,8 +1,11 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: accessors alien alien.c-types alien.structs alien.syntax
-arrays ascii assocs combinators fry kernel lexer macros math.parser
-namespaces parser sequences splitting vectors vocabs.parser locals
-io.encodings.ascii io.encodings.string ;
+USING: accessors alien alien.c-types alien.complex alien.parser
+alien.strings alien.structs alien.syntax arrays ascii assocs
+byte-arrays combinators combinators.short-circuit fry generalizations
+kernel lexer macros math math.parser namespaces parser sequences
+splitting stack-checker vectors vocabs.parser words locals
+io.encodings.ascii io.encodings.string shuffle effects math.ranges
+math.order sorting ;
 IN: alien.fortran
 
 ! XXX this currently only supports the gfortran/f2c abi.
@@ -18,6 +21,8 @@ IN: alien.fortran
 ERROR: invalid-fortran-type type ;
 
 DEFER: fortran-sig>c-sig
+DEFER: fortran-ret-type>c-type
+DEFER: fortran-arg-type>c-type
 
 <PRIVATE
 
@@ -90,7 +95,7 @@ M: real-complex-type (fortran-type>c-type)
 M: double-precision-type (fortran-type>c-type)
     "double" simple-type ;
 M: double-complex-type (fortran-type>c-type)
-    "(fortran-double-complex)" simple-type ;
+    "complex-double" simple-type ;
 M: misc-type (fortran-type>c-type)
     dup name>> simple-type ;
 
@@ -118,7 +123,7 @@ M: character-type (fortran-type>c-type)
 : (parse-fortran-type) ( fortran-type-string -- type )
     parse-out swap parse-dims swap parse-size swap
     dup >lower fortran>c-types at*
-    [ nip new-fortran-type ] [ drop f misc-type boa ] if ;
+    [ nip new-fortran-type ] [ drop misc-type boa ] if ;
 
 : parse-fortran-type ( fortran-type-string/f -- type/f )
     dup [ (parse-fortran-type) ] when ;
@@ -149,40 +154,49 @@ M: real-type (fortran-ret-type>c-type) drop "double" ;
 
 GENERIC: (fortran-arg>c-args) ( type -- main-quot added-quot )
 
+: args?dims ( type quot -- main-quot added-quot )
+    [ dup dims>> [ drop [ ] [ drop ] ] ] dip if ; inline
+
 M: integer-type (fortran-arg>c-args)
-    size>> {
-        { f [ [ <int>      ] [ drop ] ] }
-        { 1 [ [ <char>     ] [ drop ] ] }
-        { 2 [ [ <short>    ] [ drop ] ] }
-        { 4 [ [ <int>      ] [ drop ] ] }
-        { 8 [ [ <longlong> ] [ drop ] ] }
-        [ invalid-fortran-type ]
-    } case ;
+    [
+        size>> {
+            { f [ [ <int>      ] [ drop ] ] }
+            { 1 [ [ <char>     ] [ drop ] ] }
+            { 2 [ [ <short>    ] [ drop ] ] }
+            { 4 [ [ <int>      ] [ drop ] ] }
+            { 8 [ [ <longlong> ] [ drop ] ] }
+            [ invalid-fortran-type ]
+        } case
+    ] args?dims ;
 
 M: logical-type (fortran-arg>c-args)
-    call-next-method [ [ 1 0 ? ] prepend ] dip ;
+    [ call-next-method [ [ 1 0 ? ] prepend ] dip ] args?dims ;
 
 M: real-type (fortran-arg>c-args)
-    size>> {
-        { f [ [ <float>  ] [ drop ] ] }
-        { 4 [ [ <float>  ] [ drop ] ] }
-        { 8 [ [ <double> ] [ drop ] ] }
-        [ invalid-fortran-type ]
-    } case ;
+    [
+        size>> {
+            { f [ [ <float>  ] [ drop ] ] }
+            { 4 [ [ <float>  ] [ drop ] ] }
+            { 8 [ [ <double> ] [ drop ] ] }
+            [ invalid-fortran-type ]
+        } case
+    ] args?dims ;
 
 M: real-complex-type (fortran-arg>c-args)
-    size>> {
-        {  f [ [ <complex-float>  ] [ drop ] ] }
-        {  8 [ [ <complex-float>  ] [ drop ] ] }
-        { 16 [ [ <complex-double> ] [ drop ] ] }
-        [ invalid-fortran-type ]
-    } case ;
+    [
+        size>> {
+            {  f [ [ <complex-float>  ] [ drop ] ] }
+            {  8 [ [ <complex-float>  ] [ drop ] ] }
+            { 16 [ [ <complex-double> ] [ drop ] ] }
+            [ invalid-fortran-type ]
+        } case
+    ] args?dims ;
 
 M: double-precision-type (fortran-arg>c-args)
-    drop [ <double> ] [ drop ] ;
+    [ drop [ <double> ] [ drop ] ] args?dims ;
 
 M: double-complex-type (fortran-arg>c-args)
-    drop [ <complex-double> ] [ drop ] ;
+    [ drop [ <complex-double> ] [ drop ] ] args?dims ;
 
 M: character-type (fortran-arg>c-args)
     drop [ ascii string>alien ] [ length ] ;
@@ -190,72 +204,122 @@ M: character-type (fortran-arg>c-args)
 M: misc-type (fortran-arg>c-args)
     drop [ ] [ drop ] ;
 
-GENERIC: (fortran-result>) ( type -- quot )
+GENERIC: (fortran-result>) ( type -- quots )
+
+: result?dims ( type quot -- quot )
+    [ dup dims>> [ drop { [ ] } ] ] dip if ; inline
 
 M: integer-type (fortran-result>)
-    size>> {
-        { f [ [ *int      ] ] }
-        { 1 [ [ *char     ] ] }
-        { 2 [ [ *short    ] ] }
-        { 4 [ [ *int      ] ] }
-        { 8 [ [ *longlong ] ] }
+    [ size>> {
+        { f [ { [ *int      ] } ] }
+        { 1 [ { [ *char     ] } ] }
+        { 2 [ { [ *short    ] } ] }
+        { 4 [ { [ *int      ] } ] }
+        { 8 [ { [ *longlong ] } ] }
         [ invalid-fortran-type ]
-    } case ;
+    } case ] result?dims ;
 
 M: logical-type (fortran-result>)
-    call-next-method [ zero? not ] append ;
+    [ call-next-method first [ zero? not ] append 1array ] result?dims ;
 
 M: real-type (fortran-result>)
-    size>> {
-        { f [ [ *float  ] ] }
-        { 4 [ [ *float  ] ] }
-        { 8 [ [ *double ] ] }
+    [ size>> {
+        { f [ { [ *float  ] } ] }
+        { 4 [ { [ *float  ] } ] }
+        { 8 [ { [ *double ] } ] }
         [ invalid-fortran-type ]
-    } case ;
+    } case ] result?dims ;
 
 M: real-complex-type (fortran-result>)
-    size>> {
-        {  f [ [ *complex-float  ] ] }
-        {  8 [ [ *complex-float  ] ] }
-        { 16 [ [ *complex-double ] ] }
+    [ size>> {
+        {  f [ { [ *complex-float  ] } ] }
+        {  8 [ { [ *complex-float  ] } ] }
+        { 16 [ { [ *complex-double ] } ] }
         [ invalid-fortran-type ]
-    } case ;
+    } case ] result?dims ;
 
 M: double-precision-type (fortran-result>)
-    drop [ *double ] ;
+    [ drop { [ *double ] } ] result?dims ;
 
 M: double-complex-type (fortran-result>)
-    drop [ *complex-double ] ;
+    [ drop { [ *complex-double ] } ] result?dims ;
 
 M: character-type (fortran-result>)
-    drop [ ascii alien>nstring ] ;
+    drop { [ ] [ ascii alien>nstring ] } ;
 
 M: misc-type (fortran-result>)
-    drop [ ] ;
+    drop { [ ] } ;
 
 GENERIC: (<fortran-result>) ( type -- quot )
 
 M: fortran-type (<fortran-result>) 
-    (fortran-type>c-type) '[ _ <c-object> ] ;
+    (fortran-type>c-type) \ <c-object> [ ] 2sequence ;
+
+M: character-type (<fortran-result>)
+    fix-character-type dims>> product dup
+    [ \ <byte-array> ] dip [ ] 3sequence ;
 
 : [<fortran-result>] ( return parameters -- quot )
     [ parse-fortran-type ] dip
     over returns-by-value?
     [ 2drop [ ] ]
-    [ [ (<fortran-result>) ] [ '[ _ _ ndip ] ] bi* ] if ;
+    [ [ (<fortran-result>) ] [ length \ ndip [ ] 3sequence ] bi* ] if ;
 
 : [fortran-args>c-args] ( parameters -- quot )
-    [ parse-fortran-type (fortran-arg>c-args) 2array ] map flip first2
-    [ [ '[ _ spread ] ] bi@ 2array ] [ length ] bi 
-    '[ _ _ ncleave ] ;
+    [ [ ] ] [
+        [ parse-fortran-type (fortran-arg>c-args) 2array ] map flip first2
+        [ [ \ spread [ ] 2sequence ] bi@ 2array ] [ length ] bi 
+        \ ncleave [ ] 3sequence
+    ] if-empty ;
 
-:: [fortran-invoke] ( return library function parameters -- quot ) 
+:: [fortran-invoke] ( [args>args] return library function parameters -- [args>args] quot ) 
     return parameters fortran-sig>c-sig :> c-parameters :> c-return
     function fortran-name>symbol-name :> c-function
-    [ c-return library c-function c-parameters alien-invoke ] ;
+    [args>args] 
+    c-return library c-function c-parameters \ alien-invoke
+    5 [ ] nsequence
+    c-parameters length \ nkeep
+    [ ] 3sequence ;
+
+: [fortran-out-param>] ( parameter -- quot )
+    parse-fortran-type
+    [ (fortran-result>) ] [ out?>> ] bi
+    [ ] [ [ drop [ drop ] ] map ] if ;
+
+: [fortran-return>] ( return -- quot )
+    parse-fortran-type {
+        { [ dup not ] [ drop { } ] }
+        { [ dup returns-by-value? ] [ drop { [ ] } ] }
+        [ (fortran-result>) ]
+    } cond ;
+
+: letters ( -- seq ) CHAR: a CHAR: z [a,b] ;
+
+: (shuffle-map) ( return parameters -- ret par )
+    [
+        fortran-ret-type>c-type length swap "void" = [ 1+ ] unless
+        letters swap head [ "ret" swap suffix ] map
+    ] [
+        [ fortran-arg-type>c-type nip length 1+ ] map letters swap zip
+        [ first2 letters swap head [ "" 2sequence ] with map ] map concat
+    ] bi* ;
+
+: (fortran-in-shuffle) ( ret par -- seq )
+    [ [ second ] bi@ <=> ] sort append ;
+
+: (fortran-out-shuffle) ( ret par -- seq )
+    append ;
+
+: [fortran-result-shuffle] ( return parameters -- quot )
+    (shuffle-map) [ (fortran-in-shuffle) ] [ (fortran-out-shuffle) ] 2bi <effect>
+    \ shuffle-effect [ ] 2sequence ;
 
 : [fortran-results>] ( return parameters -- quot )
-    2drop [ ] ;
+    [ [fortran-result-shuffle] ]
+    [ drop [fortran-return>] ]
+    [ nip [ [fortran-out-param>] ] map concat ] 2tri
+    append
+    \ spread [ ] 2sequence append ;
 
 PRIVATE>
 
@@ -289,22 +353,26 @@ PRIVATE>
 
 : RECORD: scan in get parse-definition define-fortran-record ; parsing
 
-MACRO: fortran-invoke ( return library function parameters -- )
+: (fortran-invoke) ( return library function parameters -- quot )
     {
         [ 2nip [<fortran-result>] ]
         [ nip nip nip [fortran-args>c-args] ]
         [ [fortran-invoke] ]
         [ 2nip [fortran-results>] ]
-    } 4 ncleave 3append ;
+    } 4 ncleave 4 nappend ;
+
+MACRO: fortran-invoke ( return library function parameters -- )
+    (fortran-invoke) ;
 
 :: define-fortran-function ( return library function parameters -- )
     function create-in dup reset-generic 
     return library function parameters return parse-arglist
-    [ '[ _ _ _ _ fortran-invoke ] ] dip define-declared ;
+    [ \ fortran-invoke 5 [ ] nsequence ] dip define-declared ;
 
 : SUBROUTINE: 
     f "c-library" get scan ";" parse-tokens
     [ "()" subseq? not ] filter define-fortran-function ; parsing
+
 : FUNCTION:
     scan "c-library" get scan ";" parse-tokens
     [ "()" subseq? not ] filter define-fortran-function ; parsing
