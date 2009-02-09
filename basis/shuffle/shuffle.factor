@@ -1,8 +1,27 @@
 ! Copyright (C) 2007 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel generalizations ;
-
+USING: accessors assocs effects.parser generalizations
+hashtables kernel locals locals.backend macros make math
+parser sequences ;
 IN: shuffle
+
+<PRIVATE
+
+: >locals-assoc ( sequence -- assoc )
+    dup length dup 1- [ - ] curry map zip >hashtable ;
+
+PRIVATE>
+
+MACRO: shuffle-effect ( effect -- )
+    [ out>> ] [ in>> >locals-assoc ] bi
+    [
+        [ nip assoc-size , \ load-locals , ]
+        [ [ at , \ get-local , ] curry each ]
+        [ nip assoc-size , \ drop-locals , ] 2tri
+    ] [ ] make ;
+
+: shuffle(
+    ")" parse-effect parsed \ shuffle-effect parsed ; parsing
 
 : 2swap ( x y z t -- z t x y ) 2 2 mnswap ; inline
 
