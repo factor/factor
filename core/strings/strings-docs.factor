@@ -53,8 +53,9 @@ HELP: 1string
 
 HELP: >string
 { $values { "seq" "a sequence of characters" } { "str" string } }
-{ $description "Outputs a freshly-allocated string with the same elements as a given sequence." }
-{ $errors "Throws an error if the sequence contains elements other than real numbers." } ;
+{ $description "Outputs a freshly-allocated string with the same elements as a given sequence, by interpreting the sequence elements as Unicode code points." }
+{ $notes "This operation is only appropriate if the underlying sequence holds Unicode code points, which is rare unless it is a " { $link slice } " of another string. To convert a sequence of bytes to a string, use the words documented in " { $link "io.encodings.string" } "." }
+{ $errors "Throws an error if the sequence contains elements other than integers." } ;
 
 HELP: resize-string ( n str -- newstr )
 { $values { "n" "a non-negative integer" } { "str" string } { "newstr" string } }

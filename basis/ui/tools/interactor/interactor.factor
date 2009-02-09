@@ -5,7 +5,7 @@ hashtables io io.styles kernel math math.order math.vectors
 models models.delay namespaces parser lexer prettyprint
 quotations sequences strings threads listener classes.tuple
 ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.status-bar
-ui.gadgets.presentations ui.gadgets.worlds ui.gestures
+ui.gadgets.presentations ui.gadgets.worlds ui.gestures call
 definitions calendar concurrency.flags concurrency.mailboxes
 ui.tools.workspace accessors sets destructors fry vocabs.parser ;
 IN: ui.tools.interactor
@@ -82,8 +82,7 @@ M: interactor model-changed
     mailbox>> mailbox-put ;
 
 : clear-input ( interactor -- )
-    #! The with-datastack is a kludge to make it infer. Stupid.
-    model>> 1array [ clear-doc ] with-datastack drop ;
+    model>> [ clear-doc ] call( model -- ) ;
 
 : interactor-finish ( interactor -- )
     [ editor-string ] keep
