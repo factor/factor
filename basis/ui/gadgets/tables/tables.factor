@@ -20,7 +20,7 @@ M: object row-value drop ;
 M: object row-color 2drop f ;
 
 TUPLE: table < gadget
-renderer filled-column column-alignment action hook
+renderer filled-column column-alignment action single-click? hook
 column-widths total-width
 font selection-color focus-border-color
 mouse-color column-line-color selection-required?
@@ -84,21 +84,26 @@ M: table layout*
     [ [ row-rect rect-bounds ] dip gl-color ] dip
     '[ _ @ ] with-translation ; inline
 
-: draw-selected-row ( table row -- )
-    over selection-color>> [ gl-fill-rect ] highlight-row ;
+: draw-selected-row ( table -- )
+    {
+        { [ dup selected-index>> not ] [ drop ] }
+        [
+            [ ] [ selected-index>> ] [ selection-color>> ] tri
+            [ gl-fill-rect ] highlight-row
+        ]
+    } cond ;
 
-: draw-focused-row ( table row -- )
-    over focused?>> [
-        over focus-border-color>> [ gl-rect ] highlight-row
-    ] [ 2drop ] if ;
+: draw-focused-row ( table -- )
+    {
+        { [ dup focused?>> not ] [ drop ] }
+        { [ dup selected-index>> not ] [ drop ] }
+        [
+            [ ] [ selected-index>> ] [ focus-border-color>> ] tri
+            [ gl-rect ] highlight-row
+        ]
+    } cond ;
 
-: draw-selected ( table -- )
-    dup selected-index>> dup
-    [ [ draw-selected-row ] [ draw-focused-row ] 2bi ]
-    [ 2drop ]
-    if ;
-
-: draw-moused ( table -- )
+: draw-moused-row ( table -- )
     dup mouse-index>> dup [
         over mouse-color>> [ gl-rect ] highlight-row
     ] [ 2drop ] if ;
@@ -149,10 +154,11 @@ M: table draw-gadget*
     dup control-value empty? [ drop ] [
         origin get [
             {
-                [ draw-selected ]
+                [ draw-selected-row ]
                 [ draw-columns ]
                 [ draw-lines ]
-                [ draw-moused ]
+                [ draw-focused-row ]
+                [ draw-moused-row ]
             } cleave
         ] with-translation
     ] if ;
@@ -218,12 +224,15 @@ M: table model-changed
 PRIVATE>
 
 : row-action ( table -- )
-    dup selected-row [ swap action>> call ] [ 2drop ] if ;
+    dup selected-row
+    [ swap [ action>> call ] [ hook>> call ] bi ]
+    [ 2drop ]
+    if ;
 
 <PRIVATE
 
 : table-button-up ( table -- )
-    hand-click# get 2 =
+    dup single-click?>> hand-click# get 2 = or
     [ row-action ] [ update-selected-value ] if ;
 
 : select-row ( table n -- )
