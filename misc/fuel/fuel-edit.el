@@ -57,13 +57,6 @@
     (fuel-edit--visit-file (car loc) fuel-edit-word-method)
     (goto-line (if (numberp (cadr loc)) (cadr loc) 1))))
 
-(defun fuel-edit--read-vocabulary-name (refresh)
-  (let* ((vocabs (fuel-completion--vocabs refresh))
-         (prompt "Vocabulary name: "))
-    (if vocabs
-        (completing-read prompt vocabs nil nil nil fuel-edit--vocab-history)
-      (read-string prompt nil fuel-edit--vocab-history))))
-
 (defun fuel-edit--edit-article (name)
   (let ((cmd `(:fuel* (,name fuel-get-article-location) "fuel" t)))
     (fuel-edit--try-edit (fuel-eval--send/wait cmd))))
@@ -72,7 +65,6 @@
 ;;; Editing commands:
 
 (defvar fuel-edit--word-history nil)
-(defvar fuel-edit--vocab-history nil)
 (defvar fuel-edit--previous-location nil)
 
 (defun fuel-edit-vocabulary (&optional refresh vocab)
@@ -80,7 +72,7 @@
 When called interactively, asks for vocabulary with completion.
 With prefix argument, refreshes cached vocabulary list."
   (interactive "P")
-  (let* ((vocab (or vocab (fuel-edit--read-vocabulary-name refresh)))
+  (let* ((vocab (or vocab (fuel-completion--read-vocab refresh)))
          (cmd `(:fuel* (,vocab fuel-get-vocab-location) "fuel" t)))
     (fuel-edit--try-edit (fuel-eval--send/wait cmd))))
 

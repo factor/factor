@@ -257,7 +257,7 @@ buffer."
 
 (defun fuel-help-vocab (vocab)
   "Ask for a vocabulary name and show its help page."
-  (interactive (list (fuel-edit--read-vocabulary-name nil)))
+  (interactive (list (fuel-completion--read-vocab nil)))
   (fuel-help--get-vocab vocab))
 
 (defun fuel-help-next (&optional forget-current)

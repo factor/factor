@@ -46,6 +46,15 @@ M: fd cancel-operation ( fd -- )
         2bi
     ] if ;
 
+M: unix seek-handle ( n seek-type handle -- )
+    swap {
+        { io:seek-absolute [ SEEK_SET ] }
+        { io:seek-relative [ SEEK_CUR ] }
+        { io:seek-end [ SEEK_END ] }
+        [ io:bad-seek-type ]
+    } case
+    [ fd>> swap ] dip lseek io-error ;
+
 SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+
 SYMBOL: +output+

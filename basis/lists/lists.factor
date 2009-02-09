@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors math arrays vectors classes words locals ;
-
 IN: lists
 
 ! List Protocol
@@ -46,7 +45,7 @@ M: object nil? drop f ;
 : 2car ( cons -- car caar )    
     [ car ] [ cdr car ] bi ;
     
-: 3car ( cons -- car caar caaar )    
+: 3car ( cons -- car cadr caddr )    
     [ car ] [ cdr car ] [ cdr cdr car ] tri ;
 
 : lnth ( n list -- elt )
