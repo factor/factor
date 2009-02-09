@@ -1,10 +1,6 @@
-! Copyright (C) 2004 Chris Double.
+! Copyright (C) 2004, 2006 Chris Double, Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-!
-! Updated by Matthew Willis, July 2006
-! Updated by Chris Double, September 2006
-
-USING: arrays kernel sequences math vectors arrays namespaces
+USING: arrays kernel sequences math vectors arrays namespaces call
 make quotations parser effects stack-checker words accessors ;
 IN: promises
 
@@ -24,7 +20,7 @@ TUPLE: promise quot forced? value ;
     #! promises quotation on the stack. Re-forcing the promise
     #! will return the same value and not recall the quotation.
     dup forced?>> [
-        dup quot>> call >>value
+        dup quot>> call( -- value ) >>value
         t >>forced?
     ] unless
     value>> ;

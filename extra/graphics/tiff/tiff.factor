@@ -2,20 +2,19 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io io.encodings.binary io.files
 kernel pack endian tools.hexdump constructors sequences arrays
-sorting.slots math.order math.parser prettyprint ;
+sorting.slots math.order math.parser prettyprint classes ;
 IN: graphics.tiff
 
 TUPLE: tiff
 endianness
 the-answer
 ifd-offset
-ifds
-processed-ifds ;
+ifds ;
 
 CONSTRUCTOR: tiff ( -- tiff )
     V{ } clone >>ifds ;
 
-TUPLE: ifd count ifd-entries next ;
+TUPLE: ifd count ifd-entries next processed-tags strips ;
 
 CONSTRUCTOR: ifd ( count ifd-entries next -- ifd ) ;
 
@@ -137,8 +136,6 @@ ERROR: bad-planar-configuration n ;
 TUPLE: new-subfile-type n ;
 CONSTRUCTOR: new-subfile-type ( n -- object ) ;
 
-
-
 ERROR: bad-tiff-magic bytes ;
 
 : tiff-endianness ( byte-array -- ? )
@@ -176,6 +173,12 @@ ERROR: bad-tiff-magic bytes ;
         [ <ifd> push-ifd ] [ 0 = [ read-ifds ] unless ] bi
     ] with-tiff-endianness ;
 
+: read-strips ( ifd -- ifd )
+    dup processed-tags>>
+    [ [ strip-byte-counts instance? ] find nip n>> ]
+    [ [ strip-offsets instance? ] find nip n>> ] bi
+    [ seek-absolute seek-input read ] { } 2map-as >>strips ;
+
 ! ERROR: unhandled-ifd-entry data n ;
 
 : unhandled-ifd-entry ;
@@ -207,17 +210,18 @@ ERROR: bad-tiff-magic bytes ;
         [ unhandled-ifd-entry swap 2array ]
     } case ;
 
-: process-ifd ( ifd -- processed-ifd )
-    ifd-entries>> [ process-ifd-entry ] map ;
+: process-ifd ( ifd -- ifd )
+    dup ifd-entries>> [ process-ifd-entry ] map >>processed-tags ;
 
 : (load-tiff) ( path -- tiff )
     binary [
         <tiff>
         read-header
         read-ifds
-        dup ifds>> [ process-ifd ] map
-        >>processed-ifds
+        dup ifds>> [ process-ifd read-strips drop ] each
     ] with-file-reader ;
 
 : load-tiff ( path -- tiff )
     (load-tiff) ;
+
+! TODO: duplicate ifds = error, seeking out of bounds = error

@@ -5,7 +5,7 @@ continuations combinators compiler compiler.alien kernel math
 namespaces make parser quotations sequences strings words
 cocoa.runtime io macros memoize io.encodings.utf8
 effects libc libc.private parser lexer init core-foundation fry
-generalizations specialized-arrays.direct.alien ;
+generalizations specialized-arrays.direct.alien call ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -83,7 +83,7 @@ class-init-hooks global [ H{ } clone or ] change-at
 
 : (objc-class) ( name word -- class )
     2dup execute dup [ 2nip ] [
-        drop over class-init-hooks get at [ assert-depth ] when*
+        drop over class-init-hooks get at [ call( -- ) ] when*
         2dup execute dup [ 2nip ] [
             2drop "No such class: " prepend throw
         ] if
