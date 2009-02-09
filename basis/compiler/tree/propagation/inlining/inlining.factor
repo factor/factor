@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel arrays sequences math math.order
+USING: accessors kernel arrays sequences math math.order call
 math.partial-dispatch generic generic.standard generic.math
 classes.algebra classes.union sets quotations assocs combinators
 words namespaces continuations classes fry combinators.smart
@@ -181,8 +181,9 @@ SYMBOL: history
     "custom-inlining" word-prop ;
 
 : inline-custom ( #call word -- ? )
-    [ dup 1array ] [ "custom-inlining" word-prop ] bi* with-datastack
-    first object swap eliminate-dispatch ;
+    [ dup ] [ "custom-inlining" word-prop ] bi*
+    call( #call -- word/quot/f )
+    object swap eliminate-dispatch ;
 
 : inline-instance-check ( #call word -- ? )
     over in-d>> second value-info literal>> dup class?

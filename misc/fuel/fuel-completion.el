@@ -19,6 +19,15 @@
 (require 'fuel-log)
 
 
+;;; Aux:
+
+(defvar fuel-completion--minibuffer-map
+  (let ((map (make-keymap)))
+    (set-keymap-parent map minibuffer-local-completion-map)
+    (define-key map "?" 'self-insert-command)
+    map))
+
+
 ;;; Vocabs dictionary:
 
 (defvar fuel-completion--vocabs nil)
@@ -33,7 +42,8 @@
   fuel-completion--vocabs)
 
 (defun fuel-completion--read-vocab (&optional reload init-input history)
-  (let ((vocabs (fuel-completion--vocabs reload)))
+  (let ((minibuffer-local-completion-map fuel-completion--minibuffer-map)
+        (vocabs (fuel-completion--vocabs reload)))
     (completing-read "Vocab name: " vocabs nil nil init-input history)))
 
 (defsubst fuel-completion--vocab-list (prefix)
@@ -170,12 +180,23 @@ terminates a current completion."
     (cons completions partial)))
 
 (defun fuel-completion--read-word (prompt &optional default history all)
-  (completing-read prompt
-                   (if all fuel-completion--all-words-list-func
-                     fuel-completion--word-list-func)
-                   nil nil nil
-                   history
-                   (or default (fuel-syntax-symbol-at-point))))
+  (let ((minibuffer-local-completion-map fuel-completion--minibuffer-map))
+    (completing-read prompt
+                     (if all fuel-completion--all-words-list-func
+                       fuel-completion--word-list-func)
+                     nil nil nil
+                     history
+                     (or default (fuel-syntax-symbol-at-point)))))
+
+(defvar fuel-completion--vocab-history nil)
+
+(defun fuel-completion--read-vocab (refresh)
+  (let ((minibuffer-local-completion-map fuel-completion--minibuffer-map)
+        (vocabs (fuel-completion--vocabs refresh))
+        (prompt "Vocabulary name: "))
+    (if vocabs
+        (completing-read prompt vocabs nil nil nil fuel-completion--vocab-history)
+      (read-string prompt nil fuel-completion--vocab-history))))
 
 (defun fuel-completion--complete-symbol ()
   "Complete the symbol at point.

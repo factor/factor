@@ -244,7 +244,7 @@ With prefix argument, force reload of vocabulary list."
 With prefix argument, ask for the vocab."
   (interactive "P")
   (let ((vocab (or (and (not arg) (fuel-syntax--current-vocab))
-                   (fuel-edit--read-vocabulary-name))))
+                   (fuel-completion--read-vocab nil))))
     (when vocab
       (fuel-xref--show-vocab-words vocab
                                    (fuel-syntax--file-has-private)))))
