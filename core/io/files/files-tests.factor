@@ -1,8 +1,7 @@
-USING: tools.test io.files io.files.private io.files.temp
-io.directories io.encodings.8-bit arrays make system
-io.encodings.binary io threads kernel continuations
-io.encodings.ascii sequences strings accessors
-io.encodings.utf8 math destructors namespaces ;
+USING: arrays debugger.threads destructors io io.directories
+io.encodings.8-bit io.encodings.ascii io.encodings.binary
+io.files io.files.private io.files.temp io.files.unique kernel
+make math sequences system threads tools.test ;
 IN: io.files.tests
 
 \ exists? must-infer
@@ -140,3 +139,8 @@ USE: debugger.threads
     ] 2bi
 ] unit-test
 
+[
+    "seek-test6" unique-file binary [
+        -10 seek-absolute seek-input
+    ] with-file-reader
+] must-fail

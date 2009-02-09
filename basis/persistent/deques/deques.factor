@@ -1,6 +1,6 @@
 ! Copyback (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors math ;
+USING: kernel accessors math lists ;
 QUALIFIED: sequences
 IN: persistent.deques
 
@@ -9,25 +9,23 @@ IN: persistent.deques
 !   same source, it could take O(m) amortized time per update.
 
 <PRIVATE
-TUPLE: cons { car read-only } { cdr read-only } ;
-C: <cons> cons
 
 : each ( list quot: ( elt -- ) -- )
     over
-    [ [ [ car>> ] dip call ] [ [ cdr>> ] dip ] 2bi each ]
+    [ [ [ car ] dip call ] [ [ cdr ] dip ] 2bi each ]
     [ 2drop ] if ; inline recursive
 
 : reduce ( list start quot -- end )
     swapd each ; inline
 
 : reverse ( list -- reversed )
-    f [ swap <cons> ] reduce ;
+    f [ swap cons ] reduce ;
 
 : length ( list -- length )
     0 [ drop 1+ ] reduce ;
 
 : cut ( list index -- back front-reversed )
-    f swap [ [ [ cdr>> ] [ car>> ] bi ] dip <cons> ] times ;
+    f swap [ [ [ cdr ] [ car ] bi ] dip cons ] times ;
 
 : split-reverse ( list -- back-reversed front )
     dup length 2/ cut [ reverse ] bi@ ;
@@ -49,7 +47,7 @@ PRIVATE>
 
 <PRIVATE
 : push ( item deque -- newdeque )
-    [ front>> <cons> ] [ back>> ] bi deque boa ; inline
+    [ front>> cons ] [ back>> ] bi deque boa ; inline
 PRIVATE>
 
 : push-front ( deque item -- newdeque )
@@ -60,7 +58,7 @@ PRIVATE>
 
 <PRIVATE
 : remove ( deque -- item newdeque )
-    [ front>> car>> ] [ [ front>> cdr>> ] [ back>> ] bi deque boa ] bi ; inline
+    [ front>> car ] [ [ front>> cdr ] [ back>> ] bi deque boa ] bi ; inline
 
 : transfer ( deque -- item newdeque )
     back>> [ split-reverse deque boa remove ]
