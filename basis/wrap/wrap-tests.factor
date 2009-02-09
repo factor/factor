@@ -113,3 +113,6 @@ word wrap.">
 [ "aaa\nbb ccc\ndddddd" ] [ "aaa bb ccc dddddd" 6 wrap-string ] unit-test
 [ "aaa bb\ncccc\nddddd" ] [ "aaa bb cccc ddddd" 6 wrap-string ] unit-test
 [ "aaa bb\nccccccc\nddddddd" ] [ "aaa bb ccccccc ddddddd" 6 wrap-string ] unit-test
+
+\ wrap-string must-infer
+\ wrap-elements must-infer
