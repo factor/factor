@@ -1,25 +1,25 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar combinators
-combinators.short-circuit compiler.units concurrency.flags
-concurrency.mailboxes continuations destructors documents
-documents.elements fry hashtables help help.markup io io.styles kernel
-lexer listener math models models.delay models.filter namespaces
-parser prettyprint quotations sequences strings threads tools.vocabs
-vocabs vocabs.loader vocabs.parser words ui ui.commands ui.gadgets
-ui.gadgets.buttons ui.gadgets.editors ui.gadgets.frames
-ui.gadgets.grids ui.gadgets.labelled ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.status-bar ui.gadgets.tracks
-ui.gestures ui.operations ui.tools.browser ui.tools.common
-ui.tools.debugger ui.tools.listener.completion
+USING: accessors arrays assocs calendar combinators locals
+colors.constants combinators.short-circuit compiler.units
+concurrency.flags concurrency.mailboxes continuations destructors
+documents documents.elements fry hashtables help help.markup io
+io.styles kernel lexer listener math models models.delay models.filter
+namespaces parser prettyprint quotations sequences strings threads
+tools.vocabs vocabs vocabs.loader vocabs.parser words ui ui.commands
+ui.render ui.gadgets ui.gadgets.buttons ui.gadgets.editors
+ui.gadgets.frames ui.gadgets.grids ui.gadgets.labelled
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
+ui.gadgets.tracks ui.gadgets.borders ui.gestures ui.operations
+ui.tools.browser ui.tools.common ui.tools.debugger
+ui.tools.listener.completion ui.tools.listener.popups
 ui.tools.listener.history ;
 IN: ui.tools.listener
 
 ! If waiting is t, we're waiting for user input, and invoking
 ! evaluate-input resumes the thread.
 TUPLE: interactor < source-editor
-output history flag mailbox thread waiting token-model word-model
-completion-popup ;
+output history flag mailbox thread waiting token-model word-model popup ;
 
 : register-self ( interactor -- )
     <mailbox> >>mailbox
@@ -82,7 +82,7 @@ M: interactor ungraft*
 
 M: interactor model-changed
     2dup word-model>> eq? [
-        dup completion-popup>>
+        dup popup>>
         [ 2drop ] [ [ value>> ] dip show-summary ] if
     ] [ call-next-method ] if ;
 
@@ -163,7 +163,7 @@ M: interactor dispose drop ;
     over set-caret
     mark>caret ;
 
-TUPLE: listener-gadget < tool input output scroller popup ;
+TUPLE: listener-gadget < tool input output scroller ;
 
 { 550 700 } listener-gadget set-tool-dim
 
@@ -194,7 +194,7 @@ TUPLE: listener-gadget < tool input output scroller popup ;
         dup scroller>> 1 track-add ;
 
 M: listener-gadget focusable-child*
-    [ popup>> ] [ input>> ] bi or ;
+    input>> dup popup>> or ;
 
 : wait-for-listener ( listener -- )
     #! Wait for the listener to start.
@@ -297,29 +297,20 @@ M: object accept-completion-hook 2drop ;
     [ history>> history-add drop ] [ control-value ] [ select-all ] tri
     [ parse-lines ] with-compilation-unit ;
 
-: hide-popup ( listener -- )
-    dup popup>> track-remove
-    f >>popup
-    request-focus ;
+:: <debugger-popup> ( interactor error continuation -- popup )
+    error continuation error compute-restarts
+    [ interactor hide-popup ] <debugger>
+    COLOR: white <solid> >>interior
+    COLOR: black <solid> >>boundary
+    "Error" <labelled-gadget> ;
 
-: show-popup ( gadget listener -- )
-    dup hide-popup
-    over >>popup
-    over f track-add drop
-    request-focus ;
-
-: show-titled-popup ( listener gadget title -- )
-    [ find-listener hide-popup ] <closable-gadget>
-    swap show-popup ;
-
-: debugger-popup ( error listener -- )
-    swap dup compute-restarts
-    [ find-listener hide-popup ] <debugger>
-    "Error" show-titled-popup ;
+: debugger-popup ( interactor error continuation -- )
+    [ [ drop one-line-elt ] 2keep ] dip <debugger-popup> show-popup ;
 
 : handle-parse-error ( interactor error -- )
     dup lexer-error? [ 2dup go-to-error error>> ] when
-    swap find-listener debugger-popup ;
+    error-continuation get
+    debugger-popup ;
 
 : try-parse ( lines interactor -- quot/error/f )
     [ drop parse-lines-interactive ] [
@@ -347,7 +338,7 @@ M: interactor stream-read-quot
     } cond ;
 
 : pass-to-popup ( gesture interactor -- ? )
-    completion-popup>> focusable-child resend-gesture ;
+    popup>> focusable-child resend-gesture ;
 
 : interactor-operation ( gesture interactor -- ? )
     [ token-model>> value>> ] keep word-at-caret
@@ -356,7 +347,7 @@ M: interactor stream-read-quot
 M: interactor handle-gesture
     {
         { [ over key-gesture? not ] [ call-next-method ] }
-        { [ dup completion-popup>> ] [ { [ pass-to-popup ] [ call-next-method ] } 2&& ] }
+        { [ dup popup>> ] [ { [ pass-to-popup ] [ call-next-method ] } 2&& ] }
         { [ dup token-model>> value>> ] [ { [ interactor-operation ] [ call-next-method ] } 2&& ] }
         [ call-next-method ]
     } cond ;
@@ -381,7 +372,7 @@ interactor "completion" f {
 : listener-thread ( listener -- )
     dup listener-streams [
         [ com-follow ] help-hook set
-        '[ _ debugger-popup ] error-hook set
+        '[ [ _ input>> ] 2dip debugger-popup ] error-hook set
         welcome.
         listener
     ] with-streams* ;
@@ -436,10 +427,6 @@ listener-gadget "scrolling"
 
 listener-gadget "multi-touch" f {
     { up-action refresh-all }
-} define-command-map
-
-listener-gadget "other" f {
-    { T{ key-down f f "ESC" } hide-popup }
 } define-command-map
 
 M: listener-gadget graft*

@@ -1,24 +1,44 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors continuations kernel models namespaces
-prettyprint ui ui.commands ui.gadgets ui.gadgets.labelled assocs
+USING: accessors continuations kernel models namespaces arrays
+fry prettyprint ui ui.commands ui.gadgets ui.gadgets.labelled assocs
 ui.gadgets.tracks ui.gadgets.buttons ui.gadgets.panes
 ui.gadgets.status-bar ui.gadgets.scrollers
-ui.gestures sequences inspector models.filter ;
+ui.gadgets.tables ui.gestures sequences inspector
+models.filter ;
 QUALIFIED-WITH: ui.tools.inspector i
 IN: ui.tools.traceback
+
+TUPLE: stack-entry object string ;
+
+: <stack-entry> ( object -- stack-entry )
+    dup unparse-short stack-entry boa ;
+
+SINGLETON: stack-entry-renderer
+
+M: stack-entry-renderer row-columns drop string>> 1array ;
+
+M: stack-entry-renderer row-value drop object>> ;
+
+: <stack-table> ( model -- table )
+    [ [ <stack-entry> ] map ] <filter> <table>
+        [ i:inspector ] >>action
+        stack-entry-renderer >>renderer
+        t >>single-click? ;
+
+: <stack-display> ( model quot title -- gadget )
+    [ '[ dup _ when ] <filter> <stack-table> <scroller> ] dip
+    <labelled-gadget> ;
 
 : <callstack-display> ( model -- gadget )
     [ [ call>> callstack. ] when* ]
     t "Call stack" <labelled-pane> ;
 
 : <datastack-display> ( model -- gadget )
-    [ [ data>> stack. ] when* ]
-    t "Data stack" <labelled-pane> ;
+    [ data>> ] "Data stack" <stack-display> ;
 
 : <retainstack-display> ( model -- gadget )
-    [ [ retain>> stack. ] when* ]
-    t "Retain stack" <labelled-pane> ;
+    [ retain>> ] "Retain stack" <stack-display> ;
 
 TUPLE: traceback-gadget < track ;
 
