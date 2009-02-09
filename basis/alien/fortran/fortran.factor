@@ -155,7 +155,9 @@ GENERIC: (fortran-ret-type>c-type) ( type -- c-type )
 
 M: f (fortran-ret-type>c-type) drop "void" ;
 M: fortran-type (fortran-ret-type>c-type) (fortran-type>c-type) ;
-M: real-type (fortran-ret-type>c-type) drop "double" ;
+! XXX F2C claims to return double for REAL typed functions
+! XXX OSX Accelerate.framework uses float 
+! M: real-type (fortran-ret-type>c-type) drop "double" ;
 
 : suffix! ( seq   elt   -- seq   ) over push     ; inline
 : append! ( seq-a seq-b -- seq-a ) over push-all ; inline
@@ -374,7 +376,7 @@ MACRO: fortran-invoke ( return library function parameters -- )
 
 :: define-fortran-function ( return library function parameters -- )
     function create-in dup reset-generic 
-    return library function parameters return parse-arglist
+    return library function parameters return [ "void" ] unless* parse-arglist
     [ \ fortran-invoke 5 [ ] nsequence ] dip define-declared ;
 
 : SUBROUTINE: 

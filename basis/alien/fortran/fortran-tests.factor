@@ -116,7 +116,7 @@ RECORD: FORTRAN_TEST_RECORD
 [ "int" { } ]
 [ "logical" fortran-ret-type>c-type ] unit-test
 
-[ "double" { } ]
+[ "float" { } ]
 [ "real" fortran-ret-type>c-type ] unit-test
 
 [ "double" { } ]
@@ -136,7 +136,7 @@ RECORD: FORTRAN_TEST_RECORD
 
 ! fortran-sig>c-sig
 
-[ "double" { "int*" "char*" "float*" "double*" "long" } ]
+[ "float" { "int*" "char*" "float*" "double*" "long" } ]
 [ "real" { "integer" "character*17" "real" "real*8" } fortran-sig>c-sig ]
 unit-test
 
@@ -213,7 +213,7 @@ unit-test
         [ { [ drop ] } spread ]
     } 1 ncleave
     ! [fortran-invoke]
-    [ "double" "funpack" "fun_times__" { "float*" } alien-invoke ]
+    [ "float" "funpack" "fun_times__" { "float*" } alien-invoke ]
     1 nkeep
     ! [fortran-results>]
     shuffle( reta aa -- reta aa ) 
