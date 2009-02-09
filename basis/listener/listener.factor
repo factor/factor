@@ -18,7 +18,7 @@ GENERIC: stream-read-quot ( stream -- quot/f )
         [ 2drop f ] [ rethrow ] if
     ] recover ;
 
-: read-quot-loop  ( stream accum -- quot/f )
+: read-quot-loop ( stream accum -- quot/f )
     over stream-readln dup [
         over push
         dup read-quot-step dup
