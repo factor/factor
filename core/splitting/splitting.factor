@@ -63,7 +63,9 @@ PRIVATE>
 : split ( seq separators -- pieces )
     [ split, ] { } make ;
 
-: string-lines ( str -- seq )
+GENERIC: string-lines ( str -- seq )
+
+M: string string-lines
     dup "\r\n" intersects? [
         "\n" split [
             but-last-slice [
