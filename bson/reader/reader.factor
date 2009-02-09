@@ -1,7 +1,6 @@
-USING: mirrors io io.encodings.utf8 io.encodings.binary math kernel sequences
-       splitting accessors io.streams.byte-array namespaces prettyprint
-       bson.constants assocs alien.c-types alien.strings fry words
-       serialize byte-arrays byte-vectors ;
+USING: accessors assocs bson.constants byte-arrays byte-vectors fry io
+io.binary io.encodings.string io.encodings.utf8 kernel math namespaces
+sequences serialize ;
 
 IN: bson.reader
 
@@ -48,19 +47,19 @@ GENERIC: element-binary-read ( length type -- object )
     [ get-state ] dip '[ _ + ] change-read drop ; inline
 
 : read-int32 ( -- int32 )
-    4 [ read *int ] [ count-bytes ] bi  ; inline
+    4 [ read le> ] [ count-bytes ] bi  ; inline
 
 : read-longlong ( -- longlong )
-    8 [ read *longlong ] [ count-bytes ] bi ; inline
+    8 [ read le> ] [ count-bytes ] bi ; inline
 
 : read-double ( -- double )
-    8 [ read *double ] [ count-bytes ] bi ; inline
+    8 [ read le> bits>double ] [ count-bytes ] bi ; inline
 
 : read-byte-raw ( -- byte-raw )
     1 [ read ] [ count-bytes ] bi ; inline
 
 : read-byte ( -- byte )
-    read-byte-raw *char ; inline
+    read-byte-raw first ; inline
 
 : (read-cstring) ( acc -- )
     [ read-byte-raw first ] dip ! b acc
@@ -71,11 +70,12 @@ GENERIC: element-binary-read ( length type -- object )
 : read-cstring ( -- string )
     BV{ } clone
     [ (read-cstring) ] keep
-    >byte-array utf8 alien>string ; inline
+    [ zero? ] trim-tail
+    >byte-array utf8 decode ; inline
 
 : read-sized-string ( length -- string )
     [ read ] [ count-bytes ] bi
-    utf8 alien>string ; inline
+    [ zero? ] trim-tail utf8 decode ; inline
 
 : read-element-type ( -- type )
     read-byte ; inline

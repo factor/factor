@@ -1,5 +1,5 @@
-USING: accessors alien.c-types alien.strings assocs bson.reader
-bson.writer byte-arrays byte-vectors constructors fry io
+USING: accessors io.encodings.string assocs bson.reader
+bson.writer byte-arrays byte-vectors constructors fry io io.binary
 io.encodings.binary io.encodings.utf8 io.streams.byte-array kernel
 linked-assocs math namespaces sequences strings ;
 
@@ -126,15 +126,15 @@ SYMBOL: msg-bytes-read
 : change-bytes-read ( integer -- )
     bytes-read> [ 0 ] unless* + >bytes-read ; inline
 
-: write-byte ( byte -- ) <char> write ; inline
-: write-int32 ( int -- ) <int> write ; inline
-: write-double ( real -- ) <double> write ; inline
-: write-cstring ( string -- ) utf8 string>alien write ; inline
-: write-longlong ( object -- ) <longlong> write ; inline
+: write-byte ( byte -- ) 1 >le write ; inline
+: write-int32 ( int -- ) 4 >le write ; inline
+: write-double ( real -- ) double>bits 8 >le write ; inline
+: write-cstring ( string -- ) utf8 encode B{ 0 } append write ; inline
+: write-longlong ( object -- ) 8 >le write ; inline
 
-: read-int32 ( -- int32 ) 4 [ read *int ] [ change-bytes-read ] bi ; inline
-: read-longlong ( -- longlong ) 8 [ read *longlong ] [ change-bytes-read ] bi ; inline
-: read-byte-raw ( -- byte-raw ) 1 [ read ] [ change-bytes-read ] bi ; inline
+: read-int32 ( -- int32 ) 4 [ read le> ] [ change-bytes-read ] bi ; inline
+: read-longlong ( -- longlong ) 8 [ read le> ] [ change-bytes-read ] bi ; inline
+: read-byte-raw ( -- byte-raw ) 1 [ read le> ] [ change-bytes-read ] bi ; inline
 : read-byte ( -- byte ) read-byte-raw first ; inline
 
 : (read-cstring) ( acc -- )
@@ -146,7 +146,8 @@ SYMBOL: msg-bytes-read
 : read-cstring ( -- string )
     BV{ } clone
     [ (read-cstring) ] keep
-    >byte-array utf8 alien>string ; inline
+    [ zero? ] trim-tail
+    >byte-array utf8 decode ; inline
 
 GENERIC: (read-message) ( message opcode -- message )
 

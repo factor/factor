@@ -1,11 +1,9 @@
 ! Copyright (C) 2008 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bson bson.constants accessors kernel io.streams.string
-       io.encodings.binary classes byte-arrays quotations serialize
-       io.encodings.utf8 strings splitting math.parser 
-       sequences math assocs classes words make fry 
-       prettyprint hashtables mirrors alien.strings alien.c-types
-       io.streams.byte-array io alien.strings ;
+USING: accessors assocs bson.constants byte-arrays fry io io.binary
+io.encodings.binary io.encodings.string io.encodings.utf8
+io.streams.byte-array kernel math math.parser quotations sequences
+serialize strings words ;
 
 IN: bson.writer
 
@@ -32,11 +30,11 @@ M: objref bson-type? ( objref -- type ) drop T_Binary ;
 M: quotation bson-type? ( quotation -- type ) drop T_Binary ; 
 M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ; 
 
-: write-byte ( byte -- ) <char> write ; inline
-: write-int32 ( int -- ) <int> write ; inline
-: write-double ( real -- ) <double> write ; inline
-: write-cstring ( string -- ) utf8 string>alien write ; inline
-: write-longlong ( object -- ) <longlong> write ; inline
+: write-byte ( byte -- ) 1 >le write ; inline
+: write-int32 ( int -- ) 4 >le write ; inline
+: write-double ( real -- ) double>bits 8 >le write ; inline
+: write-cstring ( string -- ) utf8 encode B{ 0 } append write ; inline
+: write-longlong ( object -- ) 8 >le write ; inline
 
 : write-eoo ( -- ) T_EOO write-byte ; inline
 : write-type ( obj -- obj ) [ bson-type? write-byte ] keep ; inline
@@ -50,7 +48,7 @@ M: t bson-write ( t -- )
     drop 1 write-byte ;
 
 M: string bson-write ( obj -- )
-    utf8 string>alien 
+    utf8 encode B{ 0 } append
     [ length write-int32 ] keep
     write ;
 
@@ -71,14 +69,14 @@ M: quotation bson-write ( quotation -- )
     write ; 
 
 M: objid bson-write ( oid -- )
-    id>> utf8 string>alien
+    id>> utf8 encode
     [ length write-int32 ] keep
     T_Binary_UUID write-byte
     write ;
 
 M: objref bson-write ( objref -- )
-    [ ns>> utf8 string>alien ]
-    [ objid>> id>> utf8 string>alien ] bi
+    [ ns>> utf8 encode ]
+    [ objid>> id>> utf8 encode ] bi
     append
     [ length write-int32 ] keep
     T_Binary_Custom write-byte

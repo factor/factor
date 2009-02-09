@@ -9,7 +9,8 @@ IN: mongodb
 GENERIC: store ( tuple/ht -- )
 GENERIC: find ( example -- tuple/ht )
 GENERIC# nfind 1 ( example n -- tuple/ht )
-GENERIC: load ( object -- object ) 
+GENERIC: load ( object -- object )
+GENERIC: explain ( object -- object )
 
 <PRIVATE
 
@@ -39,4 +40,7 @@ M: mdb-persistent nfind ( example n -- result )
     [ mdb>> master>> ] dip (find)
     build-result ;
 
-
+M: mdb-persistent explain ( example -- result )
+    prepare-find [ query>> [ t "$explain" ] dip  set-at ] keep
+    [ mdb>> master>> ] dip (find-one)
+    build-result ; 
