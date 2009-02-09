@@ -125,7 +125,7 @@ M: lazy-until car ( lazy-until -- car )
      cons>> car ;
 
 M: lazy-until cdr ( lazy-until -- cdr )
-     [ cons>> uncons ] keep quot>> tuck call( elt -- ? )
+     [ cons>> unswons ] keep quot>> tuck call( elt -- ? )
      [ 2drop nil ] [ luntil ] if ;
 
 M: lazy-until nil? ( lazy-until -- bool )
@@ -284,7 +284,7 @@ DEFER: lconcat
     dup nil? [
         drop nil
     ] [
-        uncons swap (lconcat)
+        uncons (lconcat)
     ] if ;
 
 M: lazy-concat car ( lazy-concat -- car )

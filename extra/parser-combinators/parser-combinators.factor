@@ -17,7 +17,7 @@ ERROR: cannot-parse input ;
 
 : parse-1 ( input parser -- result )
     dupd parse dup nil? [
-        rot cannot-parse
+        swap cannot-parse
     ] [
         nip car parsed>>
     ] if ;

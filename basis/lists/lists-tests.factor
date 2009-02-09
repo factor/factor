@@ -5,7 +5,7 @@ USING: tools.test lists math ;
 IN: lists.tests
 
 { { 3 4 5 6 7 } } [
-    { 1 2 3 4 5 } seq>list [ 2 + ] lmap list>seq 
+    { 1 2 3 4 5 } sequence>cons [ 2 + ] lmap list>array
 ] unit-test
 
 { { 3 4 5 6 } } [
@@ -38,33 +38,33 @@ IN: lists.tests
                           +nil+ } } }
           +nil+ } } }
 } [
-    { 1 2 { 3 4 { 5 } } } seq>cons
+    { 1 2 { 3 4 { 5 } } } deep-sequence>cons
 ] unit-test
     
 { { 1 2 { 3 4 { 5 } } } } [
-  { 1 2 { 3 4 { 5 } } } seq>cons cons>seq
+  { 1 2 { 3 4 { 5 } } } deep-sequence>cons deep-list>array
 ] unit-test
     
 { T{ cons f 2 T{ cons f 3 T{ cons f 4 T{ cons f 5 +nil+ } } } } } [
-    { 1 2 3 4 } seq>cons [ 1+ ] lmap
+    { 1 2 3 4 } sequence>cons [ 1+ ] lmap
 ] unit-test
     
 { 15 } [
- { 1 2 3 4 5 } seq>list 0 [ + ] foldr
+ { 1 2 3 4 5 } sequence>cons 0 [ + ] foldr
 ] unit-test
     
 { { 5 4 3 2 1 } } [
-    { 1 2 3 4 5 } seq>list lreverse list>seq
+    { 1 2 3 4 5 } sequence>cons lreverse list>array
 ] unit-test
     
 { 5 } [
-    { 1 2 3 4 5 } seq>list llength
+    { 1 2 3 4 5 } sequence>cons llength
 ] unit-test
     
 { { 3 4 { 5 6 { 7 } } } } [
-  { 1 2 { 3 4 { 5 } } } seq>cons [ atom? ] [ 2 + ] traverse cons>seq
+  { 1 2 { 3 4 { 5 } } } deep-sequence>cons [ atom? ] [ 2 + ] traverse deep-list>array
 ] unit-test
     
 { { 1 2 3 4 5 6 } } [
-    { 1 2 3 } seq>list { 4 5 6 } seq>list lappend list>seq
+    { 1 2 3 } sequence>cons { 4 5 6 } sequence>cons lappend list>array
 ] unit-test
