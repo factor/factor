@@ -97,8 +97,18 @@ M: bitmap-magic summary
 : load-bitmap ( path -- bitmap )
     load-bitmap-data process-bitmap-data ;
 
+ERROR: unknown-component-order bitmap ;
+
+: bitmap>component-order ( bitmap -- object )
+    bit-count>> {
+        { 32 [ BGRA ] }
+        { 24 [ BGR ] }
+        { 8 [ BGR ] }
+        [ unknown-component-order ]
+    } case ;
+
 : bitmap>image ( bitmap -- bitmap-image )
-    { [ width>> ] [ height>> ] [ bit-count>> ] [ buffer>> ] } cleave
+    { [ width>> ] [ height>> ] [ bit-count>> ] [ bitmap>component-order ] [ buffer>> ] } cleave
     bitmap-image new-image ;
 
 M: bitmap-image load-image* ( path bitmap -- bitmap-image )

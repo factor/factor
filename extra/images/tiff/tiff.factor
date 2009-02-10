@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io io.encodings.binary io.files
-kernel pack endian tools.hexdump constructors sequences arrays
+kernel pack endian constructors sequences arrays
 sorting.slots math.order math.parser prettyprint classes
 io.binary assocs math math.bitwise byte-arrays grouping
 images.backend ;
@@ -260,16 +260,26 @@ ERROR: bad-small-ifd-type n ;
 : strips>buffer ( ifd -- ifd )
     dup strips>> concat >>buffer ;
 
+ERROR: unknown-component-order ifd ;
+
+: ifd-component-order ( ifd -- byte-order )
+    bits-per-sample find-tag sum {
+        { 32 [ RGBA ] }
+        [ unknown-component-order ]
+    } case ;
+
 : ifd>image ( ifd -- image )
     {
         [ image-width find-tag ]
         [ image-length find-tag ]
         [ bits-per-sample find-tag sum ]
+        [ ifd-component-order ]
         [ buffer>> ]
     } cleave tiff-image new-image ;
 
 : parsed-tiff>images ( tiff -- sequence )
     ifds>> [ ifd>image ] map ;
+
 
 : load-tiff ( path -- parsed-tiff )
     binary [
