@@ -228,7 +228,7 @@ SYMBOL: +stopped+
                 { step-into-all [ step-into-all-loop ] }
                 { abandon [ drop f keep-running ] }
                 ! Pass quotation to debugged thread
-                { call-in [ nip keep-running ] }
+                { call-in [ keep-running ] }
                 ! Pass previous continuation to debugged thread
                 { step-back [ step-back-msg ] }
             } case f
