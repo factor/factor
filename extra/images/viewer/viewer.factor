@@ -22,12 +22,18 @@ M: image-gadget draw-gadget* ( gadget -- )
     \ image-gadget new-gadget
         swap >>image ;
 
-: bits>gl-params ( n -- gl-bgr gl-format )
+: gl-component-order ( singletons -- n )
     {
-        { 32 [ GL_BGRA GL_UNSIGNED_BYTE ] }
-        { 24 [ GL_BGR GL_UNSIGNED_BYTE ] }
-        { 8 [ GL_BGR GL_UNSIGNED_BYTE ] }
-        { 4 [ GL_BGR GL_UNSIGNED_BYTE ] }
+        { BGR [ GL_BGR ] }
+        { RGB [ GL_BGR ] }
+        { BGRA [ GL_BGRA ] }
+        { RGBA [ GL_RGBA ] }
+        ! { RGBX [ GL_RGBX ] }
+        ! { BGRX [ GL_BGRX ] }
+        ! { ARGB [ GL_ARGB ] }
+        ! { ABGR [ GL_ABGR ] }
+        ! { XRGB [ GL_XRGB ] }
+        ! { XBGR [ GL_XBGR ] }
     } case ;
 
 M: bitmap-image draw-image ( bitmap -- )
@@ -44,7 +50,7 @@ M: bitmap-image draw-image ( bitmap -- )
         ]
         [ width>> abs ]
         [ height>> abs ]
-        [ depth>> bits>gl-params ]
+        [ component-order>> gl-component-order GL_UNSIGNED_BYTE ]
         [ buffer>> ]
     } cleave glDrawPixels ;
 
@@ -56,7 +62,7 @@ M: tiff-image draw-image ( tiff -- )
     {
         [ height>> ]
         [ width>> ]
-        [ depth>> bits>gl-params ]
+        [ component-order>> gl-component-order GL_UNSIGNED_BYTE ]
         [ buffer>> ]
     } cleave glDrawPixels ;
 
