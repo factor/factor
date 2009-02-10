@@ -44,7 +44,7 @@ HELP: fortran-invoke
 ;
 
 ARTICLE: "alien.fortran" "Fortran FFI"
-"The " { $vocab-link "alien.fortran" } " vocabulary provides an interface to code shared libraries written in Fortran."
+"The " { $vocab-link "alien.fortran" } " vocabulary provides an interface to code in shared libraries written in Fortran."
 { $subsection "alien.fortran-types" }
 { $subsection POSTPONE: LIBRARY: }
 { $subsection POSTPONE: FUNCTION: }
