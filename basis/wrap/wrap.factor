@@ -36,8 +36,10 @@ SYMBOL: line-ideal
     ] each drop ; inline
 
 : paragraph-cost ( paragraph -- cost )
-    [ head-width>> deviation ]
-    [ tail-cost>> ] bi + ;
+    dup lines>> 1list? [ drop 0 ] [
+        [ head-width>> deviation ]
+        [ tail-cost>> ] bi +
+    ] if ;
 
 : min-cost ( paragraphs -- paragraph )
     [ paragraph-cost ] min-by ;
