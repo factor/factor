@@ -142,7 +142,7 @@ PRIVATE>
 
 ! main stuff
 
-: id3-parse-mp3-file ( path -- object )
+: file-id3-tags ( path -- object/f )
     [
         {
             { [ dup id3v2? ] [ read-v2-tag-data ] } ! ( ? -- mp3v2-file )
