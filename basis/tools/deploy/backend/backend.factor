@@ -12,7 +12,7 @@ destructors accessors ;
 IN: tools.deploy.backend
 
 : copy-vm ( executable bundle-name -- vm )
-    [ prepend-path ] dip append vm over copy-file ;
+    prepend-path vm over copy-file ;
 
 : copy-fonts ( name dir -- )
     deploy-ui? get [
