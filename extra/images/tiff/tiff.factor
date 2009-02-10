@@ -271,13 +271,15 @@ ERROR: bad-small-ifd-type n ;
 : parsed-tiff>images ( tiff -- sequence )
     ifds>> [ ifd>image ] map ;
 
-! tiff files can store several images -- we just take the first for now
-M: tiff-image load-image* ( path tiff-image -- image )
-    drop binary [
+: load-tiff ( path -- parsed-tiff )
+    binary [
         <parsed-tiff>
         read-header dup endianness>> [
             read-ifds
             dup ifds>> [ process-ifd read-strips strips>buffer drop ] each
         ] with-endianness
-    ] with-file-reader
-    parsed-tiff>images first ;
+    ] with-file-reader ;
+
+! tiff files can store several images -- we just take the first for now
+M: tiff-image load-image* ( path tiff-image -- image )
+    drop load-tiff parsed-tiff>images first ;
