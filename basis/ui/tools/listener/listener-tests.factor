@@ -153,12 +153,3 @@ IN: ui.tools.listener.tests
 [ ] [ <listener-gadget> "l" set ] unit-test
 [ ] [ "l" get com-scroll-up ] unit-test
 [ ] [ "l" get com-scroll-down ] unit-test
-[ ] [ "l" get hide-popup ] unit-test
-[ ] [ <gadget> "l" get show-popup ] unit-test
-[ ] [ "l" get hide-popup ] unit-test
-
-[ ] [
-    <gadget> "l" get show-popup
-    <gadget> "l" get show-popup
-    "l" get hide-popup
-] unit-test
