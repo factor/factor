@@ -5,24 +5,17 @@ math math.vectors namespaces opengl opengl.gl opengl.sprites assocs
 sequences io.files continuations freetype
 ui.gadgets.worlds ui.text ui.text.private ui.backend
 byte-arrays accessors locals specialized-arrays.direct.uchar
-combinators.smart ;
+combinators.smart fonts memoize ;
 IN: ui.text.freetype
 
 SINGLETON: freetype-renderer
 
-SYMBOL: open-fonts
+M: freetype-renderer finish-text-rendering drop ;
 
 : freetype-error ( n -- )
-    zero? [ "FreeType error" throw ] unless ;
+    0 = [ "FreeType error" throw ] unless ;
 
-DEFER: freetype
-
-: init-freetype ( -- )
-    global [
-        f <void*> dup FT_Init_FreeType freetype-error
-        *void* \ freetype set
-        H{ } clone open-fonts set
-    ] bind ;
+DEFER: init-freetype
 
 : freetype ( -- alien )
     \ freetype get-global expired? [ init-freetype ] when
@@ -33,16 +26,8 @@ ascent descent height handle widths ;
 
 M: freetype-font hashcode* drop freetype-font hashcode* ;
 
-: close-font ( font -- ) handle>> FT_Done_Face ;
-
-: close-freetype ( -- )
-    global [
-        open-fonts [ [ drop close-font ] assoc-each f ] change
-        freetype [ FT_Done_FreeType f ] change
-    ] bind ;
-
 M: freetype-renderer free-fonts ( world -- )
-    values [ second free-sprites ] each ;
+    values [ free-sprites ] each ;
 
 : ttf-name ( font -- name )
     [ [ name>> ] [ bold?>> ] [ italic?>> ] tri ] output>array H{
@@ -58,21 +43,20 @@ M: freetype-renderer free-fonts ( world -- )
         { { "serif" t f } "VeraSeBd" }
         { { "serif" t t } "VeraBI" }
         { { "serif" f t } "VeraIt" }
-    } at ;
+    } at [ "No such font" throw ] unless* ;
 
 : ttf-path ( name -- string )
     "resource:fonts/" ".ttf" surround ;
 
-: (open-face) ( path length -- face )
+MEMO: ttf-font ( font -- contents length )
+    ttf-name ttf-path malloc-file-contents ;
+
+: open-face ( font -- face )
     #! We use FT_New_Memory_Face, not FT_New_Face, since
     #! FT_New_Face only takes an ASCII path name and causes
     #! problems on localized versions of Windows
-    [ freetype ] 2dip 0 f <void*> [
-        FT_New_Memory_Face freetype-error
-    ] keep *void* ;
-
-: open-face ( font -- face )
-    ttf-name ttf-path malloc-file-contents (open-face) ;
+    [ freetype ] dip ttf-font 0 f <void*>
+    [ FT_New_Memory_Face freetype-error ] keep *void* ;
 
 SYMBOL: dpi
 
@@ -100,24 +84,25 @@ SYMBOL: dpi
     [ dup handle>> 0 ] dip
     6 shift dpi get-global dup FT_Set_Char_Size freetype-error ;
 
-: <freetype-font> ( font -- open-font )
+MEMO: (open-font) ( font -- open-font )
     freetype-font new
         H{ } clone >>widths
         over open-face >>handle
         swap size>> set-char-size
         init-font ;
 
-: open-font ( font -- open-font )
-    freetype drop open-fonts get [ <freetype-font> ] cache ;
+GENERIC: open-font ( font -- open-font )
+
+M: font open-font
+    clone f >>background f >>foreground (open-font) ;
 
 : load-glyph ( font char -- glyph )
     [ handle>> dup ] dip 0 FT_Load_Char
     freetype-error face-glyph ;
 
 : char-width ( open-font char -- w )
-    over widths>> [
-        dupd load-glyph glyph-hori-advance ft-ceil
-    ] cache nip ;
+    swap [ widths>> ] keep
+    [ swap load-glyph glyph-hori-advance ft-ceil ] curry cache ;
 
 M: freetype-renderer string-width ( font string -- w )
     [ [ 0 ] dip open-font ] dip [ char-width + ] with each ;
@@ -195,26 +180,39 @@ M: freetype-renderer string-height ( font string -- h )
 : char-widths ( open-font string -- widths )
     [ char-width ] with { } map-as ;
 
-: scan-sums ( seq -- seq' )
+: sums ( seq -- seq )
     0 [ + ] accumulate nip ;
 
-:: (draw-string) ( open-font sprites string loc -- )
+: font-sprites ( font world -- sprites )
+    fonts>> [ drop H{ } clone ] cache ;
+
+: draw-background ( widths open-font -- )
+    [ sum ] [ height>> ] bi* 2array gl-fill-rect ;
+
+:: draw-selection ( widths open-font line -- )
+    line color>> gl-color
+    widths line start>> head-slice sum 0 2array [
+        line [ start>> ] [ end>> ] bi widths <slice> sum
+        open-font height>> 2array gl-fill-rect
+    ] with-translation ;
+
+M:: freetype-renderer draw-string ( font line loc -- )
+    line dup selection? [ string>> ] when :> string
+    font open-font :> open-font
+    open-font world get font-sprites :> sprites
+    open-font string char-widths :> widths
     GL_TEXTURE_2D [
         loc [
-            string open-font string char-widths scan-sums [
-                [ open-font sprites ] 2dip draw-char
-            ] 2each
+            font background>> gl-color
+            widths open-font draw-background
+            line selection? [ widths open-font line draw-selection ] when
+            font foreground>> gl-color
+            string widths sums [ [ open-font sprites ] 2dip draw-char ] 2each
         ] with-translation
     ] do-enabled ;
 
-: font-sprites ( font world -- open-font sprites )
-    fonts>> [ open-font H{ } clone 2array ] cache first2 ;
-
-M: freetype-renderer draw-string ( font string loc -- )
-    [ world get font-sprites ] 2dip (draw-string) ;
-
 : run-char-widths ( open-font string -- widths )
-    char-widths [ scan-sums ] [ 2 v/n ] bi v+ ;
+    char-widths [ sums ] [ 2 v/n ] bi v+ ;
 
 M: freetype-renderer x>offset ( x font string -- n )
     [ open-font ] dip
@@ -222,6 +220,19 @@ M: freetype-renderer x>offset ( x font string -- n )
     [ ] [ length ] ?if ;
 
 M:: freetype-renderer offset>x ( n font string -- x )
-    font open-font string n head string-width ;
+    font string n head-slice string-width ;
+
+M: freetype-renderer line-metrics ( font string -- metrics )
+    [ string-width ]
+    [ drop open-font [ ascent>> ft-ceil ] [ descent>> ft-ceil ] bi 0 ] 2bi
+    metrics boa ;
+
+: init-freetype ( -- )
+    global [
+        f <void*> dup FT_Init_FreeType freetype-error
+        *void* \ freetype set
+        \ (open-font) reset-memoized
+        \ ttf-font reset-memoized
+    ] bind ;
 
 freetype-renderer font-renderer set-global
