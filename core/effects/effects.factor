@@ -46,7 +46,7 @@ M: effect effect>string ( effect -- string )
 GENERIC: stack-effect ( word -- effect/f )
 
 M: word stack-effect
-    "inferred-effect" "declared-effect"
+    "declared-effect" "inferred-effect"
     [ word-prop ] bi-curry@ bi or ;
 
 M: effect clone
