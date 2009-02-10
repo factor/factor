@@ -2,10 +2,18 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs generic hashtables kernel kernel.private
 math namespaces parser sequences strings words libc fry
-alien.c-types alien.structs.fields cpu.architecture math.order ;
+alien.c-types alien.structs.fields cpu.architecture math.order
+quotations ;
 IN: alien.structs
 
-TUPLE: struct-type size align fields boxer-quot unboxer-quot getter setter ;
+TUPLE: struct-type
+size
+align
+fields
+{ boxer-quot callable }
+{ unboxer-quot callable }
+{ getter callable }
+{ setter callable } ;
 
 M: struct-type heap-size size>> ;
 
