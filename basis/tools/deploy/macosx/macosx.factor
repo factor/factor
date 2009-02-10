@@ -49,7 +49,7 @@ IN: tools.deploy.macosx
         tri
     ]
     [ create-app-plist ]
-    [ "Contents/MacOS/" append-path "" copy-vm ] 2tri
+    [ "Contents/MacOS/" append-path copy-vm ] 2tri
     dup OCT: 755 set-file-permissions ;
 
 : deploy.app-image ( vocab bundle-name -- str )
