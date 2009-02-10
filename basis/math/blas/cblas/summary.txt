@@ -1,1 +1,0 @@
-Low-level bindings to the C Basic Linear Algebra Subroutines (BLAS) library

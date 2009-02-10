@@ -151,6 +151,7 @@ M: class initial-value* no-initial-value ;
         { [ array bootstrap-word over class<= ] [ { } ] }
         { [ byte-array bootstrap-word over class<= ] [ B{ } ] }
         { [ simple-alien bootstrap-word over class<= ] [ <bad-alien> ] }
+        { [ quotation bootstrap-word over class<= ] [ [ ] ] }
         [ dup initial-value* ]
     } cond nip ;
 

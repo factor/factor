@@ -8,7 +8,7 @@ IN: tools.deploy.unix
 
 : create-app-dir ( vocab bundle-name -- vm )
     dup "" copy-fonts
-    "" copy-vm
+    copy-vm
     dup OCT: 755 set-file-permissions ;
 
 : bundle-name ( -- str )
