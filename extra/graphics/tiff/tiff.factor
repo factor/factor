@@ -4,192 +4,127 @@ USING: accessors combinators io io.encodings.binary io.files
 kernel pack endian tools.hexdump constructors sequences arrays
 sorting.slots math.order math.parser prettyprint classes
 io.binary assocs math math.bitwise byte-arrays grouping ;
-USE: multiline
-
 IN: graphics.tiff
 
-TUPLE: tiff
-endianness
-the-answer
-ifd-offset
-ifds ;
-
+TUPLE: tiff endianness the-answer ifd-offset ifds ;
 
 CONSTRUCTOR: tiff ( -- tiff )
     V{ } clone >>ifds ;
 
 TUPLE: ifd count ifd-entries next
 processed-tags strips buffer ;
-
 CONSTRUCTOR: ifd ( count ifd-entries next -- ifd ) ;
 
 TUPLE: ifd-entry tag type count offset/value ;
-
 CONSTRUCTOR: ifd-entry ( tag type count offset/value -- ifd-entry ) ;
 
-
-TUPLE: photometric-interpretation color ;
-
-CONSTRUCTOR: photometric-interpretation ( color -- object ) ;
-
-SINGLETONS: white-is-zero black-is-zero rgb palette-color ;
-
+SINGLETONS: photometric-interpretation
+photometric-interpretation-white-is-zero
+photometric-interpretation-black-is-zero
+photometric-interpretation-rgb
+photometric-interpretation-palette-color ;
 ERROR: bad-photometric-interpretation n ;
-
 : lookup-photometric-interpretation ( n -- singleton )
     {
-        { 0 [ white-is-zero ] }
-        { 1 [ black-is-zero ] }
-        { 2 [ rgb ] }
-        { 3 [ palette-color ] }
+        { 0 [ photometric-interpretation-white-is-zero ] }
+        { 1 [ photometric-interpretation-black-is-zero ] }
+        { 2 [ photometric-interpretation-rgb ] }
+        { 3 [ photometric-interpretation-palette-color ] }
         [ bad-photometric-interpretation ]
-    } case <photometric-interpretation> ;
+    } case ;
 
-
-TUPLE: compression method ;
-
-CONSTRUCTOR: compression ( method -- object ) ;
-
-SINGLETONS: no-compression CCITT-2 pack-bits lzw ;
-
+SINGLETONS: compression
+compression-none
+compression-CCITT-2
+compression-lzw
+compression-pack-bits ;
 ERROR: bad-compression n ;
-
 : lookup-compression ( n -- compression )
     {
-        { 1 [ no-compression ] }
-        { 2 [ CCITT-2 ] }
-        { 5 [ lzw ] }
-        { 32773 [ pack-bits ] }
+        { 1 [ compression-none ] }
+        { 2 [ compression-CCITT-2 ] }
+        { 5 [ compression-lzw ] }
+        { 32773 [ compression-pack-bits ] }
         [ bad-compression ]
-    } case <compression> ;
+    } case ;
 
-TUPLE: image-length n ;
-CONSTRUCTOR: image-length ( n -- object ) ;
-
-TUPLE: image-width n ;
-CONSTRUCTOR: image-width ( n -- object ) ;
-
-TUPLE: x-resolution n ;
-CONSTRUCTOR: x-resolution ( n -- object ) ;
-
-TUPLE: y-resolution n ;
-CONSTRUCTOR: y-resolution ( n -- object ) ;
-
-TUPLE: rows-per-strip n ;
-CONSTRUCTOR: rows-per-strip ( n -- object ) ;
-
-TUPLE: strip-offsets n ;
-CONSTRUCTOR: strip-offsets ( n -- object ) ;
-
-TUPLE: strip-byte-counts n ;
-CONSTRUCTOR: strip-byte-counts ( n -- object ) ;
-
-TUPLE: bits-per-sample n ;
-CONSTRUCTOR: bits-per-sample ( n -- object ) ;
-
-TUPLE: samples-per-pixel n ;
-CONSTRUCTOR: samples-per-pixel ( n -- object ) ;
-
-SINGLETONS: no-resolution-unit
-inch-resolution-unit
-centimeter-resolution-unit ;
-
-TUPLE: resolution-unit type ;
-CONSTRUCTOR: resolution-unit ( type -- object ) ;
-
+SINGLETONS: resolution-unit
+resolution-unit-none
+resolution-unit-inch
+resolution-unit-centimeter ;
 ERROR: bad-resolution-unit n ;
-
 : lookup-resolution-unit ( n -- object )
     {
-        { 1 [ no-resolution-unit ] }
-        { 2 [ inch-resolution-unit ] }
-        { 3 [ centimeter-resolution-unit ] }
+        { 1 [ resolution-unit-none ] }
+        { 2 [ resolution-unit-inch ] }
+        { 3 [ resolution-unit-centimeter ] }
         [ bad-resolution-unit ]
-    } case <resolution-unit> ;
+    } case ;
 
-
-TUPLE: predictor type ;
-CONSTRUCTOR: predictor ( type -- object ) ;
-
-SINGLETONS: no-predictor horizontal-differencing-predictor ;
-
+SINGLETONS: predictor
+predictor-none
+predictor-horizontal-differencing ;
 ERROR: bad-predictor n ;
-
 : lookup-predictor ( n -- object )
     {
-        { 1 [ no-predictor ] }
-        { 2 [ horizontal-differencing-predictor ] }
+        { 1 [ predictor-none ] }
+        { 2 [ predictor-horizontal-differencing ] }
         [ bad-predictor ]
-    } case <predictor> ;
+    } case ;
 
-
-TUPLE: planar-configuration type ;
-CONSTRUCTOR: planar-configuration ( type -- object ) ;
-
-SINGLETONS: chunky planar ;
-
+SINGLETONS: planar-configuration
+planar-configuration-chunky
+planar-configuration-planar ;
 ERROR: bad-planar-configuration n ;
-
 : lookup-planar-configuration ( n -- object )
     {
-        { 1 [ no-predictor ] }
-        { 2 [ horizontal-differencing-predictor ] }
-        [ bad-predictor ]
-    } case <planar-configuration> ;
+        { 1 [ planar-configuration-chunky ] }
+        { 2 [ planar-configuration-planar ] }
+        [ bad-planar-configuration ]
+    } case ;
 
-TUPLE: sample-format n ;
-CONSTRUCTOR: sample-format ( n -- object ) ;
 ERROR: bad-sample-format n ;
-
-SINGLETONS: sample-unsigned-integer sample-signed-integer
-sample-ieee-float sample-undefined-data ;
-
+SINGLETONS: sample-format
+sample-format-unsigned-integer
+sample-format-signed-integer
+sample-format-ieee-float
+sample-format-undefined-data ;
 : lookup-sample-format ( seq -- object )
     [
         {
-            { 1 [ sample-unsigned-integer ] }
-            { 2 [ sample-signed-integer ] }
-            { 3 [ sample-ieee-float ] }
-            { 4 [ sample-undefined-data ] }
+            { 1 [ sample-format-unsigned-integer ] }
+            { 2 [ sample-format-signed-integer ] }
+            { 3 [ sample-format-ieee-float ] }
+            { 4 [ sample-format-undefined-data ] }
             [ bad-sample-format ]
         } case
-    ] map <sample-format> ;
+    ] map ;
 
-
-TUPLE: extra-samples n ;
-CONSTRUCTOR: extra-samples ( n -- object ) ;
 ERROR: bad-extra-samples n ;
-
-SINGLETONS: unspecified-alpha-data associated-alpha-data
-unassociated-alpha-data ;
-
+SINGLETONS: extra-samples
+extra-samples-unspecified-alpha-data
+extra-samples-associated-alpha-data
+extra-samples-unassociated-alpha-data ;
 : lookup-extra-samples ( seq -- object )
     {
-        { 0 [ unspecified-alpha-data ] }
-        { 1 [ associated-alpha-data ] }
-        { 2 [ unassociated-alpha-data ] }
+        { 0 [ extra-samples-unspecified-alpha-data ] }
+        { 1 [ extra-samples-associated-alpha-data ] }
+        { 2 [ extra-samples-unassociated-alpha-data ] }
         [ bad-extra-samples ]
-    } case <extra-samples> ;
+    } case ;
 
-
-TUPLE: orientation n ;
-CONSTRUCTOR: orientation ( n -- object ) ;
-
-
-TUPLE: new-subfile-type n ;
-CONSTRUCTOR: new-subfile-type ( n -- object ) ;
+SINGLETONS: image-length image-width x-resolution y-resolution
+rows-per-strip strip-offsets strip-byte-counts bits-per-sample
+samples-per-pixel new-subfile-type orientation
+unhandled-ifd-entry ;
 
 ERROR: bad-tiff-magic bytes ;
-
 : tiff-endianness ( byte-array -- ? )
     {
         { B{ CHAR: M CHAR: M } [ big-endian ] }
         { B{ CHAR: I CHAR: I } [ little-endian ] }
         [ bad-tiff-magic ]
     } case ;
-
-: with-tiff-endianness ( tiff quot -- tiff )
-    [ dup endianness>> ] dip with-endianness ; inline
 
 : read-header ( tiff -- tiff )
     2 read tiff-endianness [ >>endianness ] keep
@@ -198,9 +133,7 @@ ERROR: bad-tiff-magic bytes ;
         4 read endian> >>ifd-offset
     ] with-endianness ;
 
-: push-ifd ( tiff ifd -- tiff )
-    over ifds>> push ;
-    ! over [ dup class ] [ ifds>> ] bi* set-at ;
+: push-ifd ( tiff ifd -- tiff ) over ifds>> push ;
 
 : read-ifd ( -- ifd )
     2 read endian>
@@ -221,22 +154,17 @@ ERROR: no-tag class ;
     dupd at* [ nip t ] [ drop f ] if ; inline
 
 : find-tag ( idf class -- tag )
-    swap processed-tags>>
-    ?at [ no-tag ] unless ;
+    swap processed-tags>> ?at [ no-tag ] unless ;
 
 : read-strips ( ifd -- ifd )
     dup
-    [ strip-byte-counts find-tag n>> ]
-    [ strip-offsets find-tag n>> ] bi
+    [ strip-byte-counts find-tag ]
+    [ strip-offsets find-tag ] bi
     2dup [ integer? ] both? [
         seek-absolute seek-input read 1array
     ] [
         [ seek-absolute seek-input read ] { } 2map-as
     ] if >>strips ;
-
-! ERROR: unhandled-ifd-entry data n ;
-
-: unhandled-ifd-entry ;
 
 ERROR: unknown-ifd-type n ;
 
@@ -301,51 +229,43 @@ ERROR: bad-small-ifd-type n ;
         [ type>> ] tri offset-bytes>obj
     ] if ;
 
-: process-ifd-entry ( ifd-entry -- object )
+: process-ifd-entry ( ifd-entry -- value class )
     [ ifd-entry-value ] [ tag>> ] bi {
-        { 254 [ <new-subfile-type> ] }
-        { 256 [ <image-width> ] }
-        { 257 [ <image-length> ] }
-        { 258 [ <bits-per-sample> ] }
-        { 259 [ lookup-compression ] }
-        { 262 [ lookup-photometric-interpretation ] }
-        { 273 [ <strip-offsets> ] }
-        { 274 [ <orientation> ] }
-        { 277 [ <samples-per-pixel> ] }
-        { 278 [ <rows-per-strip> ] }
-        { 279 [ <strip-byte-counts> ] }
-        { 282 [ <x-resolution> ] }
-        { 283 [ <y-resolution> ] }
-        { 284 [ <planar-configuration> ] }
-        { 296 [ lookup-resolution-unit ] }
-        { 317 [ lookup-predictor ] }
-        { 338 [ lookup-extra-samples ] }
-        { 339 [ lookup-sample-format ] }
-        [ unhandled-ifd-entry swap 2array ]
+        { 254 [ new-subfile-type ] }
+        { 256 [ image-width ] }
+        { 257 [ image-length ] }
+        { 258 [ bits-per-sample ] }
+        { 259 [ lookup-compression compression ] }
+        { 262 [ lookup-photometric-interpretation photometric-interpretation ] }
+        { 273 [ strip-offsets ] }
+        { 274 [ orientation ] }
+        { 277 [ samples-per-pixel ] }
+        { 278 [ rows-per-strip ] }
+        { 279 [ strip-byte-counts ] }
+        { 282 [ x-resolution ] }
+        { 283 [ y-resolution ] }
+        { 284 [ planar-configuration ] }
+        { 296 [ lookup-resolution-unit resolution-unit ] }
+        { 317 [ lookup-predictor predictor ] }
+        { 338 [ lookup-extra-samples extra-samples ] }
+        { 339 [ lookup-sample-format sample-format ] }
+        [ nip unhandled-ifd-entry ]
     } case ;
 
 : process-ifd ( ifd -- ifd )
     dup ifd-entries>>
-    [ process-ifd-entry [ class ] keep ] H{ } map>assoc >>processed-tags ;
+    [ process-ifd-entry swap ] H{ } map>assoc >>processed-tags ;
 
 : strips>buffer ( ifd -- ifd )
     dup strips>> concat >>buffer ;
-/*
-    [
-        [ rows-per-strip find-tag n>> ]
-        [ image-length find-tag n>> ] bi
-    ] [
-        strips>> [ length ] keep
-    ] bi assemble-image ;
-*/
 
 : (load-tiff) ( path -- tiff )
     binary [
         <tiff>
-        read-header [
+        read-header dup endianness>> [
             read-ifds
             dup ifds>> [ process-ifd read-strips strips>buffer drop ] each
-        ] with-tiff-endianness
+        ] with-endianness
     ] with-file-reader ;
 
 : load-tiff ( path -- tiff ) (load-tiff) ;

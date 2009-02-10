@@ -52,15 +52,15 @@ M: bitmap height ( bitmap -- ) height>> ;
 : bitmap-window ( path -- gadget )
     load-bitmap <graphics-gadget> [ "bitmap" open-window ] keep ;
 
-M: tiff width ( tiff -- ) ifds>> first image-width find-tag n>> ;
-M: tiff height ( tiff -- ) ifds>> first image-length find-tag n>> ;
+M: tiff width ( tiff -- ) ifds>> first image-width find-tag ;
+M: tiff height ( tiff -- ) ifds>> first image-length find-tag ;
 
 M: tiff draw-image ( tiff -- )
     [ 0 0 glRasterPos2i 1.0 -1.0 glPixelZoom ] dip
     ifds>> first
     {
-        [ image-width find-tag n>> ]
-        [ image-length find-tag n>> ]
-        [ bits-per-sample find-tag n>> sum bits>gl-params ]
+        [ image-width find-tag ]
+        [ image-length find-tag ]
+        [ bits-per-sample find-tag sum bits>gl-params ]
         [ buffer>> ]
     } cleave glDrawPixels ;
