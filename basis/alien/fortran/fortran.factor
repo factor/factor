@@ -5,11 +5,10 @@ byte-arrays combinators combinators.short-circuit fry generalizations
 kernel lexer macros math math.parser namespaces parser sequences
 splitting stack-checker vectors vocabs.parser words locals
 io.encodings.ascii io.encodings.string shuffle effects math.ranges
-math.order sorting system ;
+math.order sorting strings system ;
 IN: alien.fortran
 
-! XXX this currently only supports the gfortran/f2c abi.
-! XXX we should also support ifort at some point for commercial BLASes
+SINGLETONS: f2c-abi gfortran-abi intel-unix-abi intel-windows-abi ;
 
 << 
 : add-f2c-libraries ( -- )
@@ -22,17 +21,54 @@ os netbsd? [ add-f2c-libraries ] when
 : alien>nstring ( alien len encoding -- string )
     [ memory>byte-array ] dip decode ;
 
-: fortran-name>symbol-name ( fortran-name -- c-name )
-    >lower CHAR: _ over member? 
-    [ "__" append ] [ "_" append ] if ;
-
 ERROR: invalid-fortran-type type ;
 
 DEFER: fortran-sig>c-sig
 DEFER: fortran-ret-type>c-type
 DEFER: fortran-arg-type>c-type
+DEFER: fortran-name>symbol-name
+
+SYMBOL: library-fortran-abis
+SYMBOL: fortran-abi
+library-fortran-abis [ H{ } clone ] initialize
 
 <PRIVATE
+
+: lowercase-name-with-underscore ( name -- name' )
+    >lower "_" append ;
+: lowercase-name-with-extra-underscore ( name -- name' )
+    >lower CHAR: _ over member? 
+    [ "__" append ] [ "_" append ] if ;
+
+HOOK: fortran-c-abi fortran-abi ( -- abi )
+M: f2c-abi fortran-c-abi "cdecl" ;
+M: gfortran-abi fortran-c-abi "cdecl" ;
+M: intel-unix-abi fortran-c-abi "cdecl" ;
+M: intel-windows-abi fortran-c-abi "cdecl" ;
+
+HOOK: real-functions-return-double? fortran-abi ( -- ? )
+M: f2c-abi real-functions-return-double? t ;
+M: gfortran-abi real-functions-return-double? f ;
+M: intel-unix-abi real-functions-return-double? f ;
+M: intel-windows-abi real-functions-return-double? f ;
+
+HOOK: complex-functions-return-by-value? fortran-abi ( -- ? )
+M: f2c-abi complex-functions-return-by-value? f ;
+M: gfortran-abi complex-functions-return-by-value? t ;
+M: intel-unix-abi complex-functions-return-by-value? f ;
+M: intel-windows-abi complex-functions-return-by-value? f ;
+
+HOOK: character(1)-maps-to-char? fortran-abi ( -- ? )
+M: f2c-abi character(1)-maps-to-char? f ;
+M: gfortran-abi character(1)-maps-to-char? f ;
+M: intel-unix-abi character(1)-maps-to-char? t ;
+M: intel-windows-abi character(1)-maps-to-char? t ;
+
+HOOK: mangle-name fortran-abi ( name -- name' )
+M: f2c-abi mangle-name lowercase-name-with-extra-underscore ;
+M: gfortran-abi mangle-name lowercase-name-with-underscore ;
+M: intel-unix-abi mangle-name lowercase-name-with-underscore ;
+M: intel-windows-abi mangle-name >upper ;
 
 TUPLE: fortran-type dims size out? ;
 
@@ -107,10 +143,14 @@ M: double-complex-type (fortran-type>c-type)
 M: misc-type (fortran-type>c-type)
     dup name>> simple-type ;
 
+: single-char? ( character-type -- ? )
+    { [ drop character(1)-maps-to-char? ] [ dims>> product 1 = ] } 1&& ;
+
 : fix-character-type ( character-type -- character-type' )
     clone dup size>>
     [ dup dims>> [ invalid-fortran-type ] [ dup size>> 1array >>dims f >>size ] if ]
-    [ dup dims>> [ ] [ { 1 } >>dims ] if ] if ;
+    [ dup dims>> [ ] [ f >>dims ] if ] if
+    dup single-char? [ f >>dims ] when ;
 
 M: character-type (fortran-type>c-type)
     fix-character-type "char" simple-type ;
@@ -142,22 +182,23 @@ M: character-type (fortran-type>c-type)
 GENERIC: added-c-args ( type -- args )
 
 M: fortran-type added-c-args drop { } ;
-M: character-type added-c-args drop { "long" } ;
+M: character-type added-c-args fix-character-type single-char? [ { } ] [ { "long" } ] if ;
 
 GENERIC: returns-by-value? ( type -- ? )
 
 M: f returns-by-value? drop t ;
 M: fortran-type returns-by-value? drop f ;
 M: number-type returns-by-value? dims>> not ;
-M: complex-type returns-by-value? drop f ;
+M: character-type returns-by-value? fix-character-type single-char? ;
+M: complex-type returns-by-value?
+    { [ drop complex-functions-return-by-value? ] [ dims>> not ] } 1&& ;
 
 GENERIC: (fortran-ret-type>c-type) ( type -- c-type )
 
 M: f (fortran-ret-type>c-type) drop "void" ;
 M: fortran-type (fortran-ret-type>c-type) (fortran-type>c-type) ;
-! XXX F2C claims to return double for REAL typed functions
-! XXX OSX Accelerate.framework uses float 
-! M: real-type (fortran-ret-type>c-type) drop "double" ;
+M: real-type (fortran-ret-type>c-type)
+    drop real-functions-return-double? [ "double" ] [ "float" ] if ;
 
 : suffix! ( seq   elt   -- seq   ) over push     ; inline
 : append! ( seq-a seq-b -- seq-a ) over push-all ; inline
@@ -209,7 +250,9 @@ M: double-complex-type (fortran-arg>c-args)
     [ drop [ <complex-double> ] [ drop ] ] args?dims ;
 
 M: character-type (fortran-arg>c-args)
-    drop [ ascii string>alien ] [ length ] ;
+    fix-character-type single-char?
+    [ [ first <char> ] [ drop ] ]
+    [ [ ascii string>alien ] [ length ] ] if ;
 
 M: misc-type (fortran-arg>c-args)
     drop [ ] [ drop ] ;
@@ -255,7 +298,9 @@ M: double-complex-type (fortran-result>)
     [ drop { [ *complex-double ] } ] result?dims ;
 
 M: character-type (fortran-result>)
-    drop { [ ] [ ascii alien>nstring ] } ;
+    fix-character-type single-char?
+    [ { [ *char 1string ] } ]
+    [ { [ ] [ ascii alien>nstring ] } ] if ;
 
 M: misc-type (fortran-result>)
     drop { [ ] } ;
@@ -331,7 +376,17 @@ M: character-type (<fortran-result>)
     append
     \ spread [ ] 2sequence append ;
 
+: (add-fortran-library) ( fortran-abi name -- )
+    library-fortran-abis get-global set-at ;
+
 PRIVATE>
+
+: add-fortran-library ( name soname fortran-abi -- )
+    [ fortran-abi [ fortran-c-abi ] with-variable add-library ]
+    [ nip swap (add-fortran-library) ] 3bi ;
+
+: fortran-name>symbol-name ( fortran-name -- c-name )
+    mangle-name ;
 
 : fortran-type>c-type ( fortran-type -- c-type )
     parse-fortran-type (fortran-type>c-type) ;
@@ -344,7 +399,7 @@ PRIVATE>
     parse-fortran-type dup returns-by-value?
     [ (fortran-ret-type>c-type) { } ] [
         "void" swap 
-        [ added-c-args ] [ (fortran-ret-type>c-type) c-type>pointer ] bi prefix
+        [ added-c-args ] [ (fortran-type>c-type) c-type>pointer ] bi prefix
     ] if ;
 
 : fortran-arg-types>c-types ( fortran-types -- c-types )
@@ -388,4 +443,7 @@ MACRO: fortran-invoke ( return library function parameters -- )
     [ "()" subseq? not ] filter define-fortran-function ; parsing
 
 : LIBRARY:
-    scan "c-library" set ; parsing
+    scan
+    [ "c-library" set ]
+    [ library-fortran-abis get-global at fortran-abi set ] bi  ; parsing
+

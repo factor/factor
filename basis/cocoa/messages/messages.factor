@@ -19,8 +19,8 @@ IN: cocoa.messages
 SYMBOL: message-senders
 SYMBOL: super-message-senders
 
-message-senders global [ H{ } assoc-like ] change-at
-super-message-senders global [ H{ } assoc-like ] change-at
+message-senders [ H{ } clone ] initialize
+super-message-senders [ H{ } clone ] initialize
 
 : cache-stub ( method function hash -- )
     [
@@ -53,7 +53,7 @@ MEMO: <selector> ( name -- sel ) f \ selector boa ;
 
 SYMBOL: objc-methods
 
-objc-methods global [ H{ } assoc-like ] change-at
+objc-methods [ H{ } clone ] initialize
 
 : lookup-method ( selector -- method )
     dup objc-methods get at
@@ -79,7 +79,7 @@ MACRO: (send) ( selector super? -- quot )
 ! Runtime introspection
 SYMBOL: class-init-hooks
 
-class-init-hooks global [ H{ } clone or ] change-at
+class-init-hooks [ H{ } clone or ] initialize
 
 : (objc-class) ( name word -- class )
     2dup execute dup [ 2nip ] [
