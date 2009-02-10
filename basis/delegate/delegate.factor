@@ -1,10 +1,9 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg
 ! Portions copyright (C) 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes.tuple definitions
-generalizations generic generic.standard hashtables kernel
-lexer make math parser generic.parser sequences sets slots
-words words.symbol fry ;
+USING: accessors arrays assocs classes.tuple definitions generic
+generic.standard hashtables kernel lexer make math parser
+generic.parser sequences sets slots words words.symbol fry ;
 IN: delegate
 
 : protocol-words ( protocol -- words )
@@ -30,7 +29,7 @@ M: tuple-class group-words
 
 : consult-method ( word class quot -- )
     [ drop swap first create-method-in ]
-    [ nip [ , dup second , \ ndip , first , ] [ ] make ] 3bi
+    [ nip [ swap [ second [ [ dip ] curry ] times % ] [ first , ] bi ] [ ] make ] 3bi
     define ;
 
 : change-word-prop ( word prop quot -- )

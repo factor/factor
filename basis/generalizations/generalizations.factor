@@ -2,7 +2,7 @@
 ! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private math combinators
-macros quotations fry stack-checker.transforms effects ;
+macros quotations fry effects ;
 IN: generalizations
 
 <<
@@ -95,11 +95,3 @@ MACRO: nweave ( n -- )
     [ narray concat ] dip like ; inline
 
 : nappend ( n -- seq ) narray concat ; inline
-
-: nths-quot ( indices -- quot )
-    [ [ '[ _ swap nth ] ] map ] [ length ] bi
-    '[ _ cleave _ narray ] ;
-
-\ shuffle [
-    shuffle-mapping nths-quot
-] 1 define-transform
