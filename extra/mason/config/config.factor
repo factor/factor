@@ -81,7 +81,7 @@ SYMBOL: upload-directory
 
 ! Optional: override ssh and scp command names
 SYMBOL: scp-command
-scp-command global [ "scp" or ] change-at
+scp-command [ "scp" ] initialize
 
 SYMBOL: ssh-command
-ssh-command global [ "ssh" or ] change-at
+ssh-command [ "ssh" ] initialize
