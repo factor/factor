@@ -178,6 +178,4 @@ SYMBOL: remake-generics-hook
 : default-recompile-hook ( words -- alist )
     [ f ] { } map>assoc ;
 
-recompile-hook global
-[ [ default-recompile-hook ] or ]
-change-at
+recompile-hook [ [ default-recompile-hook ] ] initialize
