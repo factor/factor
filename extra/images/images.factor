@@ -6,8 +6,7 @@ io.pathnames ;
 IN: images
 
 : <image> ( path -- image )
-    normalize-path dup "." split1-last nip >lower
-    {
+    dup file-extension >lower {
         { "bmp" [ bitmap-image load-image ] }
         { "tiff" [ tiff-image load-image ] }
     } case ;
