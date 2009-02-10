@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel splitting.monotonic accessors wrap grouping ;
+USING: sequences kernel splitting.monotonic accessors grouping wrap ;
 IN: wrap.words
 
 TUPLE: word key width break? ;
