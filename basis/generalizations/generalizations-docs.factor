@@ -58,7 +58,7 @@ HELP: npick
 "placed on the top of the stack."
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 4 npick .s" "1\n2\n3\n4\n1" }
+  { $example "USING: kernel prettyprint generalizations ;" "1 2 3 4 4 npick .s clear" "1\n2\n3\n4\n1" }
   "Some core words expressed in terms of " { $link npick } ":"
     { $table
         { { $link dup } { $snippet "1 npick" } }
@@ -75,7 +75,7 @@ HELP: ndup
 "placed on the top of the stack."
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 4 ndup .s" "1\n2\n3\n4\n1\n2\n3\n4" }
+  { $example "USING: prettyprint generalizations kernel ;" "1 2 3 4 4 ndup .s clear" "1\n2\n3\n4\n1\n2\n3\n4" }
   "Some core words expressed in terms of " { $link ndup } ":"
     { $table
         { { $link dup } { $snippet "1 ndup" } }
@@ -91,7 +91,7 @@ HELP: nnip
 "for any number of items."
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 3 nnip .s" "4" }
+  { $example "USING: prettyprint generalizations kernel ;" "1 2 3 4 3 nnip .s clear" "4" }
   "Some core words expressed in terms of " { $link nnip } ":"
     { $table
         { { $link nip } { $snippet "1 nnip" } }
@@ -106,7 +106,7 @@ HELP: ndrop
 "for any number of items."
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 3 ndrop .s" "1" }
+  { $example "USING: prettyprint generalizations kernel ;" "1 2 3 4 3 ndrop .s clear" "1" }
   "Some core words expressed in terms of " { $link ndrop } ":"
     { $table
         { { $link drop } { $snippet "1 ndrop" } }
@@ -121,7 +121,7 @@ HELP: nrot
 "number of items on the stack. "
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 4 nrot .s" "2\n3\n4\n1" }
+  { $example "USING: prettyprint generalizations kernel ;" "1 2 3 4 4 nrot .s clear" "2\n3\n4\n1" }
   "Some core words expressed in terms of " { $link nrot } ":"
     { $table
         { { $link swap } { $snippet "1 nrot" } }
@@ -135,7 +135,7 @@ HELP: -nrot
 "number of items on the stack. "
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 4 -nrot .s" "4\n1\n2\n3" }
+  { $example "USING: prettyprint generalizations kernel ;" "1 2 3 4 4 -nrot .s clear" "4\n1\n2\n3" }
   "Some core words expressed in terms of " { $link -nrot } ":"
     { $table
         { { $link swap } { $snippet "1 -nrot" } }
@@ -151,8 +151,8 @@ HELP: ndip
 "stack. The quotation can consume and produce any number of items."
 } 
 { $examples
-  { $example "USING: generalizations kernel prettyprint ;" "1 2 [ dup ] 1 ndip .s" "1\n1\n2" }
-  { $example "USING: generalizations kernel prettyprint ;" "1 2 3 [ drop ] 2 ndip .s" "2\n3" }
+  { $example "USING: generalizations kernel prettyprint kernel ;" "1 2 [ dup ] 1 ndip .s clear" "1\n1\n2" }
+  { $example "USING: generalizations kernel prettyprint kernel ;" "1 2 3 [ drop ] 2 ndip .s clear" "2\n3" }
   "Some core words expressed in terms of " { $link ndip } ":"
     { $table
         { { $link dip } { $snippet "1 ndip" } }
@@ -168,7 +168,7 @@ HELP: nslip
 "removed from the stack, the quotation called, and the items restored."
 } 
 { $examples
-  { $example "USING: generalizations prettyprint ;" "[ 99 ] 1 2 3 4 5 5 nslip .s" "99\n1\n2\n3\n4\n5" }
+  { $example "USING: generalizations kernel prettyprint ;" "[ 99 ] 1 2 3 4 5 5 nslip .s clear" "99\n1\n2\n3\n4\n5" }
   "Some core words expressed in terms of " { $link nslip } ":"
     { $table
         { { $link slip } { $snippet "1 nslip" } }
@@ -184,7 +184,7 @@ HELP: nkeep
 "saved, the quotation called, and the items restored."
 } 
 { $examples
-  { $example "USING: generalizations kernel prettyprint ;" "1 2 3 4 5 [ drop drop drop drop drop 99 ] 5 nkeep .s" "99\n1\n2\n3\n4\n5" }
+  { $example "USING: generalizations kernel prettyprint ;" "1 2 3 4 5 [ drop drop drop drop drop 99 ] 5 nkeep .s clear" "99\n1\n2\n3\n4\n5" }
   "Some core words expressed in terms of " { $link nkeep } ":"
     { $table
         { { $link keep } { $snippet "1 nkeep" } }
