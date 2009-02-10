@@ -3,13 +3,14 @@
 USING: accessors combinators io io.encodings.binary io.files
 kernel pack endian tools.hexdump constructors sequences arrays
 sorting.slots math.order math.parser prettyprint classes
-io.binary assocs math math.bitwise byte-arrays grouping ;
-IN: graphics.tiff
+io.binary assocs math math.bitwise byte-arrays grouping
+images.backend ;
+IN: images.tiff
 
-TUPLE: tiff endianness the-answer ifd-offset ifds ;
+TUPLE: tiff-image < image ;
 
-CONSTRUCTOR: tiff ( -- tiff )
-    V{ } clone >>ifds ;
+TUPLE: parsed-tiff endianness the-answer ifd-offset ifds ;
+CONSTRUCTOR: parsed-tiff ( -- tiff ) V{ } clone >>ifds ;
 
 TUPLE: ifd count ifd-entries next
 processed-tags strips buffer ;
@@ -83,13 +84,13 @@ ERROR: bad-planar-configuration n ;
         [ bad-planar-configuration ]
     } case ;
 
-ERROR: bad-sample-format n ;
 SINGLETONS: sample-format
 sample-format-unsigned-integer
 sample-format-signed-integer
 sample-format-ieee-float
 sample-format-undefined-data ;
-: lookup-sample-format ( seq -- object )
+ERROR: bad-sample-format n ;
+: lookup-sample-format ( sequence -- object )
     [
         {
             { 1 [ sample-format-unsigned-integer ] }
@@ -100,12 +101,12 @@ sample-format-undefined-data ;
         } case
     ] map ;
 
-ERROR: bad-extra-samples n ;
 SINGLETONS: extra-samples
 extra-samples-unspecified-alpha-data
 extra-samples-associated-alpha-data
 extra-samples-unassociated-alpha-data ;
-: lookup-extra-samples ( seq -- object )
+ERROR: bad-extra-samples n ;
+: lookup-extra-samples ( sequence -- object )
     {
         { 0 [ extra-samples-unspecified-alpha-data ] }
         { 1 [ extra-samples-associated-alpha-data ] }
@@ -259,13 +260,26 @@ ERROR: bad-small-ifd-type n ;
 : strips>buffer ( ifd -- ifd )
     dup strips>> concat >>buffer ;
 
-: (load-tiff) ( path -- tiff )
+: ifd>image ( ifd -- image )
+    {
+        [ image-width find-tag ]
+        [ image-length find-tag ]
+        [ bits-per-sample find-tag sum ]
+        [ buffer>> ]
+    } cleave tiff-image new-image ;
+
+: parsed-tiff>images ( tiff -- sequence )
+    ifds>> [ ifd>image ] map ;
+
+: load-tiff ( path -- parsed-tiff )
     binary [
-        <tiff>
+        <parsed-tiff>
         read-header dup endianness>> [
             read-ifds
             dup ifds>> [ process-ifd read-strips strips>buffer drop ] each
         ] with-endianness
     ] with-file-reader ;
 
-: load-tiff ( path -- tiff ) (load-tiff) ;
+! tiff files can store several images -- we just take the first for now
+M: tiff-image load-image* ( path tiff-image -- image )
+    drop load-tiff parsed-tiff>images first ;
