@@ -21,22 +21,6 @@ buffer ;
 : array-copy ( bitmap array -- bitmap array' )
     over size-image>> abs memory>byte-array ;
 
-MACRO: (nbits>bitmap) ( bits -- )
-    [ -3 shift ] keep '[
-        bitmap new
-            2over * _ * >>size-image
-            swap >>height
-            swap >>width
-            swap array-copy [ >>buffer ] [ >>color-index ] bi
-            _ >>bit-count
-    ] ;
-
-: bgr>bitmap ( array height width -- bitmap )
-    24 (nbits>bitmap) ;
-
-: bgra>bitmap ( array height width -- bitmap )
-    32 (nbits>bitmap) ;
-
 : 8bit>buffer ( bitmap -- array )
     [ rgb-quads>> 4 <sliced-groups> [ 3 head-slice ] map ]
     [ color-index>> >array ] bi [ swap nth ] with map concat ;
@@ -120,6 +104,22 @@ M: bitmap-magic summary
 M: bitmap-image load-image* ( path bitmap -- bitmap-image )
     drop load-bitmap
     bitmap>image ;
+
+MACRO: (nbits>bitmap) ( bits -- )
+    [ -3 shift ] keep '[
+        bitmap new
+            2over * _ * >>size-image
+            swap >>height
+            swap >>width
+            swap array-copy [ >>buffer ] [ >>color-index ] bi
+            _ >>bit-count bitmap>image
+    ] ;
+
+: bgr>bitmap ( array height width -- bitmap )
+    24 (nbits>bitmap) ;
+
+: bgra>bitmap ( array height width -- bitmap )
+    32 (nbits>bitmap) ;
 
 : write2 ( n -- ) 2 >le write ;
 : write4 ( n -- ) 4 >le write ;
