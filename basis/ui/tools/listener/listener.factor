@@ -8,10 +8,9 @@ io.styles kernel lexer listener math models models.delay models.filter
 namespaces parser prettyprint quotations sequences strings threads
 tools.vocabs vocabs vocabs.loader vocabs.parser words ui ui.commands
 ui.render ui.gadgets ui.gadgets.buttons ui.gadgets.editors
-ui.gadgets.frames ui.gadgets.grids ui.gadgets.labelled
-ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.tracks ui.gadgets.borders ui.gestures ui.operations
-ui.tools.browser ui.tools.common ui.tools.debugger
+ui.gadgets.labelled ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
+ui.operations ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.listener.completion ui.tools.listener.popups
 ui.tools.listener.history ;
 IN: ui.tools.listener
@@ -66,13 +65,12 @@ M: char-completion (word-at-caret)
     [ '[ _ word-at-caret ] ] bi
     <filter> ;
 
-: <interactor> ( output -- gadget )
+: <interactor> ( -- gadget )
     interactor new-editor
         <flag> >>flag
         dup one-word-elt <element-model> >>token-model
         dup <word-model> >>word-model
-        dup model>> <history> >>history
-        swap >>output ;
+        dup model>> <history> >>history ;
 
 M: interactor graft*
     [ call-next-method ] [ dup word-model>> add-connection ] bi ;
@@ -173,24 +171,16 @@ TUPLE: listener-gadget < tool input output scroller ;
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> ] bi <pane-stream> ;
 
-: <listener-input> ( listener -- gadget )
-    output>> <pane-stream> <interactor> ;
-
 : init-listener ( listener -- listener )
-    <scrolling-pane> >>output
-    dup <listener-input> >>input ;
-
-: <listener-scroller> ( listener -- scroller )
-    <frame>
-        over output>> @top grid-add
-        swap input>> @center grid-add
-    <scroller> ;
+    <interactor>
+    [ >>input ] [ pane new-pane t >>scrolls? >>output ] bi
+    dup listener-streams >>output drop ;
 
 : <listener-gadget> ( -- gadget )
     vertical listener-gadget new-track
         add-toolbar
         init-listener
-        dup <listener-scroller> >>scroller
+        dup output>> <scroller> >>scroller
         dup scroller>> 1 track-add ;
 
 M: listener-gadget focusable-child*

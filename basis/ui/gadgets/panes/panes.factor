@@ -8,29 +8,32 @@ fonts ui.gadgets ui.gadgets.private ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.paragraphs
 ui.gadgets.incremental ui.gadgets.packs ui.gadgets.theme
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
-ui.text ui.gadgets.presentations ui.gadgets.grids
+ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
 ui.gadgets.grid-lines colors call ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < pack
-output current prototype scrolls?
+output current input last-line prototype scrolls?
 selection-color caret mark selecting? ;
 
 : clear-selection ( pane -- pane )
-    f >>caret f >>mark ;
+    f >>caret f >>mark ; inline
 
-: add-output ( pane current -- pane )
-    [ >>output ] [ add-gadget ] bi ;
-
-: add-current ( pane current -- pane )
-    [ >>current ] [ add-gadget ] bi ;
-
-: prepare-line ( pane -- )
+: prepare-last-line ( pane -- )
     clear-selection
-    dup prototype>> clone add-current drop ;
+    [ last-line>> unparent ]
+    [
+        [ horizontal <track> ] dip
+        dup prototype>> clone >>current
+        [ current>> f track-add ]
+        [ input>> [ 1 track-add ] when* ]
+        [ swap [ >>last-line ] [ add-gadget ] bi drop ]
+        tri
+    ]
+    [ input>> [ request-focus ] when* ] tri ;
 
 : pane-caret&mark ( pane -- caret mark )
-    [ caret>> ] [ mark>> ] bi ;
+    [ caret>> ] [ mark>> ] bi ; inline
 
 : selected-children ( pane -- seq )
     [ pane-caret&mark sort-pair ] keep gadget-subtree ;
@@ -46,15 +49,17 @@ M: pane gadget-selection ( pane -- string/f )
     [ current>> clear-gadget ]
     bi ;
 
-: new-pane ( class -- pane )
+: new-pane ( input class -- pane )
     new-gadget
+        swap >>input
+        1 >>fill
         vertical >>orientation
         <shelf> +baseline+ >>align >>prototype
-        <incremental> add-output
-        dup prepare-line
-        selection-color >>selection-color ;
+        <incremental> [ >>output ] [ add-gadget ] bi
+        dup prepare-last-line
+        selection-color >>selection-color ; inline
 
-: <pane> ( -- pane ) pane new-pane ;
+: <pane> ( -- pane ) f pane new-pane ;
 
 GENERIC: draw-selection ( loc obj -- )
 
@@ -104,8 +109,7 @@ C: <pane-stream> pane-stream
     [
         [ current>> [ unparent ] [ smash-line ] bi ] [ output>> ] bi
         add-incremental
-    ]
-    [ prepare-line ] bi ;
+    ] [ prepare-last-line ] bi ;
 
 : pane-write ( seq pane -- )
     [ pane-nl ] [ current>> stream-write ]
@@ -141,8 +145,6 @@ M: style-stream write-gadget
 : make-pane ( quot -- gadget )
     <pane> [ swap with-pane ] keep smash-pane ; inline
 
-: <scrolling-pane> ( -- pane ) <pane> t >>scrolls? ;
-
 TUPLE: pane-control < pane quot ;
 
 M: pane-control model-changed ( model pane-control -- )
@@ -150,7 +152,7 @@ M: pane-control model-changed ( model pane-control -- )
     '[ _ call( value -- ) ] with-pane ;
 
 : <pane-control> ( model quot -- pane )
-    pane-control new-pane
+    f pane-control new-pane
         swap >>quot
         swap >>model ;
 

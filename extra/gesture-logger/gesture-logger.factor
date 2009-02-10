@@ -25,7 +25,7 @@ M: gesture-logger user-input*
 
 : gesture-logger ( -- )
     [
-        <scrolling-pane> dup <scroller>
+        <pane> t >>scrolls? dup <scroller>
         "Gesture log" open-window
         <pane-stream> <gesture-logger>
         "Gesture input" open-window
