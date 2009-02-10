@@ -9,7 +9,7 @@ IN: ui.tools.listener.tests
 \ <interactor> must-infer
 
 [
-    [ ] [ <pane> <pane-stream> <interactor> "interactor" set ] unit-test
+    [ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
 
     [ ] [ "interactor" get register-self ] unit-test
 
@@ -35,7 +35,7 @@ IN: ui.tools.listener.tests
 ] with-interactive-vocabs
 
 [
-    [ ] [ <pane> <pane-stream> <interactor> "interactor" set ] unit-test
+    [ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
 
     [ ] [ "interactor" get register-self ] unit-test
 
@@ -56,7 +56,7 @@ IN: ui.tools.listener.tests
 ] with-interactive-vocabs
 
 ! Hang
-[ ] [ <pane> <pane-stream> <interactor> "interactor" set ] unit-test
+[ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
 
 [ ] [ [ "interactor" get stream-read-quot drop ] "A" spawn drop ] unit-test
 
@@ -66,7 +66,7 @@ IN: ui.tools.listener.tests
 
 [ ] [ "interactor" get interactor-eof ] unit-test
 
-[ ] [ <pane> <pane-stream> <interactor> "interactor" set ] unit-test
+[ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
 
 : text "Hello world.\nThis is a test." ;
 
@@ -91,7 +91,7 @@ IN: ui.tools.listener.tests
 
 [ t ] [ "promise" get 2 seconds ?promise-timeout text = ] unit-test
 
-[ ] [ <pane> <pane-stream> <interactor> "interactor" set ] unit-test
+[ ] [ <interactor> <pane> <pane-stream> >>output "interactor" set ] unit-test
 
 [ ] [ text "interactor" get set-editor-string ] unit-test
 
@@ -115,7 +115,7 @@ IN: ui.tools.listener.tests
 [ ] [ <listener-gadget> "listener" set ] unit-test
 
 "listener" get [
-    <pane> <interactor> "i" set
+    <interactor> <pane> <pane-stream> >>output "i" set
 
     [ t ] [ "i" get interactor? ] unit-test
 
@@ -148,7 +148,7 @@ IN: ui.tools.listener.tests
     [ ] [ "listener" get com-end ] unit-test
 ] with-grafted-gadget
 
-[ ] [ \ + <pane> <interactor> vocabs>> use-if-necessary ] unit-test
+[ ] [ \ + <interactor> vocabs>> use-if-necessary ] unit-test
 
 [ ] [ <listener-gadget> "l" set ] unit-test
 [ ] [ "l" get com-scroll-up ] unit-test

@@ -8,6 +8,8 @@ IN: ui.text
 
 SYMBOL: font-renderer
 
+HOOK: init-text-rendering font-renderer ( world -- )
+
 HOOK: finish-text-rendering font-renderer ( world -- )
 
 M: object finish-text-rendering drop ;

@@ -3,7 +3,7 @@
 USING: arrays alien alien.c-types alien.syntax kernel
 destructors accessors fry words hashtables strings
 sequences memoize assocs math math.functions locals init
-namespaces combinators fonts colors core-foundation
+namespaces combinators fonts colors cache core-foundation
 core-foundation.strings core-foundation.attributed-strings
 core-foundation.utilities core-graphics core-graphics.types
 core-text.fonts core-text.utilities ;
@@ -47,7 +47,7 @@ ERROR: not-a-string object ;
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
-TUPLE: line font line metrics dim bitmap age refs disposed ;
+TUPLE: line font line metrics dim bitmap age disposed ;
 
 : compute-line-metrics ( line -- line-metrics )
     0 <CGFloat> 0 <CGFloat> 0 <CGFloat>
@@ -92,38 +92,16 @@ TUPLE: line font line metrics dim bitmap age refs disposed ;
                     [ [ line ] dip CTLineDraw ]
                 } cleave
             ] with-bitmap-context
-            [ open-font line metrics dim ] dip 0 0 f
+            [ open-font line metrics dim ] dip 0 f
         ]
         line boa
     ] with-destructors ;
 
 M: line dispose* [ font>> CFRelease ] [ line>> CFRelease ] bi ;
 
-: ref/unref-line ( line n -- )
-    '[ _ + ] change-refs 0 >>age drop ;
-
-: ref-line ( line -- ) 1 ref/unref-line ;
-: unref-line ( line -- ) -1 ref/unref-line ;
-
 SYMBOL: cached-lines
 
 : cached-line ( font string -- line )
     cached-lines get [ <line> ] 2cache ;
 
-CONSTANT: max-line-age 10
-
-: age ( obj -- ? )
-    [ 1+ ] change-age age>> max-line-age >= ;
-
-: age-line ( line -- ? )
-    #! Outputs t whether the line is dead.
-    dup refs>> 0 = [ age ] [ drop f ] if ;
-
-: age-assoc ( assoc quot -- assoc' )
-    '[ nip @ ] assoc-partition
-    [ values dispose-each ] dip ; inline
-
-: age-lines ( -- )
-    cached-lines global [ [ age-line ] age-assoc ] change-at ;
-
-[ H{ } clone cached-lines set-global ] "core-text" add-init-hook
+[ <cache-assoc> cached-lines set-global ] "core-text" add-init-hook
