@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors arrays kernel sequences math byte-arrays
-namespaces grouping fry cap graphics.bitmap
+namespaces grouping fry cap images.bitmap
 ui.gadgets ui.gadgets.packs ui.gadgets.borders ui.gadgets.grids
 ui.gadgets.grid-lines ui.gadgets.labels ui.gadgets.buttons
-ui.render ui opengl opengl.gl colors.constants ;
+ui.render ui opengl opengl.gl colors.constants images ;
 IN: ui.render.test
 
 SINGLETON: line-test
@@ -40,7 +40,7 @@ SYMBOL: render-output
     screenshot
     [ render-output set-global ]
     [
-        "resource:extra/ui/render/test/reference.bmp" load-bitmap
+        "resource:extra/ui/render/test/reference.bmp" <image>
         bitmap= "is perfect" "needs work" ?
         "Your UI rendering " prepend
         message-window
