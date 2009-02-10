@@ -3,7 +3,7 @@ quotations ;
 IN: ui.gadgets.panes
 
 HELP: pane
-{ $class-description "A pane " { $link gadget } " displays formatted text which is written to a " { $link pane-stream } " targetting the pane. Panes are created by calling " { $link <pane> } ", " { $link <scrolling-pane> } " or " { $link <pane-control> } "." } ;
+{ $class-description "A pane " { $link gadget } " displays formatted text which is written to a " { $link pane-stream } " targetting the pane. Panes are created by calling " { $link <pane> } " or " { $link <pane-control> } "." } ;
 
 HELP: <pane>
 { $values { "pane" "a new " { $link pane } } }
@@ -38,10 +38,6 @@ HELP: make-pane
 { $values { "quot" quotation } { "gadget" "a new " { $link gadget } } }
 { $description "Calls the quotation in a new scope where " { $link output-stream } " is rebound to a " { $link pane-stream } " writing to a new pane. The output area of the new pane is output on the stack after the quotation returns. The pane itself is not output." } ;
 
-HELP: <scrolling-pane>
-{ $values { "pane" "a new " { $link pane } } }
-{ $description "Creates a new " { $link pane } " gadget which scrolls any scroll pane containing it to the bottom on output. behaving much like a terminal or logger." } ;
-
 HELP: <pane-control>
 { $values { "model" model } { "quot" { $quotation "( value -- )" } } { "pane" "a new " { $link pane } } }
 { $description "Creates a new control delegating to a " { $link pane } ". When the value of the model changes, the value is pushed on the stack and the quotation is called using " { $link with-pane } "." } ;
@@ -59,7 +55,6 @@ ARTICLE: "ui.gadgets.panes" "Pane gadgets"
 "The " { $vocab-link "ui.gadgets.panes" } " vocabulary implements panes, which display formatted text."
 { $subsection pane }
 { $subsection <pane> }
-{ $subsection <scrolling-pane> }
 { $subsection <pane-control> }
 "Panes are written to by creating a special output stream:"
 { $subsection pane-stream }

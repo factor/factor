@@ -17,7 +17,7 @@ IN: ui.gadgets.panes.tests
 
 [ t ] [ #children "num-children" get = ] unit-test
 
-: test-gadget-text
+: test-gadget-text ( quot -- ? )
     dup make-pane gadget-text dup print "======" print
     swap with-string-writer dup print "\n" ?tail drop "\n" ?tail drop = ;
 
