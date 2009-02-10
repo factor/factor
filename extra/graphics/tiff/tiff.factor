@@ -14,6 +14,7 @@ the-answer
 ifd-offset
 ifds ;
 
+
 CONSTRUCTOR: tiff ( -- tiff )
     V{ } clone >>ifds ;
 
@@ -327,8 +328,9 @@ ERROR: bad-small-ifd-type n ;
     dup ifd-entries>>
     [ process-ifd-entry [ class ] keep ] H{ } map>assoc >>processed-tags ;
 
+: strips>buffer ( ifd -- ifd )
+    dup strips>> concat >>buffer ;
 /*
-: ifd-strips>buffer ( ifd -- ifd )
     [
         [ rows-per-strip find-tag n>> ]
         [ image-length find-tag n>> ] bi
@@ -342,7 +344,7 @@ ERROR: bad-small-ifd-type n ;
         <tiff>
         read-header [
             read-ifds
-            dup ifds>> [ process-ifd read-strips drop ] each
+            dup ifds>> [ process-ifd read-strips strips>buffer drop ] each
         ] with-tiff-endianness
     ] with-file-reader ;
 
