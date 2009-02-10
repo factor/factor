@@ -37,11 +37,12 @@ IN: io.launcher.windows.nt.tests
     "out.txt" temp-file ascii file-lines first
 ] unit-test
 
-[ ] [
+[ "( scratchpad ) " ] [
     <process>
         console-vm "-run=listener" 2array >>command
         +closed+ >>stdin
-    try-process
+        +stdout+ >>stderr
+    ascii [ input-stream get contents ] with-process-reader
 ] unit-test
 
 : launcher-test-path ( -- str )
@@ -162,3 +163,5 @@ IN: io.launcher.windows.nt.tests
    
     "append-test" temp-file ascii file-contents
 ] unit-test
+
+

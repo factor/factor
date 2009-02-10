@@ -22,7 +22,7 @@ A            DEFINES-CLASS ${T}-array
 byte-array>A DEFINES byte-array>${A}
 A{           DEFINES ${A}{
 
-NTH          [ T dup c-getter array-accessor ]
+NTH          [ T dup c-type-getter-boxer array-accessor ]
 SET-NTH      [ T dup c-setter array-accessor ]
 
 WHERE

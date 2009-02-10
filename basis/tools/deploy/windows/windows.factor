@@ -1,9 +1,9 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.files io.directories kernel namespaces sequences system
-tools.deploy.backend tools.deploy.config
-tools.deploy.config.editor assocs hashtables prettyprint
-combinators windows.shell32 windows.user32 ;
+USING: io io.files io.pathnames io.directories kernel namespaces
+sequences locals system splitting tools.deploy.backend
+tools.deploy.config tools.deploy.config.editor assocs hashtables
+prettyprint combinators windows.shell32 windows.user32 ;
 IN: tools.deploy.windows
 
 : copy-dll ( bundle-name -- )
@@ -15,13 +15,18 @@ IN: tools.deploy.windows
         "resource:zlib1.dll"
     } swap copy-files-into ;
 
+:: copy-vm ( executable bundle-name extension -- vm )
+    vm "." split1-last drop extension append
+    bundle-name executable ".exe" append append-path
+    [ copy-file ] keep ;
+
 : create-exe-dir ( vocab bundle-name -- vm )
     dup copy-dll
     deploy-ui? get [
-        dup copy-freetype
-        dup "" copy-fonts
-    ] when
-    ".exe" copy-vm ;
+        [ copy-freetype ]
+        [ "" copy-fonts ]
+        [ ".exe" copy-vm ] tri
+    ] [ ".com" copy-vm ] if ;
 
 M: winnt deploy*
     "resource:" [
