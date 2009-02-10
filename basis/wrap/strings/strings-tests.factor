@@ -27,7 +27,7 @@ word wrap.">
     "  " wrap-indented-string
 ] unit-test
 
-[ "this text\nhas lots\nof spaces" ]
+[ "this text\nhas lots of\nspaces" ]
 [ "this text        has lots of       spaces" 12 wrap-string ] unit-test
 
 [ "hello\nhow\nare\nyou\ntoday?" ]
@@ -39,3 +39,5 @@ word wrap.">
 [ "aaa bb\nccccccc\nddddddd" ] [ "aaa bb ccccccc ddddddd" 6 wrap-string ] unit-test
 
 \ wrap-string must-infer
+
+[ "a b c d e f\ng h" ] [ "a b c d e f g h" 11 wrap-string ] unit-test
