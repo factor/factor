@@ -79,7 +79,7 @@ MACRO: (send) ( selector super? -- quot )
 ! Runtime introspection
 SYMBOL: class-init-hooks
 
-class-init-hooks [ H{ } clone or ] initialize
+class-init-hooks [ H{ } clone ] initialize
 
 : (objc-class) ( name word -- class )
     2dup execute dup [ 2nip ] [
