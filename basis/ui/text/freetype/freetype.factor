@@ -94,7 +94,7 @@ MEMO: (open-font) ( font -- open-font )
 GENERIC: open-font ( font -- open-font )
 
 M: font open-font
-    clone f >>background f >>foreground (open-font) ;
+    freetype drop clone f >>background f >>foreground (open-font) ;
 
 : load-glyph ( font char -- glyph )
     [ handle>> dup ] dip 0 FT_Load_Char
