@@ -12,15 +12,15 @@ T-imaginary DEFINES ${T}-imaginary
 set-T-real DEFINES set-${T}-real
 set-T-imaginary DEFINES set-${T}-imaginary
 
->T DEFINES >${T}
-T> DEFINES ${T}>
+<T> DEFINES <${T}>
+*T DEFINES *${T}
 
 WHERE
 
-: >T ( z -- alien )
+: <T> ( z -- alien )
     >rect T <c-object> [ set-T-imaginary ] [ set-T-real ] [ ] tri ; inline
 
-: T> ( alien -- z )
+: *T ( alien -- z )
     [ T-real ] [ T-imaginary ] bi rect> ; inline
 
 T in get
@@ -28,8 +28,8 @@ T in get
 define-struct
 
 T c-type
-T> 1quotation >>boxer-quot
->T 1quotation >>unboxer-quot
+<T> 1quotation >>unboxer-quot
+*T 1quotation >>boxer-quot
 drop
 
 ;FUNCTOR
