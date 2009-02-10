@@ -79,7 +79,7 @@ SYMBOL: ui-error-hook
 : ui-error ( error -- )
     ui-error-hook get [ call( error -- ) ] [ die drop ] if* ;
 
-ui-error-hook global [ [ rethrow ] or ] change-at
+ui-error-hook [ [ rethrow ] ] initialize
 
 : draw-world ( world -- )
     dup draw-world? [

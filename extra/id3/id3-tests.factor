@@ -58,7 +58,7 @@ IN: id3.tests
        }
      }
 }
-] [ "resource:extra/id3/tests/blah3.mp3" id3-parse-mp3-file ] unit-test
+] [ "resource:extra/id3/tests/blah3.mp3" file-id3-tags ] unit-test
 
 [
     T{ mp3v2-file
@@ -159,7 +159,7 @@ IN: id3.tests
         }
     }
 }
-] [ "resource:extra/id3/tests/blah2.mp3" id3-parse-mp3-file ] unit-test
+] [ "resource:extra/id3/tests/blah2.mp3" file-id3-tags ] unit-test
 
 [    
   T{ mp3v1-file
@@ -178,5 +178,5 @@ IN: id3.tests
      }
      { genre 89 }
   }
-] [ "resource:extra/id3/tests/blah.mp3" id3-parse-mp3-file ] unit-test
+] [ "resource:extra/id3/tests/blah.mp3" file-id3-tags ] unit-test
 

@@ -11,7 +11,7 @@ html.templates ;
 
 SYMBOL: tags
 
-tags global [ H{ } clone or ] change-at
+tags [ H{ } clone ] initialize
 
 : define-chloe-tag ( name quot -- ) swap tags get set-at ;
 

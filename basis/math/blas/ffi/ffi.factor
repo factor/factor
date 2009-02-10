@@ -3,9 +3,11 @@ IN: math.blas.ffi
 
 <<
 "blas" {
-    { [ os macosx? ] [ "libblas.dylib" "cdecl" add-library ] }
-    { [ os windows? ] [ "blas.dll" "cdecl" add-library ] }
-    [ "libblas.so" "cdecl" add-library ]
+    { [ os macosx? ] [ "libblas.dylib" intel-unix-abi add-fortran-library ] }
+    { [ os windows? cpu x86.32? and ] [ "blas.dll" f2c-abi add-fortran-library ] }
+    { [ os windows? cpu x86.64? and ] [ "blas.dll" gfortran-abi add-fortran-library ] }
+    { [ os freebsd? ] [ "libblas.so" gfortran-abi add-fortran-library ] }
+    [ "libblas.so" f2c-abi add-fortran-library ]
 } cond
 >>
 

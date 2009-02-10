@@ -8,7 +8,7 @@ SYMBOL: io-backend
 
 SINGLETON: c-io-backend
 
-io-backend global [ c-io-backend or ] change-at
+io-backend [ c-io-backend ] initialize
 
 HOOK: init-io io-backend ( -- )
 
