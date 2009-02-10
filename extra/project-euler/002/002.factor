@@ -1,6 +1,6 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer, Alexander Solovyov, Vishal Talwar.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences shuffle ;
+USING: kernel math sequences ;
 IN: project-euler.002
 
 ! http://projecteuler.net/index.php?section=problems&id=2
@@ -41,7 +41,7 @@ PRIVATE>
 ! -------------------
 
 : fib-upto* ( n -- seq )
-    0 1 [ pick over >= ] [ tuck + dup ] [ ] produce 3nip
+    0 1 [ pick over >= ] [ tuck + dup ] [ ] produce [ 3drop ] dip
     but-last-slice { 0 1 } prepend ;
 
 : euler002a ( -- answer )
