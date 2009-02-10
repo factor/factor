@@ -3,8 +3,9 @@
 USING: arrays assocs io kernel math models namespaces make dlists
 deques sequences threads sequences words continuations init call
 combinators hashtables concurrency.flags sets accessors calendar fry
-ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gadgets.tracks
-ui.gestures ui.backend ui.render ui.text ui.text.private ;
+destructors ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gadgets.tracks ui.gestures ui.backend ui.render ui.text
+ui.text.private ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -55,14 +56,12 @@ M: world graft*
 : reset-world ( world -- )
     #! This is used when a window is being closed, but also
     #! when restoring saved worlds on image startup.
-    [ fonts>> clear-assoc ]
-    [ unfocus-world ]
-    [ f >>handle drop ] tri ;
+    f >>handle unfocus-world ;
 
 : (ungraft-world) ( world -- )
     {
         [ handle>> select-gl-context ]
-        [ fonts>> free-fonts ]
+        [ text-handle>> dispose ]
         [ hand-clicked close-global ]
         [ hand-gadget close-global ]
     } cleave ;
@@ -95,7 +94,7 @@ M: world ungraft*
     children>> [ restore-gadget ] each ;
 
 : restore-world ( world -- )
-    dup reset-world restore-gadget ;
+    [ reset-world ] [ init-text-rendering ] [ restore-gadget ] tri ;
 
 : update-hand ( world -- )
     dup hand-world get-global eq?

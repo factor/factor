@@ -10,7 +10,7 @@ TUPLE: world < track
 active? focused?
 glass
 title status
-fonts handle
+text-handle handle
 window-loc ;
 
 : find-world ( gadget -- world/f ) [ world? ] find-parent ;
@@ -42,11 +42,11 @@ M: world request-focus-on ( child gadget -- )
     vertical swap new-track
         t >>root?
         t >>active?
-        H{ } clone >>fonts
         { 0 0 } >>window-loc
         swap >>status
         swap >>title
         swap 1 track-add
+    dup init-text-rendering
     dup request-focus ;
 
 : <world> ( gadget title status -- world )
