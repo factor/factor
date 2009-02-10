@@ -2,23 +2,20 @@ USING: images.bitmap images.viewer io.encodings.binary
 io.files io.files.unique kernel tools.test ;
 IN: images.bitmap.tests
 
-: test-bitmap32-alpha ( -- path )
-    "resource:extra/images/bitmap/test-images/32alpha.bmp" ;
-
 : test-bitmap24 ( -- path )
-    "resource:extra/images/bitmap/test-images/thiswayup24.bmp" ;
+    "resource:extra/images/test-images/thiswayup24.bmp" ;
 
 : test-bitmap16 ( -- path )
-    "resource:extra/images/bitmap/test-images/rgb16bit.bmp" ;
+    "resource:extra/images/test-images/rgb16bit.bmp" ;
 
 : test-bitmap8 ( -- path )
-    "resource:extra/images/bitmap/test-images/rgb8bit.bmp" ;
+    "resource:extra/images/test-images/rgb8bit.bmp" ;
 
 : test-bitmap4 ( -- path )
-    "resource:extra/images/bitmap/test-images/rgb4bit.bmp" ;
+    "resource:extra/images/test-images/rgb4bit.bmp" ;
 
 : test-bitmap1 ( -- path )
-    "resource:extra/images/bitmap/test-images/1bit.bmp" ;
+    "resource:extra/images/test-images/1bit.bmp" ;
 
 [ t ]
 [

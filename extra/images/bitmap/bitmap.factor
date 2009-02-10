@@ -97,7 +97,7 @@ M: bitmap-magic summary
     dup rgb-quads-length read >>rgb-quads
     dup color-index-length read >>color-index ;
 
-: load-bitmap ( path -- bitmap )
+: load-bitmap-data ( path -- bitmap )
     binary [
         bitmap new
         parse-file-header parse-bitmap-header parse-bitmap
@@ -106,14 +106,19 @@ M: bitmap-magic summary
 : alpha-channel-zero? ( bitmap -- ? )
     buffer>> 4 <sliced-groups> 3 <column> [ 0 = ] all? ;
 
+: process-bitmap-data ( bitmap -- bitmap )
+    dup raw-bitmap>buffer >>buffer
+    dup alpha-channel-zero? >>alpha-channel-zero? ;
+
+: load-bitmap ( path -- bitmap )
+    load-bitmap-data process-bitmap-data ;
+
 : bitmap>image ( bitmap -- bitmap-image )
     { [ width>> ] [ height>> ] [ bit-count>> ] [ buffer>> ] } cleave
     bitmap-image new-image ;
 
 M: bitmap-image load-image* ( path bitmap -- bitmap-image )
     drop load-bitmap
-    dup raw-bitmap>buffer >>buffer
-    dup alpha-channel-zero? >>alpha-channel-zero?
     bitmap>image ;
 
 : write2 ( n -- ) 2 >le write ;
