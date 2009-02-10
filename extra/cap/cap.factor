@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays byte-arrays kernel math namespaces
-opengl.gl sequences math.vectors ui graphics.bitmap graphics.viewer
+opengl.gl sequences math.vectors ui images.bitmap images.viewer
 models ui.gadgets.worlds ui.gadgets fry alien.syntax ;
 IN: cap
 
@@ -27,4 +27,4 @@ IN: cap
     [ screenshot ] dip save-bitmap ;
 
 : screenshot. ( window -- )
-    [ screenshot <graphics-gadget> ] [ title>> ] bi open-window ; 
+    [ screenshot <image-gadget> ] [ title>> ] bi open-window ; 

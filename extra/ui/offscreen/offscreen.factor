@@ -1,5 +1,5 @@
 ! (c) 2008 Joe Groff, see license for details
-USING: accessors continuations graphics.bitmap kernel math
+USING: accessors continuations images.bitmap kernel math
 sequences ui.gadgets ui.gadgets.worlds ui ui.backend
 destructors ;
 IN: ui.offscreen

@@ -87,11 +87,11 @@ CONSTANT: packed-length-table
         { CHAR: D 8 }
     }
 
+PRIVATE>
+
 MACRO: pack ( str -- quot )
     [ pack-table at '[ _ execute ] ] { } map-as
     '[ [ [ _ spread ] input<sequence ] B{ } append-outputs-as ] ;
-
-PRIVATE>
 
 : ch>packed-length ( ch -- n )
     packed-length-table at ; inline
@@ -113,13 +113,13 @@ PRIVATE>
 : start/end ( seq -- seq1 seq2 )
     [ 0 [ + ] accumulate nip dup ] keep v+ ; inline
 
+PRIVATE>
+
 MACRO: unpack ( str -- quot )
     [ [ ch>packed-length ] { } map-as start/end ]
     [ [ unpack-table at '[ @ ] ] { } map-as ] bi
     [ '[ [ _ _ ] dip <slice> @ ] ] 3map
     '[ [ _ cleave ] output>array ] ;
-
-PRIVATE>
 
 : unpack-native ( seq str -- seq )
     '[ _ _ unpack ] with-native-endian ; inline
