@@ -418,8 +418,12 @@ PRIVATE>
 
 : RECORD: scan in get parse-definition define-fortran-record ; parsing
 
+: set-fortran-abi ( library -- )
+    library-fortran-abis get-global at fortran-abi set ;
+
 : (fortran-invoke) ( return library function parameters -- quot )
     {
+        [ 2drop nip set-fortran-abi ]
         [ 2nip [<fortran-result>] ]
         [ nip nip nip [fortran-args>c-args] ]
         [ [fortran-invoke] ]
@@ -445,5 +449,5 @@ MACRO: fortran-invoke ( return library function parameters -- )
 : LIBRARY:
     scan
     [ "c-library" set ]
-    [ library-fortran-abis get-global at fortran-abi set ] bi  ; parsing
+    [ set-fortran-abi ] bi  ; parsing
 
