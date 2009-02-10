@@ -24,7 +24,7 @@ IN: lists.lazy.tests
 ] unit-test
 
 [ { 4 5 6 } ] [ 
-    3 { 1 2 3 } >list [ + ] lazy-map-with list>array
+    3 { 1 2 3 } >list [ + ] with lazy-map list>array
 ] unit-test
 
 [ [ ] lmap ] must-infer

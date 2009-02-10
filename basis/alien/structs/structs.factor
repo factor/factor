@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays generic hashtables kernel kernel.private
+USING: accessors arrays assocs generic hashtables kernel kernel.private
 math namespaces parser sequences strings words libc fry
 alien.c-types alien.structs.fields cpu.architecture math.order ;
 IN: alien.structs
@@ -68,3 +68,8 @@ M: struct-type stack-size
     [ expand-constants ] map
     [ [ heap-size ] [ max ] map-reduce ] keep
     compute-struct-align f (define-struct) ;
+
+: offset-of ( field struct -- offset )
+    c-types get at fields>> 
+    [ name>> = ] with find nip offset>> ;
+

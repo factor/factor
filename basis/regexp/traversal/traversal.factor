@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators kernel math
 quotations sequences regexp.parser regexp.classes fry arrays
-combinators.short-circuit regexp.utils prettyprint regexp.nfa
-shuffle ;
+combinators.short-circuit regexp.utils prettyprint regexp.nfa ;
 IN: regexp.traversal
 
 TUPLE: dfa-traverser
@@ -170,7 +169,7 @@ M: capture-group-off flag-action ( dfa-traverser flag -- )
     ] [ drop ] if ;
 
 : match-default ( transition from-state table -- to-state/f )
-    nipd transitions>> at t swap at ;
+    [ drop ] 2dip transitions>> at t swap at ;
 
 : match-transition ( obj from-state dfa -- to-state/f )
     { [ match-literal ] [ match-class ] [ match-default ] } 3|| ;

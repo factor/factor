@@ -81,11 +81,18 @@ CHLOE: a
 CHLOE: base
     compile-a-url [ [XML <base href=<->/> XML] ] [xml-code] ;
 
+: hidden-nested-fields ( -- xml )
+    nested-forms get " " join f like nested-forms-key
+    hidden-form-field ;
+
+: render-hidden ( for -- xml )
+    [ "," split [ hidden render>xml ] map ] [ f ] if* ;
+
 : compile-hidden-form-fields ( for -- )
     '[
-        _ [ "," split [ hidden render>xml ] map ] [ f ] if*
-        nested-forms get " " join f like nested-forms-key hidden-form-field>xml
-        [ [ modify-form ] each-responder ] with-string-writer <unescaped>
+        _ render-hidden
+        hidden-nested-fields
+        form-modifications
         [XML <div style="display: none;"><-><-><-></div> XML]
     ] [code] ;
 

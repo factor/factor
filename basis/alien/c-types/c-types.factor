@@ -185,6 +185,9 @@ M: f byte-length drop 0 ;
         [ "Cannot read struct fields with this type" throw ]
     ] unless* ;
 
+: c-type-getter-boxer ( name -- quot )
+    [ c-getter ] [ c-type-boxer-quot ] bi append ;
+
 : c-setter ( name -- quot )
     c-type-setter [
         [ "Cannot write struct fields with this type" throw ]

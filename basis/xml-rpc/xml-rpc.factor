@@ -126,11 +126,11 @@ TAG: int xml>item children>number ;
 TAG: double xml>item children>number ;
 
 TAG: boolean xml>item
-    dup children>string {
-        { [ dup "1" = ] [ 2drop t ] }
-        { [ "0" = ] [ drop f ] }
+    children>string {
+        { "1" [ t ] }
+        { "0" [ f ] }
         [ "Bad boolean" server-error ]
-    } cond ;
+    } case ;
 
 : unstruct-member ( tag -- )
     children-tags first2
