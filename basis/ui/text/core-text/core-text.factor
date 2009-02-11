@@ -26,11 +26,11 @@ M: core-text-renderer finish-text-rendering
     text-handle>> purge-texture-cache
     cached-lines get purge-cache ;
 
-: rendered-line ( font string -- display-list )
+: rendered-line ( font string -- texture )
     2array world get text-handle>> get-texture ;
 
 M: core-text-renderer draw-string ( font string -- )
-    rendered-line glCallList ;
+    rendered-line display-list>> glCallList ;
 
 M: core-text-renderer x>offset ( x font string -- n )
     [ 2drop 0 ] [

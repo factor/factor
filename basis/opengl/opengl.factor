@@ -5,7 +5,7 @@
 USING: alien alien.c-types continuations kernel libc math macros
 namespaces math.vectors math.constants math.functions
 math.parser opengl.gl opengl.glu combinators arrays sequences
-splitting words byte-arrays assocs colors accessors
+splitting words byte-arrays assocs colors colors.constants accessors
 generalizations locals fry specialized-arrays.float
 specialized-arrays.uint ;
 IN: opengl
@@ -106,6 +106,31 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : gl-fill-rect ( dim -- )
     fill-rect-vertices (gl-fill-rect) ;
 
+: init-texture ( -- )
+    GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR glTexParameteri
+    GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR glTexParameteri
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_REPEAT glTexParameterf
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_REPEAT glTexParameterf ;
+
+: rect-texture-coords ( -- )
+    float-array{ 0 0 1 0 1 1 0 1 } gl-texture-coord-pointer ;
+
+: do-attribs ( bits quot -- )
+    swap glPushAttrib call glPopAttrib ; inline
+
+: draw-textured-rect ( dim texture -- )
+    GL_TEXTURE_2D [
+        GL_TEXTURE_BIT [
+            GL_TEXTURE_COORD_ARRAY [
+                COLOR: white gl-color
+                GL_TEXTURE_2D swap glBindTexture
+                init-texture rect-texture-coords
+                fill-rect-vertices (gl-fill-rect)
+                GL_TEXTURE_2D 0 glBindTexture
+            ] do-enabled-client-state
+        ] do-attribs
+    ] do-enabled ;
+
 : circle-steps ( steps -- angles )
     dup length v/n 2 pi * v*n ;
 
@@ -179,9 +204,6 @@ MACRO: all-enabled-client-state ( seq quot -- )
 MACRO: set-draw-buffers ( buffers -- )
     words>values '[ _ (set-draw-buffers) ] ;
 
-: do-attribs ( bits quot -- )
-    swap glPushAttrib call glPopAttrib ; inline
-
 : gl-look-at ( eye focus up -- )
     [ first3 ] tri@ gluLookAt ;
 
@@ -206,16 +228,7 @@ MACRO: set-draw-buffers ( buffers -- )
 : make-dlist ( type quot -- id )
     [ gen-dlist ] 2dip '[ _ glNewList @ glEndList ] keep ; inline
 
-: init-texture ( -- )
-    GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP glTexParameterf
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP glTexParameterf ;
-
 : gl-translate ( point -- ) first2 0.0 glTranslated ;
-
-: rect-texture-coords ( -- )
-    float-array{ 0 0 1 0 1 1 0 1 } gl-texture-coord-pointer ;
 
 : delete-dlist ( id -- ) 1 glDeleteLists ;
 
