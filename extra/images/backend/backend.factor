@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel grouping fry sequences combinators ;
+USING: accessors kernel grouping fry sequences combinators
+images.bitmap math ;
 IN: images.backend
 
 SINGLETONS: BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR ;
@@ -37,8 +38,17 @@ GENERIC: >image ( object -- image )
         ] }
     } case RGBA >>component-order ;
 
+GENERIC: normalize-scan-line-order ( image -- image )
+
+M: image normalize-scan-line-order ;
+M: bitmap-image normalize-scan-line-order
+    dup
+    [ bitmap>> ] [ dim>> first 4 * ] bi <sliced-groups> reverse concat
+    >>bitmap ;
+    
 : normalize-image ( image -- image )
-    normalize-component-order ;
+    normalize-component-order
+    normalize-scan-line-order ;
 
 : new-image ( dim component-order bitmap class -- image )
     new 
