@@ -8,8 +8,9 @@ IN: ui.gadgets.line-support
 ! Some code shared by table and editor gadgets
 SLOT: font
 
-: line-height ( gadget -- n )
-    font>> "" text-height ;
+GENERIC: line-height ( gadget -- n )
+
+M: gadget line-height font>> "" text-height ;
 
 : y>line ( y gadget -- n )
     line-height /i ;
