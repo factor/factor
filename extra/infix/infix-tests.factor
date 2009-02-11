@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Philipp Brüschweiler
+! See http://factorcode.org/license.txt for BSD license.
 USING: infix infix.private kernel locals math math.functions
 tools.test ;
 IN: infix.tests
