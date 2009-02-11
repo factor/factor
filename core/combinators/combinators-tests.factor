@@ -324,3 +324,17 @@ DEFER: corner-case-1
 [ 4 ] [ 2 corner-case-1 ] unit-test
 
 [ 4 ] [ 2 2 [ + ] curry 1array case ] unit-test
+
+: test-case-8 ( n -- )
+    {
+        { 1 [ "foo" ] }
+    } case ;
+
+[ 3 test-case-8 ]
+[ object>> 3 = ] must-fail-with
+
+[
+    3 {
+        { 1 [ "foo" ] }
+    } case
+] [ object>> 3 = ] must-fail-with
