@@ -47,7 +47,7 @@ ERROR: not-a-string object ;
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
-TUPLE: line font line metrics dim bitmap age disposed ;
+TUPLE: line font line metrics dim bitmap disposed ;
 
 : compute-line-metrics ( line -- line-metrics )
     0 <CGFloat> 0 <CGFloat> 0 <CGFloat>
@@ -92,9 +92,9 @@ TUPLE: line font line metrics dim bitmap age disposed ;
                     [ [ line ] dip CTLineDraw ]
                 } cleave
             ] with-bitmap-context
-            [ open-font line metrics dim ] dip 0 f
+            [ open-font line metrics dim ] dip
         ]
-        line boa
+        f line boa
     ] with-destructors ;
 
 M: line dispose* [ font>> CFRelease ] [ line>> CFRelease ] bi ;
