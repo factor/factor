@@ -4,11 +4,12 @@ USING: accessors arrays colors colors.constants fry kernel math
 math.rectangles math.order math.vectors namespaces opengl sequences
 ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
 ui.gadgets.worlds ui.gadgets.theme ui.gestures ui.render ui.text
-ui.gadgets.menus ui.gadgets.line-support math.rectangles models
-math.ranges sequences combinators fonts locals ;
+ui.images ui.gadgets.menus ui.gadgets.line-support math.rectangles
+models math.ranges sequences combinators fonts locals strings ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
+GENERIC: prototype-row ( renderer -- columns )
 GENERIC: row-columns ( row renderer -- columns )
 GENERIC: row-value ( row renderer -- object )
 GENERIC: row-color ( row renderer -- color )
@@ -16,14 +17,22 @@ GENERIC: row-color ( row renderer -- color )
 SINGLETON: trivial-renderer
 
 M: trivial-renderer row-columns drop ;
+M: object prototype-row drop { "" } ;
 M: object row-value drop ;
 M: object row-color 2drop f ;
 
 TUPLE: table < gadget
-renderer filled-column column-alignment action single-click? hook
+{ renderer initial: trivial-renderer }
+filled-column column-alignment
+{ action initial: [ drop ] }
+single-click?
+{ hook initial: [ ] }
+{ gap initial: 6 }
 column-widths total-width
 font selection-color focus-border-color
-mouse-color column-line-color selection-required?
+{ mouse-color initial: COLOR: black }
+{ column-line-color initial: COLOR: dark-gray }
+selection-required?
 selected-index selected-value
 mouse-index
 focused? ;
@@ -31,32 +40,46 @@ focused? ;
 : <table> ( rows -- table )
     table new-gadget
         swap >>model
-        trivial-renderer >>renderer
-        [ drop ] >>action
-        [ ] >>hook
         f <model> >>selected-value
         sans-serif-font >>font
         selection-color >>selection-color
-        focus-border-color >>focus-border-color
-        COLOR: dark-gray >>column-line-color
-        COLOR: black >>mouse-color ;
+        focus-border-color >>focus-border-color ;
 
 <PRIVATE
 
-CONSTANT: table-gap 6
+GENERIC: cell-width ( font cell -- x )
+GENERIC: cell-height ( font cell -- y )
+GENERIC: draw-cell ( font cell -- )
+
+M: string cell-width text-width ;
+M: string cell-height text-height ;
+M: string draw-cell draw-text ;
+
+M: image-name cell-width nip image-dim first ;
+M: image-name cell-height nip image-dim second ;
+M: image-name draw-cell nip draw-image ;
 
 : table-rows ( table -- rows )
     [ control-value ] [ renderer>> ] bi '[ _ row-columns ] map ;
 
-: (compute-column-widths) ( font rows -- total widths )
-    [ drop 0 { } ] [
-        [ nip first length 0 <repetition> ] 2keep
-        [ [ text-width ] with map vmax ] with each
-        [ [ sum ] [ length 1 [-] table-gap * ] bi + ] keep
+: column-offsets ( widths gap -- x xs )
+    [ 0 ] dip '[ _ + + ] accumulate ;
+
+: initial-widths ( rows -- widths )
+    first length 0 <repetition> ;
+
+: row-column-widths ( font row -- widths )
+    [ cell-width ] with map ;
+
+: (compute-column-widths) ( gap font rows -- total widths )
+    [ 2drop 0 { } ] [
+        [ nip initial-widths ] 2keep
+        [ row-column-widths vmax ] with each
+        [ swap [ column-offsets drop ] keep - ] keep
     ] if-empty ;
 
 : compute-column-widths ( table -- total-width column-widths )
-    [ font>> ] [ table-rows ] bi (compute-column-widths) ;
+    [ gap>> ] [ font>> ] [ table-rows ] tri (compute-column-widths) ;
 
 : update-cached-widths ( table -- )
     dup compute-column-widths
@@ -108,28 +131,32 @@ M: table layout*
         over mouse-color>> [ gl-rect ] highlight-row
     ] [ 2drop ] if ;
 
-: column-offsets ( table -- xs )
-    0 [ table-gap + + ] accumulate nip ;
+: column-line-offsets ( widths gap -- xs )
+    [ column-offsets nip [ f ] ]
+    [ 2/ '[ rest-slice [ _ - ] map ] ]
+    bi if-empty ;
 
-: column-line-offsets ( table -- xs )
-    column-offsets
-    [ f ] [ rest-slice [ table-gap 2/ - ] map ] if-empty ;
-
-: draw-columns ( table -- )
+: draw-column-lines ( table -- )
     [ column-line-color>> gl-color ]
     [
-        [ column-widths>> column-line-offsets ] [ dim>> second ] bi
+        [ [ column-widths>> ] [ gap>> ] bi column-line-offsets ] [ dim>> second ] bi
         '[ [ 0 2array ] [ _ 2array ] bi gl-line ] each
     ] bi ;
 
 : column-loc ( font column width align -- loc )
-    [ [ text-width ] dip swap - ] dip
+    [ [ cell-width ] dip swap - ] dip
     * 0 2array ;
 
-: draw-column ( font column width align -- )
-    over [
-        [ 2dup ] 2dip column-loc [ draw-text ] with-translation
-    ] dip table-gap + 0 2array gl-translate ;
+: translate-column ( width gap -- )
+    + 0 2array gl-translate ;
+
+: draw-column ( font column width align gap -- )
+    [
+        over [
+            [ 2dup ] 2dip column-loc
+            [ draw-cell ] with-translation
+        ] dip
+    ] dip translate-column ;
 
 : column-alignment ( table -- seq )
     dup column-alignment>>
@@ -147,25 +174,29 @@ M: table draw-line ( row index table -- )
         [ column-widths>> ]
         [ column-alignment ]
         tri
-    ] [ row-font ] 3bi
-    '[ [ _ ] 3dip draw-column ] 3each ;
+    ]
+    [ row-font ]
+    [ 2nip gap>> ] 3tri
+    '[ [ _ ] 3dip _ draw-column ] 3each ;
 
 M: table draw-gadget*
     dup control-value empty? [ drop ] [
         {
             [ draw-selected-row ]
-            [ draw-columns ]
             [ draw-lines ]
+            [ draw-column-lines ]
             [ draw-focused-row ]
             [ draw-moused-row ]
         } cleave
     ] if ;
 
+M: table line-height ( table -- y )
+    [ font>> ] [ renderer>> prototype-row ] bi
+    [ cell-height ] with [ max ] map-reduce ;
+
 M: table pref-dim*
     [ compute-column-widths drop ] keep
-    [ font>> "" text-height ]
-    [ control-value length ]
-    bi * 2array ;
+    [ line-height ] [ control-value length ] bi * 2array ;
 
 : nth-row ( row table -- value/f ? )
     over [ control-value nth t ] [ 2drop f f ] if ;
