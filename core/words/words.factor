@@ -96,11 +96,11 @@ M: word uses ( word -- seq )
 
 SYMBOL: compiled-crossref
 
-compiled-crossref global [ H{ } assoc-like ] change-at
+compiled-crossref [ H{ } clone ] initialize
 
 SYMBOL: compiled-generic-crossref
 
-compiled-generic-crossref global [ H{ } assoc-like ] change-at
+compiled-generic-crossref [ H{ } clone ] initialize
 
 : (compiled-xref) ( word dependencies word-prop variable -- )
     [ [ set-word-prop ] curry ]
