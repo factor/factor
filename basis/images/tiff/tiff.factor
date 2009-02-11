@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators io io.encodings.binary io.files
-kernel pack endian constructors sequences arrays
-sorting.slots math.order math.parser prettyprint classes
-io.binary assocs math math.bitwise byte-arrays grouping
-images.backend ;
+USING: accessors combinators io io.encodings.binary io.files kernel
+pack endian constructors sequences arrays math.order math.parser
+prettyprint classes io.binary assocs math math.bitwise byte-arrays
+grouping images.backend ;
 IN: images.tiff
 
 TUPLE: tiff-image < image ;
