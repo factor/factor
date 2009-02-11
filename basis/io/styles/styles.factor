@@ -117,7 +117,11 @@ SYMBOL: font-style
 ! Presentation
 SYMBOL: presented
 
+! Link
 SYMBOL: href
+
+! Image
+SYMBOL: image
 
 ! Paragraph styles
 SYMBOL: page-color

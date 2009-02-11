@@ -1,15 +1,15 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables io kernel namespaces sequences
-io.styles strings quotations math opengl combinators memoize
-math.vectors sorting splitting assocs classes.tuple models
-continuations destructors accessors math.rectangles fry
-fonts ui.gadgets ui.gadgets.private ui.gadgets.borders ui.gadgets.buttons
+USING: arrays hashtables io kernel namespaces sequences io.styles
+strings quotations math opengl combinators memoize math.vectors
+sorting splitting assocs classes.tuple models continuations
+destructors accessors math.rectangles fry fonts ui.images ui.gadgets
+ui.gadgets.private ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.paragraphs
 ui.gadgets.incremental ui.gadgets.packs ui.gadgets.theme
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
-ui.gadgets.grid-lines colors call ;
+ui.gadgets.icons ui.gadgets.grid-lines colors call ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < pack
@@ -210,9 +210,13 @@ MEMO: specified-font ( assoc -- font )
 : apply-presentation-style ( style gadget -- style gadget )
     presented [ <presentation> ] apply-style ;
 
+: apply-image-style ( style gadget -- style gadget )
+    image [ nip <image-name> <icon> ] apply-style ;
+
 : style-label ( style gadget -- gadget )
     apply-font-style
     apply-presentation-style
+    apply-image-style
     nip ; inline
 
 : <styled-label> ( style text -- gadget )
@@ -322,14 +326,18 @@ M: paragraph stream-write1
     over CHAR: \s =
     [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
 
+: empty-output? ( string style -- ? )
+    [ empty? ] [ image swap key? not ] bi* and ;
+
 : gadget-format ( string style stream -- )
-    '[ _ swap <styled-label> _ swap add-gadget drop ] unless-empty ;
+    [ [ empty-output? ] 2keep ] dip
+    '[ _ _ swap <styled-label> _ swap add-gadget drop ] unless ;
 
 M: pack stream-format
     gadget-format ;
 
 M: paragraph stream-format
-    presented pick at [
+    over { presented image } [ swap key? ] with any? [
         gadget-format
     ] [
         [ " " split ] 2dip
