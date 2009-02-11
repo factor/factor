@@ -40,11 +40,6 @@ GENERIC: >image ( object -- image )
 GENERIC: normalize-scan-line-order ( image -- image )
 
 M: image normalize-scan-line-order ;
-M: bitmap-image normalize-scan-line-order
-    dup dim>> '[
-        _ first 4 * <sliced-groups> reverse concat
-    ] change-bitmap ;
-    
 : normalize-image ( image -- image )
     normalize-component-order
     normalize-scan-line-order ;
