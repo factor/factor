@@ -7,19 +7,7 @@ IN: opengl.texture-cache
 TUPLE: texture texture display-list disposed ;
 
 : make-texture-display-list ( dim texture -- dlist )
-    GL_COMPILE [
-        GL_TEXTURE_2D [
-            GL_TEXTURE_BIT [
-                GL_TEXTURE_COORD_ARRAY [
-                    COLOR: white gl-color
-                    GL_TEXTURE_2D swap glBindTexture
-                    init-texture rect-texture-coords
-                    fill-rect-vertices (gl-fill-rect)
-                    GL_TEXTURE_2D 0 glBindTexture
-                ] do-enabled-client-state
-            ] do-attribs
-        ] do-enabled
-    ] make-dlist ;
+    GL_COMPILE [ draw-textured-rect ] make-dlist ;
 
 TUPLE: texture-info dim bitmap format type ;
 
@@ -45,11 +33,10 @@ TUPLE: texture-cache renderer cache disposed ;
 
 GENERIC: render-texture ( key renderer -- texture-info )
 
-: get-texture ( key texture-cache -- dlist )
+: get-texture ( key texture-cache -- texture )
     dup check-disposed
     [ cache>> ] keep
-    '[ _ renderer>> render-texture <texture> ] cache
-    display-list>> ;
+    '[ _ renderer>> render-texture <texture> ] cache ;
 
 M: texture-cache dispose*
     cache>> values dispose-each ;
