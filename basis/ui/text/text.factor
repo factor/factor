@@ -26,7 +26,7 @@ M: object string-width string-dim first ;
 
 M: object string-height string-dim second ;
 
-HOOK: draw-string font-renderer ( font string loc -- )
+HOOK: draw-string font-renderer ( font string -- )
 
 HOOK: free-fonts font-renderer ( world -- )
 
@@ -54,16 +54,16 @@ M: array text-dim
 
 HOOK: line-metrics font-renderer ( font string -- metrics )
 
-GENERIC# draw-text 1 ( font text loc -- )
+GENERIC: draw-text ( font text -- )
 
 M: string draw-text draw-string ;
 
 M: selection draw-text draw-string ;
 
 M: array draw-text
-    [
+    GL_MODELVIEW [
         [
-            2dup { 0 0 } draw-string
-            0.0 swap string-height 0.0 glTranslated
+            [ draw-string ]
+            [ [ 0.0 ] 2dip string-height 0.0 glTranslated ] 2bi
         ] with each
-    ] with-translation ;
+    ] do-matrix ;

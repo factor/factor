@@ -172,15 +172,12 @@ M: editor draw-line ( line index editor -- )
     [
         [ selected-lines get at ] dip
         '[ first2 _ selection-color>> <selection> ] when*
-    ] keep font>> swap { 0 0 } draw-text ;
+    ] keep font>> swap draw-text ;
 
 M: editor draw-gadget*
-    origin get [
-        [ compute-selection selected-lines set ]
-        [ draw-lines ]
-        [ draw-caret ]
-        tri
-    ] with-translation ;
+    dup compute-selection selected-lines [
+        [ draw-lines ] [ draw-caret ] bi
+    ] with-variable ;
 
 M: editor pref-dim*
     [ font>> ] [ control-value ] bi text-dim ;
@@ -260,7 +257,7 @@ M: editor gadget-text* editor-string % ;
     swap caret>> set-model ;
 
 : editor-cut ( editor clipboard -- )
-    dupd gadget-copy remove-selection ;
+    [ gadget-copy ] [ drop remove-selection ] 2bi ;
 
 : delete/backspace ( editor quot -- )
     over gadget-selection? [
@@ -281,7 +278,7 @@ M: editor gadget-text* editor-string % ;
     '[ _ prev-elt ] change-caret ;
 
 : editor-prev ( editor elt -- )
-    dupd editor-select-prev mark>caret ;
+    [ editor-select-prev ] [ drop mark>caret ] 2bi ;
 
 : editor-select-next ( editor elt -- )
     '[ _ next-elt ] change-caret ;

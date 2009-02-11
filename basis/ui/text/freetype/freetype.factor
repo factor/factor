@@ -196,19 +196,17 @@ M: freetype-renderer string-height ( font string -- h )
         open-font height>> 2array gl-fill-rect
     ] with-translation ;
 
-M:: freetype-renderer draw-string ( font line loc -- )
+M:: freetype-renderer draw-string ( font line -- )
     line dup selection? [ string>> ] when :> string
     font open-font :> open-font
     open-font world get font-sprites :> sprites
     open-font string char-widths :> widths
     GL_TEXTURE_2D [
-        loc [
-            font background>> gl-color
-            widths open-font draw-background
-            line selection? [ widths open-font line draw-selection ] when
-            font foreground>> gl-color
-            string widths sums [ [ open-font sprites ] 2dip draw-char ] 2each
-        ] with-translation
+        font background>> gl-color
+        widths open-font draw-background
+        line selection? [ widths open-font line draw-selection ] when
+        font foreground>> gl-color
+        string widths sums [ [ open-font sprites ] 2dip draw-char ] 2each
     ] do-enabled ;
 
 : run-char-widths ( open-font string -- widths )

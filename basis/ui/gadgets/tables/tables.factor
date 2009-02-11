@@ -128,7 +128,7 @@ M: table layout*
 
 : draw-column ( font column width align -- )
     over [
-        [ 2dup ] 2dip column-loc draw-text
+        [ 2dup ] 2dip column-loc [ draw-text ] with-translation
     ] dip table-gap + 0 2array gl-translate ;
 
 : column-alignment ( table -- seq )
@@ -152,15 +152,13 @@ M: table draw-line ( row index table -- )
 
 M: table draw-gadget*
     dup control-value empty? [ drop ] [
-        origin get [
-            {
-                [ draw-selected-row ]
-                [ draw-columns ]
-                [ draw-lines ]
-                [ draw-focused-row ]
-                [ draw-moused-row ]
-            } cleave
-        ] with-translation
+        {
+            [ draw-selected-row ]
+            [ draw-columns ]
+            [ draw-lines ]
+            [ draw-focused-row ]
+            [ draw-moused-row ]
+        } cleave
     ] if ;
 
 M: table pref-dim*

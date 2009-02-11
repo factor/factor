@@ -54,25 +54,28 @@ SYMBOL: origin
 { 0 0 } origin set-global
 
 : visible-children ( gadget -- seq )
-    clip get origin get vneg offset-rect swap children-on ;
+    [ clip get origin get vneg offset-rect ] dip children-on ;
 
 : translate ( rect/point -- ) loc>> origin [ v+ ] change ;
 
 DEFER: draw-gadget
 
 : (draw-gadget) ( gadget -- )
-    [
-        dup translate
-        dup interior>> [
-            origin get [ dupd draw-interior ] with-translation
-        ] when*
-        dup draw-gadget*
-        dup visible-children [ draw-gadget ] each
-        dup boundary>> [
-            origin get [ dupd draw-boundary ] with-translation
-        ] when*
-        drop
-    ] with-scope ;
+    dup loc>> origin get v+ origin [
+        [
+            origin get [
+                [ dup interior>> dup [ draw-interior ] [ 2drop ] if ]
+                [ draw-gadget* ]
+                bi
+            ] with-translation
+        ]
+        [ visible-children [ draw-gadget ] each ]
+        [
+            dup boundary>> dup [
+                origin get [ draw-boundary ] with-translation
+            ] [ 2drop ] if
+        ] tri
+    ] with-variable ;
 
 : >absolute ( rect -- rect )
     origin get offset-rect ;

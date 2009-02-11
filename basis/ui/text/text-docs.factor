@@ -29,11 +29,11 @@ HELP: text-dim
 { $description "Outputs the dimensions of a piece of text, which is either a single-line string or an array of lines." } ;
 
 HELP: draw-string
-{ $values { "font" font } { "string" string } { "loc" "a pair of integers" } }
+{ $values { "font" font } { "string" string } }
 { $contract "Draws a line of text." } ;
 
 HELP: draw-text
-{ $values { "font" font } { "text" "a string or an array of strings" } { "loc" "a pair of integers" } }
+{ $values { "font" font } { "text" "a string or an array of strings" } }
 { $description "Draws a piece of text." } ;
 
 HELP: x>offset
