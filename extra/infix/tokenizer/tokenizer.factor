@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Philipp Brüschweiler
+! See http://factorcode.org/license.txt for BSD license.
 USING: infix.ast kernel peg peg.ebnf math.parser sequences
 strings ;
 IN: infix.tokenizer
