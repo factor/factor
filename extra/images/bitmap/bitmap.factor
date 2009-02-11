@@ -112,6 +112,11 @@ M: bitmap >image ( bitmap -- bitmap-image )
 M: bitmap-image load-image* ( path bitmap -- bitmap-image )
     drop load-bitmap >image ;
 
+M: bitmap-image normalize-scan-line-order
+    dup dim>> '[
+        _ first 4 * <sliced-groups> reverse concat
+    ] change-bitmap ;
+
 MACRO: (nbits>bitmap) ( bits -- )
     [ -3 shift ] keep '[
         bitmap new
