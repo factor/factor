@@ -11,17 +11,16 @@ IN: ui.text.core-text
 SINGLETON: core-text-renderer
 
 M: core-text-renderer init-text-rendering
-    <texture-cache>
-        GL_BGRA_EXT >>format
-        GL_UNSIGNED_INT_8_8_8_8_REV >>type
-        core-text-renderer >>renderer
-    >>text-handle drop ;
+    core-text-renderer <texture-cache> >>text-handle drop ;
 
 M: core-text-renderer string-dim
     [ " " string-dim { 0 1 } v* ] [ cached-line dim>> ] if-empty ;
 
 M: core-text-renderer render-texture
-    drop first2 cached-line [ dim>> ] [ bitmap>> ] bi ;
+    drop first2 cached-line
+    [ dim>> ] [ bitmap>> ] bi
+    GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8_REV
+    <texture-info> ;
 
 M: core-text-renderer finish-text-rendering
     text-handle>> purge-texture-cache
@@ -30,8 +29,8 @@ M: core-text-renderer finish-text-rendering
 : rendered-line ( font string -- display-list )
     2array world get text-handle>> get-texture ;
 
-M: core-text-renderer draw-string ( font string loc -- )
-    [ rendered-line glCallList ] with-translation ;
+M: core-text-renderer draw-string ( font string -- )
+    rendered-line glCallList ;
 
 M: core-text-renderer x>offset ( x font string -- n )
     [ 2drop 0 ] [

@@ -34,7 +34,7 @@ HELP: <char-sprite>
 { $description "Renders a character to an OpenGL texture and records a display list which draws a quad with this texture. This word allocates native resources which must be freed by " { $link free-sprites } "." } ;
 
 HELP: (draw-string)
-{ $values { "font" freetype-font } { "sprites" "a vector of " { $link sprite } " instances" } { "string" string } { "loc" "a pair of integers" } }
+{ $values { "font" freetype-font } { "sprites" "a vector of " { $link sprite } " instances" } { "string" string } }
 { $description "Draws a line of text." }
 { $notes "This is a low-level word, UI code should use " { $link draw-string } " or " { $link draw-text } " instead." }
 { $side-effects "sprites" } ;

@@ -62,6 +62,7 @@ M: world graft*
     {
         [ handle>> select-gl-context ]
         [ text-handle>> dispose ]
+        [ images>> [ dispose ] when* ]
         [ hand-clicked close-global ]
         [ hand-gadget close-global ]
     } cleave ;

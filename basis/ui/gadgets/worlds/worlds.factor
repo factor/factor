@@ -1,16 +1,17 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations kernel math models call
-namespaces opengl sequences io combinators combinators.short-circuit
-fry math.vectors ui.gadgets ui.gestures ui.render ui.text ui.text.private
-ui.backend ui.gadgets.tracks math.rectangles ;
+namespaces opengl opengl.texture-cache sequences io combinators
+combinators.short-circuit fry math.vectors math.rectangles cache
+ui.gadgets ui.gestures ui.render ui.text ui.text.private ui.backend
+ui.gadgets.tracks ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < track
 active? focused?
 glass
 title status
-text-handle handle
+text-handle handle images
 window-loc ;
 
 : find-world ( gadget -- world/f ) [ world? ] find-parent ;
@@ -62,7 +63,12 @@ M: world children-on nip children>> ;
 
 : (draw-world) ( world -- )
     dup handle>> [
-        [ init-gl ] [ draw-gadget ] [ finish-text-rendering ] tri
+        {
+            [ init-gl ]
+            [ draw-gadget ]
+            [ finish-text-rendering ]
+            [ images>> [ purge-texture-cache ] when* ]
+        } cleave
     ] with-gl-context ;
 
 : draw-world? ( world -- ? )
