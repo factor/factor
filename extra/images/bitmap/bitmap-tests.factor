@@ -5,9 +5,6 @@ IN: images.bitmap.tests
 : test-bitmap24 ( -- path )
     "resource:extra/images/test-images/thiswayup24.bmp" ;
 
-: test-bitmap16 ( -- path )
-    "resource:extra/images/test-images/rgb16bit.bmp" ;
-
 : test-bitmap8 ( -- path )
     "resource:extra/images/test-images/rgb8bit.bmp" ;
 

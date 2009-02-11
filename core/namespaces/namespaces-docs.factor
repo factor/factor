@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private
 sequences words namespaces.private quotations vectors
-math.parser math ;
+math.parser math words.symbol ;
 IN: namespaces
 
 ARTICLE: "namespaces-combinators" "Namespace combinators"
@@ -20,7 +20,8 @@ ARTICLE: "namespaces-global" "Global variables"
 { $subsection namespace }
 { $subsection global }
 { $subsection get-global }
-{ $subsection set-global } ;
+{ $subsection set-global }
+{ $subsection initialize } ;
 
 ARTICLE: "namespaces.private" "Namespace implementation details"
 "The namestack holds namespaces."
@@ -159,3 +160,7 @@ HELP: ndrop
 HELP: init-namespaces
 { $description "Resets the name stack to its initial state, holding a single copy of the global namespace." }
 $low-level-note ;
+
+HELP: initialize
+{ $values { "variable" symbol } { "quot" quotation } }
+{ $description "If " { $snippet "variable" } " does not have a value in the global namespace, calls " { $snippet "quot" } " and assigns the result to " { $snippet "variable" } " in the global namespace." } ;

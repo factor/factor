@@ -27,11 +27,11 @@ M: link summary
 ! Help articles
 SYMBOL: articles
 
-articles global [ H{ } assoc-like ] change-at
+articles [ H{ } clone ] initialize
     
 SYMBOL: article-xref
 
-article-xref global [ H{ } assoc-like ] change-at
+article-xref [ H{ } clone ] initialize
 
 GENERIC: article-name ( topic -- string )
 GENERIC: article-title ( topic -- string )

@@ -85,4 +85,4 @@ PRIVATE>
 : get-process ( name -- process )
     dup registered-processes at [ ] [ thread ] ?if ;
 
-\ registered-processes global [ H{ } assoc-like ] change-at
+\ registered-processes [ H{ } clone ] initialize

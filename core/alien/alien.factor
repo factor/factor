@@ -51,7 +51,7 @@ M: alien equal?
 
 SYMBOL: libraries
 
-libraries global [ H{ } assoc-like ] change-at
+libraries [ H{ } clone ] initialize
 
 TUPLE: library path abi dll ;
 
