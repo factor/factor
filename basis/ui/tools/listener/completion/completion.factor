@@ -1,15 +1,15 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs calendar colors colors.constants documents
-documents.elements fry kernel words sets splitting math math.vectors
-models.delay models.filter combinators.short-circuit parser present
-sequences tools.completion tools.vocabs.browser generic
-generic.standard.engines.tuple fonts ui.commands ui.operations
-ui.gadgets ui.gadgets.editors ui.gadgets.glass ui.gadgets.scrollers
-ui.gadgets.tables ui.gadgets.tracks ui.gadgets.labelled
-ui.gadgets.theme ui.gadgets.worlds ui.gadgets.wrappers ui.gestures
-ui.render ui.tools.listener.history combinators vocabs
-ui.tools.listener.popups ;
+USING: accessors arrays assocs calendar colors colors.constants
+documents documents.elements fry kernel words sets splitting math
+math.vectors models.delay models.filter combinators.short-circuit
+parser present sequences tools.completion tools.vocabs.browser generic
+generic.standard.engines.tuple fonts definitions.icons ui.images
+ui.commands ui.operations ui.gadgets ui.gadgets.editors
+ui.gadgets.glass ui.gadgets.scrollers ui.gadgets.tables
+ui.gadgets.tracks ui.gadgets.labelled ui.gadgets.theme
+ui.gadgets.worlds ui.gadgets.wrappers ui.gestures ui.render
+ui.tools.listener.history combinators vocabs ui.tools.listener.popups ;
 IN: ui.tools.listener.completion
 
 ! We don't directly depend on the listener tool but we use a few slots
@@ -25,14 +25,17 @@ TUPLE: word-completion vocabs ;
 C: <word-completion> word-completion
 
 SINGLETONS: vocab-completion char-completion history-completion ;
-
-UNION: listener-completion word-completion vocab-completion char-completion history-completion ;
+UNION: definition-completion word-completion vocab-completion ;
+UNION: listener-completion definition-completion char-completion history-completion ;
 
 GENERIC: completion-quot ( interactor completion-mode -- quot )
 
-M: word-completion completion-quot 2drop [ [ { } ] [ words-matching ] if-empty ] ;
-M: vocab-completion completion-quot 2drop [ [ { } ] [ vocabs-matching ] if-empty ] ;
-M: char-completion completion-quot 2drop [ [ { } ] [ chars-matching ] if-empty ] ;
+: (completion-quot) ( interactor completion-mode quot -- quot' )
+    2nip '[ [ { } ] _ if-empty ] ; inline
+
+M: word-completion completion-quot [ words-matching ] (completion-quot) ;
+M: vocab-completion completion-quot [ vocabs-matching ] (completion-quot) ;
+M: char-completion completion-quot [ chars-matching ] (completion-quot) ;
 M: history-completion completion-quot drop '[ drop _ history-list ] ;
 
 GENERIC: completion-element ( completion-mode -- element )
@@ -54,6 +57,15 @@ M: history-completion completion-popup-width drop dim>> first ;
 
 ! Completion modes also implement the row renderer protocol
 M: listener-completion row-columns drop present 1array ;
+
+M: definition-completion prototype-row
+    drop \ + definition-icon <image-name> "" 2array ;
+
+M: definition-completion row-columns
+    drop
+    [ definition-icon <image-name> ]
+    [ present ] bi
+    2array ;
 
 M: word-completion row-color
     [ vocabulary>> ] [ vocabs>> ] bi* {
@@ -133,6 +145,8 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
         >>renderer
         monospace-font >>font
         t >>selection-required?
+        transparent >>column-line-color
+        0 >>gap
         dup '[ _ accept-completion ] >>action ;
 
 : <completion-scroller> ( completion-popup -- scroller )

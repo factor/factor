@@ -6,24 +6,24 @@ classes.singleton classes.tuple classes.union combinators
 definitions effects fry generic help help.markup help.stylesheet
 help.topics io io.files io.pathnames io.styles kernel macros
 make namespaces prettyprint sequences sets sorting summary
-tools.vocabs vocabs vocabs.loader words words.symbol ;
+tools.vocabs vocabs vocabs.loader words words.symbol
+combinators.smart definitions.icons ;
 IN: tools.vocabs.browser
 
-: vocab-status-string ( vocab -- string )
-    {
-        { [ dup vocab not ] [ drop "" ] }
-        { [ dup vocab-main ] [ drop "[Runnable]" ] }
-        [ drop "[Loaded]" ]
-    } cond ;
+: <$definition> ( definition -- element )
+    [
+        [ definition-icon 1array \ $image prefix ]
+        [ drop " " ]
+        [ 1array \ $link prefix ] ! XXX
+        tri
+    ] output>array ;
 
 : vocab-row ( vocab -- row )
-    [ <$link> ] [ vocab-status-string ] [ vocab-summary ] tri
-    3array ;
+    [ <$definition> ] [ vocab-summary ] bi 2array ;
 
 : vocab-headings ( -- headings )
     {
         { $strong "Vocabulary" }
-        { $strong "State" }
         { $strong "Summary" }
     } ;
 
@@ -82,7 +82,7 @@ C: <vocab-author> vocab-author
     [
         "Tuple classes" $subheading
         [
-            [ <$link> ]
+            [ <$definition> ]
             [ superclass <$link> ]
             [ "slots" word-prop [ name>> ] map " " join <$snippet> ]
             tri 3array
@@ -95,7 +95,7 @@ C: <vocab-author> vocab-author
     [
         "Predicate classes" $subheading
         [
-            [ <$link> ]
+            [ <$definition> ]
             [ superclass <$link> ]
             bi 2array
         ] map
@@ -106,7 +106,7 @@ C: <vocab-author> vocab-author
 : (describe-classes) ( classes heading -- )
     '[
         _ $subheading
-        [ <$link> 1array ] map $table
+        [ <$definition> 1array ] map $table
     ] unless-empty ;
 
 : describe-builtin-classes ( classes -- )
@@ -158,14 +158,16 @@ C: <vocab-author> vocab-author
         $table
     ] unless-empty ;
 
+: word-row ( word -- element )
+    [ <$definition> ]
+    [ stack-effect dup [ effect>string <$snippet> ] when ]
+    bi 2array ;
+
+: word-headings ( -- element )
+    { { $strong "Word" } { $strong "Stack effect" } } ;
+
 : words-table ( words -- )
-    [
-        [ 1array \ $word-link prefix ]
-        [ stack-effect dup [ effect>string <$snippet> ] when ]
-        bi 2array
-    ] map
-    { { $strong "Word" } { $strong "Stack effect" } } prefix
-    $table ;
+    [ word-row ] map word-headings prefix $table ;
 
 : (describe-words) ( words heading -- )
     '[ _ $subheading words-table ] unless-empty ;
