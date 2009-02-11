@@ -15,6 +15,10 @@ GENERIC: stream-write ( seq stream -- )
 GENERIC: stream-flush ( stream -- )
 GENERIC: stream-nl ( stream -- )
 
+ERROR: bad-seek-type type ;
+SINGLETONS: seek-absolute seek-relative seek-end ;
+GENERIC: stream-seek ( n seek-type stream -- )
+
 : stream-print ( str stream -- ) [ stream-write ] keep stream-nl ;
 
 ! Default streams
@@ -27,6 +31,8 @@ SYMBOL: error-stream
 : read ( n -- seq ) input-stream get stream-read ;
 : read-until ( seps -- seq sep/f ) input-stream get stream-read-until ;
 : read-partial ( n -- seq ) input-stream get stream-read-partial ;
+: seek-input ( n seek-type -- ) input-stream get stream-seek ;
+: seek-output ( n seek-type -- ) output-stream get stream-seek ;
 
 : write1 ( elt -- ) output-stream get stream-write1 ;
 : write ( seq -- ) output-stream get stream-write ;

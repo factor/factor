@@ -200,7 +200,7 @@ SYMBOL: interactive-vocabs
 
 SYMBOL: print-use-hook
 
-print-use-hook global [ [ ] or ] change-at
+print-use-hook [ [ ] ] initialize
 
 : parse-fresh ( lines -- quot )
     [

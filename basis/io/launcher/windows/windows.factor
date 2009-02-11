@@ -103,7 +103,7 @@ TUPLE: CreateProcess-args
             over get-environment
             [ swap % "=" % % "\0" % ] assoc-each
             "\0" %
-        ] ushort-array{ } make underlying>>
+        ] ushort-array{ } make
         >>lpEnvironment
     ] when ;
 
@@ -158,7 +158,7 @@ M: windows kill-process* ( handle -- )
 M: windows wait-for-processes ( -- ? )
     processes get keys dup
     [ handle>> PROCESS_INFORMATION-hProcess ] void*-array{ } map-as
-    [ length ] [ underlying>> ] bi 0 0
+    [ length ] keep 0 0
     WaitForMultipleObjects
     dup HEX: ffffffff = [ win32-error ] when
     dup WAIT_TIMEOUT = [ 2drop t ] [ swap nth process-exited f ] if ;

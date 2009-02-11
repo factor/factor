@@ -28,6 +28,8 @@ $nl
     { $snippet "ulonglong" }
     { $snippet "float" }
     { $snippet "double" }
+    { $snippet "complex-float" }
+    { $snippet "complex-double" }
     { $snippet "void*" }
     { $snippet "bool" }
 }

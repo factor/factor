@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Jeff Bigot
 ! See http://factorcode.org/license.txt for BSD license.
-USING: adsoda xml xml.utilities xml.dispatch accessors 
+USING: adsoda xml xml.traversal xml.syntax accessors 
 combinators sequences math.parser kernel splitting values 
 continuations ;
 IN: 4DNav.space-file-decoder
@@ -8,7 +8,7 @@ IN: 4DNav.space-file-decoder
 : decode-number-array ( x -- y )  
     "," split [ string>number ] map ;
 
-PROCESS: adsoda-read-model ( tag -- )
+TAGS: adsoda-read-model ( tag -- model )
 
 TAG: dimension adsoda-read-model 
     children>> first string>number ;
@@ -56,11 +56,9 @@ TAG: space adsoda-read-model
 ;
 
 : read-model-file ( path -- x )
-  dup
-  [
-    [ file>xml "space" tags-named first adsoda-read-model ] 
-    [ drop <space> ] recover 
-  ] [  drop <space> ] if 
-
+    [
+        [ file>xml "space" tag-named adsoda-read-model ] 
+        [ 2drop <space> ] recover 
+    ] [ <space> ] if*
 ;
 

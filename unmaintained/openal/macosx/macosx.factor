@@ -9,6 +9,6 @@ LIBRARY: alut
 FUNCTION: void alutLoadWAVFile ( ALbyte* fileName, ALenum* format, void** data, ALsizei* size, ALsizei* frequency ) ;
 
 M: macosx load-wav-file ( path -- format data size frequency )
-  0 <int> f <void*> 0 <int> 0 <int>
-  [ alutLoadWAVFile ] 4keep
-  >r >r >r *int r> *void* r> *int r> *int ;
+    0 <int> f <void*> 0 <int> 0 <int>
+    [ alutLoadWAVFile ] 4keep
+    [ [ [ *int ] dip *void* ] dip *int ] dip *int ;

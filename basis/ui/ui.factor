@@ -4,7 +4,7 @@ USING: arrays assocs io kernel math models namespaces make
 dlists deques sequences threads sequences words ui.gadgets
 ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend
 ui.render continuations init combinators hashtables
-concurrency.flags sets accessors calendar ;
+concurrency.flags sets accessors calendar call ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -140,7 +140,7 @@ SYMBOL: ui-hook
             layout-queued
             redraw-worlds
             send-queued-gestures
-        ] assert-depth
+        ] call( -- )
     ] [ ui-error ] recover ;
 
 SYMBOL: ui-thread

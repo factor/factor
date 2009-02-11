@@ -53,16 +53,16 @@ MACRO: all-enabled-client-state ( seq quot -- )
     glMatrixMode glPopMatrix ; inline
 
 : gl-material ( face pname params -- )
-    float-array{ } like underlying>> glMaterialfv ;
+    float-array{ } like glMaterialfv ;
 
 : gl-vertex-pointer ( seq -- )
-    [ 2 GL_FLOAT 0 ] dip underlying>> glVertexPointer ; inline
+    [ 2 GL_FLOAT 0 ] dip glVertexPointer ; inline
 
 : gl-color-pointer ( seq -- )
-    [ 4 GL_FLOAT 0 ] dip underlying>> glColorPointer ; inline
+    [ 4 GL_FLOAT 0 ] dip glColorPointer ; inline
 
 : gl-texture-coord-pointer ( seq -- )
-    [ 2 GL_FLOAT 0 ] dip underlying>> glTexCoordPointer ; inline
+    [ 2 GL_FLOAT 0 ] dip glTexCoordPointer ; inline
 
 : line-vertices ( a b -- )
     [ first2 [ 0.5 + ] bi@ ] bi@ 4 float-array{ } nsequence
@@ -177,7 +177,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     glActiveTexture swap glBindTexture gl-error ;
 
 : (set-draw-buffers) ( buffers -- )
-    [ length ] [ >uint-array underlying>> ] bi glDrawBuffers ;
+    [ length ] [ >uint-array ] bi glDrawBuffers ;
 
 MACRO: set-draw-buffers ( buffers -- )
     words>values [ (set-draw-buffers) ] curry ;

@@ -4,7 +4,7 @@ USING: accessors arrays io io.encodings.binary io.files
 io.streams.string kernel namespaces sequences strings io.encodings.utf8
 xml.data xml.errors xml.elements ascii xml.entities
 xml.writer xml.state xml.autoencoding assocs xml.tokenize
-combinators.short-circuit xml.name ;
+combinators.short-circuit xml.name splitting ;
 IN: xml
 
 <PRIVATE
@@ -25,7 +25,7 @@ M: object process add-child ;
 M: prolog process
     xml-stack get
     { V{ { f V{ "" } } } V{ { f V{ } } } } member?
-    [ bad-prolog ] unless drop ;
+    [ bad-prolog ] unless add-child ;
 
 : before-main? ( -- ? )
     xml-stack get {
@@ -82,14 +82,23 @@ M: closer process
     ! this does *not* affect the contents of the stack
     [ notags ] unless* ;
 
+: ?first ( seq -- elt/f ) 0 swap ?nth ;
+
 : get-prolog ( seq -- prolog )
-    first dup prolog? [ drop default-prolog ] unless ;
+    { "" } ?head drop
+    ?first dup prolog?
+    [ drop default-prolog ] unless ;
+
+: cut-prolog ( seq -- newseq )
+    [ [ prolog? not ] [ "" = not ] bi and ] filter ;
 
 : make-xml-doc ( seq -- xml-doc )
     [ get-prolog ] keep
-    dup [ tag? ] find
-    [ assure-tags cut rest no-pre/post no-post-tags ] dip
-    swap <xml> ;
+    dup [ tag? ] find [
+        assure-tags cut
+        [ cut-prolog ] [ rest ] bi*
+        no-pre/post no-post-tags
+    ] dip swap <xml> ;
 
 ! * Views of XML
 

@@ -51,7 +51,7 @@ M: epoll-mx remove-output-callbacks ( fd mx -- seq )
     ] [ 2drop f ] if ;
 
 : wait-event ( mx us -- n )
-    [ [ fd>> ] [ events>> ] bi [ underlying>> ] [ length ] bi ] [ 1000 /i ] bi*
+    [ [ fd>> ] [ events>> ] bi dup length ] [ 1000 /i ] bi*
     epoll_wait multiplexer-error ;
 
 : handle-event ( event mx -- )

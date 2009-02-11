@@ -11,10 +11,10 @@ A'      IS ${T}-array
 >A'     IS >${T}-array
 <A'>    IS <${A'}>
 
-A       DEFINES direct-${T}-array
+A       DEFINES-CLASS direct-${T}-array
 <A>     DEFINES <${A}>
 
-NTH     [ T dup c-getter array-accessor ]
+NTH     [ T dup c-type-getter-boxer array-accessor ]
 SET-NTH [ T dup c-setter array-accessor ]
 
 WHERE

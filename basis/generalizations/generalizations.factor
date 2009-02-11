@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Chris Double, Doug Coleman, Eduardo
+! Copyright (C) 2007, 2009 Chris Double, Doug Coleman, Eduardo
 ! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private math combinators
@@ -22,6 +22,9 @@ MACRO: nsequence ( n seq -- )
 
 MACRO: narray ( n -- )
     '[ _ { } nsequence ] ;
+
+MACRO: nsum ( n -- )
+    1- [ + ] n*quot ;
 
 MACRO: firstn ( n -- )
     dup zero? [ drop [ drop ] ] [
@@ -70,11 +73,23 @@ MACRO: ncleave ( quots n -- )
     [ '[ _ '[ _ _ nkeep ] ] map [ ] join ] [ '[ _ ndrop ] ] bi
     compose ;
 
+MACRO: nspread ( quots n -- )
+    over empty? [ 2drop [ ] ] [
+        [ [ but-last ] dip ]
+        [ [ peek ] dip ] 2bi
+        swap
+        '[ [ _ _ nspread ] _ ndip @ ]
+    ] if ;
+
 MACRO: napply ( quot n -- )
     swap <repetition> spread>quot ;
 
 MACRO: mnswap ( m n -- )
-    1+ '[ _ -nrot ] <repetition> spread>quot ;
+    1+ '[ _ -nrot ] swap '[ _ _ napply ] ;
+
+MACRO: nweave ( n -- )
+    [ dup <reversed> [ '[ _ _ mnswap ] ] with map ] keep
+    '[ _ _ ncleave ] ;
 
 : nappend-as ( n exemplar -- seq )
     [ narray concat ] dip like ; inline
