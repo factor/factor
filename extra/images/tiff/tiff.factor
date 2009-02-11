@@ -13,7 +13,7 @@ TUPLE: parsed-tiff endianness the-answer ifd-offset ifds ;
 CONSTRUCTOR: parsed-tiff ( -- tiff ) V{ } clone >>ifds ;
 
 TUPLE: ifd count ifd-entries next
-processed-tags strips buffer ;
+processed-tags strips bitmap ;
 CONSTRUCTOR: ifd ( count ifd-entries next -- ifd ) ;
 
 TUPLE: ifd-entry tag type count offset/value ;
@@ -257,39 +257,37 @@ ERROR: bad-small-ifd-type n ;
     dup ifd-entries>>
     [ process-ifd-entry swap ] H{ } map>assoc >>processed-tags ;
 
-: strips>buffer ( ifd -- ifd )
-    dup strips>> concat >>buffer ;
+: strips>bitmap ( ifd -- ifd )
+    dup strips>> concat >>bitmap ;
 
 ERROR: unknown-component-order ifd ;
 
 : ifd-component-order ( ifd -- byte-order )
     bits-per-sample find-tag sum {
         { 32 [ RGBA ] }
+        { 24 [ RGB ] }
         [ unknown-component-order ]
     } case ;
 
-: ifd>image ( ifd -- image )
+M: ifd >image ( ifd -- image )
     {
-        [ image-width find-tag ]
-        [ image-length find-tag ]
-        [ bits-per-sample find-tag sum ]
+        [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
         [ ifd-component-order ]
-        [ buffer>> ]
+        [ bitmap>> ]
     } cleave tiff-image new-image ;
 
-: parsed-tiff>images ( tiff -- sequence )
-    ifds>> [ ifd>image ] map ;
-
+M: parsed-tiff >image ( image -- image )
+    ifds>> [ >image ] map first ;
 
 : load-tiff ( path -- parsed-tiff )
     binary [
         <parsed-tiff>
         read-header dup endianness>> [
             read-ifds
-            dup ifds>> [ process-ifd read-strips strips>buffer drop ] each
+            dup ifds>> [ process-ifd read-strips strips>bitmap drop ] each
         ] with-endianness
     ] with-file-reader ;
 
 ! tiff files can store several images -- we just take the first for now
 M: tiff-image load-image* ( path tiff-image -- image )
-    drop load-tiff parsed-tiff>images first ;
+    drop load-tiff >image ;
