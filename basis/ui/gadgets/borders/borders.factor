@@ -7,7 +7,8 @@ IN: ui.gadgets.borders
 TUPLE: border < gadget
 { size initial: { 0 0 } }
 { fill initial: { 0 0 } }
-{ align initial: { 1/2 1/2 } } ;
+{ align initial: { 1/2 1/2 } }
+{ min-dim initial: { 0 0 } } ;
 
 : new-border ( child class -- border )
     new-gadget swap add-gadget ; inline
@@ -20,7 +21,8 @@ TUPLE: border < gadget
     <border> { 1 1 } >>fill ;
 
 M: border pref-dim*
-    [ size>> 2 v*n ] [ gadget-child pref-dim ] bi v+ ;
+    [ [ size>> 2 v*n ] [ gadget-child pref-dim ] bi v+ ]
+    [ min-dim>> ] bi vmax ;
 
 M: border baseline
     [ size>> second ] [ gadget-child baseline ] bi + ;
