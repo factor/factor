@@ -106,7 +106,8 @@ todo "TODO"
 
 : <todo-list> ( -- responder )
     todo-list new-dispatcher
-        <list-action>   ""       add-responder
+        <list-action>   "list"       add-responder
+        URL" /list" <redirect-responder> "" add-responder
         <view-action>   "view"   add-responder
         <new-action>    "new"    add-responder
         <edit-action>   "edit"   add-responder
@@ -115,3 +116,52 @@ todo "TODO"
         { todo-list "todo" } >>template
     <protected>
         "view your todo list" >>description ;
+
+USING: furnace.auth.features.registration
+furnace.auth.features.edit-profile
+furnace.auth.features.deactivate-user
+db.sqlite
+furnace.alloy
+io.servers.connection
+io.sockets.secure ;
+
+: <login-config> ( responder -- responder' )
+    "Todo list" <login-realm>
+        "Todo list" >>name
+        allow-registration
+        allow-edit-profile
+        allow-deactivation ;
+
+: todo-db ( -- db ) "resource:todo.db" <sqlite-db> ;
+
+: init-todo-db ( -- )
+    todo-db [
+        init-furnace-tables
+        todo ensure-table
+    ] with-db ;
+
+: <todo-secure-config> ( -- config )
+    ! This is only suitable for testing!
+    <secure-config>
+        "resource:basis/openssl/test/dh1024.pem" >>dh-file
+        "resource:basis/openssl/test/server.pem" >>key-file
+        "password" >>password ;
+
+: <todo-app> ( -- responder )
+    init-todo-db
+    <todo-list>
+        <login-config>
+        todo-db <alloy> ;
+
+: <todo-website-server> ( -- threaded-server )
+    <http-server>
+        <todo-secure-config> >>secure-config
+        8080 >>insecure
+        8431 >>secure ;
+
+: run-todo ( -- )
+    <todo-app> main-responder set-global
+    todo-db start-expiring
+    <todo-website-server> start-server ;
+
+MAIN: run-todo
