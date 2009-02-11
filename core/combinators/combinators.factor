@@ -49,7 +49,7 @@ ERROR: no-cond ;
     reverse [ no-cond ] swap alist>quot ;
 
 ! case
-ERROR: no-case ;
+ERROR: no-case object ;
 
 : case-find ( obj assoc -- obj' )
     [
@@ -66,7 +66,7 @@ ERROR: no-case ;
     case-find {
         { [ dup array? ] [ nip second call ] }
         { [ dup callable? ] [ call ] }
-        { [ dup not ] [ no-case ] }
+        { [ dup not ] [ drop no-case ] }
     } cond ;
 
 : linear-case-quot ( default assoc -- quot )

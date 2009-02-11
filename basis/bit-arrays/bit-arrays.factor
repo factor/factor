@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types accessors math alien.accessors kernel
-kernel.private locals sequences sequences.private byte-arrays
+kernel.private sequences sequences.private byte-arrays
 parser prettyprint.custom fry ;
 IN: bit-arrays
 
@@ -70,16 +70,15 @@ M: bit-array byte-length length 7 + -3 shift ;
 
 : ?{ \ } [ >bit-array ] parse-literal ; parsing
 
-:: integer>bit-array ( n -- bit-array ) 
-    n zero? [ 0 <bit-array> ] [
-        [let | out [ n log2 1+ <bit-array> ] i! [ 0 ] n'! [ n ] |
-            [ n' zero? ] [
-                n' out underlying>> i set-alien-unsigned-1
-                n' -8 shift n'!
-                i 1+ i!
-            ] [ ] until
-            out
-        ]
+: integer>bit-array ( n -- bit-array )
+    dup 0 = [
+        <bit-array>
+    ] [
+        [ log2 1+ <bit-array> 0 ] keep
+        [ dup 0 = ] [
+            [ pick underlying>> pick set-alien-unsigned-1 ] keep
+            [ 1+ ] [ -8 shift ] bi*
+        ] [ ] until 2drop
     ] if ;
 
 : bit-array>integer ( bit-array -- n )
