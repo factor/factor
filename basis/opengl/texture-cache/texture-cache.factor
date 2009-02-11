@@ -4,7 +4,7 @@ USING: accessors assocs cache colors.constants destructors fry
 kernel opengl opengl.gl combinators ;
 IN: opengl.texture-cache
 
-TUPLE: texture texture display-list age disposed ;
+TUPLE: texture texture display-list disposed ;
 
 : make-texture-display-list ( dim texture -- dlist )
     GL_COMPILE [
@@ -30,7 +30,7 @@ C: <texture-info> texture-info
         { [ dim>> ] [ bitmap>> ] [ format>> ] [ type>> ] }
         cleave make-texture
     ] [ dim>> ] bi
-    over make-texture-display-list 0 f texture boa ;
+    over make-texture-display-list f texture boa ;
 
 M: texture dispose*
     [ texture>> delete-texture ]
