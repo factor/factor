@@ -111,6 +111,12 @@ $nl
 { $subsection with-cell }
 { $subsection write-cell } ;
 
+HELP: href
+{ $description "Character style. A URL string that the text links to." } ;
+
+HELP: image
+{ $description "Character style. A pathname string for an image file to display in place of the printed text. If this style is specified, the printed text serves the same role as the " { $snippet "alt" } " attribute of an HTML " { $snippet "img" } " tag -- the text is only displayed if the output medium does not support images." } ;
+
 ARTICLE: "character-styles" "Character styles"
 "Character styles for " { $link stream-format } " and " { $link with-style } ":"
 { $subsection foreground }
@@ -118,7 +124,10 @@ ARTICLE: "character-styles" "Character styles"
 { $subsection font-name }
 { $subsection font-size }
 { $subsection font-style }
-{ $subsection presented } ;
+"Special styles:"
+{ $subsection href }
+{ $subsection image }
+{ $see-also "presentations" } ;
 
 ARTICLE: "paragraph-styles" "Paragraph styles"
 "Paragraph styles for " { $link with-nesting } ":"
@@ -139,6 +148,8 @@ HELP: write-object
 $io-error ;
 
 ARTICLE: "presentations" "Presentations"
+"A special style for " { $link format } " and " { $link with-nesting } ":"
+{ $subsection presented }
 "The " { $link presented } " style can be used to emit clickable objects. A utility word for outputting this style:"
 { $subsection write-object } ;
 

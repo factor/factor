@@ -137,6 +137,10 @@ ALIAS: $slot $snippet
         ] with-nesting
     ] ($heading) ;
 
+! Images
+: $image ( element -- )
+    [ [ "" ] dip first image associate format ] ($span) ;
+
 ! Some links
 : write-link ( string object -- )
     link-style get [ write-object ] with-style ;
