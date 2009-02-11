@@ -15,7 +15,6 @@ TUPLE: bitmap-image < image ;
 TUPLE: bitmap magic size reserved offset header-length width
 height planes bit-count compression size-image
 x-pels y-pels color-used color-important rgb-quads color-index
-alpha-channel-zero?
 buffer ;
 
 : array-copy ( bitmap array -- bitmap array' )
@@ -87,12 +86,8 @@ M: bitmap-magic summary
         parse-file-header parse-bitmap-header parse-bitmap
     ] with-file-reader ;
 
-: alpha-channel-zero? ( bitmap -- ? )
-    buffer>> 4 <sliced-groups> 3 <column> [ 0 = ] all? ;
-
 : process-bitmap-data ( bitmap -- bitmap )
-    dup raw-bitmap>buffer >>buffer
-    dup alpha-channel-zero? >>alpha-channel-zero? ;
+    dup raw-bitmap>buffer >>buffer ;
 
 : load-bitmap ( path -- bitmap )
     load-bitmap-data process-bitmap-data ;
@@ -107,13 +102,15 @@ ERROR: unknown-component-order bitmap ;
         [ unknown-component-order ]
     } case ;
 
-: bitmap>image ( bitmap -- bitmap-image )
-    { [ width>> ] [ height>> ] [ bit-count>> ] [ bitmap>component-order ] [ buffer>> ] } cleave
-    bitmap-image new-image ;
+M: bitmap >image ( bitmap -- bitmap-image )
+    {
+        [ [ width>> ] [ height>> ] bi 2array ]
+        [ bitmap>component-order ]
+        [ buffer>> ]
+    } cleave bitmap-image new-image ;
 
 M: bitmap-image load-image* ( path bitmap -- bitmap-image )
-    drop load-bitmap
-    bitmap>image ;
+    drop load-bitmap >image ;
 
 MACRO: (nbits>bitmap) ( bits -- )
     [ -3 shift ] keep '[
@@ -122,7 +119,7 @@ MACRO: (nbits>bitmap) ( bits -- )
             swap >>height
             swap >>width
             swap array-copy [ >>buffer ] [ >>color-index ] bi
-            _ >>bit-count bitmap>image
+            _ >>bit-count >image
     ] ;
 
 : bgr>bitmap ( array height width -- bitmap )
