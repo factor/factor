@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables kernel math namespaces sequences strings
 assocs combinators io io.streams.string accessors
-xml.data wrap xml.entities unicode.categories fry ;
+xml.data wrap.strings xml.entities unicode.categories fry ;
 IN: xml.writer
 
 SYMBOL: sensitive-tags
@@ -164,7 +164,7 @@ M: sequence write-xml
 M: prolog write-xml
     "<?xml version=" write
     [ version>> write-quoted ]
-    [ " encoding=" write encoding>> write-quoted ]
+    [ drop " encoding=\"UTF-8\"" write ]
     [ standalone>> [ " standalone=\"yes\"" write ] when ] tri
     "?>" write ;
 

@@ -1,11 +1,19 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays generic hashtables kernel kernel.private
+USING: accessors arrays assocs generic hashtables kernel kernel.private
 math namespaces parser sequences strings words libc fry
-alien.c-types alien.structs.fields cpu.architecture math.order ;
+alien.c-types alien.structs.fields cpu.architecture math.order
+quotations ;
 IN: alien.structs
 
-TUPLE: struct-type size align fields ;
+TUPLE: struct-type
+size
+align
+fields
+{ boxer-quot callable }
+{ unboxer-quot callable }
+{ getter callable }
+{ setter callable } ;
 
 M: struct-type heap-size size>> ;
 
@@ -14,6 +22,10 @@ M: struct-type c-type-class drop object ;
 M: struct-type c-type-align align>> ;
 
 M: struct-type c-type-stack-align? drop f ;
+
+M: struct-type c-type-boxer-quot boxer-quot>> ;
+
+M: struct-type c-type-unboxer-quot unboxer-quot>> ;
 
 : if-value-struct ( ctype true false -- )
     [ dup value-struct? ] 2dip '[ drop "void*" @ ] if ; inline
@@ -40,7 +52,10 @@ M: struct-type stack-size
 
 : (define-struct) ( name size align fields -- )
     [ [ align ] keep ] dip
-    struct-type boa
+    struct-type new
+    swap >>fields
+    swap >>align
+    swap >>size
     swap typedef ;
 
 : make-fields ( name vocab fields -- fields )
@@ -61,3 +76,8 @@ M: struct-type stack-size
     [ expand-constants ] map
     [ [ heap-size ] [ max ] map-reduce ] keep
     compute-struct-align f (define-struct) ;
+
+: offset-of ( field struct -- offset )
+    c-types get at fields>> 
+    [ name>> = ] with find nip offset>> ;
+

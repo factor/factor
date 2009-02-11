@@ -58,10 +58,7 @@ PREDICATE: slot-writer < word "writing" word-prop >boolean ;
 : define-getter ( type spec -- )
     [ set-reader-props ] keep
     [ reader>> ]
-    [
-        type>>
-        [ c-getter ] [ c-type-boxer-quot ] bi append
-    ]
+    [ type>> c-type-getter-boxer ]
     [ ] tri
     (( c-ptr -- value )) define-struct-slot-word ;
 

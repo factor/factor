@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs namespaces make kernel sequences accessors
 combinators strings splitting io io.streams.string present
-xml.writer xml.data xml.entities html.forms
-html.templates html.templates.chloe.syntax continuations ;
+xml.writer xml.data xml.entities html.forms call
+html.templates html.templates.chloe.syntax ;
 IN: html.templates.chloe.compiler
 
 : chloe-attrs-only ( assoc -- assoc' )
@@ -41,6 +41,9 @@ DEFER: compile-element
 
 : [code-with] ( obj quot -- )
     reset-buffer [ , ] [ % ] bi* ;
+
+: [xml-code] ( quot -- )
+    [ write-xml ] compose [code] ;
 
 : expand-attr ( value -- )
     [ value present write ] [code-with] ;
@@ -80,7 +83,7 @@ ERROR: unknown-chloe-tag tag ;
 
 : compile-chloe-tag ( tag -- )
     dup main>> dup tags get at
-    [ curry assert-depth ]
+    [ call( tag -- ) ]
     [ unknown-chloe-tag ]
     ?if ;
 

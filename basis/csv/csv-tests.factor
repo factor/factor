@@ -1,11 +1,11 @@
-USING: io.streams.string csv tools.test shuffle kernel strings
+USING: io.streams.string csv tools.test kernel strings
 io.pathnames io.files.unique io.encodings.utf8 io.files
 io.directories ;
 IN: csv.tests
 
 ! I like to name my unit tests
 : named-unit-test ( name output input -- ) 
-  nipd unit-test ; inline
+  unit-test drop ; inline
 
 ! tests nicked from the wikipedia csv article
 ! http://en.wikipedia.org/wiki/Comma-separated_values

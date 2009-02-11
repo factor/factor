@@ -42,3 +42,18 @@ C-UNION: barx
     [ ] [ \ foox-x "help" get execute ] unit-test
     [ ] [ \ set-foox-x "help" get execute ] unit-test
 ] when
+
+C-STRUCT: nested
+    { "int" "x" } ;
+
+C-STRUCT: nested-2
+    { "nested" "y" } ;
+
+[ 4 ] [
+    "nested-2" <c-object>
+    "nested" <c-object>
+    4 over set-nested-x
+    over set-nested-2-y
+    nested-2-y
+    nested-x
+] unit-test
