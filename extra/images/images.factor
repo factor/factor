@@ -5,9 +5,17 @@ accessors images.bitmap images.tiff images.backend io.backend
 io.pathnames ;
 IN: images
 
-: <image> ( path -- image )
-    normalize-path dup "." split1-last nip >lower
-    {
-        { "bmp" [ bitmap-image load-image ] }
-        { "tiff" [ tiff-image load-image ] }
+ERROR: unknown-image-extension extension ;
+
+: image-class ( path -- class )
+    file-extension >lower {
+        { "bmp" [ bitmap-image ] }
+        { "tiff" [ tiff-image ] }
+        [ unknown-image-extension ]
     } case ;
+
+: load-image ( path -- image )
+    dup image-class new load-image* ;
+
+: <image> ( path -- image )
+    load-image normalize-image ;
