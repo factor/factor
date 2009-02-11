@@ -25,10 +25,13 @@ M: image-gadget draw-gadget* ( gadget -- )
 : image-window ( path -- gadget )
     [ <image> <image-gadget> dup ] [ open-window ] bi ;
 
-GENERIC: image. ( image -- )
+GENERIC: image. ( object -- )
 
-M: string image. ( image -- ) <image> <image-gadget> gadget. ;
+: default-image. ( path -- )
+    <image-gadget> gadget. ;
 
-M: pathname image. ( image -- ) <image> <image-gadget> gadget. ;
+M: string image. ( image -- ) <image> default-image. ;
 
-M: image image. ( image -- ) <image-gadget> gadget. ;
+M: pathname image. ( image -- ) <image> default-image. ;
+
+M: image image. ( image -- ) default-image. ;

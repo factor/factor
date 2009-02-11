@@ -5,7 +5,6 @@ images.bitmap math ;
 IN: images.backend
 
 SINGLETONS: BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR ;
-! RGBA
 
 TUPLE: image dim component-order bitmap ;
 
@@ -42,9 +41,9 @@ GENERIC: normalize-scan-line-order ( image -- image )
 
 M: image normalize-scan-line-order ;
 M: bitmap-image normalize-scan-line-order
-    dup
-    [ bitmap>> ] [ dim>> first 4 * ] bi <sliced-groups> reverse concat
-    >>bitmap ;
+    dup dim>> '[
+        _ first 4 * <sliced-groups> reverse concat
+    ] change-bitmap ;
     
 : normalize-image ( image -- image )
     normalize-component-order
