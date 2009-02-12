@@ -14,7 +14,9 @@ fields
 { unboxer-quot callable }
 { getter callable }
 { setter callable }
-return-in-registers ;
+return-in-registers? ;
+
+M: struct-type c-type ;
 
 M: struct-type heap-size size>> ;
 
