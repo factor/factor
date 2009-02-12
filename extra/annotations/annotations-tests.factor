@@ -1,9 +1,12 @@
-USING: annotations math sorting tools.test ;
+USING: accessors annotations combinators.short-circuit
+io.pathnames kernel math sequences sorting tools.test ;
 IN: annotations.tests
 
+!NOTE testing toplevel form 
+
 : three ( -- x )
-    !BROKEN find a dictionary
-    "threa" ;
+    !BROKEN english plz
+    "þrij" ;
 
 : four ( -- x )
     !BROKEN this code is broken
@@ -12,6 +15,13 @@ IN: annotations.tests
 : five ( -- x )
     !TODO return 5
     f ;
+
+[ t ] [
+    NOTEs {
+        [ length 1 = ]
+        [ first string>> file-name "annotations-tests.factor" = ]
+    } 1&&
+] unit-test
 
 [ { four three } ] [ BROKENs natural-sort ] unit-test
 [ { five } ] [ TODOs ] unit-test
