@@ -1,13 +1,14 @@
 USING: xmode.loader xmode.utilities xmode.rules namespaces
 strings splitting assocs sequences kernel io.files xml memoize
-words globs combinators io.encodings.utf8 sorting accessors xml.data ;
+words globs combinators io.encodings.utf8 sorting accessors xml.data
+xml.traversal ;
 IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
 
-<TAGS: parse-mode-tag ( modes tag -- )
+TAGS: parse-mode-tag ( modes tag -- )
 
-TAG: MODE
+TAG: MODE parse-mode-tag
     dup "NAME" attr [
         mode new {
             { "FILE" f (>>file) }
@@ -17,11 +18,9 @@ TAG: MODE
     ] dip
     rot set-at ;
 
-TAGS>
-
 : parse-modes-tag ( tag -- modes )
     H{ } clone [
-        swap child-tags [ parse-mode-tag ] with each
+        swap children-tags [ parse-mode-tag ] with each
     ] keep ;
 
 MEMO: modes ( -- modes )

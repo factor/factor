@@ -4,8 +4,6 @@ IN: xmode.utilities
 
 : implies ( x y -- z ) [ not ] dip or ; inline
 
-: child-tags ( tag -- seq ) children>> [ tag? ] filter ;
-
 : map-find ( seq quot -- result elt )
     [ f ] 2dip
     '[ nip @ dup ] find
@@ -37,21 +35,3 @@ MACRO: (init-from-tag) ( specs -- )
 
 : init-from-tag ( tag tuple specs -- tuple )
     over [ (init-from-tag) ] dip ; inline
-
-SYMBOL: tag-handlers
-SYMBOL: tag-handler-word
-
-: <TAGS:
-    CREATE tag-handler-word set
-    H{ } clone tag-handlers set ; parsing
-
-: (TAG:) ( name quot -- ) swap tag-handlers get set-at ;
-
-: TAG:
-    scan parse-definition
-    (TAG:) ; parsing
-
-: TAGS>
-    tag-handler-word get
-    tag-handlers get >alist [ [ dup main>> ] dip case ] curry
-    define ; parsing

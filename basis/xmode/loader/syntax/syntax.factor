@@ -3,7 +3,7 @@
 USING: accessors xmode.tokens xmode.rules xmode.keyword-map
 xml.data xml.traversal xml assocs kernel combinators sequences
 math.parser namespaces make parser lexer xmode.utilities
-parser-combinators.regexp io.files splitting arrays ;
+regexp io.files splitting arrays xml.syntax.private ;
 IN: xmode.loader.syntax
 
 ! Rule tag parsing utilities
@@ -11,9 +11,10 @@ IN: xmode.loader.syntax
     new swap init-from-tag swap add-rule ; inline
 
 : RULE:
-    scan scan-word
+    scan scan-word scan-word
     parse-definition { } make
-    swap [ (parse-rule-tag) ] 2curry (TAG:) ; parsing
+    [ swap [ (parse-rule-tag) ] 2curry ] dip
+    swap define-tag ; parsing
 
 ! Attribute utilities
 : string>boolean ( string -- ? ) "TRUE" = ;
@@ -32,7 +33,7 @@ IN: xmode.loader.syntax
     [ "NAME" attr ] [ "VALUE" attr ] bi ;
 
 : parse-props-tag ( tag -- assoc )
-    child-tags
+    children-tags
     [ parse-prop-tag ] H{ } map>assoc ;
 
 : position-attrs ( tag -- at-line-start? at-whitespace-end? at-word-start? )
@@ -46,7 +47,7 @@ IN: xmode.loader.syntax
     swap position-attrs <matcher> ;
 
 : parse-regexp-matcher ( tag -- matcher )
-    dup children>string rule-set get ignore-case?>> <regexp>
+    dup children>string rule-set get ignore-case?>> drop <regexp>
     swap position-attrs <matcher> ;
 
 : shared-tag-attrs ( -- )
@@ -79,22 +80,20 @@ IN: xmode.loader.syntax
     [ parse-literal-matcher >>end drop ] , ;
 
 ! SPAN's children
-<TAGS: parse-begin/end-tag ( rule tag -- )
+TAGS: parse-begin/end-tag ( rule tag -- )
 
-TAG: BEGIN
+TAG: BEGIN parse-begin/end-tag
     ! XXX
     parse-literal-matcher >>start drop ;
 
-TAG: END
+TAG: END parse-begin/end-tag
     ! XXX
     parse-literal-matcher >>end drop ;
-
-TAGS>
 
 : parse-begin/end-tags ( -- )
     [
         ! XXX: handle position attrs on span tag itself
-        child-tags [ parse-begin/end-tag ] with each
+        children-tags [ parse-begin/end-tag ] with each
     ] , ;
 
 : init-span-tag ( -- ) [ drop init-span ] , ;
