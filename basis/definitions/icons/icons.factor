@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes.predicate fry generic io.pathnames kernel
-macros sequences vocabs words words.symbol lexer parser ;
+macros sequences vocabs words words.symbol words.constant
+lexer parser ;
 IN: definitions.icons
 
 GENERIC: definition-icon ( definition -- path )
@@ -26,6 +27,7 @@ ICON: macro macro-word
 ICON: parsing-word parsing-word
 ICON: primitive primitive-word
 ICON: symbol symbol-word
+ICON: constant constant-word
 ICON: word normal-word
 ICON: vocab-link unopen-vocab
 
