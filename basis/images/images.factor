@@ -17,8 +17,7 @@ GENERIC: load-image* ( path tuple -- image )
         { RGBA [ ] }
         { BGRA [
             [
-                [ 4 <sliced-groups> [ [ 0 3 ] dip <slice> reverse-here ] each ]
-                [ RGBA >>component-order ] bi
+                4 <sliced-groups> dup [ [ 0 3 ] dip <slice> reverse-here ] each
             ] change-bitmap
         ] }
         { RGB [
