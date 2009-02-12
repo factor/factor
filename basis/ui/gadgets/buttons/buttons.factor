@@ -66,6 +66,16 @@ M: button-paint draw-interior
 M: button-paint draw-boundary
     button-paint dup [ draw-boundary ] [ 2drop ] if ;
 
+M: button-paint pen-pref-dim
+    [
+        {
+            [ plain>> pen-pref-dim ]
+            [ rollover>> pen-pref-dim ]
+            [ pressed>> pen-pref-dim ]
+            [ selected>> pen-pref-dim ]
+        } 2cleave
+    ] [ vmax ] reduce-outputs ;
+
 : align-left ( button -- button )
     { 0 1/2 } >>align ; inline
 
@@ -95,7 +105,9 @@ M: button-paint draw-boundary
 TUPLE: repeat-button < button ;
 
 repeat-button H{
+    { T{ button-down } [ button-clicked ] }
     { T{ drag } [ button-clicked ] }
+    { T{ button-up } [ button-update ] }
 } set-gestures
 
 : <repeat-button> ( label quot -- button )
