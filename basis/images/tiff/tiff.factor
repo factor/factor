@@ -276,7 +276,7 @@ ERROR: unknown-component-order ifd ;
     } cleave tiff-image new-image ;
 
 : tiff>image ( image -- image )
-    ifds>> [ >image ] map first ;
+    ifds>> [ ifd>image ] map first ;
 
 : load-tiff ( path -- parsed-tiff )
     binary [
