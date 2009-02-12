@@ -90,8 +90,8 @@ M: input (print-input)
     dup presented associate
     [ string>> H{ { font-style bold } } format ] with-nesting nl ;
 
-M: object (print-input)
-    short. ;
+M: word (print-input)
+    "Command: " write . ;
 
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
@@ -131,9 +131,11 @@ M: object (print-input)
 M: interactor stream-readln
     interactor-read dup [ first ] when ;
 
-: interactor-call ( quot interactor -- )
-    dup interactor-busy? [ 2drop ] [
-        [ print-input ] [ interactor-continue ] 2bi
+: (call-listener) ( quot command listener -- )
+    input>> dup interactor-busy? [ 3drop ] [
+        [ print-input drop ]
+        [ nip interactor-continue ]
+        3bi
     ] if ;
 
 M: interactor stream-read
@@ -237,19 +239,16 @@ M: string listener-input
     get-listener input>>
     [ set-editor-string ] [ request-focus ] bi ;
 
-: (call-listener) ( quot listener -- )
-    input>> interactor-call ;
-
-: call-listener ( quot -- )
+: call-listener ( quot command -- )
     get-ready-listener
-    '[ _ _ dup wait-for-listener (call-listener) ]
+    '[ _ _ _ dup wait-for-listener (call-listener) ]
     "Listener call" spawn drop ;
 
 M: listener-command invoke-command ( target command -- )
-    command-quot call-listener ;
+    [ command-quot ] [ nip ] 2bi call-listener ;
 
 M: listener-operation invoke-command ( target command -- )
-    operation-quot call-listener ;
+    [ operation-quot ] [ nip command>> ] 2bi call-listener ;
 
 : eval-listener ( string -- )
     get-listener input>> [ set-editor-string ] keep
@@ -257,6 +256,7 @@ M: listener-operation invoke-command ( target command -- )
 
 : listener-run-files ( seq -- )
     [
+        [ \ listener-run-files ] dip
         '[ _ [ run-file ] each ] call-listener
     ] unless-empty ;
 
@@ -269,7 +269,7 @@ M: listener-operation invoke-command ( target command -- )
 \ clear-output H{ { +listener+ t } } define-command
 
 : clear-stack ( listener -- )
-    [ clear ] swap (call-listener) ;
+    [ [ clear ] \ clear ] dip (call-listener) ;
 
 : use-if-necessary ( word seq -- )
     2dup [ vocabulary>> ] dip and [

@@ -95,7 +95,12 @@ M: world ungraft*
     children>> [ restore-gadget ] each ;
 
 : restore-world ( world -- )
-    [ reset-world ] [ init-text-rendering ] [ restore-gadget ] tri ;
+    {
+        [ reset-world ]
+        [ init-text-rendering ]
+        [ f >>images drop ]
+        [ restore-gadget ]
+    } cleave ;
 
 : update-hand ( world -- )
     dup hand-world get-global eq?
