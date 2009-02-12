@@ -44,11 +44,11 @@ M: retryable execute-statement* ( statement type -- )
     ] bi attempt-all drop ;
 
 : sql-props ( class -- columns table )
-    [ db-columns ] [ db-table ] bi ;
+    [ db-columns ] [ db-table-name ] bi ;
 
 : query-make ( class quot -- statements )
     #! query, input, outputs, secondary queries
-    over db-table "table" set
+    over db-table-name "table-name" set
     [ sql-props ] dip
     [ 0 sql-counter rot with-variable ] curry
     { "" { } { } { } } nmake
