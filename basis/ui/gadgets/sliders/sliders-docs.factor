@@ -1,4 +1,5 @@
-USING: help.markup help.syntax ui.gadgets models models.range ;
+USING: help.markup help.syntax ui.gadgets models models.range
+ui.gadgets.sliders.private ;
 IN: ui.gadgets.sliders
 
 HELP: elevator

@@ -7,7 +7,7 @@ documents documents.elements fry hashtables help help.markup io
 io.styles kernel lexer listener math models models.delay models.filter
 namespaces parser prettyprint quotations sequences strings threads
 tools.vocabs vocabs vocabs.loader vocabs.parser words ui ui.commands
-ui.render ui.gadgets ui.gadgets.buttons ui.gadgets.editors
+ui.pens.solid ui.gadgets ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.labelled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.tools.debugger
