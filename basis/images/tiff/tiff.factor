@@ -272,8 +272,9 @@ ERROR: unknown-component-order ifd ;
     {
         [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
         [ ifd-component-order ]
+        [ drop big-endian ] ! XXX
         [ bitmap>> ]
-    } cleave tiff-image new-image ;
+    } cleave tiff-image boa ;
 
 : tiff>image ( image -- image )
     ifds>> [ ifd>image ] map first ;
