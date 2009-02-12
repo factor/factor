@@ -138,11 +138,13 @@ M: sqlite-db-connection create-sql-statement ( class -- statement )
             modifiers 0%
         ] interleave
 
-        ", " 0%
-        find-primary-key
-        "primary key(" 0%
-        [ "," 0% ] [ column-name>> 0% ] interleave
-        "));" 0%
+        find-primary-key [
+            ", " 0%
+            "primary key(" 0%
+            [ "," 0% ] [ column-name>> 0% ] interleave
+            ")" 0%
+        ] unless-empty
+        ");" 0%
     ] query-make ;
 
 M: sqlite-db-connection drop-sql-statement ( class -- statement )

@@ -24,3 +24,4 @@ build-support/wordsize
 *.bak
 .#*
 *.swo
+checksums.txt
