@@ -95,6 +95,7 @@ COMPONENT: password
 COMPONENT: choice
 COMPONENT: checkbox
 COMPONENT: code
+COMPONENT: xml
 
 SYMBOL: template-cache
 
