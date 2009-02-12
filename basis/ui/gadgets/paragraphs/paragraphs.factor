@@ -29,10 +29,10 @@ TUPLE: paragraph < gadget margin ;
 : gadget>word ( gadget -- word )
     [ ] [ pref-dim first ] [ word-break? ] tri <word> ;
 
-TUPLE: line words ascent descent ;
+TUPLE: line words height ;
 
 : <line> ( words -- line )
-    dup [ key>> ] map dup pref-dims baseline-metrics line boa ;
+    dup [ key>> ] map dup pref-dims baseline-height line boa ;
 
 : wrap-paragraph ( paragraph -- wrapped-paragraph )
     [ children>> [ gadget>word ] map ] [ margin>> ] bi
@@ -44,17 +44,14 @@ TUPLE: line words ascent descent ;
 : max-line-width ( wrapped-paragraph -- x )
     [ words>> line-width ] [ max ] map-reduce ;
 
-: line-height ( wrapped-line -- ys )
-    [ ascent>> ] [ descent>> ] bi + ;
-
 : sum-line-heights ( wrapped-paragraph -- y )
-    [ line-height ] sigma ;
+    [ height>> ] sigma ;
 
 M: paragraph pref-dim*
     wrap-paragraph [ max-line-width ] [ sum-line-heights ] bi 2array ;
 
 : line-y-coordinates ( wrapped-paragraph -- ys )
-    0 [ line-height + ] accumulate nip ;
+    0 [ height>> + ] accumulate nip ;
 
 : word-x-coordinates ( wrapped-line -- xs )
     0 [ width>> + ] accumulate nip ;
@@ -75,8 +72,11 @@ M: paragraph layout*
     [ layout-line ] 2each ;
 
 M: paragraph baseline
-    children>> [ 0 ] [
-        first [ loc>> second ] [ baseline ] bi +
+    wrap-paragraph [ f ] [
+        first words>>
+        [ key>> ] map
+        dup [ pref-dim ] map
+        baseline-metrics drop
     ] if-empty ;
 
 PRIVATE>
