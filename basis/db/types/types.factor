@@ -165,7 +165,7 @@ ERROR: no-column column ;
 
 : >reference-string ( string pair -- string )
     first2
-    [ [ unparse " " glue ] [ db-columns ] bi ] dip
+    [ [ db-table " " glue ] [ db-columns ] bi ] dip
     swap [ column-name>> = ] with find nip
     [ no-column ] unless*
     column-name>> "(" ")" surround append ;
