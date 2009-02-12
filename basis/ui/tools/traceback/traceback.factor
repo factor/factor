@@ -5,7 +5,7 @@ fry prettyprint ui ui.commands ui.gadgets ui.gadgets.labelled assocs
 ui.gadgets.tracks ui.gadgets.buttons ui.gadgets.panes
 ui.gadgets.status-bar ui.gadgets.scrollers
 ui.gadgets.tables ui.gestures sequences inspector
-models.filter ;
+models.filter fonts ;
 QUALIFIED-WITH: ui.tools.inspector i
 IN: ui.tools.traceback
 
@@ -22,6 +22,7 @@ M: stack-entry-renderer row-value drop object>> ;
 
 : <stack-table> ( model -- table )
     [ [ <stack-entry> ] map ] <filter> <table>
+        monospace-font >>font
         [ i:inspector ] >>action
         stack-entry-renderer >>renderer
         t >>single-click? ;
