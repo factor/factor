@@ -146,7 +146,7 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
         monospace-font >>font
         t >>selection-required?
         transparent >>column-line-color
-        0 >>gap
+        2 >>gap
         dup '[ _ accept-completion ] >>action ;
 
 : <completion-scroller> ( completion-popup -- scroller )

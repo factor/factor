@@ -164,3 +164,12 @@ M: mock-gadget ungraft*
 
 \ graft* must-infer
 \ ungraft* must-infer
+
+! Test baseline calculations
+[ 10 ] [ 0 10 0 combine-baseline-metrics + ] unit-test
+[ 15 ] [ 0 10 5 combine-baseline-metrics + ] unit-test
+[ 30 ] [ 30 0 0 combine-baseline-metrics + ] unit-test
+[ 35 ] [ 10 0 30 combine-baseline-metrics + ] unit-test
+[ 20 ] [ 5 10 10 combine-baseline-metrics + ] unit-test
+[ 20 ] [ 20 10 0 combine-baseline-metrics + ] unit-test
+[ 55 ] [ 20 10 40 combine-baseline-metrics + ] unit-test

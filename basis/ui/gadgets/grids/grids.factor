@@ -50,7 +50,7 @@ TUPLE: grid-layout grid gap fill? row-heights column-widths ;
 : row-heights ( grid-layout -- heights )
     [ grid>> ] [ fill?>> ] bi
     [ [ second ] iterate-cell-dims ]
-    [ [ dup [ pref-dim>> ] map baseline-metrics + ] map ]
+    [ [ dup [ pref-dim>> ] map baseline-height ] map ]
     if ;
 
 : column-widths ( grid-layout -- widths )

@@ -66,7 +66,7 @@ PRIVATE>
 
 : max-pack-dim ( pack sizes -- dim )
     over align>> +baseline+ eq?
-    [ [ children>> ] dip baseline-metrics + 0 swap 2array ] [ nip max-dim ] if ;
+    [ [ children>> ] dip baseline-height 0 swap 2array ] [ nip max-dim ] if ;
 
 : pack-pref-dim ( pack sizes -- dim )
     [ max-pack-dim ]
@@ -81,7 +81,7 @@ M: pack pref-dim*
     children>> [ 0 ] [ first baseline ] if-empty ;
 
 : horizontal-baseline ( pack -- y )
-    children>> [ baseline ] [ max ] map-reduce ;
+    children>> dup pref-dims baseline-metrics drop ;
 
 PRIVATE>
 

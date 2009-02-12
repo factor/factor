@@ -25,7 +25,8 @@ M: border pref-dim*
     [ min-dim>> ] bi vmax ;
 
 M: border baseline
-    [ size>> second ] [ gadget-child baseline ] bi + ;
+    [ size>> second ] [ gadget-child baseline ] bi
+    dup [ + ] [ nip ] if ;
 
 : border-major-dim ( border -- dim )
     [ dim>> ] [ size>> 2 v*n ] bi v- ;
