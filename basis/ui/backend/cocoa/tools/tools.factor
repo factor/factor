@@ -57,7 +57,7 @@ CLASS: {
 }
 
 { "refreshAll:" "id" { "id" "SEL" "id" }
-    [ 3drop [ refresh-all ] call-listener f ]
+    [ 3drop [ refresh-all ] \ refresh-all call-listener f ]
 } ;
 
 : install-app-delegate ( -- )

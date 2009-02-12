@@ -77,9 +77,10 @@ TUPLE: deploy-gadget < pack vocab settings ;
     swap find-deploy-vocab set-deploy-config ;
 
 : com-deploy ( gadget -- )
-    dup com-save
-    dup find-deploy-vocab '[ _ deploy ] call-listener
-    close-window ;
+    [ com-save ]
+    [ find-deploy-vocab '[ _ deploy ] \ deploy call-listener ]
+    [ close-window ]
+    tri ;
 
 : com-help ( -- )
     "ui.tools.deploy" com-follow ;
