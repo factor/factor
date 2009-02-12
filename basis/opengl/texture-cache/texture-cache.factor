@@ -1,28 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache colors.constants destructors fry
-kernel opengl opengl.gl combinators ;
+opengl.textures kernel ;
 IN: opengl.texture-cache
-
-TUPLE: texture texture display-list disposed ;
-
-: make-texture-display-list ( dim texture -- dlist )
-    GL_COMPILE [ draw-textured-rect ] make-dlist ;
-
-TUPLE: texture-info dim bitmap format type ;
-
-C: <texture-info> texture-info
-
-: <texture> ( info -- texture )
-    [
-        { [ dim>> ] [ bitmap>> ] [ format>> ] [ type>> ] }
-        cleave make-texture
-    ] [ dim>> ] bi
-    over make-texture-display-list f texture boa ;
-
-M: texture dispose*
-    [ texture>> delete-texture ]
-    [ display-list>> delete-dlist ] bi ;
 
 TUPLE: texture-cache renderer cache disposed ;
 
@@ -31,7 +11,7 @@ TUPLE: texture-cache renderer cache disposed ;
         swap >>renderer
         <cache-assoc> >>cache ;
 
-GENERIC: render-texture ( key renderer -- texture-info )
+GENERIC: render-texture ( key renderer -- image )
 
 : get-texture ( key texture-cache -- texture )
     dup check-disposed
