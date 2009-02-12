@@ -73,3 +73,25 @@ IN: db.sqlite.tests
         "select * from person" sql-query length
     ] with-db
 ] unit-test
+
+! You don't need a primary key
+USING: accessors arrays sorting ;
+TUPLE: things one two ;
+
+things "THINGS" {
+    { "one" "ONE" INTEGER +not-null+ }
+    { "two" "TWO" INTEGER +not-null+ }
+} define-persistent
+
+[ { { 0 0 } { 0 1 } { 1 0 } { 1 1 } } ] [
+    test.db [
+       things create-table
+        0 0 things boa insert-tuple
+        0 1 things boa insert-tuple
+        1 1 things boa insert-tuple
+        1 0 things boa insert-tuple
+        f f things boa select-tuples
+        [ [ one>> ] [ two>> ] bi 2array ] map natural-sort
+       things drop-table
+    ] with-db
+] unit-test
