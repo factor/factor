@@ -15,7 +15,4 @@ ERROR: unknown-image-extension extension ;
     } case ;
 
 : load-image ( path -- image )
-    dup image-class new load-image* ;
-
-: <image> ( path -- image )
-    load-image normalize-image ;
+    dup image-class new load-image* normalize-image ;

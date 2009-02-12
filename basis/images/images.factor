@@ -5,7 +5,9 @@ IN: images
 
 SINGLETONS: BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR ;
 
-TUPLE: image dim component-order bitmap ;
+TUPLE: image dim component-order byte-order bitmap ;
+
+: <image> ( -- image ) image new ; inline
 
 GENERIC: load-image* ( path tuple -- image )
 
@@ -38,9 +40,3 @@ M: image normalize-scan-line-order ;
 : normalize-image ( image -- image )
     normalize-component-order
     normalize-scan-line-order ;
-
-: new-image ( dim component-order bitmap class -- image )
-    new 
-        swap >>bitmap
-        swap >>component-order
-        swap >>dim ; inline

@@ -23,15 +23,15 @@ M: image-gadget draw-gadget* ( gadget -- )
         swap >>image ;
 
 : image-window ( path -- gadget )
-    [ <image> <image-gadget> dup ] [ open-window ] bi ;
+    [ load-image <image-gadget> dup ] [ open-window ] bi ;
 
 GENERIC: image. ( object -- )
 
 : default-image. ( path -- )
     <image-gadget> gadget. ;
 
-M: string image. ( image -- ) <image> default-image. ;
+M: string image. ( image -- ) load-image default-image. ;
 
-M: pathname image. ( image -- ) <image> default-image. ;
+M: pathname image. ( image -- ) load-image default-image. ;
 
 M: image image. ( image -- ) default-image. ;
