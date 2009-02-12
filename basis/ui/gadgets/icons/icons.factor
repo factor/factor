@@ -3,10 +3,9 @@
 USING: kernel accessors ui.images ui.render ui.gadgets ;
 IN: ui.gadgets.icons
 
-TUPLE: icon < gadget image ;
+TUPLE: icon < gadget ;
 
-: <icon> ( image-name -- icon ) icon new swap >>image ;
+: <icon> ( image-name -- icon )
+    icon new swap <image-pen> >>interior ;
 
-M: icon draw-gadget* image>> draw-image ;
-
-M: icon pref-dim* image>> image-dim ;
+M: icon pref-dim* dup interior>> pen-pref-dim ;
