@@ -13,7 +13,8 @@ fields
 { boxer-quot callable }
 { unboxer-quot callable }
 { getter callable }
-{ setter callable } ;
+{ setter callable }
+return-in-registers ;
 
 M: struct-type heap-size size>> ;
 
@@ -37,7 +38,7 @@ M: struct-type box-parameter
     [ %box-large-struct ] [ box-parameter ] if-value-struct ;
 
 : if-small-struct ( c-type true false -- ? )
-    [ dup struct-small-enough? ] 2dip '[ f swap @ ] if ; inline
+    [ dup return-struct-in-registers? ] 2dip '[ f swap @ ] if ; inline
 
 M: struct-type unbox-return
     [ %unbox-small-struct ] [ %unbox-large-struct ] if-small-struct ;
