@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types arrays byte-arrays columns
 combinators fry grouping io io.binary io.encodings.binary
 io.files kernel libc macros math math.bitwise math.functions
 namespaces opengl opengl.gl prettyprint sequences strings
-summary ui ui.gadgets.panes images.backend ;
+summary ui ui.gadgets.panes images ;
 IN: images.bitmap
 
 TUPLE: bitmap-image < image ;
@@ -102,7 +102,7 @@ ERROR: unknown-component-order bitmap ;
         [ unknown-component-order ]
     } case ;
 
-M: bitmap >image ( bitmap -- bitmap-image )
+: >image ( bitmap -- bitmap-image )
     {
         [ [ width>> ] [ height>> ] bi 2array ]
         [ bitmap>component-order ]
