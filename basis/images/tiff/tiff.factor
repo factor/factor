@@ -3,7 +3,7 @@
 USING: accessors combinators io io.encodings.binary io.files kernel
 pack endian constructors sequences arrays math.order math.parser
 prettyprint classes io.binary assocs math math.bitwise byte-arrays
-grouping images.backend ;
+grouping images ;
 IN: images.tiff
 
 TUPLE: tiff-image < image ;
@@ -268,15 +268,16 @@ ERROR: unknown-component-order ifd ;
         [ unknown-component-order ]
     } case ;
 
-M: ifd >image ( ifd -- image )
+: ifd>image ( ifd -- image )
     {
         [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
         [ ifd-component-order ]
+        [ drop big-endian ] ! XXX
         [ bitmap>> ]
-    } cleave tiff-image new-image ;
+    } cleave tiff-image boa ;
 
-M: parsed-tiff >image ( image -- image )
-    ifds>> [ >image ] map first ;
+: tiff>image ( image -- image )
+    ifds>> [ ifd>image ] map first ;
 
 : load-tiff ( path -- parsed-tiff )
     binary [
@@ -289,4 +290,4 @@ M: parsed-tiff >image ( image -- image )
 
 ! tiff files can store several images -- we just take the first for now
 M: tiff-image load-image* ( path tiff-image -- image )
-    drop load-tiff >image ;
+    drop load-tiff tiff>image ;

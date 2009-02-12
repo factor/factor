@@ -11,46 +11,46 @@ IN: db.postgresql.ffi
 } cond "cdecl" add-library >>
 
 ! ConnSatusType
-: CONNECTION_OK                     HEX: 0 ; inline
-: CONNECTION_BAD                    HEX: 1 ; inline
-: CONNECTION_STARTED                HEX: 2 ; inline
-: CONNECTION_MADE                   HEX: 3 ; inline
-: CONNECTION_AWAITING_RESPONSE      HEX: 4 ; inline
-: CONNECTION_AUTH_OK                HEX: 5 ; inline
-: CONNECTION_SETENV                 HEX: 6 ; inline
-: CONNECTION_SSL_STARTUP            HEX: 7 ; inline
-: CONNECTION_NEEDED                 HEX: 8 ; inline
+CONSTANT: CONNECTION_OK                     HEX: 0
+CONSTANT: CONNECTION_BAD                    HEX: 1
+CONSTANT: CONNECTION_STARTED                HEX: 2
+CONSTANT: CONNECTION_MADE                   HEX: 3
+CONSTANT: CONNECTION_AWAITING_RESPONSE      HEX: 4
+CONSTANT: CONNECTION_AUTH_OK                HEX: 5
+CONSTANT: CONNECTION_SETENV                 HEX: 6
+CONSTANT: CONNECTION_SSL_STARTUP            HEX: 7
+CONSTANT: CONNECTION_NEEDED                 HEX: 8
 
 ! PostgresPollingStatusType
-: PGRES_POLLING_FAILED              HEX: 0 ; inline
-: PGRES_POLLING_READING             HEX: 1 ; inline
-: PGRES_POLLING_WRITING             HEX: 2 ; inline
-: PGRES_POLLING_OK                  HEX: 3 ; inline
-: PGRES_POLLING_ACTIVE              HEX: 4 ; inline
+CONSTANT: PGRES_POLLING_FAILED              HEX: 0
+CONSTANT: PGRES_POLLING_READING             HEX: 1
+CONSTANT: PGRES_POLLING_WRITING             HEX: 2
+CONSTANT: PGRES_POLLING_OK                  HEX: 3
+CONSTANT: PGRES_POLLING_ACTIVE              HEX: 4
 
 ! ExecStatusType;
-: PGRES_EMPTY_QUERY                 HEX: 0 ; inline
-: PGRES_COMMAND_OK                  HEX: 1 ; inline
-: PGRES_TUPLES_OK                   HEX: 2 ; inline
-: PGRES_COPY_OUT                    HEX: 3 ; inline
-: PGRES_COPY_IN                     HEX: 4 ; inline
-: PGRES_BAD_RESPONSE                HEX: 5 ; inline
-: PGRES_NONFATAL_ERROR              HEX: 6 ; inline
-: PGRES_FATAL_ERROR                 HEX: 7 ; inline
+CONSTANT: PGRES_EMPTY_QUERY                 HEX: 0
+CONSTANT: PGRES_COMMAND_OK                  HEX: 1
+CONSTANT: PGRES_TUPLES_OK                   HEX: 2
+CONSTANT: PGRES_COPY_OUT                    HEX: 3
+CONSTANT: PGRES_COPY_IN                     HEX: 4
+CONSTANT: PGRES_BAD_RESPONSE                HEX: 5
+CONSTANT: PGRES_NONFATAL_ERROR              HEX: 6
+CONSTANT: PGRES_FATAL_ERROR                 HEX: 7
 
 ! PGTransactionStatusType;
-: PQTRANS_IDLE                      HEX: 0 ; inline
-: PQTRANS_ACTIVE                    HEX: 1 ; inline
-: PQTRANS_INTRANS                   HEX: 2 ; inline
-: PQTRANS_INERROR                   HEX: 3 ; inline
-: PQTRANS_UNKNOWN                   HEX: 4 ; inline
+CONSTANT: PQTRANS_IDLE                      HEX: 0
+CONSTANT: PQTRANS_ACTIVE                    HEX: 1
+CONSTANT: PQTRANS_INTRANS                   HEX: 2
+CONSTANT: PQTRANS_INERROR                   HEX: 3
+CONSTANT: PQTRANS_UNKNOWN                   HEX: 4
 
 ! PGVerbosity;
-: PQERRORS_TERSE                    HEX: 0 ; inline
-: PQERRORS_DEFAULT                  HEX: 1 ; inline
-: PQERRORS_VERBOSE                  HEX: 2 ; inline
+CONSTANT: PQERRORS_TERSE                    HEX: 0
+CONSTANT: PQERRORS_DEFAULT                  HEX: 1
+CONSTANT: PQERRORS_VERBOSE                  HEX: 2
 
-: InvalidOid 0 ; inline
+CONSTANT: InvalidOid 0
 
 TYPEDEF: int ConnStatusType
 TYPEDEF: int ExecStatusType 
@@ -348,21 +348,21 @@ FUNCTION: int    PQdsplen ( uchar* s, int encoding ) ;
 FUNCTION: int    PQenv2encoding ( ) ;
 
 ! From git, include/catalog/pg_type.h
-: BOOL-OID 16 ; inline
-: BYTEA-OID 17 ; inline
-: CHAR-OID 18 ; inline
-: NAME-OID 19 ; inline
-: INT8-OID 20 ; inline
-: INT2-OID 21 ; inline
-: INT4-OID 23 ; inline
-: TEXT-OID 23 ; inline
-: OID-OID 26 ; inline
-: FLOAT4-OID 700 ; inline
-: FLOAT8-OID 701 ; inline
-: VARCHAR-OID 1043 ; inline
-: DATE-OID 1082 ; inline
-: TIME-OID 1083 ; inline
-: TIMESTAMP-OID 1114 ; inline
-: TIMESTAMPTZ-OID 1184 ; inline
-: INTERVAL-OID 1186 ; inline
-: NUMERIC-OID 1700 ; inline
+CONSTANT: BOOL-OID 16
+CONSTANT: BYTEA-OID 17
+CONSTANT: CHAR-OID 18
+CONSTANT: NAME-OID 19
+CONSTANT: INT8-OID 20
+CONSTANT: INT2-OID 21
+CONSTANT: INT4-OID 23
+CONSTANT: TEXT-OID 23
+CONSTANT: OID-OID 26
+CONSTANT: FLOAT4-OID 700
+CONSTANT: FLOAT8-OID 701
+CONSTANT: VARCHAR-OID 1043
+CONSTANT: DATE-OID 1082
+CONSTANT: TIME-OID 1083
+CONSTANT: TIMESTAMP-OID 1114
+CONSTANT: TIMESTAMPTZ-OID 1184
+CONSTANT: INTERVAL-OID 1186
+CONSTANT: NUMERIC-OID 1700

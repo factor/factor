@@ -44,7 +44,7 @@ M: struct-type flatten-value-type ( type -- seq )
         flatten-small-struct
     ] if ;
 
-M: x86.64 struct-small-enough? ( size -- ? )
+M: x86.64 return-struct-in-registers? ( c-type -- ? )
     heap-size 2 cells <= ;
 
 M: x86.64 dummy-stack-params? f ;

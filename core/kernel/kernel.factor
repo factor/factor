@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel.private slots.private math.private
 classes.tuple.private ;
@@ -51,7 +51,7 @@ DEFER: if
 
 ! Default
 : ?if ( default cond true false -- )
-    pick [ roll 2drop call ] [ 2nip call ] if ; inline
+    pick [ drop [ drop ] 2dip call ] [ 2nip call ] if ; inline
 
 ! Slippers and dippers.
 ! Not declared inline because the compiler special-cases them
@@ -138,6 +138,69 @@ DEFER: if
 : 2tri@ ( u v w y x z quot -- )
     dup dup 2tri* ; inline
 
+! Quotation building
+: 2curry ( obj1 obj2 quot -- curry )
+    curry curry ; inline
+
+: 3curry ( obj1 obj2 obj3 quot -- curry )
+    curry curry curry ; inline
+
+: with ( param obj quot -- obj curry )
+    swapd [ swapd call ] 2curry ; inline
+
+: prepose ( quot1 quot2 -- compose )
+    swap compose ; inline
+
+! Curried cleavers
+<PRIVATE
+
+: [curry] ( quot -- quot' ) [ curry ] curry ; inline
+
+PRIVATE>
+
+: bi-curry ( x p q -- p' q' ) [ [curry] ] bi@ bi ; inline
+
+: tri-curry ( x p q r -- p' q' r' ) [ [curry] ] tri@ tri ; inline
+
+: bi-curry* ( x y p q -- p' q' ) [ [curry] ] bi@ bi* ; inline
+
+: tri-curry* ( x y z p q r -- p' q' r' ) [ [curry] ] tri@ tri* ; inline
+
+: bi-curry@ ( x y q -- p' q' ) [curry] bi@ ; inline
+
+: tri-curry@ ( x y z q -- p' q' r' ) [curry] tri@ ; inline
+
+! Booleans
+: not ( obj -- ? ) [ f ] [ t ] if ; inline
+
+: and ( obj1 obj2 -- ? ) over ? ; inline
+
+: >boolean ( obj -- ? ) [ t ] [ f ] if ; inline
+
+: or ( obj1 obj2 -- ? ) dupd ? ; inline
+
+: xor ( obj1 obj2 -- ? ) [ f swap ? ] when* ; inline
+
+: both? ( x y quot -- ? ) bi@ and ; inline
+
+: either? ( x y quot -- ? ) bi@ or ; inline
+
+: most ( x y quot -- z )
+    [ 2dup ] dip call [ drop ] [ nip ] if ; inline
+
+! Loops
+: loop ( pred: ( -- ? ) -- )
+    [ call ] keep [ loop ] curry when ; inline recursive
+
+: do ( pred body tail -- pred body tail )
+    over 3dip ; inline
+
+: while ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
+    [ pick 3dip [ do while ] 3curry ] keep if ; inline recursive
+
+: until ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
+    [ [ not ] compose ] 2dip while ; inline
+
 ! Object protocol
 GENERIC: hashcode* ( depth obj -- code )
 
@@ -170,50 +233,6 @@ M: callstack clone (clone) ;
 GENERIC: new ( class -- tuple )
 
 GENERIC: boa ( ... class -- tuple )
-
-! Quotation building
-: 2curry ( obj1 obj2 quot -- curry )
-    curry curry ; inline
-
-: 3curry ( obj1 obj2 obj3 quot -- curry )
-    curry curry curry ; inline
-
-: with ( param obj quot -- obj curry )
-    swapd [ swapd call ] 2curry ; inline
-
-: prepose ( quot1 quot2 -- compose )
-    swap compose ; inline
-
-! Booleans
-: not ( obj -- ? ) [ f ] [ t ] if ; inline
-
-: and ( obj1 obj2 -- ? ) over ? ; inline
-
-: >boolean ( obj -- ? ) [ t ] [ f ] if ; inline
-
-: or ( obj1 obj2 -- ? ) dupd ? ; inline
-
-: xor ( obj1 obj2 -- ? ) [ f swap ? ] when* ; inline
-
-: both? ( x y quot -- ? ) bi@ and ; inline
-
-: either? ( x y quot -- ? ) bi@ or ; inline
-
-: most ( x y quot -- z )
-    [ 2dup ] dip call [ drop ] [ nip ] if ; inline
-
-! Loops
-: loop ( pred: ( -- ? ) -- )
-    dup slip swap [ loop ] [ drop ] if ; inline recursive
-
-: do ( pred body tail -- pred body tail )
-    over 3dip ; inline
-
-: while ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
-    [ pick 3dip [ do while ] 3curry ] keep if ; inline recursive
-
-: until ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
-    [ [ not ] compose ] 2dip while ; inline
 
 ! Error handling -- defined early so that other files can
 ! throw errors before continuations are loaded

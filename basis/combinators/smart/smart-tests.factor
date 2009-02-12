@@ -45,3 +45,5 @@ IN: combinators.smart.tests
 \ nested-smart-combo-test must-infer
 
 [ { { 1 2 } { 3 4 } } ] [ nested-smart-combo-test ] unit-test
+
+[ 14 ] [ [ 1 2 3 ] [ sq ] [ + ] map-reduce-outputs ] unit-test
