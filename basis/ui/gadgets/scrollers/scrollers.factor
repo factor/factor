@@ -39,12 +39,10 @@ scroller H{
         <scroller-model> >>model
 
         dup model>> dependencies>>
-        [ first <x-slider> [ >>x ] [ @bottom grid-add ] bi ]
-        [ second <y-slider> [ >>y ] [ @right grid-add ] bi ] bi
+        [ first horizontal <slider> [ >>x ] [ @bottom grid-add ] bi ]
+        [ second vertical <slider> [ >>y ] [ @right grid-add ] bi ] bi
 
-        tuck model>> <viewport> [ >>viewport ] [ @center grid-add ] bi
-
-        faint-boundary ; inline
+        tuck model>> <viewport> [ >>viewport ] [ @center grid-add ] bi ; inline
 
 : <scroller> ( gadget -- scroller ) scroller new-scroller ;
 

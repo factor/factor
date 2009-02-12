@@ -11,7 +11,7 @@ HELP: find-elevator
 HELP: slider
 { $class-description "A slider is a control for graphically manipulating a " { $link "models-range" } "."
 $nl
-"Sliders are created by calling " { $link <x-slider> } " or " { $link <y-slider> } "." } ;
+"Sliders are created by calling " { $link <slider> } "." } ;
 
 HELP: find-slider
 { $values { "gadget" gadget } { "slider/f" { $maybe slider } } }
@@ -34,24 +34,12 @@ HELP: slide-by-line
 
 HELP: <slider>
 { $values { "range" range } { "orientation" "an orientation specifier" } { "slider" "a new " { $link slider } } }
-{ $description "Internal word for constructing sliders." }
-{ $notes "This does not build a complete slider, and user code should call " { $link <x-slider> } " or " { $link <y-slider> } " instead." } ;
-
-HELP: <x-slider>
-{ $values { "range" range } { "slider" slider } }
-{ $description "Creates a new horizontal " { $link slider } "." } ;
-
-HELP: <y-slider>
-{ $values { "range" range } { "slider" slider } }
-{ $description "Creates a new vertical " { $link slider } "." } ;
-
-{ <x-slider> <y-slider> } related-words
+{ $description "Creates a new slider." } ;
 
 ARTICLE: "ui.gadgets.sliders" "Slider gadgets"
 "The " { $vocab-link "ui.gadgets.sliders" } " vocabulary implements slider gadgets. A slider allows the user to graphically manipulate a value by moving a thumb back and forth."
 { $subsection slider }
-{ $subsection <x-slider> }
-{ $subsection <y-slider> }
+{ $subsection <slider> }
 "Changing slider values:"
 { $subsection slide-by }
 { $subsection slide-by-line }
