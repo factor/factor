@@ -14,7 +14,7 @@ IN: tools.vocabs.browser
     [
         [ definition-icon 1array \ $image prefix ]
         [ drop " " ]
-        [ 1array \ $link prefix ] ! XXX
+        [ 1array \ $definition-link prefix ]
         tri
     ] output>array ;
 
