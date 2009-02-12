@@ -48,7 +48,7 @@ M: retryable execute-statement* ( statement type -- )
 
 : query-make ( class quot -- statements )
     #! query, input, outputs, secondary queries
-    over unparse "table" set
+    over db-table "table" set
     [ sql-props ] dip
     [ 0 sql-counter rot with-variable ] curry
     { "" { } { } { } } nmake
