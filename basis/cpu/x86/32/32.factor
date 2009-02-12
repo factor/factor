@@ -48,9 +48,12 @@ M: x86.32 %alien-invoke (CALL) rel-dlsym ;
 
 M: x86.32 %alien-invoke-tail (JMP) rel-dlsym ;
 
-M: x86.32 struct-small-enough? ( size -- ? )
-    heap-size { 1 2 4 8 } member?
-    os { linux netbsd solaris } member? not and ;
+M: x86.32 return-struct-in-registers? ( c-type -- ? )
+    c-type
+    [ return-in-registers?>> ]
+    [ heap-size { 1 2 4 8 } member? ] bi
+    os { linux netbsd solaris } member? not
+    and and ;
 
 : struct-return@ ( n -- operand )
     [ next-stack@ ] [ stack-frame get params>> stack@ ] if* ;
