@@ -152,6 +152,12 @@ DEFER: if
     swap compose ; inline
 
 ! Curried cleavers
+<PRIVATE
+
+: [curry] ( quot -- quot' ) [ curry ] curry ; inline
+
+PRIVATE>
+
 : bi-curry ( x p q -- p' q' ) [ [curry] ] bi@ bi ; inline
 
 : tri-curry ( x p q r -- p' q' r' ) [ [curry] ] tri@ tri ; inline
