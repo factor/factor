@@ -9,12 +9,17 @@ $nl
 { $examples
     "The following code displays a pair of sliders, and an updating label showing their current values:"
     { $code
-        "USING: models ui.gadgets.labels ui.gadgets.sliders ui.gadgets.panes ;"
-        ": <funny-slider> <x-slider> 100 over set-slider-max ;"
-        "<funny-slider> <funny-slider> 2array"
-        "dup make-pile gadget."
-        "dup [ gadget-model ] map <compose> [ unparse ] <filter>"
-        "<label-control> gadget."
+        "USING: models models.compose models.range ui.gadgets"
+        "ui.gadgets.labels ui.gadgets.packs ui.gadgets.panes"
+        "ui.gadgets.sliders ;"
+        ""
+        ": <funny-model> ( -- model ) 0 10 0 100 <range> ;"
+        ": <funny-slider> ( model -- slider ) horizontal <slider> ;"
+        ""
+        "<funny-model> <funny-model> 2array"
+        "[ <pile> [ horizontal <slider> add-gadget ] reduce gadget. ]"
+        "[ <compose> [ unparse ] <filter> <label-control> gadget. ]"
+        "bi"
     }
 } ;
 
