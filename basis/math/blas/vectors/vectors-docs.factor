@@ -93,7 +93,7 @@ HELP: Viamax
 
 HELP: Vamax
 { $values { "x" blas-vector-base } { "max" number } }
-{ $description "Return the value of the element in " { $snippet "x" } " with the largest norm-1. If more than one element has the same norm-1, returns the first element. Corresponds to the IxAMAX routines in BLAS." } ;
+{ $description "Return the value of the element in " { $snippet "x" } " with the largest norm-1. If more than one element has the same norm-1, returns the element closest to the beginning. Corresponds to the IxAMAX routines in BLAS." } ;
 
 { Viamax Vamax } related-words
 
