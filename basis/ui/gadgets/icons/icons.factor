@@ -6,6 +6,6 @@ IN: ui.gadgets.icons
 TUPLE: icon < gadget ;
 
 : <icon> ( image-name -- icon )
-    icon new swap <image-pen> >>interior ;
+    icon new swap <image-pen> t >>fill? >>interior ;
 
 M: icon pref-dim* dup interior>> pen-pref-dim ;
