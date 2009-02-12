@@ -1,6 +1,6 @@
 USING: accessors xmode.tokens xmode.keyword-map kernel
 sequences vectors assocs strings memoize unicode.case
-parser-combinators.regexp ;
+regexp regexp.backend ; ! regexp.backend has the regexp class
 IN: xmode.rules
 
 TUPLE: string-matcher string ignore-case? ;

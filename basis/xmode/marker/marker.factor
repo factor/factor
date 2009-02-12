@@ -4,8 +4,10 @@ IN: xmode.marker
 USING: kernel namespaces make xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators strings
-parser-combinators.regexp splitting parser-combinators ascii
+regexp splitting ascii parser-combinators regexp.backend
 ascii combinators.short-circuit accessors ;
+! parser-combinators is for the string-head? word
+! regexp.backend is for the regexp class
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 
@@ -150,7 +152,7 @@ M: escape-rule handle-rule-start
     process-escape? get [
         escaped? [ not ] change
         position [ + ] change
-    ] [ 2drop ] if ;
+    ] [ drop ] if ;
 
 M: seq-rule handle-rule-start
     ?end-rule
