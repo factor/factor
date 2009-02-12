@@ -32,10 +32,12 @@ WHERE
 
 ;FUNCTOR
 
-{
+CONSTANT: annotation-tags {
     "XXX" "TODO" "FIXME" "BUG" "REVIEW" "LICENSE"
     "AUTHOR" "BROKEN" "HACK" "LOL" "NOTE"
-} [ define-annotation ] each
+}
+
+annotation-tags [ define-annotation ] each
 
 >>
 
