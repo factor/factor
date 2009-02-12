@@ -3,7 +3,7 @@
 USING: accessors arrays assocs generic hashtables kernel kernel.private
 math namespaces parser sequences strings words libc fry
 alien.c-types alien.structs.fields cpu.architecture math.order
-quotations ;
+quotations byte-arrays ;
 IN: alien.structs
 
 TUPLE: struct-type
@@ -20,7 +20,7 @@ M: struct-type c-type ;
 
 M: struct-type heap-size size>> ;
 
-M: struct-type c-type-class drop object ;
+M: struct-type c-type-class drop byte-array ;
 
 M: struct-type c-type-align align>> ;
 
