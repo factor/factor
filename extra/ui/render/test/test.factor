@@ -4,7 +4,7 @@ USING: accessors colors arrays kernel sequences math byte-arrays
 namespaces grouping fry cap images.bitmap
 ui.gadgets ui.gadgets.packs ui.gadgets.borders ui.gadgets.grids
 ui.gadgets.grid-lines ui.gadgets.labels ui.gadgets.buttons
-ui.render ui opengl opengl.gl images ;
+ui.render ui opengl opengl.gl images images.loader ;
 IN: ui.render.test
 
 SINGLETON: line-test
@@ -38,7 +38,7 @@ SYMBOL: render-output
     screenshot
     [ render-output set-global ]
     [
-        "resource:extra/ui/render/test/reference.bmp" <image>
+        "resource:extra/ui/render/test/reference.bmp" load-image
         bitmap= "is perfect" "needs work" ?
         "Your UI rendering " prepend
         message-window
