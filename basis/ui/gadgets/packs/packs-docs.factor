@@ -23,7 +23,7 @@ HELP: pack
 }
 "Packs have the following slots:"
 { $list
-    { { $snippet "align" } " a rational number between 0 and 1, the alignment of gadgets along the axis perpendicular to the pack's orientation" }
+    { { $snippet "align" } " a rational number between 0 and 1, or " { $link +baseline+ } "; the alignment of gadgets along the axis perpendicular to the pack's orientation" }
     { { $snippet "fill" } " a rational number between 0 and 1, where 0 gives each gadget its preferred size and 1 fills the dimension perpendicular to the pack's orientation" }
     { { $snippet "gap" } " a pair of integers, the horizontal and vertical gap between children" }
 }
