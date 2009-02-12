@@ -10,7 +10,7 @@ tools.vocabs vocabs vocabs.loader words words.symbol
 combinators.smart definitions.icons ;
 IN: tools.vocabs.browser
 
-: <$definition> ( definition -- element )
+: <$pretty-link> ( definition -- element )
     [
         [ definition-icon 1array \ $image prefix ]
         [ drop " " ]
@@ -19,7 +19,7 @@ IN: tools.vocabs.browser
     ] output>array ;
 
 : vocab-row ( vocab -- row )
-    [ <$definition> ] [ vocab-summary ] bi 2array ;
+    [ <$pretty-link> ] [ vocab-summary ] bi 2array ;
 
 : vocab-headings ( -- headings )
     {
@@ -82,7 +82,7 @@ C: <vocab-author> vocab-author
     [
         "Tuple classes" $subheading
         [
-            [ <$definition> ]
+            [ <$pretty-link> ]
             [ superclass <$link> ]
             [ "slots" word-prop [ name>> ] map " " join <$snippet> ]
             tri 3array
@@ -95,7 +95,7 @@ C: <vocab-author> vocab-author
     [
         "Predicate classes" $subheading
         [
-            [ <$definition> ]
+            [ <$pretty-link> ]
             [ superclass <$link> ]
             bi 2array
         ] map
@@ -106,7 +106,7 @@ C: <vocab-author> vocab-author
 : (describe-classes) ( classes heading -- )
     '[
         _ $subheading
-        [ <$definition> 1array ] map $table
+        [ <$pretty-link> 1array ] map $table
     ] unless-empty ;
 
 : describe-builtin-classes ( classes -- )
@@ -159,7 +159,7 @@ C: <vocab-author> vocab-author
     ] unless-empty ;
 
 : word-row ( word -- element )
-    [ <$definition> ]
+    [ <$pretty-link> ]
     [ stack-effect dup [ effect>string <$snippet> ] when ]
     bi 2array ;
 
