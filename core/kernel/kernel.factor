@@ -152,27 +152,17 @@ DEFER: if
     swap compose ; inline
 
 ! Curried cleavers
-<PRIVATE
+: bi-curry ( x p q -- p' q' ) [ [curry] ] bi@ bi ; inline
 
-: schönfinkel ( quot -- quot' ) [ curry ] curry ; inline
+: tri-curry ( x p q r -- p' q' r' ) [ [curry] ] tri@ tri ; inline
 
-: bi-schönfinkel ( p q -- p' q' ) [ schönfinkel ] bi@ ; inline
+: bi-curry* ( x y p q -- p' q' ) [ [curry] ] bi@ bi* ; inline
 
-: tri-schönfinkel ( p q r -- p' q' r' ) [ schönfinkel ] tri@ ; inline
+: tri-curry* ( x y z p q r -- p' q' r' ) [ [curry] ] tri@ tri* ; inline
 
-PRIVATE>
+: bi-curry@ ( x y q -- p' q' ) [curry] bi@ ; inline
 
-: bi-curry ( x p q -- p' q' ) bi-schönfinkel bi ; inline
-
-: tri-curry ( x p q r -- p' q' r' ) tri-schönfinkel tri ; inline
-
-: bi-curry* ( x y p q -- p' q' ) bi-schönfinkel bi* ; inline
-
-: tri-curry* ( x y z p q r -- p' q' r' ) tri-schönfinkel tri* ; inline
-
-: bi-curry@ ( x y q -- p' q' ) schönfinkel bi@ ; inline
-
-: tri-curry@ ( x y z q -- p' q' r' ) schönfinkel tri@ ; inline
+: tri-curry@ ( x y z q -- p' q' r' ) [curry] tri@ ; inline
 
 ! Booleans
 : not ( obj -- ? ) [ f ] [ t ] if ; inline
