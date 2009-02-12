@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types arrays hashtables io kernel
-math namespaces opengl opengl.gl opengl.glu sequences strings
-vectors combinators math.vectors ui.gadgets colors colors.constants
-math.order math.rectangles locals specialized-arrays.float ;
+USING: accessors alien alien.c-types arrays hashtables io io.pathnames
+kernel math namespaces opengl opengl.gl opengl.glu sequences strings
+vectors combinators math.vectors ui.gadgets ui.images colors fry
+colors.constants math.order math.rectangles locals
+specialized-arrays.float ;
 IN: ui.render
 
 SYMBOL: clip
@@ -48,6 +49,10 @@ M: gadget draw-gadget* drop ;
 GENERIC: draw-interior ( gadget interior -- )
 
 GENERIC: draw-boundary ( gadget boundary -- )
+
+GENERIC: pen-pref-dim ( gadget pen -- dim )
+
+M: object pen-pref-dim 2drop { 0 0 } ;
 
 SYMBOL: origin
 
@@ -195,13 +200,62 @@ M: polygon draw-interior
     [ [ GL_POLYGON 0 ] dip interior-count>> glDrawArrays ]
     tri ;
 
-CONSTANT: arrow-up    { { 3 0 } { 6 6 } { 0 6 } }
-CONSTANT: arrow-right { { 0 0 } { 6 3 } { 0 6 } }
-CONSTANT: arrow-down  { { 0 0 } { 6 0 } { 3 6 } }
-CONSTANT: arrow-left  { { 0 3 } { 6 0 } { 6 6 } }
-CONSTANT: close-box   { { 0 0 } { 6 0 } { 6 6 } { 0 6 } }
+: theme-image ( name -- image-name )
+    "resource:basis/ui/gadgets/theme/" prepend-path ".tiff" append <image-name> ;
 
-: <polygon-gadget> ( color points -- gadget )
-    dup max-dim
-    [ <polygon> <gadget> ] dip >>dim
-    swap >>interior ;
+! Image pen
+TUPLE: image-pen image fill? ;
+
+: <image-pen> ( image -- pen ) f image-pen boa ;
+
+M: image-pen draw-interior
+    [ dim>> ] [ [ image>> ] [ fill?>> ] bi ] bi*
+    [ draw-scaled-image ] [
+        [ image-dim [ - 2/ ] 2map ] keep
+        '[ _ draw-image ] with-translation
+    ] if ;
+
+M: image-pen pen-pref-dim nip image>> image-dim ;
+
+! Tile pen
+TUPLE: tile-pen left center right ;
+
+: <tile-pen> ( left center right -- pen )
+    tile-pen boa ;
+
+: >tile-pen< ( pen -- left center right )
+    [ left>> ] [ center>> ] [ right>> ] tri ; inline
+
+M: tile-pen pen-pref-dim
+    swap [
+        >tile-pen< [ image-dim ] tri@
+        [ vmax vmax ] [ v+ v+ ] 3bi
+    ] dip orientation>> set-axis ;
+
+: compute-tile-xs ( gadget pen -- x1 x2 x3 )
+    [ 2drop { 0 0 } ]
+    [ nip left>> image-dim ]
+    [ [ dim>> ] [ right>> image-dim ] bi* v- ]
+    2tri ;
+
+: compute-tile-widths ( gadget pen -- w1 w2 w3 )
+    [ nip left>> image-dim ]
+    [ [ dim>> ] [ [ left>> ] [ right>> ] bi [ image-dim ] bi@ ] bi* v+ v- ]
+    [ nip right>> image-dim ]
+    2tri ;
+
+: render-tile ( tile x width gadget -- )
+    [ orientation>> '[ _ v* ] dip ] keep
+   '[
+       _ _ [ dim>> swap ] [ orientation>> ] bi set-axis
+       swap draw-scaled-image
+   ] with-translation ;
+
+M: tile-pen draw-interior ( gadget pen -- )
+    {
+        [ nip >tile-pen< ]
+        [ compute-tile-xs ]
+        [ compute-tile-widths ]
+        [ drop ]
+    } 2cleave
+    [ render-tile ] curry tri-curry@ tri-curry* tri* ;

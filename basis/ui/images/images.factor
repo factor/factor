@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces cache images accessors assocs kernel
-opengl.gl opengl.texture-cache ui.gadgets.worlds ;
+opengl opengl.gl opengl.texture-cache ui.gadgets.worlds ;
 IN: ui.images
 
 TUPLE: image-name path ;
@@ -40,6 +40,9 @@ PRIVATE>
 
 : draw-image ( image-name -- )
     rendered-image display-list>> glCallList ;
+
+: draw-scaled-image ( dim image-name -- )
+    rendered-image texture>> draw-textured-rect ;
 
 : image-dim ( image-name -- dim )
     cached-image dim>> ;
