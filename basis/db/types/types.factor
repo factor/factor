@@ -49,7 +49,7 @@ ERROR: no-slot ;
 
 ERROR: not-persistent class ;
 
-: db-table ( class -- object )
+: db-table-name ( class -- object )
     dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
 
 : db-columns ( class -- object )
@@ -165,7 +165,7 @@ ERROR: no-column column ;
 
 : >reference-string ( string pair -- string )
     first2
-    [ [ db-table " " glue ] [ db-columns ] bi ] dip
+    [ [ db-table-name " " glue ] [ db-columns ] bi ] dip
     swap [ column-name>> = ] with find nip
     [ no-column ] unless*
     column-name>> "(" ")" surround append ;
