@@ -30,23 +30,14 @@ HELP: gl-rect
 { $values { "dim" "a pair of integers" } }
 { $description "Draws the outline of a rectangle with the top-left corner at the origin and the given dimensions." } ;
 
-HELP: gen-texture
-{ $values { "id" integer } }
-{ $description "Wrapper for " { $link glGenTextures } " to handle the common case of generating a single texture ID." } ;
-
 HELP: gen-gl-buffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenBuffers } " to handle the common case of generating a single buffer ID." } ;
-
-HELP: delete-texture
-{ $values { "id" integer } }
-{ $description "Wrapper for " { $link glDeleteTextures } " to handle the common case of deleting a single texture ID." } ;
 
 HELP: delete-gl-buffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glDeleteBuffers } " to handle the common case of deleting a single buffer ID." } ;
 
-{ gen-texture delete-texture } related-words
 { gen-gl-buffer delete-gl-buffer } related-words
 
 HELP: bind-texture-unit
@@ -61,10 +52,6 @@ HELP: do-attribs
 { $values { "bits" integer } { "quot" quotation } }
 { $description "Wraps a quotation in " { $link glPushAttrib } "/" { $link glPopAttrib } " calls." } ;
 
-HELP: make-texture
-{ $values { "dim" "a pair of integers" } { "pixmap" c-ptr } { "format" "an OpenGL texture format, for example " { $link GL_UNSIGNED_BYTE } } { "type" "an OpenGL texture type, for example " { $link GL_RGBA } } { "id" "an OpenGL texture ID" } }
-{ $description "Creates a new OpenGL texture from a pixmap image whose dimensions are equal to " { $snippet "dim" } "." } ;
-  
 HELP: gen-dlist
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenLists } " to handle the common case of generating a single display list ID." } ;
@@ -81,7 +68,6 @@ HELP: with-translation
 { $values { "loc" "a pair of integers" } { "quot" quotation } }
 { $description "Calls the quotation with a translation by " { $snippet "loc" } " pixels applied to the current " { $link GL_MODELVIEW } " matrix, restoring the matrix when the quotation is done." } ;
 
-
 ARTICLE: "gl-utilities" "OpenGL utility words"
 "The " { $vocab-link "opengl" } " vocabulary implements some utility words to give OpenGL a more Factor-like feel."
 $nl
@@ -90,7 +76,6 @@ $nl
 "Wrappers:"
 { $subsection gl-color }
 { $subsection gl-translate }
-{ $subsection gen-texture }
 { $subsection bind-texture-unit }
 "Combinators:"
 { $subsection do-enabled }

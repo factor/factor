@@ -106,30 +106,8 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : gl-fill-rect ( dim -- )
     fill-rect-vertices (gl-fill-rect) ;
 
-: init-texture ( -- )
-    GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_REPEAT glTexParameterf
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_REPEAT glTexParameterf ;
-
-: rect-texture-coords ( -- )
-    float-array{ 0 0 1 0 1 1 0 1 } gl-texture-coord-pointer ;
-
 : do-attribs ( bits quot -- )
     swap glPushAttrib call glPopAttrib ; inline
-
-: draw-textured-rect ( dim texture -- )
-    GL_TEXTURE_2D [
-        GL_TEXTURE_BIT [
-            GL_TEXTURE_COORD_ARRAY [
-                COLOR: white gl-color
-                GL_TEXTURE_2D swap glBindTexture
-                init-texture rect-texture-coords
-                fill-rect-vertices (gl-fill-rect)
-                GL_TEXTURE_2D 0 glBindTexture
-            ] do-enabled-client-state
-        ] do-attribs
-    ] do-enabled ;
 
 : circle-steps ( steps -- angles )
     dup length v/n 2 pi * v*n ;
@@ -161,17 +139,11 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : (gen-gl-object) ( quot -- id )
     [ 1 0 <uint> ] dip keep *uint ; inline
 
-: gen-texture ( -- id )
-    [ glGenTextures ] (gen-gl-object) ;
-
 : gen-gl-buffer ( -- id )
     [ glGenBuffers ] (gen-gl-object) ;
 
 : (delete-gl-object) ( id quot -- )
     [ 1 swap <uint> ] dip call ; inline
-
-: delete-texture ( id -- )
-    [ glDeleteTextures ] (delete-gl-object) ;
 
 : delete-gl-buffer ( id -- )
     [ glDeleteBuffers ] (delete-gl-object) ;
@@ -206,22 +178,6 @@ MACRO: set-draw-buffers ( buffers -- )
 
 : gl-look-at ( eye focus up -- )
     [ first3 ] tri@ gluLookAt ;
-
-:: make-texture ( dim pixmap format type -- id )
-    gen-texture [
-        GL_TEXTURE_BIT [
-            GL_TEXTURE_2D swap glBindTexture
-            GL_TEXTURE_2D
-            0
-            GL_RGBA
-            dim first2
-            0
-            format
-            type
-            pixmap
-            glTexImage2D
-        ] do-attribs
-    ] keep ;
 
 : gen-dlist ( -- id ) 1 glGenLists ;
 

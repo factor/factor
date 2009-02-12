@@ -14,13 +14,12 @@ M: core-text-renderer init-text-rendering
     core-text-renderer <texture-cache> >>text-handle drop ;
 
 M: core-text-renderer string-dim
-    [ " " string-dim { 0 1 } v* ] [ cached-line dim>> ] if-empty ;
+    [ " " string-dim { 0 1 } v* ]
+    [ cached-line image>> dim>> ]
+    if-empty ;
 
 M: core-text-renderer render-texture
-    drop first2 cached-line
-    [ dim>> ] [ bitmap>> ] bi
-    GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8_REV
-    <texture-info> ;
+    drop first2 cached-line image>> ;
 
 M: core-text-renderer finish-text-rendering
     text-handle>> purge-texture-cache

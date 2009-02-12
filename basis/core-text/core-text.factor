@@ -1,12 +1,11 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien alien.c-types alien.syntax kernel
-destructors accessors fry words hashtables strings
-sequences memoize assocs math math.functions locals init
-namespaces combinators fonts colors cache core-foundation
-core-foundation.strings core-foundation.attributed-strings
-core-foundation.utilities core-graphics core-graphics.types
-core-text.fonts core-text.utilities ;
+USING: arrays alien alien.c-types alien.syntax kernel destructors
+accessors fry words hashtables strings sequences memoize assocs math
+math.functions locals init namespaces combinators fonts colors cache
+images endian core-foundation core-foundation.strings
+core-foundation.attributed-strings core-foundation.utilities
+core-graphics core-graphics.types core-text.fonts core-text.utilities ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
@@ -47,7 +46,7 @@ ERROR: not-a-string object ;
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
-TUPLE: line font line metrics dim bitmap disposed ;
+TUPLE: line font line metrics image disposed ;
 
 : compute-line-metrics ( line -- line-metrics )
     0 <CGFloat> 0 <CGFloat> 0 <CGFloat>
@@ -78,6 +77,13 @@ TUPLE: line font line metrics dim bitmap disposed ;
 : set-text-position ( context metrics -- )
     [ 0 ] dip descent>> ceiling CGContextSetTextPosition ;
 
+: <line-image> ( dim bitmap -- image )
+    <image>
+        swap >>bitmap
+        swap >>dim
+        BGRA >>component-order
+        native-endianness >>byte-order ;
+
 :: <line> ( font string -- line )
     [
         [let* | open-font [ font cache-font CFRetain |CFRelease ]
@@ -92,7 +98,7 @@ TUPLE: line font line metrics dim bitmap disposed ;
                     [ [ line ] dip CTLineDraw ]
                 } cleave
             ] with-bitmap-context
-            [ open-font line metrics dim ] dip
+            [ open-font line metrics dim ] dip <line-image>
         ]
         f line boa
     ] with-destructors ;
