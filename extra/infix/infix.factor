@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Philipp Brüschweiler
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators combinators.short-circuit
 effects fry infix.parser infix.ast kernel locals.parser
 locals.types math multiline namespaces parser quotations
