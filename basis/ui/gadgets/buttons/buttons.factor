@@ -5,7 +5,7 @@ strings quotations assocs combinators classes colors colors.constants
 classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.labels ui.gadgets.theme
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
-ui.render math.rectangles locals alien.c-types
+ui.pens ui.pens.solid ui.pens.caching math.rectangles locals
 specialized-arrays.float fry combinators.smart ;
 IN: ui.gadgets.buttons
 

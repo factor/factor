@@ -1,5 +1,5 @@
 USING: ui.gadgets help.markup help.syntax ui.gadgets.grids
-ui.render colors ;
+ui.pens colors ;
 IN: ui.gadgets.grid-lines
 
 HELP: grid-lines

@@ -8,7 +8,7 @@ generic.standard.engines.tuple fonts definitions.icons ui.images
 ui.commands ui.operations ui.gadgets ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.scrollers ui.gadgets.tables
 ui.gadgets.tracks ui.gadgets.labelled ui.gadgets.theme
-ui.gadgets.worlds ui.gadgets.wrappers ui.gestures ui.render
+ui.gadgets.worlds ui.gadgets.wrappers ui.gestures ui.pens.solid
 ui.tools.listener.history combinators vocabs ui.tools.listener.popups ;
 IN: ui.tools.listener.completion
 

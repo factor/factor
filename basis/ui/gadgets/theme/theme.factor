@@ -1,10 +1,14 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! Copyright (C) 2006, 2007 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel sequences ui.gadgets ui.render
-ui.text colors colors.gray colors.constants accessors ;
+USING: arrays kernel sequences ui.gadgets ui.pens.solid
+ui.pens.gradient ui.text ui.images colors colors.gray
+colors.constants accessors io.pathnames ;
 QUALIFIED: colors
 IN: ui.gadgets.theme
+
+: theme-image ( name -- image-name )
+    "resource:basis/ui/gadgets/theme/" prepend-path ".tiff" append <image-name> ;
 
 : solid-interior ( gadget color -- gadget )
     <solid> >>interior ; inline

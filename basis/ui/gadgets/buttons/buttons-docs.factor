@@ -1,5 +1,5 @@
 USING: help.markup help.syntax ui.gadgets ui.gadgets.labels
-ui.render kernel models classes ;
+ui.pens kernel models classes ;
 IN: ui.gadgets.buttons
 
 HELP: button

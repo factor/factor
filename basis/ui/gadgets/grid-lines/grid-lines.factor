@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors math namespaces opengl opengl.gl
-sequences math.vectors ui.gadgets ui.gadgets.grids
+sequences math.vectors ui.pens ui.gadgets ui.gadgets.grids
 ui.gadgets.grids.private ui.render math.rectangles
 fry locals arrays assocs ;
 IN: ui.gadgets.grid-lines

@@ -9,14 +9,6 @@ HELP: <labelled-gadget>
 { $values { "gadget" gadget } { "title" string } { "newgadget" "a new " { $link <labelled-gadget> } } }
 { $description "Creates a new " { $link labelled-gadget } " display " { $snippet "gadget" } " with " { $snippet "title" } " on top." } ;
 
-HELP: closable-gadget
-{ $class-description "A closable gadget displays a title bar with a close box on top of another gadget. Clicking the close box invokes a quotation. Closable gadgets are created by calling " { $link <closable-gadget> } "." } ;
-
-HELP: <closable-gadget>
-{ $values { "gadget" gadget } { "title" string } { "quot" { $quotation "( button -- )" } } }
-{ $description "Creates a new " { $link closable-gadget } ". Clicking the close box calls " { $snippet "quot" } "." }
-{ $notes "The quotation can find the " { $link closable-gadget } " instance, or any other parent gadget by calling " { $link find-parent } " with the gadget it receives on the stack." } ;
-
 HELP: <labelled-pane>
 { $values { "model" model } { "quot" { $quotation "( value -- )" } } { "scrolls?" "a boolean" } { "title" string } { "gadget" "a new " { $link gadget } } }
 { $description "Creates a new control delegating to a " { $link pane } ", and wraps it in a " { $link labelled-gadget } ". When the value of the model changes, the value is pushed on the stack and the quotation is called using " { $link with-pane } "." } ;
@@ -26,9 +18,6 @@ HELP: <labelled-pane>
 ARTICLE: "ui.gadgets.labelled" "Labelled gadgets"
 "The " { $vocab-link "ui.gadgets.labelled" } " vocabulary implements labelled borders around child gadgets."
 { $subsection labelled-gadget }
-{ $subsection <labelled-gadget> }
-"Or a labelled border with a close box:"
-{ $subsection closable-gadget }
-{ $subsection <closable-gadget> } ;
+{ $subsection <labelled-gadget> } ;
 
 ABOUT: "ui.gadgets.labelled"

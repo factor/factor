@@ -1,4 +1,4 @@
-USING: ui.gadgets ui.gadgets.worlds help.markup help.syntax
+USING: ui.gadgets help.markup help.syntax
 hashtables strings kernel system ;
 IN: ui.gestures
 
