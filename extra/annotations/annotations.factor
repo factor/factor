@@ -10,7 +10,7 @@ IN: annotations
 
 : (non-annotation-usage) ( word -- usages )
     smart-usage
-    [ { [ word? ] [ vocabulary>> "annotations" = not ] } 1&& ]
+    [ { [ word? ] [ vocabulary>> "annotations" = ] } 1&& not ]
     filter ;
 
 FUNCTOR: define-annotation ( NAME -- )
