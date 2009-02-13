@@ -7,7 +7,7 @@ ui.gadgets.worlds ui.gadgets.packs ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.panes ui.gadgets.presentations
 ui.gadgets.viewports ui.gadgets.tables ui.gadgets.tracks
 ui.gadgets.scrollers ui.gadgets.panes ui.gadgets.borders
-ui.tools.traceback ui.tools.inspector ;
+ui.gadgets.status-bar ui.tools.traceback ui.tools.inspector ;
 IN: ui.tools.debugger
 
 TUPLE: debugger < track error restarts restart-hook restart-list continuation ;
@@ -58,7 +58,7 @@ M: debugger focusable-child*
 
 : debugger-window ( error continuation -- )
     #! No restarts for the debugger window
-    f f <debugger> "Error" open-window ;
+    f f <debugger> "Error" open-status-window ;
 
 GENERIC: error-in-debugger? ( error -- ? )
 
