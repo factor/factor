@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors grouping sequences combinators
-math specialized-arrays.direct.uint byte-arrays ;
+math specialized-arrays.direct.uint byte-arrays
+specialized-arrays.direct.ushort ;
 IN: images
 
 SINGLETONS: BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR
@@ -25,6 +26,13 @@ GENERIC: load-image* ( path tuple -- image )
             [
                 dup length 4 / <direct-uint-array>
                 [ bits>float 255.0 * >integer ] map
+                >byte-array add-dummy-alpha
+            ] change-bitmap
+        ] }
+        { R16G16B16 [
+            [
+                dup length 2 / <direct-ushort-array>
+                [ -8 shift ] map
                 >byte-array add-dummy-alpha
             ] change-bitmap
         ] }
