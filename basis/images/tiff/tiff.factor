@@ -276,9 +276,10 @@ ERROR: unhandled-compression compression ;
 ERROR: unknown-component-order ifd ;
 
 : ifd-component-order ( ifd -- byte-order )
-    bits-per-sample find-tag sum {
-        { 32 [ RGBA ] }
-        { 24 [ RGB ] }
+    bits-per-sample find-tag {
+        { { 32 32 32 } [ 32R32G32B ] }
+        { { 8 8 8 8 } [ RGBA ] }
+        { { 8 8 8 } [ RGB ] }
         [ unknown-component-order ]
     } case ;
 
