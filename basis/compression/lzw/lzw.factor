@@ -110,9 +110,23 @@ ERROR: not-in-table ;
 
 : lzw-compress-chars ( lzw -- )
     {
-        [ [ clear-code lzw-compress-char ] [ reset-lzw-compress drop ] bi ]
+        ! [ [ clear-code lzw-compress-char ] [ drop ] bi ] ! reset-lzw-compress drop ] bi ]
+        [
+            [ clear-code ] dip
+            [ lzw-bit-width-compress ]
+            [ output>> write-bits ] bi
+        ]
         [ (lzw-compress-chars) ]
-        [ end-of-information lzw-compress-char ]
+        [
+            [ k>> ]
+            [ lzw-bit-width-compress ]
+            [ output>> write-bits ] tri
+        ]
+        [
+            [ end-of-information ] dip
+            [ lzw-bit-width-compress ]
+            [ output>> write-bits ] bi
+        ]
         [ ]
     } cleave dup end-of-input?>> [ drop ] [ lzw-compress-chars ] if ;
 
@@ -138,7 +152,7 @@ ERROR: not-in-table ;
 : add-to-table ( seq lzw -- ) table>> push ;
 
 : lzw-read ( lzw -- lzw n )
-    [ ] [ lzw-bit-width-uncompress ] [ input>> ] tri read-bits ;
+    [ ] [ lzw-bit-width-uncompress ] [ input>> ] tri read-bits 2drop ;
 
 DEFER: lzw-uncompress-char
 : handle-clear-code ( lzw -- )
