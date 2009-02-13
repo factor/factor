@@ -1,9 +1,11 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators io io.encodings.binary io.files kernel
-pack endian constructors sequences arrays math.order math.parser
-prettyprint classes io.binary assocs math math.bitwise byte-arrays
-grouping images compression.lzw fry strings ;
+USING: accessors arrays assocs byte-arrays classes combinators
+compression.lzw constructors endian fry grouping images io
+io.binary io.encodings.ascii io.encodings.binary
+io.encodings.string io.encodings.utf8 io.files kernel math
+math.bitwise math.order math.parser pack prettyprint sequences
+strings ;
 IN: images.tiff
 
 TUPLE: tiff-image < image ;
@@ -249,13 +251,13 @@ ERROR: bad-small-ifd-type n ;
         { 283 [ first y-resolution ] }
         { 284 [ planar-configuration ] }
         { 296 [ lookup-resolution-unit resolution-unit ] }
-        { 305 [ >string software ] }
-        { 306 [ >string date-time ] }
+        { 305 [ ascii decode software ] }
+        { 306 [ ascii decode date-time ] }
         { 317 [ lookup-predictor predictor ] }
         { 330 [ sub-ifd ] }
         { 338 [ lookup-extra-samples extra-samples ] }
         { 339 [ lookup-sample-format sample-format ] }
-        { 700 [ >string xmp ] }
+        { 700 [ utf8 decode xmp ] }
         { 34377 [ photoshop ] }
         { 34665 [ exif-ifd ] }
         { 33723 [ iptc ] }
