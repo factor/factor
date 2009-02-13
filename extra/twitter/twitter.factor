@@ -3,7 +3,9 @@ http.client json.reader kernel macros namespaces sequences
 urls.secure urls.encoding ;
 IN: twitter
 
-SYMBOLS: twitter-username twitter-password ;
+SYMBOLS: twitter-username twitter-password twitter-source ;
+
+twitter-source [ "factor" ] initialize
 
 TUPLE: twitter-status
     created-at
@@ -69,7 +71,8 @@ MACRO: keys-boa ( keys class -- )
     twitter-username twitter-password [ get ] bi@ set-basic-auth ;
 
 : update-post-data ( update -- assoc )
-    "status" associate ;
+    "status" associate
+    [ twitter-source get "source" ] dip [ set-at ] keep ;
 
 : (tweet) ( string -- json )
     update-post-data "https://twitter.com/statuses/update.json" <post-request>
