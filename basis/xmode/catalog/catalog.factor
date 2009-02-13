@@ -1,7 +1,7 @@
 USING: xmode.loader xmode.utilities xmode.rules namespaces
 strings splitting assocs sequences kernel io.files xml memoize
 words globs combinators io.encodings.utf8 sorting accessors xml.data
-xml.traversal ;
+xml.traversal xml.syntax ;
 IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
@@ -97,8 +97,8 @@ ERROR: mutually-recursive-rulesets ruleset ;
     ] if ;
 
 : finalize-mode ( rulesets -- )
-    rule-sets [
-        dup [ nip finalize-rule-set ] assoc-each
+    dup rule-sets [
+        [ nip finalize-rule-set ] assoc-each
     ] with-variable ;
 
 : load-mode ( name -- rule-sets )
