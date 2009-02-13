@@ -143,9 +143,12 @@ elevator H{
     [ dim>> ] [ thumb-dim ] [ orientation>> ] tri [ n*v ] keep set-axis
     [ ceiling ] map >>dim drop ;
 
+: slider-enabled? ( slider -- ? )
+    visible-portion 1 = not ;
+
 : layout-thumb ( slider -- )
     [ thumb>> ] keep
-    [ visible-portion 1 = not >>visible? drop ]
+    [ slider-enabled? >>visible? drop ]
     [ layout-thumb-loc ]
     [ layout-thumb-dim ]
     2tri ;
@@ -158,7 +161,7 @@ M: elevator layout*
 
 : <slide-button-pen> ( orientation left right -- pen )
     [ horizontal = ] 2dip ?
-    [ f f ] [ theme-image <image-pen> f ] bi* <button-paint> ;
+    [ f f ] [ theme-image <image-pen> f f ] bi* <button-pen> ;
 
 TUPLE: slide-button < repeat-button ;
 
@@ -185,19 +188,36 @@ M: slide-button pref-dim* dup interior>> pen-pref-dim ;
     "vertical-scroller-downarrow-clicked"
     <slide-button> ;
 
+TUPLE: slider-pen enabled disabled ;
+
 : <slider-pen> ( orientation -- pen )
     {
         { horizontal [
-            "horizontal-scroller-left"
-            "horizontal-scroller-middle"
-            "horizontal-scroller-right"
+            "horizontal-scroller-left" theme-image
+            "horizontal-scroller-middle" theme-image
+            "horizontal-scroller-right" theme-image
+            "horizontal-scroller-right-disabled" theme-image
         ] }
         { vertical [
-            "vertical-scroller-top"
-            "vertical-scroller-middle"
-            "vertical-scroller-bottom"
+            "vertical-scroller-top" theme-image
+            "vertical-scroller-middle" theme-image
+            "vertical-scroller-bottom" theme-image
+            "vertical-scroller-bottom-disabled" theme-image
         ] }
-    } case [ theme-image ] tri@ <tile-pen> ;
+    } case
+    [ <tile-pen> ] bi-curry@ 2bi \ slider-pen boa ;
+
+: slider-pen ( slider pen -- pen )
+    [ slider-enabled? ] [ [ enabled>> ] [ disabled>> ] bi ] bi* ? ;
+
+M: slider-pen draw-interior
+    dupd slider-pen draw-interior ;
+
+M: slider-pen draw-boundary
+    dupd slider-pen draw-boundary ;
+
+M: slider-pen pen-pref-dim
+    enabled>> pen-pref-dim ;
 
 M: slider pref-dim*
     [ dup interior>> pen-pref-dim ] [ drop { 100 100 } ] [ orientation>> ] tri
