@@ -1,18 +1,13 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals accessors kernel math namespaces sequences math.vectors
-math.rectangles.positioning colors colors.constants math.rectangles
-ui.commands ui.operations ui.gadgets ui.gadgets.buttons
-ui.gadgets.worlds ui.gestures ui.gadgets.theme ui.gadgets.packs
-ui.gadgets.glass ui.gadgets.borders ;
+USING: colors.constants kernel locals math.rectangles
+namespaces sequences ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.glass ui.gadgets.packs
+ui.gadgets.theme ui.gadgets.worlds ui.gestures ui.operations ;
 IN: ui.gadgets.menus
 
-: menu-loc ( world menu -- loc )
-    [ hand-loc get { 0 0 } <rect> ] 2dip
-    pref-dim swap dim>> popup-loc ;
-
 : show-menu ( owner menu -- )
-    [ find-world ] dip 2dup menu-loc show-glass ;
+    [ find-world ] dip hand-loc get { 0 0 } <rect> show-glass ;
 
 :: <menu-item> ( target hook command -- button )
     command command-name [
