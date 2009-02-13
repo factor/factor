@@ -27,7 +27,7 @@ IN: tools.hexdump
 : write-hex-line ( bytes lineno -- )
     write-offset [ >hex-digits write ] [ >ascii write ] bi nl ;
 
-: hexdump-bytes
+: hexdump-bytes ( bytes -- )
     [ length write-header ]
     [ 16 <sliced-groups> [ write-hex-line ] each-index ] bi ;
 
