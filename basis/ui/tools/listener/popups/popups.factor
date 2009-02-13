@@ -26,25 +26,19 @@ popup H{
 } set-gestures
 
 : caret-loc ( interactor element -- loc )
-    [ drop screen-loc ] [
-        [
-            [ [ editor-caret ] [ model>> ] bi ] dip
-            prev-elt
-        ] [ drop ] 2bi
-        loc>point
-    ] 2bi v+ ;
+    [
+        [ [ editor-caret ] [ model>> ] bi ] dip
+        prev-elt
+    ] [ drop ] 2bi
+    loc>point ;
 
 : relevant-rect ( popup -- rect )
     [ interactor>> ] [ element>> ] bi
     [ caret-loc ] [ drop caret-dim { 0 1 } v+ ] 2bi
     <rect> ;
 
-: listener-popup-loc ( popup -- loc )
-    [ relevant-rect ] [ pref-dim ] [ interactor>> find-world dim>> ] tri
-    popup-loc ;
-
 : show-popup ( interactor element popup -- )
     <popup>
     [ dup interactor>> (>>popup) ]
-    [ [ interactor>> find-world ] [ ] [ listener-popup-loc ] tri show-glass ]
+    [ [ interactor>> ] [ ] [ relevant-rect ] tri show-glass ]
     bi ;
