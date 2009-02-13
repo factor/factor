@@ -286,6 +286,18 @@ ERROR: unhandled-compression compression ;
 
 ERROR: unknown-component-order ifd ;
 
+: fix-bitmap-endianness ( ifd -- ifd )
+    dup [ bitmap>> ] [ bits-per-sample find-tag ] bi
+    {
+        { { 32 32 32 32 } [ 4 seq>native-endianness ] }
+        { { 32 32 32 } [ 4 seq>native-endianness ] }
+        { { 16 16 16 16 } [ 2 seq>native-endianness ] }
+        { { 16 16 16 } [ 2 seq>native-endianness ] }
+        { { 8 8 8 8 } [ ] }
+        { { 8 8 8 } [ ] }
+        [ unknown-component-order ]
+    } case >>bitmap ;
+
 : ifd-component-order ( ifd -- byte-order )
     bits-per-sample find-tag {
         { { 32 32 32 } [ R32G32B32 ] }
@@ -299,7 +311,6 @@ ERROR: unknown-component-order ifd ;
     {
         [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
         [ ifd-component-order ]
-        [ drop big-endian ] ! XXX
         [ bitmap>> ]
     } cleave tiff-image boa ;
 
@@ -314,7 +325,9 @@ ERROR: unknown-component-order ifd ;
             dup ifds>> [
                 process-ifd read-strips
                 uncompress-strips
-                strips>bitmap drop
+                strips>bitmap
+                fix-bitmap-endianness
+                drop
             ] each
         ] with-endianness
     ] with-file-reader ;
