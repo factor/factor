@@ -163,3 +163,5 @@ watch "WATCH" {
         user>> f user boa select-tuple
     ] with-db
 ] unit-test
+
+[ \ swap ensure-table ] must-fail
