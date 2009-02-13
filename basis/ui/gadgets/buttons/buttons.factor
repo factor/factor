@@ -5,8 +5,8 @@ strings quotations assocs combinators classes colors colors.constants
 classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.labels ui.gadgets.theme
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
-ui.pens ui.pens.solid ui.pens.caching math.rectangles locals
-specialized-arrays.float fry combinators.smart ;
+ui.pens ui.pens.solid ui.pens.image math.rectangles locals
+fry combinators.smart ;
 IN: ui.gadgets.buttons
 
 TUPLE: button < border pressed? selected? quot ;
@@ -21,8 +21,8 @@ TUPLE: button < border pressed? selected? quot ;
     hand-clicked get-global child? ;
 
 : button-update ( button -- )
-    dup mouse-clicked?
-    over button-rollover? and
+    dup
+    [ mouse-clicked? ] [ button-rollover? ] bi and
     buttons-down? and
     >>pressed?
     relayout-1 ;
@@ -45,28 +45,31 @@ button H{
 : <button> ( label quot -- button )
     button new-button ;
 
-TUPLE: button-paint plain rollover pressed selected ;
+TUPLE: button-pen
+plain rollover
+pressed selected pressed-selected ;
 
-C: <button-paint> button-paint
+C: <button-pen> button-pen
 
 : find-button ( gadget -- button )
     [ button? ] find-parent ;
 
-: button-paint ( button paint -- button paint )
+: button-pen ( button pen -- button pen )
     over find-button {
+        { [ dup [ pressed?>> ] [ selected?>> ] bi and ] [ drop pressed-selected>> ] }
         { [ dup pressed?>> ] [ drop pressed>> ] }
         { [ dup selected?>> ] [ drop selected>> ] }
         { [ dup button-rollover? ] [ drop rollover>> ] }
         [ drop plain>> ]
     } cond ;
 
-M: button-paint draw-interior
-    button-paint dup [ draw-interior ] [ 2drop ] if ;
+M: button-pen draw-interior
+    button-pen dup [ draw-interior ] [ 2drop ] if ;
 
-M: button-paint draw-boundary
-    button-paint dup [ draw-boundary ] [ 2drop ] if ;
+M: button-pen draw-boundary
+    button-pen dup [ draw-boundary ] [ 2drop ] if ;
 
-M: button-paint pen-pref-dim
+M: button-pen pen-pref-dim
     [
         {
             [ plain>> pen-pref-dim ]
@@ -80,8 +83,8 @@ M: button-paint pen-pref-dim
     { 0 1/2 } >>align ; inline
 
 : roll-button-theme ( button -- button )
-    f COLOR: black <solid> dup f <button-paint> >>boundary
-    f f pressed-gradient f <button-paint> >>interior
+    f COLOR: black <solid> dup f f <button-pen> >>boundary
+    f f pressed-gradient f f <button-pen> >>interior
     align-left ; inline
 
 : <roll-button> ( label quot -- button )
@@ -92,7 +95,8 @@ M: button-paint pen-pref-dim
     rollover-gradient
     pressed-gradient
     selected-gradient
-    <button-paint> ;
+    selected-gradient
+    <button-pen> ;
 
 : bevel-button-theme ( gadget -- gadget )
     <bevel-button-paint> >>interior
@@ -115,49 +119,18 @@ repeat-button H{
     #! the mouse is held down.
     repeat-button new-button bevel-button-theme ;
 
-TUPLE: checkmark-paint < caching-pen color last-vertices ;
-
-: <checkmark-paint> ( color -- paint )
-    checkmark-paint new swap >>color ;
-
-<PRIVATE
-
-: checkmark-points ( dim -- points )
-    [
-        {
-            [ { 0 0 } v* { 0.5 0.5 } v+ ]
-            [ { 1 1 } v* { 0.5 0.5 } v+ ]
-            [ { 1 0 } v* { -0.3 0.5 } v+ ]
-            [ { 0 1 } v* { -0.3 0.5 } v+ ]
-        } cleave
-    ] output>array ;
-
-: checkmark-vertices ( dim -- vertices )
-    checkmark-points concat >float-array ;
-
-PRIVATE>
-
-M: checkmark-paint recompute-pen
-    swap dim>> checkmark-vertices >>last-vertices drop ;
-
-M: checkmark-paint draw-interior
-    [ compute-pen ]
-    [ color>> gl-color ]
-    [ last-vertices>> gl-vertex-pointer ] tri
-    GL_LINES 0 4 glDrawArrays ;
-
-: checkmark-theme ( gadget -- gadget )
-    f
-    f
-    COLOR: black <solid>
-    COLOR: black <checkmark-paint>
-    <button-paint> >>interior
-    COLOR: black <solid> >>boundary ;
+: <checkmark-paint> ( -- pen )
+    "checkbox" theme-image <image-pen>
+    "checkbox" theme-image <image-pen>
+    "checkbox-clicked" theme-image <image-pen>
+    "checkbox-set" theme-image <image-pen>
+    "checkbox-set-clicked" theme-image <image-pen>
+    <button-pen> ;
 
 : <checkmark> ( -- gadget )
     <gadget>
-    checkmark-theme
-    { 14 14 } >>dim ;
+    <checkmark-paint> >>interior
+    dup dup interior>> pen-pref-dim >>dim ;
 
 : toggle-model ( model -- )
     [ not ] change-model ;
@@ -174,46 +147,18 @@ TUPLE: checkbox < button ;
 M: checkbox model-changed
     swap value>> >>selected? relayout-1 ;
 
-TUPLE: radio-paint < caching-pen color interior-vertices boundary-vertices ;
-
-: <radio-paint> ( color -- paint ) radio-paint new swap >>color ;
-
-<PRIVATE
-
-CONSTANT: circle-steps 8
-
-PRIVATE>
-
-M: radio-paint recompute-pen
-    swap dim>>
-    [ { 4 4 } swap { 9 9 } v- circle-steps fill-circle-vertices >>interior-vertices ]
-    [ { 1 1 } swap { 3 3 } v- circle-steps circle-vertices >>boundary-vertices ] bi
-    drop ;
-
-<PRIVATE
-
-: (radio-paint) ( gadget paint -- )
-    [ compute-pen ] [ color>> gl-color ] bi ;
-
-PRIVATE>
-
-M: radio-paint draw-interior
-    [ (radio-paint) ] [ interior-vertices>> gl-vertex-pointer ] bi
-    GL_POLYGON 0 circle-steps glDrawArrays ;
-
-M: radio-paint draw-boundary
-    [ (radio-paint) ] [ boundary-vertices>> gl-vertex-pointer ] bi
-    GL_LINE_STRIP 0 circle-steps 1+ glDrawArrays ;
-
-:: radio-knob-theme ( gadget -- gadget )
-    COLOR: black <radio-paint> :> radio-paint
-    gadget
-    f f radio-paint radio-paint <button-paint> >>interior
-    radio-paint >>boundary
-    { 16 16 } >>dim ;
+: <radio-paint> ( -- pen )
+    "radio" theme-image <image-pen>
+    "radio" theme-image <image-pen>
+    "radio-clicked" theme-image <image-pen>
+    "radio-set" theme-image <image-pen>
+    "radio-set-clicked" theme-image <image-pen>
+    <button-pen> ;
 
 : <radio-knob> ( -- gadget )
-    <gadget> radio-knob-theme ;
+    <gadget>
+    <radio-paint> >>interior
+    dup dup interior>> pen-pref-dim >>dim ;
 
 TUPLE: radio-control < button value ;
 
