@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax xml.data io strings ;
+USING: help.markup help.syntax xml.data io strings byte-arrays ;
 IN: xml
 
 HELP: string>xml
@@ -16,7 +16,11 @@ HELP: file>xml
 { $values { "filename" string } { "xml" xml } }
 { $description "Opens the given file, reads it in as XML, closes the file and returns the corresponding XML tree. The encoding is automatically detected." } ;
 
-{ string>xml read-xml file>xml } related-words
+HELP: bytes>xml
+{ $values { "byte-array" byte-array } { "xml" xml } }
+{ $description "Parses a byte array as an XML document. The encoding is automatically detected." } ;
+
+{ string>xml read-xml file>xml bytes>xml } related-words
 
 HELP: read-xml-chunk
 { $values { "stream" "an input stream" } { "seq" "a sequence of elements" } }
@@ -68,6 +72,7 @@ ARTICLE: { "xml" "reading" } "Reading XML"
     { $subsection read-xml-chunk }
     { $subsection string>xml-chunk }
     { $subsection file>xml }
+    { $subsection bytes>xml }
     "To read a DTD:"
     { $subsection read-dtd }
     { $subsection file>dtd }
