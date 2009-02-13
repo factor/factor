@@ -245,8 +245,8 @@ ERROR: bad-small-ifd-type n ;
         { 277 [ samples-per-pixel ] }
         { 278 [ rows-per-strip ] }
         { 279 [ strip-byte-counts ] }
-        { 282 [ x-resolution ] }
-        { 283 [ y-resolution ] }
+        { 282 [ first x-resolution ] }
+        { 283 [ first y-resolution ] }
         { 284 [ planar-configuration ] }
         { 296 [ lookup-resolution-unit resolution-unit ] }
         { 305 [ >string software ] }
