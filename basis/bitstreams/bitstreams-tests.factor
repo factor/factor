@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors bitstreams io io.streams.string kernel tools.test
-grouping compression.lzw multiline ;
+grouping compression.lzw multiline byte-arrays ;
 IN: bitstreams.tests
 
 [ 1 ]
@@ -16,7 +16,7 @@ IN: bitstreams.tests
 [ B{ 254 } ]
 [
     <string-writer> <bitstream-writer> 254 8 rot
-    [ write-bits ] keep stream>> >byte-array
+    [ write-bits ] keep output>> >byte-array
 ] unit-test
 
 
