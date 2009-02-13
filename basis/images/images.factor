@@ -7,7 +7,7 @@ IN: images
 SINGLETONS: BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR
 R16G16B16 R32G32B32 ;
 
-TUPLE: image dim component-order byte-order bitmap ;
+TUPLE: image dim component-order bitmap ;
 
 : <image> ( -- image ) image new ; inline
 
