@@ -56,8 +56,7 @@ HELP: http-request
 
 HELP: with-http-request
 { $values { "request" request } { "quot" { $quotation "( chunk -- )" } } { "response" response } }
-{ $description "Sends an HTTP request to an HTTP server, and reads the response incrementally. Chunks of data are passed to the quotation as they are read." }
-{ $errors "Throws an error if the HTTP request fails." } ;
+{ $description "Sends an HTTP request to an HTTP server, and reads the response incrementally. Chunks of data are passed to the quotation as they are read. Does not throw an error if the HTTP request fails; to do so, call " { $link check-response } " on the " { $snippet "response" } "." } ;
 
 ARTICLE: "http.client.get" "GET requests with the HTTP client"
 "Basic usage involves passing a " { $link url } " and getting a " { $link response } " and data back:"

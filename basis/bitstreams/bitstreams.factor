@@ -4,7 +4,7 @@ USING: accessors byte-arrays destructors fry io kernel locals
 math sequences ;
 IN: bitstreams
 
-TUPLE: bitstream stream current-bits #bits disposed ;
+TUPLE: bitstream stream end-of-stream? current-bits #bits disposed ;
 TUPLE: bitstream-reader < bitstream ;
 
 : reset-bitstream ( stream -- stream )
@@ -22,8 +22,12 @@ M: bitstream-reader dispose ( stream -- )
     bitstream-reader new-bitstream ; inline
 
 : read-next-byte ( bitstream -- bitstream )
-    dup stream>> stream-read1
-    [ >>current-bits ] [ 8 0 ? >>#bits ] bi ; inline
+    dup stream>> stream-read1 [
+        >>current-bits 8 >>#bits
+    ] [
+        0 >>#bits
+        t >>end-of-stream?
+    ] if* ;
 
 : maybe-read-next-byte ( bitstream -- bitstream )
     dup #bits>> 0 = [ read-next-byte ] when ; inline
@@ -31,17 +35,19 @@ M: bitstream-reader dispose ( stream -- )
 : shift-one-bit ( bitstream -- n )
     [ current-bits>> ] [ #bits>> ] bi 1- neg shift 1 bitand ; inline
 
-: next-bit ( bitstream -- n )
-    maybe-read-next-byte [
-        shift-one-bit
+: next-bit ( bitstream -- n/f ? )
+    maybe-read-next-byte
+    dup end-of-stream?>> [
+        drop f
     ] [
-        [ 1- ] change-#bits maybe-read-next-byte drop
-    ] bi ; inline
+        [ shift-one-bit ]
+        [ [ 1- ] change-#bits maybe-read-next-byte drop ] bi
+    ] if dup >boolean ;
 
-: read-bit ( bitstream -- n )
+: read-bit ( bitstream -- n ? )
     dup #bits>> 1 = [
         [ current-bits>> 1 bitand ]
-        [ read-next-byte drop ] bi
+        [ read-next-byte drop ] bi t
     ] [
         next-bit
     ] if ; inline
@@ -49,9 +55,12 @@ M: bitstream-reader dispose ( stream -- )
 : bits>integer ( seq -- n )
     0 [ [ 1 shift ] dip bitor ] reduce ; inline
 
-: read-bits ( width bitstream -- n )
-    '[ _ read-bit ] replicate bits>integer ; inline
-
+: read-bits ( width bitstream -- n width ? )
+    [
+        '[ _ read-bit drop ] replicate
+        [ f = ] trim-tail
+        [ bits>integer ] [ length ] bi
+    ] 2keep drop over = ;
 
 TUPLE: bitstream-writer < bitstream ;
 
