@@ -3,7 +3,7 @@
 USING: accessors combinators io io.encodings.binary io.files kernel
 pack endian constructors sequences arrays math.order math.parser
 prettyprint classes io.binary assocs math math.bitwise byte-arrays
-grouping images compression.lzw fry ;
+grouping images compression.lzw fry strings ;
 IN: images.tiff
 
 TUPLE: tiff-image < image ;
@@ -115,8 +115,9 @@ ERROR: bad-extra-samples n ;
 
 SINGLETONS: image-length image-width x-resolution y-resolution
 rows-per-strip strip-offsets strip-byte-counts bits-per-sample
-samples-per-pixel new-subfile-type orientation
-unhandled-ifd-entry ;
+samples-per-pixel new-subfile-type orientation software
+date-time photoshop exif-ifd sub-ifd inter-color-profile
+xmp iptc unhandled-ifd-entry ;
 
 ERROR: bad-tiff-magic bytes ;
 : tiff-endianness ( byte-array -- ? )
@@ -185,6 +186,7 @@ ERROR: unknown-ifd-type n ;
         { 10 [ 8 * ] }
         { 11 [ 4 * ] }
         { 12 [ 8 * ] }
+        { 13 [ 4 * ] }
         [ unknown-ifd-type ]
     } case ;
 
@@ -200,6 +202,7 @@ ERROR: bad-small-ifd-type n ;
         { 8 [ 2 head endian> 16 >signed ] }
         { 9 [ endian> 32 >signed ] }
         { 11 [ endian> bits>float ] }
+        { 13 [ endian> 32 >signed ] }
         [ bad-small-ifd-type ]
     } case ;
 
@@ -246,10 +249,18 @@ ERROR: bad-small-ifd-type n ;
         { 283 [ y-resolution ] }
         { 284 [ planar-configuration ] }
         { 296 [ lookup-resolution-unit resolution-unit ] }
+        { 305 [ >string software ] }
+        { 306 [ >string date-time ] }
         { 317 [ lookup-predictor predictor ] }
+        { 330 [ sub-ifd ] }
         { 338 [ lookup-extra-samples extra-samples ] }
         { 339 [ lookup-sample-format sample-format ] }
-        [ nip unhandled-ifd-entry ]
+        { 700 [ >string xmp ] }
+        { 34377 [ photoshop ] }
+        { 34665 [ exif-ifd ] }
+        { 33723 [ iptc ] }
+        { 34675 [ inter-color-profile ] }
+        [ nip unhandled-ifd-entry swap ]
     } case ;
 
 : process-ifd ( ifd -- ifd )
@@ -277,8 +288,8 @@ ERROR: unknown-component-order ifd ;
 
 : ifd-component-order ( ifd -- byte-order )
     bits-per-sample find-tag {
-        { { 32 32 32 } [ 32R32G32B ] }
-        { { 16 16 16 } [ 16R16G16B ] }
+        { { 32 32 32 } [ R32G32B32 ] }
+        { { 16 16 16 } [ R16G16B16 ] }
         { { 8 8 8 8 } [ RGBA ] }
         { { 8 8 8 } [ RGB ] }
         [ unknown-component-order ]
