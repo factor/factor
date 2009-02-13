@@ -1,13 +1,15 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: locals accessors kernel math namespaces sequences math.vectors
-colors colors.constants math.rectangles ui.commands ui.operations
-ui.gadgets ui.gadgets.buttons ui.gadgets.worlds ui.gestures
-ui.gadgets.theme ui.gadgets.packs ui.gadgets.glass ui.gadgets.borders ;
+math.rectangles.positioning colors colors.constants math.rectangles
+ui.commands ui.operations ui.gadgets ui.gadgets.buttons
+ui.gadgets.worlds ui.gestures ui.gadgets.theme ui.gadgets.packs
+ui.gadgets.glass ui.gadgets.borders ;
 IN: ui.gadgets.menus
 
 : menu-loc ( world menu -- loc )
-    [ dim>> ] [ pref-dim ] bi* [v-] hand-loc get-global vmin ;
+    [ hand-loc get { 0 0 } <rect> ] 2dip
+    pref-dim swap dim>> popup-loc ;
 
 : show-menu ( owner menu -- )
     [ find-world ] dip 2dup menu-loc show-glass ;

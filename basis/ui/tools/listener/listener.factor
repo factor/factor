@@ -91,7 +91,11 @@ M: input (print-input)
     [ string>> H{ { font-style bold } } format ] with-nesting nl ;
 
 M: word (print-input)
-    "Command: " write . ;
+    "Command: "
+    [
+        "sans-serif" font-name set
+        bold font-style set
+    ] H{ } make-assoc format . ;
 
 : print-input ( object interactor -- )
     output>> [ (print-input) ] with-output-stream* ;
