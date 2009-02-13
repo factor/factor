@@ -95,3 +95,35 @@ things "THINGS" {
        things drop-table
     ] with-db
 ] unit-test
+
+! Tables can have different names than the name of the tuple
+TUPLE: foo slot ;
+C: <foo> foo
+foo "BAR" { { "slot" "SOMETHING" INTEGER +not-null+ } } define-persistent
+
+TUPLE: hi bye try ;
+C: <hi> hi
+hi "HELLO" {
+    { "bye" "BUHBYE" INTEGER { +foreign-id+ foo "SOMETHING" } }
+    { "try" "RETHROW" INTEGER { +foreign-id+ foo "SOMETHING" } }
+} define-persistent
+
+[ T{ foo { slot 1 } } T{ hi { bye 1 } { try 1 } } ] [
+    test.db [
+        foo create-table
+        hi create-table
+        1 <foo> insert-tuple
+        f <foo> select-tuple
+        1 1 <hi> insert-tuple
+        f <hi> select-tuple
+        hi drop-table
+        foo drop-table
+    ] with-db
+] unit-test
+
+[ ] [
+    test.db [
+        hi create-table
+        hi drop-table
+    ] with-db
+] unit-test

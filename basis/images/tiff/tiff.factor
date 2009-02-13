@@ -3,7 +3,7 @@
 USING: accessors combinators io io.encodings.binary io.files kernel
 pack endian constructors sequences arrays math.order math.parser
 prettyprint classes io.binary assocs math math.bitwise byte-arrays
-grouping images ;
+grouping images compression.lzw fry ;
 IN: images.tiff
 
 TUPLE: tiff-image < image ;
@@ -256,6 +256,20 @@ ERROR: bad-small-ifd-type n ;
     dup ifd-entries>>
     [ process-ifd-entry swap ] H{ } map>assoc >>processed-tags ;
 
+ERROR: unhandled-compression compression ;
+
+: (uncompress-strips) ( strips compression -- uncompressed-strips )
+    {
+        { compression-none [ ] }
+        { compression-lzw [ [ lzw-uncompress ] map ] }
+        [ unhandled-compression ]
+    } case ;
+
+: uncompress-strips ( ifd -- ifd )
+    dup '[
+        _ compression find-tag (uncompress-strips)
+    ] change-strips ;
+
 : strips>bitmap ( ifd -- ifd )
     dup strips>> concat >>bitmap ;
 
@@ -284,7 +298,11 @@ ERROR: unknown-component-order ifd ;
         <parsed-tiff>
         read-header dup endianness>> [
             read-ifds
-            dup ifds>> [ process-ifd read-strips strips>bitmap drop ] each
+            dup ifds>> [
+                process-ifd read-strips
+                uncompress-strips
+                strips>bitmap drop
+            ] each
         ] with-endianness
     ] with-file-reader ;
 

@@ -225,11 +225,11 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : insert-trigger ( -- string )
     [
     <"
-        CREATE TRIGGER fki_${table}_${foreign-table}_id
-        BEFORE INSERT ON ${table}
+        CREATE TRIGGER fki_${table-name}_${foreign-table-name}_id
+        BEFORE INSERT ON ${table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'insert on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
-            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+            SELECT RAISE(ROLLBACK, 'insert on table "${table-name}" violates foreign key constraint "fk_${foreign-table-name}_id"')
+            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
     "> interpolate
     ] with-string-writer ;
@@ -237,12 +237,12 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : insert-trigger-not-null ( -- string )
     [
     <"
-        CREATE TRIGGER fki_${table}_${foreign-table}_id
-        BEFORE INSERT ON ${table}
+        CREATE TRIGGER fki_${table-name}_${foreign-table-name}_id
+        BEFORE INSERT ON ${table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'insert on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            SELECT RAISE(ROLLBACK, 'insert on table "${table-name}" violates foreign key constraint "fk_${foreign-table-name}_id"')
             WHERE NEW.${foreign-table-id} IS NOT NULL
-                AND (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+                AND (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
     "> interpolate
     ] with-string-writer ;
@@ -250,11 +250,11 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : update-trigger ( -- string )
     [
     <"
-        CREATE TRIGGER fku_${table}_${foreign-table}_id
-        BEFORE UPDATE ON ${table}
+        CREATE TRIGGER fku_${table-name}_${foreign-table-name}_id
+        BEFORE UPDATE ON ${table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'update on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
-            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+            SELECT RAISE(ROLLBACK, 'update on table "${table-name}" violates foreign key constraint "fk_${foreign-table-name}_id"')
+            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
     "> interpolate
     ] with-string-writer ;
@@ -262,12 +262,12 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : update-trigger-not-null ( -- string )
     [
     <"
-        CREATE TRIGGER fku_${table}_${foreign-table}_id
-        BEFORE UPDATE ON ${table}
+        CREATE TRIGGER fku_${table-name}_${foreign-table-name}_id
+        BEFORE UPDATE ON ${table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'update on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            SELECT RAISE(ROLLBACK, 'update on table "${table-name}" violates foreign key constraint "fk_${foreign-table-name}_id"')
             WHERE NEW.${foreign-table-id} IS NOT NULL
-                AND (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+                AND (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
     "> interpolate
     ] with-string-writer ;
@@ -275,11 +275,11 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : delete-trigger-restrict ( -- string )
     [
     <"
-        CREATE TRIGGER fkd_${table}_${foreign-table}_id
-        BEFORE DELETE ON ${foreign-table}
+        CREATE TRIGGER fkd_${table-name}_${foreign-table-name}_id
+        BEFORE DELETE ON ${foreign-table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'delete on table "${foreign-table}" violates foreign key constraint "fk_${foreign-table}_id"')
-            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = OLD.${foreign-table-id}) IS NOT NULL;
+            SELECT RAISE(ROLLBACK, 'delete on table "${foreign-table-name}" violates foreign key constraint "fk_${foreign-table-name}_id"')
+            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = OLD.${foreign-table-id}) IS NOT NULL;
         END;
     "> interpolate
     ] with-string-writer ;
@@ -287,10 +287,10 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : delete-trigger-cascade ( -- string )
     [
     <"
-        CREATE TRIGGER fkd_${table}_${foreign-table}_id
-        BEFORE DELETE ON ${foreign-table}
+        CREATE TRIGGER fkd_${table-name}_${foreign-table-name}_id
+        BEFORE DELETE ON ${foreign-table-name}
         FOR EACH ROW BEGIN
-            DELETE from ${table} WHERE ${table-id} = OLD.${foreign-table-id};
+            DELETE from ${table-name} WHERE ${table-id} = OLD.${foreign-table-id};
         END;
     "> interpolate
     ] with-string-writer ;
@@ -323,7 +323,7 @@ M: sqlite-db-connection compound ( string seq -- new-string )
         { "default" [ first number>string " " glue ] }
         { "references" [
             [ >reference-string ] keep
-            first2 [ "foreign-table" set ]
+            first2 [ db-table-name "foreign-table-name" set ]
             [ "foreign-table-id" set ] bi*
             create-sqlite-triggers
         ] }
