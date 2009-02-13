@@ -4,10 +4,24 @@ IN: xmode.marker
 USING: kernel namespaces make xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators strings
-regexp splitting ascii parser-combinators regexp.backend
+regexp splitting ascii regexp.backend unicode.case
 ascii combinators.short-circuit accessors ;
-! parser-combinators is for the string-head? word
 ! regexp.backend is for the regexp class
+
+! Next two words copied from parser-combinators
+! Just like head?, but they optionally ignore case
+
+: string= ( str1 str2 ignore-case -- ? )
+    [ [ >upper ] bi@ ] when sequence= ;
+
+: string-head? ( str1 str2 ignore-case -- ? )
+    2over shorter?
+    [ 3drop f ] [
+        [
+            [ nip ]
+            [ length head-slice ] 2bi
+        ] dip string=
+    ] if ;
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 

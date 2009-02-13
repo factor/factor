@@ -1,5 +1,6 @@
 USING: accessors sequences assocs kernel quotations namespaces
-xml.data xml.traversal combinators macros parser lexer words fry ;
+xml.data xml.traversal combinators macros parser lexer words fry
+regexp ;
 IN: xmode.utilities
 
 : implies ( x y -- z ) [ not ] dip or ; inline
@@ -35,3 +36,6 @@ MACRO: (init-from-tag) ( specs -- )
 
 : init-from-tag ( tag tuple specs -- tuple )
     over [ (init-from-tag) ] dip ; inline
+
+: <?insensitive-regexp> ( string ? -- regexp )
+    "i" "" ? <optioned-regexp> ;

@@ -1,7 +1,7 @@
 USING: xmode.loader.syntax xmode.tokens xmode.rules
 xmode.keyword-map xml.data xml.traversal xml assocs kernel
 combinators sequences math.parser namespaces parser
-xmode.utilities regexp io.files accessors ;
+xmode.utilities regexp io.files accessors xml.syntax ;
 IN: xmode.loader
 
 ! Based on org.gjt.sp.jedit.XModeHandler
@@ -48,7 +48,7 @@ TAG: KEYWORDS parse-rule-tag
     swap (>>keywords) ;
 
 : ?<regexp> ( string/f -- regexp/f )
-    dup [ rule-set get ignore-case?>> drop <regexp> ] when ;
+    dup [ rule-set get ignore-case?>> <?insensitive-regexp> ] when ;
 
 : (parse-rules-tag) ( tag -- rule-set )
     <rule-set> dup rule-set set

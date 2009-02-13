@@ -183,15 +183,8 @@ M: character-class-range nfa-node ( node -- )
     ] if ;
 
 M: capture-group nfa-node ( node -- )
-    "capture-groups" feature-is-broken
-    eps literal-transition add-simple-entry
-    capture-group-on add-traversal-flag
-    term>> nfa-node
-    eps literal-transition add-simple-entry
-    capture-group-off add-traversal-flag
-    2 [ concatenate-nodes ] times ;
+    term>> nfa-node ;
 
-! xyzzy
 M: non-capture-group nfa-node ( node -- )
     term>> nfa-node ;
 
