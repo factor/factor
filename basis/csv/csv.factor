@@ -46,13 +46,15 @@ DEFER: quoted-field ( -- endchar )
 
 : (row) ( -- sep )
     field , 
-    dup delimiter get = [ drop (row) ] when ;
+    dup delimiter> = [ drop (row) ] when ;
 
 : row ( -- eof? array[string] )
     [ (row) ] { } make ;
 
 : (csv) ( -- )
-    row harvest [ , ] unless-empty [ (csv) ] when ;
+    row
+    dup [ empty? ] all? [ drop ] [ , ] if
+    [ (csv) ] when ;
   
 PRIVATE>
 
@@ -60,7 +62,8 @@ PRIVATE>
     [ row nip ] with-input-stream ;
 
 : csv ( stream -- rows )
-    [ [ (csv) ] { } make ] with-input-stream ;
+    [ [ (csv) ] { } make ] with-input-stream
+    dup peek { "" } = [ but-last ] when ;
 
 : file>csv ( path encoding -- csv )
     <file-reader> csv ;

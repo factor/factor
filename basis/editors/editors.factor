@@ -1,9 +1,10 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser lexer kernel namespaces sequences definitions
 io.files io.backend io.pathnames io summary continuations
 tools.crossref tools.vocabs prettyprint source-files assocs
-vocabs vocabs.loader splitting accessors ;
+vocabs vocabs.loader splitting accessors debugger prettyprint
+help.topics ;
 IN: editors
 
 TUPLE: no-edit-hook ;
@@ -29,11 +30,21 @@ SYMBOL: edit-hook
     [ (normalize-path) ] dip edit-hook get-global
     [ call ] [ no-edit-hook edit-location ] if* ;
 
+ERROR: cannot-find-source definition ;
+
+M: cannot-find-source error.
+    "Cannot find source for ``" write
+    definition>> pprint-short
+    "''" print ;
+
 : edit ( defspec -- )
-    where [ first2 edit-location ] when* ;
+    dup where
+    [ first2 edit-location ]
+    [ dup word-link? [ name>> edit ] [ cannot-find-source ] if ]
+    ?if ;
 
 : edit-vocab ( name -- )
-    vocab-source-path 1 edit-location ;
+    >vocab-link edit ;
 
 GENERIC: error-file ( error -- file )
 

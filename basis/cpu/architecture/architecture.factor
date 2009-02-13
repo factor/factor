@@ -152,7 +152,7 @@ HOOK: %loop-entry cpu ( -- )
 HOOK: small-enough? cpu ( n -- ? )
 
 ! Is this structure small enough to be returned in registers?
-HOOK: struct-small-enough? cpu ( c-type -- ? )
+HOOK: return-struct-in-registers? cpu ( c-type -- ? )
 
 ! Do we pass this struct by value or hidden reference?
 HOOK: value-struct? cpu ( c-type -- ? )

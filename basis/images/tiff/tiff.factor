@@ -3,7 +3,7 @@
 USING: accessors combinators io io.encodings.binary io.files kernel
 pack endian constructors sequences arrays math.order math.parser
 prettyprint classes io.binary assocs math math.bitwise byte-arrays
-grouping images.backend ;
+grouping images compression.lzw fry ;
 IN: images.tiff
 
 TUPLE: tiff-image < image ;
@@ -256,6 +256,20 @@ ERROR: bad-small-ifd-type n ;
     dup ifd-entries>>
     [ process-ifd-entry swap ] H{ } map>assoc >>processed-tags ;
 
+ERROR: unhandled-compression compression ;
+
+: (uncompress-strips) ( strips compression -- uncompressed-strips )
+    {
+        { compression-none [ ] }
+        { compression-lzw [ [ lzw-uncompress ] map ] }
+        [ unhandled-compression ]
+    } case ;
+
+: uncompress-strips ( ifd -- ifd )
+    dup '[
+        _ compression find-tag (uncompress-strips)
+    ] change-strips ;
+
 : strips>bitmap ( ifd -- ifd )
     dup strips>> concat >>bitmap ;
 
@@ -268,25 +282,30 @@ ERROR: unknown-component-order ifd ;
         [ unknown-component-order ]
     } case ;
 
-M: ifd >image ( ifd -- image )
+: ifd>image ( ifd -- image )
     {
         [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
         [ ifd-component-order ]
+        [ drop big-endian ] ! XXX
         [ bitmap>> ]
-    } cleave tiff-image new-image ;
+    } cleave tiff-image boa ;
 
-M: parsed-tiff >image ( image -- image )
-    ifds>> [ >image ] map first ;
+: tiff>image ( image -- image )
+    ifds>> [ ifd>image ] map first ;
 
 : load-tiff ( path -- parsed-tiff )
     binary [
         <parsed-tiff>
         read-header dup endianness>> [
             read-ifds
-            dup ifds>> [ process-ifd read-strips strips>bitmap drop ] each
+            dup ifds>> [
+                process-ifd read-strips
+                uncompress-strips
+                strips>bitmap drop
+            ] each
         ] with-endianness
     ] with-file-reader ;
 
 ! tiff files can store several images -- we just take the first for now
 M: tiff-image load-image* ( path tiff-image -- image )
-    drop load-tiff >image ;
+    drop load-tiff tiff>image ;
