@@ -278,6 +278,7 @@ ERROR: unknown-component-order ifd ;
 : ifd-component-order ( ifd -- byte-order )
     bits-per-sample find-tag {
         { { 32 32 32 } [ 32R32G32B ] }
+        { { 16 16 16 } [ 16R16G16B ] }
         { { 8 8 8 8 } [ RGBA ] }
         { { 8 8 8 } [ RGB ] }
         [ unknown-component-order ]
