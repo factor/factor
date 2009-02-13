@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io io.streams.string kernel math math.parser
-namespaces sequences splitting grouping strings ascii byte-arrays ;
+namespaces sequences splitting grouping strings ascii
+byte-arrays byte-vectors ;
 IN: tools.hexdump
 
 <PRIVATE
@@ -26,13 +27,17 @@ IN: tools.hexdump
 : write-hex-line ( bytes lineno -- )
     write-offset [ >hex-digits write ] [ >ascii write ] bi nl ;
 
+: hexdump-bytes
+    [ length write-header ]
+    [ 16 <sliced-groups> [ write-hex-line ] each-index ] bi ;
+
 PRIVATE>
 
 GENERIC: hexdump. ( byte-array -- )
 
-M: byte-array hexdump.
-    [ length write-header ]
-    [ 16 <sliced-groups> [ write-hex-line ] each-index ] bi ;
+M: byte-array hexdump. hexdump-bytes ;
+
+M: byte-vector hexdump. hexdump-bytes ;
 
 : hexdump ( byte-array -- str )
     [ hexdump. ] with-string-writer ;
