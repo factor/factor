@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types arrays byte-arrays columns
 combinators fry grouping io io.binary io.encodings.binary io.files
 kernel macros math math.bitwise math.functions namespaces sequences
-strings images endian summary annotations ;
+strings images endian summary ;
 IN: images.bitmap
 
 TUPLE: bitmap-image < image ;
@@ -105,7 +105,6 @@ ERROR: unknown-component-order bitmap ;
     {
         [ [ width>> ] [ height>> ] bi 2array ]
         [ bitmap>component-order ]
-        [ drop little-endian ] !XXX
         [ buffer>> ]
     } cleave bitmap-image boa ;
 
