@@ -10,6 +10,7 @@ ERROR: unknown-image-extension extension ;
 : image-class ( path -- class )
     file-extension >lower {
         { "bmp" [ bitmap-image ] }
+        { "tif" [ tiff-image ] }
         { "tiff" [ tiff-image ] }
         [ unknown-image-extension ]
     } case ;
