@@ -1,5 +1,5 @@
 USING: accessors assocs hashtables http http.client json.reader
-kernel namespaces urls.encoding ;
+kernel namespaces urls.secure urls.encoding ;
 IN: twitter
 
 SYMBOLS: twitter-username twitter-password ;
