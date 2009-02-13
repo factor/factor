@@ -11,5 +11,4 @@ IN: taxes.usa.futa
 
 : futa-tax ( salary w4 -- x )
     drop futa-base-rate min
-    futa-tax-rate futa-tax-offset-credit -
-    * ;
+    futa-tax-rate futa-tax-offset-credit - * ;

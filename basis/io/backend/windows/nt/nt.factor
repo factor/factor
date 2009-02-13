@@ -87,11 +87,16 @@ ERROR: invalid-file-size n ;
 : handle>file-size ( handle -- n )
     0 <ulonglong> [ GetFileSizeEx win32-error=0/f ] keep *ulonglong ;
 
-M: winnt (stream-seek) ( n seek-type stream -- )
+ERROR: seek-before-start n ;
+
+: set-seek-ptr ( n handle -- )
+    [ dup 0 < [ seek-before-start ] when ] dip (>>ptr) ;
+
+M: winnt seek-handle ( n seek-type handle -- )
     swap {
-        { seek-absolute [ handle>> (>>ptr) ] }
-        { seek-relative [ handle>> [ + ] change-ptr drop ] }
-        { seek-end [ handle>> [ handle>> handle>file-size + ] keep (>>ptr) ] }
+        { seek-absolute [ set-seek-ptr ] }
+        { seek-relative [ [ ptr>> + ] keep set-seek-ptr ] }
+        { seek-end [ [ handle>> handle>file-size + ] keep set-seek-ptr ] }
         [ bad-seek-type ]
     } case ;
 

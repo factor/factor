@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io io.files io.pathnames ;
+USING: help.markup help.syntax io io.files io.pathnames strings ;
 IN: bootstrap.image
 
 ARTICLE: "bootstrap.image" "Bootstrapping new images"
@@ -14,7 +14,7 @@ $nl
 ABOUT: "bootstrap.image"
 
 HELP: make-image
-{ $values { "arch" "a string" } }
+{ $values { "arch" string } }
 { $description "Creates a bootstrap image from sources, where " { $snippet "architecture" } " is one of the following:"
-{ $code "x86.32" "x86.64" "ppc" "arm" }
+{ $code "x86.32" "unix-x86.64" "winnt-x86.64" "macosx-ppc" "linux-ppc" }
 "The new image file is written to the " { $link resource-path } " and is named " { $snippet "boot." { $emphasis "architecture" } ".image" } "." } ;

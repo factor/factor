@@ -47,8 +47,8 @@ PRIVATE>
 "resource:basis/io/encodings/iana/character-sets"
 utf8 <file-reader> make-aliases aliases set-global
 
-n>e-table global [ initial-n>e or ] change-at
-e>n-table global [ initial-e>n or ] change-at
+n>e-table [ initial-n>e ] initialize
+e>n-table [ initial-e>n ] initialize
 
 : register-encoding ( descriptor name -- )
     [

@@ -5,7 +5,7 @@ continuations combinators compiler compiler.alien kernel math
 namespaces make parser quotations sequences strings words
 cocoa.runtime io macros memoize io.encodings.utf8
 effects libc libc.private parser lexer init core-foundation fry
-generalizations specialized-arrays.direct.alien ;
+generalizations specialized-arrays.direct.alien call ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -19,8 +19,8 @@ IN: cocoa.messages
 SYMBOL: message-senders
 SYMBOL: super-message-senders
 
-message-senders global [ H{ } assoc-like ] change-at
-super-message-senders global [ H{ } assoc-like ] change-at
+message-senders [ H{ } clone ] initialize
+super-message-senders [ H{ } clone ] initialize
 
 : cache-stub ( method function hash -- )
     [
@@ -53,7 +53,7 @@ MEMO: <selector> ( name -- sel ) f \ selector boa ;
 
 SYMBOL: objc-methods
 
-objc-methods global [ H{ } assoc-like ] change-at
+objc-methods [ H{ } clone ] initialize
 
 : lookup-method ( selector -- method )
     dup objc-methods get at
@@ -79,11 +79,11 @@ MACRO: (send) ( selector super? -- quot )
 ! Runtime introspection
 SYMBOL: class-init-hooks
 
-class-init-hooks global [ H{ } clone or ] change-at
+class-init-hooks [ H{ } clone ] initialize
 
 : (objc-class) ( name word -- class )
     2dup execute dup [ 2nip ] [
-        drop over class-init-hooks get at [ assert-depth ] when*
+        drop over class-init-hooks get at [ call( -- ) ] when*
         2dup execute dup [ 2nip ] [
             2drop "No such class: " prepend throw
         ] if

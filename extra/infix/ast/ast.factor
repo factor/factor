@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Philipp Brüschweiler
+! See http://factorcode.org/license.txt for BSD license.
 IN: infix.ast
 
 TUPLE: ast-number value ;

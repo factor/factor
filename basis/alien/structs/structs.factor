@@ -1,15 +1,26 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays generic hashtables kernel kernel.private
+USING: accessors arrays assocs generic hashtables kernel kernel.private
 math namespaces parser sequences strings words libc fry
-alien.c-types alien.structs.fields cpu.architecture math.order ;
+alien.c-types alien.structs.fields cpu.architecture math.order
+quotations byte-arrays ;
 IN: alien.structs
 
-TUPLE: struct-type size align fields boxer-quot unboxer-quot getter setter ;
+TUPLE: struct-type
+size
+align
+fields
+{ boxer-quot callable }
+{ unboxer-quot callable }
+{ getter callable }
+{ setter callable }
+return-in-registers? ;
+
+M: struct-type c-type ;
 
 M: struct-type heap-size size>> ;
 
-M: struct-type c-type-class drop object ;
+M: struct-type c-type-class drop byte-array ;
 
 M: struct-type c-type-align align>> ;
 
@@ -29,7 +40,7 @@ M: struct-type box-parameter
     [ %box-large-struct ] [ box-parameter ] if-value-struct ;
 
 : if-small-struct ( c-type true false -- ? )
-    [ dup struct-small-enough? ] 2dip '[ f swap @ ] if ; inline
+    [ dup return-struct-in-registers? ] 2dip '[ f swap @ ] if ; inline
 
 M: struct-type unbox-return
     [ %unbox-small-struct ] [ %unbox-large-struct ] if-small-struct ;
@@ -68,3 +79,8 @@ M: struct-type stack-size
     [ expand-constants ] map
     [ [ heap-size ] [ max ] map-reduce ] keep
     compute-struct-align f (define-struct) ;
+
+: offset-of ( field struct -- offset )
+    c-types get at fields>> 
+    [ name>> = ] with find nip offset>> ;
+

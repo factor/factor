@@ -20,13 +20,13 @@ HELP: each-responder
 { $description "Applies the quotation to each responder involved in processing the current request." } ;
 
 HELP: hidden-form-field
-{ $values { "value" string } { "name" string } }
-{ $description "Renders an HTML hidden form field tag." }
+{ $values { "value" string } { "name" string } { "xml" "an XML chunk" } }
+{ $description "Renders an HTML hidden form field tag as XML." }
 { $notes "This word is used by session management, conversation scope and asides." }
 { $examples
     { $example
-        "USING: furnace.utilities io ;"
-        "\"bar\" \"foo\" hidden-form-field nl"
+        "USING: furnace.utilities io xml.writer ;"
+        "\"bar\" \"foo\" hidden-form-field write-xml nl"
         "<input type=\"hidden\" value=\"bar\" name=\"foo\"/>"
     }
 } ;
@@ -38,7 +38,7 @@ HELP: link-attr
 { $examples "Conversation scope adds attributes to link tags." } ;
 
 HELP: modify-form
-{ $values { "responder" "a responder" } }
+{ $values { "responder" "a responder" } { "xml/f" "an XML chunk or f" } }
 { $contract "Emits hidden form fields using " { $link hidden-form-field } "." }
 { $notes "This word is called by " { $link "html.templates.chloe.tags.form" } "." }
 { $examples "Session management, conversation scope and asides use hidden form fields to pass state." } ;
