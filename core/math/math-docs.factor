@@ -254,7 +254,7 @@ HELP: fp-infinity?
 { $description "Tests if " { $snippet "x" } " is an IEEE Infinity value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." }
 { $examples
     { $example "USING: math prettyprint ;" "1/0. fp-infinity? ." "t" }
-    { $example "USING: io kernel math ;" "-1/0. [ fp-infinity? ] [ 0 < ] bi [ \"negative infinity\" print ] when" "negative infinity" }
+    { $example "USING: io kernel math ;" "-1/0. [ fp-infinity? ] [ 0 < ] bi and [ \"negative infinity\" print ] when" "negative infinity" }
 } ;
 
 { fp-nan? fp-infinity? } related-words

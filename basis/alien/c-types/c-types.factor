@@ -4,7 +4,7 @@ USING: byte-arrays arrays assocs kernel kernel.private libc math
 namespaces make parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
 layouts system compiler.units io.files io.encodings.binary
-accessors combinators effects continuations fry ;
+accessors combinators effects continuations fry call classes ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -13,18 +13,20 @@ DEFER: *char
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
 TUPLE: c-type
-class
-boxer boxer-quot unboxer unboxer-quot
-getter setter
-reg-class size align stack-align? ;
-
-: new-c-type ( class -- type )
-    new
-        int-regs >>reg-class
-        object >>class ; inline
+{ class class initial: object }
+boxer
+{ boxer-quot callable }
+unboxer
+{ unboxer-quot callable }
+{ getter callable }
+{ setter callable }
+{ reg-class initial: int-regs }
+size
+align
+stack-align? ;
 
 : <c-type> ( -- type )
-    \ c-type new-c-type ;
+    \ c-type new ;
 
 SYMBOL: c-types
 
@@ -185,6 +187,9 @@ M: f byte-length drop 0 ;
         [ "Cannot read struct fields with this type" throw ]
     ] unless* ;
 
+: c-type-getter-boxer ( name -- quot )
+    [ c-getter ] [ c-type-boxer-quot ] bi append ;
+
 : c-setter ( name -- quot )
     c-type-setter [
         [ "Cannot write struct fields with this type" throw ]
@@ -221,7 +226,7 @@ M: f byte-length drop 0 ;
 TUPLE: long-long-type < c-type ;
 
 : <long-long-type> ( -- type )
-    long-long-type new-c-type ;
+    long-long-type new ;
 
 M: long-long-type unbox-parameter ( n type -- )
     c-type-unboxer %unbox-long-long ;
@@ -258,7 +263,7 @@ M: long-long-type box-return ( type -- )
         unclip [
             [
                 dup word? [
-                    def>> { } swap with-datastack first
+                    def>> call( -- object )
                 ] when
             ] map
         ] dip prefix

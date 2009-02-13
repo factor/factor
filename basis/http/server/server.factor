@@ -161,7 +161,7 @@ C: <trivial-responder> trivial-responder
 
 M: trivial-responder call-responder* nip response>> clone ;
 
-main-responder global [ <404> <trivial-responder> or ] change-at
+main-responder [ <404> <trivial-responder> ] initialize
 
 : invert-slice ( slice -- slice' )
     dup slice? [ [ seq>> ] [ from>> ] bi head-slice ] [ drop { } ] if ;

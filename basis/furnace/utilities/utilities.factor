@@ -77,17 +77,17 @@ GENERIC: link-attr ( tag responder -- )
 
 M: object link-attr 2drop ;
 
-GENERIC: modify-form ( responder -- )
+GENERIC: modify-form ( responder -- xml/f )
 
-M: object modify-form drop ;
+M: object modify-form drop f ;
 
-: hidden-form-field>xml ( value name -- xml )
+: form-modifications ( -- xml )
+    [ [ modify-form [ , ] when* ] each-responder ] { } make ;
+
+: hidden-form-field ( value name -- xml )
     over [
         [XML <input type="hidden" value=<-> name=<->/> XML]
     ] [ drop ] if ;
-
-: hidden-form-field ( value name -- )
-    hidden-form-field>xml write-xml ;
 
 : nested-forms-key "__n" ;
 

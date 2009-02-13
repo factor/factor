@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel quotations ui.gadgets
-graphics.bitmap strings ui.gadgets.worlds ;
+images.bitmap strings ui.gadgets.worlds ;
 IN: ui.offscreen
 
 HELP: <offscreen-world>
