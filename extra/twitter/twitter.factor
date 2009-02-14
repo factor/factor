@@ -27,8 +27,7 @@ MACRO: keys-boa ( keys class -- )
 : set-request-twitter-auth ( request -- request )
     twitter-username get twitter-password get set-basic-auth ;
 
-: twitter-request ( string quot -- data )
-    [ twitter-url ] dip call
+: twitter-request ( request -- data )
     set-request-twitter-auth
     http-request nip ; inline
 
@@ -101,10 +100,11 @@ PRIVATE>
     [
         "status" set
         twitter-source get "source" set
-    ] make-assoc ;
+    ] H{ } make-assoc ;
 
 : (tweet) ( string -- json )
-    update-post-data "update" [ <post-request> ] twitter-request ;
+    update-post-data "update" twitter-url
+    <post-request> twitter-request ;
 
 PRIVATE>
 
@@ -117,7 +117,8 @@ PRIVATE>
 <PRIVATE
 
 : timeline ( url -- tweets )
-    [ <get-request> ] twitter-request json>twitter-statuses ;
+    twitter-url <get-request>
+    twitter-request json>twitter-statuses ;
 
 PRIVATE>
 
