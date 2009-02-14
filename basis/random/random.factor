@@ -43,8 +43,8 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
     [ random-bytes >byte-array byte-array>bignum ]
     [ 3 shift 2^ ] bi / * >integer ;
 
-: >randomize-range ( seq -- range )
-    length 1+ 2 (a,b] ; inline
+: >randomize-range ( seq -- range/iota )
+    length dup 2 < [ drop 0 iota ] [ 1+ 2 (a,b] ] if ;
 
 PRIVATE>
 
