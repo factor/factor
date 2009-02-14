@@ -241,7 +241,7 @@ ARTICLE: "tuple-examples" "Tuple examples"
 }
 "An example of using a changer:"
 { $code
-    ": positions"
+    ": positions ( -- seq )"
     "    {"
     "        \"junior programmer\""
     "        \"senior programmer\""

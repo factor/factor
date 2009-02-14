@@ -1,39 +1,36 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types namespaces io.binary fry
-kernel math ;
+kernel math grouping sequences math.bitwise ;
 IN: endian
 
 SINGLETONS: big-endian little-endian ;
 
-: native-endianness ( -- class )
+: compute-native-endianness ( -- class )
     1 <int> *char 0 = big-endian little-endian ? ;
 
-: >signed ( x n -- y )
-    2dup neg 1+ shift 1 = [ 2^ - ] [ drop ] if ;
-
-native-endianness \ native-endianness set-global
+SYMBOL: native-endianness
+native-endianness [ compute-native-endianness ] initialize
 
 SYMBOL: endianness
+endianness [ native-endianness get-global ] initialize
 
-\ native-endianness get-global endianness set-global
-
-HOOK: >native-endian native-endianness ( obj n -- str )
+HOOK: >native-endian native-endianness ( obj n -- bytes )
 
 M: big-endian >native-endian >be ;
 
 M: little-endian >native-endian >le ;
 
-HOOK: unsigned-native-endian> native-endianness ( obj -- str )
+HOOK: unsigned-native-endian> native-endianness ( obj -- bytes )
 
 M: big-endian unsigned-native-endian> be> ;
 
 M: little-endian unsigned-native-endian> le> ;
 
-: signed-native-endian> ( obj n -- str )
+: signed-native-endian> ( obj n -- n' )
     [ unsigned-native-endian> ] dip >signed ;
 
-HOOK: >endian endianness ( obj n -- str )
+HOOK: >endian endianness ( obj n -- bytes )
 
 M: big-endian >endian >be ;
 
@@ -45,13 +42,13 @@ M: big-endian endian> be> ;
 
 M: little-endian endian> le> ;
 
-HOOK: unsigned-endian> endianness ( obj -- str )
+HOOK: unsigned-endian> endianness ( obj -- bytes )
 
 M: big-endian unsigned-endian> be> ;
 
 M: little-endian unsigned-endian> le> ;
 
-: signed-endian> ( obj n -- str )
+: signed-endian> ( obj n -- bytes )
     [ unsigned-endian> ] dip >signed ;
 
 : with-endianness ( endian quot -- )
@@ -65,3 +62,15 @@ M: little-endian unsigned-endian> le> ;
 
 : with-native-endian ( quot -- )
     \ native-endianness get-global swap with-endianness ; inline
+
+: seq>native-endianness ( seq n -- seq' )
+    native-endianness get-global dup endianness get = [
+        2drop
+    ] [
+        [ [ <sliced-groups> ] keep ] dip
+        little-endian = [
+            '[ be> _ >le ] map
+        ] [
+            '[ le> _ >be ] map
+        ] if concat
+    ] if ; inline

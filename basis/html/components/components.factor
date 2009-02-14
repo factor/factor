@@ -171,3 +171,8 @@ M: comparison render*
 SINGLETON: html
 
 M: html render* 2drop <unescaped> ;
+
+! XML component
+SINGLETON: xml
+
+M: xml render* 2drop ;

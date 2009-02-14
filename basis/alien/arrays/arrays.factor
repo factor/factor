@@ -26,7 +26,7 @@ M: array box-return drop "void*" box-return ;
 
 M: array stack-size drop "void*" stack-size ;
 
-M: array c-type-boxer-quot drop f ;
+M: array c-type-boxer-quot drop [ ] ;
 
 M: array c-type-unboxer-quot drop [ >c-ptr ] ;
 

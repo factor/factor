@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors arrays kernel sequences math byte-arrays
-namespaces grouping fry cap graphics.bitmap
+namespaces grouping fry cap images.bitmap
 ui.gadgets ui.gadgets.packs ui.gadgets.borders ui.gadgets.grids
 ui.gadgets.grid-lines ui.gadgets.labels ui.gadgets.buttons
-ui.render ui opengl opengl.gl ;
+ui.render ui opengl opengl.gl images images.loader ;
 IN: ui.render.test
 
 SINGLETON: line-test
@@ -30,7 +30,7 @@ SYMBOL: render-output
 
 : bitmap= ( bitmap1 bitmap2 -- ? )
     [
-        [ [ array>> ] [ stride 4 align ] bi group ] [ stride ] bi
+        [ [ buffer>> ] [ stride 4 align ] bi group ] [ stride ] bi
         '[ _ head twiddle ] map
     ] bi@ = ;
 
@@ -38,7 +38,7 @@ SYMBOL: render-output
     screenshot
     [ render-output set-global ]
     [
-        "resource:extra/ui/render/test/reference.bmp" load-bitmap
+        "resource:extra/ui/render/test/reference.bmp" load-image
         bitmap= "is perfect" "needs work" ?
         "Your UI rendering " prepend
         message-window
