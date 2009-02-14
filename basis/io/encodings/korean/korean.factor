@@ -24,7 +24,7 @@ cp949 "EUC-KR" register-encoding
 : (cp949.txt-lines) ( -- seq )
     ! "cp949.txt" from ...
     ! <http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP949.TXT>
-    "resource:work/io/encodings/korean/data/cp949.txt"
+    "resource:basis/io/encodings/korean/data/cp949.txt"
     ascii file-lines ;
 
 : (PCL-drop-comments) ( seq -- newseq )
