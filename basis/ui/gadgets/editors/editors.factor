@@ -8,7 +8,7 @@ continuations ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
 ui.gadgets.theme ui.gadgets.menus ui.gadgets.wrappers ui.render
 ui.pens.solid ui.gadgets.line-support ui.text ui.gestures
-math.rectangles splitting unicode.categories fonts ;
+math.rectangles splitting unicode.categories fonts grouping ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget
@@ -165,14 +165,32 @@ SYMBOL: selected-lines
 TUPLE: selected-line start end first? last? ;
 
 : compute-selection ( editor -- assoc )
-    [ selection-start/end [ [ first ] bi@ [a,b] ] 2keep ] keep model>>
-    '[ [ _ _ ] keep _ start/end-on-line 2array ] H{ } map>assoc ;
+    dup gadget-selection? [
+        [ selection-start/end [ [ first ] bi@ [a,b] ] 2keep ] keep model>>
+        '[ [ _ _ ] keep _ start/end-on-line 2array ] H{ } map>assoc
+    ] [ drop f ] if ;
+
+:: draw-empty-selection ( line pair editor -- )
+    editor font>> :> font
+    pair first font line offset>x 0 2array [
+        editor selection-color>> gl-color
+        1 font font-metrics height>> 2array gl-fill-rect
+    ] with-translation ;
+
+: draw-unselected-line ( line editor -- )
+    font>> swap draw-text ;
+
+: draw-selected-line ( line pair editor -- )
+    over all-equal? [
+        [ nip draw-unselected-line ] [ draw-empty-selection ] 3bi
+    ] [
+        [ [ first2 ] [ selection-color>> ] bi* <selection> ] keep
+        draw-unselected-line
+    ] if ;
 
 M: editor draw-line ( line index editor -- )
-    [
-        [ selected-lines get at ] dip
-        '[ first2 _ selection-color>> <selection> ] when*
-    ] keep font>> swap draw-text ;
+    [ selected-lines get at ] dip over
+    [ draw-selected-line ] [ nip draw-unselected-line ] if ;
 
 M: editor draw-gadget*
     dup compute-selection selected-lines [
