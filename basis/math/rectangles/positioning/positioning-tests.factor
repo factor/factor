@@ -37,3 +37,10 @@ IN: math.rectangles.positioning.tests
     { 100 100 }
     popup-loc
 ] unit-test
+
+[ { 0 20 } ] [
+    { -50 70 } { 0 0 } <rect>
+    { 50 50 }
+    { 100 100 }
+    popup-loc
+] unit-test

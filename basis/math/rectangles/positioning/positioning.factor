@@ -7,7 +7,7 @@ IN: math.rectangles.positioning
 ! in a semi-intelligent manner
 
 : popup-x ( visible-rect popup-dim screen-dim -- x )
-    [ loc>> first ] 2dip swap [ first ] bi@ - min ;
+    [ loc>> first ] 2dip swap [ first ] bi@ - min 0 max ;
 
 : preferred-y ( visible-rect -- y )
     [ loc>> ] [ dim>> ] bi [ second ] bi@ + ;
