@@ -18,6 +18,12 @@ IN: random.tests
 
 [ f ] [ 0 random ] unit-test
 
+[ 0 ] [ { } >randomize-range length ] unit-test
+[ 0 ] [ { 1 } >randomize-range length ] unit-test
+
+[ { } ] [ { } randomize ] unit-test
+[ { 1 } ] [ { 1 } randomize ] unit-test
+
 [ f ]
 [ 100 [ { 0 1 } random ] replicate all-equal? ] unit-test
 
