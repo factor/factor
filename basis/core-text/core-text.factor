@@ -3,9 +3,9 @@
 USING: arrays alien alien.c-types alien.syntax kernel destructors
 accessors fry words hashtables strings sequences memoize assocs math
 math.functions locals init namespaces combinators fonts colors cache
-images endian core-foundation core-foundation.strings
-core-foundation.attributed-strings core-foundation.utilities
-core-graphics core-graphics.types core-text.fonts core-text.utilities ;
+core-foundation core-foundation.strings core-foundation.attributed-strings
+core-foundation.utilities core-graphics core-graphics.types
+core-text.fonts core-text.utilities ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
@@ -77,19 +77,13 @@ TUPLE: line font line metrics image disposed ;
 : set-text-position ( context metrics -- )
     [ 0 ] dip descent>> ceiling CGContextSetTextPosition ;
 
-: <line-image> ( dim bitmap -- image )
-    <image>
-        swap >>bitmap
-        swap >>dim
-        BGRA >>component-order
-        native-endianness >>byte-order ;
-
 :: <line> ( font string -- line )
     [
         [let* | open-font [ font cache-font CFRetain |CFRelease ]
                 line [ string open-font font foreground>> <CTLine> |CFRelease ]
                 metrics [ line compute-line-metrics ]
                 dim [ metrics bounds>dim ] |
+            open-font line metrics
             dim [
                 {
                     [ font dim fill-background ]
@@ -97,8 +91,7 @@ TUPLE: line font line metrics image disposed ;
                     [ metrics set-text-position ]
                     [ [ line ] dip CTLineDraw ]
                 } cleave
-            ] with-bitmap-context
-            [ open-font line metrics dim ] dip <line-image>
+            ] make-bitmap-image
         ]
         f line boa
     ] with-destructors ;
