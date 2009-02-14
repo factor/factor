@@ -43,9 +43,6 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
     [ random-bytes >byte-array byte-array>bignum ]
     [ 3 shift 2^ ] bi / * >integer ;
 
-: >randomize-range ( seq -- range/iota )
-    length dup 2 < [ drop 0 iota ] [ 1+ 2 (a,b] ] if ;
-
 PRIVATE>
 
 : random-bits ( n -- r ) 2^ random-integer ;
@@ -55,9 +52,10 @@ PRIVATE>
         [ length random-integer ] keep nth
     ] if-empty ;
 
-: randomize ( seq -- seq' )
-    [ ] [ >randomize-range ] [ ] tri
-    '[ [ random ] [ 1- ] bi _ exchange ] each ;
+: randomize ( seq -- seq )
+    dup length [ dup 1 > ]
+    [ [ random ] [ 1- ] bi [ pick exchange ] keep ]
+    [ ] while drop ;
 
 : delete-random ( seq -- elt )
     [ length random-integer ] keep [ nth ] 2keep delete-nth ;
