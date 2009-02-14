@@ -127,3 +127,41 @@ hi "HELLO" {
         hi drop-table
     ] with-db
 ] unit-test
+
+TUPLE: show id ;
+TUPLE: user username data ;
+TUPLE: watch show user ;
+
+user "USER" {
+    { "username" "USERNAME" TEXT +not-null+ +user-assigned-id+ }
+    { "data" "DATA" TEXT }
+} define-persistent
+
+show "SHOW" {
+    { "id" "ID" +db-assigned-id+ }
+} define-persistent
+
+watch "WATCH" {
+    { "user" "USER" TEXT +not-null+
+        { +foreign-id+ user "USERNAME" } +user-assigned-id+ }
+    { "show" "SHOW" BIG-INTEGER +not-null+
+        { +foreign-id+ show "ID" } +user-assigned-id+ }
+} define-persistent
+
+[ T{ user { username "littledan" } { data "foo" } } ] [
+    test.db [
+        user create-table
+        show create-table
+        watch create-table
+        "littledan" "foo" user boa insert-tuple
+        "mark" "bar" user boa insert-tuple
+        show new insert-tuple
+        show new select-tuple
+        "littledan" f user boa select-tuple
+        watch boa insert-tuple
+        watch new select-tuple
+        user>> f user boa select-tuple
+    ] with-db
+] unit-test
+
+[ \ swap ensure-table ] must-fail

@@ -105,7 +105,6 @@ ERROR: unknown-component-order bitmap ;
     {
         [ [ width>> ] [ height>> ] bi 2array ]
         [ bitmap>component-order ]
-        [ drop little-endian ] ! XXX
         [ buffer>> ]
     } cleave bitmap-image boa ;
 
