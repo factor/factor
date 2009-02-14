@@ -38,7 +38,7 @@ $nl
 "If all you want to do is serve files from a directory, the following phrase does the trick:"
 { $code
     "USING: namespaces http.server http.server.static ;"
-    "/var/www/mysite.com/ <static> main-responder set"
+    "\"/var/www/mysite.com/\" <static> main-responder set"
     "8080 httpd"
 }
 { $subsection "http.server.static.extend" } ;
