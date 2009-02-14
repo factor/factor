@@ -41,6 +41,9 @@ M: core-text-renderer offset>x ( n font string -- x )
     cached-line line>> swap f
     CTLineGetOffsetForStringIndex ;
 
+M: core-text-renderer font-metrics ( font -- metrics )
+    cache-font-metrics ;
+
 M: core-text-renderer line-metrics ( font string -- metrics )
     [ " " line-metrics clone 0 >>width ]
     [ cached-line metrics>> ]

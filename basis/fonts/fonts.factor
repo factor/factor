@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel colors colors.constants accessors combinators ;
+USING: kernel colors colors.constants accessors combinators math ;
 IN: fonts
 
 TUPLE: font
@@ -55,7 +55,13 @@ italic?
         "monospace" >>name
         12 >>size ;
 
-TUPLE: metrics width ascent descent leading ;
+: strip-font-colors ( font -- font' )
+    clone f >>background f >>foreground ;
+
+TUPLE: metrics width ascent descent height leading ;
+
+: <metrics> ( width ascent descent leading -- metrics )
+    [ 2dup + ] dip metrics boa ;
 
 TUPLE: selection string start end color ;
 

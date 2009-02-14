@@ -52,6 +52,8 @@ M: array text-dim
 
 : text-height ( font text -- h ) text-dim second ;
 
+HOOK: font-metrics font-renderer ( font -- metrics )
+
 HOOK: line-metrics font-renderer ( font string -- metrics )
 
 GENERIC: draw-text ( font text -- )
