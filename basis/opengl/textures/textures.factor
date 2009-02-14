@@ -54,25 +54,18 @@ TUPLE: texture texture display-list disposed ;
 : make-texture-display-list ( dim texture -- dlist )
     GL_COMPILE [ draw-textured-rect ] make-dlist ;
 
-GENERIC: component-order>format ( component-order -- format )
+GENERIC: component-order>format ( component-order -- format type )
 
-M: RGBA component-order>format drop GL_RGBA ;
-M: BGRA component-order>format drop GL_BGRA_EXT ;
-
-: byte-order>type ( byte-order -- format )
-    native-endianness eq?
-    GL_UNSIGNED_INT_8_8_8_8_REV
-    GL_UNSIGNED_BYTE
-    ? ;
+M: RGBA component-order>format drop GL_RGBA GL_UNSIGNED_BYTE ;
+M: ARGB component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8_REV ;
+M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8 ;
 
 : <texture> ( image -- texture )
     [
-        {
-            [ dim>> ]
-            [ bitmap>> ]
-            [ component-order>> component-order>format ]
-            [ byte-order>> byte-order>type ]
-        } cleave make-texture
+        [ dim>> ]
+        [ bitmap>> ]
+        [ component-order>> component-order>format ]
+        tri make-texture
     ] [ dim>> ] bi
     over make-texture-display-list f texture boa ;
 

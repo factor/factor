@@ -1,8 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.destructors alien.syntax
+USING: alien.c-types alien.destructors alien.syntax accessors
 destructors fry kernel math math.bitwise sequences libc colors
-core-graphics.types core-foundation.utilities ;
+images core-graphics.types core-foundation.utilities ;
 IN: core-graphics
 
 ! CGImageAlphaInfo
@@ -126,10 +126,16 @@ FUNCTION: void* CGBitmapContextGetData ( CGContextRef c ) ;
     [ CGBitmapContextGetData ] [ bitmap-size ] bi*
     memory>byte-array ;
 
+: <bitmap-image> ( bitmap dim -- image )
+    <image>
+        swap >>dim
+        swap >>bitmap
+        little-endian? ARGB BGRA ? >>component-order ;
+
 PRIVATE>
 
-: with-bitmap-context ( dim quot -- data )
+: make-bitmap-image ( dim quot -- image )
     [
         [ [ <CGBitmapContext> &CGContextRelease ] keep ] dip
-        [ nip call ] [ drop bitmap-data ] 3bi
+        [ nip call ] [ drop [ bitmap-data ] keep <bitmap-image> ] 3bi
     ] with-destructors ; inline
