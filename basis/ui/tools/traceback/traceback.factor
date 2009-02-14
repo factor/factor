@@ -3,7 +3,7 @@
 USING: accessors continuations kernel models namespaces arrays
 fry prettyprint ui ui.commands ui.gadgets ui.gadgets.labelled assocs
 ui.gadgets.tracks ui.gadgets.buttons ui.gadgets.panes
-ui.gadgets.status-bar ui.gadgets.scrollers
+ui.gadgets.status-bar ui.gadgets.scrollers ui.gadgets.borders
 ui.gadgets.tables ui.gestures sequences inspector
 models.filter fonts ;
 QUALIFIED-WITH: ui.tools.inspector i
@@ -33,7 +33,8 @@ M: stack-entry-renderer row-value drop object>> ;
 
 : <callstack-display> ( model -- gadget )
     [ [ call>> callstack. ] when* ]
-    t "Call stack" <labelled-pane> ;
+    <pane-control> t >>scrolls? <scroller>
+    "Call stack" <labelled-gadget> ;
 
 : <datastack-display> ( model -- gadget )
     [ data>> ] "Data stack" <stack-display> ;
@@ -46,15 +47,22 @@ TUPLE: traceback-gadget < track ;
 M: traceback-gadget pref-dim* drop { 550 600 } ;
 
 : <traceback-gadget> ( model -- gadget )
-    [ vertical traceback-gadget new-track ] dip
+    [
+        vertical traceback-gadget new-track
+        { 3 3 } >>gap
+    ] dip
     [ >>model ]
     [
-        [ horizontal <track> ] dip
-        [ <datastack-display> 1/2 track-add ]
-        [ <retainstack-display> 1/2 track-add ] bi
-        1/3 track-add
-    ]
-    [ <callstack-display> 2/3 track-add ] tri
+        [ vertical <track> { 3 3 } >>gap ] dip
+        [
+            [ horizontal <track> { 3 3 } >>gap ] dip
+            [ <datastack-display> 1/2 track-add ]
+            [ <retainstack-display> 1/2 track-add ] bi
+            1/3 track-add
+        ]
+        [ <callstack-display> 2/3 track-add ] bi
+        { 3 3 } <filled-border> 1 track-add
+    ] bi
     add-toolbar ;
 
 : variables ( traceback -- )
