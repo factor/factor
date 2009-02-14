@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.syntax assocs core-foundation
 core-foundation.strings core-text.utilities destructors init
-kernel math memoize ;
+kernel math memoize fonts combinators ;
 IN: core-text.fonts
 
 TYPEDEF: void* CTFontRef
@@ -64,6 +64,12 @@ FUNCTION: CTFontRef CTFontCreateCopyWithSymbolicTraits (
    uint32_t symTraitMask
 ) ;
 
+FUNCTION: CGFloat CTFontGetAscent ( CTFontRef font ) ;
+
+FUNCTION: CGFloat CTFontGetDescent ( CTFontRef font ) ;
+
+FUNCTION: CGFloat CTFontGetLeading ( CTFontRef font ) ;
+
 CONSTANT: font-names
     H{
         { "monospace" "Monaco" }
@@ -97,6 +103,20 @@ MEMO: (cache-font) ( font -- open-font )
     ] with-destructors ;
 
 : cache-font ( font -- open-font )
-    clone f >>foreground f >>background (cache-font) ;
+    strip-font-colors (cache-font) ;
 
-[ \ (cache-font) reset-memoized ] "core-text.fonts" add-init-hook
+MEMO: (cache-font-metrics) ( font -- metrics )
+    (cache-font) {
+        [ drop 0 ]
+        [ CTFontGetAscent ]
+        [ CTFontGetDescent ]
+        [ CTFontGetLeading ]
+    } cleave <metrics> ;
+
+: cache-font-metrics ( font -- metrics )
+    strip-font-colors (cache-font-metrics) ;
+
+[
+    \ (cache-font) reset-memoized
+    \ (cache-font-metrics) reset-memoized
+] "core-text.fonts" add-init-hook

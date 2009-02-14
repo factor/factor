@@ -183,7 +183,7 @@ M: editor pref-dim*
     [ font>> ] [ control-value ] bi text-dim ;
 
 M: editor baseline
-    font>> "" line-metrics ascent>> ;
+    font>> font-metrics ascent>> ;
 
 : contents-changed ( model editor -- )
     swap

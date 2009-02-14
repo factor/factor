@@ -8,15 +8,21 @@ IN: ui.gadgets.line-support
 ! Some code shared by table and editor gadgets
 SLOT: font
 
+GENERIC: line-leading ( gadget -- n )
+
+M: gadget line-leading font>> font-metrics leading>> ;
+
 GENERIC: line-height ( gadget -- n )
 
-M: gadget line-height font>> "" text-height ;
+M: gadget line-height font>> font-metrics height>> ;
 
 : y>line ( y gadget -- n )
-    line-height /i ;
+    [ line-leading ] [ line-height ] bi
+    [ [ - ] keep ] dip + /i ;
 
 : line>y ( n gadget -- y )
-    line-height * ;
+    [ line-height ] [ line-leading ] bi
+    [ + * ] keep - ;
 
 : validate-line ( m gadget -- n )
     control-value [ drop f ] [ length 1- min 0 max ] if-empty ;
@@ -43,7 +49,7 @@ GENERIC: draw-line ( line index gadget -- )
         [ first-visible-line ]
         [ last-visible-line ]
         [ control-value ]
-        [ line-height ]
+        [ [ line-leading ] [ line-height ] bi + ]
         [ ]
     } cleave '[
         0 over _ * 2array

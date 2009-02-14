@@ -51,7 +51,7 @@ TUPLE: line font line metrics image disposed ;
 : compute-line-metrics ( line -- line-metrics )
     0 <CGFloat> 0 <CGFloat> 0 <CGFloat>
     [ CTLineGetTypographicBounds ] 3keep [ *CGFloat ] tri@
-    metrics boa ;
+    <metrics> ;
 
 : bounds>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
