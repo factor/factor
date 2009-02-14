@@ -5,7 +5,7 @@ IN: ui.gadgets.buttons
 HELP: button
 { $class-description "A button is a " { $link gadget } " which responds to mouse clicks by invoking a quotation."
 $nl
-"A button's appearance can vary depending on the state of the mouse button if the " { $snippet "interior" } " or " { $snippet "boundary" } " slots are set to instances of " { $link button-paint } "."
+"A button's appearance can vary depending on the state of the mouse button if the " { $snippet "interior" } " or " { $snippet "boundary" } " slots are set to instances of " { $link button-pen } "."
 $nl
 "A button can be selected, which is distinct from being pressed. This state is held in the " { $snippet "selected?" } " slot, and is used by the " { $link <toggle-buttons> } " word to construct a row of buttons for choosing among several alternatives." } ;
 
@@ -19,13 +19,13 @@ HELP: <roll-button>
 
 HELP: <bevel-button>
 { $values { "label" "a label specifier" } { "quot" { $quotation "( button -- )" } } { "button" button } }
-{ $description "Creates a new " { $link button } " with a shaded border which is always visible. The button appearance changes in response to mouse gestures using a " { $link button-paint } "." } ;
+{ $description "Creates a new " { $link button } " with a shaded border which is always visible. The button appearance changes in response to mouse gestures using a " { $link button-pen } "." } ;
 
 HELP: <repeat-button>
 { $values { "label" object } { "quot" { $quotation "( button -- )" } } { "button" repeat-button } }
 { $description "Creates a new " { $link button } " derived from a " { $link <bevel-button> } " which calls the quotation every 100 milliseconds as long as the mouse button is held down." } ;
 
-HELP: button-paint
+HELP: button-pen
 { $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " gneeric words by delegating to an object in one of four slots which depend on the state of the button being drawn:"
     { $list
         { { $snippet "plain"    } " - the button is inactive" }
@@ -33,7 +33,7 @@ HELP: button-paint
         { { $snippet "pressed"  } " - the button is under the mouse and a mouse button is held down" }
         { { $snippet "selected" } " - the button is selected (see " { $link <toggle-buttons> }  }
     }
-"The " { $link <roll-button> } " and " { $link <bevel-button> } " words create " { $link button } " instances with specific " { $link button-paint } "." } ;
+"The " { $link <roll-button> } " and " { $link <bevel-button> } " words create " { $link button } " instances with specific " { $link button-pen } "." } ;
 
 HELP: <toggle-button>
 { $values { "model" model } { "value" object } { "label" "a label specifier" } { "gadget" gadget } }
@@ -68,7 +68,7 @@ ARTICLE: "ui.gadgets.buttons" "Button gadgets"
 "A radio box is a row of buttons for choosing amongst several distinct possibilities:"
 { $subsection <toggle-buttons> }
 "Button appearance can be customized:"
-{ $subsection button-paint }
+{ $subsection button-pen }
 "Button constructors take " { $emphasis "label specifiers" } " as input. A label specifier is either a string, an array of strings, a gadget or " { $link f } "."
 { $see-also <command-button> "ui-commands" } ;
 
