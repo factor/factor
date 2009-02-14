@@ -1,5 +1,5 @@
 USING: random sequences tools.test kernel math math.functions
-sets grouping ;
+sets grouping random.private ;
 IN: random.tests
 
 [ 4 ] [ 4 random-bytes length ] unit-test
@@ -20,3 +20,6 @@ IN: random.tests
 
 [ f ]
 [ 100 [ { 0 1 } random ] replicate all-equal? ] unit-test
+
+[ t ]
+[ { 1 2 } [ length ] [ >randomize-range length ] bi - 1 = ] unit-test
