@@ -102,3 +102,7 @@ PRIVATE>
 
 : signed-be> ( bytes -- x )
     <reversed> signed-le> ;
+
+: >signed ( x n -- y )
+    2dup neg 1+ shift 1 = [ 2^ - ] [ drop ] if ;
+
