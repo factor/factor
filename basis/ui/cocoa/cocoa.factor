@@ -141,9 +141,9 @@ CLASS: {
 
 SYMBOL: cocoa-init-hook
 
-cocoa-init-hook global [
-    [ "MiniFactor.nib" load-nib install-app-delegate ] or
-] change-at
+cocoa-init-hook [
+    [ "MiniFactor.nib" load-nib install-app-delegate ]
+] initialize
 
 M: cocoa-ui-backend ui
     "UI" assert.app [

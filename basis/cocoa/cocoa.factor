@@ -29,7 +29,7 @@ SYMBOL: super-sent-messages
 
 SYMBOL: frameworks
 
-frameworks global [ V{ } clone or ] change-at
+frameworks [ V{ } clone ] initialize
 
 [ frameworks get [ load-framework ] each ] "cocoa.messages" add-init-hook
 

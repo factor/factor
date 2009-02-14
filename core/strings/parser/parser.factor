@@ -22,9 +22,9 @@ ERROR: bad-escape ;
 
 SYMBOL: name>char-hook
 
-name>char-hook global [
-    [ "Unicode support not available" throw ] or
-] change-at
+name>char-hook [
+    [ "Unicode support not available" throw ]
+] initialize
 
 : unicode-escape ( str -- ch str' )
     "{" ?head-slice [

@@ -24,4 +24,4 @@ IN: compiler.utilities
 
 SYMBOL: yield-hook
 
-yield-hook global [ [ ] or ] change-at
+yield-hook [ [ ] ] initialize
