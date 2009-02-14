@@ -294,8 +294,6 @@ M: object accept-completion-hook 2drop ;
 :: <debugger-popup> ( interactor error continuation -- popup )
     error continuation error compute-restarts
     [ interactor hide-popup ] <debugger>
-    COLOR: white <solid> >>interior
-    COLOR: black <solid> >>boundary
     "Error" <labelled-gadget> ;
 
 : debugger-popup ( interactor error continuation -- )

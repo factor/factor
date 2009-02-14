@@ -1,13 +1,14 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables io kernel math models
-namespaces sequences sequences words continuations debugger
-prettyprint help editors fonts ui ui.commands ui.gestures ui.gadgets
-ui.gadgets.worlds ui.gadgets.packs ui.gadgets.buttons
-ui.gadgets.labels ui.gadgets.panes ui.gadgets.presentations
-ui.gadgets.viewports ui.gadgets.tables ui.gadgets.tracks
-ui.gadgets.scrollers ui.gadgets.panes ui.gadgets.borders
-ui.gadgets.status-bar ui.tools.traceback ui.tools.inspector ;
+colors.constants namespaces sequences sequences words continuations
+debugger prettyprint help editors fonts ui ui.commands ui.gestures
+ui.gadgets ui.pens.solid ui.gadgets.worlds ui.gadgets.packs
+ui.gadgets.buttons ui.gadgets.labels ui.gadgets.panes
+ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.tables
+ui.gadgets.tracks ui.gadgets.scrollers ui.gadgets.panes
+ui.gadgets.borders ui.gadgets.status-bar ui.tools.traceback
+ui.tools.inspector ;
 IN: ui.tools.debugger
 
 TUPLE: debugger < track error restarts restart-hook restart-list continuation ;
@@ -51,7 +52,8 @@ PRIVATE>
         swap >>error
         add-toolbar
         dup <restart-list> >>restart-list
-        dup <error-display> f track-add ;
+        dup <error-display> f track-add
+        COLOR: white <solid> >>interior ;
 
 M: debugger focusable-child*
     dup restart-hook>> [ restart-list>> ] [ drop t ] if ;

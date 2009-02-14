@@ -45,10 +45,10 @@ M: history-completion completion-element drop one-line-elt ;
 
 GENERIC: completion-banner ( completion-mode -- string )
 
-M: word-completion completion-banner drop "Words:" ;
-M: vocab-completion completion-banner drop "Vocabularies:" ;
-M: char-completion completion-banner drop "Unicode code point names:" ;
-M: history-completion completion-banner drop "Input history:" ;
+M: word-completion completion-banner drop "Words" ;
+M: vocab-completion completion-banner drop "Vocabularies" ;
+M: char-completion completion-banner drop "Unicode code point names" ;
+M: history-completion completion-banner drop "Input history" ;
 
 GENERIC: completion-popup-width ( interactor completion-mode -- x )
 
@@ -152,14 +152,14 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
 : <completion-scroller> ( completion-popup -- scroller )
     [ table>> ] [ interactor>> ] [ completion-mode>> ] tri completion-popup-width
     [ <limited-scroller> ] [ 120 2array ] bi*
-    [ >>min-dim ] [ >>max-dim ] bi ;
+    [ >>min-dim ] [ >>max-dim ] bi
+    COLOR: white <solid> >>interior ;
 
 : <completion-popup> ( interactor completion-mode -- popup )
     [ vertical completion-popup new-track ] 2dip
     [ [ >>interactor ] [ >>completion-mode ] bi* ] [ <completion-table> >>table ] 2bi
     dup [ <completion-scroller> ] [ completion-mode>> completion-banner ] bi
-    <labelled-gadget> 1 track-add
-    COLOR: white <solid> >>interior ;
+    <labelled-gadget> 1 track-add ;
 
 completion-popup H{
     { T{ key-down f f "TAB" } [ table>> row-action ] }
