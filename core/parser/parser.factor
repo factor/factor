@@ -26,7 +26,7 @@ t parser-notes set-global
     parser-notes? [
         file get [ path>> write ":" write ] when* 
         lexer get [ line>> number>string write ": " write ] when*
-        "Note: " write dup print
+        "Note:" print dup print
     ] when drop ;
 
 M: parsing-word stack-effect drop (( parsed -- parsed )) ;
