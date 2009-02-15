@@ -18,8 +18,8 @@ IN: random.tests
 
 [ f ] [ 0 random ] unit-test
 
+[ { } ] [ { } randomize ] unit-test
+[ { 1 } ] [ { 1 } randomize ] unit-test
+
 [ f ]
 [ 100 [ { 0 1 } random ] replicate all-equal? ] unit-test
-
-[ t ]
-[ { 1 2 } [ length ] [ >randomize-range length ] bi - 1 = ] unit-test
