@@ -12,47 +12,25 @@ IN: regexp.utils
 : while-changes ( obj quot pred -- obj' )
     pick over call (while-changes) ; inline
 
-: assoc-with ( param assoc quot -- assoc curry )
-    swapd [ [ -rot ] dip call ] 2curry ; inline
-
-: insert-at ( value key hash -- )
-    2dup at* [
-        2nip push
-    ] [
-        drop
-        [ dup vector? [ 1vector ] unless ] 2dip set-at
-    ] if ;
-
-: ?insert-at ( value key hash/f -- hash )
-    [ H{ } clone ] unless* [ insert-at ] keep ;
-
 ERROR: bad-octal number ;
 ERROR: bad-hex number ;
 : check-octal ( octal -- octal ) dup 255 > [ bad-octal ] when ;
 : check-hex ( hex -- hex ) dup number? [ bad-hex ] unless ;
 
-: ascii? ( n -- ? ) 0 HEX: 7f between? ;
-: octal-digit? ( n -- ? ) CHAR: 0 CHAR: 7 between? ;
 : decimal-digit? ( n -- ? ) CHAR: 0 CHAR: 9 between? ;
 
 : hex-digit? ( n -- ? )
-    [
+    {
         [ decimal-digit? ]
         [ CHAR: a CHAR: f between? ]
         [ CHAR: A CHAR: F between? ]
-    ] 1|| ;
-
-: control-char? ( n -- ? )
-    [
-        [ 0 HEX: 1f between? ]
-        [ HEX: 7f = ]
-    ] 1|| ;
+    } 1|| ;
 
 : punct? ( n -- ? )
     "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" member? ;
 
 : c-identifier-char? ( ch -- ? )
-    [ [ alpha? ] [ CHAR: _ = ] ] 1|| ;
+    { [ alpha? ] [ CHAR: _ = ] } 1|| ;
 
 : java-blank? ( n -- ? )
     {
