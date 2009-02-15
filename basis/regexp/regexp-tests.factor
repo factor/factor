@@ -44,9 +44,9 @@ IN: regexp-tests
 ! Dotall mode -- when on, . matches newlines.
 ! Off by default.
 [ f ] [ "\n" "." <regexp> matches? ] unit-test
-[ t ] [ "\n" "(?s)." <regexp> matches? ] unit-test
+! [ t ] [ "\n" "(?s)." <regexp> matches? ] unit-test
 [ t ] [ "\n" R/ ./s matches? ] unit-test
-[ f ] [ "\n\n" "(?s).(?-s)." <regexp> matches? ] unit-test
+! [ f ] [ "\n\n" "(?s).(?-s)." <regexp> matches? ] unit-test
 
 [ f ] [ "" ".+" <regexp> matches? ] unit-test
 [ t ] [ "a" ".+" <regexp> matches? ] unit-test
@@ -76,8 +76,6 @@ IN: regexp-tests
 [ t ] [ "bar" "foo|bar" <regexp> matches? ] unit-test
 [ f ] [ "foobar" "foo|bar" <regexp> matches? ] unit-test
 
-/*
-! FIXME
 [ f ] [ "" "(a)" <regexp> matches? ] unit-test
 [ t ] [ "a" "(a)" <regexp> matches? ] unit-test
 [ f ] [ "aa" "(a)" <regexp> matches? ] unit-test
@@ -85,7 +83,6 @@ IN: regexp-tests
 
 [ f ] [ "aababaaabbac" "(a|b)+" <regexp> matches? ] unit-test
 [ t ] [ "ababaaabba" "(a|b)+" <regexp> matches? ] unit-test
-*/
 
 [ f ] [ "" "a{1}" <regexp> matches? ] unit-test
 [ t ] [ "a" "a{1}" <regexp> matches? ] unit-test
@@ -168,12 +165,9 @@ IN: regexp-tests
 [ f ] [ "0" "[^\\d]" <regexp> matches? ] unit-test
 [ t ] [ "a" "[^\\d]" <regexp> matches? ] unit-test
 
-/*
-! FIXME
 [ t ] [ "a" "[a-z]{1,}|[A-Z]{2,4}|b*|c|(f|g)*" <regexp> matches? ] unit-test
 [ t ] [ "a" "[a-z]{1,2}|[A-Z]{3,3}|b*|c|(f|g)*" <regexp> matches? ] unit-test
 [ t ] [ "a" "[a-z]{1,2}|[A-Z]{3,3}" <regexp> matches? ] unit-test
-*/
 
 [ t ] [ "1000" "\\d{4,6}" <regexp> matches? ] unit-test
 [ t ] [ "1000" "[0-9]{4,6}" <regexp> matches? ] unit-test
@@ -226,6 +220,7 @@ IN: regexp-tests
 [ t ] [ "c" R/ [A-Z]/i matches? ] unit-test
 [ f ] [ "3" R/ [A-Z]/i matches? ] unit-test
 
+/*
 [ t ] [ "a" "(?i)a" <regexp> matches? ] unit-test
 [ t ] [ "a" "(?i)a" <regexp> matches? ] unit-test
 [ t ] [ "A" "(?i)a" <regexp> matches? ] unit-test
@@ -235,6 +230,7 @@ IN: regexp-tests
 [ t ] [ "a" R/ (?-i)a/i matches? ] unit-test
 [ f ] [ "A" R/ (?-i)a/i matches? ] unit-test
 [ f ] [ "A" R/ (?-i)a/i matches? ] unit-test
+*/
 
 [ f ] [ "A" "[a-z]" <regexp> matches? ] unit-test
 [ t ] [ "A" R/ [a-z]/i matches? ] unit-test
@@ -253,8 +249,6 @@ IN: regexp-tests
 [ t ] [ "abc*" "[^\\*]*\\*" <regexp> matches? ] unit-test
 [ t ] [ "bca" "[^a]*a" <regexp> matches? ] unit-test
 
-/*
-! FIXME
 [ ] [
     "(0[lL]?|[1-9]\\d{0,9}(\\d{0,9}[lL])?|0[xX]\\p{XDigit}{1,8}(\\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\\.[0-9]*|\\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))"
     <regexp> drop
@@ -278,7 +272,6 @@ IN: regexp-tests
 [ "abc" ] [ "abc" "(ab|a)(bc)?" <regexp> first-match >string ] unit-test
 
 [ "b" ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match >string ] unit-test
-*/
 
 ! [ t ] [ "a:b" ".+:?" <regexp> matches? ] unit-test
 
@@ -309,7 +302,6 @@ IN: regexp-tests
 [ "-- title --" ] [ "== title ==" R/ =/ "-" re-replace ] unit-test
 
 /*
-! FIXME
 [ f ] [ "ab" "a(?!b)" <regexp> first-match ] unit-test
 [ "a" ] [ "ac" "a(?!b)" <regexp> first-match >string ] unit-test
 [ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test

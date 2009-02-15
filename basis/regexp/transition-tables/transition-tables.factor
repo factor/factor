@@ -41,8 +41,8 @@ TUPLE: transition-table transitions start-state final-states ;
     #! set the state as a key
     2dup [ to>> ] dip maybe-initialize-key
     [ [ to>> ] [ obj>> ] [ from>> ] tri ] dip
-    2dup at* [ 2nip insert-at ]
-    [ drop [ H{ } clone [ insert-at ] keep ] 2dip set-at ] if ;
+    2dup at* [ 2nip push-at ]
+    [ drop [ H{ } clone [ push-at ] keep ] 2dip set-at ] if ;
 
 : add-transition ( transition transition-table -- )
     transitions>> set-transition ;
