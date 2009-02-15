@@ -58,10 +58,10 @@ italic?
 : strip-font-colors ( font -- font' )
     clone f >>background f >>foreground ;
 
-TUPLE: metrics width ascent descent height leading ;
+TUPLE: metrics width ascent descent height leading cap-height x-height ;
 
-: <metrics> ( width ascent descent leading -- metrics )
-    [ 2dup + ] dip metrics boa ;
+: compute-height ( metrics -- )
+    dup [ ascent>> ] [ descent>> ] bi + >>height drop ;
 
 TUPLE: selection string start end color ;
 

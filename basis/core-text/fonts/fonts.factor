@@ -70,6 +70,10 @@ FUNCTION: CGFloat CTFontGetDescent ( CTFontRef font ) ;
 
 FUNCTION: CGFloat CTFontGetLeading ( CTFontRef font ) ;
 
+FUNCTION: CGFloat CTFontGetCapHeight ( CTFontRef font ) ;
+
+FUNCTION: CGFloat CTFontGetXHeight ( CTFontRef font ) ;
+
 CONSTANT: font-names
     H{
         { "monospace" "Monaco" }
@@ -106,12 +110,15 @@ MEMO: (cache-font) ( font -- open-font )
     strip-font-colors (cache-font) ;
 
 MEMO: (cache-font-metrics) ( font -- metrics )
+    [ metrics new ] dip
     (cache-font) {
-        [ drop 0 ]
-        [ CTFontGetAscent ]
-        [ CTFontGetDescent ]
-        [ CTFontGetLeading ]
-    } cleave <metrics> ;
+        [ CTFontGetAscent >>ascent ]
+        [ CTFontGetDescent >>descent ]
+        [ CTFontGetLeading >>leading ]
+        [ CTFontGetCapHeight >>cap-height ]
+        [ CTFontGetXHeight >>x-height ]
+    } cleave
+    dup compute-height ;
 
 : cache-font-metrics ( font -- metrics )
     strip-font-colors (cache-font-metrics) ;
