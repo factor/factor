@@ -9,6 +9,17 @@ TUPLE: labeled-gadget < frame content ;
 
 <PRIVATE
 
+CONSTANT: @center { 1 1 }
+CONSTANT: @left { 0 1 }
+CONSTANT: @right { 2 1 }
+CONSTANT: @top { 1 0 }
+CONSTANT: @bottom { 1 2 }
+
+CONSTANT: @top-left { 0 0 }
+CONSTANT: @top-right { 2 0 }
+CONSTANT: @bottom-left { 0 2 }
+CONSTANT: @bottom-right { 2 2 }
+
 : labeled-image ( name -- image )
     "labeled-block-" prepend theme-image ;
 
@@ -50,7 +61,8 @@ M: labeled-gadget focusable-child* content>> ;
 PRIVATE>
 
 : <labeled-gadget> ( gadget title -- newgadget )
-    labeled-gadget new-frame
+    3 3 labeled-gadget new-frame
+        { 1 1 } >>filled-cell
         /-FOO-\
         |-----|
         \-----/ ;
