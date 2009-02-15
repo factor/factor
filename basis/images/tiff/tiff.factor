@@ -359,6 +359,8 @@ ERROR: unknown-component-order ifd ;
                 ] each
             ] change-bitmap
         ] }
+        { extra-samples-unspecified-alpha-data [
+        ] }
         [ bad-extra-samples ]
     } case ;
 
@@ -383,7 +385,7 @@ ERROR: unknown-component-order ifd ;
                 strips>bitmap
                 fix-bitmap-endianness
                 strips-predictor
-                handle-alpha-data
+                dup extra-samples tag? [ handle-alpha-data ] when
                 drop
             ] each
         ] with-endianness
