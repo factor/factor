@@ -3,7 +3,7 @@
 USING: colors.constants kernel locals math.rectangles
 namespaces sequences ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.glass ui.gadgets.packs
-ui.gadgets.theme ui.gadgets.worlds ui.gestures ui.operations ;
+ui.gadgets.worlds ui.gestures ui.operations ;
 IN: ui.gadgets.menus
 
 : show-menu ( owner menu -- )
@@ -17,8 +17,7 @@ IN: ui.gadgets.menus
     ] <roll-button> ;
 
 : menu-theme ( gadget -- gadget )
-    COLOR: light-gray solid-interior
-    faint-boundary ;
+    COLOR: light-gray <solid> >>interior ;
 
 : <commands-menu> ( target hook commands -- menu )
     [ <filled-pile> ] 3dip

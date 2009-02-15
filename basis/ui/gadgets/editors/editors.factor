@@ -6,7 +6,7 @@ opengl.gl sequences strings math.vectors math.functions sorting colors
 colors.constants combinators assocs math.order fry calendar alarms
 continuations ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
-ui.gadgets.theme ui.gadgets.menus ui.gadgets.wrappers ui.render
+ui.gadgets.menus ui.gadgets.wrappers ui.render
 ui.pens.solid ui.gadgets.line-support ui.text ui.gestures
 math.rectangles splitting unicode.categories fonts grouping ;
 IN: ui.gadgets.editors

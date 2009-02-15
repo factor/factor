@@ -18,7 +18,7 @@ M: baseline-gadget baseline baseline>> ;
 : <bad-button> ( -- button )
     "Click me if you dare"
     [ "Haha" throw ]
-    <bevel-button> ;
+    <border-button> ;
 
 TUPLE: bad-gadget < gadget ;
 

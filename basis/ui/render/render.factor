@@ -87,3 +87,7 @@ DEFER: draw-gadget
         { [ dup clipped?>> not ] [ (draw-gadget) ] }
         [ [ (draw-gadget) ] with-clipping ]
     } cond ;
+
+CONSTANT: selection-color T{ rgba f 0.8 0.8 1.0 1.0 }
+
+CONSTANT: focus-border-color COLOR: dark-gray

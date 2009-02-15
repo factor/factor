@@ -6,7 +6,7 @@ sorting splitting assocs classes.tuple models continuations
 destructors accessors math.rectangles fry fonts ui.images ui.gadgets
 ui.gadgets.private ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.paragraphs
-ui.gadgets.incremental ui.gadgets.packs ui.gadgets.theme
+ui.gadgets.incremental ui.gadgets.packs
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
 ui.gadgets.icons ui.gadgets.grid-lines colors call ;
@@ -231,10 +231,10 @@ MEMO: specified-font ( assoc -- font )
     ] apply-style ;
 
 : apply-border-color-style ( style gadget -- style gadget )
-    border-color [ solid-boundary ] apply-style ;
+    border-color [ <solid> >>boundary ] apply-style ;
 
 : apply-page-color-style ( style gadget -- style gadget )
-    page-color [ solid-interior ] apply-style ;
+    page-color [ <solid> >>interior ] apply-style ;
 
 : apply-border-width-style ( style gadget -- style gadget )
     border-width [ dup 2array <border> ] apply-style ;

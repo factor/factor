@@ -3,7 +3,7 @@
 USING: accessors arrays colors colors.constants fry kernel math
 math.rectangles math.order math.vectors namespaces opengl sequences
 ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.worlds ui.gadgets.theme ui.gestures ui.render ui.text
+ui.gadgets.worlds ui.gestures ui.render ui.text
 ui.images ui.gadgets.menus ui.gadgets.line-support math.rectangles
 models math.ranges sequences combinators fonts locals strings ;
 IN: ui.gadgets.tables

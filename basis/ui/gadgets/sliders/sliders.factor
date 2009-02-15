@@ -4,7 +4,7 @@ USING: accessors arrays assocs kernel math namespaces sequences
 vectors models models.range math.vectors math.functions quotations
 colors colors.constants math.rectangles fry combinators ui.gestures
 ui.pens ui.gadgets ui.gadgets.buttons ui.gadgets.tracks math.order
-ui.gadgets.theme ui.gadgets.icons ui.pens.tile ui.pens.image ;
+ui.gadgets.icons ui.pens.tile ui.pens.image ;
 IN: ui.gadgets.sliders
 
 TUPLE: slider < track elevator thumb saved line ;

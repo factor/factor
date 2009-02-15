@@ -3,7 +3,7 @@
 USING: accessors arrays kernel math models namespaces sequences
 strings quotations assocs combinators classes colors colors.constants
 classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.labels ui.gadgets.theme
+ui.gadgets.borders ui.gadgets.labels
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
 ui.pens ui.pens.solid ui.pens.image math.rectangles locals
 fry combinators.smart ;
@@ -90,7 +90,7 @@ M: button-pen pen-pref-dim
 : <roll-button> ( label quot -- button )
     <button> roll-button-theme ;
 
-: <bevel-button-paint> ( -- paint )
+: <border-button-pen> ( -- paint )
     plain-gradient
     rollover-gradient
     pressed-gradient
@@ -98,13 +98,13 @@ M: button-pen pen-pref-dim
     selected-gradient
     <button-pen> ;
 
-: bevel-button-theme ( gadget -- gadget )
-    <bevel-button-paint> >>interior
+: border-button-theme ( gadget -- gadget )
+    <border-button-pen> >>interior
     { 5 5 } >>size
     faint-boundary ; inline
 
-: <bevel-button> ( label quot -- button )
-    <button> bevel-button-theme ;
+: <border-button> ( label quot -- button )
+    <button> border-button-theme ;
 
 TUPLE: repeat-button < button ;
 
@@ -117,7 +117,7 @@ repeat-button H{
 : <repeat-button> ( label quot -- button )
     #! Button that calls the quotation every 100ms as long as
     #! the mouse is held down.
-    repeat-button new-button bevel-button-theme ;
+    repeat-button new-button border-button-theme ;
 
 : <checkmark-paint> ( -- pen )
     "checkbox" theme-image <image-pen>
@@ -184,7 +184,7 @@ M: radio-control model-changed
         { 5 5 } >>gap ;
 
 : <toggle-button> ( value model label -- gadget )
-    <radio-control> bevel-button-theme ;
+    <radio-control> border-button-theme ;
 
 : <toggle-buttons> ( model assoc -- gadget )
     <shelf>
@@ -194,7 +194,7 @@ M: radio-control model-changed
     '[ _ _ invoke-command drop ] ;
 
 : <command-button> ( target gesture command -- button )
-    [ command-string swap ] keep command-button-quot <bevel-button> ;
+    [ command-string swap ] keep command-button-quot <border-button> ;
 
 : <toolbar> ( target -- toolbar )
     <shelf>

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences fry math
-opengl ui.pens ui.images ;
+opengl ui.pens ui.images io.pathnames ;
 IN: ui.pens.image
 
 ! Image pen
@@ -17,3 +17,6 @@ M: image-pen draw-interior
     ] if ;
 
 M: image-pen pen-pref-dim nip image>> image-dim ;
+
+: theme-image ( name -- image-name )
+    "resource:basis/ui/gadgets/theme/" prepend-path ".tiff" append <image-name> ;

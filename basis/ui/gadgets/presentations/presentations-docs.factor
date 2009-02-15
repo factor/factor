@@ -33,7 +33,7 @@ HELP: <presentation>
 { $description "Creates a new " { $link presentation } " derived from " { $link <roll-button> } "." }
 { $see-also "presentations" } ;
 
-{ <button> <bevel-button> <command-button> <roll-button> <presentation> } related-words
+{ <button> <border-button> <command-button> <roll-button> <presentation> } related-words
 
 { <status-bar> show-mouse-help show-status show-summary hide-status } related-words
 

@@ -88,7 +88,7 @@ dup layout
 [ f ] [ "s" get @right grid-child find-scroller* ] unit-test
 
 [ ] [
-    "Click Me" [ [ scroll>gadget ] [ unparent ] bi ] <bevel-button>
+    "Click Me" [ [ scroll>gadget ] [ unparent ] bi ] <border-button>
     [ <pile> swap add-gadget <scroller> ] keep
     dup quot>> call
     layout
@@ -96,7 +96,7 @@ dup layout
 
 [ t ] [
     <gadget> { 200 200 } >>dim
-    [ [ scroll>gadget ] [ unparent ] bi ] <bevel-button>
+    [ [ scroll>gadget ] [ unparent ] bi ] <border-button>
     dup
     <pile> swap add-gadget <scroller> { 100 100 } >>dim dup layout
     swap dup quot>> call
