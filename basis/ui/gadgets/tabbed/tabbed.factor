@@ -11,8 +11,7 @@ TUPLE: tabbed-gadget < track tabs book ;
 <PRIVATE
 
 : <lip> ( -- gadget )
-    "active-tab-lip" theme-image <icon>
-    dup interior>> t >>fill? drop ;
+    "active-tab-lip" theme-image <icon> ;
 
 CONSTANT: active-tab-background
     T{ rgba
