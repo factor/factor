@@ -2,21 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays generic kernel math namespaces sequences
 words splitting grouping math.vectors ui.gadgets.grids
-ui.gadgets.grids.private ui.gadgets math.order math.rectangles ;
+ui.gadgets.grids.private ui.gadgets math.order math.rectangles
+fry ;
 IN: ui.gadgets.frames
 
-CONSTANT: @center { 1 1 }
-CONSTANT: @left { 0 1 }
-CONSTANT: @right { 2 1 }
-CONSTANT: @top { 1 0 }
-CONSTANT: @bottom { 1 2 }
-
-CONSTANT: @top-left { 0 0 }
-CONSTANT: @top-right { 2 0 }
-CONSTANT: @bottom-left { 0 2 }
-CONSTANT: @bottom-right { 2 2 }
-
-TUPLE: frame < grid ;
+TUPLE: frame < grid filled-cell ;
 
 <PRIVATE
 
@@ -26,24 +16,34 @@ M: glue pref-dim* drop { 0 0 } ;
 
 : <glue> ( -- glue ) glue new-gadget ;
 
-: <frame-grid> ( -- grid ) 9 [ <glue> ] replicate 3 group ;
+: <frame-grid> ( cols rows -- grid )
+    swap '[ _ [ <glue> ] replicate ] replicate ;
 
-: (fill-center) ( n seq -- )
-    [ [ first ] [ third ] bi + [-] ] keep set-second ;
+: (fill- ( frame grid-layout quot1 quot2 -- pref-dim gap filled-cell dims )
+    [ '[ [ dim>> ] [ gap>> ] [ filled-cell>> ] tri _ tri@ ] dip ] dip call ; inline
 
-: fill-center ( dim grid-layout -- )
-    [ [ first ] [ column-widths>> ] bi* ]
-    [ [ second ] [ row-heights>> ] bi* ] 2bi
-    [ (fill-center) ] 2bi@ ;
+: available-space ( pref-dim gap dims -- avail )
+    length 1+ * [-] ; inline
+
+: -center) ( pref-dim gap filled-cell dims -- )
+    [ nip available-space ] 2keep [ remove-nth sum [-] ] 2keep set-nth ; inline
+
+: (fill-center) ( frame grid-layout quot1 quot2 -- ) (fill- -center) ; inline
+
+: fill-center ( frame grid-layout -- )
+    [ [ first ] [ column-widths>> ] (fill-center) ]
+    [ [ second ] [ row-heights>> ] (fill-center) ] 2bi ;
+
+: <frame-layout> ( frame -- grid-layout )
+    dup <grid-layout> [ fill-center ] keep ;
 
 PRIVATE>
 
 M: frame layout*
-    [ grid>> ] [ dim>> ] [ <grid-layout> ] tri
-    [ fill-center ] keep grid-layout ;
+    [ grid>> ] [ <frame-layout> ] bi grid-layout ;
 
-: new-frame ( class -- frame )
-    <frame-grid> swap new-grid ; inline
+: new-frame ( cols rows class -- frame )
+    [ <frame-grid> ] dip new-grid ; inline
 
-: <frame> ( -- frame )
+: <frame> ( cols rows -- frame )
     frame new-frame ;
