@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables io kernel namespaces sequences io.styles
+USING: arrays hashtables io kernel namespaces sequences
 strings quotations math opengl combinators memoize math.vectors
 sorting splitting assocs classes.tuple models continuations
 destructors accessors math.rectangles fry fonts ui.pens.solid
@@ -9,7 +9,7 @@ ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
 ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
-ui.gadgets.icons ui.gadgets.grid-lines colors call ;
+ui.gadgets.icons ui.gadgets.grid-lines colors call io.styles ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < pack
@@ -266,9 +266,7 @@ M: pane-block-stream dispose
     unnest-pane-stream write-gadget ;
 
 M: pane-stream make-block-stream
-    [ pane-block-stream new-nested-pane-stream ]
-    [ drop page-color swap at* [ background associate ] when ]
-    2bi [ <style-stream> ] when* ;
+    pane-block-stream new-nested-pane-stream ;
 
 ! Tables
 : apply-table-gap-style ( style grid -- style grid )

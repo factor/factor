@@ -3,7 +3,6 @@
 USING: kernel accessors opengl ui.pens ui.pens.caching ;
 IN: ui.pens.solid
 
-! Solid fill/border
 TUPLE: solid < caching-pen color interior-vertices boundary-vertices ;
 
 : <solid> ( color -- solid ) solid new swap >>color ;
@@ -16,7 +15,6 @@ M: solid recompute-pen
 
 <PRIVATE
 
-! Solid pen
 : (solid) ( gadget pen -- )
     [ compute-pen ] [ color>> gl-color ] bi ;
 
@@ -29,3 +27,6 @@ M: solid draw-interior
 M: solid draw-boundary
     [ (solid) ] [ boundary-vertices>> gl-vertex-pointer ] bi
     (gl-rect) ;
+
+M: solid pen-background
+    nip color>> ;

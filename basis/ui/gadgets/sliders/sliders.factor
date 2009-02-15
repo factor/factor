@@ -205,7 +205,7 @@ TUPLE: slider-pen enabled disabled ;
             "vertical-scroller-bottom-disabled" theme-image
         ] }
     } case
-    [ <tile-pen> ] bi-curry@ 2bi \ slider-pen boa ;
+    [ f f <tile-pen> ] bi-curry@ 2bi \ slider-pen boa ;
 
 : slider-pen ( slider pen -- pen )
     [ slider-enabled? ] [ [ enabled>> ] [ disabled>> ] bi ] bi* ? ;

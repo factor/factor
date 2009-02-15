@@ -6,10 +6,15 @@ classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
 ui.gadgets.borders ui.gadgets.labels ui.gadgets.tracks
 ui.gadgets.packs ui.gadgets.worlds ui.gestures ui.pens ui.pens.solid
 ui.pens.image ui.pens.tile math.rectangles locals fry
-combinators.smart ;
+combinators.smart call ;
 IN: ui.gadgets.buttons
 
 TUPLE: button < border pressed? selected? quot ;
+
+<PRIVATE
+
+: find-button ( gadget -- button )
+    [ button? ] find-parent ;
 
 : buttons-down? ( -- ? )
     hand-buttons get-global empty? not ;
@@ -20,6 +25,8 @@ TUPLE: button < border pressed? selected? quot ;
 : mouse-clicked? ( gadget -- ? )
     hand-clicked get-global child? ;
 
+PRIVATE>
+
 : button-update ( button -- )
     dup
     [ mouse-clicked? ] [ button-rollover? ] bi and
@@ -27,10 +34,10 @@ TUPLE: button < border pressed? selected? quot ;
     >>pressed?
     relayout-1 ;
 
-: if-clicked ( button quot -- )
-    [ dup button-update dup button-rollover? ] dip [ drop ] if ;
-
-: button-clicked ( button -- ) dup quot>> if-clicked ;
+: button-clicked ( button -- )
+    dup button-update
+    dup button-rollover?
+    [ dup quot>> call( button -- ) ] [ drop ] if ;
 
 button H{
     { T{ button-up } [ button-clicked ] }
@@ -50,9 +57,6 @@ plain rollover
 pressed selected pressed-selected ;
 
 C: <button-pen> button-pen
-
-: find-button ( gadget -- button )
-    [ button? ] find-parent ;
 
 : button-pen ( button pen -- button pen )
     over find-button {
@@ -79,29 +83,65 @@ M: button-pen pen-pref-dim
         } 2cleave
     ] [ vmax ] reduce-outputs ;
 
+M: button-pen pen-background
+    button-pen pen-background ;
+
+M: button-pen pen-foreground
+    button-pen pen-foreground ;
+
+<PRIVATE
+
 : align-left ( button -- button )
     { 0 1/2 } >>align ; inline
 
 : roll-button-theme ( button -- button )
     f COLOR: black <solid> dup f f <button-pen> >>boundary
-    f f COLOR: black <solid> f f <button-pen> >>interior
+    f f COLOR: dark-gray <solid> f f <button-pen> >>interior
     align-left ; inline
+
+PRIVATE>
 
 : <roll-button> ( label quot -- button )
     <button> roll-button-theme ;
 
-: <border-button-pen> ( -- pen )
-    "button" "button-clicked"
+<PRIVATE
+
+: <border-button-state-pen> ( prefix background foreground -- pen )
     [
         "-left" "-middle" "-right"
-        [ append theme-image ] tri-curry@ tri <tile-pen> dup
-    ] bi@ dup <button-pen> ;
+        [ append theme-image ] tri-curry@ tri
+    ] 2dip <tile-pen> ;
+
+CONSTANT: button-background
+    T{ rgba
+         f
+         0.8901960784313725
+         0.8862745098039215
+         0.8588235294117647
+         1.0
+    }
+
+CONSTANT: button-clicked-background
+    T{ rgba
+         f
+         0.2156862745098039
+         0.2431372549019608
+         0.2823529411764706
+         1.0
+    }
+    
+: <border-button-pen> ( -- pen )
+    "button" button-background COLOR: black <border-button-state-pen> dup
+    "button-clicked" button-clicked-background COLOR: white <border-button-state-pen> dup dup
+    <button-pen> ;
 
 : border-button-theme ( gadget -- gadget )
     horizontal >>orientation
     <border-button-pen> >>interior
     dup dup interior>> pen-pref-dim >>min-dim
     { 10 0 } >>size ; inline
+
+PRIVATE>
 
 : <border-button> ( label quot -- button )
     <button> border-button-theme ;
@@ -119,7 +159,9 @@ repeat-button H{
     #! the mouse is held down.
     repeat-button new-button border-button-theme ;
 
-: <checkmark-paint> ( -- pen )
+<PRIVATE
+
+: <checkmark-pen> ( -- pen )
     "checkbox" theme-image <image-pen>
     "checkbox" theme-image <image-pen>
     "checkbox-clicked" theme-image <image-pen>
@@ -129,11 +171,13 @@ repeat-button H{
 
 : <checkmark> ( -- gadget )
     <gadget>
-    <checkmark-paint> >>interior
+    <checkmark-pen> >>interior
     dup dup interior>> pen-pref-dim >>dim ;
 
 : toggle-model ( model -- )
     [ not ] change-model ;
+
+PRIVATE>
 
 TUPLE: checkbox < button ;
 
@@ -147,7 +191,9 @@ TUPLE: checkbox < button ;
 M: checkbox model-changed
     swap value>> >>selected? relayout-1 ;
 
-: <radio-paint> ( -- pen )
+<PRIVATE
+
+: <radio-pen> ( -- pen )
     "radio" theme-image <image-pen>
     "radio" theme-image <image-pen>
     "radio-clicked" theme-image <image-pen>
@@ -157,7 +203,7 @@ M: checkbox model-changed
 
 : <radio-knob> ( -- gadget )
     <gadget>
-    <radio-paint> >>interior
+    <radio-pen> >>interior
     dup dup interior>> pen-pref-dim >>dim ;
 
 TUPLE: radio-control < button value ;
@@ -175,6 +221,8 @@ M: radio-control model-changed
 :: <radio-controls> ( parent model assoc quot: ( value model label -- gadget ) -- parent )
     assoc model [ parent swap quot call add-gadget ] assoc-each ; inline
 
+PRIVATE>
+
 : <radio-button> ( value model label -- gadget )
     <radio-knob> label-on-right <radio-control> ;
 
@@ -190,11 +238,8 @@ M: radio-control model-changed
     <shelf>
         [ <toggle-button> ] <radio-controls> ;
 
-: command-button-quot ( target command -- quot )
-    '[ _ _ invoke-command drop ] ;
-
 : <command-button> ( target gesture command -- button )
-    [ command-string swap ] keep command-button-quot <border-button> ;
+    [ command-string swap ] keep '[ _ _ invoke-command drop ] <border-button> ;
 
 : <toolbar> ( target -- toolbar )
     <shelf>

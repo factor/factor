@@ -53,7 +53,7 @@ SYMBOL: origin
 
 : translate ( rect/point -- ) loc>> origin [ v+ ] change ;
 
-DEFER: draw-gadget
+GENERIC: draw-children ( gadget -- )
 
 : (draw-gadget) ( gadget -- )
     dup loc>> origin get v+ origin [
@@ -64,7 +64,7 @@ DEFER: draw-gadget
                 bi
             ] with-translation
         ]
-        [ visible-children [ draw-gadget ] each ]
+        [ draw-children ]
         [
             dup boundary>> dup [
                 origin get [ draw-boundary ] with-translation
@@ -87,6 +87,28 @@ DEFER: draw-gadget
         { [ dup clipped?>> not ] [ (draw-gadget) ] }
         [ [ (draw-gadget) ] with-clipping ]
     } cond ;
+
+! For text rendering
+SYMBOL: background
+
+SYMBOL: foreground
+
+GENERIC: gadget-background ( gadget -- color )
+
+M: gadget gadget-background dup interior>> pen-background ;
+
+GENERIC: gadget-foreground ( gadget -- color )
+
+M: gadget gadget-foreground dup interior>> pen-foreground ;
+
+M: gadget draw-children
+    [ visible-children ]
+    [ gadget-background ]
+    [ gadget-foreground ] tri [
+        [ foreground set ] when*
+        [ background set ] when*
+        [ draw-gadget ] each
+    ] with-scope ;
 
 CONSTANT: selection-color T{ rgba f 0.8 0.8 1.0 1.0 }
 

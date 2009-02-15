@@ -55,7 +55,13 @@ M: label baseline
     >label< dup string? [ first ] unless
     line-metrics ascent>> round ;
 
-M: label draw-gadget* >label< draw-text ;
+M: label draw-gadget*
+    >label<
+    [
+        background get [ font-with-background ] when*
+        foreground get [ font-with-foreground ] when*
+    ] dip
+    draw-text ;
 
 M: label gadget-text* string>> % ;
 

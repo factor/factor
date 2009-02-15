@@ -5,9 +5,9 @@ combinators ui.pens ;
 IN: ui.pens.tile
 
 ! Tile pen
-TUPLE: tile-pen left center right ;
+TUPLE: tile-pen left center right background foreground ;
 
-: <tile-pen> ( left center right -- pen )
+: <tile-pen> ( left center right background foreground -- pen )
     tile-pen boa ;
 
 : >tile-pen< ( pen -- left center right )
@@ -46,3 +46,7 @@ M: tile-pen draw-interior ( gadget pen -- )
         [ drop ]
     } 2cleave
     [ render-tile ] curry tri-curry@ tri-curry* tri* ;
+
+M: tile-pen pen-background nip background>> ;
+
+M: tile-pen pen-foreground nip foreground>> ;
