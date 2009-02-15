@@ -65,7 +65,7 @@ TUPLE: line font line metrics image disposed ;
 
 : selection-rect ( dim line selection -- rect )
     [ start>> ] [ end>> ] bi
-    [ f CTLineGetOffsetForStringIndex ] bi-curry@ bi
+    [ f CTLineGetOffsetForStringIndex round ] bi-curry@ bi
     [ drop nip 0 ] [ swap - swap second ] 3bi <CGRect> ;
 
 :: fill-selection-background ( context dim line string -- )
