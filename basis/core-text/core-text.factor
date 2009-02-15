@@ -48,14 +48,26 @@ ERROR: not-a-string object ;
 
 TUPLE: line font line metrics image disposed ;
 
-: compute-line-metrics ( line -- line-metrics )
+: compute-line-metrics ( open-font line -- line-metrics )
+    [
+        [ metrics new ] dip
+        [ CTFontGetCapHeight >>cap-height ]
+        [ CTFontGetXHeight >>x-height ]
+        bi
+    ] dip
     0 <CGFloat> 0 <CGFloat> 0 <CGFloat>
-    [ CTLineGetTypographicBounds ] 3keep [ *CGFloat ] tri@
-    <metrics> ;
+    [ CTLineGetTypographicBounds ] 3keep
+    {
+        [ >>width ]
+        [ *CGFloat >>ascent ]
+        [ *CGFloat >>descent ]
+        [ *CGFloat >>leading ]
+    } spread
+    dup compute-height ;
 
 : bounds>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
-    [ ceiling >fixnum ]
+    [ ceiling >integer ]
     bi@ 2array ;
 
 : fill-background ( context font dim -- )
@@ -81,7 +93,7 @@ TUPLE: line font line metrics image disposed ;
     [
         [let* | open-font [ font cache-font CFRetain |CFRelease ]
                 line [ string open-font font foreground>> <CTLine> |CFRelease ]
-                metrics [ line compute-line-metrics ]
+                metrics [ open-font line compute-line-metrics ]
                 dim [ metrics bounds>dim ] |
             open-font line metrics
             dim [
