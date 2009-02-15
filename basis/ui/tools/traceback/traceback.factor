@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors continuations kernel models namespaces arrays
-fry prettyprint ui ui.commands ui.gadgets ui.gadgets.labelled assocs
+fry prettyprint ui ui.commands ui.gadgets ui.gadgets.labeled assocs
 ui.gadgets.tracks ui.gadgets.buttons ui.gadgets.panes
 ui.gadgets.status-bar ui.gadgets.scrollers ui.gadgets.borders
 ui.gadgets.tables ui.gestures sequences inspector
@@ -29,12 +29,12 @@ M: stack-entry-renderer row-value drop object>> ;
 
 : <stack-display> ( model quot title -- gadget )
     [ '[ dup _ when ] <filter> <stack-table> <scroller> ] dip
-    <labelled-gadget> ;
+    <labeled-gadget> ;
 
 : <callstack-display> ( model -- gadget )
     [ [ call>> callstack. ] when* ]
     <pane-control> t >>scrolls? <scroller>
-    "Call stack" <labelled-gadget> ;
+    "Call stack" <labeled-gadget> ;
 
 : <datastack-display> ( model -- gadget )
     [ data>> ] "Data stack" <stack-display> ;

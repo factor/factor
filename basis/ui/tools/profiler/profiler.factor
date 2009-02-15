@@ -6,7 +6,7 @@ models.search models.sort models sequences vocabs
 tools.profiler words prettyprint ui ui.commands ui.gadgets
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
 ui.gadgets.buttons ui.gadgets.tables ui.gadgets.search-tables
-ui.gadgets.labelled ui.gadgets.buttons ui.gadgets.packs
+ui.gadgets.labeled ui.gadgets.buttons ui.gadgets.packs
 ui.gadgets.labels ui.gadgets.tabbed ui.gadgets.status-bar
 ui.tools.browser ui.tools.common ;
 FROM: models.filter => <filter> ;
@@ -113,11 +113,11 @@ M: method-renderer row-value drop first ;
         profiler vocabs>> <profiler-table>
             profiler vocab>> >>selected-value
             vocab-renderer >>renderer
-        "Vocabularies" <labelled-gadget>
+        "Vocabularies" <labeled-gadget>
     1/2 track-add
         profiler <words-model> <profiler-table>
             word-renderer >>renderer
-        "Words" <labelled-gadget>
+        "Words" <labeled-gadget>
     1/2 track-add ;
 
 :: <methods-tab> ( profiler -- gadget )
@@ -126,17 +126,17 @@ M: method-renderer row-value drop first ;
             profiler <generic-model> <profiler-table>
                 profiler generic>> >>selected-value
                 word-renderer >>renderer
-            "Generic words" <labelled-gadget>
+            "Generic words" <labeled-gadget>
         1/2 track-add
             profiler <class-model> <profiler-table>
                 profiler class>> >>selected-value
                 word-renderer >>renderer
-            "Classes" <labelled-gadget>
+            "Classes" <labeled-gadget>
         1/2 track-add
     1/2 track-add
         profiler methods>> <profiler-table>
             method-renderer >>renderer
-        "Methods" <labelled-gadget>
+        "Methods" <labeled-gadget>
     1/2 track-add ;
 
 : <selection-model> ( -- model ) { f 0 } <model> ;

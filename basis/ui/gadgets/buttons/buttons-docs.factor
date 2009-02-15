@@ -44,7 +44,7 @@ HELP: <toggle-button>
 
 HELP: <toggle-buttons>
 { $values { "model" model } { "assoc" "an association list mapping labels to objects" } { "gadget" gadget } }
-{ $description "Creates a row of labelled " { $link <toggle-button> } " gadgets which change the value of the model." } ;
+{ $description "Creates a row of labeled " { $link <toggle-button> } " gadgets which change the value of the model." } ;
 
 HELP: <command-button>
 { $values { "target" object } { "gesture" "a gesture" } { "command" "a command" } { "button" "a new " { $link button } } }

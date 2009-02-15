@@ -89,7 +89,7 @@ ARTICLE: "gadgets" "Pre-made UI gadgets"
 { $subsection "ui.gadgets.labels" }
 { $subsection "gadgets-polygons" }
 { $subsection "ui.gadgets.borders" }
-{ $subsection "ui.gadgets.labelled" }
+{ $subsection "ui.gadgets.labeled" }
 { $subsection "ui.gadgets.buttons" }
 { $subsection "ui.gadgets.sliders" }
 { $subsection "ui.gadgets.scrollers" }
