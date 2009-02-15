@@ -3,11 +3,10 @@
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types continuations kernel libc math macros
-namespaces math.vectors math.constants math.functions
-math.parser opengl.gl opengl.glu combinators arrays sequences
-splitting words byte-arrays assocs colors colors.constants accessors
-generalizations locals fry specialized-arrays.float
-specialized-arrays.uint ;
+namespaces math.vectors math.parser opengl.gl opengl.glu
+combinators arrays sequences splitting words byte-arrays assocs
+colors colors.constants accessors generalizations locals fry
+specialized-arrays.float specialized-arrays.uint ;
 IN: opengl
 
 : gl-color ( color -- ) >rgba-components glColor4d ; inline
@@ -108,33 +107,6 @@ MACRO: all-enabled-client-state ( seq quot -- )
 
 : do-attribs ( bits quot -- )
     swap glPushAttrib call glPopAttrib ; inline
-
-: circle-steps ( steps -- angles )
-    dup length v/n 2 pi * v*n ;
-
-: unit-circle ( angles -- points1 points2 )
-    [ [ sin ] map ] [ [ cos ] map ] bi ;
-
-: adjust-points ( points1 points2 -- points1' points2' )
-    [ [ 1 + 0.5 * ] map ] bi@ ;
-
-: scale-points ( loc dim points1 points2 -- points )
-    zip [ v* ] with map [ v+ ] with map ;
-
-: circle-points ( loc dim steps -- points )
-    circle-steps unit-circle adjust-points scale-points ;
-
-: close-path ( points -- points' )
-    dup first suffix ;
-
-: circle-vertices ( loc dim steps -- vertices )
-    #! We use GL_LINE_STRIP with a duplicated first vertex
-    #! instead of GL_LINE_LOOP to work around a bug in Apple's
-    #! X3100 driver.
-    circle-points close-path concat >float-array ;
-
-: fill-circle-vertices ( loc dim steps -- vertices )
-    circle-points concat >float-array ;
 
 : (gen-gl-object) ( quot -- id )
     [ 1 0 <uint> ] dip keep *uint ; inline

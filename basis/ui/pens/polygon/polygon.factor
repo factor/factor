@@ -10,6 +10,9 @@ interior-count
 boundary-vertices
 boundary-count ;
 
+: close-path ( points -- points' )
+    dup first suffix ;
+
 : <polygon> ( color points -- polygon )
     dup close-path [ [ concat >float-array ] [ length ] bi ] bi@
     polygon boa ;
