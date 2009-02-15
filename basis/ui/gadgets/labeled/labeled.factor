@@ -24,7 +24,7 @@ CONSTANT: @bottom-right { 2 2 }
     "labeled-block-" prepend theme-image ;
 
 : labeled-icon ( name -- icon )
-    labeled-image <icon> dup interior>> t >>fill? drop ;
+    labeled-image <icon> ;
 
 CONSTANT: labeled-title-background
     T{ rgba f
