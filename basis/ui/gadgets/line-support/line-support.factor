@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators fry kernel math math.order
+USING: accessors arrays combinators fry kernel math math.functions math.order
 math.ranges math.vectors namespaces opengl sequences ui.gadgets
 ui.render ui.text ;
 IN: ui.gadgets.line-support
@@ -18,7 +18,7 @@ M: gadget line-height font>> font-metrics height>> ;
 
 : y>line ( y gadget -- n ) line-height /i ;
 
-: line>y ( n gadget -- y ) line-height * ;
+: line>y ( n gadget -- y ) line-height * >integer ;
 
 : validate-line ( m gadget -- n )
     control-value [ drop f ] [ length 1- min 0 max ] if-empty ;
@@ -48,6 +48,6 @@ GENERIC: draw-line ( line index gadget -- )
         [ line-height ]
         [ ]
     } cleave '[
-        0 over _ * 2array
+        0 over _ * >integer 2array
         [ _ draw-line ] with-translation
     ] each-slice-index ;

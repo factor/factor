@@ -3,7 +3,8 @@
 USING: colors.constants kernel locals math.rectangles
 namespaces sequences ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.glass ui.gadgets.packs
-ui.gadgets.worlds ui.gestures ui.operations ;
+ui.gadgets.worlds ui.gestures ui.operations ui.pens.solid
+accessors ;
 IN: ui.gadgets.menus
 
 : show-menu ( owner menu -- )

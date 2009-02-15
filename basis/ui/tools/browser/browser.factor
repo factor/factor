@@ -6,12 +6,12 @@ sequences models models.history tools.apropos
 ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.gadgets.buttons ui.gadgets.packs
 ui.gadgets.editors ui.gadgets.labels ui.gadgets.status-bar
-ui.tools.common ui ;
+ui.gadgets.borders ui.tools.common ui ;
 IN: ui.tools.browser
 
 TUPLE: browser-gadget < tool pane scroller search-field ;
 
-{ 550 400 } browser-gadget set-tool-dim
+{ 650 400 } browser-gadget set-tool-dim
 
 : show-help ( link browser-gadget -- )
     model>> dup add-history
@@ -29,17 +29,19 @@ TUPLE: browser-gadget < tool pane scroller search-field ;
         10 >>max-width ;
 
 : <browser-toolbar> ( browser -- toolbar )
-    <shelf>
+    horizontal <track>
+        0 >>fill
         1/2 >>align
         { 5 5 } >>gap
-        over <toolbar> add-gadget
-        swap search-field>> "Search:" label-on-left add-gadget ;
+        over <toolbar> f track-add
+        swap search-field>> "Search:" label-on-left 1 track-add ;
 
 : <browser-gadget> ( link -- gadget )
     vertical browser-gadget new-track
+        1 >>fill
         swap >link <history> >>model
         dup <search-field> >>search-field
-        dup <browser-toolbar> f track-add
+        dup <browser-toolbar> { 3 3 } <border> { 1 0 } >>fill f track-add
         dup <help-pane> >>pane
         dup pane>> <scroller> >>scroller
         dup scroller>> 1 track-add ;

@@ -23,7 +23,7 @@ TUPLE: pack < gadget
     [ { 0 0 } ] dip '[ v+ _ v+ ] accumulate nip ;
 
 : numerically-aligned-locs ( sizes pack -- seq )
-    [ align>> ] [ dim>> ] bi '[ [ _ _ ] dip v- n*v ] map ;
+    [ align>> ] [ dim>> ] bi '[ [ _ _ ] dip v- [ * >integer ] with map ] map ;
 
 : baseline-aligned-locs ( pack -- seq )
     children>> baseline-align [ 0 swap 2array ] map ;
@@ -39,7 +39,7 @@ TUPLE: pack < gadget
 
 : round-dims ( seq -- newseq )
     [ { 0 0 } ] dip
-    [ swap v- dup [ ceiling >fixnum ] map [ swap v- ] keep ] map
+    [ swap v- dup [ ceiling ] map [ swap v- ] keep ] map
     nip ;
 
 PRIVATE>
