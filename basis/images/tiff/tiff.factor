@@ -24,7 +24,16 @@ SINGLETONS: photometric-interpretation
 photometric-interpretation-white-is-zero
 photometric-interpretation-black-is-zero
 photometric-interpretation-rgb
-photometric-interpretation-palette-color ;
+photometric-interpretation-palette-color
+photometric-interpretation-transparency-mask
+photometric-interpretation-separated
+photometric-interpretation-ycbcr
+photometric-interpretation-cielab
+photometric-interpretation-icclab
+photometric-interpretation-itulab
+photometric-interpretation-logl
+photometric-interpretation-logluv ;
+
 ERROR: bad-photometric-interpretation n ;
 : lookup-photometric-interpretation ( n -- singleton )
     {
@@ -32,21 +41,73 @@ ERROR: bad-photometric-interpretation n ;
         { 1 [ photometric-interpretation-black-is-zero ] }
         { 2 [ photometric-interpretation-rgb ] }
         { 3 [ photometric-interpretation-palette-color ] }
+        { 4 [ photometric-interpretation-transparency-mask ] }
+        { 5 [ photometric-interpretation-separated ] }
+        { 6 [ photometric-interpretation-ycbcr ] }
+        { 8 [ photometric-interpretation-cielab ] }
+        { 9 [ photometric-interpretation-icclab ] }
+        { 10 [ photometric-interpretation-itulab ] }
+        { 32844 [ photometric-interpretation-logl ] }
+        { 32845 [ photometric-interpretation-logluv ] }
         [ bad-photometric-interpretation ]
     } case ;
 
 SINGLETONS: compression
 compression-none
 compression-CCITT-2
+compression-CCITT-3
+compression-CCITT-4
 compression-lzw
-compression-pack-bits ;
+compression-jpeg-old
+compression-jpeg-new
+compression-adobe-deflate
+compression-9
+compression-10
+compression-deflate
+compression-next
+compression-ccittrlew
+compression-pack-bits
+compression-thunderscan
+compression-it8ctpad
+compression-it8lw
+compression-it8mp
+compression-it8bl
+compression-pixarfilm
+compression-pixarlog
+compression-dcs
+compression-jbig
+compression-sgilog
+compression-sgilog24
+compression-jp2000 ;
 ERROR: bad-compression n ;
 : lookup-compression ( n -- compression )
     {
         { 1 [ compression-none ] }
         { 2 [ compression-CCITT-2 ] }
+        { 3 [ compression-CCITT-3 ] }
+        { 4 [ compression-CCITT-4 ] }
         { 5 [ compression-lzw ] }
+        { 6 [ compression-jpeg-old ] }
+        { 7 [ compression-jpeg-new ] }
+        { 8 [ compression-adobe-deflate ] }
+        { 9 [ compression-9 ] }
+        { 10 [ compression-10 ] }
+        { 32766 [ compression-next ] }
+        { 32771 [ compression-ccittrlew ] }
         { 32773 [ compression-pack-bits ] }
+        { 32809 [ compression-thunderscan ] }
+        { 32895 [ compression-it8ctpad ] }
+        { 32896 [ compression-it8lw ] }
+        { 32897 [ compression-it8mp ] }
+        { 32898 [ compression-it8bl ] }
+        { 32908 [ compression-pixarfilm ] }
+        { 32909 [ compression-pixarlog ] }
+        { 32946 [ compression-deflate ] }
+        { 32947 [ compression-dcs ] }
+        { 34661 [ compression-jbig ] }
+        { 34676 [ compression-sgilog ] }
+        { 34677 [ compression-sgilog24 ] }
+        { 34712 [ compression-jp2000 ] }
         [ bad-compression ]
     } case ;
 
@@ -86,6 +147,7 @@ ERROR: bad-planar-configuration n ;
     } case ;
 
 SINGLETONS: sample-format
+sample-format-none
 sample-format-unsigned-integer
 sample-format-signed-integer
 sample-format-ieee-float
@@ -94,6 +156,7 @@ ERROR: bad-sample-format n ;
 : lookup-sample-format ( sequence -- object )
     [
         {
+            { 0 [ sample-format-none ] }
             { 1 [ sample-format-unsigned-integer ] }
             { 2 [ sample-format-signed-integer ] }
             { 3 [ sample-format-ieee-float ] }
@@ -117,11 +180,36 @@ ERROR: bad-extra-samples n ;
 
 SINGLETONS: image-length image-width x-resolution y-resolution
 rows-per-strip strip-offsets strip-byte-counts bits-per-sample
-samples-per-pixel new-subfile-type orientation software
-date-time photoshop exif-ifd sub-ifd inter-color-profile
+samples-per-pixel new-subfile-type subfile-type orientation
+software date-time photoshop exif-ifd sub-ifd inter-color-profile
 xmp iptc fill-order document-name page-number page-name
-x-position y-position
+x-position y-position host-computer copyright artist
+min-sample-value max-sample-value make model cell-width cell-length
+gray-response-unit gray-response-curve color-map threshholding
+image-description free-offsets free-byte-counts tile-width tile-length
+matteing data-type image-depth tile-depth
+ycbcr-subsampling gdal-metadata
+tile-offsets tile-byte-counts jpeg-qtables jpeg-dctables jpeg-actables
+ycbcr-positioning ycbcr-coefficients reference-black-white halftone-hints
+jpeg-interchange-format
+jpeg-interchange-format-length
+jpeg-restart-interval jpeg-tables
+t4-options clean-fax-data bad-fax-lines consecutive-bad-fax-lines
+sto-nits print-image-matching-info
 unhandled-ifd-entry ;
+
+SINGLETONS: jpeg-proc
+jpeg-proc-baseline
+jpeg-proc-lossless ;
+
+ERROR: bad-jpeg-proc n ;
+
+: lookup-jpeg-proc ( sequence -- object )
+    {
+        { 1 [ jpeg-proc-baseline ] }
+        { 14 [ jpeg-proc-lossless ] }
+        [ bad-jpeg-proc ]
+    } case ;
 
 ERROR: bad-tiff-magic bytes ;
 : tiff-endianness ( byte-array -- ? )
@@ -146,12 +234,12 @@ ERROR: bad-tiff-magic bytes ;
     4 read endian>
     4 read endian> <ifd-entry> ;
 
-: read-ifds ( tiff -- tiff )
-    dup ifd-offset>> seek-absolute seek-input
+: read-ifds ( tiff offset -- tiff )
+    seek-absolute seek-input
     2 read endian>
     dup [ read-ifd ] replicate
     4 read endian>
-    [ <ifd> push-ifd ] [ 0 = [ read-ifds ] unless ] bi ;
+    [ <ifd> push-ifd ] [ dup 0 = [ drop ] [ read-ifds ] if ] bi ;
 
 ERROR: no-tag class ;
 
@@ -242,43 +330,92 @@ ERROR: bad-small-ifd-type n ;
 : process-ifd-entry ( ifd-entry -- value class )
     [ ifd-entry-value ] [ tag>> ] bi {
         { 254 [ new-subfile-type ] }
+        { 255 [ subfile-type ] }
         { 256 [ image-width ] }
         { 257 [ image-length ] }
         { 258 [ bits-per-sample ] }
         { 259 [ lookup-compression compression ] }
         { 262 [ lookup-photometric-interpretation photometric-interpretation ] }
+        { 263 [ threshholding ] }
+        { 264 [ cell-width ] }
+        { 265 [ cell-length ] }
         { 266 [ fill-order ] }
         { 269 [ ascii decode document-name ] }
+        { 270 [ ascii decode image-description ] }
+        { 271 [ ascii decode make ] }
+        { 272 [ ascii decode model ] }
         { 273 [ strip-offsets ] }
         { 274 [ orientation ] }
         { 277 [ samples-per-pixel ] }
         { 278 [ rows-per-strip ] }
         { 279 [ strip-byte-counts ] }
+        { 280 [ min-sample-value ] }
+        { 281 [ max-sample-value ] }
         { 282 [ first x-resolution ] }
         { 283 [ first y-resolution ] }
         { 284 [ planar-configuration ] }
         { 285 [ page-name ] }
         { 286 [ x-position ] }
         { 287 [ y-position ] }
+        { 288 [ free-offsets ] }
+        { 289 [ free-byte-counts ] }
+        { 290 [ gray-response-unit ] }
+        { 291 [ gray-response-curve ] }
+        { 292 [ t4-options ] }
         { 296 [ lookup-resolution-unit resolution-unit ] }
         { 297 [ page-number ] }
         { 305 [ ascii decode software ] }
         { 306 [ ascii decode date-time ] }
+        { 315 [ ascii decode artist ] }
+        { 316 [ ascii decode host-computer ] }
         { 317 [ lookup-predictor predictor ] }
+        { 320 [ color-map ] }
+        { 321 [ halftone-hints ] }
+        { 322 [ tile-width ] }
+        { 323 [ tile-length ] }
+        { 324 [ tile-offsets ] }
+        { 325 [ tile-byte-counts ] }
+        { 326 [ bad-fax-lines ] }
+        { 327 [ clean-fax-data ] }
+        { 328 [ consecutive-bad-fax-lines ] }
         { 330 [ sub-ifd ] }
         { 338 [ lookup-extra-samples extra-samples ] }
         { 339 [ lookup-sample-format sample-format ] }
+        { 347 [ jpeg-tables ] }
+        { 512 [ lookup-jpeg-proc jpeg-proc ] }
+        { 513 [ jpeg-interchange-format ] }
+        { 514 [ jpeg-interchange-format-length ] }
+        { 515 [ jpeg-restart-interval ] }
+        { 519 [ jpeg-qtables ] }
+        { 520 [ jpeg-dctables ] }
+        { 521 [ jpeg-actables ] }
+        { 529 [ ycbcr-coefficients ] }
+        { 530 [ ycbcr-subsampling ] }
+        { 531 [ ycbcr-positioning ] }
+        { 532 [ reference-black-white ] }
         { 700 [ utf8 decode xmp ] }
+        { 32995 [ matteing ] }
+        { 32996 [ data-type ] }
+        { 32997 [ image-depth ] }
+        { 32998 [ tile-depth ] }
+        { 33432 [ copyright ] }
+        { 33723 [ iptc ] }
         { 34377 [ photoshop ] }
         { 34665 [ exif-ifd ] }
-        { 33723 [ iptc ] }
         { 34675 [ inter-color-profile ] }
+        { 37439 [ sto-nits ] }
+        { 42112 [ gdal-metadata ] }
+        { 50341 [ print-image-matching-info ] }
         [ nip unhandled-ifd-entry swap ]
     } case ;
 
-: process-ifd ( ifd -- ifd )
-    dup ifd-entries>>
-    [ process-ifd-entry swap ] H{ } map>assoc >>processed-tags ;
+: process-ifds ( parsed-tiff -- parsed-tiff )
+    [
+        [
+            dup ifd-entries>>
+            [ process-ifd-entry swap ] H{ } map>assoc >>processed-tags
+        ] map
+    ] change-ifds ;
 
 ERROR: unhandled-compression compression ;
 
@@ -361,6 +498,8 @@ ERROR: unknown-component-order ifd ;
         ] }
         { extra-samples-unspecified-alpha-data [
         ] }
+        { extra-samples-unassociated-alpha-data [
+        ] }
         [ bad-extra-samples ]
     } case ;
 
@@ -374,22 +513,35 @@ ERROR: unknown-component-order ifd ;
 : tiff>image ( image -- image )
     ifds>> [ ifd>image ] map first ;
 
-: load-tiff ( path -- parsed-tiff )
+: with-tiff-endianness ( parsed-tiff quot -- )
+    [ dup endianness>> ] dip with-endianness ; inline
+
+: load-tiff-ifds ( path -- parsed-tiff )
     binary [
         <parsed-tiff>
-        read-header dup endianness>> [
-            read-ifds
-            dup ifds>> [
-                process-ifd read-strips
-                uncompress-strips
-                strips>bitmap
-                fix-bitmap-endianness
-                strips-predictor
-                dup extra-samples tag? [ handle-alpha-data ] when
-                drop
-            ] each
-        ] with-endianness
+        read-header [
+            dup ifd-offset>> read-ifds
+            process-ifds
+        ] with-tiff-endianness
     ] with-file-reader ;
+
+: process-tif-ifds ( parsed-tiff -- parsed-tiff )
+    dup ifds>> [
+        read-strips
+        uncompress-strips
+        strips>bitmap
+        fix-bitmap-endianness
+        strips-predictor
+        dup extra-samples tag? [ handle-alpha-data ] when
+        drop
+    ] each ;
+
+: load-tiff ( path -- parsed-tiff )
+    [ load-tiff-ifds ] [
+        binary [
+            [ process-tif-ifds ] with-tiff-endianness
+        ] with-file-reader
+    ] bi ;
 
 ! tiff files can store several images -- we just take the first for now
 M: tiff-image load-image* ( path tiff-image -- image )
