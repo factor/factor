@@ -3,7 +3,7 @@
 USING: assocs accessors alien core-graphics.types core-text
 core-text.fonts kernel hashtables namespaces sequences
 ui.gadgets.worlds ui.text ui.text.private opengl opengl.gl
-opengl.texture-cache destructors combinators core-foundation
+opengl.textures destructors combinators core-foundation
 core-foundation.strings math math.vectors init colors colors.constants
 cache arrays ;
 IN: ui.text.core-text
@@ -11,22 +11,19 @@ IN: ui.text.core-text
 SINGLETON: core-text-renderer
 
 M: core-text-renderer init-text-rendering
-    core-text-renderer <texture-cache> >>text-handle drop ;
+    <cache-assoc> >>text-handle drop ;
 
 M: core-text-renderer string-dim
     [ " " string-dim { 0 1 } v* ]
     [ cached-line image>> dim>> ]
     if-empty ;
 
-M: core-text-renderer render-texture
-    drop first2 cached-line image>> ;
-
 M: core-text-renderer finish-text-rendering
-    text-handle>> purge-texture-cache
+    text-handle>> purge-cache
     cached-lines get purge-cache ;
 
 : rendered-line ( font string -- texture )
-    2array world get text-handle>> get-texture ;
+    world get text-handle>> [ cached-line image>> <texture> ] 2cache ;
 
 M: core-text-renderer draw-string ( font string -- )
     rendered-line display-list>> glCallList ;

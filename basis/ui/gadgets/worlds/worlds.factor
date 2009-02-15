@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs continuations kernel math models call
-namespaces opengl opengl.texture-cache sequences io combinators
+USING: accessors arrays assocs continuations kernel math models
+call namespaces opengl sequences io combinators
 combinators.short-circuit fry math.vectors math.rectangles cache
-ui.gadgets ui.gestures ui.render ui.text ui.text.private ui.backend
-ui.gadgets.tracks ;
+ui.gadgets ui.gestures ui.render ui.text ui.text.private
+ui.backend ui.gadgets.tracks ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < track
@@ -67,7 +67,7 @@ M: world children-on nip children>> ;
             [ init-gl ]
             [ draw-gadget ]
             [ finish-text-rendering ]
-            [ images>> [ purge-texture-cache ] when* ]
+            [ images>> [ purge-cache ] when* ]
         } cleave
     ] with-gl-context ;
 
