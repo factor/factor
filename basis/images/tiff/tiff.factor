@@ -117,10 +117,13 @@ ERROR: bad-extra-samples n ;
 
 SINGLETONS: image-length image-width x-resolution y-resolution
 rows-per-strip strip-offsets strip-byte-counts bits-per-sample
-samples-per-pixel new-subfile-type orientation software
-date-time photoshop exif-ifd sub-ifd inter-color-profile
+samples-per-pixel new-subfile-type subfile-type orientation
+software date-time photoshop exif-ifd sub-ifd inter-color-profile
 xmp iptc fill-order document-name page-number page-name
-x-position y-position
+x-position y-position host-computer copyright artist
+min-sample-value max-sample-value make model cell-width cell-length
+gray-response-unit gray-response-curve color-map threshholding
+image-description free-offsets free-byte-counts
 unhandled-ifd-entry ;
 
 ERROR: bad-tiff-magic bytes ;
@@ -242,36 +245,53 @@ ERROR: bad-small-ifd-type n ;
 : process-ifd-entry ( ifd-entry -- value class )
     [ ifd-entry-value ] [ tag>> ] bi {
         { 254 [ new-subfile-type ] }
+        { 255 [ subfile-type ] }
         { 256 [ image-width ] }
         { 257 [ image-length ] }
         { 258 [ bits-per-sample ] }
         { 259 [ lookup-compression compression ] }
         { 262 [ lookup-photometric-interpretation photometric-interpretation ] }
+        { 263 [ threshholding ] }
+        { 264 [ cell-width ] }
+        { 265 [ cell-length ] }
         { 266 [ fill-order ] }
         { 269 [ ascii decode document-name ] }
+        { 270 [ ascii decode image-description ] }
+        { 271 [ ascii decode make ] }
+        { 272 [ ascii decode model ] }
         { 273 [ strip-offsets ] }
         { 274 [ orientation ] }
         { 277 [ samples-per-pixel ] }
         { 278 [ rows-per-strip ] }
         { 279 [ strip-byte-counts ] }
+        { 280 [ min-sample-value ] }
+        { 281 [ max-sample-value ] }
         { 282 [ first x-resolution ] }
         { 283 [ first y-resolution ] }
         { 284 [ planar-configuration ] }
         { 285 [ page-name ] }
         { 286 [ x-position ] }
         { 287 [ y-position ] }
+        { 288 [ free-offsets ] }
+        { 289 [ free-byte-counts ] }
+        { 290 [ gray-response-unit ] }
+        { 291 [ gray-response-curve ] }
         { 296 [ lookup-resolution-unit resolution-unit ] }
         { 297 [ page-number ] }
         { 305 [ ascii decode software ] }
         { 306 [ ascii decode date-time ] }
+        { 315 [ ascii decode artist ] }
+        { 316 [ ascii decode host-computer ] }
         { 317 [ lookup-predictor predictor ] }
+        { 320 [ color-map ] }
         { 330 [ sub-ifd ] }
         { 338 [ lookup-extra-samples extra-samples ] }
         { 339 [ lookup-sample-format sample-format ] }
         { 700 [ utf8 decode xmp ] }
+        { 33432 [ copyright ] }
+        { 33723 [ iptc ] }
         { 34377 [ photoshop ] }
         { 34665 [ exif-ifd ] }
-        { 33723 [ iptc ] }
         { 34675 [ inter-color-profile ] }
         [ nip unhandled-ifd-entry swap ]
     } case ;
@@ -360,6 +380,8 @@ ERROR: unknown-component-order ifd ;
             ] change-bitmap
         ] }
         { extra-samples-unspecified-alpha-data [
+        ] }
+        { extra-samples-unassociated-alpha-data [
         ] }
         [ bad-extra-samples ]
     } case ;
