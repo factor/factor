@@ -40,15 +40,15 @@ IN: tools.memory
     "Decks" write-total
     "Cards" write-total ;
 
-: write-labelled-size ( n string -- )
+: write-labeled-size ( n string -- )
     [ write-cell write-size ] with-row ;
 
 : (code-room.) ( -- )
     code-room {
-        [ "Size:" write-labelled-size ]
-        [ "Used:" write-labelled-size ]
-        [ "Total free space:" write-labelled-size ]
-        [ "Largest free block:" write-labelled-size ]
+        [ "Size:" write-labeled-size ]
+        [ "Used:" write-labeled-size ]
+        [ "Total free space:" write-labeled-size ]
+        [ "Largest free block:" write-labeled-size ]
     } spread ;
 
 : heap-stat-step ( obj counts sizes -- )
