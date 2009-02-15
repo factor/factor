@@ -8,7 +8,7 @@ io.styles kernel lexer listener math models models.delay models.filter
 namespaces parser prettyprint quotations sequences strings threads
 tools.vocabs vocabs vocabs.loader vocabs.parser words ui ui.commands
 ui.pens.solid ui.gadgets ui.gadgets.buttons ui.gadgets.editors
-ui.gadgets.labelled ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.listener.completion ui.tools.listener.popups
@@ -294,7 +294,7 @@ M: object accept-completion-hook 2drop ;
 :: <debugger-popup> ( interactor error continuation -- popup )
     error continuation error compute-restarts
     [ interactor hide-popup ] <debugger>
-    "Error" <labelled-gadget> ;
+    "Error" <labeled-gadget> ;
 
 : debugger-popup ( interactor error continuation -- )
     [ [ drop one-line-elt ] 2keep ] dip <debugger-popup> show-popup ;

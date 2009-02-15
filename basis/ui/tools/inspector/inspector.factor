@@ -6,7 +6,7 @@ io io.styles arrays hashtables math.order sorting refs fonts
 ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks
 ui.gestures ui.gadgets.buttons ui.gadgets.tables
-ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.labelled
+ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.labeled
 ui.tools.common ui ;
 IN: ui.tools.inspector
 
@@ -70,8 +70,8 @@ M: hashtable make-slot-descriptions
         add-toolbar
         swap >>model
         dup model>> <inspector-table> >>table
-        dup model>> <summary-gadget> "Object" <labelled-gadget> f track-add
-        dup table>> <scroller> "Contents" <labelled-gadget> 1 track-add ;
+        dup model>> <summary-gadget> "Object" <labeled-gadget> f track-add
+        dup table>> <scroller> "Contents" <labeled-gadget> 1 track-add ;
 
 M: inspector-gadget focusable-child*
     table>> ;

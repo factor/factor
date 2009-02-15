@@ -74,7 +74,8 @@ scroller H{
     { [ nip ] [ viewport>> gadget-child swap child? ] [ nip ] }
     2&& ;
 
-: scroll>rect ( rect gadget -- )
+: scroll>rect ( rect gadget -- ) USING: prettyprint io io.streams.c ;
+    global [ over unparse show .c flush ] bind
     dup find-scroller* dup [
         [ relative-scroll-rect ] keep
         swap >>follows
