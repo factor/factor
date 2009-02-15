@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors images images.backend io.pathnames kernel
+USING: accessors images images.loader io.pathnames kernel
 namespaces opengl opengl.gl sequences strings ui ui.gadgets
 ui.gadgets.panes ui.render ;
 IN: images.viewer
@@ -23,15 +23,15 @@ M: image-gadget draw-gadget* ( gadget -- )
         swap >>image ;
 
 : image-window ( path -- gadget )
-    [ <image> <image-gadget> dup ] [ open-window ] bi ;
+    [ load-image <image-gadget> dup ] [ open-window ] bi ;
 
 GENERIC: image. ( object -- )
 
 : default-image. ( path -- )
     <image-gadget> gadget. ;
 
-M: string image. ( image -- ) <image> default-image. ;
+M: string image. ( image -- ) load-image default-image. ;
 
-M: pathname image. ( image -- ) <image> default-image. ;
+M: pathname image. ( image -- ) load-image default-image. ;
 
 M: image image. ( image -- ) default-image. ;

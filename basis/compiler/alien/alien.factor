@@ -5,7 +5,7 @@ alien.c-types alien.structs cpu.architecture ;
 IN: compiler.alien
 
 : large-struct? ( ctype -- ? )
-    dup c-struct? [ struct-small-enough? not ] [ drop f ] if ;
+    dup c-struct? [ return-struct-in-registers? not ] [ drop f ] if ;
 
 : alien-parameters ( params -- seq )
     dup parameters>>

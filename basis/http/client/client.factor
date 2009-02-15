@@ -141,12 +141,15 @@ ERROR: download-failed response ;
 : check-response ( response -- response )
     dup code>> success? [ download-failed ] unless ;
 
+: check-response-with-body ( response body -- response body )
+    [ >>body check-response ] keep ;
+
 : with-http-request ( request quot -- response )
-    [ (with-http-request) check-response ] with-destructors ; inline
+    [ (with-http-request) ] with-destructors ; inline
 
 : http-request ( request -- response data )
     [ [ % ] with-http-request ] B{ } make
-    over content-charset>> decode ;
+    over content-charset>> decode check-response-with-body ;
 
 : <get-request> ( url -- request )
     "GET" <client-request> ;
