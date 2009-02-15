@@ -3,10 +3,10 @@
 USING: accessors arrays kernel math models namespaces sequences
 strings quotations assocs combinators classes colors colors.constants
 classes.tuple opengl opengl.gl math.vectors ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.labels
-ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
-ui.pens ui.pens.solid ui.pens.image math.rectangles locals
-fry combinators.smart ;
+ui.gadgets.borders ui.gadgets.labels ui.gadgets.tracks
+ui.gadgets.packs ui.gadgets.worlds ui.gestures ui.pens ui.pens.solid
+ui.pens.image ui.pens.tile math.rectangles locals fry
+combinators.smart ;
 IN: ui.gadgets.buttons
 
 TUPLE: button < border pressed? selected? quot ;
@@ -84,24 +84,24 @@ M: button-pen pen-pref-dim
 
 : roll-button-theme ( button -- button )
     f COLOR: black <solid> dup f f <button-pen> >>boundary
-    f f pressed-gradient f f <button-pen> >>interior
+    f f COLOR: black <solid> f f <button-pen> >>interior
     align-left ; inline
 
 : <roll-button> ( label quot -- button )
     <button> roll-button-theme ;
 
-: <border-button-pen> ( -- paint )
-    plain-gradient
-    rollover-gradient
-    pressed-gradient
-    selected-gradient
-    selected-gradient
-    <button-pen> ;
+: <border-button-pen> ( -- pen )
+    "button" "button-clicked"
+    [
+        "-left" "-middle" "-right"
+        [ append theme-image ] tri-curry@ tri <tile-pen> dup
+    ] bi@ dup <button-pen> ;
 
 : border-button-theme ( gadget -- gadget )
+    horizontal >>orientation
     <border-button-pen> >>interior
-    { 5 5 } >>size
-    faint-boundary ; inline
+    dup dup interior>> pen-pref-dim >>min-dim
+    { 10 0 } >>size ; inline
 
 : <border-button> ( label quot -- button )
     <button> border-button-theme ;
@@ -199,9 +199,10 @@ M: radio-control model-changed
 : <toolbar> ( target -- toolbar )
     <shelf>
         1 >>fill
+        { 5 5 } >>gap
         swap
         [ [ "toolbar" ] dip class command-map commands>> ] keep
         '[ [ _ ] 2dip <command-button> add-gadget ] assoc-each ;
 
 : add-toolbar ( track -- track )
-    dup <toolbar> f track-add ;
+    dup <toolbar> { 3 3 } <border> align-left f track-add ;
