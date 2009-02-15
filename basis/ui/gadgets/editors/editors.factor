@@ -11,8 +11,8 @@ ui.pens.solid ui.gadgets.line-support ui.text ui.gestures
 math.rectangles splitting unicode.categories fonts grouping ;
 IN: ui.gadgets.editors
 
-TUPLE: editor < gadget
-font caret-color selection-color
+TUPLE: editor < line-gadget
+caret-color
 caret mark
 focused? blink blink-alarm ;
 
@@ -24,11 +24,10 @@ focused? blink blink-alarm ;
 
 : editor-theme ( editor -- editor )
     COLOR: red >>caret-color
-    selection-color >>selection-color
     monospace-font >>font ; inline
 
 : new-editor ( class -- editor )
-    new-gadget
+    new-line-gadget
         <document> >>model
         init-editor-locs
         editor-theme ; inline

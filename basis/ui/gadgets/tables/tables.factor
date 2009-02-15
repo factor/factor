@@ -21,7 +21,7 @@ M: object prototype-row drop { "" } ;
 M: object row-value drop ;
 M: object row-color 2drop f ;
 
-TUPLE: table < gadget
+TUPLE: table < line-gadget
 { renderer initial: trivial-renderer }
 filled-column column-alignment
 { action initial: [ drop ] }
@@ -29,7 +29,7 @@ single-click?
 { hook initial: [ ] }
 { gap initial: 6 }
 column-widths total-width
-font selection-color focus-border-color
+focus-border-color
 { mouse-color initial: COLOR: black }
 { column-line-color initial: COLOR: dark-gray }
 selection-required?
@@ -38,11 +38,10 @@ mouse-index
 focused? ;
 
 : <table> ( rows -- table )
-    table new-gadget
+    table new-line-gadget
         swap >>model
         f <model> >>selected-value
         sans-serif-font >>font
-        selection-color >>selection-color
         focus-border-color >>focus-border-color ;
 
 <PRIVATE

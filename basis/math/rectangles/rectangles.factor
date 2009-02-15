@@ -48,3 +48,6 @@ M: rect contains-point?
 : rect-containing ( points -- rect )
     [ vsupremum ] [ vinfimum ] bi
     [ nip ] [ v- ] 2bi <rect> ;
+
+: rect-min ( rect dim -- rect' )
+    [ rect-bounds ] dip vmin <rect> ;
