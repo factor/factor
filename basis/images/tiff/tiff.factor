@@ -5,7 +5,7 @@ compression.lzw constructors endian fry grouping images io
 io.binary io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files kernel math
 math.bitwise math.order math.parser pack prettyprint sequences
-strings math.vectors ;
+strings math.vectors specialized-arrays.float ;
 IN: images.tiff
 
 TUPLE: tiff-image < image ;
@@ -343,6 +343,27 @@ ERROR: unknown-component-order ifd ;
         [ unknown-component-order ]
     } case ;
 
+: handle-alpha-data ( ifd -- ifd )
+    dup extra-samples find-tag {
+        { extra-samples-associated-alpha-data [
+            [
+                B{ } like dup
+                byte-array>float-array
+                4 <sliced-groups>
+                [
+                    dup fourth dup 0 = [
+                        2drop
+                    ] [
+                        [ 3 head-slice ] dip '[ _ / ] change-each
+                    ] if
+                ] each
+            ] change-bitmap
+        ] }
+        { extra-samples-unspecified-alpha-data [
+        ] }
+        [ bad-extra-samples ]
+    } case ;
+
 : ifd>image ( ifd -- image )
     {
         [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
@@ -364,6 +385,7 @@ ERROR: unknown-component-order ifd ;
                 strips>bitmap
                 fix-bitmap-endianness
                 strips-predictor
+                dup extra-samples tag? [ handle-alpha-data ] when
                 drop
             ] each
         ] with-endianness
