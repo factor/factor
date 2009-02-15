@@ -83,7 +83,7 @@ C: <vocab-author> vocab-author
         "Tuple classes" $subheading
         [
             [ <$pretty-link> ]
-            [ superclass <$link> ]
+            [ superclass <$pretty-link> ]
             [ "slots" word-prop [ name>> ] map " " join <$snippet> ]
             tri 3array
         ] map
@@ -96,7 +96,7 @@ C: <vocab-author> vocab-author
         "Predicate classes" $subheading
         [
             [ <$pretty-link> ]
-            [ superclass <$link> ]
+            [ superclass <$pretty-link> ]
             bi 2array
         ] map
         { { $strong "Class" } { $strong "Superclass" } } prefix
@@ -150,7 +150,7 @@ C: <vocab-author> vocab-author
     [
         "Parsing words" $subheading
         [
-            [ <$link> ]
+            [ <$pretty-link> ]
             [ word-syntax dup [ <$snippet> ] when ]
             bi 2array
         ] map
@@ -190,7 +190,7 @@ C: <vocab-author> vocab-author
 : describe-symbols ( words -- )
     [
         "Symbol words" $subheading
-        [ <$link> 1array ] map $table
+        [ <$pretty-link> 1array ] map $table
     ] unless-empty ;
 
 : $words ( words -- )
