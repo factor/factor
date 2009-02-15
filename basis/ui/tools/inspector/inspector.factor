@@ -6,7 +6,7 @@ io io.styles arrays hashtables math.order sorting refs fonts
 ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks
 ui.gestures ui.gadgets.buttons ui.gadgets.tables
-ui.gadgets.status-bar ui.gadgets.theme ui.gadgets.labeled
+ui.gadgets.status-bar ui.gadgets.labeled
 ui.tools.common ui ;
 IN: ui.tools.inspector
 

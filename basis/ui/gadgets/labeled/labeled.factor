@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences colors fonts ui.gadgets
 ui.gadgets.frames ui.gadgets.grids ui.gadgets.icons ui.gadgets.labels
-ui.gadgets.theme ui.gadgets.borders ui.pens.image ;
+ui.gadgets.borders ui.pens.image ;
 IN: ui.gadgets.labeled
 
 TUPLE: labeled-gadget < frame content ;
@@ -14,7 +14,6 @@ TUPLE: labeled-gadget < frame content ;
 
 : labeled-icon ( name -- icon )
     labeled-image <icon> dup interior>> t >>fill? drop ;
-
 
 CONSTANT: labeled-title-background
     T{ rgba f
