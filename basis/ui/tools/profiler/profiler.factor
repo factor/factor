@@ -8,7 +8,7 @@ ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
 ui.gadgets.buttons ui.gadgets.tables ui.gadgets.search-tables
 ui.gadgets.labeled ui.gadgets.buttons ui.gadgets.packs
 ui.gadgets.labels ui.gadgets.tabbed ui.gadgets.status-bar
-ui.tools.browser ui.tools.common ;
+ui.gadgets.borders ui.tools.browser ui.tools.common ;
 FROM: models.filter => <filter> ;
 FROM: models.compose => <compose> ;
 IN: ui.tools.profiler
@@ -98,18 +98,23 @@ M: method-renderer row-value drop first ;
     } ;
 
 : <sort-options> ( model -- gadget )
-    sort-options <radio-buttons> horizontal >>orientation ;
-
-: <profiler-tool-bar> ( profiler -- gadget )
     <shelf>
         +baseline+ >>align
         { 5 5 } >>gap
-        over <toolbar> add-gadget
         "Sort by:" <label> add-gadget
-        swap sort>> <sort-options> add-gadget ;
+        swap sort-options <radio-buttons> horizontal >>orientation add-gadget ;
+
+: <profiler-tool-bar> ( profiler -- gadget )
+    <shelf>
+        1/2 >>align
+        { 5 5 } >>gap
+        swap
+        [ <toolbar> add-gadget ]
+        [ sort>> <sort-options> add-gadget ] bi ;
 
 :: <words-tab> ( profiler -- gadget )
     horizontal <track>
+        { 3 3 } >>gap
         profiler vocabs>> <profiler-table>
             profiler vocab>> >>selected-value
             vocab-renderer >>renderer
@@ -122,7 +127,9 @@ M: method-renderer row-value drop first ;
 
 :: <methods-tab> ( profiler -- gadget )
     vertical <track>
+        { 3 3 } >>gap
         horizontal <track>
+            { 3 3 } >>gap
             profiler <generic-model> <profiler-table>
                 profiler generic>> >>selected-value
                 word-renderer >>renderer
@@ -143,6 +150,7 @@ M: method-renderer row-value drop first ;
 
 : <profiler-gadget> ( -- profiler )
     vertical profiler-gadget new-track
+        { 5 5 } >>gap
         [ [ first ] compare ] <model> >>sort
         all-words counters <model> >>words
         <selection-model> >>vocab
@@ -150,7 +158,7 @@ M: method-renderer row-value drop first ;
         <selection-model> >>generic
         <selection-model> >>class
         dup <methods-model> >>methods
-        dup <profiler-tool-bar> f track-add
+        dup <profiler-tool-bar> { 3 3 } <filled-border> f track-add
         <tabbed-gadget>
             over <words-tab> "Words" add-tab
             over <methods-tab> "Methods" add-tab

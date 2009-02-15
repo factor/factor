@@ -231,13 +231,6 @@ PRIVATE>
         [ <radio-button> ] <radio-controls>
         { 5 5 } >>gap ;
 
-: <toggle-button> ( value model label -- gadget )
-    <radio-control> border-button-theme ;
-
-: <toggle-buttons> ( model assoc -- gadget )
-    <shelf>
-        [ <toggle-button> ] <radio-controls> ;
-
 : <command-button> ( target gesture command -- button )
     [ command-string swap ] keep '[ _ _ invoke-command drop ] <border-button> ;
 
@@ -246,8 +239,9 @@ PRIVATE>
         1 >>fill
         { 5 5 } >>gap
         swap
-        [ [ "toolbar" ] dip class command-map commands>> ] keep
-        '[ [ _ ] 2dip <command-button> add-gadget ] assoc-each ;
+        [ [ "toolbar" ] dip class command-map commands>> ]
+        [ '[ [ _ ] 2dip <command-button> add-gadget ] ]
+        bi assoc-each ;
 
 : add-toolbar ( track -- track )
     dup <toolbar> { 3 3 } <border> align-left f track-add ;
