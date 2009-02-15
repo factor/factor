@@ -85,6 +85,7 @@ M: f >label drop <gadget> ;
 
 : label-on-left/right ( -- track )
     horizontal <track>
+        0 >>fill
         +baseline+ >>align
         { 5 5 } >>gap ; inline
 PRIVATE>

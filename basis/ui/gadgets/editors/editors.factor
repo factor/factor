@@ -130,7 +130,7 @@ M: editor ungraft*
     [ first2 swap ] dip [ editor-line ] [ font>> ] bi swap offset>x round ;
 
 : loc>point ( loc editor -- loc )
-    [ loc>x ] [ [ first ] dip line>y ] 2bi 2array ;
+    [ loc>x ] [ [ first ] dip line>y ceiling ] 2bi 2array ;
 
 : caret-loc ( editor -- loc )
     [ editor-caret ] keep loc>point ;

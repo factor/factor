@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math.rectangles math.vectors namespaces kernel accessors
-combinators sequences opengl opengl.gl opengl.glu colors.constants
-ui.gadgets ui.pens ;
+combinators sequences opengl opengl.gl opengl.glu colors
+colors.constants ui.gadgets ui.pens ;
 IN: ui.render
 
 SYMBOL: clip
