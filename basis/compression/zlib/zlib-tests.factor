@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel tools.test zlib classes ;
-IN: zlib.tests
+USING: kernel tools.test compression.zlib classes ;
+IN: compression.zlib.tests
 
 : compress-me ( -- byte-array ) B{ 1 2 3 4 5 } ;
 

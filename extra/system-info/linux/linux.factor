@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unix alien alien.c-types kernel math sequences strings
-io.backend.unix splitting ;
+io.backend.unix splitting io.encodings.utf8 io.encodings.string ;
 IN: system-info.linux
 
 : (uname) ( buf -- int )
@@ -9,7 +9,7 @@ IN: system-info.linux
 
 : uname ( -- seq )
     65536 "char" <c-array> [ (uname) io-error ] keep
-    "\0" split harvest [ >string ] map
+    "\0" split harvest [ utf8 decode ] map
     6 "" pad-tail ;
 
 : sysname ( -- string ) uname first ;

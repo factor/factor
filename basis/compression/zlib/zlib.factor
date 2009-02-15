@@ -3,8 +3,8 @@
 USING: alien alien.c-types alien.syntax byte-arrays combinators
 kernel math math.functions sequences system accessors
 libc ;
-QUALIFIED: zlib.ffi
-IN: zlib
+QUALIFIED: compression.zlib.ffi
+IN: compression.zlib
 
 TUPLE: compressed data length ;
 
@@ -16,7 +16,7 @@ TUPLE: compressed data length ;
 ERROR: zlib-failed n string ;
 
 : zlib-error-message ( n -- * )
-    dup zlib.ffi:Z_ERRNO = [
+    dup compression.zlib.ffi:Z_ERRNO = [
         drop errno "native libc error"
     ] [
         dup {
@@ -27,7 +27,7 @@ ERROR: zlib-failed n string ;
     ] if zlib-failed ;
 
 : zlib-error ( n -- )
-    dup zlib.ffi:Z_OK = [ drop ] [ dup zlib-error-message zlib-failed ] if ;
+    dup compression.zlib.ffi:Z_OK = [ drop ] [ dup zlib-error-message zlib-failed ] if ;
 
 : compressed-size ( byte-array -- n )
     length 1001/1000 * ceiling 12 + ;
@@ -35,7 +35,7 @@ ERROR: zlib-failed n string ;
 : compress ( byte-array -- compressed )
     [
         [ compressed-size <byte-array> dup length <ulong> ] keep [
-            dup length zlib.ffi:compress zlib-error
+            dup length compression.zlib.ffi:compress zlib-error
         ] 3keep drop *ulong head
     ] keep length <compressed> ;
 
@@ -44,5 +44,5 @@ ERROR: zlib-failed n string ;
         length>> [ <byte-array> ] keep <ulong> 2dup
     ] [
         data>> dup length
-        zlib.ffi:uncompress zlib-error
+        compression.zlib.ffi:uncompress zlib-error
     ] bi *ulong head ;

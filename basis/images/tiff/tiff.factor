@@ -1,9 +1,11 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators io io.encodings.binary io.files kernel
-pack endian constructors sequences arrays math.order math.parser
-prettyprint classes io.binary assocs math math.bitwise byte-arrays
-grouping images.backend ;
+USING: accessors arrays assocs byte-arrays classes combinators
+compression.lzw constructors endian fry grouping images io
+io.binary io.encodings.ascii io.encodings.binary
+io.encodings.string io.encodings.utf8 io.files kernel math
+math.bitwise math.order math.parser pack prettyprint sequences
+strings ;
 IN: images.tiff
 
 TUPLE: tiff-image < image ;
@@ -115,8 +117,9 @@ ERROR: bad-extra-samples n ;
 
 SINGLETONS: image-length image-width x-resolution y-resolution
 rows-per-strip strip-offsets strip-byte-counts bits-per-sample
-samples-per-pixel new-subfile-type orientation
-unhandled-ifd-entry ;
+samples-per-pixel new-subfile-type orientation software
+date-time photoshop exif-ifd sub-ifd inter-color-profile
+xmp iptc unhandled-ifd-entry ;
 
 ERROR: bad-tiff-magic bytes ;
 : tiff-endianness ( byte-array -- ? )
@@ -185,6 +188,7 @@ ERROR: unknown-ifd-type n ;
         { 10 [ 8 * ] }
         { 11 [ 4 * ] }
         { 12 [ 8 * ] }
+        { 13 [ 4 * ] }
         [ unknown-ifd-type ]
     } case ;
 
@@ -200,6 +204,7 @@ ERROR: bad-small-ifd-type n ;
         { 8 [ 2 head endian> 16 >signed ] }
         { 9 [ endian> 32 >signed ] }
         { 11 [ endian> bits>float ] }
+        { 13 [ endian> 32 >signed ] }
         [ bad-small-ifd-type ]
     } case ;
 
@@ -242,51 +247,93 @@ ERROR: bad-small-ifd-type n ;
         { 277 [ samples-per-pixel ] }
         { 278 [ rows-per-strip ] }
         { 279 [ strip-byte-counts ] }
-        { 282 [ x-resolution ] }
-        { 283 [ y-resolution ] }
+        { 282 [ first x-resolution ] }
+        { 283 [ first y-resolution ] }
         { 284 [ planar-configuration ] }
         { 296 [ lookup-resolution-unit resolution-unit ] }
+        { 305 [ ascii decode software ] }
+        { 306 [ ascii decode date-time ] }
         { 317 [ lookup-predictor predictor ] }
+        { 330 [ sub-ifd ] }
         { 338 [ lookup-extra-samples extra-samples ] }
         { 339 [ lookup-sample-format sample-format ] }
-        [ nip unhandled-ifd-entry ]
+        { 700 [ utf8 decode xmp ] }
+        { 34377 [ photoshop ] }
+        { 34665 [ exif-ifd ] }
+        { 33723 [ iptc ] }
+        { 34675 [ inter-color-profile ] }
+        [ nip unhandled-ifd-entry swap ]
     } case ;
 
 : process-ifd ( ifd -- ifd )
     dup ifd-entries>>
     [ process-ifd-entry swap ] H{ } map>assoc >>processed-tags ;
 
+ERROR: unhandled-compression compression ;
+
+: (uncompress-strips) ( strips compression -- uncompressed-strips )
+    {
+        { compression-none [ ] }
+        { compression-lzw [ [ lzw-uncompress ] map ] }
+        [ unhandled-compression ]
+    } case ;
+
+: uncompress-strips ( ifd -- ifd )
+    dup '[
+        _ compression find-tag (uncompress-strips)
+    ] change-strips ;
+
 : strips>bitmap ( ifd -- ifd )
     dup strips>> concat >>bitmap ;
 
 ERROR: unknown-component-order ifd ;
 
+: fix-bitmap-endianness ( ifd -- ifd )
+    dup [ bitmap>> ] [ bits-per-sample find-tag ] bi
+    {
+        { { 32 32 32 32 } [ 4 seq>native-endianness ] }
+        { { 32 32 32 } [ 4 seq>native-endianness ] }
+        { { 16 16 16 16 } [ 2 seq>native-endianness ] }
+        { { 16 16 16 } [ 2 seq>native-endianness ] }
+        { { 8 8 8 8 } [ ] }
+        { { 8 8 8 } [ ] }
+        [ unknown-component-order ]
+    } case >>bitmap ;
+
 : ifd-component-order ( ifd -- byte-order )
-    bits-per-sample find-tag sum {
-        { 32 [ RGBA ] }
-        { 24 [ RGB ] }
+    bits-per-sample find-tag {
+        { { 32 32 32 } [ R32G32B32 ] }
+        { { 16 16 16 } [ R16G16B16 ] }
+        { { 8 8 8 8 } [ RGBA ] }
+        { { 8 8 8 } [ RGB ] }
         [ unknown-component-order ]
     } case ;
 
-M: ifd >image ( ifd -- image )
+: ifd>image ( ifd -- image )
     {
         [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
         [ ifd-component-order ]
         [ bitmap>> ]
-    } cleave tiff-image new-image ;
+    } cleave tiff-image boa ;
 
-M: parsed-tiff >image ( image -- image )
-    ifds>> [ >image ] map first ;
+: tiff>image ( image -- image )
+    ifds>> [ ifd>image ] map first ;
 
 : load-tiff ( path -- parsed-tiff )
     binary [
         <parsed-tiff>
         read-header dup endianness>> [
             read-ifds
-            dup ifds>> [ process-ifd read-strips strips>bitmap drop ] each
+            dup ifds>> [
+                process-ifd read-strips
+                uncompress-strips
+                strips>bitmap
+                fix-bitmap-endianness
+                drop
+            ] each
         ] with-endianness
     ] with-file-reader ;
 
 ! tiff files can store several images -- we just take the first for now
 M: tiff-image load-image* ( path tiff-image -- image )
-    drop load-tiff >image ;
+    drop load-tiff tiff>image ;

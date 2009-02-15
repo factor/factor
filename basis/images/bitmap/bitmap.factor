@@ -1,10 +1,9 @@
 ! Copyright (C) 2007, 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays byte-arrays columns
-combinators fry grouping io io.binary io.encodings.binary
-io.files kernel libc macros math math.bitwise math.functions
-namespaces opengl opengl.gl prettyprint sequences strings
-summary ui ui.gadgets.panes images.backend ;
+combinators fry grouping io io.binary io.encodings.binary io.files
+kernel macros math math.bitwise math.functions namespaces sequences
+strings images endian summary ;
 IN: images.bitmap
 
 TUPLE: bitmap-image < image ;
@@ -102,12 +101,12 @@ ERROR: unknown-component-order bitmap ;
         [ unknown-component-order ]
     } case ;
 
-M: bitmap >image ( bitmap -- bitmap-image )
+: >image ( bitmap -- bitmap-image )
     {
         [ [ width>> ] [ height>> ] bi 2array ]
         [ bitmap>component-order ]
         [ buffer>> ]
-    } cleave bitmap-image new-image ;
+    } cleave bitmap-image boa ;
 
 M: bitmap-image load-image* ( path bitmap -- bitmap-image )
     drop load-bitmap >image ;

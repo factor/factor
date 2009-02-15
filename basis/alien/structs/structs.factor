@@ -3,7 +3,7 @@
 USING: accessors arrays assocs generic hashtables kernel kernel.private
 math namespaces parser sequences strings words libc fry
 alien.c-types alien.structs.fields cpu.architecture math.order
-quotations ;
+quotations byte-arrays ;
 IN: alien.structs
 
 TUPLE: struct-type
@@ -13,11 +13,14 @@ fields
 { boxer-quot callable }
 { unboxer-quot callable }
 { getter callable }
-{ setter callable } ;
+{ setter callable }
+return-in-registers? ;
+
+M: struct-type c-type ;
 
 M: struct-type heap-size size>> ;
 
-M: struct-type c-type-class drop object ;
+M: struct-type c-type-class drop byte-array ;
 
 M: struct-type c-type-align align>> ;
 
@@ -37,7 +40,7 @@ M: struct-type box-parameter
     [ %box-large-struct ] [ box-parameter ] if-value-struct ;
 
 : if-small-struct ( c-type true false -- ? )
-    [ dup struct-small-enough? ] 2dip '[ f swap @ ] if ; inline
+    [ dup return-struct-in-registers? ] 2dip '[ f swap @ ] if ; inline
 
 M: struct-type unbox-return
     [ %unbox-small-struct ] [ %unbox-large-struct ] if-small-struct ;
