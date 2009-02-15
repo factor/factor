@@ -2,19 +2,26 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators fry kernel math math.functions math.order
 math.ranges math.vectors namespaces opengl sequences ui.gadgets
-ui.render ui.text ;
+ui.render ui.text ui.gadgets.theme ui.gadgets.scrollers ;
 IN: ui.gadgets.line-support
 
 ! Some code shared by table and editor gadgets
-SLOT: font
+TUPLE: line-gadget < gadget
+font selection-color
+min-rows max-rows
+min-cols max-cols ;
+
+: new-line-gadget ( class -- gadget )
+    new
+        selection-color >>selection-color ;
 
 GENERIC: line-leading ( gadget -- n )
 
-M: gadget line-leading font>> font-metrics leading>> ;
+M: line-gadget line-leading font>> font-metrics leading>> ;
 
 GENERIC: line-height ( gadget -- n )
 
-M: gadget line-height font>> font-metrics height>> ;
+M: line-gadget line-height font>> font-metrics height>> ;
 
 : y>line ( y gadget -- n ) line-height /i ;
 
@@ -51,3 +58,23 @@ GENERIC: draw-line ( line index gadget -- )
         0 over _ * >integer 2array
         [ _ draw-line ] with-translation
     ] each-slice-index ;
+
+<PRIVATE
+
+: clamp ( dim unit min max -- dim' )
+    [ -1/0. or * ] [ 1/.0 or * ] bi-curry* bi
+    [ max ] [ min ] bi* ;
+
+: line-gadget-width ( pref-dim gadget -- w )
+    [ first ] [ [ font>> "m" text-width ] [ min-cols>> ] [ max-cols>> ] tri ] bi* clamp ;
+
+: line-gadget-height ( pref-dim gadget -- h )
+    [ second ] [ [ line-height ] [ min-rows>> ] [ max-rows>> ] tri ] bi* clamp ;
+
+PRIVATE>
+
+M: line-gadget pref-viewport-dim
+    [ pref-dim ] keep
+    [ line-gadget-width ]
+    [ line-gadget-height ]
+    2bi 2array ;

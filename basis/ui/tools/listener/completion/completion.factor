@@ -50,11 +50,6 @@ M: vocab-completion completion-banner drop "Vocabularies" ;
 M: char-completion completion-banner drop "Unicode code point names" ;
 M: history-completion completion-banner drop "Input history" ;
 
-GENERIC: completion-popup-width ( interactor completion-mode -- x )
-
-M: object completion-popup-width 2drop 300 ;
-M: history-completion completion-popup-width drop dim>> first ;
-
 ! Completion modes also implement the row renderer protocol
 M: listener-completion row-columns drop present 1array ;
 
@@ -148,13 +143,12 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
         t >>single-click?
         transparent >>column-line-color
         2 >>gap
+        10 >>min-cols
+        10 >>max-rows
         dup '[ _ accept-completion ] >>action ;
 
 : <completion-scroller> ( completion-popup -- scroller )
-    [ table>> ] [ interactor>> ] [ completion-mode>> ] tri completion-popup-width
-    [ <limited-scroller> ] [ 120 2array ] bi*
-    [ >>min-dim ] [ >>max-dim ] bi
-    COLOR: white <solid> >>interior ;
+    table>> <scroller> COLOR: white <solid> >>interior ;
 
 : <completion-popup> ( interactor completion-mode -- popup )
     [ vertical completion-popup new-track ] 2dip
