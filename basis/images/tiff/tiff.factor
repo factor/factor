@@ -5,7 +5,7 @@ compression.lzw constructors endian fry grouping images io
 io.binary io.encodings.ascii io.encodings.binary
 io.encodings.string io.encodings.utf8 io.files kernel math
 math.bitwise math.order math.parser pack prettyprint sequences
-strings ;
+strings math.vectors specialized-arrays.float ;
 IN: images.tiff
 
 TUPLE: tiff-image < image ;
@@ -119,7 +119,9 @@ SINGLETONS: image-length image-width x-resolution y-resolution
 rows-per-strip strip-offsets strip-byte-counts bits-per-sample
 samples-per-pixel new-subfile-type orientation software
 date-time photoshop exif-ifd sub-ifd inter-color-profile
-xmp iptc unhandled-ifd-entry ;
+xmp iptc fill-order document-name page-number page-name
+x-position y-position
+unhandled-ifd-entry ;
 
 ERROR: bad-tiff-magic bytes ;
 : tiff-endianness ( byte-array -- ? )
@@ -158,6 +160,9 @@ ERROR: no-tag class ;
 
 : find-tag ( idf class -- tag )
     swap processed-tags>> ?at [ no-tag ] unless ;
+
+: tag? ( idf class -- tag )
+    swap processed-tags>> key? ;
 
 : read-strips ( ifd -- ifd )
     dup
@@ -242,6 +247,8 @@ ERROR: bad-small-ifd-type n ;
         { 258 [ bits-per-sample ] }
         { 259 [ lookup-compression compression ] }
         { 262 [ lookup-photometric-interpretation photometric-interpretation ] }
+        { 266 [ fill-order ] }
+        { 269 [ ascii decode document-name ] }
         { 273 [ strip-offsets ] }
         { 274 [ orientation ] }
         { 277 [ samples-per-pixel ] }
@@ -250,7 +257,11 @@ ERROR: bad-small-ifd-type n ;
         { 282 [ first x-resolution ] }
         { 283 [ first y-resolution ] }
         { 284 [ planar-configuration ] }
+        { 285 [ page-name ] }
+        { 286 [ x-position ] }
+        { 287 [ y-position ] }
         { 296 [ lookup-resolution-unit resolution-unit ] }
+        { 297 [ page-number ] }
         { 305 [ ascii decode software ] }
         { 306 [ ascii decode date-time ] }
         { 317 [ lookup-predictor predictor ] }
@@ -286,6 +297,27 @@ ERROR: unhandled-compression compression ;
 : strips>bitmap ( ifd -- ifd )
     dup strips>> concat >>bitmap ;
 
+: (strips-predictor) ( ifd -- ifd )
+    [ ]
+    [ image-width find-tag ]
+    [ samples-per-pixel find-tag ] tri
+    [ * ] keep
+    '[
+        _ group [ _ group [ rest ] [ first ] bi
+        [ v+ ] accumulate swap suffix concat ] map
+        concat >byte-array
+    ] change-bitmap ;
+
+: strips-predictor ( ifd -- ifd )
+    dup predictor tag? [
+        dup predictor find-tag
+        {
+            { predictor-none [ ] }
+            { predictor-horizontal-differencing [ (strips-predictor) ] }
+            [ bad-predictor ]
+        } case
+    ] when ;
+
 ERROR: unknown-component-order ifd ;
 
 : fix-bitmap-endianness ( ifd -- ifd )
@@ -302,11 +334,34 @@ ERROR: unknown-component-order ifd ;
 
 : ifd-component-order ( ifd -- byte-order )
     bits-per-sample find-tag {
+        { { 32 32 32 32 } [ R32G32B32A32 ] }
         { { 32 32 32 } [ R32G32B32 ] }
+        { { 16 16 16 16 } [ R16G16B16A16 ] }
         { { 16 16 16 } [ R16G16B16 ] }
         { { 8 8 8 8 } [ RGBA ] }
         { { 8 8 8 } [ RGB ] }
         [ unknown-component-order ]
+    } case ;
+
+: handle-alpha-data ( ifd -- ifd )
+    dup extra-samples find-tag {
+        { extra-samples-associated-alpha-data [
+            [
+                B{ } like dup
+                byte-array>float-array
+                4 <sliced-groups>
+                [
+                    dup fourth dup 0 = [
+                        2drop
+                    ] [
+                        [ 3 head-slice ] dip '[ _ / ] change-each
+                    ] if
+                ] each
+            ] change-bitmap
+        ] }
+        { extra-samples-unspecified-alpha-data [
+        ] }
+        [ bad-extra-samples ]
     } case ;
 
 : ifd>image ( ifd -- image )
@@ -329,6 +384,8 @@ ERROR: unknown-component-order ifd ;
                 uncompress-strips
                 strips>bitmap
                 fix-bitmap-endianness
+                strips-predictor
+                dup extra-samples tag? [ handle-alpha-data ] when
                 drop
             ] each
         ] with-endianness
