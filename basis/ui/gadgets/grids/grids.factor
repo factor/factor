@@ -107,7 +107,7 @@ M: grid pref-dim* <grid-layout> grid-pref-dim ;
 
 : grid-layout ( children grid-layout -- )
     [ cell-locs ] [ cell-dims ] bi
-    [ [ [ >>loc ] [ >>dim ] bi* drop ] 3each ] 3each ;
+    [ [ <rect> swap set-rect-bounds ] 3each ] 3each ;
 
 M: grid layout* [ grid>> ] [ <grid-layout> ] bi grid-layout ;
 

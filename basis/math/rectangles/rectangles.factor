@@ -51,3 +51,8 @@ M: rect contains-point?
 
 : rect-min ( rect dim -- rect' )
     [ rect-bounds ] dip vmin <rect> ;
+
+: set-rect-bounds ( rect1 rect -- )
+    [ [ loc>> ] dip (>>loc) ]
+    [ [ dim>> ] dip (>>dim) ]
+    2bi ; inline
