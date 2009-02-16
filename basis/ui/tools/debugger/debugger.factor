@@ -21,10 +21,9 @@ M: restart-renderer row-columns
     drop [ name>> ] [ "Abort" ] if* "• " prepend 1array ;
 
 : <restart-list> ( debugger -- gadget )
-    dup restarts>> f prefix <model> <table>
+    dup restarts>> f prefix <model> restart-renderer <table>
         [ [ \ restart invoke-command ] when* ] >>action
         swap restart-hook>> >>hook
-        restart-renderer >>renderer
         t >>selection-required?
         t >>single-click? ; inline
 

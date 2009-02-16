@@ -21,10 +21,9 @@ M: stack-entry-renderer row-columns drop string>> 1array ;
 M: stack-entry-renderer row-value drop object>> ;
 
 : <stack-table> ( model -- table )
-    [ [ <stack-entry> ] map ] <filter> <table>
+    [ [ <stack-entry> ] map ] <filter> stack-entry-renderer <table>
         monospace-font >>font
         [ i:inspector ] >>action
-        stack-entry-renderer >>renderer
         t >>single-click? ;
 
 : <stack-display> ( model quot title -- gadget )

@@ -3,27 +3,34 @@
 USING: accessors arrays colors colors.constants fry kernel math
 math.rectangles math.order math.vectors namespaces opengl sequences
 ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.worlds ui.gestures ui.render ui.text ui.commands
+ui.gadgets.worlds ui.gestures ui.render ui.pens.solid ui.text ui.commands
 ui.images ui.gadgets.menus ui.gadgets.line-support math.rectangles
 models math.ranges sequences combinators fonts locals strings ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
 GENERIC: prototype-row ( renderer -- columns )
+GENERIC: column-alignment ( renderer -- alignment )
+GENERIC: filled-column ( renderer -- n )
+GENERIC: column-titles ( renderer -- strings )
+
 GENERIC: row-columns ( row renderer -- columns )
 GENERIC: row-value ( row renderer -- object )
 GENERIC: row-color ( row renderer -- color )
 
 SINGLETON: trivial-renderer
 
-M: trivial-renderer row-columns drop ;
 M: object prototype-row drop { "" } ;
+M: object column-alignment drop f ;
+M: object filled-column drop f ;
+M: object column-titles drop f ;
+
+M: trivial-renderer row-columns drop ;
 M: object row-value drop ;
 M: object row-color 2drop f ;
 
 TUPLE: table < line-gadget
 { renderer initial: trivial-renderer }
-filled-column column-alignment
 { action initial: [ drop ] }
 single-click?
 { hook initial: [ ] }
@@ -37,8 +44,9 @@ selected-index selected-value
 mouse-index
 focused? ;
 
-: <table> ( rows -- table )
+: <table> ( rows renderer -- table )
     table new-line-gadget
+        swap >>renderer
         swap >>model
         f <model> >>selected-value
         sans-serif-font >>font
@@ -64,21 +72,29 @@ M: image-name draw-cell nip draw-image ;
 : column-offsets ( widths gap -- x xs )
     [ 0 ] dip '[ _ + + ] accumulate ;
 
-: initial-widths ( rows -- widths )
-    first length 0 <repetition> ;
+CONSTANT: column-title-background COLOR: light-gray
 
-: row-column-widths ( font row -- widths )
-    [ cell-width ] with map ;
+: column-title-font ( font -- font' )
+    column-title-background font-with-background t >>bold? ;
 
-: (compute-column-widths) ( gap font rows -- total widths )
-    [ 2drop 0 { } ] [
-        [ nip initial-widths ] 2keep
+: initial-widths ( table rows -- widths )
+    over renderer>> column-titles dup
+    [ [ drop font>> ] dip [ text-width ] with map ]
+    [ drop nip first length 0 <repetition> ]
+    if ;
+
+: row-column-widths ( table row -- widths )
+    [ font>> ] dip [ cell-width ] with map ;
+
+: compute-total-width ( gap widths -- total )
+    swap [ column-offsets drop ] keep - ;
+
+: compute-column-widths ( table -- total widths )
+    dup table-rows [ drop 0 { } ] [
+        [ drop gap>> ] [ initial-widths ] [ ] 2tri
         [ row-column-widths vmax ] with each
-        [ swap [ column-offsets drop ] keep - ] keep
+        [ compute-total-width ] keep
     ] if-empty ;
-
-: compute-column-widths ( table -- total-width column-widths )
-    [ gap>> ] [ font>> ] [ table-rows ] tri (compute-column-widths) ;
 
 : update-cached-widths ( table -- )
     dup compute-column-widths
@@ -90,7 +106,7 @@ M: image-name draw-cell nip draw-image ;
 
 : update-filled-column ( table -- )
     [ filled-column-width ]
-    [ filled-column>> ]
+    [ renderer>> filled-column ]
     [ column-widths>> ] tri
     2dup empty? not and
     [ [ + ] change-nth ] [ 3drop ] if ;
@@ -158,8 +174,8 @@ M: table layout*
         ] dip
     ] dip translate-column ;
 
-: column-alignment ( table -- seq )
-    dup column-alignment>>
+: table-column-alignment ( table -- seq )
+    dup renderer>> column-alignment
     [ ] [ column-widths>> length 0 <repetition> ] ?if ;
 
 :: row-font ( row index table -- font )
@@ -167,17 +183,20 @@ M: table layout*
     row table renderer>> row-color [ >>foreground ] when*
     index table selected-index>> = [ table selection-color>> >>background ] when ;
 
+: draw-columns ( columns widths alignment font gap -- )
+    '[ [ _ ] 3dip _ draw-column ] 3each ;
+
 M: table draw-line ( row index table -- )
     [
         nip
         [ renderer>> row-columns ]
         [ column-widths>> ]
-        [ column-alignment ]
+        [ table-column-alignment ]
         tri
     ]
     [ row-font ]
     [ 2nip gap>> ] 3tri
-    '[ [ _ ] 3dip _ draw-column ] 3each ;
+    draw-columns ;
 
 M: table draw-gadget*
     dup control-value empty? [ drop ] [
@@ -345,5 +364,32 @@ table "row" f {
     { T{ key-down f f "PAGE_UP" } previous-page }
     { T{ key-down f f "PAGE_DOWN" } next-page }
 } define-command-map
+
+TUPLE: column-headers < gadget table ;
+
+: <column-headers> ( table -- gadget )
+    column-headers new
+        swap >>table
+        column-title-background <solid> >>interior ;
+
+: draw-column-titles ( table -- )
+    {
+        [ renderer>> column-titles ]
+        [ column-widths>> ]
+        [ table-column-alignment ]
+        [ font>> column-title-font ]
+        [ gap>> ]
+    } cleave
+    draw-columns ;
+
+M: column-headers draw-gadget*
+    table>> draw-column-titles ;
+
+M: column-headers pref-dim*
+    table>> [ pref-dim first ] [ font>> "" text-height ] bi 2array ;
+
+M: table viewport-column-header
+    dup renderer>> column-titles
+    [ <column-headers> ] [ drop f ] if ;
 
 PRIVATE>

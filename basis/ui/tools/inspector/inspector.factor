@@ -27,6 +27,9 @@ M: inspector-renderer row-columns
 M: inspector-renderer row-value
     drop value>> ;
 
+M: inspector-renderer column-titles
+    drop { "Key" "Value" } ;
+
 : <summary-gadget> ( model -- gadget )
     [
         standard-table-style [
@@ -60,13 +63,13 @@ M: hashtable make-slot-descriptions
     call-next-method [ [ key-string>> ] compare ] sort ;
 
 : <inspector-table> ( model -- table )
-    [ make-slot-descriptions ] <filter> <table>
+    [ make-slot-descriptions ] <filter> inspector-renderer <table>
         [ dup primary-operation invoke-command ] >>action
-        inspector-renderer >>renderer
         monospace-font >>font ;
 
 : <inspector-gadget> ( model -- gadget )
     vertical inspector-gadget new-track
+        { 3 3 } >>gap
         add-toolbar
         swap >>model
         dup model>> <inspector-table> >>table

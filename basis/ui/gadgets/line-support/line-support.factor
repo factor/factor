@@ -65,13 +65,15 @@ GENERIC: draw-line ( line index gadget -- )
     [ -1/0. or * ] [ 1/.0 or * ] bi-curry* bi
     [ max ] [ min ] bi* ;
 
+: em ( font -- x ) "m" text-width ;
+
+PRIVATE>
+
 : line-gadget-width ( pref-dim gadget -- w )
-    [ first ] [ [ font>> "m" text-width ] [ min-cols>> ] [ max-cols>> ] tri ] bi* clamp ;
+    [ first ] [ [ font>> em ] [ min-cols>> ] [ max-cols>> ] tri ] bi* clamp ;
 
 : line-gadget-height ( pref-dim gadget -- h )
     [ second ] [ [ line-height ] [ min-rows>> ] [ max-rows>> ] tri ] bi* clamp ;
-
-PRIVATE>
 
 M: line-gadget pref-viewport-dim
     [ pref-dim ] keep

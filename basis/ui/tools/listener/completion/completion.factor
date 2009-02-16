@@ -136,8 +136,7 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
 
 : <completion-table> ( interactor completion-mode -- table )
     [ completion-element ] [ completion-quot ] [ nip ] 2tri
-    [ <completion-model> <table> ] dip
-        >>renderer
+    [ <completion-model> ] dip <table>
         monospace-font >>font
         t >>selection-required?
         t >>single-click?
