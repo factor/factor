@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators fry kernel math math.functions math.order
 math.ranges math.vectors namespaces opengl sequences ui.gadgets
-ui.render ui.text ui.gadgets.scrollers ;
+ui.render ui.text ui.gadgets.scrollers ui.gadgets.viewports ;
 IN: ui.gadgets.line-support
 
 ! Some code shared by table and editor gadgets
@@ -78,3 +78,6 @@ M: line-gadget pref-viewport-dim
     [ line-gadget-width ]
     [ line-gadget-height ]
     2bi 2array ;
+
+: visible-lines ( gadget -- n )
+    [ visible-dim second ] [ line-height ] bi /i 1- ;

@@ -1,7 +1,8 @@
 USING: accessors ui.gadgets.editors tools.test kernel io
 io.streams.plain definitions namespaces ui.gadgets
 ui.gadgets.grids prettyprint documents ui.gestures tools.test.ui
-models documents.elements ui.gadgets.scrollers sequences ;
+models documents.elements ui.gadgets.scrollers ui.gadgets.line-support
+sequences ;
 IN: ui.gadgets.editors.tests
 
 [ "foo bar" ] [
@@ -58,3 +59,10 @@ IN: ui.gadgets.editors.tests
 [ "A B" ] [ <editor> "A\nB" over set-editor-string [ com-join-lines ] [ editor-string ] bi ] unit-test
 
 [ 2 ] [ <editor> 20 >>min-rows 20 >>min-cols pref-viewport-dim length ] unit-test
+
+[ 20 ] [
+    <editor> 20 >>min-rows 20 >>min-cols
+    dup pref-viewport-dim >>dim
+    visible-lines
+] unit-test
+
