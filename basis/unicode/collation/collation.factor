@@ -24,12 +24,11 @@ TUPLE: weight primary secondary tertiary ignorable? ;
     ";" split1 [ [ blank? ] trim ] bi@
     [ " " split [ hex> ] "" map-as ] [ parse-weight ] bi* ;
 
-: parse-ducet ( stream -- ducet )
-    lines filter-comments
+: parse-ducet ( file -- ducet )
+    ascii file-lines filter-comments
     [ parse-line ] H{ } map>assoc ;
 
-"vocab:unicode/collation/allkeys.txt"
-ascii <file-reader> parse-ducet to: ducet
+"vocab:unicode/collation/allkeys.txt" parse-ducet to: ducet
 
 ! Fix up table for long contractions
 : help-one ( assoc key -- )

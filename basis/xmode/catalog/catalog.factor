@@ -37,8 +37,7 @@ MEMO: mode-names ( -- modes )
 MEMO: (load-mode) ( name -- rule-sets )
     modes at [
         file>>
-        "vocab:xmode/modes/" prepend
-        utf8 <file-reader> parse-mode
+        "vocab:xmode/modes/" prepend parse-mode
     ] [
         "text" (load-mode)
     ] if* ;

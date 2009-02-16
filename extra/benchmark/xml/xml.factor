@@ -6,7 +6,7 @@ IN: benchmark.xml
 
 : xml-benchmark ( -- )
     "vocab:xmode/modes/" [
-        [ utf8 <file-reader> read-xml drop ] each
+        [ file>xml drop ] each
     ] with-directory-files ;
 
 MAIN: xml-benchmark
