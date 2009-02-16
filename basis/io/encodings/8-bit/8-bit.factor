@@ -34,7 +34,7 @@ IN: io.encodings.8-bit
 
 : encoding-file ( file-name -- stream )
     "vocab:io/encodings/8-bit/" swap ".TXT"
-    3append ascii <file-reader> ;
+    3append ;
 
 : process-contents ( lines -- assoc )
     [ "#" split1 drop ] map harvest
@@ -47,8 +47,8 @@ IN: io.encodings.8-bit
 : ch>byte ( assoc -- newassoc )
     [ swap ] assoc-map >hashtable ;
 
-: parse-file ( stream -- byte>ch ch>byte )
-    lines process-contents
+: parse-file ( path -- byte>ch ch>byte )
+    ascii file-lines process-contents
     [ byte>ch ] [ ch>byte ] bi ;
 
 SYMBOL: 8-bit-encodings

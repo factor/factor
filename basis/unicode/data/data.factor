@@ -196,9 +196,9 @@ load-properties to: properties
 
 SYMBOL: interned
 
-: parse-script ( stream -- assoc )
+: parse-script ( filename -- assoc )
     ! assoc is code point/range => name
-    lines filter-comments [ split-; ] map ;
+    ascii file-lines filter-comments [ split-; ] map ;
 
 : range, ( value key -- )
     swap interned get
@@ -218,7 +218,7 @@ SYMBOL: interned
     [ expand-ranges ] with-variable ;
 
 : load-script ( filename -- table )
-    ascii <file-reader> parse-script process-script ;
+    parse-script process-script ;
 
 [ name>char [ "Invalid character" throw ] unless* ]
 name>char-hook set-global
