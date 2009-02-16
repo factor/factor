@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators fry kernel math math.functions math.order
 math.ranges math.vectors namespaces opengl sequences ui.gadgets
-ui.render ui.text ui.gadgets.theme ui.gadgets.scrollers ;
+ui.render ui.text ui.gadgets.scrollers ;
 IN: ui.gadgets.line-support
 
 ! Some code shared by table and editor gadgets
