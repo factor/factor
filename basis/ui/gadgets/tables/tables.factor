@@ -3,7 +3,7 @@
 USING: accessors arrays colors colors.constants fry kernel math
 math.rectangles math.order math.vectors namespaces opengl sequences
 ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.worlds ui.gestures ui.render ui.text
+ui.gadgets.worlds ui.gestures ui.render ui.text ui.commands
 ui.images ui.gadgets.menus ui.gadgets.line-support math.rectangles
 models math.ranges sequences combinators fonts locals strings ;
 IN: ui.gadgets.tables
@@ -130,7 +130,8 @@ M: table layout*
         over mouse-color>> [ gl-rect ] highlight-row
     ] [ 2drop ] if ;
 
-: column-line-offsets ( widths gap -- xs )
+: column-line-offsets ( table -- xs )
+    [ column-widths>> ] [ gap>> ] bi
     [ column-offsets nip [ f ] ]
     [ 2/ '[ rest-slice [ _ - ] map ] ]
     bi if-empty ;
@@ -138,7 +139,7 @@ M: table layout*
 : draw-column-lines ( table -- )
     [ column-line-color>> gl-color ]
     [
-        [ [ column-widths>> ] [ gap>> ] bi column-line-offsets ] [ dim>> second ] bi
+        [ column-line-offsets ] [ dim>> second ] bi
         '[ [ 0 2array ] [ _ 2array ] bi gl-line ] each
     ] bi ;
 
@@ -273,7 +274,7 @@ PRIVATE>
 : prev/next-row ( table n -- )
     [ dup selected-index>> ] dip '[ _ + ] [ 0 ] if* select-row ;
     
-: prev-row ( table -- )
+: previous-row ( table -- )
     -1 prev/next-row ;
 
 : next-row ( table -- )
@@ -284,6 +285,15 @@ PRIVATE>
 
 : last-row ( table -- )
     dup control-value length 1- select-row ;
+
+: prev/next-page ( table n -- )
+    over visible-lines * prev/next-row ;
+
+: previous-page ( table -- )
+    -1 prev/next-page ;
+
+: next-page ( table -- )
+    1 prev/next-page ;
 
 : hide-mouse-help ( table -- )
     f >>mouse-index [ hide-status ] [ relayout-1 ] bi ;
@@ -310,21 +320,30 @@ PRIVATE>
         show-operations-menu
     ] [ drop ] if-mouse-row ;
 
-table H{
-    { mouse-enter [ show-mouse-help ] }
-    { mouse-leave [ hide-mouse-help ] }
-    { motion [ show-mouse-help ] }
-    { T{ button-down } [ table-button-down ] }
-    { T{ button-down f f 3 } [ show-table-menu ] }
-    { T{ button-up } [ table-button-up ] }
-    { gain-focus [ t >>focused? drop ] }
-    { lose-focus [ f >>focused? drop ] }
-    { T{ drag } [ table-button-down ] }
-    { T{ key-down f f "RET" } [ row-action ] }
-    { T{ key-down f f "UP" } [ prev-row ] }
-    { T{ key-down f f "DOWN" } [ next-row ] }
-    { T{ key-down f f "HOME" } [ first-row ] }
-    { T{ key-down f f "END" } [ last-row ] }
-} set-gestures
+: focus-table ( table -- ) t >>focused? drop ;
+
+: unfocus-table ( table -- ) f >>focused? drop ;
+
+table "sundry" f {
+    { mouse-enter show-mouse-help }
+    { mouse-leave hide-mouse-help }
+    { motion show-mouse-help }
+    { T{ button-down } table-button-down }
+    { T{ button-up } table-button-up }
+    { gain-focus focus-table }
+    { lose-focus unfocus-table }
+    { T{ drag } table-button-down }
+} define-command-map
+
+table "row" f {
+    { T{ button-down f f 3 } show-table-menu }
+    { T{ key-down f f "RET" } row-action }
+    { T{ key-down f f "UP" } previous-row }
+    { T{ key-down f f "DOWN" } next-row }
+    { T{ key-down f f "HOME" } first-row }
+    { T{ key-down f f "END" } last-row }
+    { T{ key-down f f "PAGE_UP" } previous-page }
+    { T{ key-down f f "PAGE_DOWN" } next-page }
+} define-command-map
 
 PRIVATE>
