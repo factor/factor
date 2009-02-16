@@ -143,7 +143,7 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
         t >>single-click?
         transparent >>column-line-color
         2 >>gap
-        10 >>min-cols
+        30 >>min-cols
         10 >>max-rows
         dup '[ _ accept-completion ] >>action ;
 
