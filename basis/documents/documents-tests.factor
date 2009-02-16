@@ -89,6 +89,11 @@ namespaces tools.test make arrays kernel fry ;
     "doc" get doc-string
 ] unit-test
 
+<document> "doc" set
+"Hello\nworld, how are\nyou?" "doc" get set-doc-string
+
+[ { 2 4 } ] [ "doc" get doc-end ] unit-test
+
 ! Undo/redo
 [ ] [ <document> "d" set ] unit-test
 
