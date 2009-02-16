@@ -5,7 +5,7 @@ splitting kernel namespaces fry memoize ;
 IN: mime.types
 
 MEMO: mime-db ( -- seq )
-    "resource:basis/mime/types/mime.types" ascii file-lines
+    "vocab:mime/types/mime.types" ascii file-lines
     [ "#" head? not ] filter [ " \t" split harvest ] map harvest ;
 
 : nonstandard-mime-types ( -- assoc )

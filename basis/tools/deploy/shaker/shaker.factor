@@ -42,21 +42,21 @@ IN: tools.deploy.shaker
 : strip-debugger ( -- )
     strip-debugger? "debugger" vocab and [
         "Stripping debugger" show
-        "resource:basis/tools/deploy/shaker/strip-debugger.factor"
+        "vocab:tools/deploy/shaker/strip-debugger.factor"
         run-file
     ] when ;
 
 : strip-libc ( -- )
     "libc" vocab [
         "Stripping manual memory management debug code" show
-        "resource:basis/tools/deploy/shaker/strip-libc.factor"
+        "vocab:tools/deploy/shaker/strip-libc.factor"
         run-file
     ] when ;
 
 : strip-cocoa ( -- )
     "cocoa" vocab [
         "Stripping unused Cocoa methods" show
-        "resource:basis/tools/deploy/shaker/strip-cocoa.factor"
+        "vocab:tools/deploy/shaker/strip-cocoa.factor"
         run-file
     ] when ;
 
@@ -380,7 +380,7 @@ SYMBOL: deploy-vocab
             dup next-method-quot "next-method-quot" set-word-prop
         ] assoc-each
     ] each
-    "resource:basis/tools/deploy/shaker/next-methods.factor" run-file ;
+    "vocab:tools/deploy/shaker/next-methods.factor" run-file ;
 
 : strip ( -- )
     init-stripper

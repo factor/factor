@@ -21,14 +21,14 @@ ERROR: missing-name encoding ;
     dup e>n-table get-global at [ ] [ missing-name ] ?if ;
 
 <PRIVATE
-: parse-iana ( stream -- synonym-set )
-    lines { "" } split [
+: parse-iana ( file -- synonym-set )
+    utf8 file-lines { "" } split [
         [ " " split ] map
         [ first { "Name:" "Alias:" } member? ] filter
         [ second ] map { "None" } diff
     ] map harvest ;
 
-: make-aliases ( stream -- n>e )
+: make-aliases ( file -- n>e )
     parse-iana [ [ first ] [ ] bi ] H{ } map>assoc ;
 
 : initial-n>e ( -- assoc )
@@ -44,8 +44,8 @@ ERROR: missing-name encoding ;
 
 PRIVATE>
 
-"resource:basis/io/encodings/iana/character-sets"
-utf8 <file-reader> make-aliases aliases set-global
+"vocab:io/encodings/iana/character-sets"
+make-aliases aliases set-global
 
 n>e-table [ initial-n>e ] initialize
 e>n-table [ initial-e>n ] initialize

@@ -4,7 +4,7 @@ tools.test assocs words ;
 IN: unicode.collation.tests
 
 : parse-test ( -- strings )
-    "resource:basis/unicode/collation/CollationTest_SHIFTED.txt"
+    "vocab:unicode/collation/CollationTest_SHIFTED.txt"
     utf8 file-lines 5 tail
     [ ";" split1 drop " " split [ hex> ] "" map-as ] map ;
 
