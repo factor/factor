@@ -70,8 +70,8 @@ PRIVATE>
     ] tabular-output ;
 
 : heap-stats ( -- counts sizes )
-    H{ } clone H{ } clone
-    2dup '[ _ _ heap-stat-step ] each-object ;
+    [ ] instances H{ } clone H{ } clone
+    [ '[ _ _ heap-stat-step ] each ] 2keep ;
 
 : heap-stats. ( -- )
     heap-stats dup keys natural-sort standard-table-style [
