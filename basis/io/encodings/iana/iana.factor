@@ -44,7 +44,7 @@ ERROR: missing-name encoding ;
 
 PRIVATE>
 
-"resource:basis/io/encodings/iana/character-sets"
+"vocab:io/encodings/iana/character-sets"
 utf8 <file-reader> make-aliases aliases set-global
 
 n>e-table [ initial-n>e ] initialize

@@ -30,5 +30,5 @@ IN: bootstrap.x86
     temp1 JMP                                   ! go
 ] rc-absolute-cell rt-primitive 1 rex-length + jit-primitive jit-define
 
-<< "resource:basis/cpu/x86/bootstrap.factor" parse-file parsed >>
+<< "vocab:cpu/x86/bootstrap.factor" parse-file parsed >>
 call

@@ -14,14 +14,14 @@ IN: io.files.tests
 [
     "This is a line.\rThis is another line.\r"
 ] [
-    "resource:core/io/test/mac-os-eol.txt" latin1 <file-reader>
+    "vocab:io/test/mac-os-eol.txt" latin1 <file-reader>
     [ 500 read ] with-input-stream
 ] unit-test
 
 [
     255
 ] [
-    "resource:core/io/test/binary.txt" latin1 <file-reader>
+    "vocab:io/test/binary.txt" latin1 <file-reader>
     [ read1 ] with-input-stream >fixnum
 ] unit-test
 

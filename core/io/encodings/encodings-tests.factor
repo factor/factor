@@ -4,7 +4,7 @@ namespaces accessors io.encodings ;
 IN: io.streams.encodings.tests
 
 [ { } ]
-[ "resource:core/io/test/empty-file.txt" ascii <file-reader> lines ]
+[ "vocab:io/test/empty-file.txt" ascii <file-reader> lines ]
 unit-test
 
 : lines-test ( stream -- line1 line2 )
@@ -14,7 +14,7 @@ unit-test
     "This is a line."
     "This is another line."
 ] [
-    "resource:core/io/test/windows-eol.txt"
+    "vocab:io/test/windows-eol.txt"
     ascii <file-reader> lines-test
 ] unit-test
 
@@ -22,7 +22,7 @@ unit-test
     "This is a line."
     "This is another line."
 ] [
-    "resource:core/io/test/mac-os-eol.txt"
+    "vocab:io/test/mac-os-eol.txt"
     ascii <file-reader> lines-test
 ] unit-test
 
@@ -30,7 +30,7 @@ unit-test
     "This is a line."
     "This is another line."
 ] [
-    "resource:core/io/test/unix-eol.txt"
+    "vocab:io/test/unix-eol.txt"
     ascii <file-reader> lines-test
 ] unit-test
 

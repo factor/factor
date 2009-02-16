@@ -9,7 +9,7 @@ IN: unicode.script
 
 VALUE: script-table
 
-"resource:basis/unicode/script/Scripts.txt" load-script
+"vocab:unicode/script/Scripts.txt" load-script
 to: script-table
 
 : script-of ( char -- script )
