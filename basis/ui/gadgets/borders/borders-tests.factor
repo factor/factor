@@ -1,6 +1,6 @@
 IN: ui.gadgets.borders.tests
-USING: tools.test accessors namespaces kernel
-ui.gadgets ui.gadgets.borders math.rectangles ;
+USING: tools.test accessors namespaces kernel ui.gadgets
+ui.gadgets.borders ui.gadgets.borders.private math.rectangles ;
 
 [ { 110 210 } ] [ <gadget> { 100 200 } >>dim { 5 5 } <border> pref-dim ] unit-test
 
