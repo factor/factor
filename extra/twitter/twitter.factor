@@ -1,11 +1,39 @@
+! Copyright (C) 2009 Joe Groff.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators hashtables http
 http.client json.reader kernel macros namespaces sequences
-urls.secure urls.encoding ;
+urls.secure fry ;
 IN: twitter
 
+! Configuration
 SYMBOLS: twitter-username twitter-password twitter-source ;
 
 twitter-source [ "factor" ] initialize
+
+: set-twitter-credentials ( username password -- )
+    [ twitter-username set ] [ twitter-password set ] bi* ;
+
+<PRIVATE
+
+! Utilities
+MACRO: keys-boa ( keys class -- )
+    [ [ '[ _ swap at ] ] map ] dip '[ _ cleave _ boa ] ;
+
+! Twitter requests
+
+: twitter-url ( string -- url )
+    "https://twitter.com/statuses/" ".json" surround ;
+
+: set-request-twitter-auth ( request -- request )
+    twitter-username get twitter-password get set-basic-auth ;
+
+: twitter-request ( request -- data )
+    set-request-twitter-auth
+    http-request nip ; inline
+
+PRIVATE>
+
+! Data types
 
 TUPLE: twitter-status
     created-at
@@ -28,8 +56,7 @@ TUPLE: twitter-user
     protected?
     followers-count ;
 
-MACRO: keys-boa ( keys class -- )
-    [ [ \ swap \ at [ ] 3sequence ] map \ cleave ] dip \ boa [ ] 4sequence ;
+<PRIVATE
 
 : <twitter-user> ( assoc -- user )
     {
@@ -64,37 +91,42 @@ MACRO: keys-boa ( keys class -- )
 : json>twitter-status ( json-object -- tweet )
     json> <twitter-status> ;
 
-: set-twitter-credentials ( username password -- )
-    [ twitter-username set ] [ twitter-password set ] bi* ; 
+PRIVATE>
 
-: set-request-twitter-auth ( request -- request )
-    twitter-username twitter-password [ get ] bi@ set-basic-auth ;
+! Updates
+<PRIVATE
 
 : update-post-data ( update -- assoc )
-    "status" associate
-    [ twitter-source get "source" ] dip [ set-at ] keep ;
+    [
+        "status" set
+        twitter-source get "source" set
+    ] H{ } make-assoc ;
 
 : (tweet) ( string -- json )
-    update-post-data "https://twitter.com/statuses/update.json" <post-request>
-        set-request-twitter-auth 
-    http-request nip ;
+    update-post-data "update" twitter-url
+    <post-request> twitter-request ;
+
+PRIVATE>
 
 : tweet* ( string -- tweet )
     (tweet) json>twitter-status ;
 
 : tweet ( string -- ) (tweet) drop ;
 
+! Timelines
+<PRIVATE
+
+: timeline ( url -- tweets )
+    twitter-url <get-request>
+    twitter-request json>twitter-statuses ;
+
+PRIVATE>
+
 : public-timeline ( -- tweets )
-    "https://twitter.com/statuses/public_timeline.json" <get-request>
-        set-request-twitter-auth
-    http-request nip json>twitter-statuses ;
+    "public_timeline" timeline ;
 
 : friends-timeline ( -- tweets )
-    "https://twitter.com/statuses/friends_timeline.json" <get-request>
-        set-request-twitter-auth
-    http-request nip json>twitter-statuses ;
+    "friends_timeline" timeline ;
 
 : user-timeline ( username -- tweets )
-    "https://twitter.com/statuses/user_timeline/" ".json" surround <get-request>
-        set-request-twitter-auth
-    http-request nip json>twitter-statuses ;
+    "user_timeline/" prepend timeline ;
