@@ -50,7 +50,7 @@ M: pane gadget-selection ( pane -- string/f )
     bi ;
 
 : new-pane ( input class -- pane )
-    new-gadget
+    new
         swap >>input
         1 >>fill
         vertical >>orientation

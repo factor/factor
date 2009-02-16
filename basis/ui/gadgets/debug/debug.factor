@@ -8,7 +8,7 @@ TUPLE: baseline-gadget < gadget baseline ;
 M: baseline-gadget baseline baseline>> ;
 
 : <baseline-gadget> ( baseline dim -- gadget )
-    baseline-gadget new-gadget
+    baseline-gadget new
         swap >>dim
         swap >>baseline ;
 
@@ -26,7 +26,7 @@ M: bad-gadget draw-gadget* "Lulz" throw ;
 
 M: bad-gadget pref-dim* drop { 100 100 } ;
 
-: <bad-gadget> ( -- gadget ) bad-gadget new-gadget ;
+: <bad-gadget> ( -- gadget ) bad-gadget new ;
 
 : bad-gadget-test ( -- )
     <bad-button> "Test 1" open-window

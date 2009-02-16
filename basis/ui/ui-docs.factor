@@ -1,7 +1,8 @@
 USING: help.markup help.syntax strings quotations debugger
 namespaces ui.backend ui.gadgets ui.gadgets.worlds
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids
-ui.gadgets.private math.rectangles colors ui.text fonts ;
+ui.gadgets.private math.rectangles colors ui.text fonts
+kernel ;
 IN: ui
 
 HELP: windows
@@ -226,8 +227,8 @@ ARTICLE: "new-gadgets" "Implementing new gadgets"
 $nl
 "Bare gadgets can be constructed directly, which is useful if all you need is a custom appearance with no further behavior (see " { $link "ui-pen-protocol" } "):"
 { $subsection <gadget> }
-"New gadgets are defined as subclasses of an existing gadget type, perhaps even " { $link gadget } " itself. A parametrized constructor should be used to construct subclasses:"
-{ $subsection new-gadget }
+"New gadgets are defined as subclasses of an existing gadget type, perhaps even " { $link gadget } " itself. Direct subclasses of " { $link gadget } " can be constructed using " { $link new } ", however some subclasses may define their own parametrized constructors (see " { $link "parametrized-constructors" } ")."
+$nl
 "Further topics:"
 { $subsection "ui-gestures" }
 { $subsection "ui-paint" }

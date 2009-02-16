@@ -20,7 +20,7 @@ INSTANCE: word-break-gadget word-break
 TUPLE: paragraph < gadget margin ;
 
 : <paragraph> ( margin -- gadget )
-    paragraph new-gadget
+    paragraph new
     horizontal >>orientation
     swap >>margin ;
 

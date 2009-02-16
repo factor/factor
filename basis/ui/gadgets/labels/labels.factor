@@ -38,7 +38,7 @@ M: label (>>string) ( string label -- )
     sans-serif-font >>font ; inline
 
 : new-label ( string class -- label )
-    new-gadget
+    new
     swap >>string
     label-theme ; inline
 

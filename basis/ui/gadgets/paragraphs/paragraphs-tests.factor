@@ -5,7 +5,7 @@ sequences kernel ;
 
 TUPLE: fake-break < gadget ;
 
-: <fake-break> ( -- gadget ) fake-break new-gadget { 5 5 } >>dim ;
+: <fake-break> ( -- gadget ) fake-break new { 5 5 } >>dim ;
 
 INSTANCE: fake-break word-break
 

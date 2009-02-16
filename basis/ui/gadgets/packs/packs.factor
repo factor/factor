@@ -50,7 +50,7 @@ PRIVATE>
     [ [ packed-locs ] [ children>> ] bi [ (>>loc) ] 2each ] 2bi ;
 
 : <pack> ( orientation -- pack )
-    pack new-gadget
+    pack new
         swap >>orientation ;
 
 : <pile> ( -- pack ) vertical <pack> ;

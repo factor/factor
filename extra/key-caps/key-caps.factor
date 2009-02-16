@@ -151,7 +151,7 @@ TUPLE: key-caps-gadget < gadget keys alarm ;
     [ >>keys ] tri ;
 
 : <key-caps-gadget> ( -- gadget )
-    key-caps-gadget new-gadget
+    key-caps-gadget new
     add-keys-gadgets ;
 
 M: key-caps-gadget pref-dim* drop KEYBOARD-SIZE ;

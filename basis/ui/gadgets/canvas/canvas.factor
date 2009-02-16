@@ -8,7 +8,7 @@ IN: ui.gadgets.canvas
 TUPLE: canvas < gadget dlist ;
 
 : new-canvas ( class -- canvas )
-    new-gadget black <solid> >>interior ; inline
+    new black <solid> >>interior ; inline
 
 : delete-canvas-dlist ( canvas -- )
     [ find-gl-context ]

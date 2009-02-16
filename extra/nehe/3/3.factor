@@ -8,7 +8,7 @@ TUPLE: nehe3-gadget < gadget ;
 : height 256 ;
 
 : <nehe3-gadget> (  -- gadget )
-  nehe3-gadget new-gadget ;
+  nehe3-gadget new ;
 
 M: nehe3-gadget pref-dim* ( gadget -- dim )
   drop width height 2array ;
