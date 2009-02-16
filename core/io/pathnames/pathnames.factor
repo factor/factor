@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov, Doug Coleman.
+! Copyright (C) 2004, 2009 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io.backend kernel math math.order
 namespaces sequences splitting strings system ;
@@ -71,10 +71,17 @@ PRIVATE>
         [ f ]
     } cond ;
 
+: special-path? ( path -- rest ? )
+    {
+        { [ "resource:" ?head ] [ t ] }
+        { [ "vocab:" ?head ] [ t ] }
+        [ f ]
+    } cond ;
+
 : absolute-path? ( path -- ? )
     {
         { [ dup empty? ] [ f ] }
-        { [ dup "resource:" head? ] [ t ] }
+        { [ dup special-path? nip ] [ t ] }
         { [ os windows? ] [ windows-absolute-path? ] }
         { [ dup first path-separator? ] [ t ] }
         [ f ]
@@ -107,7 +114,7 @@ PRIVATE>
     dup root-directory? [
         trim-tail-separators
         dup last-path-separator [ 1+ tail ] [
-            drop "resource:" ?head [ file-name ] when
+            drop special-path? [ file-name ] when
         ] if
     ] unless ;
 
@@ -117,6 +124,8 @@ PRIVATE>
 : resource-path ( path -- newpath )
     "resource-path" get prepend-path ;
 
+GENERIC: vocab-path ( path -- newpath )
+
 GENERIC: (normalize-path) ( path -- path' )
 
 M: string (normalize-path)
@@ -124,7 +133,12 @@ M: string (normalize-path)
         trim-head-separators resource-path
         (normalize-path)
     ] [
-        current-directory get prepend-path
+        "vocab:" ?head [
+            trim-head-separators vocab-path
+            (normalize-path)
+        ] [
+            current-directory get prepend-path
+        ] if
     ] if ;
 
 M: object normalize-path ( path -- path' )

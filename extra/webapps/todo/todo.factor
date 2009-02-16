@@ -143,8 +143,8 @@ io.sockets.secure ;
 : <todo-secure-config> ( -- config )
     ! This is only suitable for testing!
     <secure-config>
-        "resource:basis/openssl/test/dh1024.pem" >>dh-file
-        "resource:basis/openssl/test/server.pem" >>key-file
+        "vocab:openssl/test/dh1024.pem" >>dh-file
+        "vocab:openssl/test/server.pem" >>key-file
         "password" >>password ;
 
 : <todo-app> ( -- responder )

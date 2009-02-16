@@ -10,7 +10,7 @@ IN: bootstrap.help
 
     t load-help? set-global
 
-    [ drop ] load-vocab-hook [
+    [ vocab ] load-vocab-hook [
         dictionary get values
         [ docs-loaded?>> not ] filter
         [ load-docs ] each

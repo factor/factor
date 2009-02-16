@@ -402,7 +402,7 @@ IN: parser.tests
     [ t ] [ "foo" "parser.tests" lookup symbol? ] unit-test
 ] times
 
-[ "resource:core/parser/test/assert-depth.factor" run-file ]
+[ "vocab:parser/test/assert-depth.factor" run-file ]
 [ got>> { 1 2 3 } sequence= ]
 must-fail-with
 
