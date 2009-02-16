@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators documents fry kernel math sequences
-unicode.categories ;
+unicode.categories accessors ;
 IN: documents.elements
 
 GENERIC: prev-elt ( loc document elt -- newloc )
@@ -55,18 +55,17 @@ M: one-char-elt next-elt 2drop ;
         [ [ first2 swap ] dip doc-line ] dip call
     ] dip =col ; inline
 
-: ((word-elt)) ( n seq -- ? n seq )
-    [ ?nth blank? ] 2keep ;
+: ((word-elt)) ( n seq -- n seq ? )
+    2dup ?nth blank? ;
 
 : break-detector ( ? -- quot )
     '[ blank? _ xor ] ; inline
 
-: (prev-word) ( ? col str -- col )
-    rot break-detector find-last-from drop ?1+ ;
+: (prev-word) ( col str ? -- col )
+    break-detector find-last-from drop ?1+ ;
 
-: (next-word) ( ? col str -- col )
-    [ rot break-detector find-from drop ] keep
-    over not [ nip length ] [ drop ] if ;
+: (next-word) ( col str ? -- col )
+    [ break-detector find-from drop ] [ drop length ] 2bi or ;
 
 PRIVATE>
 
@@ -74,11 +73,11 @@ SINGLETON: one-word-elt
 
 M: one-word-elt prev-elt
     drop
-    [ [ [ f ] dip 1- ] dip (prev-word) ] (word-elt) ;
+    [ [ 1- ] dip f (prev-word) ] (word-elt) ;
 
 M: one-word-elt next-elt
     drop
-    [ [ f ] 2dip (next-word) ] (word-elt) ;
+    [ f (next-word) ] (word-elt) ;
 
 SINGLETON: word-elt
 
@@ -100,14 +99,20 @@ M: one-line-elt prev-elt
 M: one-line-elt next-elt
     drop [ first dup ] dip doc-line length 2array ;
 
-SINGLETON: line-elt
+TUPLE: page-elt { lines read-only } ;
 
-M: line-elt prev-elt
-    2drop dup first zero? [ drop { 0 0 } ] [ -1 +line ] if ;
+C: <page-elt> page-elt
 
-M: line-elt next-elt
-    drop over first over last-line# number=
-    [ nip doc-end ] [ drop 1 +line ] if ;
+M: page-elt prev-elt
+    nip
+    2dup [ first ] [ lines>> ] bi* <
+    [ 2drop { 0 0 } ] [ lines>> neg +line ] if ;
+
+M: page-elt next-elt
+    3dup [ first ] [ last-line# ] [ lines>> ] tri* - >
+    [ drop nip doc-end ] [ nip lines>> +line ] if ;
+
+CONSTANT: line-elt T{ page-elt f 1 }
 
 SINGLETON: doc-elt
 
