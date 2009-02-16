@@ -65,7 +65,7 @@ M: quit-responder call-responder*
 [ ] [
     <dispatcher>
         add-quot-responder
-        "resource:basis/http/test" <static> >>default
+        "vocab:http/test" <static> >>default
 
     test-httpd
 ] unit-test

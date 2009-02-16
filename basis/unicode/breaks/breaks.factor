@@ -127,7 +127,7 @@ to: grapheme-table
 
 VALUE: word-break-table
 
-"resource:basis/unicode/data/WordBreakProperty.txt" load-script
+"vocab:unicode/data/WordBreakProperty.txt" load-script
 to: word-break-table
 
 C-ENUM: wOther wCR wLF wNewline wExtend wFormat wKatakana wALetter wMidLetter

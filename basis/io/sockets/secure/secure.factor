@@ -26,7 +26,7 @@ ephemeral-key-bits ;
     secure-config new
         SSLv23 >>method
         1024 >>ephemeral-key-bits
-        "resource:basis/openssl/cacert.pem" >>ca-file
+        "vocab:openssl/cacert.pem" >>ca-file
         t >>verify ;
 
 TUPLE: secure-context config handle disposed ;
