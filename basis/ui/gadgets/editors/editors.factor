@@ -555,9 +555,11 @@ TUPLE: source-editor < multiline-editor ;
     '[ _ _ elt-string ] <filter> ;
 
 ! Fields wrap an editor
-TUPLE: field < wrapper editor min-width max-width ;
+TUPLE: field < border editor min-cols max-cols ;
 
 : field-theme ( gadget -- gadget )
+    { 2 2 } >>size
+    { 1 0 } >>fill
     COLOR: gray <solid> >>boundary ; inline
 
 : <field-border> ( gadget -- border )
@@ -566,16 +568,18 @@ TUPLE: field < wrapper editor min-width max-width ;
         field-theme ;
 
 : new-field ( class -- gadget )
-    [ <editor> dup <field-border> ] dip new-wrapper swap >>editor ; inline
+    [ <editor> ] dip new-border
+        dup gadget-child >>editor
+        field-theme ; inline
 
-: column-width ( editor n -- width )
-    [ editor>> font>> ] [ CHAR: \s <string> ] bi* text-width ;
+! For line-gadget-width
+M: field font>> editor>> font>> ;
 
 M: field pref-dim*
-    [ call-next-method ]
-    [ dup min-width>> dup [ column-width 0 2array vmax ] [ 2drop ] if ]
-    [ dup max-width>> dup [ column-width 1/0. 2array vmin ] [ 2drop ] if ]
-    tri ;
+    dup
+    [ editor>> pref-dim ] keep
+    [ line-gadget-width ] [ drop second ] 2bi 2array
+    border-pref-dim ;
 
 TUPLE: model-field < field field-model ;
 

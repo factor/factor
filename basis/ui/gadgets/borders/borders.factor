@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ui.gadgets kernel math
+USING: accessors arrays ui.gadgets kernel math fry
 namespaces vectors sequences math.vectors math.rectangles ;
 IN: ui.gadgets.borders
 
@@ -11,7 +11,7 @@ TUPLE: border < gadget
 { min-dim initial: { 0 0 } } ;
 
 : new-border ( child class -- border )
-    new-gadget swap add-gadget ; inline
+    new swap add-gadget ; inline
 
 : <border> ( child gap -- border )
     swap border new-border
@@ -20,13 +20,17 @@ TUPLE: border < gadget
 : <filled-border> ( child gap -- border )
     <border> { 1 1 } >>fill ;
 
+: border-pref-dim ( border child-dim -- pref-dim )
+    '[ size>> 2 v*n _ v+ ] [ min-dim>> ] bi vmax ;
+
 M: border pref-dim*
-    [ [ size>> 2 v*n ] [ gadget-child pref-dim ] bi v+ ]
-    [ min-dim>> ] bi vmax ;
+    dup gadget-child pref-dim border-pref-dim ;
 
 M: border baseline
     [ size>> second ] [ gadget-child baseline ] bi
     dup [ + ] [ nip ] if ;
+
+<PRIVATE
 
 : border-major-dim ( border -- dim )
     [ dim>> ] [ size>> 2 v*n ] bi v- ;
@@ -46,6 +50,8 @@ M: border baseline
 
 : border-child-rect ( border -- rect )
     dup border-dim [ border-loc ] keep <rect> ;
+
+PRIVATE>
 
 M: border layout*
     [ border-child-rect ] [ gadget-child ] bi set-rect-bounds ;

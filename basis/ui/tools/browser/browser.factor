@@ -25,8 +25,8 @@ TUPLE: browser-gadget < tool pane scroller search-field ;
 
 : <search-field> ( browser -- field )
     '[ _ search-browser ] <action-field>
-        10 >>min-width
-        10 >>max-width ;
+        10 >>min-cols
+        10 >>max-cols ;
 
 : <browser-toolbar> ( browser -- toolbar )
     horizontal <track>
