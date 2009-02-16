@@ -3,16 +3,16 @@ io.files io.files.unique kernel tools.test ;
 IN: images.bitmap.tests
 
 : test-bitmap24 ( -- path )
-    "resource:basis/images/test-images/thiswayup24.bmp" ;
+    "vocab:images/test-images/thiswayup24.bmp" ;
 
 : test-bitmap8 ( -- path )
-    "resource:basis/images/test-images/rgb8bit.bmp" ;
+    "vocab:images/test-images/rgb8bit.bmp" ;
 
 : test-bitmap4 ( -- path )
-    "resource:basis/images/test-images/rgb4bit.bmp" ;
+    "vocab:images/test-images/rgb4bit.bmp" ;
 
 : test-bitmap1 ( -- path )
-    "resource:basis/images/test-images/1bit.bmp" ;
+    "vocab:images/test-images/1bit.bmp" ;
 
 [ t ]
 [

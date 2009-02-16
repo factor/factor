@@ -4,7 +4,7 @@ tools.test sequences parser splitting prettyprint ;
 IN: html.templates.fhtml.tests
 
 : test-template ( path -- ? )
-    "resource:basis/html/templates/fhtml/test/"
+    "vocab:html/templates/fhtml/test/"
     prepend
     [ ".fhtml" append <fhtml> [ call-template ] with-string-writer ]
     [ ".html" append utf8 file-contents ] bi

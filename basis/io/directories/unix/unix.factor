@@ -27,16 +27,8 @@ M: unix make-directory ( path -- )
 M: unix delete-directory ( path -- )
     normalize-path rmdir io-error ;
 
-: (copy-file) ( from to -- )
-    dup parent-directory make-directories
-    binary <file-writer> [
-        swap binary <file-reader> [
-            swap stream-copy
-        ] with-disposal
-    ] with-disposal ;
-
 M: unix copy-file ( from to -- )
-    [ normalize-path ] bi@ (copy-file) ;
+    [ normalize-path ] bi@ call-next-method ;
 
 : with-unix-directory ( path quot -- )
     [ opendir dup [ (io-error) ] unless ] dip
