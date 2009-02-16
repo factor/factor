@@ -12,8 +12,6 @@ IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < tool table ;
 
-{ 500 300 } inspector-gadget set-tool-dim
-
 TUPLE: slot-description key key-string value value-string ;
 
 : <slot-description> ( key value -- slot-description )
@@ -65,7 +63,11 @@ M: hashtable make-slot-descriptions
 : <inspector-table> ( model -- table )
     [ make-slot-descriptions ] <filter> inspector-renderer <table>
         [ dup primary-operation invoke-command ] >>action
-        monospace-font >>font ;
+        monospace-font >>font
+        15 >>min-rows
+        15 >>max-rows
+        40 >>min-cols
+        40 >>max-cols ;
 
 : <inspector-gadget> ( model -- gadget )
     vertical inspector-gadget new-track
