@@ -38,7 +38,7 @@ VALUE: properties
     ascii file-lines [ split-; ] map ;
 
 : load-data ( -- data )
-    "resource:basis/unicode/data/UnicodeData.txt" data ;
+    "vocab:unicode/data/UnicodeData.txt" data ;
 
 : filter-comments ( lines -- lines )
     [ "#@" split first ] map harvest ;
@@ -68,7 +68,7 @@ VALUE: properties
     [ " " split [ hex> ] map ] assoc-map ;
 
 : exclusions-file ( -- filename )
-    "resource:basis/unicode/data/CompositionExclusions.txt" ;
+    "vocab:unicode/data/CompositionExclusions.txt" ;
 
 : exclusions ( -- set )
     exclusions-file utf8 file-lines
@@ -147,7 +147,7 @@ C: <code-point> code-point
 
 ! Extra properties
 : properties-lines ( -- lines )
-    "resource:basis/unicode/data/PropList.txt"
+    "vocab:unicode/data/PropList.txt"
     ascii file-lines ;
 
 : parse-properties ( -- {{[a,b],prop}} )
@@ -166,7 +166,7 @@ C: <code-point> code-point
 
 ! Special casing data
 : load-special-casing ( -- special-casing )
-    "resource:basis/unicode/data/SpecialCasing.txt" data
+    "vocab:unicode/data/SpecialCasing.txt" data
     [ length 5 = ] filter
     [ [ set-code-point ] each ] H{ } make-assoc ;
 

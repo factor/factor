@@ -33,7 +33,7 @@ IN: io.encodings.8-bit
 } ;
 
 : encoding-file ( file-name -- stream )
-    "resource:basis/io/encodings/8-bit/" swap ".TXT"
+    "vocab:io/encodings/8-bit/" swap ".TXT"
     3append ascii <file-reader> ;
 
 : process-contents ( lines -- assoc )

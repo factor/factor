@@ -213,7 +213,7 @@ test-db [
     <dispatcher>
         add-quit-action
         <dispatcher>
-            "resource:basis/http/test" <static> >>default
+            "vocab:http/test" <static> >>default
         "nested" add-responder
         <action>
             [ URL" redirect-loop" <temporary-redirect> ] >>display
@@ -226,7 +226,7 @@ test-db [
     >url clone "port" get >>port ;
 
 [ t ] [
-    "resource:basis/http/test/foo.html" ascii file-contents
+    "vocab:http/test/foo.html" ascii file-contents
     "http://localhost/nested/foo.html" add-port http-get nip =
 ] unit-test
 
