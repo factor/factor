@@ -17,7 +17,7 @@ M: book model-changed ( model book -- )
     relayout ;
 
 : new-book ( model class -- book )
-    new-gadget
+    new
         swap >>model ; inline
 
 : <book> ( pages model -- book )

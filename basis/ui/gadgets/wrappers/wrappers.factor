@@ -6,7 +6,7 @@ IN: ui.gadgets.wrappers
 TUPLE: wrapper < gadget ;
 
 : new-wrapper ( child class -- wrapper )
-    new-gadget swap add-gadget ; inline
+    new swap add-gadget ; inline
 
 : <wrapper> ( child -- wrapper ) wrapper new-wrapper ;
 

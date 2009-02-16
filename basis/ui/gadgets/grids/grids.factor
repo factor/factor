@@ -11,7 +11,7 @@ grid
 { fill? initial: t } ;
 
 : new-grid ( children class -- grid )
-    new-gadget
+    new
         swap [ >>grid ] [ concat add-gadgets ] bi ; inline
 
 : <grid> ( children -- grid )

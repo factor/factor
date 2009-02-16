@@ -6,7 +6,7 @@ IN: tetris
 TUPLE: tetris-gadget < gadget { tetris tetris } { alarm } ;
 
 : <tetris-gadget> ( tetris -- gadget )
-    tetris-gadget new-gadget swap >>tetris ;
+    tetris-gadget new swap >>tetris ;
 
 M: tetris-gadget pref-dim* drop { 200 400 } ;
 

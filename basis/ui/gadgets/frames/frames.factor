@@ -14,7 +14,7 @@ TUPLE: glue < gadget ;
 
 M: glue pref-dim* drop { 0 0 } ;
 
-: <glue> ( -- glue ) glue new-gadget ;
+: <glue> ( -- glue ) glue new ;
 
 : <frame-grid> ( cols rows -- grid )
     swap '[ _ [ <glue> ] replicate ] replicate ;

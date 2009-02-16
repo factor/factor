@@ -67,7 +67,7 @@ M: axis-gadget pref-dim* drop SIZE ;
     pov-polygons [ add-pov-gadget ] assoc-map >>pov ;
 
 : <axis-gadget> ( -- gadget )
-    axis-gadget new-gadget
+    axis-gadget new
     add-pov-gadgets
     black <indicator-gadget> [ >>z-indicator ] [ add-gadget ] bi
     red   <indicator-gadget> [ >>indicator   ] [ add-gadget ] bi
@@ -97,7 +97,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
     [ (add-button-gadgets) ] 2keep ;
 
 : <joystick-demo-gadget> ( controller -- gadget )
-    joystick-demo-gadget new-gadget
+    joystick-demo-gadget new
     { 0 1 } >>orientation
     swap add-controller-label
     <shelf> add-axis-gadget add-raxis-gadget add-gadget

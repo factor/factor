@@ -36,10 +36,8 @@ M: gadget model-changed 2drop ;
 
 : nth-gadget ( n gadget -- child ) children>> nth ;
 
-: new-gadget ( class -- gadget ) new ; inline
-
 : <gadget> ( -- gadget )
-    gadget new-gadget ;
+    gadget new ;
 
 : control-value ( control -- value )
     model>> value>> ;

@@ -75,7 +75,7 @@ IN: ui.gadgets.tests
 TUPLE: mock-gadget < gadget graft-called ungraft-called ;
 
 : <mock-gadget> ( -- gadget )
-    mock-gadget new-gadget 0 >>graft-called 0 >>ungraft-called ;
+    mock-gadget new 0 >>graft-called 0 >>ungraft-called ;
 
 M: mock-gadget graft*
     [ 1+ ] change-graft-called drop ;

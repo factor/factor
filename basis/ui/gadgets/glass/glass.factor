@@ -17,7 +17,7 @@ M: gadget hide-glass-hook drop ;
 TUPLE: glass < gadget visible-rect owner ;
 
 : <glass> ( owner child visible-rect -- glass )
-    glass new-gadget
+    glass new
         swap >>visible-rect
         swap add-gadget
         swap >>owner ;

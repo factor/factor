@@ -129,7 +129,7 @@ elevator H{
 } set-gestures
 
 : <elevator> ( vector -- elevator )
-    elevator new-gadget
+    elevator new
         swap >>orientation ;
 
 : thumb-loc ( slider -- loc )

@@ -104,7 +104,7 @@ deploy-gadget "toolbar" f {
 } define-command-map
 
 : <deploy-gadget> ( vocab -- gadget )
-    deploy-gadget new-gadget
+    deploy-gadget new
       over >>vocab
       vertical >>orientation
       swap <deploy-settings> >>settings

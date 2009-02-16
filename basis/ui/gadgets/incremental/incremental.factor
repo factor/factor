@@ -8,7 +8,7 @@ IN: ui.gadgets.incremental
 TUPLE: incremental < pack cursor ;
 
 : <incremental> ( -- incremental )
-    incremental new-gadget
+    incremental new
         vertical >>orientation
         { 0 0 } >>cursor ;
 
