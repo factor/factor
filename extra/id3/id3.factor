@@ -127,11 +127,11 @@ TUPLE: mp3v1-file title artist album year comment genre ;
 : (read-v1-tag-data) ( seq -- mp3-file )
     [ <mp3v1-file> ] dip
     {
-        [ read-title   ascii decode  >>title ]
-        [ read-artist  ascii decode  >>artist ]
-        [ read-album   ascii decode  >>album ]
-        [ read-year    ascii decode  >>year ]
-        [ read-comment ascii decode  >>comment ]
+        [ read-title   ascii decode  filter-text-data >>title ]
+        [ read-artist  ascii decode  filter-text-data >>artist ]
+        [ read-album   ascii decode  filter-text-data >>album ]
+        [ read-year    ascii decode  filter-text-data >>year ]
+        [ read-comment ascii decode  filter-text-data >>comment ]
         [ read-genre   >fixnum       >>genre ]
     } cleave ;
 
