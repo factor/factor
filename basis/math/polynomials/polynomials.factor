@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel make math math.order math.vectors sequences shuffle
+USING: arrays kernel make math math.order math.vectors sequences
     splitting vectors ;
 IN: math.polynomials
 
@@ -75,7 +75,7 @@ PRIVATE>
 PRIVATE>
 
 : pgcd ( p q -- a d )
-    swap V{ 0 } clone V{ 1 } clone 2swap (pgcd) [ >array ] bi@ ;
+    [ V{ 0 } clone V{ 1 } clone ] 2dip swap (pgcd) [ >array ] bi@ ;
 
 : pdiff ( p -- p' )
     dup length v* { 0 } ?head drop ;

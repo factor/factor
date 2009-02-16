@@ -97,3 +97,5 @@ IN: vectors.tests
 [ fixnum ] [ 1 >bignum V{ } new-sequence length class ] unit-test
 
 [ fixnum ] [ 1 >bignum [ ] V{ } map-as length class ] unit-test
+
+[ V{ "lulz" } ] [ "lulz" 1vector ] unit-test

@@ -46,11 +46,13 @@ TUPLE: openssl-context < secure-context aliens sessions ;
     [ push ] [ drop ] 2bi ;
 
 : set-default-password ( ctx -- )
-    [ handle>> password-callback SSL_CTX_set_default_passwd_cb ]
-    [
-        [ handle>> ] [ default-pasword ] bi
-        SSL_CTX_set_default_passwd_cb_userdata
-    ] bi ;
+    dup config>> password>> [
+        [ handle>> password-callback SSL_CTX_set_default_passwd_cb ]
+        [
+            [ handle>> ] [ default-pasword ] bi
+            SSL_CTX_set_default_passwd_cb_userdata
+        ] bi
+    ] [ drop ] if ;
 
 : use-private-key-file ( ctx -- )
     dup config>> key-file>> [

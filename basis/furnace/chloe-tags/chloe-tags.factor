@@ -7,10 +7,9 @@ xml
 xml.data
 xml.entities
 xml.writer
-xml.utilities
-xml.literals
+xml.traversal
+xml.syntax
 html.components
-html.elements
 html.forms
 html.templates
 html.templates.chloe
@@ -20,6 +19,7 @@ http
 http.server
 http.server.redirection
 http.server.responses
+io.streams.string
 furnace.utilities ;
 IN: furnace.chloe-tags
 
@@ -58,62 +58,74 @@ CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
     #! Side-effects current namespace.
     '[ [ [ _ ] dip link-attr ] each-responder ] [code] ;
 
-: a-start-tag ( tag -- )
-    [ <a ] [code]
-    [ attrs>> non-chloe-attrs-only compile-attrs ]
-    [ compile-link-attrs ]
-    [ compile-a-url ]
-    tri
-    [ =href a> ] [code] ;
+: process-attrs ( assoc -- newassoc )
+    [ "@" ?head [ value present ] when ] assoc-map ;
 
-: a-end-tag ( tag -- )
-    drop [ </a> ] [code] ;
+: non-chloe-attrs ( tag -- )
+    attrs>> non-chloe-attrs-only [ process-attrs ] [code-with] ;
+
+: a-attrs ( tag -- )
+    [ non-chloe-attrs ]
+    [ compile-link-attrs ]
+    [ compile-a-url ] tri
+    [ present swap "href" swap [ set-at ] keep ] [code] ;
 
 CHLOE: a
     [
-        [ a-start-tag ] [ compile-children ] [ a-end-tag ] tri
+        [ a-attrs ]
+        [ compile-children>string ] bi
+        [ <unescaped> [XML <a><-></a> XML] second swap >>attrs ]
+        [xml-code]
     ] compile-with-scope ;
 
 CHLOE: base
-    compile-a-url [ <base =href base/> ] [code] ;
+    compile-a-url [ [XML <base href=<->/> XML] ] [xml-code] ;
+
+: hidden-nested-fields ( -- xml )
+    nested-forms get " " join f like nested-forms-key
+    hidden-form-field ;
+
+: render-hidden ( for -- xml )
+    [ "," split [ hidden render>xml ] map ] [ f ] if* ;
 
 : compile-hidden-form-fields ( for -- )
     '[
-        <div "display: none;" =style div>
-            _ [ "," split [ hidden render ] each ] when*
-            nested-forms get " " join f like nested-forms-key hidden-form-field
-            [ modify-form ] each-responder
-        </div>
+        _ render-hidden
+        hidden-nested-fields
+        form-modifications
+        [XML <div style="display: none;"><-><-><-></div> XML]
     ] [code] ;
 
-: compile-form-attrs ( method action attrs -- )
-    [ <form ] [code]
-    [ compile-attr [ =method ] [code] ]
-    [ compile-attr [ resolve-base-path =action ] [code] ]
-    [ compile-attrs ]
-    tri*
-    [ form> ] [code] ;
+: (compile-form-attrs) ( method action -- )
+    ! Leaves an assoc on the stack at runtime
+    [ compile-attr [ "method" pick set-at ] [code] ]
+    [ compile-attr [ resolve-base-path "action" pick set-at ] [code] ]
+    bi* ;
 
-: form-start-tag ( tag -- )
-    [
-        [ "method" optional-attr "post" or ]
-        [ "action" required-attr ]
-        [ attrs>> non-chloe-attrs-only ] tri
-        compile-form-attrs
-    ]
-    [ "for" optional-attr compile-hidden-form-fields ] bi ;
+: compile-method/action ( tag -- )
+    ! generated code is ( assoc -- assoc )
+    [ "method" optional-attr "post" or ]
+    [ "action" required-attr ] bi
+    (compile-form-attrs) ;
 
-: form-end-tag ( tag -- )
-    drop [ </form> ] [code] ;
+: compile-form-attrs ( tag -- )
+    [ non-chloe-attrs ]
+    [ compile-link-attrs ]
+    [ compile-method/action ] tri ;
+
+: hidden-fields ( tag -- )
+    "for" optional-attr compile-hidden-form-fields ;
 
 CHLOE: form
     [
-        {
-            [ compile-link-attrs ]
-            [ form-start-tag ]
-            [ compile-children ]
-            [ form-end-tag ]
-        } cleave
+        [ compile-form-attrs ]
+        [ hidden-fields ]
+        [ compile-children>string ] tri
+        [
+            <unescaped> [XML <form><-><-></form> XML] second
+                swap >>attrs
+            write-xml
+        ] [code]
     ] compile-with-scope ;
 
 : button-tag-markup ( -- xml )
@@ -121,13 +133,13 @@ CHLOE: form
         <t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
             <div style="display: inline;"><button type="submit"></button></div>
         </t:form>
-    XML> ;
+    XML> body>> clone ;
 
 : add-tag-attrs ( attrs tag -- )
     attrs>> swap update ;
 
 CHLOE: button
-    button-tag-markup body>>
+    button-tag-markup
     {
         [ [ attrs>> chloe-attrs-only ] dip add-tag-attrs ]
         [ [ attrs>> non-chloe-attrs-only ] dip "button" deep-tag-named add-tag-attrs ]

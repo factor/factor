@@ -16,5 +16,5 @@ IN: unix.utilities
     '[ [ advance ] [ *void* _ alien>string ] bi ]
     [ ] produce nip ;
 
-: strings>alien ( strings encoding -- alien )
-    '[ _ malloc-string ] void*-array{ } map-as f suffix underlying>> ;
+: strings>alien ( strings encoding -- array )
+    '[ _ malloc-string ] void*-array{ } map-as f suffix ;

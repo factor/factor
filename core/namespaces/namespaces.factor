@@ -37,4 +37,7 @@ PRIVATE>
     H{ } clone >n call ndrop ; inline
 
 : with-variable ( value key quot -- )
-    [ associate >n ] dip call ndrop ; inline
+    [ associate >n ] dip call ndrop ; inline 
+
+: initialize ( variable quot -- )
+    [ global ] [ [ unless* ] curry ] bi* change-at ;

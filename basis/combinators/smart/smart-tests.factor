@@ -37,3 +37,13 @@ IN: combinators.smart.tests
 [
     [ { 1 } { 2 } { 3 } ] B{ } append-outputs-as
 ] unit-test
+
+! Test nesting
+: nested-smart-combo-test ( -- array )
+    [ [ 1 2 ] output>array [ 3 4 ] output>array ] output>array ;
+
+\ nested-smart-combo-test must-infer
+
+[ { { 1 2 } { 3 4 } } ] [ nested-smart-combo-test ] unit-test
+
+[ 14 ] [ [ 1 2 3 ] [ sq ] [ + ] map-reduce-outputs ] unit-test

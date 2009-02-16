@@ -1,7 +1,7 @@
 IN: furnace.tests
 USING: http http.server.dispatchers http.server.responses
 http.server furnace furnace.utilities tools.test kernel
-namespaces accessors io.streams.string urls ;
+namespaces accessors io.streams.string urls xml.writer ;
 TUPLE: funny-dispatcher < dispatcher ;
 
 : <funny-dispatcher> funny-dispatcher new-dispatcher ;
@@ -30,8 +30,8 @@ M: base-path-check-responder call-responder*
     "a/b/c" split-path main-responder get call-responder body>>
 ] unit-test
 
-[ "<input type='hidden' name='foo' value='&amp;&amp;&amp;'/>" ]
-[ [ "&&&" "foo" hidden-form-field ] with-string-writer ]
+[ "<input type=\"hidden\" value=\"&amp;&amp;&amp;\" name=\"foo\"/>" ]
+[ "&&&" "foo" hidden-form-field xml>string ]
 unit-test
 
 [ f ] [ <request> request [ referrer ] with-variable ] unit-test

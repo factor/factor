@@ -4,14 +4,14 @@ USING: accessors kernel namespaces io math.parser assocs classes
 classes.tuple words arrays sequences splitting mirrors
 hashtables combinators continuations math strings inspector
 fry locals calendar calendar.format xml.entities xml.data
-validators urls present xml.writer xml.literals xml
+validators urls present xml.writer xml.syntax xml
 xmode.code2html lcs.diff2html farkup io.streams.string
 html html.streams html.forms ;
 IN: html.components
 
 GENERIC: render* ( value name renderer -- xml )
 
-: render ( name renderer -- )
+: render>xml ( name renderer -- xml )
     prepare-value
     [
         dup validation-error?
@@ -20,7 +20,10 @@ GENERIC: render* ( value name renderer -- xml )
         if
     ] 2dip
     render*
-    swap 2array write-xml ;
+    swap 2array ;
+
+: render ( name renderer -- )
+    render>xml write-xml ;
 
 SINGLETON: label
 
@@ -168,3 +171,8 @@ M: comparison render*
 SINGLETON: html
 
 M: html render* 2drop <unescaped> ;
+
+! XML component
+SINGLETON: xml
+
+M: xml render* 2drop ;

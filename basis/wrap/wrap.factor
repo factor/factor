@@ -1,60 +1,85 @@
-USING: sequences kernel namespaces make splitting
-math math.order fry assocs accessors ;
+! Copyright (C) 2009 Daniel Ehrenberg
+! See http://factorcode.org/license.txt for BSD license.
+USING: kernel sequences math arrays locals fry accessors
+lists splitting call make combinators.short-circuit namespaces
+grouping splitting.monotonic ;
 IN: wrap
 
-! Word wrapping/line breaking -- not Unicode-aware
+! black is the text length, white is the whitespace length
+TUPLE: element contents black white ;
+C: <element> element
 
-TUPLE: word key width break? ;
+: element-length ( element -- n )
+    [ black>> ] [ white>> ] bi + ;
 
-C: <word> word
+TUPLE: paragraph lines head-width tail-cost ;
+C: <paragraph> paragraph
 
-<PRIVATE
+SYMBOL: line-max
+SYMBOL: line-ideal
 
-SYMBOL: width
+: deviation ( length -- n )
+    line-ideal get - sq ;
 
-: break-here? ( column word -- ? )
-    break?>> not [ width get > ] [ drop f ] if ;
+: top-fits? ( paragraph -- ? )
+    [ head-width>> ]
+    [ lines>> 1list? line-ideal line-max ? get ] bi <= ;
 
-: find-optimal-break ( words -- n )
-    [ 0 ] dip [ [ width>> + dup ] keep break-here? ] find drop nip ;
+: fits? ( paragraph -- ? )
+    ! Make this not count spaces at end
+    { [ lines>> car 1list? ] [ top-fits? ] } 1|| ;
 
-: (wrap) ( words -- )
-    dup find-optimal-break
-    [ 1 max cut-slice [ , ] [ (wrap) ] bi* ] [ , ] if* ;
+:: min-by ( seq quot -- elt )
+    f 1.0/0.0 seq [| key value new |
+        new quot call :> newvalue
+        newvalue value < [ new newvalue ] [ key value ] if
+    ] each drop ; inline
 
-: intersperse ( seq elt -- seq' )
-    [ '[ _ , ] [ , ] interleave ] { } make ;
+: paragraph-cost ( paragraph -- cost )
+    dup lines>> 1list? [ drop 0 ] [
+        [ head-width>> deviation ]
+        [ tail-cost>> ] bi +
+    ] if ;
 
-: split-lines ( string -- words-lines )
-    string-lines [
-        " \t" split harvest
-        [ dup length f <word> ] map
-        " " 1 t <word> intersperse
-    ] map ;
+: min-cost ( paragraphs -- paragraph )
+    [ paragraph-cost ] min-by ;
 
-: join-words ( wrapped-lines -- lines )
+: new-line ( paragraph element -- paragraph )
+    [ [ lines>> ] [ 1list ] bi* swons ]
+    [ nip black>> ]
+    [ drop paragraph-cost ] 2tri
+    <paragraph> ;
+
+: glue ( paragraph element -- paragraph )
+    [ [ lines>> unswons ] dip swons swons ]
+    [ [ head-width>> ] [ element-length ] bi* + ]
+    [ drop tail-cost>> ] 2tri
+    <paragraph> ;
+
+: wrap-step ( paragraphs element -- paragraphs )
+    [ '[ _ glue ] map ]
+    [ [ min-cost ] dip new-line ]
+    2bi prefix
+    [ fits? ] filter ;
+
+: 1paragraph ( element -- paragraph )
+    [ 1list 1list ]
+    [ black>> ] bi
+    0 <paragraph> ;
+
+: post-process ( paragraph -- array )
+    lines>> deep-list>array
+    [ [ contents>> ] map ] map ;
+
+: initialize ( elements -- elements paragraph )
+    <reversed> unclip-slice 1paragraph 1array ;
+
+: wrap ( elements line-max line-ideal -- paragraph )
     [
-        [ break?>> ]
-        [ trim-head-slice ]
-        [ trim-tail-slice ] bi
-        [ key>> ] map concat
-    ] map ;
-
-: join-lines ( strings -- string )
-    "\n" join ;
-
-PRIVATE>
-
-: wrap ( words width -- lines )
-    width [
-        [ (wrap) ] { } make
-    ] with-variable ;
-
-: wrap-lines ( lines width -- newlines )
-    [ split-lines ] dip '[ _ wrap join-words ] map concat ;
-
-: wrap-string ( string width -- newstring )
-    wrap-lines join-lines ;
-
-: wrap-indented-string ( string width indent -- newstring )
-    [ length - wrap-lines ] keep '[ _ prepend ] map join-lines ;
+        line-ideal set
+        line-max set
+        initialize
+        [ wrap-step ] reduce
+        min-cost
+        post-process
+    ] with-scope ;

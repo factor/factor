@@ -57,7 +57,10 @@ HELP: hidden
 { $description "Hidden components render as a hidden form field. For example, a page for editing a weblog post might contain a hidden field with the post ID." } ;
 
 HELP: html
-{ $description "HTML components render HTML verbatim, without any escaping. Care must be taken to only render trusted input, to avoid cross-site scripting attacks." } ;
+{ $description "HTML components render HTML verbatim from a string, without any escaping. Care must be taken to only render trusted input, to avoid cross-site scripting attacks." } ;
+
+HELP: xml
+{ $description "XML components render XML verbatim, from an XML chunk. Care must be taken to only render trusted input, to avoid cross-site scripting attacks." } ;
 
 HELP: inspector
 { $description "Inspector components render an arbitrary object by passing it to the " { $link describe } " word." } ;
@@ -90,6 +93,7 @@ $nl
 { $subsection inspector }
 { $subsection comparison }
 { $subsection html }
+{ $subsection xml }
 "Tuple components:"
 { $subsection field }
 { $subsection password }
@@ -100,6 +104,6 @@ $nl
 { $subsection farkup }
 "Creating custom components:"
 { $subsection render* }
-"Custom components can emit HTML using the " { $vocab-link "xml.literals" } " vocabulary." ;
+"Custom components can emit HTML using the " { $vocab-link "xml.syntax" } " vocabulary." ;
 
 ABOUT: "html.components"

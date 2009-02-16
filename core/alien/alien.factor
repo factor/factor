@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math namespaces sequences system
 kernel.private byte-arrays arrays init ;
@@ -17,6 +17,14 @@ PREDICATE: pinned-alien < alien underlying>> pinned-c-ptr? ;
 
 UNION: pinned-c-ptr
     pinned-alien POSTPONE: f ;
+
+GENERIC: >c-ptr ( obj -- c-ptr )
+
+M: c-ptr >c-ptr ;
+
+SLOT: underlying
+
+M: object >c-ptr underlying>> ;
 
 GENERIC: expired? ( c-ptr -- ? ) flushable
 
@@ -43,7 +51,7 @@ M: alien equal?
 
 SYMBOL: libraries
 
-libraries global [ H{ } assoc-like ] change-at
+libraries [ H{ } clone ] initialize
 
 TUPLE: library path abi dll ;
 

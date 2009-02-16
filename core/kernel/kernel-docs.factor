@@ -658,7 +658,7 @@ HELP: loop
     "hi hi hi" }
     "A fun loop:"
     { $example "USING: kernel prettyprint math ; "
-    "3 [ dup . 7 + 11 mod dup 3 = not ] loop"
+    "3 [ dup . 7 + 11 mod dup 3 = not ] loop drop"
     "3\n10\n6\n2\n9\n5\n1\n8\n4\n0\n7" }
 } ;
 
@@ -949,6 +949,13 @@ ARTICLE: "assertions" "Assertions"
 { $subsection assert }
 { $subsection assert= } ;
 
+ARTICLE: "dataflow-combinators" "Data flow combinators"
+"Data flow combinators pass values between quotations:"
+{ $subsection "slip-keep-combinators" }
+{ $subsection "cleave-combinators" }
+{ $subsection "spread-combinators" }
+{ $subsection "apply-combinators" } ;
+
 ARTICLE: "dataflow" "Data and control flow"
 { $subsection "evaluator" }
 { $subsection "words" }
@@ -956,16 +963,9 @@ ARTICLE: "dataflow" "Data and control flow"
 { $subsection "booleans" }
 { $subsection "shuffle-words" }
 "A central concept in Factor is that of a " { $emphasis "combinator" } ", which is a word taking code as input."
-$nl
-"Data flow combinators:"
-{ $subsection "slip-keep-combinators" }
-{ $subsection "cleave-combinators" }
-{ $subsection "spread-combinators" }
-{ $subsection "apply-combinators" }
-"Control flow combinators:"
+{ $subsection "dataflow-combinators" }
 { $subsection "conditionals" }
 { $subsection "looping-combinators" }
-"Additional combinators:"
 { $subsection "compositional-combinators" }
 { $subsection "combinators" }
 "More combinators are defined for working on data structures, such as " { $link "sequences-combinators" } " and " { $link "assocs-combinators" } "."
@@ -973,6 +973,7 @@ $nl
 "Advanced topics:"
 { $subsection "assertions" }
 { $subsection "implementing-combinators" }
+{ $subsection "macros" }
 { $subsection "errors" }
 { $subsection "continuations" } ;
 

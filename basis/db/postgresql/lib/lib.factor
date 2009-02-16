@@ -3,7 +3,7 @@
 USING: arrays continuations db io kernel math namespaces
 quotations sequences db.postgresql.ffi alien alien.c-types
 db.types tools.walker ascii splitting math.parser combinators
-libc shuffle calendar.format byte-arrays destructors prettyprint
+libc calendar.format byte-arrays destructors prettyprint
 accessors strings serialize io.encodings.binary io.encodings.utf8
 alien.strings io.streams.byte-array summary present urls
 specialized-arrays.uint specialized-arrays.alien db.private ;
@@ -65,7 +65,7 @@ M: postgresql-result-null summary ( obj -- str )
     } case ;
 
 : param-types ( statement -- seq )
-    in-params>> [ type>> type>oid ] uint-array{ } map-as underlying>> ;
+    in-params>> [ type>> type>oid ] uint-array{ } map-as ;
 
 : malloc-byte-array/length ( byte-array -- alien length )
     [ malloc-byte-array &free ] [ length ] bi ;
@@ -91,11 +91,11 @@ M: postgresql-result-null summary ( obj -- str )
     ] 2map flip [
         f f
     ] [
-        first2 [ >void*-array underlying>> ] [ >uint-array underlying>> ] bi*
+        first2 [ >void*-array ] [ >uint-array ] bi*
     ] if-empty ;
 
 : param-formats ( statement -- seq )
-    in-params>> [ type>> type>param-format ] uint-array{ } map-as underlying>> ;
+    in-params>> [ type>> type>param-format ] uint-array{ } map-as ;
 
 : do-postgresql-bound-statement ( statement -- res )
     [
@@ -117,7 +117,7 @@ M: postgresql-result-null summary ( obj -- str )
 
 : pq-get-string ( handle row column -- obj )
     3dup PQgetvalue utf8 alien>string
-    dup empty? [ [ pq-get-is-null f ] dip ? ] [ 3nip ] if ;
+    dup empty? [ [ pq-get-is-null f ] dip ? ] [ [ 3drop ] dip ] if ;
 
 : pq-get-number ( handle row column -- obj )
     pq-get-string dup [ string>number ] when ;
@@ -134,7 +134,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
 : pq-get-blob ( handle row column -- obj/f )
     [ PQgetvalue ] 3keep 3dup PQgetlength
     dup 0 > [
-        3nip
+        [ 3drop ] dip
         [
             memory>byte-array >string
             0 <uint>

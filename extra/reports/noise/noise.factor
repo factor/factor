@@ -25,7 +25,6 @@ IN: reports.noise
         { 3drop 1 }
         { 3dup 2 }
         { 3keep 3 }
-        { 3nip 4 }
         { 3slip 3 }
         { 4drop 2 }
         { 4dup 3 }
@@ -50,10 +49,8 @@ IN: reports.noise
         { ndrop 2 }
         { ndup 3 }
         { nip 2 }
-        { nipd 3 }
         { nkeep 5 }
         { npick 6 }
-        { nrev 5 }
         { nrot 5 }
         { nslip 5 }
         { ntuck 6 }
@@ -67,7 +64,6 @@ IN: reports.noise
         { swap 1 }
         { swapd 3 }
         { tuck 2 }
-        { tuckd 4 }
         { with 1/2 }
 
         { bi 1/2 }

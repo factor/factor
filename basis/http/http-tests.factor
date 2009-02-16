@@ -299,7 +299,7 @@ test-db [
 [ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
 
 USING: html.components html.forms
-xml xml.utilities validators
+xml xml.traversal validators
 furnace furnace.conversations ;
 
 SYMBOL: a
@@ -359,3 +359,8 @@ SYMBOL: a
 ! Test cloning
 [ f ] [ <404> dup clone "b" "a" set-header drop "a" header ] unit-test
 [ f ] [ <404> dup clone "b" "a" <cookie> put-cookie drop "a" get-cookie ] unit-test
+
+! Test basic auth
+[ "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==" ] [ <request> "Aladdin" "open sesame" set-basic-auth "Authorization" header ] unit-test
+
+

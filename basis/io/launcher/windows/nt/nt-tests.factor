@@ -1,7 +1,7 @@
 USING: io.launcher tools.test calendar accessors environment
 namespaces kernel system arrays io io.files io.encodings.ascii
 sequences parser assocs hashtables math continuations eval
-io.files.temp io.directories io.pathnames ;
+io.files.temp io.directories io.pathnames splitting ;
 IN: io.launcher.windows.nt.tests
 
 [ ] [
@@ -23,9 +23,12 @@ IN: io.launcher.windows.nt.tests
 
 [ f ] [ "notepad" get process-running? ] unit-test
 
+: console-vm ( -- path )
+    vm ".exe" ?tail [ ".com" append ] when ;
+
 [ ] [
     <process>
-        vm "-quiet" "-run=hello-world" 3array >>command
+        console-vm "-quiet" "-run=hello-world" 3array >>command
         "out.txt" temp-file >>stdout
     try-process
 ] unit-test
@@ -34,11 +37,12 @@ IN: io.launcher.windows.nt.tests
     "out.txt" temp-file ascii file-lines first
 ] unit-test
 
-[ ] [
+[ "( scratchpad ) " ] [
     <process>
-        vm "-run=listener" 2array >>command
+        console-vm "-run=listener" 2array >>command
         +closed+ >>stdin
-    try-process
+        +stdout+ >>stderr
+    ascii [ input-stream get contents ] with-process-reader
 ] unit-test
 
 : launcher-test-path ( -- str )
@@ -47,7 +51,7 @@ IN: io.launcher.windows.nt.tests
 [ ] [
     launcher-test-path [
         <process>
-            vm "-script" "stderr.factor" 3array >>command
+            console-vm "-script" "stderr.factor" 3array >>command
             "out.txt" temp-file >>stdout
             "err.txt" temp-file >>stderr
         try-process
@@ -65,7 +69,7 @@ IN: io.launcher.windows.nt.tests
 [ ] [
     launcher-test-path [
         <process>
-            vm "-script" "stderr.factor" 3array >>command
+            console-vm "-script" "stderr.factor" 3array >>command
             "out.txt" temp-file >>stdout
             +stdout+ >>stderr
         try-process
@@ -79,7 +83,7 @@ IN: io.launcher.windows.nt.tests
 [ "output" ] [
     launcher-test-path [
         <process>
-            vm "-script" "stderr.factor" 3array >>command
+            console-vm "-script" "stderr.factor" 3array >>command
             "err2.txt" temp-file >>stderr
         ascii <process-reader> lines first
     ] with-directory
@@ -92,7 +96,7 @@ IN: io.launcher.windows.nt.tests
 [ t ] [
     launcher-test-path [
         <process>
-            vm "-script" "env.factor" 3array >>command
+            console-vm "-script" "env.factor" 3array >>command
         ascii <process-reader> contents
     ] with-directory eval
 
@@ -102,7 +106,7 @@ IN: io.launcher.windows.nt.tests
 [ t ] [
     launcher-test-path [
         <process>
-            vm "-script" "env.factor" 3array >>command
+            console-vm "-script" "env.factor" 3array >>command
             +replace-environment+ >>environment-mode
             os-envs >>environment
         ascii <process-reader> contents
@@ -114,7 +118,7 @@ IN: io.launcher.windows.nt.tests
 [ "B" ] [
     launcher-test-path [
         <process>
-            vm "-script" "env.factor" 3array >>command
+            console-vm "-script" "env.factor" 3array >>command
             { { "A" "B" } } >>environment
         ascii <process-reader> contents
     ] with-directory eval
@@ -125,7 +129,7 @@ IN: io.launcher.windows.nt.tests
 [ f ] [
     launcher-test-path [
         <process>
-            vm "-script" "env.factor" 3array >>command
+            console-vm "-script" "env.factor" 3array >>command
             { { "USERPROFILE" "XXX" } } >>environment
             +prepend-environment+ >>environment-mode
         ascii <process-reader> contents
@@ -151,7 +155,7 @@ IN: io.launcher.windows.nt.tests
     2 [
         launcher-test-path [
             <process>
-                vm "-script" "append.factor" 3array >>command
+                console-vm "-script" "append.factor" 3array >>command
                 "append-test" temp-file <appender> >>stdout
             try-process
         ] with-directory
@@ -159,3 +163,5 @@ IN: io.launcher.windows.nt.tests
    
     "append-test" temp-file ascii file-contents
 ] unit-test
+
+

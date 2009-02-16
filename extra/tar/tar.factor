@@ -5,8 +5,8 @@ system tools.hexdump io.encodings.binary summary accessors
 io.backend byte-arrays ;
 IN: tar
 
-: zero-checksum 256 ; inline
-: block-size 512 ; inline
+CONSTANT: zero-checksum 256
+CONSTANT: block-size 512
 
 TUPLE: tar-header name mode uid gid size mtime checksum typeflag
 linkname magic version uname gname devmajor devminor prefix ;
@@ -89,8 +89,7 @@ M: unknown-typeflag summary ( obj -- str )
 
 ! Symlink
 : typeflag-2 ( header -- )
-    [ name>> ] [ linkname>> ] bi
-    [ make-link ] 2curry ignore-errors ;
+    [ name>> ] [ linkname>> ] bi make-link ;
 
 ! character special
 : typeflag-3 ( header -- ) unknown-typeflag ;
