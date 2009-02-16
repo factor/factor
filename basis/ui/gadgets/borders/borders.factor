@@ -48,9 +48,7 @@ M: border baseline
     dup border-dim [ border-loc ] keep <rect> ;
 
 M: border layout*
-    [ gadget-child ] [ border-child-rect ] bi
-    [ loc>> >>loc ] [ dim>> >>dim ] bi
-    drop ;
+    [ border-child-rect ] [ gadget-child ] bi set-rect-bounds ;
 
 M: border focusable-child*
     gadget-child ;

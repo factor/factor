@@ -26,12 +26,12 @@ TUPLE: glass < gadget visible-rect owner ;
     [ visible-rect>> ] [ owner>> ] bi screen-loc offset-rect ;
 
 M: glass layout*
-    {
-        [ gadget-child ]
+    [
         [ visible-rect ]
         [ gadget-child pref-dim ]
         [ find-world dim>> ]
-    } cleave popup-loc >>loc prefer ;
+        tri popup-rect
+    ] [ gadget-child ] bi set-rect-bounds ;
 
 M: glass ungraft* gadget-child hide-glass-hook ;
 
