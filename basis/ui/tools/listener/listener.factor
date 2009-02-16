@@ -169,7 +169,7 @@ M: interactor dispose drop ;
 
 TUPLE: listener-gadget < tool input output scroller ;
 
-{ 550 700 } listener-gadget set-tool-dim
+{ 600 700 } listener-gadget set-tool-dim
 
 : find-listener ( gadget -- listener )
     [ listener-gadget? ] find-parent ;
