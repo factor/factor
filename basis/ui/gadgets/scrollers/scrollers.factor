@@ -7,12 +7,16 @@ models models.range models.compose combinators math.vectors
 classes.tuple math.rectangles combinators.short-circuit ;
 IN: ui.gadgets.scrollers
 
-TUPLE: scroller < frame viewport x y follows ;
+TUPLE: scroller < frame column-header viewport x y follows ;
 
 ! Scrollable gadget protocol; optional
 GENERIC: pref-viewport-dim ( gadget -- dim )
 
 M: gadget pref-viewport-dim pref-dim ;
+
+GENERIC: viewport-column-header ( gadget -- gadget/f )
+
+M: gadget viewport-column-header drop f ;
 
 : find-scroller ( gadget -- scroller/f )
     [ scroller? ] find-parent ;
@@ -102,20 +106,43 @@ M: scroller focusable-child*
 M: scroller model-changed
     f >>follows 2drop ;
 
+: build-scroller ( scroller -- scroller )
+    dup x>> { 0 1 } grid-add
+    dup y>> { 1 0 } grid-add
+    dup viewport>> { 0 0 } grid-add ; inline
+
+: <column-header-viewport> ( scroller -- viewport )
+    [ column-header>> ] [ model>> ] bi
+    <viewport> horizontal >>constraint ;
+
+: build-header-scroller ( scroller -- scroller )
+    dup <column-header-viewport> { 0 0 } grid-add
+    dup x>> { 0 2 } grid-add
+    dup y>> { 1 1 } grid-add
+    dup viewport>> { 0 1 } grid-add ; inline
+
+: init-scroller ( column-header scroller -- scroller )
+    { 1 1 } >>gap
+    over { 0 1 } { 0 0 } ? >>filled-cell
+    t >>root?
+    <scroller-model> >>model
+    swap >>column-header ; inline
+
+: build-children ( gadget scroller -- scroller )
+    dup model>> dependencies>>
+    [ first horizontal <slider> >>x ]
+    [ second vertical <slider> >>y ] bi
+    [ nip ] [ model>> <viewport> ] 2bi >>viewport ; inline
+
 PRIVATE>
 
 : <scroller> ( gadget -- scroller )
-    2 2 scroller new-frame
-        { 1 1 } >>gap
-        { 0 0 } >>filled-cell
-        t >>root?
-        <scroller-model> >>model
-
-        dup model>> dependencies>>
-        [ first horizontal <slider> [ >>x ] [ { 0 1 } grid-add ] bi ]
-        [ second vertical <slider> [ >>y ] [ { 1 0 } grid-add ] bi ] bi
-
-        tuck model>> <viewport> [ >>viewport ] [ { 0 0 } grid-add ] bi ; inline
+    dup viewport-column-header
+    dup [ 2 3 ] [ 2 2 ] if scroller new-frame
+        init-scroller
+        build-children
+        dup column-header>>
+        [ build-header-scroller ] [ build-scroller ] if ;
 
 : scroll>rect ( rect gadget -- )
     dup find-scroller* dup [
