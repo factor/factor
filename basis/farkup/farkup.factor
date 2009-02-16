@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators io
 io.streams.string kernel math namespaces peg peg.ebnf
-sequences sequences.deep strings xml.entities xml.literals
+sequences sequences.deep strings xml.entities xml.syntax
 vectors splitting xmode.code2html urls.encoding xml.data
 xml.writer ;
 IN: farkup
@@ -85,10 +85,10 @@ image-link       = "[[image:" link-content  "|" link-content "]]"
 simple-link      = "[[" link-content "]]"
     => [[ second >string dup simple-link-title link boa ]]
 
-labelled-link    = "[[" link-content "|" link-content "]]"
+labeled-link     = "[[" link-content "|" link-content "]]"
     => [[ [ second >string ] [ fourth >string ] bi link boa ]]
 
-link             = image-link | labelled-link | simple-link
+link             = image-link | labeled-link | simple-link
 
 escaped-char  = "\" .
     => [[ second 1string ]]

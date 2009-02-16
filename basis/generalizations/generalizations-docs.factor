@@ -30,6 +30,10 @@ HELP: narray
 
 { nsequence narray } related-words
 
+HELP: nsum
+{ $values { "n" integer } }
+{ $description "Adds the top " { $snippet "n" } " stack values." } ;
+
 HELP: firstn
 { $values { "n" integer } }
 { $description "A generalization of " { $link first } ", "
@@ -54,7 +58,7 @@ HELP: npick
 "placed on the top of the stack."
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 4 npick .s" "1\n2\n3\n4\n1" }
+  { $example "USING: kernel prettyprint generalizations ;" "1 2 3 4 4 npick .s clear" "1\n2\n3\n4\n1" }
   "Some core words expressed in terms of " { $link npick } ":"
     { $table
         { { $link dup } { $snippet "1 npick" } }
@@ -71,7 +75,7 @@ HELP: ndup
 "placed on the top of the stack."
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 4 ndup .s" "1\n2\n3\n4\n1\n2\n3\n4" }
+  { $example "USING: prettyprint generalizations kernel ;" "1 2 3 4 4 ndup .s clear" "1\n2\n3\n4\n1\n2\n3\n4" }
   "Some core words expressed in terms of " { $link ndup } ":"
     { $table
         { { $link dup } { $snippet "1 ndup" } }
@@ -87,7 +91,7 @@ HELP: nnip
 "for any number of items."
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 3 nnip .s" "4" }
+  { $example "USING: prettyprint generalizations kernel ;" "1 2 3 4 3 nnip .s clear" "4" }
   "Some core words expressed in terms of " { $link nnip } ":"
     { $table
         { { $link nip } { $snippet "1 nnip" } }
@@ -102,7 +106,7 @@ HELP: ndrop
 "for any number of items."
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 3 ndrop .s" "1" }
+  { $example "USING: prettyprint generalizations kernel ;" "1 2 3 4 3 ndrop .s clear" "1" }
   "Some core words expressed in terms of " { $link ndrop } ":"
     { $table
         { { $link drop } { $snippet "1 ndrop" } }
@@ -117,7 +121,7 @@ HELP: nrot
 "number of items on the stack. "
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 4 nrot .s" "2\n3\n4\n1" }
+  { $example "USING: prettyprint generalizations kernel ;" "1 2 3 4 4 nrot .s clear" "2\n3\n4\n1" }
   "Some core words expressed in terms of " { $link nrot } ":"
     { $table
         { { $link swap } { $snippet "1 nrot" } }
@@ -131,7 +135,7 @@ HELP: -nrot
 "number of items on the stack. "
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 4 -nrot .s" "4\n1\n2\n3" }
+  { $example "USING: prettyprint generalizations kernel ;" "1 2 3 4 4 -nrot .s clear" "4\n1\n2\n3" }
   "Some core words expressed in terms of " { $link -nrot } ":"
     { $table
         { { $link swap } { $snippet "1 -nrot" } }
@@ -147,8 +151,8 @@ HELP: ndip
 "stack. The quotation can consume and produce any number of items."
 } 
 { $examples
-  { $example "USING: generalizations kernel prettyprint ;" "1 2 [ dup ] 1 ndip .s" "1\n1\n2" }
-  { $example "USING: generalizations kernel prettyprint ;" "1 2 3 [ drop ] 2 ndip .s" "2\n3" }
+  { $example "USING: generalizations kernel prettyprint kernel ;" "1 2 [ dup ] 1 ndip .s clear" "1\n1\n2" }
+  { $example "USING: generalizations kernel prettyprint kernel ;" "1 2 3 [ drop ] 2 ndip .s clear" "2\n3" }
   "Some core words expressed in terms of " { $link ndip } ":"
     { $table
         { { $link dip } { $snippet "1 ndip" } }
@@ -164,7 +168,7 @@ HELP: nslip
 "removed from the stack, the quotation called, and the items restored."
 } 
 { $examples
-  { $example "USING: generalizations prettyprint ;" "[ 99 ] 1 2 3 4 5 5 nslip .s" "99\n1\n2\n3\n4\n5" }
+  { $example "USING: generalizations kernel prettyprint ;" "[ 99 ] 1 2 3 4 5 5 nslip .s clear" "99\n1\n2\n3\n4\n5" }
   "Some core words expressed in terms of " { $link nslip } ":"
     { $table
         { { $link slip } { $snippet "1 nslip" } }
@@ -180,7 +184,7 @@ HELP: nkeep
 "saved, the quotation called, and the items restored."
 } 
 { $examples
-  { $example "USING: generalizations kernel prettyprint ;" "1 2 3 4 5 [ drop drop drop drop drop 99 ] 5 nkeep .s" "99\n1\n2\n3\n4\n5" }
+  { $example "USING: generalizations kernel prettyprint ;" "1 2 3 4 5 [ drop drop drop drop drop 99 ] 5 nkeep .s clear" "99\n1\n2\n3\n4\n5" }
   "Some core words expressed in terms of " { $link nkeep } ":"
     { $table
         { { $link keep } { $snippet "1 nkeep" } }
@@ -238,6 +242,11 @@ HELP: ncleave
     }
 } ;
 
+HELP: nspread
+{ $values { "quots" "a sequence of quotations" } { "n" integer } }
+{ $description "A generalization of " { $link spread } " that can work for any quotation arity."
+} ;
+
 HELP: mnswap
 { $values { "m" integer } { "n" integer } }
 { $description "Swaps the top " { $snippet "m" } " stack elements with the " { $snippet "n" } " elements directly underneath." }
@@ -248,6 +257,17 @@ HELP: mnswap
         { { $link rot } { $snippet "2 1 mnswap" } }
         { { $link -rot } { $snippet "1 2 mnswap" } }
     }
+} ;
+
+HELP: nweave
+{ $values { "n" integer } }
+{ $description "Copies the top " { $snippet "n" } " stack elements underneath each one of the " { $snippet "n" } " elements below." }
+{ $examples
+  { $example
+    "USING: arrays kernel generalizations prettyprint ;"
+    "\"e1\" \"e2\" \"o1\" \"o2\" 2 nweave [ 3array ] 3dip 3array 2array ."
+    "{ { \"e1\" \"o1\" \"o2\" } { \"e2\" \"o1\" \"o2\" } }"
+  }
 } ;
 
 HELP: n*quot
@@ -299,18 +319,14 @@ HELP: ntuck
 }
 { $description "A generalization of " { $link tuck } " that can work for any stack depth. The top item will be copied and placed " { $snippet "n" } " items down on the stack." } ;
 
-ARTICLE: "generalizations" "Generalized shuffle words and combinators"
-"The " { $vocab-link "generalizations" } " vocabulary defines a number of stack shuffling words and combinators for use in "
-"macros where the arity of the input quotations depends on an "
-"input parameter."
-$nl
-"Generalized sequence operations:"
+ARTICLE: "sequence-generalizations" "Generalized sequence operations"
 { $subsection narray }
 { $subsection nsequence }
 { $subsection firstn }
 { $subsection nappend }
-{ $subsection nappend-as }
-"Generated stack shuffle operations:"
+{ $subsection nappend-as } ;
+
+ARTICLE: "shuffle-generalizations" "Generalized shuffle words"
 { $subsection ndup }
 { $subsection npick }
 { $subsection nrot }
@@ -319,14 +335,28 @@ $nl
 { $subsection ndrop }
 { $subsection ntuck }
 { $subsection mnswap }
-"Generalized combinators:"
+{ $subsection nweave } ;
+
+ARTICLE: "combinator-generalizations" "Generalized combinators"
 { $subsection ndip }
 { $subsection nslip }
 { $subsection nkeep }
 { $subsection napply }
 { $subsection ncleave }
-"Generalized quotation construction:"
+{ $subsection nspread } ;
+
+ARTICLE: "other-generalizations" "Additional generalizations"
 { $subsection ncurry } 
-{ $subsection nwith } ;
+{ $subsection nwith }
+{ $subsection nsum } ;
+
+ARTICLE: "generalizations" "Generalized shuffle words and combinators"
+"The " { $vocab-link "generalizations" } " vocabulary defines a number of stack shuffling words and combinators for use in "
+"macros where the arity of the input quotations depends on an "
+"input parameter."
+{ $subsection "sequence-generalizations" }
+{ $subsection "shuffle-generalizations" }
+{ $subsection "combinator-generalizations" }
+{ $subsection "other-generalizations" } ;
 
 ABOUT: "generalizations"

@@ -4,7 +4,7 @@ USING: calendar kernel math math.order math.parser namespaces
 parser sequences strings assocs hashtables debugger mime.types
 sorting logging calendar.format accessors splitting io io.files
 io.files.info io.directories io.pathnames io.encodings.binary
-fry xml.entities destructors urls html xml.literals
+fry xml.entities destructors urls html xml.syntax
 html.templates.fhtml http http.server http.server.responses
 http.server.redirection xml.writer ;
 IN: http.server.static
@@ -45,9 +45,8 @@ TUPLE: file-responder root hook special allow-listings ;
     [ file-responder get hook>> call ] [ 2drop <304> ] if ;
 
 : serving-path ( filename -- filename )
-    file-responder get root>> trim-tail-separators
-    "/"
-    rot "" or trim-head-separators 3append ;
+    [ file-responder get root>> trim-tail-separators "/" ] dip
+    "" or trim-head-separators 3append ;
 
 : serve-file ( filename -- response )
     dup mime-type

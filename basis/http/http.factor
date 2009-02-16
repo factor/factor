@@ -3,17 +3,12 @@
 USING: accessors kernel combinators math namespaces make assocs
 sequences splitting sorting sets strings vectors hashtables
 quotations arrays byte-arrays math.parser calendar
-calendar.format present urls
-
+calendar.format present urls fry
 io io.encodings io.encodings.iana io.encodings.binary
 io.encodings.8-bit io.crlf
-
 unicode.case unicode.categories
-
-http.parsers ;
-
-EXCLUDE: fry => , ;
-
+http.parsers
+base64 ;
 IN: http
 
 : (read-header) ( -- alist )
@@ -148,6 +143,9 @@ cookies ;
 : set-header ( request/response value key -- request/response )
     pick header>> set-at ;
 
+: set-basic-auth ( request username password -- request )
+    ":" glue >base64 "Basic " prepend "Authorization" set-header ;
+    
 : <request> ( -- request )
     request new
         "1.1" >>version
@@ -161,6 +159,7 @@ cookies ;
 
 : header ( request/response key -- value )
     swap header>> at ;
+
 
 TUPLE: response
 version
@@ -217,5 +216,7 @@ TUPLE: post-data data params content-type content-encoding ;
     " " split harvest [ "=" split1 [ >lower ] dip ] { } map>assoc ;
 
 : parse-content-type ( content-type -- type encoding )
-    ";" split1 parse-content-type-attributes "charset" swap at
-    name>encoding over "text/" head? latin1 binary ? or ;
+    ";" split1
+    parse-content-type-attributes "charset" swap at
+    [ name>encoding ]
+    [ dup "text/" head? latin1 binary ? ] if* ;

@@ -4,7 +4,7 @@ USING: byte-arrays arrays assocs kernel kernel.private libc math
 namespaces make parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
 layouts system compiler.units io.files io.encodings.binary
-accessors combinators effects continuations fry ;
+accessors combinators effects continuations fry call classes ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -13,18 +13,20 @@ DEFER: *char
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
 TUPLE: c-type
-class
-boxer boxer-quot unboxer unboxer-quot
-getter setter
-reg-class size align stack-align? ;
-
-: new-c-type ( class -- type )
-    new
-        int-regs >>reg-class
-        object >>class ; inline
+{ class class initial: object }
+boxer
+{ boxer-quot callable }
+unboxer
+{ unboxer-quot callable }
+{ getter callable }
+{ setter callable }
+{ reg-class initial: int-regs }
+size
+align
+stack-align? ;
 
 : <c-type> ( -- type )
-    \ c-type new-c-type ;
+    \ c-type new ;
 
 SYMBOL: c-types
 
@@ -178,10 +180,15 @@ GENERIC: byte-length ( seq -- n ) flushable
 
 M: byte-array byte-length length ;
 
+M: f byte-length drop 0 ;
+
 : c-getter ( name -- quot )
     c-type-getter [
         [ "Cannot read struct fields with this type" throw ]
     ] unless* ;
+
+: c-type-getter-boxer ( name -- quot )
+    [ c-getter ] [ c-type-boxer-quot ] bi append ;
 
 : c-setter ( name -- quot )
     c-type-setter [
@@ -201,13 +208,13 @@ M: byte-array byte-length length ;
     1 swap malloc-array ; inline
 
 : malloc-byte-array ( byte-array -- alien )
-    dup length [ nip malloc dup ] 2keep memcpy ;
+    dup byte-length [ nip malloc dup ] 2keep memcpy ;
 
 : memory>byte-array ( alien len -- byte-array )
     [ nip (byte-array) dup ] 2keep memcpy ;
 
 : byte-array>memory ( byte-array base -- )
-    swap dup length memcpy ;
+    swap dup byte-length memcpy ;
 
 : array-accessor ( type quot -- def )
     [
@@ -219,7 +226,7 @@ M: byte-array byte-length length ;
 TUPLE: long-long-type < c-type ;
 
 : <long-long-type> ( -- type )
-    long-long-type new-c-type ;
+    long-long-type new ;
 
 M: long-long-type unbox-parameter ( n type -- )
     c-type-unboxer %unbox-long-long ;
@@ -256,14 +263,14 @@ M: long-long-type box-return ( type -- )
         unclip [
             [
                 dup word? [
-                    def>> { } swap with-datastack first
+                    def>> call( -- object )
                 ] when
             ] map
         ] dip prefix
     ] when ;
 
 : malloc-file-contents ( path -- alien len )
-    binary file-contents dup malloc-byte-array swap length ;
+    binary file-contents [ malloc-byte-array ] [ length ] bi ;
 
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
@@ -283,9 +290,10 @@ M: long-long-type box-return ( type -- )
     <c-type>
         c-ptr >>class
         [ alien-cell ] >>getter
-        [ set-alien-cell ] >>setter
+        [ [ >c-ptr ] 2dip set-alien-cell ] >>setter
         bootstrap-cell >>size
         bootstrap-cell >>align
+        [ >c-ptr ] >>unboxer-quot
         "box_alien" >>boxer
         "alien_offset" >>unboxer
     "void*" define-primitive-type

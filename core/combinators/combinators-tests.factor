@@ -1,6 +1,6 @@
 USING: alien strings kernel math tools.test io prettyprint
 namespaces combinators words classes sequences accessors 
-math.functions ;
+math.functions arrays ;
 IN: combinators.tests
 
 ! Compiled
@@ -314,3 +314,27 @@ IN: combinators.tests
 \ test-case-7 must-infer
 
 [ "plus" ] [ \ + test-case-7 ] unit-test
+
+! Some corner cases (no pun intended)
+DEFER: corner-case-1
+
+<< \ corner-case-1 2 [ + ] curry 1array [ case ] curry (( a -- b )) define-declared >>
+
+[ t ] [ \ corner-case-1 optimized>> ] unit-test
+[ 4 ] [ 2 corner-case-1 ] unit-test
+
+[ 4 ] [ 2 2 [ + ] curry 1array case ] unit-test
+
+: test-case-8 ( n -- )
+    {
+        { 1 [ "foo" ] }
+    } case ;
+
+[ 3 test-case-8 ]
+[ object>> 3 = ] must-fail-with
+
+[
+    3 {
+        { 1 [ "foo" ] }
+    } case
+] [ object>> 3 = ] must-fail-with

@@ -15,14 +15,14 @@ M: bad-byte-array-length summary
 
 FUNCTOR: define-array ( T -- )
 
-A            DEFINES ${T}-array
+A            DEFINES-CLASS ${T}-array
 <A>          DEFINES <${A}>
 (A)          DEFINES (${A})
 >A           DEFINES >${A}
 byte-array>A DEFINES byte-array>${A}
 A{           DEFINES ${A}{
 
-NTH          [ T dup c-getter array-accessor ]
+NTH          [ T dup c-type-getter-boxer array-accessor ]
 SET-NTH      [ T dup c-setter array-accessor ]
 
 WHERE

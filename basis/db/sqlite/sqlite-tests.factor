@@ -73,3 +73,95 @@ IN: db.sqlite.tests
         "select * from person" sql-query length
     ] with-db
 ] unit-test
+
+! You don't need a primary key
+USING: accessors arrays sorting ;
+TUPLE: things one two ;
+
+things "THINGS" {
+    { "one" "ONE" INTEGER +not-null+ }
+    { "two" "TWO" INTEGER +not-null+ }
+} define-persistent
+
+[ { { 0 0 } { 0 1 } { 1 0 } { 1 1 } } ] [
+    test.db [
+       things create-table
+        0 0 things boa insert-tuple
+        0 1 things boa insert-tuple
+        1 1 things boa insert-tuple
+        1 0 things boa insert-tuple
+        f f things boa select-tuples
+        [ [ one>> ] [ two>> ] bi 2array ] map natural-sort
+       things drop-table
+    ] with-db
+] unit-test
+
+! Tables can have different names than the name of the tuple
+TUPLE: foo slot ;
+C: <foo> foo
+foo "BAR" { { "slot" "SOMETHING" INTEGER +not-null+ } } define-persistent
+
+TUPLE: hi bye try ;
+C: <hi> hi
+hi "HELLO" {
+    { "bye" "BUHBYE" INTEGER { +foreign-id+ foo "SOMETHING" } }
+    { "try" "RETHROW" INTEGER { +foreign-id+ foo "SOMETHING" } }
+} define-persistent
+
+[ T{ foo { slot 1 } } T{ hi { bye 1 } { try 1 } } ] [
+    test.db [
+        foo create-table
+        hi create-table
+        1 <foo> insert-tuple
+        f <foo> select-tuple
+        1 1 <hi> insert-tuple
+        f <hi> select-tuple
+        hi drop-table
+        foo drop-table
+    ] with-db
+] unit-test
+
+[ ] [
+    test.db [
+        hi create-table
+        hi drop-table
+    ] with-db
+] unit-test
+
+TUPLE: show id ;
+TUPLE: user username data ;
+TUPLE: watch show user ;
+
+user "USER" {
+    { "username" "USERNAME" TEXT +not-null+ +user-assigned-id+ }
+    { "data" "DATA" TEXT }
+} define-persistent
+
+show "SHOW" {
+    { "id" "ID" +db-assigned-id+ }
+} define-persistent
+
+watch "WATCH" {
+    { "user" "USER" TEXT +not-null+
+        { +foreign-id+ user "USERNAME" } +user-assigned-id+ }
+    { "show" "SHOW" BIG-INTEGER +not-null+
+        { +foreign-id+ show "ID" } +user-assigned-id+ }
+} define-persistent
+
+[ T{ user { username "littledan" } { data "foo" } } ] [
+    test.db [
+        user create-table
+        show create-table
+        watch create-table
+        "littledan" "foo" user boa insert-tuple
+        "mark" "bar" user boa insert-tuple
+        show new insert-tuple
+        show new select-tuple
+        "littledan" f user boa select-tuple
+        watch boa insert-tuple
+        watch new select-tuple
+        user>> f user boa select-tuple
+    ] with-db
+] unit-test
+
+[ \ swap ensure-table ] must-fail
