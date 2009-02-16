@@ -93,9 +93,9 @@ SYMBOL: bootstrap-time
         "tools.deploy.shaker" run
     ] [
         "staging" get [
-            "resource:basis/bootstrap/finish-staging.factor" run-file
+            "vocab:bootstrap/finish-staging.factor" run-file
         ] [
-            "resource:basis/bootstrap/finish-bootstrap.factor" run-file
+            "vocab:bootstrap/finish-bootstrap.factor" run-file
         ] if
 
         "output-image" get save-image-and-exit
@@ -104,6 +104,6 @@ SYMBOL: bootstrap-time
     drop
     [
         load-help? off
-        "resource:basis/bootstrap/bootstrap-error.factor" run-file
+        "vocab:bootstrap/bootstrap-error.factor" run-file
     ] with-scope
 ] recover
