@@ -88,7 +88,6 @@
                      (t 'default))))
             ((or (char-equal c ?U) (char-equal c ?C))
              'factor-font-lock-parsing-word)
-            ((char-equal c ?\() 'factor-font-lock-stack-effect)
             ((char-equal c ?\") 'factor-font-lock-string)
             (t 'factor-font-lock-comment)))))
 
