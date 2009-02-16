@@ -480,11 +480,23 @@ TUPLE: multiline-editor < editor ;
 
 : next-line ( editor -- ) line-elt editor-next ;
 
-: select-previous-line ( editor -- ) 
-    line-elt editor-select-prev ;
+<PRIVATE
 
-: select-next-line ( editor -- ) 
-    line-elt editor-select-next ;
+: page-elt ( editor -- editor element ) dup visible-lines <page-elt> ;
+
+PRIVATE>
+
+: previous-page ( editor -- ) page-elt editor-prev ;
+
+: next-page ( editor -- ) page-elt editor-next ;
+
+: select-previous-line ( editor -- ) line-elt editor-select-prev ;
+
+: select-next-line ( editor -- ) line-elt editor-select-next ;
+
+: select-previous-page ( editor -- ) page-elt editor-select-prev ;
+
+: select-next-page ( editor -- ) page-elt editor-select-next ;
 
 : insert-newline ( editor -- )
     "\n" swap user-input* drop ;
@@ -522,6 +534,10 @@ multiline-editor "multiline" f {
     { T{ key-down f f "DOWN" } next-line }
     { T{ key-down f { S+ } "UP" } select-previous-line }
     { T{ key-down f { S+ } "DOWN" } select-next-line }
+    { T{ key-down f f "PAGE_UP" } previous-page }
+    { T{ key-down f f "PAGE_DOWN" } next-page }
+    { T{ key-down f { S+ } "PAGE_UP" } select-previous-page }
+    { T{ key-down f { S+ } "PAGE_DOWN" } select-next-page }
     { T{ key-down f f "RET" } insert-newline }
     { T{ key-down f { S+ } "RET" } insert-newline }
     { T{ key-down f f "ENTER" } insert-newline }
