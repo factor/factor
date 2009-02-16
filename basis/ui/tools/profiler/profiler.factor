@@ -20,8 +20,6 @@ words
 methods
 generic class ;
 
-{ 700 400 } profiler-gadget set-tool-dim
-
 SINGLETONS: word-renderer vocab-renderer ;
 UNION: profiler-renderer word-renderer vocab-renderer ;
 
@@ -126,9 +124,13 @@ M: method-renderer column-titles drop { "Method" "Count" } ;
         { 3 3 } >>gap
         profiler vocabs>> vocab-renderer <profiler-table>
             profiler vocab>> >>selected-value
+            10 >>min-rows
+            10 >>max-rows
         "Vocabularies" <labeled-gadget>
     1/2 track-add
         profiler <words-model> word-renderer <profiler-table>
+            10 >>min-rows
+            10 >>max-rows
         "Words" <labeled-gadget>
     1/2 track-add ;
 
@@ -147,6 +149,9 @@ M: method-renderer column-titles drop { "Method" "Count" } ;
         1/2 track-add
     1/2 track-add
         profiler methods>> method-renderer <profiler-table>
+            5 >>min-rows
+            5 >>max-rows
+            40 >>min-cols
         "Methods" <labeled-gadget>
     1/2 track-add ;
 
