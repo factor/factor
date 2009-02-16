@@ -17,7 +17,7 @@ TUPLE: xml-test id uri sections description type ;
 : parse-tests ( xml -- tests )
     "TEST" tags-named [ >xml-test ] map ;
 
-: base "resource:basis/xml/tests/xmltest/" ;
+: base "vocab:xml/tests/xmltest/" ;
 
 MACRO: drop-output ( quot -- newquot )
     dup infer out>> '[ @ _ ndrop ] ;

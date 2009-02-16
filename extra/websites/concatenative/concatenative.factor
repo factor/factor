@@ -69,8 +69,8 @@ SYMBOL: dh-file
     init-factor-db ;
 
 : init-testing ( -- )
-    "resource:basis/openssl/test/dh1024.pem" dh-file set-global
-    "resource:basis/openssl/test/server.pem" key-file set-global
+    "vocab:openssl/test/dh1024.pem" dh-file set-global
+    "vocab:openssl/test/server.pem" key-file set-global
     "password" key-password set-global
     common-configuration
     <factor-website>
