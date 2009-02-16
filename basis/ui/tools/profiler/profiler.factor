@@ -35,13 +35,24 @@ M: profiler-renderer row-value
 M: vocab-renderer row-value
     call-next-method dup [ vocab ] when ;
 
+M: profiler-renderer column-alignment drop { 0 1 } ;
+M: profiler-renderer filled-column drop 0 ;
+
+M: word-renderer column-titles drop { "Word" "Count" } ;
+M: vocab-renderer column-titles drop { "Vocabulary" "Count" } ;
+
 SINGLETON: method-renderer
+
+M: method-renderer column-alignment drop { 0 1 } ;
+M: method-renderer filled-column drop 0 ;
 
 ! Value is a { method-body count } pair
 M: method-renderer row-columns
     drop [ first synopsis ] [ second present ] bi 2array ;
 
 M: method-renderer row-value drop first ;
+
+M: method-renderer column-titles drop { "Method" "Count" } ;
 
 : <profiler-model> ( values profiler -- model )
     [ [ filter-counts ] <filter> ] [ sort>> ] bi* <sort> ;
@@ -61,10 +72,8 @@ M: method-renderer row-value drop first ;
 : match? ( pair/f str -- ? )
     swap dup [ first present subseq? ] [ 2drop t ] if ;
 
-: <profiler-table> ( model -- table )
-    [ match? ] <search-table>
-        { 0 1 } >>column-alignment
-        0 >>filled-column ;
+: <profiler-table> ( model renderer -- table )
+    [ match? ] <search-table> ;
 
 : <profiler-filter-model> ( counts profiler -- model' )
     [ <model> ] dip <profiler-model> [ f prefix ] <filter> ;
@@ -115,13 +124,11 @@ M: method-renderer row-value drop first ;
 :: <words-tab> ( profiler -- gadget )
     horizontal <track>
         { 3 3 } >>gap
-        profiler vocabs>> <profiler-table>
+        profiler vocabs>> vocab-renderer <profiler-table>
             profiler vocab>> >>selected-value
-            vocab-renderer >>renderer
         "Vocabularies" <labeled-gadget>
     1/2 track-add
-        profiler <words-model> <profiler-table>
-            word-renderer >>renderer
+        profiler <words-model> word-renderer <profiler-table>
         "Words" <labeled-gadget>
     1/2 track-add ;
 
@@ -130,19 +137,16 @@ M: method-renderer row-value drop first ;
         { 3 3 } >>gap
         horizontal <track>
             { 3 3 } >>gap
-            profiler <generic-model> <profiler-table>
+            profiler <generic-model> word-renderer <profiler-table>
                 profiler generic>> >>selected-value
-                word-renderer >>renderer
             "Generic words" <labeled-gadget>
         1/2 track-add
-            profiler <class-model> <profiler-table>
+            profiler <class-model> word-renderer <profiler-table>
                 profiler class>> >>selected-value
-                word-renderer >>renderer
             "Classes" <labeled-gadget>
         1/2 track-add
     1/2 track-add
-        profiler methods>> <profiler-table>
-            method-renderer >>renderer
+        profiler methods>> method-renderer <profiler-table>
         "Methods" <labeled-gadget>
     1/2 track-add ;
 
