@@ -1,9 +1,8 @@
-USING: arrays byte-arrays help.markup help.syntax kernel
-byte-vectors.private combinators ;
+USING: arrays byte-arrays help.markup help.syntax kernel combinators ;
 IN: byte-vectors
 
 ARTICLE: "byte-vectors" "Byte vectors"
-"A byte vector is a resizable mutable sequence of unsigned bytes. Byte vector words are found in the " { $vocab-link "byte-vectors" } " vocabulary."
+"The " { $vocab-link "byte-vectors" } " vocabulary implements resizable mutable sequence of unsigned bytes. Byte vectors implement the " { $link "sequence-protocol" } " and thus all " { $link "sequences" } " can be used with them."
 $nl
 "Byte vectors form a class:"
 { $subsection byte-vector }

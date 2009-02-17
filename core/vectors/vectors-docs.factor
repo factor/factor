@@ -4,17 +4,23 @@ vectors.private combinators ;
 IN: vectors
 
 ARTICLE: "vectors" "Vectors"
-"A vector is a resizable mutable sequence of objects. The literal syntax is covered in " { $link "syntax-vectors" } ". Vector words are found in the " { $vocab-link "vectors" } " vocabulary."
+"The " { $vocab-link "vectors" } " vocabulary implements resizable mutable sequence which support the " { $link "sequence-protocol" } "."
 $nl
-"Vectors form a class:"
+"The " { $vocab-link "vectors" } " vocabulary only includes words for creating new vectors. To access and modify vector elements, use " { $link "sequences" } " in the " { $vocab-link "sequences" } " vocabulary."
+$nl
+"Vector literal syntax is documented in " { $link "syntax-vectors" } "."
+$nl
+"Vectors are intended to be used with " { $link "sequences-destructive" } ". Code that does not modify sequences in-place can use fixed-size arrays without loss of generality; see " { $link "arrays" } "."
+$nl
+"Vectors form a class of objects:"
 { $subsection vector }
 { $subsection vector? }
-"Creating vectors:"
+"Creating new vectors:"
 { $subsection >vector }
 { $subsection <vector> }
 "Creating a vector from a single element:"
 { $subsection 1vector }
-"If you don't care about initial capacity, a more elegant way to create a new vector is to write:"
+"If you don't care about initial capacity, an elegant way to create a new vector is to write:"
 { $code "V{ } clone" } ;
 
 ABOUT: "vectors"
