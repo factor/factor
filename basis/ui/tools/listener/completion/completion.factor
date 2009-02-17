@@ -131,7 +131,7 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
     find-completion-popup
     [ insert-completion ]
     [ accept-completion-hook ]
-    [ nip hide-popup ]
+    [ nip hide-glass ]
     2tri ;
 
 : <completion-table> ( interactor completion-mode -- table )
@@ -140,8 +140,6 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
         monospace-font >>font
         t >>selection-required?
         t >>single-click?
-        transparent >>column-line-color
-        2 >>gap
         30 >>min-cols
         10 >>max-rows
         dup '[ _ accept-completion ] >>action ;
@@ -162,7 +160,7 @@ completion-popup H{
 
 : show-completion-popup ( interactor mode -- )
     [ completion-element ] [ <completion-popup> ] 2bi
-    show-popup ;
+    show-listener-popup ;
 
 : code-completion-popup ( interactor -- )
     dup completion-mode show-completion-popup ;
@@ -182,5 +180,5 @@ completion-popup H{
 
 M: completion-popup handle-gesture ( gesture completion -- ? )
     2dup completion-gesture dup [
-        [ nip find-world hide-glass ] [ invoke-command ] 2bi* f
+        [ nip hide-glass ] [ invoke-command ] 2bi* f
     ] [ 2drop call-next-method ] if ;

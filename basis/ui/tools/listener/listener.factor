@@ -7,7 +7,7 @@ documents documents.elements fry hashtables help help.markup io
 io.styles kernel lexer listener math models models.delay models.filter
 namespaces parser prettyprint quotations sequences strings threads
 tools.vocabs vocabs vocabs.loader vocabs.parser words ui ui.commands
-ui.pens.solid ui.gadgets ui.gadgets.buttons ui.gadgets.editors
+ui.pens.solid ui.gadgets ui.gadgets.glass ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.tools.debugger
@@ -293,11 +293,11 @@ M: object accept-completion-hook 2drop ;
 
 :: <debugger-popup> ( interactor error continuation -- popup )
     error continuation error compute-restarts
-    [ interactor hide-popup ] <debugger>
+    [ interactor hide-glass ] <debugger>
     "Error" <labeled-gadget> ;
 
 : debugger-popup ( interactor error continuation -- )
-    [ [ drop one-line-elt ] 2keep ] dip <debugger-popup> show-popup ;
+    [ [ drop one-line-elt ] 2keep ] dip <debugger-popup> show-listener-popup ;
 
 : handle-parse-error ( interactor error -- )
     dup lexer-error? [ 2dup go-to-error error>> ] when
@@ -328,9 +328,6 @@ M: interactor stream-read-quot
             [ interactor-finish ] [ nip stream-read-quot ] if
         ]
     } cond ;
-
-: pass-to-popup ( gesture interactor -- ? )
-    popup>> focusable-child resend-gesture ;
 
 : interactor-operation ( gesture interactor -- ? )
     [ token-model>> value>> ] keep word-at-caret
