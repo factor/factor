@@ -54,7 +54,7 @@ M: f topic>filename* drop \ f topic>filename* ;
 M: topic url-of topic>filename ;
 
 : help-stylesheet ( -- string )
-    "resource:basis/help/html/stylesheet.css" ascii file-contents
+    "vocab:help/html/stylesheet.css" ascii file-contents
     [XML <style><-></style> XML] ;
 
 : help>html ( topic -- xml )

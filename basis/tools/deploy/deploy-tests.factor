@@ -65,7 +65,7 @@ M: quit-responder call-responder*
 [ ] [
     <dispatcher>
         add-quot-responder
-        "resource:basis/http/test" <static> >>default
+        "vocab:http/test" <static> >>default
 
     test-httpd
 ] unit-test
@@ -102,5 +102,10 @@ M: quit-responder call-responder*
 
 [ ] [
     "tools.deploy.test.10" shake-and-bake
+    run-temp-image
+] unit-test
+
+[ ] [
+    "tools.deploy.test.11" shake-and-bake
     run-temp-image
 ] unit-test

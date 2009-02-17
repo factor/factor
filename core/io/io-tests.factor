@@ -2,7 +2,7 @@ USING: io parser tools.test words ;
 IN: io.tests
 
 [ f ] [
-    "resource:core/io/test/no-trailing-eol.factor" run-file
+    "vocab:io/test/no-trailing-eol.factor" run-file
     "foo" "io.tests" lookup
 ] unit-test
 

@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs strings kernel sorting namespaces
 sequences definitions ;
@@ -21,17 +21,25 @@ SYMBOL: +done+
         swap >>name
         H{ } clone >>words ;
 
+TUPLE: vocab-link name ;
+
+C: <vocab-link> vocab-link
+
+UNION: vocab-spec vocab vocab-link ;
+
 GENERIC: vocab-name ( vocab-spec -- name )
+
+M: vocab vocab-name name>> ;
+
+M: vocab-link vocab-name name>> ;
+
+M: string vocab-name ;
 
 GENERIC: vocab ( vocab-spec -- vocab )
 
 M: vocab vocab ;
 
 M: object vocab ( name -- vocab ) vocab-name dictionary get at ;
-
-M: vocab vocab-name name>> ;
-
-M: string vocab-name ;
 
 GENERIC: vocab-words ( vocab-spec -- words )
 
@@ -62,11 +70,6 @@ M: f vocab-main ;
 
 ERROR: no-vocab name ;
 
-SYMBOL: load-vocab-hook ! ( name -- )
-
-: load-vocab ( name -- vocab )
-    dup load-vocab-hook get call vocab ;
-
 : vocabs ( -- seq )
     dictionary get keys natural-sort ;
 
@@ -88,17 +91,6 @@ SYMBOL: load-vocab-hook ! ( name -- )
 : child-vocabs ( vocab -- seq )
     vocab-name vocabs [ child-vocab? ] with filter ;
 
-TUPLE: vocab-link name ;
-
-: <vocab-link> ( name -- vocab-link )
-    vocab-link boa ;
-
-M: vocab-link hashcode* name>> hashcode* ;
-
-M: vocab-link vocab-name name>> ;
-
-UNION: vocab-spec vocab vocab-link ;
-
 GENERIC: >vocab-link ( name -- vocab )
 
 M: vocab-spec >vocab-link ;
@@ -110,3 +102,7 @@ M: string >vocab-link dup vocab [ ] [ <vocab-link> ] ?if ;
     vocab-name dictionary get delete-at ;
 
 M: vocab-spec forget* forget-vocab ;
+
+SYMBOL: load-vocab-hook ! ( name -- vocab )
+
+: load-vocab ( name -- vocab ) load-vocab-hook get call ;

@@ -241,6 +241,12 @@ M: vocab-link summary vocab-summary ;
         swap [ "." glue ] with map
     ] unless-empty ;
 
+: vocab-dir? ( root name -- ? )
+    over
+    [ ".factor" vocab-dir+ append-path exists? ]
+    [ 2drop f ]
+    if ;
+
 : vocabs-in-dir ( root name -- )
     dupd (all-child-vocabs) [
         2dup vocab-dir? [ dup >vocab-link , ] when

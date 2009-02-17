@@ -13,11 +13,11 @@ sequences.deep accessors io.streams.string ;
 
 SYMBOL: xml-file
 [ ] [
-    "resource:basis/xml/tests/test.xml"
+    "vocab:xml/tests/test.xml"
     [ file>xml ] with-html-entities xml-file set
 ] unit-test
 [ t ] [
-    "resource:basis/xml/tests/test.xml" binary file-contents
+    "vocab:xml/tests/test.xml" binary file-contents
     [ bytes>xml ] with-html-entities xml-file get =
 ] unit-test
 [ "1.0" ] [ xml-file get prolog>> version>> ] unit-test
