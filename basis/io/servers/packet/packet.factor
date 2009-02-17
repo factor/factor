@@ -1,3 +1,5 @@
+USING: concurrency.combinators destructors fry
+io.servers.datagram.private io.sockets kernel logging ;
 IN: io.servers.datagram
 
 <PRIVATE
@@ -18,4 +20,5 @@ LOG: received-datagram NOTICE
 PRIVATE>
 
 : with-datagrams ( seq service quot -- )
+    [ DEBUG ] dip
     '[ [ [ _ ] dip spawn-datagrams ] parallel-each ] with-logging ; inline
