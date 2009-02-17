@@ -88,7 +88,7 @@ links processing-time timestamp ;
 PRIVATE>
 
 : run-spider ( spider -- spider )
-    "spider" [
+    "spider" DEBUG [
         dup spider [
             queue-initial-links
             [ todo>> ] [ max-depth>> ] bi
