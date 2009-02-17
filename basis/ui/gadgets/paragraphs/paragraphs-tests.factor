@@ -32,11 +32,11 @@ INSTANCE: fake-break word-break
 [ { 0 30 } ] [ "c" get loc>> ] unit-test
 
 100 <paragraph>
-15 { 40 30 } <baseline-gadget> dup "a" set add-gadget
+15 15 { 40 30 } <baseline-gadget> dup "a" set add-gadget
 <fake-break> add-gadget
-10 { 40 30 } <baseline-gadget> dup "b" set add-gadget
+10 10 { 40 30 } <baseline-gadget> dup "b" set add-gadget
 <fake-break> add-gadget
-20 { 40 30 } <baseline-gadget> dup "c" set add-gadget
+20 20 { 40 30 } <baseline-gadget> dup "c" set add-gadget
 "p" set
 
 [ { 85 65 } ] [ "p" get pref-dim ] unit-test

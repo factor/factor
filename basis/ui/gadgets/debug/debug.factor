@@ -4,15 +4,16 @@ USING: kernel accessors sequences ui ui.gadgets ui.gadgets.buttons
 ui.baseline-alignment ui.render ;
 IN: ui.gadgets.debug
 
-TUPLE: baseline-gadget < gadget baseline ;
+TUPLE: baseline-gadget < gadget baseline cap-height ;
 
 M: baseline-gadget baseline baseline>> ;
 
-M: baseline-gadget cap-height dim>> second ;
+M: baseline-gadget cap-height cap-height>> ;
 
-: <baseline-gadget> ( baseline dim -- gadget )
+: <baseline-gadget> ( baseline cap-height dim -- gadget )
     baseline-gadget new
         swap >>dim
+        swap >>cap-height
         swap >>baseline ;
 
 ! An intentionally broken gadget -- used to test UI error handling,
