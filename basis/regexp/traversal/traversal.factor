@@ -68,7 +68,7 @@ TUPLE: dfa-traverser
 
 : match-class ( transition from-state table -- to-state/f )
     transitions>> at* [
-        '[ drop _ swap class-member? ] assoc-find [ nip ] [ drop ] if
+        swap '[ drop _ swap class-member? ] assoc-find spin ?
     ] [ drop ] if ;
 
 : match-default ( transition from-state table -- to-state/f )
