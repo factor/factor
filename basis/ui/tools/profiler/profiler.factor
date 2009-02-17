@@ -1,14 +1,15 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel quotations accessors fry assocs present math.order
-math.vectors arrays locals models.search models.sort models
-sequences vocabs tools.profiler words prettyprint ui ui.commands
-ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.tracks ui.gestures ui.gadgets.buttons
+math.vectors arrays locals models.search models.sort models sequences
+vocabs tools.profiler words prettyprint combinators.smart
+definitions.icons ui ui.commands ui.gadgets ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.tracks ui.gestures ui.gadgets.buttons
 ui.gadgets.tables ui.gadgets.search-tables ui.gadgets.labeled
 ui.gadgets.buttons ui.gadgets.packs ui.gadgets.labels
 ui.gadgets.tabbed ui.gadgets.status-bar ui.gadgets.borders
-ui.tools.browser ui.tools.common ui.baseline-alignment ;
+ui.tools.browser ui.tools.common ui.baseline-alignment
+ui.operations ui.images ;
 FROM: models.filter => <filter> ;
 FROM: models.compose => <compose> ;
 IN: ui.tools.profiler
@@ -23,34 +24,52 @@ generic class ;
 SINGLETONS: word-renderer vocab-renderer ;
 UNION: profiler-renderer word-renderer vocab-renderer ;
 
+<PRIVATE
+
+: with-datastack* ( seq quot -- seq' )
+    '[ _ input<sequence ] output>array ; inline
+
+PRIVATE>
+
 ! Value is a { word count } pair
 M: profiler-renderer row-columns
-    drop [ [ present ] map ] [ { "All" "" } ] if* ;
+    drop
+    [
+        [
+            [ [ definition-icon <image-name> ] [ present ] bi ]
+            [ present ]
+            bi*
+        ] with-datastack*
+    ] [ { "" "All" "" } ] if* ;
+
+M: profiler-renderer prototype-row
+    drop \ = definition-icon <image-name> "" "" 3array ;
 
 M: profiler-renderer row-value
     drop dup [ first ] when ;
 
-M: vocab-renderer row-value
-    call-next-method dup [ vocab ] when ;
+M: profiler-renderer column-alignment drop { 0 0 1 } ;
+M: profiler-renderer filled-column drop 1 ;
 
-M: profiler-renderer column-alignment drop { 0 1 } ;
-M: profiler-renderer filled-column drop 0 ;
-
-M: word-renderer column-titles drop { "Word" "Count" } ;
-M: vocab-renderer column-titles drop { "Vocabulary" "Count" } ;
+M: word-renderer column-titles drop { "" "Word" "Count" } ;
+M: vocab-renderer column-titles drop { "" "Vocabulary" "Count" } ;
 
 SINGLETON: method-renderer
 
-M: method-renderer column-alignment drop { 0 1 } ;
-M: method-renderer filled-column drop 0 ;
+M: method-renderer column-alignment drop { 0 0 1 } ;
+M: method-renderer filled-column drop 1 ;
 
 ! Value is a { method-body count } pair
 M: method-renderer row-columns
-    drop [ first synopsis ] [ second present ] bi 2array ;
+    drop [
+        [ [ definition-icon <image-name> ] [ synopsis ] bi ]
+        [ present ]
+        bi*
+    ] with-datastack* ;
 
 M: method-renderer row-value drop first ;
 
-M: method-renderer column-titles drop { "Method" "Count" } ;
+M: method-renderer column-titles drop { "" "Method" "Count" } ;
 
 : <profiler-model> ( values profiler -- model )
     [ [ filter-counts ] <filter> ] [ sort>> ] bi* <sort> ;
@@ -67,17 +86,16 @@ M: method-renderer column-titles drop { "Method" "Count" } ;
         ] <search>
     ] keep <profiler-model> ;
 
-: match? ( pair/f str -- ? )
-    swap dup [ first present subseq? ] [ 2drop t ] if ;
-
 : <profiler-table> ( model renderer -- table )
-    [ match? ] <search-table> ;
+    [ first present ] <search-table>
+        [ invoke-primary-operation ] >>action ;
 
 : <profiler-filter-model> ( counts profiler -- model' )
     [ <model> ] dip <profiler-model> [ f prefix ] <filter> ;
 
 : <vocabs-model> ( profiler -- model )
-    [ vocab-counters ] dip <profiler-filter-model> ;
+    [ vocab-counters [ [ vocab ] dip ] assoc-map ] dip
+    <profiler-filter-model> ;
 
 : <generic-model> ( profiler -- model )
     [ generic-counters ] dip <profiler-filter-model> ;
@@ -98,10 +116,16 @@ M: method-renderer column-titles drop { "Method" "Count" } ;
         [ first3 '[ _ _ method-matches? ] filter ] <filter>
     ] keep <profiler-model> ;
 
+: sort-by-name ( obj1 obj2 -- <=> )
+    [ first name>> ] compare ;
+
+: sort-by-call-count ( obj1 obj2 -- <=> )
+    [ second ] compare invert-comparison ;
+
 : sort-options ( -- alist )
     {
-        { [ [ first ] compare ] "by name" }
-        { [ [ second ] compare invert-comparison ] "by call count" }
+        { [ sort-by-name ] "by name" }
+        { [ sort-by-call-count ] "by call count" }
     } ;
 
 : <sort-options> ( model -- gadget )
@@ -160,7 +184,7 @@ M: method-renderer column-titles drop { "Method" "Count" } ;
 : <profiler-gadget> ( -- profiler )
     vertical profiler-gadget new-track
         { 5 5 } >>gap
-        [ [ first ] compare ] <model> >>sort
+        [ sort-by-name ] <model> >>sort
         all-words counters <model> >>words
         <selection-model> >>vocab
         dup <vocabs-model> >>vocabs
