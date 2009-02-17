@@ -6,8 +6,8 @@ opengl.gl sequences strings math.vectors math.functions sorting colors
 colors.constants combinators assocs math.order fry calendar alarms
 continuations ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
-ui.gadgets.menus ui.gadgets.wrappers ui.render
-ui.pens.solid ui.gadgets.line-support ui.text ui.gestures
+ui.gadgets.menus ui.gadgets.wrappers ui.render ui.pens.solid
+ui.gadgets.line-support ui.text ui.gestures ui.baseline-alignment
 math.rectangles splitting unicode.categories fonts grouping ;
 IN: ui.gadgets.editors
 
@@ -199,8 +199,9 @@ M: editor draw-gadget*
 M: editor pref-dim*
     [ font>> ] [ control-value ] bi text-dim ;
 
-M: editor baseline
-    font>> font-metrics ascent>> ;
+M: editor baseline font>> font-metrics ascent>> ;
+
+M: editor cap-height font>> font-metrics cap-height>> ;
 
 : contents-changed ( model editor -- )
     swap
@@ -482,7 +483,7 @@ TUPLE: multiline-editor < editor ;
 
 <PRIVATE
 
-: page-elt ( editor -- editor element ) dup visible-lines <page-elt> ;
+: page-elt ( editor -- editor element ) dup visible-lines 1- <page-elt> ;
 
 PRIVATE>
 

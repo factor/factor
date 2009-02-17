@@ -3,7 +3,8 @@
 USING: accessors arrays hashtables io kernel math math.functions
 namespaces make opengl sequences strings splitting ui.gadgets
 ui.gadgets.tracks ui.gadgets.packs fonts ui.render ui.pens.solid
-ui.text colors colors.constants models combinators ;
+ui.baseline-alignment ui.text colors colors.constants models
+combinators ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.
@@ -51,9 +52,18 @@ M: label (>>string) ( string label -- )
 M: label pref-dim*
     >label< text-dim ;
 
+<PRIVATE
+
+: label-metrics ( label -- metrics )
+    >label< dup string? [ first ] unless line-metrics ;
+
+PRIVATE>
+
 M: label baseline
-    >label< dup string? [ first ] unless
-    line-metrics ascent>> round ;
+    label-metrics ascent>> round ;
+
+M: label cap-height
+    label-metrics cap-height>> round ;
 
 M: label draw-gadget*
     >label<

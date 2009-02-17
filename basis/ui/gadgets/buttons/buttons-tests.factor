@@ -30,8 +30,6 @@ T{ foo-gadget } <toolbar> "t" set
 
 \ <radio-buttons> must-infer
 
-\ <toggle-buttons> must-infer
-
 \ <checkbox> must-infer
 
 [ 0 ] [

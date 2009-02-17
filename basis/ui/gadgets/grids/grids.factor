@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.order namespaces make sequences words io
-math.vectors ui.gadgets columns accessors strings.tables
+math.vectors ui.gadgets ui.baseline-alignment columns accessors strings.tables
 math.rectangles fry ;
 IN: ui.gadgets.grids
 
@@ -36,11 +36,14 @@ PRIVATE>
 : cross-zip ( seq1 seq2 -- seq1xseq2 )
     [ [ 2array ] with map ] curry map ;
 
-TUPLE: cell pref-dim baseline ;
+TUPLE: cell pref-dim baseline cap-height ;
 
-: <cell> ( gadget -- cell ) [ pref-dim ] [ baseline ] bi cell boa ;
+: <cell> ( gadget -- cell )
+    [ pref-dim ] [ baseline ] [ cap-height ] tri cell boa ;
 
 M: cell baseline baseline>> ;
+
+M: cell cap-height cap-height>> ;
 
 TUPLE: grid-layout grid gap fill? row-heights column-widths ;
 
@@ -50,7 +53,7 @@ TUPLE: grid-layout grid gap fill? row-heights column-widths ;
 : row-heights ( grid-layout -- heights )
     [ grid>> ] [ fill?>> ] bi
     [ [ second ] iterate-cell-dims ]
-    [ [ dup [ pref-dim>> ] map baseline-height ] map ]
+    [ [ dup [ pref-dim>> ] map measure-height ] map ]
     if ;
 
 : column-widths ( grid-layout -- widths )
@@ -90,7 +93,7 @@ M: grid pref-dim* <grid-layout> grid-pref-dim ;
     bi cross-zip flip ;
 
 : adjust-for-baseline ( row-locs row-cells -- row-locs' )
-    baseline-align [ 0 swap 2array v+ ] 2map ;
+    align-baselines [ 0 swap 2array v+ ] 2map ;
 
 : cell-locs ( grid-layout -- locs )
     dup fill?>>

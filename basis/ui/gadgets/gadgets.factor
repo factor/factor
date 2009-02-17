@@ -3,7 +3,7 @@
 USING: accessors arrays hashtables kernel models math namespaces
 make sequences quotations math.vectors combinators sorting
 binary-search vectors dlists deques models threads
-concurrency.flags math.order math.rectangles fry locals ;
+concurrency.flags math.order math.rectangles fry ;
 IN: ui.gadgets
 
 ! Values for orientation slot
@@ -190,54 +190,6 @@ GENERIC: pref-dim* ( gadget -- dim )
 : pref-dims ( gadgets -- seq ) [ pref-dim ] map ;
 
 M: gadget pref-dim* dim>> ;
-
-SYMBOL: +baseline+
-
-GENERIC: baseline ( gadget -- y )
-
-M: gadget baseline drop f ;
-
-: (max-ascent-and-descent) ( accum baseline height -- accum' )
-    over [ over - 2array vmax ] [ 2drop ] if ;
-
-: max-ascent-and-descent ( baselines heights -- ascent descent )
-    { 0 0 } [ (max-ascent-and-descent) ] 2reduce first2 ;
-
-: max-height-with-baseline ( baselines heights -- y )
-    0 [ swap [ max ] [ drop ] if ] 2reduce ;
-
-: max-height-without-baseline ( baselines heights -- y )
-    0 [ swap [ drop ] [ max ] if ] 2reduce ;
-
-:: baseline-align ( gadgets -- ys )
-    gadgets [ [ baseline ] map ] [ [ pref-dim second ] map ] bi
-    over 0 [ [ max ] when* ] reduce :> max-baseline
-    2dup max-height-without-baseline :> max-height-without-baseline
-    max-height-without-baseline max-baseline [-] 2 /i :> offset-with-baseline
-    max-baseline max-height-without-baseline [-] 2 /i :> offset-without-baseline
-    [
-        over [
-            drop
-            max-baseline
-            offset-with-baseline
-        ] [
-            nip
-            max-height-without-baseline
-            offset-without-baseline
-        ] if [ swap - ] dip +
-    ] 2map ;
-
-: combine-baseline-metrics ( height ascent descent -- ascent' descent' )
-    [ [ [-] 2 /i ] keep ] dip [ + ] [ max ] bi-curry* bi ;
-
-: baseline-metrics ( children sizes -- ascent descent )
-    #! Consider gadgets with a baseline and those without separately.
-    [ [ baseline ] map ] [ [ second ] map ] bi*
-    [ max-height-without-baseline ] [ max-ascent-and-descent ] 2bi
-    combine-baseline-metrics ;
-
-: baseline-height ( children sizes -- height )
-    baseline-metrics + ;
 
 GENERIC: layout* ( gadget -- )
 

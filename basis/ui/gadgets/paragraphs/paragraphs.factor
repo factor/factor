@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.order sequences wrap wrap.words
-arrays fry ui.gadgets ui.gadgets.labels ui.render ;
+arrays fry ui.gadgets ui.gadgets.labels ui.gadgets.packs.private
+ui.render ui.baseline-alignment ;
 IN: ui.gadgets.paragraphs
 
 MIXIN: word-break
@@ -32,7 +33,7 @@ TUPLE: paragraph < gadget margin ;
 TUPLE: line words height ;
 
 : <line> ( words -- line )
-    dup [ key>> ] map dup pref-dims baseline-height line boa ;
+    dup [ key>> ] map dup pref-dims measure-height line boa ;
 
 : wrap-paragraph ( paragraph -- wrapped-paragraph )
     [ children>> [ gadget>word ] map ] [ margin>> ] bi
@@ -64,7 +65,7 @@ M: paragraph pref-dim*
         words>>
         [ ]
         [ word-x-coordinates ]
-        [ [ key>> ] map baseline-align ] tri
+        [ [ key>> ] map align-baselines ] tri
     ] dip '[ _ + layout-word ] 3each ;
 
 M: paragraph layout*
@@ -76,7 +77,9 @@ M: paragraph baseline
         first words>>
         [ key>> ] map
         dup [ pref-dim ] map
-        baseline-metrics drop
+        measure-metrics drop
     ] if-empty ;
 
+M: paragraph cap-height pack-cap-height ;
+    
 PRIVATE>

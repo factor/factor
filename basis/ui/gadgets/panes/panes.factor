@@ -9,7 +9,8 @@ ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
 ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
 ui.gadgets.menus ui.clipboards ui.gestures ui.traverse ui.render
 ui.text ui.gadgets.presentations ui.gadgets.grids ui.gadgets.tracks
-ui.gadgets.icons ui.gadgets.grid-lines colors call io.styles ;
+ui.gadgets.icons ui.gadgets.grid-lines ui.baseline-alignment
+colors call io.styles ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < pack

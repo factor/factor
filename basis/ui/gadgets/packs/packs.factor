@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences ui.gadgets kernel math math.functions
-math.vectors math.order math.rectangles namespaces accessors
-fry combinators arrays ;
+USING: sequences ui.gadgets ui.baseline-alignment kernel math
+math.functions math.vectors math.order math.rectangles namespaces
+accessors fry combinators arrays ;
 IN: ui.gadgets.packs
 
 TUPLE: pack < gadget
@@ -26,7 +26,7 @@ TUPLE: pack < gadget
     [ align>> ] [ dim>> ] bi '[ [ _ _ ] dip v- [ * >integer ] with map ] map ;
 
 : baseline-aligned-locs ( pack -- seq )
-    children>> baseline-align [ 0 swap 2array ] map ;
+    children>> align-baselines [ 0 swap 2array ] map ;
 
 : aligned-locs ( sizes pack -- seq )
     dup align>> +baseline+ eq?
@@ -66,7 +66,7 @@ PRIVATE>
 
 : max-pack-dim ( pack sizes -- dim )
     over align>> +baseline+ eq?
-    [ [ children>> ] dip baseline-height 0 swap 2array ] [ nip max-dim ] if ;
+    [ [ children>> ] dip measure-height 0 swap 2array ] [ nip max-dim ] if ;
 
 : pack-pref-dim ( pack sizes -- dim )
     [ max-pack-dim ]
@@ -78,10 +78,13 @@ M: pack pref-dim*
     dup children>> pref-dims pack-pref-dim ;
 
 : vertical-baseline ( pack -- y )
-    children>> [ 0 ] [ first baseline ] if-empty ;
+    children>> [ f ] [ first baseline ] if-empty ;
 
 : horizontal-baseline ( pack -- y )
-    children>> dup pref-dims baseline-metrics drop ;
+    children>> dup pref-dims measure-metrics drop ;
+
+: pack-cap-height ( pack -- n )
+    children>> [ f ] [ first cap-height ] if-empty ;
 
 PRIVATE>
 
@@ -90,6 +93,8 @@ M: pack baseline
         { vertical [ vertical-baseline ] }
         { horizontal [ horizontal-baseline ] }
     } case ;
+
+M: pack cap-height pack-cap-height ;
 
 M: pack layout*
     dup children>> pref-dims pack-layout ;
