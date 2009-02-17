@@ -1,11 +1,16 @@
 ! Copyright (C) 2008, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel delegate fry sequences models
-models.search models.delay calendar locals ui.pens ui.pens.image
-ui.gadgets.editors ui.gadgets.labels ui.gadgets.scrollers
-ui.gadgets.tables ui.gadgets.tracks ui.gadgets.borders
-ui.gadgets.buttons ui.baseline-alignment ui.gadgets ;
+combinators.short-circuit models.search models.delay calendar locals
+ui.gestures ui.pens ui.pens.image ui.gadgets.editors ui.gadgets.labels
+ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.tracks
+ui.gadgets.borders ui.gadgets.buttons ui.baseline-alignment ui.gadgets ;
 IN: ui.gadgets.search-tables
+
+TUPLE: search-table < track table field ;
+
+: find-search-table ( gadget -- search-table/f )
+    [ search-table? ] find-parent ;
 
 TUPLE: search-field < track field ;
 
@@ -29,7 +34,15 @@ TUPLE: search-field < track field ;
         dup field>> "Search:" label-on-left 1 track-add
         dup <clear-button> f track-add ;
 
-TUPLE: search-table < track table field ;
+M: search-field focusable-child* field>> ;
+
+: pass-to-table ( gesture gadget -- ? )
+    find-search-table table>> handle-gesture ;
+
+M: search-field handle-gesture
+    over key-gesture? [
+        { [ pass-to-table ] [ call-next-method ] } 2&&
+    ] [ call-next-method ] if ;
 
 ! A protocol with customizable slots
 SLOT-PROTOCOL: table-protocol
@@ -58,9 +71,11 @@ CONSULT: table-protocol search-table table>> ;
         values >>model
         search <search-field> >>field
         dup field>> { 2 2 } <filled-border> f track-add
-        values search 500 milliseconds <delay> quot <search>
-        renderer <table> >>table
+        values search 500 milliseconds <delay> quot <string-search>
+        renderer <table> f >>takes-focus? >>table
         dup table>> <scroller> 1 track-add ;
 
 M: search-table model-changed
     nip field>> clear-search-field ;
+
+M: search-table focusable-child* field>> ;
