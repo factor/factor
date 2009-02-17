@@ -6,7 +6,6 @@ math.order math.parser memoize multiline sequences splitting
 values hashtables io.binary ;
 IN: io.encodings.korean
 
-! TODO: write-docs
 ! TODO: euckr, cp949 seperate (euckr: backslash = Won, cp949: bs <> Won)
 ! TODO: no byte manip. only code-tables.
 ! TODO: migrate to common code-table parser (by Dan).
