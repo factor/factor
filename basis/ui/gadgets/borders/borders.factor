@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ui.gadgets kernel math fry
+USING: accessors arrays ui.gadgets ui.baseline-alignment kernel math fry
 namespaces vectors sequences math.vectors math.rectangles ;
 IN: ui.gadgets.borders
 
@@ -26,10 +26,6 @@ TUPLE: border < gadget
 M: border pref-dim*
     dup gadget-child pref-dim border-pref-dim ;
 
-M: border baseline
-    [ size>> second ] [ gadget-child baseline ] bi
-    dup [ + ] [ nip ] if ;
-
 <PRIVATE
 
 : border-major-dim ( border -- dim )
@@ -51,7 +47,15 @@ M: border baseline
 : border-child-rect ( border -- rect )
     dup border-dim [ border-loc ] keep <rect> ;
 
+: border-metric ( border quot -- n )
+    [ drop size>> second ] [ [ gadget-child ] dip call ] 2bi
+    dup [ + ] [ nip ] if ; inline
+
 PRIVATE>
+
+M: border baseline [ baseline ] border-metric ;
+
+M: border cap-height [ cap-height ] border-metric ;
 
 M: border layout*
     [ border-child-rect ] [ gadget-child ] bi set-rect-bounds ;

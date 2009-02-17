@@ -82,4 +82,4 @@ M: line-gadget pref-viewport-dim
     2bi 2array ;
 
 : visible-lines ( gadget -- n )
-    [ visible-dim second ] [ line-height ] bi /i 1- ;
+    [ visible-dim second ] [ line-height ] bi /i ;

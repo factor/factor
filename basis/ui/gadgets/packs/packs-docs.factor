@@ -1,5 +1,6 @@
 USING: ui.gadgets help.markup help.syntax generic kernel
-classes.tuple quotations ui.gadgets.packs.private ;
+classes.tuple quotations ui.gadgets.packs.private
+ui.baseline-alignment ;
 IN: ui.gadgets.packs
 
 ARTICLE: "ui-pack-layout" "Pack layouts"

@@ -1,11 +1,14 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors ui ui.gadgets ui.gadgets.buttons ui.render ;
+USING: kernel accessors sequences ui ui.gadgets ui.gadgets.buttons
+ui.baseline-alignment ui.render ;
 IN: ui.gadgets.debug
 
 TUPLE: baseline-gadget < gadget baseline ;
 
 M: baseline-gadget baseline baseline>> ;
+
+M: baseline-gadget cap-height dim>> second ;
 
 : <baseline-gadget> ( baseline dim -- gadget )
     baseline-gadget new

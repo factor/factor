@@ -1,14 +1,14 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel quotations accessors fry
-assocs present math.order math.vectors arrays locals
-models.search models.sort models sequences vocabs
-tools.profiler words prettyprint ui ui.commands ui.gadgets
-ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
-ui.gadgets.buttons ui.gadgets.tables ui.gadgets.search-tables
-ui.gadgets.labeled ui.gadgets.buttons ui.gadgets.packs
-ui.gadgets.labels ui.gadgets.tabbed ui.gadgets.status-bar
-ui.gadgets.borders ui.tools.browser ui.tools.common ;
+USING: kernel quotations accessors fry assocs present math.order
+math.vectors arrays locals models.search models.sort models
+sequences vocabs tools.profiler words prettyprint ui ui.commands
+ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.tracks ui.gestures ui.gadgets.buttons
+ui.gadgets.tables ui.gadgets.search-tables ui.gadgets.labeled
+ui.gadgets.buttons ui.gadgets.packs ui.gadgets.labels
+ui.gadgets.tabbed ui.gadgets.status-bar ui.gadgets.borders
+ui.tools.browser ui.tools.common ui.baseline-alignment ;
 FROM: models.filter => <filter> ;
 FROM: models.compose => <compose> ;
 IN: ui.tools.profiler
