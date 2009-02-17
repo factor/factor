@@ -4,12 +4,29 @@ USING: logging.server sequences namespaces concurrency.messaging
 words kernel arrays shuffle tools.annotations
 prettyprint.config prettyprint debugger io.streams.string
 splitting continuations effects generalizations parser strings
-quotations fry accessors ;
+quotations fry accessors math assocs math.order ;
 IN: logging
 
 SYMBOLS: DEBUG NOTICE WARNING ERROR CRITICAL ;
 
-: log-levels { DEBUG NOTICE NOTICE WARNING ERROR CRITICAL } ;
+SYMBOL: log-level
+
+: log-levels ( -- assoc )
+    H{
+        { DEBUG 0 }
+        { NOTICE 10 }
+        { WARNING 20 }
+        { ERROR 30 }
+        { CRITICAL 40 }
+    } ;
+
+ERROR: undefined-log-level ;
+
+: log-level<=> ( log-level log-level -- ? )
+    [ log-levels at* [ undefined-log-level ] unless ] bi@ <=> ;
+
+: log? ( log-level -- ? )
+    log-level get log-level<=> +lt+ = not ;
 
 : send-to-log-server ( array string -- )
     prefix "log-server" get send ;
@@ -22,7 +39,8 @@ SYMBOL: log-service
 
 : log-message ( msg word level -- )
     check-log-message
-    log-service get dup [
+    dup log?
+    log-service get dup and [
         [ [ string-lines ] [ name>> ] [ name>> ] tri* ] dip
         4array "log-message" send-to-log-server
     ] [
@@ -35,8 +53,10 @@ SYMBOL: log-service
 : close-logs ( -- )
     { } "close-logs" send-to-log-server ;
 
-: with-logging ( service quot -- )
-    log-service swap with-variable ; inline
+: with-logging ( service level quot -- )
+    '[
+        _ log-service [ _ log-level _ with-variable ] with-variable
+    ] call ; inline
 
 ! Aspect-oriented programming idioms
 

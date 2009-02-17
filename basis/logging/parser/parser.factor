@@ -3,7 +3,7 @@
 USING: accessors peg peg.parsers memoize kernel sequences
 logging arrays words strings vectors io io.files
 io.encodings.utf8 namespaces make combinators logging.server
-calendar calendar.format ;
+calendar calendar.format assocs ;
 IN: logging.parser
 
 TUPLE: log-entry date level word-name message ;
@@ -21,7 +21,7 @@ SYMBOL: multiline
     "[" "]" surrounded-by ;
 
 : 'log-level' ( -- parser )
-    log-levels [
+    log-levels keys [
         [ name>> token ] keep [ nip ] curry action
     ] map choice ;
 
