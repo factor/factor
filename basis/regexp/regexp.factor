@@ -21,7 +21,7 @@ IN: regexp
 
 : construct-regexp ( regexp -- regexp' )
     {
-        [ parse-regexp ]
+        [ dup raw>> parse-regexp >>parse-tree drop ]
         [ construct-nfa ]
         [ construct-dfa ]
         [ ]
@@ -32,9 +32,6 @@ IN: regexp
 
 : match ( string regexp -- slice/f )
     (match) return-match ;
-
-: match* ( string regexp -- slice/f captured-groups )
-    (match) [ return-match ] [ captured-groups>> ] bi ;
 
 : matches? ( string regexp -- ? )
     dupd match

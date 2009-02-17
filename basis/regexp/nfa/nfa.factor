@@ -11,21 +11,9 @@ IN: regexp.nfa
 
 ERROR: feature-is-broken feature ;
 
-SYMBOL: negation-mode
-: negated? ( -- ? ) negation-mode get 0 or odd? ; 
+SYMBOL: negated?
 
 SINGLETON: eps
-
-MIXIN: traversal-flag
-SINGLETON: lookahead-on INSTANCE: lookahead-on traversal-flag
-SINGLETON: lookahead-off INSTANCE: lookahead-off traversal-flag
-SINGLETON: lookbehind-on INSTANCE: lookbehind-on traversal-flag
-SINGLETON: lookbehind-off INSTANCE: lookbehind-off traversal-flag
-SINGLETON: capture-group-on INSTANCE: capture-group-on traversal-flag
-SINGLETON: capture-group-off INSTANCE: capture-group-off traversal-flag
-SINGLETON: front-anchor INSTANCE: front-anchor traversal-flag
-SINGLETON: back-anchor INSTANCE: back-anchor traversal-flag
-SINGLETON: word-boundary INSTANCE: word-boundary traversal-flag
 
 : options ( -- obj ) current-regexp get options>> ;
 
@@ -53,7 +41,7 @@ GENERIC: nfa-node ( node -- )
             s1 [ regexp next-state ]
             stack [ regexp stack>> ]
             table [ regexp nfa-table>> ] |
-        negated? [
+        negated? get [
             s0 f obj class make-transition table add-transition
             s0 s1 <default-transition> table add-transition
         ] [
@@ -61,10 +49,6 @@ GENERIC: nfa-node ( node -- )
         ] if
         s0 s1 2array stack push
         t s1 table final-states>> set-at ] ;
-
-: add-traversal-flag ( flag -- )
-    stack peek second
-    current-regexp get nfa-traversal-flags>> push-at ;
 
 :: concatenate-nodes ( -- )
     [let* | regexp [ current-regexp get ]
@@ -97,7 +81,7 @@ GENERIC: nfa-node ( node -- )
         t s5 table final-states>> set-at
         s4 s5 2array stack push ] ;
 
-M: kleene-star nfa-node ( node -- )
+M: star nfa-node ( node -- )
     term>> nfa-node
     [let* | regexp [ current-regexp get ]
             stack [ regexp stack>> ]
@@ -139,16 +123,11 @@ M: constant nfa-node ( node -- )
         char>> literal-transition add-simple-entry
     ] if ;
 
-M: epsilon nfa-node ( node -- )
-    drop eps literal-transition add-simple-entry ;
-
 M: word nfa-node ( node -- ) class-transition add-simple-entry ;
 
 M: any-char nfa-node ( node -- )
     [ dotall option? ] dip any-char-no-nl ?
     class-transition add-simple-entry ;
-
-! M: beginning-of-text nfa-node ( node -- ) ;
 
 M: beginning-of-line nfa-node ( node -- ) class-transition add-simple-entry ;
 
@@ -182,38 +161,6 @@ M: character-class-range nfa-node ( node -- )
         class-transition add-simple-entry
     ] if ;
 
-M: capture-group nfa-node ( node -- )
-    term>> nfa-node ;
-
-M: non-capture-group nfa-node ( node -- )
-    term>> nfa-node ;
-
-M: reluctant-kleene-star nfa-node ( node -- )
-    term>> <kleene-star> nfa-node ;
-
-M: negation nfa-node ( node -- )
-    negation-mode inc
-    term>> nfa-node 
-    negation-mode dec ;
-
-M: lookahead nfa-node ( node -- )
-    "lookahead" feature-is-broken
-    eps literal-transition add-simple-entry
-    lookahead-on add-traversal-flag
-    term>> nfa-node
-    eps literal-transition add-simple-entry
-    lookahead-off add-traversal-flag
-    2 [ concatenate-nodes ] times ;
-
-M: lookbehind nfa-node ( node -- )
-    "lookbehind" feature-is-broken
-    eps literal-transition add-simple-entry
-    lookbehind-on add-traversal-flag
-    term>> nfa-node
-    eps literal-transition add-simple-entry
-    lookbehind-off add-traversal-flag
-    2 [ concatenate-nodes ] times ;
-
 M: option nfa-node ( node -- )
     [ option>> ] [ on?>> ] bi [ option-on ] [ option-off ] if
     eps literal-transition add-simple-entry ;
@@ -221,7 +168,6 @@ M: option nfa-node ( node -- )
 : construct-nfa ( regexp -- )
     [
         reset-regexp
-        negation-mode off
         [ current-regexp set ]
         [ parse-tree>> nfa-node ]
         [ set-start-state ] tri
