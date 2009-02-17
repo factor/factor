@@ -55,3 +55,11 @@ IN: linked-assocs.test
     4 6 pick values [ first call ] each
     + swap values <reversed> [ second call ] each
 ] unit-test
+
+{ V{ { "az" 1 } { "by" 2 } { "cx" 3 } } } [
+    <linked-hash>
+    1 "az" pick set-at
+    2 "by" pick set-at
+    3 "cx" pick set-at
+    >alist
+] unit-test

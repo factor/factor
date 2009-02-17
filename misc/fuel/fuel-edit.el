@@ -65,7 +65,6 @@
 ;;; Editing commands:
 
 (defvar fuel-edit--word-history nil)
-(defvar fuel-edit--previous-location nil)
 
 (defun fuel-edit-vocabulary (&optional refresh vocab)
   "Visits vocabulary file in Emacs.
@@ -129,7 +128,7 @@ was last invoked."
   (interactive)
   (condition-case nil
       (pop-tag-mark)
-    (error "No previous location for find word or vocab invokation")))
+    (error "No previous location for find word or vocab invocation")))
 
 (defvar fuel-edit--buffer-history nil)
 

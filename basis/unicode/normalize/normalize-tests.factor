@@ -23,7 +23,7 @@ IN: unicode.normalize.tests
 [ "\u00d55c" ] [ "\u001112\u001161\u0011ab" nfc ] unit-test
 
 : parse-test ( -- tests )
-    "resource:basis/unicode/normalize/NormalizationTest.txt"
+    "vocab:unicode/normalize/NormalizationTest.txt"
     utf8 file-lines filter-comments
     [ ";" split 5 head [ " " split [ hex> ] "" map-as ] map ] map ;
 

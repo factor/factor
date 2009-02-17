@@ -82,5 +82,5 @@ TAG: KEYWORDS parse-rule-tag
         [ merge-rule-set-props ] with each
     ] when* ;
 
-: parse-mode ( stream -- rule-sets )
-    read-xml parse-mode-tag ;
+: parse-mode ( filename -- rule-sets )
+    file>xml parse-mode-tag ;
