@@ -1,0 +1,1 @@
+Skipping escape analysis pass for code which does not allocate

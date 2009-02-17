@@ -1,0 +1,1 @@
+SHA2 checksum algorithm

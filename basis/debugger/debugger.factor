@@ -70,7 +70,7 @@ M: string error. print ;
     "Type :help for debugging help." print flush ;
 
 : try ( quot -- )
-    [ print-error-and-restarts ] recover ;
+    [ print-error-and-restarts ] recover ; inline
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write third . ;

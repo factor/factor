@@ -17,9 +17,7 @@ $nl
 ARTICLE: "hashtables" "Hashtables"
 "A hashtable provides efficient (expected constant time) lookup and storage of key/value pairs. Keys are compared for equality, and a hashing function is used to reduce the number of comparisons made. The literal syntax is covered in " { $link "syntax-hashtables" } "."
 $nl
-"Hashtable words are in the " { $vocab-link "hashtables" } " vocabulary. Unsafe implementation words are in the " { $vocab-link "hashtables.private" } " vocabulary."
-$nl
-"Hashtables implement the " { $link "assocs-protocol" } "."
+"Words for constructing hashtables are in the " { $vocab-link "hashtables" } " vocabulary. Hashtables implement the " { $link "assocs-protocol" } ", and all " { $link "assocs" } " can be used on them; there are no hashtable-specific words to access and modify keys, because associative mapping operations are generic and work with all associative mappings."
 $nl
 "Hashtables are a class of objects."
 { $subsection hashtable }
