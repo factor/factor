@@ -1,1 +1,1 @@
-Encoding and decoding strings
+Converting strings to byte arrays and vice versa

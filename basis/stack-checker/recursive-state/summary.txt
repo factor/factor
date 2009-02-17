@@ -1,0 +1,1 @@
+Tracking word nesting during stack effect inference
