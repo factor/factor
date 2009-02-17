@@ -23,8 +23,8 @@ IN: ui.gadgets.packs.tests
 
 ! Test baseline alignment
 <shelf> +baseline+ >>align
-    5 { 10 10 } <baseline-gadget> add-gadget
-    10 { 10 10 } <baseline-gadget> add-gadget
+    5 5 { 10 10 } <baseline-gadget> add-gadget
+    10 10 { 10 10 } <baseline-gadget> add-gadget
 "g" set
 
 [ ] [ "g" get prefer ] unit-test
@@ -40,7 +40,7 @@ IN: ui.gadgets.packs.tests
 ! Test mixed baseline and ordinary alignment
 <shelf> +baseline+ >>align
     <gadget> { 20 20 } >>dim add-gadget
-    10 { 10 10 } <baseline-gadget> add-gadget
+    10 10 { 10 10 } <baseline-gadget> add-gadget
 "g" set
 
 [ { 30 20 } ] [ "g" get pref-dim ] unit-test
@@ -53,10 +53,12 @@ IN: ui.gadgets.packs.tests
 
 <shelf> +baseline+ >>align
     <gadget> { 15 15 } >>dim add-gadget
-    5 { 10 10 } <baseline-gadget> add-gadget
+    5 5 { 10 10 } <baseline-gadget> add-gadget
 "g" set
 
 [ { 25 15 } ] [ "g" get pref-dim ] unit-test
+
+[ ] [ "g" get prefer ] unit-test
 
 [ ] [ "g" get layout ] unit-test
 
@@ -66,13 +68,26 @@ IN: ui.gadgets.packs.tests
 
 <shelf> +baseline+ >>align
     <gadget> { 20 20 } >>dim add-gadget
-    30 { 10 50 } <baseline-gadget> add-gadget
+    30 30 { 10 50 } <baseline-gadget> add-gadget
 "g" set
 
 [ { 30 50 } ] [ "g" get pref-dim ] unit-test
+
+[ ] [ "g" get prefer ] unit-test
 
 [ ] [ "g" get layout ] unit-test
 
 [ V{ { 0 5 } { 20 0 } } ] [
     "g" get children>> [ loc>> ] map
 ] unit-test
+
+<shelf> +baseline+ >>align
+    <gadget> { 30 30 } >>dim add-gadget
+    30 4 { 30 30 } <baseline-gadget> add-gadget
+"g" set
+
+[ { 60 43 } ] [ "g" get pref-dim ] unit-test
+
+[ ] [ "g" get prefer ] unit-test
+
+[ ] [ "g" get layout ] unit-test

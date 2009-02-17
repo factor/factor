@@ -71,8 +71,8 @@ IN: ui.gadgets.grids.tests
 [ { 10 230 } ] [ "c" get loc>> ] unit-test
 [ { 100 100 } ] [ "c" get dim>> ] unit-test
 
-5 { 10 10 } <baseline-gadget>
-10 { 10 10 } <baseline-gadget> 2array
+5 10 { 10 10 } <baseline-gadget>
+10 10 { 10 10 } <baseline-gadget> 2array
 1array <grid> f >>fill?
 "g" set
 
