@@ -58,25 +58,17 @@ DEFER: ?make-staging-image
 : staging-command-line ( profile -- flags )
     [
         "-staging" ,
-
         dup empty? [
             "-i=" my-boot-image-name append ,
         ] [
             dup but-last ?make-staging-image
-
             "-resource-path=" "" resource-path append ,
-
             "-i=" over but-last staging-image-name append ,
-
             "-run=tools.deploy.restage" ,
         ] if
-
         "-output-image=" over staging-image-name append ,
-
         "-include=" swap " " join append ,
-
         strip-word-names? [ "-no-stack-traces" , ] when
-
         "-no-user-init" ,
     ] { } make ;
 
@@ -101,16 +93,11 @@ DEFER: ?make-staging-image
 
         [
             "-i=" bootstrap-profile staging-image-name append ,
-
             "-resource-path=" "" resource-path append ,
-
             "-run=tools.deploy.shaker" ,
-
             [ "-deploy-vocab=" prepend , ]
             [ make-deploy-config "-deploy-config=" prepend , ] bi
-
             "-output-image=" prepend ,
-
             strip-word-names? [ "-no-stack-traces" , ] when
         ] { } make
     ] bind ;

@@ -1,32 +1,25 @@
 USING: arrays byte-arrays help.markup help.syntax
 kernel kernel.private strings.private sequences vectors
-sbufs math ;
+sbufs math tools.vocabs.browser ;
 IN: strings
 
 ARTICLE: "strings" "Strings"
-"A string is a fixed-size mutable sequence of Unicode 5.1 code points."
+"The " { $vocab-link "strings" } " vocabulary implements fixed-size mutable sequences of of Unicode 5.1 code points."
 $nl
-"Characters are not a first-class type; they are simply represented as integers between 0 and 16777216 (2^24). Only characters up to 2097152 (2^21) have a defined meaning in Unicode."
+"Code points, or characters as they're informally known, are not a first-class type; they are simply represented as integers in the range 0 and 16,777,216 (2^24), inclusive. Only characters up to 2,097,152 (2^21) have a defined meaning in Unicode."
 $nl
 "String literal syntax is covered in " { $link "syntax-strings" } "."
 $nl
-"String words are found in the " { $vocab-link "strings" } " vocabulary."
+"Since strings implement the " { $link "sequence-protocol" } ", basic string manipulation can be performed with " { $link "sequences" } " in the " { $vocab-link "sequences" } " vocabulary. More text processing functionality can be found in vocabularies carrying the " { $link T{ vocab-tag { name "text" } } } " tag."
 $nl
 "Strings form a class:"
 { $subsection string }
 { $subsection string? }
-"Creating strings:"
+"Creating new strings:"
 { $subsection >string }
 { $subsection <string> }
 "Creating a string from a single character:"
-{ $subsection 1string }
-"Since strings are sequences, basic string manipulation can be performed using sequence operations (" { $link "sequences" } "). More advanced functionality can be found in other vocabularies, including but not limited to:"
-{ $list
-    { { $link "ascii" } " - ASCII algorithms for interoperability with legacy applications" }
-    { { $link "unicode" } " - Unicode algorithms for modern multilingual applications" }
-    { { $vocab-link "regexp" } " - regular expressions" }
-    { { $vocab-link "peg" } " - parser expression grammars" }
-} ;
+{ $subsection 1string } ;
 
 ABOUT: "strings"
 
