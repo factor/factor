@@ -420,7 +420,7 @@ SYMBOL: deploy-vocab
         [ error-continuation get call>> callstack>array die ]
         ! Don't reference these words literally, if we're stripping the
         ! debugger out we don't want to load the prettyprinter at all
-        [ [:c] nl [print-error] ] if
+        [ [:c] execute nl [print-error] execute flush ] if
         1 exit
     ] recover ; inline
 
