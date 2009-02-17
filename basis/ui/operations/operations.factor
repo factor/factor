@@ -48,10 +48,16 @@ operations [ <linked-hash> ] initialize
 : primary-operation ( obj -- operation )
     [ command>> +primary+ word-prop ] find-operation ;
 
+: invoke-primary-operation ( obj -- )
+    dup primary-operation invoke-command ;
+
 : secondary-operation ( obj -- operation )
     dup
     [ command>> +secondary+ word-prop ] find-operation
     [ ] [ primary-operation ] ?if ;
+
+: invoke-secondary-operation ( obj -- )
+    dup secondary-operation invoke-command ;
 
 : default-flags ( -- assoc )
     H{ { +keyboard+ f } { +primary+ f } { +secondary+ f } } ;

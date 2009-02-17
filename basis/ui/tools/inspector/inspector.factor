@@ -1,13 +1,12 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors inspector namespaces kernel models fry
-models.filter prettyprint sequences mirrors assocs classes
-io io.styles arrays hashtables math.order sorting refs fonts
+colors.constants models.filter prettyprint sequences mirrors assocs
+classes io io.styles arrays hashtables math.order sorting refs fonts
 ui.tools.browser ui.commands ui.operations ui.gadgets ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks
-ui.gestures ui.gadgets.buttons ui.gadgets.tables
-ui.gadgets.status-bar ui.gadgets.labeled
-ui.tools.common ui ;
+ui.gadgets.scrollers ui.gadgets.slots ui.gadgets.tracks ui.gestures
+ui.gadgets.buttons ui.gadgets.tables ui.gadgets.status-bar
+ui.gadgets.labeled ui.tools.common ui ;
 IN: ui.tools.inspector
 
 TUPLE: inspector-gadget < tool table ;
@@ -62,8 +61,10 @@ M: hashtable make-slot-descriptions
 
 : <inspector-table> ( model -- table )
     [ make-slot-descriptions ] <filter> inspector-renderer <table>
-        [ dup primary-operation invoke-command ] >>action
+        [ invoke-primary-operation ] >>action
         monospace-font >>font
+        COLOR: dark-gray >>column-line-color
+        6 >>gap
         15 >>min-rows
         15 >>max-rows
         40 >>min-cols
