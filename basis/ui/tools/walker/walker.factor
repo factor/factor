@@ -13,8 +13,6 @@ status continuation thread
 traceback
 closing? ;
 
-{ 620 620 } walker-gadget set-tool-dim
-
 : walker-command ( walker msg -- )
     swap
     dup thread>> thread-registered?
@@ -81,6 +79,15 @@ walker-gadget "toolbar" f {
     { T{ key-down f f "a" } com-abandon }
     { T{ key-down f f "d" } close-window }
     { T{ key-down f f "F1" } walker-help }
+} define-command-map
+
+walker-gadget "multitouch" f {
+    { left-action com-back }
+    { right-action com-step }
+    { up-action com-out }
+    { down-action com-into }
+    { zoom-out-action close-window }
+    { zoom-in-action com-abandon }
 } define-command-map
 
 : walker-for-thread? ( thread gadget -- ? )
