@@ -12,6 +12,7 @@ IN: io.servers.connection
 
 TUPLE: threaded-server
 name
+log-level
 secure insecure
 secure-config
 sockets
@@ -29,6 +30,7 @@ ready ;
 : new-threaded-server ( class -- threaded-server )
     new
         "server" >>name
+        DEBUG >>log-level
         ascii >>encoding
         1 minutes >>timeout
         V{ } clone >>sockets
@@ -115,7 +117,7 @@ M: threaded-server handle-client* handler>> call ;
 : (start-server) ( threaded-server -- )
     init-server
     dup threaded-server [
-        dup name>> [
+        [ ] [ name>> ] [ log-level>> ] tri [
             [ listen-on [ start-accept-loop ] parallel-each ]
             [ ready>> raise-flag ]
             bi
