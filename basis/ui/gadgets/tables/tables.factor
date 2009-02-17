@@ -34,14 +34,15 @@ TUPLE: table < line-gadget
 { action initial: [ drop ] }
 single-click?
 { hook initial: [ ] }
-{ gap initial: 6 }
+{ gap initial: 2 }
 column-widths total-width
 focus-border-color
 { mouse-color initial: COLOR: black }
-{ column-line-color initial: COLOR: dark-gray }
+{ column-line-color initial: T{ rgba f 0 0 0 0 } }
 selection-required?
 selected-index selected-value
 mouse-index
+{ takes-focus? initial: t }
 focused? ;
 
 : <table> ( rows renderer -- table )
@@ -263,7 +264,7 @@ M: table model-changed
     [ hand-rel second ] keep y>line ;
 
 : table-button-down ( table -- )
-    dup request-focus
+    dup takes-focus?>> [ dup request-focus ] when
     dup control-value empty? [ drop ] [
         dup [ mouse-row ] keep validate-line
         [ >>mouse-index ] [ (select-row) ] bi
