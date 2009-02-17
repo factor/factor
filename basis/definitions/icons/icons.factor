@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes.predicate fry generic io.pathnames kernel
 macros sequences vocabs words words.symbol words.constant
-lexer parser ;
+lexer parser help.topics ;
 IN: definitions.icons
 
 GENERIC: definition-icon ( definition -- path )
@@ -30,6 +30,8 @@ ICON: symbol symbol-word
 ICON: constant constant-word
 ICON: word normal-word
 ICON: vocab-link unopen-vocab
+ICON: word-link word-help-article
+ICON: link help-article
 
 PRIVATE>
 

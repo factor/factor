@@ -2,14 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs definitions fry help.topics kernel
 colors.constants math.rectangles models.filter namespaces sequences
-sorting ui.gadgets ui.gadgets.glass ui.gadgets.labeled
-ui.gadgets.scrollers ui.gadgets.tables ui.gadgets.search-tables
-ui.gadgets.wrappers ui.gestures ui.operations ui.pens.solid ;
+sorting definitions.icons ui.gadgets ui.gadgets.glass
+ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
+ui.gadgets.search-tables ui.gadgets.wrappers ui.gestures ui.operations
+ui.pens.solid ui.images ;
 IN: ui.tools.browser.popups
 
 SINGLETON: link-renderer
 
-M: link-renderer row-columns drop second 1array ;
+M: link-renderer row-columns
+    drop first2 [ definition-icon <image-name> ] dip 2array ;
 
 M: link-renderer row-value drop first ;
 

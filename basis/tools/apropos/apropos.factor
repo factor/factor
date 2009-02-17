@@ -11,7 +11,7 @@ IN: tools.apropos
         dup [ vocab-spec? ] all? [
             $vocabs
         ] [
-            [ <$link> ] map $list
+            [ <$pretty-link> 1array ] map $table
         ] if
     ] if ;
 
