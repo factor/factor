@@ -1,11 +1,18 @@
 USING: help.markup help.syntax
-kernel kernel.private prettyprint sequences.private ;
+kernel kernel.private prettyprint sequences.private sequences ;
 IN: arrays
 
+ARTICLE: "arrays-unsafe" "Unsafe array operations"
+"These two words are used internally by the Factor implementation. User code should never need to call them; instead use " { $link nth } " and " { $link set-nth } "."
+{ $subsection array-nth }
+{ $subsection set-array-nth } ;
+
 ARTICLE: "arrays" "Arrays"
-"Arrays are fixed-size mutable sequences (" { $link "sequence-protocol" } "). The literal syntax is covered in " { $link "syntax-arrays" } ". Resizable arrays also exist and are called vectors; see " { $link "vectors" } "."
+"The " { $vocab-link "arrays" } " vocabulary implements fixed-size mutable sequences which support the " { $link "sequence-protocol" } "."
 $nl
-"Array words are in the " { $vocab-link "arrays" } " vocabulary. Unsafe implementation words are in the " { $vocab-link "sequences.private" } " vocabulary."
+"The " { $vocab-link "arrays" } " vocabulary only includes words for creating new arrays. To access and modify array elements, use " { $link "sequences" } " in the " { $vocab-link "sequences" } " vocabulary."
+$nl
+"Array literal syntax is documented in " { $link "syntax-arrays" } ". Resizable arrays also exist and are known as " { $link "vectors" } "."
 $nl
 "Arrays form a class of objects:"
 { $subsection array }
@@ -18,11 +25,10 @@ $nl
 { $subsection 2array }
 { $subsection 3array }
 { $subsection 4array }
-"Arrays can be accessed without bounds checks in a pointer unsafe way."
-{ $subsection array-nth }
-{ $subsection set-array-nth }
 "The class of two-element arrays:"
-{ $subsection pair } ;
+{ $subsection pair }
+"Arrays can be accessed without bounds checks in a pointer unsafe way."
+{ $subsection "arrays-unsafe" } ;
 
 ABOUT: "arrays"
 
