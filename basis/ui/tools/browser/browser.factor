@@ -2,14 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: debugger help help.topics help.crossref kernel models compiler.units
 assocs words vocabs accessors fry combinators.short-circuit
-sequences models models.history tools.apropos
+sequences models models.history tools.apropos combinators
 ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.gadgets.buttons ui.gadgets.packs
 ui.gadgets.editors ui.gadgets.labels ui.gadgets.status-bar
-ui.gadgets.borders ui.tools.common ui ;
+ui.gadgets.glass ui.gadgets.borders ui.tools.common
+ui.tools.browser.popups ui ;
 IN: ui.tools.browser
 
-TUPLE: browser-gadget < tool pane scroller search-field ;
+TUPLE: browser-gadget < tool pane scroller search-field popup ;
 
 { 650 400 } browser-gadget set-tool-dim
 
@@ -51,6 +52,13 @@ M: browser-gadget graft*
 
 M: browser-gadget ungraft*
     [ call-next-method ] [ remove-definition-observer ] bi ;
+
+M: browser-gadget handle-gesture
+    {
+        { [ over key-gesture? not ] [ call-next-method ] }
+        { [ dup popup>> ] [ { [ pass-to-popup ] [ call-next-method ] } 2&& ] }
+        [ call-next-method ]
+    } cond ;
 
 : showing-definition? ( defspec assoc -- ? )
     {
@@ -115,6 +123,8 @@ browser-gadget "navigation" "Commands for navigating in the article hierarchy" {
     { T{ key-down f { A+ } "u" } com-up }
     { T{ key-down f { A+ } "p" } com-prev }
     { T{ key-down f { A+ } "n" } com-next }
+    { T{ key-down f { A+ } "k" } com-show-outgoing-links }
+    { T{ key-down f { A+ } "K" } com-show-incoming-links }
 } define-command-map
 
 browser-gadget "multi-touch" f {
