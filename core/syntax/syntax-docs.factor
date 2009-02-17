@@ -485,8 +485,13 @@ HELP: CHAR:
 HELP: "
 { $syntax "\"string...\"" }
 { $values { "string" "literal and escaped characters" } }
-{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", and appends the resulting string to the parse tree. String literals cannot span multiple lines. Strings containing the " { $link POSTPONE: " } " character and various other special characters can be read by inserting escape sequences." }
-{ $examples { $example "USE: io" "\"Hello\\nworld\" print" "Hello\nworld" } } ;
+{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", and appends the resulting string to the parse tree. String literals cannot span multiple lines. Strings containing the " { $link POSTPONE: " } " character and various other special characters can be read by inserting " { $link "escape" } "." }
+{ $examples
+  "A string with a newline in it:"
+  { $example "USE: io" "\"Hello\\nworld\" print" "Hello\nworld" }
+  "A string with a named Unicode code point:"
+  { $example "USE: io" "\"\\u{greek-capital-letter-sigma}\" print" "\u{greek-capital-letter-sigma}" }
+} ;
 
 HELP: SBUF"
 { $syntax "SBUF\" string... \"" }
