@@ -87,7 +87,7 @@ M: method-renderer column-titles drop { "" "Method" "Count" } ;
     ] keep <profiler-model> ;
 
 : <profiler-table> ( model renderer -- table )
-    [ first present ] <search-table>
+    [ dup [ first present ] when ] <search-table>
         [ invoke-primary-operation ] >>action ;
 
 : <profiler-filter-model> ( counts profiler -- model' )
