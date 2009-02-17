@@ -12,8 +12,6 @@ ui.commands ui.gadgets.editors ui.gestures ui.operations
 ui.tools.deploy models ;
 IN: ui.tools.operations
 
-V{ } clone operations set-global
-
 ! Objects
 [ drop t ] \ inspector H{
     { +primary+ t }
