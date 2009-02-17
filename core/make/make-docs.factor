@@ -2,14 +2,57 @@ IN: make
 USING: help.markup help.syntax quotations sequences math.parser
 kernel ;
 
+ARTICLE: "make-philosophy" "Make philosophy"
+{ $heading "When to use make" }
+"Make is useful for complex sequence construction which is hard to express with sequence combinators and various combinations of utility words."
+$nl
+"For example, this example uses " { $link make } " and reads better than a version using utility words:"
+{ $code "[ [ left>> , ] [ \"+\" % center>> % \"-\" % ] [ right , ] tri ] { } make" }
+"compare the above to"
+{ $code "[ center>> \"+\" \"-\" surround ] [ left>> prefix ] [ right suffix ] tri" }
+"The first one has a similar shape to the eventual output array. The second one has an arbitrary structure and uses three different utilities. Furthermore, the second version also constructs two redundant intermediate sequences, and for longer sequences, this extra copying will outweigh any overhead " { $link make } " has due to its use of a dynamic variable to store the sequence being built."
+$nl
+"On the other hand, using " { $link make } " instead of a single call to " { $link surround } " is overkill. The below headings summarize the most important cases where other idioms are more appropriate than " { $link make } "."
+{ $heading "Make versus combinators" }
+"Sometimes, usages of " { $link make } " are better expressed with " { $link "sequences-combinators" } ". For example, instead of calling a combinator with a quotation which executes " { $link , } " exactly once on each iteration, oftena combinator encapsulating that specific idiom exists and can be used."
+$nl
+"For example,"
+{ $code "[ [ 42 * , ] each ] { } make" }
+"is equivalent to"
+{ $code "[ 42 * ] map" }
+"and"
+{ $code "[ [ reverse % ] each ] \"\" make" }
+"is equivalent to"
+{ $code "[ [ reverse ] map concat" }
+{ $heading "Utilities for simple make patterns" }
+"Sometimes, an existing word already implements a specific " { $link make } " usage. For example, " { $link suffix } " is equivalent to the following, with the added caveat that the below example always outputs an array:"
+{ $code "[ , % ] { } make" }
+"The existing utility words can in some cases express intent better than an arbitrary-looking string or " { $link , } " and " { $link % } "."
+{ $heading "Constructing quotations" }
+"Simple quotation construction can often be accomplished using " { $link "fry" } " and " { $link "compositional-combinators" } "."
+$nl
+"For example,"
+{ $code "[ 2 , , \ + , ] [ ] make" }
+"is better expressed as"
+{ $code "'[ 2 _ + ]" } ;
+
 ARTICLE: "namespaces-make" "Making sequences with variables"
 "The " { $vocab-link "make" } " vocabulary implements a facility for constructing sequences by holding an accumulator sequence in a variable. Storing the accumulator sequence in a variable rather than the stack may allow code to be written with less stack manipulation."
+$nl
+"Sequence construction is wrapped in a combinator:"
 { $subsection make }
+"Inside the quotation passed to " { $link make } ", several words accumulate values:"
 { $subsection , }
 { $subsection % }
 { $subsection # }
-"The accumulator sequence can be accessed directly:"
-{ $subsection building } ;
+"The accumulator sequence can be accessed directly from inside a " { $link make } ":"
+{ $subsection building }
+{ $example
+  "USING: make math.parser io ;"
+  "[ \"Language #\" % CHAR: \s , 5 # ] \"\" make print"
+  "Language #5"
+}
+{ $subsection "make-philosophy" } ;
 
 ABOUT: "namespaces-make"
 
