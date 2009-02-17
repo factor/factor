@@ -22,6 +22,10 @@ M: stack-entry-renderer row-value drop object>> ;
 
 : <stack-table> ( model -- table )
     [ [ <stack-entry> ] map ] <filter> stack-entry-renderer <table>
+        10 >>min-rows
+        10 >>max-rows
+        40 >>min-cols
+        40 >>max-cols
         monospace-font >>font
         [ i:inspector ] >>action
         t >>single-click? ;
@@ -42,8 +46,6 @@ M: stack-entry-renderer row-value drop object>> ;
     [ retain>> ] "Retain stack" <stack-display> ;
 
 TUPLE: traceback-gadget < track ;
-
-M: traceback-gadget pref-dim* drop { 550 600 } ;
 
 : <traceback-gadget> ( model -- gadget )
     [
