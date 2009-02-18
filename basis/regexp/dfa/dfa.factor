@@ -2,83 +2,74 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry kernel locals
 math math.order regexp.nfa regexp.transition-tables sequences
-sets sorting vectors regexp.utils sequences.deep ;
+sets sorting vectors sequences.deep ;
 USING: io prettyprint threads ;
 IN: regexp.dfa
 
-: find-delta ( states transition regexp -- new-states )
-    nfa-table>> transitions>>
-    rot [ swap at at ] with with gather sift ;
+: (while-changes) ( obj quot: ( obj -- obj' ) pred: ( obj -- <=> ) pred-ret -- obj )
+    [ [ dup slip ] dip pick over call ] dip dupd =
+    [ 3drop ] [ (while-changes) ] if ; inline recursive
 
-: (find-epsilon-closure) ( states regexp -- new-states )
+: while-changes ( obj quot pred -- obj' )
+    3dup nip call (while-changes) ; inline
+
+: find-delta ( states transition nfa -- new-states )
+    transitions>> '[ _ swap _ at at ] gather sift ;
+
+: (find-epsilon-closure) ( states nfa -- new-states )
     eps swap find-delta ;
 
-: find-epsilon-closure ( states regexp -- new-states )
+: find-epsilon-closure ( states nfa -- new-states )
     '[ dup _ (find-epsilon-closure) union ] [ length ] while-changes
     natural-sort ;
 
-: find-closure ( states transition regexp -- new-states )
-    [ find-delta ] 2keep nip find-epsilon-closure ;
+: find-closure ( states transition nfa -- new-states )
+    [ find-delta ] keep find-epsilon-closure ;
 
-: find-start-state ( regexp -- state )
-    [ nfa-table>> start-state>> 1vector ] keep find-epsilon-closure ;
+: find-start-state ( nfa -- state )
+    [ start-state>> 1vector ] keep find-epsilon-closure ;
 
-: find-transitions ( seq1 regexp -- seq2 )
-    nfa-table>> transitions>>
-    [ at keys ] curry gather
+: find-transitions ( dfa-state nfa -- next-dfa-state )
+    transitions>>
+    '[ _ at keys ] gather
     eps swap remove ;
 
-: add-todo-state ( state regexp -- )
-    2dup visited-states>> key? [
-        2drop
-    ] [
-        [ visited-states>> conjoin ]
-        [ new-states>> push ] 2bi
+: add-todo-state ( state visited-states new-states -- )
+    3dup drop key? [ 3drop ] [
+        [ conjoin ] [ push ] bi-curry* bi
     ] if ;
 
-: new-transitions ( regexp -- )
-    dup new-states>> [
-        drop
-    ] [
-        dupd pop dup pick find-transitions rot
-        [
-            [ [ find-closure ] 2keep nip dupd add-todo-state ] 3keep
-            [ swapd transition make-transition ] dip
-            dfa-table>> add-transition 
-        ] curry with each
-        new-transitions
+:: new-transitions ( nfa dfa new-states visited-states -- nfa dfa )
+    new-states [ nfa dfa ] [
+        new-states pop :> state
+        state nfa-table find-transitions
+        [| trans |
+            state trans nfa find-closure :> new-state
+            state visited-states new-state add-todo-state
+            state new-state trans transition make-transition dfa add-transition
+        ] each
+        nfa dfa new-states visited-states new-transitions
     ] if-empty ;
 
 : states ( hashtable -- array )
     [ keys ]
     [ values [ values concat ] map concat append ] bi ;
 
-: set-final-states ( regexp -- )
-    dup
-    [ nfa-table>> final-states>> keys ]
-    [ dfa-table>> transitions>> states ] bi
-    [ intersects? ] with filter
-
-    swap dfa-table>> final-states>>
+: set-final-states ( nfa dfa -- )
+    [
+        [ final-states>> keys ]
+        [ transitions>> states ] bi*
+        [ intersects? ] with filter
+    ] [ final-states>> ] bi
     [ conjoin ] curry each ;
 
-: set-initial-state ( regexp -- )
-    dup
-    [ dfa-table>> ] [ find-start-state ] bi
-    [ >>start-state drop ] keep
-    1vector >>new-states drop ;
+: initialize-dfa ( nfa -- dfa )
+    <transition-table>
+        swap find-start-state >>start-state ;
 
-: set-traversal-flags ( regexp -- )
-    dup
-    [ nfa-traversal-flags>> ]
-    [ dfa-table>> transitions>> keys ] bi
-    [ [ nip ] [ [ swap at ] with map concat ] 2bi ] with H{ } map>assoc
-    >>dfa-traversal-flags drop ;
-
-: construct-dfa ( regexp -- )
-    {
-        [ set-initial-state ]
-        [ new-transitions ]
-        [ set-final-states ]
-        [ set-traversal-flags ]
-    } cleave ;
+: construct-dfa ( nfa -- dfa )
+    dup initialize-dfa
+    dup start-state>> 1vector
+    H{ } clone
+    new-transitions
+    [ set-final-states ] keep ;

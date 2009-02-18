@@ -189,8 +189,8 @@ IN: regexp-tests
 [ t ] [ "SXY" "\\0123XY" <regexp> matches? ] unit-test
 [ t ] [ "x" "\\x78" <regexp> matches? ] unit-test
 [ f ] [ "y" "\\x78" <regexp> matches? ] unit-test
-[ t ] [ "x" "\\u000078" <regexp> matches? ] unit-test
-[ f ] [ "y" "\\u000078" <regexp> matches? ] unit-test
+[ t ] [ "x" "\\u0078" <regexp> matches? ] unit-test
+[ f ] [ "y" "\\u0078" <regexp> matches? ] unit-test
 
 [ t ] [ "ab" "a+b" <regexp> matches? ] unit-test
 [ f ] [ "b" "a+b" <regexp> matches? ] unit-test
@@ -317,16 +317,6 @@ IN: regexp-tests
 ! Bug in parsing word
 [ t ] [ "a" R' a' matches? ] unit-test
 
-! Convert to lowercase until E
-[ f ] [ "AA" R/ \LAA\E/ matches? ] unit-test
-[ t ] [ "aa" R/ \LAA\E/ matches? ] unit-test
-
-! Convert to uppercase until E
-[ t ] [ "AA" R/ \Uaa\E/ matches? ] unit-test
-[ f ] [ "aa" R/ \Uaa\E/ matches? ] unit-test
-
-! [ "{Lower}" <regexp> ] [ invalid-range? ] must-fail-with
-
 ! [ t ] [ "a" R/ ^a/ matches? ] unit-test
 ! [ f ] [ "\na" R/ ^a/ matches? ] unit-test
 ! [ f ] [ "\r\na" R/ ^a/ matches? ] unit-test
@@ -370,10 +360,10 @@ IN: regexp-tests
 ! [ t ] [ "\r\na" R/ ^a/m matches? ] unit-test
 ! [ t ] [ "\ra" R/ ^a/m matches? ] unit-test
 
-! [ t ] [ "a" "a$" R/ a$/m matches? ] unit-test
-! [ t ] [ "a\n" "a$" R/ a$/m matches? ] unit-test
-! [ t ] [ "a\r" "a$" R/ a$/m matches? ] unit-test
-! [ t ] [ "a\r\n" "a$" R/ a$/m matches? ] unit-test
+! [ t ] [ "a" R/ a$/m matches? ] unit-test
+! [ t ] [ "a\n" R/ a$/m matches? ] unit-test
+! [ t ] [ "a\r" R/ a$/m matches? ] unit-test
+! [ t ] [ "a\r\n" R/ a$/m matches? ] unit-test
 
 ! [ f ] [ "foobxr" "foo\\z" <regexp> match-head ] unit-test
 ! [ 3 ] [ "foo" "foo\\z" <regexp> match-head ] unit-test

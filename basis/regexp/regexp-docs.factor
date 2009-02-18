@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel strings help.markup help.syntax regexp.backend ;
+USING: kernel strings help.markup help.syntax ;
 IN: regexp
 
 HELP: <regexp>
