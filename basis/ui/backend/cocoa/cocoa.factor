@@ -3,12 +3,12 @@
 USING: accessors math arrays assocs cocoa cocoa.application
 command-line kernel memory namespaces cocoa.messages
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
-cocoa.windows cocoa.classes cocoa.nibs sequences system ui
+cocoa.windows cocoa.classes cocoa.nibs sequences ui
 ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
 ui.backend.cocoa.views core-foundation core-foundation.run-loop
 core-graphics.types threads math.rectangles fry libc
 generalizations alien.c-types cocoa.views
-combinators io.thread ;
+combinators io.thread locals ;
 IN: ui.backend.cocoa
 
 TUPLE: handle ;
@@ -36,14 +36,17 @@ M: pasteboard set-clipboard-contents
     <clipboard> selection set-global ;
 
 : world>NSRect ( world -- NSRect )
-    [ window-loc>> ] [ dim>> ] bi [ first2 ] bi@ <CGRect> ;
+    [ 0 0 ] dip dim>> first2 <CGRect> ;
 
-: gadget-window ( world -- )
-    dup <FactorView>
-    2dup swap world>NSRect <ViewWindow>
-    [ [ -> release ] [ install-window-delegate ] bi* ]
-    [ <window-handle> ] 2bi
-    >>handle drop ;
+: auto-position ( window loc -- )
+    dup { 0 0 } = [
+        drop
+        windows get [ -> center ] [
+            peek second window-loc>>
+            dupd first2 <CGPoint> -> cascadeTopLeftFromPoint:
+            -> setFrameTopLeftPoint:
+        ] if-empty
+    ] [ first2 <CGPoint> -> setFrameTopLeftPoint: ] if ;
 
 M: cocoa-ui-backend set-title ( string world -- )
     handle>> window>> swap <NSString> -> setTitle: ;
@@ -63,17 +66,16 @@ M: cocoa-ui-backend set-fullscreen* ( ? world -- )
 M: cocoa-ui-backend fullscreen* ( world -- ? )
     handle>> view>> -> isInFullScreenMode zero? not ;
 
-: auto-position ( world -- )
-    dup window-loc>> { 0 0 } = [
-        handle>> window>> -> center
-    ] [
-        drop
-    ] if ;
-
-M: cocoa-ui-backend (open-window) ( world -- )
-    dup gadget-window
-    dup auto-position
-    handle>> window>> f -> makeKeyAndOrderFront: ;
+M:: cocoa-ui-backend (open-window) ( world -- )
+    world dim>> <FactorView> :> view
+    view world world>NSRect <ViewWindow> :> window
+    view -> release
+    window world window-loc>> auto-position
+    world view register-window
+    world window save-position
+    window install-window-delegate
+    view window <window-handle> world (>>handle)
+    window f -> makeKeyAndOrderFront: ;
 
 M: cocoa-ui-backend (close-window) ( handle -- )
     window>> -> release ;

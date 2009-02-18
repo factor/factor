@@ -365,10 +365,11 @@ CLASS: {
     -> openGLContext -> CGLContextObj NSOpenGLCPSwapInterval 1 <int>
     CGLSetParameter drop ;
 
-: <FactorView> ( world -- view )
-    FactorView over dim>> <GLView>
-    [ sync-refresh-to-screen ] keep
-    [ register-window ] keep ;
+: <FactorView> ( dim -- view )
+    FactorView swap <GLView> [ sync-refresh-to-screen ] keep ;
+
+: save-position ( world window -- )
+    -> frame CGRect-top-left 2array >>window-loc drop ;
 
 CLASS: {
     { +superclass+ "NSObject" }
@@ -377,10 +378,7 @@ CLASS: {
 
 { "windowDidMove:" "void" { "id" "SEL" "id" }
     [
-        2nip -> object
-        [ -> contentView window ]
-        [ window-content-rect CGRect-x-y 2array ] bi
-        >>window-loc drop
+        2nip -> object [ -> contentView window ] keep save-position
     ]
 }
 
