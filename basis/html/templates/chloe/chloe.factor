@@ -107,7 +107,7 @@ TUPLE: cached-template path last-modified quot ;
     path>> ".xml" append
     [ ]
     [ file-info modified>> ]
-    [ utf8 <file-reader> read-xml compile-template ] tri
+    [ file>xml compile-template ] tri
     \ cached-template boa ;
 
 \ load-template DEBUG add-input-logging

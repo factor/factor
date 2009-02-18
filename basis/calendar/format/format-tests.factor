@@ -51,6 +51,11 @@ IN: calendar.format.tests
     timestamp>string
 ] unit-test
 
+[ "20080504070000" ] [
+    "Sun May 04 07:00:00 2008 GMT" cookie-string>timestamp
+    timestamp>mdtm
+] unit-test
+
 [
     T{ timestamp f
         2008
@@ -74,3 +79,5 @@ IN: calendar.format.tests
         { gmt-offset T{ duration f 0 0 0 0 0 0 } }
     }
 ] [ "Thursday, 02-Oct-2008 23:59:59 GMT" cookie-string>timestamp ] unit-test
+
+

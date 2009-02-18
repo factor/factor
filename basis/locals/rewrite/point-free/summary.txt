@@ -1,0 +1,1 @@
+Rewriting applicative code to use the retain stack instead of named values
