@@ -61,11 +61,9 @@ C: <ftp-disconnect> ftp-disconnect
     normalize-path server get serving-directory>> head? ;
 
 : can-serve-directory? ( path -- ? )
-    canonicalize-path
     { [ exists? ] [ file-info directory? ] [ serving? ] } 1&& ;
 
 : can-serve-file? ( path -- ? )
-    canonicalize-path
     {
         [ exists? ]
         [ file-info type>> +regular-file+ = ]
@@ -351,7 +349,7 @@ M: ftp-server handle-client* ( server -- )
 : <ftp-server> ( directory port -- server )
     ftp-server new-threaded-server
         swap >>insecure
-        swap >>serving-directory
+        swap canonicalize-path >>serving-directory
         "ftp.server" >>name
         5 minutes >>timeout
         latin1 >>encoding ;
