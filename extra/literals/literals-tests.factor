@@ -2,10 +2,11 @@ USING: kernel literals math tools.test ;
 IN: literals.tests
 
 <<
-: five 5 ;
-: seven-eleven 7 11 ;
 : six-six-six 6 6 6 ;
 >>
+
+: five 5 ;
+: seven-eleven 7 11 ;
 
 [ { 5 } ] [ { $ five } ] unit-test
 [ { 7 11 } ] [ { $ seven-eleven } ] unit-test
