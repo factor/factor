@@ -13,7 +13,7 @@ USING: tools.test logging math ;
 
 \ error-logging-test ERROR add-error-logging
 
-"logging-test" [
+"logging-test" DEBUG [
     [ 4 ] [ 1 3 input-logging-test ] unit-test
     
     [ 4 ] [ 1 3 output-logging-test ] unit-test

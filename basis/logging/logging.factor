@@ -33,14 +33,16 @@ ERROR: undefined-log-level ;
 
 SYMBOL: log-service
 
+ERROR: bad-log-message-parameters msg word level ;
+
 : check-log-message ( msg word level -- msg word level )
     3dup [ string? ] [ word? ] [ word? ] tri* and and
-    [ "Bad parameters to log-message" throw ] unless ; inline
+    [ bad-log-message-parameters ] unless ; inline
 
 : log-message ( msg word level -- )
     check-log-message
-    dup log?
-    log-service get dup and [
+    log-service get
+    2dup [ log? ] [ ] bi* and [
         [ [ string-lines ] [ name>> ] [ name>> ] tri* ] dip
         4array "log-message" send-to-log-server
     ] [
