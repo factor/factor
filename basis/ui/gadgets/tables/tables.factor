@@ -162,7 +162,7 @@ M: table layout*
 
 : column-loc ( font column width align -- loc )
     [ [ cell-width ] dip swap - ] dip
-    * 0 2array ;
+    * >integer 0 2array ;
 
 : translate-column ( width gap -- )
     + 0 2array gl-translate ;
