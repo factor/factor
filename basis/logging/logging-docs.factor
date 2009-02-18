@@ -8,6 +8,9 @@ HELP: DEBUG
 HELP: NOTICE
 { $description "Log level for ordinary messages." } ;
 
+HELP: WARNING
+{ $description "Log level for warnings." } ;
+
 HELP: ERROR
 { $description "Log level for error messages." } ;
 
@@ -18,6 +21,7 @@ ARTICLE: "logging.levels" "Log levels"
 "Several log levels are supported, from lowest to highest:"
 { $subsection DEBUG }
 { $subsection NOTICE }
+{ $subsection WARNING }
 { $subsection ERROR }
 { $subsection CRITICAL } ;
 
@@ -36,7 +40,7 @@ ARTICLE: "logging.files" "Log files"
 
 HELP: log-message
 { $values { "msg" string } { "word" word } { "level" "a log level" } }
-{ $description "Sends a message to the current log. Does nothing if not executing in a dynamic scope established by " { $link with-logging } "." } ;
+{ $description "Sends a message to the current log if the level is more urgent than " { $link log-level } ". Does nothing if not executing in a dynamic scope established by " { $link with-logging } "." } ;
 
 HELP: add-logging
 { $values { "level" "a log level" } { "word" word } }
@@ -91,7 +95,7 @@ HELP: close-logs
 
 HELP: with-logging
 { $values { "service" "a log service name" } { "quot" quotation } }
-{ $description "Calls the quotation a new dynamic scope where all logging calls are sent to the log file for " { $snippet "service" } "." } ;
+{ $description "Calls the quotation a new dynamic scope where all logging calls more urgent than " { $link log-level } " are sent to the log file for " { $snippet "service" } "." } ;
 
 ARTICLE: "logging.rotation" "Log rotation"
 "Log files should be rotated periodically to prevent unbounded growth."
@@ -120,4 +124,3 @@ ARTICLE: "logging" "Logging framework"
 { $subsection "logging.server" } ;
 
 ABOUT: "logging"
-

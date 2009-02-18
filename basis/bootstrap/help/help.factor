@@ -5,6 +5,7 @@ IN: bootstrap.help
 
 : load-help ( -- )
     "help.lint" require
+    "tools.vocabs.browser" require
     "alien.syntax" require
     "compiler" require
 
