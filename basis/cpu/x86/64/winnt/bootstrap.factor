@@ -7,5 +7,5 @@ IN: bootstrap.x86
 : stack-frame-size ( -- n ) 8 bootstrap-cells ;
 : arg ( -- reg ) RCX ;
 
-<< "resource:basis/cpu/x86/64/bootstrap.factor" parse-file parsed >>
+<< "vocab:cpu/x86/64/bootstrap.factor" parse-file parsed >>
 call

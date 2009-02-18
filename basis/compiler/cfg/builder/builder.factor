@@ -55,7 +55,7 @@ GENERIC: emit-node ( node -- next )
 
 : begin-word ( -- )
     #! We store the basic block after the prologue as a loop
-    #! labelled by the current word, so that self-recursive
+    #! labeled by the current word, so that self-recursive
     #! calls can skip an epilogue/prologue.
     ##prologue
     ##branch

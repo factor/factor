@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2007, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make sequences io io.files io.pathnames kernel
 assocs words vocabs definitions parser continuations hashtables
@@ -18,6 +18,22 @@ V{
 : add-vocab-root ( root -- )
     vocab-roots get adjoin ;
 
+SYMBOL: root-cache
+
+root-cache [ H{ } clone ] initialize
+
+ERROR: not-found-in-roots path ;
+
+<PRIVATE
+
+: find-root-for ( path -- path/f )
+    vocab-roots get [ prepend-path exists? ] with find nip ;
+
+M: string vocab-path ( string -- path/f )
+    dup find-root-for [ prepend-path ] [ not-found-in-roots ] if* ;
+
+PRIVATE>
+
 : vocab-dir ( vocab -- dir )
     vocab-name { { CHAR: . CHAR: / } } substitute ;
 
@@ -26,25 +42,9 @@ V{
     [ [ dup peek ] dip append suffix ] when*
     "/" join ;
 
-: vocab-dir? ( root name -- ? )
-    over
-    [ ".factor" vocab-dir+ append-path exists? ]
-    [ 2drop f ]
-    if ;
-
-SYMBOL: root-cache
-
-H{ } clone root-cache set-global
-
-<PRIVATE
-
-: (find-vocab-root) ( name -- path/f )
-    vocab-roots get swap [ vocab-dir? ] curry find nip ;
-
-PRIVATE>
-
 : find-vocab-root ( vocab -- path/f )
-    vocab-name dup root-cache get at [ ] [ (find-vocab-root) ] ?if ;
+    vocab-name dup root-cache get at
+    [ ] [ ".factor" vocab-dir+ find-root-for ] ?if ;
 
 : vocab-append-path ( vocab path -- newpath )
     swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
@@ -104,14 +104,14 @@ SYMBOL: blacklist
 : add-to-blacklist ( error vocab -- )
     vocab-name blacklist get dup [ set-at ] [ 3drop ] if ;
 
-GENERIC: (load-vocab) ( name -- )
+GENERIC: (load-vocab) ( name -- vocab )
 
 M: vocab (load-vocab)
     [
         dup source-loaded?>> +parsing+ eq? [
             dup source-loaded?>> [ dup load-source ] unless
             dup docs-loaded?>> [ dup load-docs ] unless
-        ] unless drop
+        ] unless
     ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 
 M: vocab-link (load-vocab)
@@ -120,22 +120,15 @@ M: vocab-link (load-vocab)
 M: string (load-vocab)
     create-vocab (load-vocab) ;
 
-[
-    [
-        dup vocab-name blacklist get at* [ rethrow ] [
-            drop dup find-vocab-root
-            [ [ (load-vocab) ] with-compiler-errors ]
-            [ dup vocab [ drop ] [ no-vocab ] if ]
-            if
-        ] if
-    ] with-compiler-errors
-] load-vocab-hook set-global
-
 PRIVATE>
 
-: vocab-where ( vocab -- loc )
-    vocab-source-path dup [ 1 2array ] when ;
+[
+    dup vocab-name blacklist get at* [ rethrow ] [
+        drop dup find-vocab-root
+        [ [ (load-vocab) ] with-compiler-errors ]
+        [ dup vocab [ ] [ no-vocab ] ?if ]
+        if
+    ] if
+] load-vocab-hook set-global
 
-M: vocab where vocab-where ;
-
-M: vocab-link where vocab-where ;
+M: vocab-spec where vocab-source-path dup [ 1 2array ] when ;

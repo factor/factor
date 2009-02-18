@@ -80,7 +80,7 @@ VALUE: gb>u
 VALUE: u>gb
 VALUE: mapping
 
-"resource:basis/io/encodings/chinese/gb-18030-2000.xml"
+"vocab:io/encodings/chinese/gb-18030-2000.xml"
 ascii <file-reader> xml>gb-data
 [ ranges-u>gb to: u>gb ] [ ranges-gb>u to: gb>u ] bi
 >biassoc to: mapping

@@ -1,0 +1,1 @@
+Normalize IR created by high level IR builder to simplify subsequent passes

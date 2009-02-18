@@ -1,8 +1,8 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel ui.commands
 ui.gestures sequences strings math words generic namespaces make
-hashtables help.markup quotations assocs fry ;
+hashtables help.markup quotations assocs fry linked-assocs ;
 IN: ui.operations
 
 SYMBOL: +keyboard+
@@ -34,8 +34,11 @@ M: operation command-word command>> command-word ;
 
 SYMBOL: operations
 
+operations [ <linked-hash> ] initialize
+
 : object-operations ( obj -- operations )
-    operations get [ predicate>> call ] with filter ;
+    operations get values
+    [ predicate>> call ] with filter ;
 
 : find-operation ( obj quot -- command )
     [ object-operations ] dip find-last nip ; inline
@@ -51,10 +54,14 @@ SYMBOL: operations
 : default-flags ( -- assoc )
     H{ { +keyboard+ f } { +primary+ f } { +secondary+ f } } ;
 
+: (define-operation) ( operation -- )
+    dup [ command>> ] [ predicate>> ] bi
+    2array operations get set-at ;
+
 : define-operation ( pred command flags -- )
     default-flags swap assoc-union
     dupd define-command <operation>
-    operations get push ;
+    (define-operation) ;
 
 : modify-operation ( hook translator operation -- operation )
     clone

@@ -4,5 +4,5 @@ USING: xml xml.data kernel tools.test ;
 IN: xml.tests
 
 [ t ] [
-    "resource:basis/xmode/xmode.dtd" file>dtd dtd?
+    "vocab:xmode/xmode.dtd" file>dtd dtd?
 ] unit-test
