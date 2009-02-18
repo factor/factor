@@ -16,7 +16,3 @@ TUPLE: ftp-response n strings parsed ;
     over strings>> push ;
 
 : ftp-send ( string -- ) write "\r\n" write flush ;
-
-CONSTANT: ftp-ipv4 1
-
-CONSTANT: ftp-ipv6 2

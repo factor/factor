@@ -93,7 +93,7 @@ ERROR: ftp-error got expected ;
 : ensure-login ( url -- url )
     dup username>> [
         "anonymous" >>username
-        "ftp-client" >>password
+        "ftp-client@factorcode.org" >>password
     ] unless ;
 
 : >ftp-url ( url -- url' ) >url ensure-port ensure-login ;
