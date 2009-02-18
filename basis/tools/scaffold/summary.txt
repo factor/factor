@@ -1,0 +1,1 @@
+Tool to create the scaffolding for new vocabularies
