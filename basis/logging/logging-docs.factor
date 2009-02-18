@@ -94,7 +94,7 @@ HELP: close-logs
 { $description "Closes all open log streams. Subsequent logging will re-open the streams. This should be used before moving or deleting log files." } ;
 
 HELP: with-logging
-{ $values { "service" "a log service name" } { "level" "a log level" } { "quot" quotation } }
+{ $values { "service" "a log service name" } { "quot" quotation } }
 { $description "Calls the quotation a new dynamic scope where all logging calls more urgent than " { $link log-level } " are sent to the log file for " { $snippet "service" } "." } ;
 
 ARTICLE: "logging.rotation" "Log rotation"
