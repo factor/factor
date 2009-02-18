@@ -293,22 +293,22 @@ PRIVATE>
     in-layout? get
     [ "Cannot add/remove gadgets in layout*" throw ] when ;
 
+GENERIC: remove-gadget ( gadget parent -- )
+
+M: gadget remove-gadget
+    over (unparent)
+    [ unfocus-gadget ]
+    [ children>> delete ]
+    [ nip relayout ]
+    2tri ;
+
 : unparent ( gadget -- )
     not-in-layout
-    [
-        dup parent>> dup [
-            over (unparent)
-            [ unfocus-gadget ] 2keep
-            [ children>> delete ] keep
-            relayout
-        ] [
-            2drop
-        ] if
-    ] when* ;
+    [ dup parent>> dup [ remove-gadget ] [ 2drop ] if ] when* ;
 
 : clear-gadget ( gadget -- )
     not-in-layout
-    dup (clear-gadget) relayout ;
+    [ (clear-gadget) ] [ relayout ] bi ;
 
 <PRIVATE
 

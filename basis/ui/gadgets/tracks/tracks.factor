@@ -60,12 +60,7 @@ PRIVATE>
 : track-add ( track gadget constraint -- track )
     pick sizes>> push add-gadget ;
 
-: track-remove ( track gadget -- track )
-    [ drop ] [
-        [ swap children>> index ]
-        [ drop sizes>> ]
-        [ nip unparent ]
-        2tri delete-nth
-    ] 2bi ;
+M: track remove-gadget
+    [ [ children>> index ] keep sizes>> delete-nth ] [ call-next-method ] 2bi ;
 
 : clear-track ( track -- ) [ sizes>> delete-all ] [ clear-gadget ] bi ;
