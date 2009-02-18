@@ -34,7 +34,7 @@ IN: project-euler.012
 ! --------
 
 : euler012 ( -- answer )
-    8 [ dup nth-triangle tau* 500 < ] [ 1+ ] [ ] while nth-triangle ;
+    8 [ dup nth-triangle tau* 500 < ] [ 1+ ] while nth-triangle ;
 
 ! [ euler012 ] 10 ave-time
 ! 6573 ms ave run time - 346.27 SD (10 trials)

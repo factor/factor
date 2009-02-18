@@ -70,7 +70,7 @@ SYMBOL: error-stream
 <PRIVATE
 
 : each-morsel ( handler: ( data -- ) reader: ( -- data ) -- )
-    [ dup ] compose swap [ drop ] while ; inline
+    [ dup ] compose swap while drop ; inline
 
 PRIVATE>
 

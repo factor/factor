@@ -126,7 +126,7 @@ TUPLE: merge
 : sort-loop ( merge quot -- )
     [ 2 [ over seq>> length over > ] ] dip
     [ [ 1 shift 2dup ] dip sort-pass ] curry
-    [ ] while 2drop ; inline
+    while 2drop ; inline
 
 : each-pair ( seq quot -- )
     [ [ length 1+ 2/ ] keep ] dip
