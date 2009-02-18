@@ -1,8 +1,30 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.order words regexp.utils
-ascii unicode.categories combinators.short-circuit ;
+USING: accessors kernel math math.order words
+ascii unicode.categories combinators.short-circuit sequences ;
 IN: regexp.classes
+
+: punct? ( ch -- ? )
+    "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" member? ;
+
+: c-identifier-char? ( ch -- ? )
+    { [ alpha? ] [ CHAR: _ = ] } 1|| ;
+
+: java-blank? ( ch -- ? )
+    {
+        CHAR: \s CHAR: \t CHAR: \n
+        HEX: b HEX: 7 CHAR: \r
+    } member? ;
+
+: java-printable? ( ch -- ? )
+    [ [ alpha? ] [ punct? ] ] 1|| ;
+
+: hex-digit? ( ch -- ? )
+    {
+        [ CHAR: A CHAR: F between? ]
+        [ CHAR: a CHAR: f between? ]
+        [ CHAR: 0 CHAR: 9 between? ]
+    } 1|| ;
 
 SINGLETONS: any-char any-char-no-nl
 letter-class LETTER-class Letter-class digit-class
@@ -14,8 +36,8 @@ unmatchable-class terminator-class word-boundary-class ;
 SINGLETONS: beginning-of-input beginning-of-line
 end-of-input end-of-line ;
 
-MIXIN: node
-TUPLE: character-class-range from to ; INSTANCE: character-class-range node
+TUPLE: range from to ;
+C: <range> range
 
 GENERIC: class-member? ( obj class -- ? )
 
@@ -23,7 +45,7 @@ M: t class-member? ( obj class -- ? ) 2drop f ;
 
 M: integer class-member? ( obj class -- ? ) 2drop f ;
 
-M: character-class-range class-member? ( obj class -- ? )
+M: range class-member? ( obj class -- ? )
     [ from>> ] [ to>> ] bi between? ;
 
 M: any-char class-member? ( obj class -- ? )

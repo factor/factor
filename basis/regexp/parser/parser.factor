@@ -1,28 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: peg.ebnf kernel math.parser sequences assocs arrays
-combinators regexp.classes strings splitting peg locals ;
+USING: peg.ebnf kernel math.parser sequences assocs arrays fry math
+combinators regexp.classes strings splitting peg locals accessors
+regexp.ast ;
 IN: regexp.parser
-
-TUPLE: range from to ;
-TUPLE: char-class ranges ;
-TUPLE: primitive-class class ;
-TUPLE: not-char-class ranges ;
-TUPLE: not-primitive-class class ;
-TUPLE: from-to n m ;
-TUPLE: at-least n ;
-TUPLE: up-to n ;
-TUPLE: exactly n ;
-TUPLE: times expression times ;
-TUPLE: concatenation seq ;
-TUPLE: alternation seq ;
-TUPLE: maybe term ;
-TUPLE: star term ;
-TUPLE: plus term ;
-TUPLE: with-options tree options ;
-TUPLE: ast ^? $? tree ;
-SINGLETON: any-char
-
 : allowed-char? ( ch -- ? )
     ".()|[*+?" member? not ;
 
@@ -64,20 +45,15 @@ ERROR: bad-class name ;
         { CHAR: e [ HEX: 1b ] }
         { CHAR: \\ [ CHAR: \\ ] }
 
-        { CHAR: w [ c-identifier-class primitive-class boa ] }
-        { CHAR: W [ c-identifier-class not-primitive-class boa ] }
-        { CHAR: s [ java-blank-class primitive-class boa ] }
-        { CHAR: S [ java-blank-class not-primitive-class boa ] }
-        { CHAR: d [ digit-class primitive-class boa ] }
-        { CHAR: D [ digit-class not-primitive-class boa ] }
+        { CHAR: w [ c-identifier-class <primitive-class> ] }
+        { CHAR: W [ c-identifier-class <primitive-class> <negation> ] }
+        { CHAR: s [ java-blank-class <primitive-class> ] }
+        { CHAR: S [ java-blank-class <primitive-class> <negation> ] }
+        { CHAR: d [ digit-class <primitive-class> ] }
+        { CHAR: D [ digit-class <primitive-class> <negation> ] }
 
         [ ]
     } case ;
-
-TUPLE: options on off ;
-
-SINGLETONS: unix-lines dotall multiline comments case-insensitive
-unicode-case reversed-regexp ;
 
 : options-assoc ( -- assoc )
     H{
@@ -98,19 +74,30 @@ unicode-case reversed-regexp ;
     options-assoc value-at ;
 
 : parse-options ( on off -- options )
-    [ [ ch>option ] map ] bi@ options boa ;
+    [ [ ch>option ] { } map-as ] bi@ <options> ;
 
-! TODO: make range syntax better (negation, and, etc),
-!       add syntax for various parenthized things,
+: string>options ( string -- options )
+    "-" split1 parse-options ;
+ 
+: options>string ( options -- string )
+    [ on>> ] [ off>> ] bi
+    [ [ option>ch ] map ] bi@
+    [ "-" swap 3append ] unless-empty
+    "" like ;
+
+! TODO: add syntax for various parenthized things,
 !       add greedy and nongreedy forms of matching
 ! (once it's all implemented)
 
-EBNF: (parse-regexp)
+EBNF: parse-regexp
 
 CharacterInBracket = !("}") Character
 
-Escape = "p{" CharacterInBracket*:s "}" => [[ s >string name>class primitive-class boa ]]
-       | "P{" CharacterInBracket*:s "}" => [[ s >string name>class not-primitive-class boa ]]
+QuotedCharacter = !("\\E") .
+
+Escape = "p{" CharacterInBracket*:s "}" => [[ s >string name>class <primitive-class> ]]
+       | "P{" CharacterInBracket*:s "}" => [[ s >string name>class <primitive-class> <negation> ]]
+       | "Q" QuotedCharacter*:s "\\E" => [[ s <concatenation> ]]
        | "u" Character:a Character:b Character:c Character:d
             => [[ { a b c d } hex> ensure-number ]]
        | "x" Character:a Character:b
@@ -119,30 +106,30 @@ Escape = "p{" CharacterInBracket*:s "}" => [[ s >string name>class primitive-cla
             => [[ { a b c } oct> ensure-number ]]
        | . => [[ lookup-escape ]]
 
-Character = "\\" Escape:e => [[ e ]]
-          | . ?[ allowed-char? ]?
+EscapeSequence = "\\" Escape:e => [[ e ]]
 
-AnyRangeCharacter = Character | "["
+Character = EscapeSequence | . ?[ allowed-char? ]?
+
+AnyRangeCharacter = EscapeSequence | .
 
 RangeCharacter = !("]") AnyRangeCharacter
 
-Range = RangeCharacter:a "-" RangeCharacter:b => [[ a b range boa ]]
+Range = RangeCharacter:a "-" RangeCharacter:b => [[ a b <range> ]]
       | RangeCharacter
 
-StartRange = AnyRangeCharacter:a "-" RangeCharacter:b => [[ a b range boa ]]
+StartRange = AnyRangeCharacter:a "-" RangeCharacter:b => [[ a b <range> ]]
            | AnyRangeCharacter
 
 Ranges = StartRange:s Range*:r => [[ r s prefix ]]
 
-CharClass = "^" Ranges:e => [[ e not-char-class boa ]]
-          | Ranges:e => [[ e char-class boa ]]
+CharClass = "^"?:n Ranges:e => [[ e n char-class ]]
 
 Options = [idmsux]*
 
 Parenthized = "?:" Alternation:a => [[ a ]]
             | "?" Options:on "-"? Options:off ":" Alternation:a
-                => [[ a on off parse-options with-options boa ]]
-            | "?#" [^)]* => [[ ignore ]]
+                => [[ a on off parse-options <with-options> ]]
+            | "?#" [^)]* => [[ f ]]
             | Alternation
 
 Element = "(" Parenthized:p ")" => [[ p ]]
@@ -152,32 +139,24 @@ Element = "(" Parenthized:p ")" => [[ p ]]
 
 Number = (!(","|"}").)* => [[ string>number ensure-number ]]
 
-Times = "," Number:n "}" => [[ n up-to boa ]]
-      | Number:n ",}" => [[ n at-least boa ]]
-      | Number:n "}" => [[ n exactly boa ]]
+Times = "," Number:n "}" => [[ 0 n <from-to> ]]
+      | Number:n ",}" => [[ n <at-least> ]]
+      | Number:n "}" => [[ n n <from-to> ]]
       | "}" => [[ bad-number ]]
-      | Number:n "," Number:m "}" => [[ n m from-to boa ]]
+      | Number:n "," Number:m "}" => [[ n m <from-to> ]]
 
-Repeated = Element:e "{" Times:t => [[ e t times boa ]]
-         | Element:e "?" => [[ e maybe boa ]]
-         | Element:e "*" => [[ e star boa ]]
-         | Element:e "+" => [[ e plus boa ]]
+Repeated = Element:e "{" Times:t => [[ e t <times> ]]
+         | Element:e "?" => [[ e <maybe> ]]
+         | Element:e "*" => [[ e <star> ]]
+         | Element:e "+" => [[ e <plus> ]]
          | Element
 
-Concatenation = Repeated*:r => [[ r concatenation boa ]]
+Concatenation = Repeated*:r => [[ r sift <concatenation> ]]
 
 Alternation = Concatenation:c ("|" Concatenation)*:a
-                => [[ a empty? [ c ] [ a values c prefix alternation boa ] if ]]
+                => [[ a empty? [ c ] [ a values c prefix <alternation> ] if ]]
 
 End = !(.)
 
 Main = Alternation End
 ;EBNF
-
-: parse-regexp ( string -- regexp )
-    ! Hack because I want $ allowable in regexps,
-    ! but with special behavior at the end
-    ! This fails if the regexp is stupid, though...
-    dup first CHAR: ^ = tuck [ rest ] when
-    dup peek CHAR: $ = tuck [ but-last ] when
-    (parse-regexp) ast boa ;

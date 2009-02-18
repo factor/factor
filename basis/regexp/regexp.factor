@@ -2,33 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math sequences strings sets
 assocs prettyprint.backend prettyprint.custom make lexer
-namespaces parser arrays fry regexp.backend regexp.utils
+namespaces parser arrays fry locals
 regexp.parser regexp.nfa regexp.dfa regexp.traversal
-regexp.transition-tables splitting sorting ;
+regexp.transition-tables splitting sorting regexp.ast ;
 IN: regexp
 
-: default-regexp ( string -- regexp )
-    regexp new
-        swap >>raw
-        <transition-table> >>nfa-table
-        <transition-table> >>dfa-table
-        <transition-table> >>minimized-table
-        H{ } clone >>nfa-traversal-flags
-        H{ } clone >>dfa-traversal-flags
-        H{ } clone >>options
-        H{ } clone >>matchers
-        reset-regexp ;
-
-: construct-regexp ( regexp -- regexp' )
-    {
-        [ dup raw>> parse-regexp >>parse-tree drop ]
-        [ construct-nfa ]
-        [ construct-dfa ]
-        [ ]
-    } cleave ;
+TUPLE: regexp raw options parse-tree dfa ;
 
 : (match) ( string regexp -- dfa-traverser )
-    <dfa-traverser> do-match ; inline
+    dfa>> <dfa-traverser> do-match ; inline
 
 : match ( string regexp -- slice/f )
     (match) return-match ;
@@ -94,17 +76,17 @@ IN: regexp
         { "R| "  "|"  }
     } swap [ subseq? not nip ] curry assoc-find drop ;
 
-: string>options ( string -- options )
-    [ ch>option dup ] H{ } map>assoc ;
-
-: options>string ( options -- string )
-    keys [ option>ch ] map natural-sort >string ;
-
 PRIVATE>
 
-: <optioned-regexp> ( string option-string -- regexp )
-    [ default-regexp ] [ string>options ] bi* >>options
-    construct-regexp ;
+:: <optioned-regexp> ( string options -- regexp )
+    string parse-regexp :> tree
+    options parse-options :> opt
+    tree opt <with-options> :> ast
+    regexp new
+        string >>raw
+        opt >>options
+        tree >>parse-tree
+        tree opt <with-options> construct-nfa construct-dfa >>dfa ;
 
 : <regexp> ( string -- regexp ) "" <optioned-regexp> ;
 

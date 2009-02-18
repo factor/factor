@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators kernel math
-quotations sequences regexp.parser regexp.classes fry arrays
-combinators.short-circuit regexp.utils prettyprint regexp.nfa ;
+quotations sequences regexp.classes fry arrays
+combinators.short-circuit prettyprint regexp.nfa ;
 IN: regexp.traversal
 
 TUPLE: dfa-traverser
@@ -13,8 +13,7 @@ TUPLE: dfa-traverser
     start-index current-index
     matches ;
 
-: <dfa-traverser> ( text regexp -- match )
-    dfa-table>>
+: <dfa-traverser> ( text dfa -- match )
     dfa-traverser new
         swap [ start-state>> >>current-state ] [ >>dfa-table ] bi
         swap >>text
