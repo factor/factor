@@ -13,7 +13,7 @@ ui.gadgets.icons ui.gadgets.grid-lines ui.baseline-alignment
 colors call io.styles ;
 IN: ui.gadgets.panes
 
-TUPLE: pane < pack
+TUPLE: pane < track
 output current input last-line prototype scrolls?
 selection-color caret mark selecting? ;
 
@@ -28,7 +28,7 @@ selection-color caret mark selecting? ;
         dup prototype>> clone >>current
         [ current>> f track-add ]
         [ input>> [ 1 track-add ] when* ]
-        [ swap [ >>last-line ] [ add-gadget ] bi drop ]
+        [ swap [ >>last-line ] [ 1 track-add ] bi drop ]
         tri
     ]
     [ input>> [ request-focus ] when* ] tri ;
@@ -51,12 +51,11 @@ M: pane gadget-selection ( pane -- string/f )
     bi ;
 
 : new-pane ( input class -- pane )
-    new
+    [ vertical ] dip new-track
         swap >>input
         1 >>fill
-        vertical >>orientation
         <shelf> +baseline+ >>align >>prototype
-        <incremental> [ >>output ] [ add-gadget ] bi
+        <incremental> [ >>output ] [ f track-add ] bi
         dup prepare-last-line
         selection-color >>selection-color ; inline
 
