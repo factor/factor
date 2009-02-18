@@ -30,7 +30,7 @@ SYMBOL: insomniac-recipients
 \ (email-log-report) NOTICE add-error-logging
 
 : email-log-report ( service word-names -- )
-    "logging.insomniac" DEBUG [ (email-log-report) ] with-logging ;
+    "logging.insomniac" [ (email-log-report) ] with-logging ;
 
 : schedule-insomniac ( service word-names -- )
     [ [ email-log-report ] assoc-each rotate-logs ] 2curry

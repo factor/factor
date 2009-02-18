@@ -55,10 +55,8 @@ ERROR: bad-log-message-parameters msg word level ;
 : close-logs ( -- )
     { } "close-logs" send-to-log-server ;
 
-: with-logging ( service level quot -- )
-    '[
-        _ log-service [ _ log-level _ with-variable ] with-variable
-    ] call ; inline
+: with-logging ( service quot -- )
+    [ log-service ] dip with-variable ; inline
 
 ! Aspect-oriented programming idioms
 

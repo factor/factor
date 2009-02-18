@@ -117,7 +117,7 @@ M: threaded-server handle-client* handler>> call ;
 : (start-server) ( threaded-server -- )
     init-server
     dup threaded-server [
-        [ ] [ name>> ] [ log-level>> ] tri [
+        [ ] [ name>> ] bi [
             [ listen-on [ start-accept-loop ] parallel-each ]
             [ ready>> raise-flag ]
             bi
