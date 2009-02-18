@@ -7,10 +7,21 @@ regexp.parser regexp.nfa regexp.dfa regexp.traversal
 regexp.transition-tables splitting sorting regexp.ast ;
 IN: regexp
 
-TUPLE: regexp raw options parse-tree dfa ;
+TUPLE: regexp raw parse-tree options dfa ;
+
+: <optioned-regexp> ( string options -- regexp )
+    [ dup parse-regexp ] [ string>options ] bi*
+    2dup <with-options> construct-nfa construct-dfa
+    regexp boa ;
+
+: <regexp> ( string -- regexp ) "" <optioned-regexp> ;
+
+<PRIVATE
 
 : (match) ( string regexp -- dfa-traverser )
     dfa>> <dfa-traverser> do-match ; inline
+
+PRIVATE>
 
 : match ( string regexp -- slice/f )
     (match) return-match ;
@@ -40,8 +51,12 @@ TUPLE: regexp raw options parse-tree dfa ;
     dupd first-match
     [ split1-slice swap ] [ "" like f swap ] if* ;
 
+<PRIVATE
+
 : (re-split) ( string regexp -- )
     over [ [ re-cut , ] keep (re-split) ] [ 2drop ] if ;
+
+PRIVATE>
 
 : re-split ( string regexp -- seq )
     [ (re-split) ] { } make ;
@@ -75,22 +90,6 @@ TUPLE: regexp raw options parse-tree dfa ;
         { "R{ "  "}"  }
         { "R| "  "|"  }
     } swap [ subseq? not nip ] curry assoc-find drop ;
-
-PRIVATE>
-
-:: <optioned-regexp> ( string options -- regexp )
-    string parse-regexp :> tree
-    options parse-options :> opt
-    tree opt <with-options> :> ast
-    regexp new
-        string >>raw
-        opt >>options
-        tree >>parse-tree
-        tree opt <with-options> construct-nfa construct-dfa >>dfa ;
-
-: <regexp> ( string -- regexp ) "" <optioned-regexp> ;
-
-<PRIVATE
 
 : parsing-regexp ( accum end -- accum )
     lexer get dup skip-blank

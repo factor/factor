@@ -41,11 +41,11 @@ IN: regexp.dfa
 
 :: new-transitions ( nfa dfa new-states visited-states -- nfa dfa )
     new-states [ nfa dfa ] [
-        new-states pop :> state
-        state nfa-table find-transitions
+        pop :> state
+        state nfa find-transitions
         [| trans |
             state trans nfa find-closure :> new-state
-            state visited-states new-state add-todo-state
+            new-state visited-states new-states add-todo-state
             state new-state trans transition make-transition dfa add-transition
         ] each
         nfa dfa new-states visited-states new-transitions
