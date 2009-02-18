@@ -58,7 +58,7 @@ C: <ftp-disconnect> ftp-disconnect
     send-response ;
 
 : serving? ( path -- ? )
-    normalize-path server get serving-directory>> head? ;
+    canonicalize-path server get serving-directory>> head? ;
 
 : can-serve-directory? ( path -- ? )
     { [ exists? ] [ file-info directory? ] [ serving? ] } 1&& ;
