@@ -116,5 +116,5 @@ deploy-gadget "toolbar" f {
 : deploy-tool ( vocab -- )
     vocab-name
     [ <deploy-gadget> { 10 10 } <border> ]
-    [ "Deploying \"" "\"" surround ] bi
+    [ "Deploying “" "”" surround ] bi
     open-window ;
