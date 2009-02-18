@@ -70,14 +70,8 @@ C: <ftp-disconnect> ftp-disconnect
         [ serving? ]
     } 1&& ;
 
-: can-serve? ( path -- ? )
-    [ can-serve-file? ] [ can-serve-directory? ] bi or ;
-
 : ftp-error ( string -- ) 500 server-response ;
-: ftp-syntax-error ( string -- ) 501 server-response ;
 : ftp-unimplemented ( string -- ) 502 server-response ;
-: ftp-file-not-available ( string -- ) 550 server-response ;
-: ftp-illegal-file-name ( string -- ) 553 server-response ;
 
 : send-banner ( -- )
     "Welcome to " host-name append 220 server-response ;
