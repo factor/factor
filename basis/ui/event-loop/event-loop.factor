@@ -13,6 +13,6 @@ IN: ui.event-loop
 
 HOOK: do-events ui-backend ( -- )
 
-: event-loop ( -- ) [ event-loop? ] [ do-events ] [ ] while ;
+: event-loop ( -- ) [ event-loop? ] [ do-events ] while ;
 
 : ui-wait ( -- ) 10 milliseconds sleep ;

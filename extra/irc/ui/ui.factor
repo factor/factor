@@ -152,7 +152,7 @@ M: object handle-inbox
 : display ( stream tab -- )
     '[ _ [ [ t ]
            [ _ dup chat>> hear handle-inbox ]
-           [  ] while ] with-output-stream ] "ircv" spawn drop ;
+           while ] with-output-stream ] "ircv" spawn drop ;
 
 : <irc-pane> ( tab -- tab pane )
     <scrolling-pane>

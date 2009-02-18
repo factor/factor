@@ -135,7 +135,7 @@ METHOD: collide ( <axion> -- )
   0                   >>theta-d
   0                   >>theta-dd
 
-  [ 0.00001 theta-dd-small? ] [ -0.001 0.001 random-theta-dd ] [ ] while
+  [ 0.00001 theta-dd-small? ] [ -0.001 0.001 random-theta-dd ] while
 
   drop ;
 
@@ -201,7 +201,7 @@ METHOD: collide ( <hadron> -- )
   0                   >>theta-d
   0                   >>theta-dd
 
-  [ 0.00001 theta-dd-small? ] [ -0.001 0.001 random-theta-dd ] [ ] while
+  [ 0.00001 theta-dd-small? ] [ -0.001 0.001 random-theta-dd ] while
 
   0 1 0 1 rgba boa >>myc
 
@@ -302,7 +302,7 @@ METHOD: collide ( <muon> -- )
   0                                    >>theta-d
   0                                    >>theta-dd
 
-  [ 0.001 theta-dd-small? ] [ -0.1 0.1 random-theta-dd ] [ ] while
+  [ 0.001 theta-dd-small? ] [ -0.1 0.1 random-theta-dd ] while
 
   set-good-color
   set-anti-color
@@ -355,7 +355,7 @@ METHOD: collide ( <quark> -- )
   0                                      >>theta-d
   0                                      >>theta-dd
 
-  [ 0.00001 theta-dd-small? ] [ -0.001 0.001 random-theta-dd ] [ ] while
+  [ 0.00001 theta-dd-small? ] [ -0.001 0.001 random-theta-dd ] while
 
   drop ;
 
