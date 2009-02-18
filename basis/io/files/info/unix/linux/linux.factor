@@ -72,13 +72,14 @@ M: linux file-systems
     ] map ;
 
 : (find-mount-point) ( path mtab-paths -- mtab-entry )
-    [ follow-links ] dip 2dup at* [
+    2dup at* [
         2nip
     ] [
         drop [ parent-directory ] dip (find-mount-point)
     ] if ;
 
 : find-mount-point ( path -- mtab-entry )
+    canonicalize-path
     parse-mtab [ [ mount-point>> ] keep ] H{ } map>assoc (find-mount-point) ;
 
 ERROR: file-system-not-found ;
