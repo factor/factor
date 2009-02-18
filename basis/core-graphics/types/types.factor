@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax kernel layouts ;
+USING: alien.c-types alien.syntax kernel layouts math ;
 IN: core-graphics.types
 
 << cell 4 = "float" "double" ? "CGFloat" typedef >>
@@ -59,7 +59,10 @@ C-STRUCT: CGRect
     [ set-CGRect-x ] keep ;
 
 : CGRect-x-y ( alien -- origin-x origin-y )
-    [ CGRect-x ] keep CGRect-y ;
+    [ CGRect-x ] [ CGRect-y ] bi ;
+
+: CGRect-top-left ( alien -- x y )
+    [ CGRect-x ] [ [ CGRect-y ] [ CGRect-h ] bi + ] bi ;
 
 C-STRUCT: CGAffineTransform
     { "CGFloat" "a" }
