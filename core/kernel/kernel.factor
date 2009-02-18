@@ -185,8 +185,7 @@ PRIVATE>
 
 : either? ( x y quot -- ? ) bi@ or ; inline
 
-: most ( x y quot -- z )
-    [ 2dup ] dip call [ drop ] [ nip ] if ; inline
+: most ( x y quot -- z ) 2keep ? ; inline
 
 ! Loops
 : loop ( pred: ( -- ? ) -- )
