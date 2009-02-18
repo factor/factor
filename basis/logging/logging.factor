@@ -11,6 +11,8 @@ SYMBOLS: DEBUG NOTICE WARNING ERROR CRITICAL ;
 
 SYMBOL: log-level
 
+log-level [ DEBUG ] initialize
+
 : log-levels ( -- assoc )
     H{
         { DEBUG 0 }
