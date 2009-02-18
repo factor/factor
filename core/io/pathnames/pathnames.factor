@@ -119,7 +119,14 @@ PRIVATE>
     ] unless ;
 
 : file-extension ( filename -- extension )
-    "." split1-last nip ;
+    file-name "." split1-last nip ;
+
+: path-components ( path -- seq )
+    normalize-path path-separator split harvest ;
+
+HOOK: canonicalize-path os ( path -- path' )
+
+M: object canonicalize-path normalize-path ;
 
 : resource-path ( path -- newpath )
     "resource-path" get prepend-path ;
