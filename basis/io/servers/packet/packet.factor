@@ -1,6 +1,6 @@
 USING: concurrency.combinators destructors fry
-io.servers.datagram.private io.sockets kernel logging ;
-IN: io.servers.datagram
+io.sockets kernel logging ;
+IN: io.servers.packet
 
 <PRIVATE
 
