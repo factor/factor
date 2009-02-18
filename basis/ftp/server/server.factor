@@ -1,52 +1,46 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit accessors combinators io
-io.encodings.8-bit io.encodings io.encodings.binary
-io.encodings.utf8 io.files io.files.info io.directories
-io.sockets kernel math.parser namespaces make sequences
-ftp io.launcher.unix.parser unicode.case splitting
-assocs classes io.servers.connection destructors calendar
-io.timeouts io.streams.duplex threads continuations math
-concurrency.promises byte-arrays io.backend tools.hexdump
-io.streams.string math.bitwise tools.files io.pathnames ;
+USING: accessors assocs byte-arrays calendar classes
+combinators combinators.short-circuit concurrency.promises
+continuations destructors ftp io io.backend io.directories
+io.encodings io.encodings.8-bit io.encodings.binary
+tools.files io.encodings.utf8 io.files io.files.info
+io.pathnames io.launcher.unix.parser io.servers.connection
+io.sockets io.streams.duplex io.streams.string io.timeouts
+kernel make math math.bitwise math.parser namespaces sequences
+splitting threads unicode.case logging calendar.format
+strings io.files.links io.files.types ;
 IN: ftp.server
 
-TUPLE: ftp-client url mode state command-promise user password ;
-
-: <ftp-client> ( url -- ftp-client )
-    ftp-client new
-        swap >>url ;
-    
+SYMBOL: server
 SYMBOL: client
 
-: ftp-server-directory ( -- str )
-    \ ftp-server-directory get-global "resource:temp" or
-    normalize-path ;
+TUPLE: ftp-server < threaded-server { serving-directory string } ;
+
+TUPLE: ftp-client user password extra-connection ;
 
 TUPLE: ftp-command raw tokenized ;
-
-: <ftp-command> ( -- obj )
-    ftp-command new ;
+: <ftp-command> ( str -- obj )
+    dup \ <ftp-command> DEBUG log-message
+    ftp-command new
+        over >>raw
+        swap tokenize-command >>tokenized ;
 
 TUPLE: ftp-get path ;
-
 : <ftp-get> ( path -- obj )
     ftp-get new
         swap >>path ;
 
 TUPLE: ftp-put path ;
-
 : <ftp-put> ( path -- obj )
     ftp-put new
         swap >>path ;
 
 TUPLE: ftp-list ;
-
 C: <ftp-list> ftp-list
 
-: read-command ( -- ftp-command )
-    <ftp-command> readln
-    [ >>raw ] [ tokenize-command >>tokenized ] bi ;
+TUPLE: ftp-disconnect ;
+C: <ftp-disconnect> ftp-disconnect
 
 : (send-response) ( n string separator -- )
     [ number>string write ] 2dip write ftp-send ;
@@ -56,28 +50,50 @@ C: <ftp-list> ftp-list
     [ but-last-slice [ "-" (send-response) ] with each ]
     [ first " " (send-response) ] 2bi ;
 
-: server-response ( n string -- )
+: server-response ( string n -- )
+    2dup number>string swap ":" glue \ server-response DEBUG log-message
     <ftp-response>
-        swap add-response-line
         swap >>n
+        swap add-response-line
     send-response ;
 
-: ftp-error ( string -- )
-    500 "Unrecognized command: " rot append server-response ;
+: serving? ( path -- ? )
+    normalize-path server get serving-directory>> head? ;
+
+: can-serve-directory? ( path -- ? )
+    canonicalize-path
+    { [ exists? ] [ file-info directory? ] [ serving? ] } 1&& ;
+
+: can-serve-file? ( path -- ? )
+    canonicalize-path
+    {
+        [ exists? ]
+        [ file-info type>> +regular-file+ = ]
+        [ serving? ]
+    } 1&& ;
+
+: can-serve? ( path -- ? )
+    [ can-serve-file? ] [ can-serve-directory? ] bi or ;
+
+: ftp-error ( string -- ) 500 server-response ;
+: ftp-syntax-error ( string -- ) 501 server-response ;
+: ftp-unimplemented ( string -- ) 502 server-response ;
+: ftp-file-not-available ( string -- ) 550 server-response ;
+: ftp-illegal-file-name ( string -- ) 553 server-response ;
 
 : send-banner ( -- )
-    220 "Welcome to " host-name append server-response ;
+    "Welcome to " host-name append 220 server-response ;
 
 : anonymous-only ( -- )
-    530 "This FTP server is anonymous only." server-response ;
+    "This FTP server is anonymous only." 530 server-response ;
 
 : handle-QUIT ( obj -- )
-    drop 221 "Goodbye." server-response ;
+    drop "Goodbye." 221 server-response ;
 
 : handle-USER ( ftp-command -- )
     [
         tokenized>> second client get (>>user)
-        331 "Please specify the password." server-response
+        "Please specify the password." 331 server-response
     ] [
         2drop "bad USER" ftp-error
     ] recover ;
@@ -85,7 +101,7 @@ C: <ftp-list> ftp-list
 : handle-PASS ( ftp-command -- )
     [
         tokenized>> second client get (>>password)
-        230 "Login successful" server-response
+        "Login successful" 230 server-response
     ] [
         2drop "PASS error" ftp-error
     ] recover ;
@@ -102,7 +118,7 @@ ERROR: type-error type ;
 : handle-TYPE ( obj -- )
     [
         tokenized>> second parse-type
-        [ 200 ] dip "Switching to " " mode" surround server-response
+        "Switching to " " mode" surround 200 server-response
     ] [
         2drop "TYPE is binary only" ftp-error
     ] recover ;
@@ -115,65 +131,57 @@ ERROR: type-error type ;
 
 : handle-PWD ( obj -- )
     drop
-    257 current-directory get "\"" dup surround server-response ;
+    current-directory get "\"" dup surround 257 server-response ;
 
 : handle-SYST ( obj -- )
     drop
-    215 "UNIX Type: L8" server-response ;
-
-: if-command-promise ( quot -- )
-    [ client get command-promise>> ] dip
-    [ "Establish an active or passive connection first" ftp-error ] if* ;
-
-: handle-STOR ( obj -- )
-    [
-        tokenized>> second
-        [ [ <ftp-put> ] dip fulfill ] if-command-promise
-    ] [
-        2drop
-    ] recover ;
-
-! EPRT |2|::1|62138|
-! : handle-EPRT ( obj -- )
-    ! tokenized>> second "|" split harvest ;
+    "UNIX Type: L8" 215 server-response ;
 
 : start-directory ( -- )
-    150 "Here comes the directory listing." server-response ;
+    "Here comes the directory listing." 150 server-response ;
+
+: transfer-outgoing-file ( path -- )
+    [ "Opening BINARY mode data connection for " ] dip
+    [ file-name ] [
+        file-info size>> number>string
+        "(" " bytes)." surround
+    ] bi " " glue append 150 server-response ;
+
+: transfer-incoming-file ( path -- )
+    "Opening BINARY mode data connection for " prepend
+    150 server-response ;
+
+: finish-file-transfer ( -- )
+    "File send OK." 226 server-response ;
+
+GENERIC: handle-passive-command ( stream obj -- )
+
+: passive-loop ( server -- )
+    [
+        [
+            |dispose
+            30 seconds over set-timeout
+            accept drop &dispose
+            client get extra-connection>>
+            30 seconds ?promise-timeout
+            handle-passive-command
+        ]
+        [ client get f >>extra-connection drop ]
+        [ drop ] cleanup
+    ] with-destructors ;
 
 : finish-directory ( -- )
-    226 "Directory send OK." server-response ;
+    "Directory send OK." 226 server-response ;
 
-GENERIC: service-command ( stream obj -- )
-
-M: ftp-list service-command ( stream obj -- )
+M: ftp-list handle-passive-command ( stream obj -- )
     drop
     start-directory [
         utf8 encode-output
         [ current-directory get directory. ] with-string-writer string-lines
         harvest [ ftp-send ] each
-    ] with-output-stream
-    finish-directory ;
+    ] with-output-stream finish-directory ;
 
-: transfer-outgoing-file ( path -- )
-    [
-        150
-        "Opening BINARY mode data connection for "
-    ] dip
-    [
-        file-name
-    ] [
-        file-info size>> number>string
-        "(" " bytes)." surround
-    ] bi " " glue append server-response ;
-
-: transfer-incoming-file ( path -- )
-    [ 150 ] dip "Opening BINARY mode data connection for " prepend
-    server-response ;
-
-: finish-file-transfer ( -- )
-    226 "File send OK." server-response ;
-
-M: ftp-get service-command ( stream obj -- )
+M: ftp-get handle-passive-command ( stream obj -- )
     [
         path>>
         [ transfer-outgoing-file ]
@@ -183,7 +191,7 @@ M: ftp-get service-command ( stream obj -- )
         3drop "File transfer failed" ftp-error
     ] recover ;
 
-M: ftp-put service-command ( stream obj -- )
+M: ftp-put handle-passive-command ( stream obj -- )
     [
         path>>
         [ transfer-incoming-file ]
@@ -193,165 +201,165 @@ M: ftp-put service-command ( stream obj -- )
         3drop "File transfer failed" ftp-error
     ] recover ;
 
-: passive-loop ( server -- )
-    [
-        [
-            |dispose
-            30 seconds over set-timeout
-            accept drop &dispose
-            client get command-promise>>
-            30 seconds ?promise-timeout
-            service-command
-        ]
-        [ client get f >>command-promise drop ]
-        [ drop ] cleanup
-    ] with-destructors ;
+M: ftp-disconnect handle-passive-command ( stream obj -- )
+    drop dispose ;
+
+: fulfill-client ( obj -- )
+    client get extra-connection>> [
+        fulfill
+    ] [
+        drop
+        "Establish an active or passive connection first" ftp-error
+    ] if* ;
+
+: handle-STOR ( obj -- )
+    tokenized>> second
+    dup can-serve-file? [
+        <ftp-put> fulfill-client
+    ] [
+        drop 
+        <ftp-disconnect> fulfill-client
+    ] if ;
 
 : handle-LIST ( obj -- )
-    drop
-    [ [ <ftp-list> ] dip fulfill ] if-command-promise ;
-
-: handle-SIZE ( obj -- )
-    [
-        [ 213 ] dip
-        tokenized>> second file-info size>>
-        number>string server-response
+    drop current-directory get
+    can-serve-directory? [
+        <ftp-list> fulfill-client
     ] [
-        2drop
-        550 "Could not get file size" server-response
-    ] recover ;
+        <ftp-disconnect> fulfill-client
+    ] if ;
+
+: not-a-plain-file ( path -- )
+    ": not a plain file." append ftp-error ;
 
 : handle-RETR ( obj -- )
-    [ tokenized>> second <ftp-get> swap fulfill ]
-    curry if-command-promise ;
+    tokenized>> second
+    dup can-serve-file? [
+        <ftp-get> fulfill-client
+    ] [
+        not-a-plain-file
+        <ftp-disconnect> fulfill-client
+    ] if ;
+
+: handle-SIZE ( obj -- )
+    tokenized>> second
+    dup can-serve-file? [
+        file-info size>> number>string 213 server-response
+    ] [
+        not-a-plain-file
+    ] if ;
 
 : expect-connection ( -- port )
+    <promise> client get (>>extra-connection)
     random-local-server
-    client get <promise> >>command-promise drop
     [ [ passive-loop ] curry in-thread ]
     [ addr>> port>> ] bi ;
 
 : handle-PASV ( obj -- )
-    drop client get passive >>mode drop
-    221
+    drop
     expect-connection port>bytes [ number>string ] bi@ "," glue
     "Entering Passive Mode (127,0,0,1," ")" surround
-    server-response ;
+    221 server-response ;
 
 : handle-EPSV ( obj -- )
     drop
-    client get command-promise>> [
-        "You already have a passive stream" ftp-error
-    ] [
-        229
-        expect-connection number>string
-        "Entering Extended Passive Mode (|||" "|)" surround
-        server-response
-    ] if ;
+    client get f >>extra-connection drop
+    expect-connection number>string
+    "Entering Extended Passive Mode (|||" "|)" surround
+    229 server-response ;
 
-! LPRT 6,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,242,186
-! : handle-LPRT ( obj -- ) tokenized>> "," split ;
-
-ERROR: not-a-directory ;
-ERROR: no-permissions ;
-
-: handle-CWD ( obj -- )
-    [
-        tokenized>> second dup normalize-path
-        dup ftp-server-directory head? [
-            no-permissions
-        ] unless
-
-        file-info directory? [
-            set-current-directory
-            250 "Directory successully changed." server-response
+: handle-MDTM ( obj -- )
+    tokenized>> 1 swap ?nth [
+        dup file-info dup directory? [
+            drop not-a-plain-file
         ] [
-            not-a-directory
+            nip
+            modified>> timestamp>mdtm
+            213 server-response
         ] if
     ] [
-        2drop
-        550 "Failed to change directory." server-response
-    ] recover ;
+        "" not-a-plain-file
+    ] if* ;
 
-: unrecognized-command ( obj -- ) raw>> ftp-error ;
+ERROR: not-a-directory ;
+ERROR: no-directory-permissions ;
 
-: handle-client-loop ( -- )
-    <ftp-command> readln
-    USE: prettyprint    global [ dup . flush ] bind
-    [ >>raw ]
-    [ tokenize-command >>tokenized ] bi
+: directory-change-success ( -- )
+    "Directory successully changed." 250 server-response ;
+
+: directory-change-failed ( -- )
+    "Failed to change directory." 553 server-response ;
+
+: handle-CWD ( obj -- )
+    tokenized>> 1 swap ?nth [
+        dup can-serve-directory? [
+            set-current-directory
+            directory-change-success
+        ] [
+            drop
+            directory-change-failed
+        ] if
+    ] [
+        directory-change-success
+    ] if* ;
+
+: unrecognized-command ( obj -- )
+    raw>> "Unrecognized command: " prepend ftp-error ;
+
+: client-loop-dispatch ( str/f -- ? )
     dup tokenized>> first >upper {
+        { "QUIT" [ handle-QUIT f ] }
         { "USER" [ handle-USER t ] }
         { "PASS" [ handle-PASS t ] }
-        { "ACCT" [ drop "ACCT unimplemented" ftp-error t ] }
-        { "CWD" [ handle-CWD t ] }
-        ! { "XCWD" [ ] }
-        ! { "CDUP" [ ] }
-        ! { "SMNT" [ ] }
-
-        ! { "REIN" [ drop client get reset-ftp-client t ] }
-        { "QUIT" [ handle-QUIT f ] }
-
-        ! { "PORT" [  ] } ! TODO
-        { "PASV" [ handle-PASV t ] }
-        ! { "MODE" [ ] }
-        { "TYPE" [ handle-TYPE t ] }
-        ! { "STRU" [ ] }
-
-        ! { "ALLO" [ ] }
-        ! { "REST" [ ] }
-        { "STOR" [ handle-STOR t ] }
-        ! { "STOU" [ ] }
-        { "RETR" [ handle-RETR t ] }
-        { "LIST" [ handle-LIST t ] }
-        { "SIZE" [ handle-SIZE t ] }
-        ! { "NLST" [ ] }
-        ! { "APPE" [ ] }
-        ! { "RNFR" [ ] }
-        ! { "RNTO" [ ] }
-        ! { "DELE" [ handle-DELE t ] }
-        ! { "RMD" [ handle-RMD t ] }
-        ! ! { "XRMD" [ handle-XRMD t ] }
-        ! { "MKD" [ handle-MKD t ] }
-        { "PWD" [ handle-PWD t ] }
-        ! { "ABOR" [ ] }
-
         { "SYST" [ handle-SYST t ] }
-        ! { "STAT" [ ] }
-        ! { "HELP" [ ] }
-
-        ! { "SITE" [ ] }
-        ! { "NOOP" [ ] }
-
-        ! { "EPRT" [ handle-EPRT ] }
-        ! { "LPRT" [ handle-LPRT ] }
+        { "ACCT" [ drop "ACCT unimplemented" ftp-unimplemented t ] }
+        { "PWD" [ handle-PWD t ] }
+        { "TYPE" [ handle-TYPE t ] }
+        { "CWD" [ handle-CWD t ] }
+        { "PASV" [ handle-PASV t ] }
         { "EPSV" [ handle-EPSV t ] }
-        ! { "LPSV" [ drop handle-LPSV t ] }
+        { "LIST" [ handle-LIST t ] }
+        { "STOR" [ handle-STOR t ] }
+        { "RETR" [ handle-RETR t ] }
+        { "SIZE" [ handle-SIZE t ] }
+        { "MDTM" [ handle-MDTM t ] }
         [ drop unrecognized-command t ]
-    } case [ handle-client-loop ] when ;
+    } case ;
 
-TUPLE: ftp-server < threaded-server ;
+: read-command ( -- ftp-command/f )
+    readln [ f ] [ <ftp-command> ] if-empty ;
+
+: handle-client-loop ( -- )
+    read-command [
+        client-loop-dispatch
+        [ handle-client-loop ] when
+    ] when* ;
+
+: serve-directory ( server -- )
+    serving-directory>> [
+        send-banner
+        handle-client-loop
+    ] with-directory ;
 
 M: ftp-server handle-client* ( server -- )
-    drop
     [
-        ftp-server-directory [
-            host-name <ftp-client> client set
-            send-banner handle-client-loop
-        ] with-directory
+        "New client" \ handle-client* DEBUG log-message
+        ftp-client new client set
+        [ server set ] [ serve-directory ] bi
     ] with-destructors ;
 
-: <ftp-server> ( port -- server )
+: <ftp-server> ( directory port -- server )
     ftp-server new-threaded-server
         swap >>insecure
+        swap >>serving-directory
         "ftp.server" >>name
         5 minutes >>timeout
         latin1 >>encoding ;
 
-: ftpd ( port -- )
+: ftpd ( directory port -- )
     <ftp-server> start-server ;
 
-: ftpd-main ( -- ) 2100 ftpd ;
+: ftpd-main ( path -- ) 2100 ftpd ;
 
 MAIN: ftpd-main
 
