@@ -10,7 +10,7 @@ IN: annotations
 PRIVATE>
 
 : $annotation ( element -- )
-    P first
+    first
     [ "!" " your comment here" surround 1array $syntax ]
     [ [ "Treats the rest of the line after the exclamation point as a code annotation that can be looked up with the " \ $link ] dip comment-usage.-word 2array " word." 3array $description ]
     [ ": foo ( x y z -- w )\n    !" " --w-ó()ò-w-- kilroy was here\n    + * ;" surround 1array $unchecked-example ]

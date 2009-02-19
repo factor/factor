@@ -99,6 +99,8 @@ PRIVATE>
 
 : fuel-vocab-help ( name -- ) (fuel-vocab-help) fuel-eval-set-result ;
 
+: fuel-word-synopsis ( word usings -- ) (fuel-word-synopsis) fuel-eval-set-result ;
+
 : fuel-vocab-summary ( name -- )
     (fuel-vocab-summary) fuel-eval-set-result ;
 
