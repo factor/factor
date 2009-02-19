@@ -22,10 +22,10 @@ PRIVATE>
     world get image-texture-cache [ cached-image <texture> ] cache ;
 
 : draw-image ( image-name -- )
-    rendered-image display-list>> glCallList ;
+    rendered-image draw-texture ;
 
 : draw-scaled-image ( dim image-name -- )
-    rendered-image texture>> draw-textured-rect ;
+    rendered-image draw-scaled-texture ;
 
 : image-dim ( image-name -- dim )
     cached-image dim>> ;

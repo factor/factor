@@ -5,7 +5,7 @@ core-text.fonts kernel hashtables namespaces sequences
 ui.gadgets.worlds ui.text ui.text.private opengl opengl.gl
 opengl.textures destructors combinators core-foundation
 core-foundation.strings math math.vectors init colors colors.constants
-cache arrays ;
+cache arrays images ;
 IN: ui.text.core-text
 
 SINGLETON: core-text-renderer
@@ -23,10 +23,12 @@ M: core-text-renderer finish-text-rendering
     cached-lines get purge-cache ;
 
 : rendered-line ( font string -- texture )
-    world get text-handle>> [ cached-line image>> <texture> ] 2cache ;
+    world get text-handle>>
+    [ cached-line image>> <texture> ]
+    2cache ;
 
 M: core-text-renderer draw-string ( font string -- )
-    rendered-line display-list>> glCallList ;
+    rendered-line draw-texture ;
 
 M: core-text-renderer x>offset ( x font string -- n )
     [ 2drop 0 ] [
