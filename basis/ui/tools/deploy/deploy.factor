@@ -83,7 +83,7 @@ TUPLE: deploy-gadget < pack vocab settings ;
     tri ;
 
 : com-help ( -- )
-    "ui.tools.deploy" com-follow ;
+    "ui.tools.deploy" com-browse ;
 
 \ com-help H{
     { +nullary+ t }

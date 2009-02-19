@@ -103,7 +103,7 @@ M: inspector-gadget focusable-child*
         slot-editor-window
     ] [ 2drop 2drop ] if ;
 
-: inspector-help ( -- ) "ui-inspector" com-follow ;
+: inspector-help ( -- ) "ui-inspector" com-browse ;
 
 \ inspector-help H{ { +nullary+ t } } define-command
 

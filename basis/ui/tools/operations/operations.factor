@@ -93,7 +93,7 @@ UNION: definition word method-spec link vocab vocab-link ;
 
 [ definition? ] \ com-forget H{ } define-operation
 
-[ topic? ] \ com-follow H{
+[ topic? ] \ com-browse H{
     { +keyboard+ T{ key-down f { C+ } "h" } }
     { +primary+ t }
 } define-operation
