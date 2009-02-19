@@ -87,6 +87,8 @@ HELP: inconsistent-recursive-call-error
 } ;
 
 ARTICLE: "inference-errors" "Inference warnings and errors"
+"These conditions are thrown by " { $link "inference" } ", as well as the " { $link "compiler" } "."
+$nl
 "Main wrapper for all inference warnings and errors:"
 { $subsection inference-error }
 "Inference warnings:"

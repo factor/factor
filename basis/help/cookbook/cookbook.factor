@@ -220,24 +220,6 @@ ARTICLE: "cookbook-io" "Input and output cookbook"
     "io"
 } ;
 
-ARTICLE: "cookbook-compiler" "Compiler cookbook"
-"Factor includes two compilers which work behind the scenes. Words are always compiled, and the compilers do not have to be invoked explicitly. For the most part, compilation is a fully transparent process. However, there are a few things worth knowing about the compilation process."
-$nl
-"The optimizing compiler trades off compile time for performance of generated code, so loading certain vocabularies might take a while. Saving the image after loading vocabularies can save you a lot of time that you would spend waiting for the same code to load in every coding session; see " { $link "images" } " for information."
-$nl
-"After loading a vocabulary, you might see messages like:"
-{ $code
-    ":errors - print 2 compiler errors."
-    ":warnings - print 50 compiler warnings."
-}
-"These warnings arise from the compiler's stack effect checker. Warnings are non-fatal conditions -- not all code has a static stack effect, so you try to minimize warnings but understand that in many cases they cannot be eliminated. Errors indicate programming mistakes, such as erroneous stack effect declarations."
-{ $references
-    "To learn more about the compiler and static stack effect inference, read these articles:"
-    "compiler"
-    "compiler-errors"
-    "inference"
-} ;
-
 ARTICLE: "cookbook-application" "Application cookbook"
 "Vocabularies can define a main entry point:"
 { $code "IN: game-of-life"
@@ -396,7 +378,6 @@ ARTICLE: "cookbook" "Factor cookbook"
 { $subsection "cookbook-io" }
 { $subsection "cookbook-application" }
 { $subsection "cookbook-scripts" }
-{ $subsection "cookbook-compiler" }
 { $subsection "cookbook-philosophy" }
 { $subsection "cookbook-pitfalls" }
 { $subsection "cookbook-next" } ;
