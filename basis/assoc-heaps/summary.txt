@@ -1,0 +1,1 @@
+Priority queue with fast insertion, removal of first element, and lookup of arbitrary elements by key

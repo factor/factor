@@ -1,4 +1,5 @@
-USING: help.markup help.syntax io.backend io.files strings ;
+USING: help.markup help.syntax io.backend io.files strings
+sequences ;
 IN: io.pathnames
 
 HELP: path-separator?
@@ -21,6 +22,10 @@ HELP: file-name
     { $example "USING: io.pathnames prettyprint ;" "\"/usr/bin/gcc\" file-name ." "\"gcc\"" }
     { $example "USING: io.pathnames prettyprint ;" "\"/usr/libexec/awk/\" file-name ." "\"awk\"" }
 } ;
+
+HELP: path-components
+{ $values { "path" "a pathnames string" } { "seq" sequence } }
+{ $description "Splits a pathname on the " { $link path-separator } " into its its component strings." } ;
 
 HELP: append-path
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
@@ -57,6 +62,10 @@ HELP: normalize-path
 { $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
 { $description "Called by words such as " { $link <file-reader> } " and " { $link <file-writer> } " to prepare a pathname before passing it to underlying code." } ;
 
+HELP: canonicalize-path
+{ $values { "path" "a pathname string" } { "path'" "a new pathname string" } }
+{ $description "Returns an canonical name for a path. The canonical name is an absolute path containing no symlinks." } ;
+
 HELP: <pathname>
 { $values { "string" "a pathname string" } { "pathname" pathname } }
 { $description "Creates a new " { $link pathname } "." } ;
@@ -74,9 +83,12 @@ ARTICLE: "io.pathnames" "Pathname manipulation"
 { $subsection POSTPONE: P" }
 "Pathname manipulation:"
 { $subsection normalize-path }
+{ $subsection canonicalize-path }
 { $subsection parent-directory }
 { $subsection file-name }
 { $subsection last-path-separator }
+{ $subsection path-components }
+{ $subsection prepend-path }
 { $subsection append-path }
 "Pathname presentations:"
 { $subsection pathname }
