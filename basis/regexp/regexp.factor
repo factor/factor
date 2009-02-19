@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math sequences strings sets
 assocs prettyprint.backend prettyprint.custom make lexer
-namespaces parser arrays fry locals
+namespaces parser arrays fry locals regexp.minimize
 regexp.parser regexp.nfa regexp.dfa regexp.traversal
 regexp.transition-tables splitting sorting regexp.ast ;
 IN: regexp
@@ -11,7 +11,7 @@ TUPLE: regexp raw parse-tree options dfa ;
 
 : <optioned-regexp> ( string options -- regexp )
     [ dup parse-regexp ] [ string>options ] bi*
-    2dup <with-options> construct-nfa construct-dfa
+    2dup <with-options> construct-nfa construct-dfa minimize
     regexp boa ;
 
 : <regexp> ( string -- regexp ) "" <optioned-regexp> ;
