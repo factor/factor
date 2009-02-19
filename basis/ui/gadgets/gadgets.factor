@@ -295,16 +295,22 @@ PRIVATE>
 
 GENERIC: remove-gadget ( gadget parent -- )
 
-M: gadget remove-gadget
-    over (unparent)
-    [ unfocus-gadget ]
-    [ children>> delete ]
-    [ nip relayout ]
-    2tri ;
+M: gadget remove-gadget 2drop ;
 
 : unparent ( gadget -- )
     not-in-layout
-    [ dup parent>> dup [ remove-gadget ] [ 2drop ] if ] when* ;
+    [
+        dup parent>> dup
+        [
+            [ remove-gadget ] [
+                over (unparent)
+                [ unfocus-gadget ]
+                [ children>> delete ]
+                [ nip relayout ]
+                2tri
+            ] 2bi
+        ] [ 2drop ] if
+    ] when* ;
 
 : clear-gadget ( gadget -- )
     not-in-layout
