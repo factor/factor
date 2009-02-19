@@ -90,6 +90,12 @@ PRIVATE>
 : (fuel-word-help) ( name -- elem )
     fuel-find-word [ [ auto-use? on (fuel-word-element) ] with-scope ] [ f ] if* ;
 
+: (fuel-word-synopsis) ( word usings -- str/f )
+    [
+        [ vocab ] filter interactive-vocabs get append interactive-vocabs set
+        fuel-find-word [ synopsis ] when*
+    ] with-scope ;
+
 : (fuel-word-see) ( word -- elem )
     [ name>> \ article swap ]
     [ [ see ] with-string-writer \ $code swap 2array ] bi 3array ; inline
