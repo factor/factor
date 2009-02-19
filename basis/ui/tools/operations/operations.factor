@@ -12,8 +12,6 @@ sequences tools.vocabs classes compiler.units accessors
 vocabs.parser ;
 IN: ui.tools.operations
 
-V{ } clone operations set-global
-
 ! Objects
 [ drop t ] \ inspect H{
     { +primary+ t }

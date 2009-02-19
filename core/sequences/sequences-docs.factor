@@ -247,12 +247,12 @@ HELP: array-capacity
 HELP: array-nth
 { $values { "n" "a non-negative fixnum" } { "array" "an array" }  { "elt" object } }
 { $description "Low-level array element accessor." }
-{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
+{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory. User code must use " { $link nth } " instead." } ;
 
 HELP: set-array-nth
 { $values { "elt" object } { "n" "a non-negative fixnum" } { "array" "an array" }  }
 { $description "Low-level array element mutator." }
-{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory." } ;
+{ $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types or array bounds, and improper use can corrupt memory. User code must use " { $link set-nth } " instead." } ;
 
 HELP: collect
 { $values { "n" "a non-negative integer" } { "quot" { $quotation "( n -- value )" } } { "into" "a sequence of length at least " { $snippet "n" } } }
