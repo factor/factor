@@ -357,16 +357,16 @@ editor "editing" f {
     { T{ key-down f { A+ } "BACKSPACE" } delete-to-end-of-line }
 } define-command-map
 
-: paste ( editor -- ) clipboard get paste-clipboard ;
+: com-paste ( editor -- ) clipboard get paste-clipboard ;
 
 : paste-selection ( editor -- ) selection get paste-clipboard ;
 
-: cut ( editor -- ) clipboard get editor-cut ;
+: com-cut ( editor -- ) clipboard get editor-cut ;
 
 editor "clipboard" f {
-    { paste-action paste }
+    { paste-action com-paste }
     { copy-action com-copy }
-    { cut-action cut }
+    { cut-action com-cut }
     { T{ button-up f f 2 } paste-selection }
     { T{ button-up } com-copy-selection }
 } define-command-map
@@ -465,7 +465,14 @@ editor "selection" f {
 } define-command-map
 
 : editor-menu ( editor -- )
-    { com-undo com-redo cut com-copy paste } show-commands-menu ;
+    {
+        com-undo
+        com-redo
+        ----
+        com-cut
+        com-copy
+        com-paste
+    } show-commands-menu ;
 
 editor "misc" f {
     { T{ button-down f f 3 } editor-menu }
