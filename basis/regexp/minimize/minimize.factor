@@ -1,8 +1,39 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences regexp.transition-tables fry assocs
-accessors locals math sorting arrays sets hashtables regexp.dfa  ;
+accessors locals math sorting arrays sets hashtables regexp.dfa
+combinators.short-circuit ;
 IN: regexp.minimize
+
+: number-transitions ( transitions numbering -- new-transitions )
+    dup '[
+        [ _ at ]
+        [ [ first _ at ] assoc-map ] bi*
+    ] assoc-map ;
+
+: table>state-numbers ( table -- assoc )
+    transitions>> keys <enum> [ swap ] H{ } assoc-map-as ;
+
+: map-set ( assoc quot -- new-assoc )
+    '[ drop @ dup ] assoc-map ; inline
+
+: rewrite-transitions ( transition-table assoc quot -- transition-table )
+    [
+        [ '[ _ at ] change-start-state ]
+        [ '[ [ _ at ] map-set ] change-final-states ]
+        [ ] tri
+    ] dip '[ _ @ ] change-transitions ; inline
+
+: number-states ( table -- newtable )
+    dup table>state-numbers
+    [ number-transitions ] rewrite-transitions ;
+
+: initially-same? ( s1 s2 transition-table -- ? )
+    {
+        [ drop <= ]
+        [ transitions>> '[ _ at keys ] bi@ set= ]
+        [ final-states>> '[ _ key? ] bi@ = ]
+    } 3&& ;
 
 :: initialize-partitions ( transition-table -- partitions )
     ! Partition table is sorted-array => ?
@@ -10,11 +41,8 @@ IN: regexp.minimize
     transition-table transitions>> keys :> states
     states [| s1 |
         states [| s2 |
-            s1 s2 <= [
-                s1 s2 [ transition-table transitions>> at keys ] bi@ set=
-                s1 s2 [ transition-table final-states>> key? ] bi@ = and
-                [ t s1 s2 2array out set-at ] when
-            ] when
+            s1 s2 transition-table initially-same?
+            [ s1 s2 2array out conjoin ] when
         ] each
     ] each out ;
 
@@ -29,7 +57,6 @@ IN: regexp.minimize
     '[ _ same-partition? ] assoc-all? ;
 
 : partition-more ( partitions transition-table -- partitions )
-    ! This is horribly slow!
     over '[ drop first2 _ _ stay-same? ] assoc-filter ;
 
 : partition>classes ( partitions -- synonyms ) ! old-state => new-state
@@ -40,7 +67,7 @@ IN: regexp.minimize
 
 : state-classes ( transition-table -- synonyms )
     [ initialize-partitions ] keep
-    '[ _ partition-more ] [ ] while-changes
+    '[ _ partition-more ] [ assoc-size ] while-changes
     partition>classes ;
 
 : canonical-state? ( state state-classes -- ? )
@@ -52,33 +79,12 @@ IN: regexp.minimize
 : rewrite-duplicates ( new-transitions state-classes -- new-transitions )
     '[ [ _ at ] assoc-map ] assoc-map ;
 
-: map-set ( assoc quot -- new-assoc )
-    '[ drop @ dup ] assoc-map ; inline
+: combine-transitions ( transitions state-classes -- new-transitions )
+    [ delete-duplicates ] [ rewrite-duplicates ] bi ;
 
 : combine-states ( table -- smaller-table )
     dup state-classes
-    [
-        '[
-            _ [ delete-duplicates ]
-            [ rewrite-duplicates ] bi
-        ] change-transitions
-    ]
-    [ '[ [ _ at ] map-set ] change-final-states ]
-    [ '[ _ at ] change-start-state ]
-    tri ;
-
-: number-transitions ( transitions numbering -- new-transitions )
-    [
-        [ at ]
-        [ '[ first _ at ] assoc-map ]
-        bi-curry bi*
-    ] curry assoc-map ;
-
-: number-states ( table -- newtable )
-    dup transitions>> keys <enum> [ swap ] H{ } assoc-map-as
-    [ '[ _ at ] change-start-state ]
-    [ '[ [ _ at ] map-set ] change-final-states ]
-    [ '[ _ number-transitions ] change-transitions ] tri ;
+    [ combine-transitions ] rewrite-transitions ;
 
 : minimize ( table -- minimal-table )
     clone number-states combine-states ;

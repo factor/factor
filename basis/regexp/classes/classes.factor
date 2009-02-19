@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.order words
 ascii unicode.categories combinators.short-circuit sequences ;
@@ -41,9 +41,10 @@ C: <range> range
 
 GENERIC: class-member? ( obj class -- ? )
 
+! When does t get put in?
 M: t class-member? ( obj class -- ? ) 2drop f ;
 
-M: integer class-member? ( obj class -- ? ) 2drop f ;
+M: integer class-member? ( obj class -- ? ) = ;
 
 M: range class-member? ( obj class -- ? )
     [ from>> ] [ to>> ] bi between? ;
@@ -111,3 +112,15 @@ M: beginning-of-line class-member? ( obj class -- ? )
 
 M: end-of-line class-member? ( obj class -- ? )
     2drop f ;
+
+TUPLE: or-class seq ;
+C: <or-class> or-class
+
+TUPLE: not-class class ;
+C: <not-class> not-class
+
+M: or-class class-member?
+    seq>> [ class-member? ] with any? ;
+
+M: not-class class-member?
+    class>> class-member? not ;

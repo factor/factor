@@ -16,11 +16,17 @@ C: <from-to> from-to
 TUPLE: at-least n ;
 C: <at-least> at-least
 
-TUPLE: concatenation seq ;
-C: <concatenation> concatenation
+SINGLETON: epsilon
 
-TUPLE: alternation seq ;
-C: <alternation> alternation
+TUPLE: concatenation first second ;
+
+: <concatenation> ( seq -- concatenation )
+    epsilon [ concatenation boa ] reduce ;
+
+TUPLE: alternation first second ;
+
+: <alternation> ( seq -- alternation )
+    unclip [ alternation boa ] reduce ;
 
 TUPLE: star term ;
 C: <star> star

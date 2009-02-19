@@ -4,6 +4,7 @@ USING: peg.ebnf kernel math.parser sequences assocs arrays fry math
 combinators regexp.classes strings splitting peg locals accessors
 regexp.ast ;
 IN: regexp.parser
+
 : allowed-char? ( ch -- ? )
     ".()|[*+?" member? not ;
 
@@ -130,6 +131,7 @@ Parenthized = "?:" Alternation:a => [[ a ]]
             | "?" Options:on "-"? Options:off ":" Alternation:a
                 => [[ a on off parse-options <with-options> ]]
             | "?#" [^)]* => [[ f ]]
+            | "?~" Alternation:a => [[ a <negation> ]]
             | Alternation
 
 Element = "(" Parenthized:p ")" => [[ p ]]
