@@ -235,7 +235,7 @@ HELP: arg
 
 HELP: >polar
 { $values { "z" number } { "abs" "a non-negative real number" } { "arg" "a number in the interval " { $snippet "(-pi,pi]" } } }
-{ $description "Creates a complex number from an absolute value and argument (polar form)." } ;
+{ $description "Converts a complex number into an absolute value and argument (polar form)." } ;
 
 HELP: cis
 { $values { "arg" "a real number" } { "z" "a complex number on the unit circle" } }

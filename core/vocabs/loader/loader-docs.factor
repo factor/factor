@@ -34,13 +34,20 @@ $nl
 { $subsection "vocabs.roots" }
 "Vocabulary names map directly to source files. A vocabulary named " { $snippet "foo.bar" } " must be defined in a " { $snippet "bar" } " directory nested inside a " { $snippet "foo" } " directory of a vocabulary root. Any level of vocabulary nesting is permitted."
 $nl
-"The vocabulary directory - " { $snippet "bar" } " in our example - can contain the following files; the first is required while the rest are optional:"
+"The vocabulary directory - " { $snippet "bar" } " in our example - contains a source file:"
 { $list
-    { { $snippet "foo/bar/bar.factor" } " - the source file, defines words in the " { $snippet "foo.bar" } " vocabulary" }
+  { { $snippet "foo/bar/bar.factor" } " - the source file, must define words in the " { $snippet "foo.bar" } " vocabulary with an " { $snippet "IN: foo.bar" } " form" }
+}
+"Two other Factor source files, storing documentation and tests, respectively, are optional:"
+{ $list
     { { $snippet "foo/bar/bar-docs.factor" } " - documentation, see " { $link "writing-help" } }
     { { $snippet "foo/bar/bar-tests.factor" } " - unit tests, see " { $link "tools.test" } }
+}
+"Finally, three text files can contain meta-data:"
+{ $list
+    { { $snippet "foo/bar/authors.txt" } " - a series of lines, with one author name per line. These are listed under " { $link "vocab-authors" } }
     { { $snippet "foo/bar/summary.txt" } " - a one-line description" }
-    { { $snippet "foo/bar/tags.txt" } " - a whitespace-separated list of tags which classify the vocabulary" }
+    { { $snippet "foo/bar/tags.txt" } " - a whitespace-separated list of tags which classify the vocabulary. Consult " { $link "vocab-tags" } " for a list of existing tags you can re-use" }
 }
 "While " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " load vocabularies which have not been loaded before adding them to the search path, it is also possible to load a vocabulary without adding it to the search path:"
 { $subsection require }
