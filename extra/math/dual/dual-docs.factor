@@ -46,6 +46,48 @@ HELP: d^
 }
 { $description "Raise a dual number to a (possibly dual) power" } ;
 
+HELP: dabs
+{ $values
+     { "x" dual }
+     { "|x|" dual }
+}
+{ $description "Absolute value of a dual number." } ;
+
+HELP: dacosh
+{ $values
+     { "x" dual }
+     { "y" dual }
+}
+{ $description "Inverse hyberbolic cosine of a dual number." } ;
+
+HELP: dasinh
+{ $values
+     { "x" dual }
+     { "y" dual }
+}
+{ $description "Inverse hyberbolic sine of a dual number." } ;
+
+HELP: datanh
+{ $values
+     { "x" dual }
+     { "y" dual }
+}
+{ $description "Inverse hyberbolic tangent of a dual number." } ;
+
+HELP: dneg
+{ $values
+     { "x" dual }
+     { "-x" dual }
+}
+{ $description "Negative of a dual number." } ;
+
+HELP: drecip
+{ $values
+     { "x" dual }
+     { "1/x" dual }
+}
+{ $description "Reciprocal of a dual number." } ;
+
 HELP: define-dual-method
 { $values
     { "word" word }
