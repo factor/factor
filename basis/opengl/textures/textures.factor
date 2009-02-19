@@ -19,17 +19,21 @@ M: RGBA component-order>format drop GL_RGBA GL_UNSIGNED_BYTE ;
 M: ARGB component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8_REV ;
 M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8 ;
 
+: repeat-last ( seq n -- seq' )
+    over peek pad-tail concat ;
+
 : power-of-2-bitmap ( rows dim size -- bitmap dim )
     '[
-        [ [ [ _ group ] map ] dip first '[ _ over peek pad-tail concat ] map ]
-        [ second over peek pad-tail ] bi
-        concat
+        first2
+        [ [ _ ] dip '[ _ group _ repeat-last ] map ]
+        [ repeat-last ]
+        bi*
     ] keep ;
 
 : image-rows ( image -- rows )
     [ bitmap>> ]
     [ dim>> first ]
-    [ component-order>> bytes-per-component ]
+    [ component-order>> bytes-per-pixel ]
     tri * group ; inline
 
 : power-of-2-image ( image -- image )
@@ -37,7 +41,7 @@ M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8 ;
         clone dup
         [ image-rows ]
         [ dim>> [ next-power-of-2 ] map ]
-        [ component-order>> bytes-per-component ] tri
+        [ component-order>> bytes-per-pixel ] tri
         power-of-2-bitmap
         [ >>bitmap ] [ >>dim ] bi*
     ] unless ;
