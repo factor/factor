@@ -19,15 +19,19 @@ ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 "Higher-level words can be found in " { $link "compilation-units" } "." ;
 
 ARTICLE: "compiler" "Optimizing compiler"
-"Factor is a fully compiled language implementation with two distinct compilers:"
+"Factor includes two compilers which work behind the scenes. Words are always compiled, and the compilers do not have to be invoked explicitly. For the most part, compilation is fully transparent. However, there are a few things worth knowing about the compilation process."
+$nl
+"The two compilers differ in the level of analysis they perform:"
 { $list
     { "The " { $emphasis "non-optimizing quotation compiler" } " compiles quotations to naive machine code very quickly. The non-optimizing quotation compiler is part of the VM." }
     { "The " { $emphasis "optimizing word compiler" } " compiles whole words at a time while performing extensive data and control flow analysis. This provides greater performance for generated code, but incurs a much longer compile time. The optimizing compiler is written in Factor." }
 }
-"The optimizing compiler only compiles words which have a static stack effect. This means that methods defined on fundamental generic words such as " { $link nth } " should have a static stack effect; for otherwise, most of the system would be compiled with the non-optimizing compiler. See " { $link "inference" } " and " { $link "cookbook-pitfalls" } "."
-{ $subsection "compiler-usage" }
+"The optimizing compiler only compiles words which have a static stack effect. This means that methods defined on fundamental generic words such as " { $link nth } " should have a static stack effect. See " { $link "inference" } " and " { $link "cookbook-pitfalls" } "."
+$nl
+"The optimizing compiler also trades off compile time for performance of generated code, so loading certain vocabularies might take a while. Saving the image after loading vocabularies can save you a lot of time that you would spend waiting for the same code to load in every coding session; see " { $link "images" } " for information."
 { $subsection "compiler-errors" }
-{ $subsection "hints" } ;
+{ $subsection "hints" }
+{ $subsection "compiler-usage" } ;
 
 ABOUT: "compiler"
 
