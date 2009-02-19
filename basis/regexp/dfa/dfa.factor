@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry kernel locals
 math math.order regexp.nfa regexp.transition-tables sequences
@@ -6,9 +6,13 @@ sets sorting vectors sequences.deep ;
 USING: io prettyprint threads ;
 IN: regexp.dfa
 
-: (while-changes) ( obj quot: ( obj -- obj' ) pred: ( obj -- <=> ) pred-ret -- obj )
-    [ [ dup slip ] dip pick over call ] dip dupd =
-    [ 3drop ] [ (while-changes) ] if ; inline recursive
+:: (while-changes) ( obj quot: ( obj -- obj' ) comp: ( obj -- key ) old-key -- obj )
+    obj quot call :> new-obj
+    new-obj comp call :> new-key
+    new-key old-key =
+    [ new-obj ]
+    [ new-obj quot comp new-key (while-changes) ]
+    if ; inline recursive
 
 : while-changes ( obj quot pred -- obj' )
     3dup nip call (while-changes) ; inline

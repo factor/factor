@@ -33,7 +33,7 @@ TUPLE: dfa-traverser
 
 : text-finished? ( dfa-traverser -- ? )
     {
-        [ current-state>> empty? ]
+        [ current-state>> not ]
         [ end-of-text? ]
         [ match-failed?>> ]
     } 1|| ;
@@ -59,8 +59,7 @@ TUPLE: dfa-traverser
     1 text-character ;
 
 : increment-state ( dfa-traverser state -- dfa-traverser )
-    [ [ 1 + ] change-current-index ]
-    [ first ] bi* >>current-state ;
+    [ [ 1 + ] change-current-index ] dip >>current-state ;
 
 : match-literal ( transition from-state table -- to-state/f )
     transitions>> at at ;
