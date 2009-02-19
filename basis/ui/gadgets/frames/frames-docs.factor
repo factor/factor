@@ -1,5 +1,5 @@
 USING: help.syntax help.markup ui.gadgets kernel arrays
-quotations classes.tuple ui.gadgets.grids parser ;
+quotations classes.tuple ui.gadgets.grids parser math ;
 IN: ui.gadgets.frames
 
 ARTICLE: "ui-frame-layout" "Frame layouts"
@@ -18,8 +18,8 @@ $nl
 "Frames are constructed by calling " { $link <frame> } " and since they inherit from " { $link grid } ", children can be managed with " { $link grid-add } " and " { $link grid-remove } "." } ;
 
 HELP: <frame>
-{ $values { "frame" frame } }
-{ $description "Creates a new " { $link frame } " for laying out gadgets in a 3x3 grid." } ;
+{ $values { "cols" integer } { "rows" integer } { "frame" frame } }
+{ $description "Creates a new " { $link frame } " for laying out gadgets in a grid." } ;
 
 { grid frame } related-words
 

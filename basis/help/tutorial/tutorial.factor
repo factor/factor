@@ -40,11 +40,11 @@ $nl
 $nl
 "When you do this, you will get an error about the " { $link dup } " word not being found. This is because this word is part of the " { $vocab-link "kernel" } " vocabulary, but this vocabulary is not part of the source file's " { $link "vocabulary-search" } ". You must explicitly list dependencies in source files. This allows Factor to automatically load required vocabularies and makes larger programs easier to maintain."
 $nl
-"To add the word to the search path, first convince yourself that this word is in the " { $vocab-link "kernel" } " vocabulary. Enter " { $snippet "dup" } " in the listener's input area, and press " { $operation com-follow } ". This will open the documentation browser tool, viewing the help for the " { $link dup } " word. One of the subheadings in the help article will mention the word's vocabulary."
+"To add the word to the search path, first convince yourself that this word is in the " { $vocab-link "kernel" } " vocabulary. Enter " { $snippet "dup" } " in the listener's input area, and press " { $operation com-browse } ". This will open the documentation browser tool, viewing the help for the " { $link dup } " word. One of the subheadings in the help article will mention the word's vocabulary."
 $nl
 "So now, add the following at the start of the source file:"
 { $code "USING: kernel ;" }
-"Next, find out what vocabulary " { $link reverse } " lives in; type the word name " { $snippet "reverse" } " in the listener's input area, and press " { $operation com-follow } "."
+"Next, find out what vocabulary " { $link reverse } " lives in; type the word name " { $snippet "reverse" } " in the listener's input area, and press " { $operation com-browse } "."
 $nl
 "It lives in the " { $vocab-link "sequences" } " vocabulary, so we add that to the search path:"
 { $code "USING: kernel sequences ;" }

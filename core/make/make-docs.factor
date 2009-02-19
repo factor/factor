@@ -49,8 +49,8 @@ $nl
 { $subsection building }
 { $example
   "USING: make math.parser io ;"
-  "[ \"Language #\" % CHAR: \s , 5 # ] \"\" make print"
-  "Language #5"
+  "[ \"Language #\" % CHAR: \\s , 5 # ] \"\" make print"
+  "Language # 5"
 }
 { $subsection "make-philosophy" } ;
 

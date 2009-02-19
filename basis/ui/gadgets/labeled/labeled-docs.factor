@@ -9,7 +9,7 @@ HELP: <labeled-gadget>
 { $values { "gadget" gadget } { "title" string } { "newgadget" "a new " { $link <labeled-gadget> } } }
 { $description "Creates a new " { $link labeled-gadget } " display " { $snippet "gadget" } " with " { $snippet "title" } " on top." } ;
 
-ARTICLE: "ui.gadgets.labeled" "Labelled gadgets"
+ARTICLE: "ui.gadgets.labeled" "Labeled gadgets"
 "The " { $vocab-link "ui.gadgets.labeled" } " vocabulary implements labeled borders around child gadgets."
 { $subsection labeled-gadget }
 { $subsection <labeled-gadget> } ;

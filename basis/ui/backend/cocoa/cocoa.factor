@@ -3,7 +3,7 @@
 USING: accessors math arrays assocs cocoa cocoa.application
 command-line kernel memory namespaces cocoa.messages
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
-cocoa.windows cocoa.classes cocoa.nibs sequences ui
+cocoa.windows cocoa.classes cocoa.nibs sequences ui ui.private
 ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
 ui.backend.cocoa.views core-foundation core-foundation.run-loop
 core-graphics.types threads math.rectangles fry libc

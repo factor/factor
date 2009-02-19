@@ -16,9 +16,9 @@ ARTICLE: "ui-pen-protocol" "UI pen protocol"
 "The default value of these slots is the " { $link f } " singleton, which implements the above protocol by doing nothing."
 $nl
 "Some other pre-defined implementations:"
-{ $vocab-subsection "ui.pens.gradient" }
-{ $vocab-subsection "ui.pens.image" }
-{ $vocab-subsection "ui.pens.polygon" }
-{ $vocab-subsection "ui.pens.solid" }
-{ $vocab-subsection "ui.pens.tile" }
+{ $vocab-subsection "Gradient pens" "ui.pens.gradient" }
+{ $vocab-subsection "Image pens" "ui.pens.image" }
+{ $vocab-subsection "Polygon pens" "ui.pens.polygon" }
+{ $vocab-subsection "Solid pens" "ui.pens.solid" }
+{ $vocab-subsection "Tile pens" "ui.pens.tile" }
 "Custom implementations must follow the guidelines set forth in " { $link "ui-paint-custom" } "." ;

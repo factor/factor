@@ -8,6 +8,8 @@ ui.gadgets.tracks ui.gestures ui.backend ui.render ui.text
 ui.text.private ;
 IN: ui
 
+<PRIVATE
+
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
 
@@ -72,10 +74,6 @@ M: world ungraft*
     [ handle>> (close-window) ]
     [ reset-world ] tri ;
 
-: find-window ( quot -- world )
-    windows get values
-    [ gadget-child swap call ] with find-last nip ; inline
-
 : init-ui ( -- )
     <dlist> \ graft-queue set-global
     <dlist> \ layout-queue set-global
@@ -134,8 +132,16 @@ SYMBOL: ui-thread
     t \ ui-running set-global
     [ f \ ui-running set-global ] [ ] cleanup ; inline
 
+PRIVATE>
+
+: find-window ( quot -- world )
+    windows get values
+    [ gadget-child swap call ] with find-last nip ; inline
+
 : ui-running? ( -- ? )
     \ ui-running get-global ;
+
+<PRIVATE
 
 : update-ui-loop ( -- )
     [ ui-running? ui-thread get-global self eq? and ]
@@ -145,6 +151,21 @@ SYMBOL: ui-thread
 : start-ui-thread ( -- )
     [ self ui-thread set-global update-ui-loop ]
     "UI update" spawn drop ;
+
+: start-ui ( quot -- )
+    call notify-ui-thread start-ui-thread ;
+
+: restore-windows ( -- )
+    [
+        windows get [ values ] [ delete-all ] bi
+        [ restore-world ] each
+        forget-rollover
+    ] (with-ui) ;
+
+: restore-windows? ( -- ? )
+    windows get empty? not ;
+
+PRIVATE>
 
 : open-world-window ( world -- )
     dup pref-dim >>dim dup relayout graft ;
@@ -166,25 +187,10 @@ HOOK: close-window ui-backend ( gadget -- )
 M: object close-window
     find-world [ ungraft ] when* ;
 
-: start-ui ( quot -- )
-    call notify-ui-thread start-ui-thread ;
-
 [
     f \ ui-running set-global
     <flag> ui-notify-flag set-global
 ] "ui" add-init-hook
-
-HOOK: (with-ui) ui-backend ( quot -- )
-
-: restore-windows ( -- )
-    [
-        windows get [ values ] [ delete-all ] bi
-        [ restore-world ] each
-        forget-rollover
-    ] (with-ui) ;
-
-: restore-windows? ( -- ? )
-    windows get empty? not ;
 
 : with-ui ( quot -- )
     ui-running? [ call ] [ '[ init-ui @ ] (with-ui) ] if ;

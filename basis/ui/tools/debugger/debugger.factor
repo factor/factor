@@ -42,7 +42,7 @@ M: restart-renderer row-columns
 
 PRIVATE>
 
-: <debugger> ( error continuation restarts restart-hook -- gadget )
+: <debugger> ( error continuation restarts restart-hook -- debugger )
     vertical debugger new-track
         { 3 3 } >>gap
         swap >>restart-hook

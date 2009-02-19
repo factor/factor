@@ -26,21 +26,6 @@ HELP: complex
 
 ABOUT: "complex-numbers"
 
-HELP: 2>rect
-{ $values { "x" "a complex number" } { "y" "a complex number" } { "xr" "real part of " { $snippet "x" } } { "xi" "imaginary part of " { $snippet "x" } } { "yr" "real part of " { $snippet "y" } } { "yi" "imaginary part of " { $snippet "y" } } }
-{ $description "Extracts real and imaginary components of two numbers at once." } ;
-
-HELP: complex/
-{ $values { "x" "a complex number" } { "y" "a complex number" } { "r" "a real number" } { "i" "a real number" } { "m" "a real number" } }
-{ $description
-    "Complex division kernel. If we use the notation from " { $link 2>rect } ", this word computes:"
-    { $code
-        "r = xr*yr+xi*yi"
-        "i = xi*yr-xr*yi"
-        "m = yr*yr+yi*yi"
-    }
-} ;
-
 HELP: <complex> ( x y -- z )
 { $values { "x" "a real number" } { "y" "a real number" } { "z" "a complex number" } }
 { $description "Low-level complex number constructor. User code should call " { $link rect> } " instead." } ;

@@ -3,7 +3,7 @@ IN: ui.tools.browser
 
 ARTICLE: "ui-browser" "UI browser"
 "The browser is used to display Factor code, documentation, and vocabularies. The browser is opened when a word or articlelink presentation is clicked. It can also be opened using words:"
-{ $subsection com-follow }
+{ $subsection com-browse }
 { $subsection browser-window }
 { $command-map browser-gadget "toolbar" }
 { $command-map browser-gadget "scrolling" }

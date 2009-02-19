@@ -2,7 +2,7 @@ USING: help.markup help.syntax strings quotations debugger
 namespaces ui.backend ui.gadgets ui.gadgets.worlds
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids
 ui.gadgets.private math.rectangles colors ui.text fonts
-kernel ;
+kernel ui.private ;
 IN: ui
 
 HELP: windows
@@ -88,13 +88,12 @@ ARTICLE: "building-ui" "Building user interfaces"
 
 ARTICLE: "gadgets" "Pre-made UI gadgets"
 { $subsection "ui.gadgets.labels" }
-{ $subsection "gadgets-polygons" }
 { $subsection "ui.gadgets.borders" }
 { $subsection "ui.gadgets.labeled" }
 { $subsection "ui.gadgets.buttons" }
 { $subsection "ui.gadgets.sliders" }
 { $subsection "ui.gadgets.scrollers" }
-{ $subsection "gadgets-editors" }
+{ $subsection "ui.gadgets.editors" }
 { $subsection "ui.gadgets.menus" }
 { $subsection "ui.gadgets.panes" }
 { $subsection "ui.gadgets.presentations" }

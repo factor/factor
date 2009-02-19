@@ -24,7 +24,7 @@ ARTICLE: "ui-listener" "UI listener"
 { $operations \ word }
 { $command-map interactor "quotation" }
 { $heading "Editing commands" }
-"The text editing commands are standard; see " { $link "gadgets-editors" } "."
+"The text editing commands are standard; see " { $link "ui.gadgets.editors" } "."
 { $heading "Implementation" }
 "Listeners are instances of " { $link listener-gadget } ". The listener consists of an output area (instance of " { $link pane } ") and an input area (instance of " { $link interactor } "). Clickable presentations can also be printed to the listener; see " { $link "ui-presentations" } "." ;
 
