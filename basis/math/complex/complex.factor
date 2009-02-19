@@ -7,41 +7,26 @@ IN: math.complex.private
 
 M: real real-part ;
 M: real imaginary-part drop 0 ;
-
 M: complex real-part real>> ;
 M: complex imaginary-part imaginary>> ;
-
 M: complex absq >rect [ sq ] bi@ + ;
-
-: 2>rect ( x y -- xr yr xi yi )
-    [ [ real-part ] bi@ ]
-    [ [ imaginary-part ] bi@ ] 2bi ; inline
-
-M: complex hashcode*
-    nip >rect [ hashcode ] bi@ bitxor ;
-
-M: complex equal?
-    over complex? [
-        2>rect = [ = ] [ 2drop f ] if
-    ] [ 2drop f ] if ;
-
-M: complex number=
-    2>rect number= [ number= ] [ 2drop f ] if ;
-
-: *re ( x y -- xr*yr xi*ri ) 2>rect [ * ] 2bi@ ; inline
-: *im ( x y -- xi*yr xr*yi ) 2>rect [ * swap ] dip * ; inline
-
-M: complex + 2>rect [ + ] 2bi@ (rect>) ;
-M: complex - 2>rect [ - ] 2bi@ (rect>) ;
+M: complex hashcode* nip >rect [ hashcode ] bi@ bitxor ;
+: componentwise ( x y quot -- a b ) [ [ >rect ] bi@ ] dip bi-curry@ bi* ; inline
+: complex= ( x y quot -- ? ) componentwise and ; inline
+M: complex equal? over complex? [ [ = ] complex= ] [ 2drop f ] if ;
+M: complex number= [ number= ] complex= ;
+: complex-op ( x y quot -- z ) componentwise (rect>) ; inline
+M: complex + [ + ] complex-op ;
+M: complex - [ - ] complex-op ;
+: *re ( x y -- xr*yr xi*yi ) [ >rect ] bi@ [ * ] bi-curry@ bi* ; inline
+: *im ( x y -- xi*yr xr*yi ) swap [ >rect ] bi@ swap [ * ] bi-curry@ bi* ; inline
 M: complex * [ *re - ] [ *im + ] 2bi (rect>) ;
-
-: complex/ ( x y -- r i m )
-    [ [ *re + ] [ *im - ] 2bi ] keep absq ; inline
-
-M: complex / complex/ [ / ] curry bi@ (rect>) ;
-
+: (complex/) ( x y -- r i m ) [ [ *re + ] [ *im - ] 2bi ] keep absq ; inline
+: complex/ ( x y quot -- z ) [ (complex/) ] dip curry bi@ (rect>) ; inline
+M: complex / [ / ] complex/ ;
+M: complex /f [ /f ] complex/ ;
+M: complex /i [ /i ] complex/ ;
 M: complex abs absq >float fsqrt ;
-
 M: complex sqrt >polar [ fsqrt ] [ 2.0 / ] bi* polar> ;
 
 IN: syntax
