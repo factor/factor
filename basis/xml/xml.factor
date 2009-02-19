@@ -4,7 +4,7 @@ USING: accessors arrays io io.encodings.binary io.files
 io.streams.string kernel namespaces sequences strings io.encodings.utf8
 xml.data xml.errors xml.elements ascii xml.entities
 xml.writer xml.state xml.autoencoding assocs xml.tokenize
-combinators.short-circuit xml.name splitting ;
+combinators.short-circuit xml.name splitting io.streams.byte-array ;
 IN: xml
 
 <PRIVATE
@@ -183,6 +183,9 @@ PRIVATE>
 
 : file>xml ( filename -- xml )
     binary <file-reader> read-xml ;
+
+: bytes>xml ( byte-array -- xml )
+    binary <byte-reader> read-xml ;
 
 : read-dtd ( stream -- dtd )
     [

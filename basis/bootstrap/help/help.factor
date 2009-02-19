@@ -5,12 +5,13 @@ IN: bootstrap.help
 
 : load-help ( -- )
     "help.lint" require
+    "tools.vocabs.browser" require
     "alien.syntax" require
     "compiler" require
 
     t load-help? set-global
 
-    [ drop ] load-vocab-hook [
+    [ vocab ] load-vocab-hook [
         dictionary get values
         [ docs-loaded?>> not ] filter
         [ load-docs ] each

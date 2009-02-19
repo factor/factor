@@ -9,7 +9,7 @@ IN: tools.files.windows
 
 M: windows (directory.) ( entries -- lines )
     <listing-tool>
-        { file-datetime directory-or-size file-name } >>specs
+        { +file-datetime+ +directory-or-size+ +file-name+ } >>specs
         { { directory-entry>> name>> <=> } } >>sort
     list-files ;
 

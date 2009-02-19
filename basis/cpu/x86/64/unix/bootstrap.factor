@@ -7,5 +7,5 @@ IN: bootstrap.x86
 : stack-frame-size ( -- n ) 4 bootstrap-cells ;
 : arg ( -- reg ) RDI ;
 
-<< "resource:basis/cpu/x86/64/bootstrap.factor" parse-file parsed >>
+<< "vocab:cpu/x86/64/bootstrap.factor" parse-file parsed >>
 call

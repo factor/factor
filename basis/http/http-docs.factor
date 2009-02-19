@@ -113,6 +113,12 @@ HELP: set-header
 { $notes "This word always returns the same object that was input. This allows for a “pipeline” coding style, where several header parameters are set in a row." }
 { $side-effects "request/response" } ;
 
+HELP: set-basic-auth
+{ $values { "request" request } { "username" string } { "password" string } }
+{ $description "Sets the " { $snippet "Authorization" } " header of " { $snippet "request" } " to perform HTTP Basic authentication with the given " { $snippet "username" } " and " { $snippet "password" } "." }
+{ $notes "This word always returns the same object that was input. This allows for a “pipeline” coding style, where several header parameters are set in a row." }
+{ $side-effects "request" } ;
+
 ARTICLE: "http.cookies" "HTTP cookies"
 "Every " { $link request } " and " { $link response } " instance can contain cookies."
 $nl

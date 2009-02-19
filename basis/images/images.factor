@@ -1,33 +1,56 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors grouping sequences combinators ;
+USING: kernel accessors grouping sequences combinators
+math specialized-arrays.direct.uint byte-arrays
+specialized-arrays.direct.ushort specialized-arrays.uint
+specialized-arrays.ushort specialized-arrays.float ;
 IN: images
 
-SINGLETONS: BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR ;
+SINGLETONS: BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR
+R16G16B16 R32G32B32 R16G16B16A16 R32G32B32A32 ;
 
-TUPLE: image dim component-order byte-order bitmap ;
+TUPLE: image dim component-order bitmap ;
 
 : <image> ( -- image ) image new ; inline
 
 GENERIC: load-image* ( path tuple -- image )
 
+: add-dummy-alpha ( seq -- seq' )
+    3 <sliced-groups>
+    [ 255 suffix ] map concat ;
+
+: normalize-floats ( byte-array -- byte-array )
+    byte-array>float-array [ 255.0 * >integer ] B{ } map-as ;
+
 : normalize-component-order ( image -- image )
     dup component-order>>
     {
         { RGBA [ ] }
-        { BGRA [
+        { R32G32B32A32 [
+            [ normalize-floats ] change-bitmap
+        ] }
+        { R32G32B32 [
+            [ normalize-floats add-dummy-alpha ] change-bitmap
+        ] }
+        { R16G16B16A16 [
+            [ byte-array>ushort-array [ -8 shift ] B{ } map-as ] change-bitmap
+        ] }
+        { R16G16B16 [
             [
-                [ 4 <sliced-groups> [ [ 0 3 ] dip <slice> reverse-here ] each ]
-                [ RGBA >>component-order ] bi
+                byte-array>ushort-array [ -8 shift ] B{ } map-as add-dummy-alpha
             ] change-bitmap
         ] }
-        { RGB [
-            [ 3 <sliced-groups> [ 255 suffix ] map concat ] change-bitmap
+        { BGRA [
+            [
+                4 <sliced-groups> dup [ 3 head-slice reverse-here ] each
+            ] change-bitmap
         ] }
+        { RGB [ [ add-dummy-alpha ] change-bitmap ] }
         { BGR [
             [
-                3 <sliced-groups> dup [ [ 0 3 ] dip <slice> reverse-here ] each
-                [ 255 suffix ] map concat
+                3 <sliced-groups>
+                [ [ 3 head-slice reverse-here ] each ]
+                [ add-dummy-alpha ] bi
             ] change-bitmap
         ] }
     } case
@@ -38,5 +61,6 @@ GENERIC: normalize-scan-line-order ( image -- image )
 M: image normalize-scan-line-order ;
 
 : normalize-image ( image -- image )
+    [ >byte-array ] change-bitmap
     normalize-component-order
     normalize-scan-line-order ;

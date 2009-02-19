@@ -7,7 +7,7 @@ GENERIC: foo
 
 M: integer foo + ;
 
-"resource:basis/tools/crossref/test/foo.factor" run-file
+"vocab:tools/crossref/test/foo.factor" run-file
 
 [ t ] [ integer \ foo method \ + usage member? ] unit-test
 [ t ] [ \ foo usage [ pathname? ] any? ] unit-test

@@ -57,6 +57,13 @@ HELP: with-system-random
 
 { with-random with-secure-random with-system-random } related-words
 
+HELP: randomize
+{ $values
+     { "seq" sequence }
+     { "seq" sequence }
+}
+{ $description "Randomizes a sequence in-place with the Fisher-Yates algorithm and returns the sequence." } ;
+
 HELP: delete-random
 { $values
      { "seq" sequence }
@@ -83,6 +90,8 @@ $nl
 { $subsection with-secure-random }
 "Implementation:"
 { $subsection "random-protocol" }
+"Randomizing a sequence:"
+{ $subsection randomize }
 "Deleting a random element from a sequence:"
 { $subsection delete-random } ;
 

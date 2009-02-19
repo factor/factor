@@ -3,7 +3,7 @@ IN: benchmark.crc32
 
 : crc32-file ( -- )
     10 [
-        "resource:basis/mime/multipart/multipart-tests.factor"
+        "vocab:mime/multipart/multipart-tests.factor"
         crc32 checksum-file drop
     ] times ;
 

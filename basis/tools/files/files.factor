@@ -35,9 +35,10 @@ IN: tools.files
 
 PRIVATE>
 
-SYMBOLS: file-name file-name/type permissions file-type nlinks file-size
-file-date file-time file-datetime uid gid user group link-target unix-datetime
-directory-or-size ;
+SYMBOLS: +file-name+ +file-name/type+ +permissions+ +file-type+
++nlinks+ +file-size+ +file-date+ +file-time+ +file-datetime+
++uid+ +gid+ +user+ +group+ +link-target+ +unix-datetime+
++directory-or-size+ ;
 
 TUPLE: listing-tool path specs sort ;
 
@@ -48,10 +49,10 @@ C: <file-listing> file-listing
 : <listing-tool> ( path -- listing-tool )
     listing-tool new
         swap >>path
-        { file-name } >>specs ;
+        { +file-name+ } >>specs ;
 
 : list-slow? ( listing-tool -- ? )
-    specs>> { file-name } sequence= not ;
+    specs>> { +file-name+ } sequence= not ;
 
 ERROR: unknown-file-spec symbol ;
 
@@ -59,12 +60,12 @@ HOOK: file-spec>string os ( file-listing spec -- string )
 
 M: object file-spec>string ( file-listing spec -- string )
     {
-        { file-name [ directory-entry>> name>> ] }
-        { directory-or-size [ file-info>> dir-or-size ] }
-        { file-size [ file-info>> size>> number>string ] }
-        { file-date [ file-info>> modified>> listing-date ] }
-        { file-time [ file-info>> modified>> listing-time ] }
-        { file-datetime [ file-info>> modified>> timestamp>ymdhms ] }
+        { +file-name+ [ directory-entry>> name>> ] }
+        { +directory-or-size+ [ file-info>> dir-or-size ] }
+        { +file-size+ [ file-info>> size>> number>string ] }
+        { +file-date+ [ file-info>> modified>> listing-date ] }
+        { +file-time+ [ file-info>> modified>> listing-time ] }
+        { +file-datetime+ [ file-info>> modified>> timestamp>ymdhms ] }
         [ unknown-file-spec ]
     } case ;
 
@@ -85,22 +86,22 @@ HOOK: (directory.) os ( path -- lines )
 
 : directory. ( path -- ) (directory.) simple-table. ;
 
-SYMBOLS: device-name mount-point type
-available-space free-space used-space total-space
-percent-used percent-free ;
+SYMBOLS: +device-name+ +mount-point+ +type+
++available-space+ +free-space+ +used-space+ +total-space+
++percent-used+ +percent-free+ ;
 
 : percent ( real -- integer ) 100 * >integer ; inline
 
 : file-system-spec ( file-system-info obj -- str )
     {
-        { device-name [ device-name>> "" or ] }
-        { mount-point [ mount-point>> "" or ] }
-        { type [ type>> "" or ] }
-        { available-space [ available-space>> 0 or ] }
-        { free-space [ free-space>> 0 or ] }
-        { used-space [ used-space>> 0 or ] }
-        { total-space [ total-space>> 0 or ] }
-        { percent-used [
+        { +device-name+ [ device-name>> "" or ] }
+        { +mount-point+ [ mount-point>> "" or ] }
+        { +type+ [ type>> "" or ] }
+        { +available-space+ [ available-space>> 0 or ] }
+        { +free-space+ [ free-space>> 0 or ] }
+        { +used-space+ [ used-space>> 0 or ] }
+        { +total-space+ [ total-space>> 0 or ] }
+        { +percent-used+ [
             [ used-space>> ] [ total-space>> ] bi
             [ 0 or ] bi@ dup 0 =
             [ 2drop 0 ] [ / percent ] if
@@ -116,8 +117,8 @@ percent-used percent-free ;
 
 : file-systems. ( -- )
     {
-        device-name available-space free-space used-space
-        total-space percent-used mount-point
+        +device-name+ +available-space+ +free-space+ +used-space+
+        +total-space+ +percent-used+ +mount-point+
     } print-file-systems ;
 
 {

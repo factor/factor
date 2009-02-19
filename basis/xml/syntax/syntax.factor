@@ -174,6 +174,8 @@ PRIVATE>
 : [XML
     "XML]" [ string>chunk ] parse-def ; parsing
 
+<PRIVATE
+
 : remove-blanks ( seq -- newseq )
     [ { [ string? not ] [ [ blank? ] all? not ] } 1|| ] filter ;
 
@@ -241,3 +243,5 @@ M: interpolated [undo-xml]
     [undo-xml] '[ H{ } clone [ _ bind ] keep >enum ] ;
 
 \ interpolate-xml 1 [ undo-xml ] define-pop-inverse
+
+PRIVATE>

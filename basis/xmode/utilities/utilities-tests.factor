@@ -47,6 +47,6 @@ TAGS>
         "PUBLIC"
     }
 ] [
-    "resource:basis/xmode/utilities/test.xml"
+    "vocab:xmode/utilities/test.xml"
     file>xml parse-company-tag
 ] unit-test

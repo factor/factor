@@ -3,7 +3,7 @@
 IN: xml.tests
 USING: kernel xml tools.test io namespaces make sequences
 xml.errors xml.entities.html parser strings xml.data io.files
-xml.traversal continuations assocs
+xml.traversal continuations assocs io.encodings.binary
 sequences.deep accessors io.streams.string ;
 
 ! This is insufficient
@@ -12,8 +12,14 @@ sequences.deep accessors io.streams.string ;
 \ string>xml must-infer
 
 SYMBOL: xml-file
-[ ] [ "resource:basis/xml/tests/test.xml"
-    [ file>xml ] with-html-entities xml-file set ] unit-test
+[ ] [
+    "vocab:xml/tests/test.xml"
+    [ file>xml ] with-html-entities xml-file set
+] unit-test
+[ t ] [
+    "vocab:xml/tests/test.xml" binary file-contents
+    [ bytes>xml ] with-html-entities xml-file get =
+] unit-test
 [ "1.0" ] [ xml-file get prolog>> version>> ] unit-test
 [ f ] [ xml-file get prolog>> standalone>> ] unit-test
 [ "a" ] [ xml-file get space>> ] unit-test
