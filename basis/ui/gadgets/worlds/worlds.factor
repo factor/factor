@@ -61,6 +61,9 @@ M: world focusable-child* gadget-child ;
 
 M: world children-on nip children>> ;
 
+M: world remove-gadget
+    2dup glass>> eq? [ 2drop ] [ call-next-method ] if ;
+
 : (draw-world) ( world -- )
     dup handle>> [
         {
