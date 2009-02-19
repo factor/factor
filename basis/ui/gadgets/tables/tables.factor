@@ -33,7 +33,7 @@ TUPLE: table < line-gadget
 { renderer initial: trivial-renderer }
 { action initial: [ drop ] }
 single-click?
-{ hook initial: [ ] }
+{ hook initial: [ drop ] }
 { gap initial: 2 }
 column-widths total-width
 focus-border-color
@@ -274,7 +274,7 @@ PRIVATE>
 
 : row-action ( table -- )
     dup selected-row
-    [ swap [ action>> call ] [ hook>> call ] bi ]
+    [ swap [ action>> call ] [ dup hook>> call ] bi ]
     [ 2drop ]
     if ;
 
@@ -336,7 +336,13 @@ PRIVATE>
 : show-table-menu ( table -- )
     [
         [ nip ]
-        [ [ nth-row drop ] [ renderer>> row-value ] [ hook>> ] tri ] 2bi
+        [ swap select-row ]
+        [
+            [ nth-row drop ]
+            [ renderer>> row-value ]
+            [ dup hook>> curry ]
+            tri
+        ] 2tri
         show-operations-menu
     ] [ drop ] if-mouse-row ;
 

@@ -231,11 +231,12 @@ PRIVATE>
         [ <radio-button> ] <radio-controls>
         { 5 5 } >>gap ;
 
-: command-button-quot ( gesture command -- quot )
-    '[ _ _ invoke-command drop ] ;
+: command-button-quot ( target command -- quot )
+    '[ _ _ invoke-command ] ;
 
 : <command-button> ( target gesture command -- button )
-    [ command-string swap ] keep command-button-quot <border-button> ;
+    [ command-string swap ] keep command-button-quot
+    '[ drop @ ] <border-button> ;
 
 : <toolbar> ( target -- toolbar )
     <shelf>

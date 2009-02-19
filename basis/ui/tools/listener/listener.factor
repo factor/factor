@@ -291,13 +291,11 @@ M: object accept-completion-hook 2drop ;
     [ history>> history-add drop ] [ control-value ] [ select-all ] tri
     [ parse-lines ] with-compilation-unit ;
 
-:: <debugger-popup> ( interactor error continuation -- popup )
-    error continuation error compute-restarts
-    [ interactor hide-glass ] <debugger>
-    "Error" <labeled-gadget> ;
+: <debugger-popup> ( error continuation -- popup )
+    over compute-restarts [ hide-glass ] <debugger> "Error" <labeled-gadget> ;
 
 : debugger-popup ( interactor error continuation -- )
-    [ [ drop one-line-elt ] 2keep ] dip <debugger-popup> show-listener-popup ;
+    [ one-line-elt ] 2dip <debugger-popup> show-listener-popup ;
 
 : handle-parse-error ( interactor error -- )
     dup lexer-error? [ 2dup go-to-error error>> ] when
@@ -360,7 +358,7 @@ interactor "completion" f {
 
 : listener-thread ( listener -- )
     dup listener-streams [
-        [ com-follow ] help-hook set
+        [ com-browse ] help-hook set
         '[ [ _ input>> ] 2dip debugger-popup ] error-hook set
         welcome.
         listener
@@ -384,7 +382,7 @@ interactor "completion" f {
         [ wait-for-listener ]
     } cleave ;
 
-: listener-help ( -- ) "ui-listener" com-follow ;
+: listener-help ( -- ) "ui-listener" com-browse ;
 
 \ listener-help H{ { +nullary+ t } } define-command
 
