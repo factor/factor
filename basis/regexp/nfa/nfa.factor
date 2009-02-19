@@ -3,14 +3,12 @@
 USING: accessors arrays assocs grouping kernel
 locals math namespaces sequences fry quotations
 math.order math.ranges vectors unicode.categories
-regexp.transition-tables words sets 
+regexp.transition-tables words sets hashtables
 unicode.case.private regexp.ast regexp.classes ;
 ! This uses unicode.case.private for ch>upper and ch>lower
 ! but case-insensitive matching should be done by case-folding everything
 ! before processing starts
 IN: regexp.nfa
-
-ERROR: feature-is-broken feature ;
 
 SYMBOL: negated?
 
@@ -21,14 +19,13 @@ SINGLETON: eps
 
 SYMBOL: option-stack
 
-SYMBOL: combine-stack
-
 SYMBOL: state
 
 : next-state ( -- state )
     state [ get ] [ inc ] bi ;
 
 SYMBOL: nfa-table
+: table ( -- table ) nfa-table get ;
 
 : set-each ( keys value hashtable -- )
     '[ _ swap _ set-at ] each ;
@@ -46,84 +43,56 @@ SYMBOL: nfa-table
 : option? ( obj -- ? )
     option-stack get assoc-stack ;
 
-: set-start-state ( -- nfa-table )
-    nfa-table get
-        combine-stack get pop first >>start-state ;
+GENERIC: nfa-node ( node -- start-state end-state )
 
-GENERIC: nfa-node ( node -- )
+:: add-simple-entry ( obj class -- start-state end-state )
+    next-state :> s0
+    next-state :> s1
+    negated? get [
+        s0 f obj class make-transition table add-transition
+        s0 s1 <default-transition> table add-transition
+    ] [
+        s0 s1 obj class make-transition table add-transition
+    ] if
+    s0 s1 ;
 
-:: add-simple-entry ( obj class -- )
-    [let* | s0 [ next-state ]
-            s1 [ next-state ]
-            stack [ combine-stack get ]
-            table [ nfa-table get ] |
-        negated? get [
-            s0 f obj class make-transition table add-transition
-            s0 s1 <default-transition> table add-transition
-        ] [
-            s0 s1 obj class make-transition table add-transition
-        ] if
-        s0 s1 2array stack push
-        t s1 table final-states>> set-at ] ;
+: epsilon-transition ( source target -- )
+    eps <literal-transition> table add-transition ;
 
-:: concatenate-nodes ( -- )
-    [let* | stack [ combine-stack get ]
-            table [ nfa-table get ]
-            s2 [ stack peek first ]
-            s3 [ stack pop second ]
-            s0 [ stack peek first ]
-            s1 [ stack pop second ] |
-        s1 s2 eps <literal-transition> table add-transition
-        s1 table final-states>> delete-at
-        s0 s3 2array stack push ] ;
+M:: star nfa-node ( node -- start end )
+    node term>> nfa-node :> s1 :> s0
+    next-state :> s2
+    next-state :> s3
+    s1 s0 epsilon-transition
+    s2 s0 epsilon-transition
+    s2 s3 epsilon-transition
+    s1 s3 epsilon-transition
+    s2 s3 ;
 
-:: alternate-nodes ( -- )
-    [let* | stack [ combine-stack get ]
-            table [ nfa-table get ]
-            s2 [ stack peek first ]
-            s3 [ stack pop second ]
-            s0 [ stack peek first ]
-            s1 [ stack pop second ]
-            s4 [ next-state ]
-            s5 [ next-state ] |
-        s4 s0 eps <literal-transition> table add-transition
-        s4 s2 eps <literal-transition> table add-transition
-        s1 s5 eps <literal-transition> table add-transition
-        s3 s5 eps <literal-transition> table add-transition
-        s1 table final-states>> delete-at
-        s3 table final-states>> delete-at
-        t s5 table final-states>> set-at
-        s4 s5 2array stack push ] ;
+M: epsilon nfa-node
+    drop eps literal-transition add-simple-entry ;
 
-M: star nfa-node ( node -- )
-    term>> nfa-node
-    [let* | stack [ combine-stack get ]
-            s0 [ stack peek first ]
-            s1 [ stack pop second ]
-            s2 [ next-state ]
-            s3 [ next-state ]
-            table [ nfa-table get ] |
-        s1 table final-states>> delete-at
-        t s3 table final-states>> set-at
-        s1 s0 eps <literal-transition> table add-transition
-        s2 s0 eps <literal-transition> table add-transition
-        s2 s3 eps <literal-transition> table add-transition
-        s1 s3 eps <literal-transition> table add-transition
-        s2 s3 2array stack push ] ;
+M: concatenation nfa-node ( node -- start end )
+    [ first>> ] [ second>> ] bi
+    reversed-regexp option? [ swap ] when
+    [ nfa-node ] bi@
+    [ epsilon-transition ] dip ;
 
-M: concatenation nfa-node ( node -- )
-    seq>> [ eps literal-transition add-simple-entry ] [
-        reversed-regexp option? [ <reversed> ] when
-        [ [ nfa-node ] each ]
-        [ length 1- [ concatenate-nodes ] times ] bi
-    ] if-empty ;
+:: alternate-nodes ( s0 s1 s2 s3 -- start end )
+    next-state :> s4
+    next-state :> s5
+    s4 s0 epsilon-transition
+    s4 s2 epsilon-transition
+    s1 s5 epsilon-transition
+    s3 s5 epsilon-transition
+    s4 s5 ;
 
-M: alternation nfa-node ( node -- )
-    seq>>
-    [ [ nfa-node ] each ]
-    [ length 1- [ alternate-nodes ] times ] bi ;
+M: alternation nfa-node ( node -- start end )
+    [ first>> ] [ second>> ] bi
+    [ nfa-node ] bi@
+    alternate-nodes ;
 
-M: integer nfa-node ( node -- )
+M: integer nfa-node ( node -- start end )
     case-insensitive option? [
         dup [ ch>lower ] [ ch>upper ] bi
         2dup = [
@@ -131,26 +100,26 @@ M: integer nfa-node ( node -- )
             literal-transition add-simple-entry
         ] [
             [ literal-transition add-simple-entry ] bi@
-            alternate-nodes drop
+            alternate-nodes [ nip ] dip
         ] if
     ] [
         literal-transition add-simple-entry
     ] if ;
 
-M: primitive-class nfa-node ( node -- )
+M: primitive-class nfa-node ( node -- start end )
     class>> dup
     { letter-class LETTER-class } member? case-insensitive option? and
     [ drop Letter-class ] when
     class-transition add-simple-entry ;
 
-M: any-char nfa-node ( node -- )
+M: any-char nfa-node ( node -- start end )
     [ dotall option? ] dip any-char-no-nl ?
     class-transition add-simple-entry ;
 
-M: negation nfa-node ( node -- )
+M: negation nfa-node ( node -- start end )
     negate term>> nfa-node negate ;
 
-M: range nfa-node ( node -- )
+M: range nfa-node ( node -- start end )
     case-insensitive option? [
         ! This should be implemented for Unicode by case-folding
         ! the input and all strings in the regexp.
@@ -169,15 +138,16 @@ M: range nfa-node ( node -- )
         class-transition add-simple-entry
     ] if ;
 
-M: with-options nfa-node ( node -- )
+M: with-options nfa-node ( node -- start end )
     dup options>> [ tree>> nfa-node ] using-options ;
 
 : construct-nfa ( ast -- nfa-table )
     [
         negated? off
-        V{ } clone combine-stack set
         0 state set
         <transition-table> clone nfa-table set
         nfa-node
-        set-start-state
+        table
+            swap dup associate >>final-states
+            swap >>start-state
     ] with-scope ;

@@ -4,14 +4,15 @@ USING: accessors combinators kernel math sequences strings sets
 assocs prettyprint.backend prettyprint.custom make lexer
 namespaces parser arrays fry locals regexp.minimize
 regexp.parser regexp.nfa regexp.dfa regexp.traversal
-regexp.transition-tables splitting sorting regexp.ast ;
+regexp.transition-tables splitting sorting regexp.ast
+regexp.negation ;
 IN: regexp
 
 TUPLE: regexp raw parse-tree options dfa ;
 
 : <optioned-regexp> ( string options -- regexp )
     [ dup parse-regexp ] [ string>options ] bi*
-    2dup <with-options> construct-nfa construct-dfa minimize
+    2dup <with-options> ast>dfa
     regexp boa ;
 
 : <regexp> ( string -- regexp ) "" <optioned-regexp> ;
