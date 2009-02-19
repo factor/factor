@@ -27,7 +27,7 @@ TUPLE: links-popup < wrapper ;
     '[ @ sorted-links ] <filter>
     link-renderer [ second ] <search-table>
         [ invoke-primary-operation ] >>action
-        dup '[ _ hide-glass ] >>hook
+        [ hide-glass ] >>hook
         t >>selection-required? ;
 
 : <links-popup> ( model quot title -- gadget )
