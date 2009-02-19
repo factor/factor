@@ -1,10 +1,10 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types arrays assocs cocoa kernel
-math cocoa.messages cocoa.subclassing cocoa.classes cocoa.views
-cocoa.application cocoa.pasteboard cocoa.types cocoa.windows
-sequences ui ui.gadgets ui.gadgets.private ui.gadgets.worlds ui.gestures
-core-foundation.strings core-graphics core-graphics.types
+USING: accessors alien alien.c-types arrays assocs cocoa kernel math
+cocoa.messages cocoa.subclassing cocoa.classes cocoa.views
+cocoa.application cocoa.pasteboard cocoa.types cocoa.windows sequences
+ui ui.private ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gestures core-foundation.strings core-graphics core-graphics.types
 threads combinators math.rectangles ;
 IN: ui.backend.cocoa.views
 

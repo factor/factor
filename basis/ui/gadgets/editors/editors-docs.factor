@@ -92,8 +92,8 @@ ARTICLE: "gadgets-editors-commands" "Editor gadget commands"
 { $command-map editor "selection" }
 { $command-map multiline-editor "multiline" } ;
 
-ARTICLE: "gadgets-editors" "Editor gadgets"
-"The " { $vocab-link "ui.gadgets.editors" } " vocabulary implements editor gadgets. An editor edits a passage of text."
+ARTICLE: "ui.gadgets.editors" "Editor gadgets"
+"The " { $vocab-link "ui.gadgets.editors" } " vocabulary implements editor gadgets. An editor edits a passage of text. Editors display a " { $link document } ". Editors are built from and inherit all features of " { $link "ui.gadgets.line-support" } "."
 { $subsection "gadgets-editors-commands" }
 "Editors:"
 { $subsection editor }
@@ -108,4 +108,4 @@ ARTICLE: "gadgets-editors" "Editor gadgets"
 "Editors edit " { $emphasis "documents" } ":"
 { $subsection "documents" } ;
 
-ABOUT: "gadgets-editors"
+ABOUT: "ui.gadgets.editors"

@@ -92,7 +92,7 @@ HELP: clear-doc
 { $side-effects "document" } ;
 
 ARTICLE: "documents" "Documents"
-"The " { $vocab-link "documents" } " vocabulary implements " { $emphasis "documents" } ", which are models storing a passage of text as a sequence of lines. Operations are defined for operating on subranges of the text, and " { $link "gadgets-editors" } " can display these models."
+"The " { $vocab-link "documents" } " vocabulary implements " { $emphasis "documents" } ", which are models storing a passage of text as a sequence of lines. Operations are defined for operating on subranges of the text, and " { $link "ui.gadgets.editors" } " can display these models."
 { $subsection document }
 { $subsection <document> }
 "Getting and setting the contents of the entire document:"
@@ -109,7 +109,7 @@ ARTICLE: "documents" "Documents"
 { $subsection each-line }
 { $subsection "document-locs" }
 { $subsection "documents.elements" }
-{ $see-also "gadgets-editors" } ;
+{ $see-also "ui.gadgets.editors" } ;
 
 ARTICLE: "document-locs" "Document locations"
 "Locations in the document are represented as a line/column number pair, with both indices being zero-based. There are some words for manipulating locations:"

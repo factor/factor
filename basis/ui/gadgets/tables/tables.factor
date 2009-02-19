@@ -38,7 +38,7 @@ single-click?
 column-widths total-width
 focus-border-color
 { mouse-color initial: COLOR: black }
-{ column-line-color initial: T{ rgba f 0 0 0 0 } }
+column-line-color
 selection-required?
 selected-index selected-value
 mouse-index
@@ -51,7 +51,8 @@ focused? ;
         swap >>model
         f <model> >>selected-value
         sans-serif-font >>font
-        focus-border-color >>focus-border-color ;
+        focus-border-color >>focus-border-color
+        transparent >>column-line-color ;
 
 <PRIVATE
 

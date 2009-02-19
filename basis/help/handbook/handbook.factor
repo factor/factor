@@ -288,6 +288,7 @@ $nl
 { $subsection "first-program" }
 { $subsection "handbook-language-reference" }
 { $subsection "handbook-environment-reference" }
+{ $subsection "ui" }
 { $subsection "handbook-library-reference" }
 "The below indices only include articles from loaded vocabularies. To explore more vocabularies, see " { $link "vocab-index" } "."
 { $subsection "article-index" }
