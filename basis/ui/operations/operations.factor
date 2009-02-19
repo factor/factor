@@ -45,8 +45,11 @@ operations [ <linked-hash> ] initialize
 : find-operation ( obj quot -- command )
     [ object-operations ] dip find-last nip ; inline
 
+: primary-operation? ( operation -- ? )
+    command>> +primary+ word-prop ;
+
 : primary-operation ( obj -- operation )
-    [ command>> +primary+ word-prop ] find-operation ;
+    [ primary-operation? ] find-operation ;
 
 : invoke-primary-operation ( obj -- )
     dup primary-operation invoke-command ;
