@@ -252,10 +252,14 @@ M: real tanh ftanh ;
 
 : -i* ( x -- y ) >rect swap neg rect> ;
 
-: asin ( x -- y )
+GENERIC: asin ( x -- y ) foldable
+
+M: number asin
     dup [-1,1]? [ fasin ] [ i* asinh -i* ] if ; inline
 
-: acos ( x -- y )
+GENERIC: acos ( x -- y ) foldable
+
+M: number acos
     dup [-1,1]? [ facos ] [ asin pi 2 / swap - ] if ;
     inline
 

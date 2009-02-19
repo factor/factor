@@ -6,6 +6,8 @@ math.order math.parser memoize multiline sequences splitting
 values hashtables io.binary ;
 IN: io.encodings.korean
 
+! TODO: migrate to common code-table parser (by Dan).
+
 SINGLETON: cp949
 
 cp949 "EUC-KR" register-encoding
