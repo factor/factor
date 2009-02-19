@@ -66,3 +66,7 @@ IN: io.pathnames.tests
 ] with-scope
 
 [ t ] [ cwd "misc" resource-path [ ] with-directory cwd = ] unit-test
+
+! Regression test for bug in file-extension
+[ f ] [ "/funny.directory/file-with-no-extension" file-extension ] unit-test
+[ "" ] [ "/funny.directory/file-with-no-extension." file-extension ] unit-test
