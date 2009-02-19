@@ -92,7 +92,7 @@ PRIVATE>
 
 : (fuel-word-synopsis) ( word usings -- str/f )
     [
-        [ vocab ] filter interactive-vocabs get append interactive-vocabs set
+        [ vocab ] filter interactive-vocabs [ append ] change
         fuel-find-word [ synopsis ] when*
     ] with-scope ;
 
