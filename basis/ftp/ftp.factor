@@ -4,8 +4,7 @@ USING: accessors arrays assocs combinators io io.files kernel
 math.parser sequences strings ;
 IN: ftp
 
-SINGLETON: active
-SINGLETON: passive
+SYMBOLS: +active+ +passive+ ;
 
 TUPLE: ftp-response n strings parsed ;
 
@@ -17,5 +16,3 @@ TUPLE: ftp-response n strings parsed ;
     over strings>> push ;
 
 : ftp-send ( string -- ) write "\r\n" write flush ;
-: ftp-ipv4 1 ; inline
-: ftp-ipv6 2 ; inline

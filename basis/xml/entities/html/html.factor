@@ -11,7 +11,7 @@ VALUE: html-entities
 
 : get-html ( -- table )
     { "lat1" "special" "symbol" } [
-        "resource:basis/xml/entities/html/xhtml-"
+        "vocab:xml/entities/html/xhtml-"
         swap ".ent" 3append read-entities-file
     ] map first3 assoc-union assoc-union ;
 

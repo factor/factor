@@ -136,7 +136,7 @@
   (fuel-syntax--second-word-regex '("&:" "SYMBOL:" "VAR:")))
 
 (defconst fuel-syntax--stack-effect-regex
-  "\\( ( .* )\\)\\|\\( (( .* ))\\)")
+  "\\( ( [^\n]* )\\)\\|\\( (( [^\n]* ))\\)")
 
 (defconst fuel-syntax--using-lines-regex "^USING: +\\([^;]+\\);")
 
@@ -239,6 +239,8 @@
     (modify-syntax-entry ?\r " " table)
     (modify-syntax-entry ?\  " " table)
     (modify-syntax-entry ?\n " " table)
+    (modify-syntax-entry ?\( "()" table)
+    (modify-syntax-entry ?\) ")(" table)
     table))
 
 (defconst fuel-syntax--syntactic-keywords
@@ -247,8 +249,6 @@
     ;; Comments:
     ("\\_<\\(#?!\\) .*\\(\n\\|$\\)" (1 "<") (2 ">"))
     ("\\_<\\(#?!\\)\\(\n\\|$\\)" (1 "<") (2 ">"))
-    (" \\((\\)( \\([^\n]*\\) )\\()\\)\\( \\|\n\\)" (1 "<b") (2 "w") (3 ">b"))
-    (" \\((\\) \\([^\n]*\\) \\()\\)\\( \\|\n\\)" (1 "<b") (2 "w") (3 ">b"))
     ;; Strings
     ("\\( \\|^\\)\\(DLL\\|P\\|SBUF\\)\\(\"\\)\\([^\n\r\f\\\"]\\|\\\\.\\)*?\\(\"\\)"
      (3 "\"") (5 "\""))

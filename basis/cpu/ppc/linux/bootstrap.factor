@@ -6,5 +6,5 @@ IN: bootstrap.ppc
 : c-area-size ( -- n ) 10 bootstrap-cells ;
 : lr-save ( -- n ) bootstrap-cell ;
 
-<< "resource:basis/cpu/ppc/bootstrap.factor" parse-file parsed >>
+<< "vocab:cpu/ppc/bootstrap.factor" parse-file parsed >>
 call

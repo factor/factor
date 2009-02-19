@@ -1,1 +1,1 @@
-OS and CPU queries, environment variables, paths
+OS and CPU queries and other system-level tasks

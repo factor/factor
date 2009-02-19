@@ -9,7 +9,7 @@ IN: bootstrap.stage1
 
 "Bootstrap stage 1..." print flush
 
-"resource:core/bootstrap/primitives.factor" run-file
+"vocab:bootstrap/primitives.factor" run-file
 
 load-help? off
 { "resource:core" } vocab-roots set
@@ -40,7 +40,7 @@ load-help? off
     "bootstrap.layouts" require
 
     [
-        "resource:basis/bootstrap/stage2.factor"
+        "vocab:bootstrap/stage2.factor"
         dup exists? [
             run-file
         ] [
