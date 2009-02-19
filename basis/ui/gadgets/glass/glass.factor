@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces ui.gadgets ui.gadgets.worlds
 ui.gadgets.wrappers ui.gestures math.rectangles
-math.rectangles.positioning combinators ;
+math.rectangles.positioning combinators vectors ;
 IN: ui.gadgets.glass
 
 GENERIC: hide-glass-hook ( gadget -- )
@@ -32,16 +32,15 @@ M: glass layout*
 
 M: glass ungraft* gadget-child hide-glass-hook ;
 
-: (hide-glass) ( gadget -- )
-    [ [ unparent ] when* f ] change-glass drop ;
-
 : add-glass ( glass world -- )
-    dup (hide-glass) swap [ add-gadget ] [ >>glass ] bi drop ;
+    [ swap add-gadget drop ] [ [ ?push ] change-layers drop ] 2bi ;
 
 PRIVATE>
 
 : hide-glass ( child -- )
-    find-world [ [ (hide-glass) ] [ request-focus ] bi ] when* ;
+    [ glass? ] find-parent
+    [ dup find-world [ unparent ] dip request-focus ]
+    when* ;
 
 : show-glass ( owner child visible-rect -- )
     <glass>
