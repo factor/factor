@@ -12,3 +12,5 @@ IN: math.dual.tests
 [ 1/2 -1/4 ] [ 2 1 <dual> 1 swap d/ unpack-dual ] unit-test
 [ 2 ] [ 1 1 <dual> 2 d^ epsilon-part>> ] unit-test
 [ 2.0 .25 ] [ 4 1 <dual> sqrt unpack-dual ] unit-test
+[ 2 -1 ] [ -2 1 <dual> dabs unpack-dual ] unit-test
+[ -2 -1 ] [ 2 1 <dual> dneg unpack-dual ] unit-test
