@@ -33,8 +33,8 @@ $nl
     { { $snippet { $emphasis "foo" } "*" } { "alternative form of " { $snippet "foo" } ", or a generic word called by " { $snippet "foo" } } { { $links at* pprint* } } }
     { { $snippet "(" { $emphasis "foo" } ")" } { "implementation detail word used by " { $snippet "foo" } } { { $link (clone) } } }
     { { $snippet "set-" { $emphasis "foo" } } { "sets " { $snippet "foo" } " to a new value" } { $links set-length } }
-    { { $snippet { $emphasis "foo" } ">>" } { "gets the " { $snippet "foo" } " slot of the tuple at the top of the stack; see " { $link "accessors" } } { { $link >>name } } }
-    { { $snippet ">>" { $emphasis "foo" } } { "sets the " { $snippet "foo" } " slot of the tuple at the top of the stack; see " { $link "accessors" } } { { $link name>> } } }
+    { { $snippet { $emphasis "foo" } ">>" } { "gets the " { $snippet "foo" } " slot of the tuple at the top of the stack; see " { $link "accessors" } } { { $link name>> } } }
+    { { $snippet ">>" { $emphasis "foo" } } { "sets the " { $snippet "foo" } " slot of the tuple at the top of the stack; see " { $link "accessors" } } { { $link >>name } } }
     { { $snippet "with-" { $emphasis "foo" } } { "performs some kind of initialization and cleanup related to " { $snippet "foo" } ", usually in a new dynamic scope" } { $links with-scope with-input-stream with-output-stream } }
     { { $snippet "$" { $emphasis "foo" } } { "help markup" } { $links $heading $emphasis } }
 }
