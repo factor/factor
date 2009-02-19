@@ -9,7 +9,7 @@ IN: ui.gadgets.worlds
 
 TUPLE: world < track
 active? focused?
-glass
+layers
 title status
 text-handle handle images
 window-loc ;
@@ -53,16 +53,20 @@ M: world request-focus-on ( child gadget -- )
 : <world> ( gadget title status -- world )
     world new-world ;
 
+: as-big-as-possible ( world gadget -- )
+    dup [ { 0 0 } >>loc over dim>> >>dim ] when 2drop ; inline
+
 M: world layout*
-    dup call-next-method
-    dup glass>> dup [ swap dim>> >>dim drop ] [ 2drop ] if ;
+    [ call-next-method ]
+    [ dup layers>> [ as-big-as-possible ] with each ] bi ;
 
 M: world focusable-child* gadget-child ;
 
 M: world children-on nip children>> ;
 
 M: world remove-gadget
-    2dup glass>> eq? [ 2drop ] [ call-next-method ] if ;
+    2dup layers>> memq?
+    [ layers>> delq ] [ call-next-method ] if ;
 
 : (draw-world) ( world -- )
     dup handle>> [
