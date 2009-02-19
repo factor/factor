@@ -197,7 +197,7 @@ M: method-renderer column-titles drop { "" "Method" "Count" } ;
             over <methods-tab> "Methods" add-tab
         1 track-add ;
 
-: profiler-help ( -- ) "ui-profiler" com-follow ;
+: profiler-help ( -- ) "ui-profiler" com-browse ;
 
 \ profiler-help H{ { +nullary+ t } } define-command
 

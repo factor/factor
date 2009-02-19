@@ -81,12 +81,12 @@ M: browser-gadget focusable-child* search-field>> ;
 
 \ browser-window H{ { +nullary+ t } } define-command
 
-: com-follow ( link -- )
+: com-browse ( link -- )
     [ browser-gadget? ] find-window
     [ [ raise-window ] [ gadget-child show-help ] bi ]
     [ (browser-window) ] if* ;
 
-: show-browser ( -- ) "handbook" com-follow ;
+: show-browser ( -- ) "handbook" com-browse ;
 
 \ show-browser H{ { +nullary+ t } } define-command
 
@@ -96,7 +96,7 @@ M: browser-gadget focusable-child* search-field>> ;
 
 : com-documentation ( browser -- ) "handbook" swap show-help ;
 
-: browser-help ( -- ) "ui-browser" com-follow ;
+: browser-help ( -- ) "ui-browser" com-browse ;
 
 \ browser-help H{ { +nullary+ t } } define-command
 
