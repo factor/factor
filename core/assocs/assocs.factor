@@ -38,7 +38,7 @@ M: assoc assoc-like drop ;
 : substituter ( assoc -- quot )
     [ dupd at* [ nip ] [ drop ] if ] curry ; inline
 
-: with-assoc ( assoc quot: ( value key -- assoc ) -- quot: ( key value -- ) )
+: with-assoc ( assoc quot: ( value key assoc -- ) -- quot: ( key value -- ) )
     curry [ swap ] prepose ; inline
 
 PRIVATE>
