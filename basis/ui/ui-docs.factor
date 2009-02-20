@@ -84,6 +84,7 @@ ARTICLE: "building-ui" "Building user interfaces"
 { $subsection "ui-layouts" }
 { $subsection "gadgets" }
 { $subsection "ui-windows" }
+{ $subsection "ui.gadgets.status-bar" }
 { $see-also "models" } ;
 
 ARTICLE: "gadgets" "Pre-made UI gadgets"
