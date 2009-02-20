@@ -7,9 +7,6 @@ IN: csv.tests
 : named-unit-test ( name output input -- ) 
   unit-test drop ; inline
 
-! tests nicked from the wikipedia csv article
-! http://en.wikipedia.org/wiki/Comma-separated_values
-
 "Fields are separated by commas"
 [ { { "1997" "Ford" "E350" } } ] 
 [ "1997,Ford,E350" <string-reader> csv ] named-unit-test
@@ -90,3 +87,5 @@ IN: csv.tests
     { { "writing,some,csv,tests" } } dup "csv-test2-"
     unique-file utf8 [ csv>file ] [ file>csv ] 2bi =
 ] unit-test
+
+[ { { "hello" "" "" "" "goodbye" "" } } ] [ "hello,,\"\",,goodbye," <string-reader> csv ] unit-test

@@ -4,25 +4,47 @@ USING: logging.server sequences namespaces concurrency.messaging
 words kernel arrays shuffle tools.annotations
 prettyprint.config prettyprint debugger io.streams.string
 splitting continuations effects generalizations parser strings
-quotations fry accessors ;
+quotations fry accessors math assocs math.order ;
 IN: logging
 
 SYMBOLS: DEBUG NOTICE WARNING ERROR CRITICAL ;
 
-: log-levels { DEBUG NOTICE NOTICE WARNING ERROR CRITICAL } ;
+SYMBOL: log-level
+
+log-level [ DEBUG ] initialize
+
+: log-levels ( -- assoc )
+    H{
+        { DEBUG 0 }
+        { NOTICE 10 }
+        { WARNING 20 }
+        { ERROR 30 }
+        { CRITICAL 40 }
+    } ;
+
+ERROR: undefined-log-level ;
+
+: log-level<=> ( log-level log-level -- ? )
+    [ log-levels at* [ undefined-log-level ] unless ] bi@ <=> ;
+
+: log? ( log-level -- ? )
+    log-level get log-level<=> +lt+ = not ;
 
 : send-to-log-server ( array string -- )
     prefix "log-server" get send ;
 
 SYMBOL: log-service
 
+ERROR: bad-log-message-parameters msg word level ;
+
 : check-log-message ( msg word level -- msg word level )
     3dup [ string? ] [ word? ] [ word? ] tri* and and
-    [ "Bad parameters to log-message" throw ] unless ; inline
+    [ bad-log-message-parameters ] unless ; inline
 
 : log-message ( msg word level -- )
     check-log-message
-    log-service get dup [
+    log-service get
+    2dup [ log? ] [ ] bi* and [
         [ [ string-lines ] [ name>> ] [ name>> ] tri* ] dip
         4array "log-message" send-to-log-server
     ] [
@@ -36,7 +58,7 @@ SYMBOL: log-service
     { } "close-logs" send-to-log-server ;
 
 : with-logging ( service quot -- )
-    log-service swap with-variable ; inline
+    [ log-service ] dip with-variable ; inline
 
 ! Aspect-oriented programming idioms
 

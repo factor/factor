@@ -14,15 +14,15 @@ IN: io.files.tests
 [
     "This is a line.\rThis is another line.\r"
 ] [
-    "resource:core/io/test/mac-os-eol.txt" latin1 <file-reader>
-    [ 500 read ] with-input-stream
+    "vocab:io/test/mac-os-eol.txt" latin1
+    [ 500 read ] with-file-reader
 ] unit-test
 
 [
     255
 ] [
-    "resource:core/io/test/binary.txt" latin1 <file-reader>
-    [ read1 ] with-input-stream >fixnum
+    "vocab:io/test/binary.txt" latin1
+    [ read1 ] with-file-reader >fixnum
 ] unit-test
 
 [ ] [
@@ -39,11 +39,11 @@ IN: io.files.tests
 ] [
     [
         "separator-test.txt" temp-file
-        latin1 <file-reader> [
+        latin1 [
             "J" read-until 2array ,
             "i" read-until 2array ,
             "X" read-until 2array ,
-        ] with-input-stream
+        ] with-file-reader
     ] { } make
 ] unit-test
 

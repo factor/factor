@@ -1,8 +1,8 @@
 IN: html.templates.chloe
-USING: help.markup help.syntax html.components html.forms
+USING: xml.data help.markup help.syntax html.components html.forms
 html.templates html.templates.chloe.syntax
 html.templates.chloe.compiler html.templates.chloe.components
-math xml.data strings quotations namespaces ;
+math strings quotations namespaces ;
 
 HELP: <chloe>
 { $values { "path" "a pathname string without the trailing " { $snippet ".xml" } " extension" } { "chloe" chloe } }
@@ -70,6 +70,7 @@ ARTICLE: "html.templates.chloe.tags.component" "Component Chloe tags"
     { { $snippet "t:field" }      { $link field } }
     { { $snippet "t:hidden" }     { $link hidden } }
     { { $snippet "t:html" }       { $link html } }
+    { { $snippet "t:xml" }        { $link xml } }
     { { $snippet "t:inspector" }  { $link inspector } }
     { { $snippet "t:label" }      { $link label } }
     { { $snippet "t:link" }       { $link link } }

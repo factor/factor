@@ -21,6 +21,12 @@ MACRO: reduce-outputs ( quot operation -- newquot )
 : sum-outputs ( quot -- n )
     [ + ] reduce-outputs ; inline
 
+MACRO: map-reduce-outputs ( quot mapper reducer -- newquot )
+    [ dup infer out>> ] 2dip
+    [ swap '[ _ _ napply ] ]
+    [ [ 1 [-] ] dip n*quot ] bi-curry* bi
+    '[ @ @ @ ] ;
+
 MACRO: append-outputs-as ( quot exemplar -- newquot )
     [ dup infer out>> ] dip '[ @ _ _ nappend-as ] ;
 

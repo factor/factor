@@ -1,4 +1,4 @@
-USING: kernel math.blas.vectors sequences tools.test ;
+USING: kernel math.blas.vectors math.functions sequences tools.test ;
 IN: math.blas.vectors.tests
 
 ! clone
@@ -126,11 +126,11 @@ unit-test
 
 ! Vnorm
 
-[ 5.0 ] [ svector{ 3.0 4.0 } Vnorm ] unit-test
-[ 5.0 ] [ dvector{ 3.0 4.0 } Vnorm ] unit-test
+[ t ] [ svector{ 3.0 4.0 } Vnorm 5.0 0.000001 ~ ] unit-test
+[ t ] [ dvector{ 3.0 4.0 } Vnorm 5.0 0.000001 ~ ] unit-test
 
-[ 13.0 ] [ cvector{ C{ 3.0 4.0 } 12.0 } Vnorm ] unit-test
-[ 13.0 ] [ zvector{ C{ 3.0 4.0 } 12.0 } Vnorm ] unit-test
+[ t ] [ cvector{ C{ 3.0 4.0 } 12.0 } Vnorm 13.0 0.000001 ~ ] unit-test
+[ t ] [ zvector{ C{ 3.0 4.0 } 12.0 } Vnorm 13.0 0.000001 ~ ] unit-test
 
 ! Vasum
 

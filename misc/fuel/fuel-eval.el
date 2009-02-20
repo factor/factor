@@ -77,7 +77,7 @@
         (t (error "Invalid 'in' (%s)" in))))
 
 (defsubst factor--fuel-usings (usings)
-  (cond ((null usings) :usings)
+  (cond ((or (null usings) (eq usings :usings)) :usings)
         ((eq usings t) nil)
         ((listp usings) `(:array ,@usings))
         (t (error "Invalid 'usings' (%s)" usings))))

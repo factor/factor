@@ -10,10 +10,10 @@ IN: unicode.breaks.tests
         dup last-grapheme head last-grapheme ] unit-test
 
 : grapheme-break-test ( -- filename )
-    "resource:basis/unicode/breaks/GraphemeBreakTest.txt" ;
+    "vocab:unicode/breaks/GraphemeBreakTest.txt" ;
 
 : word-break-test ( -- filename )
-    "resource:basis/unicode/breaks/WordBreakTest.txt" ;
+    "vocab:unicode/breaks/WordBreakTest.txt" ;
 
 : parse-test-file ( file-name -- tests )
     utf8 file-lines

@@ -22,7 +22,7 @@ ARTICLE: "slot-class-declaration" "Slot class declarations"
 ARTICLE: "slot-class-coercion" "Coercive slot declarations"
 "If the class of a slot is declared to be one of " { $link fixnum } " or " { $link float } ", then rather than testing values with the class predicate, writer words coerce values to the relevant type with " { $link >fixnum } " or " { $link >float } ". This may still result in error, but permits a wider range of values than a class predicate test. It also results in a possible loss of precision; for example, storing a large integer into a " { $link fixnum } " slot will silently overflow and discard high bits, and storing a ratio into a " { $link float } " slot may lose precision if the ratio is one which cannot be represented exactly with floating-point."
 $nl
-"This feature is mostly intended as an optimization for low-level code designed to avoid integer overflow, or where floating point precision is sufficient. Most code needs to work transparently with large integers, and thus hsould avoid the coercion behavior by using " { $link integer } " and " { $link real } " in place of " { $link fixnum } " and " { $link float } "." ;
+"This feature is mostly intended as an optimization for low-level code designed to avoid integer overflow, or where floating point precision is sufficient. Most code needs to work transparently with large integers, and thus should avoid the coercion behavior by using " { $link integer } " and " { $link real } " in place of " { $link fixnum } " and " { $link float } "." ;
 
 ARTICLE: "tuple-declarations" "Tuple slot declarations"
 "The slot specifier syntax of the " { $link POSTPONE: TUPLE: } " parsing word understands the following slot attributes:"
@@ -241,7 +241,7 @@ ARTICLE: "tuple-examples" "Tuple examples"
 }
 "An example of using a changer:"
 { $code
-    ": positions"
+    ": positions ( -- seq )"
     "    {"
     "        \"junior programmer\""
     "        \"senior programmer\""
