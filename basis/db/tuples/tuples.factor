@@ -3,7 +3,8 @@
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
 math.parser io prettyprint db.types continuations
-destructors mirrors sets db.types db.private ;
+destructors mirrors sets db.types db.private fry
+combinators.short-circuit ;
 IN: db.tuples
 
 HOOK: create-sql-statement db-connection ( class -- object )
@@ -29,7 +30,7 @@ GENERIC: eval-generator ( singleton -- object )
 
 : resulting-tuple ( exemplar-tuple row out-params -- tuple )
     rot class new [
-        [ [ slot-name>> ] dip set-slot-named ] curry 2each
+        '[ slot-name>> _ set-slot-named ] 2each
     ] keep ;
 
 : query-tuples ( exemplar-tuple statement -- seq )
@@ -98,33 +99,49 @@ M: query >query clone ;
 
 M: tuple >query <query> swap >>tuple ;
 
+ERROR: no-defined-persistent object ;
+
+: ensure-defined-persistent ( object -- object )
+    dup { [ class? ] [ "db-table" word-prop ] } 1&& [
+        no-defined-persistent
+    ] unless ;
+
 : create-table ( class -- )
+    ensure-defined-persistent
     create-sql-statement [ execute-statement ] with-disposals ;
 
 : drop-table ( class -- )
+    ensure-defined-persistent
     drop-sql-statement [ execute-statement ] with-disposals ;
 
 : recreate-table ( class -- )
+    ensure-defined-persistent
     [
-        [ drop-sql-statement [ execute-statement ] with-disposals
-        ] curry ignore-errors
+        '[
+            _ drop-sql-statement [ execute-statement ] with-disposals
+        ] ignore-errors
     ] [ create-table ] bi ;
 
-: ensure-table ( class -- ) [ create-table ] curry ignore-errors ;
+: ensure-table ( class -- )
+    ensure-defined-persistent
+    '[ _ create-table ] ignore-errors ;
 
 : ensure-tables ( classes -- ) [ ensure-table ] each ;
 
 : insert-tuple ( tuple -- )
-    dup class db-columns find-primary-key db-assigned-id-spec?
+    dup class ensure-defined-persistent
+    db-columns find-primary-key db-assigned-id-spec?
     [ insert-db-assigned-statement ] [ insert-user-assigned-statement ] if ;
 
 : update-tuple ( tuple -- )
-    dup class
+    dup class ensure-defined-persistent
     db-connection get update-statements>> [ <update-tuple-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
 : delete-tuples ( tuple -- )
-    dup dup class <delete-tuples-statement> [
+    dup
+    dup class ensure-defined-persistent
+    <delete-tuples-statement> [
         [ bind-tuple ] keep execute-statement
     ] with-disposal ;
 
@@ -132,8 +149,8 @@ M: tuple >query <query> swap >>tuple ;
     >query [ tuple>> ] [ query>statement ] bi do-select ;
 
 : select-tuple ( query/tuple -- tuple/f )
-    >query 1 >>limit [ tuple>> ] [ query>statement ] bi do-select
-    [ f ] [ first ] if-empty ;
+    >query 1 >>limit [ tuple>> ] [ query>statement ] bi
+    do-select [ f ] [ first ] if-empty ;
 
 : count-tuples ( query/tuple -- n )
     >query [ tuple>> ] [ <count-statement> ] bi do-count

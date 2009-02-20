@@ -1,6 +1,7 @@
 USING: io io.files io.files.temp io.directories io.launcher
 kernel namespaces prettyprint tools.test db.sqlite db sequences
-continuations db.types db.tuples unicode.case ;
+continuations db.types db.tuples unicode.case accessors arrays
+sorting ;
 IN: db.sqlite.tests
 
 : db-path ( -- path ) "test.db" temp-file ;
@@ -74,8 +75,9 @@ IN: db.sqlite.tests
     ] with-db
 ] unit-test
 
+[ \ swap ensure-table ] must-fail
+
 ! You don't need a primary key
-USING: accessors arrays sorting ;
 TUPLE: things one two ;
 
 things "THINGS" {
@@ -115,7 +117,7 @@ hi "HELLO" {
         1 <foo> insert-tuple
         f <foo> select-tuple
         1 1 <hi> insert-tuple
-        f <hi> select-tuple
+        f f <hi> select-tuple
         hi drop-table
         foo drop-table
     ] with-db
@@ -158,10 +160,9 @@ watch "WATCH" {
         show new insert-tuple
         show new select-tuple
         "littledan" f user boa select-tuple
+        swap [ username>> ] [ id>> ] bi*
         watch boa insert-tuple
         watch new select-tuple
         user>> f user boa select-tuple
     ] with-db
 ] unit-test
-
-[ \ swap ensure-table ] must-fail
