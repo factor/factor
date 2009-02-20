@@ -15,7 +15,8 @@ M: object default-emacsclient ( -- path ) "emacsclient" ;
         "--no-wait" ,
         number>string "+" prepend ,
         ,
-    ] { } make run-detached drop ;
+    ] { } make
+    os windows? [ run-detached drop ] [ try-process ] if ;
 
 : emacs ( word -- )
     where first2 emacsclient ;
