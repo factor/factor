@@ -32,6 +32,7 @@ $nl
 { $subsection >rgba-components }
 "Further topics:"
 { $subsection "colors.protocol" }
+{ $subsection "colors.constants" }
 { $vocab-subsection "Grayscale colors" "colors.gray" }
 { $vocab-subsection "HSV colors" "colors.hsv" } ;
 
