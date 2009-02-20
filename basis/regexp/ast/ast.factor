@@ -1,11 +1,8 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays accessors fry sequences ;
+USING: kernel arrays accessors fry sequences regexp.classes ;
 FROM: math.ranges => [a,b] ;
 IN: regexp.ast
-
-TUPLE: primitive-class class ;
-C: <primitive-class> primitive-class
 
 TUPLE: negation term ;
 C: <negation> negation
@@ -56,4 +53,4 @@ M: from-to <times>
     [ n>> ] [ m>> ] bi [a,b] swap '[ _ repetition ] map <alternation> ;
 
 : char-class ( ranges ? -- term )
-    [ <alternation> ] dip [ <negation> ] when ;
+    [ <or-class> ] dip [ <not-class> ] when ;

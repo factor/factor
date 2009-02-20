@@ -102,9 +102,7 @@ M: integer nfa-node ( node -- start end )
             [ literal-transition add-simple-entry ] bi@
             alternate-nodes [ nip ] dip
         ] if
-    ] [
-        literal-transition add-simple-entry
-    ] if ;
+    ] [ literal-transition add-simple-entry ] if ;
 
 M: primitive-class nfa-node ( node -- start end )
     class>> dup
@@ -112,12 +110,15 @@ M: primitive-class nfa-node ( node -- start end )
     [ drop Letter-class ] when
     class-transition add-simple-entry ;
 
+M: or-class nfa-node class-transition add-simple-entry ;
+M: not-class nfa-node class-transition add-simple-entry ;
+
 M: any-char nfa-node ( node -- start end )
     [ dotall option? ] dip any-char-no-nl ?
     class-transition add-simple-entry ;
 
-M: negation nfa-node ( node -- start end )
-    negate term>> nfa-node negate ;
+! M: negation nfa-node ( node -- start end )
+!     negate term>> nfa-node negate ;
 
 M: range nfa-node ( node -- start end )
     case-insensitive option? [
