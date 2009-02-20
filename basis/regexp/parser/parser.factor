@@ -132,11 +132,15 @@ Parenthized = "?:" Alternation:a => [[ a ]]
                 => [[ a on off parse-options <with-options> ]]
             | "?#" [^)]* => [[ f ]]
             | "?~" Alternation:a => [[ a <negation> ]]
+            | "?=" Alternation:a => [[ a <lookahead> ]]
+            | "?!" Alternation:a => [[ a <negation> <lookahead> ]]
+            | "?<=" Alternation:a => [[ a <lookbehind> ]]
+            | "?<!" Alternation:a => [[ a <negation> <lookbehind> ]]
             | Alternation
 
 Element = "(" Parenthized:p ")" => [[ p ]]
         | "[" CharClass:r "]" => [[ r ]]
-        | ".":d => [[ any-char ]]
+        | ".":d => [[ any-char <primitive-class> ]]
         | Character
 
 Number = (!(","|"}").)* => [[ string>number ensure-number ]]

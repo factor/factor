@@ -317,6 +317,22 @@ IN: regexp-tests
 ! Bug in parsing word
 [ t ] [ "a" R' a' matches? ] unit-test
 
+! Testing negation
+[ f ] [ "a" R/ (?~a)/ matches? ] unit-test
+[ t ] [ "aa" R/ (?~a)/ matches? ] unit-test
+[ t ] [ "bb" R/ (?~a)/ matches? ] unit-test
+[ t ] [ "" R/ (?~a)/ matches? ] unit-test
+
+[ f ] [ "a" R/ (?~a+|b)/ matches? ] unit-test
+[ f ] [ "aa" R/ (?~a+|b)/ matches? ] unit-test
+[ t ] [ "bb" R/ (?~a+|b)/ matches? ] unit-test
+[ f ] [ "b" R/ (?~a+|b)/ matches? ] unit-test
+[ t ] [ "" R/ (?~a+|b)/ matches? ] unit-test
+
+! Intersecting classes
+[ t ] [ "ab" R/ ac|\p{Lower}b/ matches? ] unit-test
+[ t ] [ "ab" R/ ac|[a-z]b/ matches? ] unit-test
+
 ! [ t ] [ "a" R/ ^a/ matches? ] unit-test
 ! [ f ] [ "\na" R/ ^a/ matches? ] unit-test
 ! [ f ] [ "\r\na" R/ ^a/ matches? ] unit-test

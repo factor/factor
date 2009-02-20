@@ -3,17 +3,26 @@
 USING: accessors arrays assocs grouping kernel
 locals math namespaces sequences fry quotations
 math.order math.ranges vectors unicode.categories
-regexp.transition-tables words sets hashtables
+regexp.transition-tables words sets hashtables combinators.short-circuit
 unicode.case.private regexp.ast regexp.classes ;
+IN: regexp.nfa
+
 ! This uses unicode.case.private for ch>upper and ch>lower
 ! but case-insensitive matching should be done by case-folding everything
 ! before processing starts
-IN: regexp.nfa
 
-SYMBOL: negated?
+GENERIC: remove-lookahead ( syntax-tree -- syntax-tree' )
+! This is unfinished and does nothing right now!
 
-: negate ( -- )
-    negated? [ not ] change ;
+M: object remove-lookahead ;
+
+M: with-options remove-lookahead
+    [ tree>> remove-lookahead ] [ options>> ] bi <with-options> ;
+
+M: alternation remove-lookahead
+    [ first>> ] [ second>> ] bi [ remove-lookahead ] bi@ ;
+
+M: concatenation remove-lookahead ;
 
 SINGLETON: eps
 
@@ -45,16 +54,9 @@ SYMBOL: nfa-table
 
 GENERIC: nfa-node ( node -- start-state end-state )
 
-:: add-simple-entry ( obj class -- start-state end-state )
-    next-state :> s0
-    next-state :> s1
-    negated? get [
-        s0 f obj class make-transition table add-transition
-        s0 s1 <default-transition> table add-transition
-    ] [
-        s0 s1 obj class make-transition table add-transition
-    ] if
-    s0 s1 ;
+: add-simple-entry ( obj class -- start-state end-state )
+    [ next-state next-state 2dup ] 2dip
+    make-transition table add-transition ;
 
 : epsilon-transition ( source target -- )
     eps <literal-transition> table add-transition ;
@@ -92,62 +94,66 @@ M: alternation nfa-node ( node -- start end )
     [ nfa-node ] bi@
     alternate-nodes ;
 
+GENERIC: modify-class ( char-class -- char-class' )
+
+M: object modify-class ;
+
+M: integer modify-class
+    case-insensitive option? [
+        dup Letter? [
+            [ ch>lower ] [ ch>upper ] bi 2array <or-class>
+        ] when
+    ] when ;
+
 M: integer nfa-node ( node -- start end )
+    modify-class dup class?
+    class-transition literal-transition ?
+    add-simple-entry ;
+
+M: primitive-class modify-class
+    class>> modify-class <primitive-class> ;
+
+M: or-class modify-class
+    seq>> [ modify-class ] map <or-class> ;
+
+M: not-class modify-class
+    class>> modify-class <not-class> ;
+
+M: any-char modify-class
+    [ dotall option? ] dip any-char-no-nl ? ;
+
+: modify-letter-class ( class -- newclass )
+    case-insensitive option? [ drop Letter-class ] when ;
+M: letter-class modify-class modify-letter-class ;
+M: LETTER-class modify-class modify-letter-class ;
+
+: cased-range? ( range -- ? )
+    [ from>> ] [ to>> ] bi {
+        [ [ letter? ] bi@ and ]
+        [ [ LETTER? ] bi@ and ]
+    } 2|| ;
+
+M: range modify-class
     case-insensitive option? [
-        dup [ ch>lower ] [ ch>upper ] bi
-        2dup = [
-            2drop
-            literal-transition add-simple-entry
-        ] [
-            [ literal-transition add-simple-entry ] bi@
-            alternate-nodes [ nip ] dip
-        ] if
-    ] [ literal-transition add-simple-entry ] if ;
-
-M: primitive-class nfa-node ( node -- start end )
-    class>> dup
-    { letter-class LETTER-class } member? case-insensitive option? and
-    [ drop Letter-class ] when
-    class-transition add-simple-entry ;
-
-M: or-class nfa-node class-transition add-simple-entry ;
-M: not-class nfa-node class-transition add-simple-entry ;
-
-M: any-char nfa-node ( node -- start end )
-    [ dotall option? ] dip any-char-no-nl ?
-    class-transition add-simple-entry ;
-
-! M: negation nfa-node ( node -- start end )
-!     negate term>> nfa-node negate ;
-
-M: range nfa-node ( node -- start end )
-    case-insensitive option? [
-        ! This should be implemented for Unicode by case-folding
-        ! the input and all strings in the regexp.
-        dup [ from>> ] [ to>> ] bi
-        2dup [ Letter? ] bi@ and [
-            rot drop
+        dup cased-range? [
+            [ from>> ] [ to>> ] bi
             [ [ ch>lower ] bi@ <range> ]
             [ [ ch>upper ] bi@ <range> ] 2bi 
-            [ class-transition add-simple-entry ] bi@
-            alternate-nodes
-        ] [
-            2drop
-            class-transition add-simple-entry
-        ] if
-    ] [
-        class-transition add-simple-entry
-    ] if ;
+            2array <or-class>
+        ] when
+    ] when ;
+
+M: class nfa-node
+    modify-class class-transition add-simple-entry ;
 
 M: with-options nfa-node ( node -- start end )
     dup options>> [ tree>> nfa-node ] using-options ;
 
 : construct-nfa ( ast -- nfa-table )
     [
-        negated? off
         0 state set
-        <transition-table> clone nfa-table set
-        nfa-node
+        <transition-table> nfa-table set
+        remove-lookahead nfa-node
         table
             swap dup associate >>final-states
             swap >>start-state
