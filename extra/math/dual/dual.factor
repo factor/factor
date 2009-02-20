@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Jason W. Merrill.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.functions math.derivatives accessors
-    macros words effects vocabs sequences generalizations fry
-    combinators.smart generic compiler.units ;
+    macros generic compiler.units words effects vocabs
+    sequences arrays assocs generalizations fry make
+    combinators.smart help help.markup ;
 
 IN: math.dual
 
@@ -48,6 +49,19 @@ MACRO: chain-rule ( word -- e )
     tri
     '[ [ @ _ @ ] sum-outputs ] ;
 
+: set-dual-help ( word dword -- ) 
+    [ swap
+        [ stack-effect [ in>> ] [ out>> ] bi append 
+            [ dual ] { } map>assoc { $values } prepend
+        ]
+        [ [ { $description } % "Version of " , 
+                   { $link } swap suffix , 
+                   " extended to work on dual numbers." , ] 
+            { } make
+        ]
+        bi* 2array
+    ] keep set-word-help ;
+
 PRIVATE>
 
 MACRO: dual-op ( word -- )
@@ -58,13 +72,11 @@ MACRO: dual-op ( word -- )
     '[ _ @ @ <dual> ] ;
 
 : define-dual ( word -- )
-    [ 
-        [ stack-effect ] 
-        [ name>> "d" prepend "math.dual" create ]
-        bi [ set-stack-effect ] keep
-    ]
-    keep
-    '[ _ dual-op ] define ;
+    dup name>> "d" prepend "math.dual" create
+    [ [ stack-effect ] dip set-stack-effect ]
+    [ set-dual-help ]
+    [ swap '[ _ dual-op ] define ]
+    2tri ;
 
 ! Specialize math functions to operate on dual numbers.
 [ all-words [ "derivative" word-prop ] filter
