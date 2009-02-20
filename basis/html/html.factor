@@ -15,7 +15,7 @@ IN: html
             </head>
             <body><-></body>
         </html>
-    XML> ; inline
+    XML> ;
 
 : render-error ( message -- xml )
     [XML <span class="error"><-></span> XML] ;

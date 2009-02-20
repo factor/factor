@@ -5,8 +5,8 @@ USING: accessors kernel io.sockets io.sockets.secure tools.test ;
 
 [ ] [
     <secure-config>
-        "resource:basis/openssl/test/server.pem" >>key-file
-        "resource:basis/openssl/test/dh1024.pem" >>dh-file
+        "vocab:openssl/test/server.pem" >>key-file
+        "vocab:openssl/test/dh1024.pem" >>dh-file
         "password" >>password
     [ ] with-secure-context
 ] unit-test

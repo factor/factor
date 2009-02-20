@@ -1,0 +1,1 @@
+Propagation for read-only tuple slots and array lengths

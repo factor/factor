@@ -423,7 +423,6 @@ PRIVATE>
 
 : (fortran-invoke) ( return library function parameters -- quot )
     {
-        [ 2drop nip set-fortran-abi ]
         [ 2nip [<fortran-result>] ]
         [ nip nip nip [fortran-args>c-args] ]
         [ [fortran-invoke] ]
@@ -431,7 +430,7 @@ PRIVATE>
     } 4 ncleave 4 nappend ;
 
 MACRO: fortran-invoke ( return library function parameters -- )
-    (fortran-invoke) ;
+    { [ 2drop nip set-fortran-abi ] [ (fortran-invoke) ] } 4 ncleave ;
 
 :: define-fortran-function ( return library function parameters -- )
     function create-in dup reset-generic 

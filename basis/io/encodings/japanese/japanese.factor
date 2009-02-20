@@ -44,10 +44,10 @@ TUPLE: jis assoc ;
 : make-jis ( filename -- jis )
     ascii file-lines process-jis <jis> ;
 
-"resource:basis/io/encodings/japanese/CP932.txt"
+"vocab:io/encodings/japanese/CP932.txt"
 make-jis to: windows-31j-table
 
-"resource:basis/io/encodings/japanese/sjis-0208-1997-std.txt"
+"vocab:io/encodings/japanese/sjis-0208-1997-std.txt"
 make-jis to: shift-jis-table
 
 : small? ( char -- ? )

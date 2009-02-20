@@ -30,5 +30,5 @@ IN: bootstrap.x86
     (JMP) drop
 ] rc-relative rt-primitive 1 jit-primitive jit-define
 
-<< "resource:basis/cpu/x86/bootstrap.factor" parse-file parsed >>
+<< "vocab:cpu/x86/bootstrap.factor" parse-file parsed >>
 call

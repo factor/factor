@@ -659,7 +659,7 @@ M: ppc %callback-value ( ctype -- )
 
 M: ppc small-enough? ( n -- ? ) -32768 32767 between? ;
 
-M: ppc struct-small-enough? ( size -- ? ) drop f ;
+M: ppc return-struct-in-registers? ( c-type -- ? ) drop f ;
 
 M: ppc %box-small-struct
     drop "No small structs" throw ;

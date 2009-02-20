@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io.backend io.streams.c init fry
 namespaces make assocs kernel parser lexer strings.parser vocabs
@@ -42,21 +42,21 @@ IN: tools.deploy.shaker
 : strip-debugger ( -- )
     strip-debugger? "debugger" vocab and [
         "Stripping debugger" show
-        "resource:basis/tools/deploy/shaker/strip-debugger.factor"
+        "vocab:tools/deploy/shaker/strip-debugger.factor"
         run-file
     ] when ;
 
 : strip-libc ( -- )
     "libc" vocab [
         "Stripping manual memory management debug code" show
-        "resource:basis/tools/deploy/shaker/strip-libc.factor"
+        "vocab:tools/deploy/shaker/strip-libc.factor"
         run-file
     ] when ;
 
 : strip-cocoa ( -- )
     "cocoa" vocab [
         "Stripping unused Cocoa methods" show
-        "resource:basis/tools/deploy/shaker/strip-cocoa.factor"
+        "vocab:tools/deploy/shaker/strip-cocoa.factor"
         run-file
     ] when ;
 
@@ -232,7 +232,6 @@ IN: tools.deploy.shaker
             "tools"
             "io.launcher"
             "random"
-            "compiler"
             "stack-checker"
             "bootstrap"
             "listener"
@@ -241,7 +240,7 @@ IN: tools.deploy.shaker
         strip-dictionary? [
             "libraries" "alien" lookup ,
 
-            { } { "cpu" } strip-vocab-globals %
+            { } { "cpu" "compiler" } strip-vocab-globals %
 
             {
                 gensym
@@ -359,12 +358,26 @@ IN: tools.deploy.shaker
 
 SYMBOL: deploy-vocab
 
-: set-boot-quot* ( word -- )
+: [:c] ( -- word ) ":c" "debugger" lookup ;
+
+: [print-error] ( -- word ) "print-error" "debugger" lookup ;
+
+: deploy-boot-quot ( word -- )
     [
-        \ boot ,
+        [ boot ] %
         init-hooks get values concat %
-        ,
-        strip-io? [ \ flush , ] unless
+        strip-debugger? [ , ] [
+            ! Don't reference try directly
+            [:c]
+            [print-error]
+            '[
+                [ _ execute ] [
+                    _ execute nl
+                    _ execute
+                ] recover
+            ] %
+        ] if
+        strip-io? [ [ flush ] % ] unless
         [ 0 exit ] %
     ] [ ] make
     set-boot-quot ;
@@ -380,7 +393,7 @@ SYMBOL: deploy-vocab
             dup next-method-quot "next-method-quot" set-word-prop
         ] assoc-each
     ] each
-    "resource:basis/tools/deploy/shaker/next-methods.factor" run-file ;
+    "vocab:tools/deploy/shaker/next-methods.factor" run-file ;
 
 : strip ( -- )
     init-stripper
@@ -392,7 +405,7 @@ SYMBOL: deploy-vocab
     strip-init-hooks
     strip-c-io
     f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
-    deploy-vocab get vocab-main set-boot-quot*
+    deploy-vocab get vocab-main deploy-boot-quot
     stripped-word-props
     stripped-globals strip-globals
     compress-byte-arrays
@@ -401,16 +414,33 @@ SYMBOL: deploy-vocab
     compress-wrappers
     strip-words ;
 
+: deploy-error-handler ( quot -- )
+    [
+        strip-debugger?
+        [ error-continuation get call>> callstack>array die ]
+        ! Don't reference these words literally, if we're stripping the
+        ! debugger out we don't want to load the prettyprinter at all
+        [ [:c] execute nl [print-error] execute flush ] if
+        1 exit
+    ] recover ; inline
+
 : (deploy) ( final-image vocab config -- )
     #! Does the actual work of a deployment in the slave
     #! stage2 image
     [
         [
+            strip-debugger? [
+                "debugger" require
+                "inspector" require
+            ] unless
             deploy-vocab set
             deploy-vocab get require
+            deploy-vocab get vocab-main [
+                "Vocabulary has no MAIN: word." print flush 1 exit
+            ] unless
             strip
             finish-deploy
-        ] [ error-continuation get call>> callstack>array die 1 exit ] recover
+        ] deploy-error-handler
     ] bind ;
 
 : do-deploy ( -- )
