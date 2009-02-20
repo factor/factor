@@ -234,6 +234,7 @@ $nl
 { $subsection "ui-paint" }
 { $subsection "ui-control-impl" }
 { $subsection "clipboard-protocol" }
+{ $subsection "ui.gadgets.line-support" }
 { $see-also "ui-layout-impl" } ;
 
 ARTICLE: "starting-ui" "Starting the UI"
