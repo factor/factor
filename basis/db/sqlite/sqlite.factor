@@ -348,7 +348,7 @@ M: sqlite-db-connection persistent-table ( -- assoc )
                 ] each
             ] bi
         ] each
-    ] call ;
+    ] call ; inline
 
 : sqlite-create-table ( sql-specs class-name -- )
     [
