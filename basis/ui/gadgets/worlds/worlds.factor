@@ -10,18 +10,24 @@ IN: ui.gadgets.worlds
 TUPLE: world < track
 active? focused?
 layers
-title status
+title status status-owner
 text-handle handle images
 window-loc ;
 
 : find-world ( gadget -- world/f ) [ world? ] find-parent ;
 
 : show-status ( string/f gadget -- )
-    find-world dup [
-        status>> dup [ set-model ] [ 2drop ] if
-    ] [ 2drop ] if ;
+    dup find-world dup [
+        dup status>> [
+            [ (>>status-owner) ] [ status>> set-model ] bi
+        ] [ 3drop ] if
+    ] [ 3drop ] if ;
 
-: hide-status ( gadget -- ) f swap show-status ;
+: hide-status ( gadget -- )
+    dup find-world dup [
+        [ status-owner>> eq? ] keep
+        '[ f _ [ (>>status-owner) ] [ status>> set-model ] 2bi ] when
+    ] [ 2drop ] if ;
 
 ERROR: no-world-found ;
 
