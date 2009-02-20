@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry kernel locals
 math math.order regexp.nfa regexp.transition-tables sequences
-sets sorting vectors sequences.deep ;
+sets sorting vectors sequences.deep math.functions regexp.classes ;
 USING: io prettyprint threads ;
 IN: regexp.dfa
 
@@ -16,6 +16,34 @@ IN: regexp.dfa
 
 : while-changes ( obj quot pred -- obj' )
     3dup nip call (while-changes) ; inline
+
+TUPLE: parts in out ;
+
+: make-partition ( choices classes -- partition )
+    zip [ first ] partition parts boa ;
+
+: powerset-partition ( classes -- partitions )
+    ! Here is where class algebra will happen, when I implement it
+    [ length [ 2^ ] keep ] keep '[
+        _ [ ] map-bits _ make-partition
+    ] map ;
+
+: partition>class ( parts -- class )
+    [ in>> ] [ out>> ] bi
+    [ <or-class> ] bi@ <not-class> 2array <and-class> ;
+
+: get-transitions ( partition state-transitions -- next-states )
+    [ in>> ] dip '[ at ] gather ;
+
+: disambiguate-overlap ( nfa -- nfa' )  
+    [
+        [
+            [ keys powerset-partition ] keep '[
+                [ partition>class ]
+                [ _ get-transitions ] bi
+            ] H{ } map>assoc
+        ] assoc-map
+    ] change-transitions ;
 
 : find-delta ( states transition nfa -- new-states )
     transitions>> '[ _ swap _ at at ] gather sift ;
@@ -72,6 +100,7 @@ IN: regexp.dfa
         swap find-start-state >>start-state ;
 
 : construct-dfa ( nfa -- dfa )
+    disambiguate-overlap
     dup initialize-dfa
     dup start-state>> 1vector
     H{ } clone

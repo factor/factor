@@ -18,7 +18,7 @@ SINGLETON: epsilon
 TUPLE: concatenation first second ;
 
 : <concatenation> ( seq -- concatenation )
-    epsilon [ concatenation boa ] reduce ;
+    [ epsilon ] [ unclip [ concatenation boa ] reduce ] if-empty ;
 
 TUPLE: alternation first second ;
 
@@ -54,3 +54,9 @@ M: from-to <times>
 
 : char-class ( ranges ? -- term )
     [ <or-class> ] dip [ <not-class> ] when ;
+
+TUPLE: lookahead term ;
+C: <lookahead> lookahead
+
+TUPLE: lookbehind term ;
+C: <lookbehind> lookbehind

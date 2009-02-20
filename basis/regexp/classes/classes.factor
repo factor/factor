@@ -4,28 +4,6 @@ USING: accessors kernel math math.order words
 ascii unicode.categories combinators.short-circuit sequences ;
 IN: regexp.classes
 
-: punct? ( ch -- ? )
-    "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" member? ;
-
-: c-identifier-char? ( ch -- ? )
-    { [ alpha? ] [ CHAR: _ = ] } 1|| ;
-
-: java-blank? ( ch -- ? )
-    {
-        CHAR: \s CHAR: \t CHAR: \n
-        HEX: b HEX: 7 CHAR: \r
-    } member? ;
-
-: java-printable? ( ch -- ? )
-    [ [ alpha? ] [ punct? ] ] 1|| ;
-
-: hex-digit? ( ch -- ? )
-    {
-        [ CHAR: A CHAR: F between? ]
-        [ CHAR: a CHAR: f between? ]
-        [ CHAR: 0 CHAR: 9 between? ]
-    } 1|| ;
-
 SINGLETONS: any-char any-char-no-nl
 letter-class LETTER-class Letter-class digit-class
 alpha-class non-newline-blank-class
@@ -70,15 +48,23 @@ M: ascii-class class-member? ( obj class -- ? )
 M: digit-class class-member? ( obj class -- ? )
     drop digit? ;
 
+: c-identifier-char? ( ch -- ? )
+    { [ alpha? ] [ CHAR: _ = ] } 1|| ;
+
 M: c-identifier-class class-member? ( obj class -- ? )
-    drop
-    { [ digit? ] [ Letter? ] [ CHAR: _ = ] } 1|| ;
+    drop c-identifier-char? ;
 
 M: alpha-class class-member? ( obj class -- ? )
     drop alpha? ;
 
+: punct? ( ch -- ? )
+    "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" member? ;
+
 M: punctuation-class class-member? ( obj class -- ? )
     drop punct? ;
+
+: java-printable? ( ch -- ? )
+    { [ alpha? ] [ punct? ] } 1|| ;
 
 M: java-printable-class class-member? ( obj class -- ? )
     drop java-printable? ;
@@ -89,8 +75,21 @@ M: non-newline-blank-class class-member? ( obj class -- ? )
 M: control-character-class class-member? ( obj class -- ? )
     drop control? ;
 
+: hex-digit? ( ch -- ? )
+    {
+        [ CHAR: A CHAR: F between? ]
+        [ CHAR: a CHAR: f between? ]
+        [ CHAR: 0 CHAR: 9 between? ]
+    } 1|| ;
+
 M: hex-digit-class class-member? ( obj class -- ? )
     drop hex-digit? ;
+
+: java-blank? ( ch -- ? )
+    {
+        CHAR: \s CHAR: \t CHAR: \n
+        HEX: b HEX: 7 CHAR: \r
+    } member? ;
 
 M: java-blank-class class-member? ( obj class -- ? )
     drop java-blank? ;
@@ -99,13 +98,7 @@ M: unmatchable-class class-member? ( obj class -- ? )
     2drop f ;
 
 M: terminator-class class-member? ( obj class -- ? )
-    drop {
-        [ CHAR: \r = ]
-        [ CHAR: \n = ]
-        [ CHAR: \u000085 = ]
-        [ CHAR: \u002028 = ]
-        [ CHAR: \u002029 = ]
-    } 1|| ;
+    drop "\r\n\u000085\u002029\u002028" member? ;
 
 M: beginning-of-line class-member? ( obj class -- ? )
     2drop f ;
@@ -119,6 +112,9 @@ C: <or-class> or-class
 TUPLE: not-class class ;
 C: <not-class> not-class
 
+: <and-class> ( classes -- class )
+    [ <not-class> ] map <or-class> <not-class> ;
+
 TUPLE: primitive-class class ;
 C: <primitive-class> primitive-class
 
@@ -130,3 +126,5 @@ M: not-class class-member?
 
 M: primitive-class class-member?
     class>> class-member? ;
+
+UNION: class primitive-class not-class or-class range ;
