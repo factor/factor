@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: regexp.nfa regexp.dfa regexp.minimize kernel sequences
-assocs regexp.classes hashtables accessors ;
+assocs regexp.classes hashtables accessors fry vectors
+regexp.ast regexp.transition-tables ;
 IN: regexp.negation
 
 : ast>dfa ( parse-tree -- minimal-dfa )
@@ -32,5 +33,29 @@ CONSTANT: fail-state -1
         [ add-fail-state ] change-transitions
         dup inverse-final-states >>final-states ;
 
-! M: negation nfa-node ( node -- )
-!     ast>dfa negate-table adjoin-dfa ;
+: renumber-transitions ( transitions numbering -- new-transitions )
+    dup '[
+        [ _ at ]
+        [ [ [ _ at ] map ] assoc-map ] bi*
+    ] assoc-map ;
+
+: renumber-states ( transition-table -- transition-table )
+    dup transitions>> keys [ next-state ] H{ } map>assoc
+    [ renumber-transitions ] rewrite-transitions ;
+
+: box-transitions ( transition-table -- transition-table )
+    [ [ [ 1vector ] assoc-map ] assoc-map ] change-transitions ;
+
+: unify-final-state ( transition-table -- transition-table )
+    dup [ final-states>> keys ] keep
+    '[ -1 eps <literal-transition> _ add-transition ] each
+    H{ { -1 -1 } } >>final-states ;
+
+: adjoin-dfa ( transition-table -- start end )
+    box-transitions unify-final-state renumber-states
+    [ start-state>> ]
+    [ final-states>> keys first ]
+    [ table [ transitions>> ] bi@ swap update ] tri ;
+
+M: negation nfa-node ( node -- start end )
+    term>> ast>dfa negate-table adjoin-dfa ;

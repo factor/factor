@@ -47,11 +47,11 @@ ERROR: bad-class name ;
         { CHAR: \\ [ CHAR: \\ ] }
 
         { CHAR: w [ c-identifier-class <primitive-class> ] }
-        { CHAR: W [ c-identifier-class <primitive-class> <negation> ] }
+        { CHAR: W [ c-identifier-class <primitive-class> <not-class> ] }
         { CHAR: s [ java-blank-class <primitive-class> ] }
-        { CHAR: S [ java-blank-class <primitive-class> <negation> ] }
+        { CHAR: S [ java-blank-class <primitive-class> <not-class> ] }
         { CHAR: d [ digit-class <primitive-class> ] }
-        { CHAR: D [ digit-class <primitive-class> <negation> ] }
+        { CHAR: D [ digit-class <primitive-class> <not-class> ] }
 
         [ ]
     } case ;

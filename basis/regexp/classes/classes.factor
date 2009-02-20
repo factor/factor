@@ -119,8 +119,14 @@ C: <or-class> or-class
 TUPLE: not-class class ;
 C: <not-class> not-class
 
+TUPLE: primitive-class class ;
+C: <primitive-class> primitive-class
+
 M: or-class class-member?
     seq>> [ class-member? ] with any? ;
 
 M: not-class class-member?
     class>> class-member? not ;
+
+M: primitive-class class-member?
+    class>> class-member? ;
