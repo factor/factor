@@ -223,13 +223,6 @@ M: sqlite-db-connection persistent-table ( -- assoc )
     "> interpolate
     ] with-string-writer ;
 
-: drop-insert-trigger ( -- string )
-    [
-        <"
-            DROP TRIGGER fki_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id;
-        "> interpolate
-    ] with-string-writer ;
-
 : update-trigger ( -- string )
     [
     <"
@@ -255,13 +248,6 @@ M: sqlite-db-connection persistent-table ( -- assoc )
     "> interpolate
     ] with-string-writer ;
 
-: drop-update-trigger ( -- string )
-    [
-        <"
-            DROP TRIGGER fku_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id;
-        "> interpolate
-    ] with-string-writer ;
-
 : delete-trigger-restrict ( -- string )
     [
     <"
@@ -274,13 +260,6 @@ M: sqlite-db-connection persistent-table ( -- assoc )
     "> interpolate
     ] with-string-writer ;
 
-: drop-delete-trigger-restrict ( -- string )
-    [
-        <"
-            DROP TRIGGER fkd_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id;
-        "> interpolate
-    ] with-string-writer ;
-
 : delete-trigger-cascade ( -- string )
     [
     <"
@@ -290,13 +269,6 @@ M: sqlite-db-connection persistent-table ( -- assoc )
             DELETE from ${table-name} WHERE ${table-id} = OLD.${foreign-table-id};
         END;
     "> interpolate
-    ] with-string-writer ;
-
-: drop-delete-trigger-cascade ( -- string )
-    [
-        <"
-            DROP TRIGGER fkd_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id;
-        "> interpolate
     ] with-string-writer ;
 
 : can-be-null? ( -- ? )
@@ -322,33 +294,22 @@ M: sqlite-db-connection persistent-table ( -- assoc )
         delete-trigger-restrict sqlite-trigger,
     ] if ;
 
-: drop-sqlite-triggers ( -- )
-    drop-insert-trigger sqlite-trigger,
-    drop-update-trigger sqlite-trigger,
-    delete-cascade? [
-        drop-delete-trigger-cascade sqlite-trigger,
-    ] [
-        drop-delete-trigger-restrict sqlite-trigger,
-    ] if ;
-
-: db-triggers ( sql-specs word -- )
-    '[
-        [ modifiers>> [ +foreign-id+ = ] deep-any? ] filter
+: create-db-triggers ( sql-specs -- )
+    [ modifiers>> [ +foreign-id+ = ] deep-any? ] filter
+    [
+        [ class>> db-table-name "db-table" set ]
         [
-            [ class>> db-table-name "db-table" set ]
+            [ "sql-spec" set ]
+            [ column-name>> "table-id" set ]
+            [ ] tri
+            modifiers>> [ [ +foreign-id+ = ] deep-any? ] filter
             [
-                [ "sql-spec" set ]
-                [ column-name>> "table-id" set ]
-                [ ] tri
-                modifiers>> [ [ +foreign-id+ = ] deep-any? ] filter
-                [
-                    [ second db-table-name "foreign-table-name" set ]
-                    [ third "foreign-table-id" set ] bi
-                    _ execute
-                ] each
-            ] bi
-        ] each
-    ] call ; inline
+                [ second db-table-name "foreign-table-name" set ]
+                [ third "foreign-table-id" set ] bi
+                create-sqlite-triggers
+            ] each
+        ] bi
+    ] each ;
 
 : sqlite-create-table ( sql-specs class-name -- )
     [
@@ -373,15 +334,12 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 
 M: sqlite-db-connection create-sql-statement ( class -- statement )
     [
-        ! specs name
         [ sqlite-create-table ]
-        [ drop \ create-sqlite-triggers db-triggers ] 2bi
+        [ drop create-db-triggers ] 2bi
     ] query-make ;
 
 M: sqlite-db-connection drop-sql-statement ( class -- statements )
-    [
-        nip "drop table " 0% 0% ";" 0%
-    ] query-make ;
+    [ nip "drop table " 0% 0% ";" 0% ] query-make ;
 
 M: sqlite-db-connection compound ( string seq -- new-string )
     over {
