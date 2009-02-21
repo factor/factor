@@ -78,6 +78,9 @@ M: integer year. ( n -- )
 M: timestamp year. ( timestamp -- )
     year>> year. ;
 
+: timestamp>mdtm ( timestamp -- str )
+    [ { YYYY MM DD hh mm ss } formatted ] with-string-writer ;
+
 : (timestamp>string) ( timestamp -- )
     { DAY ", " D " " MONTH " " YYYY " " hh ":" mm ":" ss } formatted ;
 

@@ -111,6 +111,7 @@ beast.
     | C-cC-ev         | edit vocabulary (fuel-edit-vocabulary)                     |
     | C-cC-ew         | edit word (fuel-edit-word-at-point)                        |
     | C-cC-ed         | edit word's doc (C-u M-x fuel-edit-word-doc-at-point)      |
+    | C-cC-el         | load vocabs in USING: form                                 |
     |-----------------+------------------------------------------------------------|
     | C-cC-er         | eval region                                                |
     | C-M-r, C-cC-ee  | eval region, extending it to definition boundaries         |
