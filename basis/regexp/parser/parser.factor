@@ -83,7 +83,7 @@ ERROR: bad-class name ;
 : options>string ( options -- string )
     [ on>> ] [ off>> ] bi
     [ [ option>ch ] map ] bi@
-    [ "-" swap 3append ] unless-empty
+    [ "-" glue ] unless-empty
     "" like ;
 
 ! TODO: add syntax for various parenthized things,
