@@ -235,7 +235,7 @@ HELP: arg
 
 HELP: >polar
 { $values { "z" number } { "abs" "a non-negative real number" } { "arg" "a number in the interval " { $snippet "(-pi,pi]" } } }
-{ $description "Creates a complex number from an absolute value and argument (polar form)." } ;
+{ $description "Converts a complex number into an absolute value and argument (polar form)." } ;
 
 HELP: cis
 { $values { "arg" "a real number" } { "z" "a complex number on the unit circle" } }
@@ -276,14 +276,6 @@ HELP: mod-inv
 { $examples
     { $example "USING: math.functions prettyprint ;" "173 1119 mod-inv ." "815" }
     { $example "USING: math prettyprint ;" "173 815 * 1119 mod ." "1" }
-} ;
-
-HELP: each-bit
-{ $values { "n" integer } { "quot" { $quotation "( ? -- )" } } }
-{ $description "Applies the quotation to each bit of the integer, starting from the least significant bit, and stopping at the last bit from which point on all bits are either clear (if the integer is positive) or all bits are set (if the integer is negataive)." }
-{ $examples
-    { $example "USING: math.functions make prettyprint ;" "[ BIN: 1101 [ , ] each-bit ] { } make ." "{ t f t t }" }
-    { $example "USING: math.functions make prettyprint ;" "[ -3 [ , ] each-bit ] { } make ." "{ t f }" }
 } ;
 
 HELP: ~

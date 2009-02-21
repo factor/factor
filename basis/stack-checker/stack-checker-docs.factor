@@ -56,7 +56,7 @@ ARTICLE: "inference-recursive" "Stack effects of recursive words"
 "When a recursive call is encountered, the declared stack effect is substituted in. When inference is complete, the inferred stack effect is compared with the declared stack effect."
 $nl
 "Attempting to infer the stack effect of a recursive word which outputs a variable number of objects on the stack will fail. For example, the following will throw an " { $link unbalanced-branches-error } ":"
-{ $code ": foo ( seq -- ) dup empty? [ drop ] [ dup pop foo ] if" "[ foo ] infer." }
+{ $code ": foo ( seq -- ) dup empty? [ drop ] [ dup pop foo ] if ;" "[ foo ] infer." }
 "If you declare an incorrect stack effect, inference will fail also. Badly defined recursive words cannot confuse the inferencer." ;
 
 ARTICLE: "inference-recursive-combinators" "Recursive combinator inference"

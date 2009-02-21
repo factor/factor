@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.functions sequences
+USING: arrays kernel math sequences accessors math.bits
 sequences.private words namespaces macros hints
 combinators fry io.binary combinators.smart ;
 IN: math.bitwise
@@ -65,7 +65,7 @@ DEFER: byte-bit-count
 
 \ byte-bit-count
 256 [
-    0 swap [ [ 1+ ] when ] each-bit
+    8 <bits> 0 [ [ 1+ ] when ] reduce
 ] B{ } map-as '[ HEX: ff bitand _ nth-unsafe ]
 (( byte -- table )) define-declared
 
