@@ -96,7 +96,7 @@ PRIVATE>
     texture new swap >>loc
     swap
     [ dim>> >>dim ] keep
-    [ dim>> { 0 0 } = ] keep '[
+    [ dim>> product 0 = ] keep '[
         _
         [ dim>> texture-coords >>texture-coords ]
         [ power-of-2-image make-texture >>texture ] bi
