@@ -8,3 +8,11 @@ ERROR: sql-error ;
 
 ERROR: table-exists ;
 ERROR: bad-schema ;
+
+ERROR: sql-syntax-error error ;
+
+ERROR: sql-table-exists table ;
+C: <sql-table-exists> sql-table-exists
+
+ERROR: sql-table-missing table ;
+C: <sql-table-missing> sql-table-missing
