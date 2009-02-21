@@ -27,8 +27,12 @@ TUPLE: links-popup < wrapper ;
     '[ @ sorted-links ] <filter>
     link-renderer [ second ] <search-table>
         [ invoke-primary-operation ] >>action
-        [ hide-glass ] >>hook
-        t >>selection-required? ;
+        [ drop ] >>hook ! hide-glass ] >>hook
+        t >>selection-required?
+        10 >>min-rows
+        10 >>max-rows
+        30 >>min-cols
+        30 >>max-cols ;
 
 : <links-popup> ( model quot title -- gadget )
     [ <links-table> COLOR: white <solid> >>interior ] dip
