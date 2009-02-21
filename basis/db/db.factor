@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations destructors kernel math
 namespaces sequences classes.tuple words strings
-tools.walker accessors combinators fry ;
+tools.walker accessors combinators fry db.errors ;
 IN: db
 
 <PRIVATE
@@ -77,7 +77,11 @@ GENERIC: bind-tuple ( tuple statement -- )
 GENERIC: execute-statement* ( statement type -- )
 
 M: object execute-statement* ( statement type -- )
-    drop query-results dispose ;
+    '[
+        _ _ drop query-results dispose
+    ] [
+        parse-db-error rethrow
+    ] recover ;
 
 : execute-one-statement ( statement -- )
     dup type>> execute-statement* ;
