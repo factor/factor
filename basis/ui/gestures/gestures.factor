@@ -84,6 +84,23 @@ delete-action select-all-action
 left-action right-action up-action down-action
 zoom-in-action zoom-out-action ;
 
+UNION: action
+undo-action redo-action
+cut-action copy-action paste-action
+delete-action select-all-action
+left-action right-action up-action down-action
+zoom-in-action zoom-out-action ;
+
+CONSTANT: action-gestures
+    {
+        { "z" undo-action }
+        { "Z" redo-action }
+        { "x" cut-action }
+        { "c" copy-action }
+        { "v" paste-action }
+        { "a" select-all-action }
+    }
+
 ! Modifiers
 SYMBOLS: C+ A+ M+ S+ ;
 
@@ -322,5 +339,15 @@ M: down-action gesture>string drop "Swipe down" ;
 M: zoom-in-action gesture>string drop "Zoom in" ;
 
 M: zoom-out-action gesture>string drop "Zoom out (pinch)" ;
+
+HOOK: action-modifier os ( -- mod )
+
+M: object action-modifier C+ ;
+M: macosx action-modifier A+ ;
+
+M: action gesture>string
+    action-gestures value-at
+    action-modifier 1array
+    swap f <key-down> gesture>string ;
 
 M: object gesture>string drop f ;

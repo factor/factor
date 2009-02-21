@@ -4,7 +4,7 @@ USING: accessors arrays assocs continuations kernel math models
 call namespaces opengl sequences io combinators
 combinators.short-circuit fry math.vectors math.rectangles cache
 ui.gadgets ui.gestures ui.render ui.text ui.text.private
-ui.backend ui.gadgets.tracks ;
+ui.backend ui.gadgets.tracks ui.commands ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < track
@@ -110,20 +110,20 @@ ui-error-hook [ [ rethrow ] ] initialize
         ] with-variable
     ] [ drop ] if ;
 
-world H{
-    { T{ key-down f { C+ } "z" } [ undo-action send-action ] }
-    { T{ key-down f { C+ } "Z" } [ redo-action send-action ] }
-    { T{ key-down f { C+ } "x" } [ cut-action send-action ] }
-    { T{ key-down f { C+ } "c" } [ copy-action send-action ] }
-    { T{ key-down f { C+ } "v" } [ paste-action send-action ] }
-    { T{ key-down f { C+ } "a" } [ select-all-action send-action ] }
+world
+action-gestures [
+    [ [ { C+ } ] dip f <key-down> ]
+    [ '[ _ send-action ] ]
+    bi*
+] H{ } assoc-map-as
+H{
     { T{ button-down f { C+ } 1 } [ drop T{ button-down f f 3 } button-gesture ] }
     { T{ button-down f { A+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
     { T{ button-down f { M+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
     { T{ button-up f { C+ } 1 } [ drop T{ button-up f f 3 } button-gesture ] }
     { T{ button-up f { A+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
     { T{ button-up f { M+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
-} set-gestures
+} assoc-union set-gestures
 
 PREDICATE: specific-button-up < button-up #>> ;
 PREDICATE: specific-button-down < button-down #>> ;

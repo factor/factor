@@ -369,11 +369,11 @@ editor "editing" f {
 : com-cut ( editor -- ) clipboard get editor-cut ;
 
 editor "clipboard" f {
-    { paste-action com-paste }
-    { copy-action com-copy }
     { cut-action com-cut }
-    { T{ button-up f f 2 } paste-selection }
+    { copy-action com-copy }
+    { paste-action com-paste }
     { T{ button-up } com-copy-selection }
+    { T{ button-up f f 2 } paste-selection }
 } define-command-map
 
 : previous-character ( editor -- )
