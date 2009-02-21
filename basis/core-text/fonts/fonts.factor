@@ -118,7 +118,7 @@ MEMO: (cache-font-metrics) ( font -- metrics )
         [ CTFontGetCapHeight >>cap-height ]
         [ CTFontGetXHeight >>x-height ]
     } cleave
-    dup compute-height ;
+    compute-height ;
 
 : cache-font-metrics ( font -- metrics )
     strip-font-colors (cache-font-metrics) ;

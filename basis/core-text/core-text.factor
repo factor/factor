@@ -48,22 +48,28 @@ ERROR: not-a-string object ;
 
 TUPLE: line font line metrics image loc dim disposed ;
 
-: compute-line-metrics ( open-font line -- line-metrics )
-    [
-        [ metrics new ] dip
-        [ CTFontGetCapHeight >>cap-height ]
-        [ CTFontGetXHeight >>x-height ]
-        bi
-    ] dip
+: typographic-bounds ( line -- width ascent descent leading )
     0 <CGFloat> 0 <CGFloat> 0 <CGFloat>
-    [ CTLineGetTypographicBounds ] 3keep
+    [ CTLineGetTypographicBounds ] 3keep [ *CGFloat ] tri@ ; inline
+
+: store-typographic-bounds ( metrics width ascent descent leading -- metrics )
     {
         [ >>width ]
-        [ *CGFloat >>ascent ]
-        [ *CGFloat >>descent ]
-        [ *CGFloat >>leading ]
-    } spread
-    dup compute-height ;
+        [ >>ascent ]
+        [ >>descent ]
+        [ >>leading ]
+    } spread ; inline
+
+: compute-font-metrics ( metrics font -- metrics )
+    [ CTFontGetCapHeight >>cap-height ]
+    [ CTFontGetXHeight >>x-height ]
+    bi ; inline
+
+: compute-line-metrics ( open-font line -- line-metrics )
+    [ metrics new ] 2dip
+    [ compute-font-metrics ]
+    [ typographic-bounds store-typographic-bounds ] bi*
+    compute-height ;
 
 : metrics>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi

@@ -60,8 +60,8 @@ italic?
 
 TUPLE: metrics width ascent descent height leading cap-height x-height ;
 
-: compute-height ( metrics -- )
-    dup [ ascent>> ] [ descent>> ] bi + >>height drop ;
+: compute-height ( metrics -- metrics )
+    dup [ ascent>> ] [ descent>> ] bi + >>height ; inline
 
 TUPLE: selection string start end color ;
 
