@@ -20,7 +20,7 @@ M: with-options remove-lookahead
     [ tree>> remove-lookahead ] [ options>> ] bi <with-options> ;
 
 M: alternation remove-lookahead
-    [ first>> ] [ second>> ] bi [ remove-lookahead ] bi@ ;
+    [ first>> ] [ second>> ] bi [ remove-lookahead ] bi@ alternation boa ;
 
 M: concatenation remove-lookahead ;
 
