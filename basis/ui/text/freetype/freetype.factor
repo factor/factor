@@ -18,8 +18,7 @@ M: freetype-renderer finish-text-rendering drop ;
 DEFER: init-freetype
 
 : freetype ( -- alien )
-    \ freetype get-global expired? [ init-freetype ] when
-    \ freetype get-global ;
+    \ freetype [ init-freetype ] initialize-alien ;
 
 TUPLE: freetype-font < identity-tuple
 ascent descent height handle widths ;
