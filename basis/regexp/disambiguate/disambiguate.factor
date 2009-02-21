@@ -1,4 +1,4 @@
-! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
+! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors regexp.classes math.bits assocs sequences
 arrays sets regexp.dfa math fry regexp.minimize ;

@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.order words combinators
+USING: accessors kernel math math.order words combinators locals
 ascii unicode.categories combinators.short-circuit sequences ;
+QUALIFIED-WITH: multi-methods m
 IN: regexp.classes
 
 SINGLETONS: any-char any-char-no-nl
@@ -106,37 +107,74 @@ M: beginning-of-line class-member? ( obj class -- ? )
 M: end-of-line class-member? ( obj class -- ? )
     2drop f ;
 
+M: f class-member? 2drop f ;
+
+TUPLE: primitive-class class ;
+C: <primitive-class> primitive-class
+
 TUPLE: or-class seq ;
 
 TUPLE: not-class class ;
 
 TUPLE: and-class seq ;
 
-TUPLE: primitive-class class ;
-C: <primitive-class> primitive-class
+m:GENERIC: combine-and ( class1 class2 -- combined ? )
+
+m:METHOD: combine-and { object object } 2drop f f ;
+
+m:METHOD: combine-and { integer integer }
+    2dup = [ drop t ] [ 2drop f t ] if ;
+
+m:METHOD: combine-and { t object }
+    nip t ;
+
+m:METHOD: combine-and { f object }
+    drop t ;
+
+m:METHOD: combine-and { integer object }
+    2dup class-member? [ drop t ] [ 2drop f t ] if ;
+
+m:GENERIC: combine-or ( class1 class2 -- combined ? )
+
+m:METHOD: combine-or { object object } 2drop f f ;
+
+m:METHOD: combine-or { integer integer }
+    2dup = [ drop t ] [ 2drop f f ] if ;
+
+m:METHOD: combine-or { t object }
+    drop t ;
+
+m:METHOD: combine-or { f object }
+    nip t ;
+
+m:METHOD: combine-or { integer object }
+    2dup class-member? [ nip t ] [ 2drop f f ] if ;
+
+: try-combine ( elt1 elt2 quot -- combined/f ? )
+    3dup call [ [ 3drop ] dip t ] [ drop swapd call ] if ; inline
+
+:: prefix-combining ( seq elt quot: ( elt1 elt2 -- combined/f ? ) -- newseq )
+    f :> combined!
+    seq [ elt quot try-combine swap combined! ] find drop
+    [ seq remove-nth combined prefix ]
+    [ seq elt prefix ] if* ; inline
+
+:: combine ( seq quot: ( elt1 elt2 -- combined/f ? ) empty class -- newseq )
+    seq { } [ quot prefix-combining ] reduce
+    dup length {
+        { 0 [ drop empty ] }
+        { 1 [ first ] }
+        [ drop class new swap >>seq ]
+    } case ; inline
 
 : <and-class> ( seq -- class )
-    t swap remove
-    f over member? [ drop f ] [
-        dup length {
-            { 0 [ drop t ] }
-            { 1 [ first ] }
-            [ drop and-class boa ]
-        } case
-    ] if ;
+    [ combine-and ] t and-class combine ;
 
 M: and-class class-member?
     seq>> [ class-member? ] with all? ;
 
 : <or-class> ( seq -- class )
-    f swap remove
-    t over member? [ drop t ] [
-        dup length {
-            { 0 [ drop f ] }
-            { 1 [ first ] }
-            [ drop or-class boa ]
-        } case
-    ] if ;
+    [ combine-or ] t or-class combine ;
 
 M: or-class class-member?
     seq>> [ class-member? ] with any? ;
