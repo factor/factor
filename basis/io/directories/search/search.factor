@@ -57,8 +57,14 @@ PRIVATE>
         pusher [ [ f ] compose iterate-directory drop ] dip
     ] [ drop f ] recover ; inline
 
+ERROR: file-not-found ;
+
 : find-in-directories ( directories bfs? quot: ( obj -- ? ) -- path'/f )
-    '[ _ _ find-file ] attempt-all ;
+    [
+        '[ _ _ find-file [ file-not-found ] unless* ] attempt-all
+    ] [
+        drop f
+    ] recover ;
 
 : find-all-in-directories ( directories bfs? quot: ( obj -- ? ) -- paths/f )
     '[ _ _ find-all-files ] map concat ;
