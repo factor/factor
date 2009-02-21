@@ -281,10 +281,10 @@ HOOK: modifiers>string os ( modifiers -- string )
 M: macosx modifiers>string
     [
         {
-            { A+ [ "⌘" ] }
-            { M+ [ "⎇" ] }
-            { S+ [ "⇧" ] }
-            { C+ [ "⌃" ] }
+            { A+ [ "\u{place-of-interest-sign}" ] }
+            { M+ [ "\u{option-key}" ] }
+            { S+ [ "\u{upwards-white-arrow}" ] }
+            { C+ [ "\u{up-arrowhead}" ] }
         } case
     ] map "" join ;
 
