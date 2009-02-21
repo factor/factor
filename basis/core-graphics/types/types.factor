@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax kernel layouts math ;
+USING: alien.c-types alien.syntax kernel layouts
+math math.rectangles arrays ;
 IN: core-graphics.types
 
 << cell 4 = "float" "double" ? "CGFloat" typedef >>
@@ -32,6 +33,17 @@ C-STRUCT: CGSize
 C-STRUCT: CGRect
     { "CGPoint" "origin" }
     { "CGSize"  "size"   } ;
+
+: CGPoint>loc ( CGPoint -- loc )
+    [ CGPoint-x ] [ CGPoint-y ] bi 2array ;
+
+: CGSize>dim ( CGSize -- dim )
+    [ CGSize-w ] [ CGSize-h ] bi 2array ;
+
+: CGRect>rect ( CGRect -- rect )
+    [ CGRect-origin CGPoint>loc ]
+    [ CGRect-size CGSize>dim ]
+    bi <rect> ; inline
 
 : CGRect-x ( CGRect -- x )
     CGRect-origin CGPoint-x ; inline

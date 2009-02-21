@@ -169,11 +169,12 @@ TUPLE: selected-line start end first? last? ;
         '[ [ _ _ ] keep _ start/end-on-line 2array ] H{ } map>assoc
     ] [ drop f ] if ;
 
-:: draw-empty-selection ( line pair editor -- )
-    editor font>> :> font
-    pair first font line offset>x 0 2array [
+:: draw-selection ( line pair editor -- )
+    pair [ editor font>> line offset>x ] map :> pair
+    pair first 0 2array [
         editor selection-color>> gl-color
-        1 font font-metrics height>> 2array gl-fill-rect
+        pair second pair first - round 1 max
+        editor line-height 2array gl-fill-rect
     ] with-translation ;
 
 : draw-unselected-line ( line editor -- )
@@ -181,10 +182,13 @@ TUPLE: selected-line start end first? last? ;
 
 : draw-selected-line ( line pair editor -- )
     over all-equal? [
-        [ nip draw-unselected-line ] [ draw-empty-selection ] 3bi
+        [ nip draw-unselected-line ] [ draw-selection ] 3bi
     ] [
-        [ [ first2 ] [ selection-color>> ] bi* <selection> ] keep
-        draw-unselected-line
+        [ draw-selection ]
+        [
+            [ [ first2 ] [ selection-color>> ] bi* <selection> ] keep
+            draw-unselected-line
+        ] 3bi
     ] if ;
 
 M: editor draw-line ( line index editor -- )
@@ -197,7 +201,8 @@ M: editor draw-gadget*
     ] with-variable ;
 
 M: editor pref-dim*
-    [ font>> ] [ control-value ] bi text-dim ;
+    ! Add some space for the caret.
+    [ font>> ] [ control-value ] bi text-dim { 1 0 } v+ ;
 
 M: editor baseline font>> font-metrics ascent>> ;
 

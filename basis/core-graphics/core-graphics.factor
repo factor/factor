@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.destructors alien.syntax accessors
+USING: alien alien.c-types alien.destructors alien.syntax accessors
 destructors fry kernel math math.bitwise sequences libc colors
 images core-graphics.types core-foundation.utilities ;
 IN: core-graphics
@@ -117,8 +117,8 @@ FUNCTION: void* CGBitmapContextGetData ( CGContextRef c ) ;
 : bitmap-color-space ( -- color-space )
     CGColorSpaceCreateDeviceRGB &CGColorSpaceRelease ;
 
-: <CGBitmapContext> ( dim -- context )
-    [ malloc-bitmap-data ] [ first2 8 ] [ first 4 * ] tri
+: <CGBitmapContext> ( data dim -- context )
+    [ first2 8 ] [ first 4 * ] bi
     bitmap-color-space bitmap-flags CGBitmapContextCreate
     [ "CGBitmapContextCreate failed" throw ] unless* ;
 
@@ -134,8 +134,13 @@ FUNCTION: void* CGBitmapContextGetData ( CGContextRef c ) ;
 
 PRIVATE>
 
+: dummy-context ( -- context )
+    \ dummy-context [
+        [ 4 malloc { 1 1 } <CGBitmapContext> ] with-destructors
+    ] initialize-alien ;
+
 : make-bitmap-image ( dim quot -- image )
     [
-        [ [ <CGBitmapContext> &CGContextRelease ] keep ] dip
+        [ [ [ malloc-bitmap-data ] keep <CGBitmapContext> &CGContextRelease ] keep ] dip
         [ nip call ] [ drop [ bitmap-data ] keep <bitmap-image> ] 3bi
     ] with-destructors ; inline

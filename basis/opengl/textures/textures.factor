@@ -9,7 +9,7 @@ IN: opengl.textures
 
 : delete-texture ( id -- ) [ glDeleteTextures ] (delete-gl-object) ;
 
-TUPLE: texture texture-coords texture display-list disposed ;
+TUPLE: texture loc dim texture-coords texture display-list disposed ;
 
 <PRIVATE
 
@@ -72,10 +72,12 @@ M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8 ;
         GL_TEXTURE_BIT [
             GL_TEXTURE_COORD_ARRAY [
                 COLOR: white gl-color
-                [ [ GL_TEXTURE_2D ] dip texture>> glBindTexture ]
-                [ init-texture texture-coords>> gl-texture-coord-pointer ] bi
-                fill-rect-vertices (gl-fill-rect)
-                GL_TEXTURE_2D 0 glBindTexture
+                dup loc>> [
+                    [ [ GL_TEXTURE_2D ] dip texture>> glBindTexture ]
+                    [ init-texture texture-coords>> gl-texture-coord-pointer ] bi
+                    fill-rect-vertices (gl-fill-rect)
+                    GL_TEXTURE_2D 0 glBindTexture
+                ] with-translation
             ] do-enabled-client-state
         ] do-attribs
     ] do-enabled ;
@@ -85,19 +87,21 @@ M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8 ;
     { { 0 0 } { 1 0 } { 1 1 } { 0 1 } } [ v* ] with map
     float-array{ } join ;
 
-: make-texture-display-list ( dim texture -- dlist )
-    GL_COMPILE [ draw-textured-rect ] make-dlist ;
+: make-texture-display-list ( texture -- dlist )
+    GL_COMPILE [ [ dim>> ] keep draw-textured-rect ] make-dlist ;
 
 PRIVATE>
 
-: <texture> ( image -- texture )
-    dup dim>> { 0 0 } = [ drop texture new ] [
-        [ dim>> ]
-        [ dim>> texture-coords ]
-        [ power-of-2-image make-texture ] tri
-        f f texture boa
-        [ nip ] [ make-texture-display-list ] 2bi >>display-list
-    ] if ;
+: <texture> ( image loc -- texture )
+    texture new swap >>loc
+    swap
+    [ dim>> >>dim ] keep
+    [ dim>> { 0 0 } = ] keep '[
+        _
+        [ dim>> texture-coords >>texture-coords ]
+        [ power-of-2-image make-texture >>texture ] bi
+        dup make-texture-display-list >>display-list
+    ] unless ;
 
 M: texture dispose*
     [ texture>> [ delete-texture ] when* ]

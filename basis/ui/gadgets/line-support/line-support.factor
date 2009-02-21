@@ -21,7 +21,7 @@ M: line-gadget line-leading font>> font-metrics leading>> ;
 
 GENERIC: line-height ( gadget -- n )
 
-M: line-gadget line-height font>> font-metrics height>> ;
+M: line-gadget line-height font>> font-metrics height>> ceiling ;
 
 : y>line ( y gadget -- n ) line-height /i ;
 

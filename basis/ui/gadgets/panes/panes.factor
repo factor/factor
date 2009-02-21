@@ -213,8 +213,12 @@ MEMO: specified-font ( assoc -- font )
 : apply-image-style ( style gadget -- style gadget )
     image [ nip <image-name> <icon> ] apply-style ;
 
+: apply-background-style ( style gadget -- style gadget )
+    background [ <solid> >>interior ] apply-style ;
+
 : style-label ( style gadget -- gadget )
     apply-font-style
+    apply-background-style
     apply-presentation-style
     apply-image-style
     nip ; inline

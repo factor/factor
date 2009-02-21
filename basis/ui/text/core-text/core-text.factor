@@ -15,7 +15,7 @@ M: core-text-renderer init-text-rendering
 
 M: core-text-renderer string-dim
     [ " " string-dim { 0 1 } v* ]
-    [ cached-line image>> dim>> ]
+    [ cached-line dim>> ]
     if-empty ;
 
 M: core-text-renderer finish-text-rendering
@@ -24,7 +24,7 @@ M: core-text-renderer finish-text-rendering
 
 : rendered-line ( font string -- texture )
     world get text-handle>>
-    [ cached-line image>> <texture> ]
+    [ cached-line [ image>> ] [ loc>> ] bi <texture> ]
     2cache ;
 
 M: core-text-renderer draw-string ( font string -- )

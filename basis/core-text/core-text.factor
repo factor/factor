@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien alien.c-types alien.syntax kernel destructors
 accessors fry words hashtables strings sequences memoize assocs math
-math.functions locals init namespaces combinators fonts colors cache
-core-foundation core-foundation.strings core-foundation.attributed-strings
-core-foundation.utilities core-graphics core-graphics.types
-core-text.fonts core-text.utilities ;
+math.vectors math.rectangles math.functions locals init namespaces
+combinators fonts colors cache core-foundation core-foundation.strings
+core-foundation.attributed-strings core-foundation.utilities
+core-graphics core-graphics.types core-text.fonts core-text.utilities ;
 IN: core-text
 
 TYPEDEF: void* CTLineRef
@@ -46,7 +46,7 @@ ERROR: not-a-string object ;
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
-TUPLE: line font line metrics image disposed ;
+TUPLE: line font line metrics image loc dim disposed ;
 
 : compute-line-metrics ( open-font line -- line-metrics )
     [
@@ -65,7 +65,7 @@ TUPLE: line font line metrics image disposed ;
     } spread
     dup compute-height ;
 
-: bounds>dim ( bounds -- dim )
+: metrics>dim ( bounds -- dim )
     [ width>> ] [ [ ascent>> ] [ descent>> ] bi + ] bi
     [ ceiling >integer ]
     bi@ 2array ;
@@ -80,30 +80,48 @@ TUPLE: line font line metrics image disposed ;
     [ f CTLineGetOffsetForStringIndex round ] bi-curry@ bi
     [ drop nip 0 ] [ swap - swap second ] 3bi <CGRect> ;
 
-:: fill-selection-background ( context dim line string -- )
+:: fill-selection-background ( context loc dim line string -- )
     string selection? [
         context string color>> >rgba-components CGContextSetRGBFillColor
-        context dim line string selection-rect CGContextFillRect
+        context dim line string selection-rect
+        dup CGRect-x loc first - over set-CGRect-x
+        CGContextFillRect
     ] when ;
 
-: set-text-position ( context metrics -- )
-    [ 0 ] dip descent>> ceiling CGContextSetTextPosition ;
+: line-rect ( line -- rect )
+    dummy-context CTLineGetImageBounds ;
+
+: set-text-position ( context loc -- )
+    first2 [ neg ] bi@ CGContextSetTextPosition ;
+
+:: line-loc ( metrics loc dim -- loc )
+    loc first
+    metrics ascent>> ceiling dim second loc second + - 2array ;
 
 :: <line> ( font string -- line )
     [
         [let* | open-font [ font cache-font CFRetain |CFRelease ]
                 line [ string open-font font foreground>> <CTLine> |CFRelease ]
-                metrics [ open-font line compute-line-metrics ]
-                dim [ metrics bounds>dim ] |
+
+                rect [ line line-rect ]
+                (loc) [ rect CGRect-origin CGPoint>loc ]
+                (dim) [ rect CGRect-size CGSize>dim ]
+                (ext) [ (loc) (dim) v+ ]
+                loc [ (loc) [ floor ] map ]
+                ext [ (loc) (dim) [ + ceiling ] 2map ]
+                dim [ ext loc [ - >integer ] 2map ]
+                metrics [ open-font line compute-line-metrics ] |
             open-font line metrics
             dim [
                 {
                     [ font dim fill-background ]
-                    [ dim line string fill-selection-background ]
-                    [ metrics set-text-position ]
+                    [ loc dim line string fill-selection-background ]
+                    [ loc set-text-position ]
                     [ [ line ] dip CTLineDraw ]
                 } cleave
             ] make-bitmap-image
+            metrics loc dim line-loc
+            metrics metrics>dim
         ]
         f line boa
     ] with-destructors ;
