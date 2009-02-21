@@ -2,16 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations destructors kernel math
 namespaces sequences classes.tuple words strings
-tools.walker accessors combinators fry ;
+tools.walker accessors combinators fry db.errors ;
 IN: db
-
-<PRIVATE
 
 TUPLE: db-connection
     handle
     insert-statements
     update-statements
     delete-statements ;
+
+<PRIVATE
 
 : new-db-connection ( class -- obj )
     new
@@ -23,6 +23,7 @@ PRIVATE>
 
 GENERIC: db-open ( db -- db-connection )
 HOOK: db-close db-connection ( handle -- )
+HOOK: parse-db-error db-connection ( error -- error' )
 
 : dispose-statements ( assoc -- ) values dispose-each ;
 
@@ -77,7 +78,11 @@ GENERIC: bind-tuple ( tuple statement -- )
 GENERIC: execute-statement* ( statement type -- )
 
 M: object execute-statement* ( statement type -- )
-    drop query-results dispose ;
+    '[
+        _ _ drop query-results dispose
+    ] [
+        parse-db-error rethrow
+    ] recover ;
 
 : execute-one-statement ( statement -- )
     dup type>> execute-statement* ;
