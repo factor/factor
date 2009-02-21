@@ -26,15 +26,8 @@ IN: libc
 : (realloc) ( alien size -- newalien )
     "void*" "libc" "realloc" { "void*" "ulong" } alien-invoke ;
 
-SYMBOL: malloc-expiry
-
 : mallocs ( -- assoc )
-    malloc-expiry get-global expired? [
-        -1 <alien> malloc-expiry set-global
-        H{ } clone dup \ mallocs set-global
-    ] [
-        \ mallocs get-global
-    ] if ;
+    \ mallocs [ H{ } clone ] initialize-alien ;
 
 PRIVATE>
 

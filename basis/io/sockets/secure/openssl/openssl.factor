@@ -143,16 +143,11 @@ TUPLE: ssl-handle file handle connected disposed ;
 
 SYMBOL: default-secure-context
 
-: context-expired? ( context -- ? )
-    dup [ handle>> expired? ] [ drop t ] if ;
-
 : current-secure-context ( -- ctx )
     secure-context get [
-        default-secure-context get dup context-expired? [
-            drop
-            <secure-config> <secure-context> default-secure-context set-global
-            current-secure-context
-        ] when
+        default-secure-context [
+            <secure-config> <secure-context>
+        ] initialize-alien
     ] unless* ;
 
 : <ssl-handle> ( fd -- ssl )
@@ -189,8 +184,7 @@ M: openssl check-certificate ( host ssl -- )
     ] [ 2drop ] if ;
 
 : get-session ( addrspec -- session/f )
-    current-secure-context sessions>> at
-    dup expired? [ drop f ] when ;
+    current-secure-context sessions>> at ;
 
 : save-session ( session addrspec -- )
     current-secure-context sessions>> set-at ;
