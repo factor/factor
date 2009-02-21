@@ -1,9 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel db.private ;
+USING: kernel ;
 IN: db.errors
-
-HOOK: parse-db-error db-connection ( error -- error' )
 
 ERROR: db-error ;
 ERROR: sql-error ;
