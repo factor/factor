@@ -90,6 +90,7 @@ ARTICLE: "gadgets-editors-commands" "Editor gadget commands"
 { $command-map editor "editing" }
 { $command-map editor "caret-motion" }
 { $command-map editor "selection" }
+{ $command-map editor "clipboard" }
 { $command-map multiline-editor "multiline" } ;
 
 ARTICLE: "ui.gadgets.editors" "Editor gadgets"

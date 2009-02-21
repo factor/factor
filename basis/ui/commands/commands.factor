@@ -71,7 +71,7 @@ M: word command-description ( word -- str )
     [ props>> ] [ default-flags swap assoc-union ] bi* update ;
 
 : command-quot ( target command -- quot )
-    dup 1quotation swap +nullary+ word-prop
+    [ 1quotation ] [ +nullary+ word-prop ] bi
     [ nip ] [ curry ] if ;
 
 M: word invoke-command ( target command -- )
