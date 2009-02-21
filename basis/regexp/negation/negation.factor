@@ -1,12 +1,12 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: regexp.nfa regexp.dfa regexp.minimize kernel sequences
+USING: regexp.nfa regexp.disambiguate kernel sequences
 assocs regexp.classes hashtables accessors fry vectors
-regexp.ast regexp.transition-tables ;
+regexp.ast regexp.transition-tables regexp.minimize ;
 IN: regexp.negation
 
 : ast>dfa ( parse-tree -- minimal-dfa )
-    construct-nfa construct-dfa minimize ;
+    construct-nfa nfa>dfa ;
 
 CONSTANT: fail-state -1
 

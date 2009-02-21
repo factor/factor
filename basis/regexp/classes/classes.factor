@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.order words
+USING: accessors kernel math math.order words combinators
 ascii unicode.categories combinators.short-circuit sequences ;
 IN: regexp.classes
 
@@ -107,19 +107,46 @@ M: end-of-line class-member? ( obj class -- ? )
     2drop f ;
 
 TUPLE: or-class seq ;
-C: <or-class> or-class
 
 TUPLE: not-class class ;
-C: <not-class> not-class
 
-: <and-class> ( classes -- class )
-    [ <not-class> ] map <or-class> <not-class> ;
+TUPLE: and-class seq ;
 
 TUPLE: primitive-class class ;
 C: <primitive-class> primitive-class
 
+: <and-class> ( seq -- class )
+    t swap remove
+    f over member? [ drop f ] [
+        dup length {
+            { 0 [ drop t ] }
+            { 1 [ first ] }
+            [ drop and-class boa ]
+        } case
+    ] if ;
+
+M: and-class class-member?
+    seq>> [ class-member? ] with all? ;
+
+: <or-class> ( seq -- class )
+    f swap remove
+    t over member? [ drop t ] [
+        dup length {
+            { 0 [ drop f ] }
+            { 1 [ first ] }
+            [ drop or-class boa ]
+        } case
+    ] if ;
+
 M: or-class class-member?
     seq>> [ class-member? ] with any? ;
+
+: <not-class> ( class -- inverse )
+    {
+        { t [ f ] }
+        { f [ t ] }
+        [ not-class boa ]
+    } case ;
 
 M: not-class class-member?
     class>> class-member? not ;
