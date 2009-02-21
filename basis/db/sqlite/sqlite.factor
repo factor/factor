@@ -6,7 +6,8 @@ sequences strings classes.tuple alien.c-types continuations
 db.sqlite.lib db.sqlite.ffi db.tuples words db.types combinators
 math.intervals io nmake accessors vectors math.ranges random
 math.bitwise db.queries destructors db.tuples.private interpolate
-io.streams.string multiline make db.private sequences.deep ;
+io.streams.string multiline make db.private sequences.deep
+db.errors.sqlite ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
@@ -346,4 +347,10 @@ M: sqlite-db-connection compound ( string seq -- new-string )
         { "default" [ first number>string " " glue ] }
         { "references" [ >reference-string ] }
         [ 2drop ]
+    } case ;
+
+M: sqlite-db-connection parse-db-error
+    dup n>> {
+        { 1 [ string>> parse-sqlite-sql-error ] }
+        [ drop ]
     } case ;
