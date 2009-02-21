@@ -1,11 +1,12 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors colors.constants fry kernel math
-math.rectangles math.order math.vectors namespaces opengl sequences
-ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
-ui.gadgets.worlds ui.gestures ui.render ui.pens.solid ui.text ui.commands
-ui.images ui.gadgets.menus ui.gadgets.line-support math.rectangles
-models math.ranges sequences combinators fonts locals strings ;
+math.functions math.rectangles math.order math.vectors namespaces
+opengl sequences ui.gadgets ui.gadgets.scrollers ui.gadgets.status-bar
+ui.gadgets.worlds ui.gestures ui.render ui.pens.solid ui.text
+ui.commands ui.images ui.gadgets.menus ui.gadgets.line-support
+math.rectangles models math.ranges sequences combinators fonts locals
+strings ;
 IN: ui.gadgets.tables
 
 ! Row rendererer protocol
@@ -61,7 +62,7 @@ GENERIC: cell-height ( font cell -- y )
 GENERIC: draw-cell ( font cell -- )
 
 M: string cell-width text-width ;
-M: string cell-height text-height ;
+M: string cell-height text-height ceiling ;
 M: string draw-cell draw-text ;
 
 M: image-name cell-width nip image-dim first ;
@@ -245,9 +246,12 @@ PRIVATE>
     [ 2drop ]
     if ;
 
+: hide-mouse-help ( table -- )
+    f >>mouse-index [ hide-status ] [ relayout-1 ] bi ;
+
 M: table model-changed
     [ nip ] [ initial-selected-index ] 2bi {
-        [ >>selected-index drop ]
+        [ >>selected-index f >>mouse-index drop ]
         [ show-row-summary ]
         [ drop update-selected-value ]
         [ drop relayout ]
@@ -315,9 +319,6 @@ PRIVATE>
 
 : next-page ( table -- )
     1 prev/next-page ;
-
-: hide-mouse-help ( table -- )
-    f >>mouse-index [ hide-status ] [ relayout-1 ] bi ;
 
 : valid-row? ( row table -- ? )
     control-value length 1- 0 swap between? ;
