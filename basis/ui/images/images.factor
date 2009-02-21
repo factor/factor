@@ -19,7 +19,8 @@ MEMO: cached-image ( image-name -- image ) path>> load-image ;
 PRIVATE>
 
 : rendered-image ( path -- texture )
-    world get image-texture-cache [ cached-image <texture> ] cache ;
+    world get image-texture-cache
+    [ cached-image { 0 0 } <texture> ] cache ;
 
 : draw-image ( image-name -- )
     rendered-image draw-texture ;
