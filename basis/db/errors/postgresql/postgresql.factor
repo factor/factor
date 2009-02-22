@@ -1,21 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel db.errors peg.ebnf strings sequences math
-combinators.short-circuit accessors math.parser ;
+combinators.short-circuit accessors math.parser quoting ;
 IN: db.errors.postgresql
-
-: quote? ( ch -- ? ) "'\"" member? ;
-
-: quoted? ( str -- ? )
-    {
-        [ length 1 > ]
-        [ first quote? ]
-        [ [ first ] [ peek ] bi = ]
-    } 1&& ;
-
-: unquote ( str -- newstr )
-    dup quoted? [ but-last-slice rest-slice >string ] when ;
-
 
 EBNF: parse-postgresql-sql-error
 
