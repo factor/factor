@@ -1,4 +1,32 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test db.errors.postgresql ;
+USING: accessors combinators.short-circuit db db.errors
+db.errors.postgresql db.postgresql io.files.unique kernel namespaces
+tools.test db.tester continuations ;
 IN: db.errors.postgresql.tests
+
+postgresql-test-db [
+
+    [ "drop table foo;" sql-command ] ignore-errors
+    [ "drop table ship;" sql-command ] ignore-errors
+
+    [
+        "insert into foo (id) values('1');" sql-command
+    ] [
+        { [ sql-table-missing? ] [ table>> "foo" = ] } 1&&
+    ] must-fail-with
+
+    [
+        "create table ship(id integer);" sql-command
+        "create table ship(id integer);" sql-command
+    ] [
+        { [ sql-table-exists? ] [ table>> "ship" = ] } 1&&
+    ] must-fail-with
+    
+    [
+        "create table foo(id) lol;" sql-command
+    ] [
+        sql-syntax-error?
+    ] must-fail-with
+
+] with-db
