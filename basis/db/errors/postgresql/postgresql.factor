@@ -4,8 +4,6 @@ USING: kernel db.errors peg.ebnf strings sequences math
 combinators.short-circuit accessors math.parser ;
 IN: db.errors.postgresql
 
-! ERROR:  relation "foo" does not exist
-
 : quote? ( ch -- ? ) "'\"" member? ;
 
 : quoted? ( str -- ? )
@@ -24,10 +22,16 @@ EBNF: parse-postgresql-sql-error
 Error = "ERROR:" [ ]+
 
 TableError =
-    Error "relation " (!(" already exists").)+:table " already exists"
+    Error ("relation "|"table ")(!(" already exists").)+:table " already exists"
         => [[ table >string unquote <sql-table-exists> ]]
-    | Error "relation " (!(" does not exist").)+:table " does not exist"
+    | Error ("relation "|"table ")(!(" does not exist").)+:table " does not exist"
         => [[ table >string unquote <sql-table-missing> ]]
+
+FunctionError =
+    Error "function" (!(" already exists").)+:table " already exists"
+        => [[ table >string <sql-function-exists> ]]
+    | Error "function" (!(" does not exist").)+:table " does not exist"
+        => [[ table >string <sql-function-missing> ]]
 
 SyntaxError =
     Error "syntax error at end of input":error
@@ -35,7 +39,9 @@ SyntaxError =
     | Error "syntax error at or near " .+:syntaxerror
         => [[ syntaxerror >string unquote <sql-syntax-error> ]]
 
-PostgresqlSqlError = (TableError | SyntaxError) 
+UnknownError = .* => [[ >string <sql-unknown-error> ]]
+
+PostgresqlSqlError = (TableError | FunctionError | SyntaxError | UnknownError) 
 
 ;EBNF
 
