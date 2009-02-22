@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators.short-circuit db db.errors
 db.errors.postgresql db.postgresql io.files.unique kernel namespaces
-tools.test db.tester ;
+tools.test db.tester continuations ;
 IN: db.errors.postgresql.tests
 
 postgresql-test-db [
