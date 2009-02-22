@@ -2,8 +2,41 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: concurrency.combinators db.pools db.sqlite db.tuples
 db.types kernel math random threads tools.test db sequences
-io prettyprint ;
+io prettyprint db.postgresql db.sqlite accessors io.files.temp
+namespaces fry system ;
 IN: db.tester
+
+: postgresql-test-db ( -- postgresql-db )
+    <postgresql-db>
+        "localhost" >>host
+        "postgres" >>username
+        "thepasswordistrust" >>password
+        "factor-test" >>database ;
+
+: sqlite-test-db ( -- sqlite-db )
+    "tuples-test.db" temp-file <sqlite-db> ;
+
+
+! These words leak resources, but are useful for interactivel testing
+: set-sqlite-db ( -- )
+    sqlite-db db-open db-connection set ;
+
+: set-postgresql-db ( -- )
+    postgresql-db db-open db-connection set ;
+
+
+: test-sqlite ( quot -- )
+    '[
+        [ ] [ sqlite-test-db _ with-db ] unit-test
+    ] call ; inline
+
+: test-postgresql ( quot -- )
+    '[
+        os windows? cpu x86.64? and [
+            [ ] [ postgresql-test-db _ with-db ] unit-test
+        ] unless
+    ] call ; inline
+
 
 TUPLE: test-1 id a b c ;
 
@@ -22,9 +55,6 @@ test-2 "TEST2" {
    { "y" "Y" { VARCHAR 256 } +not-null+ }
    { "z" "Z" { VARCHAR 256 } +not-null+ }
 } define-persistent
-
-: sqlite-test-db ( -- db ) "test.db" <sqlite-db> ;
-: test-db ( -- db ) "test.db" <sqlite-db> ;
 
 : db-tester ( test-db -- )
     [
