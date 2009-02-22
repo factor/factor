@@ -278,14 +278,6 @@ HELP: mod-inv
     { $example "USING: math prettyprint ;" "173 815 * 1119 mod ." "1" }
 } ;
 
-HELP: each-bit
-{ $values { "n" integer } { "quot" { $quotation "( ? -- )" } } }
-{ $description "Applies the quotation to each bit of the integer, starting from the least significant bit, and stopping at the last bit from which point on all bits are either clear (if the integer is positive) or all bits are set (if the integer is negataive)." }
-{ $examples
-    { $example "USING: math.functions make prettyprint ;" "[ BIN: 1101 [ , ] each-bit ] { } make ." "{ t f t t }" }
-    { $example "USING: math.functions make prettyprint ;" "[ -3 [ , ] each-bit ] { } make ." "{ t f }" }
-} ;
-
 HELP: ~
 { $values { "x" real } { "y" real } { "epsilon" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " and " { $snippet "y" } " are approximately equal to each other. There are three possible comparison tests, chosen based on the sign of " { $snippet "epsilon" } ":"

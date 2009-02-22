@@ -1,8 +1,9 @@
 ! Copyright (C) 2009 Jason W. Merrill.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.functions math.derivatives accessors
-    macros words effects sequences generalizations fry
-    combinators.smart generic compiler.units ;
+    macros generic compiler.units words effects vocabs
+    sequences arrays assocs generalizations fry make
+    combinators.smart help help.markup ;
 
 IN: math.dual
 
@@ -48,6 +49,19 @@ MACRO: chain-rule ( word -- e )
     tri
     '[ [ @ _ @ ] sum-outputs ] ;
 
+: set-dual-help ( word dword -- ) 
+    [ swap
+        [ stack-effect [ in>> ] [ out>> ] bi append 
+            [ dual ] { } map>assoc { $values } prepend
+        ]
+        [ [ { $description } % "Version of " , 
+                   { $link } swap suffix , 
+                   " extended to work on dual numbers." , ] 
+            { } make
+        ]
+        bi* 2array
+    ] keep set-word-help ;
+
 PRIVATE>
 
 MACRO: dual-op ( word -- )
@@ -57,36 +71,13 @@ MACRO: dual-op ( word -- )
     tri
     '[ _ @ @ <dual> ] ;
 
-: define-dual-method ( word -- )
-    [ \ dual swap create-method ] keep '[ _ dual-op ] define ;
+: define-dual ( word -- )
+    dup name>> "d" prepend "math.dual" create
+    [ [ stack-effect ] dip set-stack-effect ]
+    [ set-dual-help ]
+    [ swap '[ _ dual-op ] define ]
+    2tri ;
 
 ! Specialize math functions to operate on dual numbers.
-[ { sqrt exp log sin cos tan sinh cosh tanh acos asin atan }
-    [ define-dual-method ] each ] with-compilation-unit
-
-! Inverse methods { asinh, acosh, atanh } are not generic, so
-! there is no way to specialize them for dual numbers.  However,
-! they are defined in terms of functions that can operate on
-! dual numbers and arithmetic methods, so if it becomes
-! possible to make arithmetic operators work directly on dual
-! numbers, we will get these for free.
-
-! Arithmetic words are not generic (yet?), so we have to 
-! define special versions of them to operate on dual numbers.
-: d+ ( x y -- x+y ) \ + dual-op ;
-: d- ( x y -- x-y ) \ - dual-op ;
-: d* ( x y -- x*y ) \ * dual-op ;
-: d/ ( x y -- x/y ) \ / dual-op ;
-: d^ ( x y -- x^y ) \ ^ dual-op ;
-
-: dabs ( x -- |x| ) \ abs dual-op ;
-
-! The following words are also not generic, but are defined in
-! terms of words that can operate on dual numbers and
-! arithmetic.  If it becomes possible to implement arithmetic on
-! dual numbers directly, these functions can be deleted.
-: dneg ( x -- -x ) \ neg dual-op ;
-: drecip ( x -- 1/x ) \ recip dual-op ;
-: dasinh ( x -- y ) \ asinh dual-op ;
-: dacosh ( x -- y ) \ acosh dual-op ;
-: datanh ( x -- y ) \ atanh dual-op ;
+[ all-words [ "derivative" word-prop ] filter
+    [ define-dual ] each ] with-compilation-unit

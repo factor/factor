@@ -10,92 +10,14 @@ HELP: <dual>
 }
 { $description "Creates a dual number from its ordinary and epsilon parts." } ;
 
-HELP: d*
-{ $values
-    { "x" dual } { "y" dual }
-    { "x*y" dual }
-}
-{ $description "Multiply dual numbers." } ;
-
-HELP: d+
-{ $values
-    { "x" dual } { "y" dual }
-    { "x+y" dual }
-}
-{ $description "Add dual numbers." } ;
-
-HELP: d-
-{ $values
-    { "x" dual } { "y" dual }
-    { "x-y" dual }
-}
-{ $description "Subtract dual numbers." } ;
-
-HELP: d/
-{ $values
-    { "x" dual } { "y" dual }
-    { "x/y" dual }
-}
-{ $description "Divide dual numbers." } 
-{ $errors "Throws an error if the ordinary part of " { $snippet "x" } " is zero." } ;
-
-HELP: d^
-{ $values
-    { "x" dual } { "y" dual }
-    { "x^y" dual }
-}
-{ $description "Raise a dual number to a (possibly dual) power" } ;
-
-HELP: dabs
-{ $values
-     { "x" dual }
-     { "|x|" dual }
-}
-{ $description "Absolute value of a dual number." } ;
-
-HELP: dacosh
-{ $values
-     { "x" dual }
-     { "y" dual }
-}
-{ $description "Inverse hyberbolic cosine of a dual number." } ;
-
-HELP: dasinh
-{ $values
-     { "x" dual }
-     { "y" dual }
-}
-{ $description "Inverse hyberbolic sine of a dual number." } ;
-
-HELP: datanh
-{ $values
-     { "x" dual }
-     { "y" dual }
-}
-{ $description "Inverse hyberbolic tangent of a dual number." } ;
-
-HELP: dneg
-{ $values
-     { "x" dual }
-     { "-x" dual }
-}
-{ $description "Negative of a dual number." } ;
-
-HELP: drecip
-{ $values
-     { "x" dual }
-     { "1/x" dual }
-}
-{ $description "Reciprocal of a dual number." } ;
-
-HELP: define-dual-method
+HELP: define-dual
 { $values
     { "word" word }
 }
-{ $description "Defines a method on the dual numbers for generic word." }
+{ $description "Defines a word " { $snippet "d[word]" } " in the " { $vocab-link "math.dual" } " vocabulary that operates on dual numbers." }
 { $notes "Uses the derivative word-prop, which holds a list of quotations giving the partial derivatives of the word with respect to each of its arguments.  This can be set using " { $link POSTPONE: DERIVATIVE: } "." } ;
 
-{ define-dual-method dual-op POSTPONE: DERIVATIVE: } related-words
+{ define-dual dual-op POSTPONE: DERIVATIVE: } related-words
 
 HELP: dual
 { $class-description "The class of dual numbers with non-zero epsilon part." } ;
@@ -127,6 +49,5 @@ ARTICLE: "math.dual" "Dual Numbers"
 $nl
 "Dual numbers are ordered pairs " { $snippet "<o,e>"} "--an ordinary part and an epsilon part--with component-wise addition and multiplication defined by "{ $snippet "<o1,e1>*<o2,e2> = <o1*o2,e1*o2 + e2*o1>" } ". They are analagous to complex numbers with " { $snippet "i^2 = 0" } "instead of " { $snippet "i^2 = -1" } ". For well-behaved functions " { $snippet "f" } ", " { $snippet "f(<o1,e1>) = f(o1) + e1*f'(o1)" } ", where " { $snippet "f'"} " is the derivative of " { $snippet "f" } "."
 ;
-
 
 ABOUT: "math.dual"
