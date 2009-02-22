@@ -211,8 +211,6 @@ ERROR: no-vocab vocab ;
 : with-scaffold ( quot -- )
     [ H{ } clone using ] dip with-variable ; inline
 
-PRIVATE>
-
 : link-vocab ( vocab -- )
     check-vocab
     "Edit documentation: " write
@@ -221,7 +219,9 @@ PRIVATE>
 : docs. ( word -- )
     [ (docs.) ] [ nl vocabulary>> link-vocab ] bi ;
 
-: scaffold-docs ( vocab -- )
+PRIVATE>
+
+: scaffold-help ( vocab -- )
     [
         dup "-docs.factor" vocab/suffix>path scaffolding? [
             set-scaffold-docs-file
@@ -233,13 +233,15 @@ PRIVATE>
 : scaffold-undocumented ( string -- )
     [ interesting-words. ] [ link-vocab ] bi ;
 
-: scaffold-vocab ( vocab-root vocab -- )
+: scaffold-vocab ( vocab-root string -- )
     {
         [ scaffold-directory ]
         [ scaffold-main ]
         [ scaffold-authors ]
         [ nip require ]
     } 2cleave ;
+
+<PRIVATE
 
 : tests-file-string ( vocab -- string )
     [
@@ -250,6 +252,8 @@ PRIVATE>
 
 : set-scaffold-tests-file ( vocab path -- )
     [ tests-file-string ] dip utf8 set-file-contents ;
+
+PRIVATE>
 
 : scaffold-tests ( vocab -- )
     dup "-tests.factor" vocab/suffix>path
