@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel strings words ;
+USING: help.markup help.syntax kernel strings words vocabs ;
 IN: tools.scaffold
 
 HELP: developer-name
@@ -13,7 +13,7 @@ HELP: help.
 { $description "Prints out scaffold help markup for a given word." } ;
 
 HELP: scaffold-help
-{ $values { "string" string } }
+{ $values { "vocab" vocab } }
 { $description "Takes an existing vocabulary and creates a help file with scaffolded help for each word. This word only works if no help file yet exists." } ;
 
 HELP: scaffold-undocumented
