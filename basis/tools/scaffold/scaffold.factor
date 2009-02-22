@@ -169,7 +169,7 @@ ERROR: no-vocab vocab ;
 : docs-header. ( word -- )
     "HELP: " write name>> print ;
 
-: (docs.) ( word -- )
+: (help.) ( word -- )
     [ docs-header. ] [ $values. ] [ $description. ] tri ;
 
 : interesting-words ( vocab -- array )
@@ -178,7 +178,7 @@ ERROR: no-vocab vocab ;
     natural-sort ;
 
 : interesting-words. ( vocab -- )
-    interesting-words [ (docs.) nl ] each ;
+    interesting-words [ (help.) nl ] each ;
 
 : docs-file-string ( vocab -- str2 )
     [
@@ -216,10 +216,10 @@ ERROR: no-vocab vocab ;
     "Edit documentation: " write
     "-docs.factor" vocab/suffix>path <pathname> . ;
 
-: docs. ( word -- )
-    [ (docs.) ] [ nl vocabulary>> link-vocab ] bi ;
-
 PRIVATE>
+
+: help. ( word -- )
+    [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;
 
 : scaffold-help ( vocab -- )
     [
