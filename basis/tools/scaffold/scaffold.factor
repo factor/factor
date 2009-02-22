@@ -5,7 +5,7 @@ io.encodings.utf8 hashtables kernel namespaces sequences
 vocabs.loader io combinators calendar accessors math.parser
 io.streams.string ui.tools.operations quotations strings arrays
 prettyprint words vocabs sorting sets classes math alien urls
-splitting ascii ;
+splitting ascii combinators.short-circuit ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -18,18 +18,19 @@ ERROR: no-vocab vocab ;
 
 <PRIVATE
 
-: root? ( string -- ? ) vocab-roots get member? ;
+: vocab-root? ( string -- ? ) vocab-roots get member? ;
 
 : contains-dot? ( string -- ? ) ".." swap subseq? ;
 
 : contains-separator? ( string -- ? ) [ path-separator? ] any? ;
 
 : check-vocab-name ( string -- string )
-    dup contains-dot? [ vocab-name-contains-dot ] when
-    dup contains-separator? [ vocab-name-contains-separator ] when ;
+    [ ]
+    [ contains-dot? [ vocab-name-contains-dot ] when ]
+    [ contains-separator? [ vocab-name-contains-separator ] when ] tri ;
 
 : check-root ( string -- string )
-    dup root? [ not-a-vocab-root ] unless ;
+    dup vocab-root? [ not-a-vocab-root ] unless ;
 
 : directory-exists ( path -- )
     "Not creating a directory, it already exists: " write print ;
@@ -37,18 +38,18 @@ ERROR: no-vocab vocab ;
 : scaffold-directory ( path -- )
     dup exists? [ directory-exists ] [ make-directories ] if ;
 
-: not-scaffolding ( path -- )
-    "Not creating scaffolding for " write <pathname> . ;
+: not-scaffolding ( path -- path )
+    "Not creating scaffolding for " write dup <pathname> . ;
 
-: scaffolding ( path -- )
-    "Creating scaffolding for " write <pathname> . ;
+: scaffolding ( path -- path )
+    "Creating scaffolding for " write dup <pathname> . ;
 
 : (scaffold-path) ( path string -- path )
-    dupd [ file-name ] dip append append-path ;
+    [ dup file-name ] dip append append-path ;
 
 : scaffold-path ( path string -- path ? )
     (scaffold-path)
-    dup exists? [ dup not-scaffolding f ] [ dup scaffolding t ] if ;
+    dup exists? [ not-scaffolding f ] [ scaffolding t ] if ;
 
 : scaffold-copyright ( -- )
     "! Copyright (C) " write now year>> number>string write
@@ -85,14 +86,14 @@ ERROR: no-vocab vocab ;
 
 : scaffold-authors ( path -- )
     "authors.txt" append-path dup exists? [
-        not-scaffolding
+        not-scaffolding drop
     ] [
-        dup scaffolding
+        scaffolding
         developer-name get swap utf8 set-file-contents
     ] if ;
 
 : lookup-type ( string -- object/string ? )
-    "new" ?head drop [ [ CHAR: ' = ] [ digit? ] bi or ] trim-tail
+    "new" ?head drop [ { [ CHAR: ' = ] [ digit? ] } 1|| ] trim-tail
     H{
         { "object" object } { "obj" object }
         { "quot" quotation }
@@ -134,6 +135,9 @@ ERROR: no-vocab vocab ;
         " }" write
     ] each ;
 
+: 4bl ( -- )
+    "    " write ; inline
+
 : $values. ( word -- )
     "declared-effect" word-prop [
         [ in>> ] [ out>> ] bi
@@ -141,8 +145,8 @@ ERROR: no-vocab vocab ;
             2drop
         ] [
             "{ $values" print
-            [ "    " write ($values.) ]
-            [ [ nl "    " write ($values.) ] unless-empty ] bi*
+            [ 4bl ($values.) ]
+            [ [ nl 4bl ($values.) ] unless-empty ] bi*
             nl "}" print
         ] if
     ] when* ;
@@ -159,7 +163,7 @@ ERROR: no-vocab vocab ;
 
 : interesting-words ( vocab -- array )
     words
-    [ [ "help" word-prop ] [ predicate? ] bi or not ] filter
+    [ { [ "help" word-prop ] [ predicate? ] } 1|| not ] filter
     natural-sort ;
 
 : interesting-words. ( vocab -- )
@@ -237,7 +241,6 @@ PRIVATE>
     {
         [ drop scaffold-directory ]
         [ scaffold-main ]
-        [ scaffold-tests ]
         [ drop scaffold-authors ]
         [ nip require ]
     } 2cleave ;
@@ -250,7 +253,7 @@ SYMBOL: examples-flag
         "           \"\""
         "           \"\""
         "}"
-    } [ examples-flag get [ "    " write ] when print ] each ;
+    } [ examples-flag get [ 4bl ] when print ] each ;
 
 : examples ( n -- )
     t \ examples-flag [
@@ -260,10 +263,11 @@ SYMBOL: examples-flag
     ] with-variable ;
 
 : scaffold-rc ( path -- )
+    [ home ] dip append-path
     [ touch-file ] [ "Click to edit: " write <pathname> . ] bi ;
 
-: scaffold-factor-boot-rc ( -- )
-    home ".factor-boot-rc" append-path scaffold-rc ;
+: scaffold-factor-boot-rc ( -- ) ".factor-boot-rc" scaffold-rc ;
 
-: scaffold-factor-rc ( -- )
-    home ".factor-rc" append-path scaffold-rc ;
+: scaffold-factor-rc ( -- ) ".factor-rc" scaffold-rc ;
+
+: scaffold-emacs ( -- ) ".emacs" scaffold-rc ;
