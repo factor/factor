@@ -4,39 +4,9 @@ USING: io.files io.files.temp kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
 prettyprint calendar sequences db.sqlite math.intervals
 db.postgresql accessors random math.bitwise system
-math.ranges strings urls fry db.tuples.private db.private ;
+math.ranges strings urls fry db.tuples.private db.private
+db.tester ;
 IN: db.tuples.tests
-
-: sqlite-db ( -- sqlite-db )
-    "tuples-test.db" temp-file <sqlite-db> ;
-
-: test-sqlite ( quot -- )
-    '[
-        [ ] [
-            "tuples-test.db" temp-file <sqlite-db> _ with-db
-        ] unit-test
-    ] call ; inline
-
-: postgresql-db ( -- postgresql-db )
-    <postgresql-db>
-        "localhost" >>host
-        "postgres" >>username
-        "thepasswordistrust" >>password
-        "factor-test" >>database ;
-
-: test-postgresql ( quot -- )
-    '[
-        os windows? cpu x86.64? and [
-            [ ] [ postgresql-db _ with-db ] unit-test
-        ] unless
-    ] call ; inline
-
-! These words leak resources, but are useful for interactivel testing 
-: sqlite-test-db ( -- )
-    sqlite-db db-open db-connection set ;
-
-: postgresql-test-db ( -- )
-    postgresql-db db-open db-connection set ;
 
 TUPLE: person the-id the-name the-number the-real
 ts date time blob factor-blob url ;
