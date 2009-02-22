@@ -3,7 +3,7 @@
 USING: alien.syntax kernel sequences system ;
 IN: serial.unix.termios
 
-: NCCS 20 ; inline
+CONSTANT: NCCS 20
 
 TYPEDEF: uint tcflag_t
 TYPEDEF: uchar cc_t
