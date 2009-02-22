@@ -5,19 +5,23 @@ namespaces sequences db.sqlite.ffi db combinators
 continuations db.types calendar.format serialize
 io.streams.byte-array byte-arrays io.encodings.binary
 io.backend db.errors present urls io.encodings.utf8
-io.encodings.string accessors shuffle io prettyprint
-db.private ;
+io.encodings.string accessors shuffle io db.private ;
 IN: db.sqlite.lib
 
 ERROR: sqlite-error < db-error n string ;
 ERROR: sqlite-sql-error < sql-error n string ;
+
+: <sqlite-sql-error> ( n string -- error )
+    \ sqlite-sql-error new
+        swap >>string
+        swap >>n ;
 
 : throw-sqlite-error ( n -- * )
     dup sqlite-error-messages nth sqlite-error ;
 
 : sqlite-statement-error ( -- * )
     SQLITE_ERROR
-    db-connection get handle>> sqlite3_errmsg sqlite-sql-error ;
+    db-connection get handle>> sqlite3_errmsg <sqlite-sql-error> throw ;
 
 : sqlite-check-result ( n -- )
     {
@@ -125,8 +129,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
     ] if* (sqlite-bind-type) ;
 
 : sqlite-finalize ( handle -- ) sqlite3_finalize sqlite-check-result ;
-: sqlite-reset ( handle -- )
-"resetting: " write dup . sqlite3_reset sqlite-check-result ;
+: sqlite-reset ( handle -- ) sqlite3_reset sqlite-check-result ;
 : sqlite-clear-bindings ( handle -- )
     sqlite3_clear_bindings sqlite-check-result ;
 : sqlite-#columns ( query -- int ) sqlite3_column_count ;
