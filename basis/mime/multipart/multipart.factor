@@ -3,7 +3,8 @@
 USING: multiline kernel sequences io splitting fry namespaces
 http.parsers hashtables assocs combinators ascii io.files.unique
 accessors io.encodings.binary io.files byte-arrays math
-io.streams.string combinators.short-circuit strings math.order ;
+io.streams.string combinators.short-circuit strings math.order
+quoting ;
 IN: mime.multipart
 
 CONSTANT: buffer-size 65536
@@ -74,18 +75,6 @@ ERROR: end-of-stream multipart ;
 
 : empty-name? ( string -- ? )
     { "''" "\"\"" "" f } member? ;
-
-: quote? ( ch -- ? ) "'\"" member? ;
-
-: quoted? ( str -- ? )
-    {
-        [ length 1 > ]
-        [ first quote? ]
-        [ [ first ] [ peek ] bi = ]
-    } 1&& ;
-
-: unquote ( str -- newstr )
-    dup quoted? [ but-last-slice rest-slice >string ] when ;
 
 : save-uploaded-file ( multipart -- )
     dup filename>> empty-name? [
