@@ -7,9 +7,9 @@ IN: regexp.negation.tests
     ! R/ |[^a]|.+/
     T{ transition-table
         { transitions H{
-            { 0 H{ { CHAR: a 1 } { T{ not-class f T{ or-class f { CHAR: a } } } -1 } } }
-            { 1 H{ { T{ not-class f T{ or-class f { } } } -1 } } }
-            { -1 H{ { any-char -1 } } }
+            { 0 H{ { CHAR: a 1 } { T{ not-class f CHAR: a } -1 } } }
+            { 1 H{ { t -1 } } }
+            { -1 H{ { t -1 } } }
         } } 
         { start-state 0 }
         { final-states H{ { 0 0 } { -1 -1 } } }

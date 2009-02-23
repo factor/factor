@@ -20,8 +20,7 @@ C: <range> range
 
 GENERIC: class-member? ( obj class -- ? )
 
-! When does t get put in?
-M: t class-member? ( obj class -- ? ) 2drop f ;
+M: t class-member? ( obj class -- ? ) 2drop t ;
 
 M: integer class-member? ( obj class -- ? ) = ;
 
@@ -120,7 +119,10 @@ TUPLE: and-class seq ;
 
 m:GENERIC: combine-and ( class1 class2 -- combined ? )
 
-m:METHOD: combine-and { object object } 2drop f f ;
+: replace-if-= ( object object -- object ? )
+    over = ;
+
+m:METHOD: combine-and { object object } replace-if-= ;
 
 m:METHOD: combine-and { integer integer }
     2dup = [ drop t ] [ 2drop f t ] if ;
@@ -131,12 +133,15 @@ m:METHOD: combine-and { t object }
 m:METHOD: combine-and { f object }
     drop t ;
 
+m:METHOD: combine-and { not-class object }
+    [ class>> ] dip = [ f t ] [ f f ] if ;
+
 m:METHOD: combine-and { integer object }
     2dup class-member? [ drop t ] [ 2drop f t ] if ;
 
 m:GENERIC: combine-or ( class1 class2 -- combined ? )
 
-m:METHOD: combine-or { object object } 2drop f f ;
+m:METHOD: combine-or { object object } replace-if-= ;
 
 m:METHOD: combine-or { integer integer }
     2dup = [ drop t ] [ 2drop f f ] if ;
@@ -146,6 +151,9 @@ m:METHOD: combine-or { t object }
 
 m:METHOD: combine-or { f object }
     nip t ;
+
+m:METHOD: combine-or { not-class object }
+    [ class>> ] dip = [ t t ] [ f f ] if ;
 
 m:METHOD: combine-or { integer object }
     2dup class-member? [ nip t ] [ 2drop f f ] if ;
@@ -174,7 +182,7 @@ M: and-class class-member?
     seq>> [ class-member? ] with all? ;
 
 : <or-class> ( seq -- class )
-    [ combine-or ] t or-class combine ;
+    [ combine-or ] f or-class combine ;
 
 M: or-class class-member?
     seq>> [ class-member? ] with any? ;
@@ -183,7 +191,7 @@ M: or-class class-member?
     {
         { t [ f ] }
         { f [ t ] }
-        [ not-class boa ]
+        [ dup not-class? [ class>> ] [ not-class boa ] if ]
     } case ;
 
 M: not-class class-member?
