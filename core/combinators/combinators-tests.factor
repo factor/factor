@@ -176,8 +176,8 @@ IN: combinators.tests
 
 [ "an array" ] [ { 1 2 3 } case-test-3 ] unit-test
 
-: case-const-1 1 ;
-: case-const-2 2 ; inline
+CONSTANT: case-const-1 1
+CONSTANT: case-const-2 2
 
 ! Compiled
 : case-test-4 ( obj -- str )
