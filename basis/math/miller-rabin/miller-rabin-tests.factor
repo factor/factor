@@ -7,4 +7,5 @@ IN: math.miller-rabin.tests
 [ f ] [ 36 miller-rabin ] unit-test
 [ t ] [ 37 miller-rabin ] unit-test
 [ 101 ] [ 100 next-prime ] unit-test
+[ t ] [ 2135623355842621559 miller-rabin ] unit-test
 [ 100000000000031 ] [ 100000000000000 next-prime ] unit-test

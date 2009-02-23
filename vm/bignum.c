@@ -1827,14 +1827,13 @@ int
 bignum_unsigned_logbitp(int shift, bignum_type bignum)
 {
   bignum_length_type len = (BIGNUM_LENGTH (bignum));
-  bignum_digit_type digit;
   int index = shift / BIGNUM_DIGIT_LENGTH;
-  int p;
   if (index >= len)
     return 0;
-  digit = (BIGNUM_REF (bignum, index));
-  p = shift % BIGNUM_DIGIT_LENGTH;
-  return digit & (1 << p);
+  bignum_digit_type digit = (BIGNUM_REF (bignum, index));
+  int p = shift % BIGNUM_DIGIT_LENGTH;
+  bignum_digit_type mask = ((F_FIXNUM)1) << p;
+  return (digit & mask) ? 1 : 0;
 }
 
 /* Allocates memory */

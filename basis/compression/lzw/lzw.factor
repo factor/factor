@@ -69,11 +69,11 @@ ERROR: index-too-big n ;
 : omega-k-in-table? ( lzw -- ? )
     [ omega-k>> ] [ table>> ] bi key? ;
 
-ERROR: not-in-table ;
+ERROR: not-in-table value ;
 
 : write-output ( lzw -- )
     [
-        [ omega>> ] [ table>> ] bi at* [ not-in-table ] unless
+        [ omega>> ] [ table>> ] bi ?at [ not-in-table ] unless
     ] [
         [ lzw-bit-width-compress ]
         [ output>> write-bits ] bi

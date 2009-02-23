@@ -212,10 +212,11 @@
           fuel-syntax--end-of-def-line-regex
           fuel-syntax--single-liner-regex))
 
+(defconst fuel-syntax--word-signature-regex
+  (format ":[^ ]* \\([^ ]+\\)\\(%s\\)*" fuel-syntax--stack-effect-regex))
+
 (defconst fuel-syntax--defun-signature-regex
-  (format "\\(%s\\|%s\\)"
-          (format ":[^ ]* [^ ]+\\(%s\\)*" fuel-syntax--stack-effect-regex)
-          "M[^:]*: [^ ]+ [^ ]+"))
+  (format "\\(%s\\|%s\\)" fuel-syntax--word-signature-regex "M[^:]*: [^ ]+ [^ ]+"))
 
 (defconst fuel-syntax--constructor-decl-regex
   "\\_<C: +\\(\\w+\\) +\\(\\w+\\)\\( .*\\)?$")

@@ -205,10 +205,10 @@ TYPEDEF: size_t socklen_t
 
 TYPEDEF: void* WNDPROC
 
-: FALSE 0 ; inline
-: TRUE 1 ; inline
+CONSTANT: FALSE 0
+CONSTANT: TRUE 1
 
-: >BOOLEAN ( ? -- 1/0 ) 1 0 ? ; inline
+: >BOOLEAN ( ? -- 1/0 ) TRUE FALSE ? ; inline
 
 ! typedef LRESULT (CALLBACK* WNDPROC)(HWND, UINT, WPARAM, LPARAM);
 

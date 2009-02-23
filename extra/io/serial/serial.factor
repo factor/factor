@@ -14,8 +14,10 @@ M: invalid-baud summary ( invalid-baud -- string )
     "Baud rate " " not supported" surround ;
 
 HOOK: lookup-baud os ( m -- n )
-HOOK: open-serial os ( serial -- stream )
+HOOK: open-serial os ( serial -- serial' )
+M: serial dispose ( serial -- ) stream>> dispose ;
 
 {
     { [ os unix? ] [ "io.serial.unix" ] } 
+    { [ os windows? ] [ "io.serial.windows" ] }
 } cond require
