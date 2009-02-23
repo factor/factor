@@ -6,8 +6,9 @@
 !  http://cairographics.org/samples/text/
 
 
-USING: cairo.ffi math math.constants byte-arrays kernel ui ui.render
-combinators ui.gadgets opengl.gl accessors ;
+USING: cairo.ffi math math.constants byte-arrays kernel ui
+ui.render combinators ui.gadgets opengl.gl accessors
+namespaces opengl ;
 
 IN: cairo-demo
 
@@ -18,14 +19,15 @@ IN: cairo-demo
     CAIRO_FORMAT_ARGB32 384 256 over 4 *
     cairo_image_surface_create_for_data ;
 
-
 TUPLE: cairo-demo-gadget < gadget image-array cairo-t ;
 
 M: cairo-demo-gadget draw-gadget* ( gadget -- )
-    0 0 glRasterPos2i
-    1.0 -1.0 glPixelZoom
-    [ 384 256 GL_RGBA GL_UNSIGNED_BYTE ] dip
-    image-array>> glDrawPixels ;
+    origin get [
+        0 0 glRasterPos2i
+        1.0 -1.0 glPixelZoom
+        [ 384 256 GL_RGBA GL_UNSIGNED_BYTE ] dip
+        image-array>> glDrawPixels
+    ] with-translation ;
 
 : create-surface ( gadget -- cairo_surface_t )
     make-image-array [ swap (>>image-array) ] keep
@@ -34,7 +36,7 @@ M: cairo-demo-gadget draw-gadget* ( gadget -- )
 : init-cairo ( gadget -- cairo_t )
     create-surface cairo_create ;
 
-M: cairo-demo-gadget pref-dim* drop { 384 256 0 } ;
+M: cairo-demo-gadget pref-dim* drop { 384 256 } ;
 
 ERROR: no-cairo-t ;
 
