@@ -27,8 +27,8 @@ M: ppc machine-registers
         { double-float-regs T{ range f 0 29 1 } }
     } ;
 
-: scratch-reg 28 ; inline
-: fp-scratch-reg 30 ; inline
+CONSTANT: scratch-reg 28
+CONSTANT: fp-scratch-reg 30
 
 M: ppc two-operand? f ;
 
@@ -40,8 +40,8 @@ M: ppc %load-reference ( reg obj -- )
 M: ppc %alien-global ( register symbol dll -- )
     [ 0 swap LOAD32 ] 2dip rc-absolute-ppc-2/2 rel-dlsym ;
 
-: ds-reg 29 ; inline
-: rs-reg 30 ; inline
+CONSTANT: ds-reg 29
+CONSTANT: rs-reg 30
 
 GENERIC: loc-reg ( loc -- reg )
 

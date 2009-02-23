@@ -9,17 +9,17 @@ core-foundation core-foundation.run-loop core-foundation.strings
 core-foundation.time ;
 IN: core-foundation.fsevents
 
-: kFSEventStreamCreateFlagUseCFTypes 2 ; inline
-: kFSEventStreamCreateFlagWatchRoot 4 ; inline
+CONSTANT: kFSEventStreamCreateFlagUseCFTypes 2
+CONSTANT: kFSEventStreamCreateFlagWatchRoot 4
 
-: kFSEventStreamEventFlagMustScanSubDirs 1 ; inline
-: kFSEventStreamEventFlagUserDropped 2 ; inline
-: kFSEventStreamEventFlagKernelDropped 4 ; inline
-: kFSEventStreamEventFlagEventIdsWrapped 8 ; inline
-: kFSEventStreamEventFlagHistoryDone 16 ; inline
-: kFSEventStreamEventFlagRootChanged 32 ; inline
-: kFSEventStreamEventFlagMount 64 ; inline
-: kFSEventStreamEventFlagUnmount 128 ; inline
+CONSTANT: kFSEventStreamEventFlagMustScanSubDirs 1
+CONSTANT: kFSEventStreamEventFlagUserDropped 2
+CONSTANT: kFSEventStreamEventFlagKernelDropped 4
+CONSTANT: kFSEventStreamEventFlagEventIdsWrapped 8
+CONSTANT: kFSEventStreamEventFlagHistoryDone 16
+CONSTANT: kFSEventStreamEventFlagRootChanged 32
+CONSTANT: kFSEventStreamEventFlagMount 64
+CONSTANT: kFSEventStreamEventFlagUnmount 128
 
 TYPEDEF: int FSEventStreamCreateFlags
 TYPEDEF: int FSEventStreamEventFlags
@@ -36,7 +36,7 @@ C-STRUCT: FSEventStreamContext
 ! callback(FSEventStreamRef streamRef, void *clientCallBackInfo, size_t numEvents, void *eventPaths, const FSEventStreamEventFlags eventFlags[], const FSEventStreamEventId eventIds[]);
 TYPEDEF: void* FSEventStreamCallback
 
-: FSEventStreamEventIdSinceNow HEX: FFFFFFFFFFFFFFFF ; inline
+CONSTANT: FSEventStreamEventIdSinceNow HEX: FFFFFFFFFFFFFFFF
 
 FUNCTION: FSEventStreamRef FSEventStreamCreate (
     CFAllocatorRef           allocator,

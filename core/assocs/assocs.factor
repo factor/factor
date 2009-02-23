@@ -19,6 +19,9 @@ GENERIC: >alist ( assoc -- newassoc )
 
 M: assoc assoc-like drop ;
 
+: ?at ( key assoc -- value/key ? )
+    dupd at* [ [ nip ] [ drop ] if ] keep ; inline
+
 <PRIVATE
 
 : (assoc-each) ( assoc quot -- seq quot' )
@@ -36,7 +39,7 @@ M: assoc assoc-like drop ;
     [ first = ] with find swap ; inline
 
 : substituter ( assoc -- quot )
-    [ dupd at* [ nip ] [ drop ] if ] curry ; inline
+    [ ?at drop ] curry ; inline
 
 : with-assoc ( assoc quot: ( value key assoc -- ) -- quot: ( key value -- ) )
     curry [ swap ] prepose ; inline
@@ -80,7 +83,7 @@ PRIVATE>
     at* drop ; inline
 
 : at-default ( key assoc -- value/key )
-    2dup at* [ 2nip ] [ 2drop ] if ; inline
+    ?at drop ; inline
 
 M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ dup assoc-size ] dip new-assoc

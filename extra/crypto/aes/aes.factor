@@ -4,7 +4,7 @@ USING: arrays kernel math memoize sequences math.bitwise
 locals ;
 IN: crypto.aes
 
-: AES_BLOCK_SIZE 16 ; inline
+CONSTANT: AES_BLOCK_SIZE 16
 
 : sbox ( -- array )
 {

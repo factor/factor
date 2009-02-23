@@ -1,6 +1,6 @@
 USING: definitions io.launcher kernel parser words sequences math
 math.parser namespaces editors make system combinators.short-circuit
-fry threads ;
+fry threads vocabs.loader ;
 IN: editors.emacs
 
 SYMBOL: emacsclient-path
@@ -22,3 +22,5 @@ M: object default-emacsclient ( -- path ) "emacsclient" ;
     where first2 emacsclient ;
 
 [ emacsclient ] edit-hook set-global
+
+os windows? [ "editors.emacs.windows" require ] when

@@ -6,7 +6,7 @@ sequences hints arrays ;
 IN: benchmark.nbody
 
 : solar-mass ( -- x ) 4 pi sq * ; inline
-: days-per-year 365.24 ; inline
+CONSTANT: days-per-year 365.24
 
 TUPLE: body
 { location double-array }

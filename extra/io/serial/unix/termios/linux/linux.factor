@@ -3,7 +3,7 @@
 USING: alien.syntax kernel system unix ;
 IN: io.serial.unix.termios
 
-: NCCS 32 ; inline
+CONSTANT: NCCS 32
 
 TYPEDEF: uchar cc_t
 TYPEDEF: uint speed_t

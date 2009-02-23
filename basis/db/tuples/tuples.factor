@@ -4,7 +4,7 @@ USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
 math.parser io prettyprint db.types continuations
 destructors mirrors sets db.types db.private fry
-combinators.short-circuit ;
+combinators.short-circuit db.errors ;
 IN: db.tuples
 
 HOOK: create-sql-statement db-connection ( class -- object )
@@ -118,13 +118,15 @@ ERROR: no-defined-persistent object ;
     ensure-defined-persistent
     [
         '[
-            _ drop-sql-statement [ execute-statement ] with-disposals
-        ] ignore-errors
+            [
+                _ drop-sql-statement [ execute-statement ] with-disposals
+            ] ignore-table-missing
+        ] ignore-function-missing
     ] [ create-table ] bi ;
 
 : ensure-table ( class -- )
     ensure-defined-persistent
-    '[ _ create-table ] ignore-errors ;
+    '[ [ _ create-table ] ignore-table-exists ] ignore-function-exists ;
 
 : ensure-tables ( classes -- ) [ ensure-table ] each ;
 

@@ -139,3 +139,6 @@ unit-test
         { "d" [ 4 ] }
     } [ nip first even? ] assoc-partition
 ] unit-test
+
+[ 1 f ] [ 1 H{ } ?at ] unit-test
+[ 2 t ] [ 1 H{ { 1 2 } } ?at ] unit-test
