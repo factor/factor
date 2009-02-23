@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test math.bits sequences arrays ;
+USING: tools.test math math.bits sequences arrays ;
 IN: math.bits.tests
 
 [ t ] [ BIN: 111111 3 <bits> second ] unit-test
@@ -14,3 +14,18 @@ IN: math.bits.tests
 [ 2 ] [ -3 make-bits length ] unit-test
 [ 1 ] [ 1 make-bits length ] unit-test
 [ 1 ] [ -1 make-bits length ] unit-test
+
+! Odd bug
+[ t ] [
+    1067811677921310779 make-bits
+    1067811677921310779 >bignum make-bits
+    sequence=
+] unit-test
+
+[ t ] [
+    1067811677921310779 make-bits peek
+] unit-test
+
+[ t ] [
+    1067811677921310779 >bignum make-bits peek
+] unit-test
