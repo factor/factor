@@ -146,6 +146,28 @@ word."
                                   (fuel-syntax--end-of-symbol-pos))))
 
 
+;;; Convert word to generic + method:
+
+(defun fuel-refactor-make-generic ()
+  "Inserts a new generic definition with the current word's stack effect.
+The word's body is put in a new method for the generic."
+  (interactive)
+  (let ((p (point)))
+    (fuel-syntax--beginning-of-defun)
+    (unless (re-search-forward fuel-syntax--word-signature-regex nil t)
+      (goto-char p)
+      (error "Cannot find a proper word definition here"))
+    (let ((begin (match-beginning 0))
+          (end (match-end 0))
+          (name (match-string-no-properties 1))
+          (cls (read-string "Method's class (object): " nil nil "object")))
+      (goto-char begin)
+      (insert "GENERIC")
+      (goto-char (+ end 7))
+      (newline 2)
+      (insert "M: " cls " " name " "))))
+
+
 ;;; Inline word:
 
 (defun fuel-refactor--word-def (word)

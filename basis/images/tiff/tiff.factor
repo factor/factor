@@ -243,9 +243,6 @@ ERROR: bad-tiff-magic bytes ;
 
 ERROR: no-tag class ;
 
-: ?at ( key assoc -- value/key ? )
-    dupd at* [ nip t ] [ drop f ] if ; inline
-
 : find-tag ( idf class -- tag )
     swap processed-tags>> ?at [ no-tag ] unless ;
 

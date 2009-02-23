@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel base64 checksums.md5 sequences checksums
-locals prettyprint math math.bitwise grouping io combinators
+locals prettyprint math math.bits grouping io combinators
 fry make combinators.short-circuit math.functions splitting ;
 IN: crypto.passwd-md5
 
@@ -22,8 +22,8 @@ PRIVATE>
                 password length
                 [ 16 / ceiling swap <repetition> concat ] keep
                 head-slice append
-                password [ length ] [ first ] bi
-                '[ [ CHAR: \0 _ ? , ] each-bit ] "" make append
+                password [ length make-bits ] [ first ] bi
+                '[ CHAR: \0 _ ? ] "" map-as append
                 md5 checksum-bytes ] |
         1000 [
             "" swap

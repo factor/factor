@@ -4,7 +4,7 @@ USING: arrays math kernel accessors sequences sequences.private
 deques search-deques hashtables ;
 IN: unrolled-lists
 
-: unroll-factor 32 ; inline
+CONSTANT: unroll-factor 32
 
 <PRIVATE
 

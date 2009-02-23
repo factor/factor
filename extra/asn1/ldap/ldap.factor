@@ -3,9 +3,9 @@
 
 IN: asn1.ldap
 
-: SearchScope_BaseObject      0 ; inline
-: SearchScope_SingleLevel     1 ; inline
-: SearchScope_WholeSubtree    2 ; inline
+CONSTANT: SearchScope_BaseObject      0
+CONSTANT: SearchScope_SingleLevel     1
+CONSTANT: SearchScope_WholeSubtree    2
 
 : asn-syntax ( -- hashtable )
     H{

@@ -6,7 +6,7 @@ IN: checksums.adler-32
 
 SINGLETON: adler-32
 
-: adler-32-modulus 65521 ; inline
+CONSTANT: adler-32-modulus 65521
 
 M: adler-32 checksum-bytes ( bytes checksum -- value )
     drop

@@ -4,8 +4,8 @@ ui.render accessors combinators ;
 IN: opengl.demo-support
 
 : FOV ( -- x ) 2.0 sqrt 1+ ; inline
-: MOUSE-MOTION-SCALE 0.5 ; inline
-: KEY-ROTATE-STEP 10.0 ; inline
+CONSTANT: MOUSE-MOTION-SCALE 0.5
+CONSTANT: KEY-ROTATE-STEP 10.0
 
 SYMBOL: last-drag-loc
 

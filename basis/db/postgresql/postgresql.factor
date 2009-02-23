@@ -5,8 +5,8 @@ kernel math math.parser namespaces make prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
 db.tuples db.types tools.annotations math.ranges
 combinators classes locals words tools.walker db.private
-nmake accessors random db.queries destructors db.tuples.private ;
-USE: tools.walker
+nmake accessors random db.queries destructors db.tuples.private
+db.postgresql db.errors.postgresql splitting ;
 IN: db.postgresql
 
 TUPLE: postgresql-db host port pgopts pgtty database username password ;
@@ -280,3 +280,14 @@ M: postgresql-db-connection compound ( string object -- string' )
         { "references" [ >reference-string ] }
         [ drop no-compound-found ]
     } case ;
+
+M: postgresql-db-connection parse-db-error
+    "\n" split dup length {
+        { 1 [ first parse-postgresql-sql-error ] }
+        { 3 [
+                first3
+                [ parse-postgresql-sql-error ] 2dip
+                postgresql-location >>location
+        ] }
+    } case ;
+

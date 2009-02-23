@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel math.constants math.private
+USING: math kernel math.constants math.private math.bits
 math.libm combinators math.order sequences ;
 IN: math.functions
 
@@ -26,16 +26,6 @@ GENERIC: sqrt ( x -- y ) foldable
 M: real sqrt
     >float dup 0.0 < [ neg fsqrt 0.0 swap rect> ] [ fsqrt ] if ;
 
-: each-bit ( n quot: ( ? -- ) -- )
-    over [ 0 = ] [ -1 = ] bi or [
-        2drop
-    ] [
-        2dup { [ odd? ] [ call ] [ 2/ ] [ each-bit ] } spread
-    ] if ; inline recursive
-
-: map-bits ( n quot: ( ? -- obj ) -- seq )
-    accumulator [ each-bit ] dip ; inline
-
 : factor-2s ( n -- r s )
     #! factor an integer into 2^r * s
     dup 0 = [ 1 ] [
@@ -47,7 +37,7 @@ M: real sqrt
 GENERIC# ^n 1 ( z w -- z^w )
 
 : (^n) ( z w -- z^w )
-    1 swap [ [ dupd * ] when [ sq ] dip ] each-bit nip ; inline
+    make-bits 1 [ [ dupd * ] when [ sq ] dip ] reduce nip ; inline
 
 M: integer ^n
     [ factor-2s ] dip [ (^n) ] keep rot * shift ;
@@ -94,9 +84,9 @@ PRIVATE>
     dup zero? [ drop 0./0. ] [ 0 < 1./0. 0 ? ] if ; inline
 
 : (^mod) ( n x y -- z )
-    1 swap [
+    make-bits 1 [
         [ dupd * pick mod ] when [ sq over mod ] dip
-    ] each-bit 2nip ; inline
+    ] reduce 2nip ; inline
 
 : (gcd) ( b a x y -- a d )
     over zero? [

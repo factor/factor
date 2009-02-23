@@ -7,10 +7,10 @@ core-foundation.file-descriptors core-foundation.timers
 core-foundation.time ;
 IN: core-foundation.run-loop
 
-: kCFRunLoopRunFinished 1 ; inline
-: kCFRunLoopRunStopped 2 ; inline
-: kCFRunLoopRunTimedOut 3 ; inline
-: kCFRunLoopRunHandledSource 4 ; inline
+CONSTANT: kCFRunLoopRunFinished 1
+CONSTANT: kCFRunLoopRunStopped 2
+CONSTANT: kCFRunLoopRunTimedOut 3
+CONSTANT: kCFRunLoopRunHandledSource 4
 
 TYPEDEF: void* CFRunLoopRef
 TYPEDEF: void* CFRunLoopSourceRef
