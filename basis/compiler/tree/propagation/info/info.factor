@@ -32,9 +32,9 @@ literal?
 length
 slots ;
 
-: null-info T{ value-info f null empty-interval } ; inline
+CONSTANT: null-info T{ value-info f null empty-interval }
 
-: object-info T{ value-info f object full-interval } ; inline
+CONSTANT: object-info T{ value-info f object full-interval }
 
 : class-interval ( class -- interval )
     dup real class<=

@@ -61,7 +61,7 @@ PRIVATE>
 : month-abbreviation ( n -- string )
     check-month 1- month-abbreviations nth ;
 
-: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 } ; inline
+CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
 
 : day-names ( -- array )
     {

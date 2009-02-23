@@ -5,7 +5,7 @@ io.encodings.utf8 hashtables kernel namespaces sequences
 vocabs.loader io combinators calendar accessors math.parser
 io.streams.string ui.tools.operations quotations strings arrays
 prettyprint words vocabs sorting sets classes math alien urls
-splitting ascii ;
+splitting ascii combinators.short-circuit ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -18,37 +18,61 @@ ERROR: no-vocab vocab ;
 
 <PRIVATE
 
-: root? ( string -- ? ) vocab-roots get member? ;
+: vocab-root? ( string -- ? ) vocab-roots get member? ;
 
 : contains-dot? ( string -- ? ) ".." swap subseq? ;
 
 : contains-separator? ( string -- ? ) [ path-separator? ] any? ;
 
 : check-vocab-name ( string -- string )
-    dup contains-dot? [ vocab-name-contains-dot ] when
-    dup contains-separator? [ vocab-name-contains-separator ] when ;
+    [ ]
+    [ contains-dot? [ vocab-name-contains-dot ] when ]
+    [ contains-separator? [ vocab-name-contains-separator ] when ] tri ;
 
 : check-root ( string -- string )
-    dup root? [ not-a-vocab-root ] unless ;
+    dup vocab-root? [ not-a-vocab-root ] unless ;
+
+: check-vocab ( vocab -- vocab )
+    dup find-vocab-root [ no-vocab ] unless ;
+
+: check-vocab-root/vocab ( vocab-root string -- vocab-root string )
+    [ check-root ] [ check-vocab-name ] bi* ;
+
+: replace-vocab-separators ( vocab -- path )
+    path-separator first CHAR: . associate substitute ; inline
+
+: vocab-root/vocab>path ( vocab-root vocab -- path )
+    check-vocab-root/vocab
+    [ ] [ replace-vocab-separators ] bi* append-path ;
+
+: vocab>path ( vocab -- path )
+    check-vocab
+    [ find-vocab-root ] keep vocab-root/vocab>path ;
+
+: vocab-root/vocab/file>path ( vocab-root vocab file -- path )
+    [ vocab-root/vocab>path ] dip append-path ;
+
+: vocab-root/vocab/suffix>path ( vocab-root vocab suffix -- path )
+    [ vocab-root/vocab>path dup file-name append-path ] dip append ;
+
+: vocab/suffix>path ( vocab suffix -- path )
+    [ vocab>path dup file-name append-path ] dip append ;
 
 : directory-exists ( path -- )
     "Not creating a directory, it already exists: " write print ;
 
-: scaffold-directory ( path -- )
+: scaffold-directory ( vocab-root vocab -- )
+    vocab-root/vocab>path
     dup exists? [ directory-exists ] [ make-directories ] if ;
 
-: not-scaffolding ( path -- )
-    "Not creating scaffolding for " write <pathname> . ;
+: not-scaffolding ( path -- path )
+    "Not creating scaffolding for " write dup <pathname> . ;
 
-: scaffolding ( path -- )
-    "Creating scaffolding for " write <pathname> . ;
+: scaffolding ( path -- path )
+    "Creating scaffolding for " write dup <pathname> . ;
 
-: (scaffold-path) ( path string -- path )
-    dupd [ file-name ] dip append append-path ;
-
-: scaffold-path ( path string -- path ? )
-    (scaffold-path)
-    dup exists? [ dup not-scaffolding f ] [ dup scaffolding t ] if ;
+: scaffolding? ( path -- path ? )
+    dup exists? [ not-scaffolding f ] [ scaffolding t ] if ;
 
 : scaffold-copyright ( -- )
     "! Copyright (C) " write now year>> number>string write
@@ -62,37 +86,25 @@ ERROR: no-vocab vocab ;
         "IN: " write print
     ] with-string-writer ;
 
-: set-scaffold-main-file ( path vocab -- )
-    main-file-string swap utf8 set-file-contents ;
+: set-scaffold-main-file ( vocab path -- )
+    [ main-file-string ] dip utf8 set-file-contents ;
 
-: scaffold-main ( path vocab -- )
-    [ ".factor" scaffold-path ] dip
-    swap [ set-scaffold-main-file ] [ 2drop ] if ;
-
-: tests-file-string ( vocab -- string )
-    [
-        scaffold-copyright
-        "USING: tools.test " write dup write " ;" print
-        "IN: " write write ".tests" print
-    ] with-string-writer ;
-
-: set-scaffold-tests-file ( path vocab -- )
-    tests-file-string swap utf8 set-file-contents ;
-
-: scaffold-tests ( path vocab -- )
-    [ "-tests.factor" scaffold-path ] dip
-    swap [ set-scaffold-tests-file ] [ 2drop ] if ;
-
-: scaffold-authors ( path -- )
-    "authors.txt" append-path dup exists? [
-        not-scaffolding
+: scaffold-main ( vocab-root vocab -- )
+    tuck ".factor" vocab-root/vocab/suffix>path scaffolding? [
+        set-scaffold-main-file
     ] [
-        dup scaffolding
-        developer-name get swap utf8 set-file-contents
+        2drop
+    ] if ;
+
+: scaffold-authors ( vocab-root vocab -- )
+    "authors.txt" vocab-root/vocab/file>path scaffolding? [
+        [ developer-name get ] dip utf8 set-file-contents
+    ] [
+        drop
     ] if ;
 
 : lookup-type ( string -- object/string ? )
-    "new" ?head drop [ [ CHAR: ' = ] [ digit? ] bi or ] trim-tail
+    "new" ?head drop [ { [ CHAR: ' = ] [ digit? ] } 1|| ] trim-tail
     H{
         { "object" object } { "obj" object }
         { "quot" quotation }
@@ -134,6 +146,9 @@ ERROR: no-vocab vocab ;
         " }" write
     ] each ;
 
+: 4bl ( -- )
+    "    " write ; inline
+
 : $values. ( word -- )
     "declared-effect" word-prop [
         [ in>> ] [ out>> ] bi
@@ -141,8 +156,8 @@ ERROR: no-vocab vocab ;
             2drop
         ] [
             "{ $values" print
-            [ "    " write ($values.) ]
-            [ [ nl "    " write ($values.) ] unless-empty ] bi*
+            [ 4bl ($values.) ]
+            [ [ nl 4bl ($values.) ] unless-empty ] bi*
             nl "}" print
         ] if
     ] when* ;
@@ -151,21 +166,21 @@ ERROR: no-vocab vocab ;
     drop
     "{ $description \"\" } ;" print ;
 
-: help-header. ( word -- )
+: docs-header. ( word -- )
     "HELP: " write name>> print ;
 
 : (help.) ( word -- )
-    [ help-header. ] [ $values. ] [ $description. ] tri ;
+    [ docs-header. ] [ $values. ] [ $description. ] tri ;
 
 : interesting-words ( vocab -- array )
     words
-    [ [ "help" word-prop ] [ predicate? ] bi or not ] filter
+    [ { [ "help" word-prop ] [ predicate? ] } 1|| not ] filter
     natural-sort ;
 
 : interesting-words. ( vocab -- )
     interesting-words [ (help.) nl ] each ;
 
-: help-file-string ( vocab -- str2 )
+: docs-file-string ( vocab -- str2 )
     [
         {
             [ "IN: " write print nl ]
@@ -186,61 +201,67 @@ ERROR: no-vocab vocab ;
     [ bl write ] each
     " ;" print ;
 
-: set-scaffold-help-file ( path vocab -- )
-    swap utf8 <file-writer> [
+: set-scaffold-docs-file ( vocab path -- )
+    utf8 <file-writer> [
         scaffold-copyright
-        [ help-file-string ] [ write-using ] bi
+        [ docs-file-string ] [ write-using ] bi
         write
     ] with-output-stream ;
-
-: check-scaffold ( vocab-root string -- vocab-root string )
-    [ check-root ] [ check-vocab-name ] bi* ;
-
-: vocab>scaffold-path ( vocab-root string -- path )
-    path-separator first CHAR: . associate substitute
-    append-path ;
-
-: prepare-scaffold ( vocab-root string -- string path )
-    check-scaffold [ vocab>scaffold-path ] keep ;
 
 : with-scaffold ( quot -- )
     [ H{ } clone using ] dip with-variable ; inline
 
-: check-vocab ( vocab -- vocab )
-    dup find-vocab-root [ no-vocab ] unless ;
-
-PRIVATE>
-
 : link-vocab ( vocab -- )
     check-vocab
     "Edit documentation: " write
-    [ find-vocab-root ]
-    [ vocab>scaffold-path ] bi
-    "-docs.factor" (scaffold-path) <pathname> . ;
+    "-docs.factor" vocab/suffix>path <pathname> . ;
+
+PRIVATE>
 
 : help. ( word -- )
     [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;
 
-: scaffold-help ( string -- )
+: scaffold-help ( vocab -- )
     [
-        [ find-vocab-root ] [ check-vocab ] bi
-        prepare-scaffold
-        [ "-docs.factor" scaffold-path ] dip
-        swap [ set-scaffold-help-file ] [ 2drop ] if
+        dup "-docs.factor" vocab/suffix>path scaffolding? [
+            set-scaffold-docs-file
+        ] [
+            2drop
+        ] if
     ] with-scaffold ;
 
 : scaffold-undocumented ( string -- )
     [ interesting-words. ] [ link-vocab ] bi ;
 
 : scaffold-vocab ( vocab-root string -- )
-    prepare-scaffold
     {
-        [ drop scaffold-directory ]
+        [ scaffold-directory ]
         [ scaffold-main ]
-        [ scaffold-tests ]
-        [ drop scaffold-authors ]
+        [ scaffold-authors ]
         [ nip require ]
     } 2cleave ;
+
+<PRIVATE
+
+: tests-file-string ( vocab -- string )
+    [
+        scaffold-copyright
+        "USING: tools.test " write dup write " ;" print
+        "IN: " write write ".tests" print
+    ] with-string-writer ;
+
+: set-scaffold-tests-file ( vocab path -- )
+    [ tests-file-string ] dip utf8 set-file-contents ;
+
+PRIVATE>
+
+: scaffold-tests ( vocab -- )
+    dup "-tests.factor" vocab/suffix>path
+    scaffolding? [
+        set-scaffold-tests-file
+    ] [
+        2drop
+    ] if ;
 
 SYMBOL: examples-flag
 
@@ -250,7 +271,7 @@ SYMBOL: examples-flag
         "           \"\""
         "           \"\""
         "}"
-    } [ examples-flag get [ "    " write ] when print ] each ;
+    } [ examples-flag get [ 4bl ] when print ] each ;
 
 : examples ( n -- )
     t \ examples-flag [
@@ -260,10 +281,11 @@ SYMBOL: examples-flag
     ] with-variable ;
 
 : scaffold-rc ( path -- )
+    [ home ] dip append-path
     [ touch-file ] [ "Click to edit: " write <pathname> . ] bi ;
 
-: scaffold-factor-boot-rc ( -- )
-    home ".factor-boot-rc" append-path scaffold-rc ;
+: scaffold-factor-boot-rc ( -- ) ".factor-boot-rc" scaffold-rc ;
 
-: scaffold-factor-rc ( -- )
-    home ".factor-rc" append-path scaffold-rc ;
+: scaffold-factor-rc ( -- ) ".factor-rc" scaffold-rc ;
+
+: scaffold-emacs ( -- ) ".emacs" scaffold-rc ;

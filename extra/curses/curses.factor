@@ -10,9 +10,9 @@ IN: curses
 SYMBOL: curses-windows
 SYMBOL: current-window
 
-: ERR -1 ; inline
-: FALSE 0 ; inline
-: TRUE 1 ; inline
+CONSTANT: ERR -1
+CONSTANT: FALSE 0
+CONSTANT: TRUE 1
 : >BOOLEAN ( n -- TRUE/FALSE ) >boolean TRUE FALSE ? ; inline
 
 ERROR: duplicate-window window ;

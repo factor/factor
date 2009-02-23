@@ -58,6 +58,7 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
 "Utility operations built up from the " { $link "assocs-protocol" } ":"
 { $subsection key? }
 { $subsection at }
+{ $subsection ?at }
 { $subsection assoc-empty? }
 { $subsection keys }
 { $subsection values }
@@ -188,11 +189,15 @@ HELP: key?
 { $values { "key" object } { "assoc" assoc } { "?" "a boolean" } }
 { $description "Tests if an assoc contains a key." } ;
 
-{ at at* key? } related-words
+{ at at* key? ?at } related-words
 
 HELP: at
 { $values { "key" "an object" } { "assoc" assoc } { "value/f" "the value associated to the key, or " { $link f } " if the key is not present in the assoc" } }
 { $description "Looks up the value associated with a key. This word makes no distinction between a missing value and a value set to " { $link f } "; if the difference is important, use " { $link at* } "." } ;
+
+HELP: ?at
+{ $values { "key" "an object" } { "assoc" assoc } { "value/key" "the value associated to the key, or the key if the key is not present in the assoc" } { "?" "a boolean" } }
+{ $description "Looks up the value associated with a key. If the key was not present, an error can be thrown without extra stack shuffling. This word handles assocs that store " { $link f } "." } ;
 
 HELP: assoc-each
 { $values { "assoc" assoc } { "quot" { $quotation "( key value -- )" } } }

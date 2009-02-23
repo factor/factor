@@ -197,7 +197,7 @@ code in the buffer."
   (when (string-match factor-mode--cycle-basename-regex basename)
     (cons (match-string 1 basename) (match-string 2 basename))))
 
-(defun factor-mode--cycle-next (file)
+(defun factor-mode--cycle-next (file skip)
   (let* ((dir (file-name-directory file))
          (basename (file-name-nondirectory file))
          (p/s (factor-mode--cycle-split basename))
@@ -211,7 +211,8 @@ code in the buffer."
       (let* ((suffix (ring-ref ring (+ i idx)))
              (path (expand-file-name (concat prefix suffix) dir)))
         (when (or (file-exists-p path)
-                  (and (not (member suffix factor-mode--cycling-no-ask))
+                  (and (not skip)
+                       (not (member suffix factor-mode--cycling-no-ask))
                        (y-or-n-p (format "Create %s? " path))))
           (setq result path))
         (when (and (not factor-mode-cycle-always-ask-p)
@@ -224,10 +225,11 @@ code in the buffer."
 (defsubst factor-mode--cycling-setup ()
   (setq factor-mode--cycling-no-ask nil))
 
-(defun factor-mode-visit-other-file (&optional file)
-  "Cycle between code, tests and docs factor files."
-  (interactive)
-  (let ((file (factor-mode--cycle-next (or file (buffer-file-name)))))
+(defun factor-mode-visit-other-file (&optional skip)
+  "Cycle between code, tests and docs factor files.
+With prefix, non-existing files will be skipped."
+  (interactive "P")
+  (let ((file (factor-mode--cycle-next (buffer-file-name) skip)))
     (unless file (error "No other file found"))
     (find-file file)
     (unless (file-exists-p file)
