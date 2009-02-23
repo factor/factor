@@ -4,15 +4,15 @@ USING: arrays kernel math cocoa cocoa.messages cocoa.classes
 sequences math.bitwise ;
 IN: cocoa.windows
 
-: NSBorderlessWindowMask     0 ; inline
-: NSTitledWindowMask         1 ; inline
-: NSClosableWindowMask       2 ; inline
-: NSMiniaturizableWindowMask 4 ; inline
-: NSResizableWindowMask      8 ; inline
+CONSTANT: NSBorderlessWindowMask     0
+CONSTANT: NSTitledWindowMask         1
+CONSTANT: NSClosableWindowMask       2
+CONSTANT: NSMiniaturizableWindowMask 4
+CONSTANT: NSResizableWindowMask      8
 
-: NSBackingStoreRetained    0 ; inline
-: NSBackingStoreNonretained 1 ; inline
-: NSBackingStoreBuffered    2 ; inline
+CONSTANT: NSBackingStoreRetained    0
+CONSTANT: NSBackingStoreNonretained 1
+CONSTANT: NSBackingStoreBuffered    2
 
 : standard-window-type ( -- n )
     {

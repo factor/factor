@@ -77,20 +77,20 @@ SYMBOL: objects
 
 ! Constants
 
-: image-magic HEX: 0f0e0d0c ; inline
-: image-version 4 ; inline
+CONSTANT: image-magic HEX: 0f0e0d0c
+CONSTANT: image-version 4
 
-: data-base 1024 ; inline
+CONSTANT: data-base 1024
 
-: userenv-size 70 ; inline
+CONSTANT: userenv-size 70
 
-: header-size 10 ; inline
+CONSTANT: header-size 10
 
-: data-heap-size-offset 3 ; inline
-: t-offset              6 ; inline
-: 0-offset              7 ; inline
-: 1-offset              8 ; inline
-: -1-offset             9 ; inline
+CONSTANT: data-heap-size-offset 3
+CONSTANT: t-offset              6
+CONSTANT: 0-offset              7
+CONSTANT: 1-offset              8
+CONSTANT: -1-offset             9
 
 SYMBOL: sub-primitives
 
