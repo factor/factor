@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax combinators io.ports
-io.streams.duplex io.unix.backend system kernel math math.bitwise
-vocabs.loader unix io.serial io.serial.unix.termios ;
+io.streams.duplex system kernel math math.bitwise
+vocabs.loader unix io.serial io.serial.unix.termios io.backend.unix ;
 IN: io.serial.unix
 
 << {
@@ -31,8 +31,9 @@ FUNCTION: int cfsetspeed ( termios* t, speed_t s ) ;
 : <file-rw> ( path -- stream ) open-rw fd>duplex-stream ;
 
 M: unix open-serial ( serial -- serial' )
+    dup
     path>> { O_RDWR O_NOCTTY O_NDELAY } flags file-mode open-file
-    fd>duplex-stream ;
+    fd>duplex-stream >>stream ;
 
 : serial-fd ( serial -- fd )
     stream>> in>> handle>> fd>> ;

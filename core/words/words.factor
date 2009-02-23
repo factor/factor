@@ -133,7 +133,7 @@ compiled-generic-crossref [ H{ } clone ] initialize
 
 SYMBOL: visited
 
-: reset-on-redefine { "inferred-effect" "cannot-infer" } ; inline
+CONSTANT: reset-on-redefine { "inferred-effect" "cannot-infer" }
 
 : (redefined) ( word -- )
     dup visited get key? [ drop ] [

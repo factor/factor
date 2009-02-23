@@ -5,7 +5,7 @@ sequences vectors fry libc destructors
 specialized-arrays.direct.alien ;
 IN: cocoa.enumeration
 
-: NS-EACH-BUFFER-SIZE 16 ; inline
+CONSTANT: NS-EACH-BUFFER-SIZE 16
 
 : with-enumeration-buffers ( quot -- )
     '[

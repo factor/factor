@@ -18,7 +18,7 @@ C: <rsa> rsa
 
 <PRIVATE
 
-: public-key 65537 ; inline
+CONSTANT: public-key 65537
 
 : rsa-primes ( numbits -- p q )
     2/ 2 unique-primes first2 ;

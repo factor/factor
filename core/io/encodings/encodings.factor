@@ -14,7 +14,7 @@ GENERIC: encode-char ( char stream encoding -- )
 
 GENERIC: <decoder> ( stream encoding -- newstream )
 
-: replacement-char HEX: fffd ; inline
+CONSTANT: replacement-char HEX: fffd
 
 TUPLE: decoder stream code cr ;
 

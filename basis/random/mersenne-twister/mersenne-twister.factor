@@ -11,9 +11,9 @@ IN: random.mersenne-twister
 
 TUPLE: mersenne-twister { seq uint-array } { i fixnum } ;
 
-: n 624 ; inline
-: m 397 ; inline
-: a uint-array{ 0 HEX: 9908b0df } ; inline
+CONSTANT: n 624
+CONSTANT: m 397
+CONSTANT: a uint-array{ 0 HEX: 9908b0df }
 
 : y ( n seq -- y )
     [ nth-unsafe 31 mask-bit ]

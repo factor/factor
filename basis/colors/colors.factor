@@ -6,7 +6,11 @@ IN: colors
 
 TUPLE: color ;
 
-TUPLE: rgba < color { red read-only } { green read-only } { blue read-only } { alpha read-only } ;
+TUPLE: rgba < color
+{ red read-only }
+{ green read-only }
+{ blue read-only }
+{ alpha read-only } ;
 
 C: <rgba> rgba
 

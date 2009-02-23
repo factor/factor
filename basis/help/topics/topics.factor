@@ -55,7 +55,7 @@ M: no-article summary
     drop "Help article does not exist" ;
 
 : article ( name -- article )
-    dup articles get at* [ nip ] [ drop no-article ] if ;
+    articles get ?at [ no-article ] unless ;
 
 M: object article-name article article-name ;
 M: object article-title article article-title ;

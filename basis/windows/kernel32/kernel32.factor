@@ -1226,7 +1226,7 @@ FUNCTION: BOOL GetExitCodeProcess ( HANDLE hProcess, LPDWORD lpExitCode ) ;
 FUNCTION: DWORD GetFileAttributesW ( LPCTSTR lpFileName ) ;
 ! FUNCTION: GetFileAttributesExA
 
-: GetFileExInfoStandard 0 ; inline
+CONSTANT: GetFileExInfoStandard 0
 
 
 FUNCTION: BOOL GetFileAttributesExW ( LPCTSTR lpFileName, GET_FILEEX_INFO_LEVELS fInfoLevelId, LPVOID lpFileInformation ) ;
