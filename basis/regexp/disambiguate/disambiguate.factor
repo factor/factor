@@ -12,11 +12,12 @@ TUPLE: parts in out ;
 : powerset-partition ( classes -- partitions )
     [ length [ 2^ ] keep ] keep '[
         _ <bits> _ make-partition
-    ] map ;
+    ] map rest ;
 
 : partition>class ( parts -- class )
-    [ in>> ] [ out>> ] bi
-    [ <or-class> ] bi@ <not-class> 2array <and-class> ;
+    [ out>> [ <not-class> ] map ]
+    [ in>> <and-class> ] bi
+    prefix <and-class> ;
 
 : get-transitions ( partition state-transitions -- next-states )
     [ in>> ] dip '[ _ at ] map prune ;

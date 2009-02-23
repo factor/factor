@@ -120,7 +120,7 @@ M: not-class modify-class
     class>> modify-class <not-class> ;
 
 M: any-char modify-class
-    [ dotall option? ] dip any-char-no-nl ? ;
+    drop dotall option? t any-char-no-nl ? ;
 
 : modify-letter-class ( class -- newclass )
     case-insensitive option? [ drop Letter-class ] when ;

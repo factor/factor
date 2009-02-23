@@ -12,11 +12,11 @@ CONSTANT: fail-state -1
 
 : add-default-transition ( state's-transitions -- new-state's-transitions )
     clone dup
-    [ [ fail-state ] dip keys <or-class> <not-class> ] keep set-at ;
+    [ [ fail-state ] dip keys [ <not-class> ] map <and-class> ] keep set-at ;
 
 : fail-state-recurses ( transitions -- new-transitions )
     clone dup
-    [ fail-state any-char associate fail-state ] dip set-at ;
+    [ fail-state t associate fail-state ] dip set-at ;
 
 : add-fail-state ( transitions -- new-transitions )
     [ add-default-transition ] assoc-map
@@ -48,8 +48,8 @@ CONSTANT: fail-state -1
 
 : unify-final-state ( transition-table -- transition-table )
     dup [ final-states>> keys ] keep
-    '[ -1 eps <literal-transition> _ add-transition ] each
-    H{ { -1 -1 } } >>final-states ;
+    '[ -2 eps <literal-transition> _ add-transition ] each
+    H{ { -2 -2 } } >>final-states ;
 
 : adjoin-dfa ( transition-table -- start end )
     box-transitions unify-final-state renumber-states
