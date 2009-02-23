@@ -9,7 +9,7 @@ IN: math.analysis
 ! http://www.rskey.org/gamma.htm  "Lanczos Approximation"
 ! n=6: error ~ 3 x 10^-11
 
-: gamma-g6 5.15 ; inline
+CONSTANT: gamma-g6 5.15
 
 : gamma-p6
     {
