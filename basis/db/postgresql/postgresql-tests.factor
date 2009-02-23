@@ -1,14 +1,7 @@
 USING: kernel db.postgresql alien continuations io classes
 prettyprint sequences namespaces tools.test db db.private
-db.tuples db.types unicode.case accessors system ;
+db.tuples db.types unicode.case accessors system db.tester ;
 IN: db.postgresql.tests
-
-: postgresql-test-db ( -- postgresql-db )
-    <postgresql-db>
-        "localhost" >>host
-        "postgres" >>username
-        "thepasswordistrust" >>password
-        "factor-test" >>database ;
 
 os windows? cpu x86.64? and [
     [ ] [ postgresql-test-db [ ] with-db ] unit-test

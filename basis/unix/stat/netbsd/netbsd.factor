@@ -6,8 +6,8 @@ cell-bits {
     { 64 [ "unix.stat.netbsd.64" require ] }
 } case
 
-: _VFS_NAMELEN    32   ; inline
-: _VFS_MNAMELEN   1024 ; inline
+CONSTANT: _VFS_NAMELEN    32  
+CONSTANT: _VFS_MNAMELEN   1024
 
 C-STRUCT: statvfs
     { "ulong"   "f_flag" }   

@@ -3,7 +3,7 @@
 USING: io.files.windows io.streams.duplex kernel math
 math.bitwise windows.kernel32 accessors alien.c-types
 windows io.files.windows fry locals continuations ;
-IN: serial.windows
+IN: io.serial.windows
 
 : <serial-stream> ( path encoding -- duplex )
     [ open-r/w dup ] dip <encoder-duplex> ;

@@ -12,8 +12,8 @@ TUPLE: tetris
     { paused? initial: f }
     { running? initial: t } ;
 
-: default-width 10 ; inline
-: default-height 20 ; inline
+CONSTANT: default-width 10
+CONSTANT: default-height 20
 
 : <tetris> ( width height -- tetris )
     dupd <board> swap <piece-llist>

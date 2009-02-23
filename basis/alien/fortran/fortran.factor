@@ -170,8 +170,8 @@ M: character-type (fortran-type>c-type)
 
 : (parse-fortran-type) ( fortran-type-string -- type )
     parse-out swap parse-dims swap parse-size swap
-    dup >lower fortran>c-types at*
-    [ nip new-fortran-type ] [ drop misc-type boa ] if ;
+    >lower fortran>c-types ?at
+    [ new-fortran-type ] [ misc-type boa ] if ;
 
 : parse-fortran-type ( fortran-type-string/f -- type/f )
     dup [ (parse-fortran-type) ] when ;

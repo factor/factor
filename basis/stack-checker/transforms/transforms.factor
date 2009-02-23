@@ -105,7 +105,7 @@ IN: stack-checker.transforms
 ] 1 define-transform
 
 ! Membership testing
-: bit-member-n 256 ; inline
+CONSTANT: bit-member-n 256
 
 : bit-member? ( seq -- ? )
     #! Can we use a fast byte array test here?
