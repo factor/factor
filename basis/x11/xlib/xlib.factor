@@ -447,10 +447,10 @@ FUNCTION: Status XDrawString (
 
 ! 8.7 - Transferring Images between Client and Server
 
-: XYBitmap 0 ; inline
-: XYPixmap 1 ; inline
-: ZPixmap  2 ; inline
-: AllPlanes -1 ; inline
+CONSTANT: XYBitmap 0
+CONSTANT: XYPixmap 1
+CONSTANT: ZPixmap  2
+CONSTANT: AllPlanes -1
 
 C-STRUCT: XImage-funcs
     { "void*" "create_image" }
@@ -1074,9 +1074,9 @@ FUNCTION: Status XMaskEvent ( Display* display, long event_mask, XEvent* event_r
 
 ! 11.3 - Event Queue Management
 
-: QueuedAlready 0 ; inline
-: QueuedAfterReading 1 ; inline
-: QueuedAfterFlush 2 ; inline
+CONSTANT: QueuedAlready 0
+CONSTANT: QueuedAfterReading 1
+CONSTANT: QueuedAfterFlush 2
 
 FUNCTION: int XEventsQueued ( Display* display, int mode ) ;
 FUNCTION: int XPending ( Display* display ) ;
@@ -1093,7 +1093,7 @@ FUNCTION: int XSetErrorHandler ( void* handler ) ;
 ! 12 - Input Device Functions
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: None 0 ; inline
+CONSTANT: None 0
 
 FUNCTION: int XGrabPointer (
   Display* display,
