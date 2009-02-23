@@ -19,8 +19,8 @@ IN: math.bitwise.tests
 [ 268 ] [ 1 { 8 { 3 2 } } bitfield ] unit-test
 [ 512 ] [ 1 { { 1+ 8 } } bitfield ] unit-test
 
-: a 1 ; inline
-: b 2 ; inline
+CONSTANT: a 1
+CONSTANT: b 2
 
 : foo ( -- flags ) { a b } flags ;
 

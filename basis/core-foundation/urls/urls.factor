@@ -4,7 +4,7 @@ USING: alien.syntax kernel core-foundation.strings
 core-foundation ;
 IN: core-foundation.urls
 
-: kCFURLPOSIXPathStyle 0 ; inline
+CONSTANT: kCFURLPOSIXPathStyle 0
 
 TYPEDEF: void* CFURLRef
 
