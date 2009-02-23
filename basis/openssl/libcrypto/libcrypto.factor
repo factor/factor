@@ -48,14 +48,14 @@ C-STRUCT: bio
     { "void*" "crypto-ex-data-stack" }
     { "int" "crypto-ex-data-dummy" } ;
 
-: BIO_NOCLOSE       HEX: 00 ; inline
-: BIO_CLOSE         HEX: 01 ; inline
+CONSTANT: BIO_NOCLOSE       HEX: 00
+CONSTANT: BIO_CLOSE         HEX: 01
 
-: RSA_3             HEX: 3 ; inline
-: RSA_F4            HEX: 10001 ; inline
+CONSTANT: RSA_3             HEX: 3
+CONSTANT: RSA_F4            HEX: 10001
 
-: BIO_C_SET_SSL     109 ; inline
-: BIO_C_GET_SSL     110 ; inline
+CONSTANT: BIO_C_SET_SSL     109
+CONSTANT: BIO_C_GET_SSL     110
 
 LIBRARY: libcrypto
 

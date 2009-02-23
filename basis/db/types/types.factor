@@ -124,9 +124,6 @@ FACTOR-BLOB NULL URL ;
 ! PostgreSQL Types:
 ! http://developer.postgresql.org/pgdocs/postgres/datatype.html
 
-: ?at ( obj assoc -- value/obj ? )
-    dupd at* [ [ nip ] [ drop ] if ] keep ;
-
 ERROR: unknown-modifier modifier ;
 
 : lookup-modifier ( obj -- string )

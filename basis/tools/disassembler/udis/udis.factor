@@ -24,10 +24,10 @@ FUNCTION: void ud_translate_att ( ud* u ) ;
 : UD_SYN_INTEL ( -- addr ) &: ud_translate_intel ; inline
 : UD_SYN_ATT ( -- addr ) &: ud_translate_att ; inline
 
-: UD_EOI          -1 ; inline
-: UD_INP_CACHE_SZ 32 ; inline
-: UD_VENDOR_AMD   0 ; inline
-: UD_VENDOR_INTEL 1 ; inline
+CONSTANT: UD_EOI          -1
+CONSTANT: UD_INP_CACHE_SZ 32
+CONSTANT: UD_VENDOR_AMD   0
+CONSTANT: UD_VENDOR_INTEL 1
 
 FUNCTION: void ud_init ( ud* u ) ;
 FUNCTION: void ud_set_mode ( ud* u, uint8_t mode ) ;
