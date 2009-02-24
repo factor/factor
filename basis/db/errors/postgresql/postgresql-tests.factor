@@ -5,7 +5,7 @@ db.errors.postgresql db.postgresql io.files.unique kernel namespaces
 tools.test db.tester continuations ;
 IN: db.errors.postgresql.tests
 
-postgresql-test-db [
+[
 
     [ "drop table foo;" sql-command ] ignore-errors
     [ "drop table ship;" sql-command ] ignore-errors
@@ -29,4 +29,4 @@ postgresql-test-db [
         sql-syntax-error?
     ] must-fail-with
 
-] with-db
+] test-postgresql
