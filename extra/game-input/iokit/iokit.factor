@@ -121,12 +121,12 @@ CONSTANT: hat-switch-matching-hash
 : hat-switch? ( {usage-page,usage} -- ? )
     { 1 HEX: 39 } = ; inline
 
-: pov-values
+CONSTANT: pov-values
     {
         pov-up pov-up-right pov-right pov-down-right
         pov-down pov-down-left pov-left pov-up-left
         pov-neutral
-    } ; inline
+    }
 
 : button-value ( value -- f/(0,1] )
     IOHIDValueGetIntegerValue dup zero? [ drop f ] when ;

@@ -5,43 +5,43 @@ cocoa cocoa.messages cocoa.classes cocoa.types sequences
 continuations accessors ;
 IN: cocoa.views
 
-: NSOpenGLPFAAllRenderers 1 ;
-: NSOpenGLPFADoubleBuffer 5 ;
-: NSOpenGLPFAStereo 6 ;
-: NSOpenGLPFAAuxBuffers 7 ;
-: NSOpenGLPFAColorSize 8 ;
-: NSOpenGLPFAAlphaSize 11 ;
-: NSOpenGLPFADepthSize 12 ;
-: NSOpenGLPFAStencilSize 13 ;
-: NSOpenGLPFAAccumSize 14 ;
-: NSOpenGLPFAMinimumPolicy 51 ;
-: NSOpenGLPFAMaximumPolicy 52 ;
-: NSOpenGLPFAOffScreen 53 ;
-: NSOpenGLPFAFullScreen 54 ;
-: NSOpenGLPFASampleBuffers 55 ;
-: NSOpenGLPFASamples 56 ;
-: NSOpenGLPFAAuxDepthStencil 57 ;
-: NSOpenGLPFAColorFloat  58 ;
-: NSOpenGLPFAMultisample 59 ;
-: NSOpenGLPFASupersample 60 ;
-: NSOpenGLPFASampleAlpha 61 ;
-: NSOpenGLPFARendererID 70 ;
-: NSOpenGLPFASingleRenderer 71 ;
-: NSOpenGLPFANoRecovery 72 ;
-: NSOpenGLPFAAccelerated 73 ;
-: NSOpenGLPFAClosestPolicy 74 ;
-: NSOpenGLPFARobust 75 ;
-: NSOpenGLPFABackingStore 76 ;
-: NSOpenGLPFAMPSafe 78 ;
-: NSOpenGLPFAWindow 80 ;
-: NSOpenGLPFAMultiScreen 81 ;
-: NSOpenGLPFACompliant 83 ;
-: NSOpenGLPFAScreenMask 84 ;
-: NSOpenGLPFAPixelBuffer 90 ;
-: NSOpenGLPFAAllowOfflineRenderers 96 ;
-: NSOpenGLPFAVirtualScreenCount 128 ;
+CONSTANT: NSOpenGLPFAAllRenderers 1
+CONSTANT: NSOpenGLPFADoubleBuffer 5
+CONSTANT: NSOpenGLPFAStereo 6
+CONSTANT: NSOpenGLPFAAuxBuffers 7
+CONSTANT: NSOpenGLPFAColorSize 8
+CONSTANT: NSOpenGLPFAAlphaSize 11
+CONSTANT: NSOpenGLPFADepthSize 12
+CONSTANT: NSOpenGLPFAStencilSize 13
+CONSTANT: NSOpenGLPFAAccumSize 14
+CONSTANT: NSOpenGLPFAMinimumPolicy 51
+CONSTANT: NSOpenGLPFAMaximumPolicy 52
+CONSTANT: NSOpenGLPFAOffScreen 53
+CONSTANT: NSOpenGLPFAFullScreen 54
+CONSTANT: NSOpenGLPFASampleBuffers 55
+CONSTANT: NSOpenGLPFASamples 56
+CONSTANT: NSOpenGLPFAAuxDepthStencil 57
+CONSTANT: NSOpenGLPFAColorFloat  58
+CONSTANT: NSOpenGLPFAMultisample 59
+CONSTANT: NSOpenGLPFASupersample 60
+CONSTANT: NSOpenGLPFASampleAlpha 61
+CONSTANT: NSOpenGLPFARendererID 70
+CONSTANT: NSOpenGLPFASingleRenderer 71
+CONSTANT: NSOpenGLPFANoRecovery 72
+CONSTANT: NSOpenGLPFAAccelerated 73
+CONSTANT: NSOpenGLPFAClosestPolicy 74
+CONSTANT: NSOpenGLPFARobust 75
+CONSTANT: NSOpenGLPFABackingStore 76
+CONSTANT: NSOpenGLPFAMPSafe 78
+CONSTANT: NSOpenGLPFAWindow 80
+CONSTANT: NSOpenGLPFAMultiScreen 81
+CONSTANT: NSOpenGLPFACompliant 83
+CONSTANT: NSOpenGLPFAScreenMask 84
+CONSTANT: NSOpenGLPFAPixelBuffer 90
+CONSTANT: NSOpenGLPFAAllowOfflineRenderers 96
+CONSTANT: NSOpenGLPFAVirtualScreenCount 128
 
-: kCGLRendererGenericFloatID HEX: 00020400 ;
+CONSTANT: kCGLRendererGenericFloatID HEX: 00020400
 
 <PRIVATE
 
@@ -94,7 +94,7 @@ PRIVATE>
 USE: opengl.gl
 USE: alien.syntax
 
-: NSOpenGLCPSwapInterval 222 ;
+CONSTANT: NSOpenGLCPSwapInterval 222
 
 LIBRARY: OpenGL
 
