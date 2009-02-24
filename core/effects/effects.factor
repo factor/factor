@@ -48,6 +48,8 @@ M: word stack-effect
     { "declared-effect" "inferred-effect" }
     swap props>> [ at ] curry map [ ] find nip ;
 
+M: deferred stack-effect call-next-method (( -- * )) or ;
+
 M: effect clone
     [ in>> clone ] [ out>> clone ] bi <effect> ;
 

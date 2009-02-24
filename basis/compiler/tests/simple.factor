@@ -54,7 +54,7 @@ IN: compiler.tests
 
 ! Labels
 
-: recursive-test ( ? -- ) [ f recursive-test ] when ; inline
+: recursive-test ( ? -- ) [ f recursive-test ] when ; inline recursive
 
 [ ] [ t [ recursive-test ] compile-call ] unit-test
 

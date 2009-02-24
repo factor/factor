@@ -99,7 +99,7 @@ FUNCTION: void* BIO_f_buffer (  ) ;
 ! evp.h
 ! ===============================================
 
-: EVP_MAX_MD_SIZE 64 ;
+CONSTANT: EVP_MAX_MD_SIZE 64
 
 C-STRUCT: EVP_MD_CTX
     { "EVP_MD*" "digest" }

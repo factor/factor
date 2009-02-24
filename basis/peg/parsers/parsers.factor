@@ -7,12 +7,12 @@ IN: peg.parsers
 
 TUPLE: just-parser p1 ;
 
-: just-pattern
+CONSTANT: just-pattern
   [
     execute dup [
       dup remaining>> empty? [ drop f ] unless
     ] when
-  ] ;
+  ]
 
 
 M: just-parser (compile) ( parser -- quot )
