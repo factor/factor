@@ -20,7 +20,7 @@ conversation "CONVERSATIONS" {
     { "session" "SESSION" BIG-INTEGER +not-null+ }
 } define-persistent
 
-: conversation-id-key "__c" ;
+CONSTANT: conversation-id-key "__c"
 
 TUPLE: conversations < server-state-manager ;
 

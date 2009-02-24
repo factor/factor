@@ -2,7 +2,7 @@ USING: slides help.markup math arrays hashtables namespaces
 sequences kernel sequences parser memoize ;
 IN: minneapolis-talk
 
-: minneapolis-slides
+CONSTANT: minneapolis-slides
 {
     { $slide "What is Factor?"
         "Dynamically typed, stack language"
@@ -175,7 +175,7 @@ IN: minneapolis-talk
         "Mailing list: factor-talk@lists.sf.net"
     }
     { $slide "Questions?" }
-} ;
+}
 
 : minneapolis-talk ( -- ) minneapolis-slides slides-window ;
 

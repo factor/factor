@@ -8,7 +8,7 @@ help.topics math.functions compiler.tree.optimizer
 compiler.cfg.optimizer fry ;
 IN: google-tech-talk
 
-: google-slides
+CONSTANT: google-slides
 {
     { $slide "Factor!"
         { $url "http://factorcode.org" }
@@ -562,7 +562,7 @@ IN: google-tech-talk
         "Put your prejudices aside and give it a shot!"
     }
     { $slide "Questions?" }
-} ;
+}
 
 : google-talk ( -- ) google-slides slides-window ;
 

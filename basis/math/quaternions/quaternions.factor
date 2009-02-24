@@ -45,13 +45,13 @@ PRIVATE>
     first2 [ imaginary-part ] dip >rect 3array ;
 
 ! Zero
-: q0 { 0 0 } ;
+CONSTANT: q0 { 0 0 }
 
 ! Units
-: q1 { 1 0 } ;
-: qi { C{ 0 1 } 0 } ;
-: qj { 0 1 } ;
-: qk { 0 C{ 0 1 } } ;
+CONSTANT: q1 { 1 0 }
+CONSTANT: qi { C{ 0 1 } 0 }
+CONSTANT: qj { 0 1 }
+CONSTANT: qk { 0 C{ 0 1 } }
 
 ! Euler angles
 
