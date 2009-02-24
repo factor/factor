@@ -28,9 +28,9 @@ TUPLE: irc-tab < frame chat client window ;
 
 : write-color ( str color -- )
     foreground associate format ;
-: dark-red T{ rgba f 0.5 0.0 0.0 1 } ;
-: dark-green T{ rgba f 0.0 0.5 0.0 1 } ;
-: dark-blue T{ rgba f 0.0 0.0 0.5 1 } ;
+CONSTANT: dark-red T{ rgba f 0.5 0.0 0.0 1 }
+CONSTANT: dark-green T{ rgba f 0.0 0.5 0.0 1 }
+CONSTANT: dark-blue T{ rgba f 0.0 0.0 0.5 1 }
 
 : dot-or-parens ( string -- string )
     [ "." ]

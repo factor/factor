@@ -18,7 +18,7 @@ tags [ H{ } clone ] initialize
 : CHLOE:
     scan parse-definition define-chloe-tag ; parsing
 
-: chloe-ns "http://factorcode.org/chloe/1.0" ; inline
+CONSTANT: chloe-ns "http://factorcode.org/chloe/1.0"
 
 : chloe-name? ( name -- ? )
     url>> chloe-ns = ;

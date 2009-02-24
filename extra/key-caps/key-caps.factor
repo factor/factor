@@ -4,7 +4,7 @@ words arrays assocs math calendar fry alarms ui
 ui.gadgets.borders ui.gestures ;
 IN: key-caps
 
-: key-locations H{
+CONSTANT: key-locations H{
     { key-escape        { {   0   0 } {  10  10 } } }
 
     { key-f1            { {  20   0 } {  10  10 } } }
@@ -129,9 +129,9 @@ IN: key-caps
 
     { key-keypad-0       { { 190 55 } {  20  10 } } }
     { key-keypad-.       { { 210 55 } {  10  10 } } }
-} ;
+}
 
-: KEYBOARD-SIZE { 230 65 } ;
+CONSTANT: KEYBOARD-SIZE { 230 65 }
 : FREQUENCY ( -- f ) 30 recip seconds ;
 
 TUPLE: key-caps-gadget < gadget keys alarm ;
