@@ -92,10 +92,10 @@ C: <continuation> continuation
 
 PRIVATE>
 
-: continue-with ( obj continuation -- )
+: continue-with ( obj continuation -- * )
     [ (continue-with) ] 2 (throw) ;
 
-: continue ( continuation -- )
+: continue ( continuation -- * )
     f swap continue-with ;
 
 SYMBOL: return-continuation
@@ -103,7 +103,7 @@ SYMBOL: return-continuation
 : with-return ( quot -- )
     [ [ return-continuation set ] prepose callcc0 ] with-scope ; inline
 
-: return ( -- )
+: return ( -- * )
     return-continuation get continue ;
 
 : with-datastack ( stack quot -- newstack )
@@ -173,7 +173,7 @@ TUPLE: restart name obj continuation ;
 
 C: <restart> restart
 
-: restart ( restart -- )
+: restart ( restart -- * )
     [ obj>> ] [ continuation>> ] bi continue-with ;
 
 M: object compute-restarts drop { } ;

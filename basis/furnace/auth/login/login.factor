@@ -64,7 +64,7 @@ SYMBOL: capabilities
 
 PRIVATE>
 
-: flashed-variables { description capabilities } ;
+CONSTANT: flashed-variables { description capabilities }
 
 : login-failed ( -- * )
     "invalid username or password" validation-error

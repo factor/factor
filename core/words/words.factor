@@ -212,8 +212,8 @@ M: word subwords drop f ;
 : gensym ( -- word )
     "( gensym )" f <word> ;
 
-: define-temp ( quot -- word )
-    [ gensym dup ] dip define ;
+: define-temp ( quot effect -- word )
+    [ gensym dup ] 2dip define-declared ;
 
 : reveal ( word -- )
     dup [ name>> ] [ vocabulary>> ] bi dup vocab-words

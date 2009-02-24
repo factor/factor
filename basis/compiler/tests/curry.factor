@@ -1,5 +1,5 @@
 USING: tools.test quotations math kernel sequences
-assocs namespaces make compiler.units ;
+assocs namespaces make compiler.units compiler ;
 IN: compiler.tests
 
 [ 3 ] [ 5 [ [ 2 - ] curry call ] compile-call ] unit-test
@@ -32,15 +32,15 @@ IN: compiler.tests
     compile-call
 ] unit-test
 
-: foobar ( quot -- )
-    dup slip swap [ foobar ] [ drop ] if ; inline
+: foobar ( quot: ( -- ) -- )
+    dup slip swap [ foobar ] [ drop ] if ; inline recursive
 
 [ ] [ [ [ f ] foobar ] compile-call ] unit-test
 
 [ { 6 7 8 } ] [ { 1 2 3 } 5 [ [ + ] curry map ] compile-call ] unit-test
 [ { 6 7 8 } ] [ { 1 2 3 } [ 5 [ + ] curry map ] compile-call ] unit-test
 
-: funky-assoc>map
+: funky-assoc>map ( assoc quot -- seq )
     [
         [ call f ] curry assoc-find 3drop
     ] { } make ; inline

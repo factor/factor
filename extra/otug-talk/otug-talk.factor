@@ -39,7 +39,7 @@ M: png-gadget ungraft* ( gadget -- )
 : $tetris ( element -- )
     drop [ <default-tetris> <tetris-gadget> gadget. ] ($block) ;
 
-: otug-slides
+CONSTANT: otug-slides
 {
     { $slide "Factor!"
         { $url "http://factorcode.org" }
@@ -361,7 +361,7 @@ var price = (order == null ? null : order.price);"> }
         "Factor has many cool things that I didn't talk about"
         "Questions?"
     }
-} ;
+}
 
 : otug-talk ( -- ) otug-slides slides-window ;
 
