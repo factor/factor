@@ -55,7 +55,7 @@ TUPLE: pred-test ;
 
 ! regression
 
-: literal-not-branch 0 not [ ] [ ] if ;
+: literal-not-branch ( -- ) 0 not [ ] [ ] if ;
 
 [ ] [ literal-not-branch ] unit-test
 
@@ -108,12 +108,12 @@ GENERIC: void-generic ( obj -- * )
 [ 10 ] [ branch-fold-regression-1 ] unit-test
 
 ! another regression
-: constant-branch-fold-0 "hey" ; foldable
+: constant-branch-fold-0 ( -- value ) "hey" ; foldable
 : constant-branch-fold-1 ( -- ? ) constant-branch-fold-0 "hey" = ; inline
 [ 1 ] [ [ constant-branch-fold-1 [ 1 ] [ 2 ] if ] compile-call ] unit-test
 
 ! another regression
-: foo f ;
+: foo ( -- value ) f ;
 : bar ( -- ? ) foo 4 4 = and ;
 [ f ] [ bar ] unit-test
 
@@ -134,15 +134,15 @@ M: slice foozul ;
 ] unit-test
 
 ! regression
-: constant-fold-2 f ; foldable
-: constant-fold-3 4 ; foldable
+: constant-fold-2 ( -- value ) f ; foldable
+: constant-fold-3 ( -- value ) 4 ; foldable
 
 [ f t ] [
     [ constant-fold-2 constant-fold-3 4 = ] compile-call
 ] unit-test
 
-: constant-fold-4 f ; foldable
-: constant-fold-5 f ; foldable
+: constant-fold-4 ( -- value ) f ; foldable
+: constant-fold-5 ( -- value ) f ; foldable
 
 [ f ] [
     [ constant-fold-4 constant-fold-5 or ] compile-call
@@ -247,7 +247,7 @@ USE: binary-search.private
 [ 3 "an integer" ] [ 3 lift-throw-tail-regression ] unit-test
 [ "hi" "a string" ] [ "hi" lift-throw-tail-regression ] unit-test
 
-: lift-loop-tail-test-1 ( a quot -- )
+: lift-loop-tail-test-1 ( a quot: ( -- ) -- )
     over even? [
         [ [ 3 - ] dip call ] keep lift-loop-tail-test-1
     ] [
@@ -256,10 +256,12 @@ USE: binary-search.private
         ] [
             [ [ 2 - ] dip call ] keep lift-loop-tail-test-1
         ] if
-    ] if ; inline
+    ] if ; inline recursive
 
-: lift-loop-tail-test-2
+: lift-loop-tail-test-2 ( -- a b c )
     10 [ ] lift-loop-tail-test-1 1 2 3 ;
+
+\ lift-loop-tail-test-2 must-infer
 
 [ 1 2 3 ] [ lift-loop-tail-test-2 ] unit-test
 
