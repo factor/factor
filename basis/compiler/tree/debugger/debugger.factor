@@ -144,7 +144,7 @@ SYMBOL: node-count
 
 : make-report ( word/quot -- assoc )
     [
-        dup word? [ build-tree-from-word nip ] [ build-tree ] if
+        dup word? [ build-tree-from-word ] [ build-tree ] if
         optimize-tree
 
         H{ } clone words-called set

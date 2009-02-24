@@ -12,18 +12,18 @@ IN: compiler.tree.builder
 
 : with-tree-builder ( quot -- nodes )
     '[ V{ } clone stack-visitor set @ ]
-    with-infer ; inline
+    with-infer nip ; inline
 
 : build-tree ( quot -- nodes )
     #! Not safe to call from inference transforms.
-    [ f initial-recursive-state infer-quot ] with-tree-builder nip ;
+    [ f initial-recursive-state infer-quot ] with-tree-builder ;
 
 : build-tree-with ( in-stack quot -- nodes out-stack )
     #! Not safe to call from inference transforms.
     [
         [ >vector \ meta-d set ]
         [ f initial-recursive-state infer-quot ] bi*
-    ] with-tree-builder nip
+    ] with-tree-builder
     unclip-last in-d>> ;
 
 : build-sub-tree ( #call quot -- nodes )
@@ -45,7 +45,7 @@ IN: compiler.tree.builder
 : check-no-compile ( word -- )
     dup "no-compile" word-prop [ cannot-infer-effect ] [ drop ] if ;
 
-: build-tree-from-word ( word -- effect nodes )
+: build-tree-from-word ( word -- nodes )
     [
         [
             {
