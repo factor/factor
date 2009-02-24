@@ -146,11 +146,10 @@ M: object apply-object push-literal ;
     [ 3drop ] [ effect-error ] if ;
 
 : finish-word ( word -- )
-    current-effect
-    [ check-effect ]
-    [ drop recorded get push ]
-    [ "inferred-effect" set-word-prop ]
-    2tri ;
+    [ current-effect check-effect ]
+    [ recorded get push ]
+    [ t "inferred-effect" set-word-prop ]
+    tri ;
 
 : cannot-infer-effect ( word -- * )
     "cannot-infer" word-prop throw ;

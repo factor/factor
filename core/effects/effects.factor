@@ -44,9 +44,7 @@ M: effect effect>string ( effect -- string )
 
 GENERIC: stack-effect ( word -- effect/f )
 
-M: word stack-effect
-    { "declared-effect" "inferred-effect" }
-    swap props>> [ at ] curry map [ ] find nip ;
+M: word stack-effect "declared-effect" word-prop ;
 
 M: deferred stack-effect call-next-method (( -- * )) or ;
 
