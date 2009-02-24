@@ -303,7 +303,7 @@ HINTS: recursive-inline-hang-3 array ;
 : member-test ( obj -- ? ) { + - * / /i } member? ;
 
 \ member-test must-infer
-[ ] [ \ member-test build-tree-from-word optimize-tree 2drop ] unit-test
+[ ] [ \ member-test build-tree-from-word optimize-tree drop ] unit-test
 [ t ] [ \ + member-test ] unit-test
 [ f ] [ \ append member-test ] unit-test
 
