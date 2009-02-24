@@ -8,7 +8,7 @@ help.topics math.functions compiler.tree.optimizer
 compiler.cfg.optimizer fry ;
 IN: vpri-talk
 
-: vpri-slides
+CONSTANT: vpri-slides
 {
     { $slide "Factor!"
         { $url "http://factorcode.org" }
@@ -485,7 +485,7 @@ IN: vpri-talk
         "Factor has many cool things that I didn't talk about"
         "Questions?"
     }
-} ;
+}
 
 : vpri-talk ( -- ) vpri-slides slides-window ;
 

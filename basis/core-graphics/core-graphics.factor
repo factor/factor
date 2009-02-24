@@ -99,9 +99,11 @@ FUNCTION: void CGContextSetShouldSmoothFonts (
    bool shouldSmoothFonts
 ) ;
 
-FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
-
 FUNCTION: void* CGBitmapContextGetData ( CGContextRef c ) ;
+
+CONSTANT: kCGLRendererGenericFloatID HEX: 00020400
+
+FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
 
 <PRIVATE
 

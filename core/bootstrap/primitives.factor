@@ -538,4 +538,4 @@ tuple
 [ [ first2 ] dip make-primitive ] each-index
 
 ! Bump build number
-"build" "kernel" create build 1+ 1quotation define
+"build" "kernel" create build 1+ [ ] curry (( -- n )) define-declared

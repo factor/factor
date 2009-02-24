@@ -12,17 +12,17 @@ TYPEDEF: uchar KeyCode
 
 ! Reserved Resource and Constant Definitions
 
-: ParentRelative 1 ;
-: CopyFromParent 0 ;
-: PointerWindow 0 ;
-: InputFocus 1 ;
-: PointerRoot 1 ;
-: AnyPropertyType 0 ;
-: AnyKey 0 ;
-: AnyButton 0 ;
-: AllTemporary 0 ;
-: CurrentTime 0 ;
-: NoSymbol 0 ;
+CONSTANT: ParentRelative 1
+CONSTANT: CopyFromParent 0
+CONSTANT: PointerWindow 0
+CONSTANT: InputFocus 1
+CONSTANT: PointerRoot 1
+CONSTANT: AnyPropertyType 0
+CONSTANT: AnyKey 0
+CONSTANT: AnyButton 0
+CONSTANT: AllTemporary 0
+CONSTANT: CurrentTime 0
+CONSTANT: NoSymbol 0
 
 ! Key masks. Used as modifiers to GrabButton and GrabKey, results of QueryPointer,
 !   state in various key-, mouse-, and button-related events.
@@ -31,14 +31,14 @@ TYPEDEF: uchar KeyCode
 ! modifier names.  Used to build a SetModifierMapping request or
 ! to read a GetModifierMapping request.  These correspond to the
 ! masks defined above.
-: ShiftMapIndex         0 ;
-: LockMapIndex          1 ;
-: ControlMapIndex       2 ;
-: Mod1MapIndex          3 ;
-: Mod2MapIndex          4 ;
-: Mod3MapIndex          5 ;
-: Mod4MapIndex          6 ;
-: Mod5MapIndex          7 ;
+CONSTANT: ShiftMapIndex 0
+CONSTANT: LockMapIndex 1
+CONSTANT: ControlMapIndex 2
+CONSTANT: Mod1MapIndex 3
+CONSTANT: Mod2MapIndex 4
+CONSTANT: Mod3MapIndex 5
+CONSTANT: Mod4MapIndex 6
+CONSTANT: Mod5MapIndex 7
 
 
 ! button masks.  Used in same manner as Key masks above. Not to be confused
@@ -53,100 +53,100 @@ TYPEDEF: uchar KeyCode
 
 ! Notify modes
 
-: NotifyNormal          0 ;
-: NotifyGrab            1 ;
-: NotifyUngrab          2 ;
-: NotifyWhileGrabbed    3 ;
+CONSTANT: NotifyNormal 0
+CONSTANT: NotifyGrab 1
+CONSTANT: NotifyUngrab 2
+CONSTANT: NotifyWhileGrabbed 3
 
-: NotifyHint            1 ; ! for MotionNotify events
+CONSTANT: NotifyHint 1 ! for MotionNotify events
                        
 ! Notify detail
 
-: NotifyAncestor         0 ;
-: NotifyVirtual          1 ;
-: NotifyInferior         2 ;
-: NotifyNonlinear        3 ;
-: NotifyNonlinearVirtual 4 ;
-: NotifyPointer          5 ;
-: NotifyPointerRoot      6 ;
-: NotifyDetailNone       7 ;
+CONSTANT: NotifyAncestor 0
+CONSTANT: NotifyVirtual 1
+CONSTANT: NotifyInferior 2
+CONSTANT: NotifyNonlinear 3
+CONSTANT: NotifyNonlinearVirtual 4
+CONSTANT: NotifyPointer 5
+CONSTANT: NotifyPointerRoot 6
+CONSTANT: NotifyDetailNone 7
 
 ! Visibility notify
 
-: VisibilityUnobscured          0 ;
-: VisibilityPartiallyObscured   1 ;
-: VisibilityFullyObscured       2 ;
+CONSTANT: VisibilityUnobscured 0
+CONSTANT: VisibilityPartiallyObscured 1
+CONSTANT: VisibilityFullyObscured 2
 
 ! Circulation request
 
-: PlaceOnTop            0 ;
-: PlaceOnBottom         1 ;
+CONSTANT: PlaceOnTop 0
+CONSTANT: PlaceOnBottom 1
 
 ! protocol families
 
-: FamilyInternet        0 ;     ! IPv4
-: FamilyDECnet          1 ;
-: FamilyChaos           2 ;
-: FamilyInternet6       6 ;     ! IPv6
+CONSTANT: FamilyInternet 0     ! IPv4
+CONSTANT: FamilyDECnet 1
+CONSTANT: FamilyChaos 2
+CONSTANT: FamilyInternet6 6     ! IPv6
 
 ! authentication families not tied to a specific protocol
-: FamilyServerInterpreted 5 ;
+CONSTANT: FamilyServerInterpreted 5
 
 ! Property notification
 
-: PropertyNewValue      0 ;
-: PropertyDelete        1 ;
+CONSTANT: PropertyNewValue 0
+CONSTANT: PropertyDelete 1
 
 ! Color Map notification
 
-: ColormapUninstalled   0 ;
-: ColormapInstalled     1 ;
+CONSTANT: ColormapUninstalled 0
+CONSTANT: ColormapInstalled 1
 
 ! GrabPointer, GrabButton, GrabKeyboard, GrabKey Modes
 
-: GrabModeSync          0 ;
-: GrabModeAsync         1 ;
+CONSTANT: GrabModeSync 0
+CONSTANT: GrabModeAsync 1
 
 ! GrabPointer, GrabKeyboard reply status
 
-: GrabSuccess           0 ;
-: AlreadyGrabbed        1 ;
-: GrabInvalidTime       2 ;
-: GrabNotViewable       3 ;
-: GrabFrozen            4 ;
+CONSTANT: GrabSuccess 0
+CONSTANT: AlreadyGrabbed 1
+CONSTANT: GrabInvalidTime 2
+CONSTANT: GrabNotViewable 3
+CONSTANT: GrabFrozen 4
 
 ! AllowEvents modes
 
-: AsyncPointer          0 ;
-: SyncPointer           1 ;
-: ReplayPointer         2 ;
-: AsyncKeyboard         3 ;
-: SyncKeyboard          4 ;
-: ReplayKeyboard        5 ;
-: AsyncBoth             6 ;
-: SyncBoth              7 ;
+CONSTANT: AsyncPointer 0
+CONSTANT: SyncPointer 1
+CONSTANT: ReplayPointer 2
+CONSTANT: AsyncKeyboard 3
+CONSTANT: SyncKeyboard 4
+CONSTANT: ReplayKeyboard 5
+CONSTANT: AsyncBoth 6
+CONSTANT: SyncBoth 7
 
 ! Used in SetInputFocus, GetInputFocus
 
 : RevertToNone         ( -- n ) None ;
 : RevertToPointerRoot  ( -- n ) PointerRoot ;
-: RevertToParent        2 ;
+CONSTANT: RevertToParent 2
 
 ! *****************************************************************
 ! * ERROR CODES 
 ! *****************************************************************
 
-: Success          0 ; ! everything's okay
-: BadRequest       1 ; ! bad request code
-: BadValue         2 ; ! int parameter out of range
-: BadWindow        3 ; ! parameter not a Window
-: BadPixmap        4 ; ! parameter not a Pixmap
-: BadAtom          5 ; ! parameter not an Atom
-: BadCursor        6 ; ! parameter not a Cursor
-: BadFont          7 ; ! parameter not a Font
-: BadMatch         8 ; ! parameter mismatch
-: BadDrawable      9 ; ! parameter not a Pixmap or Window
-: BadAccess       10 ; ! depending on context:
+CONSTANT: Success 0 ! everything's okay
+CONSTANT: BadRequest 1 ! bad request code
+CONSTANT: BadValue 2 ! int parameter out of range
+CONSTANT: BadWindow 3 ! parameter not a Window
+CONSTANT: BadPixmap 4 ! parameter not a Pixmap
+CONSTANT: BadAtom 5 ! parameter not an Atom
+CONSTANT: BadCursor 6 ! parameter not a Cursor
+CONSTANT: BadFont 7 ! parameter not a Font
+CONSTANT: BadMatch 8 ! parameter mismatch
+CONSTANT: BadDrawable 9 ! parameter not a Pixmap or Window
+CONSTANT: BadAccess 10 ! depending on context:
                        !         - key/button already grabbed
                        !         - attempt to free an illegal 
                        !           cmap entry 
@@ -154,16 +154,16 @@ TYPEDEF: uchar KeyCode
                        !           color map entry.
                        !        - attempt to modify the access control
                        !           list from other than the local host.
-: BadAlloc          11 ; ! insufficient resources
-: BadColor          12 ; ! no such colormap
-: BadGC             13 ; ! parameter not a GC
-: BadIDChoice       14 ; ! choice not in range or already used
-: BadName           15 ; ! font or color name doesn't exist
-: BadLength         16 ; ! Request length incorrect
-: BadImplementation 17 ; ! server is defective
+CONSTANT: BadAlloc 11 ! insufficient resources
+CONSTANT: BadColor 12 ! no such colormap
+CONSTANT: BadGC 13 ! parameter not a GC
+CONSTANT: BadIDChoice 14 ! choice not in range or already used
+CONSTANT: BadName 15 ! font or color name doesn't exist
+CONSTANT: BadLength 16 ! Request length incorrect
+CONSTANT: BadImplementation 17 ! server is defective
 
-: FirstExtensionError   128 ;
-: LastExtensionError    255 ;
+CONSTANT: FirstExtensionError 128
+CONSTANT: LastExtensionError 255
 
 ! *****************************************************************
 ! * WINDOW DEFINITIONS 
@@ -172,44 +172,44 @@ TYPEDEF: uchar KeyCode
 ! Window classes used by CreateWindow
 ! Note that CopyFromParent is already defined as 0 above
 
-: InputOutput           1 ;
-: InputOnly             2 ;
+CONSTANT: InputOutput 1
+CONSTANT: InputOnly 2
 
 ! Used in CreateWindow for backing-store hint
 
-: NotUseful               0 ;
-: WhenMapped              1 ;
-: Always                  2 ;
+CONSTANT: NotUseful 0
+CONSTANT: WhenMapped 1
+CONSTANT: Always 2
 
 ! Used in ChangeSaveSet
 
-: SetModeInsert           0 ;
-: SetModeDelete           1 ;
+CONSTANT: SetModeInsert 0
+CONSTANT: SetModeDelete 1
 
 ! Used in ChangeCloseDownMode
 
-: DestroyAll              0 ;
-: RetainPermanent         1 ;
-: RetainTemporary         2 ;
+CONSTANT: DestroyAll 0
+CONSTANT: RetainPermanent 1
+CONSTANT: RetainTemporary 2
 
 ! Window stacking method (in configureWindow)
 
-: Above                   0 ;
-: Below                   1 ;
-: TopIf                   2 ;
-: BottomIf                3 ;
-: Opposite                4 ;
+CONSTANT: Above 0
+CONSTANT: Below 1
+CONSTANT: TopIf 2
+CONSTANT: BottomIf 3
+CONSTANT: Opposite 4
 
 ! Circulation direction
 
-: RaiseLowest             0 ;
-: LowerHighest            1 ;
+CONSTANT: RaiseLowest 0
+CONSTANT: LowerHighest 1
 
 ! Property modes
 
-: PropModeReplace         0 ;
-: PropModePrepend         1 ;
-: PropModeAppend          2 ;
+CONSTANT: PropModeReplace 0
+CONSTANT: PropModePrepend 1
+CONSTANT: PropModeAppend 2
 
 ! *****************************************************************
 ! * GRAPHICS DEFINITIONS
@@ -217,62 +217,62 @@ TYPEDEF: uchar KeyCode
 
 ! LineStyle
 
-: LineSolid             0 ;
-: LineOnOffDash         1 ;
-: LineDoubleDash        2 ;
+CONSTANT: LineSolid 0
+CONSTANT: LineOnOffDash 1
+CONSTANT: LineDoubleDash 2
 
 ! capStyle
 
-: CapNotLast            0 ;
-: CapButt               1 ;
-: CapRound              2 ;
-: CapProjecting         3 ;
+CONSTANT: CapNotLast 0
+CONSTANT: CapButt 1
+CONSTANT: CapRound 2
+CONSTANT: CapProjecting 3
 
 ! joinStyle
 
-: JoinMiter             0 ;
-: JoinRound             1 ;
-: JoinBevel             2 ;
+CONSTANT: JoinMiter 0
+CONSTANT: JoinRound 1
+CONSTANT: JoinBevel 2
 
 ! fillStyle
 
-: FillSolid             0 ;
-: FillTiled             1 ;
-: FillStippled          2 ;
-: FillOpaqueStippled    3 ;
+CONSTANT: FillSolid 0
+CONSTANT: FillTiled 1
+CONSTANT: FillStippled 2
+CONSTANT: FillOpaqueStippled 3
 
 ! fillRule
 
-: EvenOddRule           0 ;
-: WindingRule           1 ;
+CONSTANT: EvenOddRule 0
+CONSTANT: WindingRule 1
 
 ! subwindow mode
 
-: ClipByChildren        0 ;
-: IncludeInferiors      1 ;
+CONSTANT: ClipByChildren 0
+CONSTANT: IncludeInferiors 1
 
 ! SetClipRectangles ordering
 
-: Unsorted              0 ;
-: YSorted               1 ;
-: YXSorted              2 ;
-: YXBanded              3 ;
+CONSTANT: Unsorted 0
+CONSTANT: YSorted 1
+CONSTANT: YXSorted 2
+CONSTANT: YXBanded 3
 
 ! CoordinateMode for drawing routines
 
-: CoordModeOrigin   0 ; ! relative to the origin
-: CoordModePrevious 1 ; ! relative to previous point
+CONSTANT: CoordModeOrigin 0 ! relative to the origin
+CONSTANT: CoordModePrevious 1 ! relative to previous point
 
 ! Polygon shapes
 
-: Complex       0 ; ! paths may intersect
-: Nonconvex     1 ; ! no paths intersect, but not convex
-: Convex        2 ; ! wholly convex
+CONSTANT: Complex 0 ! paths may intersect
+CONSTANT: Nonconvex 1 ! no paths intersect, but not convex
+CONSTANT: Convex 2 ! wholly convex
 
 ! Arc modes for PolyFillArc
 
-: ArcChord    0 ; ! join endpoints of arc
-: ArcPieSlice 1 ; ! join endpoints to center of arc
+CONSTANT: ArcChord 0 ! join endpoints of arc
+CONSTANT: ArcPieSlice 1 ! join endpoints to center of arc
 
 ! *****************************************************************
 ! * FONTS 
@@ -280,10 +280,10 @@ TYPEDEF: uchar KeyCode
 
 ! used in QueryFont -- draw direction
 
-: FontLeftToRight               0 ;
-: FontRightToLeft               1 ;
+CONSTANT: FontLeftToRight 0
+CONSTANT: FontRightToLeft 1
 
-: FontChange            255 ;
+CONSTANT: FontChange 255
 
 ! *****************************************************************
 ! *  IMAGING 
@@ -291,9 +291,9 @@ TYPEDEF: uchar KeyCode
 
 ! ImageFormat -- PutImage, GetImage
 
-: XYBitmap              0 ; ! depth 1, XYFormat
-: XYPixmap              1 ; ! depth == drawable depth
-: ZPixmap               2 ; ! depth == drawable depth
+CONSTANT: XYBitmap 0 ! depth 1, XYFormat
+CONSTANT: XYPixmap 1 ! depth == drawable depth
+CONSTANT: ZPixmap 2 ! depth == drawable depth
 
 ! *****************************************************************
 ! *  COLOR MAP STUFF 
@@ -301,8 +301,8 @@ TYPEDEF: uchar KeyCode
 
 ! For CreateColormap
 
-: AllocNone             0 ; ! create map with no entries
-: AllocAll              1 ; ! allocate entire map writeable
+CONSTANT: AllocNone 0 ! create map with no entries
+CONSTANT: AllocAll 1 ! allocate entire map writeable
 
 
 ! Flags used in StoreNamedColor, StoreColors
@@ -317,20 +317,20 @@ TYPEDEF: uchar KeyCode
 
 ! QueryBestSize Class
 
-: CursorShape           0 ; ! largest size that can be displayed
-: TileShape             1 ; ! size tiled fastest
-: StippleShape          2 ; ! size stippled fastest
+CONSTANT: CursorShape 0 ! largest size that can be displayed
+CONSTANT: TileShape 1 ! size tiled fastest
+CONSTANT: StippleShape 2 ! size stippled fastest
 
 ! ***************************************************************** 
 ! * KEYBOARD/POINTER STUFF
 ! *****************************************************************
 
-: AutoRepeatModeOff     0 ;
-: AutoRepeatModeOn      1 ;
-: AutoRepeatModeDefault 2 ;
+CONSTANT: AutoRepeatModeOff 0
+CONSTANT: AutoRepeatModeOn 1
+CONSTANT: AutoRepeatModeDefault 2
 
-: LedModeOff            0 ;
-: LedModeOn             1 ;
+CONSTANT: LedModeOff 0
+CONSTANT: LedModeOn 1
 
 ! masks for ChangeKeyboardControl
 
@@ -343,33 +343,33 @@ TYPEDEF: uchar KeyCode
 : KBKey                ( -- n ) 6 2^ ;
 : KBAutoRepeatMode     ( -- n ) 7 2^ ;
 
-: MappingSuccess        0 ;
-: MappingBusy           1 ;
-: MappingFailed         2 ;
+CONSTANT: MappingSuccess 0
+CONSTANT: MappingBusy 1
+CONSTANT: MappingFailed 2
 
-: MappingModifier               0 ;
-: MappingKeyboard               1 ;
-: MappingPointer                2 ;
+CONSTANT: MappingModifier 0
+CONSTANT: MappingKeyboard 1
+CONSTANT: MappingPointer 2
 
 ! *****************************************************************
 ! * SCREEN SAVER STUFF 
 ! *****************************************************************
 
-: DontPreferBlanking    0 ;
-: PreferBlanking        1 ;
-: DefaultBlanking       2 ;
+CONSTANT: DontPreferBlanking 0
+CONSTANT: PreferBlanking 1
+CONSTANT: DefaultBlanking 2
 
-: DisableScreenSaver    0 ;
-: DisableScreenInterval 0 ;
+CONSTANT: DisableScreenSaver 0
+CONSTANT: DisableScreenInterval 0
 
-: DontAllowExposures    0 ;
-: AllowExposures        1 ;
-: DefaultExposures      2 ;
+CONSTANT: DontAllowExposures 0
+CONSTANT: AllowExposures 1
+CONSTANT: DefaultExposures 2
 
 ! for ForceScreenSaver
 
-: ScreenSaverReset 0 ;
-: ScreenSaverActive 1 ;
+CONSTANT: ScreenSaverReset 0
+CONSTANT: ScreenSaverActive 1
 
 ! *****************************************************************
 ! * HOSTS AND CONNECTIONS
@@ -377,30 +377,30 @@ TYPEDEF: uchar KeyCode
 
 ! for ChangeHosts
 
-: HostInsert            0 ;
-: HostDelete            1 ;
+CONSTANT: HostInsert 0
+CONSTANT: HostDelete 1
 
 ! for ChangeAccessControl
 
-: EnableAccess          1 ;
-: DisableAccess         0 ;
+CONSTANT: EnableAccess 1
+CONSTANT: DisableAccess 0
 
 ! Display classes  used in opening the connection 
 ! Note that the statically allocated ones are even numbered and the
 ! dynamically changeable ones are odd numbered
 
-: StaticGray            0 ;
-: GrayScale             1 ;
-: StaticColor           2 ;
-: PseudoColor           3 ;
-: TrueColor             4 ;
-: DirectColor           5 ;
+CONSTANT: StaticGray 0
+CONSTANT: GrayScale 1
+CONSTANT: StaticColor 2
+CONSTANT: PseudoColor 3
+CONSTANT: TrueColor 4
+CONSTANT: DirectColor 5
 
 
 ! Byte order  used in imageByteOrder and bitmapBitOrder
 
-: LSBFirst              0 ;
-: MSBFirst              1 ;
+CONSTANT: LSBFirst 0
+CONSTANT: MSBFirst 1
 
 ! *****************************************************************
 ! * EXTENDED WINDOW MANAGER HINTS

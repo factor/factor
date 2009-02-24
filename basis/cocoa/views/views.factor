@@ -40,10 +40,6 @@ CONSTANT: NSOpenGLPFAScreenMask 84
 CONSTANT: NSOpenGLPFAPixelBuffer 90
 CONSTANT: NSOpenGLPFAAllowOfflineRenderers 96
 CONSTANT: NSOpenGLPFAVirtualScreenCount 128
-
-CONSTANT: kCGLRendererGenericFloatID HEX: 00020400
-
-
 CONSTANT: NSOpenGLCPSwapInterval 222
 
 <PRIVATE

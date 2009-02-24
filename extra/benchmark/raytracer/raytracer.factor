@@ -8,13 +8,14 @@ hints ;
 IN: benchmark.raytracer
 
 ! parameters
-: light
-    #! Normalized { -1 -3 2 }.
+
+! Normalized { -1 -3 2 }.
+CONSTANT: light
     double-array{
         -0.2672612419124244
         -0.8017837257372732
         0.5345224838248488
-    } ; inline
+    }
 
 CONSTANT: oversampling 4
 

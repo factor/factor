@@ -104,7 +104,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
     [ lo-word ] keep hi-word 2array
     swap window (>>window-loc) ;
 
-: wm-keydown-codes ( -- key )
+CONSTANT: wm-keydown-codes
     H{
         { 8 "BACKSPACE" }
         { 9 "TAB" }
@@ -132,7 +132,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
         { 121 "F10" }
         { 122 "F11" }
         { 123 "F12" }
-    } ;
+    }
 
 : key-state-down? ( key -- ? )
     GetKeyState 16 bit? ;
@@ -155,22 +155,22 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
         alt? [ A+ , ] when
     ] { } make [ empty? not ] keep f ? ;
 
-: exclude-keys-wm-keydown
+CONSTANT: exclude-keys-wm-keydown
     H{
         { 16 "SHIFT" }
         { 17 "CTRL" }
         { 18 "ALT" }
         { 20 "CAPS-LOCK" }
-    } ;
+    }
 
-: exclude-keys-wm-char
-    ! Values are ignored
+! Values are ignored
+CONSTANT: exclude-keys-wm-char
     H{
         { 8 "BACKSPACE" }
         { 9 "TAB" }
         { 13 "RET" }
         { 27 "ESC" }
-    } ;
+    }
 
 : exclude-key-wm-keydown? ( n -- ? )
     exclude-keys-wm-keydown key? ;

@@ -288,12 +288,12 @@ HELP: define-declared
 { $side-effects "word" } ;
 
 HELP: define-temp
-{ $values { "quot" quotation } { "word" word } }
+{ $values { "quot" quotation } { "effect" effect } { "word" word } }
 { $description "Creates an uninterned word that will call " { $snippet "quot" } " when executed." }
 { $notes
     "The following phrases are equivalent:"
     { $code "[ 2 2 + . ] call" }
-    { $code "[ 2 2 + . ] define-temp execute" }
+    { $code "[ 2 2 + . ] (( -- )) define-temp execute" }
     "This word must be called from inside " { $link with-compilation-unit } "."
 } ;
 

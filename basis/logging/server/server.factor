@@ -63,7 +63,7 @@ SYMBOL: log-files
     dup values [ try-dispose ] each
     clear-assoc ;
 
-: keep-logs 10 ;
+CONSTANT: keep-logs 10
 
 : ?delete-file ( path -- )
     dup exists? [ delete-file ] [ drop ] if ;

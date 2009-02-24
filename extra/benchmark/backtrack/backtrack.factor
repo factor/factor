@@ -10,7 +10,7 @@ IN: benchmark.backtrack
 ! placing them on the stack, and applying the operations
 ! +, -, * and rot as many times as we wish.
 
-: nop ;
+: nop ( -- ) ;
 
 : do-something ( a b -- c )
     { + - * } amb-execute ;
@@ -42,7 +42,7 @@ MEMO: 24-from-4 ( a b c d -- ? )
         ] sigma
     ] sigma ;
 
-: words { 24-from-1 24-from-2 24-from-3 24-from-4 } ;
+CONSTANT: words { 24-from-1 24-from-2 24-from-3 24-from-4 }
 
 : backtrack-benchmark ( -- )
     words [ reset-memoized ] each
