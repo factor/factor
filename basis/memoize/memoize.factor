@@ -1,47 +1,45 @@
-! Copyright (C) 2007 Slava Pestov, Daniel Ehrenberg.
+! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel hashtables sequences arrays words namespaces make
 parser math assocs effects definitions quotations summary
-accessors ;
+accessors fry ;
 IN: memoize
-
-: packer ( n -- quot )
-    { [ f ] [ ] [ 2array ] [ 3array ] [ 4array ] } nth ;
-
-: unpacker ( n -- quot )
-    { [ drop ] [ ] [ first2 ] [ first3 ] [ first4 ] } nth ;
-
-: #in ( word -- n )
-    stack-effect in>> length ;
-
-: #out ( word -- n )
-    stack-effect out>> length ;
-
-: pack/unpack ( quot word -- newquot )
-    [ dup #in unpacker % swap % #out packer % ] [ ] make ;
-
-: make-memoizer ( quot word -- quot )
-    [
-        [ #in packer % ] keep
-        [ "memoize" word-prop , ] keep
-        [ pack/unpack , ] keep
-        \ cache ,
-        #out unpacker %
-    ] [ ] make ;
 
 ERROR: too-many-arguments ;
 
 M: too-many-arguments summary
     drop "There must be no more than 4 input and 4 output arguments" ;
 
-: check-memoized ( word -- )
-    [ #in ] [ #out ] bi [ 4 > ] either? [ too-many-arguments ] when ;
+<PRIVATE
+
+: packer ( seq -- quot )
+    length { [ f ] [ ] [ 2array ] [ 3array ] [ 4array ] } nth ;
+
+: unpacker ( seq -- quot )
+    length { [ drop ] [ ] [ first2 ] [ first3 ] [ first4 ] } nth ;
+
+: pack/unpack ( quot effect -- newquot )
+    [ in>> packer ] [ out>> unpacker ] bi surround ;
+
+: unpack/pack ( quot effect -- newquot )
+    [ in>> unpacker ] [ out>> packer ] bi surround ;
+
+: check-memoized ( effect -- )
+    [ in>> ] [ out>> ] bi [ length 4 > ] either? [ too-many-arguments ] when ;
+
+: make-memoizer ( table quot effect -- quot )
+    [ check-memoized ] keep
+    [ unpack/pack '[ _ _ cache ] ] keep
+    pack/unpack ;
+
+PRIVATE>
 
 : define-memoized ( word quot -- )
-    over check-memoized
-    2dup "memo-quot" set-word-prop
-    over H{ } clone "memoize" set-word-prop
-    over make-memoizer define ;
+    [ H{ } clone ] dip
+    [ pick stack-effect make-memoizer define ]
+    [ nip "memo-quot" set-word-prop ]
+    [ drop "memoize" set-word-prop ]
+    3tri ;
 
 : MEMO: (:) define-memoized ; parsing
 
@@ -57,11 +55,10 @@ M: memoized reset-word
     bi ;
 
 : memoize-quot ( quot effect -- memo-quot )
-    gensym swap dupd "declared-effect" set-word-prop
-    dup rot define-memoized 1quotation ;
+    [ H{ } clone ] 2dip make-memoizer ;
 
 : reset-memoized ( word -- )
     "memoize" word-prop clear-assoc ;
 
 : invalidate-memoized ( inputs... word -- )
-    [ #in packer call ] [ "memoize" word-prop delete-at ] bi ;
+    [ stack-effect in>> packer call ] [ "memoize" word-prop delete-at ] bi ;

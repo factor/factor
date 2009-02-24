@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser kernel sequences words effects combinators assocs
 definitions quotations namespaces memoize accessors ;
@@ -7,7 +7,7 @@ IN: macros
 <PRIVATE
 
 : real-macro-effect ( word -- effect' )
-    "declared-effect" word-prop in>> 1 <effect> ;
+    stack-effect in>> 1 <effect> ;
 
 PRIVATE>
 
