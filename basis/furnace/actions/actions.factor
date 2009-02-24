@@ -63,7 +63,7 @@ TUPLE: action rest init authorize display validate submit ;
 : param ( name -- value )
     params get at ;
 
-: revalidate-url-key "__u" ;
+CONSTANT: revalidate-url-key "__u"
 
 : revalidate-url ( -- url/f )
     revalidate-url-key param

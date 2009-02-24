@@ -11,11 +11,11 @@ IN: math.analysis
 
 CONSTANT: gamma-g6 5.15
 
-: gamma-p6
+CONSTANT: gamma-p6
     {
         2.50662827563479526904 225.525584619175212544 -268.295973841304927459
         80.9030806934622512966 -5.00757863970517583837 0.0114684895434781459556
-    } ; inline
+    }
 
 : gamma-z ( x n -- seq )
     [ + recip ] with map 1.0 0 pick set-nth ;

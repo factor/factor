@@ -5,7 +5,7 @@ strings.private system random layouts vectors
 sbufs strings.private slots.private alien math.order
 alien.accessors alien.c-types alien.syntax alien.strings
 namespaces libc sequences.private io.encodings.ascii
-classes ;
+classes compiler ;
 IN: compiler.tests
 
 ! Make sure that intrinsic ops compile to correct code.

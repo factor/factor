@@ -4,8 +4,8 @@ IN: nehe.3
 
 TUPLE: nehe3-gadget < gadget ;
 
-: width 256 ;
-: height 256 ;
+CONSTANT: width 256
+CONSTANT: height 256
 
 : <nehe3-gadget> (  -- gadget )
   nehe3-gadget new ;

@@ -87,7 +87,7 @@ compiler.tree.combinators ;
     ] contains-node?
 ] unit-test
 
-: blah f ;
+: blah ( -- value ) f ;
 
 DEFER: a
 

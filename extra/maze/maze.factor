@@ -4,7 +4,7 @@ arrays kernel random ui ui.gadgets ui.gadgets.canvas ui.render
 math.order math.rectangles ;
 IN: maze
 
-: line-width 8 ;
+CONSTANT: line-width 8
 
 SYMBOL: visited
 

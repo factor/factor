@@ -1,14 +1,14 @@
-! Copyright (C) 2005, 2009 Eduardo Cavazos and Slava Pestov
+! Copyright (C) 2005, 2008 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays ui ui.gadgets
 ui.gestures ui.backend ui.clipboards ui.gadgets.worlds ui.render
-ui.event-loop assocs kernel math namespaces opengl
-sequences strings x11.xlib x11.events x11.xim x11.glx
-x11.clipboard x11.constants x11.windows io.encodings.string
-io.encodings.ascii io.encodings.utf8 combinators command-line
-math.vectors classes.tuple opengl.gl threads math.rectangles
+ui.event-loop assocs kernel math namespaces opengl sequences
+strings x11.xlib x11.events x11.xim x11.glx x11.clipboard
+x11.constants x11.windows io.encodings.string io.encodings.ascii
+io.encodings.utf8 combinators command-line
+math.vectors classes.tuple opengl.gl threads math.geometry.rect
 environment ascii ;
-IN: ui.backend.x11
+IN: ui.x11
 
 SINGLETON: x11-ui-backend
 
@@ -91,7 +91,7 @@ M: world key-down-event
     3bi ;
 
 : key-up-event>gesture ( event -- gesture )
-    [ event-modifiers ] [ 0 XLookupKeysym key-code ] bi <key-up> ;
+    dup event-modifiers swap 0 XLookupKeysym key-code <key-up> ;
 
 M: world key-up-event
     [ key-up-event>gesture ] dip propagate-key-gesture ;
@@ -177,25 +177,27 @@ M: world selection-request-event
     } cond ;
 
 M: x11-ui-backend (close-window) ( handle -- )
-    [ xic>> XDestroyIC ]
-    [ glx>> destroy-glx ]
-    [ window>> [ unregister-window ] [ destroy-window ] bi ]
-    tri ;
+    dup xic>> XDestroyIC
+    dup glx>> destroy-glx
+    window>> dup unregister-window
+    destroy-window ;
 
 M: world client-event
     swap close-box? [ ungraft ] [ drop ] if ;
 
 : gadget-window ( world -- )
-    [ [ window-loc>> ] [ dim>> ] bi glx-window ]
-    [ "Factor" create-xic ]
-    [ ] tri <x11-handle>
-    [ window>> register-window ] [ >>handle drop ] 2bi ;
+    dup window-loc>> over rect-dim glx-window
+    over "Factor" create-xic rot <x11-handle>
+    2dup window>> register-window
+    >>handle drop ;
 
 : wait-event ( -- event )
     QueuedAfterFlush events-queued 0 > [
         next-event dup
-        None XFilterEvent 0 = [ drop wait-event ] unless
-    ] [ ui-wait wait-event ] if ;
+        None XFilterEvent zero? [ drop wait-event ] unless
+    ] [
+        ui-wait wait-event
+    ] if ;
 
 M: x11-ui-backend do-events
     wait-event dup XAnyEvent-window window dup
@@ -229,7 +231,7 @@ M: x11-ui-backend set-title ( string world -- )
 
 M: x11-ui-backend set-fullscreen* ( ? world -- )
     handle>> window>> "XClientMessageEvent" <c-object>
-    [ set-XClientMessageEvent-window ] keep
+    tuck set-XClientMessageEvent-window
     swap _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ?
     over set-XClientMessageEvent-data0
     ClientMessage over set-XClientMessageEvent-type
@@ -275,7 +277,7 @@ M: x11-ui-backend (close-offscreen-buffer) ( handle -- )
 M: x11-ui-backend offscreen-pixels ( world -- alien w h )
     [ [ dim>> ] [ handle>> pixmap>> ] bi pixmap-bits ] [ dim>> first2 ] bi ;
 
-M: x11-ui-backend (with-ui) ( quot -- )
+M: x11-ui-backend ui ( -- )
     [
         f [
             [
@@ -291,5 +293,5 @@ M: x11-ui-backend beep ( -- )
 
 x11-ui-backend ui-backend set-global
 
-[ "DISPLAY" os-env "ui.tools" "listener" ? ]
+[ "DISPLAY" os-env "ui" "listener" ? ]
 main-vocab-hook set-global

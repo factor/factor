@@ -34,7 +34,7 @@ SYMBOL: xim
     XNResourceClass over 0 XCreateIC
     [ "XCreateIC() failed" throw ] unless* ;
 
-: buf-size 100 ;
+CONSTANT: buf-size 100
 
 SYMBOL: keybuf
 SYMBOL: keysym

@@ -39,9 +39,9 @@ IN: cocoa.subclassing
     swap prefix [ encode-type "0" append ] map concat ;
 
 : prepare-method ( ret types quot -- type imp )
-    [ [ encode-types ] 2keep ] dip [
-        "cdecl" swap 4array % \ alien-callback ,
-    ] [ ] make define-temp ;
+    [ [ encode-types ] 2keep ] dip
+    '[ _ _ "cdecl" _ alien-callback ]
+    (( -- callback )) define-temp ;
 
 : prepare-methods ( methods -- methods )
     [

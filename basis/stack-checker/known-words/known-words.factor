@@ -319,11 +319,17 @@ M: object infer-call*
 \ fixnum/i { fixnum fixnum } { integer } define-primitive
 \ fixnum/i make-foldable
 
+\ fixnum/i-fast { fixnum fixnum } { fixnum } define-primitive
+\ fixnum/i-fast make-foldable
+
 \ fixnum-mod { fixnum fixnum } { fixnum } define-primitive
 \ fixnum-mod make-foldable
 
 \ fixnum/mod { fixnum fixnum } { integer fixnum } define-primitive
 \ fixnum/mod make-foldable
+
+\ fixnum/mod-fast { fixnum fixnum } { fixnum fixnum } define-primitive
+\ fixnum/mod-fast make-foldable
 
 \ fixnum-bitand { fixnum fixnum } { fixnum } define-primitive
 \ fixnum-bitand make-foldable

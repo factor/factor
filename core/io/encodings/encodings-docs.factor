@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io quotations ;
+USING: help.markup help.syntax io quotations math ;
 IN: io.encodings
 
 HELP: <encoder>
@@ -71,6 +71,9 @@ HELP: with-encoded-output
 { $description "Creates a new encoder with the given encoding descriptor and calls the quotation using this encoder. The original encoder object is restored after the quotation returns and the stream is kept open for future output operations." } ;
 
 HELP: replacement-char
+{ $values
+    { "value" integer }
+}
 { $description "A code point that replaces input that could not be decoded. The presence of this character in the decoded data usually signifies an error." } ;
 
 ARTICLE: "encodings-descriptors" "Encoding descriptors"
