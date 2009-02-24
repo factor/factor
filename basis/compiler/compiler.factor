@@ -49,7 +49,7 @@ SYMBOL: +failed+
     H{ } clone generic-dependencies set
     f swap compiler-error ;
 
-: fail ( word error -- * )
+: fail ( word error -- )
     [ swap compiler-error ]
     [
         drop
@@ -111,9 +111,6 @@ t compile-dependencies? set-global
 
 : decompile ( word -- )
     f 2array 1array modify-code-heap ;
-
-: compile-call ( quot -- )
-    [ dup infer define-temp ] with-compilation-unit execute ;
 
 : optimized-recompile-hook ( words -- alist )
     [
