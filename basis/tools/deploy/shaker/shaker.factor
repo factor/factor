@@ -190,7 +190,7 @@ IN: tools.deploy.shaker
         "Stripping default methods" show
         [
             [ generic? ] instances
-            [ "No method" throw ] (( -- * )) define-temp
+            [ "No method" throw ] define-temp
             dup t "default" set-word-prop
             '[
                 [ _ "default-method" set-word-prop ] [ make-generic ] bi
