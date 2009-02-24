@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays arrays assocs kernel kernel.private libc math
 namespaces make parser sequences strings words assocs splitting
@@ -275,7 +275,7 @@ M: long-long-type box-return ( type -- )
 : if-void ( type true false -- )
     pick "void" = [ drop nip call ] [ nip call ] if ; inline
 
-: primitive-types
+CONSTANT: primitive-types
     {
         "char" "uchar"
         "short" "ushort"
@@ -284,7 +284,7 @@ M: long-long-type box-return ( type -- )
         "longlong" "ulonglong"
         "float" "double"
         "void*" "bool"
-    } ;
+    }
 
 [
     <c-type>

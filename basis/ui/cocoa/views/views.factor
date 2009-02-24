@@ -14,15 +14,15 @@ IN: ui.cocoa.views
     #! Cocoa -> Factor UI button mapping
     -> buttonNumber H{ { 0 1 } { 2 2 } { 1 3 } } at ;
 
-: modifiers
+CONSTANT: modifiers
     {
         { S+ HEX: 20000 }
         { C+ HEX: 40000 }
         { A+ HEX: 100000 }
         { M+ HEX: 80000 }
-    } ;
+    }
 
-: key-codes
+CONSTANT: key-codes
     H{
         { 71 "CLEAR" }
         { 36 "RET" }
@@ -47,7 +47,7 @@ IN: ui.cocoa.views
         { 126 "UP" }
         { 116 "PAGE_UP" }
         { 121 "PAGE_DOWN" }
-    } ;
+    }
 
 : key-code ( event -- string ? )
     dup -> keyCode key-codes at

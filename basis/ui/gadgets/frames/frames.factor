@@ -13,16 +13,16 @@ M: glue pref-dim* drop { 0 0 } ;
 
 : <frame-grid> ( -- grid ) 9 [ <glue> ] replicate 3 group ;
 
-: @center 1 1 ; inline
-: @left 0 1 ; inline
-: @right 2 1 ; inline
-: @top 1 0 ; inline
-: @bottom 1 2 ; inline
+: @center ( -- i j ) 1 1 ; inline
+: @left ( -- i j ) 0 1 ; inline
+: @right ( -- i j ) 2 1 ; inline
+: @top ( -- i j ) 1 0 ; inline
+: @bottom ( -- i j ) 1 2 ; inline
 
-: @top-left 0 0 ; inline
-: @top-right 2 0 ; inline
-: @bottom-left 0 2 ; inline
-: @bottom-right 2 2 ; inline
+: @top-left ( -- i j ) 0 0 ; inline
+: @top-right ( -- i j ) 2 0 ; inline
+: @bottom-left ( -- i j ) 0 2 ; inline
+: @bottom-right ( -- i j ) 2 2 ; inline
 
 TUPLE: frame < grid ;
 

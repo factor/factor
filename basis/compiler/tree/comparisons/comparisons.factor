@@ -5,9 +5,9 @@ IN: compiler.tree.comparisons
 
 ! Some utilities for working with comparison operations.
 
-: comparison-ops { < > <= >= } ;
+CONSTANT: comparison-ops { < > <= >= }
 
-: generic-comparison-ops { before? after? before=? after=? } ;
+CONSTANT: generic-comparison-ops { before? after? before=? after=? }
 
 : assumption ( i1 i2 op -- i3 )
     {

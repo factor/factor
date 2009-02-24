@@ -19,9 +19,9 @@ IN: cocoa.application
         ] curry assoc-each
     ] keep ;
 
-: NSApplicationDelegateReplySuccess 0 ;
-: NSApplicationDelegateReplyCancel  1 ;
-: NSApplicationDelegateReplyFailure 2 ;
+CONSTANT: NSApplicationDelegateReplySuccess 0
+CONSTANT: NSApplicationDelegateReplyCancel  1
+CONSTANT: NSApplicationDelegateReplyFailure 2
 
 : with-autorelease-pool ( quot -- )
     NSAutoreleasePool -> new slip -> release ; inline
