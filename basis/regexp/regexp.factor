@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math sequences strings sets
 assocs prettyprint.backend prettyprint.custom make lexer
@@ -10,17 +10,28 @@ IN: regexp
 
 TUPLE: regexp raw parse-tree options dfa ;
 
+: make-regexp ( string ast -- regexp )
+    f f <options> f regexp boa ;
+
 : <optioned-regexp> ( string options -- regexp )
     [ dup parse-regexp ] [ string>options ] bi*
-    2dup <with-options> ast>dfa
-    regexp boa ;
+    f regexp boa ;
 
 : <regexp> ( string -- regexp ) "" <optioned-regexp> ;
 
 <PRIVATE
 
+: get-dfa ( regexp -- dfa )
+    dup dfa>> [ ] [
+        dup 
+        [ parse-tree>> ]
+        [ options>> ] bi
+        <with-options> ast>dfa
+        [ >>dfa drop ] keep
+    ] ?if ;
+
 : (match) ( string regexp -- dfa-traverser )
-    dfa>> <dfa-traverser> do-match ; inline
+    get-dfa <dfa-traverser> do-match ; inline
 
 PRIVATE>
 
@@ -97,7 +108,7 @@ PRIVATE>
     [ [ index-from dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
     lexer get dup still-parsing-line?
     [ (parse-token) ] [ drop f ] if
-    <optioned-regexp> parsed ;
+    <optioned-regexp> dup get-dfa drop parsed ;
 
 PRIVATE>
 

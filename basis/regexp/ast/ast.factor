@@ -13,7 +13,10 @@ C: <from-to> from-to
 TUPLE: at-least n ;
 C: <at-least> at-least
 
-SINGLETON: epsilon
+TUPLE: tagged-epsilon tag ;
+C: <tagged-epsilon> tagged-epsilon
+
+CONSTANT: epsilon T{ tagged-epsilon }
 
 TUPLE: concatenation first second ;
 
@@ -60,3 +63,10 @@ C: <lookahead> lookahead
 
 TUPLE: lookbehind term ;
 C: <lookbehind> lookbehind
+
+TUPLE: possessive-star term ;
+C: <possessive-star> possessive-star
+
+: <possessive-plus> ( term -- term' )
+    dup <possessive-star> 2array <concatenation> ;
+

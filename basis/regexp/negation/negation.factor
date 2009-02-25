@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: regexp.nfa regexp.disambiguate kernel sequences
 assocs regexp.classes hashtables accessors fry vectors
-regexp.ast regexp.transition-tables regexp.minimize ;
+regexp.ast regexp.transition-tables regexp.minimize namespaces ;
 IN: regexp.negation
 
 : ast>dfa ( parse-tree -- minimal-dfa )
@@ -48,14 +48,14 @@ CONSTANT: fail-state -1
 
 : unify-final-state ( transition-table -- transition-table )
     dup [ final-states>> keys ] keep
-    '[ -2 eps <literal-transition> _ add-transition ] each
+    '[ -2 epsilon <literal-transition> _ add-transition ] each
     H{ { -2 -2 } } >>final-states ;
 
 : adjoin-dfa ( transition-table -- start end )
     box-transitions unify-final-state renumber-states
     [ start-state>> ]
     [ final-states>> keys first ]
-    [ table [ transitions>> ] bi@ swap update ] tri ;
+    [ nfa-table get [ transitions>> ] bi@ swap update ] tri ;
 
 M: negation nfa-node ( node -- start end )
     term>> ast>dfa negate-table adjoin-dfa ;
