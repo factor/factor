@@ -4,45 +4,48 @@ USING: regexp sequences kernel regexp.negation regexp.ast
 accessors fry ;
 IN: regexp.combinators
 
-: <nothing> ( -- regexp )
-    R/ (?~.*)/ ;
-
-: <literal> ( string -- regexp )
-    [ "\\Q" "\\E" surround ] [ <concatenation> ] bi make-regexp ;
-
-: <or> ( regexps -- disjunction )
-    [ [ raw>> "(" ")" surround ] map "|" join ]
-    [ [ parse-tree>> ] map <alternation> ] bi
-    make-regexp ;
-
-: <any-of> ( strings -- regexp )
-    [ <literal> ] map <or> ;
-
-: <sequence> ( regexps -- regexp )
-    [ [ raw>> ] map concat ]
-    [ [ parse-tree>> ] map <concatenation> ] bi
-    make-regexp ;
+<PRIVATE
 
 : modify-regexp ( regexp raw-quot tree-quot -- new-regexp )
     [ '[ raw>> @ ] ]
     [ '[ parse-tree>> @ ] ] bi* bi
     make-regexp ; inline
 
+PRIVATE>
+
+CONSTANT: <nothing> R/ (?~.*)/
+
+: <literal> ( string -- regexp )
+    [ "\\Q" "\\E" surround ] [ <concatenation> ] bi make-regexp ; foldable
+
+: <or> ( regexps -- disjunction )
+    [ [ raw>> "(" ")" surround ] map "|" join ]
+    [ [ parse-tree>> ] map <alternation> ] bi
+    make-regexp ; foldable
+
+: <any-of> ( strings -- regexp )
+    [ <literal> ] map <or> ; foldable
+
+: <sequence> ( regexps -- regexp )
+    [ [ raw>> ] map concat ]
+    [ [ parse-tree>> ] map <concatenation> ] bi
+    make-regexp ; foldable
+
 : <not> ( regexp -- not-regexp )
     [ "(?~" ")" surround ]
-    [ <negation> ] modify-regexp ;
+    [ <negation> ] modify-regexp ; foldable
 
 : <and> ( regexps -- conjunction )
-    [ <not> ] map <or> <not> ;
+    [ <not> ] map <or> <not> ; foldable
 
 : <zero-or-more> ( regexp -- regexp* )
     [ "(" ")*" surround ]
-    [ <star> ] modify-regexp ;
+    [ <star> ] modify-regexp ; foldable
 
 : <one-or-more> ( regexp -- regexp+ )
     [ "(" ")+" surround ]
-    [ <plus> ] modify-regexp ;
+    [ <plus> ] modify-regexp ; foldable
 
 : <option> ( regexp -- regexp? )
     [ "(" ")?" surround ]
-    [ <maybe> ] modify-regexp ;
+    [ <maybe> ] modify-regexp ; foldable
