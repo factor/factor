@@ -6,7 +6,7 @@ regexp.ast ;
 IN: regexp.parser
 
 : allowed-char? ( ch -- ? )
-    ".()|[*+?" member? not ;
+    ".()|[*+?$^" member? not ;
 
 ERROR: bad-number ;
 
@@ -53,6 +53,8 @@ ERROR: bad-class name ;
         { CHAR: d [ digit-class <primitive-class> ] }
         { CHAR: D [ digit-class <primitive-class> <not-class> ] }
 
+        { CHAR: z [ end-of-input <tagged-epsilon> ] }
+        { CHAR: A [ beginning-of-input <tagged-epsilon> ] }
         [ ]
     } case ;
 
@@ -109,7 +111,10 @@ Escape = "p{" CharacterInBracket*:s "}" => [[ s >string name>class <primitive-cl
 
 EscapeSequence = "\\" Escape:e => [[ e ]]
 
-Character = EscapeSequence | . ?[ allowed-char? ]?
+Character = EscapeSequence
+          | "$" => [[ $ <tagged-epsilon> ]]
+          | "^" => [[ ^ <tagged-epsilon> ]]
+          | . ?[ allowed-char? ]?
 
 AnyRangeCharacter = EscapeSequence | .
 
@@ -152,6 +157,8 @@ Times = "," Number:n "}" => [[ 0 n <from-to> ]]
       | Number:n "," Number:m "}" => [[ n m <from-to> ]]
 
 Repeated = Element:e "{" Times:t => [[ e t <times> ]]
+         | Element:e "*+" => [[ e <possessive-star> ]]
+         | Element:e "++" => [[ e <possessive-plus> ]]
          | Element:e "?" => [[ e <maybe> ]]
          | Element:e "*" => [[ e <star> ]]
          | Element:e "+" => [[ e <plus> ]]

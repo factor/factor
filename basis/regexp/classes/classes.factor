@@ -12,8 +12,7 @@ ascii-class punctuation-class java-printable-class blank-class
 control-character-class hex-digit-class java-blank-class c-identifier-class
 unmatchable-class terminator-class word-boundary-class ;
 
-SINGLETONS: beginning-of-input beginning-of-line
-end-of-input end-of-line ;
+SINGLETONS: beginning-of-input ^ end-of-input $ ;
 
 TUPLE: range from to ;
 C: <range> range
@@ -100,10 +99,10 @@ M: unmatchable-class class-member? ( obj class -- ? )
 M: terminator-class class-member? ( obj class -- ? )
     drop "\r\n\u000085\u002029\u002028" member? ;
 
-M: beginning-of-line class-member? ( obj class -- ? )
+M: ^ class-member? ( obj class -- ? )
     2drop f ;
 
-M: end-of-line class-member? ( obj class -- ? )
+M: $ class-member? ( obj class -- ? )
     2drop f ;
 
 M: f class-member? 2drop f ;

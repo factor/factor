@@ -1,5 +1,5 @@
 USING: regexp tools.test kernel sequences regexp.parser
-regexp.traversal eval strings multiline ;
+regexp.traversal eval strings multiline accessors ;
 IN: regexp-tests
 
 \ <regexp> must-infer
@@ -332,6 +332,16 @@ IN: regexp-tests
 ! Intersecting classes
 [ t ] [ "ab" R/ ac|\p{Lower}b/ matches? ] unit-test
 [ t ] [ "ab" R/ ac|[a-z]b/ matches? ] unit-test
+[ t ] [ "ac" R/ ac|\p{Lower}b/ matches? ] unit-test
+[ t ] [ "ac" R/ ac|[a-z]b/ matches? ] unit-test
+[ t ] [ "ac" R/ [a-zA-Z]c|\p{Lower}b/ matches? ] unit-test
+[ t ] [ "ab" R/ [a-zA-Z]c|\p{Lower}b/ matches? ] unit-test
+[ t ] [ "πb" R/ [a-zA-Z]c|\p{Lower}b/ matches? ] unit-test
+[ f ] [ "πc" R/ [a-zA-Z]c|\p{Lower}b/ matches? ] unit-test
+[ f ] [ "Ab" R/ [a-zA-Z]c|\p{Lower}b/ matches? ] unit-test
+
+[ f ] [ "foo" <regexp> dfa>> >boolean ] unit-test
+[ t ] [ R/ foo/ dfa>> >boolean ] unit-test
 
 ! [ t ] [ "a" R/ ^a/ matches? ] unit-test
 ! [ f ] [ "\na" R/ ^a/ matches? ] unit-test

@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs grouping kernel
 locals math namespaces sequences fry quotations
@@ -24,8 +24,6 @@ M: alternation remove-lookahead
 
 M: concatenation remove-lookahead ;
 
-SINGLETON: eps
-
 SYMBOL: option-stack
 
 SYMBOL: state
@@ -34,7 +32,6 @@ SYMBOL: state
     state [ get ] [ inc ] bi ;
 
 SYMBOL: nfa-table
-: table ( -- table ) nfa-table get ;
 
 : set-each ( keys value hashtable -- )
     '[ _ swap _ set-at ] each ;
@@ -56,10 +53,10 @@ GENERIC: nfa-node ( node -- start-state end-state )
 
 : add-simple-entry ( obj class -- start-state end-state )
     [ next-state next-state 2dup ] 2dip
-    make-transition table add-transition ;
+    make-transition nfa-table get add-transition ;
 
 : epsilon-transition ( source target -- )
-    eps <literal-transition> table add-transition ;
+    epsilon <literal-transition> nfa-table get add-transition ;
 
 M:: star nfa-node ( node -- start end )
     node term>> nfa-node :> s1 :> s0
@@ -71,8 +68,8 @@ M:: star nfa-node ( node -- start end )
     s1 s3 epsilon-transition
     s2 s3 ;
 
-M: epsilon nfa-node
-    drop eps literal-transition add-simple-entry ;
+M: tagged-epsilon nfa-node
+    literal-transition add-simple-entry ;
 
 M: concatenation nfa-node ( node -- start end )
     [ first>> ] [ second>> ] bi
@@ -154,7 +151,7 @@ M: with-options nfa-node ( node -- start end )
         0 state set
         <transition-table> nfa-table set
         remove-lookahead nfa-node
-        table
+        nfa-table get
             swap dup associate >>final-states
             swap >>start-state
     ] with-scope ;

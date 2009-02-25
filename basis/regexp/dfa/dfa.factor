@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry kernel locals
 math math.order regexp.nfa regexp.transition-tables sequences
-sets sorting vectors ;
+sets sorting vectors regexp.ast ;
 IN: regexp.dfa
 
 :: (while-changes) ( obj quot: ( obj -- obj' ) comp: ( obj -- key ) old-key -- obj )
@@ -20,7 +20,7 @@ IN: regexp.dfa
     transitions>> '[ _ swap _ at at ] gather sift ;
 
 : (find-epsilon-closure) ( states nfa -- new-states )
-    eps swap find-delta ;
+    epsilon swap find-delta ;
 
 : find-epsilon-closure ( states nfa -- new-states )
     '[ dup _ (find-epsilon-closure) union ] [ length ] while-changes
@@ -35,7 +35,7 @@ IN: regexp.dfa
 : find-transitions ( dfa-state nfa -- next-dfa-state )
     transitions>>
     '[ _ at keys ] gather
-    eps swap remove ;
+    epsilon swap remove ;
 
 : add-todo-state ( state visited-states new-states -- )
     3dup drop key? [ 3drop ] [
