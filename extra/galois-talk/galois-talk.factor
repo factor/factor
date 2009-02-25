@@ -8,7 +8,7 @@ help.topics math.functions compiler.tree.optimizer
 compiler.cfg.optimizer fry ;
 IN: galois-talk
 
-: galois-slides
+CONSTANT: galois-slides
 {
     { $slide "Factor!"
         { $url "http://factorcode.org" }
@@ -305,7 +305,7 @@ IN: galois-talk
         "Factor has many cool things that I didn't talk about"
         "Questions?"
     }
-} ;
+}
 
 : galois-talk ( -- ) galois-slides slides-window ;
 

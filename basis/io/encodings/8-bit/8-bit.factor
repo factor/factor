@@ -4,12 +4,12 @@ USING: math.parser arrays io.encodings sequences kernel assocs
 hashtables io.encodings.ascii generic parser classes.tuple words
 words.symbol io io.files splitting namespaces math
 compiler.units accessors classes.singleton classes.mixin
-io.encodings.iana ;
+io.encodings.iana fry ;
 IN: io.encodings.8-bit
 
 <PRIVATE
 
-: mappings {
+CONSTANT: mappings {
     ! encoding-name iana-name file-name
     { "latin1" "ISO_8859-1:1987" "8859-1" }
     { "latin2" "ISO_8859-2:1987" "8859-2" }
@@ -30,11 +30,10 @@ IN: io.encodings.8-bit
     { "windows-1252" "windows-1252" "CP1252" }
     { "ebcdic" "IBM037" "CP037" }
     { "mac-roman" "macintosh" "ROMAN" }
-} ;
+}
 
 : encoding-file ( file-name -- stream )
-    "vocab:io/encodings/8-bit/" swap ".TXT"
-    3append ;
+    "vocab:io/encodings/8-bit/" ".TXT" surround ;
 
 : process-contents ( lines -- assoc )
     [ "#" split1 drop ] map harvest
@@ -42,7 +41,7 @@ IN: io.encodings.8-bit
 
 : byte>ch ( assoc -- array )
     256 replacement-char <array>
-    [ [ swapd set-nth ] curry assoc-each ] keep ;
+    [ '[ swap _ set-nth ] assoc-each ] keep ;
 
 : ch>byte ( assoc -- newassoc )
     [ swap ] assoc-map >hashtable ;

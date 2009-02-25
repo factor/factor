@@ -80,9 +80,9 @@ M: object fake-quotations> ;
     scan-param parsed
     \ add-mixin-instance parsed ; parsing
 
-: `inline \ inline parsed ; parsing
+: `inline [ word make-inline ] over push-all ; parsing
 
-: `parsing \ parsing parsed ; parsing
+: `parsing [ word make-parsing ] over push-all ; parsing
 
 : `(
     ")" parse-effect effect set ; parsing

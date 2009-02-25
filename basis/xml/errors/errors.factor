@@ -290,7 +290,7 @@ M: quoteless-attr summary
 
 TUPLE: attr-w/< < xml-error-at ;
 
-: attr-w/< ( value -- * )
+: attr-w/< ( -- * )
     \ attr-w/< xml-error-at throw ;
 
 M: attr-w/< summary
@@ -299,7 +299,7 @@ M: attr-w/< summary
 
 TUPLE: text-w/]]> < xml-error-at ;
 
-: text-w/]]> ( text -- * )
+: text-w/]]> ( -- * )
     \ text-w/]]> xml-error-at throw ;
 
 M: text-w/]]> summary

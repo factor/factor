@@ -97,8 +97,8 @@ VALUE: properties
     [ nip zero? not ] assoc-filter
     >hashtable ;
 
-: categories ( -- names )
-    ! For non-existent characters, use Cn
+! For non-existent characters, use Cn
+CONSTANT: categories
     { "Cn"
       "Lu" "Ll" "Lt" "Lm" "Lo"
       "Mn" "Mc" "Me"
@@ -106,9 +106,9 @@ VALUE: properties
       "Pc" "Pd" "Ps" "Pe" "Pi" "Pf" "Po"
       "Sm" "Sc" "Sk" "So"
       "Zs" "Zl" "Zp"
-      "Cc" "Cf" "Cs" "Co" } ;
+      "Cc" "Cf" "Cs" "Co" }
 
-: num-chars HEX: 2FA1E ;
+CONSTANT: num-chars HEX: 2FA1E
 
 ! the maximum unicode char in the first 3 planes
 

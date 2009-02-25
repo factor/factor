@@ -474,7 +474,7 @@ cell-bits 32 = [
 ] unit-test
 
 ! A reduction
-: buffalo-sauce f ;
+: buffalo-sauce ( -- value ) f ;
 
 : steak ( -- )
     buffalo-sauce [ steak ] when ; inline recursive
