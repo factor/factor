@@ -8,10 +8,16 @@ regexp.transition-tables splitting sorting regexp.ast
 regexp.negation ;
 IN: regexp
 
-TUPLE: regexp raw parse-tree options dfa ;
+TUPLE: regexp
+    { raw read-only }
+    { parse-tree read-only }
+    { options read-only }
+    dfa ;
 
 : make-regexp ( string ast -- regexp )
-    f f <options> f regexp boa ;
+    f f <options> f regexp boa ; foldable
+    ! Foldable because, when the dfa slot is set,
+    ! it'll be set to the same thing regardless of who sets it
 
 : <optioned-regexp> ( string options -- regexp )
     [ dup parse-regexp ] [ string>options ] bi*
@@ -21,17 +27,17 @@ TUPLE: regexp raw parse-tree options dfa ;
 
 <PRIVATE
 
-: get-dfa ( regexp -- dfa )
-    dup dfa>> [ ] [
+: compile-regexp ( regexp -- regexp )
+    dup dfa>> [
         dup 
         [ parse-tree>> ]
         [ options>> ] bi
         <with-options> ast>dfa
-        [ >>dfa drop ] keep
-    ] ?if ;
+        >>dfa
+    ] unless ;
 
 : (match) ( string regexp -- dfa-traverser )
-    get-dfa <dfa-traverser> do-match ; inline
+    compile-regexp dfa>> <dfa-traverser> do-match ; inline
 
 PRIVATE>
 
@@ -108,7 +114,7 @@ PRIVATE>
     [ [ index-from dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
     lexer get dup still-parsing-line?
     [ (parse-token) ] [ drop f ] if
-    <optioned-regexp> dup get-dfa drop parsed ;
+    <optioned-regexp> compile-regexp parsed ;
 
 PRIVATE>
 
