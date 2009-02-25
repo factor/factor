@@ -8,21 +8,22 @@ hints ;
 IN: benchmark.raytracer
 
 ! parameters
-: light
-    #! Normalized { -1 -3 2 }.
+
+! Normalized { -1 -3 2 }.
+CONSTANT: light
     double-array{
         -0.2672612419124244
         -0.8017837257372732
         0.5345224838248488
-    } ; inline
+    }
 
-: oversampling 4 ; inline
+CONSTANT: oversampling 4
 
-: levels 3 ; inline
+CONSTANT: levels 3
 
-: size 200 ; inline
+CONSTANT: size 200
 
-: delta 1.4901161193847656E-8 ; inline
+CONSTANT: delta 1.4901161193847656E-8
 
 TUPLE: ray { orig double-array read-only } { dir double-array read-only } ;
 
@@ -88,7 +89,7 @@ TUPLE: group < sphere { objs array read-only } ;
 M: group intersect-scene ( hit ray group -- hit )
     [ drop objs>> [ intersect-scene ] with each ] if-ray-sphere ;
 
-: initial-hit T{ hit f double-array{ 0.0 0.0 0.0 } 1/0. } ; inline
+CONSTANT: initial-hit T{ hit f double-array{ 0.0 0.0 0.0 } 1/0. }
 
 : initial-intersect ( ray scene -- hit )
     [ initial-hit ] 2dip intersect-scene ; inline

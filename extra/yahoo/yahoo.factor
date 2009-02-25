@@ -18,8 +18,7 @@ format similar-ok language country site subscription license ;
         first3 <result>
     ] map ;
 
-: yahoo-url ( -- str )
-    URL" http://search.yahooapis.com/WebSearchService/V1/webSearch" ;
+CONSTANT: yahoo-url URL" http://search.yahooapis.com/WebSearchService/V1/webSearch"
 
 :: param ( search url name quot -- search url )
     search url search quot call
@@ -49,8 +48,7 @@ format similar-ok language country site subscription license ;
     "similar_ok" [ similar-ok>> ] bool-param
     nip ;
 
-: factor-id
-    "fRrVAKzV34GDyeRw6bUHDhEWHRedwfOC7e61wwXZLgGF80E67spxdQXuugBe2pgIevMmKwA-" ;
+CONSTANT: factor-id "fRrVAKzV34GDyeRw6bUHDhEWHRedwfOC7e61wwXZLgGF80E67spxdQXuugBe2pgIevMmKwA-"
 
 : <search> ( query -- search )
     search new

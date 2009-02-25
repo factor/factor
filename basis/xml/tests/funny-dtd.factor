@@ -4,6 +4,6 @@ IN: xml.tests
 USING: xml xml.writer io.files io.encodings.utf8 tools.test kernel ;
 
 [ t ] [
-    "resource:basis/xml/tests/funny-dtd.xml" utf8 file-contents string>xml
+    "vocab:xml/tests/funny-dtd.xml" utf8 file-contents string>xml
     dup xml>string string>xml =
 ] unit-test

@@ -86,7 +86,7 @@ FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFi
 ALIAS: ShellExecute ShellExecuteW
 
 : open-in-explorer ( dir -- )
-    f "open" rot (normalize-path) f f SW_SHOWNORMAL ShellExecute drop ;
+    [ f "open" ] dip (normalize-path) f f SW_SHOWNORMAL ShellExecute drop ;
 
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT
@@ -190,9 +190,9 @@ TYPEDEF: ITEMIDLIST ITEMID_CHILD
 TYPEDEF: ITEMID_CHILD* PITEMID_CHILD
 TYPEDEF: ITEMID_CHILD* PCUITEMID_CHILD
 
-: STRRET_WSTR 0 ; inline
-: STRRET_OFFSET 1 ; inline
-: STRRET_CSTR 2 ; inline
+CONSTANT: STRRET_WSTR 0
+CONSTANT: STRRET_OFFSET 1
+CONSTANT: STRRET_CSTR 2
 
 C-UNION: STRRET-union "LPWSTR" "LPSTR" "UINT" "char[260]" ;
 C-STRUCT: STRRET

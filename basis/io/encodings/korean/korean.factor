@@ -6,6 +6,8 @@ math.order math.parser memoize multiline sequences splitting
 values hashtables io.binary ;
 IN: io.encodings.korean
 
+! TODO: migrate to common code-table parser (by Dan).
+
 SINGLETON: cp949
 
 cp949 "EUC-KR" register-encoding
@@ -17,7 +19,7 @@ cp949 "EUC-KR" register-encoding
 : cp949.txt-lines ( -- seq )
     ! "cp949.txt" from ...
     ! <http://unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WINDOWS/CP949.TXT>
-    "resource:basis/io/encodings/korean/data/cp949.txt"
+    "vocab:io/encodings/korean/data/cp949.txt"
     ascii file-lines ;
 
 : drop-comments ( seq -- newseq )

@@ -1,0 +1,1 @@
+Protocol for extending the prettyprinter on custom data types

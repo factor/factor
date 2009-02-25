@@ -47,21 +47,24 @@ IN: tools.files.unix
 
 M: unix (directory.) ( path -- lines )
     <listing-tool>
-        { permissions nlinks user group file-size file-date file-name } >>specs
+        {
+            +permissions+ +nlinks+ +user+ +group+
+            +file-size+ +file-date+ +file-name+
+        } >>specs
         { { directory-entry>> name>> <=> } } >>sort
     [ [ list-files ] with-group-cache ] with-user-cache ;
 
 M: unix file-spec>string ( file-listing spec -- string )
     {
-        { file-name/type [
+        { +file-name/type+ [
             directory-entry>> [ name>> ] [ file-type>trailing ] bi append
         ] }
-        { permissions [ file-info>> permissions-string ] }
-        { nlinks [ file-info>> nlink>> number>string ] }
-        { user [ file-info>> uid>> user-name ] }
-        { group [ file-info>> gid>> group-name ] }
-        { uid [ file-info>> uid>> number>string ] }
-        { gid [ file-info>> gid>> number>string ] }
+        { +permissions+ [ file-info>> permissions-string ] }
+        { +nlinks+ [ file-info>> nlink>> number>string ] }
+        { +user+ [ file-info>> uid>> user-name ] }
+        { +group+ [ file-info>> gid>> group-name ] }
+        { +uid+ [ file-info>> uid>> number>string ] }
+        { +gid+ [ file-info>> gid>> number>string ] }
         [ call-next-method ]
     } case ;
 

@@ -1,0 +1,1 @@
+Stack effect inference for inline and inline recursive words

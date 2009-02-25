@@ -91,6 +91,8 @@ unit-test
 [ f ] [ BIN: -1101 >bignum 3 bit? ] unit-test
 [ t ] [ BIN: -1101 >bignum 4 bit? ] unit-test
 
+[ t ] [ 1067811677921310779 >bignum 59 bit? ] unit-test
+
 [ 2 ] [ 0 next-power-of-2 ] unit-test
 [ 2 ] [ 1 next-power-of-2 ] unit-test
 [ 2 ] [ 2 next-power-of-2 ] unit-test

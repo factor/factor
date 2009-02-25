@@ -9,14 +9,14 @@ IN: checksums.sha2
 
 SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
 
-: a 0 ; inline
-: b 1 ; inline
-: c 2 ; inline
-: d 3 ; inline
-: e 4 ; inline
-: f 5 ; inline
-: g 6 ; inline
-: h 7 ; inline
+CONSTANT: a 0
+CONSTANT: b 1
+CONSTANT: c 2
+CONSTANT: d 3
+CONSTANT: e 4
+CONSTANT: f 5
+CONSTANT: g 6
+CONSTANT: h 7
 
 : initial-H-256 ( -- seq )
     {

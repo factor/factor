@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: slots arrays definitions generic hashtables summary io
 kernel math namespaces make prettyprint prettyprint.config
@@ -9,7 +9,7 @@ combinators generic.math classes.builtin classes compiler.units
 generic.standard vocabs init kernel.private io.encodings
 accessors math.order destructors source-files parser
 classes.tuple.parser effects.parser lexer compiler.errors
-generic.parser strings.parser vocabs.parser ;
+generic.parser strings.parser vocabs.loader vocabs.parser ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -70,7 +70,7 @@ M: string error. print ;
     "Type :help for debugging help." print flush ;
 
 : try ( quot -- )
-    [ print-error-and-restarts ] recover ;
+    [ print-error-and-restarts ] recover ; inline
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write third . ;
@@ -323,3 +323,5 @@ M: bad-escape summary drop "Bad escape code" ;
 M: bad-literal-tuple summary drop "Bad literal tuple" ;
 
 M: check-mixin-class summary drop "Not a mixin class" ;
+
+M: not-found-in-roots summary drop "Cannot resolve vocab: path" ;

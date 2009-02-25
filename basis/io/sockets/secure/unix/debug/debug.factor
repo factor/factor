@@ -5,7 +5,7 @@ IN: io.sockets.secure.unix.debug
 
 : with-test-context ( quot -- )
     <secure-config>
-        "resource:basis/openssl/test/server.pem" >>key-file
-        "resource:basis/openssl/test/dh1024.pem" >>dh-file
+        "vocab:openssl/test/server.pem" >>key-file
+        "vocab:openssl/test/dh1024.pem" >>dh-file
         "password" >>password
     swap with-secure-context ; inline

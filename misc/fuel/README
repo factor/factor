@@ -111,6 +111,7 @@ beast.
     | C-cC-ev         | edit vocabulary (fuel-edit-vocabulary)                     |
     | C-cC-ew         | edit word (fuel-edit-word-at-point)                        |
     | C-cC-ed         | edit word's doc (C-u M-x fuel-edit-word-doc-at-point)      |
+    | C-cC-el         | load vocabs in USING: form                                 |
     |-----------------+------------------------------------------------------------|
     | C-cC-er         | eval region                                                |
     | C-M-r, C-cC-ee  | eval region, extending it to definition boundaries         |
@@ -138,6 +139,8 @@ beast.
     | C-cC-xi         | replace word by its definition (fuel-refactor-inline-word) |
     | C-cC-xw         | rename all uses of a word (fuel-refactor-rename-word)      |
     | C-cC-xa         | extract region as a separate ARTICLE: form                 |
+    | C-cC-xg         | convert current word definition into GENERIC + method      |
+    |                 | (fuel-refactor-make-generic)                               |
     |-----------------+------------------------------------------------------------|
 
 *** In the listener:
