@@ -1,12 +1,13 @@
 ! Copyright (C) 2005, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays assocs classes compiler db hashtables
-io.files kernel math math.parser namespaces prettyprint
+io.files kernel math math.parser namespaces prettyprint fry
 sequences strings classes.tuple alien.c-types continuations
 db.sqlite.lib db.sqlite.ffi db.tuples words db.types combinators
 math.intervals io nmake accessors vectors math.ranges random
 math.bitwise db.queries destructors db.tuples.private interpolate
-io.streams.string multiline make db.private ;
+io.streams.string multiline make db.private sequences.deep
+db.errors.sqlite ;
 IN: db.sqlite
 
 TUPLE: sqlite-db path ;
@@ -126,30 +127,6 @@ M: sqlite-statement query-results ( query -- result-set )
     dup handle>> sqlite-result-set new-result-set
     dup advance-row ;
 
-M: sqlite-db-connection create-sql-statement ( class -- statement )
-    [
-        dupd
-        "create table " 0% 0%
-        "(" 0% [ ", " 0% ] [
-            dup "sql-spec" set
-            dup column-name>> [ "table-id" set ] [ 0% ] bi
-            " " 0%
-            dup type>> lookup-create-type 0%
-            modifiers 0%
-        ] interleave
-
-        find-primary-key [
-            ", " 0%
-            "primary key(" 0%
-            [ "," 0% ] [ column-name>> 0% ] interleave
-            ")" 0%
-        ] unless-empty
-        ");" 0%
-    ] query-make ;
-
-M: sqlite-db-connection drop-sql-statement ( class -- statement )
-    [ "drop table " 0% 0% ";" 0% drop ] query-make ;
-
 M: sqlite-db-connection <insert-db-assigned-statement> ( tuple -- statement )
     [
         "insert into " 0% 0%
@@ -225,10 +202,10 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : insert-trigger ( -- string )
     [
     <"
-        CREATE TRIGGER fki_${table-name}_${foreign-table-name}_id
+        CREATE TRIGGER fki_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE INSERT ON ${table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'insert on table "${table-name}" violates foreign key constraint "fk_${foreign-table-name}_id"')
+            SELECT RAISE(ROLLBACK, 'insert on table "${table-name}" violates foreign key constraint "fki_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id"')
             WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
     "> interpolate
@@ -237,11 +214,11 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : insert-trigger-not-null ( -- string )
     [
     <"
-        CREATE TRIGGER fki_${table-name}_${foreign-table-name}_id
+        CREATE TRIGGER fki_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE INSERT ON ${table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'insert on table "${table-name}" violates foreign key constraint "fk_${foreign-table-name}_id"')
-            WHERE NEW.${foreign-table-id} IS NOT NULL
+            SELECT RAISE(ROLLBACK, 'insert on table "${table-name}" violates foreign key constraint "fki_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id"')
+            WHERE NEW.${table-id} IS NOT NULL
                 AND (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
     "> interpolate
@@ -250,11 +227,11 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : update-trigger ( -- string )
     [
     <"
-        CREATE TRIGGER fku_${table-name}_${foreign-table-name}_id
+        CREATE TRIGGER fku_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE UPDATE ON ${table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'update on table "${table-name}" violates foreign key constraint "fk_${foreign-table-name}_id"')
-            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+            SELECT RAISE(ROLLBACK, 'update on table "${table-name}" violates foreign key constraint "fku_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id"')
+            WHERE (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
     "> interpolate
     ] with-string-writer ;
@@ -262,11 +239,11 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : update-trigger-not-null ( -- string )
     [
     <"
-        CREATE TRIGGER fku_${table-name}_${foreign-table-name}_id
+        CREATE TRIGGER fku_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE UPDATE ON ${table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'update on table "${table-name}" violates foreign key constraint "fk_${foreign-table-name}_id"')
-            WHERE NEW.${foreign-table-id} IS NOT NULL
+            SELECT RAISE(ROLLBACK, 'update on table "${table-name}" violates foreign key constraint "fku_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id"')
+            WHERE NEW.${table-id} IS NOT NULL
                 AND (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
         END;
     "> interpolate
@@ -275,11 +252,11 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : delete-trigger-restrict ( -- string )
     [
     <"
-        CREATE TRIGGER fkd_${table-name}_${foreign-table-name}_id
+        CREATE TRIGGER fkd_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE DELETE ON ${foreign-table-name}
         FOR EACH ROW BEGIN
-            SELECT RAISE(ROLLBACK, 'delete on table "${foreign-table-name}" violates foreign key constraint "fk_${foreign-table-name}_id"')
-            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = OLD.${foreign-table-id}) IS NOT NULL;
+            SELECT RAISE(ROLLBACK, 'delete on table "${foreign-table-name}" violates foreign key constraint "fkd_${table-name}_$table-id}_${foreign-table-name}_${foreign-table-id}_id"')
+            WHERE (SELECT ${foreign-table-id} FROM ${foreign-table-name} WHERE ${foreign-table-id} = OLD.${foreign-table-id}) IS NOT NULL;
         END;
     "> interpolate
     ] with-string-writer ;
@@ -287,7 +264,7 @@ M: sqlite-db-connection persistent-table ( -- assoc )
 : delete-trigger-cascade ( -- string )
     [
     <"
-        CREATE TRIGGER fkd_${table-name}_${foreign-table-name}_id
+        CREATE TRIGGER fkd_${table-name}_${table-id}_${foreign-table-name}_${foreign-table-id}_id
         BEFORE DELETE ON ${foreign-table-name}
         FOR EACH ROW BEGIN
             DELETE from ${table-name} WHERE ${table-id} = OLD.${foreign-table-id};
@@ -318,14 +295,62 @@ M: sqlite-db-connection persistent-table ( -- assoc )
         delete-trigger-restrict sqlite-trigger,
     ] if ;
 
+: create-db-triggers ( sql-specs -- )
+    [ modifiers>> [ +foreign-id+ = ] deep-any? ] filter
+    [
+        [ class>> db-table-name "db-table" set ]
+        [
+            [ "sql-spec" set ]
+            [ column-name>> "table-id" set ]
+            [ ] tri
+            modifiers>> [ [ +foreign-id+ = ] deep-any? ] filter
+            [
+                [ second db-table-name "foreign-table-name" set ]
+                [ third "foreign-table-id" set ] bi
+                create-sqlite-triggers
+            ] each
+        ] bi
+    ] each ;
+
+: sqlite-create-table ( sql-specs class-name -- )
+    [
+        "create table " 0% 0%
+        "(" 0% [ ", " 0% ] [
+            dup "sql-spec" set
+            dup column-name>> [ "table-id" set ] [ 0% ] bi
+            " " 0%
+            dup type>> lookup-create-type 0%
+            modifiers 0%
+        ] interleave
+    ] [
+        drop
+        find-primary-key [
+            ", " 0%
+            "primary key(" 0%
+            [ "," 0% ] [ column-name>> 0% ] interleave
+            ")" 0%
+        ] unless-empty
+        ");" 0%
+    ] 2bi ;
+
+M: sqlite-db-connection create-sql-statement ( class -- statement )
+    [
+        [ sqlite-create-table ]
+        [ drop create-db-triggers ] 2bi
+    ] query-make ;
+
+M: sqlite-db-connection drop-sql-statement ( class -- statements )
+    [ nip "drop table " 0% 0% ";" 0% ] query-make ;
+
 M: sqlite-db-connection compound ( string seq -- new-string )
     over {
         { "default" [ first number>string " " glue ] }
-        { "references" [
-            [ >reference-string ] keep
-            first2 [ db-table-name "foreign-table-name" set ]
-            [ "foreign-table-id" set ] bi*
-            create-sqlite-triggers
-        ] }
+        { "references" [ >reference-string ] }
         [ 2drop ]
+    } case ;
+
+M: sqlite-db-connection parse-db-error
+    dup n>> {
+        { 1 [ string>> parse-sqlite-sql-error ] }
+        [ drop ]
     } case ;

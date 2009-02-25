@@ -18,7 +18,7 @@ TYPEDEF: chtype attr_t
 TYPEDEF: short NCURSES_SIZE_T
 TYPEDEF: ushort wchar_t
 
-: CCHARW_MAX  5 ; inline
+CONSTANT: CCHARW_MAX  5
 
 C-STRUCT: cchar_t
     { "attr_t" "attr" }

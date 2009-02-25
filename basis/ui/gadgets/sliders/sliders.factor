@@ -18,7 +18,7 @@ TUPLE: slider < frame elevator thumb saved line ;
 : elevator-length ( slider -- n )
   [ elevator>> dim>> ] [ orientation>> ] bi v. ;
 
-: min-thumb-dim 15 ;
+CONSTANT: min-thumb-dim 15
 
 : slider-value ( gadget -- n ) model>> range-value >fixnum ;
 : slider-page  ( gadget -- n ) model>> range-page-value    ;

@@ -16,9 +16,9 @@ crossref off
 
 H{ } clone sub-primitives set
 
-"resource:core/bootstrap/syntax.factor" parse-file
+"vocab:bootstrap/syntax.factor" parse-file
 
-"resource:basis/cpu/" architecture get {
+"vocab:cpu/" architecture get {
     { "x86.32" "x86/32" }
     { "winnt-x86.64" "x86/64/winnt" }
     { "unix-x86.64" "x86/64/unix" }
@@ -27,7 +27,7 @@ H{ } clone sub-primitives set
     { "arm" "arm" }
 } at "/bootstrap.factor" 3append parse-file
 
-"resource:core/bootstrap/layouts/layouts.factor" parse-file
+"vocab:bootstrap/layouts/layouts.factor" parse-file
 
 ! Now we have ( syntax-quot arch-quot layouts-quot ) on the stack
 
@@ -538,4 +538,4 @@ tuple
 [ [ first2 ] dip make-primitive ] each-index
 
 ! Bump build number
-"build" "kernel" create build 1+ 1quotation define
+"build" "kernel" create build 1+ [ ] curry (( -- n )) define-declared

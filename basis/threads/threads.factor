@@ -118,7 +118,7 @@ DEFER: stop
     [ ] while
     drop ;
 
-: start ( namestack thread -- )
+: start ( namestack thread -- * )
     [
         set-self
         set-namestack

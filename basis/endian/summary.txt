@@ -1,0 +1,1 @@
+Utilities for working with big-endian and little-endian data

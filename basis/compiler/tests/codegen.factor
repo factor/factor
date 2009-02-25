@@ -51,7 +51,7 @@ unit-test
     \ foo [ global >n get ndrop ] compile-call
 ] unit-test
 
-: blech drop ;
+: blech ( x -- ) drop ;
 
 [ 3 ]
 [
@@ -102,7 +102,7 @@ unit-test
 [ ] [
     [
         [ 200 dup [ 200 3array ] curry map drop ] times
-    ] [ define-temp ] with-compilation-unit drop
+    ] [ (( n -- )) define-temp ] with-compilation-unit drop
 ] unit-test
 
 ! Test how dispatch handles the end of a basic block

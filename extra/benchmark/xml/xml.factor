@@ -5,8 +5,8 @@ sequences xml ;
 IN: benchmark.xml
 
 : xml-benchmark ( -- )
-    "resource:basis/xmode/modes/" [
-        [ utf8 <file-reader> read-xml drop ] each
+    "vocab:xmode/modes/" [
+        [ file>xml drop ] each
     ] with-directory-files ;
 
 MAIN: xml-benchmark

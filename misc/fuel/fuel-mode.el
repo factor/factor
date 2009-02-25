@@ -132,6 +132,18 @@ With prefix argument, ask for the file name."
   (let ((file (car (fuel-mode--read-file arg))))
     (when file (fuel-debug--uses-for-file file))))
 
+(defun fuel-load-usings ()
+  "Loads all vocabularies in the current buffer's USING: from.
+Useful to activate autodoc help messages in a vocabulary not yet
+loaded. See documentation for `fuel-autodoc-eval-using-form-p'
+for details."
+  (interactive)
+  (message "Loading all vocabularies in USING: form ...")
+  (let ((err (fuel-eval--retort-error
+              (fuel-eval--send/wait '(:fuel* (t) t :usings) 120000))))
+    (message (if err "Warning: some vocabularies failed to load"
+               "All vocabularies loaded"))))
+
 
 ;;; Minor mode definition:
 
@@ -191,7 +203,8 @@ interacting with a factor listener is at your disposal.
 
 (fuel-mode--key ?e ?d 'fuel-edit-word-doc-at-point)
 (fuel-mode--key ?e ?e 'fuel-eval-extended-region)
-(fuel-mode--key ?e ?l 'fuel-run-file)
+(fuel-mode--key ?e ?k 'fuel-run-file)
+(fuel-mode--key ?e ?l 'fuel-load-usings)
 (fuel-mode--key ?e ?r 'fuel-eval-region)
 (fuel-mode--key ?e ?u 'fuel-update-usings)
 (fuel-mode--key ?e ?v 'fuel-edit-vocabulary)
@@ -200,6 +213,7 @@ interacting with a factor listener is at your disposal.
 
 (fuel-mode--key ?x ?a 'fuel-refactor-extract-article)
 (fuel-mode--key ?x ?i 'fuel-refactor-inline-word)
+(fuel-mode--key ?x ?g 'fuel-refactor-make-generic)
 (fuel-mode--key ?x ?r 'fuel-refactor-extract-region)
 (fuel-mode--key ?x ?s 'fuel-refactor-extract-sexp)
 (fuel-mode--key ?x ?v 'fuel-refactor-extract-vocab)

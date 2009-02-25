@@ -10,7 +10,7 @@ IN: html.templates.chloe.tests
     "?>" split1 nip ; inline
 
 : test-template ( name -- template )
-    "resource:basis/html/templates/chloe/test/"
+    "vocab:html/templates/chloe/test/"
     prepend <chloe> ;
 
 [ "Hello world" ] [
