@@ -23,7 +23,7 @@ aside "ASIDES" {
     { "post-data" "POST_DATA" FACTOR-BLOB }
 } define-persistent
 
-: aside-id-key "__a" ;
+CONSTANT: aside-id-key "__a"
 
 TUPLE: asides < server-state-manager ;
 

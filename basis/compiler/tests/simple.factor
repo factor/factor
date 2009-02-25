@@ -18,13 +18,13 @@ IN: compiler.tests
 [ "hey" ] [ [ "hey" ] compile-call ] unit-test
 
 ! Calls
-: no-op ;
+: no-op ( -- ) ;
 
 [ ] [ [ no-op ] compile-call ] unit-test
 [ 3 ] [ [ no-op 3 ] compile-call ] unit-test
 [ 3 ] [ [ 3 no-op ] compile-call ] unit-test
 
-: bar 4 ;
+: bar ( -- value ) 4 ;
 
 [ 4 ] [ [ bar no-op ] compile-call ] unit-test
 [ 4 3 ] [ [ no-op bar 3 ] compile-call ] unit-test
@@ -54,7 +54,7 @@ IN: compiler.tests
 
 ! Labels
 
-: recursive-test ( ? -- ) [ f recursive-test ] when ; inline
+: recursive-test ( ? -- ) [ f recursive-test ] when ; inline recursive
 
 [ ] [ t [ recursive-test ] compile-call ] unit-test
 

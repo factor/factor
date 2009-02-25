@@ -1,7 +1,7 @@
 USING: arrays kernel xml-rpc ;
 IN: lisppaste
 
-: url "http://www.common-lisp.net:8185/RPC2" ;
+CONSTANT: url "http://www.common-lisp.net:8185/RPC2"
 
 : channels ( -- seq )
     { } "listchannels" url invoke-method ;

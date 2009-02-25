@@ -5,8 +5,8 @@ calendar locals strings ui.gadgets.buttons
 combinators math.parser assocs threads ;
 IN: joystick-demo
 
-: SIZE { 151 151 } ;
-: INDICATOR-SIZE { 4 4 } ;
+CONSTANT: SIZE { 151 151 }
+CONSTANT: INDICATOR-SIZE { 4 4 }
 : FREQUENCY ( -- f ) 30 recip seconds ;
 
 TUPLE: axis-gadget < gadget indicator z-indicator pov ;
@@ -21,7 +21,7 @@ M: axis-gadget pref-dim* drop SIZE ;
 : indicator-polygon ( -- polygon )
     { 0 0 } INDICATOR-SIZE (rect-polygon) ;
 
-: pov-polygons
+CONSTANT: pov-polygons
     V{
         { pov-neutral    { { 70 75 } { 75 70 } { 80 75 } { 75 80 } } }
         { pov-up         { { 70 65 } { 75 60 } { 80 65 } } }
@@ -32,7 +32,7 @@ M: axis-gadget pref-dim* drop SIZE ;
         { pov-down-left  { { 67 90 } { 60 90 } { 60 83 } } }
         { pov-left       { { 65 70 } { 60 75 } { 65 80 } } }
         { pov-up-left    { { 67 60 } { 60 60 } { 60 67 } } }
-    } ;
+    }
 
 : <indicator-gadget> ( color -- indicator )
     indicator-polygon <polygon-gadget> ;
