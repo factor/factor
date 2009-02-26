@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors kernel fry math math.vectors sequences arrays vectors assocs
-       hashtables models models.range models.compose combinators
+       hashtables models models.range models.product combinators
        ui ui.gadgets ui.gadgets.buttons ui.gadgets.frames ui.gadgets.packs
        ui.gadgets.grids ui.gadgets.viewports ui.gadgets.books locals ;
 

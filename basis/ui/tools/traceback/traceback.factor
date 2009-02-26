@@ -5,7 +5,7 @@ fry prettyprint ui ui.commands ui.gadgets ui.gadgets.labeled assocs
 ui.gadgets.tracks ui.gadgets.buttons ui.gadgets.panes
 ui.gadgets.status-bar ui.gadgets.scrollers ui.gadgets.borders
 ui.gadgets.tables ui.gestures sequences inspector
-models.filter fonts ;
+models.arrow fonts ;
 QUALIFIED-WITH: ui.tools.inspector i
 IN: ui.tools.traceback
 
@@ -21,7 +21,7 @@ M: stack-entry-renderer row-columns drop string>> 1array ;
 M: stack-entry-renderer row-value drop object>> ;
 
 : <stack-table> ( model -- table )
-    [ [ <stack-entry> ] map ] <filter> stack-entry-renderer <table>
+    [ [ <stack-entry> ] map ] <arrow> stack-entry-renderer <table>
         10 >>min-rows
         10 >>max-rows
         40 >>min-cols
@@ -31,7 +31,7 @@ M: stack-entry-renderer row-value drop object>> ;
         t >>single-click? ;
 
 : <stack-display> ( model quot title -- gadget )
-    [ '[ dup _ when ] <filter> <stack-table> <scroller> ] dip
+    [ '[ dup _ when ] <arrow> <stack-table> <scroller> ] dip
     <labeled-gadget> ;
 
 : <callstack-display> ( model -- gadget )
@@ -67,7 +67,7 @@ TUPLE: traceback-gadget < track ;
     add-toolbar ;
 
 : variables ( traceback -- )
-    model>> [ dup [ name>> vars-in-scope ] when ] <filter> i:inspect-model ;
+    model>> [ dup [ name>> vars-in-scope ] when ] <arrow> i:inspect-model ;
 
 : traceback-window ( continuation -- )
     <model> <traceback-gadget> "Traceback" open-status-window ;

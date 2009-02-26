@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ui.gadgets ui.gadgets.viewports
-ui.gadgets.frames ui.gadgets.grids
-ui.gadgets.sliders ui.gestures kernel math namespaces sequences
-models models.range models.compose combinators math.vectors
-classes.tuple math.rectangles combinators.short-circuit ;
+ui.gadgets.frames ui.gadgets.grids ui.gadgets.sliders
+ui.gestures kernel math namespaces sequences models models.range
+models.product combinators math.vectors classes.tuple
+math.rectangles combinators.short-circuit ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller < frame column-header viewport x y follows ;
@@ -42,7 +42,7 @@ scroller H{
 } set-gestures
 
 : <scroller-model> ( -- model )
-    0 0 0 0 <range> 0 0 0 0 <range> 2array <compose> ;
+    0 0 0 0 <range> 0 0 0 0 <range> 2array <product> ;
 
 M: viewport pref-dim* gadget-child pref-viewport-dim ;
 

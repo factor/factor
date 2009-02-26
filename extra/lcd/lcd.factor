@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors sequences kernel math io calendar grouping
-calendar.format calendar.model arrays models models.filter
+calendar.format calendar.model arrays models models.arrow
 namespaces ui.gadgets ui.gadgets.labels ui.gadgets.theme ui ;
 IN: lcd
 
@@ -24,7 +24,7 @@ IN: lcd
     3array [ pad-00 ] map ":" join ;
 
 : <time-display> ( timestamp -- gadget )
-    [ hh:mm:ss lcd ] <filter> <label-control>
+    [ hh:mm:ss lcd ] <arrow> <label-control>
     "99:99:99" lcd >>string
     monospace-font >>font ;
 

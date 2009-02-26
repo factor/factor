@@ -4,7 +4,7 @@ USING: accessors arrays assocs calendar combinators locals
 colors.constants combinators.short-circuit compiler.units
 concurrency.flags concurrency.mailboxes continuations destructors
 documents documents.elements fry hashtables help help.markup io
-io.styles kernel lexer listener math models models.delay models.filter
+io.styles kernel lexer listener math models models.delay models.arrow
 namespaces parser prettyprint quotations sequences strings threads
 tools.vocabs vocabs vocabs.loader vocabs.parser words ui ui.commands
 ui.pens.solid ui.gadgets ui.gadgets.glass ui.gadgets.buttons ui.gadgets.editors
@@ -63,7 +63,7 @@ M: char-completion (word-at-caret)
 : <word-model> ( interactor -- model )
     [ token-model>> 1/3 seconds <delay> ]
     [ '[ _ word-at-caret ] ] bi
-    <filter> ;
+    <arrow> ;
 
 : <interactor> ( -- gadget )
     interactor new-editor
