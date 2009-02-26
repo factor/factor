@@ -44,11 +44,11 @@ IN: stack-checker.backend
 
 : pop-r ( -- obj )
     meta-r dup empty?
-    [ too-many-r> inference-error ] [ pop ] if ;
+    [ too-many-r> ] [ pop ] if ;
 
 : consume-r ( n -- seq )
     meta-r 2dup length >
-    [ too-many-r> inference-error ] when
+    [ too-many-r> ] when
     [ swap tail* ] [ shorten-by ] 2bi ;
 
 : output-r ( seq -- ) meta-r push-all ;
@@ -81,7 +81,7 @@ M: object apply-object push-literal ;
     terminated? on meta-d clone meta-r clone #terminate, ;
 
 : check->r ( -- )
-    meta-r empty? [ \ too-many->r inference-error ] unless ;
+    meta-r empty? [ too-many->r ] unless ;
 
 : infer-quot-here ( quot -- )
     meta-r [
@@ -104,7 +104,7 @@ M: object apply-object push-literal ;
 
 : infer-literal-quot ( literal -- )
     dup recursive-quotation? [
-        value>> recursive-quotation-error inference-error
+        value>> recursive-quotation-error
     ] [
         dup value>> callable? [
             [ value>> ]
@@ -139,7 +139,7 @@ M: object apply-object push-literal ;
     meta-d clone #return, ;
 
 : required-stack-effect ( word -- effect )
-    dup stack-effect [ ] [ missing-effect inference-error ] ?if ;
+    dup stack-effect [ ] [ missing-effect ] ?if ;
 
 : check-effect ( word effect -- )
     over required-stack-effect 2dup effect<=
