@@ -199,8 +199,11 @@ generic-comparison-ops [
 ] "outputs" set-word-prop
 
 \ both-fixnums? [
-    [ class>> fixnum classes-intersect? not ] either?
-    f <literal-info> object-info ?
+    [ class>> ] bi@ {
+        { [ 2dup [ fixnum classes-intersect? not ] either? ] [ f <literal-info> ] }
+        { [ 2dup [ fixnum class<= ] both? ] [ t <literal-info> ] }
+        [ object-info ]
+    } cond 2nip
 ] "outputs" set-word-prop
 
 {
