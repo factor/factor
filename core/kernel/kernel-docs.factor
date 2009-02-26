@@ -57,6 +57,7 @@ HELP: clear
 { $description "Clears the data stack." } ;
 
 HELP: build
+{ $values { "n" integer } }
 { $description "The current build number. Factor increments this number whenever a new boot image is created." } ;
 
 HELP: hashcode*
