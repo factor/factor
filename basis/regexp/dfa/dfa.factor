@@ -49,7 +49,7 @@ IN: regexp.dfa
         [| trans |
             state trans nfa find-closure :> new-state
             new-state visited-states new-states add-todo-state
-            state new-state trans transition make-transition dfa add-transition
+            state new-state trans dfa add-transition
         ] each
         nfa dfa new-states visited-states new-transitions
     ] if-empty ;

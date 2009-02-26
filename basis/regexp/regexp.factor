@@ -12,37 +12,47 @@ TUPLE: regexp
     { raw read-only }
     { parse-tree read-only }
     { options read-only }
-    dfa ;
+    dfa reverse-dfa ;
 
 : make-regexp ( string ast -- regexp )
-    f f <options> f regexp boa ; foldable
+    f f <options> f f regexp boa ; foldable
     ! Foldable because, when the dfa slot is set,
     ! it'll be set to the same thing regardless of who sets it
 
 : <optioned-regexp> ( string options -- regexp )
     [ dup parse-regexp ] [ string>options ] bi*
-    f regexp boa ;
+    f f regexp boa ;
 
 : <regexp> ( string -- regexp ) "" <optioned-regexp> ;
 
 <PRIVATE
 
+: get-ast ( regexp -- ast )
+    [ parse-tree>> ] [ options>> ] bi <with-options> ;
+
 : compile-regexp ( regexp -- regexp )
-    dup dfa>> [
-        dup 
-        [ parse-tree>> ]
-        [ options>> ] bi
-        <with-options> ast>dfa
-        >>dfa
-    ] unless ;
+    dup '[ [ _ get-ast ast>dfa ] unless* ] change-dfa ;
+
+: <reversed-option> ( ast -- reversed )
+    "r" string>options <with-options> ;
+
+: compile-reverse ( regexp -- regexp )
+    dup '[ [ _ get-ast <reversed-option> ast>dfa ] unless* ] change-reverse-dfa ;
 
 : (match) ( string regexp -- dfa-traverser )
-    compile-regexp dfa>> <dfa-traverser> do-match ; inline
+    compile-regexp dfa>> <dfa-traverser> do-match ;
+
+: (match-reversed) ( string regexp -- dfa-traverser )
+    [ <reversed> ] [ compile-reverse reverse-dfa>> ] bi*
+    <dfa-traverser> do-match ;
 
 PRIVATE>
 
 : match ( string regexp -- slice/f )
     (match) return-match ;
+
+: match-from-end ( string regexp -- slice/f )
+    (match-reversed) return-match ;
 
 : matches? ( string regexp -- ? )
     dupd match
@@ -109,11 +119,18 @@ PRIVATE>
         { "R| "  "|"  }
     } swap [ subseq? not nip ] curry assoc-find drop ;
 
+: take-until ( end lexer -- string )
+    dup skip-blank [
+        [ index-from ] 2keep
+        [ swapd subseq ]
+        [ 2drop 1+ ] 3bi
+    ] change-lexer-column ;
+
+: parse-noblank-token ( lexer -- str/f )
+    dup still-parsing-line? [ (parse-token) ] [ drop f ] if ;
+
 : parsing-regexp ( accum end -- accum )
-    lexer get dup skip-blank
-    [ [ index-from dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
-    lexer get dup still-parsing-line?
-    [ (parse-token) ] [ drop f ] if
+    lexer get [ take-until ] [ parse-noblank-token ] bi
     <optioned-regexp> compile-regexp parsed ;
 
 PRIVATE>
