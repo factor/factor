@@ -15,7 +15,7 @@ IN: math.compare.tests
 [ -3 ] [ 1 -3 negmin ] unit-test
 [ -1 ] [ -1 3 negmin ] unit-test
 
-[ 0 ] [ 0 -1 2 clamp ] unit-test
-[ 1 ] [ 0 1 2 clamp ] unit-test
-[ 2 ] [ 0 3 2 clamp ] unit-test
+[ 0 ] [ -1 0 2 clamp ] unit-test
+[ 1 ] [ 1 0 2 clamp ] unit-test
+[ 2 ] [ 3 0 2 clamp ] unit-test
 
