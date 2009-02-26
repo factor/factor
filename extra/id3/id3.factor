@@ -1,6 +1,10 @@
 ! Copyright (C) 2009 Tim Wawrzynczak
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences io io.encodings.binary io.files io.pathnames strings kernel math io.mmap io.mmap.uchar accessors syntax combinators math.ranges unicode.categories byte-arrays io.encodings.string io.encodings.utf8 assocs math.parser ;
+USING: sequences io io.encodings.binary io.files io.pathnames
+strings kernel math io.mmap io.mmap.uchar accessors syntax
+combinators math.ranges unicode.categories byte-arrays
+io.encodings.string io.encodings.utf8 assocs math.parser
+combinators.short-circuit ;
 IN: id3
 
 <PRIVATE
@@ -160,7 +164,7 @@ TUPLE: id3-info title artist album year comment genre ;
     "ID3" head? ;
 
 : id3v1? ( mmap -- ? )
-    128 tail-slice* "TAG" head? ;
+    { [ length 128 >= ] [ 128 tail-slice* "TAG" head? ] } 1&& ;
 
 : >28bitword ( seq -- int )
     0 [ swap 7 shift bitor ] reduce ;
