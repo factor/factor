@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar colors colors.constants
 documents documents.elements fry kernel words sets splitting math
-math.vectors models.delay models.filter combinators.short-circuit
+math.vectors models.delay models.arrow combinators.short-circuit
 parser present sequences tools.completion tools.vocabs.browser generic
 generic.standard.engines.tuple fonts definitions.icons ui.images
 ui.commands ui.operations ui.gadgets ui.gadgets.editors
@@ -102,7 +102,7 @@ TUPLE: completion-popup < track interactor table completion-mode ;
 
 : <completion-model> ( editor element quot -- model )
     [ <element-model> 1/3 seconds <delay> ] dip
-    '[ @ keys 1000 short head ] <filter> ;
+    '[ @ keys 1000 short head ] <arrow> ;
 
 M: completion-popup focusable-child* table>> ;
 

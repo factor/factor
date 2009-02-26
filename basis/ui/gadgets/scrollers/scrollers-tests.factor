@@ -1,9 +1,9 @@
 USING: ui.gadgets ui.gadgets.scrollers namespaces tools.test
-kernel models models.compose models.range ui.gadgets.viewports
-ui.gadgets.labels ui.gadgets.grids
-ui.gadgets.sliders math math.vectors arrays sequences
-tools.test.ui math.rectangles accessors ui.gadgets.buttons
-ui.gadgets.packs ui.gadgets.scrollers.private ;
+kernel models models.product models.range ui.gadgets.viewports
+ui.gadgets.labels ui.gadgets.grids ui.gadgets.sliders math
+math.vectors arrays sequences tools.test.ui math.rectangles
+accessors ui.gadgets.buttons ui.gadgets.packs
+ui.gadgets.scrollers.private ;
 IN: ui.gadgets.scrollers.tests
 
 [ ] [
@@ -21,7 +21,7 @@ IN: ui.gadgets.scrollers.tests
 
 [ ] [
     <gadget> dup "g" set
-    10 1 0 100 <range> 20 1 0 100 <range> 2array <compose>
+    10 1 0 100 <range> 20 1 0 100 <range> 2array <product>
     <viewport> "v" set
 ] unit-test
 

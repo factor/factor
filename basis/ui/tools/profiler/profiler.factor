@@ -10,8 +10,8 @@ ui.gadgets.buttons ui.gadgets.packs ui.gadgets.labels
 ui.gadgets.tabbed ui.gadgets.status-bar ui.gadgets.borders
 ui.tools.browser ui.tools.common ui.baseline-alignment
 ui.operations ui.images ;
-FROM: models.filter => <filter> ;
-FROM: models.compose => <compose> ;
+FROM: models.arrow => <arrow> ;
+FROM: models.product => <product> ;
 IN: ui.tools.profiler
 
 TUPLE: profiler-gadget < tool
@@ -72,7 +72,7 @@ M: method-renderer row-value drop first ;
 M: method-renderer column-titles drop { "" "Method" "Count" } ;
 
 : <profiler-model> ( values profiler -- model )
-    [ [ filter-counts ] <filter> ] [ sort>> ] bi* <sort> ;
+    [ [ filter-counts ] <arrow> ] [ sort>> ] bi* <sort> ;
 
 : <words-model> ( profiler -- model )
     [
@@ -91,7 +91,7 @@ M: method-renderer column-titles drop { "" "Method" "Count" } ;
         [ invoke-primary-operation ] >>action ;
 
 : <profiler-filter-model> ( counts profiler -- model' )
-    [ <model> ] dip <profiler-model> [ f prefix ] <filter> ;
+    [ <model> ] dip <profiler-model> [ f prefix ] <arrow> ;
 
 : <vocabs-model> ( profiler -- model )
     [ vocab-counters [ [ vocab ] dip ] assoc-map ] dip
@@ -112,8 +112,8 @@ M: method-renderer column-titles drop { "" "Method" "Count" } ;
 : <methods-model> ( profiler -- model )
     [
         [ method-counters <model> ] dip
-        [ generic>> ] [ class>> ] bi 3array <compose>
-        [ first3 '[ _ _ method-matches? ] filter ] <filter>
+        [ generic>> ] [ class>> ] bi 3array <product>
+        [ first3 '[ _ _ method-matches? ] filter ] <arrow>
     ] keep <profiler-model> ;
 
 : sort-by-name ( obj1 obj2 -- <=> )

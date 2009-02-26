@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.functions math.parser models
-models.filter models.range models.compose sequences ui
+models.arrow models.range models.product sequences ui
 ui.gadgets ui.gadgets.frames ui.gadgets.labels ui.gadgets.packs
 ui.gadgets.sliders ui.render math.rectangles accessors
 ui.gadgets.grids colors ;
@@ -20,7 +20,7 @@ M: color-preview model-changed
     swap value>> >>interior relayout-1 ;
 
 : <color-model> ( model -- model )
-    [ first3 [ 256 /f ] tri@ 1 <rgba> <solid> ] <filter> ;
+    [ first3 [ 256 /f ] tri@ 1 <rgba> <solid> ] <arrow> ;
 
 : <color-slider> ( model -- gadget )
     horizontal <slider> 1 >>line ;
@@ -28,7 +28,7 @@ M: color-preview model-changed
 : <color-sliders> ( -- gadget model )
     3 [ 0 0 0 255 <range> ] replicate
     [ <filled-pile> { 5 5 } >>gap [ <color-slider> add-gadget ] reduce ]
-    [ [ range-model ] map <compose> ]
+    [ [ range-model ] map <product> ]
     bi ;
 
 : <color-picker> ( -- gadget )
@@ -40,7 +40,7 @@ M: color-preview model-changed
             [ <color-model> <color-preview> @center grid-add ]
             [
                 [ [ truncate number>string ] map " " join ]
-                <filter> <label-control>
+                <arrow> <label-control>
                 @bottom grid-add
             ] bi
         ] bi* ;

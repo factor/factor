@@ -3,7 +3,7 @@
 USING: accessors kernel concurrency.messaging inspector
 ui.tools.listener ui.tools.traceback ui.gadgets.buttons
 ui.gadgets.status-bar ui.gadgets.tracks ui.commands ui.gadgets
-models models.filter ui.tools.browser ui.tools.common ui.gestures
+models models.arrow ui.tools.browser ui.tools.common ui.gestures
 ui.gadgets.labels ui threads namespaces make tools.walker assocs
 combinators fry ;
 IN: ui.tools.walker
@@ -53,7 +53,7 @@ M: walker-gadget focusable-child*
     ] "" make ;
 
 : <thread-status> ( model thread -- gadget )
-    '[ _ walker-state-string ] <filter> <label-control> ;
+    '[ _ walker-state-string ] <arrow> <label-control> ;
 
 : <walker-gadget> ( status continuation thread -- gadget )
     vertical walker-gadget new-track

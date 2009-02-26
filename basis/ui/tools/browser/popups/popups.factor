@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs definitions fry help.topics kernel
-colors.constants math.rectangles models.filter namespaces sequences
+colors.constants math.rectangles models.arrow namespaces sequences
 sorting definitions.icons ui.gadgets ui.gadgets.glass
 ui.gadgets.labeled ui.gadgets.scrollers ui.gadgets.tables
 ui.gadgets.search-tables ui.gadgets.wrappers ui.gestures ui.operations
@@ -24,10 +24,10 @@ TUPLE: links-popup < wrapper ;
     swap second subseq? ;
 
 : <links-table> ( model quot -- table )
-    '[ @ sorted-links ] <filter>
+    '[ @ sorted-links ] <arrow>
     link-renderer [ second ] <search-table>
         [ invoke-primary-operation ] >>action
-        [ drop ] >>hook ! hide-glass ] >>hook
+        [ hide-glass ] >>hook
         t >>selection-required?
         10 >>min-rows
         10 >>max-rows
