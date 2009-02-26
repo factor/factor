@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors generic kernel math sequences arrays assocs
-alarms calendar math.order ;
+alarms calendar math.order continuations fry ;
 IN: models
 
 TUPLE: model < identity-tuple
@@ -68,10 +68,9 @@ GENERIC: model-changed ( model observer -- )
     drop ;
 
 : with-locked-model ( model quot -- )
-    swap
-    t >>locked?
-    slip
-    f >>locked? drop ; inline
+    [ '[ _ t >>locked? @ ] ]
+    [ drop '[ _ f >>locked? drop ] ]
+    2bi [ ] cleanup ; inline
 
 GENERIC: update-model ( model -- )
 
@@ -84,7 +83,7 @@ M: model update-model drop ;
     dup locked?>> [
         2drop
     ] [
-        dup [
+        [
             swap >>value
             [ update-model ] [ notify-connections ] bi
         ] with-locked-model
