@@ -9,8 +9,8 @@ M: inference-error error-help error>> error-help ;
 M: inference-error error.
     [ word>> [ "In word: " write . ] when* ] [ error>> error. ] bi ;
 
-M: literal-expected summary
-    drop "Literal value expected" ;
+M: literal-expected error.
+    "Got a computed value where a " write what>> write " was expected" print ;
 
 M: unbalanced-branches-error error.
     "Unbalanced branches:" print

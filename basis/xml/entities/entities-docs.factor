@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax assocs ;
 IN: xml.entities
 
 ABOUT: "xml.entities"
@@ -12,6 +12,7 @@ ARTICLE: "xml.entities" "XML entities"
 "For entities used in HTML/XHTML, see " { $vocab-link "xml.entities.html" } ;
 
 HELP: entities
+{ $values { "value" assoc } }
 { $description "A hash table from default XML entity names (like " { $snippet "&amp;" } " and " { $snippet "&lt;" } ") to the characters they represent. This is automatically included when parsing any XML document." }
 { $see-also with-entities } ;
 
