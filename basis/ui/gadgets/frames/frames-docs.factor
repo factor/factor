@@ -1,5 +1,5 @@
-USING: help.syntax help.markup ui.gadgets kernel arrays
-quotations classes.tuple ui.gadgets.grids parser math ;
+USING: help.syntax help.markup ui.gadgets kernel arrays math help sequences
+quotations classes.tuple ui.gadgets.grids ;
 IN: ui.gadgets.frames
 
 ARTICLE: "ui-frame-layout" "Frame layouts"

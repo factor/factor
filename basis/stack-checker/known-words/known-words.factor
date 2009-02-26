@@ -87,7 +87,7 @@ M: composed infer-call*
     terminated? get [ 1 infer-r> infer-call ] unless ;
 
 M: object infer-call*
-    \ literal-expected inference-warning ;
+    "literal quotation" literal-expected ;
 
 : infer-nslip ( n -- )
     [ infer->r infer-call ] [ infer-r> ] bi ;
