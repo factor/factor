@@ -7,7 +7,7 @@ HELP: delay
 { $examples
     "The following code displays a sliders and a label which is updated half a second after the slider stops changing:"
     { $code
-        "USING: models models.delay models.filter models.range"
+        "USING: models models.delay models.arrow models.range"
         "ui.gadgets ui.gadgets.labels ui.gadgets.sliders ui.gadgets.panes"
         "math.parser calendar ;"
         ""
@@ -15,7 +15,7 @@ HELP: delay
         "    0 10 0 100 <range> horizontal <slider> ;"
         ""
         "<funny-slider> dup gadget."
-        "model>> 1/2 seconds <delay> [ unparse ] <filter>"
+        "model>> 1/2 seconds <delay> [ unparse ] <arrow>"
         "<label-control> gadget."
     }
 } ;

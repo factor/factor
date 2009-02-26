@@ -1,0 +1,1 @@
+Product models combine the values of a sequence of models into one

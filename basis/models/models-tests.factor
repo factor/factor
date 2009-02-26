@@ -1,4 +1,4 @@
-USING: arrays generic kernel math models models.compose
+USING: arrays generic kernel math models models.product
 namespaces sequences assocs accessors tools.test ;
 IN: models.tests
 
@@ -16,7 +16,7 @@ M: model-tester model-changed nip t >>hit? drop ;
 
 3 <model> "model-a" set
 4 <model> "model-b" set
-"model-a" get "model-b" get 2array <compose> "model-c" set
+"model-a" get "model-b" get 2array <product> "model-c" set
 
 "model-c" get activate-model
 [ { 3 4 } ] [ "model-c" get value>>  ] unit-test

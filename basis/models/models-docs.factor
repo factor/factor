@@ -130,8 +130,8 @@ $nl
 { $subsection activate-model }
 { $subsection deactivate-model }
 { $subsection "models-impl" }
-{ $subsection "models-filter" }
-{ $subsection "models-compose" }
+{ $subsection "models.arrow" }
+{ $subsection "models.product" }
 { $subsection "models-history" }
 { $subsection "models-range" }
 { $subsection "models-delay" } ;
