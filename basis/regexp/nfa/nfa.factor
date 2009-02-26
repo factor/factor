@@ -51,12 +51,12 @@ SYMBOL: nfa-table
 
 GENERIC: nfa-node ( node -- start-state end-state )
 
-: add-simple-entry ( obj class -- start-state end-state )
-    [ next-state next-state 2dup ] 2dip
-    make-transition nfa-table get add-transition ;
+: add-simple-entry ( obj -- start-state end-state )
+    [ next-state next-state 2dup ] dip
+    nfa-table get add-transition ;
 
 : epsilon-transition ( source target -- )
-    epsilon <literal-transition> nfa-table get add-transition ;
+    epsilon nfa-table get add-transition ;
 
 M:: star nfa-node ( node -- start end )
     node term>> nfa-node :> s1 :> s0
@@ -69,7 +69,7 @@ M:: star nfa-node ( node -- start end )
     s2 s3 ;
 
 M: tagged-epsilon nfa-node
-    literal-transition add-simple-entry ;
+    add-simple-entry ;
 
 M: concatenation nfa-node ( node -- start end )
     [ first>> ] [ second>> ] bi
@@ -103,9 +103,7 @@ M: integer modify-class
     ] when ;
 
 M: integer nfa-node ( node -- start end )
-    modify-class dup class?
-    class-transition literal-transition ?
-    add-simple-entry ;
+    modify-class add-simple-entry ;
 
 M: primitive-class modify-class
     class>> modify-class <primitive-class> ;
@@ -141,7 +139,7 @@ M: range modify-class
     ] when ;
 
 M: class nfa-node
-    modify-class class-transition add-simple-entry ;
+    modify-class add-simple-entry ;
 
 M: with-options nfa-node ( node -- start end )
     dup options>> [ tree>> nfa-node ] using-options ;

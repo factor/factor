@@ -240,7 +240,9 @@ IN: regexp-tests
 
 [ t ] [ "abc" <reversed> R/ abc/r matches? ] unit-test
 [ t ] [ "abc" <reversed> R/ a[bB][cC]/r matches? ] unit-test
-! [ t ] [ "adcbe" R/ a(?r)(bcd)(?-r)e/ matches? ] unit-test ! FIXME
+
+[ t ] [ "xabc" R/ abc/ match-from-end >boolean ] unit-test
+[ t ] [ "xabc" R/ a[bB][cC]/ match-from-end >boolean ] unit-test
 
 [ t ] [ "s@f" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
 [ f ] [ "a" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test

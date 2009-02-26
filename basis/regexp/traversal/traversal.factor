@@ -9,7 +9,6 @@ TUPLE: dfa-traverser
     dfa-table
     current-state
     text
-    match-failed?
     start-index current-index
     matches ;
 
@@ -25,9 +24,6 @@ TUPLE: dfa-traverser
     [ current-state>> ]
     [ dfa-table>> final-states>> ] bi key? ;
 
-: beginning-of-text? ( dfa-traverser -- ? )
-    current-index>> 0 <= ; inline
-
 : end-of-text? ( dfa-traverser -- ? )
     [ current-index>> ] [ text>> length ] bi >= ; inline
 
@@ -35,7 +31,6 @@ TUPLE: dfa-traverser
     {
         [ current-state>> not ]
         [ end-of-text? ]
-        [ match-failed?>> ]
     } 1|| ;
 
 : save-final-state ( dfa-straverser -- )
@@ -59,7 +54,8 @@ TUPLE: dfa-traverser
     1 text-character ;
 
 : increment-state ( dfa-traverser state -- dfa-traverser )
-    [ [ 1 + ] change-current-index ] dip >>current-state ;
+    >>current-state
+    [ 1 + ] change-current-index ;
 
 : match-literal ( transition from-state table -- to-state/f )
     transitions>> at at ;
@@ -69,11 +65,8 @@ TUPLE: dfa-traverser
         swap '[ drop _ swap class-member? ] assoc-find spin ?
     ] [ drop ] if ;
 
-: match-default ( transition from-state table -- to-state/f )
-    [ drop ] 2dip transitions>> at t swap at ;
-
 : match-transition ( obj from-state dfa -- to-state/f )
-    { [ match-literal ] [ match-class ] [ match-default ] } 3|| ;
+    { [ match-literal ] [ match-class ] } 3|| ;
 
 : setup-match ( match -- obj state dfa-table )
     [ [ current-index>> ] [ text>> ] bi nth ]
@@ -90,6 +83,6 @@ TUPLE: dfa-traverser
     dup matches>>
     [ drop f ]
     [
-        [ [ text>> ] [ start-index>> ] bi ]
-        [ peek ] bi* rot <slice>
+        [ [ start-index>> ] [ text>> ] bi ]
+        [ peek ] bi* swap <slice>
     ] if-empty ;
