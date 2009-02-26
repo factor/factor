@@ -1,12 +1,11 @@
 USING: arrays generic kernel math models namespaces sequences assocs
-tools.test models.compose accessors locals ;
-IN: models.compose.tests
+tools.test models.product accessors locals ;
+IN: models.product.tests
 
-! Test compose
 [ ] [
     1 <model> "a" set
     2 <model> "b" set
-    "a" get "b" get 2array <compose> "c" set
+    "a" get "b" get 2array <product> "c" set
 ] unit-test
 
 [ ] [ "c" get activate-model ] unit-test
@@ -30,7 +29,7 @@ M: an-observer model-changed nip [ 1+ ] change-i drop ;
 [ 1 0 ] [
     [let* | m1 [ 1 <model> ]
             m2 [ 2 <model> ]
-            c [ { m1 m2 } <compose> ]
+            c [ { m1 m2 } <product> ]
             o1 [ an-observer new ]
             o2 [ an-observer new ] |
         

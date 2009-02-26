@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel models arrays sequences math math.order
-models.compose ;
+models.product ;
 IN: models.range
 
-TUPLE: range < compose ;
+TUPLE: range < product ;
 
 : <range> ( value page min max -- range )
-    4array [ <model> ] map range new-compose ;
+    4array [ <model> ] map range new-product ;
 
 : range-model ( range -- model ) dependencies>> first ;
 : range-page ( range -- model ) dependencies>> second ;

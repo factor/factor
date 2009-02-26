@@ -1,11 +1,10 @@
 USING: arrays generic kernel math models namespaces sequences assocs
-tools.test models.filter accessors ;
-IN: models.filter.tests
+tools.test models.arrow accessors ;
+IN: models.arrow.tests
 
-! Test multiple filters
 3 <model> "x" set
-"x" get [ 2 * ] <filter> dup "z" set
-[ 1+ ] <filter> "y" set
+"x" get [ 2 * ] <arrow> dup "z" set
+[ 1+ ] <arrow> "y" set
 [ ] [ "y" get activate-model ] unit-test
 [ t ] [ "z" get "x" get connections>> memq? ] unit-test
 [ 7 ] [ "y" get value>> ] unit-test
@@ -15,7 +14,7 @@ IN: models.filter.tests
 [ f ] [ "z" get "x" get connections>> memq? ] unit-test
 
 3 <model> "x" set
-"x" get [ sq ] <filter> "y" set
+"x" get [ sq ] <arrow> "y" set
 
 4 "x" get set-model
 
