@@ -73,7 +73,7 @@ TUPLE: sessions < server-state-manager domain verify? ;
     [ session set ] [ save-session-after ] bi
     sessions get responder>> call-responder ;
 
-: session-id-key "__s" ;
+CONSTANT: session-id-key "__s"
 
 : verify-session ( session -- session )
     sessions get verify?>> [

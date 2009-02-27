@@ -20,7 +20,7 @@ TUPLE: persistent-vector
 
 M: persistent-vector length count>> ;
 
-: node-size 32 ; inline
+CONSTANT: node-size 32
 
 : node-mask ( m -- n ) node-size mod ; inline
 

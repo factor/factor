@@ -172,9 +172,6 @@ SYMBOL: remake-generics-hook
         ] [ ] cleanup
     ] with-scope ; inline
 
-: compile-call ( quot -- )
-    [ define-temp ] with-compilation-unit execute ;
-
 : default-recompile-hook ( words -- alist )
     [ f ] { } map>assoc ;
 

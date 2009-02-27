@@ -9,9 +9,9 @@ ERROR: unknown-digest name ;
 
 TUPLE: openssl-checksum name ;
 
-: openssl-md5 T{ openssl-checksum f "md5" } ;
+CONSTANT: openssl-md5 T{ openssl-checksum f "md5" }
 
-: openssl-sha1 T{ openssl-checksum f "sha1" } ;
+CONSTANT: openssl-sha1 T{ openssl-checksum f "sha1" }
 
 INSTANCE: openssl-checksum stream-checksum
 

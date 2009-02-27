@@ -474,7 +474,7 @@ cell-bits 32 = [
 ] unit-test
 
 ! A reduction
-: buffalo-sauce f ;
+: buffalo-sauce ( -- value ) f ;
 
 : steak ( -- )
     buffalo-sauce [ steak ] when ; inline recursive
@@ -509,4 +509,9 @@ cell-bits 32 = [
 [ t ] [
     [ { array } declare 2 <groups> [ . . ] assoc-each ]
     \ nth-unsafe inlined?
+] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare = ]
+    \ both-fixnums? inlined?
 ] unit-test

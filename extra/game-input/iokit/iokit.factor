@@ -21,33 +21,33 @@ iokit-game-input-backend game-input-backend set-global
         [ &CFRelease NSFastEnumeration>vector ] [ f ] if*
     ] with-destructors ;
 
-: game-devices-matching-seq
+CONSTANT: game-devices-matching-seq
     {
         H{ { "DeviceUsage" 4 } { "DeviceUsagePage" 1 } } ! joysticks
         H{ { "DeviceUsage" 5 } { "DeviceUsagePage" 1 } } ! gamepads
         H{ { "DeviceUsage" 6 } { "DeviceUsagePage" 1 } } ! keyboards
-    } ; inline
+    }
 
-: buttons-matching-hash
-    H{ { "UsagePage" 9 } { "Type" 2 } } ; inline
-: keys-matching-hash
-    H{ { "UsagePage" 7 } { "Type" 2 } } ; inline
-: x-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 30 } { "Type" 1 } } ; inline
-: y-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 31 } { "Type" 1 } } ; inline
-: z-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 32 } { "Type" 1 } } ; inline
-: rx-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 33 } { "Type" 1 } } ; inline
-: ry-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 34 } { "Type" 1 } } ; inline
-: rz-axis-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 35 } { "Type" 1 } } ; inline
-: slider-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 36 } { "Type" 1 } } ; inline
-: hat-switch-matching-hash
-    H{ { "UsagePage" 1 } { "Usage" HEX: 39 } { "Type" 1 } } ; inline
+CONSTANT: buttons-matching-hash
+    H{ { "UsagePage" 9 } { "Type" 2 } }
+CONSTANT: keys-matching-hash
+    H{ { "UsagePage" 7 } { "Type" 2 } }
+CONSTANT: x-axis-matching-hash
+    H{ { "UsagePage" 1 } { "Usage" HEX: 30 } { "Type" 1 } }
+CONSTANT: y-axis-matching-hash
+    H{ { "UsagePage" 1 } { "Usage" HEX: 31 } { "Type" 1 } }
+CONSTANT: z-axis-matching-hash
+    H{ { "UsagePage" 1 } { "Usage" HEX: 32 } { "Type" 1 } }
+CONSTANT: rx-axis-matching-hash
+    H{ { "UsagePage" 1 } { "Usage" HEX: 33 } { "Type" 1 } }
+CONSTANT: ry-axis-matching-hash
+    H{ { "UsagePage" 1 } { "Usage" HEX: 34 } { "Type" 1 } }
+CONSTANT: rz-axis-matching-hash
+    H{ { "UsagePage" 1 } { "Usage" HEX: 35 } { "Type" 1 } }
+CONSTANT: slider-matching-hash
+    H{ { "UsagePage" 1 } { "Usage" HEX: 36 } { "Type" 1 } }
+CONSTANT: hat-switch-matching-hash
+    H{ { "UsagePage" 1 } { "Usage" HEX: 39 } { "Type" 1 } }
 
 : device-elements-matching ( device matching-hash -- vector )
     [
@@ -121,12 +121,12 @@ iokit-game-input-backend game-input-backend set-global
 : hat-switch? ( {usage-page,usage} -- ? )
     { 1 HEX: 39 } = ; inline
 
-: pov-values
+CONSTANT: pov-values
     {
         pov-up pov-up-right pov-right pov-down-right
         pov-down pov-down-left pov-left pov-up-left
         pov-neutral
-    } ; inline
+    }
 
 : button-value ( value -- f/(0,1] )
     IOHIDValueGetIntegerValue dup zero? [ drop f ] when ;

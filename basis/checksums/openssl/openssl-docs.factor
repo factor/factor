@@ -1,5 +1,5 @@
 IN: checksums.openssl
-USING: help.syntax help.markup ;
+USING: checksums help.syntax help.markup ;
 
 HELP: openssl-checksum
 { $class-description "The class of checksum algorithms implemented by OpenSSL. The exact set of algorithms supported depends on how the OpenSSL library was compiled; " { $snippet "md5" } " and " { $snippet "sha1" } " should be universally available." } ;
@@ -9,9 +9,11 @@ HELP: <openssl-checksum>
 { $description "Creates a new OpenSSL checksum object." } ;
 
 HELP: openssl-md5
+{ $values { "value" checksum } }
 { $description "The OpenSSL MD5 message digest implementation." } ;
 
 HELP: openssl-sha1
+{ $values { "value" checksum } }
 { $description "The OpenSSL SHA1 message digest implementation." } ;
 
 HELP: unknown-digest
