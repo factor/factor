@@ -5,7 +5,7 @@ IN: editors.editplus
 
 : editplus-path ( -- path )
     \ editplus-path get-global [
-        "EditPlus 2" t [ "editplus.exe" tail? ] find-in-program-files
+        "EditPlus 2" [ "editplus.exe" tail? ] find-in-program-files
         [ "editplus.exe" ] unless*
     ] unless* ;
 

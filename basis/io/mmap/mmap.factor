@@ -2,15 +2,20 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors io.files io.files.info
 io.backend kernel quotations system alien alien.accessors
-accessors system vocabs.loader combinators alien.c-types ;
+accessors system vocabs.loader combinators alien.c-types
+math ;
 IN: io.mmap
 
 TUPLE: mapped-file address handle length disposed ;
 
 HOOK: (mapped-file) os ( path length -- address handle )
 
+ERROR: bad-mmap-size path size ;
+
 : <mapped-file> ( path -- mmap )
-    [ normalize-path ] [ file-info size>> ] bi [ (mapped-file) ] keep
+    [ normalize-path ] [ file-info size>> ] bi
+    dup 0 <= [ bad-mmap-size ] when
+    [ (mapped-file) ] keep
     f mapped-file boa ;
 
 HOOK: close-mapped-file io-backend ( mmap -- )
