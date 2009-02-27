@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test regexp.minimize assocs regexp accessors regexp.transition-tables ;
+USING: tools.test regexp.minimize assocs regexp regexp.syntax
+accessors regexp.transition-tables ;
 IN: regexp.minimize.tests
 
 [ t ] [ 1 2 H{ { { 1 2 } t } } same-partition? ] unit-test

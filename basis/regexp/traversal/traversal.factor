@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators kernel math
-quotations sequences regexp.classes fry arrays
+quotations sequences regexp.classes fry arrays regexp.matchers
 combinators.short-circuit prettyprint regexp.nfa ;
 IN: regexp.traversal
 
@@ -9,16 +9,14 @@ TUPLE: dfa-traverser
     dfa-table
     current-state
     text
-    start-index current-index
-    matches ;
+    current-index
+    match-index ;
 
 : <dfa-traverser> ( text dfa -- match )
     dfa-traverser new
         swap [ start-state>> >>current-state ] [ >>dfa-table ] bi
         swap >>text
-        0 >>start-index
-        0 >>current-index
-        V{ } clone >>matches ;
+        0 >>current-index ;
 
 : final-state? ( dfa-traverser -- ? )
     [ current-state>> ]
@@ -33,25 +31,11 @@ TUPLE: dfa-traverser
         [ end-of-text? ]
     } 1|| ;
 
-: save-final-state ( dfa-straverser -- )
-    [ current-index>> ] [ matches>> ] bi push ;
+: save-final-state ( dfa-traverser -- dfa-traverser )
+    dup current-index>> >>match-index ;
 
 : match-done? ( dfa-traverser -- ? )
-    dup final-state? [
-        dup save-final-state
-    ] when text-finished? ;
-
-: text-character ( dfa-traverser n -- ch )
-    [ text>> ] swap '[ current-index>> _ + ] bi nth ;
-
-: previous-text-character ( dfa-traverser -- ch )
-    -1 text-character ;
-
-: current-text-character ( dfa-traverser -- ch )
-    0 text-character ;
-
-: next-text-character ( dfa-traverser -- ch )
-    1 text-character ;
+    dup final-state? [ save-final-state ] when text-finished? ;
 
 : increment-state ( dfa-traverser state -- dfa-traverser )
     >>current-state
@@ -79,10 +63,7 @@ TUPLE: dfa-traverser
         [ increment-state do-match ] when*
     ] unless ;
 
-: return-match ( dfa-traverser -- slice/f )
-    dup matches>>
-    [ drop f ]
-    [
-        [ [ start-index>> ] [ text>> ] bi ]
-        [ peek ] bi* swap <slice>
-    ] if-empty ;
+TUPLE: dfa-matcher dfa ;
+C: <dfa-matcher> dfa-matcher
+M: dfa-matcher match-index 
+    dfa>> <dfa-traverser> do-match match-index>> ;

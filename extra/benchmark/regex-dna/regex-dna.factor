@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors regexp prettyprint io io.encodings.ascii
-io.files kernel sequences assocs namespaces ;
+USING: accessors regexp.matchers prettyprint io io.encodings.ascii
+io.files kernel sequences assocs namespaces regexp ;
 IN: benchmark.regex-dna
 
 ! Based on http://shootout.alioth.debian.org/gp4/benchmark.php?test=regexdna&lang=ruby&id=1

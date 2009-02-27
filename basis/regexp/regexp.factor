@@ -5,25 +5,28 @@ assocs prettyprint.backend prettyprint.custom make lexer
 namespaces parser arrays fry locals regexp.minimize
 regexp.parser regexp.nfa regexp.dfa regexp.traversal
 regexp.transition-tables splitting sorting regexp.ast
-regexp.negation ;
+regexp.negation regexp.matchers regexp.compiler ;
 IN: regexp
 
 TUPLE: regexp
     { raw read-only }
     { parse-tree read-only }
     { options read-only }
-    dfa reverse-dfa ;
+    dfa reverse-dfa dfa-quot ;
 
 : make-regexp ( string ast -- regexp )
-    f f <options> f f regexp boa ; foldable
+    f f <options> f f f regexp boa ; foldable
     ! Foldable because, when the dfa slot is set,
     ! it'll be set to the same thing regardless of who sets it
 
 : <optioned-regexp> ( string options -- regexp )
     [ dup parse-regexp ] [ string>options ] bi*
-    f f regexp boa ;
+    f f f regexp boa ;
 
 : <regexp> ( string -- regexp ) "" <optioned-regexp> ;
+
+TUPLE: reverse-matcher regexp ;
+C: <reverse-matcher> reverse-matcher
 
 <PRIVATE
 
@@ -33,76 +36,24 @@ TUPLE: regexp
 : compile-regexp ( regexp -- regexp )
     dup '[ [ _ get-ast ast>dfa ] unless* ] change-dfa ;
 
+: compile-dfa-quot ( regexp -- regexp )
+    dup '[ [ _ compile-regexp dfa>> dfa>quotation ] unless* ] change-dfa-quot ;
+
 : <reversed-option> ( ast -- reversed )
     "r" string>options <with-options> ;
 
 : compile-reverse ( regexp -- regexp )
     dup '[ [ _ get-ast <reversed-option> ast>dfa ] unless* ] change-reverse-dfa ;
 
-: (match) ( string regexp -- dfa-traverser )
-    compile-regexp dfa>> <dfa-traverser> do-match ;
+M: regexp match-index ( string regexp -- index/f )
+    dup dfa-quot>>
+    [ <quot-matcher> ]
+    [ compile-regexp dfa>> <dfa-matcher> ] ?if
+    match-index ;
 
-: (match-reversed) ( string regexp -- dfa-traverser )
-    [ <reversed> ] [ compile-reverse reverse-dfa>> ] bi*
-    <dfa-traverser> do-match ;
-
-PRIVATE>
-
-: match ( string regexp -- slice/f )
-    (match) return-match ;
-
-: match-from-end ( string regexp -- slice/f )
-    (match-reversed) return-match ;
-
-: matches? ( string regexp -- ? )
-    dupd match
-    [ [ length ] bi@ = ] [ drop f ] if* ;
-
-: match-head ( string regexp -- end/f ) match [ length ] [ f ] if* ;
-
-: match-at ( string m regexp -- n/f finished? )
-    [
-        2dup swap length > [ 2drop f f ] [ tail-slice t ] if
-    ] dip swap [ match-head f ] [ 2drop f t ] if ;
-
-: match-range ( string m regexp -- a/f b/f )
-    3dup match-at over [
-        drop nip rot drop dupd +
-    ] [
-        [ 3drop drop f f ] [ drop [ 1+ ] dip match-range ] if
-    ] if ;
-
-: first-match ( string regexp -- slice/f )
-    dupd 0 swap match-range rot over [ <slice> ] [ 3drop f ] if ;
-
-: re-cut ( string regexp -- end/f start )
-    dupd first-match
-    [ split1-slice swap ] [ "" like f swap ] if* ;
-
-<PRIVATE
-
-: (re-split) ( string regexp -- )
-    over [ [ re-cut , ] keep (re-split) ] [ 2drop ] if ;
-
-PRIVATE>
-
-: re-split ( string regexp -- seq )
-    [ (re-split) ] { } make ;
-
-: re-replace ( string regexp replacement -- result )
-    [ re-split ] dip join ;
-
-: next-match ( string regexp -- end/f match/f )
-    dupd first-match dup
-    [ [ split1-slice nip ] keep ] [ 2drop f f ] if ;
-
-: all-matches ( string regexp -- seq )
-    [ dup ] swap '[ _ next-match ] [ ] produce nip harvest ;
-
-: count-matches ( string regexp -- n )
-    all-matches length ;
-
-<PRIVATE
+M: reverse-matcher match-index ( string regexp -- index/f )
+    [ <reversed> ] [ regexp>> compile-reverse reverse-dfa>> ] bi*
+    <dfa-traverser> do-match match-index>> ;
 
 : find-regexp-syntax ( string -- prefix suffix )
     {
@@ -131,7 +82,7 @@ PRIVATE>
 
 : parsing-regexp ( accum end -- accum )
     lexer get [ take-until ] [ parse-noblank-token ] bi
-    <optioned-regexp> compile-regexp parsed ;
+    <optioned-regexp> compile-dfa-quot parsed ;
 
 PRIVATE>
 
