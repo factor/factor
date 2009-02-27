@@ -1,34 +1,43 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: regexp regexp.private regexp.classes kernel sequences regexp.negation
+USING: regexp.classes kernel sequences regexp.negation
 quotations regexp.minimize assocs fry math locals combinators
-accessors words compiler.units ;
+accessors words compiler.units kernel.private strings
+sequences.private arrays regexp.matchers call ;
 IN: regexp.compiler
 
 : literals>cases ( literal-transitions -- case-body )
     [ 1quotation ] assoc-map ;
 
 : non-literals>dispatch ( non-literal-transitions -- quot )
-    [ [ '[ dup _ class-member? ] ] [ 1quotation ] bi* ] assoc-map
-    [ 3drop f ] suffix '[ _ cond ] ;
+    [ [ '[ dup _ class-member? ] ] [ '[ drop _ execute ] ] bi* ] assoc-map
+    [ 3drop ] suffix '[ _ cond ] ;
+
+: expand-one-or ( or-class transition -- alist )
+    [ seq>> ] dip '[ _ 2array ] map ;
+
+: expand-or ( alist -- new-alist )
+    [
+        first2 over or-class?
+        [ expand-one-or ] [ 2array 1array ] if
+    ] map concat ;
 
 : split-literals ( transitions -- case default )
-    ! Convert disjunction of literals to literals. Also maybe small ranges.
-    >alist [ first integer? ] partition
+    >alist expand-or [ first integer? ] partition
     [ literals>cases ] [ non-literals>dispatch ] bi* ;
 
-USING: kernel.private strings sequences.private ;
-
-:: step ( index str case-body final? -- match? )
+:: step ( last-match index str case-body final? -- last-index/f )
+    final? index last-match ?
     index str bounds-check? [
         index 1+ str
         index str nth-unsafe
         case-body case
-    ] [ final? ] if ; inline
+    ] when ; inline
 
 : transitions>quot ( transitions final-state? -- quot )
     [ split-literals suffix ] dip
-    '[ { array-capacity string } declare _ _ step ] ;
+    '[ _ _ step ] ;
+    ! '[ { array-capacity string } declare _ _ step ] ;
 
 : word>quot ( word dfa -- quot )
     [ transitions>> at ]
@@ -39,7 +48,8 @@ USING: kernel.private strings sequences.private ;
     '[
         [
             dup _ word>quot
-            (( index string -- ? )) define-declared
+            (( last-match index string -- ? ))
+            define-declared
         ] each
     ] with-compilation-unit ;
 
@@ -59,7 +69,13 @@ USING: kernel.private strings sequences.private ;
     states>words [ states>code ] keep start-state>> ;
 
 : run-regexp ( string word -- ? )
-    [ 0 ] 2dip execute ; inline
+    [ f 0 ] 2dip execute ; inline
 
-: regexp>quotation ( regexp -- quot )
-    compile-regexp dfa>> dfa>word '[ _ run-regexp ] ;
+: dfa>quotation ( dfa -- quot )
+    dfa>word '[ _ run-regexp ] ;
+
+TUPLE: quot-matcher quot ;
+C: <quot-matcher> quot-matcher
+
+M: quot-matcher match-index
+    quot>> call( string -- i/f ) ;

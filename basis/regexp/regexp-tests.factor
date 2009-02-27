@@ -1,5 +1,5 @@
 USING: regexp tools.test kernel sequences regexp.parser
-regexp.traversal eval strings multiline accessors ;
+regexp.traversal eval strings multiline accessors regexp.matchers ;
 IN: regexp-tests
 
 \ <regexp> must-infer
@@ -241,8 +241,8 @@ IN: regexp-tests
 [ t ] [ "abc" <reversed> R/ abc/r matches? ] unit-test
 [ t ] [ "abc" <reversed> R/ a[bB][cC]/r matches? ] unit-test
 
-[ t ] [ "xabc" R/ abc/ match-from-end >boolean ] unit-test
-[ t ] [ "xabc" R/ a[bB][cC]/ match-from-end >boolean ] unit-test
+[ t ] [ "xabc" R/ abc/ <reverse-matcher> match >boolean ] unit-test
+[ t ] [ "xabc" R/ a[bB][cC]/ <reverse-matcher> match >boolean ] unit-test
 
 [ t ] [ "s@f" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
 [ f ] [ "a" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
