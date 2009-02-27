@@ -141,9 +141,7 @@ M: object infer-call*
     apply-word/effect ;
 
 : infer-exit ( -- )
-    \ exit
-    { integer } { } t >>terminated? <effect>
-    apply-word/effect ;
+    \ exit (( n -- * )) apply-word/effect ;
 
 : infer-load-locals ( -- )
     pop-literal nip
@@ -189,7 +187,7 @@ M: object infer-call*
         { \ load-locals [ infer-load-locals ] }
         { \ get-local [ infer-get-local ] }
         { \ drop-locals [ infer-drop-locals ] }
-        { \ do-primitive [ unknown-primitive-error inference-warning ] }
+        { \ do-primitive [ unknown-primitive-error ] }
         { \ alien-invoke [ infer-alien-invoke ] }
         { \ alien-indirect [ infer-alien-indirect ] }
         { \ alien-callback [ infer-alien-callback ] }
@@ -207,7 +205,7 @@ M: object infer-call*
 {
     declare call (call) slip 2slip 3slip dip 2dip 3dip
     curry compose execute (execute) if dispatch <tuple-boa>
-    (throw) load-local load-locals get-local drop-locals do-primitive
+    (throw) exit load-local load-locals get-local drop-locals do-primitive
     alien-invoke alien-indirect alien-callback
 } [ t "special" set-word-prop ] each
 
