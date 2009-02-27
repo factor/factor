@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cairo.ffi alien.c-types kernel accessors sequences
-namespaces fry continuations destructors ;
+namespaces fry continuations destructors math images.memory ;
 IN: cairo
 
 ERROR: cairo-error message ;
@@ -18,7 +18,7 @@ ERROR: cairo-error message ;
         _ [ check-cairo ] bi
     ] with-destructors ; inline
 
-: check-surface ( surface -- ) cairo_surface_status check-cairo ;
+: check-surface ( surface -- ) cairo_surface_status (check-cairo) ;
 
 : with-surface ( cairo_surface quot -- )
     '[
@@ -32,9 +32,15 @@ ERROR: cairo-error message ;
 : width>stride ( width -- stride ) "uint" heap-size * ; inline
 
 : <image-surface> ( data dim -- surface )
-    first2 over width>stride CAIRO_FORMAT_ARGB32
+    [ CAIRO_FORMAT_ARGB32 ] dip first2 over width>stride
     cairo_image_surface_create_for_data
     dup check-surface ;
 
+: <cairo> ( surface -- cairo ) cairo_create dup check-cairo ; inline
+
 : make-bitmap-image ( dim quot -- image )
-    '[ <image-surface> &cairo_surface_destroy @ ] make-memory-bitmap ; inline
+    '[
+        <image-surface> &cairo_surface_destroy
+        cairo_create &cairo_destroy
+        @
+    ] make-memory-bitmap ; inline
