@@ -2,20 +2,21 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! pangocairo bindings, from pango/pangocairo.h
-USING: cairo.ffi alien.c-types math alien.syntax system
-combinators alien arrays pango pango.fonts ;
+USING: cairo.ffi alien.c-types math alien.syntax system destructors
+memoize accessors kernel combinators alien arrays fonts pango
+pango.fonts ;
 IN: pango.cairo
 
 << "pangocairo" {
     { [ os winnt? ] [ "libpangocairo-1.0-0.dll" ] }
-    { [ os macosx? ] [ "libpangocairo-1.0.0.dylib" ] }
+    { [ os macosx? ] [ "/opt/local/lib/libpangocairo-1.0.0.dylib" ] }
     { [ os unix? ] [ "libpangocairo-1.0.so" ] }
 } cond "cdecl" add-library >>
 
 LIBRARY: pangocairo
 
 FUNCTION: PangoFontMap*
-pango_cairo_font_map_new  ( ) ;
+pango_cairo_font_map_new ( ) ;
 
 FUNCTION: PangoFontMap*
 pango_cairo_font_map_new_for_font_type ( cairo_font_type_t fonttype ) ;
@@ -86,3 +87,31 @@ pango_cairo_layout_path ( cairo_t* cr, PangoLayout* layout ) ;
 
 FUNCTION: void
 pango_cairo_error_underline_path ( cairo_t* cr, double x, double y, double width, double height ) ;
+
+MEMO: (cache-font) ( font -- open-font )
+    [ pango_cairo_font_map_get_default dummy-pango-context ] dip
+    cache-font-description
+    pango_font_map_load_font ;
+
+: cache-font ( font -- open-font )
+    strip-font-colors (cache-font) ;
+
+: get-font-metrics ( font -- metrics )
+    (cache-font) f pango_font_get_metrics &pango_font_metrics_unref ;
+
+: parse-font-metrics ( metrics -- metrics' )
+    [ metrics new ] dip
+    {
+        [ pango_font_metrics_get_ascent PANGO_SCALE /f >>height ]
+        [ pango_font_metrics_get_descent PANGO_SCALE /f >>descent ]
+        [ drop 0 >>leading ]
+        [ drop 0 >>cap-height ]
+        [ drop 0 >>x-height ]
+    } cleave
+    dup [ height>> ] [ descent>> ] bi - >>ascent ;
+
+MEMO: (cache-font-metrics) ( font -- metrics )
+    [ get-font-metrics parse-font-metrics ] with-destructors ;
+
+: cache-font-metrics ( font -- metrics )
+    strip-font-colors (cache-font-metrics) ;
