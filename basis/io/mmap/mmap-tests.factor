@@ -11,21 +11,11 @@ IN: io.mmap.tests
 [ "mmap-test-file.txt" temp-file delete-file ] ignore-errors
 
 
-[ ]
-[ "mmap-empty-file.txt" temp-file touch-file ] unit-test
+[ "mmap-empty-file.txt" temp-file delete-file ] ignore-errors
+[ ] [ "mmap-empty-file.txt" temp-file touch-file ] unit-test
 
-! Test for leaking resources bug on Unix
-[ ]
 [
-    100000 [
-        [
-            "mmap-empty-file.txt" temp-file [
-                drop
-            ] with-mapped-file
-        ] [ dup bad-mmap-size? [ drop ] [ rethrow ] if ] recover
-    ] times
-
-    "asdf" "mmap-asdf-file.txt" temp-file [ ascii set-file-contents ] keep [
+    "mmap-empty-file.txt" temp-file [
         drop
     ] with-mapped-file
-] unit-test
+] [ bad-mmap-size? ] must-fail-with
