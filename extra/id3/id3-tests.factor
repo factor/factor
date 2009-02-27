@@ -20,7 +20,7 @@ IN: id3.tests
    "2009"
    "COMMENT"
    "Bluegrass"
-] [ "resource:extra/id3/tests/blah.mp3" file-id3-tags id3-params ] unit-test
+] [ "vocab:id3/tests/blah.mp3" file-id3-tags id3-params ] unit-test
 
 [
     "Anthem of the Trinity"
@@ -29,7 +29,7 @@ IN: id3.tests
     f
     f
     "Classical"
-] [ "resource:extra/id3/tests/blah2.mp3" file-id3-tags id3-params ] unit-test
+] [ "vocab:id3/tests/blah2.mp3" file-id3-tags id3-params ] unit-test
 
 [    
    "Stormy Weather"
@@ -38,5 +38,5 @@ IN: id3.tests
     f
    "eng, AG# 08E1C12E"
    "Big Band"
-] [ "resource:extra/id3/tests/blah3.mp3" file-id3-tags id3-params ] unit-test
+] [ "vocab:id3/tests/blah3.mp3" file-id3-tags id3-params ] unit-test
 
