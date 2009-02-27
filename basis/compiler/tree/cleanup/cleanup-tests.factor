@@ -510,3 +510,8 @@ cell-bits 32 = [
     [ { array } declare 2 <groups> [ . . ] assoc-each ]
     \ nth-unsafe inlined?
 ] unit-test
+
+[ t ] [
+    [ { fixnum fixnum } declare = ]
+    \ both-fixnums? inlined?
+] unit-test
