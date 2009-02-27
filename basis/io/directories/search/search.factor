@@ -51,7 +51,8 @@ PRIVATE>
         [ keep and ] curry iterate-directory
     ] [ drop f ] recover ; inline
 
-: find-all-files ( path bfs? quot: ( obj -- ? ) -- paths/f )
+: find-all-files ( path quot: ( obj -- ? ) -- paths/f )
+    f swap
     '[
         _ _ _ [ <directory-iterator> ] dip
         pusher [ [ f ] compose iterate-directory drop ] dip
