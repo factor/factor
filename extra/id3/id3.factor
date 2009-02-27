@@ -45,9 +45,9 @@ TUPLE: frame frame-id flags size data ;
 
 TUPLE: id3v2-info header frames ;
 
-TUPLE: id3-info title artist album year comment genre ;
+TUPLE: id3v1-info title artist album year comment genre ;
 
-: <id3-info> ( -- object ) id3-info new ;
+: <id3v1-info> ( -- object ) id3v1-info new ;
 
 : <id3v2-info> ( header frames -- object )
     [ [ frame-id>> ] keep ] H{ } map>assoc
@@ -137,7 +137,7 @@ TUPLE: id3-info title artist album year comment genre ;
 : skip-to-v1-data ( seq -- seq ) 125 tail-slice* ; inline
 
 : (read-v1-tag-data) ( seq -- mp3-file )
-    [ <id3-info> ] dip
+    [ <id3v1-info> ] dip
     {
         [ 30 head-slice decode-text filter-text-data >>title ]
         [ [ 30 60 ] dip subseq decode-text filter-text-data >>artist ]
@@ -187,8 +187,3 @@ PRIVATE>
             [ drop f ]
         } cond
     ] with-mapped-uchar-file ;
-
-: write-id3-tags ( id3v2-info path -- )
-    binary [
-        
-    ] with-file-writer ;
