@@ -4,12 +4,11 @@ USING: sequences io io.encodings.binary io.files io.pathnames
 strings kernel math io.mmap io.mmap.uchar accessors syntax
 combinators math.ranges unicode.categories byte-arrays
 io.encodings.string io.encodings.utf8 assocs math.parser
-combinators.short-circuit ;
+combinators.short-circuit fry ;
 IN: id3
 
 <PRIVATE
 
-! genres
 CONSTANT: genres
   H{
     { 0 "Blues" }
@@ -225,7 +224,7 @@ TUPLE: id3-info title artist album year comment genre ;
 : read-v2-header ( mmap -- id3header )
     [ <header> ] dip
     {
-        [ read-header-supported-version?  >>version ]
+        [ read-header-supported-version? >>version ]
         [ read-header-flags >>flags ]
         [ read-header-size >>size ]
     } cleave ;
@@ -233,16 +232,19 @@ TUPLE: id3-info title artist album year comment genre ;
 : drop-header ( mmap -- seq1 seq2 )
     dup 10 tail-slice swap ;
 
+: frame-tag ( frame string -- tag/f )
+    '[ frame-id>> _ = ] find nip ; inline
+
 : parse-frames ( id3v2-info -- id3-info )
     [ <id3-info> ] dip frames>>
     {
-        [ [ frame-id>> "TIT2" = ] find nip [ data>> >>title ] when* ]
-        [ [ frame-id>> "TALB" = ] find nip [ data>> >>album ] when* ]
-        [ [ frame-id>> "TPE1" = ] find nip [ data>> >>artist ] when* ]
-        [ [ frame-id>> "TCON" = ] find nip [ data>> [ [ digit? ] filter string>number ] keep swap [ genres at nip ] when*
+        [ "TIT2" frame-tag [ data>> >>title ] when* ]
+        [ "TALB" frame-tag [ data>> >>album ] when* ]
+        [ "TPE1" frame-tag [ data>> >>artist ] when* ]
+        [ "TCON" frame-tag [ data>> [ [ digit? ] filter string>number ] keep swap [ genres at nip ] when*
           >>genre ] when* ]
-        [ [ frame-id>> "COMM" = ] find nip [ data>> >>comment ] when* ]
-        [ [ frame-id>> "TYER" = ] find nip [ data>> >>year ] when* ]
+        [ "COMM" frame-tag [ data>> >>comment ] when* ]
+        [ "TYER" frame-tag [ data>> >>year ] when* ]
     } cleave ;
 
 : read-v2-tag-data ( seq -- id3-info )
