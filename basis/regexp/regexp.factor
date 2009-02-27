@@ -45,13 +45,13 @@ C: <reverse-matcher> reverse-matcher
 : compile-reverse ( regexp -- regexp )
     dup '[ [ _ get-ast <reversed-option> ast>dfa ] unless* ] change-reverse-dfa ;
 
-M: regexp match-index ( string regexp -- index/f )
+M: regexp match-index-from ( string regexp -- index/f )
     dup dfa-quot>>
     [ <quot-matcher> ]
     [ compile-regexp dfa>> <dfa-matcher> ] ?if
-    match-index ;
+    match-index-from ;
 
-M: reverse-matcher match-index ( string regexp -- index/f )
+M: reverse-matcher match-index-from ( string regexp -- index/f )
     [ <reversed> ] [ regexp>> compile-reverse reverse-dfa>> ] bi*
     <dfa-traverser> do-match match-index>> ;
 

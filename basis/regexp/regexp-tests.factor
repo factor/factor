@@ -208,8 +208,8 @@ IN: regexp-tests
 [ f ] [ "aaaxb" "a+ab" <regexp> matches? ] unit-test
 [ t ] [ "aaacb" "a+cb" <regexp> matches? ] unit-test
 
-[ 3 ] [ "aaacb" "a*" <regexp> match-head ] unit-test
-[ 2 ] [ "aaacb" "aa?" <regexp> match-head ] unit-test
+[ 3 ] [ "aaacb" "a*" <regexp> match-index-head ] unit-test
+[ 2 ] [ "aaacb" "aa?" <regexp> match-index-head ] unit-test
 
 [ t ] [ "aaa" R/ AAA/i matches? ] unit-test
 [ f ] [ "aax" R/ AAA/i matches? ] unit-test
@@ -238,11 +238,11 @@ IN: regexp-tests
 [ f ] [ "A" "\\p{Lower}" <regexp> matches? ] unit-test
 [ t ] [ "A" R/ \p{Lower}/i matches? ] unit-test
 
-[ t ] [ "abc" <reversed> R/ abc/r matches? ] unit-test
-[ t ] [ "abc" <reversed> R/ a[bB][cC]/r matches? ] unit-test
+[ t ] [ "abc" reverse R/ abc/r matches? ] unit-test
+[ t ] [ "abc" reverse R/ a[bB][cC]/r matches? ] unit-test
 
-[ t ] [ "xabc" R/ abc/ <reverse-matcher> match >boolean ] unit-test
-[ t ] [ "xabc" R/ a[bB][cC]/ <reverse-matcher> match >boolean ] unit-test
+[ t ] [ "xabc" R/ abc/ <reverse-matcher> match-index-head >boolean ] unit-test
+[ t ] [ "xabc" R/ a[bB][cC]/ <reverse-matcher> match-index-head >boolean ] unit-test
 
 [ t ] [ "s@f" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
 [ f ] [ "a" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
@@ -267,13 +267,13 @@ IN: regexp-tests
 
 [ ] [ "USING: regexp kernel ; R' \\*[^\s*][^*]*\\*' drop" eval ] unit-test
 
-[ "ab" ] [ "ab" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
-[ "abc" ] [ "abc" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
+[ "ab" ] [ "ab" "(a|ab)(bc)?" <regexp> match-head >string ] unit-test
+[ "abc" ] [ "abc" "(a|ab)(bc)?" <regexp> match-head >string ] unit-test
 
-[ "ab" ] [ "ab" "(ab|a)(bc)?" <regexp> first-match >string ] unit-test
-[ "abc" ] [ "abc" "(ab|a)(bc)?" <regexp> first-match >string ] unit-test
+[ "ab" ] [ "ab" "(ab|a)(bc)?" <regexp> match-head >string ] unit-test
+[ "abc" ] [ "abc" "(ab|a)(bc)?" <regexp> match-head >string ] unit-test
 
-[ "b" ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match >string ] unit-test
+[ "b" ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> match-head >string ] unit-test
 
 ! [ t ] [ "a:b" ".+:?" <regexp> matches? ] unit-test
 
@@ -304,16 +304,16 @@ IN: regexp-tests
 [ "-- title --" ] [ "== title ==" R/ =/ "-" re-replace ] unit-test
 
 /*
-[ f ] [ "ab" "a(?!b)" <regexp> first-match ] unit-test
-[ "a" ] [ "ac" "a(?!b)" <regexp> first-match >string ] unit-test
+[ f ] [ "ab" "a(?!b)" <regexp> match-head ] unit-test
+[ "a" ] [ "ac" "a(?!b)" <regexp> match-head >string ] unit-test
 [ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 [ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
-[ "a" ] [ "ab" "a(?=b)(?=b)" <regexp> first-match >string ] unit-test
-[ "a" ] [ "ba" "a(?<=b)(?<=b)" <regexp> first-match >string ] unit-test
-[ "a" ] [ "cab" "a(?=b)(?<=c)" <regexp> first-match >string ] unit-test
+[ "a" ] [ "ab" "a(?=b)(?=b)" <regexp> match-head >string ] unit-test
+[ "a" ] [ "ba" "a(?<=b)(?<=b)" <regexp> match-head >string ] unit-test
+[ "a" ] [ "cab" "a(?=b)(?<=c)" <regexp> match-head >string ] unit-test
 
-[ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head ] unit-test
-[ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
+[ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-index-head ] unit-test
+[ f ] [ "foobxr" "foo(?=bar)" <regexp> match-index-head ] unit-test
 */
 
 ! Bug in parsing word
@@ -393,15 +393,15 @@ IN: regexp-tests
 ! [ t ] [ "a\r" R/ a$/m matches? ] unit-test
 ! [ t ] [ "a\r\n" R/ a$/m matches? ] unit-test
 
-! [ f ] [ "foobxr" "foo\\z" <regexp> match-head ] unit-test
-! [ 3 ] [ "foo" "foo\\z" <regexp> match-head ] unit-test
+! [ f ] [ "foobxr" "foo\\z" <regexp> match-index-head ] unit-test
+! [ 3 ] [ "foo" "foo\\z" <regexp> match-index-head ] unit-test
 
 ! [ t ] [ "foo" "\\bfoo\\b" <regexp> matches? ] unit-test
 ! [ t ] [ "afoob" "\\Bfoo\\B" <regexp> matches? ] unit-test
 ! [ t ] [ "afoob" "\\bfoo\\b" <regexp> matches? ] unit-test
 ! [ f ] [ "foo" "\\Bfoo\\B" <regexp> matches? ] unit-test
 
-! [ 3 ] [ "foo bar" "foo\\b" <regexp> match-head ] unit-test
+! [ 3 ] [ "foo bar" "foo\\b" <regexp> match-index-head ] unit-test
 ! [ f ] [ "fooxbar" "foo\\b" <regexp> matches? ] unit-test
 ! [ t ] [ "foo" "foo\\b" <regexp> matches? ] unit-test
 ! [ t ] [ "foo bar" "foo\\b bar" <regexp> matches? ] unit-test
@@ -409,18 +409,18 @@ IN: regexp-tests
 ! [ f ] [ "foo" "foo\\bbar" <regexp> matches? ] unit-test
 
 ! [ f ] [ "foo bar" "foo\\B" <regexp> matches? ] unit-test
-! [ 3 ] [ "fooxbar" "foo\\B" <regexp> match-head ] unit-test
+! [ 3 ] [ "fooxbar" "foo\\B" <regexp> match-index-head ] unit-test
 ! [ t ] [ "foo" "foo\\B" <regexp> matches? ] unit-test
 ! [ f ] [ "foo bar" "foo\\B bar" <regexp> matches? ] unit-test
 ! [ t ] [ "fooxbar" "foo\\Bxbar" <regexp> matches? ] unit-test
 ! [ f ] [ "foo" "foo\\Bbar" <regexp> matches? ] unit-test
 
-! [ 1 ] [ "aaacb" "a+?" <regexp> match-head ] unit-test
-! [ 1 ] [ "aaacb" "aa??" <regexp> match-head ] unit-test
+! [ 1 ] [ "aaacb" "a+?" <regexp> match-index-head ] unit-test
+! [ 1 ] [ "aaacb" "aa??" <regexp> match-index-head ] unit-test
 ! [ f ] [ "aaaab" "a++ab" <regexp> matches? ] unit-test
 ! [ t ] [ "aaacb" "a++cb" <regexp> matches? ] unit-test
-! [ 3 ] [ "aacb" "aa?c" <regexp> match-head ] unit-test
-! [ 3 ] [ "aacb" "aa??c" <regexp> match-head ] unit-test
+! [ 3 ] [ "aacb" "aa?c" <regexp> match-index-head ] unit-test
+! [ 3 ] [ "aacb" "aa??c" <regexp> match-index-head ] unit-test
 
 ! "ab" "a(?=b*)" <regexp> match
 ! "abbbbbc" "a(?=b*c)" <regexp> match

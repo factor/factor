@@ -12,11 +12,11 @@ TUPLE: dfa-traverser
     current-index
     match-index ;
 
-: <dfa-traverser> ( text dfa -- match )
+: <dfa-traverser> ( start-index text dfa -- match )
     dfa-traverser new
         swap [ start-state>> >>current-state ] [ >>dfa-table ] bi
         swap >>text
-        0 >>current-index ;
+        swap >>current-index ;
 
 : final-state? ( dfa-traverser -- ? )
     [ current-state>> ]
@@ -65,5 +65,5 @@ TUPLE: dfa-traverser
 
 TUPLE: dfa-matcher dfa ;
 C: <dfa-matcher> dfa-matcher
-M: dfa-matcher match-index 
+M: dfa-matcher match-index-from
     dfa>> <dfa-traverser> do-match match-index>> ;
