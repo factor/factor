@@ -1,61 +1,60 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences math splitting make fry ;
+USING: kernel sequences math splitting make fry locals math.ranges
+accessors arrays ;
 IN: regexp.matchers
 
 ! For now, a matcher is just something with a method to do the
 ! equivalent of match.
 
-! matcher protocol:
-GENERIC: match-index ( string matcher -- index/f )
+GENERIC: match-index-from ( i string matcher -- index/f )
 
-: match ( string matcher -- slice/f )
-    dupd match-index [ head-slice ] [ drop f ] if* ;
+: match-index-head ( string matcher -- index/f )
+    [ 0 ] 2dip match-index-from ;
+
+: match-slice ( i string matcher -- slice/f )
+    [ 2dup ] dip match-index-from
+    [ swap <slice> ] [ 2drop f ] if* ;
 
 : matches? ( string matcher -- ? )
-    dupd match-index
+    dupd match-index-head
     [ swap length = ] [ drop f ] if* ;
 
-: match-head ( string matcher -- end/f ) match [ length ] [ f ] if* ;
+: map-find ( seq quot -- result elt )
+    [ f ] 2dip
+    '[ nip @ dup ] find
+    [ [ drop f ] unless ] dip ; inline
 
-: match-at ( string m matcher -- n/f finished? )
-    [
-        2dup swap length > [ 2drop f f ] [ tail-slice t ] if
-    ] dip swap [ match-head f ] [ 2drop f t ] if ;
+:: match-from ( i string matcher -- slice/f )
+    i string length [a,b)
+    [ string matcher match-slice ] map-find drop ;
 
-: match-range ( string m matcher -- a/f b/f )
-    3dup match-at over [
-        drop nip rot drop dupd +
-    ] [
-        [ 3drop drop f f ] [ drop [ 1+ ] dip match-range ] if
-    ] if ;
+: match-head ( str matcher -- slice/f )
+    [ 0 ] 2dip match-from ;
 
-: first-match ( string matcher -- slice/f )
-    dupd 0 swap match-range rot over [ <slice> ] [ 3drop f ] if ;
+: next-match ( i string matcher -- i match/f )
+    match-from [ dup [ to>> ] when ] keep ;
 
-: re-cut ( string matcher -- end/f start )
-    dupd first-match
-    [ split1-slice swap ] [ "" like f swap ] if* ;
-
-<PRIVATE
-
-: (re-split) ( string matcher -- )
-    over [ [ re-cut , ] keep (re-split) ] [ 2drop ] if ;
-
-PRIVATE>
-
-: re-split ( string matcher -- seq )
-    [ (re-split) ] { } make ;
-
-: re-replace ( string matcher replacement -- result )
-    [ re-split ] dip join ;
-
-: next-match ( string matcher -- end/f match/f )
-    dupd first-match dup
-    [ [ split1-slice nip ] keep ] [ 2drop f f ] if ;
-
-: all-matches ( string matcher -- seq )
-    [ dup ] swap '[ _ next-match ] [ ] produce nip harvest ;
+:: all-matches ( string matcher -- seq )
+    0 [ dup ] [ string matcher next-match ] [ ] produce nip but-last ;
 
 : count-matches ( string matcher -- n )
     all-matches length ;
+
+<PRIVATE
+
+:: split-slices ( string slices -- new-slices )
+    slices [ to>> ] map 0 prefix
+    slices [ from>> ] map string length suffix
+    [ string <slice> ] 2map ;
+
+PRIVATE>
+
+: re-split1 ( string matcher -- before after/f )
+    dupd match-head [ 1array split-slices first2 ] [ f ] if* ;
+
+: re-split ( string matcher -- seq )
+    dupd all-matches split-slices ;
+
+: re-replace ( string matcher replacement -- result )
+    [ re-split ] dip join ;

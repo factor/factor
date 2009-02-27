@@ -36,8 +36,7 @@ IN: regexp.compiler
 
 : transitions>quot ( transitions final-state? -- quot )
     [ split-literals suffix ] dip
-    '[ _ _ step ] ;
-    ! '[ { array-capacity string } declare _ _ step ] ;
+    '[ { array-capacity string } declare _ _ step ] ;
 
 : word>quot ( word dfa -- quot )
     [ transitions>> at ]
@@ -68,8 +67,11 @@ IN: regexp.compiler
 : dfa>word ( dfa -- word )
     states>words [ states>code ] keep start-state>> ;
 
-: run-regexp ( string word -- ? )
-    [ f 0 ] 2dip execute ; inline
+: check-string ( string -- string )
+    dup string? [ "String required" throw ] unless ;
+
+: run-regexp ( start-index string word -- ? )
+    { [ f ] [ >fixnum ] [ check-string ] [ execute ] } spread ; inline
 
 : dfa>quotation ( dfa -- quot )
     dfa>word '[ _ run-regexp ] ;
@@ -77,5 +79,5 @@ IN: regexp.compiler
 TUPLE: quot-matcher quot ;
 C: <quot-matcher> quot-matcher
 
-M: quot-matcher match-index
-    quot>> call( string -- i/f ) ;
+M: quot-matcher match-index-from
+    quot>> call( index string -- i/f ) ;
