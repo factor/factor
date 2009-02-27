@@ -80,4 +80,4 @@ TUPLE: inconsistent-recursive-call-error word ;
 TUPLE: unknown-primitive-error ;
 
 : unknown-primitive-error ( -- * )
-    \ unknown-primitive-error inference-error ;
+    \ unknown-primitive-error inference-warning ;
