@@ -3,7 +3,7 @@
 USING: accessors arrays calendar combinators.short-circuit
 continuations debugger http.client io.directories io.files
 io.launcher io.pathnames kernel make mason.common mason.config
-mason.platform mason.report namespaces sequences ;
+mason.platform mason.report mason.email namespaces sequences ;
 IN: mason.child
 
 : make-cmd ( -- args )
@@ -90,4 +90,5 @@ IN: mason.child
 
         build-clean? status-clean status-dirty ? return-with
     ] callcc1
-    status set ;
+    status set
+    email-report ;
