@@ -11,7 +11,7 @@ M: object default-emacsclient ( -- path ) "emacsclient" ;
 
 : emacsclient ( file line -- )
     [
-        { [ \ emacsclient-path get ] [ default-emacsclient ] } 0|| ,
+        { [ emacsclient-path get ] [ default-emacsclient ] } 0|| ,
         "--no-wait" ,
         number>string "+" prepend ,
         ,
