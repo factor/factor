@@ -38,7 +38,7 @@ HELP: find-in-directories
 
 HELP: find-all-files
 { $values
-     { "path" "a pathname string" } { "bfs?" "a boolean, breadth-first or depth-first" } { "quot" quotation }
+     { "path" "a pathname string" } { "quot" quotation }
      { "paths/f" "a sequence of pathname strings or f" }
 }
 { $description "Finds all files in the input directory matching the predicate quotation in a breadth-first or depth-first traversal." } ;
