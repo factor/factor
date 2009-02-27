@@ -1,37 +1,40 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cairo.ffi kernel accessors sequences
+USING: cairo.ffi alien.c-types kernel accessors sequences
 namespaces fry continuations destructors ;
 IN: cairo
 
-TUPLE: cairo-t alien ;
-C: <cairo-t> cairo-t
-M: cairo-t dispose ( alien -- ) alien>> cairo_destroy ;
+ERROR: cairo-error message ;
 
-TUPLE: cairo-surface-t alien ;
-C: <cairo-surface-t> cairo-surface-t
-M: cairo-surface-t dispose ( alien -- ) alien>> cairo_surface_destroy ;
+: (check-cairo) ( cairo_status_t -- )
+    dup CAIRO_STATUS_SUCCESS =
+    [ drop ] [ cairo_status_to_string cairo-error ] if ;
 
-: check-cairo ( cairo_status_t -- )
-    dup CAIRO_STATUS_SUCCESS = [ drop ]
-    [ cairo_status_to_string "Cairo error: " prepend throw ] if ;
+: check-cairo ( cairo -- ) cairo_status (check-cairo) ;
 
-SYMBOL: cairo
-: cr ( -- cairo ) cairo get ; inline
-
-: (with-cairo) ( cairo-t quot -- )
-    [ alien>> cairo ] dip
-    '[ @ cr cairo_status check-cairo ]
-    with-variable ; inline
-    
 : with-cairo ( cairo quot -- )
-    [ <cairo-t> ] dip '[ _ (with-cairo) ] with-disposal ; inline
+    '[
+        _ &cairo_destroy
+        _ [ check-cairo ] bi
+    ] with-destructors ; inline
 
-: (with-surface) ( cairo-surface-t quot -- )
-    [ alien>> ] dip [ cairo_surface_status check-cairo ] bi ; inline
+: check-surface ( surface -- ) cairo_surface_status check-cairo ;
 
 : with-surface ( cairo_surface quot -- )
-    [ <cairo-surface-t> ] dip '[ _ (with-surface) ] with-disposal ; inline
+    '[
+        _ &cairo_surface_destroy
+        _ [ check-surface ] bi
+    ] with-destructors ; inline
 
 : with-cairo-from-surface ( cairo_surface quot -- )
     '[ cairo_create _ with-cairo ] with-surface ; inline
+
+: width>stride ( width -- stride ) "uint" heap-size * ; inline
+
+: <image-surface> ( data dim -- surface )
+    first2 over width>stride CAIRO_FORMAT_ARGB32
+    cairo_image_surface_create_for_data
+    dup check-surface ;
+
+: make-bitmap-image ( dim quot -- image )
+    '[ <image-surface> &cairo_surface_destroy @ ] make-memory-bitmap ; inline

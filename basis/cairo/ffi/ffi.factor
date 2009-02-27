@@ -4,8 +4,8 @@
 ! Adapted from cairo.h, version 1.5.14
 ! License: http://factorcode.org/license.txt
 
-USING: system combinators alien alien.syntax kernel 
-alien.c-types accessors sequences arrays ui.gadgets ;
+USING: system combinators alien alien.syntax alien.c-types
+alien.destructors kernel accessors sequences arrays ui.gadgets ;
 
 IN: cairo.ffi
 << "cairo" {
@@ -93,6 +93,8 @@ cairo_reference ( cairo_t* cr ) ;
 
 FUNCTION: void
 cairo_destroy ( cairo_t* cr ) ;
+
+DESTRUCTOR: cairo_destroy
 
 FUNCTION: uint
 cairo_get_reference_count ( cairo_t* cr ) ;
@@ -693,6 +695,8 @@ cairo_surface_finish ( cairo_surface_t* surface ) ;
 
 FUNCTION: void
 cairo_surface_destroy ( cairo_surface_t* surface ) ;
+
+DESTRUCTOR: cairo_surface_destroy
 
 FUNCTION: uint
 cairo_surface_get_reference_count ( cairo_surface_t* surface ) ;
