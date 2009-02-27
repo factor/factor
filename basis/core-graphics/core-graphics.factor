@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.destructors alien.syntax accessors
 destructors fry kernel math math.bitwise sequences libc colors
-images core-graphics.types core-foundation.utilities ;
+images images.memory core-graphics.types core-foundation.utilities ;
 IN: core-graphics
 
 ! CGImageAlphaInfo
@@ -110,12 +110,6 @@ FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pnam
 : bitmap-flags ( -- flags )
     { kCGImageAlphaPremultipliedFirst kCGBitmapByteOrder32Host } flags ;
 
-: bitmap-size ( dim -- n )
-    product "uint" heap-size * ;
-
-: malloc-bitmap-data ( dim -- alien )
-    bitmap-size 1 calloc &free ;
-
 : bitmap-color-space ( -- color-space )
     CGColorSpaceCreateDeviceRGB &CGColorSpaceRelease ;
 
@@ -123,16 +117,6 @@ FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pnam
     [ first2 8 ] [ first 4 * ] bi
     bitmap-color-space bitmap-flags CGBitmapContextCreate
     [ "CGBitmapContextCreate failed" throw ] unless* ;
-
-: bitmap-data ( bitmap dim -- data )
-    [ CGBitmapContextGetData ] [ bitmap-size ] bi*
-    memory>byte-array ;
-
-: <bitmap-image> ( bitmap dim -- image )
-    <image>
-        swap >>dim
-        swap >>bitmap
-        little-endian? ARGB BGRA ? >>component-order ;
 
 PRIVATE>
 
@@ -142,7 +126,4 @@ PRIVATE>
     ] initialize-alien ;
 
 : make-bitmap-image ( dim quot -- image )
-    [
-        [ [ [ malloc-bitmap-data ] keep <CGBitmapContext> &CGContextRelease ] keep ] dip
-        [ nip call ] [ drop [ bitmap-data ] keep <bitmap-image> ] 3bi
-    ] with-destructors ; inline
+    '[ <CGBitmapContext> &CGContextRelease @ ] make-memory-bitmap ; inline
