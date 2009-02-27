@@ -50,15 +50,15 @@ ERROR: no-method object generic ;
     convert-hi-tag-methods
     <lo-tag-dispatch-engine> ;
 
+: mangle-method ( method -- quot )
+    1quotation generic get extra-values \ drop <repetition>
+    prepend [ ] like ;
+
 : find-default ( methods -- quot )
     #! Side-effects methods.
     object bootstrap-word swap delete-at* [
-        drop generic get "default-method" word-prop 1quotation
+        drop generic get "default-method" word-prop mangle-method
     ] unless ;
-
-: mangle-method ( method generic -- quot )
-    [ 1quotation ] [ extra-values \ drop <repetition> ] bi*
-    prepend [ ] like ;
 
 : <standard-engine> ( word -- engine )
     object bootstrap-word assumed set {
@@ -67,7 +67,7 @@ ERROR: no-method object generic ;
         [ V{ } clone "engines" set-word-prop ]
         [
             "methods" word-prop
-            [ generic get mangle-method ] assoc-map
+            [ mangle-method ] assoc-map
             [ find-default default set ]
             [ <big-dispatch-engine> ]
             bi

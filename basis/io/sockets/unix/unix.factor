@@ -94,7 +94,7 @@ M: unix (datagram)
 
 SYMBOL: receive-buffer
 
-: packet-size 65536 ; inline
+CONSTANT: packet-size 65536
 
 [ packet-size malloc receive-buffer set-global ] "io.sockets.unix" add-init-hook
 

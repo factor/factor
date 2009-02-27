@@ -44,11 +44,11 @@ IN: stack-checker.backend
 
 : pop-r ( -- obj )
     meta-r dup empty?
-    [ too-many-r> inference-error ] [ pop ] if ;
+    [ too-many-r> ] [ pop ] if ;
 
 : consume-r ( n -- seq )
     meta-r 2dup length >
-    [ too-many-r> inference-error ] when
+    [ too-many-r> ] when
     [ swap tail* ] [ shorten-by ] 2bi ;
 
 : output-r ( seq -- ) meta-r push-all ;
@@ -81,7 +81,7 @@ M: object apply-object push-literal ;
     terminated? on meta-d clone meta-r clone #terminate, ;
 
 : check->r ( -- )
-    meta-r empty? [ \ too-many->r inference-error ] unless ;
+    meta-r empty? [ too-many->r ] unless ;
 
 : infer-quot-here ( quot -- )
     meta-r [
@@ -104,7 +104,7 @@ M: object apply-object push-literal ;
 
 : infer-literal-quot ( literal -- )
     dup recursive-quotation? [
-        value>> recursive-quotation-error inference-error
+        value>> recursive-quotation-error
     ] [
         dup value>> callable? [
             [ value>> ]
@@ -124,18 +124,13 @@ M: object apply-object push-literal ;
 : undo-infer ( -- )
     recorded get [ f "inferred-effect" set-word-prop ] each ;
 
-: consume/produce ( effect quot -- )
-    #! quot is ( inputs outputs -- )
-    [
-        [
-            [ in>> length consume-d ]
-            [ out>> length produce-d ]
-            bi
-        ] dip call
-    ] [
-        drop
-        terminated?>> [ terminate ] when
-    ] 2bi ; inline
+: (consume/produce) ( effect -- inputs outputs )
+    [ in>> length consume-d ] [ out>> length produce-d ] bi ;
+
+: consume/produce ( effect quot: ( inputs outputs -- ) -- )
+    '[ (consume/produce) @ ]
+    [ terminated?>> [ terminate ] when ]
+    bi ; inline
 
 : infer-word-def ( word -- )
     [ specialized-def ] [ add-recursive-state ] bi infer-quot ;
@@ -143,30 +138,18 @@ M: object apply-object push-literal ;
 : end-infer ( -- )
     meta-d clone #return, ;
 
-: effect-required? ( word -- ? )
-    {
-        { [ dup deferred? ] [ drop f ] }
-        { [ dup crossref? not ] [ drop f ] }
-        [ def>> [ word? ] any? ]
-    } cond ;
-
-: ?missing-effect ( word -- )
-    dup effect-required?
-    [ missing-effect inference-error ] [ drop ] if ;
+: required-stack-effect ( word -- effect )
+    dup stack-effect [ ] [ missing-effect ] ?if ;
 
 : check-effect ( word effect -- )
-    over stack-effect {
-        { [ dup not ] [ 2drop ?missing-effect ] }
-        { [ 2dup effect<= ] [ 3drop ] }
-        [ effect-error ]
-    } cond ;
+    over required-stack-effect 2dup effect<=
+    [ 3drop ] [ effect-error ] if ;
 
 : finish-word ( word -- )
-    current-effect
-    [ check-effect ]
-    [ drop recorded get push ]
-    [ "inferred-effect" set-word-prop ]
-    2tri ;
+    [ current-effect check-effect ]
+    [ recorded get push ]
+    [ t "inferred-effect" set-word-prop ]
+    tri ;
 
 : cannot-infer-effect ( word -- * )
     "cannot-infer" word-prop throw ;
@@ -183,22 +166,20 @@ M: object apply-object push-literal ;
             dependencies off
             generic-dependencies off
             [ infer-word-def end-infer ]
-            [ finish-word current-effect ]
-            bi
+            [ finish-word ]
+            [ stack-effect ]
+            tri
         ] with-scope
     ] maybe-cannot-infer ;
 
 : apply-word/effect ( word effect -- )
     swap '[ _ #call, ] consume/produce ;
 
-: required-stack-effect ( word -- effect )
-    dup stack-effect [ ] [ \ missing-effect inference-error ] ?if ;
-
 : call-recursive-word ( word -- )
     dup required-stack-effect apply-word/effect ;
 
 : cached-infer ( word -- )
-    dup "inferred-effect" word-prop apply-word/effect ;
+    dup stack-effect apply-word/effect ;
 
 : with-infer ( quot -- effect visitor )
     [

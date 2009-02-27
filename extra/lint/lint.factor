@@ -42,7 +42,7 @@ SYMBOL: def-hash-keys
     set-alien-float alien-float
 } ;
 
-: trivial-defs
+: trivial-defs ( -- seq )
     {
         [ drop ] [ 2array ]
         [ bitand ]

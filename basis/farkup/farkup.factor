@@ -157,7 +157,7 @@ stand-alone
            = (line | code | heading | list | table | paragraph | nl)*
 ;EBNF
 
-: invalid-url "javascript:alert('Invalid URL in farkup');" ;
+CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
 
 : check-url ( href -- href' )
     {

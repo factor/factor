@@ -5,7 +5,7 @@ ui.gestures ui.backend ui.clipboards ui.gadgets.worlds ui.render
 ui.event-loop assocs kernel math namespaces opengl sequences
 strings x11.xlib x11.events x11.xim x11.glx x11.clipboard
 x11.constants x11.windows io.encodings.string io.encodings.ascii
-io.encodings.utf8 combinators command-line
+io.encodings.utf8 combinators combinators.short-circuit command-line
 math.vectors classes.tuple opengl.gl threads math.geometry.rect
 environment ascii ;
 IN: ui.x11
@@ -29,14 +29,14 @@ M: world configure-event
     ! In case dimensions didn't change
     relayout-1 ;
 
-: modifiers
+CONSTANT: modifiers
     {
         { S+ HEX: 1 }
         { C+ HEX: 4 }
         { A+ HEX: 8 }
-    } ;
-    
-: key-codes
+    }
+
+CONSTANT: key-codes
     H{
         { HEX: FF08 "BACKSPACE" }
         { HEX: FF09 "TAB"       }
@@ -62,7 +62,7 @@ M: world configure-event
         { HEX: FFC4 "F7"        }
         { HEX: FFC5 "F8"        }
         { HEX: FFC6 "F9"        }
-    } ;
+    }
 
 : key-code ( keysym -- keycode action? )
     dup key-codes at [ t ] [ 1string f ] ?if ;
@@ -73,9 +73,9 @@ M: world configure-event
 : valid-input? ( string gesture -- ? )
     over empty? [ 2drop f ] [
         mods>> { f { S+ } } member? [
-            [ [ 127 = not ] [ CHAR: \s >= ] bi and ] all?
+            [ { [ 127 = not ] [ CHAR: \s >= ] } 1&& ] all?
         ] [
-            [ [ 127 = not ] [ CHAR: \s >= ] [ alpha? not ] tri and and ] all?
+            [ { [ 127 = not ] [ CHAR: \s >= ] [ alpha? not ] } 1&& ] all?
         ] if
     ] if ;
 
