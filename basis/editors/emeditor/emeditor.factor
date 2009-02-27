@@ -5,7 +5,7 @@ IN: editors.emeditor
 
 : emeditor-path ( -- path )
     \ emeditor-path get-global [
-        "EmEditor" t [ "EmEditor.exe" tail? ] find-in-program-files
+        "EmEditor" [ "EmEditor.exe" tail? ] find-in-program-files
         [ "EmEditor.exe" ] unless*
     ] unless* ;
 
