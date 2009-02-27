@@ -4,140 +4,39 @@ USING: sequences io io.encodings.binary io.files io.pathnames
 strings kernel math io.mmap io.mmap.uchar accessors syntax
 combinators math.ranges unicode.categories byte-arrays
 io.encodings.string io.encodings.utf16 assocs math.parser
-combinators.short-circuit fry namespaces multiline
-combinators.smart splitting io.encodings.ascii ;
+combinators.short-circuit fry namespaces combinators.smart
+splitting io.encodings.ascii arrays ;
 IN: id3
 
 <PRIVATE
 
 CONSTANT: genres
     {
-        "Blues" 
-        "Classic Rock" 
-        "Country" 
-        "Dance" 
-        "Disco" 
-        "Funk" 
-        "Grunge" 
-        "Hip-Hop" 
-        "Jazz" 
-        "Metal" 
-        "New Age" 
-        "Oldies" 
-        "Other" 
-        "Pop" 
-        "R&B" 
-        "Rap" 
-        "Reggae" 
-        "Rock" 
-        "Techno" 
-        "Industrial" 
-        "Alternative" 
-        "Ska" 
-        "Death Metal" 
-        "Pranks" 
-        "Soundtrack" 
-        "Euro-Techno" 
-        "Ambient" 
-        "Trip-Hop" 
-        "Vocal" 
-        "Jazz+Funk" 
-        "Fusion" 
-        "Trance" 
-        "Classical" 
-        "Instrumental" 
-        "Acid" 
-        "House" 
-        "Game" 
-        "Sound Clip" 
-        "Gospel" 
-        "Noise" 
-        "AlternRock" 
-        "Bass" 
-        "Soul" 
-        "Punk" 
-        "Space" 
-        "Meditative" 
-        "Instrumental Pop" 
-        "Instrumental Rock" 
-        "Ethnic" 
-        "Gothic" 
-        "Darkwave" 
-        "Techno-Industrial" 
-        "Electronic" 
-        "Pop-Folk" 
-        "Eurodance" 
-        "Dream" 
-        "Southern Rock" 
-        "Comedy" 
-        "Cult" 
-        "Gangsta" 
-        "Top 40" 
-        "Christian Rap" 
-        "Pop/Funk" 
-        "Jungle" 
-        "Native American" 
-        "Cabaret" 
-        "New Wave" 
-        "Psychedelic" 
-        "Rave" 
-        "Showtunes" 
-        "Trailer" 
-        "Lo-Fi" 
-        "Tribal" 
-        "Acid Punk" 
-        "Acid Jazz" 
-        "Polka" 
-        "Retro" 
-        "Musical" 
-        "Rock & Roll" 
-        "Hard Rock" 
-        "Folk" 
-        "Folk-Rock" 
-        "National Folk" 
-        "Swing" 
-        "Fast Fusion" 
-        "Bebop" 
-        "Latin" 
-        "Revival" 
-        "Celtic" 
-        "Bluegrass" 
-        "Avantgarde" 
-        "Gothic Rock" 
-        "Progressive Rock" 
-        "Psychedelic Rock" 
-        "Symphonic Rock" 
-        "Slow Rock" 
-        "Big Band" 
-        "Chorus" 
-        "Easy Listening" 
-        "Acoustic" 
-        "Humour" 
-        "Speech" 
-        "Chanson" 
-        "Opera" 
-        "Chamber Music" 
-        "Sonata" 
-        "Symphony" 
-        "Booty Bass" 
-        "Primus" 
-        "Porn Groove" 
-        "Satire" 
-        "Slow Jam" 
-        "Club" 
-        "Tango" 
-        "Samba" 
-        "Folklore" 
-        "Ballad" 
-        "Power Ballad" 
-        "Rhythmic Soul" 
-        "Freestyle" 
-        "Duet" 
-        "Punk Rock" 
-        "Drum Solo" 
-        "A capella" 
-        "Euro-House"
-        "Dance Hall"
+        "Blues" "Classic Rock" "Country" "Dance" "Disco" "Funk" 
+        "Grunge" "Hip-Hop" "Jazz" "Metal" "New Age" "Oldies" "Other" 
+        "Pop" "R&B" "Rap" "Reggae" "Rock" "Techno" "Industrial" 
+        "Alternative" "Ska" "Death Metal" "Pranks" "Soundtrack" 
+        "Euro-Techno" "Ambient" "Trip-Hop" "Vocal" "Jazz+Funk" 
+        "Fusion" "Trance" "Classical" "Instrumental" "Acid" "House" 
+        "Game" "Sound Clip" "Gospel" "Noise" "AlternRock" "Bass" 
+        "Soul" "Punk" "Space" "Meditative" "Instrumental Pop" 
+        "Instrumental Rock" "Ethnic" "Gothic" "Darkwave" 
+        "Techno-Industrial" "Electronic" "Pop-Folk" "Eurodance" 
+        "Dream" "Southern Rock" "Comedy" "Cult" "Gangsta" "Top 40" 
+        "Christian Rap" "Pop/Funk" "Jungle" "Native American" 
+        "Cabaret" "New Wave" "Psychedelic" "Rave" "Showtunes" 
+        "Trailer" "Lo-Fi" "Tribal" "Acid Punk" "Acid Jazz" "Polka" 
+        "Retro" "Musical" "Rock & Roll" "Hard Rock" "Folk" 
+        "Folk-Rock" "National Folk" "Swing" "Fast Fusion" "Bebop" 
+        "Latin" "Revival" "Celtic" "Bluegrass" "Avantgarde" 
+        "Gothic Rock" "Progressive Rock" "Psychedelic Rock" 
+        "Symphonic Rock" "Slow Rock" "Big Band" "Chorus" 
+        "Easy Listening" "Acoustic" "Humour" "Speech" "Chanson" 
+        "Opera" "Chamber Music" "Sonata" "Symphony" "Booty Bass" 
+        "Primus" "Porn Groove" "Satire" "Slow Jam" "Club" "Tango" 
+        "Samba" "Folklore" "Ballad" "Power Ballad" "Rhythmic Soul" 
+        "Freestyle" "Duet" "Punk Rock" "Drum Solo" "A capella" 
+        "Euro-House" "Dance Hall"
     }
 
 TUPLE: header version flags size ;
@@ -146,9 +45,9 @@ TUPLE: frame frame-id flags size data ;
 
 TUPLE: id3v2-info header frames ;
 
-TUPLE: id3-info title artist album year comment genre ;
+TUPLE: id3v1-info title artist album year comment genre ;
 
-: <id3-info> ( -- object ) id3-info new ;
+: <id3v1-info> ( -- object ) id3v1-info new ;
 
 : <id3v2-info> ( header frames -- object )
     [ [ frame-id>> ] keep ] H{ } map>assoc
@@ -186,24 +85,11 @@ TUPLE: id3-info title artist album year comment genre ;
 : filter-text-data ( data -- filtered )
     [ printable? ] filter ; inline
 
-! frame details stuff
-
 : valid-frame-id? ( id -- ? )
     [ { [ digit? ] [ LETTER? ] } 1|| ] all? ; inline
 
-: read-frame-id ( mmap -- id )
-    4 head-slice ; inline
-
-: read-frame-size ( mmap -- size )
-    [ 4 8 ] dip subseq ; inline
-
-: read-frame-flags ( mmap -- flags )
-    [ 8 10 ] dip subseq ; inline
-
 : read-frame-data ( frame mmap -- frame data )
     [ 10 over size>> 10 + ] dip <slice> filter-text-data ; inline
-
-! read whole frames
 
 : decode-text ( string -- string' )
     dup 2 short head
@@ -213,14 +99,14 @@ TUPLE: id3-info title artist album year comment genre ;
 : (read-frame) ( mmap -- frame )
     [ <frame> ] dip
     {
-        [ read-frame-id decode-text >>frame-id ]
-        [ read-frame-flags >byte-array >>flags ]
-        [ read-frame-size >28bitword >>size ]
+        [ 4 head-slice decode-text >>frame-id ]
+        [ [ 4 8 ] dip subseq >28bitword >>size ]
+        [ [ 8 10 ] dip subseq >byte-array >>flags ]
         [ read-frame-data decode-text >>data ]
     } cleave ;
 
 : read-frame ( mmap -- frame/f )
-    dup read-frame-id valid-frame-id?
+    dup 4 head-slice valid-frame-id?
     [ (read-frame) ] [ drop f ] if ;
 
 : remove-frame ( mmap frame -- mmap )
@@ -233,54 +119,32 @@ TUPLE: id3-info title artist album year comment genre ;
     
 ! header stuff
 
-: read-header-supported-version? ( mmap -- ? )
-    3 tail-slice first { 3 4 } member? ; inline
-
-: read-header-flags ( mmap -- flags ) 5 swap nth ; inline
-
-: read-header-size ( mmap -- size )
-    [ 6 10 ] dip <slice> >28bitword ; inline
-
-: read-v2-header ( mmap -- id3header )
+: read-v2-header ( seq -- id3header )
     [ <header> ] dip
     {
-        [ read-header-supported-version? >>version ]
-        [ read-header-flags >>flags ]
-        [ read-header-size >>size ]
+        [ [ 3 5 ] dip <slice> >array >>version ]
+        [ [ 5 ] dip nth >>flags ]
+        [ [ 6 10 ] dip <slice> >28bitword >>size ]
     } cleave ; inline
 
-: drop-header ( mmap -- seq1 seq2 )
-    [ 10 tail-slice ] [ ] bi ; inline
-
 : read-v2-tag-data ( seq -- id3v2-info )
-    drop-header read-v2-header
-    swap read-frames <id3v2-info> ; inline
+    10 cut-slice
+    [ read-v2-header ]
+    [ read-frames ] bi* <id3v2-info> ; inline
     
 ! v1 information
 
 : skip-to-v1-data ( seq -- seq ) 125 tail-slice* ; inline
 
-: read-title ( seq -- title ) 30 head-slice ; inline
-
-: read-artist ( seq -- title ) [ 30 60 ] dip subseq ; inline
-
-: read-album ( seq -- album ) [ 60 90 ] dip subseq ; inline
-
-: read-year ( seq -- year ) [ 90 94 ] dip subseq ; inline
-
-: read-comment ( seq -- comment ) [ 94 124 ] dip subseq ; inline
-
-: read-genre ( seq -- genre ) [ 124 ] dip nth ; inline
-
 : (read-v1-tag-data) ( seq -- mp3-file )
-    [ <id3-info> ] dip
+    [ <id3v1-info> ] dip
     {
-        [ read-title   decode-text filter-text-data >>title   ]
-        [ read-artist  decode-text filter-text-data >>artist  ]
-        [ read-album   decode-text filter-text-data >>album   ]
-        [ read-year    decode-text filter-text-data >>year    ]
-        [ read-comment decode-text filter-text-data >>comment ]
-        [ read-genre   number>string                >>genre   ]
+        [ 30 head-slice decode-text filter-text-data >>title ]
+        [ [ 30 60 ] dip subseq decode-text filter-text-data >>artist ]
+        [ [ 60 90 ] dip subseq decode-text filter-text-data >>album ]
+        [ [ 90 94 ] dip subseq decode-text filter-text-data >>year ]
+        [ [ 94 124 ] dip subseq decode-text filter-text-data >>comment ]
+        [ [ 124 ] dip nth number>string >>genre ]
     } cleave ; inline
 
 : read-v1-tag-data ( seq -- mp3-file )
