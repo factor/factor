@@ -3,9 +3,9 @@
 USING: sequences io io.encodings.binary io.files io.pathnames
 strings kernel math io.mmap io.mmap.uchar accessors syntax
 combinators math.ranges unicode.categories byte-arrays
-io.encodings.string io.encodings.utf8 assocs math.parser
+io.encodings.string io.encodings.utf16 assocs math.parser
 combinators.short-circuit fry namespaces multiline
-combinators.smart splitting ;
+combinators.smart splitting io.encodings.ascii ;
 IN: id3
 
 <PRIVATE
@@ -205,13 +205,18 @@ TUPLE: id3-info title artist album year comment genre ;
 
 ! read whole frames
 
+: decode-text ( string -- string' )
+    dup 2 short head
+    { { HEX: ff HEX: fe } { HEX: fe HEX: ff } } member?
+    utf16 ascii ? decode ; inline
+
 : (read-frame) ( mmap -- frame )
     [ <frame> ] dip
     {
-        [ read-frame-id    utf8 decode  >>frame-id ]
-        [ read-frame-flags >byte-array  >>flags ]
-        [ read-frame-size  >28bitword   >>size ]
-        [ read-frame-data  utf8 decode  >>data ]
+        [ read-frame-id decode-text >>frame-id ]
+        [ read-frame-flags >byte-array >>flags ]
+        [ read-frame-size >28bitword >>size ]
+        [ read-frame-data decode-text >>data ]
     } cleave ;
 
 : read-frame ( mmap -- frame/f )
@@ -270,12 +275,12 @@ TUPLE: id3-info title artist album year comment genre ;
 : (read-v1-tag-data) ( seq -- mp3-file )
     [ <id3-info> ] dip
     {
-        [ read-title   utf8 decode  filter-text-data >>title   ]
-        [ read-artist  utf8 decode  filter-text-data >>artist  ]
-        [ read-album   utf8 decode  filter-text-data >>album   ]
-        [ read-year    utf8 decode  filter-text-data >>year    ]
-        [ read-comment utf8 decode  filter-text-data >>comment ]
-        [ read-genre   number>string                 >>genre   ]
+        [ read-title   decode-text filter-text-data >>title   ]
+        [ read-artist  decode-text filter-text-data >>artist  ]
+        [ read-album   decode-text filter-text-data >>album   ]
+        [ read-year    decode-text filter-text-data >>year    ]
+        [ read-comment decode-text filter-text-data >>comment ]
+        [ read-genre   number>string                >>genre   ]
     } cleave ; inline
 
 : read-v1-tag-data ( seq -- mp3-file )
