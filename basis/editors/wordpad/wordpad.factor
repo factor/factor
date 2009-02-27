@@ -4,7 +4,7 @@ IN: editors.wordpad
 
 : wordpad-path ( -- path )
     \ wordpad-path get [
-        "Windows NT\\Accessories" t
+        "Windows NT\\Accessories"
         [ "wordpad.exe" tail? ] find-in-program-files
     ] unless* ;
 

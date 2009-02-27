@@ -6,7 +6,7 @@ IN: id3
 HELP: file-id3-tags
 { $values 
     { "path" "a path string" } 
-    { "object/f" "a tuple storing ID3 metadata or f" } }
+    { "id3v2-info/f" "a tuple storing ID3v2 metadata or f" } }
     { $description "Return a tuple containing the ID3 information parsed out of the MP3 file, or " { $link f } " if no metadata is present.  Currently, the parser supports the following tags: "
       $nl { $link title>> }
       $nl { $link artist>> }

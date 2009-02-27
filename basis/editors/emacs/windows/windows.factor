@@ -6,7 +6,7 @@ IN: editors.emacs.windows
 
 M: windows default-emacsclient
     {
-        [ "Emacs" t [ "emacsclientw.exe" tail? ] find-in-program-files ]
-        [ "Emacs" t [ "emacsclient.exe" tail? ] find-in-program-files ]
+        [ "Emacs" [ "emacsclientw.exe" tail? ] find-in-program-files ]
+        [ "Emacs" [ "emacsclient.exe" tail? ] find-in-program-files ]
         [ "emacsclient.exe" ]
     } 0|| ;
