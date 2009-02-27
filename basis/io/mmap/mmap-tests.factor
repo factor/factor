@@ -1,6 +1,6 @@
 USING: io io.mmap io.mmap.char io.files io.files.temp
 io.directories kernel tools.test continuations sequences
-io.encodings.ascii accessors ;
+io.encodings.ascii accessors math ;
 IN: io.mmap.tests
 
 [ "mmap-test-file.txt" temp-file delete-file ] ignore-errors
