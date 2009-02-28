@@ -20,8 +20,7 @@ IN: images.memory
     [ bitmap-data ] keep
     <image>
         swap >>dim
-        swap >>bitmap
-        little-endian? ARGB BGRA ? >>component-order ;
+        swap >>bitmap ;
 
 PRIVATE>
 

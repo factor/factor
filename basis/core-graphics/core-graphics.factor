@@ -126,4 +126,5 @@ PRIVATE>
     ] initialize-alien ;
 
 : make-bitmap-image ( dim quot -- image )
-    '[ <CGBitmapContext> &CGContextRelease @ ] make-memory-bitmap ; inline
+    '[ <CGBitmapContext> &CGContextRelease @ ] make-memory-bitmap
+    ARGB >>component-order ; inline

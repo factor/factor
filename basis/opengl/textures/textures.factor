@@ -17,7 +17,7 @@ GENERIC: component-order>format ( component-order -- format type )
 
 M: RGBA component-order>format drop GL_RGBA GL_UNSIGNED_BYTE ;
 M: ARGB component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8_REV ;
-M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8 ;
+M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
 
 : repeat-last ( seq n -- seq' )
     over peek pad-tail concat ;

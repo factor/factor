@@ -34,7 +34,7 @@ TUPLE: image dim component-order bitmap ;
 GENERIC: load-image* ( path tuple -- image )
 
 : add-dummy-alpha ( seq -- seq' )
-    3 <sliced-groups> [ 255 suffix ] map concat ;
+    3 <groups> [ 255 suffix ] map concat ;
 
 : normalize-floats ( byte-array -- byte-array )
     byte-array>float-array [ 255.0 * >integer ] B{ } map-as ;
@@ -63,8 +63,7 @@ M: R16G16B16 normalize-component-order*
     drop RGB16>8 add-dummy-alpha ;
 
 : BGR>RGB ( bitmap bytes-per-pixel -- pixels )
-    dup <sliced-groups>
-    [ 3 head-slice reverse-here ] each ; inline
+    <groups> [ 3 cut [ reverse ] dip append ] map B{ } join ; inline
 
 M: BGRA normalize-component-order*
     drop 4 BGR>RGB ;
@@ -74,6 +73,15 @@ M: RGB normalize-component-order*
 
 M: BGR normalize-component-order*
     drop 3 BGR>RGB add-dummy-alpha ;
+
+: ARGB>RGBA ( bitmap -- bitmap' )
+    4 <groups> [ unclip suffix ] map B{ } join ;
+
+M: ARGB normalize-component-order*
+    drop ARGB>RGBA ;
+
+M: ABGR normalize-component-order*
+    drop ARGB>RGBA 4 BGR>RGB ;
 
 GENERIC: normalize-scan-line-order ( image -- image )
 
