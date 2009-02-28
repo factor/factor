@@ -512,7 +512,7 @@ ERROR: custom-error ;
 [ [ missing->r-check ] infer ] must-fail
 
 ! Corner case
-[ [ [ f dup ] [ dup ] [ ] produce ] infer ] must-fail
+[ [ [ f dup ] [ dup ] produce ] infer ] must-fail
 
 [ [ [ f dup ] [ ] while ] infer ] must-fail
 

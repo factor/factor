@@ -18,7 +18,7 @@ SYMBOL: locale ! Just casing locale, or overall?
 <PRIVATE
 
 : split-subseq ( string sep -- strings )
-    [ dup ] swap '[ _ split1-slice swap ] [ ] produce nip ;
+    [ dup ] swap '[ _ split1-slice swap ] produce nip ;
 
 : replace ( old new str -- newstr )
     [ split-subseq ] dip join ; inline

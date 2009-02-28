@@ -102,8 +102,7 @@ PRIVATE>
 <PRIVATE
 
 : >pieces ( str quot: ( str -- i ) -- graphemes )
-    [ dup empty? not ] swap '[ dup @ cut-slice swap ]
-    [ ] produce nip ; inline
+    [ dup empty? not ] swap '[ dup @ cut-slice swap ] produce nip ; inline
 
 PRIVATE>
 
