@@ -84,11 +84,11 @@ VALUE: johab-table
         h>b/b swap 2byte-array
         stream stream-write
     ]
-    [ c 1byte-array stream drop drop
-      stream-write
+    [
+        c 1byte-array
+        stream stream-write
     ]
-    if ;
-    
+    if ; inline
 
 M: johab encode-char ( char stream encoding -- )
     drop [ unicode>johab ] [ byte? not ] encode-char-mb ;
