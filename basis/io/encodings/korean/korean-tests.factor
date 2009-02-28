@@ -5,7 +5,8 @@ io.encodings.korean.private io.encodings.string io.streams.string
 kernel locals multiline namespaces sequences strings tools.test ;
 IN: io.encodings.korean.tests
 
-! convert cp949 <> unicode
+
+! cp949 encodings
 
 [ f ] [ HEX: 80 cp949>unicode ] unit-test
 [ f ] [ HEX: ff cp949>unicode ] unit-test
@@ -44,3 +45,25 @@ IN: io.encodings.korean.tests
 [ t ] [ phrase-cp949 3 head* cp949 decode phrase-unicode 2 head* = ] unit-test
 
 [ t ] [ phrase-cp949 2 head* cp949 decode phrase-unicode 2 head* CHAR: replacement-character suffix = ] unit-test
+
+
+! johab encodings
+[ HEX: 20 ] [ HEX: 20 johab>unicode ] unit-test
+[ HEX: 3133 ] [ HEX: 8444 johab>unicode ] unit-test
+[ HEX: 8A5D ] [ HEX: AD4F unicode>johab ] unit-test
+
+
+: phrase-johab ( -- s )
+    B{
+        149 183 208 129 162 137 137 193 32 164 130 150 129 172 101
+        183 161 33
+    } ;
+
+: phrase-johab>unicode ( -- s )
+    phrase-johab johab decode ;
+
+: phrase-unicode>johab ( -- s )
+    phrase-unicode johab encode ;
+
+[ t ] [ phrase-johab>unicode phrase-unicode = ] unit-test
+[ t ] [ phrase-unicode>johab phrase-johab = ] unit-test

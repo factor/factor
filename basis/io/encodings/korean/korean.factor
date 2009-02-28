@@ -11,7 +11,14 @@ SINGLETON: cp949
 
 cp949 "EUC-KR" register-encoding
 
+SINGLETON: johab
+
+! johab "JOHAB" register-encoding
+
+
 <PRIVATE
+
+! cp949 encodings
 
 VALUE: cp949-table
 
@@ -38,7 +45,7 @@ M:: cp949 encode-char ( char stream encoding -- )
         stream stream-write
     ] if ;
 
-: decode-char-step2 ( c stream -- char )
+: cp949-decode-char-step2 ( c stream -- char )
     stream-read1
     [ 2byte-array be> cp949>unicode ]
     [ drop replacement-char ] if* ;
@@ -47,6 +54,50 @@ M:: cp949 decode-char ( stream encoding -- char/f )
     stream stream-read1
     {
         { [ dup not ] [ drop f ] }
-        { [ dup cp949-1st? ] [ stream decode-char-step2 ] }
+        { [ dup cp949-1st? ] [ stream cp949-decode-char-step2 ] }
         [ ]
     } cond ;
+
+
+
+! johab encodings
+
+VALUE: johab-table
+
+"vocab:io/encodings/korean/data/johab.txt" <code-table>*
+    to: johab-table
+
+: johab>unicode ( n -- u ) johab-table n>u ;
+
+: unicode>johab ( u -- n ) johab-table u>n ;
+
+: johab-1st? ( n -- ? )
+    [ HEX: 84 HEX: D3 between? ]
+    [ HEX: D8 HEX: DE between? ]
+    [ HEX: E0 HEX: F9 between? ]
+    tri { } 3sequence [ t? ] any? ;
+
+M:: johab encode-char ( char stream encoding -- )
+    char unicode>johab byte?
+    [ char 1byte-array stream stream-write ] [
+        char unicode>johab
+        h>b/b swap 2byte-array
+        stream stream-write
+    ] if ;
+
+: johab-decode-char-step2 ( c stream -- char )
+    stream-read1
+    [ 2byte-array be> johab>unicode ]
+    [ drop replacement-char ] if* ;
+
+M:: johab decode-char ( stream encoding -- char/f )
+    stream stream-read1
+    {
+        { [ dup not ] [ drop f ] }
+        { [ dup johab-1st? ] [ stream johab-decode-char-step2 ] }
+        [ ]
+    } cond ;
+
+PRIVATE>
+
+
