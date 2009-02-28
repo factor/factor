@@ -1,6 +1,6 @@
 USING: accessors arrays combinators definitions generalizations
 help help.markup help.topics kernel sequences sorting vocabs
-words ;
+words combinators.smart ;
 IN: annotations
 
 <PRIVATE
@@ -13,17 +13,35 @@ PRIVATE>
     first
     [ "!" " your comment here" surround 1array $syntax ]
     [ [ "Treats the rest of the line after the exclamation point as a code annotation that can be looked up with the " \ $link ] dip comment-usage.-word 2array " word." 3array $description ]
-    [ ": foo ( x y z -- w )\n    !" " --w-ó()ò-w-- kilroy was here\n    + * ;" surround 1array $unchecked-example ]
+    [ ": foo ( x y z -- w )\n    !" " --w-ó()ò-w-- kilroy was here\n    + * ;" surround 1array $code ]
     tri ;
+
+: <$annotation> ( word -- element )
+    \ $annotation swap 2array 1array ;
 
 : $annotation-usage. ( element -- )
     first
     [ "Displays a list of words, help articles, and vocabularies that contain " \ $link ] dip comment-word 2array " annotations." 3array $description ;
 
+: <$annotation-usage.> ( word -- element )
+    \ $annotation-usage. swap 2array 1array ;
+
 : $annotation-usage ( element -- )
-    first
-    { "usages" sequence } $values
-    [ "Returns a list of words, help articles, and vocabularies that contain " \ $link ] dip [ comment-word 2array " annotations. For a more user-friendly display, use the " \ $link ] [ comment-usage.-word 2array " word." 6 narray ] bi 1array $description ;
+    first [
+        [ "Returns a list of words, help articles, and vocabularies that contain " ] dip
+        [
+            comment-word <$link>
+            " annotations. For a more user-friendly display, use the "
+        ] [
+            comment-usage.-word <$link>
+            " word."
+        ] bi
+    ] output>array $description ;
+
+: <$annotation-usage> ( word -- element )
+    [ { $values { "usages" sequence } } ] dip
+    \ $annotation-usage swap 2array
+    2array ;
 
 "Code annotations"
 {
@@ -42,9 +60,9 @@ annotation-tags natural-sort
 
 annotation-tags [
     {
-        [ [ \ $annotation swap 2array 1array ] [ comment-word set-word-help ] bi ]
-        [ [ \ $annotation-usage swap 2array 1array ] [ comment-usage-word set-word-help ] bi ]
-        [ [ \ $annotation-usage. swap 2array 1array ] [ comment-usage.-word set-word-help ] bi ]
+        [ [ <$annotation> ] [ comment-word set-word-help ] bi ]
+        [ [ <$annotation-usage> ] [ comment-usage-word set-word-help ] bi ]
+        [ [ <$annotation-usage.> ] [ comment-usage.-word set-word-help ] bi ]
         [ [ comment-word ] [ comment-usage-word ] [ comment-usage.-word ] tri 3array related-words ]
     } cleave
 ] each

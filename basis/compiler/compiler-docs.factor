@@ -1,5 +1,5 @@
 USING: help.markup help.syntax words io parser
-assocs words.private sequences compiler.units ;
+assocs words.private sequences compiler.units quotations ;
 IN: compiler
 
 HELP: enable-compiler
@@ -16,6 +16,8 @@ ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 { $subsection optimized-recompile-hook }
 "Removing a word's optimized definition:"
 { $subsection decompile }
+"Compiling a single quotation:"
+{ $subsection compile-call }
 "Higher-level words can be found in " { $link "compilation-units" } "." ;
 
 ARTICLE: "compiler" "Optimizing compiler"
@@ -48,3 +50,8 @@ HELP: optimized-recompile-hook
 { $values { "words" "a sequence of words" } { "alist" "an association list" } }
 { $description "Compile a set of words." }
 { $notes "This is an internal word, and user code should call " { $link compile } " instead." } ;
+
+HELP: compile-call
+{ $values { "quot" quotation } }
+{ $description "Compiles and runs a quotation." }
+{ $notes "This word is used by compiler unit tests to test compilation of small pieces of code." } ;

@@ -118,6 +118,7 @@
     ($nl . fuel-markup--newline)
     ($notes . fuel-markup--notes)
     ($operation . fuel-markup--link)
+    ($or . fuel-markup--or)
     ($parsing-note . fuel-markup--parsing-note)
     ($predicate . fuel-markup--predicate)
     ($prettyprinting-note . fuel-markup--prettyprinting-note)
@@ -467,6 +468,14 @@
 (defun fuel-markup--maybe (e)
   (fuel-markup--instance (cons '$instance (cdr e)))
   (insert " or f "))
+
+(defun fuel-markup--or (e)
+  (let ((fst (car (cdr e)))
+        (mid (butlast (cddr e)))
+        (lst (car (last (cdr e)))))
+    (insert (format "%s" fst))
+    (dolist (m mid) (insert (format ", %s" m)))
+    (insert (format " or %s" lst))))
 
 (defun fuel-markup--values (e)
   (fuel-markup--insert-heading "Inputs and outputs")

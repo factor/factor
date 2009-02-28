@@ -150,377 +150,377 @@ CONSTANT: PM_NOYIELD    2
 ! 
 ! Standard Cursor IDs
 !
-: IDC_ARROW           32512 ; inline
-: IDC_IBEAM           32513 ; inline
-: IDC_WAIT            32514 ; inline
-: IDC_CROSS           32515 ; inline
-: IDC_UPARROW         32516 ; inline
-: IDC_SIZE            32640 ; inline ! OBSOLETE: use IDC_SIZEALL
-: IDC_ICON            32641 ; inline ! OBSOLETE: use IDC_ARROW
-: IDC_SIZENWSE        32642 ; inline
-: IDC_SIZENESW        32643 ; inline
-: IDC_SIZEWE          32644 ; inline
-: IDC_SIZENS          32645 ; inline
-: IDC_SIZEALL         32646 ; inline
-: IDC_NO              32648 ; inline ! not in win3.1
-: IDC_HAND            32649 ; inline
-: IDC_APPSTARTING     32650 ; inline ! not in win3.1
-: IDC_HELP            32651 ; inline
+CONSTANT: IDC_ARROW           32512
+CONSTANT: IDC_IBEAM           32513
+CONSTANT: IDC_WAIT            32514
+CONSTANT: IDC_CROSS           32515
+CONSTANT: IDC_UPARROW         32516
+CONSTANT: IDC_SIZE            32640 ! OBSOLETE: use IDC_SIZEALL
+CONSTANT: IDC_ICON            32641 ! OBSOLETE: use IDC_ARROW
+CONSTANT: IDC_SIZENWSE        32642
+CONSTANT: IDC_SIZENESW        32643
+CONSTANT: IDC_SIZEWE          32644
+CONSTANT: IDC_SIZENS          32645
+CONSTANT: IDC_SIZEALL         32646
+CONSTANT: IDC_NO              32648 ! not in win3.1
+CONSTANT: IDC_HAND            32649
+CONSTANT: IDC_APPSTARTING     32650 ! not in win3.1
+CONSTANT: IDC_HELP            32651
 
 ! Predefined Clipboard Formats
-: CF_TEXT             1 ; inline
-: CF_BITMAP           2 ; inline
-: CF_METAFILEPICT     3 ; inline
-: CF_SYLK             4 ; inline
-: CF_DIF              5 ; inline
-: CF_TIFF             6 ; inline
-: CF_OEMTEXT          7 ; inline
-: CF_DIB              8 ; inline
-: CF_PALETTE          9 ; inline
-: CF_PENDATA          10 ; inline
-: CF_RIFF             11 ; inline
-: CF_WAVE             12 ; inline
-: CF_UNICODETEXT      13 ; inline
-: CF_ENHMETAFILE      14 ; inline
-: CF_HDROP            15 ; inline
-: CF_LOCALE           16 ; inline
-: CF_DIBV5            17 ; inline
-: CF_MAX              18 ; inline
+CONSTANT: CF_TEXT             1
+CONSTANT: CF_BITMAP           2
+CONSTANT: CF_METAFILEPICT     3
+CONSTANT: CF_SYLK             4
+CONSTANT: CF_DIF              5
+CONSTANT: CF_TIFF             6
+CONSTANT: CF_OEMTEXT          7
+CONSTANT: CF_DIB              8
+CONSTANT: CF_PALETTE          9
+CONSTANT: CF_PENDATA          10
+CONSTANT: CF_RIFF             11
+CONSTANT: CF_WAVE             12
+CONSTANT: CF_UNICODETEXT      13
+CONSTANT: CF_ENHMETAFILE      14
+CONSTANT: CF_HDROP            15
+CONSTANT: CF_LOCALE           16
+CONSTANT: CF_DIBV5            17
+CONSTANT: CF_MAX              18
 
-: CF_OWNERDISPLAY HEX: 0080 ; inline
-: CF_DSPTEXT HEX: 0081 ; inline
-: CF_DSPBITMAP HEX: 0082 ; inline
-: CF_DSPMETAFILEPICT HEX: 0083 ; inline
-: CF_DSPENHMETAFILE HEX: 008E ; inline
+CONSTANT: CF_OWNERDISPLAY HEX: 0080
+CONSTANT: CF_DSPTEXT HEX: 0081
+CONSTANT: CF_DSPBITMAP HEX: 0082
+CONSTANT: CF_DSPMETAFILEPICT HEX: 0083
+CONSTANT: CF_DSPENHMETAFILE HEX: 008E
 
 ! "Private" formats don't get GlobalFree()'d
-: CF_PRIVATEFIRST HEX: 200 ; inline
-: CF_PRIVATELAST HEX: 2FF ; inline
+CONSTANT: CF_PRIVATEFIRST HEX: 200
+CONSTANT: CF_PRIVATELAST HEX: 2FF
 
 ! "GDIOBJ" formats do get DeleteObject()'d
-: CF_GDIOBJFIRST HEX: 300 ; inline
-: CF_GDIOBJLAST HEX: 3FF ; inline
+CONSTANT: CF_GDIOBJFIRST HEX: 300
+CONSTANT: CF_GDIOBJLAST HEX: 3FF
 
 ! Virtual Keys, Standard Set
-: VK_LBUTTON        HEX: 01 ; inline
-: VK_RBUTTON        HEX: 02 ; inline
-: VK_CANCEL         HEX: 03 ; inline
-: VK_MBUTTON        HEX: 04 ; inline  ! NOT contiguous with L & RBUTTON
-: VK_XBUTTON1       HEX: 05 ; inline  ! NOT contiguous with L & RBUTTON
-: VK_XBUTTON2       HEX: 06 ; inline  ! NOT contiguous with L & RBUTTON
+CONSTANT: VK_LBUTTON        HEX: 01
+CONSTANT: VK_RBUTTON        HEX: 02
+CONSTANT: VK_CANCEL         HEX: 03
+CONSTANT: VK_MBUTTON        HEX: 04  ! NOT contiguous with L & RBUTTON
+CONSTANT: VK_XBUTTON1       HEX: 05  ! NOT contiguous with L & RBUTTON
+CONSTANT: VK_XBUTTON2       HEX: 06  ! NOT contiguous with L & RBUTTON
 ! 0x07 : unassigned
-: VK_BACK           HEX: 08 ; inline
-: VK_TAB            HEX: 09 ; inline
+CONSTANT: VK_BACK           HEX: 08
+CONSTANT: VK_TAB            HEX: 09
 ! 0x0A - 0x0B : reserved
 
-: VK_CLEAR          HEX: 0C ; inline
-: VK_RETURN         HEX: 0D ; inline
+CONSTANT: VK_CLEAR          HEX: 0C
+CONSTANT: VK_RETURN         HEX: 0D
 
-: VK_SHIFT          HEX: 10 ; inline
-: VK_CONTROL        HEX: 11 ; inline
-: VK_MENU           HEX: 12 ; inline
-: VK_PAUSE          HEX: 13 ; inline
-: VK_CAPITAL        HEX: 14 ; inline
+CONSTANT: VK_SHIFT          HEX: 10
+CONSTANT: VK_CONTROL        HEX: 11
+CONSTANT: VK_MENU           HEX: 12
+CONSTANT: VK_PAUSE          HEX: 13
+CONSTANT: VK_CAPITAL        HEX: 14
 
-: VK_KANA           HEX: 15 ; inline
-: VK_HANGEUL        HEX: 15 ; inline ! old name - here for compatibility
-: VK_HANGUL         HEX: 15 ; inline
-: VK_JUNJA          HEX: 17 ; inline
-: VK_FINAL          HEX: 18 ; inline
-: VK_HANJA          HEX: 19 ; inline
-: VK_KANJI          HEX: 19 ; inline
+CONSTANT: VK_KANA           HEX: 15
+CONSTANT: VK_HANGEUL        HEX: 15 ! old name - here for compatibility
+CONSTANT: VK_HANGUL         HEX: 15
+CONSTANT: VK_JUNJA          HEX: 17
+CONSTANT: VK_FINAL          HEX: 18
+CONSTANT: VK_HANJA          HEX: 19
+CONSTANT: VK_KANJI          HEX: 19
 
-: VK_ESCAPE         HEX: 1B ; inline
+CONSTANT: VK_ESCAPE         HEX: 1B
 
-: VK_CONVERT        HEX: 1C ; inline
-: VK_NONCONVERT     HEX: 1D ; inline
-: VK_ACCEPT         HEX: 1E ; inline
-: VK_MODECHANGE     HEX: 1F ; inline
+CONSTANT: VK_CONVERT        HEX: 1C
+CONSTANT: VK_NONCONVERT     HEX: 1D
+CONSTANT: VK_ACCEPT         HEX: 1E
+CONSTANT: VK_MODECHANGE     HEX: 1F
 
-: VK_SPACE          HEX: 20 ; inline
-: VK_PRIOR          HEX: 21 ; inline
-: VK_NEXT           HEX: 22 ; inline
-: VK_END            HEX: 23 ; inline
-: VK_HOME           HEX: 24 ; inline
-: VK_LEFT           HEX: 25 ; inline
-: VK_UP             HEX: 26 ; inline
-: VK_RIGHT          HEX: 27 ; inline
-: VK_DOWN           HEX: 28 ; inline
-: VK_SELECT         HEX: 29 ; inline
-: VK_PRINT          HEX: 2A ; inline
-: VK_EXECUTE        HEX: 2B ; inline
-: VK_SNAPSHOT       HEX: 2C ; inline
-: VK_INSERT         HEX: 2D ; inline
-: VK_DELETE         HEX: 2E ; inline
-: VK_HELP           HEX: 2F ; inline
+CONSTANT: VK_SPACE          HEX: 20
+CONSTANT: VK_PRIOR          HEX: 21
+CONSTANT: VK_NEXT           HEX: 22
+CONSTANT: VK_END            HEX: 23
+CONSTANT: VK_HOME           HEX: 24
+CONSTANT: VK_LEFT           HEX: 25
+CONSTANT: VK_UP             HEX: 26
+CONSTANT: VK_RIGHT          HEX: 27
+CONSTANT: VK_DOWN           HEX: 28
+CONSTANT: VK_SELECT         HEX: 29
+CONSTANT: VK_PRINT          HEX: 2A
+CONSTANT: VK_EXECUTE        HEX: 2B
+CONSTANT: VK_SNAPSHOT       HEX: 2C
+CONSTANT: VK_INSERT         HEX: 2D
+CONSTANT: VK_DELETE         HEX: 2E
+CONSTANT: VK_HELP           HEX: 2F
 
-: VK_0 CHAR: 0 ; inline
-: VK_1 CHAR: 1 ; inline
-: VK_2 CHAR: 2 ; inline
-: VK_3 CHAR: 3 ; inline
-: VK_4 CHAR: 4 ; inline
-: VK_5 CHAR: 5 ; inline
-: VK_6 CHAR: 6 ; inline
-: VK_7 CHAR: 7 ; inline
-: VK_8 CHAR: 8 ; inline
-: VK_9 CHAR: 9 ; inline
+CONSTANT: VK_0 CHAR: 0
+CONSTANT: VK_1 CHAR: 1
+CONSTANT: VK_2 CHAR: 2
+CONSTANT: VK_3 CHAR: 3
+CONSTANT: VK_4 CHAR: 4
+CONSTANT: VK_5 CHAR: 5
+CONSTANT: VK_6 CHAR: 6
+CONSTANT: VK_7 CHAR: 7
+CONSTANT: VK_8 CHAR: 8
+CONSTANT: VK_9 CHAR: 9
 
-: VK_A CHAR: A ; inline
-: VK_B CHAR: B ; inline
-: VK_C CHAR: C ; inline
-: VK_D CHAR: D ; inline
-: VK_E CHAR: E ; inline
-: VK_F CHAR: F ; inline
-: VK_G CHAR: G ; inline
-: VK_H CHAR: H ; inline
-: VK_I CHAR: I ; inline
-: VK_J CHAR: J ; inline
-: VK_K CHAR: K ; inline
-: VK_L CHAR: L ; inline
-: VK_M CHAR: M ; inline
-: VK_N CHAR: N ; inline
-: VK_O CHAR: O ; inline
-: VK_P CHAR: P ; inline
-: VK_Q CHAR: Q ; inline
-: VK_R CHAR: R ; inline
-: VK_S CHAR: S ; inline
-: VK_T CHAR: T ; inline
-: VK_U CHAR: U ; inline
-: VK_V CHAR: V ; inline
-: VK_W CHAR: W ; inline
-: VK_X CHAR: X ; inline
-: VK_Y CHAR: Y ; inline
-: VK_Z CHAR: Z ; inline
+CONSTANT: VK_A CHAR: A
+CONSTANT: VK_B CHAR: B
+CONSTANT: VK_C CHAR: C
+CONSTANT: VK_D CHAR: D
+CONSTANT: VK_E CHAR: E
+CONSTANT: VK_F CHAR: F
+CONSTANT: VK_G CHAR: G
+CONSTANT: VK_H CHAR: H
+CONSTANT: VK_I CHAR: I
+CONSTANT: VK_J CHAR: J
+CONSTANT: VK_K CHAR: K
+CONSTANT: VK_L CHAR: L
+CONSTANT: VK_M CHAR: M
+CONSTANT: VK_N CHAR: N
+CONSTANT: VK_O CHAR: O
+CONSTANT: VK_P CHAR: P
+CONSTANT: VK_Q CHAR: Q
+CONSTANT: VK_R CHAR: R
+CONSTANT: VK_S CHAR: S
+CONSTANT: VK_T CHAR: T
+CONSTANT: VK_U CHAR: U
+CONSTANT: VK_V CHAR: V
+CONSTANT: VK_W CHAR: W
+CONSTANT: VK_X CHAR: X
+CONSTANT: VK_Y CHAR: Y
+CONSTANT: VK_Z CHAR: Z
 
-: VK_LWIN           HEX: 5B ; inline
-: VK_RWIN           HEX: 5C ; inline
-: VK_APPS           HEX: 5D ; inline
+CONSTANT: VK_LWIN           HEX: 5B
+CONSTANT: VK_RWIN           HEX: 5C
+CONSTANT: VK_APPS           HEX: 5D
 
 ! 0x5E : reserved
 
-: VK_SLEEP          HEX: 5F ; inline
+CONSTANT: VK_SLEEP          HEX: 5F
 
-: VK_NUMPAD0        HEX: 60 ; inline
-: VK_NUMPAD1        HEX: 61 ; inline
-: VK_NUMPAD2        HEX: 62 ; inline
-: VK_NUMPAD3        HEX: 63 ; inline
-: VK_NUMPAD4        HEX: 64 ; inline
-: VK_NUMPAD5        HEX: 65 ; inline
-: VK_NUMPAD6        HEX: 66 ; inline
-: VK_NUMPAD7        HEX: 67 ; inline
-: VK_NUMPAD8        HEX: 68 ; inline
-: VK_NUMPAD9        HEX: 69 ; inline
-: VK_MULTIPLY       HEX: 6A ; inline
-: VK_ADD            HEX: 6B ; inline
-: VK_SEPARATOR      HEX: 6C ; inline
-: VK_SUBTRACT       HEX: 6D ; inline
-: VK_DECIMAL        HEX: 6E ; inline
-: VK_DIVIDE         HEX: 6F ; inline
-: VK_F1             HEX: 70 ; inline
-: VK_F2             HEX: 71 ; inline
-: VK_F3             HEX: 72 ; inline
-: VK_F4             HEX: 73 ; inline
-: VK_F5             HEX: 74 ; inline
-: VK_F6             HEX: 75 ; inline
-: VK_F7             HEX: 76 ; inline
-: VK_F8             HEX: 77 ; inline
-: VK_F9             HEX: 78 ; inline
-: VK_F10            HEX: 79 ; inline
-: VK_F11            HEX: 7A ; inline
-: VK_F12            HEX: 7B ; inline
-: VK_F13            HEX: 7C ; inline
-: VK_F14            HEX: 7D ; inline
-: VK_F15            HEX: 7E ; inline
-: VK_F16            HEX: 7F ; inline
-: VK_F17            HEX: 80 ; inline
-: VK_F18            HEX: 81 ; inline
-: VK_F19            HEX: 82 ; inline
-: VK_F20            HEX: 83 ; inline
-: VK_F21            HEX: 84 ; inline
-: VK_F22            HEX: 85 ; inline
-: VK_F23            HEX: 86 ; inline
-: VK_F24            HEX: 87 ; inline
+CONSTANT: VK_NUMPAD0        HEX: 60
+CONSTANT: VK_NUMPAD1        HEX: 61
+CONSTANT: VK_NUMPAD2        HEX: 62
+CONSTANT: VK_NUMPAD3        HEX: 63
+CONSTANT: VK_NUMPAD4        HEX: 64
+CONSTANT: VK_NUMPAD5        HEX: 65
+CONSTANT: VK_NUMPAD6        HEX: 66
+CONSTANT: VK_NUMPAD7        HEX: 67
+CONSTANT: VK_NUMPAD8        HEX: 68
+CONSTANT: VK_NUMPAD9        HEX: 69
+CONSTANT: VK_MULTIPLY       HEX: 6A
+CONSTANT: VK_ADD            HEX: 6B
+CONSTANT: VK_SEPARATOR      HEX: 6C
+CONSTANT: VK_SUBTRACT       HEX: 6D
+CONSTANT: VK_DECIMAL        HEX: 6E
+CONSTANT: VK_DIVIDE         HEX: 6F
+CONSTANT: VK_F1             HEX: 70
+CONSTANT: VK_F2             HEX: 71
+CONSTANT: VK_F3             HEX: 72
+CONSTANT: VK_F4             HEX: 73
+CONSTANT: VK_F5             HEX: 74
+CONSTANT: VK_F6             HEX: 75
+CONSTANT: VK_F7             HEX: 76
+CONSTANT: VK_F8             HEX: 77
+CONSTANT: VK_F9             HEX: 78
+CONSTANT: VK_F10            HEX: 79
+CONSTANT: VK_F11            HEX: 7A
+CONSTANT: VK_F12            HEX: 7B
+CONSTANT: VK_F13            HEX: 7C
+CONSTANT: VK_F14            HEX: 7D
+CONSTANT: VK_F15            HEX: 7E
+CONSTANT: VK_F16            HEX: 7F
+CONSTANT: VK_F17            HEX: 80
+CONSTANT: VK_F18            HEX: 81
+CONSTANT: VK_F19            HEX: 82
+CONSTANT: VK_F20            HEX: 83
+CONSTANT: VK_F21            HEX: 84
+CONSTANT: VK_F22            HEX: 85
+CONSTANT: VK_F23            HEX: 86
+CONSTANT: VK_F24            HEX: 87
 
 ! 0x88 - 0x8F : unassigned
 
-: VK_NUMLOCK        HEX: 90 ; inline
-: VK_SCROLL         HEX: 91 ; inline
+CONSTANT: VK_NUMLOCK        HEX: 90
+CONSTANT: VK_SCROLL         HEX: 91
 
 ! NEC PC-9800 kbd definitions
-: VK_OEM_NEC_EQUAL  HEX: 92 ; inline  ! '=' key on numpad
+CONSTANT: VK_OEM_NEC_EQUAL  HEX: 92  ! '=' key on numpad
 
 ! Fujitsu/OASYS kbd definitions
-: VK_OEM_FJ_JISHO   HEX: 92 ; inline  ! 'Dictionary' key
-: VK_OEM_FJ_MASSHOU HEX: 93 ; inline  ! 'Unregister word' key
-: VK_OEM_FJ_TOUROKU HEX: 94 ; inline  ! 'Register word' key
-: VK_OEM_FJ_LOYA    HEX: 95 ; inline  ! 'Left OYAYUBI' key
-: VK_OEM_FJ_ROYA    HEX: 96 ; inline  ! 'Right OYAYUBI' key
+CONSTANT: VK_OEM_FJ_JISHO   HEX: 92  ! 'Dictionary' key
+CONSTANT: VK_OEM_FJ_MASSHOU HEX: 93  ! 'Unregister word' key
+CONSTANT: VK_OEM_FJ_TOUROKU HEX: 94  ! 'Register word' key
+CONSTANT: VK_OEM_FJ_LOYA    HEX: 95  ! 'Left OYAYUBI' key
+CONSTANT: VK_OEM_FJ_ROYA    HEX: 96  ! 'Right OYAYUBI' key
 
 ! 0x97 - 0x9F : unassigned
 
 ! VK_L* & VK_R* - left and right Alt, Ctrl and Shift virtual keys.
 ! Used only as parameters to GetAsyncKeyState() and GetKeyState().
 ! No other API or message will distinguish left and right keys in this way.
-: VK_LSHIFT         HEX: A0 ; inline
-: VK_RSHIFT         HEX: A1 ; inline
-: VK_LCONTROL       HEX: A2 ; inline
-: VK_RCONTROL       HEX: A3 ; inline
-: VK_LMENU          HEX: A4 ; inline
-: VK_RMENU          HEX: A5 ; inline
+CONSTANT: VK_LSHIFT         HEX: A0
+CONSTANT: VK_RSHIFT         HEX: A1
+CONSTANT: VK_LCONTROL       HEX: A2
+CONSTANT: VK_RCONTROL       HEX: A3
+CONSTANT: VK_LMENU          HEX: A4
+CONSTANT: VK_RMENU          HEX: A5
 
-: VK_BROWSER_BACK        HEX: A6 ; inline
-: VK_BROWSER_FORWARD     HEX: A7 ; inline
-: VK_BROWSER_REFRESH     HEX: A8 ; inline
-: VK_BROWSER_STOP        HEX: A9 ; inline
-: VK_BROWSER_SEARCH      HEX: AA ; inline
-: VK_BROWSER_FAVORITES   HEX: AB ; inline
-: VK_BROWSER_HOME        HEX: AC ; inline
+CONSTANT: VK_BROWSER_BACK        HEX: A6
+CONSTANT: VK_BROWSER_FORWARD     HEX: A7
+CONSTANT: VK_BROWSER_REFRESH     HEX: A8
+CONSTANT: VK_BROWSER_STOP        HEX: A9
+CONSTANT: VK_BROWSER_SEARCH      HEX: AA
+CONSTANT: VK_BROWSER_FAVORITES   HEX: AB
+CONSTANT: VK_BROWSER_HOME        HEX: AC
 
-: VK_VOLUME_MUTE         HEX: AD ; inline
-: VK_VOLUME_DOWN         HEX: AE ; inline
-: VK_VOLUME_UP           HEX: AF ; inline
-: VK_MEDIA_NEXT_TRACK    HEX: B0 ; inline
-: VK_MEDIA_PREV_TRACK    HEX: B1 ; inline
-: VK_MEDIA_STOP          HEX: B2 ; inline
-: VK_MEDIA_PLAY_PAUSE    HEX: B3 ; inline
-: VK_LAUNCH_MAIL         HEX: B4 ; inline
-: VK_LAUNCH_MEDIA_SELECT HEX: B5 ; inline
-: VK_LAUNCH_APP1         HEX: B6 ; inline
-: VK_LAUNCH_APP2         HEX: B7 ; inline
+CONSTANT: VK_VOLUME_MUTE         HEX: AD
+CONSTANT: VK_VOLUME_DOWN         HEX: AE
+CONSTANT: VK_VOLUME_UP           HEX: AF
+CONSTANT: VK_MEDIA_NEXT_TRACK    HEX: B0
+CONSTANT: VK_MEDIA_PREV_TRACK    HEX: B1
+CONSTANT: VK_MEDIA_STOP          HEX: B2
+CONSTANT: VK_MEDIA_PLAY_PAUSE    HEX: B3
+CONSTANT: VK_LAUNCH_MAIL         HEX: B4
+CONSTANT: VK_LAUNCH_MEDIA_SELECT HEX: B5
+CONSTANT: VK_LAUNCH_APP1         HEX: B6
+CONSTANT: VK_LAUNCH_APP2         HEX: B7
 
 ! 0xB8 - 0xB9 : reserved
 
-: VK_OEM_1          HEX: BA ; inline  ! ';:' for US
-: VK_OEM_PLUS       HEX: BB ; inline  ! '+' any country
-: VK_OEM_COMMA      HEX: BC ; inline  ! ',' any country
-: VK_OEM_MINUS      HEX: BD ; inline  ! '-' any country
-: VK_OEM_PERIOD     HEX: BE ; inline  ! '.' any country
-: VK_OEM_2          HEX: BF ; inline  ! '/?' for US
-: VK_OEM_3          HEX: C0 ; inline  ! '`~' for US
+CONSTANT: VK_OEM_1          HEX: BA  ! ';:' for US
+CONSTANT: VK_OEM_PLUS       HEX: BB  ! '+' any country
+CONSTANT: VK_OEM_COMMA      HEX: BC  ! ',' any country
+CONSTANT: VK_OEM_MINUS      HEX: BD  ! '-' any country
+CONSTANT: VK_OEM_PERIOD     HEX: BE  ! '.' any country
+CONSTANT: VK_OEM_2          HEX: BF  ! '/?' for US
+CONSTANT: VK_OEM_3          HEX: C0  ! '`~' for US
 
 ! 0xC1 - 0xD7 : reserved
 
 ! 0xD8 - 0xDA : unassigned
 
-: VK_OEM_4          HEX: DB ; inline !  '[{' for US
-: VK_OEM_5          HEX: DC ; inline !  '\|' for US
-: VK_OEM_6          HEX: DD ; inline !  ']}' for US
-: VK_OEM_7          HEX: DE ; inline !  ''"' for US
-: VK_OEM_8          HEX: DF ; inline
+CONSTANT: VK_OEM_4          HEX: DB !  '[{' for US
+CONSTANT: VK_OEM_5          HEX: DC !  '\|' for US
+CONSTANT: VK_OEM_6          HEX: DD !  ']}' for US
+CONSTANT: VK_OEM_7          HEX: DE !  ''"' for US
+CONSTANT: VK_OEM_8          HEX: DF
 
 ! 0xE0 : reserved
 
 ! Various extended or enhanced keyboards
-: VK_OEM_AX         HEX: E1 ; inline !  'AX' key on Japanese AX kbd
-: VK_OEM_102        HEX: E2 ; inline !  "<>" or "\|" on RT 102-key kbd.
-: VK_ICO_HELP       HEX: E3 ; inline !  Help key on ICO
-: VK_ICO_00         HEX: E4 ; inline !  00 key on ICO
+CONSTANT: VK_OEM_AX         HEX: E1 !  'AX' key on Japanese AX kbd
+CONSTANT: VK_OEM_102        HEX: E2 !  "<>" or "\|" on RT 102-key kbd.
+CONSTANT: VK_ICO_HELP       HEX: E3 !  Help key on ICO
+CONSTANT: VK_ICO_00         HEX: E4 !  00 key on ICO
 
-: VK_PROCESSKEY     HEX: E5 ; inline
+CONSTANT: VK_PROCESSKEY     HEX: E5
 
-: VK_ICO_CLEAR      HEX: E6 ; inline
+CONSTANT: VK_ICO_CLEAR      HEX: E6
 
-: VK_PACKET         HEX: E7 ; inline
+CONSTANT: VK_PACKET         HEX: E7
 
 ! 0xE8 : unassigned
 
 ! Nokia/Ericsson definitions
-: VK_OEM_RESET      HEX: E9 ; inline
-: VK_OEM_JUMP       HEX: EA ; inline
-: VK_OEM_PA1        HEX: EB ; inline
-: VK_OEM_PA2        HEX: EC ; inline
-: VK_OEM_PA3        HEX: ED ; inline
-: VK_OEM_WSCTRL     HEX: EE ; inline
-: VK_OEM_CUSEL      HEX: EF ; inline
-: VK_OEM_ATTN       HEX: F0 ; inline
-: VK_OEM_FINISH     HEX: F1 ; inline
-: VK_OEM_COPY       HEX: F2 ; inline
-: VK_OEM_AUTO       HEX: F3 ; inline
-: VK_OEM_ENLW       HEX: F4 ; inline
-: VK_OEM_BACKTAB    HEX: F5 ; inline
+CONSTANT: VK_OEM_RESET      HEX: E9
+CONSTANT: VK_OEM_JUMP       HEX: EA
+CONSTANT: VK_OEM_PA1        HEX: EB
+CONSTANT: VK_OEM_PA2        HEX: EC
+CONSTANT: VK_OEM_PA3        HEX: ED
+CONSTANT: VK_OEM_WSCTRL     HEX: EE
+CONSTANT: VK_OEM_CUSEL      HEX: EF
+CONSTANT: VK_OEM_ATTN       HEX: F0
+CONSTANT: VK_OEM_FINISH     HEX: F1
+CONSTANT: VK_OEM_COPY       HEX: F2
+CONSTANT: VK_OEM_AUTO       HEX: F3
+CONSTANT: VK_OEM_ENLW       HEX: F4
+CONSTANT: VK_OEM_BACKTAB    HEX: F5
 
-: VK_ATTN           HEX: F6 ; inline
-: VK_CRSEL          HEX: F7 ; inline
-: VK_EXSEL          HEX: F8 ; inline
-: VK_EREOF          HEX: F9 ; inline
-: VK_PLAY           HEX: FA ; inline
-: VK_ZOOM           HEX: FB ; inline
-: VK_NONAME         HEX: FC ; inline
-: VK_PA1            HEX: FD ; inline
-: VK_OEM_CLEAR      HEX: FE ; inline
+CONSTANT: VK_ATTN           HEX: F6
+CONSTANT: VK_CRSEL          HEX: F7
+CONSTANT: VK_EXSEL          HEX: F8
+CONSTANT: VK_EREOF          HEX: F9
+CONSTANT: VK_PLAY           HEX: FA
+CONSTANT: VK_ZOOM           HEX: FB
+CONSTANT: VK_NONAME         HEX: FC
+CONSTANT: VK_PA1            HEX: FD
+CONSTANT: VK_OEM_CLEAR      HEX: FE
 ! 0xFF : reserved
 
 ! Key State Masks for Mouse Messages
-: MK_LBUTTON          HEX: 0001 ; inline
-: MK_RBUTTON          HEX: 0002 ; inline
-: MK_SHIFT            HEX: 0004 ; inline
-: MK_CONTROL          HEX: 0008 ; inline
-: MK_MBUTTON          HEX: 0010 ; inline
-: MK_XBUTTON1         HEX: 0020 ; inline
-: MK_XBUTTON2         HEX: 0040 ; inline
+CONSTANT: MK_LBUTTON          HEX: 0001
+CONSTANT: MK_RBUTTON          HEX: 0002
+CONSTANT: MK_SHIFT            HEX: 0004
+CONSTANT: MK_CONTROL          HEX: 0008
+CONSTANT: MK_MBUTTON          HEX: 0010
+CONSTANT: MK_XBUTTON1         HEX: 0020
+CONSTANT: MK_XBUTTON2         HEX: 0040
 
 ! Some fields are not defined for win64
 ! Window field offsets for GetWindowLong()
-: GWL_WNDPROC         -4 ; inline
-: GWL_HINSTANCE       -6 ; inline
-: GWL_HWNDPARENT      -8 ; inline
-: GWL_USERDATA        -21 ; inline
-: GWL_ID              -12 ; inline
+CONSTANT: GWL_WNDPROC         -4
+CONSTANT: GWL_HINSTANCE       -6
+CONSTANT: GWL_HWNDPARENT      -8
+CONSTANT: GWL_USERDATA        -21
+CONSTANT: GWL_ID              -12
 
-: GWL_STYLE           -16 ; inline
-: GWL_EXSTYLE         -20 ; inline
+CONSTANT: GWL_STYLE           -16
+CONSTANT: GWL_EXSTYLE         -20
 
-: GWLP_WNDPROC        -4 ; inline
-: GWLP_HINSTANCE      -6 ; inline
-: GWLP_HWNDPARENT     -8 ; inline
-: GWLP_USERDATA       -21 ; inline
-: GWLP_ID             -12 ; inline
+CONSTANT: GWLP_WNDPROC        -4
+CONSTANT: GWLP_HINSTANCE      -6
+CONSTANT: GWLP_HWNDPARENT     -8
+CONSTANT: GWLP_USERDATA       -21
+CONSTANT: GWLP_ID             -12
 
 ! Class field offsets for GetClassLong()
-: GCL_MENUNAME        -8 ; inline
-: GCL_HBRBACKGROUND   -10 ; inline
-: GCL_HCURSOR         -12 ; inline
-: GCL_HICON           -14 ; inline
-: GCL_HMODULE         -16 ; inline
-: GCL_WNDPROC         -24 ; inline
-: GCL_HICONSM         -34 ; inline
-: GCL_CBWNDEXTRA      -18 ; inline
-: GCL_CBCLSEXTRA      -20 ; inline
-: GCL_STYLE           -26 ; inline
-: GCW_ATOM            -32 ; inline
+CONSTANT: GCL_MENUNAME        -8
+CONSTANT: GCL_HBRBACKGROUND   -10
+CONSTANT: GCL_HCURSOR         -12
+CONSTANT: GCL_HICON           -14
+CONSTANT: GCL_HMODULE         -16
+CONSTANT: GCL_WNDPROC         -24
+CONSTANT: GCL_HICONSM         -34
+CONSTANT: GCL_CBWNDEXTRA      -18
+CONSTANT: GCL_CBCLSEXTRA      -20
+CONSTANT: GCL_STYLE           -26
+CONSTANT: GCW_ATOM            -32
 
-: GCLP_MENUNAME       -8 ; inline
-: GCLP_HBRBACKGROUND  -10 ; inline
-: GCLP_HCURSOR        -12 ; inline
-: GCLP_HICON          -14 ; inline
-: GCLP_HMODULE        -16 ; inline
-: GCLP_WNDPROC        -24 ; inline
-: GCLP_HICONSM        -34 ; inline
+CONSTANT: GCLP_MENUNAME       -8
+CONSTANT: GCLP_HBRBACKGROUND  -10
+CONSTANT: GCLP_HCURSOR        -12
+CONSTANT: GCLP_HICON          -14
+CONSTANT: GCLP_HMODULE        -16
+CONSTANT: GCLP_WNDPROC        -24
+CONSTANT: GCLP_HICONSM        -34
 
-: MB_ICONASTERISK    HEX: 00000040 ; inline
-: MB_ICONEXCLAMATION HEX: 00000030 ; inline
-: MB_ICONHAND        HEX: 00000010 ; inline
-: MB_ICONQUESTION    HEX: 00000020 ; inline
-: MB_OK              HEX: 00000000 ; inline
+CONSTANT: MB_ICONASTERISK    HEX: 00000040
+CONSTANT: MB_ICONEXCLAMATION HEX: 00000030
+CONSTANT: MB_ICONHAND        HEX: 00000010
+CONSTANT: MB_ICONQUESTION    HEX: 00000020
+CONSTANT: MB_OK              HEX: 00000000
 
 ALIAS: FVIRTKEY TRUE
-: FNOINVERT 2 ; inline
-: FSHIFT 4 ; inline
-: FCONTROL 8 ; inline
-: FALT 16 ; inline
+CONSTANT: FNOINVERT 2
+CONSTANT: FSHIFT 4
+CONSTANT: FCONTROL 8
+CONSTANT: FALT 16
 
-: MAPVK_VK_TO_VSC 0 ; inline
-: MAPVK_VSC_TO_VK 1 ; inline
-: MAPVK_VK_TO_CHAR 2 ; inline
-: MAPVK_VSC_TO_VK_EX 3 ; inline
-: MAPVK_VK_TO_VSC_EX 3 ; inline
+CONSTANT: MAPVK_VK_TO_VSC 0
+CONSTANT: MAPVK_VSC_TO_VK 1
+CONSTANT: MAPVK_VK_TO_CHAR 2
+CONSTANT: MAPVK_VSC_TO_VK_EX 3
+CONSTANT: MAPVK_VK_TO_VSC_EX 3
 
-: TME_HOVER 1 ; inline
-: TME_LEAVE 2 ; inline
-: TME_NONCLIENT 16 ; inline
-: TME_QUERY HEX: 40000000 ; inline
-: TME_CANCEL HEX: 80000000 ; inline
-: HOVER_DEFAULT HEX: ffffffff ; inline
+CONSTANT: TME_HOVER 1
+CONSTANT: TME_LEAVE 2
+CONSTANT: TME_NONCLIENT 16
+CONSTANT: TME_QUERY HEX: 40000000
+CONSTANT: TME_CANCEL HEX: 80000000
+CONSTANT: HOVER_DEFAULT HEX: ffffffff
 C-STRUCT: TRACKMOUSEEVENT
     { "DWORD" "cbSize" }
     { "DWORD" "dwFlags" }
@@ -528,15 +528,15 @@ C-STRUCT: TRACKMOUSEEVENT
     { "DWORD" "dwHoverTime" } ;
 TYPEDEF: TRACKMOUSEEVENT* LPTRACKMOUSEEVENT
 
-: DBT_DEVICEARRIVAL HEX: 8000 ; inline
-: DBT_DEVICEREMOVECOMPLETE HEX: 8004 ; inline
+CONSTANT: DBT_DEVICEARRIVAL HEX: 8000
+CONSTANT: DBT_DEVICEREMOVECOMPLETE HEX: 8004
 
-: DBT_DEVTYP_DEVICEINTERFACE 5 ; inline
+CONSTANT: DBT_DEVTYP_DEVICEINTERFACE 5
 
-: DEVICE_NOTIFY_WINDOW_HANDLE 0 ; inline
-: DEVICE_NOTIFY_SERVICE_HANDLE 1 ; inline
+CONSTANT: DEVICE_NOTIFY_WINDOW_HANDLE 0
+CONSTANT: DEVICE_NOTIFY_SERVICE_HANDLE 1
 
-: DEVICE_NOTIFY_ALL_INTERFACE_CLASSES 4 ; inline
+CONSTANT: DEVICE_NOTIFY_ALL_INTERFACE_CLASSES 4
 
 C-STRUCT: DEV_BROADCAST_HDR
     { "DWORD" "dbch_size" }
@@ -671,7 +671,6 @@ FUNCTION: HWND CreateWindowExW (
 ALIAS: CreateWindowEx CreateWindowExW
 
 : CreateWindow ( a b c d e f g h i j k -- hwnd ) 0 12 -nrot CreateWindowEx ; inline
-
 
 ! FUNCTION: CreateWindowStationA
 ! FUNCTION: CreateWindowStationW

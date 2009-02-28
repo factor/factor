@@ -7,11 +7,11 @@ IN: editors.scite
 
 : scite-path ( -- path )
     \ scite-path get-global [
-        "Scintilla Text Editor" t
+        "Scintilla Text Editor"
         [ >lower "scite.exe" tail? ] find-in-program-files
 
         [
-            "SciTE Source Code Editor" t
+            "SciTE Source Code Editor"
             [ >lower "scite.exe" tail? ] find-in-program-files
         ] unless*
         [ "scite.exe" ] unless*

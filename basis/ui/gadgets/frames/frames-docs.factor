@@ -1,4 +1,4 @@
-USING: help.syntax help.markup ui.gadgets kernel arrays
+USING: help.syntax help.markup ui.gadgets kernel arrays math help sequences
 quotations classes.tuple ui.gadgets.grids ;
 IN: ui.gadgets.frames
 
@@ -22,15 +22,15 @@ ARTICLE: "ui-frame-layout" "Frame layouts"
     drop
     { $description "Symbolic constant for a common input to " { $link grid-add } "." } print-element ;
 
-HELP: @center $ui-frame-constant ;
-HELP: @left $ui-frame-constant ;
-HELP: @right $ui-frame-constant ;
-HELP: @top $ui-frame-constant ;
-HELP: @bottom $ui-frame-constant ;
-HELP: @top-left $ui-frame-constant ;
-HELP: @top-right $ui-frame-constant ;
-HELP: @bottom-left $ui-frame-constant ;
-HELP: @bottom-right $ui-frame-constant ;
+{ @center @left @right @top @bottom @top-left @top-right @bottom-left @bottom-right }
+[
+    [
+        {
+            { $values { "i" integer } { "j" integer } }
+            { $ui-frame-constant }
+        }
+    ] dip set-word-help
+] each
 
 HELP: frame
 { $class-description "A frame is a gadget which lays out its children in a 3x3 grid. If the frame is enlarged past its preferred size, the center gadget fills up available room."

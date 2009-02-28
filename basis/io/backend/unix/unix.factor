@@ -77,7 +77,7 @@ M: io-timeout summary drop "I/O operation timed out" ;
     '[ handle>> _ wait-for-fd ] with-timeout ;
 
 ! Some general stuff
-: file-mode OCT: 0666 ;
+CONSTANT: file-mode OCT: 0666
  
 ! Readers
 : (refill) ( port -- n )

@@ -12,7 +12,7 @@ IN: irc.client
 ! Setup and running objects
 ! ======================================
 
-: irc-port 6667 ; ! Default irc port
+CONSTANT: irc-port 6667 ! Default irc port
 
 TUPLE: irc-profile server port nickname password ;
 C: <irc-profile> irc-profile

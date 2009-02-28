@@ -96,8 +96,6 @@ M: object specializer-declaration class ;
 { string string }
 "specializer" set-word-prop
 
-\ find-last-sep { string sbuf } "specializer" set-word-prop
-
 \ >string { sbuf } "specializer" set-word-prop
 
 \ >array { { vector } } "specializer" set-word-prop

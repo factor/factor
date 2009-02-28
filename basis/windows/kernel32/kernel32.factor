@@ -993,8 +993,8 @@ FUNCTION: BOOL DuplicateHandle (
     BOOL bInheritHandle,
     DWORD dwOptions ) ;
 
-: DUPLICATE_CLOSE_SOURCE 1 ;
-: DUPLICATE_SAME_ACCESS 2 ;
+CONSTANT: DUPLICATE_CLOSE_SOURCE 1
+CONSTANT: DUPLICATE_SAME_ACCESS 2
 
 ! FUNCTION: EncodePointer
 ! FUNCTION: EncodeSystemPointer
@@ -1226,7 +1226,7 @@ FUNCTION: BOOL GetExitCodeProcess ( HANDLE hProcess, LPDWORD lpExitCode ) ;
 FUNCTION: DWORD GetFileAttributesW ( LPCTSTR lpFileName ) ;
 ! FUNCTION: GetFileAttributesExA
 
-: GetFileExInfoStandard 0 ; inline
+CONSTANT: GetFileExInfoStandard 0
 
 
 FUNCTION: BOOL GetFileAttributesExW ( LPCTSTR lpFileName, GET_FILEEX_INFO_LEVELS fInfoLevelId, LPVOID lpFileInformation ) ;

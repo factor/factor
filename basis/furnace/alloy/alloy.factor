@@ -10,7 +10,7 @@ furnace.auth.providers
 furnace.auth.login.permits ;
 IN: furnace.alloy
 
-: state-classes { session aside conversation permit } ; inline
+CONSTANT: state-classes { session aside conversation permit }
 
 : init-furnace-tables ( -- )
     state-classes ensure-tables

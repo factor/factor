@@ -173,7 +173,7 @@ TUPLE: radio-paint < caching-pen color interior-vertices boundary-vertices ;
 
 <PRIVATE
 
-: circle-steps 8 ;
+CONSTANT: circle-steps 8
 
 PRIVATE>
 
