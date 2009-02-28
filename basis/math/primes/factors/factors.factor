@@ -7,7 +7,7 @@ IN: math.primes.factors
 
 : count-factor ( n d -- n' c )
     [ 1 ] 2dip [ /i ] keep
-    [ dupd /mod zero? ] curry [ nip [ 1+ ] dip ] [ drop ] while
+    [ dupd /mod zero? ] curry [ nip [ 1+ ] dip ] while drop
     swap ;
 
 : write-factor ( n d -- n' d )
@@ -18,7 +18,7 @@ PRIVATE>
 : group-factors ( n -- seq )
     [
         2
-        [ 2dup sq < ] [ write-factor next-prime ] [ ] until
+        [ 2dup sq < ] [ write-factor next-prime ] until
         drop dup 2 < [ drop ] [ 1 2array , ] if
     ] { } make ;
 

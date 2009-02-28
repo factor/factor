@@ -765,15 +765,15 @@ HELP: 4dip
 } ;
 
 HELP: while
-{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } { "tail" "a quotation" } }
+{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } }
 { $description "Calls " { $snippet "body" } " until " { $snippet "pred" } " returns " { $link f } "." } ;
 
 HELP: until
-{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } { "tail" "a quotation" } }
+{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } }
 { $description "Calls " { $snippet "body" } " until " { $snippet "pred" } " returns " { $link t } "." } ;
 
 HELP: do
-{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } { "tail" "a quotation" } }
+{ $values { "pred" { $quotation "( -- ? )" } } { "body" "a quotation" } }
 { $description "Executes one iteration of a " { $link while } " or " { $link until } " loop." } ;
 
 HELP: loop
@@ -794,18 +794,11 @@ ARTICLE: "looping-combinators" "Looping combinators"
 "In most cases, loops should be written using high-level combinators (such as " { $link "sequences-combinators" } ") or tail recursion. However, sometimes, the best way to express intent is with a loop."
 { $subsection while }
 { $subsection until }
-"The above two combinators take a " { $snippet "tail" } " quotation. Strictly speaking, the " { $snippet "tail" } " is not necessary, since the following are equivalent:"
-{ $code
-    "[ P ] [ Q ] [ T ] while"
-    "[ P ] [ Q ] [ ] while T"
-}
-"However, depending on the stack effects of " { $snippet "pred" } " and " { $snippet "quot" } ", the " { $snippet "tail" } " quotation might need to be non-empty in order to balance out the stack effect of branches for stack effect inference."
-$nl
 "To execute one iteration of a loop, use the following word:"
 { $subsection do }
 "This word is intended as a modifier. The normal " { $link while } " loop never executes the body if the predicate returns first on the first iteration. To ensure the body executes at least once, use " { $link do } ":"
 { $code
-    "[ P ] [ Q ] [ T ] do while"
+    "[ P ] [ Q ] do while"
 }
 "A simpler looping combinator which executes a single quotation until it returns " { $link f } ":"
 { $subsection loop } ;

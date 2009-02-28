@@ -205,7 +205,7 @@ SYMBOL: +stopped+
                 ]
             } case
         ] handle-synchronous
-    ] [ ] while ;
+    ] while ;
 
 : step-back-msg ( continuation -- continuation' )
     walker-history tget
@@ -233,7 +233,7 @@ SYMBOL: +stopped+
                 { step-back [ step-back-msg ] }
             } case f
         ] handle-synchronous
-    ] [ ] while ;
+    ] while ;
 
 : walker-loop ( -- )
     +running+ set-status
@@ -256,7 +256,7 @@ SYMBOL: +stopped+
                 [ walker-suspended ]
             } case
         ] handle-synchronous
-    ] [ ] until ;
+    ] until ;
 
 : associate-thread ( walker -- )
     walker-thread tset

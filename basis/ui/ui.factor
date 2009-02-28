@@ -146,7 +146,7 @@ PRIVATE>
 : update-ui-loop ( -- )
     [ ui-running? ui-thread get-global self eq? and ]
     [ ui-notify-flag get lower-flag update-ui ]
-    [ ] while ;
+    while ;
 
 : start-ui-thread ( -- )
     [ self ui-thread set-global update-ui-loop ]
