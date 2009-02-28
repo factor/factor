@@ -24,6 +24,7 @@ LIBRARY: glib
 
 TYPEDEF: void* gpointer
 TYPEDEF: int gint
+TYPEDEF: bool gboolean
 
 FUNCTION: void
 g_free ( gpointer mem ) ;

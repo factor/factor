@@ -1,4 +1,5 @@
 ! Copyright (C) 2008 Matthew Willis.
+! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! pangocairo bindings, from pango/pangocairo.h
@@ -101,13 +102,8 @@ MEMO: (cache-font) ( font -- open-font )
 
 : parse-font-metrics ( metrics -- metrics' )
     [ metrics new ] dip
-    {
-        [ pango_font_metrics_get_ascent PANGO_SCALE /f >>height ]
-        [ pango_font_metrics_get_descent PANGO_SCALE /f >>descent ]
-        [ drop 0 >>leading ]
-        [ drop 0 >>cap-height ]
-        [ drop 0 >>x-height ]
-    } cleave
+    [ pango_font_metrics_get_ascent PANGO_SCALE /f >>height ]
+    [ pango_font_metrics_get_descent PANGO_SCALE /f >>descent ] bi
     dup [ height>> ] [ descent>> ] bi - >>ascent ;
 
 MEMO: (cache-font-metrics) ( font -- metrics )
