@@ -18,6 +18,37 @@ SINGLETON: johab
 
 <PRIVATE
 
+:: encode-char-mb
+( c stream quot-conv: ( c -- c2 ) quot-mb?: ( c -- ? ) -- )
+    c quot-conv call quot-mb? call
+    [
+        c quot-conv call
+        h>b/b swap 2byte-array
+        stream stream-write
+    ]
+    [
+        c 1byte-array
+        stream stream-write
+    ]
+    if ; inline
+
+:: decode-char-mb
+( stream quot-conv: ( c -- c2 ) quot-mb?: ( c -- ? ) -- char/f )
+    stream stream-read1
+    {
+        { [ dup not ] [ drop f ] }
+        {
+            [ dup quot-mb? call ]
+            [
+                stream stream-read1
+                [ 2byte-array be> quot-conv call ]
+                [ drop replacement-char ]
+                if*
+            ]
+        }
+        [ ]
+    } cond ; inline
+
 ! cp949 encodings
 
 VALUE: cp949-table
@@ -37,27 +68,11 @@ VALUE: cp949-table
 : byte? ( n -- ? )
     0 HEX: ff between? ;
 
-M:: cp949 encode-char ( char stream encoding -- )
-    char unicode>cp949 byte?
-    [ char 1byte-array stream stream-write ] [
-        char unicode>cp949
-        h>b/b swap 2byte-array
-        stream stream-write
-    ] if ;
+M: cp949 encode-char ( char stream encoding -- )
+    drop [ unicode>cp949 ] [ byte? not ] encode-char-mb ;
 
-: cp949-decode-char-step2 ( c stream -- char )
-    stream-read1
-    [ 2byte-array be> cp949>unicode ]
-    [ drop replacement-char ] if* ;
-
-M:: cp949 decode-char ( stream encoding -- char/f )
-    stream stream-read1
-    {
-        { [ dup not ] [ drop f ] }
-        { [ dup cp949-1st? ] [ stream cp949-decode-char-step2 ] }
-        [ ]
-    } cond ;
-
+M: cp949 decode-char ( stream encoding -- char/f )
+    drop [ cp949>unicode ] [ cp949-1st? ] decode-char-mb ;
 
 
 ! johab encodings
@@ -77,35 +92,12 @@ VALUE: johab-table
     [ HEX: E0 HEX: F9 between? ]
     tri { } 3sequence [ t? ] any? ;
 
-:: encode-char-mb ( c stream quot-conv: ( c -- c2 ) quot-mb?: ( c -- ? ) -- )
-    c quot-conv call quot-mb? call
-    [
-        c quot-conv call
-        h>b/b swap 2byte-array
-        stream stream-write
-    ]
-    [
-        c 1byte-array
-        stream stream-write
-    ]
-    if ; inline
-
 M: johab encode-char ( char stream encoding -- )
     drop [ unicode>johab ] [ byte? not ] encode-char-mb ;
 
+M: johab decode-char ( stream encoding -- char/f )
+    drop [ johab>unicode ] [ johab-1st? ] decode-char-mb ;
 
-: johab-decode-char-step2 ( c stream -- char )
-    stream-read1
-    [ 2byte-array be> johab>unicode ]
-    [ drop replacement-char ] if* ;
-
-M:: johab decode-char ( stream encoding -- char/f )
-    stream stream-read1
-    {
-        { [ dup not ] [ drop f ] }
-        { [ dup johab-1st? ] [ stream johab-decode-char-step2 ] }
-        [ ]
-    } cond ;
 
 PRIVATE>
 
