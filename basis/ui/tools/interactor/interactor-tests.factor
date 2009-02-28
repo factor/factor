@@ -22,7 +22,7 @@ tools.test kernel calendar parser accessors calendar io ;
     ! This should not throw an exception
     [ ] [ "interactor" get evaluate-input ] unit-test
 
-    [ ] [ [ "interactor" get interactor-busy? ] [ yield ] [ ] while ] unit-test
+    [ ] [ [ "interactor" get interactor-busy? ] [ yield ] while ] unit-test
 
     [ ] [ "[ 1 2 3 ]" "interactor" get set-editor-string ] unit-test
 

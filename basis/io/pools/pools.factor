@@ -35,7 +35,7 @@ GENERIC: make-connection ( pool -- conn )
 
 : acquire-connection ( pool -- conn )
     dup check-pool
-    [ dup connections>> empty? ] [ dup new-connection ] [ ] while
+    [ dup connections>> empty? ] [ dup new-connection ] while
     connections>> pop ;
 
 : (with-pooled-connection) ( conn pool quot -- )
