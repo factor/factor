@@ -15,12 +15,12 @@ unit-test
 
 [ "xyzzy" ] [ [ "xyzzy" write ] with-string-writer ] unit-test
 
-[ "a" ] [ 1 SBUF" cba" stream-read ] unit-test
-[ "ab" ] [ 2 SBUF" cba" stream-read ] unit-test
-[ "abc" ] [ 3 SBUF" cba" stream-read ] unit-test
-[ "abc" ] [ 4 SBUF" cba" stream-read ] unit-test
+[ "a" ] [ 1 "abc" <string-reader> stream-read ] unit-test
+[ "ab" ] [ 2 "abc" <string-reader> stream-read ] unit-test
+[ "abc" ] [ 3 "abc" <string-reader> stream-read ] unit-test
+[ "abc" ] [ 4 "abc" <string-reader> stream-read ] unit-test
 [ "abc" f ] [
-    3 SBUF" cba" [ stream-read ] keep stream-read1
+    3 "abc" <string-reader> [ stream-read ] keep stream-read1
 ] unit-test
 
 [

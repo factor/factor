@@ -1,13 +1,13 @@
 ! Copyright (C) 2006 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences sequences.private namespaces
-words io io.binary io.files io.streams.string quotations
+words io io.binary io.files quotations
 definitions checksums ;
 IN: checksums.crc32
 
-: crc32-polynomial HEX: edb88320 ; inline
+CONSTANT: crc32-polynomial HEX: edb88320
 
-: crc32-table V{ } ; inline
+CONSTANT: crc32-table V{ }
 
 256 [
     8 [

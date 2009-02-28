@@ -67,24 +67,24 @@ SYMBOL: stamp
 : ?prepare-build-machine ( -- )
     builds/factor exists? [ prepare-build-machine ] unless ;
 
-: load-everything-vocabs-file "load-everything-vocabs" ;
-: load-everything-errors-file "load-everything-errors" ;
+CONSTANT: load-everything-vocabs-file "load-everything-vocabs"
+CONSTANT: load-everything-errors-file "load-everything-errors"
 
-: test-all-vocabs-file "test-all-vocabs" ;
-: test-all-errors-file "test-all-errors" ;
+CONSTANT: test-all-vocabs-file "test-all-vocabs"
+CONSTANT: test-all-errors-file "test-all-errors"
 
-: help-lint-vocabs-file "help-lint-vocabs" ;
-: help-lint-errors-file "help-lint-errors" ;
+CONSTANT: help-lint-vocabs-file "help-lint-vocabs"
+CONSTANT: help-lint-errors-file "help-lint-errors"
 
-: boot-time-file "boot-time" ;
-: load-time-file "load-time" ;
-: compiler-errors-file "compiler-errors" ;
-: test-time-file "test-time" ;
-: help-lint-time-file "help-lint-time" ;
-: benchmark-time-file "benchmark-time" ;
-: html-help-time-file "html-help-time" ;
+CONSTANT: boot-time-file "boot-time"
+CONSTANT: load-time-file "load-time"
+CONSTANT: compiler-errors-file "compiler-errors"
+CONSTANT: test-time-file "test-time"
+CONSTANT: help-lint-time-file "help-lint-time"
+CONSTANT: benchmark-time-file "benchmark-time"
+CONSTANT: html-help-time-file "html-help-time"
 
-: benchmarks-file "benchmarks" ;
+CONSTANT: benchmarks-file "benchmarks"
 
 SYMBOL: status
 

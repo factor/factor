@@ -14,12 +14,12 @@ SYMBOL: deploy-threads?
 
 SYMBOL: deploy-io
 
-: deploy-io-options
+CONSTANT: deploy-io-options
     {
         { 1 "Level 1 - No input/output" }
         { 2 "Level 2 - Basic ANSI C streams" }
         { 3 "Level 3 - Non-blocking streams and networking" }
-    } ;
+    }
 
 : strip-io? ( -- ? ) deploy-io get 1 = ;
 
@@ -27,7 +27,7 @@ SYMBOL: deploy-io
 
 SYMBOL: deploy-reflection
 
-: deploy-reflection-options
+CONSTANT: deploy-reflection-options
     {
         { 1 "Level 1 - No reflection" }
         { 2 "Level 2 - Retain word names" }
@@ -35,7 +35,7 @@ SYMBOL: deploy-reflection
         { 4 "Level 4 - Debugger" }
         { 5 "Level 5 - Parser" }
         { 6 "Level 6 - Full environment" }
-    } ;
+    }
 
 : strip-word-names? ( -- ? ) deploy-reflection get 2 < ;
 : strip-prettyprint? ( -- ? ) deploy-reflection get 3 < ;

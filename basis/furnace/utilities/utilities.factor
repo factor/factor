@@ -89,7 +89,7 @@ M: object modify-form drop f ;
         [XML <input type="hidden" value=<-> name=<->/> XML]
     ] [ drop ] if ;
 
-: nested-forms-key "__n" ;
+CONSTANT: nested-forms-key "__n"
 
 : request-params ( request -- assoc )
     dup method>> {
@@ -131,7 +131,7 @@ M: object modify-form drop f ;
 
 SYMBOL: exit-continuation
 
-: exit-with ( value -- )
+: exit-with ( value -- * )
     exit-continuation get continue-with ;
 
 : with-exit-continuation ( quot -- value )

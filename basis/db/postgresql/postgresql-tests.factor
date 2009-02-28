@@ -1,20 +1,13 @@
 USING: kernel db.postgresql alien continuations io classes
 prettyprint sequences namespaces tools.test db db.private
-db.tuples db.types unicode.case accessors system ;
+db.tuples db.types unicode.case accessors system db.tester ;
 IN: db.postgresql.tests
 
-: test-db ( -- postgresql-db )
-    <postgresql-db>
-        "localhost" >>host
-        "postgres" >>username
-        "thepasswordistrust" >>password
-        "factor-test" >>database ;
-
 os windows? cpu x86.64? and [
-    [ ] [ test-db [ ] with-db ] unit-test
+    [ ] [ postgresql-test-db [ ] with-db ] unit-test
 
     [ ] [
-        test-db [
+        postgresql-test-db [
             [ "drop table person;" sql-command ] ignore-errors
             "create table person (name varchar(30), country varchar(30));"
                 sql-command
@@ -30,7 +23,7 @@ os windows? cpu x86.64? and [
             { "Jane" "New Zealand" }
         }
     ] [
-        test-db [
+        postgresql-test-db [
             "select * from person" sql-query
         ] with-db
     ] unit-test
@@ -40,11 +33,11 @@ os windows? cpu x86.64? and [
             { "John" "America" }
             { "Jane" "New Zealand" }
         }
-    ] [ test-db [ "select * from person" sql-query ] with-db ] unit-test
+    ] [ postgresql-test-db [ "select * from person" sql-query ] with-db ] unit-test
 
     [
     ] [
-        test-db [
+        postgresql-test-db [
             "insert into person(name, country) values('Jimmy', 'Canada')"
             sql-command
         ] with-db
@@ -56,10 +49,10 @@ os windows? cpu x86.64? and [
             { "Jane" "New Zealand" }
             { "Jimmy" "Canada" }
         }
-    ] [ test-db [ "select * from person" sql-query ] with-db ] unit-test
+    ] [ postgresql-test-db [ "select * from person" sql-query ] with-db ] unit-test
 
     [
-        test-db [
+        postgresql-test-db [
             [
                 "insert into person(name, country) values('Jose', 'Mexico')" sql-command
                 "insert into person(name, country) values('Jose', 'Mexico')" sql-command
@@ -69,14 +62,14 @@ os windows? cpu x86.64? and [
     ] must-fail
 
     [ 3 ] [
-        test-db [
+        postgresql-test-db [
             "select * from person" sql-query length
         ] with-db
     ] unit-test
 
     [
     ] [
-        test-db [
+        postgresql-test-db [
             [
                 "insert into person(name, country) values('Jose', 'Mexico')"
                 sql-command
@@ -87,7 +80,7 @@ os windows? cpu x86.64? and [
     ] unit-test
 
     [ 5 ] [
-        test-db [
+        postgresql-test-db [
             "select * from person" sql-query length
         ] with-db
     ] unit-test

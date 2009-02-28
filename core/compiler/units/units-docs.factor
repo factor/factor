@@ -67,7 +67,3 @@ HELP: modify-code-heap ( alist -- )
 HELP: compile
 { $values { "words" "a sequence of words" } }
 { $description "Compiles a set of words." } ;
-
-HELP: compile-call
-{ $values { "quot" "a quotation" } }
-{ $description "Compiles and runs a quotation." } ;

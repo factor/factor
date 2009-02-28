@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math.bitwise serial serial.unix ;
+USING: accessors kernel math.bitwise io.serial io.serial.unix ;
 IN: io.serial.unix
 
 : serial-obj ( -- obj )

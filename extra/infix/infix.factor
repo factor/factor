@@ -14,11 +14,8 @@ ERROR: local-not-defined name ;
 M: local-not-defined summary
     drop "local is not defined" ;
 
-: at? ( key assoc -- value/key ? )
-    dupd at* [ nip t ] [ drop f ] if ;
-
 : >local-word ( string -- word )
-    locals get at? [ local-not-defined ] unless ;
+    locals get ?at [ local-not-defined ] unless ;
 
 : select-op ( string -- word )
     {

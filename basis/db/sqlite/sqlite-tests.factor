@@ -123,12 +123,8 @@ hi "HELLO" {
     ] with-db
 ] unit-test
 
-[ ] [
-    test.db [
-        hi create-table
-        hi drop-table
-    ] with-db
-] unit-test
+
+! Test SQLite triggers
 
 TUPLE: show id ;
 TUPLE: user username data ;
@@ -144,12 +140,12 @@ show "SHOW" {
 } define-persistent
 
 watch "WATCH" {
-    { "user" "USER" TEXT +not-null+
-        { +foreign-id+ user "USERNAME" } +user-assigned-id+ }
-    { "show" "SHOW" BIG-INTEGER +not-null+
-        { +foreign-id+ show "ID" } +user-assigned-id+ }
+    { "user" "USER" TEXT +not-null+ +user-assigned-id+
+        { +foreign-id+ user "USERNAME" } }
+    { "show" "SHOW" BIG-INTEGER +not-null+ +user-assigned-id+
+        { +foreign-id+ show "ID" } }
 } define-persistent
-
+    
 [ T{ user { username "littledan" } { data "foo" } } ] [
     test.db [
         user create-table
@@ -160,7 +156,7 @@ watch "WATCH" {
         show new insert-tuple
         show new select-tuple
         "littledan" f user boa select-tuple
-        swap [ username>> ] [ id>> ] bi*
+        [ id>> ] [ username>> ] bi*
         watch boa insert-tuple
         watch new select-tuple
         user>> f user boa select-tuple
