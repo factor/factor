@@ -488,7 +488,7 @@ PRIVATE>
     V{ } clone [ [ push ] curry compose ] keep ; inline
 
 : produce-as ( pred quot tail exemplar -- seq )
-    [ swap accumulator [ swap while ] dip ] dip like ; inline
+    [ [ accumulator [ while ] dip ] dip dip ] dip like ; inline
 
 : produce ( pred quot tail -- seq )
     { } produce-as ; inline

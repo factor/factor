@@ -55,7 +55,7 @@ PRIVATE>
 : randomize ( seq -- seq )
     dup length [ dup 1 > ]
     [ [ random ] [ 1- ] bi [ pick exchange ] keep ]
-    [ ] while drop ;
+    while drop ;
 
 : delete-random ( seq -- elt )
     [ length random-integer ] keep [ nth ] 2keep delete-nth ;
