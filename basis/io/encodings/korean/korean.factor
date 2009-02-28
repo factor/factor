@@ -77,13 +77,22 @@ VALUE: johab-table
     [ HEX: E0 HEX: F9 between? ]
     tri { } 3sequence [ t? ] any? ;
 
-M:: johab encode-char ( char stream encoding -- )
-    char unicode>johab byte?
-    [ char 1byte-array stream stream-write ] [
-        char unicode>johab
+:: encode-char-mb ( c stream quot-conv: ( c -- c2 ) quot-mb?: ( c -- ? ) -- )
+    c quot-conv call quot-mb? call
+    [
+        c quot-conv call
         h>b/b swap 2byte-array
         stream stream-write
-    ] if ;
+    ]
+    [ c 1byte-array stream drop drop
+      stream-write
+    ]
+    if ;
+    
+
+M: johab encode-char ( char stream encoding -- )
+    drop [ unicode>johab ] [ byte? not ] encode-char-mb ;
+
 
 : johab-decode-char-step2 ( c stream -- char )
     stream-read1
