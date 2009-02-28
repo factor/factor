@@ -122,7 +122,7 @@ SYMBOL: *iso2022kr-status*
 H{ } *iso2022kr-status* set-global
 
 : iso2022kr-stream-get-status ( stream -- so/si/f )
-    *iso2022kr-status* get-global swap at ;
+    *iso2022kr-status* get-global at ;
 
 : iso2022kr-stream-get-status* ( stream -- so/si )
     iso2022kr-stream-get-status
@@ -131,8 +131,6 @@ H{ } *iso2022kr-status* set-global
 :: iso2022kr-stream-set-status ( stream so/si -- )
     so/si stream *iso2022kr-status* get-global set-at ;
 
-: iso2022kr-stream-shift-out? ( stream -- ? )
-    iso2022kr-stream-get-status* shift-out = ;
 
 
 M: iso2022kr encode-char ( char stream encoding -- )
@@ -142,15 +140,21 @@ M: iso2022kr encode-char ( char stream encoding -- )
         char unicode>cp949 byte?
         [
             ! if <SO> written, then enclose with <SI>.
-            stream iso2022kr-stream-shift-out?
-            [ shift-in 1byte-array stream stream-write ] [ ] if
+            stream iso2022kr-stream-get-status shift-out =
+            [
+                shift-in 1byte-array stream stream-write
+                stream shift-in iso2022kr-stream-set-status
+            ] [ ] if
             ! plain ascii
             char 1byte-array stream stream-write
         ]
         [
             ! if <SO> is closed, then start it.
-            stream iso2022kr-stream-shift-out? not
-            [ shift-out 1byte-array stream stream-write ] [ ] if
+            stream iso2022kr-stream-get-status [ shift-in = ] [ f = ] bi or
+            [
+                shift-out 1byte-array stream stream-write
+                stream shift-out iso2022kr-stream-set-status
+            ] [ ] if
             !
             char unicode>cp949 h>b/b swap 2byte-array
             ! GR -> GL
@@ -160,6 +164,44 @@ M: iso2022kr encode-char ( char stream encoding -- )
         ] if
     ] ;
 
+
+M: iso2022kr decode-char ( stream encoding -- char/f )
+    drop
+    [let | stream [ ]
+           c1! [ 0 ]
+           c2! [ 0 ] |
+        stream stream-read1 c1!
+        {
+            ! EOF
+            { [ c1 not ] [ f ] }
+            ! designator -- ignore
+            { [ c1 designator = ] [ replacement-char ] }
+            ! <SO>
+            {
+                [ c1 shift-out = ]
+                [
+                    stream shift-out iso2022kr-stream-set-status
+                    replacement-char
+                ]
+            }
+            ! <SI>
+            {
+                [ c1 shift-in = ]
+                [
+                    stream shift-in iso2022kr-stream-set-status
+                    replacement-char
+                ]
+            }
+            !
+            [
+                stream iso2022kr-stream-get-status shift-out =
+                [
+                    stream stream-read1 c2!
+                    c1 c2 2byte-array be> cp949>unicode
+                ]
+                [ c1 ] if
+            ]
+        } cond ] ;
 
 
 
