@@ -224,7 +224,7 @@ $io-error ;
 ARTICLE: "stream-protocol" "Stream protocol"
 "The stream protocol consists of a large number of generic words, many of which are optional."
 $nl
-"Stream protocol words are rarely called directly, since code which only works with one stream at a time should be written use " { $link "stdio" } " instead, wrapping I/O operations such as " { $link read } " and " { $link write } " in " { $link with-input-stream } " and " { $link with-output-stream } "."
+"Stream protocol words are rarely called directly, since code which only works with one stream at a time should be written to use " { $link "stdio" } " instead, wrapping I/O operations such as " { $link read } " and " { $link write } " in " { $link with-input-stream } " and " { $link with-output-stream } "."
 $nl
 "All streams must implement the " { $link dispose } " word in addition to the stream protocol."
 $nl

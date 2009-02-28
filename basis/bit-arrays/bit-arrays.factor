@@ -78,7 +78,7 @@ M: bit-array byte-length length 7 + -3 shift ;
         [ dup 0 = ] [
             [ pick underlying>> pick set-alien-unsigned-1 ] keep
             [ 1+ ] [ -8 shift ] bi*
-        ] [ ] until 2drop
+        ] until 2drop
     ] if ;
 
 : bit-array>integer ( bit-array -- n )

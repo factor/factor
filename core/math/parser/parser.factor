@@ -96,7 +96,7 @@ PRIVATE>
 
 : positive>base ( num radix -- str )
     dup 1 <= [ "Invalid radix" throw ] when
-    [ dup 0 > ] swap [ /mod >digit ] curry [ ] "" produce-as nip
+    [ dup 0 > ] swap [ /mod >digit ] curry "" produce-as nip
     dup reverse-here ; inline
 
 PRIVATE>

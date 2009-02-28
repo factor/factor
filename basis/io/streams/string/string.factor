@@ -1,17 +1,11 @@
-! Copyright (C) 2003, 2009 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io kernel math namespaces sequences sbufs
-strings generic splitting continuations destructors
-io.streams.plain io.encodings math.order growable ;
+strings generic splitting continuations destructors sequences.private
+io.streams.plain io.encodings math.order growable io.streams.sequence ;
 IN: io.streams.string
 
 <PRIVATE
-
-: harden-as ( seq growble-exemplar -- newseq )
-    underlying>> like ;
-
-: growable-read-until ( growable n -- str )
-    >fixnum dupd tail-slice swap harden-as dup reverse-here ;
 
 SINGLETON: null-encoding
 
@@ -32,34 +26,18 @@ M: growable stream-flush drop ;
     <string-writer> swap [ output-stream get ] compose with-output-stream*
     >string ; inline
 
-M: growable stream-read1 [ f ] [ pop ] if-empty ;
+! New implementation
 
-: find-last-sep ( seq seps -- n )
-    swap [ memq? ] curry find-last drop ;
+TUPLE: string-reader { underlying string read-only } { i array-capacity } ;
 
-M: growable stream-read-until
-    [ find-last-sep ] keep over [
-        [ swap 1+ growable-read-until ] 2keep [ nth ] 2keep
-        set-length
-    ] [
-        [ swap drop 0 growable-read-until f like f ] keep
-        delete-all
-    ] if ;
-
-M: growable stream-read
-    [
-        drop f
-    ] [
-        [ length swap - 0 max ] keep
-        [ swap growable-read-until ] 2keep
-        set-length
-    ] if-empty ;
-
-M: growable stream-read-partial
-    stream-read ;
+M: string-reader stream-read-partial stream-read ;
+M: string-reader stream-read sequence-read ;
+M: string-reader stream-read1 sequence-read1 ;
+M: string-reader stream-read-until sequence-read-until ;
+M: string-reader dispose drop ;
 
 : <string-reader> ( str -- stream )
-    >sbuf dup reverse-here null-encoding <decoder> ;
+    0 string-reader boa null-encoding <decoder> ;
 
 : with-string-reader ( str quot -- )
     [ <string-reader> ] dip with-input-stream ; inline

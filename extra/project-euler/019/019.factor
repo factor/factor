@@ -53,7 +53,7 @@ IN: project-euler.019
 : first-days ( end-date start-date -- days )
     [ 2dup after=? ]
     [ dup 1 months time+ swap day-of-week ]
-    [ ] produce 2nip ;
+    produce 2nip ;
 
 PRIVATE>
 

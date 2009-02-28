@@ -78,7 +78,7 @@ PRIVATE>
 : full-depth-first ( graph pre post tail -- ? )
     '[ [ visited? get [ nip not ] assoc-find ] 
        [ drop _ _ (depth-first) @ ] 
-       [ 2drop ] while ] swap search-wrap ; inline
+       while 2drop ] swap search-wrap ; inline
 
 : dag? ( graph -- ? )
     V{ } clone swap [ 2dup swap push dupd

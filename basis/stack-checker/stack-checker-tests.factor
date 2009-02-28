@@ -512,9 +512,9 @@ ERROR: custom-error ;
 [ [ missing->r-check ] infer ] must-fail
 
 ! Corner case
-[ [ [ f dup ] [ dup ] [ ] produce ] infer ] must-fail
+[ [ [ f dup ] [ dup ] produce ] infer ] must-fail
 
-[ [ [ f dup ] [ ] [ ] while ] infer ] must-fail
+[ [ [ f dup ] [ ] while ] infer ] must-fail
 
 : erg's-inference-bug ( -- ) f dup [ erg's-inference-bug ] when ; inline
 
