@@ -159,9 +159,7 @@ M: winnt file-system-info ( path -- file-system-info )
     find-first-volume
     [
         '[
-            [ _ find-next-volume dup ]
-            [ ]
-            [ drop ] produce
+            [ _ find-next-volume dup ] [ ] produce nip
             swap prefix
         ]
     ] [ '[ _ FindVolumeClose win32-error=0/f ] ] bi [ ] cleanup ;

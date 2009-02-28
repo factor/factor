@@ -667,12 +667,11 @@ ARTICLE: "looping-combinators" "Looping combinators"
 "In most cases, loops should be written using high-level combinators (such as " { $link "sequences-combinators" } ") or tail recursion. However, sometimes, the best way to express intent is with a loop."
 { $subsection while }
 { $subsection until }
-$nl
 "To execute one iteration of a loop, use the following word:"
 { $subsection do }
 "This word is intended as a modifier. The normal " { $link while } " loop never executes the body if the predicate returns first on the first iteration. To ensure the body executes at least once, use " { $link do } ":"
 { $code
-    "[ P ] [ Q ] [ T ] do while"
+    "[ P ] [ Q ] do while"
 }
 "A simpler looping combinator which executes a single quotation until it returns " { $link f } ":"
 { $subsection loop } ;
