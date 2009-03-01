@@ -337,7 +337,7 @@ TUPLE: solid dimension silhouettes
 : compute-adjacencies ( solid -- solid )
     dup dimension>> [ >= ] curry 
     [ keep swap ] curry MAX-FACE-PER-CORNER swap
-    [ [ test-faces-combinaisons ] 2keep 1- ] [ ] while drop ;
+    [ [ test-faces-combinaisons ] 2keep 1- ] while drop ;
 
 : find-adjacencies ( solid -- solid ) 
     erase-old-adjacencies   

@@ -487,14 +487,14 @@ PRIVATE>
 : accumulator ( quot -- quot' vec )
     V{ } clone [ [ push ] curry compose ] keep ; inline
 
-: produce-as ( pred quot tail exemplar -- seq )
-    [ swap accumulator [ swap while ] dip ] dip like ; inline
+: produce-as ( pred quot exemplar -- seq )
+    [ accumulator [ while ] dip ] dip like ; inline
 
-: produce ( pred quot tail -- seq )
+: produce ( pred quot -- seq )
     { } produce-as ; inline
 
 : follow ( obj quot -- seq )
-    [ dup ] swap [ keep ] curry [ ] produce nip ; inline
+    [ dup ] swap [ keep ] curry produce nip ; inline
 
 : prepare-index ( seq quot -- seq n quot )
     [ dup length ] dip ; inline

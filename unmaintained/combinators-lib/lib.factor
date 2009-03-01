@@ -126,12 +126,9 @@ MACRO: multikeep ( word out-indexes -- ... )
         r> [ drop \ r> , ] each
     ] [ ] make ;
 
-: do-while ( pred body tail -- )
-    [ tuck 2slip ] dip while ; inline
-
 : generate ( generator predicate -- obj )
-    '[ dup @ dup [ nip ] unless not ]
-    swap [ ] do-while ;
+    '[ dup @ dup [ nip ] unless ]
+    swap do until ;
 
 MACRO: predicates ( seq -- quot/f )
     dup [ 1quotation [ drop ] prepend ] map

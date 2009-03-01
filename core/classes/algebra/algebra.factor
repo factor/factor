@@ -210,7 +210,7 @@ M: anonymous-complement (classes-intersect?)
     [ [ name>> ] compare ] sort >vector
     [ dup empty? not ]
     [ dup largest-class [ over delete-nth ] dip ]
-    [ ] produce nip ;
+    produce nip ;
 
 : min-class ( class seq -- class/f )
     over [ classes-intersect? ] curry filter

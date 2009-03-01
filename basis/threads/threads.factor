@@ -115,7 +115,7 @@ DEFER: stop
     sleep-queue
     [ dup expire-sleep? ]
     [ dup heap-pop drop expire-sleep ]
-    [ ] while
+    while
     drop ;
 
 : start ( namestack thread -- * )
