@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors sequences ui ui.gadgets ui.gadgets.buttons
-ui.baseline-alignment ui.render ;
+USING: accessors arrays colors.constants combinators kernel
+opengl sequences ui ui.baseline-alignment ui.gadgets
+ui.gadgets.buttons ui.gadgets.labels ui.pens ui.render ui.text ;
 IN: ui.gadgets.debug
 
 TUPLE: baseline-gadget < gadget baseline cap-height ;
@@ -35,3 +36,16 @@ M: bad-gadget pref-dim* drop { 100 100 } ;
 : bad-gadget-test ( -- )
     <bad-button> "Test 1" open-window
     <bad-gadget> "Test 2" open-window ;
+
+SINGLETON: metrics-paint
+
+M: metrics-paint draw-boundary
+    drop
+    COLOR: red gl-color
+    [ dim>> ] [ >label< line-metrics ] bi
+    [ [ first ] [ ascent>> ] bi* [ nip 0 swap 2array ] [ 2array ] 2bi gl-line ]
+    [ drop gl-rect ]
+    2bi ;
+
+: <metrics-gadget> ( text font -- gadget )
+    [ <label> ] dip >>font metrics-paint >>boundary ;
