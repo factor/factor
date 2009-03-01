@@ -103,31 +103,24 @@ VALUE: euc-0212-table
     [ euc-0201-table u>n ]
     [ euc-0208-table u>n ]
     [ euc-0212-table u>n ]
-    tri 3array harvest first
-    ;
-
-:: eucjp>unicode ( n -- u )
-    n
-    [ euc-0201-table n>u ]
-    [ euc-0208-table n>u ]
-    [ euc-0212-table n>u ]
     tri 3array harvest
     dup length zero?
-    [ drop replacement-char ]
-    [ first ]
-    if ;
-
+    [ drop f ]
+    [ first ] if ;
 
 M: eucjp encode-char ( c stream encoding -- )
     drop
     [let | stream [ ]
            c [ ] |
-        c unicode>eucjp small?
+        c unicode>eucjp [ c ] unless*
+        ! FIXME: ???
+        drop t ! ascii? ! ] [ HEX: 20 HEX: 7E between? ] bi or
         [
             c stream stream-write1
         ]
         [
             c unicode>eucjp
+            HEX: 8080 +
             h>b/b 2byte-array stream stream-write
         ]
         if
@@ -155,8 +148,10 @@ M: eucjp decode-char ( stream encoding -- char/f )
                         ! 0208, 0212
                         c1 c2 2byte-array be> HEX: 8080 -
                         [ euc-0208-table n>u ]
-                        [ euc-0212-table n>u ] bi 2array harvest first
-                        [ replacement-char ] unless*
+                        [ euc-0212-table n>u ] bi 2array harvest
+                        dup length zero?
+                        [ drop replacement-char ]
+                        [ first ] if
                     ] if
                 ]
                 [ replacement-char ] if
