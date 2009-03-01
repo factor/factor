@@ -36,7 +36,7 @@ PRIVATE>
 
 : all-users ( -- seq )
     [
-        [ getpwent dup ] [ passwd>new-passwd ] [ drop ] produce
+        [ getpwent dup ] [ passwd>new-passwd ] produce nip
     ] with-pwent ;
 
 SYMBOL: user-cache

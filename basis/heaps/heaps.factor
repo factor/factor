@@ -190,7 +190,7 @@ M: heap heap-pop ( heap -- value key )
 : heap-pop-all ( heap -- alist )
     [ dup heap-empty? not ]
     [ dup heap-pop swap 2array ]
-    [ ] produce nip ;
+    produce nip ;
 
 : slurp-heap ( heap quot: ( elt -- ) -- )
     over heap-empty? [ 2drop ] [

@@ -25,9 +25,11 @@ SINGLETON: solaris
 SINGLETON: macosx
 SINGLETON: linux
 
+SINGLETON: haiku
+
 UNION: bsd freebsd netbsd openbsd macosx ;
 
-UNION: unix bsd solaris linux ;
+UNION: unix bsd solaris linux haiku ;
 
 : os ( -- class ) \ os get-global ; foldable
 
@@ -51,6 +53,7 @@ UNION: unix bsd solaris linux ;
         { "solaris" solaris }
         { "macosx" macosx }
         { "linux" linux }
+        { "haiku" haiku }
     } at ;
 
 PRIVATE>

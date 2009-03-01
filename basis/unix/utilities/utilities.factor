@@ -14,7 +14,7 @@ IN: unix.utilities
 : alien>strings ( alien encoding -- strings )
     [ [ dup more? ] ] dip
     '[ [ advance ] [ *void* _ alien>string ] bi ]
-    [ ] produce nip ;
+    produce nip ;
 
 : strings>alien ( strings encoding -- array )
     '[ _ malloc-string ] void*-array{ } map-as f suffix ;
