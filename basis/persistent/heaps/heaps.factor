@@ -98,6 +98,6 @@ M: branch pheap-push
     <persistent-heap> swap [ rot pheap-push ] assoc-each ;
 
 : pheap>alist ( heap -- alist )
-    [ dup pheap-empty? not ] [ pheap-pop 2array ] [ ] produce nip ;
+    [ dup pheap-empty? not ] [ pheap-pop 2array ] produce nip ;
 
 : pheap>values ( heap -- seq ) pheap>alist keys ;

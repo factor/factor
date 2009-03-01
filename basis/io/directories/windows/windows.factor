@@ -61,7 +61,7 @@ M: windows (directory-entries) ( path -- seq )
         '[
             [ _ find-next-file dup ]
             [ >directory-entry ]
-            [ drop ] produce
+            produce nip
             over name>> "." = [ nip ] [ swap prefix ] if
         ]
     ] [ '[ _ FindClose win32-error=0/f ] ] bi [ ] cleanup ;

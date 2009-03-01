@@ -12,7 +12,7 @@ base64 ;
 IN: http
 
 : (read-header) ( -- alist )
-    [ read-crlf dup f like ] [ parse-header-line ] [ drop ] produce ;
+    [ read-crlf dup f like ] [ parse-header-line ] produce nip ;
 
 : collect-headers ( assoc -- assoc' )
     H{ } clone [ '[ _ push-at ] assoc-each ] keep ;
