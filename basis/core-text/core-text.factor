@@ -46,7 +46,7 @@ ERROR: not-a-string object ;
         CTLineCreateWithAttributedString
     ] with-destructors ;
 
-TUPLE: line font line metrics image loc dim disposed ;
+TUPLE: line line metrics image loc dim disposed ;
 
 : typographic-bounds ( line -- width ascent descent leading )
     0 <CGFloat> 0 <CGFloat> 0 <CGFloat>
@@ -86,11 +86,14 @@ TUPLE: line font line metrics image loc dim disposed ;
     [ f CTLineGetOffsetForStringIndex round ] bi-curry@ bi
     [ drop nip 0 ] [ swap - swap second ] 3bi <CGRect> ;
 
+: CGRect-translate-x ( CGRect x -- CGRect' )
+    [ dup CGRect-x ] dip - over set-CGRect-x ;
+
 :: fill-selection-background ( context loc dim line string -- )
     string selection? [
         context string color>> >rgba-components CGContextSetRGBFillColor
         context dim line string selection-rect
-        dup CGRect-x loc first - over set-CGRect-x
+        loc first CGRect-translate-x
         CGContextFillRect
     ] when ;
 
@@ -106,7 +109,7 @@ TUPLE: line font line metrics image loc dim disposed ;
 
 :: <line> ( font string -- line )
     [
-        [let* | open-font [ font cache-font CFRetain |CFRelease ]
+        [let* | open-font [ font cache-font ]
                 line [ string open-font font foreground>> <CTLine> |CFRelease ]
 
                 rect [ line line-rect ]
@@ -117,7 +120,7 @@ TUPLE: line font line metrics image loc dim disposed ;
                 ext [ (loc) (dim) [ + ceiling ] 2map ]
                 dim [ ext loc [ - >integer ] 2map ]
                 metrics [ open-font line compute-line-metrics ] |
-            open-font line metrics
+            line metrics
             dim [
                 {
                     [ font dim fill-background ]
@@ -132,7 +135,7 @@ TUPLE: line font line metrics image loc dim disposed ;
         f line boa
     ] with-destructors ;
 
-M: line dispose* [ font>> CFRelease ] [ line>> CFRelease ] bi ;
+M: line dispose* line>> CFRelease ;
 
 SYMBOL: cached-lines
 
