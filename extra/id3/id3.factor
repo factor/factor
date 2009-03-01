@@ -115,7 +115,7 @@ TUPLE: id3v1-info title artist album year comment genre ;
 : read-frames ( mmap -- frames )
     [ dup read-frame dup ]
     [ [ remove-frame ] keep ]
-    [ drop ] produce nip ;
+    produce 2nip ;
     
 ! header stuff
 

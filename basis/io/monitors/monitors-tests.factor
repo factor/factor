@@ -101,13 +101,13 @@ os { winnt linux macosx } member? [
         ! Non-recursive
         [ ] [ "monitor-timeout-test" temp-file f <monitor> "m" set ] unit-test
         [ ] [ 3 seconds "m" get set-timeout ] unit-test
-        [ [ t ] [ "m" get next-change drop ] [ ] while ] must-fail
+        [ [ t ] [ "m" get next-change drop ] while ] must-fail
         [ ] [ "m" get dispose ] unit-test
 
         ! Recursive
         [ ] [ "monitor-timeout-test" temp-file t <monitor> "m" set ] unit-test
         [ ] [ 3 seconds "m" get set-timeout ] unit-test
-        [ [ t ] [ "m" get next-change drop ] [ ] while ] must-fail
+        [ [ t ] [ "m" get next-change drop ] while ] must-fail
         [ ] [ "m" get dispose ] unit-test
     ] with-monitors
 ] when

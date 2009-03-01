@@ -40,7 +40,7 @@ IN: project-euler.071
 PRIVATE>
 
 : euler071 ( -- answer )
-    2/5 [ dup denominator 1000000 <= ] [ 3/7 mediant dup ] [ ] produce
+    2/5 [ dup denominator 1000000 <= ] [ 3/7 mediant dup ] produce
     nip penultimate numerator ;
 
 ! [ euler071 ] 100 ave-time

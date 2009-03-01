@@ -35,7 +35,7 @@ IN: project-euler.148
     dup 1+ * 2/ ; inline
 
 : >base7 ( x -- y )
-    [ dup 0 > ] [ 7 /mod ] [ ] produce nip ;
+    [ dup 0 > ] [ 7 /mod ] produce nip ;
 
 : (use-digit) ( prev x index -- next )
     [ [ 1+ * ] [ sum-1toN 7 sum-1toN ] bi ] dip ^ * + ;

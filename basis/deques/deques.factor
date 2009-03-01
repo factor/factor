@@ -36,6 +36,6 @@ GENERIC: deque-empty? ( deque -- ? )
 : slurp-deque ( deque quot -- )
     [ drop '[ _ deque-empty? not ] ]
     [ '[ _ pop-back @ ] ]
-    2bi [ ] while ; inline
+    2bi while ; inline
 
 MIXIN: deque
