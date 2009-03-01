@@ -92,7 +92,7 @@ MEMO: (cache-font-description) ( font -- description )
     [
         [ pango_font_description_new |pango_font_description_free ] dip {
             [ name>> pango_font_description_set_family ]
-            [ size>> PANGO_SCALE * >integer pango_font_description_set_size ]
+            [ size>> float>pango pango_font_description_set_size ]
             [ bold?>> PANGO_WEIGHT_BOLD PANGO_WEIGHT_NORMAL ? pango_font_description_set_weight ]
             [ italic?>> PANGO_STYLE_ITALIC PANGO_STYLE_NORMAL ? pango_font_description_set_style ]
             [ drop ]

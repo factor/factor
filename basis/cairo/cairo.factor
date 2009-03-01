@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: colors fonts cairo.ffi alien alien.c-types kernel accessors
 sequences namespaces fry continuations destructors math images
-images.memory ;
+images.memory math.rectangles ;
 IN: cairo
 
 ERROR: cairo-error message ;
@@ -60,3 +60,8 @@ ERROR: cairo-error message ;
 
 : set-source-color ( cr color -- )
     >rgba-components cairo_set_source_rgba ;
+
+: fill-rect ( cr rect -- )
+    [ rect-bounds [ first2 ] bi@ cairo_rectangle ]
+    [ drop cairo_fill ]
+    2bi ;

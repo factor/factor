@@ -5,7 +5,7 @@
 ! pangocairo bindings, from pango/pangocairo.h
 USING: cairo.ffi alien.c-types math alien.syntax system destructors
 memoize accessors kernel combinators alien arrays fonts pango
-pango.fonts ;
+pango.fonts namespaces ;
 IN: pango.cairo
 
 << "pangocairo" {
@@ -89,8 +89,21 @@ pango_cairo_layout_path ( cairo_t* cr, PangoLayout* layout ) ;
 FUNCTION: void
 pango_cairo_error_underline_path ( cairo_t* cr, double x, double y, double width, double height ) ;
 
+SYMBOL: dpi
+
+72 dpi set-global
+
+: dummy-pango-context ( -- context )
+    \ dummy-pango-context [
+        pango_context_new
+    ] initialize-alien ;
+
 MEMO: (cache-font) ( font -- open-font )
-    [ pango_cairo_font_map_get_default dummy-pango-context ] dip
+    [
+        pango_cairo_font_map_get_default
+        dup dpi get pango_cairo_font_map_set_resolution
+        dummy-pango-context
+    ] dip
     cache-font-description
     pango_font_map_load_font ;
 
@@ -102,9 +115,9 @@ MEMO: (cache-font) ( font -- open-font )
 
 : parse-font-metrics ( metrics -- metrics' )
     [ metrics new ] dip
-    [ pango_font_metrics_get_ascent PANGO_SCALE /f >>height ]
-    [ pango_font_metrics_get_descent PANGO_SCALE /f >>descent ] bi
-    dup [ height>> ] [ descent>> ] bi - >>ascent ;
+    [ pango_font_metrics_get_ascent pango>float >>ascent ]
+    [ pango_font_metrics_get_descent pango>float >>descent ] bi
+    compute-height ;
 
 MEMO: (cache-font-metrics) ( font -- metrics )
     [ get-font-metrics parse-font-metrics ] with-destructors ;
