@@ -4,7 +4,7 @@ USING: sequences kernel io io.files combinators.short-circuit
 math.order values assocs io.encodings io.binary fry strings math
 io.encodings.ascii arrays byte-arrays accessors splitting
 math.parser biassocs io.encodings.iana io.encodings.asian
-locals ;
+locals multiline combinators ;
 IN: io.encodings.japanese
 
 SINGLETON: shift-jis
@@ -136,17 +136,33 @@ M: eucjp encode-char ( c stream encoding -- )
 M: eucjp decode-char ( stream encoding -- char/f )
     drop
     [let | stream [ ]
-           c1! [ 0 ] |
+           c1! [ 0 ]
+           c2! [ 0 ] |
         stream stream-read1 c1!
-        c1 small?
-        [ c1 ]
+        c1
         [
-            c1
-            stream stream-read1
-            2byte-array be>
-            eucjp>unicode
+            c1 HEX: 20 HEX: 7E between?
+            [ c1 euc-0201-table n>u ]
+            [
+                stream stream-read1 c2!
+                c2
+                [
+                    c1 HEX: 8E =
+                    [
+                        c2 euc-0201-table n>u
+                    ] ! 0201
+                    [
+                        ! 0208, 0212
+                        c1 c2 2byte-array be> HEX: 8080 -
+                        [ euc-0208-table n>u ]
+                        [ euc-0212-table n>u ] bi 2array harvest first
+                        [ replacement-char ] unless*
+                    ] if
+                ]
+                [ replacement-char ] if
+            ] if
         ]
-        if
+        [ f ] if
     ] ;
 
 
