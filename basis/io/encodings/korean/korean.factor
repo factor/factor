@@ -197,8 +197,9 @@ M: iso2022kr decode-char ( stream encoding -- char/f )
                 stream iso2022kr-stream-get-status shift-out =
                 [
                     stream stream-read1 c2!
-                    c1 c2 2byte-array be> cp949>unicode
-                    GL>GR at
+                    c1 c2 2byte-array
+                    [ GL>GR at ] map
+                    be> cp949>unicode                    
                 ]
                 [ c1 ] if
             ]
