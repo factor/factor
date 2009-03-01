@@ -3,7 +3,8 @@
 USING: sequences kernel io io.files combinators.short-circuit
 math.order values assocs io.encodings io.binary fry strings math
 io.encodings.ascii arrays byte-arrays accessors splitting
-math.parser biassocs io.encodings.iana ;
+math.parser biassocs io.encodings.iana io.encodings.asian
+locals ;
 IN: io.encodings.japanese
 
 SINGLETON: shift-jis
@@ -13,6 +14,11 @@ shift-jis "Shift_JIS" register-encoding
 SINGLETON: windows-31j
 
 windows-31j "Windows-31J" register-encoding
+
+SINGLETON: eucjp
+
+! eucjp "EUCJP" register-encoding
+
 
 <PRIVATE
 
@@ -25,6 +31,8 @@ VALUE: windows-31j-table
 
 M: windows-31j <encoder> drop windows-31j-table <encoder> ;
 M: windows-31j <decoder> drop windows-31j-table <decoder> ;
+
+
 
 TUPLE: jis assoc ;
 
@@ -47,8 +55,10 @@ TUPLE: jis assoc ;
 "vocab:io/encodings/japanese/CP932.txt"
 make-jis to: windows-31j-table
 
+
 "vocab:io/encodings/japanese/sjis-0208-1997-std.txt"
 make-jis to: shift-jis-table
+
 
 : small? ( char -- ? )
     ! ASCII range or single-byte halfwidth katakana
@@ -71,5 +81,74 @@ M: jis decode-char
             [ 2drop replacement-char ] if*
         ] if
     ] [ 2drop f ] if* ;
+
+
+! EUC-JP
+
+VALUE: euc-0201-table
+
+VALUE: euc-0208-table
+
+VALUE: euc-0212-table
+
+"vocab:io/encodings/japanese/euc-0201.txt" <code-table>* to: euc-0201-table
+
+"vocab:io/encodings/japanese/euc-0208.txt" <code-table>* to: euc-0208-table
+
+"vocab:io/encodings/japanese/euc-0212.txt" <code-table>* to: euc-0212-table
+
+
+:: unicode>eucjp ( u -- n )
+    u
+    [ euc-0201-table u>n ]
+    [ euc-0208-table u>n ]
+    [ euc-0212-table u>n ]
+    tri 3array harvest first
+    ;
+
+:: eucjp>unicode ( n -- u )
+    n
+    [ euc-0201-table n>u ]
+    [ euc-0208-table n>u ]
+    [ euc-0212-table n>u ]
+    tri 3array harvest
+    dup length zero?
+    [ drop replacement-char ]
+    [ first ]
+    if ;
+
+
+M: eucjp encode-char ( c stream encoding -- )
+    drop
+    [let | stream [ ]
+           c [ ] |
+        c unicode>eucjp small?
+        [
+            c stream stream-write1
+        ]
+        [
+            c unicode>eucjp
+            h>b/b 2byte-array stream stream-write
+        ]
+        if
+    ] ;
+
+M: eucjp decode-char ( stream encoding -- char/f )
+    drop
+    [let | stream [ ]
+           c1! [ 0 ] |
+        stream stream-read1 c1!
+        c1 small?
+        [ c1 ]
+        [
+            c1
+            stream stream-read1
+            2byte-array be>
+            eucjp>unicode
+        ]
+        if
+    ] ;
+
+
 
 PRIVATE>
