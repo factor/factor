@@ -1,6 +1,6 @@
 USING: accessors assocs bson.constants byte-arrays byte-vectors fry io
 io.binary io.encodings.string io.encodings.utf8 kernel math namespaces
-sequences serialize ;
+sequences serialize arrays ;
 
 IN: bson.reader
 
@@ -175,6 +175,11 @@ M: bson-binary element-data-read ( type -- binary )
 M: bson-null element-data-read ( type -- bf  )
     drop
     f ;
+
+M: bson-oid element-data-read ( type -- oid )
+    drop
+    read-longlong
+    read-int32 oid boa ;
 
 M: bson-binary-custom element-binary-read ( size type -- dbref )
     2drop

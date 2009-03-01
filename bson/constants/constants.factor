@@ -1,11 +1,13 @@
-USING: accessors constructors uuid ;
+USING: accessors kernel uuid ;
 
 IN: bson.constants
 
 TUPLE: objid id ;
 
-CONSTRUCTOR: objid ( -- objid )
-   uuid1 >>id ; inline
+: <objid> ( -- objid )
+   objid new uuid1 >>id ; inline
+
+TUPLE: oid { a initial: 0 } { b initial: 0 } ;
 
 TUPLE: objref ns objid ;
 

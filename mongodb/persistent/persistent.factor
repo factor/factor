@@ -1,6 +1,6 @@
 USING: accessors assocs classes fry kernel linked-assocs math mirrors
 namespaces sequences strings vectors words bson.constants 
-continuations mongodb.tuple ;
+continuations mongodb.driver mongodb.tuple ;
 
 IN: mongodb.persistent
 
@@ -18,10 +18,10 @@ DEFER: create-mdb-command
 
 <PRIVATE
 
-CONSTANT: MDB_INFO "_mdb_info"
+CONSTANT: MDB_INFO "_mdb_"
 
 : <objref> ( tuple -- objref )
-    [ mdb-collection>> ] [ _id>> ] bi objref boa ; inline
+    [ mdb-collection-prop ] [ _id>> ] bi objref boa ; inline
 
 : mdbinfo>tuple-class ( mdbinfo -- class )
     [ first ] keep second lookup ; inline

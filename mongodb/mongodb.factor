@@ -1,7 +1,8 @@
-USING: accessors assocs fry io.encodings.binary io.sockets kernel math
-math.parser namespaces sequences splitting
-mongodb.connection mongodb.persistent mongodb.msg mongodb.query
-mongodb.tuple ;
+USING: accessors assocs combinators fry io.encodings.binary
+io.sockets kernel math math.parser mongodb.driver
+mongodb.msg mongodb.operations mongodb.persistent
+mongodb.tuple namespaces
+sequences splitting ;
 
 IN: mongodb
 
@@ -18,29 +19,32 @@ GENERIC: explain ( object -- object )
     [ mdb-collection>> get-collection-fqn ] keep
     H{ } tuple>query <mdb-query-msg> ; inline
 
+TUPLE: mdb-result { cursor integer }
+{ start# integer }
+{ returned# integer }
+{ objects sequence } ;
+
+: build-result ( resultmsg -- mdb-result )
+    [ mdb-result new ] dip
+    {
+        [ cursor>> >>cursor ]
+        [ start#>> >>start# ]
+        [ returned#>> >>returned# ]
+        [ objects>> [ assoc>tuple ] map >>objects ]
+    } cleave ;
+
 PRIVATE>
-
-
-: <mdb> ( db host port -- mdb )
-    (<mdb>) ;
 
 M: mdb-persistent store ( tuple --  )
     prepare-store ! H { collection { ... values ... } 
     [ [ get-collection-fqn ] dip
-      values <mdb-insert-msg>      
-      [ mdb>> master>> binary ] dip '[ _ write-message ] with-client   
+      values <mdb-insert-msg> send-message     
     ] assoc-each  ;
 
 M: mdb-persistent find ( example -- result )
-    prepare-find [ mdb>> master>> ] dip (find)
+    prepare-find [ mdb>> master>> ] dip send-query
     build-result ;
 
 M: mdb-persistent nfind ( example n -- result )
     [ prepare-find ] dip >>return#
-    [ mdb>> master>> ] dip (find)
-    build-result ;
-
-M: mdb-persistent explain ( example -- result )
-    prepare-find [ query>> [ t "$explain" ] dip  set-at ] keep
-    [ mdb>> master>> ] dip (find-one)
-    build-result ; 
+    send-query build-result ;
