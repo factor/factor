@@ -7,13 +7,13 @@ IN: glib
 <<
 
 "glib" {
-    { [ os winnt? ] [ "glib2.dll" ] }
+    { [ os winnt? ] [ "libglib-2.0-0.dll" ] }
     { [ os macosx? ] [ "/opt/local/lib/libglib-2.0.0.dylib" ] }
     { [ os unix? ] [ "libglib-2.0.0.so" ] }
 } cond "cdecl" add-library
 
 "gobject" {
-    { [ os winnt? ] [ "gobject2.dll" ] }
+    { [ os winnt? ] [ "libgobject-2.0-0.dll" ] }
     { [ os macosx? ] [ "/opt/local/lib/libgobject-2.0.0.dylib" ] }
     { [ os unix? ] [ "libgobject-2.0.0.so" ] }
 } cond "cdecl" add-library
