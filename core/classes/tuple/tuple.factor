@@ -278,7 +278,7 @@ M: tuple-class (define-tuple-class)
     [ 3drop ] [ redefine-tuple-class ] if ;
 
 : thrower-effect ( slots -- effect )
-    [ dup array? [ first ] when ] map f <effect> t >>terminated? ;
+    [ dup array? [ first ] when ] map { "*" } <effect> ;
 
 : define-error-class ( class superclass slots -- )
     [ define-tuple-class ]
