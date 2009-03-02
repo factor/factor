@@ -21,7 +21,7 @@ PRIVATE>
     } cond ; foldable
 
 : next-prime ( n -- p )
-    next-odd [ dup really-prime? ] [ 2 + ] [ ] until ; foldable
+    next-odd [ dup really-prime? ] [ 2 + ] until ; foldable
 
 : primes-between ( low high -- seq )
     [ dup 3 max dup even? [ 1 + ] when ] dip

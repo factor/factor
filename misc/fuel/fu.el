@@ -37,5 +37,18 @@
 (autoload 'fuel-scaffold-help "fuel-scaffold.el"
   "Create a Factor vocabulary help file." t)
 
+(mapc (lambda (group)
+        (custom-add-load group (symbol-name group))
+        (custom-add-load 'fuel (symbol-name group)))
+      '(fuel fuel-faces
+             factor-mode
+             fuel-autodoc
+             fuel-stack
+             fuel-help
+             fuel-xref
+             fuel-listener
+             fuel-scaffold
+             fuel-debug
+             fuel-mode))
 
 ;;; fu.el ends here

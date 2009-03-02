@@ -32,7 +32,7 @@ IN: quoted-printable
     [ 1- cut-slice swap ] [ f swap ] if* concat ;
 
 : divide-lines ( strings -- strings )
-    [ dup ] [ take-some ] [ ] produce nip ;
+    [ dup ] [ take-some ] produce nip ;
 
 PRIVATE>
 
@@ -53,7 +53,7 @@ PRIVATE>
     ] when ;
 
 : read-quoted ( -- bytes )
-    [ read1 dup ] [ read-char ] [ drop ] B{ } produce-as ;
+    [ read1 dup ] [ read-char ] B{ } produce-as nip ;
 
 PRIVATE>
 
