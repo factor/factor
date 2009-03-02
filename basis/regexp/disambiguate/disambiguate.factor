@@ -33,7 +33,9 @@ TUPLE: parts in out ;
         ] assoc-map
     ] change-transitions ;
 
+USE: sorting
+
 : nfa>dfa ( nfa -- dfa )
-    construct-dfa
-    minimize disambiguate
+    construct-dfa minimize
+    disambiguate
     construct-dfa minimize ;
