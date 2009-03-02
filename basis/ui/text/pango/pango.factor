@@ -31,7 +31,7 @@ M: pango-renderer offset>x ( n font string -- x )
     cached-line swap line-offset>x ;
 
 M: pango-renderer font-metrics ( font -- metrics )
-    cache-font-metrics ;
+    "" cached-layout metrics>> clone f >>width ;
 
 M: pango-renderer line-metrics ( font string -- metrics )
     cached-layout metrics>> ;
