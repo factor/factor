@@ -30,13 +30,10 @@ M: pango-renderer x>offset ( x font string -- n )
 M: pango-renderer offset>x ( n font string -- x )
     cached-line swap line-offset>x ;
 
-: missing-metrics ( metrics -- metrics )
-    5 >>cap-height 5 >>x-height ;
-
 M: pango-renderer font-metrics ( font -- metrics )
-    cache-font-metrics missing-metrics ;
+    cache-font-metrics ;
 
 M: pango-renderer line-metrics ( font string -- metrics )
-    cached-layout metrics>> missing-metrics ;
+    cached-layout metrics>> ;
 
 pango-renderer font-renderer set-global

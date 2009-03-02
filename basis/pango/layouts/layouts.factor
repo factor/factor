@@ -5,7 +5,7 @@ USING: arrays sequences alien alien.c-types alien.destructors
 alien.syntax math math.functions math.vectors destructors combinators
 colors fonts accessors assocs namespaces kernel pango pango.fonts
 pango.cairo cairo cairo.ffi glib unicode.data images cache init
-math.rectangles fry ;
+math.rectangles fry memoize ;
 IN: pango.layouts
 
 LIBRARY: pango
@@ -31,8 +31,8 @@ pango_layout_get_font_description ( PangoLayout* layout ) ;
 FUNCTION: void
 pango_layout_get_pixel_size ( PangoLayout* layout, int* width, int* height ) ;
 
-FUNCTION: int
-pango_layout_get_baseline ( PangoLayout* layout ) ;
+FUNCTION: void
+pango_layout_get_extents ( PangoLayout* layout, PangoRectangle* ink_rect, PangoRectangle* logical_rect ) ;
 
 FUNCTION: void
 pango_layout_get_pixel_extents ( PangoLayout* layout, PangoRectangle* ink_rect, PangoRectangle* logical_rect ) ;
@@ -59,20 +59,35 @@ DESTRUCTOR: pango_layout_iter_free
 
 TUPLE: layout font string layout metrics ink-rect logical-rect image disposed ;
 
-: layout-dim ( layout -- dim )
-    0 <int> 0 <int> [ pango_layout_get_pixel_size ] 2keep
-    [ *int ] bi@ 2array ;
+SYMBOL: dpi
 
-: layout-extents ( layout -- ink-rect logical-rect )
-    "PangoRectangle" <c-object>
-    "PangoRectangle" <c-object>
-    [ pango_layout_get_pixel_extents ] 2keep
-    [ PangoRectangle>rect ] bi@ ;
+72 dpi set-global
 
-: layout-baseline ( layout -- baseline )
-    pango_layout_get_iter &pango_layout_iter_free
-    pango_layout_iter_get_baseline
-    pango>float ;
+: dummy-pango-context ( -- context )
+    \ dummy-pango-context [
+        pango_context_new
+    ] initialize-alien ;
+
+MEMO: (cache-font) ( font -- open-font )
+    [
+        pango_cairo_font_map_get_default
+        dup dpi get pango_cairo_font_map_set_resolution
+        dummy-pango-context
+    ] dip
+    cache-font-description
+    pango_font_map_load_font ;
+
+: cache-font ( font -- open-font )
+    strip-font-colors (cache-font) ;
+
+: get-font-metrics ( font -- metrics )
+    f pango_font_get_metrics &pango_font_metrics_unref ;
+
+: parse-font-metrics ( metrics -- metrics' )
+    [ metrics new ] dip
+    [ pango_font_metrics_get_ascent pango>float >>ascent ]
+    [ pango_font_metrics_get_descent pango>float >>descent ] bi
+    compute-height ;
 
 : set-layout-font ( str layout -- )
     swap pango_layout_set_font_description ;
@@ -89,6 +104,40 @@ TUPLE: layout font string layout metrics ink-rect logical-rect image disposed ;
     dummy-cairo pango_cairo_create_layout |g_object_unref
     [ set-layout-font ] keep
     [ set-layout-text ] keep ;
+
+: layout-extents ( layout -- ink-rect logical-rect )
+    "PangoRectangle" <c-object>
+    "PangoRectangle" <c-object>
+    [ pango_layout_get_extents ] 2keep
+    [ PangoRectangle>rect ] bi@ ;
+
+: glyph-height ( font string -- y )
+    swap <PangoLayout> &g_object_unref layout-extents drop dim>> second ;
+
+: missing-font-metrics ( metrics font -- metrics )
+    #! Pango doesn't provide these, but Core Text does, so we
+    #! simulate them on Pango.
+    [ "x" glyph-height >>x-height ]
+    [ "Y" glyph-height >>cap-height ]
+    bi ;
+
+MEMO: (cache-font-metrics) ( font -- metrics )
+    [
+        (cache-font)
+        [
+            get-font-metrics
+            parse-font-metrics
+        ] keep
+        missing-font-metrics
+    ] with-destructors ;
+
+: cache-font-metrics ( font -- metrics )
+    strip-font-colors (cache-font-metrics) ;
+
+: layout-baseline ( layout -- baseline )
+    pango_layout_get_iter &pango_layout_iter_free
+    pango_layout_iter_get_baseline
+    pango>float ;
 
 : set-foreground ( cr font -- )
     foreground>> set-source-color ;
@@ -130,17 +179,18 @@ TUPLE: layout font string layout metrics ink-rect logical-rect image disposed ;
 : set-text-position ( cr loc -- )
     first2 cairo_move_to ;
 
-: layout-metrics ( dim baseline -- metrics )
-    metrics new
-        swap >>ascent
-        swap first2 [ >>width ] [ >>height ] bi*
+: layout-metrics ( layout -- metrics )
+    dup font>> cache-font-metrics clone
+        swap
+        [ layout>> layout-baseline >>ascent ]
+        [ logical-rect>> dim>> [ first >>width ] [ second >>height ] bi ] bi
         dup [ height>> ] [ ascent>> ] bi - >>descent ;
 
 : text-position ( layout -- loc )
     [ logical-rect>> ] [ ink-rect>> ] bi [ loc>> ] bi@ v- ;
 
 : draw-layout ( layout -- image )
-    dup ink-rect>> dim>> [
+    dup ink-rect>> dim>> [ >fixnum ] map [
         swap {
             [ layout>> pango_cairo_update_layout ]
             [ [ font>> ] [ ink-rect>> dim>> ] bi fill-background ]
@@ -158,7 +208,7 @@ TUPLE: layout font string layout metrics ink-rect logical-rect image disposed ;
             swap >>font
             dup [ string>> ] [ font>> cache-font-description ] bi <PangoLayout> >>layout
             dup layout>> layout-extents [ >>ink-rect ] [ >>logical-rect ] bi*
-            dup [ logical-rect>> dim>> ] [ layout>> layout-baseline ] bi layout-metrics >>metrics
+            dup layout-metrics >>metrics
             dup draw-layout >>image
     ] with-destructors ;
 

@@ -32,6 +32,6 @@ C-STRUCT: PangoRectangle
     { "int" "height" } ;
 
 : PangoRectangle>rect ( PangoRectangle -- rect )
-    [ [ PangoRectangle-x ] [ PangoRectangle-y ] bi 2array ]
-    [ [ PangoRectangle-width ] [ PangoRectangle-height ] bi 2array ] bi
+    [ [ PangoRectangle-x pango>float ] [ PangoRectangle-y pango>float ] bi 2array ]
+    [ [ PangoRectangle-width pango>float ] [ PangoRectangle-height pango>float ] bi 2array ] bi
     <rect> ;
