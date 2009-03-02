@@ -22,11 +22,7 @@ SINGLETON: windows-ui-backend
     [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
 
 : enum-clipboard ( -- seq )
-    0
-    [ EnumClipboardFormats win32-error dup dup 0 > ]
-    [ ]
-    [ drop ]
-    produce nip ;
+    0 [ EnumClipboardFormats win32-error dup dup 0 > ] [ ] produce 2nip ;
 
 : with-clipboard ( quot -- )
     f OpenClipboard win32-error=0/f

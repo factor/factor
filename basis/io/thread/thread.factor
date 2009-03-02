@@ -11,7 +11,7 @@ SYMBOL: io-thread-running?
     sleep-time io-multiplex yield ;
 
 : start-io-thread ( -- )
-    [ [ io-thread-running? get-global ] [ io-thread ] [ ] while ]
+    [ [ io-thread-running? get-global ] [ io-thread ] while ]
     "I/O wait" spawn drop ;
 
 [

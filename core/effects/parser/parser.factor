@@ -21,7 +21,7 @@ ERROR: bad-effect ;
     ] if ;
 
 : parse-effect-tokens ( end -- tokens )
-    [ parse-effect-token dup ] curry [ ] [ drop ] produce ;
+    [ parse-effect-token dup ] curry [ ] produce nip ;
 
 : parse-effect ( end -- effect )
     parse-effect-tokens { "--" } split1 dup

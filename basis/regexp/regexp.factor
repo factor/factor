@@ -75,7 +75,7 @@ IN: regexp
     [ [ split1-slice nip ] keep ] [ 2drop f f ] if ;
 
 : all-matches ( string regexp -- seq )
-    [ dup ] swap '[ _ next-match ] [ ] produce nip harvest ;
+    [ dup ] swap '[ _ next-match ] produce nip harvest ;
 
 : count-matches ( string regexp -- n )
     all-matches length ;
