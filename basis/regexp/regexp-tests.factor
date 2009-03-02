@@ -342,6 +342,9 @@ IN: regexp-tests
 [ f ] [ "πc" R/ [a-zA-Z]c|\p{Lower}b/ matches? ] unit-test
 [ f ] [ "Ab" R/ [a-zA-Z]c|\p{Lower}b/ matches? ] unit-test
 
+[ t ] [ "aaaa" R/ .*a./ matches? ] unit-test
+
+! DFA is compiled when needed, or when literal
 [ f ] [ "foo" <regexp> dfa>> >boolean ] unit-test
 [ t ] [ R/ foo/ dfa>> >boolean ] unit-test
 

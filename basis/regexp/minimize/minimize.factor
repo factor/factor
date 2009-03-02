@@ -19,6 +19,7 @@ IN: regexp.minimize
 
 : rewrite-transitions ( transition-table assoc quot -- transition-table )
     [
+        [ clone ] dip
         [ '[ _ at ] change-start-state ]
         [ '[ [ _ at ] map-set ] change-final-states ]
         [ ] tri
