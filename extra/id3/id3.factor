@@ -5,7 +5,7 @@ strings kernel math io.mmap io.mmap.uchar accessors syntax
 combinators math.ranges unicode.categories byte-arrays
 io.encodings.string io.encodings.utf16 assocs math.parser
 combinators.short-circuit fry namespaces combinators.smart
-splitting io.encodings.ascii arrays ;
+splitting io.encodings.ascii arrays io.files.info ;
 IN: id3
 
 <PRIVATE
@@ -179,7 +179,7 @@ PRIVATE>
 
 : id3-frame ( id3 key -- value/f ) [ ] frame-named ; inline
 
-: file-id3-tags ( path -- id3v2-info/f )
+: (file-id3-tags) ( path -- id3v2-info/f )
     [
         {
             { [ dup id3v2? ] [ read-v2-tag-data ] }
@@ -187,3 +187,6 @@ PRIVATE>
             [ drop f ]
         } cond
     ] with-mapped-uchar-file ;
+
+: file-id3-tags ( path -- id3v2-info/f )
+    dup file-info size>> 0 <= [ drop f ] [ (file-id3-tags) ] if ;
