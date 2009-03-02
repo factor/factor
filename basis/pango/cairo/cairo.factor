@@ -3,9 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! pangocairo bindings, from pango/pangocairo.h
-USING: cairo.ffi alien.c-types math alien.syntax system destructors
-memoize accessors kernel combinators alien arrays fonts pango
-pango.fonts namespaces ;
+USING: alien alien.syntax combinators system cairo.ffi ;
 IN: pango.cairo
 
 << "pangocairo" {
@@ -88,39 +86,3 @@ pango_cairo_layout_path ( cairo_t* cr, PangoLayout* layout ) ;
 
 FUNCTION: void
 pango_cairo_error_underline_path ( cairo_t* cr, double x, double y, double width, double height ) ;
-
-SYMBOL: dpi
-
-72 dpi set-global
-
-: dummy-pango-context ( -- context )
-    \ dummy-pango-context [
-        pango_context_new
-    ] initialize-alien ;
-
-MEMO: (cache-font) ( font -- open-font )
-    [
-        pango_cairo_font_map_get_default
-        dup dpi get pango_cairo_font_map_set_resolution
-        dummy-pango-context
-    ] dip
-    cache-font-description
-    pango_font_map_load_font ;
-
-: cache-font ( font -- open-font )
-    strip-font-colors (cache-font) ;
-
-: get-font-metrics ( font -- metrics )
-    (cache-font) f pango_font_get_metrics &pango_font_metrics_unref ;
-
-: parse-font-metrics ( metrics -- metrics' )
-    [ metrics new ] dip
-    [ pango_font_metrics_get_ascent pango>float >>ascent ]
-    [ pango_font_metrics_get_descent pango>float >>descent ] bi
-    compute-height ;
-
-MEMO: (cache-font-metrics) ( font -- metrics )
-    [ get-font-metrics parse-font-metrics ] with-destructors ;
-
-: cache-font-metrics ( font -- metrics )
-    strip-font-colors (cache-font-metrics) ;
