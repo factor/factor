@@ -39,15 +39,11 @@ ARTICLE: { "regexp" "theory" } "The theory of regular expressions"
 "The Factor regular expression engine was built with the design decision to support negation and intersection at the expense of backreferences. This lets us have a guaranteed linear-time matching algorithm. Systems like Ragel and Lex also use this algorithm, but in the Factor regular expression engine, all other features of regexps are still present." ;
 
 ARTICLE: { "regexp" "operations" } "Matching operations with regular expressions"
-{ $subsection match }
 { $subsection matches? }
-{ $subsection match-at }
-{ $subsection match-range }
-{ $subsection first-match }
-{ $subsection re-cut }
+{ $subsection match-slice }
+{ $subsection re-split1 }
 { $subsection re-split }
 { $subsection re-replace }
-{ $subsection next-match }
 { $subsection all-matches }
 { $subsection count-matches }
 { $subsection re-replace } ;
