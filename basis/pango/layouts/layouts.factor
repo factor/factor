@@ -80,15 +80,6 @@ MEMO: (cache-font) ( font -- open-font )
 : cache-font ( font -- open-font )
     strip-font-colors (cache-font) ;
 
-: get-font-metrics ( font -- metrics )
-    f pango_font_get_metrics &pango_font_metrics_unref ;
-
-: parse-font-metrics ( metrics -- metrics' )
-    [ metrics new ] dip
-    [ pango_font_metrics_get_ascent pango>float >>ascent ]
-    [ pango_font_metrics_get_descent pango>float >>descent ] bi
-    compute-height ;
-
 : set-layout-font ( str layout -- )
     swap pango_layout_set_font_description ;
 
@@ -114,25 +105,15 @@ MEMO: (cache-font) ( font -- open-font )
 : glyph-height ( font string -- y )
     swap <PangoLayout> &g_object_unref layout-extents drop dim>> second ;
 
-: missing-font-metrics ( metrics font -- metrics )
-    #! Pango doesn't provide these, but Core Text does, so we
+MEMO: missing-font-metrics ( font -- metrics )
+    #! Pango doesn't provide x-height and cap-height but Core Text does, so we
     #! simulate them on Pango.
-    [ "x" glyph-height >>x-height ]
-    [ "Y" glyph-height >>cap-height ]
-    bi ;
-
-MEMO: (cache-font-metrics) ( font -- metrics )
     [
+        [ metrics new ] dip
         (cache-font)
-        [
-            get-font-metrics
-            parse-font-metrics
-        ] keep
-        missing-font-metrics
+        [ "x" glyph-height >>x-height ]
+        [ "Y" glyph-height >>cap-height ] bi
     ] with-destructors ;
-
-: cache-font-metrics ( font -- metrics )
-    strip-font-colors (cache-font-metrics) ;
 
 : layout-baseline ( layout -- baseline )
     pango_layout_get_iter &pango_layout_iter_free
@@ -180,7 +161,7 @@ MEMO: (cache-font-metrics) ( font -- metrics )
     first2 cairo_move_to ;
 
 : layout-metrics ( layout -- metrics )
-    dup font>> cache-font-metrics clone
+    dup font>> missing-font-metrics clone
         swap
         [ layout>> layout-baseline >>ascent ]
         [ logical-rect>> dim>> [ first >>width ] [ second >>height ] bi ] bi
