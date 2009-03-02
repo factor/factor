@@ -120,7 +120,7 @@ M: mdb-reply-op (read-message) ( msg-stub opcode -- message )
     read-longlong >>cursor
     read-int32 >>start#
     read-int32 [ >>returned# ] keep
-    [ <linked-hash> stream>assoc drop ] accumulator [ times ] dip >>objects ;    
+    [ H{ } stream>assoc drop ] accumulator [ times ] dip >>objects ;    
 
 : read-header ( message -- message )
     read-int32 >>length
@@ -151,7 +151,7 @@ PRIVATE>
      write flush ; inline
 
 : build-query-object ( query -- selector )
-    [let | selector [ <linked-hash> ] |
+    [let | selector [ H{ } clone ] |
         { [ orderby>> [ "orderby" selector set-at ] when* ]
           [ explain>> [ "$explain" selector set-at ] when* ]
           [ hint>> [ "$hint" selector set-at ] when* ] 

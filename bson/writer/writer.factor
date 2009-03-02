@@ -93,9 +93,16 @@ M: sequence bson-write ( array -- )
         [ length 5 + bson-write ] keep
         write
         write-eoo ; 
-    
+
+: write-oid ( hashtable -- )
+    [ MDB_OID_FIELD ] dip at*
+    [ [ MDB_OID_FIELD ] dip write-pair ] [ drop ] if ; inline
+
+: oid-field? ( name -- boolean )
+    MDB_OID_FIELD = ; inline
+
 M: assoc bson-write ( hashtable -- )
-    '[ _ [ write-pair ] assoc-each ]
+    '[ _ [ write-oid ] [ [ over oid-field? [ 2drop ] [ write-pair ] if ] assoc-each ] bi ]
     binary swap with-byte-writer
     [ length 5 + bson-write ] keep
     write

@@ -11,6 +11,8 @@ TUPLE: oid { a initial: 0 } { b initial: 0 } ;
 
 TUPLE: objref ns objid ;
 
+CONSTANT: MDB_OID_FIELD "_id"
+
 CONSTANT: T_EOO  0  
 CONSTANT: T_Double  1  
 CONSTANT: T_Integer  16  
