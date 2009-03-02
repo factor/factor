@@ -29,7 +29,7 @@ M: real sqrt
 : factor-2s ( n -- r s )
     #! factor an integer into 2^r * s
     dup 0 = [ 1 ] [
-        0 swap [ dup even? ] [ [ 1+ ] [ 2/ ] bi* ] [ ] while
+        0 swap [ dup even? ] [ [ 1+ ] [ 2/ ] bi* ] while
     ] if ; inline
 
 <PRIVATE

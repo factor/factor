@@ -199,7 +199,7 @@ M: array make-slot
         swap
         peel-off-name
         peel-off-class
-        [ dup empty? ] [ peel-off-attributes ] [ ] until drop
+        [ dup empty? ] [ peel-off-attributes ] until drop
     check-initial-value ;
 
 M: slot-spec make-slot

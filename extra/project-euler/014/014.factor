@@ -43,7 +43,7 @@ IN: project-euler.014
 PRIVATE>
 
 : collatz ( n -- seq )
-    [ [ dup 1 > ] [ dup , next-collatz ] [ ] while , ] { } make ;
+    [ [ dup 1 > ] [ dup , next-collatz ] while , ] { } make ;
 
 : euler014 ( -- answer )
     1000000 [1,b] 0 [ collatz longest ] reduce first ;
