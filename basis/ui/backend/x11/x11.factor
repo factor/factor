@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2009 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types arrays ui ui.gadgets
-ui.gestures ui.backend ui.clipboards ui.gadgets.worlds ui.render
-ui.event-loop assocs kernel math namespaces opengl
-sequences strings x11.xlib x11.events x11.xim x11.glx
-x11.clipboard x11.constants x11.windows io.encodings.string
+USING: accessors alien alien.c-types arrays ui ui.private ui.gadgets
+ui.gadgets.private ui.gestures ui.backend ui.clipboards
+ui.gadgets.worlds ui.render ui.event-loop assocs kernel math
+namespaces opengl sequences strings x11.xlib x11.events x11.xim
+x11.glx x11.clipboard x11.constants x11.windows io.encodings.string
 io.encodings.ascii io.encodings.utf8 combinators command-line
 math.vectors classes.tuple opengl.gl threads math.rectangles
 environment ascii ;
@@ -15,7 +15,7 @@ SINGLETON: x11-ui-backend
 : XA_NET_WM_NAME ( -- atom ) "_NET_WM_NAME" x-atom ;
 
 TUPLE: x11-handle-base glx ;
-TUPLE: x11-handle < x11-handle-base xic window ;
+TUPLE: x11-handle < x11-handle-base window xic ;
 TUPLE: x11-pixmap-handle < x11-handle-base pixmap glx-pixmap ;
 
 C: <x11-handle> x11-handle
@@ -132,11 +132,11 @@ M: world motion-event
 
 M: world focus-in-event
     nip
-    dup handle>> xic>> XSetICFocus focus-world ;
+    [ handle>> xic>> XSetICFocus ] [ focus-world ] bi ;
 
 M: world focus-out-event
     nip
-    dup handle>> xic>> XUnsetICFocus unfocus-world ;
+    [ handle>> xic>> XUnsetICFocus ] [ unfocus-world ] bi ;
 
 M: world selection-notify-event
     [ handle>> window>> selection-from-event ] keep
@@ -186,9 +186,10 @@ M: world client-event
     swap close-box? [ ungraft ] [ drop ] if ;
 
 : gadget-window ( world -- )
-    [ [ window-loc>> ] [ dim>> ] bi glx-window ]
-    [ "Factor" create-xic ]
-    [ ] tri <x11-handle>
+    dup
+    [ window-loc>> ] [ dim>> ] bi glx-window swap
+    dup "Factor" create-xic
+    <x11-handle>
     [ window>> register-window ] [ >>handle drop ] 2bi ;
 
 : wait-event ( -- event )

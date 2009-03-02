@@ -8,11 +8,11 @@ USING: system combinators alien alien.syntax alien.c-types
 alien.destructors kernel accessors sequences arrays ui.gadgets ;
 
 IN: cairo.ffi
-<< "cairo" {
-    { [ os winnt? ] [ "libcairo-2.dll" ] }
-    { [ os macosx? ] [ "/opt/local/lib/libcairo.dylib" ] }
-    { [ os unix? ] [ "libcairo.so.2" ] }
-} cond "cdecl" add-library >>
+<< {
+    { [ os winnt? ] [ "cairo" "libcairo-2.dll" "cdecl" add-library ] }
+    { [ os macosx? ] [ "cairo" "/opt/local/lib/libcairo.dylib" "cdecl" add-library ] }
+    { [ os unix? ] [ ] }
+} cond >>
 
 LIBRARY: cairo
 
