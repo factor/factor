@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.order words combinators locals
 ascii unicode.categories combinators.short-circuit sequences ;
-QUALIFIED-WITH: multi-methods m
 IN: regexp.classes
 
 SINGLETONS: any-char any-char-no-nl
@@ -116,46 +115,40 @@ TUPLE: not-class class ;
 
 TUPLE: and-class seq ;
 
-m:GENERIC: combine-and ( class1 class2 -- combined ? )
+GENERIC: combine-and ( class1 class2 -- combined ? )
 
 : replace-if-= ( object object -- object ? )
     over = ;
 
-m:METHOD: combine-and { object object } replace-if-= ;
+M: object combine-and replace-if-= ;
 
-m:METHOD: combine-and { integer integer }
-    2dup = [ drop t ] [ 2drop f t ] if ;
-
-m:METHOD: combine-and { t object }
-    nip t ;
-
-m:METHOD: combine-and { f object }
+M: t combine-and
     drop t ;
 
-m:METHOD: combine-and { not-class object }
-    [ class>> ] dip = [ f t ] [ f f ] if ;
-
-m:METHOD: combine-and { integer object }
-    2dup class-member? [ drop t ] [ 2drop f t ] if ;
-
-m:GENERIC: combine-or ( class1 class2 -- combined ? )
-
-m:METHOD: combine-or { object object } replace-if-= ;
-
-m:METHOD: combine-or { integer integer }
-    2dup = [ drop t ] [ 2drop f f ] if ;
-
-m:METHOD: combine-or { t object }
-    drop t ;
-
-m:METHOD: combine-or { f object }
+M: f combine-and
     nip t ;
 
-m:METHOD: combine-or { not-class object }
-    [ class>> ] dip = [ t t ] [ f f ] if ;
+M: not-class combine-and
+    class>> = [ f t ] [ f f ] if ;
 
-m:METHOD: combine-or { integer object }
-    2dup class-member? [ nip t ] [ 2drop f f ] if ;
+M: integer combine-and
+    swap 2dup class-member? [ drop t ] [ 2drop f t ] if ;
+
+GENERIC: combine-or ( class1 class2 -- combined ? )
+
+M: object combine-or replace-if-= ;
+
+M: t combine-or
+    drop f ;
+
+M: f combine-or
+    drop t ;
+
+M: not-class combine-or
+    class>> = [ t t ] [ f f ] if ;
+
+M: integer combine-or
+    2dup swap class-member? [ drop t ] [ 2drop f f ] if ;
 
 : try-combine ( elt1 elt2 quot -- combined/f ? )
     3dup call [ [ 3drop ] dip t ] [ drop swapd call ] if ; inline

@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test regexp.minimize assocs regexp regexp.syntax
+USING: tools.test regexp.minimize assocs regexp
 accessors regexp.transition-tables ;
 IN: regexp.minimize.tests
 
