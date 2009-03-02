@@ -2,15 +2,15 @@
 ! Portions copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings arrays assocs ui
-ui.gadgets ui.backend ui.clipboards ui.gadgets.worlds
-ui.gestures ui.event-loop io kernel math
-math.vectors namespaces make sequences strings vectors words
-windows.kernel32 windows.gdi32 windows.user32 windows.opengl32
-windows.messages windows.types windows.nt windows threads libc
-combinators fry combinators.short-circuit continuations
-command-line shuffle opengl ui.render ascii math.bitwise locals
-accessors math.rectangles math.order ascii calendar
-io.encodings.utf16n ;
+ui.private ui.gadgets ui.gadgets.private ui.backend
+ui.clipboards ui.gadgets.worlds ui.gestures ui.event-loop io
+kernel math math.vectors namespaces make sequences strings
+vectors words windows.kernel32 windows.gdi32 windows.user32
+windows.opengl32 windows.messages windows.types windows.nt
+windows threads libc combinators fry combinators.short-circuit
+continuations command-line shuffle opengl ui.render ascii
+math.bitwise locals accessors math.rectangles math.order ascii
+calendar io.encodings.utf16n ;
 IN: ui.backend.windows
 
 SINGLETON: windows-ui-backend
@@ -25,8 +25,7 @@ SINGLETON: windows-ui-backend
     0
     [ EnumClipboardFormats win32-error dup dup 0 > ]
     [ ]
-    [ drop ]
-    produce nip ;
+    produce 2nip ;
 
 : with-clipboard ( quot -- )
     f OpenClipboard win32-error=0/f

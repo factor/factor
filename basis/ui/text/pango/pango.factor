@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types assocs cache kernel math math.vectors
 namespaces opengl.textures pango.cairo pango.layouts ui.gadgets.worlds
-ui.text ui.text.private pango ;
+ui.text ui.text.private pango sequences ;
 IN: ui.text.pango
 
 SINGLETON: pango-renderer
@@ -10,7 +10,9 @@ SINGLETON: pango-renderer
 M: pango-renderer init-text-rendering
     <cache-assoc> >>text-handle drop ;
 
-M: pango-renderer string-dim cached-layout logical-rect>> dim>> ;
+M: pango-renderer string-dim
+    [ " " string-dim { 0 1 } v* ]
+    [ cached-layout logical-rect>> dim>> [ >integer ] map ] if-empty ;
 
 M: pango-renderer finish-text-rendering
     text-handle>> purge-cache
@@ -31,9 +33,11 @@ M: pango-renderer offset>x ( n font string -- x )
     cached-line swap line-offset>x ;
 
 M: pango-renderer font-metrics ( font -- metrics )
-    "" cached-layout metrics>> clone f >>width ;
+    " " cached-layout metrics>> clone f >>width ;
 
 M: pango-renderer line-metrics ( font string -- metrics )
-    cached-layout metrics>> ;
+    [ " " line-metrics clone 0 >>width ]
+    [ cached-layout metrics>> ]
+    if-empty ;
 
 pango-renderer font-renderer set-global
