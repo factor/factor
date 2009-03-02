@@ -6,7 +6,8 @@ quotations effects tools.test continuations generic.standard
 sorting assocs definitions prettyprint io inspector
 classes.tuple classes.union classes.predicate debugger
 threads.private io.streams.string io.timeouts io.thread
-sequences.private destructors combinators eval locals.backend ;
+sequences.private destructors combinators eval locals.backend
+system ;
 IN: stack-checker.tests
 
 \ infer. must-infer
@@ -511,9 +512,9 @@ ERROR: custom-error ;
 [ [ missing->r-check ] infer ] must-fail
 
 ! Corner case
-[ [ [ f dup ] [ dup ] [ ] produce ] infer ] must-fail
+[ [ [ f dup ] [ dup ] produce ] infer ] must-fail
 
-[ [ [ f dup ] [ ] [ ] while ] infer ] must-fail
+[ [ [ f dup ] [ ] while ] infer ] must-fail
 
 : erg's-inference-bug ( -- ) f dup [ erg's-inference-bug ] when ; inline
 
@@ -582,3 +583,5 @@ DEFER: eee'
     [ debugging-curry-folding ] curry call ; inline recursive
 
 [ [ ] debugging-curry-folding ] must-infer
+
+[ [ exit ] [ 1 2 3 ] if ] must-infer

@@ -6,7 +6,7 @@ IN: editors.etexteditor
 
 : etexteditor-path ( -- str )
     \ etexteditor-path get-global [
-        "e" t [ "e.exe" tail? ] find-in-program-files
+        "e" [ "e.exe" tail? ] find-in-program-files
         [ "e" ] unless*
     ] unless* ;
 

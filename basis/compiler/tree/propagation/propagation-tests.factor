@@ -441,7 +441,7 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 
 [ V{ real } ] [ [ recursive-test-3 ] final-classes ] unit-test
 
-[ V{ real } ] [ [ [ dup 10 < ] [ ] [ ] while ] final-classes ] unit-test
+[ V{ real } ] [ [ [ dup 10 < ] [ ] while ] final-classes ] unit-test
 
 [ V{ float } ] [
     [ { float } declare 10 [ 2.3 * ] times ] final-classes
