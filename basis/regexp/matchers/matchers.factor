@@ -32,8 +32,12 @@ GENERIC: match-index-from ( i string matcher -- index/f )
 : match-head ( str matcher -- slice/f )
     [ 0 ] 2dip match-from ;
 
+<PRIVATE
+
 : next-match ( i string matcher -- i match/f )
     match-from [ dup [ to>> ] when ] keep ;
+
+PRIVATE>
 
 :: all-matches ( string matcher -- seq )
     0 [ dup ] [ string matcher next-match ] [ ] produce nip but-last ;
