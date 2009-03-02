@@ -4,14 +4,14 @@ USING: kernel math math.parser namespaces make sequences strings
 words assocs combinators accessors arrays ;
 IN: effects
 
-TUPLE: effect in out terminated? ;
+TUPLE: effect { in read-only } { out read-only } { terminated? read-only } ;
 
 : <effect> ( in out -- effect )
     dup { "*" } sequence= [ drop { } t ] [ f ] if
     effect boa ;
 
 : effect-height ( effect -- n )
-    [ out>> length ] [ in>> length ] bi - ;
+    [ out>> length ] [ in>> length ] bi - ; inline
 
 : effect<= ( eff1 eff2 -- ? )
     {
@@ -20,7 +20,7 @@ TUPLE: effect in out terminated? ;
         { [ 2dup [ in>> length ] bi@ > ] [ f ] }
         { [ 2dup [ effect-height ] bi@ = not ] [ f ] }
         [ t ]
-    } cond 2nip ;
+    } cond 2nip ; inline
 
 GENERIC: effect>string ( obj -- str )
 M: string effect>string ;
