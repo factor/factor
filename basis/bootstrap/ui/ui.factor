@@ -14,7 +14,7 @@ IN: bootstrap.ui
     "ui-text-backend" get [
         {
             { [ os macosx? ] [ "core-text" ] }
-            { [ os windows? ] [ "freetype" ] }
+            { [ os windows? ] [ "pango" ] }
             { [ os unix? ] [ "pango" ] }
         } cond
     ] unless* "ui.text." prepend require
