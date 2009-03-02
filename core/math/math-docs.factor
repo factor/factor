@@ -308,7 +308,7 @@ HELP: find-last-integer
 
 HELP: byte-array>bignum
 { $values { "byte-array" byte-array } { "n" integer } }
-{ $description "Converts a byte-array, interpreted as little-endian, into a bignum integer. User code should call " { $link >le } " or " { $link >be } " instead." } ;
+{ $description "Converts a byte-array, interpreted as little-endian, into a bignum integer. User code should call " { $link le> } " or " { $link be> } " instead." } ;
 
 ARTICLE: "division-by-zero" "Division by zero"
 "Floating point division never raises an error if the denominator is zero. This means that if at least one of the two inputs to " { $link / } ", " { $link /f } " or " { $link mod } " is a float, the result will be a floating point infinity or not a number value."

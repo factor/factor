@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences sequences.private namespaces
-words io io.binary io.files io.streams.string quotations
+words io io.binary io.files quotations
 definitions checksums ;
 IN: checksums.crc32
 

@@ -41,7 +41,7 @@ IN: formatting
         [ dup 10.0 >=
           [ 10.0 / [ 1+ ] dip ]
           [ 10.0 * [ 1- ] dip ] if
-        ] [ ] while 
+        ] while 
      ] keep 0 < [ neg ] when ;
 
 : exp>string ( exp base digits -- string )
