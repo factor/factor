@@ -223,7 +223,7 @@ CONSTANT: otug-slides
     }
     { $slide "Modifiers"
         { $code ": bank ( n -- n )" "    readln string>number +" "    dup \"Balance: $\" write . ;" }
-        { $code "0 [ dup 0 > ] [ bank ] [ ] while" }
+        { $code "0 [ dup 0 > ] [ bank ] while" }
     }
     { $slide "Modifiers"
         { $code "0 [ dup 0 > ] [ bank ] [ ] do while" }
