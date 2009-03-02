@@ -177,6 +177,9 @@ SYMBOL: history
 : always-inline-word? ( word -- ? )
     { curry compose } memq? ;
 
+: never-inline-word? ( word -- ? )
+    [ deferred? ] [ { call execute } memq? ] bi or ;
+
 : custom-inlining? ( word -- ? )
     "custom-inlining" word-prop ;
 
@@ -199,7 +202,7 @@ SYMBOL: history
     #! calls the compiler at parse time (doing so is
     #! discouraged, but it should still work.)
     {
-        { [ dup deferred? ] [ 2drop f ] }
+        { [ dup never-inline-word? ] [ 2drop f ] }
         { [ dup \ instance? eq? ] [ inline-instance-check ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
