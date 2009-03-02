@@ -6,11 +6,11 @@
 USING: alien alien.syntax combinators system cairo.ffi ;
 IN: pango.cairo
 
-<< "pangocairo" {
-    { [ os winnt? ] [ "libpangocairo-1.0-0.dll" ] }
-    { [ os macosx? ] [ "/opt/local/lib/libpangocairo-1.0.0.dylib" ] }
-    { [ os unix? ] [ "libpangocairo-1.0.so" ] }
-} cond "cdecl" add-library >>
+<< {
+    { [ os winnt? ] [ "pangocairo" "libpangocairo-1.0-0.dll" "cdecl" add-library ] }
+    { [ os macosx? ] [ "pangocairo" "/opt/local/lib/libpangocairo-1.0.0.dylib" "cdecl" add-library ] }
+    { [ os unix? ] [ ] }
+} cond >>
 
 LIBRARY: pangocairo
 

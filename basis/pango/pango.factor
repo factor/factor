@@ -9,11 +9,11 @@ IN: pango
 ! Helpful functions from other parts of pango
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-<< "pango" {
-    { [ os winnt? ] [ "libpango-1.0-0.dll" ] }
-    { [ os macosx? ] [ "/opt/local/lib/libpango-1.0.0.dylib" ] }
-    { [ os unix? ] [ "libpango-1.0.so" ] }
-} cond "cdecl" add-library >>
+<< {
+    { [ os winnt? ] [ "pango" "libpango-1.0-0.dll" "cdecl" add-library ] }
+    { [ os macosx? ] [ "pango" "/opt/local/lib/libpango-1.0.0.dylib" "cdecl" add-library ] }
+    { [ os unix? ] [ ] }
+} cond >>
 
 LIBRARY: pango
 
