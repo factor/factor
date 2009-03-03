@@ -5,7 +5,8 @@ strings kernel math io.mmap io.mmap.uchar accessors syntax
 combinators math.ranges unicode.categories byte-arrays
 io.encodings.string io.encodings.utf16 assocs math.parser
 combinators.short-circuit fry namespaces combinators.smart
-splitting io.encodings.ascii arrays io.files.info ;
+splitting io.encodings.ascii arrays io.files.info unicode.case
+io.directories.search ;
 IN: id3
 
 <PRIVATE
@@ -190,3 +191,7 @@ PRIVATE>
 
 : file-id3-tags ( path -- id3v2-info/f )
     dup file-info size>> 0 <= [ drop f ] [ (file-id3-tags) ] if ;
+
+: parse-id3s ( path -- seq )
+    [ >lower ".mp3" tail? ] find-all-files
+    [ dup file-id3-tags ] { } map>assoc ;
