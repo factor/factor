@@ -1,5 +1,5 @@
 USING: images.bitmap images.viewer io.encodings.binary
-io.files io.files.unique kernel tools.test ;
+io.files io.files.unique kernel tools.test images.loader ;
 IN: images.bitmap.tests
 
 : test-bitmap24 ( -- path )
@@ -17,7 +17,7 @@ IN: images.bitmap.tests
 [ t ]
 [
     test-bitmap24
-    [ binary file-contents ] [ load-bitmap ] bi
+    [ binary file-contents ] [ load-image ] bi
 
     "test-bitmap24" unique-file
     [ save-bitmap ] [ binary file-contents ] bi =
