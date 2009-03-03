@@ -1,10 +1,9 @@
-USING: regexp tools.test kernel sequences regexp.parser
+USING: regexp tools.test kernel sequences regexp.parser regexp.private
 regexp.traversal eval strings multiline accessors regexp.matchers ;
 IN: regexp-tests
 
 \ <regexp> must-infer
 \ compile-regexp must-infer
-\ compile-dfa-quot must-infer
 \ matches? must-infer
 
 [ f ] [ "b" "a*" <regexp> matches? ] unit-test
