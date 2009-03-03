@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Yun, Jonghyouk.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays byte-arrays io io.encodings io.encodings.euc-kr assocs
+USING: arrays byte-arrays io io.encodings io.encodings.johab assocs
 io.encodings.string io.streams.string io.encodings.euc.private words
 kernel locals multiline namespaces sequences strings tools.test ;
 IN: io.encodings.johab.tests
@@ -16,6 +16,8 @@ IN: io.encodings.johab.tests
 [ HEX: 3133 ] [ HEX: 8444 johab>unicode ] unit-test
 [ HEX: 8A5D ] [ HEX: AD4F unicode>johab ] unit-test
 
+: phrase-unicode ( -- s )
+    "\u00b3d9\u00d574\u00bb3c\u00acfc \u00bc31\u00b450\u00c0b0\u00c774!" ;
 
 : phrase-johab ( -- s )
     B{
