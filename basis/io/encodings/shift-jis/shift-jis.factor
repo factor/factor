@@ -3,8 +3,9 @@
 USING: sequences kernel io io.files combinators.short-circuit
 math.order values assocs io.encodings io.binary fry strings math
 io.encodings.ascii arrays byte-arrays accessors splitting
-math.parser biassocs io.encodings.iana ;
-IN: io.encodings.japanese
+math.parser biassocs io.encodings.iana
+locals multiline combinators simple-flat-file ;
+IN: io.encodings.shift-jis
 
 SINGLETON: shift-jis
 
@@ -28,26 +29,16 @@ M: windows-31j <decoder> drop windows-31j-table <decoder> ;
 
 TUPLE: jis assoc ;
 
-: <jis> ( assoc -- jis )
-    [ nip ] assoc-filter
-    >biassoc jis boa ;
-
 : ch>jis ( ch tuple -- jis ) assoc>> value-at [ encode-error ] unless* ;
 : jis>ch ( jis tuple -- string ) assoc>> at replacement-char or ;
 
-: process-jis ( lines -- assoc )
-    [ "#" split1 drop ] map harvest [
-        "\t" split 2 head
-        [ 2 short tail hex> ] map
-    ] map ;
-
 : make-jis ( filename -- jis )
-    ascii file-lines process-jis <jis> ;
+    flat-file>biassoc [ nip ] assoc-filter jis boa ;
 
-"vocab:io/encodings/japanese/CP932.txt"
+"vocab:io/encodings/shift-jis/CP932.txt"
 make-jis to: windows-31j-table
 
-"vocab:io/encodings/japanese/sjis-0208-1997-std.txt"
+"vocab:io/encodings/shift-jis/sjis-0208-1997-std.txt"
 make-jis to: shift-jis-table
 
 : small? ( char -- ? )
@@ -71,5 +62,3 @@ M: jis decode-char
             [ 2drop replacement-char ] if*
         ] if
     ] [ 2drop f ] if* ;
-
-PRIVATE>

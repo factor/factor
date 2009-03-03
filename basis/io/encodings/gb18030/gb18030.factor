@@ -4,7 +4,7 @@ USING: xml xml.data kernel io io.encodings interval-maps splitting fry
 math.parser sequences combinators assocs locals accessors math arrays
 byte-arrays values io.encodings.ascii ascii io.files biassocs
 math.order combinators.short-circuit io.binary io.encodings.iana ;
-IN: io.encodings.chinese
+IN: io.encodings.gb18030
 
 SINGLETON: gb18030
 
@@ -80,7 +80,7 @@ VALUE: gb>u
 VALUE: u>gb
 VALUE: mapping
 
-"vocab:io/encodings/chinese/gb-18030-2000.xml"
+"vocab:io/encodings/gb18030/gb-18030-2000.xml"
 ascii <file-reader> xml>gb-data
 [ ranges-u>gb to: u>gb ] [ ranges-gb>u to: gb>u ] bi
 >biassoc to: mapping
