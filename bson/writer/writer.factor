@@ -3,7 +3,7 @@
 USING: accessors assocs bson.constants byte-arrays fry io io.binary
 io.encodings.binary io.encodings.string io.encodings.utf8
 io.streams.byte-array kernel math math.parser quotations sequences
-serialize strings words ;
+serialize strings words hashtables ;
 
 IN: bson.writer
 
@@ -20,10 +20,10 @@ M: f bson-type? ( boolean -- type ) drop T_Boolean ;
 M: real bson-type? ( real -- type ) drop T_Double ; 
 M: word bson-type? ( word -- type ) drop T_String ; 
 M: tuple bson-type? ( tuple -- type ) drop T_Object ;  
-M: assoc bson-type? ( hashtable -- type ) drop T_Object ; 
+M: sequence bson-type? ( seq -- type ) drop T_Array ;
 M: string bson-type? ( string -- type ) drop T_String ; 
 M: integer bson-type? ( integer -- type ) drop T_Integer ; 
-M: sequence bson-type? ( seq -- type ) drop T_Array ;
+M: hashtable bson-type? ( hashtable -- type ) drop T_Object ; 
 
 M: oid bson-type? ( word -- type ) drop T_OID ;
 M: objid bson-type? ( objid -- type ) drop T_Binary ;
@@ -98,11 +98,11 @@ M: sequence bson-write ( array -- )
     [ MDB_OID_FIELD ] dip at*
     [ [ MDB_OID_FIELD ] dip write-pair ] [ drop ] if ; inline
 
-: oid-field? ( name -- boolean )
-    MDB_OID_FIELD = ; inline
+: skip-field? ( name -- boolean )
+    { MDB_OID_FIELD MDB_INTERNAL_FIELD } member? ; inline
 
-M: assoc bson-write ( hashtable -- )
-    '[ _ [ write-oid ] [ [ over oid-field? [ 2drop ] [ write-pair ] if ] assoc-each ] bi ]
+M: hashtable bson-write ( hashtable -- )
+    '[ _ [ write-oid ] [ [ over skip-field? [ 2drop ] [ write-pair ] if ] assoc-each ] bi ]
     binary swap with-byte-writer
     [ length 5 + bson-write ] keep
     write

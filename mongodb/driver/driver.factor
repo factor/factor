@@ -6,7 +6,7 @@ IN: mongodb.driver
 
 TUPLE: mdb-node master? inet ;
 
-TUPLE: mdb name nodes collections ;
+TUPLE: mdb-db name nodes collections ;
 
 TUPLE: mdb-cursor collection id return# ;
 
@@ -22,9 +22,6 @@ CONSTRUCTOR: mdb-cursor ( id collection return# -- cursor ) ;
 CONSTRUCTOR: mdb-collection ( name -- collection ) ;
 
 CONSTANT: MDB-GENERAL-ERROR 1
-
-CONSTANT: MDB_OID "_id"
-CONSTANT: MDB_PROPERTIES  "_mdb_"
 
 CONSTANT: PARTIAL? "partial?"
 CONSTANT: DIRTY? "dirty?"
@@ -43,8 +40,10 @@ SYMBOL: mdb-socket-stream
 
 PRIVATE>
 
-: mdb>> ( -- mdb )
-    mdb get ; inline
+SYMBOL: mdb-instance
+
+: mdb ( -- mdb )
+    mdb-instance get ; inline
 
 : master>> ( mdb -- inet )
     nodes>> [ t ] dip at inet>> ;
@@ -53,7 +52,7 @@ PRIVATE>
     nodes>> [ f ] dip at inet>> ;
 
 : with-db ( mdb quot -- ... )
-    [ [ '[ _ [ mdb set ] keep master>>
+    [ [ '[ _ [ mdb-instance set ] keep master>>
            [ remote-address set ] keep
            binary <client>
            local-address set
@@ -64,16 +63,16 @@ PRIVATE>
 <PRIVATE
 
 : index-collection ( -- ns )
-   mdb>> name>> "%s.system.indexes" sprintf ; inline
+   mdb name>> "%s.system.indexes" sprintf ; inline
 
 : namespaces-collection ( -- ns )
-    mdb>> name>> "%s.system.namespaces" sprintf ; inline
+    mdb name>> "%s.system.namespaces" sprintf ; inline
 
 : cmd-collection ( -- ns )
-    mdb>> name>> "%s.$cmd" sprintf ; inline
+    mdb name>> "%s.$cmd" sprintf ; inline
  
 : index-ns ( colname -- index-ns )
-    [ mdb>> name>> ] dip "%s.%s" sprintf ; inline
+    [ mdb name>> ] dip "%s.%s" sprintf ; inline
 
 : ismaster-cmd ( node -- result )
     binary "admin.$cmd" H{ { "ismaster" 1 } } <mdb-query-msg>
@@ -103,11 +102,11 @@ PRIVATE>
     ] when* ;
 
 : verify-nodes ( -- )
-    mdb>> nodes>> [ t ] dip at
+    mdb nodes>> [ t ] dip at
     check-nodes
     H{ } clone tuck
     '[ dup master?>> _ set-at ] each
-    [ mdb>> ] dip >>nodes drop ;
+    [ mdb ] dip >>nodes drop ;
 
 : send-message ( message -- )
     [ mdb-stream>> ] dip '[ _ write-message ] with-stream* ;
@@ -133,7 +132,7 @@ PRIVATE>
     check-nodes
     H{ } clone tuck
     '[ dup master?>> _ set-at ] each
-    H{ } clone mdb boa ;
+    H{ } clone mdb-db boa ;
 
 : create-collection ( name -- )
     [ cmd-collection ] dip
@@ -152,7 +151,7 @@ PRIVATE>
     '[ _ "%s contains invalid characters ( . $ ; )" sprintf throw ] when ; inline
 
 : (ensure-collection) ( collection --  )
-    mdb>> collections>> dup keys length 0 = 
+    mdb collections>> dup keys length 0 = 
     [ load-collection-list      
       [ [ "options" ] dip key? ] filter
       [ [ "name" ] dip at "." split second <mdb-collection> ] map
@@ -166,11 +165,11 @@ MEMO: reserved-namespace? ( name -- ? )
 PRIVATE>
 
 MEMO: ensure-collection ( collection -- fq-collection )
-    "." split1 over mdb>> name>> =
+    "." split1 over mdb name>> =
     [ [ drop ] dip ] [ drop ] if
     [ ] [ reserved-namespace? ] bi
     [ [ (ensure-collection) ] keep ] unless
-    [ mdb>> name>> ] dip "%s.%s" sprintf ; inline
+    [ mdb name>> ] dip "%s.%s" sprintf ; inline
 
 : <query> ( collection query -- mdb-query )
     [ ensure-collection ] dip
