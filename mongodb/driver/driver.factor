@@ -134,10 +134,21 @@ PRIVATE>
     '[ dup master?>> _ set-at ] each
     H{ } clone mdb-db boa ;
 
-: create-collection ( name -- )
+GENERIC: create-collection ( name -- )
+M: string create-collection
+    <mdb-collection> create-collection ;
+
+M: mdb-collection create-collection ( mdb-collection -- )
     [ cmd-collection ] dip
-    "create" H{ } clone [ set-at ] keep 
-     <mdb-query-msg> 1 >>return# send-query-plain objects>> first check-ok
+    <linked-hash> [
+        [ [ name>> "create" ] dip set-at ]
+        [ [ [ capped>> ] keep ] dip
+          '[ _ _
+             [ [ drop t "capped" ] dip set-at ]
+             [ [ size>> "size" ] dip set-at ]
+             [ [ max>> "max" ] dip set-at ] 2tri ] when
+        ] 2bi
+    ] keep <mdb-query-msg> 1 >>return# send-query-plain objects>> first check-ok
     [ "could not create collection" throw ] unless ;
 
 : load-collection-list ( -- collection-list )
@@ -194,10 +205,12 @@ GENERIC# hint 1 ( mdb-query index-hint -- mdb-query )
 M: mdb-query-msg hint ( mdb-query index-hint -- mdb-query )
     >>hint ;
 
-: find ( mdb-query -- cursor result )
+GENERIC: find ( mdb-query -- cursor result )
+M: mdb-query-msg find
      send-query ;
 
-: explain ( mdb-query -- result )
+GENERIC: explain ( mdb-query -- result )
+M: mdb-query-msg explain
     t >>explain find [ drop ] dip ;
 
 GENERIC: get-more ( mdb-cursor -- mdb-cursor objects )
@@ -205,10 +218,12 @@ M: mdb-cursor get-more ( mdb-cursor -- mdb-cursor objects )
     [ [ collection>> ] [ return#>> ] [ id>> ] tri <mdb-getmore-msg> send-query ] 
     [ f f ] if* ;
 
-: find-one ( mdb-query -- result )
+GENERIC: find-one ( mdb-query -- result )
+M: mdb-query-msg find-one
     1 >>return# send-query-plain ;
 
-: count ( collection query -- result )
+GENERIC: count ( collection query -- result )
+M: assoc count
     [ "count" H{ } clone [ set-at ] keep ] dip
     [ over [ "query" ] dip set-at ] when*
     [ cmd-collection ] dip <mdb-query-msg> find-one objects>> first
@@ -218,11 +233,14 @@ M: mdb-cursor get-more ( mdb-cursor -- mdb-cursor objects )
     cmd-collection H{ { "getlasterror" 1 } } <mdb-query-msg>
     find-one objects>> [ "err" ] at ;
 
-: validate ( collection -- )
+GENERIC: validate ( collection -- )
+M: string validate
     [ cmd-collection ] dip
     "validate" H{ } clone [ set-at ] keep
     <mdb-query-msg> find-one objects>> first [ check-ok ] keep
     '[ "result" _ at print ] when ;
+M: mdb-collection validate
+    name>> validate ;
 
 <PRIVATE
 
@@ -231,15 +249,18 @@ M: mdb-cursor get-more ( mdb-cursor -- mdb-cursor objects )
 
 PRIVATE>
 
-: save ( collection object -- )
+GENERIC: save ( collection assoc -- )
+M: assoc save
     [ ensure-collection ] dip
     <mdb-insert-msg> send-message-check-error ;
 
-: save-unsafe ( collection object -- )
+GENERIC: save-unsafe ( collection object -- )
+M: assoc save-unsafe
     [ ensure-collection ] dip
     <mdb-insert-msg> send-message ;
 
-: ensure-index ( collection name spec -- )
+GENERIC: ensure-index ( collection name spec -- )
+M: assoc ensure-index
     H{ } clone
     [ [ "key" ] dip set-at ] keep
     [ [ "name" ] dip set-at ] keep
@@ -254,19 +275,23 @@ PRIVATE>
     [ cmd-collection ] dip <mdb-query-msg> find-one objects>> first
     check-ok [ "could not drop index" throw ] unless ;
 
-: update ( collection selector object -- )
+GENERIC: update ( collection selector object -- )
+M: assoc update
     [ ensure-collection ] dip
     <mdb-update-msg> send-message-check-error ;
 
-: update-unsafe ( collection selector object -- )
+GENERIC: update-unsafe ( collection selector object -- )
+M: assoc update-unsafe
     [ ensure-collection ] dip
     <mdb-update-msg> send-message ;
  
-: delete ( collection selector -- )
+GENERIC: delete ( collection selector -- )
+M: assoc delete
     [ ensure-collection ] dip
     <mdb-delete-msg> send-message-check-error ;
 
-: delete-unsafe ( collection selector -- )
+GENERIC: delete-unsafe ( collection selector -- )
+M: assoc delete-unsafe
     [ ensure-collection ] dip
     <mdb-delete-msg> send-message ;
 
