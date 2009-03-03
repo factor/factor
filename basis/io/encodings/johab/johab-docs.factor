@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Yun, Jonghyouk.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup ;
-IN: io.encodings.korean.johab
+IN: io.encodings.johab
 
 ABOUT: johab
 

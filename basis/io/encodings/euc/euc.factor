@@ -13,11 +13,13 @@ TUPLE: euc { table biassoc } ;
     HEX: 0 HEX: ff between? ;
 
 M: euc encode-char ( char stream encoding -- )
-    swapd table>> value-at dup byte?
-    [ swap stream-write1 ] [
-        h>b/b swap 2byte-array
-        swap stream-write
-    ] if ;
+    swapd table>> value-at [
+        dup byte?
+        [ swap stream-write1 ] [
+            h>b/b swap 2byte-array
+            swap stream-write
+        ] if
+    ] [ encode-error ] if* ;
 
 : euc-multibyte? ( ch -- ? )
     HEX: 81 HEX: fe between? ;
