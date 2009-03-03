@@ -20,11 +20,6 @@ GENERIC: match-index-from ( i string matcher -- index/f )
     dupd match-index-head
     [ swap length = ] [ drop f ] if* ;
 
-: map-find ( seq quot -- result elt )
-    [ f ] 2dip
-    '[ nip @ dup ] find
-    [ [ drop f ] unless ] dip ; inline
-
 :: match-from ( i string matcher -- slice/f )
     i string length [a,b)
     [ string matcher match-slice ] map-find drop ;
@@ -40,7 +35,7 @@ GENERIC: match-index-from ( i string matcher -- index/f )
 PRIVATE>
 
 :: all-matches ( string matcher -- seq )
-    0 [ dup ] [ string matcher next-match ] [ ] produce nip but-last ;
+    0 [ dup ] [ string matcher next-match ] produce nip but-last ;
 
 : count-matches ( string matcher -- n )
     all-matches length ;
