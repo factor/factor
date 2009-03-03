@@ -68,7 +68,7 @@ GENERIC: load-image* ( path tuple -- image )
             [
                 3 <sliced-groups>
                 [ [ 3 head-slice reverse-here ] each ]
-                [ add-dummy-alpha ] bi
+                [ [ 255 suffix ] map ] bi concat
             ] change-bitmap
         ] }
     } case

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings.japanese tools.test io.encodings.string arrays strings ;
-IN: io.encodings.japanese.tests
+USING: io.encodings.shift-jis tools.test io.encodings.string arrays strings ;
+IN: io.encodings.shift-jis.tests
 
 [ { CHAR: replacement-character } ] [ { 141 } shift-jis decode >array ] unit-test
 [ "" ] [ "" shift-jis decode >string ] unit-test

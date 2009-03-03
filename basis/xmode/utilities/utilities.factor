@@ -5,11 +5,6 @@ IN: xmode.utilities
 
 : implies ( x y -- z ) [ not ] dip or ; inline
 
-: map-find ( seq quot -- result elt )
-    [ f ] 2dip
-    '[ nip @ dup ] find
-    [ [ drop f ] unless ] dip ; inline
-
 : tag-init-form ( spec -- quot )
     {
         { [ dup quotation? ] [ [ object get tag get ] prepose ] }
