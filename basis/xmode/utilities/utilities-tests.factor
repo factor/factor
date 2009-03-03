@@ -2,13 +2,6 @@ IN: xmode.utilities.tests
 USING: accessors xmode.utilities tools.test xml xml.data kernel
 strings vectors sequences io.files prettyprint assocs
 unicode.case ;
-[ "hi" 3 ] [
-    { 1 2 3 4 5 6 7 8 } [ H{ { 3 "hi" } } at ] map-find
-] unit-test
-
-[ f f ] [
-    { 1 2 3 4 5 6 7 8 } [ H{ { 11 "hi" } } at ] map-find
-] unit-test
 
 TUPLE: company employees type ;
 
