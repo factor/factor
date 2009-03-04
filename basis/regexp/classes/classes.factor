@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.order words combinators locals
 ascii unicode.categories combinators.short-circuit sequences
-fry macros arrays ;
+fry macros arrays assocs sets ;
 IN: regexp.classes
 
 SINGLETONS: any-char any-char-no-nl
@@ -208,3 +208,57 @@ M: primitive-class class-member?
     class>> class-member? ;
 
 UNION: class primitive-class not-class or-class and-class range ;
+
+TUPLE: condition question yes no ;
+C: <condition> condition
+
+GENERIC# replace-question 2 ( class from to -- new-class )
+
+M:: object replace-question ( class from to -- new-class )
+    class from = to class ? ;
+
+: replace-compound ( class from to -- seq )
+    [ seq>> ] 2dip '[ _ _ replace-question ] map ;
+
+M: and-class replace-question
+    replace-compound <and-class> ;
+
+M: or-class replace-question
+    replace-compound <or-class> ;
+
+M: not-class replace-question
+    class>> replace-question <not-class> ;
+
+: answer ( table question answer -- new-table )
+    '[ [ _ _ replace-question ] dip ] assoc-map
+    [ drop ] assoc-filter ;
+
+DEFER: make-condition
+
+: (make-condition) ( table questions question -- condition )
+    [ 2nip ]
+    [ swap [ t answer ] dip make-condition ]
+    [ swap [ f answer ] dip make-condition ] 3tri
+    2dup = [ 2nip ] [ <condition> ] if ;
+
+: make-condition ( table questions -- condition )
+    [ values ] [ unclip (make-condition) ] if-empty ;
+
+GENERIC: class>questions ( class -- questions )
+: compound-questions ( class -- questions ) seq>> [ class>questions ] gather ;
+M: or-class class>questions compound-questions ;
+M: and-class class>questions compound-questions ;
+M: not-class class>questions class>> class>questions ;
+M: object class>questions 1array ;
+
+: table>questions ( table -- questions )
+    keys <and-class> class>questions t swap remove ;
+
+: table>condition ( table -- condition )
+    >alist dup table>questions make-condition ;
+
+: condition-map ( condition quot: ( obj -- obj' ) -- new-condition ) 
+    over condition? [
+        [ [ question>> ] [ yes>> ] [ no>> ] tri ] dip
+        '[ _ condition-map ] bi@ <condition>
+    ] [ call ] if ; inline recursive

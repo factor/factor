@@ -9,9 +9,17 @@ IN: regexp.compiler
 : literals>cases ( literal-transitions -- case-body )
     [ 1quotation ] assoc-map ;
 
+: condition>quot ( condition -- quot )
+    dup condition? [
+        [ question>> ] [ yes>> ] [ no>> ] tri
+        [ condition>quot ] bi@
+        '[ dup _ class-member? _ _ if ]
+    ] [
+        [ [ 3drop ] ] [ '[ drop _ execute ] ] if-empty
+    ] if ;
+
 : non-literals>dispatch ( non-literal-transitions -- quot )
-    [ [ '[ dup _ class-member? ] ] [ '[ drop _ execute ] ] bi* ] assoc-map
-    [ 3drop ] suffix '[ _ cond ] ;
+    table>condition condition>quot ;
 
 : expand-one-or ( or-class transition -- alist )
     [ seq>> ] dip '[ _ 2array ] map ;
@@ -36,7 +44,7 @@ IN: regexp.compiler
 
 : transitions>quot ( transitions final-state? -- quot )
     [ split-literals suffix ] dip
-    '[ { array-capacity string } declare _ _ step ] ;
+    '[ { array-capacity sequence } declare _ _ step ] ;
 
 : word>quot ( word dfa -- quot )
     [ transitions>> at ]
@@ -67,11 +75,12 @@ IN: regexp.compiler
 : dfa>word ( dfa -- word )
     states>words [ states>code ] keep start-state>> ;
 
-: check-string ( string -- string )
-    dup string? [ "String required" throw ] unless ;
+: check-sequence ( string -- string )
+    ! Make this configurable
+    dup sequence? [ "String required" throw ] unless ;
 
 : run-regexp ( start-index string word -- ? )
-    { [ f ] [ >fixnum ] [ check-string ] [ execute ] } spread ; inline
+    { [ f ] [ >fixnum ] [ check-sequence ] [ execute ] } spread ; inline
 
 : dfa>quotation ( dfa -- quot )
     dfa>word '[ _ run-regexp ] ;

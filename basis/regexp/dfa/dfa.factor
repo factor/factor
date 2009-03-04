@@ -8,9 +8,6 @@ IN: regexp.dfa
 : find-delta ( states transition nfa -- new-states )
     transitions>> '[ _ swap _ at at ] gather sift ;
 
-TUPLE: condition question yes no ;
-C: <condition> condition
-
 :: epsilon-loop ( state table nfa question -- )
     state table at :> old-value
     old-value question 2array <or-class> :> new-question
@@ -27,53 +24,12 @@ C: <condition> condition
         ] assoc-each
     ] unless ;
 
-GENERIC# replace-question 2 ( class from to -- new-class )
-
-M: object replace-question
-    [ [ = ] keep ] dip swap ? ;
-
-: replace-compound ( class from to -- seq )
-    [ seq>> ] 2dip '[ _ _ replace-question ] map ;
-
-M: and-class replace-question
-    replace-compound <and-class> ;
-
-M: or-class replace-question
-    replace-compound <or-class> ;
-
-: answer ( table question answer -- new-table )
-    '[ _ _ replace-question ] assoc-map
-    [ nip ] assoc-filter ;
-
-DEFER: make-condition
-
-: (make-condition) ( table questions question -- condition )
-    [ 2nip ]
-    [ swap [ t answer ] dip make-condition ]
-    [ swap [ f answer ] dip make-condition ] 3tri
-    <condition> ;
-
-: make-condition ( table questions -- condition )
-    [ keys ] [ unclip (make-condition) ] if-empty ;
-
-GENERIC: class>questions ( class -- questions )
-: compound-questions ( class -- questions ) seq>> [ class>questions ] gather ;
-M: or-class class>questions compound-questions ;
-M: and-class class>questions compound-questions ;
-M: object class>questions 1array ;
-
-: table>condition ( table -- condition )
-    ! This is wrong, since actually an arbitrary and-class or or-class can be used
-    dup
-    values <or-class> class>questions t swap remove
-    make-condition ;
-
 : epsilon-table ( states nfa -- table )
     [ H{ } clone tuck ] dip
     '[ _ _ t epsilon-loop ] each ;
 
 : find-epsilon-closure ( states nfa -- dfa-state )
-    epsilon-table table>condition ;
+    epsilon-table [ swap ] assoc-map table>condition ;
 
 : find-closure ( states transition nfa -- new-states )
     [ find-delta ] keep find-epsilon-closure ;

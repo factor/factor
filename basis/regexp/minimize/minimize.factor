@@ -2,13 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences regexp.transition-tables fry assocs
 accessors locals math sorting arrays sets hashtables regexp.dfa
-combinators.short-circuit ;
+combinators.short-circuit regexp.classes ;
 IN: regexp.minimize
 
 : number-transitions ( transitions numbering -- new-transitions )
     dup '[
         [ _ at ]
-        [ [ _ at ] assoc-map ] bi*
+        [ [ [ _ at ] condition-map ] assoc-map ] bi*
     ] assoc-map ;
 
 : table>state-numbers ( table -- assoc )
@@ -29,6 +29,9 @@ IN: regexp.minimize
     dup table>state-numbers
     [ number-transitions ] rewrite-transitions ;
 
+: no-conditions? ( state transition-table -- ? )
+    transitions>> at values [ condition? ] any? not ;
+
 : initially-same? ( s1 s2 transition-table -- ? )
     {
         [ drop <= ]
@@ -39,7 +42,8 @@ IN: regexp.minimize
 :: initialize-partitions ( transition-table -- partitions )
     ! Partition table is sorted-array => ?
     H{ } clone :> out
-    transition-table transitions>> keys :> states
+    transition-table transitions>> keys
+    [ transition-table no-conditions? ] filter :> states
     states [| s1 |
         states [| s2 |
             s1 s2 transition-table initially-same?

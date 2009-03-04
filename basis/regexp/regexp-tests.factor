@@ -1,5 +1,5 @@
 USING: regexp tools.test kernel sequences regexp.parser regexp.private
-regexp.traversal eval strings multiline accessors regexp.matchers ;
+eval strings multiline accessors regexp.matchers ;
 IN: regexp-tests
 
 \ <regexp> must-infer

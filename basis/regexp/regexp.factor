@@ -3,7 +3,7 @@
 USING: accessors combinators kernel math sequences strings sets
 assocs prettyprint.backend prettyprint.custom make lexer
 namespaces parser arrays fry locals regexp.minimize
-regexp.parser regexp.nfa regexp.dfa regexp.traversal
+regexp.parser regexp.nfa regexp.dfa
 regexp.transition-tables splitting sorting regexp.ast
 regexp.negation regexp.matchers regexp.compiler ;
 IN: regexp
@@ -12,16 +12,16 @@ TUPLE: regexp
     { raw read-only }
     { parse-tree read-only }
     { options read-only }
-    dfa reverse-dfa dfa-quot ;
+    dfa reverse-dfa ;
 
 : make-regexp ( string ast -- regexp )
-    f f <options> f f f regexp boa ; foldable
+    f f <options> f f regexp boa ; foldable
     ! Foldable because, when the dfa slot is set,
     ! it'll be set to the same thing regardless of who sets it
 
 : <optioned-regexp> ( string options -- regexp )
     [ dup parse-regexp ] [ string>options ] bi*
-    f f f regexp boa ;
+    f f regexp boa ;
 
 : <regexp> ( string -- regexp ) "" <optioned-regexp> ;
 
@@ -34,26 +34,25 @@ C: <reverse-matcher> reverse-matcher
     [ parse-tree>> ] [ options>> ] bi <with-options> ;
 
 : compile-regexp ( regexp -- regexp )
-    dup '[ [ _ get-ast ast>dfa ] unless* ] change-dfa ;
-
-: compile-dfa-quot ( regexp -- regexp )
-    dup '[ [ _ compile-regexp dfa>> dfa>quotation ] unless* ] change-dfa-quot ;
+    dup '[ [ _ get-ast ast>dfa dfa>quotation ] unless* ] change-dfa ;
 
 : <reversed-option> ( ast -- reversed )
     "r" string>options <with-options> ;
 
 : compile-reverse ( regexp -- regexp )
-    dup '[ [ _ get-ast <reversed-option> ast>dfa ] unless* ] change-reverse-dfa ;
+    dup '[
+        [
+            _ get-ast <reversed-option>
+            ast>dfa dfa>quotation
+        ] unless*
+    ] change-reverse-dfa ;
 
 M: regexp match-index-from ( string regexp -- index/f )
-    dup dfa-quot>>
-    [ <quot-matcher> ]
-    [ compile-regexp dfa>> <dfa-matcher> ] ?if
-    match-index-from ;
+    compile-regexp dfa-quot>> <quot-matcher> match-index-from ;
 
 M: reverse-matcher match-index-from ( string regexp -- index/f )
     [ <reversed> ] [ regexp>> compile-reverse reverse-dfa>> ] bi*
-    <dfa-traverser> do-match match-index>> ;
+    <quot-matcher> match-index-from ;
 
 : find-regexp-syntax ( string -- prefix suffix )
     {
