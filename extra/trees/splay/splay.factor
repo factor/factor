@@ -1,7 +1,7 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces sequences assocs parser
-prettyprint.backend trees generic math.order accessors ;
+trees generic math.order accessors prettyprint.custom ;
 IN: trees.splay
 
 TUPLE: splay < tree ;
@@ -137,4 +137,4 @@ M: splay new-assoc
 M: splay assoc-like
     drop dup splay? [ >splay ] unless ;
 
-! M: splay pprint-delims drop \ SPLAY{ \ } ;
+M: splay pprint-delims drop \ SPLAY{ \ } ;

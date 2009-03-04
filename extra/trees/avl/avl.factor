@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel generic math math.functions
-math.parser namespaces io prettyprint.backend sequences trees
-assocs parser accessors math.order ;
+math.parser namespaces io sequences trees
+assocs parser accessors math.order prettyprint.custom ;
 IN: trees.avl
 
 TUPLE: avl < tree ;
@@ -155,4 +155,4 @@ M: avl assoc-like
 : AVL{
     \ } [ >avl ] parse-literal ; parsing
 
-! M: avl pprint-delims drop \ AVL{ \ } ;
+M: avl pprint-delims drop \ AVL{ \ } ;
