@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.order words combinators locals
 ascii unicode.categories combinators.short-circuit sequences
-fry macros arrays assocs sets ;
+fry macros arrays assocs sets classes ;
 IN: regexp.classes
 
 SINGLETONS: any-char any-char-no-nl
@@ -130,7 +130,13 @@ M: f combine-and
     nip t ;
 
 M: not-class combine-and
-    class>> = [ f t ] [ f f ] if ;
+    class>> 2dup = [ 2drop f t ] [
+        dup integer? [
+            2dup swap class-member?
+            [ 2drop f f ]
+            [ drop t ] if
+        ] [ 2drop f f ] if
+    ] if ;
 
 M: integer combine-and
     swap 2dup class-member? [ drop t ] [ 2drop f t ] if ;
@@ -150,9 +156,6 @@ M: not-class combine-or
 
 M: integer combine-or
     2dup swap class-member? [ drop t ] [ 2drop f f ] if ;
-
-MACRO: instance? ( class -- ? )
-    "predicate" word-prop ;
 
 : flatten ( seq class -- newseq )
     '[ dup _ instance? [ seq>> ] [ 1array ] if ] map concat ; inline
@@ -201,6 +204,9 @@ M: and-class <not-class>
 M: or-class <not-class>
     seq>> [ <not-class> ] map <and-class> ;
 
+M: t <not-class> drop f ;
+M: f <not-class> drop t ;
+
 M: not-class class-member?
     class>> class-member? not ;
 
@@ -230,8 +236,8 @@ M: not-class replace-question
     class>> replace-question <not-class> ;
 
 : answer ( table question answer -- new-table )
-    '[ [ _ _ replace-question ] dip ] assoc-map
-    [ drop ] assoc-filter ;
+    '[ _ _ replace-question ] assoc-map
+    [ nip ] assoc-filter ;
 
 DEFER: make-condition
 
@@ -242,7 +248,7 @@ DEFER: make-condition
     2dup = [ 2nip ] [ <condition> ] if ;
 
 : make-condition ( table questions -- condition )
-    [ values ] [ unclip (make-condition) ] if-empty ;
+    [ keys ] [ unclip (make-condition) ] if-empty ;
 
 GENERIC: class>questions ( class -- questions )
 : compound-questions ( class -- questions ) seq>> [ class>questions ] gather ;
@@ -252,9 +258,10 @@ M: not-class class>questions class>> class>questions ;
 M: object class>questions 1array ;
 
 : table>questions ( table -- questions )
-    keys <and-class> class>questions t swap remove ;
+    values <and-class> class>questions t swap remove ;
 
 : table>condition ( table -- condition )
+    ! input table is state => class
     >alist dup table>questions make-condition ;
 
 : condition-map ( condition quot: ( obj -- obj' ) -- new-condition ) 

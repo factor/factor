@@ -27,20 +27,23 @@ IN: regexp.classes.tests
 [ T{ primitive-class { class letter-class } } ] [ letter-class <primitive-class> dup 2array <and-class> ] unit-test
 [ T{ primitive-class { class letter-class } } ] [ letter-class <primitive-class> dup 2array <or-class> ] unit-test
 [ T{ or-class { seq { 2 3 1 } } } ] [ { 1 2 } <or-class> { 2 3 } <or-class> 2array <or-class> ] unit-test
+[ T{ or-class { seq { 3 2 } } } ] [ { 2 3 } <or-class> 1 <not-class> 2array <and-class> ] unit-test
+[ f ] [ t <not-class> ] unit-test
+[ t ] [ f <not-class> ] unit-test
 
 ! Making classes into nested conditionals
 
 [ V{ 1 2 3 4 } ] [ T{ and-class f { 1 T{ not-class f 2 } T{ or-class f { 3 4 } } 2 } } class>questions ] unit-test
-[ { 3 } ] [ { { t 3 } } table>condition ] unit-test
-[ { T{ primitive-class } } ] [ { { t 1 } { T{ primitive-class } 2 } } table>questions ] unit-test
-[ { { t 1 } { t 2 } } ] [ { { t 1 } { T{ primitive-class } 2 } } T{ primitive-class } t answer ] unit-test
-[ { { t 1 } } ] [ { { t 1 } { T{ primitive-class } 2 } } T{ primitive-class } f answer ] unit-test
-[ T{ condition f T{ primitive-class } { 1 2 } { 1 } } ] [ { { t 1 } { T{ primitive-class } 2 } } table>condition ] unit-test
+[ { 3 } ] [ { { 3 t } } table>condition ] unit-test
+[ { T{ primitive-class } } ] [ { { 1 t } { 2 T{ primitive-class } } } table>questions ] unit-test
+[ { { 1 t } { 2 t } } ] [ { { 1 t } { 2 T{ primitive-class } } } T{ primitive-class } t answer ] unit-test
+[ { { 1 t } } ] [ { { 1 t } { 2 T{ primitive-class } } } T{ primitive-class } f answer ] unit-test
+[ T{ condition f T{ primitive-class } { 1 2 } { 1 } } ] [ { { 1 t } { 2 T{ primitive-class } } } table>condition ] unit-test
 
 SYMBOL: foo
 SYMBOL: bar
 
-[ T{ condition f T{ primitive-class f bar } T{ condition f T{ primitive-class f foo } { 1 2 3 } { 1 3 } } T{ condition f T{ primitive-class f foo } { 1 2 } { 1 } } } ] [ { { t 1 } { T{ primitive-class f foo } 2 } { T{ primitive-class f bar } 3 } } table>condition ] unit-test
+[ T{ condition f T{ primitive-class f bar } T{ condition f T{ primitive-class f foo } { 1 2 3 } { 1 3 } } T{ condition f T{ primitive-class f foo } { 1 2 } { 1 } } } ] [ { { 1 t } { 2 T{ primitive-class f foo } } { 3 T{ primitive-class f bar } } } table>condition ] unit-test
 
 [ t ] [ foo <primitive-class> dup t replace-question ] unit-test
 [ f ] [ foo <primitive-class> dup f replace-question ] unit-test

@@ -18,8 +18,12 @@ IN: regexp.compiler
         [ [ 3drop ] ] [ '[ drop _ execute ] ] if-empty
     ] if ;
 
-: non-literals>dispatch ( non-literal-transitions -- quot )
+: new-non-literals>dispatch ( non-literal-transitions -- quot )
     table>condition condition>quot ;
+
+: non-literals>dispatch ( non-literal-transitions -- quot )
+    [ [ '[ dup _ class-member? ] ] [ '[ drop _ execute ] ] bi* ] assoc-map
+    [ 3drop ] suffix '[ _ cond ] ;
 
 : expand-one-or ( or-class transition -- alist )
     [ seq>> ] dip '[ _ 2array ] map ;

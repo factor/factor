@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test regexp.minimize assocs regexp
-accessors regexp.transition-tables ;
+accessors regexp.transition-tables regexp.parser regexp.negation ;
 IN: regexp.minimize.tests
 
 [ t ] [ 1 2 H{ { { 1 2 } t } } same-partition? ] unit-test
@@ -13,13 +13,16 @@ IN: regexp.minimize.tests
 
 [ { { 1 2 } { 3 4 } } ] [ H{ { "elephant" 1 } { "tiger" 3 } } H{ { "elephant" 2 } { "tiger" 4 } } assemble-values ] unit-test
 
-[ 3 ] [ R/ ab|ac/ dfa>> transitions>> assoc-size ] unit-test
-[ 3 ] [ R/ a(b|c)/ dfa>> transitions>> assoc-size ] unit-test
-[ 1 ] [ R/ ((aa*)*)*/ dfa>> transitions>> assoc-size ] unit-test
-[ 1 ] [ R/ a|((aa*)*)*/ dfa>> transitions>> assoc-size ] unit-test
-[ 2 ] [ R/ ab|((aa*)*)*b/ dfa>> transitions>> assoc-size ] unit-test
-[ 4 ] [ R/ ab|cd/ dfa>> transitions>> assoc-size ] unit-test
-[ 1 ] [ R/ [a-z]*|[A-Z]*/i dfa>> transitions>> assoc-size ] unit-test
+: regexp-states ( string -- n )
+    parse-regexp ast>dfa transitions>> assoc-size ;
+
+[ 3 ] [ "ab|ac" regexp-states ] unit-test
+[ 3 ] [ "a(b|c)" regexp-states ] unit-test
+[ 1 ] [ "((aa*)*)*" regexp-states ] unit-test
+[ 1 ] [ "a|((aa*)*)*" regexp-states ] unit-test
+[ 2 ] [ "ab|((aa*)*)*b" regexp-states ] unit-test
+[ 4 ] [ "ab|cd" regexp-states ] unit-test
+[ 1 ] [ "(?i:[a-z]*|[A-Z]*)" regexp-states ] unit-test
 
 [
     T{ transition-table

@@ -29,7 +29,7 @@ IN: regexp.dfa
     '[ _ _ t epsilon-loop ] each ;
 
 : find-epsilon-closure ( states nfa -- dfa-state )
-    epsilon-table [ swap ] assoc-map table>condition ;
+    epsilon-table table>condition ;
 
 : find-closure ( states transition nfa -- new-states )
     [ find-delta ] keep find-epsilon-closure ;
@@ -59,18 +59,13 @@ IN: regexp.dfa
         nfa dfa new-states visited-states new-transitions
     ] if-empty ;
 
-: states ( hashtable -- array )
-    [ keys ]
-    [ values [ values concat ] map concat ] bi
-    append ;
-
 : set-final-states ( nfa dfa -- )
     [
         [ final-states>> keys ]
-        [ transitions>> states ] bi*
+        [ transitions>> keys ] bi*
         [ intersects? ] with filter
-    ] [ final-states>> ] bi
-    [ conjoin ] curry each ;
+        unique
+    ] keep (>>final-states) ;
 
 : initialize-dfa ( nfa -- dfa )
     <transition-table>

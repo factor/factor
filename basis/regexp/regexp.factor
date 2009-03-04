@@ -48,7 +48,7 @@ C: <reverse-matcher> reverse-matcher
     ] change-reverse-dfa ;
 
 M: regexp match-index-from ( string regexp -- index/f )
-    compile-regexp dfa-quot>> <quot-matcher> match-index-from ;
+    compile-regexp dfa>> <quot-matcher> match-index-from ;
 
 M: reverse-matcher match-index-from ( string regexp -- index/f )
     [ <reversed> ] [ regexp>> compile-reverse reverse-dfa>> ] bi*
@@ -81,7 +81,7 @@ M: reverse-matcher match-index-from ( string regexp -- index/f )
 
 : parsing-regexp ( accum end -- accum )
     lexer get [ take-until ] [ parse-noblank-token ] bi
-    <optioned-regexp> compile-dfa-quot parsed ;
+    <optioned-regexp> compile-regexp parsed ;
 
 PRIVATE>
 
