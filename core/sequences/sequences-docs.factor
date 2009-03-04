@@ -397,6 +397,10 @@ HELP: find-last-from
 { $values { "n" "a starting index" } { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "i" "the index of the first match, or f" } { "elt" "the first matching element, or " { $link f } } }
 { $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of f and " { $link f } " as the element." } ;
 
+HELP: map-find
+{ $values { "seq" sequence } { "quot" { $quotation "( elt -- result/f )" } } { "result" "the first non-false result of the quotation" } { "elt" "the first matching element, or " { $link f } } }
+{ $description "Applies the quotation to each element of the sequence, until the quotation outputs a true value. If the quotation ever yields a result which is not " { $link f } ", then the value is output, along with the element of the sequence which yielded this." } ;
+
 HELP: any?
 { $values { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the sequence contains an element satisfying the predicate, by applying the predicate to each element in turn until a true value is found. If the sequence is empty or if the end of the sequence is reached, outputs " { $link f } "." } ;
@@ -1455,6 +1459,7 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection map }
 { $subsection map-as }
 { $subsection map-index }
+{ $subsection map-reduce }
 { $subsection accumulate }
 { $subsection produce }
 { $subsection produce-as }
@@ -1473,6 +1478,7 @@ ARTICLE: "sequence-2combinators" "Pair-wise sequence combinators"
 { $subsection 2reduce }
 { $subsection 2map }
 { $subsection 2map-as }
+{ $subsection 2map-reduce }
 { $subsection 2all? } ;
 
 ARTICLE: "sequence-3combinators" "Triple-wise sequence combinators"
@@ -1507,7 +1513,8 @@ ARTICLE: "sequences-search" "Searching sequences"
 { $subsection find }
 { $subsection find-from }
 { $subsection find-last }
-{ $subsection find-last-from } ;
+{ $subsection find-last-from }
+{ $subsection map-find } ;
 
 ARTICLE: "sequences-trimming" "Trimming sequences"
 "Trimming words:"
