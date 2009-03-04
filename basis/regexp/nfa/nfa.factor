@@ -11,19 +11,6 @@ IN: regexp.nfa
 ! but case-insensitive matching should be done by case-folding everything
 ! before processing starts
 
-GENERIC: remove-lookahead ( syntax-tree -- syntax-tree' )
-! This is unfinished and does nothing right now!
-
-M: object remove-lookahead ;
-
-M: with-options remove-lookahead
-    [ tree>> remove-lookahead ] [ options>> ] bi <with-options> ;
-
-M: alternation remove-lookahead
-    [ first>> ] [ second>> ] bi [ remove-lookahead ] bi@ alternation boa ;
-
-M: concatenation remove-lookahead ;
-
 SYMBOL: option-stack
 
 SYMBOL: state
@@ -148,7 +135,7 @@ M: with-options nfa-node ( node -- start end )
     [
         0 state set
         <transition-table> nfa-table set
-        remove-lookahead nfa-node
+        nfa-node
         nfa-table get
             swap dup associate >>final-states
             swap >>start-state

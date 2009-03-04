@@ -1,7 +1,8 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.order words combinators locals
-ascii unicode.categories combinators.short-circuit sequences ;
+ascii unicode.categories combinators.short-circuit sequences
+fry macros arrays ;
 IN: regexp.classes
 
 SINGLETONS: any-char any-char-no-nl
@@ -150,6 +151,12 @@ M: not-class combine-or
 M: integer combine-or
     2dup swap class-member? [ drop t ] [ 2drop f f ] if ;
 
+MACRO: instance? ( class -- ? )
+    "predicate" word-prop ;
+
+: flatten ( seq class -- newseq )
+    '[ dup _ instance? [ seq>> ] [ 1array ] if ] map concat ; inline
+
 : try-combine ( elt1 elt2 quot -- combined/f ? )
     3dup call [ [ 3drop ] dip t ] [ drop swapd call ] if ; inline
 
@@ -160,7 +167,8 @@ M: integer combine-or
     [ seq elt prefix ] if* ; inline
 
 :: combine ( seq quot: ( elt1 elt2 -- combined/f ? ) empty class -- newseq )
-    seq { } [ quot prefix-combining ] reduce
+    seq class flatten
+    { } [ quot prefix-combining ] reduce
     dup length {
         { 0 [ drop empty ] }
         { 1 [ first ] }
@@ -179,12 +187,19 @@ M: and-class class-member?
 M: or-class class-member?
     seq>> [ class-member? ] with any? ;
 
-: <not-class> ( class -- inverse )
-    {
-        { t [ f ] }
-        { f [ t ] }
-        [ dup not-class? [ class>> ] [ not-class boa ] if ]
-    } case ;
+GENERIC: <not-class> ( class -- inverse )
+
+M: object <not-class>
+    not-class boa ;
+
+M: not-class <not-class>
+    class>> ;
+
+M: and-class <not-class>
+    seq>> [ <not-class> ] map <or-class> ;
+
+M: or-class <not-class>
+    seq>> [ <not-class> ] map <and-class> ;
 
 M: not-class class-member?
     class>> class-member? not ;
@@ -192,4 +207,4 @@ M: not-class class-member?
 M: primitive-class class-member?
     class>> class-member? ;
 
-UNION: class primitive-class not-class or-class range ;
+UNION: class primitive-class not-class or-class and-class range ;
