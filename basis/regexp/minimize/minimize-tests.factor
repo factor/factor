@@ -47,3 +47,5 @@ IN: regexp.minimize.tests
         { final-states H{ { 3 3 } { 6 6 } } }
     } combine-states
 ] unit-test
+
+[ [ ] [ ] while-changes ] must-infer

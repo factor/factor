@@ -14,11 +14,20 @@ TUPLE: transition-table transitions start-state final-states ;
 : maybe-initialize-key ( key hashtable -- )
     2dup key? [ 2drop ] [ [ H{ } clone ] 2dip set-at ] if ;
 
-:: set-transition ( from to obj hash -- )
+:: (set-transition) ( from to obj hash -- )
+    to hash maybe-initialize-key
+    from hash at
+    [ [ to obj ] dip set-at ]
+    [ to obj associate from hash set-at ] if* ;
+
+: set-transition ( from to obj transition-table -- )
+    transitions>> (set-transition) ;
+
+:: (add-transition) ( from to obj hash -- )
     to hash maybe-initialize-key
     from hash at
     [ [ to obj ] dip push-at ]
     [ to 1vector obj associate from hash set-at ] if* ;
 
 : add-transition ( from to obj transition-table -- )
-    transitions>> set-transition ;
+    transitions>> (add-transition) ;

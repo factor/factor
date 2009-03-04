@@ -140,7 +140,7 @@ GENERIC: combine-or ( class1 class2 -- combined ? )
 M: object combine-or replace-if-= ;
 
 M: t combine-or
-    drop f ;
+    nip t ;
 
 M: f combine-or
     drop t ;

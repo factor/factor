@@ -16,7 +16,7 @@ C: <at-least> at-least
 TUPLE: tagged-epsilon tag ;
 C: <tagged-epsilon> tagged-epsilon
 
-CONSTANT: epsilon T{ tagged-epsilon }
+CONSTANT: epsilon T{ tagged-epsilon { tag t } }
 
 TUPLE: concatenation first second ;
 
