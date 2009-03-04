@@ -8,6 +8,9 @@ C: <affine-transform> affine-transform
 
 CONSTANT: identity-transform T{ affine-transform f { 1.0 0.0 } { 0.0 1.0 } { 0.0 0.0 } }
 
+: axes ( a -- a' )
+    clone { 0.0 0.0 } >>origin ;
+
 : a.v ( a v -- v )
     [ [ x>> ] [ first  ] bi* v*n ]
     [ [ y>> ] [ second ] bi* v*n ]
