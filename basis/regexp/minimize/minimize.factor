@@ -8,7 +8,7 @@ IN: regexp.minimize
 : number-transitions ( transitions numbering -- new-transitions )
     dup '[
         [ _ at ]
-        [ [ first _ at ] assoc-map ] bi*
+        [ [ _ at ] assoc-map ] bi*
     ] assoc-map ;
 
 : table>state-numbers ( table -- assoc )
@@ -65,6 +65,17 @@ IN: regexp.minimize
     [ drop first2 swap ] assoc-map
     <reversed>
     >hashtable ;
+
+:: (while-changes) ( obj quot: ( obj -- obj' ) comp: ( obj -- key ) old-key -- obj )
+    obj quot call :> new-obj
+    new-obj comp call :> new-key
+    new-key old-key =
+    [ new-obj ]
+    [ new-obj quot comp new-key (while-changes) ]
+    if ; inline recursive
+
+: while-changes ( obj quot pred -- obj' )
+    3dup nip call (while-changes) ; inline
 
 : state-classes ( transition-table -- synonyms )
     [ initialize-partitions ] keep

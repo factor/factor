@@ -55,8 +55,12 @@ M:: star nfa-node ( node -- start end )
     s1 s3 epsilon-transition
     s2 s3 ;
 
+GENERIC: modify-epsilon ( tag -- newtag )
+
+M: object modify-epsilon ;
+
 M: tagged-epsilon nfa-node
-    add-simple-entry ;
+    clone [ modify-epsilon ] change-tag add-simple-entry ;
 
 M: concatenation nfa-node ( node -- start end )
     [ first>> ] [ second>> ] bi
