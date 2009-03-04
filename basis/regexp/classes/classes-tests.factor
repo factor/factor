@@ -23,3 +23,4 @@ IN: regexp.classes.tests
 [ 1 ] [ { 1 1 } <or-class> ] unit-test
 [ T{ primitive-class { class letter-class } } ] [ letter-class <primitive-class> dup 2array <and-class> ] unit-test
 [ T{ primitive-class { class letter-class } } ] [ letter-class <primitive-class> dup 2array <or-class> ] unit-test
+[ T{ or-class { seq { 2 3 1 } } } ] [ { 1 2 } <or-class> { 2 3 } <or-class> 2array <or-class> ] unit-test
