@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel math math.order models
-namespaces make sequences words strings system hashtables
-math.parser math.vectors classes.tuple classes boxes calendar
-alarms combinators sets columns fry deques ui.gadgets
-ui.gadgets.private unicode.case combinators.short-circuit call ;
+namespaces make sequences words strings system hashtables math.parser
+math.vectors classes.tuple classes boxes calendar alarms combinators
+sets columns fry deques ui.gadgets ui.gadgets.private unicode.case
+unicode.categories combinators.short-circuit call ;
 IN: ui.gestures
 
 GENERIC: handle-gesture ( gesture gadget -- ? )
@@ -236,12 +236,10 @@ SYMBOL: drag-timer
 
 : multi-click? ( button -- ? )
     {
-        { [ multi-click-timeout?  not ] [ f ] }
-        { [ multi-click-button?   not ] [ f ] }
-        { [ multi-click-position? not ] [ f ] }
-        { [ multi-click-position? not ] [ f ] }
-        [ t ]
-    } cond nip ;
+        [ multi-click-timeout? ]
+        [ multi-click-button? ]
+        [ multi-click-position? ]
+    } 0&& nip ;
 
 : update-click# ( button -- )
     global [
@@ -310,8 +308,11 @@ M: object modifiers>string
 
 M: key-down gesture>string
     [ mods>> ] [ sym>> ] bi
-    dup { [ length 1 = ] [ upper? ] } 1&&
-    [ [ S+ prefix ] dip ] [ >upper ] if
+    {
+        { [ dup { [ length 1 = ] [ first Letter? ] } 1&& ] [ [ S+ prefix ] dip ] }
+        { [ dup " " = ] [ drop "SPACE" ] }
+        [ >upper ]
+    } cond
     [ modifiers>string ] dip append ;
 
 M: button-up gesture>string
