@@ -821,6 +821,11 @@ PRIVATE>
     [ [ 2unclip-slice ] dip [ call ] keep ] dip
     compose 2reduce ; inline
 
+: map-find ( seq quot -- result elt )
+    [ f ] 2dip
+    [ [ nip ] dip call dup ] curry find
+    [ [ drop f ] unless ] dip ; inline
+
 : unclip-last-slice ( seq -- butlast-slice last )
     [ but-last-slice ] [ peek ] bi ; inline
 
