@@ -39,21 +39,26 @@ IN: regexp.dfa
 
 : find-transitions ( dfa-state nfa -- next-dfa-state )
     transitions>>
-    '[ _ at keys ] gather
-    epsilon swap remove ;
+    '[ _ at keys [ condition-states ] map concat ] gather
+    [ tagged-epsilon? not ] filter ;
 
 : add-todo-state ( state visited-states new-states -- )
     3dup drop key? [ 3drop ] [
         [ conjoin ] [ push ] bi-curry* bi
     ] if ;
 
+: add-todo-states ( state/condition visited-states new-states -- )
+    [ condition-states ] 2dip
+    '[ _ _ add-todo-state ] each ;
+
 :: new-transitions ( nfa dfa new-states visited-states -- nfa dfa )
     new-states [ nfa dfa ] [
         pop :> state
+        state dfa transitions>> maybe-initialize-key
         state nfa find-transitions
         [| trans |
             state trans nfa find-closure :> new-state
-            new-state visited-states new-states add-todo-state
+            new-state visited-states new-states add-todo-states
             state new-state trans dfa set-transition
         ] each
         nfa dfa new-states visited-states new-transitions
@@ -73,7 +78,7 @@ IN: regexp.dfa
 
 : construct-dfa ( nfa -- dfa )
     dup initialize-dfa
-    dup start-state>> 1vector
+    dup start-state>> condition-states >vector
     H{ } clone
     new-transitions
     [ set-final-states ] keep ;

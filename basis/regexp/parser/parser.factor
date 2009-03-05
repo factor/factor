@@ -54,6 +54,7 @@ ERROR: bad-class name ;
         { CHAR: D [ digit-class <primitive-class> <not-class> ] }
 
         { CHAR: z [ end-of-input <tagged-epsilon> ] }
+        { CHAR: Z [ end-of-file <tagged-epsilon> ] }
         { CHAR: A [ beginning-of-input <tagged-epsilon> ] }
         [ ]
     } case ;

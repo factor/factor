@@ -30,6 +30,7 @@ IN: regexp.classes.tests
 [ T{ or-class { seq { 3 2 } } } ] [ { 2 3 } <or-class> 1 <not-class> 2array <and-class> ] unit-test
 [ f ] [ t <not-class> ] unit-test
 [ t ] [ f <not-class> ] unit-test
+[ f ] [ 1 <not-class> 1 t replace-question ] unit-test
 
 ! Making classes into nested conditionals
 
@@ -43,7 +44,7 @@ IN: regexp.classes.tests
 SYMBOL: foo
 SYMBOL: bar
 
-[ T{ condition f T{ primitive-class f bar } T{ condition f T{ primitive-class f foo } { 1 2 3 } { 1 3 } } T{ condition f T{ primitive-class f foo } { 1 2 } { 1 } } } ] [ { { 1 t } { 2 T{ primitive-class f foo } } { 3 T{ primitive-class f bar } } } table>condition ] unit-test
+[ T{ condition f T{ primitive-class f bar } T{ condition f T{ primitive-class f foo } { 1 3 2 } { 1 3 } } T{ condition f T{ primitive-class f foo } { 1 2 } { 1 } } } ] [ { { 1 t } { 3 T{ primitive-class f bar } } { 2 T{ primitive-class f foo } } } table>condition ] unit-test
 
 [ t ] [ foo <primitive-class> dup t replace-question ] unit-test
 [ f ] [ foo <primitive-class> dup f replace-question ] unit-test
