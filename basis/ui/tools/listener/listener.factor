@@ -6,7 +6,7 @@ concurrency.flags concurrency.mailboxes continuations destructors
 documents documents.elements fry hashtables help help.markup io
 io.styles kernel lexer listener math models models.delay models.arrow
 namespaces parser prettyprint quotations sequences strings threads
-tools.vocabs vocabs vocabs.loader vocabs.parser words ui ui.commands
+tools.vocabs vocabs vocabs.loader vocabs.parser words debugger ui ui.commands
 ui.pens.solid ui.gadgets ui.gadgets.glass ui.gadgets.buttons ui.gadgets.editors
 ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
@@ -44,7 +44,7 @@ M: interactor vocabs>>
     ] if ;
 
 : vocab-exists? ( name -- ? )
-    { [ vocab ] [ find-vocab-root ] } 1|| ;
+    '[ _ { [ vocab ] [ find-vocab-root ] } 1|| ] [ drop f ] recover ;
 
 GENERIC: (word-at-caret) ( token completion-mode -- obj )
 
@@ -329,7 +329,8 @@ M: interactor stream-read-quot
 
 : interactor-operation ( gesture interactor -- ? )
     [ token-model>> value>> ] keep word-at-caret
-    [ nip ] [ gesture>operation ] 2bi dup [ invoke-command f ] [ 2drop t ] if ;
+    [ nip ] [ gesture>operation ] 2bi
+    dup [ invoke-command f ] [ 2drop t ] if ;
 
 M: interactor handle-gesture
     {
