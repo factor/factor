@@ -37,4 +37,4 @@ M: bad-lambda-rewrite summary
 ERROR: bad-local args obj ;
 
 M: bad-local summary
-    drop "You have bound a bug in locals. Please report." ;
+    drop "You have found a bug in locals. Please report." ;
