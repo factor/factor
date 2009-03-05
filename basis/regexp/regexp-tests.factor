@@ -1,3 +1,5 @@
+! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg
+! See http://factorcode.org/license.txt for BSD license.
 USING: regexp tools.test kernel sequences regexp.parser regexp.private
 eval strings multiline accessors regexp.matchers ;
 IN: regexp-tests
@@ -383,13 +385,20 @@ IN: regexp-tests
 [ t ] [ "a" R/ \Aa\z/m matches? ] unit-test
 [ f ] [ "a\n" R/ \Aa\z/m matches? ] unit-test
 
-[ t ] [ "a\r\n" R/ \Aa\Z/m matches? ] unit-test
-[ t ] [ "a\n" R/ \Aa\Z/m matches? ] unit-test
+[ f ] [ "a\r\n" R/ \Aa\Z/m matches? ] unit-test
+[ f ] [ "a\n" R/ \Aa\Z/m matches? ] unit-test
+[ 1 ] [ "a\r\n" R/ \Aa\Z/m count-matches ] unit-test
+[ 1 ] [ "a\n" R/ \Aa\Z/m count-matches ] unit-test
 
 [ t ] [ "a" R/ \Aa\Z/m matches? ] unit-test
 [ f ] [ "\na" R/ \Aaa\Z/m matches? ] unit-test
 [ f ] [ "\r\na" R/ \Aa\Z/m matches? ] unit-test
 [ f ] [ "\ra" R/ \Aa\Z/m matches? ] unit-test
+
+[ 1 ] [ "a" R/ \Aa\Z/m count-matches ] unit-test
+[ 1 ] [ "\na" R/ \Aaa\Z/m count-matches ] unit-test
+[ 1 ] [ "\r\na" R/ \Aa\Z/m count-matches ] unit-test
+[ 1 ] [ "\ra" R/ \Aa\Z/m count-matches ] unit-test
 
 [ t ] [ "a" R/ ^a/m matches? ] unit-test
 [ f ] [ "\na" R/ ^a/m matches? ] unit-test
