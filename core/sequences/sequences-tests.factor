@@ -1,5 +1,5 @@
 USING: arrays kernel math namespaces sequences kernel.private
-sequences.private strings sbufs tools.test vectors
+sequences.private strings sbufs tools.test vectors assocs
 generic vocabs.loader ;
 IN: sequences.tests
 
@@ -274,3 +274,11 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 [ "asdf" iota ] must-fail
 [ T{ iota { n 10 } } ] [ 10 iota ] unit-test
 [ 0 ] [ 10 iota first ] unit-test
+
+[ "hi" 3 ] [
+    { 1 2 3 4 5 6 7 8 } [ H{ { 3 "hi" } } at ] map-find
+] unit-test
+
+[ f f ] [
+    { 1 2 3 4 5 6 7 8 } [ H{ { 11 "hi" } } at ] map-find
+] unit-test

@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings.chinese io.encodings.string strings tools.test arrays ;
-IN: io.encodings.chinese.tests
+USING: io.encodings.gb18030 io.encodings.string strings tools.test arrays ;
+IN: io.encodings.gb18030.tests
 
 [ "hello" ] [ "hello" gb18030 encode >string ] unit-test
 [ "hello" ] [ "hello" gb18030 decode ] unit-test

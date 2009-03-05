@@ -152,7 +152,7 @@ M: object apply-object push-literal ;
     tri ;
 
 : cannot-infer-effect ( word -- * )
-    "cannot-infer" word-prop throw ;
+    "cannot-infer" word-prop rethrow ;
 
 : maybe-cannot-infer ( word quot -- )
     [ [ "cannot-infer" set-word-prop ] keep throw ] recover ; inline

@@ -1,14 +1,14 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax ;
-IN: io.encodings.japanese
+IN: io.encodings.shift-jis
 
-ARTICLE: "io.encodings.japanese" "Japanese text encodings"
-"Several encodings are used for Japanese text besides the standard UTF encodings for Unicode strings. These are mostly based on the character set defined in the JIS X 208 standard. Current coverage of encodings is incomplete."
+ARTICLE: "io.encodings.shift-jis" "Shift JIS"
+"Shift JIS is a text encoding for Japanese. There are multiple versions, depending on whether the offical standard or the modified Microsoft version is required."
 { $subsection shift-jis }
 { $subsection windows-31j } ;
 
-ABOUT: "io.encodings.japanese"
+ABOUT: "io.encodings.shift-jis"
 
 HELP: windows-31j
 { $class-description "The encoding descriptor Windows-31J, which is sometimes informally called Shift JIS. This is based on Code Page 932." }

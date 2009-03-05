@@ -42,8 +42,7 @@ GENERIC: load-image* ( path tuple -- image )
 GENERIC: normalize-component-order* ( image component-order -- image )
 
 : normalize-component-order ( image -- image )
-    dup component-order>> '[ _ normalize-component-order* ] change-bitmap
-    RGBA >>component-order ;
+    dup component-order>> '[ _ normalize-component-order* ] change-bitmap ;
 
 M: RGBA normalize-component-order* drop ;
 
