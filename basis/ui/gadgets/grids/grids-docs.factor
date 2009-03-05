@@ -9,7 +9,9 @@ ARTICLE: "ui-grid-layout" "Grid layouts"
 "Managing children:"
 { $subsection grid-add }
 { $subsection grid-remove }
-{ $subsection grid-child } ;
+{ $subsection grid-child }
+"Grid lines:"
+{ $subsection "ui.gadgets.grid-lines" } ;
 
 HELP: grid
 { $class-description "A grid gadget lays out its children so that all gadgets in a column have equal width and all gadgets in a row have equal height."
@@ -23,22 +25,24 @@ $nl
 "The " { $link add-gadget } ", " { $link unparent } " and " { $link clear-gadget } " words should not be used to manage child gadgets of grids." } ;
 
 HELP: <grid>
-{ $values { "children" "a sequence of sequences of gadgets" } { "grid" "a new " { $link grid } } }
+{ $values { "children" "a sequence of sequences of gadgets, column-major" } { "grid" "a new " { $link grid } } }
 { $description "Creates a new " { $link grid } " gadget with the given children." } ;
 
 HELP: grid-child
-{ $values { "grid" grid } { "i" "non-negative integer" } { "j" "non-negative integer" } { "gadget" gadget } }
-{ $description "Outputs the child gadget at the " { $snippet "i" } "," { $snippet "j" } "th position of the grid." }
+{ $values { "grid" grid } { "pair" "a pair with shape " { $snippet "{ col row }" } } { "gadget" gadget } }
+{ $description "Outputs the child gadget at the specified location." }
 { $errors "Throws an error if the indices are out of bounds." } ;
 
 HELP: grid-add
-{ $values { "grid" grid } { "child" gadget } { "i" "non-negative integer" } { "j" "non-negative integer" } }
+{ $values { "grid" grid } { "child" gadget } { "pair" "a pair with shape " { $snippet "{ col row }" } } }
 { $description "Adds a child gadget at the specified location." }
+{ $errors "Throws an error if the indices are out of bounds." }
 { $side-effects "grid" } ;
 
 HELP: grid-remove
-{ $values { "grid" grid } { "i" "non-negative integer" } { "j" "non-negative integer" } }
+{ $values { "grid" grid } { "pair" "a pair with shape " { $snippet "{ col row }" } } }
 { $description "Removes a child gadget from the specified location." }
+{ $errors "Throws an error if the indices are out of bounds." }
 { $side-effects "grid" } ;
 
 ABOUT: "ui-grid-layout"

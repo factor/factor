@@ -270,3 +270,8 @@ HELP: with-return
 } } ;
 
 { return with-return } related-words
+
+HELP: restart
+{ $values { "restart" restart } }
+{ $description "Invokes a restart." }
+{ $class-description "The class of restarts." } ;

@@ -35,7 +35,7 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
 [
     [
         "car"
-        H{ { font "monospace" } }
+        H{ { font-name "monospace" } }
         format
     ] make-html-string
 ] unit-test

@@ -1,5 +1,5 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: accessors assocs kernel tools.test quadtrees math.geometry.rect sorting ;
+USING: accessors assocs kernel tools.test quadtrees math.rectangles sorting ;
 IN: quadtrees.tests
 
 : unit-bounds ( -- rect ) { -1.0 -1.0 } { 2.0 2.0 } <rect> ;

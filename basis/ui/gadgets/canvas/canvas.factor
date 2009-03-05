@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.backend ui.gadgets ui.gadgets.theme
+USING: ui.backend ui.gadgets
 ui.gadgets.worlds ui.render opengl opengl.gl kernel namespaces
 classes.tuple colors accessors ;
 IN: ui.gadgets.canvas
@@ -8,7 +8,7 @@ IN: ui.gadgets.canvas
 TUPLE: canvas < gadget dlist ;
 
 : new-canvas ( class -- canvas )
-    new-gadget black solid-interior ; inline
+    new black <solid> >>interior ; inline
 
 : delete-canvas-dlist ( canvas -- )
     [ find-gl-context ]

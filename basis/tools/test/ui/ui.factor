@@ -1,5 +1,5 @@
-USING: dlists ui.gadgets kernel ui namespaces io.streams.string
-io ;
+USING: dlists ui.gadgets ui.gadgets.private
+kernel ui namespaces io.streams.string io ;
 IN: tools.test.ui
 
 ! We can't print to output-stream here because that might be a pane

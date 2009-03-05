@@ -501,3 +501,10 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 [ { \ + 3 } ] [ [let | a [ 3 ] | { \ + a } ] ] unit-test
 
 [ 3 ] [ [let | a [ \ + ] | 1 2 [ \ a execute ] ] call ] unit-test
+
+! erg found this problem
+:: erg's-:>-bug ( n ? -- n ) [ n :> n n ] [ n :> b b ] if ;
+
+[ 3 ] [ 3 f erg's-:>-bug ] unit-test
+    
+[ 3 ] [ 3 t erg's-:>-bug ] unit-test

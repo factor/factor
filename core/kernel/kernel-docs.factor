@@ -446,6 +446,133 @@ HELP: 2tri@
     }
 } ;
 
+HELP: bi-curry
+{ $values { "x" object } { "p" { $quotation "( x -- ... )" } } { "q" { $quotation "( x -- ... )" } } { "p'" { $snippet "[ x p ]" } } { "q'" { $snippet "[ x q ]" } } }
+{ $description "Partially applies " { $snippet "p" } " and " { $snippet "q" } " to " { $snippet "x" } "." }
+{ $notes
+  "The following two lines are equivalent:"
+  { $code
+    "[ p ] [ q ] bi-curry [ call ] bi@"
+    "[ p ] [ q ] bi"
+  }
+  "Higher-arity variants of " { $link bi } " can be built from " { $link bi-curry } ":"
+  { $code
+    "[ p ] [ q ] bi-curry bi == [ p ] [ q ] 2bi"
+    "[ p ] [ q ] bi-curry bi-curry bi == [ p ] [ q ] 3bi"
+  }
+  "The combination " { $snippet "bi-curry bi*" } " cannot be expressed with the non-currying dataflow combinators alone; it is equivalent to a stack shuffle preceding " { $link 2bi* } ":"
+  { $code
+    "[ p ] [ q ] bi-curry bi*"
+    "[ swap ] keep [ p ] [ q ] 2bi*"
+  }
+  "To put it another way, " { $snippet "bi-curry bi*" } " handles the case where you have three values " { $snippet "a b c" } " on the stack, and you wish to apply " { $snippet "p" } " to " { $snippet "a c" } " and " { $snippet "q" } " to " { $snippet "b c" } "."
+} ;
+
+HELP: tri-curry
+{ $values
+  { "x" object }
+  { "p" { $quotation "( x -- ... )" } }
+  { "q" { $quotation "( x -- ... )" } }
+  { "r" { $quotation "( x -- ... )" } }
+  { "p'" { $snippet "[ x p ]" } }
+  { "q'" { $snippet "[ x q ]" } }
+  { "r'" { $snippet "[ x r ]" } }
+}
+{ $description "Partially applies " { $snippet "p" } ", " { $snippet "q" } " and " { $snippet "r" } " to " { $snippet "x" } "." }
+{ $notes
+  "The following two lines are equivalent:"
+  { $code
+    "[ p ] [ q ] [ r ] tri-curry [ call ] tri@"
+    "[ p ] [ q ] [ r ] tri"
+  }
+  "Higher-arity variants of " { $link tri } " can be built from " { $link tri-curry } ":"
+  { $code
+    "[ p ] [ q ] [ r ] tri-curry tri == [ p ] [ q ] [ r ] 2tri"
+    "[ p ] [ q ] [ r ] tri-curry tri-curry bi == [ p ] [ q ] [ r ] 3tri"
+  }
+  "The combination " { $snippet "tri-curry tri*" } " cannot be expressed with the non-currying dataflow combinators alone; it handles the case where you have four values " { $snippet "a b c d" } " on the stack, and you wish to apply " { $snippet "p" } " to " { $snippet "a d" } ", " { $snippet "q" } " to " { $snippet "b d" } " and " { $snippet "r" } " to " { $snippet "c d" } "." } ;
+
+HELP: bi-curry*
+{ $values { "x" object } { "y" object } { "p" { $quotation "( x -- ... )" } } { "q" { $quotation "( y -- ... )" } } { "p'" { $snippet "[ x p ]" } } { "q'" { $snippet "[ y q ]" } } }
+{ $description "Partially applies " { $snippet "p" } " to " { $snippet "x" } ", and " { $snippet "q" } " to " { $snippet "y" } "." }
+{ $notes
+  "The following two lines are equivalent:"
+  { $code
+    "[ p ] [ q ] bi-curry* [ call ] bi@"
+    "[ p ] [ q ] bi*"
+  }
+  "The combination " { $snippet "bi-curry* bi" } " is equivalent to a stack shuffle preceding " { $link 2bi* } ":"
+  { $code
+    "[ p ] [ q ] bi-curry* bi"
+    "[ over ] dip [ p ] [ q ] 2bi*"
+  }
+  "In other words, " { $snippet "bi-curry* bi" } " handles the case where you have the three values " { $snippet "a b c" } " on the stack, and you wish to apply " { $snippet "p" } " to " { $snippet "a b" } " and " { $snippet "q" } " to " { $snippet "a c" } "."
+  $nl
+  "The combination " { $snippet "bi-curry* bi*" } " is equivalent to a stack shuffle preceding " { $link 2bi* } ":"
+  { $code
+    "[ p ] [ q ] bi-curry* bi*"
+    "[ swap ] dip [ p ] [ q ] 2bi*"
+  }
+  "In other words, " { $snippet "bi-curry* bi*" } " handles the case where you have the four values " { $snippet "a b c d" } " on the stack, and you wish to apply " { $snippet "p" } " to " { $snippet "a c" } " and " { $snippet "q" } " to " { $snippet "b d" } "."
+  
+} ;
+
+HELP: tri-curry*
+{ $values
+  { "x" object }
+  { "y" object }
+  { "z" object }
+  { "p" { $quotation "( x -- ... )" } }
+  { "q" { $quotation "( y -- ... )" } }
+  { "r" { $quotation "( z -- ... )" } }
+  { "p'" { $snippet "[ x p ]" } }
+  { "q'" { $snippet "[ y q ]" } }
+  { "r'" { $snippet "[ z r ]" } }
+}
+{ $description "Partially applies " { $snippet "p" } " to " { $snippet "x" } ", " { $snippet "q" } " to " { $snippet "y" } " and " { $snippet "r" } " to " { $snippet "z" } "." }
+{ $notes
+  "The following two lines are equivalent:"
+  { $code
+    "[ p ] [ q ] [ r ] tri-curry* [ call ] tri@"
+    "[ p ] [ q ] [ r ] tri*"
+  }
+  "The combination " { $snippet "tri-curry* tri" } " is equivalent to a stack shuffle preceding " { $link 2tri* } ":"
+  { $code
+    "[ p ] [ q ] [ r ] tri-curry* tri"
+    "[ [ over ] dip over ] dip [ p ] [ q ] [ r ] 2tri*"
+  }
+} ;
+
+HELP: bi-curry@
+{ $values { "x" object } { "y" object } { "q" { $quotation "( obj -- ... )" } } { "p'" { $snippet "[ x q ]" } } { "q'" { $snippet "[ y q ]" } } }
+{ $description "Partially applies " { $snippet "q" } " to " { $snippet "x" } " and " { $snippet "y" } "." }
+{ $notes
+  "The following two lines are equivalent:"
+  { $code
+    "[ q ] bi-curry@"
+    "[ q ] [ q ] bi-curry*"
+  }
+} ;
+
+HELP: tri-curry@
+{ $values
+  { "x" object }
+  { "y" object }
+  { "z" object }
+  { "q" { $quotation "( obj -- ... )" } }
+  { "p'" { $snippet "[ x q ]" } }
+  { "q'" { $snippet "[ y q ]" } }
+  { "r'" { $snippet "[ z q ]" } }
+}
+{ $description "Partially applies " { $snippet "q" } " to " { $snippet "x" } ", " { $snippet "y" } " and " { $snippet "z" } "." }
+{ $notes
+  "The following two lines are equivalent:"
+  { $code
+    "[ q ] tri-curry@"
+    "[ q ] [ q ] [ q ] tri-curry*"
+  }
+} ;
+
 HELP: if
 { $values { "?" "a generalized boolean" } { "true" quotation } { "false" quotation } }
 { $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation. Otherwise calls the " { $snippet "true" } " quotation."
@@ -844,15 +971,61 @@ $nl
 { $subsection 2keep }
 { $subsection 3keep } ;
 
+ARTICLE: "curried-dataflow" "Curried dataflow combinators"
+"Curried cleave combinators:"
+{ $subsection bi-curry }
+{ $subsection tri-curry }
+"Curried spread combinators:"
+{ $subsection bi-curry* }
+{ $subsection tri-curry* }
+"Curried apply combinators:"
+{ $subsection bi-curry@ }
+{ $subsection tri-curry@ }
+{ $see-also "dataflow-combinators" } ;
+
+ARTICLE: "compositional-examples" "Examples of compositional combinator usage"
+"Consider printing the same message ten times:"
+{ $code ": print-10 ( -- ) 10 [ \"Hello, world.\" print ] times ;" }
+"if we wanted to abstract out the message into a parameter, we could keep it on the stack between iterations:"
+{ $code ": print-10 ( message -- ) 10 [ dup print ] times drop ;" }
+"However, keeping loop-invariant values on the stack doesn't always work out nicely. For example, a word to subtract a value from each element of a sequence:"
+{ $code ": subtract-n ( seq n -- seq' ) swap [ over - ] map nip ;" }
+"Three shuffle words are required to pass the value around. Instead, the loop-invariant value can be partially applied to a quotation using " { $link curry } ", yielding a new quotation that is passed to " { $link map } ":"
+{ $example
+  "USING: kernel math prettyprint sequences ;"
+  ": subtract-n ( seq n -- seq' ) [ - ] curry map ;"
+  "{ 10 20 30 } 5 subtract-n ."
+  "{ 5 15 25 }"
+}
+"Now consider the word that is dual to the one above; instead of subtracting " { $snippet "n" } " from each stack element, it subtracts each element from " { $snippet "n" } "."
+$nl
+"One way to write this is with a pair of " { $link swap } "s:"
+{ $code ": n-subtract ( n seq -- seq' ) swap [ swap - ] curry map ;" }
+"Since this pattern comes up often, " { $link with } " encapsulates it:"
+{ $example
+  "USING: kernel math prettyprint sequences ;"
+  ": n-subtract ( n seq -- seq' ) [ - ] with map ;"
+  "30 { 10 20 30 } n-subtract ."
+  "{ 20 10 0 }"
+}
+{ $see-also "fry.examples" } ;
+
 ARTICLE: "compositional-combinators" "Compositional combinators"
-"Quotations can be composed using efficient quotation-specific operations:"
+"Certain combinators transform quotations to produce a new quotation."
+{ $subsection "compositional-examples" }
+"Fundamental operations:"
 { $subsection curry }
+{ $subsection compose }
+"Derived operations:"
 { $subsection 2curry }
 { $subsection 3curry }
 { $subsection with }
-{ $subsection compose }
 { $subsection prepose }
-"Quotations also implement the sequence protocol, and can be manipulated with sequence words; see " { $link "quotations" } "." ;
+"These operations run in constant time, and in many cases are optimized out altogether by the " { $link "compiler" } ". " { $link "fry" } " are an abstraction built on top of these operations, and code that uses this abstraction is often clearer than direct calls to the below words."
+$nl
+"Curried dataflow combinators can be used to build more complex dataflow by combining cleave, spread and apply patterns in various ways."
+{ $subsection "curried-dataflow" }
+"Quotations also implement the sequence protocol, and can be manipulated with sequence words; see " { $link "quotations" } ". However, such runtime quotation manipulation will not be optimized by the optimizing compiler." ;
 
 ARTICLE: "implementing-combinators" "Implementing combinators"
 "The following pair of words invoke words and quotations reflectively:"
@@ -948,7 +1121,8 @@ ARTICLE: "dataflow-combinators" "Data flow combinators"
 { $subsection "slip-keep-combinators" }
 { $subsection "cleave-combinators" }
 { $subsection "spread-combinators" }
-{ $subsection "apply-combinators" } ;
+{ $subsection "apply-combinators" }
+{ $see-also "curried-dataflow" } ;
 
 ARTICLE: "dataflow" "Data and control flow"
 { $subsection "evaluator" }
