@@ -10,14 +10,14 @@ SLOT: i
     [ i>> ] [ underlying>> ] bi ; inline
 
 : next ( stream -- )
-    [ 1+ ] change-i drop ;
+    [ 1+ ] change-i drop ; inline
 
 : sequence-read1 ( stream -- elt/f )
     [ >sequence-stream< ?nth ]
     [ next ] bi ; inline
 
 : add-length ( n stream -- i+n )
-    [ i>> + ] [ underlying>> length ] bi min  ;
+    [ i>> + ] [ underlying>> length ] bi min  ; inline
 
 : (sequence-read) ( n stream -- seq/f )
     [ add-length ] keep
