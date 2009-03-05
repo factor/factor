@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes.tuple classes.tuple.parser kernel words
-make fry sequences parser accessors ;
+make fry sequences parser accessors effects ;
 IN: compiler.cfg.instructions.syntax
 
 : insn-word ( -- word )
@@ -11,7 +11,7 @@ IN: compiler.cfg.instructions.syntax
     "insn" "compiler.cfg.instructions" lookup ;
 
 : insn-effect ( word -- effect )
-    boa-effect [ but-last ] change-in { } >>out ;
+    boa-effect in>> but-last f <effect> ;
 
 : INSN:
     parse-tuple-definition "regs" suffix

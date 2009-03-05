@@ -56,25 +56,17 @@ FUNCTION: void CFRunLoopRemoveTimer (
 
 : CFRunLoopDefaultMode ( -- alien )
     #! Ugly, but we don't have static NSStrings
-    \ CFRunLoopDefaultMode get-global dup expired? [
-        drop
+    \ CFRunLoopDefaultMode [
         "kCFRunLoopDefaultMode" <CFString>
-        dup \ CFRunLoopDefaultMode set-global
-    ] when ;
+    ] initialize-alien ;
 
 TUPLE: run-loop fds sources timers ;
 
 : <run-loop> ( -- run-loop )
     V{ } clone V{ } clone V{ } clone \ run-loop boa ;
 
-SYMBOL: expiry-check
-
 : run-loop ( -- run-loop )
-    \ run-loop get-global not expiry-check get expired? or
-    [
-        31337 <alien> expiry-check set-global
-        <run-loop> dup \ run-loop set-global
-    ] [ \ run-loop get-global ] if ;
+    \ run-loop [ <run-loop> ] initialize-alien ;
 
 : add-source-to-run-loop ( source -- )
     [ run-loop sources>> push ]

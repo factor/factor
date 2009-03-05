@@ -1,0 +1,29 @@
+USING: math help.markup help.syntax ;
+IN: core-graphics.types
+
+HELP: <CGRect>
+{ $values { "x" real } { "y" real } { "w" real } { "h" real } { "rect" "an " { $snippet "CGRect" } } }
+{ $description "Allocates a new " { $snippet "CGRect" } " in the Factor heap." } ;
+
+HELP: <CGPoint>
+{ $values { "x" real } { "y" real } { "point" "an " { $snippet "CGPoint" } } }
+{ $description "Allocates a new " { $snippet "CGPoint" } " in the Factor heap." } ;
+
+HELP: <CGSize>
+{ $values { "w" real } { "h" real } { "size" "an " { $snippet "CGSize" } } }
+{ $description "Allocates a new " { $snippet "CGSize" } " in the Factor heap." } ;
+
+ARTICLE: "core-graphics.types" "Core Graphics types"
+"The Core Graphics binding defines some common C structs:"
+{ $code
+    "CGRect"
+    "CGPoint"
+    "CGSize"
+}
+"Some words for working with the above:"
+{ $subsection <CGRect> }
+{ $subsection <CGPoint> }
+{ $subsection <CGSize> } ;
+
+IN: core-graphics.types
+ABOUT: "core-graphics.types"

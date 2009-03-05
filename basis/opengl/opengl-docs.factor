@@ -1,10 +1,11 @@
-USING: help.markup help.syntax io kernel math quotations
-opengl.gl assocs vocabs.loader sequences accessors ;
+USING: alien help.markup help.syntax io kernel math quotations
+opengl.gl assocs vocabs.loader sequences accessors colors ;
 IN: opengl
 
 HELP: gl-color
-{ $values { "color" "a color specifier" } }
-{ $description "Wrapper for " { $link glColor4d } " taking a color specifier." } ;
+{ $values { "color" color } }
+{ $description "Wrapper for " { $link glColor4d } " taking an instance of " { $link color } "." }
+{ $notes "See " { $link "colors" } "." } ;
 
 HELP: gl-error
 { $description "If the most recent OpenGL call resulted in an error, print the error to " { $link output-stream } "." } ;
@@ -29,23 +30,14 @@ HELP: gl-rect
 { $values { "dim" "a pair of integers" } }
 { $description "Draws the outline of a rectangle with the top-left corner at the origin and the given dimensions." } ;
 
-HELP: gen-texture
-{ $values { "id" integer } }
-{ $description "Wrapper for " { $link glGenTextures } " to handle the common case of generating a single texture ID." } ;
-
 HELP: gen-gl-buffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenBuffers } " to handle the common case of generating a single buffer ID." } ;
-
-HELP: delete-texture
-{ $values { "id" integer } }
-{ $description "Wrapper for " { $link glDeleteTextures } " to handle the common case of deleting a single texture ID." } ;
 
 HELP: delete-gl-buffer
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glDeleteBuffers } " to handle the common case of deleting a single buffer ID." } ;
 
-{ gen-texture delete-texture } related-words
 { gen-gl-buffer delete-gl-buffer } related-words
 
 HELP: bind-texture-unit
@@ -60,21 +52,6 @@ HELP: do-attribs
 { $values { "bits" integer } { "quot" quotation } }
 { $description "Wraps a quotation in " { $link glPushAttrib } "/" { $link glPopAttrib } " calls." } ;
 
-HELP: sprite
-{ $class-description "A sprite is an OpenGL texture together with a display list which renders a textured quad. Sprites are used to draw text in the UI. Sprites have the following slots:"
-    { $list
-        { { $snippet "dlist" } " - an OpenGL display list ID" }
-        { { $snippet "texture" } " - an OpenGL texture ID" }
-        { { $snippet "loc" } " - top-left corner of the sprite" }
-        { { $snippet "dim" } " - dimensions of the sprite" }
-        { { $snippet "dim2" } " - dimensions of the sprite, rounded up to the nearest powers of two" }
-    }
-} ;
-
-HELP: gray-texture
-{ $values { "sprite" sprite } { "pixmap" "an alien or byte array" } { "id" "an OpenGL texture ID" } }
-{ $description "Creates a new OpenGL texture from a 1 byte per pixel image whose dimensions are equal to " { $snippet "dim2" } "." } ;
-
 HELP: gen-dlist
 { $values { "id" integer } }
 { $description "Wrapper for " { $link glGenLists } " to handle the common case of generating a single display list ID." } ;
@@ -87,14 +64,9 @@ HELP: gl-translate
 { $values { "point" "a pair of integers" } }
 { $description "Wrapper for " { $link glTranslated } " taking a point object." } ;
 
-HELP: free-sprites
-{ $values { "sprites" "a sequence of " { $link sprite } " instances" } }
-{ $description "Deallocates native resources associated toa  sequence of sprites." } ;
-
 HELP: with-translation
 { $values { "loc" "a pair of integers" } { "quot" quotation } }
 { $description "Calls the quotation with a translation by " { $snippet "loc" } " pixels applied to the current " { $link GL_MODELVIEW } " matrix, restoring the matrix when the quotation is done." } ;
-
 
 ARTICLE: "gl-utilities" "OpenGL utility words"
 "The " { $vocab-link "opengl" } " vocabulary implements some utility words to give OpenGL a more Factor-like feel."
@@ -104,7 +76,6 @@ $nl
 "Wrappers:"
 { $subsection gl-color }
 { $subsection gl-translate }
-{ $subsection gen-texture }
 { $subsection bind-texture-unit }
 "Combinators:"
 { $subsection do-enabled }

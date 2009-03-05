@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight
-! Copyright (C) 2007, 2008 Slava Pestov
+! Copyright (C) 2007, 2009 Slava Pestov
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien assocs continuations destructors
-kernel namespaces accessors sets summary ;
+USING: alien assocs continuations alien.destructors kernel
+namespaces accessors sets summary ;
 IN: libc
 
 : errno ( -- int )
@@ -26,15 +26,8 @@ IN: libc
 : (realloc) ( alien size -- newalien )
     "void*" "libc" "realloc" { "void*" "ulong" } alien-invoke ;
 
-SYMBOL: malloc-expiry
-
 : mallocs ( -- assoc )
-    malloc-expiry get-global expired? [
-        -1 <alien> malloc-expiry set-global
-        H{ } clone dup \ mallocs set-global
-    ] [
-        \ mallocs get-global
-    ] if ;
+    \ mallocs [ H{ } clone ] initialize-alien ;
 
 PRIVATE>
 
@@ -58,13 +51,13 @@ M: realloc-error summary
 
 <PRIVATE
 
-: add-malloc ( alien -- )
-    mallocs conjoin ;
+: add-malloc ( alien -- alien )
+    dup mallocs conjoin ;
 
 : delete-malloc ( alien -- )
     [
         mallocs delete-at*
-        [ double-free ] unless drop
+        [ drop ] [ double-free ] if
     ] when* ;
 
 : malloc-exists? ( alien -- ? )
@@ -73,19 +66,16 @@ M: realloc-error summary
 PRIVATE>
 
 : malloc ( size -- alien )
-    (malloc) check-ptr
-    dup add-malloc ;
+    (malloc) check-ptr add-malloc ;
 
 : calloc ( count size -- alien )
-    (calloc) check-ptr
-    dup add-malloc ;
+    (calloc) check-ptr add-malloc ;
 
 : realloc ( alien size -- newalien )
     [ >c-ptr ] dip
     over malloc-exists? [ realloc-error ] unless
-    dupd (realloc) check-ptr
-    swap delete-malloc
-    dup add-malloc ;
+    [ drop ] [ (realloc) check-ptr ] 2bi
+    [ delete-malloc ] [ add-malloc ] bi* ;
 
 : free ( alien -- )
     >c-ptr [ delete-malloc ] [ (free) ] bi ;
@@ -96,17 +86,4 @@ PRIVATE>
 : strlen ( alien -- len )
     "size_t" "libc" "strlen" { "char*" } alien-invoke ;
 
-<PRIVATE
-
-! Memory allocations
-TUPLE: memory-destructor alien disposed ;
-
-M: memory-destructor dispose* alien>> free ;
-
-PRIVATE>
-
-: &free ( alien -- alien )
-    dup f memory-destructor boa &dispose drop ; inline
-
-: |free ( alien -- alien )
-    dup f memory-destructor boa |dispose drop ; inline
+DESTRUCTOR: free

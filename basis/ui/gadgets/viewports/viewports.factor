@@ -2,57 +2,39 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ui.gadgets ui.gadgets.borders
 kernel math namespaces sequences models math.vectors
-math.geometry.rect ;
+math.rectangles ;
 IN: ui.gadgets.viewports
 
-CONSTANT: viewport-gap { 3 3 }
-CONSTANT: scroller-border { 1 1 }
-
-TUPLE: viewport < gadget ;
+TUPLE: viewport < gadget { constraint initial: { 1 1 } } ;
 
 : find-viewport ( gadget -- viewport )
     [ viewport? ] find-parent ;
 
-: viewport-padding ( -- padding )
-    viewport-gap 2 v*n scroller-border v+ ;
-
-: viewport-dim ( viewport -- dim )
-    gadget-child pref-dim viewport-padding v+ ;
-
 : <viewport> ( content model -- viewport )
-    viewport new-gadget
+    viewport new
         swap >>model
         t >>clipped?
         swap add-gadget ;
 
 M: viewport layout*
-    [ gadget-child ] [
-        [ dim>> viewport-padding v- ]
-        [ gadget-child pref-dim ]
-        bi vmax
-    ] bi >>dim drop ;
+    [ gadget-child ]
+    [ [ dim>> ] [ gadget-child pref-dim ] bi vmax ] bi >>dim drop ;
 
 M: viewport focusable-child*
     gadget-child ;
 
-M: viewport pref-dim* viewport-dim ;
-
 : scroller-value ( scroller -- loc )
-    model>> range-value [ >fixnum ] map ;
+    model>> range-value [ >integer ] map ;
 
 M: viewport model-changed
     nip
     [ relayout-1 ]
     [
         [ gadget-child ]
-        [
-            scroller-value vneg
-            viewport-gap v+
-            scroller-border v+
-        ] bi
-        >>loc drop
+        [ scroller-value vneg ]
+        [ constraint>> ]
+        tri v* >>loc drop
     ] bi ;
 
 : visible-dim ( gadget -- dim )
-    dup parent>> viewport?
-    [ parent>> rect-dim viewport-gap 2 v*n v- ] [ dim>> ] if ;
+    dup parent>> viewport? [ parent>> ] when dim>> ;

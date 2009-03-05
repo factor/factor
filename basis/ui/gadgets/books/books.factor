@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences models ui.gadgets
-math.geometry.rect fry ;
+math.rectangles fry ;
 IN: ui.gadgets.books
 
 TUPLE: book < gadget ;
@@ -16,12 +16,15 @@ M: book model-changed ( model book -- )
     dup current-page show-gadget
     relayout ;
 
-: new-book ( pages model class -- book )
-    new-gadget
-        swap >>model
-        swap add-gadgets ; inline
+: new-book ( model class -- book )
+    new
+        swap >>model ; inline
 
-: <book> ( pages model -- book ) book new-book ;
+: <book> ( pages model -- book )
+    book new-book swap add-gadgets ;
+
+: <empty-book> ( model -- book )
+    book new-book ;
 
 M: book pref-dim* ( book -- dim ) children>> pref-dims max-dim ;
 

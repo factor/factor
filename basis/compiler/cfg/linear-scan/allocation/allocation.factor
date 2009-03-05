@@ -105,7 +105,7 @@ SYMBOL: spill-counts
     #! If it has been spilled already, reuse spill location.
     over reload-from>>
     [ over vreg>> reg-class>> next-spill-location ] unless*
-    tuck [ >>spill-to ] [ >>reload-from ] 2bi* ;
+    [ >>spill-to ] [ >>reload-from ] bi-curry bi* ;
 
 : split-and-spill ( new existing -- before after )
     dup rot start>> split-interval

@@ -4,8 +4,8 @@ USING: kernel vocabs vocabs.loader sequences system ;
 [ "bootstrap." prepend vocab ] all? [
     "ui.tools" require
 
-    "ui.cocoa" vocab [
-        "ui.cocoa.tools" require
+    "ui.backend.cocoa" vocab [
+        "ui.backend.cocoa.tools" require
     ] when
 
     "ui.tools.walker" require

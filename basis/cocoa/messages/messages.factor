@@ -167,13 +167,19 @@ assoc-union alien>objc-types set-global
         drop "void*"
     ] unless ;
 
+ERROR: no-objc-type name ;
+
+: decode-type ( ch -- ctype )
+    1string dup objc>alien-types get at
+    [ ] [ no-objc-type ] ?if ;
+
 : (parse-objc-type) ( i string -- ctype )
     [ [ 1+ ] dip ] [ nth ] 2bi {
         { [ dup "rnNoORV" member? ] [ drop (parse-objc-type) ] }
         { [ dup CHAR: ^ = ] [ 3drop "void*" ] }
         { [ dup CHAR: { = ] [ drop objc-struct-type ] }
         { [ dup CHAR: [ = ] [ 3drop "void*" ] }
-        [ 2nip 1string objc>alien-types get at ]
+        [ 2nip decode-type ]
     } cond ;
 
 : parse-objc-type ( string -- ctype ) 0 swap (parse-objc-type) ;

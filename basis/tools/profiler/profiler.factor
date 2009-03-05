@@ -3,45 +3,51 @@
 USING: accessors words sequences math prettyprint kernel arrays io
 io.styles namespaces assocs kernel.private strings combinators
 sorting math.parser vocabs definitions tools.profiler.private
-continuations generic compiler.units sets ;
+continuations generic compiler.units sets classes fry ;
 IN: tools.profiler
 
 : profile ( quot -- )
     [ t profiling call ] [ f profiling ] [ ] cleanup ;
 
-: counters ( words -- assoc )
-    [ dup counter>> ] { } map>assoc ;
+: filter-counts ( alist -- alist' )
+    [ second 0 > ] filter ;
 
-GENERIC: (profile.) ( obj -- )
+: map-counters ( obj quot -- alist )
+    { } map>assoc filter-counts ; inline
 
-TUPLE: usage-profile word ;
+: counters ( words -- alist )
+    [ dup counter>> ] map-counters ;
 
-C: <usage-profile> usage-profile
+: cumulative-counters ( obj quot -- alist )
+    '[ dup @ [ counter>> ] sigma ] map-counters ; inline
 
-M: word (profile.)
-    [ name>> "( no name )" or ] [ <usage-profile> ] bi write-object ;
+: vocab-counters ( -- alist )
+    vocabs [ words [ predicate? not ] filter ] cumulative-counters ;
 
-TUPLE: vocab-profile vocab ;
+: generic-counters ( -- alist )
+    all-words [ subwords ] cumulative-counters ;
 
-C: <vocab-profile> vocab-profile
+: methods-on ( class -- methods )
+    dup implementors [ method ] with map ;
 
-M: string (profile.)
-    dup <vocab-profile> write-object ;
+: class-counters ( -- alist )
+    classes [ methods-on ] cumulative-counters ;
 
-M: method-body (profile.)
-    [ synopsis ] [ "method-generic" word-prop <usage-profile> ] bi
-    write-object ;
+: method-counters ( -- alist )
+    all-words [ subwords ] map concat counters ;
 
-: counter. ( obj n -- )
-    [
-        [ [ (profile.) ] with-cell ] dip
-        [ number>string write ] with-cell
-    ] with-row ;
+: profiler-usage ( word -- words )
+    [ smart-usage [ word? ] filter ]
+    [ compiled-generic-usage keys ]
+    [ compiled-usage keys ]
+    tri 3append prune ;
+
+: usage-counters ( word -- alist )
+    profiler-usage counters ;
 
 : counters. ( assoc -- )
-    [ second 0 > ] filter sort-values
     standard-table-style [
-        [ counter. ] assoc-each
+        sort-values simple-table.
     ] tabular-output ;
 
 : profile. ( -- )
@@ -58,19 +64,20 @@ M: method-body (profile.)
     "Call counts for words which call " write
     dup pprint
     ":" print
-    [ smart-usage [ word? ] filter ]
-    [ compiled-generic-usage keys ]
-    [ compiled-usage keys ]
-    tri 3append prune counters counters. ;
+    usage-counters counters. ;
 
 : vocabs-profile. ( -- )
     "Call counts for all vocabularies:" print
-    vocabs [
-        dup words
-        [ "predicating" word-prop not ] filter
-        [ counter>> ] map sum
-    ] { } map>assoc counters. ;
+    vocab-counters counters. ;
+
+: generic-profile. ( -- )
+    "Call counts for methods on generic words:" print
+    generic-counters counters. ;
+
+: class-profile. ( -- )
+    "Call counts for methods on classes:" print
+    class-counters counters. ;
 
 : method-profile. ( -- )
-    all-words [ subwords ] map concat
-    counters counters. ;
+    "Call counts for all methods:" print
+    method-counters counters. ;
