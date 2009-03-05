@@ -309,7 +309,7 @@ M: object modifiers>string
 M: key-down gesture>string
     [ mods>> ] [ sym>> ] bi
     {
-        { [ dup { [ length 1 = ] [ first Letter? ] } 1&& ] [ [ S+ prefix ] dip ] }
+        { [ dup { [ length 1 = ] [ first LETTER? ] } 1&& ] [ [ S+ prefix ] dip ] }
         { [ dup " " = ] [ drop "SPACE" ] }
         [ >upper ]
     } cond
