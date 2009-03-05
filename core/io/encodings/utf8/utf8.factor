@@ -1,8 +1,7 @@
 ! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math math.order kernel sequences sbufs vectors growable io
-continuations namespaces io.encodings combinators strings
-binary-search ;
+continuations namespaces io.encodings combinators strings ;
 IN: io.encodings.utf8
 
 ! Decoding UTF-8
@@ -85,7 +84,7 @@ PRIVATE>
     0 [ code-point-length + ] accumulate swap suffix ;
 
 : utf8-index> ( n string -- n' )
-    code-point-offsets natural-search drop ;
+    code-point-offsets [ <= ] with find drop ;
 
 : >utf8-index ( n string -- n' )
     code-point-offsets nth ;
