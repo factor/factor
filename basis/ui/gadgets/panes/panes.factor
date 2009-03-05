@@ -21,16 +21,18 @@ selection-color caret mark selecting? ;
     f >>caret f >>mark ; inline
 
 : prepare-last-line ( pane -- )
+    [ last-line>> ] keep
+    [ current>> f track-add ]
+    [ input>> [ 1 track-add ] when* ] bi
+    drop ; inline
+
+: init-current ( pane -- pane )
+    dup prototype>> clone >>current ; inline
+
+: next-line ( pane -- )
     clear-selection
-    [ last-line>> unparent ]
-    [
-        [ horizontal <track> ] dip
-        dup prototype>> clone >>current
-        [ current>> f track-add ]
-        [ input>> [ 1 track-add ] when* ]
-        [ swap [ >>last-line ] [ 1 track-add ] bi drop ]
-        tri
-    ]
+    [ input>> unparent ]
+    [ init-current prepare-last-line ]
     [ input>> [ request-focus ] when* ] tri ;
 
 : pane-caret&mark ( pane -- caret mark )
@@ -50,14 +52,27 @@ M: pane gadget-selection ( pane -- string/f )
     [ current>> clear-gadget ]
     bi ;
 
+: init-prototype ( pane -- pane )
+    <shelf> +baseline+ >>align >>prototype ; inline
+
+: init-output ( pane -- pane )
+    <incremental> [ >>output ] [ f track-add ] bi ; inline
+
+: pane-theme ( pane -- pane )
+    1 >>fill
+    selection-color >>selection-color ; inline
+
+: init-last-line ( pane -- pane )
+    horizontal <track> [ >>last-line ] [ 1 track-add ] bi ; inline
+
 : new-pane ( input class -- pane )
     [ vertical ] dip new-track
         swap >>input
-        1 >>fill
-        <shelf> +baseline+ >>align >>prototype
-        <incremental> [ >>output ] [ f track-add ] bi
-        dup prepare-last-line
-        selection-color >>selection-color ; inline
+        pane-theme
+        init-prototype
+        init-output
+        init-current
+        init-last-line ; inline
 
 : <pane> ( -- pane ) f pane new-pane ;
 
@@ -109,7 +124,7 @@ C: <pane-stream> pane-stream
     [
         [ current>> [ unparent ] [ smash-line ] bi ] [ output>> ] bi
         add-incremental
-    ] [ prepare-last-line ] bi ;
+    ] [ next-line ] bi ;
 
 : pane-write ( seq pane -- )
     [ pane-nl ] [ current>> stream-write ]
