@@ -10,21 +10,30 @@ IN: math.primes.factors
     [ dupd /mod zero? ] curry [ nip [ 1+ ] dip ] while drop
     swap ;
 
-: write-factor ( n d -- n' d )
-    2dup mod zero? [ [ [ count-factor ] keep swap 2array , ] keep ] when ;
+: write-factor ( n d -- n' d' )
+    2dup mod zero? [
+        [ [ count-factor ] keep swap 2array , ] keep
+        ! If the remainder is a prime number, increase d so that
+        ! the caller stops looking for factors.
+        over prime? [ drop dup ] when
+    ] when ;
 
-PRIVATE>
-
-: group-factors ( n -- seq )
+: (group-factors) ( n -- seq )
     [
         2
         [ 2dup sq < ] [ write-factor next-prime ] until
         drop dup 2 < [ drop ] [ 1 2array , ] if
     ] { } make ;
 
-: unique-factors ( n -- seq ) group-factors [ first ] map ;
+PRIVATE>
 
-: factors ( n -- seq ) group-factors [ first2 swap <array> ] map concat ;
+: group-factors ( n -- seq )
+    dup prime? [ 1 2array 1array ] [ (group-factors) ] if ; flushable
+
+: unique-factors ( n -- seq ) group-factors [ first ] map ; flushable
+
+: factors ( n -- seq )
+    group-factors [ first2 swap <array> ] map concat ; flushable
 
 : totient ( n -- t )
     {
