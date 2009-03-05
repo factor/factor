@@ -1,6 +1,6 @@
 USING: delegate kernel arrays tools.test words math definitions
 compiler.units parser generic prettyprint io.streams.string
-accessors eval ;
+accessors eval multiline ;
 IN: delegate.tests
 
 TUPLE: hello this that ;
@@ -38,7 +38,7 @@ M: hello bing hello-test ;
 [ H{ { goodbye [ these>> ] } } ] [ baz protocol-consult ] unit-test
 [ H{ } ] [ bee protocol-consult ] unit-test
 
-[ "USING: delegate ;\nIN: delegate.tests\nPROTOCOL: baz foo bar { whoa 1 } ;\n" ] [ [ baz see ] with-string-writer ] unit-test
+[ "USING: delegate ;\nIN: delegate.tests\nPROTOCOL: baz foo bar { whoa 1 } ; inline\n" ] [ [ baz see ] with-string-writer ] unit-test
 
 GENERIC: one
 M: integer one ;
@@ -91,3 +91,56 @@ CONSULT: slot-protocol-test-2 slot-protocol-test-3 d>> ;
     T{ slot-protocol-test-3 f T{ slot-protocol-test-2 f "a" "b" 5 } }
     [ a>> ] [ b>> ] [ c>> ] tri
 ] unit-test
+
+GENERIC: do-me ( x -- )
+
+M: f do-me drop ;
+
+[ ] [ f do-me ] unit-test
+
+TUPLE: a-tuple ;
+
+PROTOCOL: silly-protocol do-me ;
+
+! Replacing a method definition with a consultation would cause problems
+[ [ ] ] [
+    <" IN: delegate.tests
+    USE: kernel
+
+    M: a-tuple do-me drop ; "> <string-reader> "delegate-test" parse-stream
+] unit-test
+
+[ ] [ T{ a-tuple } do-me ] unit-test
+
+[ [ ] ] [
+    <" IN: delegate.tests
+    USE: kernel
+    USE: delegate
+    CONSULT: silly-protocol a-tuple drop f ; "> <string-reader> "delegate-test" parse-stream
+] unit-test
+
+[ ] [ T{ a-tuple } do-me ] unit-test
+
+! A slot protocol issue
+DEFER: slot-protocol-test-3
+SLOT: y
+
+[ f ] [ \ y>> \ slot-protocol-test-3 method >boolean ] unit-test
+
+[ [ ] ] [
+    <" IN: delegate.tests
+USING: accessors delegate ;
+TUPLE: slot-protocol-test-3 x ;
+CONSULT: y>> slot-protocol-test-3 x>> ;">
+    <string-reader> "delegate-test-1" parse-stream
+] unit-test
+
+[ t ] [ \ y>> \ slot-protocol-test-3 method >boolean ] unit-test
+
+[ [ ] ] [
+    <" IN: delegate.tests
+TUPLE: slot-protocol-test-3 x y ;">
+    <string-reader> "delegate-test-1" parse-stream
+] unit-test
+
+[ t ] [ \ y>> \ slot-protocol-test-3 method >boolean ] unit-test

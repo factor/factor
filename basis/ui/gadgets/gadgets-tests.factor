@@ -1,7 +1,8 @@
-USING: accessors ui.gadgets ui.gadgets.packs ui.gadgets.worlds
-tools.test namespaces models kernel dlists deques math sets
-math.parser ui sequences hashtables assocs io arrays prettyprint
-io.streams.string math.geometry.rect ;
+USING: accessors ui.gadgets ui.gadgets.private ui.gadgets.packs
+ui.gadgets.worlds tools.test namespaces models kernel dlists deques
+math sets math.parser ui sequences hashtables assocs io arrays
+prettyprint io.streams.string math.rectangles ui.gadgets.private
+sets generic ;
 IN: ui.gadgets.tests
 
 [ { 300 300 } ]
@@ -37,14 +38,14 @@ IN: ui.gadgets.tests
 "g3" get "g2" get add-gadget drop
 
 [ { 30 30 } ] [ "g1" get screen-loc ] unit-test
-[ { 30 30 } ] [ "g1" get screen-rect rect-loc ] unit-test
-[ { 30 30 } ] [ "g1" get screen-rect rect-dim ] unit-test
+[ { 30 30 } ] [ "g1" get screen-rect loc>> ] unit-test
+[ { 30 30 } ] [ "g1" get screen-rect dim>> ] unit-test
 [ { 20 20 } ] [ "g2" get screen-loc ] unit-test
-[ { 20 20 } ] [ "g2" get screen-rect rect-loc ] unit-test
-[ { 50 180 } ] [ "g2" get screen-rect rect-dim ] unit-test
+[ { 20 20 } ] [ "g2" get screen-rect loc>> ] unit-test
+[ { 50 180 } ] [ "g2" get screen-rect dim>> ] unit-test
 [ { 0 0 } ] [ "g3" get screen-loc ] unit-test
-[ { 0 0 } ] [ "g3" get screen-rect rect-loc ] unit-test
-[ { 100 200 } ] [ "g3" get screen-rect rect-dim ] unit-test
+[ { 0 0 } ] [ "g3" get screen-rect loc>> ] unit-test
+[ { 100 200 } ] [ "g3" get screen-rect dim>> ] unit-test
 
 <gadget> "g1" set
 "g1" get { 300 300 } >>dim drop
@@ -57,9 +58,9 @@ IN: ui.gadgets.tests
 "g3" get { 100 100 } >>loc
          { 20 20 } >>dim drop
 
-[ t ] [ { 30 30 } "g2" get inside? ] unit-test
+[ t ] [ { 30 30 } "g2" get contains-point? ] unit-test
 
-[ t ] [ { 30 30 } "g1" get (pick-up) "g2" get eq? ] unit-test
+[ t ] [ { 30 30 } "g1" get pick-up "g2" get eq? ] unit-test
 
 [ t ] [ { 30 30 } "g1" get pick-up "g2" get eq? ] unit-test
 
@@ -75,7 +76,7 @@ IN: ui.gadgets.tests
 TUPLE: mock-gadget < gadget graft-called ungraft-called ;
 
 : <mock-gadget> ( -- gadget )
-    mock-gadget new-gadget 0 >>graft-called 0 >>ungraft-called ;
+    mock-gadget new 0 >>graft-called 0 >>ungraft-called ;
 
 M: mock-gadget graft*
     [ 1+ ] change-graft-called drop ;
@@ -161,3 +162,6 @@ M: mock-gadget ungraft*
 \ relayout must-infer
 \ relayout-1 must-infer
 \ pref-dim must-infer
+
+\ graft* must-infer
+\ ungraft* must-infer

@@ -22,7 +22,7 @@ IN: math.statistics
 
 : minmax ( seq -- min max )
     #! find the min and max of a seq in one pass
-    [ 1/0. -1/0. ] dip [ tuck [ min ] [ max ] 2bi* ] each ;
+    [ 1/0. -1/0. ] dip [ [ min ] [ max ] bi-curry bi* ] each ;
 
 : range ( seq -- n )
     minmax swap - ;

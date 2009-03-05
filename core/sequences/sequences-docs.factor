@@ -502,11 +502,9 @@ HELP: delete-slice
 { $side-effects "seq" } ;
 
 HELP: replace-slice
-{ $values { "new" sequence } { "seq" "a mutable sequence" } { "from" "a non-negative integer" } { "to" "a non-negative integer" } }
+{ $values { "new" sequence } { "seq" sequence } { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq'" sequence } }
 { $description "Replaces a range of elements beginning at index " { $snippet "from" } " and ending before index " { $snippet "to" } " with a new sequence." }
-{ $notes "If the " { $snippet "to - from" } " is equal to the length of " { $snippet "new" } ", the sequence remains the same size, and does not have to support resizing. However, if " { $snippet "to - from" } " is not equal to the length of " { $snippet "new" } ", the " { $link set-length } " word is called on " { $snippet "seq" } ", so fixed-size sequences should not be passed in this case." }
-{ $errors "Throws an error if " { $snippet "new" } " contains elements whose types are not permissible in " { $snippet "seq" } "." }
-{ $side-effects "seq" } ;
+{ $errors "Throws an error if " { $snippet "new" } " contains elements whose types are not permissible in " { $snippet "seq" } "." } ;
 
 { push prefix suffix } related-words
 
@@ -1445,7 +1443,9 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection unclip-last-slice }
 { $subsection cut-slice }
 "A utility for words which use slices as iterators:"
-{ $subsection <flat-slice> } ;
+{ $subsection <flat-slice> }
+"Replacing slices with new elements:"
+{ $subsection replace-slice } ;
 
 ARTICLE: "sequences-combinators" "Sequence combinators"
 "Iteration:"
@@ -1553,7 +1553,6 @@ ARTICLE: "sequences-destructive" "Destructive operations"
 { $subsection move }
 { $subsection exchange }
 { $subsection copy }
-{ $subsection replace-slice }
 "Many operations have constructive and destructive variants:"
 { $table
     { "Constructive" "Destructive" }

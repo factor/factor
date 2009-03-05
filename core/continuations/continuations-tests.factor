@@ -4,7 +4,7 @@ kernel.private accessors eval ;
 IN: continuations.tests
 
 : (callcc1-test)
-    swap 1- tuck swap ?push
+    [ 1- dup ] dip ?push
     over 0 = [ "test-cc" get continue-with ] when
     (callcc1-test) ;
 

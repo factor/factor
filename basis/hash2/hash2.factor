@@ -14,7 +14,7 @@ IN: hash2
 : <hash2> ( size -- hash2 ) f <array> ;
 
 : 2= ( a b pair -- ? )
-    first2 swapd [ = ] 2bi@ and ; inline
+    first2 [ = ] bi-curry@ bi* and ; inline
 
 : (assoc2) ( a b alist -- {a,b,val} )
     [ 2= ] with with find nip ; inline
