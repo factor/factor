@@ -10,7 +10,7 @@ TUPLE: image-gadget < gadget { image image } ;
 M: image-gadget pref-dim*
     image>> dim>> ;
 
-: draw-image ( tiff -- )
+: draw-image ( image -- )
     0 0 glRasterPos2i 1.0 -1.0 glPixelZoom
     [ dim>> first2 GL_RGBA GL_UNSIGNED_BYTE ]
     [ bitmap>> ] bi glDrawPixels ;
