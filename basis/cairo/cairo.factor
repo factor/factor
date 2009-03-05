@@ -14,22 +14,7 @@ ERROR: cairo-error message ;
 
 : check-cairo ( cairo -- ) cairo_status (check-cairo) ;
 
-: with-cairo ( cairo quot -- )
-    '[
-        _ &cairo_destroy
-        _ [ check-cairo ] bi
-    ] with-destructors ; inline
-
 : check-surface ( surface -- ) cairo_surface_status (check-cairo) ;
-
-: with-surface ( cairo_surface quot -- )
-    '[
-        _ &cairo_surface_destroy
-        _ [ check-surface ] bi
-    ] with-destructors ; inline
-
-: with-cairo-from-surface ( cairo_surface quot -- )
-    '[ cairo_create _ with-cairo ] with-surface ; inline
 
 : width>stride ( width -- stride ) "uint" heap-size * ; inline
 
@@ -43,7 +28,7 @@ ERROR: cairo-error message ;
 : make-bitmap-image ( dim quot -- image )
     '[
         <image-surface> &cairo_surface_destroy
-        cairo_create &cairo_destroy
+        <cairo> &cairo_destroy
         @
     ] make-memory-bitmap
     BGRA >>component-order ; inline

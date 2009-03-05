@@ -5,13 +5,16 @@ USING: arrays sequences alien alien.c-types alien.destructors
 alien.syntax math math.functions math.vectors destructors combinators
 colors fonts accessors assocs namespaces kernel pango pango.fonts
 pango.cairo cairo cairo.ffi glib unicode.data images cache init
-math.rectangles fry memoize ;
+math.rectangles fry memoize io.encodings.utf8 ;
 IN: pango.layouts
 
 LIBRARY: pango
 
 FUNCTION: PangoLayout*
 pango_layout_new ( PangoContext* context ) ;
+
+FUNCTION: PangoContext*
+pango_layout_get_context ( PangoLayout* layout ) ;
 
 FUNCTION: void
 pango_layout_set_text ( PangoLayout* layout, char* text, int length ) ;
@@ -57,42 +60,23 @@ pango_layout_iter_free ( PangoLayoutIter* iter ) ;
 
 DESTRUCTOR: pango_layout_iter_free
 
-TUPLE: layout font string layout metrics ink-rect logical-rect image disposed ;
+TUPLE: layout font string selection layout metrics ink-rect logical-rect image disposed ;
 
 SYMBOL: dpi
 
 72 dpi set-global
 
-: dummy-pango-context ( -- context )
-    \ dummy-pango-context [
-        pango_context_new
-    ] initialize-alien ;
-
-MEMO: (cache-font) ( font -- open-font )
-    [
-        pango_cairo_font_map_get_default
-        dup dpi get pango_cairo_font_map_set_resolution
-        dummy-pango-context
-    ] dip
-    cache-font-description
-    pango_font_map_load_font ;
-
-: cache-font ( font -- open-font )
-    strip-font-colors (cache-font) ;
-
-: set-layout-font ( str layout -- )
-    swap pango_layout_set_font_description ;
+: set-layout-font ( font layout -- )
+    swap cache-font-description pango_layout_set_font_description ;
 
 : set-layout-text ( str layout -- )
     #! Replace nulls with something else since Pango uses null-terminated
     #! strings
-    swap
-    dup selection? [ string>> ] when
-    { { 0 CHAR: zero-width-no-break-space } } substitute
-    -1 pango_layout_set_text ;
+    swap -1 pango_layout_set_text ;
 
 : <PangoLayout> ( text font -- layout )
     dummy-cairo pango_cairo_create_layout |g_object_unref
+    [ pango_layout_get_context dpi get pango_cairo_context_set_resolution ] keep
     [ set-layout-font ] keep
     [ set-layout-text ] keep ;
 
@@ -110,7 +94,6 @@ MEMO: missing-font-metrics ( font -- metrics )
     #! simulate them on Pango.
     [
         [ metrics new ] dip
-        (cache-font)
         [ "x" glyph-height >>x-height ]
         [ "Y" glyph-height >>cap-height ] bi
     ] with-destructors ;
@@ -131,31 +114,42 @@ MEMO: missing-font-metrics ( font -- metrics )
     '[ _ 0 2array v- ] change-loc ;
 
 : first-line ( layout -- line )
-    0 pango_layout_get_line_readonly ;
+    layout>> 0 pango_layout_get_line_readonly ;
 
-: line-offset>x ( line n -- x )
+: line-offset>x ( layout n -- x )
+    #! n is an index into the UTF8 encoding of the text
+    [ drop first-line ] [ swap string>> >utf8-index ] 2bi
     f 0 <int> [ pango_layout_line_index_to_x ] keep
     *int pango>float ;
 
-: x>line-offset ( line x -- n )
-    float>pango 0 <int> 0 <int>
-    [ pango_layout_line_x_to_index drop ] 2keep
-    [ *int ] bi@ + ;
+: x>line-offset ( layout x -- n )
+    #! n is an index into the UTF8 encoding of the text
+    [
+        [ first-line ] dip
+        float>pango 0 <int> 0 <int>
+        [ pango_layout_line_x_to_index drop ] 2keep
+        [ *int ] bi@ swap
+    ] [ drop string>> ] 2bi utf8-index> + ;
 
-: selection-rect ( dim layout selection -- rect )
-    [ first-line ] [ [ start>> ] [ end>> ] bi ] bi*
-    [ line-offset>x ] bi-curry@ bi
+: selection-start/end ( selection -- start end )
+    selection>> [ start>> ] [ end>> ] bi ;
+
+: selection-rect ( layout -- rect )
+    [ ink-rect>> dim>> ] [ ] [ selection-start/end ] tri [ line-offset>x ] bi-curry@ bi
     [ drop nip 0 2array ] [ swap - swap second 2array ] 3bi <rect> ;
 
 : fill-selection-background ( cr layout -- )
-    dup string>> selection? [
-        [ string>> color>> set-source-color ]
+    dup selection>> [
+        [ selection>> color>> set-source-color ]
         [
-            [ [ ink-rect>> dim>> ] [ layout>> ] [ string>> ] tri selection-rect ]
-            [ ink-rect>> loc>> first ] bi rect-translate-x
+            [ selection-rect ] [ ink-rect>> loc>> first ] bi
+            rect-translate-x
             fill-rect
         ] 2bi
     ] [ 2drop ] if ;
+
+: text-position ( layout -- loc )
+    [ logical-rect>> ] [ ink-rect>> ] bi [ loc>> ] bi@ v- ;
 
 : set-text-position ( cr loc -- )
     first2 cairo_move_to ;
@@ -166,9 +160,6 @@ MEMO: missing-font-metrics ( font -- metrics )
         [ layout>> layout-baseline >>ascent ]
         [ logical-rect>> dim>> [ first >>width ] [ second >>height ] bi ] bi
         dup [ height>> ] [ ascent>> ] bi - >>descent ;
-
-: text-position ( layout -- loc )
-    [ logical-rect>> ] [ ink-rect>> ] bi [ loc>> ] bi@ v- ;
 
 : draw-layout ( layout -- image )
     dup ink-rect>> dim>> [ >fixnum ] map [
@@ -182,12 +173,20 @@ MEMO: missing-font-metrics ( font -- metrics )
         } 2cleave
     ] make-bitmap-image ;
 
+: escape-nulls ( str -- str' )
+    { { 0 CHAR: zero-width-no-break-space } } substitute ;
+
+: unpack-selection ( layout string/selection -- layout )
+    dup selection? [
+        [ string>> escape-nulls >>string ] [ >>selection ] bi
+    ] [ escape-nulls >>string ] if ; inline
+
 : <layout> ( font string -- line )
     [
         layout new
-            swap >>string
+            swap unpack-selection
             swap >>font
-            dup [ string>> ] [ font>> cache-font-description ] bi <PangoLayout> >>layout
+            dup [ string>> ] [ font>> ] bi <PangoLayout> >>layout
             dup layout>> layout-extents [ >>ink-rect ] [ >>logical-rect ] bi*
             dup layout-metrics >>metrics
             dup draw-layout >>image

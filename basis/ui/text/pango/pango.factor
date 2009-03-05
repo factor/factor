@@ -27,10 +27,10 @@ M: pango-renderer draw-string ( font string -- )
     rendered-layout draw-texture ;
 
 M: pango-renderer x>offset ( x font string -- n )
-    cached-line swap x>line-offset ;
+    cached-layout swap x>line-offset ;
 
 M: pango-renderer offset>x ( n font string -- x )
-    cached-line swap line-offset>x ;
+    cached-layout swap line-offset>x ;
 
 M: pango-renderer font-metrics ( font -- metrics )
     " " cached-layout metrics>> clone f >>width ;
