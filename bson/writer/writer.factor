@@ -3,7 +3,7 @@
 USING: accessors assocs bson.constants byte-arrays fry io io.binary
 io.encodings.binary io.encodings.string io.encodings.utf8
 io.streams.byte-array kernel math math.parser quotations sequences
-serialize strings words ;
+serialize strings words tools.hexdump ;
 
 IN: bson.writer
 
@@ -99,11 +99,13 @@ M: sequence bson-write ( array -- )
     [ [ MDB_OID_FIELD ] dip write-pair ] [ drop ] if ; inline
 
 : skip-field? ( name -- boolean )
-    { MDB_OID_FIELD MDB_INTERNAL_FIELD } member? ; inline
+    { "_id" "_mdb" } member? ; inline
 
 M: assoc bson-write ( assoc -- )
-    '[ _ [ write-oid ] [ [ over skip-field? [ 2drop ] [ write-pair ] if ] assoc-each ] bi ]
-    binary swap with-byte-writer
+    [ binary ] dip
+    '[ _  [ write-oid ] keep
+       [ over skip-field? [ 2drop ] [ write-pair ] if ] assoc-each
+    ] with-byte-writer
     [ length 5 + bson-write ] keep
     write
     write-eoo ; 

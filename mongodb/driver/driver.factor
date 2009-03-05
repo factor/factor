@@ -1,6 +1,6 @@
 USING: accessors assocs fry io.sockets kernel math mongodb.msg formatting linked-assocs destructors continuations
 mongodb.operations namespaces sequences splitting math.parser io.encodings.binary combinators io.streams.duplex
-arrays io memoize constructors sets strings ;
+arrays io memoize constructors sets strings uuid ;
 
 IN: mongodb.driver
 
@@ -231,7 +231,7 @@ M: assoc count
  
 : lasterror ( -- error )
     cmd-collection H{ { "getlasterror" 1 } } <mdb-query-msg>
-    find-one objects>> [ "err" ] at ;
+    find-one objects>> first [ "err" ] dip at ;
 
 GENERIC: validate ( collection -- )
 M: string validate
@@ -262,6 +262,7 @@ M: assoc save-unsafe
 GENERIC: ensure-index ( collection name spec -- )
 M: assoc ensure-index
     H{ } clone
+    [ [ uuid1 "_id" ] dip set-at ] keep
     [ [ "key" ] dip set-at ] keep
     [ [ "name" ] dip set-at ] keep
     [ [ index-ns "ns" ] dip set-at ] keep

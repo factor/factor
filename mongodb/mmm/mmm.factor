@@ -1,7 +1,7 @@
 USING: accessors fry io io.encodings.binary io.servers.connection
 io.sockets io.streams.byte-array kernel math mongodb.msg classes formatting
-mongodb.msg.private namespaces prettyprint tools.walker calendar calendar.format
-json.writer ;
+namespaces prettyprint tools.walker calendar calendar.format
+json.writer mongodb.operations.private mongodb.operations ;
 
 IN: mongodb.mmm
 
