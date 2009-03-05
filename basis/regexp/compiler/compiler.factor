@@ -28,7 +28,6 @@ M: end-of-file question>quot
             [ length swap - 2 <= ]
             [ swap tail { "\n" "\r\n" "\r" "" } member? ]
         } 2&&
-        [ [ nip [ length ] keep ] when ] keep
     ] ;
 
 M: $ question>quot

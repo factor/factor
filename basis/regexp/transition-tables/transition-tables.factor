@@ -36,19 +36,14 @@ TUPLE: transition-table transitions start-state final-states ;
 : map-set ( assoc quot -- new-assoc )
     '[ drop @ dup ] assoc-map ; inline
 
-: rewrite-transitions ( transition-table assoc quot -- transition-table )
-    [
-        [ clone ] dip
-        [ '[ _ condition-at ] change-start-state ]
-        [ '[ [ _ at ] map-set ] change-final-states ]
-        [ ] tri
-    ] dip '[ _ @ ] change-transitions ; inline
-
 : number-transitions ( transitions numbering -- new-transitions )
     dup '[
         [ _ at ]
         [ [ _ condition-at ] assoc-map ] bi*
     ] assoc-map ;
 
-: transitions-at ( transitions numbering -- transitions )
-    [ number-transitions ] rewrite-transitions ;
+: transitions-at ( transition-table assoc -- transition-table )
+    [ clone ] dip
+    [ '[ _ condition-at ] change-start-state ]
+    [ '[ [ _ at ] map-set ] change-final-states ]
+    [ '[ _ number-transitions ] change-transitions ] tri ;

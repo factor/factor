@@ -74,15 +74,10 @@ IN: regexp.minimize
 : delete-duplicates ( transitions state-classes -- new-transitions )
     '[ drop _ canonical-state? ] assoc-filter ;
 
-: rewrite-duplicates ( new-transitions state-classes -- new-transitions )
-    '[ [ _ at ] assoc-map ] assoc-map ;
-
-: combine-transitions ( transitions state-classes -- new-transitions )
-    [ delete-duplicates ] [ rewrite-duplicates ] bi ;
-
 : combine-states ( table -- smaller-table )
     dup state-classes
-    [ combine-transitions ] rewrite-transitions ;
+    [ transitions-at ] keep
+    '[ _ delete-duplicates ] change-transitions ;
 
 : minimize ( table -- minimal-table )
-    clone number-states ; ! combine-states ;
+    clone number-states combine-states ;
