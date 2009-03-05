@@ -6,6 +6,10 @@ HELP: range
 { $class-description "Range models implement the " { $link "range-model-protocol" } " with real numbers as the minimum, current, maximum, and page size. Range models are created with " { $link <range> } "." }
 { $notes { $link "ui.gadgets.sliders" } " use range models." } ;
 
+HELP: <range>
+{ $values { "value" real } { "page" real } { "min" real } { "max" real } { "range" range } }
+{ $description "Creates a new " { $link range } " model." } ;
+
 HELP: range-model
 { $values { "range" range } { "model" model } }
 { $description "Outputs a model holding a range model's current value." }

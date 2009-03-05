@@ -32,10 +32,11 @@ IN: cocoa.subclassing
     [ add-protocols ] [ add-methods ] [ objc_registerClassPair ]
     tri ;
 
+: encode-type ( type -- encoded )
+    dup alien>objc-types get at [ ] [ no-objc-type ] ?if ;
+
 : encode-types ( return types -- encoding )
-    swap prefix [
-        alien>objc-types get at "0" append
-    ] map concat ;
+    swap prefix [ encode-type "0" append ] map concat ;
 
 : prepare-method ( ret types quot -- type imp )
     [ [ encode-types ] 2keep ] dip

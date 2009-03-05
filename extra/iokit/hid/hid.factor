@@ -1,5 +1,6 @@
 USING: iokit alien alien.syntax alien.c-types kernel
-system core-foundation ;
+system core-foundation core-foundation.data
+core-foundation.dictionaries ;
 IN: iokit.hid
 
 CONSTANT: kIOHIDDeviceKey "IOHIDDevice"

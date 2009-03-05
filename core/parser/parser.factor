@@ -3,7 +3,7 @@
 USING: arrays definitions generic assocs kernel math namespaces
 sequences strings vectors words words.symbol quotations io
 combinators sorting splitting math.parser effects continuations
-io.files io.streams.string vocabs io.encodings.utf8 source-files
+io.files vocabs io.encodings.utf8 source-files
 classes hashtables compiler.errors compiler.units accessors sets
 lexer vocabs.parser ;
 IN: parser
@@ -26,7 +26,7 @@ t parser-notes set-global
     parser-notes? [
         file get [ path>> write ":" write ] when* 
         lexer get [ line>> number>string write ": " write ] when*
-        "Note: " write dup print
+        "Note:" print dup print
     ] when drop ;
 
 M: parsing-word stack-effect drop (( parsed -- parsed )) ;
@@ -164,6 +164,7 @@ SYMBOL: interactive-vocabs
     "inspector"
     "io"
     "io.files"
+    "io.pathnames"
     "kernel"
     "listener"
     "math"
@@ -178,7 +179,9 @@ SYMBOL: interactive-vocabs
     "strings"
     "syntax"
     "tools.annotations"
+    "tools.apropos"
     "tools.crossref"
+    "tools.disassembler"
     "tools.memory"
     "tools.profiler"
     "tools.test"

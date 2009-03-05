@@ -1,36 +1,49 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ui.gestures ui.gadgets ui.gadgets.buttons
-ui.gadgets.frames ui.gadgets.grids math.order
-ui.gadgets.theme ui.render kernel math namespaces sequences
-vectors models models.range math.vectors math.functions
-quotations colors math.geometry.rect fry ;
+USING: accessors arrays assocs kernel math namespaces sequences
+vectors models models.range math.vectors math.functions quotations
+colors colors.constants math.rectangles fry combinators ui.gestures
+ui.pens ui.gadgets ui.gadgets.buttons ui.gadgets.tracks math.order
+ui.gadgets.icons ui.pens.tile ui.pens.image ;
 IN: ui.gadgets.sliders
+
+TUPLE: slider < track elevator thumb saved line ;
+
+: slider-value ( gadget -- n ) model>> range-value >fixnum ;
+: slider-page ( gadget -- n ) model>> range-page-value ;
+: slider-max ( gadget -- n ) model>> range-max-value ;
+: slider-max* ( gadget -- n ) model>> range-max-value* ;
+
+: slide-by ( amount slider -- ) model>> move-by ;
+: slide-by-page ( amount slider -- ) model>> move-by-page ;
+
+: slide-by-line ( amount slider -- ) [ line>> * ] keep slide-by ;
+
+<PRIVATE
 
 TUPLE: elevator < gadget direction ;
 
 : find-elevator ( gadget -- elevator/f ) [ elevator? ] find-parent ;
 
-TUPLE: slider < frame elevator thumb saved line ;
-
 : find-slider ( gadget -- slider/f ) [ slider? ] find-parent ;
 
+CONSTANT: elevator-padding 4
+
 : elevator-length ( slider -- n )
-  [ elevator>> dim>> ] [ orientation>> ] bi v. ;
+    [ elevator>> dim>> ] [ orientation>> ] bi v.
+    elevator-padding 2 * - ;
 
-CONSTANT: min-thumb-dim 15
+CONSTANT: min-thumb-dim 30
 
-: slider-value ( gadget -- n ) model>> range-value >fixnum ;
-: slider-page  ( gadget -- n ) model>> range-page-value    ;
-: slider-max   ( gadget -- n ) model>> range-max-value     ;
-: slider-max*  ( gadget -- n ) model>> range-max-value*    ;
+: visible-portion ( slider -- n )
+    [ slider-page ] [ slider-max 1 max ] bi / 1 min ;
 
 : thumb-dim ( slider -- h )
     [
-        [ [ slider-page ] [ slider-max 1 max ] bi / 1 min ]
-        [ elevator-length ] bi * min-thumb-dim max
+        [ visible-portion ] [ elevator-length ] bi *
+        min-thumb-dim max
     ]
-    [ [ elevator>> dim>> ] [ orientation>> ] bi v. ] bi min ;
+    [ elevator-length ] bi min ;
 
 : slider-scale ( slider -- n )
     #! A scaling factor such that if x is a slider co-ordinate,
@@ -40,20 +53,23 @@ CONSTANT: min-thumb-dim 15
     [ slider-max* 1 max ]
     bi / ;
 
-: slider>screen ( m scale -- n ) slider-scale * ;
-: screen>slider ( m scale -- n ) slider-scale / ;
+: slider>screen ( m slider -- n ) slider-scale * elevator-padding + ;
+: screen>slider ( m slider -- n ) [ elevator-padding - ] dip slider-scale / ;
 
 M: slider model-changed nip elevator>> relayout-1 ;
 
-TUPLE: thumb < gadget ;
+TUPLE: thumb < track ;
 
 : begin-drag ( thumb -- )
     find-slider dup slider-value >>saved drop ;
 
 : do-drag ( thumb -- )
-    find-slider drag-loc over orientation>> v.
-    over screen>slider swap [ saved>> + ] keep
-    model>> set-range-value ;
+    find-slider {
+        [ orientation>> drag-loc v. ]
+        [ screen>slider ]
+        [ saved>> + ]
+        [ model>> set-range-value ]
+    } cleave ;
 
 thumb H{
     { T{ button-down } [ begin-drag ] }
@@ -61,28 +77,47 @@ thumb H{
     { T{ drag } [ do-drag ] }
 } set-gestures
 
-: thumb-theme ( thumb -- thumb )
-    plain-gradient >>interior
-    faint-boundary ; inline
+CONSTANT: horizontal-thumb-tiles
+    {
+        { "horizontal-scroller-handle-left" f }
+        { "horizontal-scroller-handle-middle" 1/2 }
+        { "horizontal-scroller-handle-grip" f }
+        { "horizontal-scroller-handle-middle" 1/2 }
+        { "horizontal-scroller-handle-right" f }
+    }
 
-: <thumb> ( vector -- thumb )
-    thumb new-gadget
-        swap >>orientation
-        t >>root?
-    thumb-theme ;
+CONSTANT: vertical-thumb-tiles
+    {
+        { "vertical-scroller-handle-top" f }
+        { "vertical-scroller-handle-middle" 1/2 }
+        { "vertical-scroller-handle-grip" f }
+        { "vertical-scroller-handle-middle" 1/2 }
+        { "vertical-scroller-handle-bottom" f }
+    }
 
-: slide-by ( amount slider -- ) model>> move-by ;
+: build-thumb ( thumb -- thumb )
+    dup orientation>> {
+        { horizontal [ horizontal-thumb-tiles ] }
+        { vertical [ vertical-thumb-tiles ] }
+    } case
+    [ [ theme-image <icon> ] dip track-add ] assoc-each ;
 
-: slide-by-page ( amount slider -- ) model>> move-by-page ;
+: <thumb> ( orientation -- thumb )
+    thumb new-track
+        0 >>fill
+        1/2 >>align
+        build-thumb
+        t >>root? ;
 
 : compute-direction ( elevator -- -1/1 )
-    dup find-slider swap hand-click-rel
-    over orientation>> v.
-    over screen>slider
-    swap slider-value - sgn ;
+    [ hand-click-rel ] [ find-slider ] bi
+    [ orientation>> v. ]
+    [ screen>slider ]
+    [ slider-value - sgn ]
+    tri ;
 
 : elevator-hold ( elevator -- )
-    dup direction>> swap find-slider slide-by-page ;
+    [ direction>> ] [ find-slider ] bi slide-by-page ;
 
 : elevator-click ( elevator -- )
     dup compute-direction >>direction
@@ -94,70 +129,112 @@ elevator H{
 } set-gestures
 
 : <elevator> ( vector -- elevator )
-  elevator new-gadget
-    swap             >>orientation
-    lowered-gradient >>interior ;
-
-: (layout-thumb) ( slider n -- n thumb )
-    over orientation>> n*v swap thumb>> ;
+    elevator new
+        swap >>orientation ;
 
 : thumb-loc ( slider -- loc )
-    dup slider-value swap slider>screen ;
+    [ slider-value ] keep slider>screen ;
 
-: layout-thumb-loc ( slider -- )
-    dup thumb-loc (layout-thumb)
-    [ [ floor ] map ] dip (>>loc) ;
+: layout-thumb-loc ( thumb slider -- )
+    [ thumb-loc ] [ orientation>> ] bi n*v
+    [ floor ] map >>loc drop ;
 
-: layout-thumb-dim ( slider -- )
-    dup dup thumb-dim (layout-thumb)
-    [
-        [ [ rect-dim ] dip ] [ drop orientation>> ] 2bi set-axis
-        [ ceiling ] map
-    ] dip (>>dim) ;
+: layout-thumb-dim ( thumb slider -- )
+    [ dim>> ] [ thumb-dim ] [ orientation>> ] tri [ n*v ] keep set-axis
+    [ ceiling ] map >>dim drop ;
+
+: slider-enabled? ( slider -- ? )
+    visible-portion 1 = not ;
 
 : layout-thumb ( slider -- )
-    dup layout-thumb-loc layout-thumb-dim ;
+    [ thumb>> ] keep
+    [ slider-enabled? >>visible? drop ]
+    [ layout-thumb-loc ]
+    [ layout-thumb-dim ]
+    2tri ;
 
 M: elevator layout*
     find-slider layout-thumb ;
 
-: slide-by-line ( amount slider -- ) [ line>> * ] keep slide-by ;
+: add-thumb-to-elevator ( object -- object )
+    [ elevator>> ] [ thumb>> ] bi add-gadget ;
 
-: <slide-button> ( vector polygon amount -- button )
-    [ gray swap <polygon-gadget> ] dip
-    '[ _ swap find-slider slide-by-line ] <repeat-button>
-    swap >>orientation ;
+: <slide-button-pen> ( orientation left right -- pen )
+    [ horizontal = ] 2dip ?
+    [ f f ] [ theme-image <image-pen> f f ] bi* <button-pen> ;
 
-: elevator, ( gadget orientation -- gadget )
-    tuck <elevator> >>elevator
-    swap <thumb> >>thumb
-    dup elevator>> over thumb>> add-gadget
-    @center grid-add ;
+TUPLE: slide-button < repeat-button ;
 
-: <left-button>  ( -- button ) { 0 1 } arrow-left -1 <slide-button> ;
-: <right-button> ( -- button ) { 0 1 } arrow-right 1 <slide-button> ;
-: <up-button>    ( -- button ) { 1 0 } arrow-up   -1 <slide-button> ;
-: <down-button>  ( -- button ) { 1 0 } arrow-down  1 <slide-button> ;
+: <slide-button> ( orientation amount left right -- button )
+    [ swap ] 2dip
+    [
+        [ <gadget> ] dip
+        '[ _ swap find-slider slide-by-line ]
+        slide-button new-button
+    ] 3dip
+    <slide-button-pen> >>interior ;
 
-: <slider> ( range orientation -- slider )
-    slider new-frame
-        swap >>orientation
-        swap >>model
-        32 >>line ;
+M: slide-button pref-dim* dup interior>> pen-pref-dim ;
 
-: <x-slider> ( range -- slider )
-    { 1 0 } <slider>
-        <left-button> @left grid-add
-        { 0 1 } elevator,
-        <right-button> @right grid-add ;
+: <up-button> ( orientation -- button )
+    -1
+    "horizontal-scroller-leftarrow-clicked"
+    "vertical-scroller-uparrow-clicked"
+    <slide-button> ;
 
-: <y-slider> ( range -- slider )
-    { 0 1 } <slider>
-        <up-button> @top grid-add
-        { 1 0 } elevator,
-        <down-button> @bottom grid-add ;
+: <down-button> ( orientation -- button )
+    1
+    "horizontal-scroller-rightarrow-clicked"
+    "vertical-scroller-downarrow-clicked"
+    <slide-button> ;
+
+TUPLE: slider-pen enabled disabled ;
+
+: <slider-pen> ( orientation -- pen )
+    {
+        { horizontal [
+            "horizontal-scroller-left" theme-image
+            "horizontal-scroller-middle" theme-image
+            "horizontal-scroller-right" theme-image
+            "horizontal-scroller-right-disabled" theme-image
+        ] }
+        { vertical [
+            "vertical-scroller-top" theme-image
+            "vertical-scroller-middle" theme-image
+            "vertical-scroller-bottom" theme-image
+            "vertical-scroller-bottom-disabled" theme-image
+        ] }
+    } case
+    [ f f <tile-pen> ] bi-curry@ 2bi \ slider-pen boa ;
+
+: slider-pen ( slider pen -- pen )
+    [ slider-enabled? ] [ [ enabled>> ] [ disabled>> ] bi ] bi* ? ;
+
+M: slider-pen draw-interior
+    dupd slider-pen draw-interior ;
+
+M: slider-pen draw-boundary
+    dupd slider-pen draw-boundary ;
+
+M: slider-pen pen-pref-dim
+    enabled>> pen-pref-dim ;
 
 M: slider pref-dim*
-    dup call-next-method
-    swap orientation>> [ 40 v*n ] keep
+    [ dup interior>> pen-pref-dim ] [ drop { 100 100 } ] [ orientation>> ] tri
     set-axis ;
+
+PRIVATE>
+
+: <slider> ( range orientation -- slider )
+    slider new-track
+        swap >>model
+        32 >>line
+        dup orientation>> {
+            [ <slider-pen> >>interior ]
+            [ <thumb> >>thumb ]
+            [ <elevator> >>elevator ]
+            [ drop dup add-thumb-to-elevator 1 track-add ]
+            [ <up-button> f track-add ]
+            [ <down-button> f track-add ]
+            [ drop <gadget> { 1 1 } >>dim f track-add ]
+        } cleave ;

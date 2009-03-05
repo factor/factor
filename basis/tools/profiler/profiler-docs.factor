@@ -28,7 +28,7 @@ $nl
 ABOUT: "profiling"
 
 HELP: counters
-{ $values { "words" "a sequence of words" } { "assoc" "an association list mapping words to integers" } }
+{ $values { "words" "a sequence of words" } { "alist" "an association list mapping words to integers" } }
 { $description "Outputs an association list of word call counts." } ;
 
 HELP: counters.

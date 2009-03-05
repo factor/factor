@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions generic io kernel assocs
 hashtables namespaces make parser prettyprint sequences strings
-io.styles vectors words math sorting splitting classes slots
-vocabs help.stylesheet help.topics vocabs.loader quotations
-combinators ;
+io.styles vectors words math sorting splitting classes slots fry
+sets vocabs help.stylesheet help.topics vocabs.loader quotations
+combinators call ;
 IN: help.markup
 
 PREDICATE: simple-element < array
@@ -27,8 +27,8 @@ GENERIC: print-element ( element -- )
 
 M: simple-element print-element [ print-element ] each ;
 M: string print-element [ write ] ($span) ;
-M: array print-element unclip execute ;
-M: word print-element { } swap execute ;
+M: array print-element unclip execute( arg -- ) ;
+M: word print-element { } swap execute( arg -- ) ;
 M: f print-element drop ;
 
 : print-element* ( element style -- )
@@ -137,6 +137,10 @@ ALIAS: $slot $snippet
         ] with-nesting
     ] ($heading) ;
 
+! Images
+: $image ( element -- )
+    [ [ "" ] dip first image associate format ] ($span) ;
+
 ! Some links
 : write-link ( string object -- )
     link-style get [ write-object ] with-style ;
@@ -147,8 +151,17 @@ ALIAS: $slot $snippet
 : $link ( element -- )
     first ($link) ;
 
+: ($definition-link) ( word -- )
+    [ article-name ] keep write-link ;
+
+: $definition-link ( element -- )
+    first ($definition-link) ;
+
 : ($long-link) ( object -- )
     [ article-title ] [ >link ] bi write-link ;
+
+: $long-link ( object -- )
+    first ($long-link) ;
 
 : ($subsection) ( element quot -- )
     [
@@ -194,7 +207,7 @@ ALIAS: $slot $snippet
     "See also" $heading $links ;
 
 : related-words ( seq -- )
-    dup [ "related" set-word-prop ] curry each ;
+    dup '[ _ "related" set-word-prop ] each ;
 
 : $related ( element -- )
     first dup "related" word-prop remove
@@ -341,7 +354,8 @@ M: f ($instance)
 
 GENERIC: elements* ( elt-type element -- )
 
-M: simple-element elements* [ elements* ] with each ;
+M: simple-element elements*
+    [ elements* ] with each ;
 
 M: object elements* 2drop ;
 
@@ -352,13 +366,10 @@ M: array elements*
 : elements ( elt-type element -- seq ) [ elements* ] { } make ;
 
 : collect-elements ( element seq -- elements )
-    [
-        swap [
-            elements [
-                rest [ dup set ] each
-            ] each
-        ] curry each
-    ] H{ } make-assoc keys ;
+    swap '[ _ elements [ rest ] map concat ] map concat prune ;
 
 : <$link> ( topic -- element )
-    \ $link swap 2array ;
+    1array \ $link prefix ;
+
+: <$snippet> ( str -- element )
+    1array \ $snippet prefix ;

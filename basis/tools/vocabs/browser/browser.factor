@@ -6,47 +6,37 @@ classes.singleton classes.tuple classes.union combinators
 definitions effects fry generic help help.markup help.stylesheet
 help.topics io io.files io.pathnames io.styles kernel macros
 make namespaces prettyprint sequences sets sorting summary
-tools.vocabs vocabs vocabs.loader words words.symbol ;
+tools.vocabs vocabs vocabs.loader words words.symbol
+combinators.smart definitions.icons ;
 IN: tools.vocabs.browser
 
-: vocab-status-string ( vocab -- string )
+: <$pretty-link> ( definition -- element )
+    [
+        [ definition-icon 1array \ $image prefix ]
+        [ drop " " ]
+        [ 1array \ $definition-link prefix ]
+        tri
+    ] output>array ;
+
+: vocab-row ( vocab -- row )
+    [ <$pretty-link> ] [ vocab-summary ] bi 2array ;
+
+: vocab-headings ( -- headings )
     {
-        { [ dup not ] [ drop "" ] }
-        { [ dup vocab-main ] [ drop "[Runnable]" ] }
-        [ drop "[Loaded]" ]
-    } cond ;
+        { $strong "Vocabulary" }
+        { $strong "Summary" }
+    } ;
 
-: write-status ( vocab -- )
-    vocab vocab-status-string write ;
-
-: vocab. ( vocab -- )
-    [
-        [ [ write-status ] with-cell ]
-        [ [ ($link) ] with-cell ]
-        [ [ vocab-summary write ] with-cell ] tri
-    ] with-row ;
-
-: vocab-headings. ( -- )
-    [
-        [ "State" write ] with-cell
-        [ "Vocabulary" write ] with-cell
-        [ "Summary" write ] with-cell
-    ] with-row ;
-
-: root-heading. ( root -- )
+: root-heading ( root -- )
     [ "Children from " prepend ] [ "Children" ] if*
     $heading ;
 
-: $vocabs ( assoc -- )
+: $vocabs ( seq -- )
+    [ vocab-row ] map vocab-headings prefix $table ;
+
+: $vocab-roots ( assoc -- )
     [
-        [ drop ] [
-            [ root-heading. ]
-            [
-                standard-table-style [
-                    vocab-headings. [ vocab. ] each
-                ] ($grid)
-            ] bi*
-        ] if-empty
+        [ drop ] [ [ root-heading ] [ $vocabs ] bi* ] if-empty
     ] assoc-each ;
 
 TUPLE: vocab-tag name ;
@@ -74,7 +64,7 @@ C: <vocab-author> vocab-author
     ] unless-empty ;
 
 : describe-children ( vocab -- )
-    vocab-name all-child-vocabs $vocabs ;
+    vocab-name all-child-vocabs $vocab-roots ;
 
 : describe-files ( vocab -- )
     vocab-files [ <pathname> ] map [
@@ -92,9 +82,9 @@ C: <vocab-author> vocab-author
     [
         "Tuple classes" $subheading
         [
-            [ <$link> ]
-            [ superclass <$link> ]
-            [ "slots" word-prop [ name>> ] map " " join \ $snippet swap 2array ]
+            [ <$pretty-link> ]
+            [ superclass <$pretty-link> ]
+            [ "slots" word-prop [ name>> ] map " " join <$snippet> ]
             tri 3array
         ] map
         { { $strong "Class" } { $strong "Superclass" } { $strong "Slots" } } prefix
@@ -105,8 +95,8 @@ C: <vocab-author> vocab-author
     [
         "Predicate classes" $subheading
         [
-            [ <$link> ]
-            [ superclass <$link> ]
+            [ <$pretty-link> ]
+            [ superclass <$pretty-link> ]
             bi 2array
         ] map
         { { $strong "Class" } { $strong "Superclass" } } prefix
@@ -116,7 +106,7 @@ C: <vocab-author> vocab-author
 : (describe-classes) ( classes heading -- )
     '[
         _ $subheading
-        [ <$link> 1array ] map $table
+        [ <$pretty-link> 1array ] map $table
     ] unless-empty ;
 
 : describe-builtin-classes ( classes -- )
@@ -160,25 +150,27 @@ C: <vocab-author> vocab-author
     [
         "Parsing words" $subheading
         [
-            [ <$link> ]
-            [ word-syntax dup [ \ $snippet swap 2array ] when ]
+            [ <$pretty-link> ]
+            [ word-syntax dup [ <$snippet> ] when ]
             bi 2array
         ] map
         { { $strong "Word" } { $strong "Syntax" } } prefix
         $table
     ] unless-empty ;
 
+: word-row ( word -- element )
+    [ <$pretty-link> ]
+    [ stack-effect dup [ effect>string <$snippet> ] when ]
+    bi 2array ;
+
+: word-headings ( -- element )
+    { { $strong "Word" } { $strong "Stack effect" } } ;
+
+: words-table ( words -- )
+    [ word-row ] map word-headings prefix $table ;
+
 : (describe-words) ( words heading -- )
-    '[
-        _ $subheading
-        [
-            [ <$link> ]
-            [ stack-effect dup [ effect>string \ $snippet swap 2array ] when ]
-            bi 2array
-        ] map
-        { { $strong "Word" } { $strong "Stack effect" } } prefix
-        $table
-    ] unless-empty ;
+    '[ _ $subheading words-table ] unless-empty ;
 
 : describe-generics ( words -- )
     "Generic words" (describe-words) ;
@@ -198,11 +190,11 @@ C: <vocab-author> vocab-author
 : describe-symbols ( words -- )
     [
         "Symbol words" $subheading
-        [ <$link> 1array ] map $table
+        [ <$pretty-link> 1array ] map $table
     ] unless-empty ;
 
-: describe-words ( vocab -- )
-    words [
+: $words ( words -- )
+    [
         "Words" $heading
 
         natural-sort
@@ -229,7 +221,7 @@ C: <vocab-author> vocab-author
 
 : words. ( vocab -- )
     last-element off
-    vocab-name describe-words ;
+    [ require ] [ words $words ] bi ;
 
 : describe-metadata ( vocab -- )
     [
@@ -239,11 +231,11 @@ C: <vocab-author> vocab-author
     ] { } make
     [ "Meta-data" $heading $table ] unless-empty ;
 
-: $describe-vocab ( element -- )
+: $vocab ( element -- )
     first {
         [ describe-help ]
         [ describe-metadata ]
-        [ describe-words ]
+        [ words $words ]
         [ describe-files ]
         [ describe-children ]
     } cleave ;
@@ -262,10 +254,10 @@ C: <vocab-author> vocab-author
     [ vocab-authors ] keyed-vocabs ;
 
 : $tagged-vocabs ( element -- )
-    first tagged $vocabs ;
+    first tagged $vocab-roots ;
 
 : $authored-vocabs ( element -- )
-    first authored $vocabs ;
+    first authored $vocab-roots ;
 
 : $all-tags ( element -- )
     drop "Tags" $heading all-tags $tags ;
@@ -282,14 +274,14 @@ M: vocab-spec article-title vocab-name " vocabulary" append ;
 M: vocab-spec article-name vocab-name ;
 
 M: vocab-spec article-content
-    vocab-name \ $describe-vocab swap 2array ;
+    vocab-name \ $vocab swap 2array ;
 
 M: vocab-spec article-parent drop "vocab-index" ;
 
 M: vocab-tag >link ;
 
 M: vocab-tag article-title
-    name>> "Vocabularies tagged ``" "''" surround ;
+    name>> "Vocabularies tagged “" "”" surround ;
 
 M: vocab-tag article-name name>> ;
 

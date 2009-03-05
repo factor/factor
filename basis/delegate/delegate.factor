@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg
+! Portions copyright (C) 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors parser generic kernel classes classes.tuple
-words slots assocs sequences arrays vectors definitions
-math hashtables sets generalizations namespaces make
-words.symbol ;
+USING: accessors arrays assocs classes.tuple definitions generic
+generic.standard hashtables kernel lexer make math parser
+generic.parser sequences sets slots words words.symbol fry ;
 IN: delegate
 
 : protocol-words ( protocol -- words )
@@ -13,6 +13,9 @@ IN: delegate
     \ protocol-consult word-prop ;
 
 GENERIC: group-words ( group -- words )
+
+M: standard-generic group-words
+    dup "combination" word-prop #>> 2array 1array ;
 
 M: tuple-class group-words
     all-slots [
@@ -25,19 +28,20 @@ M: tuple-class group-words
 ! Consultation
 
 : consult-method ( word class quot -- )
-    [ drop swap first create-method ]
-    [ nip [ , dup second , \ ndip , first , ] [ ] make ] 3bi
+    [ drop swap first create-method-in ]
+    [ nip [ swap [ second [ [ dip ] curry ] times % ] [ first , ] bi ] [ ] make ] 3bi
     define ;
 
 : change-word-prop ( word prop quot -- )
-    rot props>> swap change-at ; inline
+    [ swap props>> ] dip change-at ; inline
 
 : register-protocol ( group class quot -- )
-    rot \ protocol-consult [ swapd ?set-at ] change-word-prop ;
+    [ \ protocol-consult ] 2dip
+    '[ [ _ _ swap ] dip ?set-at ] change-word-prop ;
 
 : define-consult ( group class quot -- )
     [ register-protocol ]
-    [ [ group-words ] 2dip [ consult-method ] 2curry each ]
+    [ [ group-words ] 2dip '[ _ _ consult-method ] each ]
     3bi ;
 
 : CONSULT:
@@ -78,16 +82,15 @@ M: tuple-class group-words
     [ dup word? [ 0 2array ] when ] map ;
 
 : define-protocol ( protocol wordlist -- )
-    fill-in-depth
-    [ forget-old-definitions ]
-    [ add-new-definitions ]
-    [ initialize-protocol-props ] 2tri ;
+    [ drop define-symbol ] [
+        fill-in-depth
+        [ forget-old-definitions ]
+        [ add-new-definitions ]
+        [ initialize-protocol-props ] 2tri
+    ] 2bi ;
 
 : PROTOCOL:
-    CREATE-WORD
-    [ define-symbol ]
-    [ f "inline" set-word-prop ]
-    [ parse-definition define-protocol ] tri ; parsing
+    CREATE-WORD parse-definition define-protocol ; parsing
 
 PREDICATE: protocol < word protocol-words ; ! Subclass of symbol?
 
@@ -102,3 +105,8 @@ M: protocol definition protocol-words show-words ;
 M: protocol definer drop \ PROTOCOL: \ ; ;
 
 M: protocol group-words protocol-words ;
+
+: SLOT-PROTOCOL:
+    CREATE-WORD ";" parse-tokens
+    [ [ reader-word ] [ writer-word ] bi 2array ] map concat
+    define-protocol ; parsing

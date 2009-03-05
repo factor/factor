@@ -24,3 +24,5 @@ USING: accessors kernel colors colors.hsv tools.test math ;
 
 [ 5/6 5/36 5/6 ] [ 5/6 5/6 5/6 hsv>rgb ] unit-test
 [ 1/6 0 1/6 ] [ 5/6 1 1/6 hsv>rgb ] unit-test
+
+[ 0.5 ] [ 180 0.1 0.2 0.5 <hsva> alpha>> ] unit-test

@@ -1,12 +1,12 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alarms arrays calendar kernel make math math.geometry.rect math.parser namespaces sequences system tetris.game tetris.gl ui.gadgets ui.gadgets.labels ui.gadgets.worlds ui.gadgets.status-bar ui.gestures ui.render ui ;
+USING: accessors alarms arrays calendar kernel make math math.rectangles math.parser namespaces sequences system tetris.game tetris.gl ui.gadgets ui.gadgets.labels ui.gadgets.worlds ui.gadgets.status-bar ui.gestures ui.render ui ;
 IN: tetris
 
 TUPLE: tetris-gadget < gadget { tetris tetris } { alarm } ;
 
 : <tetris-gadget> ( tetris -- gadget )
-    tetris-gadget new-gadget swap >>tetris ;
+    tetris-gadget new swap >>tetris ;
 
 M: tetris-gadget pref-dim* drop { 200 400 } ;
 
@@ -18,7 +18,7 @@ M: tetris-gadget pref-dim* drop { 200 400 } ;
 
 M: tetris-gadget draw-gadget* ( gadget -- )
     [
-        dup rect-dim [ first ] [ second ] bi rot tetris>> draw-tetris
+        [ dim>> first2 ] [ tetris>> ] bi draw-tetris
     ] keep update-status ;
 
 : new-tetris ( gadget -- gadget )

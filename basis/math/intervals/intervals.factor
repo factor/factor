@@ -120,9 +120,9 @@ TUPLE: interval { from read-only } { to read-only } ;
         { [ over full-interval eq? ] [ nip ] }
         { [ dup full-interval eq? ] [ drop ] }
         [
-            [ interval>points ] bi@ swapd
+            [ interval>points ] bi@
             [ [ swap endpoint< ] most ]
-            [ [ swap endpoint> ] most ] 2bi*
+            [ [ swap endpoint> ] most ] bi-curry* bi*
             <interval>
         ]
     } cond ;

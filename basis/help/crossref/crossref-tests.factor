@@ -13,7 +13,7 @@ io.streams.string continuations debugger compiler.units eval ;
 
 [ t ] [
     "foo" article-children
-    "foo" "help.crossref.tests" lookup 1array sequence=
+    "foo" "help.crossref.tests" lookup >link 1array sequence=
 ] unit-test
 
 [ "foo" ] [ "foo" "help.crossref.tests" lookup article-parent ] unit-test
