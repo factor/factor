@@ -17,8 +17,8 @@ IN: sequences.tests
 
 [ 5040 ] [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
 
-[ 5040 [ 1 1 2 6 24 120 720 ] ]
-[ [ 1 2 3 4 5 6 7 ] 1 [ * ] accumulate ] unit-test
+[ 5040 { 1 1 2 6 24 120 720 } ]
+[ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate ] unit-test
 
 [ f f ] [ [ ] [ ] find ] unit-test
 [ 0 1 ] [ [ 1 ] [ ] find ] unit-test

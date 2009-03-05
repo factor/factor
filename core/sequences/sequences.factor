@@ -416,7 +416,7 @@ PRIVATE>
     over map-into ; inline
 
 : accumulate ( seq identity quot -- final newseq )
-    swapd [ [ call ] [ 2drop ] 3bi ] curry map ; inline
+    swapd [ [ call ] [ 2drop ] 3bi ] curry { } map-as ; inline
 
 : 2each ( seq1 seq2 quot -- )
     (2each) each-integer ; inline
