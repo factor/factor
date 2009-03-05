@@ -28,6 +28,10 @@ CLASS: {
     [ [ 3drop ] dip finder-run-files ]
 }
 
+{ "applicationShouldHandleReopen:hasVisibleWindows:" "int" { "id" "SEL" "id" "int" }
+    [ [ 3drop ] dip 0 = [ show-listener ] when 0 ]
+}
+
 { "factorListener:" "id" { "id" "SEL" "id" }
     [ 3drop show-listener f ]
 }
