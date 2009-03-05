@@ -763,12 +763,6 @@ HELP: >>
 
 HELP: call-next-method
 { $description "Calls the next applicable method. Only valid inside a method definition. The values at the top of the stack are passed on to the next method, and they must be compatible with that method's class specializer." }
-{ $notes "This is syntax sugar around " { $link (call-next-method) } ". The following two lines are equivalent:"
-    { $code
-        "M: my-class my-generic ... call-next-method ... ;"
-        "M: my-class my-generic ... \\ my-class \\ my-generic (call-next-method) ... ;"
-    }
-"In most cases, this word should be called with the original input values on the stack. Calling it with other values is usually a sign of poor design." }
 { $errors
     "Throws a " { $link no-next-method } " error if this is the least specific method, and throws an " { $link inconsistent-next-method } " error if the values at the top of the stack are not compatible with the current method's specializer."
 } ;
