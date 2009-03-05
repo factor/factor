@@ -12,7 +12,7 @@ ascii-class punctuation-class java-printable-class blank-class
 control-character-class hex-digit-class java-blank-class c-identifier-class
 unmatchable-class terminator-class word-boundary-class ;
 
-SINGLETONS: beginning-of-input ^ end-of-input $ ;
+SINGLETONS: beginning-of-input ^ end-of-input $ end-of-file ;
 
 TUPLE: range from to ;
 C: <range> range
@@ -233,7 +233,7 @@ M: or-class replace-question
     replace-compound <or-class> ;
 
 M: not-class replace-question
-    class>> replace-question <not-class> ;
+    [ class>> ] 2dip replace-question <not-class> ;
 
 : answer ( table question answer -- new-table )
     '[ _ _ replace-question ] assoc-map
@@ -258,7 +258,7 @@ M: not-class class>questions class>> class>questions ;
 M: object class>questions 1array ;
 
 : table>questions ( table -- questions )
-    values <and-class> class>questions t swap remove ;
+    values [ class>questions ] gather >array t swap remove ;
 
 : table>condition ( table -- condition )
     ! input table is state => class
@@ -269,3 +269,12 @@ M: object class>questions 1array ;
         [ [ question>> ] [ yes>> ] [ no>> ] tri ] dip
         '[ _ condition-map ] bi@ <condition>
     ] [ call ] if ; inline recursive
+
+: condition-states ( condition -- states )
+    dup condition? [
+        [ yes>> ] [ no>> ] bi
+        [ condition-states ] bi@ append prune
+    ] [ 1array ] if ;
+
+: condition-at ( condition assoc -- new-condition )
+    '[ _ at ] condition-map ;

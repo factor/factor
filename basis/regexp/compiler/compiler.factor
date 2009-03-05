@@ -3,27 +3,76 @@
 USING: regexp.classes kernel sequences regexp.negation
 quotations regexp.minimize assocs fry math locals combinators
 accessors words compiler.units kernel.private strings
-sequences.private arrays regexp.matchers call ;
+sequences.private arrays regexp.matchers call namespaces
+regexp.transition-tables combinators.short-circuit ;
 IN: regexp.compiler
 
-: literals>cases ( literal-transitions -- case-body )
-    [ 1quotation ] assoc-map ;
+GENERIC: question>quot ( question -- quot )
+
+<PRIVATE
+
+SYMBOL: shortest?
+SYMBOL: backwards?
+
+M: t question>quot drop [ 2drop t ] ;
+
+M: beginning-of-input question>quot
+    drop [ drop zero? ] ;
+
+M: end-of-input question>quot
+    drop [ length = ] ;
+
+M: end-of-file question>quot
+    drop [
+        {
+            [ length swap - 2 <= ]
+            [ swap tail { "\n" "\r\n" "\r" "" } member? ]
+        } 2&&
+        [ [ nip [ length ] keep ] when ] keep
+    ] ;
+
+M: $ question>quot
+    drop [ { [ length = ] [ ?nth "\r\n" member? ] } 2|| ] ;
+
+M: ^ question>quot
+    drop [ { [ drop zero? ] [ [ 1- ] dip ?nth "\r\n" member? ] } 2|| ] ;
+
+! Maybe the condition>quot things can be combined, given a suitable method
+! for question>quot on classes, but maybe that'd make stack shuffling annoying
+
+: execution-quot ( next-state -- quot )
+    ! The conditions here are for lookaround and anchors, etc
+    dup condition? [
+        [ question>> question>quot ] [ yes>> ] [ no>> ] tri
+        [ execution-quot ] bi@
+        '[ 2dup @ _ _ if ]
+    ] [
+        ! There shouldn't be a condition like this!
+        dup sequence?
+        [ [ [ 2drop ] ] [ first '[ _ execute ] ] if-empty ]
+        [ '[ _ execute ] ] if
+    ] if ;
+
+TUPLE: box contents ;
+C: <box> box
 
 : condition>quot ( condition -- quot )
+    ! Conditions here are for different classes
     dup condition? [
         [ question>> ] [ yes>> ] [ no>> ] tri
         [ condition>quot ] bi@
         '[ dup _ class-member? _ _ if ]
     ] [
-        [ [ 3drop ] ] [ '[ drop _ execute ] ] if-empty
+        contents>>
+        [ [ 3drop ] ] [ execution-quot '[ drop @ ] ] if-empty
     ] if ;
 
-: new-non-literals>dispatch ( non-literal-transitions -- quot )
-    table>condition condition>quot ;
-
 : non-literals>dispatch ( non-literal-transitions -- quot )
-    [ [ '[ dup _ class-member? ] ] [ '[ drop _ execute ] ] bi* ] assoc-map
-    [ 3drop ] suffix '[ _ cond ] ;
+    [ swap ] assoc-map ! we want state => predicate, and get the opposite as input
+    table>condition [ <box> ] condition-map condition>quot ;
+
+: literals>cases ( literal-transitions -- case-body )
+    [ execution-quot ] assoc-map ;
 
 : expand-one-or ( or-class transition -- alist )
     [ seq>> ] dip '[ _ 2array ] map ;
@@ -38,17 +87,22 @@ IN: regexp.compiler
     >alist expand-or [ first integer? ] partition
     [ literals>cases ] [ non-literals>dispatch ] bi* ;
 
-:: step ( last-match index str case-body final? -- last-index/f )
+:: step ( last-match index str quot final? direction -- last-index/f )
     final? index last-match ?
     index str bounds-check? [
-        index 1+ str
+        index direction + str
         index str nth-unsafe
-        case-body case
+        quot call
     ] when ; inline
 
+: direction ( -- n )
+    backwards? get -1 1 ? ;
+
 : transitions>quot ( transitions final-state? -- quot )
-    [ split-literals suffix ] dip
-    '[ { array-capacity sequence } declare _ _ step ] ;
+    dup shortest? get and [ 2drop [ drop nip ] ] [
+        [ split-literals swap case>quot ] dip direction
+        '[ { array-capacity string } declare _ _ _ step ]
+    ] if ;
 
 : word>quot ( word dfa -- quot )
     [ transitions>> at ]
@@ -64,30 +118,37 @@ IN: regexp.compiler
         ] each
     ] with-compilation-unit ;
 
-: transitions-at ( transitions assoc -- new-transitions )
-    dup '[
-        [ _ at ]
-        [ [ _ at ] assoc-map ] bi*
-    ] assoc-map ;
-
 : states>words ( dfa -- words dfa )
     dup transitions>> keys [ gensym ] H{ } map>assoc
-    [ [ transitions-at ] rewrite-transitions ]
+    [ transitions-at ]
     [ values ]
     bi swap ; 
 
 : dfa>word ( dfa -- word )
     states>words [ states>code ] keep start-state>> ;
 
-: check-sequence ( string -- string )
+: check-string ( string -- string )
     ! Make this configurable
-    dup sequence? [ "String required" throw ] unless ;
+    dup string? [ "String required" throw ] unless ;
 
-: run-regexp ( start-index string word -- ? )
-    { [ f ] [ >fixnum ] [ check-sequence ] [ execute ] } spread ; inline
+: setup-regexp ( start-index string -- f start-index string )
+    [ f ] [ >fixnum ] [ check-string ] tri* ; inline
+
+PRIVATE>
+
+! The quotation returned is ( start-index string -- i/f )
 
 : dfa>quotation ( dfa -- quot )
-    dfa>word '[ _ run-regexp ] ;
+    dfa>word execution-quot '[ setup-regexp @ ] ;
+
+: dfa>shortest-quotation ( dfa -- quot )
+    t shortest? [ dfa>quotation ] with-variable ;
+
+: dfa>reverse-quotation ( dfa -- quot )
+    t backwards? [ dfa>quotation ] with-variable ;
+
+: dfa>reverse-shortest-quotation ( dfa -- quot )
+    t backwards? [ dfa>shortest-quotation ] with-variable ;
 
 TUPLE: quot-matcher quot ;
 C: <quot-matcher> quot-matcher

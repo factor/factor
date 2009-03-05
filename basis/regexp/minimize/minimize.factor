@@ -5,29 +5,11 @@ accessors locals math sorting arrays sets hashtables regexp.dfa
 combinators.short-circuit regexp.classes ;
 IN: regexp.minimize
 
-: number-transitions ( transitions numbering -- new-transitions )
-    dup '[
-        [ _ at ]
-        [ [ [ _ at ] condition-map ] assoc-map ] bi*
-    ] assoc-map ;
-
 : table>state-numbers ( table -- assoc )
     transitions>> keys <enum> [ swap ] H{ } assoc-map-as ;
 
-: map-set ( assoc quot -- new-assoc )
-    '[ drop @ dup ] assoc-map ; inline
-
-: rewrite-transitions ( transition-table assoc quot -- transition-table )
-    [
-        [ clone ] dip
-        [ '[ _ at ] change-start-state ]
-        [ '[ [ _ at ] map-set ] change-final-states ]
-        [ ] tri
-    ] dip '[ _ @ ] change-transitions ; inline
-
 : number-states ( table -- newtable )
-    dup table>state-numbers
-    [ number-transitions ] rewrite-transitions ;
+    dup table>state-numbers transitions-at ;
 
 : no-conditions? ( state transition-table -- ? )
     transitions>> at values [ condition? ] any? not ;
@@ -103,4 +85,4 @@ IN: regexp.minimize
     [ combine-transitions ] rewrite-transitions ;
 
 : minimize ( table -- minimal-table )
-    clone number-states combine-states ;
+    clone number-states ; ! combine-states ;

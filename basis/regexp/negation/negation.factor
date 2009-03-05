@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: regexp.nfa regexp.disambiguate kernel sequences
 assocs regexp.classes hashtables accessors fry vectors
-regexp.ast regexp.transition-tables regexp.minimize namespaces ;
+regexp.ast regexp.transition-tables regexp.minimize
+regexp.dfa namespaces ;
 IN: regexp.negation
 
 : ast>dfa ( parse-tree -- minimal-dfa )
-    construct-nfa nfa>dfa ;
+    construct-nfa disambiguate construct-dfa minimize ;
 
 CONSTANT: fail-state -1
 
@@ -33,15 +34,9 @@ CONSTANT: fail-state -1
         [ add-fail-state ] change-transitions
         dup inverse-final-states >>final-states ;
 
-: renumber-transitions ( transitions numbering -- new-transitions )
-    dup '[
-        [ _ at ]
-        [ [ [ _ at ] map ] assoc-map ] bi*
-    ] assoc-map ;
-
 : renumber-states ( transition-table -- transition-table )
     dup transitions>> keys [ next-state ] H{ } map>assoc
-    [ renumber-transitions ] rewrite-transitions ;
+    transitions-at ;
 
 : box-transitions ( transition-table -- transition-table )
     [ [ [ 1vector ] assoc-map ] assoc-map ] change-transitions ;

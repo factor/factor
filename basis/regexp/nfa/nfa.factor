@@ -56,8 +56,15 @@ M:: star nfa-node ( node -- start end )
     s2 s3 ;
 
 GENERIC: modify-epsilon ( tag -- newtag )
+! Potential off-by-one errors when lookaround nested in lookbehind
 
 M: object modify-epsilon ;
+
+M: $ modify-epsilon
+    multiline option? [ drop end-of-input ] unless ;
+
+M: ^ modify-epsilon
+    multiline option? [ drop beginning-of-input ] unless ;
 
 M: tagged-epsilon nfa-node
     clone [ modify-epsilon ] change-tag add-simple-entry ;

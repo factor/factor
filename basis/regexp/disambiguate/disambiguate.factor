@@ -42,6 +42,3 @@ TUPLE: parts in out ;
             ] preserving-epsilon
         ] assoc-map
     ] change-transitions ;
-
-: nfa>dfa ( nfa -- dfa )
-    disambiguate construct-dfa minimize ;

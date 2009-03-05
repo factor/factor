@@ -45,9 +45,9 @@ IN: regexp-tests
 ! Dotall mode -- when on, . matches newlines.
 ! Off by default.
 [ f ] [ "\n" "." <regexp> matches? ] unit-test
-! [ t ] [ "\n" "(?s)." <regexp> matches? ] unit-test
+[ t ] [ "\n" "(?s:.)" <regexp> matches? ] unit-test
 [ t ] [ "\n" R/ ./s matches? ] unit-test
-! [ f ] [ "\n\n" "(?s).(?-s)." <regexp> matches? ] unit-test
+[ f ] [ "\n\n" "(?s:.)." <regexp> matches? ] unit-test
 
 [ f ] [ "" ".+" <regexp> matches? ] unit-test
 [ t ] [ "a" ".+" <regexp> matches? ] unit-test
@@ -221,17 +221,15 @@ IN: regexp-tests
 [ t ] [ "c" R/ [A-Z]/i matches? ] unit-test
 [ f ] [ "3" R/ [A-Z]/i matches? ] unit-test
 
-/*
-[ t ] [ "a" "(?i)a" <regexp> matches? ] unit-test
-[ t ] [ "a" "(?i)a" <regexp> matches? ] unit-test
-[ t ] [ "A" "(?i)a" <regexp> matches? ] unit-test
-[ t ] [ "A" "(?i)a" <regexp> matches? ] unit-test
+[ t ] [ "a" "(?i:a)" <regexp> matches? ] unit-test
+[ t ] [ "a" "(?i:a)" <regexp> matches? ] unit-test
+[ t ] [ "A" "(?i:a)" <regexp> matches? ] unit-test
+[ t ] [ "A" "(?i:a)" <regexp> matches? ] unit-test
 
-[ t ] [ "a" R/ (?-i)a/i matches? ] unit-test
-[ t ] [ "a" R/ (?-i)a/i matches? ] unit-test
-[ f ] [ "A" R/ (?-i)a/i matches? ] unit-test
-[ f ] [ "A" R/ (?-i)a/i matches? ] unit-test
-*/
+[ t ] [ "a" R/ (?-i:a)/i matches? ] unit-test
+[ t ] [ "a" R/ (?-i:a)/i matches? ] unit-test
+[ f ] [ "A" R/ (?-i:a)/i matches? ] unit-test
+[ f ] [ "A" R/ (?-i:a)/i matches? ] unit-test
 
 [ f ] [ "A" "[a-z]" <regexp> matches? ] unit-test
 [ t ] [ "A" R/ [a-z]/i matches? ] unit-test
@@ -242,8 +240,8 @@ IN: regexp-tests
 [ t ] [ "abc" reverse R/ abc/r matches? ] unit-test
 [ t ] [ "abc" reverse R/ a[bB][cC]/r matches? ] unit-test
 
-[ t ] [ "xabc" R/ abc/ <reverse-matcher> match-index-head >boolean ] unit-test
-[ t ] [ "xabc" R/ a[bB][cC]/ <reverse-matcher> match-index-head >boolean ] unit-test
+[ t ] [ 3 "xabc" R/ abc/ <reverse-matcher> match-index-from >boolean ] unit-test
+[ t ] [ 3 "xabc" R/ a[bB][cC]/ <reverse-matcher> match-index-from >boolean ] unit-test
 
 [ t ] [ "s@f" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
 [ f ] [ "a" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
@@ -276,10 +274,6 @@ IN: regexp-tests
 
 [ "b" ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> match-head >string ] unit-test
 
-! [ t ] [ "a:b" ".+:?" <regexp> matches? ] unit-test
-
-! [ 1 ] [ "hello" ".+?" <regexp> match length ] unit-test
-
 [ { "1" "2" "3" "4" } ]
 [ "1ABC2DEF3GHI4" R/ [A-Z]+/ re-split [ >string ] map ] unit-test
 
@@ -304,18 +298,16 @@ IN: regexp-tests
   
 [ "-- title --" ] [ "== title ==" R/ =/ "-" re-replace ] unit-test
 
-/*
 [ f ] [ "ab" "a(?!b)" <regexp> match-head ] unit-test
 [ "a" ] [ "ac" "a(?!b)" <regexp> match-head >string ] unit-test
 [ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 [ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 [ "a" ] [ "ab" "a(?=b)(?=b)" <regexp> match-head >string ] unit-test
-[ "a" ] [ "ba" "a(?<=b)(?<=b)" <regexp> match-head >string ] unit-test
-[ "a" ] [ "cab" "a(?=b)(?<=c)" <regexp> match-head >string ] unit-test
+[ "a" ] [ "ba" "(?<=b)(?<=b)a" <regexp> match-head >string ] unit-test
+[ "a" ] [ "cab" "(?<=c)a(?=b)" <regexp> match-head >string ] unit-test
 
 [ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-index-head ] unit-test
 [ f ] [ "foobxr" "foo(?=bar)" <regexp> match-index-head ] unit-test
-*/
 
 ! Bug in parsing word
 [ t ] [ "a" R' a' matches? ] unit-test
@@ -349,56 +341,70 @@ IN: regexp-tests
 [ f ] [ "foo" <regexp> dfa>> >boolean ] unit-test
 [ t ] [ R/ foo/ dfa>> >boolean ] unit-test
 
-! [ t ] [ "a" R/ ^a/ matches? ] unit-test
-! [ f ] [ "\na" R/ ^a/ matches? ] unit-test
-! [ f ] [ "\r\na" R/ ^a/ matches? ] unit-test
-! [ f ] [ "\ra" R/ ^a/ matches? ] unit-test
+[ t ] [ "a" R/ ^a/ matches? ] unit-test
+[ f ] [ "\na" R/ ^a/ matches? ] unit-test
+[ f ] [ "\r\na" R/ ^a/ matches? ] unit-test
+[ f ] [ "\ra" R/ ^a/ matches? ] unit-test
 
-! [ t ] [ "a" R/ a$/ matches? ] unit-test
-! [ f ] [ "a\n" R/ a$/ matches? ] unit-test
-! [ f ] [ "a\r" R/ a$/ matches? ] unit-test
-! [ f ] [ "a\r\n" R/ a$/ matches? ] unit-test
+[ 1 ] [ "a" R/ ^a/ count-matches ] unit-test
+[ 0 ] [ "\na" R/ ^a/ count-matches ] unit-test
+[ 0 ] [ "\r\na" R/ ^a/ count-matches ] unit-test
+[ 0 ] [ "\ra" R/ ^a/ count-matches ] unit-test
 
-! [ t ] [ "a" R/ a$|b$/ matches? ] unit-test
-! [ t ] [ "b" R/ a$|b$/ matches? ] unit-test
-! [ t ] [ "ab" R/ a$|b$/ matches? ] unit-test
-! [ t ] [ "ba" R/ ba$|b$/ matches? ] unit-test
+[ t ] [ "a" R/ a$/ matches? ] unit-test
+[ f ] [ "a\n" R/ a$/ matches? ] unit-test
+[ f ] [ "a\r" R/ a$/ matches? ] unit-test
+[ f ] [ "a\r\n" R/ a$/ matches? ] unit-test
 
-! [ t ] [ "a" R/ \Aa/ matches? ] unit-test
-! [ f ] [ "\na" R/ \Aaa/ matches? ] unit-test
-! [ f ] [ "\r\na" R/ \Aa/ matches? ] unit-test
-! [ f ] [ "\ra" R/ \Aa/ matches? ] unit-test
+[ 1 ] [ "a" R/ a$/ count-matches ] unit-test
+[ 0 ] [ "a\n" R/ a$/ count-matches ] unit-test
+[ 0 ] [ "a\r" R/ a$/ count-matches ] unit-test
+[ 0 ] [ "a\r\n" R/ a$/ count-matches ] unit-test
 
-! [ t ] [ "a" R/ \Aa/m matches? ] unit-test
-! [ f ] [ "\na" R/ \Aaa/m matches? ] unit-test
-! [ f ] [ "\r\na" R/ \Aa/m matches? ] unit-test
-! [ f ] [ "\ra" R/ \Aa/m matches? ] unit-test
+[ t ] [ "a" R/ a$|b$/ matches? ] unit-test
+[ t ] [ "b" R/ a$|b$/ matches? ] unit-test
+[ f ] [ "ab" R/ a$|b$/ matches? ] unit-test
+[ t ] [ "ba" R/ ba$|b$/ matches? ] unit-test
 
-! [ t ] [ "\r\n\n\n\nam" R/ ^am/m matches? ] unit-test
+[ t ] [ "a" R/ \Aa/ matches? ] unit-test
+[ f ] [ "\na" R/ \Aaa/ matches? ] unit-test
+[ f ] [ "\r\na" R/ \Aa/ matches? ] unit-test
+[ f ] [ "\ra" R/ \Aa/ matches? ] unit-test
 
-! [ t ] [ "a" R/ \Aa\z/m matches? ] unit-test
-! [ f ] [ "a\n" R/ \Aa\z/m matches? ] unit-test
+[ t ] [ "a" R/ \Aa/m matches? ] unit-test
+[ f ] [ "\na" R/ \Aaa/m matches? ] unit-test
+[ f ] [ "\r\na" R/ \Aa/m matches? ] unit-test
+[ f ] [ "\ra" R/ \Aa/m matches? ] unit-test
+[ 0 ] [ "\ra" R/ \Aa/m count-matches ] unit-test
 
-! [ t ] [ "a\r\n" R/ \Aa\Z/m matches? ] unit-test
-! [ t ] [ "a\n" R/ \Aa\Z/m matches? ] unit-test
+[ f ] [ "\r\n\n\n\nam" R/ ^am/m matches? ] unit-test
+[ 1 ] [ "\r\n\n\n\nam" R/ ^am/m count-matches ] unit-test
 
-! [ t ] [ "a" R/ \Aa\Z/m matches? ] unit-test
-! [ f ] [ "\na" R/ \Aaa\Z/m matches? ] unit-test
-! [ f ] [ "\r\na" R/ \Aa\Z/m matches? ] unit-test
-! [ f ] [ "\ra" R/ \Aa\Z/m matches? ] unit-test
+[ t ] [ "a" R/ \Aa\z/m matches? ] unit-test
+[ f ] [ "a\n" R/ \Aa\z/m matches? ] unit-test
 
-! [ t ] [ "a" R/ ^a/m matches? ] unit-test
-! [ t ] [ "\na" R/ ^a/m matches? ] unit-test
-! [ t ] [ "\r\na" R/ ^a/m matches? ] unit-test
-! [ t ] [ "\ra" R/ ^a/m matches? ] unit-test
+[ t ] [ "a\r\n" R/ \Aa\Z/m matches? ] unit-test
+[ t ] [ "a\n" R/ \Aa\Z/m matches? ] unit-test
 
-! [ t ] [ "a" R/ a$/m matches? ] unit-test
-! [ t ] [ "a\n" R/ a$/m matches? ] unit-test
-! [ t ] [ "a\r" R/ a$/m matches? ] unit-test
-! [ t ] [ "a\r\n" R/ a$/m matches? ] unit-test
+[ t ] [ "a" R/ \Aa\Z/m matches? ] unit-test
+[ f ] [ "\na" R/ \Aaa\Z/m matches? ] unit-test
+[ f ] [ "\r\na" R/ \Aa\Z/m matches? ] unit-test
+[ f ] [ "\ra" R/ \Aa\Z/m matches? ] unit-test
 
-! [ f ] [ "foobxr" "foo\\z" <regexp> match-index-head ] unit-test
-! [ 3 ] [ "foo" "foo\\z" <regexp> match-index-head ] unit-test
+[ t ] [ "a" R/ ^a/m matches? ] unit-test
+[ f ] [ "\na" R/ ^a/m matches? ] unit-test
+[ 1 ] [ "\na" R/ ^a/m count-matches ] unit-test
+[ 1 ] [ "\r\na" R/ ^a/m count-matches ] unit-test
+[ 1 ] [ "\ra" R/ ^a/m count-matches ] unit-test
+
+[ t ] [ "a" R/ a$/m matches? ] unit-test
+[ f ] [ "a\n" R/ a$/m matches? ] unit-test
+[ 1 ] [ "a\n" R/ a$/m count-matches ] unit-test
+[ 1 ] [ "a\r" R/ a$/m count-matches ] unit-test
+[ 1 ] [ "a\r\n" R/ a$/m count-matches ] unit-test
+
+[ f ] [ "foobxr" "foo\\z" <regexp> match-index-head ] unit-test
+[ 3 ] [ "foo" "foo\\z" <regexp> match-index-head ] unit-test
 
 ! [ t ] [ "foo" "\\bfoo\\b" <regexp> matches? ] unit-test
 ! [ t ] [ "afoob" "\\Bfoo\\B" <regexp> matches? ] unit-test

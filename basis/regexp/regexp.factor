@@ -3,7 +3,7 @@
 USING: accessors combinators kernel math sequences strings sets
 assocs prettyprint.backend prettyprint.custom make lexer
 namespaces parser arrays fry locals regexp.minimize
-regexp.parser regexp.nfa regexp.dfa
+regexp.parser regexp.nfa regexp.dfa regexp.classes
 regexp.transition-tables splitting sorting regexp.ast
 regexp.negation regexp.matchers regexp.compiler ;
 IN: regexp
@@ -27,6 +27,7 @@ TUPLE: regexp
 
 TUPLE: reverse-matcher regexp ;
 C: <reverse-matcher> reverse-matcher
+! Reverse matchers won't work properly with most combinators, for now
 
 <PRIVATE
 
@@ -39,20 +40,30 @@ C: <reverse-matcher> reverse-matcher
 : <reversed-option> ( ast -- reversed )
     "r" string>options <with-options> ;
 
+M: lookahead question>quot ! Returns ( index string -- ? )
+    term>> ast>dfa dfa>shortest-quotation ;
+
+M: lookbehind question>quot ! Returns ( index string -- ? )
+    term>> <reversed-option>
+    ast>dfa dfa>reverse-shortest-quotation
+    [ [ 1- ] dip ] prepose ;
+
 : compile-reverse ( regexp -- regexp )
     dup '[
         [
             _ get-ast <reversed-option>
-            ast>dfa dfa>quotation
+            ast>dfa dfa>reverse-quotation
         ] unless*
     ] change-reverse-dfa ;
 
-M: regexp match-index-from ( string regexp -- index/f )
+M: regexp match-index-from
     compile-regexp dfa>> <quot-matcher> match-index-from ;
 
-M: reverse-matcher match-index-from ( string regexp -- index/f )
-    [ <reversed> ] [ regexp>> compile-reverse reverse-dfa>> ] bi*
+M: reverse-matcher match-index-from
+    regexp>> compile-reverse reverse-dfa>>
     <quot-matcher> match-index-from ;
+
+! The following two should do some caching
 
 : find-regexp-syntax ( string -- prefix suffix )
     {
