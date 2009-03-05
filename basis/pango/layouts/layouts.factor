@@ -74,9 +74,12 @@ SYMBOL: dpi
     #! strings
     swap -1 pango_layout_set_text ;
 
+: set-layout-resolution ( layout -- )
+    pango_layout_get_context dpi get pango_cairo_context_set_resolution ;
+
 : <PangoLayout> ( text font -- layout )
     dummy-cairo pango_cairo_create_layout |g_object_unref
-    [ pango_layout_get_context dpi get pango_cairo_context_set_resolution ] keep
+    [ set-layout-resolution ] keep
     [ set-layout-font ] keep
     [ set-layout-text ] keep ;
 
