@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel sequences sbufs vectors growable io continuations
-namespaces io.encodings combinators strings ;
+USING: math math.order kernel sequences sbufs vectors growable io
+continuations namespaces io.encodings combinators strings
+binary-search ;
 IN: io.encodings.utf8
 
 ! Decoding UTF-8
@@ -30,9 +31,9 @@ SINGLETON: utf8
 : begin-utf8 ( stream byte -- stream char )
     {
         { [ dup -7 shift zero? ] [ ] }
-        { [ dup -5 shift BIN: 110 number= ] [ double ] }
-        { [ dup -4 shift BIN: 1110 number= ] [ triple ] }
-        { [ dup -3 shift BIN: 11110 number= ] [ quadruple ] }
+        { [ dup -5 shift BIN: 110 = ] [ double ] }
+        { [ dup -4 shift BIN: 1110 = ] [ triple ] }
+        { [ dup -3 shift BIN: 11110 = ] [ quadruple ] }
         [ drop replacement-char ]
     } cond ; inline
 
@@ -71,3 +72,20 @@ M: utf8 encode-char
     drop swap char>utf8 ;
 
 PRIVATE>
+
+: code-point-length ( n -- x )
+    log2 {
+        { [ dup 0 7 between? ] [ 1 ] }
+        { [ dup 8 11 between? ] [ 2 ] }
+        { [ dup 12 16 between? ] [ 3 ] }
+        { [ dup 17 21 between? ] [ 4 ] }
+    } cond nip ;
+
+: code-point-offsets ( string -- indices )
+    0 [ code-point-length + ] accumulate swap suffix ;
+
+: utf8-index> ( n string -- n' )
+    code-point-offsets natural-search drop ;
+
+: >utf8-index ( n string -- n' )
+    code-point-offsets nth ;
