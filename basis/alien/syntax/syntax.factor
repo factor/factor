@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov, Alex Chapman.
+! Copyright (C) 2005, 2009 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays alien alien.c-types alien.structs
 alien.arrays alien.strings kernel math namespaces parser

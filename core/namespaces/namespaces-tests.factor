@@ -3,7 +3,7 @@ IN: namespaces.tests
 
 H{ } clone "test-namespace" set
 
-: test-namespace ( -- )
+: test-namespace ( -- ? )
     H{ } clone dup [ namespace = ] bind ;
 
 [ t ] [ test-namespace ] unit-test
@@ -14,6 +14,9 @@ H{ } clone "test-namespace" set
 unit-test
 
 SYMBOL: test-initialize
+
+f test-initialize set-global
+
 test-initialize [ 1 ] initialize
 test-initialize [ 2 ] initialize
 

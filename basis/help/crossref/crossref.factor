@@ -1,17 +1,19 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic assocs
+USING: arrays definitions generic assocs math fry
 io kernel namespaces prettyprint prettyprint.sections
 sequences words summary classes help.topics help.markup ;
 IN: help.crossref
 
+: article-links ( topic elements -- seq )
+    [ article-content ] dip
+    collect-elements [ >link ] map ;
+
 : article-children ( topic -- seq )
-    article-content { $subsection } collect-elements ;
+    { $subsection } article-links ;
 
 M: link uses
-    article-content
-    { $subsection $link $see-also }
-    collect-elements [ \ f or ] map ;
+    { $subsection $link $see-also } article-links ;
 
 : help-path ( topic -- seq )
     [ article-parent ] follow rest ;
@@ -24,3 +26,15 @@ M: link uses
 
 : unxref-article ( topic -- )
     >link unxref ;
+
+: prev/next ( obj seq n -- obj' )
+    [ [ index dup ] keep ] dip swap
+    '[ _ + _ ?nth ] when ;
+
+: prev/next-article ( article n -- article' )
+    [ dup article-parent dup ] dip
+    '[ article-children _ prev/next ] [ 2drop f ] if ;
+
+: prev-article ( article -- prev ) -1 prev/next-article ;
+
+: next-article ( article -- next ) 1 prev/next-article ;

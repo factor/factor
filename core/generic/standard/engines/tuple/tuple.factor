@@ -77,7 +77,10 @@ PREDICATE: engine-word < word
 M: engine-word stack-effect
     "tuple-dispatch-generic" word-prop
     [ extra-values ] [ stack-effect ] bi
-    dup [ clone [ length + ] change-in ] [ 2drop f ] if ;
+    dup [
+        [ in>> length + ] [ out>> ] [ terminated?>> ] tri
+        effect boa
+    ] [ 2drop f ] if ;
 
 M: engine-word crossref? "forgotten" word-prop not ;
 

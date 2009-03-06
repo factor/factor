@@ -1,9 +1,11 @@
-! Copyright (C) 2005, 2008 Slava Pestov
+! Copyright (C) 2005, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ui.gadgets ui.gadgets.labels ui.render
-kernel math namespaces sequences math.order math.geometry.rect
-locals ;
+USING: accessors kernel math math.order sequences wrap wrap.words
+arrays fry ui.gadgets ui.gadgets.labels ui.gadgets.packs.private
+ui.render ui.baseline-alignment ;
 IN: ui.gadgets.paragraphs
+
+MIXIN: word-break
 
 ! A word break gadget
 TUPLE: word-break-gadget < label ;
@@ -13,68 +15,71 @@ TUPLE: word-break-gadget < label ;
 
 M: word-break-gadget draw-gadget* drop ;
 
+INSTANCE: word-break-gadget word-break
+
 ! A gadget that arranges its children in a word-wrap style.
 TUPLE: paragraph < gadget margin ;
 
 : <paragraph> ( margin -- gadget )
-    paragraph new-gadget
-    { 1 0 } >>orientation
+    paragraph new
+    horizontal >>orientation
     swap >>margin ;
 
-SYMBOL: x SYMBOL: max-x
+<PRIVATE
 
-SYMBOL: y SYMBOL: max-y
+: gadget>word ( gadget -- word )
+    [ ] [ pref-dim first ] [ word-break? ] tri <word> ;
 
-SYMBOL: line-height
+TUPLE: line words height ;
 
-SYMBOL: margin
+: <line> ( words -- line )
+    dup [ key>> ] map dup pref-dims measure-height line boa ;
 
-: overrun? ( width -- ? ) x get + margin get > ;
+: wrap-paragraph ( paragraph -- wrapped-paragraph )
+    [ children>> [ gadget>word ] map ] [ margin>> ] bi
+    dup wrap-words [ <line> ] map ;
 
-: zero-vars ( seq -- ) [ 0 swap set ] each ;
+: line-width ( wrapped-line -- n )
+    [ break?>> ] trim-tail-slice [ width>> ] sigma ;
 
-: wrap-line ( -- )
-    line-height get y +@
-    { x line-height } zero-vars ;
+: max-line-width ( wrapped-paragraph -- x )
+    [ words>> line-width ] [ max ] map-reduce ;
 
-: wrap-pos ( -- pos ) x get y get 2array ; inline
-
-: advance-x ( x -- )
-    x +@
-    x get max-x [ max ] change ;
-
-: advance-y ( y -- )
-    dup line-height [ max ] change
-    y get + max-y [ max ] change ;
-
-:: wrap-step ( quot child -- )
-    child pref-dim
-    [
-        child
-        [
-            word-break-gadget?
-            [ drop ] [ first overrun? [ wrap-line ] when ] if
-        ]
-        [ wrap-pos quot call ] bi
-    ]
-    [ first advance-x ]
-    [ second advance-y ]
-    tri ; inline
-
-: wrap-dim ( -- dim ) max-x get max-y get 2array ;
-
-: init-wrap ( paragraph -- )
-    margin>> margin set
-    { x max-x y max-y line-height } zero-vars ;
-
-: do-wrap ( paragraph quot -- dim )
-    [
-        swap dup init-wrap
-        [ wrap-step ] with each-child wrap-dim
-    ] with-scope ; inline
+: sum-line-heights ( wrapped-paragraph -- y )
+    [ height>> ] sigma ;
 
 M: paragraph pref-dim*
-    [ 2drop ] do-wrap ;
+    wrap-paragraph [ max-line-width ] [ sum-line-heights ] bi 2array ;
+
+: line-y-coordinates ( wrapped-paragraph -- ys )
+    0 [ height>> + ] accumulate nip ;
+
+: word-x-coordinates ( wrapped-line -- xs )
+    0 [ width>> + ] accumulate nip ;
+
+: layout-word ( word x y -- )
+    [ key>> ] 2dip 2array >>loc prefer ;
+
+: layout-line ( wrapped-line y -- )
+    [
+        words>>
+        [ ]
+        [ word-x-coordinates ]
+        [ [ key>> ] map align-baselines ] tri
+    ] dip '[ _ + layout-word ] 3each ;
 
 M: paragraph layout*
-    [ swap dup prefer (>>loc) ] do-wrap drop ;
+    wrap-paragraph dup line-y-coordinates
+    [ layout-line ] 2each ;
+
+M: paragraph baseline
+    wrap-paragraph [ f ] [
+        first words>>
+        [ key>> ] map
+        dup [ pref-dim ] map
+        measure-metrics drop
+    ] if-empty ;
+
+M: paragraph cap-height pack-cap-height ;
+    
+PRIVATE>

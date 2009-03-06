@@ -15,7 +15,7 @@ HELP: track
 
 HELP: <track>
 { $values { "orientation" "an orientation specifier" } { "track" "a new " { $link track } } }
-{ $description "Creates a new track which lays out children along the given axis. Children are laid out vertically if the orientation is " { $snippet "{ 0 1 }" } " and horizontally if the orientation is " { $snippet "{ 1 0 }" } "." } ; 
+{ $description "Creates a new track which lays out children along the given orientation, either " { $link horizontal } " or " { $link vertical } "." } ;
 
 HELP: track-add
 { $values { "gadget" gadget } { "track" track } { "constraint" "a number between 0 and 1, or " { $link f } } }

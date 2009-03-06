@@ -28,15 +28,14 @@ IN: compiler.cfg.intrinsics.slots
     ] [ drop emit-primitive ] if ;
 
 : (emit-set-slot) ( infos -- obj-reg )
-    [ 3inputs [ tuck ] dip ^^offset>slot ]
-    [ second value-tag ]
-    bi* ^^set-slot ;
+    [ 3inputs ^^offset>slot ] [ second value-tag ] bi*
+    pick [ ^^set-slot ] dip ;
 
 : (emit-set-slot-imm) ( infos -- obj-reg )
     ds-drop
-    [ 2inputs tuck ]
+    [ 2inputs ]
     [ [ third literal>> ] [ second value-tag ] bi ] bi*
-    ##set-slot-imm ;
+    pick [ ##set-slot-imm ] dip ;
 
 : emit-set-slot ( node -- )
     dup node-input-infos

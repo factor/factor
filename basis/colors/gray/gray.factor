@@ -3,9 +3,15 @@
 USING: colors kernel accessors ;
 IN: colors.gray
 
-TUPLE: gray < color gray alpha ;
+TUPLE: gray < color { gray read-only } { alpha read-only } ;
 
 C: <gray> gray
 
 M: gray >rgba ( gray -- rgba )
     [ gray>> dup dup ] [ alpha>> ] bi <rgba> ;
+
+M: gray red>> gray>> ;
+
+M: gray green>> gray>> ;
+
+M: gray blue>> gray>> ;

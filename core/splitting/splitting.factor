@@ -4,35 +4,46 @@ USING: kernel math make strings arrays vectors sequences
 sets math.order accessors ;
 IN: splitting
 
+<PRIVATE
+
+: ?chomp ( seq begin tester chopper -- newseq ? )
+    [ [ 2dup ] dip call ] dip
+    [ [ length ] dip call t ] curry
+    [ drop f ] if ; inline
+
+PRIVATE>
+
 : ?head ( seq begin -- newseq ? )
-    2dup head? [ length tail t ] [ drop f ] if ;
+    [ head? ] [ tail ] ?chomp ;
 
 : ?head-slice ( seq begin -- newseq ? )
-    2dup head? [ length tail-slice t ] [ drop f ] if ;
+    [ head? ] [ tail-slice ] ?chomp ;
 
 : ?tail ( seq end -- newseq ? )
-    2dup tail? [ length head* t ] [ drop f ] if ;
+    [ tail? ] [ head* ] ?chomp ;
 
 : ?tail-slice ( seq end -- newseq ? )
-    2dup tail? [ length head-slice* t ] [ drop f ] if ;
+    [ tail? ] [ head-slice* ] ?chomp ;
 
-: (split1) ( seq subseq -- start end ? )
-    tuck swap start dup
-    [ swap [ drop ] [ length + ] 2bi t ]
-    [ 2drop f f f ]
-    if ;
+<PRIVATE
+
+: (split1) ( seq subseq quot -- before after )
+    [
+        swap [
+            [ drop length ] [ start dup ] 2bi
+            [ [ nip ] [ + ] 2bi t ]
+            [ 2drop f f f ]
+            if
+        ] keep swap
+    ] dip [ 2nip f ] if ; inline
+
+PRIVATE>
 
 : split1 ( seq subseq -- before after )
-    [ drop ] [ (split1) ] 2bi
-    [ [ over ] dip [ head ] [ tail ] 2bi* ]
-    [ 2drop f ]
-    if ;
+    [ snip ] (split1) ;
 
 : split1-slice ( seq subseq -- before-slice after-slice )
-    [ drop ] [ (split1) ] 2bi
-    [ [ over ] dip [ head-slice ] [ tail-slice ] 2bi* ]
-    [ 2drop f ]
-    if ;
+    [ snip-slice ] (split1) ;
 
 : split1-last ( seq subseq -- before after )
     [ <reversed> ] bi@ split1 [ reverse ] bi@
@@ -49,9 +60,12 @@ IN: splitting
 
 : split, ( seq separators -- ) 0 rot (split) ;
 
-: split ( seq separators -- pieces ) [ split, ] { } make ;
+: split ( seq separators -- pieces )
+    [ split, ] { } make ;
 
-: string-lines ( str -- seq )
+GENERIC: string-lines ( str -- seq )
+
+M: string string-lines
     dup "\r\n" intersects? [
         "\n" split [
             but-last-slice [

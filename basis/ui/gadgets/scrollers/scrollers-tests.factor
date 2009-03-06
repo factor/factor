@@ -1,9 +1,9 @@
 USING: ui.gadgets ui.gadgets.scrollers namespaces tools.test
-kernel models models.compose models.range ui.gadgets.viewports
-ui.gadgets.labels ui.gadgets.grids ui.gadgets.frames
-ui.gadgets.sliders math math.vectors arrays sequences
-tools.test.ui math.geometry.rect accessors ui.gadgets.buttons
-ui.gadgets.packs ;
+kernel models models.product models.range ui.gadgets.viewports
+ui.gadgets.labels ui.gadgets.grids ui.gadgets.sliders math
+math.vectors arrays sequences tools.test.ui math.rectangles
+accessors ui.gadgets.buttons ui.gadgets.packs
+ui.gadgets.scrollers.private ;
 IN: ui.gadgets.scrollers.tests
 
 [ ] [
@@ -12,8 +12,8 @@ IN: ui.gadgets.scrollers.tests
 ] unit-test
 
 [ { 100 200 } ] [
-    { 100 200 } "g" get scroll>rect
-    "s" get follows>> rect-loc
+    { 100 200 } point>rect "g" get scroll>rect
+    "s" get follows>> loc>>
 ] unit-test
 
 [ ] [ "s" get scroll>bottom ] unit-test
@@ -21,14 +21,14 @@ IN: ui.gadgets.scrollers.tests
 
 [ ] [
     <gadget> dup "g" set
-    10 1 0 100 <range> 20 1 0 100 <range> 2array <compose>
+    10 1 0 100 <range> 20 1 0 100 <range> 2array <product>
     <viewport> "v" set
 ] unit-test
 
 "v" get [
     [ { 10 20 } ] [ "v" get model>> range-value ] unit-test
 
-    [ { 10 20 } ] [ "g" get rect-loc vneg viewport-gap v+ scroller-border v+ ] unit-test
+    [ { 10 20 } ] [ "g" get loc>> vneg ] unit-test
 ] with-grafted-gadget
 
 [ ] [
@@ -41,15 +41,15 @@ IN: ui.gadgets.scrollers.tests
 [ ] [ "s" get layout ] unit-test
 
 "s" get [
-    [ { 34 34 } ] [ "s" get viewport>> rect-dim ] unit-test
+    [ { 31 31 } ] [ "s" get viewport>> dim>> ] unit-test
 
-    [ { 107 107 } ] [ "s" get viewport>> viewport-dim ] unit-test
+    [ { 100 100 } ] [ "s" get viewport>> gadget-child pref-dim ] unit-test
 
     [ ] [ { 0 0 } "s" get scroll ] unit-test
 
     [ { 0 0 } ] [ "s" get model>> range-min-value ] unit-test
 
-    [ { 107 107 } ] [ "s" get model>> range-max-value ] unit-test
+    [ { 100 100 } ] [ "s" get model>> range-max-value ] unit-test
 
     [ ] [ { 10 20 } "s" get scroll ] unit-test
 
@@ -57,7 +57,7 @@ IN: ui.gadgets.scrollers.tests
 
     [ { 10 20 } ] [ "s" get viewport>> model>> range-value ] unit-test
 
-    [ { 10 20 } ] [ "g" get rect-loc vneg viewport-gap v+ scroller-border v+ ] unit-test
+    [ { 10 20 } ] [ "g" get loc>> vneg ] unit-test
 ] with-grafted-gadget
 
 <gadget> { 600 400 } >>dim "g1" set
@@ -75,7 +75,7 @@ dup layout
         "g2" get scroll>gadget
         "s" get layout
         "s" get scroller-value
-    ] map [ { 2 0 } = ] all?
+    ] map [ { 0 0 } = ] all?
 ] unit-test
 
 [ ] [ "Hi" <label> dup "l" set <scroller> "s" set ] unit-test
@@ -84,11 +84,11 @@ dup layout
 [ t ] [ "l" get dup find-scroller viewport>> swap child? ] unit-test
 [ t ] [ "l" get find-scroller* "s" get eq? ] unit-test
 [ f ] [ "s" get viewport>> find-scroller* ] unit-test
-[ t ] [ "s" get @right grid-child slider? ] unit-test
-[ f ] [ "s" get @right grid-child find-scroller* ] unit-test
+[ t ] [ "s" get { 1 0 } grid-child slider? ] unit-test
+[ f ] [ "s" get { 1 0 } grid-child find-scroller* ] unit-test
 
 [ ] [
-    "Click Me" [ [ scroll>gadget ] [ unparent ] bi ] <bevel-button>
+    "Click Me" [ [ scroll>gadget ] [ unparent ] bi ] <border-button>
     [ <pile> swap add-gadget <scroller> ] keep
     dup quot>> call
     layout
@@ -96,13 +96,13 @@ dup layout
 
 [ t ] [
     <gadget> { 200 200 } >>dim
-    [ [ scroll>gadget ] [ unparent ] bi ] <bevel-button>
+    [ [ scroll>gadget ] [ unparent ] bi ] <border-button>
     dup
     <pile> swap add-gadget <scroller> { 100 100 } >>dim dup layout
     swap dup quot>> call
     dup layout
     model>> dependencies>> [ range-max value>> ] map
-    viewport-padding =
+    { 0 0 } =
 ] unit-test
 
 \ <scroller> must-infer

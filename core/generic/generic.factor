@@ -83,6 +83,9 @@ TUPLE: check-method class generic ;
 PREDICATE: method-body < word
     "method-generic" word-prop >boolean ;
 
+M: method-spec stack-effect
+    first2 method stack-effect ;
+
 M: method-body stack-effect
     "method-generic" word-prop stack-effect ;
 

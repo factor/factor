@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math namespaces make sequences words io
-io.styles math.vectors ui.gadgets columns accessors
-math.geometry.rect locals fry ;
+USING: arrays kernel math math.order namespaces make sequences words io
+math.vectors ui.gadgets ui.baseline-alignment columns accessors strings.tables
+math.rectangles fry ;
 IN: ui.gadgets.grids
 
 TUPLE: grid < gadget
@@ -11,79 +11,119 @@ grid
 { fill? initial: t } ;
 
 : new-grid ( children class -- grid )
-    new-gadget
-        swap >>grid
-        dup grid>> concat add-gadgets ; inline
+    new
+        swap [ >>grid ] [ concat add-gadgets ] bi ; inline
 
 : <grid> ( children -- grid )
     grid new-grid ;
 
-:: grid-child ( grid i j -- gadget ) i j grid grid>> nth nth ;
+<PRIVATE
 
-:: grid-add ( grid child i j -- grid )
-    grid i j grid-child unparent
-    grid child add-gadget
-    child i j grid grid>> nth set-nth ;
+: grid@ ( grid pair -- col# row )
+    swap [ first2 ] [ grid>> ] bi* nth ;
 
-: grid-remove ( grid i j -- grid ) [ <gadget> ] 2dip grid-add ;
+PRIVATE>
 
-: pref-dim-grid ( grid -- dims )
-    grid>> [ [ pref-dim ] map ] map ;
+: grid-child ( grid pair -- gadget ) grid@ nth ;
 
-: (compute-grid) ( grid -- seq ) [ max-dim ] map ;
+: grid-add ( grid child pair -- grid )
+    [ nip grid-child unparent ] [ drop add-gadget ] [ swapd grid@ set-nth ] 3tri ;
 
-: compute-grid ( grid -- horiz vert )
-    pref-dim-grid [ flip (compute-grid) ] [ (compute-grid) ] bi ;
+: grid-remove ( grid pair -- grid ) [ <gadget> ] dip grid-add ;
 
-: (pair-up) ( horiz vert -- dim )
-    [ first ] [ second ] bi* 2array ;
+<PRIVATE
 
-: pair-up ( horiz vert -- dims )
-    [ [ (pair-up) ] curry map ] with map ;
+: cross-zip ( seq1 seq2 -- seq1xseq2 )
+    [ [ 2array ] with map ] curry map ;
 
-: add-gaps ( gap seq -- newseq )
-    [ v+ ] with map ;
+TUPLE: cell pref-dim baseline cap-height ;
 
-: gap-sum ( gap seq -- newseq )
-    dupd add-gaps dim-sum v+ ;
+: <cell> ( gadget -- cell )
+    [ pref-dim ] [ baseline ] [ cap-height ] tri cell boa ;
 
-M: grid pref-dim*
-    dup gap>> swap compute-grid [ over ] dip
-    [ gap-sum ] 2bi@ (pair-up) ;
+M: cell baseline baseline>> ;
 
-: do-grid ( dims grid quot -- )
-    [ grid>> ] dip '[ _ 2each ] 2each ; inline
+M: cell cap-height cap-height>> ;
 
-: grid-positions ( grid dims -- locs )
-    [ gap>> dup ] dip add-gaps swap [ v+ ] accumulate nip ;
+TUPLE: grid-layout grid gap fill? row-heights column-widths ;
 
-: position-grid ( grid horiz vert -- )
-    pick [ [ over ] dip [ grid-positions ] 2bi@ pair-up ] dip
-    [ (>>loc) ] do-grid ;
+: iterate-cell-dims ( cells quot -- seq )
+    '[ [ pref-dim>> @ ] [ max ] map-reduce ] map ; inline
 
-: resize-grid ( grid horiz vert -- )
-    pick fill?>> [
-        pair-up swap [ (>>dim) ] do-grid
-    ] [
-        2drop grid>> [ [ prefer ] each ] each
+: row-heights ( grid-layout -- heights )
+    [ grid>> ] [ fill?>> ] bi
+    [ [ second ] iterate-cell-dims ]
+    [ [ dup [ pref-dim>> ] map measure-height ] map ]
+    if ;
+
+: column-widths ( grid-layout -- widths )
+    grid>> flip [ first ] iterate-cell-dims ;
+
+: <grid-layout> ( grid -- grid-layout )
+    \ grid-layout new
+        swap
+        [ grid>> [ [ <cell> ] map ] map >>grid ]
+        [ fill?>> >>fill? ]
+        [ gap>> >>gap ]
+        tri
+        dup row-heights >>row-heights
+        dup column-widths >>column-widths ;
+
+: accumulate-cell-dims ( seq gap -- n ns )
+    dup '[ + _ + ] accumulate ;
+
+: accumulate-cell-xs ( grid-layout -- x xs )
+    [ column-widths>> ] [ gap>> first ] bi
+    accumulate-cell-dims ;
+
+: accumulate-cell-ys ( grid-layout -- y ys )
+    [ row-heights>> ] [ gap>> second ] bi
+    accumulate-cell-dims ;
+
+: grid-pref-dim ( grid-layout -- dim )
+    [ accumulate-cell-xs drop ]
+    [ accumulate-cell-ys drop ]
+    bi 2array ;
+
+M: grid pref-dim* <grid-layout> grid-pref-dim ;
+
+: (compute-cell-locs) ( grid-layout -- locs )
+    [ accumulate-cell-xs nip ]
+    [ accumulate-cell-ys nip ]
+    bi cross-zip flip ;
+
+: adjust-for-baseline ( row-locs row-cells -- row-locs' )
+    align-baselines [ 0 swap 2array v+ ] 2map ;
+
+: cell-locs ( grid-layout -- locs )
+    dup fill?>>
+    [ (compute-cell-locs) ] [
+        [ (compute-cell-locs) ] [ grid>> ] bi
+        [ adjust-for-baseline ] 2map
     ] if ;
 
-: grid-layout ( grid horiz vert -- )
-    [ position-grid ] 3keep resize-grid ;
+: cell-dims ( grid-layout -- dims )
+    dup fill?>>
+    [ [ column-widths>> ] [ row-heights>> ] bi cross-zip flip ]
+    [ grid>> [ [ pref-dim>> ] map ] map ]
+    if ;
 
-M: grid layout* dup compute-grid grid-layout ;
+: grid-layout ( children grid-layout -- )
+    [ cell-locs ] [ cell-dims ] bi
+    [ [ <rect> swap set-rect-bounds ] 3each ] 3each ;
+
+M: grid layout* [ grid>> ] [ <grid-layout> ] bi grid-layout ;
 
 M: grid children-on ( rect gadget -- seq )
-    dup children>> empty?
-      [ 2drop f ]
-      [
+    dup children>> empty? [ 2drop f ] [
         { 0 1 } swap grid>>
         [ 0 <column> fast-children-on ] keep
         <slice> concat
-      ]
-    if ;
+    ] if ;
 
 M: grid gadget-text*
     grid>>
     [ [ gadget-text ] map ] map format-table
     [ CHAR: \n , ] [ % ] interleave ;
+
+PRIVATE>

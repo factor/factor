@@ -23,6 +23,8 @@ MEMO: rgb.txt ( -- assoc )
 
 PRIVATE>
 
+: named-colors ( -- keys ) rgb.txt keys ;
+
 ERROR: no-such-color name ;
 
 : named-color ( name -- rgb )

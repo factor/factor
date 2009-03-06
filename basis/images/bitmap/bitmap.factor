@@ -6,15 +6,20 @@ kernel macros math math.bitwise math.functions namespaces sequences
 strings images endian summary ;
 IN: images.bitmap
 
-TUPLE: bitmap-image < image ;
+TUPLE: bitmap-image < image
+magic size reserved offset header-length width
+height planes bit-count compression size-image
+x-pels y-pels color-used color-important rgb-quads color-index ;
 
 ! Currently can only handle 24/32bit bitmaps.
 ! Handles row-reversed bitmaps (their height is negative)
 
-TUPLE: bitmap magic size reserved offset header-length width
-height planes bit-count compression size-image
-x-pels y-pels color-used color-important rgb-quads color-index
-buffer ;
+ERROR: bitmap-magic magic ;
+
+M: bitmap-magic summary
+    drop "First two bytes of bitmap stream must be 'BM'" ;
+
+<PRIVATE
 
 : array-copy ( bitmap array -- bitmap array' )
     over size-image>> abs memory>byte-array ;
@@ -37,16 +42,11 @@ ERROR: bmp-not-supported n ;
         { 1 [ bmp-not-supported ] }
     } case >byte-array ;
 
-ERROR: bitmap-magic ;
-
-M: bitmap-magic summary
-    drop "First two bytes of bitmap stream must be 'BM'" ;
-
 : read2 ( -- n ) 2 read le> ;
 : read4 ( -- n ) 4 read le> ;
 
 : parse-file-header ( bitmap -- bitmap )
-    2 read >string dup "BM" = [ bitmap-magic ] unless >>magic
+    2 read dup "BM" sequence= [ bitmap-magic ] unless >>magic
     read4 >>size
     read4 >>reserved
     read4 >>offset ;
@@ -79,17 +79,13 @@ M: bitmap-magic summary
     dup rgb-quads-length read >>rgb-quads
     dup color-index-length read >>color-index ;
 
-: load-bitmap-data ( path -- bitmap )
-    binary [
-        bitmap new
-        parse-file-header parse-bitmap-header parse-bitmap
+: load-bitmap-data ( path bitmap -- bitmap )
+    [ binary ] dip '[
+        _ parse-file-header parse-bitmap-header parse-bitmap
     ] with-file-reader ;
 
 : process-bitmap-data ( bitmap -- bitmap )
-    dup raw-bitmap>buffer >>buffer ;
-
-: load-bitmap ( path -- bitmap )
-    load-bitmap-data process-bitmap-data ;
+    dup raw-bitmap>buffer >>bitmap ;
 
 ERROR: unknown-component-order bitmap ;
 
@@ -101,15 +97,16 @@ ERROR: unknown-component-order bitmap ;
         [ unknown-component-order ]
     } case ;
 
-: >image ( bitmap -- bitmap-image )
-    {
-        [ [ width>> ] [ height>> ] bi 2array ]
-        [ bitmap>component-order ]
-        [ buffer>> ]
-    } cleave bitmap-image boa ;
+: fill-image-slots ( bitmap -- bitmap )
+    dup {
+        [ [ width>> ] [ height>> ] bi 2array >>dim ]
+        [ bitmap>component-order >>component-order ]
+        [ bitmap>> >>bitmap ]
+    } cleave ;
 
-M: bitmap-image load-image* ( path bitmap -- bitmap-image )
-    drop load-bitmap >image ;
+M: bitmap-image load-image* ( path bitmap -- bitmap )
+    load-bitmap-data process-bitmap-data
+    fill-image-slots ;
 
 M: bitmap-image normalize-scan-line-order
     dup dim>> '[
@@ -118,12 +115,12 @@ M: bitmap-image normalize-scan-line-order
 
 MACRO: (nbits>bitmap) ( bits -- )
     [ -3 shift ] keep '[
-        bitmap new
+        bitmap-image new
             2over * _ * >>size-image
             swap >>height
             swap >>width
-            swap array-copy [ >>buffer ] [ >>color-index ] bi
-            _ >>bit-count >image
+            swap array-copy [ >>bitmap ] [ >>color-index ] bi
+            _ >>bit-count fill-image-slots
     ] ;
 
 : bgr>bitmap ( array height width -- bitmap )
@@ -135,11 +132,13 @@ MACRO: (nbits>bitmap) ( bits -- )
 : write2 ( n -- ) 2 >le write ;
 : write4 ( n -- ) 4 >le write ;
 
+PRIVATE>
+
 : save-bitmap ( bitmap path -- )
     binary [
         B{ CHAR: B CHAR: M } write
         [
-            buffer>> length 14 + 40 + write4
+            color-index>> length 14 + 40 + write4
             0 write4
             54 write4
             40 write4

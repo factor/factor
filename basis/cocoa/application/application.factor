@@ -1,27 +1,17 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax io kernel namespaces core-foundation
-core-foundation.arrays core-foundation.data
 core-foundation.strings cocoa.messages cocoa cocoa.classes
 cocoa.runtime sequences threads init summary kernel.private
 assocs ;
 IN: cocoa.application
 
 : <NSString> ( str -- alien ) <CFString> -> autorelease ;
-: <NSArray> ( seq -- alien ) <CFArray> -> autorelease ;
-: <NSNumber> ( number -- alien ) <CFNumber> -> autorelease ;
-: <NSData> ( byte-array -- alien ) <CFData> -> autorelease ;
-: <NSDictionary> ( assoc -- alien )
-    NSMutableDictionary over assoc-size -> dictionaryWithCapacity:
-    [
-        [
-            spin -> setObject:forKey:
-        ] curry assoc-each
-    ] keep ;
 
-CONSTANT: NSApplicationDelegateReplySuccess 0
-CONSTANT: NSApplicationDelegateReplyCancel  1
-CONSTANT: NSApplicationDelegateReplyFailure 2
+C-ENUM:
+NSApplicationDelegateReplySuccess
+NSApplicationDelegateReplyCancel
+NSApplicationDelegateReplyFailure ;
 
 : with-autorelease-pool ( quot -- )
     NSAutoreleasePool -> new slip -> release ; inline
@@ -45,7 +35,8 @@ FUNCTION: void NSBeep ( ) ;
     [ NSNotificationCenter -> defaultCenter ] dip
     -> removeObserver: ;
 
-: cocoa-app ( quot -- ) [ call NSApp -> run ] with-cocoa ; inline
+: cocoa-app ( quot -- )
+    [ call NSApp -> run ] with-cocoa ; inline
 
 : install-delegate ( receiver delegate -- )
     -> alloc -> init -> setDelegate: ;

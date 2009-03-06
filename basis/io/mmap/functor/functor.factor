@@ -22,7 +22,7 @@ WHERE
 : <mapped-A> ( mapped-file -- direct-array )
     T mapped-file>direct <A> ; inline
 
-: with-mapped-A-file ( path length quot -- )
+: with-mapped-A-file ( path quot -- )
     '[ <mapped-A> @ ] with-mapped-file ; inline
 
 ;FUNCTOR

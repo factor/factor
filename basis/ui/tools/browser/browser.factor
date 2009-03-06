@@ -1,41 +1,64 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: debugger ui.tools.workspace help help.topics kernel
-models models.history ui.commands ui.gadgets ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
-ui.gadgets.buttons compiler.units assocs words vocabs
-accessors fry combinators.short-circuit ;
+USING: debugger help help.topics help.crossref kernel models compiler.units
+assocs words vocabs accessors fry combinators.short-circuit
+sequences models models.history tools.apropos combinators
+ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
+ui.gadgets.tracks ui.gestures ui.gadgets.buttons ui.gadgets.packs
+ui.gadgets.editors ui.gadgets.labels ui.gadgets.status-bar
+ui.gadgets.glass ui.gadgets.borders ui.tools.common
+ui.tools.browser.popups ui ;
 IN: ui.tools.browser
 
-TUPLE: browser-gadget < track pane history ;
+TUPLE: browser-gadget < tool pane scroller search-field popup ;
 
-: show-help ( link help -- )
-    history>> dup add-history
+{ 650 400 } browser-gadget set-tool-dim
+
+: show-help ( link browser-gadget -- )
+    model>> dup add-history
     [ >link ] dip set-model ;
 
 : <help-pane> ( browser-gadget -- gadget )
-    history>> [ '[ _ print-topic ] try ] <pane-control> ;
+    model>> [ '[ _ print-topic ] try ] <pane-control> ;
 
-: init-history ( browser-gadget -- )
-    "handbook" >link <history> >>history drop ;
+: search-browser ( string browser -- )
+    '[ <apropos> _ show-help ] unless-empty ;
 
-: <browser-gadget> ( -- gadget )
-    { 0 1 } browser-gadget new-track
-        dup init-history
-        add-toolbar
+: <search-field> ( browser -- field )
+    '[ _ search-browser ] <action-field>
+        10 >>min-cols
+        10 >>max-cols ;
+
+: <browser-toolbar> ( browser -- toolbar )
+    horizontal <track>
+        0 >>fill
+        1/2 >>align
+        { 5 5 } >>gap
+        over <toolbar> f track-add
+        swap search-field>> "Search:" label-on-left 1 track-add ;
+
+: <browser-gadget> ( link -- gadget )
+    vertical browser-gadget new-track
+        1 >>fill
+        swap >link <history> >>model
+        dup <search-field> >>search-field
+        dup <browser-toolbar> { 3 3 } <border> { 1 0 } >>fill f track-add
         dup <help-pane> >>pane
-        dup pane>> <scroller> 1 track-add ;
-
-M: browser-gadget call-tool* show-help ;
-
-M: browser-gadget tool-scroller
-    pane>> find-scroller ;
+        dup pane>> <scroller> >>scroller
+        dup scroller>> 1 track-add ;
 
 M: browser-gadget graft*
     [ add-definition-observer ] [ call-next-method ] bi ;
 
 M: browser-gadget ungraft*
     [ call-next-method ] [ remove-definition-observer ] bi ;
+
+M: browser-gadget handle-gesture
+    {
+        { [ over key-gesture? not ] [ call-next-method ] }
+        { [ dup popup>> ] [ { [ pass-to-popup ] [ call-next-method ] } 2&& ] }
+        [ call-next-method ]
+    } cond ;
 
 : showing-definition? ( defspec assoc -- ? )
     {
@@ -45,24 +68,35 @@ M: browser-gadget ungraft*
     } 2|| ;
 
 M: browser-gadget definitions-changed ( assoc browser -- )
-    history>>
-    dup value>> rot showing-definition?
-    [ notify-connections ] [ drop ] if ;
+    model>> [ value>> swap showing-definition? ] keep
+    '[ _ notify-connections ] when ;
 
-: help-action ( browser-gadget -- link )
-    history>> value>> >link ;
+M: browser-gadget focusable-child* search-field>> ;
 
-: com-follow ( link -- ) browser-gadget call-tool ;
+: (browser-window) ( topic -- )
+    <browser-gadget> "Browser" open-status-window ;
 
-: com-back ( browser -- ) history>> go-back ;
+: browser-window ( -- )
+    "handbook" (browser-window) ;
 
-: com-forward ( browser -- ) history>> go-forward ;
+\ browser-window H{ { +nullary+ t } } define-command
+
+: com-browse ( link -- )
+    [ browser-gadget? ] find-window
+    [ [ raise-window ] [ gadget-child show-help ] bi ]
+    [ (browser-window) ] if* ;
+
+: show-browser ( -- ) "handbook" com-browse ;
+
+\ show-browser H{ { +nullary+ t } } define-command
+
+: com-back ( browser -- ) model>> go-back ;
+
+: com-forward ( browser -- ) model>> go-forward ;
 
 : com-documentation ( browser -- ) "handbook" swap show-help ;
 
-: com-vocabularies ( browser -- ) "vocab-index" swap show-help ;
-
-: browser-help ( -- ) "ui-browser" help-window ;
+: browser-help ( -- ) "ui-browser" com-browse ;
 
 \ browser-help H{ { +nullary+ t } } define-command
 
@@ -70,11 +104,41 @@ browser-gadget "toolbar" f {
     { T{ key-down f { A+ } "LEFT" } com-back }
     { T{ key-down f { A+ } "RIGHT" } com-forward }
     { f com-documentation }
-    { f com-vocabularies }
     { T{ key-down f f "F1" } browser-help }
 } define-command-map
 
-browser-gadget "multi-touch" f {
-    { T{ left-action } com-back }
-    { T{ right-action } com-forward }
+: ?show-help ( link browser -- )
+    over [ show-help ] [ 2drop ] if ;
+
+: navigate ( browser quot -- )
+    '[ control-value @ ] keep ?show-help ;
+
+: com-up ( browser -- ) [ article-parent ] navigate ;
+
+: com-prev ( browser -- ) [ prev-article ] navigate ;
+
+: com-next ( browser -- ) [ next-article ] navigate ;
+
+browser-gadget "navigation" "Commands for navigating in the article hierarchy" {
+    { T{ key-down f { A+ } "u" } com-up }
+    { T{ key-down f { A+ } "p" } com-prev }
+    { T{ key-down f { A+ } "n" } com-next }
+    { T{ key-down f { A+ } "k" } com-show-outgoing-links }
+    { T{ key-down f { A+ } "K" } com-show-incoming-links }
 } define-command-map
+
+browser-gadget "multi-touch" f {
+    { left-action com-back }
+    { right-action com-forward }
+} define-command-map
+
+browser-gadget "scrolling"
+"The browser's scroller can be scrolled from the keyboard."
+{
+    { T{ key-down f f "UP" } com-scroll-up }
+    { T{ key-down f f "DOWN" } com-scroll-down }
+    { T{ key-down f f "PAGE_UP" } com-page-up }
+    { T{ key-down f f "PAGE_DOWN" } com-page-down }
+} define-command-map
+
+MAIN: browser-window

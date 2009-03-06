@@ -1,37 +1,52 @@
 ! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cairo.ffi kernel accessors sequences
-namespaces fry continuations destructors ;
+USING: colors fonts cairo.ffi alien alien.c-types kernel accessors
+sequences namespaces fry continuations destructors math images
+images.memory math.rectangles ;
 IN: cairo
 
-TUPLE: cairo-t alien ;
-C: <cairo-t> cairo-t
-M: cairo-t dispose ( alien -- ) alien>> cairo_destroy ;
+ERROR: cairo-error message ;
 
-TUPLE: cairo-surface-t alien ;
-C: <cairo-surface-t> cairo-surface-t
-M: cairo-surface-t dispose ( alien -- ) alien>> cairo_surface_destroy ;
+: (check-cairo) ( cairo_status_t -- )
+    dup CAIRO_STATUS_SUCCESS =
+    [ drop ] [ cairo_status_to_string cairo-error ] if ;
 
-: check-cairo ( cairo_status_t -- )
-    dup CAIRO_STATUS_SUCCESS = [ drop ]
-    [ cairo_status_to_string "Cairo error: " prepend throw ] if ;
+: check-cairo ( cairo -- ) cairo_status (check-cairo) ;
 
-SYMBOL: cairo
-: cr ( -- cairo ) cairo get ; inline
+: check-surface ( surface -- ) cairo_surface_status (check-cairo) ;
 
-: (with-cairo) ( cairo-t quot -- )
-    [ alien>> cairo ] dip
-    '[ @ cr cairo_status check-cairo ]
-    with-variable ; inline
-    
-: with-cairo ( cairo quot -- )
-    [ <cairo-t> ] dip '[ _ (with-cairo) ] with-disposal ; inline
+: width>stride ( width -- stride ) "uint" heap-size * ; inline
 
-: (with-surface) ( cairo-surface-t quot -- )
-    [ alien>> ] dip [ cairo_surface_status check-cairo ] bi ; inline
+: <image-surface> ( data dim -- surface )
+    [ CAIRO_FORMAT_ARGB32 ] dip first2 over width>stride
+    cairo_image_surface_create_for_data
+    dup check-surface ;
 
-: with-surface ( cairo_surface quot -- )
-    [ <cairo-surface-t> ] dip '[ _ (with-surface) ] with-disposal ; inline
+: <cairo> ( surface -- cairo ) cairo_create dup check-cairo ; inline
 
-: with-cairo-from-surface ( cairo_surface quot -- )
-    '[ cairo_create _ with-cairo ] with-surface ; inline
+: make-bitmap-image ( dim quot -- image )
+    '[
+        <image-surface> &cairo_surface_destroy
+        <cairo> &cairo_destroy
+        @
+    ] make-memory-bitmap
+    BGRA >>component-order ; inline
+
+: dummy-cairo ( -- cr )
+    #! Sometimes we want a dummy context; eg with Pango, we want
+    #! to measure text dimensions to create a new image context with,
+    #! but we need an existing context to measure text dimensions
+    #! with so we use the dummy.
+    \ dummy-cairo [
+        CAIRO_FORMAT_ARGB32 0 0 cairo_image_surface_create
+        cairo_create
+    ] initialize-alien ;
+
+: set-source-color ( cr color -- )
+    >rgba-components cairo_set_source_rgba ;
+
+: fill-rect ( cr rect -- )
+    [ rect-bounds [ first2 ] bi@ cairo_rectangle ]
+    [ drop cairo_fill ]
+    2bi ;
