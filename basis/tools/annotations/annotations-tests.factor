@@ -38,3 +38,11 @@ M: object another-generic ;
 [ ] [ \ another-generic reset ] unit-test
 
 [ "" ] [ [ 3 another-generic drop ] with-string-writer ] unit-test
+
+GENERIC: blah-generic ( a -- b )
+
+M: string blah-generic ;
+
+{ string blah-generic } watch
+
+[ ] [ "hi" blah-generic ] unit-test
