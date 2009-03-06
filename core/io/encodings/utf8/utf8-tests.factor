@@ -22,3 +22,6 @@ IN: io.encodings.utf8.tests
 
 [ { BIN: 11110101 BIN: 10111111 BIN: 10000000 BIN: 10111111 BIN: 11101111 BIN: 10000000 BIN: 10111111 BIN: 11011111 BIN: 10000000 CHAR: x } ]
 [ { BIN: 101111111000000111111 BIN: 1111000000111111 BIN: 11111000000 CHAR: x } encode-utf8-w/stream ] unit-test
+
+[ 3 ] [ 1 "日本語" >utf8-index ] unit-test
+[ 3 ] [ 9 "日本語" utf8-index> ] unit-test

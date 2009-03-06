@@ -12,7 +12,7 @@ SYMBOL: last-drag-loc
 TUPLE: demo-gadget < gadget yaw pitch distance ;
 
 : new-demo-gadget ( yaw pitch distance class -- gadget )
-    new-gadget
+    new
         swap >>distance
         swap >>pitch
         swap >>yaw ;

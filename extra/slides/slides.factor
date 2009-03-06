@@ -77,7 +77,7 @@ CONSTANT: stylesheet
 TUPLE: slides < book ;
 
 : <slides> ( slides -- gadget )
-    [ <page> ] map 0 <model> slides new-book ;
+    0 <model> slides new-book [ <page> add-gadget ] reduce ;
 
 : change-page ( book n -- )
     over control-value + over children>> length rem

@@ -1,17 +1,18 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel math math.order models
-namespaces make sequences words strings system hashtables
-math.parser math.vectors classes.tuple classes boxes calendar
-alarms combinators sets columns fry deques ui.gadgets ;
+namespaces make sequences words strings system hashtables math.parser
+math.vectors classes.tuple classes boxes calendar alarms combinators
+sets columns fry deques ui.gadgets ui.gadgets.private unicode.case
+unicode.categories combinators.short-circuit call ;
 IN: ui.gestures
 
 GENERIC: handle-gesture ( gesture gadget -- ? )
 
 M: object handle-gesture
-    tuck class superclasses
-    [ "gestures" word-prop ] map
-    assoc-stack dup [ call f ] [ 2drop t ] if ;
+    [ nip ]
+    [ class superclasses [ "gestures" word-prop ] map assoc-stack ] 2bi
+    dup [ call( gadget -- ) f ] [ 2drop t ] if ;
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
 
@@ -34,9 +35,11 @@ M: send-gesture send-queued-gesture
 
 TUPLE: propagate-gesture gesture gadget ;
 
+: resend-gesture ( gesture gadget -- ? )
+    [ handle-gesture ] with each-parent ;
+
 M: propagate-gesture send-queued-gesture
-    [ gesture>> ] [ gadget>> ] bi
-    [ handle-gesture ] with each-parent drop ;
+    [ gesture>> ] [ gadget>> ] bi resend-gesture drop ;
 
 : propagate-gesture ( gesture gadget -- )
     \ propagate-gesture queue-gesture ;
@@ -63,46 +66,58 @@ M: user-input send-queued-gesture
     '[ _ \ user-input queue-gesture ] unless-empty ;
 
 ! Gesture objects
-TUPLE: motion ;             C: <motion> motion
 TUPLE: drag # ;             C: <drag> drag
 TUPLE: button-up mods # ;   C: <button-up> button-up
 TUPLE: button-down mods # ; C: <button-down> button-down
-TUPLE: mouse-scroll ;       C: <mouse-scroll> mouse-scroll
-TUPLE: mouse-enter ;        C: <mouse-enter> mouse-enter
-TUPLE: mouse-leave ;        C: <mouse-leave> mouse-leave
-TUPLE: lose-focus ;         C: <lose-focus> lose-focus
-TUPLE: gain-focus ;         C: <gain-focus> gain-focus
+
+SINGLETONS:
+motion
+mouse-scroll
+mouse-enter mouse-leave
+lose-focus gain-focus ;
 
 ! Higher-level actions
-TUPLE: cut-action ;         C: <cut-action> cut-action
-TUPLE: copy-action ;        C: <copy-action> copy-action
-TUPLE: paste-action ;       C: <paste-action> paste-action
-TUPLE: delete-action ;      C: <delete-action> delete-action
-TUPLE: select-all-action ;  C: <select-all-action> select-all-action
+SINGLETONS:
+undo-action redo-action
+cut-action copy-action paste-action
+delete-action select-all-action
+left-action right-action up-action down-action
+zoom-in-action zoom-out-action ;
 
-TUPLE: left-action ;        C: <left-action> left-action
-TUPLE: right-action ;       C: <right-action> right-action
-TUPLE: up-action ;          C: <up-action> up-action
-TUPLE: down-action ;        C: <down-action> down-action
+UNION: action
+undo-action redo-action
+cut-action copy-action paste-action
+delete-action select-all-action
+left-action right-action up-action down-action
+zoom-in-action zoom-out-action ;
 
-TUPLE: zoom-in-action ;     C: <zoom-in-action> zoom-in-action
-TUPLE: zoom-out-action ;    C: <zoom-out-action> zoom-out-action
+CONSTANT: action-gestures
+    {
+        { "z" undo-action }
+        { "Z" redo-action }
+        { "x" cut-action }
+        { "c" copy-action }
+        { "v" paste-action }
+        { "a" select-all-action }
+    }
 
 ! Modifiers
 SYMBOLS: C+ A+ M+ S+ ;
 
-TUPLE: key-down mods sym ;
+TUPLE: key-gesture mods sym ;
 
-: <key-gesture> ( mods sym action? class -- mods' sym' )
+TUPLE: key-down < key-gesture ;
+
+: new-key-gesture ( mods sym action? class -- mods' sym' )
     [ [ [ S+ swap remove f like ] dip ] unless ] dip boa ; inline
 
 : <key-down> ( mods sym action? -- key-down )
-    key-down <key-gesture> ;
+    key-down new-key-gesture ;
 
-TUPLE: key-up mods sym ;
+TUPLE: key-up < key-gesture ;
 
 : <key-up> ( mods sym action? -- key-up )
-    key-up <key-gesture> ;
+    key-up new-key-gesture ;
 
 ! Hand state
 
@@ -162,15 +177,15 @@ SYMBOL: drag-timer
 
 : fire-motion ( -- )
     hand-buttons get-global empty? [
-        T{ motion } hand-gadget get-global propagate-gesture
+        motion hand-gadget get-global propagate-gesture
     ] [
         drag-gesture
     ] if ;
 
 : hand-gestures ( new old -- )
     drop-prefix <reversed>
-    T{ mouse-leave } swap each-gesture
-    T{ mouse-enter } swap each-gesture ;
+    mouse-leave swap each-gesture
+    mouse-enter swap each-gesture ;
 
 : forget-rollover ( -- )
     f hand-world set-global
@@ -179,10 +194,10 @@ SYMBOL: drag-timer
     parents hand-gestures ;
 
 : send-lose-focus ( gadget -- )
-    T{ lose-focus } swap send-gesture ;
+    lose-focus swap send-gesture ;
 
 : send-gain-focus ( gadget -- )
-    T{ gain-focus } swap send-gesture ;
+    gain-focus swap send-gesture ;
 
 : focus-child ( child gadget ? -- )
     [
@@ -221,12 +236,10 @@ SYMBOL: drag-timer
 
 : multi-click? ( button -- ? )
     {
-        { [ multi-click-timeout?  not ] [ f ] }
-        { [ multi-click-button?   not ] [ f ] }
-        { [ multi-click-position? not ] [ f ] }
-        { [ multi-click-position? not ] [ f ] }
-        [ t ]
-    } cond nip ;
+        [ multi-click-timeout? ]
+        [ multi-click-button? ]
+        [ multi-click-position? ]
+    } 0&& nip ;
 
 : update-click# ( button -- )
     global [
@@ -271,19 +284,36 @@ SYMBOL: drag-timer
 : send-wheel ( direction loc world -- )
     move-hand
     scroll-direction set-global
-    T{ mouse-scroll } hand-gadget get-global propagate-gesture ;
+    mouse-scroll hand-gadget get-global propagate-gesture ;
 
 : send-action ( world gesture -- )
     swap world-focus propagate-gesture ;
 
 GENERIC: gesture>string ( gesture -- string/f )
 
-: modifiers>string ( modifiers -- string )
-    [ name>> ] map concat >string ;
+HOOK: modifiers>string os ( modifiers -- string )
+
+M: macosx modifiers>string
+    [
+        {
+            { A+ [ "\u{place-of-interest-sign}" ] }
+            { M+ [ "\u{option-key}" ] }
+            { S+ [ "\u{upwards-white-arrow}" ] }
+            { C+ [ "\u{up-arrowhead}" ] }
+        } case
+    ] map "" join ;
+
+M: object modifiers>string
+    [ name>> ] map "" join ;
 
 M: key-down gesture>string
-    dup mods>> modifiers>string
-    swap sym>> append ;
+    [ mods>> ] [ sym>> ] bi
+    {
+        { [ dup { [ length 1 = ] [ first LETTER? ] } 1&& ] [ [ S+ prefix ] dip ] }
+        { [ dup " " = ] [ drop "SPACE" ] }
+        [ >upper ]
+    } cond
+    [ modifiers>string ] dip append ;
 
 M: button-up gesture>string
     [
@@ -310,5 +340,15 @@ M: down-action gesture>string drop "Swipe down" ;
 M: zoom-in-action gesture>string drop "Zoom in" ;
 
 M: zoom-out-action gesture>string drop "Zoom out (pinch)" ;
+
+HOOK: action-modifier os ( -- mod )
+
+M: object action-modifier C+ ;
+M: macosx action-modifier A+ ;
+
+M: action gesture>string
+    action-gestures value-at
+    action-modifier 1array
+    swap f <key-down> gesture>string ;
 
 M: object gesture>string drop f ;

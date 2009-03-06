@@ -43,7 +43,7 @@ M: integer ^n
     [ factor-2s ] dip [ (^n) ] keep rot * shift ;
 
 M: ratio ^n
-    [ >fraction ] dip tuck [ ^n ] 2bi@ / ;
+    [ >fraction ] dip [ ^n ] curry bi@ / ;
 
 M: float ^n
     (^n) ;

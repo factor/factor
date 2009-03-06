@@ -1,5 +1,6 @@
 IN: documents.tests
-USING: documents namespaces tools.test make arrays kernel fry ;
+USING: documents documents.private accessors sequences
+namespaces tools.test make arrays kernel fry ;
 
 ! Tests
 
@@ -89,18 +90,64 @@ USING: documents namespaces tools.test make arrays kernel fry ;
 ] unit-test
 
 <document> "doc" set
-"Hello world" "doc" get set-doc-string
-[ { 0 0 } ] [ { 0 0 } "doc" get T{ one-word-elt } prev-elt ] unit-test
-[ { 0 0 } ] [ { 0 2 } "doc" get T{ one-word-elt } prev-elt ] unit-test
-[ { 0 0 } ] [ { 0 5 } "doc" get T{ one-word-elt } prev-elt ] unit-test
-[ { 0 5 } ] [ { 0 2 } "doc" get T{ one-word-elt } next-elt ] unit-test
-[ { 0 5 } ] [ { 0 5 } "doc" get T{ one-word-elt } next-elt ] unit-test
-
-<document> "doc" set
 "Hello\nworld, how are\nyou?" "doc" get set-doc-string
 
 [ { 2 4 } ] [ "doc" get doc-end ] unit-test
 
-[ { 0 0 } ] [ { 0 3 } "doc" get T{ line-elt } prev-elt ] unit-test
-[ { 0 3 } ] [ { 1 3 } "doc" get T{ line-elt } prev-elt ] unit-test
-[ { 2 4 } ] [ { 2 1 } "doc" get T{ line-elt } next-elt ] unit-test
+! Undo/redo
+[ ] [ <document> "d" set ] unit-test
+
+[ ] [ "Hello, world." "d" get set-doc-string ] unit-test
+
+[
+    T{ edit
+       { old-string "" }
+       { new-string "Hello, world." }
+       { from { 0 0 } }
+       { old-to { 0 0 } }
+       { new-to { 0 13 } }
+    }
+] [ "d" get undos>> first ] unit-test
+
+[ ] [ "Goodbye" { 0 0 } { 0 5 } "d" get set-doc-range ] unit-test
+
+[ "Goodbye, world." ] [ "d" get doc-string ] unit-test
+
+[ ] [ "cruel " { 0 9 } { 0 9 } "d" get set-doc-range ] unit-test
+
+[ 3 ] [ "d" get undos>> length ] unit-test
+
+[ "Goodbye, cruel world." ] [ "d" get doc-string ] unit-test
+
+[ "" { 0 9 } { 0 15 } ] [
+    "d" get undos>> peek
+    [ old-string>> ] [ from>> ] [ new-to>> ] tri
+] unit-test
+
+[ ] [ "d" get undo ] unit-test
+
+[ "Goodbye, world." ] [ "d" get doc-string ] unit-test
+
+[ ] [ "d" get undo ] unit-test
+
+[ "Hello, world." ] [ "d" get doc-string ] unit-test
+
+[ ] [ "d" get redo ] unit-test
+
+[ "Goodbye, world." ] [ "d" get doc-string ] unit-test
+
+[ ] [ <document> "d" set ] unit-test
+
+[ ] [ "d" get clear-doc ] unit-test
+
+[ ] [ "d" get clear-doc ] unit-test
+
+[ 0 ] [ "d" get undos>> length ] unit-test
+
+[ ] [ <document> "d" set ] unit-test
+
+[ ] [ "d" get value>> "value" set ] unit-test
+
+[ ] [ "Hello world" "d" get set-doc-string ] unit-test
+
+[ { "" } ] [ "value" get ] unit-test

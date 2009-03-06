@@ -237,7 +237,7 @@ USING: math.parser
     [wlet | update-value-label [ ! ( -- )
               BEHAVIOUR weight>> truncate-number number>string
               VALUE-LABEL
-              set-label-string ] |
+              (>>string) ] |
 
       update-value-label
       
@@ -275,7 +275,7 @@ USING: math.parser
     [wlet | update-value-label [ ( -- )
               BOIDS-GADGET boids>> length number>string
               VALUE-LABEL
-              set-label-string ] |
+              (>>string) ] |
 
       update-value-label
       

@@ -16,7 +16,7 @@ M: image-gadget pref-dim*
     [ bitmap>> ] bi glDrawPixels ;
 
 M: image-gadget draw-gadget* ( gadget -- )
-    origin get [ image>> draw-image ] with-translation ;
+    image>> draw-image ;
 
 : <image-gadget> ( image -- gadget )
     \ image-gadget new-gadget

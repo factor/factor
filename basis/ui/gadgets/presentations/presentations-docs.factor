@@ -33,7 +33,7 @@ HELP: <presentation>
 { $description "Creates a new " { $link presentation } " derived from " { $link <roll-button> } "." }
 { $see-also "presentations" } ;
 
-{ <button> <bevel-button> <command-button> <roll-button> <presentation> } related-words
+{ <button> <border-button> <command-button> <roll-button> <presentation> } related-words
 
 { <status-bar> show-mouse-help show-status show-summary hide-status } related-words
 
@@ -42,9 +42,10 @@ HELP: show-mouse-help
 { $description "Displays a " { $link summary } " of the " { $snippet "object" } "in the status bar of the " { $link world } " containing this presentation. This word is executed when the mouse enters the presentation." } ;
 
 ARTICLE: "ui.gadgets.presentations" "Presentation gadgets"
-"Outliner gadgets are usually not constructed directly, and instead are written to " { $link "ui.gadgets.panes" } " with formatted stream output words (" { $link "presentations" } ")."
+"The " { $vocab-link "ui.gadgets.presentations" } " vocabulary implements presentations, which are graphical representations of an object, associated with the object itself (see " { $link "ui-operations" } ")."
+$nl
+"Clicking a presentation with the left mouse button invokes the object's primary operation, and clicking with the right mouse button displays a menu of all applicable operations. Presentations are usually not constructed directly, and instead are written to " { $link "ui.gadgets.panes" } " with formatted stream output words (see " { $link "presentations" } ")."
 { $subsection presentation }
-{ $subsection <presentation> }
-"Presentations remember the object they are presenting; operations can be performed on the presented object. See " { $link "ui-operations" } "." ;
+{ $subsection <presentation> } ;
 
 ABOUT: "ui.gadgets.presentations"
