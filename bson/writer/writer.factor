@@ -3,7 +3,7 @@
 USING: accessors assocs bson.constants byte-arrays fry io io.binary
 io.encodings.binary io.encodings.string io.encodings.utf8
 io.streams.byte-array kernel math math.parser quotations sequences
-serialize strings words tools.hexdump ;
+serialize strings words calendar ;
 
 IN: bson.writer
 
@@ -24,6 +24,7 @@ M: sequence bson-type? ( seq -- type ) drop T_Array ;
 M: string bson-type? ( string -- type ) drop T_String ; 
 M: integer bson-type? ( integer -- type ) drop T_Integer ; 
 M: assoc bson-type? ( assoc -- type ) drop T_Object ;
+M: timestamp bson-type? ( timestamp -- type ) drop T_Date ;
 
 M: oid bson-type? ( word -- type ) drop T_OID ;
 M: objid bson-type? ( objid -- type ) drop T_Binary ;
@@ -58,6 +59,9 @@ M: integer bson-write ( num -- )
 
 M: real bson-write ( num -- )
     >float write-double ;
+
+M: timestamp bson-write ( timestamp -- )
+    timestamp>millis write-longlong ;
 
 M: byte-array bson-write ( binary -- )
     [ length write-int32 ] keep

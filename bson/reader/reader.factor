@@ -1,6 +1,6 @@
 USING: accessors assocs bson.constants byte-arrays byte-vectors fry io
 io.binary io.encodings.string io.encodings.utf8 kernel math namespaces
-sequences serialize arrays ;
+sequences serialize arrays calendar ;
 
 IN: bson.reader
 
@@ -167,6 +167,10 @@ M: bson-double element-data-read ( type -- double )
 M: bson-boolean element-data-read ( type -- boolean )
     drop
     read-byte t = ;
+
+M: bson-date element-data-read ( type -- timestamp )
+    drop
+    read-longlong millis>timestamp ;
 
 M: bson-binary element-data-read ( type -- binary )
     drop
