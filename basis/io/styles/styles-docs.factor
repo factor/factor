@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io.streams.plain io strings
-hashtables kernel quotations ;
+hashtables kernel quotations colors ;
 IN: io.styles
 
 HELP: stream-format
@@ -111,14 +111,23 @@ $nl
 { $subsection with-cell }
 { $subsection write-cell } ;
 
+HELP: href
+{ $description "Character style. A URL string that the text links to." } ;
+
+HELP: image
+{ $description "Character style. A pathname string for an image file to display in place of the printed text. If this style is specified, the printed text serves the same role as the " { $snippet "alt" } " attribute of an HTML " { $snippet "img" } " tag -- the text is only displayed if the output medium does not support images." } ;
+
 ARTICLE: "character-styles" "Character styles"
 "Character styles for " { $link stream-format } " and " { $link with-style } ":"
 { $subsection foreground }
 { $subsection background }
-{ $subsection font }
+{ $subsection font-name }
 { $subsection font-size }
 { $subsection font-style }
-{ $subsection presented } ;
+"Special styles:"
+{ $subsection href }
+{ $subsection image }
+{ $see-also "presentations" } ;
 
 ARTICLE: "paragraph-styles" "Paragraph styles"
 "Paragraph styles for " { $link with-nesting } ":"
@@ -139,10 +148,12 @@ HELP: write-object
 $io-error ;
 
 ARTICLE: "presentations" "Presentations"
+"A special style for " { $link format } " and " { $link with-nesting } ":"
+{ $subsection presented }
 "The " { $link presented } " style can be used to emit clickable objects. A utility word for outputting this style:"
 { $subsection write-object } ;
 
-ARTICLE: "styles" "Styled text"
+ARTICLE: "styles" "Text styles"
 "The " { $link stream-format } ", " { $link with-style } ", " { $link with-nesting } " and " { $link tabular-output } " words take a hashtable of style attributes. Output stream implementations are free to ignore style information."
 $nl
 "Style hashtables are keyed by symbols from the " { $vocab-link "io.styles" } " vocabulary."
@@ -172,34 +183,33 @@ HELP: bold-italic
 { $description "A value for the " { $link font-style } " character style denoting boldface italicized text." } ;
 
 HELP: foreground
-{ $description "Character style. Text color, denoted by a sequence of four numbers between 0 and 1 (red, green, blue and alpha)." } 
+{ $description "Character style. An instance of " { $link color } ". See " { $link "colors" } "." } 
 { $examples
     { $code
         "10 ["
-            "    \"Hello world\" swap"
-            "    { 0.1 0.1 0.2 1 } n*v { 1 1 1 1 } vmin"
-            "    foreground associate format nl"
+            "    \"Hello world\\n\""
+            "    swap 10 / 1 <gray> foreground associate format"
         "] each"
     }
 } ;
 
 HELP: background
-{ $description "Character style. Background color, denoted by a sequence of four numbers between 0 and 1 (red, green, blue and alpha)." }
+{ $description "Character style. An instance of " { $link color } ". See " { $link "colors" } "." }
 { $examples
     { $code
         "10 ["
-            "    \"Hello world\" swap"
-            "    { 0.1 0.4 0.1 } n*v { 1 1 1 } vmin { 1 } append"
+            "    \"Hello world\\n\""
+            "    swap 10 / 1 1 over - over 1 <rgba>"
             "    background associate format nl"
         "] each"
     }
 } ;
 
-HELP: font
+HELP: font-name
 { $description "Character style. Font family named by a string." }
 { $examples
     "This example outputs some different font sizes:"
-    { $code "{ \"monospace\" \"serif\" \"sans-serif\" }\n[ dup font associate format nl ] each" }
+    { $code "{ \"monospace\" \"serif\" \"sans-serif\" }\n[ dup font-name associate format nl ] each" }
 } ;
 
 HELP: font-size
@@ -221,26 +231,20 @@ HELP: font-style
 HELP: presented
 { $description "Character and paragraph style. An object associated with the text. In the Factor UI, this is shown as a clickable presentation of the object; left-clicking invokes a default command, and right-clicking shows a menu of commands." } ;
 
-HELP: presented-path
-{ $description "Character and paragraph style. An editable object associated with the text. In the Factor UI, this is shown as a clickable presentation of the object path together with an expander button which displays an object editor; left-clicking invokes a default command, and right-clicking shows a menu of commands." } ;
-
-HELP: presented-printer
-{ $description "Character and paragraph style. A quotation with stack effect " { $snippet "( obj -- )" } " which is applied to the value at the " { $link presented-path } " if the presentation needs to be re-displayed after the object has been edited." } ;
-
 HELP: page-color
-{ $description "Paragraph style. Background color of the paragraph block, denoted by a sequence of four numbers between 0 and 1 (red, green, blue and alpha)." } 
+{ $description "Paragraph style. An instance of " { $link color } ". See " { $link "colors" } "." } 
 { $examples
-    { $code "H{ { page-color { 1 0.8 0.5 1 } } }\n[ \"A background\" write ] with-nesting nl" }
+    { $code "H{ { page-color T{ rgba f 1 0.8 0.5 1 } } }\n[ \"A background\" write ] with-nesting nl" }
 } ;
 
 HELP: border-color
-{ $description "Paragraph style. Border color of the paragraph block, denoted by a sequence of four numbers between 0 and 1 (red, green, blue and alpha)." } 
+{ $description "Paragraph style. An instance of " { $link color } ". See " { $link "colors" } "." }
 { $examples
-    { $code "H{ { border-color { 1 0 0 1 } } }\n[ \"A border\" write ] with-nesting nl" }
+    { $code "H{ { border-color T{ rgba f 1 0 0 1 } } }\n[ \"A border\" write ] with-nesting nl" }
 } ;
 
 HELP: border-width
-{ $description "Paragraph style. Pixels between edge of text and border color, an integer." } 
+{ $description "Paragraph style. Pixels between edge of text and border, an integer." } 
 { $examples
     { $code "H{ { border-width 10 } }\n[ \"Some inset text\" write ] with-nesting nl" }
 } ;
@@ -256,7 +260,7 @@ HELP: table-gap
 { table-gap table-border stream-write-table tabular-output } related-words
 
 HELP: table-border
-{ $description "Table style. Color of the border drawn between cells, denoted by a sequence of four numbers between 0 and 1 (red, green, blue and alpha)." } ;
+{ $description "Table style. An instance of " { $link color } ". See " { $link "colors" } "." } ;
 
 HELP: input
 { $class-description "Class of input text presentations. Instances can be used passed to " { $link write-object } " to output a clickable piece of input. Input text presentations are created by calling " { $link <input> } "." }

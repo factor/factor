@@ -6,7 +6,7 @@ IN: colors.hsv
 ! h [0,360)
 ! s [0,1]
 ! v [0,1]
-TUPLE: hsva < color hue saturation value alpha ;
+TUPLE: hsva < color { hue read-only } { saturation read-only } { value read-only } { alpha read-only } ;
 
 C: <hsva> hsva
 

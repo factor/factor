@@ -26,7 +26,7 @@ GENERIC: render-cairo* ( gadget -- )
 TUPLE: cairo-gadget < gadget ;
 
 : <cairo-gadget> ( dim -- gadget )
-    cairo-gadget new-gadget
+    cairo-gadget new
         swap >>dim ;
 
 M: cairo-gadget draw-gadget*

@@ -91,39 +91,8 @@ HELP: clear-doc
 { $description "Removes all text from the document." }
 { $side-effects "document" } ;
 
-HELP: prev-elt
-{ $values { "loc" "a pair of integers" } { "document" document } { "elt" "an element" } { "newloc" "a pair of integers" } }
-{ $contract "Outputs the location of the first occurrence of the element prior to " { $snippet "loc" } "." } ;
-
-{ prev-elt next-elt } related-words
-
-HELP: next-elt
-{ $values { "loc" "a pair of integers" } { "document" document } { "elt" "an element" } { "newloc" "a pair of integers" } }
-{ $contract "Outputs the location of the first occurrence of the element following " { $snippet "loc" } "." } ;
-
-HELP: char-elt
-{ $class-description "An element representing a single character." } ;
-
-HELP: one-word-elt
-{ $class-description "An element representing a single word. The " { $link prev-elt } " and " { $link next-elt } " words return the location of the beginning and the end of the word at the current location." } ;
-
-{ one-word-elt word-elt } related-words
-
-HELP: word-elt
-{ $class-description "An element representing a single word. The " { $link prev-elt } " and " { $link next-elt } " words return the location of the previous and next word from the current location." } ;
-
-HELP: one-line-elt
-{ $class-description "An element representing a single line. The " { $link prev-elt } " and " { $link next-elt } " words return the location of the beginning and the end of the line at the current location." } ;
-
-{ one-line-elt line-elt } related-words
-
-HELP: line-elt
-{ $class-description "An element representing a single line. The " { $link prev-elt } " and " { $link next-elt } " words return the location of the previous and next line from the current location." } ;
-
-HELP: doc-elt
-{ $class-description "An element representing the entire document. The " { $link prev-elt } " word outputs the start of the document and the " { $link next-elt } " word outputs the end of the document." } ;
-
 ARTICLE: "documents" "Documents"
+"The " { $vocab-link "documents" } " vocabulary implements " { $emphasis "documents" } ", which are models storing a passage of text as a sequence of lines. Operations are defined for operating on subranges of the text, and " { $link "ui.gadgets.editors" } " can display these models."
 { $subsection document }
 { $subsection <document> }
 "Getting and setting the contents of the entire document:"
@@ -138,24 +107,18 @@ ARTICLE: "documents" "Documents"
 { $subsection remove-doc-range }
 "A combinator:"
 { $subsection each-line }
-{ $see-also "gadgets-editors" } ;
+{ $subsection "document-locs" }
+{ $subsection "documents.elements" }
+{ $see-also "ui.gadgets.editors" } ;
 
-ARTICLE: "document-locs-elts" "Locations and elements"
+ARTICLE: "document-locs" "Document locations"
 "Locations in the document are represented as a line/column number pair, with both indices being zero-based. There are some words for manipulating locations:"
 { $subsection +col }
 { $subsection +line }
 { $subsection =col }
 { $subsection =line }
-"New locations can be created out of existing ones by finding the start or end of a document element nearest to a given location."
-{ $subsection prev-elt }
-{ $subsection next-elt }
-"The different types of document elements correspond to the standard editing taxonomy:"
-{ $subsection char-elt }
-{ $subsection one-word-elt }
-{ $subsection word-elt }
-{ $subsection one-line-elt }
-{ $subsection line-elt }
-{ $subsection doc-elt }
 "Miscellaneous words for working with locations:"
 { $subsection lines-equal? }
 { $subsection validate-loc } ;
+
+ABOUT: "documents"

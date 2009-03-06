@@ -19,8 +19,9 @@ TUPLE: node value children ;
             nip ,
         ] [
             [
-                2dup children>> swap first head-slice %
-                tuck traverse-step traverse-to-path
+                [ children>> swap first head-slice % ]
+                [ tuck traverse-step traverse-to-path ]
+                2bi
             ] make-node
         ] if
     ] if ;
@@ -33,8 +34,8 @@ TUPLE: node value children ;
             nip ,
         ] [
             [
-                2dup traverse-step traverse-from-path
-                tuck children>> swap first 1+ tail-slice %
+                [ traverse-step traverse-from-path ]
+                [ tuck children>> swap first 1+ tail-slice % ] 2bi
             ] make-node
         ] if
     ] if ;
@@ -77,7 +78,7 @@ DEFER: (gadget-subtree)
     [ (gadget-subtree) ] { } make ;
 
 M: node gadget-text*
-    dup children>> swap value>> gadget-seq-text ;
+    [ children>> ] [ value>> ] bi gadget-seq-text ;
 
 : gadget-text-range ( frompath topath gadget -- str )
     gadget-subtree gadget-text ;

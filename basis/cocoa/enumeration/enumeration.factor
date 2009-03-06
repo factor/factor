@@ -8,12 +8,11 @@ IN: cocoa.enumeration
 CONSTANT: NS-EACH-BUFFER-SIZE 16
 
 : with-enumeration-buffers ( quot -- )
-    [
-        [
-            "NSFastEnumerationState" malloc-object &free
-            NS-EACH-BUFFER-SIZE "id" heap-size * malloc-object &free
-            NS-EACH-BUFFER-SIZE
-        ] dip call
+    '[
+        "NSFastEnumerationState" malloc-object &free
+        NS-EACH-BUFFER-SIZE "id" malloc-array &free
+        NS-EACH-BUFFER-SIZE
+        @
     ] with-destructors ; inline
 
 :: (NSFastEnumeration-each) ( object quot: ( elt -- ) state stackbuf count -- )

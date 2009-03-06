@@ -1,10 +1,10 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables io kernel math math.parser memory
 namespaces parser lexer sequences strings io.styles
 vectors words generic system combinators continuations debugger
 definitions compiler.units accessors colors prettyprint fry
-sets vocabs.parser ;
+sets vocabs.parser call ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
@@ -18,7 +18,7 @@ GENERIC: stream-read-quot ( stream -- quot/f )
         [ 2drop f ] [ rethrow ] if
     ] recover ;
 
-: read-quot-loop  ( stream accum -- quot/f )
+: read-quot-loop ( stream accum -- quot/f )
     over stream-readln dup [
         over push
         dup read-quot-step dup
@@ -54,7 +54,19 @@ SYMBOL: visible-vars
 
 SYMBOL: error-hook
 
-[ print-error-and-restarts ] error-hook set-global
+: call-error-hook ( error -- )
+    error-continuation get error-hook get
+    call( error continuation -- ) ;
+
+[ drop print-error-and-restarts ] error-hook set-global
+
+SYMBOL: display-stacks?
+
+t display-stacks? set-global
+
+SYMBOL: max-stack-items
+
+10 max-stack-items set-global
 
 <PRIVATE
 
@@ -74,14 +86,19 @@ SYMBOL: error-hook
             ] each
         ] tabular-output
     ] unless-empty ;
-
-SYMBOL: display-stacks?
-
-t display-stacks? set-global
+    
+: trimmed-stack. ( seq -- )
+    dup length max-stack-items get > [
+        max-stack-items get cut*
+        [
+            [ length number>string "(" " more items)" surround ] keep
+            write-object nl
+        ] dip
+    ] when stack. ;
 
 : stacks. ( -- )
     display-stacks? get [
-        datastack [ nl "--- Data stack:" title. stack. ] unless-empty
+        datastack [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
     ] when ;
 
 : prompt. ( -- )
@@ -90,14 +107,8 @@ t display-stacks? set-global
 
 : listen ( -- )
     visible-vars. stacks. prompt.
-    [ read-quot [ [ error-hook get call ] recover ] [ bye ] if* ]
-    [
-        dup lexer-error? [
-            error-hook get call
-        ] [
-            rethrow
-        ] if
-    ] recover ;
+    [ read-quot [ [ call-error-hook ] recover ] [ bye ] if* ]
+    [ dup lexer-error? [ call-error-hook ] [ rethrow ] if ] recover ;
 
 : until-quit ( -- )
     quit-flag get [ quit-flag off ] [ listen until-quit ] if ;

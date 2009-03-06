@@ -1,17 +1,38 @@
-{
-    IBClasses = (
-        {
-            ACTIONS = {
-                newFactorWorkspace = id; 
-                runFactorFile = id; 
-                saveFactorImage = id; 
-                saveFactorImageAs = id; 
-                showFactorHelp = id; 
-            }; 
-            CLASS = FirstResponder; 
-            LANGUAGE = ObjC; 
-            SUPERCLASS = NSObject; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>factorBrowser</key>
+				<string>id</string>
+				<key>factorListener</key>
+				<string>id</string>
+				<key>newFactorBrowser</key>
+				<string>id</string>
+				<key>newFactorListener</key>
+				<string>id</string>
+				<key>refreshAll</key>
+				<string>id</string>
+				<key>runFactorFile</key>
+				<string>id</string>
+				<key>saveFactorImage</key>
+				<string>id</string>
+				<key>saveFactorImageAs</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

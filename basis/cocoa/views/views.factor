@@ -1,8 +1,8 @@
-! Copyright (C) 2006, 2008 Slava Pestov
+! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: specialized-arrays.int arrays kernel math namespaces make
-cocoa cocoa.messages cocoa.classes cocoa.types sequences
-continuations accessors ;
+cocoa cocoa.messages cocoa.classes core-graphics
+core-graphics.types sequences continuations accessors ;
 IN: cocoa.views
 
 CONSTANT: NSOpenGLPFAAllRenderers 1
@@ -40,29 +40,29 @@ CONSTANT: NSOpenGLPFAScreenMask 84
 CONSTANT: NSOpenGLPFAPixelBuffer 90
 CONSTANT: NSOpenGLPFAAllowOfflineRenderers 96
 CONSTANT: NSOpenGLPFAVirtualScreenCount 128
-
-CONSTANT: kCGLRendererGenericFloatID HEX: 00020400
+CONSTANT: NSOpenGLCPSwapInterval 222
 
 <PRIVATE
 
-SYMBOL: +software-renderer+
-SYMBOL: +multisample+
+SYMBOL: software-renderer?
+SYMBOL: multisample?
 
 PRIVATE>
 
 : with-software-renderer ( quot -- )
-    t +software-renderer+ pick with-variable ; inline
+    [ t software-renderer? ] dip with-variable ; inline
+
 : with-multisample ( quot -- )
-    t +multisample+ pick with-variable ; inline
+    [ t multisample? ] dip with-variable ; inline
 
 : <PixelFormat> ( attributes -- pixelfmt )
     NSOpenGLPixelFormat -> alloc swap [
         %
         NSOpenGLPFADepthSize , 16 ,
-        +software-renderer+ get [
+        software-renderer? get [
             NSOpenGLPFARendererID , kCGLRendererGenericFloatID ,
         ] when
-        +multisample+ get [
+        multisample? get [
             NSOpenGLPFASupersample ,
             NSOpenGLPFASampleBuffers , 1 ,
             NSOpenGLPFASamples , 8 ,
@@ -73,7 +73,7 @@ PRIVATE>
     -> autorelease ;
 
 : <GLView> ( class dim -- view )
-    [ -> alloc 0 0 ] dip first2 <NSRect>
+    [ -> alloc 0 0 ] dip first2 <CGRect>
     NSOpenGLPFAWindow NSOpenGLPFADoubleBuffer 2array <PixelFormat>
     -> initWithFrame:pixelFormat:
     dup 1 -> setPostsBoundsChangedNotifications:
@@ -81,26 +81,12 @@ PRIVATE>
 
 : view-dim ( view -- dim )
     -> bounds
-    dup NSRect-w >fixnum
-    swap NSRect-h >fixnum 2array ;
+    [ CGRect-w >fixnum ] [ CGRect-h >fixnum ] bi
+    2array ;
 
 : mouse-location ( view event -- loc )
     [
         -> locationInWindow f -> convertPoint:fromView:
-        [ NSPoint-x ] [ NSPoint-y ] bi
-    ] [ drop -> frame NSRect-h ] 2bi
+        [ CGPoint-x ] [ CGPoint-y ] bi
+    ] [ drop -> frame CGRect-h ] 2bi
     swap - 2array ;
-
-USE: opengl.gl
-USE: alien.syntax
-
-CONSTANT: NSOpenGLCPSwapInterval 222
-
-LIBRARY: OpenGL
-
-TYPEDEF: int CGLError
-TYPEDEF: void* CGLContextObj
-TYPEDEF: int CGLContextParameter
-
-FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
-

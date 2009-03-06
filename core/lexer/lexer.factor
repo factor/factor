@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors namespaces math words strings
 io vectors arrays math.parser combinators continuations ;
@@ -23,13 +23,11 @@ TUPLE: lexer text line line-text line-length column ;
     lexer new-lexer ;
 
 : skip ( i seq ? -- n )
-    [ tuck ] dip
-    [ swap CHAR: \s eq? xor ] curry find-from drop
-    [ ] [ length ] ?if ;
+    over length
+    [ [ swap CHAR: \s eq? xor ] curry find-from drop ] dip or ;
 
 : change-lexer-column ( lexer quot -- )
-    swap
-    [ [ column>> ] [ line-text>> ] bi rot call ] keep
+    [ [ column>> ] [ line-text>> ] bi ] prepose keep
     (>>column) ; inline
 
 GENERIC: skip-blank ( lexer -- )
