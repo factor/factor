@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math sorting words parser io summary
 quotations sequences prettyprint continuations effects
@@ -20,16 +20,34 @@ M: word reset
         f "unannotated-def" set-word-prop
     ] [ drop ] if ;
 
+M: method-spec reset
+    first2 method reset ;
+
 ERROR: cannot-annotate-twice word ;
 
+<PRIVATE
+
+: check-annotate-twice ( word -- word )
+    dup "unannotated-def" word-prop [
+        cannot-annotate-twice
+    ] when ;
+
+: method-spec>word ( obj -- word )
+    dup method-spec? [ first2 method ] when ;
+
+: save-unannotated-def ( word -- )
+    dup def>> "unannotated-def" set-word-prop ;
+
+: (annotate) ( word quot -- )
+    [ dup def>> ] dip call define ; inline
+
+PRIVATE>
+
 : annotate ( word quot -- )
-    over "unannotated-def" word-prop [
-        over cannot-annotate-twice
-    ] when
-    [
-        over dup def>> "unannotated-def" set-word-prop
-        [ dup def>> ] dip call define
-    ] with-compilation-unit ; inline
+    [ method-spec>word check-annotate-twice ] dip
+    [ over save-unannotated-def (annotate) ] with-compilation-unit ; inline
+
+<PRIVATE
 
 : word-inputs ( word -- seq )
     stack-effect [
@@ -58,8 +76,12 @@ ERROR: cannot-annotate-twice word ;
 : (watch) ( word def -- def )
     over '[ _ entering @ _ leaving ] ;
 
+PRIVATE>
+
 : watch ( word -- )
-    dup [ (watch) ] annotate ;
+    dup '[ [ _ ] dip (watch) ] annotate ;
+
+<PRIVATE
 
 : (watch-vars) ( word vars quot -- newquot )
    '[
@@ -67,6 +89,8 @@ ERROR: cannot-annotate-twice word ;
         "--- Variable values:" print _ [ dup get ] H{ } map>assoc describe
         @
     ] ;
+
+PRIVATE>
 
 : watch-vars ( word vars -- )
     dupd '[ [ _ _ ] dip (watch-vars) ] annotate ;
@@ -77,6 +101,9 @@ M: generic annotate-methods
     [ "methods" word-prop values ] dip [ annotate ] curry each ;
 
 M: word annotate-methods
+    annotate ;
+
+M: method-spec annotate-methods
     annotate ;
 
 : breakpoint ( word -- )
@@ -92,8 +119,12 @@ word-timing [ H{ } clone ] initialize
 : reset-word-timing ( -- )
     word-timing get clear-assoc ;
 
+<PRIVATE
+
 : (add-timing) ( def word -- def' )
     '[ _ benchmark _ word-timing get at+ ] ;
+
+PRIVATE>
 
 : add-timing ( word -- )
     dup '[ _ (add-timing) ] annotate ;
