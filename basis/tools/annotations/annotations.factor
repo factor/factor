@@ -90,10 +90,10 @@ PRIVATE>
         @
     ] ;
 
+PRIVATE>
+
 : watch-vars ( word vars -- )
     dupd '[ [ _ _ ] dip (watch-vars) ] annotate ;
-
-PRIVATE>
 
 GENERIC# annotate-methods 1 ( word quot -- )
 
