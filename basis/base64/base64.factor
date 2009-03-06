@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators io io.binary io.encodings.binary
-io.streams.byte-array io.streams.string kernel math namespaces
+io.streams.byte-array kernel math namespaces
 sequences strings io.crlf ;
 IN: base64
 
@@ -75,10 +75,10 @@ PRIVATE>
     } case ;
 
 : >base64 ( seq -- base64 )
-    binary [ [ encode-base64 ] with-string-reader ] with-byte-writer ;
+    binary [ binary [ encode-base64 ] with-byte-reader ] with-byte-writer ;
 
 : base64> ( base64 -- seq )
-    [ binary [ decode-base64 ] with-byte-reader ] with-string-writer ;
+    binary [ binary [ decode-base64 ] with-byte-reader ] with-byte-writer ;
 
 : >base64-lines ( seq -- base64 )
-    binary [ [ encode-base64-lines ] with-string-reader ] with-byte-writer ;
+    binary [ binary [ encode-base64-lines ] with-byte-reader ] with-byte-writer ;
