@@ -1,4 +1,4 @@
-USING: help.markup help.syntax quotations kernel irc.messages ;
+USING: help.markup help.syntax quotations kernel irc.messages irc.messages.base irc.messages.parser ;
 IN: irc.client
 
 HELP: irc-client "IRC Client object" ;
@@ -56,15 +56,15 @@ ARTICLE: "irc.client" "IRC Client"
 "Some of the RFC defined irc messages as objects:"
 { $table
   { { $link irc-message } "base of all irc messages" }
-  { { $link logged-in } "logged in to server" }
+  { { $link rpl-welcome } "logged in to server" }
   { { $link ping } "ping message" }
   { { $link join } "channel join" }
   { { $link part } "channel part" }
   { { $link quit } "quit from irc" }
   { { $link privmsg } "private message (to client or channel)" }
   { { $link kick } "kick from channel" }
-  { { $link roomlist } "list of participants in channel" }
-  { { $link nick-in-use } "chosen nick is in use by another client" }
+  { { $link rpl-names } "list of participants in channel" }
+  { { $link rpl-nickname-in-use } "chosen nick is in use by another client" }
   { { $link notice } "notice message" }
   { { $link mode } "mode change" }
   { { $link unhandled } "uninmplemented/unhandled message" }

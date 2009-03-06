@@ -3,7 +3,7 @@
 USING: concurrency.mailboxes kernel io.sockets io.encodings.8-bit calendar
        accessors destructors namespaces io assocs arrays fry
        continuations threads strings classes combinators splitting hashtables
-       ascii irc.messages ;
+       ascii irc.messages irc.messages.base irc.messages.parser call ;
 RENAME: join sequences => sjoin
 EXCLUDE: sequences => join ;
 IN: irc.client
@@ -74,12 +74,12 @@ SINGLETON: irc-disconnected ! sent when connection is lost
 SINGLETON: irc-connected    ! sent when connection is established
 
 : terminate-irc ( irc-client -- )
-    [ is-running>> ] keep and [
+    dup is-running>> [
         f >>is-running
         [ stream>> dispose ] keep
         [ in-messages>> ] [ out-messages>> ] bi 2array
         [ irc-end swap mailbox-put ] each
-    ] when* ;
+    ] [ drop ] if ;
 
 <PRIVATE
 
@@ -120,7 +120,7 @@ M: irc-chat to-chat in-messages>> mailbox-put ;
 
 : chats-with-participant ( nick -- seq )
     irc> chats>> values
-    [ [ irc-channel-chat? ] keep and [ participants>> key? ] [ drop f ] if* ]
+    [ dup irc-channel-chat? [ participants>> key? ] [ 2drop f ] if ]
     with filter ;
 
 : to-chats-with-participant ( message nickname -- )
@@ -165,11 +165,10 @@ M: irc-chat to-chat in-messages>> mailbox-put ;
     " hostname servername :irc.factor" irc-print ;
 
 : /CONNECT ( server port -- stream )
-    irc> connect>> call drop ; inline
+    irc> connect>> call( host port -- stream local ) drop ;
 
 : /JOIN ( channel password -- )
-    "JOIN " irc-write
-    [ [ " :" ] dip 3append ] when* irc-print ;
+    "JOIN " irc-write [ " :" swap 3append ] when* irc-print ;
 
 : /PONG ( text -- )
     "PONG " irc-write irc-print ;
@@ -187,7 +186,7 @@ M: join forward-name trailing>> ;
 M: part forward-name channel>> ;
 M: kick forward-name channel>> ;
 M: mode forward-name name>> ;
-M: privmsg forward-name dup name>> me? [ irc-message-sender ] [ name>> ] if ;
+M: privmsg forward-name dup target>> me? [ sender>> ] [ target>> ] if ;
 
 UNION: single-forward join part kick mode privmsg ;
 UNION: multiple-forward nick quit ;
@@ -200,48 +199,48 @@ M: irc-message forward-message
 M: single-forward forward-message dup forward-name to-chat ;
 
 M: multiple-forward forward-message
-    dup irc-message-sender to-chats-with-participant ;
+    dup sender>> to-chats-with-participant ;
   
 M: broadcast-forward forward-message
     irc> chats>> values [ to-chat ] with each ;
 
 GENERIC: process-message ( irc-message -- )
 M: object      process-message drop ; 
-M: logged-in   process-message
-    name>> t irc> [ (>>is-ready) ] [ (>>nick) ] [ chats>> ] tri
+M: rpl-welcome process-message
+    nickname>> t irc> [ (>>is-ready) ] [ (>>nick) ] [ chats>> ] tri
     values [ initialize-chat ] each ;
 M: ping        process-message trailing>> /PONG ;
-M: nick-in-use process-message name>> "_" append /NICK ;
+M: rpl-nickname-in-use process-message name>> "_" append /NICK ;
 
 M: join process-message
-    [ drop +normal+ ] [ irc-message-sender ] [ trailing>> ] tri
+    [ drop +normal+ ] [ sender>> ] [ trailing>> ] tri
     dup chat> [ add-participant ] [ 3drop ] if ;
 
 M: part process-message
-    [ irc-message-sender ] [ channel>> ] bi remove-participant ;
+    [ sender>> ] [ channel>> ] bi remove-participant ;
 
 M: kick process-message
-    [ [ who>> ] [ channel>> ] bi remove-participant ]
-    [ dup who>> me? [ unregister-chat ] [ drop ] if ]
+    [ [ user>> ] [ channel>> ] bi remove-participant ]
+    [ dup user>> me? [ unregister-chat ] [ drop ] if ]
     bi ;
 
 M: quit process-message
-    irc-message-sender remove-participant-from-all ;
+    sender>> remove-participant-from-all ;
 
 M: nick process-message
-    [ irc-message-sender ] [ trailing>> ] bi rename-participant-in-all ;
+    [ sender>> ] [ trailing>> ] bi rename-participant-in-all ;
 
 M: mode process-message ( mode -- )
-    [ channel-mode? ] keep and [
+    dup channel-mode? [
         [ name>> ] [ mode>> ] [ parameter>> ] tri
         [ change-participant-mode ] [ 2drop ] if*
-    ] when* ;
+    ] [ drop ] if ;
 
 : >nick/mode ( string -- nick mode )
     dup first "+@" member? [ unclip ] [ 0 ] if participant-mode ;
 
 : names-reply>participants ( names-reply -- participants )
-    trailing>> [ blank? ] trim " " split
+    nicks>> [ blank? ] trim " " split
     [ >nick/mode 2array ] map >hashtable ;
 
 : maybe-clean-participants ( channel-chat -- )
@@ -249,14 +248,14 @@ M: mode process-message ( mode -- )
         H{ } clone >>participants f >>clean-participants
     ] when drop ;
 
-M: names-reply process-message
+M: rpl-names process-message
     [ names-reply>participants ] [ channel>> chat> ] bi [
         [ maybe-clean-participants ] 
         [ participants>> 2array assoc-combine ]
         [ (>>participants) ] tri
     ] [ drop ] if* ;
 
-M: end-of-names process-message
+M: rpl-names-end process-message
     channel>> chat> [
         t >>clean-participants
         [ f f f <participant-changed> ] dip name>> to-chat
@@ -268,7 +267,7 @@ M: end-of-names process-message
 
 GENERIC: handle-outgoing-irc ( irc-message -- ? )
 M: irc-end     handle-outgoing-irc drop f ;
-M: irc-message handle-outgoing-irc irc-message>client-line irc-print t ;
+M: irc-message handle-outgoing-irc irc-message>string irc-print t ;
 
 ! ======================================
 ! Reader/Writer
@@ -293,9 +292,9 @@ DEFER: (connect-irc)
 : (reader-loop) ( -- ? )
     irc> stream>> [
         |dispose stream-readln [
-            parse-irc-line handle-reader-message t
+            string>irc-message handle-reader-message t
         ] [
-            handle-disconnect
+            f handle-disconnect
         ] if*
     ] with-destructors ;
 
@@ -314,7 +313,7 @@ DEFER: (connect-irc)
     [ forward-message ] [ process-message ] [ irc-end? not ] tri ;
 
 : strings>privmsg ( name string -- privmsg )
-    privmsg new [ (>>trailing) ] keep [ (>>name) ] keep ;
+    privmsg new [ (>>trailing) ] keep [ (>>target) ] keep ;
 
 : maybe-annotate-with-name ( name obj -- obj )
     { { [ dup string? ] [ strings>privmsg ] }
@@ -325,7 +324,7 @@ DEFER: (connect-irc)
 GENERIC: annotate-message ( chat object -- object )
 M: object  annotate-message nip ;
 M: part    annotate-message swap name>> >>channel ;
-M: privmsg annotate-message swap name>> >>name ;
+M: privmsg annotate-message swap name>> >>target ;
 M: string  annotate-message [ name>> ] dip strings>privmsg ;
 
 : spawn-irc ( -- )
@@ -335,7 +334,7 @@ M: string  annotate-message [ name>> ] dip strings>privmsg ;
     3drop ;
 
 GENERIC: (attach-chat) ( irc-chat -- )
-USE: prettyprint
+
 M: irc-chat (attach-chat)
     [ [ irc> >>client ] [ name>> ] bi irc> chats>> set-at ]
     [ [ irc> is-ready>> ] dip and [ initialize-chat ] when* ]
