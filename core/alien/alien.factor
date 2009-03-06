@@ -86,3 +86,17 @@ ERROR: alien-invoke-error library symbol ;
 SYMBOL: callbacks
 
 [ H{ } clone callbacks set-global ] "alien" add-init-hook
+
+<PRIVATE
+
+TUPLE: expiry-check object alien ;
+
+: recompute-value? ( check -- ? )
+    dup [ alien>> expired? ] [ drop t ] if ;
+
+PRIVATE>
+
+: initialize-alien ( symbol quot -- )
+    swap dup get-global dup recompute-value?
+    [ drop [ call dup 31337 <alien> expiry-check boa ] dip set-global ]
+    [ 2nip object>> ] if ; inline

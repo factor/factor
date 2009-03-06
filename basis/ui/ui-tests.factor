@@ -1,4 +1,5 @@
 IN: ui.tests
-USING: ui tools.test ;
+USING: ui ui.private tools.test ;
 
 \ open-window must-infer
+\ update-ui must-infer

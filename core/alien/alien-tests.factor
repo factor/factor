@@ -74,3 +74,15 @@ cell 8 = [
 [ f ] [ DLL" fadfasdfsada" dll-valid? ] unit-test
 
 [ f ] [ "does not exist" DLL" fadsfasfdsaf" dlsym ] unit-test
+
+SYMBOL: initialize-test
+
+f initialize-test set-global
+
+[ 31337 ] [ initialize-test [ 31337 ] initialize-alien ] unit-test
+
+[ 31337 ] [ initialize-test [ 69 ] initialize-alien ] unit-test
+
+[ ] [ initialize-test get BAD-ALIEN >>alien drop ] unit-test
+
+[ 7575 ] [ initialize-test [ 7575 ] initialize-alien ] unit-test

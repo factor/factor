@@ -1,13 +1,22 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ui.gadgets ui.gadgets.viewports
-ui.gadgets.frames ui.gadgets.grids ui.gadgets.theme
-ui.gadgets.sliders ui.gestures kernel math namespaces sequences
-models models.range models.compose combinators math.vectors
-classes.tuple math.geometry.rect combinators.short-circuit ;
+ui.gadgets.frames ui.gadgets.grids ui.gadgets.sliders
+ui.gestures kernel math namespaces sequences models models.range
+models.product combinators math.vectors classes.tuple
+math.rectangles combinators.short-circuit ;
 IN: ui.gadgets.scrollers
 
-TUPLE: scroller < frame viewport x y follows ;
+TUPLE: scroller < frame column-header viewport x y follows ;
+
+! Scrollable gadget protocol; optional
+GENERIC: pref-viewport-dim ( gadget -- dim )
+
+M: gadget pref-viewport-dim pref-dim ;
+
+GENERIC: viewport-column-header ( gadget -- gadget/f )
+
+M: gadget viewport-column-header drop f ;
 
 : find-scroller ( gadget -- scroller/f )
     [ scroller? ] find-parent ;
@@ -20,6 +29,8 @@ TUPLE: scroller < frame viewport x y follows ;
 
 : scroll-down-line ( scroller -- ) y>> 1 swap slide-by-line ;
 
+<PRIVATE
+
 : do-mouse-scroll ( scroller -- )
     scroll-direction get-global
     [ first swap x>> slide-by-line ]
@@ -27,43 +38,27 @@ TUPLE: scroller < frame viewport x y follows ;
     2bi ;
 
 scroller H{
-    { T{ mouse-scroll } [ do-mouse-scroll ] }
+    { mouse-scroll [ do-mouse-scroll ] }
 } set-gestures
 
 : <scroller-model> ( -- model )
-    0 0 0 0 <range> 0 0 0 0 <range> 2array <compose> ;
+    0 0 0 0 <range> 0 0 0 0 <range> 2array <product> ;
 
-: new-scroller ( gadget class -- scroller )
-    new-frame
-        t >>root?
-        <scroller-model> >>model
-
-        dup model>> dependencies>>
-        [ first <x-slider> [ >>x ] [ @bottom grid-add ] bi ]
-        [ second <y-slider> [ >>y ] [ @right grid-add ] bi ] bi
-
-        tuck model>> <viewport> [ >>viewport ] [ @center grid-add ] bi
-
-        faint-boundary ; inline
-
-: <scroller> ( gadget -- scroller ) scroller new-scroller ;
+M: viewport pref-dim* gadget-child pref-viewport-dim ;
 
 : scroll ( value scroller -- )
     [
-        viewport>> [ rect-dim { 0 0 } ] [ viewport-dim ] bi
+        viewport>> [ dim>> { 0 0 } ] [ gadget-child pref-dim ] bi
         4array flip
     ] keep
     2dup control-value = [ 2drop ] [ set-control-value ] if ;
 
-: rect-min ( rect dim -- rect' )
-    [ [ loc>> ] [ dim>> ] bi ] dip vmin <rect> ;
-
 : (scroll>rect) ( rect scroller -- )
-    [ [ loc>> { 1 1 } v- ] [ dim>> { 1 1 } v+ ] bi <rect> ] dip
+    [ [ loc>> ] [ dim>> { 1 1 } v+ ] bi <rect> ] dip
     {
-        [ scroller-value vneg offset-rect viewport-gap offset-rect ]
+        [ scroller-value vneg offset-rect ]
         [ viewport>> dim>> rect-min ]
-        [ viewport>> 2rect-extent [ v- { 0 0 } vmin ] [ v- { 0 0 } vmax ] 2bi* v+ ]
+        [ viewport>> [ v- { 0 0 } vmin ] [ v- { 0 0 } vmax ] with-rect-extents v+ ]
         [ scroller-value v+ ]
         [ scroll ]
     } cleave ;
@@ -76,39 +71,18 @@ scroller H{
     { [ nip ] [ viewport>> gadget-child swap child? ] [ nip ] }
     2&& ;
 
-: scroll>rect ( rect gadget -- )
-    dup find-scroller* dup [
-        [ relative-scroll-rect ] keep
-        swap >>follows
-        relayout
-    ] [ 3drop ] if ;
-
 : (update-scroller) ( scroller -- )
     [ scroller-value ] keep scroll ;
 
 : (scroll>gadget) ( gadget scroller -- )
     2dup swap child? [
-        [ [ pref-dim { 0 0 } swap <rect> ] keep ] dip
+        [ [ [ { 0 0 } ] dip pref-dim <rect> ] keep ] dip
         [ relative-scroll-rect ] keep
         (scroll>rect)
     ] [ f >>follows (update-scroller) drop ] if ;
 
-: scroll>gadget ( gadget -- )
-    dup find-scroller* dup [
-        swap >>follows
-        relayout
-    ] [
-        2drop
-    ] if ;
-
 : (scroll>bottom) ( scroller -- )
-    [ viewport>> viewport-dim { 0 1 } v* ] keep scroll ;
-
-: scroll>bottom ( gadget -- )
-    find-scroller [ t >>follows relayout-1 ] when* ;
-
-: scroll>top ( gadget -- )
-    <zero-rect> swap scroll>rect ;
+    [ viewport>> gadget-child pref-dim { 0 1 } v* ] keep scroll ;
 
 GENERIC: update-scroller ( scroller follows -- )
 
@@ -132,12 +106,61 @@ M: scroller focusable-child*
 M: scroller model-changed
     f >>follows 2drop ;
 
-TUPLE: limited-scroller < scroller
-{ min-dim initial: { 0 0 } }
-{ max-dim initial: { 1/0. 1/0. } } ;
+: build-scroller ( scroller -- scroller )
+    dup x>> { 0 1 } grid-add
+    dup y>> { 1 0 } grid-add
+    dup viewport>> { 0 0 } grid-add ; inline
 
-: <limited-scroller> ( gadget -- scroller )
-    limited-scroller new-scroller ;
+: <column-header-viewport> ( scroller -- viewport )
+    [ column-header>> ] [ model>> ] bi
+    <viewport> horizontal >>constraint ;
 
-M: limited-scroller pref-dim*
-    [ call-next-method ] [ min-dim>> vmax ] [ max-dim>> vmin ] tri ;
+: build-header-scroller ( scroller -- scroller )
+    dup <column-header-viewport> { 0 0 } grid-add
+    dup x>> { 0 2 } grid-add
+    dup y>> { 1 1 } grid-add
+    dup viewport>> { 0 1 } grid-add ; inline
+
+: init-scroller ( column-header scroller -- scroller )
+    { 1 1 } >>gap
+    over { 0 1 } { 0 0 } ? >>filled-cell
+    t >>root?
+    <scroller-model> >>model
+    swap >>column-header ; inline
+
+: build-children ( gadget scroller -- scroller )
+    dup model>> dependencies>>
+    [ first horizontal <slider> >>x ]
+    [ second vertical <slider> >>y ] bi
+    [ nip ] [ model>> <viewport> ] 2bi >>viewport ; inline
+
+PRIVATE>
+
+: <scroller> ( gadget -- scroller )
+    dup viewport-column-header
+    dup [ 2 3 ] [ 2 2 ] if scroller new-frame
+        init-scroller
+        build-children
+        dup column-header>>
+        [ build-header-scroller ] [ build-scroller ] if ;
+
+: scroll>rect ( rect gadget -- )
+    dup find-scroller* dup [
+        [ relative-scroll-rect ] keep
+        swap >>follows
+        relayout
+    ] [ 3drop ] if ;
+
+: scroll>gadget ( gadget -- )
+    dup find-scroller* dup [
+        swap >>follows
+        relayout
+    ] [
+        2drop
+    ] if ;
+
+: scroll>bottom ( gadget -- )
+    find-scroller [ t >>follows relayout-1 ] when* ;
+
+: scroll>top ( gadget -- )
+    <zero-rect> swap scroll>rect ;

@@ -43,13 +43,13 @@ PRIVATE>
     >intervals ensure-disjoint interval-map boa ;
 
 : <interval-set> ( specification -- map )
-    [ dup 2array ] map <interval-map> ;
+    dup zip <interval-map> ;
 
 :: coalesce ( alist -- specification )
     ! Only works with integer keys, because they're discrete
     ! Makes 2array keys
     [
-        alist sort-keys unclip first2 dupd roll
+        alist sort-keys unclip swap [ [ first dup ] [ second ] bi ] dip
         [| oldkey oldval key val | ! Underneath is start
             oldkey 1+ key =
             oldval val = and

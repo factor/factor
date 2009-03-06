@@ -1,21 +1,17 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types continuations kernel libc math macros
-namespaces math.vectors math.constants math.functions
-math.parser opengl.gl opengl.glu combinators arrays sequences
-splitting words byte-arrays assocs colors accessors
-generalizations locals fry specialized-arrays.float
-specialized-arrays.uint ;
+namespaces math.vectors math.parser opengl.gl opengl.glu
+combinators arrays sequences splitting words byte-arrays assocs
+colors colors.constants accessors generalizations locals fry
+specialized-arrays.float specialized-arrays.uint ;
 IN: opengl
 
-: color>raw ( object -- r g b a )
-    >rgba { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave ; inline
+: gl-color ( color -- ) >rgba-components glColor4d ; inline
 
-: gl-color ( color -- ) color>raw glColor4d ; inline
-
-: gl-clear-color ( color -- ) color>raw glClearColor ;
+: gl-clear-color ( color -- ) >rgba-components glClearColor ;
 
 : gl-clear ( color -- )
     gl-clear-color GL_COLOR_BUFFER_BIT glClear ;
@@ -43,10 +39,10 @@ IN: opengl
     [ glDisableClientState ] each ; inline
 
 MACRO: all-enabled ( seq quot -- )
-    [ words>values ] dip [ (all-enabled) ] 2curry ;
+    [ words>values ] dip '[ _ _ (all-enabled) ] ;
 
 MACRO: all-enabled-client-state ( seq quot -- )
-    [ words>values ] dip [ (all-enabled-client-state) ] 2curry ;
+    [ words>values ] dip '[ _ (all-enabled-client-state) ] ;
 
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep
@@ -109,47 +105,17 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : gl-fill-rect ( dim -- )
     fill-rect-vertices (gl-fill-rect) ;
 
-: circle-steps ( steps -- angles )
-    dup length v/n 2 pi * v*n ;
-
-: unit-circle ( angles -- points1 points2 )
-    [ [ sin ] map ] [ [ cos ] map ] bi ;
-
-: adjust-points ( points1 points2 -- points1' points2' )
-    [ [ 1 + 0.5 * ] map ] bi@ ;
-
-: scale-points ( loc dim points1 points2 -- points )
-    zip [ v* ] with map [ v+ ] with map ;
-
-: circle-points ( loc dim steps -- points )
-    circle-steps unit-circle adjust-points scale-points ;
-
-: close-path ( points -- points' )
-    dup first suffix ;
-
-: circle-vertices ( loc dim steps -- vertices )
-    #! We use GL_LINE_STRIP with a duplicated first vertex
-    #! instead of GL_LINE_LOOP to work around a bug in Apple's
-    #! X3100 driver.
-    circle-points close-path concat >float-array ;
-
-: fill-circle-vertices ( loc dim steps -- vertices )
-    circle-points concat >float-array ;
+: do-attribs ( bits quot -- )
+    swap glPushAttrib call glPopAttrib ; inline
 
 : (gen-gl-object) ( quot -- id )
     [ 1 0 <uint> ] dip keep *uint ; inline
-
-: gen-texture ( -- id )
-    [ glGenTextures ] (gen-gl-object) ;
 
 : gen-gl-buffer ( -- id )
     [ glGenBuffers ] (gen-gl-object) ;
 
 : (delete-gl-object) ( id quot -- )
     [ 1 swap <uint> ] dip call ; inline
-
-: delete-texture ( id -- )
-    [ glDeleteTextures ] (delete-gl-object) ;
 
 : delete-gl-buffer ( id -- )
     [ glDeleteBuffers ] (delete-gl-object) ;
@@ -180,78 +146,19 @@ MACRO: all-enabled-client-state ( seq quot -- )
     [ length ] [ >uint-array ] bi glDrawBuffers ;
 
 MACRO: set-draw-buffers ( buffers -- )
-    words>values [ (set-draw-buffers) ] curry ;
-
-: do-attribs ( bits quot -- )
-    swap glPushAttrib call glPopAttrib ; inline
+    words>values '[ _ (set-draw-buffers) ] ;
 
 : gl-look-at ( eye focus up -- )
     [ first3 ] tri@ gluLookAt ;
 
-TUPLE: sprite loc dim dim2 dlist texture ;
-
-: <sprite> ( loc dim dim2 -- sprite )
-    f f sprite boa ;
-
-: sprite-size2 ( sprite -- w h ) dim2>> first2 ;
-
-: sprite-width ( sprite -- w ) dim>> first ;
-
-: gray-texture ( sprite pixmap -- id )
-    gen-texture [
-        GL_TEXTURE_BIT [
-            GL_TEXTURE_2D swap glBindTexture
-            [
-                [ GL_TEXTURE_2D 0 GL_RGBA ] dip
-                sprite-size2 0 GL_LUMINANCE_ALPHA
-                GL_UNSIGNED_BYTE
-            ] dip glTexImage2D
-        ] do-attribs
-    ] keep ;
-    
 : gen-dlist ( -- id ) 1 glGenLists ;
 
 : make-dlist ( type quot -- id )
-    gen-dlist [ rot glNewList call glEndList ] keep ; inline
-
-: init-texture ( -- )
-    GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP glTexParameterf
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP glTexParameterf ;
+    [ gen-dlist ] 2dip '[ _ glNewList @ glEndList ] keep ; inline
 
 : gl-translate ( point -- ) first2 0.0 glTranslated ;
 
-: rect-texture-coords ( -- )
-    float-array{ 0 0 1 0 1 1 0 1 } gl-texture-coord-pointer ;
-
-: draw-sprite ( sprite -- )
-    GL_TEXTURE_COORD_ARRAY [
-        dup loc>> gl-translate
-        GL_TEXTURE_2D over texture>> glBindTexture
-        init-texture rect-texture-coords
-        dim2>> fill-rect-vertices
-        (gl-fill-rect)
-        GL_TEXTURE_2D 0 glBindTexture
-    ] do-enabled-client-state ;
-
-: make-sprite-dlist ( sprite -- id )
-    GL_MODELVIEW [
-        GL_COMPILE [ draw-sprite ] make-dlist
-    ] do-matrix ;
-
-: init-sprite ( texture sprite -- )
-    swap >>texture
-    dup make-sprite-dlist >>dlist drop ;
-
 : delete-dlist ( id -- ) 1 glDeleteLists ;
-
-: free-sprite ( sprite -- )
-    [ dlist>> delete-dlist ]
-    [ texture>> delete-texture ] bi ;
-
-: free-sprites ( sprites -- )
-    [ nip [ free-sprite ] when* ] assoc-each ;
 
 : with-translation ( loc quot -- )
     GL_MODELVIEW [ [ gl-translate ] dip call ] do-matrix ; inline
