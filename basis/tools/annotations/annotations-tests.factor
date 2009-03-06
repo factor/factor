@@ -1,5 +1,5 @@
 USING: tools.test tools.annotations tools.time math parser eval
-io.streams.string kernel ;
+io.streams.string kernel strings ;
 IN: tools.annotations.tests
 
 : foo ;
