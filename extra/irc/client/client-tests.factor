@@ -1,7 +1,7 @@
 USING: kernel tools.test accessors arrays sequences
        io io.streams.duplex namespaces threads destructors
-       calendar irc.client.private irc.client irc.messages.private
-       concurrency.mailboxes classes assocs combinators ;
+       calendar irc.client.private irc.client irc.messages
+       concurrency.mailboxes classes assocs combinators irc.messages.parser ;
 EXCLUDE: irc.messages => join ;
 RENAME: join irc.messages => join_
 IN: irc.client.tests
@@ -49,13 +49,13 @@ M: mb-writer dispose drop ;
 
   { "factorbot" } [ irc> nick>> ] unit-test
 
-  { "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
+!  { "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
 
   { "#factortest" } [ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
-                      parse-irc-line forward-name ] unit-test
+                      string>irc-message forward-name ] unit-test
 
   { "someuser" } [ ":someuser!n=user@some.where PRIVMSG factorbot :hi"
-                   parse-irc-line forward-name ] unit-test
+                   string>irc-message forward-name ] unit-test
 ] with-irc
 
 ! Test login and nickname set
@@ -102,7 +102,7 @@ M: mb-writer dispose drop ;
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
       ":somebody!n=somebody@some.where PRIVMSG #factortest :hello" %push-line
       [ privmsg? ] read-matching-message
-      [ class ] [ name>> ] [ trailing>> ] tri
+      [ class ] [ target>> ] [ trailing>> ] tri
   ] unit-test
 ] with-irc
 
@@ -110,7 +110,7 @@ M: mb-writer dispose drop ;
       "ircuser" <irc-nick-chat>  [ %add-named-chat ] keep
       ":ircuser!n=user@isp.net PRIVMSG factorbot :hello" %push-line
       [ privmsg? ] read-matching-message
-      [ class ] [ name>> ] [ trailing>> ] tri
+      [ class ] [ target>> ] [ trailing>> ] tri
   ] unit-test
 ] with-irc
 
