@@ -106,3 +106,9 @@ ARTICLE: "test-article-2" "This is a test article"
 [ ] [
     \ = <model> [ see ] <pane-control> [ ] with-grafted-gadget
 ] unit-test
+
+: <test-pane> ( -- foo )
+    <gadget> pane new-pane ;
+
+[ t ] [ <test-pane> dup input>> child? ] unit-test
+[ t ] [ <test-pane> dup last-line>> child? ] unit-test
