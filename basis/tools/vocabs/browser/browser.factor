@@ -288,7 +288,7 @@ M: vocab-tag article-name name>> ;
 M: vocab-tag article-content
     \ $tagged-vocabs swap name>> 2array ;
 
-M: vocab-tag article-parent drop "vocab-index" ;
+M: vocab-tag article-parent drop "vocab-tags" ;
 
 M: vocab-tag summary article-title ;
 
@@ -302,6 +302,6 @@ M: vocab-author article-name name>> ;
 M: vocab-author article-content
     \ $authored-vocabs swap name>> 2array ;
 
-M: vocab-author article-parent drop "vocab-index" ;
+M: vocab-author article-parent drop "vocab-authors" ;
 
 M: vocab-author summary article-title ;

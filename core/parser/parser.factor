@@ -5,7 +5,7 @@ sequences strings vectors words words.symbol quotations io
 combinators sorting splitting math.parser effects continuations
 io.files vocabs io.encodings.utf8 source-files
 classes hashtables compiler.errors compiler.units accessors sets
-lexer vocabs.parser ;
+lexer vocabs.parser slots ;
 IN: parser
 
 : location ( -- loc )
@@ -223,8 +223,8 @@ print-use-hook [ [ ] ] initialize
     swap assoc-diff keys [
         {
             { [ dup where dup [ first ] when file get path>> = not ] [ f ] }
-            { [ dup "reading" word-prop ] [ f ] }
-            { [ dup "writing" word-prop ] [ f ] }
+            { [ dup reader-method? ] [ f ] }
+            { [ dup writer-method? ] [ f ] }
             [ t ]
         } cond nip
     ] filter ;

@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.functions math.parser models
 models.arrow models.range models.product sequences ui
-ui.gadgets ui.gadgets.frames ui.gadgets.labels ui.gadgets.packs
-ui.gadgets.sliders ui.render math.rectangles accessors
+ui.gadgets ui.gadgets.tracks ui.gadgets.labels ui.gadgets.packs
+ui.gadgets.sliders ui.pens.solid ui.render math.rectangles accessors
 ui.gadgets.grids colors ;
 IN: color-picker
 
@@ -12,7 +12,7 @@ IN: color-picker
 TUPLE: color-preview < gadget ;
 
 : <color-preview> ( model -- gadget )
-    color-preview new-gadget
+    color-preview new
         swap >>model
         { 100 100 } >>dim ;
 
@@ -32,16 +32,16 @@ M: color-preview model-changed
     bi ;
 
 : <color-picker> ( -- gadget )
-    <frame>
+    vertical <track>
         { 5 5 } >>gap
         <color-sliders>
-        [ @top grid-add ]
+        [ f track-add ]
         [
-            [ <color-model> <color-preview> @center grid-add ]
+            [ <color-model> <color-preview> 1 track-add ]
             [
                 [ [ truncate number>string ] map " " join ]
                 <arrow> <label-control>
-                @bottom grid-add
+                f track-add
             ] bi
         ] bi* ;
 

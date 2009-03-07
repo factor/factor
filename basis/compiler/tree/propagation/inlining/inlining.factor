@@ -17,8 +17,10 @@ IN: compiler.tree.propagation.inlining
 ! we are more eager to inline
 SYMBOL: node-count
 
-: count-nodes ( nodes -- )
-    0 swap [ drop 1+ ] each-node node-count set ;
+: count-nodes ( nodes -- n )
+    0 swap [ drop 1+ ] each-node ;
+
+: compute-node-count ( nodes -- ) count-nodes node-count set ;
 
 ! We try not to inline the same word too many times, to avoid
 ! combinatorial explosion
@@ -33,9 +35,6 @@ M: word splicing-nodes
 M: callable splicing-nodes
     build-sub-tree analyze-recursive normalize ;
 
-: propagate-body ( #call -- )
-    body>> (propagate) ;
-
 ! Dispatch elimination
 : eliminate-dispatch ( #call class/f word/quot/f -- ? )
     dup [
@@ -44,7 +43,7 @@ M: callable splicing-nodes
             2dup splicing-nodes
             [ >>method ] [ >>body ] bi*
         ] if
-        propagate-body t
+        body>> (propagate) t
     ] [ 2drop f >>method f >>body f >>class drop f ] if ;
 
 : inlining-standard-method ( #call word -- class/f method/f )
@@ -161,10 +160,10 @@ SYMBOL: history
 : inline-word-def ( #call word quot -- ? )
     over history get memq? [ 3drop f ] [
         [
-            swap remember-inlining
-            dupd splicing-nodes >>body
-            propagate-body
-        ] with-scope
+            [ remember-inlining ] dip
+            [ drop ] [ splicing-nodes ] 2bi
+            [ >>body drop ] [ count-nodes ] [ (propagate) ] tri
+        ] with-scope node-count +@
         t
     ] if ;
 

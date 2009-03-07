@@ -20,5 +20,5 @@ IN: compiler.tree.propagation
     H{ } clone 1array value-infos set
     H{ } clone 1array constraints set
     H{ } clone inlining-count set
-    dup count-nodes
+    dup compute-node-count
     dup (propagate) ;
