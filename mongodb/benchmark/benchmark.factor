@@ -1,19 +1,19 @@
 USING: calendar math fry kernel assocs math.ranges
 sequences formatting combinators namespaces io tools.time prettyprint
-accessors words mongodb.driver ;
+accessors words mongodb.driver strings math.parser ;
 
 IN: mongodb.benchmark
 
-SYMBOLS: per-trial collection host db port ;
+SYMBOL: collection
 
 : get* ( symbol default -- value )
     [ get ] dip or ; inline
 
 : trial-size ( -- size )
-    per-trial 10000 get* ; inline flushable
+    "per-trial" 10000 get* ; inline flushable
 
 : batch-size ( -- size )
-    \ batch-size 100 get* ; inline flushable
+    "batch-size" 100 get* ; inline flushable
 
 TUPLE: result doc collection index batch lasterror ;
 
@@ -249,7 +249,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 
     
 : run-benchmarks ( -- )
-    db "db" get* host "127.0.0.1" get* port 27020 get* <mdb>
+    "db" "db" get* "host" "127.0.0.1" get* "port" 27020 get* dup string? [ string>number ] when <mdb>
     [
         print-header
         ! insert
@@ -270,4 +270,5 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
         
     ] with-db ;
         
+MAIN: run-benchmarks
 
