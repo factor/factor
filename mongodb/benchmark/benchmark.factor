@@ -9,15 +9,19 @@ SYMBOL: collection
 : get* ( symbol default -- value )
     [ get ] dip or ; inline
 
+: ensure-number ( v -- n )
+    dup string? [ string>number ] when ; inline
+
 : trial-size ( -- size )
-    "per-trial" 10000 get* ; inline flushable
+    "per-trial" 10000 get* ensure-number ; inline flushable
 
 : batch-size ( -- size )
-    "batch-size" 100 get* ; inline flushable
+    "batch-size" 100 get* ensure-number ; inline flushable
 
 TUPLE: result doc collection index batch lasterror ;
 
 : <result> ( -- ) result new result set ; inline
+
 
 CONSTANT: CHECK-KEY f 
 
@@ -249,7 +253,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 
     
 : run-benchmarks ( -- )
-    "db" "db" get* "host" "127.0.0.1" get* "port" 27020 get* dup string? [ string>number ] when <mdb>
+    "db" "db" get* "host" "127.0.0.1" get* "port" 27020 get* ensure-number <mdb>
     [
         print-header
         ! insert
