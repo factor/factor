@@ -1,17 +1,51 @@
 ! Copyright (C) 2008 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs bson.constants byte-arrays fry io io.binary
+USING: accessors assocs bson.constants 
+byte-arrays byte-vectors calendar fry io io.binary io.encodings
 io.encodings.binary io.encodings.string io.encodings.utf8
-io.streams.byte-array kernel math math.parser quotations sequences
-serialize strings words calendar ;
+io.streams.byte-array kernel math math.parser namespaces
+quotations sequences serialize strings words ;
+
 
 IN: bson.writer
 
-#! Writes the object out to a stream in BSON format
+#! Writes the object out to a byte-vector in BSON format
 
 <PRIVATE
 
-GENERIC: bson-type? ( obj -- type )
+SYMBOL: shared-buffer 
+
+CONSTANT: INT32-SIZE 4
+
+: (buffer) ( -- buffer )
+    shared-buffer get
+    [ 4096 <byte-vector> [ shared-buffer set ] keep ] unless* ; inline
+
+PRIVATE>
+
+: ensure-buffer ( -- )
+    (buffer) drop ;
+
+: reset-buffer ( -- )
+    (buffer) 0 >>length drop ;
+
+: with-buffer ( quot -- byte-vector )
+    [ (buffer) ] dip [ output-stream get ] compose
+    with-output-stream* dup encoder? [ stream>> ] when ; inline
+
+: with-length ( quot: ( -- ) -- bytes-written start-index )
+    [ (buffer) [ length ] keep ] dip call
+    length swap [ - ] keep ; inline
+
+: with-length-prefix ( quot: ( -- ) -- )
+    [ B{ 0 0 0 0 } write ] prepose with-length
+    [ INT32-SIZE >le ] dip (buffer)
+    '[ _ over [ nth ] dip _ + _ set-nth ]
+    [ INT32-SIZE ] dip each-integer ; inline
+
+<PRIVATE
+
+GENERIC: bson-type? ( obj -- type ) foldable flushable
 GENERIC: bson-write ( obj -- )
 
 M: t bson-type? ( boolean -- type ) drop T_Boolean ; 
@@ -41,7 +75,6 @@ M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ;
 : write-eoo ( -- ) T_EOO write-byte ; inline
 : write-type ( obj -- obj ) [ bson-type? write-byte ] keep ; inline
 : write-pair ( name object -- ) write-type [ write-cstring ] dip bson-write ; inline
-
 
 M: f bson-write ( f -- )
     drop 0 write-byte ; 
@@ -91,12 +124,10 @@ M: objref bson-write ( objref -- )
     write ;
     
 M: sequence bson-write ( array -- )
-    '[ _ [ [ write-type ] dip number>string write-cstring bson-write ]
-        each-index ]
-        binary swap with-byte-writer
-        [ length 5 + bson-write ] keep
-        write
-        write-eoo ; 
+    '[ _ [ [ write-type ] dip number>string
+           write-cstring bson-write ] each-index
+       write-eoo
+    ] with-length-prefix ;
 
 : write-oid ( assoc -- )
     [ MDB_OID_FIELD ] dip at*
@@ -106,20 +137,16 @@ M: sequence bson-write ( array -- )
     { "_id" "_mdb" } member? ; inline
 
 M: assoc bson-write ( assoc -- )
-    [ binary ] dip
     '[ _  [ write-oid ] keep
        [ over skip-field? [ 2drop ] [ write-pair ] if ] assoc-each
-    ] with-byte-writer
-    [ length 5 + bson-write ] keep
-    write
-    write-eoo ; 
+       write-eoo ] with-length-prefix ; 
 
 M: word bson-write name>> bson-write ;
 
 PRIVATE>
-    
-: assoc>array ( assoc -- byte-array )
-    '[ _ bson-write ] binary swap with-byte-writer ; inline
+
+: assoc>bv ( assoc -- byte-vector )
+    [ '[ _ bson-write ] with-buffer ] with-scope ; inline
 
 : assoc>stream ( assoc -- )
     bson-write ; inline

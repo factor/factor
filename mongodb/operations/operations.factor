@@ -3,6 +3,10 @@ io io.binary io.encodings.binary io.encodings.string io.encodings.utf8
 io.streams.byte-array kernel math mongodb.msg namespaces sequences
 locals assocs combinators linked-assocs ;
 
+IN: alien.c-types
+
+M: byte-vector byte-length length ;
+
 IN: mongodb.operations
 
 <PRIVATE
@@ -129,8 +133,7 @@ M: mdb-reply-op (read-message) ( msg-stub opcode -- message )
     read-int32 >>opcode
     read-int32 >>flags ; inline
 
-: write-header ( message length -- )
-    MSG-HEADER-SIZE + write-int32
+: write-header ( message -- )
     [ req-id>> write-int32 ] keep
     [ resp-id>> write-int32 ] keep 
     opcode>> write-int32 ; inline
@@ -145,10 +148,11 @@ PRIVATE>
 
 <PRIVATE
 
+USE: tools.walker
+
 : (write-message) ( message quot -- )
-     [ binary ] dip with-byte-writer 
-     [ length write-header ] keep 
-     write flush ; inline
+    '[ [ [ _ write-header ] dip _ call ] with-length-prefix ] with-buffer
+    write flush reset-buffer ; inline
 
 : build-query-object ( query -- selector )
     [let | selector [ H{ } clone ] |
@@ -158,7 +162,7 @@ PRIVATE>
           [ query>> "query" selector set-at ]
         } cleave
         selector
-    ] ;     
+    ] ; inline flushable    
 
 PRIVATE>
 
@@ -169,8 +173,8 @@ M: mdb-query-msg write-message ( message -- )
         [ collection>> write-cstring ] keep
         [ skip#>> write-int32 ] keep
         [ return#>> write-int32 ] keep
-        [ build-query-object assoc>array write ] keep
-        returnfields>> [ assoc>array write ] when* 
+        [ build-query-object assoc>stream ] keep
+        returnfields>> [ assoc>stream ] when* 
      ] (write-message) ;
  
 M: mdb-insert-msg write-message ( message -- )
@@ -178,7 +182,7 @@ M: mdb-insert-msg write-message ( message -- )
     '[ _
        [ flags>> write-int32 ] keep
        [ collection>> write-cstring ] keep
-       objects>> [ assoc>array write ] each
+       objects>> [ assoc>stream ] each
     ] (write-message) ;
 
 M: mdb-update-msg write-message ( message -- )
@@ -187,8 +191,8 @@ M: mdb-update-msg write-message ( message -- )
        [ flags>> write-int32 ] keep
        [ collection>> write-cstring ] keep
        [ upsert?>> write-int32 ] keep
-       [ selector>> assoc>array write ] keep
-       object>> assoc>array write
+       [ selector>> assoc>stream ] keep
+       object>> assoc>stream
     ] (write-message) ;
 
 M: mdb-delete-msg write-message ( message -- )
@@ -197,7 +201,7 @@ M: mdb-delete-msg write-message ( message -- )
        [ flags>> write-int32 ] keep
        [ collection>> write-cstring ] keep
        0 write-int32
-       selector>> assoc>array write
+       selector>> assoc>stream
     ] (write-message) ;
 
 M: mdb-getmore-msg write-message ( message -- )

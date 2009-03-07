@@ -3,7 +3,7 @@
 USING: assocs help.markup help.syntax kernel ;
 IN: bson.writer
 
-HELP: assoc>array
+HELP: assoc>bv
 { $values
      { "assoc" assoc }
      { "byte-array" null }

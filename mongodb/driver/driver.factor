@@ -1,6 +1,6 @@
 USING: accessors assocs fry io.sockets kernel math mongodb.msg formatting linked-assocs destructors continuations
 mongodb.operations namespaces sequences splitting math.parser io.encodings.binary combinators io.streams.duplex
-arrays io memoize constructors sets strings uuid ;
+arrays io memoize constructors sets strings uuid bson.writer ;
 
 IN: mongodb.driver
 
@@ -52,7 +52,7 @@ SYMBOL: mdb-instance
     nodes>> [ f ] dip at inet>> ;
 
 : with-db ( mdb quot -- ... )
-    [ [ '[ _ [ mdb-instance set ] keep master>>
+    [ [ '[ _ [ mdb-instance set ensure-buffer ] keep master>>
            [ remote-address set ] keep
            binary <client>
            local-address set
