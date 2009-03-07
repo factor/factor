@@ -58,6 +58,11 @@ M: mb-writer dispose drop ;
                    string>irc-message forward-name ] unit-test
 ] with-irc
 
+{ privmsg "#channel" "hello" } [
+    "#channel" "hello" strings>privmsg
+    [ class ] [ target>> ] [ trailing>> ] tri
+] unit-test
+
 ! Test login and nickname set
 [ { "factorbot2" } [
     ":some.where 001 factorbot2 :Welcome factorbot2" %push-line
