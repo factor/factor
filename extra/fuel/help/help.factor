@@ -48,7 +48,7 @@ SYMBOL: $doc-path
     ] { } make 3array ;
 
 : fuel-vocab-help-row ( vocab -- element )
-    [ drop "" ] [ vocab-name ] [ summary ] tri 3array ;
+    [ vocab-name ] [ summary ] bi 2array ;
 
 : fuel-vocab-help-root-heading ( root -- element )
     [ "Children from " prepend ] [ "Other children" ] if* \ $heading swap 2array ;
