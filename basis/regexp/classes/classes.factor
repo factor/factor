@@ -239,6 +239,9 @@ M: not-class replace-question
     '[ _ _ replace-question ] assoc-map
     [ nip ] assoc-filter ;
 
+: answers ( table questions answer -- new-table )
+    '[ _ answer ] each ;
+
 DEFER: make-condition
 
 : (make-condition) ( table questions question -- condition )

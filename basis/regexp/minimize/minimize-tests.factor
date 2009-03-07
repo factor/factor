@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test regexp.minimize assocs regexp
-accessors regexp.transition-tables regexp.parser regexp.negation ;
+accessors regexp.transition-tables regexp.parser
+regexp.classes regexp.negation ;
 IN: regexp.minimize.tests
 
 [ t ] [ 1 2 H{ { { 1 2 } t } } same-partition? ] unit-test
@@ -52,3 +53,6 @@ IN: regexp.minimize.tests
 ] unit-test
 
 [ [ ] [ ] while-changes ] must-infer
+
+[ H{ { T{ or-class f { 1 2 } } 3 } { 4 5 } } ]
+[ H{ { 1 3 } { 2 3 } { 4 5 } } combine-state-transitions ] unit-test

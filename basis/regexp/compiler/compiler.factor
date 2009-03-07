@@ -36,21 +36,17 @@ M: $ question>quot
 M: ^ question>quot
     drop [ { [ drop zero? ] [ [ 1- ] dip ?nth "\r\n" member? ] } 2|| ] ;
 
-! Maybe the condition>quot things can be combined, given a suitable method
-! for question>quot on classes, but maybe that'd make stack shuffling annoying
-
-: execution-quot ( next-state -- quot )
+: (execution-quot) ( next-state -- quot )
     ! The conditions here are for lookaround and anchors, etc
     dup condition? [
         [ question>> question>quot ] [ yes>> ] [ no>> ] tri
-        [ execution-quot ] bi@
+        [ (execution-quot) ] bi@
         '[ 2dup @ _ _ if ]
-    ] [
-        ! There shouldn't be a condition like this!
-        dup sequence?
-        [ [ [ 2drop ] ] [ first '[ _ execute ] ] if-empty ]
-        [ '[ _ execute ] ] if
-    ] if ;
+    ] [ '[ _ execute ] ] if ;
+
+: execution-quot ( next-state -- quot )
+    dup sequence? [ first ] when
+    (execution-quot) ;
 
 TUPLE: box contents ;
 C: <box> box
@@ -66,8 +62,9 @@ C: <box> box
         [ [ 3drop ] ] [ execution-quot '[ drop @ ] ] if-empty
     ] if ;
 
-: non-literals>dispatch ( non-literal-transitions -- quot )
+: non-literals>dispatch ( literals non-literals  -- quot )
     [ swap ] assoc-map ! we want state => predicate, and get the opposite as input
+    swap keys f answers
     table>condition [ <box> ] condition-map condition>quot ;
 
 : literals>cases ( literal-transitions -- case-body )
@@ -84,7 +81,7 @@ C: <box> box
 
 : split-literals ( transitions -- case default )
     >alist expand-or [ first integer? ] partition
-    [ literals>cases ] [ non-literals>dispatch ] bi* ;
+    [ [ literals>cases ] keep ] dip non-literals>dispatch ;
 
 :: step ( last-match index str quot final? direction -- last-index/f )
     final? index last-match ?

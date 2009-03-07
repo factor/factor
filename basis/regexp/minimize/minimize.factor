@@ -11,8 +11,8 @@ IN: regexp.minimize
 : number-states ( table -- newtable )
     dup table>state-numbers transitions-at ;
 
-: no-conditions? ( state transition-table -- ? )
-    transitions>> at values [ condition? ] any? not ;
+: has-conditions? ( state transitions -- ? )
+    at values [ condition? ] any? ;
 
 : initially-same? ( s1 s2 transition-table -- ? )
     {
@@ -25,7 +25,8 @@ IN: regexp.minimize
     ! Partition table is sorted-array => ?
     H{ } clone :> out
     transition-table transitions>> keys
-    [ transition-table no-conditions? ] filter :> states
+    [ transition-table transitions>> has-conditions? ] partition :> states
+    [ dup 2array out conjoin ] each
     states [| s1 |
         states [| s2 |
             s1 s2 transition-table initially-same?
@@ -68,16 +69,27 @@ IN: regexp.minimize
     '[ _ partition-more ] [ assoc-size ] while-changes
     partition>classes ;
 
-: canonical-state? ( state state-classes -- ? )
-    dupd at = ;
+: canonical-state? ( state transitions state-classes -- ? )
+    '[ dup _ at =  ] swap '[ _ has-conditions? ] bi or ;
 
 : delete-duplicates ( transitions state-classes -- new-transitions )
-    '[ drop _ canonical-state? ] assoc-filter ;
+    dupd '[ drop _ _ canonical-state? ] assoc-filter ;
 
 : combine-states ( table -- smaller-table )
     dup state-classes
     [ transitions-at ] keep
     '[ _ delete-duplicates ] change-transitions ;
 
+: combine-state-transitions ( hash -- hash )
+    H{ } clone tuck '[
+        _ [ 2array <or-class> ] change-at
+    ] assoc-each [ swap ] assoc-map ;
+
+: combine-transitions ( table -- table )
+    [ [ combine-state-transitions ] assoc-map ] change-transitions ;
+
 : minimize ( table -- minimal-table )
-    clone number-states combine-states ;
+    clone
+    number-states
+    combine-states
+    combine-transitions ;

@@ -40,13 +40,18 @@ C: <reverse-matcher> reverse-matcher
 : <reversed-option> ( ast -- reversed )
     "r" string>options <with-options> ;
 
+: maybe-negated ( lookaround quot -- regexp-quot )
+    '[ term>> @ ] [ positive?>> [ ] [ not ] ? ] bi compose ;
+
 M: lookahead question>quot ! Returns ( index string -- ? )
-    term>> ast>dfa dfa>shortest-quotation ;
+    [ ast>dfa dfa>shortest-quotation ] maybe-negated ;
 
 M: lookbehind question>quot ! Returns ( index string -- ? )
-    term>> <reversed-option>
-    ast>dfa dfa>reverse-shortest-quotation
-    [ [ 1- ] dip ] prepose ;
+    [
+        <reversed-option>
+        ast>dfa dfa>reverse-shortest-quotation
+        [ [ 1- ] dip ] prepose
+    ] maybe-negated ;
 
 : compile-reverse ( regexp -- regexp )
     dup '[

@@ -43,11 +43,11 @@ CONSTANT: fail-state -1
 
 : unify-final-state ( transition-table -- transition-table )
     dup [ final-states>> keys ] keep
-    '[ -2 epsilon _ add-transition ] each
+    '[ -2 epsilon _ set-transition ] each
     H{ { -2 -2 } } >>final-states ;
 
 : adjoin-dfa ( transition-table -- start end )
-    box-transitions unify-final-state renumber-states
+    unify-final-state renumber-states box-transitions 
     [ start-state>> ]
     [ final-states>> keys first ]
     [ nfa-table get [ transitions>> ] bi@ swap update ] tri ;
