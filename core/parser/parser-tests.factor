@@ -557,6 +557,9 @@ EXCLUDE: qualified.tests.bar => x ;
 [ "IN: qualified.tests RENAME: doesnotexist qualified.tests => blahx" eval ]
 [ error>> no-word-error? ] must-fail-with
 
+! Two similar bugs
+
+! Replace : def with something in << >>
 [ [ ] ] [
     "IN: parser.tests : was-once-a-word-bug ( -- ) ;"
     <string-reader> "was-once-a-word-test" parse-stream
@@ -570,3 +573,20 @@ EXCLUDE: qualified.tests.bar => x ;
 ] unit-test
 
 [ t ] [ "was-once-a-word-bug" "parser.tests" lookup >boolean ] unit-test
+
+! Replace : def with DEFER:
+[ [ ] ] [
+    "IN: parser.tests : is-not-deferred ( -- ) ;"
+    <string-reader> "is-not-deferred" parse-stream
+] unit-test
+
+[ t ] [ "is-not-deferred" "parser.tests" lookup >boolean ] unit-test
+[ f ] [ "is-not-deferred" "parser.tests" lookup deferred? ] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests DEFER: is-not-deferred"
+    <string-reader> "is-not-deferred" parse-stream
+] unit-test
+
+[ t ] [ "is-not-deferred" "parser.tests" lookup >boolean ] unit-test
+[ t ] [ "is-not-deferred" "parser.tests" lookup deferred? ] unit-test

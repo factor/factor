@@ -135,8 +135,7 @@ IN: bootstrap.syntax
 
     "DEFER:" [
         scan current-vocab create
-        dup old-definitions get [ delete-at ] with each
-        set-word
+        [ fake-definition ] [ set-word ] [ [ undefined ] define ] tri
     ] define-syntax
 
     ":" [

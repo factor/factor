@@ -120,7 +120,7 @@ M: method-body crossref?
     2bi ;
 
 : create-method ( class generic -- method )
-    2dup method dup [ 2nip ] [
+    2dup method dup [ 2nip dup reset-generic ] [
         drop
         [ <method> dup ] 2keep
         reveal-method
