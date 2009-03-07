@@ -220,10 +220,14 @@ print-use-hook [ [ ] ] initialize
     "quiet" get [ drop ] [ "Loading " write print flush ] if ;
 
 : filter-moved ( assoc1 assoc2 -- seq )
-    swap assoc-diff [
-        drop where dup [ first ] when
-        file get path>> =
-    ] assoc-filter keys ;
+    swap assoc-diff keys [
+        {
+            { [ dup where dup [ first ] when file get path>> = not ] [ f ] }
+            { [ dup "reading" word-prop ] [ f ] }
+            { [ dup "writing" word-prop ] [ f ] }
+            [ t ]
+        } cond nip
+    ] filter ;
 
 : removed-definitions ( -- assoc1 assoc2 )
     new-definitions old-definitions
