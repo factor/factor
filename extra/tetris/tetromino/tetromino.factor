@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays namespaces sequences math math.order
-math.vectors colors random ;
+math.vectors colors colors.constants random ;
 IN: tetris.tetromino
 
 TUPLE: tetromino states colour ;
@@ -20,7 +20,7 @@ SYMBOL: tetrominoes
         { 0 2 }
         { 0 3 }
       }
-    } cyan
+    } COLOR: cyan
   ] [
     {
       {         { 1 0 }
@@ -37,11 +37,11 @@ SYMBOL: tetrominoes
         { 0 1 } { 1 1 }
                 { 1 2 }
       }
-    } purple
+    } COLOR: purple
   ] [
     { { { 0 0 } { 1 0 }
         { 0 1 } { 1 1 } }
-    } yellow
+    } COLOR: yellow
   ] [
     {
       { { 0 0 } { 1 0 } { 2 0 }
@@ -58,7 +58,7 @@ SYMBOL: tetrominoes
         { 0 1 }
         { 0 2 } { 1 2 }
       }
-    } orange
+    } COLOR: orange
   ] [
     { 
       { { 0 0 } { 1 0 } { 2 0 }
@@ -75,7 +75,7 @@ SYMBOL: tetrominoes
         { 0 1 }
         { 0 2 }
       }
-    } blue
+    } COLOR: blue
   ] [
     {
       {          { 1 0 } { 2 0 }
@@ -85,7 +85,7 @@ SYMBOL: tetrominoes
         { 0 1 } { 1 1 }
                 { 1 2 }
       }
-    } green
+    } COLOR: green
   ] [
     {
       {
@@ -96,9 +96,9 @@ SYMBOL: tetrominoes
         { 0 1 } { 1 1 }
         { 0 2 }
       }
-    } red
+    } COLOR: red
   ]
-} [ call <tetromino> ] map tetrominoes set-global
+} [ first2 <tetromino> ] map tetrominoes set-global
 
 : random-tetromino ( -- tetromino )
     tetrominoes get random ;
