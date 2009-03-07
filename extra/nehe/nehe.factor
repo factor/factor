@@ -5,10 +5,10 @@ IN: nehe
 : nehe-window ( -- )
     [
         <filled-pile>
-            "Nehe 2" [ drop run2 ] <bevel-button> add-gadget
-            "Nehe 3" [ drop run3 ] <bevel-button> add-gadget
-            "Nehe 4" [ drop run4 ] <bevel-button> add-gadget
-            "Nehe 5" [ drop run5 ] <bevel-button> add-gadget
+            "Nehe 2" [ drop run2 ] <border-button> add-gadget
+            "Nehe 3" [ drop run3 ] <border-button> add-gadget
+            "Nehe 4" [ drop run4 ] <border-button> add-gadget
+            "Nehe 5" [ drop run5 ] <border-button> add-gadget
         "Nehe examples" open-window
     ] with-ui ;
 

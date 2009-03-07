@@ -2,9 +2,17 @@ USING: kernel math arrays math.vectors math.matrices
 namespaces make
 math.constants math.functions
 math.vectors
-splitting grouping self math.trig
-  sequences accessors 4DNav.deep models ;
+splitting grouping math.trig
+  sequences accessors 4DNav.deep models vars ;
 IN: 4DNav.turtle
+
+! replacement of self
+
+VAR: self
+
+: with-self ( quot obj -- ) [ >self call ] with-scope ;
+
+: save-self ( quot -- ) self> [ self> clone >self call ] dip >self ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

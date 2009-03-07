@@ -37,13 +37,13 @@ M: array rewrite-literal? [ rewrite-literal? ] any? ;
 
 M: quotation rewrite-literal? [ rewrite-literal? ] any? ;
 
+M: vector rewrite-literal? [ rewrite-literal? ] any? ;
+
 M: wrapper rewrite-literal? wrapped>> rewrite-literal? ;
 
-M: hashtable rewrite-literal? drop t ;
+M: hashtable rewrite-literal? >alist rewrite-literal? ;
 
-M: vector rewrite-literal? drop t ;
-
-M: tuple rewrite-literal? drop t ;
+M: tuple rewrite-literal? tuple>array rewrite-literal? ;
 
 M: object rewrite-literal? drop f ;
 
@@ -58,12 +58,16 @@ GENERIC: rewrite-element ( obj -- )
 M: array rewrite-element
     dup rewrite-literal? [ rewrite-sequence ] [ , ] if ;
 
-M: vector rewrite-element rewrite-sequence ;
+M: vector rewrite-element
+    dup rewrite-literal? [ rewrite-sequence ] [ , ] if ;
 
-M: hashtable rewrite-element >alist rewrite-sequence \ >hashtable , ;
+M: hashtable rewrite-element
+    dup rewrite-literal? [ >alist rewrite-sequence \ >hashtable , ] [ , ] if ;
 
 M: tuple rewrite-element
-    [ tuple-slots rewrite-elements ] [ class ] bi '[ _ boa ] % ;
+    dup rewrite-literal? [
+        [ tuple-slots rewrite-elements ] [ class ] bi '[ _ boa ] %
+    ] [ , ] if ;
 
 M: quotation rewrite-element rewrite-sugar* ;
 
