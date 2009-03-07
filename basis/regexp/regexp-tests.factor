@@ -24,8 +24,8 @@ IN: regexp-tests
 [ t ] [ "b" "b|" <regexp> matches? ] unit-test
 [ t ] [ "" "b|" <regexp> matches? ] unit-test
 [ t ] [ "" "b|" <regexp> matches? ] unit-test
-[ f ] [ "" "|" <regexp> matches? ] unit-test
-[ f ] [ "" "|||||||" <regexp> matches? ] unit-test
+[ t ] [ "" "|" <regexp> matches? ] unit-test
+[ t ] [ "" "|||||||" <regexp> matches? ] unit-test
 
 [ f ] [ "aa" "a|b|c" <regexp> matches? ] unit-test
 [ f ] [ "bb" "a|b|c" <regexp> matches? ] unit-test
@@ -182,7 +182,7 @@ IN: regexp-tests
 [ f ] [ "abc" "[\\p{Upper}]{3}" <regexp> matches? ] unit-test
 [ t ] [ "ABC" "[\\p{Upper}]{3}" <regexp> matches? ] unit-test
 
-[ f ] [ "" "\\Q\\E" <regexp> matches? ] unit-test
+[ t ] [ "" "\\Q\\E" <regexp> matches? ] unit-test
 [ f ] [ "a" "\\Q\\E" <regexp> matches? ] unit-test
 [ t ] [ "|*+" "\\Q|*+\\E" <regexp> matches? ] unit-test
 [ f ] [ "abc" "\\Q|*+\\E" <regexp> matches? ] unit-test
@@ -300,8 +300,10 @@ IN: regexp-tests
   
 [ "-- title --" ] [ "== title ==" R/ =/ "-" re-replace ] unit-test
 
-[ f ] [ "ab" "a(?!b)" <regexp> match-head ] unit-test
+[ "" ] [ "ab" "a(?!b)" <regexp> match-head >string ] unit-test
 [ "a" ] [ "ac" "a(?!b)" <regexp> match-head >string ] unit-test
+[ t ] [ "fxxbar" ".{3}(?!foo)bar" <regexp> matches? ] unit-test
+[ t ] [ "foobar" ".{3}(?!foo)bar" <regexp> matches? ] unit-test
 [ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 [ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 [ "a" ] [ "ab" "a(?=b)(?=b)" <regexp> match-head >string ] unit-test
@@ -396,9 +398,9 @@ IN: regexp-tests
 [ f ] [ "\ra" R/ \Aa\Z/m matches? ] unit-test
 
 [ 1 ] [ "a" R/ \Aa\Z/m count-matches ] unit-test
-[ 1 ] [ "\na" R/ \Aaa\Z/m count-matches ] unit-test
-[ 1 ] [ "\r\na" R/ \Aa\Z/m count-matches ] unit-test
-[ 1 ] [ "\ra" R/ \Aa\Z/m count-matches ] unit-test
+[ 0 ] [ "\na" R/ \Aaa\Z/m count-matches ] unit-test
+[ 0 ] [ "\r\na" R/ \Aa\Z/m count-matches ] unit-test
+[ 0 ] [ "\ra" R/ \Aa\Z/m count-matches ] unit-test
 
 [ t ] [ "a" R/ ^a/m matches? ] unit-test
 [ f ] [ "\na" R/ ^a/m matches? ] unit-test

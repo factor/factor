@@ -58,15 +58,8 @@ M: from-to <times>
 : char-class ( ranges ? -- term )
     [ <or-class> ] dip [ <not-class> ] when ;
 
-TUPLE: lookahead term ;
+TUPLE: lookahead term positive? ;
 C: <lookahead> lookahead
 
-TUPLE: lookbehind term ;
+TUPLE: lookbehind term positive? ;
 C: <lookbehind> lookbehind
-
-TUPLE: possessive-star term ;
-C: <possessive-star> possessive-star
-
-: <possessive-plus> ( term -- term' )
-    dup <possessive-star> 2array <concatenation> ;
-
