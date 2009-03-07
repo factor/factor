@@ -139,9 +139,9 @@ file-chooser H{
     f track-add
     <shelf> 
         over [  swap fc-go-parent ] curry  "go up" 
-            swap <bevel-button> add-gadget
+            swap <border-button> add-gadget
         over [  swap fc-go-home ] curry  "go home" 
-            swap <bevel-button> add-gadget
+            swap <border-button> add-gadget
     !    over [ swap fc-ok-action ] curry "OK" 
     !    swap <bevel-button> add-gadget
     !    [ drop ]  "Cancel" swap <bevel-button> add-gadget

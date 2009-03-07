@@ -13,6 +13,7 @@ sequences
 combinators
 continuations
 colors
+colors.constants
 prettyprint
 vars
 quotations
@@ -28,23 +29,19 @@ ui.gadgets.panes
        ui.gadgets.borders
        ui.gadgets.handler
        ui.gadgets.slate
-       ui.gadgets.theme
        ui.gadgets.frames
        ui.gadgets.tracks
        ui.gadgets.labels
-       ui.gadgets.labelled       
+       ui.gadgets.labeled       
        ui.gadgets.lists
        ui.gadgets.buttons
        ui.gadgets.packs
        ui.gadgets.grids
        ui.gestures
-       ui.tools.workspace
        ui.gadgets.scrollers
 splitting
 vectors
 math.vectors
-rewrite-closures
-self
 values
 4DNav.turtle
 4DNav.window3D
@@ -55,6 +52,8 @@ fry
 adsoda
 adsoda.tools
 ;
+QUALIFIED-WITH: ui.pens.solid s
+
 
 IN: 4DNav
 VALUE: selected-file
@@ -74,9 +73,12 @@ VAR: present-space
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! replacement of namespaces.lib
+! namespace utilities
     
 : make* ( seq -- seq ) [ dup quotation? [ call ] [ ] if ] map ;
+
+: closed-quot ( quot -- quot )
+  namestack swap '[ namestack [ _ set-namestack @ ] dip set-namestack ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! waiting for deep-cleave-quots
@@ -131,11 +133,11 @@ VAR: present-space
 : model-projection-chooser ( -- gadget )
    observer3d> projection-mode>>
    { { 1 "perspective" } { 0 "orthogonal" } } 
-   <toggle-buttons> ;
+   <radio-buttons> ;
 
 : collision-detection-chooser ( -- gadget )
    observer3d> collision-mode>>
-   { { t "on" } { f "off" }  } <toggle-buttons> ;
+   { { t "on" } { f "off" }  } <radio-buttons> ;
 
 : model-projection ( x -- space ) 
     present-space>  swap space-project ;
@@ -184,8 +186,11 @@ VAR: present-space
 ! menu
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+USE: ui.gadgets.labeled.private
+
 : menu-rotations-4D ( -- gadget )
-    <frame>
+    3 3 <frame>
+        { 1 1 } >>filled-cell
          <pile> 1 >>fill
           "XY +" [ drop rotation-step 4D-Rxy rotation-4D ] 
                 button* add-gadget
@@ -225,7 +230,8 @@ VAR: present-space
 ;
 
 : menu-translations-4D ( -- gadget )
-    <frame> 
+    3 3 <frame> 
+        { 1 1 } >>filled-cell
         <pile> 1 >>fill
             <shelf> 1 >>fill  
                 "X+" [ drop {  1 0 0 0 } translation-step v*n 
@@ -325,12 +331,13 @@ VAR: present-space
     [ ".xml" tail? ] filter 
     [ append-path ] with map
     [ <run-file-button> add-gadget ] each
-    swap <labelled-gadget> ;
+    swap <labeled-gadget> ;
 
 ! -----------------------------------------------------
 
 : menu-rotations-3D ( -- gadget )
-    <frame>
+    3 3 <frame>
+        { 1 1 } >>filled-cell
         "Turn\n left"  [ rotation-step  turn-left  ] 
             camera-button   @left grid-add     
         "Turn\n right" [ rotation-step turn-right ] 
@@ -348,7 +355,8 @@ VAR: present-space
 ;
 
 : menu-translations-3D ( -- gadget )
-    <frame>
+    3 3 <frame>
+        { 1 1 } >>filled-cell
         "left\n(alt)"        [ translation-step  strafe-left  ]
             camera-button @left grid-add  
         "right\n(alt)"       [ translation-step  strafe-right ]
@@ -477,8 +485,7 @@ M: space adsoda-display-model
     { 0 1 } <track>
         menu-bar f track-add
         <list-runner>  
-            <limited-scroller>  
-            { 200 400 } >>max-dim
+            <scroller>
         f track-add
         <shelf>
             "Projection mode : " <label> add-gadget
@@ -492,17 +499,17 @@ M: space adsoda-display-model
         <pile>
             0.5 >>align    
             menu-4D add-gadget 
-            light-purple solid-interior
-            "4D movements" <labelled-gadget>
+            COLOR: purple s:<solid> >>interior
+            "4D movements" <labeled-gadget>
         f track-add
         <pile>
             0.5 >>align
             { 2 2 } >>gap
             menu-3D add-gadget
-            light-purple solid-interior 
-            "Camera 3D" <labelled-gadget>
+            COLOR: purple s:<solid> >>interior
+            "Camera 3D" <labeled-gadget>
         f track-add      
-        gray solid-interior
+        COLOR: gray s:<solid> >>interior
  ;
  
 : viewer-windows* ( --  )
