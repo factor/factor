@@ -229,27 +229,27 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     '[ _ swap _
        '[ [ [ _ execute ] dip
             [ execute ] each _ execute benchmark ] with-result ] each
-       print-separator ] ;
+       print-separator ] ; inline
    
 : run-insert-bench ( doc-word-seq feat-seq -- )
     "Insert Tests" print
     print-separator-bold
-    \ insert bench-quot each ;
+    \ insert bench-quot each ; inline
 
 : run-find-one-bench ( doc-word-seq feat-seq -- )
     "Query Tests - Find-One" print
     print-separator-bold
-    \ find-one bench-quot each ;
+    \ find-one bench-quot each ; inline
 
 : run-find-all-bench ( doc-word-seq feat-seq -- )
     "Query Tests - Find-All" print
     print-separator-bold
-    \ find-all bench-quot each ;
+    \ find-all bench-quot each ; inline
 
 : run-find-range-bench ( doc-word-seq feat-seq -- )
     "Query Tests - Find-Range" print
     print-separator-bold
-    \ find-range bench-quot each ;
+    \ find-range bench-quot each ; inline
 
     
 : run-benchmarks ( -- )

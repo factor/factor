@@ -58,7 +58,7 @@ SYMBOL: mdb-instance
            local-address set
            mdb-socket-stream set ] ] dip compose
       [ mdb-stream>> [ dispose ] when* ] [ ] cleanup
-    ] with-scope ;
+    ] with-scope ; inline
 
 <PRIVATE
 
