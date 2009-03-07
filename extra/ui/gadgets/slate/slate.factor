@@ -14,7 +14,6 @@ TUPLE: slate < gadget action pdim graft ungraft ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : init-slate ( slate -- slate )
-  init-gadget
   [ ]         >>action
   { 200 200 } >>pdim
   [ ]         >>graft
@@ -29,8 +28,11 @@ M: slate pref-dim* ( slate -- dim ) pdim>> ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-USING: combinators arrays sequences math math.geometry
+USING: combinators arrays sequences math
        opengl.gl ui.gadgets.worlds ;
+
+: width ( rect -- w ) dim>> first ;
+: height ( rect -- h ) dim>> second ;
 
 : screen-y* ( gadget -- loc )
   {

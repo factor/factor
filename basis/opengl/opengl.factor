@@ -42,7 +42,7 @@ MACRO: all-enabled ( seq quot -- )
     [ words>values ] dip '[ _ _ (all-enabled) ] ;
 
 MACRO: all-enabled-client-state ( seq quot -- )
-    [ words>values ] dip '[ _ (all-enabled-client-state) ] ;
+    [ words>values ] dip '[ _ _ (all-enabled-client-state) ] ;
 
 : do-matrix ( mode quot -- )
     swap [ glMatrixMode glPushMatrix call ] keep
