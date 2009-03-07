@@ -4,8 +4,7 @@ USING: accessors math.vectors classes.tuple math.rectangles colors
 kernel sequences models opengl math math.order namespaces
 ui.commands ui.gestures ui.render ui.gadgets
 ui.gadgets.labels ui.gadgets.scrollers
-ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.packs
-ui.gadgets.theme ;
+ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.packs ;
 IN: ui.gadgets.lists
 
 TUPLE: list < pack index presenter color hook ;
@@ -14,7 +13,7 @@ TUPLE: list < pack index presenter color hook ;
     selection-color >>color ; inline
 
 : <list> ( hook presenter model -- gadget )
-    list new-gadget
+    list new
         { 0 1 } >>orientation
         1 >>fill
         0 >>index
