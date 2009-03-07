@@ -23,6 +23,9 @@ TUPLE: redefine-error def ;
 : remember-definition ( definition loc -- )
     new-definitions get first (remember-definition) ;
 
+: fake-definition ( definition -- )
+    old-definitions get [ delete-at ] with each ;
+
 : remember-class ( class loc -- )
     [ dup new-definitions get first key? [ dup redefine-error ] when ] dip
     new-definitions get second (remember-definition) ;

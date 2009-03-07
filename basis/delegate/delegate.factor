@@ -2,9 +2,12 @@
 ! Portions copyright (C) 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes.tuple definitions generic
-generic.standard hashtables kernel lexer make math parser
-generic.parser sequences sets slots words words.symbol fry ;
+generic.standard hashtables kernel lexer math parser
+generic.parser sequences sets slots words words.symbol fry
+locals combinators.short-circuit compiler.units ;
 IN: delegate
+
+<PRIVATE
 
 : protocol-words ( protocol -- words )
     \ protocol-words word-prop ;
@@ -27,27 +30,72 @@ M: tuple-class group-words
 
 ! Consultation
 
-: consult-method ( word class quot -- )
-    [ drop swap first create-method-in ]
-    [ nip [ swap [ second [ [ dip ] curry ] times % ] [ first , ] bi ] [ ] make ] 3bi
+TUPLE: consultation group class quot loc ;
+
+: <consultation> ( group class quot -- consultation )
+    f consultation boa ; 
+
+: create-consult-method ( word consultation -- method )
+    [ class>> swap first create-method dup fake-definition ] keep
+    [ drop ] [ "consultation" set-word-prop ] 2bi ;
+
+PREDICATE: consult-method < method-body "consultation" word-prop ;
+
+M: consult-method reset-word
+    [ call-next-method ] [ f "consultation" set-word-prop ] bi ;
+
+: consult-method-quot ( quot word -- object )
+    [ second [ [ dip ] curry ] times ] [ first ] bi
+    '[ _ call _ execute ] ;
+
+: consult-method ( word consultation -- )
+    [ create-consult-method ]
+    [ quot>> swap consult-method-quot ] 2bi
     define ;
 
 : change-word-prop ( word prop quot -- )
     [ swap props>> ] dip change-at ; inline
 
-: register-protocol ( group class quot -- )
-    [ \ protocol-consult ] 2dip
-    '[ [ _ _ swap ] dip ?set-at ] change-word-prop ;
+: each-generic ( consultation quot -- )
+    [ [ group>> group-words ] keep ] dip curry each ; inline
 
-: define-consult ( group class quot -- )
-    [ register-protocol ]
-    [ [ group-words ] 2dip '[ _ _ consult-method ] each ]
-    3bi ;
+: register-consult ( consultation -- )
+    [ group>> \ protocol-consult ] [ ] [ class>> ] tri
+    '[ [ _ _ ] dip ?set-at ] change-word-prop ;
+
+: consult-methods ( consultation -- )
+    [ consult-method ] each-generic ;
+
+: unregister-consult ( consultation -- )
+    [ class>> ] [ group>> ] bi
+    \ protocol-consult word-prop delete-at ;
+
+:: unconsult-method ( word consultation -- )
+    consultation class>> word first method
+    dup { [ ] [ "consultation" word-prop consultation eq? ] } 1&&
+    [ forget ] [ drop ] if ;
+
+: unconsult-methods ( consultation -- )
+    [ unconsult-method ] each-generic ;
+
+PRIVATE>
+
+: define-consult ( consultation -- )
+    [ register-consult ] [ consult-methods ] bi ;
 
 : CONSULT:
-    scan-word scan-word parse-definition define-consult ; parsing
+    scan-word scan-word parse-definition <consultation>
+    [ save-location ] [ define-consult ] bi ; parsing
+
+M: consultation where loc>> ;
+
+M: consultation set-where (>>loc) ;
+
+M: consultation forget*
+    [ unconsult-methods ] [ unregister-consult ] bi ;
 
 ! Protocols
+<PRIVATE
 
 : cross-2each ( seq1 seq2 quot -- )
     [ with each ] 2curry each ; inline
@@ -69,8 +117,8 @@ M: tuple-class group-words
     swap protocol-words diff ;
 
 : add-new-definitions ( protocol wordlist -- )
-    [ drop protocol-consult >alist ] [ added-words ] 2bi
-    [ swap first2 consult-method ] cross-2each ;
+    [ drop protocol-consult values ] [ added-words ] 2bi
+    [ swap consult-method ] cross-2each ;
 
 : initialize-protocol-props ( protocol wordlist -- )
     [
@@ -80,6 +128,11 @@ M: tuple-class group-words
 
 : fill-in-depth ( wordlist -- wordlist' )
     [ dup word? [ 0 2array ] when ] map ;
+
+: show-words ( wordlist' -- wordlist )
+    [ dup second zero? [ first ] when ] map ;
+
+PRIVATE>
 
 : define-protocol ( protocol wordlist -- )
     [ drop define-symbol ] [
@@ -97,8 +150,6 @@ PREDICATE: protocol < word protocol-words ; ! Subclass of symbol?
 M: protocol forget*
     [ f forget-old-definitions ] [ call-next-method ] bi ;
 
-: show-words ( wordlist' -- wordlist )
-    [ dup second zero? [ first ] when ] map ;
 
 M: protocol definition protocol-words show-words ;
 
