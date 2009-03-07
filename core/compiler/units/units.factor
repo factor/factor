@@ -72,14 +72,12 @@ SYMBOL: outdated-tuples
 SYMBOL: update-tuples-hook
 SYMBOL: remake-generics-hook
 
+: index>= ( obj1 obj2 seq -- ? )
+    [ index ] curry bi@ >= ;
+
 : dependency>= ( how1 how2 -- ? )
-    [
-        {
-            called-dependency
-            flushed-dependency
-            inlined-dependency
-        } index
-    ] bi@ >= ;
+    { called-dependency flushed-dependency inlined-dependency }
+    index>= ;
 
 : strongest-dependency ( how1 how2 -- how )
     [ called-dependency or ] bi@ [ dependency>= ] most ;

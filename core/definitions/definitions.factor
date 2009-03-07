@@ -9,12 +9,8 @@ SYMBOL: inlined-dependency
 SYMBOL: flushed-dependency
 SYMBOL: called-dependency
 
-<PRIVATE
-
 : set-in-unit ( value key assoc -- )
     [ set-at ] [ no-compilation-unit ] if* ;
-
-PRIVATE>
 
 SYMBOL: changed-definitions
 
@@ -23,13 +19,7 @@ SYMBOL: changed-definitions
 
 SYMBOL: changed-generics
 
-: changed-generic ( class generic -- )
-    changed-generics get set-in-unit ;
-
 SYMBOL: remake-generics
-
-: remake-generic ( generic -- )
-    dup remake-generics get set-in-unit ;
 
 SYMBOL: new-classes
 
@@ -52,11 +42,9 @@ M: object forget* drop ;
 SYMBOL: forgotten-definitions
 
 : forgotten-definition ( defspec -- )
-    dup forgotten-definitions get
-    [ no-compilation-unit ] unless*
-    set-at ;
+    dup forgotten-definitions get set-in-unit ;
 
-: forget ( defspec -- ) dup forgotten-definition forget* ;
+: forget ( defspec -- ) [ forgotten-definition ] [ forget* ] bi ;
 
 : forget-all ( definitions -- ) [ forget ] each ;
 
