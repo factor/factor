@@ -1,14 +1,14 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.backend ui.gadgets
-ui.gadgets.worlds ui.render opengl opengl.gl kernel namespaces
-classes.tuple colors accessors ;
+USING: ui.backend ui.gadgets ui.gadgets.worlds ui.pens.solid opengl
+opengl.gl kernel namespaces classes.tuple colors colors.constants
+accessors ;
 IN: ui.gadgets.canvas
 
 TUPLE: canvas < gadget dlist ;
 
 : new-canvas ( class -- canvas )
-    new black <solid> >>interior ; inline
+    new COLOR: black <solid> >>interior ; inline
 
 : delete-canvas-dlist ( canvas -- )
     [ find-gl-context ]
@@ -23,8 +23,6 @@ TUPLE: canvas < gadget dlist ;
     [ 2nip ] [ drop make-canvas-dlist ] if ; inline
 
 : draw-canvas ( canvas quot -- )
-    origin get [
-        cache-canvas-dlist glCallList
-    ] with-translation ; inline
+    cache-canvas-dlist glCallList ; inline
 
 M: canvas ungraft* delete-canvas-dlist ;
