@@ -125,7 +125,7 @@ PROTOCOL: silly-protocol do-me ;
 DEFER: slot-protocol-test-3
 SLOT: y
 
-[ f ] [ \ y>> \ slot-protocol-test-3 method >boolean ] unit-test
+[ f ] [ \ slot-protocol-test-3 \ y>> method >boolean ] unit-test
 
 [ [ ] ] [
     <" IN: delegate.tests
@@ -135,7 +135,7 @@ CONSULT: y>> slot-protocol-test-3 x>> ;">
     <string-reader> "delegate-test-1" parse-stream
 ] unit-test
 
-[ t ] [ \ y>> \ slot-protocol-test-3 method >boolean ] unit-test
+[ t ] [ \ slot-protocol-test-3 \ y>> method >boolean ] unit-test
 
 [ [ ] ] [
     <" IN: delegate.tests
@@ -143,4 +143,16 @@ TUPLE: slot-protocol-test-3 x y ;">
     <string-reader> "delegate-test-1" parse-stream
 ] unit-test
 
-[ t ] [ \ y>> \ slot-protocol-test-3 method >boolean ] unit-test
+! We now have a real accessor for the y slot; we don't want it to
+! get lost
+[ t ] [ \ slot-protocol-test-3 \ y>> method >boolean ] unit-test
+
+! We want to be able to override methods after consultation
+[ [ ] ] [
+    <" IN: delegate.tests
+    USING: delegate kernel sequences delegate.protocols accessors ;
+    TUPLE: override-method-test seq ;
+    CONSULT: sequence-protocol override-method-test seq>> ;
+    M: override-method-test like drop ; ">
+    <string-reader> "delegate-test-2" parse-stream
+] unit-test
