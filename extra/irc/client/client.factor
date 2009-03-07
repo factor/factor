@@ -313,7 +313,7 @@ DEFER: (connect-irc)
     [ forward-message ] [ process-message ] [ irc-end? not ] tri ;
 
 : strings>privmsg ( name string -- privmsg )
-    privmsg new [ (>>trailing) ] keep [ (>>target) ] keep ;
+    " :" prepend append "PRIVMSG " prepend string>irc-message ;
 
 : maybe-annotate-with-name ( name obj -- obj )
     { { [ dup string? ] [ strings>privmsg ] }
