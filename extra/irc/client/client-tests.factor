@@ -34,6 +34,7 @@ M: mb-writer dispose drop ;
 : %add-named-chat ( chat -- ) irc> attach-chat ;
 : %push-line ( line -- ) irc> stream>> in>> push-line yield ;
 : %join ( channel -- ) <irc-channel-chat> irc> attach-chat ;
+: %pop-output-line ( -- string ) irc> stream>> out>> lines>> pop ;
 
 : read-matching-message ( chat quot: ( msg -- ? ) -- irc-message )
     [ in-messages>> 0.1 seconds ] dip mailbox-get-timeout? ;
@@ -79,8 +80,7 @@ M: mb-writer dispose drop ;
 
 ! Test join
 [ { "JOIN #factortest" } [
-      "#factortest" %join
-      irc> stream>> out>> lines>> pop
+      "#factortest" %join %pop-output-line
   ] unit-test
 ] with-irc
 
@@ -219,5 +219,12 @@ M: mb-writer dispose drop ;
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
       ":ircserver.net MODE #factortest +o ircuser" %push-line
       [ participant-changed? ] read-matching-message
+  ] unit-test
+] with-irc
+
+! Send privmsg
+[ { "PRIVMSG #factortest :hello" } [
+      "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
+      "hello" swap speak %pop-output-line
   ] unit-test
 ] with-irc
