@@ -94,7 +94,7 @@ IN: bootstrap.syntax
         lexer get skip-blank parse-string <pathname> parsed
     ] define-syntax
 
-    "[" [ \ ] [ >quotation ] parse-literal ] define-syntax
+    "[" [ parse-quotation parsed ] define-syntax
     "{" [ \ } [ >array ] parse-literal ] define-syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-syntax

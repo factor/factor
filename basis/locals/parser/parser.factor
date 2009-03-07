@@ -6,6 +6,11 @@ locals.rewrite.closures locals.types make namespaces parser
 quotations sequences splitting words vocabs.parser ;
 IN: locals.parser
 
+SYMBOL: in-lambda?
+
+: ?rewrite-closures ( form -- form' )
+    in-lambda? get [ 1array ] [ rewrite-closures ] if ;
+
 : make-local ( name -- word )
     "!" ?tail [
         <local-reader>
@@ -20,28 +25,33 @@ IN: locals.parser
     [ <local-word> [ dup name>> set ] [ ] [ ] tri ] dip
     "local-word-def" set-word-prop ;
 
-SYMBOL: locals
-
 : push-locals ( assoc -- )
     use get push ;
 
 : pop-locals ( assoc -- )
-    use get delete ;
+    use get delq ;
 
-SYMBOL: in-lambda?
+SINGLETON: lambda-parser
 
-: (parse-lambda) ( assoc end -- quot )
-    [
+SYMBOL: locals
+
+: ((parse-lambda)) ( assoc quot -- quot' )
+    '[
         in-lambda? on
-        over locals set
-        over push-locals
-        parse-until >quotation
-        swap pop-locals
-    ] with-scope ;
+        lambda-parser quotation-parser set
+        [ locals set ] [ push-locals @ ] [ pop-locals ] tri
+    ] with-scope ; inline
+    
+: (parse-lambda) ( assoc -- quot )
+    [ \ ] parse-until >quotation ] ((parse-lambda)) ;
 
 : parse-lambda ( -- lambda )
     "|" parse-tokens make-locals
-    \ ] (parse-lambda) <lambda> ;
+    (parse-lambda) <lambda>
+    ?rewrite-closures ;
+
+M: lambda-parser parse-quotation ( -- quotation )
+    H{ } clone (parse-lambda) ;
 
 : parse-binding ( end -- pair/f )
     scan {
@@ -65,12 +75,20 @@ SYMBOL: in-lambda?
 : parse-bindings ( end -- bindings vars )
     [ (parse-bindings) ] with-bindings ;
 
+: parse-let ( -- form )
+    "|" expect "|" parse-bindings
+    (parse-lambda) <let> ?rewrite-closures ;
+
 : parse-bindings* ( end -- words assoc )
     [
         namespace push-locals
         (parse-bindings)
         namespace pop-locals
     ] with-bindings ;
+
+: parse-let* ( -- form )
+    "|" expect "|" parse-bindings*
+    (parse-lambda) <let*> ?rewrite-closures ;
 
 : (parse-wbindings) ( end -- )
     dup parse-binding dup [
@@ -81,21 +99,29 @@ SYMBOL: in-lambda?
 : parse-wbindings ( end -- bindings vars )
     [ (parse-wbindings) ] with-bindings ;
 
+: parse-wlet ( -- form )
+    "|" expect "|" parse-wbindings
+    (parse-lambda) <wlet> ?rewrite-closures ;
+
 : parse-locals ( -- vars assoc )
     "(" expect ")" parse-effect
     word [ over "declared-effect" set-word-prop ] when*
     in>> [ dup pair? [ first ] when ] map make-locals ;
 
-: parse-locals-definition ( word -- word quot )
-    parse-locals \ ; (parse-lambda) <lambda>
+: parse-locals-definition ( word reader -- word quot )
+    [ parse-locals ] dip
+    ((parse-lambda)) <lambda>
     [ "lambda" set-word-prop ]
-    [ rewrite-closures dup length 1 = [ first ] [ bad-lambda-rewrite ] if ] 2bi ;
+    [ rewrite-closures dup length 1 = [ first ] [ bad-rewrite ] if ] 2bi ; inline
 
-: (::) ( -- word def ) CREATE-WORD parse-locals-definition ;
+: (::) ( -- word def )
+    CREATE-WORD
+    [ parse-definition ]
+    parse-locals-definition ;
 
 : (M::) ( -- word def )
     CREATE-METHOD
-    [ parse-locals-definition ] with-method-definition ;
-
-: parsed-lambda ( accum form -- accum )
-    in-lambda? get [ parsed ] [ rewrite-closures over push-all ] if ;
+    [
+        [ parse-definition ] 
+        parse-locals-definition
+    ] with-method-definition ;
