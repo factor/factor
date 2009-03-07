@@ -1,10 +1,9 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test core-text core-foundation
-core-foundation.dictionaries destructors
-arrays kernel generalizations math accessors
-core-foundation.utilities
-combinators hashtables colors ;
+USING: tools.test core-text core-text.fonts core-foundation
+core-foundation.dictionaries destructors arrays kernel generalizations
+math accessors core-foundation.utilities combinators hashtables colors
+colors.constants ;
 IN: core-text.tests
 
 : test-font ( name -- font )
@@ -21,8 +20,8 @@ IN: core-text.tests
 
 : test-typographic-bounds ( string font -- ? )
     [
-        test-font &CFRelease white <CTLine> &CFRelease
-        line-typographic-bounds {
+        test-font &CFRelease tuck COLOR: white <CTLine> &CFRelease
+        compute-line-metrics {
             [ width>> float? ]
             [ ascent>> float? ]
             [ descent>> float? ]
