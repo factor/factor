@@ -139,7 +139,7 @@ TUPLE: key-caps-gadget < gadget keys alarm ;
 : make-key-gadget ( scancode dim array -- )
     [ 
         swap [ 
-            " " [ drop ] <bevel-button>
+            " " [ drop ] <border-button>
             swap [ first >>loc ] [ second >>dim ] bi
         ] [ execute ] bi*
     ] dip set-nth ;

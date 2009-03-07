@@ -5,7 +5,7 @@ sequences strings vectors words words.symbol quotations io
 combinators sorting splitting math.parser effects continuations
 io.files vocabs io.encodings.utf8 source-files
 classes hashtables compiler.errors compiler.units accessors sets
-lexer vocabs.parser ;
+lexer vocabs.parser slots ;
 IN: parser
 
 : location ( -- loc )
@@ -113,12 +113,16 @@ ERROR: staging-violation word ;
 : parse-until ( end -- vec )
     100 <vector> swap (parse-until) ;
 
+SYMBOL: quotation-parser
+
+HOOK: parse-quotation quotation-parser ( -- quot )
+
+M: f parse-quotation \ ] parse-until >quotation ;
+
 : parsed ( accum obj -- accum ) over push ;
 
 : (parse-lines) ( lexer -- quot )
-    [
-        f parse-until >quotation
-    ] with-lexer ;
+    [ f parse-until >quotation ] with-lexer ;
 
 : parse-lines ( lines -- quot )
     lexer-factory get call (parse-lines) ;
@@ -216,10 +220,14 @@ print-use-hook [ [ ] ] initialize
     "quiet" get [ drop ] [ "Loading " write print flush ] if ;
 
 : filter-moved ( assoc1 assoc2 -- seq )
-    swap assoc-diff [
-        drop where dup [ first ] when
-        file get path>> =
-    ] assoc-filter keys ;
+    swap assoc-diff keys [
+        {
+            { [ dup where dup [ first ] when file get path>> = not ] [ f ] }
+            { [ dup reader-method? ] [ f ] }
+            { [ dup writer-method? ] [ f ] }
+            [ t ]
+        } cond nip
+    ] filter ;
 
 : removed-definitions ( -- assoc1 assoc2 )
     new-definitions old-definitions

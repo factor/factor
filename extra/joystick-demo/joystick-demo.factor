@@ -1,7 +1,7 @@
 USING: ui ui.gadgets sequences kernel arrays math colors
-ui.render math.vectors accessors fry ui.gadgets.packs game-input
-ui.gadgets.labels ui.gadgets.borders alarms
-calendar locals strings ui.gadgets.buttons
+colors.constants ui.render ui.pens.polygon ui.pens.solid math.vectors
+accessors fry ui.gadgets.packs game-input ui.gadgets.labels
+ui.gadgets.borders alarms calendar locals strings ui.gadgets.buttons
 combinators math.parser assocs threads ;
 IN: joystick-demo
 
@@ -56,11 +56,11 @@ CONSTANT: pov-polygons
     [ z-indicator>> (>>loc) ] 2bi* ;
 
 : move-pov ( gadget pov -- )
-    swap pov>> [ interior>> -rot = [ gray ] [ white ] if >>color drop ]
+    swap pov>> [ interior>> -rot = COLOR: gray COLOR: white ? >>color drop ]
     with assoc-each ;
 
 :: add-pov-gadget ( gadget direction polygon -- gadget direction gadget )
-    gadget white polygon <polygon-gadget> [ add-gadget ] keep
+    gadget COLOR: white polygon <polygon-gadget> [ add-gadget ] keep
     direction swap ;
 
 : add-pov-gadgets ( gadget -- gadget )
@@ -69,14 +69,14 @@ CONSTANT: pov-polygons
 : <axis-gadget> ( -- gadget )
     axis-gadget new
     add-pov-gadgets
-    black <indicator-gadget> [ >>z-indicator ] [ add-gadget ] bi
-    red   <indicator-gadget> [ >>indicator   ] [ add-gadget ] bi
+    COLOR: black <indicator-gadget> [ >>z-indicator ] [ add-gadget ] bi
+    COLOR: red   <indicator-gadget> [ >>indicator   ] [ add-gadget ] bi
     dup [ 0.0 0.0 0.0 move-axis ] [ f move-pov ] bi ;
 
 TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
 
 : add-gadget-with-border ( parent child -- parent )
-    { 2 2 } <border> gray <solid> >>boundary add-gadget ;
+    { 2 2 } <border> COLOR: gray <solid> >>boundary add-gadget ;
 
 : add-controller-label ( gadget controller -- gadget )
     [ >>controller ] [ product-string <label> add-gadget ] bi ;
@@ -89,7 +89,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
 
 :: (add-button-gadgets) ( gadget shelf -- )
     gadget controller>> read-controller buttons>> length [
-        number>string [ ] <bevel-button>
+        number>string [ drop ] <border-button>
         shelf over add-gadget drop
     ] map gadget (>>buttons) ;
 
@@ -107,7 +107,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
     [ >>selected? drop ] 2each ;
 
 : kill-update-axes ( gadget -- )
-    gray <solid> >>interior
+    COLOR: gray <solid> >>interior
     [ [ cancel-alarm ] when* f ] change-alarm
     relayout-1 ;
 

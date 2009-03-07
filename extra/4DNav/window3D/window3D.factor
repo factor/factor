@@ -28,7 +28,7 @@ IN: 4DNav.window3D
 TUPLE: window3D  < gadget observer ; 
 
 : <window3D>  ( model observer -- gadget )
-    window3D  new-gadget 
+    window3D  new
     swap 2dup 
     projection-mode>> add-connection
     2dup 
