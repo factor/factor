@@ -556,3 +556,17 @@ EXCLUDE: qualified.tests.bar => x ;
 
 [ "IN: qualified.tests RENAME: doesnotexist qualified.tests => blahx" eval ]
 [ error>> no-word-error? ] must-fail-with
+
+[ [ ] ] [
+    "IN: parser.tests : was-once-a-word-bug ( -- ) ;"
+    <string-reader> "was-once-a-word-test" parse-stream
+] unit-test
+
+[ t ] [ "was-once-a-word-bug" "parser.tests" lookup >boolean ] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests USE: words << \"was-once-a-word-bug\" \"parser.tests\" create [ ] (( -- )) define-declared >>"
+    <string-reader> "was-once-a-word-test" parse-stream
+] unit-test
+
+[ t ] [ "was-once-a-word-bug" "parser.tests" lookup >boolean ] unit-test

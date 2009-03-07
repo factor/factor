@@ -113,12 +113,16 @@ ERROR: staging-violation word ;
 : parse-until ( end -- vec )
     100 <vector> swap (parse-until) ;
 
+SYMBOL: quotation-parser
+
+HOOK: parse-quotation quotation-parser ( -- quot )
+
+M: f parse-quotation \ ] parse-until >quotation ;
+
 : parsed ( accum obj -- accum ) over push ;
 
 : (parse-lines) ( lexer -- quot )
-    [
-        f parse-until >quotation
-    ] with-lexer ;
+    [ f parse-until >quotation ] with-lexer ;
 
 : parse-lines ( lines -- quot )
     lexer-factory get call (parse-lines) ;
