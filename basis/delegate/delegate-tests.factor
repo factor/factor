@@ -1,6 +1,7 @@
 USING: delegate kernel arrays tools.test words math definitions
 compiler.units parser generic prettyprint io.streams.string
-accessors eval multiline ;
+accessors eval multiline generic.standard delegate.protocols
+delegate.private assocs ;
 IN: delegate.tests
 
 TUPLE: hello this that ;
@@ -35,7 +36,7 @@ M: hello bing hello-test ;
 [ 3 ] [ 1 0 <hello> f <goodbye> 2 whoa ] unit-test
 
 [ ] [ 3 [ "USING: accessors delegate ; IN: delegate.tests CONSULT: baz goodbye these>> ;" eval ] times ] unit-test
-[ H{ { goodbye [ these>> ] } } ] [ baz protocol-consult ] unit-test
+[ H{ { goodbye T{ consultation f baz goodbye [ these>> ] } } } ] [ baz protocol-consult ] unit-test
 [ H{ } ] [ bee protocol-consult ] unit-test
 
 [ "USING: delegate ;\nIN: delegate.tests\nPROTOCOL: baz foo bar { whoa 1 } ; inline\n" ] [ [ baz see ] with-string-writer ] unit-test
@@ -112,6 +113,7 @@ PROTOCOL: silly-protocol do-me ;
 
 [ ] [ T{ a-tuple } do-me ] unit-test
 
+! Change method definition to consultation
 [ [ ] ] [
     <" IN: delegate.tests
     USE: kernel
@@ -119,13 +121,22 @@ PROTOCOL: silly-protocol do-me ;
     CONSULT: silly-protocol a-tuple drop f ; "> <string-reader> "delegate-test" parse-stream
 ] unit-test
 
+! Method should be there
 [ ] [ T{ a-tuple } do-me ] unit-test
+
+! Now try removing the consulation
+[ [ ] ] [
+    <" IN: delegate.tests "> <string-reader> "delegate-test" parse-stream
+] unit-test
+
+! Method should be gone
+[ T{ a-tuple } do-me ] [ no-method? ] must-fail-with
 
 ! A slot protocol issue
 DEFER: slot-protocol-test-3
 SLOT: y
 
-[ f ] [ \ y>> \ slot-protocol-test-3 method >boolean ] unit-test
+[ f ] [ \ slot-protocol-test-3 \ y>> method >boolean ] unit-test
 
 [ [ ] ] [
     <" IN: delegate.tests
@@ -135,7 +146,7 @@ CONSULT: y>> slot-protocol-test-3 x>> ;">
     <string-reader> "delegate-test-1" parse-stream
 ] unit-test
 
-[ t ] [ \ y>> \ slot-protocol-test-3 method >boolean ] unit-test
+[ t ] [ \ slot-protocol-test-3 \ y>> method >boolean ] unit-test
 
 [ [ ] ] [
     <" IN: delegate.tests
@@ -143,4 +154,46 @@ TUPLE: slot-protocol-test-3 x y ;">
     <string-reader> "delegate-test-1" parse-stream
 ] unit-test
 
-[ t ] [ \ y>> \ slot-protocol-test-3 method >boolean ] unit-test
+! We now have a real accessor for the y slot; we don't want it to
+! get lost
+[ t ] [ \ slot-protocol-test-3 \ y>> method >boolean ] unit-test
+
+! We want to be able to override methods after consultation
+[ [ ] ] [
+    <" IN: delegate.tests
+    USING: delegate kernel sequences delegate.protocols accessors ;
+    TUPLE: override-method-test seq ;
+    CONSULT: sequence-protocol override-method-test seq>> ;
+    M: override-method-test like drop ; ">
+    <string-reader> "delegate-test-2" parse-stream
+] unit-test
+
+DEFER: seq-delegate
+    
+! See if removing a consultation updates protocol-consult word prop
+[ [ ] ] [
+    <" IN: delegate.tests
+    USING: accessors delegate delegate.protocols ;
+    TUPLE: seq-delegate seq ;
+    CONSULT: sequence-protocol seq-delegate seq>> ;">
+    <string-reader> "remove-consult-test" parse-stream
+] unit-test
+
+[ t ] [
+    seq-delegate
+    sequence-protocol \ protocol-consult word-prop
+    key?
+] unit-test
+
+[ [ ] ] [
+    <" IN: delegate.tests
+    USING: delegate delegate.protocols ;
+    TUPLE: seq-delegate seq ;">
+    <string-reader> "remove-consult-test" parse-stream
+] unit-test
+
+[ f ] [
+    seq-delegate
+    sequence-protocol \ protocol-consult word-prop
+    key?
+] unit-test

@@ -703,3 +703,31 @@ TUPLE: bogus-hashcode-2 x ;
 M: bogus-hashcode-1 hashcode* 2drop 0 >bignum ;
 
 [ ] [ T{ bogus-hashcode-2 f T{ bogus-hashcode-1 } } hashcode drop ] unit-test
+
+DEFER: change-slot-test
+SLOT: kex
+
+[ ] [
+    "IN: classes.tuple.tests USING: kernel accessors ; TUPLE: change-slot-test ; SLOT: kex M: change-slot-test kex>> drop 3 ;"
+    <string-reader> "change-slot-test" parse-stream
+    drop
+] unit-test
+
+[ t ] [ \ change-slot-test \ kex>> method >boolean ] unit-test
+
+[ ] [
+    "IN: classes.tuple.tests USING: kernel accessors ; TUPLE: change-slot-test kex ;"
+    <string-reader> "change-slot-test" parse-stream
+    drop
+] unit-test
+
+[ t ] [ \ change-slot-test \ kex>> method >boolean ] unit-test
+
+[ ] [
+    "IN: classes.tuple.tests USING: kernel accessors ; TUPLE: change-slot-test ; SLOT: kex M: change-slot-test kex>> drop 3 ;"
+    <string-reader> "change-slot-test" parse-stream
+    drop
+] unit-test
+
+[ t ] [ \ change-slot-test \ kex>> method >boolean ] unit-test
+[ f ] [ \ change-slot-test \ kex>> method "reading" word-prop ] unit-test
