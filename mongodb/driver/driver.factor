@@ -51,7 +51,7 @@ SYMBOL: mdb-instance
 : slave>> ( mdb -- inet )
     nodes>> [ f ] dip at inet>> ;
 
-: with-db ( mdb quot -- ... )
+: with-db ( mdb quot: ( -- * ) -- * )
     [ [ '[ _ [ mdb-instance set ensure-buffer ] keep master>>
            [ remote-address set ] keep
            binary <client>

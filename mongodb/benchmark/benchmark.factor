@@ -19,6 +19,8 @@ TUPLE: result doc collection index batch lasterror ;
 
 : <result> ( -- ) result new result set ; inline
 
+CONSTANT: CHECK-KEY f 
+
 CONSTANT: DOC-SMALL H{ }
 
 CONSTANT: DOC-MEDIUM H{ { "integer" 5 }
@@ -164,7 +166,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     [ '[ _ _ (insert-batch) ] ] [ '[ _ _ (insert) ] ] if ;
 
 : check-for-key ( assoc key -- )
-    swap key? [ "ups... where's the key" throw ] unless ; inline
+    CHECK-KEY [ swap key? [ "ups... where's the key" throw ] unless ] [ 2drop ] if ; inline
 
 : find-one ( -- quot: ( -- ) )
     collection-name
