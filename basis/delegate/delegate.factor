@@ -4,7 +4,7 @@
 USING: accessors arrays assocs classes.tuple definitions generic
 generic.standard hashtables kernel lexer math parser
 generic.parser sequences sets slots words words.symbol fry
-locals combinators.short-circuit compiler.units ;
+compiler.units ;
 IN: delegate
 
 <PRIVATE
@@ -70,10 +70,12 @@ M: consult-method reset-word
     [ class>> ] [ group>> ] bi
     \ protocol-consult word-prop delete-at ;
 
-:: unconsult-method ( word consultation -- )
-    consultation class>> word first method
-    dup { [ ] [ "consultation" word-prop consultation eq? ] } 1&&
-    [ forget ] [ drop ] if ;
+: unconsult-method ( word consultation -- )
+    [ class>> swap first method ] keep
+    over [
+        over "consultation" word-prop eq?
+        [ forget ] [ drop ] if
+    ] [ 2drop ] if ;
 
 : unconsult-methods ( consultation -- )
     [ unconsult-method ] each-generic ;
