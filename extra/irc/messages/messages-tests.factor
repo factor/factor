@@ -13,7 +13,8 @@ IN: irc.messages.tests
      { parameters { "#factortest" } }
      { trailing "hi" }
      { target "#factortest" }
-     { text "hi" } } }
+     { text "hi" }
+     { sender "someuser" } } }
 [ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
   string>irc-message f >>timestamp ] unit-test
 
@@ -22,7 +23,8 @@ IN: irc.messages.tests
      { prefix "someuser!n=user@some.where" }
      { command "JOIN" }
      { parameters { } }
-     { trailing "#factortest" } } }
+     { trailing "#factortest" }
+     { sender "someuser" } } }
 [ ":someuser!n=user@some.where JOIN :#factortest"
   string>irc-message f >>timestamp ] unit-test
 
@@ -52,7 +54,8 @@ IN: irc.messages.tests
      { prefix "someuser!n=user@some.where" }
      { command "NICK" }
      { parameters  { } }
-     { trailing "someuser2" } } }
+     { trailing "someuser2" }
+     { sender "someuser" } } }
 [ ":someuser!n=user@some.where NICK :someuser2"
   string>irc-message f >>timestamp ] unit-test
 
