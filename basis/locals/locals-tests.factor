@@ -493,7 +493,7 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
     [| | 0 '[ [let | A [ 10 ] | A _ + ] ] call ] call
 ] unit-test
 
-! Discovered by littledan
+! littledan found this problem
 [ "bar" ] [ [let | a [ [let | foo [ "bar" ] | foo ] ] | a ] ] unit-test
 [ 10 ] [ [let | a [ 10 ] | [let | b [ a ] | b ] ] ] unit-test
 
@@ -515,3 +515,14 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 [ 3 ] [ 3 f erg's-:>-bug-2 ] unit-test
     
 [ 3 ] [ 3 t erg's-:>-bug-2 ] unit-test
+
+! dharmatech found this problem
+GENERIC: ed's-bug ( a -- b )
+
+M: string ed's-bug reverse ;
+M: integer ed's-bug neg ;
+
+:: ed's-test-case ( a -- b )
+   { [ a ed's-bug ] } && ;
+
+[ t ] [ \ ed's-test-case optimized>> ] unit-test
