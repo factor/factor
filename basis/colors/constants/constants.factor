@@ -27,7 +27,7 @@ PRIVATE>
 
 ERROR: no-such-color name ;
 
-: named-color ( name -- rgb )
+: named-color ( name -- color )
     dup rgb.txt at [ ] [ no-such-color ] ?if ;
 
 : COLOR: scan named-color parsed ; parsing
