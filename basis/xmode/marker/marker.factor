@@ -4,9 +4,8 @@ IN: xmode.marker
 USING: kernel namespaces make xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators strings
-regexp splitting ascii regexp.backend unicode.case
+regexp splitting ascii unicode.case regexp.matchers
 ascii combinators.short-circuit accessors ;
-! regexp.backend is for the regexp class
 
 ! Next two words copied from parser-combinators
 ! Just like head?, but they optionally ignore case

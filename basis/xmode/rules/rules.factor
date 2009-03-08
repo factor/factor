@@ -1,6 +1,8 @@
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors xmode.tokens xmode.keyword-map kernel
 sequences vectors assocs strings memoize unicode.case
-regexp regexp.backend ; ! regexp.backend has the regexp class
+regexp ;
 IN: xmode.rules
 
 TUPLE: string-matcher string ignore-case? ;
