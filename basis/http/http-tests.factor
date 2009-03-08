@@ -9,6 +9,8 @@ IN: http.tests
 
 [ "text/html" utf8 ] [ "text/html;  charset=UTF-8" parse-content-type ] unit-test
 
+[ "text/html" utf8 ] [ "text/html; charset=\"utf-8\"" parse-content-type ] unit-test
+
 [ "application/octet-stream" binary ] [ "application/octet-stream" parse-content-type ] unit-test
 
 : lf>crlf "\n" split "\r\n" join ;
