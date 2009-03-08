@@ -91,5 +91,5 @@ IN: regexp.minimize
 : minimize ( table -- minimal-table )
     clone
     number-states
-    combine-states
+    ! combine-states
     combine-transitions ;
