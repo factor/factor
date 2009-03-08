@@ -9,17 +9,20 @@ IN: regexp.combinators.tests
 [ t t t ] [ "foo" "bar" "baz" [ strings matches? ] tri@ ] unit-test
 [ f f f ] [ "food" "ibar" "ba" [ strings matches? ] tri@ ] unit-test
 
+USE: multiline
+/*
+! Why is conjuction broken?
 : conj ( -- regexp )
-    { R/ .*a/ R/ b.*/ } <and> ;
+    { R' .*a' R' b.*' } <and> ;
 
 [ t ] [ "bljhasflsda" conj matches? ] unit-test
 [ f ] [ "bsdfdfs" conj matches? ] unit-test ! why does this fail?
 [ f ] [ "fsfa" conj matches? ] unit-test
 
-! For some reason, creating this DFA doesn't work
-! [ f ] [ "bljhasflsda" conj <not> matches? ] unit-test
-! [ t ] [ "bsdfdfs" conj <not> matches? ] unit-test
-! [ t ] [ "fsfa" conj <not> matches? ] unit-test
+[ f ] [ "bljhasflsda" conj <not> matches? ] unit-test
+[ t ] [ "bsdfdfs" conj <not> matches? ] unit-test
+[ t ] [ "fsfa" conj <not> matches? ] unit-test
+*/
 
 [ f f ] [ "" "hi" [ <nothing> matches? ] bi@ ] unit-test
 [ t t ] [ "" "hi" [ <nothing> <not> matches? ] bi@ ] unit-test

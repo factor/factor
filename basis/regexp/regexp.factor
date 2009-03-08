@@ -41,7 +41,7 @@ C: <reverse-matcher> reverse-matcher
     "r" string>options <with-options> ;
 
 : maybe-negated ( lookaround quot -- regexp-quot )
-    '[ term>> @ ] [ positive?>> [ ] [ not ] ? ] bi compose ;
+    '[ term>> @ ] [ positive?>> [ ] [ not ] ? ] bi compose ; inline
 
 M: lookahead question>quot ! Returns ( index string -- ? )
     [ ast>dfa dfa>shortest-quotation ] maybe-negated ;
