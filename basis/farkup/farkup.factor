@@ -169,8 +169,8 @@ CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
     } cond url-encode ;
 
 : write-link ( href text -- xml )
-    [ check-url link-no-follow? get "true" and ] dip
-    [XML <a href=<-> nofollow=<->><-></a> XML] ;
+    [ check-url link-no-follow? get "nofollow" and ] dip
+    [XML <a href=<-> rel=<->><-></a> XML] ;
 
 : write-image-link ( href text -- xml )
     disable-images? get [
