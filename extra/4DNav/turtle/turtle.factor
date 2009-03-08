@@ -10,9 +10,9 @@ IN: 4DNav.turtle
 
 VAR: self
 
-: with-self ( quot obj -- ) [ >self call ] with-scope ;
+: with-self ( quot obj -- ) [ >self call ] with-scope ; inline
 
-: save-self ( quot -- ) self> [ self> clone >self call ] dip >self ;
+: save-self ( quot -- ) self> [ self> clone >self call ] dip >self ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
