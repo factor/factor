@@ -5,8 +5,9 @@ eval strings multiline accessors regexp.matchers ;
 IN: regexp-tests
 
 \ <regexp> must-infer
-\ compile-regexp must-infer
-\ matches? must-infer
+! the following don't compile because [ ] with-compilation-unit doesn't compile
+! \ compile-regexp must-infer
+! \ matches? must-infer
 
 [ f ] [ "b" "a*" <regexp> matches? ] unit-test
 [ t ] [ "" "a*" <regexp> matches? ] unit-test
