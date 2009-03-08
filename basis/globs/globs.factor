@@ -1,42 +1,42 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser-combinators parser-combinators.regexp lists sequences kernel
-promises strings unicode.case ;
+USING: sequences kernel regexp.combinators regexp.matchers strings unicode.case
+peg.ebnf regexp arrays ;
 IN: globs
 
-<PRIVATE
+EBNF: <glob>
 
-: 'char' ( -- parser )
-    [ ",*?" member? not ] satisfy ;
+Character = "\\" .:c => [[ c 1string <literal> ]]
+          | !(","|"}") . => [[ 1string <literal> ]]
 
-: 'string' ( -- parser )
-    'char' <+> [ >lower token ] <@ ;
+RangeCharacter = !("]") .
 
-: 'escaped-char' ( -- parser )
-    "\\" token any-char-parser &> [ 1token ] <@ ;
+Range = RangeCharacter:a "-" RangeCharacter:b => [[ a b <char-range> ]]
+      | RangeCharacter => [[ 1string <literal> ]]
 
-: 'escaped-string' ( -- parser )
-    'string' 'escaped-char' <|> ;
+StartRange = .:a "-" RangeCharacter:b => [[ a b <char-range> ]]
+           | . => [[ 1string <literal> ]]
 
-DEFER: 'term'
+Ranges = StartRange:s Range*:r => [[ r s prefix ]]
 
-: 'glob' ( -- parser )
-    'term' <*> [ <and-parser> ] <@ ;
+CharClass = "^"?:n Ranges:e => [[ e <or> n [ <not> ] when ]]
 
-: 'union' ( -- parser )
-    'glob' "," token nonempty-list-of "{" "}" surrounded-by
-    [ <or-parser> ] <@ ;
+AlternationBody = Concatenation:c "," AlternationBody:a => [[ a c prefix ]]
+                | Concatenation => [[ 1array ]]
 
-LAZY: 'term' ( -- parser )
-    'union'
-    'character-class' <|>
-    "?" token [ drop any-char-parser ] <@ <|>
-    "*" token [ drop any-char-parser <*> ] <@ <|>
-    'escaped-string' <|> ;
+Element = "*" => [[ R/ .*/ ]]
+        | "?" => [[ R/ ./ ]]
+        | "[" CharClass:c "]" => [[ c ]]
+        | "{" AlternationBody:b "}" => [[ b <or> ]]
+        | Character
 
-PRIVATE>
+Concatenation = Element* => [[ <sequence> ]]
 
-: <glob> ( string -- glob ) 'glob' just parse-1 just ;
+End = !(.)
+
+Main = Concatenation End
+
+;EBNF
 
 : glob-matches? ( input glob -- ? )
-    [ >lower ] [ <glob> ] bi* parse nil? not ;
+    [ >case-fold ] bi@ <glob> matches? ;
