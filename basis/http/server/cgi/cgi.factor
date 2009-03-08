@@ -53,9 +53,9 @@ IN: http.server.cgi
     "CGI output follows" >>message
     swap '[
         binary encode-output
-        _ output-stream get swap <cgi-process> binary <process-stream> [
+        output-stream get _ <cgi-process> binary <process-stream> [
             post-request? [ request get post-data>> data>> write flush ] when
-            '[ _ write ] each-block
+            '[ _ stream-write ] each-block
         ] with-stream
     ] >>body ;
 

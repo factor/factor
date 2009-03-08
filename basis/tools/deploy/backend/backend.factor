@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make continuations.private kernel.private init
 assocs kernel vocabs words sequences memory io system arrays
@@ -14,9 +14,14 @@ IN: tools.deploy.backend
 : copy-vm ( executable bundle-name -- vm )
     prepend-path vm over copy-file ;
 
-: copy-fonts ( name dir -- )
+CONSTANT: theme-path "basis/ui/gadgets/theme/"
+
+: copy-theme ( name dir -- )
     deploy-ui? get [
-        append-path "resource:fonts/" swap copy-tree-into
+        append-path
+        theme-path append-path
+        [ make-directories ]
+        [ theme-path "resource:" prepend swap copy-tree ] bi
     ] [ 2drop ] if ;
 
 : image-name ( vocab bundle-name -- str )
