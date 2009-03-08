@@ -162,7 +162,7 @@ PEG: (parse-set-cookie) ( string -- alist )
         'value' ,
         'space' ,
     ] seq*
-    [ ";,=" member? not ] satisfy repeat1 [ drop f ] action
+    [ ";,=" member? not ] satisfy repeat0 [ drop f ] action
     2choice ;
 
 PEG: (parse-cookie) ( string -- alist )

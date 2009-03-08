@@ -34,7 +34,7 @@ IN: http
 
 : check-header-string ( str -- str )
     #! http://en.wikipedia.org/wiki/HTTP_Header_Injection
-    dup "\r\n\"" intersects?
+    dup "\r\n" intersects?
     [ "Header injection attack" throw ] when ;
 
 : write-header ( assoc -- )

@@ -95,4 +95,4 @@ PRIVATE>
 
 : [infix|
     "|" parse-bindings "infix]" parse-infix-locals <let>
-    parsed-lambda ; parsing
+    ?rewrite-closures over push-all ; parsing

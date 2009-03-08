@@ -63,7 +63,9 @@ M: pane gadget-selection ( pane -- string/f )
     selection-color >>selection-color ; inline
 
 : init-last-line ( pane -- pane )
-    horizontal <track> [ >>last-line ] [ 1 track-add ] bi ; inline
+    horizontal <track>
+    [ >>last-line ] [ 1 track-add ] bi
+    dup prepare-last-line ; inline
 
 : new-pane ( input class -- pane )
     [ vertical ] dip new-track

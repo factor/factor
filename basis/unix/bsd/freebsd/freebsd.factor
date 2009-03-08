@@ -1,7 +1,7 @@
 USING: alien.syntax ;
 IN: unix
 
-: FD_SETSIZE 1024 ;
+CONSTANT: FD_SETSIZE 1024
 
 C-STRUCT: addrinfo
     { "int" "flags" }

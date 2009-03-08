@@ -19,7 +19,7 @@ M: image-gadget draw-gadget* ( gadget -- )
     image>> draw-image ;
 
 : <image-gadget> ( image -- gadget )
-    \ image-gadget new-gadget
+    \ image-gadget new
         swap >>image ;
 
 : image-window ( path -- gadget )

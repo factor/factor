@@ -44,16 +44,6 @@ HELP: annotate-methods
      { "word" word } { "quot" quotation } }
 { $description "Annotates the word -- for generic words, all its methods -- with the quotation." } ;
 
-HELP: entering
-{ $values
-     { "str" string } }
-{ $description "Prints a message and the inputs to the word before the word has been called." } ;
-
-HELP: leaving
-{ $values
-     { "str" string } }
-{ $description "Prints a message and the outputs from a word after a word has been called." } ;
-
 HELP: reset
 { $values
      { "word" word } }
@@ -64,12 +54,6 @@ HELP: watch-vars
 { $values
      { "word" word } { "vars" "a sequence of symbols" } }
 { $description "Annotates a word definition to print the " { $snippet "vars" } " upon entering the word. This word is useful for debugging." } ;
-
-HELP: word-inputs
-{ $values
-     { "word" word }
-     { "seq" sequence } }
-{ $description "Makes a sequence of the inputs to a word by counting the number of inputs in the stack effect and saving that many items from the datastack." } ;
 
 HELP: add-timing
 { $values { "word" word } }
