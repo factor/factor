@@ -7,7 +7,7 @@ IN: simple-flat-file
     [ "#" split1 drop ] map harvest ;
 
 : split-column ( line -- columns )
-    "\t" split 2 head ;
+    " \t" split harvest 2 head ;
 
 : parse-hex ( s -- n )
     2 short tail hex> ;
