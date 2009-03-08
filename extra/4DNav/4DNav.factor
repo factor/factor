@@ -3,6 +3,7 @@
 USING: kernel 
 namespaces
 accessors
+assocs
 make
 math
 math.functions
@@ -16,6 +17,7 @@ colors
 colors.constants
 prettyprint
 vars
+call
 quotations
 io
 io.directories
@@ -27,8 +29,6 @@ ui.gadgets.panes
        ui.gadgets
        ui.traverse
        ui.gadgets.borders
-       ui.gadgets.handler
-       ui.gadgets.slate
        ui.gadgets.frames
        ui.gadgets.tracks
        ui.gadgets.labels
@@ -53,6 +53,7 @@ adsoda
 adsoda.tools
 ;
 QUALIFIED-WITH: ui.pens.solid s
+QUALIFIED-WITH: ui.gadgets.wrappers w
 
 
 IN: 4DNav
@@ -391,6 +392,13 @@ USE: ui.gadgets.labeled.private
             { 0 10 } >>gap
         add-gadget
         menu-quick-views add-gadget ; 
+
+TUPLE: handler < w:wrapper table ;
+
+: <handler> ( child -- handler ) handler w:new-wrapper ;
+
+M: handler handle-gesture ( gesture gadget -- ? )
+   tuck table>> at dup [ call( gadget -- ) f ] [ 2drop t ] if ;
 
 : add-keyboard-delegate ( obj -- obj )
  <handler>
