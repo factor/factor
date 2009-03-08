@@ -86,7 +86,9 @@ M: browser-gadget focusable-child* search-field>> ;
     [ [ raise-window ] [ gadget-child show-help ] bi ]
     [ (browser-window) ] if* ;
 
-: show-browser ( -- ) "handbook" com-browse ;
+: show-browser ( -- )
+    [ browser-gadget? ] find-window
+    [ raise-window ] [ browser-window ] if* ;
 
 \ show-browser H{ { +nullary+ t } } define-command
 

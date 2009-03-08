@@ -13,8 +13,8 @@ HELP: PROTOCOL:
 { define-protocol POSTPONE: PROTOCOL: } related-words
 
 HELP: define-consult
-{ $values { "class" "a class" } { "group" "a protocol, generic word or tuple class" } { "quot" "a quotation" } }
-{ $description "Defines a class to consult, using the given quotation, on the generic words contained in the group." }
+{ $values { "consultation" consultation } }
+{ $description "Defines a class to consult, using the quotation, on the generic words contained in the group." }
 { $notes "Usually, " { $link POSTPONE: CONSULT: } " should be used instead. This is only for runtime use." } ;
 
 HELP: CONSULT:

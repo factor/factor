@@ -2,6 +2,8 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
+	<t:atom t:href="$planet/feed.xml">[ planet-factor ]</t:atom>
+
 	<t:title>[ planet-factor ]</t:title>
 
 	<table width="100%" cellpadding="10">
