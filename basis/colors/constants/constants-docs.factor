@@ -2,7 +2,7 @@ IN: colors.constants
 USING: help.markup help.syntax strings colors ;
 
 HELP: named-color
-{ $values { "string" string } { "color" color } }
+{ $values { "name" string } { "color" color } }
 { $description "Outputs a named color from the " { $snippet "rgb.txt" } " database." }
 { $notes "In most cases, " { $link POSTPONE: COLOR: } " should be used instead." }
 { $errors "Throws an error if the color is not listed in " { $snippet "rgb.txt" } "." } ;

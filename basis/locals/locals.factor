@@ -9,19 +9,13 @@ IN: locals
     scan locals get [ :>-outside-lambda-error ] unless*
     [ make-local ] bind <def> parsed ; parsing
 
-: [| parse-lambda parsed-lambda ; parsing
+: [| parse-lambda over push-all ; parsing
 
-: [let
-    "|" expect "|" parse-bindings
-    \ ] (parse-lambda) <let> parsed-lambda ; parsing
+: [let parse-let over push-all ; parsing
 
-: [let*
-    "|" expect "|" parse-bindings*
-    \ ] (parse-lambda) <let*> parsed-lambda ; parsing
+: [let* parse-let* over push-all ; parsing
 
-: [wlet
-    "|" expect "|" parse-wbindings
-    \ ] (parse-lambda) <wlet> parsed-lambda ; parsing
+: [wlet parse-wlet over push-all ; parsing
 
 : :: (::) define ; parsing
 
@@ -30,6 +24,8 @@ IN: locals
 : MACRO:: (::) define-macro ; parsing
 
 : MEMO:: (::) define-memoized ; parsing
+
+USE: syntax
 
 {
     "locals.macros"

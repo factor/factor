@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors sequences kernel math io calendar grouping
-calendar.format calendar.model arrays models models.arrow
-namespaces ui.gadgets ui.gadgets.labels ui.gadgets.theme ui ;
+calendar.format calendar.model fonts arrays models models.arrow
+namespaces ui.gadgets ui.gadgets.labels ui ;
 IN: lcd
 
 : lcd-digit ( row digit -- str )

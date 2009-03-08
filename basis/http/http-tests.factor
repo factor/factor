@@ -11,12 +11,6 @@ IN: http.tests
 
 [ "application/octet-stream" binary ] [ "application/octet-stream" parse-content-type ] unit-test
 
-[ { } ] [ "" parse-cookie ] unit-test
-[ { } ] [ "" parse-set-cookie ] unit-test
-
-! Make sure that totally invalid cookies don't confuse us
-[ { } ] [ "hello world; how are you" parse-cookie ] unit-test
-
 : lf>crlf "\n" split "\r\n" join ;
 
 STRING: read-request-test-1
