@@ -7,10 +7,13 @@ IN: simple-flat-file
     [ "#" split1 drop ] map harvest ;
 
 : split-column ( line -- columns )
-    " \t" split harvest 2 head ;
+    " \t" split harvest 2 short head 2 f pad-tail ;
 
 : parse-hex ( s -- n )
-    2 short tail hex> ;
+    dup [
+        "0x" ?head [ "U+" ?head [ "Missing 0x or U+" throw ] unless ] unless
+        hex>
+    ] when ;
 
 : parse-line ( line -- code-unicode )
     split-column [ parse-hex ] map ;
