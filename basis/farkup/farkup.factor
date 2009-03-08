@@ -165,8 +165,8 @@ CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
         { [ dup [ 127 > ] any? ] [ drop invalid-url ] }
         { [ dup first "/\\" member? ] [ drop invalid-url ] }
         { [ CHAR: : over member? ] [ dup absolute-url? [ drop invalid-url ] unless ] }
-        [ relative-link-prefix get prepend "" like ]
-    } cond url-encode ;
+        [ relative-link-prefix get prepend "" like url-encode ]
+    } cond ;
 
 : write-link ( href text -- xml )
     [ check-url link-no-follow? get "nofollow" and ] dip
