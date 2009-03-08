@@ -1,10 +1,10 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors math.vectors classes.tuple math.rectangles colors
-kernel sequences models opengl math math.order namespaces
-ui.commands ui.gestures ui.render ui.gadgets
-ui.gadgets.labels ui.gadgets.scrollers
-ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.packs ;
+kernel sequences models opengl math math.order namespaces call
+ui.commands ui.gestures ui.render ui.gadgets ui.gadgets.labels
+ui.gadgets.scrollers ui.gadgets.presentations ui.gadgets.viewports
+ui.gadgets.packs ;
 IN: ui.gadgets.lists
 
 TUPLE: list < pack index presenter color hook ;
@@ -32,7 +32,7 @@ TUPLE: list < pack index presenter color hook ;
     hook>> [ [ list? ] find-parent ] prepend ;
 
 : <list-presentation> ( hook elt presenter -- gadget )
-    keep [ >label text-theme ] dip
+    [ call( elt -- obj ) ] [ drop ] 2bi [ >label text-theme ] dip
     <presentation>
     swap >>hook ; inline
 

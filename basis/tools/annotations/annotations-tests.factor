@@ -45,4 +45,4 @@ M: string blah-generic ;
 
 { string blah-generic } watch
 
-[ ] [ "hi" blah-generic ] unit-test
+[ "hi" ] [ "hi" blah-generic ] unit-test
