@@ -23,9 +23,6 @@ CONSTANT: fail-state -1
     [ add-default-transition ] assoc-map
     fail-state-recurses ;
 
-: assoc>set ( assoc -- keys-set )
-    [ drop dup ] assoc-map ;
-
 : inverse-final-states ( transition-table -- final-states )
     [ transitions>> assoc>set ] [ final-states>> ] bi assoc-diff ;
 
