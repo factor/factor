@@ -10,7 +10,7 @@ IN: ascii
 : LETTER? ( ch -- ? ) CHAR: A CHAR: Z between? ; inline
 : digit? ( ch -- ? ) CHAR: 0 CHAR: 9 between? ; inline
 : printable? ( ch -- ? ) CHAR: \s CHAR: ~ between? ; inline
-: control? ( ch -- ? ) "\0\e\r\n\t\u000008\u00007f" member? ; inline
+: control? ( ch -- ? ) { [ 0 HEX: 1F between? ] [ HEX: 7F = ] } 1|| ; inline
 : quotable? ( ch -- ? ) { [ printable? ] [ "\"\\" member? not ] } 1&& ; inline
 : Letter? ( ch -- ? ) { [ letter? ] [ LETTER? ] } 1|| ; inline
 : alpha? ( ch -- ? ) { [ Letter? ] [ digit? ] } 1|| ; inline

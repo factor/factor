@@ -29,11 +29,14 @@ selection-color caret mark selecting? ;
 : init-current ( pane -- pane )
     dup prototype>> clone >>current ; inline
 
+: focus-input ( pane -- )
+    input>> [ request-focus ] when* ;
+
 : next-line ( pane -- )
     clear-selection
     [ input>> unparent ]
     [ init-current prepare-last-line ]
-    [ input>> [ request-focus ] when* ] tri ;
+    [ focus-input ] tri ;
 
 : pane-caret&mark ( pane -- caret mark )
     [ caret>> ] [ mark>> ] bi ; inline
@@ -364,9 +367,8 @@ M: paragraph stream-format
         interleave
     ] if ;
 
-: caret>mark ( pane -- pane )
-    dup caret>> >>mark
-    dup relayout-1 ;
+: caret>mark ( pane -- )
+    dup caret>> >>mark relayout-1 ;
 
 GENERIC: sloppy-pick-up* ( loc gadget -- n )
 
@@ -388,45 +390,46 @@ M: f sloppy-pick-up*
     [ 3drop { } ]
     if ;
 
-: move-caret ( pane loc -- pane )
+: move-caret ( pane loc -- )
     over screen-loc v- over sloppy-pick-up >>caret
-    dup relayout-1 ;
+    relayout-1 ;
 
 : begin-selection ( pane -- )
     f >>selecting?
-    hand-loc get move-caret
+    dup hand-loc get move-caret
     f >>mark
     drop ;
 
 : extend-selection ( pane -- )
     hand-moved? [
-        dup selecting?>> [
-            hand-loc get move-caret
-        ] [
-            dup hand-clicked get child? [
-                t >>selecting?
-                dup hand-clicked set-global
-                hand-click-loc get move-caret
-                caret>mark
-            ] when
-        ] if
-        dup dup caret>> gadget-at-path scroll>gadget
-    ] when drop ;
+        [
+            dup selecting?>> [
+                hand-loc get move-caret
+            ] [
+                dup hand-clicked get child? [
+                    t >>selecting?
+                    [ hand-clicked set-global ]
+                    [ hand-click-loc get move-caret ]
+                    [ caret>mark ]
+                    tri
+                ] [ drop ] if
+            ] if
+        ] [ dup caret>> gadget-at-path scroll>gadget ] bi
+    ] [ drop ] if ;
 
 : end-selection ( pane -- )
     f >>selecting?
-    hand-moved? [
-        [ com-copy-selection ] [ request-focus ] bi
-    ] [
-        relayout-1
-    ] if ;
+    hand-moved?
+    [ [ com-copy-selection ] [ request-focus ] bi ]
+    [ [ relayout-1 ] [ focus-input ] bi ]
+    if ;
 
 : select-to-caret ( pane -- )
     t >>selecting?
-    dup mark>> [ caret>mark ] unless
-    hand-loc get move-caret
-    dup request-focus
-    com-copy-selection ;
+    [ dup mark>> [ dup caret>mark ] unless hand-loc get move-caret ]
+    [ com-copy-selection ]
+    [ request-focus ]
+    tri ;
 
 : pane-menu ( pane -- ) { com-copy } show-commands-menu ;
 
