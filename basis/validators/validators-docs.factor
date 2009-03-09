@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io.streams.string quotations 
-strings math regexp regexp.backend ;
+strings math regexp ;
 IN: validators
 
 HELP: v-checkbox
