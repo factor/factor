@@ -52,13 +52,12 @@ SYMBOL: mdb-instance
     nodes>> [ f ] dip at inet>> ;
 
 : with-db ( mdb quot: ( -- * ) -- * )
-    [ [ '[ _ [ mdb-instance set ensure-buffer ] keep master>>
-           [ remote-address set ] keep
-           binary <client>
-           local-address set
+    [ [ '[ ensure-buffer _ [ mdb-instance set ] keep
+           master>> [ remote-address set ] keep
+           binary <client> local-address set
            mdb-socket-stream set ] ] dip compose
-      [ mdb-stream>> [ dispose ] when* ] [ ] cleanup
-    ] with-scope ; inline
+      [ mdb-stream>> [ dispose ] when* ]
+      [ ] cleanup ] with-scope ; inline
 
 <PRIVATE
 
@@ -189,7 +188,7 @@ MEMO: ensure-collection ( collection -- fq-collection )
 GENERIC# limit 1 ( mdb-query limit# -- mdb-query )
 M: mdb-query-msg limit ( query limit# -- mdb-query )
     >>return# ; inline
- 
+
 GENERIC# skip 1 ( mdb-query skip# -- mdb-query )
 M: mdb-query-msg skip ( query skip# -- mdb-query )
     >>skip# ; inline
