@@ -20,9 +20,9 @@ GENERIC: match-index-from ( i string matcher -- index/f )
     dupd match-index-head
     [ swap length = ] [ drop f ] if* ;
 
-:: match-from ( i string matcher -- slice/f )
-    i string length [a,b)
-    [ string matcher match-slice ] map-find drop ;
+: match-from ( i string matcher -- slice/f )
+    [ [ length [a,b) ] keep ] dip
+    '[ _ _ match-slice ] map-find drop ;
 
 : match-head ( str matcher -- slice/f )
     [ 0 ] 2dip match-from ;
