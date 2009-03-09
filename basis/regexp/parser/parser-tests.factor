@@ -1,34 +1,24 @@
-USING: kernel tools.test regexp.backend regexp ;
-IN: regexp.parser
+USING: kernel tools.test regexp.parser fry sequences ;
+IN: regexp.parser.tests
 
-: test-regexp ( string -- )
-    default-regexp parse-regexp ;
+: regexp-parses ( string -- )
+    [ [ ] ] dip '[ _ parse-regexp drop ] unit-test ;
 
-! [ "(" ] [ unmatched-parentheses? ] must-fail-with
+: regexp-fails ( string -- )
+    '[ _ parse-regexp ] must-fail ;
 
-[ ] [ "a|b" test-regexp ] unit-test
-[ ] [ "a.b" test-regexp ] unit-test
-[ ] [ "a|b|c" test-regexp ] unit-test
-[ ] [ "abc|b" test-regexp ] unit-test
-[ ] [ "a|bcd" test-regexp ] unit-test
-[ ] [ "a|(b)" test-regexp ] unit-test
-[ ] [ "(a)|b" test-regexp ] unit-test
-[ ] [ "(a|b)" test-regexp ] unit-test
-[ ] [ "((a)|(b))" test-regexp ] unit-test
+{
+    "a|b" "a.b" "a|b|c" "abc|b" "a|bcd" "a|(b)" "(?-i:a)" "||"
+    "(a)|b" "(a|b)" "((a)|(b))" "(?:a)" "(?i:a)" "|b" "b|"
+    "[abc]" "[a-c]" "[^a-c]" "[^]]" "[]a]" "[[]" "[]-a]" "[a-]" "[-]"
+    "[--a]" "foo*" "(foo)*" "(a|b)|c" "(foo){2,3}" "(foo){2,}"
+    "(foo){2}" "{2,3}" "{," "{,}" "}" "foo}" "[^]-a]" "[^-]a]"
+    "[a-]" "[^a-]" "[^a-]" "a{,2}" "(?#foobar)"
+    "\\p{Space}" "\\t" "\\[" "[\\]]" "\\P{Space}"
+    "\\ueeee" "\\0333" "\\xff" "\\\\" "\\w"
+} [ regexp-parses ] each
 
-[ ] [ "(?:a)" test-regexp ] unit-test
-[ ] [ "(?i:a)" test-regexp ] unit-test
-[ ] [ "(?-i:a)" test-regexp ] unit-test
-[ "(?z:a)" test-regexp ] [ unknown-regexp-option? ] must-fail-with
-[ "(?-z:a)" test-regexp ] [ unknown-regexp-option? ] must-fail-with
-
-[ ] [ "(?=a)" test-regexp ] unit-test
-
-[ ] [ "[abc]" test-regexp ] unit-test
-[ ] [ "[a-c]" test-regexp ] unit-test
-[ ] [ "[^a-c]" test-regexp ] unit-test
-[ "[^]" test-regexp ] must-fail
-
-[ ] [ "|b" test-regexp ] unit-test
-[ ] [ "b|" test-regexp ] unit-test
-[ ] [ "||" test-regexp ] unit-test
+{
+    "[^]" "[]" "a{foo}" "a{,}" "a{}" "(?)" "\\p{foo}" "\\P{foo}"
+    "\\ueeeg" "\\0339" "\\xfg"
+} [ regexp-fails ] each
