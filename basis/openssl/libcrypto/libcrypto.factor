@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Elie CHAFTARI
+! Copyright (C) 2007 Elie CHAFTARI, 2009 Maxim Savchenko
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Tested with OpenSSL 0.9.8a_0 on Mac OS X 10.4.9 PowerPC
@@ -159,3 +159,65 @@ FUNCTION: int RSA_check_key ( void* rsa ) ;
 FUNCTION: void RSA_free ( void* rsa ) ;
 
 FUNCTION: int RSA_print_fp ( void* fp, void* x, int offset ) ;
+
+! ===============================================
+! objects.h
+! ===============================================
+
+FUNCTION: int OBJ_sn2nid ( char* s ) ;
+
+! ===============================================
+! bn.h
+! ===============================================
+
+FUNCTION: int BN_num_bits ( void* a ) ;
+
+FUNCTION: void* BN_bin2bn ( void* s, int len, void* ret ) ;
+
+FUNCTION: int BN_bn2bin ( void* a, void* to ) ;
+
+FUNCTION: void BN_clear_free ( void* a ) ;
+
+! ===============================================
+! ec.h
+! ===============================================
+
+CONSTANT: POINT_CONVERSION_COMPRESSED 2
+CONSTANT: POINT_CONVERSION_UNCOMPRESSED 4
+CONSTANT: POINT_CONVERSION_HYBRID 6
+
+FUNCTION: int EC_GROUP_get_degree ( void* group ) ;
+
+FUNCTION: void* EC_POINT_new ( void* group ) ;
+
+FUNCTION: void EC_POINT_clear_free ( void* point ) ;
+
+FUNCTION: int EC_POINT_point2oct ( void* group, void* point, int form, void* buf, int len, void* ctx ) ;
+
+FUNCTION: int EC_POINT_oct2point ( void* group, void* point, void* buf, int len, void* ctx ) ;
+
+FUNCTION: void* EC_KEY_new_by_curve_name ( int nid ) ;
+
+FUNCTION: void EC_KEY_free ( void* r ) ;
+
+FUNCTION: int EC_KEY_set_private_key ( void* key, void* priv_key ) ;
+
+FUNCTION: int EC_KEY_set_public_key ( void* key, void* pub_key ) ;
+
+FUNCTION: int EC_KEY_generate_key ( void* eckey ) ;
+
+FUNCTION: void* EC_KEY_get0_group ( void* key ) ;
+
+FUNCTION: void* EC_KEY_get0_private_key ( void* key ) ;
+
+FUNCTION: void* EC_KEY_get0_public_key ( void* key ) ;
+
+! ===============================================
+! ecdsa.h
+! ===============================================
+
+FUNCTION: int ECDSA_size ( void* eckey ) ;
+
+FUNCTION: int ECDSA_sign ( int type, void* dgst, int dgstlen, void* sig, void* siglen, void* eckey ) ;
+
+FUNCTION: int ECDSA_verify ( int type, void* dgst, int dgstlen, void* sig, int siglen, void* eckey ) ;
