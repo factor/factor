@@ -1,86 +1,74 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math sequences strings sets
 assocs prettyprint.backend prettyprint.custom make lexer
-namespaces parser arrays fry regexp.backend regexp.utils
-regexp.parser regexp.nfa regexp.dfa regexp.traversal
-regexp.transition-tables splitting sorting ;
+namespaces parser arrays fry locals regexp.minimize
+regexp.parser regexp.nfa regexp.dfa regexp.classes
+regexp.transition-tables splitting sorting regexp.ast
+regexp.negation regexp.matchers regexp.compiler ;
 IN: regexp
 
-: default-regexp ( string -- regexp )
-    regexp new
-        swap >>raw
-        <transition-table> >>nfa-table
-        <transition-table> >>dfa-table
-        <transition-table> >>minimized-table
-        H{ } clone >>nfa-traversal-flags
-        H{ } clone >>dfa-traversal-flags
-        H{ } clone >>options
-        H{ } clone >>matchers
-        reset-regexp ;
+TUPLE: regexp
+    { raw read-only }
+    { parse-tree read-only }
+    { options read-only }
+    dfa reverse-dfa ;
 
-: construct-regexp ( regexp -- regexp' )
-    {
-        [ parse-regexp ]
-        [ construct-nfa ]
-        [ construct-dfa ]
-        [ ]
-    } cleave ;
+: make-regexp ( string ast -- regexp )
+    f f <options> f f regexp boa ; foldable
+    ! Foldable because, when the dfa slot is set,
+    ! it'll be set to the same thing regardless of who sets it
 
-: (match) ( string regexp -- dfa-traverser )
-    <dfa-traverser> do-match ; inline
+: <optioned-regexp> ( string options -- regexp )
+    [ dup parse-regexp ] [ string>options ] bi*
+    f f regexp boa ;
 
-: match ( string regexp -- slice/f )
-    (match) return-match ;
+: <regexp> ( string -- regexp ) "" <optioned-regexp> ;
 
-: match* ( string regexp -- slice/f captured-groups )
-    (match) [ return-match ] [ captured-groups>> ] bi ;
-
-: matches? ( string regexp -- ? )
-    dupd match
-    [ [ length ] bi@ = ] [ drop f ] if* ;
-
-: match-head ( string regexp -- end/f ) match [ length ] [ f ] if* ;
-
-: match-at ( string m regexp -- n/f finished? )
-    [
-        2dup swap length > [ 2drop f f ] [ tail-slice t ] if
-    ] dip swap [ match-head f ] [ 2drop f t ] if ;
-
-: match-range ( string m regexp -- a/f b/f )
-    3dup match-at over [
-        drop nip rot drop dupd +
-    ] [
-        [ 3drop drop f f ] [ drop [ 1+ ] dip match-range ] if
-    ] if ;
-
-: first-match ( string regexp -- slice/f )
-    dupd 0 swap match-range rot over [ <slice> ] [ 3drop f ] if ;
-
-: re-cut ( string regexp -- end/f start )
-    dupd first-match
-    [ split1-slice swap ] [ "" like f swap ] if* ;
-
-: (re-split) ( string regexp -- )
-    over [ [ re-cut , ] keep (re-split) ] [ 2drop ] if ;
-
-: re-split ( string regexp -- seq )
-    [ (re-split) ] { } make ;
-
-: re-replace ( string regexp replacement -- result )
-    [ re-split ] dip join ;
-
-: next-match ( string regexp -- end/f match/f )
-    dupd first-match dup
-    [ [ split1-slice nip ] keep ] [ 2drop f f ] if ;
-
-: all-matches ( string regexp -- seq )
-    [ dup ] swap '[ _ next-match ] produce nip harvest ;
-
-: count-matches ( string regexp -- n )
-    all-matches length ;
+TUPLE: reverse-matcher regexp ;
+C: <reverse-matcher> reverse-matcher
+! Reverse matchers won't work properly with most combinators, for now
 
 <PRIVATE
+
+: get-ast ( regexp -- ast )
+    [ parse-tree>> ] [ options>> ] bi <with-options> ;
+
+: compile-regexp ( regexp -- regexp )
+    dup '[ [ _ get-ast ast>dfa dfa>quotation ] unless* ] change-dfa ;
+
+: <reversed-option> ( ast -- reversed )
+    "r" string>options <with-options> ;
+
+: maybe-negated ( lookaround quot -- regexp-quot )
+    '[ term>> @ ] [ positive?>> [ ] [ not ] ? ] bi compose ; inline
+
+M: lookahead question>quot ! Returns ( index string -- ? )
+    [ ast>dfa dfa>shortest-quotation ] maybe-negated ;
+
+M: lookbehind question>quot ! Returns ( index string -- ? )
+    [
+        <reversed-option>
+        ast>dfa dfa>reverse-shortest-quotation
+        [ [ 1- ] dip ] prepose
+    ] maybe-negated ;
+
+: compile-reverse ( regexp -- regexp )
+    dup '[
+        [
+            _ get-ast <reversed-option>
+            ast>dfa dfa>reverse-quotation
+        ] unless*
+    ] change-reverse-dfa ;
+
+M: regexp match-index-from
+    compile-regexp dfa>> <quot-matcher> match-index-from ;
+
+M: reverse-matcher match-index-from
+    regexp>> compile-reverse reverse-dfa>>
+    <quot-matcher> match-index-from ;
+
+! The following two should do some caching
 
 : find-regexp-syntax ( string -- prefix suffix )
     {
@@ -97,28 +85,19 @@ IN: regexp
         { "R| "  "|"  }
     } swap [ subseq? not nip ] curry assoc-find drop ;
 
-: string>options ( string -- options )
-    [ ch>option dup ] H{ } map>assoc ;
+: take-until ( end lexer -- string )
+    dup skip-blank [
+        [ index-from ] 2keep
+        [ swapd subseq ]
+        [ 2drop 1+ ] 3bi
+    ] change-lexer-column ;
 
-: options>string ( options -- string )
-    keys [ option>ch ] map natural-sort >string ;
-
-PRIVATE>
-
-: <optioned-regexp> ( string option-string -- regexp )
-    [ default-regexp ] [ string>options ] bi* >>options
-    construct-regexp ;
-
-: <regexp> ( string -- regexp ) "" <optioned-regexp> ;
-
-<PRIVATE
+: parse-noblank-token ( lexer -- str/f )
+    dup still-parsing-line? [ (parse-token) ] [ drop f ] if ;
 
 : parsing-regexp ( accum end -- accum )
-    lexer get dup skip-blank
-    [ [ index-from dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
-    lexer get dup still-parsing-line?
-    [ (parse-token) ] [ drop f ] if
-    <optioned-regexp> parsed ;
+    lexer get [ take-until ] [ parse-noblank-token ] bi
+    <optioned-regexp> compile-regexp parsed ;
 
 PRIVATE>
 
