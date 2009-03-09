@@ -14,8 +14,6 @@ IN: regexp.minimize.tests
 
 [ { { 1 2 } { 3 4 } } ] [ H{ { "elephant" 1 } { "tiger" 3 } } H{ { "elephant" 2 } { "tiger" 4 } } assemble-values ] unit-test
 
-USE: multiline
-/*
 : regexp-states ( string -- n )
     parse-regexp ast>dfa transitions>> assoc-size ;
 
@@ -26,7 +24,6 @@ USE: multiline
 [ 2 ] [ "ab|((aa*)*)*b" regexp-states ] unit-test
 [ 4 ] [ "ab|cd" regexp-states ] unit-test
 [ 1 ] [ "(?i:[a-z]*|[A-Z]*)" regexp-states ] unit-test
-*/
 
 [
     T{ transition-table

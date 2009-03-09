@@ -11,8 +11,8 @@ IN: regexp.minimize
 : number-states ( table -- newtable )
     dup table>state-numbers transitions-at ;
 
-: has-conditions? ( state transitions -- ? )
-    at values [ condition? ] any? ;
+: has-conditions? ( assoc -- ? )
+    values [ condition? ] any? ;
 
 : initially-same? ( s1 s2 transition-table -- ? )
     {
@@ -24,9 +24,7 @@ IN: regexp.minimize
 :: initialize-partitions ( transition-table -- partitions )
     ! Partition table is sorted-array => ?
     H{ } clone :> out
-    transition-table transitions>> keys
-    [ transition-table transitions>> has-conditions? ] partition :> states
-    [ dup 2array out conjoin ] each
+    transition-table transitions>> keys :> states
     states [| s1 |
         states [| s2 |
             s1 s2 transition-table initially-same?
@@ -35,7 +33,7 @@ IN: regexp.minimize
     ] each out ;
 
 : same-partition? ( s1 s2 partitions -- ? )
-    [ 2array natural-sort ] dip key? ;
+    { [ [ 2array natural-sort ] dip key? ] [ drop = ] } 3|| ;
 
 : assemble-values ( assoc1 assoc2 -- values )
     dup keys '[ _ swap [ at ] curry map ] bi@ zip ;
@@ -64,13 +62,19 @@ IN: regexp.minimize
 : while-changes ( obj quot pred -- obj' )
     3dup nip call (while-changes) ; inline
 
-: state-classes ( transition-table -- synonyms )
+: (state-classes) ( transition-table -- partition )
     [ initialize-partitions ] keep
-    '[ _ partition-more ] [ assoc-size ] while-changes
-    partition>classes ;
+    '[ _ partition-more ] [ assoc-size ] while-changes ;
+
+: assoc>set ( assoc -- keys-set )
+    [ drop dup ] assoc-map ;
+
+: state-classes ( transition-table -- synonyms )
+    clone [ [ nip has-conditions? ] assoc-partition ] change-transitions
+    [ assoc>set ] [ (state-classes) partition>classes ] bi* assoc-union ;
 
 : canonical-state? ( state transitions state-classes -- ? )
-    '[ dup _ at =  ] swap '[ _ has-conditions? ] bi or ;
+    '[ dup _ at =  ] swap '[ _ at has-conditions? ] bi or ;
 
 : delete-duplicates ( transitions state-classes -- new-transitions )
     dupd '[ drop _ _ canonical-state? ] assoc-filter ;
@@ -91,5 +95,5 @@ IN: regexp.minimize
 : minimize ( table -- minimal-table )
     clone
     number-states
-    ! combine-states
+    combine-states
     combine-transitions ;
