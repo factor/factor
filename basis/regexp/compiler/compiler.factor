@@ -106,13 +106,15 @@ C: <box> box
     transitions>quot ;
 
 : states>code ( words dfa -- )
-    '[
+    [ ! with-compilation-unit doesn't compile, so we need call( -- )
         [
-            dup _ word>quot
-            (( last-match index string -- ? ))
-            define-declared
-        ] each
-    ] with-compilation-unit ;
+            '[
+                dup _ word>quot
+                (( last-match index string -- ? ))
+                define-declared
+            ] each
+        ] with-compilation-unit
+    ] call( words dfa -- ) ;
 
 : states>words ( dfa -- words dfa )
     dup transitions>> keys [ gensym ] H{ } map>assoc
