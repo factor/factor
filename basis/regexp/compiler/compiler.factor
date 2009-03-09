@@ -64,7 +64,7 @@ C: <box> box
 
 : non-literals>dispatch ( literals non-literals  -- quot )
     [ swap ] assoc-map ! we want state => predicate, and get the opposite as input
-    swap keys f answers
+    swap keys f assoc-answers
     table>condition [ <box> ] condition-map condition>quot ;
 
 : literals>cases ( literal-transitions -- case-body )

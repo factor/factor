@@ -16,7 +16,7 @@ USE: multiline
     { R' .*a' R' b.*' } <and> ;
 
 [ t ] [ "bljhasflsda" conj matches? ] unit-test
-[ f ] [ "bsdfdfs" conj matches? ] unit-test ! why does this fail?
+[ f ] [ "bsdfdfs" conj matches? ] unit-test
 [ f ] [ "fsfa" conj matches? ] unit-test
 
 [ f ] [ "bljhasflsda" conj <not> matches? ] unit-test
