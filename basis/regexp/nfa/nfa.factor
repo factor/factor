@@ -1,235 +1,153 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs grouping kernel regexp.backend
-locals math namespaces regexp.parser sequences fry quotations
-math.order math.ranges vectors unicode.categories regexp.utils
-regexp.transition-tables words sets regexp.classes unicode.case.private ;
+USING: accessors arrays assocs grouping kernel
+locals math namespaces sequences fry quotations
+math.order math.ranges vectors unicode.categories
+regexp.transition-tables words sets hashtables combinators.short-circuit
+unicode.case.private regexp.ast regexp.classes ;
+IN: regexp.nfa
+
 ! This uses unicode.case.private for ch>upper and ch>lower
 ! but case-insensitive matching should be done by case-folding everything
 ! before processing starts
-IN: regexp.nfa
 
-ERROR: feature-is-broken feature ;
+SYMBOL: option-stack
 
-SYMBOL: negation-mode
-: negated? ( -- ? ) negation-mode get 0 or odd? ; 
+SYMBOL: state
 
-SINGLETON: eps
+: next-state ( -- state )
+    state [ get ] [ inc ] bi ;
 
-MIXIN: traversal-flag
-SINGLETON: lookahead-on INSTANCE: lookahead-on traversal-flag
-SINGLETON: lookahead-off INSTANCE: lookahead-off traversal-flag
-SINGLETON: lookbehind-on INSTANCE: lookbehind-on traversal-flag
-SINGLETON: lookbehind-off INSTANCE: lookbehind-off traversal-flag
-SINGLETON: capture-group-on INSTANCE: capture-group-on traversal-flag
-SINGLETON: capture-group-off INSTANCE: capture-group-off traversal-flag
-SINGLETON: front-anchor INSTANCE: front-anchor traversal-flag
-SINGLETON: back-anchor INSTANCE: back-anchor traversal-flag
-SINGLETON: word-boundary INSTANCE: word-boundary traversal-flag
+SYMBOL: nfa-table
 
-: options ( -- obj ) current-regexp get options>> ;
+: set-each ( keys value hashtable -- )
+    '[ _ swap _ set-at ] each ;
 
-: option? ( obj -- ? ) options key? ;
+: options>hash ( options -- hashtable )
+    H{ } clone [
+        [ [ on>> t ] dip set-each ]
+        [ [ off>> f ] dip set-each ] 2bi
+    ] keep ;
 
-: option-on ( obj -- ) options conjoin ;
+: using-options ( options quot -- )
+    [ options>hash option-stack [ ?push ] change ] dip
+    call option-stack get pop* ; inline
 
-: option-off ( obj -- ) options delete-at ;
+: option? ( obj -- ? )
+    option-stack get assoc-stack ;
 
-: next-state ( regexp -- state )
-    [ state>> ] [ [ 1+ ] change-state drop ] bi ;
+GENERIC: nfa-node ( node -- start-state end-state )
 
-: set-start-state ( regexp -- )
-    dup stack>> [
-        drop
-    ] [
-        [ nfa-table>> ] [ pop first ] bi* >>start-state drop
-    ] if-empty ;
+: add-simple-entry ( obj -- start-state end-state )
+    [ next-state next-state 2dup ] dip
+    nfa-table get add-transition ;
 
-GENERIC: nfa-node ( node -- )
+: epsilon-transition ( source target -- )
+    epsilon nfa-table get add-transition ;
 
-:: add-simple-entry ( obj class -- )
-    [let* | regexp [ current-regexp get ]
-            s0 [ regexp next-state ]
-            s1 [ regexp next-state ]
-            stack [ regexp stack>> ]
-            table [ regexp nfa-table>> ] |
-        negated? [
-            s0 f obj class make-transition table add-transition
-            s0 s1 <default-transition> table add-transition
-        ] [
-            s0 s1 obj class make-transition table add-transition
-        ] if
-        s0 s1 2array stack push
-        t s1 table final-states>> set-at ] ;
+M:: star nfa-node ( node -- start end )
+    node term>> nfa-node :> s1 :> s0
+    next-state :> s2
+    next-state :> s3
+    s1 s0 epsilon-transition
+    s2 s0 epsilon-transition
+    s2 s3 epsilon-transition
+    s1 s3 epsilon-transition
+    s2 s3 ;
 
-: add-traversal-flag ( flag -- )
-    stack peek second
-    current-regexp get nfa-traversal-flags>> push-at ;
+GENERIC: modify-epsilon ( tag -- newtag )
+! Potential off-by-one errors when lookaround nested in lookbehind
 
-:: concatenate-nodes ( -- )
-    [let* | regexp [ current-regexp get ]
-            stack [ regexp stack>> ]
-            table [ regexp nfa-table>> ]
-            s2 [ stack peek first ]
-            s3 [ stack pop second ]
-            s0 [ stack peek first ]
-            s1 [ stack pop second ] |
-        s1 s2 eps <literal-transition> table add-transition
-        s1 table final-states>> delete-at
-        s0 s3 2array stack push ] ;
+M: object modify-epsilon ;
 
-:: alternate-nodes ( -- )
-    [let* | regexp [ current-regexp get ]
-            stack [ regexp stack>> ]
-            table [ regexp nfa-table>> ]
-            s2 [ stack peek first ]
-            s3 [ stack pop second ]
-            s0 [ stack peek first ]
-            s1 [ stack pop second ]
-            s4 [ regexp next-state ]
-            s5 [ regexp next-state ] |
-        s4 s0 eps <literal-transition> table add-transition
-        s4 s2 eps <literal-transition> table add-transition
-        s1 s5 eps <literal-transition> table add-transition
-        s3 s5 eps <literal-transition> table add-transition
-        s1 table final-states>> delete-at
-        s3 table final-states>> delete-at
-        t s5 table final-states>> set-at
-        s4 s5 2array stack push ] ;
+M: $ modify-epsilon
+    multiline option? [ drop end-of-input ] unless ;
 
-M: kleene-star nfa-node ( node -- )
-    term>> nfa-node
-    [let* | regexp [ current-regexp get ]
-            stack [ regexp stack>> ]
-            s0 [ stack peek first ]
-            s1 [ stack pop second ]
-            s2 [ regexp next-state ]
-            s3 [ regexp next-state ]
-            table [ regexp nfa-table>> ] |
-        s1 table final-states>> delete-at
-        t s3 table final-states>> set-at
-        s1 s0 eps <literal-transition> table add-transition
-        s2 s0 eps <literal-transition> table add-transition
-        s2 s3 eps <literal-transition> table add-transition
-        s1 s3 eps <literal-transition> table add-transition
-        s2 s3 2array stack push ] ;
+M: ^ modify-epsilon
+    multiline option? [ drop beginning-of-input ] unless ;
 
-M: concatenation nfa-node ( node -- )
-    seq>>
-    reversed-regexp option? [ <reversed> ] when
-    [ [ nfa-node ] each ]
-    [ length 1- [ concatenate-nodes ] times ] bi ;
+M: tagged-epsilon nfa-node
+    clone [ modify-epsilon ] change-tag add-simple-entry ;
 
-M: alternation nfa-node ( node -- )
-    seq>>
-    [ [ nfa-node ] each ]
-    [ length 1- [ alternate-nodes ] times ] bi ;
+M: concatenation nfa-node ( node -- start end )
+    [ first>> ] [ second>> ] bi
+    reversed-regexp option? [ swap ] when
+    [ nfa-node ] bi@
+    [ epsilon-transition ] dip ;
 
-M: constant nfa-node ( node -- )
+:: alternate-nodes ( s0 s1 s2 s3 -- start end )
+    next-state :> s4
+    next-state :> s5
+    s4 s0 epsilon-transition
+    s4 s2 epsilon-transition
+    s1 s5 epsilon-transition
+    s3 s5 epsilon-transition
+    s4 s5 ;
+
+M: alternation nfa-node ( node -- start end )
+    [ first>> ] [ second>> ] bi
+    [ nfa-node ] bi@
+    alternate-nodes ;
+
+GENERIC: modify-class ( char-class -- char-class' )
+
+M: object modify-class ;
+
+M: integer modify-class
     case-insensitive option? [
-        dup char>> [ ch>lower ] [ ch>upper ] bi
-        2dup = [
-            2drop
-            char>> literal-transition add-simple-entry
-        ] [
-            [ literal-transition add-simple-entry ] bi@
-            alternate-nodes drop
-        ] if
-    ] [
-        char>> literal-transition add-simple-entry
-    ] if ;
+        dup Letter? [
+            [ ch>lower ] [ ch>upper ] bi 2array <or-class>
+        ] when
+    ] when ;
 
-M: epsilon nfa-node ( node -- )
-    drop eps literal-transition add-simple-entry ;
+M: integer nfa-node ( node -- start end )
+    modify-class add-simple-entry ;
 
-M: word nfa-node ( node -- ) class-transition add-simple-entry ;
+M: primitive-class modify-class
+    class>> modify-class <primitive-class> ;
 
-M: any-char nfa-node ( node -- )
-    [ dotall option? ] dip any-char-no-nl ?
-    class-transition add-simple-entry ;
+M: or-class modify-class
+    seq>> [ modify-class ] map <or-class> ;
 
-! M: beginning-of-text nfa-node ( node -- ) ;
+M: not-class modify-class
+    class>> modify-class <not-class> ;
 
-M: beginning-of-line nfa-node ( node -- ) class-transition add-simple-entry ;
+M: any-char modify-class
+    drop dotall option? t any-char-no-nl ? ;
 
-M: end-of-line nfa-node ( node -- ) class-transition add-simple-entry ;
+: modify-letter-class ( class -- newclass )
+    case-insensitive option? [ drop Letter-class ] when ;
+M: letter-class modify-class modify-letter-class ;
+M: LETTER-class modify-class modify-letter-class ;
 
-: choose-letter-class ( node -- node' )
-    case-insensitive option? Letter-class rot ? ;
+: cased-range? ( range -- ? )
+    [ from>> ] [ to>> ] bi {
+        [ [ letter? ] bi@ and ]
+        [ [ LETTER? ] bi@ and ]
+    } 2|| ;
 
-M: letter-class nfa-node ( node -- )
-    choose-letter-class class-transition add-simple-entry ;
-
-M: LETTER-class nfa-node ( node -- )
-    choose-letter-class class-transition add-simple-entry ;
-
-M: character-class-range nfa-node ( node -- )
+M: range modify-class
     case-insensitive option? [
-        ! This should be implemented for Unicode by case-folding
-        ! the input and all strings in the regexp.
-        dup [ from>> ] [ to>> ] bi
-        2dup [ Letter? ] bi@ and [
-            rot drop
-            [ [ ch>lower ] bi@ character-class-range boa ]
-            [ [ ch>upper ] bi@ character-class-range boa ] 2bi 
-            [ class-transition add-simple-entry ] bi@
-            alternate-nodes
-        ] [
-            2drop
-            class-transition add-simple-entry
-        ] if
-    ] [
-        class-transition add-simple-entry
-    ] if ;
+        dup cased-range? [
+            [ from>> ] [ to>> ] bi
+            [ [ ch>lower ] bi@ <range> ]
+            [ [ ch>upper ] bi@ <range> ] 2bi 
+            2array <or-class>
+        ] when
+    ] when ;
 
-M: capture-group nfa-node ( node -- )
-    "capture-groups" feature-is-broken
-    eps literal-transition add-simple-entry
-    capture-group-on add-traversal-flag
-    term>> nfa-node
-    eps literal-transition add-simple-entry
-    capture-group-off add-traversal-flag
-    2 [ concatenate-nodes ] times ;
+M: class nfa-node
+    modify-class add-simple-entry ;
 
-! xyzzy
-M: non-capture-group nfa-node ( node -- )
-    term>> nfa-node ;
+M: with-options nfa-node ( node -- start end )
+    dup options>> [ tree>> nfa-node ] using-options ;
 
-M: reluctant-kleene-star nfa-node ( node -- )
-    term>> <kleene-star> nfa-node ;
-
-M: negation nfa-node ( node -- )
-    negation-mode inc
-    term>> nfa-node 
-    negation-mode dec ;
-
-M: lookahead nfa-node ( node -- )
-    "lookahead" feature-is-broken
-    eps literal-transition add-simple-entry
-    lookahead-on add-traversal-flag
-    term>> nfa-node
-    eps literal-transition add-simple-entry
-    lookahead-off add-traversal-flag
-    2 [ concatenate-nodes ] times ;
-
-M: lookbehind nfa-node ( node -- )
-    "lookbehind" feature-is-broken
-    eps literal-transition add-simple-entry
-    lookbehind-on add-traversal-flag
-    term>> nfa-node
-    eps literal-transition add-simple-entry
-    lookbehind-off add-traversal-flag
-    2 [ concatenate-nodes ] times ;
-
-M: option nfa-node ( node -- )
-    [ option>> ] [ on?>> ] bi [ option-on ] [ option-off ] if
-    eps literal-transition add-simple-entry ;
-
-: construct-nfa ( regexp -- )
+: construct-nfa ( ast -- nfa-table )
     [
-        reset-regexp
-        negation-mode off
-        [ current-regexp set ]
-        [ parse-tree>> nfa-node ]
-        [ set-start-state ] tri
+        0 state set
+        <transition-table> nfa-table set
+        nfa-node
+        nfa-table get
+            swap dup associate >>final-states
+            swap >>start-state
     ] with-scope ;

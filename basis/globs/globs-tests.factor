@@ -14,5 +14,6 @@ USING: tools.test globs ;
 [ f ] [ "foo.java" "*.{xml,txt}" glob-matches? ] unit-test
 [ t ] [ "foo.txt" "*.{xml,txt}" glob-matches? ] unit-test
 [ t ] [ "foo.xml" "*.{xml,txt}" glob-matches? ] unit-test
-[ f ] [ "foo." "*.{,xml,txt}" glob-matches? ] unit-test
+[ f ] [ "foo." "*.{xml,txt}" glob-matches? ] unit-test
+[ t ] [ "foo." "*.{,xml,txt}" glob-matches? ] unit-test
 [ t ] [ "foo.{" "*.{" glob-matches? ] unit-test
