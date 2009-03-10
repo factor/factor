@@ -2,7 +2,7 @@
 ! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private math combinators
-macros quotations fry ;
+macros quotations fry effects ;
 IN: generalizations
 
 <<

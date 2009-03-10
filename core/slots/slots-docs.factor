@@ -42,11 +42,11 @@ $nl
     "    \"alice@bigcorp.com\" >>from"
     "send-email"
 }
-"This is because " { $link swap } " is easier to understand than " { $link tuck } ":"
+"The above has less shuffling than the writer version:"
 { $code
     "<email>"
-    "    tuck (>>subject)"
-    "    tuck (>>to)"
+    "    [ (>>subject) ] keep"
+    "    [ (>>to) ] keep"
     "    \"alice@bigcorp.com\" over (>>from)"
     "send-email"
 }

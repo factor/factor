@@ -12,10 +12,10 @@ SYMBOL: last-drag-loc
 TUPLE: demo-gadget < gadget yaw pitch distance ;
 
 : new-demo-gadget ( yaw pitch distance class -- gadget )
-    new-gadget
+    new
         swap >>distance
         swap >>pitch
-        swap >>yaw ;
+        swap >>yaw ; inline
 
 GENERIC: far-plane ( gadget -- z )
 GENERIC: near-plane ( gadget -- z )
@@ -104,6 +104,6 @@ demo-gadget H{
     
     { T{ button-down f f 1 }    [ drop reset-last-drag-rel ] }
     { T{ drag f 1 }             [ drag-yaw-pitch rot [ pitch-demo-gadget ] keep yaw-demo-gadget ] }
-    { T{ mouse-scroll }         [ scroll-direction get second over distance-step * swap zoom-demo-gadget ] }
+    { mouse-scroll              [ scroll-direction get second over distance-step * swap zoom-demo-gadget ] }
 } set-gestures
 

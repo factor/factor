@@ -1,12 +1,13 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays sequences math namespaces strings io
-vectors words assocs combinators sorting unicode.case
-unicode.categories math.order ;
+USING: accessors kernel arrays sequences math namespaces
+strings io fry vectors words assocs combinators sorting
+unicode.case unicode.categories math.order vocabs
+tools.vocabs unicode.data ;
 IN: tools.completion
 
 : (fuzzy) ( accum ch i full -- accum i ? )
-    index-from 
+    index-from
     [
         [ swap push ] 2keep 1+ t
     ] [
@@ -61,20 +62,20 @@ IN: tools.completion
     dupd fuzzy score max ;
 
 : completion ( short candidate -- result )
-    [ second >lower swap complete ] keep first 2array ;
+    [ second >lower swap complete ] keep 2array ;
 
 : completions ( short candidates -- seq )
-    over empty? [
-        nip [ first ] map
-    ] [
-        [ >lower ] dip [ completion ] with map
-        rank-completions
-    ] if ;
+    [ ] [ [ >lower ] dip [ completion ] with map rank-completions ]
+    bi-curry if-empty ;
 
-: string-completions ( short strs -- seq )
-    dup zip completions ;
+: name-completions ( str seq -- seq' )
+    [ dup name>> ] { } map>assoc completions ;
 
-: limited-completions ( short candidates -- seq )
-    [ completions ] [ drop ] 2bi
-    2dup [ length 50 > ] [ empty? ] bi* and
-    [ 2drop f ] [ drop 50 short head ] if ;
+: words-matching ( str -- seq )
+    all-words name-completions ;
+
+: vocabs-matching ( str -- seq )
+    all-vocabs-seq name-completions ;
+
+: chars-matching ( str -- seq )
+    name-map keys dup zip completions ;

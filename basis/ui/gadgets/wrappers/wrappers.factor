@@ -1,17 +1,21 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors ui.gadgets kernel ;
-
+USING: accessors kernel ui.gadgets ui.baseline-alignment ;
 IN: ui.gadgets.wrappers
 
 TUPLE: wrapper < gadget ;
 
-: new-wrapper ( child class -- wrapper ) new-gadget swap add-gadget ;
+: new-wrapper ( child class -- wrapper )
+    new swap add-gadget ; inline
 
-: <wrapper> ( child -- border ) wrapper new-wrapper ;
+: <wrapper> ( child -- wrapper ) wrapper new-wrapper ;
 
-M: wrapper pref-dim* ( wrapper -- dim ) gadget-child pref-dim ;
+M: wrapper pref-dim* gadget-child pref-dim ;
 
-M: wrapper layout* ( wrapper -- ) [ dim>> ] [ gadget-child ] bi (>>dim) ;
+M: wrapper baseline gadget-child baseline ;
 
-M: wrapper focusable-child* ( wrapper -- child/t ) gadget-child ;
+M: wrapper cap-height gadget-child cap-height ;
+
+M: wrapper layout* [ gadget-child ] [ dim>> ] bi >>dim drop ;
+
+M: wrapper focusable-child* gadget-child ;

@@ -31,9 +31,8 @@ uses definitions ;
     source-files get [ nip xref-source ] assoc-each ;
 
 : record-form ( quot source-file -- )
-    tuck unxref-source
-    quot-uses keys >>uses
-    xref-source ;
+    [ quot-uses keys ] dip
+    [ unxref-source ] [ (>>uses) ] [ xref-source ] tri ;
 
 : record-definitions ( file -- )
     new-definitions get >>definitions drop ;

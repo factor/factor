@@ -1,17 +1,18 @@
-! Copyright (C) 2006, 2008 Slava Pestov
+! Copyright (C) 2006, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays documents kernel math models
-namespaces locals fry make opengl opengl.gl sequences strings
-io.styles math.vectors sorting colors combinators assocs
-math.order fry calendar alarms ui.clipboards ui.commands
-ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.theme
-ui.gadgets.menus ui.gadgets.wrappers ui.render ui.gestures
-math.geometry.rect ;
+USING: accessors arrays documents documents.elements kernel math
+math.ranges models models.arrow namespaces locals fry make opengl
+opengl.gl sequences strings math.vectors math.functions sorting colors
+colors.constants combinators assocs math.order fry calendar alarms
+continuations ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
+ui.gadgets.menus ui.gadgets.wrappers ui.render ui.pens.solid
+ui.gadgets.line-support ui.text ui.gestures ui.baseline-alignment
+math.rectangles splitting unicode.categories fonts grouping ;
 IN: ui.gadgets.editors
 
-TUPLE: editor < gadget
-font color caret-color selection-color
+TUPLE: editor < line-gadget
+caret-color
 caret mark
 focused? blink blink-alarm ;
 
@@ -22,13 +23,11 @@ focused? blink blink-alarm ;
     <loc> >>mark ; inline
 
 : editor-theme ( editor -- editor )
-    black >>color
-    red >>caret-color
-    selection-color >>selection-color
+    COLOR: red >>caret-color
     monospace-font >>font ; inline
 
 : new-editor ( class -- editor )
-    new-gadget
+    new-line-gadget
         <document> >>model
         init-editor-locs
         editor-theme ; inline
@@ -81,33 +80,25 @@ M: editor ungraft*
     dup caret>> deactivate-editor-model
     dup mark>> deactivate-editor-model ;
 
-: editor-caret* ( editor -- loc ) caret>> value>> ;
+: editor-caret ( editor -- loc ) caret>> value>> ;
 
-: editor-mark* ( editor -- loc ) mark>> value>> ;
+: editor-mark ( editor -- loc ) mark>> value>> ;
 
 : set-caret ( loc editor -- )
     [ model>> validate-loc ] keep
     caret>> set-model ;
 
 : change-caret ( editor quot -- )
-    [ [ [ editor-caret* ] [ model>> ] bi ] dip call ] [ drop ] 2bi
+    [ [ [ editor-caret ] [ model>> ] bi ] dip call ] [ drop ] 2bi
     set-caret ; inline
 
 : mark>caret ( editor -- )
-    [ editor-caret* ] [ mark>> ] bi set-model ;
+    [ editor-caret ] [ mark>> ] bi set-model ;
 
 : change-caret&mark ( editor quot -- )
     [ change-caret ] [ drop mark>caret ] 2bi ; inline
 
 : editor-line ( n editor -- str ) control-value nth ;
-
-: editor-font* ( editor -- font ) font>> open-font ;
-
-: line-height ( editor -- n )
-    editor-font* "" string-height ;
-
-: y>line ( y editor -- line# )
-    line-height /i ;
 
 :: point>loc ( point editor -- loc )
     point second editor y>line {
@@ -116,7 +107,7 @@ M: editor ungraft*
         [| n |
             n
             point first
-            editor editor-font*
+            editor font>>
             n editor editor-line
             x>offset 2array
         ]
@@ -129,26 +120,19 @@ M: editor ungraft*
     [ clicked-loc ] dip set-model ;
 
 : focus-editor ( editor -- )
-    dup start-blinking
-    t >>focused?
-    relayout-1 ;
+    [ start-blinking ] [ t >>focused? relayout-1 ] bi ;
 
 : unfocus-editor ( editor -- )
-    dup stop-blinking
-    f >>focused?
-    relayout-1 ;
+    [ stop-blinking ] [ f >>focused? relayout-1 ] bi ;
 
-: offset>x ( col# line# editor -- x )
-    [ editor-line ] keep editor-font* spin head-slice string-width ;
+: loc>x ( loc editor -- x )
+    [ first2 swap ] dip [ editor-line ] [ font>> ] bi swap offset>x round ;
 
-: loc>x ( loc editor -- x ) [ first2 swap ] dip offset>x ;
-
-: line>y ( lines# editor -- y )
-    line-height * ;
+: loc>point ( loc editor -- loc )
+    [ loc>x ] [ [ first ] dip line>y ceiling ] 2bi 2array ;
 
 : caret-loc ( editor -- loc )
-    [ editor-caret* ] keep
-    [ loc>x ] [ [ first ] dip line>y ] 2bi 2array ;
+    [ editor-caret ] keep loc>point ;
 
 : caret-dim ( editor -- dim )
     line-height 0 swap 2array ;
@@ -160,93 +144,69 @@ M: editor ungraft*
         ] keep scroll>rect
     ] [ drop ] if ;
 
-: draw-caret ( -- )
-    editor get [ focused?>> ] [ blink>> ] bi and [
-        editor get
+: draw-caret? ( editor -- ? )
+    [ focused?>> ] [ blink>> ] bi and ;
+
+: draw-caret ( editor -- )
+    dup draw-caret? [
         [ caret-color>> gl-color ]
         [
-            dup caret-loc origin get v+
-            swap caret-dim over v+
-            gl-line
+            [ caret-loc ] [ caret-dim ] bi
+            over v+ gl-line
         ] bi
-    ] when ;
-
-: line-translation ( n -- loc )
-    editor get line-height * 0.0 swap 2array ;
-
-: translate-lines ( n -- )
-    line-translation gl-translate ;
-
-: draw-line ( editor str -- )
-    [ font>> ] dip { 0 0 } draw-string ;
-
-: first-visible-line ( editor -- n )
-    [
-        [ clip get rect-loc second origin get second - ] dip
-        y>line
-    ] keep model>> validate-line ;
-
-: last-visible-line ( editor -- n )
-    [
-        [ clip get rect-extent nip second origin get second - ] dip
-        y>line
-    ] keep model>> validate-line 1+ ;
-
-: with-editor ( editor quot -- )
-    [
-        swap
-        dup first-visible-line \ first-visible-line set
-        dup last-visible-line \ last-visible-line set
-        dup model>> document set
-        editor set
-        call
-    ] with-scope ; inline
-
-: visible-lines ( editor -- seq )
-    [ \ first-visible-line get \ last-visible-line get ] dip
-    control-value <slice> ;
-
-: with-editor-translation ( n quot -- )
-    [ line-translation origin get v+ ] dip with-translation ;
-    inline
-
-: draw-lines ( -- )
-    \ first-visible-line get [
-        editor get dup color>> gl-color
-        dup visible-lines
-        [ draw-line 1 translate-lines ] with each
-    ] with-editor-translation ;
+    ] [ drop ] if ;
 
 : selection-start/end ( editor -- start end )
-    [ editor-mark* ] [ editor-caret* ] bi sort-pair ;
+    [ editor-mark ] [ editor-caret ] bi sort-pair ;
 
-: (draw-selection) ( x1 x2 -- )
-    over -
-    dup 0 = [ 2 + ] when
-    [ 0.0 2array ] [ editor get line-height 2array ] bi*
-    swap [ gl-fill-rect ] with-translation ;
+SYMBOL: selected-lines
 
-: draw-selected-line ( start end n -- )
-    [ start/end-on-line ] keep
-    tuck [ editor get offset>x ] 2bi@
-    (draw-selection) ;
+TUPLE: selected-line start end first? last? ;
 
-: draw-selection ( -- )
-    editor get selection-color>> gl-color
-    editor get selection-start/end
-    over first [
-        2dup '[
-            [ _ _ ] dip
-            draw-selected-line
-            1 translate-lines
-        ] each-line
-    ] with-editor-translation ;
+: compute-selection ( editor -- assoc )
+    dup gadget-selection? [
+        [ selection-start/end [ [ first ] bi@ [a,b] ] 2keep ] keep model>>
+        '[ [ _ _ ] keep _ start/end-on-line 2array ] H{ } map>assoc
+    ] [ drop f ] if ;
+
+:: draw-selection ( line pair editor -- )
+    pair [ editor font>> line offset>x ] map :> pair
+    pair first 0 2array [
+        editor selection-color>> gl-color
+        pair second pair first - round 1 max
+        editor line-height 2array gl-fill-rect
+    ] with-translation ;
+
+: draw-unselected-line ( line editor -- )
+    font>> swap draw-text ;
+
+: draw-selected-line ( line pair editor -- )
+    over all-equal? [
+        [ nip draw-unselected-line ] [ draw-selection ] 3bi
+    ] [
+        [ draw-selection ]
+        [
+            [ [ first2 ] [ selection-color>> ] bi* <selection> ] keep
+            draw-unselected-line
+        ] 3bi
+    ] if ;
+
+M: editor draw-line ( line index editor -- )
+    [ selected-lines get at ] dip over
+    [ draw-selected-line ] [ nip draw-unselected-line ] if ;
 
 M: editor draw-gadget*
-    [ draw-selection draw-lines draw-caret ] with-editor ;
+    dup compute-selection selected-lines [
+        [ draw-lines ] [ draw-caret ] bi
+    ] with-variable ;
 
 M: editor pref-dim*
-    dup editor-font* swap control-value text-dim ;
+    ! Add some space for the caret.
+    [ font>> ] [ control-value ] bi text-dim { 1 0 } v+ ;
+
+M: editor baseline font>> font-metrics ascent>> ;
+
+M: editor cap-height font>> font-metrics cap-height>> ;
 
 : contents-changed ( model editor -- )
     swap
@@ -291,12 +251,12 @@ M: editor gadget-text* editor-string % ;
 
 : mouse-elt ( -- element )
     hand-click# get {
-        { 1 T{ one-char-elt } }
-        { 2 T{ one-word-elt } }
-    } at T{ one-line-elt } or ;
+        { 1 one-char-elt }
+        { 2 one-word-elt }
+    } at one-line-elt or ;
 
 : drag-direction? ( loc editor -- ? )
-    editor-mark* before? ;
+    editor-mark before? ;
 
 : drag-selection-caret ( loc editor element -- loc )
     [
@@ -306,7 +266,7 @@ M: editor gadget-text* editor-string % ;
 : drag-selection-mark ( loc editor element -- loc )
     [
         [ drag-direction? not ] keep
-        [ editor-mark* ] [ model>> ] bi
+        [ editor-mark ] [ model>> ] bi
     ] dip prev/next-elt ? ;
 
 : drag-caret&mark ( editor -- caret mark )
@@ -320,13 +280,13 @@ M: editor gadget-text* editor-string % ;
     swap caret>> set-model ;
 
 : editor-cut ( editor clipboard -- )
-    dupd gadget-copy remove-selection ;
+    [ gadget-copy ] [ drop remove-selection ] 2bi ;
 
 : delete/backspace ( editor quot -- )
     over gadget-selection? [
         drop remove-selection
     ] [
-        [ [ [ editor-caret* ] [ model>> ] bi ] dip call ]
+        [ [ [ editor-caret ] [ model>> ] bi ] dip call ]
         [ drop model>> ]
         2bi remove-doc-range
     ] if ; inline
@@ -341,7 +301,7 @@ M: editor gadget-text* editor-string % ;
     '[ _ prev-elt ] change-caret ;
 
 : editor-prev ( editor elt -- )
-    dupd editor-select-prev mark>caret ;
+    [ editor-select-prev ] [ drop mark>caret ] 2bi ;
 
 : editor-select-next ( editor elt -- )
     '[ _ next-elt ] change-caret ;
@@ -350,42 +310,48 @@ M: editor gadget-text* editor-string % ;
     dupd editor-select-next mark>caret ;
 
 : editor-select ( from to editor -- )
-    tuck [ mark>> set-model ] [ caret>> set-model ] 2bi* ;
+    [ mark>> set-model ] [ caret>> set-model ] bi-curry bi* ;
 
 : select-elt ( editor elt -- )
-    [ [ [ editor-caret* ] [ model>> ] bi ] dip prev/next-elt ] [ drop ] 2bi
+    [ [ [ editor-caret ] [ model>> ] bi ] dip prev/next-elt ] [ drop ] 2bi
     editor-select ;
 
-: start-of-document ( editor -- ) T{ doc-elt } editor-prev ;
+: start-of-document ( editor -- ) doc-elt editor-prev ;
 
-: end-of-document ( editor -- ) T{ doc-elt } editor-next ;
+: end-of-document ( editor -- ) doc-elt editor-next ;
 
 : position-caret ( editor -- )
-    mouse-elt dup T{ one-char-elt } =
+    mouse-elt dup one-char-elt =
     [ drop dup extend-selection dup mark>> click-loc ]
     [ select-elt ] if ;
 
-: insert-newline ( editor -- ) "\n" swap user-input* drop ;
-
 : delete-next-character ( editor -- ) 
-    T{ char-elt } editor-delete ;
+    char-elt editor-delete ;
 
 : delete-previous-character ( editor -- ) 
-    T{ char-elt } editor-backspace ;
+    char-elt editor-backspace ;
 
 : delete-previous-word ( editor -- ) 
-    T{ word-elt } editor-delete ;
+    word-elt editor-delete ;
 
 : delete-next-word ( editor -- ) 
-    T{ word-elt } editor-backspace ;
+    word-elt editor-backspace ;
 
 : delete-to-start-of-line ( editor -- ) 
-    T{ one-line-elt } editor-delete ;
+    one-line-elt editor-delete ;
 
 : delete-to-end-of-line ( editor -- ) 
-    T{ one-line-elt } editor-backspace ;
+    one-line-elt editor-backspace ;
 
-editor "general" f {
+: com-undo ( editor -- )
+    model>> undo ;
+
+: com-redo ( editor -- )
+    model>> redo ;
+
+editor "editing" f {
+    { undo-action com-undo }
+    { redo-action com-redo }
     { T{ key-down f f "DELETE" } delete-next-character }
     { T{ key-down f { S+ } "DELETE" } delete-next-character }
     { T{ key-down f f "BACKSPACE" } delete-previous-character }
@@ -396,18 +362,18 @@ editor "general" f {
     { T{ key-down f { A+ } "BACKSPACE" } delete-to-end-of-line }
 } define-command-map
 
-: paste ( editor -- ) clipboard get paste-clipboard ;
+: com-paste ( editor -- ) clipboard get paste-clipboard ;
 
 : paste-selection ( editor -- ) selection get paste-clipboard ;
 
-: cut ( editor -- ) clipboard get editor-cut ;
+: com-cut ( editor -- ) clipboard get editor-cut ;
 
 editor "clipboard" f {
-    { T{ paste-action } paste }
-    { T{ button-up f f 2 } paste-selection }
-    { T{ copy-action } com-copy }
+    { cut-action com-cut }
+    { copy-action com-copy }
+    { paste-action com-paste }
     { T{ button-up } com-copy-selection }
-    { T{ cut-action } cut }
+    { T{ button-up f f 2 } paste-selection }
 } define-command-map
 
 : previous-character ( editor -- )
@@ -415,7 +381,7 @@ editor "clipboard" f {
         dup selection-start/end drop
         over set-caret mark>caret
     ] [
-        T{ char-elt } editor-prev
+        char-elt editor-prev
     ] if ;
 
 : next-character ( editor -- )
@@ -423,27 +389,21 @@ editor "clipboard" f {
         dup selection-start/end nip
         over set-caret mark>caret
     ] [
-        T{ char-elt } editor-next
+        char-elt editor-next
     ] if ;
 
-: previous-line ( editor -- ) T{ line-elt } editor-prev ;
+: previous-word ( editor -- ) word-elt editor-prev ;
 
-: next-line ( editor -- ) T{ line-elt } editor-next ;
+: next-word ( editor -- ) word-elt editor-next ;
 
-: previous-word ( editor -- ) T{ word-elt } editor-prev ;
+: start-of-line ( editor -- ) one-line-elt editor-prev ;
 
-: next-word ( editor -- ) T{ word-elt } editor-next ;
-
-: start-of-line ( editor -- ) T{ one-line-elt } editor-prev ;
-
-: end-of-line ( editor -- ) T{ one-line-elt } editor-next ;
+: end-of-line ( editor -- ) one-line-elt editor-next ;
 
 editor "caret-motion" f {
     { T{ button-down } position-caret }
     { T{ key-down f f "LEFT" } previous-character }
     { T{ key-down f f "RIGHT" } next-character }
-    { T{ key-down f f "UP" } previous-line }
-    { T{ key-down f f "DOWN" } next-line }
     { T{ key-down f { C+ } "LEFT" } previous-word }
     { T{ key-down f { C+ } "RIGHT" } next-word }
     { T{ key-down f f "HOME" } start-of-line }
@@ -452,59 +412,55 @@ editor "caret-motion" f {
     { T{ key-down f { C+ } "END" } end-of-document }
 } define-command-map
 
-: select-all ( editor -- ) T{ doc-elt } select-elt ;
+: clear-editor ( editor -- )
+    #! The with-datastack is a kludge to make it infer. Stupid.
+    model>> 1array [ clear-doc ] with-datastack drop ;
 
-: select-line ( editor -- ) T{ one-line-elt } select-elt ;
+: select-all ( editor -- ) doc-elt select-elt ;
 
-: select-word ( editor -- ) T{ one-word-elt } select-elt ;
+: select-line ( editor -- ) one-line-elt select-elt ;
 
-: selected-word ( editor -- string )
+: select-word ( editor -- ) one-word-elt select-elt ;
+
+: selected-token ( editor -- string )
     dup gadget-selection?
     [ dup select-word ] unless
     gadget-selection ;
 
 : select-previous-character ( editor -- ) 
-    T{ char-elt } editor-select-prev ;
+    char-elt editor-select-prev ;
 
 : select-next-character ( editor -- ) 
-    T{ char-elt } editor-select-next ;
-
-: select-previous-line ( editor -- ) 
-    T{ line-elt } editor-select-prev ;
-
-: select-next-line ( editor -- ) 
-    T{ line-elt } editor-select-next ;
+    char-elt editor-select-next ;
 
 : select-previous-word ( editor -- ) 
-    T{ word-elt } editor-select-prev ;
+    word-elt editor-select-prev ;
 
 : select-next-word ( editor -- ) 
-    T{ word-elt } editor-select-next ;
+    word-elt editor-select-next ;
 
 : select-start-of-line ( editor -- ) 
-    T{ one-line-elt } editor-select-prev ;
+    one-line-elt editor-select-prev ;
 
 : select-end-of-line ( editor -- ) 
-    T{ one-line-elt } editor-select-next ;
+    one-line-elt editor-select-next ;
 
 : select-start-of-document ( editor -- ) 
-    T{ doc-elt } editor-select-prev ;
+    doc-elt editor-select-prev ;
 
 : select-end-of-document ( editor -- ) 
-    T{ doc-elt } editor-select-next ;
+    doc-elt editor-select-next ;
 
 editor "selection" f {
     { T{ button-down f { S+ } 1 } extend-selection }
     { T{ drag } drag-selection }
-    { T{ gain-focus } focus-editor }
-    { T{ lose-focus } unfocus-editor }
-    { T{ delete-action } remove-selection }
-    { T{ select-all-action } select-all }
+    { gain-focus focus-editor }
+    { lose-focus unfocus-editor }
+    { delete-action remove-selection }
+    { select-all-action select-all }
     { T{ key-down f { C+ } "l" } select-line }
     { T{ key-down f { S+ } "LEFT" } select-previous-character }
     { T{ key-down f { S+ } "RIGHT" } select-next-character }
-    { T{ key-down f { S+ } "UP" } select-previous-line }
-    { T{ key-down f { S+ } "DOWN" } select-next-line }
     { T{ key-down f { S+ C+ } "LEFT" } select-previous-word }
     { T{ key-down f { S+ C+ } "RIGHT" } select-next-word }
     { T{ key-down f { S+ } "HOME" } select-start-of-line }
@@ -514,7 +470,14 @@ editor "selection" f {
 } define-command-map
 
 : editor-menu ( editor -- )
-    { cut com-copy paste } show-commands-menu ;
+    {
+        com-undo
+        com-redo
+        ----
+        com-cut
+        com-copy
+        com-paste
+    } show-commands-menu ;
 
 editor "misc" f {
     { T{ button-down f f 3 } editor-menu }
@@ -526,10 +489,72 @@ TUPLE: multiline-editor < editor ;
 : <multiline-editor> ( -- editor )
     multiline-editor new-editor ;
 
-multiline-editor "general" f {
+: previous-line ( editor -- ) line-elt editor-prev ;
+
+: next-line ( editor -- ) line-elt editor-next ;
+
+<PRIVATE
+
+: page-elt ( editor -- editor element ) dup visible-lines 1- <page-elt> ;
+
+PRIVATE>
+
+: previous-page ( editor -- ) page-elt editor-prev ;
+
+: next-page ( editor -- ) page-elt editor-next ;
+
+: select-previous-line ( editor -- ) line-elt editor-select-prev ;
+
+: select-next-line ( editor -- ) line-elt editor-select-next ;
+
+: select-previous-page ( editor -- ) page-elt editor-select-prev ;
+
+: select-next-page ( editor -- ) page-elt editor-select-next ;
+
+: insert-newline ( editor -- )
+    "\n" swap user-input* drop ;
+
+: change-selection ( editor quot -- )
+    '[ gadget-selection @ ] keep user-input* drop ; inline
+
+: join-lines ( string -- string' )
+    "\n" split
+    [ rest-slice [ [ blank? ] trim-head-slice ] change-each ]
+    [ but-last-slice [ [ blank? ] trim-tail-slice ] change-each ]
+    [ " " join ]
+    tri ;
+
+: this-line-and-next ( document line -- start end )
+    [ nip 0 swap 2array ]
+    [ [ nip 1+ ] [ 1+ swap doc-line length ] 2bi 2array ]
+    2bi ;
+
+: last-line? ( document line -- ? )
+    [ last-line# ] dip = ;
+
+: com-join-lines ( editor -- )
+    dup gadget-selection?
+    [ [ join-lines ] change-selection ] [
+        [ model>> ] [ editor-caret first ] bi
+        2dup last-line? [ 2drop ] [
+            [ this-line-and-next ] [ drop ] 2bi
+            [ join-lines ] change-doc-range
+        ] if
+    ] if ;
+
+multiline-editor "multiline" f {
+    { T{ key-down f f "UP" } previous-line }
+    { T{ key-down f f "DOWN" } next-line }
+    { T{ key-down f { S+ } "UP" } select-previous-line }
+    { T{ key-down f { S+ } "DOWN" } select-next-line }
+    { T{ key-down f f "PAGE_UP" } previous-page }
+    { T{ key-down f f "PAGE_DOWN" } next-page }
+    { T{ key-down f { S+ } "PAGE_UP" } select-previous-page }
+    { T{ key-down f { S+ } "PAGE_DOWN" } select-next-page }
     { T{ key-down f f "RET" } insert-newline }
     { T{ key-down f { S+ } "RET" } insert-newline }
     { T{ key-down f f "ENTER" } insert-newline }
+    { T{ key-down f { C+ } "j" } com-join-lines }
 } define-command-map
 
 TUPLE: source-editor < multiline-editor ;
@@ -537,29 +562,65 @@ TUPLE: source-editor < multiline-editor ;
 : <source-editor> ( -- editor )
     source-editor new-editor ;
 
-! Fields wrap an editor and edit an external model
-TUPLE: field < wrapper field-model editor ;
+! A useful model
+: <element-model> ( editor element -- model )
+    [ [ caret>> ] [ model>> ] bi ] dip
+    '[ _ _ elt-string ] <arrow> ;
+
+! Fields wrap an editor
+TUPLE: field < border editor min-cols max-cols ;
 
 : field-theme ( gadget -- gadget )
-    gray <solid> >>boundary ; inline
+    { 2 2 } >>size
+    { 1 0 } >>fill
+    COLOR: gray <solid> >>boundary ; inline
 
 : <field-border> ( gadget -- border )
-    2 <border>
+    { 2 2 } <border>
         { 1 0 } >>fill
         field-theme ;
 
-: <field> ( model -- gadget )
-    <editor> dup <field-border> field new-wrapper
-        swap >>editor
-        swap >>field-model ;
+: new-field ( class -- gadget )
+    [ <editor> ] dip new-border
+        dup gadget-child >>editor
+        field-theme ; inline
 
-M: field graft*
+! For line-gadget-width
+M: field font>> editor>> font>> ;
+
+M: field pref-dim*
+    dup
+    [ editor>> pref-dim ] keep
+    [ line-gadget-width ] [ drop second ] 2bi 2array
+    border-pref-dim ;
+
+TUPLE: model-field < field field-model ;
+
+: <model-field> ( model -- gadget )
+    model-field new-field swap >>field-model ;
+
+M: model-field graft*
     [ [ field-model>> value>> ] [ editor>> ] bi set-editor-string ]
     [ dup editor>> model>> add-connection ]
     bi ;
 
-M: field ungraft*
+M: model-field ungraft*
     dup editor>> model>> remove-connection ;
 
-M: field model-changed
+M: model-field model-changed
     nip [ editor>> editor-string ] [ field-model>> ] bi set-model ;
+
+TUPLE: action-field < field quot ;
+
+: <action-field> ( quot -- gadget )
+    action-field new-field swap >>quot ;
+
+: invoke-action-field ( field -- )
+    [ editor>> editor-string ]
+    [ editor>> clear-editor ]
+    [ quot>> ]
+    tri call ;
+
+action-field H{
+    { T{ key-down f f "RET" } [ invoke-action-field ] }
+} set-gestures

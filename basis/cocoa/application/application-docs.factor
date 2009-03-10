@@ -8,12 +8,6 @@ HELP: <NSString>
 
 { <NSString> <CFString> CF>string } related-words
 
-HELP: <NSArray>
-{ $values { "seq" "a sequence of " { $link alien } " instances" } { "alien" alien } }
-{ $description "Allocates an autoreleased " { $snippet "CFArray" } "." } ;
-
-{ <NSArray> <CFArray> } related-words
-
 HELP: with-autorelease-pool
 { $values { "quot" quotation } }
 { $description "Sets up a new " { $snippet "NSAutoreleasePool"  } ", calls the quotation and frees the pool." } ;

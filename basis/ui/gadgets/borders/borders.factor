@@ -1,27 +1,32 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ui.gadgets kernel math
-namespaces vectors sequences math.vectors math.geometry.rect ;
+USING: accessors arrays ui.gadgets ui.baseline-alignment kernel math fry
+namespaces vectors sequences math.vectors math.rectangles ;
 IN: ui.gadgets.borders
 
 TUPLE: border < gadget
 { size initial: { 0 0 } }
 { fill initial: { 0 0 } }
-{ align initial: { 1/2 1/2 } } ;
+{ align initial: { 1/2 1/2 } }
+{ min-dim initial: { 0 0 } } ;
 
 : new-border ( child class -- border )
-    new-gadget swap add-gadget ; inline
+    new swap add-gadget ; inline
 
 : <border> ( child gap -- border )
     swap border new-border
-        swap dup 2array >>size ;
+        swap >>size ;
 
 : <filled-border> ( child gap -- border )
     <border> { 1 1 } >>fill ;
 
+: border-pref-dim ( border child-dim -- pref-dim )
+    '[ size>> 2 v*n _ v+ ] [ min-dim>> ] bi vmax ;
+
 M: border pref-dim*
-    [ size>> 2 v*n ] keep
-    gadget-child pref-dim v+ ;
+    dup gadget-child pref-dim border-pref-dim ;
+
+<PRIVATE
 
 : border-major-dim ( border -- dim )
     [ dim>> ] [ size>> 2 v*n ] bi v- ;
@@ -30,7 +35,7 @@ M: border pref-dim*
     gadget-child pref-dim ;
 
 : scale ( a b s -- c )
-    tuck { 1 1 } swap v- [ v* ] 2bi@ v+ ;
+    [ v* ] [ { 1 1 } swap v- v* ] bi-curry bi* v+ ;
 
 : border-dim ( border -- dim )
     [ border-major-dim ] [ border-minor-dim ] [ fill>> ] tri scale ;
@@ -42,11 +47,18 @@ M: border pref-dim*
 : border-child-rect ( border -- rect )
     dup border-dim [ border-loc ] keep <rect> ;
 
+: border-metric ( border quot -- n )
+    [ drop size>> second ] [ [ gadget-child ] dip call ] 2bi
+    dup [ + ] [ nip ] if ; inline
+
+PRIVATE>
+
+M: border baseline [ baseline ] border-metric ;
+
+M: border cap-height [ cap-height ] border-metric ;
+
 M: border layout*
-    dup border-child-rect swap gadget-child
-    over loc>> >>loc
-    swap dim>> >>dim
-    drop ;
+    [ border-child-rect ] [ gadget-child ] bi set-rect-bounds ;
 
 M: border focusable-child*
     gadget-child ;

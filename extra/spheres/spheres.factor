@@ -1,4 +1,4 @@
-USING: kernel opengl opengl.demo-support opengl.gl
+USING: kernel opengl opengl.demo-support opengl.gl opengl.textures
 opengl.shaders opengl.framebuffers opengl.capabilities multiline
 ui.gadgets accessors sequences ui.render ui math locals arrays
 generalizations combinators ui.gadgets.worlds ;

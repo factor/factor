@@ -29,15 +29,7 @@ PRIVATE>
 : dec ( variable -- ) -1 swap +@ ; inline
 : bind ( ns quot -- ) swap >n call ndrop ; inline
 : counter ( variable -- n ) global [ 0 or 1+ dup ] change-at ;
-
-: make-assoc ( quot exemplar -- hash )
-    20 swap new-assoc [ >n call ndrop ] keep ; inline
-
-: with-scope ( quot -- )
-    H{ } clone >n call ndrop ; inline
-
-: with-variable ( value key quot -- )
-    [ associate >n ] dip call ndrop ; inline 
-
-: initialize ( variable quot -- )
-    [ global ] [ [ unless* ] curry ] bi* change-at ;
+: make-assoc ( quot exemplar -- hash ) 20 swap new-assoc [ swap bind ] keep ; inline
+: with-scope ( quot -- ) H{ } clone swap bind ; inline
+: with-variable ( value key quot -- ) [ associate ] dip bind ; inline
+: initialize ( variable quot -- ) [ global ] dip [ unless* ] curry change-at ; inline

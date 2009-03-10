@@ -1,7 +1,7 @@
 USING: help.markup help.syntax ui.commands ui.operations
-ui.tools.search ui.tools.workspace editors vocabs.loader
-kernel sequences prettyprint tools.test tools.vocabs strings
-unicode.categories unicode.case ui.tools.browser ;
+editors vocabs.loader kernel sequences prettyprint tools.test
+tools.vocabs strings unicode.categories unicode.case
+ui.tools.browser ui.tools.common ;
 IN: help.tutorial
 
 ARTICLE: "first-program-start" "Creating a vocabulary for your first program"
@@ -11,7 +11,7 @@ $nl
 { $code "USE: tools.scaffold" }
 "Then, ask the scaffold tool to create a new vocabulary named " { $snippet "palindrome" } ":"
 { $code "\"resource:work\" \"palindrome\" scaffold-vocab" }
-"If you look at the output, you will see that a few files were created in your ``work'' directory. The following phrase will print the full path of your work directory:"
+"If you look at the output, you will see that a few files were created in your “work” directory. The following phrase will print the full path of your work directory:"
 { $code "\"work\" resource-path ." }
 "The work directory is one of several " { $link "vocabs.roots" } " where Factor searches for vocabularies. It is possible to define new vocabulary roots; see " { $link "add-vocab-roots" } ". To keep things simple in this tutorial, we'll just use the work directory, though."
 $nl
@@ -36,21 +36,21 @@ $nl
 { $code ": palindrome? ( string -- ? ) dup reverse = ;" }
 "Place this definition at the end of your source file."
 $nl
-"Now we have changed the source file, we must reload it into Factor so that we can test the new definition. To do this, simply go to the Factor workspace and press " { $command workspace "workflow" refresh-all } ". This will find any previously-loaded source files which have changed on disk, and reload them."
+"Now we have changed the source file, we must reload it into Factor so that we can test the new definition. To do this, simply go to the Factor listener and press " { $command tool "common" refresh-all } ". This will find any previously-loaded source files which have changed on disk, and reload them."
 $nl
 "When you do this, you will get an error about the " { $link dup } " word not being found. This is because this word is part of the " { $vocab-link "kernel" } " vocabulary, but this vocabulary is not part of the source file's " { $link "vocabulary-search" } ". You must explicitly list dependencies in source files. This allows Factor to automatically load required vocabularies and makes larger programs easier to maintain."
 $nl
-"To add the word to the search path, first convince yourself that this word is in the " { $vocab-link "kernel" } " vocabulary. Enter " { $snippet "dup" } " in the listener's input area, and press " { $operation com-follow } ". This will open the documentation browser tool, viewing the help for the " { $link dup } " word. One of the subheadings in the help article will mention the word's vocabulary."
+"To add the word to the search path, first convince yourself that this word is in the " { $vocab-link "kernel" } " vocabulary. Enter " { $snippet "dup" } " in the listener's input area, and press " { $operation com-browse } ". This will open the documentation browser tool, viewing the help for the " { $link dup } " word. One of the subheadings in the help article will mention the word's vocabulary."
 $nl
 "So now, add the following at the start of the source file:"
 { $code "USING: kernel ;" }
-"Next, find out what vocabulary " { $link reverse } " lives in; type the word name " { $snippet "reverse" } " in the workspace listener's input area, and press " { $operation com-follow } "."
+"Next, find out what vocabulary " { $link reverse } " lives in; type the word name " { $snippet "reverse" } " in the listener's input area, and press " { $operation com-browse } "."
 $nl
 "It lives in the " { $vocab-link "sequences" } " vocabulary, so we add that to the search path:"
 { $code "USING: kernel sequences ;" }
 "Finally, check what vocabulary " { $link = } " lives in, and confirm that it's in the " { $vocab-link "kernel" } " vocabulary, which we've already added to the search path."
 $nl
-"Now press " { $command workspace "workflow" refresh-all } " again, and the source file should reload without any errors. You can now go on and learn about " { $link "first-program-test" } "." ;
+"Now press " { $command tool "common" refresh-all } " again, and the source file should reload without any errors. You can now go on and learn about " { $link "first-program-test" } "." ;
 
 ARTICLE: "first-program-test" "Testing your first program"
 "Your " { $snippet "palindrome.factor" } " file should look like the following after the previous section:"
@@ -64,9 +64,9 @@ ARTICLE: "first-program-test" "Testing your first program"
 }
 "We will now test our new word in the listener. First, push a string on the stack:"
 { $code "\"hello\"" }
-"Note that the stack display at the top of the workspace now shows this string. Having supplied the input, we call our word:"
+"Note that the stack display in the listener now shows this string. Having supplied the input, we call our word:"
 { $code "palindrome?" }
-"The stack display should now have a boolean false - " { $link f } " - which is the word's output. Since ``hello'' is not a palindrome, this is what we expect. We can get rid of this boolean by calling " { $link drop } ". The stack should be empty after this is done."
+"The stack display should now have a boolean false - " { $link f } " - which is the word's output. Since “hello” is not a palindrome, this is what we expect. We can get rid of this boolean by calling " { $link drop } ". The stack should be empty after this is done."
 $nl
 "Now, let's try it with a palindrome; we will push the string and call the word in the same line of code:"
 { $code "\"racecar\" palindrome?" }
@@ -120,7 +120,7 @@ $nl
 { $code "filter" }
 "Now the stack should contain the following string:"
 { "\"AmanaplanacanalPanama\"" }
-"This is almost what we want; we just need to convert the string to lower case now. This can be done by calling " { $link >lower } "; the " { $snippet ">" } " prefix is a naming convention for conversion operations, and should be read as ``to'':"
+"This is almost what we want; we just need to convert the string to lower case now. This can be done by calling " { $link >lower } "; the " { $snippet ">" } " prefix is a naming convention for conversion operations, and should be read as “to”:"
 { $code ">lower" }
 "Finally, let's print the top of the stack and discard it:"
 { $code "." }
@@ -132,13 +132,13 @@ $nl
 $nl
 "We modify " { $snippet "palindrome?" } " to first apply " { $snippet "normalize" } " to its input:"
 { $code ": palindrome? ( str -- ? ) normalize dup reverse = ;" }
-"Now if you press " { $command workspace "workflow" refresh-all } ", the source file should reload without any errors. You can run unit tests again, and this time, they will all pass:"
+"Now if you press " { $command tool "common" refresh-all } ", the source file should reload without any errors. You can run unit tests again, and this time, they will all pass:"
 { $code "\"palindrome\" test" } ;
 
 ARTICLE: "first-program" "Your first program"
 "In this tutorial, we will write a simple Factor program which prompts the user to enter a word, and tests if it is a palindrome (that is, the word is spelled the same backwards and forwards)."
 $nl
-"In this tutorial, you will learn about basic Factor development tools. You may want to open a second workspace window by pressing " { $command workspace "workflow" workspace-window } "; this will allow you to read this tutorial and browse other documentation at the same time."
+"In this tutorial, you will learn about basic Factor development tools."
 { $subsection "first-program-start" }
 { $subsection "first-program-logic" }
 { $subsection "first-program-test" }

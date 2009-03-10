@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations sequences math namespaces make sets
-math.parser math.ranges assocs regexp unicode.categories arrays
+math.parser math.ranges assocs regexp regexp.matchers unicode.categories arrays
 hashtables words classes quotations xmode.catalog unicode.case ;
 IN: validators
 
@@ -54,12 +54,12 @@ IN: validators
     ] if ;
 
 : v-regexp ( str what regexp -- str )
-    [ over ] dip matches?
-    [ drop ] [ "invalid " prepend throw ] if ;
+    3dup nip matches?
+    [ 2drop ] [ drop "invalid " prepend throw ] if ;
 
 : v-email ( str -- str )
     #! From http://www.regular-expressions.info/email.html
-    60 v-max-length
+    320 v-max-length
     "e-mail"
     R' [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}'i
     v-regexp ;

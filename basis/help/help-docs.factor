@@ -340,7 +340,7 @@ HELP: $values
 HELP: $instance
 { $values { "element" "an array with shape " { $snippet "{ class }" } } }
 { $description
-    "Produces the text ``a " { $emphasis "class" } "'' or ``an " { $emphasis "class" } "'', depending on the first letter of " { $emphasis "class" } "."
+    "Produces the text “a " { $emphasis "class" } "” or “an " { $emphasis "class" } "”, depending on the first letter of " { $emphasis "class" } "."
 }
 { $examples
     { $markup-example { $instance string } }
@@ -351,7 +351,7 @@ HELP: $instance
 HELP: $maybe
 { $values { "element" "an array with shape " { $snippet "{ class }" } } }
 { $description
-    "Produces the text ``a " { $emphasis "class" } " or f'' or ``an " { $emphasis "class" } " or f'', depending on the first letter of " { $emphasis "class" } "."
+    "Produces the text “a " { $emphasis "class" } " or f” or “an " { $emphasis "class" } " or f”, depending on the first letter of " { $emphasis "class" } "."
 }
 { $examples
     { $markup-example { $maybe string } }
@@ -360,7 +360,7 @@ HELP: $maybe
 HELP: $quotation
 { $values { "element" "an array with shape " { $snippet "{ effect }" } } }
 { $description
-    "Produces the text ``a quotation with stack effect " { $emphasis "effect" } "''."
+    "Produces the text “a quotation with stack effect " { $emphasis "effect" } "”."
 }
 { $examples
     { $markup-example { $quotation "( obj -- )" } }
