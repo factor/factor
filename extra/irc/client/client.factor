@@ -152,8 +152,6 @@ M: irc-chat to-chat in-messages>> mailbox-put ;
         [ (>>nick) ] [ (>>parameter) ] [ +mode+ >>action ] tri ] dip to-chat ]
     3bi ; ! FIXME
 
-DEFER: me?
-
 ! ======================================
 ! IRC client messages
 ! ======================================
