@@ -1,6 +1,8 @@
 ! Copyright (C) 2006, 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators kernel math math.vectors namespaces opengl opengl.gl sequences tetris.board tetris.game tetris.piece ui.render tetris.tetromino ui.gadgets ;
+USING: accessors arrays combinators kernel math math.vectors
+namespaces opengl opengl.gl sequences tetris.board tetris.game
+tetris.piece ui.render tetris.tetromino ui.gadgets colors ;
 IN: tetris.gl
 
 #! OpenGL rendering for tetris
@@ -16,7 +18,7 @@ IN: tetris.gl
 
 : draw-next-piece ( piece -- )
     dup tetromino>> colour>>
-    clone 0.2 >>alpha gl-color draw-piece-blocks ;
+    >rgba-components drop 0.2 <rgba> gl-color draw-piece-blocks ;
 
 ! TODO: move implementation specific stuff into tetris-board
 : (draw-row) ( x y row -- )

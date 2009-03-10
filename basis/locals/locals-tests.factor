@@ -357,12 +357,12 @@ ERROR: punned-class x ;
 [ T{ punned-class f 3 } ] [ 3 [| a | T{ punned-class f a } ] call ] unit-test
 
 :: literal-identity-test ( -- a b )
-    { } V{ } ;
+    { 1 } V{ } ;
 
-[ t f ] [
+[ t t ] [
     literal-identity-test
     literal-identity-test
-    swapd [ eq? ] [ eq? ] 2bi*
+    [ eq? ] [ eq? ] bi-curry* bi*
 ] unit-test
 
 :: mutable-local-in-literal-test ( a! -- b ) a 1 + a! { a } ;
@@ -401,9 +401,10 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 [ 10 ] [ 10 [| A | { [ A ] } ] call first call ] unit-test
 
 [
-    "USING: locals fry math ; [ 0 '[ [let | A [ 10 ] | A _ + ] ] ]" eval
+    "USING: locals fry math ; 1 '[ [let | A [ 10 ] | A _ + ] ]"
+    eval call
 ] [ error>> >r/r>-in-fry-error? ] must-fail-with
-
+    
 :: (funny-macro-test) ( obj quot -- ? ) obj { quot } 1&& ; inline
 : funny-macro-test ( n -- ? ) [ odd? ] (funny-macro-test) ;
 
@@ -492,7 +493,7 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
     [| | 0 '[ [let | A [ 10 ] | A _ + ] ] call ] call
 ] unit-test
 
-! Discovered by littledan
+! littledan found this problem
 [ "bar" ] [ [let | a [ [let | foo [ "bar" ] | foo ] ] | a ] ] unit-test
 [ 10 ] [ [let | a [ 10 ] | [let | b [ a ] | b ] ] ] unit-test
 
@@ -501,3 +502,27 @@ M:: integer lambda-method-forget-test ( a -- b ) ;
 [ { \ + 3 } ] [ [let | a [ 3 ] | { \ + a } ] ] unit-test
 
 [ 3 ] [ [let | a [ \ + ] | 1 2 [ \ a execute ] ] call ] unit-test
+
+! erg found this problem
+:: erg's-:>-bug ( n ? -- n ) ? [ n :> n n ] [ n :> b b ] if ;
+
+[ 3 ] [ 3 f erg's-:>-bug ] unit-test
+    
+[ 3 ] [ 3 t erg's-:>-bug ] unit-test
+
+:: erg's-:>-bug-2 ( n ? -- n ) ? n '[ _ :> n n ] [ n :> b b ] if ;
+
+[ 3 ] [ 3 f erg's-:>-bug-2 ] unit-test
+    
+[ 3 ] [ 3 t erg's-:>-bug-2 ] unit-test
+
+! dharmatech found this problem
+GENERIC: ed's-bug ( a -- b )
+
+M: string ed's-bug reverse ;
+M: integer ed's-bug neg ;
+
+:: ed's-test-case ( a -- b )
+   { [ a ed's-bug ] } && ;
+
+[ t ] [ \ ed's-test-case optimized>> ] unit-test

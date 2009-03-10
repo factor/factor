@@ -48,14 +48,12 @@ IN: ui.gadgets.worlds.tests
 
 TUPLE: focusing < gadget ;
 
-: <focusing>
-    focusing new-gadget ;
+: <focusing> ( -- gadget ) focusing new ;
 
 TUPLE: focus-test < gadget ;
 
-: <focus-test>
-    focus-test new-gadget
-    dup <focusing> add-gadget drop ;
+: <focus-test> ( -- gadget )
+    focus-test new <focusing> add-gadget ;
 
 M: focus-test focusable-child* gadget-child ;
 

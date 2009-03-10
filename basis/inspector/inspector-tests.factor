@@ -10,8 +10,6 @@ H{ } describe
 
 [ "fixnum instance\n" ] [ [ 3 describe ] with-string-writer ] unit-test
 
-[ ] [ inspector-hook get-global inspector-hook set ] unit-test
-
 [ ] [ H{ } clone inspect ] unit-test
 
 [ ] [ "a" "b" &add ] unit-test

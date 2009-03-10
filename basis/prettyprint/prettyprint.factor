@@ -149,14 +149,16 @@ PRIVATE>
 
 : .c ( -- ) callstack callstack. ;
 
-: pprint-cell ( obj -- ) [ pprint ] with-cell ;
+: pprint-cell ( obj -- ) [ pprint-short ] with-cell ;
+
+SYMBOL: pprint-string-cells?
 
 : simple-table. ( values -- )
     standard-table-style [
         [
             [
                 [
-                    dup string?
+                    dup string? pprint-string-cells? get not and
                     [ [ write ] with-cell ]
                     [ pprint-cell ]
                     if
@@ -233,15 +235,6 @@ M: pathname synopsis* pprint* ;
     ] with-string-writer ;
 
 M: word summary synopsis ;
-
-: synopsis-alist ( definitions -- alist )
-    [ dup synopsis swap ] { } map>assoc ;
-
-: definitions. ( alist -- )
-    [ write-object nl ] assoc-each ;
-
-: sorted-definitions. ( definitions -- )
-    synopsis-alist sort-keys definitions. ;
 
 GENERIC: declarations. ( obj -- )
 

@@ -4,8 +4,8 @@ USING: fry accessors arrays kernel words sequences generic math
 namespaces make quotations assocs combinators classes.tuple
 classes.tuple.private effects summary hashtables classes generic
 sets definitions generic.standard slots.private continuations locals
-stack-checker.backend stack-checker.state stack-checker.visitor
-stack-checker.errors stack-checker.values
+generalizations stack-checker.backend stack-checker.state
+stack-checker.visitor stack-checker.errors stack-checker.values
 stack-checker.recursive-state ;
 IN: stack-checker.transforms
 
@@ -154,4 +154,13 @@ CONSTANT: bit-member-n 256
 
 \ memq? [
     dup sequence? [ memq-quot ] [ drop f ] if
+] 1 define-transform
+
+! Shuffling
+: nths-quot ( indices -- quot )
+    [ [ '[ _ swap nth ] ] map ] [ length ] bi
+    '[ _ cleave _ narray ] ;
+
+\ shuffle [
+    shuffle-mapping nths-quot
 ] 1 define-transform

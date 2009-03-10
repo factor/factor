@@ -1,43 +1,49 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays generic kernel math namespaces sequences
 words splitting grouping math.vectors ui.gadgets.grids
-ui.gadgets math.geometry.rect ;
+ui.gadgets.grids.private ui.gadgets math.order math.rectangles
+fry ;
 IN: ui.gadgets.frames
+
+TUPLE: frame < grid filled-cell ;
+
+<PRIVATE
 
 TUPLE: glue < gadget ;
 
 M: glue pref-dim* drop { 0 0 } ;
 
-: <glue> ( -- glue ) glue new-gadget ;
+: <glue> ( -- glue ) glue new ;
 
-: <frame-grid> ( -- grid ) 9 [ <glue> ] replicate 3 group ;
+: <frame-grid> ( cols rows -- grid )
+    swap '[ _ [ <glue> ] replicate ] replicate ;
 
-: @center ( -- i j ) 1 1 ; inline
-: @left ( -- i j ) 0 1 ; inline
-: @right ( -- i j ) 2 1 ; inline
-: @top ( -- i j ) 1 0 ; inline
-: @bottom ( -- i j ) 1 2 ; inline
+: (fill- ( frame grid-layout quot1 quot2 -- pref-dim gap filled-cell dims )
+    [ '[ [ dim>> ] [ gap>> ] [ filled-cell>> ] tri _ tri@ ] dip ] dip call ; inline
 
-: @top-left ( -- i j ) 0 0 ; inline
-: @top-right ( -- i j ) 2 0 ; inline
-: @bottom-left ( -- i j ) 0 2 ; inline
-: @bottom-right ( -- i j ) 2 2 ; inline
+: available-space ( pref-dim gap dims -- avail )
+    length 1+ * [-] ; inline
 
-TUPLE: frame < grid ;
+: -center) ( pref-dim gap filled-cell dims -- )
+    [ nip available-space ] 2keep [ remove-nth sum [-] ] 2keep set-nth ; inline
 
-: new-frame ( class -- frame )
-    <frame-grid> swap new-grid ; inline
+: (fill-center) ( frame grid-layout quot1 quot2 -- ) (fill- -center) ; inline
 
-: <frame> ( -- frame )
-    frame new-frame ;
+: fill-center ( frame grid-layout -- )
+    [ [ first ] [ column-widths>> ] (fill-center) ]
+    [ [ second ] [ row-heights>> ] (fill-center) ] 2bi ;
 
-: (fill-center) ( dim vec -- )
-    [ [ first ] [ third ] bi v+ [v-] ] keep set-second ;
+: <frame-layout> ( frame -- grid-layout )
+    dup <grid-layout> [ fill-center ] keep ;
 
-: fill-center ( dim horiz vert -- )
-    [ over ] dip [ (fill-center) ] 2bi@ ;
+PRIVATE>
 
 M: frame layout*
-    dup compute-grid
-    [ [ dim>> ] 2dip fill-center ] [ grid-layout ] 3bi ;
+    [ grid>> ] [ <frame-layout> ] bi grid-layout ;
+
+: new-frame ( cols rows class -- frame )
+    [ <frame-grid> ] dip new-grid ; inline
+
+: <frame> ( cols rows -- frame )
+    frame new-frame ;

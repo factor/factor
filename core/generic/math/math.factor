@@ -33,10 +33,11 @@ PREDICATE: math-class < class
 
 : math-upgrade ( class1 class2 -- quot )
     [ math-class-max ] 2keep
-    [ over ] dip (math-upgrade) [
+    [
         (math-upgrade)
         dup empty? [ [ dip ] curry [ ] like ] unless
-    ] dip append ;
+    ] [ (math-upgrade) ]
+    bi-curry* bi append ;
 
 ERROR: no-math-method left right generic ;
 

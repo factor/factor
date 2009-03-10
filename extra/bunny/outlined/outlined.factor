@@ -1,6 +1,6 @@
 USING: arrays bunny.model bunny.cel-shaded continuations
 destructors kernel math multiline opengl opengl.shaders
-opengl.framebuffers opengl.gl opengl.demo-support fry
+opengl.framebuffers opengl.gl opengl.textures opengl.demo-support fry
 opengl.capabilities sequences ui.gadgets combinators accessors
 macros locals ;
 IN: bunny.outlined

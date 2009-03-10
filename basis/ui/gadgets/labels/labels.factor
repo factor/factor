@@ -1,56 +1,95 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hashtables io kernel math namespaces
-make opengl sequences strings splitting ui.gadgets
-ui.gadgets.tracks ui.gadgets.theme ui.render colors models ;
+USING: accessors arrays hashtables io kernel math math.functions
+namespaces make opengl sequences strings splitting ui.gadgets
+ui.gadgets.tracks ui.gadgets.packs fonts ui.render ui.pens.solid
+ui.baseline-alignment ui.text colors colors.constants models
+combinators ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.
-TUPLE: label < gadget text font color ;
+TUPLE: label < gadget text font ;
 
-: label-string ( label -- string )
+SLOT: string
+
+M: label string>> ( label -- string )
     text>> dup string? [ "\n" join ] unless ; inline
 
-: set-label-string ( string label -- )
-    [ CHAR: \n over memq? [ string-lines ] when ] dip (>>text) ; inline
+<PRIVATE
+
+PREDICATE: string-array < array [ string? ] all? ;
+
+PRIVATE>
+
+: ?string-lines ( string -- string/array )
+    CHAR: \n over memq? [ string-lines ] when ;
+
+ERROR: not-a-string object ;
+
+M: label (>>string) ( string label -- )
+    [
+        {
+            { [ dup string-array? ] [ ] }
+            { [ dup string? ] [ ?string-lines ] }
+            [ not-a-string ]
+        } cond
+    ] dip (>>text) ; inline
 
 : label-theme ( gadget -- gadget )
-    sans-serif-font >>font
-    black >>color ; inline
+    sans-serif-font >>font ; inline
 
 : new-label ( string class -- label )
-    new-gadget
-    [ set-label-string ] keep
+    new
+    swap >>string
     label-theme ; inline
 
 : <label> ( string -- label )
     label new-label ;
 
+: >label< ( label -- font text )
+    [ font>> ] [ text>> ] bi ;
+
 M: label pref-dim*
-    [ font>> open-font ] [ text>> ] bi text-dim ;
+    >label< text-dim ;
+
+<PRIVATE
+
+: label-metrics ( label -- metrics )
+    >label< dup string? [ first ] unless line-metrics ;
+
+PRIVATE>
+
+M: label baseline
+    label-metrics ascent>> round ;
+
+M: label cap-height
+    label-metrics cap-height>> round ;
 
 M: label draw-gadget*
-    [ color>> gl-color ]
-    [ [ font>> ] [ text>> ] bi origin get draw-text ] bi ;
+    >label<
+    [
+        background get [ font-with-background ] when*
+        foreground get [ font-with-foreground ] when*
+    ] dip
+    draw-text ;
 
-M: label gadget-text* label-string % ;
+M: label gadget-text* string>> % ;
 
 TUPLE: label-control < label ;
 
 M: label-control model-changed
-    swap value>> over set-label-string relayout ;
+    swap value>> >>string relayout ;
 
 : <label-control> ( model -- gadget )
     "" label-control new-label
         swap >>model ;
 
 : text-theme ( gadget -- gadget )
-    black >>color
     monospace-font >>font ;
 
 : reverse-video-theme ( label -- label )
-    white >>color
-    black solid-interior ;
+    sans-serif-font reverse-video-font >>font
+    COLOR: black <solid> >>interior ;
 
 GENERIC: >label ( obj -- gadget )
 M: string >label <label> ;
@@ -58,12 +97,21 @@ M: array >label <label> ;
 M: object >label ;
 M: f >label drop <gadget> ;
 
+<PRIVATE
+
+: label-on-left/right ( -- track )
+    horizontal <track>
+        0 >>fill
+        +baseline+ >>align
+        { 5 5 } >>gap ; inline
+PRIVATE>
+
 : label-on-left ( gadget label -- button )
-    { 1 0 } <track>
+    label-on-left/right
         swap >label f track-add
         swap 1 track-add ;
 
 : label-on-right ( label gadget -- button )
-    { 1 0 } <track>
+    label-on-left/right
         swap f track-add
         swap >label 1 track-add ;

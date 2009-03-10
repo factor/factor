@@ -1,1 +1,0 @@
-Bake is similar to make but with additional features

@@ -93,7 +93,7 @@ M: bignum (log2) bignum-log2 ;
 
 : pre-scale ( num den -- scale shifted-num scaled-den )
     2dup [ log2 ] bi@ -
-    tuck [ neg 54 + shift ] [ [ scale-denonimator ] dip + ] 2bi*
+    [ neg 54 + shift ] [ [ scale-denonimator ] dip + ] bi-curry bi*
     -rot ; inline
 
 ! Second step: loop

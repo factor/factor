@@ -42,7 +42,7 @@ SYMBOL: previous
         2drop
     ] [
         over previous get conjoin
-        dup slip
+        [ call ] keep
         [ nip (closure) ] curry assoc-each
     ] if ; inline recursive
 

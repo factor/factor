@@ -1,0 +1,12 @@
+libcairo-2.dll
+libgio-2.0-0.dll
+libglib-2.0-0.dll
+libgmodule-2.0-0.dll
+libgobject-2.0-0.dll
+libgthread-2.0-0.dll
+libpango-1.0-0.dll
+libpangocairo-1.0-0.dll
+libpangowin32-1.0-0.dll
+libpng12-0.dll
+libtiff3.dll
+zlib1.dll

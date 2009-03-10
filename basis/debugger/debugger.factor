@@ -252,8 +252,8 @@ M: already-disposed summary drop "Attempting to operate on disposed object" ;
 M: no-current-vocab summary
     drop "Not in a vocabulary; IN: form required" ;
 
-M: no-word-error summary
-    drop "Word not found in current vocabulary search path" ;
+M: no-word-error error.
+    "No word named ``" write name>> write "'' found in current vocabulary search path" print ;
 
 M: staging-violation summary
     drop
