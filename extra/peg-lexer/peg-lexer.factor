@@ -38,11 +38,11 @@ M: lex-hash at* swap {
    [ execute [ error-stack get first throw ] unless* ] with-global-lexer
    ast>> ;
 
-: create-bnf ( name parser -- ) [ lexer get skip-blank parse* dup V{ } = [ parsed ] unless ] curry
-    define POSTPONE: parsing ;
-
+: create-bnf ( name parser -- ) reset-tokenizer [ lexer get skip-blank parse* dup V{ } = [ parsed ] unless ] curry
+    define word make-parsing ;
+    
 : ON-BNF: CREATE-WORD reset-tokenizer ";ON-BNF" parse-multiline-string parse-ebnf
-    main swap at reset-tokenizer create-bnf ; parsing
+    main swap at create-bnf ; parsing
 
 ! Tokenizer like standard factor lexer
 EBNF: factor
