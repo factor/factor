@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: regexp.combinators tools.test regexp kernel sequences regexp.matchers ;
+USING: regexp.combinators tools.test regexp kernel sequences ;
 IN: regexp.combinators.tests
 
 : strings ( -- regexp )
