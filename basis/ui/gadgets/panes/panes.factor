@@ -104,7 +104,7 @@ M: pane draw-gadget*
     dup gadget-selection? [
         [ selection-color>> gl-color ]
         [
-            [ [ origin get ] dip loc>> v- ] keep selected-children
+            [ loc>> vneg ] keep selected-children
             [ draw-selection ] with each
         ] bi
     ] [ drop ] if ;
