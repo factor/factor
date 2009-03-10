@@ -1,6 +1,6 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel sequences ;
+USING: alien.syntax kernel sequences fry ;
 IN: core-foundation.arrays
 
 TYPEDEF: void* CFArrayRef
@@ -17,6 +17,5 @@ FUNCTION: CFIndex CFArrayGetCount ( CFArrayRef array ) ;
     dup CFArrayGetCount [ CFArrayGetValueAtIndex ] with map ;
 
 : <CFArray> ( seq -- alien )
-    [ f swap length f CFArrayCreateMutable ] keep
-    [ length ] keep
-    [ [ dupd ] dip CFArraySetValueAtIndex ] 2each ;
+    f over length &: kCFTypeArrayCallBacks CFArrayCreateMutable
+    [ '[ [ _ ] 2dip swap CFArraySetValueAtIndex ] each-index ] keep ;

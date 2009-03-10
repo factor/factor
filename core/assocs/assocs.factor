@@ -20,7 +20,7 @@ GENERIC: >alist ( assoc -- newassoc )
 M: assoc assoc-like drop ;
 
 : ?at ( key assoc -- value/key ? )
-    dupd at* [ [ nip ] [ drop ] if ] keep ; inline
+    2dup at* [ 2nip t ] [ 2drop f ] if ; inline
 
 <PRIVATE
 

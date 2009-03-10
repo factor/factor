@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors colors help.markup help.syntax kernel opengl
-opengl.gl sequences specialized-arrays.float ui.pens ;
+opengl.gl sequences specialized-arrays.float math.vectors
+ui.gadgets ui.pens ;
 IN: ui.pens.polygon
 
 ! Polygon pen
@@ -31,3 +32,7 @@ M: polygon draw-interior
     [ interior-vertices>> gl-vertex-pointer ]
     [ [ GL_POLYGON 0 ] dip interior-count>> glDrawArrays ]
     tri ;
+
+: <polygon-gadget> ( color points -- gadget )
+    [ <polygon> ] [ { 0 0 } [ vmax ] reduce ] bi
+    [ <gadget> ] 2dip [ >>interior ] [ >>dim ] bi* ;
