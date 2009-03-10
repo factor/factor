@@ -30,15 +30,11 @@ M: lex-hash at* swap {
         H{ } clone \ packrat set ] f make-assoc <lex-hash>
    swap bind ; inline
 
-! Usage:
-! ON-BNF: word expr= [1-9] ;ON-BNF
-! << name parser create-bnf >>
-
 : parse* ( parser -- ast ) compile
    [ execute [ error-stack get first throw ] unless* ] with-global-lexer
    ast>> ;
 
-: create-bnf ( name parser -- ) reset-tokenizer [ lexer get skip-blank parse* dup V{ } = [ parsed ] unless ] curry
+: create-bnf ( name parser -- ) reset-tokenizer [ lexer get skip-blank parse* parsed ] curry
     define word make-parsing ;
     
 : ON-BNF: CREATE-WORD reset-tokenizer ";ON-BNF" parse-multiline-string parse-ebnf
