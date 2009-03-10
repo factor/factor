@@ -8,4 +8,7 @@ HELP: ON-BNF:
 
 HELP: create-bnf
 { $values { "word" string } { "parser" parser } }
-{ $description "Runtime equivalent of ON-BNF- also useful with manually constructed parsers." } ;
+{ $description "Runtime equivalent of " { $link POSTPONE: ON-BNF: } " also useful with manually constructed parsers." } ;
+
+HELP: factor
+{ $description "Tokenizer that acts like standard factor lexer, separating tokens by whitespace." } ;
