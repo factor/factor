@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: regexp tools.test kernel sequences regexp.parser regexp.private
-eval strings multiline accessors regexp.matchers ;
+eval strings multiline accessors ;
 IN: regexp-tests
 
 \ <regexp> must-infer
@@ -239,11 +239,11 @@ IN: regexp-tests
 [ f ] [ "A" "\\p{Lower}" <regexp> matches? ] unit-test
 [ t ] [ "A" R/ \p{Lower}/i matches? ] unit-test
 
-[ t ] [ "abc" reverse R/ abc/r matches? ] unit-test
-[ t ] [ "abc" reverse R/ a[bB][cC]/r matches? ] unit-test
+[ t ] [ "abc" R/ abc/r matches? ] unit-test
+[ t ] [ "abc" R/ a[bB][cC]/r matches? ] unit-test
 
-[ t ] [ 3 "xabc" R/ abc/ <reverse-matcher> match-index-from >boolean ] unit-test
-[ t ] [ 3 "xabc" R/ a[bB][cC]/ <reverse-matcher> match-index-from >boolean ] unit-test
+[ t ] [ 3 "xabc" R/ abc/r match-index-from >boolean ] unit-test
+[ t ] [ 3 "xabc" R/ a[bB][cC]/r match-index-from >boolean ] unit-test
 
 [ t ] [ "s@f" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
 [ f ] [ "a" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
@@ -341,9 +341,19 @@ IN: regexp-tests
 
 [ t ] [ "aaaa" R/ .*a./ matches? ] unit-test
 
+[ f ] [ "ab" R/ (?~ac|\p{Lower}b)/ matches? ] unit-test
+[ f ] [ "ab" R/ (?~ac|[a-z]b)/ matches? ] unit-test
+[ f ] [ "ac" R/ (?~ac|\p{Lower}b)/ matches? ] unit-test
+[ f ] [ "ac" R/ (?~ac|[a-z]b)/ matches? ] unit-test
+[ f ] [ "ac" R/ (?~[a-zA-Z]c|\p{Lower}b)/ matches? ] unit-test
+[ f ] [ "ab" R/ (?~[a-zA-Z]c|\p{Lower}b)/ matches? ] unit-test
+[ f ] [ "πb" R/ (?~[a-zA-Z]c|\p{Lower}b)/ matches? ] unit-test
+[ t ] [ "πc" R/ (?~[a-zA-Z]c|\p{Lower}b)/ matches? ] unit-test
+[ t ] [ "Ab" R/ (?~[a-zA-Z]c|\p{Lower}b)/ matches? ] unit-test
+
 ! DFA is compiled when needed, or when literal
-[ f ] [ "foo" <regexp> dfa>> >boolean ] unit-test
-[ t ] [ R/ foo/ dfa>> >boolean ] unit-test
+[ regexp-initial-word ] [ "foo" <regexp> dfa>> ] unit-test
+[ f ] [ R/ foo/ dfa>> \ regexp-initial-word = ] unit-test
 
 [ t ] [ "a" R/ ^a/ matches? ] unit-test
 [ f ] [ "\na" R/ ^a/ matches? ] unit-test
