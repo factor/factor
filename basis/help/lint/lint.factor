@@ -132,6 +132,11 @@ SYMBOL: vocabs-quot
         [ check-descriptions ]
     } cleave ;
 
+: check-class-description ( word element -- )
+    [ class? not ]
+    [ { $class-description } swap elements empty? not ] bi* and
+    [ "A word that is not a class has a $class-description" throw ] when ;
+
 : all-word-help ( words -- seq )
     [ word-help ] filter ;
 
@@ -153,7 +158,8 @@ M: help-error error.
         dup '[
             _ dup word-help
             [ check-values ]
-            [ nip [ check-nulls ] [ check-see-also ] [ check-markup ] tri ] 2bi
+            [ check-class-description ]
+            [ nip [ check-nulls ] [ check-see-also ] [ check-markup ] tri ] 2tri
         ] check-something
     ] [ drop ] if ;
 
