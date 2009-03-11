@@ -3,7 +3,7 @@
 USING: kernel quotations accessors fry assocs present math.order
 math.vectors arrays locals models.search models.sort models sequences
 vocabs tools.profiler words prettyprint combinators.smart
-definitions.icons ui ui.commands ui.gadgets ui.gadgets.panes
+definitions.icons see ui ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.tracks ui.gestures ui.gadgets.buttons
 ui.gadgets.tables ui.gadgets.search-tables ui.gadgets.labeled
 ui.gadgets.buttons ui.gadgets.packs ui.gadgets.labels
