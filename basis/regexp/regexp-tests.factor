@@ -431,6 +431,8 @@ IN: regexp-tests
 [ f ] [ "a bar b" R/ foo/ re-contains? ] unit-test
 [ t ] [ "foo" R/ foo/ re-contains? ] unit-test
 
+[ { "foo" "fxx" "fab" } ] [ "fab fxx foo" R/ f../r all-matches [ >string ] map ] unit-test
+
 ! [ t ] [ "foo" "\\bfoo\\b" <regexp> matches? ] unit-test
 ! [ t ] [ "afoob" "\\Bfoo\\B" <regexp> matches? ] unit-test
 ! [ t ] [ "afoob" "\\bfoo\\b" <regexp> matches? ] unit-test
