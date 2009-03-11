@@ -1,40 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: slides help.markup math arrays hashtables namespaces
-sequences kernel sequences parser memoize io.encodings.binary
-locals kernel.private tools.vocabs.browser assocs quotations
- tools.vocabs tools.annotations tools.crossref
-help.topics math.functions compiler.tree.optimizer
-compiler.cfg.optimizer fry
-ui.gadgets.panes tetris tetris.game combinators generalizations
-multiline sequences.private ;
+USING: slides help.markup math arrays hashtables namespaces sequences
+kernel sequences parser memoize io.encodings.binary locals
+kernel.private tools.vocabs.browser assocs quotations tools.vocabs
+tools.annotations tools.crossref help.topics math.functions
+compiler.tree.optimizer compiler.cfg.optimizer fry ui.gadgets.panes
+tetris tetris.game combinators generalizations multiline
+sequences.private ;
 IN: otug-talk
-
-USING: cairo cairo.ffi cairo.gadgets accessors
-io.backend ui.gadgets ;
-
-TUPLE: png-gadget < cairo-gadget surface ;
-
-: <png-gadget> ( file -- gadget )
-    png-gadget new-gadget
-    swap normalize-path
-    cairo_image_surface_create_from_png >>surface ; inline
-
-M: png-gadget pref-dim* ( gadget -- )
-    surface>>
-    [ cairo_image_surface_get_width ]
-    [ cairo_image_surface_get_height ]
-    bi 2array ;
-
-M: png-gadget render-cairo* ( gadget -- )
-    cr swap surface>> 0 0 cairo_set_source_surface
-    cr cairo_paint ;
-
-M: png-gadget ungraft* ( gadget -- )
-    surface>> cairo_surface_destroy ;
-
-: $bitmap ( element -- )
-    [ first <png-gadget> gadget. ] ($block) ;
 
 : $tetris ( element -- )
     drop [ <default-tetris> <tetris-gadget> gadget. ] ($block) ;
@@ -105,11 +78,11 @@ CONSTANT: otug-slides
     }
     { $slide "Data flow combinators - cleave family"
         { { $link bi } ", " { $link tri } ", " { $link cleave } }
-        { $bitmap "resource:extra/otug-talk/bi.png" }
+        { $image "resource:extra/otug-talk/bi.tiff" }
     }
     { $slide "Data flow combinators - cleave family"
         { { $link 2bi } ", " { $link 2tri } ", " { $link 2cleave } }
-        { $bitmap "resource:extra/otug-talk/2bi.png" }
+        { $image "resource:extra/otug-talk/2bi.tiff" }
     }
     { $slide "Data flow combinators"
         "First, let's define a data type:"
@@ -128,19 +101,19 @@ CONSTANT: otug-slides
     }
     { $slide "Data flow combinators - spread family"
         { { $link bi* } ", " { $link tri* } ", " { $link spread } }
-        { $bitmap "resource:extra/otug-talk/bi_star.png" }
+        { $image "resource:extra/otug-talk/bi_star.tiff" }
     }
     { $slide "Data flow combinators - spread family"
         { { $link 2bi* } }
-        { $bitmap "resource:extra/otug-talk/2bi_star.png" }
+        { $image "resource:extra/otug-talk/2bi_star.tiff" }
     }
     { $slide "Data flow combinators - apply family"
         { { $link bi@ } ", " { $link tri@ } ", " { $link napply } }
-        { $bitmap "resource:extra/otug-talk/bi_at.png" }
+        { $image "resource:extra/otug-talk/bi_at.tiff" }
     }
     { $slide "Data flow combinators - apply family"
         { { $link 2bi@ } }
-        { $bitmap "resource:extra/otug-talk/2bi_at.png" }
+        { $image "resource:extra/otug-talk/2bi_at.tiff" }
     }
     { $slide "Shuffle words"
         "When data flow combinators are not enough"

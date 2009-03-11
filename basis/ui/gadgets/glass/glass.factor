@@ -71,7 +71,7 @@ popup H{
     { T{ key-down f f "ESC" } [ hide-glass ] }
 } set-gestures
 
-: pass-to-popup ( gesture interactor -- ? )
+: pass-to-popup ( gesture owner -- ? )
     popup>> focusable-child resend-gesture ;
 
 : show-popup ( owner popup visible-rect -- )
