@@ -33,8 +33,6 @@ M: lookbehind question>quot ! Returns ( index string -- ? )
         '[ [ 1- ] dip f _ execute ]
     ] maybe-negated ;
 
-<PRIVATE
-
 : check-string ( string -- string )
     ! Make this configurable
     dup string? [ "String required" throw ] unless ;
@@ -58,26 +56,49 @@ PRIVATE>
 
 <PRIVATE
 
+: make-slice ( i j seq -- slice )
+    [ 2dup > [ swap [ 1+ ] bi@ ] when ] dip <slice> ; inline
+
 : match-slice ( i string quot -- slice/f )
     [ 2dup ] dip call
-    [ swap <slice> ] [ 2drop f ] if* ; inline
+    [ swap make-slice ] [ 2drop f ] if* ; inline
 
-: match-from ( i string quot -- slice/f )
-    [ [ length [a,b) ] keep ] dip
-    '[ _ _ match-slice ] map-find drop ; inline
+: search-range ( i string reverse? -- seq )
+    [ drop 0 [a,b] ] [ length [a,b) ] if ; inline
 
-: next-match ( i string quot -- i match/f )
-    match-from [ dup [ to>> ] when ] keep ; inline
+:: next-match ( i string quot reverse? -- i slice/f )
+    i string reverse? search-range
+    [ string quot match-slice ] map-find drop
+    [ dup [ reverse? [ from>> ] [ to>> ] if ] when ] keep ; inline
 
 : do-next-match ( i string regexp -- i match/f )
-    dup next-match>> execute( i string regexp -- i match/f ) ;
+    dup next-match>> execute( i string regexp -- i match/f ) ; inline
 
 PRIVATE>
 
-: all-matches ( string regexp -- seq )
+TUPLE: match-iterator
+    { string read-only }
+    { regexp read-only }
+    { i read-only }
+    { value read-only } ;
+
+: iterate ( iterator -- iterator'/f )
+    dup
+    [ i>> ] [ string>> ] [ regexp>> ] tri do-next-match
+    [ [ [ string>> ] [ regexp>> ] bi ] 2dip match-iterator boa ]
+    [ 2drop f ] if* ;
+
+: value ( iterator/f -- value/f )
+    dup [ value>> ] when ;
+
+: <match-iterator> ( string regexp -- match-iterator )
     [ check-string ] dip
-    [ 0 [ dup ] ] 2dip '[ _ _ do-next-match ] produce
-    nip but-last ;
+    2dup end/start nip f
+    match-iterator boa
+    iterate ; inline
+
+: all-matches ( string regexp -- seq )
+    <match-iterator> [ iterate ] follow [ value ] map ;
 
 : count-matches ( string regexp -- n )
     all-matches length ;
@@ -92,8 +113,7 @@ PRIVATE>
 PRIVATE>
 
 : first-match ( string regexp -- slice/f )
-    [ 0 ] [ check-string ] [ ] tri*
-    do-next-match nip ;
+    <match-iterator> value ;
 
 : re-contains? ( string regexp -- ? )
     first-match >boolean ;
@@ -137,9 +157,9 @@ GENERIC: compile-next-match ( regexp -- regexp )
 M: regexp compile-next-match ( regexp -- regexp )
     dup '[
         dup \ next-initial-word = [
-            drop _ compile-regexp dfa>>
-            '[ _ '[ _ _ execute ] next-match ]
-            (( i string -- i match/f )) simple-define-temp
+            drop _ [ compile-regexp dfa>> ] [ reverse-regexp? ] bi
+            '[ _ '[ _ _ execute ] _ next-match ]
+            (( i string regexp -- i match/f )) simple-define-temp
         ] when
     ] change-next-match ;
 
