@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables help.markup help.stylesheet io
 io.styles kernel math models namespaces sequences ui ui.gadgets
-ui.gadgets.books ui.gadgets.panes ui.gestures ui.pens.gradient ui.render
+ui.gadgets.books ui.gadgets.panes ui.gestures ui.pens.gradient
 parser accessors colors ;
 IN: slides
 
@@ -98,6 +98,7 @@ TUPLE: slides < book ;
     parse-definition strip-tease [ parsed ] each ; parsing
 
 \ slides H{
+    { T{ button-down } [ request-focus ] }
     { T{ key-down f f "DOWN" } [ next-page ] }
     { T{ key-down f f "UP" } [ prev-page ] }
 } set-gestures

@@ -1,18 +1,18 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: regexp.classes kernel sequences regexp.negation
-quotations regexp.minimize assocs fry math locals combinators
+quotations assocs fry math locals combinators
 accessors words compiler.units kernel.private strings
-sequences.private arrays regexp.matchers call namespaces
+sequences.private arrays call namespaces
 regexp.transition-tables combinators.short-circuit ;
 IN: regexp.compiler
 
 GENERIC: question>quot ( question -- quot )
 
-<PRIVATE
-
 SYMBOL: shortest?
 SYMBOL: backwards?
+
+<PRIVATE
 
 M: t question>quot drop [ 2drop t ] ;
 
@@ -64,7 +64,7 @@ C: <box> box
 
 : non-literals>dispatch ( literals non-literals  -- quot )
     [ swap ] assoc-map ! we want state => predicate, and get the opposite as input
-    swap keys f answers
+    swap keys f assoc-answers
     table>condition [ <box> ] condition-map condition>quot ;
 
 : literals>cases ( literal-transitions -- case-body )
@@ -106,13 +106,15 @@ C: <box> box
     transitions>quot ;
 
 : states>code ( words dfa -- )
-    '[
+    [ ! with-compilation-unit doesn't compile, so we need call( -- )
         [
-            dup _ word>quot
-            (( last-match index string -- ? ))
-            define-declared
-        ] each
-    ] with-compilation-unit ;
+            '[
+                dup _ word>quot
+                (( last-match index string -- ? ))
+                define-declared
+            ] each
+        ] with-compilation-unit
+    ] call( words dfa -- ) ;
 
 : states>words ( dfa -- words dfa )
     dup transitions>> keys [ gensym ] H{ } map>assoc
@@ -120,34 +122,23 @@ C: <box> box
     [ values ]
     bi swap ; 
 
-: dfa>word ( dfa -- word )
+: dfa>main-word ( dfa -- word )
     states>words [ states>code ] keep start-state>> ;
-
-: check-string ( string -- string )
-    ! Make this configurable
-    dup string? [ "String required" throw ] unless ;
-
-: setup-regexp ( start-index string -- f start-index string )
-    [ f ] [ >fixnum ] [ check-string ] tri* ; inline
 
 PRIVATE>
 
-! The quotation returned is ( start-index string -- i/f )
+: simple-define-temp ( quot effect -- word )
+    [ [ define-temp ] with-compilation-unit ] call( quot effect -- word ) ;
 
-: dfa>quotation ( dfa -- quot )
-    dfa>word execution-quot '[ setup-regexp @ ] ;
+: dfa>word ( dfa -- quot )
+    dfa>main-word execution-quot '[ drop [ f ] 2dip @ ]
+    (( start-index string regexp -- i/f )) simple-define-temp ;
 
-: dfa>shortest-quotation ( dfa -- quot )
-    t shortest? [ dfa>quotation ] with-variable ;
+: dfa>shortest-word ( dfa -- word )
+    t shortest? [ dfa>word ] with-variable ;
 
-: dfa>reverse-quotation ( dfa -- quot )
-    t backwards? [ dfa>quotation ] with-variable ;
+: dfa>reverse-word ( dfa -- word )
+    t backwards? [ dfa>word ] with-variable ;
 
-: dfa>reverse-shortest-quotation ( dfa -- quot )
-    t backwards? [ dfa>shortest-quotation ] with-variable ;
-
-TUPLE: quot-matcher quot ;
-C: <quot-matcher> quot-matcher
-
-M: quot-matcher match-index-from
-    quot>> call( index string -- i/f ) ;
+: dfa>reverse-shortest-word ( dfa -- word )
+    t backwards? [ dfa>shortest-word ] with-variable ;

@@ -108,11 +108,6 @@ M: bitmap-image load-image* ( path bitmap -- bitmap )
     load-bitmap-data process-bitmap-data
     fill-image-slots ;
 
-M: bitmap-image normalize-scan-line-order
-    dup dim>> '[
-        _ first 4 * <sliced-groups> reverse concat
-    ] change-bitmap ;
-
 MACRO: (nbits>bitmap) ( bits -- )
     [ -3 shift ] keep '[
         bitmap-image new
@@ -121,6 +116,7 @@ MACRO: (nbits>bitmap) ( bits -- )
             swap >>width
             swap array-copy [ >>bitmap ] [ >>color-index ] bi
             _ >>bit-count fill-image-slots
+            t >>upside-down?
     ] ;
 
 : bgr>bitmap ( array height width -- bitmap )
