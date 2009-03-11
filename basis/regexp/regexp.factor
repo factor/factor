@@ -40,7 +40,7 @@ M: lookbehind question>quot ! Returns ( index string -- ? )
 : match-index-from ( i string regexp -- index/f )
     ! This word is unsafe. It assumes that i is a fixnum
     ! and that string is a string.
-    dup dfa>> execute( index string regexp -- i/f ) ;
+    dup dfa>> execute-unsafe( index string regexp -- i/f ) ;
 
 GENERIC: end/start ( string regexp -- end start )
 M: regexp end/start drop length 0 ;
@@ -72,7 +72,7 @@ PRIVATE>
     [ dup [ reverse? [ from>> ] [ to>> ] if ] when ] keep ; inline
 
 : do-next-match ( i string regexp -- i match/f )
-    dup next-match>> execute( i string regexp -- i match/f ) ; inline
+    dup next-match>> execute-unsafe( i string regexp -- i match/f ) ; inline
 
 PRIVATE>
 
