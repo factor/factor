@@ -17,21 +17,16 @@ TUPLE: reverse-regexp < regexp ;
 
 <PRIVATE
 
-: maybe-negated ( lookaround quot -- regexp-quot )
-    '[ term>> @ ] [ positive?>> [ ] [ not ] ? ] bi compose ; inline
-
 M: lookahead question>quot ! Returns ( index string -- ? )
-    [ ast>dfa dfa>shortest-word '[ f _ execute ] ] maybe-negated ;
+    term>> ast>dfa dfa>shortest-word '[ f _ execute ] ;
 
 : <reversed-option> ( ast -- reversed )
     "r" string>options <with-options> ;
 
 M: lookbehind question>quot ! Returns ( index string -- ? )
-    [
-        <reversed-option>
-        ast>dfa dfa>reverse-shortest-word
-        '[ [ 1- ] dip f _ execute ]
-    ] maybe-negated ;
+    term>> <reversed-option>
+    ast>dfa dfa>reverse-shortest-word
+    '[ [ 1- ] dip f _ execute ] ;
 
 : check-string ( string -- string )
     ! Make this configurable

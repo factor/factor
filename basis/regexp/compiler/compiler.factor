@@ -3,7 +3,7 @@
 USING: regexp.classes kernel sequences regexp.negation
 quotations assocs fry math locals combinators
 accessors words compiler.units kernel.private strings
-sequences.private arrays call namespaces
+sequences.private arrays call namespaces unicode.breaks
 regexp.transition-tables combinators.short-circuit ;
 IN: regexp.compiler
 
@@ -15,6 +15,10 @@ SYMBOL: backwards?
 <PRIVATE
 
 M: t question>quot drop [ 2drop t ] ;
+M: f question>quot drop [ 2drop f ] ;
+
+M: not-class question>quot
+    class>> question>quot [ not ] compose ;
 
 M: beginning-of-input question>quot
     drop [ drop zero? ] ;
@@ -35,6 +39,9 @@ M: $ question>quot
 
 M: ^ question>quot
     drop [ { [ drop zero? ] [ [ 1- ] dip ?nth "\r\n" member? ] } 2|| ] ;
+
+M: word-break question>quot
+    drop [ word-break-at? ] ;
 
 : (execution-quot) ( next-state -- quot )
     ! The conditions here are for lookaround and anchors, etc
