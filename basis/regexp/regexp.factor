@@ -89,16 +89,17 @@ PRIVATE>
     slices [ from>> ] map string length suffix
     [ string <slice> ] 2map ;
 
-: match-head ( str regexp -- slice/f )
-    [
-        [ 0 ] [ check-string ] [ dup dfa>> '[ _ _ execute ] ] tri*
-        match-from
-    ] call( str regexp -- slice/f ) ;
-
 PRIVATE>
 
+: first-match ( string regexp -- slice/f )
+    [ 0 ] [ check-string ] [ ] tri*
+    do-next-match nip ;
+
+: re-contains? ( string regexp -- ? )
+    first-match >boolean ;
+
 : re-split1 ( string regexp -- before after/f )
-    dupd match-head [ 1array split-slices first2 ] [ f ] if* ;
+    dupd first-match [ 1array split-slices first2 ] [ f ] if* ;
 
 : re-split ( string regexp -- seq )
     dupd all-matches split-slices ;
