@@ -204,18 +204,21 @@ GENERIC# hint 1 ( mdb-query index-hint -- mdb-query )
 M: mdb-query-msg hint ( mdb-query index-hint -- mdb-query )
     >>hint ;
 
+GENERIC: get-more ( mdb-cursor -- mdb-cursor objects )
+M: mdb-cursor get-more ( mdb-cursor -- mdb-cursor objects )
+    [ [ collection>> ] [ return#>> ] [ id>> ] tri <mdb-getmore-msg> send-query ] 
+    [ f f ] if* ;
+
 GENERIC: find ( mdb-query -- cursor result )
 M: mdb-query-msg find
-     send-query ;
+    send-query ;
+M: mdb-cursor find
+    get-more ;
 
 GENERIC: explain ( mdb-query -- result )
 M: mdb-query-msg explain
     t >>explain find [ drop ] dip ;
 
-GENERIC: get-more ( mdb-cursor -- mdb-cursor objects )
-M: mdb-cursor get-more ( mdb-cursor -- mdb-cursor objects )
-    [ [ collection>> ] [ return#>> ] [ id>> ] tri <mdb-getmore-msg> send-query ] 
-    [ f f ] if* ;
 
 GENERIC: find-one ( mdb-query -- result )
 M: mdb-query-msg find-one
@@ -275,15 +278,19 @@ M: assoc ensure-index
     [ cmd-collection ] dip <mdb-query-msg> find-one objects>> first
     check-ok [ "could not drop index" throw ] unless ;
 
-GENERIC: update ( collection selector object -- )
-M: assoc update
-    [ ensure-collection ] dip
-    <mdb-update-msg> send-message-check-error ;
+: <update> ( collection selector object -- update-msg )
+    [ ensure-collection ] 2dip <mdb-update-msg> ;
 
-GENERIC: update-unsafe ( collection selector object -- )
-M: assoc update-unsafe
-    [ ensure-collection ] dip
-    <mdb-update-msg> send-message ;
+: >upsert ( mdb-update-msg -- mdb-update-msg )
+    1 >>upsert? ; 
+
+GENERIC: update ( mdb-update-msg -- )
+M: mdb-update-msg update
+    send-message-check-error ;
+
+GENERIC: update-unsafe ( mdb-update-msg -- )
+M: mdb-update-msg update-unsafe
+    send-message ;
  
 GENERIC: delete ( collection selector -- )
 M: assoc delete
