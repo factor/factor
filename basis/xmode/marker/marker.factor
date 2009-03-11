@@ -3,7 +3,7 @@
 USING: kernel namespaces make xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators strings
-regexp splitting unicode.case
+regexp splitting unicode.case ascii
 combinators.short-circuit accessors ;
 IN: xmode.marker
 
@@ -84,7 +84,7 @@ M: string-matcher text-matches?
     ] keep string>> length and ;
 
 M: regexp text-matches?
-    [ >string ] dip match-head ;
+    [ >string ] dip re-contains? ;
 
 : rule-start-matches? ( rule -- match-count/f )
     dup start>> tuck swap can-match-here? [

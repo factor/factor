@@ -165,7 +165,7 @@ SYMBOL: pprint-string-cells?
                 ] each
             ] with-row
         ] each
-    ] tabular-output ;
+    ] tabular-output nl ;
 
 GENERIC: see ( defspec -- )
 

@@ -175,7 +175,7 @@ TUPLE: listener-gadget < tool input output scroller ;
     [ listener-gadget? ] find-parent ;
 
 : listener-streams ( listener -- input output )
-    [ input>> ] [ output>> ] bi <pane-stream> ;
+    [ input>> ] [ output>> <pane-stream> ] bi ;
 
 : init-listener ( listener -- listener )
     <interactor>
