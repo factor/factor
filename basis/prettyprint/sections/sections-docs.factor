@@ -199,7 +199,7 @@ HELP: <flow
 
 HELP: colon
 { $class-description "A " { $link block } " section. When printed as a " { $link long-section } ", indents every line except the first." }
-{ $notes "Colon sections are used to enclose word definitions printed by " { $link see } "." } ;
+{ $notes "Colon sections are used to enclose word definitions when " { $link "see" } "." } ;
 
 HELP: <colon
 { $description "Begins a " { $link colon } " section." } ;

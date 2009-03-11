@@ -33,8 +33,6 @@ M: lookbehind question>quot ! Returns ( index string -- ? )
         '[ [ 1- ] dip f _ execute ]
     ] maybe-negated ;
 
-<PRIVATE
-
 : check-string ( string -- string )
     ! Make this configurable
     dup string? [ "String required" throw ] unless ;
@@ -42,7 +40,7 @@ M: lookbehind question>quot ! Returns ( index string -- ? )
 : match-index-from ( i string regexp -- index/f )
     ! This word is unsafe. It assumes that i is a fixnum
     ! and that string is a string.
-    dup dfa>> execute( index string regexp -- i/f ) ;
+    dup dfa>> execute-unsafe( index string regexp -- i/f ) ;
 
 GENERIC: end/start ( string regexp -- end start )
 M: regexp end/start drop length 0 ;
@@ -58,26 +56,59 @@ PRIVATE>
 
 <PRIVATE
 
-: match-slice ( i string quot -- slice/f )
+TUPLE: match { i read-only } { j read-only } { seq read-only } ;
+
+: match-slice ( i string quot -- match/f )
     [ 2dup ] dip call
-    [ swap <slice> ] [ 2drop f ] if* ; inline
+    [ swap match boa ] [ 2drop f ] if* ; inline
 
-: match-from ( i string quot -- slice/f )
-    [ [ length [a,b) ] keep ] dip
-    '[ _ _ match-slice ] map-find drop ; inline
+: search-range ( i string reverse? -- seq )
+    [ drop 0 [a,b] ] [ length [a,b) ] if ; inline
 
-: next-match ( i string quot -- i match/f )
-    match-from [ dup [ to>> ] when ] keep ; inline
+: match>result ( match reverse? -- i start end string )
+    over [
+        [ [ i>> ] [ j>> tuck ] [ seq>> ] tri ] dip
+        [ [ swap [ 1+ ] bi@ ] dip ] when
+    ] [ 2drop f f f f ] if ; inline
 
-: do-next-match ( i string regexp -- i match/f )
-    dup next-match>> execute( i string regexp -- i match/f ) ;
+:: next-match ( i string quot reverse? -- i start end string )
+    i string reverse? search-range
+    [ string quot match-slice ] map-find drop
+    reverse? match>result ; inline
+
+: do-next-match ( i string regexp -- i start end string )
+    dup next-match>>
+    execute-unsafe( i string regexp -- i start end string ) ;
+
+: next-slice ( i string regexp -- i/f slice/f )
+    do-next-match
+    [ slice boa ] [ drop ] if* ; inline
 
 PRIVATE>
 
-: all-matches ( string regexp -- seq )
+TUPLE: match-iterator
+    { string read-only }
+    { regexp read-only }
+    { i read-only }
+    { value read-only } ;
+
+: iterate ( iterator -- iterator'/f )
+    dup
+    [ i>> ] [ string>> ] [ regexp>> ] tri next-slice
+    [ [ [ string>> ] [ regexp>> ] bi ] 2dip match-iterator boa ]
+    [ 2drop f ] if* ;
+
+: value ( iterator/f -- value/f )
+    dup [ value>> ] when ;
+
+: <match-iterator> ( string regexp -- match-iterator )
     [ check-string ] dip
-    [ 0 [ dup ] ] 2dip '[ _ _ do-next-match ] produce
-    nip but-last ;
+    2dup end/start nip f
+    match-iterator boa
+    iterate ; inline
+
+: all-matches ( string regexp -- seq )
+    <match-iterator> [ iterate ] follow [ value ] map ;
 
 : count-matches ( string regexp -- n )
     all-matches length ;
@@ -92,8 +123,7 @@ PRIVATE>
 PRIVATE>
 
 : first-match ( string regexp -- slice/f )
-    [ 0 ] [ check-string ] [ ] tri*
-    do-next-match nip ;
+    <match-iterator> value ;
 
 : re-contains? ( string regexp -- ? )
     first-match >boolean ;
@@ -129,21 +159,19 @@ M: regexp compile-regexp ( regexp -- regexp )
 M: reverse-regexp compile-regexp ( regexp -- regexp )
     t backwards? [ do-compile-regexp ] with-variable ;
 
-GENERIC: compile-next-match ( regexp -- regexp )
+DEFER: compile-next-match
 
-: next-initial-word ( i string regexp -- i slice/f )
+: next-initial-word ( i string regexp -- i start end string )
     compile-next-match do-next-match ;
 
-M: regexp compile-next-match ( regexp -- regexp )
+: compile-next-match ( regexp -- regexp )
     dup '[
         dup \ next-initial-word = [
-            drop _ compile-regexp dfa>>
-            '[ _ '[ _ _ execute ] next-match ]
-            (( i string -- i match/f )) simple-define-temp
+            drop _ [ compile-regexp dfa>> ] [ reverse-regexp? ] bi
+            '[ _ '[ _ _ execute ] _ next-match ]
+            (( i string regexp -- i start end string )) simple-define-temp
         ] when
     ] change-next-match ;
-
-! Write M: reverse-regexp compile-next-match
 
 PRIVATE>
 
