@@ -47,7 +47,9 @@ HELP: definition
 ARTICLE: "see" "Printing definitions"
 "The " { $vocab-link "see" } " vocabulary implements support for printing out " { $link "definitions" } " in the image."
 $nl
-"Printing a definition (see " { $link "definitions" } "):"
+"Printing a definition:"
 { $subsection see }
 "Printing the methods defined on a generic word or class (see " { $link "objects" } "):"
 { $subsection see-methods } ;
+
+ABOUT: "see"
