@@ -433,24 +433,24 @@ IN: regexp-tests
 
 [ { "foo" "fxx" "fab" } ] [ "fab fxx foo" R/ f../r all-matches [ >string ] map ] unit-test
 
-! [ t ] [ "foo" "\\bfoo\\b" <regexp> matches? ] unit-test
-! [ t ] [ "afoob" "\\Bfoo\\B" <regexp> matches? ] unit-test
-! [ t ] [ "afoob" "\\bfoo\\b" <regexp> matches? ] unit-test
-! [ f ] [ "foo" "\\Bfoo\\B" <regexp> matches? ] unit-test
+[ t ] [ "foo" "\\bfoo\\b" <regexp> re-contains? ] unit-test
+[ t ] [ "afoob" "\\Bfoo\\B" <regexp> re-contains? ] unit-test
+[ f ] [ "afoob" "\\bfoo\\b" <regexp> re-contains? ] unit-test
+[ f ] [ "foo" "\\Bfoo\\B" <regexp> re-contains? ] unit-test
 
-! [ 3 ] [ "foo bar" "foo\\b" <regexp> match-index-head ] unit-test
-! [ f ] [ "fooxbar" "foo\\b" <regexp> matches? ] unit-test
-! [ t ] [ "foo" "foo\\b" <regexp> matches? ] unit-test
-! [ t ] [ "foo bar" "foo\\b bar" <regexp> matches? ] unit-test
-! [ f ] [ "fooxbar" "foo\\bxbar" <regexp> matches? ] unit-test
-! [ f ] [ "foo" "foo\\bbar" <regexp> matches? ] unit-test
+[ 3 ] [ "foo bar" "foo\\b" <regexp> first-match length ] unit-test
+[ f ] [ "fooxbar" "foo\\b" <regexp> re-contains? ] unit-test
+[ t ] [ "foo" "foo\\b" <regexp> re-contains? ] unit-test
+[ t ] [ "foo bar" "foo\\b bar" <regexp> matches? ] unit-test
+[ f ] [ "fooxbar" "foo\\bxbar" <regexp> matches? ] unit-test
+[ f ] [ "foo" "foo\\bbar" <regexp> matches? ] unit-test
 
-! [ f ] [ "foo bar" "foo\\B" <regexp> matches? ] unit-test
-! [ 3 ] [ "fooxbar" "foo\\B" <regexp> match-index-head ] unit-test
-! [ t ] [ "foo" "foo\\B" <regexp> matches? ] unit-test
-! [ f ] [ "foo bar" "foo\\B bar" <regexp> matches? ] unit-test
-! [ t ] [ "fooxbar" "foo\\Bxbar" <regexp> matches? ] unit-test
-! [ f ] [ "foo" "foo\\Bbar" <regexp> matches? ] unit-test
+[ f ] [ "foo bar" "foo\\B" <regexp> re-contains? ] unit-test
+[ 3 ] [ "fooxbar" "foo\\B" <regexp> first-match length ] unit-test
+[ f ] [ "foo" "foo\\B" <regexp> re-contains? ] unit-test
+[ f ] [ "foo bar" "foo\\B bar" <regexp> matches? ] unit-test
+[ t ] [ "fooxbar" "foo\\Bxbar" <regexp> matches? ] unit-test
+[ f ] [ "foo" "foo\\Bbar" <regexp> matches? ] unit-test
 
 ! [ 1 ] [ "aaacb" "a+?" <regexp> match-index-head ] unit-test
 ! [ 1 ] [ "aaacb" "aa??" <regexp> match-index-head ] unit-test
