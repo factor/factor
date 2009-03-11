@@ -452,30 +452,21 @@ IN: regexp-tests
 [ t ] [ "fooxbar" "foo\\Bxbar" <regexp> matches? ] unit-test
 [ f ] [ "foo" "foo\\Bbar" <regexp> matches? ] unit-test
 
-! [ 1 ] [ "aaacb" "a+?" <regexp> match-index-head ] unit-test
-! [ 1 ] [ "aaacb" "aa??" <regexp> match-index-head ] unit-test
-! [ f ] [ "aaaab" "a++ab" <regexp> matches? ] unit-test
-! [ t ] [ "aaacb" "a++cb" <regexp> matches? ] unit-test
-! [ 3 ] [ "aacb" "aa?c" <regexp> match-index-head ] unit-test
-! [ 3 ] [ "aacb" "aa??c" <regexp> match-index-head ] unit-test
+[ t ] [ "ab" "a(?=b*)" <regexp> re-contains? ] unit-test
+[ t ] [ "abbbbbc" "a(?=b*c)" <regexp> re-contains? ] unit-test
+[ f ] [ "abbbbb" "a(?=b*c)" <regexp> re-contains? ] unit-test
+[ t ] [ "ab" "a(?=b*)" <regexp> re-contains? ] unit-test
 
-! "ab" "a(?=b*)" <regexp> match
-! "abbbbbc" "a(?=b*c)" <regexp> match
-! "ab" "a(?=b*)" <regexp> match
+[ "az" ] [ "baz" "(?<=b)(az)" <regexp> first-match >string ] unit-test
+[ f ] [ "chaz" "(?<=b)(az)" <regexp> re-contains? ] unit-test
+[ "a" ] [ "cbaz" "(?<=b*)a" <regexp> first-match >string ] unit-test
+[ f ] [ "baz" "a(?<=b)" <regexp> re-contains? ] unit-test
 
-! "baz" "(az)(?<=b)" <regexp> first-match
-! "cbaz" "a(?<=b*)" <regexp> first-match
-! "baz" "a(?<=b)" <regexp> first-match
+[ f ] [ "baz" "(?<!b)a" <regexp> re-contains? ] unit-test
+[ t ] [ "caz" "(?<!b)a" <regexp> re-contains? ] unit-test
 
-! "baz" "a(?<!b)" <regexp> first-match
-! "caz" "a(?<!b)" <regexp> first-match
+[ "abcd" ] [ "abcdefg" "a(?=bcdefg)bcd" <regexp> first-match >string ] unit-test
+[ t ] [ "abcdefg" "a(?#bcdefg)bcd" <regexp> re-contains? ] unit-test
+[ t ] [ "abcdefg" "a(?:bcdefg)" <regexp> matches? ] unit-test
 
-! "abcdefg" "a(?=bcdefg)bcd" <regexp> first-match
-! "abcdefg" "a(?#bcdefg)bcd" <regexp> first-match
-! "abcdefg" "a(?:bcdefg)" <regexp> first-match
-
-! "caba" "a(?<=b)" <regexp> first-match
-
-! capture group 1: "aaaa"  2: ""
-! "aaaa" "(a*)(a*)" <regexp> match*
-! "aaaa" "(a*)(a+)" <regexp> match*
+[ 3 ] [ "caba" "(?<=b)a" <regexp> first-match from>> ] unit-test
