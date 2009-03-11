@@ -56,7 +56,7 @@ $nl
 { $subsection redefine-error } ;
 
 ARTICLE: "definitions" "Definitions"
-"A " { $emphasis "definition" } " is an artifact read from a source file. This includes words, methods, and help articles. Words for working with definitions are found in the " { $vocab-link "definitions" } " vocabulary. Implementations of the definition protocol include pathnames, words, methods, and help articles."
+"A " { $emphasis "definition" } " is an artifact read from a source file. This includes words, methods, help articles, and path names (which represent the source file at that location). Words for working with definitions are found in the " { $vocab-link "definitions" } " vocabulary."
 { $subsection "definition-protocol" }
 { $subsection "definition-crossref" }
 { $subsection "definition-checking" }
