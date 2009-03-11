@@ -1,7 +1,7 @@
 
 USING: kernel sequences assocs sets locals combinators
        accessors system math math.functions unicode.case prettyprint
-       combinators.cleave dns ;
+       combinators.smart dns ;
 
 IN: dns.cache.rr
 
@@ -16,7 +16,7 @@ TUPLE: <entry> time data ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : make-cache-key ( obj -- key )
-  { [ name>> >lower ] [ type>> unparse ] [ class>> unparse ] } 1arr " " join ;
+  [ [ name>> >lower ] [ type>> ] [ class>> ] tri ] output>array ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

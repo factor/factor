@@ -1,6 +1,6 @@
 USING: help.markup help.crossref help.stylesheet help.topics
 help.syntax definitions io prettyprint summary arrays math
-sequences vocabs strings ;
+sequences vocabs strings see ;
 IN: help
 
 ARTICLE: "printing-elements" "Printing markup elements"

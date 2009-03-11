@@ -1,5 +1,5 @@
 USING: help.syntax help.markup kernel macros prettyprint
-memoize combinators arrays generalizations ;
+memoize combinators arrays generalizations see ;
 IN: locals
 
 HELP: [|

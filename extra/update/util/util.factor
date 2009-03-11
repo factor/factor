@@ -1,6 +1,6 @@
 
 USING: kernel classes strings quotations words math math.parser arrays
-       combinators.cleave
+       combinators.smart
        accessors
        system prettyprint splitting
        sequences combinators sequences.deep
@@ -58,5 +58,5 @@ DEFER: to-strings
 
 : datestamp ( -- string )
   now
-    { year>> month>> day>> hour>> minute>> } <arr>
+  [ { [ year>> ] [ month>> ] [ day>> ] [ hour>> ] [ minute>> ] } cleave ] output>array
   [ pad-00 ] map "-" join ;

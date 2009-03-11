@@ -1,6 +1,6 @@
 USING: help.markup help.syntax io kernel math namespaces parser
 prettyprint sequences vocabs.loader namespaces stack-checker
-help command-line multiline ;
+help command-line multiline see ;
 IN: help.cookbook
 
 ARTICLE: "cookbook-syntax" "Basic syntax cookbook"
