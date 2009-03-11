@@ -213,12 +213,16 @@ TUPLE: slice
 : collapse-slice ( m n slice -- m' n' seq )
     [ from>> ] [ seq>> ] bi [ [ + ] curry bi@ ] dip ; inline
 
-ERROR: slice-error from to seq reason ;
+TUPLE: slice-error from to seq reason ;
+
+: slice-error ( from to seq ? string -- from to seq )
+    [ \ slice-error boa throw ] curry when ; inline
 
 : check-slice ( from to seq -- from to seq )
-    pick 0 < [ "start < 0" slice-error ] when
-    dup length pick < [ "end > sequence" slice-error ] when
-    2over > [ "start > end" slice-error ] when ; inline
+    3dup
+    [ 2drop 0 < "start < 0" slice-error ]
+    [ nip length > "end > sequence" slice-error ]
+    [ drop > "start > end" slice-error ] 3tri ; inline
 
 : <slice> ( from to seq -- slice )
     dup slice? [ collapse-slice ] when
@@ -326,8 +330,8 @@ PRIVATE>
     [ (append) ] new-like ; inline
 
 : 3append-as ( seq1 seq2 seq3 exemplar -- newseq )
-    [ pick length pick length pick length + + ] dip [
-        [ [ pick length pick length + ] dip copy ]
+    [ 3dup [ length ] tri@ + + ] dip [
+        [ [ 2over [ length ] bi@ + ] dip copy ]
         [ (append) ] bi
     ] new-like ; inline
 

@@ -4,7 +4,7 @@ USING: accessors arrays definitions generic io kernel assocs
 hashtables namespaces make parser prettyprint sequences strings
 io.styles vectors words math sorting splitting classes slots fry
 sets vocabs help.stylesheet help.topics vocabs.loader quotations
-combinators call ;
+combinators call see ;
 IN: help.markup
 
 PREDICATE: simple-element < array
@@ -300,7 +300,7 @@ M: f ($instance)
         ] with-style
     ] ($block) ; inline
 
-: $see ( element -- ) first [ see ] ($see) ;
+: $see ( element -- ) first [ see* ] ($see) ;
 
 : $synopsis ( element -- ) first [ synopsis write ] ($see) ;
 
@@ -344,6 +344,8 @@ M: f ($instance)
 : $io-error ( children -- )
     drop
     "Throws an error if the I/O operation fails." $errors ;
+
+FROM: prettyprint.private => with-pprint ;
 
 : $prettyprinting-note ( children -- )
     drop {

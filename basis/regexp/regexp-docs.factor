@@ -23,7 +23,7 @@ ARTICLE: { "regexp" "construction" } "Constructing regular expressions"
 { $vocab-link "regexp.combinators" } ;
 
 ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
-"Regexp syntax is largely compatible with Perl, Java and extended POSTFIX regexps, but not completely." $nl
+"Regexp syntax is largely compatible with Perl, Java and extended POSIX regexps, but not completely." $nl
 "A new addition is the inclusion of a negation operator, with the syntax " { $snippet "(?~foo)" } " to match everything that does not match " { $snippet "foo" } "." $nl
 "One missing feature is backreferences. This is because of a design decision to allow only regular expressions following the formal theory of regular languages. For more information, see " { $link { "regexp" "theory" } } ". You can create a new regular expression to match a particular string using " { $vocab-link "regexp.combinators" } " and group capture is available to extract parts of a regular expression match." $nl
 "A distinction from Perl is that " { $snippet "\\G" } ", which references the previous match, is not included. This is because that sequence is inherently stateful, and Factor regexps don't hold state." $nl

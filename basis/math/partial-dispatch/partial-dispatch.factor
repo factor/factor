@@ -84,7 +84,7 @@ M: word integer-op-input-classes
 
 : define-integer-op-word ( fix-word big-word triple -- )
     [
-        [ 2nip integer-op-word ] [ integer-op-quot ] 3bi
+        [ 2nip integer-op-word dup make-foldable ] [ integer-op-quot ] 3bi
         (( x y -- z )) define-declared
     ] [
         2nip
