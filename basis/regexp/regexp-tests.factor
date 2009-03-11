@@ -211,8 +211,8 @@ IN: regexp-tests
 [ f ] [ "aaaxb" "a+ab" <regexp> matches? ] unit-test
 [ t ] [ "aaacb" "a+cb" <regexp> matches? ] unit-test
 
-[ "aaa" ] [ "aaacb" "a*" <regexp> match-head >string ] unit-test
-[ "aa" ] [ "aaacb" "aa?" <regexp> match-head >string ] unit-test
+[ "aaa" ] [ "aaacb" "a*" <regexp> first-match >string ] unit-test
+[ "aa" ] [ "aaacb" "aa?" <regexp> first-match >string ] unit-test
 
 [ t ] [ "aaa" R/ AAA/i matches? ] unit-test
 [ f ] [ "aax" R/ AAA/i matches? ] unit-test
@@ -268,13 +268,13 @@ IN: regexp-tests
 
 [ ] [ "USING: regexp kernel ; R' \\*[^\s*][^*]*\\*' drop" eval ] unit-test
 
-[ "ab" ] [ "ab" "(a|ab)(bc)?" <regexp> match-head >string ] unit-test
-[ "abc" ] [ "abc" "(a|ab)(bc)?" <regexp> match-head >string ] unit-test
+[ "ab" ] [ "ab" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
+[ "abc" ] [ "abc" "(a|ab)(bc)?" <regexp> first-match >string ] unit-test
 
-[ "ab" ] [ "ab" "(ab|a)(bc)?" <regexp> match-head >string ] unit-test
-[ "abc" ] [ "abc" "(ab|a)(bc)?" <regexp> match-head >string ] unit-test
+[ "ab" ] [ "ab" "(ab|a)(bc)?" <regexp> first-match >string ] unit-test
+[ "abc" ] [ "abc" "(ab|a)(bc)?" <regexp> first-match >string ] unit-test
 
-[ "b" ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> match-head >string ] unit-test
+[ "b" ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match >string ] unit-test
 
 [ { "1" "2" "3" "4" } ]
 [ "1ABC2DEF3GHI4" R/ [A-Z]+/ re-split [ >string ] map ] unit-test
@@ -300,18 +300,18 @@ IN: regexp-tests
   
 [ "-- title --" ] [ "== title ==" R/ =/ "-" re-replace ] unit-test
 
-[ "" ] [ "ab" "a(?!b)" <regexp> match-head >string ] unit-test
-[ "a" ] [ "ac" "a(?!b)" <regexp> match-head >string ] unit-test
+[ "" ] [ "ab" "a(?!b)" <regexp> first-match >string ] unit-test
+[ "a" ] [ "ac" "a(?!b)" <regexp> first-match >string ] unit-test
 [ t ] [ "fxxbar" ".{3}(?!foo)bar" <regexp> matches? ] unit-test
 [ t ] [ "foobar" ".{3}(?!foo)bar" <regexp> matches? ] unit-test
 [ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 [ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
-[ "a" ] [ "ab" "a(?=b)(?=b)" <regexp> match-head >string ] unit-test
-[ "a" ] [ "ba" "(?<=b)(?<=b)a" <regexp> match-head >string ] unit-test
-[ "a" ] [ "cab" "(?<=c)a(?=b)" <regexp> match-head >string ] unit-test
+[ "a" ] [ "ab" "a(?=b)(?=b)" <regexp> first-match >string ] unit-test
+[ "a" ] [ "ba" "(?<=b)(?<=b)a" <regexp> first-match >string ] unit-test
+[ "a" ] [ "cab" "(?<=c)a(?=b)" <regexp> first-match >string ] unit-test
 
-[ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head length ] unit-test
-[ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
+[ 3 ] [ "foobar" "foo(?=bar)" <regexp> first-match length ] unit-test
+[ f ] [ "foobxr" "foo(?=bar)" <regexp> first-match ] unit-test
 
 ! Bug in parsing word
 [ t ] [ "a" R' a' matches? ] unit-test
@@ -424,8 +424,12 @@ IN: regexp-tests
 [ 1 ] [ "a\r" R/ a$/m count-matches ] unit-test
 [ 1 ] [ "a\r\n" R/ a$/m count-matches ] unit-test
 
-[ f ] [ "foobxr" "foo\\z" <regexp> match-head ] unit-test
-[ 3 ] [ "foo" "foo\\z" <regexp> match-head length ] unit-test
+[ f ] [ "foobxr" "foo\\z" <regexp> first-match ] unit-test
+[ 3 ] [ "foo" "foo\\z" <regexp> first-match length ] unit-test
+
+[ t ] [ "a foo b" R/ foo/ re-contains? ] unit-test
+[ f ] [ "a bar b" R/ foo/ re-contains? ] unit-test
+[ t ] [ "foo" R/ foo/ re-contains? ] unit-test
 
 ! [ t ] [ "foo" "\\bfoo\\b" <regexp> matches? ] unit-test
 ! [ t ] [ "afoob" "\\Bfoo\\B" <regexp> matches? ] unit-test
