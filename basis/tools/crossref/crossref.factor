@@ -1,11 +1,11 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs definitions io io.styles kernel prettyprint
-sorting ;
+sorting see ;
 IN: tools.crossref
 
 : synopsis-alist ( definitions -- alist )
-    [ dup synopsis swap ] { } map>assoc ;
+    [ [ synopsis ] keep ] { } map>assoc ;
 
 : definitions. ( alist -- )
     [ write-object nl ] assoc-each ;

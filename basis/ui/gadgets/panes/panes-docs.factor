@@ -26,10 +26,6 @@ HELP: gadget.
 { $description "Writes a gadget followed by a newline to " { $link output-stream } "." }
 { $notes "Not all streams support this operation." } ;
 
-HELP: ?nl
-{ $values { "stream" pane-stream } }
-{ $description "Inserts a line break in the pane unless the current line is empty." } ;
-
 HELP: with-pane
 { $values { "pane" pane } { "quot" quotation } }
 { $description "Clears the pane and calls the quotation in a new scope where " { $link output-stream } " is rebound to a " { $link pane-stream } " writing to the pane." } ;

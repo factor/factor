@@ -163,20 +163,32 @@ M: integer combine-or
 : try-combine ( elt1 elt2 quot -- combined/f ? )
     3dup call [ [ 3drop ] dip t ] [ drop swapd call ] if ; inline
 
+DEFER: answer
+
+:: try-cancel ( elt1 elt2 empty -- combined/f ? )
+    [ elt1 elt2 empty answer dup elt1 = not ] try-combine ;
+
 :: prefix-combining ( seq elt quot: ( elt1 elt2 -- combined/f ? ) -- newseq )
     f :> combined!
-    seq [ elt quot try-combine swap combined! ] find drop
+    seq [ elt quot call swap combined! ] find drop
     [ seq remove-nth combined prefix ]
     [ seq elt prefix ] if* ; inline
 
+: combine-by ( seq quot -- new-seq )
+    { } swap '[ _ prefix-combining ] reduce ; inline
+
+:: seq>instance ( seq empty class -- instance )
+    seq length {
+        { 0 [ empty ] }
+        { 1 [ seq first ] }
+        [ drop class new seq >>seq ]
+    } case ; inline
+
 :: combine ( seq quot: ( elt1 elt2 -- combined/f ? ) empty class -- newseq )
     seq class flatten
-    { } [ quot prefix-combining ] reduce
-    dup length {
-        { 0 [ drop empty ] }
-        { 1 [ first ] }
-        [ drop class new swap >>seq ]
-    } case ; inline
+    [ quot try-combine ] combine-by
+    ! [ empty try-cancel ] combine-by ! This makes the algorithm O(n^4)
+    empty class seq>instance ; inline
 
 : <and-class> ( seq -- class )
     [ combine-and ] t and-class combine ;
@@ -218,36 +230,36 @@ UNION: class primitive-class not-class or-class and-class range ;
 TUPLE: condition question yes no ;
 C: <condition> condition
 
-GENERIC# replace-question 2 ( class from to -- new-class )
+GENERIC# answer 2 ( class from to -- new-class )
 
-M:: object replace-question ( class from to -- new-class )
+M:: object answer ( class from to -- new-class )
     class from = to class ? ;
 
 : replace-compound ( class from to -- seq )
-    [ seq>> ] 2dip '[ _ _ replace-question ] map ;
+    [ seq>> ] 2dip '[ _ _ answer ] map ;
 
-M: and-class replace-question
+M: and-class answer
     replace-compound <and-class> ;
 
-M: or-class replace-question
+M: or-class answer
     replace-compound <or-class> ;
 
-M: not-class replace-question
-    [ class>> ] 2dip replace-question <not-class> ;
+M: not-class answer
+    [ class>> ] 2dip answer <not-class> ;
 
-: answer ( table question answer -- new-table )
-    '[ _ _ replace-question ] assoc-map
+: assoc-answer ( table question answer -- new-table )
+    '[ _ _ answer ] assoc-map
     [ nip ] assoc-filter ;
 
-: answers ( table questions answer -- new-table )
-    '[ _ answer ] each ;
+: assoc-answers ( table questions answer -- new-table )
+    '[ _ assoc-answer ] each ;
 
 DEFER: make-condition
 
 : (make-condition) ( table questions question -- condition )
     [ 2nip ]
-    [ swap [ t answer ] dip make-condition ]
-    [ swap [ f answer ] dip make-condition ] 3tri
+    [ swap [ t assoc-answer ] dip make-condition ]
+    [ swap [ f assoc-answer ] dip make-condition ] 3tri
     2dup = [ 2nip ] [ <condition> ] if ;
 
 : make-condition ( table questions -- condition )

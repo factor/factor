@@ -6,9 +6,6 @@ regexp.ast regexp.transition-tables regexp.minimize
 regexp.dfa namespaces ;
 IN: regexp.negation
 
-: ast>dfa ( parse-tree -- minimal-dfa )
-    construct-nfa disambiguate construct-dfa minimize ;
-
 CONSTANT: fail-state -1
 
 : add-default-transition ( state's-transitions -- new-state's-transitions )
@@ -48,6 +45,9 @@ CONSTANT: fail-state -1
     [ start-state>> ]
     [ final-states>> keys first ]
     [ nfa-table get [ transitions>> ] bi@ swap update ] tri ;
+
+: ast>dfa ( parse-tree -- minimal-dfa )
+    construct-nfa disambiguate construct-dfa minimize ;
 
 M: negation nfa-node ( node -- start end )
     term>> ast>dfa negate-table adjoin-dfa ;

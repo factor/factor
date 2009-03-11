@@ -46,9 +46,7 @@ IN: tools.profiler
     profiler-usage counters ;
 
 : counters. ( assoc -- )
-    standard-table-style [
-        sort-values simple-table.
-    ] tabular-output ;
+    sort-values simple-table. ;
 
 : profile. ( -- )
     "Call counts for all words:" print

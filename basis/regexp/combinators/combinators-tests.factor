@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: regexp.combinators tools.test regexp kernel sequences regexp.matchers ;
+USING: regexp.combinators tools.test regexp kernel sequences ;
 IN: regexp.combinators.tests
 
 : strings ( -- regexp )
@@ -16,7 +16,7 @@ USE: multiline
     { R' .*a' R' b.*' } <and> ;
 
 [ t ] [ "bljhasflsda" conj matches? ] unit-test
-[ f ] [ "bsdfdfs" conj matches? ] unit-test ! why does this fail?
+[ f ] [ "bsdfdfs" conj matches? ] unit-test
 [ f ] [ "fsfa" conj matches? ] unit-test
 
 [ f ] [ "bljhasflsda" conj <not> matches? ] unit-test

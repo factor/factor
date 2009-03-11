@@ -161,7 +161,7 @@ $nl
 { $subsection "word-definition" }
 { $subsection "word-props" }
 { $subsection "word.private" }
-{ $see-also "vocabularies" "vocabs.loader" "definitions" } ;
+{ $see-also "vocabularies" "vocabs.loader" "definitions" "see" } ;
 
 ABOUT: "words"
 
