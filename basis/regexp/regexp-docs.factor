@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel strings help.markup help.syntax regexp.matchers math ;
+USING: kernel strings help.markup help.syntax math ;
 IN: regexp
 
 ABOUT: "regexp"
@@ -39,13 +39,14 @@ ARTICLE: { "regexp" "theory" } "The theory of regular expressions"
 "The Factor regular expression engine was built with the design decision to support negation and intersection at the expense of backreferences. This lets us have a guaranteed linear-time matching algorithm. Systems like Ragel and Lex also use this algorithm, but in the Factor regular expression engine, all other features of regexps are still present." ;
 
 ARTICLE: { "regexp" "operations" } "Matching operations with regular expressions"
-{ $subsection all-matches }
 { $subsection matches? }
+{ $subsection re-contains? }
+{ $subsection first-match }
+{ $subsection all-matches }
 { $subsection re-split1 }
 { $subsection re-split }
 { $subsection re-replace }
-{ $subsection count-matches }
-{ $subsection re-replace } ;
+{ $subsection count-matches } ;
 
 HELP: <regexp>
 { $values { "string" string } { "regexp" regexp } }
@@ -63,25 +64,33 @@ HELP: regexp
 { $class-description "The class of regular expressions. To construct these, see " { $link { "regexp" "construction" } } "." } ;
 
 HELP: matches?
-{ $values { "string" string } { "matcher" regexp } { "?" "a boolean" } }
+{ $values { "string" string } { "regexp" regexp } { "?" "a boolean" } }
 { $description "Tests if the string as a whole matches the given regular expression." } ;
 
 HELP: re-split1
-{ $values { "string" string } { "matcher" regexp } { "before" string } { "after/f" string } }
+{ $values { "string" string } { "regexp" regexp } { "before" string } { "after/f" string } }
 { $description "Searches the string for a substring which matches the pattern. If found, the input string is split on the leftmost and longest occurence of the match, and the two halves are given as output. If no match is found, then the input string and " { $link f } " are output." } ;
 
 HELP: all-matches
-{ $values { "string" string } { "matcher" regexp } { "seq" "a sequence of slices of the input" } }
+{ $values { "string" string } { "regexp" regexp } { "seq" "a sequence of slices of the input" } }
 { $description "Finds a sequence of disjoint substrings which each match the pattern. It chooses this by finding the leftmost longest match, and then the leftmost longest match which starts after the end of the previous match, and so on." } ;
 
 HELP: count-matches
-{ $values { "string" string } { "matcher" regexp } { "n" integer } }
+{ $values { "string" string } { "regexp" regexp } { "n" integer } }
 { $description "Counts how many disjoint matches the regexp has in the string, as made unambiguous by " { $link all-matches } "." } ;
 
 HELP: re-split
-{ $values { "string" string } { "matcher" regexp } { "seq" "a sequence of slices of the input" } }
+{ $values { "string" string } { "regexp" regexp } { "seq" "a sequence of slices of the input" } }
 { $description "Splits the input string into chunks separated by the regular expression. Each chunk contains no match of the regexp. The chunks are chosen by the strategy of " { $link all-matches } "." } ;
 
 HELP: re-replace
-{ $values { "string" string } { "matcher" regexp } { "replacement" string } { "result" string } }
+{ $values { "string" string } { "regexp" regexp } { "replacement" string } { "result" string } }
 { $description "Replaces substrings which match the input regexp with the given replacement text. The boundaries of the substring are chosen by the strategy used by " { $link all-matches } "." } ;
+
+HELP: first-match
+{ $values { "string" string } { "regexp" regexp } { "slice/f" "the match, if one exists" } }
+{ $description "Finds the first match of the regular expression in the string, and returns it as a slice. If there is no match, then " { $link f } " is returned." } ;
+
+HELP: re-contains?
+{ $values { "string" string } { "regexp" regexp } { "?" "a boolean" } }
+{ $description "Determines whether the string has a substring which matches the regular expression given." } ;
