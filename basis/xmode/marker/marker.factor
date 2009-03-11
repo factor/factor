@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: xmode.marker
 USING: kernel namespaces make xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators strings
-regexp splitting ascii unicode.case regexp.matchers
-ascii combinators.short-circuit accessors ;
+regexp splitting unicode.case ascii
+combinators.short-circuit accessors ;
+IN: xmode.marker
 
 ! Next two words copied from parser-combinators
 ! Just like head?, but they optionally ignore case
@@ -84,7 +84,7 @@ M: string-matcher text-matches?
     ] keep string>> length and ;
 
 M: regexp text-matches?
-    [ >string ] dip match-head ;
+    [ >string ] dip re-contains? ;
 
 : rule-start-matches? ( rule -- match-count/f )
     dup start>> tuck swap can-match-here? [

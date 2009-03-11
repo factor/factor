@@ -9,7 +9,7 @@ IN: inspector
 
 SYMBOL: +number-rows+
 
-: summary. ( obj -- ) [ summary ] keep write-object nl ;
+: print-summary ( obj -- ) [ summary ] keep write-object ;
 
 <PRIVATE
 
@@ -40,7 +40,7 @@ M: mirror fix-slot-names
 
 : (describe) ( obj assoc -- keys )
     t pprint-string-cells? [
-        [ summary. ] [
+        [ print-summary nl ] [
             dup hashtable? [ sort-unparsed-keys ] when
             [ fix-slot-names add-numbers simple-table. ] [ keys ] bi
         ] bi*

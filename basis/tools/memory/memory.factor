@@ -63,11 +63,12 @@ PRIVATE>
         { "" "Total" "Used" "Free" } write-headings
         (data-room.)
     ] tabular-output
-    nl
+    nl nl
     "==== CODE HEAP" print
     standard-table-style [
         (code-room.)
-    ] tabular-output ;
+    ] tabular-output
+    nl ;
 
 : heap-stats ( -- counts sizes )
     [ ] instances H{ } clone H{ } clone
@@ -83,4 +84,4 @@ PRIVATE>
                 pick at pprint-cell
             ] with-row
         ] each 2drop
-    ] tabular-output ;
+    ] tabular-output nl ;
