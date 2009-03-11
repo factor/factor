@@ -56,23 +56,33 @@ PRIVATE>
 
 <PRIVATE
 
-: make-slice ( i j seq -- slice )
-    [ 2dup > [ swap [ 1+ ] bi@ ] when ] dip <slice> ; inline
+TUPLE: match { i read-only } { j read-only } { seq read-only } ;
 
-: match-slice ( i string quot -- slice/f )
+: match-slice ( i string quot -- match/f )
     [ 2dup ] dip call
-    [ swap make-slice ] [ 2drop f ] if* ; inline
+    [ swap match boa ] [ 2drop f ] if* ; inline
 
 : search-range ( i string reverse? -- seq )
     [ drop 0 [a,b] ] [ length [a,b) ] if ; inline
 
-:: next-match ( i string quot reverse? -- i slice/f )
+: match>result ( match reverse? -- i start end string )
+    over [
+        [ [ i>> ] [ j>> tuck ] [ seq>> ] tri ] dip
+        [ [ swap [ 1+ ] bi@ ] dip ] when
+    ] [ 2drop f f f f ] if ; inline
+
+:: next-match ( i string quot reverse? -- i start end string )
     i string reverse? search-range
     [ string quot match-slice ] map-find drop
-    [ dup [ reverse? [ from>> ] [ to>> ] if ] when ] keep ; inline
+    reverse? match>result ; inline
 
-: do-next-match ( i string regexp -- i match/f )
-    dup next-match>> execute( i string regexp -- i match/f ) ; inline
+: do-next-match ( i string regexp -- i start end string )
+    dup next-match>>
+    execute( i string regexp -- i start end string ) ;
+
+: next-slice ( i string regexp -- i/f slice/f )
+    do-next-match
+    [ slice boa ] [ drop ] if* ; inline
 
 PRIVATE>
 
@@ -84,7 +94,7 @@ TUPLE: match-iterator
 
 : iterate ( iterator -- iterator'/f )
     dup
-    [ i>> ] [ string>> ] [ regexp>> ] tri do-next-match
+    [ i>> ] [ string>> ] [ regexp>> ] tri next-slice
     [ [ [ string>> ] [ regexp>> ] bi ] 2dip match-iterator boa ]
     [ 2drop f ] if* ;
 
@@ -149,21 +159,19 @@ M: regexp compile-regexp ( regexp -- regexp )
 M: reverse-regexp compile-regexp ( regexp -- regexp )
     t backwards? [ do-compile-regexp ] with-variable ;
 
-GENERIC: compile-next-match ( regexp -- regexp )
+DEFER: compile-next-match
 
-: next-initial-word ( i string regexp -- i slice/f )
+: next-initial-word ( i string regexp -- i start end string )
     compile-next-match do-next-match ;
 
-M: regexp compile-next-match ( regexp -- regexp )
+: compile-next-match ( regexp -- regexp )
     dup '[
         dup \ next-initial-word = [
             drop _ [ compile-regexp dfa>> ] [ reverse-regexp? ] bi
             '[ _ '[ _ _ execute ] _ next-match ]
-            (( i string regexp -- i match/f )) simple-define-temp
+            (( i string regexp -- i start end string )) simple-define-temp
         ] when
     ] change-next-match ;
-
-! Write M: reverse-regexp compile-next-match
 
 PRIVATE>
 
