@@ -139,7 +139,7 @@ M: regexp compile-next-match ( regexp -- regexp )
         dup \ next-initial-word = [
             drop _ compile-regexp dfa>>
             '[ _ '[ _ _ execute ] next-match ]
-            (( i string -- i match/f )) simple-define-temp
+            (( i string regexp -- i match/f )) simple-define-temp
         ] when
     ] change-next-match ;
 
