@@ -51,8 +51,8 @@ PRIVATE>
 
 <PRIVATE
 
-:: (next-match) ( i string regexp word: ( i string regexp -- j ) reverse? -- i start end ? )
-    i string regexp word execute dup [| j |
+:: (next-match) ( i string regexp quot: ( i string regexp -- j ) reverse? -- i start end ? )
+    i string regexp quot call dup [| j |
         j i j
         reverse? [ swap [ 1+ ] bi@ ] when
         string
@@ -61,10 +61,10 @@ PRIVATE>
 : search-range ( i string reverse? -- seq )
     [ drop dup 1+ -1 ] [ length 1 ] if range boa ; inline
 
-:: next-match ( i string regexp word reverse? -- i start end ? )
+:: next-match ( i string regexp quot: ( i string regexp -- j ) reverse? -- i start end ? )
     f f f f
     i string reverse? search-range
-    [ [ 2drop 2drop ] dip string regexp word reverse? (next-match) dup ] find 2drop ; inline
+    [ [ 2drop 2drop ] dip string regexp quot reverse? (next-match) dup ] find 2drop ; inline
 
 : do-next-match ( i string regexp -- i start end ? )
     dup next-match>>
@@ -151,7 +151,7 @@ DEFER: compile-next-match
 : compile-next-match ( regexp -- regexp )
     dup '[
         dup \ next-initial-word = [
-            drop _ [ compile-regexp dfa>> ] [ reverse-regexp? ] bi
+            drop _ [ compile-regexp dfa>> def>> ] [ reverse-regexp? ] bi
             '[ { array-capacity string regexp } declare _ _ next-match ]
             (( i string regexp -- i start end string )) simple-define-temp
         ] when
