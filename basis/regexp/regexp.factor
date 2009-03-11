@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel math sequences strings sets
-assocs prettyprint.backend prettyprint.custom make lexer
-namespaces parser arrays fry locals regexp.parser splitting
-sorting regexp.ast regexp.negation regexp.compiler words
-call call.private math.ranges ;
+USING: accessors combinators kernel kernel.private math sequences
+sequences.private strings sets assocs prettyprint.backend
+prettyprint.custom make lexer namespaces parser arrays fry locals
+regexp.parser splitting sorting regexp.ast regexp.negation
+regexp.compiler words call call.private math.ranges ;
 IN: regexp
 
 TUPLE: regexp
@@ -56,7 +56,7 @@ PRIVATE>
 
 <PRIVATE
 
-:: (next-match) ( i string regexp word: ( i string -- j ) reverse? -- i start end ? )
+:: (next-match) ( i string regexp word: ( i string regexp -- j ) reverse? -- i start end ? )
     i string regexp word execute dup [| j |
         j i j
         reverse? [ swap [ 1+ ] bi@ ] when
@@ -64,7 +64,7 @@ PRIVATE>
     ] [ drop f f f f ] if ; inline
 
 : search-range ( i string reverse? -- seq )
-    [ drop 0 [a,b] ] [ length [a,b) ] if ; inline
+    [ drop dup 1+ -1 ] [ length 1 ] if range boa ; inline
 
 :: next-match ( i string regexp word reverse? -- i start end ? )
     f f f f
@@ -157,7 +157,7 @@ DEFER: compile-next-match
     dup '[
         dup \ next-initial-word = [
             drop _ [ compile-regexp dfa>> ] [ reverse-regexp? ] bi
-            '[ _ _ next-match ]
+            '[ { array-capacity string regexp } declare _ _ next-match ]
             (( i string regexp -- i start end string )) simple-define-temp
         ] when
     ] change-next-match ;
