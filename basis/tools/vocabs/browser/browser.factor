@@ -66,15 +66,18 @@ C: <vocab-author> vocab-author
 : describe-children ( vocab -- )
     vocab-name all-child-vocabs $vocab-roots ;
 
+: files. ( seq -- )
+    snippet-style get [
+        code-style get [
+            [ nl ] [ [ string>> ] keep write-object ] interleave
+        ] with-nesting
+    ] with-style ;
+
 : describe-files ( vocab -- )
     vocab-files [ <pathname> ] map [
         "Files" $heading
         [
-            snippet-style get [
-                code-style get [
-                    stack.
-                ] with-nesting
-            ] with-style
+            files.
         ] ($block)
     ] unless-empty ;
 
