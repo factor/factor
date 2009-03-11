@@ -4,7 +4,7 @@ namespaces quotations sequences.private classes continuations
 generic.standard effects classes.tuple classes.tuple.private
 arrays vectors strings compiler.units accessors classes.algebra
 calendar prettyprint io.streams.string splitting summary
-columns math.order classes.private slots slots.private eval ;
+columns math.order classes.private slots slots.private eval see ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;

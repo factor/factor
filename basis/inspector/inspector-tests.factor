@@ -8,7 +8,7 @@ f describe
 H{ } describe
 H{ } describe
 
-[ "fixnum instance\n" ] [ [ 3 describe ] with-string-writer ] unit-test
+[ "fixnum instance\n\n" ] [ [ 3 describe ] with-string-writer ] unit-test
 
 [ ] [ H{ } clone inspect ] unit-test
 
