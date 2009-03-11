@@ -61,7 +61,7 @@ ARTICLE: "definitions" "Definitions"
 { $subsection "definition-crossref" }
 { $subsection "definition-checking" }
 { $subsection "compilation-units" }
-{ $see-also "parser" "source-files" "words" "generic" "help-impl" } ;
+{ $see-also "see" "parser" "source-files" "words" "generic" "help-impl" } ;
 
 ABOUT: "definitions"
 
