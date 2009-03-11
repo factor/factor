@@ -211,8 +211,8 @@ IN: regexp-tests
 [ f ] [ "aaaxb" "a+ab" <regexp> matches? ] unit-test
 [ t ] [ "aaacb" "a+cb" <regexp> matches? ] unit-test
 
-[ 3 ] [ "aaacb" "a*" <regexp> match-index-head ] unit-test
-[ 2 ] [ "aaacb" "aa?" <regexp> match-index-head ] unit-test
+[ "aaa" ] [ "aaacb" "a*" <regexp> match-head >string ] unit-test
+[ "aa" ] [ "aaacb" "aa?" <regexp> match-head >string ] unit-test
 
 [ t ] [ "aaa" R/ AAA/i matches? ] unit-test
 [ f ] [ "aax" R/ AAA/i matches? ] unit-test
@@ -310,8 +310,8 @@ IN: regexp-tests
 [ "a" ] [ "ba" "(?<=b)(?<=b)a" <regexp> match-head >string ] unit-test
 [ "a" ] [ "cab" "(?<=c)a(?=b)" <regexp> match-head >string ] unit-test
 
-[ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-index-head ] unit-test
-[ f ] [ "foobxr" "foo(?=bar)" <regexp> match-index-head ] unit-test
+[ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head length ] unit-test
+[ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
 
 ! Bug in parsing word
 [ t ] [ "a" R' a' matches? ] unit-test
@@ -424,8 +424,8 @@ IN: regexp-tests
 [ 1 ] [ "a\r" R/ a$/m count-matches ] unit-test
 [ 1 ] [ "a\r\n" R/ a$/m count-matches ] unit-test
 
-[ f ] [ "foobxr" "foo\\z" <regexp> match-index-head ] unit-test
-[ 3 ] [ "foo" "foo\\z" <regexp> match-index-head ] unit-test
+[ f ] [ "foobxr" "foo\\z" <regexp> match-head ] unit-test
+[ 3 ] [ "foo" "foo\\z" <regexp> match-head length ] unit-test
 
 ! [ t ] [ "foo" "\\bfoo\\b" <regexp> matches? ] unit-test
 ! [ t ] [ "afoob" "\\Bfoo\\B" <regexp> matches? ] unit-test
