@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors opengl ui.pens ui.pens.caching ;
+USING: kernel accessors opengl math colors ui.pens ui.pens.caching ;
 IN: ui.pens.solid
 
 TUPLE: solid < caching-pen color interior-vertices boundary-vertices ;
@@ -29,4 +29,4 @@ M: solid draw-boundary
     (gl-rect) ;
 
 M: solid pen-background
-    nip color>> ;
+    nip color>> dup alpha>> 1 number= [ drop transparent ] unless ;
