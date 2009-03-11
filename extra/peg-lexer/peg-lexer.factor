@@ -1,6 +1,5 @@
 USING: hashtables assocs sequences locals math accessors multiline delegate strings
-delegate.protocols kernel peg peg.ebnf lexer namespaces combinators parser words
-tools.annotations prettyprint ;
+delegate.protocols kernel peg peg.ebnf lexer namespaces combinators parser words ;
 IN: peg-lexer
 
 TUPLE: lex-hash hash ;
