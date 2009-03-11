@@ -220,7 +220,7 @@ M: assert error.
         5 line-limit set
         [ expect>> [ [ "Expect:" write ] with-cell pprint-cell ] with-row ]
         [ got>> [ [ "Got:" write ] with-cell pprint-cell ] with-row ] bi
-    ] tabular-output ;
+    ] tabular-output nl ;
 
 M: immutable summary drop "Sequence is immutable" ;
 
