@@ -1,5 +1,6 @@
 USING: hashtables assocs sequences locals math accessors multiline delegate strings
-delegate.protocols kernel peg peg.ebnf lexer namespaces combinators parser words ;
+delegate.protocols kernel peg peg.ebnf lexer namespaces combinators parser words
+tools.annotations prettyprint ;
 IN: peg-lexer
 
 TUPLE: lex-hash hash ;
@@ -8,20 +9,23 @@ CONSULT: assoc-protocol lex-hash hash>> ;
 
 : pos-or-0 ( neg? -- pos/0 ) dup 0 < [ drop 0 ] when ;
 
-:: store-pos ( v a -- )
-   [let | n [ input a at v head-slice ] |
-      v "\n" n last-index 0 or - lexer get (>>column)
-      n [ "\n" = ] filter length 1 + lexer get (>>line) ] ;
+:: prepare-pos ( v i -- c l )
+ [let | n [ i v head-slice ] |
+      v CHAR: \n n last-index -1 or 1+ -
+      n [ CHAR: \n = ] count 1+ ] ;
+      
+: store-pos ( v a -- ) input swap at prepare-pos
+   lexer get [ (>>line) ] keep (>>column) ;
 
 M: lex-hash set-at swap {
    { pos [ store-pos ] }
    [ swap hash>> set-at ] } case ;
 
-:: at-pos ( t l c -- p ) t l 1 - head-slice [ length ] map sum pos-or-0 c + ;
+:: at-pos ( t l c -- p ) t l head-slice [ length ] map sum l 1- + c + ;
 
 M: lex-hash at* swap {
       { input [ drop lexer get text>> "\n" join t ] }
-      { pos [ drop lexer get [ text>> ] [ line>> ] [ column>> ] tri at-pos t ] }
+      { pos [ drop lexer get [ text>> ] [ line>> 1- ] [ column>> 1+ ] tri at-pos t ] }
       [ swap hash>> at* ] } case ;
 
 : with-global-lexer ( quot -- result )
