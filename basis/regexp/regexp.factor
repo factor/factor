@@ -56,28 +56,20 @@ PRIVATE>
 
 <PRIVATE
 
-TUPLE: match { i read-only } { start read-only } { end read-only } { string read-only } ;
-
-:: <match> ( i string quot: ( i string -- i seq j ) reverse? -- match/f )
-    i string quot call dup [| j |
+:: (next-match) ( i string regexp word: ( i string -- j ) reverse? -- i start end ? )
+    i string regexp word execute dup [| j |
         j i j
         reverse? [ swap [ 1+ ] bi@ ] when
-        string match boa
-    ] when ; inline
+        string
+    ] [ drop f f f f ] if ; inline
 
 : search-range ( i string reverse? -- seq )
     [ drop 0 [a,b] ] [ length [a,b) ] if ; inline
 
-: match>result ( match -- i start end string )
-    dup
-    [ { [ i>> ] [ start>> ] [ end>> ] [ string>> ] } cleave ]
-    [ drop f f f f ]
-    if ; inline
-
-:: next-match ( i string quot reverse? -- i start end ? )
+:: next-match ( i string regexp word reverse? -- i start end ? )
+    f f f f
     i string reverse? search-range
-    [ string quot reverse? <match> ] map-find drop
-    match>result ; inline
+    [ [ 2drop 2drop ] dip string regexp word reverse? (next-match) dup ] find 2drop ; inline
 
 : do-next-match ( i string regexp -- i start end ? )
     dup next-match>>
@@ -89,10 +81,10 @@ TUPLE: match { i read-only } { start read-only } { end read-only } { string read
         i' string regexp quot (each-match)
     ] [ 3drop ] if ; inline recursive
 
-PRIVATE>
-
 : prepare-match-iterator ( string regexp -- i string regexp )
     [ check-string ] dip [ end/start nip ] 2keep ; inline
+
+PRIVATE>
 
 : each-match ( string regexp quot: ( start end string -- ) -- )
     [ prepare-match-iterator ] dip (each-match) ; inline
@@ -165,7 +157,7 @@ DEFER: compile-next-match
     dup '[
         dup \ next-initial-word = [
             drop _ [ compile-regexp dfa>> ] [ reverse-regexp? ] bi
-            '[ _ '[ _ _ execute ] _ next-match ]
+            '[ _ _ next-match ]
             (( i string regexp -- i start end string )) simple-define-temp
         ] when
     ] change-next-match ;
