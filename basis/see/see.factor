@@ -199,7 +199,7 @@ M: builtin-class see-class*
 
 M: word see*
     [ see-class ]
-    [ [ class? ] [ symbol? not ] bi and [ nl ] when ]
+    [ [ class? ] [ symbol? not ] bi and [ nl nl ] when ]
     [
         dup [ class? ] [ symbol? ] bi and
         [ drop ] [ call-next-method ] if
