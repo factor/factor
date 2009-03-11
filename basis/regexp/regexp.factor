@@ -2,71 +2,194 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math sequences strings sets
 assocs prettyprint.backend prettyprint.custom make lexer
-namespaces parser arrays fry locals regexp.minimize
-regexp.parser regexp.nfa regexp.dfa regexp.classes
-regexp.transition-tables splitting sorting regexp.ast
-regexp.negation regexp.matchers regexp.compiler ;
+namespaces parser arrays fry locals regexp.parser splitting
+sorting regexp.ast regexp.negation regexp.compiler words
+call call.private math.ranges ;
 IN: regexp
 
 TUPLE: regexp
     { raw read-only }
     { parse-tree read-only }
     { options read-only }
-    dfa reverse-dfa ;
+    dfa next-match ;
 
-: make-regexp ( string ast -- regexp )
-    f f <options> f f regexp boa ; foldable
-    ! Foldable because, when the dfa slot is set,
-    ! it'll be set to the same thing regardless of who sets it
+TUPLE: reverse-regexp < regexp ;
 
-: <optioned-regexp> ( string options -- regexp )
-    [ dup parse-regexp ] [ string>options ] bi*
-    f f regexp boa ;
+<PRIVATE
 
-: <regexp> ( string -- regexp ) "" <optioned-regexp> ;
+: maybe-negated ( lookaround quot -- regexp-quot )
+    '[ term>> @ ] [ positive?>> [ ] [ not ] ? ] bi compose ; inline
 
-TUPLE: reverse-matcher regexp ;
-C: <reverse-matcher> reverse-matcher
-! Reverse matchers won't work properly with most combinators, for now
+M: lookahead question>quot ! Returns ( index string -- ? )
+    [ ast>dfa dfa>shortest-word '[ f _ execute ] ] maybe-negated ;
+
+: <reversed-option> ( ast -- reversed )
+    "r" string>options <with-options> ;
+
+M: lookbehind question>quot ! Returns ( index string -- ? )
+    [
+        <reversed-option>
+        ast>dfa dfa>reverse-shortest-word
+        '[ [ 1- ] dip f _ execute ]
+    ] maybe-negated ;
+
+: check-string ( string -- string )
+    ! Make this configurable
+    dup string? [ "String required" throw ] unless ;
+
+: match-index-from ( i string regexp -- index/f )
+    ! This word is unsafe. It assumes that i is a fixnum
+    ! and that string is a string.
+    dup dfa>> execute-unsafe( index string regexp -- i/f ) ;
+
+GENERIC: end/start ( string regexp -- end start )
+M: regexp end/start drop length 0 ;
+M: reverse-regexp end/start drop length 1- -1 swap ;
+
+PRIVATE>
+
+: matches? ( string regexp -- ? )
+    [ end/start ] 2keep
+    [ check-string ] dip
+    match-index-from
+    [ swap = ] [ drop f ] if* ;
+
+<PRIVATE
+
+TUPLE: match { i read-only } { j read-only } { seq read-only } ;
+
+: match-slice ( i string quot -- match/f )
+    [ 2dup ] dip call
+    [ swap match boa ] [ 2drop f ] if* ; inline
+
+: search-range ( i string reverse? -- seq )
+    [ drop 0 [a,b] ] [ length [a,b) ] if ; inline
+
+: match>result ( match reverse? -- i start end string )
+    over [
+        [ [ i>> ] [ j>> tuck ] [ seq>> ] tri ] dip
+        [ [ swap [ 1+ ] bi@ ] dip ] when
+    ] [ 2drop f f f f ] if ; inline
+
+:: next-match ( i string quot reverse? -- i start end string )
+    i string reverse? search-range
+    [ string quot match-slice ] map-find drop
+    reverse? match>result ; inline
+
+: do-next-match ( i string regexp -- i start end string )
+    dup next-match>>
+    execute-unsafe( i string regexp -- i start end string ) ;
+
+: next-slice ( i string regexp -- i/f slice/f )
+    do-next-match
+    [ slice boa ] [ drop ] if* ; inline
+
+PRIVATE>
+
+TUPLE: match-iterator
+    { string read-only }
+    { regexp read-only }
+    { i read-only }
+    { value read-only } ;
+
+: iterate ( iterator -- iterator'/f )
+    dup
+    [ i>> ] [ string>> ] [ regexp>> ] tri next-slice
+    [ [ [ string>> ] [ regexp>> ] bi ] 2dip match-iterator boa ]
+    [ 2drop f ] if* ;
+
+: value ( iterator/f -- value/f )
+    dup [ value>> ] when ;
+
+: <match-iterator> ( string regexp -- match-iterator )
+    [ check-string ] dip
+    2dup end/start nip f
+    match-iterator boa
+    iterate ; inline
+
+: all-matches ( string regexp -- seq )
+    <match-iterator> [ iterate ] follow [ value ] map ;
+
+: count-matches ( string regexp -- n )
+    all-matches length ;
+
+<PRIVATE
+
+:: split-slices ( string slices -- new-slices )
+    slices [ to>> ] map 0 prefix
+    slices [ from>> ] map string length suffix
+    [ string <slice> ] 2map ;
+
+PRIVATE>
+
+: first-match ( string regexp -- slice/f )
+    <match-iterator> value ;
+
+: re-contains? ( string regexp -- ? )
+    first-match >boolean ;
+
+: re-split1 ( string regexp -- before after/f )
+    dupd first-match [ 1array split-slices first2 ] [ f ] if* ;
+
+: re-split ( string regexp -- seq )
+    dupd all-matches split-slices ;
+
+: re-replace ( string regexp replacement -- result )
+    [ re-split ] dip join ;
 
 <PRIVATE
 
 : get-ast ( regexp -- ast )
     [ parse-tree>> ] [ options>> ] bi <with-options> ;
 
-: compile-regexp ( regexp -- regexp )
-    dup '[ [ _ get-ast ast>dfa dfa>quotation ] unless* ] change-dfa ;
+GENERIC: compile-regexp ( regex -- regexp )
 
-: <reversed-option> ( ast -- reversed )
-    "r" string>options <with-options> ;
+: regexp-initial-word ( i string regexp -- i/f )
+    compile-regexp match-index-from ;
 
-: maybe-negated ( lookaround quot -- regexp-quot )
-    '[ term>> @ ] [ positive?>> [ ] [ not ] ? ] bi compose ; inline
-
-M: lookahead question>quot ! Returns ( index string -- ? )
-    [ ast>dfa dfa>shortest-quotation ] maybe-negated ;
-
-M: lookbehind question>quot ! Returns ( index string -- ? )
-    [
-        <reversed-option>
-        ast>dfa dfa>reverse-shortest-quotation
-        [ [ 1- ] dip ] prepose
-    ] maybe-negated ;
-
-: compile-reverse ( regexp -- regexp )
+: do-compile-regexp ( regexp -- regexp )
     dup '[
-        [
-            _ get-ast <reversed-option>
-            ast>dfa dfa>reverse-quotation
-        ] unless*
-    ] change-reverse-dfa ;
+        dup \ regexp-initial-word =
+        [ drop _ get-ast ast>dfa dfa>word ] when
+    ] change-dfa ;
 
-M: regexp match-index-from
-    compile-regexp dfa>> <quot-matcher> match-index-from ;
+M: regexp compile-regexp ( regexp -- regexp )
+    do-compile-regexp ;
 
-M: reverse-matcher match-index-from
-    regexp>> compile-reverse reverse-dfa>>
-    <quot-matcher> match-index-from ;
+M: reverse-regexp compile-regexp ( regexp -- regexp )
+    t backwards? [ do-compile-regexp ] with-variable ;
+
+DEFER: compile-next-match
+
+: next-initial-word ( i string regexp -- i start end string )
+    compile-next-match do-next-match ;
+
+: compile-next-match ( regexp -- regexp )
+    dup '[
+        dup \ next-initial-word = [
+            drop _ [ compile-regexp dfa>> ] [ reverse-regexp? ] bi
+            '[ _ '[ _ _ execute ] _ next-match ]
+            (( i string regexp -- i start end string )) simple-define-temp
+        ] when
+    ] change-next-match ;
+
+PRIVATE>
+
+: new-regexp ( string ast options class -- regexp )
+    [ \ regexp-initial-word \ next-initial-word ] dip boa ; inline
+
+: make-regexp ( string ast -- regexp )
+    f f <options> regexp new-regexp ;
+
+: <optioned-regexp> ( string options -- regexp )
+    [ dup parse-regexp ] [ string>options ] bi*
+    dup on>> reversed-regexp swap member?
+    [ reverse-regexp new-regexp ]
+    [ regexp new-regexp ] if ;
+
+: <regexp> ( string -- regexp ) "" <optioned-regexp> ;
+
+<PRIVATE
 
 ! The following two should do some caching
 
@@ -97,7 +220,7 @@ M: reverse-matcher match-index-from
 
 : parsing-regexp ( accum end -- accum )
     lexer get [ take-until ] [ parse-noblank-token ] bi
-    <optioned-regexp> compile-regexp parsed ;
+    <optioned-regexp> compile-next-match parsed ;
 
 PRIVATE>
 
@@ -120,3 +243,4 @@ M: regexp pprint*
             [ options>> options>string % ] bi
         ] "" make
     ] keep present-text ;
+

@@ -171,6 +171,7 @@ ARTICLE: "ui-layouts" "Gadget hierarchy and layouts"
 { $subsection "ui-frame-layout" }
 { $subsection "ui-book-layout" }
 "Advanced topics:"
+{ $subsection "ui.gadgets.glass" }
 { $subsection "ui-null-layout" }
 { $subsection "ui-incremental-layout" }
 { $subsection "ui-layout-impl" }

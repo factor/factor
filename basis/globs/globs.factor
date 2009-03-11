@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel regexp.combinators regexp.matchers strings unicode.case
+USING: sequences kernel regexp.combinators strings unicode.case
 peg.ebnf regexp arrays ;
 IN: globs
 
