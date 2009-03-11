@@ -44,14 +44,17 @@ M: lookbehind question>quot ! Returns ( index string -- ? )
     ! and that string is a string.
     dup dfa>> execute( index string regexp -- i/f ) ;
 
-: match-index-head ( string regexp -- index/f )
-    [ 0 ] 2dip [ check-string ] dip match-index-from ;
+GENERIC: end/start ( string regexp -- end start )
+M: regexp end/start drop length 0 ;
+M: reverse-regexp end/start drop length 1- -1 swap ;
 
 PRIVATE>
 
 : matches? ( string regexp -- ? )
-    dupd match-index-head
-    [ swap length = ] [ drop f ] if* ;
+    [ end/start ] 2keep
+    [ check-string ] dip
+    match-index-from
+    [ swap = ] [ drop f ] if* ;
 
 <PRIVATE
 
