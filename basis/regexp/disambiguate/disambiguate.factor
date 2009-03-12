@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors regexp.classes math.bits assocs sequences
-arrays sets regexp.dfa math fry regexp.minimize regexp.ast ;
+arrays sets regexp.dfa math fry regexp.minimize regexp.ast regexp.transition-tables ;
 IN: regexp.disambiguate
 
 TUPLE: parts in out ;
@@ -32,9 +32,8 @@ TUPLE: parts in out ;
 : preserving-epsilon ( state-transitions quot -- new-state-transitions )
     [ [ drop tagged-epsilon? ] assoc-filter ] bi
     assoc-union H{ } assoc-like ; inline
-
 : disambiguate ( nfa -- nfa )  
-    [
+    expand-ors [
         dup new-transitions '[
             [
                 _ swap '[ _ get-transitions ] assoc-map

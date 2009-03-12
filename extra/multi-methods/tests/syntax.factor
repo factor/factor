@@ -1,7 +1,7 @@
 IN: multi-methods.tests
 USING: multi-methods tools.test math sequences namespaces system
 kernel strings definitions prettyprint debugger arrays
-hashtables continuations classes assocs accessors ;
+hashtables continuations classes assocs accessors see ;
 
 GENERIC: first-test
 
