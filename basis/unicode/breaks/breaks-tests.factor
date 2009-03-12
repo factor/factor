@@ -37,3 +37,5 @@ IN: unicode.breaks.tests
 
 grapheme-break-test parse-test-file [ >graphemes ] test
 word-break-test parse-test-file [ >words ] test
+
+[ { t f t t f t } ] [ 6 [ "as df" word-break-at? ] map ] unit-test
