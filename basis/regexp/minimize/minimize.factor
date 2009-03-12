@@ -96,4 +96,5 @@ IN: regexp.minimize
     clone
     number-states
     combine-states
-    combine-transitions ;
+    combine-transitions
+    expand-ors ;
