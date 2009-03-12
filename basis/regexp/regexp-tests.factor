@@ -287,7 +287,7 @@ IN: regexp-tests
 [ { "a" "" } ] [ "a=" R/ =/ re-split [ >string ] map ] unit-test
 
 [ { "ABC" "DEF" "GHI" } ]
-[ "1ABC2DEF3GHI4" R/ [A-Z]+/ all-matches [ >string ] map ] unit-test
+[ "1ABC2DEF3GHI4" R/ [A-Z]+/ all-matching-subseqs ] unit-test
 
 [ 3 ]
 [ "1ABC2DEF3GHI4" R/ [A-Z]+/ count-matches ] unit-test
@@ -431,7 +431,7 @@ IN: regexp-tests
 [ f ] [ "a bar b" R/ foo/ re-contains? ] unit-test
 [ t ] [ "foo" R/ foo/ re-contains? ] unit-test
 
-[ { "foo" "fxx" "fab" } ] [ "fab fxx foo" R/ f../r all-matches [ >string ] map ] unit-test
+[ { "foo" "fxx" "fab" } ] [ "fab fxx foo" R/ f../r all-matching-subseqs ] unit-test
 
 [ t ] [ "foo" "\\bfoo\\b" <regexp> re-contains? ] unit-test
 [ t ] [ "afoob" "\\Bfoo\\B" <regexp> re-contains? ] unit-test
