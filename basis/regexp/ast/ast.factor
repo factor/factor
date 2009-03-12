@@ -58,8 +58,8 @@ M: from-to <times>
 : char-class ( ranges ? -- term )
     [ <or-class> ] dip [ <not-class> ] when ;
 
-TUPLE: lookahead term positive? ;
+TUPLE: lookahead term ;
 C: <lookahead> lookahead
 
-TUPLE: lookbehind term positive? ;
+TUPLE: lookbehind term ;
 C: <lookbehind> lookbehind

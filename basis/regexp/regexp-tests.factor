@@ -287,7 +287,7 @@ IN: regexp-tests
 [ { "a" "" } ] [ "a=" R/ =/ re-split [ >string ] map ] unit-test
 
 [ { "ABC" "DEF" "GHI" } ]
-[ "1ABC2DEF3GHI4" R/ [A-Z]+/ all-matches [ >string ] map ] unit-test
+[ "1ABC2DEF3GHI4" R/ [A-Z]+/ all-matching-subseqs ] unit-test
 
 [ 3 ]
 [ "1ABC2DEF3GHI4" R/ [A-Z]+/ count-matches ] unit-test
@@ -431,49 +431,42 @@ IN: regexp-tests
 [ f ] [ "a bar b" R/ foo/ re-contains? ] unit-test
 [ t ] [ "foo" R/ foo/ re-contains? ] unit-test
 
-! [ t ] [ "foo" "\\bfoo\\b" <regexp> matches? ] unit-test
-! [ t ] [ "afoob" "\\Bfoo\\B" <regexp> matches? ] unit-test
-! [ t ] [ "afoob" "\\bfoo\\b" <regexp> matches? ] unit-test
-! [ f ] [ "foo" "\\Bfoo\\B" <regexp> matches? ] unit-test
+[ { "foo" "fxx" "fab" } ] [ "fab fxx foo" R/ f../r all-matching-subseqs ] unit-test
 
-! [ 3 ] [ "foo bar" "foo\\b" <regexp> match-index-head ] unit-test
-! [ f ] [ "fooxbar" "foo\\b" <regexp> matches? ] unit-test
-! [ t ] [ "foo" "foo\\b" <regexp> matches? ] unit-test
-! [ t ] [ "foo bar" "foo\\b bar" <regexp> matches? ] unit-test
-! [ f ] [ "fooxbar" "foo\\bxbar" <regexp> matches? ] unit-test
-! [ f ] [ "foo" "foo\\bbar" <regexp> matches? ] unit-test
+[ t ] [ "foo" "\\bfoo\\b" <regexp> re-contains? ] unit-test
+[ t ] [ "afoob" "\\Bfoo\\B" <regexp> re-contains? ] unit-test
+[ f ] [ "afoob" "\\bfoo\\b" <regexp> re-contains? ] unit-test
+[ f ] [ "foo" "\\Bfoo\\B" <regexp> re-contains? ] unit-test
 
-! [ f ] [ "foo bar" "foo\\B" <regexp> matches? ] unit-test
-! [ 3 ] [ "fooxbar" "foo\\B" <regexp> match-index-head ] unit-test
-! [ t ] [ "foo" "foo\\B" <regexp> matches? ] unit-test
-! [ f ] [ "foo bar" "foo\\B bar" <regexp> matches? ] unit-test
-! [ t ] [ "fooxbar" "foo\\Bxbar" <regexp> matches? ] unit-test
-! [ f ] [ "foo" "foo\\Bbar" <regexp> matches? ] unit-test
+[ 3 ] [ "foo bar" "foo\\b" <regexp> first-match length ] unit-test
+[ f ] [ "fooxbar" "foo\\b" <regexp> re-contains? ] unit-test
+[ t ] [ "foo" "foo\\b" <regexp> re-contains? ] unit-test
+[ t ] [ "foo bar" "foo\\b bar" <regexp> matches? ] unit-test
+[ f ] [ "fooxbar" "foo\\bxbar" <regexp> matches? ] unit-test
+[ f ] [ "foo" "foo\\bbar" <regexp> matches? ] unit-test
 
-! [ 1 ] [ "aaacb" "a+?" <regexp> match-index-head ] unit-test
-! [ 1 ] [ "aaacb" "aa??" <regexp> match-index-head ] unit-test
-! [ f ] [ "aaaab" "a++ab" <regexp> matches? ] unit-test
-! [ t ] [ "aaacb" "a++cb" <regexp> matches? ] unit-test
-! [ 3 ] [ "aacb" "aa?c" <regexp> match-index-head ] unit-test
-! [ 3 ] [ "aacb" "aa??c" <regexp> match-index-head ] unit-test
+[ f ] [ "foo bar" "foo\\B" <regexp> re-contains? ] unit-test
+[ 3 ] [ "fooxbar" "foo\\B" <regexp> first-match length ] unit-test
+[ f ] [ "foo" "foo\\B" <regexp> re-contains? ] unit-test
+[ f ] [ "foo bar" "foo\\B bar" <regexp> matches? ] unit-test
+[ t ] [ "fooxbar" "foo\\Bxbar" <regexp> matches? ] unit-test
+[ f ] [ "foo" "foo\\Bbar" <regexp> matches? ] unit-test
 
-! "ab" "a(?=b*)" <regexp> match
-! "abbbbbc" "a(?=b*c)" <regexp> match
-! "ab" "a(?=b*)" <regexp> match
+[ t ] [ "ab" "a(?=b*)" <regexp> re-contains? ] unit-test
+[ t ] [ "abbbbbc" "a(?=b*c)" <regexp> re-contains? ] unit-test
+[ f ] [ "abbbbb" "a(?=b*c)" <regexp> re-contains? ] unit-test
+[ t ] [ "ab" "a(?=b*)" <regexp> re-contains? ] unit-test
 
-! "baz" "(az)(?<=b)" <regexp> first-match
-! "cbaz" "a(?<=b*)" <regexp> first-match
-! "baz" "a(?<=b)" <regexp> first-match
+[ "az" ] [ "baz" "(?<=b)(az)" <regexp> first-match >string ] unit-test
+[ f ] [ "chaz" "(?<=b)(az)" <regexp> re-contains? ] unit-test
+[ "a" ] [ "cbaz" "(?<=b*)a" <regexp> first-match >string ] unit-test
+[ f ] [ "baz" "a(?<=b)" <regexp> re-contains? ] unit-test
 
-! "baz" "a(?<!b)" <regexp> first-match
-! "caz" "a(?<!b)" <regexp> first-match
+[ f ] [ "baz" "(?<!b)a" <regexp> re-contains? ] unit-test
+[ t ] [ "caz" "(?<!b)a" <regexp> re-contains? ] unit-test
 
-! "abcdefg" "a(?=bcdefg)bcd" <regexp> first-match
-! "abcdefg" "a(?#bcdefg)bcd" <regexp> first-match
-! "abcdefg" "a(?:bcdefg)" <regexp> first-match
+[ "abcd" ] [ "abcdefg" "a(?=bcdefg)bcd" <regexp> first-match >string ] unit-test
+[ t ] [ "abcdefg" "a(?#bcdefg)bcd" <regexp> re-contains? ] unit-test
+[ t ] [ "abcdefg" "a(?:bcdefg)" <regexp> matches? ] unit-test
 
-! "caba" "a(?<=b)" <regexp> first-match
-
-! capture group 1: "aaaa"  2: ""
-! "aaaa" "(a*)(a*)" <regexp> match*
-! "aaaa" "(a*)(a+)" <regexp> match*
+[ 3 ] [ "caba" "(?<=b)a" <regexp> first-match from>> ] unit-test

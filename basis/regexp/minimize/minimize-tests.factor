@@ -54,5 +54,5 @@ IN: regexp.minimize.tests
 
 [ [ ] [ ] while-changes ] must-infer
 
-[ H{ { T{ or-class f { 1 2 } } 3 } { 4 5 } } ]
+[ H{ { T{ or-class f { 2 1 } } 3 } { 4 5 } } ]
 [ H{ { 1 3 } { 2 3 } { 4 5 } } combine-state-transitions ] unit-test
