@@ -77,17 +77,8 @@ C: <box> box
 : literals>cases ( literal-transitions -- case-body )
     [ execution-quot ] assoc-map ;
 
-: expand-one-or ( or-class transition -- alist )
-    [ seq>> ] dip '[ _ 2array ] map ;
-
-: expand-or ( alist -- new-alist )
-    [
-        first2 over or-class?
-        [ expand-one-or ] [ 2array 1array ] if
-    ] map concat ;
-
 : split-literals ( transitions -- case default )
-    >alist expand-or [ first integer? ] partition
+    { } assoc-like [ first integer? ] partition
     [ [ literals>cases ] keep ] dip non-literals>dispatch ;
 
 :: step ( last-match index str quot final? direction -- last-index/f )
