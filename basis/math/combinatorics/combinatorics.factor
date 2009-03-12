@@ -16,7 +16,7 @@ IN: math.combinatorics
 ! http://msdn2.microsoft.com/en-us/library/aa302371.aspx
 
 : factoradic ( n -- factoradic )
-    0 [ over 0 > ] [ 1+ [ /mod ] keep swap ] [ ] produce reverse 2nip ;
+    0 [ over 0 > ] [ 1+ [ /mod ] keep swap ] produce reverse 2nip ;
 
 : (>permutation) ( seq n -- seq )
     [ '[ _ dupd >= [ 1+ ] when ] map ] keep prefix ;

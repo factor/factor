@@ -64,7 +64,6 @@ M: topic url-of topic>filename ;
     tri simple-page ;
           
 : generate-help-file ( topic -- )
-    dup .
     dup topic>filename utf8 [ help>html write-xml ] with-file-writer ;
 
 : all-vocabs-really ( -- seq )

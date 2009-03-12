@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors alien alien.accessors arrays byte-arrays
 classes sequences.private continuations.private effects generic
@@ -11,7 +11,7 @@ strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
 combinators locals locals.backend locals.types words.private
-quotations.private stack-checker.values
+quotations.private call call.private stack-checker.values
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -87,7 +87,7 @@ M: composed infer-call*
     terminated? get [ 1 infer-r> infer-call ] unless ;
 
 M: object infer-call*
-    \ literal-expected inference-warning ;
+    "literal quotation" literal-expected ;
 
 : infer-nslip ( n -- )
     [ infer->r infer-call ] [ infer-r> ] bi ;
@@ -137,13 +137,18 @@ M: object infer-call*
 
 : infer-(throw) ( -- )
     \ (throw)
-    peek-d literal value>> 2 + f <effect> t >>terminated?
+    peek-d literal value>> 2 + { "*" } <effect>
+    apply-word/effect ;
+
+: infer-execute-effect-unsafe ( -- )
+    \ execute
+    pop-literal nip
+    [ in>> "word" suffix ] [ out>> ] [ terminated?>> ] tri
+    effect boa
     apply-word/effect ;
 
 : infer-exit ( -- )
-    \ exit
-    { integer } { } t >>terminated? <effect>
-    apply-word/effect ;
+    \ exit (( n -- * )) apply-word/effect ;
 
 : infer-load-locals ( -- )
     pop-literal nip
@@ -180,6 +185,7 @@ M: object infer-call*
         { \ compose [ infer-compose ] }
         { \ execute [ infer-execute ] }
         { \ (execute) [ infer-execute ] }
+        { \ execute-effect-unsafe [ infer-execute-effect-unsafe ] }
         { \ if [ infer-if ] }
         { \ dispatch [ infer-dispatch ] }
         { \ <tuple-boa> [ infer-<tuple-boa> ] }
@@ -189,7 +195,7 @@ M: object infer-call*
         { \ load-locals [ infer-load-locals ] }
         { \ get-local [ infer-get-local ] }
         { \ drop-locals [ infer-drop-locals ] }
-        { \ do-primitive [ unknown-primitive-error inference-warning ] }
+        { \ do-primitive [ unknown-primitive-error ] }
         { \ alien-invoke [ infer-alien-invoke ] }
         { \ alien-indirect [ infer-alien-indirect ] }
         { \ alien-callback [ infer-alien-callback ] }
@@ -205,10 +211,10 @@ M: object infer-call*
     "local-word-def" word-prop infer-quot-here ;
 
 {
-    declare call (call) slip 2slip 3slip dip 2dip 3dip
-    curry compose execute (execute) if dispatch <tuple-boa>
-    (throw) load-local load-locals get-local drop-locals do-primitive
-    alien-invoke alien-indirect alien-callback
+    declare call (call) slip 2slip 3slip dip 2dip 3dip curry compose
+    execute (execute) execute-effect-unsafe if dispatch <tuple-boa>
+    (throw) exit load-local load-locals get-local drop-locals
+    do-primitive alien-invoke alien-indirect alien-callback
 } [ t "special" set-word-prop ] each
 
 { call execute dispatch load-locals get-local drop-locals }

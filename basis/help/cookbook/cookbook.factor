@@ -1,6 +1,6 @@
 USING: help.markup help.syntax io kernel math namespaces parser
 prettyprint sequences vocabs.loader namespaces stack-checker
-help command-line multiline ;
+help command-line multiline see ;
 IN: help.cookbook
 
 ARTICLE: "cookbook-syntax" "Basic syntax cookbook"
@@ -343,7 +343,7 @@ ARTICLE: "cookbook-pitfalls" "Pitfalls to avoid"
     { "When a source file uses two vocabularies which define words with the same name, the order of the vocabularies in the " { $link POSTPONE: USE: } " or " { $link POSTPONE: USING: } " forms is important. The " { $link POSTPONE: QUALIFIED: } " word implements qualified naming, which can be used to resolve ambiguities." }
     { "If a literal object appears in a word definition, the object itself is pushed on the stack when the word executes, not a copy. If you intend to mutate this object, you must " { $link clone } " it first. See " { $link "syntax-literals" } "." }
     { "For a discussion of potential issues surrounding the " { $link f } " object, see " { $link "booleans" } "." }
-    { "Factor's object system is quite flexible. Careless usage of union, mixin and predicate classes can lead to similar problems to those caused by ``multiple inheritance'' in other languages. In particular, it is possible to have two classes such that they have a non-empty intersection and yet neither is a subclass of the other. If a generic word defines methods on two such classes, various disambiguation rules are applied to ensure method dispatch remains deterministic, however they may not be what you expect. See " { $link "method-order" } " for details." }
+    { "Factor's object system is quite flexible. Careless usage of union, mixin and predicate classes can lead to similar problems to those caused by “multiple inheritance” in other languages. In particular, it is possible to have two classes such that they have a non-empty intersection and yet neither is a subclass of the other. If a generic word defines methods on two such classes, various disambiguation rules are applied to ensure method dispatch remains deterministic, however they may not be what you expect. See " { $link "method-order" } " for details." }
     { "Performance-sensitive code should have a static stack effect so that it can be compiled by the optimizing word compiler, which generates more efficient code than the non-optimizing quotation compiler. See " { $link "inference" } " and " { $link "compiler" } "."
     $nl
     "This means that methods defined on performance sensitive, frequently-called core generic words such as " { $link nth } " should have static stack effects which are consistent with each other, since a generic word will only have a static stack effect if all methods do."

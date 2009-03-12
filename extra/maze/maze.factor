@@ -1,7 +1,7 @@
 ! From http://www.ffconsultancy.com/ocaml/maze/index.html
 USING: sequences namespaces math math.vectors opengl opengl.gl
 arrays kernel random ui ui.gadgets ui.gadgets.canvas ui.render
-math.order math.geometry.rect ;
+math.order math.rectangles accessors ;
 IN: maze
 
 CONSTANT: line-width 8
@@ -53,7 +53,7 @@ TUPLE: maze < canvas ;
 
 : <maze> ( -- gadget ) maze new-canvas ;
 
-: n ( gadget -- n ) rect-dim first2 min line-width /i ;
+: n ( gadget -- n ) dim>> first2 min line-width /i ;
 
 M: maze layout* delete-canvas-dlist ;
 

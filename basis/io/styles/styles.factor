@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables io io.streams.plain io.streams.string
 colors summary make accessors splitting math.order
-kernel namespaces assocs destructors strings sequences ;
+kernel namespaces assocs destructors strings sequences
+present fry strings.tables delegate delegate.protocols ;
 IN: io.styles
 
 GENERIC: stream-format ( str style stream -- )
@@ -10,6 +11,10 @@ GENERIC: make-span-stream ( style stream -- stream' )
 GENERIC: make-block-stream ( style stream -- stream' )
 GENERIC: make-cell-stream ( style stream -- stream' )
 GENERIC: stream-write-table ( table-cells style stream -- )
+
+PROTOCOL: formatted-output-stream-protocol
+stream-format make-span-stream make-block-stream
+make-cell-stream stream-write-table ;
 
 : format ( str style -- ) output-stream get stream-format ;
 
@@ -39,35 +44,11 @@ GENERIC: stream-write-table ( table-cells style stream -- )
 
 TUPLE: filter-writer stream ;
 
-M: filter-writer stream-format
-    stream>> stream-format ;
+CONSULT: output-stream-protocol filter-writer stream>> ;
 
-M: filter-writer stream-write
-    stream>> stream-write ;
+CONSULT: formatted-output-stream-protocol filter-writer stream>> ;
 
-M: filter-writer stream-write1
-    stream>> stream-write1 ;
-
-M: filter-writer make-span-stream
-    stream>> make-span-stream ;
-
-M: filter-writer make-block-stream
-    stream>> make-block-stream ;
-
-M: filter-writer make-cell-stream
-    stream>> make-cell-stream ;
-
-M: filter-writer stream-flush
-    stream>> stream-flush ;
-
-M: filter-writer stream-nl
-    stream>> stream-nl ;
-
-M: filter-writer stream-write-table
-    stream>> stream-write-table ;
-
-M: filter-writer dispose
-    stream>> dispose ;
+M: filter-writer dispose stream>> dispose ;
 
 TUPLE: ignore-close-stream < filter-writer ;
 
@@ -115,21 +96,8 @@ M: plain-writer make-span-stream
 M: plain-writer make-block-stream
     nip <ignore-close-stream> ;
 
-: format-column ( seq ? -- seq )
-    [
-        [ 0 [ length max ] reduce ] keep
-        swap [ CHAR: \s pad-tail ] curry map
-    ] unless ;
-
-: map-last ( seq quot -- seq )
-    [ dup length <reversed> ] dip [ 0 = ] prepose 2map ; inline
-
-: format-table ( table -- seq )
-    flip [ format-column ] map-last
-    flip [ " " join ] map ;
-
 M: plain-writer stream-write-table
-    [ drop format-table [ print ] each ] with-output-stream* ;
+    [ drop format-table [ nl ] [ write ] interleave ] with-output-stream* ;
 
 M: plain-writer make-cell-stream 2drop <string-writer> ;
 
@@ -142,16 +110,18 @@ SYMBOL: bold-italic
 ! Character styles
 SYMBOL: foreground
 SYMBOL: background
-SYMBOL: font
+SYMBOL: font-name
 SYMBOL: font-size
 SYMBOL: font-style
 
 ! Presentation
 SYMBOL: presented
-SYMBOL: presented-path
-SYMBOL: presented-printer
 
+! Link
 SYMBOL: href
+
+! Image
+SYMBOL: image
 
 ! Paragraph styles
 SYMBOL: page-color
@@ -174,11 +144,13 @@ TUPLE: input string ;
 
 C: <input> input
 
+M: input present string>> ;
+
 M: input summary
     [
         "Input: " %
-        string>> "\n" split1 swap %
-        "..." "" ? %
+        string>> "\n" split1
+        [ % ] [ "..." "" ? % ] bi*
     ] "" make ;
 
 : write-object ( str obj -- ) presented associate format ;

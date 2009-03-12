@@ -59,6 +59,35 @@ buffer."
   :type 'boolean
   :group 'fuel-listener)
 
+(defcustom fuel-listener-history-filename (expand-file-name "~/.fuel_history")
+  "File where listener input history is saved, so that it persists between sessions."
+  :type 'filename
+  :group 'fuel-listener)
+
+(defcustom fuel-listener-history-size comint-input-ring-size
+  "Maximum size of the saved listener input history."
+  :type 'integer
+  :group 'fuel-listener)
+
+
+;;; Listener history:
+
+(defun fuel-listener--sentinel (proc event)
+  (when (string= event "finished\n")
+    (with-current-buffer (process-buffer proc)
+      (let ((comint-input-ring-file-name fuel-listener-history-filename))
+        (comint-write-input-ring)
+        (when (buffer-name (current-buffer))
+          (insert "\nBye bye. It's been nice listening to you!\n")
+          (insert "Press C-cz to bring me back.\n" ))))))
+
+(defun fuel-listener--history-setup ()
+  (set (make-local-variable 'comint-input-ring-file-name) fuel-listener-history-filename)
+  (set (make-local-variable 'comint-input-ring-size) fuel-listener-history-size)
+  (add-hook 'kill-buffer-hook 'comint-write-input-ring nil t)
+  (comint-read-input-ring t)
+  (set-process-sentinel (get-buffer-process (current-buffer)) 'fuel-listener--sentinel))
+
 
 ;;; Fuel listener buffer/process:
 
@@ -84,7 +113,8 @@ buffer."
     (pop-to-buffer (fuel-listener--buffer))
     (make-comint-in-buffer "fuel listener" (current-buffer) factor nil
                            "-run=listener" (format "-i=%s" image))
-    (fuel-listener--wait-for-prompt 10000)
+    (fuel-listener--wait-for-prompt 60000)
+    (fuel-listener--history-setup)
     (fuel-con--setup-connection (current-buffer))))
 
 (defun fuel-listener--connect-process (port)

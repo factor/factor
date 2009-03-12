@@ -1,5 +1,6 @@
 USING: ui.gadgets help.markup help.syntax generic kernel
-classes.tuple quotations ;
+classes.tuple quotations ui.gadgets.packs.private
+ui.baseline-alignment ;
 IN: ui.gadgets.packs
 
 ARTICLE: "ui-pack-layout" "Pack layouts"
@@ -23,7 +24,7 @@ HELP: pack
 }
 "Packs have the following slots:"
 { $list
-    { { $snippet "align" } " a rational number between 0 and 1, the alignment of gadgets along the axis perpendicular to the pack's orientation" }
+    { { $snippet "align" } " a rational number between 0 and 1, or " { $link +baseline+ } "; the alignment of gadgets along the axis perpendicular to the pack's orientation" }
     { { $snippet "fill" } " a rational number between 0 and 1, where 0 gives each gadget its preferred size and 1 fills the dimension perpendicular to the pack's orientation" }
     { { $snippet "gap" } " a pair of integers, the horizontal and vertical gap between children" }
 }
@@ -38,7 +39,7 @@ HELP: pack-layout
 
 HELP: <pack>
 { $values { "orientation" "an orientation specifier" } { "pack" "a new " { $link pack } } }
-{ $description "Creates a new pack which lays out children along the given axis. Children are laid out vertically if the orientation is " { $snippet "{ 0 1 }" } " and horizontally if the orientation is " { $snippet "{ 1 0 }" } "." } ;
+{ $description "Creates a new pack which lays out children with the given orientation, either " { $link horizontal } " or " { $link vertical } "." } ;
 
 { <pack> <pile> <shelf> } related-words
 
@@ -51,7 +52,7 @@ HELP: <shelf>
 { $description "Creates a new " { $link pack } " which lays out its children horizontally." } ;
 
 HELP: pack-pref-dim
-{ $values { "gadget" gadget } { "sizes" "a sequence of pairs of integers" } { "dim" "a pair of integers" } }
+{ $values { "pack" pack } { "sizes" "a sequence of pairs of integers" } { "dim" "a pair of integers" } }
 { $description "Computes the preferred size of a pack, with each gadget receiving its size from the corresponding index of the " { $snippet "sizes" } " sequence." }
 { $notes
     "This word is useful if you are writing your own layout gadget which inherits from " { $link pack } ". This allows you to reuse layout logic while computing gadget sizes using a custom procedure."

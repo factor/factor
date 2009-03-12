@@ -3,7 +3,7 @@
 USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
-sequences.private assocs models models.filter arrays accessors
+sequences.private assocs models models.arrow arrays accessors
 generic generic.standard definitions make sbufs ;
 IN: tools.walker
 
@@ -205,7 +205,7 @@ SYMBOL: +stopped+
                 ]
             } case
         ] handle-synchronous
-    ] [ ] while ;
+    ] while ;
 
 : step-back-msg ( continuation -- continuation' )
     walker-history tget
@@ -228,12 +228,12 @@ SYMBOL: +stopped+
                 { step-into-all [ step-into-all-loop ] }
                 { abandon [ drop f keep-running ] }
                 ! Pass quotation to debugged thread
-                { call-in [ nip keep-running ] }
+                { call-in [ keep-running ] }
                 ! Pass previous continuation to debugged thread
                 { step-back [ step-back-msg ] }
             } case f
         ] handle-synchronous
-    ] [ ] while ;
+    ] while ;
 
 : walker-loop ( -- )
     +running+ set-status
@@ -256,7 +256,7 @@ SYMBOL: +stopped+
                 [ walker-suspended ]
             } case
         ] handle-synchronous
-    ] [ ] until ;
+    ] until ;
 
 : associate-thread ( walker -- )
     walker-thread tset

@@ -2,7 +2,7 @@ USING: windows.dinput windows.dinput.constants parser
 alien.c-types windows.ole32 namespaces assocs kernel arrays
 vectors windows.kernel32 windows.com windows.dinput shuffle
 windows.user32 windows.messages sequences combinators locals
-math.geometry.rect ui.windows accessors math windows alien
+math.rectangles ui.windows accessors math windows alien
 alien.strings io.encodings.utf16 io.encodings.utf16n
 continuations byte-arrays game-input.dinput.keys-array
 game-input ;
@@ -235,11 +235,11 @@ M: dinput-game-input-backend instance-id
         succeeded-quot call
     ] failed-quot if ; inline
 
-: pov-values
+CONSTANT: pov-values
     {
         pov-up pov-up-right pov-right pov-down-right
         pov-down pov-down-left pov-left pov-up-left
-    } ; inline
+    }
 
 : >axis ( long -- float )
     32767 - 32767.0 /f ;

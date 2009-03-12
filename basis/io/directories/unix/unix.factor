@@ -61,5 +61,5 @@ M: unix (directory-entries) ( path -- seq )
     [
         '[ _ find-next-file dup ]
         [ >directory-entry ]
-        [ drop ] produce
+        produce nip
     ] with-unix-directory ;

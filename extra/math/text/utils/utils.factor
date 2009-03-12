@@ -4,4 +4,4 @@ USING: kernel math sequences ;
 IN: math.text.utils
 
 : 3digit-groups ( n -- seq )
-    [ dup 0 > ] [ 1000 /mod ] [ ] produce nip ;
+    [ dup 0 > ] [ 1000 /mod ] produce nip ;

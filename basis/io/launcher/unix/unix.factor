@@ -97,7 +97,7 @@ TUPLE: signal n ;
     dup WIFEXITED [ WEXITSTATUS ] [ WTERMSIG signal boa ] if ;
 
 M: unix wait-for-processes ( -- ? )
-    -1 0 <int> tuck WNOHANG waitpid
+    0 <int> -1 over WNOHANG waitpid
     dup 0 <= [
         2drop t
     ] [

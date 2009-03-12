@@ -1,4 +1,4 @@
-USING: descriptive kernel math tools.test continuations prettyprint io.streams.string ;
+USING: descriptive kernel math tools.test continuations prettyprint io.streams.string see ;
 IN: descriptive.tests
 
 DESCRIPTIVE: divide ( num denom -- fraction ) / ;

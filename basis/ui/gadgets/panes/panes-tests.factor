@@ -2,7 +2,7 @@ USING: alien ui.gadgets.panes ui.gadgets namespaces
 kernel sequences io io.styles io.streams.string tools.test
 prettyprint definitions help help.syntax help.markup
 help.stylesheet splitting tools.test.ui models math summary
-inspector accessors ;
+inspector accessors help.topics see ;
 IN: ui.gadgets.panes.tests
 
 : #children "pane" get children>> length ;
@@ -17,9 +17,9 @@ IN: ui.gadgets.panes.tests
 
 [ t ] [ #children "num-children" get = ] unit-test
 
-: test-gadget-text
+: test-gadget-text ( quot -- ? )
     dup make-pane gadget-text dup print "======" print
-    swap with-string-writer dup print "\n" ?tail drop "\n" ?tail drop = ;
+    swap with-string-writer dup print = ;
 
 [ t ] [ [ "hello" write ] test-gadget-text ] unit-test
 [ t ] [ [ "hello" pprint ] test-gadget-text ] unit-test
@@ -79,6 +79,36 @@ IN: ui.gadgets.panes.tests
     ] test-gadget-text
 ] unit-test
 
+[ t ] [
+    [
+        last-element off
+        \ = >link $title
+        "Hello world" print-content
+    ] test-gadget-text
+] unit-test
+
+[ t ] [
+    [
+        last-element off
+        \ = >link title-style get [
+            $navigation-table
+        ] with-nesting
+        "Hello world" print-content
+    ] test-gadget-text
+] unit-test
+
+[ t ] [
+    [ { { "a\n" } } simple-table. ] test-gadget-text
+] unit-test
+
+[ t ] [
+    [ { { "a" } } simple-table. "x" write ] test-gadget-text
+] unit-test
+
+[ t ] [
+    [ H{ } [ { { "a" } } simple-table. ] with-nesting "x" write ] test-gadget-text
+] unit-test
+
 ARTICLE: "test-article-1" "This is a test article"
 "Hello world, how are you today." ;
 
@@ -98,3 +128,9 @@ ARTICLE: "test-article-2" "This is a test article"
 [ ] [
     \ = <model> [ see ] <pane-control> [ ] with-grafted-gadget
 ] unit-test
+
+: <test-pane> ( -- foo )
+    <gadget> pane new-pane ;
+
+[ t ] [ <test-pane> dup input>> child? ] unit-test
+[ t ] [ <test-pane> dup last-line>> child? ] unit-test

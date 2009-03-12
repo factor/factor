@@ -5,7 +5,7 @@ io.streams.string math help help.markup accessors ;
 
 : my-pprint pprint ;
 
-[ drop t ] \ my-pprint [ ] [ ] f operation boa "op" set
+[ drop t ] \ my-pprint [ ] f operation boa "op" set
 
 [ [ 3 my-pprint ] ] [
     3 "op" get command>> command-quot
@@ -13,7 +13,7 @@ io.streams.string math help help.markup accessors ;
 
 [ "3" ] [ [ 3 "op" get invoke-command ] with-string-writer ] unit-test
 
-[ drop t ] \ my-pprint [ ] [ editor-string ] f operation boa
+[ drop t ] \ my-pprint [ editor-string ] f operation boa
 "op" set
 
 [ "\"4\"" ] [
@@ -26,3 +26,5 @@ io.streams.string math help help.markup accessors ;
 [ ] [
     [ { $operations \ + } print-element ] with-string-writer drop
 ] unit-test
+
+\ object-operations must-infer

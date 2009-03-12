@@ -87,9 +87,9 @@ unless
     if ;
 
 : (thunked-quots) ( quots iunknown-methods thunk -- {thunk,quot}s )
-    [ '[ _ '[ @ com-unwrap ] [ swap 2array ] curry map ] ]
-    [ '[ _                   [ swap 2array ] curry map ] ] bi bi*
-    swap append ;
+    [ '[ @ com-unwrap ] [ swap 2array ] curry map ]
+    [                   [ swap 2array ] curry map ] bi-curry bi*
+    prepend ;
 
 : compile-alien-callback ( word return parameters abi quot -- word )
     '[ _ _ _ _ alien-callback ]

@@ -77,7 +77,7 @@ M: integer user-groups ( id -- seq )
     user-name (user-groups) ;
     
 : all-groups ( -- seq )
-    [ getgrent dup ] [ group-struct>group ] [ drop ] produce ;
+    [ getgrent dup ] [ group-struct>group ] produce nip ;
 
 : <group-cache> ( -- assoc )
     all-groups [ [ id>> ] keep ] H{ } map>assoc ;

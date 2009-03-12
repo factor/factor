@@ -1,14 +1,15 @@
 USING: accessors ui.gadgets.editors tools.test kernel io
 io.streams.plain definitions namespaces ui.gadgets
 ui.gadgets.grids prettyprint documents ui.gestures tools.test.ui
-models ;
+models documents.elements ui.gadgets.scrollers ui.gadgets.line-support
+sequences ;
 IN: ui.gadgets.editors.tests
 
 [ "foo bar" ] [
     <editor> "editor" set
     "editor" get [
         "foo bar" "editor" get set-editor-string
-        "editor" get T{ one-line-elt } select-elt
+        "editor" get one-line-elt select-elt
         "editor" get gadget-selection
     ] with-grafted-gadget
 ] unit-test
@@ -17,7 +18,7 @@ IN: ui.gadgets.editors.tests
     <editor> "editor" set
     "editor" get [
         "foo bar\nbaz quux" "editor" get set-editor-string
-        "editor" get T{ one-line-elt } select-elt
+        "editor" get one-line-elt select-elt
         "editor" get gadget-selection
     ] with-grafted-gadget
 ] unit-test
@@ -43,8 +44,25 @@ IN: ui.gadgets.editors.tests
 
 \ <editor> must-infer
 
-"hello" <model> <field> "field" set
+"hello" <model> <model-field> "field" set
 
 "field" get [
     [ "hello" ] [ "field" get field-model>> value>> ] unit-test
 ] with-grafted-gadget
+
+[ "Hello world." ] [ "Hello    \n    world." join-lines ] unit-test
+[ "  Hello world.  " ] [ "  Hello    \n    world.  " join-lines ] unit-test
+[ "  Hello world. Goodbye." ] [ "  Hello    \n    world.  \n  Goodbye." join-lines ] unit-test
+
+[ ] [ <editor> com-join-lines ] unit-test
+[ ] [ <editor> "A" over set-editor-string com-join-lines ] unit-test
+[ "A B" ] [ <editor> "A\nB" over set-editor-string [ com-join-lines ] [ editor-string ] bi ] unit-test
+
+[ 2 ] [ <editor> 20 >>min-rows 20 >>min-cols pref-viewport-dim length ] unit-test
+
+[ 20 ] [
+    <editor> 20 >>min-rows 20 >>min-cols
+    dup pref-viewport-dim >>dim
+    visible-lines
+] unit-test
+

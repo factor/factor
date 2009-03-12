@@ -42,9 +42,11 @@ IN: x11.windows
 : auto-position ( window loc -- )
     { 0 0 } = [ drop ] [ set-size-hints ] if ;
 
+: >xy ( pair -- x y ) first2 [ >integer ] bi@ ;
+
 : create-window ( loc dim visinfo -- window )
     pick [
-        [ [ [ dpy get root get ] dip first2 ] dip { 1 1 } vmax first2 0 ] dip
+        [ [ [ dpy get root get ] dip >xy ] dip { 1 1 } vmax >xy 0 ] dip
         [ XVisualInfo-depth InputOutput ] keep
         [ XVisualInfo-visual create-window-mask ] keep
         window-attributes XCreateWindow

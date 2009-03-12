@@ -29,12 +29,12 @@ ERROR: :>-outside-lambda-error ;
 M: :>-outside-lambda-error summary
     drop ":> cannot be used outside of lambda expressions" ;
 
-ERROR: bad-lambda-rewrite output ;
-
-M: bad-lambda-rewrite summary
-    drop "You have found a bug in locals. Please report." ;
-
 ERROR: bad-local args obj ;
 
 M: bad-local summary
-    drop "You have bound a bug in locals. Please report." ;
+    drop "You have found a bug in locals. Please report." ;
+
+ERROR: bad-rewrite args obj ;
+
+M: bad-rewrite summary
+    drop "You have found a bug in locals. Please report." ;

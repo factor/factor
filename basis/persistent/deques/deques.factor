@@ -67,4 +67,4 @@ PRIVATE>
     <deque> [ push-back ] reduce ;
 
 : deque>sequence ( deque -- sequence )
-    [ dup deque-empty? not ] [ pop-front swap ] [ ] produce nip ;
+    [ dup deque-empty? not ] [ pop-front swap ] produce nip ;

@@ -1,5 +1,6 @@
 USING: help.markup help.syntax opengl kernel strings
-       classes.tuple classes quotations models math.geometry.rect ;
+classes.tuple classes quotations models math.rectangles
+ui.gadgets.private accessors ;
 IN: ui.gadgets
 
 HELP: gadget-child
@@ -29,9 +30,9 @@ HELP: user-input*
 { $contract "Handle free-form textual input while the gadget has keyboard focus." } ;
 
 HELP: children-on
-{ $values { "rect/point" "a " { $link rect } " or a pair of integers" } { "gadget" gadget } { "seq" "a sequence of gadgets" } }
-{ $contract "Outputs a sequence of gadgets which potentially intersect a rectangle or contain a point in the co-ordinate system of the gadget." }
-{ $notes "This does not have to be an accurate intersection test, and simply returning " { $snippet "children" } " is a valid implementation. However, an accurate intersection test reduces the amount of work done when drawing this gadget if it is partially clipped and not all children are visible." } ;
+{ $values { "rect" rect } { "gadget" gadget } { "seq" "a sequence of gadgets" } }
+{ $contract "Outputs a sequence of gadgets which potentially intersect a rectangle in the co-ordinate system of the gadget." }
+{ $notes "This does not have to be an accurate intersection test, and simply returning " { $link children>> } " is a valid implementation. However, an accurate intersection test reduces the amount of work done when drawing this gadget if it is partially clipped and not all children are visible." } ;
 
 HELP: pick-up
 { $values { "point" "a pair of integers" } { "gadget" gadget } { "child/f" { $maybe gadget } } }

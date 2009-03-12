@@ -37,9 +37,7 @@ SYMBOL: literals
 : current-stack-height ( -- n ) meta-d length d-in get - ;
 
 : current-effect ( -- effect )
-    d-in get
-    meta-d length <effect>
-    terminated? get >>terminated? ;
+    d-in get meta-d length terminated? get effect boa ;
 
 : init-inference ( -- )
     terminated? off
