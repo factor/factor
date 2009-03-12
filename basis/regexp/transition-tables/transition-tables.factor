@@ -47,3 +47,15 @@ TUPLE: transition-table transitions start-state final-states ;
     [ '[ _ condition-at ] change-start-state ]
     [ '[ [ _ at ] map-set ] change-final-states ]
     [ '[ _ number-transitions ] change-transitions ] tri ;
+
+: expand-one-or ( or-class transition -- alist )
+    [ seq>> ] dip '[ _ 2array ] map ;
+
+: expand-or ( state-transitions -- new-transitions )
+    >alist [
+        first2 over or-class?
+        [ expand-one-or ] [ 2array 1array ] if
+    ] map concat >hashtable ;
+
+: expand-ors ( transition-table -- transition-table )
+    [ [ expand-or ] assoc-map ] change-transitions ;

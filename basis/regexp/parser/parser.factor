@@ -56,6 +56,8 @@ ERROR: bad-class name ;
         { CHAR: z [ end-of-input <tagged-epsilon> ] }
         { CHAR: Z [ end-of-file <tagged-epsilon> ] }
         { CHAR: A [ beginning-of-input <tagged-epsilon> ] }
+        { CHAR: b [ word-break <tagged-epsilon> ] }
+        { CHAR: B [ word-break <not-class> <tagged-epsilon> ] }
         [ ]
     } case ;
 
@@ -138,10 +140,10 @@ Parenthized = "?:" Alternation:a => [[ a ]]
                 => [[ a on off parse-options <with-options> ]]
             | "?#" [^)]* => [[ f ]]
             | "?~" Alternation:a => [[ a <negation> ]]
-            | "?=" Alternation:a => [[ a t <lookahead> <tagged-epsilon> ]]
-            | "?!" Alternation:a => [[ a f <lookahead> <tagged-epsilon> ]]
-            | "?<=" Alternation:a => [[ a t <lookbehind> <tagged-epsilon> ]]
-            | "?<!" Alternation:a => [[ a f <lookbehind> <tagged-epsilon> ]]
+            | "?=" Alternation:a => [[ a <lookahead> <tagged-epsilon> ]]
+            | "?!" Alternation:a => [[ a <lookahead> <not-class> <tagged-epsilon> ]]
+            | "?<=" Alternation:a => [[ a <lookbehind> <tagged-epsilon> ]]
+            | "?<!" Alternation:a => [[ a <lookbehind> <not-class> <tagged-epsilon> ]]
             | Alternation
 
 Element = "(" Parenthized:p ")" => [[ p ]]

@@ -6,7 +6,7 @@ IN: regexp.classes.tests
 ! Class algebra
 
 [ f ] [ { 1 2 } <and-class> ] unit-test
-[ T{ or-class f { 2 1 } } ] [ { 1 2 } <or-class> ] unit-test
+[ T{ or-class f { 1 2 } } ] [ { 1 2 } <or-class> ] unit-test
 [ 3 ] [ { 1 2 } <and-class> 3 2array <or-class> ] unit-test
 [ CHAR: A ] [ CHAR: A LETTER-class <primitive-class> 2array <and-class> ] unit-test
 [ CHAR: A ] [ LETTER-class <primitive-class> CHAR: A 2array <and-class> ] unit-test
@@ -26,11 +26,13 @@ IN: regexp.classes.tests
 [ t ] [ { t t } <or-class> ] unit-test
 [ T{ primitive-class { class letter-class } } ] [ letter-class <primitive-class> dup 2array <and-class> ] unit-test
 [ T{ primitive-class { class letter-class } } ] [ letter-class <primitive-class> dup 2array <or-class> ] unit-test
-[ T{ or-class { seq { 2 3 1 } } } ] [ { 1 2 } <or-class> { 2 3 } <or-class> 2array <or-class> ] unit-test
-[ T{ or-class { seq { 3 2 } } } ] [ { 2 3 } <or-class> 1 <not-class> 2array <and-class> ] unit-test
+[ T{ or-class { seq { 1 2 3 } } } ] [ { 1 2 } <or-class> { 2 3 } <or-class> 2array <or-class> ] unit-test
+[ T{ or-class { seq { 2 3 } } } ] [ { 2 3 } <or-class> 1 <not-class> 2array <and-class> ] unit-test
 [ f ] [ t <not-class> ] unit-test
 [ t ] [ f <not-class> ] unit-test
 [ f ] [ 1 <not-class> 1 t answer ] unit-test
+[ t ] [ { 1 2 } <or-class> <not-class> 1 2 3array <or-class> ] unit-test
+[ f ] [ { 1 2 } <and-class> <not-class> 1 2 3array <and-class> ] unit-test
 
 ! Making classes into nested conditionals
 
