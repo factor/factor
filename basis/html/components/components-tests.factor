@@ -4,6 +4,8 @@ io.streams.null accessors inspector html.streams
 html.components html.forms namespaces
 xml.writer ;
 
+\ render must-infer
+
 [ ] [ begin-form ] unit-test
 
 [ ] [ 3 "hi" set-value ] unit-test

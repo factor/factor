@@ -1,7 +1,7 @@
 USING: delegate kernel arrays tools.test words math definitions
 compiler.units parser generic prettyprint io.streams.string
 accessors eval multiline generic.standard delegate.protocols
-delegate.private assocs ;
+delegate.private assocs see ;
 IN: delegate.tests
 
 TUPLE: hello this that ;

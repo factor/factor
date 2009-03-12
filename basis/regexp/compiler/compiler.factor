@@ -3,7 +3,7 @@
 USING: regexp.classes kernel sequences regexp.negation
 quotations assocs fry math locals combinators
 accessors words compiler.units kernel.private strings
-sequences.private arrays call namespaces
+sequences.private arrays call namespaces unicode.breaks
 regexp.transition-tables combinators.short-circuit ;
 IN: regexp.compiler
 
@@ -15,6 +15,10 @@ SYMBOL: backwards?
 <PRIVATE
 
 M: t question>quot drop [ 2drop t ] ;
+M: f question>quot drop [ 2drop f ] ;
+
+M: not-class question>quot
+    class>> question>quot [ not ] compose ;
 
 M: beginning-of-input question>quot
     drop [ drop zero? ] ;
@@ -35,6 +39,9 @@ M: $ question>quot
 
 M: ^ question>quot
     drop [ { [ drop zero? ] [ [ 1- ] dip ?nth "\r\n" member? ] } 2|| ] ;
+
+M: word-break question>quot
+    drop [ word-break-at? ] ;
 
 : (execution-quot) ( next-state -- quot )
     ! The conditions here are for lookaround and anchors, etc
@@ -70,17 +77,8 @@ C: <box> box
 : literals>cases ( literal-transitions -- case-body )
     [ execution-quot ] assoc-map ;
 
-: expand-one-or ( or-class transition -- alist )
-    [ seq>> ] dip '[ _ 2array ] map ;
-
-: expand-or ( alist -- new-alist )
-    [
-        first2 over or-class?
-        [ expand-one-or ] [ 2array 1array ] if
-    ] map concat ;
-
 : split-literals ( transitions -- case default )
-    >alist expand-or [ first integer? ] partition
+    { } assoc-like [ first integer? ] partition
     [ [ literals>cases ] keep ] dip non-literals>dispatch ;
 
 :: step ( last-match index str quot final? direction -- last-index/f )

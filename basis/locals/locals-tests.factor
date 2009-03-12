@@ -2,7 +2,7 @@ USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
 accessors generic eval combinators combinators.short-circuit
 combinators.short-circuit.smart math.order math.functions
-definitions compiler.units fry lexer words.symbol ;
+definitions compiler.units fry lexer words.symbol see ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
