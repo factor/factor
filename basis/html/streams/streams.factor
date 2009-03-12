@@ -75,7 +75,7 @@ MACRO: make-css ( pairs -- str )
     {
         { foreground fg-css, }
         { background bg-css, }
-        { font font-css, }
+        { font-name font-css, }
         { font-style style-css, }
         { font-size size-css, }
     } make-css ;

@@ -1,4 +1,5 @@
 IN: tools.vocabs.browser.tests
-USING: tools.vocabs.browser tools.test help.markup ;
+USING: tools.vocabs.browser tools.test help.markup help vocabs ;
 
-[ ] [ { $describe-vocab "scratchpad" } print-content ] unit-test
+[ ] [ { $vocab "scratchpad" } print-content ] unit-test
+[ ] [ "classes" vocab print-topic ] unit-test

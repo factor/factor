@@ -41,7 +41,7 @@ M: fixnum bitnot fixnum-bitnot ;
 M: fixnum bit? neg shift 1 bitand 0 > ;
 
 : fixnum-log2 ( x -- n )
-    0 swap [ dup 1 eq? ] [ [ 1+ ] [ 2/ ] bi* ] [ ] until drop ;
+    0 swap [ dup 1 eq? ] [ [ 1+ ] [ 2/ ] bi* ] until drop ;
 
 M: fixnum (log2) fixnum-log2 ;
 
@@ -93,7 +93,7 @@ M: bignum (log2) bignum-log2 ;
 
 : pre-scale ( num den -- scale shifted-num scaled-den )
     2dup [ log2 ] bi@ -
-    tuck [ neg 54 + shift ] [ [ scale-denonimator ] dip + ] 2bi*
+    [ neg 54 + shift ] [ [ scale-denonimator ] dip + ] bi-curry bi*
     -rot ; inline
 
 ! Second step: loop
@@ -103,7 +103,7 @@ M: bignum (log2) bignum-log2 ;
 : /f-loop ( scale mantissa den -- scale' fraction-and-guard rem )
     [ 2dup /i log2 53 > ]
     [ [ shift-mantissa ] dip ]
-    [ ] while /mod ; inline
+    while /mod ; inline
 
 ! Third step: post-scaling
 : unscaled-float ( mantissa -- n )

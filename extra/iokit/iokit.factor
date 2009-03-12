@@ -1,6 +1,6 @@
 USING: alien.syntax alien.c-types core-foundation
-core-foundation.bundles system combinators kernel sequences
-debugger io accessors ;
+core-foundation.bundles core-foundation.dictionaries system
+combinators kernel sequences debugger io accessors ;
 IN: iokit
 
 <<
@@ -166,9 +166,7 @@ M: mach-error error.
     IOObjectRelease mach-error ;
 
 : io-objects-from-iterator* ( i -- i array )
-    [ dup IOIteratorNext dup MACH_PORT_NULL = not ]
-    [ ]
-    [ drop ] produce ;
+    [ dup IOIteratorNext dup MACH_PORT_NULL = not ] [ ] produce nip ;
 
 : io-objects-from-iterator ( i -- array )
     io-objects-from-iterator* [ release-io-object ] dip ;

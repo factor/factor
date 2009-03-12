@@ -40,21 +40,20 @@ IN: tools.memory
     "Decks" write-total
     "Cards" write-total ;
 
-: write-labelled-size ( n string -- )
+: write-labeled-size ( n string -- )
     [ write-cell write-size ] with-row ;
 
 : (code-room.) ( -- )
     code-room {
-        [ "Size:" write-labelled-size ]
-        [ "Used:" write-labelled-size ]
-        [ "Total free space:" write-labelled-size ]
-        [ "Largest free block:" write-labelled-size ]
+        [ "Size:" write-labeled-size ]
+        [ "Used:" write-labeled-size ]
+        [ "Total free space:" write-labeled-size ]
+        [ "Largest free block:" write-labeled-size ]
     } spread ;
 
 : heap-stat-step ( obj counts sizes -- )
-    [ over ] dip
     [ [ class ] dip inc-at ]
-    [ [ [ size ] [ class ] bi ] dip at+ ] 2bi* ;
+    [ [ [ size ] [ class ] bi ] dip at+ ] bi-curry* bi ;
 
 PRIVATE>
 
@@ -64,15 +63,16 @@ PRIVATE>
         { "" "Total" "Used" "Free" } write-headings
         (data-room.)
     ] tabular-output
-    nl
+    nl nl
     "==== CODE HEAP" print
     standard-table-style [
         (code-room.)
-    ] tabular-output ;
+    ] tabular-output
+    nl ;
 
 : heap-stats ( -- counts sizes )
-    H{ } clone H{ } clone
-    2dup '[ _ _ heap-stat-step ] each-object ;
+    [ ] instances H{ } clone H{ } clone
+    [ '[ _ _ heap-stat-step ] each ] 2keep ;
 
 : heap-stats. ( -- )
     heap-stats dup keys natural-sort standard-table-style [
@@ -84,4 +84,4 @@ PRIVATE>
                 pick at pprint-cell
             ] with-row
         ] each 2drop
-    ] tabular-output ;
+    ] tabular-output nl ;

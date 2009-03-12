@@ -5,6 +5,6 @@ IN: io.directories.search.tests
 [ t ] [
     [
         10 [ "io.paths.test" "gogogo" make-unique-file ] replicate
-        current-temporary-directory get t [ ] find-all-files
+        current-temporary-directory get [ ] find-all-files
     ] with-unique-directory drop [ natural-sort ] bi@ =
 ] unit-test

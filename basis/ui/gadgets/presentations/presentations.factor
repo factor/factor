@@ -1,9 +1,8 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays accessors definitions hashtables io kernel
-sequences strings io.styles words help math models
-namespaces quotations
-ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+USING: arrays accessors definitions hashtables io kernel sequences
+strings words help math models namespaces quotations ui.gadgets
+ui.gadgets.borders ui.gadgets.buttons ui.gadgets.buttons.private
 ui.gadgets.labels ui.gadgets.menus ui.gadgets.worlds
 ui.gadgets.status-bar ui.commands ui.operations ui.gestures ;
 IN: ui.gadgets.presentations
@@ -35,17 +34,17 @@ M: presentation ungraft*
     dup hand-gadget get-global child? [ dup hide-status ] when
     call-next-method ;
 
-: show-operations-menu ( presentation -- )
+: show-presentation-menu ( presentation -- )
     [ ] [ object>> ] [ dup hook>> curry ] tri
-    <operations-menu> show-menu ;
+    show-operations-menu ;
 
 presentation H{
-    { T{ button-down f f 3 } [ show-operations-menu ] }
-    { T{ mouse-leave } [ [ hide-status ] [ button-update ] bi ] }
-    { T{ mouse-enter } [ show-mouse-help ] }
+    { T{ button-down f f 3 } [ show-presentation-menu ] }
+    { mouse-leave [ [ hide-status ] [ button-update ] bi ] }
+    { mouse-enter [ show-mouse-help ] }
     ! Responding to motion too allows nested presentations to
     ! display status help properly, when the mouse leaves a
     ! nested presentation and is still inside the parent, the
     ! parent doesn't receive a mouse-enter
-    { T{ motion } [ show-mouse-help ] }
+    { motion [ show-mouse-help ] }
 } set-gestures

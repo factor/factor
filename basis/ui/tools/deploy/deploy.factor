@@ -1,17 +1,18 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.gadgets colors kernel ui.render namespaces models
-models.mapping sequences ui.gadgets.buttons ui.gadgets.packs
-ui.gadgets.labels tools.deploy.config tools.deploy.config.editor
-namespaces ui.gadgets.editors ui.gadgets.borders ui.gestures
+USING: colors kernel namespaces models tools.deploy.config
+tools.deploy.config.editor tools.deploy vocabs
+namespaces models.mapping sequences system accessors fry
+ui.gadgets ui.render ui.gadgets.buttons ui.gadgets.packs
+ui.gadgets.labels ui.gadgets.editors ui.gadgets.borders ui.gestures
 ui.commands assocs ui.gadgets.tracks ui ui.tools.listener
-tools.deploy vocabs ui.tools.workspace system accessors fry ;
+ui.tools.browser ;
 IN: ui.tools.deploy
 
 TUPLE: deploy-gadget < pack vocab settings ;
 
 : bundle-name ( parent -- parent )
-    deploy-name get <field>
+    deploy-name get <model-field>
     "Executable name:" label-on-left add-gadget ;
 
 : deploy-ui ( parent -- parent )
@@ -76,12 +77,13 @@ TUPLE: deploy-gadget < pack vocab settings ;
     swap find-deploy-vocab set-deploy-config ;
 
 : com-deploy ( gadget -- )
-    dup com-save
-    dup find-deploy-vocab '[ _ deploy ] call-listener
-    close-window ;
+    [ com-save ]
+    [ find-deploy-vocab '[ _ deploy ] \ deploy call-listener ]
+    [ close-window ]
+    tri ;
 
 : com-help ( -- )
-    "ui.tools.deploy" help-window ;
+    "ui.tools.deploy" com-browse ;
 
 \ com-help H{
     { +nullary+ t }
@@ -102,17 +104,17 @@ deploy-gadget "toolbar" f {
 } define-command-map
 
 : <deploy-gadget> ( vocab -- gadget )
-    deploy-gadget new-gadget
-      over                           >>vocab
-      { 0 1 }                        >>orientation
-      swap <deploy-settings>         >>settings    
-      dup settings>>                 add-gadget
-      dup <toolbar> { 10 10 } >>gap  add-gadget
+    deploy-gadget new
+      over >>vocab
+      vertical >>orientation
+      swap <deploy-settings> >>settings
+      dup settings>> add-gadget
+      dup <toolbar> { 10 10 } >>gap add-gadget
     deploy-settings-theme
     dup com-revert ;
     
 : deploy-tool ( vocab -- )
     vocab-name
-    [ <deploy-gadget> 10 <border> ]
-    [ "Deploying \"" "\"" surround ] bi
+    [ <deploy-gadget> { 10 10 } <border> ]
+    [ "Deploying “" "”" surround ] bi
     open-window ;

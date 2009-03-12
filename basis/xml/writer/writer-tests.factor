@@ -15,10 +15,10 @@ IN: xml.writer.tests
 [ "ns:foo" ] [ T{ name { space "ns" } { main "foo" } } name>string ] unit-test
 
 : reprints-as ( to from -- )
-     [ '[ _ ] ] [ '[ _ string>xml xml>string ] ] bi* unit-test ;
+     [ ] [ string>xml xml>string ] bi-curry* unit-test ;
 
 : pprint-reprints-as ( to from -- )
-     [ '[ _ ] ] [ '[ _ string>xml pprint-xml>string ] ] bi* unit-test ;
+     [ ] [ string>xml pprint-xml>string ] bi-curry* unit-test ;
 
 : reprints-same ( string -- ) dup reprints-as ;
 

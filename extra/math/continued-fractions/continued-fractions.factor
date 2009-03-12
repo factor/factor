@@ -1,0 +1,24 @@
+! Copyright (C) 2009 Samuel Tardieu.
+! See http://factorcode.org/license.txt for BSD license.
+USING: kernel math math.functions sequences vectors ;
+IN: math.continued-fractions
+
+<PRIVATE
+
+: split-float ( f -- d i ) dup >integer [ - ] keep ;
+
+: closest ( seq -- newseq ) unclip-last round >integer suffix ;
+
+PRIVATE>
+
+: next-approx ( seq -- )
+    dup [ pop split-float ] [ push ] bi
+    dup zero? [ 2drop ] [ recip swap push ] if ;
+
+: >ratio ( seq -- a/b )
+    closest reverse unclip-slice [ swap recip + ] reduce ;
+
+: approx ( epsilon float -- a/b )
+    dup 1vector
+    [ 3dup >ratio - abs < ] [ dup next-approx ] while
+    2nip >ratio ;

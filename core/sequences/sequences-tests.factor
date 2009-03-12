@@ -1,5 +1,5 @@
 USING: arrays kernel math namespaces sequences kernel.private
-sequences.private strings sbufs tools.test vectors
+sequences.private strings sbufs tools.test vectors assocs
 generic vocabs.loader ;
 IN: sequences.tests
 
@@ -17,8 +17,8 @@ IN: sequences.tests
 
 [ 5040 ] [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
 
-[ 5040 [ 1 1 2 6 24 120 720 ] ]
-[ [ 1 2 3 4 5 6 7 ] 1 [ * ] accumulate ] unit-test
+[ 5040 { 1 1 2 6 24 120 720 } ]
+[ { 1 2 3 4 5 6 7 } 1 [ * ] accumulate ] unit-test
 
 [ f f ] [ [ ] [ ] find ] unit-test
 [ 0 1 ] [ [ 1 ] [ ] find ] unit-test
@@ -134,28 +134,28 @@ unit-test
 
 [ V{ } ] [ 6 >vector 0 6 pick delete-slice ] unit-test
 
-[ V{ 1 2 "a" "b" 5 6 7 } ] [
-    { "a" "b" } 2 4 V{ 1 2 3 4 5 6 7 } clone
-    [ replace-slice ] keep
+[ { 1 2 "a" "b" 5 6 7 } ] [
+    { "a" "b" } 2 4 { 1 2 3 4 5 6 7 }
+    replace-slice
 ] unit-test
 
-[ V{ 1 2 "a" "b" 6 7 } ] [
-    { "a" "b" } 2 5 V{ 1 2 3 4 5 6 7 } clone
-    [ replace-slice ] keep
+[ { 1 2 "a" "b" 6 7 } ] [
+    { "a" "b" } 2 5 { 1 2 3 4 5 6 7 }
+    replace-slice
 ] unit-test
 
-[ V{ 1 2 "a" "b" 4 5 6 7 } ] [
-    { "a" "b" } 2 3 V{ 1 2 3 4 5 6 7 } clone
-    [ replace-slice ] keep
+[ { 1 2 "a" "b" 4 5 6 7 } ] [
+    { "a" "b" } 2 3 { 1 2 3 4 5 6 7 }
+    replace-slice
 ] unit-test
 
-[ V{ 1 2 3 4 5 6 7 "a" "b" } ] [
-    { "a" "b" } 7 7 V{ 1 2 3 4 5 6 7 } clone
-    [ replace-slice ] keep
+[ { 1 2 3 4 5 6 7 "a" "b" } ] [
+    { "a" "b" } 7 7 { 1 2 3 4 5 6 7 }
+    replace-slice
 ] unit-test
 
-[ V{ "a" 3 } ] [
-    { "a" } 0 2 V{ 1 2 3 } clone [ replace-slice ] keep
+[ { "a" 3 } ] [
+    { "a" } 0 2 { 1 2 3 } replace-slice
 ] unit-test
 
 [ { 1 4 9 } ] [ { 1 2 3 } clone dup [ sq ] change-each ] unit-test
@@ -165,7 +165,7 @@ unit-test
 [ 5 ] [ 1 >bignum "\u000001\u000005\u000007" nth-unsafe ] unit-test
 
 [ SBUF" before&after" ] [
-    "&" 6 11 SBUF" before and after" [ replace-slice ] keep
+    "&" 6 11 SBUF" before and after" replace-slice
 ] unit-test
 
 [ 3 "a" ] [ { "a" "b" "c" "a" "d" } [ "a" = ] find-last ] unit-test
@@ -274,3 +274,11 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 [ "asdf" iota ] must-fail
 [ T{ iota { n 10 } } ] [ 10 iota ] unit-test
 [ 0 ] [ 10 iota first ] unit-test
+
+[ "hi" 3 ] [
+    { 1 2 3 4 5 6 7 8 } [ H{ { 3 "hi" } } at ] map-find
+] unit-test
+
+[ f f ] [
+    { 1 2 3 4 5 6 7 8 } [ H{ { 11 "hi" } } at ] map-find
+] unit-test

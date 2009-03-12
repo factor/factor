@@ -1,45 +1,25 @@
-USING: help.syntax help.markup ui.gadgets kernel arrays
+USING: help.syntax help.markup ui.gadgets kernel arrays math help sequences
 quotations classes.tuple ui.gadgets.grids ;
 IN: ui.gadgets.frames
 
 ARTICLE: "ui-frame-layout" "Frame layouts"
-"Frames resemble " { $link "ui-grid-layout" } " except the size of grid is fixed at 3x3, and the center gadget fills up any available space. Because frames inherit from grids, grid layout words can be used to add and remove children."
+"Frames extend " { $link "ui-grid-layout" } " with the ability to give all remaining space to a distinguished filled cell."
+$nl
+"The filled cell's column/row pair is stored in the frame gadget's " { $slot "filled-cell" } " slot. If the actual dimensions of a frame exceed it preferred dimensions, then the fill slot is resized appropriately, together with its row and column."
+$nl
+"Because frames inherit from grids, grid layout words can be used to add and remove children."
 { $subsection frame }
 "Creating empty frames:"
-{ $subsection <frame> }
-"A set of mnemonic words for the positions on a frame's 3x3 grid; these words push values which may be passed to " { $link grid-add } ":"
-{ $subsection @center }
-{ $subsection @left }
-{ $subsection @right }
-{ $subsection @top }
-{ $subsection @bottom }
-{ $subsection @top-left }
-{ $subsection @top-right }
-{ $subsection @bottom-left }
-{ $subsection @bottom-right } ;
-
-: $ui-frame-constant ( element -- )
-    drop
-    { $description "Symbolic constant for a common input to " { $link grid-add } "." } print-element ;
-
-HELP: @center $ui-frame-constant ;
-HELP: @left $ui-frame-constant ;
-HELP: @right $ui-frame-constant ;
-HELP: @top $ui-frame-constant ;
-HELP: @bottom $ui-frame-constant ;
-HELP: @top-left $ui-frame-constant ;
-HELP: @top-right $ui-frame-constant ;
-HELP: @bottom-left $ui-frame-constant ;
-HELP: @bottom-right $ui-frame-constant ;
+{ $subsection <frame> } ;
 
 HELP: frame
-{ $class-description "A frame is a gadget which lays out its children in a 3x3 grid. If the frame is enlarged past its preferred size, the center gadget fills up available room."
+{ $class-description "A frame is a gadget which lays out its children in a grid, and assigns all remaining space to a distinguished filled cell. The " { $slot "filled-cell" } " slot stores a pair with shape " { $snippet "{ col row }" } "."
 $nl
 "Frames are constructed by calling " { $link <frame> } " and since they inherit from " { $link grid } ", children can be managed with " { $link grid-add } " and " { $link grid-remove } "." } ;
 
 HELP: <frame>
-{ $values { "frame" frame } }
-{ $description "Creates a new " { $link frame } " for laying out gadgets in a 3x3 grid." } ;
+{ $values { "cols" integer } { "rows" integer } { "frame" frame } }
+{ $description "Creates a new " { $link frame } " for laying out gadgets in a grid." } ;
 
 { grid frame } related-words
 

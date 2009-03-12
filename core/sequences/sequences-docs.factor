@@ -397,6 +397,10 @@ HELP: find-last-from
 { $values { "n" "a starting index" } { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "i" "the index of the first match, or f" } { "elt" "the first matching element, or " { $link f } } }
 { $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of f and " { $link f } " as the element." } ;
 
+HELP: map-find
+{ $values { "seq" sequence } { "quot" { $quotation "( elt -- result/f )" } } { "result" "the first non-false result of the quotation" } { "elt" "the first matching element, or " { $link f } } }
+{ $description "Applies the quotation to each element of the sequence, until the quotation outputs a true value. If the quotation ever yields a result which is not " { $link f } ", then the value is output, along with the element of the sequence which yielded this." } ;
+
 HELP: any?
 { $values { "seq" sequence } { "quot" { $quotation "( elt -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if the sequence contains an element satisfying the predicate, by applying the predicate to each element in turn until a true value is found. If the sequence is empty or if the end of the sequence is reached, outputs " { $link f } "." } ;
@@ -498,11 +502,9 @@ HELP: delete-slice
 { $side-effects "seq" } ;
 
 HELP: replace-slice
-{ $values { "new" sequence } { "seq" "a mutable sequence" } { "from" "a non-negative integer" } { "to" "a non-negative integer" } }
+{ $values { "new" sequence } { "seq" sequence } { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq'" sequence } }
 { $description "Replaces a range of elements beginning at index " { $snippet "from" } " and ending before index " { $snippet "to" } " with a new sequence." }
-{ $notes "If the " { $snippet "to - from" } " is equal to the length of " { $snippet "new" } ", the sequence remains the same size, and does not have to support resizing. However, if " { $snippet "to - from" } " is not equal to the length of " { $snippet "new" } ", the " { $link set-length } " word is called on " { $snippet "seq" } ", so fixed-size sequences should not be passed in this case." }
-{ $errors "Throws an error if " { $snippet "new" } " contains elements whose types are not permissible in " { $snippet "seq" } "." }
-{ $side-effects "seq" } ;
+{ $errors "Throws an error if " { $snippet "new" } " contains elements whose types are not permissible in " { $snippet "seq" } "." } ;
 
 { push prefix suffix } related-words
 
@@ -915,24 +917,19 @@ HELP: supremum
 { $errors "Throws an error if the sequence is empty." } ;
 
 HELP: produce
-{ $values { "pred" { $quotation "( -- ? )" } } { "quot" { $quotation "( -- obj )" } } { "tail" "a quotation" } { "seq" "a sequence" } }
+{ $values { "pred" { $quotation "( -- ? )" } } { "quot" { $quotation "( -- obj )" } } { "seq" "a sequence" } }
 { $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence at the end." }
 { $examples
     "The following example divides a number by two until we reach zero, and accumulates intermediate results:"
-    { $example "USING: kernel math prettyprint sequences ;" "1337 [ dup 0 > ] [ 2/ dup ] [ ] produce nip ." "{ 668 334 167 83 41 20 10 5 2 1 0 }" }
-    "The " { $snippet "tail" } " quotation is used when the predicate produces more than one output value. In this case, we have to drop this value even if the predicate fails in order for stack inference to calculate a stack effect for the " { $link produce } " call:"
-    { $unchecked-example "USING: kernel prettyprint random sequences ;" "[ 10 random dup 1 > ] [ ] [ drop ] produce ." "{ 8 2 2 9 }" }
+    { $example "USING: kernel math prettyprint sequences ;" "1337 [ dup 0 > ] [ 2/ dup ] produce nip ." "{ 668 334 167 83 41 20 10 5 2 1 0 }" }
+    "The following example collects random numbers as long as they are greater than 1:"
+    { $unchecked-example "USING: kernel prettyprint random sequences ;" "[ 10 random dup 1 > ] [ ] produce nip ." "{ 8 2 2 9 }" }
 } ;
 
 HELP: produce-as
-{ $values { "pred" { $quotation "( -- ? )" } } { "quot" { $quotation "( -- obj )" } } { "tail" "a quotation" } { "exemplar" sequence } { "seq" "a sequence" } }
+{ $values { "pred" { $quotation "( -- ? )" } } { "quot" { $quotation "( -- obj )" } } { "exemplar" sequence } { "seq" "a sequence" } }
 { $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence of type " { $snippet "exemplar" } " at the end." }
-{ $examples
-    "The following example divides a number by two until we reach zero, and accumulates intermediate results:"
-    { $example "USING: kernel math prettyprint sequences ;" "1337 [ dup 0 > ] [ 2/ dup ] [ ] V{ } produce-as nip ." "V{ 668 334 167 83 41 20 10 5 2 1 0 }" }
-    "The " { $snippet "tail" } " quotation is used when the predicate produces more than one output value. In this case, we have to drop this value even if the predicate fails in order for stack inference to calculate a stack effect for the " { $link produce } " call:"
-    { $unchecked-example "USING: kernel prettyprint random sequences ;" "[ 10 random dup 1 > ] [ ] [ drop ] B{ } produce-as ." "B{ 8 2 2 9 }" }
-} ;
+{ $examples "See " { $link produce } " for examples." } ;
 
 HELP: sigma
 { $values { "seq" sequence } { "quot" quotation } { "n" number } }
@@ -1446,7 +1443,9 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection unclip-last-slice }
 { $subsection cut-slice }
 "A utility for words which use slices as iterators:"
-{ $subsection <flat-slice> } ;
+{ $subsection <flat-slice> }
+"Replacing slices with new elements:"
+{ $subsection replace-slice } ;
 
 ARTICLE: "sequences-combinators" "Sequence combinators"
 "Iteration:"
@@ -1460,6 +1459,7 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection map }
 { $subsection map-as }
 { $subsection map-index }
+{ $subsection map-reduce }
 { $subsection accumulate }
 { $subsection produce }
 { $subsection produce-as }
@@ -1478,6 +1478,7 @@ ARTICLE: "sequence-2combinators" "Pair-wise sequence combinators"
 { $subsection 2reduce }
 { $subsection 2map }
 { $subsection 2map-as }
+{ $subsection 2map-reduce }
 { $subsection 2all? } ;
 
 ARTICLE: "sequence-3combinators" "Triple-wise sequence combinators"
@@ -1512,7 +1513,8 @@ ARTICLE: "sequences-search" "Searching sequences"
 { $subsection find }
 { $subsection find-from }
 { $subsection find-last }
-{ $subsection find-last-from } ;
+{ $subsection find-last-from }
+{ $subsection map-find } ;
 
 ARTICLE: "sequences-trimming" "Trimming sequences"
 "Trimming words:"
@@ -1551,7 +1553,6 @@ ARTICLE: "sequences-destructive" "Destructive operations"
 { $subsection move }
 { $subsection exchange }
 { $subsection copy }
-{ $subsection replace-slice }
 "Many operations have constructive and destructive variants:"
 { $table
     { "Constructive" "Destructive" }

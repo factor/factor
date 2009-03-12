@@ -10,7 +10,11 @@ TUPLE: slot-spec name offset class initial read-only ;
 
 PREDICATE: reader < word "reader" word-prop ;
 
+PREDICATE: reader-method < method-body "reading" word-prop ;
+
 PREDICATE: writer < word "writer" word-prop ;
+
+PREDICATE: writer-method < method-body "writing" word-prop ;
 
 : <slot-spec> ( -- slot-spec )
     slot-spec new
@@ -199,7 +203,7 @@ M: array make-slot
         swap
         peel-off-name
         peel-off-class
-        [ dup empty? ] [ peel-off-attributes ] [ ] until drop
+        [ dup empty? ] [ peel-off-attributes ] until drop
     check-initial-value ;
 
 M: slot-spec make-slot

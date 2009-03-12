@@ -185,21 +185,20 @@ PRIVATE>
 
 : either? ( x y quot -- ? ) bi@ or ; inline
 
-: most ( x y quot -- z )
-    [ 2dup ] dip call [ drop ] [ nip ] if ; inline
+: most ( x y quot -- z ) 2keep ? ; inline
 
 ! Loops
 : loop ( pred: ( -- ? ) -- )
     [ call ] keep [ loop ] curry when ; inline recursive
 
-: do ( pred body tail -- pred body tail )
-    over 3dip ; inline
+: do ( pred body -- pred body )
+    dup 2dip ; inline
 
-: while ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
-    [ pick 3dip [ do while ] 3curry ] keep if ; inline recursive
+: while ( pred: ( -- ? ) body: ( -- ) -- )
+    swap do compose [ loop ] curry when ; inline
 
-: until ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
-    [ [ not ] compose ] 2dip while ; inline
+: until ( pred: ( -- ? ) body: ( -- ) -- )
+    [ [ not ] compose ] dip while ; inline
 
 ! Object protocol
 GENERIC: hashcode* ( depth obj -- code )

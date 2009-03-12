@@ -102,8 +102,7 @@ PRIVATE>
 <PRIVATE
 
 : >pieces ( str quot: ( str -- i ) -- graphemes )
-    [ dup empty? not ] swap '[ dup @ cut-slice swap ]
-    [ ] produce nip ; inline
+    [ dup empty? not ] swap '[ dup @ cut-slice swap ] produce nip ; inline
 
 PRIVATE>
 
@@ -229,3 +228,20 @@ PRIVATE>
 
 : >words ( str -- words )
     [ first-word ] >pieces ;
+
+<PRIVATE
+
+: nth-next ( i str -- str[i-1] str[i] )
+    [ [ 1- ] keep ] dip '[ _ nth ] bi@ ;
+
+PRIVATE>
+
+: word-break-at? ( i str -- ? )
+    {
+        [ drop zero? ]
+        [ length = ]
+        [
+            [ nth-next [ word-break-prop ] dip ] 2keep
+            word-break-next nip
+        ]
+    } 2|| ;

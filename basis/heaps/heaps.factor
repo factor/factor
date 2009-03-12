@@ -82,8 +82,8 @@ M: heap heap-size ( heap -- n )
     data>> first ; inline
 
 : data-exchange ( m n heap -- )
-    [ tuck data-nth [ data-nth ] dip ] 3keep
-    tuck [ data-set-nth ] 2dip data-set-nth ; inline
+    [ [ data-nth ] curry bi@ ]
+    [ [ data-set-nth ] curry bi@ ] 3bi ; inline
 
 GENERIC: heap-compare ( pair1 pair2 heap -- ? )
 
@@ -190,7 +190,7 @@ M: heap heap-pop ( heap -- value key )
 : heap-pop-all ( heap -- alist )
     [ dup heap-empty? not ]
     [ dup heap-pop swap 2array ]
-    [ ] produce nip ;
+    produce nip ;
 
 : slurp-heap ( heap quot: ( elt -- ) -- )
     over heap-empty? [ 2drop ] [

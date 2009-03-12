@@ -29,7 +29,7 @@ M: real sqrt
 : factor-2s ( n -- r s )
     #! factor an integer into 2^r * s
     dup 0 = [ 1 ] [
-        0 swap [ dup even? ] [ [ 1+ ] [ 2/ ] bi* ] [ ] while
+        0 swap [ dup even? ] [ [ 1+ ] [ 2/ ] bi* ] while
     ] if ; inline
 
 <PRIVATE
@@ -43,7 +43,7 @@ M: integer ^n
     [ factor-2s ] dip [ (^n) ] keep rot * shift ;
 
 M: ratio ^n
-    [ >fraction ] dip tuck [ ^n ] 2bi@ / ;
+    [ >fraction ] dip [ ^n ] curry bi@ / ;
 
 M: float ^n
     (^n) ;

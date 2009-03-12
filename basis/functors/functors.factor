@@ -122,20 +122,13 @@ DEFER: ;FUNCTOR delimiter
     functor-words use get delq ;
 
 : parse-functor-body ( -- form )
-    t in-lambda? [
-        V{ } clone
-        push-functor-words
-        "WHERE" parse-bindings* \ ;FUNCTOR (parse-lambda)
-        <let*> parsed-lambda
-        pop-functor-words
-        >quotation
-    ] with-variable ;
+    push-functor-words
+    "WHERE" parse-bindings*
+    [ \ ;FUNCTOR parse-until >quotation ] ((parse-lambda)) <let*> 1quotation
+    pop-functor-words ;
 
 : (FUNCTOR:) ( -- word def )
-    CREATE
-    parse-locals dup push-locals
-    parse-functor-body swap pop-locals <lambda>
-    rewrite-closures first ;
+    CREATE-WORD [ parse-functor-body ] parse-locals-definition ;
 
 PRIVATE>
 

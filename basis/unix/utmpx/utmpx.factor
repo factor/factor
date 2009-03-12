@@ -57,7 +57,7 @@ M: unix utmpx>utmpx-record ( utmpx -- utmpx-record )
     [
         [ getutxent dup ]
         [ utmpx>utmpx-record ]
-        [ drop ] produce
+        produce nip
     ] with-utmpx ;
     
 os {

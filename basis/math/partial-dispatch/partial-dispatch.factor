@@ -84,7 +84,7 @@ M: word integer-op-input-classes
 
 : define-integer-op-word ( fix-word big-word triple -- )
     [
-        [ 2nip integer-op-word ] [ integer-op-quot ] 3bi
+        [ 2nip integer-op-word dup make-foldable ] [ integer-op-quot ] 3bi
         (( x y -- z )) define-declared
     ] [
         2nip
@@ -104,10 +104,10 @@ M: word integer-op-input-classes
 
 : define-integer-ops ( word fix-word big-word -- )
     [
-        rot tuck
+        rot
         [ fixnum fixnum 3array "derived-from" set-word-prop ]
         [ bignum bignum 3array "derived-from" set-word-prop ]
-        2bi*
+        bi-curry bi*
     ] [
         [ integer-op-triples ] 2dip
         [ define-integer-op-words ]

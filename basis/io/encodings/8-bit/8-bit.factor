@@ -4,7 +4,7 @@ USING: math.parser arrays io.encodings sequences kernel assocs
 hashtables io.encodings.ascii generic parser classes.tuple words
 words.symbol io io.files splitting namespaces math
 compiler.units accessors classes.singleton classes.mixin
-io.encodings.iana fry ;
+io.encodings.iana fry simple-flat-file ;
 IN: io.encodings.8-bit
 
 <PRIVATE
@@ -35,36 +35,22 @@ CONSTANT: mappings {
 : encoding-file ( file-name -- stream )
     "vocab:io/encodings/8-bit/" ".TXT" surround ;
 
-: process-contents ( lines -- assoc )
-    [ "#" split1 drop ] map harvest
-    [ "\t" split 2 head [ 2 short tail hex> ] map ] map ;
-
-: byte>ch ( assoc -- array )
-    256 replacement-char <array>
-    [ '[ swap _ set-nth ] assoc-each ] keep ;
-
-: ch>byte ( assoc -- newassoc )
-    [ swap ] assoc-map >hashtable ;
-
-: parse-file ( path -- byte>ch ch>byte )
-    ascii file-lines process-contents
-    [ byte>ch ] [ ch>byte ] bi ;
-
 SYMBOL: 8-bit-encodings
 
-TUPLE: 8-bit decode encode ;
+TUPLE: 8-bit biassoc ;
 
 : encode-8-bit ( char stream assoc -- )
-    swapd at*
-    [ swap stream-write1 ] [ nip encode-error ] if ; inline
+    swapd value-at
+    [ swap stream-write1 ] [ encode-error ] if* ; inline
 
-M: 8-bit encode-char encode>> encode-8-bit ;
+M: 8-bit encode-char biassoc>> encode-8-bit ;
 
-: decode-8-bit ( stream array -- char/f )
-    swap stream-read1 dup
-    [ swap nth [ replacement-char ] unless* ] [ 2drop f ] if ; inline
+: decode-8-bit ( stream assoc -- char/f )
+    swap stream-read1
+    [ swap at [ replacement-char ] unless* ]
+    [ drop f ] if* ; inline
 
-M: 8-bit decode-char decode>> decode-8-bit ;
+M: 8-bit decode-char biassoc>> decode-8-bit ;
 
 MIXIN: 8-bit-encoding
 
@@ -87,7 +73,7 @@ PRIVATE>
         first3
         [ create-encoding ]
         [ dupd register-encoding ]
-        [ encoding-file parse-file 8-bit boa ]
+        [ encoding-file flat-file>biassoc 8-bit boa ]
         tri*
     ] H{ } map>assoc
     8-bit-encodings set-global

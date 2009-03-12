@@ -1,6 +1,8 @@
 USING: help.markup help.syntax strings quotations debugger
-io.styles namespaces ui.backend ui.gadgets ui.gadgets.worlds
-ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids math.geometry.rect colors ;
+namespaces ui.backend ui.gadgets ui.gadgets.worlds
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids
+ui.gadgets.private math.rectangles colors ui.text fonts
+kernel ui.private ;
 IN: ui
 
 HELP: windows
@@ -36,10 +38,13 @@ HELP: unregister-window
 { $description "Removes a window from the global " { $link windows } " variable." }
 { $notes "This word should only be called only by the UI backend, and not user code." } ;
 
-HELP: ui
-{ $description "Starts the Factor UI." } ;
+HELP: (with-ui)
+{ $values { "quot" quotation } }
+{ $contract "Starts the Factor UI." }
+{ $notes "This is a low-level word; user code should call " { $link with-ui } " instead." } ;
 
 HELP: start-ui
+{ $values { "quot" quotation } }
 { $description "Called by the UI backend to initialize the platform-independent parts of UI. This word should be called after the backend is ready to start displaying new windows, and before the event loop starts." } ;
 
 HELP: (open-window)
@@ -57,22 +62,17 @@ HELP: with-ui
 { $notes "This combinator should be used in the " { $link POSTPONE: MAIN: } " word of a vocabulary, in order for the vocabulary to work when run from the UI listener (" { $snippet "\"my-app\" run" } " and the command line (" { $snippet "./factor -run=my-app" } ")." }
 { $examples "The " { $vocab-link "hello-ui" } " vocabulary implements a simple UI application which uses this combinator." } ;
 
+HELP: beep
+{ $description "Plays the system beep sound." } ;
+
 ARTICLE: "ui-glossary" "UI glossary"
 { $table
     { "color" { "an instance of " { $link color } } }
     { "dimension" "a pair of integers denoting pixel size on screen" }
-    { "font specifier"
-        { "an array of three elements:"
-            { $list
-                { "font family - one of " { $snippet "serif" } ", " { $snippet "sans-serif" } " or " { $snippet "monospace" } }
-                { "font style - one of " { $link plain } ", " { $link bold } ", " { $link italic } " or " { $link bold-italic } }
-                "font size in points"
-            }
-        }
-    }
+    { "font" { "an instance of " { $link font } } }
     { "gadget" { "a graphical element which responds to user input. Gadgets are tuples which (directly or indirectly) inherit from " { $link gadget } "." } }
     { "label specifier" { "a string, " { $link f } " or a gadget. See " { $link "ui.gadgets.buttons" } } }
-    { "orientation specifier" { "one of " { $snippet "{ 0 1 }" } " or " { $snippet "{ 1 0 }" } ", with the former denoting vertical orientation and the latter denoting horizontal. Using a vector instead of symbolic constants allows these values to be directly useful in co-ordinate calculations" } }
+    { "orientation specifier" { "one of " { $link horizontal } " or " { $link vertical } } }
     { "point" "a pair of integers denoting a pixel location on screen" }
 } ;
 
@@ -84,25 +84,25 @@ ARTICLE: "building-ui" "Building user interfaces"
 { $subsection "ui-layouts" }
 { $subsection "gadgets" }
 { $subsection "ui-windows" }
+{ $subsection "ui.gadgets.status-bar" }
 { $see-also "models" } ;
 
 ARTICLE: "gadgets" "Pre-made UI gadgets"
 { $subsection "ui.gadgets.labels" }
-{ $subsection "gadgets-polygons" }
 { $subsection "ui.gadgets.borders" }
-{ $subsection "ui.gadgets.labelled" }
+{ $subsection "ui.gadgets.labeled" }
 { $subsection "ui.gadgets.buttons" }
 { $subsection "ui.gadgets.sliders" }
 { $subsection "ui.gadgets.scrollers" }
-{ $subsection "gadgets-editors" }
+{ $subsection "ui.gadgets.editors" }
 { $subsection "ui.gadgets.menus" }
 { $subsection "ui.gadgets.panes" }
 { $subsection "ui.gadgets.presentations" }
-{ $subsection "ui.gadgets.lists" } ;
+{ $subsection "ui.gadgets.tables" } ;
 
 ARTICLE: "ui-geometry" "Gadget geometry"
 "The " { $link gadget } " class inherits from the " { $link rect } " class, and thus all gadgets have a bounding box:"
-{ $subsection "math.geometry.rect" }
+{ $subsection "math.rectangles" }
 "Word for converting from a child gadget's co-ordinate system to a parent's:"
 { $subsection relative-loc }
 { $subsection screen-loc }
@@ -131,7 +131,7 @@ ARTICLE: "ui-backend" "Developing UI backends"
 "UI backends may implement the " { $link "clipboard-protocol" } "." ;
 
 ARTICLE: "ui-backend-init" "UI initialization and the event loop"
-"An UI backend is required to define a method on the " { $link ui } " word. This word should contain backend initialization, together with some boilerplate:"
+"An UI backend is required to define a method on the " { $link (with-ui) } " word. This word should contain backend initialization, together with some boilerplate:"
 { $code
     "IN: shells"
     ""
@@ -143,7 +143,7 @@ ARTICLE: "ui-backend-init" "UI initialization and the event loop"
 }
 "The above word must call the following:"
 { $subsection start-ui }
-"The " { $link ui } " word must not return until the event loop has stopped and the UI has been shut down." ;
+"The " { $link (with-ui) } " word must not return until the event loop has stopped and the UI has been shut down." ;
 
 ARTICLE: "ui-backend-windows" "UI backend window management"
 "The high-level " { $link open-window } " word eventually calls a low-level word which you must implement:"
@@ -171,6 +171,7 @@ ARTICLE: "ui-layouts" "Gadget hierarchy and layouts"
 { $subsection "ui-frame-layout" }
 { $subsection "ui-book-layout" }
 "Advanced topics:"
+{ $subsection "ui.gadgets.glass" }
 { $subsection "ui-null-layout" }
 { $subsection "ui-incremental-layout" }
 { $subsection "ui-layout-impl" }
@@ -227,26 +228,17 @@ ARTICLE: "new-gadgets" "Implementing new gadgets"
 $nl
 "Bare gadgets can be constructed directly, which is useful if all you need is a custom appearance with no further behavior (see " { $link "ui-pen-protocol" } "):"
 { $subsection <gadget> }
-"New gadgets are defined as subclasses of an existing gadget type, perhaps even " { $link gadget } " itself. A parametrized constructor should be used to construct subclasses:"
-{ $subsection new-gadget }
+"New gadgets are defined as subclasses of an existing gadget type, perhaps even " { $link gadget } " itself. Direct subclasses of " { $link gadget } " can be constructed using " { $link new } ", however some subclasses may define their own parametrized constructors (see " { $link "parametrized-constructors" } ")."
+$nl
 "Further topics:"
 { $subsection "ui-gestures" }
 { $subsection "ui-paint" }
 { $subsection "ui-control-impl" }
 { $subsection "clipboard-protocol" }
+{ $subsection "ui.gadgets.line-support" }
 { $see-also "ui-layout-impl" } ;
 
 ARTICLE: "starting-ui" "Starting the UI"
-"The UI starts automatically where possible:"
-{ $list
-    { "On Windows, the UI starts when the Factor executable is run." }
-    { "On X11, the UI starts if the " { $snippet "DISPLAY" } " environment variable is set." }
-    { "On Mac OS X, the UI starts if the " { $snippet "Factor.app" } " application bundle is run." }
-}
-"In all cases, passing the " { $snippet "-run=listener" } " command line switch starts the terminal listener instead. The UI can be started from the terminal listener using a word:"
-{ $subsection ui }
-"To run the terminal listener and the UI simultaneously, start the UI in a new thread:"
-{ $code "USING: threads ui ;" "[ ui ] in-thread" }
 "The main word of a vocabulary implementing a UI application should use a combinator to ensure that the application works when run from the command line as well as in the UI listener:"
 { $subsection with-ui } ;
 

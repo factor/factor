@@ -1,1 +1,0 @@
-Collection of 'cursors' representing locations in a gap buffer

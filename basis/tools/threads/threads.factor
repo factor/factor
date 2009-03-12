@@ -29,4 +29,4 @@ IN: tools.threads
         threads >alist sort-keys values [
             [ thread. ] with-row
         ] each
-    ] tabular-output ;
+    ] tabular-output nl ;

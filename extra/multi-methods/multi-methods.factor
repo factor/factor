@@ -5,7 +5,7 @@ combinators arrays words assocs parser namespaces make
 definitions prettyprint prettyprint.backend prettyprint.custom
 quotations generalizations debugger io compiler.units
 kernel.private effects accessors hashtables sorting shuffle
-math.order sets ;
+math.order sets see ;
 IN: multi-methods
 
 ! PART I: Converting hook specializers
@@ -82,7 +82,7 @@ SYMBOL: total
 : topological-sort ( seq quot -- newseq )
     [ >vector [ dup empty? not ] ] dip
     [ dupd maximal-element [ over delete-nth ] dip ] curry
-    [ ] produce nip ; inline
+    produce nip ; inline
 
 : classes< ( seq1 seq2 -- lt/eq/gt )
     [

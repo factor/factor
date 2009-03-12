@@ -65,12 +65,12 @@ SYMBOL: error-stream
 : bl ( -- ) " " write ;
 
 : lines ( stream -- seq )
-    [ [ readln dup ] [ ] [ drop ] produce ] with-input-stream ;
+    [ [ readln dup ] [ ] produce nip ] with-input-stream ;
 
 <PRIVATE
 
 : each-morsel ( handler: ( data -- ) reader: ( -- data ) -- )
-    [ dup ] compose swap [ drop ] while ; inline
+    [ dup ] compose swap while drop ; inline
 
 PRIVATE>
 
@@ -79,8 +79,7 @@ PRIVATE>
 
 : contents ( stream -- seq )
     [
-        [ 65536 read-partial dup ]
-        [ ] [ drop ] produce concat f like
+        [ 65536 read-partial dup ] [ ] produce nip concat f like
     ] with-input-stream ;
 
 : each-block ( quot: ( block -- ) -- )

@@ -5,6 +5,9 @@ assocs accessors namespaces compiler.errors stack-checker.values
 stack-checker.recursive-state ;
 IN: stack-checker.errors
 
+: pretty-word ( word -- word' )
+    dup method-body? [ "method-generic" word-prop ] when ;
+
 TUPLE: inference-error error type word ;
 
 M: inference-error compiler-error-type type>> ;
@@ -20,9 +23,11 @@ M: inference-error compiler-error-type type>> ;
 : inference-warning ( ... class -- * )
     +warning+ (inference-error) ; inline
 
-TUPLE: literal-expected ;
+TUPLE: literal-expected what ;
 
-M: object (literal) \ literal-expected inference-warning ;
+: literal-expected ( what -- * ) \ literal-expected inference-warning ;
+
+M: object (literal) "literal value" literal-expected ;
 
 TUPLE: unbalanced-branches-error branches quots ;
 
@@ -31,9 +36,16 @@ TUPLE: unbalanced-branches-error branches quots ;
 
 TUPLE: too-many->r ;
 
+: too-many->r ( -- * ) \ too-many->r inference-error ;
+
 TUPLE: too-many-r> ;
 
+: too-many-r> ( -- * ) \ too-many-r> inference-error ;
+
 TUPLE: missing-effect word ;
+
+: missing-effect ( word -- * )
+    pretty-word \ missing-effect inference-error ;
 
 TUPLE: effect-error word inferred declared ;
 
@@ -42,12 +54,30 @@ TUPLE: effect-error word inferred declared ;
 
 TUPLE: recursive-quotation-error quot ;
 
+: recursive-quotation-error ( word -- * )
+    \ recursive-quotation-error inference-error ;
+
 TUPLE: undeclared-recursion-error word ;
+
+: undeclared-recursion-error ( word -- * )
+    \ undeclared-recursion-error inference-error ;
 
 TUPLE: diverging-recursion-error word ;
 
+: diverging-recursion-error ( word -- * )
+    \ diverging-recursion-error inference-error ;
+
 TUPLE: unbalanced-recursion-error word height ;
+
+: unbalanced-recursion-error ( word height -- * )
+    \ unbalanced-recursion-error inference-error ;
 
 TUPLE: inconsistent-recursive-call-error word ;
 
+: inconsistent-recursive-call-error ( word -- * )
+    \ inconsistent-recursive-call-error inference-error ;
+
 TUPLE: unknown-primitive-error ;
+
+: unknown-primitive-error ( -- * )
+    \ unknown-primitive-error inference-warning ;
