@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel math sequences strings sets
-assocs prettyprint.backend prettyprint.custom make lexer
-namespaces parser arrays fry locals regexp.parser splitting
-sorting regexp.ast regexp.negation regexp.compiler words
-call call.private math.ranges ;
+USING: accessors combinators kernel kernel.private math sequences
+sequences.private strings sets assocs prettyprint.backend
+prettyprint.custom make lexer namespaces parser arrays fry locals
+regexp.parser splitting sorting regexp.ast regexp.negation
+regexp.compiler words call call.private math.ranges ;
 IN: regexp
 
 TUPLE: regexp
@@ -17,23 +17,16 @@ TUPLE: reverse-regexp < regexp ;
 
 <PRIVATE
 
-: maybe-negated ( lookaround quot -- regexp-quot )
-    '[ term>> @ ] [ positive?>> [ ] [ not ] ? ] bi compose ; inline
-
 M: lookahead question>quot ! Returns ( index string -- ? )
-    [ ast>dfa dfa>shortest-word '[ f _ execute ] ] maybe-negated ;
+    term>> ast>dfa dfa>shortest-word '[ f _ execute ] ;
 
 : <reversed-option> ( ast -- reversed )
     "r" string>options <with-options> ;
 
 M: lookbehind question>quot ! Returns ( index string -- ? )
-    [
-        <reversed-option>
-        ast>dfa dfa>reverse-shortest-word
-        '[ [ 1- ] dip f _ execute ]
-    ] maybe-negated ;
-
-<PRIVATE
+    term>> <reversed-option>
+    ast>dfa dfa>reverse-shortest-word
+    '[ [ 1- ] dip f _ execute ] ;
 
 : check-string ( string -- string )
     ! Make this configurable
@@ -42,7 +35,7 @@ M: lookbehind question>quot ! Returns ( index string -- ? )
 : match-index-from ( i string regexp -- index/f )
     ! This word is unsafe. It assumes that i is a fixnum
     ! and that string is a string.
-    dup dfa>> execute( index string regexp -- i/f ) ;
+    dup dfa>> execute-unsafe( index string regexp -- i/f ) ;
 
 GENERIC: end/start ( string regexp -- end start )
 M: regexp end/start drop length 0 ;
@@ -51,61 +44,82 @@ M: reverse-regexp end/start drop length 1- -1 swap ;
 PRIVATE>
 
 : matches? ( string regexp -- ? )
-    [ end/start ] 2keep
     [ check-string ] dip
+    [ end/start ] 2keep
     match-index-from
-    [ swap = ] [ drop f ] if* ;
+    [ = ] [ drop f ] if* ;
 
 <PRIVATE
 
-: match-slice ( i string quot -- slice/f )
-    [ 2dup ] dip call
-    [ swap <slice> ] [ 2drop f ] if* ; inline
+:: (next-match) ( i string regexp quot: ( i string regexp -- j ) reverse? -- i start end ? )
+    i string regexp quot call dup [| j |
+        j i j
+        reverse? [ swap [ 1+ ] bi@ ] when
+        string
+    ] [ drop f f f f ] if ; inline
 
-: match-from ( i string quot -- slice/f )
-    [ [ length [a,b) ] keep ] dip
-    '[ _ _ match-slice ] map-find drop ; inline
+: search-range ( i string reverse? -- seq )
+    [ drop dup 1+ -1 ] [ length 1 ] if range boa ; inline
 
-: next-match ( i string quot -- i match/f )
-    match-from [ dup [ to>> ] when ] keep ; inline
+:: next-match ( i string regexp quot: ( i string regexp -- j ) reverse? -- i start end ? )
+    f f f f
+    i string reverse? search-range
+    [ [ 2drop 2drop ] dip string regexp quot reverse? (next-match) dup ] find 2drop ; inline
 
-: do-next-match ( i string regexp -- i match/f )
-    dup next-match>> execute( i string regexp -- i match/f ) ;
+: do-next-match ( i string regexp -- i start end ? )
+    dup next-match>>
+    execute-unsafe( i string regexp -- i start end ? ) ; inline
+
+:: (each-match) ( i string regexp quot: ( start end string -- ) -- )
+    i string regexp do-next-match [| i' start end |
+        start end string quot call
+        i' string regexp quot (each-match)
+    ] [ 3drop ] if ; inline recursive
+
+: prepare-match-iterator ( string regexp -- i string regexp )
+    [ check-string ] dip [ end/start nip ] 2keep ; inline
 
 PRIVATE>
 
-: all-matches ( string regexp -- seq )
-    [ check-string ] dip
-    [ 0 [ dup ] ] 2dip '[ _ _ do-next-match ] produce
-    nip but-last ;
+: each-match ( string regexp quot: ( start end string -- ) -- )
+    [ prepare-match-iterator ] dip (each-match) ; inline
+
+: map-matches ( string regexp quot: ( start end string -- obj ) -- seq )
+    accumulator [ each-match ] dip >array ; inline
+
+: all-matching-slices ( string regexp -- seq )
+    [ slice boa ] map-matches ;
+
+: all-matching-subseqs ( string regexp -- seq )
+    [ subseq ] map-matches ;
 
 : count-matches ( string regexp -- n )
-    all-matches length ;
+    [ 0 ] 2dip [ 3drop 1+ ] each-match ;
 
 <PRIVATE
 
-:: split-slices ( string slices -- new-slices )
-    slices [ to>> ] map 0 prefix
-    slices [ from>> ] map string length suffix
-    [ string <slice> ] 2map ;
+:: (re-split) ( string regexp quot -- new-slices )
+    0 string regexp [| end start end' string |
+        end' ! leave it on the stack for the next iteration
+        end start string quot call
+    ] map-matches
+    ! Final chunk
+    swap string length string quot call suffix ; inline
 
 PRIVATE>
 
 : first-match ( string regexp -- slice/f )
-    [ 0 ] [ check-string ] [ ] tri*
-    do-next-match nip ;
+    [ prepare-match-iterator do-next-match ] [ drop ] 2bi
+    '[ _ slice boa nip ] [ 3drop f ] if ;
 
 : re-contains? ( string regexp -- ? )
-    first-match >boolean ;
-
-: re-split1 ( string regexp -- before after/f )
-    dupd first-match [ 1array split-slices first2 ] [ f ] if* ;
+    prepare-match-iterator do-next-match [ 3drop ] dip >boolean ;
 
 : re-split ( string regexp -- seq )
-    dupd all-matches split-slices ;
+    [ slice boa ] (re-split) ;
 
 : re-replace ( string regexp replacement -- result )
-    [ re-split ] dip join ;
+    [ [ subseq ] (re-split) ] dip join ;
 
 <PRIVATE
 
@@ -129,21 +143,19 @@ M: regexp compile-regexp ( regexp -- regexp )
 M: reverse-regexp compile-regexp ( regexp -- regexp )
     t backwards? [ do-compile-regexp ] with-variable ;
 
-GENERIC: compile-next-match ( regexp -- regexp )
+DEFER: compile-next-match
 
-: next-initial-word ( i string regexp -- i slice/f )
+: next-initial-word ( i string regexp -- i start end string )
     compile-next-match do-next-match ;
 
-M: regexp compile-next-match ( regexp -- regexp )
+: compile-next-match ( regexp -- regexp )
     dup '[
         dup \ next-initial-word = [
-            drop _ compile-regexp dfa>>
-            '[ _ '[ _ _ execute ] next-match ]
-            (( i string -- i match/f )) simple-define-temp
+            drop _ [ compile-regexp dfa>> def>> ] [ reverse-regexp? ] bi
+            '[ { array-capacity string regexp } declare _ _ next-match ]
+            (( i string regexp -- i start end string )) simple-define-temp
         ] when
     ] change-next-match ;
-
-! Write M: reverse-regexp compile-next-match
 
 PRIVATE>
 
