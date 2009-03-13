@@ -1,5 +1,5 @@
 ! Copyright (C) 2009 Doug Coleman.
-! See http:
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax ;
 IN: windows.usp10
 
