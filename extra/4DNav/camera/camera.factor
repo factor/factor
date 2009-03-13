@@ -1,5 +1,4 @@
-USING: kernel namespaces math.vectors opengl 4DNav.turtle 
-self ;
+USING: kernel namespaces math.vectors opengl 4DNav.turtle  ;
 
 IN: 4DNav.camera
 

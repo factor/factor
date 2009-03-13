@@ -1,5 +1,5 @@
 USING: help.syntax help.markup kernel macros prettyprint
-memoize combinators arrays generalizations ;
+memoize combinators arrays generalizations see ;
 IN: locals
 
 HELP: [|
@@ -134,19 +134,30 @@ $nl
     "ordinary-word-test ordinary-word-test eq? ."
     "t"
 }
-"In a word with locals, literals expand into code which constructs the literal, and so every invocation pushes a new object:"
+"In a word with locals, literals which do not contain locals still behave in the same way:"
 { $example
     "USE: locals"
     "IN: scratchpad"
     "TUPLE: person first-name last-name ;"
-    ":: ordinary-word-test ( -- tuple )"
+    ":: locals-word-test ( -- tuple )"
     "    T{ person { first-name \"Alan\" } { last-name \"Kay\" } } ;"
-    "ordinary-word-test ordinary-word-test eq? ."
+    "locals-word-test locals-word-test eq? ."
+    "t"
+}
+"However, literals with locals in them actually expand into code for constructing a new object:"
+{ $example
+    "USING: locals splitting ;"
+    "IN: scratchpad"
+    "TUPLE: person first-name last-name ;"
+    ":: constructor-test ( -- tuple )"
+    "    \"Jane Smith\" \" \" split1 :> last :> first"
+    "    T{ person { first-name first } { last-name last } } ;"
+    "constructor-test constructor-test eq? ."
     "f"
 }
 "One exception to the above rule is that array instances containing no free variables do retain identity. This allows macros such as " { $link cond } " to recognize that the array is constant and expand at compile-time."
 { $heading "Example" }
-"For example, here is an implementation of the " { $link 3array } " word which uses this feature:"
+"Here is an implementation of the " { $link 3array } " word which uses this feature:"
 { $code ":: 3array ( x y z -- array ) { x y z } ;" } ;
 
 ARTICLE: "locals-mutable" "Mutable locals"

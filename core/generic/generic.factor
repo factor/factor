@@ -71,6 +71,13 @@ TUPLE: check-method class generic ;
         \ check-method boa throw
     ] unless ; inline
 
+: changed-generic ( class generic -- )
+    changed-generics get
+    [ [ [ class-or ] when* ] change-at ] [ no-compilation-unit ] if* ;
+
+: remake-generic ( generic -- )
+    dup remake-generics get set-in-unit ;
+
 : with-methods ( class generic quot -- )
     [ drop changed-generic ]
     [ [ "methods" word-prop ] dip call ]
@@ -113,7 +120,7 @@ M: method-body crossref?
     2bi ;
 
 : create-method ( class generic -- method )
-    2dup method dup [ 2nip ] [
+    2dup method dup [ 2nip dup reset-generic ] [
         drop
         [ <method> dup ] 2keep
         reveal-method

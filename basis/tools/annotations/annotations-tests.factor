@@ -1,5 +1,5 @@
 USING: tools.test tools.annotations tools.time math parser eval
-io.streams.string kernel ;
+io.streams.string kernel strings ;
 IN: tools.annotations.tests
 
 : foo ;
@@ -45,4 +45,4 @@ M: string blah-generic ;
 
 { string blah-generic } watch
 
-[ ] [ "hi" blah-generic ] unit-test
+[ "hi" ] [ "hi" blah-generic ] unit-test

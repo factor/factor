@@ -84,7 +84,7 @@ SYMBOL: max-stack-items
                     bi
                 ] with-row
             ] each
-        ] tabular-output
+        ] tabular-output nl
     ] unless-empty ;
     
 : trimmed-stack. ( seq -- )

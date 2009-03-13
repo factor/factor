@@ -3,7 +3,7 @@ ui.gadgets ui.gadgets.worlds ui ;
 IN: ui.gadgets.status-bar
 
 HELP: show-status
-{ $values { "string" string } { "gadget" gadget } }
+{ $values { "string/f" string } { "gadget" gadget } }
 { $description "Displays a status message in the gadget's world." }
 { $notes "The status message will only be visible if the window was opened with " { $link open-status-window } ", and not " { $link open-window } "." } ;
 

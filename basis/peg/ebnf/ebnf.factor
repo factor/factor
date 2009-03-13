@@ -128,28 +128,28 @@ PEG: escaper ( string -- ast )
   #! in the EBNF syntax itself.
   [
     {
-      [ dup blank?    ]
-      [ dup CHAR: " = ]
-      [ dup CHAR: ' = ]
-      [ dup CHAR: | = ]
-      [ dup CHAR: { = ]
-      [ dup CHAR: } = ]
-      [ dup CHAR: = = ]
-      [ dup CHAR: ) = ]
-      [ dup CHAR: ( = ]
-      [ dup CHAR: ] = ]
-      [ dup CHAR: [ = ]
-      [ dup CHAR: . = ]
-      [ dup CHAR: ! = ]
-      [ dup CHAR: & = ]
-      [ dup CHAR: * = ]
-      [ dup CHAR: + = ]
-      [ dup CHAR: ? = ]
-      [ dup CHAR: : = ]
-      [ dup CHAR: ~ = ]
-      [ dup CHAR: < = ]
-      [ dup CHAR: > = ]
-    } 0|| not nip    
+      [ blank?    ]
+      [ CHAR: " = ]
+      [ CHAR: ' = ]
+      [ CHAR: | = ]
+      [ CHAR: { = ]
+      [ CHAR: } = ]
+      [ CHAR: = = ]
+      [ CHAR: ) = ]
+      [ CHAR: ( = ]
+      [ CHAR: ] = ]
+      [ CHAR: [ = ]
+      [ CHAR: . = ]
+      [ CHAR: ! = ]
+      [ CHAR: & = ]
+      [ CHAR: * = ]
+      [ CHAR: + = ]
+      [ CHAR: ? = ]
+      [ CHAR: : = ]
+      [ CHAR: ~ = ]
+      [ CHAR: < = ]
+      [ CHAR: > = ]
+    } 1|| not
   ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
 : 'terminal' ( -- parser )
@@ -161,9 +161,9 @@ PEG: escaper ( string -- ast )
   #! Parse a valid foreign parser name
   [
     {
-      [ dup blank?    ]
-      [ dup CHAR: > = ]
-    } 0|| not nip    
+      [ blank?    ]
+      [ CHAR: > = ]
+    } 1|| not
   ] satisfy repeat1 [ >string ] action ;
 
 : 'foreign' ( -- parser )

@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.builtin
 classes.intersection classes.mixin classes.predicate
@@ -66,15 +66,18 @@ C: <vocab-author> vocab-author
 : describe-children ( vocab -- )
     vocab-name all-child-vocabs $vocab-roots ;
 
+: files. ( seq -- )
+    snippet-style get [
+        code-style get [
+            [ nl ] [ [ string>> ] keep write-object ] interleave
+        ] with-nesting
+    ] with-style ;
+
 : describe-files ( vocab -- )
     vocab-files [ <pathname> ] map [
         "Files" $heading
         [
-            snippet-style get [
-                code-style get [
-                    stack.
-                ] with-nesting
-            ] with-style
+            files.
         ] ($block)
     ] unless-empty ;
 
@@ -221,7 +224,7 @@ C: <vocab-author> vocab-author
 
 : words. ( vocab -- )
     last-element off
-    [ require ] [ words $words ] bi ;
+    [ require ] [ words $words ] bi nl ;
 
 : describe-metadata ( vocab -- )
     [
@@ -288,7 +291,7 @@ M: vocab-tag article-name name>> ;
 M: vocab-tag article-content
     \ $tagged-vocabs swap name>> 2array ;
 
-M: vocab-tag article-parent drop "vocab-index" ;
+M: vocab-tag article-parent drop "vocab-tags" ;
 
 M: vocab-tag summary article-title ;
 
@@ -302,6 +305,6 @@ M: vocab-author article-name name>> ;
 M: vocab-author article-content
     \ $authored-vocabs swap name>> 2array ;
 
-M: vocab-author article-parent drop "vocab-index" ;
+M: vocab-author article-parent drop "vocab-authors" ;
 
 M: vocab-author summary article-title ;

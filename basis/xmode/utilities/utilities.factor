@@ -1,10 +1,9 @@
 USING: accessors sequences assocs kernel quotations namespaces
-xml.data xml.traversal combinators macros parser lexer words fry ;
+xml.data xml.traversal combinators macros parser lexer words fry
+regexp ;
 IN: xmode.utilities
 
 : implies ( x y -- z ) [ not ] dip or ; inline
-
-: child-tags ( tag -- seq ) children>> [ tag? ] filter ;
 
 : tag-init-form ( spec -- quot )
     {
@@ -33,20 +32,5 @@ MACRO: (init-from-tag) ( specs -- )
 : init-from-tag ( tag tuple specs -- tuple )
     over [ (init-from-tag) ] dip ; inline
 
-SYMBOL: tag-handlers
-SYMBOL: tag-handler-word
-
-: <TAGS:
-    CREATE tag-handler-word set
-    H{ } clone tag-handlers set ; parsing
-
-: (TAG:) ( name quot -- ) swap tag-handlers get set-at ;
-
-: TAG:
-    scan parse-definition
-    (TAG:) ; parsing
-
-: TAGS>
-    tag-handler-word get
-    tag-handlers get >alist [ [ dup main>> ] dip case ] curry
-    define ; parsing
+: <?insensitive-regexp> ( string ? -- regexp )
+    "i" "" ? <optioned-regexp> ;
