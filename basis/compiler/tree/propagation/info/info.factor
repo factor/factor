@@ -238,7 +238,7 @@ DEFER: (value-info-union)
 
 : value-infos-union ( infos -- info )
     [ null-info ]
-    [ dup first [ value-info-union ] reduce ] if-empty ;
+    [ unclip-slice [ value-info-union ] reduce ] if-empty ;
 
 : literals<= ( info1 info2 -- ? )
     {

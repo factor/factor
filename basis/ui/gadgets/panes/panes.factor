@@ -66,7 +66,7 @@ M: pane gadget-selection ( pane -- string/f )
     selection-color >>selection-color ; inline
 
 : init-last-line ( pane -- pane )
-    horizontal <track>
+    horizontal <track> 0 >>fill +baseline+ >>align
     [ >>last-line ] [ 1 track-add ] bi
     dup prepare-last-line ; inline
 

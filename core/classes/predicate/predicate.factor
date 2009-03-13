@@ -25,8 +25,9 @@ DEFER: predicate-instance? ( object class -- ? )
 : predicate-quot ( class -- quot )
     [
         \ dup ,
-        dup superclass "predicate" word-prop %
-        "predicate-definition" word-prop , [ drop f ] , \ if ,
+        [ superclass "predicate" word-prop % ]
+        [ "predicate-definition" word-prop , ] bi
+        [ drop f ] , \ if ,
     ] [ ] make ;
 
 : define-predicate-class ( class superclass definition -- )
@@ -42,9 +43,8 @@ DEFER: predicate-instance? ( object class -- ? )
     update-predicate-instance ;
 
 M: predicate-class reset-class
-    [ call-next-method ]
-    [ { "predicate-definition" } reset-props ]
-    bi ;
+    [ call-next-method ] [ { "predicate-definition" } reset-props ] bi
+    update-predicate-instance ;
 
 M: predicate-class rank-class drop 1 ;
 

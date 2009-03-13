@@ -42,8 +42,11 @@ PREDICATE: class < word "class" word-prop ;
 
 PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
+M: predicate forget*
+    [ call-next-method ] [ f "predicating" set-word-prop ] bi ;
+
 M: predicate reset-word
-    [ call-next-method ] [ { "predicating" } reset-props ] bi ;
+    [ call-next-method ] [ f "predicating" set-word-prop ] bi ;
 
 : define-predicate ( class quot -- )
     [ "predicate" word-prop first ] dip
