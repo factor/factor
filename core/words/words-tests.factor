@@ -55,18 +55,18 @@ GENERIC: testing
 
 [ f ] [ \ testing generic? ] unit-test
 
-: forgotten ;
-: another-forgotten ;
+: forgotten ( -- ) ;
+: another-forgotten ( -- ) ;
 
 FORGET: forgotten
 
 FORGET: another-forgotten
-: another-forgotten ;
+: another-forgotten ( -- ) ;
 
 ! I forgot remove-crossref calls!
-: fee ;
-: foe fee ;
-: fie foe ;
+: fee ( -- ) ;
+: foe ( -- ) fee ;
+: fie ( -- ) foe ;
 
 [ t ] [ \ fee usage [ word? ] filter empty? ] unit-test
 [ t ] [ \ foe usage empty? ] unit-test
@@ -97,7 +97,7 @@ DEFER: calls-a-gensym
 ! more xref buggery
 [ f ] [
     GENERIC: xyzzle ( x -- x )
-    : a ; \ a
+    : a ( -- ) ; \ a
     M: integer xyzzle a ;
     FORGET: a
     M: object xyzzle ;

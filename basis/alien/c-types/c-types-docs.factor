@@ -217,6 +217,8 @@ $nl
 "Utilities for automatically freeing memory in conjunction with " { $link with-destructors } ":"
 { $subsection &free }
 { $subsection |free }
+"The " { $link &free } " and " { $link |free } " words are generated using " { $link "alien.destructors" } "."
+$nl
 "You can unsafely copy a range of bytes from one memory location to another:"
 { $subsection memcpy }
 "You can copy a range of bytes from memory into a byte array:"
@@ -243,4 +245,6 @@ $nl
 "New C types can be defined:"
 { $subsection "c-structs" }
 { $subsection "c-unions" }
+"A utility for defining " { $link "destructors" } " for deallocating memory:"
+{ $subsection "alien.destructors" }
 { $see-also "aliens" } ;
