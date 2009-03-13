@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs colors combinators grouping io
+USING: arrays accessors assocs colors combinators grouping io
 io.streams.string io.styles kernel make math math.parser namespaces
 parser prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections quotations sequences sorting strings vocabs
@@ -40,12 +40,15 @@ IN: prettyprint
             \ USING: pprint-word
             [ pprint-vocab ] each
             \ ; pprint-word
-        ] with-pprint nl
+        ] with-pprint
     ] unless-empty ;
 
 : use/in. ( in use -- )
-    dupd remove [ { "syntax" "scratchpad" } member? not ] filter
-    use. in. ;
+    over "syntax" 2array diff
+    [ nip use. ]
+    [ empty? not and [ nl ] when ]
+    [ drop in. ]
+    2tri ;
 
 : vocab-names ( words -- vocabs )
     dictionary get
@@ -68,7 +71,8 @@ IN: prettyprint
 PRIVATE>
 
 : with-use ( obj quot -- )
-    make-pprint use/in. nl do-pprint ; inline
+    make-pprint [ use/in. ] [ empty? not or [ nl ] when ] 2bi
+    do-pprint ; inline
 
 : with-in ( obj quot -- )
     make-pprint drop [ write-in bl ] when* do-pprint ; inline
