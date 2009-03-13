@@ -46,9 +46,6 @@ M: predicate finalize-word
         [ drop ]
     } cond ;
 
-! M: math-partial finalize-word
-!     dup primitive? [ drop ] [ nip cached-expansion ] if ;
-
 M: word finalize-word drop ;
 
 M: #call finalize*
