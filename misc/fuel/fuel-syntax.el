@@ -240,8 +240,6 @@
     (modify-syntax-entry ?\r " " table)
     (modify-syntax-entry ?\  " " table)
     (modify-syntax-entry ?\n " " table)
-    (modify-syntax-entry ?\( "()" table)
-    (modify-syntax-entry ?\) ")(" table)
     table))
 
 (defconst fuel-syntax--syntactic-keywords
@@ -278,6 +276,8 @@
     ;; Parenthesis:
     ("\\_<\\((\\)\\_>" (1 "()"))
     ("\\_<\\()\\)\\_>" (1 ")("))
+    ("\\_<(\\((\\)\\_>" (1 "()"))
+    ("\\_<\\()\\))\\_>" (1 ")("))
     ;; Quotations:
     ("\\_<'\\(\\[\\)\\_>" (1 "(]"))      ; fried
     ("\\_<\\(\\[\\)\\_>" (1 "(]"))
