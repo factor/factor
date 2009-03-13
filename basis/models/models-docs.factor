@@ -137,7 +137,7 @@ $nl
 { $subsection "models-delay" } ;
 
 ARTICLE: "models-impl" "Implementing models"
-"New types of models can be defined, for example see " { $vocab-link "models.filter" } "."
+"New types of models can be defined, for example see " { $vocab-link "models.arrow" } "."
 $nl
 "Models can execute hooks when activated:"
 { $subsection model-activated }

@@ -8,3 +8,13 @@ IN: io.directories.search.tests
         current-temporary-directory get [ ] find-all-files
     ] with-unique-directory drop [ natural-sort ] bi@ =
 ] unit-test
+
+[ f ] [
+    { "omg you shoudnt have a directory called this" "or this" }
+    t
+    [ "asdfasdfasdfasdfasdf" tail? ] find-in-directories
+] unit-test
+
+[ f ] [
+    { } t [ "asdfasdfasdfasdfasdf" tail? ] find-in-directories
+] unit-test

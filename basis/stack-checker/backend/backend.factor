@@ -155,7 +155,7 @@ M: object apply-object push-literal ;
     "cannot-infer" word-prop rethrow ;
 
 : maybe-cannot-infer ( word quot -- )
-    [ [ "cannot-infer" set-word-prop ] keep throw ] recover ; inline
+    [ [ "cannot-infer" set-word-prop ] keep rethrow ] recover ; inline
 
 : infer-word ( word -- effect )
     [

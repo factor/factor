@@ -10,10 +10,11 @@ stack-checker.recursive-state ;
 IN: stack-checker.transforms
 
 : give-up-transform ( word -- )
-    dup recursive-word?
-    [ call-recursive-word ]
-    [ dup infer-word apply-word/effect ]
-    if ;
+    {
+        { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
+        { [ dup recursive-word? ] [ call-recursive-word ] }
+        [ dup infer-word apply-word/effect ]
+    } cond ;
 
 :: ((apply-transform)) ( word quot values stack rstate -- )
     rstate recursive-state

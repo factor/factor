@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.files io.pathnames io.directories kernel namespaces
+USING: io io.files io.pathnames io.directories io.encodings.ascii kernel namespaces
 sequences locals system splitting tools.deploy.backend
 tools.deploy.config tools.deploy.config.editor assocs hashtables
 prettyprint combinators windows.shell32 windows.user32 ;
@@ -9,11 +9,10 @@ IN: tools.deploy.windows
 : copy-dll ( bundle-name -- )
     "resource:factor.dll" swap copy-file-into ;
 
-: copy-freetype ( bundle-name -- )
-    {
-        "resource:freetype6.dll"
-        "resource:zlib1.dll"
-    } swap copy-files-into ;
+: copy-pango ( bundle-name -- )
+    "resource:build-support/dlls.txt" ascii file-lines
+    [ "resource:" prepend-path ] map
+    swap copy-files-into ;
 
 :: copy-vm ( executable bundle-name extension -- vm )
     vm "." split1-last drop extension append
@@ -23,8 +22,8 @@ IN: tools.deploy.windows
 : create-exe-dir ( vocab bundle-name -- vm )
     dup copy-dll
     deploy-ui? get [
-        [ copy-freetype ]
-        [ "" copy-fonts ]
+        [ copy-pango ]
+        [ "" copy-theme ]
         [ ".exe" copy-vm ] tri
     ] [ ".com" copy-vm ] if ;
 

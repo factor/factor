@@ -447,31 +447,11 @@ get_url() {
 
 maybe_download_dlls() {
     if [[ $OS == winnt ]] ; then
-        get_url http://factorcode.org/dlls/freetype6.dll
-        get_url http://factorcode.org/dlls/zlib1.dll
-        get_url http://factorcode.org/dlls/OpenAL32.dll
-        get_url http://factorcode.org/dlls/alut.dll
-        get_url http://factorcode.org/dlls/comerr32.dll
-        get_url http://factorcode.org/dlls/gssapi32.dll
-        get_url http://factorcode.org/dlls/iconv.dll
-        get_url http://factorcode.org/dlls/k5sprt32.dll
-        get_url http://factorcode.org/dlls/krb5_32.dll
-        get_url http://factorcode.org/dlls/libcairo-2.dll
-        get_url http://factorcode.org/dlls/libeay32.dll
-        get_url http://factorcode.org/dlls/libiconv2.dll
-        get_url http://factorcode.org/dlls/libintl3.dll
-        get_url http://factorcode.org/dlls/libpq.dll
-        get_url http://factorcode.org/dlls/libxml2.dll
-        get_url http://factorcode.org/dlls/libxslt.dll
-        get_url http://factorcode.org/dlls/msvcr71.dll
-        get_url http://factorcode.org/dlls/ogg.dll
-        get_url http://factorcode.org/dlls/pgaevent.dll
-        get_url http://factorcode.org/dlls/sqlite3.dll
-        get_url http://factorcode.org/dlls/ssleay32.dll
-        get_url http://factorcode.org/dlls/theora.dll
-        get_url http://factorcode.org/dlls/vorbis.dll
-        chmod 777 *.dll
-        check_ret chmod
+	for file in `cat build-support/dlls.txt`; do
+	    get_url http://factorcode.org/dlls/$file
+            chmod 777 *.dll
+            check_ret chmod
+	done
     fi
 }
 
@@ -522,7 +502,7 @@ make_boot_image() {
 }
 
 install_build_system_apt() {
-    sudo apt-get --yes install libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
+    sudo apt-get --yes install libc6-dev libpango-1.0-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
     check_ret sudo
 }
 
