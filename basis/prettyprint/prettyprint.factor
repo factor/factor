@@ -40,12 +40,12 @@ IN: prettyprint
             \ USING: pprint-word
             [ pprint-vocab ] each
             \ ; pprint-word
-        ] with-pprint
+        ] with-pprint nl
     ] unless-empty ;
 
 : use/in. ( in use -- )
     dupd remove [ { "syntax" "scratchpad" } member? not ] filter
-    use. nl in. ;
+    use. in. ;
 
 : vocab-names ( words -- vocabs )
     dictionary get
@@ -61,7 +61,7 @@ IN: prettyprint
         "To avoid doing this in the future, add the following USING:" print
         "and IN: forms at the top of the source file:" print nl
     ] with-style
-    { { page-color COLOR: light-gray } } [ prelude. ] with-nesting
+    { { page-color T{ rgba f 0.8 0.8 0.8 1.0 } } } [ prelude. ] with-nesting
     nl nl
 ] print-use-hook set-global
 
