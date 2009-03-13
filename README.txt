@@ -24,7 +24,7 @@ The Factor runtime is written in GNU C99, and is built with GNU make and
 gcc.
 
 Factor supports various platforms. For an up-to-date list, see
-<http://factorcode.org/getfactor.fhtml>.
+<http://factorcode.org>.
 
 Factor requires gcc 3.4 or later.
 
@@ -35,17 +35,6 @@ you add 'SITE_CFLAGS=-fno-forward-propagate' to the command-line
 arguments for make.
 
 Run 'make' ('gmake' on *BSD) with no parameters to build the Factor VM.
-
-Compilation will yield an executable named 'factor' on Unix,
-'factor.exe' on Windows XP/Vista, and 'factor-ce.exe' on Windows CE.
-
-* Libraries needed for compilation
-
-For X11 support, you need recent development libraries for libc,
-Freetype, X11, OpenGL and GLUT. On a Debian-derived Linux distribution
-(like Ubuntu), you can use the following line to grab everything:
-
-    sudo apt-get install libc6-dev libfreetype6-dev libx11-dev glutg3-dev
 
 * Bootstrapping the Factor image
 
@@ -69,6 +58,12 @@ machines.
 On Unix, Factor can either run a graphical user interface using X11, or
 a terminal listener.
 
+For X11 support, you need recent development libraries for libc,
+Pango, X11, OpenGL and GLUT. On a Debian-derived Linux distribution
+(like Ubuntu), you can use the following line to grab everything:
+
+    sudo apt-get install libc6-dev libpango-1.0-dev libx11-dev glutg3-dev
+
 If your DISPLAY environment variable is set, the UI will start
 automatically:
 
@@ -77,14 +72,6 @@ automatically:
 To run an interactive terminal listener:
 
   ./factor -run=listener
-
-If you're inside a terminal session, you can start the UI with one of
-the following two commands:
-
-  ui
-  [ ui ] in-thread
-  
-The latter keeps the terminal listener running.
 
 * Running Factor on Mac OS X - Cocoa UI
 
@@ -110,7 +97,7 @@ When compiling Factor, pass the X11=1 parameter:
 
 Then bootstrap with the following switches:
 
-  ./factor -i=boot.<cpu>.image -ui-backend=x11
+  ./factor -i=boot.<cpu>.image -ui-backend=x11 -ui-text-backend=pango
 
 Now if $DISPLAY is set, running ./factor will start the UI.
 
@@ -126,6 +113,12 @@ the command prompt using the console application:
 
   factor.com -i=boot.<cpu>.image
 
+Before bootstrapping, you will need to download the DLLs for the Pango
+text rendering library. The required DLLs are listed in
+build-support/dlls.txt and are available from the following location:
+
+  <http://factorcode.org/dlls>
+
 Once bootstrapped, double-clicking factor.exe or factor.com starts
 the Factor UI.
 
@@ -135,7 +128,9 @@ To run the listener in the command prompt:
 
 * The Factor FAQ
 
-The Factor FAQ is available at <http://factorcode.org/faq.fhtml>.
+The Factor FAQ is available at the following location:
+
+  <http://concatenative.org/wiki/view/Factor/FAQ>
 
 * Command line usage
 

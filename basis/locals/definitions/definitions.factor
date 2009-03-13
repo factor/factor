@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors definitions effects generic kernel locals
-macros memoize prettyprint prettyprint.backend words ;
+macros memoize prettyprint prettyprint.backend see words ;
 IN: locals.definitions
 
 PREDICATE: lambda-word < word "lambda" word-prop >boolean ;

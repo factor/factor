@@ -34,9 +34,14 @@ IN: compiler.tree.propagation.recursive
     } cond interval-union nip ;
 
 : generalize-counter ( info' initial -- info )
-    2dup [ class>> null-class? ] either? [ drop ] [
-        [ drop clone ] [ [ interval>> ] bi@ ] 2bi
-        generalize-counter-interval >>interval
+    2dup [ not ] either? [ drop ] [
+        2dup [ class>> null-class? ] either? [ drop ] [
+            [ clone ] dip
+            [ [ drop ] [ [ interval>> ] bi@ generalize-counter-interval ] 2bi >>interval ]
+            [ [ drop ] [ [ slots>> ] bi@ [ generalize-counter ] 2map ] 2bi >>slots ]
+            [ [ drop ] [ [ length>> ] bi@ generalize-counter ] 2bi >>length ]
+            tri
+        ] if
     ] if ;
 
 : unify-recursive-stacks ( stacks initial -- infos )

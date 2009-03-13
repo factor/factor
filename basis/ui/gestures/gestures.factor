@@ -306,12 +306,18 @@ M: macosx modifiers>string
 M: object modifiers>string
     [ name>> ] map "" join ;
 
+HOOK: keysym>string os ( keysym -- string )
+
+M: macosx keysym>string >upper ;
+
+M: object keysym>string ;
+
 M: key-down gesture>string
     [ mods>> ] [ sym>> ] bi
     {
         { [ dup { [ length 1 = ] [ first LETTER? ] } 1&& ] [ [ S+ prefix ] dip ] }
         { [ dup " " = ] [ drop "SPACE" ] }
-        [ >upper ]
+        [ keysym>string ]
     } cond
     [ modifiers>string ] dip append ;
 

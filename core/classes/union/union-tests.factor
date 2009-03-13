@@ -4,7 +4,7 @@ tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
 classes.algebra vectors definitions source-files
 compiler.units kernel.private sorting vocabs io.streams.string
-eval ;
+eval see ;
 IN: classes.union.tests
 
 ! DEFER: bah

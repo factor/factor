@@ -97,7 +97,7 @@ M: plain-writer make-block-stream
     nip <ignore-close-stream> ;
 
 M: plain-writer stream-write-table
-    [ drop format-table [ print ] each ] with-output-stream* ;
+    [ drop format-table [ nl ] [ write ] interleave ] with-output-stream* ;
 
 M: plain-writer make-cell-stream 2drop <string-writer> ;
 

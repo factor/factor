@@ -47,7 +47,7 @@ $nl
 { $subsection <method> }
 "A " { $emphasis "method specifier" } " refers to a method and implements the " { $link "definition-protocol" } ":"
 { $subsection method-spec }
-{ $see-also see see-methods } ;
+{ $see-also "see" } ;
 
 ARTICLE: "method-combination" "Custom method combination"
 "Abstractly, a generic word can be thought of as a big chain of type conditional tests applied to the top of the stack, with methods as the bodies of each test. The " { $emphasis "method combination" } " is this control flow glue between the set of methods, and several aspects of it can be customized:"

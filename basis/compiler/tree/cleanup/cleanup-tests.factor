@@ -515,3 +515,8 @@ cell-bits 32 = [
     [ { fixnum fixnum } declare = ]
     \ both-fixnums? inlined?
 ] unit-test
+
+[ t ] [
+    [ { integer integer } declare + drop ]
+    { + +-integer-integer } inlined?
+] unit-test
