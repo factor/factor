@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.builtin
 classes.intersection classes.mixin classes.predicate
@@ -224,7 +224,7 @@ C: <vocab-author> vocab-author
 
 : words. ( vocab -- )
     last-element off
-    [ require ] [ words $words ] bi ;
+    [ require ] [ words $words ] bi nl ;
 
 : describe-metadata ( vocab -- )
     [
