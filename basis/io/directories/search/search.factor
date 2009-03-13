@@ -61,8 +61,8 @@ PRIVATE>
 ERROR: file-not-found ;
 
 : find-in-directories ( directories bfs? quot: ( obj -- ? ) -- path'/f )
-    [
-        '[ _ _ find-file [ file-not-found ] unless* ] attempt-all
+    '[
+        _ [ _ _ find-file [ file-not-found ] unless* ] attempt-all
     ] [
         drop f
     ] recover ;
