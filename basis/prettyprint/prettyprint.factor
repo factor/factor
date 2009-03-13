@@ -4,7 +4,7 @@ USING: accessors assocs colors combinators grouping io
 io.streams.string io.styles kernel make math math.parser namespaces
 parser prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections quotations sequences sorting strings vocabs
-vocabs.parser words ;
+vocabs.parser words sets ;
 IN: prettyprint
 
 <PRIVATE
@@ -32,7 +32,7 @@ IN: prettyprint
     [ \ IN: pprint-word pprint-vocab ] with-pprint ;
 
 : in. ( vocab -- )
-    [ write-in nl ] when* ;
+    [ write-in ] when* ;
 
 : use. ( seq -- )
     [
@@ -52,21 +52,23 @@ IN: prettyprint
     [ [ words>> eq? nip ] with assoc-find 2drop ] curry map sift ;
 
 : prelude. ( -- )
-    in get use get vocab-names use/in. ;
+    in get use get vocab-names prune in get ".private" append swap remove use/in. ;
 
 [
     nl
-    "Restarts were invoked adding vocabularies to the search path." print
-    "To avoid doing this in the future, add the following USING:" print
-    "and IN: forms at the top of the source file:" print nl
-    prelude.
-    nl
+    { { font-style bold } { font-name "sans-serif" } } [
+        "Restarts were invoked adding vocabularies to the search path." print
+        "To avoid doing this in the future, add the following USING:" print
+        "and IN: forms at the top of the source file:" print nl
+    ] with-style
+    { { page-color T{ rgba f 0.8 0.8 0.8 1.0 } } } [ prelude. ] with-nesting
+    nl nl
 ] print-use-hook set-global
 
 PRIVATE>
 
 : with-use ( obj quot -- )
-    make-pprint use/in. do-pprint ; inline
+    make-pprint use/in. nl do-pprint ; inline
 
 : with-in ( obj quot -- )
     make-pprint drop [ write-in bl ] when* do-pprint ; inline
