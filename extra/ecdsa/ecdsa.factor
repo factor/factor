@@ -3,22 +3,16 @@
 
 USING: kernel accessors sequences sequences.private destructors math namespaces
        locals openssl openssl.libcrypto byte-arrays bit-arrays.private
-       alien.c-types ;
+       alien.c-types alien.destructors ;
 
 IN: ecdsa
 
 <PRIVATE
 
-TUPLE: openssl-object handle ;
+TUPLE: ec-key handle ;
 
-GENERIC# free-handle 1 ( obj handle -- obj )
-
-M: openssl-object dispose
-    dup [ free-handle f ] change-handle 2drop ;
-
-TUPLE: ec-key < openssl-object ;
-
-M: ec-key free-handle EC_KEY_free ;
+M: ec-key dispose
+    [ EC_KEY_free f ] change-handle drop ;
 
 : <ec-key> ( curve -- key )
     OBJ_sn2nid dup zero? [ "Unknown curve name" throw ] when
@@ -27,13 +21,9 @@ M: ec-key free-handle EC_KEY_free ;
 : ec-key-handle ( -- handle )
     ec-key get dup handle>> [ nip ] [ already-disposed ] if* ;
 
-TUPLE: openssl-bignum < openssl-object ;
+DESTRUCTOR: BN_clear_free
 
-M: openssl-bignum free-handle BN_clear_free ;
-
-TUPLE: ec-point < openssl-object ;
-
-M: ec-point free-handle EC_POINT_clear_free ;
+DESTRUCTOR: EC_POINT_clear_free
 
 PRIVATE>
 
@@ -45,19 +35,18 @@ PRIVATE>
 
 : set-private-key ( bin -- )
     ec-key-handle swap
-    dup length f BN_bin2bn dup ssl-error dup openssl-bignum boa
-    [ drop EC_KEY_set_private_key ssl-error ] with-disposal ;
+    dup length f BN_bin2bn dup ssl-error
+    [ &BN_clear_free EC_KEY_set_private_key ssl-error ] with-destructors ;
 
 :: set-public-key ( BIN -- )
     ec-key-handle :> KEY
     KEY EC_KEY_get0_group :> GROUP
-    GROUP EC_POINT_new dup ssl-error :> POINT
-    POINT ec-point boa
+    GROUP EC_POINT_new dup ssl-error
     [
-        drop
+        &EC_POINT_clear_free :> POINT
         GROUP POINT BIN dup length f EC_POINT_oct2point ssl-error
         KEY POINT EC_KEY_set_public_key ssl-error
-    ] with-disposal ;
+    ] with-destructors ;
 
 : get-private-key ( -- bin/f )
     ec-key-handle EC_KEY_get0_private_key
