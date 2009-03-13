@@ -221,8 +221,9 @@ TUPLE: slice-error from to seq reason ;
 : check-slice ( from to seq -- from to seq )
     3dup
     [ 2drop 0 < "start < 0" slice-error ]
-    [ nip length > "end > sequence" slice-error ]
-    [ drop > "start > end" slice-error ] 3tri ; inline
+    [ [ drop ] 2dip length > "end > sequence" slice-error ]
+    [ drop > "start > end" slice-error ]
+    3tri ; inline
 
 : <slice> ( from to seq -- slice )
     dup slice? [ collapse-slice ] when
