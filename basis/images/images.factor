@@ -27,7 +27,7 @@ R16G16B16 R32G32B32 R16G16B16A16 R32G32B32A32 ;
         { R32G32B32A32 [ 16 ] }
     } case ;
 
-TUPLE: image dim component-order bitmap ;
+TUPLE: image dim component-order upside-down? bitmap ;
 
 : <image> ( -- image ) image new ; inline
 
@@ -82,11 +82,16 @@ M: ARGB normalize-component-order*
 M: ABGR normalize-component-order*
     drop ARGB>RGBA 4 BGR>RGB ;
 
-GENERIC: normalize-scan-line-order ( image -- image )
-
-M: image normalize-scan-line-order ;
+: normalize-scan-line-order ( image -- image )
+    dup upside-down?>> [
+        dup dim>> first 4 * '[
+            _ <groups> reverse concat
+        ] change-bitmap
+        f >>upside-down?
+    ] when ;
 
 : normalize-image ( image -- image )
     [ >byte-array ] change-bitmap
     normalize-component-order
-    normalize-scan-line-order ;
+    normalize-scan-line-order
+    RGBA >>component-order ;

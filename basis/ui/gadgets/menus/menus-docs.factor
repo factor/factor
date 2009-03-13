@@ -16,7 +16,7 @@ HELP: show-commands-menu
 { $notes "Useful for right-click context menus." } ;
 
 ARTICLE: "ui.gadgets.menus" "Popup menus"
-"The " { $vocab-link "ui.gadgets.menus" } " vocabulary implements popup menus."
+"The " { $vocab-link "ui.gadgets.menus" } " vocabulary displays popup menus in " { $link "ui.gadgets.glass" } "."
 { $subsection <commands-menu> }
 { $subsection show-menu }
 { $subsection show-commands-menu } ;

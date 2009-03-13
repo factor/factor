@@ -7,7 +7,7 @@ tools.deploy.config.editor assocs hashtables prettyprint ;
 IN: tools.deploy.unix
 
 : create-app-dir ( vocab bundle-name -- vm )
-    dup "" copy-fonts
+    dup "" copy-theme
     copy-vm
     dup OCT: 755 set-file-permissions ;
 

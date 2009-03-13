@@ -4,7 +4,7 @@ USING: accessors arrays definitions generic io kernel assocs
 hashtables namespaces make parser prettyprint sequences strings
 io.styles vectors words math sorting splitting classes slots fry
 sets vocabs help.stylesheet help.topics vocabs.loader quotations
-combinators call ;
+combinators call see ;
 IN: help.markup
 
 PREDICATE: simple-element < array
@@ -13,7 +13,6 @@ PREDICATE: simple-element < array
 SYMBOL: last-element
 SYMBOL: span
 SYMBOL: block
-SYMBOL: table
 
 : last-span? ( -- ? ) last-element get span eq? ;
 : last-block? ( -- ? ) last-element get block eq? ;
@@ -44,7 +43,7 @@ M: f print-element drop ;
     [ print-element ] with-default-style ;
 
 : ($block) ( quot -- )
-    last-element get { f table } member? [ nl ] unless
+    last-element get [ nl ] when
     span last-element set
     call
     block last-element set ; inline
@@ -218,7 +217,7 @@ ALIAS: $slot $snippet
         table-content-style get [
             swap [ last-element off call ] tabular-output
         ] with-style
-    ] ($block) table last-element set ; inline
+    ] ($block) ; inline
 
 : $list ( element -- )
     list-style get [
@@ -301,7 +300,7 @@ M: f ($instance)
         ] with-style
     ] ($block) ; inline
 
-: $see ( element -- ) first [ see ] ($see) ;
+: $see ( element -- ) first [ see* ] ($see) ;
 
 : $synopsis ( element -- ) first [ synopsis write ] ($see) ;
 
@@ -345,6 +344,8 @@ M: f ($instance)
 : $io-error ( children -- )
     drop
     "Throws an error if the I/O operation fails." $errors ;
+
+FROM: prettyprint.private => with-pprint ;
 
 : $prettyprinting-note ( children -- )
     drop {

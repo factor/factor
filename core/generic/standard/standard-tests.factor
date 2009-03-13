@@ -5,7 +5,7 @@ specialized-arrays.double byte-arrays bit-arrays parser
 namespaces make quotations stack-checker vectors growable
 hashtables sbufs prettyprint byte-vectors bit-vectors
 specialized-vectors.double definitions generic sets graphs assocs
-grouping ;
+grouping see ;
 
 GENERIC: lo-tag-test ( obj -- obj' )
 

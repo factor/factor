@@ -33,19 +33,19 @@ M: inspector-renderer column-titles
             [
                 [
                     [ "Class:" write ] with-cell
-                    [ class . ] with-cell
+                    [ class pprint ] with-cell
                 ] with-row
             ]
             [
                 [
                     [ "Object:" write ] with-cell
-                    [ short. ] with-cell
+                    [ pprint-short ] with-cell
                 ] with-row
             ]
             [
                 [
                     [ "Summary:" write ] with-cell
-                    [ summary. ] with-cell
+                    [ print-summary ] with-cell
                 ] with-row
             ] tri
         ] tabular-output

@@ -194,6 +194,7 @@ ARTICLE: "io" "Input and output"
 ARTICLE: "tools" "Developer tools"
 { $subsection "tools.vocabs" }
 "Exploratory tools:"
+{ $subsection "see" }
 { $subsection "editor" }
 { $subsection "listener" }
 { $subsection "tools.crossref" }

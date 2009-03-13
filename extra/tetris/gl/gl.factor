@@ -35,7 +35,7 @@ IN: tetris.gl
 : scale-board ( width height board -- )
     [ width>> ] [ height>> ] bi swapd [ / ] dup 2bi* 1 glScalef ;
 
-: (draw-tetris) ( width height tetris -- )
+: draw-tetris ( width height tetris -- )
     #! width and height are in pixels
     GL_MODELVIEW [
         {
@@ -45,6 +45,3 @@ IN: tetris.gl
             [ current-piece draw-piece ]
         } cleave
     ] do-matrix ;
-
-: draw-tetris ( width height tetris -- )
-    origin get [ (draw-tetris) ] with-translation ;

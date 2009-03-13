@@ -34,7 +34,7 @@ IN: http
 
 : check-header-string ( str -- str )
     #! http://en.wikipedia.org/wiki/HTTP_Header_Injection
-    dup "\r\n\"" intersects?
+    dup "\r\n" intersects?
     [ "Header injection attack" throw ] when ;
 
 : write-header ( assoc -- )
@@ -213,7 +213,10 @@ TUPLE: post-data data params content-type content-encoding ;
         swap >>content-type ;
 
 : parse-content-type-attributes ( string -- attributes )
-    " " split harvest [ "=" split1 [ >lower ] dip ] { } map>assoc ;
+    " " split harvest [
+        "=" split1
+        [ >lower ] [ "\"" ?head drop "\"" ?tail drop ] bi*
+    ] { } map>assoc ;
 
 : parse-content-type ( content-type -- type encoding )
     ";" split1

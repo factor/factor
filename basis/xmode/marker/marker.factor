@@ -1,11 +1,26 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: xmode.marker
 USING: kernel namespaces make xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators strings
-parser-combinators.regexp splitting parser-combinators ascii
-ascii combinators.short-circuit accessors ;
+regexp splitting unicode.case ascii
+combinators.short-circuit accessors ;
+IN: xmode.marker
+
+! Next two words copied from parser-combinators
+! Just like head?, but they optionally ignore case
+
+: string= ( str1 str2 ignore-case -- ? )
+    [ [ >upper ] bi@ ] when sequence= ;
+
+: string-head? ( str1 str2 ignore-case -- ? )
+    2over shorter?
+    [ 3drop f ] [
+        [
+            [ nip ]
+            [ length head-slice ] 2bi
+        ] dip string=
+    ] if ;
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 
@@ -69,7 +84,7 @@ M: string-matcher text-matches?
     ] keep string>> length and ;
 
 M: regexp text-matches?
-    [ >string ] dip match-head ;
+    [ >string ] dip re-contains? ;
 
 : rule-start-matches? ( rule -- match-count/f )
     dup start>> tuck swap can-match-here? [
@@ -150,7 +165,7 @@ M: escape-rule handle-rule-start
     process-escape? get [
         escaped? [ not ] change
         position [ + ] change
-    ] [ 2drop ] if ;
+    ] [ drop ] if ;
 
 M: seq-rule handle-rule-start
     ?end-rule
