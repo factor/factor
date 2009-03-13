@@ -1,4 +1,4 @@
-USING: math tools.test classes.algebra ;
+USING: math tools.test classes.algebra words kernel sequences assocs ;
 IN: classes.predicate
 
 PREDICATE: negative < integer 0 < ;
@@ -19,3 +19,9 @@ M: positive abs ;
 [ 10 ] [ -10 abs ] unit-test
 [ 10 ] [ 10 abs ] unit-test
 [ 0 ] [ 0 abs ] unit-test
+
+PREDICATE: blah < word blah eq? ;
+
+[ f ] [ \ predicate-instance? "compiled-uses" word-prop keys \ blah swap memq? ] unit-test
+
+FORGET: blah

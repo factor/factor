@@ -7,7 +7,7 @@ sorting assocs definitions prettyprint io inspector
 classes.tuple classes.union classes.predicate debugger
 threads.private io.streams.string io.timeouts io.thread
 sequences.private destructors combinators eval locals.backend
-system ;
+system compiler.units ;
 IN: stack-checker.tests
 
 \ infer. must-infer
@@ -581,3 +581,10 @@ DEFER: eee'
 [ [ ] debugging-curry-folding ] must-infer
 
 [ [ exit ] [ 1 2 3 ] if ] must-infer
+
+! Stack effects are required now but FORGET: clears them...
+: forget-test ( -- ) ;
+
+[ forget-test ] must-infer
+[ ] [ [ \ forget-test forget ] with-compilation-unit ] unit-test
+[ forget-test ] must-infer
