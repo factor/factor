@@ -111,7 +111,7 @@ t compile-dependencies? set-global
     ] with-return ;
 
 : compile-loop ( deque -- )
-    [ (compile) yield-hook get call ] slurp-deque ;
+    [ (compile) yield-hook get assert-depth ] slurp-deque ;
 
 : decompile ( word -- )
     f 2array 1array modify-code-heap ;
@@ -119,7 +119,9 @@ t compile-dependencies? set-global
 : compile-call ( quot -- )
     [ dup infer define-temp ] with-compilation-unit execute ;
 
-: optimized-recompile-hook ( words -- alist )
+SINGLETON: optimizing-compiler
+
+M: optimizing-compiler recompile ( words -- alist )
     [
         <hashed-dlist> compile-queue set
         H{ } clone compiled set
@@ -129,10 +131,10 @@ t compile-dependencies? set-global
     ] with-scope ;
 
 : enable-compiler ( -- )
-    [ optimized-recompile-hook ] recompile-hook set-global ;
+    optimizing-compiler compiler-impl set-global ;
 
 : disable-compiler ( -- )
-    [ default-recompile-hook ] recompile-hook set-global ;
+    f compiler-impl set-global ;
 
 : recompile-all ( -- )
     forget-errors all-words compile ;
