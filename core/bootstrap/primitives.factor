@@ -47,10 +47,10 @@ init-caches
 
 ! Trivial recompile hook. We don't want to touch the code heap
 ! during stage1 bootstrap, it would just waste time.
-! SINGLETON: dummy-compiler
-! M: dummy-compiler recompile drop { } ;
-! dummy-compiler compiler-impl set
-[ drop { } ] recompile-hook set
+SINGLETON: dummy-compiler
+M: dummy-compiler recompile drop { } ;
+dummy-compiler compiler-impl set
+
 call
 call
 call
