@@ -62,7 +62,7 @@ M: R16G16B16 normalize-component-order*
     drop RGB16>8 add-dummy-alpha ;
 
 : BGR>RGB ( bitmap bytes-per-pixel -- pixels )
-    <groups> [ 3 cut [ reverse ] dip append ] map B{ } join ; inline
+    <sliced-groups> [ <reversed> ] map B{ } join ; inline
 
 M: BGRA normalize-component-order*
     drop 4 BGR>RGB ;
