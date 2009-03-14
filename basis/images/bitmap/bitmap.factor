@@ -130,28 +130,30 @@ MACRO: (nbits>bitmap) ( bits -- )
 
 PRIVATE>
 
-: save-bitmap ( bitmap path -- )
+: bitmap>color-index ( bitmap-array -- byte-array )
+    4 <sliced-groups> [ 3 head-slice reverse ] map B{ } join ; inline
+
+: save-bitmap ( image path -- )
     binary [
         B{ CHAR: B CHAR: M } write
         [
-            color-index>> length 14 + 40 + write4
+            bitmap>> bitmap>color-index length 14 + 40 + write4
             0 write4
             54 write4
             40 write4
         ] [
             {
-                [ width>> write4 ]
-                [ height>> write4 ]
-                [ planes>> 1 or write2 ]
-                [ bit-count>> 24 or write2 ]
-                [ compression>> 0 or write4 ]
-                [ size-image>> write4 ]
-                [ x-pels>> 0 or write4 ]
-                [ y-pels>> 0 or write4 ]
-                [ color-used>> 0 or write4 ]
-                [ color-important>> 0 or write4 ]
-                [ rgb-quads>> write ]
-                [ color-index>> write ]
+                [ dim>> first2 [ write4 ] bi@ ]
+                [ drop 1 write2 ]
+                [ drop 24 write2 ]
+                [ drop 0 write4 ]
+                [ bitmap>> bitmap>color-index length write4 ]
+                [ drop 0 write4 ]
+                [ drop 0 write4 ]
+                [ drop 0 write4 ]
+                [ drop 0 write4 ]
+                ! rgb-quads
+                [ bitmap>> bitmap>color-index write ]
             } cleave
         ] bi
     ] with-file-writer ;
