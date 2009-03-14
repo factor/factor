@@ -2,6 +2,9 @@ IN: compiler.units.tests
 USING: definitions compiler.units tools.test arrays sequences words kernel
 accessors namespaces fry ;
 
+[ [ [ ] define-temp ] with-compilation-unit ] must-infer
+[ [ [ ] define-temp ] with-nested-compilation-unit ] must-infer
+
 [ flushed-dependency ] [ f flushed-dependency strongest-dependency ] unit-test
 [ flushed-dependency ] [ flushed-dependency f strongest-dependency ] unit-test
 [ inlined-dependency ] [ flushed-dependency inlined-dependency strongest-dependency ] unit-test

@@ -12,8 +12,6 @@ ARTICLE: "compiler-usage" "Calling the optimizing compiler"
 "Normally, new word definitions are recompiled automatically. This can be changed:"
 { $subsection disable-compiler }
 { $subsection enable-compiler }
-"The optimizing compiler can be called directly, although this should not be necessary under normal circumstances:"
-{ $subsection optimized-recompile-hook }
 "Removing a word's optimized definition:"
 { $subsection decompile }
 "Compiling a single quotation:"
@@ -46,9 +44,8 @@ HELP: (compile)
 { $description "Compile a single word." }
 { $notes "This is an internal word, and user code should call " { $link compile } " instead." } ;
 
-HELP: optimized-recompile-hook
-{ $values { "words" "a sequence of words" } { "alist" "an association list" } }
-{ $description "Compile a set of words." }
+HELP: optimizing-compiler
+{ $description "Singleton class implementing " { $link recompile } " to call the optimizing compiler." }
 { $notes "This is an internal word, and user code should call " { $link compile } " instead." } ;
 
 HELP: compile-call
