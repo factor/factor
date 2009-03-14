@@ -19,7 +19,7 @@ SYMBOL: changed-definitions
 
 SYMBOL: changed-generics
 
-SYMBOL: remake-generics
+SYMBOL: outdated-generics
 
 SYMBOL: new-classes
 
