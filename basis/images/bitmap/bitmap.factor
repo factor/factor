@@ -6,10 +6,12 @@ kernel macros math math.bitwise math.functions namespaces sequences
 strings images endian summary ;
 IN: images.bitmap
 
-TUPLE: bitmap-image < image
+TUPLE: loading-bitmap 
 magic size reserved offset header-length width
 height planes bit-count compression size-image
 x-pels y-pels color-used color-important rgb-quads color-index ;
+
+TUPLE: bitmap-image < image ;
 
 ! Currently can only handle 24/32bit bitmaps.
 ! Handles row-reversed bitmaps (their height is negative)
@@ -30,7 +32,7 @@ M: bitmap-magic summary
 
 ERROR: bmp-not-supported n ;
 
-: raw-bitmap>buffer ( bitmap -- array )
+: raw-bitmap>seq ( bitmap -- array )
     dup bit-count>>
     {
         { 32 [ color-index>> ] }
@@ -64,10 +66,10 @@ ERROR: bmp-not-supported n ;
     read4 >>color-used
     read4 >>color-important ;
 
-: rgb-quads-length ( bitmap -- n )
+: rgb-quads-length ( loading-bitmap -- n )
     [ offset>> 14 - ] [ header-length>> ] bi - ;
 
-: color-index-length ( bitmap -- n )
+: color-index-length ( loading-bitmap -- n )
     {
         [ width>> ]
         [ planes>> * ]
@@ -79,13 +81,10 @@ ERROR: bmp-not-supported n ;
     dup rgb-quads-length read >>rgb-quads
     dup color-index-length read >>color-index ;
 
-: load-bitmap-data ( path bitmap -- bitmap )
+: load-bitmap-data ( path loading-bitmap -- loading-bitmap )
     [ binary ] dip '[
         _ parse-file-header parse-bitmap-header parse-bitmap
     ] with-file-reader ;
-
-: process-bitmap-data ( bitmap -- bitmap )
-    dup raw-bitmap>buffer >>bitmap ;
 
 ERROR: unknown-component-order bitmap ;
 
@@ -97,26 +96,26 @@ ERROR: unknown-component-order bitmap ;
         [ unknown-component-order ]
     } case ;
 
-: fill-image-slots ( bitmap -- bitmap )
-    dup {
+: loading-bitmap>bitmap-image ( loading-bitmap -- bitmap-image )
+    [ bitmap-image new ] dip
+    {
+        [ raw-bitmap>seq >>bitmap ]
         [ [ width>> ] [ height>> ] bi 2array >>dim ]
         [ bitmap>component-order >>component-order ]
-        [ bitmap>> >>bitmap ]
     } cleave ;
 
-M: bitmap-image load-image* ( path bitmap -- bitmap )
-    load-bitmap-data process-bitmap-data
-    fill-image-slots ;
+M: bitmap-image load-image* ( path loading-bitmap -- bitmap )
+    drop loading-bitmap new
+    load-bitmap-data loading-bitmap>bitmap-image ;
 
 MACRO: (nbits>bitmap) ( bits -- )
     [ -3 shift ] keep '[
-        bitmap-image new
+        loading-bitmap new
             2over * _ * >>size-image
             swap >>height
             swap >>width
             swap array-copy [ >>bitmap ] [ >>color-index ] bi
-            _ >>bit-count fill-image-slots
-            t >>upside-down?
+            _ >>bit-count
     ] ;
 
 : bgr>bitmap ( array height width -- bitmap )
@@ -143,15 +142,33 @@ PRIVATE>
             40 write4
         ] [
             {
+                ! width height
                 [ dim>> first2 [ write4 ] bi@ ]
+
+                ! planes
                 [ drop 1 write2 ]
+
+                ! bit-count
                 [ drop 24 write2 ]
+
+                ! compression
                 [ drop 0 write4 ]
+
+                ! size-image
                 [ bitmap>> bitmap>color-index length write4 ]
+
+                ! x-pels
                 [ drop 0 write4 ]
+
+                ! y-pels
                 [ drop 0 write4 ]
+
+                ! color-used
                 [ drop 0 write4 ]
+
+                ! color-important
                 [ drop 0 write4 ]
+
                 ! rgb-quads
                 [ bitmap>> bitmap>color-index write ]
             } cleave
