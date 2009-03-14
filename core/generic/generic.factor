@@ -3,7 +3,7 @@
 USING: accessors words kernel sequences namespaces make assocs
 hashtables definitions kernel.private classes classes.private
 classes.algebra quotations arrays vocabs effects combinators
-sets compiler.units ;
+sets ;
 IN: generic
 
 ! Method combination protocol
@@ -20,11 +20,6 @@ M: generic definition drop f ;
     [ { "unannotated-def" } reset-props ]
     [ dup "combination" word-prop perform-combination ]
     bi ;
-
-[
-    remake-generics get keys
-    [ generic? ] filter [ make-generic ] each
-] remake-generics-hook set-global
 
 : method ( class generic -- method/f )
     "methods" word-prop at ;
@@ -76,7 +71,10 @@ TUPLE: check-method class generic ;
     [ [ [ class-or ] when* ] change-at ] [ no-compilation-unit ] if* ;
 
 : remake-generic ( generic -- )
-    dup remake-generics get set-in-unit ;
+    dup outdated-generics get set-in-unit ;
+
+: remake-generics ( -- )
+    outdated-generics get keys [ generic? ] filter [ make-generic ] each ;
 
 : with-methods ( class generic quot -- )
     [ drop changed-generic ]

@@ -1,10 +1,10 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs grouping kernel
-locals math namespaces sequences fry quotations
-math.order math.ranges vectors unicode.categories
-regexp.transition-tables words sets hashtables combinators.short-circuit
-unicode.case.private regexp.ast regexp.classes ;
+USING: accessors arrays assocs grouping kernel locals math namespaces
+sequences fry quotations math.order math.ranges vectors
+unicode.categories regexp.transition-tables words sets hashtables
+combinators.short-circuit unicode.case unicode.case.private regexp.ast
+regexp.classes ;
 IN: regexp.nfa
 
 ! This uses unicode.case.private for ch>upper and ch>lower
