@@ -27,7 +27,7 @@ PRIVATE>
 
 : <labeled-gadget> ( gadget title -- newgadget )
     labeled-gadget "labeled-block" [
-        over >>content
+        pick >>content
         /-FOO-\
         |-----|
         \-----/
