@@ -135,7 +135,7 @@ ERROR: no-vocab vocab ;
 
 : ($values.) ( array -- )
     [
-        " { " write
+        "{ " write
         dup array? [ first ] when
         dup lookup-type [
             [ unparse write bl ]
