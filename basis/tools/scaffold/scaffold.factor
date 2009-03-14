@@ -5,7 +5,7 @@ io.encodings.utf8 hashtables kernel namespaces sequences
 vocabs.loader io combinators calendar accessors math.parser
 io.streams.string ui.tools.operations quotations strings arrays
 prettyprint words vocabs sorting sets classes math alien urls
-splitting ascii combinators.short-circuit ;
+splitting ascii combinators.short-circuit alarms words.symbol ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -116,6 +116,7 @@ ERROR: no-vocab vocab ;
         { "ch" "a character" }
         { "word" word }
         { "array" array }
+        { "alarm" alarm }
         { "duration" duration }
         { "path" "a pathname string" }
         { "vocab" "a vocabulary specifier" }
@@ -162,15 +163,26 @@ ERROR: no-vocab vocab ;
         ] if
     ] when* ;
 
+: symbol-description. ( word -- )
+    drop
+    "{ $var-description \"\" } ;" print ;
+
 : $description. ( word -- )
     drop
     "{ $description \"\" } ;" print ;
+
+: docs-body. ( word/symbol -- )
+    dup symbol? [
+        symbol-description.
+    ] [
+        [ $values. ] [ $description. ] bi
+    ] if ;
 
 : docs-header. ( word -- )
     "HELP: " write name>> print ;
 
 : (help.) ( word -- )
-    [ docs-header. ] [ $values. ] [ $description. ] tri ;
+    [ docs-header. ] [ docs-body. ] bi ;
 
 : interesting-words ( vocab -- array )
     words
