@@ -6,15 +6,20 @@ kernel macros math math.bitwise math.functions namespaces sequences
 strings images endian summary ;
 IN: images.bitmap
 
+: assert-sequence= ( a b -- )
+    2dup sequence= [ 2drop ] [ assert ] if ;
+
+: read2 ( -- n ) 2 read le> ;
+: read4 ( -- n ) 4 read le> ;
+
+TUPLE: bitmap-image < image ;
+
+! Used to construct the final bitmap-image
+
 TUPLE: loading-bitmap 
 magic size reserved offset header-length width
 height planes bit-count compression size-image
 x-pels y-pels color-used color-important rgb-quads color-index ;
-
-TUPLE: bitmap-image < image ;
-
-! Currently can only handle 24/32bit bitmaps.
-! Handles row-reversed bitmaps (their height is negative)
 
 ERROR: bitmap-magic magic ;
 
@@ -22,9 +27,6 @@ M: bitmap-magic summary
     drop "First two bytes of bitmap stream must be 'BM'" ;
 
 <PRIVATE
-
-: array-copy ( bitmap array -- bitmap array' )
-    over size-image>> abs memory>byte-array ;
 
 : 8bit>buffer ( bitmap -- array )
     [ rgb-quads>> 4 <sliced-groups> [ 3 head-slice ] map ]
@@ -37,18 +39,12 @@ ERROR: bmp-not-supported n ;
     {
         { 32 [ color-index>> ] }
         { 24 [ color-index>> ] }
-        { 16 [ bmp-not-supported ] }
         { 8 [ 8bit>buffer ] }
-        { 4 [ bmp-not-supported ] }
-        { 2 [ bmp-not-supported ] }
-        { 1 [ bmp-not-supported ] }
+        [ bmp-not-supported ]
     } case >byte-array ;
 
-: read2 ( -- n ) 2 read le> ;
-: read4 ( -- n ) 4 read le> ;
-
 : parse-file-header ( bitmap -- bitmap )
-    2 read dup "BM" sequence= [ bitmap-magic ] unless >>magic
+    2 read "BM" assert-sequence=
     read4 >>size
     read4 >>reserved
     read4 >>offset ;
@@ -77,7 +73,7 @@ ERROR: bmp-not-supported n ;
         [ height>> abs * ]
     } cleave ;
 
-: parse-bitmap ( bitmap -- bitmap )
+: parse-bitmap ( loading-bitmap -- loading-bitmap )
     dup rgb-quads-length read >>rgb-quads
     dup color-index-length read >>color-index ;
 
@@ -108,29 +104,13 @@ M: bitmap-image load-image* ( path loading-bitmap -- bitmap )
     drop loading-bitmap new
     load-bitmap-data loading-bitmap>bitmap-image ;
 
-MACRO: (nbits>bitmap) ( bits -- )
-    [ -3 shift ] keep '[
-        loading-bitmap new
-            2over * _ * >>size-image
-            swap >>height
-            swap >>width
-            swap array-copy [ >>bitmap ] [ >>color-index ] bi
-            _ >>bit-count
-    ] ;
-
-: bgr>bitmap ( array height width -- bitmap )
-    24 (nbits>bitmap) ;
-
-: bgra>bitmap ( array height width -- bitmap )
-    32 (nbits>bitmap) ;
-
 : write2 ( n -- ) 2 >le write ;
 : write4 ( n -- ) 4 >le write ;
 
 PRIVATE>
 
 : bitmap>color-index ( bitmap-array -- byte-array )
-    4 <sliced-groups> [ 3 head-slice reverse ] map B{ } join ; inline
+    4 <sliced-groups> [ 3 head-slice <reversed> ] map B{ } join ; inline
 
 : save-bitmap ( image path -- )
     binary [
