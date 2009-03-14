@@ -11,6 +11,8 @@ IN: images.bitmap
 
 : read2 ( -- n ) 2 read le> ;
 : read4 ( -- n ) 4 read le> ;
+: write2 ( n -- ) 2 >le write ;
+: write4 ( n -- ) 4 >le write ;
 
 TUPLE: bitmap-image < image ;
 
@@ -34,22 +36,25 @@ M: bitmap-magic summary
 
 ERROR: bmp-not-supported n ;
 
-: raw-bitmap>seq ( bitmap -- array )
+: reverse-lines ( byte-array width -- byte-array )
+    3 * <sliced-groups> <reversed> concat ; inline
+
+: raw-bitmap>seq ( loading-bitmap -- array )
     dup bit-count>>
     {
         { 32 [ color-index>> ] }
-        { 24 [ color-index>> ] }
-        { 8 [ 8bit>buffer ] }
+        { 24 [ [ color-index>> ] [ width>> ] bi reverse-lines ] }
+        { 8 [ [ 8bit>buffer ] [ width>> ] bi reverse-lines ] }
         [ bmp-not-supported ]
     } case >byte-array ;
 
-: parse-file-header ( bitmap -- bitmap )
+: parse-file-header ( loading-bitmap -- loading-bitmap )
     2 read "BM" assert-sequence=
     read4 >>size
     read4 >>reserved
     read4 >>offset ;
 
-: parse-bitmap-header ( bitmap -- bitmap )
+: parse-bitmap-header ( loading-bitmap -- loading-bitmap )
     read4 >>header-length
     read4 >>width
     read4 >>height
@@ -84,7 +89,7 @@ ERROR: bmp-not-supported n ;
 
 ERROR: unknown-component-order bitmap ;
 
-: bitmap>component-order ( bitmap -- object )
+: bitmap>component-order ( loading-bitmap -- object )
     bit-count>> {
         { 32 [ BGRA ] }
         { 24 [ BGR ] }
@@ -102,10 +107,8 @@ ERROR: unknown-component-order bitmap ;
 
 M: bitmap-image load-image* ( path loading-bitmap -- bitmap )
     drop loading-bitmap new
-    load-bitmap-data loading-bitmap>bitmap-image ;
-
-: write2 ( n -- ) 2 >le write ;
-: write4 ( n -- ) 4 >le write ;
+    load-bitmap-data
+    loading-bitmap>bitmap-image ;
 
 PRIVATE>
 
@@ -150,7 +153,10 @@ PRIVATE>
                 [ drop 0 write4 ]
 
                 ! rgb-quads
-                [ bitmap>> bitmap>color-index write ]
+                [
+                    [ bitmap>> bitmap>color-index ] [ dim>> first ] bi
+                    reverse-lines write
+                ]
             } cleave
         ] bi
     ] with-file-writer ;
