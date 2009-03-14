@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types arrays byte-arrays columns
 combinators fry grouping io io.binary io.encodings.binary io.files
 kernel macros math math.bitwise math.functions namespaces sequences
-strings images endian summary ;
+strings images endian summary bitstreams ;
 IN: images.bitmap
 
 : assert-sequence= ( a b -- )
@@ -19,7 +19,7 @@ TUPLE: bitmap-image < image ;
 ! Used to construct the final bitmap-image
 
 TUPLE: loading-bitmap 
-magic size reserved offset header-length width
+size reserved offset header-length width
 height planes bit-count compression size-image
 x-pels y-pels color-used color-important rgb-quads color-index ;
 
