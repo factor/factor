@@ -1,32 +1,33 @@
-USING: kernel tools.test trees trees.avl math random sequences assocs ;
+USING: kernel tools.test trees trees.avl math random sequences
+assocs accessors ;
 IN: trees.avl.tests
 
 [ "key1" 0 "key2" 0 ] [
     T{ avl-node f "key1" f f T{ avl-node f "key2" f f 1 } 2 }
     [ single-rotate ] go-left
-    [ node-left dup node-key swap avl-node-balance ] keep
-    dup node-key swap avl-node-balance
+    [ left>> dup key>> swap balance>> ] keep
+    dup key>> swap balance>>
 ] unit-test
 
 [ "key1" 0 "key2" 0 ] [
     T{ avl-node f "key1" f f T{ avl-node f "key2" f f f 1 } 2 }
     [ select-rotate ] go-left
-    [ node-left dup node-key swap avl-node-balance ] keep
-    dup node-key swap avl-node-balance
+    [ left>> dup key>> swap balance>> ] keep
+    dup key>> swap balance>>
 ] unit-test
 
 [ "key1" 0 "key2" 0 ] [
     T{ avl-node f "key1" f T{ avl-node f "key2" f f f -1 } f -2 }
     [ single-rotate ] go-right
-    [ node-right dup node-key swap avl-node-balance ] keep
-    dup node-key swap avl-node-balance
+    [ right>> dup key>> swap balance>> ] keep
+    dup key>> swap balance>>
 ] unit-test
 
 [ "key1" 0 "key2" 0 ] [
     T{ avl-node f "key1" f T{ avl-node f "key2" f f f -1 } f -2 }
     [ select-rotate ] go-right
-    [ node-right dup node-key swap avl-node-balance ] keep
-    dup node-key swap avl-node-balance
+    [ right>> dup key>> swap balance>> ] keep
+    dup key>> swap balance>>
 ] unit-test
 
 [ "key1" -1 "key2" 0 "key3" 0 ]
@@ -34,55 +35,55 @@ IN: trees.avl.tests
         T{ avl-node f "key2" f 
             T{ avl-node f "key3" f f f 1 } f -1 } 2 }
     [ double-rotate ] go-left
-    [ node-left dup node-key swap avl-node-balance ] keep
-    [ node-right dup node-key swap avl-node-balance ] keep
-    dup node-key swap avl-node-balance ] unit-test
+    [ left>> dup key>> swap balance>> ] keep
+    [ right>> dup key>> swap balance>> ] keep
+    dup key>> swap balance>> ] unit-test
 [ "key1" 0 "key2" 0 "key3" 0 ]
 [ T{ avl-node f "key1" f f
         T{ avl-node f "key2" f
             T{ avl-node f "key3" f f f 0 } f -1 } 2 } 
     [ double-rotate ] go-left
-    [ node-left dup node-key swap avl-node-balance ] keep
-    [ node-right dup node-key swap avl-node-balance ] keep
-    dup node-key swap avl-node-balance ] unit-test
+    [ left>> dup key>> swap balance>> ] keep
+    [ right>> dup key>> swap balance>> ] keep
+    dup key>> swap balance>> ] unit-test
 [ "key1" 0 "key2" 1 "key3" 0 ]
 [ T{ avl-node f "key1" f f
         T{ avl-node f "key2" f
             T{ avl-node f "key3" f f f -1 } f -1 } 2 } 
     [ double-rotate ] go-left
-    [ node-left dup node-key swap avl-node-balance ] keep
-    [ node-right dup node-key swap avl-node-balance ] keep
-    dup node-key swap avl-node-balance ] unit-test
+    [ left>> dup key>> swap balance>> ] keep
+    [ right>> dup key>> swap balance>> ] keep
+    dup key>> swap balance>> ] unit-test
 
 [ "key1" 1 "key2" 0 "key3" 0 ]
 [ T{ avl-node f "key1" f
         T{ avl-node f "key2" f f
             T{ avl-node f "key3" f f f -1 } 1 } f -2 }
     [ double-rotate ] go-right
-    [ node-right dup node-key swap avl-node-balance ] keep
-    [ node-left dup node-key swap avl-node-balance ] keep
-    dup node-key swap avl-node-balance ] unit-test
+    [ right>> dup key>> swap balance>> ] keep
+    [ left>> dup key>> swap balance>> ] keep
+    dup key>> swap balance>> ] unit-test
 [ "key1" 0 "key2" 0 "key3" 0 ]
 [ T{ avl-node f "key1" f
         T{ avl-node f "key2" f f
             T{ avl-node f "key3" f f f 0 } 1 } f -2 }
     [ double-rotate ] go-right
-    [ node-right dup node-key swap avl-node-balance ] keep
-    [ node-left dup node-key swap avl-node-balance ] keep
-    dup node-key swap avl-node-balance ] unit-test
+    [ right>> dup key>> swap balance>> ] keep
+    [ left>> dup key>> swap balance>> ] keep
+    dup key>> swap balance>> ] unit-test
 [ "key1" 0 "key2" -1 "key3" 0 ]
 [ T{ avl-node f "key1" f
         T{ avl-node f "key2" f f
             T{ avl-node f "key3" f f f 1 } 1 } f -2 }
     [ double-rotate ] go-right
-    [ node-right dup node-key swap avl-node-balance ] keep
-    [ node-left dup node-key swap avl-node-balance ] keep
-    dup node-key swap avl-node-balance ] unit-test
+    [ right>> dup key>> swap balance>> ] keep
+    [ left>> dup key>> swap balance>> ] keep
+    dup key>> swap balance>> ] unit-test
 
 [ "eight" ] [
     <avl> "seven" 7 pick set-at
     "eight" 8 pick set-at "nine" 9 pick set-at
-    tree-root node-value
+    root>> value>>
 ] unit-test
 
 [ "another eight" ] [ ! ERROR!

@@ -1,8 +1,10 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences io kernel accessors math math.order ;
+USING: sequences io io.streams.plain kernel accessors math math.order
+growable destructors ;
 IN: io.streams.sequence
 
+! Readers
 SLOT: underlying
 SLOT: i
 
@@ -36,3 +38,12 @@ SLOT: i
 : sequence-read-until ( separators stream -- seq sep/f )
     [ find-sep ] keep
     [ sequence-read ] [ next ] bi swap ; inline
+
+! Writers
+M: growable dispose drop ;
+
+M: growable stream-write1 push ;
+M: growable stream-write push-all ;
+M: growable stream-flush drop ;
+
+INSTANCE: growable plain-writer

@@ -25,4 +25,3 @@ IN: trees.tests
 [ "replaced four" ] [ test-tree 9 over delete-at 4 swap at ] unit-test
 [ "nine" "replaced four" ] [ test-tree 7 over delete-at 9 over at 4 rot at ] unit-test
 [ "nine" ] [ test-tree 7 over delete-at 4 over delete-at 9 swap at ] unit-test
-

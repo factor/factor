@@ -1,7 +1,7 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test trees.splay math namespaces assocs
-sequences random sets ;
+sequences random sets make grouping ;
 IN: trees.splay.tests
 
 : randomize-numeric-splay-tree ( splay-tree -- )

@@ -17,11 +17,11 @@ HELP: >splay
 HELP: splay
 { $class-description "This is the class for splay trees. Splay trees have amortized average-case logarithmic time storage and retrieval operations, and better complexity on more skewed lookup distributions, though in bad situations they can degrade to linear time, resembling a linked list. These conform to the assoc protocol." } ;
 
-ARTICLE: { "splay" "intro" } "Splay trees"
+ARTICLE: "trees.splay" "Splay trees"
 "This is a library for splay trees. Splay trees have amortized average-case logarithmic time storage and retrieval operations, and better complexity on more skewed lookup distributions, though in bad situations they can degrade to linear time, resembling a linked list. These trees conform to the assoc protocol."
 { $subsection splay }
 { $subsection <splay> }
 { $subsection >splay }
 { $subsection POSTPONE: SPLAY{ } ;
 
-ABOUT: { "splay" "intro" }
+ABOUT: "trees.splay"
