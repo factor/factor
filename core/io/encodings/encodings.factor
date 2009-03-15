@@ -47,6 +47,9 @@ M: object <decoder> f decoder boa ;
         ] when
     ] when nip ; inline
 
+M: decoder stream-element-type
+    drop +character+ ;
+
 M: decoder stream-read1
     dup >decoder< decode-char fix-read1 ;
 
@@ -120,6 +123,9 @@ M: object <encoder> encoder boa ;
 
 : >encoder< ( encoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ; inline
+
+M: encoder stream-element-type
+    drop +character+ ;
 
 M: encoder stream-write1
     >encoder< encode-char ;
