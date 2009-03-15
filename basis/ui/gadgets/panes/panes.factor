@@ -21,6 +21,8 @@ TUPLE: pane-stream pane ;
 
 C: <pane-stream> pane-stream
 
+M: pane-stream stream-element-type drop +character+ ;
+
 <PRIVATE
 
 : clear-selection ( pane -- pane )
