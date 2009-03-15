@@ -61,26 +61,30 @@ M: R16G16B16A16 normalize-component-order*
 M: R16G16B16 normalize-component-order*
     drop RGB16>8 add-dummy-alpha ;
 
-: BGR>RGB ( bitmap bytes-per-pixel -- pixels )
-    <sliced-groups> [ <reversed> ] map B{ } join ; inline
+: BGR>RGB ( bitmap -- pixels )
+    3 <sliced-groups> [ <reversed> ] map B{ } join ; inline
+
+: BGRA>RGBA ( bitmap -- pixels )
+    4 <sliced-groups>
+    [ unclip-last-slice [ <reversed> ] dip suffix ] map concat ; inline
 
 M: BGRA normalize-component-order*
-    drop 4 BGR>RGB ;
+    drop BGRA>RGBA ;
 
 M: RGB normalize-component-order*
     drop add-dummy-alpha ;
 
 M: BGR normalize-component-order*
-    drop 3 BGR>RGB add-dummy-alpha ;
+    drop BGR>RGB add-dummy-alpha ;
 
 : ARGB>RGBA ( bitmap -- bitmap' )
-    4 <groups> [ unclip suffix ] map B{ } join ;
+    4 <groups> [ unclip suffix ] map B{ } join ; inline
 
 M: ARGB normalize-component-order*
     drop ARGB>RGBA ;
 
 M: ABGR normalize-component-order*
-    drop ARGB>RGBA 4 BGR>RGB ;
+    drop ARGB>RGBA BGRA>RGBA ;
 
 : normalize-scan-line-order ( image -- image )
     dup upside-down?>> [
