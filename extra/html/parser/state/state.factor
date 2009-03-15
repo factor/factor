@@ -29,13 +29,13 @@ TUPLE: state string i ;
     ] [ drop ] if ; inline recursive
 
 : take-until ( quot: ( -- ? ) -- )
-    [ get-i ] dip skip-until get-i
+    get-i [ skip-until ] dip get-i
     state get string>> subseq ;
 
 : string-matches? ( string circular -- ? )
-    get-char over push-circular sequence= ;
+    get-char over push-growing-circular sequence= ;
 
 : take-string ( match -- string )
-    dup length <circular-string>
+    dup length <growing-circular>
     [ 2dup string-matches? ] take-until nip
     dup length rot length 1- - head next ;
