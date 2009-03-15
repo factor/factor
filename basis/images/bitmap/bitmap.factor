@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types arrays byte-arrays columns
 combinators fry grouping io io.binary io.encodings.binary io.files
 kernel macros math math.bitwise math.functions namespaces sequences
-strings images endian summary ;
+strings images endian summary locals ;
 IN: images.bitmap
 
 : assert-sequence= ( a b -- )
@@ -78,9 +78,28 @@ ERROR: bmp-not-supported n ;
         [ height>> abs * ]
     } cleave ;
 
+: image-size ( loading-bitmap -- n )
+    [ [ width>> ] [ height>> ] bi * ] [ bit-count>> 8 /i ] bi * abs ;
+
+:: fixup-color-index ( loading-bitmap -- loading-bitmap )
+    loading-bitmap width>> :> width
+    loading-bitmap height>> abs :> height
+    loading-bitmap color-index>> length :> color-index-length
+    height 3 * :> height*3
+    color-index-length width height*3 * - height*3 /i :> misaligned
+    misaligned 0 > [
+        loading-bitmap [
+            loading-bitmap width>> misaligned + 3 * <sliced-groups>
+            [ 3 misaligned * head* ] map concat
+        ] change-color-index
+    ] [
+        loading-bitmap
+    ] if ;
+
 : parse-bitmap ( loading-bitmap -- loading-bitmap )
     dup rgb-quads-length read >>rgb-quads
-    dup color-index-length read >>color-index ;
+    dup color-index-length read >>color-index
+    fixup-color-index ;
 
 : load-bitmap-data ( path loading-bitmap -- loading-bitmap )
     [ binary ] dip '[
@@ -102,6 +121,7 @@ ERROR: unknown-component-order bitmap ;
     {
         [ raw-bitmap>seq >>bitmap ]
         [ [ width>> ] [ height>> abs ] bi 2array >>dim ]
+        [ height>> 0 < [ t >>upside-down? ] when ]
         [ bitmap>component-order >>component-order ]
     } cleave ;
 
