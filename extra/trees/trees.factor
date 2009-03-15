@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic math sequences arrays io namespaces
 prettyprint.private kernel.private assocs random combinators
-parser prettyprint.backend math.order accessors ;
+parser math.order accessors deques make prettyprint.custom ;
 IN: trees
 
 TUPLE: tree root count ;
@@ -20,15 +20,17 @@ INSTANCE: tree assoc
 TUPLE: node key value left right ;
 
 : new-node ( key value class -- node )
-    new swap >>value swap >>key ;
+    new
+        swap >>value
+        swap >>key ;
 
 : <node> ( key value -- node )
     node new-node ;
 
 SYMBOL: current-side
 
-: left ( -- symbol ) -1 ; inline
-: right ( -- symbol ) 1 ; inline
+CONSTANT: left -1
+CONSTANT: right 1
 
 : key-side ( k1 k2 -- n )
     <=> {
@@ -45,32 +47,41 @@ SYMBOL: current-side
 
 : node-link@ ( node ? -- node )
     go-left? xor [ left>> ] [ right>> ] if ;
+
 : set-node-link@ ( left parent ? -- ) 
-    go-left? xor [ set-node-left ] [ set-node-right ] if ;
+    go-left? xor [ (>>left) ] [ (>>right) ] if ;
 
 : node-link ( node -- child ) f node-link@  ;
+
 : set-node-link ( child node -- ) f set-node-link@ ;
+
 : node+link ( node -- child ) t node-link@ ;
+
 : set-node+link ( child node -- ) t set-node-link@ ;
 
-: with-side ( side quot -- ) [ swap current-side set call ] with-scope ; inline
+: with-side ( side quot -- )
+    [ swap current-side set call ] with-scope ; inline
+
 : with-other-side ( quot -- )
     current-side get neg swap with-side ; inline
+
 : go-left ( quot -- ) left swap with-side ; inline
+
 : go-right ( quot -- ) right swap with-side ; inline
 
 : leaf? ( node -- ? )
     [ left>> ] [ right>> ] bi or not ;
 
-: random-side ( -- side ) left right 2array random ;
+: random-side ( -- side )
+    left right 2array random ;
 
 : choose-branch ( key node -- key node-left/right )
-    2dup node-key key-side [ node-link ] with-side ;
+    2dup key>> key-side [ node-link ] with-side ;
 
 : node-at* ( key node -- value ? )
     [
-        2dup node-key = [
-            nip node-value t
+        2dup key>> = [
+            nip value>> t
         ] [
             choose-branch node-at*
         ] if
@@ -94,8 +105,9 @@ M: tree set-at ( value key tree -- )
 
 : valid-node? ( node -- ? )
     [
-        dup dup left>> [ node-key swap node-key before? ] when* >r
-        dup dup right>> [ node-key swap node-key after? ] when* r> and swap
+        dup dup left>> [ key>> swap key>> before? ] when*
+        [
+        dup dup right>> [ key>> swap key>> after? ] when* ] dip and swap
         dup left>> valid-node? swap right>> valid-node? and and
     ] [ t ] if* ;
 
@@ -104,7 +116,7 @@ M: tree set-at ( value key tree -- )
 : (node>alist) ( node -- )
     [
         [ left>> (node>alist) ]
-        [ [ node-key ] [ node-value ] bi 2array , ]
+        [ [ key>> ] [ value>> ] bi 2array , ]
         [ right>> (node>alist) ]
         tri
     ] when* ;
@@ -115,8 +127,9 @@ M: tree clear-assoc
     0 >>count
     f >>root drop ;
 
-: copy-node-contents ( new old -- )
-    dup node-key pick set-node-key node-value swap set-node-value ;
+: copy-node-contents ( new old -- new )
+    [ key>> >>key ]
+    [ value>> >>value ] bi ;
 
 ! Deletion
 DEFER: delete-node
@@ -134,12 +147,12 @@ DEFER: delete-node
     dup node-link (prune-extremity) ;
 
 : replace-with-child ( node -- node )
-    dup dup node-link copy-node-contents dup node-link delete-node over set-node-link ;
+    dup node-link copy-node-contents dup node-link delete-node over set-node-link ;
 
 : replace-with-extremity ( node -- node )
     dup node-link dup node+link [
         ! predecessor/successor is not the immediate child
-        [ prune-extremity ] with-other-side dupd copy-node-contents
+        [ prune-extremity ] with-other-side copy-node-contents
     ] [
         ! node-link is the predecessor/successor
         drop replace-with-child
@@ -166,7 +179,7 @@ DEFER: delete-node
     ] if ;
 
 : delete-bst-node ( key node -- node )
-    2dup node-key key-side dup 0 eq? [
+    2dup key>> key-side dup 0 eq? [
         drop nip delete-node
     ] [
         [ tuck node-link delete-bst-node over set-node-link ] with-side
@@ -188,7 +201,7 @@ M: tree assoc-like drop dup tree? [ >tree ] unless ;
 : TREE{
     \ } [ >tree ] parse-literal ; parsing
                                                         
-M: tree pprint-delims drop \ TREE{ \ } ;
 M: tree assoc-size count>> ;
+M: tree pprint-delims drop \ TREE{ \ } ;
 M: tree >pprint-sequence >alist ;
 M: tree pprint-narrow? drop t ;

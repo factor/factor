@@ -80,32 +80,17 @@ M: quit-responder call-responder*
 
 [ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test
 
-[ ] [
-    "tools.deploy.test.6" shake-and-bake
-    run-temp-image
-] unit-test
-
-[ ] [
-    "tools.deploy.test.7" shake-and-bake
-    run-temp-image
-] unit-test
-
-[ ] [
-    "tools.deploy.test.8" shake-and-bake
-    run-temp-image
-] unit-test
-
-[ ] [
-    "tools.deploy.test.9" shake-and-bake
-    run-temp-image
-] unit-test
-
-[ ] [
-    "tools.deploy.test.10" shake-and-bake
-    run-temp-image
-] unit-test
-
-[ ] [
-    "tools.deploy.test.11" shake-and-bake
-    run-temp-image
-] unit-test
+{
+    "tools.deploy.test.6"
+    "tools.deploy.test.7"
+    "tools.deploy.test.8"
+    "tools.deploy.test.9"
+    "tools.deploy.test.10"
+    "tools.deploy.test.11"
+    "tools.deploy.test.12"
+} [
+    [ ] swap [
+        shake-and-bake
+        run-temp-image
+    ] curry unit-test
+] each

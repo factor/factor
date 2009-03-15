@@ -5,6 +5,8 @@ sequences io namespaces io.encodings.private accessors sequences.private
 io.streams.sequence destructors math combinators ;
 IN: io.streams.byte-array
 
+M: byte-vector stream-element-type drop +byte+ ;
+
 : <byte-writer> ( encoding -- stream )
     512 <byte-vector> swap <encoder> ;
 
@@ -13,6 +15,8 @@ IN: io.streams.byte-array
     dup encoder? [ stream>> ] when >byte-array ; inline
 
 TUPLE: byte-reader { underlying byte-array read-only } { i array-capacity } ;
+
+M: byte-reader stream-element-type drop +byte+ ;
 
 M: byte-reader stream-read-partial stream-read ;
 M: byte-reader stream-read sequence-read ;

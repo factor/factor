@@ -356,9 +356,9 @@ M: quotation fjsc-parse ( object -- ast )
 : fjsc-compile* ( string -- string )
   'statement' parse ast>> fjsc-compile ;
 
-: fc* ( string -- string )
+: fc* ( string -- )
   [
-  'statement' parse ast>> values>> do-expressions
+    'statement' parse ast>> values>> do-expressions
   ] { } make [ write ] each ;
 
 

@@ -17,11 +17,11 @@ HELP: >avl
 HELP: avl
 { $class-description "This is the class for AVL trees. These conform to the assoc protocol and have efficient (logarithmic time) storage and retrieval operations." } ;
 
-ARTICLE: { "avl" "intro" } "AVL trees"
+ARTICLE: "trees.avl" "AVL trees"
 "This is a library for AVL trees, with logarithmic time storage and retrieval operations. These trees conform to the assoc protocol."
 { $subsection avl }
 { $subsection <avl> }
 { $subsection >avl }
 { $subsection POSTPONE: AVL{ } ;
 
-ABOUT: { "avl" "intro" }
+ABOUT: "trees.avl"

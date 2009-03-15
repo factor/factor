@@ -112,4 +112,12 @@ M: gadget draw-children
 
 CONSTANT: selection-color T{ rgba f 0.8 0.8 1.0 1.0 }
 
+CONSTANT: panel-background-color
+    T{ rgba f
+        0.7843137254901961
+        0.7686274509803922
+        0.7176470588235294
+        1.0
+    }
+
 CONSTANT: focus-border-color COLOR: dark-gray
