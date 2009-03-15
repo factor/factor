@@ -57,7 +57,7 @@ ERROR: bmp-not-supported n ;
 : parse-bitmap-header ( loading-bitmap -- loading-bitmap )
     read4 >>header-length
     read4 >>width
-    read4 >>height
+    read4 32 >signed >>height
     read2 >>planes
     read2 >>bit-count
     read4 >>compression
@@ -101,7 +101,7 @@ ERROR: unknown-component-order bitmap ;
     [ bitmap-image new ] dip
     {
         [ raw-bitmap>seq >>bitmap ]
-        [ [ width>> ] [ height>> ] bi 2array >>dim ]
+        [ [ width>> ] [ height>> abs ] bi 2array >>dim ]
         [ bitmap>component-order >>component-order ]
     } cleave ;
 
