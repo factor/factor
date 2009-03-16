@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs dlists definitions math graphs generic
-combinators deques search-deques macros io stack-checker
+combinators deques search-deques macros io stack-checker call
 stack-checker.state stack-checker.inlining combinators.short-circuit
 compiler.errors compiler.units compiler.tree.builder
 compiler.tree.optimizer compiler.cfg.builder compiler.cfg.optimizer
@@ -111,7 +111,7 @@ t compile-dependencies? set-global
     ] with-return ;
 
 : compile-loop ( deque -- )
-    [ (compile) yield-hook get assert-depth ] slurp-deque ;
+    [ (compile) yield-hook get call( -- ) ] slurp-deque ;
 
 : decompile ( word -- )
     f 2array 1array modify-code-heap ;
