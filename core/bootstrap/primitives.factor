@@ -25,7 +25,8 @@ H{ } clone sub-primitives set
     { "linux-ppc" "ppc/linux" }
     { "macosx-ppc" "ppc/macosx" }
     { "arm" "arm" }
-} at "/bootstrap.factor" 3append parse-file
+} ?at [ "Bad architecture: " prepend throw ] unless
+"/bootstrap.factor" 3append parse-file
 
 "vocab:bootstrap/layouts/layouts.factor" parse-file
 
@@ -45,10 +46,6 @@ init-caches
 ! Vocabulary for slot accessors
 "accessors" create-vocab drop
 
-! Trivial recompile hook. We don't want to touch the code heap
-! during stage1 bootstrap, it would just waste time.
-SINGLETON: dummy-compiler
-M: dummy-compiler recompile drop { } ;
 dummy-compiler compiler-impl set
 
 call
