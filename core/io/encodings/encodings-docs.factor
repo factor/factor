@@ -124,6 +124,6 @@ ARTICLE: "io.encodings" "I/O encodings"
 "Combinators to change the encoding:"
 { $subsection with-encoded-output }
 { $subsection with-decoded-input }
-{ $see-also "encodings-introduction" "stream-elements" } ;
+{ $see-also "encodings-introduction" } ;
 
 ABOUT: "io.encodings"

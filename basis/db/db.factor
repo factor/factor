@@ -149,4 +149,4 @@ M: db-connection rollback-transaction ( -- ) "ROLLBACK" sql-command ;
     t in-transaction [
         begin-transaction
         [ ] [ rollback-transaction ] cleanup commit-transaction
-    ] with-variable ;
+    ] with-variable ; inline

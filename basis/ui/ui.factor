@@ -153,7 +153,7 @@ PRIVATE>
     "UI update" spawn drop ;
 
 : start-ui ( quot -- )
-    call notify-ui-thread start-ui-thread ;
+    call( -- ) notify-ui-thread start-ui-thread ;
 
 : restore-windows ( -- )
     [
@@ -193,6 +193,6 @@ M: object close-window
 ] "ui" add-init-hook
 
 : with-ui ( quot -- )
-    ui-running? [ call ] [ '[ init-ui @ ] (with-ui) ] if ;
+    ui-running? [ call( -- ) ] [ '[ init-ui @ ] (with-ui) ] if ;
 
 HOOK: beep ui-backend ( -- )

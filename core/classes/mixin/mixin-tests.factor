@@ -109,3 +109,13 @@ TUPLE: flat-mx-2-1 ; INSTANCE: flat-mx-2-1 flat-mx-2
 MIXIN: empty-mixin
 
 [ f ] [ "hi" empty-mixin? ] unit-test
+
+MIXIN: move-instance-declaration-mixin
+
+[ ] [ "IN: classes.mixin.tests.a USE: strings USE: classes.mixin.tests INSTANCE: string move-instance-declaration-mixin" <string-reader> "move-mixin-test-1" parse-stream drop ] unit-test
+
+[ ] [ "IN: classes.mixin.tests.b USE: strings USE: classes.mixin.tests INSTANCE: string move-instance-declaration-mixin" <string-reader> "move-mixin-test-2" parse-stream drop ] unit-test
+
+[ ] [ "IN: classes.mixin.tests.a" <string-reader> "move-mixin-test-1" parse-stream drop ] unit-test
+
+[ { string } ] [ move-instance-declaration-mixin members ] unit-test
