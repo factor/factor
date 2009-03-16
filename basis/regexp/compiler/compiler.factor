@@ -104,13 +104,11 @@ C: <box> box
     transitions>quot ;
 
 : states>code ( words dfa -- )
-    [
-        '[
-            dup _ word>quot
-            (( last-match index string -- ? ))
-            define-declared
-        ] each
-    ] with-compilation-unit ;
+    '[
+        dup _ word>quot
+        (( last-match index string -- ? ))
+        define-declared
+    ] each ;
 
 : states>words ( dfa -- words dfa )
     dup transitions>> keys [ gensym ] H{ } map>assoc
@@ -123,12 +121,9 @@ C: <box> box
 
 PRIVATE>
 
-: simple-define-temp ( quot effect -- word )
-    [ define-temp ] with-compilation-unit ;
-
 : dfa>word ( dfa -- quot )
     dfa>main-word execution-quot '[ drop [ f ] 2dip @ ]
-    (( start-index string regexp -- i/f )) simple-define-temp ;
+    (( start-index string regexp -- i/f )) define-temp ;
 
 : dfa>shortest-word ( dfa -- word )
     t shortest? [ dfa>word ] with-variable ;

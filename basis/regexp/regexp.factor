@@ -4,7 +4,7 @@ USING: accessors combinators kernel kernel.private math sequences
 sequences.private strings sets assocs prettyprint.backend
 prettyprint.custom make lexer namespaces parser arrays fry locals
 regexp.parser splitting sorting regexp.ast regexp.negation
-regexp.compiler words call call.private math.ranges ;
+regexp.compiler compiler.units words call call.private math.ranges ;
 IN: regexp
 
 TUPLE: regexp
@@ -35,7 +35,7 @@ M: lookbehind question>quot ! Returns ( index string -- ? )
 : match-index-from ( i string regexp -- index/f )
     ! This word is unsafe. It assumes that i is a fixnum
     ! and that string is a string.
-    dup dfa>> execute-unsafe( index string regexp -- i/f ) ;
+    dup dfa>> execute-unsafe( index string regexp -- i/f ) ; inline
 
 GENERIC: end/start ( string regexp -- end start )
 M: regexp end/start drop length 0 ;
@@ -129,31 +129,28 @@ PRIVATE>
 GENERIC: compile-regexp ( regex -- regexp )
 
 : regexp-initial-word ( i string regexp -- i/f )
-    compile-regexp match-index-from ;
+    [ compile-regexp ] with-compilation-unit match-index-from ;
 
-: do-compile-regexp ( regexp -- regexp )
+M: regexp compile-regexp ( regexp -- regexp )
     dup '[
         dup \ regexp-initial-word =
         [ drop _ get-ast ast>dfa dfa>word ] when
     ] change-dfa ;
 
-M: regexp compile-regexp ( regexp -- regexp )
-    do-compile-regexp ;
-
 M: reverse-regexp compile-regexp ( regexp -- regexp )
-    t backwards? [ do-compile-regexp ] with-variable ;
+    t backwards? [ call-next-method ] with-variable ;
 
 DEFER: compile-next-match
 
 : next-initial-word ( i string regexp -- i start end string )
-    compile-next-match do-next-match ;
+    [ compile-next-match ] with-compilation-unit do-next-match ;
 
 : compile-next-match ( regexp -- regexp )
     dup '[
         dup \ next-initial-word = [
             drop _ [ compile-regexp dfa>> def>> ] [ reverse-regexp? ] bi
             '[ { array-capacity string regexp } declare _ _ next-match ]
-            (( i string regexp -- i start end string )) simple-define-temp
+            (( i string regexp -- i start end string )) define-temp
         ] when
     ] change-next-match ;
 
