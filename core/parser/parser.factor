@@ -214,7 +214,7 @@ print-use-hook [ [ ] ] initialize
     [
         V{ } clone amended-use set
         parse-lines
-        amended-use get empty? [ print-use-hook get call ] unless
+        amended-use get empty? [ print-use-hook get assert-depth ] unless
     ] with-file-vocabs ;
 
 : parsing-file ( file -- )
