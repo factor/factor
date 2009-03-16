@@ -83,14 +83,15 @@ ERROR: bmp-not-supported n ;
 
 :: fixup-color-index ( loading-bitmap -- loading-bitmap )
     loading-bitmap width>> :> width
+    width 3 * :> width*3
     loading-bitmap height>> abs :> height
     loading-bitmap color-index>> length :> color-index-length
-    height 3 * :> height*3
-    color-index-length width height*3 * - height*3 /i :> misaligned
-    misaligned 0 > [
+    color-index-length height /i :> stride
+    color-index-length width*3 height * - height /i :> padding
+    padding 0 > [
         loading-bitmap [
-            loading-bitmap width>> misaligned + 3 * <sliced-groups>
-            [ 3 misaligned * head* ] map concat
+            stride <sliced-groups>
+            [ width*3 head-slice ] map concat
         ] change-color-index
     ] [
         loading-bitmap
