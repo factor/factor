@@ -533,6 +533,7 @@ tuple
     { "gc-reset" "memory" }
     { "jit-compile" "quotations" }
     { "load-locals" "locals.backend" }
+    { "check-datastack" "kernel.private" }
 }
 [ [ first2 ] dip make-primitive ] each-index
 
