@@ -21,6 +21,8 @@ TUPLE: pane-stream pane ;
 
 C: <pane-stream> pane-stream
 
+M: pane-stream stream-element-type drop +character+ ;
+
 <PRIVATE
 
 : clear-selection ( pane -- pane )
@@ -66,7 +68,7 @@ M: pane gadget-selection ( pane -- string/f )
     selection-color >>selection-color ; inline
 
 : init-last-line ( pane -- pane )
-    horizontal <track>
+    horizontal <track> 0 >>fill +baseline+ >>align
     [ >>last-line ] [ 1 track-add ] bi
     dup prepare-last-line ; inline
 

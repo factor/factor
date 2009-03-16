@@ -248,7 +248,7 @@ M: word forget*
     dup "forgotten" word-prop [ drop ] [
         [ delete-xref ]
         [ [ name>> ] [ vocabulary>> vocab-words ] bi delete-at ]
-        [ [ reset-word ] [ t "forgotten" set-word-prop ] bi ]
+        [ t "forgotten" set-word-prop ]
         tri
     ] if ;
 

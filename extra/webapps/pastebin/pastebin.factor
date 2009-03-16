@@ -83,8 +83,7 @@ annotation "ANNOTATIONS"
 ! LINKS, ETC
 ! ! !
 
-: pastebin-url ( -- url )
-    URL" $pastebin/list" ;
+CONSTANT: pastebin-url URL" $pastebin/"
 
 : paste-url ( id -- url )
     "$pastebin/paste" >url swap "id" set-query-param ;
@@ -187,7 +186,7 @@ M: annotation entity-url
                 "id" value <paste> delete-tuples
                 "id" value f <annotation> delete-tuples
             ] with-transaction
-            URL" $pastebin/list" <redirect>
+            pastebin-url <redirect>
         ] >>submit
 
         <protected>

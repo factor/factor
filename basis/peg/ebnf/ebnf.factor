@@ -5,7 +5,7 @@ sequences quotations vectors namespaces make math assocs
 continuations peg peg.parsers unicode.categories multiline
 splitting accessors effects sequences.deep peg.search
 combinators.short-circuit lexer io.streams.string stack-checker
-io combinators parser ;
+io combinators parser call ;
 IN: peg.ebnf
 
 : rule ( name word -- parser )
@@ -36,7 +36,7 @@ TUPLE: tokenizer any one many ;
 
 : TOKENIZER: 
   scan search [ "Tokenizer not found" throw ] unless*
-  execute \ tokenizer set-global ; parsing
+  execute( -- tokenizer ) \ tokenizer set-global ; parsing
 
 TUPLE: ebnf-non-terminal symbol ;
 TUPLE: ebnf-terminal symbol ;
@@ -128,28 +128,28 @@ PEG: escaper ( string -- ast )
   #! in the EBNF syntax itself.
   [
     {
-      [ dup blank?    ]
-      [ dup CHAR: " = ]
-      [ dup CHAR: ' = ]
-      [ dup CHAR: | = ]
-      [ dup CHAR: { = ]
-      [ dup CHAR: } = ]
-      [ dup CHAR: = = ]
-      [ dup CHAR: ) = ]
-      [ dup CHAR: ( = ]
-      [ dup CHAR: ] = ]
-      [ dup CHAR: [ = ]
-      [ dup CHAR: . = ]
-      [ dup CHAR: ! = ]
-      [ dup CHAR: & = ]
-      [ dup CHAR: * = ]
-      [ dup CHAR: + = ]
-      [ dup CHAR: ? = ]
-      [ dup CHAR: : = ]
-      [ dup CHAR: ~ = ]
-      [ dup CHAR: < = ]
-      [ dup CHAR: > = ]
-    } 0|| not nip    
+      [ blank?    ]
+      [ CHAR: " = ]
+      [ CHAR: ' = ]
+      [ CHAR: | = ]
+      [ CHAR: { = ]
+      [ CHAR: } = ]
+      [ CHAR: = = ]
+      [ CHAR: ) = ]
+      [ CHAR: ( = ]
+      [ CHAR: ] = ]
+      [ CHAR: [ = ]
+      [ CHAR: . = ]
+      [ CHAR: ! = ]
+      [ CHAR: & = ]
+      [ CHAR: * = ]
+      [ CHAR: + = ]
+      [ CHAR: ? = ]
+      [ CHAR: : = ]
+      [ CHAR: ~ = ]
+      [ CHAR: < = ]
+      [ CHAR: > = ]
+    } 1|| not
   ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
 : 'terminal' ( -- parser )
@@ -161,9 +161,9 @@ PEG: escaper ( string -- ast )
   #! Parse a valid foreign parser name
   [
     {
-      [ dup blank?    ]
-      [ dup CHAR: > = ]
-    } 0|| not nip    
+      [ blank?    ]
+      [ CHAR: > = ]
+    } 1|| not
   ] satisfy repeat1 [ >string ] action ;
 
 : 'foreign' ( -- parser )
@@ -391,7 +391,7 @@ M: ebnf-choice (transform) ( ast -- parser )
   options>> [ (transform) ] map choice ;
 
 M: ebnf-any-character (transform) ( ast -- parser )
-  drop tokenizer any>> call ;
+  drop tokenizer any>> call( -- parser ) ;
 
 M: ebnf-range (transform) ( ast -- parser )
   pattern>> range-pattern ;
@@ -469,17 +469,17 @@ ERROR: bad-effect quot effect ;
  
 M: ebnf-action (transform) ( ast -- parser )
   [ parser>> (transform) ] [ code>> insert-escapes ] [ parser>> ] tri build-locals  
-  string-lines parse-lines check-action-effect action ;
+  [ string-lines parse-lines ] call( string -- quot ) check-action-effect action ;
 
 M: ebnf-semantic (transform) ( ast -- parser )
   [ parser>> (transform) ] [ code>> insert-escapes ] [ parser>> ] tri build-locals 
-  string-lines parse-lines semantic ;
+  [ string-lines parse-lines ] call( string -- quot ) semantic ;
 
 M: ebnf-var (transform) ( ast -- parser )
   parser>> (transform) ;
 
 M: ebnf-terminal (transform) ( ast -- parser )
-  symbol>> tokenizer one>> call ;
+  symbol>> tokenizer one>> call( symbol -- parser ) ;
 
 M: ebnf-foreign (transform) ( ast -- parser )
   dup word>> search
@@ -487,7 +487,7 @@ M: ebnf-foreign (transform) ( ast -- parser )
   swap rule>> [ main ] unless* over rule [
     nip
   ] [
-    execute
+    execute( -- parser )
   ] if* ;
 
 : parser-not-found ( name -- * )
@@ -530,7 +530,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 
 : EBNF: 
   reset-tokenizer CREATE-WORD dup ";EBNF" parse-multiline-string  
-  ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop 
+  ebnf>quot swapd (( input -- ast )) define-declared "ebnf-parser" set-word-prop 
   reset-tokenizer ; parsing
 
 

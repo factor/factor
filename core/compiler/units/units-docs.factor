@@ -17,7 +17,7 @@ $nl
 "Forward reference checking (see " { $link "definition-checking" } "):"
 { $subsection forward-reference? }
 "A hook to be called at the end of the compilation unit. If the optimizing compiler is loaded, this compiles new words with the " { $link "compiler" } ":"
-{ $subsection recompile-hook }
+{ $subsection recompile }
 "Low-level compiler interface exported by the Factor VM:"
 { $subsection modify-code-heap } ;
 
@@ -47,8 +47,9 @@ $nl
 $nl
 "Since compilation is relatively expensive, you should try to batch up as many definitions into one compilation unit as possible." } ;
 
-HELP: recompile-hook
-{ $var-description "Quotation with stack effect " { $snippet "( words -- )" } ", called at the end of " { $link with-compilation-unit } "." } ;
+HELP: recompile
+{ $values { "words" "a sequence of words" } { "alist" "an association list mapping words to compiled definitions" } }
+{ $contract "Internal word which compiles words. Called at the end of " { $link with-compilation-unit } "." } ;
 
 HELP: no-compilation-unit
 { $values { "word" word } }

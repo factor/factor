@@ -4,6 +4,10 @@ USING: hashtables generic kernel math namespaces make sequences
 continuations destructors assocs ;
 IN: io
 
+SYMBOLS: +byte+ +character+ ;
+
+GENERIC: stream-element-type ( stream -- type )
+
 GENERIC: stream-read1 ( stream -- elt )
 GENERIC: stream-read ( n stream -- seq )
 GENERIC: stream-read-until ( seps stream -- seq sep/f )
