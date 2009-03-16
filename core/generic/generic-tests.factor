@@ -247,4 +247,4 @@ GENERIC: move-method-generic ( a -- b )
 
 [ ] [ "IN: generic.tests.a" <string-reader> "move-method-test-1" parse-stream drop ] unit-test
 
-[ { string } ] [ move-method-generic order ] unit-test
+[ { string } ] [ \ move-method-generic order ] unit-test
