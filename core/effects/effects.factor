@@ -63,3 +63,6 @@ M: effect clone
 
 : shuffle ( stack shuffle -- newstack )
     shuffle-mapping swap nths ;
+
+: add-effect-input ( effect -- effect' )
+    [ in>> "obj" suffix ] [ out>> ] [ terminated?>> ] tri effect boa ;

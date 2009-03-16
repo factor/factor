@@ -144,4 +144,5 @@ void *primitives[] = {
 	primitive_clear_gc_stats,
 	primitive_jit_compile,
 	primitive_load_locals,
+	primitive_check_datastack
 };
