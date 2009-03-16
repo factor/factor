@@ -13,6 +13,10 @@ IN: sequences.tests
 [ V{ 4 5 } ] [ { 1 2 3 4 5 } 2 tail-slice* >vector ] unit-test
 [ V{ 3 4 } ] [ 2 4 1 10 dup <slice> subseq >vector ] unit-test
 [ V{ 3 4 } ] [ 0 2 2 4 1 10 dup <slice> <slice> subseq >vector ] unit-test
+[ 0 10 "hello" <slice> ] must-fail
+[ -10 3 "hello" <slice> ] must-fail
+[ 2 1 "hello" <slice> ] must-fail
+
 [ "cba" ] [ "abcdef" 3 head-slice reverse ] unit-test
 
 [ 5040 ] [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test

@@ -3,7 +3,7 @@ io.streams.string namespaces classes effects source-files assocs
 sequences strings io.files io.pathnames definitions
 continuations sorting classes.tuple compiler.units debugger
 vocabs vocabs.loader accessors eval combinators lexer
-vocabs.parser words.symbol ;
+vocabs.parser words.symbol multiline ;
 IN: parser.tests
 
 \ run-file must-infer
@@ -560,7 +560,7 @@ EXCLUDE: qualified.tests.bar => x ;
 ! Two similar bugs
 
 ! Replace : def with something in << >>
-[ [ ] ] [
+/* [ [ ] ] [
     "IN: parser.tests : was-once-a-word-bug ( -- ) ;"
     <string-reader> "was-once-a-word-test" parse-stream
 ] unit-test
@@ -572,7 +572,7 @@ EXCLUDE: qualified.tests.bar => x ;
     <string-reader> "was-once-a-word-test" parse-stream
 ] unit-test
 
-[ t ] [ "was-once-a-word-bug" "parser.tests" lookup >boolean ] unit-test
+[ t ] [ "was-once-a-word-bug" "parser.tests" lookup >boolean ] unit-test */
 
 ! Replace : def with DEFER:
 [ [ ] ] [

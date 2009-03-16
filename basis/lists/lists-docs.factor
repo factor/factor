@@ -21,7 +21,7 @@ ARTICLE: { "lists" "protocol" } "The list protocol"
 { $subsection cdr }
 { $subsection nil? } ;
 
-ARTICLE: { "lists" "strict" } "Strict lists"
+ARTICLE: { "lists" "strict" } "Constructing strict lists"
 "Strict lists are simply cons cells where the car and cdr have already been evaluated. These are the lists of Lisp. To construct a strict list, the following words are provided:"
 { $subsection cons }
 { $subsection swons }

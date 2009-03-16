@@ -25,7 +25,8 @@ H{ } clone sub-primitives set
     { "linux-ppc" "ppc/linux" }
     { "macosx-ppc" "ppc/macosx" }
     { "arm" "arm" }
-} at "/bootstrap.factor" 3append parse-file
+} ?at [ "Bad architecture: " prepend throw ] unless
+"/bootstrap.factor" 3append parse-file
 
 "vocab:bootstrap/layouts/layouts.factor" parse-file
 
@@ -36,7 +37,7 @@ H{ } clone sub-primitives set
     dictionary
     new-classes
     changed-definitions changed-generics
-    remake-generics forgotten-definitions
+    outdated-generics forgotten-definitions
     root-cache source-files update-map implementors-map
 } [ H{ } clone swap set ] each
 
@@ -45,9 +46,7 @@ init-caches
 ! Vocabulary for slot accessors
 "accessors" create-vocab drop
 
-! Trivial recompile hook. We don't want to touch the code heap
-! during stage1 bootstrap, it would just waste time.
-[ drop { } ] recompile-hook set
+dummy-compiler compiler-impl set
 
 call
 call

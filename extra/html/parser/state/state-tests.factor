@@ -10,4 +10,5 @@ IN: html.parser.state.tests
 [ "hello" ] [ "hello" [ take-rest ] string-parse ] unit-test
 [ "hi" " how are you?" ] [ "hi how are you?" [ [ get-char blank? ] take-until take-rest ] string-parse ] unit-test
 [ "foo" ";bar" ] [ "foo;bar" [ CHAR: ; take-char take-rest ] string-parse ] unit-test
-! [ "foo " " bar" ] [ "foo and bar" [ "and" take-string take-rest ] string-parse ] unit-test
+[ "foo " " bar" ]
+[ "foo and bar" [ "and" take-string take-rest ] string-parse ] unit-test

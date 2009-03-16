@@ -309,8 +309,7 @@ FUNCTION: bool check_sse2 ( ) ;
     check_sse2 ;
 
 "-no-sse2" (command-line) member? [
-    [ optimized-recompile-hook ] recompile-hook
-    [ { check_sse2 } compile ] with-variable
+    optimizing-compiler compiler-impl [ { check_sse2 } compile ] with-variable
 
     "Checking if your CPU supports SSE2..." print flush
     sse2? [

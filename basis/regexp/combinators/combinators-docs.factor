@@ -5,16 +5,32 @@ IN: regexp.combinators
 
 ABOUT: "regexp.combinators"
 
+ARTICLE: "regexp.combinators.intro" "Regular expression combinator rationale"
+"Regular expression combinators are useful when part of the regular expression contains user input. For example, given a sequence of strings on the stack, a regular expression which matches any one of them can be constructed:"
+{ $code
+  "[ <literal> ] map <or>"
+}
+"Without combinators, a naive approach would look as follows:"
+{ $code
+  "\"|\" join <regexp>"
+}
+"However, this code is incorrect, because one of the strings in the sequence might contain characters which have special meaning inside a regular expression. Combinators avoid this problem by building a regular expression syntax tree directly, without any parsing." ;
+
 ARTICLE: "regexp.combinators" "Regular expression combinators"
-"The " { $vocab-link "regexp.combinators" } " vocabulary defines combinators which can be used to build up regular expressions to match strings. This is in addition to the traditional syntax defined in the " { $vocab-link "regexp" } " vocabulary."
+"The " { $vocab-link "regexp.combinators" } " vocabulary defines combinators which can be used to build up regular expressions to match strings. This complements the traditional syntax defined in the " { $vocab-link "regexp" } " vocabulary."
+{ $subsection "regexp.combinators.intro" }
+"Basic combinators:"
 { $subsection <literal> }
 { $subsection <nothing> }
+"Higher-order combinators for building new regular expressions from existing ones:"
 { $subsection <or> }
 { $subsection <and> }
 { $subsection <not> }
 { $subsection <sequence> }
 { $subsection <zero-or-more> }
+"Derived combinators implemented in terms of the above:"
 { $subsection <one-or-more> }
+"Setting options:"
 { $subsection <option> } ;
 
 HELP: <literal>

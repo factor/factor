@@ -48,6 +48,8 @@ CONSULT: output-stream-protocol filter-writer stream>> ;
 
 CONSULT: formatted-output-stream-protocol filter-writer stream>> ;
 
+M: filter-writer stream-element-type stream>> stream-element-type ;
+
 M: filter-writer dispose stream>> dispose ;
 
 TUPLE: ignore-close-stream < filter-writer ;

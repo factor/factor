@@ -1,6 +1,6 @@
-! Copyright (c) 2008 Slava Pestov
+! Copyright (c) 2008, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math.order namespaces combinators.short-circuit
+USING: accessors kernel math.order namespaces combinators.short-circuit call
 html.forms
 html.templates
 html.templates.chloe
@@ -23,7 +23,7 @@ TUPLE: boilerplate < filter-responder template init ;
 M:: boilerplate call-responder* ( path responder -- )
     begin-form
     path responder call-next-method
-    responder init>> call
+    responder init>> call( -- )
     dup wrap-boilerplate? [
         clone [| body |
             [

@@ -3,7 +3,7 @@
 USING: regexp.classes kernel sequences regexp.negation
 quotations assocs fry math locals combinators
 accessors words compiler.units kernel.private strings
-sequences.private arrays call namespaces unicode.breaks
+sequences.private arrays namespaces unicode.breaks
 regexp.transition-tables combinators.short-circuit ;
 IN: regexp.compiler
 
@@ -104,15 +104,13 @@ C: <box> box
     transitions>quot ;
 
 : states>code ( words dfa -- )
-    [ ! with-compilation-unit doesn't compile, so we need call( -- )
-        [
-            '[
-                dup _ word>quot
-                (( last-match index string -- ? ))
-                define-declared
-            ] each
-        ] with-compilation-unit
-    ] call( words dfa -- ) ;
+    [
+        '[
+            dup _ word>quot
+            (( last-match index string -- ? ))
+            define-declared
+        ] each
+    ] with-compilation-unit ;
 
 : states>words ( dfa -- words dfa )
     dup transitions>> keys [ gensym ] H{ } map>assoc
@@ -126,7 +124,7 @@ C: <box> box
 PRIVATE>
 
 : simple-define-temp ( quot effect -- word )
-    [ [ define-temp ] with-compilation-unit ] call( quot effect -- word ) ;
+    [ define-temp ] with-compilation-unit ;
 
 : dfa>word ( dfa -- quot )
     dfa>main-word execution-quot '[ drop [ f ] 2dip @ ]

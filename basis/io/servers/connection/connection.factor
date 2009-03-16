@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2003, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors kernel math math.parser
 namespaces parser sequences strings prettyprint
@@ -7,7 +7,7 @@ fry accessors arrays io io.sockets io.encodings.ascii
 io.sockets.secure io.files io.streams.duplex io.timeouts
 io.encodings threads make concurrency.combinators
 concurrency.semaphores concurrency.flags
-combinators.short-circuit ;
+combinators.short-circuit call ;
 IN: io.servers.connection
 
 TUPLE: threaded-server
@@ -69,7 +69,7 @@ GENERIC: handle-client* ( threaded-server -- )
     [ [ remote-address set ] [ local-address set ] bi* ]
     2bi ;
 
-M: threaded-server handle-client* handler>> call ;
+M: threaded-server handle-client* handler>> call( -- ) ;
 
 : handle-client ( client remote local -- )
     '[
