@@ -8,7 +8,7 @@ ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
 ui.backend.cocoa.views core-foundation core-foundation.run-loop
 core-graphics.types threads math.rectangles fry libc
 generalizations alien.c-types cocoa.views
-combinators io.thread locals ;
+combinators io.thread locals call ;
 IN: ui.backend.cocoa
 
 TUPLE: handle ;
@@ -152,7 +152,7 @@ M: cocoa-ui-backend (with-ui)
     "UI" assert.app [
         [
             init-clipboard
-            cocoa-init-hook get call
+            cocoa-init-hook get call( -- )
             start-ui
             f io-thread-running? set-global
             init-thread-timer
