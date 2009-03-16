@@ -60,11 +60,16 @@ GENERIC: modify-epsilon ( tag -- newtag )
 
 M: object modify-epsilon ;
 
+: line-option ( multiline unix-lines default -- option )
+    multiline option? [
+        drop [ unix-lines option? ] 2dip swap ?
+    ] [ 2nip ] if ;
+
 M: $ modify-epsilon
-    multiline option? [ drop end-of-input ] unless ;
+    $unix end-of-input line-option ;
 
 M: ^ modify-epsilon
-    multiline option? [ drop beginning-of-input ] unless ;
+    ^unix beginning-of-input line-option ;
 
 M: tagged-epsilon nfa-node
     clone [ modify-epsilon ] change-tag add-simple-entry ;

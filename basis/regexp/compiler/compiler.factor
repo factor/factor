@@ -17,9 +17,6 @@ SYMBOL: backwards?
 M: t question>quot drop [ 2drop t ] ;
 M: f question>quot drop [ 2drop f ] ;
 
-M: not-class question>quot
-    class>> question>quot [ not ] compose ;
-
 M: beginning-of-input question>quot
     drop [ drop zero? ] ;
 
@@ -39,6 +36,12 @@ M: $ question>quot
 
 M: ^ question>quot
     drop [ { [ drop zero? ] [ [ 1- ] dip ?nth "\r\n" member? ] } 2|| ] ;
+
+M: $unix question>quot
+    drop [ { [ length = ] [ ?nth CHAR: \n = ] } 2|| ] ;
+
+M: ^unix question>quot
+    drop [ { [ drop zero? ] [ [ 1- ] dip ?nth CHAR: \n = ] } 2|| ] ;
 
 M: word-break question>quot
     drop [ word-break-at? ] ;
