@@ -1,6 +1,6 @@
 USING: assocs classes help.markup help.syntax io.streams.string
 http http.server.dispatchers http.server.responses
-furnace.redirection strings multiline ;
+furnace.redirection strings multiline html.forms ;
 IN: furnace.actions
 
 HELP: <action>
@@ -74,6 +74,8 @@ HELP: validate-params
     }
 } ;
 
+{ validate-params validate-values } related-words
+      
 HELP: validation-failed
 { $description "Stops processing the current request and takes action depending on the type of the current request:"
     { $list
