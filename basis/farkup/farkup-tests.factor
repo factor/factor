@@ -99,6 +99,7 @@ link-no-follow? off
 [ "<p><img src=\"lol.jpg\" alt=\"teh lol\"/></p>" ] [ "[[image:lol.jpg|teh lol]]" convert-farkup ] unit-test
 [ "<p><a href=\"http://lol.com\">http://lol.com</a></p>" ] [ "[[http://lol.com]]" convert-farkup ] unit-test
 [ "<p><a href=\"http://lol.com\">haha</a></p>" ] [ "[[http://lol.com|haha]]" convert-farkup ] unit-test
+[ "<p><a href=\"http://lol.com/search?q=sex\">haha</a></p>" ] [ "[[http://lol.com/search?q=sex|haha]]" convert-farkup ] unit-test
 [ "<p><a href=\"Foo/Bar\">Bar</a></p>" ] [ "[[Foo/Bar]]" convert-farkup ] unit-test
 
 "/wiki/view/" relative-link-prefix [

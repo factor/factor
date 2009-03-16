@@ -24,7 +24,6 @@ ui.gadgets.panes
 ui.gadgets.scrollers
 prettyprint
 combinators
-rewrite-closures
 accessors
 values
 tools.walker
@@ -67,7 +66,7 @@ file-chooser H{
      [ directory? ] bi or ]  filter
 ;
 
-: update-filelist-model ( file-chooser -- file-chooser )
+: update-filelist-model ( file-chooser -- )
     [ list-of-files ] [ model>> ] bi set-model ;
 
 : init-filelist-model ( file-chooser -- file-chooser )
@@ -86,7 +85,7 @@ file-chooser H{
 : fc-go-home ( file-chooser -- )
     [ home ] (fc-go) ;
 
-: fc-change-directory ( file-chooser file -- file-chooser )
+: fc-change-directory ( file-chooser file -- )
     dupd [ path>> value>> normalize-path ] [ name>> ] bi* 
     append-path over path>> set-model    
     update-filelist-model

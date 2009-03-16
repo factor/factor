@@ -9,7 +9,7 @@ IN: geo-ip
 
 : db-path ( -- path ) "IpToCountry.csv" temp-file ;
 
-: db-url ( -- url ) "http://software77.net/cgi-bin/ip-country/geo-ip.pl?action=download" ;
+CONSTANT: db-url "http://software77.net/cgi-bin/ip-country/geo-ip.pl?action=download"
 
 : download-db ( -- path )
     db-path dup exists? [

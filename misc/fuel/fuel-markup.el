@@ -335,9 +335,8 @@
 
 (defun fuel-markup--vocab-list (e)
   (let ((rows (mapcar '(lambda (elem)
-                         (list (car elem)
-                               (list '$vocab-link (cadr elem))
-                               (caddr elem)))
+                         (list (list '$vocab-link (car elem))
+                               (cadr elem)))
                       (cdr e))))
     (fuel-markup--table (cons '$table rows))))
 

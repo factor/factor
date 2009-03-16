@@ -11,13 +11,15 @@ IN: opengl.textures
 
 TUPLE: texture loc dim texture-coords texture display-list disposed ;
 
-<PRIVATE
-
 GENERIC: component-order>format ( component-order -- format type )
 
+M: RGB component-order>format drop GL_RGB GL_UNSIGNED_BYTE ;
+M: BGR component-order>format drop GL_BGR GL_UNSIGNED_BYTE ;
 M: RGBA component-order>format drop GL_RGBA GL_UNSIGNED_BYTE ;
 M: ARGB component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8_REV ;
 M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
+
+<PRIVATE
 
 : repeat-last ( seq n -- seq' )
     over peek pad-tail concat ;

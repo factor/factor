@@ -63,7 +63,8 @@ TUPLE: popup < wrapper owner ;
         swap >>owner ; inline
 
 M: popup hide-glass-hook
-    owner>> f >>popup request-focus ;
+    dup owner>> 2dup popup>> eq?
+    [ f >>popup request-focus drop ] [ 2drop ] if ;
 
 PRIVATE>
 
@@ -71,11 +72,9 @@ popup H{
     { T{ key-down f f "ESC" } [ hide-glass ] }
 } set-gestures
 
-: pass-to-popup ( gesture interactor -- ? )
+: pass-to-popup ( gesture owner -- ? )
     popup>> focusable-child resend-gesture ;
 
 : show-popup ( owner popup visible-rect -- )
-    [ <popup> ] dip
-    [ drop dup owner>> (>>popup) ]
-    [ [ [ owner>> ] keep ] dip show-glass ]
-    2bi ;
+    [ [ dup dup popup>> [ hide-glass ] when* ] dip <popup> ] dip
+    [ drop >>popup drop ] [ show-glass ] 3bi ;

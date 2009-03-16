@@ -1,8 +1,8 @@
 
 USING: kernel combinators sequences sets math threads namespaces continuations
        debugger io io.sockets unicode.case accessors destructors
-       combinators.cleave combinators.short-circuit 
-       newfx fry
+       combinators.short-circuit combinators.smart
+       newfx fry arrays
        dns dns.util dns.misc ;
 
 IN: dns.server
@@ -16,7 +16,7 @@ SYMBOL: records-var
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : {name-type-class} ( obj -- array )
-  { [ name>> >lower ] [ type>> ] [ class>> ] } <arr> ;
+  [ [ name>> >lower ] [ type>> ] [ class>> ] tri ] output>array ; 
 
 : rr=query? ( obj obj -- ? ) [ {name-type-class} ] bi@ = ;
 
@@ -52,9 +52,9 @@ SYMBOL: records-var
 
 : rr->rdata-names ( rr -- names/f )
     {
-      { [ dup type>> NS    = ] [ rdata>>            {1} ] }
-      { [ dup type>> MX    = ] [ rdata>> exchange>> {1} ] }
-      { [ dup type>> CNAME = ] [ rdata>>            {1} ] }
+      { [ dup type>> NS    = ] [ rdata>>            1array ] }
+      { [ dup type>> MX    = ] [ rdata>> exchange>> 1array ] }
+      { [ dup type>> CNAME = ] [ rdata>>            1array ] }
       { [ t ]                  [ drop f ] }
     }
   cond ;

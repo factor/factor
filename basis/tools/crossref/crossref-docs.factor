@@ -3,7 +3,7 @@ IN: tools.crossref
 
 ARTICLE: "tools.crossref" "Cross-referencing tools" 
 { $subsection usage. }
-{ $see-also "definitions" "words" see see-methods } ;
+{ $see-also "definitions" "words" "see" } ;
 
 ABOUT: "tools.crossref"
 

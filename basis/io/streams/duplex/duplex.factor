@@ -15,6 +15,11 @@ CONSULT: formatted-output-stream-protocol duplex-stream out>> ;
 
 : >duplex-stream< ( stream -- in out ) [ in>> ] [ out>> ] bi ; inline
 
+M: duplex-stream stream-element-type
+    [ in>> ] [ out>> ] bi
+    [ stream-element-type ] bi@
+    2dup eq? [ drop ] [ "Cannot determine element type" throw ] if ;
+
 M: duplex-stream set-timeout
     >duplex-stream< [ set-timeout ] bi-curry@ bi ;
 

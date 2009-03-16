@@ -27,7 +27,7 @@ R16G16B16 R32G32B32 R16G16B16A16 R32G32B32A32 ;
         { R32G32B32A32 [ 16 ] }
     } case ;
 
-TUPLE: image dim component-order bitmap ;
+TUPLE: image dim component-order upside-down? bitmap ;
 
 : <image> ( -- image ) image new ; inline
 
@@ -61,32 +61,41 @@ M: R16G16B16A16 normalize-component-order*
 M: R16G16B16 normalize-component-order*
     drop RGB16>8 add-dummy-alpha ;
 
-: BGR>RGB ( bitmap bytes-per-pixel -- pixels )
-    <groups> [ 3 cut [ reverse ] dip append ] map B{ } join ; inline
+: BGR>RGB ( bitmap -- pixels )
+    3 <sliced-groups> [ <reversed> ] map B{ } join ; inline
+
+: BGRA>RGBA ( bitmap -- pixels )
+    4 <sliced-groups>
+    [ unclip-last-slice [ <reversed> ] dip suffix ] map concat ; inline
 
 M: BGRA normalize-component-order*
-    drop 4 BGR>RGB ;
+    drop BGRA>RGBA ;
 
 M: RGB normalize-component-order*
     drop add-dummy-alpha ;
 
 M: BGR normalize-component-order*
-    drop 3 BGR>RGB add-dummy-alpha ;
+    drop BGR>RGB add-dummy-alpha ;
 
 : ARGB>RGBA ( bitmap -- bitmap' )
-    4 <groups> [ unclip suffix ] map B{ } join ;
+    4 <groups> [ unclip suffix ] map B{ } join ; inline
 
 M: ARGB normalize-component-order*
     drop ARGB>RGBA ;
 
 M: ABGR normalize-component-order*
-    drop ARGB>RGBA 4 BGR>RGB ;
+    drop ARGB>RGBA BGRA>RGBA ;
 
-GENERIC: normalize-scan-line-order ( image -- image )
-
-M: image normalize-scan-line-order ;
+: normalize-scan-line-order ( image -- image )
+    dup upside-down?>> [
+        dup dim>> first 4 * '[
+            _ <groups> reverse concat
+        ] change-bitmap
+        f >>upside-down?
+    ] when ;
 
 : normalize-image ( image -- image )
     [ >byte-array ] change-bitmap
     normalize-component-order
-    normalize-scan-line-order ;
+    normalize-scan-line-order
+    RGBA >>component-order ;

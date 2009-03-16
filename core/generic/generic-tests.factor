@@ -2,7 +2,8 @@ USING: accessors alien arrays definitions generic generic.standard
 generic.math assocs hashtables io kernel math namespaces parser
 prettyprint sequences strings tools.test vectors words
 quotations classes classes.algebra classes.tuple continuations
-layouts classes.union sorting compiler.units eval multiline ;
+layouts classes.union sorting compiler.units eval multiline
+io.streams.string ;
 IN: generic.tests
 
 GENERIC: foobar ( x -- y )
@@ -236,3 +237,14 @@ M: number c-n-m-cache ;
 [ ] [ [ { integer c-n-m-cache } forget ] with-compilation-unit ] unit-test
 
 [ 2 ] [ 2 c-n-m-cache ] unit-test
+
+! Moving a method from one vocab to another doesn't always work
+GENERIC: move-method-generic ( a -- b )
+
+[ ] [ "IN: generic.tests.a USE: strings USE: generic.tests M: string move-method-generic ;" <string-reader> "move-method-test-1" parse-stream drop ] unit-test
+
+[ ] [ "IN: generic.tests.b USE: strings USE: generic.tests M: string move-method-generic ;" <string-reader> "move-method-test-2" parse-stream drop ] unit-test
+
+[ ] [ "IN: generic.tests.a" <string-reader> "move-method-test-1" parse-stream drop ] unit-test
+
+[ { string } ] [ move-method-generic order ] unit-test

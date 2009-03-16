@@ -1,0 +1,140 @@
+! Copyright (C) 2009 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
+USING: regexp.classes kernel sequences regexp.negation
+quotations assocs fry math locals combinators
+accessors words compiler.units kernel.private strings
+sequences.private arrays namespaces unicode.breaks
+regexp.transition-tables combinators.short-circuit ;
+IN: regexp.compiler
+
+GENERIC: question>quot ( question -- quot )
+
+SYMBOL: shortest?
+SYMBOL: backwards?
+
+<PRIVATE
+
+M: t question>quot drop [ 2drop t ] ;
+M: f question>quot drop [ 2drop f ] ;
+
+M: not-class question>quot
+    class>> question>quot [ not ] compose ;
+
+M: beginning-of-input question>quot
+    drop [ drop zero? ] ;
+
+M: end-of-input question>quot
+    drop [ length = ] ;
+
+M: end-of-file question>quot
+    drop [
+        {
+            [ length swap - 2 <= ]
+            [ swap tail { "\n" "\r\n" "\r" "" } member? ]
+        } 2&&
+    ] ;
+
+M: $ question>quot
+    drop [ { [ length = ] [ ?nth "\r\n" member? ] } 2|| ] ;
+
+M: ^ question>quot
+    drop [ { [ drop zero? ] [ [ 1- ] dip ?nth "\r\n" member? ] } 2|| ] ;
+
+M: word-break question>quot
+    drop [ word-break-at? ] ;
+
+: (execution-quot) ( next-state -- quot )
+    ! The conditions here are for lookaround and anchors, etc
+    dup condition? [
+        [ question>> question>quot ] [ yes>> ] [ no>> ] tri
+        [ (execution-quot) ] bi@
+        '[ 2dup @ _ _ if ]
+    ] [ '[ _ execute ] ] if ;
+
+: execution-quot ( next-state -- quot )
+    dup sequence? [ first ] when
+    (execution-quot) ;
+
+TUPLE: box contents ;
+C: <box> box
+
+: condition>quot ( condition -- quot )
+    ! Conditions here are for different classes
+    dup condition? [
+        [ question>> ] [ yes>> ] [ no>> ] tri
+        [ condition>quot ] bi@
+        '[ dup _ class-member? _ _ if ]
+    ] [
+        contents>>
+        [ [ 3drop ] ] [ execution-quot '[ drop @ ] ] if-empty
+    ] if ;
+
+: non-literals>dispatch ( literals non-literals  -- quot )
+    [ swap ] assoc-map ! we want state => predicate, and get the opposite as input
+    swap keys f assoc-answers
+    table>condition [ <box> ] condition-map condition>quot ;
+
+: literals>cases ( literal-transitions -- case-body )
+    [ execution-quot ] assoc-map ;
+
+: split-literals ( transitions -- case default )
+    { } assoc-like [ first integer? ] partition
+    [ [ literals>cases ] keep ] dip non-literals>dispatch ;
+
+:: step ( last-match index str quot final? direction -- last-index/f )
+    final? index last-match ?
+    index str bounds-check? [
+        index direction + str
+        index str nth-unsafe
+        quot call
+    ] when ; inline
+
+: direction ( -- n )
+    backwards? get -1 1 ? ;
+
+: transitions>quot ( transitions final-state? -- quot )
+    dup shortest? get and [ 2drop [ drop nip ] ] [
+        [ split-literals swap case>quot ] dip direction
+        '[ { array-capacity string } declare _ _ _ step ]
+    ] if ;
+
+: word>quot ( word dfa -- quot )
+    [ transitions>> at ]
+    [ final-states>> key? ] 2bi
+    transitions>quot ;
+
+: states>code ( words dfa -- )
+    [
+        '[
+            dup _ word>quot
+            (( last-match index string -- ? ))
+            define-declared
+        ] each
+    ] with-compilation-unit ;
+
+: states>words ( dfa -- words dfa )
+    dup transitions>> keys [ gensym ] H{ } map>assoc
+    [ transitions-at ]
+    [ values ]
+    bi swap ; 
+
+: dfa>main-word ( dfa -- word )
+    states>words [ states>code ] keep start-state>> ;
+
+PRIVATE>
+
+: simple-define-temp ( quot effect -- word )
+    [ define-temp ] with-compilation-unit ;
+
+: dfa>word ( dfa -- quot )
+    dfa>main-word execution-quot '[ drop [ f ] 2dip @ ]
+    (( start-index string regexp -- i/f )) simple-define-temp ;
+
+: dfa>shortest-word ( dfa -- word )
+    t shortest? [ dfa>word ] with-variable ;
+
+: dfa>reverse-word ( dfa -- word )
+    t backwards? [ dfa>word ] with-variable ;
+
+: dfa>reverse-shortest-word ( dfa -- word )
+    t backwards? [ dfa>shortest-word ] with-variable ;
