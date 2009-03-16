@@ -40,7 +40,14 @@ SYMBOL: compiler-impl
 
 HOOK: recompile compiler-impl ( words -- alist )
 
+! Non-optimizing compiler
 M: f recompile [ f ] { } map>assoc ;
+
+! Trivial compiler. We don't want to touch the code heap
+! during stage1 bootstrap, it would just waste time.
+SINGLETON: dummy-compiler
+
+M: dummy-compiler recompile drop { } ;
 
 : <definitions> ( -- pair ) { H{ } H{ } } [ clone ] map ;
 
