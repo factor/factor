@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.encodings io.backend io.ports io.streams.duplex
 io splitting grouping sequences namespaces kernel
-destructors math concurrency.combinators accessors
+destructors math concurrency.combinators accessors call fry
 arrays continuations quotations system vocabs.loader combinators ;
 IN: io.pipes
 
@@ -29,11 +29,12 @@ HOOK: (pipe) io-backend ( -- pipe )
 : ?writer ( handle/f -- stream )
     [ <output-port> &dispose ] [ output-stream get ] if* ;
 
-GENERIC: run-pipeline-element ( input-fd output-fd obj -- quot )
+GENERIC: run-pipeline-element ( input-fd output-fd obj -- result )
 
 M: callable run-pipeline-element
     [
-        [ [ ?reader ] [ ?writer ] bi* ] dip with-streams*
+        [ [ ?reader ] [ ?writer ] bi* ] dip
+        '[ _ call( -- result ) ] with-streams*
     ] with-destructors ;
 
 : <pipes> ( n -- pipes )
