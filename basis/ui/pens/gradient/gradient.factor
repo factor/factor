@@ -42,3 +42,5 @@ M: gradient draw-interior
         [ last-colors>> gl-color-pointer ]
         [ colors>> draw-gradient ]
     } cleave ;
+
+M: gradient pen-background 2drop transparent ;

@@ -503,7 +503,7 @@ ERROR: unknown-component-order ifd ;
 : ifd>image ( ifd -- image )
     {
         [ [ image-width find-tag ] [ image-length find-tag ] bi 2array ]
-        [ ifd-component-order ]
+        [ ifd-component-order f ]
         [ bitmap>> ]
     } cleave tiff-image boa ;
 

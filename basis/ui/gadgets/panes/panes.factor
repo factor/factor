@@ -17,6 +17,14 @@ TUPLE: pane < track
 output current input last-line prototype scrolls?
 selection-color caret mark selecting? ;
 
+TUPLE: pane-stream pane ;
+
+C: <pane-stream> pane-stream
+
+M: pane-stream stream-element-type drop +character+ ;
+
+<PRIVATE
+
 : clear-selection ( pane -- pane )
     f >>caret f >>mark ; inline
 
@@ -29,11 +37,14 @@ selection-color caret mark selecting? ;
 : init-current ( pane -- pane )
     dup prototype>> clone >>current ; inline
 
+: focus-input ( pane -- )
+    input>> [ request-focus ] when* ;
+
 : next-line ( pane -- )
     clear-selection
     [ input>> unparent ]
     [ init-current prepare-last-line ]
-    [ input>> [ request-focus ] when* ] tri ;
+    [ focus-input ] tri ;
 
 : pane-caret&mark ( pane -- caret mark )
     [ caret>> ] [ mark>> ] bi ; inline
@@ -46,12 +57,6 @@ M: pane gadget-selection? pane-caret&mark and ;
 M: pane gadget-selection ( pane -- string/f )
     selected-children gadget-text ;
 
-: pane-clear ( pane -- )
-    clear-selection
-    [ output>> clear-incremental ]
-    [ current>> clear-gadget ]
-    bi ;
-
 : init-prototype ( pane -- pane )
     <shelf> +baseline+ >>align >>prototype ; inline
 
@@ -63,20 +68,9 @@ M: pane gadget-selection ( pane -- string/f )
     selection-color >>selection-color ; inline
 
 : init-last-line ( pane -- pane )
-    horizontal <track>
+    horizontal <track> 0 >>fill +baseline+ >>align
     [ >>last-line ] [ 1 track-add ] bi
     dup prepare-last-line ; inline
-
-: new-pane ( input class -- pane )
-    [ vertical ] dip new-track
-        swap >>input
-        pane-theme
-        init-prototype
-        init-output
-        init-current
-        init-last-line ; inline
-
-: <pane> ( -- pane ) f pane new-pane ;
 
 GENERIC: draw-selection ( loc obj -- )
 
@@ -101,17 +95,13 @@ M: pane draw-gadget*
     dup gadget-selection? [
         [ selection-color>> gl-color ]
         [
-            [ [ origin get ] dip loc>> v- ] keep selected-children
+            [ loc>> vneg ] keep selected-children
             [ draw-selection ] with each
         ] bi
     ] [ drop ] if ;
 
 : scroll-pane ( pane -- )
     dup scrolls?>> [ scroll>bottom ] [ drop ] if ;
-
-TUPLE: pane-stream pane ;
-
-C: <pane-stream> pane-stream
 
 : smash-line ( current -- gadget )
     dup children>> {
@@ -120,13 +110,17 @@ C: <pane-stream> pane-stream
         [ drop ]
     } cond ;
 
-: smash-pane ( pane -- gadget ) output>> smash-line ;
-
 : pane-nl ( pane -- )
     [
         [ current>> [ unparent ] [ smash-line ] bi ] [ output>> ] bi
         add-incremental
     ] [ next-line ] bi ;
+
+: ?pane-nl ( pane -- )
+    [ dup current>> children>> empty? [ pane-nl ] [ drop ] if ]
+    [ pane-nl ] bi ;
+
+: smash-pane ( pane -- gadget ) [ pane-nl ] [ output>> smash-line ] bi ;
 
 : pane-write ( seq pane -- )
     [ pane-nl ] [ current>> stream-write ]
@@ -135,43 +129,6 @@ C: <pane-stream> pane-stream
 : pane-format ( seq style pane -- )
     [ nip pane-nl ] [ current>> stream-format ]
     bi-curry bi-curry interleave ;
-
-GENERIC: write-gadget ( gadget stream -- )
-
-M: pane-stream write-gadget ( gadget pane-stream -- )
-    pane>> current>> swap add-gadget drop ;
-
-M: style-stream write-gadget
-    stream>> write-gadget ;
-
-: print-gadget ( gadget stream -- )
-    [ write-gadget ] [ nip stream-nl ] 2bi ;
-
-: gadget. ( gadget -- )
-    output-stream get print-gadget ;
-
-: ?nl ( stream -- )
-    dup pane>> current>> children>> empty?
-    [ dup stream-nl ] unless drop ;
-
-: with-pane ( pane quot -- )
-    over scroll>top
-    over pane-clear [ <pane-stream> ] dip
-    over [ with-output-stream* ] dip ?nl ; inline
-
-: make-pane ( quot -- gadget )
-    <pane> [ swap with-pane ] keep smash-pane ; inline
-
-TUPLE: pane-control < pane quot ;
-
-M: pane-control model-changed ( model pane-control -- )
-    [ value>> ] [ dup quot>> ] bi*
-    '[ _ call( value -- ) ] with-pane ;
-
-: <pane-control> ( model quot -- pane )
-    f pane-control new-pane
-        swap >>quot
-        swap >>model ;
 
 : do-pane-stream ( pane-stream quot -- )
     [ pane>> ] dip keep scroll-pane ; inline
@@ -195,7 +152,59 @@ M: pane-stream stream-flush drop ;
 M: pane-stream make-span-stream
     swap <style-stream> <ignore-close-stream> ;
 
+PRIVATE>
+
+: new-pane ( input class -- pane )
+    [ vertical ] dip new-track
+        swap >>input
+        pane-theme
+        init-prototype
+        init-output
+        init-current
+        init-last-line ; inline
+
+: <pane> ( -- pane ) f pane new-pane ;
+
+GENERIC: write-gadget ( gadget stream -- )
+
+M: pane-stream write-gadget ( gadget pane-stream -- )
+    pane>> current>> swap add-gadget drop ;
+
+M: style-stream write-gadget
+    stream>> write-gadget ;
+
+: print-gadget ( gadget stream -- )
+    [ write-gadget ] [ nip stream-nl ] 2bi ;
+
+: gadget. ( gadget -- )
+    output-stream get print-gadget ;
+
+: pane-clear ( pane -- )
+    clear-selection
+    [ output>> clear-incremental ]
+    [ current>> clear-gadget ]
+    bi ;
+
+: with-pane ( pane quot -- )
+    [ [ scroll>top ] [ pane-clear ] [ <pane-stream> ] tri ] dip
+    with-output-stream* ; inline
+
+: make-pane ( quot -- gadget )
+    [ <pane> ] dip [ with-pane ] [ drop smash-pane ] 2bi ; inline
+
+TUPLE: pane-control < pane quot ;
+
+M: pane-control model-changed ( model pane-control -- )
+    [ value>> ] [ dup quot>> ] bi*
+    '[ _ call( value -- ) ] with-pane ;
+
+: <pane-control> ( model quot -- pane )
+    f pane-control new-pane
+        swap >>quot
+        swap >>model ;
+
 ! Character styles
+<PRIVATE
 
 MEMO: specified-font ( assoc -- font )
     #! We memoize here to avoid creating lots of duplicate font objects.
@@ -276,10 +285,7 @@ TUPLE: nested-pane-stream < pane-stream style parent ;
     inline
 
 : unnest-pane-stream ( stream -- child parent )
-    dup ?nl
-    dup style>>
-    over pane>> smash-pane style-pane
-    swap parent>> ;
+    [ [ style>> ] [ pane>> smash-pane ] bi style-pane ] [ parent>> ] bi ;
 
 TUPLE: pane-block-stream < nested-pane-stream ;
 
@@ -306,7 +312,7 @@ M: pane-stream make-block-stream
 
 TUPLE: pane-cell-stream < nested-pane-stream ;
 
-M: pane-cell-stream dispose ?nl ;
+M: pane-cell-stream dispose drop ;
 
 M: pane-stream make-cell-stream
     pane-cell-stream new-nested-pane-stream ;
@@ -315,7 +321,7 @@ M: pane-stream stream-write-table
     [
         swap [ [ pane>> smash-pane ] map ] map
         styled-grid
-    ] dip print-gadget ;
+    ] dip write-gadget ;
 
 ! Stream utilities
 M: pack dispose drop ;
@@ -364,9 +370,8 @@ M: paragraph stream-format
         interleave
     ] if ;
 
-: caret>mark ( pane -- pane )
-    dup caret>> >>mark
-    dup relayout-1 ;
+: caret>mark ( pane -- )
+    dup caret>> >>mark relayout-1 ;
 
 GENERIC: sloppy-pick-up* ( loc gadget -- n )
 
@@ -388,47 +393,50 @@ M: f sloppy-pick-up*
     [ 3drop { } ]
     if ;
 
-: move-caret ( pane loc -- pane )
+: move-caret ( pane loc -- )
     over screen-loc v- over sloppy-pick-up >>caret
-    dup relayout-1 ;
+    relayout-1 ;
 
 : begin-selection ( pane -- )
     f >>selecting?
-    hand-loc get move-caret
+    dup hand-loc get move-caret
     f >>mark
     drop ;
 
 : extend-selection ( pane -- )
     hand-moved? [
-        dup selecting?>> [
-            hand-loc get move-caret
-        ] [
-            dup hand-clicked get child? [
-                t >>selecting?
-                dup hand-clicked set-global
-                hand-click-loc get move-caret
-                caret>mark
-            ] when
-        ] if
-        dup dup caret>> gadget-at-path scroll>gadget
-    ] when drop ;
+        [
+            dup selecting?>> [
+                hand-loc get move-caret
+            ] [
+                dup hand-clicked get child? [
+                    t >>selecting?
+                    [ hand-clicked set-global ]
+                    [ hand-click-loc get move-caret ]
+                    [ caret>mark ]
+                    tri
+                ] [ drop ] if
+            ] if
+        ] [ dup caret>> gadget-at-path scroll>gadget ] bi
+    ] [ drop ] if ;
 
 : end-selection ( pane -- )
     f >>selecting?
-    hand-moved? [
-        [ com-copy-selection ] [ request-focus ] bi
-    ] [
-        relayout-1
-    ] if ;
+    hand-moved?
+    [ [ com-copy-selection ] [ request-focus ] bi ]
+    [ [ relayout-1 ] [ focus-input ] bi ]
+    if ;
 
 : select-to-caret ( pane -- )
     t >>selecting?
-    dup mark>> [ caret>mark ] unless
-    hand-loc get move-caret
-    dup request-focus
-    com-copy-selection ;
+    [ dup mark>> [ dup caret>mark ] unless hand-loc get move-caret ]
+    [ com-copy-selection ]
+    [ request-focus ]
+    tri ;
 
 : pane-menu ( pane -- ) { com-copy } show-commands-menu ;
+
+PRIVATE>
 
 pane H{
     { T{ button-down } [ begin-selection ] }

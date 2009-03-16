@@ -84,6 +84,8 @@ M: interactor model-changed
         [ 2drop ] [ [ value>> ] dip show-summary ] if
     ] [ call-next-method ] if ;
 
+M: interactor stream-element-type drop +character+ ;
+
 GENERIC: (print-input) ( object -- )
 
 M: input (print-input)
@@ -175,7 +177,7 @@ TUPLE: listener-gadget < tool input output scroller ;
     [ listener-gadget? ] find-parent ;
 
 : listener-streams ( listener -- input output )
-    [ input>> ] [ output>> ] bi <pane-stream> ;
+    [ input>> ] [ output>> <pane-stream> ] bi ;
 
 : init-listener ( listener -- listener )
     <interactor>

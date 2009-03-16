@@ -3,7 +3,10 @@
 USING: help.syntax help.markup ;
 IN: io.encodings.johab
 
-ABOUT: johab
-
 HELP: johab
 { $class-description "Korean Johab encoding (KSC5601-1992). This encoding is not commonly used anymore." } ;
+
+ARTICLE: "io.encodings.johab" "Korean Johab encoding"
+{ $subsection johab } ;
+
+ABOUT: "io.encodings.johab"

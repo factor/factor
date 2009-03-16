@@ -6,17 +6,17 @@ io.streams.byte-array ;
 IN: bitstreams.tests
 
 [ 1 t ]
-[ B{ 254 } <string-reader> <bitstream-reader> read-bit ] unit-test
+[ B{ 254 } binary <byte-reader> <bitstream-reader> read-bit ] unit-test
 
 [ 254 8 t ]
-[ B{ 254 } <string-reader> <bitstream-reader> 8 swap read-bits ] unit-test
+[ B{ 254 } binary <byte-reader> <bitstream-reader> 8 swap read-bits ] unit-test
 
 [ 4095 12 t ]
-[ B{ 255 255 } <string-reader> <bitstream-reader> 12 swap read-bits ] unit-test
+[ B{ 255 255 } binary <byte-reader> <bitstream-reader> 12 swap read-bits ] unit-test
 
 [ B{ 254 } ]
 [
-    <string-writer> <bitstream-writer> 254 8 rot
+    binary <byte-writer> <bitstream-writer> 254 8 rot
     [ write-bits ] keep stream>> >byte-array
 ] unit-test
 

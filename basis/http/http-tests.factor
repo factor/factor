@@ -9,13 +9,9 @@ IN: http.tests
 
 [ "text/html" utf8 ] [ "text/html;  charset=UTF-8" parse-content-type ] unit-test
 
+[ "text/html" utf8 ] [ "text/html; charset=\"utf-8\"" parse-content-type ] unit-test
+
 [ "application/octet-stream" binary ] [ "application/octet-stream" parse-content-type ] unit-test
-
-[ { } ] [ "" parse-cookie ] unit-test
-[ { } ] [ "" parse-set-cookie ] unit-test
-
-! Make sure that totally invalid cookies don't confuse us
-[ { } ] [ "hello world; how are you" parse-cookie ] unit-test
 
 : lf>crlf "\n" split "\r\n" join ;
 

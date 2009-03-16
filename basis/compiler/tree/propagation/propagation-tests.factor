@@ -655,3 +655,36 @@ MIXIN: empty-mixin
 ! [ t ] [ [ dup t xor and ] final-classes first false-class? ] unit-test
 
 ! [ t ] [ [ dup t xor swap and ] final-classes first false-class? ] unit-test
+
+! generalize-counter-interval wasn't being called in all the right places.
+! bug found by littledan
+
+TUPLE: littledan-1 { a read-only } ;
+
+: (littledan-1-test) ( a -- ) a>> 1+ littledan-1 boa (littledan-1-test) ; inline recursive
+
+: littledan-1-test ( -- ) 0 littledan-1 boa (littledan-1-test) ; inline
+
+[ ] [ [ littledan-1-test ] final-classes drop ] unit-test
+
+TUPLE: littledan-2 { from read-only } { to read-only } ;
+
+: (littledan-2-test) ( x -- i elt )
+    [ from>> ] [ to>> ] bi + dup littledan-2 boa (littledan-2-test) ; inline recursive
+
+: littledan-2-test ( x -- i elt )
+    [ 0 ] dip { array-capacity } declare littledan-2 boa (littledan-2-test) ; inline
+
+[ ] [ [ littledan-2-test ] final-classes drop ] unit-test
+
+: (littledan-3-test) ( x -- )
+    length 1+ f <array> (littledan-3-test) ; inline recursive
+
+: littledan-3-test ( x -- )
+    0 f <array> (littledan-3-test) ; inline
+
+[ ] [ [ littledan-3-test ] final-classes drop ] unit-test
+
+[ V{ 0 } ] [ [ { } length ] final-literals ] unit-test
+
+[ V{ 1 } ] [ [ { } length 1+ f <array> length ] final-literals ] unit-test

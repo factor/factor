@@ -176,6 +176,7 @@ SYMBOL: interactive-vocabs
     "memory"
     "namespaces"
     "prettyprint"
+    "see"
     "sequences"
     "slicing"
     "sorting"

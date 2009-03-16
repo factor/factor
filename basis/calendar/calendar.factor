@@ -39,8 +39,10 @@ M: not-a-month summary
     drop "Months are indexed starting at 1" ;
 
 <PRIVATE
+
 : check-month ( n -- n )
     dup zero? [ not-a-month ] when ;
+
 PRIVATE>
 
 : month-names ( -- array )
@@ -52,11 +54,11 @@ PRIVATE>
 : month-name ( n -- string )
     check-month 1- month-names nth ;
 
-: month-abbreviations ( -- array )
+CONSTANT: month-abbreviations
     {
         "Jan" "Feb" "Mar" "Apr" "May" "Jun"
         "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
-    } ;
+    }
 
 : month-abbreviation ( n -- string )
     check-month 1- month-abbreviations nth ;
@@ -70,17 +72,17 @@ CONSTANT: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 }
 
 : day-name ( n -- string ) day-names nth ;
 
-: day-abbreviations2 ( -- array )
-    { "Su" "Mo" "Tu" "We" "Th" "Fr" "Sa" } ;
+CONSTANT: day-abbreviations2
+    { "Su" "Mo" "Tu" "We" "Th" "Fr" "Sa" }
 
 : day-abbreviation2 ( n -- string )
-    day-abbreviations2 nth ;
+    day-abbreviations2 nth ; inline
 
-: day-abbreviations3 ( -- array )
-    { "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" } ;
+CONSTANT: day-abbreviations3
+    { "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" }
 
 : day-abbreviation3 ( n -- string )
-    day-abbreviations3 nth ;
+    day-abbreviations3 nth ; inline
 
 : average-month ( -- ratio ) 30+5/12 ; inline
 : months-per-year ( -- integer ) 12 ; inline

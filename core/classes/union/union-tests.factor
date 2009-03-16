@@ -4,7 +4,7 @@ tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
 classes.algebra vectors definitions source-files
 compiler.units kernel.private sorting vocabs io.streams.string
-eval ;
+eval see ;
 IN: classes.union.tests
 
 ! DEFER: bah
@@ -70,9 +70,13 @@ UNION: redefine-bug-2 redefine-bug-1 quotation ;
 
 [ t ] [ "blah" "classes.union.tests" lookup union-class? ] unit-test
 
+[ t ] [ "foo?" "classes.union.tests" lookup predicate? ] unit-test
+
 [ ] [ "IN: classes.union.tests USE: math UNION: blah integer ;" <string-reader> "union-reset-test" parse-stream drop ] unit-test
 
 [ t ] [ "blah" "classes.union.tests" lookup union-class? ] unit-test
+
+[ f ] [ "foo?" "classes.union.tests" lookup predicate? ] unit-test
 
 GENERIC: test-generic ( x -- y )
 

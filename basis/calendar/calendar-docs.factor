@@ -36,7 +36,7 @@ HELP: month-name
 { $description "Looks up the month name and returns it as a string.  January has an index of 1 instead of zero." } ;
 
 HELP: month-abbreviations
-{ $values { "array" array } }
+{ $values { "value" array } }
 { $description "Returns an array with the English abbreviated names of all the months." }
 { $warning "Do not use this array for looking up a month name directly. Use month-abbreviation instead." } ;
 
@@ -54,7 +54,7 @@ HELP: day-name
 { $description "Looks up the day name and returns it as a string." } ;
 
 HELP: day-abbreviations2
-{ $values { "array" array } }
+{ $values { "value" array } }
 { $description "Returns an array with the abbreviated English names of the days of the week.  This abbreviation is two characters long." } ;
 
 HELP: day-abbreviation2
@@ -62,7 +62,7 @@ HELP: day-abbreviation2
 { $description "Looks up the abbreviated day name and returns it as a string. This abbreviation is two characters long." } ;
 
 HELP: day-abbreviations3
-{ $values { "array" array } }
+{ $values { "value" array } }
 { $description "Returns an array with the abbreviated English names of the days of the week.  This abbreviation is three characters long." } ;
 
 HELP: day-abbreviation3

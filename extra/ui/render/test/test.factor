@@ -26,21 +26,14 @@ SYMBOL: render-output
     #! On Windows, white is { 253 253 253 } ?
     [ 10 /i ] map ;
 
-: stride ( bitmap -- n ) width>> 3 * ;
-
 : bitmap= ( bitmap1 bitmap2 -- ? )
-    [
-        dup [ [ height>> ] [ stride ] bi * ] [ array>> length ] bi = [
-            [ [ array>> ] [ stride 4 align ] bi group ] [ stride ] bi
-            '[ _ head twiddle ] map
-        ] unless
-    ] bi@ = ;
+    [ bitmap>> twiddle ] bi@ = ;
 
 : check-rendering ( gadget -- )
     screenshot
     [ render-output set-global ]
     [
-        "resource:extra/ui/render/test/reference.bmp" load-image
+        "vocab:ui/render/test/reference.bmp" load-image
         bitmap= "is perfect" "needs work" ?
         "Your UI rendering " prepend
         message-window
@@ -74,12 +67,6 @@ M: take-screenshot draw-boundary
         3array <grid>
             { 5 5 } >>gap
             COLOR: blue <grid-lines> >>boundary
-        add-gadget
-        <gadget>
-            { 14 14 } >>dim
-            COLOR: black <checkmark-paint> >>interior
-            COLOR: black <solid> >>boundary
-        { 4 4 } <border>
         add-gadget ;
     
 : ui-render-test ( -- )

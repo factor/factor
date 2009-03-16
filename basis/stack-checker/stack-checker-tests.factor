@@ -7,7 +7,7 @@ sorting assocs definitions prettyprint io inspector
 classes.tuple classes.union classes.predicate debugger
 threads.private io.streams.string io.timeouts io.thread
 sequences.private destructors combinators eval locals.backend
-system ;
+system compiler.units ;
 IN: stack-checker.tests
 
 \ infer. must-infer
@@ -288,7 +288,7 @@ DEFER: bar
 [ [ [ dup call ] dup call ] infer ]
 [ inference-error? ] must-fail-with
 
-: m dup call ; inline
+: m ( q -- ) dup call ; inline
 
 [ [ [ m ] m ] infer ] [ inference-error? ] must-fail-with
 
@@ -296,13 +296,13 @@ DEFER: bar
 
 [ [ [ m' ] m' ] infer ] [ inference-error? ] must-fail-with
 
-: m'' [ dup curry ] ; inline
+: m'' ( -- q ) [ dup curry ] ; inline
 
-: m''' m'' call call ; inline
+: m''' ( -- ) m'' call call ; inline
 
 [ [ [ m''' ] m''' ] infer ] [ inference-error? ] must-fail-with
 
-: m-if t over if ; inline
+: m-if ( a b c -- ) t over if ; inline
 
 [ [ [ m-if ] m-if ] infer ] [ inference-error? ] must-fail-with
 
@@ -488,7 +488,7 @@ ERROR: custom-error ;
     [ custom-error ] infer
 ] unit-test
 
-: funny-throw throw ; inline
+: funny-throw ( a -- * ) throw ; inline
 
 [ T{ effect f 0 0 t } ] [
     [ 3 funny-throw ] infer
@@ -502,12 +502,8 @@ ERROR: custom-error ;
     [ dup [ 3 throw ] dip ] infer
 ] unit-test
 
-! This was a false trigger of the undecidable quotation
-! recursion bug
-{ 2 1 } [ find-last-sep ] must-infer-as
-
 ! Regression
-: missing->r-check 1 load-locals ;
+: missing->r-check ( a -- ) 1 load-locals ;
 
 [ [ missing->r-check ] infer ] must-fail
 
@@ -516,7 +512,7 @@ ERROR: custom-error ;
 
 [ [ [ f dup ] [ ] while ] infer ] must-fail
 
-: erg's-inference-bug ( -- ) f dup [ erg's-inference-bug ] when ; inline
+: erg's-inference-bug ( -- ) f dup [ erg's-inference-bug ] when ; inline recursive
 
 [ [ erg's-inference-bug ] infer ] must-fail
 
@@ -544,10 +540,10 @@ M: object inference-invalidation-d inference-invalidation-c 2drop ;
 
 [ [ inference-invalidation-d ] infer ] must-fail
 
-: bad-recursion-3 ( -- ) dup [ [ bad-recursion-3 ] dip ] when ; inline
+: bad-recursion-3 ( -- ) dup [ [ bad-recursion-3 ] dip ] when ; inline recursive
 [ [ bad-recursion-3 ] infer ] must-fail
 
-: bad-recursion-4 ( -- ) 4 [ dup call roll ] times ; inline
+: bad-recursion-4 ( -- ) 4 [ dup call roll ] times ; inline recursive
 [ [ [ ] [ 1 2 3 ] over dup bad-recursion-4 ] infer ] must-fail
 
 : bad-recursion-5 ( obj quot: ( -- ) -- ) dup call swap bad-recursion-5 ; inline recursive
@@ -585,3 +581,10 @@ DEFER: eee'
 [ [ ] debugging-curry-folding ] must-infer
 
 [ [ exit ] [ 1 2 3 ] if ] must-infer
+
+! Stack effects are required now but FORGET: clears them...
+: forget-test ( -- ) ;
+
+[ forget-test ] must-infer
+[ ] [ [ \ forget-test forget ] with-compilation-unit ] unit-test
+[ forget-test ] must-infer

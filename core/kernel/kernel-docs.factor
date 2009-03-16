@@ -684,7 +684,7 @@ $nl
 "This operation is efficient and does not copy the quotation." }
 { $examples
     { $example "USING: kernel prettyprint ;" "5 [ . ] curry ." "[ 5 . ]" }
-    { $example "USING: kernel prettyprint ;" "\\ = [ see ] curry ." "[ \\ = see ]" }
+    { $example "USING: kernel prettyprint see ;" "\\ = [ see ] curry ." "[ \\ = see ]" }
     { $example "USING: kernel math prettyprint sequences ;" "{ 1 2 3 } 2 [ - ] curry map ." "{ -1 0 1 }" }
 } ;
 
