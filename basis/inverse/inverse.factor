@@ -5,7 +5,7 @@ sequences assocs math arrays stack-checker effects generalizations
 continuations debugger classes.tuple namespaces make vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
 sequences.private combinators mirrors splitting
-combinators.short-circuit fry words.symbol generalizations ;
+combinators.short-circuit fry words.symbol generalizations call ;
 RENAME: _ fry => __
 IN: inverse
 
@@ -122,7 +122,7 @@ M: math-inverse inverse
 
 M: pop-inverse inverse
     [ "pop-length" word-prop cut-slice swap >quotation ]
-    [ "pop-inverse" word-prop ] bi compose call ;
+    [ "pop-inverse" word-prop ] bi compose call( -- quot ) ;
 
 : (undo) ( revquot -- )
     [ unclip-slice inverse % (undo) ] unless-empty ;

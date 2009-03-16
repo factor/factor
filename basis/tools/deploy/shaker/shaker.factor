@@ -53,6 +53,13 @@ IN: tools.deploy.shaker
         run-file
     ] when ;
 
+: strip-call ( -- )
+    "call" vocab [
+        "Stripping stack effect checking from call( and execute(" show
+        "vocab:tools/deploy/shaker/strip-call.factor"
+        run-file
+    ] when ;
+
 : strip-cocoa ( -- )
     "cocoa" vocab [
         "Stripping unused Cocoa methods" show
@@ -256,9 +263,7 @@ IN: tools.deploy.shaker
                 command-line:main-vocab-hook
                 compiled-crossref
                 compiled-generic-crossref
-                recompile-hook
-                update-tuples-hook
-                remake-generics-hook
+                compiler-impl
                 definition-observers
                 definitions:crossref
                 interactive-vocabs
@@ -399,6 +404,7 @@ SYMBOL: deploy-vocab
     init-stripper
     strip-default-methods
     strip-libc
+    strip-call
     strip-cocoa
     strip-debugger
     compute-next-methods

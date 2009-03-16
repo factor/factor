@@ -1,8 +1,9 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel continuations assocs namespaces
 sequences words vocabs definitions hashtables init sets
-math math.order classes classes.algebra ;
+math math.order classes classes.algebra classes.tuple
+classes.tuple.private generic ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -35,7 +36,18 @@ TUPLE: redefine-error def ;
     [ new-definitions get assoc-stack not ]
     [ drop f ] if ;
 
-SYMBOL: recompile-hook
+SYMBOL: compiler-impl
+
+HOOK: recompile compiler-impl ( words -- alist )
+
+! Non-optimizing compiler
+M: f recompile [ f ] { } map>assoc ;
+
+! Trivial compiler. We don't want to touch the code heap
+! during stage1 bootstrap, it would just waste time.
+SINGLETON: dummy-compiler
+
+M: dummy-compiler recompile drop { } ;
 
 : <definitions> ( -- pair ) { H{ } H{ } } [ clone ] map ;
 
@@ -68,12 +80,7 @@ GENERIC: definitions-changed ( assoc obj -- )
     dup changed-definitions get update
     dup dup changed-vocabs update ;
 
-: compile ( words -- )
-    recompile-hook get call modify-code-heap ;
-
-SYMBOL: outdated-tuples
-SYMBOL: update-tuples-hook
-SYMBOL: remake-generics-hook
+: compile ( words -- ) recompile modify-code-heap ;
 
 : index>= ( obj1 obj2 seq -- ? )
     [ index ] curry bi@ >= ;
@@ -125,24 +132,15 @@ SYMBOL: remake-generics-hook
     changed-generics get compiled-generic-usages
     append assoc-combine keys ;
 
-: call-recompile-hook ( -- )
-    to-recompile recompile-hook get call ;
-
-: call-remake-generics-hook ( -- )
-    remake-generics-hook get call ;
-
-: call-update-tuples-hook ( -- )
-    update-tuples-hook get call ;
-
 : unxref-forgotten-definitions ( -- )
     forgotten-definitions get
     keys [ word? ] filter
     [ delete-compiled-xref ] each ;
 
 : finish-compilation-unit ( -- )
-    call-remake-generics-hook
-    call-recompile-hook
-    call-update-tuples-hook
+    remake-generics
+    to-recompile recompile
+    update-tuples
     unxref-forgotten-definitions
     modify-code-heap ;
 
@@ -150,7 +148,7 @@ SYMBOL: remake-generics-hook
     [
         H{ } clone changed-definitions set
         H{ } clone changed-generics set
-        H{ } clone remake-generics set
+        H{ } clone outdated-generics set
         H{ } clone outdated-tuples set
         H{ } clone new-classes set
         [ finish-compilation-unit ] [ ] cleanup
@@ -160,7 +158,7 @@ SYMBOL: remake-generics-hook
     [
         H{ } clone changed-definitions set
         H{ } clone changed-generics set
-        H{ } clone remake-generics set
+        H{ } clone outdated-generics set
         H{ } clone forgotten-definitions set
         H{ } clone outdated-tuples set
         H{ } clone new-classes set
@@ -172,8 +170,3 @@ SYMBOL: remake-generics-hook
             notify-definition-observers
         ] [ ] cleanup
     ] with-scope ; inline
-
-: default-recompile-hook ( words -- alist )
-    [ f ] { } map>assoc ;
-
-recompile-hook [ [ default-recompile-hook ] ] initialize

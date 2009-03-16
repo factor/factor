@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: colors.constants kernel locals math.rectangles
-namespaces sequences ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.buttons ui.gadgets.glass ui.gadgets.packs
-ui.gadgets.worlds ui.gestures ui.operations ui.pens ui.pens.solid
-opengl math.vectors words accessors math math.order sorting ;
+USING: colors.constants kernel locals math.rectangles namespaces
+sequences ui.commands ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets.glass ui.gadgets.packs ui.gadgets.frames ui.gadgets.worlds
+ui.gadgets.frames ui.gadgets.corners ui.gestures ui.operations
+ui.render ui.pens ui.pens.solid opengl math.vectors words accessors
+math math.order sorting ;
 IN: ui.gadgets.menus
 
 : show-menu ( owner menu -- )
@@ -30,6 +31,10 @@ M: separator-pen draw-interior
     dim>> [ { 0 0.5 } v* ] [ { 1 0.5 } v* ] bi
     [ [ >integer ] map ] bi@ gl-line ;
 
+: <menu-items> ( items -- gadget )
+    [ <filled-pile> ] dip add-gadgets
+    panel-background-color <solid> >>interior ;
+
 PRIVATE>
 
 SINGLETON: ----
@@ -43,10 +48,16 @@ M: ---- <menu-item>
 : menu-theme ( gadget -- gadget )
     COLOR: light-gray <solid> >>interior ;
 
+: <menu> ( gadgets -- menu )
+    <menu-items>
+    frame "menu-background" [
+        /-----\
+        |-----|
+        \-----/
+    ] make-corners ;
+
 : <commands-menu> ( target hook commands -- menu )
-    [ <filled-pile> ] 3dip
-    [ <menu-item> add-gadget ] with with each
-    { 5 5 } <border> menu-theme ;
+    [ <menu-item> ] with with map <menu> ;
 
 : show-commands-menu ( target commands -- )
     [ dup [ ] ] dip <commands-menu> show-menu ;

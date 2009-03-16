@@ -41,7 +41,7 @@ SYMBOL: message-histogram
         [ >alist sort-values <reversed> ] dip [
             [ swapd with-cell pprint-cell ] with-row
         ] curry assoc-each
-    ] tabular-output ;
+    ] tabular-output ; inline
 
 : log-entry. ( entry -- )
     "====== " write

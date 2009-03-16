@@ -80,7 +80,7 @@ ERROR: bad-log-message-parameters msg word level ;
 PRIVATE>
 
 : (define-logging) ( word level quot -- )
-    [ dup ] 2dip 2curry annotate ;
+    [ dup ] 2dip 2curry annotate ; inline
 
 : call-logging-quot ( quot word level -- quot' )
     [ "called" ] 2dip [ log-message ] 3curry prepose ;

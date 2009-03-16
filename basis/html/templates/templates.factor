@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel fry io io.encodings.utf8 io.files
 debugger prettyprint continuations namespaces boxes sequences
-arrays strings html io.streams.string assocs
+arrays strings html io.streams.string assocs call
 quotations xml.data xml.writer xml.syntax ;
 IN: html.templates
 
@@ -12,7 +12,7 @@ GENERIC: call-template* ( template -- )
 
 M: string call-template* write ;
 
-M: callable call-template* call ;
+M: callable call-template* call( -- ) ;
 
 M: xml call-template* write-xml ;
 

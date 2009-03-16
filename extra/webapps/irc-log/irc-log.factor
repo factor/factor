@@ -7,15 +7,15 @@ IN: webapps.irc-log
 
 TUPLE: irclog-app < dispatcher ;
 
-: irc-link ( -- string )   
+: irc-link ( channel -- string )   
     gmt -7 hours convert-timezone >date<
     [ unparse 2 tail ] 2dip
-    "http://bespin.org/~nef/logs/concatenative/%02s.%02d.%02d"
+    "http://bespin.org/~nef/logs/%s/%02s.%02d.%02d"
     sprintf ;
     
 : <display-irclog-action> ( -- action )
     <action>
-        [ irc-link <redirect> ] >>display ;
+        [ "concatenative" irc-link <redirect> ] >>display ;
 
 : <irclog-app> ( -- dispatcher )
     irclog-app new-dispatcher

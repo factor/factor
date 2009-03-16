@@ -37,6 +37,7 @@ ui.gadgets.panes
        ui.gadgets.buttons
        ui.gadgets.packs
        ui.gadgets.grids
+       ui.gadgets.corners
        ui.gestures
        ui.gadgets.scrollers
 splitting
@@ -186,8 +187,6 @@ VAR: present-space
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! menu
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USE: ui.gadgets.labeled.private
 
 : menu-rotations-4D ( -- gadget )
     3 3 <frame>
