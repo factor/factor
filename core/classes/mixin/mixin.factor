@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.union words kernel sequences
 definitions combinators arrays assocs generic accessors ;
@@ -21,8 +21,9 @@ M: mixin-class rank-class drop 3 ;
         drop
     ] [
         [ { } redefine-mixin-class ]
+        [ H{ } clone "instances" set-word-prop ]
         [ update-classes ]
-        bi
+        tri
     ] if ;
 
 TUPLE: check-mixin-class class ;
@@ -44,6 +45,11 @@ TUPLE: check-mixin-class class ;
     [ [ update-class ] each ]
     [ implementors [ remake-generic ] each ] bi ;
 
+: (add-mixin-instance) ( class mixin -- )
+    [ [ suffix ] change-mixin-class ]
+    [ [ f ] 2dip "instances" word-prop set-at ]
+    2bi ;
+
 : add-mixin-instance ( class mixin -- )
     #! Note: we call update-classes on the new member, not the
     #! mixin. This ensures that we only have to update the
@@ -53,20 +59,22 @@ TUPLE: check-mixin-class class ;
     #! updated by transitivity; the mixins usages appear in
     #! class-usages of the member, now that it's been added.
     [ 2drop ] [
-        [ [ suffix ] change-mixin-class ] 2keep
-        [ nip ] [ [ new-class? ] either? ] 2bi [
-            update-classes/new
-        ] [
-            update-classes
-        ] if
+        [ (add-mixin-instance) ] 2keep
+        [ nip ] [ [ new-class? ] either? ] 2bi
+        [ update-classes/new ] [ update-classes ] if
     ] if-mixin-member? ;
+
+: (remove-mixin-instance) ( class mixin -- )
+    [ [ swap remove ] change-mixin-class ]
+    [ "instances" word-prop delete-at ]
+    2bi ;
 
 : remove-mixin-instance ( class mixin -- )
     #! The order of the three clauses is important here. The last
     #! one must come after the other two so that the entries it
     #! adds to changed-generics are not overwritten.
     [
-        [ [ swap remove ] change-mixin-class ]
+        [ (remove-mixin-instance) ]
         [ nip update-classes ]
         [ class-usages update-methods ]
         2tri
@@ -76,32 +84,21 @@ M: mixin-class class-forgotten remove-mixin-instance ;
 
 ! Definition protocol implementation ensures that removing an
 ! INSTANCE: declaration from a source file updates the mixin.
-TUPLE: mixin-instance loc class mixin ;
+TUPLE: mixin-instance class mixin ;
 
-M: mixin-instance equal?
-    {
-        { [ over mixin-instance? not ] [ f ] }
-        { [ 2dup [ class>> ] bi@ = not ] [ f ] }
-        { [ 2dup [ mixin>> ] bi@ = not ] [ f ] }
-        [ t ]
-    } cond 2nip ;
+C: <mixin-instance> mixin-instance
 
-M: mixin-instance hashcode*
-    [ class>> ] [ mixin>> ] bi 2array hashcode* ;
+: >mixin-instance< ( mixin-instance -- class mixin )
+    [ class>> ] [ mixin>> ] bi ; inline
 
-: <mixin-instance> ( class mixin -- definition )
-    mixin-instance new
-        swap >>mixin
-        swap >>class ;
+M: mixin-instance where >mixin-instance< "instances" word-prop at ;
 
-M: mixin-instance where loc>> ;
-
-M: mixin-instance set-where (>>loc) ;
+M: mixin-instance set-where >mixin-instance< "instances" word-prop set-at ;
 
 M: mixin-instance definer drop \ INSTANCE: f ;
 
 M: mixin-instance definition drop f ;
 
 M: mixin-instance forget*
-    [ class>> ] [ mixin>> ] bi
+    >mixin-instance<
     dup mixin-class? [ remove-mixin-instance ] [ 2drop ] if ;

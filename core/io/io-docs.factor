@@ -262,7 +262,6 @@ $nl
 { $subsection stream-nl }
 "This word is for streams that allow seeking:"
 { $subsection stream-seek }
-"For a discussion of the distinction between binary and string streams, see " { $link "stream-elements" } "."
 { $see-also "io.timeouts" } ;
 
 ARTICLE: "stdio-motivation" "Motivation for default streams"
@@ -313,7 +312,7 @@ $nl
 { $subsection read }
 { $subsection read-until }
 { $subsection read-partial }
-"If the default input stream is a string stream (" { $link "stream-elements" } "), lines of text can be read:"
+"If the default input stream is a character stream (" { $link stream-element-type } " outputs " { $link +character+ } "), lines of text can be read:"
 { $subsection readln }
 "Seeking on the default input stream:"
 { $subsection seek-input }
@@ -328,7 +327,7 @@ $nl
 { $subsection flush }
 { $subsection write1 }
 { $subsection write }
-"If the default output stream is a string stream (" { $link "stream-elements" } "), lines of text can be written:"
+"If the default output stream is a character stream (" { $link stream-element-type } " outputs " { $link +character+ } "), lines of text can be written:"
 { $subsection readln }
 { $subsection print }
 { $subsection nl }
