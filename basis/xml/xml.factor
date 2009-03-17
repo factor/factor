@@ -4,7 +4,8 @@ USING: accessors arrays io io.encodings.binary io.files
 io.streams.string kernel namespaces sequences strings io.encodings.utf8
 xml.data xml.errors xml.elements ascii xml.entities
 xml.writer xml.state xml.autoencoding assocs xml.tokenize
-combinators.short-circuit xml.name splitting io.streams.byte-array ;
+combinators.short-circuit xml.name splitting io.streams.byte-array
+combinators ;
 IN: xml
 
 <PRIVATE
@@ -159,6 +160,9 @@ PRIVATE>
         xml-stack get first second
     ] with-state ; inline
 
+: make-xml ( stream quot -- xml )
+    0 read-seq make-xml-doc ; inline
+
 PRIVATE>
 
 : each-element ( stream quot: ( xml-elem -- ) -- )
@@ -169,14 +173,16 @@ PRIVATE>
     ] with-state ; inline
 
 : read-xml ( stream -- xml )
-    [ start-document [ process ] when* ]
-    0 read-seq make-xml-doc ;
+    dup stream-element-type {
+        { +character+ [ [ check ] make-xml ] }
+        { +byte+ [ [ start-document [ process ] when* ] make-xml ] }
+    } case ;
 
 : read-xml-chunk ( stream -- seq )
     [ check ] 1 read-seq <xml-chunk> ;
 
 : string>xml ( string -- xml )
-    <string-reader> [ check ] 0 read-seq make-xml-doc ;
+    <string-reader> read-xml ;
 
 : string>xml-chunk ( string -- xml )
     <string-reader> read-xml-chunk ;
