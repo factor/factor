@@ -22,7 +22,7 @@ ARTICLE: "regexp" "Regular expressions"
 { $subsection { "regexp" "deploy" } } ;
 
 ARTICLE: { "regexp" "intro" } "A quick introduction to regular expressions"
-"Regular expressions are a terse way to do certain simple string processing tasks. For example, to replace all instances of " { $snippet "foo" } " in one string with { $snippet "bar" } ", the following can be used:
+"Regular expressions are a terse way to do certain simple string processing tasks. For example, to replace all instances of " { $snippet "foo" } " in one string with " { $snippet "bar" } ", the following can be used:"
 { $code "R/ foo/ \"bar\" re-replace" }
 "That could be done with sequence operations, but consider doing this replacement for an arbitrary number of o's, at least two:"
 { $code "R/ foo+/ \"bar\" re-replace" }
@@ -31,7 +31,7 @@ ARTICLE: { "regexp" "intro" } "A quick introduction to regular expressions"
 "To search a file for all lines that match a given regular expression, you could use code like this:"
 { $code <" "file.txt" ascii file-lines [ R/ (f|b)oo+/ re-contains? ] filter "> }
 "To test if a string in its entirity matches a regular expression, the following can be used:"
-{ $example <" "fooo" R/ (b|f)oo+/ matches? . "> "t" }
+{ $example <" USING: regexp prettyprint ; "fooo" R/ (b|f)oo+/ matches? . "> "t" }
 "Regular expressions can't be used for all parsing tasks. For example, they are not powerful enough to match balancing parentheses." ;
 
 ARTICLE: { "regexp" "construction" } "Constructing regular expressions"
