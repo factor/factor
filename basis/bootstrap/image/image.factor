@@ -446,6 +446,8 @@ M: quotation '
         quotation type-number object tag-number [
             emit ! array
             f ' emit ! compiled
+            f ' emit ! cached-effect
+            f ' emit ! cache-counter
             0 emit ! xt
             0 emit ! code
         ] emit-object

@@ -7,7 +7,7 @@ combinators combinators.short-circuit splitting debugger
 hashtables sorting effects vocabs vocabs.loader assocs editors
 continuations classes.predicate macros math sets eval
 vocabs.parser words.symbol values grouping unicode.categories
-sequences.deep call ;
+sequences.deep ;
 IN: help.lint
 
 SYMBOL: vocabs-quot

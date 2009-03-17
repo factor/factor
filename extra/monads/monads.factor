@@ -6,7 +6,7 @@ shuffle ;
 IN: monads
 
 ! Functors
-GENERIC# fmap 1 ( functor quot -- functor' ) inline
+GENERIC# fmap 1 ( functor quot -- functor' )
 
 ! Monads
 
@@ -21,7 +21,7 @@ GENERIC: >>= ( mvalue -- quot )
 M: monad return monad-of return ;
 M: monad fail   monad-of fail   ;
 
-: bind ( mvalue quot -- mvalue' ) swap >>= call ;
+: bind ( mvalue quot -- mvalue' ) swap >>= call( quot -- mvalue ) ;
 : >>   ( mvalue k -- mvalue' ) '[ drop _ ] bind ;
 
 :: lift-m2 ( m1 m2 f monad -- m3 )
@@ -30,14 +30,14 @@ M: monad fail   monad-of fail   ;
 :: apply ( mvalue mquot monad -- result )
     mvalue [| value |
         mquot [| quot |
-            value quot call monad return
+            value quot call( value -- mvalue ) monad return
         ] bind
     ] bind ;
 
 M: monad fmap over '[ @ _ return ] bind ;
 
 ! 'do' notation
-: do ( quots -- result ) unclip dip [ bind ] each ;
+: do ( quots -- result ) unclip [ call( -- mvalue ) ] curry dip [ bind ] each ;
 
 ! Identity
 SINGLETON: identity-monad
@@ -51,7 +51,7 @@ M: identity monad-of drop identity-monad ;
 M: identity-monad return drop identity boa ;
 M: identity-monad fail   "Fail" throw ;
 
-M: identity >>= value>> '[ _ swap call ] ;
+M: identity >>= value>> '[ _ swap call( x -- y ) ] ;
 
 : run-identity ( identity -- value ) value>> ;
 
@@ -73,7 +73,7 @@ M: maybe-monad return drop just ;
 M: maybe-monad fail   2drop nothing ;
 
 M: nothing >>= '[ drop _ ] ;
-M: just    >>= value>> '[ _ swap call ] ;
+M: just    >>= value>> '[ _ swap call( x -- y ) ] ;
 
 : if-maybe ( maybe just-quot nothing-quot -- )
     pick nothing? [ 2nip call ] [ drop [ value>> ] dip call ] if ; inline
@@ -97,7 +97,7 @@ M: either-monad return  drop right ;
 M: either-monad fail    drop left ;
 
 M: left  >>= '[ drop _ ] ;
-M: right >>= value>> '[ _ swap call ] ;
+M: right >>= value>> '[ _ swap call( x -- y ) ] ;
 
 : if-either ( value left-quot right-quot -- )
     [ [ value>> ] [ left? ] bi ] 2dip if ; inline
@@ -140,14 +140,14 @@ M: state monad-of drop state-monad ;
 M: state-monad return drop '[ _ 2array ] state ;
 M: state-monad fail   "Fail" throw ;
 
-: mcall ( state -- ) quot>> call ;
+: mcall ( x state -- y ) quot>> call( x -- y ) ;
 
 M: state >>= '[ _ swap '[ _ mcall first2 @ mcall ] state ] ;
 
 : get-st ( -- state ) [ dup 2array ] state ;
 : put-st ( value -- state ) '[ drop _ f 2array ] state ;
 
-: run-st ( state initial -- ) swap mcall second ;
+: run-st ( state initial -- value ) swap mcall second ;
 
 : return-st ( value -- mvalue ) state-monad return ;
 
@@ -166,7 +166,7 @@ M: reader-monad fail   "Fail" throw ;
 
 M: reader >>= '[ _ swap '[ dup _ mcall @ mcall ] reader ] ;
 
-: run-reader ( reader env -- ) swap mcall ;
+: run-reader ( reader env -- value ) swap quot>> call( env -- value ) ;
 
 : ask ( -- reader ) [ ] reader ;
 : local ( reader quot -- reader' ) swap '[ @ _ mcall ] reader ;
@@ -187,6 +187,6 @@ M: writer-monad fail   "Fail" throw ;
 
 M: writer >>= '[ [ _ run-writer ] dip '[ @ run-writer ] dip append writer ] ;
 
-: pass ( writer -- writer' ) run-writer [ first2 ] dip swap call writer ;
+: pass ( writer -- writer' ) run-writer [ first2 ] dip swap call( x -- y ) writer ;
 : listen ( writer -- writer' ) run-writer [ 2array ] keep writer ;
 : tell ( seq -- writer ) f swap writer ;

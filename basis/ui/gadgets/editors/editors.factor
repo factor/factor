@@ -8,7 +8,7 @@ continuations ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
 ui.gadgets.menus ui.gadgets.wrappers ui.render ui.pens.solid
 ui.gadgets.line-support ui.text ui.gestures ui.baseline-alignment
-math.rectangles splitting unicode.categories fonts grouping call ;
+math.rectangles splitting unicode.categories fonts grouping ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < line-gadget

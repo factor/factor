@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays byte-arrays definitions generic
 hashtables kernel math namespaces parser lexer sequences strings
@@ -246,4 +246,8 @@ IN: bootstrap.syntax
     "initial:" "syntax" lookup define-symbol
     
     "read-only" "syntax" lookup define-symbol
+
+    "call(" [ \ call-effect parse-call( ] define-syntax
+
+    "execute(" [ \ execute-effect parse-call( ] define-syntax
 ] with-compilation-unit

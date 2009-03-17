@@ -5,7 +5,7 @@ sequences assocs math arrays stack-checker effects generalizations
 continuations debugger classes.tuple namespaces make vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
 sequences.private combinators mirrors splitting
-combinators.short-circuit fry words.symbol generalizations call ;
+combinators.short-circuit fry words.symbol generalizations ;
 RENAME: _ fry => __
 IN: inverse
 

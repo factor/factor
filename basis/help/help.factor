@@ -5,7 +5,7 @@ parser prettyprint sequences words words.symbol assocs
 definitions generic quotations effects slots continuations
 classes.tuple debugger combinators vocabs help.stylesheet
 help.topics help.crossref help.markup sorting classes
-vocabs.loader call ;
+vocabs.loader ;
 IN: help
 
 GENERIC: word-help* ( word -- content )

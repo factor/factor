@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions graphs assocs kernel
 kernel.private slots.private math namespaces sequences strings
@@ -9,8 +9,6 @@ IN: words
 : word ( -- word ) \ word get-global ;
 
 : set-word ( word -- ) \ word set-global ;
-
-GENERIC: execute ( word -- )
 
 M: word execute (execute) ;
 

@@ -7,7 +7,7 @@ fry accessors arrays io io.sockets io.encodings.ascii
 io.sockets.secure io.files io.streams.duplex io.timeouts
 io.encodings threads make concurrency.combinators
 concurrency.semaphores concurrency.flags
-combinators.short-circuit call ;
+combinators.short-circuit ;
 IN: io.servers.connection
 
 TUPLE: threaded-server

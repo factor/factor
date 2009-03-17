@@ -1,11 +1,12 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors arrays kernel words sequences generic math
-namespaces make quotations assocs combinators classes.tuple
-classes.tuple.private effects summary hashtables classes generic
-sets definitions generic.standard slots.private continuations locals
-generalizations stack-checker.backend stack-checker.state
-stack-checker.visitor stack-checker.errors stack-checker.values
+USING: fry accessors arrays kernel kernel.private combinators.private
+words sequences generic math namespaces make quotations assocs
+combinators classes.tuple classes.tuple.private effects summary
+hashtables classes generic sets definitions generic.standard
+slots.private continuations locals generalizations
+stack-checker.backend stack-checker.state stack-checker.visitor
+stack-checker.errors stack-checker.values
 stack-checker.recursive-state ;
 IN: stack-checker.transforms
 
@@ -49,6 +50,47 @@ IN: stack-checker.transforms
     [ drop "transform-quot" set-word-prop ]
     [ nip "transform-n" set-word-prop ]
     3bi ;
+
+! call( and execute(
+: (call-effect>quot) ( in out effect -- quot )
+    [
+        [ [ datastack ] dip dip ] %
+        [ [ , ] bi@ \ check-datastack , ] dip
+        '[ _ wrong-values ] , \ unless ,
+    ] [ ] make ;
+
+: call-effect>quot ( effect -- quot )
+    [ in>> length ] [ out>> length ] [ ] tri
+    [ (call-effect>quot) ] keep add-effect-input
+    [ call-effect-unsafe ] 2curry ;
+
+\ call-effect [ call-effect>quot ] 1 define-transform
+
+: execute-effect-slow ( word effect -- )
+    [ '[ _ execute ] ] dip call-effect ; inline
+
+TUPLE: inline-cache value ;
+
+: cache-hit? ( word ic -- ? ) value>> eq? ; inline
+
+: cache-hit ( word effect ic -- ) drop execute-effect-unsafe ; inline
+
+: execute-effect-unsafe? ( word effect -- ? )
+    over optimized>> [ [ stack-effect ] dip effect<= ] [ 2drop f ] if ; inline
+
+: cache-miss ( word effect ic -- )
+    2over execute-effect-unsafe?
+    [ [ nip (>>value) ] [ drop execute-effect-unsafe ] 3bi ]
+    [ drop execute-effect-slow ] if ; inline
+
+: execute-effect-ic ( word effect ic -- )
+    #! ic is a mutable cell { effect }
+    3dup nip cache-hit? [ cache-hit ] [ cache-miss ] if ; inline
+
+: execute-effect>quot ( effect -- quot )
+    inline-cache new '[ _ _ execute-effect-ic ] ;
+
+\ execute-effect [ execute-effect>quot ] 1 define-transform
 
 ! Combinators
 \ cond [ cond>quot ] 1 define-transform
@@ -141,8 +183,12 @@ CONSTANT: bit-member-n 256
     dup bit-member? [
         bit-member-quot
     ] [
-        [ literalize [ t ] ] { } map>assoc
-        [ drop f ] suffix [ case ] curry
+        dup length 4 <= [
+            [ drop f ] swap
+            [ literalize [ t ] ] { } map>assoc linear-case-quot
+        ] [
+            unique [ key? ] curry
+        ] if
     ] if ;
 
 \ member? [

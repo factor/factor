@@ -102,7 +102,6 @@ void *primitives[] = {
 	primitive_set_alien_double,
 	primitive_alien_cell,
 	primitive_set_alien_cell,
-	primitive_throw,
 	primitive_alien_address,
 	primitive_set_slot,
 	primitive_string_nth,

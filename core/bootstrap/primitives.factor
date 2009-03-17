@@ -243,6 +243,8 @@ bi
 "quotation" "quotations" create {
     { "array" { "array" "arrays" } read-only }
     { "compiled" read-only }
+    "cached-effect"
+    "cache-counter"
 } define-builtin
 
 "dll" "alien" create {
@@ -491,7 +493,6 @@ tuple
     { "set-alien-double" "alien.accessors" }
     { "alien-cell" "alien.accessors" }
     { "set-alien-cell" "alien.accessors" }
-    { "(throw)" "kernel.private" }
     { "alien-address" "alien" }
     { "set-slot" "slots.private" }
     { "string-nth" "strings.private" }
