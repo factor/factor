@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: peg.ebnf kernel math.parser sequences assocs arrays fry math
 combinators regexp.classes strings splitting peg locals accessors
-regexp.ast ;
+regexp.ast unicode.case ;
 IN: regexp.parser
 
 : allowed-char? ( ch -- ? )
@@ -19,20 +19,19 @@ ERROR: bad-number ;
 ERROR: bad-class name ;
 
 : name>class ( name -- class )
-    {
-        { "Lower" letter-class }
-        { "Upper" LETTER-class }
-        { "Alpha" Letter-class }
-        { "ASCII" ascii-class }
-        { "Digit" digit-class }
-        { "Alnum" alpha-class }
-        { "Punct" punctuation-class }
-        { "Graph" java-printable-class }
-        { "Print" java-printable-class }
-        { "Blank" non-newline-blank-class }
-        { "Cntrl" control-character-class }
-        { "XDigit" hex-digit-class }
-        { "Space" java-blank-class }
+    >string >case-fold {
+        { "lower" letter-class }
+        { "upper" LETTER-class }
+        { "alpha" Letter-class }
+        { "ascii" ascii-class }
+        { "digit" digit-class }
+        { "alnum" alpha-class }
+        { "punct" punctuation-class }
+        { "graph" java-printable-class }
+        { "blank" non-newline-blank-class }
+        { "cntrl" control-character-class }
+        { "xdigit" hex-digit-class }
+        { "space" java-blank-class }
         ! TODO: unicode-character-class
     } [ bad-class ] at-error ;
 
@@ -66,11 +65,8 @@ ERROR: bad-class name ;
         { CHAR: i case-insensitive }
         { CHAR: d unix-lines }
         { CHAR: m multiline }
-        { CHAR: n multiline }
         { CHAR: r reversed-regexp }
         { CHAR: s dotall }
-        { CHAR: u unicode-case }
-        { CHAR: x comments }
     } ;
 
 : ch>option ( ch -- singleton )
@@ -101,8 +97,8 @@ CharacterInBracket = !("}") Character
 
 QuotedCharacter = !("\\E") .
 
-Escape = "p{" CharacterInBracket*:s "}" => [[ s >string name>class <primitive-class> ]]
-       | "P{" CharacterInBracket*:s "}" => [[ s >string name>class <primitive-class> <negation> ]]
+Escape = "p{" CharacterInBracket*:s "}" => [[ s name>class <primitive-class> ]]
+       | "P{" CharacterInBracket*:s "}" => [[ s name>class <primitive-class> <negation> ]]
        | "Q" QuotedCharacter*:s "\\E" => [[ s <concatenation> ]]
        | "u" Character:a Character:b Character:c Character:d
             => [[ { a b c d } hex> ensure-number ]]
