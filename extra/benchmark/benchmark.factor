@@ -24,10 +24,10 @@ IN: benchmark
         [
             [
                 [ [ 1array $vocab-link ] with-cell ]
-                [ [ 1000000 /f pprint-cell ] [ "failed" write ] if* ] bi*
+                [ [ 1000000 /f pprint-cell ] [ [ "failed" write ] with-cell ] if* ] bi*
             ] with-row
         ] assoc-each
-    ] tabular-output ;
+    ] tabular-output nl ;
 
 : benchmarks ( -- )
     run-benchmarks benchmarks. ;

@@ -47,7 +47,7 @@ article "ARTICLES" {
 
 : <article> ( title -- article ) article new swap >>title ;
 
-TUPLE: revision id title author date content parsed description ;
+TUPLE: revision id title author date content description ;
 
 revision "REVISIONS" {
     { "id" "ID" INTEGER +db-assigned-id+ }
@@ -55,7 +55,6 @@ revision "REVISIONS" {
     { "author" "AUTHOR" { VARCHAR 256 } +not-null+ } ! uid
     { "date" "DATE" TIMESTAMP +not-null+ }
     { "content" "CONTENT" TEXT +not-null+ }
-    { "parsed" "PARSED" FACTOR-BLOB +not-null+ } ! Farkup AST
     { "description" "DESCRIPTION" TEXT }
 } define-persistent
 
@@ -71,9 +70,6 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <revision> ( id -- revision )
     revision new swap >>id ;
-
-: compute-html ( revision -- )
-    dup content>> parse-farkup >>parsed drop ;
 
 : validate-title ( -- )
     { { "title" [ v-one-line ] } } validate-params ;
@@ -141,13 +137,12 @@ M: revision feed-entry-url id>> revision-url ;
     [ title>> ] [ id>> ] bi article boa insert-tuple ;
 
 : add-revision ( revision -- )
-    [ compute-html ]
     [ insert-tuple ]
     [
         dup title>> <article> select-tuple
         [ amend-article ] [ add-article ] if*
     ]
-    tri ;
+    bi ;
 
 : <edit-article-action> ( -- action )
     <page-action>

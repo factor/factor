@@ -279,7 +279,7 @@ ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 
 "SQLite example combinator:"
 { $code <"
-USING: db.sqlite db io.files ;
+USING: db.sqlite db io.files io.files.temp ;
 : with-sqlite-db ( quot -- )
     "my-database.db" temp-file <sqlite-db> swap with-db ; inline"> } 
 

@@ -12,7 +12,7 @@ ascii-class punctuation-class java-printable-class blank-class
 control-character-class hex-digit-class java-blank-class c-identifier-class
 unmatchable-class terminator-class word-boundary-class ;
 
-SINGLETONS: beginning-of-input ^ end-of-input $ end-of-file word-break ;
+SINGLETONS: beginning-of-input ^ end-of-input $ end-of-file ^unix $unix word-break ;
 
 TUPLE: range from to ;
 C: <range> range

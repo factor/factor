@@ -470,3 +470,13 @@ IN: regexp-tests
 [ t ] [ "abcdefg" "a(?:bcdefg)" <regexp> matches? ] unit-test
 
 [ 3 ] [ "caba" "(?<=b)a" <regexp> first-match from>> ] unit-test
+
+[ t ] [ "\ra" R/ .^a/ms matches? ] unit-test
+[ f ] [ "\ra" R/ .^a/mds matches? ] unit-test
+[ t ] [ "\na" R/ .^a/ms matches? ] unit-test
+[ t ] [ "\na" R/ .^a/mds matches? ] unit-test
+
+[ t ] [ "a\r" R/ a$./ms matches? ] unit-test
+[ f ] [ "a\r" R/ a$./mds matches? ] unit-test
+[ t ] [ "a\n" R/ a$./ms matches? ] unit-test
+[ t ] [ "a\n" R/ a$./mds matches? ] unit-test
