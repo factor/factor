@@ -5,7 +5,7 @@ io.files hashtables quotations splitting grouping arrays io
 math.parser hash2 math.order byte-arrays words namespaces words
 compiler.units parser io.encodings.ascii values interval-maps
 ascii sets combinators locals math.ranges sorting make
-strings.parser io.encodings.utf8 ;
+strings.parser io.encodings.utf8 memoize ;
 IN: unicode.data
 
 VALUE: simple-lower
@@ -108,6 +108,9 @@ CONSTANT: categories
       "Zs" "Zl" "Zp"
       "Cc" "Cf" "Cs" "Co" }
 
+MEMO: categories-map ( -- hashtable )
+    categories <enum> [ swap ] H{ } assoc-map-as ;
+
 CONSTANT: num-chars HEX: 2FA1E
 
 ! the maximum unicode char in the first 3 planes
@@ -124,10 +127,10 @@ CONSTANT: num-chars HEX: 2FA1E
     ] assoc-each table ;
 
 :: process-category ( data -- category-listing )
-    [let | table [ num-chars <byte-array> ] |
-        2 data (process-data) [| char cat |
-            cat categories index char table ?set-nth
-        ] assoc-each table fill-ranges ] ;
+    num-chars <byte-array> :> table
+    2 data (process-data) [| char cat |
+        cat categories-map at char table ?set-nth
+    ] assoc-each table fill-ranges ;
 
 : process-names ( data -- names-hash )
     1 swap (process-data) [
