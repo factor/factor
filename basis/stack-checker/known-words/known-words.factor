@@ -11,7 +11,7 @@ strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
 combinators locals locals.backend locals.types words.private
-quotations.private call call.private stack-checker.values
+quotations.private combinators.private stack-checker.values
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
@@ -135,11 +135,6 @@ M: object infer-call*
     peek-d literal value>> second 1+ { tuple } <effect>
     apply-word/effect ;
 
-: infer-(throw) ( -- )
-    \ (throw)
-    peek-d literal value>> 2 + { "*" } <effect>
-    apply-word/effect ;
-
 : infer-effect-unsafe ( word -- )
     pop-literal nip
     add-effect-input
@@ -194,7 +189,6 @@ M: object infer-call*
         { \ if [ infer-if ] }
         { \ dispatch [ infer-dispatch ] }
         { \ <tuple-boa> [ infer-<tuple-boa> ] }
-        { \ (throw) [ infer-(throw) ] }
         { \ exit [ infer-exit ] }
         { \ load-local [ 1 infer->r ] }
         { \ load-locals [ infer-load-locals ] }
@@ -218,7 +212,7 @@ M: object infer-call*
 {
     declare call (call) slip 2slip 3slip dip 2dip 3dip curry compose
     execute (execute) call-effect-unsafe execute-effect-unsafe if
-    dispatch <tuple-boa> (throw) exit load-local load-locals get-local
+    dispatch <tuple-boa> exit load-local load-locals get-local
     drop-locals do-primitive alien-invoke alien-indirect
     alien-callback
 } [ t "special" set-word-prop ] each

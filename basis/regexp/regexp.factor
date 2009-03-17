@@ -4,7 +4,7 @@ USING: accessors combinators kernel kernel.private math sequences
 sequences.private strings sets assocs prettyprint.backend
 prettyprint.custom make lexer namespaces parser arrays fry locals
 regexp.parser splitting sorting regexp.ast regexp.negation
-regexp.compiler compiler.units words call call.private math.ranges ;
+regexp.compiler compiler.units words math.ranges ;
 IN: regexp
 
 TUPLE: regexp
@@ -35,7 +35,7 @@ M: lookbehind question>quot ! Returns ( index string -- ? )
 : match-index-from ( i string regexp -- index/f )
     ! This word is unsafe. It assumes that i is a fixnum
     ! and that string is a string.
-    dup dfa>> execute-unsafe( index string regexp -- i/f ) ; inline
+    dup dfa>> execute( index string regexp -- i/f ) ; inline
 
 GENERIC: end/start ( string regexp -- end start )
 M: regexp end/start drop length 0 ;
@@ -68,7 +68,7 @@ PRIVATE>
 
 : do-next-match ( i string regexp -- i start end ? )
     dup next-match>>
-    execute-unsafe( i string regexp -- i start end ? ) ; inline
+    execute( i string regexp -- i start end ? ) ; inline
 
 :: (each-match) ( i string regexp quot: ( start end string -- ) -- )
     i string regexp do-next-match [| i' start end |

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.encodings io.backend io.ports io.streams.duplex
 io splitting grouping sequences namespaces kernel
-destructors math concurrency.combinators accessors call fry
+destructors math concurrency.combinators accessors fry
 arrays continuations quotations system vocabs.loader combinators ;
 IN: io.pipes
 

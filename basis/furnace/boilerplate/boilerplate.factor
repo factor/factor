@@ -1,6 +1,6 @@
 ! Copyright (c) 2008, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math.order namespaces combinators.short-circuit call
+USING: accessors kernel math.order namespaces combinators.short-circuit
 html.forms
 html.templates
 html.templates.chloe
