@@ -30,7 +30,7 @@ SYMBOL: bootstrap-time
     [ "bootstrap." prepend require ] each ;
 
 : count-words ( pred -- )
-    all-words swap count number>string write ;
+    all-words swap count number>string write ; inline
 
 : print-time ( ms -- )
     1000 /i

@@ -13,14 +13,14 @@ IN: help.lint
 SYMBOL: vocabs-quot
 
 : check-example ( element -- )
-    [
-        rest [
+    '[
+        _ rest [
             but-last "\n" join
             [ (eval>string) ] call( code -- output )
             "\n" ?tail drop
         ] keep
         peek assert=
-    ] vocabs-quot get call ;
+    ] vocabs-quot get call( quot -- ) ;
 
 : check-examples ( element -- )
     \ $example swap elements [ check-example ] each ;

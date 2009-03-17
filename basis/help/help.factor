@@ -140,7 +140,7 @@ help-hook [ [ print-topic ] ] initialize
     sort-articles [ \ $subsection swap 2array ] map print-element ;
 
 : $index ( element -- )
-    first call [ ($index) ] unless-empty ;
+    first call( -- seq ) [ ($index) ] unless-empty ;
 
 : $about ( element -- )
     first vocab-help [ 1array $subsection ] when* ;

@@ -90,7 +90,7 @@ PRIVATE>
 
 : run ( vocab -- )
     dup load-vocab vocab-main [
-        execute
+        execute( -- )
     ] [
         "The " write vocab-name write
         " vocabulary does not define an entry point." print

@@ -36,7 +36,7 @@ M: array fake-quotations> [ fake-quotations> ] map ;
 
 M: object fake-quotations> ;
 
-: parse-definition* ( -- )
+: parse-definition* ( accum -- accum )
     parse-definition >fake-quotations parsed \ fake-quotations> parsed ;
 
 : DEFINE* ( accum -- accum ) effect get parsed \ define* parsed ;
