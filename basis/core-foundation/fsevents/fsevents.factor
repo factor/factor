@@ -167,7 +167,7 @@ SYMBOL: event-stream-callbacks
     eventFlags numEvents <direct-int-array>
     eventIds numEvents <direct-longlong-array>
     3array flip
-    info event-stream-callbacks get at [ drop ] or call ;
+    info event-stream-callbacks get at [ drop ] or call( changes -- ) ;
 
 : master-event-source-callback ( -- alien )
     "void"

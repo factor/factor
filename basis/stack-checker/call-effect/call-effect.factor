@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators combinators.private effects fry
-kernel kernel.private make sequences continuations
+kernel kernel.private make sequences continuations quotations
 stack-checker stack-checker.transforms ;
 IN: stack-checker.call-effect
 
@@ -20,18 +20,22 @@ TUPLE: inline-cache value ;
 
 : cache-hit? ( word/quot ic -- ? ) value>> eq? ; inline
 
-SYMBOL: +failed+
+SYMBOL: +unknown+
 
-: cached-effect ( quot -- effect )
+GENERIC: cached-effect ( quot -- effect )
+
+M: object cached-effect drop +unknown+ ;
+
+M: quotation cached-effect
     dup cached-effect>>
     [ ] [
-        [ [ infer ] [ 2drop +failed+ ] recover dup ] keep
+        [ [ infer ] [ 2drop +unknown+ ] recover dup ] keep
         (>>cached-effect)
     ] ?if ;
 
 : call-effect-unsafe? ( quot effect -- ? )
     [ cached-effect ] dip
-    over +failed+ eq?
+    over +unknown+ eq?
     [ 2drop f ] [ effect<= ] if ; inline
 
 : (call-effect-slow>quot) ( in out effect -- quot )
