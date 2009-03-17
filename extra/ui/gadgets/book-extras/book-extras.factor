@@ -6,6 +6,6 @@ IN: ui.gadgets.book-extras
 : prev ( book -- ) model>> [ 1 - ] change-model ;
 : (book-t) ( quot -- quot ) '[ : owner ( gadget -- book ) parent>> dup book? [ owner ] unless ; owner @ ] ;
 : <book-btn> ( label quot -- button ) (book-t) <button> ;
-: <book-bevel-btn> ( label quot -- button ) (book-t) <bevel-button> ;
+: <book-bevel-btn> ( label quot -- button ) (book-t) <border-button> ;
 : >>> ( label -- button ) [ next ] <book-btn> ;
 : <<< ( label -- button ) [ prev ] <book-btn> ;

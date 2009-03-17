@@ -477,26 +477,24 @@ ERROR: unknown-component-order ifd ;
         [ unknown-component-order ]
     } case ;
 
+: normalize-alpha-data ( seq -- byte-array )
+    ! [ normalize-alpha-data ] change-bitmap
+    B{ } like dup
+    byte-array>float-array
+    4 <sliced-groups>
+    [
+        dup fourth dup 0 = [
+            2drop
+        ] [
+            [ 3 head-slice ] dip '[ _ / ] change-each
+        ] if
+    ] each ;
+
 : handle-alpha-data ( ifd -- ifd )
     dup extra-samples find-tag {
-        { extra-samples-associated-alpha-data [
-            [
-                B{ } like dup
-                byte-array>float-array
-                4 <sliced-groups>
-                [
-                    dup fourth dup 0 = [
-                        2drop
-                    ] [
-                        [ 3 head-slice ] dip '[ _ / ] change-each
-                    ] if
-                ] each
-            ] change-bitmap
-        ] }
-        { extra-samples-unspecified-alpha-data [
-        ] }
-        { extra-samples-unassociated-alpha-data [
-        ] }
+        { extra-samples-associated-alpha-data [ ] }
+        { extra-samples-unspecified-alpha-data [ ] }
+        { extra-samples-unassociated-alpha-data [ ] }
         [ bad-extra-samples ]
     } case ;
 

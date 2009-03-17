@@ -530,7 +530,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 
 : EBNF: 
   reset-tokenizer CREATE-WORD dup ";EBNF" parse-multiline-string  
-  ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop 
+  ebnf>quot swapd (( input -- ast )) define-declared "ebnf-parser" set-word-prop 
   reset-tokenizer ; parsing
 
 
