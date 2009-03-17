@@ -51,47 +51,6 @@ IN: stack-checker.transforms
     [ nip "transform-n" set-word-prop ]
     3bi ;
 
-! call( and execute(
-: (call-effect>quot) ( in out effect -- quot )
-    [
-        [ [ datastack ] dip dip ] %
-        [ [ , ] bi@ \ check-datastack , ] dip
-        '[ _ wrong-values ] , \ unless ,
-    ] [ ] make ;
-
-: call-effect>quot ( effect -- quot )
-    [ in>> length ] [ out>> length ] [ ] tri
-    [ (call-effect>quot) ] keep add-effect-input
-    [ call-effect-unsafe ] 2curry ;
-
-\ call-effect [ call-effect>quot ] 1 define-transform
-
-: execute-effect-slow ( word effect -- )
-    [ '[ _ execute ] ] dip call-effect ; inline
-
-TUPLE: inline-cache value ;
-
-: cache-hit? ( word ic -- ? ) value>> eq? ; inline
-
-: cache-hit ( word effect ic -- ) drop execute-effect-unsafe ; inline
-
-: execute-effect-unsafe? ( word effect -- ? )
-    over optimized>> [ [ stack-effect ] dip effect<= ] [ 2drop f ] if ; inline
-
-: cache-miss ( word effect ic -- )
-    2over execute-effect-unsafe?
-    [ [ nip (>>value) ] [ drop execute-effect-unsafe ] 3bi ]
-    [ drop execute-effect-slow ] if ; inline
-
-: execute-effect-ic ( word effect ic -- )
-    #! ic is a mutable cell { effect }
-    3dup nip cache-hit? [ cache-hit ] [ cache-miss ] if ; inline
-
-: execute-effect>quot ( effect -- quot )
-    inline-cache new '[ _ _ execute-effect-ic ] ;
-
-\ execute-effect [ execute-effect>quot ] 1 define-transform
-
 ! Combinators
 \ cond [ cond>quot ] 1 define-transform
 
