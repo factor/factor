@@ -1,4 +1,4 @@
-USING: accessors kernel uuid ;
+USING: accessors kernel math parser sequences strings uuid ;
 
 IN: bson.constants
 
@@ -10,6 +10,12 @@ TUPLE: objid id ;
 TUPLE: oid { a initial: 0 } { b initial: 0 } ;
 
 TUPLE: objref ns objid ;
+
+TUPLE: mdbregexp { regexp string } { options string } ;
+
+: <mdbregexp> ( string -- mdbregexp )
+   [ mdbregexp new ] dip >>regexp ;
+
 
 CONSTANT: MDB_OID_FIELD "_id"
 CONSTANT: MDB_INTERNAL_FIELD "_mdb_"

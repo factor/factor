@@ -59,6 +59,7 @@ M: string bson-type? ( string -- type ) drop T_String ;
 M: integer bson-type? ( integer -- type ) drop T_Integer ; 
 M: assoc bson-type? ( assoc -- type ) drop T_Object ;
 M: timestamp bson-type? ( timestamp -- type ) drop T_Date ;
+M: mdbregexp bson-type? ( regexp -- type ) drop T_Regexp ;
 
 M: oid bson-type? ( word -- type ) drop T_OID ;
 M: objid bson-type? ( objid -- type ) drop T_Binary ;
@@ -122,12 +123,15 @@ M: objref bson-write ( objref -- )
     [ length write-int32 ] keep
     T_Binary_Custom write-byte
     write ;
+
+M: mdbregexp bson-write ( regexp -- )
+   [ regexp>> utf8 encode write-cstring ]
+   [ options>> utf8 encode write-cstring ] bi ; 
     
 M: sequence bson-write ( array -- )
     '[ _ [ [ write-type ] dip number>string
            write-cstring bson-write ] each-index
-       write-eoo
-    ] with-length-prefix ;
+       write-eoo ] with-length-prefix ;
 
 : write-oid ( assoc -- )
     [ MDB_OID_FIELD ] dip at*

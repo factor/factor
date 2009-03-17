@@ -26,6 +26,7 @@ PREDICATE: bson-string  < integer T_String = ;
 PREDICATE: bson-object  < integer T_Object = ;
 PREDICATE: bson-array   < integer T_Array = ;
 PREDICATE: bson-binary  < integer T_Binary = ;
+PREDICATE: bson-regexp  < integer T_Regexp = ;
 PREDICATE: bson-binary-bytes < integer T_Binary_Bytes = ;
 PREDICATE: bson-binary-function < integer T_Binary_Function = ;
 PREDICATE: bson-binary-uuid < integer T_Binary_UUID = ;
@@ -165,17 +166,21 @@ M: bson-double element-data-read ( type -- double )
     read-double ;
 
 M: bson-boolean element-data-read ( type -- boolean )
-    drop
-    read-byte t = ;
+   drop
+   read-byte t = ;
 
 M: bson-date element-data-read ( type -- timestamp )
-    drop
-    read-longlong millis>timestamp ;
+   drop
+   read-longlong millis>timestamp ;
 
 M: bson-binary element-data-read ( type -- binary )
-    drop
-    read-int32 read-byte element-binary-read ;
+   drop
+   read-int32 read-byte element-binary-read ;
 
+M: bson-regexp element-data-read ( type -- mdbregexp )
+   drop mdbregexp new
+   read-cstring >>regexp read-cstring >>options ;
+ 
 M: bson-null element-data-read ( type -- bf  )
     drop
     f ;

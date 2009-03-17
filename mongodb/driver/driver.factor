@@ -1,6 +1,6 @@
 USING: accessors assocs fry io.sockets kernel math mongodb.msg formatting linked-assocs destructors continuations
 mongodb.operations namespaces sequences splitting math.parser io.encodings.binary combinators io.streams.duplex
-arrays io memoize constructors sets strings uuid bson.writer ;
+arrays io memoize constructors sets strings uuid bson.writer bson.constants parser ;
 
 IN: mongodb.driver
 
@@ -38,7 +38,12 @@ SYMBOL: mdb-socket-stream
 : check-ok ( result -- ? )
      [ "ok" ] dip key? ; inline 
 
+: >mdbregexp ( value -- regexp )
+   first <mdbregexp> ;
+
 PRIVATE>
+
+: r/ \ / [ >mdbregexp ]  parse-literal ; parsing 
 
 SYMBOL: mdb-instance
 
