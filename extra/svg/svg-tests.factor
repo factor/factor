@@ -3,8 +3,8 @@ USING: accessors arrays literals math math.affine-transforms
 math.functions multiline sequences svg tools.test xml xml.traversal ;
 IN: svg.tests
 
-{ 1.0 2.25 } { -3.0 4.0 } { 5.5 0.000001 } <affine-transform> 1array [
-    "matrix ( 1 +2.25 -3  , 0.4e+1  ,5.5, 1e-6 )" svg-transform>affine-transform
+{ 1.0 2.25 } { -3.0 4.0 } { 5.5 0.5 } <affine-transform> 1array [
+    "matrix ( 1 +2.25 -3  , 0.4e+1  ,5.5, 5e-1 )" svg-transform>affine-transform
 ] unit-test
 
 { 1.0 0.0 } { 0.0 1.0 } { 5.0 10.0 } <affine-transform> 1array [
@@ -27,17 +27,22 @@ IN: svg.tests
     "scale(2.0 4.0)" svg-transform>affine-transform
 ] unit-test
 
-{ 1.0 0.0 } { $[ 45 degrees tan ] 1.0 } { 0.0 0.0 } <affine-transform> 1array [
+[ t ] [
     "skewX(45)" svg-transform>affine-transform
+    { 1.0 0.0 } { 1.0 1.0 } { 0.0 0.0 } <affine-transform> 0.001 a~
 ] unit-test
 
-{ 1.0 $[ -45 degrees tan ] } { 0.0 1.0 } { 0.0 0.0 } <affine-transform> 1array [
+[ t ] [
     "skewY(-4.5e1)" svg-transform>affine-transform
+    { 1.0 -1.0 } { 0.0 1.0 } { 0.0 0.0 } <affine-transform> 0.001 a~
 ] unit-test
 
-{ $[  30 degrees cos ] $[ 30 degrees sin ] }
-{ $[ -30 degrees sin ] $[ 30 degrees cos ] } { 0.0 0.0 } <affine-transform> 1array [
+[ t ] [
     "rotate(30)" svg-transform>affine-transform
+    { $[ 0.75 sqrt ] 0.5            }
+    { -0.5           $[ 0.75 sqrt ] }
+    {  0.0           0.0            } <affine-transform> 
+    0.001 a~
 ] unit-test
 
 [ t ] [
