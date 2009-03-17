@@ -27,6 +27,14 @@ IN: combinators.tests
 [ -3 ] [ 1 4 \ - compile-execute(-test-2 ] unit-test
 [ 5 ] [ 1 4 \ + compile-execute(-test-2 ] unit-test
 
+: compile-call(-test-1 ( a b q -- c ) call( a b -- c ) ;
+
+[ t ] [ \ compile-call(-test-1 optimized>> ] unit-test
+[ 4 ] [ 1 3 [ + ] compile-call(-test-1 ] unit-test
+[ 7 ] [ 1 3 2 [ * + ] curry compile-call(-test-1 ] unit-test
+[ 7 ] [ 1 3 [ 2 * ] [ + ] compose compile-call(-test-1 ] unit-test
+[ 4 ] [ 1 3 [ { + } [ ] like call ] compile-call(-test-1 ] unit-test
+
 ! Compiled
 : cond-test-1 ( obj -- str )
     {
