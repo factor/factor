@@ -160,7 +160,7 @@ DEFER: next
 PRIVATE>
 
 : stop ( -- )
-    self [ exit-handler>> call ] [ unregister-thread ] bi next ;
+    self [ exit-handler>> call( -- ) ] [ unregister-thread ] bi next ;
 
 : suspend ( quot state -- obj )
     [

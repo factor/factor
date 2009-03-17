@@ -80,7 +80,7 @@ IN: bootstrap.syntax
         scan {
             { [ dup length 1 = ] [ first ] }
             { [ "\\" ?head ] [ next-escape >string "" assert= ] }
-            [ name>char-hook get call ]
+            [ name>char-hook get call( name -- char ) ]
         } cond parsed
     ] define-syntax
 
@@ -231,7 +231,7 @@ IN: bootstrap.syntax
     "<<" [
         [
             \ >> parse-until >quotation
-        ] with-nested-compilation-unit call
+        ] with-nested-compilation-unit call( -- )
     ] define-syntax
 
     "call-next-method" [
