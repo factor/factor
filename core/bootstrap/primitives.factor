@@ -140,9 +140,6 @@ bootstrapping? on
 "word" "words" create register-builtin
 "byte-array" "byte-arrays" create register-builtin
 
-! For predicate classes
-"predicate-instance?" "classes.predicate" create drop
-
 ! We need this before defining c-ptr below
 "f" "syntax" lookup { } define-builtin
 
