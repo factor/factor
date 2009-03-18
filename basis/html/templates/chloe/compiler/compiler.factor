@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs namespaces make kernel sequences accessors
 combinators strings splitting io io.streams.string present
-xml.writer xml.data xml.entities html.forms call
+xml.writer xml.data xml.entities html.forms
 html.templates html.templates.chloe.syntax ;
 IN: html.templates.chloe.compiler
 

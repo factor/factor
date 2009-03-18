@@ -140,9 +140,6 @@ bootstrapping? on
 "word" "words" create register-builtin
 "byte-array" "byte-arrays" create register-builtin
 
-! For predicate classes
-"predicate-instance?" "classes.predicate" create drop
-
 ! We need this before defining c-ptr below
 "f" "syntax" lookup { } define-builtin
 
@@ -243,6 +240,8 @@ bi
 "quotation" "quotations" create {
     { "array" { "array" "arrays" } read-only }
     { "compiled" read-only }
+    "cached-effect"
+    "cache-counter"
 } define-builtin
 
 "dll" "alien" create {
@@ -491,7 +490,6 @@ tuple
     { "set-alien-double" "alien.accessors" }
     { "alien-cell" "alien.accessors" }
     { "set-alien-cell" "alien.accessors" }
-    { "(throw)" "kernel.private" }
     { "alien-address" "alien" }
     { "set-slot" "slots.private" }
     { "string-nth" "strings.private" }
@@ -533,6 +531,7 @@ tuple
     { "gc-reset" "memory" }
     { "jit-compile" "quotations" }
     { "load-locals" "locals.backend" }
+    { "check-datastack" "kernel.private" }
 }
 [ [ first2 ] dip make-primitive ] each-index
 

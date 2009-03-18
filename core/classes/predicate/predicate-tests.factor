@@ -19,9 +19,3 @@ M: positive abs ;
 [ 10 ] [ -10 abs ] unit-test
 [ 10 ] [ 10 abs ] unit-test
 [ 0 ] [ 0 abs ] unit-test
-
-PREDICATE: blah < word blah eq? ;
-
-[ f ] [ \ predicate-instance? "compiled-uses" word-prop keys \ blah swap memq? ] unit-test
-
-FORGET: blah
