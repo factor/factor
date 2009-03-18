@@ -44,6 +44,10 @@ watching-site "WATCHING_SITE" {
     { "site-id" "SITE_ID" INTEGER +user-assigned-id+ }
 } define-persistent
 
+TUPLE: reporting-site email url up? changed? last-up? error last-error ;
+
+<PRIVATE
+
 : set-notify-site-watchers ( site new-up? -- site )
     [ over up?>> = [ t >>changed? ] unless ] keep >>up? ;
 
@@ -59,8 +63,6 @@ watching-site "WATCHING_SITE" {
     f set-notify-site-watchers
     now >>last-error
     update-tuple ;
-
-TUPLE: reporting-site email url up? changed? last-up? error last-error ;
 
 : sites-to-report ( -- seq )
     "select account.email, site.url, site.up, site.changed, site.last_up, site.error, site.last_error from account, site, watching_site where account.account_id = watching_site.account_id and site.site_id = watching_site.site_id and site.changed = '1'" sql-query 
@@ -79,6 +81,8 @@ TUPLE: reporting-site email url up? changed? last-up? error last-error ;
 : select-account/site ( email url -- account site )
     [ <account> select-tuple account-id>> ]
     [ insert-site site-id>> ] bi* ;
+
+PRIVATE>
 
 : watch-site ( email url -- )
     select-account/site <watching-site> insert-tuple ;
