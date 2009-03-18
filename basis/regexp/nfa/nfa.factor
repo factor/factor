@@ -4,7 +4,7 @@ USING: accessors arrays assocs grouping kernel locals math namespaces
 sequences fry quotations math.order math.ranges vectors
 unicode.categories regexp.transition-tables words sets hashtables
 combinators.short-circuit unicode.case unicode.case.private regexp.ast
-regexp.classes ;
+regexp.classes memoize ;
 IN: regexp.nfa
 
 ! This uses unicode.case.private for ch>upper and ch>lower
@@ -140,17 +140,17 @@ M: LETTER-class modify-class modify-letter-class ;
         [ [ LETTER? ] bi@ and ]
     } 2|| ;
 
-M: range modify-class
+M: range-class modify-class
     case-insensitive option? [
         dup cased-range? [
             [ from>> ] [ to>> ] bi
-            [ [ ch>lower ] bi@ <range> ]
-            [ [ ch>upper ] bi@ <range> ] 2bi 
+            [ [ ch>lower ] bi@ <range-class> ]
+            [ [ ch>upper ] bi@ <range-class> ] 2bi 
             2array <or-class>
         ] when
     ] when ;
 
-M: class nfa-node
+M: object nfa-node
     modify-class add-simple-entry ;
 
 M: with-options nfa-node ( node -- start end )
