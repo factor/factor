@@ -29,6 +29,22 @@ VALUE: properties
 : char>name ( char -- name ) name-map value-at ;
 : property? ( char property -- ? ) properties at interval-key? ;
 
+! For non-existent characters, use Cn
+CONSTANT: categories
+    { "Cn"
+      "Lu" "Ll" "Lt" "Lm" "Lo"
+      "Mn" "Mc" "Me"
+      "Nd" "Nl" "No"
+      "Pc" "Pd" "Ps" "Pe" "Pi" "Pf" "Po"
+      "Sm" "Sc" "Sk" "So"
+      "Zs" "Zl" "Zp"
+      "Cc" "Cf" "Cs" "Co" }
+
+MEMO: categories-map ( -- hashtable )
+    categories <enum> [ swap ] H{ } assoc-map-as ;
+
+CONSTANT: num-chars HEX: 2FA1E
+
 : category# ( char -- category )
     ! There are a few characters that should be Cn
     ! that this gives Cf or Mn
@@ -111,22 +127,6 @@ VALUE: properties
     [ string>number ] assoc-map
     [ nip zero? not ] assoc-filter
     >hashtable ;
-
-! For non-existent characters, use Cn
-CONSTANT: categories
-    { "Cn"
-      "Lu" "Ll" "Lt" "Lm" "Lo"
-      "Mn" "Mc" "Me"
-      "Nd" "Nl" "No"
-      "Pc" "Pd" "Ps" "Pe" "Pi" "Pf" "Po"
-      "Sm" "Sc" "Sk" "So"
-      "Zs" "Zl" "Zp"
-      "Cc" "Cf" "Cs" "Co" }
-
-MEMO: categories-map ( -- hashtable )
-    categories <enum> [ swap ] H{ } assoc-map-as ;
-
-CONSTANT: num-chars HEX: 2FA1E
 
 ! the maximum unicode char in the first 3 planes
 

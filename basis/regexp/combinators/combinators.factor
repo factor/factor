@@ -13,14 +13,14 @@ IN: regexp.combinators
 
 PRIVATE>
 
-CONSTANT: <nothing> R/ (?~.*)/
+CONSTANT: <nothing> R/ (?~.*)/s
 
 : <literal> ( string -- regexp )
     [ "\\Q" "\\E" surround ] [ <concatenation> ] bi make-regexp ; foldable
 
 : <char-range> ( char1 char2 -- regexp )
     [ [ "[" "-" surround ] [ "]" append ] bi* append ]
-    [ <range> ]
+    [ <range-class> ]
     2bi make-regexp ;
 
 : <or> ( regexps -- disjunction )
