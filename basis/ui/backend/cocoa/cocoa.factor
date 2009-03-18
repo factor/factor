@@ -8,7 +8,7 @@ ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
 ui.backend.cocoa.views core-foundation core-foundation.run-loop
 core-graphics.types threads math.rectangles fry libc
 generalizations alien.c-types cocoa.views
-combinators io.thread locals call ;
+combinators io.thread locals ;
 IN: ui.backend.cocoa
 
 TUPLE: handle ;

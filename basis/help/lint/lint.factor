@@ -7,20 +7,20 @@ combinators combinators.short-circuit splitting debugger
 hashtables sorting effects vocabs vocabs.loader assocs editors
 continuations classes.predicate macros math sets eval
 vocabs.parser words.symbol values grouping unicode.categories
-sequences.deep call ;
+sequences.deep ;
 IN: help.lint
 
 SYMBOL: vocabs-quot
 
 : check-example ( element -- )
-    [
-        rest [
+    '[
+        _ rest [
             but-last "\n" join
             [ (eval>string) ] call( code -- output )
             "\n" ?tail drop
         ] keep
         peek assert=
-    ] vocabs-quot get call ;
+    ] vocabs-quot get call( quot -- ) ;
 
 : check-examples ( element -- )
     \ $example swap elements [ check-example ] each ;

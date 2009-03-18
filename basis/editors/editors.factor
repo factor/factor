@@ -28,7 +28,7 @@ SYMBOL: edit-hook
 
 : edit-location ( file line -- )
     [ (normalize-path) ] dip edit-hook get-global
-    [ call ] [ no-edit-hook edit-location ] if* ;
+    [ call( file line -- ) ] [ no-edit-hook edit-location ] if* ;
 
 ERROR: cannot-find-source definition ;
 

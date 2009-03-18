@@ -122,6 +122,7 @@ IN: tools.deploy.shaker
                 "inline"
                 "inlined-block"
                 "input-classes"
+                "instances"
                 "interval"
                 "intrinsics"
                 "lambda"
@@ -344,7 +345,8 @@ IN: tools.deploy.shaker
     ] 2each ;
 
 : compress-quotations ( -- )
-    [ quotation? ] [ remain-compiled ] "quotations" compress ;
+    [ quotation? ] [ remain-compiled ] "quotations" compress
+    [ quotation? ] instances [ f >>cached-effect f >>cache-counter drop ] each ;
 
 : compress-strings ( -- )
     [ string? ] [ ] "strings" compress ;

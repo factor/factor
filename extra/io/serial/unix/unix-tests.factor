@@ -5,7 +5,10 @@ IN: io.serial.unix
 
 : serial-obj ( -- obj )
     serial new
-    "/dev/ttyS0" >>path
+    "/dev/ttyS0" >>path ! linux
+    ! "/dev/dty00" >>path ! netbsd
+    ! "/dev/ttyd0" >>path ! freebsd
+    ! "/dev/ttyU0" >>path ! openbsd
     19200 >>baud
     { IGNPAR ICRNL } flags >>iflag
     { } flags >>oflag

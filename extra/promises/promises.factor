@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2006 Chris Double, Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel sequences math vectors arrays namespaces call
+USING: arrays kernel sequences math vectors arrays namespaces
 make quotations parser effects stack-checker words accessors ;
 IN: promises
 

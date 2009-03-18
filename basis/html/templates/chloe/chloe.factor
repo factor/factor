@@ -4,7 +4,7 @@ USING: accessors kernel sequences combinators kernel fry
 namespaces make classes.tuple assocs splitting words arrays io
 io.files io.files.info io.encodings.utf8 io.streams.string
 unicode.case mirrors math urls present multiline quotations xml
-logging call
+logging
 xml.data xml.writer xml.syntax strings
 html.forms
 html

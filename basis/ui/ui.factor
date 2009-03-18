@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces make dlists
-deques sequences threads sequences words continuations init call
+deques sequences threads sequences words continuations init
 combinators hashtables concurrency.flags sets accessors calendar fry
 destructors ui.gadgets ui.gadgets.private ui.gadgets.worlds
 ui.gadgets.tracks ui.gestures ui.backend ui.render ui.text

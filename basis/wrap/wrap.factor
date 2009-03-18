@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences math arrays locals fry accessors
-lists splitting call make combinators.short-circuit namespaces
+lists splitting make combinators.short-circuit namespaces
 grouping splitting.monotonic ;
 IN: wrap
 

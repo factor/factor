@@ -172,6 +172,10 @@ typedef struct {
 	CELL array;
 	/* tagged */
 	CELL compiledp;
+	/* tagged */
+	CELL cached_effect;
+	/* tagged */
+	CELL cache_counter;
 	/* UNTAGGED */
 	XT xt;
 	/* UNTAGGED compiled code block */
