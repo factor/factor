@@ -39,7 +39,7 @@ M: object normalize-directory normalize-path ;
 
 : set-io-backend ( io-backend -- )
     io-backend set-global init-io init-stdio
-    "io.files" init-hooks get at call ;
+    "io.files" init-hooks get at call( -- ) ;
 
 ! Note that we have 'alien' in our using list so that the alien
 ! init hook runs before this one.

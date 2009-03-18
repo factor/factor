@@ -39,13 +39,13 @@ ERROR: cannot-annotate-twice word ;
     dup def>> "unannotated-def" set-word-prop ;
 
 : (annotate) ( word quot -- )
-    [ dup def>> ] dip call define ; inline
+    [ dup def>> ] dip call( old -- new ) define ;
 
 PRIVATE>
 
 : annotate ( word quot -- )
     [ method-spec>word check-annotate-twice ] dip
-    [ over save-unannotated-def (annotate) ] with-compilation-unit ; inline
+    [ over save-unannotated-def (annotate) ] with-compilation-unit ;
 
 <PRIVATE
 

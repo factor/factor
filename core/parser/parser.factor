@@ -1,11 +1,10 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math namespaces
-sequences strings vectors words words.symbol quotations io
-combinators sorting splitting math.parser effects continuations
-io.files vocabs io.encodings.utf8 source-files
-classes hashtables compiler.errors compiler.units accessors sets
-lexer vocabs.parser slots ;
+sequences strings vectors words words.symbol quotations io combinators
+sorting splitting math.parser effects continuations io.files vocabs
+io.encodings.utf8 source-files classes hashtables compiler.errors
+compiler.units accessors sets lexer vocabs.parser slots ;
 IN: parser
 
 : location ( -- loc )
@@ -90,9 +89,9 @@ SYMBOL: auto-use?
 
 ERROR: staging-violation word ;
 
-: execute-parsing ( word -- )
+: execute-parsing ( accum word -- accum )
     dup changed-definitions get key? [ staging-violation ] when
-    execute ;
+    execute( accum -- accum ) ;
 
 : scan-object ( -- object )
     scan-word dup parsing-word?
@@ -125,7 +124,7 @@ M: f parse-quotation \ ] parse-until >quotation ;
     [ f parse-until >quotation ] with-lexer ;
 
 : parse-lines ( lines -- quot )
-    lexer-factory get call (parse-lines) ;
+    lexer-factory get call( lines -- lexer ) (parse-lines) ;
 
 : parse-literal ( accum end quot -- accum )
     [ parse-until ] dip call parsed ; inline
@@ -214,7 +213,7 @@ print-use-hook [ [ ] ] initialize
     [
         V{ } clone amended-use set
         parse-lines
-        amended-use get empty? [ print-use-hook get call ] unless
+        amended-use get empty? [ print-use-hook get call( -- ) ] unless
     ] with-file-vocabs ;
 
 : parsing-file ( file -- )
@@ -288,7 +287,7 @@ print-use-hook [ [ ] ] initialize
     ] recover ;
 
 : run-file ( file -- )
-    [ parse-file call ] curry assert-depth ;
+    parse-file call( -- ) ;
 
 : ?run-file ( path -- )
     dup exists? [ run-file ] [ drop ] if ;

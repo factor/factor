@@ -54,11 +54,8 @@ IN: tools.deploy.shaker
     ] when ;
 
 : strip-call ( -- )
-    "call" vocab [
-        "Stripping stack effect checking from call( and execute(" show
-        "vocab:tools/deploy/shaker/strip-call.factor"
-        run-file
-    ] when ;
+    "Stripping stack effect checking from call( and execute(" show
+    "vocab:tools/deploy/shaker/strip-call.factor" run-file ;
 
 : strip-cocoa ( -- )
     "cocoa" vocab [
@@ -122,6 +119,7 @@ IN: tools.deploy.shaker
                 "inline"
                 "inlined-block"
                 "input-classes"
+                "instances"
                 "interval"
                 "intrinsics"
                 "lambda"
@@ -344,7 +342,8 @@ IN: tools.deploy.shaker
     ] 2each ;
 
 : compress-quotations ( -- )
-    [ quotation? ] [ remain-compiled ] "quotations" compress ;
+    [ quotation? ] [ remain-compiled ] "quotations" compress
+    [ quotation? ] instances [ f >>cached-effect f >>cache-counter drop ] each ;
 
 : compress-strings ( -- )
     [ string? ] [ ] "strings" compress ;

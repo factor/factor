@@ -105,5 +105,5 @@ walker-gadget "multitouch" f {
 
 [
     dup find-walker-window dup
-    [ raise-window 3drop ] [ drop [ walker-window ] with-ui ] if
+    [ raise-window 3drop ] [ drop '[ _ _ _ walker-window ] with-ui ] if
 ] show-walker-hook set-global

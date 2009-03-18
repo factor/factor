@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors sequences kernel assocs combinators
 validators http hashtables namespaces fry continuations locals
-io arrays math boxes splitting urls call
+io arrays math boxes splitting urls
 xml.entities
 http.server
 http.server.responses

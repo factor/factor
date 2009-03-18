@@ -514,6 +514,8 @@ void primitive_array_to_quotation(void)
 	quot->array = dpeek();
 	quot->xt = lazy_jit_compile;
 	quot->compiledp = F;
+	quot->cached_effect = F;
+	quot->cache_counter = F;
 	drepl(tag_object(quot));
 }
 

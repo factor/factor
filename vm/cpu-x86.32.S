@@ -29,7 +29,7 @@ and the callstack top is passed in EDX */
 	pop %ebp ; \
 	pop %ebx
 
-#define QUOT_XT_OFFSET 9
+#define QUOT_XT_OFFSET 17
 
 /* We pass a function pointer to memcpy to work around a Mac OS X
 ABI limitation which would otherwise require us to do a bizzaro PC-relative
