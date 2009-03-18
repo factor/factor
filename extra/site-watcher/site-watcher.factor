@@ -3,12 +3,9 @@
 USING: db.sqlite db.types db.tuples kernel accessors
 db io.files io.files.temp locals io.directories continuations
 assocs sequences alarms namespaces http.client init calendar
-math math.parser smtp strings io combinators arrays
-generalizations combinators.smart prettyprint ;
+math math.parser smtp strings io combinators arrays debugger
+generalizations combinators.smart io.streams.string ;
 IN: site-watcher
-
-: ?unparse ( string/object -- string )
-    dup string? [ unparse ] unless ; inline
 
 : site-watcher-path ( -- path ) "site-watcher.db" temp-file ; inline
 
@@ -87,7 +84,7 @@ SYMBOL: running-site-watcher
     update-tuple ;
 
 : site-bad ( site error -- )
-    ?unparse >>error
+    [ error. ] with-string-writer >>error
     f set-notify-site-watchers
     now >>last-error
     update-tuple ;
