@@ -54,11 +54,8 @@ IN: tools.deploy.shaker
     ] when ;
 
 : strip-call ( -- )
-    "call" vocab [
-        "Stripping stack effect checking from call( and execute(" show
-        "vocab:tools/deploy/shaker/strip-call.factor"
-        run-file
-    ] when ;
+    "Stripping stack effect checking from call( and execute(" show
+    "vocab:tools/deploy/shaker/strip-call.factor" run-file ;
 
 : strip-cocoa ( -- )
     "cocoa" vocab [
