@@ -117,8 +117,17 @@ M: or-class modify-class
 M: not-class modify-class
     class>> modify-class <not-class> ;
 
-M: any-char modify-class
-    drop dotall option? t any-char-no-nl ? ;
+MEMO: unix-dot ( -- class )
+    CHAR: \n <not-class> ;
+
+MEMO: nonl-dot ( -- class )
+    { CHAR: \n CHAR: \r } <or-class> <not-class> ;
+
+M: dot modify-class
+    drop dotall option? [ t ] [
+        unix-lines option?
+        unix-dot nonl-dot ?
+    ] if ;
 
 : modify-letter-class ( class -- newclass )
     case-insensitive option? [ drop Letter-class ] when ;

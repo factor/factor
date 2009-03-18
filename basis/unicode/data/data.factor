@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Daniel Ehrenberg.
+! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit assocs math kernel sequences
 io.files hashtables quotations splitting grouping arrays io
@@ -28,6 +28,21 @@ VALUE: properties
 : name>char ( name -- char ) name-map at ;
 : char>name ( char -- name ) name-map value-at ;
 : property? ( char property -- ? ) properties at interval-key? ;
+
+: category# ( char -- category )
+    ! There are a few characters that should be Cn
+    ! that this gives Cf or Mn
+    ! Cf = 26; Mn = 5; Cn = 29
+    ! Use a compressed array instead?
+    dup category-map ?nth [ ] [
+        dup HEX: E0001 HEX: E007F between?
+        [ drop 26 ] [
+            HEX: E0100 HEX: E01EF between?  5 29 ?
+        ] if
+    ] ?if ;
+
+: category ( char -- category )
+    category# categories nth ;
 
 ! Loading data from UnicodeData.txt
 
@@ -194,34 +209,6 @@ postprocess-class
 load-special-casing to: special-casing
 
 load-properties to: properties
-
-! Utility to load resource files that look like Scripts.txt
-
-SYMBOL: interned
-
-: parse-script ( filename -- assoc )
-    ! assoc is code point/range => name
-    ascii file-lines filter-comments [ split-; ] map ;
-
-: range, ( value key -- )
-    swap interned get
-    [ = ] with find nip 2array , ;
-
-: expand-ranges ( assoc -- interval-map )
-    [
-        [
-            swap CHAR: . over member? [
-                ".." split1 [ hex> ] bi@ 2array
-            ] [ hex> ] if range,
-        ] assoc-each
-    ] { } make <interval-map> ;
-
-: process-script ( ranges -- table )
-    dup values prune interned
-    [ expand-ranges ] with-variable ;
-
-: load-script ( filename -- table )
-    parse-script process-script ;
 
 [ name>char [ "Invalid character" throw ] unless* ]
 name>char-hook set-global
