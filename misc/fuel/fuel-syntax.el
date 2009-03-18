@@ -106,9 +106,10 @@
   "\\_<\"[^>]\\([^\"\n]\\|\\\\\"\\)*\n")
 
 (defconst fuel-syntax--word-definition-regex
-  (fuel-syntax--second-word-regex
-   '(":" "::" "GENERIC:" "DEFER:" "HOOK:" "MAIN:" "MATH:" "POSTPONE:"
-     "SYMBOL:" "RENAME:")))
+  (format "\\_<\\(%s\\)?: +\\_<\\(\\w+\\)\\_>"
+          (regexp-opt
+           '(":" "GENERIC" "DEFER" "HOOK" "MAIN" "MATH" "POSTPONE"
+             "SYMBOL" "RENAME"))))
 
 (defconst fuel-syntax--alias-definition-regex
   "^ALIAS: +\\(\\_<.+?\\_>\\) +\\(\\_<.+?\\_>\\)")
@@ -167,9 +168,6 @@
 
 (defconst fuel-syntax--indent-def-start-regex
   (format "^\\(%s:\\)\\( \\|\n\\)" (regexp-opt fuel-syntax--indent-def-starts)))
-
-(defconst fuel-syntax--no-indent-def-start-regex
-  (format "^\\(%s:\\) " (regexp-opt fuel-syntax--no-indent-def-starts)))
 
 (defconst fuel-syntax--definition-start-regex
   (format "^\\(%s:\\) " (regexp-opt (append fuel-syntax--no-indent-def-starts
@@ -261,8 +259,8 @@
     ("\\_<\\(C\\)-ENUM: \\(;\\)" (1 "<b") (2 ">b"))
     ("\\_<C-ENUM:\\( \\|\n\\)" (1 "<b"))
     ("\\_<TUPLE: +\\w+? +< +\\w+? *\\( \\|\n\\)\\([^;]\\|$\\)" (1 "<b"))
-    ("\\_<\\(TUPLE\\|SYMBOLS\\|VARS\\): +\\w+? *\\( \\|\n\\)\\([^;<\n]\\|\\_>\\)"
-     (2 "<b"))
+    ("\\_<TUPLE: +\\w+? *\\( \\|\n\\)\\([^;<\n]\\|\\_>\\)" (1 "<b"))
+    ("\\_<\\(SYMBOLS\\|VARS\\|SINGLETONS\\): *?\\( \\|\n\\)\\([^;\n]\\|\\_>\\)" (2 "<b"))
     ("\\(\n\\| \\);\\_>" (1 ">b"))
     ;; Let and lambda:
     ("\\_<\\(!(\\) .* \\()\\)" (1 "<") (2 ">"))
