@@ -1,67 +1,10 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: db.sqlite db.types db.tuples kernel accessors
-db io.files io.files.temp locals io.directories continuations
-assocs sequences alarms namespaces http.client init calendar
-math math.parser smtp strings io combinators arrays debugger
-generalizations combinators.smart io.streams.string ;
+USING: accessors alarms arrays calendar combinators
+combinators.smart continuations db db.tuples debugger
+http.client init io.streams.string kernel locals math
+math.parser namespaces sequences site-watcher.db smtp ;
 IN: site-watcher
-
-: site-watcher-path ( -- path ) "site-watcher.db" temp-file ; inline
-
-[ site-watcher-path delete-file ] ignore-errors
-
-: with-sqlite-db ( quot -- )
-    site-watcher-path <sqlite-db> swap with-db ; inline
-
-TUPLE: account account-id email ;
-
-: <account> ( email -- account )
-    account new
-        swap >>email ;
-
-account "ACCOUNT" {
-    { "account-id" "ACCOUNT_ID" +db-assigned-id+ }
-    { "email" "EMAIL" VARCHAR }
-} define-persistent
-
-TUPLE: site site-id url up? changed? last-up error last-error ;
-
-: <site> ( url -- site )
-    site new
-        swap >>url ;
-
-site "SITE" {
-    { "site-id" "SITE_ID" INTEGER +db-assigned-id+ }
-    { "url" "URL" VARCHAR }
-    { "up?" "UP" BOOLEAN }
-    { "changed?" "CHANGED" BOOLEAN }
-    { "last-up" "LAST_UP" TIMESTAMP }
-    { "error" "ERROR" VARCHAR }
-    { "last-error" "LAST_ERROR" TIMESTAMP }
-} define-persistent
-
-TUPLE: watching-site account-id site-id ;
-
-: <watching-site> ( account-id site-id -- watching-site )
-    watching-site new
-        swap >>site-id
-        swap >>account-id ;
-
-watching-site "WATCHING_SITE" {
-    { "account-id" "ACCOUNT_ID" INTEGER +user-assigned-id+ }
-    { "site-id" "SITE_ID" INTEGER +user-assigned-id+ }
-} define-persistent
-
-: select-account/site ( email url -- account site )
-    [ <account> select-tuple account-id>> ]
-    [ <site> select-tuple site-id>> ] bi* ;
-    
-: watch-site ( email url -- )
-    select-account/site <watching-site> insert-tuple ;
-
-: unwatch-site ( email url -- )
-    select-account/site <watching-site> delete-tuples ;
 
 SYMBOL: site-watcher-from
 "factor-site-watcher@gmail.com" site-watcher-from set-global
@@ -70,6 +13,7 @@ SYMBOL: site-watcher-frequency
 10 seconds site-watcher-frequency set-global
  
 SYMBOL: running-site-watcher
+[ f running-site-watcher set-global ] "site-watcher" add-init-hook
 
 <PRIVATE
 
@@ -122,7 +66,24 @@ TUPLE: reporting-site email url up? changed? last-up? error last-error ;
     [ [ reporting-site boa ] input<sequence ] map email-accounts
     "update site set changed = 'f';" sql-command ;
 
+: insert-site ( url -- site )
+    <site> dup select-tuple [
+        dup t >>up? insert-tuple
+    ] unless ;
+
 PRIVATE>
+
+: select-account/site ( email url -- account site )
+    [ <account> select-tuple account-id>> ]
+    [ insert-site site-id>> ] bi* ;
+
+: watch-site ( email url -- )
+    select-account/site <watching-site> insert-tuple ;
+
+: unwatch-site ( email url -- )
+    select-account/site <watching-site> delete-tuples ;
+
+: insert-account ( email -- ) <account> insert-tuple ;
 
 : watch-sites ( -- alarm )
     [
@@ -131,12 +92,6 @@ PRIVATE>
         ] with-sqlite-db
     ] site-watcher-frequency get every ;
 
-: watch-new-site ( url -- )
-    <site> t >>up? insert-tuple ;
-
-: insert-account ( email -- )
-    <account> insert-tuple ;
-
 : run-site-watcher ( -- )
     running-site-watcher get [ 
         watch-sites running-site-watcher set-global 
@@ -144,20 +99,3 @@ PRIVATE>
 
 : stop-site-watcher ( -- )
     running-site-watcher get [ cancel-alarm ] when* ;
-
-[ f running-site-watcher set-global ] "site-watcher" add-init-hook
-
-
-:: fake-sites ( -- seq )
-    [
-        account ensure-table
-        site ensure-table
-        watching-site ensure-table
-
-        "erg@factorcode.org" insert-account
-        "http://asdfasdfasdfasdfqwerqqq.com" watch-new-site
-        "http://fark.com" watch-new-site
-
-        "erg@factorcode.org" "http://asdfasdfasdfasdfqwerqqq.com" watch-site
-        f <site> select-tuples
-    ] with-sqlite-db ;
