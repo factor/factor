@@ -5,14 +5,15 @@ io.directories io.files.temp kernel io.streams.string calendar
 debugger combinators.smart sequences ;
 IN: site-watcher.db
 
-TUPLE: account account-id email ;
+TUPLE: account account-id account-name email ;
 
-: <account> ( email -- account )
+: <account> ( account-name -- account )
     account new
-        swap >>email ;
+        swap >>account-name ;
 
 account "ACCOUNT" {
     { "account-id" "ACCOUNT_ID" +db-assigned-id+ }
+    { "account-name" "ACCOUNT_NAME" VARCHAR }
     { "email" "EMAIL" VARCHAR }
 } define-persistent
 
@@ -74,7 +75,7 @@ TUPLE: reporting-site email url up? changed? last-up? error last-error ;
         dup t >>up? insert-tuple
     ] unless ;
 
-: insert-account ( email -- ) <account> insert-tuple ;
+: insert-account ( account-name -- ) <account> insert-tuple ;
 
 : find-sites ( -- seq ) f <site> select-tuples ;
 
