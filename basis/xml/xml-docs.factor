@@ -67,9 +67,9 @@ HELP: string>dtd
 
 ARTICLE: { "xml" "reading" } "Reading XML"
     "The following words are used to read something into an XML document"
-    { $subsection string>xml }
     { $subsection read-xml }
     { $subsection read-xml-chunk }
+    { $subsection string>xml }
     { $subsection string>xml-chunk }
     { $subsection file>xml }
     { $subsection bytes>xml }
@@ -90,10 +90,16 @@ ARTICLE: { "xml" "events" } "Event-based XML parsing"
     { $subsection pull-event }
     { $subsection pull-elem } ;
 
+ARTICLE: { "xml" "namespaces" } "Working with XML namespaces"
+"The Factor XML parser implements XML namespaces, and provides convenient utilities for working with them. Anywhere in the public API that a name is accepted as an argument, either a string or an XML name is accepted. If a string is used, it is coerced into a name by giving it a null namespace. Names are stored as " { $link name } " tuples, which have slots for the namespace prefix and namespace URL as well as the main part of the tag name." $nl
+"To make it easier to create XML names, the parsing word " { $snippet "XML-NS:" } " is provided in the " { $vocab-link "xml.syntax" } " vocabulary." $nl
+"When parsing XML, names are automatically augmented with the appropriate namespace URL when the information is available. This does not take into account any XML schema which might allow for such prefixes to be omitted. When generating XML to be written, keep in mind that the XML writer knows only about the literal prefixes and ignores the URLs. It is your job to make sure that they match up correctly, and that there is the appropriate " { $snippet "xmlns" } " declaration." ;
+
 ARTICLE: "xml" "XML parser"
 "The " { $vocab-link "xml" } " vocabulary implements the XML 1.0 and 1.1 standards, converting strings of text into XML and vice versa. The parser checks for well-formedness but is not validating. There is only partial support for processing DTDs."
     { $subsection { "xml" "reading" } }
     { $subsection { "xml" "events" } }
+    { $subsection { "xml" "namespaces" } }
     { $vocab-subsection "Writing XML" "xml.writer" }
     { $vocab-subsection "XML parsing errors" "xml.errors" }
     { $vocab-subsection "XML entities" "xml.entities" }

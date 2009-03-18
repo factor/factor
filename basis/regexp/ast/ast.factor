@@ -37,8 +37,7 @@ C: <with-options> with-options
 TUPLE: options on off ;
 C: <options> options
 
-SINGLETONS: unix-lines dotall multiline comments case-insensitive
-unicode-case reversed-regexp ;
+SINGLETONS: unix-lines dotall multiline case-insensitive reversed-regexp ;
 
 : <maybe> ( term -- term' )
     f <concatenation> 2array <alternation> ;
