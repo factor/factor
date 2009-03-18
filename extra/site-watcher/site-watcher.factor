@@ -3,7 +3,7 @@
 USING: accessors alarms arrays calendar combinators
 combinators.smart continuations debugger http.client
 init io.streams.string kernel locals math math.parser
-namespaces sequences site-watcher.db smtp ;
+namespaces sequences site-watcher.db site-watcher.db.private smtp ;
 IN: site-watcher
 
 SYMBOL: site-watcher-from
