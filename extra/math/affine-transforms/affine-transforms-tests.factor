@@ -33,6 +33,12 @@ IN: math.affine-transforms.tests
     dup inverse-transform a.
 ] unit-test
 
+{ 2.0 -1.0 } { -1.0 -2.0 } { 5.0 -6.0 } <affine-transform> 1array [
+    { 1.0 0.0 } { 0.0 -1.0 } { 0.0 0.0 } <affine-transform>
+    { 2.0 1.0 } { -1.0 2.0 } { 5.0 6.0 } <affine-transform>
+    a.
+] unit-test
+
 [ t ] [
     { 0.01  0.02  } { 0.03  0.04  } { 0.05  0.06  } <affine-transform>
     { 0.011 0.021 } { 0.031 0.041 } { 0.051 0.061 } <affine-transform> 0.01 a~

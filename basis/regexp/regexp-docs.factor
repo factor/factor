@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel strings help.markup help.syntax math regexp.parser regexp.ast ;
+USING: kernel strings help.markup help.syntax math regexp.parser
+regexp.ast multiline ;
 IN: regexp
 
 ABOUT: "regexp"
@@ -21,8 +22,17 @@ ARTICLE: "regexp" "Regular expressions"
 { $subsection { "regexp" "deploy" } } ;
 
 ARTICLE: { "regexp" "intro" } "A quick introduction to regular expressions"
-
-;
+"Regular expressions are a terse way to do certain simple string processing tasks. For example, to replace all instances of " { $snippet "foo" } " in one string with " { $snippet "bar" } ", the following can be used:"
+{ $code "R/ foo/ \"bar\" re-replace" }
+"That could be done with sequence operations, but consider doing this replacement for an arbitrary number of o's, at least two:"
+{ $code "R/ foo+/ \"bar\" re-replace" }
+"The " { $snippet "+" } " operator matches one or more occurrences of the previous expression; in this case " { $snippet "o" } ". Another useful feature is alternation. Say we want to do this replacement with fooooo or boooo. Then we could use the code"
+{ $code "R/ (f|b)oo+/ \"bar\" re-replace" }
+"To search a file for all lines that match a given regular expression, you could use code like this:"
+{ $code <" "file.txt" ascii file-lines [ R/ (f|b)oo+/ re-contains? ] filter "> }
+"To test if a string in its entirety matches a regular expression, the following can be used:"
+{ $example <" USING: regexp prettyprint ; "fooo" R/ (b|f)oo+/ matches? . "> "t" }
+"Regular expressions can't be used for all parsing tasks. For example, they are not powerful enough to match balancing parentheses." ;
 
 ARTICLE: { "regexp" "construction" } "Constructing regular expressions"
 "Most of the time, regular expressions are literals and the parsing word should be used, to construct them at parse time. This ensures that they are only compiled once, and gives parse time syntax checking."
@@ -33,20 +43,71 @@ ARTICLE: { "regexp" "construction" } "Constructing regular expressions"
 "Another approach is to use " { $vocab-link "regexp.combinators" } "." ;
 
 ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
-"Regexp syntax is largely compatible with Perl, Java and extended POSIX regexps, but not completely. A new addition is the inclusion of a negation operator, with the syntax " { $snippet "(?~foo)" } " to match everything that does not match " { $snippet "foo" } "."
+"Regexp syntax is largely compatible with Perl, Java and extended POSIX regexps, but not completely. Below, the syntax is documented."
 { $heading "Characters" }
+"At its core, regular expressions consist of character literals. For example, " { $snippet "R/ f/" } " is a regular expression matching just the string 'f'. In addition, the normal escape codes are provided, like " { $snippet "\\t" } " for the tab character and " { $snippet "\\uxxxxxx" } "for an arbitrary Unicode code point, by its hex value. In addition, any character can be preceded by a backslash to escape it, unless this has special meaning. For example, to match a literal opening parenthesis, use " { $snippet "\\(" } "."
+{ $heading "Concatenation, alternation and grouping" }
+"Regular expressions can be built out of multiple characters by concatenation. For example, " { $snippet "R/ ab/" } " matches a followed by b. The " { $snippet "|" } " (alternation) operator can construct a regexp which matches one of two alternatives. Parentheses can be used for gropuing. So " { $snippet "R/ f(oo|ar)/" } " would match either 'foo' or 'far'."
 { $heading "Character classes" }
+"Square brackets define a convenient way to refer to a set of characters. For example, " { $snippet "[ab]" } " refers to either a or b. And " { $snippet "[a-z]" } " refers to all of the characters between a and z, in code point order. You can use these together, as in " { $snippet "[ac-fz]" } " which matches all of the characters between c and f, in addition to a and z. Character classes can be negated using a carat, as in " { $snippet "[^a]" } " which matches all characters which are not a."
 { $heading "Predefined character classes" }
+"Several character classes are predefined, both for convenience and because they are too large to represent directly. In Factor regular expressions, all character classes are Unicode-aware."
+{ $table
+    { { $snippet "\\d" } "Digits" }
+    { { $snippet "\\D" } "Not digits" }
+    { { $snippet "\\s" } "Whitespace" }
+    { { $snippet "\\S" } "Not whitespace" }
+    { { $snippet "\\w" } "Word character (alphanumeric or underscore)" }
+    { { $snippet "\\W" } "Not word character" }
+    { { $snippet "\\p{property}" } "Character which fulfils the property" }
+    { { $snippet "\\P{property}" } "Character which does not fulfil the property" } }
+"Properties for " { $snippet "\\p" } " and " { $snippet "\\P" } " (case-insensitive):"
+{ $table
+    { { $snippet "\\p{lower}" } "Lower case letters" }
+    { { $snippet "\\p{upper}" } "Upper case letters" }
+    { { $snippet "\\p{alpha}" } "Letters" }
+    { { $snippet "\\p{ascii}" } "Characters in the ASCII range" }
+    { { $snippet "\\p{alnum}" } "Letters or numbers" }
+    { { $snippet "\\p{punct}" } "Punctuation" }
+    { { $snippet "\\p{blank}" } "Non-newline whitespace" }
+    { { $snippet "\\p{cntrl}" } "Control character" }
+    { { $snippet "\\p{space}" } "Whitespace" }
+    { { $snippet "\\p{xdigit}" } "Hexidecimal digit" } } ! In the future: Unicode
+"Full unicode properties are not yet supported."
 { $heading "Boundaries" }
+"Special operators exist to match certain points in the string. These are called 'zero-width' because they do not consume any characters."
+{ $table
+    { { $snippet "^" } "Beginning of a line" }
+    { { $snippet "$" } "End of a line" }
+    { { $snippet "\\A" } "Beginning of text" }
+    { { $snippet "\\z" } "End of text" }
+    { { $snippet "\\Z" } "Almost end of text: only thing after is newline" }
+    { { $snippet "\\b" } "Word boundary (by Unicode word boundaries)" }
+    { { $snippet "\\b" } "Not word boundary (by Unicode word boundaries)" } }
 { $heading "Greedy quantifiers" }
-{ $heading "Reluctant quantifiers" }
-{ $heading "Posessive quantifiers" }
-{ $heading "Logical operations" }
+"It is possible to have a regular expression which matches a variable number of occurrences of another regular expression."
+{ $table
+    { { $snippet "a*" } "Zero or more occurrences of a" }
+    { { $snippet "a+" } "One or more occurrences of a" }
+    { { $snippet "a?" } "Zero or one occurrences of a" }
+    { { $snippet "a{n}" } "n occurrences of a" }
+    { { $snippet "a{n,}" } "At least n occurrences of a" }
+    { { $snippet "a{,m}" } "At most m occurrences of a" }
+    { { $snippet "a{n,m}" } "Between n and m occurrences of a" } }
+"All of these quantifiers are " { $emphasis "greedy" } ", meaning that they take as many repetitions as possible within the larger regular expression. Reluctant and posessive quantifiers are not yet supported."
 { $heading "Lookaround" }
+"Operators are provided to look ahead and behind the current point in the regular expression. These can be used in any context, but they're the most useful at the beginning or end of a regular expression."
+{ $table
+    { { $snippet "(?=a)" } "Asserts that the current position is immediately followed by a" }
+    { { $snippet "(?!a)" } "Asserts that the current position is not immediately followed by a" }
+    { { $snippet "(?<=a)" } "Asserts that the current position is immediately preceded by a" }
+    { { $snippet "(?<!a)" } "Asserts that the current position is not immediately preceded by a" } }
+{ $heading "Quotation" }
+"To make it convenient to have a long string which uses regexp operators, a special syntax is provided. If a substring begins with " { $snippet "\\Q" } " then everything until " { $snippet "\\E" } " is quoted (escaped). For example, " { $snippet "R/ \\Qfoo\\bar|baz()\\E/" } " matches exactly the string " { $snippet "\"foo\\bar|baz()\"" } "."
 { $heading "Unsupported features" }
 "One missing feature is backreferences. This is because of a design decision to allow only regular expressions following the formal theory of regular languages. For more information, see " { $link { "regexp" "theory" } } ". You can create a new regular expression to match a particular string using " { $vocab-link "regexp.combinators" } " and group capture is available to extract parts of a regular expression match." $nl
 "Another feature is Perl's " { $snippet "\\G" } " syntax, which references the previous match, is not included. This is because that sequence is inherently stateful, and Factor regexps don't hold state." $nl
-"Additionally, none of the operations which embed code into a regexp are supported, as this would require the inclusion of the Factor parser and compiler in any application which wants to expose regexps to the user. None of the casing operations are included, for simplicity." ; ! Also describe syntax, from the beginning
+"None of the operations which embed code into a regexp are supported, as this would require the inclusion of the Factor parser and compiler in any application which wants to expose regexps to the user. None of the casing operations are included of Perl like \\L, for simplicity." ; ! Also describe syntax, from the beginning
 
 ARTICLE: { "regexp" "options" } "Regular expression options"
 "When " { $link { "regexp" "construction" } } ", various options can be provided. Options have single-character names. A string of options has one of the following two forms:"
@@ -58,12 +119,29 @@ $nl
   { "i" { $link case-insensitive } }
   { "d" { $link unix-lines } }
   { "m" { $link multiline } }
-  { "n" { $link multiline } }
-  { "r" { $link reversed-regexp } }
   { "s" { $link dotall } }
-  { "u" { $link unicode-case } }
-  { "x" { $link comments } }
+  { "r" { $link reversed-regexp } }
 } ;
+
+HELP: case-insensitive
+{ $syntax "R/ .../i" }
+{ $description "On regexps, the " { $snippet "i" } " option makes the match case-insenstive. Currently, this is handled incorrectly with respect to Unicode, as characters like ß do not expand into SS in upper case. This should be fixed in a future version." } ;
+
+HELP: unix-lines
+{ $syntax "R/ .../d" }
+{ $description "With this mode, only newlines (" { $snippet "\\n" } ") are recognized for line breaking. This affects " { $snippet "$" } " and " { $snippet "^" } " when in multiline mode." } ;
+
+HELP: multiline
+{ $syntax "R/ .../m" }
+{ $description "This mode makes the zero-width constraints " { $snippet "$" } " and " { $snippet "^" } " match the beginning or end of a line. Otherwise, they only match the beginning or end of the input text. This can be used together with " { $link dotall } "." } ;
+
+HELP: dotall
+{ $syntax "R/ .../s" }
+{ $description "This mode, traditionally called single line mode, makes " { $snippet "." } " match everything, including line breaks. By default, it does not match line breaking characters. This can be used together with " { $link multiline } "." } ;
+
+HELP: reversed-regexp
+{ $syntax "R/ .../r" }
+{ $description "When running a regexp compiled with this mode, matches will start from the end of the input string, going towards the beginning." } ;
 
 ARTICLE: { "regexp" "theory" } "The theory of regular expressions"
 "Far from being just a practical tool invented by Unix hackers, regular expressions were studied formally before computer programs were written to process them." $nl
