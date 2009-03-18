@@ -413,8 +413,7 @@ editor "caret-motion" f {
 } define-command-map
 
 : clear-editor ( editor -- )
-    #! The with-datastack is a kludge to make it infer. Stupid.
-    model>> 1array [ clear-doc ] with-datastack drop ;
+    model>> clear-doc ;
 
 : select-all ( editor -- ) doc-elt select-elt ;
 
@@ -619,7 +618,7 @@ TUPLE: action-field < field quot ;
     [ editor>> editor-string ]
     [ editor>> clear-editor ]
     [ quot>> ]
-    tri call ;
+    tri call( string -- ) ;
 
 action-field H{
     { T{ key-down f f "RET" } [ invoke-action-field ] }

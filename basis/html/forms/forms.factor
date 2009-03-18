@@ -1,6 +1,6 @@
 ! Copyright (C) 2008, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors strings namespaces assocs hashtables io call
+USING: kernel accessors strings namespaces assocs hashtables io
 mirrors math fry sequences words continuations
 xml.entities xml.writer xml.syntax ;
 IN: html.forms

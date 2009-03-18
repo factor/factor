@@ -1,6 +1,7 @@
 USING: arrays help.markup help.syntax strings sbufs vectors
 kernel quotations generic generic.standard classes
-math assocs sequences sequences.private ;
+math assocs sequences sequences.private combinators.private
+effects words ;
 IN: combinators
 
 ARTICLE: "combinators-quot" "Quotation construction utilities"
@@ -8,6 +9,19 @@ ARTICLE: "combinators-quot" "Quotation construction utilities"
 { $subsection cond>quot }
 { $subsection case>quot }
 { $subsection alist>quot } ;
+
+ARTICLE: "call" "Calling code with known stack effects"
+"Arbitrary quotations and words can be called from code accepted by the optimizing compiler. This is done by specifying the stack effect of the quotation literally. It is checked at runtime that the stack effect is accurate."
+$nl
+"Quotations:"
+{ $subsection POSTPONE: call( }
+{ $subsection call-effect }
+"Words:"
+{ $subsection POSTPONE: execute( }
+{ $subsection execute-effect }
+"Unsafe calls:"
+{ $subsection call-effect-unsafe }
+{ $subsection execute-effect-unsafe } ;
 
 ARTICLE: "combinators" "Additional combinators"
 "The " { $vocab-link "combinators" } " vocabulary provides a few useful combinators."
@@ -27,10 +41,26 @@ $nl
 $nl
 "A combinator which can help with implementing methods on " { $link hashcode* } ":"
 { $subsection recursive-hashcode }
+{ $subsection "call" }
 { $subsection "combinators-quot" }
 { $see-also "quotations" "dataflow" } ;
 
 ABOUT: "combinators"
+
+HELP: call-effect
+{ $values { "quot" quotation } { "effect" effect } }
+{ $description "Given a quotation and a stack effect, calls the quotation, asserting at runtime that it has the given stack effect. This is a macro which expands given a literal effect parameter, and an arbitrary quotation which is not required at compile time." } ;
+
+HELP: execute-effect
+{ $values { "word" word } { "effect" effect } }
+{ $description "Given a word and a stack effect, executes the word, asserting at runtime that it has the given stack effect. This is a macro which expands given a literal effect parameter, and an arbitrary word which is not required at compile time." } ;
+
+HELP: execute-effect-unsafe
+{ $values { "word" word } { "effect" effect } }
+{ $description "Given a word and a stack effect, executes the word, blindly declaring at runtime that it has the given stack effect. This is a macro which expands given a literal effect parameter, and an arbitrary word which is not required at compile time." }
+{ $warning "If the word being executed has an incorrect stack effect, undefined behavior will result. User code should use " { $link POSTPONE: execute( } " instead." } ;
+    
+{ call-effect call-effect-unsafe execute-effect execute-effect-unsafe } related-words
 
 HELP: cleave
 { $values { "x" object } { "seq" "a sequence of quotations with stack effect " { $snippet "( x -- ... )" } } }

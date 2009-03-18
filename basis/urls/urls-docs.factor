@@ -82,9 +82,9 @@ HELP: parse-host
 { $notes "This word is used by " { $link >url } ". It can also be used directly to parse " { $snippet "host:port" } " strings which are not full URLs." }
 { $examples
     { $example
-        "USING: prettyprint urls kernel ;"
-        "\"sbcl.org:80\" parse-host .s 2drop"
-        "\"sbcl.org\"\n80"
+        "USING: arrays kernel prettyprint urls ;"
+        "\"sbcl.org:80\" parse-host 2array ."
+        "{ \"sbcl.org\" 80 }"
     }
 } ;
 

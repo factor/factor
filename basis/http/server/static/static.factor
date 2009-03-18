@@ -6,7 +6,7 @@ sorting logging calendar.format accessors splitting io io.files
 io.files.info io.directories io.pathnames io.encodings.binary
 fry xml.entities destructors urls html xml.syntax
 html.templates.fhtml http http.server http.server.responses
-http.server.redirection xml.writer call ;
+http.server.redirection xml.writer ;
 IN: http.server.static
 
 TUPLE: file-responder root hook special allow-listings ;

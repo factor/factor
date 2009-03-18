@@ -62,5 +62,3 @@ M: funky url-of "http://www.funky-town.com/" swap town>> append ;
 ] unit-test
 
 [ ] [ [ { 1 2 3 } describe ] with-html-writer drop ] unit-test
-
-[ ] [ [ \ predicate-instance? def>> . ] with-html-writer drop ] unit-test

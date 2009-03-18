@@ -1,10 +1,9 @@
 IN: tools.deploy.tests
 USING: tools.test system io.pathnames io.files io.files.info
-io.files.temp kernel tools.deploy.config
-tools.deploy.config.editor tools.deploy.backend math sequences
-io.launcher arrays namespaces continuations layouts accessors
-io.encodings.ascii urls math.parser io.directories
-tools.deploy.test ;
+io.files.temp kernel tools.deploy.config tools.deploy.config.editor
+tools.deploy.backend math sequences io.launcher arrays namespaces
+continuations layouts accessors io.encodings.ascii urls math.parser
+io.directories tools.deploy.test ;
 
 [ t ] [ "hello-world" shake-and-bake 500000 small-enough? ] unit-test
 
@@ -26,6 +25,8 @@ tools.deploy.test ;
 os macosx? [
     [ t ] [ "webkit-demo" shake-and-bake 500000 small-enough? ] unit-test
 ] when
+
+[ t ] [ "benchmark.regex-dna" shake-and-bake 1200000 small-enough? ] unit-test
 
 {
     "tools.deploy.test.1"

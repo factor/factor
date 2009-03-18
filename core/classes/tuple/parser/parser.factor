@@ -30,7 +30,7 @@ ERROR: duplicate-slot-names names ;
 
 ERROR: invalid-slot-name name ;
 
-: parse-long-slot-name ( -- )
+: parse-long-slot-name ( -- spec )
     [ scan , \ } parse-until % ] { } make ;
 
 : parse-slot-name ( string/f -- ? )
@@ -64,7 +64,7 @@ ERROR: bad-literal-tuple ;
 
 : parse-slot-value ( -- )
     scan scan-object 2array , scan {
-        { f [ unexpected-eof ] }
+        { f [ \ } unexpected-eof ] }
         { "}" [ ] }
         [ bad-literal-tuple ]
     } case ;
@@ -72,13 +72,13 @@ ERROR: bad-literal-tuple ;
 : (parse-slot-values) ( -- )
     parse-slot-value
     scan {
-        { f [ unexpected-eof ] }
+        { f [ \ } unexpected-eof ] }
         { "{" [ (parse-slot-values) ] }
         { "}" [ ] }
         [ bad-literal-tuple ]
     } case ;
 
-: parse-slot-values ( -- )
+: parse-slot-values ( -- values )
     [ (parse-slot-values) ] { } make ;
 
 : boa>tuple ( class slots -- tuple )

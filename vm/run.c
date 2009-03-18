@@ -155,6 +155,32 @@ void primitive_set_retainstack(void)
 	rs = array_to_stack(untag_array(dpop()),rs_bot);
 }
 
+/* Used to implement call( */
+void primitive_check_datastack(void)
+{
+	F_FIXNUM out = to_fixnum(dpop());
+	F_FIXNUM in = to_fixnum(dpop());
+	F_FIXNUM height = out - in;
+	F_ARRAY *array = untag_array(dpop());
+	F_FIXNUM length = array_capacity(array);
+	F_FIXNUM depth = (ds - ds_bot + CELLS) / CELLS;
+	if(depth - height != length)
+		dpush(F);
+	else
+	{
+		F_FIXNUM i;
+		for(i = 0; i < length - in; i++)
+		{
+			if(get(ds_bot + i * CELLS) != array_nth(array,i))
+			{
+				dpush(F);
+				return;
+			}
+		}
+		dpush(T);
+	}
+}
+
 void primitive_getenv(void)
 {
 	F_FIXNUM e = untag_fixnum_fast(dpeek());
