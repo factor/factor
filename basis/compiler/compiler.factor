@@ -111,7 +111,7 @@ t compile-dependencies? set-global
     ] with-return ;
 
 : compile-loop ( deque -- )
-    [ (compile) yield-hook get assert-depth ] slurp-deque ;
+    [ (compile) yield-hook get call( -- ) ] slurp-deque ;
 
 : decompile ( word -- )
     f 2array 1array modify-code-heap ;

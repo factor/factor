@@ -194,5 +194,5 @@ M: quadtree clear-assoc ( assoc -- )
 : swizzle ( sequence quot -- sequence' )
     [ dup ] dip map
     [ zip ] [ rect-containing <quadtree> ] bi
-    [ '[ first2 _ set-at ] each ] [ values ] bi ;
+    [ '[ first2 _ set-at ] each ] [ values ] bi ; inline
 

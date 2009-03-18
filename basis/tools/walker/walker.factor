@@ -139,7 +139,6 @@ SYMBOL: +stopped+
     { dip [ (step-into-dip) ] }
     { 2dip [ (step-into-2dip) ] }
     { 3dip [ (step-into-3dip) ] }
-    { (throw) [ drop (step-into-quot) ] }
     { execute [ (step-into-execute) ] }
     { if [ (step-into-if) ] }
     { dispatch [ (step-into-dispatch) ] }

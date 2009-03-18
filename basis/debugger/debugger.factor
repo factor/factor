@@ -325,3 +325,5 @@ M: bad-literal-tuple summary drop "Bad literal tuple" ;
 M: check-mixin-class summary drop "Not a mixin class" ;
 
 M: not-found-in-roots summary drop "Cannot resolve vocab: path" ;
+
+M: wrong-values summary drop "Quotation called with wrong stack effect" ;

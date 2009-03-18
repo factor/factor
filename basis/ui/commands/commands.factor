@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel sequences strings
 math assocs words generic namespaces make assocs quotations
-splitting ui.gestures unicode.case unicode.categories tr fry
-call ;
+splitting ui.gestures unicode.case unicode.categories tr fry ;
 IN: ui.commands
 
 SYMBOL: +nullary+

@@ -22,6 +22,8 @@ DEFER: 3dip
 ! Combinators
 GENERIC: call ( callable -- )
 
+GENERIC: execute ( word -- )
+
 DEFER: if
 
 : ? ( ? true false -- true/false )
@@ -235,7 +237,7 @@ GENERIC: boa ( ... class -- tuple )
 
 ! Error handling -- defined early so that other files can
 ! throw errors before continuations are loaded
-: throw ( error -- * ) 5 getenv [ die ] or 1 (throw) ;
+GENERIC: throw ( error -- * )
 
 ERROR: assert got expect ;
 

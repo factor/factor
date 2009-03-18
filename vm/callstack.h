@@ -14,8 +14,6 @@ CELL frame_scan(F_STACK_FRAME *frame);
 CELL frame_type(F_STACK_FRAME *frame);
 
 void primitive_callstack(void);
-void primitive_set_datastack(void);
-void primitive_set_retainstack(void);
 void primitive_set_callstack(void);
 void primitive_callstack_to_array(void);
 void primitive_innermost_stack_frame_quot(void);

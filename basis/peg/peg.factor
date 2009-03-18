@@ -4,7 +4,7 @@ USING: kernel sequences strings fry namespaces make math assocs
 io vectors arrays math.parser math.order vectors combinators
 classes sets unicode.categories compiler.units parser words
 quotations effects memoize accessors locals effects splitting
-combinators.short-circuit generalizations call ;
+combinators.short-circuit generalizations ;
 IN: peg
 
 TUPLE: parse-result remaining ast ;

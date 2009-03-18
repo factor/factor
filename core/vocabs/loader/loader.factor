@@ -64,7 +64,7 @@ SYMBOL: load-help?
         +parsing+ >>source-loaded?
         dup vocab-source-path [ parse-file ] [ [ ] ] if*
         [ +parsing+ >>source-loaded? ] dip
-        [ % ] [ assert-depth ] if-bootstrapping
+        [ % ] [ call( -- ) ] if-bootstrapping
         +done+ >>source-loaded? drop
     ] [ ] [ f >>source-loaded? ] cleanup ;
 
@@ -90,7 +90,7 @@ PRIVATE>
 
 : run ( vocab -- )
     dup load-vocab vocab-main [
-        execute
+        execute( -- )
     ] [
         "The " write vocab-name write
         " vocabulary does not define an entry point." print

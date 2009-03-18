@@ -20,7 +20,7 @@ CONSTANT: deck-bits 18
 : tuple-class-offset ( -- n ) bootstrap-cell tuple tag-number - ; inline
 : class-hash-offset ( -- n ) bootstrap-cell object tag-number - ; inline
 : word-xt-offset ( -- n ) 9 bootstrap-cells object tag-number - ; inline
-: quot-xt-offset ( -- n ) 3 bootstrap-cells object tag-number - ; inline
+: quot-xt-offset ( -- n ) 5 bootstrap-cells object tag-number - ; inline
 : word-code-offset ( -- n ) 10 bootstrap-cells object tag-number - ; inline
 : array-start-offset ( -- n ) 2 bootstrap-cells object tag-number - ; inline
 : compiled-header-size ( -- n ) 4 bootstrap-cells ; inline
