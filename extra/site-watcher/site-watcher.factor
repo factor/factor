@@ -71,19 +71,19 @@ TUPLE: reporting-site email url up? changed? last-up? error last-error ;
         dup t >>up? insert-tuple
     ] unless ;
 
-PRIVATE>
+: insert-account ( email -- ) <account> insert-tuple ;
 
 : select-account/site ( email url -- account site )
     [ <account> select-tuple account-id>> ]
     [ insert-site site-id>> ] bi* ;
+
+PRIVATE>
 
 : watch-site ( email url -- )
     select-account/site <watching-site> insert-tuple ;
 
 : unwatch-site ( email url -- )
     select-account/site <watching-site> delete-tuples ;
-
-: insert-account ( email -- ) <account> insert-tuple ;
 
 : watch-sites ( -- alarm )
     [

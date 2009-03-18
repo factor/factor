@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: db.tuples locals site-watcher site-watcher.db ;
+USING: db.tuples locals site-watcher site-watcher.db
+site-watcher.private kernel ;
 IN: site-watcher.tests
 
 :: fake-sites ( -- seq )
@@ -10,8 +11,8 @@ IN: site-watcher.tests
         watching-site ensure-table
 
         "erg@factorcode.org" insert-account
-        "http://asdfasdfasdfasdfqwerqqq.com" insert-site
-        "http://fark.com" insert-site
+        "http://asdfasdfasdfasdfqwerqqq.com" insert-site drop
+        "http://fark.com" insert-site drop
 
         "erg@factorcode.org" "http://asdfasdfasdfasdfqwerqqq.com" watch-site
         f <site> select-tuples
