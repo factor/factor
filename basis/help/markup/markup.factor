@@ -4,7 +4,7 @@ USING: accessors arrays definitions generic io kernel assocs
 hashtables namespaces make parser prettyprint sequences strings
 io.styles vectors words math sorting splitting classes slots fry
 sets vocabs help.stylesheet help.topics vocabs.loader quotations
-combinators call see ;
+combinators see ;
 IN: help.markup
 
 PREDICATE: simple-element < array

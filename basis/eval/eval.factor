@@ -4,7 +4,7 @@ USING: splitting parser compiler.units kernel namespaces
 debugger io.streams.string fry ;
 IN: eval
 
-: parse-string ( str -- )
+: parse-string ( str -- quot )
     [ string-lines parse-lines ] with-compilation-unit ;
 
 : (eval) ( str -- )

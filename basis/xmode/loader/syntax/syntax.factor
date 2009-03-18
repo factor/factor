@@ -12,7 +12,7 @@ IN: xmode.loader.syntax
 
 : RULE:
     scan scan-word scan-word [
-        parse-definition { } make
+        [ parse-definition call( -- ) ] { } make
         swap [ (parse-rule-tag) ] 2curry
     ] dip swap define-tag ; parsing
 

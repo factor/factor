@@ -18,6 +18,6 @@ SYMBOL: current-method
 : with-method-definition ( method quot -- )
     over current-method set call current-method off ; inline
 
-: (M:) ( method def -- )
+: (M:) ( -- method def )
     CREATE-METHOD [ parse-definition ] with-method-definition ;
 

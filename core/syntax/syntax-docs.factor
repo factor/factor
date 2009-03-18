@@ -770,3 +770,13 @@ HELP: call-next-method
 { POSTPONE: call-next-method (call-next-method) next-method } related-words
 
 { POSTPONE: << POSTPONE: >> } related-words
+
+HELP: call(
+{ $syntax "call( stack -- effect )" }
+{ $description "Calls the quotation on the top of the stack, asserting that it has the given stack effect. The quotation does not need to be known at compile time." } ;
+
+HELP: execute(
+{ $syntax "execute( stack -- effect )" }
+{ $description "Calls the word on the top of the stack, asserting that it has the given stack effect. The word does not need to be known at compile time." } ;
+
+{ POSTPONE: call( POSTPONE: execute( } related-words

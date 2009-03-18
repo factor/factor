@@ -464,7 +464,7 @@ TUPLE: callback-context ;
     dup current-callback eq? [
         drop
     ] [
-        yield-hook get call wait-to-return
+        yield-hook get call( -- ) wait-to-return
     ] if ;
 
 : do-callback ( quot token -- )

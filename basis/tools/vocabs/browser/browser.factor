@@ -244,11 +244,7 @@ C: <vocab-author> vocab-author
     } cleave ;
 
 : keyed-vocabs ( str quot -- seq )
-    all-vocabs [
-        swap [
-            [ [ 2dup ] dip swap call member? ] filter
-        ] dip swap
-    ] assoc-map 2nip ; inline
+    [ all-vocabs ] 2dip '[ [ _ swap @ member? ] filter ] assoc-map ; inline
 
 : tagged ( tag -- assoc )
     [ vocab-tags ] keyed-vocabs ;

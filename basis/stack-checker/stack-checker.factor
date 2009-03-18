@@ -1,7 +1,7 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io effects namespaces sequences quotations vocabs
-generic words stack-checker.backend stack-checker.state
+vocabs.loader generic words stack-checker.backend stack-checker.state
 stack-checker.known-words stack-checker.transforms
 stack-checker.errors stack-checker.inlining
 stack-checker.visitor.dummy ;
@@ -28,3 +28,5 @@ M: callable infer ( quot -- effect )
         dup subwords [ f "inferred-effect" set-word-prop ] each
         f "inferred-effect" set-word-prop
     ] each ;
+
+"stack-checker.call-effect" require

@@ -78,6 +78,8 @@ IN: bootstrap.syntax
     "call-next-method"
     "initial:"
     "read-only"
+    "call("
+    "execute("
 } [ "syntax" create drop ] each
 
 "t" "syntax" lookup define-symbol
