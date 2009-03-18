@@ -4,7 +4,7 @@ USING: db.sqlite db.types db.tuples kernel accessors
 db io.files io.files.temp locals io.directories continuations
 assocs sequences alarms namespaces http.client init calendar
 math math.parser smtp strings io combinators arrays
-generalizations combinators.smart ;
+generalizations combinators.smart prettyprint ;
 IN: site-watcher
 
 : ?unparse ( string/object -- string )
