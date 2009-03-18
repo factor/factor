@@ -5,22 +5,7 @@ bit-arrays namespaces make sequences.private arrays quotations
 assocs classes.predicate math.order strings.parser ;
 IN: unicode.syntax
 
-! Character classes (categories)
-
-: category# ( char -- category )
-    ! There are a few characters that should be Cn
-    ! that this gives Cf or Mn
-    ! Cf = 26; Mn = 5; Cn = 29
-    ! Use a compressed array instead?
-    dup category-map ?nth [ ] [
-        dup HEX: E0001 HEX: E007F between?
-        [ drop 26 ] [
-            HEX: E0100 HEX: E01EF between?  5 29 ?
-        ] if
-    ] ?if ;
-
-: category ( char -- category )
-    category# categories nth ;
+<PRIVATE
 
 : >category-array ( categories -- bitarray )
     categories [ swap member? ] with map >bit-array ;
@@ -39,6 +24,8 @@ IN: unicode.syntax
 
 : define-category ( word categories -- )
     [category] integer swap define-predicate-class ;
+
+PRIVATE>
 
 : CATEGORY:
     CREATE ";" parse-tokens define-category ; parsing

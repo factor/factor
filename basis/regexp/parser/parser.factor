@@ -18,6 +18,13 @@ ERROR: bad-number ;
 
 ERROR: bad-class name ;
 
+: parse-unicode-class ( name -- class )
+    ! Implement this!
+    drop f ;
+
+: unicode-class ( name -- class )
+    parse-unicode-class [ bad-class ] unless* ;
+
 : name>class ( name -- class )
     >string >case-fold {
         { "lower" letter-class }
@@ -32,8 +39,7 @@ ERROR: bad-class name ;
         { "cntrl" control-character-class }
         { "xdigit" hex-digit-class }
         { "space" java-blank-class }
-        ! TODO: unicode-character-class
-    } [ bad-class ] at-error ;
+    } [ unicode-class ] at-error ;
 
 : lookup-escape ( char -- ast )
     {
@@ -144,7 +150,7 @@ Parenthized = "?:" Alternation:a => [[ a ]]
 
 Element = "(" Parenthized:p ")" => [[ p ]]
         | "[" CharClass:r "]" => [[ r ]]
-        | ".":d => [[ any-char <primitive-class> ]]
+        | ".":d => [[ dot ]]
         | Character
 
 Number = (!(","|"}").)* => [[ string>number ensure-number ]]
