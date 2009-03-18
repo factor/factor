@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lexer sets sequences kernel splitting effects
 combinators arrays parser ;
@@ -26,3 +26,6 @@ ERROR: bad-effect ;
 : parse-effect ( end -- effect )
     parse-effect-tokens { "--" } split1 dup
     [ <effect> ] [ "Stack effect declaration must contain --" throw ] if ;
+
+: parse-call( ( accum word -- accum )
+    [ ")" parse-effect parsed ] dip parsed ;

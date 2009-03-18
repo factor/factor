@@ -23,7 +23,7 @@ SYMBOL: this-test
         [ this-test get failure ] recover
     ] [
         call
-    ] if ;
+    ] if ; inline
 
 : unit-test ( output input -- )
     [ 2array ] 2keep '[

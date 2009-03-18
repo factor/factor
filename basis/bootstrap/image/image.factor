@@ -446,6 +446,8 @@ M: quotation '
         quotation type-number object tag-number [
             emit ! array
             f ' emit ! compiled
+            f ' emit ! cached-effect
+            f ' emit ! cache-counter
             0 emit ! xt
             0 emit ! code
         ] emit-object
@@ -515,7 +517,7 @@ M: quotation '
     20000 <hashtable> objects set
     emit-header t, 0, 1, -1,
     "Building generic words..." print flush
-    call-remake-generics-hook
+    remake-generics
     "Serializing words..." print flush
     emit-words
     "Serializing JIT data..." print flush

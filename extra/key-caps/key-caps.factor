@@ -139,7 +139,7 @@ TUPLE: key-caps-gadget < gadget keys alarm ;
 : make-key-gadget ( scancode dim array -- )
     [ 
         swap [ 
-            " " [ drop ] <bevel-button>
+            " " [ drop ] <border-button>
             swap [ first >>loc ] [ second >>dim ] bi
         ] [ execute ] bi*
     ] dip set-nth ;
@@ -151,7 +151,7 @@ TUPLE: key-caps-gadget < gadget keys alarm ;
     [ >>keys ] tri ;
 
 : <key-caps-gadget> ( -- gadget )
-    key-caps-gadget new-gadget
+    key-caps-gadget new
     add-keys-gadgets ;
 
 M: key-caps-gadget pref-dim* drop KEYBOARD-SIZE ;
@@ -174,7 +174,7 @@ M: key-caps-gadget handle-gesture
 : key-caps ( -- )
     [
         open-game-input
-        <key-caps-gadget> 5 <border> "Key Caps" open-window
+        <key-caps-gadget> { 5 5 } <border> "Key Caps" open-window
     ] with-ui ;
 
 MAIN: key-caps

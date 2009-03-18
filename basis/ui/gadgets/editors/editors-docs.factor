@@ -1,5 +1,6 @@
 USING: documents help.markup help.syntax ui.gadgets
-ui.gadgets.scrollers models strings ui.commands ;
+ui.gadgets.scrollers models strings ui.commands
+ui.text colors fonts ;
 IN: ui.gadgets.editors
 
 HELP: editor
@@ -7,12 +8,12 @@ HELP: editor
 $nl
 "Editors have the following slots:"
 { $list
-    { { $snippet "font" } " - a font specifier." }
-    { { $snippet "color" } " - text color specifier." }
-    { { $snippet "caret-color" } " - caret color specifier." }
-    { { $snippet "selection-color" } " - selection background color specifier." }
-    { { $snippet "caret" } " - a model storing a line/column pair." }
-    { { $snippet "mark" } " - a model storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
+    { { $snippet "font" } " - a " { $link font } "." }
+    { { $snippet "color" } " - a " { $link color } "." }
+    { { $snippet "caret-color" } " - a " { $link color } "." }
+    { { $snippet "selection-color" } " - a " { $link color } "." }
+    { { $snippet "caret" } " - a " { $link model } " storing a line/column pair." }
+    { { $snippet "mark" } " - a " { $link model } " storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
     { { $snippet "focused?" } " - a boolean." }
 } } ;
 
@@ -20,13 +21,13 @@ HELP: <editor>
 { $values { "editor" "a new " { $link editor } } }
 { $description "Creates a new " { $link editor } " with an empty document." } ;
 
-{ editor-caret* editor-mark* } related-words
+{ editor-caret editor-mark } related-words
 
-HELP: editor-caret*
+HELP: editor-caret
 { $values { "editor" editor } { "loc" "a pair of integers" } }
 { $description "Outputs the current caret location as a line/column number pair." } ;
 
-HELP: editor-mark*
+HELP: editor-mark
 { $values { "editor" editor } { "loc" "a pair of integers" } }
 { $description "Outputs the current mark location as a line/column number pair." } ;
 
@@ -66,8 +67,8 @@ HELP: set-editor-string
 
 ARTICLE: "gadgets-editors-selection" "The caret and mark"
 "If there is no selection, the caret and the mark are at the same location; otherwise the mark delimits the end-point of the selection opposite the caret."
-{ $subsection editor-caret* }
-{ $subsection editor-mark* }
+{ $subsection editor-caret }
+{ $subsection editor-mark }
 { $subsection change-caret }
 { $subsection change-caret&mark }
 { $subsection mark>caret }
@@ -80,18 +81,32 @@ ARTICLE: "gadgets-editors-selection" "The caret and mark"
 { $subsection scroll>caret }
 "Use " { $link user-input* } " to change selected text." ;
 
-ARTICLE: "gadgets-editors" "Editor gadgets"
-"An editor edits a multi-line passage of text."
-{ $command-map editor "general" }
-{ $command-map editor "caret-motion" }
-{ $command-map editor "selection" }
-{ $heading "Editor words" }
-{ $subsection editor }
-{ $subsection <editor> }
+ARTICLE: "gadgets-editors-contents" "Getting and setting editor contents"
 { $subsection editor-string }
 { $subsection set-editor-string }
-{ $subsection "gadgets-editors-selection" }
-{ $subsection "documents" }
-{ $subsection "document-locs-elts" } ;
+{ $subsection clear-editor } ;
 
-ABOUT: "gadgets-editors"
+ARTICLE: "gadgets-editors-commands" "Editor gadget commands"
+{ $command-map editor "editing" }
+{ $command-map editor "caret-motion" }
+{ $command-map editor "selection" }
+{ $command-map editor "clipboard" }
+{ $command-map multiline-editor "multiline" } ;
+
+ARTICLE: "ui.gadgets.editors" "Editor gadgets"
+"The " { $vocab-link "ui.gadgets.editors" } " vocabulary implements editor gadgets. An editor edits a passage of text. Editors display a " { $link document } ". Editors are built from and inherit all features of " { $link "ui.gadgets.line-support" } "."
+{ $subsection "gadgets-editors-commands" }
+"Editors:"
+{ $subsection editor }
+{ $subsection <editor> }
+{ $subsection "gadgets-editors-contents" }
+{ $subsection "gadgets-editors-selection" }
+"Multiline editors:"
+{ $subsection <multiline-editor> }
+"Fields:"
+{ $subsection <model-field> }
+{ $subsection <action-field> }
+"Editors edit " { $emphasis "documents" } ":"
+{ $subsection "documents" } ;
+
+ABOUT: "ui.gadgets.editors"

@@ -4,7 +4,7 @@ USING: byte-arrays arrays assocs kernel kernel.private libc math
 namespaces make parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
 layouts system compiler.units io.files io.encodings.binary
-accessors combinators effects continuations fry call classes ;
+accessors combinators effects continuations fry classes ;
 IN: alien.c-types
 
 DEFER: <int>

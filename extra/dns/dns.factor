@@ -5,7 +5,7 @@ USING: kernel byte-arrays combinators strings arrays sequences splitting
        destructors
        io io.binary io.sockets io.encodings.binary
        accessors
-       combinators.cleave
+       combinators.smart
        newfx
        ;
 
@@ -145,12 +145,13 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : query->ba ( query -- ba )
+  [
     {
       [ name>>                 dn->ba ]
       [ type>>  type-table  of uint16->ba ]
       [ class>> class-table of uint16->ba ]
-    }
-  <arr> concat ;
+    } cleave
+  ] output>array concat ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -169,6 +170,7 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : soa->ba ( rdata -- ba )
+  [
     {
       [ mname>>   dn->ba ]
       [ rname>>   dn->ba ]
@@ -177,8 +179,8 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
       [ retry>>   uint32->ba ]
       [ expire>>  uint32->ba ]
       [ minimum>> uint32->ba ]
-    }
-  <arr> concat ;
+    } cleave
+  ] output>array concat ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -198,6 +200,7 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : rr->ba ( rr -- ba )
+  [
     {
       [ name>>                 dn->ba     ]
       [ type>>  type-table  of uint16->ba ]
@@ -207,12 +210,13 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
         [ type>>            ] [ rdata>> ] bi rdata->ba
         [ length uint16->ba ] [         ] bi append
       ]
-    }
-  <arr> concat ;
+    } cleave
+  ] output>array concat ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : header-bits-ba ( message -- ba )
+  [
     {
       [ qr>>                     15 shift ]
       [ opcode>> opcode-table of 11 shift ]
@@ -222,10 +226,11 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
       [ ra>>                      7 shift ]
       [ z>>                       4 shift ]
       [ rcode>>  rcode-table of   0 shift ]
-    }
-  <arr> sum uint16->ba ;
+    } cleave
+  ] sum-outputs uint16->ba ;
 
 : message->ba ( message -- ba )
+  [
     {
       [ id>> uint16->ba ]
       [ header-bits-ba ]
@@ -237,8 +242,8 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
       [ answer-section>>     [ rr->ba    ] map concat ]
       [ authority-section>>  [ rr->ba    ] map concat ]
       [ additional-section>> [ rr->ba    ] map concat ]
-    }
-  <arr> concat ;
+    } cleave
+  ] output>array concat ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -475,7 +480,7 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 
 : ask ( message -- message ) dns-server ask-server ;
 
-: query->message ( query -- message ) <message> swap {1} >>question-section ;
+: query->message ( query -- message ) <message> swap 1array >>question-section ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

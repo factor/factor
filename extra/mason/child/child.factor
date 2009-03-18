@@ -1,21 +1,22 @@
-! Copyright (C) 2008 Eduardo Cavazos, Slava Pestov.
+! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar combinators.short-circuit
-continuations debugger http.client io.directories io.files
-io.launcher io.pathnames kernel make mason.common mason.config
+continuations debugger http.client io.directories io.files io.launcher
+io.pathnames io.encodings.ascii kernel make mason.common mason.config
 mason.platform mason.report mason.email namespaces sequences ;
 IN: mason.child
 
 : make-cmd ( -- args )
     gnu-make platform 2array ;
 
+: dll-url ( -- url )
+    "http://factorcode.org/dlls/"
+    target-cpu get "x86.64" = [ "64/" append ] when ;
+
 : download-dlls ( -- )
     target-os get "winnt" = [
-        "http://factorcode.org/dlls/"
-        target-cpu get "x86.64" = [ "64/" append ] when
-        [ "freetype6.dll" append ]
-        [ "zlib1.dll" append ] bi
-        [ download ] bi@
+        dll-url "build-support/dlls.txt" ascii file-lines
+        [ append download ] with each
     ] when ;
 
 : make-vm ( -- )

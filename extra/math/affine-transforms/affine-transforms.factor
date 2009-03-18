@@ -3,10 +3,13 @@ USING: accessors arrays combinators combinators.short-circuit kernel math math.v
 math.functions sequences ;
 IN: math.affine-transforms
 
-TUPLE: affine-transform x y origin ;
+TUPLE: affine-transform { x read-only } { y read-only } { origin read-only } ;
 C: <affine-transform> affine-transform
 
 CONSTANT: identity-transform T{ affine-transform f { 1.0 0.0 } { 0.0 1.0 } { 0.0 0.0 } }
+
+: axes ( a -- a' )
+     [ x>> ] [ y>> ] bi { 0.0 0.0 } <affine-transform> ;
 
 : a.v ( a v -- v )
     [ [ x>> ] [ first  ] bi* v*n ]
@@ -23,7 +26,7 @@ CONSTANT: identity-transform T{ affine-transform f { 1.0 0.0 } { 0.0 1.0 } { 0.0
     [ 0.0 2array ] [ 0.0 swap 2array ] bi* { 0.0 0.0 } <affine-transform> ;
 
 : center-rotation ( transform center -- transform )
-    [ clone dup ] dip [ vneg a.v ] [ v+ ] bi >>origin ;
+    [ [ x>> ] [ y>> ] [ ] tri ] dip [ vneg a.v ] [ v+ ] bi <affine-transform> ;
     
 : flatten-transform ( transform -- array )
     [ x>> ] [ y>> ] [ origin>> ] tri 3append ;
@@ -42,8 +45,8 @@ CONSTANT: identity-transform T{ affine-transform f { 1.0 0.0 } { 0.0 1.0 } { 0.0
     (inverted-axes) { 0.0 0.0 } <affine-transform> ;
 
 : inverse-transform ( a -- a^-1 )
-    [ inverse-axes dup ] [ origin>> ] bi
-    a.v vneg >>origin ;
+    [ inverse-axes [ x>> ] [ y>> ] [ ] tri ] [ origin>> ] bi
+    a.v vneg <affine-transform> ;
 
 : transpose-axes ( a -- a^T )
     [ [ x>> first  ] [ y>> first  ] bi 2array ]
@@ -51,11 +54,11 @@ CONSTANT: identity-transform T{ affine-transform f { 1.0 0.0 } { 0.0 1.0 } { 0.0
     [ origin>> ] tri <affine-transform> ;
 
 : a. ( a a -- a )
-    transpose-axes {
-        [ [ x>> ] [ x>> ] bi* v. ]
-        [ [ x>> ] [ y>> ] bi* v. ]
-        [ [ y>> ] [ x>> ] bi* v. ]
-        [ [ y>> ] [ y>> ] bi* v. ]
+    {
+        [ [ transpose-axes x>> ] [ x>> ] bi* v. ]
+        [ [ transpose-axes y>> ] [ x>> ] bi* v. ]
+        [ [ transpose-axes x>> ] [ y>> ] bi* v. ]
+        [ [ transpose-axes y>> ] [ y>> ] bi* v. ]
         [ origin>> a.v ]
     } 2cleave
     [ [ 2array ] 2bi@ ] dip <affine-transform> ;

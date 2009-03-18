@@ -1,10 +1,9 @@
-! Copyright (C) 2008 Doug Coleman.
+! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators io
-io.streams.string kernel math namespaces peg peg.ebnf
-sequences sequences.deep strings xml.entities xml.syntax
-vectors splitting xmode.code2html urls.encoding xml.data
-xml.writer ;
+USING: sequences kernel splitting lists fry accessors assocs math.order
+math combinators namespaces urls.encoding xml.syntax xmode.code2html
+xml.data arrays strings vectors xml.writer io.streams.string locals
+unicode.categories ;
 IN: farkup
 
 SYMBOL: relative-link-prefix
@@ -39,123 +38,174 @@ TUPLE: line-break ;
 : simple-link-title ( string -- string' )
     dup absolute-url? [ "/" split1-last swap or ] unless ;
 
-EBNF: parse-farkup
-nl               = ("\r\n" | "\r" | "\n") => [[ drop "\n" ]]
-whitespace       = " " | "\t" | nl
+! _foo*bar_baz*bing works like <i>foo*bar</i>baz<b>bing</b>
+! I could support overlapping, but there's not a good use case for it.
 
-heading1      = "=" (!("=" | nl).)+ "="
-    => [[ second >string heading1 boa ]]
+DEFER: (parse-paragraph)
 
-heading2      = "==" (!("=" | nl).)+ "=="
-    => [[ second >string heading2 boa ]]
+: parse-paragraph ( string -- seq )
+    (parse-paragraph) list>array ;
 
-heading3      = "===" (!("=" | nl).)+ "==="
-    => [[ second >string heading3 boa ]]
+: make-paragraph ( string -- paragraph )
+    parse-paragraph paragraph boa ;
 
-heading4      = "====" (!("=" | nl).)+ "===="
-    => [[ second >string heading4 boa ]]
+: cut-half-slice ( string i -- before after-slice )
+    [ head ] [ 1+ short tail-slice ] 2bi ;
 
-heading          = heading4 | heading3 | heading2 | heading1
+: find-cut ( string quot -- before after delimiter )
+    dupd find
+    [ [ cut-half-slice ] [ f ] if* ] dip ; inline
 
+: parse-delimiter ( string delimiter class -- paragraph )
+    [ '[ _ = ] find-cut drop ] dip
+    '[ parse-paragraph _ new swap >>child ]
+    [ (parse-paragraph) ] bi* cons ;
 
+: delimiter-class ( delimiter -- class )
+    H{
+        { CHAR: * strong }
+        { CHAR: _ emphasis }
+        { CHAR: ^ superscript }
+        { CHAR: ~ subscript }
+        { CHAR: % inline-code }
+    } at ;
 
-strong        = "*" (!("*" | nl).)+ "*"
-    => [[ second >string strong boa ]]
+: parse-link ( string -- paragraph-list )
+    rest-slice "]]" split1-slice [
+        "|" split1
+        [ "" like dup simple-link-title ] unless*
+        [ "image:" ?head ] dip swap [ image boa ] [ parse-paragraph link boa ] if
+    ] dip [ (parse-paragraph) cons ] when* ;
 
-emphasis      = "_" (!("_" | nl).)+ "_"
-    => [[ second >string emphasis boa ]]
+: ?first ( seq -- elt ) 0 swap ?nth ;
 
-superscript   = "^" (!("^" | nl).)+ "^"
-    => [[ second >string superscript boa ]]
+: parse-big-link ( before after -- link rest )
+    dup ?first CHAR: [ =
+    [ parse-link ]
+    [ [ CHAR: [ suffix ] [ (parse-paragraph) ] bi* ]
+    if ;
 
-subscript     = "~" (!("~" | nl).)+ "~"
-    => [[ second >string subscript boa ]]
+: escape ( before after -- before' after' )
+    [ nil ] [ unclip-slice swap [ suffix ] dip (parse-paragraph) ] if-empty ;
 
-inline-code   = "%" (!("%" | nl).)+ "%"
-    => [[ second >string inline-code boa ]]
+: (parse-paragraph) ( string -- list )
+    [ nil ] [
+        [ "*_^~%[\\" member? ] find-cut [
+            {
+                { CHAR: [ [ parse-big-link ] }
+                { CHAR: \\ [ escape ] }
+                [ dup delimiter-class parse-delimiter ]
+            } case cons
+        ] [ drop "" like 1list ] if*
+    ] if-empty ;
 
-link-content     = (!("|"|"]").)+
-                    => [[ >string ]]
+: <farkup-state> ( string -- state ) string-lines ;
+: look ( state i -- char ) swap first ?nth ;
+: done? ( state -- ? ) empty? ;
+: take-line ( state -- state' line ) unclip-slice ;
 
-image-link       = "[[image:" link-content  "|" link-content "]]"
-                    => [[ [ second >string ] [ fourth >string ] bi image boa ]]
-                  | "[[image:" link-content "]]"
-                    => [[ second >string f image boa ]]
+: take-lines ( state char -- state' lines )
+    dupd '[ ?first _ = not ] find drop
+    [ cut-slice ] [ f ] if* swap ;
 
-simple-link      = "[[" link-content "]]"
-    => [[ second >string dup simple-link-title link boa ]]
+:: (take-until) ( state delimiter accum -- string/f state' )
+    state empty? [ accum "\n" join f ] [
+        state unclip-slice :> first :> rest
+        first delimiter split1 :> after :> before
+        before accum push
+        after [
+            accum "\n" join
+            rest after prefix
+        ] [
+            rest delimiter accum (take-until)
+        ] if
+    ] if ;
 
-labeled-link     = "[[" link-content "|" link-content "]]"
-    => [[ [ second >string ] [ fourth >string ] bi link boa ]]
+: take-until ( state delimiter -- string/f state' )
+    V{ } clone (take-until) ;
 
-link             = image-link | labeled-link | simple-link
+: count= ( string -- n )
+    dup <reversed> [ [ CHAR: = = not ] find drop 0 or ] bi@ min ;
 
-escaped-char  = "\" .
-    => [[ second 1string ]]
+: trim= ( string -- string' )
+    [ CHAR: = = ] trim ;
 
-inline-tag       = strong | emphasis | superscript | subscript | inline-code
-                   | link | escaped-char
+: make-heading ( string class -- heading )
+    [ trim= parse-paragraph ] dip boa ; inline
 
+: parse-heading ( state -- state' heading )
+    take-line dup count= {
+        { 0 [ make-paragraph ] }
+        { 1 [ heading1 make-heading ] }
+        { 2 [ heading2 make-heading ] }
+        { 3 [ heading3 make-heading ] }
+        { 4 [ heading4 make-heading ] }
+        [ drop heading4 make-heading ]
+    } case ;
 
+: trim-row ( seq -- seq' )
+    rest
+    dup peek empty? [ but-last ] when ;
 
-inline-delimiter = '*' | '_' | '^' | '~' | '%' | '\' | '['
+: ?peek ( seq -- elt/f )
+    [ f ] [ peek ] if-empty ;
 
-cell             = (!(inline-delimiter | '|' | nl).)+
-    => [[ >string ]]
-    
-table-column     = (list | cell | inline-tag | inline-delimiter  ) '|'
-    => [[ first ]]
-table-row        = "|" (table-column)+
-    => [[ second table-row boa ]]
-table            =  ((table-row nl => [[ first ]] )+ table-row? | table-row)
-    => [[ table boa ]]
+: coalesce ( rows -- rows' )
+    V{ } clone [
+        '[
+            _ dup ?peek ?peek CHAR: \\ =
+            [ [ pop "|" rot 3append ] keep ] when
+            push 
+        ] each
+    ] keep ;
 
-text = (!(nl | code | heading | inline-delimiter | table ).)+
-    => [[ >string ]]
+: parse-table ( state -- state' table )
+    CHAR: | take-lines [
+        "|" split
+        trim-row
+        coalesce
+        [ parse-paragraph ] map
+        table-row boa
+    ] map table boa ;
 
-paragraph-nl-item = nl list
-    | nl line
-    | nl => [[ line-breaks? get [ drop line-break new ] when ]]
-paragraph-item = (table | code | text | inline-tag | inline-delimiter)+
-paragraph = ((paragraph-item paragraph-nl-item)+ nl+ => [[ first ]]
-             | (paragraph-item paragraph-nl-item)+ paragraph-item?
-             | paragraph-item)
-    => [[ paragraph boa ]]
+: parse-line ( state -- state' item )
+    take-line dup "___" =
+    [ drop line new ] [ make-paragraph ] if ;
 
+: parse-list ( state char class -- state' list )
+    [
+        take-lines
+        [ rest parse-paragraph list-item boa ] map
+    ] dip boa ; inline
 
-list-item     = (cell | inline-tag | inline-delimiter)*
+: parse-ul ( state -- state' ul )
+    CHAR: - unordered-list parse-list ;
 
-ordered-list-item      = '#' list-item
-    => [[ second list-item boa ]]
-ordered-list = ((ordered-list-item nl)+ ordered-list-item? | ordered-list-item)
-    => [[ ordered-list boa ]]
+: parse-ol ( state -- state' ul )
+    CHAR: # ordered-list parse-list ;
 
-unordered-list-item    = '-' list-item
-    => [[ second list-item boa ]]
-unordered-list = ((unordered-list-item nl)+ unordered-list-item? | unordered-list-item)
-    => [[ unordered-list boa ]]
+: parse-code ( state -- state' item )
+    dup 1 look CHAR: [ =
+    [ unclip-slice make-paragraph ] [
+        "{" take-until [ rest ] dip
+        "}]" take-until
+        [ code boa ] dip swap
+    ] if ;
 
-list = ordered-list | unordered-list
+: parse-item ( state -- state' item )
+    dup 0 look {
+        { CHAR: = [ parse-heading ] }
+        { CHAR: | [ parse-table ] }
+        { CHAR: _ [ parse-line ] }
+        { CHAR: - [ parse-ul ] }
+        { CHAR: # [ parse-ol ] } 
+        { CHAR: [ [ parse-code ] }
+        { f [ rest-slice f ] }
+        [ drop take-line make-paragraph ]
+    } case ;
 
-
-line = '___'
-    => [[ drop line new ]]
-
-
-named-code
-           =  '[' (!('{' | whitespace | '[').)+ '{' (!("}]").)+ "}]"
-    => [[ [ second >string ] [ fourth >string ] bi code boa ]]
-
-simple-code
-           = "[{" (!("}]").)+ "}]"
-    => [[ second >string f swap code boa ]]
-
-code = named-code | simple-code
-
-
-stand-alone
-           = (line | code | heading | list | table | paragraph | nl)*
-;EBNF
+: parse-farkup ( string -- farkup )
+    <farkup-state> [ dup done? not ] [ parse-item ] produce nip sift ;
 
 CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
 
@@ -165,21 +215,8 @@ CONSTANT: invalid-url "javascript:alert('Invalid URL in farkup');"
         { [ dup [ 127 > ] any? ] [ drop invalid-url ] }
         { [ dup first "/\\" member? ] [ drop invalid-url ] }
         { [ CHAR: : over member? ] [ dup absolute-url? [ drop invalid-url ] unless ] }
-        [ relative-link-prefix get prepend "" like ]
-    } cond url-encode ;
-
-: write-link ( href text -- xml )
-    [ check-url link-no-follow? get "true" and ] dip
-    [XML <a href=<-> nofollow=<->><-></a> XML] ;
-
-: write-image-link ( href text -- xml )
-    disable-images? get [
-        2drop
-        [XML <strong>Images are not allowed</strong> XML]
-    ] [
-        [ check-url ] [ f like ] bi*
-        [XML <img src=<-> alt=<->/> XML]
-    ] if ;
+        [ relative-link-prefix get prepend "" like url-encode ]
+    } cond ;
 
 : render-code ( string mode -- xml )
     [ string-lines ] dip htmlize-lines
@@ -206,11 +243,27 @@ M: ordered-list (write-farkup) "ol" farkup-inside ;
 M: paragraph (write-farkup) "p" farkup-inside ;
 M: table (write-farkup) "table" farkup-inside ;
 
+: write-link ( href text -- xml )
+    [ check-url link-no-follow? get "nofollow" and ] dip
+    [XML <a href=<-> rel=<->><-></a> XML] ;
+
+: write-image-link ( href text -- xml )
+    disable-images? get [
+        2drop
+        [XML <strong>Images are not allowed</strong> XML]
+    ] [
+        [ check-url ] [ f like ] bi*
+        [XML <img src=<-> alt=<->/> XML]
+    ] if ;
+
+: open-link ( link -- href text )
+    [ href>> ] [ text>> (write-farkup) ] bi ;
+
 M: link (write-farkup)
-    [ href>> ] [ text>> ] bi write-link ;
+    open-link write-link ;
 
 M: image (write-farkup)
-    [ href>> ] [ text>> ] bi write-image-link ;
+    open-link write-image-link ;
 
 M: code (write-farkup)
     [ string>> ] [ mode>> ] bi render-code ;
@@ -228,9 +281,7 @@ M: table-row (write-farkup)
 
 M: string (write-farkup) ;
 
-M: vector (write-farkup) [ (write-farkup) ] map ;
-
-M: f (write-farkup) ;
+M: array (write-farkup) [ (write-farkup) ] map ;
 
 : farkup>xml ( string -- xml )
     parse-farkup (write-farkup) ;
@@ -240,3 +291,4 @@ M: f (write-farkup) ;
 
 : convert-farkup ( string -- string' )
     [ write-farkup ] with-string-writer ;
+

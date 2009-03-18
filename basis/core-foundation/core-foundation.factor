@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax destructors accessors kernel ;
+USING: alien.syntax alien.c-types alien.destructors accessors kernel ;
 IN: core-foundation
 
 TYPEDEF: void* CFTypeRef
@@ -10,22 +10,27 @@ CONSTANT: kCFAllocatorDefault f
 
 TYPEDEF: bool Boolean
 TYPEDEF: long CFIndex
+TYPEDEF: char UInt8
 TYPEDEF: int SInt32
 TYPEDEF: uint UInt32
 TYPEDEF: ulong CFTypeID
 TYPEDEF: UInt32 CFOptionFlags
 TYPEDEF: void* CFUUIDRef
 
+ALIAS: <CFIndex> <long>
+ALIAS: *CFIndex *long
+
+C-STRUCT: CFRange
+{ "CFIndex" "location" }
+{ "CFIndex" "length" } ;
+
+: <CFRange> ( location length -- range )
+    "CFRange" <c-object>
+    [ set-CFRange-length ] keep
+    [ set-CFRange-location ] keep ;
+
 FUNCTION: CFTypeRef CFRetain ( CFTypeRef cf ) ;
 
 FUNCTION: void CFRelease ( CFTypeRef cf ) ;
 
-TUPLE: CFRelease-destructor alien disposed ;
-
-M: CFRelease-destructor dispose* alien>> CFRelease ;
-
-: &CFRelease ( alien -- alien )
-    dup f CFRelease-destructor boa &dispose drop ; inline
-
-: |CFRelease ( alien -- alien )
-    dup f CFRelease-destructor boa |dispose drop ; inline
+DESTRUCTOR: CFRelease

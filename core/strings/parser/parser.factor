@@ -29,7 +29,7 @@ name>char-hook [
 : unicode-escape ( str -- ch str' )
     "{" ?head-slice [
         CHAR: } over index cut-slice
-        [ >string name>char-hook get call ] dip
+        [ >string name>char-hook get call( name -- char ) ] dip
         rest-slice
     ] [
         6 cut-slice [ hex> ] dip
@@ -45,10 +45,10 @@ name>char-hook [
 : (parse-string) ( str -- m )
     dup [ "\"\\" member? ] find dup [
         [ cut-slice [ % ] dip rest-slice ] dip
-        dup CHAR: " = [
-            drop from>>
+        CHAR: " = [
+            from>>
         ] [
-            drop next-escape [ , ] dip (parse-string)
+            next-escape [ , ] dip (parse-string)
         ] if
     ] [
         "Unterminated string" throw
@@ -59,8 +59,8 @@ name>char-hook [
         [ swap tail-slice (parse-string) ] "" make swap
     ] change-lexer-column ;
 
-: (unescape-string) ( str -- str' )
-    dup [ CHAR: \\ = ] find [
+: (unescape-string) ( str -- )
+    CHAR: \\ over index dup [
         cut-slice [ % ] dip rest-slice
         next-escape [ , ] dip
         (unescape-string)

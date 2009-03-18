@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays byte-arrays definitions generic
 hashtables kernel math namespaces parser lexer sequences strings
@@ -80,7 +80,7 @@ IN: bootstrap.syntax
         scan {
             { [ dup length 1 = ] [ first ] }
             { [ "\\" ?head ] [ next-escape >string "" assert= ] }
-            [ name>char-hook get call ]
+            [ name>char-hook get call( name -- char ) ]
         } cond parsed
     ] define-syntax
 
@@ -94,7 +94,7 @@ IN: bootstrap.syntax
         lexer get skip-blank parse-string <pathname> parsed
     ] define-syntax
 
-    "[" [ \ ] [ >quotation ] parse-literal ] define-syntax
+    "[" [ parse-quotation parsed ] define-syntax
     "{" [ \ } [ >array ] parse-literal ] define-syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-syntax
@@ -135,8 +135,7 @@ IN: bootstrap.syntax
 
     "DEFER:" [
         scan current-vocab create
-        dup old-definitions get [ delete-at ] with each
-        set-word
+        [ fake-definition ] [ set-word ] [ [ undefined ] define ] tri
     ] define-syntax
 
     ":" [
@@ -232,7 +231,7 @@ IN: bootstrap.syntax
     "<<" [
         [
             \ >> parse-until >quotation
-        ] with-nested-compilation-unit call
+        ] with-nested-compilation-unit call( -- )
     ] define-syntax
 
     "call-next-method" [
@@ -247,4 +246,8 @@ IN: bootstrap.syntax
     "initial:" "syntax" lookup define-symbol
     
     "read-only" "syntax" lookup define-symbol
+
+    "call(" [ \ call-effect parse-call( ] define-syntax
+
+    "execute(" [ \ execute-effect parse-call( ] define-syntax
 ] with-compilation-unit

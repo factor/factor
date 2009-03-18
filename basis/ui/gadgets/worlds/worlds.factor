@@ -1,26 +1,33 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations kernel math models
-namespaces opengl sequences io combinators fry math.vectors
-ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-math.geometry.rect ;
+namespaces opengl sequences io combinators combinators.short-circuit
+fry math.vectors math.rectangles cache ui.gadgets ui.gestures
+ui.render ui.text ui.text.private ui.backend ui.gadgets.tracks
+ui.commands ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < track
 active? focused?
-glass
-title status
-fonts handle
+layers
+title status status-owner
+text-handle handle images
 window-loc ;
 
 : find-world ( gadget -- world/f ) [ world? ] find-parent ;
 
 : show-status ( string/f gadget -- )
-    find-world dup [
-        status>> dup [ set-model ] [ 2drop ] if
-    ] [ 2drop ] if ;
+    dup find-world dup [
+        dup status>> [
+            [ (>>status-owner) ] [ status>> set-model ] bi
+        ] [ 3drop ] if
+    ] [ 3drop ] if ;
 
-: hide-status ( gadget -- ) f swap show-status ;
+: hide-status ( gadget -- )
+    dup find-world dup [
+        [ status-owner>> eq? ] keep
+        '[ f _ [ (>>status-owner) ] [ status>> set-model ] 2bi ] when
+    ] [ 2drop ] if ;
 
 ERROR: no-world-found ;
 
@@ -39,38 +46,48 @@ M: world request-focus-on ( child gadget -- )
     [ 2drop ] [ dup focused?>> (request-focus) ] if ;
 
 : new-world ( gadget title status class -- world )
-    { 0 1 } swap new-track
+    vertical swap new-track
         t >>root?
         t >>active?
-        H{ } clone >>fonts
         { 0 0 } >>window-loc
         swap >>status
         swap >>title
         swap 1 track-add
+    dup init-text-rendering
     dup request-focus ;
 
 : <world> ( gadget title status -- world )
     world new-world ;
 
+: as-big-as-possible ( world gadget -- )
+    dup [ { 0 0 } >>loc over dim>> >>dim ] when 2drop ; inline
+
 M: world layout*
-    dup call-next-method
-    dup glass>> [
-        [ dup rect-dim ] dip (>>dim)
-    ] when* drop ;
+    [ call-next-method ]
+    [ dup layers>> [ as-big-as-possible ] with each ] bi ;
 
 M: world focusable-child* gadget-child ;
 
 M: world children-on nip children>> ;
 
+M: world remove-gadget
+    2dup layers>> memq?
+    [ layers>> delq ] [ call-next-method ] if ;
+
 : (draw-world) ( world -- )
     dup handle>> [
-        [ dup init-gl ] keep draw-gadget
+        {
+            [ init-gl ]
+            [ draw-gadget ]
+            [ finish-text-rendering ]
+            [ images>> [ purge-cache ] when* ]
+        } cleave
     ] with-gl-context ;
 
 : draw-world? ( world -- ? )
     #! We don't draw deactivated worlds, or those with 0 size.
     #! On Windows, the latter case results in GL errors.
-    [ active?>> ] [ handle>> ] [ dim>> [ 0 > ] all? ] tri and and ;
+    { [ active?>> ] [ handle>> ] [ dim>> [ 0 > ] all? ] } 1&& ;
 
 TUPLE: world-error error world ;
 
@@ -79,36 +96,34 @@ C: <world-error> world-error
 SYMBOL: ui-error-hook
 
 : ui-error ( error -- )
-    ui-error-hook get [ call ] [ die ] if* ;
+    ui-error-hook get [ call( error -- ) ] [ die drop ] if* ;
 
 ui-error-hook [ [ rethrow ] ] initialize
 
 : draw-world ( world -- )
     dup draw-world? [
         dup world [
-            [
-                (draw-world)
-            ] [
+            [ (draw-world) ] [
                 over <world-error> ui-error
                 f >>active? drop
             ] recover
         ] with-variable
-    ] [
-        drop
-    ] if ;
+    ] [ drop ] if ;
 
-world H{
-    { T{ key-down f { C+ } "x" } [ T{ cut-action } send-action ] }
-    { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
-    { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
-    { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
+world
+action-gestures [
+    [ [ { C+ } ] dip f <key-down> ]
+    [ '[ _ send-action ] ]
+    bi*
+] H{ } assoc-map-as
+H{
     { T{ button-down f { C+ } 1 } [ drop T{ button-down f f 3 } button-gesture ] }
     { T{ button-down f { A+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
     { T{ button-down f { M+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
     { T{ button-up f { C+ } 1 } [ drop T{ button-up f f 3 } button-gesture ] }
     { T{ button-up f { A+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
     { T{ button-up f { M+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
-} set-gestures
+} assoc-union set-gestures
 
 PREDICATE: specific-button-up < button-up #>> ;
 PREDICATE: specific-button-down < button-down #>> ;

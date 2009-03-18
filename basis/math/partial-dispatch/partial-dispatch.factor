@@ -45,31 +45,41 @@ M: word integer-op-input-classes
         { bitnot fixnum-bitnot }
     } at swap or ;
 
+: bignum-fixnum-op-quot ( big-word -- quot )
+    '[ fixnum>bignum _ execute ] ;
+
+: fixnum-bignum-op-quot ( big-word -- quot )
+    '[ [ fixnum>bignum ] dip _ execute ] ;
+
 : integer-fixnum-op-quot ( fix-word big-word -- quot )
     [
         [ over fixnum? ] %
-        [ '[ _ execute ] , ]
-        [ '[ fixnum>bignum _ execute ] , ] bi*
-        \ if ,
+        [ '[ _ execute ] , ] [ bignum-fixnum-op-quot , ] bi* \ if ,
     ] [ ] make ;
 
 : fixnum-integer-op-quot ( fix-word big-word -- quot )
     [
         [ dup fixnum? ] %
-        [ '[ _ execute ] , ]
-        [ '[ [ fixnum>bignum ] dip _ execute ] , ] bi*
-        \ if ,
+        [ '[ _ execute ] , ] [ fixnum-bignum-op-quot , ] bi* \ if ,
+    ] [ ] make ;
+
+: integer-bignum-op-quot ( big-word -- quot )
+    [
+        [ over fixnum? ] %
+        [ fixnum-bignum-op-quot , ] [ '[ _ execute ] , ] bi \ if ,
     ] [ ] make ;
 
 : integer-integer-op-quot ( fix-word big-word -- quot )
     [
-        [ dup fixnum? ] %
-        2dup integer-fixnum-op-quot ,
+        [ 2dup both-fixnums? ] %
+        [ '[ _ execute ] , ]
         [
-            [ over fixnum? [ [ fixnum>bignum ] dip ] when ] %
-            nip ,
-        ] [ ] make ,
-        \ if ,
+            [
+                [ dup fixnum? ] %
+                [ bignum-fixnum-op-quot , ]
+                [ integer-bignum-op-quot , ] bi \ if ,
+            ] [ ] make ,
+        ] bi* \ if ,
     ] [ ] make ;
 
 : integer-op-word ( triple -- word )
@@ -84,7 +94,7 @@ M: word integer-op-input-classes
 
 : define-integer-op-word ( fix-word big-word triple -- )
     [
-        [ 2nip integer-op-word ] [ integer-op-quot ] 3bi
+        [ 2nip integer-op-word dup make-foldable ] [ integer-op-quot ] 3bi
         (( x y -- z )) define-declared
     ] [
         2nip
@@ -104,10 +114,10 @@ M: word integer-op-input-classes
 
 : define-integer-ops ( word fix-word big-word -- )
     [
-        rot tuck
+        rot
         [ fixnum fixnum 3array "derived-from" set-word-prop ]
         [ bignum bignum 3array "derived-from" set-word-prop ]
-        2bi*
+        bi-curry bi*
     ] [
         [ integer-op-triples ] 2dip
         [ define-integer-op-words ]

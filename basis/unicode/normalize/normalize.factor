@@ -151,8 +151,8 @@ TUPLE: compose-state i str char after last-class ;
 
 DEFER: compose-iter
 
-: try-noncombining ( char state -- state )
-    tuck char>> swap combine-chars
+: try-noncombining ( state char -- state )
+    [ drop ] [ [ char>> ] dip combine-chars ] 2bi
     [ >>char to f >>last-class compose-iter ] when* ; inline
 
 : compose-iter ( state -- state )
@@ -161,7 +161,7 @@ DEFER: compose-iter
             { f [ drop ] }
             { 0 [
                 over last-class>>
-                [ drop ] [ swap try-noncombining ] if ] }
+                [ drop ] [ try-noncombining ] if ] }
             [ try-compose to compose-iter ]
         } case
     ] when* ; inline recursive

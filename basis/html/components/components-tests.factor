@@ -4,6 +4,8 @@ io.streams.null accessors inspector html.streams
 html.components html.forms namespaces
 xml.writer ;
 
+\ render must-infer
+
 [ ] [ begin-form ] unit-test
 
 [ ] [ 3 "hi" set-value ] unit-test
@@ -161,7 +163,7 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 
 [ ] [ "-foo\n-bar" "farkup" set-value ] unit-test
 
-[ "<ul><li>foo</li>\n<li>bar</li></ul>" ] [
+[ "<ul><li>foo</li><li>bar</li></ul>" ] [
     [ "farkup" T{ farkup } render ] with-string-writer
 ] unit-test
 

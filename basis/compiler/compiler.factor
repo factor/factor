@@ -1,15 +1,14 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
-continuations vocabs assocs dlists definitions math graphs
-generic combinators deques search-deques io stack-checker
-stack-checker.state stack-checker.inlining
-combinators.short-circuit compiler.errors compiler.units
-compiler.tree.builder compiler.tree.optimizer
-compiler.cfg.builder compiler.cfg.optimizer
+continuations vocabs assocs dlists definitions math graphs generic
+combinators deques search-deques macros io stack-checker
+stack-checker.state stack-checker.inlining combinators.short-circuit
+compiler.errors compiler.units compiler.tree.builder
+compiler.tree.optimizer compiler.cfg.builder compiler.cfg.optimizer
 compiler.cfg.linearization compiler.cfg.two-operand
-compiler.cfg.linear-scan compiler.cfg.stack-frame
-compiler.codegen compiler.utilities ;
+compiler.cfg.linear-scan compiler.cfg.stack-frame compiler.codegen
+compiler.utilities ;
 IN: compiler
 
 SYMBOL: compile-queue
@@ -50,8 +49,12 @@ SYMBOLS: +optimized+ +unoptimized+ ;
     H{ } clone generic-dependencies set
     f swap compiler-error ;
 
+: ignore-error? ( word error -- ? )
+    [ [ inline? ] [ macro? ] bi or ]
+    [ compiler-error-type +warning+ eq? ] bi* and ;
+
 : fail ( word error -- * )
-    [ swap compiler-error ]
+    [ 2dup ignore-error? [ 2drop ] [ swap compiler-error ] if ]
     [
         drop
         [ compiled-unxref ]
@@ -108,7 +111,7 @@ t compile-dependencies? set-global
     ] with-return ;
 
 : compile-loop ( deque -- )
-    [ (compile) yield-hook get call ] slurp-deque ;
+    [ (compile) yield-hook get call( -- ) ] slurp-deque ;
 
 : decompile ( word -- )
     f 2array 1array modify-code-heap ;
@@ -116,7 +119,9 @@ t compile-dependencies? set-global
 : compile-call ( quot -- )
     [ dup infer define-temp ] with-compilation-unit execute ;
 
-: optimized-recompile-hook ( words -- alist )
+SINGLETON: optimizing-compiler
+
+M: optimizing-compiler recompile ( words -- alist )
     [
         <hashed-dlist> compile-queue set
         H{ } clone compiled set
@@ -126,10 +131,10 @@ t compile-dependencies? set-global
     ] with-scope ;
 
 : enable-compiler ( -- )
-    [ optimized-recompile-hook ] recompile-hook set-global ;
+    optimizing-compiler compiler-impl set-global ;
 
 : disable-compiler ( -- )
-    [ default-recompile-hook ] recompile-hook set-global ;
+    f compiler-impl set-global ;
 
 : recompile-all ( -- )
     forget-errors all-words compile ;

@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays io io.styles kernel namespaces make
 parser prettyprint sequences words words.symbol assocs
@@ -93,44 +93,44 @@ M: word article-parent "help-parent" word-prop ;
 
 M: word set-article-parent swap "help-parent" set-word-prop ;
 
-: $doc-path ( article -- )
-    help-path [
-        [
-            help-path-style get [
-                "Parent topics: " write $links
-            ] with-style
-        ] ($block)
-    ] unless-empty ;
+: ($title) ( topic -- )
+    [ [ article-title ] [ >link ] bi write-object ] ($block) ;
+
+: $navigation-row ( content element label -- )
+    [ prefix 1array ] dip prefix , ;
+
+: $navigation-table ( topic -- )
+    [
+        [ help-path [ \ $links "Up:" $navigation-row ] unless-empty ]
+        [ prev-article [ 1array \ $long-link "Prev:" $navigation-row ] when* ]
+        [ next-article [ 1array \ $long-link "Next:" $navigation-row ] when* ]
+        tri
+    ] { } make [ $table ] unless-empty ;
 
 : $title ( topic -- )
     title-style get [
         title-style get [
-            dup [
-                dup article-title swap >link write-object
-            ] ($block) $doc-path
+            [ ($title) ]
+            [ help-path-style get [ $navigation-table ] with-style ] bi
         ] with-nesting
     ] with-style nl ;
 
 : print-topic ( topic -- )
     >link
-    last-element off dup $title
-    article-content print-content nl ;
+    last-element off
+    [ $title ] [ article-content print-content nl ] bi ;
 
 SYMBOL: help-hook
 
 help-hook [ [ print-topic ] ] initialize
 
 : help ( topic -- )
-    help-hook get call ;
+    help-hook get call( topic -- ) ;
 
 : about ( vocab -- )
     dup require
-    dup vocab [ ] [
-        "No such vocabulary: " prepend throw
-    ] ?if
-    dup vocab-help [
-        help
-    ] [
+    dup vocab [ ] [ no-vocab ] ?if
+    dup vocab-help [ help ] [
         "The " write vocab-name write
         " vocabulary does not define a main help article." print
         "To define one, refer to \\ ABOUT: help" print
@@ -140,7 +140,7 @@ help-hook [ [ print-topic ] ] initialize
     sort-articles [ \ $subsection swap 2array ] map print-element ;
 
 : $index ( element -- )
-    first call [ ($index) ] unless-empty ;
+    first call( -- seq ) [ ($index) ] unless-empty ;
 
 : $about ( element -- )
     first vocab-help [ 1array $subsection ] when* ;

@@ -20,7 +20,7 @@ HELP: enable-fhtml
 { $side-effects "responder" } ;
 
 ARTICLE: "http.server.static.extend" "Hooks for dynamic content"
-"The static responder can be extended for dynamic content by associating quotations with MIME types in the hashtable stored in the " { $slot "special" } " slot. The quotations have stack effect " { $snippet "( path -- )" } "."
+"The static responder can be extended for dynamic content by associating quotations with MIME types in the hashtable stored in the " { $slot "special" } " slot. The quotations have stack effect " { $snippet "( path -- response )" } "."
 $nl
 "A utility word uses the above feature to enable server-side " { $snippet ".fhtml" } " scripts, allowing a development style much like PHP:"
 { $subsection enable-fhtml }

@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov
+! Copyright (C) 2008, 2009 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors strings namespaces assocs hashtables io
 mirrors math fry sequences words continuations
@@ -96,7 +96,7 @@ C: <validation-error> validation-error
     >hashtable "validators" set-word-prop ;
 
 : validate ( value quot -- result )
-    [ <validation-error> ] recover ; inline
+    '[ _ call( value -- validated ) ] [ <validation-error> ] recover ;
 
 : validate-value ( name value quot -- )
     validate

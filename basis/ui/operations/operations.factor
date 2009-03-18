@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel ui.commands
-ui.gestures sequences strings math words generic namespaces make
+ui.gestures sequences strings math words generic namespaces
 hashtables help.markup quotations assocs fry linked-assocs ;
 IN: ui.operations
 
@@ -9,11 +9,10 @@ SYMBOL: +keyboard+
 SYMBOL: +primary+
 SYMBOL: +secondary+
 
-TUPLE: operation predicate command translator hook listener? ;
+TUPLE: operation predicate command translator listener? ;
 
 : <operation> ( predicate command -- operation )
     operation new
-        [ ] >>hook
         [ ] >>translator
         swap >>command
         swap >>predicate ;
@@ -38,18 +37,30 @@ operations [ <linked-hash> ] initialize
 
 : object-operations ( obj -- operations )
     operations get values
-    [ predicate>> call ] with filter ;
+    [ predicate>> call( obj -- ? ) ] with filter ;
+
+: gesture>operation ( gesture object -- operation/f )
+    object-operations [ operation-gesture = ] with find nip ;
 
 : find-operation ( obj quot -- command )
     [ object-operations ] dip find-last nip ; inline
 
+: primary-operation? ( operation -- ? )
+    command>> +primary+ word-prop ;
+
 : primary-operation ( obj -- operation )
-    [ command>> +primary+ word-prop ] find-operation ;
+    [ primary-operation? ] find-operation ;
+
+: invoke-primary-operation ( obj -- )
+    dup primary-operation invoke-command ;
 
 : secondary-operation ( obj -- operation )
     dup
     [ command>> +secondary+ word-prop ] find-operation
     [ ] [ primary-operation ] ?if ;
+
+: invoke-secondary-operation ( obj -- )
+    dup secondary-operation invoke-command ;
 
 : default-flags ( -- assoc )
     H{ { +keyboard+ f } { +primary+ f } { +secondary+ f } } ;
@@ -63,28 +74,23 @@ operations [ <linked-hash> ] initialize
     dupd define-command <operation>
     (define-operation) ;
 
-: modify-operation ( hook translator operation -- operation )
+: modify-operation ( translator operation -- operation )
     clone
         swap >>translator
-        swap >>hook
         t >>listener? ;
 
-: modify-operations ( operations hook translator -- operations )
-    '[ [ _ _ ] dip modify-operation ] map ;
+: modify-operations ( operations translator -- operations )
+    '[ [ _ ] dip modify-operation ] map ;
 
-: operations>commands ( object hook translator -- pairs )
-    [ object-operations ] 2dip modify-operations
+: operations>commands ( object translator -- pairs )
+    [ object-operations ] dip modify-operations
     [ [ operation-gesture ] keep ] { } map>assoc ;
 
-: define-operation-map ( class group blurb object hook translator -- )
+: define-operation-map ( class group blurb object translator -- )
     operations>commands define-command-map ;
 
 : operation-quot ( target command -- quot )
-    [
-        swap literalize ,
-        dup translator>> %
-        command>> ,
-    ] [ ] make ;
+    [ translator>> ] [ command>> ] bi '[ _ @ _ execute ] ;
 
 M: operation invoke-command ( target command -- )
-    [ hook>> call ] keep operation-quot call ;
+    operation-quot call( -- ) ;

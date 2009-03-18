@@ -1,96 +1,89 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays generic hashtables io kernel assocs math
-namespaces prettyprint sequences strings io.styles vectors words
-quotations mirrors splitting math.parser classes vocabs refs
-sets sorting summary debugger continuations fry ;
+namespaces prettyprint prettyprint.custom prettyprint.sections
+sequences strings io.styles vectors words quotations mirrors
+splitting math.parser classes vocabs sets sorting summary
+debugger continuations fry combinators ;
 IN: inspector
 
-: value-editor ( path -- )
-    [
-        [ pprint-short ] presented-printer set
-        dup presented-path set
-    ] H{ } make-assoc
-    [ get-ref pprint-short ] with-nesting ;
-
-SYMBOL: +sequence+
 SYMBOL: +number-rows+
-SYMBOL: +editable+
 
-: write-slot-editor ( path -- )
-    [
-        +editable+ get [
-            value-editor
-        ] [
-            get-ref pprint-short
-        ] if
-    ] with-cell ;
+: print-summary ( obj -- ) [ summary ] keep write-object ;
 
-: write-key ( mirror key -- )
-    +sequence+ get
-    [ 2drop ] [ <key-ref> write-slot-editor ] if ;
+<PRIVATE
 
-: write-value ( mirror key -- )
-    <value-ref> write-slot-editor ;
+: sort-unparsed-keys ( assoc -- alist )
+    >alist dup keys
+    [ unparse-short ] map
+    zip sort-values keys ;
 
-: describe-row ( mirror key n -- )
-    [
-        +number-rows+ get [ pprint-cell ] [ drop ] if
-        [ write-key ] [ write-value ] 2bi
-    ] with-row ;
+GENERIC: add-numbers ( alist -- table' )
 
-: summary. ( obj -- ) [ summary ] keep write-object nl ;
+M: enum add-numbers ;
 
-: sorted-keys ( assoc -- alist )
-    dup hashtable? [
-        keys
-        [ [ unparse-short ] keep ] { } map>assoc
-        sort-keys values
-    ] [ keys ] if ;
+M: assoc add-numbers
+    +number-rows+ get [
+        dup length [ prefix ] 2map
+    ] when ;
 
-: describe* ( obj mirror keys -- )
-    [ summary. ] 2dip
-    [ drop ] [
-        dup enum? [ +sequence+ on ] when
-        standard-table-style [
-            swap '[ [ _ ] 2dip describe-row ] each-index
-        ] tabular-output
-    ] if-empty ;
+TUPLE: slot-name name ;
 
-: describe ( obj -- )
-    dup make-mirror dup sorted-keys describe* ;
+M: slot-name pprint* name>> text ;
+
+GENERIC: fix-slot-names ( assoc -- assoc )
+
+M: assoc fix-slot-names >alist ;
+
+M: mirror fix-slot-names
+    [ [ slot-name boa ] dip ] { } assoc-map-as ;
+
+: (describe) ( obj assoc -- keys )
+    t pprint-string-cells? [
+        [ print-summary nl ] [
+            dup hashtable? [ sort-unparsed-keys ] when
+            [ fix-slot-names add-numbers simple-table. ] [ keys ] bi
+        ] bi*
+    ] with-variable ;
+
+PRIVATE>
+
+: describe ( obj -- ) dup make-mirror (describe) drop ;
 
 M: tuple error. describe ;
 
-: namestack. ( seq -- )
+: vars-in-scope ( seq -- alist )
     [ [ global eq? not ] filter [ keys ] gather ] keep
-    '[ dup _ assoc-stack ] H{ } map>assoc describe ;
+    '[ dup _ assoc-stack ] H{ } map>assoc ;
 
 : .vars ( -- )
-    namestack namestack. ;
+    namestack vars-in-scope describe ;
 
 : :vars ( -- )
-    error-continuation get name>> namestack. ;
+    error-continuation get name>> vars-in-scope describe ;
 
-SYMBOL: inspector-hook
+SYMBOL: me
 
-[ t +number-rows+ [ describe* ] with-variable ] inspector-hook set-global
+<PRIVATE
 
 SYMBOL: inspector-stack
 
-SYMBOL: me
+SYMBOL: sorted-keys
 
 : reinspect ( obj -- )
     [ me set ]
     [
-        dup make-mirror dup mirror set dup sorted-keys dup \ keys set
-        inspector-hook get call
+        dup make-mirror dup mirror set
+        t +number-rows+ [ (describe) ] with-variable
+        sorted-keys set
     ] bi ;
 
 : (inspect) ( obj -- )
     [ inspector-stack get push ] [ reinspect ] bi ;
 
-: key@ ( n -- key ) \ keys get nth ;
+PRIVATE>
+
+: key@ ( n -- key ) sorted-keys get nth ;
 
 : &push ( -- obj ) me get ;
 
@@ -98,7 +91,7 @@ SYMBOL: me
 
 : &back ( -- )
     inspector-stack get
-    dup length 1 <= [ drop ] [ dup pop* peek reinspect ] if ;
+    dup length 1 <= [ drop ] [ [ pop* ] [ peek reinspect ] bi ] if ;
 
 : &add ( value key -- ) mirror get set-at &push reinspect ;
 

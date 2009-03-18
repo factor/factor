@@ -54,7 +54,7 @@ SYMBOL: main-vocab-hook
     embedded? [
         "alien.remote-control"
     ] [
-        main-vocab-hook get [ call ] [ "listener" ] if*
+        main-vocab-hook get [ call( -- vocab ) ] [ "listener" ] if*
     ] if ;
 
 : default-cli-args ( -- )

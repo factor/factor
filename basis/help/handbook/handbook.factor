@@ -162,8 +162,7 @@ ARTICLE: "encodings-introduction" "An introduction to encodings"
 { $code "\"file.txt\" utf16 file-contents" }
 "Encoding descriptors are also used by " { $link "io.streams.byte-array" } " and taken by combinators like " { $link with-file-writer } " and " { $link with-byte-reader } " which deal with streams. It is " { $emphasis "not" } " used with " { $link "io.streams.string" } " because these deal with abstract text."
 $nl
-"When the " { $link binary } " encoding is used, a " { $link byte-array } " is expected for writing and returned for reading, since the stream deals with bytes. All other encodings deal with strings, since they are used to represent text."
-{ $see-also "stream-elements" } ;
+"When the " { $link binary } " encoding is used, a " { $link byte-array } " is expected for writing and returned for reading, since the stream deals with bytes. All other encodings deal with strings, since they are used to represent text." ;
 
 ARTICLE: "io" "Input and output"
 { $heading "Streams" }
@@ -194,6 +193,7 @@ ARTICLE: "io" "Input and output"
 ARTICLE: "tools" "Developer tools"
 { $subsection "tools.vocabs" }
 "Exploratory tools:"
+{ $subsection "see" }
 { $subsection "editor" }
 { $subsection "listener" }
 { $subsection "tools.crossref" }
@@ -288,6 +288,7 @@ $nl
 { $subsection "first-program" }
 { $subsection "handbook-language-reference" }
 { $subsection "handbook-environment-reference" }
+{ $subsection "ui" }
 { $subsection "handbook-library-reference" }
 "The below indices only include articles from loaded vocabularies. To explore more vocabularies, see " { $link "vocab-index" } "."
 { $subsection "article-index" }

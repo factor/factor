@@ -1,16 +1,16 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables help.markup help.stylesheet io
 io.styles kernel math models namespaces sequences ui ui.gadgets
-ui.gadgets.books ui.gadgets.panes ui.gestures ui.render
-parser accessors colors ;
+ui.gadgets.books ui.gadgets.panes ui.gestures ui.pens.gradient
+parser accessors colors fry ;
 IN: slides
 
 CONSTANT: stylesheet
     H{
         { default-span-style
             H{
-                { font "sans-serif" }
+                { font-name "sans-serif" }
                 { font-size 36 }
             }
         }
@@ -21,14 +21,14 @@ CONSTANT: stylesheet
         }
         { code-style
             H{
-                { font "monospace" }
+                { font-name "monospace" }
                 { font-size 36 }
                 { page-color T{ rgba f 0.4 0.4 0.4 0.3 } }
             }
         }
         { snippet-style
             H{
-                { font "monospace" }
+                { font-name "monospace" }
                 { font-size 36 }
                 { foreground T{ rgba f 0.1 0.1 0.4 1 } }
             }
@@ -39,11 +39,10 @@ CONSTANT: stylesheet
         { list-style
             H{ { table-gap { 10 20 } } }
         }
-        { bullet "\u0000b7" }
     }
 
 : $title ( string -- )
-    [ H{ { font "sans-serif" } { font-size 48 } } format ] ($block) ;
+    [ H{ { font-name "sans-serif" } { font-size 48 } } format ] ($block) ;
 
 : $divider ( -- )
     [
@@ -77,7 +76,7 @@ CONSTANT: stylesheet
 TUPLE: slides < book ;
 
 : <slides> ( slides -- gadget )
-    [ <page> ] map 0 <model> slides new-book ;
+    0 <model> slides new-book [ <page> add-gadget ] reduce ;
 
 : change-page ( book n -- )
     over control-value + over children>> length rem
@@ -99,9 +98,10 @@ TUPLE: slides < book ;
     parse-definition strip-tease [ parsed ] each ; parsing
 
 \ slides H{
+    { T{ button-down } [ request-focus ] }
     { T{ key-down f f "DOWN" } [ next-page ] }
     { T{ key-down f f "UP" } [ prev-page ] }
 } set-gestures
 
 : slides-window ( slides -- )
-    [ <slides> "Slides" open-window ] with-ui ;
+    '[ _ <slides> "Slides" open-window ] with-ui ;

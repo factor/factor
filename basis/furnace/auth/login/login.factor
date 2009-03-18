@@ -53,7 +53,7 @@ M: login-realm modify-form ( responder -- )
 
 \ successful-login DEBUG add-input-logging
 
-: logout ( -- )
+: logout ( -- response )
     permit-id get [ delete-permit ] when*
     URL" $realm" end-aside ;
 

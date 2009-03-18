@@ -220,7 +220,7 @@ M: assert error.
         5 line-limit set
         [ expect>> [ [ "Expect:" write ] with-cell pprint-cell ] with-row ]
         [ got>> [ [ "Got:" write ] with-cell pprint-cell ] with-row ] bi
-    ] tabular-output ;
+    ] tabular-output nl ;
 
 M: immutable summary drop "Sequence is immutable" ;
 
@@ -252,8 +252,8 @@ M: already-disposed summary drop "Attempting to operate on disposed object" ;
 M: no-current-vocab summary
     drop "Not in a vocabulary; IN: form required" ;
 
-M: no-word-error summary
-    drop "Word not found in current vocabulary search path" ;
+M: no-word-error error.
+    "No word named ``" write name>> write "'' found in current vocabulary search path" print ;
 
 M: staging-violation summary
     drop
@@ -325,3 +325,5 @@ M: bad-literal-tuple summary drop "Bad literal tuple" ;
 M: check-mixin-class summary drop "Not a mixin class" ;
 
 M: not-found-in-roots summary drop "Cannot resolve vocab: path" ;
+
+M: wrong-values summary drop "Quotation called with wrong stack effect" ;

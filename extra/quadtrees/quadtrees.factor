@@ -1,7 +1,6 @@
 ! (c) 2009 Joe Groff, see BSD license
-USING: assocs kernel math.geometry.rect combinators accessors
-math.vectors vectors sequences math math.points math.geometry
-combinators.short-circuit arrays fry ;
+USING: assocs kernel math.rectangles combinators accessors
+math.vectors vectors sequences math combinators.short-circuit arrays fry ;
 IN: quadtrees
 
 TUPLE: quadtree { bounds rect } point value ll lr ul ur leaf? ;
@@ -12,9 +11,9 @@ TUPLE: quadtree { bounds rect } point value ll lr ul ur leaf? ;
         t >>leaf? ;
 
 : rect-ll ( rect -- point ) loc>> ;
-: rect-lr ( rect -- point ) [ loc>> ] [ width  ] bi v+x ;
-: rect-ul ( rect -- point ) [ loc>> ] [ height ] bi v+y ;
-: rect-ur ( rect -- point ) [ loc>> ] [ dim>>  ] bi v+  ;
+: rect-lr ( rect -- point ) [ loc>> ] [ dim>> { 1 0 } v* ] bi v+ ;
+: rect-ul ( rect -- point ) [ loc>> ] [ dim>> { 0 1 } v* ] bi v+ ;
+: rect-ur ( rect -- point ) [ loc>> ] [ dim>>  ] bi v+ ;
 
 : rect-center ( rect -- point ) [ loc>> ] [ dim>> 0.5 v*n ] bi v+ ; inline
 
@@ -100,12 +99,12 @@ DEFER: in-rect*
     dup leaf?>> [ leaf-at-point ] [ node-at-point ] if ;
 
 : (node-in-rect*) ( values rect node -- values )
-    2dup bounds>> intersects? [ in-rect* ] [ 2drop ] if ;
+    2dup bounds>> contains-rect? [ in-rect* ] [ 2drop ] if ;
 : node-in-rect* ( values rect node -- values )
     [ (node-in-rect*) ] with each-quadrant ;
 
 : leaf-in-rect* ( values rect leaf -- values ) 
-    tuck { [ nip point>> ] [ point>> swap intersects? ] } 2&&
+    tuck { [ nip point>> ] [ point>> swap contains-point? ] } 2&&
     [ value>> over push ] [ drop ] if ;
 
 : in-rect* ( values rect tree -- values )
@@ -195,5 +194,5 @@ M: quadtree clear-assoc ( assoc -- )
 : swizzle ( sequence quot -- sequence' )
     [ dup ] dip map
     [ zip ] [ rect-containing <quadtree> ] bi
-    [ '[ first2 _ set-at ] each ] [ values ] bi ;
+    [ '[ first2 _ set-at ] each ] [ values ] bi ; inline
 

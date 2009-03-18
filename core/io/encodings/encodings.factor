@@ -47,6 +47,9 @@ M: object <decoder> f decoder boa ;
         ] when
     ] when nip ; inline
 
+M: decoder stream-element-type
+    drop +character+ ;
+
 M: decoder stream-read1
     dup >decoder< decode-char fix-read1 ;
 
@@ -61,9 +64,8 @@ M: decoder stream-read1
 : (read) ( n quot -- n string )
     over 0 <string> [
         [
-            slip over
-            [ swapd set-nth-unsafe f ] [ 3drop t ] if
-        ] 2curry find-integer
+            over [ swapd set-nth-unsafe f ] [ 3drop t ] if
+        ] curry compose find-integer
     ] keep ; inline
 
 : finish-read ( n string -- string/f )
@@ -74,7 +76,8 @@ M: decoder stream-read1
     } cond ; inline
 
 M: decoder stream-read
-    tuck >decoder< [ decode-char ] 2curry (read) finish-read fix-read ;
+    [ nip ] [ >decoder< [ decode-char ] 2curry (read) finish-read ] 2bi
+    fix-read ;
 
 M: decoder stream-read-partial stream-read ;
 
@@ -120,6 +123,9 @@ M: object <encoder> encoder boa ;
 
 : >encoder< ( encoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ; inline
+
+M: encoder stream-element-type
+    drop +character+ ;
 
 M: encoder stream-write1
     >encoder< encode-char ;

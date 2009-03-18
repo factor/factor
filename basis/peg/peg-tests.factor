@@ -5,6 +5,8 @@ USING: kernel tools.test strings namespaces make arrays sequences
        peg peg.private peg.parsers accessors words math accessors ;
 IN: peg.tests
 
+\ parse must-infer
+
 [ ] [ reset-pegs ] unit-test
 
 [

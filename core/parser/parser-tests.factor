@@ -3,7 +3,7 @@ io.streams.string namespaces classes effects source-files assocs
 sequences strings io.files io.pathnames definitions
 continuations sorting classes.tuple compiler.units debugger
 vocabs vocabs.loader accessors eval combinators lexer
-vocabs.parser words.symbol ;
+vocabs.parser words.symbol multiline ;
 IN: parser.tests
 
 \ run-file must-infer
@@ -402,9 +402,7 @@ IN: parser.tests
     [ t ] [ "foo" "parser.tests" lookup symbol? ] unit-test
 ] times
 
-[ "vocab:parser/test/assert-depth.factor" run-file ]
-[ got>> { 1 2 3 } sequence= ]
-must-fail-with
+[ "vocab:parser/test/assert-depth.factor" run-file ] must-fail
 
 2 [
     [ ] [
@@ -556,3 +554,37 @@ EXCLUDE: qualified.tests.bar => x ;
 
 [ "IN: qualified.tests RENAME: doesnotexist qualified.tests => blahx" eval ]
 [ error>> no-word-error? ] must-fail-with
+
+! Two similar bugs
+
+! Replace : def with something in << >>
+/* [ [ ] ] [
+    "IN: parser.tests : was-once-a-word-bug ( -- ) ;"
+    <string-reader> "was-once-a-word-test" parse-stream
+] unit-test
+
+[ t ] [ "was-once-a-word-bug" "parser.tests" lookup >boolean ] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests USE: words << \"was-once-a-word-bug\" \"parser.tests\" create [ ] (( -- )) define-declared >>"
+    <string-reader> "was-once-a-word-test" parse-stream
+] unit-test
+
+[ t ] [ "was-once-a-word-bug" "parser.tests" lookup >boolean ] unit-test */
+
+! Replace : def with DEFER:
+[ [ ] ] [
+    "IN: parser.tests : is-not-deferred ( -- ) ;"
+    <string-reader> "is-not-deferred" parse-stream
+] unit-test
+
+[ t ] [ "is-not-deferred" "parser.tests" lookup >boolean ] unit-test
+[ f ] [ "is-not-deferred" "parser.tests" lookup deferred? ] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests DEFER: is-not-deferred"
+    <string-reader> "is-not-deferred" parse-stream
+] unit-test
+
+[ t ] [ "is-not-deferred" "parser.tests" lookup >boolean ] unit-test
+[ t ] [ "is-not-deferred" "parser.tests" lookup deferred? ] unit-test

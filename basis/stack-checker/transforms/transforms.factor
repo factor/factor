@@ -1,19 +1,21 @@
-! Copyright (C) 2007, 2009 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors arrays kernel words sequences generic math
-namespaces make quotations assocs combinators classes.tuple
-classes.tuple.private effects summary hashtables classes generic
-sets definitions generic.standard slots.private continuations locals
+USING: fry accessors arrays kernel kernel.private combinators.private
+words sequences generic math namespaces make quotations assocs
+combinators classes.tuple classes.tuple.private effects summary
+hashtables classes generic sets definitions generic.standard
+slots.private continuations locals generalizations
 stack-checker.backend stack-checker.state stack-checker.visitor
 stack-checker.errors stack-checker.values
 stack-checker.recursive-state ;
 IN: stack-checker.transforms
 
 : give-up-transform ( word -- )
-    dup recursive-word?
-    [ call-recursive-word ]
-    [ dup infer-word apply-word/effect ]
-    if ;
+    {
+        { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
+        { [ dup recursive-word? ] [ call-recursive-word ] }
+        [ dup infer-word apply-word/effect ]
+    } cond ;
 
 :: ((apply-transform)) ( word quot values stack rstate -- )
     rstate recursive-state
@@ -140,8 +142,12 @@ CONSTANT: bit-member-n 256
     dup bit-member? [
         bit-member-quot
     ] [
-        [ literalize [ t ] ] { } map>assoc
-        [ drop f ] suffix [ case ] curry
+        dup length 4 <= [
+            [ drop f ] swap
+            [ literalize [ t ] ] { } map>assoc linear-case-quot
+        ] [
+            unique [ key? ] curry
+        ] if
     ] if ;
 
 \ member? [
@@ -154,4 +160,13 @@ CONSTANT: bit-member-n 256
 
 \ memq? [
     dup sequence? [ memq-quot ] [ drop f ] if
+] 1 define-transform
+
+! Shuffling
+: nths-quot ( indices -- quot )
+    [ [ '[ _ swap nth ] ] map ] [ length ] bi
+    '[ _ cleave _ narray ] ;
+
+\ shuffle [
+    shuffle-mapping nths-quot
 ] 1 define-transform
