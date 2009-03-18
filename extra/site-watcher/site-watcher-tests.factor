@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: db.tuples locals site-watcher site-watcher.db
-site-watcher.private kernel ;
+site-watcher.private kernel db io.directories io.files.temp
+continuations ;
 IN: site-watcher.tests
 
 : site-watcher-path ( -- path ) "site-watcher.db" temp-file ; inline
