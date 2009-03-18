@@ -32,7 +32,6 @@ void signal_error(int signal, F_STACK_FRAME *native_stack);
 void type_error(CELL type, CELL tagged);
 void not_implemented_error(void);
 
-void primitive_throw(void);
 void primitive_call_clear(void);
 
 INLINE void type_check(CELL type, CELL tagged)

@@ -110,7 +110,7 @@ HELP: command-string
 { $values { "gesture" "a gesture" } { "command" "a command" } { "string" string } }
 { $description "Outputs a string containing the command name followed by the gesture." }
 { $examples
-    { $example
+    { $unchecked-example
         "USING: io ui.commands ui.gestures ;"
         "IN: scratchpad"
         ": com-my-command ;"

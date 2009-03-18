@@ -485,8 +485,13 @@ HELP: CHAR:
 HELP: "
 { $syntax "\"string...\"" }
 { $values { "string" "literal and escaped characters" } }
-{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", and appends the resulting string to the parse tree. String literals cannot span multiple lines. Strings containing the " { $link POSTPONE: " } " character and various other special characters can be read by inserting escape sequences." }
-{ $examples { $example "USE: io" "\"Hello\\nworld\" print" "Hello\nworld" } } ;
+{ $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", and appends the resulting string to the parse tree. String literals cannot span multiple lines. Strings containing the " { $link POSTPONE: " } " character and various other special characters can be read by inserting " { $link "escape" } "." }
+{ $examples
+  "A string with a newline in it:"
+  { $example "USE: io" "\"Hello\\nworld\" print" "Hello\nworld" }
+  "A string with a named Unicode code point:"
+  { $example "USE: io" "\"\\u{greek-capital-letter-sigma}\" print" "\u{greek-capital-letter-sigma}" }
+} ;
 
 HELP: SBUF"
 { $syntax "SBUF\" string... \"" }
@@ -758,12 +763,6 @@ HELP: >>
 
 HELP: call-next-method
 { $description "Calls the next applicable method. Only valid inside a method definition. The values at the top of the stack are passed on to the next method, and they must be compatible with that method's class specializer." }
-{ $notes "This is syntax sugar around " { $link (call-next-method) } ". The following two lines are equivalent:"
-    { $code
-        "M: my-class my-generic ... call-next-method ... ;"
-        "M: my-class my-generic ... \\ my-class \\ my-generic (call-next-method) ... ;"
-    }
-"In most cases, this word should be called with the original input values on the stack. Calling it with other values is usually a sign of poor design." }
 { $errors
     "Throws a " { $link no-next-method } " error if this is the least specific method, and throws an " { $link inconsistent-next-method } " error if the values at the top of the stack are not compatible with the current method's specializer."
 } ;
@@ -771,3 +770,13 @@ HELP: call-next-method
 { POSTPONE: call-next-method (call-next-method) next-method } related-words
 
 { POSTPONE: << POSTPONE: >> } related-words
+
+HELP: call(
+{ $syntax "call( stack -- effect )" }
+{ $description "Calls the quotation on the top of the stack, asserting that it has the given stack effect. The quotation does not need to be known at compile time." } ;
+
+HELP: execute(
+{ $syntax "execute( stack -- effect )" }
+{ $description "Calls the word on the top of the stack, asserting that it has the given stack effect. The word does not need to be known at compile time." } ;
+
+{ POSTPONE: call( POSTPONE: execute( } related-words

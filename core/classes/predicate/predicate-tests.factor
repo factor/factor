@@ -1,4 +1,4 @@
-USING: math tools.test classes.algebra ;
+USING: math tools.test classes.algebra words kernel sequences assocs ;
 IN: classes.predicate
 
 PREDICATE: negative < integer 0 < ;

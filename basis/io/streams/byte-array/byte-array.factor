@@ -2,8 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays byte-vectors kernel io.encodings io.streams.string
 sequences io namespaces io.encodings.private accessors sequences.private
-io.streams.sequence destructors ;
+io.streams.sequence destructors math combinators ;
 IN: io.streams.byte-array
+
+M: byte-vector stream-element-type drop +byte+ ;
 
 : <byte-writer> ( encoding -- stream )
     512 <byte-vector> swap <encoder> ;
@@ -14,11 +16,21 @@ IN: io.streams.byte-array
 
 TUPLE: byte-reader { underlying byte-array read-only } { i array-capacity } ;
 
+M: byte-reader stream-element-type drop +byte+ ;
+
 M: byte-reader stream-read-partial stream-read ;
 M: byte-reader stream-read sequence-read ;
 M: byte-reader stream-read1 sequence-read1 ;
 M: byte-reader stream-read-until sequence-read-until ;
 M: byte-reader dispose drop ;
+
+M: byte-reader stream-seek ( n seek-type stream -- )
+    swap {
+        { seek-absolute [ (>>i) ] }
+        { seek-relative [ [ + ] change-i drop ] }
+        { seek-end [ dup underlying>> length >>i [ + ] change-i drop ] }
+        [ bad-seek-type ]
+    } case ;
 
 : <byte-reader> ( byte-array encoding -- stream )
     [ B{ } like 0 byte-reader boa ] dip <decoder> ;

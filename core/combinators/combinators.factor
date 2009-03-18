@@ -1,9 +1,33 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
 hashtables sorting words sets math.order make ;
 IN: combinators
+
+<PRIVATE
+
+: call-effect-unsafe ( quot effect -- ) drop call ;
+
+: execute-effect-unsafe ( word effect -- ) drop execute ;
+
+M: object throw 5 getenv [ die ] or (( error -- * )) call-effect-unsafe ;
+
+PRIVATE>
+
+ERROR: wrong-values effect ;
+
+! We can't USE: effects here so we forward reference slots instead
+SLOT: in
+SLOT: out
+
+: call-effect ( quot effect -- )
+    [ [ datastack ] dip dip ] dip
+    [ in>> length ] [ out>> length ] [ ] tri [ check-datastack ] dip
+    [ wrong-values ] curry unless ;
+
+: execute-effect ( word effect -- )
+    [ [ execute ] curry ] dip call-effect ;
 
 ! cleave
 : cleave ( x seq -- )

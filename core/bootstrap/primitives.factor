@@ -25,7 +25,8 @@ H{ } clone sub-primitives set
     { "linux-ppc" "ppc/linux" }
     { "macosx-ppc" "ppc/macosx" }
     { "arm" "arm" }
-} at "/bootstrap.factor" 3append parse-file
+} ?at [ "Bad architecture: " prepend throw ] unless
+"/bootstrap.factor" 3append parse-file
 
 "vocab:bootstrap/layouts/layouts.factor" parse-file
 
@@ -36,7 +37,7 @@ H{ } clone sub-primitives set
     dictionary
     new-classes
     changed-definitions changed-generics
-    remake-generics forgotten-definitions
+    outdated-generics forgotten-definitions
     root-cache source-files update-map implementors-map
 } [ H{ } clone swap set ] each
 
@@ -45,9 +46,7 @@ init-caches
 ! Vocabulary for slot accessors
 "accessors" create-vocab drop
 
-! Trivial recompile hook. We don't want to touch the code heap
-! during stage1 bootstrap, it would just waste time.
-[ drop { } ] recompile-hook set
+dummy-compiler compiler-impl set
 
 call
 call
@@ -140,9 +139,6 @@ bootstrapping? on
 "alien" "alien" create register-builtin
 "word" "words" create register-builtin
 "byte-array" "byte-arrays" create register-builtin
-
-! For predicate classes
-"predicate-instance?" "classes.predicate" create drop
 
 ! We need this before defining c-ptr below
 "f" "syntax" lookup { } define-builtin
@@ -244,6 +240,8 @@ bi
 "quotation" "quotations" create {
     { "array" { "array" "arrays" } read-only }
     { "compiled" read-only }
+    "cached-effect"
+    "cache-counter"
 } define-builtin
 
 "dll" "alien" create {
@@ -492,7 +490,6 @@ tuple
     { "set-alien-double" "alien.accessors" }
     { "alien-cell" "alien.accessors" }
     { "set-alien-cell" "alien.accessors" }
-    { "(throw)" "kernel.private" }
     { "alien-address" "alien" }
     { "set-slot" "slots.private" }
     { "string-nth" "strings.private" }
@@ -534,6 +531,7 @@ tuple
     { "gc-reset" "memory" }
     { "jit-compile" "quotations" }
     { "load-locals" "locals.backend" }
+    { "check-datastack" "kernel.private" }
 }
 [ [ first2 ] dip make-primitive ] each-index
 

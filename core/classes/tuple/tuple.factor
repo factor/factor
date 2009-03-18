@@ -4,7 +4,7 @@ USING: arrays definitions hashtables kernel kernel.private math
 namespaces make sequences sequences.private strings vectors
 words quotations memory combinators generic classes
 classes.algebra classes.builtin classes.private slots.private
-slots compiler.units math.private accessors assocs effects ;
+slots math.private accessors assocs effects ;
 IN: classes.tuple
 
 PREDICATE: tuple-class < class
@@ -188,6 +188,8 @@ ERROR: bad-superclass class ;
 : apply-slot-permutation ( old-values triples -- new-values )
     [ first3 update-slot ] with map ;
 
+SYMBOL: outdated-tuples
+
 : permute-slots ( old-values layout -- new-values )
     [ first all-slots ] [ outdated-tuples get at ] bi
     compute-slot-permutation
@@ -211,8 +213,6 @@ ERROR: bad-superclass class ;
         [ outdated-tuple? ] curry instances
         dup [ update-tuple ] map become
     ] if ;
-
-[ update-tuples ] update-tuples-hook set-global
 
 : update-tuples-after ( class -- )
     [ all-slots ] [ tuple-layout ] bi outdated-tuples get set-at ;
@@ -251,9 +251,9 @@ M: tuple-class update-class
     3bi ;
 
 : tuple-class-unchanged? ( class superclass slots -- ? )
-    [ over ] dip
     [ [ superclass ] [ bootstrap-word ] bi* = ]
-    [ [ "slots" word-prop ] dip = ] 2bi* and ;
+    [ [ "slots" word-prop ] dip = ]
+    bi-curry* bi and ;
 
 : valid-superclass? ( class -- ? )
     [ tuple-class? ] [ tuple eq? ] bi or ;
@@ -278,7 +278,7 @@ M: tuple-class (define-tuple-class)
     [ 3drop ] [ redefine-tuple-class ] if ;
 
 : thrower-effect ( slots -- effect )
-    [ dup array? [ first ] when ] map f <effect> t >>terminated? ;
+    [ dup array? [ first ] when ] map { "*" } <effect> ;
 
 : define-error-class ( class superclass slots -- )
     [ define-tuple-class ]

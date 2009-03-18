@@ -298,7 +298,7 @@ SYMBOL: delayed
   #! Work through all delayed parsers and recompile their
   #! words to have the correct bodies.
   delayed get [
-    call compile-parser 1quotation (( -- result )) define-declared
+    call( -- parser ) compile-parser 1quotation (( -- result )) define-declared
   ] assoc-each ;
 
 : compile ( parser -- word )
@@ -309,7 +309,7 @@ SYMBOL: delayed
   ] with-compilation-unit ;
 
 : compiled-parse ( state word -- result )
-  swap [ execute [ error-stack get first throw ] unless* ] with-packrat ; inline 
+  swap [ execute( -- result ) [ error-stack get first throw ] unless* ] with-packrat ;
 
 : (parse) ( input parser -- result )
   dup word? [ compile ] unless compiled-parse ;
@@ -527,7 +527,7 @@ M: box-parser (compile) ( peg -- quot )
   #! to produce the parser to be compiled.
   #! This differs from 'delay' which calls
   #! it at run time.
-  quot>> call compile-parser 1quotation ;
+  quot>> call( -- parser ) compile-parser 1quotation ;
 
 PRIVATE>
 

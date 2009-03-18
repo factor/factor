@@ -135,4 +135,4 @@ SYMBOL: exit-continuation
     exit-continuation get continue-with ;
 
 : with-exit-continuation ( quot -- value )
-    '[ exit-continuation set @ ] callcc1 exit-continuation off ;
+    '[ exit-continuation set @ ] callcc1 exit-continuation off ; inline

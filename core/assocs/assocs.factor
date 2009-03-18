@@ -20,7 +20,7 @@ GENERIC: >alist ( assoc -- newassoc )
 M: assoc assoc-like drop ;
 
 : ?at ( key assoc -- value/key ? )
-    dupd at* [ [ nip ] [ drop ] if ] keep ; inline
+    2dup at* [ 2nip t ] [ 2drop f ] if ; inline
 
 <PRIVATE
 
@@ -41,7 +41,7 @@ M: assoc assoc-like drop ;
 : substituter ( assoc -- quot )
     [ ?at drop ] curry ; inline
 
-: with-assoc ( assoc quot: ( value key -- assoc ) -- quot: ( key value -- ) )
+: with-assoc ( assoc quot: ( value key assoc -- ) -- quot: ( key value -- ) )
     curry [ swap ] prepose ; inline
 
 PRIVATE>
@@ -71,7 +71,7 @@ PRIVATE>
 
 : assoc-partition ( assoc quot -- true-assoc false-assoc )
     [ (assoc-each) partition ] [ drop ] 2bi
-    tuck [ assoc-like ] 2bi@ ; inline
+    [ assoc-like ] curry bi@ ; inline
 
 : assoc-any? ( assoc quot -- ? )
     assoc-find 2nip ; inline

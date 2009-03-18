@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar kernel math math.order math.parser namespaces
 parser sequences strings assocs hashtables debugger mime.types
@@ -42,7 +42,9 @@ TUPLE: file-responder root hook special allow-listings ;
 
 : serve-static ( filename mime-type -- response )
     over modified-since?
-    [ file-responder get hook>> call ] [ 2drop <304> ] if ;
+    [ file-responder get hook>> call( filename mime-type -- response ) ]
+    [ 2drop <304> ]
+    if ;
 
 : serving-path ( filename -- filename )
     [ file-responder get root>> trim-tail-separators "/" ] dip
@@ -51,7 +53,7 @@ TUPLE: file-responder root hook special allow-listings ;
 : serve-file ( filename -- response )
     dup mime-type
     dup file-responder get special>> at
-    [ call ] [ serve-static ] ?if ;
+    [ call( filename -- response ) ] [ serve-static ] ?if ;
 
 \ serve-file NOTICE add-input-logging
 

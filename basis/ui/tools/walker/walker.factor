@@ -1,14 +1,14 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel concurrency.messaging inspector
 ui.tools.listener ui.tools.traceback ui.gadgets.buttons
 ui.gadgets.status-bar ui.gadgets.tracks ui.commands ui.gadgets
-models models.filter ui.tools.workspace ui.gestures
+models models.arrow ui.tools.browser ui.tools.common ui.gestures
 ui.gadgets.labels ui threads namespaces make tools.walker assocs
 combinators fry ;
 IN: ui.tools.walker
 
-TUPLE: walker-gadget < track
+TUPLE: walker-gadget < tool
 status continuation thread
 traceback
 closing? ;
@@ -53,10 +53,10 @@ M: walker-gadget focusable-child*
     ] "" make ;
 
 : <thread-status> ( model thread -- gadget )
-    '[ _ walker-state-string ] <filter> <label-control> ;
+    '[ _ walker-state-string ] <arrow> <label-control> ;
 
 : <walker-gadget> ( status continuation thread -- gadget )
-    { 0 1 } walker-gadget new-track
+    vertical walker-gadget new-track
         swap >>thread
         swap >>continuation
         swap >>status
@@ -66,7 +66,7 @@ M: walker-gadget focusable-child*
         dup status>> self <thread-status> f track-add
         dup traceback>> 1 track-add ;
     
-: walker-help ( -- ) "ui-walker" help-window ;
+: walker-help ( -- ) "ui-walker" com-browse ;
 
 \ walker-help H{ { +nullary+ t } } define-command
 
@@ -79,6 +79,15 @@ walker-gadget "toolbar" f {
     { T{ key-down f f "a" } com-abandon }
     { T{ key-down f f "d" } close-window }
     { T{ key-down f f "F1" } walker-help }
+} define-command-map
+
+walker-gadget "multitouch" f {
+    { left-action com-back }
+    { right-action com-step }
+    { up-action com-out }
+    { down-action com-into }
+    { zoom-out-action close-window }
+    { zoom-in-action com-abandon }
 } define-command-map
 
 : walker-for-thread? ( thread gadget -- ? )
@@ -96,5 +105,5 @@ walker-gadget "toolbar" f {
 
 [
     dup find-walker-window dup
-    [ raise-window 3drop ] [ drop [ walker-window ] with-ui ] if
+    [ raise-window 3drop ] [ drop '[ _ _ _ walker-window ] with-ui ] if
 ] show-walker-hook set-global

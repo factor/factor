@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private accessors math
 math.order combinators hints arrays ;
@@ -16,14 +16,19 @@ IN: binary-search
     [ [ from>> ] [ midpoint@ ] bi + ] [ seq>> ] bi
     [ drop ] [ dup ] [ ] tri* nth ; inline
 
+DEFER: (search)
+
+: keep-searching ( seq quot -- slice )
+    [ dup midpoint@ ] dip call collapse-slice slice boa (search) ; inline
+
 : (search) ( quot: ( elt -- <=> ) seq -- i elt )
     dup length 1 <= [
         finish
     ] [
         decide {
             { +eq+ [ finish ] }
-            { +lt+ [ dup midpoint@ head-slice (search) ] }
-            { +gt+ [ dup midpoint@ tail-slice (search) ] }
+            { +lt+ [ [ (head) ] keep-searching ] }
+            { +gt+ [ [ (tail) ] keep-searching ] }
         } case
     ] if ; inline recursive
 

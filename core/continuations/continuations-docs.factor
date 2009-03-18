@@ -83,7 +83,6 @@ $nl
 { $subsection with-return }
 "Reflecting the datastack:"
 { $subsection with-datastack }
-{ $subsection assert-depth }
 "Continuations serve as the building block for a number of higher-level abstractions, such as " { $link "errors" } " and " { $link "threads" } "."
 { $subsection "continuations.private" } ;
 
@@ -217,10 +216,6 @@ HELP: with-datastack
     { $example "USING: continuations math prettyprint ;" "{ 3 7 } [ + ] with-datastack ." "{ 10 }" }
 } ;
 
-HELP: assert-depth
-{ $values { "quot" "a quotation" } }
-{ $description "Runs a quotation. Throws an error if the quotation attempts to take input values from the stack, or leave outputs on the stack." } ;
-
 HELP: attempt-all
 { $values
      { "seq" sequence } { "quot" quotation }
@@ -270,3 +265,8 @@ HELP: with-return
 } } ;
 
 { return with-return } related-words
+
+HELP: restart
+{ $values { "restart" restart } }
+{ $description "Invokes a restart." }
+{ $class-description "The class of restarts." } ;

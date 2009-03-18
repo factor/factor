@@ -1,11 +1,14 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs io kernel math models namespaces make
-dlists deques sequences threads sequences words ui.gadgets
-ui.gadgets.worlds ui.gadgets.tracks ui.gestures ui.backend
-ui.render continuations init combinators hashtables
-concurrency.flags sets accessors calendar call ;
+USING: arrays assocs io kernel math models namespaces make dlists
+deques sequences threads sequences words continuations init
+combinators hashtables concurrency.flags sets accessors calendar fry
+destructors ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.gadgets.tracks ui.gestures ui.backend ui.render ui.text
+ui.text.private ;
 IN: ui
+
+<PRIVATE
 
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
@@ -35,8 +38,8 @@ SYMBOL: windows
 
 : focus-gestures ( new old -- )
     drop-prefix <reversed>
-    T{ lose-focus } swap each-gesture
-    T{ gain-focus } swap each-gesture ;
+    lose-focus swap each-gesture
+    gain-focus swap each-gesture ;
 
 : focus-world ( world -- )
     t >>focused?
@@ -55,25 +58,21 @@ M: world graft*
 : reset-world ( world -- )
     #! This is used when a window is being closed, but also
     #! when restoring saved worlds on image startup.
-    [ fonts>> clear-assoc ]
-    [ unfocus-world ]
-    [ f >>handle drop ] tri ;
+    f >>handle unfocus-world ;
 
 : (ungraft-world) ( world -- )
-    [ free-fonts ]
-    [ hand-clicked close-global ]
-    [ hand-gadget close-global ] tri ;
+    {
+        [ handle>> select-gl-context ]
+        [ text-handle>> dispose ]
+        [ images>> [ dispose ] when* ]
+        [ hand-clicked close-global ]
+        [ hand-gadget close-global ]
+    } cleave ;
 
 M: world ungraft*
     [ (ungraft-world) ]
     [ handle>> (close-window) ]
     [ reset-world ] tri ;
-
-: find-window ( quot -- world )
-    windows get values
-    [ gadget-child swap call ] with find-last nip ; inline
-
-SYMBOL: ui-hook
 
 : init-ui ( -- )
     <dlist> \ graft-queue set-global
@@ -94,15 +93,12 @@ SYMBOL: ui-hook
     children>> [ restore-gadget ] each ;
 
 : restore-world ( world -- )
-    dup reset-world restore-gadget ;
-
-: restore-windows ( -- )
-    windows get [ values ] keep delete-all
-    [ restore-world ] each
-    forget-rollover ;
-
-: restore-windows? ( -- ? )
-    windows get empty? not ;
+    {
+        [ reset-world ]
+        [ init-text-rendering ]
+        [ f >>images drop ]
+        [ restore-gadget ]
+    } cleave ;
 
 : update-hand ( world -- )
     dup hand-world get-global eq?
@@ -119,28 +115,15 @@ SYMBOL: ui-hook
 : redraw-worlds ( seq -- )
     [ dup update-hand draw-world ] each ;
 
-: notify ( gadget -- )
-    dup graft-state>>
-    [ first { f f } { t t } ? >>graft-state ] keep
-    {
-        { { f t } [ dup activate-control graft* ] }
-        { { t f } [ dup deactivate-control ungraft* ] }
-    } case ;
-
-: notify-queued ( -- )
-    graft-queue [ notify ] slurp-deque ;
-
 : send-queued-gestures ( -- )
     gesture-queue [ send-queued-gesture notify-queued ] slurp-deque ;
 
 : update-ui ( -- )
     [
-        [
-            notify-queued
-            layout-queued
-            redraw-worlds
-            send-queued-gestures
-        ] call( -- )
+        notify-queued
+        layout-queued
+        redraw-worlds
+        send-queued-gestures
     ] [ ui-error ] recover ;
 
 SYMBOL: ui-thread
@@ -149,8 +132,16 @@ SYMBOL: ui-thread
     t \ ui-running set-global
     [ f \ ui-running set-global ] [ ] cleanup ; inline
 
+PRIVATE>
+
+: find-window ( quot -- world )
+    windows get values
+    [ gadget-child swap call ] with find-last nip ; inline
+
 : ui-running? ( -- ? )
     \ ui-running get-global ;
+
+<PRIVATE
 
 : update-ui-loop ( -- )
     [ ui-running? ui-thread get-global self eq? and ]
@@ -160,6 +151,21 @@ SYMBOL: ui-thread
 : start-ui-thread ( -- )
     [ self ui-thread set-global update-ui-loop ]
     "UI update" spawn drop ;
+
+: start-ui ( quot -- )
+    call( -- ) notify-ui-thread start-ui-thread ;
+
+: restore-windows ( -- )
+    [
+        windows get [ values ] [ delete-all ] bi
+        [ restore-world ] each
+        forget-rollover
+    ] (with-ui) ;
+
+: restore-windows? ( -- ? )
+    windows get empty? not ;
+
+PRIVATE>
 
 : open-world-window ( world -- )
     dup pref-dim >>dim dup relayout graft ;
@@ -181,30 +187,12 @@ HOOK: close-window ui-backend ( gadget -- )
 M: object close-window
     find-world [ ungraft ] when* ;
 
-: start-ui ( -- )
-    restore-windows? [
-        restore-windows
-    ] [
-        init-ui ui-hook get call
-    ] if
-    notify-ui-thread start-ui-thread ;
-
 [
     f \ ui-running set-global
     <flag> ui-notify-flag set-global
 ] "ui" add-init-hook
 
-HOOK: ui ui-backend ( -- )
-
-MAIN: ui
-
 : with-ui ( quot -- )
-    ui-running? [
-        call
-    ] [
-        f windows set-global
-        [
-            ui-hook set
-            ui
-        ] with-scope
-    ] if ;
+    ui-running? [ call( -- ) ] [ '[ init-ui @ ] (with-ui) ] if ;
+
+HOOK: beep ui-backend ( -- )

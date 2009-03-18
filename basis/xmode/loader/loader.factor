@@ -1,56 +1,54 @@
 USING: xmode.loader.syntax xmode.tokens xmode.rules
 xmode.keyword-map xml.data xml.traversal xml assocs kernel
 combinators sequences math.parser namespaces parser
-xmode.utilities parser-combinators.regexp io.files accessors ;
+xmode.utilities regexp io.files accessors xml.syntax ;
 IN: xmode.loader
 
 ! Based on org.gjt.sp.jedit.XModeHandler
 
 ! RULES and its children
-<TAGS: parse-rule-tag ( rule-set tag -- )
+TAGS: parse-rule-tag ( rule-set tag -- )
 
-TAG: PROPS
+TAG: PROPS parse-rule-tag
     parse-props-tag >>props drop ;
 
-TAG: IMPORT
+TAG: IMPORT parse-rule-tag
     "DELEGATE" attr swap import-rule-set ;
 
-TAG: TERMINATE
+TAG: TERMINATE parse-rule-tag
     "AT_CHAR" attr string>number >>terminate-char drop ;
 
-RULE: SEQ seq-rule
+RULE: SEQ seq-rule parse-rule-tag
     shared-tag-attrs delegate-attr literal-start ;
 
-RULE: SEQ_REGEXP seq-rule
+RULE: SEQ_REGEXP seq-rule parse-rule-tag
     shared-tag-attrs delegate-attr regexp-attr regexp-start ;
 
-RULE: SPAN span-rule
+RULE: SPAN span-rule parse-rule-tag
     shared-tag-attrs delegate-attr match-type-attr span-attrs parse-begin/end-tags init-span-tag ;
 
-RULE: SPAN_REGEXP span-rule
+RULE: SPAN_REGEXP span-rule parse-rule-tag
     shared-tag-attrs delegate-attr match-type-attr span-attrs regexp-attr parse-begin/end-tags init-span-tag ;
 
-RULE: EOL_SPAN eol-span-rule
+RULE: EOL_SPAN eol-span-rule parse-rule-tag
     shared-tag-attrs delegate-attr match-type-attr literal-start init-eol-span-tag ;
 
-RULE: EOL_SPAN_REGEXP eol-span-rule
+RULE: EOL_SPAN_REGEXP eol-span-rule parse-rule-tag
     shared-tag-attrs delegate-attr match-type-attr regexp-attr regexp-start init-eol-span-tag ;
 
-RULE: MARK_FOLLOWING mark-following-rule
+RULE: MARK_FOLLOWING mark-following-rule parse-rule-tag
     shared-tag-attrs match-type-attr literal-start ;
 
-RULE: MARK_PREVIOUS mark-previous-rule
+RULE: MARK_PREVIOUS mark-previous-rule parse-rule-tag
     shared-tag-attrs match-type-attr literal-start ;
 
-TAG: KEYWORDS ( rule-set tag -- key value )
+TAG: KEYWORDS parse-rule-tag
     rule-set get ignore-case?>> <keyword-map>
-    swap child-tags [ over parse-keyword-tag ] each
+    swap children-tags [ over parse-keyword-tag ] each
     swap (>>keywords) ;
 
-TAGS>
-
 : ?<regexp> ( string/f -- regexp/f )
-    dup [ rule-set get ignore-case?>> <regexp> ] when ;
+    dup [ rule-set get ignore-case?>> <?insensitive-regexp> ] when ;
 
 : (parse-rules-tag) ( tag -- rule-set )
     <rule-set> dup rule-set set
@@ -66,7 +64,7 @@ TAGS>
 
 : parse-rules-tag ( tag -- rule-set )
     [
-        [ (parse-rules-tag) ] [ child-tags ] bi
+        [ (parse-rules-tag) ] [ children-tags ] bi
         [ parse-rule-tag ] with each
         rule-set get
     ] with-scope ;

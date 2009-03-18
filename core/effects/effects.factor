@@ -1,17 +1,17 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.parser namespaces make sequences strings
 words assocs combinators accessors arrays ;
 IN: effects
 
-TUPLE: effect in out terminated? ;
+TUPLE: effect { in read-only } { out read-only } { terminated? read-only } ;
 
 : <effect> ( in out -- effect )
     dup { "*" } sequence= [ drop { } t ] [ f ] if
     effect boa ;
 
 : effect-height ( effect -- n )
-    [ out>> length ] [ in>> length ] bi - ;
+    [ out>> length ] [ in>> length ] bi - ; inline
 
 : effect<= ( eff1 eff2 -- ? )
     {
@@ -20,10 +20,11 @@ TUPLE: effect in out terminated? ;
         { [ 2dup [ in>> length ] bi@ > ] [ f ] }
         { [ 2dup [ effect-height ] bi@ = not ] [ f ] }
         [ t ]
-    } cond 2nip ;
+    } cond 2nip ; inline
 
 GENERIC: effect>string ( obj -- str )
 M: string effect>string ;
+M: object effect>string drop "object" ;
 M: word effect>string name>> ;
 M: integer effect>string number>string ;
 M: pair effect>string first2 [ effect>string ] bi@ ": " glue ;
@@ -57,11 +58,11 @@ M: effect clone
 : split-shuffle ( stack shuffle -- stack1 stack2 )
     in>> length cut* ;
 
-: load-shuffle ( stack shuffle -- )
-    in>> [ set ] 2each ;
-
-: shuffled-values ( shuffle -- values )
-    out>> [ get ] map ;
+: shuffle-mapping ( effect -- mapping )
+    [ out>> ] [ in>> ] bi [ index ] curry map ;
 
 : shuffle ( stack shuffle -- newstack )
-    [ [ load-shuffle ] keep shuffled-values ] with-scope ;
+    shuffle-mapping swap nths ;
+
+: add-effect-input ( effect -- effect' )
+    [ in>> "obj" suffix ] [ out>> ] [ terminated?>> ] tri effect boa ;

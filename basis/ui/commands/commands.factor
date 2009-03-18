@@ -56,7 +56,7 @@ TR: convert-command-name "-" " " ;
 
 M: word command-name ( word -- str )
     name>> 
-    "com-" ?head drop
+    "com-" ?head drop "." ?tail drop
     dup first Letter? [ rest ] unless
     (command-name) ;
 
@@ -70,11 +70,11 @@ M: word command-description ( word -- str )
     [ props>> ] [ default-flags swap assoc-union ] bi* update ;
 
 : command-quot ( target command -- quot )
-    dup 1quotation swap +nullary+ word-prop
+    [ 1quotation ] [ +nullary+ word-prop ] bi
     [ nip ] [ curry ] if ;
 
 M: word invoke-command ( target command -- )
-    command-quot call ;
+    command-quot call( -- ) ;
 
 M: word command-word ;
 

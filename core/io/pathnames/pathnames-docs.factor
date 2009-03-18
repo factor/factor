@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io.backend io.files strings
+USING: help.markup help.syntax io.backend io.files io.directories strings
 sequences ;
 IN: io.pathnames
 
@@ -60,7 +60,15 @@ HELP: pathname
 
 HELP: normalize-path
 { $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
-{ $description "Called by words such as " { $link <file-reader> } " and " { $link <file-writer> } " to prepare a pathname before passing it to underlying code." } ;
+{ $description "Prepends the " { $link current-directory } " to the pathname, resolves a " { $snippet "resource:" } " prefix, if present, and performs any platform-specific pathname normalization." }
+{ $notes "High-level words, such as " { $link <file-reader> } " and " { $link delete-file } " call this word for you. It only needs to be called directly when passing pathnames to C functions or external processes. This is because Factor does not use the operating system's notion of a current directory, and instead maintains its own dynamically-scoped " { $link current-directory } " variable." }
+{ $examples
+  "For example, if you create a file named " { $snippet "data.txt" } " in the current directory, and wish to pass it to a process, you must normalize it:"
+  { $code
+    "\"1 2 3\" \"data.txt\" ascii set-file-contents"
+    "\"munge\" \"data.txt\" normalize-path 2array run-process"
+  }
+} ;
 
 HELP: canonicalize-path
 { $values { "path" "a pathname string" } { "path'" "a new pathname string" } }
@@ -74,24 +82,21 @@ HELP: home
 { $values { "dir" string } }
 { $description "Outputs the user's home directory." } ;
 
-ARTICLE: "pathname-normalization" "Pathname normalization"
-"Words that take a pathname should normalize the pathname by calling " { $link normalize-path } ".When normalizing a pathname, the input pathname is either absolute or relative to the " { $link current-directory } ". If absolute, such as the root directories " { $snippet "/" } " or " { $snippet "c:\\" } ", the pathname is left alone, while if relative, the current directory is prepended to the pathname. If a pathname begins with the magic string " { $snippet "resource:" } ", this string is replaced with the Factor directory. On Windows, all pathnames, absolute and relative, are converted to Unicode pathamess." ;
-
 ARTICLE: "io.pathnames" "Pathname manipulation"
-{ $subsection "pathname-normalization" }
-"Literal pathnames:"
-{ $subsection POSTPONE: P" }
 "Pathname manipulation:"
-{ $subsection normalize-path }
-{ $subsection canonicalize-path }
 { $subsection parent-directory }
 { $subsection file-name }
 { $subsection last-path-separator }
 { $subsection path-components }
 { $subsection prepend-path }
 { $subsection append-path }
+{ $subsection canonicalize-path }
 "Pathname presentations:"
 { $subsection pathname }
-{ $subsection <pathname> } ;
+{ $subsection <pathname> }
+"Literal pathnames:"
+{ $subsection POSTPONE: P" }
+"Low-level word:"
+{ $subsection normalize-path } ;
 
 ABOUT: "io.pathnames"

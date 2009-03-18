@@ -1,6 +1,6 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel arrays sequences math math.order call
+USING: accessors kernel arrays sequences math math.order
 math.partial-dispatch generic generic.standard generic.math
 classes.algebra classes.union sets quotations assocs combinators
 words namespaces continuations classes fry combinators.smart
@@ -17,8 +17,10 @@ IN: compiler.tree.propagation.inlining
 ! we are more eager to inline
 SYMBOL: node-count
 
-: count-nodes ( nodes -- )
-    0 swap [ drop 1+ ] each-node node-count set ;
+: count-nodes ( nodes -- n )
+    0 swap [ drop 1+ ] each-node ;
+
+: compute-node-count ( nodes -- ) count-nodes node-count set ;
 
 ! We try not to inline the same word too many times, to avoid
 ! combinatorial explosion
@@ -33,9 +35,6 @@ M: word splicing-nodes
 M: callable splicing-nodes
     build-sub-tree analyze-recursive normalize ;
 
-: propagate-body ( #call -- )
-    body>> (propagate) ;
-
 ! Dispatch elimination
 : eliminate-dispatch ( #call class/f word/quot/f -- ? )
     dup [
@@ -44,7 +43,7 @@ M: callable splicing-nodes
             2dup splicing-nodes
             [ >>method ] [ >>body ] bi*
         ] if
-        propagate-body t
+        body>> (propagate) t
     ] [ 2drop f >>method f >>body f >>class drop f ] if ;
 
 : inlining-standard-method ( #call word -- class/f method/f )
@@ -161,10 +160,10 @@ SYMBOL: history
 : inline-word-def ( #call word quot -- ? )
     over history get memq? [ 3drop f ] [
         [
-            swap remember-inlining
-            dupd splicing-nodes >>body
-            propagate-body
-        ] with-scope
+            [ remember-inlining ] dip
+            [ drop ] [ splicing-nodes ] 2bi
+            [ >>body drop ] [ count-nodes ] [ (propagate) ] tri
+        ] with-scope node-count +@
         t
     ] if ;
 
@@ -176,6 +175,9 @@ SYMBOL: history
 
 : always-inline-word? ( word -- ? )
     { curry compose } memq? ;
+
+: never-inline-word? ( word -- ? )
+    [ deferred? ] [ { call execute } memq? ] bi or ;
 
 : custom-inlining? ( word -- ? )
     "custom-inlining" word-prop ;
@@ -199,7 +201,7 @@ SYMBOL: history
     #! calls the compiler at parse time (doing so is
     #! discouraged, but it should still work.)
     {
-        { [ dup deferred? ] [ 2drop f ] }
+        { [ dup never-inline-word? ] [ 2drop f ] }
         { [ dup \ instance? eq? ] [ inline-instance-check ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }

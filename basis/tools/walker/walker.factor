@@ -3,7 +3,7 @@
 USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
-sequences.private assocs models models.filter arrays accessors
+sequences.private assocs models models.arrow arrays accessors
 generic generic.standard definitions make sbufs ;
 IN: tools.walker
 
@@ -139,7 +139,6 @@ SYMBOL: +stopped+
     { dip [ (step-into-dip) ] }
     { 2dip [ (step-into-2dip) ] }
     { 3dip [ (step-into-3dip) ] }
-    { (throw) [ drop (step-into-quot) ] }
     { execute [ (step-into-execute) ] }
     { if [ (step-into-if) ] }
     { dispatch [ (step-into-dispatch) ] }
@@ -228,7 +227,7 @@ SYMBOL: +stopped+
                 { step-into-all [ step-into-all-loop ] }
                 { abandon [ drop f keep-running ] }
                 ! Pass quotation to debugged thread
-                { call-in [ nip keep-running ] }
+                { call-in [ keep-running ] }
                 ! Pass previous continuation to debugged thread
                 { step-back [ step-back-msg ] }
             } case f

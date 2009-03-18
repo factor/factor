@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions graphs assocs kernel
 kernel.private slots.private math namespaces sequences strings
@@ -9,8 +9,6 @@ IN: words
 : word ( -- word ) \ word get-global ;
 
 : set-word ( word -- ) \ word set-global ;
-
-GENERIC: execute ( word -- )
 
 M: word execute (execute) ;
 
@@ -109,10 +107,9 @@ compiled-generic-crossref [ H{ } clone ] initialize
 
 : compiled-xref ( word dependencies generic-dependencies -- )
     [ [ drop crossref? ] { } assoc-filter-as f like ] bi@
-    [ over ] dip
     [ "compiled-uses" compiled-crossref (compiled-xref) ]
     [ "compiled-generic-uses" compiled-generic-crossref (compiled-xref) ]
-    2bi* ;
+    bi-curry* bi ;
 
 : (compiled-unxref) ( word word-prop variable -- )
     [ [ [ dupd word-prop ] dip get remove-vertex* ] 2curry ]
@@ -249,7 +246,7 @@ M: word forget*
     dup "forgotten" word-prop [ drop ] [
         [ delete-xref ]
         [ [ name>> ] [ vocabulary>> vocab-words ] bi delete-at ]
-        [ [ reset-word ] [ t "forgotten" set-word-prop ] bi ]
+        [ t "forgotten" set-word-prop ]
         tri
     ] if ;
 

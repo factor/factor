@@ -4,7 +4,7 @@
 USING: accessors arrays assocs combinators help help.crossref
 help.markup help.topics io io.streams.string kernel make namespaces
 parser prettyprint sequences summary tools.vocabs tools.vocabs.browser
-vocabs vocabs.loader words ;
+vocabs vocabs.loader words see ;
 
 IN: fuel.help
 
@@ -31,6 +31,8 @@ IN: fuel.help
 : fuel-parent-topics ( word -- seq )
     help-path [ dup article-title swap 2array ] map ; inline
 
+SYMBOL: $doc-path
+
 : (fuel-word-element) ( word -- element )
     \ article swap dup article-title swap
     [
@@ -46,12 +48,13 @@ IN: fuel.help
     ] { } make 3array ;
 
 : fuel-vocab-help-row ( vocab -- element )
-    [ vocab-status-string ] [ vocab-name ] [ summary ] tri 3array ;
+    [ vocab-name ] [ summary ] bi 2array ;
 
 : fuel-vocab-help-root-heading ( root -- element )
     [ "Children from " prepend ] [ "Other children" ] if* \ $heading swap 2array ;
 
 SYMBOL: vocab-list
+SYMBOL: describe-words
 
 : fuel-vocab-help-table ( vocabs -- element )
     [ fuel-vocab-help-row ] map vocab-list prefix ;
@@ -69,7 +72,7 @@ SYMBOL: vocab-list
     all-child-vocabs fuel-vocab-list ; inline
 
 : fuel-vocab-describe-words ( name -- element )
-    [ describe-words ] with-string-writer \ describe-words swap 2array ; inline
+    [ words. ] with-string-writer \ describe-words swap 2array ; inline
 
 : (fuel-vocab-element) ( name -- element )
     dup require \ article swap dup >vocab-link

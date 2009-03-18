@@ -1,10 +1,10 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables heaps kernel kernel.private math
 namespaces sequences vectors continuations continuations.private
-dlists assocs system combinators init boxes accessors
-math.order deques strings quotations fry ;
+dlists assocs system combinators combinators.private init boxes
+accessors math.order deques strings quotations fry ;
 IN: threads
 
 SYMBOL: initial-thread
@@ -126,7 +126,7 @@ DEFER: stop
         { } set-retainstack
         { } set-datastack
         self quot>> [ call stop ] call-clear
-    ] 2 (throw) ;
+    ] (( namestack thread -- * )) call-effect-unsafe ;
 
 DEFER: next
 
@@ -160,7 +160,7 @@ DEFER: next
 PRIVATE>
 
 : stop ( -- )
-    self [ exit-handler>> call ] [ unregister-thread ] bi next ;
+    self [ exit-handler>> call( -- ) ] [ unregister-thread ] bi next ;
 
 : suspend ( quot state -- obj )
     [
