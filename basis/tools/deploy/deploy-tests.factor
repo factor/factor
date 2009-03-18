@@ -26,6 +26,8 @@ os macosx? [
     [ t ] [ "webkit-demo" shake-and-bake 500000 small-enough? ] unit-test
 ] when
 
+[ t ] [ "benchmark.regex-dna" shake-and-bake 1200000 small-enough? ] unit-test
+
 {
     "tools.deploy.test.1"
     "tools.deploy.test.2"
