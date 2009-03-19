@@ -1,5 +1,9 @@
-USING: help.syntax help.markup ;
+! Copyright (C) 2009 Daniel Ehrenberg
+! See http://factorcode.org/license.txt for BSD license.
+USING: help.syntax help.markup strings ;
 IN: unicode.script
+
+ABOUT: script-of
 
 HELP: script-of
 { $values { "char" "a code point" } { "script" "a symbol" } }
