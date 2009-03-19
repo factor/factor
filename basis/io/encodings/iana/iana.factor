@@ -10,15 +10,11 @@ SYMBOL: e>n-table
 SYMBOL: aliases
 PRIVATE>
 
-ERROR: missing-encoding name ;
+: name>encoding ( name -- encoding/f )
+    n>e-table get-global at ;
 
-: name>encoding ( name -- encoding )
-    dup n>e-table get-global at [ ] [ missing-encoding ] ?if ;
-
-ERROR: missing-name encoding ;
-
-: encoding>name ( encoding -- name )
-    dup e>n-table get-global at [ ] [ missing-name ] ?if ;
+: encoding>name ( encoding -- name/f )
+    e>n-table get-global at ;
 
 <PRIVATE
 : parse-iana ( file -- synonym-set )

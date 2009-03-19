@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs hashtables io.encodings.ascii io.files kernel math
     math.parser namespaces make sequences sequences.private sorting
-    splitting grouping strings sets accessors ;
+    splitting grouping strings sets accessors project-euler.common ;
 IN: project-euler.059
 
 ! http://projecteuler.net/index.php?section=problems&id=59
@@ -89,4 +89,4 @@ PRIVATE>
 ! [ euler059 ] 100 ave-time
 ! 8 ms ave run time - 1.4 SD (100 trials)
 
-MAIN: euler059
+SOLUTION: euler059

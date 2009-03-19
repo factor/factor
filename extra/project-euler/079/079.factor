@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs io.encodings.ascii io.files kernel make math math.parser
-    sequences sets ;
+    sequences sets project-euler.common ;
 IN: project-euler.079
 
 ! http://projecteuler.net/index.php?section=problems&id=79
@@ -63,4 +63,4 @@ PRIVATE>
 ! TODO: prune and diff are relatively slow; topological sort could be
 ! cleaned up and generalized much better, but it works for this problem
 
-MAIN: euler079
+SOLUTION: euler079
