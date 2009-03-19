@@ -3,11 +3,11 @@
 USING: accessors arrays assocs grouping kernel locals math namespaces
 sequences fry quotations math.order math.ranges vectors
 unicode.categories regexp.transition-tables words sets hashtables
-combinators.short-circuit unicode.case unicode.case.private regexp.ast
+combinators.short-circuit unicode.data regexp.ast
 regexp.classes memoize ;
 IN: regexp.nfa
 
-! This uses unicode.case.private for ch>upper and ch>lower
+! This uses unicode.data for ch>upper and ch>lower
 ! but case-insensitive matching should be done by case-folding everything
 ! before processing starts
 

@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit unicode.categories kernel math
 combinators splitting sequences math.parser io.files io assocs
-arrays namespaces make math.ranges unicode.normalize.private values
-io.encodings.ascii unicode.syntax unicode.data compiler.units fry
+arrays namespaces make math.ranges unicode.normalize
+unicode.normalize.private values io.encodings.ascii
+unicode.syntax unicode.data compiler.units fry
 alien.syntax sets accessors interval-maps memoize locals words ;
 IN: unicode.breaks
 
@@ -126,7 +127,7 @@ to: grapheme-table
 
 VALUE: word-break-table
 
-"vocab:unicode/data/WordBreakProperty.txt" load-script
+"vocab:unicode/data/WordBreakProperty.txt" load-key-value
 to: word-break-table
 
 C-ENUM: wOther wCR wLF wNewline wExtend wFormat wKatakana wALetter wMidLetter
