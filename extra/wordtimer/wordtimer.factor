@@ -1,6 +1,6 @@
 USING: kernel sequences namespaces make math assocs words arrays
 tools.annotations vocabs sorting prettyprint io system
-math.statistics accessors tools.time ;
+math.statistics accessors tools.time fry ;
 IN: wordtimer
 
 SYMBOL: *wordtimes*
@@ -40,7 +40,7 @@ SYMBOL: *calling*
   [ swap time-unless-recursing ] 2curry ; 
 
 : add-timer ( word -- )
-  dup [ (add-timer) ] annotate ;
+  dup '[ [ _ ] dip (add-timer) ] annotate ;
 
 : add-timers ( vocab -- )
   words [ add-timer ] each ;

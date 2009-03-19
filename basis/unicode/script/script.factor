@@ -7,10 +7,14 @@ words words.symbol compiler.units arrays interval-maps
 unicode.data ;
 IN: unicode.script
 
+<PRIVATE
+
 VALUE: script-table
 
-"vocab:unicode/script/Scripts.txt" load-script
+"vocab:unicode/script/Scripts.txt" load-key-value
 to: script-table
+
+PRIVATE>
 
 : script-of ( char -- script )
     script-table interval-at ;

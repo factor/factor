@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Samuel Tardieu
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.parser sequences ;
+USING: kernel math math.functions math.parser sequences project-euler.common ;
 IN: project-euler.057
 
 ! http://projecteuler.net/index.php?section=problems&id=57
@@ -40,4 +40,4 @@ IN: project-euler.057
 ! [ euler057 ] time
 ! 3.375118 seconds
 
-MAIN: euler057
+SOLUTION: euler057

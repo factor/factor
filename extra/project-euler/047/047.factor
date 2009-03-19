@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.primes math.primes.factors
-    math.ranges namespaces sequences ;
+    math.ranges namespaces sequences project-euler.common ;
 IN: project-euler.047
 
 ! http://projecteuler.net/index.php?section=problems&id=47
@@ -93,4 +93,4 @@ PRIVATE>
 ! TODO: I don't like that you have to specify the upper bound, maybe try making
 ! this lazy so it could also short-circuit when it finds the answer?
 
-MAIN: euler047a
+SOLUTION: euler047a

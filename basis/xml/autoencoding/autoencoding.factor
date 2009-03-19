@@ -3,7 +3,7 @@
 USING: kernel namespaces xml.name io.encodings.utf8 xml.elements
 io.encodings.utf16 xml.tokenize xml.state math ascii sequences
 io.encodings.string io.encodings combinators accessors
-xml.data io.encodings.iana ;
+xml.data io.encodings.iana xml.errors ;
 IN: xml.autoencoding
 
 : decode-stream ( encoding -- )
@@ -35,7 +35,10 @@ IN: xml.autoencoding
 
 : prolog-encoding ( prolog -- )
     encoding>> dup "UTF-16" =
-    [ drop ] [ name>encoding [ decode-stream ] when* ] if ;
+    [ drop ] [
+        dup name>encoding
+        [ decode-stream ] [ bad-encoding ] ?if
+    ] if ;
 
 : instruct-encoding ( instruct/prolog -- )
     dup prolog?

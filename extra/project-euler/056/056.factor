@@ -29,4 +29,4 @@ IN: project-euler.056
 ! [ euler056 ] 100 ave-time
 ! 22 ms ave run time - 2.13 SD (100 trials)
 
-MAIN: euler056
+SOLUTION: euler056

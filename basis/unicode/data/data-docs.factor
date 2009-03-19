@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Daniel Ehrenberg
+! See http://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup strings ;
 IN: unicode.data
 
@@ -5,18 +7,14 @@ ABOUT: "unicode.data"
 
 ARTICLE: "unicode.data" "Unicode data tables"
 "The " { $vocab-link "unicode.data" "unicode.data" } " vocabulary contains core Unicode data tables and code for parsing this from files."
-{ $subsection load-script }
 { $subsection canonical-entry }
 { $subsection combine-chars }
 { $subsection combining-class }
 { $subsection non-starter? }
 { $subsection name>char }
 { $subsection char>name }
-{ $subsection property? } ;
-
-HELP: load-script
-{ $values { "filename" string } { "table" "an interval map" } }
-{ $description "This loads a file that looks like Script.txt in the Unicode Character Database and converts it into an efficient interval map, where the keys are characters and the values are strings for the properties." } ;
+{ $subsection property? }
+{ $subsection load-key-value } ;
 
 HELP: canonical-entry
 { $values { "char" "a code point" } { "seq" string } }
@@ -49,3 +47,7 @@ HELP: name>char
 HELP: property?
 { $values { "char" "a code point" } { "property" string } { "?" "a boolean" } }
 { $description "Tests whether the code point is listed under the given property in PropList.txt in the Unicode Character Database." } ;
+
+HELP: load-key-value
+{ $values { "filename" string } { "table" "an interval map" } }
+{ $description "This loads a file that looks like Script.txt in the Unicode Character Database and converts it into an efficient interval map, where the keys are characters and the values are strings for the properties." } ;

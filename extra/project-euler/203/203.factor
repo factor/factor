@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel math math.primes.factors sequences sets ;
+USING: fry kernel math math.primes.factors sequences sets project-euler.common ;
 IN: project-euler.203
 
 ! http://projecteuler.net/index.php?section=problems&id=203
@@ -61,4 +61,4 @@ PRIVATE>
 ! [ euler203 ] 100 ave-time
 ! 12 ms ave run time - 1.6 SD (100 trials)
 
-MAIN: euler203
+SOLUTION: euler203
