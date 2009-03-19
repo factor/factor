@@ -65,9 +65,9 @@ TUPLE: reporting-site email url up? changed? last-up? error last-error ;
     update-tuple ;
 
 : sites-to-report ( -- seq )
-    "select account.email, site.url, site.up, site.changed, site.last_up, site.error, site.last_error from account, site, watching_site where account.account_name = watching_site.account_name and site.site_id = watching_site.site_id and site.changed = '1'" sql-query 
+    "select users.email, site.url, site.up, site.changed, site.last_up, site.error, site.last_error from users, site, watching_site where users.username = watching_site.account_name and site.site_id = watching_site.site_id and site.changed = '1'" sql-query 
     [ [ reporting-site boa ] input<sequence ] map
-    "update site set changed = 'f';" sql-command ;
+    "update site set changed = 0;" sql-command ;
 
 : insert-site ( url -- site )
     <site> dup select-tuple [ ] [ dup t >>up? insert-tuple ] ?if ;
@@ -90,3 +90,8 @@ PRIVATE>
 : watching-sites ( username -- sites )
     f <watching-site> select-tuples
     [ site-id>> site new swap >>site-id select-tuple ] map ;
+
+: site-watcher-path ( -- path ) "site-watcher.db" temp-file ; inline
+
+: with-site-watcher-db ( quot -- )
+    site-watcher-path <sqlite-db> swap with-db ; inline

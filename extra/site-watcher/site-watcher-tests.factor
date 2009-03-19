@@ -5,13 +5,6 @@ site-watcher.private kernel db io.directories io.files.temp
 continuations db.sqlite site-watcher.db.private ;
 IN: site-watcher.tests
 
-: site-watcher-path ( -- path ) "site-watcher.db" temp-file ; inline
-
-[ site-watcher-path delete-file ] ignore-errors
-
-: with-sqlite-db ( quot -- )
-    site-watcher-path <sqlite-db> swap with-db ; inline
-
 :: fake-sites ( -- seq )
     [
         account ensure-table
