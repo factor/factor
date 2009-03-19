@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions sequences ;
+USING: kernel math math.functions sequences project-euler.common ;
 IN: project-euler.148
 
 ! http://projecteuler.net/index.php?section=problems&id=148
@@ -51,4 +51,4 @@ PRIVATE>
 ! [ euler148 ] 100 ave-time
 ! 0 ms ave run time - 0.17 SD (100 trials)
 
-MAIN: euler148
+SOLUTION: euler148

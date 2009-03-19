@@ -46,4 +46,4 @@ PRIVATE>
 ! [ euler071 ] 100 ave-time
 ! 155 ms ave run time - 6.95 SD (100 trials)
 
-MAIN: euler071
+SOLUTION: euler071

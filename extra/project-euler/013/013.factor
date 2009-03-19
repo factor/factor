@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.parser sequences ;
+USING: math.parser sequences project-euler.common ;
 IN: project-euler.013
 
 ! http://projecteuler.net/index.php?section=problems&id=13
@@ -230,4 +230,4 @@ PRIVATE>
 ! [ euler013 ] 100 ave-time
 ! 0 ms ave run time - 0.31 SD (100 trials)
 
-MAIN: euler013
+SOLUTION: euler013

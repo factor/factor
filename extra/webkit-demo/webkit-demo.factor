@@ -1,17 +1,18 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel
 cocoa
 cocoa.application
 cocoa.types
 cocoa.classes
-cocoa.windows ;
+cocoa.windows
+core-graphics.types ;
 IN: webkit-demo
 
 FRAMEWORK: /System/Library/Frameworks/WebKit.framework
 IMPORT: WebView
 
-: rect ( -- rect ) 0 0 700 500 <NSRect> ;
+: rect ( -- rect ) 0 0 700 500 <CGRect> ;
 
 : <WebView> ( -- id )
     WebView -> alloc

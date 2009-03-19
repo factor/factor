@@ -1,6 +1,7 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii kernel math.ranges math.text.english sequences ;
+USING: ascii kernel math.ranges math.text.english sequences
+project-euler.common ;
 IN: project-euler.017
 
 ! http://projecteuler.net/index.php?section=problems&id=17
@@ -28,4 +29,4 @@ IN: project-euler.017
 ! [ euler017 ] 100 ave-time
 ! 15 ms ave run time - 1.71 SD (100 trials)
 
-MAIN: euler017
+SOLUTION: euler017
