@@ -321,7 +321,7 @@
 (defsubst fuel-syntax--is-last-char (pos)
   (save-excursion
     (goto-char (1+ pos))
-    (fuel-syntax--looking-at-emptiness)))
+    (looking-at-p "[ ]*$")))
 
 (defsubst fuel-syntax--line-offset (pos)
   (- pos (save-excursion
