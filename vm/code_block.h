@@ -83,7 +83,7 @@ CELL compiled_code_format(void);
 
 bool stack_traces_p(void);
 
-F_CODE_BLOCK *add_compiled_block(
+F_CODE_BLOCK *add_code_block(
 	CELL type,
 	F_ARRAY *code,
 	F_ARRAY *labels,

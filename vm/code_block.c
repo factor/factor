@@ -1,9 +1,8 @@
 #include "master.h"
 
-void flush_icache_for(F_CODE_BLOCK *compiled)
+void flush_icache_for(F_CODE_BLOCK *block)
 {
-	CELL start = (CELL)(compiled + 1);
-	flush_icache(start,compiled->code_length);
+	flush_icache((CELL)block,block->block.size);
 }
 
 void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter)
@@ -170,7 +169,7 @@ is added to the heap. */
 collections */
 void mark_code_block(F_CODE_BLOCK *compiled)
 {
-	mark_block(compiled_to_block(compiled));
+	mark_block(&compiled->block);
 
 	copy_handle(&compiled->literals);
 	copy_handle(&compiled->relocation);
@@ -361,18 +360,18 @@ CELL compiled_code_format(void)
 }
 
 /* Might GC */
-void *allot_code_block(CELL size)
+F_CODE_BLOCK *allot_code_block(CELL size)
 {
-	void *start = heap_allot(&code_heap,size);
+	F_BLOCK *block = heap_allot(&code_heap,size + sizeof(F_CODE_BLOCK));
 
 	/* If allocation failed, do a code GC */
-	if(start == NULL)
+	if(block == NULL)
 	{
 		gc();
-		start = heap_allot(&code_heap,size);
+		block = heap_allot(&code_heap,size + sizeof(F_CODE_BLOCK));
 
 		/* Insufficient room even after code GC, give up */
-		if(start == NULL)
+		if(block == NULL)
 		{
 			CELL used, total_free, max_free;
 			heap_usage(&code_heap,&used,&total_free,&max_free);
@@ -385,11 +384,11 @@ void *allot_code_block(CELL size)
 		}
 	}
 
-	return start;
+	return (F_CODE_BLOCK *)block;
 }
 
 /* Might GC */
-F_CODE_BLOCK *add_compiled_block(
+F_CODE_BLOCK *add_code_block(
 	CELL type,
 	F_ARRAY *code,
 	F_ARRAY *labels,
@@ -404,7 +403,7 @@ F_CODE_BLOCK *add_compiled_block(
 	REGISTER_UNTAGGED(code);
 	REGISTER_UNTAGGED(labels);
 
-	F_CODE_BLOCK *compiled = allot_code_block(sizeof(F_CODE_BLOCK) + code_length);
+	F_CODE_BLOCK *compiled = allot_code_block(code_length);
 
 	UNREGISTER_UNTAGGED(labels);
 	UNREGISTER_UNTAGGED(code);
@@ -415,7 +414,6 @@ F_CODE_BLOCK *add_compiled_block(
 	compiled->type = type;
 	compiled->last_scan = NURSERY;
 	compiled->needs_fixup = true;
-	compiled->code_length = code_length;
 	compiled->literals = literals;
 	compiled->relocation = relocation;
 
