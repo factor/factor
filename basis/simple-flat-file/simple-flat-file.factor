@@ -29,4 +29,4 @@ IN: simple-flat-file
     ";" split [ [ blank? ] trim ] map ;
 
 : data ( filename -- data )
-    ascii file-lines drop-comments [ split-; ] map ;
+    utf8 file-lines drop-comments [ split-; ] map ;
