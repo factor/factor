@@ -5,7 +5,7 @@ io.files hashtables quotations splitting grouping arrays io
 math.parser hash2 math.order byte-arrays words namespaces words
 compiler.units parser io.encodings.ascii values interval-maps
 ascii sets combinators locals math.ranges sorting make
-strings.parser io.encodings.utf8 memoize ;
+strings.parser io.encodings.utf8 memoize simple-flat-file ;
 IN: unicode.data
 
 <PRIVATE
@@ -18,11 +18,12 @@ VALUE: combine-map
 VALUE: class-map
 VALUE: compatibility-map
 VALUE: category-map
-VALUE: name-map
 VALUE: special-casing
 VALUE: properties
 
 PRIVATE>
+
+VALUE: name-map
 
 : canonical-entry ( char -- seq ) canonical-map at ; inline
 : combine-chars ( a b -- char/f ) combine-map hash2 ; inline
@@ -76,20 +77,10 @@ PRIVATE>
 
 ! Loading data from UnicodeData.txt
 
-: split-; ( line -- array )
-    ";" split [ [ blank? ] trim ] map ;
-
-: data ( filename -- data )
-    ascii file-lines [ split-; ] map ;
-
 : load-data ( -- data )
     "vocab:unicode/data/UnicodeData.txt" data ;
 
-: filter-comments ( lines -- lines )
-    [ "#@" split first ] map harvest ;
-
 : (process-data) ( index data -- newdata )
-    filter-comments
     [ [ nth ] keep first swap ] with { } map>assoc
     [ [ hex> ] dip ] assoc-map ;
 
@@ -182,15 +173,13 @@ C: <code-point> code-point
     <code-point> swap first set ;
 
 ! Extra properties
-: properties-lines ( -- lines )
-    "vocab:unicode/data/PropList.txt"
-    ascii file-lines ;
-
 : parse-properties ( -- {{[a,b],prop}} )
-    properties-lines filter-comments [
-        split-; first2
-        [ ".." split1 [ dup ] unless* [ hex> ] bi@ 2array ] dip
-    ] { } map>assoc ;
+    "vocab:unicode/data/PropList.txt" data [
+        [
+            ".." split1 [ dup ] unless*
+            [ hex> ] bi@ 2array
+        ] dip
+    ] assoc-map ;
 
 : properties>intervals ( properties -- assoc[str,interval] )
     dup values prune [ f ] H{ } map>assoc
@@ -233,10 +222,6 @@ name>char-hook set-global
 
 SYMBOL: interned
 
-: parse-key-value ( filename -- assoc )
-    ! assoc is code point/range => name
-    ascii file-lines filter-comments [ split-; ] map ;
-
 : range, ( value key -- )
     swap interned get
     [ = ] with find nip 2array , ;
@@ -257,4 +242,4 @@ SYMBOL: interned
 PRIVATE>
 
 : load-key-value ( filename -- table )
-    parse-key-value process-key-value ;
+    data process-key-value ;
