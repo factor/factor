@@ -107,12 +107,12 @@ void update_literal_references(F_CODE_BLOCK *compiled)
 aging and nursery collections */
 void copy_literal_references(F_CODE_BLOCK *compiled)
 {
-	if(collecting_gen >= compiled->last_scan)
+	if(collecting_gen >= compiled->block.last_scan)
 	{
 		if(collecting_accumulation_gen_p())
-			compiled->last_scan = collecting_gen;
+			compiled->block.last_scan = collecting_gen;
 		else
-			compiled->last_scan = collecting_gen + 1;
+			compiled->block.last_scan = collecting_gen + 1;
 
 		/* initialize chase pointer */
 		CELL scan = newspace->here;
@@ -153,7 +153,7 @@ to update references to other words, without worrying about literals
 or dlsyms. */
 void update_word_references(F_CODE_BLOCK *compiled)
 {
-	if(compiled->needs_fixup)
+	if(compiled->block.needs_fixup)
 		relocate_code_block(compiled);
 	else
 	{
@@ -305,8 +305,8 @@ void relocate_code_block_step(F_REL *rel, F_CODE_BLOCK *compiled)
 /* Perform all fixups on a code block */
 void relocate_code_block(F_CODE_BLOCK *compiled)
 {
-	compiled->last_scan = NURSERY;
-	compiled->needs_fixup = false;
+	compiled->block.last_scan = NURSERY;
+	compiled->block.needs_fixup = false;
 	iterate_relocations(compiled,relocate_code_block_step);
 	flush_icache_for(compiled);
 }
@@ -411,9 +411,9 @@ F_CODE_BLOCK *add_code_block(
 	UNREGISTER_ROOT(literals);
 
 	/* compiled header */
-	compiled->type = type;
-	compiled->last_scan = NURSERY;
-	compiled->needs_fixup = true;
+	compiled->block.type = type;
+	compiled->block.last_scan = NURSERY;
+	compiled->block.needs_fixup = true;
 	compiled->literals = literals;
 	compiled->relocation = relocation;
 

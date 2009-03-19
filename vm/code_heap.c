@@ -14,7 +14,7 @@ bool in_code_heap_p(CELL ptr)
 
 void set_word_code(F_WORD *word, F_CODE_BLOCK *compiled)
 {
-	if(compiled->type != WORD_TYPE)
+	if(compiled->block.type != WORD_TYPE)
 		critical_error("bad param to set_word_xt",(CELL)compiled);
 
 	word->code = compiled;
