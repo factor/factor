@@ -12,8 +12,7 @@ TUPLE: account account-id account-name email ;
         swap >>account-name ;
 
 account "ACCOUNT" {
-    { "account-id" "ACCOUNT_ID" +db-assigned-id+ }
-    { "account-name" "ACCOUNT_NAME" VARCHAR }
+    { "account-name" "ACCOUNT_NAME" VARCHAR +user-assigned-id+ }
     { "email" "EMAIL" VARCHAR }
 } define-persistent
 
@@ -33,15 +32,15 @@ site "SITE" {
     { "last-error" "LAST_ERROR" TIMESTAMP }
 } define-persistent
 
-TUPLE: watching-site account-id site-id ;
+TUPLE: watching-site account-name site-id ;
 
-: <watching-site> ( account-id site-id -- watching-site )
+: <watching-site> ( account-name site-id -- watching-site )
     watching-site new
         swap >>site-id
-        swap >>account-id ;
+        swap >>account-name ;
 
 watching-site "WATCHING_SITE" {
-    { "account-id" "ACCOUNT_ID" INTEGER +user-assigned-id+ }
+    { "account-name" "ACCOUNT_NAME" VARCHAR +user-assigned-id+ }
     { "site-id" "SITE_ID" INTEGER +user-assigned-id+ }
 } define-persistent
 
@@ -71,22 +70,23 @@ TUPLE: reporting-site email url up? changed? last-up? error last-error ;
     "update site set changed = 'f';" sql-command ;
 
 : insert-site ( url -- site )
-    <site> dup select-tuple [
-        dup t >>up? insert-tuple
-    ] unless ;
+    <site> dup select-tuple [ ] [ dup t >>up? insert-tuple ] ?if ;
 
 : insert-account ( account-name -- ) <account> insert-tuple ;
 
 : find-sites ( -- seq ) f <site> select-tuples ;
 
-: select-account/site ( email url -- account site )
-    [ <account> select-tuple account-id>> ]
-    [ insert-site site-id>> ] bi* ;
+: select-account/site ( username url -- account site )
+    insert-site site-id>> ;
 
 PRIVATE>
 
-: watch-site ( email url -- )
+: watch-site ( username url -- )
     select-account/site <watching-site> insert-tuple ;
 
-: unwatch-site ( email url -- )
+: unwatch-site ( username url -- )
     select-account/site <watching-site> delete-tuples ;
+
+: watching-sites ( username -- sites )
+    f <watching-site> select-tuples
+    [ site-id>> site new swap >>site-id select-tuple ] map ;
