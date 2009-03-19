@@ -58,4 +58,4 @@ PRIVATE>
 ! TODO: try using bit arrays or other methods outlined here:
 !     http://home.comcast.net/~babdulbaki/Circular_Primes.html
 
-MAIN: euler035
+SOLUTION: euler035

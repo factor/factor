@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser math.primes sequences ;
+USING: kernel math math.parser math.primes sequences project-euler.common ;
 IN: project-euler.037
 
 ! http://projecteuler.net/index.php?section=problems&id=37
@@ -49,4 +49,4 @@ PRIVATE>
 ! [ euler037 ] 100 ave-time
 ! 130 ms ave run time - 6.27 SD (100 trials)
 
-MAIN: euler037
+SOLUTION: euler037

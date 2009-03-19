@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences math math.functions math.ranges locals ;
+USING: kernel sequences math math.functions math.ranges locals project-euler.common ;
 IN: project-euler.190
 
 ! http://projecteuler.net/index.php?section=problems&id=190
@@ -51,4 +51,4 @@ PRIVATE>
 ! [ euler150 ] 100 ave-time
 ! 5 ms ave run time - 1.01 SD (100 trials)
 
-MAIN: euler190
+SOLUTION: euler190

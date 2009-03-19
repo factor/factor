@@ -1,6 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit kernel make math math.ranges sequences ;
+USING: combinators.short-circuit kernel make math math.ranges
+sequences project-euler.common ;
 IN: project-euler.014
 
 ! http://projecteuler.net/index.php?section=problems&id=14
@@ -72,4 +73,4 @@ PRIVATE>
 
 ! TODO: try using memoization
 
-MAIN: euler014a
+SOLUTION: euler014a

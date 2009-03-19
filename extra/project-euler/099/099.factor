@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.encodings.ascii io.files kernel math math.functions math.parser
-    math.vectors sequences splitting ;
+    math.vectors sequences splitting project-euler.common ;
 IN: project-euler.099
 
 ! http://projecteuler.net/index.php?section=problems&id=99
@@ -49,4 +49,4 @@ PRIVATE>
 ! [ euler099 ] 100 ave-time
 ! 16 ms ave run timen - 1.67 SD (100 trials)
 
-MAIN: euler099
+SOLUTION: euler099

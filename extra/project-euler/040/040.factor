@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser sequences strings ;
+USING: kernel math math.parser sequences strings project-euler.common ;
 IN: project-euler.040
 
 ! http://projecteuler.net/index.php?section=problems&id=40
@@ -48,4 +48,4 @@ PRIVATE>
 ! [ euler040 ] 100 ave-time
 ! 444 ms ave run time - 23.64 SD (100 trials)
 
-MAIN: euler040
+SOLUTION: euler040
