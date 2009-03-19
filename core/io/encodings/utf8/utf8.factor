@@ -73,7 +73,7 @@ M: utf8 encode-char
 PRIVATE>
 
 : code-point-length ( n -- x )
-    log2 {
+    next-power-of-2 log2 {
         { [ dup 0 7 between? ] [ 1 ] }
         { [ dup 8 11 between? ] [ 2 ] }
         { [ dup 12 16 between? ] [ 3 ] }
