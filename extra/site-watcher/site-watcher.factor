@@ -11,7 +11,7 @@ SYMBOL: site-watcher-from
 "factor-site-watcher@gmail.com" site-watcher-from set-global
 
 SYMBOL: site-watcher-frequency
-10 seconds site-watcher-frequency set-global
+5 minutes site-watcher-frequency set-global
  
 SYMBOL: running-site-watcher
 [ f running-site-watcher set-global ] "site-watcher" add-init-hook
