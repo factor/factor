@@ -22,4 +22,4 @@ IN: project-euler.020
 ! [ euler020 ] 100 ave-time
 ! 0 ms ave run time - 0.55 (100 trials)
 
-MAIN: euler020
+SOLUTION: euler020

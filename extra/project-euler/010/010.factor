@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer, Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.primes sequences ;
+USING: math.primes sequences project-euler.common ;
 IN: project-euler.010
 
 ! http://projecteuler.net/index.php?section=problems&id=10
@@ -22,4 +22,4 @@ IN: project-euler.010
 ! [ euler010 ] 100 ave-time
 ! 15 ms ave run time - 0.41 SD (100 trials)
 
-MAIN: euler010
+SOLUTION: euler010

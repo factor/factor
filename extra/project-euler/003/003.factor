@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.primes.factors sequences ;
+USING: math.primes.factors sequences project-euler.common ;
 IN: project-euler.003
 
 ! http://projecteuler.net/index.php?section=problems&id=3
@@ -22,4 +22,4 @@ IN: project-euler.003
 ! [ euler003 ] 100 ave-time
 ! 1 ms ave run time - 0.49 SD (100 trials)
 
-MAIN: euler003
+SOLUTION: euler003

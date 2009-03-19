@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators kernel math math.order namespaces sequences ;
+USING: assocs combinators kernel math math.order namespaces sequences project-euler.common ;
 IN: project-euler.151
 
 ! http://projecteuler.net/index.php?section=problems&id=151
@@ -76,4 +76,4 @@ DEFER: (euler151)
 ! [ euler151 ] 100 ave-time
 ! ? ms run time - 100 trials
 
-MAIN: euler151
+SOLUTION: euler151

@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar combinators kernel math math.ranges namespaces sequences
-    math.order ;
+    math.order project-euler.common ;
 IN: project-euler.019
 
 ! http://projecteuler.net/index.php?section=problems&id=19
@@ -63,4 +63,4 @@ PRIVATE>
 ! [ euler019a ] 100 ave-time
 ! 17 ms ave run time - 2.13 SD (100 trials)
 
-MAIN: euler019
+SOLUTION: euler019
