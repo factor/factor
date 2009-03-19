@@ -44,14 +44,13 @@ SYMBOL: running-site-watcher
 
 PRIVATE>
 
-: watch-sites ( -- alarm )
-    [
-        find-sites check-sites sites-to-report send-reports
-    ] site-watcher-frequency get every ;
+: watch-sites ( -- )
+    find-sites check-sites sites-to-report send-reports ;
 
 : run-site-watcher ( -- )
     running-site-watcher get [ 
-        watch-sites running-site-watcher set-global 
+        [ watch-sites ] site-watcher-frequency get every
+        running-site-watcher set-global 
     ] unless ;
 
 : stop-site-watcher ( -- )
