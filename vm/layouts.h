@@ -111,7 +111,10 @@ typedef enum
 
 typedef struct _F_BLOCK
 {
-	F_BLOCK_STATUS status;
+	char status; /* free or allocated? */
+	char type; /* this is WORD_TYPE or QUOTATION_TYPE */
+	char last_scan; /* the youngest generation in which this block's literals may live */
+	char needs_fixup; /* is this a new block that needs full fixup? */
 
 	/* In bytes, includes this header */
 	CELL size;
@@ -131,9 +134,6 @@ typedef struct _F_FREE_BLOCK
 typedef struct
 {
 	F_BLOCK block;
-	char type; /* this is WORD_TYPE or QUOTATION_TYPE */
-	char last_scan; /* the youngest generation in which this block's literals may live */
-	char needs_fixup; /* is this a new block that needs full fixup? */
 	CELL literals; /* # bytes */
 	CELL relocation; /* tagged pointer to byte-array or f */
 } F_CODE_BLOCK;

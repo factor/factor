@@ -157,7 +157,7 @@ bool jit_stack_frame_p(F_ARRAY *array)
 
 void set_quot_xt(F_QUOTATION *quot, F_CODE_BLOCK *code)
 {
-	if(code->type != QUOTATION_TYPE)
+	if(code->block.type != QUOTATION_TYPE)
 		critical_error("Bad param to set_quot_xt",(CELL)code);
 
 	quot->code = code;
