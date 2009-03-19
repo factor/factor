@@ -13,7 +13,8 @@ ARTICLE: "unicode.data" "Unicode data tables"
 { $subsection non-starter? }
 { $subsection name>char }
 { $subsection char>name }
-{ $subsection property? } ;
+{ $subsection property? }
+{ $subsection load-key-value } ;
 
 HELP: canonical-entry
 { $values { "char" "a code point" } { "seq" string } }
@@ -46,3 +47,7 @@ HELP: name>char
 HELP: property?
 { $values { "char" "a code point" } { "property" string } { "?" "a boolean" } }
 { $description "Tests whether the code point is listed under the given property in PropList.txt in the Unicode Character Database." } ;
+
+HELP: load-key-value
+{ $values { "filename" string } { "table" "an interval map" } }
+{ $description "This loads a file that looks like Script.txt in the Unicode Character Database and converts it into an efficient interval map, where the keys are characters and the values are strings for the properties." } ;
