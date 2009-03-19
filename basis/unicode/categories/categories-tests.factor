@@ -1,4 +1,7 @@
-USING: tools.test kernel unicode.categories words sequences unicode.syntax ;
+! Copyright (C) 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
+USING: tools.test kernel unicode.categories words sequences unicode.data ;
+IN: unicode.categories.tests
 
 [ { f f t t f t t f f t } ] [ CHAR: A { 
     blank? letter? LETTER? Letter? digit? 

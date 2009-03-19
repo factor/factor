@@ -5,8 +5,7 @@ sequences splitting sorting sets strings vectors hashtables
 quotations arrays byte-arrays math.parser calendar
 calendar.format present urls fry
 io io.encodings io.encodings.iana io.encodings.binary
-io.encodings.8-bit io.crlf
-unicode.case unicode.categories
+io.encodings.8-bit io.crlf ascii
 http.parsers
 base64 ;
 IN: http
@@ -215,11 +214,10 @@ TUPLE: post-data data params content-type content-encoding ;
 : parse-content-type-attributes ( string -- attributes )
     " " split harvest [
         "=" split1
-        [ >lower ] [ "\"" ?head drop "\"" ?tail drop ] bi*
+        "\"" ?head drop "\"" ?tail drop
     ] { } map>assoc ;
 
 : parse-content-type ( content-type -- type encoding )
     ";" split1
-    parse-content-type-attributes "charset" swap at
-    [ name>encoding ]
-    [ dup "text/" head? latin1 binary ? ] if* ;
+    parse-content-type-attributes "charset" swap at name>encoding
+    [ dup "text/" head? latin1 binary ? ] unless* ;

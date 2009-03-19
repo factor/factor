@@ -18,6 +18,13 @@ ERROR: bad-number ;
 
 ERROR: bad-class name ;
 
+: parse-unicode-class ( name -- class )
+    ! Implement this!
+    drop f ;
+
+: unicode-class ( name -- class )
+    dup parse-unicode-class [ ] [ bad-class ] ?if ;
+
 : name>class ( name -- class )
     >string >case-fold {
         { "lower" letter-class }
@@ -32,8 +39,7 @@ ERROR: bad-class name ;
         { "cntrl" control-character-class }
         { "xdigit" hex-digit-class }
         { "space" java-blank-class }
-        ! TODO: unicode-character-class
-    } [ bad-class ] at-error ;
+    } [ unicode-class ] at-error ;
 
 : lookup-escape ( char -- ast )
     {
@@ -119,10 +125,10 @@ AnyRangeCharacter = EscapeSequence | .
 
 RangeCharacter = !("]") AnyRangeCharacter
 
-Range = RangeCharacter:a "-" RangeCharacter:b => [[ a b <range> ]]
+Range = RangeCharacter:a "-" RangeCharacter:b => [[ a b <range-class> ]]
       | RangeCharacter
 
-StartRange = AnyRangeCharacter:a "-" RangeCharacter:b => [[ a b <range> ]]
+StartRange = AnyRangeCharacter:a "-" RangeCharacter:b => [[ a b <range-class> ]]
            | AnyRangeCharacter
 
 Ranges = StartRange:s Range*:r => [[ r s prefix ]]
@@ -144,7 +150,7 @@ Parenthized = "?:" Alternation:a => [[ a ]]
 
 Element = "(" Parenthized:p ")" => [[ p ]]
         | "[" CharClass:r "]" => [[ r ]]
-        | ".":d => [[ any-char <primitive-class> ]]
+        | ".":d => [[ dot ]]
         | Character
 
 Number = (!(","|"}").)* => [[ string>number ensure-number ]]
