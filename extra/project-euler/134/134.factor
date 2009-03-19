@@ -45,4 +45,4 @@ PRIVATE>
 ! [ euler134 ] 10 ave-time
 ! 933 ms ave run timen - 19.58 SD (10 trials)
 
-MAIN: euler134
+SOLUTION: euler134

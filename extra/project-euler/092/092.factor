@@ -50,4 +50,4 @@ PRIVATE>
 
 ! TODO: this solution is not very efficient, much better optimizations exist
 
-MAIN: euler092
+SOLUTION: euler092

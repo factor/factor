@@ -1,6 +1,6 @@
 ! Copyright (c) 2007, 2008 Aaron Schaefer, Alexander Solovyov, Vishal Talwar.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences ;
+USING: kernel math sequences project-euler.common ;
 IN: project-euler.002
 
 ! http://projecteuler.net/index.php?section=problems&id=2
@@ -77,4 +77,4 @@ PRIVATE>
 ! [ euler002b ] 100 ave-time
 ! 0 ms ave run time - 0.0 SD (100 trials)
 
-MAIN: euler002b
+SOLUTION: euler002b

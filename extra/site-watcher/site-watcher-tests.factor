@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: db.tuples locals site-watcher site-watcher.db
 site-watcher.private kernel db io.directories io.files.temp
-continuations ;
+continuations db.sqlite site-watcher.db.private ;
 IN: site-watcher.tests
 
 : site-watcher-path ( -- path ) "site-watcher.db" temp-file ; inline

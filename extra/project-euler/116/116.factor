@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.ranges sequences ;
+USING: kernel math math.ranges sequences project-euler.common ;
 IN: project-euler.116
 
 ! http://projecteuler.net/index.php?section=problems&id=116
@@ -57,4 +57,4 @@ PRIVATE>
 ! [ euler116 ] 100 ave-time
 ! 0 ms ave run time - 0.34 SD (100 trials)
 
-MAIN: euler116
+SOLUTION: euler116

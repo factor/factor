@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.combinatorics math.parser ;
+USING: kernel math.combinatorics math.parser project-euler.common ;
 IN: project-euler.024
 
 ! http://projecteuler.net/index.php?section=problems&id=24
@@ -28,4 +28,4 @@ IN: project-euler.024
 ! [ euler024 ] 100 ave-time
 ! 0 ms ave run time - 0.27 SD (100 trials)
 
-MAIN: euler024
+SOLUTION: euler024
