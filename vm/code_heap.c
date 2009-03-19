@@ -40,7 +40,7 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 	while(scan)
 	{
 		if(scan->status != B_FREE)
-			iter(block_to_compiled(scan));
+			iter((F_CODE_BLOCK *)scan);
 		scan = next_block(&code_heap,scan);
 	}
 }
@@ -103,7 +103,7 @@ void primitive_modify_code_heap(void)
 			REGISTER_UNTAGGED(alist);
 			REGISTER_UNTAGGED(word);
 
-			F_CODE_BLOCK *compiled = add_compiled_block(
+			F_CODE_BLOCK *compiled = add_code_block(
 				WORD_TYPE,
 				code,
 				labels,
@@ -137,7 +137,7 @@ void primitive_code_room(void)
 
 F_CODE_BLOCK *forward_xt(F_CODE_BLOCK *compiled)
 {
-	return block_to_compiled(compiled_to_block(compiled)->forwarding);
+	return (F_CODE_BLOCK *)compiled->block.forwarding;
 }
 
 void forward_frame_xt(F_STACK_FRAME *frame)

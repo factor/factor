@@ -80,7 +80,7 @@ void build_free_list(F_HEAP *heap, CELL size)
 }
 
 /* Allocate a block of memory from the mark and sweep GC heap */
-void *heap_allot(F_HEAP *heap, CELL size)
+F_BLOCK *heap_allot(F_HEAP *heap, CELL size)
 {
 	F_FREE_BLOCK *prev = NULL;
 	F_FREE_BLOCK *scan = heap->free_list;
@@ -92,9 +92,7 @@ void *heap_allot(F_HEAP *heap, CELL size)
 		if(scan->block.status != B_FREE)
 			critical_error("Invalid block in free list",(CELL)scan);
 
-		CELL this_size = scan->block.size - sizeof(F_BLOCK);
-
-		if(this_size < size)
+		if(scan->block.size < size)
 		{
 			prev = scan;
 			scan = scan->next_free;
@@ -104,7 +102,7 @@ void *heap_allot(F_HEAP *heap, CELL size)
 		/* we found a candidate block */
 		F_FREE_BLOCK *next_free;
 
-		if(this_size - size <= sizeof(F_BLOCK) * 2)
+		if(scan->block.size - size <= sizeof(F_BLOCK) * 2)
 		{
 			/* too small to be split */
 			next_free = scan->next_free;
@@ -112,12 +110,11 @@ void *heap_allot(F_HEAP *heap, CELL size)
 		else
 		{
 			/* split the block in two */
-			CELL new_size = size + sizeof(F_BLOCK);
-			F_FREE_BLOCK *split = (F_FREE_BLOCK *)((CELL)scan + new_size);
+			F_FREE_BLOCK *split = (F_FREE_BLOCK *)((CELL)scan + size);
 			split->block.status = B_FREE;
-			split->block.size = scan->block.size - new_size;
+			split->block.size = scan->block.size - size;
 			split->next_free = scan->next_free;
-			scan->block.size = new_size;
+			scan->block.size = size;
 			next_free = split;
 		}
 
@@ -126,8 +123,7 @@ void *heap_allot(F_HEAP *heap, CELL size)
 
 		/* this is our new block */
 		scan->block.status = B_ALLOCATED;
-
-		return &scan->block + 1;
+		return &scan->block;
 	}
 
 	return NULL;

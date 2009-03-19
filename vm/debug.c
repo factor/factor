@@ -324,11 +324,11 @@ void dump_code_heap(void)
 			status = "free";
 			break;
 		case B_ALLOCATED:
-			size += object_size(block_to_compiled(scan)->relocation);
+			size += object_size(((F_CODE_BLOCK *)scan)->relocation);
 			status = "allocated";
 			break;
 		case B_MARKED:
-			size += object_size(block_to_compiled(scan)->relocation);
+			size += object_size(((F_CODE_BLOCK *)scan)->relocation);
 			status = "marked";
 			break;
 		default:

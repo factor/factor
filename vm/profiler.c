@@ -21,7 +21,7 @@ F_CODE_BLOCK *compile_profiling_stub(F_WORD *word)
 	UNREGISTER_ROOT(code);
 	UNREGISTER_ROOT(literals);
 
-	return add_compiled_block(
+	return add_code_block(
 		WORD_TYPE,
 		untag_object(code),
 		NULL, /* no labels */
