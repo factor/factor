@@ -65,7 +65,7 @@ TUPLE: reporting-site email url up? changed? last-up? error last-error ;
     update-tuple ;
 
 : sites-to-report ( -- seq )
-    "select account.email, site.url, site.up, site.changed, site.last_up, site.error, site.last_error from account, site, watching_site where account.account_id = watching_site.account_id and site.site_id = watching_site.site_id and site.changed = '1'" sql-query 
+    "select account.email, site.url, site.up, site.changed, site.last_up, site.error, site.last_error from account, site, watching_site where account.account_name = watching_site.account_name and site.site_id = watching_site.site_id and site.changed = '1'" sql-query 
     [ [ reporting-site boa ] input<sequence ] map
     "update site set changed = 'f';" sql-command ;
 
