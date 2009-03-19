@@ -1,10 +1,11 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences splitting kernel math.parser io.files io.encodings.ascii biassocs ;
+USING: sequences splitting kernel math.parser io.files io.encodings.ascii
+biassocs ascii ;
 IN: simple-flat-file
 
 : drop-comments ( seq -- newseq )
-    [ "#" split1 drop ] map harvest ;
+    [ "#@" split first ] map harvest ;
 
 : split-column ( line -- columns )
     " \t" split harvest 2 short head 2 f pad-tail ;
@@ -24,3 +25,8 @@ IN: simple-flat-file
 : flat-file>biassoc ( filename -- biassoc )
     ascii file-lines process-codetable-lines >biassoc ;
 
+: split-; ( line -- array )
+    ";" split [ [ blank? ] trim ] map ;
+
+: data ( filename -- data )
+    ascii file-lines drop-comments [ split-; ] map ;
