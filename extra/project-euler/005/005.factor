@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math math.functions sequences ;
+USING: math math.functions sequences project-euler.common ;
 IN: project-euler.005
 
 ! http://projecteuler.net/index.php?section=problems&id=5
@@ -23,4 +23,4 @@ IN: project-euler.005
 ! [ euler005 ] 100 ave-time
 ! 0 ms ave run time - 0.14 SD (100 trials)
 
-MAIN: euler005
+SOLUTION: euler005

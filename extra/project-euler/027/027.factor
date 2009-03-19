@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.primes project-euler.common sequences ;
+USING: kernel math math.primes project-euler.common sequences
+project-euler.common ;
 IN: project-euler.027
 
 ! http://projecteuler.net/index.php?section=problems&id=27
@@ -72,4 +73,4 @@ PRIVATE>
 
 ! TODO: generalize max-consecutive/max-product (from #26) into a new word
 
-MAIN: euler027
+SOLUTION: euler027

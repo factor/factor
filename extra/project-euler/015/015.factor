@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.combinatorics ;
+USING: kernel math math.combinatorics project-euler.common ;
 IN: project-euler.015
 
 ! http://projecteuler.net/index.php?section=problems&id=15
@@ -30,4 +30,4 @@ PRIVATE>
 ! [ euler015 ] 100 ave-time
 ! 0 ms ave run time - 0.2 SD (100 trials)
 
-MAIN: euler015
+SOLUTION: euler015
