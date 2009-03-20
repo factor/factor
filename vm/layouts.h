@@ -102,12 +102,38 @@ typedef struct {
 } F_STRING;
 
 /* The compiled code heap is structured into blocks. */
-typedef struct
+typedef enum
 {
+	B_FREE,
+	B_ALLOCATED,
+	B_MARKED
+} F_BLOCK_STATUS;
+
+typedef struct _F_BLOCK
+{
+	char status; /* free or allocated? */
 	char type; /* this is WORD_TYPE or QUOTATION_TYPE */
 	char last_scan; /* the youngest generation in which this block's literals may live */
 	char needs_fixup; /* is this a new block that needs full fixup? */
-	CELL code_length; /* # bytes */
+
+	/* In bytes, includes this header */
+	CELL size;
+
+	/* Used during compaction */
+	struct _F_BLOCK *forwarding;
+} F_BLOCK;
+
+typedef struct _F_FREE_BLOCK
+{
+	F_BLOCK block;
+
+	/* Filled in on image load */
+	struct _F_FREE_BLOCK *next_free;
+} F_FREE_BLOCK;
+
+typedef struct
+{
+	F_BLOCK block;
 	CELL literals; /* # bytes */
 	CELL relocation; /* tagged pointer to byte-array or f */
 } F_CODE_BLOCK;
