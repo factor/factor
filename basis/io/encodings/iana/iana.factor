@@ -10,10 +10,10 @@ SYMBOL: e>n-table
 SYMBOL: aliases
 PRIVATE>
 
-: name>encoding ( name -- encoding/f )
+: name>encoding ( name -- encoding )
     n>e-table get-global at ;
 
-: encoding>name ( encoding -- name/f )
+: encoding>name ( encoding -- name )
     e>n-table get-global at ;
 
 <PRIVATE

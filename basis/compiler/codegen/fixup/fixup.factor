@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays byte-vectors generic assocs hashtables
 io.binary kernel kernel.private math namespaces make sequences
@@ -28,51 +28,47 @@ M: label-fixup fixup*
     [ label>> ] [ class>> ] bi compiled-offset 4 - rot
     3array label-table get push ;
 
-TUPLE: rel-fixup arg class type ;
+TUPLE: rel-fixup class type ;
 
-: rel-fixup ( arg class type -- ) \ rel-fixup boa , ;
+: rel-fixup ( class type -- ) \ rel-fixup boa , ;
 
 : push-4 ( value vector -- )
     [ length ] [ B{ 0 0 0 0 } swap push-all ] [ underlying>> ] tri
     swap set-alien-unsigned-4 ;
 
 M: rel-fixup fixup*
-    [ [ arg>> ] [ class>> ] [ type>> ] tri { 0 8 16 } bitfield ]
-    [ class>> rc-absolute-cell = cell 4 ? compiled-offset swap - ] bi
-    [ relocation-table get push-4 ] bi@ ;
+    [ type>> ]
+    [ class>> ]
+    [ class>> rc-absolute-cell = cell 4 ? compiled-offset swap - ] tri
+    { 0 24 28 } bitfield
+    relocation-table get push-4 ;
 
 M: integer fixup* , ;
 
-: indq ( elt seq -- n ) [ eq? ] with find drop ;
-
-: adjoin* ( obj table -- n )
-    2dup indq [ 2nip ] [ dup length [ push ] dip ] if* ;
-
 SYMBOL: literal-table
 
-: add-literal ( obj -- n ) literal-table get adjoin* ;
+: add-literal ( obj -- ) literal-table get push ;
 
 : add-dlsym-literals ( symbol dll -- )
-    [ string>symbol ] dip 2array literal-table get push-all ;
+    [ string>symbol add-literal ] [ add-literal ] bi* ;
 
 : rel-dlsym ( name dll class -- )
-    [ literal-table get length [ add-dlsym-literals ] dip ] dip
-    rt-dlsym rel-fixup ;
+    [ add-dlsym-literals ] dip rt-dlsym rel-fixup ;
 
 : rel-word ( word class -- )
     [ add-literal ] dip rt-xt rel-fixup ;
 
 : rel-primitive ( word class -- )
-    [ def>> first ] dip rt-primitive rel-fixup ;
+    [ def>> first add-literal ] dip rt-primitive rel-fixup ;
 
 : rel-immediate ( literal class -- )
     [ add-literal ] dip rt-immediate rel-fixup ;
 
 : rel-this ( class -- )
-    0 swap rt-label rel-fixup ;
+    rt-this rel-fixup ;
 
 : rel-here ( offset class -- )
-    rt-here rel-fixup ;
+    [ add-literal ] dip rt-here rel-fixup ;
 
 : init-fixup ( -- )
     BV{ } clone relocation-table set
