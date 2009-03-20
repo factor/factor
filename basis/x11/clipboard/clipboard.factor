@@ -26,7 +26,7 @@ TUPLE: x-clipboard atom contents ;
     CurrentTime XConvertSelection drop ;
 
 : snarf-property ( prop-return -- string )
-    dup *void* [ *void* ascii alien>string ] [ drop f ] if ;
+    dup *void* [ *void* utf8 alien>string ] [ drop f ] if ;
 
 : window-property ( win prop delete? -- string )
     [ [ dpy get ] 2dip 0 -1 ] dip AnyPropertyType
@@ -37,7 +37,7 @@ TUPLE: x-clipboard atom contents ;
     swap XSelectionEvent-property zero? [
         drop f
     ] [
-        selection-property 1 window-property utf8 decode
+        selection-property 1 window-property
     ] if ;
 
 : own-selection ( prop win -- )
