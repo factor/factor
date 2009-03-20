@@ -5,14 +5,14 @@ IN: io.streams.limited
 
 HELP: <limited-stream>
 { $values
-     { "stream" "an input stream" } { "limit" integer } { "mode" "a " { $link limited-stream } " mode singleton" }
+     { "stream" "an input stream" } { "limit" integer } { "mode" { $link stream-throws } " or " { $link stream-eofs } }
      { "stream'" "an input stream" }
 }
 { $description "Constructs a new " { $link limited-stream } " from an existing stream. User code should use " { $link limit } " or " { $link limit-input } "." } ;
 
 HELP: limit
 { $values
-     { "stream" "an input stream" } { "limit" integer } { "mode" "a " { $link limited-stream } " mode singleton" }
+     { "stream" "an input stream" } { "limit" integer } { "mode" { $link stream-throws } " or " { $link stream-eofs } }
      { "stream'" "a stream" }
 }
 { $description "Changes a decoder's stream to be a limited stream, or wraps " { $snippet "stream" } " in a " { $link limited-stream } "." }
@@ -36,7 +36,7 @@ HELP: limit
     }
 } ;
 
-HELP: unlimit
+HELP: unlimited
 { $values
      { "stream" "an input stream" }
      { "stream'" "a stream" }
@@ -51,22 +51,22 @@ HELP: limited-stream
 
 HELP: limit-input
 { $values
-     { "limit" integer } { "mode" "a " { $link limited-stream } " mode singleton" }
+     { "limit" integer } { "mode" { $link stream-throws } " or " { $link stream-eofs } }
 }
 { $description "Wraps the current " { $link input-stream } " in a " { $link limited-stream } "." } ;
 
-HELP: unlimit-input
+HELP: unlimited-input
 { $description "Returns the underlying stream of the limited-stream stored in " { $link input-stream } "." } ;
 
 HELP: stream-eofs
 { $values
-    { "value" "a " { $link limited-stream } " mode singleton" }
+    { "value" { $link stream-throws } " or " { $link stream-eofs } }
 }
 { $description "If the " { $slot "mode" } " of a limited stream is set to this singleton, the stream will return " { $link f } " upon exhaustion." } ;
 
 HELP: stream-throws
 { $values
-    { "value" "a " { $link limited-stream } " mode singleton" }
+    { "value" { $link stream-throws } " or " { $link stream-eofs } }
 }
 { $description "If the " { $slot "mode" } " of a limited stream is set to this singleton, the stream will throw " { $link limit-exceeded } " upon exhaustion." } ;
 
@@ -79,9 +79,9 @@ ARTICLE: "io.streams.limited" "Limited input streams"
 "Wrap the current " { $link input-stream } " in a limited stream:"
 { $subsection limit-input }
 "Unlimits a limited stream:"
-{ $subsection unlimit }
+{ $subsection unlimited }
 "Unlimits the current " { $link input-stream } ":"
-{ $subsection unlimit-input }
+{ $subsection unlimited-input }
 "Make a limited stream throw an exception on exhaustion:"
 { $subsection stream-throws }
 "Make a limited stream return " { $link f } " on exhaustion:"
