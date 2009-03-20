@@ -139,6 +139,18 @@ CELL allot_array_1(CELL obj)
 	return tag_object(a);
 }
 
+CELL allot_array_2(CELL v1, CELL v2)
+{
+	REGISTER_ROOT(v1);
+	REGISTER_ROOT(v2);
+	F_ARRAY *a = allot_array_internal(ARRAY_TYPE,2);
+	UNREGISTER_ROOT(v2);
+	UNREGISTER_ROOT(v1);
+	set_array_nth(a,0,v1);
+	set_array_nth(a,1,v2);
+	return tag_object(a);
+}
+
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4)
 {
 	REGISTER_ROOT(v1);

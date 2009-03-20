@@ -11,12 +11,34 @@ void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter)
 	{
 		F_BYTE_ARRAY *relocation = untag_object(compiled->relocation);
 
-		F_REL *rel = (F_REL *)(relocation + 1);
-		F_REL *rel_end = (F_REL *)((char *)rel + byte_array_capacity(relocation));
+		CELL index = 1;
+
+		CELL *rel = (CELL *)(relocation + 1);
+		CELL *rel_end = (CELL *)((char *)rel + byte_array_capacity(relocation));
 
 		while(rel < rel_end)
 		{
-			iter(rel,compiled);
+			iter(*rel,index,compiled);
+
+			switch(REL_TYPE(*rel))
+			{
+			case RT_PRIMITIVE:
+			case RT_XT:
+			case RT_IMMEDIATE:
+			case RT_HERE:
+				index++;
+				break;
+			case RT_DLSYM:
+				index += 2;
+				break;
+			case RT_THIS:
+			case RT_STACK_CHAIN:
+				break;
+			default:
+				critical_error("Bad rel type",*rel);
+				return; /* Can't happen */
+			}
+
 			rel++;
 		}
 	}
@@ -85,13 +107,13 @@ void store_address_in_code_block(CELL class, CELL offset, F_FIXNUM absolute_valu
 	}
 }
 
-void update_literal_references_step(F_REL *rel, F_CODE_BLOCK *compiled)
+void update_literal_references_step(CELL rel, CELL index, F_CODE_BLOCK *compiled)
 {
 	if(REL_TYPE(rel) == RT_IMMEDIATE)
 	{
-		CELL offset = rel->offset + (CELL)(compiled + 1);
+		CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
 		F_ARRAY *literals = untag_object(compiled->literals);
-		F_FIXNUM absolute_value = array_nth(literals,REL_ARGUMENT(rel));
+		F_FIXNUM absolute_value = array_nth(literals,index);
 		store_address_in_code_block(REL_CLASS(rel),offset,absolute_value);
 	}
 }
@@ -136,13 +158,13 @@ CELL object_xt(CELL obj)
 		return (CELL)untag_quotation(obj)->xt;
 }
 
-void update_word_references_step(F_REL *rel, F_CODE_BLOCK *compiled)
+void update_word_references_step(CELL rel, CELL index, F_CODE_BLOCK *compiled)
 {
 	if(REL_TYPE(rel) == RT_XT)
 	{
-		CELL offset = rel->offset + (CELL)(compiled + 1);
+		CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
 		F_ARRAY *literals = untag_object(compiled->literals);
-		CELL xt = object_xt(array_nth(literals,REL_ARGUMENT(rel)));
+		CELL xt = object_xt(array_nth(literals,index));
 		store_address_in_code_block(REL_CLASS(rel),offset,xt);
 	}
 }
@@ -228,11 +250,10 @@ void undefined_symbol(void)
 }
 
 /* Look up an external library symbol referenced by a compiled code block */
-void *get_rel_symbol(F_REL *rel, F_ARRAY *literals)
+void *get_rel_symbol(F_ARRAY *literals, CELL index)
 {
-	CELL arg = REL_ARGUMENT(rel);
-	CELL symbol = array_nth(literals,arg);
-	CELL library = array_nth(literals,arg + 1);
+	CELL symbol = array_nth(literals,index);
+	CELL library = array_nth(literals,index + 1);
 
 	F_DLL *dll = (library == F ? NULL : untag_dll(library));
 
@@ -265,37 +286,37 @@ void *get_rel_symbol(F_REL *rel, F_ARRAY *literals)
 }
 
 /* Compute an address to store at a relocation */
-void relocate_code_block_step(F_REL *rel, F_CODE_BLOCK *compiled)
+void relocate_code_block_step(CELL rel, CELL index, F_CODE_BLOCK *compiled)
 {
-	CELL offset = rel->offset + (CELL)(compiled + 1);
+	CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
 	F_ARRAY *literals = untag_object(compiled->literals);
 	F_FIXNUM absolute_value;
 
 	switch(REL_TYPE(rel))
 	{
 	case RT_PRIMITIVE:
-		absolute_value = (CELL)primitives[REL_ARGUMENT(rel)];
+		absolute_value = (CELL)primitives[to_fixnum(array_nth(literals,index))];
 		break;
 	case RT_DLSYM:
-		absolute_value = (CELL)get_rel_symbol(rel,literals);
+		absolute_value = (CELL)get_rel_symbol(literals,index);
 		break;
 	case RT_IMMEDIATE:
-		absolute_value = array_nth(literals,REL_ARGUMENT(rel));
+		absolute_value = array_nth(literals,index);
 		break;
 	case RT_XT:
-		absolute_value = object_xt(array_nth(literals,REL_ARGUMENT(rel)));
+		absolute_value = object_xt(array_nth(literals,index));
 		break;
 	case RT_HERE:
-		absolute_value = rel->offset + (CELL)(compiled + 1) + (short)REL_ARGUMENT(rel);
+		absolute_value = offset + (short)to_fixnum(array_nth(literals,index));
 		break;
-	case RT_LABEL:
-		absolute_value = (CELL)(compiled + 1) + REL_ARGUMENT(rel);
+	case RT_THIS:
+		absolute_value = (CELL)(compiled + 1);
 		break;
 	case RT_STACK_CHAIN:
 		absolute_value = (CELL)&stack_chain;
 		break;
 	default:
-		critical_error("Bad rel type",rel->type);
+		critical_error("Bad rel type",rel);
 		return; /* Can't happen */
 	}
 

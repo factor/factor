@@ -109,6 +109,7 @@ F_ARRAY *allot_array(CELL type, CELL capacity, CELL fill);
 F_BYTE_ARRAY *allot_byte_array(CELL size);
 
 CELL allot_array_1(CELL obj);
+CELL allot_array_2(CELL v1, CELL v2);
 CELL allot_array_4(CELL v1, CELL v2, CELL v3, CELL v4);
 
 void primitive_array(void);

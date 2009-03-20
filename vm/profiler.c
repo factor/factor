@@ -3,7 +3,7 @@
 /* Allocates memory */
 F_CODE_BLOCK *compile_profiling_stub(F_WORD *word)
 {
-	CELL literals = allot_array_1(tag_object(word));
+	CELL literals = allot_array_2(tag_object(word),tag_object(word));
 	REGISTER_ROOT(literals);
 
 	F_ARRAY *quadruple = untag_object(userenv[JIT_PROFILING]);
@@ -11,12 +11,12 @@ F_CODE_BLOCK *compile_profiling_stub(F_WORD *word)
 	CELL code = array_nth(quadruple,0);
 	REGISTER_ROOT(code);
 
-	F_REL rel;
-	rel.type = to_fixnum(array_nth(quadruple,2)) | (to_fixnum(array_nth(quadruple,1)) << 8);
-	rel.offset = to_fixnum(array_nth(quadruple,3)) * compiled_code_format();
+	CELL rel = (to_fixnum(array_nth(quadruple,1)) << 24)
+		| (to_fixnum(array_nth(quadruple,2)) << 28)
+		| (to_fixnum(array_nth(quadruple,3)) * compiled_code_format());
 
-	F_BYTE_ARRAY *relocation = allot_byte_array(sizeof(F_REL));
-	memcpy((void *)BREF(relocation,0),&rel,sizeof(F_REL));
+	F_BYTE_ARRAY *relocation = allot_byte_array(sizeof(CELL));
+	memcpy(relocation + 1,&rel,sizeof(CELL));
 
 	UNREGISTER_ROOT(code);
 	UNREGISTER_ROOT(literals);
