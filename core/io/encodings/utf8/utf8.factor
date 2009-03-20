@@ -73,12 +73,14 @@ M: utf8 encode-char
 PRIVATE>
 
 : code-point-length ( n -- x )
-    log2 {
-        { [ dup 0 7 between? ] [ 1 ] }
-        { [ dup 8 11 between? ] [ 2 ] }
-        { [ dup 12 16 between? ] [ 3 ] }
-        { [ dup 17 21 between? ] [ 4 ] }
-    } cond nip ;
+    dup zero? [ drop 1 ] [
+        log2 {
+            { [ dup 0 6 between? ] [ 1 ] }
+            { [ dup 7 10 between? ] [ 2 ] }
+            { [ dup 11 15 between? ] [ 3 ] }
+            { [ dup 16 20 between? ] [ 4 ] }
+        } cond nip
+    ] if ;
 
 : code-point-offsets ( string -- indices )
     0 [ code-point-length + ] accumulate swap suffix ;

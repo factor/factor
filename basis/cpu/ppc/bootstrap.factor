@@ -41,7 +41,7 @@ big-endian on
     stack-frame 6 LI
     6 1 next-save STW
     0 1 lr-save stack-frame + STW
-] rc-absolute-ppc-2/2 rt-label 1 jit-prolog jit-define
+] rc-absolute-ppc-2/2 rt-this 1 jit-prolog jit-define
 
 [
     0 6 LOAD32
