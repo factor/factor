@@ -13,8 +13,8 @@ void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter)
 
 		CELL index = 1;
 
-		CELL *rel = (CELL *)(relocation + 1);
-		CELL *rel_end = (CELL *)((char *)rel + byte_array_capacity(relocation));
+		F_REL *rel = (F_REL *)(relocation + 1);
+		F_REL *rel_end = (F_REL *)((char *)rel + byte_array_capacity(relocation));
 
 		while(rel < rel_end)
 		{
@@ -107,7 +107,7 @@ void store_address_in_code_block(CELL class, CELL offset, F_FIXNUM absolute_valu
 	}
 }
 
-void update_literal_references_step(CELL rel, CELL index, F_CODE_BLOCK *compiled)
+void update_literal_references_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 {
 	if(REL_TYPE(rel) == RT_IMMEDIATE)
 	{
@@ -158,7 +158,7 @@ CELL object_xt(CELL obj)
 		return (CELL)untag_quotation(obj)->xt;
 }
 
-void update_word_references_step(CELL rel, CELL index, F_CODE_BLOCK *compiled)
+void update_word_references_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 {
 	if(REL_TYPE(rel) == RT_XT)
 	{
@@ -286,7 +286,7 @@ void *get_rel_symbol(F_ARRAY *literals, CELL index)
 }
 
 /* Compute an address to store at a relocation */
-void relocate_code_block_step(CELL rel, CELL index, F_CODE_BLOCK *compiled)
+void relocate_code_block_step(F_REL rel, CELL index, F_CODE_BLOCK *compiled)
 {
 	CELL offset = REL_OFFSET(rel) + (CELL)(compiled + 1);
 	F_ARRAY *literals = untag_object(compiled->literals);

@@ -11,12 +11,12 @@ F_CODE_BLOCK *compile_profiling_stub(F_WORD *word)
 	CELL code = array_nth(quadruple,0);
 	REGISTER_ROOT(code);
 
-	CELL rel = (to_fixnum(array_nth(quadruple,1)) << 24)
+	F_REL rel = (to_fixnum(array_nth(quadruple,1)) << 24)
 		| (to_fixnum(array_nth(quadruple,2)) << 28)
 		| (to_fixnum(array_nth(quadruple,3)) * compiled_code_format());
 
-	F_BYTE_ARRAY *relocation = allot_byte_array(sizeof(CELL));
-	memcpy(relocation + 1,&rel,sizeof(CELL));
+	F_BYTE_ARRAY *relocation = allot_byte_array(sizeof(F_REL));
+	memcpy(relocation + 1,&rel,sizeof(F_REL));
 
 	UNREGISTER_ROOT(code);
 	UNREGISTER_ROOT(literals);

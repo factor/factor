@@ -94,7 +94,7 @@ F_ARRAY *code_to_emit(CELL code)
 	return untag_object(array_nth(untag_object(code),0));
 }
 
-CELL rel_to_emit(CELL code, CELL code_format, CELL code_length, bool *rel_p)
+F_REL rel_to_emit(CELL code, CELL code_format, CELL code_length, bool *rel_p)
 {
 	F_ARRAY *quadruple = untag_object(code);
 	CELL rel_class = array_nth(quadruple,1);
@@ -117,8 +117,8 @@ CELL rel_to_emit(CELL code, CELL code_format, CELL code_length, bool *rel_p)
 
 #define EMIT(name) { \
 		bool rel_p; \
-		CELL rel = rel_to_emit(name,code_format,code_count,&rel_p); \
-		if(rel_p) GROWABLE_BYTE_ARRAY_APPEND(relocation,&rel,sizeof(CELL)); \
+		F_REL rel = rel_to_emit(name,code_format,code_count,&rel_p); \
+		if(rel_p) GROWABLE_BYTE_ARRAY_APPEND(relocation,&rel,sizeof(F_REL)); \
 		GROWABLE_ARRAY_APPEND(code,code_to_emit(name)); \
 	}
 
