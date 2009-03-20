@@ -104,6 +104,7 @@ M: string to-chat
     [ to-chat ] [ drop ] if* ;
 
 M: irc-chat to-chat in-messages>> mailbox-put ;
+M: sequence to-chat [ to-chat ] with each ;
 
 : unregister-chat ( name -- )
     irc> chats>>
@@ -122,9 +123,6 @@ M: irc-chat to-chat in-messages>> mailbox-put ;
     irc> chats>> values
     [ dup irc-channel-chat? [ participants>> key? ] [ 2drop f ] if ]
     with filter ;
-
-: to-chats-with-participant ( message nickname -- )
-    chats-with-participant [ to-chat ] with each ;
 
 : remove-participant-from-all ( nick -- )
     dup chats-with-participant [ (remove-participant) ] with each ;
@@ -199,7 +197,7 @@ M: irc-message forward-message
 M: single-forward forward-message dup forward-name to-chat ;
 
 M: multiple-forward forward-message
-    dup sender>> to-chats-with-participant ;
+    dup sender>> chats-with-participant to-chat ;
   
 M: broadcast-forward forward-message
     irc> chats>> values [ to-chat ] with each ;
