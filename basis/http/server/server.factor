@@ -253,7 +253,7 @@ LOG: httpd-benchmark DEBUG
         httpd-benchmark
     ] [ call ] if ; inline
 
-TUPLE: http-server < threaded-server request-limit ;
+TUPLE: http-server < threaded-server ;
 
 SYMBOL: request-limit
 
