@@ -139,10 +139,10 @@ check_library_exists() {
 }
 
 check_X11_libraries() {
-    check_library_exists freetype
     check_library_exists GLU
     check_library_exists GL
     check_library_exists X11
+    check_library_exists pango
 }
 
 check_libraries() {
