@@ -97,7 +97,7 @@ F_CODE_BLOCK *frame_code(F_STACK_FRAME *frame)
 
 CELL frame_type(F_STACK_FRAME *frame)
 {
-	return frame_code(frame)->type;
+	return frame_code(frame)->block.type;
 }
 
 CELL frame_executing(F_STACK_FRAME *frame)
