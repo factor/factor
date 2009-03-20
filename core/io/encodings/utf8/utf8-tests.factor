@@ -1,5 +1,5 @@
 USING: io.encodings.utf8 tools.test io.encodings.string strings arrays
-bootstrap.unicode ;
+bootstrap.unicode kernel sequences ;
 IN: io.encodings.utf8.tests
 
 : decode-utf8-w/stream ( array -- newarray )
@@ -25,3 +25,7 @@ IN: io.encodings.utf8.tests
 
 [ 3 ] [ 1 "日本語" >utf8-index ] unit-test
 [ 3 ] [ 9 "日本語" utf8-index> ] unit-test
+
+[ 3 ] [ 2 "lápis" >utf8-index ] unit-test
+
+[ V{ } ] [ 100000 [ [ code-point-length ] [ 1string utf8 encode length ] bi = not ] filter ] unit-test
