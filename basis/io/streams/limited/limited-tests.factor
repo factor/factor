@@ -57,13 +57,13 @@ IN: io.streams.limited.tests
 
 [ t ]
 [
-    "abc" <string-reader> 3 stream-eofs limit unlimit
+    "abc" <string-reader> 3 stream-eofs limit unlimited
     "abc" <string-reader> =
 ] unit-test
 
 [ t ]
 [
-    "abc" <string-reader> 3 stream-eofs limit unlimit
+    "abc" <string-reader> 3 stream-eofs limit unlimited
     "abc" <string-reader> =
 ] unit-test
 
@@ -71,7 +71,7 @@ IN: io.streams.limited.tests
 [
     [
         "resource:license.txt" utf8 <file-reader> &dispose
-        3 stream-eofs limit unlimit
+        3 stream-eofs limit unlimited
         "resource:license.txt" utf8 <file-reader> &dispose
         [ decoder? ] both?
     ] with-destructors

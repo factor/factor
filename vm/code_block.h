@@ -44,13 +44,14 @@ typedef enum {
 #define REL_RELATIVE_ARM_3_MASK 0xffffff
 
 /* code relocation table consists of a table of entries for each fixup */
+typedef u32 F_REL;
 #define REL_TYPE(r)   (((r) & 0xf0000000) >> 28)
 #define REL_CLASS(r)  (((r) & 0x0f000000) >> 24)
 #define REL_OFFSET(r)  ((r) & 0x00ffffff)
 
 void flush_icache_for(F_CODE_BLOCK *compiled);
 
-typedef void (*RELOCATION_ITERATOR)(CELL rel, CELL index, F_CODE_BLOCK *compiled);
+typedef void (*RELOCATION_ITERATOR)(F_REL rel, CELL index, F_CODE_BLOCK *compiled);
 
 void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter);
 
