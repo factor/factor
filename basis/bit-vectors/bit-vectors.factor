@@ -31,7 +31,7 @@ M: bit-array new-resizable drop <bit-vector> ;
 
 INSTANCE: bit-vector growable
 
-: ?V{ \ } [ >bit-vector ] parse-literal ; parsing
+SYNTAX: ?V{ \ } [ >bit-vector ] parse-literal ;
 
 M: bit-vector >pprint-sequence ;
 M: bit-vector pprint-delims drop \ ?V{ \ } ;

@@ -34,9 +34,9 @@ TUPLE: tokenizer any one many ;
 : reset-tokenizer ( -- )
   default-tokenizer \ tokenizer set-global ;
 
-: TOKENIZER: 
+SYNTAX: TOKENIZER: 
   scan search [ "Tokenizer not found" throw ] unless*
-  execute( -- tokenizer ) \ tokenizer set-global ; parsing
+  execute( -- tokenizer ) \ tokenizer set-global ;
 
 TUPLE: ebnf-non-terminal symbol ;
 TUPLE: ebnf-terminal symbol ;
@@ -522,16 +522,14 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   parse-ebnf dup dup parser [ main swap at compile ] with-variable
   [ compiled-parse ] curry [ with-scope ast>> ] curry ;
 
-: <EBNF "EBNF>" reset-tokenizer parse-multiline-string parse-ebnf main swap at  
-  parsed reset-tokenizer ; parsing
+SYNTAX: <EBNF "EBNF>" reset-tokenizer parse-multiline-string parse-ebnf main swap at  
+  parsed reset-tokenizer ;
 
-: [EBNF "EBNF]" reset-tokenizer parse-multiline-string ebnf>quot nip 
-  parsed \ call parsed reset-tokenizer ; parsing
+SYNTAX: [EBNF "EBNF]" reset-tokenizer parse-multiline-string ebnf>quot nip 
+  parsed \ call parsed reset-tokenizer ;
 
-: EBNF: 
+SYNTAX: EBNF: 
   reset-tokenizer CREATE-WORD dup ";EBNF" parse-multiline-string  
   ebnf>quot swapd (( input -- ast )) define-declared "ebnf-parser" set-word-prop 
-  reset-tokenizer ; parsing
-
-
+  reset-tokenizer ;
 

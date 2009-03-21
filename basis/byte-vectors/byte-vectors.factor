@@ -42,7 +42,7 @@ M: byte-array like
 
 M: byte-array new-resizable drop <byte-vector> ;
 
-: BV{ \ } [ >byte-vector ] parse-literal ; parsing
+SYNTAX: BV{ \ } [ >byte-vector ] parse-literal ;
 
 M: byte-vector pprint* pprint-object ;
 M: byte-vector pprint-delims drop \ BV{ \ } ;

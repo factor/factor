@@ -62,7 +62,7 @@ M: nibble-array resize
 
 M: nibble-array byte-length length nibbles>bytes ;
 
-: N{ \ } [ >nibble-array ] parse-literal ; parsing
+SYNTAX: N{ \ } [ >nibble-array ] parse-literal ;
 
 INSTANCE: nibble-array sequence
 

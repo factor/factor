@@ -29,8 +29,6 @@ SYMBOLS: Cn Lu Ll Lt Lm Lo Mn Mc Me Nd Nl No Pc Pd Ps Pe Pi Pf Po Sm Sc Sk So Zs
 
 PRIVATE>
 
-: CATEGORY:
-    parse-category define-category ; parsing
+SYNTAX: CATEGORY: parse-category define-category ;
 
-: CATEGORY-NOT:
-    parse-category define-not-category ; parsing
+SYNTAX: CATEGORY-NOT: parse-category define-not-category ;
