@@ -616,7 +616,7 @@ PRIVATE>
 
 ERROR: parse-failed input word ;
 
-: PEG:
+SYNTAX: PEG:
   (:)
   [let | def [ ] word [ ] |
     [
@@ -630,7 +630,7 @@ ERROR: parse-failed input word ;
         ]
       ] with-compilation-unit
     ] over push-all
-  ] ; parsing
+  ] ;
 
 USING: vocabs vocabs.loader ;
 

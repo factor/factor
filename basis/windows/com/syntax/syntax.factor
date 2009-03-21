@@ -90,14 +90,13 @@ unless
 
 PRIVATE>
 
-: COM-INTERFACE:
+SYNTAX: COM-INTERFACE:
     scan
     scan find-com-interface-definition
     scan string>guid
     parse-com-functions
     <com-interface-definition>
     dup save-com-interface-definition
-    define-words-for-com-interface
-    ; parsing
+    define-words-for-com-interface ;
 
-: GUID: scan string>guid parsed ; parsing
+SYNTAX: GUID: scan string>guid parsed ;

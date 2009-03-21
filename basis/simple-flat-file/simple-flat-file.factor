@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences splitting kernel math.parser io.files io.encodings.utf8
-biassocs ascii ;
+biassocs ascii namespaces arrays make assocs interval-maps sets ;
 IN: simple-flat-file
 
 : drop-comments ( seq -- newseq )
@@ -30,3 +30,25 @@ IN: simple-flat-file
 
 : data ( filename -- data )
     utf8 file-lines drop-comments [ split-; ] map ;
+
+SYMBOL: interned
+
+: range, ( value key -- )
+    swap interned get
+    [ = ] with find nip 2array , ;
+
+: expand-ranges ( assoc -- interval-map )
+    [
+        [
+            swap CHAR: . over member? [
+                ".." split1 [ hex> ] bi@ 2array
+            ] [ hex> ] if range,
+        ] assoc-each
+    ] { } make <interval-map> ;
+
+: process-interval-file ( ranges -- table )
+    dup values prune interned
+    [ expand-ranges ] with-variable ;
+
+: load-interval-file ( filename -- table )
+    data process-interval-file ;
