@@ -19,9 +19,10 @@ M: descriptive-error summary
     [ recover ] 2curry ;
 PRIVATE>
 
-: define-descriptive ( word def -- )
-    [ "descriptive-definition" set-word-prop ]
-    [ dupd [descriptive] define ] 2bi ;
+: define-descriptive ( word def effect -- )
+    [ drop "descriptive-definition" set-word-prop ]
+    [ [ dupd [descriptive] ] dip define-declared ]
+    3bi ;
 
 SYNTAX: DESCRIPTIVE: (:) define-descriptive ;
 

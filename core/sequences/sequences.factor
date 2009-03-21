@@ -176,7 +176,7 @@ PRIVATE>
     3 swap bounds-check nip first4-unsafe ; flushable
 
 : ?nth ( n seq -- elt/f )
-    2dup bounds-check? [ nth-unsafe ] [ 2drop f ] if ; flushable
+    2dup bounds-check? [ nth-unsafe ] [ 2drop f ] if ; inline
 
 MIXIN: virtual-sequence
 GENERIC: virtual-seq ( seq -- seq' )
