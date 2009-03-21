@@ -152,7 +152,7 @@ M: avl new-assoc 2drop <avl> ;
 M: avl assoc-like
     drop dup avl? [ >avl ] unless ;
 
-: AVL{
-    \ } [ >avl ] parse-literal ; parsing
+SYNTAX: AVL{
+    \ } [ >avl ] parse-literal ;
 
 M: avl pprint-delims drop \ AVL{ \ } ;

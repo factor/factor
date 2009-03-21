@@ -279,12 +279,12 @@ H{ } clone verify-messages set-global
 
 : verify-message ( n -- word ) verify-messages get-global at ;
 
-: X509_V_:
+SYNTAX: X509_V_:
     scan "X509_V_" prepend create-in
     scan-word
     [ 1quotation (( -- value )) define-inline ]
     [ verify-messages get set-at ]
-    2bi ; parsing
+    2bi ;
 
 >>
 
