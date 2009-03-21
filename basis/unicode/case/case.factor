@@ -1,8 +1,8 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unicode.data sequences namespaces
-sbufs make unicode.syntax unicode.normalize math hints
-unicode.categories combinators unicode.syntax assocs combinators.short-circuit
+sbufs make unicode.normalize math hints
+unicode.categories combinators assocs combinators.short-circuit
 strings splitting kernel accessors unicode.breaks fry locals ;
 QUALIFIED: ascii
 IN: unicode.case
