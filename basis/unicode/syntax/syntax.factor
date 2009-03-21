@@ -27,12 +27,12 @@ IN: unicode.syntax
 
 PRIVATE>
 
-: CATEGORY:
-    CREATE ";" parse-tokens define-category ; parsing
+SYNTAX: CATEGORY:
+    CREATE ";" parse-tokens define-category ;
 
 : seq-minus ( seq1 seq2 -- diff )
     [ member? not ] curry filter ;
 
-: CATEGORY-NOT:
+SYNTAX: CATEGORY-NOT:
     CREATE ";" parse-tokens
-    categories swap seq-minus define-category ; parsing
+    categories swap seq-minus define-category ;

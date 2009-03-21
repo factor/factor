@@ -59,12 +59,11 @@ M: object specializer-declaration class ;
 : specialized-length ( specializer -- n )
     dup [ array? ] all? [ first ] when length ;
 
-: HINTS:
+SYNTAX: HINTS:
     scan-object
     dup method-spec? [ first2 method ] when
     [ redefined ]
     [ parse-definition "specializer" set-word-prop ] bi ;
-    parsing
 
 ! Default specializers
 { first first2 first3 first4 }

@@ -14,10 +14,10 @@ GENERIC: definition-icon ( definition -- path )
 
 <<
 
-: ICON:
+SYNTAX: ICON:
     scan-word \ definition-icon create-method
     scan '[ drop _ definition-icon-path ]
-    define ; parsing
+    define ;
 
 >>
 

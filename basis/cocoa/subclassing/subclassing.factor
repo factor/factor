@@ -76,6 +76,6 @@ SYMBOL: +superclass+
         import-objc-class
     ] bind ;
 
-: CLASS:
+SYNTAX: CLASS:
     parse-definition unclip
-    >hashtable define-objc-class ; parsing
+    >hashtable define-objc-class ;

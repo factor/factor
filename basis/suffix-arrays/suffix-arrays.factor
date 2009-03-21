@@ -32,7 +32,7 @@ PRIVATE>
 : >suffix-array ( seq -- array )
     [ suffixes ] map concat natural-sort ;
 
-: SA{ \ } [ >suffix-array ] parse-literal ; parsing
+SYNTAX: SA{ \ } [ >suffix-array ] parse-literal ;
 
 : query ( begin suffix-array -- matches )
     2dup find-index dup
