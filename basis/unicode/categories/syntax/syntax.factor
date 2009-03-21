@@ -17,8 +17,14 @@ SYMBOLS: Cn Lu Ll Lt Lm Lo Mn Mc Me Nd Nl No Pc Pd Ps Pe Pi Pf Po Sm Sc Sk So Zs
     [ >category-array ] dip
     '[ dup category# _ nth-unsafe [ drop t ] _ if ] ;
 
+: integer-predicate-class ( word predicate -- )
+    integer swap define-predicate-class ;
+
 : define-category ( word categories code -- )
-    [category] integer swap define-predicate-class ;
+    [category] integer-predicate-class ;
+
+: define-not-category ( word categories code -- )
+    [category] [ not ] compose integer-predicate-class ;
 
 : parse-category ( -- word tokens quot )
     CREATE-CLASS \ ; parse-until { | } split1
@@ -31,6 +37,4 @@ PRIVATE>
     parse-category define-category ; parsing
 
 : CATEGORY-NOT:
-    parse-category
-    [ categories swap diff ] dip
-    define-category ; parsing
+    parse-category define-not-category ; parsing
