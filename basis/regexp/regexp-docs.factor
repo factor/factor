@@ -76,6 +76,8 @@ ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
     { { $snippet "\\p{Nd}" } "Character in Unicode category Nd" } 
     { { $snippet "\\p{Z}" } "Character in Unicode category beginning with Z" } 
     { { $snippet "\\p{script=Cham}" } "Character in the Cham writing system" } }
+{ $heading "Character class operations" }
+"Character classes can be composed using four binary operations: " { $snippet "|| && ~~ --" } ". These do the operations union, intersection, symmetric difference and difference, respectively. For example, characters which are lower-case but not Latin script could be matched as " { $snippet "[\\p{lower}--\\p{script=latin}]" } ". These operations are right-associative, and " { $snippet "^" } " binds tighter than them. There is no syntax for grouping."
 { $heading "Boundaries" }
 "Special operators exist to match certain points in the string. These are called 'zero-width' because they do not consume any characters."
 { $table
