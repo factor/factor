@@ -230,7 +230,10 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     dup or-class flatten partition-classes
     dup not-integers>> length {
         { 0 [ nip make-or-class ] }
-        { 1 [ not-integers>> first [ class>> '[ _ swap class-member? ] any? ] keep or ] }
+        { 1 [
+            not-integers>> first
+            [ class>> '[ _ swap class-member? ] any? ] keep or
+        ] }
         [ 3drop t ]
     } case ;
 
@@ -250,6 +253,12 @@ M: or-class <not-class>
 
 M: t <not-class> drop f ;
 M: f <not-class> drop t ;
+
+: <minus-class> ( a b -- a-b )
+    <not-class> 2array <and-class> ;
+
+: <sym-diff-class> ( a b -- a~b )
+    2array [ <or-class> ] [ <and-class> ] bi <minus-class> ;
 
 M: primitive-class class-member?
     class>> class-member? ;
