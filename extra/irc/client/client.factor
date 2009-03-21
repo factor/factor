@@ -3,7 +3,7 @@
 USING: concurrency.mailboxes kernel io.sockets io.encodings.8-bit calendar
        accessors destructors namespaces io assocs arrays fry
        continuations threads strings classes combinators splitting hashtables
-       ascii irc.messages irc.messages.base irc.messages.parser call ;
+       ascii irc.messages irc.messages.base irc.messages.parser ;
 RENAME: join sequences => sjoin
 EXCLUDE: sequences => join ;
 IN: irc.client
