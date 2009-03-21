@@ -6,7 +6,7 @@ IN: unicode.data
 ABOUT: "unicode.data"
 
 ARTICLE: "unicode.data" "Unicode data tables"
-"The " { $vocab-link "unicode.data" "unicode.data" } " vocabulary contains core Unicode data tables and code for parsing this from files."
+"The " { $vocab-link "unicode.data" "unicode.data" } " vocabulary contains core Unicode data tables and code for parsing this from files. The following words access these data tables."
 { $subsection canonical-entry }
 { $subsection combine-chars }
 { $subsection combining-class }
@@ -14,7 +14,11 @@ ARTICLE: "unicode.data" "Unicode data tables"
 { $subsection name>char }
 { $subsection char>name }
 { $subsection property? }
-{ $subsection load-key-value } ;
+{ $subsection category }
+{ $subsection ch>upper }
+{ $subsection ch>lower } 
+{ $subsection ch>title } 
+{ $subsection special-case } ;
 
 HELP: canonical-entry
 { $values { "char" "a code point" } { "seq" string } }
@@ -48,6 +52,22 @@ HELP: property?
 { $values { "char" "a code point" } { "property" string } { "?" "a boolean" } }
 { $description "Tests whether the code point is listed under the given property in PropList.txt in the Unicode Character Database." } ;
 
-HELP: load-key-value
-{ $values { "filename" string } { "table" "an interval map" } }
-{ $description "This loads a file that looks like Script.txt in the Unicode Character Database and converts it into an efficient interval map, where the keys are characters and the values are strings for the properties." } ;
+HELP: category
+{ $values { "char" "a code point" } { "category" string } }
+{ $description "Returns the general category of a code point, in the form of a string. This will always be a string within the ASCII range of length two. If the code point is unassigned, then it returns " { $snippet "Cn" } "." } ;
+
+HELP: ch>upper
+{ $values { "ch" "a code point" } { "upper" "a code point" } }
+{ $description "Returns the simple upper-cased version of the code point, if it exists. This does not handle context-sensitive or locale-dependent properties of linguistically accurate case conversion, and does not correctly handle characters which become multiple characters on conversion to this case." } ;
+
+HELP: ch>lower
+{ $values { "ch" "a code point" } { "lower" "a code point" } }
+{ $description "Returns the simple lower-cased version of the code point, if it exists. This does not handle context-sensitive or locale-dependent properties of linguistically accurate case conversion, and does not correctly handle characters which become multiple characters on conversion to this case." } ;
+
+HELP: ch>title
+{ $values { "ch" "a code point" } { "title" "a code point" } }
+{ $description "Returns the simple title-cased version of the code point, if it exists. This does not handle context-sensitive or locale-dependent properties of linguistically accurate case conversion, and does not correctly handle characters which become multiple characters on conversion to this case." } ;
+
+HELP: special-case
+{ $values { "ch" "a code point" } { "casing-tuple" { "a tuple, or " { $link f } } } }
+{ $description "If a code point has special casing behavior, returns a tuple which represents that information." } ;
