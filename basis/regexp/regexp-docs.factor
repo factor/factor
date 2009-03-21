@@ -45,7 +45,7 @@ ARTICLE: { "regexp" "construction" } "Constructing regular expressions"
 ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
 "Regexp syntax is largely compatible with Perl, Java and extended POSIX regexps, but not completely. Below, the syntax is documented."
 { $heading "Characters" }
-"At its core, regular expressions consist of character literals. For example, " { $snippet "R/ f/" } " is a regular expression matching just the string 'f'. In addition, the normal escape codes are provided, like " { $snippet "\\t" } " for the tab character and " { $snippet "\\uxxxxxx" } "for an arbitrary Unicode code point, by its hex value. In addition, any character can be preceded by a backslash to escape it, unless this has special meaning. For example, to match a literal opening parenthesis, use " { $snippet "\\(" } "."
+"At its core, regular expressions consist of character literals. For example, " { $snippet "R/ f/" } " is a regular expression matching just the string 'f'. In addition, the normal escape codes are provided, like " { $snippet "\\t" } " for the tab character and " { $snippet "\\uxxxxxx" } " for an arbitrary Unicode code point, by its hex value. In addition, any character can be preceded by a backslash to escape it, unless this has special meaning. For example, to match a literal opening parenthesis, use " { $snippet "\\(" } "."
 { $heading "Concatenation, alternation and grouping" }
 "Regular expressions can be built out of multiple characters by concatenation. For example, " { $snippet "R/ ab/" } " matches a followed by b. The " { $snippet "|" } " (alternation) operator can construct a regexp which matches one of two alternatives. Parentheses can be used for gropuing. So " { $snippet "R/ f(oo|ar)/" } " would match either 'foo' or 'far'."
 { $heading "Character classes" }
@@ -72,10 +72,12 @@ ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
     { { $snippet "\\p{blank}" } "Non-newline whitespace" }
     { { $snippet "\\p{cntrl}" } "Control character" }
     { { $snippet "\\p{space}" } "Whitespace" }
-    { { $snippet "\\p{xdigit}" } "Hexidecimal digit" }
+    { { $snippet "\\p{xdigit}" } "Hexadecimal digit" }
     { { $snippet "\\p{Nd}" } "Character in Unicode category Nd" } 
     { { $snippet "\\p{Z}" } "Character in Unicode category beginning with Z" } 
     { { $snippet "\\p{script=Cham}" } "Character in the Cham writing system" } }
+{ $heading "Character class operations" }
+"Character classes can be composed using four binary operations: " { $snippet "|| && ~~ --" } ". These do the operations union, intersection, symmetric difference and difference, respectively. For example, characters which are lower-case but not Latin script could be matched as " { $snippet "[\\p{lower}--\\p{script=latin}]" } ". These operations are right-associative, and " { $snippet "^" } " binds tighter than them. There is no syntax for grouping."
 { $heading "Boundaries" }
 "Special operators exist to match certain points in the string. These are called 'zero-width' because they do not consume any characters."
 { $table
