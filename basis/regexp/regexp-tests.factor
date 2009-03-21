@@ -508,3 +508,29 @@ IN: regexp-tests
 [ t ] [ " " R/ \P{LL}/ matches? ] unit-test
 [ f ] [ "a" R/ \P{sCriPt = latin}/ matches? ] unit-test
 [ t ] [ " " R/ \P{SCRIPT = laTIn}/ matches? ] unit-test
+
+! Logical operators
+[ t ] [ "a" R/ [\p{script=latin}\p{lower}]/ matches? ] unit-test
+[ t ] [ "π" R/ [\p{script=latin}\p{lower}]/ matches? ] unit-test
+[ t ] [ "A" R/ [\p{script=latin}\p{lower}]/ matches? ] unit-test
+[ f ] [ "3" R/ [\p{script=latin}\p{lower}]/ matches? ] unit-test
+
+[ t ] [ "a" R/ [\p{script=latin}||\p{lower}]/ matches? ] unit-test
+[ t ] [ "π" R/ [\p{script=latin}||\p{lower}]/ matches? ] unit-test
+[ t ] [ "A" R/ [\p{script=latin}||\p{lower}]/ matches? ] unit-test
+[ f ] [ "3" R/ [\p{script=latin}||\p{lower}]/ matches? ] unit-test
+
+[ t ] [ "a" R/ [\p{script=latin}&&\p{lower}]/ matches? ] unit-test
+[ f ] [ "π" R/ [\p{script=latin}&&\p{lower}]/ matches? ] unit-test
+[ f ] [ "A" R/ [\p{script=latin}&&\p{lower}]/ matches? ] unit-test
+[ f ] [ "3" R/ [\p{script=latin}&&\p{lower}]/ matches? ] unit-test
+
+[ f ] [ "a" R/ [\p{script=latin}~~\p{lower}]/ matches? ] unit-test
+[ t ] [ "π" R/ [\p{script=latin}~~\p{lower}]/ matches? ] unit-test
+[ t ] [ "A" R/ [\p{script=latin}~~\p{lower}]/ matches? ] unit-test
+[ f ] [ "3" R/ [\p{script=latin}~~\p{lower}]/ matches? ] unit-test
+
+[ f ] [ "a" R/ [\p{script=latin}--\p{lower}]/ matches? ] unit-test
+[ f ] [ "π" R/ [\p{script=latin}--\p{lower}]/ matches? ] unit-test
+[ t ] [ "A" R/ [\p{script=latin}--\p{lower}]/ matches? ] unit-test
+[ f ] [ "3" R/ [\p{script=latin}--\p{lower}]/ matches? ] unit-test
