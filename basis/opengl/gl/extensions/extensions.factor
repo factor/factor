@@ -47,7 +47,7 @@ reset-gl-function-number-counter
     parameters return parse-arglist [ abi indirect-quot ] dip
     define-declared ;
 
-: GL-FUNCTION:
+SYNTAX: GL-FUNCTION:
     gl-function-calling-convention
     scan
     scan dup
@@ -55,5 +55,4 @@ reset-gl-function-number-counter
     gl-function-number
     [ gl-function-pointer ] 2curry swap
     ";" parse-tokens [ "()" subseq? not ] filter
-    define-indirect
-    ; parsing
+    define-indirect ;

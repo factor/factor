@@ -67,7 +67,7 @@ IN: mason.child
         try-process
     ] with-directory ;
 
-: return-with ( obj -- ) return-continuation get continue-with ;
+: return-with ( obj -- * ) return-continuation get continue-with ;
 
 : build-clean? ( -- ? )
     {

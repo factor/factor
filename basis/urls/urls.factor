@@ -179,7 +179,7 @@ PRIVATE>
     dup protocol>> '[ _ protocol-port or ] change-port ;
 
 ! Literal syntax
-: URL" lexer get skip-blank parse-string >url parsed ; parsing
+SYNTAX: URL" lexer get skip-blank parse-string >url parsed ;
 
 USING: vocabs vocabs.loader ;
 

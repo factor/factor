@@ -131,8 +131,8 @@ M: splay new-assoc
 : >splay ( assoc -- tree )
     T{ splay f f 0 } assoc-clone-like ;
 
-: SPLAY{
-    \ } [ >splay ] parse-literal ; parsing
+SYNTAX: SPLAY{
+    \ } [ >splay ] parse-literal ;
 
 M: splay assoc-like
     drop dup splay? [ >splay ] unless ;

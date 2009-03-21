@@ -21,11 +21,11 @@ IN: vars
     [ define-var-getter ]
     [ define-var-setter ] tri ;
 
-: VAR: ! var
-    scan define-var ; parsing
+SYNTAX: VAR: ! var
+    scan define-var ;
 
 : define-vars ( seq -- )
     [ define-var ] each ;
 
-: VARS: ! vars ...
-    ";" parse-tokens define-vars ; parsing
+SYNTAX: VARS: ! vars ...
+    ";" parse-tokens define-vars ;

@@ -19,8 +19,8 @@ MACRO: shuffle-effect ( effect -- )
         [ [ at \ swap \ nth [ ] 3sequence ] curry map , \ cleave , ] 2bi
     ] [ ] make ;
 
-: shuffle(
-    ")" parse-effect parsed \ shuffle-effect parsed ; parsing
+SYNTAX: shuffle(
+    ")" parse-effect parsed \ shuffle-effect parsed ;
 
 : 2swap ( x y z t -- z t x y ) 2 2 mnswap ; inline
 

@@ -148,19 +148,29 @@ Character = EscapeSequence
           | "^" => [[ ^ <tagged-epsilon> ]]
           | . ?[ allowed-char? ]?
 
-AnyRangeCharacter = EscapeSequence | .
+AnyRangeCharacter = !("&&"|"||"|"--"|"~~") (EscapeSequence | .)
 
 RangeCharacter = !("]") AnyRangeCharacter
 
-Range = RangeCharacter:a "-" RangeCharacter:b => [[ a b <range-class> ]]
+Range = RangeCharacter:a "-" !("-") RangeCharacter:b => [[ a b <range-class> ]]
       | RangeCharacter
 
-StartRange = AnyRangeCharacter:a "-" RangeCharacter:b => [[ a b <range-class> ]]
+StartRange = AnyRangeCharacter:a "-" !("-") RangeCharacter:b => [[ a b <range-class> ]]
            | AnyRangeCharacter
 
 Ranges = StartRange:s Range*:r => [[ r s prefix ]]
 
-CharClass = "^"?:n Ranges:e => [[ e n char-class ]]
+BasicCharClass =  "^"?:n Ranges:e => [[ e n char-class ]]
+
+CharClass = BasicCharClass:b "&&" CharClass:c
+                => [[ b c 2array <and-class> ]]
+          | BasicCharClass:b "||" CharClass:c
+                => [[ b c 2array <or-class> ]]
+          | BasicCharClass:b "~~" CharClass:c
+                => [[ b c <sym-diff-class> ]]
+          | BasicCharClass:b "--" CharClass:c
+                => [[ b c <minus-class> ]]
+          | BasicCharClass
 
 Options = [idmsux]*
 
