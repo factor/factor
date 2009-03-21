@@ -46,6 +46,11 @@ IN: calendar.format
 
 : read-0000 ( -- n ) 4 read string>number ;
 
+: hhmm>timestamp ( hhmm -- timestamp )
+    [
+        0 0 0 read-00 read-00 0 instant <timestamp>
+    ] with-string-reader ;
+
 GENERIC: day. ( obj -- )
 
 M: integer day. ( n -- )
