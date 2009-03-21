@@ -108,21 +108,24 @@ M: terminator-class class-member? ( obj class -- ? )
 
 M: f class-member? 2drop f ;
 
+: same? ( obj1 obj2 quot1: ( obj1 -- val1 ) quot2: ( obj2 -- val2 ) -- ? )
+    bi* = ; inline
+
 M: script-class class-member?
-    [ script-of ] [ script>> ] bi* = ;
+    [ script-of ] [ script>> ] same? ;
 
 M: category-class class-member?
-    [ category# ] [ category>> ] bi* = ;
+    [ category ] [ category>> ] same? ;
 
 M: category-range-class class-member?
-    [ category first ] [ category>> ] bi* = ;
+    [ category first ] [ category>> ] same? ;
 
 TUPLE: not-class class ;
 
 PREDICATE: not-integer < not-class class>> integer? ;
 
 UNION: simple-class
-    primitive-class range-class category-class category-range-class dot ;
+    primitive-class range-class dot ;
 PREDICATE: not-simple < not-class class>> simple-class? ;
 
 M: not-class class-member?
