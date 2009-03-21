@@ -96,12 +96,12 @@ ARTICLE: "prettyprint-literal" "Literal prettyprinting protocol"
 { $code
     "TUPLE: rect w h ;"
     ""
-    ": RECT["
+    "SYNTAX: RECT["
     "    scan-word"
     "    scan-word \\ * assert="
     "    scan-word"
     "    scan-word \\ ] assert="
-    "    <rect> parsed ; parsing"
+    "    <rect> parsed ;"
 }
 "An example literal might be:"
 { $code "RECT[ 100 * 200 ]" }

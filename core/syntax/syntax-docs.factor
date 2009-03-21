@@ -177,10 +177,10 @@ HELP: delimiter
 { $syntax ": foo ... ; delimiter" }
 { $description "Declares the most recently defined word as a delimiter. Delimiters are words which are only ever valid as the end of a nested block to be read by " { $link parse-until } ". An unpaired occurrence of a delimiter is a parse error." } ;
 
-HELP: parsing
-{ $syntax ": foo ... ; parsing" }
-{ $description "Declares the most recently defined word as a parsing word." }
-{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< : hello \"Hello parser!\" print ; parsing >>\n: world hello ;" "Hello parser!" } } ;
+HELP: SYNTAX:
+{ $syntax "SYNTAX: foo ... ;" }
+{ $description "Defines a parsing word." }
+{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< SYNTAX: HELLO \"Hello parser!\" print ; >>\n: world HELLO ;" "Hello parser!" } } ;
 
 HELP: inline
 { $syntax ": foo ... ; inline" }

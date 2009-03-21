@@ -56,8 +56,8 @@ PRIVATE>
 : unadvise ( word --  )
     [ reset ] [ { before after around advised } [ f swap set-word-prop ] with each ] bi ;
 
-: ADVISE: ! word adname location => word adname quot loc
-    scan-word scan scan-word parse-definition swap [ spin ] dip advise ; parsing
+SYNTAX: ADVISE: ! word adname location => word adname quot loc
+    scan-word scan scan-word parse-definition swap [ spin ] dip advise ;
     
-: UNADVISE:    
-    scan-word parsed \ unadvise parsed ; parsing
+SYNTAX: UNADVISE:    
+    scan-word parsed \ unadvise parsed ;

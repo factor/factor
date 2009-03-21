@@ -106,7 +106,7 @@ IN: parser.tests
     ] unit-test
     DEFER: foo
 
-    "IN: parser.tests USING: math prettyprint ; : foo 2 2 + . ; parsing" eval
+    "IN: parser.tests USING: math prettyprint ; SYNTAX: foo 2 2 + . ;" eval
 
     [ ] [ "USE: parser.tests foo" eval ] unit-test
 
@@ -487,7 +487,7 @@ IN: parser.tests
 [ "DEFER: blahy" eval ] [ error>> error>> no-current-vocab? ] must-fail-with
 
 [
-    "IN: parser.tests : blahy ; parsing FORGET: blahy" eval
+    "IN: parser.tests SYNTAX: blahy ; FORGET: blahy" eval
 ] [
     error>> staging-violation?
 ] must-fail-with

@@ -58,7 +58,7 @@ CONSTANT: num-chars HEX: 2FA1E
 
 PRIVATE>
 
-: category# ( char -- category )
+: category# ( char -- n )
     ! There are a few characters that should be Cn
     ! that this gives Cf or Mn
     ! Cf = 26; Mn = 5; Cn = 29
@@ -219,27 +219,3 @@ load-properties to: properties
 
 [ name>char [ "Invalid character" throw ] unless* ]
 name>char-hook set-global
-
-SYMBOL: interned
-
-: range, ( value key -- )
-    swap interned get
-    [ = ] with find nip 2array , ;
-
-: expand-ranges ( assoc -- interval-map )
-    [
-        [
-            swap CHAR: . over member? [
-                ".." split1 [ hex> ] bi@ 2array
-            ] [ hex> ] if range,
-        ] assoc-each
-    ] { } make <interval-map> ;
-
-: process-key-value ( ranges -- table )
-    dup values prune interned
-    [ expand-ranges ] with-variable ;
-
-PRIVATE>
-
-: load-key-value ( filename -- table )
-    data process-key-value ;

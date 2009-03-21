@@ -70,7 +70,7 @@ M: A >pprint-sequence ;
 
 M: A pprint* pprint-object ;
 
-: A{ \ } [ >A ] parse-literal ; parsing
+SYNTAX: A{ \ } [ >A ] parse-literal ;
 
 INSTANCE: A sequence
 

@@ -224,8 +224,7 @@ M: no-method error.
     ] if ;
 
 ! Syntax
-: GENERIC:
-    CREATE define-generic ; parsing
+SYNTAX: GENERIC: CREATE define-generic ;
 
 : parse-method ( -- quot classes generic )
     parse-definition [ 2 tail ] [ second ] [ first ] tri ;
@@ -238,13 +237,13 @@ M: no-method error.
 
 : (METHOD:) ( -- method def ) CREATE-METHOD parse-definition ;
 
-: METHOD: (METHOD:) define ; parsing
+SYNTAX: METHOD: (METHOD:) define ;
 
 ! For compatibility
-: M:
+SYNTAX: M:
     scan-word 1array scan-word create-method-in
     parse-definition
-    define ; parsing
+    define ;
 
 ! Definition protocol. We qualify core generics here
 QUALIFIED: syntax
