@@ -48,6 +48,6 @@ IN: benchmark.spectral-norm
 HINTS: spectral-norm fixnum ;
 
 : spectral-norm-main ( -- )
-    5500 spectral-norm . ;
+    2000 spectral-norm . ;
 
 MAIN: spectral-norm-main
