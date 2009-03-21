@@ -204,17 +204,17 @@ PRIVATE>
 
 PRIVATE>
 
-: R! CHAR: ! parsing-regexp ; parsing
-: R" CHAR: " parsing-regexp ; parsing
-: R# CHAR: # parsing-regexp ; parsing
-: R' CHAR: ' parsing-regexp ; parsing
-: R( CHAR: ) parsing-regexp ; parsing
-: R/ CHAR: / parsing-regexp ; parsing
-: R@ CHAR: @ parsing-regexp ; parsing
-: R[ CHAR: ] parsing-regexp ; parsing
-: R` CHAR: ` parsing-regexp ; parsing
-: R{ CHAR: } parsing-regexp ; parsing
-: R| CHAR: | parsing-regexp ; parsing
+SYNTAX: R! CHAR: ! parsing-regexp ;
+SYNTAX: R" CHAR: " parsing-regexp ;
+SYNTAX: R# CHAR: # parsing-regexp ;
+SYNTAX: R' CHAR: ' parsing-regexp ;
+SYNTAX: R( CHAR: ) parsing-regexp ;
+SYNTAX: R/ CHAR: / parsing-regexp ;
+SYNTAX: R@ CHAR: @ parsing-regexp ;
+SYNTAX: R[ CHAR: ] parsing-regexp ;
+SYNTAX: R` CHAR: ` parsing-regexp ;
+SYNTAX: R{ CHAR: } parsing-regexp ;
+SYNTAX: R| CHAR: | parsing-regexp ;
 
 USING: vocabs vocabs.loader ;
 

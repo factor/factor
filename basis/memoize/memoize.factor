@@ -41,7 +41,7 @@ PRIVATE>
     [ drop "memoize" set-word-prop ]
     3tri ;
 
-: MEMO: (:) define-memoized ; parsing
+SYNTAX: MEMO: (:) define-memoized ;
 
 PREDICATE: memoized < word "memoize" word-prop ;
 

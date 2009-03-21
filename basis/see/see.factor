@@ -93,7 +93,6 @@ M: object declarations. drop ;
 
 M: word declarations.
     {
-        POSTPONE: parsing
         POSTPONE: delimiter
         POSTPONE: inline
         POSTPONE: recursive

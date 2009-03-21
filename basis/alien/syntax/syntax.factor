@@ -7,35 +7,34 @@ effects assocs combinators lexer strings.parser alien.parser
 fry vocabs.parser words.constant ;
 IN: alien.syntax
 
-: DLL" lexer get skip-blank parse-string dlopen parsed ; parsing
+SYNTAX: DLL" lexer get skip-blank parse-string dlopen parsed ;
 
-: ALIEN: scan string>number <alien> parsed ; parsing
+SYNTAX: ALIEN: scan string>number <alien> parsed ;
 
-: BAD-ALIEN <bad-alien> parsed ; parsing
+SYNTAX: BAD-ALIEN <bad-alien> parsed ;
 
-: LIBRARY: scan "c-library" set ; parsing
+SYNTAX: LIBRARY: scan "c-library" set ;
 
-: FUNCTION:
+SYNTAX: FUNCTION:
     scan "c-library" get scan ";" parse-tokens
     [ "()" subseq? not ] filter
-    define-function ; parsing
+    define-function ;
 
-: TYPEDEF:
-    scan scan typedef ; parsing
+SYNTAX: TYPEDEF:
+    scan scan typedef ;
 
-: C-STRUCT:
-    scan in get parse-definition define-struct ; parsing
+SYNTAX: C-STRUCT:
+    scan in get parse-definition define-struct ;
 
-: C-UNION:
-    scan parse-definition define-union ; parsing
+SYNTAX: C-UNION:
+    scan parse-definition define-union ;
 
-: C-ENUM:
+SYNTAX: C-ENUM:
     ";" parse-tokens
     [ [ create-in ] dip define-constant ] each-index ;
-    parsing
 
 : address-of ( name library -- value )
     load-library dlsym [ "No such symbol" throw ] unless* ;
 
-: &:
-    scan "c-library" get '[ _ _ address-of ] over push-all ; parsing
+SYNTAX: &:
+    scan "c-library" get '[ _ _ address-of ] over push-all ;

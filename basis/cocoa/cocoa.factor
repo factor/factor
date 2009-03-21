@@ -14,18 +14,14 @@ SYMBOL: sent-messages
 : remember-send ( selector -- )
     sent-messages (remember-send) ;
 
-: ->
-    scan dup remember-send parsed \ send parsed ;
-    parsing
+SYNTAX: -> scan dup remember-send parsed \ send parsed ;
 
 SYMBOL: super-sent-messages
 
 : remember-super-send ( selector -- )
     super-sent-messages (remember-send) ;
 
-: SUPER->
-    scan dup remember-super-send parsed \ super-send parsed ;
-    parsing
+SYNTAX: SUPER-> scan dup remember-super-send parsed \ super-send parsed ;
 
 SYMBOL: frameworks
 
@@ -33,9 +29,9 @@ frameworks [ V{ } clone ] initialize
 
 [ frameworks get [ load-framework ] each ] "cocoa.messages" add-init-hook
 
-: FRAMEWORK: scan [ load-framework ] [ frameworks get push ] bi ; parsing
+SYNTAX: FRAMEWORK: scan [ load-framework ] [ frameworks get push ] bi ;
 
-: IMPORT: scan [ ] import-objc-class ; parsing
+SYNTAX: IMPORT: scan [ ] import-objc-class ;
 
 "Compiling Objective C bridge..." print
 
