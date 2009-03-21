@@ -72,8 +72,10 @@ ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
     { { $snippet "\\p{blank}" } "Non-newline whitespace" }
     { { $snippet "\\p{cntrl}" } "Control character" }
     { { $snippet "\\p{space}" } "Whitespace" }
-    { { $snippet "\\p{xdigit}" } "Hexidecimal digit" } } ! In the future: Unicode
-"Full unicode properties are not yet supported."
+    { { $snippet "\\p{xdigit}" } "Hexidecimal digit" }
+    { { $snippet "\\p{Nd}" } "Character in Unicode category Nd" } 
+    { { $snippet "\\p{Z}" } "Character in Unicode category beginning with Z" } 
+    { { $snippet "\\p{script=Cham}" } "Character in the Cham writing system" } }
 { $heading "Boundaries" }
 "Special operators exist to match certain points in the string. These are called 'zero-width' because they do not consume any characters."
 { $table
