@@ -111,7 +111,7 @@ IN: bootstrap.syntax
     "delimiter" [ word t "delimiter" set-word-prop ] define-core-syntax
 
     "SYNTAX:" [
-        (:) define-syntax
+        CREATE-WORD parse-definition define-syntax
     ] define-core-syntax
 
     "SYMBOL:" [
@@ -142,7 +142,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     ":" [
-        (:) define
+        (:) define-declared
     ] define-core-syntax
 
     "GENERIC:" [
@@ -218,11 +218,6 @@ IN: bootstrap.syntax
 
     "FORGET:" [
         scan-object forget
-    ] define-core-syntax
-
-    "(" [
-        ")" parse-effect
-        word dup [ set-stack-effect ] [ 2drop ] if
     ] define-core-syntax
 
     "((" [

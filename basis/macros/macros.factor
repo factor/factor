@@ -6,15 +6,16 @@ IN: macros
 
 <PRIVATE
 
-: real-macro-effect ( word -- effect' )
-    stack-effect in>> 1 <effect> ;
+: real-macro-effect ( effect -- effect' )
+    in>> 1 <effect> ;
 
 PRIVATE>
 
-: define-macro ( word definition -- )
-    [ "macro" set-word-prop ]
-    [ over real-macro-effect memoize-quot [ call ] append define ]
-    2bi ;
+: define-macro ( word definition effect -- )
+    real-macro-effect
+    [ drop "macro" set-word-prop ]
+    [ [ memoize-quot [ call ] append ] keep define-declared ]
+    3bi ;
 
 SYNTAX: MACRO: (:) define-macro ;
 
