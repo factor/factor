@@ -40,8 +40,9 @@ M: lex-hash at* swap {
 : create-bnf ( name parser -- ) reset-tokenizer [ lexer get skip-blank parse* parsed ] curry
     define word make-parsing ;
     
-: ON-BNF: CREATE-WORD reset-tokenizer ";ON-BNF" parse-multiline-string parse-ebnf
-    main swap at create-bnf ; parsing
+SYNTAX: ON-BNF:
+    CREATE-WORD reset-tokenizer ";ON-BNF" parse-multiline-string parse-ebnf
+    main swap at create-bnf ;
 
 ! Tokenizer like standard factor lexer
 EBNF: factor

@@ -31,7 +31,7 @@ M: complex sqrt >polar [ fsqrt ] [ 2.0 / ] bi* polar> ;
 
 IN: syntax
 
-: C{ \ } [ first2 rect> ] parse-literal ; parsing
+SYNTAX: C{ \ } [ first2 rect> ] parse-literal ;
 
 USE: prettyprint.custom
 

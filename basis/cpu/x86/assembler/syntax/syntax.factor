@@ -11,5 +11,4 @@ IN: cpu.x86.assembler.syntax
 : define-registers ( names size -- )
     '[ _ define-register ] each-index ;
 
-: REGISTERS: ( -- )
-    scan-word ";" parse-tokens swap define-registers ; parsing
+SYNTAX: REGISTERS: scan-word ";" parse-tokens swap define-registers ;

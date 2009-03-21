@@ -23,8 +23,7 @@ PRIVATE>
     [ "descriptive-definition" set-word-prop ]
     [ dupd [descriptive] define ] 2bi ;
 
-: DESCRIPTIVE:
-    (:) define-descriptive ; parsing
+SYNTAX: DESCRIPTIVE: (:) define-descriptive ;
 
 PREDICATE: descriptive < word
     "descriptive-definition" word-prop ;
@@ -34,8 +33,7 @@ M: descriptive definer drop \ DESCRIPTIVE: \ ; ;
 M: descriptive definition
     "descriptive-definition" word-prop ;
 
-: DESCRIPTIVE::
-    (::) define-descriptive ; parsing
+SYNTAX: DESCRIPTIVE:: (::) define-descriptive ;
 
 INTERSECTION: descriptive-lambda descriptive lambda-word ;
 

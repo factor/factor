@@ -128,10 +128,10 @@ PRIVATE>
 : d-transform ( triple -- new-triple )
     { { -1 -2 -2 } { 2 1 2 } { 2 2 3 } } transform ;
 
-: SOLUTION:
+SYNTAX: SOLUTION:
     scan-word
     [ name>> "-main" append create-in ] keep
     [ drop in get vocab (>>main) ]
     [ [ . ] swap prefix (( -- )) define-declared ]
-    2bi ; parsing
+    2bi ;
 

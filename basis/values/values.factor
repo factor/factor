@@ -30,11 +30,11 @@ PREDICATE: value-word < word
         [ second \ obj>> = ]
     } 1&& ;
 
-: VALUE:
+SYNTAX: VALUE:
     CREATE-WORD
     dup t "no-def-strip" set-word-prop
     T{ value-holder } clone [ obj>> ] curry
-    (( -- value )) define-declared ; parsing
+    (( -- value )) define-declared ;
 
 M: value-word definer drop \ VALUE: f ;
 
@@ -43,9 +43,9 @@ M: value-word definition drop f ;
 : set-value ( value word -- )
     def>> first (>>obj) ;
 
-: to:
+SYNTAX: to:
     scan-word literalize parsed
-    \ set-value parsed ; parsing
+    \ set-value parsed ;
 
 : get-value ( word -- value )
     def>> first obj>> ;

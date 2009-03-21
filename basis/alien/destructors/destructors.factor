@@ -26,4 +26,4 @@ M: F-destructor dispose* alien>> F ;
 
 ;FUNCTOR
 
-: DESTRUCTOR: scan-word define-destructor ; parsing
+SYNTAX: DESTRUCTOR: scan-word define-destructor ;
