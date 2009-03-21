@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences unicode.categories.syntax math math.order
-combinators hints ;
+combinators hints combinators.short-circuit ;
 IN: xml.char-classes
 
 CATEGORY: 1.0name-start
@@ -15,11 +15,11 @@ CATEGORY: 1.0name-char
     "_-.\u000387:" member? ;
 
 CATEGORY: 1.1name-start
-    Ll Lu Lo Lm Ln Nl |
+    Ll Lu Lo Lm Nl |
     "_:" member? ;
 
 CATEGORY: 1.1name-char
-    Ll Lu Lo Lm Ln Nl Mc Mn Nd Pc Cf |
+    Ll Lu Lo Lm Nl Mc Mn Nd Pc Cf |
     "_-.\u0000b7:" member? ;
 
 : name-start? ( 1.0? char -- ? )
