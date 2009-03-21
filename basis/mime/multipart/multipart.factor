@@ -76,6 +76,18 @@ ERROR: end-of-stream multipart ;
 : empty-name? ( string -- ? )
     { "''" "\"\"" "" f } member? ;
 
+: quote? ( ch -- ? ) "'\"" member? ;
+
+: quoted? ( str -- ? )
+    {
+        [ length 1 > ]
+        [ first quote? ]
+        [ [ first ] [ peek ] bi = ]
+    } 1&& ;
+
+: unquote ( str -- newstr )
+    dup quoted? [ but-last-slice rest-slice >string ] when ;
+
 : save-uploaded-file ( multipart -- )
     dup filename>> empty-name? [
         drop
