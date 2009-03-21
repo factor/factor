@@ -5,7 +5,8 @@ combinators splitting sequences math.parser io.files io assocs
 arrays namespaces make math.ranges unicode.normalize
 unicode.normalize.private values io.encodings.ascii
 unicode.syntax unicode.data compiler.units fry
-alien.syntax sets accessors interval-maps memoize locals words ;
+alien.syntax sets accessors interval-maps memoize locals words
+simple-flat-file ;
 IN: unicode.breaks
 
 <PRIVATE
@@ -127,7 +128,7 @@ to: grapheme-table
 
 VALUE: word-break-table
 
-"vocab:unicode/data/WordBreakProperty.txt" load-key-value
+"vocab:unicode/data/WordBreakProperty.txt" load-interval-file
 to: word-break-table
 
 C-ENUM: wOther wCR wLF wNewline wExtend wFormat wKatakana wALetter wMidLetter

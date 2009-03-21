@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: unicode.data kernel math sequences parser lexer
 bit-arrays namespaces make sequences.private arrays quotations
-assocs classes.predicate math.order strings.parser ;
+assocs classes.predicate math.order strings.parser sets ;
 IN: unicode.syntax
 
 <PRIVATE
@@ -30,9 +30,6 @@ PRIVATE>
 : CATEGORY:
     CREATE ";" parse-tokens define-category ; parsing
 
-: seq-minus ( seq1 seq2 -- diff )
-    [ member? not ] curry filter ;
-
 : CATEGORY-NOT:
     CREATE ";" parse-tokens
-    categories swap seq-minus define-category ; parsing
+    categories swap diff define-category ; parsing
