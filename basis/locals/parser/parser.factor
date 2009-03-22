@@ -104,7 +104,7 @@ M: lambda-parser parse-quotation ( -- quotation )
     (parse-lambda) <wlet> ?rewrite-closures ;
 
 : parse-locals ( -- effect vars assoc )
-    "(" expect ")" parse-effect
+    complete-effect
     dup
     in>> [ dup pair? [ first ] when ] map make-locals ;
 

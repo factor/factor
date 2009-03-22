@@ -42,7 +42,7 @@ M: object fake-quotations> ;
     parse-definition >fake-quotations parsed \ fake-quotations> parsed ;
 
 : parse-declared* ( accum -- accum )
-    "(" expect ")" parse-effect
+    complete-effect
     [ parse-definition* ] dip
     parsed ;
 
@@ -71,7 +71,7 @@ SYNTAX: `M:
 SYNTAX: `C:
     scan-param parsed
     scan-param parsed
-    "(" expect ")" parse-effect
+    complete-effect
     [ [ [ boa ] curry ] over push-all ] dip parsed
     \ define-declared* parsed ;
 

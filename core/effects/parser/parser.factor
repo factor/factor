@@ -27,5 +27,8 @@ ERROR: bad-effect ;
     parse-effect-tokens { "--" } split1 dup
     [ <effect> ] [ "Stack effect declaration must contain --" throw ] if ;
 
+: complete-effect ( -- effect )
+    "(" expect ")" parse-effect ;
+
 : parse-call( ( accum word -- accum )
     [ ")" parse-effect ] dip 2array over push-all ;
