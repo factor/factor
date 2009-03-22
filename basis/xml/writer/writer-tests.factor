@@ -61,7 +61,7 @@ IN: xml.writer.tests
 [ "<foo>         bar            </foo>" string>xml pprint-xml>string ] unit-test
 [ "<foo'>" ] [ "<foo'>" <unescaped> xml>string ] unit-test
 
-: test-file "resource:basis/xml/writer/test.xml" ;
+CONSTANT: test-file "resource:basis/xml/writer/test.xml"
 
 [ ] [ "<?xml version='1.0' encoding='UTF-16BE'?><x/>" string>xml test-file utf8 [ write-xml ] with-file-writer ] unit-test
 [ "x" ] [ test-file file>xml body>> name>> main>> ] unit-test
