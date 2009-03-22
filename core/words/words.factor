@@ -169,8 +169,7 @@ CONSTANT: reset-on-redefine { "inferred-effect" "cannot-infer" }
     ] if ;
 
 : define-declared ( word def effect -- )
-    pick swap "declared-effect" set-word-prop
-    define ;
+    [ nip swap set-stack-effect ] [ drop define ] 3bi ;
 
 : make-inline ( word -- )
     t "inline" set-word-prop ;
@@ -257,7 +256,5 @@ M: word hashcode*
     nip 1 slot { fixnum } declare ; foldable
 
 M: word literalize <wrapper> ;
-
-: ?word-name ( word -- name ) dup word? [ name>> ] when ;
 
 : xref-words ( -- ) all-words [ xref ] each ;
