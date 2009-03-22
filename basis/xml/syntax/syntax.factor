@@ -17,8 +17,8 @@ M: no-tag summary
     >alist swap '[ _ no-tag boa throw ] suffix
     '[ dup main>> _ case ] ;
 
-: define-tags ( word -- )
-    dup dup "xtable" word-prop compile-tags define ;
+: define-tags ( word effect -- )
+    [ dup dup "xtable" word-prop compile-tags ] dip define-declared ;
 
 :: define-tag ( string word quot -- )
     quot string word "xtable" word-prop set-at
@@ -27,16 +27,16 @@ M: no-tag summary
 PRIVATE>
 
 SYNTAX: TAGS:
-    CREATE
-    [ H{ } clone "xtable" set-word-prop ]
-    [ define-tags ] bi ;
+    CREATE complete-effect
+    [ drop H{ } clone "xtable" set-word-prop ]
+    [ define-tags ]
+    2bi ;
 
 SYNTAX: TAG:
     scan scan-word parse-definition define-tag ;
 
 SYNTAX: XML-NS:
-    CREATE-WORD (( string -- name )) over set-stack-effect
-    scan '[ f swap _ <name> ] define-memoized ;
+    CREATE-WORD scan '[ f swap _ <name> ] (( string -- name )) define-memoized ;
 
 <PRIVATE
 
