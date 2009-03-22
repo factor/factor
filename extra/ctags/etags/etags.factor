@@ -5,7 +5,7 @@
 ! Alfredo Beaumont <alfredo.beaumont@gmail.com>
 USING: kernel sequences sorting assocs words prettyprint ctags
 io.encodings.ascii io.files math math.parser namespaces make
-strings shuffle io.backend arrays ;
+strings shuffle io.backend arrays present ;
 IN: ctags.etags
 
 : etag-at ( key hash -- vector )
@@ -36,7 +36,7 @@ IN: ctags.etags
 
 : etag ( lines seq -- str )
   [
-    dup first ?word-name %
+    dup first present %
     1 HEX: 7f <string> %
     second dup number>string %
     1 CHAR: , <string> %
