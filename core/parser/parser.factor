@@ -134,7 +134,7 @@ M: f parse-quotation \ ] parse-until >quotation ;
 
 : (:) ( -- word def effect )
     CREATE-WORD
-    "(" expect ")" parse-effect
+    complete-effect
     parse-definition swap ;
 
 ERROR: bad-number ;
