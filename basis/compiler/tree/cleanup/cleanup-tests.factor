@@ -90,7 +90,7 @@ M: object xyz ;
         [ swap [ call 1+ ] dip ] keep (i-repeat)
     ] if ; inline recursive
 
-: i-repeat [ { integer } declare ] dip 0 -rot (i-repeat) ; inline
+: i-repeat ( n quot -- ) [ { integer } declare ] dip 0 -rot (i-repeat) ; inline
 
 [ t ] [
     [ [ dup xyz drop ] i-repeat ] \ xyz inlined?

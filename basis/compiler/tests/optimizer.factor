@@ -13,7 +13,7 @@ M: array xyz xyz ;
 [ t ] [ \ xyz optimized>> ] unit-test
 
 ! Test predicate inlining
-: pred-test-1
+: pred-test-1 ( a -- b c )
     dup fixnum? [
         dup integer? [ "integer" ] [ "nope" ] if
     ] [
@@ -24,7 +24,7 @@ M: array xyz xyz ;
 
 TUPLE: pred-test ;
 
-: pred-test-2
+: pred-test-2 ( a -- b c )
     dup tuple? [
         dup pred-test? [ "pred-test" ] [ "nope" ] if
     ] [
@@ -33,7 +33,7 @@ TUPLE: pred-test ;
 
 [ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-2 ] unit-test
 
-: pred-test-3
+: pred-test-3 ( a -- b c )
     dup pred-test? [
         dup tuple? [ "pred-test" ] [ "nope" ] if
     ] [
@@ -42,14 +42,14 @@ TUPLE: pred-test ;
 
 [ T{ pred-test } "pred-test" ] [ T{ pred-test } pred-test-3 ] unit-test
 
-: inline-test
+: inline-test ( a -- b )
     "nom" = ;
 
 [ t ] [ "nom" inline-test ] unit-test
 [ f ] [ "shayin" inline-test ] unit-test
 [ f ] [ 3 inline-test ] unit-test
 
-: fixnum-declarations >fixnum 24 shift 1234 bitxor ;
+: fixnum-declarations ( a -- b ) >fixnum 24 shift 1234 bitxor ;
 
 [ ] [ 1000000 fixnum-declarations . ] unit-test
 
@@ -61,13 +61,13 @@ TUPLE: pred-test ;
 
 ! regression
 
-: bad-kill-1 ( a b -- c d e ) [ 3 f ] [ dup bad-kill-1 ] if ; inline
-: bad-kill-2 bad-kill-1 drop ;
+: bad-kill-1 ( a b -- c d e ) [ 3 f ] [ dup bad-kill-1 ] if ; inline recursive
+: bad-kill-2 ( a b -- c d ) bad-kill-1 drop ;
 
 [ 3 ] [ t bad-kill-2 ] unit-test
 
 ! regression
-: (the-test) ( x -- y ) dup 0 > [ 1- (the-test) ] when ; inline
+: (the-test) ( x -- y ) dup 0 > [ 1- (the-test) ] when ; inline recursive
 : the-test ( -- x y ) 2 dup (the-test) ;
 
 [ 2 0 ] [ the-test ] unit-test
@@ -77,7 +77,7 @@ TUPLE: pred-test ;
     < [
         6 1 (double-recursion)
         3 2 (double-recursion)
-    ] when ; inline
+    ] when ; inline recursive
 
 : double-recursion ( -- ) 0 2 (double-recursion) ;
 
@@ -85,7 +85,7 @@ TUPLE: pred-test ;
 
 ! regression
 : double-label-1 ( a b c -- d )
-    [ f double-label-1 ] [ swap nth-unsafe ] if ; inline
+    [ f double-label-1 ] [ swap nth-unsafe ] if ; inline recursive
 
 : double-label-2 ( a -- b )
     dup array? [ ] [ ] if 0 t double-label-1 ;
@@ -100,7 +100,7 @@ GENERIC: void-generic ( obj -- * )
 
 ! regression
 : branch-fold-regression-0 ( m -- n )
-    t [ ] [ 1+ branch-fold-regression-0 ] if ; inline
+    t [ ] [ 1+ branch-fold-regression-0 ] if ; inline recursive
 
 : branch-fold-regression-1 ( -- m )
     10 branch-fold-regression-0 ;
@@ -224,7 +224,7 @@ USE: binary-search.private
 ] unit-test
 
 ! Regression
-: empty-compound ;
+: empty-compound ( -- ) ;
 
 : node-successor-f-bug ( x -- * )
     [ 3 throw ] [ empty-compound ] compose [ 3 throw ] if ;
@@ -293,7 +293,7 @@ HINTS: recursive-inline-hang-3 array ;
 
 ! Wow
 : counter-example ( a b c d -- a' b' c' d' )
-    dup 0 > [ 1 - [ rot 2 * ] dip counter-example ] when ; inline
+    dup 0 > [ 1 - [ rot 2 * ] dip counter-example ] when ; inline recursive
 
 : counter-example' ( -- a' b' c' d' )
     1 2 3.0 3 counter-example ;
