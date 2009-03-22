@@ -508,8 +508,8 @@ HELP: P"
 HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
-{ $description "Declares the stack effect of the most recently defined word, storing a new " { $link effect } " instance in the " { $snippet "\"declared-effect\"" } " word property." }
-{ $notes "All words except those only pushing literals on the stack must have a stack effect declaration. See " { $link "effect-declaration" } " for details." } ;
+{ $description "A stack effect declaration. This is treated as a comment unless it appears inside a word definition." }
+{ $see-also "effect-declaration" } ;
 
 HELP: ((
 { $syntax "(( inputs -- outputs ))" }

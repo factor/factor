@@ -127,6 +127,11 @@ IN: bootstrap.syntax
         ";" parse-tokens
         [ create-class-in define-singleton-class ] each
     ] define-core-syntax
+
+    "DEFER:" [
+        scan current-vocab create
+        [ fake-definition ] [ set-word ] [ [ undefined ] define ] tri
+    ] define-core-syntax
     
     "ALIAS:" [
         CREATE-WORD scan-word define-alias
@@ -136,32 +141,24 @@ IN: bootstrap.syntax
         CREATE scan-object define-constant
     ] define-core-syntax
 
-    "DEFER:" [
-        scan current-vocab create
-        [ fake-definition ] [ set-word ] [ [ undefined ] define ] tri
-    ] define-core-syntax
-
     ":" [
         (:) define-declared
     ] define-core-syntax
 
     "GENERIC:" [
-        CREATE-GENERIC define-simple-generic
+        [ simple-combination ] (GENERIC:)
     ] define-core-syntax
 
     "GENERIC#" [
-        CREATE-GENERIC
-        scan-word <standard-combination> define-generic
+        [ scan-word <standard-combination> ] (GENERIC:)
     ] define-core-syntax
 
     "MATH:" [
-        CREATE-GENERIC
-        T{ math-combination } define-generic
+        [ math-combination ] (GENERIC:)
     ] define-core-syntax
 
     "HOOK:" [
-        CREATE-GENERIC scan-word
-        <hook-combination> define-generic
+        [ scan-word <hook-combination> ] (GENERIC:)
     ] define-core-syntax
 
     "M:" [
@@ -218,6 +215,10 @@ IN: bootstrap.syntax
 
     "FORGET:" [
         scan-object forget
+    ] define-core-syntax
+
+    "(" [
+        ")" parse-effect drop
     ] define-core-syntax
 
     "((" [
