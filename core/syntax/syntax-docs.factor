@@ -180,7 +180,7 @@ HELP: delimiter
 HELP: SYNTAX:
 { $syntax "SYNTAX: foo ... ;" }
 { $description "Defines a parsing word." }
-{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< SYNTAX: HELLO \"Hello parser!\" print ; >>\n: world HELLO ;" "Hello parser!" } } ;
+{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< SYNTAX: HELLO \"Hello parser!\" print ; >>\n: world ( -- ) HELLO ;" "Hello parser!" } } ;
 
 HELP: inline
 { $syntax ": foo ... ; inline" }
