@@ -27,7 +27,7 @@ IN: ctags
     ctag-lineno number>string %
   ] "" make ;
 
-: ctag-strings ( seq1 -- seq2 )
+: ctag-strings ( alist -- seq )
   [ ctag ] map ;
 
 : ctags-write ( seq path -- )

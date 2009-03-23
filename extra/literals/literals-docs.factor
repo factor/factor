@@ -21,7 +21,7 @@ CONSTANT: five 5
 USING: kernel literals prettyprint ;
 IN: scratchpad
 
-<< : seven-eleven 7 11 ; >>
+<< : seven-eleven ( -- a b ) 7 11 ; >>
 { $ seven-eleven } .
     "> "{ 7 11 }" }
 
@@ -37,7 +37,7 @@ HELP: $[
 USING: kernel literals math prettyprint ;
 IN: scratchpad
 
-<< : five 5 ; >>
+<< CONSTANT: five 5 >>
 { $[ five dup 1+ dup 2 + ] } .
     "> "{ 5 6 8 }" }
 
@@ -51,7 +51,7 @@ ARTICLE: "literals" "Interpolating code results into literal values"
 USING: kernel literals math prettyprint ;
 IN: scratchpad
 
-<< : five 5 ; >>
+<< CONSTANT: five 5 >>
 { $ five $[ five dup 1+ dup 2 + ] } .
     "> "{ 5 5 6 8 }" }
 { $subsection POSTPONE: $ }
