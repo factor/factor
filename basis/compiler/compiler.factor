@@ -35,11 +35,14 @@ SYMBOLS: +optimized+ +unoptimized+ ;
     [ usage [ word? ] filter ] [ compiled-usage keys ] if
     [ queue-compile ] each ;
 
-: ripple-up? ( word status -- ? )
-    swap "compiled-status" word-prop [ = not ] keep and ;
+: ripple-up? ( status word -- ? )
+    [
+        [ nip changed-effects get key? ]
+        [ "compiled-status" word-prop eq? not ] 2bi or
+    ] keep "compiled-status" word-prop and ;
 
 : save-compiled-status ( word status -- )
-    [ dupd ripple-up? [ ripple-up ] [ drop ] if ]
+    [ over ripple-up? [ ripple-up ] [ drop ] if ]
     [ "compiled-status" set-word-prop ]
     2bi ;
 

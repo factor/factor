@@ -199,8 +199,7 @@ M: sequence update-methods ( class seq -- )
             2cleave
         ] if
     ]
-    [ 2drop remake-generic ]
-    3tri ;
+    [ 2drop remake-generic ] 3tri ;
 
 M: generic subwords
     [

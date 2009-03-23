@@ -4,7 +4,8 @@ namespaces quotations sequences.private classes continuations
 generic.standard effects classes.tuple classes.tuple.private
 arrays vectors strings compiler.units accessors classes.algebra
 calendar prettyprint io.streams.string splitting summary
-columns math.order classes.private slots slots.private eval see ;
+columns math.order classes.private slots slots.private eval see
+words.symbol ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -62,7 +63,7 @@ TUPLE: predicate-test ;
 
 C: <predicate-test> predicate-test
 
-: predicate-test drop f ;
+: predicate-test ( a -- ? ) drop f ;
 
 [ t ] [ <predicate-test> predicate-test? ] unit-test
 
@@ -97,7 +98,7 @@ TUPLE: size-test a b c d ;
     size-test tuple-layout second =
 ] unit-test
 
-GENERIC: <yo-momma>
+GENERIC: <yo-momma> ( a -- b )
 
 TUPLE: yo-momma ;
 
@@ -123,7 +124,7 @@ TUPLE: loc-recording ;
 
 TUPLE: forget-robustness ;
 
-GENERIC: forget-robustness-generic
+GENERIC: forget-robustness-generic ( a -- b )
 
 M: forget-robustness forget-robustness-generic ;
 
@@ -493,7 +494,7 @@ must-fail-with
 [ t ] [ "z" accessor-exists? ] unit-test
 
 [ [ ] ] [
-    "IN: classes.tuple.tests GENERIC: forget-accessors-test"
+    "IN: classes.tuple.tests GENERIC: forget-accessors-test ( a -- b )"
     <string-reader>
     "forget-accessors-test" parse-stream
 ] unit-test
@@ -508,7 +509,7 @@ TUPLE: another-forget-accessors-test ;
 
 
 [ [ ] ] [
-    "IN: classes.tuple.tests GENERIC: another-forget-accessors-test"
+    "IN: classes.tuple.tests GENERIC: another-forget-accessors-test ( a -- b )"
     <string-reader>
     "another-forget-accessors-test" parse-stream
 ] unit-test
@@ -567,7 +568,7 @@ GENERIC: break-me ( obj -- )
 
 [ ] [ "IN: classes.tuple.tests USE: kernel M: subclass-reset-test-1 break-me drop ;" eval ] unit-test
 
-[ ] [ "IN: classes.tuple.tests : subclass-reset-test ;" <string-reader> "subclass-reset-test" parse-stream drop ] unit-test
+[ ] [ "IN: classes.tuple.tests : subclass-reset-test ( -- ) ;" <string-reader> "subclass-reset-test" parse-stream drop ] unit-test
 
 [ f ] [ subclass-reset-test-1 tuple-class? ] unit-test
 [ f ] [ subclass-reset-test-2 tuple-class? ] unit-test
@@ -666,7 +667,7 @@ DEFER: error-y
 
 [ ] [ [ \ error-y dup class? [ forget-class ] [ drop ] if ] with-compilation-unit ] unit-test
 
-[ ] [ "IN: classes.tuple.tests GENERIC: error-y" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests GENERIC: error-y ( a -- b )" eval ] unit-test
 
 [ f ] [ \ error-y tuple-class? ] unit-test
 
@@ -731,3 +732,17 @@ SLOT: kex
 
 [ t ] [ \ change-slot-test \ kex>> method >boolean ] unit-test
 [ f ] [ \ change-slot-test \ kex>> method "reading" word-prop ] unit-test
+
+DEFER: redefine-tuple-twice
+
+[ ] [ "IN: classes.tuple.tests TUPLE: redefine-tuple-twice ;" eval ] unit-test
+
+[ t ] [ \ redefine-tuple-twice symbol? ] unit-test
+
+[ ] [ "IN: classes.tuple.tests DEFER: redefine-tuple-twice" eval ] unit-test
+
+[ t ] [ \ redefine-tuple-twice deferred? ] unit-test
+
+[ ] [ "IN: classes.tuple.tests TUPLE: redefine-tuple-twice ;" eval ] unit-test
+
+[ t ] [ \ redefine-tuple-twice symbol? ] unit-test

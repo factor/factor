@@ -148,6 +148,7 @@ GENERIC: definitions-changed ( assoc obj -- )
     [
         H{ } clone changed-definitions set
         H{ } clone changed-generics set
+        H{ } clone changed-effects set
         H{ } clone outdated-generics set
         H{ } clone outdated-tuples set
         H{ } clone new-classes set
@@ -158,6 +159,7 @@ GENERIC: definitions-changed ( assoc obj -- )
     [
         H{ } clone changed-definitions set
         H{ } clone changed-generics set
+        H{ } clone changed-effects set
         H{ } clone outdated-generics set
         H{ } clone forgotten-definitions set
         H{ } clone outdated-tuples set
