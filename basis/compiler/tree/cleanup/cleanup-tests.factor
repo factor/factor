@@ -197,7 +197,7 @@ M: fixnum annotate-entry-test-1 drop ;
         [ dup annotate-entry-test-1 1+ ] dip (annotate-entry-test-2)
     ] if ; inline recursive
 
-: annotate-entry-test-2 0 -rot (annotate-entry-test-2) ; inline
+: annotate-entry-test-2 ( from to -- ) 0 -rot (annotate-entry-test-2) ; inline
 
 [ f ] [
     [ { bignum } declare annotate-entry-test-2 ]

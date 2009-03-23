@@ -247,8 +247,7 @@ M: tuple-class update-class
             bi
         ] each-subclass
     ]
-    [ define-new-tuple-class ]
-    3bi ;
+    [ define-new-tuple-class ] 3bi ;
 
 : tuple-class-unchanged? ( class superclass slots -- ? )
     [ [ superclass ] [ bootstrap-word ] bi* = ]
@@ -275,7 +274,7 @@ M: word (define-tuple-class)
 
 M: tuple-class (define-tuple-class)
     3dup tuple-class-unchanged?
-    [ 3drop ] [ redefine-tuple-class ] if ;
+    [ 2drop ?define-symbol ] [ redefine-tuple-class ] if ;
 
 : thrower-effect ( slots -- effect )
     [ dup array? [ first ] when ] map { "*" } <effect> ;
