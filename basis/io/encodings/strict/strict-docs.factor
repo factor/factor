@@ -3,6 +3,6 @@
 USING: help.syntax help.markup ;
 IN: io.encodings.strict
 
-HELP: strict ( encoding -- strict-encoding )
-{ $values { "encoding" "an encoding descriptor" } { "strict-encoding" "a strict encoding descriptor" } }
+HELP: strict ( code -- strict )
+{ $values { "code" "an encoding descriptor" } { "strict" "a strict encoding descriptor" } }
 { $description "Makes an encoding strict, that is, in the presence of a malformed code point, an error is thrown. Note that the existence of a replacement character in a file (U+FFFD) also throws an error." } ;
