@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Daniel Ehrenberg, Bruno Deferrari,
+! Copyright (C) 2007, 2009 Daniel Ehrenberg, Bruno Deferrari,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel namespaces sequences

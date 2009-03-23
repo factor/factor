@@ -13,7 +13,7 @@ GENERIC: zammo ( obj -- str )
 
 SINGLETON: word-and-singleton
 
-: word-and-singleton 3 ;
+: word-and-singleton ( -- x ) 3 ;
 
 [ t ] [ \ word-and-singleton word-and-singleton? ] unit-test
 [ 3 ] [ word-and-singleton ] unit-test

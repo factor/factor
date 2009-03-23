@@ -270,7 +270,7 @@ cell 8 = [
 ] when
 
 ! Some randomized tests
-: compiled-fixnum* fixnum* ;
+: compiled-fixnum* ( a b -- c ) fixnum* ;
 
 [ ] [
     10000 [ 
@@ -281,7 +281,7 @@ cell 8 = [
     ] times
 ] unit-test
 
-: compiled-fixnum>bignum fixnum>bignum ;
+: compiled-fixnum>bignum ( a -- b ) fixnum>bignum ;
 
 [ bignum ] [ 0 compiled-fixnum>bignum class ] unit-test
 
@@ -293,7 +293,7 @@ cell 8 = [
     ] times
 ] unit-test
 
-: compiled-bignum>fixnum bignum>fixnum ;
+: compiled-bignum>fixnum ( a -- b ) bignum>fixnum ;
 
 [ ] [
     10000 [

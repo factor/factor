@@ -106,7 +106,7 @@ STRING: test-svg-string
 </svg>
 ;
 
-: test-svg-path
+: test-svg-path ( -- obj )
     test-svg-string string>xml body>> children-tags first ;
 
 [ { T{ moveto f { -1.0 -1.0 } f } T{ lineto f { 2.0 2.0 } t } } ]

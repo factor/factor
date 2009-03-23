@@ -1,3 +1,3 @@
 IN: vocabs.loader.test.d
 
-: foo iterate-next ;
+: foo ( -- ) iterate-next ;

@@ -21,21 +21,21 @@ IN: kernel.tests
 
 [ ] [ :c ] unit-test
 
-: overflow-d 3 overflow-d ;
+: overflow-d ( -- ) 3 overflow-d ;
 
 [ overflow-d ] [ { "kernel-error" 12 f f } = ] must-fail-with
 
 [ ] [ :c ] unit-test
 
-: (overflow-d-alt) 3 ;
+: (overflow-d-alt) ( -- ) 3 ;
 
-: overflow-d-alt (overflow-d-alt) overflow-d-alt ;
+: overflow-d-alt ( -- ) (overflow-d-alt) overflow-d-alt ;
 
 [ overflow-d-alt ] [ { "kernel-error" 12 f f } = ] must-fail-with
 
 [ ] [ [ :c ] with-string-writer drop ] unit-test
 
-: overflow-r 3 load-local overflow-r ;
+: overflow-r ( -- ) 3 load-local overflow-r ;
 
 [ overflow-r ] [ { "kernel-error" 14 f f } = ] must-fail-with
 
@@ -99,7 +99,7 @@ IN: kernel.tests
 [ ] [ :c ] unit-test
 
 ! Doesn't compile; important
-: foo 5 + 0 [ ] each ;
+: foo ( a -- b ) 5 + 0 [ ] each ;
 
 [ drop foo ] must-fail
 [ ] [ :c ] unit-test
@@ -115,7 +115,7 @@ IN: kernel.tests
 [ loop ] must-fail
 
 ! Discovered on Windows
-: total-failure-1 "" [ ] map unimplemented ;
+: total-failure-1 ( -- ) "" [ ] map unimplemented ;
 
 [ total-failure-1 ] must-fail
 

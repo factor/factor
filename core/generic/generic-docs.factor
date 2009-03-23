@@ -1,6 +1,6 @@
 USING: help.markup help.syntax words classes classes.algebra
 definitions kernel alien sequences math quotations
-generic.standard generic.math combinators prettyprint ;
+generic.standard generic.math combinators prettyprint effects ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"
@@ -115,7 +115,7 @@ HELP: make-generic
 $low-level-note ;
 
 HELP: define-generic
-{ $values { "word" word } { "combination" "a method combination" } }
+{ $values { "word" word } { "effect" effect } { "combination" "a method combination" } }
 { $description "Defines a generic word. A method combination is an object which responds to the " { $link perform-combination } " generic word." }
 { $contract "The method combination quotation is called each time the generic word has to be updated (for example, when a method is added), and thus must be side-effect free." } ;
 
