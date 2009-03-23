@@ -5,7 +5,7 @@ io.streams.duplex destructors make io.launcher ;
 IN: io.backend.unix.tests
 
 ! Unix domain stream sockets
-: socket-server "unix-domain-socket-test" temp-file ;
+: socket-server ( -- path ) "unix-domain-socket-test" temp-file ;
 
 [
     [ socket-server delete-file ] ignore-errors
@@ -33,8 +33,8 @@ yield
     ] { } make
 ] unit-test
 
-: datagram-server "unix-domain-datagram-test" temp-file ;
-: datagram-client "unix-domain-datagram-test-2" temp-file ;
+: datagram-server ( -- path ) "unix-domain-datagram-test" temp-file ;
+: datagram-client ( -- path ) "unix-domain-datagram-test-2" temp-file ;
 
 ! Unix domain datagram sockets
 [ datagram-server delete-file ] ignore-errors
@@ -104,7 +104,7 @@ datagram-client <local> <datagram>
 [ ] [ "d" get dispose ] unit-test
 
 ! Test error behavior
-: another-datagram "unix-domain-datagram-test-3" temp-file ;
+: another-datagram ( -- path ) "unix-domain-datagram-test-3" temp-file ;
 
 [ another-datagram delete-file ] ignore-errors
 

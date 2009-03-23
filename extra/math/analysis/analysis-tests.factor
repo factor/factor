@@ -2,8 +2,7 @@ USING: kernel math math.functions tools.test math.analysis
 math.constants ;
 IN: math.analysis.tests
 
-: eps
-    .00000001 ;
+CONSTANT: eps .00000001
 
 [ t ] [ -9000000000000000000000000000000000000000000 gamma 1/0. = ] unit-test
 [ t ] [ -1.5 gamma 2.363271801207344 eps ~ ] unit-test
