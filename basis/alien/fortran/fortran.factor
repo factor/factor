@@ -416,7 +416,7 @@ PRIVATE>
 : define-fortran-record ( name vocab fields -- )
     [ >lower ] [ ] [ fortran-record>c-struct ] tri* define-struct ;
 
-: RECORD: scan in get parse-definition define-fortran-record ; parsing
+SYNTAX: RECORD: scan in get parse-definition define-fortran-record ;
 
 : set-fortran-abi ( library -- )
     library-fortran-abis get-global at fortran-abi set ;
@@ -437,16 +437,16 @@ MACRO: fortran-invoke ( return library function parameters -- )
     return library function parameters return [ "void" ] unless* parse-arglist
     [ \ fortran-invoke 5 [ ] nsequence ] dip define-declared ;
 
-: SUBROUTINE: 
+SYNTAX: SUBROUTINE: 
     f "c-library" get scan ";" parse-tokens
-    [ "()" subseq? not ] filter define-fortran-function ; parsing
+    [ "()" subseq? not ] filter define-fortran-function ;
 
-: FUNCTION:
+SYNTAX: FUNCTION:
     scan "c-library" get scan ";" parse-tokens
-    [ "()" subseq? not ] filter define-fortran-function ; parsing
+    [ "()" subseq? not ] filter define-fortran-function ;
 
-: LIBRARY:
+SYNTAX: LIBRARY:
     scan
     [ "c-library" set ]
-    [ set-fortran-abi ] bi  ; parsing
+    [ set-fortran-abi ] bi ;
 

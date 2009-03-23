@@ -1,12 +1,12 @@
 ! Copyright (C) 2007, 2009 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors arrays kernel kernel.private combinators.private
-words sequences generic math namespaces make quotations assocs
-combinators classes.tuple classes.tuple.private effects summary
-hashtables classes generic sets definitions generic.standard
-slots.private continuations locals generalizations
-stack-checker.backend stack-checker.state stack-checker.visitor
-stack-checker.errors stack-checker.values
+words sequences generic math math.order namespaces make quotations assocs
+combinators combinators.short-circuit classes.tuple
+classes.tuple.private effects summary hashtables classes generic sets
+definitions generic.standard slots.private continuations locals
+generalizations stack-checker.backend stack-checker.state
+stack-checker.visitor stack-checker.errors stack-checker.values
 stack-checker.recursive-state ;
 IN: stack-checker.transforms
 
@@ -107,36 +107,28 @@ IN: stack-checker.transforms
 ] 1 define-transform
 
 ! Membership testing
-CONSTANT: bit-member-n 256
+CONSTANT: bit-member-max 256
 
 : bit-member? ( seq -- ? )
     #! Can we use a fast byte array test here?
     {
-        { [ dup length 8 < ] [ f ] }
-        { [ dup [ integer? not ] any? ] [ f ] }
-        { [ dup [ 0 < ] any? ] [ f ] }
-        { [ dup [ bit-member-n >= ] any? ] [ f ] }
-        [ t ]
-    } cond nip ;
+        [ length 4 > ]
+        [ [ integer? ] all? ]
+        [ [ 0 bit-member-max between? ] any? ]
+    } 1&& ;
 
 : bit-member-seq ( seq -- flags )
-    bit-member-n swap [ member? 1 0 ? ] curry B{ } map-as ;
-
-: exact-float? ( f -- ? )
-    dup float? [ dup >integer >float = ] [ drop f ] if ; inline
+    [ supremum 1+ ] keep '[ _ member? 1 0 ? ] B{ } map-as ;
 
 : bit-member-quot ( seq -- newquot )
-    [
-        bit-member-seq ,
-        [
-            {
-                { [ over fixnum? ] [ ?nth 1 eq? ] }
-                { [ over bignum? ] [ ?nth 1 eq? ] }
-                { [ over exact-float? ] [ ?nth 1 eq? ] }
-                [ 2drop f ]
-            } cond
-        ] %
-    ] [ ] make ;
+    bit-member-seq
+    '[
+        _ {
+            { [ over fixnum? ] [ ?nth 1 eq? ] }
+            { [ over bignum? ] [ ?nth 1 eq? ] }
+            [ 2drop f ]
+        } cond
+    ] ;
 
 : member-quot ( seq -- newquot )
     dup bit-member? [

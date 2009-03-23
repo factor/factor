@@ -4,7 +4,7 @@ USING: combinators.short-circuit sequences io.files
 io.encodings.ascii kernel values splitting accessors math.parser
 ascii io assocs strings math namespaces make sorting combinators
 math.order arrays unicode.normalize unicode.data locals
-unicode.syntax macros sequences.deep words unicode.breaks
+macros sequences.deep words unicode.breaks
 quotations combinators.short-circuit simple-flat-file ;
 IN: unicode.collation
 

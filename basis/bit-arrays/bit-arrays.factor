@@ -68,7 +68,7 @@ M: bit-array resize
 
 M: bit-array byte-length length 7 + -3 shift ;
 
-: ?{ \ } [ >bit-array ] parse-literal ; parsing
+SYNTAX: ?{ \ } [ >bit-array ] parse-literal ;
 
 : integer>bit-array ( n -- bit-array )
     dup 0 = [

@@ -232,7 +232,10 @@ ERROR: bad-create name vocab ;
 
 PREDICATE: parsing-word < word "parsing" word-prop ;
 
-: make-parsing ( word -- ) t "parsing" set-word-prop ;
+M: parsing-word definer drop \ SYNTAX: \ ; ;
+
+: define-syntax ( word quot -- )
+    [ drop ] [ define ] 2bi t "parsing" set-word-prop ;
 
 : delimiter? ( obj -- ? )
     dup word? [ "delimiter" word-prop ] [ drop f ] if ;

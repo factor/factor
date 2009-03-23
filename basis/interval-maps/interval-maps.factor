@@ -8,17 +8,21 @@ TUPLE: interval-map array ;
 
 <PRIVATE
 
+ALIAS: start first
+ALIAS: end second
+ALIAS: value third
+
 : find-interval ( key interval-map -- interval-node )
-    [ first <=> ] with search nip ;
+    array>> [ start <=> ] with search nip ;
 
 : interval-contains? ( key interval-node -- ? )
-    first2 between? ;
+    [ start ] [ end ] bi between? ;
 
 : all-intervals ( sequence -- intervals )
     [ [ dup number? [ dup 2array ] when ] dip ] { } assoc-map-as ;
 
 : disjoint? ( node1 node2 -- ? )
-    [ second ] [ first ] bi* < ;
+    [ end ] [ start ] bi* < ;
 
 : ensure-disjoint ( intervals -- intervals )
     dup [ disjoint? ] monotonic?
@@ -30,13 +34,16 @@ TUPLE: interval-map array ;
 PRIVATE>
 
 : interval-at* ( key map -- value ? )
-    [ drop ] [ array>> find-interval ] 2bi
+    [ drop ] [ find-interval ] 2bi
     [ nip ] [ interval-contains? ] 2bi
-    [ third t ] [ drop f f ] if ;
+    [ value t ] [ drop f f ] if ;
 
 : interval-at ( key map -- value ) interval-at* drop ;
 
 : interval-key? ( key map -- ? ) interval-at* nip ;
+
+: interval-values ( map -- values )
+    array>> [ value ] map ;
 
 : <interval-map> ( specification -- map )
     all-intervals [ [ first second ] compare ] sort

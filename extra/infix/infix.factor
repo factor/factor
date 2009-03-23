@@ -81,8 +81,8 @@ M: ast-function infix-codegen
     infix-codegen prepare-operand ;
 PRIVATE>
 
-: [infix
-    "infix]" [infix-parse parsed \ call parsed ; parsing
+SYNTAX: [infix
+    "infix]" [infix-parse parsed \ call parsed ;
 
 <PRIVATE
 : parse-infix-locals ( assoc end -- quot )
@@ -93,6 +93,6 @@ PRIVATE>
     ] with-scope ;
 PRIVATE>
 
-: [infix|
+SYNTAX: [infix|
     "|" parse-bindings "infix]" parse-infix-locals <let>
-    ?rewrite-closures over push-all ; parsing
+    ?rewrite-closures over push-all ;
