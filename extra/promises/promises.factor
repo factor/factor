@@ -35,7 +35,7 @@ TUPLE: promise quot forced? value ;
     \ promise ,
   ] [ ] make ;
 
-: LAZY:
+SYNTAX: LAZY:
   CREATE-WORD
   dup parse-definition
-  make-lazy-quot define ; parsing
+  make-lazy-quot define ;

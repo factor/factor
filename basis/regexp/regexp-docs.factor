@@ -45,11 +45,11 @@ ARTICLE: { "regexp" "construction" } "Constructing regular expressions"
 ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
 "Regexp syntax is largely compatible with Perl, Java and extended POSIX regexps, but not completely. Below, the syntax is documented."
 { $heading "Characters" }
-"At its core, regular expressions consist of character literals. For example, " { $snippet "R/ f/" } " is a regular expression matching just the string 'f'. In addition, the normal escape codes are provided, like " { $snippet "\\t" } " for the tab character and " { $snippet "\\uxxxxxx" } "for an arbitrary Unicode code point, by its hex value. In addition, any character can be preceded by a backslash to escape it, unless this has special meaning. For example, to match a literal opening parenthesis, use " { $snippet "\\(" } "."
+"At its core, regular expressions consist of character literals. For example, " { $snippet "R/ f/" } " is a regular expression matching just the string 'f'. In addition, the normal escape codes are provided, like " { $snippet "\\t" } " for the tab character and " { $snippet "\\uxxxxxx" } " for an arbitrary Unicode code point, by its hex value. In addition, any character can be preceded by a backslash to escape it, unless this has special meaning. For example, to match a literal opening parenthesis, use " { $snippet "\\(" } "."
 { $heading "Concatenation, alternation and grouping" }
-"Regular expressions can be built out of multiple characters by concatenation. For example, " { $snippet "R/ ab/" } " matches a followed by b. The " { $snippet "|" } " (alternation) operator can construct a regexp which matches one of two alternatives. Parentheses can be used for gropuing. So " { $snippet "R/ f(oo|ar)/" } " would match either 'foo' or 'far'."
+"Regular expressions can be built out of multiple characters by concatenation. For example, " { $snippet "R/ ab/" } " matches a followed by b. The " { $snippet "|" } " (alternation) operator can construct a regexp which matches one of two alternatives. Parentheses can be used for grouping. So " { $snippet "R/ f(oo|ar)/" } " would match either 'foo' or 'far'."
 { $heading "Character classes" }
-"Square brackets define a convenient way to refer to a set of characters. For example, " { $snippet "[ab]" } " refers to either a or b. And " { $snippet "[a-z]" } " refers to all of the characters between a and z, in code point order. You can use these together, as in " { $snippet "[ac-fz]" } " which matches all of the characters between c and f, in addition to a and z. Character classes can be negated using a carat, as in " { $snippet "[^a]" } " which matches all characters which are not a."
+"Square brackets define a convenient way to refer to a set of characters. For example, " { $snippet "[ab]" } " refers to either a or b. And " { $snippet "[a-z]" } " refers to all of the characters between a and z, in code point order. You can use these together, as in " { $snippet "[ac-fz]" } " which matches all of the characters between c and f, in addition to a and z. Character classes can be negated using a caret, as in " { $snippet "[^a]" } " which matches all characters which are not a."
 { $heading "Predefined character classes" }
 "Several character classes are predefined, both for convenience and because they are too large to represent directly. In Factor regular expressions, all character classes are Unicode-aware."
 { $table
@@ -72,8 +72,12 @@ ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
     { { $snippet "\\p{blank}" } "Non-newline whitespace" }
     { { $snippet "\\p{cntrl}" } "Control character" }
     { { $snippet "\\p{space}" } "Whitespace" }
-    { { $snippet "\\p{xdigit}" } "Hexidecimal digit" } } ! In the future: Unicode
-"Full unicode properties are not yet supported."
+    { { $snippet "\\p{xdigit}" } "Hexadecimal digit" }
+    { { $snippet "\\p{Nd}" } "Character in Unicode category Nd" } 
+    { { $snippet "\\p{Z}" } "Character in Unicode category beginning with Z" } 
+    { { $snippet "\\p{script=Cham}" } "Character in the Cham writing system" } }
+{ $heading "Character class operations" }
+"Character classes can be composed using four binary operations: " { $snippet "|| && ~~ --" } ". These do the operations union, intersection, symmetric difference and difference, respectively. For example, characters which are lower-case but not Latin script could be matched as " { $snippet "[\\p{lower}--\\p{script=latin}]" } ". These operations are right-associative, and " { $snippet "^" } " binds tighter than them. There is no syntax for grouping."
 { $heading "Boundaries" }
 "Special operators exist to match certain points in the string. These are called 'zero-width' because they do not consume any characters."
 { $table
@@ -105,9 +109,18 @@ ARTICLE: { "regexp" "syntax" } "Regular expression syntax"
 { $heading "Quotation" }
 "To make it convenient to have a long string which uses regexp operators, a special syntax is provided. If a substring begins with " { $snippet "\\Q" } " then everything until " { $snippet "\\E" } " is quoted (escaped). For example, " { $snippet "R/ \\Qfoo\\bar|baz()\\E/" } " matches exactly the string " { $snippet "\"foo\\bar|baz()\"" } "."
 { $heading "Unsupported features" }
-"One missing feature is backreferences. This is because of a design decision to allow only regular expressions following the formal theory of regular languages. For more information, see " { $link { "regexp" "theory" } } ". You can create a new regular expression to match a particular string using " { $vocab-link "regexp.combinators" } " and group capture is available to extract parts of a regular expression match." $nl
-"Another feature is Perl's " { $snippet "\\G" } " syntax, which references the previous match, is not included. This is because that sequence is inherently stateful, and Factor regexps don't hold state." $nl
-"None of the operations which embed code into a regexp are supported, as this would require the inclusion of the Factor parser and compiler in any application which wants to expose regexps to the user. None of the casing operations are included of Perl like \\L, for simplicity." ; ! Also describe syntax, from the beginning
+{ $subheading "Group capture" }
+{ $subheading "Reluctant and posessive quantifiers" }
+{ $subheading "Backreferences" }
+"Backreferences were omitted because of a design decision to allow only regular expressions following the formal theory of regular languages. For more information, see " { $link { "regexp" "theory" } } "."
+$nl
+"To work around the lack of backreferences, consider using group capture and then creating a new regular expression to match the captured string using " { $vocab-link "regexp.combinators" } "."
+{ $subheading "Previous match" }
+"Another feature that is not included is Perl's " { $snippet "\\G" } " syntax, which references the previous match. This is because that sequence is inherently stateful, and Factor regexps don't hold state."
+{ $subheading "Embedding code" }
+"Operations which embed code into a regexp are not supported. This would require the inclusion of the Factor parser and compiler in any deployed application which wants to expose regexps to the user, leading to an undesirable increase in the code size."
+{ $heading "Casing operations" }
+"No special casing operations are included, for example Perl's " { $snippet "\\L" } "." ;
 
 ARTICLE: { "regexp" "options" } "Regular expression options"
 "When " { $link { "regexp" "construction" } } ", various options can be provided. Options have single-character names. A string of options has one of the following two forms:"
@@ -150,7 +163,7 @@ ARTICLE: { "regexp" "theory" } "The theory of regular expressions"
 "This implies, by DeMorgan's law, that, if you have two regular languages, their intersection is also regular. That is, for any two regular expressions, there exists a regular expression which matches strings that match both inputs." $nl
 "Traditionally, regular expressions on computer support an additional operation: backreferences. For example, the Perl regexp " { $snippet "/(.*)$1/" } " matches a string repated twice. If a backreference refers to a string with a predetermined maximum length, then the resulting language is still regular." $nl
 "But, if not, the language is not regular. There is strong evidence that there is no efficient way to parse with backreferences in the general case. Perl uses a naive backtracking algorithm which has pathological behavior in some cases, taking exponential time to match even if backreferences aren't used. Additionally, expressions with backreferences don't have the properties with negation and intersection described above." $nl
-"The Factor regular expression engine was built with the design decision to support negation and intersection at the expense of backreferences. This lets us have a guaranteed linear-time matching algorithm. Systems like Ragel and Lex also use this algorithm, but in the Factor regular expression engine, all other features of regexps are still present." ;
+"The Factor regular expression engine was built with the design decision to support negation and intersection at the expense of backreferences. This lets us have a guaranteed linear-time matching algorithm. Systems like Ragel and Lex use the same algorithm." ;
 
 ARTICLE: { "regexp" "operations" } "Matching operations with regular expressions"
 "Testing if a string matches a regular expression:"

@@ -3,5 +3,5 @@
 USING: kernel generic generic.parser words fry ;
 IN: method-chains
 
-: AFTER: (M:) dupd '[ [ _ (call-next-method) ] _ bi ] define ; parsing
-: BEFORE: (M:) over '[ _ [ _ (call-next-method) ] bi ] define ; parsing
+SYNTAX: AFTER: (M:) dupd '[ [ _ (call-next-method) ] _ bi ] define ;
+SYNTAX: BEFORE: (M:) over '[ _ [ _ (call-next-method) ] bi ] define ;

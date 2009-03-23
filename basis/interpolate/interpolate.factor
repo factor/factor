@@ -38,6 +38,6 @@ MACRO: interpolate ( string -- )
 : interpolate-locals ( string -- quot )
     [ search [ ] ] (interpolate) ;
 
-: I[
+SYNTAX: I[
     "]I" parse-multiline-string
-    interpolate-locals over push-all ; parsing
+    interpolate-locals over push-all ;

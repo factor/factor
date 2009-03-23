@@ -16,7 +16,7 @@ PRIVATE>
     [ over real-macro-effect memoize-quot [ call ] append define ]
     2bi ;
 
-: MACRO: (:) define-macro ; parsing
+SYNTAX: MACRO: (:) define-macro ;
 
 PREDICATE: macro < word "macro" word-prop >boolean ;
 

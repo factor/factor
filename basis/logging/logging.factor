@@ -135,11 +135,11 @@ PRIVATE>
     [ [ input-logging-quot ] 2keep drop error-logging-quot ]
     (define-logging) ;
 
-: LOG:
+SYNTAX: LOG:
     #! Syntax: name level
     CREATE-WORD dup scan-word
     '[ 1array stack>message _ _ log-message ]
-    (( message -- )) define-declared ; parsing
+    (( message -- )) define-declared ;
 
 USE: vocabs.loader
 

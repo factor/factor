@@ -30,4 +30,4 @@ ERROR: no-such-color name ;
 : named-color ( name -- color )
     dup rgb.txt at [ ] [ no-such-color ] ?if ;
 
-: COLOR: scan named-color parsed ; parsing
+SYNTAX: COLOR: scan named-color parsed ;

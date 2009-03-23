@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit kernel math sequences strings ;
+USING: sequences math kernel strings combinators.short-circuit ;
 IN: quoting
 
 : quote? ( ch -- ? ) "'\"" member? ;

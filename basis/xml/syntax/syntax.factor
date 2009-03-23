@@ -26,17 +26,17 @@ M: no-tag summary
 
 PRIVATE>
 
-: TAGS:
+SYNTAX: TAGS:
     CREATE
     [ H{ } clone "xtable" set-word-prop ]
-    [ define-tags ] bi ; parsing
+    [ define-tags ] bi ;
 
-: TAG:
-    scan scan-word parse-definition define-tag ; parsing
+SYNTAX: TAG:
+    scan scan-word parse-definition define-tag ;
 
-: XML-NS:
+SYNTAX: XML-NS:
     CREATE-WORD (( string -- name )) over set-stack-effect
-    scan '[ f swap _ <name> ] define-memoized ; parsing
+    scan '[ f swap _ <name> ] define-memoized ;
 
 <PRIVATE
 
@@ -168,11 +168,11 @@ MACRO: interpolate-xml ( xml -- quot )
 
 PRIVATE>
 
-: <XML
-    "XML>" [ string>doc ] parse-def ; parsing
+SYNTAX: <XML
+    "XML>" [ string>doc ] parse-def ;
 
-: [XML
-    "XML]" [ string>chunk ] parse-def ; parsing
+SYNTAX: [XML
+    "XML]" [ string>chunk ] parse-def ;
 
 <PRIVATE
 
