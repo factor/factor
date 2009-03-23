@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words assocs kernel accessors parser sequences summary
-lexer splitting combinators locals xml.data memoize sequences.deep
-xml.data xml.state xml namespaces present arrays generalizations strings
-make math macros multiline inverse combinators.short-circuit 
-sorting fry unicode.categories ;
+USING: words assocs kernel accessors parser effects.parser
+sequences summary lexer splitting combinators locals xml.data
+memoize sequences.deep xml.data xml.state xml namespaces present
+arrays generalizations strings make math macros multiline
+inverse combinators.short-circuit sorting fry unicode.categories
+effects ;
 IN: xml.syntax
 
 <PRIVATE
@@ -22,12 +23,12 @@ M: no-tag summary
 
 :: define-tag ( string word quot -- )
     quot string word "xtable" word-prop set-at
-    word define-tags ;
+    word word stack-effect define-tags ;
 
 PRIVATE>
 
 SYNTAX: TAGS:
-    CREATE complete-effect
+    CREATE-WORD complete-effect
     [ drop H{ } clone "xtable" set-word-prop ]
     [ define-tags ]
     2bi ;
