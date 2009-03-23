@@ -2,7 +2,7 @@ USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
 accessors generic eval combinators combinators.short-circuit
 combinators.short-circuit.smart math.order math.functions
-definitions compiler.units fry lexer words.symbol see ;
+definitions compiler.units fry lexer words.symbol see multiline ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -391,6 +391,65 @@ ERROR: punned-class x ;
 \ big-case-test must-infer
 
 [ 9 ] [ 3 big-case-test ] unit-test
+
+! Dan found this problem
+: littledan-case-problem-1 ( a -- b )
+    {
+        { t [ 3 ] }
+        { f [ 4 ] }
+        [| x | x 12 + { "howdy" } nth ]
+    } case ;
+
+\ littledan-case-problem-1 must-infer
+
+[ "howdy" ] [ -12 \ littledan-case-problem-1 def>> call ] unit-test
+[ "howdy" ] [ -12 littledan-case-problem-1 ] unit-test
+
+:: littledan-case-problem-2 ( a -- b )
+    a {
+        { t [ a not ] }
+        { f [ 4 ] }
+        [| x | x a - { "howdy" } nth ]
+    } case ;
+
+\ littledan-case-problem-2 must-infer
+
+[ "howdy" ] [ -12 \ littledan-case-problem-2 def>> call ] unit-test
+[ "howdy" ] [ -12 littledan-case-problem-2 ] unit-test
+
+:: littledan-cond-problem-1 ( a -- b )
+    a {
+        { [ dup 0 < ] [ drop a not ] }
+        { [| y | y y 0 > ] [ drop 4 ] }
+        [| x | x a - { "howdy" } nth ]
+    } cond ;
+
+\ littledan-cond-problem-1 must-infer
+
+[ f ] [ -12 \ littledan-cond-problem-1 def>> call ] unit-test
+[ 4 ] [ 12 \ littledan-cond-problem-1 def>> call ] unit-test
+[ "howdy" ] [ 0 \ littledan-cond-problem-1 def>> call ] unit-test
+[ f ] [ -12 littledan-cond-problem-1 ] unit-test
+[ 4 ] [ 12 littledan-cond-problem-1 ] unit-test
+[ "howdy" ] [ 0 littledan-cond-problem-1 ] unit-test
+
+/*
+:: littledan-case-problem-3 ( a quot -- b )
+    a {
+        { t [ a not ] }
+        { f [ 4 ] }
+        quot
+    } case ; inline
+
+[ f ] [ t [ ] littledan-case-problem-3 ] unit-test
+[ 144 ] [ 12 [ sq ] littledan-case-problem-3 ] unit-test
+[| | [| a | a ] littledan-case-problem-3 ] must-infer
+
+: littledan-case-problem-4 ( a -- b )
+    [ 1 + ] littledan-case-problem-3 ;
+
+\ littledan-case-problem-4 must-infer
+*/
 
 GENERIC: lambda-method-forget-test ( a -- b )
 

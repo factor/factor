@@ -10,7 +10,7 @@ HELP: <n-based-assoc>
 USING: assocs prettyprint kernel sequences.n-based ;
 IN: scratchpad
 
-: months
+: months ( -- assoc )
     {
         "January"
         "February"
@@ -36,7 +36,7 @@ HELP: n-based-assoc
 USING: assocs prettyprint kernel sequences.n-based ;
 IN: scratchpad
 
-: months
+: months ( -- assoc )
     {
         "January"
         "February"
