@@ -7,14 +7,14 @@ IN: macros
 <PRIVATE
 
 : real-macro-effect ( effect -- effect' )
-    in>> 1 <effect> ;
+    in>> { "quot" } <effect> ;
 
 PRIVATE>
 
 : define-macro ( word definition effect -- )
     real-macro-effect
-    [ drop "macro" set-word-prop ]
     [ [ memoize-quot [ call ] append ] keep define-declared ]
+    [ drop "macro" set-word-prop ]
     3bi ;
 
 SYNTAX: MACRO: (:) define-macro ;
