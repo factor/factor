@@ -132,7 +132,7 @@ IN: vocabs.loader.tests
     "vocabs.loader.test.d" vocab source-loaded?>>
 ] unit-test
 
-: forget-junk
+: forget-junk ( -- )
     [
         { "2" "a" "b" "d" "e" "f" }
         [

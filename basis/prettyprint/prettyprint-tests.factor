@@ -63,7 +63,7 @@ unit-test
 [ "USING: math ;\nIN: prettyprint.tests\n: bar ( x -- y ) 2 + ;\n" ]
 [ [ \ bar see ] with-string-writer ] unit-test
 
-: blah 
+: blah ( a a a a a a a a a a a a a a a a a a a a -- )
     drop
     drop
     drop
@@ -102,7 +102,7 @@ unit-test
         ] keep =
     ] with-scope ;
 
-GENERIC: method-layout
+GENERIC: method-layout ( a -- b )
 
 M: complex method-layout
     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -135,7 +135,7 @@ M: object method-layout ;
     [ \ method-layout see-methods ] with-string-writer "\n" split
 ] unit-test
 
-: soft-break-test
+: soft-break-test ( -- str )
     {
         "USING: kernel math sequences strings ;"
         "IN: prettyprint.tests"
@@ -152,7 +152,7 @@ M: object method-layout ;
 
 DEFER: parse-error-file
 
-: another-soft-break-test
+: another-soft-break-test ( -- str )
     {
         "USING: make sequences ;"
         "IN: prettyprint.tests"
@@ -166,7 +166,7 @@ DEFER: parse-error-file
     check-see
 ] unit-test
 
-: string-layout
+: string-layout ( -- str )
     {
         "USING: accessors debugger io kernel ;"
         "IN: prettyprint.tests"
@@ -187,7 +187,7 @@ DEFER: parse-error-file
 
 \ send soft "break-after" set-word-prop
 
-: final-soft-break-test
+: final-soft-break-test ( -- str )
     {
         "USING: kernel sequences ;"
         "IN: prettyprint.tests"
@@ -202,7 +202,7 @@ DEFER: parse-error-file
     "final-soft-break-layout" final-soft-break-test check-see
 ] unit-test
 
-: narrow-test
+: narrow-test ( -- str )
     {
         "USING: arrays combinators continuations kernel sequences ;"
         "IN: prettyprint.tests"
@@ -218,7 +218,7 @@ DEFER: parse-error-file
     "narrow-layout" narrow-test check-see
 ] unit-test
 
-: another-narrow-test
+: another-narrow-test ( -- str )
     {
         "IN: prettyprint.tests"
         ": another-narrow-layout ( -- obj )"
@@ -326,7 +326,7 @@ INTERSECTION: intersection-see-test sequence number ;
     
 TUPLE: started-out-hustlin' ;
 
-GENERIC: ended-up-ballin'
+GENERIC: ended-up-ballin' ( a -- b )
 
 M: started-out-hustlin' ended-up-ballin' ; inline
 

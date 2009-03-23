@@ -72,7 +72,7 @@ SYMBOL: picker
         \ dispatch ,
     ] [ ] make ; inline
 
-TUPLE: math-combination ;
+SINGLETON: math-combination
 
 M: math-combination make-default-method
     drop default-math-method ;

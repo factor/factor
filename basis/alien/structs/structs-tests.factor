@@ -24,7 +24,7 @@ os winnt? cpu x86? and [
     ] when
 ] when
 
-: MAX_FOOS 30 ;
+CONSTANT: MAX_FOOS 30
 
 C-STRUCT: foox
     { { "int" MAX_FOOS } "x" } ;

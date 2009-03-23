@@ -148,7 +148,7 @@ IN: calendar.tests
 [ t ] [ 123456789000000 [ micros>timestamp timestamp>micros ] keep = ] unit-test
 [ t ] [ 123456789123456000 [ micros>timestamp timestamp>micros ] keep = ] unit-test
 
-: checktime+ now dup clone [ rot time+ drop ] keep = ;
+: checktime+ ( duration -- ? ) now dup clone [ rot time+ drop ] keep = ;
 
 [ t ] [ 5 seconds checktime+ ] unit-test
 

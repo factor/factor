@@ -18,6 +18,6 @@ MACRO: set-slots ( slots -- quot )
 
 SYNTAX: CONSTRUCTOR:
     scan-word [ name>> "<" ">" surround create-in ] keep
-    "(" expect ")" parse-effect
+    complete-effect
     parse-definition
     define-constructor ;

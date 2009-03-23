@@ -119,14 +119,14 @@ M: mock-gadget ungraft*
         [ { f f } ] [ "g" get graft-state>> ] unit-test
     ] with-variable
 
-    : add-some-children
+    : add-some-children ( gadget -- gadget )
         3 [
             <mock-gadget> over <model> >>model
             "g" get over add-gadget drop
             swap 1+ number>string set
         ] each ;
 
-    : status-flags
+    : status-flags ( -- seq )
         { "g" "1" "2" "3" } [ get graft-state>> ] map prune ;
 
     : notify-combo ( ? ? -- )

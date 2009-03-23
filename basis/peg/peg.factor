@@ -618,7 +618,7 @@ ERROR: parse-failed input word ;
 
 SYNTAX: PEG:
   (:)
-  [let | def [ ] word [ ] |
+  [let | effect [ ] def [ ] word [ ] |
     [
       [
         [let | compiled-def [ def call compile ] |
@@ -626,7 +626,7 @@ SYNTAX: PEG:
             dup compiled-def compiled-parse
             [ ast>> ] [ word parse-failed ] ?if
           ]
-          word swap define
+          word swap effect define-declared
         ]
       ] with-compilation-unit
     ] over push-all
