@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs bson.constants 
-byte-arrays byte-vectors calendar fry io io.binary io.encodings
-io.encodings.binary io.encodings.string io.encodings.utf8
-io.streams.byte-array kernel math math.parser namespaces
-quotations sequences serialize strings words ;
+USING: accessors assocs bson.constants byte-arrays byte-vectors
+calendar fry io io.binary io.encodings io.encodings.string
+io.encodings.utf8 kernel math math.parser namespaces quotations
+sequences serialize strings tools.walker words ;
 
 
 IN: bson.writer
@@ -16,6 +15,8 @@ IN: bson.writer
 SYMBOL: shared-buffer 
 
 CONSTANT: INT32-SIZE 4
+CONSTANT: CHAR-SIZE 1
+CONSTANT: INT64-SIZE 8
 
 : (buffer) ( -- buffer )
     shared-buffer get
@@ -24,10 +25,10 @@ CONSTANT: INT32-SIZE 4
 PRIVATE>
 
 : ensure-buffer ( -- )
-    (buffer) drop ;
+    (buffer) drop ; inline
 
 : reset-buffer ( -- )
-    (buffer) 0 >>length drop ;
+    (buffer) 0 >>length drop ; inline
 
 : with-buffer ( quot -- byte-vector )
     [ (buffer) ] dip [ output-stream get ] compose
@@ -67,11 +68,11 @@ M: objref bson-type? ( objref -- type ) drop T_Binary ;
 M: quotation bson-type? ( quotation -- type ) drop T_Binary ; 
 M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ; 
 
-: write-byte ( byte -- ) 1 >le write ; inline
-: write-int32 ( int -- ) 4 >le write ; inline
-: write-double ( real -- ) double>bits 8 >le write ; inline
+: write-byte ( byte -- ) CHAR-SIZE >le write ; inline
+: write-int32 ( int -- ) INT32-SIZE >le write ; inline
+: write-double ( real -- ) double>bits INT64-SIZE >le write ; inline
 : write-cstring ( string -- ) utf8 encode B{ 0 } append write ; inline
-: write-longlong ( object -- ) 8 >le write ; inline
+: write-longlong ( object -- ) INT64-SIZE >le write ; inline
 
 : write-eoo ( -- ) T_EOO write-byte ; inline
 : write-type ( obj -- obj ) [ bson-type? write-byte ] keep ; inline
