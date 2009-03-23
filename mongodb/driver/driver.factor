@@ -1,6 +1,8 @@
-USING: accessors assocs fry io.sockets kernel math mongodb.msg formatting linked-assocs destructors continuations
-mongodb.operations namespaces sequences splitting math.parser io.encodings.binary combinators io.streams.duplex
-arrays io memoize constructors sets strings uuid bson.writer bson.constants parser ;
+USING: accessors assocs bson.constants bson.writer combinators
+constructors continuations destructors formatting fry io
+io.encodings.binary io.sockets io.streams.duplex kernel linked-assocs
+math math.parser memoize mongodb.msg mongodb.operations namespaces
+parser sequences sets splitting strings uuid syntax ;
 
 IN: mongodb.driver
 
@@ -43,7 +45,8 @@ SYMBOL: mdb-socket-stream
 
 PRIVATE>
 
-: r/ \ / [ >mdbregexp ]  parse-literal ; parsing 
+SYNTAX: r/ ( token -- mdbregexp )
+    \ / [ >mdbregexp ]  parse-literal ; 
 
 SYMBOL: mdb-instance
 
