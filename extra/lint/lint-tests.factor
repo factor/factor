@@ -9,6 +9,6 @@ IN: lint.tests
 : lint2 ( n -- n' ) 1 + ; ! 1+
 [ { [ 1 + ] } ] [ \ lint2 lint ] unit-test
 
-: lint3 dup -rot ; ! tuck
+: lint3 ( a b -- b a b ) dup -rot ; ! tuck
 
 [ { { lint3 { [ dup -rot ] } } } ] [ \ lint3 lint-word ] unit-test

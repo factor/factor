@@ -6,7 +6,7 @@
 
 USING: arrays kernel sequences io io.files io.backend
 io.encodings.ascii math.parser vocabs definitions
-namespaces make words sorting ;
+namespaces make words sorting present ;
 IN: ctags
 
 : ctag-word ( ctag -- word )
@@ -20,7 +20,7 @@ IN: ctags
 
 : ctag ( seq -- str )
   [
-    dup ctag-word ?word-name %
+    dup ctag-word present %
     "\t" %
     dup ctag-path normalize-path %
     "\t" %

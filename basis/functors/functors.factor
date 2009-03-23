@@ -14,9 +14,9 @@ IN: functors
 
 : scan-param ( -- obj ) scan-object literalize ;
 
-: define* ( word def effect -- ) pick set-word define-declared ;
+: define* ( word def -- ) over set-word define ;
 
-: define-syntax* ( word def -- ) over set-word define-syntax ;
+: define-declared* ( word def effect -- ) pick set-word define-declared ;
 
 TUPLE: fake-quotation seq ;
 
@@ -41,7 +41,12 @@ M: object fake-quotations> ;
 : parse-definition* ( accum -- accum )
     parse-definition >fake-quotations parsed \ fake-quotations> parsed ;
 
-: DEFINE* ( accum -- accum ) effect get parsed \ define* parsed ;
+: parse-declared* ( accum -- accum )
+    complete-effect
+    [ parse-definition* ] dip
+    parsed ;
+
+: DEFINE* ( accum -- accum ) \ define-declared* parsed ;
 
 SYNTAX: `TUPLE:
     scan-param parsed
@@ -57,31 +62,28 @@ SYNTAX: `TUPLE:
     \ define-tuple-class parsed ;
 
 SYNTAX: `M:
-    effect off
     scan-param parsed
     scan-param parsed
     \ create-method-in parsed
     parse-definition*
-    DEFINE* ;
+    \ define* parsed ;
 
 SYNTAX: `C:
-    effect off
     scan-param parsed
     scan-param parsed
-    [ [ boa ] curry ] over push-all
-    DEFINE* ;
+    complete-effect
+    [ [ [ boa ] curry ] over push-all ] dip parsed
+    \ define-declared* parsed ;
 
 SYNTAX: `:
-    effect off
     scan-param parsed
-    parse-definition*
-    DEFINE* ;
+    parse-declared*
+    \ define-declared* parsed ;
 
 SYNTAX: `SYNTAX:
-    effect off
     scan-param parsed
     parse-definition*
-    \ define-syntax* parsed ;
+    \ define-syntax parsed ;
 
 SYNTAX: `INSTANCE:
     scan-param parsed
@@ -89,9 +91,6 @@ SYNTAX: `INSTANCE:
     \ add-mixin-instance parsed ;
 
 SYNTAX: `inline [ word make-inline ] over push-all ;
-
-SYNTAX: `(
-    ")" parse-effect effect set ;
 
 : (INTERPOLATE) ( accum quot -- accum )
     [ scan interpolate-locals ] dip
@@ -118,7 +117,6 @@ DEFER: ;FUNCTOR delimiter
         { "INSTANCE:" POSTPONE: `INSTANCE: }
         { "SYNTAX:" POSTPONE: `SYNTAX: }
         { "inline" POSTPONE: `inline }
-        { "(" POSTPONE: `( }
     } ;
 
 : push-functor-words ( -- )
@@ -133,9 +131,9 @@ DEFER: ;FUNCTOR delimiter
     [ \ ;FUNCTOR parse-until >quotation ] ((parse-lambda)) <let*> 1quotation
     pop-functor-words ;
 
-: (FUNCTOR:) ( -- word def )
+: (FUNCTOR:) ( -- word def effect )
     CREATE-WORD [ parse-functor-body ] parse-locals-definition ;
 
 PRIVATE>
 
-SYNTAX: FUNCTOR: (FUNCTOR:) define ;
+SYNTAX: FUNCTOR: (FUNCTOR:) define-declared ;

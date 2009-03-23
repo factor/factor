@@ -4,7 +4,7 @@ http.server furnace furnace.utilities tools.test kernel
 namespaces accessors io.streams.string urls xml.writer ;
 TUPLE: funny-dispatcher < dispatcher ;
 
-: <funny-dispatcher> funny-dispatcher new-dispatcher ;
+: <funny-dispatcher> ( -- dispatcher ) funny-dispatcher new-dispatcher ;
 
 TUPLE: base-path-check-responder ;
 

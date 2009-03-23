@@ -5,9 +5,9 @@ IN: ui.gadgets.buttons.tests
 
 TUPLE: foo-gadget ;
 
-: com-foo-a ;
+: com-foo-a ( -- ) ;
 
-: com-foo-b ;
+: com-foo-b ( -- ) ;
 
 \ foo-gadget "toolbar" f {
     { f com-foo-a }
