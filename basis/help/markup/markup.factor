@@ -4,7 +4,7 @@ USING: accessors arrays definitions generic io kernel assocs
 hashtables namespaces make parser prettyprint sequences strings
 io.styles vectors words math sorting splitting classes slots fry
 sets vocabs help.stylesheet help.topics vocabs.loader quotations
-combinators see ;
+combinators see present ;
 IN: help.markup
 
 PREDICATE: simple-element < array
@@ -276,7 +276,7 @@ M: f ($instance)
     $snippet ;
 
 : values-row ( seq -- seq )
-    unclip \ $snippet swap ?word-name 2array
+    unclip \ $snippet swap present 2array
     swap dup first word? [ \ $instance prefix ] when 2array ;
 
 : $values ( element -- )

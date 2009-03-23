@@ -186,7 +186,7 @@ M: f generic-forget-test-3 ;
 
 [ f ] [ f generic-forget-test-3 ] unit-test
 
-: a-word ;
+: a-word ( -- ) ;
 
 GENERIC: a-generic ( a -- b )
 
@@ -196,7 +196,7 @@ M: integer a-generic a-word ;
 
 [ t ] [ "m" get \ a-word usage memq? ] unit-test
 
-[ ] [ "IN: generic.tests : a-generic ;" eval ] unit-test
+[ ] [ "IN: generic.tests : a-generic ( -- ) ;" eval ] unit-test
 
 [ f ] [ "m" get \ a-word usage memq? ] unit-test
 

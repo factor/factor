@@ -31,8 +31,6 @@ IN: infix.tests
 [ f ] [ 2 \ gcd check-word ] unit-test ! multiple return values
 [ f ] [ 1 \ drop check-word ] unit-test ! no return value
 [ f ] [ 1 \ lcm check-word ] unit-test ! takes 2 args
-: no-stack-effect-declared + ;
-[ 0 \ no-stack-effect-declared check-word ] must-fail
 
 : qux ( -- x ) 2 ;
 [ t ] [ 0 \ qux check-word ] unit-test

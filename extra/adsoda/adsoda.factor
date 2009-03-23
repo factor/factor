@@ -60,7 +60,7 @@ t to: remove-hidden-solids?
 : dimension ( array -- x )      length 1- ; inline 
 : last ( seq -- x )           [ dimension ] [ nth ] bi ; inline
 : change-last ( seq quot -- ) 
-    [ [ dimension ] keep ] dip change-nth  ; 
+    [ [ dimension ] keep ] dip change-nth  ; inline
 
 ! -------------------------------------------------------------
 ! light
@@ -445,7 +445,7 @@ TUPLE: space name dimension solids ambient-color lights ;
 
 : space-apply ( space m quot -- space ) 
         curry [ map ] curry [ dup solids>> ] dip
-        [ call ] [ drop ] recover drop ;
+        [ call ] [ 2drop ] recover drop ; inline
 : space-transform ( space m -- space ) 
     [ solid-transform ] space-apply ;
 : space-translate ( space v -- space ) 

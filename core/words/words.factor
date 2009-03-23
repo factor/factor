@@ -164,13 +164,14 @@ CONSTANT: reset-on-redefine { "inferred-effect" "cannot-infer" }
 : set-stack-effect ( effect word -- )
     2dup "declared-effect" word-prop = [ 2drop ] [
         swap
+        [ drop changed-effect ]
         [ "declared-effect" set-word-prop ]
-        [ drop dup primitive? [ dup redefined ] unless drop ] 2bi
+        [ drop dup primitive? [ drop ] [ redefined ] if ]
+        2tri
     ] if ;
 
 : define-declared ( word def effect -- )
-    pick swap "declared-effect" set-word-prop
-    define ;
+    [ nip swap set-stack-effect ] [ drop define ] 3bi ;
 
 : make-inline ( word -- )
     t "inline" set-word-prop ;
@@ -193,7 +194,7 @@ M: word reset-word
     {
         "unannotated-def" "parsing" "inline" "recursive"
         "foldable" "flushable" "reading" "writing" "reader"
-        "writer" "declared-effect" "delimiter"
+        "writer" "delimiter"
     } reset-props ;
 
 GENERIC: subwords ( word -- seq )
@@ -257,7 +258,5 @@ M: word hashcode*
     nip 1 slot { fixnum } declare ; foldable
 
 M: word literalize <wrapper> ;
-
-: ?word-name ( word -- name ) dup word? [ name>> ] when ;
 
 : xref-words ( -- ) all-words [ xref ] each ;

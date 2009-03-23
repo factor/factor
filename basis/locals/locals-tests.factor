@@ -192,14 +192,14 @@ M:: string lambda-generic ( a b -- c ) a b lambda-generic-2 ;
 DEFER: xyzzy
 
 [ ] [
-    "IN: locals.tests USE: math GENERIC: xyzzy M: integer xyzzy ;"
+    "IN: locals.tests USE: math GENERIC: xyzzy ( a -- b ) M: integer xyzzy ;"
     <string-reader> "lambda-generic-test" parse-stream drop
 ] unit-test
 
 [ 10 ] [ 10 xyzzy ] unit-test
 
 [ ] [
-    "IN: locals.tests USE: math USE: locals GENERIC: xyzzy M:: integer xyzzy ( n -- ) 5 ;"
+    "IN: locals.tests USE: math USE: locals GENERIC: xyzzy ( a -- b ) M:: integer xyzzy ( n -- x ) 5 ;"
     <string-reader> "lambda-generic-test" parse-stream drop
 ] unit-test
 
@@ -245,7 +245,7 @@ M:: fixnum next-method-test ( a -- b ) a call-next-method 1 + ;
 
 [ 5 ] [ 1 next-method-test ] unit-test
 
-: no-with-locals-test { 1 2 3 } [| x | x 3 + ] map ;
+: no-with-locals-test ( -- seq ) { 1 2 3 } [| x | x 3 + ] map ;
 
 [ { 4 5 6 } ] [ no-with-locals-test ] unit-test
 
@@ -259,7 +259,7 @@ M:: fixnum next-method-test ( a -- b ) a call-next-method 1 + ;
 
 :: a-word-with-locals ( a b -- ) ;
 
-: new-definition "USING: math ;\nIN: locals.tests\n: a-word-with-locals ( -- x ) 2 3 + ;\n" ;
+CONSTANT: new-definition "USING: math ;\nIN: locals.tests\n: a-word-with-locals ( -- x ) 2 3 + ;\n"
 
 [ ] [ new-definition eval ] unit-test
 
@@ -268,7 +268,7 @@ M:: fixnum next-method-test ( a -- b ) a call-next-method 1 + ;
     new-definition =
 ] unit-test
 
-: method-definition "USING: locals locals.tests sequences ;\nM:: sequence method-with-locals ( a -- y ) a reverse ;\n" ;
+CONSTANT: method-definition "USING: locals locals.tests sequences ;\nM:: sequence method-with-locals ( a -- y ) a reverse ;\n"
 
 GENERIC: method-with-locals ( x -- y )
 

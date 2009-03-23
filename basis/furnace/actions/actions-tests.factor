@@ -7,7 +7,7 @@ IN: furnace.actions.tests
     [ "a" param "b" param [ string>number ] bi@ + ] >>display
 "action-1" set
 
-: lf>crlf "\n" split "\r\n" join ;
+: lf>crlf ( string -- string' ) "\n" split "\r\n" join ;
 
 STRING: action-request-test-1
 GET http://foo/bar?a=12&b=13 HTTP/1.1

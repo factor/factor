@@ -21,7 +21,7 @@ PREDICATE: writer-method < method-body "writing" word-prop ;
         object bootstrap-word >>class ;
 
 : define-typecheck ( class generic quot props -- )
-    [ dup define-simple-generic create-method ] 2dip
+    [ create-method ] 2dip
     [ [ props>> ] [ drop ] [ ] tri* update ]
     [ drop define ]
     3bi ;
@@ -36,7 +36,6 @@ PREDICATE: writer-method < method-body "writing" word-prop ;
 
 : reader-word ( name -- word )
     ">>" append "accessors" create
-    dup (( object -- value )) "declared-effect" set-word-prop
     dup t "reader" set-word-prop ;
 
 : reader-props ( slot-spec -- assoc )
@@ -46,13 +45,18 @@ PREDICATE: writer-method < method-body "writing" word-prop ;
         t "flushable" set
     ] H{ } make-assoc ;
 
+: define-reader-generic ( name -- )
+    reader-word (( object -- value )) define-simple-generic ;
+
 : define-reader ( class slot-spec -- )
-    [ name>> reader-word ] [ reader-quot ] [ reader-props ] tri
-    define-typecheck ;
+    [ nip name>> define-reader-generic ]
+    [
+        [ name>> reader-word ] [ reader-quot ] [ reader-props ] tri
+        define-typecheck
+    ] 2bi ;
 
 : writer-word ( name -- word )
     "(>>" ")" surround "accessors" create
-    dup (( value object -- )) "declared-effect" set-word-prop
     dup t "writer" set-word-prop ;
 
 ERROR: bad-slot-value value class ;
@@ -92,9 +96,14 @@ ERROR: bad-slot-value value class ;
 : writer-props ( slot-spec -- assoc )
     "writing" associate ;
 
+: define-writer-generic ( name -- )
+    writer-word (( object value -- )) define-simple-generic ;
+
 : define-writer ( class slot-spec -- )
-    [ name>> writer-word ] [ writer-quot ] [ writer-props ] tri
-    define-typecheck ;
+    [ nip name>> define-writer-generic ] [
+        [ name>> writer-word ] [ writer-quot ] [ writer-props ] tri
+        define-typecheck
+    ] 2bi ;
 
 : setter-word ( name -- word )
     ">>" prepend "accessors" create ;
@@ -134,8 +143,8 @@ ERROR: bad-slot-value value class ;
 
 : define-protocol-slot ( name -- )
     {
-        [ reader-word define-simple-generic ]
-        [ writer-word define-simple-generic ]
+        [ define-reader-generic ]
+        [ define-writer-generic ]
         [ define-setter ]
         [ define-changer ]
     } cleave ;
