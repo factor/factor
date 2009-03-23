@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Maxim Savchenko
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: namespaces ecdsa tools.test checksums checksums.openssl ;
+USING: namespaces ecdsa tools.test checksums checksums.sha2 ;
 IN: ecdsa.tests
 
 SYMBOLS: priv-key pub-key signature ;
@@ -16,7 +16,7 @@ SYMBOLS: priv-key pub-key signature ;
 
 [ ] ! Signing message
 [
-    message "sha256" <openssl-checksum> checksum-bytes
+    message sha-256 checksum-bytes
     priv-key get
     "prime256v1" [ set-private-key ecdsa-sign ] with-ec
     signature set
@@ -24,7 +24,7 @@ SYMBOLS: priv-key pub-key signature ;
 
 [ t ] ! Verifying signature
 [
-    message "sha256" <openssl-checksum> checksum-bytes
+    message sha-256 checksum-bytes
     signature get pub-key get
     "prime256v1" [ set-public-key ecdsa-verify ] with-ec
 ] unit-test
