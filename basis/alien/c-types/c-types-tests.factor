@@ -4,7 +4,7 @@ sequences system libc alien.strings io.encodings.utf8 ;
 
 \ expand-constants must-infer
 
-: xyz 123 ;
+CONSTANT: xyz 123
 
 [ { "blah" 123 } ] [ { "blah" xyz } expand-constants ] unit-test
 

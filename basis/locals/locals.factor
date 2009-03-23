@@ -1,4 +1,4 @@
-! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
+! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lexer macros memoize parser sequences vocabs
 vocabs.loader words kernel namespaces locals.parser locals.types
@@ -17,7 +17,7 @@ SYNTAX: [let* parse-let* over push-all ;
 
 SYNTAX: [wlet parse-wlet over push-all ;
 
-SYNTAX: :: (::) define ;
+SYNTAX: :: (::) define-declared ;
 
 SYNTAX: M:: (M::) define ;
 

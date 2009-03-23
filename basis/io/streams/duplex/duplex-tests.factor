@@ -5,13 +5,13 @@ IN: io.streams.duplex.tests
 ! Test duplex stream close behavior
 TUPLE: closing-stream < disposable ;
 
-: <closing-stream> closing-stream new ;
+: <closing-stream> ( -- stream ) closing-stream new ;
 
 M: closing-stream dispose* drop ;
 
 TUPLE: unclosable-stream ;
 
-: <unclosable-stream> unclosable-stream new ;
+: <unclosable-stream> ( -- stream ) unclosable-stream new ;
 
 M: unclosable-stream dispose
     "Can't close me!" throw ;

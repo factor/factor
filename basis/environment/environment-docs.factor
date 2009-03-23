@@ -17,7 +17,7 @@ HELP: (set-os-envs)
 { $notes "In most cases, use " { $link set-os-envs } " instead." } ;
 
 
-HELP: os-env ( key -- value )
+HELP: os-env
 { $values { "key" string } { "value" string } }
 { $description "Looks up the value of a shell environment variable." }
 { $examples
@@ -39,14 +39,14 @@ HELP: set-os-envs
     "Names and values of environment variables are operating system-specific. Windows NT allows values up to 32766 characters in length."
 } ;
 
-HELP: set-os-env ( value key -- )
+HELP: set-os-env
 { $values { "value" string } { "key" string } }
 { $description "Set an environment variable." }
 { $notes
     "Names and values of environment variables are operating system-specific."
 } ;
 
-HELP: unset-os-env ( key -- )
+HELP: unset-os-env
 { $values { "key" string } }
 { $description "Unset an environment variable." }
 { $notes

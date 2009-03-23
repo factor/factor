@@ -4,7 +4,7 @@ IN: models.tests
 
 TUPLE: model-tester hit? ;
 
-: <model-tester> model-tester new ;
+: <model-tester> ( -- model-tester ) model-tester new ;
 
 M: model-tester model-changed nip t >>hit? drop ;
 

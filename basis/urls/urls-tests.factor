@@ -2,7 +2,7 @@ IN: urls.tests
 USING: urls urls.private tools.test
 arrays kernel assocs present accessors ;
 
-: urls
+CONSTANT: urls
     {
         {
             T{ url
@@ -80,7 +80,7 @@ arrays kernel assocs present accessors ;
             }
             "ftp://slava:secret@ftp.kernel.org/"
         }
-    } ;
+    }
 
 urls [
     [ 1array ] [ [ >url ] curry ] bi* unit-test
