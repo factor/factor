@@ -23,7 +23,7 @@ HELP: unique-retries
 
 { unique-length unique-retries } related-words
 
-HELP: make-unique-file ( prefix suffix -- path )
+HELP: make-unique-file
 { $values { "prefix" "a string" } { "suffix" "a string" }
 { "path" "a pathname string" } }
 { $description "Creates a file that is guaranteed not to exist in the directory stored in " { $link current-temporary-directory } ". The file name is composed of a prefix, a number of random digits and letters, and the suffix. Returns the full pathname." }
@@ -31,18 +31,18 @@ HELP: make-unique-file ( prefix suffix -- path )
 
 { unique-file make-unique-file cleanup-unique-file } related-words
 
-HELP: cleanup-unique-file ( prefix suffix quot: ( path -- ) -- )
+HELP: cleanup-unique-file
 { $values { "prefix" "a string" } { "suffix" "a string" }
 { "quot" "a quotation" } }
 { $description "Creates a file with " { $link make-unique-file } " and calls the quotation with the path name on the stack." }
 { $notes "The unique file will be deleted after calling this word." } ;
 
-HELP: unique-directory ( -- path )
+HELP: unique-directory
 { $values { "path" "a pathname string" } }
 { $description "Creates a directory in the value in " { $link current-temporary-directory } " that is guaranteed not to exist in and returns the full pathname." }
 { $errors "Throws an error if the directory cannot be created after a number of tries. The most likely error is incorrect directory permissions on the temporary directory." } ;
 
-HELP: cleanup-unique-directory ( quot -- )
+HELP: cleanup-unique-directory
 { $values { "quot" "a quotation" } }
 { $description "Creates a directory with " { $link unique-directory } " and calls the quotation with the pathname on the stack using the " { $link with-temporary-directory } " combinator. The quotation can access the " { $link current-temporary-directory } " symbol for the name of the temporary directory. Subsequent unique files will be created in this unique directory until the combinator returns." }
 { $notes "The directory will be deleted after calling this word, even if an error is thrown in the quotation. This combinator is like " { $link with-unique-directory } " but does not delete the directory." } ;

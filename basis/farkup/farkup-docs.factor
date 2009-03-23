@@ -9,7 +9,7 @@ HELP: write-farkup
 { $values { "string" string } }
 { $description "Parse a Farkup string and writes the resulting HTML to " { $link output-stream } "." } ;
 
-HELP: parse-farkup ( string -- farkup )
+HELP: parse-farkup
 { $values { "string" string } { "farkup" "a Farkup syntax tree node" } }
 { $description "Parses Farkup and outputs a tree of " { $link "farkup-ast" } "." } ;
 

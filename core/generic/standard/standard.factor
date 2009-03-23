@@ -24,7 +24,7 @@ M: quotation engine>quot
 ERROR: no-method object generic ;
 
 : error-method ( word -- quot )
-    picker swap [ no-method ] curry append ;
+    [ picker ] dip [ no-method ] curry append ;
 
 : push-method ( method specializer atomic assoc -- )
     [
@@ -56,7 +56,7 @@ ERROR: no-method object generic ;
 
 : find-default ( methods -- quot )
     #! Side-effects methods.
-    object bootstrap-word swap delete-at* [
+    [ object bootstrap-word ] dip delete-at* [
         drop generic get "default-method" word-prop mangle-method
     ] unless ;
 
@@ -104,8 +104,10 @@ PREDICATE: standard-generic < generic
 PREDICATE: simple-generic < standard-generic
     "combination" word-prop #>> zero? ;
 
-: define-simple-generic ( word -- )
-    T{ standard-combination f 0 } define-generic ;
+CONSTANT: simple-combination T{ standard-combination f 0 }
+
+: define-simple-generic ( word effect -- )
+    [ simple-combination ] dip define-generic ;
 
 : with-standard ( combination quot -- quot' )
     [ #>> (dispatch#) ] dip with-variable ; inline

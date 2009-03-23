@@ -7,7 +7,7 @@ IN: advice.tests
 [
     [ ad-do-it ] must-fail
     
-    : foo "foo" ; 
+    : foo ( -- str ) "foo" ; 
     \ foo make-advised
  
     { "bar" "foo" } [
