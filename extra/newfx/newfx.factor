@@ -140,11 +140,11 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: filter-of ( quot seq -- seq ) swap filter ;
+: filter-of ( quot seq -- seq ) swap filter ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: map-over ( quot seq -- seq ) swap map ;
+: map-over ( quot seq -- seq ) swap map ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -242,7 +242,7 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: purge ( seq quot -- seq ) [ not ] compose filter ;
+: purge ( seq quot -- seq ) [ not ] compose filter ; inline
 
 : purge! ( seq quot -- seq )
-  dupd '[ swap @ [ pluck! ] [ drop ] if ] each-index ;
+  dupd '[ swap @ [ pluck! ] [ drop ] if ] each-index ; inline

@@ -139,8 +139,8 @@ HELP: flags
 { $examples
     { $example "USING: math.bitwise kernel prettyprint ;"
         "IN: scratchpad"
-        ": MY-CONSTANT HEX: 1 ; inline"
-        "{ HEX: 20 MY-CONSTANT BIN: 100 } flags .h"
+        "CONSTANT: x HEX: 1"
+        "{ HEX: 20 x BIN: 100 } flags .h"
         "25"
     }
 } ;

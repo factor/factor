@@ -26,17 +26,17 @@ ABOUT: "strings"
 HELP: string
 { $description "The class of fixed-length character strings. See " { $link "syntax-strings" } " for syntax and " { $link "strings" } " for general information." } ;
 
-HELP: string-nth ( n string -- ch )
+HELP: string-nth
 { $values { "n" fixnum } { "string" string } { "ch" "the character at the " { $snippet "n" } "th index" } }
 { $description "Unsafe string accessor, used to define " { $link nth } " on strings." }
 { $warning "This word is in the " { $vocab-link "strings.private" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link nth } " instead." } ;
 
-HELP: set-string-nth ( ch n string -- )
+HELP: set-string-nth
 { $values { "ch" "a character" } { "n" fixnum } { "string" string }  }
 { $description "Unsafe string mutator, used to define " { $link set-nth } " on strings." }
 { $warning "This word is in the " { $vocab-link "strings.private" } " vocabulary because it does not perform type or bounds checking. User code should call " { $link set-nth } " instead." } ;
 
-HELP: <string> ( n ch -- string )
+HELP: <string>
 { $values { "n" "a positive integer specifying string length" } { "ch" "an initial character" } { "string" string } }
 { $description "Creates a new string with the given length and all characters initially set to " { $snippet "ch" } "." } ;
 

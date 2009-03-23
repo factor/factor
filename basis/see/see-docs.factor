@@ -25,7 +25,7 @@ HELP: definer
 { $examples
     { $example "USING: definitions prettyprint ;"
                "IN: scratchpad"
-               ": foo ; \\ foo definer . ."
+               ": foo ( -- ) ; \\ foo definer . ."
                ";\nPOSTPONE: :"
     }
     { $example "USING: definitions prettyprint ;"
