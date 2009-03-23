@@ -203,7 +203,7 @@ M: lazy-append nil? ( lazy-append -- bool )
 
 TUPLE: lazy-from-by n quot ;
 
-C: lfrom-by lazy-from-by ( n quot -- list )
+C: lfrom-by lazy-from-by
 
 : lfrom ( n -- list )
     [ 1+ ] lfrom-by ;

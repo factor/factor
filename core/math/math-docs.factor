@@ -307,7 +307,7 @@ HELP: find-last-integer
 { $notes "This word is used to implement " { $link find-last } "." } ;
 
 HELP: byte-array>bignum
-{ $values { "byte-array" byte-array } { "n" integer } }
+{ $values { "x" byte-array } { "y" bignum } }
 { $description "Converts a byte-array, interpreted as little-endian, into a bignum integer. User code should call " { $link le> } " or " { $link be> } " instead." } ;
 
 ARTICLE: "division-by-zero" "Division by zero"

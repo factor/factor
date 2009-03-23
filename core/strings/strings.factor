@@ -17,7 +17,7 @@ IN: strings
 : rehash-string ( str -- )
     1 over sequence-hashcode swap set-string-hashcode ; inline
 
-: set-string-nth ( ch n str -- )
+: set-string-nth ( ch n string -- )
     pick HEX: 7f fixnum<=
     [ set-string-nth-fast ] [ set-string-nth-slow ] if ; inline
 

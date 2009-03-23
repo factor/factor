@@ -12,11 +12,11 @@ GENERIC: get-ref ( ref -- obj )
 GENERIC: set-ref ( obj ref -- )
 
 TUPLE: key-ref < ref ;
-C: <key-ref> key-ref ( assoc key -- ref )
+C: <key-ref> key-ref
 M: key-ref get-ref key>> ;
 M: key-ref set-ref >ref< rename-at ;
 
 TUPLE: value-ref < ref ;
-C: <value-ref> value-ref ( assoc key -- ref )
+C: <value-ref> value-ref
 M: value-ref get-ref >ref< at ;
 M: value-ref set-ref >ref< set-at ;
