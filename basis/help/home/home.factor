@@ -24,7 +24,7 @@ M: object add-recent-where f ;
     first get [ nl ] [ 1array $pretty-link ] interleave ;
 
 : $recent-searches ( element -- )
-    drop recent-searches get [ nl ] [ ($link) ] interleave ;
+    drop recent-searches get [ <$link> ] map $list ;
 
 : redisplay-recent-page ( -- )
     "help.home" >link dup associate
