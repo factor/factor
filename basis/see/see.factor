@@ -10,6 +10,8 @@ prettyprint.sections sequences sets sorting strings summary
 words words.symbol ;
 IN: see
 
+GENERIC: synopsis* ( defspec -- )
+
 GENERIC: see* ( defspec -- )
 
 : see ( defspec -- ) see* nl ;
@@ -93,7 +95,6 @@ M: object declarations. drop ;
 
 M: word declarations.
     {
-        POSTPONE: parsing
         POSTPONE: delimiter
         POSTPONE: inline
         POSTPONE: recursive

@@ -49,7 +49,7 @@ DEFER: <% delimiter
         drop
     ] if ;
 
-: %> lexer get parse-%> ; parsing
+SYNTAX: %> lexer get parse-%> ;
 
 : parse-template-lines ( lines -- quot )
     <template-lexer> [

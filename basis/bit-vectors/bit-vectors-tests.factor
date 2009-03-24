@@ -3,7 +3,7 @@ USING: tools.test bit-vectors vectors sequences kernel math ;
 
 [ 0 ] [ 123 <bit-vector> length ] unit-test
 
-: do-it
+: do-it ( seq -- )
     1234 swap [ [ even? ] dip push ] curry each ;
 
 [ t ] [

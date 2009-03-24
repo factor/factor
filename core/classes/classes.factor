@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions assocs kernel kernel.private
 slots.private namespaces make sequences strings words words.symbol
@@ -126,14 +126,19 @@ M: sequence implementors [ implementors ] gather ;
         } spread
     ] H{ } make-assoc ;
 
+: ?define-symbol ( word -- )
+    dup deferred? [ define-symbol ] [ drop ] if ;
+
 : (define-class) ( word props -- )
     [
-        dup class? [ dup [ implementors-map+ ] [ new-class ] bi ] unless
-        dup reset-class
-        dup deferred? [ dup define-symbol ] when
-        dup redefined
-        dup props>>
-    ] dip assoc-union >>props
+        {
+            [ dup class? [ drop ] [ [ implementors-map+ ] [ new-class ] bi ] if ]
+            [ reset-class ]
+            [ ?define-symbol ]
+            [ redefined ]
+            [ ]
+        } cleave
+    ] dip [ assoc-union ] curry change-props
     dup predicate-word
     [ 1quotation "predicate" set-word-prop ]
     [ swap "predicating" set-word-prop ]

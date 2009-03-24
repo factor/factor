@@ -5,22 +5,22 @@ IN: html.parser.state
 
 TUPLE: state string i ;
 
-: get-i ( -- i ) state get i>> ;
+: get-i ( -- i ) state get i>> ; inline
 
 : get-char ( -- char )
-    state get [ i>> ] [ string>> ] bi ?nth ;
+    state get [ i>> ] [ string>> ] bi ?nth ; inline
 
 : get-next ( -- char )
-    state get [ i>> 1+ ] [ string>> ] bi ?nth ;
+    state get [ i>> 1+ ] [ string>> ] bi ?nth ; inline
 
 : next ( -- )
-    state get [ 1+ ] change-i drop ;
+    state get [ 1+ ] change-i drop ; inline
 
 : string-parse ( string quot -- )
-    [ 0 state boa state ] dip with-variable ;
+    [ 0 state boa state ] dip with-variable ; inline
 
 : short* ( n seq -- n' seq )
-    over [ nip dup length swap ] unless ;
+    over [ nip dup length swap ] unless ; inline
 
 : skip-until ( quot: ( -- ? ) -- )
     get-char [
@@ -30,12 +30,12 @@ TUPLE: state string i ;
 
 : take-until ( quot: ( -- ? ) -- )
     get-i [ skip-until ] dip get-i
-    state get string>> subseq ;
+    state get string>> subseq ; inline
 
 : string-matches? ( string circular -- ? )
-    get-char over push-growing-circular sequence= ;
+    get-char over push-growing-circular sequence= ; inline
 
 : take-string ( match -- string )
     dup length <growing-circular>
     [ 2dup string-matches? ] take-until nip
-    dup length rot length 1- - head next ;
+    dup length rot length 1- - head next ; inline

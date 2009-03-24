@@ -9,14 +9,14 @@ TUPLE: just-parser p1 ;
 
 CONSTANT: just-pattern
   [
-    execute dup [
+    dup [
       dup remaining>> empty? [ drop f ] unless
     ] when
   ]
 
 
 M: just-parser (compile) ( parser -- quot )
-  p1>> compile-parser just-pattern curry ;
+  p1>> compile-parser-quot just-pattern compose ;
 
 : just ( parser -- parser )
   just-parser boa wrap-peg ;

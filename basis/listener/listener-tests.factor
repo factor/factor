@@ -3,7 +3,7 @@ tools.test parser math namespaces continuations vocabs kernel
 compiler.units eval vocabs.parser ;
 IN: listener.tests
 
-: hello "Hi" print ; parsing
+SYNTAX: hello "Hi" print ;
 
 : parse-interactive ( string -- quot )
     <string-reader> stream-read-quot ;
@@ -50,7 +50,7 @@ IN: listener.tests
 
 [
     [ ] [
-        "IN: listener.tests : hello\n\"world\" ;" parse-interactive
+        "IN: listener.tests : hello ( -- )\n\"world\" ;" parse-interactive
         drop
     ] unit-test
 ] with-file-vocabs

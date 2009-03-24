@@ -6,7 +6,7 @@ io.streams.string io.files io.files.temp io.directories
 splitting destructors sequences db db.tuples db.sqlite
 continuations urls math.parser furnace furnace.utilities ;
 
-: with-session
+: with-session ( session quot -- )
     [
         [ [ save-session-after ] [ session set ] bi ] dip call
     ] with-destructors ; inline
@@ -22,7 +22,7 @@ M: foo call-responder*
     "x" [ 1+ ] schange
     "x" sget number>string "text/html" <content> ;
 
-: url-responder-mock-test
+: url-responder-mock-test ( -- )
     [
         <request>
             "GET" >>method
@@ -34,7 +34,7 @@ M: foo call-responder*
         [ write-response-body drop ] with-string-writer
     ] with-destructors ;
 
-: sessions-mock-test
+: sessions-mock-test ( -- )
     [
         <request>
             "GET" >>method
@@ -45,7 +45,7 @@ M: foo call-responder*
         [ write-response-body drop ] with-string-writer
     ] with-destructors ;
 
-: <exiting-action>
+: <exiting-action> ( -- action )
     <action>
         [ [ ] "text/plain" <content> exit-with ] >>display ;
 

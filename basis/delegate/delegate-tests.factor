@@ -41,13 +41,13 @@ M: hello bing hello-test ;
 
 [ "USING: delegate ;\nIN: delegate.tests\nPROTOCOL: baz foo bar { whoa 1 } ; inline\n" ] [ [ baz see ] with-string-writer ] unit-test
 
-GENERIC: one
+GENERIC: one ( a -- b )
 M: integer one ;
-GENERIC: two
+GENERIC: two ( a -- b )
 M: integer two ;
-GENERIC: three
+GENERIC: three ( a -- b )
 M: integer three ;
-GENERIC: four
+GENERIC: four ( a -- b )
 M: integer four ;
 
 PROTOCOL: alpha one two ;

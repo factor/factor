@@ -285,7 +285,7 @@ paste "PASTE"
 [ test-cascade ] test-postgresql
 [ test-restrict ] test-postgresql
 
-: test-repeated-insert
+: test-repeated-insert ( -- )
     [ ] [ person ensure-table ] unit-test
     [ ] [ person1 get insert-tuple ] unit-test
     [ person1 get insert-tuple ] must-fail ;
@@ -458,7 +458,7 @@ TUPLE: bignum-test id m n o ;
         swap >>n
         swap >>m ;
 
-: test-bignum
+: test-bignum ( -- )
     bignum-test "BIGNUM_TEST"
     {
         { "id" "ID" +db-assigned-id+ }
@@ -478,7 +478,7 @@ TUPLE: bignum-test id m n o ;
 TUPLE: secret n message ;
 C: <secret> secret
 
-: test-random-id
+: test-random-id ( -- )
     secret "SECRET"
     {
         { "n" "ID" +random-id+ system-random-generator }
