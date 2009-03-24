@@ -137,7 +137,7 @@ SYMBOL: tagstack
     ] when ;
 
 : tag-parse ( quot -- vector )
-    V{ } clone tagstack [ string-parse ] with-variable ;
+    V{ } clone tagstack [ string-parse ] with-variable ; inline
 
 : parse-html ( string -- vector )
     [ (parse-html) tagstack get ] tag-parse ;

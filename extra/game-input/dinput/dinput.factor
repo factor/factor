@@ -2,10 +2,10 @@ USING: windows.dinput windows.dinput.constants parser
 alien.c-types windows.ole32 namespaces assocs kernel arrays
 vectors windows.kernel32 windows.com windows.dinput shuffle
 windows.user32 windows.messages sequences combinators locals
-math.rectangles ui.windows accessors math windows alien
+math.rectangles accessors math windows alien
 alien.strings io.encodings.utf16 io.encodings.utf16n
 continuations byte-arrays game-input.dinput.keys-array
-game-input ;
+game-input ui.backend.windows ;
 IN: game-input.dinput
 
 SINGLETON: dinput-game-input-backend

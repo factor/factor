@@ -57,7 +57,7 @@ DEFER: check-status
         [ dup quit? [ quit-game ] [ repeat ] if ]
     if ;
 : build-quad ( -- array ) 4 [ 10 random ] replicate >array ;
-: 24-able? ( vector -- t/f ) [ makes-24? ] with-datastack first ;
+: 24-able? ( quad -- t/f ) [ makes-24? ] with-datastack first ;
 : 24-able ( -- vector ) build-quad dup 24-able? [ drop build-quad ] unless ;
 : set-commands ( -- ) { + - * / rot swap q } commands set ;
 : play-game ( -- ) set-commands 24-able repeat ;

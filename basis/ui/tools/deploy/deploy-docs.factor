@@ -1,4 +1,4 @@
-USING: help.markup help.syntax ;
+USING: help.markup help.syntax help.tips ;
 IN: ui.tools.deploy
 
 HELP: deploy-tool
@@ -13,5 +13,7 @@ $nl
 { $subsection deploy-tool }
 "Alternatively, right-click on a vocabulary presentation in the UI and choose " { $strong "Deploy tool" } " from the resulting popup menu."
 { $see-also "tools.deploy" } ;
+
+TIP: "Generate stand-alone applications from vocabularies with the " { $link "ui.tools.deploy" } "." ;
 
 ABOUT: "ui.tools.deploy"

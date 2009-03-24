@@ -127,6 +127,7 @@ ARTICLE: "help" "Help system"
 { $subsection "browsing-help" }
 { $subsection "writing-help" }
 { $subsection "help.lint" }
+{ $subsection "tips-of-the-day" }
 { $subsection "help-impl" } ;
 
 IN: help

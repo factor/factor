@@ -29,7 +29,7 @@ HELP: reset-progress ( -- )
     "a loop which makes use of " { $link progress } "."
 } ;
 
-HELP: progress ( -- time )
+HELP: progress
 { $values { "time" "an integer" } }
 { $description
     "Gives the time elapsed since the last time"

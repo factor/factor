@@ -62,7 +62,9 @@ ARTICLE: "first-program-test" "Testing your first program"
     ""
     ": palindrome? ( str -- ? ) dup reverse = ;"
 }
-"We will now test our new word in the listener. First, push a string on the stack:"
+"We will now test our new word in the listener. First we have add the palindrome vocabulary to the listener's vocabulary search path:"
+{ $code "USE: palindrome"}
+"Next, push a string on the stack:"
 { $code "\"hello\"" }
 "Note that the stack display in the listener now shows this string. Having supplied the input, we call our word:"
 { $code "palindrome?" }
@@ -132,6 +134,8 @@ $nl
 $nl
 "We modify " { $snippet "palindrome?" } " to first apply " { $snippet "normalize" } " to its input:"
 { $code ": palindrome? ( str -- ? ) normalize dup reverse = ;" }
+"Factor compiles the file from the top down. So, be sure to place the definition for " { $snippet "normalize" } " above the definition for " { $snippet "palindrome?" } "."
+$nl
 "Now if you press " { $command tool "common" refresh-all } ", the source file should reload without any errors. You can run unit tests again, and this time, they will all pass:"
 { $code "\"palindrome\" test" } ;
 
