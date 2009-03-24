@@ -122,10 +122,12 @@ CONSTANT: site-list-url URL" $site-watcher-app/"
 site-watcher-db <alloy>
 main-responder set-global
 
-: start-site-watcher ( -- )
-    <site-watcher-server> start-server ;
-
 : init-db ( -- )
     site-watcher-db [
         { site account watching-site } [ ensure-table ] each
     ] with-db ;
+
+: start-site-watcher ( -- )
+    init-db
+    site-watcher-db run-site-watcher
+    <site-watcher-server> start-server ;
