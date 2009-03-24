@@ -50,6 +50,9 @@ $nl
 "Printing a definition:"
 { $subsection see }
 "Printing the methods defined on a generic word or class (see " { $link "objects" } "):"
-{ $subsection see-methods } ;
+{ $subsection see-methods }
+"Definition specifiers implementing the " { $link "definition-protocol" } " should also implement the " { $emphasis "see protocol" } ":"
+{ $subsection see* }
+{ $subsection synopsis* } ;
 
 ABOUT: "see"
