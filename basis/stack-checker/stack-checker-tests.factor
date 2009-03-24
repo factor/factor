@@ -292,7 +292,7 @@ DEFER: bar
 
 [ [ [ m ] m ] infer ] [ inference-error? ] must-fail-with
 
-: m' dup curry call ; inline
+: m' ( quot -- ) dup curry call ; inline
 
 [ [ [ m' ] m' ] infer ] [ inference-error? ] must-fail-with
 

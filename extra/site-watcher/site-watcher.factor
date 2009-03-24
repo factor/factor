@@ -1,16 +1,17 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alarms arrays calendar combinators
-combinators.smart continuations debugger http.client
-init io.streams.string kernel locals math math.parser
-namespaces sequences site-watcher.db site-watcher.db.private smtp ;
+combinators.smart continuations debugger http.client fry
+init io.streams.string kernel locals math math.parser db
+namespaces sequences site-watcher.db site-watcher.db.private
+smtp ;
 IN: site-watcher
 
 SYMBOL: site-watcher-from
 "factor-site-watcher@gmail.com" site-watcher-from set-global
 
 SYMBOL: site-watcher-frequency
-10 seconds site-watcher-frequency set-global
+5 minutes site-watcher-frequency set-global
  
 SYMBOL: running-site-watcher
 [ f running-site-watcher set-global ] "site-watcher" add-init-hook
@@ -44,13 +45,13 @@ SYMBOL: running-site-watcher
 
 PRIVATE>
 
-: watch-sites ( -- )
-    find-sites check-sites sites-to-report send-reports ;
+: watch-sites ( db -- )
+    [ find-sites check-sites sites-to-report send-reports ] with-db ;
 
-: run-site-watcher ( -- )
-    running-site-watcher get [ 
-        [ watch-sites ] site-watcher-frequency get every
-        running-site-watcher set-global 
+: run-site-watcher ( db -- )
+    [ running-site-watcher get ] dip '[ 
+        [ _ watch-sites ] site-watcher-frequency get every
+        running-site-watcher set
     ] unless ;
 
 : stop-site-watcher ( -- )

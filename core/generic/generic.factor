@@ -185,13 +185,21 @@ M: sequence update-methods ( class seq -- )
         [ changed-generic ] [ remake-generic drop ] 2bi
     ] with each ;
 
-: define-generic ( word combination -- )
-    over "combination" word-prop over = [ drop ] [
-        2dup "combination" set-word-prop
-        over "methods" word-prop values forget-all
-        over H{ } clone "methods" set-word-prop
-        dupd define-default-method
-    ] if remake-generic ;
+: define-generic ( word combination effect -- )
+    [ nip swap set-stack-effect ]
+    [
+        drop
+        2dup [ "combination" word-prop ] dip = [ 2drop ] [
+            {
+                [ "combination" set-word-prop ]
+                [ drop "methods" word-prop values forget-all ]
+                [ drop H{ } clone "methods" set-word-prop ]
+                [ define-default-method ]
+            }
+            2cleave
+        ] if
+    ]
+    [ 2drop remake-generic ] 3tri ;
 
 M: generic subwords
     [

@@ -11,8 +11,8 @@ big-endian on
 
 4 jit-code-format set
 
-: ds-reg 29 ;
-: rs-reg 30 ;
+CONSTANT: ds-reg 29
+CONSTANT: rs-reg 30
 
 : factor-area-size ( -- n ) 4 bootstrap-cells ;
 

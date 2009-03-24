@@ -1,10 +1,11 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: debugger help help.topics help.crossref kernel models compiler.units
-assocs words vocabs accessors fry combinators.short-circuit
-sequences models models.history tools.apropos combinators
-ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.tracks ui.gestures ui.gadgets.buttons ui.gadgets.packs
+USING: debugger help help.topics help.crossref help.home kernel
+models compiler.units assocs words vocabs accessors fry
+combinators.short-circuit namespaces sequences models
+models.history help.apropos combinators ui.commands ui.gadgets
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks
+ui.gestures ui.gadgets.buttons ui.gadgets.packs
 ui.gadgets.editors ui.gadgets.labels ui.gadgets.status-bar
 ui.gadgets.glass ui.gadgets.borders ui.tools.common
 ui.tools.browser.popups ui ;
@@ -15,8 +16,8 @@ TUPLE: browser-gadget < tool pane scroller search-field popup ;
 { 650 400 } browser-gadget set-tool-dim
 
 : show-help ( link browser-gadget -- )
-    model>> dup add-history
-    [ >link ] dip set-model ;
+    [ >link ] [ model>> ] bi*
+    [ [ add-recent ] [ add-history ] bi* ] [ set-model ] 2bi ;
 
 : <help-pane> ( browser-gadget -- gadget )
     model>> [ '[ _ print-topic ] try ] <pane-control> ;
@@ -96,7 +97,7 @@ M: browser-gadget focusable-child* search-field>> ;
 
 : com-forward ( browser -- ) model>> go-forward ;
 
-: com-documentation ( browser -- ) "handbook" swap show-help ;
+: com-documentation ( browser -- ) "help.home" swap show-help ;
 
 : browser-help ( -- ) "ui-browser" com-browse ;
 
@@ -113,7 +114,7 @@ browser-gadget "toolbar" f {
     over [ show-help ] [ 2drop ] if ;
 
 : navigate ( browser quot -- )
-    '[ control-value @ ] keep ?show-help ;
+    '[ control-value @ ] keep ?show-help ; inline
 
 : com-up ( browser -- ) [ article-parent ] navigate ;
 

@@ -1,7 +1,8 @@
 USING: editors help.markup help.syntax summary inspector io io.styles
 listener parser prettyprint tools.profiler tools.walker ui.commands
 ui.gadgets.panes ui.gadgets.presentations ui.operations
-ui.tools.operations ui.tools.profiler ui.tools.common vocabs see ;
+ui.tools.operations ui.tools.profiler ui.tools.common vocabs see
+help.tips ;
 IN: ui.tools
 
 ARTICLE: "starting-ui-tools" "Starting the UI tools"
@@ -66,5 +67,7 @@ $nl
 { $subsection "ui.tools.deploy" }
 "Platform-specific features:"
 { $subsection "ui-cocoa" } ;
+
+TIP: "All UI developer tools support a common set of " { $link "ui-shortcuts" } ". Each individual tool has its own shortcuts as well; the F1 key is context-sensitive." ;
 
 ABOUT: "ui-tools"

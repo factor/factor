@@ -3,7 +3,7 @@ USING: arrays generic kernel math models namespaces sequences assocs
 tools.test models.range ;
 
 ! Test <range> 
-: setup-range 0 0 0 255 <range> ;
+: setup-range ( -- range ) 0 0 0 255 <range> ;
 
 ! clamp-value should not go past range ends
 [ 0   ] [ -10 setup-range clamp-value ] unit-test

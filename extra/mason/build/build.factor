@@ -5,6 +5,8 @@ io.files io.launcher mason.child mason.cleanup mason.common
 mason.help mason.release mason.report namespaces prettyprint ;
 IN: mason.build
 
+QUALIFIED: continuations
+
 : create-build-dir ( -- )
     now datestamp stamp set
     build-dir make-directory ;
@@ -21,10 +23,11 @@ IN: mason.build
     create-build-dir
     enter-build-dir
     clone-builds-factor
-    record-id
-    build-child
-    upload-help
-    release
-    cleanup ;
+    [
+        record-id
+        build-child
+        upload-help
+        release
+    ] [ cleanup ] [ ] continuations:cleanup ;
 
 MAIN: build

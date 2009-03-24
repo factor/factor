@@ -83,10 +83,6 @@ HELP: nil?
 
 { nil nil? } related-words
 
-HELP: list? ( object -- ? )
-{ $values { "object" "an object" } { "?" "a boolean" } }
-{ $description "Returns true if the object conforms to the list protocol." } ;
-
 { 1list 2list 3list } related-words
 
 HELP: 1list
