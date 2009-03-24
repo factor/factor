@@ -142,7 +142,7 @@ check_X11_libraries() {
     check_library_exists GLU
     check_library_exists GL
     check_library_exists X11
-    check_library_exists pango
+    check_library_exists pango-1.0
 }
 
 check_libraries() {
