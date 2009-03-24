@@ -21,7 +21,7 @@ T{ dispose-dummy } "b" set
 
 TUPLE: dummy-obj destroyed? ;
 
-: <dummy-obj> dummy-obj new ;
+: <dummy-obj> ( -- obj ) dummy-obj new ;
 
 TUPLE: dummy-destructor obj ;
 
@@ -30,10 +30,10 @@ C: <dummy-destructor> dummy-destructor
 M: dummy-destructor dispose ( obj -- )
     obj>> t >>destroyed? drop ;
 
-: destroy-always
+: destroy-always ( obj -- )
     <dummy-destructor> &dispose drop ;
 
-: destroy-later
+: destroy-later ( obj -- )
     <dummy-destructor> |dispose drop ;
 
 [ t ] [

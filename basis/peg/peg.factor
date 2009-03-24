@@ -116,7 +116,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
   #! Evaluate a rule, return an ast resulting from it.
   #! Return fail if the rule failed. The rule has
   #! stack effect ( -- parse-result )
-  pos get swap execute process-rule-result ; inline
+  pos get swap execute( -- parse-result ) process-rule-result ; inline
 
 : memo ( pos id -- memo-entry )
   #! Return the result from the memo cache. 
@@ -244,14 +244,15 @@ TUPLE: peg-head rule-id involved-set eval-set ;
 
 : with-packrat ( input quot -- result )
   #! Run the quotation with a packrat cache active.
-  swap [ 
-    input set
+  [ 
+    swap input set
     0 pos set
     f lrstack set
     V{ } clone error-stack set
     H{ } clone \ heads set
     H{ } clone \ packrat set
-  ] H{ } make-assoc swap bind ; inline
+    call
+  ] with-scope ; inline
 
 
 GENERIC: (compile) ( peg -- quot )
@@ -264,20 +265,16 @@ GENERIC: (compile) ( peg -- quot )
   ] if ;
     
 : execute-parser ( word -- result )
-  pos get apply-rule process-parser-result ; inline
-
-: parser-body ( parser -- quot )
-  #! Return the body of the word that is the compiled version
-  #! of the parser.
-  gensym 2dup swap peg>> (compile) (( -- result )) define-declared
-  swap dupd id>> "peg-id" set-word-prop
-  [ execute-parser ] curry ;
+  pos get apply-rule process-parser-result ;
 
 : preset-parser-word ( parser -- parser word )
   gensym [ >>compiled ] keep ;
 
 : define-parser-word ( parser word -- )
-  swap parser-body (( -- result )) define-declared ;
+  #! Return the body of the word that is the compiled version
+  #! of the parser.
+  2dup swap peg>> (compile) (( -- result )) define-declared
+  swap id>> "peg-id" set-word-prop ;
 
 : compile-parser ( parser -- word )
   #! Look to see if the given parser has been compiled.
@@ -292,19 +289,22 @@ GENERIC: (compile) ( peg -- quot )
     preset-parser-word [ define-parser-word ] keep
   ] if* ;
 
+: compile-parser-quot ( parser -- quot )
+  compile-parser [ execute-parser ] curry ;
+
 SYMBOL: delayed
 
 : fixup-delayed ( -- )
   #! Work through all delayed parsers and recompile their
   #! words to have the correct bodies.
   delayed get [
-    call( -- parser ) compile-parser 1quotation (( -- result )) define-declared
+    call( -- parser ) compile-parser-quot (( -- result )) define-declared
   ] assoc-each ;
 
 : compile ( parser -- word )
   [
     H{ } clone delayed [ 
-      compile-parser fixup-delayed 
+      compile-parser-quot (( -- result )) define-temp fixup-delayed 
     ] with-variable
   ] with-compilation-unit ;
 
@@ -411,8 +411,8 @@ M: seq-parser (compile) ( peg -- quot )
   [
     [ input-slice V{ } clone <parse-result> ] %
     [
-      parsers>> unclip compile-parser 1quotation [ parse-seq-element ] curry ,
-      [ compile-parser 1quotation [ merge-errors ] compose [ parse-seq-element ] curry , ] each 
+      parsers>> unclip compile-parser-quot [ parse-seq-element ] curry ,
+      [ compile-parser-quot [ merge-errors ] compose [ parse-seq-element ] curry , ] each 
     ] { } make , \ 1&& , 
   ] [ ] make ;
 
@@ -421,8 +421,8 @@ TUPLE: choice-parser parsers ;
 M: choice-parser (compile) ( peg -- quot )
   [ 
     [
-      parsers>> [ compile-parser ] map 
-      unclip 1quotation , [ 1quotation [ merge-errors ] compose , ] each
+      parsers>> [ compile-parser-quot ] map 
+      unclip , [ [ merge-errors ] compose , ] each
     ] { } make , \ 0|| ,
   ] [ ] make ;
 
@@ -438,7 +438,7 @@ TUPLE: repeat0-parser p1 ;
   ] if* ; inline recursive
 
 M: repeat0-parser (compile) ( peg -- quot )
-  p1>> compile-parser 1quotation '[ 
+  p1>> compile-parser-quot '[ 
     input-slice V{ } clone <parse-result> _ swap (repeat) 
   ] ; 
 
@@ -452,7 +452,7 @@ TUPLE: repeat1-parser p1 ;
   ] if* ;
 
 M: repeat1-parser (compile) ( peg -- quot )
-  p1>> compile-parser 1quotation '[ 
+  p1>> compile-parser-quot '[ 
     input-slice V{ } clone <parse-result> _ swap (repeat) repeat1-empty-check  
   ] ; 
 
@@ -462,7 +462,7 @@ TUPLE: optional-parser p1 ;
   [ input-slice f <parse-result> ] unless* ;
 
 M: optional-parser (compile) ( peg -- quot )
-  p1>> compile-parser 1quotation '[ @ check-optional ] ;
+  p1>> compile-parser-quot '[ @ check-optional ] ;
 
 TUPLE: semantic-parser p1 quot ;
 
@@ -474,7 +474,7 @@ TUPLE: semantic-parser p1 quot ;
   ] if ; inline
 
 M: semantic-parser (compile) ( peg -- quot )
-  [ p1>> compile-parser 1quotation ] [ quot>> ] bi  
+  [ p1>> compile-parser-quot ] [ quot>> ] bi  
   '[ @ _ check-semantic ] ;
 
 TUPLE: ensure-parser p1 ;
@@ -483,7 +483,7 @@ TUPLE: ensure-parser p1 ;
   [ ignore <parse-result> ] [ drop f ] if ;
 
 M: ensure-parser (compile) ( peg -- quot )
-  p1>> compile-parser 1quotation '[ input-slice @ check-ensure ] ;
+  p1>> compile-parser-quot '[ input-slice @ check-ensure ] ;
 
 TUPLE: ensure-not-parser p1 ;
 
@@ -491,7 +491,7 @@ TUPLE: ensure-not-parser p1 ;
   [ drop f ] [ ignore <parse-result> ] if ;
 
 M: ensure-not-parser (compile) ( peg -- quot )
-  p1>> compile-parser 1quotation '[ input-slice @ check-ensure-not ] ;
+  p1>> compile-parser-quot '[ input-slice @ check-ensure-not ] ;
 
 TUPLE: action-parser p1 quot ;
 
@@ -503,12 +503,12 @@ TUPLE: action-parser p1 quot ;
   ] if ; inline
 
 M: action-parser (compile) ( peg -- quot )
-  [ p1>> compile-parser 1quotation ] [ quot>> ] bi '[ @ _ check-action ] ;
+  [ p1>> compile-parser-quot ] [ quot>> ] bi '[ @ _ check-action ] ;
 
 TUPLE: sp-parser p1 ;
 
 M: sp-parser (compile) ( peg -- quot )
-  p1>> compile-parser 1quotation '[ 
+  p1>> compile-parser-quot '[ 
     input-slice [ blank? ] trim-head-slice input-from pos set @ 
   ] ;
 
@@ -527,7 +527,7 @@ M: box-parser (compile) ( peg -- quot )
   #! to produce the parser to be compiled.
   #! This differs from 'delay' which calls
   #! it at run time.
-  quot>> call( -- parser ) compile-parser 1quotation ;
+  quot>> call( -- parser ) compile-parser-quot ;
 
 PRIVATE>
 
@@ -616,9 +616,9 @@ PRIVATE>
 
 ERROR: parse-failed input word ;
 
-: PEG:
+SYNTAX: PEG:
   (:)
-  [let | def [ ] word [ ] |
+  [let | effect [ ] def [ ] word [ ] |
     [
       [
         [let | compiled-def [ def call compile ] |
@@ -626,11 +626,11 @@ ERROR: parse-failed input word ;
             dup compiled-def compiled-parse
             [ ast>> ] [ word parse-failed ] ?if
           ]
-          word swap define
+          word swap effect define-declared
         ]
       ] with-compilation-unit
     ] over push-all
-  ] ; parsing
+  ] ;
 
 USING: vocabs vocabs.loader ;
 

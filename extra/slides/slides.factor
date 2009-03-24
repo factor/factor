@@ -94,8 +94,8 @@ TUPLE: slides < book ;
         2 + (strip-tease)
     ] with map ;
 
-: STRIP-TEASE:
-    parse-definition strip-tease [ parsed ] each ; parsing
+SYNTAX: STRIP-TEASE:
+    parse-definition strip-tease [ parsed ] each ;
 
 \ slides H{
     { T{ button-down } [ request-focus ] }

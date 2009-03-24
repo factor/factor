@@ -5,7 +5,7 @@ help.stylesheet splitting tools.test.ui models math summary
 inspector accessors help.topics see ;
 IN: ui.gadgets.panes.tests
 
-: #children "pane" get children>> length ;
+: #children ( -- n ) "pane" get children>> length ;
 
 [ ] [ <pane> "pane" set ] unit-test
 

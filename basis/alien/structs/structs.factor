@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs generic hashtables kernel kernel.private
 math namespaces parser sequences strings words libc fry
@@ -56,10 +56,10 @@ M: struct-type stack-size
 : (define-struct) ( name size align fields -- )
     [ [ align ] keep ] dip
     struct-type new
-    swap >>fields
-    swap >>align
-    swap >>size
-    swap typedef ;
+        swap >>fields
+        swap >>align
+        swap >>size
+        swap typedef ;
 
 : make-fields ( name vocab fields -- fields )
     [ first2 <field-spec> ] with with map ;
@@ -68,12 +68,11 @@ M: struct-type stack-size
     [ c-type-align ] [ max ] map-reduce ;
 
 : define-struct ( name vocab fields -- )
-    [
-        [ 2drop ] [ make-fields ] 3bi
-        [ struct-offsets ] keep
-        [ [ type>> ] map compute-struct-align ] keep
-        [ (define-struct) ] keep
-    ] [ 2drop '[ _ swap define-field ] ] 3bi each ;
+    [ 2drop ] [ make-fields ] 3bi
+    [ struct-offsets ] keep
+    [ [ type>> ] map compute-struct-align ] keep
+    [ (define-struct) ] keep
+    [ define-field ] each ;
 
 : define-union ( name members -- )
     [ expand-constants ] map
@@ -83,4 +82,3 @@ M: struct-type stack-size
 : offset-of ( field struct -- offset )
     c-types get at fields>> 
     [ name>> = ] with find nip offset>> ;
-

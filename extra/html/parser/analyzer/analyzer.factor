@@ -46,7 +46,7 @@ TUPLE: link attributes clickable ;
 : find-between-all ( vector quot -- seq )
     dupd
     '[ _ [ closing?>> not ] bi and ] find-all
-    [ first2 find-between* ] with map ;
+    [ first2 find-between* ] with map ; inline
 
 : remove-blank-text ( vector -- vector' )
     [
@@ -113,7 +113,7 @@ TUPLE: link attributes clickable ;
     [ clickable>> [ bl bl text>> print ] each nl ] bi ;
 
 : find-by-text ( seq quot -- tag )
-    [ dup name>> text = ] prepose find drop ;
+    [ dup name>> text = ] prepose find drop ; inline
 
 : find-opening-tags-by-name ( name seq -- seq )
     [ [ name>> = ] [ closing?>> not ] bi and ] with find-all ;

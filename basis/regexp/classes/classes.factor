@@ -108,21 +108,24 @@ M: terminator-class class-member? ( obj class -- ? )
 
 M: f class-member? 2drop f ;
 
+: same? ( obj1 obj2 quot1: ( obj1 -- val1 ) quot2: ( obj2 -- val2 ) -- ? )
+    bi* = ; inline
+
 M: script-class class-member?
-    [ script-of ] [ script>> ] bi* = ;
+    [ script-of ] [ script>> ] same? ;
 
 M: category-class class-member?
-    [ category# ] [ category>> ] bi* = ;
+    [ category ] [ category>> ] same? ;
 
 M: category-range-class class-member?
-    [ category first ] [ category>> ] bi* = ;
+    [ category first ] [ category>> ] same? ;
 
 TUPLE: not-class class ;
 
 PREDICATE: not-integer < not-class class>> integer? ;
 
 UNION: simple-class
-    primitive-class range-class category-class category-range-class dot ;
+    primitive-class range-class dot ;
 PREDICATE: not-simple < not-class class>> simple-class? ;
 
 M: not-class class-member?
@@ -227,7 +230,10 @@ TUPLE: class-partition integers not-integers simples not-simples and or other ;
     dup or-class flatten partition-classes
     dup not-integers>> length {
         { 0 [ nip make-or-class ] }
-        { 1 [ not-integers>> first [ class>> '[ _ swap class-member? ] any? ] keep or ] }
+        { 1 [
+            not-integers>> first
+            [ class>> '[ _ swap class-member? ] any? ] keep or
+        ] }
         [ 3drop t ]
     } case ;
 
@@ -247,6 +253,12 @@ M: or-class <not-class>
 
 M: t <not-class> drop f ;
 M: f <not-class> drop t ;
+
+: <minus-class> ( a b -- a-b )
+    <not-class> 2array <and-class> ;
+
+: <sym-diff-class> ( a b -- a~b )
+    2array [ <or-class> ] [ <and-class> ] bi <minus-class> ;
 
 M: primitive-class class-member?
     class>> class-member? ;

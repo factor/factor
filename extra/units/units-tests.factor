@@ -15,7 +15,7 @@ IN: units.tests
 [ t ] [ 1 m 2 m 3 m 3array d-product 6 m^3 = ] unit-test
 [ t ] [ 3 m d-recip 1/3 { } { m } <dimensioned> = ] unit-test
 
-: km/L km 1 L d/ ;
-: mpg miles 1 gallons d/ ;
+: km/L ( n -- d ) km 1 L d/ ;
+: mpg ( n -- d ) miles 1 gallons d/ ;
 
 [ t ] [ 100 10 / km/L [ mpg ] undo 23 1 ~ ] unit-test

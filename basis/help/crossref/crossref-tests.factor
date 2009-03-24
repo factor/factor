@@ -4,7 +4,7 @@ definitions assocs sequences kernel namespaces parser arrays
 io.streams.string continuations debugger compiler.units eval ;
 
 [ ] [
-    "IN: help.crossref.tests USING: help.syntax help.markup ; : foo ; HELP: foo \"foo is great\" ; ARTICLE: \"foo\" \"Foo\" { $subsection foo } ;" eval
+    "IN: help.crossref.tests USING: help.syntax help.markup ; : foo ( -- ) ; HELP: foo \"foo is great\" ; ARTICLE: \"foo\" \"Foo\" { $subsection foo } ;" eval
 ] unit-test
 
 [ $subsection ] [
@@ -23,7 +23,7 @@ io.streams.string continuations debugger compiler.units eval ;
 ] unit-test
 
 [ ] [
-    "IN: help.crossref.tests USING: help.syntax help.markup ; : bar ; HELP: bar \"bar is great\" ; ARTICLE: \"bar\" \"Bar\" { $subsection bar } ;" eval
+    "IN: help.crossref.tests USING: help.syntax help.markup ; : bar ( -- ) ; HELP: bar \"bar is great\" ; ARTICLE: \"bar\" \"Bar\" { $subsection bar } ;" eval
 ] unit-test
 
 [ ] [

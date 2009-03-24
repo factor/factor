@@ -40,10 +40,9 @@ M: bad-tr summary
 
 PRIVATE>
 
-: TR:
+SYNTAX: TR:
     scan parse-definition
     unclip-last [ unclip-last ] dip compute-tr
     [ check-tr ]
     [ [ create-tr ] dip define-tr ]
     [ [ "-fast" append create-tr ] dip define-fast-tr ] 2tri ;
-    parsing

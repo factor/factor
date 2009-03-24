@@ -480,3 +480,57 @@ IN: regexp-tests
 [ f ] [ "a\r" R/ a$./mds matches? ] unit-test
 [ t ] [ "a\n" R/ a$./ms matches? ] unit-test
 [ t ] [ "a\n" R/ a$./mds matches? ] unit-test
+
+! Unicode categories
+[ t ] [ "a" R/ \p{L}/ matches? ] unit-test
+[ t ] [ "A" R/ \p{L}/ matches? ] unit-test
+[ f ] [ " " R/ \p{L}/ matches? ] unit-test
+[ f ] [ "a" R/ \P{L}/ matches? ] unit-test
+[ f ] [ "A" R/ \P{L}/ matches? ] unit-test
+[ t ] [ " " R/ \P{L}/ matches? ] unit-test
+
+[ t ] [ "a" R/ \p{Ll}/ matches? ] unit-test
+[ f ] [ "A" R/ \p{Ll}/ matches? ] unit-test
+[ f ] [ " " R/ \p{Ll}/ matches? ] unit-test
+[ f ] [ "a" R/ \P{Ll}/ matches? ] unit-test
+[ t ] [ "A" R/ \P{Ll}/ matches? ] unit-test
+[ t ] [ " " R/ \P{Ll}/ matches? ] unit-test
+
+[ t ] [ "a" R/ \p{script=Latin}/ matches? ] unit-test
+[ f ] [ " " R/ \p{script=Latin}/ matches? ] unit-test
+[ f ] [ "a" R/ \P{script=Latin}/ matches? ] unit-test
+[ t ] [ " " R/ \P{script=Latin}/ matches? ] unit-test
+
+! These should be case-insensitive
+[ f ] [ " " R/ \p{l}/ matches? ] unit-test
+[ f ] [ "a" R/ \P{l}/ matches? ] unit-test
+[ f ] [ "a" R/ \P{ll}/ matches? ] unit-test
+[ t ] [ " " R/ \P{LL}/ matches? ] unit-test
+[ f ] [ "a" R/ \P{sCriPt = latin}/ matches? ] unit-test
+[ t ] [ " " R/ \P{SCRIPT = laTIn}/ matches? ] unit-test
+
+! Logical operators
+[ t ] [ "a" R/ [\p{script=latin}\p{lower}]/ matches? ] unit-test
+[ t ] [ "π" R/ [\p{script=latin}\p{lower}]/ matches? ] unit-test
+[ t ] [ "A" R/ [\p{script=latin}\p{lower}]/ matches? ] unit-test
+[ f ] [ "3" R/ [\p{script=latin}\p{lower}]/ matches? ] unit-test
+
+[ t ] [ "a" R/ [\p{script=latin}||\p{lower}]/ matches? ] unit-test
+[ t ] [ "π" R/ [\p{script=latin}||\p{lower}]/ matches? ] unit-test
+[ t ] [ "A" R/ [\p{script=latin}||\p{lower}]/ matches? ] unit-test
+[ f ] [ "3" R/ [\p{script=latin}||\p{lower}]/ matches? ] unit-test
+
+[ t ] [ "a" R/ [\p{script=latin}&&\p{lower}]/ matches? ] unit-test
+[ f ] [ "π" R/ [\p{script=latin}&&\p{lower}]/ matches? ] unit-test
+[ f ] [ "A" R/ [\p{script=latin}&&\p{lower}]/ matches? ] unit-test
+[ f ] [ "3" R/ [\p{script=latin}&&\p{lower}]/ matches? ] unit-test
+
+[ f ] [ "a" R/ [\p{script=latin}~~\p{lower}]/ matches? ] unit-test
+[ t ] [ "π" R/ [\p{script=latin}~~\p{lower}]/ matches? ] unit-test
+[ t ] [ "A" R/ [\p{script=latin}~~\p{lower}]/ matches? ] unit-test
+[ f ] [ "3" R/ [\p{script=latin}~~\p{lower}]/ matches? ] unit-test
+
+[ f ] [ "a" R/ [\p{script=latin}--\p{lower}]/ matches? ] unit-test
+[ f ] [ "π" R/ [\p{script=latin}--\p{lower}]/ matches? ] unit-test
+[ t ] [ "A" R/ [\p{script=latin}--\p{lower}]/ matches? ] unit-test
+[ f ] [ "3" R/ [\p{script=latin}--\p{lower}]/ matches? ] unit-test
