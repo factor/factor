@@ -89,4 +89,4 @@ PRIVATE>
         -> locationInWindow f -> convertPoint:fromView:
         [ CGPoint-x ] [ CGPoint-y ] bi
     ] [ drop -> frame CGRect-h ] 2bi
-    swap - 2array ;
+    swap - [ >integer ] bi@ 2array ;
