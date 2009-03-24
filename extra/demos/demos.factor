@@ -1,6 +1,6 @@
 
 USING: kernel fry sequences
-       vocabs.loader tools.vocabs.browser
+       vocabs.loader help.vocabs
        ui ui.gadgets ui.gadgets.buttons ui.gadgets.packs ui.gadgets.scrollers
        ui.tools.listener
        accessors ;
