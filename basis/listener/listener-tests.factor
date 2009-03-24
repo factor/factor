@@ -50,7 +50,7 @@ SYNTAX: hello "Hi" print ;
 
 [
     [ ] [
-        "IN: listener.tests : hello\n\"world\" ;" parse-interactive
+        "IN: listener.tests : hello ( -- )\n\"world\" ;" parse-interactive
         drop
     ] unit-test
 ] with-file-vocabs

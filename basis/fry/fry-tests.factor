@@ -34,7 +34,7 @@ sequences eval accessors ;
     { "a" "b" "c" } swap map
 ] unit-test
 
-: funny-dip '[ [ @ ] dip ] call ; inline
+: funny-dip ( obj quot -- ) '[ [ @ ] dip ] call ; inline
 
 [ "hi" 3 ] [ "h" "i" 3 [ append ] funny-dip ] unit-test
 

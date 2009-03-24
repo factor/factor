@@ -3,7 +3,7 @@ USING: kernel accessors assocs
 sequences sequences.n-based tools.test ;
 IN: sequences.n-based.tests
 
-: months
+: months ( -- assoc )
     V{
         "January"
         "February"

@@ -36,7 +36,7 @@ H{ } clone sub-primitives set
 "syntax" vocab vocab-words bootstrap-syntax set {
     dictionary
     new-classes
-    changed-definitions changed-generics
+    changed-definitions changed-generics changed-effects
     outdated-generics forgotten-definitions
     root-cache source-files update-map implementors-map
 } [ H{ } clone swap set ] each
@@ -48,9 +48,9 @@ init-caches
 
 dummy-compiler compiler-impl set
 
-call
-call
-call
+call( -- )
+call( -- )
+call( -- )
 
 ! After we execute bootstrap/layouts
 num-types get f <array> builtins set
@@ -335,205 +335,204 @@ tuple
 (( quot1 quot2 -- compose )) define-declared
 
 ! Sub-primitive words
-: make-sub-primitive ( word vocab -- )
-    create
-    dup reset-word
-    dup 1quotation define ;
+: make-sub-primitive ( word vocab effect -- )
+    [ create dup 1quotation ] dip define-declared ;
 
 {
-    { "(execute)" "words.private" }
-    { "(call)" "kernel.private" }
-    { "both-fixnums?" "math.private" }
-    { "fixnum+fast" "math.private" }
-    { "fixnum-fast" "math.private" }
-    { "fixnum*fast" "math.private" }
-    { "fixnum-bitand" "math.private" }
-    { "fixnum-bitor" "math.private" }
-    { "fixnum-bitxor" "math.private" }
-    { "fixnum-bitnot" "math.private" }
-    { "fixnum-mod" "math.private" }
-    { "fixnum-shift-fast" "math.private" }
-    { "fixnum/i-fast" "math.private" }
-    { "fixnum/mod-fast" "math.private" }
-    { "fixnum<" "math.private" }
-    { "fixnum<=" "math.private" }
-    { "fixnum>" "math.private" }
-    { "fixnum>=" "math.private" }
-    { "drop" "kernel" }
-    { "2drop" "kernel" }
-    { "3drop" "kernel" }
-    { "dup" "kernel" }
-    { "2dup" "kernel" }
-    { "3dup" "kernel" }
-    { "rot" "kernel" }
-    { "-rot" "kernel" }
-    { "dupd" "kernel" }
-    { "swapd" "kernel" }
-    { "nip" "kernel" }
-    { "2nip" "kernel" }
-    { "tuck" "kernel" }
-    { "over" "kernel" }
-    { "pick" "kernel" }
-    { "swap" "kernel" }
-    { "eq?" "kernel" }
-    { "tag" "kernel.private" }
-    { "slot" "slots.private" }
-    { "get-local" "locals.backend" }
-    { "load-local" "locals.backend" }
-    { "drop-locals" "locals.backend" }
-} [ make-sub-primitive ] assoc-each
+    { "(execute)" "words.private" (( word -- )) }
+    { "(call)" "kernel.private" (( quot -- )) }
+    { "both-fixnums?" "math.private" (( x y -- ? )) }
+    { "fixnum+fast" "math.private" (( x y -- z )) }
+    { "fixnum-fast" "math.private" (( x y -- z )) }
+    { "fixnum*fast" "math.private" (( x y -- z )) }
+    { "fixnum-bitand" "math.private" (( x y -- z )) }
+    { "fixnum-bitor" "math.private" (( x y -- z )) }
+    { "fixnum-bitxor" "math.private" (( x y -- z )) }
+    { "fixnum-bitnot" "math.private" (( x -- y )) }
+    { "fixnum-mod" "math.private" (( x y -- z )) }
+    { "fixnum-shift-fast" "math.private" (( x y -- z )) }
+    { "fixnum/i-fast" "math.private" (( x y -- z )) }
+    { "fixnum/mod-fast" "math.private" (( x y -- z w )) }
+    { "fixnum<" "math.private" (( x y -- ? )) }
+    { "fixnum<=" "math.private" (( x y -- z )) }
+    { "fixnum>" "math.private" (( x y -- ? )) }
+    { "fixnum>=" "math.private" (( x y -- ? )) }
+    { "drop" "kernel" (( x -- )) }
+    { "2drop" "kernel" (( x y -- )) }
+    { "3drop" "kernel" (( x y z -- )) }
+    { "dup" "kernel" (( x -- x x )) }
+    { "2dup" "kernel" (( x y -- x y x y )) }
+    { "3dup" "kernel" (( x y z -- x y z x y z )) }
+    { "rot" "kernel" (( x y z -- y z x )) }
+    { "-rot" "kernel" (( x y z -- z x y )) }
+    { "dupd" "kernel" (( x y -- x x y )) }
+    { "swapd" "kernel" (( x y z -- y x z )) }
+    { "nip" "kernel" (( x y -- y )) }
+    { "2nip" "kernel" (( x y z -- z )) }
+    { "tuck" "kernel" (( x y -- y x y )) }
+    { "over" "kernel" (( x y -- x y x )) }
+    { "pick" "kernel" (( x y z -- x y z x )) }
+    { "swap" "kernel" (( x y -- y x )) }
+    { "eq?" "kernel" (( obj1 obj2 -- ? )) }
+    { "tag" "kernel.private" (( object -- n )) }
+    { "slot" "slots.private" (( obj m -- value )) }
+    { "get-local" "locals.backend" (( n -- obj )) }
+    { "load-local" "locals.backend" (( obj -- )) }
+    { "drop-locals" "locals.backend" (( n -- )) }
+} [ first3 make-sub-primitive ] each
 
 ! Primitive words
-: make-primitive ( word vocab n -- )
-    [ create dup reset-word ] dip
-    [ do-primitive ] curry [ ] like define ;
+: make-primitive ( word vocab n effect -- )
+    [
+        [ create dup reset-word ] dip
+        [ do-primitive ] curry
+    ] dip define-declared ;
 
 {
-    { "bignum>fixnum" "math.private" }
-    { "float>fixnum" "math.private" }
-    { "fixnum>bignum" "math.private" }
-    { "float>bignum" "math.private" }
-    { "fixnum>float" "math.private" }
-    { "bignum>float" "math.private" }
-    { "<ratio>" "math.private" }
-    { "string>float" "math.private" }
-    { "float>string" "math.private" }
-    { "float>bits" "math" }
-    { "double>bits" "math" }
-    { "bits>float" "math" }
-    { "bits>double" "math" }
-    { "<complex>" "math.private" }
-    { "fixnum+" "math.private" }
-    { "fixnum-" "math.private" }
-    { "fixnum*" "math.private" }
-    { "fixnum/i" "math.private" }
-    { "fixnum/mod" "math.private" }
-    { "fixnum-shift" "math.private" }
-    { "bignum=" "math.private" }
-    { "bignum+" "math.private" }
-    { "bignum-" "math.private" }
-    { "bignum*" "math.private" }
-    { "bignum/i" "math.private" }
-    { "bignum-mod" "math.private" }
-    { "bignum/mod" "math.private" }
-    { "bignum-bitand" "math.private" }
-    { "bignum-bitor" "math.private" }
-    { "bignum-bitxor" "math.private" }
-    { "bignum-bitnot" "math.private" }
-    { "bignum-shift" "math.private" }
-    { "bignum<" "math.private" }
-    { "bignum<=" "math.private" }
-    { "bignum>" "math.private" }
-    { "bignum>=" "math.private" }
-    { "bignum-bit?" "math.private" }
-    { "bignum-log2" "math.private" }
-    { "byte-array>bignum" "math" }
-    { "float=" "math.private" }
-    { "float+" "math.private" }
-    { "float-" "math.private" }
-    { "float*" "math.private" }
-    { "float/f" "math.private" }
-    { "float-mod" "math.private" }
-    { "float<" "math.private" }
-    { "float<=" "math.private" }
-    { "float>" "math.private" }
-    { "float>=" "math.private" }
-    { "<word>" "words" }
-    { "word-xt" "words" }
-    { "getenv" "kernel.private" }
-    { "setenv" "kernel.private" }
-    { "(exists?)" "io.files.private" }
-    { "gc" "memory" }
-    { "gc-stats" "memory" }
-    { "save-image" "memory" }
-    { "save-image-and-exit" "memory" }
-    { "datastack" "kernel" }
-    { "retainstack" "kernel" }
-    { "callstack" "kernel" }
-    { "set-datastack" "kernel" }
-    { "set-retainstack" "kernel" }
-    { "set-callstack" "kernel" }
-    { "exit" "system" }
-    { "data-room" "memory" }
-    { "code-room" "memory" }
-    { "micros" "system" }
-    { "modify-code-heap" "compiler.units" }
-    { "dlopen" "alien" }
-    { "dlsym" "alien" }
-    { "dlclose" "alien" }
-    { "<byte-array>" "byte-arrays" }
-    { "(byte-array)" "byte-arrays" }
-    { "<displaced-alien>" "alien" }
-    { "alien-signed-cell" "alien.accessors" }
-    { "set-alien-signed-cell" "alien.accessors" }
-    { "alien-unsigned-cell" "alien.accessors" }
-    { "set-alien-unsigned-cell" "alien.accessors" }
-    { "alien-signed-8" "alien.accessors" }
-    { "set-alien-signed-8" "alien.accessors" }
-    { "alien-unsigned-8" "alien.accessors" }
-    { "set-alien-unsigned-8" "alien.accessors" }
-    { "alien-signed-4" "alien.accessors" }
-    { "set-alien-signed-4" "alien.accessors" }
-    { "alien-unsigned-4" "alien.accessors" }
-    { "set-alien-unsigned-4" "alien.accessors" }
-    { "alien-signed-2" "alien.accessors" }
-    { "set-alien-signed-2" "alien.accessors" }
-    { "alien-unsigned-2" "alien.accessors" }
-    { "set-alien-unsigned-2" "alien.accessors" }
-    { "alien-signed-1" "alien.accessors" }
-    { "set-alien-signed-1" "alien.accessors" }
-    { "alien-unsigned-1" "alien.accessors" }
-    { "set-alien-unsigned-1" "alien.accessors" }
-    { "alien-float" "alien.accessors" }
-    { "set-alien-float" "alien.accessors" }
-    { "alien-double" "alien.accessors" }
-    { "set-alien-double" "alien.accessors" }
-    { "alien-cell" "alien.accessors" }
-    { "set-alien-cell" "alien.accessors" }
-    { "alien-address" "alien" }
-    { "set-slot" "slots.private" }
-    { "string-nth" "strings.private" }
-    { "set-string-nth-fast" "strings.private" }
-    { "set-string-nth-slow" "strings.private" }
-    { "resize-array" "arrays" }
-    { "resize-string" "strings" }
-    { "<array>" "arrays" }
-    { "begin-scan" "memory" }
-    { "next-object" "memory" }
-    { "end-scan" "memory" }
-    { "size" "memory" }
-    { "die" "kernel" }
-    { "fopen" "io.streams.c" }
-    { "fgetc" "io.streams.c" }
-    { "fread" "io.streams.c" }
-    { "fputc" "io.streams.c" }
-    { "fwrite" "io.streams.c" }
-    { "fflush" "io.streams.c" }
-    { "fclose" "io.streams.c" }
-    { "<wrapper>" "kernel" }
-    { "(clone)" "kernel" }
-    { "<string>" "strings" }
-    { "array>quotation" "quotations.private" }
-    { "quotation-xt" "quotations" }
-    { "<tuple>" "classes.tuple.private" }
-    { "profiling" "tools.profiler.private" }
-    { "become" "kernel.private" }
-    { "(sleep)" "threads.private" }
-    { "<tuple-boa>" "classes.tuple.private" }
-    { "callstack>array" "kernel" }
-    { "innermost-frame-quot" "kernel.private" }
-    { "innermost-frame-scan" "kernel.private" }
-    { "set-innermost-frame-quot" "kernel.private" }
-    { "call-clear" "kernel" }
-    { "resize-byte-array" "byte-arrays" }
-    { "dll-valid?" "alien" }
-    { "unimplemented" "kernel.private" }
-    { "gc-reset" "memory" }
-    { "jit-compile" "quotations" }
-    { "load-locals" "locals.backend" }
-    { "check-datastack" "kernel.private" }
-}
-[ [ first2 ] dip make-primitive ] each-index
+    { "bignum>fixnum" "math.private" (( x -- y )) }
+    { "float>fixnum" "math.private" (( x -- y )) }
+    { "fixnum>bignum" "math.private" (( x -- y )) }
+    { "float>bignum" "math.private" (( x -- y )) }
+    { "fixnum>float" "math.private" (( x -- y )) }
+    { "bignum>float" "math.private" (( x -- y )) }
+    { "<ratio>" "math.private" (( a b -- a/b )) }
+    { "string>float" "math.private" (( str -- n/f )) }
+    { "float>string" "math.private" (( n -- str )) }
+    { "float>bits" "math" (( x -- n )) }
+    { "double>bits" "math" (( x -- n )) }
+    { "bits>float" "math" (( n -- x )) }
+    { "bits>double" "math" (( n -- x )) }
+    { "<complex>" "math.private" (( x y -- z )) }
+    { "fixnum+" "math.private" (( x y -- z )) }
+    { "fixnum-" "math.private" (( x y -- z )) }
+    { "fixnum*" "math.private" (( x y -- z )) }
+    { "fixnum/i" "math.private" (( x y -- z )) }
+    { "fixnum/mod" "math.private" (( x y -- z w )) }
+    { "fixnum-shift" "math.private" (( x y -- z )) }
+    { "bignum=" "math.private" (( x y -- ? )) }
+    { "bignum+" "math.private" (( x y -- z )) }
+    { "bignum-" "math.private" (( x y -- z )) }
+    { "bignum*" "math.private" (( x y -- z )) }
+    { "bignum/i" "math.private" (( x y -- z )) }
+    { "bignum-mod" "math.private" (( x y -- z )) }
+    { "bignum/mod" "math.private" (( x y -- z w )) }
+    { "bignum-bitand" "math.private" (( x y -- z )) }
+    { "bignum-bitor" "math.private" (( x y -- z )) }
+    { "bignum-bitxor" "math.private" (( x y -- z )) }
+    { "bignum-bitnot" "math.private" (( x -- y )) }
+    { "bignum-shift" "math.private" (( x y -- z )) }
+    { "bignum<" "math.private" (( x y -- ? )) }
+    { "bignum<=" "math.private" (( x y -- ? )) }
+    { "bignum>" "math.private" (( x y -- ? )) }
+    { "bignum>=" "math.private" (( x y -- ? )) }
+    { "bignum-bit?" "math.private" (( n x -- ? )) }
+    { "bignum-log2" "math.private" (( x -- n )) }
+    { "byte-array>bignum" "math" (( x -- y ))  }
+    { "float=" "math.private" (( x y -- ? )) }
+    { "float+" "math.private" (( x y -- z )) }
+    { "float-" "math.private" (( x y -- z )) }
+    { "float*" "math.private" (( x y -- z )) }
+    { "float/f" "math.private" (( x y -- z )) }
+    { "float-mod" "math.private" (( x y -- z )) }
+    { "float<" "math.private" (( x y -- ? )) }
+    { "float<=" "math.private" (( x y -- ? )) }
+    { "float>" "math.private" (( x y -- ? )) }
+    { "float>=" "math.private" (( x y -- ? )) }
+    { "<word>" "words" (( name vocab -- word )) }
+    { "word-xt" "words" (( word -- start end )) }
+    { "getenv" "kernel.private" (( n -- obj )) }
+    { "setenv" "kernel.private" (( obj n -- )) }
+    { "(exists?)" "io.files.private" (( path -- ? )) }
+    { "gc" "memory" (( -- )) }
+    { "gc-stats" "memory" f }
+    { "save-image" "memory" (( path -- )) }
+    { "save-image-and-exit" "memory" (( path -- )) }
+    { "datastack" "kernel" (( -- ds )) }
+    { "retainstack" "kernel" (( -- rs )) }
+    { "callstack" "kernel" (( -- cs )) }
+    { "set-datastack" "kernel" (( ds -- )) }
+    { "set-retainstack" "kernel" (( rs -- )) }
+    { "set-callstack" "kernel" (( cs -- )) }
+    { "exit" "system" (( n -- )) }
+    { "data-room" "memory" (( -- cards generations )) }
+    { "code-room" "memory" (( -- code-free code-total )) }
+    { "micros" "system" (( -- us )) }
+    { "modify-code-heap" "compiler.units" (( alist -- )) }
+    { "dlopen" "alien" (( path -- dll )) }
+    { "dlsym" "alien" (( name dll -- alien )) }
+    { "dlclose" "alien" (( dll -- )) }
+    { "<byte-array>" "byte-arrays" (( n -- byte-array )) }
+    { "(byte-array)" "byte-arrays" (( n -- byte-array )) }
+    { "<displaced-alien>" "alien" (( displacement c-ptr -- alien )) }
+    { "alien-signed-cell" "alien.accessors" f }
+    { "set-alien-signed-cell" "alien.accessors" f }
+    { "alien-unsigned-cell" "alien.accessors" f }
+    { "set-alien-unsigned-cell" "alien.accessors" f }
+    { "alien-signed-8" "alien.accessors" f }
+    { "set-alien-signed-8" "alien.accessors" f }
+    { "alien-unsigned-8" "alien.accessors" f }
+    { "set-alien-unsigned-8" "alien.accessors" f }
+    { "alien-signed-4" "alien.accessors" f }
+    { "set-alien-signed-4" "alien.accessors" f }
+    { "alien-unsigned-4" "alien.accessors" f }
+    { "set-alien-unsigned-4" "alien.accessors" f }
+    { "alien-signed-2" "alien.accessors" f }
+    { "set-alien-signed-2" "alien.accessors" f }
+    { "alien-unsigned-2" "alien.accessors" f }
+    { "set-alien-unsigned-2" "alien.accessors" f }
+    { "alien-signed-1" "alien.accessors" f }
+    { "set-alien-signed-1" "alien.accessors" f }
+    { "alien-unsigned-1" "alien.accessors" f }
+    { "set-alien-unsigned-1" "alien.accessors" f }
+    { "alien-float" "alien.accessors" f }
+    { "set-alien-float" "alien.accessors" f }
+    { "alien-double" "alien.accessors" f }
+    { "set-alien-double" "alien.accessors" f }
+    { "alien-cell" "alien.accessors" f }
+    { "set-alien-cell" "alien.accessors" f }
+    { "alien-address" "alien" (( c-ptr -- addr )) }
+    { "set-slot" "slots.private" (( value obj n -- )) }
+    { "string-nth" "strings.private" (( n string -- ch )) }
+    { "set-string-nth-fast" "strings.private" (( ch n string -- )) }
+    { "set-string-nth-slow" "strings.private" (( ch n string -- )) }
+    { "resize-array" "arrays" (( n array -- newarray )) }
+    { "resize-string" "strings" (( n str -- newstr )) }
+    { "<array>" "arrays" (( n elt -- array )) }
+    { "begin-scan" "memory" (( -- )) }
+    { "next-object" "memory" (( -- obj )) }
+    { "end-scan" "memory" (( -- )) }
+    { "size" "memory" (( obj -- n )) }
+    { "die" "kernel" (( -- )) }
+    { "fopen" "io.streams.c" (( path mode -- alien )) }
+    { "fgetc" "io.streams.c" (( alien -- ch/f )) }
+    { "fread" "io.streams.c" (( n alien -- str/f )) }
+    { "fputc" "io.streams.c" (( ch alien -- )) }
+    { "fwrite" "io.streams.c" (( string alien -- )) }
+    { "fflush" "io.streams.c" (( alien -- )) }
+    { "fclose" "io.streams.c" (( alien -- )) }
+    { "<wrapper>" "kernel" (( obj -- wrapper )) }
+    { "(clone)" "kernel" (( obj -- newobj )) }
+    { "<string>" "strings" (( n ch -- string )) }
+    { "array>quotation" "quotations.private" (( array -- quot )) }
+    { "quotation-xt" "quotations" (( quot -- xt )) }
+    { "<tuple>" "classes.tuple.private" (( layout -- tuple )) }
+    { "profiling" "tools.profiler.private" (( ? -- )) }
+    { "become" "kernel.private" (( old new -- )) }
+    { "(sleep)" "threads.private" (( us -- )) }
+    { "<tuple-boa>" "classes.tuple.private" (( ... layout -- tuple )) }
+    { "callstack>array" "kernel" (( callstack -- array )) }
+    { "innermost-frame-quot" "kernel.private" (( callstack -- quot )) }
+    { "innermost-frame-scan" "kernel.private" (( callstack -- n )) }
+    { "set-innermost-frame-quot" "kernel.private" (( n callstack -- )) }
+    { "call-clear" "kernel" (( quot -- )) }
+    { "resize-byte-array" "byte-arrays" (( n byte-array -- newbyte-array )) }
+    { "dll-valid?" "alien" (( dll -- ? )) }
+    { "unimplemented" "kernel.private" (( -- * )) }
+    { "gc-reset" "memory" (( -- )) }
+    { "jit-compile" "quotations" (( quot -- )) }
+    { "load-locals" "locals.backend" (( ... n -- )) }
+    { "check-datastack" "kernel.private" (( array in# out# -- ? )) }
+} [ [ first3 ] dip swap make-primitive ] each-index
 
 ! Bump build number
 "build" "kernel" create build 1+ [ ] curry (( -- n )) define-declared

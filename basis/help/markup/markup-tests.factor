@@ -11,7 +11,7 @@ TUPLE: blahblah quux ;
 [ ] [ \ >>quux print-topic ] unit-test
 [ ] [ \ blahblah? print-topic ] unit-test
 
-: fooey "fooey" throw ;
+: fooey ( -- * ) "fooey" throw ;
 
 [ ] [ \ fooey print-topic ] unit-test
 

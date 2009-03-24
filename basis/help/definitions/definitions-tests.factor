@@ -7,7 +7,7 @@ IN: help.definitions.tests
 
 [
     [ 4 ] [
-        "IN: help.definitions.tests USING: help.syntax ; : hello ; HELP: hello \"test\" ; ARTICLE: \"hello\" \"world\" ; ARTICLE: \"hello2\" \"world\" ;" <string-reader> "foo"
+        "IN: help.definitions.tests USING: help.syntax ; : hello ( -- ) ; HELP: hello \"test\" ; ARTICLE: \"hello\" \"world\" ; ARTICLE: \"hello2\" \"world\" ;" <string-reader> "foo"
         parse-stream drop
 
         "foo" source-file definitions>> first assoc-size
@@ -20,7 +20,7 @@ IN: help.definitions.tests
     ] unit-test
 
     [ 2 ] [
-        "IN: help.definitions.tests USING: help.syntax ; : hello ; ARTICLE: \"hello\" \"world\" ;" <string-reader> "foo"
+        "IN: help.definitions.tests USING: help.syntax ; : hello ( -- ) ; ARTICLE: \"hello\" \"world\" ;" <string-reader> "foo"
         parse-stream drop
 
         "foo" source-file definitions>> first assoc-size
@@ -32,7 +32,7 @@ IN: help.definitions.tests
         "hello" "help.definitions.tests" lookup "help" word-prop
     ] unit-test
 
-    [ ] [ "IN: help.definitions.tests USING: help.syntax ; : xxx ; HELP: xxx ;" eval ] unit-test
+    [ ] [ "IN: help.definitions.tests USING: help.syntax ; : xxx ( -- ) ; HELP: xxx ;" eval ] unit-test
 
     [ ] [ "xxx" "help.definitions.tests" lookup print-topic ] unit-test
 

@@ -90,7 +90,7 @@ M: object xyz ;
         [ swap [ call 1+ ] dip ] keep (i-repeat)
     ] if ; inline recursive
 
-: i-repeat [ { integer } declare ] dip 0 -rot (i-repeat) ; inline
+: i-repeat ( n quot -- ) [ { integer } declare ] dip 0 -rot (i-repeat) ; inline
 
 [ t ] [
     [ [ dup xyz drop ] i-repeat ] \ xyz inlined?
@@ -197,7 +197,7 @@ M: fixnum annotate-entry-test-1 drop ;
         [ dup annotate-entry-test-1 1+ ] dip (annotate-entry-test-2)
     ] if ; inline recursive
 
-: annotate-entry-test-2 0 -rot (annotate-entry-test-2) ; inline
+: annotate-entry-test-2 ( from to -- ) 0 -rot (annotate-entry-test-2) ; inline
 
 [ f ] [
     [ { bignum } declare annotate-entry-test-2 ]

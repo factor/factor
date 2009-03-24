@@ -280,16 +280,6 @@ M: growable call-next-hooker call-next-method "growable " prepend ;
     V{ } my-var [ call-next-hooker ] with-variable
 ] unit-test
 
-GENERIC: no-stack-effect-decl
-
-M: hashtable no-stack-effect-decl ;
-M: vector no-stack-effect-decl ;
-M: sbuf no-stack-effect-decl ;
-
-[ ] [ \ no-stack-effect-decl see ] unit-test
-
-[ ] [ \ no-stack-effect-decl def>> . ] unit-test
-
 ! Cross-referencing with generic words
 TUPLE: xref-tuple-1 ;
 TUPLE: xref-tuple-2 < xref-tuple-1 ;

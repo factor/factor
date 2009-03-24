@@ -13,9 +13,9 @@ $nl
 "Definitions can answer a sequence of definitions they directly depend on:"
 { $subsection uses }
 "Definitions must implement a few operations used for printing them in source form:"
-{ $subsection synopsis* }
 { $subsection definer }
-{ $subsection definition } ;
+{ $subsection definition }
+{ $see-also "see" } ;
 
 ARTICLE: "definition-crossref" "Definition cross referencing"
 "A common cross-referencing system is used to track definition usages:"

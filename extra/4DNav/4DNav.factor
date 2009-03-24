@@ -172,7 +172,7 @@ VAR: present-space
         swap call space-ensure-solids 
     >present-space 
     update-model-projections 
-    update-observer-projections ;
+    update-observer-projections ; inline
 
 : rotation-4D ( m -- ) 
     '[ _ [ [ middle-of-space dup vneg ] keep 

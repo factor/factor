@@ -165,7 +165,7 @@ HELP: execute ( word -- )
 { $values { "word" word } }
 { $description "Executes a word." }
 { $examples
-    { $example "USING: kernel io words ;" "IN: scratchpad" ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
+    { $example "USING: kernel io words ;" "IN: scratchpad" ": twice ( word -- ) dup execute execute ;\n: hello ( -- ) \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;
 
 HELP: deferred
@@ -273,8 +273,8 @@ HELP: bootstrap-word
 { $values { "word" word } { "target" word } }
 { $description "Looks up a word with the same name and vocabulary as the given word, performing a transformation to handle parsing words in the target dictionary. Used during bootstrap to transfer host words to the target dictionary." } ;
 
-HELP: parsing-word? ( obj -- ? )
-{ $values { "obj" object } { "?" "a boolean" } }
+HELP: parsing-word?
+{ $values { "object" object } { "?" "a boolean" } }
 { $description "Tests if an object is a parsing word declared by " { $link POSTPONE: SYNTAX: } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;
 
