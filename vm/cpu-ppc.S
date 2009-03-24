@@ -45,7 +45,7 @@ multiply_overflow:
 	
 /* Note that the XT is passed to the quotation in r11 */
 #define CALL_OR_JUMP_QUOT \
-	lwz r11,9(r3)	   /* load quotation-xt slot */ XX \
+	lwz r11,17(r3)	   /* load quotation-xt slot */ XX \
 
 #define CALL_QUOT \
 	CALL_OR_JUMP_QUOT XX \
