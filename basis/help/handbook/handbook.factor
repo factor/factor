@@ -4,7 +4,7 @@ prettyprint.backend prettyprint.custom kernel.private io generic
 math system strings sbufs vectors byte-arrays quotations
 io.streams.byte-array classes.builtin parser lexer
 classes.predicate classes.union classes.intersection
-classes.singleton classes.tuple tools.vocabs.browser math.parser
+classes.singleton classes.tuple help.vocabs math.parser
 accessors ;
 IN: help.handbook
 
@@ -278,11 +278,7 @@ ARTICLE: "handbook-library-reference" "Library reference"
 "This index only includes articles from loaded vocabularies. To explore more vocabularies, see " { $link "vocab-index" } "."
 { $index [ "handbook" orphan-articles remove ] } ;
 
-ARTICLE: "handbook" "Factor documentation"
-"Welcome to Factor."
-$nl
-"Explore the code base:"
-{ $subsection "vocab-index" }
+ARTICLE: "handbook" "Factor handbook"
 "Learn the language:"
 { $subsection "cookbook" }
 { $subsection "first-program" }
@@ -290,11 +286,13 @@ $nl
 { $subsection "handbook-environment-reference" }
 { $subsection "ui" }
 { $subsection "handbook-library-reference" }
-"The below indices only include articles from loaded vocabularies. To explore more vocabularies, see " { $link "vocab-index" } "."
+"Explore loaded libraries:"
 { $subsection "article-index" }
 { $subsection "primitive-index" }
 { $subsection "error-index" }
 { $subsection "type-index" }
-{ $subsection "class-index" } ;
+{ $subsection "class-index" }
+"Explore the code base:"
+{ $subsection "vocab-index" } ;
 
 ABOUT: "handbook"

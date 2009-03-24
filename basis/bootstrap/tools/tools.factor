@@ -14,7 +14,6 @@ IN: bootstrap.tools
     "tools.time"
     "tools.threads"
     "tools.vocabs"
-    "tools.vocabs.browser"
     "tools.vocabs.monitor"
     "editors"
 } [ require ] each

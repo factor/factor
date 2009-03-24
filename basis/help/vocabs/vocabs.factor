@@ -6,17 +6,16 @@ classes.singleton classes.tuple classes.union combinators
 definitions effects fry generic help help.markup help.stylesheet
 help.topics io io.files io.pathnames io.styles kernel macros
 make namespaces prettyprint sequences sets sorting summary
-tools.vocabs vocabs vocabs.loader words words.symbol
-combinators.smart definitions.icons ;
-IN: tools.vocabs.browser
+tools.vocabs vocabs vocabs.loader words words.symbol definitions.icons ;
+IN: help.vocabs
+
+: $pretty-link ( element -- )
+    [ first definition-icon 1array $image " " print-element ]
+    [ $definition-link ]
+    bi ;
 
 : <$pretty-link> ( definition -- element )
-    [
-        [ definition-icon 1array \ $image prefix ]
-        [ drop " " ]
-        [ 1array \ $definition-link prefix ]
-        tri
-    ] output>array ;
+    1array \ $pretty-link prefix ;
 
 : vocab-row ( vocab -- row )
     [ <$pretty-link> ] [ vocab-summary ] bi 2array ;
