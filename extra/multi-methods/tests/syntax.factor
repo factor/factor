@@ -3,7 +3,7 @@ USING: multi-methods tools.test math sequences namespaces system
 kernel strings definitions prettyprint debugger arrays
 hashtables continuations classes assocs accessors see ;
 
-GENERIC: first-test
+GENERIC: first-test ( -- )
 
 [ t ] [ \ first-test generic? ] unit-test
 
@@ -13,7 +13,7 @@ SINGLETON: paper    INSTANCE: paper thing
 SINGLETON: scissors INSTANCE: scissors thing
 SINGLETON: rock     INSTANCE: rock thing
 
-GENERIC: beats?
+GENERIC: beats? ( obj1 obj2 -- ? )
 
 METHOD: beats? { paper scissors } t ;
 METHOD: beats? { scissors rock } t ;
@@ -34,7 +34,7 @@ METHOD: beats? { thing thing } f ;
 
 SYMBOL: some-var
 
-GENERIC: hook-test
+GENERIC: hook-test ( -- obj )
 
 METHOD: hook-test { array { some-var array } } reverse ;
 METHOD: hook-test { { some-var array } } class ;
@@ -57,7 +57,7 @@ TUPLE: busted-1 ;
 TUPLE: busted-2 ; INSTANCE: busted-2 busted
 TUPLE: busted-3 ;
 
-GENERIC: busted-sort
+GENERIC: busted-sort ( obj1 obj2 -- obj1 obj2 )
 
 METHOD: busted-sort { busted-1 busted-2 } ;
 METHOD: busted-sort { busted-2 busted-3 } ;
