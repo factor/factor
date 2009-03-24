@@ -204,7 +204,8 @@ IN: tools.deploy.shaker
     ] when ;
 
 : strip-vocab-globals ( except names -- words )
-    [ child-vocabs [ words ] map concat ] map concat swap diff ;
+    [ child-vocabs [ words ] map concat ] map concat
+    swap [ first2 lookup ] map sift diff ;
 
 : stripped-globals ( -- seq )
     [
@@ -245,7 +246,8 @@ IN: tools.deploy.shaker
         strip-dictionary? [
             "libraries" "alien" lookup ,
 
-            { } { "cpu" "compiler" } strip-vocab-globals %
+            { { "yield-hook" "compiler.utilities" } }
+            { "cpu" "compiler" } strip-vocab-globals %
 
             {
                 gensym
