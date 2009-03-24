@@ -354,7 +354,7 @@ H{ } clone wm-handlers set-global
 
 : add-wm-handler ( quot wm -- )
     dup array?
-    [ [ execute add-wm-handler ] with each ]
+    [ [ execute( -- wm ) add-wm-handler ] with each ]
     [ wm-handlers get-global set-at ] if ;
 
 [ handle-wm-close 0                  ] WM_CLOSE add-wm-handler

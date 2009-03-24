@@ -108,7 +108,7 @@ HELP: lappend
 { $description "Perform a similar functionality to that of the " { $link append } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-append> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required. Successive calls to " { $link cdr } " will iterate through list1, followed by list2." } ;
 
 HELP: lfrom-by
-{ $values { "n" "an integer" } { "quot" { $quotation "( -- int )" } } { "list" "a lazy list of integers" } }
+{ $values { "n" "an integer" } { "quot" { $quotation "( -- int )" } } { "lazy-from-by" "a lazy list of integers" } }
 { $description "Return an infinite lazy list of values starting from n, with each successive value being the result of applying quot to n." } ;
 
 HELP: lfrom

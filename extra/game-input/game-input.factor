@@ -35,7 +35,7 @@ PRIVATE>
     ] when ;
 
 : with-game-input ( quot -- )
-    open-game-input [ close-game-input ] [ ] cleanup ;
+    open-game-input [ close-game-input ] [ ] cleanup ; inline
 
 TUPLE: controller handle ;
 TUPLE: controller-state x y z rx ry rz slider pov buttons ;

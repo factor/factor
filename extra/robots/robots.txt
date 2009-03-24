@@ -1,0 +1,279 @@
+
+
+# robots.txt
+
+Sitemap: http://www.chiplist.com/sitemap.txt
+
+User-Agent: *
+
+Disallow: /cgi-bin/
+Disallow: /scripts/
+Disallow: /ChipList2/scripts/
+#Disallow: /styles/
+Disallow: /ChipList2/styles/
+
+Disallow: /ads/
+Disallow: /ChipList2/ads/
+Disallow: /advertisements/
+Disallow: /ChipList2/advertisements/
+
+Disallow: /graphics/
+Disallow: /ChipList2/graphics/
+
+#Disallow: /ChipList1/
+
+
+# robots.txt for http://www.wikipedia.org/ and friends
+#
+# Please note: There are a lot of pages on this site, and there are
+# some misbehaved spiders out there that go _way_ too fast. If you're
+# irresponsible, your access to the site may be blocked.
+
+# Inktomi's "Slurp" can read a minimum delay between hits; if your
+# bot supports such a thing using the 'Crawl-delay' or another
+# instruction, please let us know.
+
+# *at least* 1 second please. preferably more :D
+#User-agent: *
+Crawl-delay: 1
+Request-rate: 1/1
+Visit-time: 0200-0500
+
+# Crawlers that are kind enough to obey, but which we'd rather not have
+# unless they're feeding search engines.
+User-agent: UbiCrawler
+Disallow: /
+
+User-agent: DOC
+Disallow: /
+
+User-agent: Zao
+Disallow: /
+
+# Some bots are known to be trouble, particularly those designed to copy
+# entire sites. Please obey robots.txt.
+User-agent: sitecheck.internetseer.com
+Disallow: /
+
+User-agent: Zealbot
+Disallow: /
+
+User-agent: MSIECrawler
+Disallow: /
+
+User-agent: SiteSnagger
+Disallow: /
+
+User-agent: WebStripper
+Disallow: /
+
+User-agent: WebCopier
+Disallow: /
+
+User-agent: Fetch
+Disallow: /
+
+User-agent: Offline Explorer
+Disallow: /
+
+User-agent: Teleport
+Disallow: /
+
+User-agent: TeleportPro
+Disallow: /
+
+User-agent: WebZIP
+Disallow: /
+
+User-agent: linko
+Disallow: /
+
+User-agent: HTTrack
+Disallow: /
+
+User-agent: Microsoft.URL.Control
+Disallow: /
+
+User-agent: Xenu
+Disallow: /
+
+User-agent: larbin
+Disallow: /
+
+User-agent: libwww
+Disallow: /
+
+User-agent: ZyBORG
+Disallow: /
+
+User-agent: Download Ninja
+Disallow: /
+
+#
+# Sorry, wget in its recursive mode is a frequent problem.
+# Please read the man page and use it properly; there is a
+# --wait option you can use to set the delay between hits,
+# for instance.
+#
+User-agent: wget
+Disallow: /
+
+#
+# The 'grub' distributed client has been *very* poorly behaved.
+#
+User-agent: grub-client
+Disallow: /
+
+#
+# Doesn't follow robots.txt anyway, but...
+#
+User-agent: k2spider
+Disallow: /
+
+#
+# Hits many times per second, not acceptable
+# http://www.nameprotect.com/botinfo.html
+User-agent: NPBot
+Disallow: /
+
+# A capture bot, downloads gazillions of pages with no public benefit
+# http://www.webreaper.net/
+User-agent: WebReaper
+Disallow: /
+
+
+# Provided courtesy of http://browsers.garykeith.com.
+# Created on February 13, 2008 at 7:39:00 PM GMT.
+#
+# Place this file in the root public folder of your website.
+# It will stop the following bots from indexing your website.
+#
+User-agent: abot
+User-agent: ALeadSoftbot
+User-agent: BeijingCrawler
+User-agent: BilgiBot
+User-agent: bot
+User-agent: botlist
+User-agent: BOTW Spider
+User-agent: bumblebee
+User-agent: Bumblebee
+User-agent: BuzzRankingBot
+User-agent: Charlotte
+User-agent: Clushbot
+User-agent: Crawler
+User-agent: CydralSpider
+User-agent: DataFountains
+User-agent: DiamondBot
+User-agent: Dulance bot
+User-agent: DYNAMIC
+User-agent: EARTHCOM.info
+User-agent: EDI
+User-agent: envolk
+User-agent: Exabot
+User-agent: Exabot-Images
+User-agent: Exabot-Test
+User-agent: exactseek-pagereaper
+User-agent: Exalead NG
+User-agent: FANGCrawl
+User-agent: Feed::Find
+User-agent: flatlandbot
+User-agent: Gigabot
+User-agent: GigabotSiteSearch
+User-agent: GurujiBot
+User-agent: Hatena Antenna
+User-agent: Hatena Bookmark
+User-agent: Hatena RSS
+User-agent: HatenaScreenshot
+User-agent: Helix
+User-agent: HiddenMarket
+User-agent: HyperEstraier
+User-agent: iaskspider
+User-agent: IIITBOT
+User-agent: InfociousBot
+User-agent: iVia
+User-agent: iVia Page Fetcher
+User-agent: Jetbot
+User-agent: Kolinka Forum Search
+User-agent: KRetrieve
+User-agent: LetsCrawl.com
+User-agent: Lincoln State Web Browser
+User-agent: Links4US-Crawler
+User-agent: LOOQ
+User-agent: Lsearch/sondeur
+User-agent: MapoftheInternet.com
+User-agent: NationalDirectory
+User-agent: NetCarta_WebMapper
+User-agent: NewsGator
+User-agent: NextGenSearchBot
+User-agent: ng
+User-agent: nicebot
+User-agent: NP
+User-agent: NPBot
+User-agent: Nudelsalat
+User-agent: Nutch
+User-agent: OmniExplorer_Bot
+User-agent: OpenIntelligenceData
+User-agent: Oracle Enterprise Search
+User-agent: Pajaczek
+User-agent: panscient.com
+User-agent: PeerFactor 404 crawler
+User-agent: PeerFactor Crawler
+User-agent: PlantyNet
+User-agent: PlantyNet_WebRobot
+User-agent: plinki
+User-agent: PMAFind
+User-agent: Pogodak!
+User-agent: QuickFinder Crawler
+User-agent: Radiation Retriever
+User-agent: Reaper
+User-agent: RedCarpet
+User-agent: ScorpionBot
+User-agent: Scrubby
+User-agent: Scumbot
+User-agent: searchbot
+User-agent: Seeker.lookseek.com
+User-agent: SeznamBot
+User-agent: ShowXML
+User-agent: snap.com
+User-agent: snap.com beta crawler
+User-agent: Snapbot
+User-agent: SnapPreviewBot
+User-agent: sohu
+User-agent: SpankBot
+User-agent: Speedy Spider
+User-agent: Speedy_Spider
+User-agent: SpeedySpider
+User-agent: spider
+User-agent: SquigglebotBot
+User-agent: SurveyBot
+User-agent: SynapticSearch
+User-agent: T-H-U-N-D-E-R-S-T-O-N-E
+User-agent: Talkro Web-Shot
+User-agent: Tarantula
+User-agent: TerrawizBot
+User-agent: TheInformant
+User-agent: TMCrawler
+User-agent: TridentSpider
+User-agent: Tutorial Crawler
+User-agent: Twiceler
+User-agent: unwrapbot
+User-agent: URI::Fetch
+User-agent: VengaBot
+User-agent: Vonna.com b o t
+User-agent: Vortex
+User-agent: Votay bot
+User-agent: WebAlta Crawler
+User-agent: Webbot
+User-agent: Webclipping.com
+User-agent: WebCorp
+User-agent: Webinator
+User-agent: WIRE
+User-agent: WISEbot
+User-agent: Xerka WebBot
+User-agent: XSpider
+User-agent: YodaoBot
+User-agent: Yoono
+User-agent: yoono
+Disallow: /
+
+

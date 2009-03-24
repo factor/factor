@@ -97,8 +97,7 @@ HELP: <clumps>
     { $example
         "USING: grouping sequences math prettyprint kernel ;"
         "IN: scratchpad"
-        ": share-price"
-        "    { 13/50 51/100 13/50 1/10 4/5 17/20 33/50 3/25 19/100 3/100 } ;"
+        "CONSTANT: share-price { 13/50 51/100 13/50 1/10 4/5 17/20 33/50 3/25 19/100 3/100 }"
         ""
         "share-price 4 <clumps> [ [ sum ] [ length ] bi / ] map ."
         "{ 113/400 167/400 201/400 241/400 243/400 91/200 1/4 }"
