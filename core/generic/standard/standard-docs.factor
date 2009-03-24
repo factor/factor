@@ -1,5 +1,5 @@
 USING: generic help.markup help.syntax sequences math
-math.parser ;
+math.parser effects ;
 IN: generic.standard
 
 HELP: no-method
@@ -28,7 +28,7 @@ HELP: hook-combination
 } ;
 
 HELP: define-simple-generic
-{ $values { "word" "a word" } }
+{ $values { "word" "a word" } { "effect" effect } }
 { $description "Defines a generic word with the " { $link standard-combination } " method combination and a dispatch position of 0." } ;
 
 { standard-combination hook-combination } related-words

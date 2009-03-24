@@ -16,8 +16,8 @@ MACRO: set-slots ( slots -- quot )
     [ [ in>> '[ _ _ construct ] ] dip compose ] [ drop ] 2bi
     define-declared ;
 
-: CONSTRUCTOR:
+SYNTAX: CONSTRUCTOR:
     scan-word [ name>> "<" ">" surround create-in ] keep
-    "(" expect ")" parse-effect
+    complete-effect
     parse-definition
-    define-constructor ; parsing
+    define-constructor ;

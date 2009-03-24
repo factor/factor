@@ -18,7 +18,7 @@ M: word disassemble word-xt 2array disassemble ;
 
 M: method-spec disassemble first2 method disassemble ;
 
-cpu x86? os unix? and
+cpu x86?
 "tools.disassembler.udis"
 "tools.disassembler.gdb" ?
 require

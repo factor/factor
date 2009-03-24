@@ -288,7 +288,7 @@ CONSTANT: case-const-2 2
     } case
 ] unit-test
 
-: do-not-call "do not call" throw ;
+: do-not-call ( -- * ) "do not call" throw ;
 
 : test-case-6 ( obj -- value )
     {

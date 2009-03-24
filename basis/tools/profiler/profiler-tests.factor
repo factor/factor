@@ -25,7 +25,7 @@ words ;
 
 : indirect-test ( callback -- ) "void" { } "cdecl" alien-indirect ;
 
-: foobar ;
+: foobar ( -- ) ;
 
 [
     [ ] [ callback-test indirect-test ] unit-test
@@ -34,9 +34,9 @@ words ;
 
 [ 1 ] [ \ foobar counter>> ] unit-test
 
-: fooblah { } [ ] each ;
+: fooblah ( -- ) { } [ ] like call ;
 
-: foobaz fooblah fooblah ;
+: foobaz ( -- ) fooblah fooblah ;
 
 [ foobaz ] profile
 

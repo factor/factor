@@ -1,32 +1,11 @@
-typedef enum
-{
-	B_FREE,
-	B_ALLOCATED,
-	B_MARKED
-} F_BLOCK_STATUS;
-
-typedef struct _F_BLOCK
-{
-	F_BLOCK_STATUS status;
-
-	/* In bytes, includes this header */
-	CELL size;
-
-	/* Filled in on image load */
-	struct _F_BLOCK *next_free;
-
-	/* Used during compaction */
-	struct _F_BLOCK *forwarding;
-} F_BLOCK;
-
 typedef struct {
 	F_SEGMENT *segment;
-	F_BLOCK *free_list;
+	F_FREE_BLOCK *free_list;
 } F_HEAP;
 
 void new_heap(F_HEAP *heap, CELL size);
 void build_free_list(F_HEAP *heap, CELL size);
-void *heap_allot(F_HEAP *heap, CELL size);
+F_BLOCK *heap_allot(F_HEAP *heap, CELL size);
 void mark_block(F_BLOCK *block);
 void unmark_marked(F_HEAP *heap);
 void free_unmarked(F_HEAP *heap);

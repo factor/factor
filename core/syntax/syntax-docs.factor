@@ -177,10 +177,10 @@ HELP: delimiter
 { $syntax ": foo ... ; delimiter" }
 { $description "Declares the most recently defined word as a delimiter. Delimiters are words which are only ever valid as the end of a nested block to be read by " { $link parse-until } ". An unpaired occurrence of a delimiter is a parse error." } ;
 
-HELP: parsing
-{ $syntax ": foo ... ; parsing" }
-{ $description "Declares the most recently defined word as a parsing word." }
-{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< : hello \"Hello parser!\" print ; parsing >>\n: world hello ;" "Hello parser!" } } ;
+HELP: SYNTAX:
+{ $syntax "SYNTAX: foo ... ;" }
+{ $description "Defines a parsing word." }
+{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< SYNTAX: HELLO \"Hello parser!\" print ; >>\n: world ( -- ) HELLO ;" "Hello parser!" } } ;
 
 HELP: inline
 { $syntax ": foo ... ; inline" }
@@ -508,8 +508,8 @@ HELP: P"
 HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
-{ $description "Declares the stack effect of the most recently defined word, storing a new " { $link effect } " instance in the " { $snippet "\"declared-effect\"" } " word property." }
-{ $notes "All words except those only pushing literals on the stack must have a stack effect declaration. See " { $link "effect-declaration" } " for details." } ;
+{ $description "A stack effect declaration. This is treated as a comment unless it appears inside a word definition." }
+{ $see-also "effect-declaration" } ;
 
 HELP: ((
 { $syntax "(( inputs -- outputs ))" }

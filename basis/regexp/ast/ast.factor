@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel arrays accessors fry sequences regexp.classes ;
-FROM: math.ranges => [a,b] ;
+USING: kernel arrays accessors fry sequences regexp.classes
+math.ranges math ;
 IN: regexp.ast
 
 TUPLE: negation term ;
@@ -49,10 +49,20 @@ SINGLETONS: unix-lines dotall multiline case-insensitive reversed-regexp ;
     <array> <concatenation> ;
 
 GENERIC: <times> ( term times -- term' )
+
 M: at-least <times>
     n>> swap [ repetition ] [ <star> ] bi 2array <concatenation> ;
+
+: to-times ( term n -- ast )
+    dup zero?
+    [ 2drop epsilon ]
+    [ dupd 1- to-times 2array <concatenation> <maybe> ]
+    if ;
+
 M: from-to <times>
-    [ n>> ] [ m>> ] bi [a,b] swap '[ _ repetition ] map <alternation> ;
+    [ n>> swap repetition ]
+    [ [ m>> ] [ n>> ] bi - to-times ] 2bi
+    2array <concatenation> ;
 
 : char-class ( ranges ? -- term )
     [ <or-class> ] dip [ <not-class> ] when ;

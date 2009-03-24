@@ -15,7 +15,7 @@ $nl
 { $vocab-subsection "Word and grapheme breaks" "unicode.breaks" }
 { $vocab-subsection "Unicode normalization" "unicode.normalize" }
 "The following are mostly for internal use:"
-{ $vocab-subsection "Unicode syntax" "unicode.syntax" }
+{ $vocab-subsection "Unicode category syntax" "unicode.categories.syntax" }
 { $vocab-subsection "Unicode data tables" "unicode.data" }
 { $see-also "ascii" "io.encodings" } ;
 

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: peg.ebnf kernel math.parser sequences assocs arrays fry math
 combinators regexp.classes strings splitting peg locals accessors
-regexp.ast unicode.case ;
+regexp.ast unicode.case unicode.script.private unicode.categories
+memoize interval-maps sets unicode.data combinators.short-circuit ;
 IN: regexp.parser
 
 : allowed-char? ( ch -- ? )
@@ -18,8 +19,41 @@ ERROR: bad-number ;
 
 ERROR: bad-class name ;
 
+: simple ( str -- simple )
+    ! Alternatively, first collation key level?
+    >case-fold [ " \t_" member? not ] filter ;
+
+: simple-table ( seq -- table )
+    [ [ simple ] keep ] H{ } map>assoc ;
+
+MEMO: simple-script-table ( -- table )
+    script-table interval-values prune simple-table ;
+
+MEMO: simple-category-table ( -- table )
+    categories simple-table ;
+
+: parse-unicode-class ( name -- class )
+    {
+        { [ dup { [ length 1 = ] [ first "clmnpsz" member? ] } 1&& ] [
+            >upper first
+            <category-range-class>
+        ] }
+        { [ dup >title categories member? ] [
+            simple-category-table at <category-class>
+        ] }
+        { [ "script=" ?head ] [
+            dup simple-script-table at
+            [ <script-class> ]
+            [ "script=" prepend bad-class ] ?if
+        ] }
+        [ bad-class ]
+    } cond ;
+
+: unicode-class ( name -- class )
+    dup parse-unicode-class [ ] [ bad-class ] ?if ;
+
 : name>class ( name -- class )
-    >string >case-fold {
+    >string simple {
         { "lower" letter-class }
         { "upper" LETTER-class }
         { "alpha" Letter-class }
@@ -32,8 +66,7 @@ ERROR: bad-class name ;
         { "cntrl" control-character-class }
         { "xdigit" hex-digit-class }
         { "space" java-blank-class }
-        ! TODO: unicode-character-class
-    } [ bad-class ] at-error ;
+    } [ unicode-class ] at-error ;
 
 : lookup-escape ( char -- ast )
     {
@@ -115,19 +148,29 @@ Character = EscapeSequence
           | "^" => [[ ^ <tagged-epsilon> ]]
           | . ?[ allowed-char? ]?
 
-AnyRangeCharacter = EscapeSequence | .
+AnyRangeCharacter = !("&&"|"||"|"--"|"~~") (EscapeSequence | .)
 
 RangeCharacter = !("]") AnyRangeCharacter
 
-Range = RangeCharacter:a "-" RangeCharacter:b => [[ a b <range> ]]
+Range = RangeCharacter:a "-" !("-") RangeCharacter:b => [[ a b <range-class> ]]
       | RangeCharacter
 
-StartRange = AnyRangeCharacter:a "-" RangeCharacter:b => [[ a b <range> ]]
+StartRange = AnyRangeCharacter:a "-" !("-") RangeCharacter:b => [[ a b <range-class> ]]
            | AnyRangeCharacter
 
 Ranges = StartRange:s Range*:r => [[ r s prefix ]]
 
-CharClass = "^"?:n Ranges:e => [[ e n char-class ]]
+BasicCharClass =  "^"?:n Ranges:e => [[ e n char-class ]]
+
+CharClass = BasicCharClass:b "&&" CharClass:c
+                => [[ b c 2array <and-class> ]]
+          | BasicCharClass:b "||" CharClass:c
+                => [[ b c 2array <or-class> ]]
+          | BasicCharClass:b "~~" CharClass:c
+                => [[ b c <sym-diff-class> ]]
+          | BasicCharClass:b "--" CharClass:c
+                => [[ b c <minus-class> ]]
+          | BasicCharClass
 
 Options = [idmsux]*
 
@@ -144,7 +187,7 @@ Parenthized = "?:" Alternation:a => [[ a ]]
 
 Element = "(" Parenthized:p ")" => [[ p ]]
         | "[" CharClass:r "]" => [[ r ]]
-        | ".":d => [[ any-char <primitive-class> ]]
+        | ".":d => [[ dot ]]
         | Character
 
 Number = (!(","|"}").)* => [[ string>number ensure-number ]]

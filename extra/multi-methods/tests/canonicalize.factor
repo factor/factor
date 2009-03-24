@@ -4,11 +4,11 @@ kernel strings ;
 
 [ { POSTPONE: f integer } ] [ { f integer } canonicalize-specializer-0 ] unit-test
 
-: setup-canon-test
+: setup-canon-test ( -- )
     0 args set
     V{ } clone hooks set ;
 
-: canon-test-1
+: canon-test-1 ( -- seq )
     { integer { cpu x86 } sequence } canonicalize-specializer-1 ;
 
 [ { { -2 integer } { -1 sequence } { cpu x86 } } ] [
@@ -36,12 +36,12 @@ kernel strings ;
     ] with-scope
 ] unit-test
 
-: example-1
+CONSTANT: example-1
     {
         { { { cpu x86 } { os linux } } "a" }
         { { { cpu ppc } } "b" }
         { { string { os windows } } "c" }
-    } ;
+    }
 
 [
     {

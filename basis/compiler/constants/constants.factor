@@ -23,7 +23,7 @@ CONSTANT: deck-bits 18
 : quot-xt-offset ( -- n ) 5 bootstrap-cells object tag-number - ; inline
 : word-code-offset ( -- n ) 10 bootstrap-cells object tag-number - ; inline
 : array-start-offset ( -- n ) 2 bootstrap-cells object tag-number - ; inline
-: compiled-header-size ( -- n ) 4 bootstrap-cells ; inline
+: compiled-header-size ( -- n ) 5 bootstrap-cells ; inline
 
 ! Relocation classes
 CONSTANT: rc-absolute-cell    0
@@ -42,7 +42,7 @@ CONSTANT: rt-dlsym       1
 CONSTANT: rt-dispatch    2
 CONSTANT: rt-xt          3
 CONSTANT: rt-here        4
-CONSTANT: rt-label       5
+CONSTANT: rt-this        5
 CONSTANT: rt-immediate   6
 CONSTANT: rt-stack-chain 7
 

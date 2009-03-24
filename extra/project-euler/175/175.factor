@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math math.parser math.ranges sequences vectors ;
+USING: combinators kernel math math.parser math.ranges sequences vectors project-euler.common ;
 IN: project-euler.175
 
 ! http://projecteuler.net/index.php?section=problems&id=175
@@ -55,4 +55,4 @@ PRIVATE>
 ! [ euler175 ] 100 ave-time
 ! 0 ms ave run time - 0.31 SD (100 trials)
 
-MAIN: euler175
+SOLUTION: euler175

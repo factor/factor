@@ -86,4 +86,4 @@ PRIVATE>
 ! [ euler018a ] 100 ave-time
 ! 0 ms ave run time - 0.39 SD (100 trials)
 
-MAIN: euler018a
+SOLUTION: euler018a

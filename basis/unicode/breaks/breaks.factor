@@ -2,9 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit unicode.categories kernel math
 combinators splitting sequences math.parser io.files io assocs
-arrays namespaces make math.ranges unicode.normalize.private values
-io.encodings.ascii unicode.syntax unicode.data compiler.units fry
-alien.syntax sets accessors interval-maps memoize locals words ;
+arrays namespaces make math.ranges unicode.normalize
+unicode.normalize.private values io.encodings.ascii
+unicode.data compiler.units fry unicode.categories.syntax
+alien.syntax sets accessors interval-maps memoize locals words
+simple-flat-file ;
 IN: unicode.breaks
 
 <PRIVATE
@@ -30,9 +32,9 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
         [ drop Control ]
     } case ;
 
-CATEGORY: (extend) Me Mn ;
-: extend? ( ch -- ? )
-    { [ (extend)? ] [ "Other_Grapheme_Extend" property? ] } 1|| ;
+CATEGORY: extend
+    Me Mn |
+    "Other_Grapheme_Extend" property? ;
 
 : loe? ( ch -- ? )
     "Logical_Order_Exception" property? ;
@@ -126,7 +128,7 @@ to: grapheme-table
 
 VALUE: word-break-table
 
-"vocab:unicode/data/WordBreakProperty.txt" load-script
+"vocab:unicode/data/WordBreakProperty.txt" load-interval-file
 to: word-break-table
 
 C-ENUM: wOther wCR wLF wNewline wExtend wFormat wKatakana wALetter wMidLetter

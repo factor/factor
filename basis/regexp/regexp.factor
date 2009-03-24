@@ -1,10 +1,9 @@
 ! Copyright (C) 2008, 2009 Doug Coleman, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel kernel.private math sequences
-sequences.private strings sets assocs prettyprint.backend
-prettyprint.custom make lexer namespaces parser arrays fry locals
-regexp.parser splitting sorting regexp.ast regexp.negation
-regexp.compiler compiler.units words math.ranges ;
+sequences.private strings sets assocs make lexer namespaces parser
+arrays fry locals regexp.parser splitting sorting regexp.ast
+regexp.negation regexp.compiler compiler.units words math.ranges ;
 IN: regexp
 
 TUPLE: regexp
@@ -205,23 +204,20 @@ PRIVATE>
 
 PRIVATE>
 
-: R! CHAR: ! parsing-regexp ; parsing
-: R" CHAR: " parsing-regexp ; parsing
-: R# CHAR: # parsing-regexp ; parsing
-: R' CHAR: ' parsing-regexp ; parsing
-: R( CHAR: ) parsing-regexp ; parsing
-: R/ CHAR: / parsing-regexp ; parsing
-: R@ CHAR: @ parsing-regexp ; parsing
-: R[ CHAR: ] parsing-regexp ; parsing
-: R` CHAR: ` parsing-regexp ; parsing
-: R{ CHAR: } parsing-regexp ; parsing
-: R| CHAR: | parsing-regexp ; parsing
+SYNTAX: R! CHAR: ! parsing-regexp ;
+SYNTAX: R" CHAR: " parsing-regexp ;
+SYNTAX: R# CHAR: # parsing-regexp ;
+SYNTAX: R' CHAR: ' parsing-regexp ;
+SYNTAX: R( CHAR: ) parsing-regexp ;
+SYNTAX: R/ CHAR: / parsing-regexp ;
+SYNTAX: R@ CHAR: @ parsing-regexp ;
+SYNTAX: R[ CHAR: ] parsing-regexp ;
+SYNTAX: R` CHAR: ` parsing-regexp ;
+SYNTAX: R{ CHAR: } parsing-regexp ;
+SYNTAX: R| CHAR: | parsing-regexp ;
 
-M: regexp pprint*
-    [
-        [
-            [ raw>> dup find-regexp-syntax swap % swap % % ]
-            [ options>> options>string % ] bi
-        ] "" make
-    ] keep present-text ;
+USING: vocabs vocabs.loader ;
 
+"prettyprint" vocab [
+    "regexp.prettyprint" require
+] when

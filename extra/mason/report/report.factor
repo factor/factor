@@ -16,7 +16,7 @@ IN: mason.report
     "git id: " write "git-id" eval-file print nl ;
 
 : with-report ( quot -- )
-    [ "report" utf8 ] dip '[ common-report @ ] with-file-writer ;
+    [ "report" utf8 ] dip '[ common-report @ ] with-file-writer ; inline
 
 : compile-failed-report ( error -- )
     [

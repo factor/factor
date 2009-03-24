@@ -1,12 +1,14 @@
-! Copyright (C) 2008 Daniel Ehrenberg.
+! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit assocs math kernel sequences
 io.files hashtables quotations splitting grouping arrays io
 math.parser hash2 math.order byte-arrays words namespaces words
 compiler.units parser io.encodings.ascii values interval-maps
 ascii sets combinators locals math.ranges sorting make
-strings.parser io.encodings.utf8 memoize ;
+strings.parser io.encodings.utf8 memoize simple-flat-file ;
 IN: unicode.data
+
+<PRIVATE
 
 VALUE: simple-lower
 VALUE: simple-upper
@@ -16,35 +18,69 @@ VALUE: combine-map
 VALUE: class-map
 VALUE: compatibility-map
 VALUE: category-map
-VALUE: name-map
 VALUE: special-casing
 VALUE: properties
 
-: canonical-entry ( char -- seq ) canonical-map at ;
-: combine-chars ( a b -- char/f ) combine-map hash2 ;
-: compatibility-entry ( char -- seq ) compatibility-map at  ;
-: combining-class ( char -- n ) class-map at ;
-: non-starter? ( char -- ? ) combining-class { 0 f } member? not ;
-: name>char ( name -- char ) name-map at ;
-: char>name ( char -- name ) name-map value-at ;
-: property? ( char property -- ? ) properties at interval-key? ;
+PRIVATE>
+
+VALUE: name-map
+
+: canonical-entry ( char -- seq ) canonical-map at ; inline
+: combine-chars ( a b -- char/f ) combine-map hash2 ; inline
+: compatibility-entry ( char -- seq ) compatibility-map at ; inline
+: combining-class ( char -- n ) class-map at ; inline
+: non-starter? ( char -- ? ) combining-class { 0 f } member? not ; inline
+: name>char ( name -- char ) name-map at ; inline
+: char>name ( char -- name ) name-map value-at ; inline
+: property? ( char property -- ? ) properties at interval-key? ; inline
+: ch>lower ( ch -- lower ) simple-lower at-default ; inline
+: ch>upper ( ch -- upper ) simple-upper at-default ; inline
+: ch>title ( ch -- title ) simple-title at-default ; inline
+: special-case ( ch -- casing-tuple ) special-casing at ; inline
+
+! For non-existent characters, use Cn
+CONSTANT: categories
+    { "Cn"
+      "Lu" "Ll" "Lt" "Lm" "Lo"
+      "Mn" "Mc" "Me"
+      "Nd" "Nl" "No"
+      "Pc" "Pd" "Ps" "Pe" "Pi" "Pf" "Po"
+      "Sm" "Sc" "Sk" "So"
+      "Zs" "Zl" "Zp"
+      "Cc" "Cf" "Cs" "Co" }
+
+<PRIVATE
+
+MEMO: categories-map ( -- hashtable )
+    categories <enum> [ swap ] H{ } assoc-map-as ;
+
+CONSTANT: num-chars HEX: 2FA1E
+
+PRIVATE>
+
+: category# ( char -- n )
+    ! There are a few characters that should be Cn
+    ! that this gives Cf or Mn
+    ! Cf = 26; Mn = 5; Cn = 29
+    ! Use a compressed array instead?
+    dup category-map ?nth [ ] [
+        dup HEX: E0001 HEX: E007F between?
+        [ drop 26 ] [
+            HEX: E0100 HEX: E01EF between?  5 29 ?
+        ] if
+    ] ?if ;
+
+: category ( char -- category )
+    category# categories nth ;
+
+<PRIVATE
 
 ! Loading data from UnicodeData.txt
-
-: split-; ( line -- array )
-    ";" split [ [ blank? ] trim ] map ;
-
-: data ( filename -- data )
-    ascii file-lines [ split-; ] map ;
 
 : load-data ( -- data )
     "vocab:unicode/data/UnicodeData.txt" data ;
 
-: filter-comments ( lines -- lines )
-    [ "#@" split first ] map harvest ;
-
 : (process-data) ( index data -- newdata )
-    filter-comments
     [ [ nth ] keep first swap ] with { } map>assoc
     [ [ hex> ] dip ] assoc-map ;
 
@@ -97,22 +133,6 @@ VALUE: properties
     [ nip zero? not ] assoc-filter
     >hashtable ;
 
-! For non-existent characters, use Cn
-CONSTANT: categories
-    { "Cn"
-      "Lu" "Ll" "Lt" "Lm" "Lo"
-      "Mn" "Mc" "Me"
-      "Nd" "Nl" "No"
-      "Pc" "Pd" "Ps" "Pe" "Pi" "Pf" "Po"
-      "Sm" "Sc" "Sk" "So"
-      "Zs" "Zl" "Zp"
-      "Cc" "Cf" "Cs" "Co" }
-
-MEMO: categories-map ( -- hashtable )
-    categories <enum> [ swap ] H{ } assoc-map-as ;
-
-CONSTANT: num-chars HEX: 2FA1E
-
 ! the maximum unicode char in the first 3 planes
 
 : ?set-nth ( val index seq -- )
@@ -140,24 +160,26 @@ CONSTANT: num-chars HEX: 2FA1E
 : multihex ( hexstring -- string )
     " " split [ hex> ] map sift ;
 
+PRIVATE>
+
 TUPLE: code-point lower title upper ;
 
 C: <code-point> code-point
+
+<PRIVATE
 
 : set-code-point ( seq -- )
     4 head [ multihex ] map first4
     <code-point> swap first set ;
 
 ! Extra properties
-: properties-lines ( -- lines )
-    "vocab:unicode/data/PropList.txt"
-    ascii file-lines ;
-
 : parse-properties ( -- {{[a,b],prop}} )
-    properties-lines filter-comments [
-        split-; first2
-        [ ".." split1 [ dup ] unless* [ hex> ] bi@ 2array ] dip
-    ] { } map>assoc ;
+    "vocab:unicode/data/PropList.txt" data [
+        [
+            ".." split1 [ dup ] unless*
+            [ hex> ] bi@ 2array
+        ] dip
+    ] assoc-map ;
 
 : properties>intervals ( properties -- assoc[str,interval] )
     dup values prune [ f ] H{ } map>assoc
@@ -194,34 +216,6 @@ postprocess-class
 load-special-casing to: special-casing
 
 load-properties to: properties
-
-! Utility to load resource files that look like Scripts.txt
-
-SYMBOL: interned
-
-: parse-script ( filename -- assoc )
-    ! assoc is code point/range => name
-    ascii file-lines filter-comments [ split-; ] map ;
-
-: range, ( value key -- )
-    swap interned get
-    [ = ] with find nip 2array , ;
-
-: expand-ranges ( assoc -- interval-map )
-    [
-        [
-            swap CHAR: . over member? [
-                ".." split1 [ hex> ] bi@ 2array
-            ] [ hex> ] if range,
-        ] assoc-each
-    ] { } make <interval-map> ;
-
-: process-script ( ranges -- table )
-    dup values prune interned
-    [ expand-ranges ] with-variable ;
-
-: load-script ( filename -- table )
-    parse-script process-script ;
 
 [ name>char [ "Invalid character" throw ] unless* ]
 name>char-hook set-global

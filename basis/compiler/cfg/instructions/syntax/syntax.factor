@@ -13,10 +13,10 @@ IN: compiler.cfg.instructions.syntax
 : insn-effect ( word -- effect )
     boa-effect in>> but-last f <effect> ;
 
-: INSN:
+SYNTAX: INSN:
     parse-tuple-definition "regs" suffix
     [ dup tuple eq? [ drop insn-word ] when ] dip
     [ define-tuple-class ]
     [ 2drop save-location ]
     [ 2drop [ ] [ '[ f _ boa , ] ] [ insn-effect ] tri define-inline ]
-    3tri ; parsing
+    3tri ;

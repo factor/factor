@@ -34,14 +34,13 @@ M: too-many-arguments summary
 
 PRIVATE>
 
-: define-memoized ( word quot -- )
-    [ H{ } clone ] dip
-    [ pick stack-effect make-memoizer define ]
-    [ nip "memo-quot" set-word-prop ]
-    [ drop "memoize" set-word-prop ]
+: define-memoized ( word quot effect -- )
+    [ drop "memo-quot" set-word-prop ]
+    [ 2drop H{ } clone "memoize" set-word-prop ]
+    [ [ [ dup "memoize" word-prop ] 2dip make-memoizer ] keep define-declared ]
     3tri ;
 
-: MEMO: (:) define-memoized ; parsing
+SYNTAX: MEMO: (:) define-memoized ;
 
 PREDICATE: memoized < word "memoize" word-prop ;
 
