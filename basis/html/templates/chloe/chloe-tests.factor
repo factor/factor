@@ -5,7 +5,7 @@ splitting unicode.categories furnace accessors
 html.templates.chloe.compiler ;
 IN: html.templates.chloe.tests
 
-: run-template
+: run-template ( quot -- string )
     with-string-writer [ "\r\n\t" member? not ] filter
     "?>" split1 nip ; inline
 
@@ -37,7 +37,7 @@ IN: html.templates.chloe.tests
     ] run-template
 ] unit-test
 
-: test4-aux? t ;
+: test4-aux? ( -- ? ) t ;
 
 [ "True" ] [
     [
@@ -45,7 +45,7 @@ IN: html.templates.chloe.tests
     ] run-template
 ] unit-test
 
-: test5-aux? f ;
+: test5-aux? ( -- ? ) f ;
 
 [ "" ] [
     [

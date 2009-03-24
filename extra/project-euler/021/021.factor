@@ -35,4 +35,4 @@ IN: project-euler.021
 ! [ euler021 ] 100 ave-time
 ! 335 ms ave run time - 18.63 SD (100 trials)
 
-MAIN: euler021
+SOLUTION: euler021

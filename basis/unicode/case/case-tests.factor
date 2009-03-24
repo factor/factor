@@ -1,6 +1,7 @@
 ! Copyright (C) 2008, 2009 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: unicode.case unicode.case.private tools.test namespaces strings unicode.normalize ;
+USING: unicode.case tools.test namespaces strings unicode.normalize
+unicode.case.private ;
 IN: unicode.case.tests
 
 \ >upper must-infer

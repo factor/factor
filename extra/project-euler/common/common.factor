@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make math math.functions math.matrices math.miller-rabin
     math.order math.parser math.primes.factors math.ranges math.ratios
-    sequences sorting strings unicode.case ;
+    sequences sorting strings unicode.case parser accessors vocabs.parser
+    namespaces vocabs words quotations prettyprint ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -129,4 +130,11 @@ PRIVATE>
     { { 1 2 2 } { 2 1 2 } { 2 2 3 } } transform ;
 : d-transform ( triple -- new-triple )
     { { -1 -2 -2 } { 2 1 2 } { 2 2 3 } } transform ;
+
+SYNTAX: SOLUTION:
+    scan-word
+    [ name>> "-main" append create-in ] keep
+    [ drop in get vocab (>>main) ]
+    [ [ . ] swap prefix (( -- )) define-declared ]
+    2bi ;
 

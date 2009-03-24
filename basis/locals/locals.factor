@@ -1,31 +1,29 @@
-! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
+! Copyright (C) 2007, 2009 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lexer macros memoize parser sequences vocabs
 vocabs.loader words kernel namespaces locals.parser locals.types
 locals.errors ;
 IN: locals
 
-: :>
+SYNTAX: :>
     scan locals get [ :>-outside-lambda-error ] unless*
-    [ make-local ] bind <def> parsed ; parsing
+    [ make-local ] bind <def> parsed ;
 
-: [| parse-lambda over push-all ; parsing
+SYNTAX: [| parse-lambda over push-all ;
 
-: [let parse-let over push-all ; parsing
+SYNTAX: [let parse-let over push-all ;
 
-: [let* parse-let* over push-all ; parsing
+SYNTAX: [let* parse-let* over push-all ;
 
-: [wlet parse-wlet over push-all ; parsing
+SYNTAX: [wlet parse-wlet over push-all ;
 
-: :: (::) define ; parsing
+SYNTAX: :: (::) define-declared ;
 
-: M:: (M::) define ; parsing
+SYNTAX: M:: (M::) define ;
 
-: MACRO:: (::) define-macro ; parsing
+SYNTAX: MACRO:: (::) define-macro ;
 
-: MEMO:: (::) define-memoized ; parsing
-
-USE: syntax
+SYNTAX: MEMO:: (::) define-memoized ;
 
 {
     "locals.macros"

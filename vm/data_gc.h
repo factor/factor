@@ -30,7 +30,7 @@ u64 decks_scanned;
 CELL code_heap_scans;
 
 /* What generation was being collected when copy_code_heap_roots() was last
-called? Until the next call to add_compiled_block(), future
+called? Until the next call to add_code_block(), future
 collections of younger generations don't have to touch the code
 heap. */
 CELL last_code_heap_scan;

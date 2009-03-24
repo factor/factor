@@ -36,7 +36,7 @@ IN: tools.walker.tests
     [ 2 2 fixnum+ ] test-walker
 ] unit-test
 
-: foo 2 2 fixnum+ ;
+: foo ( -- x ) 2 2 fixnum+ ;
 
 [ { 8 } ] [
     [ foo 4 fixnum+ ] test-walker

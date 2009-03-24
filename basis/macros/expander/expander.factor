@@ -1,8 +1,8 @@
-! Copyright (C) 2008 Slava Pestov.
+! Copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private namespaces make
 quotations accessors words continuations vectors effects math
-generalizations fry ;
+generalizations fry arrays ;
 IN: macros.expander
 
 GENERIC: expand-macros ( quot -- quot' )
@@ -17,7 +17,23 @@ SYMBOL: stack
     [ delete-all ]
     bi ;
 
-: literal ( obj -- ) stack get push ;
+GENERIC: condomize? ( obj -- ? )
+
+M: array condomize? [ condomize? ] any? ;
+
+M: callable condomize? [ condomize? ] any? ;
+
+M: object condomize? drop f ;
+
+GENERIC: condomize ( obj -- obj' )
+
+M: array condomize [ condomize ] map ;
+
+M: callable condomize [ condomize ] map ;
+
+M: object condomize ;
+
+: literal ( obj -- ) dup condomize? [ condomize ] when stack get push ;
 
 GENERIC: expand-macros* ( obj -- )
 

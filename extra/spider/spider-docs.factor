@@ -23,7 +23,7 @@ HELP: slurp-heap-while
 
 ARTICLE: "spider-tutorial" "Spider tutorial"
 "To create a new spider, call the " { $link <spider> } " word with a link to the site you wish to spider."
-{ $code <" "http://concatentative.org" <spider> "> }
+{ $code <" "http://concatenative.org" <spider> "> }
 "The max-depth is initialized to 0, which retrieves just the initial page. Let's initialize it to something more fun:"
 { $code <" 1 >>max-depth "> }
 "Now the spider will retrieve the first page and all the pages it links to in the same domain." $nl

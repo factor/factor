@@ -19,10 +19,10 @@ ebcdic-fisea "EBCDIC-FI-SE-A" register-encoding
     "csEBCDICFISEA" n>e-table get delete-at
     ebcdic-fisea e>n-table get delete-at
 ] unit-test
-[ "EBCDIC-FI-SE-A" name>encoding ] must-fail
-[ "csEBCDICFISEA" name>encoding ] must-fail
-[ ebcdic-fisea encoding>name ] must-fail
+[ f ] [ "EBCDIC-FI-SE-A" name>encoding ] unit-test
+[ f ] [ "csEBCDICFISEA" name>encoding ] unit-test
+[ f ] [ ebcdic-fisea encoding>name ] unit-test
 
 [ ebcdic-fisea "foobar" register-encoding ] must-fail
-[ "foobar" name>encoding ] must-fail
-[ ebcdic-fisea encoding>name ] must-fail
+[ f ] [ "foobar" name>encoding ] unit-test
+[ f ] [ ebcdic-fisea encoding>name ] unit-test

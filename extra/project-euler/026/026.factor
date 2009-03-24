@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.primes math.ranges sequences ;
+USING: kernel math math.functions math.primes math.ranges sequences project-euler.common ;
 IN: project-euler.026
 
 ! http://projecteuler.net/index.php?section=problems&id=26
@@ -68,4 +68,4 @@ PRIVATE>
 ! [ euler026 ] 100 ave-time
 ! 290 ms ave run time - 19.2 SD (100 trials)
 
-MAIN: euler026
+SOLUTION: euler026

@@ -44,8 +44,8 @@ PRIVATE>
 
 : run-project-euler ( -- )
     problem-prompt dup problem-solved? [
+        "Answer: " write
         dup number>euler "project-euler." prepend run
-        "Answer: " write dup number? [ number>string ] when print
         "Source: " write solution-path .
     ] [
         drop "That problem has not been solved yet..." print

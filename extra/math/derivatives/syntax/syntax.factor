@@ -5,6 +5,6 @@ USING: kernel parser words effects accessors sequences
     
 IN: math.derivatives.syntax
 
-: DERIVATIVE: scan-object dup stack-effect in>> length [1,b] 
+SYNTAX: DERIVATIVE: scan-object dup stack-effect in>> length [1,b] 
     [ drop scan-object ] map 
-    "derivative" set-word-prop ; parsing
+    "derivative" set-word-prop ;

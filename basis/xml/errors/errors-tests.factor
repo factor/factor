@@ -1,5 +1,5 @@
 USING: continuations xml xml.errors tools.test kernel arrays
-xml.data quotations fry ;
+xml.data quotations fry byte-arrays ;
 IN: xml.errors.tests
 
 : xml-error-test ( expected-error xml-string -- )
@@ -40,3 +40,4 @@ T{ bad-doctype f 1 22 T{ opener { name T{ name f "" "foo" "" } } { attrs T{ attr
 T{ disallowed-char f 1 4 1 } "<x>\u000001</x>" xml-error-test
 T{ missing-close f 1 8 } "<!-- foo" xml-error-test
 T{ misplaced-directive f 1 9 "ENTITY" } "<!ENTITY foo 'bar'><x/>" xml-error-test
+[ "<?xml version='1.0' encoding='foobar'?>" >byte-array bytes>xml ] [ T{ bad-encoding f 1 39 "foobar" } = ] must-fail-with

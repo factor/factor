@@ -32,7 +32,7 @@ big-endian off
     temp0 PUSH
     ! alignment
     stack-reg stack-frame-size 3 bootstrap-cells - SUB
-] rc-absolute-cell rt-label 1 rex-length + jit-prolog jit-define
+] rc-absolute-cell rt-this 1 rex-length + jit-prolog jit-define
 
 [
     ! load literal

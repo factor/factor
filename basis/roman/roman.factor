@@ -74,4 +74,4 @@ PRIVATE>
 : roman/mod ( str1 str2 -- str3 str4 )
     [ /mod ] binary-roman-op [ >roman ] dip ;
 
-: ROMAN: scan roman> parsed ; parsing
+SYNTAX: ROMAN: scan roman> parsed ;

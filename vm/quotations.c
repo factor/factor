@@ -94,37 +94,30 @@ F_ARRAY *code_to_emit(CELL code)
 	return untag_object(array_nth(untag_object(code),0));
 }
 
-F_REL rel_to_emit(CELL code, CELL code_format, CELL code_length,
-	CELL rel_argument, bool *rel_p)
+F_REL rel_to_emit(CELL code, CELL code_format, CELL code_length, bool *rel_p)
 {
 	F_ARRAY *quadruple = untag_object(code);
 	CELL rel_class = array_nth(quadruple,1);
 	CELL rel_type = array_nth(quadruple,2);
 	CELL offset = array_nth(quadruple,3);
 
-	F_REL rel;
-
 	if(rel_class == F)
 	{
 		*rel_p = false;
-		rel.type = 0;
-		rel.offset = 0;
+		return 0;
 	}
 	else
 	{
 		*rel_p = true;
-		rel.type = to_fixnum(rel_type)
-			| (to_fixnum(rel_class) << 8)
-			| (rel_argument << 16);
-		rel.offset = (code_length + to_fixnum(offset)) * code_format;
+		return (to_fixnum(rel_type) << 28)
+			| (to_fixnum(rel_class) << 24)
+			| ((code_length + to_fixnum(offset)) * code_format);
 	}
-
-	return rel;
 }
 
-#define EMIT(name,rel_argument) { \
+#define EMIT(name) { \
 		bool rel_p; \
-		F_REL rel = rel_to_emit(name,code_format,code_count,rel_argument,&rel_p); \
+		F_REL rel = rel_to_emit(name,code_format,code_count,&rel_p); \
 		if(rel_p) GROWABLE_BYTE_ARRAY_APPEND(relocation,&rel,sizeof(F_REL)); \
 		GROWABLE_ARRAY_APPEND(code,code_to_emit(name)); \
 	}
@@ -157,8 +150,8 @@ bool jit_stack_frame_p(F_ARRAY *array)
 
 void set_quot_xt(F_QUOTATION *quot, F_CODE_BLOCK *code)
 {
-	if(code->type != QUOTATION_TYPE)
-		critical_error("bad param to set_quot_xt",(CELL)code);
+	if(code->block.type != QUOTATION_TYPE)
+		critical_error("Bad param to set_quot_xt",(CELL)code);
 
 	quot->code = code;
 	quot->xt = (XT)(code + 1);
@@ -192,7 +185,7 @@ void jit_compile(CELL quot, bool relocate)
 	bool stack_frame = jit_stack_frame_p(untag_object(array));
 
 	if(stack_frame)
-		EMIT(userenv[JIT_PROLOG],0);
+		EMIT(userenv[JIT_PROLOG]);
 
 	CELL i;
 	CELL length = array_capacity(untag_object(array));
@@ -217,35 +210,36 @@ void jit_compile(CELL quot, bool relocate)
 					GROWABLE_ARRAY_ADD(literals,T);
 				}
 
-				EMIT(word->subprimitive,literals_count - 1);
+				EMIT(word->subprimitive);
 			}
 			else
 			{
-				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
+				GROWABLE_ARRAY_ADD(literals,obj);
 
 				if(i == length - 1)
 				{
 					if(stack_frame)
-						EMIT(userenv[JIT_EPILOG],0);
+						EMIT(userenv[JIT_EPILOG]);
 
-					EMIT(userenv[JIT_WORD_JUMP],literals_count - 1);
+					EMIT(userenv[JIT_WORD_JUMP]);
 
 					tail_call = true;
 				}
 				else
-					EMIT(userenv[JIT_WORD_CALL],literals_count - 1);
+					EMIT(userenv[JIT_WORD_CALL]);
 			}
 			break;
 		case WRAPPER_TYPE:
 			wrapper = untag_object(obj);
 			GROWABLE_ARRAY_ADD(literals,wrapper->object);
-			EMIT(userenv[JIT_PUSH_IMMEDIATE],literals_count - 1);
+			EMIT(userenv[JIT_PUSH_IMMEDIATE]);
 			break;
 		case FIXNUM_TYPE:
 			if(jit_primitive_call_p(untag_object(array),i))
 			{
-				EMIT(userenv[JIT_SAVE_STACK],0);
-				EMIT(userenv[JIT_PRIMITIVE],to_fixnum(obj));
+				EMIT(userenv[JIT_SAVE_STACK]);
+				GROWABLE_ARRAY_ADD(literals,obj);
+				EMIT(userenv[JIT_PRIMITIVE]);
 
 				i++;
 
@@ -256,15 +250,15 @@ void jit_compile(CELL quot, bool relocate)
 			if(jit_fast_if_p(untag_object(array),i))
 			{
 				if(stack_frame)
-					EMIT(userenv[JIT_EPILOG],0);
+					EMIT(userenv[JIT_EPILOG]);
 
 				jit_compile(array_nth(untag_object(array),i),relocate);
 				jit_compile(array_nth(untag_object(array),i + 1),relocate);
 
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
-				EMIT(userenv[JIT_IF_1],literals_count - 1);
+				EMIT(userenv[JIT_IF_1]);
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i + 1));
-				EMIT(userenv[JIT_IF_2],literals_count - 1);
+				EMIT(userenv[JIT_IF_2]);
 
 				i += 2;
 
@@ -276,7 +270,7 @@ void jit_compile(CELL quot, bool relocate)
 				jit_compile(obj,relocate);
 
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
-				EMIT(userenv[JIT_DIP],literals_count - 1);
+				EMIT(userenv[JIT_DIP]);
 
 				i++;
 				break;
@@ -286,7 +280,7 @@ void jit_compile(CELL quot, bool relocate)
 				jit_compile(obj,relocate);
 
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
-				EMIT(userenv[JIT_2DIP],literals_count - 1);
+				EMIT(userenv[JIT_2DIP]);
 
 				i++;
 				break;
@@ -296,7 +290,7 @@ void jit_compile(CELL quot, bool relocate)
 				jit_compile(obj,relocate);
 
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
-				EMIT(userenv[JIT_3DIP],literals_count - 1);
+				EMIT(userenv[JIT_3DIP]);
 
 				i++;
 				break;
@@ -305,10 +299,10 @@ void jit_compile(CELL quot, bool relocate)
 			if(jit_fast_dispatch_p(untag_object(array),i))
 			{
 				if(stack_frame)
-					EMIT(userenv[JIT_EPILOG],0);
+					EMIT(userenv[JIT_EPILOG]);
 
 				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
-				EMIT(userenv[JIT_DISPATCH],literals_count - 1);
+				EMIT(userenv[JIT_DISPATCH]);
 
 				i++;
 
@@ -322,7 +316,7 @@ void jit_compile(CELL quot, bool relocate)
 			}
 		default:
 			GROWABLE_ARRAY_ADD(literals,obj);
-			EMIT(userenv[JIT_PUSH_IMMEDIATE],literals_count - 1);
+			EMIT(userenv[JIT_PUSH_IMMEDIATE]);
 			break;
 		}
 	}
@@ -330,16 +324,16 @@ void jit_compile(CELL quot, bool relocate)
 	if(!tail_call)
 	{
 		if(stack_frame)
-			EMIT(userenv[JIT_EPILOG],0);
+			EMIT(userenv[JIT_EPILOG]);
 
-		EMIT(userenv[JIT_RETURN],0);
+		EMIT(userenv[JIT_RETURN]);
 	}
 
 	GROWABLE_ARRAY_TRIM(code);
 	GROWABLE_ARRAY_TRIM(literals);
 	GROWABLE_BYTE_ARRAY_TRIM(relocation);
 
-	F_CODE_BLOCK *compiled = add_compiled_block(
+	F_CODE_BLOCK *compiled = add_code_block(
 		QUOTATION_TYPE,
 		untag_object(code),
 		NULL,

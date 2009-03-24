@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.primes sequences ;
+USING: arrays kernel locals math math.primes sequences project-euler.common ;
 IN: project-euler.050
 
 ! http://projecteuler.net/index.php?section=problems&id=50
@@ -87,4 +87,4 @@ PRIVATE>
 ! [ euler050 ] 100 ave-time
 ! 291 ms run / 20.6 ms GC ave time - 100 trials
 
-MAIN: euler050
+SOLUTION: euler050

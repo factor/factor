@@ -27,19 +27,17 @@ combinators vocabs.parser grouping ;
 
 IN: vocabs.loader.test.2
 
-: hello 3 ;
+: hello ( -- ) ;
 
 MAIN: hello
 
 IN: vocabs.loader.tests
 
-[ { 3 3 3 } ] [
+[ ] [
     "vocabs.loader.test.2" run
     "vocabs.loader.test.2" vocab run
     "vocabs.loader.test.2" <vocab-link> run
-    3array
 ] unit-test
-
 
 [
     "resource:core/vocabs/loader/test/a/a.factor" forget-source
@@ -134,7 +132,7 @@ IN: vocabs.loader.tests
     "vocabs.loader.test.d" vocab source-loaded?>>
 ] unit-test
 
-: forget-junk
+: forget-junk ( -- )
     [
         { "2" "a" "b" "d" "e" "f" }
         [

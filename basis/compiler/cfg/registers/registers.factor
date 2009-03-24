@@ -17,6 +17,6 @@ C: <ds-loc> ds-loc
 TUPLE: rs-loc < loc ;
 C: <rs-loc> rs-loc
 
-: V scan-word scan-word vreg boa parsed ; parsing
-: D scan-word <ds-loc> parsed ; parsing
-: R scan-word <rs-loc> parsed ; parsing
+SYNTAX: V scan-word scan-word vreg boa parsed ;
+SYNTAX: D scan-word <ds-loc> parsed ;
+SYNTAX: R scan-word <rs-loc> parsed ;

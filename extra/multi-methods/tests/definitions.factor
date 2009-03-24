@@ -26,7 +26,7 @@ DEFER: fake
 
     DEFER: testing
 
-    [ ] [ \ testing define-generic ] unit-test
+    [ ] [ \ testing (( -- )) define-generic ] unit-test
 
     [ t ] [ \ testing generic? ] unit-test
 ] with-compilation-unit

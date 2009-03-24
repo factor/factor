@@ -3,7 +3,7 @@
 USING: words parser alien alien.c-types kernel fry accessors ;
 IN: core-text.utilities
 
-: C-GLOBAL:
+SYNTAX: C-GLOBAL:
     CREATE-WORD
     dup name>> '[ _ f dlsym *void* ]
-    (( -- value )) define-declared ; parsing
+    (( -- value )) define-declared ;

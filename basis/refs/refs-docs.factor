@@ -37,14 +37,14 @@ HELP: key-ref
 { $class-description "Instances of this class identify a key in an associative structure. New key references are created by calling " { $link <key-ref> } "." } ;
 
 HELP: <key-ref>
-{ $values { "key" object } { "assoc" "an assoc" } { "ref" key-ref } }
+{ $values { "assoc" "an assoc" } { "key" object } { "key-ref" key-ref } }
 { $description "Creates a reference to a key stored in an assoc." } ;
 
 HELP: value-ref
 { $class-description "Instances of this class identify a value associated to a key in an associative structure. New value references are created by calling " { $link <value-ref> } "." } ;
 
 HELP: <value-ref>
-{ $values { "key" object } { "assoc" "an assoc" } { "ref" value-ref } }
+{ $values { "assoc" "an assoc" } { "key" object } { "value-ref" value-ref } }
 { $description "Creates a reference to the value associated with " { $snippet "key" } " in " { $snippet "assoc" } "." } ;
 
 { get-ref set-ref delete-ref } related-words

@@ -2,20 +2,33 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math math.order words combinators locals
 ascii unicode.categories combinators.short-circuit sequences
-fry macros arrays assocs sets classes mirrors ;
+fry macros arrays assocs sets classes mirrors unicode.script
+unicode.data ;
 IN: regexp.classes
 
-SINGLETONS: any-char any-char-no-nl
-letter-class LETTER-class Letter-class digit-class
+SINGLETONS: dot letter-class LETTER-class Letter-class digit-class
 alpha-class non-newline-blank-class
 ascii-class punctuation-class java-printable-class blank-class
 control-character-class hex-digit-class java-blank-class c-identifier-class
 unmatchable-class terminator-class word-boundary-class ;
 
-SINGLETONS: beginning-of-input ^ end-of-input $ end-of-file ^unix $unix word-break ;
+SINGLETONS: beginning-of-input ^ end-of-input $ end-of-file
+^unix $unix word-break ;
 
-TUPLE: range from to ;
-C: <range> range
+TUPLE: range-class from to ;
+C: <range-class> range-class
+
+TUPLE: primitive-class class ;
+C: <primitive-class> primitive-class
+
+TUPLE: category-class category ;
+C: <category-class> category-class
+
+TUPLE: category-range-class category ;
+C: <category-range-class> category-range-class
+
+TUPLE: script-class script ;
+C: <script-class> script-class
 
 GENERIC: class-member? ( obj class -- ? )
 
@@ -23,14 +36,8 @@ M: t class-member? ( obj class -- ? ) 2drop t ;
 
 M: integer class-member? ( obj class -- ? ) = ;
 
-M: range class-member? ( obj class -- ? )
+M: range-class class-member? ( obj class -- ? )
     [ from>> ] [ to>> ] bi between? ;
-
-M: any-char class-member? ( obj class -- ? )
-    2drop t ;
-
-M: any-char-no-nl class-member? ( obj class -- ? )
-    drop CHAR: \n = not ;
 
 M: letter-class class-member? ( obj class -- ? )
     drop letter? ;
@@ -99,21 +106,27 @@ M: unmatchable-class class-member? ( obj class -- ? )
 M: terminator-class class-member? ( obj class -- ? )
     drop "\r\n\u000085\u002029\u002028" member? ;
 
-M: ^ class-member? ( obj class -- ? )
-    2drop f ;
-
-M: $ class-member? ( obj class -- ? )
-    2drop f ;
-
 M: f class-member? 2drop f ;
 
-TUPLE: primitive-class class ;
-C: <primitive-class> primitive-class
+: same? ( obj1 obj2 quot1: ( obj1 -- val1 ) quot2: ( obj2 -- val2 ) -- ? )
+    bi* = ; inline
+
+M: script-class class-member?
+    [ script-of ] [ script>> ] same? ;
+
+M: category-class class-member?
+    [ category ] [ category>> ] same? ;
+
+M: category-range-class class-member?
+    [ category first ] [ category>> ] same? ;
 
 TUPLE: not-class class ;
 
 PREDICATE: not-integer < not-class class>> integer? ;
-PREDICATE: not-primitive < not-class class>> primitive-class? ;
+
+UNION: simple-class
+    primitive-class range-class dot ;
+PREDICATE: not-simple < not-class class>> simple-class? ;
 
 M: not-class class-member?
     class>> class-member? not ;
@@ -140,14 +153,14 @@ DEFER: substitute
         [ drop class new seq { } like >>seq ]
     } case ; inline
 
-TUPLE: class-partition integers not-integers primitives not-primitives and or other ;
+TUPLE: class-partition integers not-integers simples not-simples and or other ;
 
 : partition-classes ( seq -- class-partition )
     prune
     [ integer? ] partition
     [ not-integer? ] partition
-    [ primitive-class? ] partition ! extend primitive-class to epsilon tags
-    [ not-primitive? ] partition
+    [ simple-class? ] partition
+    [ not-simple? ] partition
     [ and-class? ] partition
     [ or-class? ] partition
     class-partition boa ;
@@ -161,17 +174,17 @@ TUPLE: class-partition integers not-integers primitives not-primitives and or ot
 
 : filter-not-integers ( partition -- partition' )
     dup
-    [ primitives>> ] [ not-primitives>> ] [ or>> ] tri
+    [ simples>> ] [ not-simples>> ] [ or>> ] tri
     3append and-class boa
     '[ [ class>> _ class-member? ] filter ] change-not-integers ;
 
 : answer-ors ( partition -- partition' )
-    dup [ not-integers>> ] [ not-primitives>> ] [ primitives>> ] tri 3append
+    dup [ not-integers>> ] [ not-simples>> ] [ simples>> ] tri 3append
     '[ [ _ [ t substitute ] each ] map ] change-or ;
 
 : contradiction? ( partition -- ? )
     {
-        [ [ primitives>> ] [ not-primitives>> ] bi intersects? ]
+        [ [ simples>> ] [ not-simples>> ] bi intersects? ]
         [ other>> f swap member? ]
     } 1|| ;
 
@@ -192,17 +205,17 @@ TUPLE: class-partition integers not-integers primitives not-primitives and or ot
 
 : filter-integers ( partition -- partition' )
     dup
-    [ primitives>> ] [ not-primitives>> ] [ and>> ] tri
+    [ simples>> ] [ not-simples>> ] [ and>> ] tri
     3append or-class boa
     '[ [ _ class-member? not ] filter ] change-integers ;
 
 : answer-ands ( partition -- partition' )
-    dup [ integers>> ] [ not-primitives>> ] [ primitives>> ] tri 3append
+    dup [ integers>> ] [ not-simples>> ] [ simples>> ] tri 3append
     '[ [ _ [ f substitute ] each ] map ] change-and ;
 
 : tautology? ( partition -- ? )
     {
-        [ [ primitives>> ] [ not-primitives>> ] bi intersects? ]
+        [ [ simples>> ] [ not-simples>> ] bi intersects? ]
         [ other>> t swap member? ]
     } 1|| ;
 
@@ -217,7 +230,10 @@ TUPLE: class-partition integers not-integers primitives not-primitives and or ot
     dup or-class flatten partition-classes
     dup not-integers>> length {
         { 0 [ nip make-or-class ] }
-        { 1 [ not-integers>> first [ class>> '[ _ swap class-member? ] any? ] keep or ] }
+        { 1 [
+            not-integers>> first
+            [ class>> '[ _ swap class-member? ] any? ] keep or
+        ] }
         [ 3drop t ]
     } case ;
 
@@ -238,10 +254,14 @@ M: or-class <not-class>
 M: t <not-class> drop f ;
 M: f <not-class> drop t ;
 
+: <minus-class> ( a b -- a-b )
+    <not-class> 2array <and-class> ;
+
+: <sym-diff-class> ( a b -- a~b )
+    2array [ <or-class> ] [ <and-class> ] bi <minus-class> ;
+
 M: primitive-class class-member?
     class>> class-member? ;
-
-UNION: class primitive-class not-class or-class and-class range ;
 
 TUPLE: condition question yes no ;
 C: <condition> condition
