@@ -89,7 +89,7 @@ M: browser-gadget focusable-child* search-field>> ;
 
 : show-browser ( -- )
     [ browser-gadget? ] find-window
-    [ raise-window ] [ browser-window ] if* ;
+    [ [ raise-window ] [ request-focus ] bi ] [ browser-window ] if* ;
 
 \ show-browser H{ { +nullary+ t } } define-command
 
