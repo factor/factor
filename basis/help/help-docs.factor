@@ -69,12 +69,6 @@ ARTICLE: "element-types" "Element types"
 IN: help.markup
 ABOUT: "element-types"
 
-ARTICLE: "browsing-help" "Browsing documentation"
-"The easiest way to browse the help is from the help browser tool in the UI, however you can also display help topics in the listener. Help topics are identified by article name strings, or words. You can request a specific help topic:"
-{ $subsection help }
-"You can also display the main help article for a vocabulary:"
-{ $subsection about } ;
-
 ARTICLE: "writing-help" "Writing documentation"
 "By convention, documentation is written in files whose names end with " { $snippet "-docs.factor" } ". Vocabulary documentation should be placed in the same directory as the vocabulary source code; see " { $link "vocabs.loader" } "."
 $nl
@@ -147,11 +141,6 @@ HELP: help
 { $values { "topic" "an article name or a word" } }
 { $description
     "Displays a help topic."
-} ;
-HELP: about
-{ $values { "vocab" "a vocabulary specifier" } }
-{ $description
-    "Displays the main help article for the vocabulary. The main help article is set with the " { $link POSTPONE: ABOUT: } " parsing word."
 } ;
 
 HELP: :help

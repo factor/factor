@@ -98,17 +98,13 @@ netbsd-x86-32:
 netbsd-x86-64:
 	$(MAKE) $(EXECUTABLE) CONFIG=vm/Config.netbsd.x86.64
 
-macosx-freetype:
-	ln -sf libfreetype.6.dylib \
-		Factor.app/Contents/Frameworks/libfreetype.dylib
-
-macosx-ppc: macosx-freetype
+macosx-ppc:
 	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.ppc
 
-macosx-x86-32: macosx-freetype
+macosx-x86-32:
 	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.x86.32
 
-macosx-x86-64: macosx-freetype
+macosx-x86-64:
 	$(MAKE) $(EXECUTABLE) macosx.app CONFIG=vm/Config.macosx.x86.64
 
 linux-x86-32:

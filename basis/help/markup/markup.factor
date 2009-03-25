@@ -140,6 +140,9 @@ ALIAS: $slot $snippet
 : $image ( element -- )
     [ [ "" ] dip first image associate format ] ($span) ;
 
+: <$image> ( path -- element )
+    1array \ $image prefix ;
+
 ! Some links
 : write-link ( string object -- )
     link-style get [ write-object ] with-style ;
