@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs bson.constants byte-arrays byte-vectors
-calendar fry io io.binary io.encodings io.encodings.string
+calendar fry io io.binary io.encodings io.encodings.string io.encodings.private
 io.encodings.utf8 kernel math math.parser namespaces quotations
-sequences serialize strings tools.walker words ;
+sequences sequences.private serialize strings tools.walker words ;
 
 
 IN: bson.writer
@@ -20,18 +20,18 @@ CONSTANT: INT64-SIZE 8
 
 : (buffer) ( -- buffer )
     shared-buffer get
-    [ 4096 <byte-vector> [ shared-buffer set ] keep ] unless* ; inline
+    [ 8192 <byte-vector> [ shared-buffer set ] keep ] unless* ; inline
 
 PRIVATE>
+
+: reset-buffer ( buffer -- )
+    0 >>length drop ; inline
 
 : ensure-buffer ( -- )
     (buffer) drop ; inline
 
-: reset-buffer ( -- )
-    (buffer) 0 >>length drop ; inline
-
 : with-buffer ( quot -- byte-vector )
-    [ (buffer) ] dip [ output-stream get ] compose
+    [ (buffer) [ reset-buffer ] keep dup ] dip
     with-output-stream* dup encoder? [ stream>> ] when ; inline
 
 : with-length ( quot: ( -- ) -- bytes-written start-index )
@@ -41,9 +41,15 @@ PRIVATE>
 : with-length-prefix ( quot: ( -- ) -- )
     [ B{ 0 0 0 0 } write ] prepose with-length
     [ INT32-SIZE >le ] dip (buffer)
-    '[ _ over [ nth ] dip _ + _ set-nth ]
+    '[ _ over [ nth-unsafe ] dip _ + _ set-nth-unsafe ]
     [ INT32-SIZE ] dip each-integer ; inline
 
+: with-length-prefix-excl ( quot: ( -- ) -- )
+    [ B{ 0 0 0 0 } write ] prepose with-length
+    [ INT32-SIZE - INT32-SIZE >le ] dip (buffer)
+    '[ _ over [ nth-unsafe ] dip _ + _ set-nth-unsafe ]
+    [ INT32-SIZE ] dip each-integer ; inline
+    
 <PRIVATE
 
 GENERIC: bson-type? ( obj -- type ) foldable flushable
@@ -68,10 +74,11 @@ M: objref bson-type? ( objref -- type ) drop T_Binary ;
 M: quotation bson-type? ( quotation -- type ) drop T_Binary ; 
 M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ; 
 
+: write-utf8-string ( string -- ) output-stream get utf8 encoder-write ; inline
 : write-byte ( byte -- ) CHAR-SIZE >le write ; inline
 : write-int32 ( int -- ) INT32-SIZE >le write ; inline
 : write-double ( real -- ) double>bits INT64-SIZE >le write ; inline
-: write-cstring ( string -- ) utf8 encode B{ 0 } append write ; inline
+: write-cstring ( string -- ) write-utf8-string B{ 0 } write ; inline
 : write-longlong ( object -- ) INT64-SIZE >le write ; inline
 
 : write-eoo ( -- ) T_EOO write-byte ; inline
@@ -85,9 +92,7 @@ M: t bson-write ( t -- )
     drop 1 write-byte ;
 
 M: string bson-write ( obj -- )
-    utf8 encode B{ 0 } append
-    [ length write-int32 ] keep
-    write ;
+    '[ _ write-cstring ] with-length-prefix-excl ;
 
 M: integer bson-write ( num -- )
     write-int32 ;
@@ -112,22 +117,18 @@ M: oid bson-write ( oid -- )
     [ a>> write-longlong ] [ b>> write-int32 ] bi ;
 
 M: objid bson-write ( oid -- )
-    id>> utf8 encode
-    [ length write-int32 ] keep
     T_Binary_UUID write-byte
-    write ;
+    id>> '[ _ write-utf8-string ] with-length-prefix ;
 
 M: objref bson-write ( objref -- )
-    [ ns>> utf8 encode ]
-    [ objid>> id>> utf8 encode ] bi
-    append
-    [ length write-int32 ] keep
     T_Binary_Custom write-byte
-    write ;
-
+    '[ _
+       [ ns>> write-cstring ]
+       [ objid>> id>> write-cstring ] bi ] with-length-prefix ;
+       
 M: mdbregexp bson-write ( regexp -- )
-   [ regexp>> utf8 encode write-cstring ]
-   [ options>> utf8 encode write-cstring ] bi ; 
+   [ regexp>> write-cstring ]
+   [ options>> write-cstring ] bi ; 
     
 M: sequence bson-write ( array -- )
     '[ _ [ [ write-type ] dip number>string

@@ -1,7 +1,7 @@
-USING: accessors bson.reader bson.writer byte-arrays byte-vectors fry
-io io.binary io.encodings.binary io.encodings.string io.encodings.utf8
-io.streams.byte-array kernel math mongodb.msg namespaces sequences
-locals assocs combinators linked-assocs ;
+USING: accessors assocs bson.reader bson.writer byte-arrays
+byte-vectors combinators formatting fry io io.binary io.encodings.private
+io.encodings.binary io.encodings.string io.encodings.utf8 io.files
+kernel locals math mongodb.msg namespaces sequences uuid ;
 
 IN: alien.c-types
 
@@ -41,7 +41,7 @@ SYMBOL: msg-bytes-read
 : write-byte ( byte -- ) 1 >le write ; inline
 : write-int32 ( int -- ) 4 >le write ; inline
 : write-double ( real -- ) double>bits 8 >le write ; inline
-: write-cstring ( string -- ) utf8 encode B{ 0 } append write ; inline
+: write-cstring ( string -- ) output-stream get utf8 encoder-write 0 write-byte ; inline
 : write-longlong ( object -- ) 8 >le write ; inline
 
 : read-int32 ( -- int32 ) 4 [ read le> ] [ change-bytes-read ] bi ; inline
@@ -150,9 +150,14 @@ PRIVATE>
 
 USE: tools.walker
 
-: (write-message) ( message quot -- )
+: dump-to-file ( array -- )
+    [ uuid1 "/tmp/mfb/%s.dump" sprintf binary ] dip
+    '[ _ write ] with-file-writer ;
+
+: (write-message) ( message quot -- )    
     '[ [ [ _ write-header ] dip _ call ] with-length-prefix ] with-buffer
-    write flush reset-buffer ; inline
+    ! [ dump-to-file ] keep
+    write flush ; inline
 
 : build-query-object ( query -- selector )
     [let | selector [ H{ } clone ] |

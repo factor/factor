@@ -5,297 +5,315 @@ IN: mongodb.driver
 
 HELP: <mdb-collection>
 { $values
-     { "name" null }
-     { "collection" null }
+  { "name" "name of the collection" }
+  { "collection" "mdb-collection instance" }
 }
-{ $description "" } ;
-
-HELP: <mdb-cursor>
-{ $values
-     { "id" null } { "collection" null } { "return#" null }
-     { "cursor" null }
-}
-{ $description "" } ;
+{ $description "Creates a new mdb-collection instance. Use this to create capped/limited collections. See also: " { $link mdb-collection } }
+{ $examples
+  { $example "\"mycollection\" <mdb-collection> t >>capped" } } ;
 
 HELP: <mdb>
 { $values
-     { "db" null } { "host" null } { "port" null }
-     { "mdb" null }
+  { "db" "name of the database to use" }
+  { "host" "host name or IP address" }
+  { "port" "port number" }
+  { "mdb" "mdb-db instance" }
 }
-{ $description "" } ;
+{ $description "Create a new mdb-db instance and automatically resolves master/slave information in a paired MongoDB setup." }
+{ $examples
+  { $example "\"db\" \"127.0.0.1\" 27017 <mdb>" } } ;
 
 HELP: <query>
 { $values
-     { "collection" "the collection to be queried" } { "query" "query" }
-     { "mdb-query" "mdb-query-msg tuple instance" }
+  { "collection" "collection to query" }
+  { "query" "query assoc" }
+  { "mdb-query" "mdb-query-msg instance" }
 }
-{ $description "create a new query instance" } ;
+{ $description "Creates a new mdb-query-msg instance. "
+  "This word must be called from within a with-db scope."
+  "For more see: "
+  { $link with-db } }
+{ $examples
+  { $example "\"mycollection\" H{ } <query>" } } ;
+
+HELP: <update>
+{ $values
+  { "collection" "collection to update" }
+  { "selector" "selector assoc (selects which object(s) to update" }
+  { "object" "updated object or update instruction" }
+  { "update-msg" "mdb-update-msg instance" }
+}
+{ $description "" } ;
+
+HELP: >upsert
+{ $values
+  { "mdb-update-msg" null }
+  { "mdb-update-msg" null }
+}
+{ $description "" } ;
 
 HELP: DIRTY?
 { $values
-    
-     { "value" null }
+  
+  { "value" null }
 }
 { $description "" } ;
 
 HELP: MDB-GENERAL-ERROR
 { $values
-    
-     { "value" null }
+  
+  { "value" null }
 }
 { $description "" } ;
 
 HELP: PARTIAL?
 { $values
-    
-     { "value" null }
+  
+  { "value" null }
 }
 { $description "" } ;
 
 HELP: asc
 { $values
-     { "key" null }
-     { "spec" null }
+  { "key" null }
+  { "spec" null }
 }
 { $description "" } ;
 
 HELP: boolean
-{ $values
-    
-     { "value" null }
-}
-{ $description "" } ;
+{ $var-description "" } ;
 
 HELP: count
 { $values
-     { "collection" null } { "query" null }
-     { "result" null }
+  { "collection" null }
+  { "query" null }
+  { "result" null }
 }
 { $description "" } ;
 
 HELP: create-collection
 { $values
-     { "name" null }
+  { "name" null }
 }
 { $description "" } ;
 
 HELP: delete
 { $values
-     { "collection" null } { "selector" null }
+  { "collection" null }
+  { "selector" null }
 }
 { $description "" } ;
 
 HELP: delete-unsafe
 { $values
-     { "collection" null } { "selector" null }
+  { "collection" null }
+  { "selector" null }
 }
 { $description "" } ;
 
 HELP: desc
 { $values
-     { "key" null }
-     { "spec" null }
+  { "key" null }
+  { "spec" null }
 }
 { $description "" } ;
 
 HELP: drop-collection
 { $values
-     { "name" null }
+  { "name" null }
 }
 { $description "" } ;
 
 HELP: drop-index
 { $values
-     { "collection" null } { "name" null }
+  { "collection" null }
+  { "name" null }
 }
 { $description "" } ;
 
 HELP: ensure-collection
 { $values
-     { "collection" null }
-     { "fq-collection" null }
+  { "collection" null }
+  { "fq-collection" null }
 }
 { $description "" } ;
 
 HELP: ensure-index
 { $values
-     { "collection" null } { "name" null } { "spec" null }
+  { "collection" null }
+  { "name" null }
+  { "spec" null }
 }
 { $description "" } ;
 
-HELP: explain
+HELP: explain.
 { $values
-     { "mdb-query" null }
-     { "result" null }
+  { "mdb-query" null }
 }
 { $description "" } ;
 
 HELP: find
 { $values
-     { "mdb-query" null }
-     { "cursor" null } { "result" null }
+  { "mdb-query" null }
+  { "cursor" null }
+  { "result" null }
 }
 { $description "" } ;
 
 HELP: find-one
 { $values
-     { "mdb-query" null }
-     { "result" null }
+  { "mdb-query" null }
+  { "result" null }
 }
 { $description "" } ;
 
 HELP: get-more
 { $values
-     { "mdb-cursor" null }
-     { "mdb-cursor" null } { "objects" null }
+  { "mdb-cursor" null }
+  { "mdb-cursor" null }
+  { "objects" null }
 }
 { $description "" } ;
 
 HELP: hint
 { $values
-     { "mdb-query" null } { "index-hint" null }
-     { "mdb-query" null }
+  { "mdb-query" null }
+  { "index-hint" null }
+  { "mdb-query" null }
 }
 { $description "" } ;
 
 HELP: lasterror
 { $values
-    
-     { "error" null }
+  
+  { "error" null }
 }
 { $description "" } ;
 
 HELP: limit
 { $values
-     { "mdb-query" null } { "limit#" null }
-     { "mdb-query" null }
+  { "mdb-query" null }
+  { "limit#" null }
+  { "mdb-query" null }
 }
 { $description "" } ;
 
 HELP: load-collection-list
 { $values
-    
-     { "collection-list" null }
+  
+  { "collection-list" null }
 }
 { $description "" } ;
 
 HELP: load-index-list
 { $values
-    
-     { "index-list" null }
+  
+  { "index-list" null }
 }
 { $description "" } ;
 
 HELP: master>>
 { $values
-     { "mdb" null }
-     { "inet" null }
+  { "mdb" null }
+  { "inet" null }
 }
 { $description "" } ;
 
 HELP: mdb
 { $values
-    
-     { "mdb" null }
+  
+  { "mdb" null }
 }
 { $description "" } ;
 
 HELP: mdb-collection
-{ $values
-    
-     { "value" null }
-}
-{ $description "" } ;
+{ $var-description "" } ;
 
 HELP: mdb-cursor
-{ $values
-    
-     { "value" null }
-}
-{ $description "" } ;
+{ $var-description "" } ;
 
 HELP: mdb-db
-{ $values
-    
-     { "value" null }
-}
-{ $description "" } ;
+{ $var-description "" } ;
 
 HELP: mdb-error
 { $values
-     { "id" null } { "msg" null }
+  { "id" null }
+  { "msg" null }
 }
 { $description "" } ;
 
 HELP: mdb-instance
-{ $values
-    
-     { "value" null }
-}
-{ $description "" } ;
+{ $var-description "" } ;
 
 HELP: mdb-node
+{ $var-description "" } ;
+
+HELP: r/
 { $values
-    
-     { "value" null }
+  { "token" null }
+  { "mdbregexp" null }
 }
 { $description "" } ;
 
 HELP: save
 { $values
-     { "collection" null } { "assoc" assoc }
+  { "collection" null }
+  { "assoc" assoc }
 }
 { $description "" } ;
 
 HELP: save-unsafe
 { $values
-     { "collection" null } { "object" object }
+  { "collection" null }
+  { "object" object }
 }
 { $description "" } ;
 
 HELP: skip
 { $values
-     { "mdb-query" null } { "skip#" null }
-     { "mdb-query" null }
+  { "mdb-query" null }
+  { "skip#" null }
+  { "mdb-query" null }
 }
 { $description "" } ;
 
 HELP: slave>>
 { $values
-     { "mdb" null }
-     { "inet" null }
+  { "mdb" null }
+  { "inet" null }
 }
 { $description "" } ;
 
 HELP: sort
 { $values
-     { "mdb-query" null } { "quot" quotation }
-     { "mdb-query" null }
+  { "mdb-query" null }
+  { "quot" quotation }
+  { "mdb-query" null }
 }
 { $description "" } ;
 
 HELP: update
 { $values
-     { "collection" null } { "selector" null } { "object" object }
+  { "mdb-update-msg" null }
 }
 { $description "" } ;
 
 HELP: update-unsafe
 { $values
-     { "collection" null } { "selector" null } { "object" object }
+  { "mdb-update-msg" null }
 }
 { $description "" } ;
 
-HELP: validate
+HELP: validate.
 { $values
-     { "collection" null }
+  { "collection" null }
 }
 { $description "" } ;
 
 HELP: with-db
 { $values
-     { "mdb" null } { "quot" quotation }
-     { "..." null }
+  { "mdb" null }
+  { "quot" quotation }
 }
 { $description "" } ;
 
@@ -304,3 +322,4 @@ ARTICLE: "mongodb.driver" "mongodb.driver"
 ;
 
 ABOUT: "mongodb.driver"
+

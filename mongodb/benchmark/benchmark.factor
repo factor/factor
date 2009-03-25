@@ -1,6 +1,6 @@
 USING: calendar math fry kernel assocs math.ranges
 sequences formatting combinators namespaces io tools.time prettyprint
-accessors words mongodb.driver strings math.parser ;
+accessors words mongodb.driver strings math.parser tools.walker bson.writer ;
 
 IN: mongodb.benchmark
 
@@ -164,7 +164,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     "_x_idx" H{ { "x" 1 } } ensure-index ; inline
 
 : insert ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
-    prepare-collection 
+    prepare-collection
     result get index>> [ [ prepare-index ] keep ] when
     result get batch>>
     [ '[ _ _ (insert-batch) ] ] [ '[ _ _ (insert) ] ] if ;
@@ -233,7 +233,7 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
    
 : run-insert-bench ( doc-word-seq feat-seq -- )
     "Insert Tests" print
-    print-separator-bold
+    print-separator-bold 
     \ insert bench-quot each ; inline
 
 : run-find-one-bench ( doc-word-seq feat-seq -- )
@@ -254,24 +254,23 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     
 : run-benchmarks ( -- )
     "db" "db" get* "host" "127.0.0.1" get* "port" 27020 get* ensure-number <mdb>
-    [
+    [   ensure-buffer
         print-header
         ! insert
-        { small-doc-prepare medium-doc-prepare large-doc-prepare }
+        ! { small-doc-prepare medium-doc-prepare
+        { large-doc-prepare }
         { { } { index } { errcheck } { index errcheck }
-          { batch } { batch errcheck }
-          { batch index errcheck } }
-        run-insert-bench
+          { batch } { batch errcheck } { batch index errcheck }
+        } run-insert-bench
         ! find-one
-        { small-doc medium-doc large-doc }
-        { { } { index } } run-find-one-bench
+        ! { small-doc medium-doc large-doc }
+        ! { { } { index } } run-find-one-bench
         ! find-all
-        { small-doc medium-doc large-doc }
-        { { } { index } } run-find-all-bench
+        ! { small-doc medium-doc large-doc }
+        ! { { } { index } } run-find-all-bench
         ! find-range
-        { small-doc medium-doc large-doc }
-        { { } { index } } run-find-range-bench
-        
+        ! { small-doc medium-doc large-doc }
+        ! { { } { index } } run-find-range-bench        
     ] with-db ;
         
 MAIN: run-benchmarks

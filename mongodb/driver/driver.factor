@@ -2,7 +2,7 @@ USING: accessors assocs bson.constants bson.writer combinators
 constructors continuations destructors formatting fry io
 io.encodings.binary io.sockets io.streams.duplex kernel linked-assocs
 math math.parser memoize mongodb.msg mongodb.operations namespaces
-parser sequences sets splitting strings uuid syntax ;
+parser prettyprint sequences sets splitting strings uuid ;
 
 IN: mongodb.driver
 
@@ -20,7 +20,6 @@ TUPLE: mdb-collection
 { size integer initial: -1 }
 { max integer initial: -1 } ;
 
-CONSTRUCTOR: mdb-cursor ( id collection return# -- cursor ) ;
 CONSTRUCTOR: mdb-collection ( name -- collection ) ;
 
 CONSTANT: MDB-GENERAL-ERROR 1
@@ -29,24 +28,6 @@ CONSTANT: PARTIAL? "partial?"
 CONSTANT: DIRTY? "dirty?"
 
 ERROR: mdb-error id msg ;
-
-<PRIVATE
-
-SYMBOL: mdb-socket-stream
-
-: mdb-stream>> ( -- stream )
-    mdb-socket-stream get ; inline
-
-: check-ok ( result -- ? )
-     [ "ok" ] dip key? ; inline 
-
-: >mdbregexp ( value -- regexp )
-   first <mdbregexp> ;
-
-PRIVATE>
-
-SYNTAX: r/ ( token -- mdbregexp )
-    \ / [ >mdbregexp ]  parse-literal ; 
 
 SYMBOL: mdb-instance
 
@@ -59,14 +40,39 @@ SYMBOL: mdb-instance
 : slave>> ( mdb -- inet )
     nodes>> [ f ] dip at inet>> ;
 
-: with-db ( mdb quot: ( -- * ) -- * )
-    [ [ '[ ensure-buffer _ [ mdb-instance set ] keep
-           master>> [ remote-address set ] keep
-           binary <client> local-address set
-           mdb-socket-stream set ] ] dip compose
-      [ mdb-stream>> [ dispose ] when* ]
-      [ ] cleanup ] with-scope ; inline
+<PRIVATE
 
+CONSTRUCTOR: mdb-cursor ( id collection return# -- cursor ) ;
+
+SYMBOL: mdb-socket-stream
+
+: >>mdb-stream ( stream -- )
+    mdb-socket-stream set ; inline
+
+: mdb-stream>> ( -- stream )
+    mdb-socket-stream get ; inline
+
+: check-ok ( result -- ? )
+     [ "ok" ] dip key? ; inline 
+
+: >mdbregexp ( value -- regexp )
+   first <mdbregexp> ; inline
+
+: prepare-mdb-session ( mdb -- stream )
+    [ mdb-instance set ] keep
+    master>> [ remote-address set ] keep
+    binary <client> local-address set ; inline    
+
+PRIVATE>
+
+SYNTAX: r/ ( token -- mdbregexp )
+    \ / [ >mdbregexp ]  parse-literal ; 
+
+: with-db ( mdb quot -- ... )
+    [ [ prepare-mdb-session ] dip
+      [ [ >>mdb-stream ] keep ] prepose
+      with-disposal ] with-scope ; inline
+  
 <PRIVATE
 
 : index-collection ( -- ns )
@@ -184,7 +190,7 @@ PRIVATE>
 
 MEMO: ensure-collection ( collection -- fq-collection )
     "." split1 over mdb name>> =
-    [ [ drop ] dip ] [ drop ] if
+    [ nip ] [ drop ] if
     [ ] [ reserved-namespace? ] bi
     [ [ (ensure-collection) ] keep ] unless
     [ mdb name>> ] dip "%s.%s" sprintf ; inline
@@ -223,9 +229,9 @@ M: mdb-query-msg find
 M: mdb-cursor find
     get-more ;
 
-GENERIC: explain ( mdb-query -- result )
-M: mdb-query-msg explain
-    t >>explain find [ drop ] dip ;
+GENERIC: explain. ( mdb-query -- )
+M: mdb-query-msg explain.
+    t >>explain find nip . ;
 
 
 GENERIC: find-one ( mdb-query -- result )
@@ -243,14 +249,14 @@ M: assoc count
     cmd-collection H{ { "getlasterror" 1 } } <mdb-query-msg>
     find-one objects>> first [ "err" ] dip at ;
 
-GENERIC: validate ( collection -- )
-M: string validate
+GENERIC: validate. ( collection -- )
+M: string validate.
     [ cmd-collection ] dip
     "validate" H{ } clone [ set-at ] keep
     <mdb-query-msg> find-one objects>> first [ check-ok ] keep
     '[ "result" _ at print ] when ;
-M: mdb-collection validate
-    name>> validate ;
+M: mdb-collection validate.
+    name>> validate. ;
 
 <PRIVATE
 
@@ -312,7 +318,7 @@ M: assoc delete-unsafe
 
 : load-index-list ( -- index-list )
     index-collection
-    H{ } clone <mdb-query-msg> find [ drop ] dip ;
+    H{ } clone <mdb-query-msg> find nip ;
 
 : drop-collection ( name -- )
     [ cmd-collection ] dip
