@@ -168,6 +168,7 @@ SYMBOL: interactive-vocabs
     "help"
     "help.apropos"
     "help.lint"
+    "help.vocabs"
     "inspector"
     "io"
     "io.files"

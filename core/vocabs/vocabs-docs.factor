@@ -96,3 +96,6 @@ $nl
 HELP: >vocab-link
 { $values { "name" string } { "vocab" "a vocabulary specifier" } }
 { $description "If the vocabulary is loaded, outputs the corresponding " { $link vocab } " instance, otherwise creates a new " { $link vocab-link } "." } ;
+
+HELP: runnable-vocab
+{ $class-description "The class of vocabularies with a " { $slot "main" } " word." } ;

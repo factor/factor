@@ -56,6 +56,7 @@ $nl
 "Application vocabularies can define a main entry point, giving the user a convenient way to run the application:"
 { $subsection POSTPONE: MAIN: }
 { $subsection run }
+{ $subsection runnable-vocab }
 { $see-also "vocabularies" "parser-files" "source-files" } ;
 
 ABOUT: "vocabs.loader"
