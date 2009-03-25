@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math namespaces sequences system
-kernel.private byte-arrays arrays init ;
+kernel.private byte-arrays arrays init io.backend ;
 IN: alien
 
 ! Some predicate classes used by the compiler for optimization
@@ -64,6 +64,7 @@ TUPLE: library path abi dll ;
     library dup [ dll>> ] when ;
 
 : add-library ( name path abi -- )
+    [ dup [ normalize-path ] when ] dip
     <library> swap libraries get set-at ;
 
 ERROR: alien-callback-error ;
