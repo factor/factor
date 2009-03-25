@@ -2,18 +2,22 @@ IN: help.home
 USING: help.markup help.syntax ;
 
 ARTICLE: "help.home" "Factor documentation"
-{ $heading "Starting points" }
+"If this is your first time with Factor, you can start by writing " { $link "first-program" } "."
+{ $heading "Reference" }
 { $list
-  { $link "ui-listener" }
   { $link "handbook" }
   { $link "vocab-index" }
+  { $link "ui-tools" }
+  { $link "handbook-library-reference" }
 }
 { $heading "Recently visited" }
 { $table
   { "Words" "Articles" "Vocabs" }
   { { $recent recent-words } { $recent recent-articles } { $recent recent-vocabs } }
-} print-element
+}
+"The browser, completion popups and other tools use a common set of " { $link "definitions.icons" } "."
 { $heading "Recent searches" }
-{ $recent-searches } ;
+{ $recent-searches }
+"Use the search field in the top-right of the " { $link "ui-browser" } " window to search for words, vocabularies and help articles." ;
 
 ABOUT: "help.home"

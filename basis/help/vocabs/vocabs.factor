@@ -9,6 +9,9 @@ make namespaces prettyprint sequences sets sorting summary
 tools.vocabs vocabs vocabs.loader words words.symbol definitions.icons ;
 IN: help.vocabs
 
+: about ( vocab -- )
+    [ require ] [ vocab help ] bi ;
+
 : $pretty-link ( element -- )
     [ first definition-icon 1array $image " " print-element ]
     [ $definition-link ]

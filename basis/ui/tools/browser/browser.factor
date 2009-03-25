@@ -78,7 +78,7 @@ M: browser-gadget focusable-child* search-field>> ;
     <browser-gadget> "Browser" open-status-window ;
 
 : browser-window ( -- )
-    "handbook" (browser-window) ;
+    "help.home" (browser-window) ;
 
 \ browser-window H{ { +nullary+ t } } define-command
 
@@ -89,7 +89,7 @@ M: browser-gadget focusable-child* search-field>> ;
 
 : show-browser ( -- )
     [ browser-gadget? ] find-window
-    [ raise-window ] [ browser-window ] if* ;
+    [ [ raise-window ] [ request-focus ] bi ] [ browser-window ] if* ;
 
 \ show-browser H{ { +nullary+ t } } define-command
 
@@ -97,7 +97,7 @@ M: browser-gadget focusable-child* search-field>> ;
 
 : com-forward ( browser -- ) model>> go-forward ;
 
-: com-documentation ( browser -- ) "help.home" swap show-help ;
+: com-home ( browser -- ) "help.home" swap show-help ;
 
 : browser-help ( -- ) "ui-browser" com-browse ;
 
@@ -106,7 +106,7 @@ M: browser-gadget focusable-child* search-field>> ;
 browser-gadget "toolbar" f {
     { T{ key-down f { A+ } "LEFT" } com-back }
     { T{ key-down f { A+ } "RIGHT" } com-forward }
-    { f com-documentation }
+    { T{ key-down f { A+ } "H" } com-home }
     { T{ key-down f f "F1" } browser-help }
 } define-command-map
 
