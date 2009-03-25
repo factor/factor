@@ -150,7 +150,7 @@ USE: tools.walker
 
 : (write-message) ( message quot -- )    
     '[ [ [ _ write-header ] dip _ call ] with-length-prefix ] with-buffer
-    [ dump-to-file ] keep
+    ! [ dump-to-file ] keep
     write flush ; inline
 
 : build-query-object ( query -- selector )
