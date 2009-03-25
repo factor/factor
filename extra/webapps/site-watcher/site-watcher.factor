@@ -71,7 +71,7 @@ CONSTANT: site-list-url URL" $site-watcher-app/"
 : <update-notify-action> ( -- action )
     <page-action>
         [
-            username <account> select-tuple from-object
+            username f <account> select-tuple from-object
         ] >>init
         { site-watcher-app "update-notify" } >>template
         [
@@ -82,8 +82,10 @@ CONSTANT: site-list-url URL" $site-watcher-app/"
             } validate-params
         ] >>validate
         [
-            username <account> select-tuple
+            username f <account> select-tuple
             "email" value >>email
+            "twitter" value >>twitter
+            "sms" value >>sms
             update-tuple
             site-list-url <redirect>
         ] >>submit
@@ -121,6 +123,10 @@ CONSTANT: site-list-url URL" $site-watcher-app/"
 <boilerplate> { site-watcher-app "site-watcher" } >>template
 site-watcher-db <alloy>
 main-responder set-global
+
+M: site-watcher-app init-user-profile
+    drop
+    "username" value "email" value <account> insert-tuple ;
 
 : init-db ( -- )
     site-watcher-db [
