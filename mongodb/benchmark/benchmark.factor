@@ -254,23 +254,23 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     
 : run-benchmarks ( -- )
     "db" "db" get* "host" "127.0.0.1" get* "port" 27020 get* ensure-number <mdb>
-    [   ensure-buffer
-        print-header
-        ! insert
-        ! { small-doc-prepare medium-doc-prepare
-        { large-doc-prepare }
-        { { } { index } { errcheck } { index errcheck }
-          { batch } { batch errcheck } { batch index errcheck }
-        } run-insert-bench
-        ! find-one
-        ! { small-doc medium-doc large-doc }
-        ! { { } { index } } run-find-one-bench
-        ! find-all
-        ! { small-doc medium-doc large-doc }
-        ! { { } { index } } run-find-all-bench
-        ! find-range
-        ! { small-doc medium-doc large-doc }
-        ! { { } { index } } run-find-range-bench        
+    [ ensure-buffer
+      print-header
+      ! insert
+      { small-doc-prepare medium-doc-prepare
+        large-doc-prepare }
+      { { } { index } { errcheck } { index errcheck }
+        { batch } { batch errcheck } { batch index errcheck }
+      } run-insert-bench
+      ! find-one
+      { small-doc medium-doc large-doc }
+      { { } { index } } run-find-one-bench
+      ! find-all
+      { small-doc medium-doc large-doc }
+      { { } { index } } run-find-all-bench
+      ! find-range
+      { small-doc medium-doc large-doc }
+      { { } { index } } run-find-range-bench        
     ] with-db ;
         
 MAIN: run-benchmarks

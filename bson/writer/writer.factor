@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs bson.constants byte-arrays byte-vectors
 calendar fry io io.binary io.encodings io.encodings.string io.encodings.private
-io.encodings.utf8 kernel math math.parser namespaces quotations
+io.encodings.utf8.private io.encodings.utf8 kernel math math.parser namespaces quotations
 sequences sequences.private serialize strings tools.walker words ;
 
 
@@ -21,6 +21,13 @@ CONSTANT: INT64-SIZE 8
 : (buffer) ( -- buffer )
     shared-buffer get
     [ 8192 <byte-vector> [ shared-buffer set ] keep ] unless* ; inline
+
+: >le-stream ( x n -- )
+    ! >le write  
+    swap '[ _ swap nth-byte 0 B{ 0 }
+            [ set-nth-unsafe ] keep write ] each
+            ; inline
+
 
 PRIVATE>
 
@@ -74,12 +81,14 @@ M: objref bson-type? ( objref -- type ) drop T_Binary ;
 M: quotation bson-type? ( quotation -- type ) drop T_Binary ; 
 M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ; 
 
-: write-utf8-string ( string -- ) output-stream get utf8 encoder-write ; inline
-: write-byte ( byte -- ) CHAR-SIZE >le write ; inline
-: write-int32 ( int -- ) INT32-SIZE >le write ; inline
-: write-double ( real -- ) double>bits INT64-SIZE >le write ; inline
-: write-cstring ( string -- ) write-utf8-string B{ 0 } write ; inline
-: write-longlong ( object -- ) INT64-SIZE >le write ; inline
+: write-utf8-string ( string -- )
+    output-stream get '[ _ swap char>utf8 ] each ; inline
+
+: write-byte ( byte -- ) CHAR-SIZE >le-stream ; inline
+: write-int32 ( int -- ) INT32-SIZE >le-stream ; inline
+: write-double ( real -- ) double>bits INT64-SIZE >le-stream ; inline
+: write-cstring ( string -- ) write-utf8-string 0 write-byte ; inline
+: write-longlong ( object -- ) INT64-SIZE >le-stream ; inline
 
 : write-eoo ( -- ) T_EOO write-byte ; inline
 : write-type ( obj -- obj ) [ bson-type? write-byte ] keep ; inline

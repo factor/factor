@@ -1,7 +1,7 @@
 USING: accessors assocs bson.reader bson.writer byte-arrays
 byte-vectors combinators formatting fry io io.binary io.encodings.private
-io.encodings.binary io.encodings.string io.encodings.utf8 io.files
-kernel locals math mongodb.msg namespaces sequences uuid ;
+io.encodings.binary io.encodings.string io.encodings.utf8 io.encodings.utf8.private io.files
+kernel locals math mongodb.msg namespaces sequences uuid bson.writer.private ;
 
 IN: alien.c-types
 
@@ -37,12 +37,6 @@ SYMBOL: msg-bytes-read
 
 : change-bytes-read ( integer -- )
     bytes-read> [ 0 ] unless* + >bytes-read ; inline
-
-: write-byte ( byte -- ) 1 >le write ; inline
-: write-int32 ( int -- ) 4 >le write ; inline
-: write-double ( real -- ) double>bits 8 >le write ; inline
-: write-cstring ( string -- ) output-stream get utf8 encoder-write 0 write-byte ; inline
-: write-longlong ( object -- ) 8 >le write ; inline
 
 : read-int32 ( -- int32 ) 4 [ read le> ] [ change-bytes-read ] bi ; inline
 : read-longlong ( -- longlong ) 8 [ read le> ] [ change-bytes-read ] bi ; inline
@@ -156,7 +150,7 @@ USE: tools.walker
 
 : (write-message) ( message quot -- )    
     '[ [ [ _ write-header ] dip _ call ] with-length-prefix ] with-buffer
-    ! [ dump-to-file ] keep
+    [ dump-to-file ] keep
     write flush ; inline
 
 : build-query-object ( query -- selector )
