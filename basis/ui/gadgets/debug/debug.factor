@@ -2,8 +2,22 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays colors.constants combinators kernel
 opengl sequences ui ui.baseline-alignment ui.gadgets
-ui.gadgets.buttons ui.gadgets.labels ui.pens ui.render ui.text ;
+ui.gadgets.buttons ui.gadgets.labels ui.pens ui.render ui.text
+ui.gadgets.private dlists namespaces io.streams.string io ;
 IN: ui.gadgets.debug
+
+! We can't print to output-stream here because that might be a pane
+! stream, and our graft-queue rebinding here would be captured
+! by code adding children to the pane...
+: with-grafted-gadget ( gadget quot -- )
+    [
+        <dlist> \ graft-queue set
+        <dlist> \ layout-queue set
+        over
+        graft notify-queued
+        dip
+        ungraft notify-queued
+    ] with-string-writer print ; inline
 
 TUPLE: baseline-gadget < gadget baseline cap-height ;
 
