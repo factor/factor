@@ -1,7 +1,7 @@
 USING: continuations documents
 ui.tools.listener hashtables kernel namespaces parser sequences
 tools.test ui.commands ui.gadgets ui.gadgets.editors
-ui.gadgets.panes vocabs words tools.test.ui slots.private
+ui.gadgets.panes vocabs words ui.gadgets.debug slots.private
 threads arrays generic threads accessors listener math
 calendar concurrency.promises io ui.tools.common ;
 IN: ui.tools.listener.tests

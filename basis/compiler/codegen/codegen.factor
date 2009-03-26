@@ -3,7 +3,7 @@
 USING: namespaces make math math.order math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
-alien.strings alien.arrays alien.complex sets libc
+alien.strings alien.arrays alien.complex sets libc alien.libraries
 continuations.private fry cpu.architecture
 compiler.errors
 compiler.alien

@@ -62,6 +62,7 @@ bootstrapping? on
 {
     "alien"
     "alien.accessors"
+    "alien.libraries"
     "arrays"
     "byte-arrays"
     "classes.private"
@@ -458,9 +459,9 @@ tuple
     { "code-room" "memory" (( -- code-free code-total )) }
     { "micros" "system" (( -- us )) }
     { "modify-code-heap" "compiler.units" (( alist -- )) }
-    { "dlopen" "alien" (( path -- dll )) }
-    { "dlsym" "alien" (( name dll -- alien )) }
-    { "dlclose" "alien" (( dll -- )) }
+    { "dlopen" "alien.libraries" (( path -- dll )) }
+    { "dlsym" "alien.libraries" (( name dll -- alien )) }
+    { "dlclose" "alien.libraries" (( dll -- )) }
     { "<byte-array>" "byte-arrays" (( n -- byte-array )) }
     { "(byte-array)" "byte-arrays" (( n -- byte-array )) }
     { "<displaced-alien>" "alien" (( displacement c-ptr -- alien )) }

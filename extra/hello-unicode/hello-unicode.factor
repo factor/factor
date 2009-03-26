@@ -15,6 +15,6 @@ IN: hello-unicode
         ] with-style
     ] make-pane { 10 10 } <border> ;
 
-: hello-unicode ( -- ) <hello-gadget> "გამარჯობა" open-window ;
+: hello-unicode ( -- ) [ <hello-gadget> "გამარჯობა" open-window ] with-ui ;
 
 MAIN: hello-unicode

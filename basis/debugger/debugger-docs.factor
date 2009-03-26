@@ -1,6 +1,7 @@
 USING: alien arrays generic generic.math help.markup help.syntax
 kernel math memory strings sbufs vectors io io.files classes
-help generic.standard continuations io.files.private listener ;
+help generic.standard continuations io.files.private listener
+alien.libraries ;
 IN: debugger
 
 ARTICLE: "debugger" "The debugger"

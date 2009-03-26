@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs fry help.markup help.topics io
 kernel make math math.parser namespaces sequences sorting
-summary tools.completion tools.vocabs tools.vocabs.browser
+summary tools.completion tools.vocabs help.vocabs
 vocabs words unicode.case help ;
-IN: tools.apropos
+IN: help.apropos
 
 : $completions ( seq -- )
     dup [ word? ] all? [ words-table ] [
@@ -66,6 +66,10 @@ M: apropos article-name article-title ;
 
 M: apropos article-content
     search>> 1array \ $apropos prefix ;
+
+M: apropos >link ;
+
+INSTANCE: apropos topic
 
 : apropos ( str -- )
     <apropos> print-topic ;

@@ -3,7 +3,7 @@
 USING: accessors arrays assocs calendar colors colors.constants
 documents documents.elements fry kernel words sets splitting math
 math.vectors models.delay models.arrow combinators.short-circuit
-parser present sequences tools.completion tools.vocabs.browser generic
+parser present sequences tools.completion help.vocabs generic
 generic.standard.engines.tuple fonts definitions.icons ui.images
 ui.commands ui.operations ui.gadgets ui.gadgets.editors
 ui.gadgets.glass ui.gadgets.scrollers ui.gadgets.tables
