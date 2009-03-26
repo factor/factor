@@ -1,7 +1,7 @@
 USING: ui.gadgets ui.gadgets.scrollers namespaces tools.test
 kernel models models.product models.range ui.gadgets.viewports
 ui.gadgets.labels ui.gadgets.grids ui.gadgets.sliders math
-math.vectors arrays sequences tools.test.ui math.rectangles
+math.vectors arrays sequences ui.gadgets.debug math.rectangles
 accessors ui.gadgets.buttons ui.gadgets.packs
 ui.gadgets.scrollers.private ;
 IN: ui.gadgets.scrollers.tests
