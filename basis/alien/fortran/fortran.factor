@@ -5,7 +5,7 @@ byte-arrays combinators combinators.short-circuit fry generalizations
 kernel lexer macros math math.parser namespaces parser sequences
 splitting stack-checker vectors vocabs.parser words locals
 io.encodings.ascii io.encodings.string shuffle effects math.ranges
-math.order sorting strings system ;
+math.order sorting strings system alien.libraries ;
 IN: alien.fortran
 
 SINGLETONS: f2c-abi gfortran-abi intel-unix-abi intel-windows-abi ;
