@@ -160,7 +160,7 @@ factor-console: $(DLL_OBJS) $(EXE_OBJS)
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION) $(EXE_OBJS)
 
 factor-ffi-test: $(TEST_OBJS)
-	$(CC) $(LIBPATH) $(CFLAGS) $(SHARED_FLAG) -o libfactor-ffi-test$(DLL_EXTENSION) $(TEST_OBJS)
+	$(CC) $(LIBPATH) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o libfactor-ffi-test$(DLL_EXTENSION) $(TEST_OBJS)
 
 clean:
 	rm -f vm/*.o

@@ -1,4 +1,5 @@
-USING: alien alien.fortran kernel system combinators ;
+USING: alien alien.fortran kernel system combinators
+alien.libraries ;
 IN: math.blas.ffi
 
 <<

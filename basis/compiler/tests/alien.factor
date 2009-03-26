@@ -4,7 +4,7 @@ namespaces namespaces tools.test sequences stack-checker
 stack-checker.errors words arrays parser quotations
 continuations effects namespaces.private io io.streams.string
 memory system threads tools.test math accessors combinators
-specialized-arrays.float ;
+specialized-arrays.float alien.libraries ;
 
 <<
 : libfactor-ffi-tests-path ( -- string )
