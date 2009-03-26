@@ -135,9 +135,7 @@ SYMBOL: ui-notify-flag
 
 : forget-pref-dim ( gadget -- ) f >>pref-dim drop ;
 
-: ui-state ( symbol -- value ) get [ "UI not running" throw ] unless* ;
-
-: layout-queue ( -- queue ) \ layout-queue ui-state ;
+: layout-queue ( -- queue ) \ layout-queue get ;
 
 : layout-later ( gadget -- )
     #! When unit testing gadgets without the UI running, the
@@ -216,7 +214,8 @@ M: gadget ungraft* drop ;
 
 <PRIVATE
 
-: graft-queue ( -- dlist ) \ graft-queue ui-state ;
+: graft-queue ( -- dlist )
+    \ graft-queue get [ "UI not running" throw ] unless* ;
 
 : unqueue-graft ( gadget -- )
     [ graft-node>> graft-queue delete-node ]
