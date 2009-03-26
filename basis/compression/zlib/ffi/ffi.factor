@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax combinators system ;
+USING: alien alien.syntax combinators system alien.libraries ;
 IN: compression.zlib.ffi
 
 << "zlib" {
