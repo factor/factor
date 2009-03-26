@@ -4,7 +4,7 @@ USING: accessors arrays alien alien.c-types alien.structs
 alien.arrays alien.strings kernel math namespaces parser
 sequences words quotations math.parser splitting grouping
 effects assocs combinators lexer strings.parser alien.parser 
-fry vocabs.parser words.constant ;
+fry vocabs.parser words.constant alien.libraries ;
 IN: alien.syntax
 
 SYNTAX: DLL" lexer get skip-blank parse-string dlopen parsed ;

@@ -6,6 +6,7 @@ EXE_SUFFIX =
 DLL_PREFIX = lib
 DLL_EXTENSION = .a
 # DLL_EXTENSION = .so
+SHARED_FLAG = -shared
 
 PLAF_DLL_OBJS = vm/os-unix.o
 PLAF_EXE_OBJS += vm/main-unix.o

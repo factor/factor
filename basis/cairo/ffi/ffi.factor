@@ -5,7 +5,8 @@
 ! License: http://factorcode.org/license.txt
 
 USING: system combinators alien alien.syntax alien.c-types
-alien.destructors kernel accessors sequences arrays ui.gadgets ;
+alien.destructors kernel accessors sequences arrays ui.gadgets
+alien.libraries ;
 
 IN: cairo.ffi
 << {

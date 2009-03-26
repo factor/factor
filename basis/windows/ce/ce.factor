@@ -1,4 +1,4 @@
-USING: alien sequences ;
+USING: alien sequences alien.libraries ;
 {
     { "advapi32" "\\windows\\coredll.dll" "stdcall" }
     { "gdi32"    "\\windows\\coredll.dll" "stdcall" }
