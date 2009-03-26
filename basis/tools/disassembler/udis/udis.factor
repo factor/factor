@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.disassembler namespaces combinators
 alien alien.syntax alien.c-types lexer parser kernel
-sequences layouts math math.order
+sequences layouts math math.order alien.libraries
 math.parser system make fry arrays ;
 IN: tools.disassembler.udis
 

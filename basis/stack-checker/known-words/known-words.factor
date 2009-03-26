@@ -12,6 +12,7 @@ classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
 combinators locals locals.backend locals.types words.private
 quotations.private combinators.private stack-checker.values
+alien.libraries
 stack-checker.alien
 stack-checker.state
 stack-checker.errors
