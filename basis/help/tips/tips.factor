@@ -1,16 +1,30 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser arrays namespaces sequences random help.markup kernel io
-io.styles colors.constants ;
+io.styles colors.constants definitions accessors ;
 IN: help.tips
 
 SYMBOL: tips
 
 tips [ V{ } clone ] initialize
 
-SYNTAX: TIP: parse-definition >array tips get push ;
+TUPLE: tip < identity-tuple content loc ;
 
-: a-tip ( -- tip ) tips get random ;
+M: tip forget* tips get delq ;
+
+M: tip where loc>> ;
+
+M: tip set-where (>>loc) ;
+
+: <tip> ( content -- tip ) f tip boa ;
+
+: add-tip ( tip -- ) tips get push ;
+
+SYNTAX: TIP:
+    parse-definition >array <tip>
+    [ save-location ] [ add-tip ] bi ;
+
+: a-tip ( -- tip ) tips get random content>> ;
 
 SYMBOL: tip-of-the-day-style
 
@@ -35,4 +49,4 @@ H{
 : tip-of-the-day. ( -- ) { $tip-of-the-day } print-content nl ;
 
 : $tips-of-the-day ( element -- )
-    drop tips get [ nl nl ] [ print-element ] interleave ;
+    drop tips get [ nl nl ] [ content>> print-element ] interleave ;
