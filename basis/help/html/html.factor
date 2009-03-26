@@ -3,7 +3,7 @@
 USING: io.encodings.utf8 io.encodings.ascii io.encodings.binary
 io.files io.files.temp io.directories html.streams help kernel
 assocs sequences make words accessors arrays help.topics vocabs
-tools.vocabs tools.vocabs.browser namespaces prettyprint io
+tools.vocabs help.vocabs namespaces prettyprint io
 vocabs.loader serialize fry memoize unicode.case math.order
 sorting debugger html xml.syntax xml.writer ;
 IN: help.html

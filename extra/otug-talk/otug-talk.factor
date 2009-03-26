@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: slides help.markup math arrays hashtables namespaces sequences
 kernel sequences parser memoize io.encodings.binary locals
-kernel.private tools.vocabs.browser assocs quotations tools.vocabs
+kernel.private help.vocabs assocs quotations tools.vocabs
 tools.annotations tools.crossref help.topics math.functions
 compiler.tree.optimizer compiler.cfg.optimizer fry ui.gadgets.panes
 tetris tetris.game combinators generalizations multiline

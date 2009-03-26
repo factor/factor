@@ -14,7 +14,7 @@ IN: site-watcher.tests
         site ensure-table
         watching-site ensure-table
 
-        "erg@factorcode.org" insert-account
+        "erg" "erg@factorcode.org" insert-account
         "http://asdfasdfasdfasdfqwerqqq.com" insert-site drop
         "http://fark.com" insert-site drop
 

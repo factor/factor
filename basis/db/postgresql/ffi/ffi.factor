@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 ! tested on debian linux with postgresql 8.1
-USING: alien alien.syntax combinators system ;
+USING: alien alien.syntax combinators system alien.libraries ;
 IN: db.postgresql.ffi
 
 << "postgresql" {

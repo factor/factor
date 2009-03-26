@@ -1,7 +1,7 @@
 USING: alien ui.gadgets.panes ui.gadgets namespaces
 kernel sequences io io.styles io.streams.string tools.test
 prettyprint definitions help help.syntax help.markup
-help.stylesheet splitting tools.test.ui models math summary
+help.stylesheet splitting ui.gadgets.debug models math summary
 inspector accessors help.topics see ;
 IN: ui.gadgets.panes.tests
 
