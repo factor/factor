@@ -172,22 +172,30 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
 : check-for-key ( assoc key -- )
     CHECK-KEY [ swap key? [ "ups... where's the key" throw ] unless ] [ 2drop ] if ; inline
 
+: (check-find-result) ( result -- )
+    "x" check-for-key ; inline
+  
+: (find) ( cursor -- )
+    [ find [ (check-find-result) ] each (find) ] when* ; inline recursive
+
 : find-one ( -- quot: ( -- ) )
-    collection-name
-    trial-size 2 / "x" H{ } clone [ set-at ] keep
-    '[ _ _ <query> 1 limit find [ drop ] dip first "x" check-for-key  ] ;
-
+    [ trial-size
+      collection-name
+      trial-size 2 / "x" H{ } clone [ set-at ] keep
+      '[ _ _ <query> 1 limit (find) ] times ] ;
+  
 : find-all ( -- quot: ( -- ) )
-    collection-name
-    H{ } clone
-    '[ _ _ <query> find [ "x" check-for-key  ] each drop ] ;
-
+      collection-name
+      H{ } clone
+      '[ _ _ <query> (find) ] ;
+  
 : find-range ( -- quot: ( -- ) )
-    collection-name
-    trial-size 2 / "$gt" H{ } clone [ set-at ] keep
-    [ trial-size 2 / batch-size + "$lt" ] dip [ set-at ] keep
-    "x" H{ } clone [ set-at ] keep
-    '[ _ _ <query> find [ "x" check-for-key ] each drop ] ;
+    [ trial-size batch-size /i
+       collection-name
+       trial-size 2 / "$gt" H{ } clone [ set-at ] keep
+       [ trial-size 2 / batch-size + "$lt" ] dip [ set-at ] keep
+       "x" H{ } clone [ set-at ] keep
+       '[ _ _ <query> find [ "x" check-for-key ] each drop ] times ] ;
 
 : batch ( -- )
     result [ t >>batch ] change ; inline
