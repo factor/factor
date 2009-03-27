@@ -1,6 +1,7 @@
 CFLAGS += -DWINDOWS -mno-cygwin
 LIBS = -lm
 PLAF_DLL_OBJS += vm/os-windows.o
+SHARED_FLAG = -shared
 EXE_EXTENSION=.exe
 CONSOLE_EXTENSION=.com
 DLL_EXTENSION=.dll

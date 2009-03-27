@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax kernel system combinators ;
+USING: alien alien.syntax kernel system combinators
+alien.libraries ;
 IN: freetype
 
 << "freetype" {

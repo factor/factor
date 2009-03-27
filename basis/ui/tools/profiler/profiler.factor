@@ -208,4 +208,6 @@ profiler-gadget "toolbar" f {
 : profiler-window ( -- )
     <profiler-gadget> "Profiling results" open-status-window ;
 
+: com-profile ( quot -- ) profile profiler-window ;
+
 MAIN: profiler-window
