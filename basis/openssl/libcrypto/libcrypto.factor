@@ -5,7 +5,8 @@
 !
 ! export LD_LIBRARY_PATH=/opt/local/lib
 
-USING: alien alien.syntax combinators kernel system ;
+USING: alien alien.syntax combinators kernel system
+alien.libraries ;
 
 IN: openssl.libcrypto
 

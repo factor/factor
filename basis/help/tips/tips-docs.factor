@@ -1,5 +1,6 @@
 IN: help.tips
-USING: help.markup help.syntax debugger ;
+USING: help.markup help.syntax debugger prettyprint see help help.vocabs
+help.apropos tools.time stack-checker editors ;
 
 TIP: "To look at the most recent error, run " { $link :error } ". To look at the most recent error's callstack, run " { $link :c } "." ;
 
@@ -15,6 +16,8 @@ TIP: "You can write documentation for your own code using the " { $link "help" }
 
 TIP: "You can write graphical applications using the " { $link "ui" } "." ;
 
+TIP: "Power tools: " { $links see edit help about apropos time infer. } ;
+ 
 ARTICLE: "all-tips-of-the-day" "All tips of the day"
 { $tips-of-the-day } ;
 

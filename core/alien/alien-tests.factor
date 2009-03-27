@@ -1,7 +1,7 @@
-IN: alien.tests
 USING: accessors alien alien.accessors alien.syntax byte-arrays arrays
 kernel kernel.private namespaces tools.test sequences libc math
-system prettyprint layouts ;
+system prettyprint layouts alien.libraries ;
+IN: alien.tests
 
 [ t ] [ -1 <alien> alien-address 0 > ] unit-test
 

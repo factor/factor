@@ -1,4 +1,4 @@
-USING: alien sequences ;
+USING: alien sequences alien.libraries ;
 {
     { "advapi32" "\\windows\\coredll.dll" "stdcall" }
     { "gdi32"    "\\windows\\coredll.dll" "stdcall" }
@@ -10,6 +10,5 @@ USING: alien sequences ;
     { "libm"     "\\windows\\coredll.dll" "stdcall"   }
     ! { "gl"       "libGLES_CM.dll"         "stdcall" }
     ! { "glu"      "libGLES_CM.dll"         "stdcall" }
-    ! { "freetype" "libfreetype-6.dll"      "stdcall" }
     { "ole32"    "ole32.dll"    "stdcall" }
 } [ first3 add-library ] each
