@@ -8,11 +8,11 @@ IN: roman
 
 <PRIVATE
 
-: roman-digits ( -- seq )
-    { "m" "cm" "d" "cd" "c" "xc" "l" "xl" "x" "ix" "v" "iv" "i" } ;
+CONSTANT: roman-digits
+    { "m" "cm" "d" "cd" "c" "xc" "l" "xl" "x" "ix" "v" "iv" "i" }
 
-: roman-values ( -- seq )
-    { 1000 900 500 400 100 90 50 40 10 9 5 4 1 } ;
+CONSTANT: roman-values
+    { 1000 900 500 400 100 90 50 40 10 9 5 4 1 }
 
 ERROR: roman-range-error n ;
 
