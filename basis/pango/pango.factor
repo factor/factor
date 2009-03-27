@@ -2,7 +2,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license
 USING: arrays system alien.destructors alien.c-types alien.syntax alien
-combinators math.rectangles kernel math ;
+combinators math.rectangles kernel math alien.libraries ;
 IN: pango
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

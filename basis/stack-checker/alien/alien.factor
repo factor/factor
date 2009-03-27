@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors combinators math namespaces
-init sets words
+init sets words alien.libraries
 alien alien.c-types
 stack-checker.backend stack-checker.errors stack-checker.visitor ;
 IN: stack-checker.alien

@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.syntax combinators kernel system ;
+USING: accessors alien alien.syntax combinators kernel system
+alien.libraries ;
 IN: curses.ffi
 
 << "curses" {
