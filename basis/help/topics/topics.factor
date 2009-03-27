@@ -7,8 +7,12 @@ IN: help.topics
 
 TUPLE: link name ;
 
+INSTANCE: link definition
+
 MIXIN: topic
+
 INSTANCE: link topic
+
 INSTANCE: word topic
 
 GENERIC: >link ( obj -- obj )
