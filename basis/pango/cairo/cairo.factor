@@ -3,7 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! pangocairo bindings, from pango/pangocairo.h
-USING: alien alien.syntax combinators system cairo.ffi ;
+USING: alien alien.syntax combinators system cairo.ffi
+alien.libraries ;
 IN: pango.cairo
 
 << {

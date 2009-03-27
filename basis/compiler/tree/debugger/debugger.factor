@@ -160,7 +160,7 @@ SYMBOL: node-count
                     { [ dup generic? ] [ generics-called ] }
                     { [ dup method-body? ] [ methods-called ] }
                     [ words-called ]
-                } cond inc-at
+                } cond get inc-at
             ] [ drop ] if
         ] each-node
         node-count set
