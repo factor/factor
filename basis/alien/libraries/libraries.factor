@@ -18,5 +18,4 @@ TUPLE: library path abi dll ;
     library dup [ dll>> ] when ;
 
 : add-library ( name path abi -- )
-    [ dup [ normalize-path ] when ] dip
     <library> swap libraries get set-at ;
