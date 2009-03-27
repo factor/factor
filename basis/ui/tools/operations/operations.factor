@@ -81,8 +81,6 @@ IN: ui.tools.operations
     { +listener+ t }
 } define-operation
 
-UNION: definition word method-spec link vocab vocab-link ;
-
 [ definition? ] \ edit H{
     { +keyboard+ T{ key-down f { C+ } "e" } }
     { +listener+ t }

@@ -28,7 +28,7 @@ IN: opengl
     over glEnableClientState dip glDisableClientState ; inline
 
 : words>values ( word/value-seq -- value-seq )
-    [ dup word? [ execute ] when ] map ;
+    [ ?execute ] map ;
 
 : (all-enabled) ( seq quot -- )
     over [ glEnable ] each dip [ glDisable ] each ; inline
