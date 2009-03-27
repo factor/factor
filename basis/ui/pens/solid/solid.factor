@@ -9,8 +9,8 @@ TUPLE: solid < caching-pen color interior-vertices boundary-vertices ;
 
 M: solid recompute-pen
     swap dim>>
-    [ (fill-rect-vertices) >>interior-vertices ]
-    [ (rect-vertices) >>boundary-vertices ]
+    [ [ { 0 0 } ] dip (fill-rect-vertices) >>interior-vertices ]
+    [ [ { 0 0 } ] dip (rect-vertices) >>boundary-vertices ]
     bi drop ;
 
 <PRIVATE
