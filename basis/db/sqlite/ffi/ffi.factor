@@ -3,7 +3,7 @@
 ! An interface to the sqlite database. Tested against sqlite v3.1.3.
 ! Not all functions have been wrapped.
 USING: alien compiler kernel math namespaces sequences strings alien.syntax
-    system combinators alien.c-types ;
+system combinators alien.c-types alien.libraries ;
 IN: db.sqlite.ffi
 
 << "sqlite" {

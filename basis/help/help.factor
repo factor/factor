@@ -127,15 +127,6 @@ help-hook [ [ print-topic ] ] initialize
 : help ( topic -- )
     help-hook get call( topic -- ) ;
 
-: about ( vocab -- )
-    dup require
-    dup vocab [ ] [ no-vocab ] ?if
-    dup vocab-help [ help ] [
-        "The " write vocab-name write
-        " vocabulary does not define a main help article." print
-        "To define one, refer to \\ ABOUT: help" print
-    ] ?if ;
-
 : ($index) ( articles -- )
     sort-articles [ \ $subsection swap 2array ] map print-element ;
 

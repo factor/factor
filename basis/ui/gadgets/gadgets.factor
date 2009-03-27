@@ -214,7 +214,8 @@ M: gadget ungraft* drop ;
 
 <PRIVATE
 
-: graft-queue ( -- dlist ) \ graft-queue get ;
+: graft-queue ( -- dlist )
+    \ graft-queue get [ "UI not running" throw ] unless* ;
 
 : unqueue-graft ( gadget -- )
     [ graft-node>> graft-queue delete-node ]
