@@ -57,9 +57,7 @@ M: list draw-gadget*
     origin get [
         dup color>> gl-color
         selected-rect [
-            dup loc>> [
-                dim>> gl-fill-rect
-            ] with-translation
+            rect-bounds gl-fill-rect
         ] when*
     ] with-translation ;
 
