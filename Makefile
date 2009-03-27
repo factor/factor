@@ -159,7 +159,7 @@ factor-console: $(DLL_OBJS) $(EXE_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION) $(EXE_OBJS)
 
-factor-ffi-test: $(TEST_OBJS)
+factor-ffi-test: vm/ffi_test.o
 	$(CC) $(LIBPATH) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o libfactor-ffi-test$(DLL_EXTENSION) $(TEST_OBJS)
 
 clean:
@@ -168,6 +168,9 @@ clean:
 
 vm/resources.o:
 	$(WINDRES) vm/factor.rs vm/resources.o
+
+vm/ffi_test.o: vm/ffi_test.c
+	$(CC) -c $(CFLAGS) $(FFI_TEST_CFLAGS) -o $@ $<
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
