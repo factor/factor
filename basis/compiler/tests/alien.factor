@@ -13,7 +13,7 @@ IN: compiler.tests
     {
         { [ os winnt? ]  [ "libfactor-ffi-test.dll" ] }
         { [ os macosx? ] [ "libfactor-ffi-test.dylib" ] }
-        { [ os unix?  ]  [ "libfactor-ffi-test.so" ] }
+        { [ os unix?  ]  [ "libfactor-ffi-test.a" ] }
     } cond append-path ;
 
 "f-cdecl" libfactor-ffi-tests-path "cdecl" add-library
@@ -124,8 +124,6 @@ unit-test
     "int" { "int" "int" "int" "int" } "stdcall" alien-indirect
     gc ;
 
-LIBRARY: f-stdcall
-
 [ f ] [ "f-stdcall" load-library f = ] unit-test
 [ "stdcall" ] [ "f-stdcall" library abi>> ] unit-test
 
@@ -166,7 +164,7 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
 
 : ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result y )
     "int"
-    "f-stdcall" "ffi_test_31"
+    "f-cdecl" "ffi_test_31"
     { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
     alien-invoke gc 3 ;
 
@@ -174,7 +172,7 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
 
 : ffi_test_31_point_5 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a -- result )
     "float"
-    "f-stdcall" "ffi_test_31_point_5"
+    "f-cdecl" "ffi_test_31_point_5"
     { "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" "float" }
     alien-invoke ;
 
