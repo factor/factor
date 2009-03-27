@@ -41,7 +41,7 @@ GENERIC: element-read ( type -- cont? )
 GENERIC: element-data-read ( type -- object )
 GENERIC: element-binary-read ( length type -- object )
 
-: byte-arrary>number ( seq -- number )
+: byte-array>number ( seq -- number )
     byte-array>bignum >integer ; inline
 
 : get-state ( -- state )
@@ -203,4 +203,4 @@ PRIVATE>
 : stream>assoc ( exemplar -- assoc bytes-read )
     <state> dup state
     [ read-int32 >>size read-elements ] with-variable 
-    [ result>> ] [ read>> ] bi ; inline
+    [ result>> ] [ read>> ] bi ; 
