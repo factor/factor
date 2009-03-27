@@ -566,8 +566,8 @@ HELP: GENERIC#
 { $description "Defines a new generic word which dispatches on the " { $snippet "n" } "th most element from the top of the stack in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." }
 { $notes
     "The following two definitions are equivalent:"
-    { $code "GENERIC: foo" }
-    { $code "GENERIC# foo 0" }
+    { $code "GENERIC: foo ( obj -- )" }
+    { $code "GENERIC# foo 0 ( obj -- )" }
 } ;
 
 HELP: MATH:
