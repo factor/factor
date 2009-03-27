@@ -1,5 +1,5 @@
-USING: calendar math fry kernel assocs math.ranges
-sequences formatting combinators namespaces io tools.time prettyprint
+USING: calendar math fry kernel assocs math.ranges bson.reader io.streams.byte-array
+sequences formatting combinators namespaces io tools.time prettyprint io.encodings.binary
 accessors words mongodb.driver strings math.parser tools.walker bson.writer ;
 
 IN: mongodb.benchmark
@@ -13,7 +13,7 @@ SYMBOL: collection
     dup string? [ string>number ] when ; inline
 
 : trial-size ( -- size )
-    "per-trial" 10000 get* ensure-number ; inline flushable
+    "per-trial" 5000 get* ensure-number ; inline flushable
 
 : batch-size ( -- size )
     "batch-size" 100 get* ensure-number ; inline flushable
@@ -169,6 +169,13 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     result get batch>>
     [ '[ _ _ (insert-batch) ] ] [ '[ _ _ (insert) ] ] if ;
 
+: serialize ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
+    '[ trial-size [ _ call assoc>bv drop ] each-integer ] ; inline
+
+: deserialize ( doc-quot: ( i -- doc ) -- quot: ( -- ) )
+    [ 0 ] dip call assoc>bv
+    '[ trial-size [  _ binary [ H{ } stream>assoc 2drop ] with-byte-reader ] times ] ; inline
+
 : check-for-key ( assoc key -- )
     CHECK-KEY [ swap key? [ "ups... where's the key" throw ] unless ] [ 2drop ] if ; inline
 
@@ -213,14 +220,14 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
       lasterror>> bchar
       trial-size ] dip
     1000000 / /i
-    "%-18s: {batch:%s,index:%s;errchk:%s} %10s op/s"
+    "%-18s: {batch:%s,index:%s;errchk:%s} %10s docs/s"
     sprintf print flush ; inline
 
 : print-separator ( -- )
-    "--------------------------------------------------------------" print flush ; inline
+    "----------------------------------------------------------------" print flush ; inline
 
 : print-separator-bold ( -- )
-    "==============================================================" print flush ; inline
+    "================================================================" print flush ; inline
 
 : print-header ( -- )
     trial-size
@@ -238,7 +245,17 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
        '[ [ [ _ execute ] dip
             [ execute ] each _ execute benchmark ] with-result ] each
        print-separator ] ; inline
-   
+
+: run-serialization-bench ( doc-word-seq feat-seq -- )
+    "Serialization Tests" print
+    print-separator-bold
+    \ serialize bench-quot each ; inline
+
+: run-deserialization-bench ( doc-word-seq feat-seq -- )
+    "Deserialization Tests" print
+    print-separator-bold
+    \ deserialize bench-quot each ; inline
+    
 : run-insert-bench ( doc-word-seq feat-seq -- )
     "Insert Tests" print
     print-separator-bold 
@@ -262,8 +279,15 @@ CONSTANT: DOC-LARGE H{ { "base_url" "http://www.example.com/test-me" }
     
 : run-benchmarks ( -- )
     "db" "db" get* "host" "127.0.0.1" get* "port" 27020 get* ensure-number <mdb>
-    [ ensure-buffer
-      print-header
+    [ print-header
+      ! serialization
+      { small-doc-prepare medium-doc-prepare
+        large-doc-prepare }
+      { { } } run-serialization-bench
+      ! deserialization
+      { small-doc-prepare medium-doc-prepare
+        large-doc-prepare }
+      { { } } run-deserialization-bench
       ! insert
       { small-doc-prepare medium-doc-prepare
         large-doc-prepare }

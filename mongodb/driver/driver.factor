@@ -70,7 +70,7 @@ SYNTAX: r/ ( token -- mdbregexp )
 
 : with-db ( mdb quot -- ... )
     [ [ prepare-mdb-session ] dip
-      [ [ >>mdb-stream ] keep ] prepose
+      [ >>mdb-stream ] prepose
       with-disposal ] with-scope ; inline
   
 <PRIVATE

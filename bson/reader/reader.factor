@@ -1,6 +1,6 @@
 USING: accessors assocs bson.constants byte-arrays byte-vectors fry io
 io.binary io.encodings.string io.encodings.utf8 kernel math namespaces
-sequences serialize arrays calendar ;
+sequences serialize arrays calendar io.encodings ;
 
 IN: bson.reader
 
@@ -41,6 +41,9 @@ GENERIC: element-read ( type -- cont? )
 GENERIC: element-data-read ( type -- object )
 GENERIC: element-binary-read ( length type -- object )
 
+: byte-arrary>number ( seq -- number )
+    byte-array>bignum >integer ; inline
+
 : get-state ( -- state )
     state get ; inline
 
@@ -48,13 +51,13 @@ GENERIC: element-binary-read ( length type -- object )
     [ get-state ] dip '[ _ + ] change-read drop ; inline
 
 : read-int32 ( -- int32 )
-    4 [ read le> ] [ count-bytes ] bi  ; inline
+    4 [ read byte-array>number ] [ count-bytes ] bi  ; inline
 
 : read-longlong ( -- longlong )
-    8 [ read le> ] [ count-bytes ] bi ; inline
+    8 [ read byte-array>number ] [ count-bytes ] bi ; inline
 
 : read-double ( -- double )
-    8 [ read le> bits>double ] [ count-bytes ] bi ; inline
+    8 [ read byte-array>number bits>double ] [ count-bytes ] bi ; inline
 
 : read-byte-raw ( -- byte-raw )
     1 [ read ] [ count-bytes ] bi ; inline
@@ -62,21 +65,12 @@ GENERIC: element-binary-read ( length type -- object )
 : read-byte ( -- byte )
     read-byte-raw first ; inline
 
-: (read-cstring) ( acc -- )
-    [ read-byte-raw first ] dip ! b acc
-    2dup push             ! b acc
-    [ 0 = ] dip      ! bool acc
-    '[ _ (read-cstring) ] unless ; inline recursive
-
 : read-cstring ( -- string )
-    BV{ } clone
-    [ (read-cstring) ] keep
-    [ zero? ] trim-tail
-    >byte-array utf8 decode ; inline
+    input-stream get utf8 <decoder>
+    "\0" swap stream-read-until drop ; inline
 
 : read-sized-string ( length -- string )
-    [ read ] [ count-bytes ] bi
-    [ zero? ] trim-tail utf8 decode ; inline
+    drop read-cstring ; inline
 
 : read-element-type ( -- type )
     read-byte ; inline
@@ -128,14 +122,11 @@ M: bson-eoo element-read ( type -- cont? )
 
 M: bson-not-eoo element-read ( type -- cont? )
     [ peek-scope ] dip                                 ! scope type 
-    '[  _ 
-       read-cstring push-element [ name>> ] [ type>> ] bi 
+    '[ _ read-cstring push-element [ name>> ] [ type>> ] bi 
        [ element-data-read ] keep
        end-element
        swap
-    ] dip    
-    set-at
-    t ;
+    ] dip set-at t ;
 
 : [scope-changer] ( state -- state quot )
     dup exemplar>> '[ [ [ _ clone ] dip push ] keep ] ; inline
@@ -212,4 +203,4 @@ PRIVATE>
 : stream>assoc ( exemplar -- assoc bytes-read )
     <state> dup state
     [ read-int32 >>size read-elements ] with-variable 
-    [ result>> ] [ read>> ] bi ;
+    [ result>> ] [ read>> ] bi ; inline

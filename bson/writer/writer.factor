@@ -82,7 +82,7 @@ M: quotation bson-type? ( quotation -- type ) drop T_Binary ;
 M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ; 
 
 : write-utf8-string ( string -- )
-    output-stream get '[ _ swap char>utf8 ] each ; inline
+    output-stream get utf8 <encoder> stream-write ; inline
 
 : write-byte ( byte -- ) CHAR-SIZE >le-stream ; inline
 : write-int32 ( int -- ) INT32-SIZE >le-stream ; inline
