@@ -12,6 +12,8 @@ IN: words
 
 M: word execute (execute) ;
 
+M: word ?execute execute( -- value ) ;
+
 M: word <=>
     [ [ name>> ] [ vocabulary>> ] bi 2array ] compare ;
 
@@ -260,3 +262,5 @@ M: word hashcode*
 M: word literalize <wrapper> ;
 
 : xref-words ( -- ) all-words [ xref ] each ;
+
+INSTANCE: word definition

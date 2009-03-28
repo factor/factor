@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: constructors kernel splitting unicode.case combinators
-accessors images.bitmap images.tiff images io.backend
+accessors images.bitmap images.tiff images images.normalization
 io.pathnames ;
 IN: images.loader
 

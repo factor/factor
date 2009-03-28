@@ -26,7 +26,7 @@ HELP: scaffold-undocumented
 HELP: scaffold-vocab
 { $values
      { "vocab-root" "a vocabulary root string" } { "string" string } }
-{ $description "Creates a directory in the given root for a new vocabulary and adds a main .factor file, a tests file, and an authors.txt file." } ;
+{ $description "Creates a directory in the given root for a new vocabulary and adds a main .factor file and an authors.txt file." } ;
 
 HELP: scaffold-emacs
 { $description "Touches the .emacs file in your home directory and provides a clickable link to open it in an editor." } ;
