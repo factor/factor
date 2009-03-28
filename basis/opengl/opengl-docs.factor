@@ -23,11 +23,11 @@ HELP: gl-line
 { $description "Draws a line between two points." } ;
 
 HELP: gl-fill-rect
-{ $values { "dim" "a pair of integers" } }
+{ $values { "loc" "a pair of integers" } { "dim" "a pair of integers" } }
 { $description "Draws a filled rectangle with the top-left corner at the origin and the given dimensions." } ;
 
 HELP: gl-rect
-{ $values { "dim" "a pair of integers" } }
+{ $values { "loc" "a pair of integers" } { "dim" "a pair of integers" } }
 { $description "Draws the outline of a rectangle with the top-left corner at the origin and the given dimensions." } ;
 
 HELP: gen-gl-buffer
