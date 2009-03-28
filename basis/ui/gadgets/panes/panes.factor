@@ -79,9 +79,7 @@ GENERIC: draw-selection ( loc obj -- )
 
 M: gadget draw-selection ( loc gadget -- )
     swap offset-rect [
-        dup loc>> [
-            dim>> gl-fill-rect
-        ] with-translation
+        rect-bounds gl-fill-rect
     ] if-fits ;
 
 M: node draw-selection ( loc node -- )

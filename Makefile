@@ -11,6 +11,7 @@ IMAGE = factor.image
 BUNDLE = Factor.app
 LIBPATH = -L/usr/X11R6/lib
 CFLAGS = -Wall
+FFI_TEST_CFLAGS = -fPIC
 
 ifdef DEBUG
 	CFLAGS += -g
@@ -140,9 +141,10 @@ wince-arm:
 
 macosx.app: factor
 	mkdir -p $(BUNDLE)/Contents/MacOS
+	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
 	ln -s Factor.app/Contents/MacOS/factor ./factor
-	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks
+	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks/$(ENGINE)
 
 	install_name_tool \
 		-change libfactor.dylib \

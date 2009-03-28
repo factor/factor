@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2008 Slava Pestov.
+! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.order math.vectors sequences ;
 IN: math.matrices
@@ -57,3 +57,6 @@ PRIVATE>
 
 : norm-gram-schmidt ( seq -- orthonormal )
     gram-schmidt [ normalize ] map ;
+
+: cross-zip ( seq1 seq2 -- seq1xseq2 )
+    [ [ 2array ] with map ] curry map ;

@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2008 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors words kernel sequences namespaces make assocs
 hashtables definitions kernel.private classes classes.private
@@ -26,6 +26,8 @@ M: generic definition drop f ;
 
 PREDICATE: method-spec < pair
     first2 generic? swap class? and ;
+
+INSTANCE: method-spec definition
 
 : order ( generic -- seq )
     "methods" word-prop keys sort-classes ;
