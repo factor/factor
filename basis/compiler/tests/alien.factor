@@ -13,7 +13,7 @@ IN: compiler.tests
     {
         { [ os winnt? ]  [ "libfactor-ffi-test.dll" ] }
         { [ os macosx? ] [ "libfactor-ffi-test.dylib" ] }
-        { [ os unix?  ]  [ "libfactor-ffi-test.a" ] }
+        { [ os unix?  ]  [ "libfactor-ffi-test.so" ] }
     } cond append-path ;
 
 "f-cdecl" libfactor-ffi-tests-path "cdecl" add-library
