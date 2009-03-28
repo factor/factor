@@ -1,9 +1,10 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel math math.order math.vectors
-namespaces make quotations sequences splitting.monotonic
-sequences.private strings unicode.case lexer parser
-grouping ;
+USING: accessors arrays assocs fry generalizations grouping
+kernel lexer macros make math math.order math.vectors
+namespaces parser quotations sequences sequences.private
+splitting.monotonic stack-checker strings unicode.case
+words effects ;
 IN: roman
 
 <PRIVATE
@@ -40,38 +41,33 @@ ERROR: roman-range-error n ;
 PRIVATE>
 
 : >roman ( n -- str )
-    dup roman-range-check
-    [ (>roman) ] "" make ;
+    dup roman-range-check [ (>roman) ] "" make ;
 
 : >ROMAN ( n -- str ) >roman >upper ;
 
 : roman> ( str -- n )
-    >lower [ roman<= ] monotonic-split
-    [ (roman>) ] sigma ;
+    >lower [ roman<= ] monotonic-split [ (roman>) ] sigma ;
 
 <PRIVATE
 
-: 2roman> ( str1 str2 -- m n )
-    [ roman> ] bi@ ;
-
-: binary-roman-op ( str1 str2 quot -- str3 )
-    [ 2roman> ] dip call >roman ; inline
+MACRO: binary-roman-op ( quot -- quot' )
+    dup infer [ in>> swap ] [ out>> ] bi
+    '[ [ roman> ] _ napply @ [ >roman ] _ napply ] ;
 
 PRIVATE>
 
-: roman+ ( str1 str2 -- str3 )
-    [ + ] binary-roman-op ;
+<<
+SYNTAX: ROMAN-OP:
+    scan-word [ name>> "roman" prepend create-in ] keep
+    1quotation '[ _ binary-roman-op ]
+    dup infer [ in>> ] [ out>> ] bi
+    [ "string" <repetition> ] bi@ <effect> define-declared ;
+>>
 
-: roman- ( str1 str2 -- str3 )
-    [ - ] binary-roman-op ;
-
-: roman* ( str1 str2 -- str3 )
-    [ * ] binary-roman-op ;
-
-: roman/i ( str1 str2 -- str3 )
-    [ /i ] binary-roman-op ;
-
-: roman/mod ( str1 str2 -- str3 str4 )
-    [ /mod ] binary-roman-op [ >roman ] dip ;
+ROMAN-OP: +
+ROMAN-OP: -
+ROMAN-OP: *
+ROMAN-OP: /i
+ROMAN-OP: /mod
 
 SYNTAX: ROMAN: scan roman> parsed ;
