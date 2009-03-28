@@ -234,9 +234,9 @@ M: mdb-query-msg explain.
     t >>explain find nip . ;
 
 
-GENERIC: find-one ( mdb-query -- result )
+GENERIC: find-one ( mdb-query -- result/f )
 M: mdb-query-msg find-one
-    1 >>return# send-query-plain ;
+    1 >>return# send-query-plain objects>> [ first ] [ f ] if* ;
 
 GENERIC: count ( collection query -- result )
 M: assoc count
