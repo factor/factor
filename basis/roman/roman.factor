@@ -20,11 +20,14 @@ ERROR: roman-range-error n ;
 : roman-range-check ( n -- )
     dup 1 3999 between? [ drop ] [ roman-range-error ] if ;
 
+: roman-digit-index ( ch -- n )
+    1string roman-digits index ; inline
+
 : roman<= ( ch1 ch2 -- ? )
-    [ 1string roman-digits index ] bi@ >= ;
+    [ roman-digit-index ] bi@ >= ;
 
 : roman>n ( ch -- n )
-    1string roman-digits index roman-values nth ;
+    roman-digit-index roman-values nth ;
 
 : (>roman) ( n -- )
     roman-values roman-digits [
@@ -32,11 +35,8 @@ ERROR: roman-range-error n ;
     ] 2each drop ;
 
 : (roman>) ( seq -- n )
-    [ [ roman>n ] map ] [ all-eq? ] bi [
-        sum
-    ] [
-        first2 swap -
-    ] if ;
+    [ [ roman>n ] map ] [ all-eq? ] bi
+    [ sum ] [ first2 swap - ] if ;
 
 PRIVATE>
 
