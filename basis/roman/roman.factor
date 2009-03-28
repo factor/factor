@@ -51,7 +51,7 @@ PRIVATE>
 <PRIVATE
 
 MACRO: binary-roman-op ( quot -- quot' )
-    dup infer [ in>> swap ] [ out>> ] bi
+    [ infer in>> ] [ ] [ infer out>> ] tri
     '[ [ roman> ] _ napply @ [ >roman ] _ napply ] ;
 
 PRIVATE>
