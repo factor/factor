@@ -38,3 +38,9 @@ USING: arrays kernel math roman roman.private sequences tools.test ;
 [ "iii" "iii"  roman- ] must-fail
 
 [ 30 ] [ ROMAN: xxx ] unit-test
+
+[ roman+ ] must-infer
+[ roman- ] must-infer
+[ roman* ] must-infer
+[ roman/i ] must-infer
+[ roman/mod ] must-infer
