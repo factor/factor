@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: farkup kernel peg peg.ebnf tools.test namespaces xml
-urls.encoding assocs xml.traversal xml.data ;
+urls.encoding assocs xml.traversal xml.data sequences random
+io continuations math ;
 IN: farkup.tests
 
 relative-link-prefix off
@@ -180,3 +181,29 @@ link-no-follow? off
 [ "<p><em>italics<strong>both</strong></em>after<strong></strong></p>" ] [ "_italics*both_after*" convert-farkup ] unit-test
 [ "<table><tr><td>foo|bar</td></tr></table>" ] [ "|foo\\|bar|" convert-farkup ] unit-test
 [ "<p></p>" ] [ "\\" convert-farkup ] unit-test
+
+! [ "<p>[abc]</p>" ] [ "[abc]" convert-farkup ] unit-test
+
+: random-markup ( -- string )
+    10 [
+        2 random 1 = [
+            {
+                "[["
+                "*"
+                "_"
+                "|"
+                "-"
+                "[{"
+                "\n"
+            } random
+        ] [
+            "abc"
+        ] if
+    ] replicate concat ;
+
+[ t ] [
+    100 [
+        drop random-markup
+        [ convert-farkup drop t ] [ drop print f ] recover
+    ] all?
+] unit-test
