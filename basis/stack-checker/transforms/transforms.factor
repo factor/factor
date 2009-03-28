@@ -154,6 +154,15 @@ CONSTANT: bit-member-max 256
     dup sequence? [ memq-quot ] [ drop f ] if
 ] 1 define-transform
 
+! Index search
+\ index [
+    dup sequence? [
+        dup length 4 >= [
+            dup length zip >hashtable '[ _ at ]
+        ] [ drop f ] if
+    ] [ drop f ] if
+] 1 define-transform
+
 ! Shuffling
 : nths-quot ( indices -- quot )
     [ [ '[ _ swap nth ] ] map ] [ length ] bi
