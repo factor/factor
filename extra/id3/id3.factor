@@ -48,15 +48,14 @@ TUPLE: id3v2-info header frames ;
 
 TUPLE: id3v1-info title artist album year comment genre ;
 
-: <id3v1-info> ( -- object ) id3v1-info new ;
+: <id3v1-info> ( -- object ) id3v1-info new ; inline
 
 : <id3v2-info> ( header frames -- object )
-    [ [ frame-id>> ] keep ] H{ } map>assoc
-    id3v2-info boa ;
+    [ [ frame-id>> ] keep ] H{ } map>assoc id3v2-info boa ;
 
-: <header> ( -- object ) header new ;
+: <header> ( -- object ) header new ; inline
 
-: <frame> ( -- object ) frame new ;
+: <frame> ( -- object ) frame new ; inline
 
 : id3v2? ( mmap -- ? ) "ID3" head? ; inline
 
@@ -66,7 +65,7 @@ TUPLE: id3v1-info title artist album year comment genre ;
 : id3v1-frame ( string key -- frame )
     <frame>
         swap >>frame-id
-        swap >>data ;
+        swap >>data ; inline
 
 : id3v1>id3v2 ( id3v1 -- id3v2 )
     [
@@ -78,7 +77,7 @@ TUPLE: id3v1-info title artist album year comment genre ;
             [ comment>> "COMM" id3v1-frame ]
             [ genre>> "TCON" id3v1-frame ]
         } cleave
-    ] output>array f swap <id3v2-info> ;
+    ] output>array f swap <id3v2-info> ; inline
 
 : >28bitword ( seq -- int )
     0 [ [ 7 shift ] dip bitor ] reduce ; inline
@@ -104,11 +103,11 @@ TUPLE: id3v1-info title artist album year comment genre ;
         [ [ 4 8 ] dip subseq >28bitword >>size ]
         [ [ 8 10 ] dip subseq >byte-array >>flags ]
         [ read-frame-data decode-text >>data ]
-    } cleave ;
+    } cleave ; inline
 
 : read-frame ( mmap -- frame/f )
     dup 4 head-slice valid-frame-id?
-    [ (read-frame) ] [ drop f ] if ;
+    [ (read-frame) ] [ drop f ] if ; inline
 
 : remove-frame ( mmap frame -- mmap )
     size>> 10 + tail-slice ; inline
@@ -116,10 +115,8 @@ TUPLE: id3v1-info title artist album year comment genre ;
 : read-frames ( mmap -- frames )
     [ dup read-frame dup ]
     [ [ remove-frame ] keep ]
-    produce 2nip ;
+    produce 2nip ; inline
     
-! header stuff
-
 : read-v2-header ( seq -- id3header )
     [ <header> ] dip
     {
@@ -133,8 +130,6 @@ TUPLE: id3v1-info title artist album year comment genre ;
     [ read-v2-header ]
     [ read-frames ] bi* <id3v2-info> ; inline
     
-! v1 information
-
 : skip-to-v1-data ( seq -- seq ) 125 tail-slice* ; inline
 
 : (read-v1-tag-data) ( seq -- mp3-file )
@@ -159,28 +154,7 @@ TUPLE: id3v1-info title artist album year comment genre ;
         drop
     ] if ; inline
 
-PRIVATE>
-
-: frame-named ( id3 name quot -- obj )
-    [ swap frames>> at* ] dip
-    [ data>> ] prepose [ drop f ] if ; inline
-
-: id3-title ( id3 -- title/f ) "TIT2" [ ] frame-named ; inline
-
-: id3-artist ( id3 -- artist/f ) "TPE1" [ ] frame-named ; inline
-
-: id3-album ( id3 -- album/f ) "TALB" [ ] frame-named ; inline
-
-: id3-year ( id3 -- year/f ) "TYER" [ ] frame-named ; inline
-
-: id3-comment ( id3 -- comment/f ) "COMM" [ ] frame-named ; inline
-
-: id3-genre ( id3 -- genre/f )
-    "TCON" [ parse-genre ] frame-named ; inline
-
-: id3-frame ( id3 key -- value/f ) [ ] frame-named ; inline
-
-: (file-id3-tags) ( path -- id3v2-info/f )
+: (mp3>id3) ( path -- id3v2-info/f )
     [
         {
             { [ dup id3v2? ] [ read-v2-tag-data ] }
@@ -189,9 +163,36 @@ PRIVATE>
         } cond
     ] with-mapped-uchar-file ;
 
-: file-id3-tags ( path -- id3v2-info/f )
-    dup file-info size>> 0 <= [ drop f ] [ (file-id3-tags) ] if ;
+: (find-id3-frame) ( id3 name quot: ( obj -- obj' ) -- obj' )
+    [ swap frames>> at* ] dip
+    [ data>> ] prepose [ drop f ] if ; inline
 
-: parse-id3s ( path -- seq )
-    [ >lower ".mp3" tail? ] find-all-files
-    [ dup file-id3-tags ] { } map>assoc ;
+PRIVATE>
+
+: mp3>id3 ( path -- id3v2-info/f )
+    dup file-info size>> 0 <= [ drop f ] [ (mp3>id3) ] if ; inline
+
+: find-id3-frame ( id3 name -- obj/f )
+    [ ] (find-id3-frame) ; inline
+
+: title ( id3 -- title/f ) "TIT2" find-id3-frame ; inline
+
+: artist ( id3 -- artist/f ) "TPE1" find-id3-frame ; inline
+
+: album ( id3 -- album/f ) "TALB" find-id3-frame ; inline
+
+: year ( id3 -- year/f ) "TYER" find-id3-frame ; inline
+
+: comment ( id3 -- comment/f ) "COMM" find-id3-frame ; inline
+
+: genre ( id3 -- genre/f )
+    "TCON" [ parse-genre ] (find-id3-frame) ; inline
+
+: find-mp3s ( path -- seq )
+    [ >lower ".mp3" tail? ] find-all-files ; inline
+
+: mp3-paths>id3s ( seq -- seq' )
+    [ dup mp3>id3 ] { } map>assoc ; inline
+
+: parse-mp3-directory ( path -- seq )
+    find-mp3s mp3-paths>id3s ;
