@@ -1,6 +1,6 @@
-IN: compiler.units.tests
 USING: definitions compiler.units tools.test arrays sequences words kernel
 accessors namespaces fry ;
+IN: compiler.units.tests
 
 [ [ [ ] define-temp ] with-compilation-unit ] must-infer
 [ [ [ ] define-temp ] with-nested-compilation-unit ] must-infer
@@ -31,3 +31,18 @@ accessors namespaces fry ;
     ] with-compilation-unit
     "b" get execute
 ] unit-test
+
+! Notify observers even if compilation unit did nothing
+SINGLETON: observer
+
+observer add-definition-observer
+
+SYMBOL: counter
+
+0 counter set-global
+
+M: observer definitions-changed 2drop global [ counter inc ] bind ;
+
+[ ] with-compilation-unit
+
+[ 1 ] [ counter get-global ] unit-test

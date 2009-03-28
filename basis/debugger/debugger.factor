@@ -9,7 +9,7 @@ combinators generic.math classes.builtin classes compiler.units
 generic.standard vocabs init kernel.private io.encodings
 accessors math.order destructors source-files parser
 classes.tuple.parser effects.parser lexer compiler.errors
-generic.parser strings.parser vocabs.loader vocabs.parser ;
+generic.parser strings.parser vocabs.loader vocabs.parser see ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -309,11 +309,20 @@ M: lexer-error compute-restarts
 M: lexer-error error-help
     error>> error-help ;
 
-M: object compiler-error. ( error word -- )
-    nl
-    "While compiling " write pprint ": " print
-    nl
-    print-error ;
+M: object compiler-error. ( error -- )
+    [
+        [
+            [
+                [ line#>> # ": " % ]
+                [ word>> synopsis % ] bi
+            ] "" make
+        ] [
+            [
+                presented set
+                bold font-style set
+            ] H{ } make-assoc
+        ] bi format nl
+    ] [ error>> error. ] bi ;
 
 M: bad-effect summary
     drop "Bad stack effect declaration" ;
