@@ -5,7 +5,7 @@ stack-checker summary io.pathnames io.styles kernel namespaces
 parser prettyprint quotations tools.crossref tools.annotations
 editors tools.profiler tools.test tools.time tools.walker vocabs
 vocabs.loader words sequences tools.vocabs classes
-compiler.units accessors vocabs.parser macros.expander ui
+compiler.errors compiler.units accessors vocabs.parser macros.expander ui
 ui.tools.browser ui.tools.listener ui.tools.listener.completion
 ui.tools.profiler ui.tools.inspector ui.tools.traceback
 ui.commands ui.gadgets.editors ui.gestures ui.operations
@@ -86,6 +86,24 @@ IN: ui.tools.operations
     { +listener+ t }
 } define-operation
 
+! Compiler errors
+: edit-error ( error -- )
+    [ file>> ] [ line#>> ] bi edit-location ;
+
+[ compiler-error? ] \ edit-error H{
+    { +primary+ t }
+    { +secondary+ t }
+    { +listener+ t }
+} define-operation
+
+: com-reload ( error -- )
+    file>> run-file ;
+
+[ compiler-error? ] \ com-reload H{
+    { +listener+ t }
+} define-operation
+
+! Definitions
 : com-forget ( defspec -- )
     [ forget ] with-compilation-unit ;
 
