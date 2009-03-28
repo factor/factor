@@ -28,7 +28,7 @@ M: byte-reader stream-seek ( n seek-type stream -- )
     swap {
         { seek-absolute [ (>>i) ] }
         { seek-relative [ [ + ] change-i drop ] }
-        { seek-end [ dup underlying>> length >>i [ + ] change-i drop ] }
+        { seek-end [ [ underlying>> length + ] keep (>>i) ] }
         [ bad-seek-type ]
     } case ;
 
