@@ -2,7 +2,7 @@ USING: alien ui.gadgets.panes ui.gadgets namespaces
 kernel sequences io io.styles io.streams.string tools.test
 prettyprint definitions help help.syntax help.markup
 help.stylesheet splitting ui.gadgets.debug models math summary
-inspector accessors help.topics see ;
+inspector accessors help.topics see fry ;
 IN: ui.gadgets.panes.tests
 
 : #children ( -- n ) "pane" get children>> length ;
@@ -18,8 +18,9 @@ IN: ui.gadgets.panes.tests
 [ t ] [ #children "num-children" get = ] unit-test
 
 : test-gadget-text ( quot -- ? )
-    dup make-pane gadget-text dup print "======" print
-    swap with-string-writer dup print = ;
+    '[ _ call( -- ) ]
+    [ make-pane gadget-text dup print "======" print ]
+    [ with-string-writer dup print ] bi = ;
 
 [ t ] [ [ "hello" write ] test-gadget-text ] unit-test
 [ t ] [ [ "hello" pprint ] test-gadget-text ] unit-test
