@@ -23,3 +23,7 @@ kernel io.streams.string xml.writer ;
 [ "<span class=\"MARKUP\">: foo</span> <span class=\"MARKUP\">;</span>" ] [
     { ": foo ;" } "factor" htmlize-lines xml>string
 ] unit-test
+
+[ ":foo" ] [
+    { ":foo" } "factor" htmlize-lines xml>string
+] unit-test
