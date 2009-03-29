@@ -1,7 +1,6 @@
-! FUNCTION: AbortDoc
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax kernel windows.types ;
+USING: alien alien.syntax alien.destructors kernel windows.types ;
 IN: windows.gdi32
 
 ! Stock Logical Objects
@@ -36,6 +35,7 @@ CONSTANT: DIB_PAL_COLORS 1
 
 LIBRARY: gdi32
 
+! FUNCTION: AbortDoc
 ! FUNCTION: AbortPath
 ! FUNCTION: AddFontMemResourceEx
 ! FUNCTION: AddFontResourceA
@@ -178,9 +178,11 @@ FUNCTION: HRGN CreateRectRgn ( int x, int y, int w, int h ) ;
 ! FUNCTION: DdEntry9
 ! FUNCTION: DeleteColorSpace
 FUNCTION: BOOL DeleteDC ( HDC hdc ) ;
+DESTRUCTOR: DeleteDC
 ! FUNCTION: DeleteEnhMetaFile
 ! FUNCTION: DeleteMetaFile
 FUNCTION: BOOL DeleteObject ( HGDIOBJ hObject ) ;
+DESTRUCTOR: DeleteObject
 ! FUNCTION: DescribePixelFormat
 ! FUNCTION: DeviceCapabilitiesExA
 ! FUNCTION: DeviceCapabilitiesExW
