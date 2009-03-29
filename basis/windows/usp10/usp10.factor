@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax ;
+USING: alien.syntax alien.destructors ;
 IN: windows.usp10
 
 LIBRARY: usp10
@@ -261,6 +261,8 @@ FUNCTION: HRESULT ScriptStringAnalyse (
 FUNCTION: HRESULT ScriptStringFree (
     SCRIPT_STRING_ANALYSIS* pssa
 ) ;
+
+DESTRUCTOR: ScriptStringFree
 
 FUNCTION: SIZE* ScriptString_pSize ( SCRIPT_STRING_ANALYSIS ssa ) ;
 
