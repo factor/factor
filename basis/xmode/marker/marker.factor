@@ -84,7 +84,7 @@ M: string-matcher text-matches?
     ] keep string>> length and ;
 
 M: regexp text-matches?
-    [ >string ] dip re-contains? ;
+    [ >string ] dip first-match to>> ;
 
 : rule-start-matches? ( rule -- match-count/f )
     dup start>> tuck swap can-match-here? [
