@@ -75,7 +75,7 @@ DEFER: (parse-paragraph)
         "|" split1
         [ "" like dup simple-link-title ] unless*
         [ "image:" ?head ] dip swap [ image boa ] [ parse-paragraph link boa ] if
-    ] dip [ (parse-paragraph) cons ] when* ;
+    ] dip [ (parse-paragraph) cons ] [ 1list ] if* ;
 
 : ?first ( seq -- elt ) 0 swap ?nth ;
 
@@ -187,7 +187,8 @@ DEFER: (parse-paragraph)
 : parse-code ( state -- state' item )
     dup 1 look CHAR: [ =
     [ unclip-slice make-paragraph ] [
-        "{" take-until [ rest ] dip
+        "{" take-until
+        [ rest ] dip
         "}]" take-until
         [ code boa ] dip swap
     ] if ;
