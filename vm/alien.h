@@ -40,6 +40,7 @@ void primitive_set_alien_cell(void);
 DLLEXPORT void to_value_struct(CELL src, void *dest, CELL size);
 DLLEXPORT void box_value_struct(void *src, CELL size);
 DLLEXPORT void box_small_struct(CELL x, CELL y, CELL size);
+void box_medium_struct(CELL x1, CELL x2, CELL x3, CELL x4, CELL size);
 
 DEFINE_UNTAG(F_DLL,DLL_TYPE,dll)
 
