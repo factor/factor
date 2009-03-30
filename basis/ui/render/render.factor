@@ -38,7 +38,7 @@ SYMBOL: viewport-translation
     ! white gl-clear is broken w.r.t window resizing
     ! Linux/PPC Radeon 9200
     COLOR: white gl-color
-    clip get dim>> gl-fill-rect ;
+    { 0 0 } clip get dim>> gl-fill-rect ;
 
 GENERIC: draw-gadget* ( gadget -- )
 

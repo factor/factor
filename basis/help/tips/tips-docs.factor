@@ -17,7 +17,14 @@ TIP: "You can write documentation for your own code using the " { $link "help" }
 TIP: "You can write graphical applications using the " { $link "ui" } "." ;
 
 TIP: "Power tools: " { $links see edit help about apropos time infer. } ;
- 
+
+TIP: "Tips of the day implement the " { $link "definition-protocol" } " and new tips of the day can be defined using the " { $link POSTPONE: TIP: } " parsing word." ;
+
+HELP: TIP:
+{ $syntax "TIP: content ;" }
+{ $values { "content" "a markup element" } }
+{ $description "Defines a new tip of the day." } ;
+  
 ARTICLE: "all-tips-of-the-day" "All tips of the day"
 { $tips-of-the-day } ;
 

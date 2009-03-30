@@ -11,6 +11,7 @@ IMAGE = factor.image
 BUNDLE = Factor.app
 LIBPATH = -L/usr/X11R6/lib
 CFLAGS = -Wall
+FFI_TEST_CFLAGS = -fPIC
 
 ifdef DEBUG
 	CFLAGS += -g
@@ -140,9 +141,10 @@ wince-arm:
 
 macosx.app: factor
 	mkdir -p $(BUNDLE)/Contents/MacOS
+	mkdir -p $(BUNDLE)/Contents/Frameworks
 	mv $(EXECUTABLE) $(BUNDLE)/Contents/MacOS/factor
 	ln -s Factor.app/Contents/MacOS/factor ./factor
-	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks
+	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks/$(ENGINE)
 
 	install_name_tool \
 		-change libfactor.dylib \
@@ -160,11 +162,11 @@ factor-console: $(DLL_OBJS) $(EXE_OBJS)
 		$(CFLAGS) $(CFLAGS_CONSOLE) -o factor$(EXE_SUFFIX)$(CONSOLE_EXTENSION) $(EXE_OBJS)
 
 factor-ffi-test: vm/ffi_test.o
-	$(CC) $(LIBPATH) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o libfactor-ffi-test$(DLL_EXTENSION) $(TEST_OBJS)
+	$(CC) $(LIBPATH) $(CFLAGS) $(FFI_TEST_CFLAGS) $(SHARED_FLAG) -o libfactor-ffi-test$(SHARED_DLL_EXTENSION) $(TEST_OBJS)
 
 clean:
 	rm -f vm/*.o
-	rm -f factor*.dll libfactor.{a,so,dylib}
+	rm -f factor*.dll libfactor.{a,so,dylib} libfactor-ffi-test.{a,so,dylib}
 
 vm/resources.o:
 	$(WINDRES) vm/factor.rs vm/resources.o

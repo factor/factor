@@ -34,16 +34,18 @@ M: object specializer-declaration class ;
         [ specializer-declaration ] map '[ _ declare ] pick append
     ] { } map>assoc ;
 
+: specialize-quot ( quot specializer -- quot' )
+    specializer-cases alist>quot ;
+
 : method-declaration ( method -- quot )
     [ "method-generic" word-prop dispatch# object <array> ]
     [ "method-class" word-prop ]
     bi prefix ;
 
 : specialize-method ( quot method -- quot' )
-    method-declaration '[ _ declare ] prepend ;
-
-: specialize-quot ( quot specializer -- quot' )
-    specializer-cases alist>quot ;
+    [ method-declaration '[ _ declare ] prepend ]
+    [ "method-generic" word-prop "specializer" word-prop ] bi
+    [ specialize-quot ] when* ;
 
 : standard-method? ( method -- ? )
     dup method-body? [
@@ -52,9 +54,11 @@ M: object specializer-declaration class ;
 
 : specialized-def ( word -- quot )
     [ def>> ] keep
-    [ dup standard-method? [ specialize-method ] [ drop ] if ]
-    [ "specializer" word-prop [ specialize-quot ] when* ]
-    bi ;
+    dup generic? [ drop ] [
+        [ dup standard-method? [ specialize-method ] [ drop ] if ]
+        [ "specializer" word-prop [ specialize-quot ] when* ]
+        bi
+    ] if ;
 
 : specialized-length ( specializer -- n )
     dup [ array? ] all? [ first ] when length ;
