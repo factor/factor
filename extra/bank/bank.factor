@@ -59,7 +59,7 @@ C: <transaction> transaction
         [ dup [ over [ swap call ] dip ] dip 1 days time+ ] dip each-day
     ] [
         3drop
-    ] if ;
+    ] if ; inline
 
 : process-to-date ( account date -- account )
     over interest-last-paid>> 1 days time+
