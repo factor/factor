@@ -160,12 +160,23 @@ void box_value_struct(void *src, CELL size)
 	dpush(tag_object(array));
 }
 
-/* On OS X, structs <= 8 bytes are returned in registers. */
+/* On some x86 OSes, structs <= 8 bytes are returned in registers. */
 void box_small_struct(CELL x, CELL y, CELL size)
 {
 	CELL data[2];
 	data[0] = x;
 	data[1] = y;
+	box_value_struct(data,size);
+}
+
+/* On OS X/PPC, complex numbers are returned in registers. */
+void box_medium_struct(CELL x1, CELL x2, CELL x3, CELL x4, CELL size)
+{
+	CELL data[4];
+	data[0] = x1;
+	data[1] = x2;
+	data[2] = x3;
+	data[3] = x4;
 	box_value_struct(data,size);
 }
 
