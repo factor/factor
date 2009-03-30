@@ -242,18 +242,18 @@ GENERIC: count ( collection query -- result )
 M: assoc count
     [ "count" H{ } clone [ set-at ] keep ] dip
     [ over [ "query" ] dip set-at ] when*
-    [ cmd-collection ] dip <mdb-query-msg> find-one objects>> first
+    [ cmd-collection ] dip <mdb-query-msg> find-one 
     [ check-ok ] keep '[ "n" _ at >fixnum ] [ f ] if ;
  
 : lasterror ( -- error )
     cmd-collection H{ { "getlasterror" 1 } } <mdb-query-msg>
-    find-one objects>> first [ "err" ] dip at ;
+    find-one [ "err" ] dip at ;
 
 GENERIC: validate. ( collection -- )
 M: string validate.
     [ cmd-collection ] dip
     "validate" H{ } clone [ set-at ] keep
-    <mdb-query-msg> find-one objects>> first [ check-ok ] keep
+    <mdb-query-msg> find-one [ check-ok ] keep
     '[ "result" _ at print ] when ;
 M: mdb-collection validate.
     name>> validate. ;
@@ -289,7 +289,7 @@ M: assoc ensure-index
     H{ } clone
     [ [ "index" ] dip set-at ] keep
     [ [ "deleteIndexes" ] dip set-at ] keep
-    [ cmd-collection ] dip <mdb-query-msg> find-one objects>> first
+    [ cmd-collection ] dip <mdb-query-msg> find-one 
     check-ok [ "could not drop index" throw ] unless ;
 
 : <update> ( collection selector object -- update-msg )
@@ -323,5 +323,5 @@ M: assoc delete-unsafe
 : drop-collection ( name -- )
     [ cmd-collection ] dip
     "drop" H{ } clone [ set-at ] keep
-    <mdb-query-msg> find-one objects>> first check-ok
+    <mdb-query-msg> find-one check-ok
     [ "could not drop collection" throw ] unless ;
