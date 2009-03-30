@@ -195,8 +195,6 @@ void mark_code_block(F_CODE_BLOCK *compiled)
 
 	copy_handle(&compiled->literals);
 	copy_handle(&compiled->relocation);
-
-	flush_icache_for(compiled);
 }
 
 void mark_stack_frame_step(F_STACK_FRAME *frame)
