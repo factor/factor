@@ -2,7 +2,7 @@ USING: help.markup help.syntax ui.commands ;
 IN: ui.tools.browser
 
 ARTICLE: "ui-browser" "UI browser"
-"The browser is used to display Factor code, documentation, and vocabularies. The browser is opened when a word or articlelink presentation is clicked. It can also be opened using words:"
+"The browser is used to display Factor code, documentation, and vocabularies. The browser is opened when a word or article link presentation is clicked. It can also be opened using words:"
 { $subsection com-browse }
 { $subsection browser-window }
 { $command-map browser-gadget "toolbar" }
