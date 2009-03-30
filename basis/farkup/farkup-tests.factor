@@ -182,7 +182,7 @@ link-no-follow? off
 [ "<table><tr><td>foo|bar</td></tr></table>" ] [ "|foo\\|bar|" convert-farkup ] unit-test
 [ "<p></p>" ] [ "\\" convert-farkup ] unit-test
 
-! [ "<p>[abc]</p>" ] [ "[abc]" convert-farkup ] unit-test
+[ "<p>[abc]</p>" ] [ "[abc]" convert-farkup ] unit-test
 
 : random-markup ( -- string )
     10 [
