@@ -3,9 +3,6 @@ namespaces math.rectangles accessors ui.gadgets.grids.private
 ui.gadgets.debug sequences ;
 IN: ui.gadgets.grids.tests
 
-[ { { { 1 "a" } { 1 "b" } } { { 2 "a" } { 2 "b" } } } ]
-[ { 1 2 } { "a" "b" } cross-zip ] unit-test
-
 [ { 0 0 } ] [ { } <grid> pref-dim ] unit-test
 
 : 100x100 ( -- gadget ) <gadget> { 100 100 } >>dim ;

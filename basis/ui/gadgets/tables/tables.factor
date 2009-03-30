@@ -121,16 +121,15 @@ M: table layout*
     [ [ line-height ] dip * 0 swap 2array ]
     [ drop [ dim>> first ] [ line-height ] bi 2array ] 2bi <rect> ;
 
-: highlight-row ( table row color quot -- )
-    [ [ row-rect rect-bounds ] dip gl-color ] dip
-    '[ _ @ ] with-translation ; inline
+: row-bounds ( table row -- loc dim )
+    row-rect rect-bounds ; inline
 
 : draw-selected-row ( table -- )
     {
         { [ dup selected-index>> not ] [ drop ] }
         [
-            [ ] [ selected-index>> ] [ selection-color>> ] tri
-            [ gl-fill-rect ] highlight-row
+            [ ] [ selected-index>> ] [ selection-color>> gl-color ] tri
+            row-bounds gl-fill-rect
         ]
     } cond ;
 
@@ -139,14 +138,15 @@ M: table layout*
         { [ dup focused?>> not ] [ drop ] }
         { [ dup selected-index>> not ] [ drop ] }
         [
-            [ ] [ selected-index>> ] [ focus-border-color>> ] tri
-            [ gl-rect ] highlight-row
+            [ ] [ selected-index>> ] [ focus-border-color>> gl-color ] tri
+            row-bounds gl-rect
         ]
     } cond ;
 
 : draw-moused-row ( table -- )
     dup mouse-index>> dup [
-        over mouse-color>> [ gl-rect ] highlight-row
+        over mouse-color>> gl-color
+        row-bounds gl-rect
     ] [ 2drop ] if ;
 
 : column-line-offsets ( table -- xs )
@@ -279,7 +279,7 @@ PRIVATE>
 
 : row-action ( table -- )
     dup selected-row
-    [ swap [ action>> call ] [ dup hook>> call ] bi ]
+    [ swap [ action>> call( value -- ) ] [ dup hook>> call( table -- ) ] bi ]
     [ 2drop ]
     if ;
 

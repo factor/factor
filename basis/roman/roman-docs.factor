@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel math ;
+USING: help.markup help.syntax kernel math strings ;
 IN: roman
 
 HELP: >roman
@@ -39,7 +39,7 @@ HELP: roman>
 { >roman >ROMAN roman> } related-words
 
 HELP: roman+
-{ $values { "str1" "a string" } { "str2" "a string" } { "str3" "a string" } }
+{ $values { "string" string } { "string" string } { "string" string } }
 { $description "Adds two Roman numerals." }
 { $examples 
     { $example "USING: io roman ;"
@@ -49,7 +49,7 @@ HELP: roman+
 } ;
 
 HELP: roman-
-{ $values { "str1" "a string" } { "str2" "a string" } { "str3" "a string" } }
+{ $values { "string" string } { "string" string } { "string" string } }
 { $description "Subtracts two Roman numerals." }
 { $examples 
     { $example "USING: io roman ;"
@@ -61,7 +61,7 @@ HELP: roman-
 { roman+ roman- } related-words
 
 HELP: roman*
-{ $values { "str1" "a string" } { "str2" "a string" } { "str3" "a string" } }
+{ $values { "string" string } { "string" string } { "string" string } }
 { $description "Multiplies two Roman numerals." }
 { $examples 
     { $example "USING: io roman ;"
@@ -71,7 +71,7 @@ HELP: roman*
 } ;
 
 HELP: roman/i
-{ $values { "str1" "a string" } { "str2" "a string" } { "str3" "a string" } }
+{ $values { "string" string } { "string" string } { "string" string } }
 { $description "Computes the integer division of two Roman numerals." }
 { $examples 
     { $example "USING: io roman ;"
@@ -81,7 +81,7 @@ HELP: roman/i
 } ;
 
 HELP: roman/mod
-{ $values { "str1" "a string" } { "str2" "a string" } { "str3" "a string" } { "str4" "a string" } }
+{ $values { "string" string } { "string" string } { "string" string } { "string" string } }
 { $description "Computes the quotient and remainder of two Roman numerals." }
 { $examples 
     { $example "USING: kernel io roman ;"

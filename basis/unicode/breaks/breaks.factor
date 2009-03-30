@@ -60,7 +60,7 @@ SYMBOL: table
 : finish-table ( -- table )
     table get [ [ 1 = ] map ] map ;
 
-: eval-seq ( seq -- seq ) [ dup word? [ execute ] when ] map ;
+: eval-seq ( seq -- seq ) [ ?execute ] map ;
 
 : (set-table) ( class1 class2 val -- )
     [ table get nth ] dip '[ _ or ] change-nth ;

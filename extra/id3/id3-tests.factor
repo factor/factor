@@ -5,12 +5,12 @@ IN: id3.tests
 
 : id3-params ( id3 -- title artist album year comment genre )
     {
-        [ id3-title ]
-        [ id3-artist ]
-        [ id3-album ]
-        [ id3-year ]
-        [ id3-comment ]
-        [ id3-genre ]
+        [ title ]
+        [ artist ]
+        [ album ]
+        [ year ]
+        [ comment ]
+        [ genre ]
     } cleave ;
 
 [
@@ -20,7 +20,7 @@ IN: id3.tests
    "2009"
    "COMMENT"
    "Bluegrass"
-] [ "vocab:id3/tests/blah.mp3" file-id3-tags id3-params ] unit-test
+] [ "vocab:id3/tests/blah.mp3" mp3>id3 id3-params ] unit-test
 
 [
     "Anthem of the Trinity"
@@ -29,7 +29,7 @@ IN: id3.tests
     f
     f
     "Classical"
-] [ "vocab:id3/tests/blah2.mp3" file-id3-tags id3-params ] unit-test
+] [ "vocab:id3/tests/blah2.mp3" mp3>id3 id3-params ] unit-test
 
 [    
    "Stormy Weather"
@@ -38,5 +38,5 @@ IN: id3.tests
     f
    "eng, AG# 08E1C12E"
    "Big Band"
-] [ "vocab:id3/tests/blah3.mp3" file-id3-tags id3-params ] unit-test
+] [ "vocab:id3/tests/blah3.mp3" mp3>id3 id3-params ] unit-test
 

@@ -1,15 +1,14 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache colors.constants destructors fry kernel
-opengl opengl.gl combinators images grouping specialized-arrays.float
-locals sequences math math.vectors generalizations ;
+opengl opengl.gl combinators images images.tesselation grouping
+specialized-arrays.float locals sequences math math.vectors
+math.matrices generalizations fry columns ;
 IN: opengl.textures
 
 : gen-texture ( -- id ) [ glGenTextures ] (gen-gl-object) ;
 
 : delete-texture ( id -- ) [ glDeleteTextures ] (delete-gl-object) ;
-
-TUPLE: texture loc dim texture-coords texture display-list disposed ;
 
 GENERIC: component-order>format ( component-order -- format type )
 
@@ -19,7 +18,13 @@ M: RGBA component-order>format drop GL_RGBA GL_UNSIGNED_BYTE ;
 M: ARGB component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8_REV ;
 M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
 
+GENERIC: draw-texture ( texture -- )
+
+GENERIC: draw-scaled-texture ( dim texture -- )
+
 <PRIVATE
+
+TUPLE: single-texture loc dim texture-coords texture display-list disposed ;
 
 : repeat-last ( seq n -- seq' )
     over peek pad-tail concat ;
@@ -69,20 +74,27 @@ M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
     GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_REPEAT glTexParameteri
     GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_REPEAT glTexParameteri ;
 
-: draw-textured-rect ( dim texture -- )
+: with-texturing ( quot -- )
     GL_TEXTURE_2D [
         GL_TEXTURE_BIT [
             GL_TEXTURE_COORD_ARRAY [
                 COLOR: white gl-color
-                dup loc>> [
-                    [ [ GL_TEXTURE_2D ] dip texture>> glBindTexture ]
-                    [ init-texture texture-coords>> gl-texture-coord-pointer ] bi
-                    fill-rect-vertices (gl-fill-rect)
-                    GL_TEXTURE_2D 0 glBindTexture
-                ] with-translation
+                call
             ] do-enabled-client-state
         ] do-attribs
-    ] do-enabled ;
+    ] do-enabled ; inline
+
+: (draw-textured-rect) ( dim texture -- )
+    [ loc>> ]
+    [ [ GL_TEXTURE_2D ] dip texture>> glBindTexture ]
+    [ init-texture texture-coords>> gl-texture-coord-pointer ] tri
+    swap gl-fill-rect ;
+
+: draw-textured-rect ( dim texture -- )
+    [
+        (draw-textured-rect)
+        GL_TEXTURE_2D 0 glBindTexture
+    ] with-texturing ;
 
 : texture-coords ( dim -- coords )
     [ dup next-power-of-2 /f ] map
@@ -92,10 +104,8 @@ M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
 : make-texture-display-list ( texture -- dlist )
     GL_COMPILE [ [ dim>> ] keep draw-textured-rect ] make-dlist ;
 
-PRIVATE>
-
-: <texture> ( image loc -- texture )
-    texture new swap >>loc
+: <single-texture> ( image loc -- texture )
+   single-texture new swap >>loc
     swap
     [ dim>> >>dim ] keep
     [ dim>> product 0 = ] keep '[
@@ -105,12 +115,59 @@ PRIVATE>
         dup make-texture-display-list >>display-list
     ] unless ;
 
-M: texture dispose*
+M: single-texture dispose*
     [ texture>> [ delete-texture ] when* ]
     [ display-list>> [ delete-dlist ] when* ] bi ;
 
-: draw-texture ( texture -- )
-    display-list>> [ glCallList ] when* ;
+M: single-texture draw-texture display-list>> [ glCallList ] when* ;
 
-: draw-scaled-texture ( dim texture -- )
+M: single-texture draw-scaled-texture
     dup texture>> [ draw-textured-rect ] [ 2drop ] if ;
+
+TUPLE: multi-texture grid display-list loc disposed ;
+
+: image-locs ( image-grid -- loc-grid )
+    [ first [ dim>> first ] map ] [ 0 <column> [ dim>> second ] map ] bi
+    [ 0 [ + ] accumulate nip ] bi@
+    cross-zip flip ;
+
+: <texture-grid> ( image-grid loc -- grid )
+    [ dup image-locs ] dip
+    '[ [ _ v+ <single-texture> |dispose ] 2map ] 2map ;
+
+: draw-textured-grid ( grid -- )
+    [ [ [ dim>> ] keep (draw-textured-rect) ] each ] each ;
+
+: make-textured-grid-display-list ( grid -- dlist )
+    GL_COMPILE [
+        [
+            [
+                [
+                    [ dim>> ] keep (draw-textured-rect)
+                ] each
+            ] each
+            GL_TEXTURE_2D 0 glBindTexture
+        ] with-texturing
+    ] make-dlist ;
+
+: <multi-texture> ( image-grid loc -- multi-texture )
+    [
+        [
+            <texture-grid> dup
+            make-textured-grid-display-list
+        ] keep
+        f multi-texture boa
+    ] with-destructors ;
+
+M: multi-texture draw-texture display-list>> [ glCallList ] when* ;
+
+M: multi-texture dispose* grid>> [ [ dispose ] each ] each ;
+
+CONSTANT: max-texture-size { 256 256 }
+
+PRIVATE>
+
+: <texture> ( image loc -- texture )
+    over dim>> max-texture-size [ <= ] 2all?
+    [ <single-texture> ]
+    [ [ max-texture-size tesselate ] dip <multi-texture> ] if ;
