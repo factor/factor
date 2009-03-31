@@ -1,41 +1,62 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces math kernel sequences accessors fry circular ;
+USING: namespaces math kernel sequences accessors fry circular
+unicode.case unicode.categories locals ;
 IN: html.parser.state
 
-TUPLE: state string i ;
+TUPLE: state-parser string i ;
 
-: get-i ( -- i ) state get i>> ; inline
+: <state-parser> ( string -- state-parser )
+    state-parser new
+        swap >>string
+        0 >>i ;
 
-: get-char ( -- char )
-    state get [ i>> ] [ string>> ] bi ?nth ; inline
+: (get-char) ( i state -- char/f )
+    string>> ?nth ; inline
 
-: get-next ( -- char )
-    state get [ i>> 1+ ] [ string>> ] bi ?nth ; inline
+: get-char ( state -- char/f )
+    [ i>> ] keep (get-char) ; inline
 
-: next ( -- )
-    state get [ 1+ ] change-i drop ; inline
+: get-next ( state -- char/f )
+    [ i>> 1+ ] keep (get-char) ; inline
+
+: next ( state -- state )
+    [ 1+ ] change-i ; inline
+
+: get+increment ( state -- char/f )
+    [ get-char ] [ next drop ] bi ; inline
 
 : string-parse ( string quot -- )
-    [ 0 state boa state ] dip with-variable ; inline
+    [ <state-parser> ] dip call ; inline
 
-: short* ( n seq -- n' seq )
-    over [ nip dup length swap ] unless ; inline
+:: skip-until ( state quot: ( obj -- ? ) -- )
+    state get-char [
+        quot call [ state next quot skip-until ] unless
+    ] when* ; inline recursive
 
-: skip-until ( quot: ( -- ? ) -- )
-    get-char [
-        [ call ] keep swap
-        [ drop ] [ next skip-until ] if
-    ] [ drop ] if ; inline recursive
+: take-until ( state quot: ( obj -- ? ) -- string )
+    [ drop i>> ]
+    [ skip-until ]
+    [ drop [ i>> ] [ string>> ] bi ] 2tri subseq ; inline
 
-: take-until ( quot: ( -- ? ) -- )
-    get-i [ skip-until ] dip get-i
-    state get string>> subseq ; inline
+:: take-until-string ( state-parser string -- string' )
+    string length <growing-circular> :> growing
+    state-parser
+    [
+        growing push-growing-circular
+        string growing sequence=
+    ] take-until :> found
+    found dup length
+    growing length 1- - head
+    state-parser next drop ;
+    
+: skip-whitespace ( state -- state )
+    [ [ blank? not ] take-until drop ] keep ;
 
-: string-matches? ( string circular -- ? )
-    get-char over push-growing-circular sequence= ; inline
+: take-rest ( state -- string )
+    [ drop f ] take-until ; inline
 
-: take-string ( match -- string )
-    dup length <growing-circular>
-    [ 2dup string-matches? ] take-until nip
-    dup length rot length 1- - head next ; inline
+: take-until-char ( state ch -- string )
+    '[ _ = ] take-until ;
+
+: string-parse-end? ( state -- ? ) get-next not ;
