@@ -30,6 +30,6 @@ PRIVATE>
 : bind ( ns quot -- ) swap >n call ndrop ; inline
 : counter ( variable -- n ) global [ 0 or 1+ dup ] change-at ;
 : make-assoc ( quot exemplar -- hash ) 20 swap new-assoc [ swap bind ] keep ; inline
-: with-scope ( quot -- ) H{ } clone swap bind ; inline
+: with-scope ( quot -- ) 5 <hashtable> swap bind ; inline
 : with-variable ( value key quot -- ) [ associate ] dip bind ; inline
 : initialize ( variable quot -- ) [ global ] dip [ unless* ] curry change-at ; inline
