@@ -53,6 +53,21 @@ test         = <foreign parse-smalltalk Literal>
 [ T{ ast-block f { "x" } { T{ ast-return f T{ ast-name f "x" } } } } ] [ "[ :x|^x]" test-Literal ] unit-test
 [ T{ ast-block f { } { T{ ast-return f self } } } ] [ "[^self]" test-Literal ] unit-test
 
+[
+    T{ ast-block
+       { arguments { "i" } }
+       { body
+         {
+             T{ ast-message-send
+                { receiver T{ ast-name { name "i" } } }
+                { selector "print" }
+             }
+         }
+       }
+    }
+]
+[ "[ :i | i print ]" test-Literal ] unit-test
+
 EBNF: test-FormalBlockArgumentDeclarationList
 test         = <foreign parse-smalltalk FormalBlockArgumentDeclarationList>
 ;EBNF
@@ -88,6 +103,24 @@ test         = <foreign parse-smalltalk Expression>
 
 [
     T{ ast-message-send f
+        T{ ast-message-send f 3 "factorial" { } }
+        "+"
+        { T{ ast-message-send f 4 "factorial" { } } }
+    }
+]
+[ "   3 factorial + 4 factorial" test-Expression ] unit-test
+
+[
+    T{ ast-message-send f
+        T{ ast-message-send f 3 "factorial" { } }
+        "+"
+        { T{ ast-message-send f 4 "factorial" { } } }
+    }
+]
+[ "   3 factorial + 4 factorial     " test-Expression ] unit-test
+
+[
+    T{ ast-message-send f
         T{ ast-message-send f
             T{ ast-message-send f 3 "factorial" { } }
             "+"
@@ -98,13 +131,53 @@ test         = <foreign parse-smalltalk Expression>
     }
 ]
 [ "(3 factorial + 4) factorial" test-Expression ] unit-test
+
+[
+    T{ ast-message-send
+       { receiver
+         T{ ast-message-send
+            { receiver
+              T{ ast-message-send
+                 { receiver 1 }
+                 { selector "<" }
+                 { arguments { 10 } }
+              }
+            }
+            { selector "ifTrue:ifFalse:" }
+            { arguments
+              {
+                  T{ ast-block { body { "HI" } } }
+                  T{ ast-block { body { "BYE" } } }
+              }
+            }
+         }
+       }
+       { selector "print" }
+    }
+]
+[ "((1 < 10) ifTrue: [ 'HI' ] ifFalse: [ 'BYE' ]) print" test-Expression ] unit-test
+
+[
+    T{ ast-message-send
+       { receiver
+         T{ ast-message-send
+            { receiver { T{ ast-block { body { "a" } } } } }
+            { selector "at:" }
+            { arguments { 0 } }
+         }
+       }
+       { selector "value" }
+    }
+]
+[ "(#(['a']) at: 0) value" test-Expression ] unit-test
+
 EBNF: test-FinalStatement
 test         = <foreign parse-smalltalk FinalStatement>
 ;EBNF
 
-[ T{ ast-return f T{ ast-name f "value" } } ] [ "value" test-FinalStatement ] unit-test
+[ T{ ast-name f "value" } ] [ "value" test-FinalStatement ] unit-test
 [ T{ ast-return f T{ ast-name f "value" } } ] [ "^value" test-FinalStatement ] unit-test
-[ T{ ast-return f T{ ast-assignment f T{ ast-name f "value" } 5 } } ] [ "value:=5" test-FinalStatement ] unit-test
+[ T{ ast-assignment f T{ ast-name f "value" } 5 } ] [ "value:=5" test-FinalStatement ] unit-test
 
 EBNF: test-LocalVariableDeclarationList
 test         = <foreign parse-smalltalk LocalVariableDeclarationList>

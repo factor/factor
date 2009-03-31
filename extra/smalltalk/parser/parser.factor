@@ -143,13 +143,15 @@ BinaryMessageSend = (BinaryMessageSend:lhs
                     | BinaryMessageSend-1
 
 KeywordMessageSegment = Keyword:k OptionalWhiteSpace BinaryMessageOperand:arg => [[ { k arg } ]]
-KeywordMessageSend = BinaryMessageOperand:receiver
+KeywordMessageSend = (BinaryMessageSend | UnaryMessageSend | Operand):receiver
                      OptionalWhiteSpace
                      KeywordMessageSegment:h
                      (OptionalWhiteSpace KeywordMessageSegment:s => [[ s ]])*:t
                      => [[ receiver t h prefix unzip [ concat ] dip ast-message-send boa ]]
 
-Expression = KeywordMessageSend | BinaryMessageSend | UnaryMessageSend | Operand
+Expression = OptionalWhiteSpace
+             (KeywordMessageSend | BinaryMessageSend | UnaryMessageSend | Operand):e
+             => [[ e ]]
 
 AssignmentOperation = OptionalWhiteSpace BindableIdentifier:i
                       OptionalWhiteSpace ":=" OptionalWhiteSpace => [[ i ast-name boa ]]
@@ -157,7 +159,8 @@ AssignmentStatement = AssignmentOperation:a Statement:s => [[ a s ast-assignment
 Statement = AssignmentStatement | Expression
 
 MethodReturnOperator = OptionalWhiteSpace "^"
-FinalStatement = (MethodReturnOperator)? Statement:s => [[ s ast-return boa ]]
+FinalStatement = (MethodReturnOperator Statement:s => [[ s ast-return boa ]])
+                 | Statement
 
 LocalVariableDeclarationList = OptionalWhiteSpace "|" OptionalWhiteSpace
                 (BindableIdentifier:h
@@ -200,4 +203,14 @@ ClassDeclaration = OptionalWhiteSpace "class" OptionalWhiteSpace Identifier:name
 End = !(.)
 
 Program = ClassDeclaration* End
+;EBNF
+
+EBNF: parse-smalltalk-statement
+
+Statement = <foreign parse-smalltalk Statement>
+
+End = !(.)
+
+Program = Statement? => [[ nil or ]] End
+
 ;EBNF

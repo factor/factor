@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators.short-circuit
 continuations fry kernel namespaces quotations sequences sets
-slots locals.types generalizations smalltalk.ast
+generalizations slots locals.types generalizations smalltalk.ast
 smalltalk.compiler.lexenv smalltalk.selectors ;
 IN: smalltalk.compiler
 
@@ -12,16 +12,18 @@ GENERIC: need-return-continuation? ( ast -- ? )
 
 M: ast-return need-return-continuation? drop t ;
 
-M: ast-block need-return-continuation? body>> [ need-return-continuation? ] any? ;
+M: ast-block need-return-continuation? body>> need-return-continuation? ;
 
 M: ast-message-send need-return-continuation?
     {
         [ receiver>> need-return-continuation? ]
-        [ arguments>> [ need-return-continuation? ] any? ]
+        [ arguments>> need-return-continuation? ]
     } 1&& ;
 
 M: ast-assignment need-return-continuation?
     value>> need-return-continuation? ;
+
+M: array need-return-continuation? [ need-return-continuation? ] any? ;
 
 M: object need-return-continuation? drop f ;
 
@@ -30,15 +32,19 @@ GENERIC: assigned-locals ( ast -- seq )
 M: ast-return assigned-locals value>> assigned-locals ;
 
 M: ast-block assigned-locals
-    [ body>> [ assigned-locals ] map concat ] [ arguments>> ] bi diff ;
+    [ body>> assigned-locals ] [ arguments>> ] bi diff ;
 
 M: ast-message-send assigned-locals
+    [ arguments>> assigned-locals ]
     [ receiver>> assigned-locals ]
-    [ arguments>> [ assigned-locals ] map ] bi append ;
+    bi append ;
 
 M: ast-assignment assigned-locals
     [ name>> dup ast-name? [ name>> 1array ] [ drop { } ] if ]
     [ value>> assigned-locals ] bi append ;
+
+M: array assigned-locals
+    [ assigned-locals ] map concat ;
 
 M: object assigned-locals drop f ;
 
@@ -52,14 +58,30 @@ M: ast-name compile-ast
     name>> swap local-readers>> at 1quotation ;
 
 M: ast-message-send compile-ast
+    [ arguments>> [ compile-ast ] with map [ ] join ]
     [ receiver>> compile-ast ]
-    [ arguments>> [ compile-ast ] with map concat ]
     [ nip selector>> selector>generic ]
     2tri [ append ] dip suffix ;
 
 M: ast-return compile-ast
     value>> compile-ast
     [ return-continuation get continue-with ] append ;
+
+GENERIC: contains-blocks? ( obj -- ? )
+
+M: ast-block contains-blocks? drop t ;
+
+M: object contains-blocks? drop f ;
+
+M: array contains-blocks? [ contains-blocks? ] any? ;
+
+M: array compile-ast
+    dup contains-blocks? [
+        [ [ compile-ast ] with map [ ] join ] [ length ] bi
+        '[ @ _ narray ]
+    ] [
+        call-next-method
+    ] if ;
 
 GENERIC: compile-assignment ( lexenv name -- quot )
 
@@ -95,8 +117,15 @@ M: ast-block compile-ast
         bi-curry* bi
         append
     ] if-empty
-    <lambda> '[ @ ] ;
+    <lambda> '[ _ ] ;
 
 : compile-method ( block -- quot )
-    [ [ empty-lexenv ] dip compile-ast ] [ arguments>> length ] [ need-return-continuation? ] tri
+    [ [ empty-lexenv ] dip compile-ast [ call ] compose ]
+    [ arguments>> length ]
+    [ need-return-continuation? ]
+    tri
     [ '[ [ _ _ ncurry [ return-continuation set ] prepose callcc1 ] with-scope ] ] [ drop ] if ;
+
+: compile-statement ( statement -- quot )
+    [ [ empty-lexenv ] dip compile-ast ] [ need-return-continuation? ] bi
+    [ '[ [ [ return-continuation set @ ] callcc1 ] with-scope ] ] when ;
