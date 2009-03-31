@@ -106,7 +106,7 @@ TUPLE: entry title url description date ;
         { "feed" [ atom1.0 ] }
     } case ;
 
-GENERIC: parse-feed ( string -- feed )
+GENERIC: parse-feed ( sequence -- feed )
 
 M: string parse-feed [ string>xml xml>feed ] with-html-entities ;
 
