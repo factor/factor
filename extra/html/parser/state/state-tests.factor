@@ -1,14 +1,30 @@
-USING: tools.test html.parser.state ascii kernel ;
+USING: tools.test html.parser.state ascii kernel accessors ;
 IN: html.parser.state.tests
 
-: take-rest ( -- string )
-    [ f ] take-until ;
+[ "hello" ]
+[ "hello" [ take-rest ] string-parse ] unit-test
 
-: take-char ( -- string )
-    [ get-char = ] curry take-until ;
+[ "hi" " how are you?" ]
+[
+    "hi how are you?"
+    [ [ [ blank? ] take-until ] [ take-rest ] bi ] string-parse
+] unit-test
 
-[ "hello" ] [ "hello" [ take-rest ] string-parse ] unit-test
-[ "hi" " how are you?" ] [ "hi how are you?" [ [ get-char blank? ] take-until take-rest ] string-parse ] unit-test
-[ "foo" ";bar" ] [ "foo;bar" [ CHAR: ; take-char take-rest ] string-parse ] unit-test
+[ "foo" ";bar" ]
+[
+    "foo;bar" [
+        [ CHAR: ; take-until-char ] [ take-rest ] bi
+    ] string-parse
+] unit-test
+
 [ "foo " " bar" ]
-[ "foo and bar" [ "and" take-string take-rest ] string-parse ] unit-test
+[
+    "foo and bar" [
+        [ "and" take-until-string ] [ take-rest ] bi 
+    ] string-parse
+] unit-test
+
+[ 6 ]
+[
+    "      foo   " [ skip-whitespace i>> ] string-parse
+] unit-test
