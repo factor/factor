@@ -20,7 +20,7 @@ GENERIC: array-element>string ( object -- string )
 M: object array-element>string smalltalk>string ;
 
 M: array array-element>string
-    [ smalltalk>string ] map " " join "(" ")" surround ;
+    [ array-element>string ] map " " join "(" ")" surround ;
 
 M: array smalltalk>string
     array-element>string "#" prepend ;
