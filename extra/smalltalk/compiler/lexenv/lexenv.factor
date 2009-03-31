@@ -3,9 +3,15 @@
 USING: assocs kernel accessors ;
 IN: smalltalk.compiler.lexenv
 
-TUPLE: lexenv local-readers local-writers ;
+! local-readers: assoc string => word
+! local-writers: assoc string => word
+! self: word or f for top-level forms
+! class: class word or f for top-level forms
+! method: generic word or f for top-level forms
+TUPLE: lexenv local-readers local-writers self class method ;
 
-C: <lexenv> lexenv
+: <lexenv> ( local-readers local-writers -- lexenv )
+    f f f lexenv boa ; inline
 
 CONSTANT: empty-lexenv T{ lexenv }
 
