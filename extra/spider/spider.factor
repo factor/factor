@@ -25,7 +25,7 @@ TUPLE: unique-deque assoc deque ;
 : <unique-deque> ( -- unique-deque )
     H{ } clone <dlist> unique-deque boa ;
 
-: store-url ( url depth unique-deque -- )
+: push-url ( url depth unique-deque -- )
     [ <todo-url> ] dip
     [ [ [ t ] dip url>> ] [ assoc>> ] bi* set-at ]
     [ deque>> push-back ] 2bi ;
@@ -38,7 +38,7 @@ TUPLE: unique-deque assoc deque ;
     >url
     spider new
         over >>base
-        swap 0 <unique-deque> [ store-url ] keep >>todo
+        swap 0 <unique-deque> [ push-url ] keep >>todo
         <unique-deque> >>nonmatching
         <unique-deque> >>filtered
         0 >>max-depth
@@ -52,7 +52,7 @@ TUPLE: unique-deque assoc deque ;
     filters>> [ '[ [ _ 1&& ] filter ] call( seq -- seq' ) ] when* ;
 
 : push-links ( links level unique-deque -- )
-    '[ _ _ store-url ] each ;
+    '[ _ _ push-url ] each ;
 
 : add-todo ( links level spider -- )
     todo>> push-links ;
