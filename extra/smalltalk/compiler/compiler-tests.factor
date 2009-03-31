@@ -1,12 +1,10 @@
 USING: smalltalk.compiler tools.test prettyprint smalltalk.ast
-stack-checker locals.rewrite.closures kernel accessors
-compiler.units sequences ;
+smalltalk.compiler.lexenv stack-checker locals.rewrite.closures
+kernel accessors compiler.units sequences ;
 IN: smalltalk.compiler.tests
 
 : test-compilation ( ast -- quot )
-    [
-        compile-method rewrite-closures first
-    ] with-compilation-unit ;
+    [ compile-smalltalk [ call ] append ] with-compilation-unit ;
 
 : test-inference ( ast -- in# out# )
     test-compilation infer [ in>> ] [ out>> ] bi ;
@@ -31,7 +29,7 @@ IN: smalltalk.compiler.tests
            T{ ast-assignment f
               T{ ast-name f "a" }
               T{ ast-message-send f
-                 T{ ast-name f "asmal" }
+                 T{ ast-name f "c" }
                  "+"
                  { T{ ast-name f "b" } }
               }

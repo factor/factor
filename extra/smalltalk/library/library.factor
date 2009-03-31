@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel present io math sequences assocs math.ranges
-locals smalltalk.selectors smalltalk.ast ;
+locals smalltalk.selectors smalltalk.ast smalltalk.classes ;
 IN: smalltalk.library
 
 ! Some unary selectors
@@ -73,3 +73,7 @@ M: object selector-value: call( input -- result ) ;
 M: object selector-value:value: call( input input -- result ) ;
 M: object selector-value:value:value: call( input input input -- result ) ;
 M: object selector-value:value:value:value: call( input input input input -- result ) ;
+
+SELECTOR: new
+
+M: object selector-new new ;
