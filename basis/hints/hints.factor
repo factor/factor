@@ -119,6 +119,6 @@ SYNTAX: HINTS:
 
 \ >be { { bignum fixnum } { fixnum fixnum } } "specializer" set-word-prop
 
-\ hashtable \ at* method { { fixnum hashtable } { word hashtable } } "specializer" set-word-prop
+\ hashtable \ at* method { { fixnum object } { word object } } "specializer" set-word-prop
 
 \ hashtable \ set-at method { { object fixnum object } { object word object } } "specializer" set-word-prop
