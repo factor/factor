@@ -7,7 +7,7 @@ IN: smalltalk.listener
 
 : eval-smalltalk ( string -- )
     [
-        parse-smalltalk-statement compile-statement rewrite-closures first
+        parse-smalltalk compile-smalltalk
     ] with-compilation-unit call( -- result )
     dup nil? [ drop ] [ "Result: " write smalltalk>string print ] if ;
 

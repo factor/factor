@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: peg peg.ebnf smalltalk.ast sequences sequences.deep strings
-math.parser kernel arrays byte-arrays math assocs ;
+math.parser kernel arrays byte-arrays math assocs accessors ;
 IN: smalltalk.parser
 
 ! Based on http://chronos-st.blogspot.com/2007/12/smalltalk-in-one-page.html
@@ -189,28 +189,23 @@ MethodDeclaration = OptionalWhiteSpace "method" OptionalWhiteSpace MethodHeader:
         OptionalWhiteSpace "["
         ExecutableCode:code
         OptionalWhiteSpace "]"
-        => [[ header first2 "self" suffix code ast-block boa ast-method boa ]]
+        => [[ header first2 code ast-block boa ast-method boa ]]
 
 ClassDeclaration = OptionalWhiteSpace "class" OptionalWhiteSpace Identifier:name
         OptionalWhiteSpace
         ("extends" OptionalWhiteSpace Identifier:superclass OptionalWhiteSpace => [[ superclass ]])?:superclass
         OptionalWhiteSpace "["
-        (OptionalWhiteSpace LocalVariableDeclarationList)?:ivars
-        (MethodDeclaration:h (OptionalWhiteSpace MethodDeclaration:m => [[ m ]])*:t => [[ t h prefix >array ]])?:methods
+        (OptionalWhiteSpace LocalVariableDeclarationList:l => [[ l names>> ]])?:ivars
+        (MethodDeclaration:h (OptionalWhiteSpace MethodDeclaration:m => [[ m ]])*:t => [[ t h prefix ]])?:methods
         OptionalWhiteSpace "]"
-        => [[ name superclass "Object" or ivars methods ast-class boa ]]
+        => [[ name superclass "Object" or ivars >array methods >array ast-class boa ]]
 
+ForeignClassDeclaration = OptionalWhiteSpace "foreign"
+                          OptionalWhiteSpace Identifier:name
+                          OptionalWhiteSpace Literal:class
+                          => [[ class name ast-foreign boa ]]
 End = !(.)
 
-Program = ClassDeclaration* End
-;EBNF
-
-EBNF: parse-smalltalk-statement
-
-Statement = <foreign parse-smalltalk Statement>
-
-End = !(.)
-
-Program = Statement? => [[ nil or ]] End
+Program = (ClassDeclaration|ForeignClassDeclaration|ExecutableCode) => [[ nil or ]] End
 
 ;EBNF

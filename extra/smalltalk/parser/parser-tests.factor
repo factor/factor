@@ -68,6 +68,13 @@ test         = <foreign parse-smalltalk Literal>
 ]
 [ "[ :i | i print ]" test-Literal ] unit-test
 
+[
+    T{ ast-block
+       { body { 5 self } }
+    }
+]
+[ "[5. self]" test-Literal ] unit-test
+
 EBNF: test-FormalBlockArgumentDeclarationList
 test         = <foreign parse-smalltalk FormalBlockArgumentDeclarationList>
 ;EBNF
@@ -206,5 +213,16 @@ test         = <foreign parse-smalltalk KeywordMessageSend>
     }
 ]
 [ "3 factorial + 4 factorial between: 10 and: 100" test-KeywordMessageSend ] unit-test
+
+[ { 1 2 } ] [ "1. 2" parse-smalltalk ] unit-test
+
+[
+    T{ ast-class
+       { name "Test" }
+       { superclass "Object" }
+       { ivars { "a" } }
+    }
+]
+[ "class Test [|a|]" parse-smalltalk ] unit-test
 
 [ ] [ "vocab:smalltalk/parser/test.st" ascii file-contents parse-smalltalk drop ] unit-test

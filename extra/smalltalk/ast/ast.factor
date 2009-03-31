@@ -14,5 +14,7 @@ TUPLE: ast-assignment { name ast-name } value ;
 TUPLE: ast-local-variables { names array } ;
 TUPLE: ast-method { name string } { body ast-block } ;
 TUPLE: ast-class { name string } { superclass string } { ivars array } { methods array } ;
+TUPLE: ast-foreign { class string } { name string } ;
+
 TUPLE: symbol { name string } ;
 MEMO: intern ( name -- symbol ) symbol boa ;
