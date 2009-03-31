@@ -1,9 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays html.parser.utils hashtables io kernel
-namespaces make prettyprint quotations sequences splitting
-html.parser.state strings unicode.categories unicode.case ;
+USING: accessors arrays hashtables html.parser.state
+html.parser.utils kernel make namespaces sequences
+unicode.case unicode.categories combinators.short-circuit
+quoting ;
 IN: html.parser
+
 
 TUPLE: tag name attributes text closing? ;
 
@@ -28,113 +30,100 @@ SYMBOL: tagstack
 : make-tag ( string attribs -- tag )
     [ [ closing-tag? ] keep "/" trim1 ] dip rot <tag> ;
 
-: make-text-tag ( string -- tag )
+: new-tag ( string type -- tag )
     tag new
-        text >>name
-        swap >>text ;
+        swap >>name
+        swap >>text ; inline
 
-: make-comment-tag ( string -- tag )
-    tag new
-        comment >>name
-        swap >>text ;
+: make-text-tag ( string -- tag ) text new-tag ; inline
 
-: make-dtd-tag ( string -- tag )
-    tag new
-        dtd >>name
-        swap >>text ;
+: make-comment-tag ( string -- tag ) comment new-tag ; inline
 
-: read-whitespace ( -- string )
-    [ get-char blank? not ] take-until ;
+: make-dtd-tag ( string -- tag ) dtd new-tag ; inline
 
-: read-whitespace* ( -- ) read-whitespace drop ;
+: read-single-quote ( state-parser -- string )
+    [ [ CHAR: ' = ] take-until ] [ next drop ] bi ;
 
-: read-token ( -- string )
-    read-whitespace*
-    [ get-char blank? ] take-until ;
+: read-double-quote ( state-parser -- string )
+    [ [ CHAR: " = ] take-until ] [ next drop ] bi ;
 
-: read-single-quote ( -- string )
-    [ get-char CHAR: ' = ] take-until ;
+: read-quote ( state-parser -- string )
+    dup get+increment CHAR: ' =
+    [ read-single-quote ] [ read-double-quote ] if ;
 
-: read-double-quote ( -- string )
-    [ get-char CHAR: " = ] take-until ;
+: read-key ( state-parser -- string )
+    skip-whitespace
+    [ { [ CHAR: = = ] [ blank? ] } 1|| ] take-until ;
 
-: read-quote ( -- string )
-    get-char next CHAR: ' =
-    [ read-single-quote ] [ read-double-quote ] if next ;
+: read-= ( state-parser -- )
+    skip-whitespace
+    [ [ CHAR: = = ] take-until drop ] [ next drop ] bi ;
 
-: read-key ( -- string )
-    read-whitespace*
-    [ get-char [ CHAR: = = ] [ blank? ] bi or ] take-until ;
+: read-token ( state-parser -- string )
+    [ blank? ] take-until ;
 
-: read-= ( -- )
-    read-whitespace*
-    [ get-char CHAR: = = ] take-until drop next ;
-
-: read-value ( -- string )
-    read-whitespace*
-    get-char quote? [ read-quote ] [ read-token ] if
+: read-value ( state-parser -- string )
+    skip-whitespace
+    dup get-char quote? [ read-quote ] [ read-token ] if
     [ blank? ] trim ;
 
-: read-comment ( -- )
-    "-->" take-string make-comment-tag push-tag ;
+: read-comment ( state-parser -- )
+    "-->" take-until-string make-comment-tag push-tag ;
 
-: read-dtd ( -- )
-    ">" take-string make-dtd-tag push-tag ;
+: read-dtd ( state-parser -- )
+    ">" take-until-string make-dtd-tag push-tag ;
 
-: read-bang ( -- )
-    next get-char CHAR: - = get-next CHAR: - = and [
+: read-bang ( state-parser -- )
+    next dup { [ get-char CHAR: - = ] [ get-next CHAR: - = ] } 1&& [
         next next
         read-comment
     ] [
         read-dtd
     ] if ;
 
-: read-tag ( -- string )
-    [ get-char CHAR: > = get-char CHAR: < = or ] take-until
-    get-char CHAR: < = [ next ] unless ;
+: read-tag ( state-parser -- string )
+    [ [ "><" member? ] take-until ]
+    [ dup get-char CHAR: < = [ next ] unless drop ] bi ;
 
-: read-< ( -- string )
-    next get-char CHAR: ! = [
-        read-bang f
+: read-until-< ( state-parser -- string )
+    [ CHAR: < = ] take-until ;
+
+: parse-text ( state-parser -- )
+    read-until-< [ make-text-tag push-tag ] unless-empty ;
+
+: (parse-attributes) ( state-parser -- )
+    skip-whitespace
+    dup string-parse-end? [
+        drop
     ] [
-        read-tag
+        [
+            [ read-key >lower ] [ read-= ] [ read-value ] tri
+            2array ,
+        ] keep (parse-attributes)
     ] if ;
 
-: read-until-< ( -- string )
-    [ get-char CHAR: < = ] take-until ;
-
-: parse-text ( -- )
-    read-until-< [
-        make-text-tag push-tag
-    ] unless-empty ;
-
-: (parse-attributes) ( -- )
-    read-whitespace*
-    string-parse-end? [
-        read-key >lower read-= read-value
-        2array , (parse-attributes)
-    ] unless ;
-
-: parse-attributes ( -- hashtable )
+: parse-attributes ( state-parser -- hashtable )
     [ (parse-attributes) ] { } make >hashtable ;
 
 : (parse-tag) ( string -- string' hashtable )
     [
-        read-token >lower
-        parse-attributes
+        [ read-token >lower ] [ parse-attributes ] bi
     ] string-parse ;
 
-: parse-tag ( -- )
-    read-< [
-        (parse-tag) make-tag push-tag
-    ] unless-empty ;
+: read-< ( state-parser -- string/f )
+    next dup get-char [
+        CHAR: ! = [ read-bang f ] [ read-tag ] if
+    ] [
+        drop f
+    ] if* ;
 
-: (parse-html) ( -- )
-    get-next [
-        parse-text
-        parse-tag
-        (parse-html)
-    ] when ;
+: parse-tag ( state-parser -- )
+    read-< [ (parse-tag) make-tag push-tag ] unless-empty ;
+
+: (parse-html) ( state-parser -- )
+    dup get-next [
+        [ parse-text ] [ parse-tag ] [ (parse-html) ] tri
+    ] [ drop ] if ;
 
 : tag-parse ( quot -- vector )
     V{ } clone tagstack [ string-parse ] with-variable ; inline
