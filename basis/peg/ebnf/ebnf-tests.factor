@@ -3,7 +3,7 @@
 !
 USING: kernel tools.test peg peg.ebnf words math math.parser 
        sequences accessors peg.parsers parser namespaces arrays 
-       strings eval ;
+       strings eval unicode.data multiline ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -520,3 +520,13 @@ Tok                = Spaces (Number | Special )
 { "\\" } [
   "\\" [EBNF foo="\\" EBNF]
 ] unit-test
+
+[ "USE: peg.ebnf [EBNF EBNF]" eval ] must-fail
+
+[ <" USE: peg.ebnf [EBNF
+    lol = a
+    lol = b
+  EBNF] "> eval
+] [
+    error>> [ redefined-rule? ] [ name>> "lol" = ] bi and
+] must-fail-with
