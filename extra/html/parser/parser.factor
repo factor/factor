@@ -68,10 +68,10 @@ SYMBOL: tagstack
     [ blank? ] trim ;
 
 : read-comment ( state-parser -- )
-    "-->" take-until-string make-comment-tag push-tag ;
+    "-->" take-until-sequence make-comment-tag push-tag ;
 
 : read-dtd ( state-parser -- )
-    ">" take-until-string make-dtd-tag push-tag ;
+    ">" take-until-sequence make-dtd-tag push-tag ;
 
 : read-bang ( state-parser -- )
     next dup { [ get-char CHAR: - = ] [ get-next CHAR: - = ] } 1&& [
@@ -93,7 +93,7 @@ SYMBOL: tagstack
 
 : (parse-attributes) ( state-parser -- )
     skip-whitespace
-    dup string-parse-end? [
+    dup state-parse-end? [
         drop
     ] [
         [
@@ -108,7 +108,7 @@ SYMBOL: tagstack
 : (parse-tag) ( string -- string' hashtable )
     [
         [ read-token >lower ] [ parse-attributes ] bi
-    ] string-parse ;
+    ] state-parse ;
 
 : read-< ( state-parser -- string/f )
     next dup get-char [
@@ -126,7 +126,7 @@ SYMBOL: tagstack
     ] [ drop ] if ;
 
 : tag-parse ( quot -- vector )
-    V{ } clone tagstack [ string-parse ] with-variable ; inline
+    V{ } clone tagstack [ state-parse ] with-variable ; inline
 
 : parse-html ( string -- vector )
     [ (parse-html) tagstack get ] tag-parse ;
