@@ -659,13 +659,40 @@ M: ppc %callback-value ( ctype -- )
 
 M: ppc small-enough? ( n -- ? ) -32768 32767 between? ;
 
-M: ppc return-struct-in-registers? ( c-type -- ? ) drop f ;
+M: ppc return-struct-in-registers? ( c-type -- ? )
+    c-type return-in-registers?>> ;
 
-M: ppc %box-small-struct
-    drop "No small structs" throw ;
+M: ppc %box-small-struct ( c-type -- )
+    #! Box a <= 16-byte struct returned in r3:r4:r5:r6
+    heap-size 7 LI
+    "box_medium_struct" f %alien-invoke ;
 
-M: ppc %unbox-small-struct
-    drop "No small structs" throw ;
+: %unbox-struct-1 ( -- )
+    ! Alien must be in r3.
+    "alien_offset" f %alien-invoke
+    3 3 0 LWZ ;
+
+: %unbox-struct-2 ( -- )
+    ! Alien must be in r3.
+    "alien_offset" f %alien-invoke
+    4 3 4 LWZ
+    3 3 0 LWZ ;
+
+: %unbox-struct-4 ( -- )
+    ! Alien must be in r3.
+    "alien_offset" f %alien-invoke
+    6 3 12 LWZ
+    5 3 8 LWZ
+    4 3 4 LWZ
+    3 3 0 LWZ ;
+
+M: ppc %unbox-small-struct ( size -- )
+    #! Alien must be in EAX.
+    heap-size cell align cell /i {
+        { 1 [ %unbox-struct-1 ] }
+        { 2 [ %unbox-struct-2 ] }
+        { 4 [ %unbox-struct-4 ] }
+    } case ;
 
 USE: vocabs.loader
 
@@ -673,3 +700,5 @@ USE: vocabs.loader
     { [ os macosx? ] [ "cpu.ppc.macosx" require ] }
     { [ os linux? ] [ "cpu.ppc.linux" require ] }
 } cond
+
+"complex-double" c-type t >>return-in-registers? drop
