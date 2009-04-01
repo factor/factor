@@ -11,7 +11,6 @@ IN: math.blas.ffi
         [ os [ freebsd? ] [ linux? cpu x86.32? and ] bi or ]
         [ "libblas.so" gfortran-abi add-fortran-library ]
     }
-    { [ os [ freebsd? ] [ linux? ] bi or ] [ "libblas.so" gfortran-abi add-fortran-library ] }
     [ "libblas.so" f2c-abi add-fortran-library ]
 } cond
 >>

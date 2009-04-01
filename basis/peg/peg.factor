@@ -155,18 +155,21 @@ TUPLE: peg-head rule-id involved-set eval-set ;
   dup pos>> pos set ans>>
   ; inline
 
-:: (setup-lr) ( r l s -- )
-  s head>> l head>> eq? [
-    l head>> s (>>head)
-    l head>> [ s rule-id>> suffix ] change-involved-set drop
-    r l s next>> (setup-lr)
-  ] unless ;
+:: (setup-lr) ( l s -- )
+  s [ 
+    s left-recursion? [ s throw ] unless
+    s head>> l head>> eq? [
+      l head>> s (>>head)
+      l head>> [ s rule-id>> suffix ] change-involved-set drop
+      l s next>> (setup-lr)
+    ] unless 
+  ] when ;
 
 :: setup-lr ( r l -- )
   l head>> [
     r rule-id V{ } clone V{ } clone peg-head boa l (>>head)
   ] unless
-  r l lrstack get (setup-lr) ;
+  l lrstack get (setup-lr) ;
 
 :: lr-answer ( r p m -- ast )
   [let* |
@@ -216,8 +219,10 @@ TUPLE: peg-head rule-id involved-set eval-set ;
     lrstack get next>> lrstack set
     pos get m (>>pos)
     lr head>> [
-      ans lr (>>seed)
-      r p m lr-answer
+      m ans>> left-recursion? [
+        ans lr (>>seed)
+        r p m lr-answer
+     ] [ ans ] if 
     ] [
       ans m (>>ans)
       ans
