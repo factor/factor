@@ -83,11 +83,16 @@ TUPLE: state-parser sequence n ;
     [ <state-parser> ] dip call ; inline
 
 :: take-quoted-string ( state-parser escape-char quote-char -- string )
+    state-parser n>> :> start-n
     state-parser advance
     [
         {
             [ { [ previous quote-char = ] [ current quote-char = ] } 1&& ]
             [ current quote-char = not ]
         } 1||
-    ] take-while
-    state-parser advance* ;
+    ] take-while :> string
+    state-parser current quote-char = [
+        state-parser advance* string
+    ] [
+        start-n state-parser (>>n) f
+    ] if ;
