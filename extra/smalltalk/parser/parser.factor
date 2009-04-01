@@ -104,7 +104,7 @@ BlockLiteral = "["
                  "|"
                  => [[ args ]]
                 )?:args
-                ExecutableCode:body OptionalWhiteSpace
+                ExecutableCode:body
                 "]" => [[ args >array body ast-block boa ]]
 
 Literal = (ConstantReference
@@ -125,40 +125,37 @@ Operand =       Literal
 UnaryMessage = OptionalWhiteSpace
                UnaryMessageSelector:s !(":")
                => [[ s { } ast-message boa ]]
-UnaryMessageOperand = UnaryMessageSend | Operand
-UnaryMessageSend = UnaryMessageOperand:receiver
-                   UnaryMessage:h
-                   (OptionalWhiteSpace ";" UnaryMessage:m => [[ m ]])*:t
-                   => [[ receiver t h prefix >array <ast-cascade> ]]
 
 BinaryMessage = OptionalWhiteSpace
                 BinaryMessageSelector:selector
                 OptionalWhiteSpace
-                BinaryMessageOperand:rhs
+                (MessageSend | Operand):rhs
                 => [[ selector { rhs } ast-message boa ]]
                                    
-BinaryMessageOperand = BinaryMessageSend | UnaryMessageSend | Operand
-BinaryMessageSend = (BinaryMessageSend | UnaryMessageSend | Operand):lhs
-                    BinaryMessage:h
-                   (OptionalWhiteSpace ";" BinaryMessage:m => [[ m ]])*:t
-                   => [[ lhs t h prefix >array <ast-cascade> ]]
-
-KeywordMessageSegment = Keyword:k OptionalWhiteSpace BinaryMessageOperand:arg => [[ { k arg } ]]
+KeywordMessageSegment = Keyword:k OptionalWhiteSpace (BinaryMessageSend | UnaryMessageSend | Operand):arg => [[ { k arg } ]]
 KeywordMessage = OptionalWhiteSpace
                  KeywordMessageSegment:h
                  (OptionalWhiteSpace KeywordMessageSegment:s => [[ s ]])*:t
                  => [[ t h prefix unzip [ concat ] dip ast-message boa ]]
-KeywordMessageSend = (BinaryMessageSend | UnaryMessageSend | Operand):receiver
-                     OptionalWhiteSpace
-                     KeywordMessage:m
-                     => [[ receiver m 1array <ast-cascade> ]]
 
 Message = BinaryMessage | UnaryMessage | KeywordMessage
 
-MessageSend = (MessageSend | Operand):lhs
+UnaryMessageSend = (MessageSend | Operand):lhs
               Message:h
               (OptionalWhiteSpace ";" Message:m => [[ m ]])*:t
               => [[ lhs t h prefix >array <ast-cascade> ]]
+
+BinaryMessageSend = (MessageSend | Operand):lhs
+              Message:h
+              (OptionalWhiteSpace ";" Message:m => [[ m ]])*:t
+              => [[ lhs t h prefix >array <ast-cascade> ]]
+
+KeywordMessageSend = (BinaryMessageSend | UnaryMessageSend | Operand):lhs
+              KeywordMessage:h
+              (OptionalWhiteSpace ";" Message:m => [[ m ]])*:t
+              => [[ lhs t h prefix >array <ast-cascade> ]]
+
+MessageSend = BinaryMessageSend | UnaryMessageSend | KeywordMessageSend
 
 Expression = OptionalWhiteSpace
              (MessageSend | Operand):e
@@ -182,6 +179,7 @@ LocalVariableDeclarationList = OptionalWhiteSpace "|" OptionalWhiteSpace
 ExecutableCode = (LocalVariableDeclarationList)?:locals
                  ((Statement:s OptionalWhiteSpace "." => [[ s ]])*:h
                  FinalStatement:t (".")? => [[ h t suffix ]])?:body
+                 OptionalWhiteSpace
                  => [[ body locals [ suffix ] when* >array ]]
 
 TopLevelForm = ExecutableCode => [[ ast-sequence boa ]]
@@ -201,7 +199,7 @@ MethodHeader =   KeywordMethodHeader
 MethodDeclaration = OptionalWhiteSpace "method" OptionalWhiteSpace MethodHeader:header
         OptionalWhiteSpace "["
         ExecutableCode:code
-        OptionalWhiteSpace "]"
+        "]"
         => [[ header first2 code ast-block boa ast-method boa ]]
 
 ClassDeclaration = OptionalWhiteSpace "class" OptionalWhiteSpace Identifier:name
@@ -209,7 +207,13 @@ ClassDeclaration = OptionalWhiteSpace "class" OptionalWhiteSpace Identifier:name
         ("extends" OptionalWhiteSpace Identifier:superclass OptionalWhiteSpace => [[ superclass ]])?:superclass
         OptionalWhiteSpace "["
         (OptionalWhiteSpace LocalVariableDeclarationList:l => [[ l names>> ]])?:ivars
-        (MethodDeclaration:h (OptionalWhiteSpace MethodDeclaration:m => [[ m ]])*:t => [[ t h prefix ]])?:methods
+        (MethodDeclaration:h
+         (OptionalWhiteSpace
+          "."
+          OptionalWhiteSpace
+          MethodDeclaration:m => [[ m ]])*:t (".")?
+          => [[ t h prefix ]]
+         )?:methods
         OptionalWhiteSpace "]"
         => [[ name superclass "Object" or ivars >array methods >array ast-class boa ]]
 

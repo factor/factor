@@ -30,23 +30,23 @@ class TreeNode extends Object [
         output
             nextPutAll: 'long lived tree of depth '; print: maxDepth; tab;
             nextPutAll: ' check: '; print: longLivedTree itemCheck; nl
-    ]
+    ].
 
     method binarytrees [
         self binarytrees: self arg to: self stdout.
         ^''
-    ]
+    ].
 
     method left: leftChild right: rightChild item: anItem [
         left := leftChild.
         right := rightChild.
         item := anItem
-    ]
+    ].
 
     method itemCheck [
         ^left isNil
             ifTrue: [item] ifFalse: [item + (left itemCheck - right itemCheck)]
-    ]
+    ].
 
     method bottomUpTree: anItem depth: anInteger [
         ^(anInteger > 0)
@@ -56,11 +56,11 @@ class TreeNode extends Object [
                     right: (self bottomUpTree: 2*anItem depth: anInteger - 1)
                     item: anItem
             ] ifFalse: [self left: nil right: nil item: anItem]
-    ]
+    ].
 
     method left: leftChild right: rightChild item: anItem [
         ^(super new) left: leftChild right: rightChild item: anItem
     ]
-]
+].
 
 Tests binarytrees

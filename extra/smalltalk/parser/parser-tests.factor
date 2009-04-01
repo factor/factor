@@ -228,12 +228,12 @@ test         = <foreign parse-smalltalk LocalVariableDeclarationList>
 [ T{ ast-local-variables f { "i" "j" } } ] [ " |  i j   |" test-LocalVariableDeclarationList ] unit-test
 
 
-EBNF: test-KeywordMessageSend
-test         = <foreign parse-smalltalk KeywordMessageSend>
+EBNF: test-MessageSend
+test         = <foreign parse-smalltalk MessageSend>
 ;EBNF
 
 [ T{ ast-message-send f T{ ast-name f "x" } "foo:bar:" { 1 2 } } ]
-[ "x foo:1 bar:2" test-KeywordMessageSend ] unit-test
+[ "x foo:1 bar:2" test-MessageSend ] unit-test
 
 [
     T{ ast-message-send
@@ -247,7 +247,7 @@ test         = <foreign parse-smalltalk KeywordMessageSend>
         { 10 100 }
     }
 ]
-[ "3 factorial + 4 factorial between: 10 and: 100" test-KeywordMessageSend ] unit-test
+[ "3 factorial + 4 factorial between: 10 and: 100" test-MessageSend ] unit-test
 
 [ T{ ast-sequence f { 1 2 } } ] [ "1. 2" parse-smalltalk ] unit-test
 
@@ -282,5 +282,7 @@ test         = <foreign parse-smalltalk KeywordMessageSend>
     }
 ]
 [ "class Test1 [|a|]. class Test2 extends Test1 [|b|]" parse-smalltalk ] unit-test
+
+[ ] [ "class Foo []. Tests blah " parse-smalltalk drop ] unit-test
 
 [ ] [ "vocab:smalltalk/parser/test.st" ascii file-contents parse-smalltalk drop ] unit-test
