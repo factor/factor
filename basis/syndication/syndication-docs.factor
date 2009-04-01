@@ -36,7 +36,7 @@ HELP: download-feed
 { $description "Downloads a feed from a URL using the " { $link "http.client" } "." } ;
 
 HELP: parse-feed
-{ $values { "sequence" "a string or a byte array" } { "feed" feed } }
+{ $values { "seq" "a string or a byte array" } { "feed" feed } }
 { $description "Parses a feed." } ;
 
 HELP: xml>feed

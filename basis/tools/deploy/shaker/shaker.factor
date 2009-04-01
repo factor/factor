@@ -157,6 +157,7 @@ IN: tools.deploy.shaker
                 "specializer"
                 "step-into"
                 "step-into?"
+                "superclass"
                 "transform-n"
                 "transform-quot"
                 "tuple-dispatch-generic"
