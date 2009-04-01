@@ -6,7 +6,6 @@ unicode.case unicode.categories combinators.short-circuit
 quoting fry ;
 IN: html.parser
 
-
 TUPLE: tag name attributes text closing? ;
 
 SINGLETON: text
@@ -52,7 +51,7 @@ SYMBOL: tagstack
     skip-whitespace
     [ current { [ CHAR: = = ] [ blank? ] } 1|| ] take-until ;
 
-: read-= ( state-parser -- )
+: read-=1 ( state-parser -- )
     skip-whitespace
     [ [ current CHAR: = = ] take-until drop ] [ next drop ] bi ;
 
@@ -71,12 +70,8 @@ SYMBOL: tagstack
     ">" take-until-sequence dtd new-tag push-tag ;
 
 : read-bang ( state-parser -- )
-    next dup { [ current CHAR: - = ] [ peek-next CHAR: - = ] } 1&& [
-        next next
-        read-comment
-    ] [
-        read-dtd
-    ] if ;
+    next dup { [ current CHAR: - = ] [ peek-next CHAR: - = ] } 1&&
+    [ next next read-comment ] [ read-dtd ] if ;
 
 : read-tag ( state-parser -- string )
     [ [ current "><" member? ] take-until ]
@@ -88,15 +83,17 @@ SYMBOL: tagstack
 : parse-text ( state-parser -- )
     read-until-< [ text new-tag push-tag ] unless-empty ;
 
+: parse-key/value ( state-parser -- key value )
+    [ read-key >lower ]
+    [ skip-whitespace "=" take-sequence ]
+    [ swap [ read-value ] [ drop f ] if ] tri ;
+
 : (parse-attributes) ( state-parser -- )
     skip-whitespace
     dup state-parse-end? [
         drop
     ] [
-        [
-            [ read-key >lower ] [ read-= ] [ read-value ] tri
-            swap set
-        ] keep (parse-attributes)
+        [ parse-key/value swap set ] [ (parse-attributes) ] bi
     ] if ;
 
 : parse-attributes ( state-parser -- hashtable )
