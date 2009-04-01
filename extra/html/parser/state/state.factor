@@ -2,31 +2,32 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math kernel sequences accessors fry circular
 unicode.case unicode.categories locals ;
+
 IN: html.parser.state
 
-TUPLE: state-parser string i ;
+TUPLE: state-parser sequence n ;
 
-: <state-parser> ( string -- state-parser )
+: <state-parser> ( sequence -- state-parser )
     state-parser new
-        swap >>string
-        0 >>i ;
+        swap >>sequence
+        0 >>n ;
 
-: (get-char) ( i state -- char/f )
-    string>> ?nth ; inline
+: (get-char) ( n state -- char/f )
+    sequence>> ?nth ; inline
 
 : get-char ( state -- char/f )
-    [ i>> ] keep (get-char) ; inline
+    [ n>> ] keep (get-char) ; inline
 
 : get-next ( state -- char/f )
-    [ i>> 1+ ] keep (get-char) ; inline
+    [ n>> 1 + ] keep (get-char) ; inline
 
 : next ( state -- state )
-    [ 1+ ] change-i ; inline
+    [ 1 + ] change-n ; inline
 
 : get+increment ( state -- char/f )
     [ get-char ] [ next drop ] bi ; inline
 
-: string-parse ( string quot -- )
+: state-parse ( sequence quot -- )
     [ <state-parser> ] dip call ; inline
 
 :: skip-until ( state quot: ( obj -- ? ) -- )
@@ -34,17 +35,23 @@ TUPLE: state-parser string i ;
         quot call [ state next quot skip-until ] unless
     ] when* ; inline recursive
 
-: take-until ( state quot: ( obj -- ? ) -- string )
-    [ drop i>> ]
-    [ skip-until ]
-    [ drop [ i>> ] [ string>> ] bi ] 2tri subseq ; inline
+: state-parse-end? ( state -- ? ) get-next not ;
 
-:: take-until-string ( state-parser string -- string' )
-    string length <growing-circular> :> growing
+: take-until ( state quot: ( obj -- ? ) -- sequence/f )
+    over state-parse-end? [
+        2drop f
+    ] [
+        [ drop n>> ]
+        [ skip-until ]
+        [ drop [ n>> ] [ sequence>> ] bi ] 2tri subseq
+    ] if ; inline
+
+:: take-until-sequence ( state-parser sequence -- sequence' )
+    sequence length <growing-circular> :> growing
     state-parser
     [
         growing push-growing-circular
-        string growing sequence=
+        sequence growing sequence=
     ] take-until :> found
     found dup length
     growing length 1- - head
@@ -53,10 +60,8 @@ TUPLE: state-parser string i ;
 : skip-whitespace ( state -- state )
     [ [ blank? not ] take-until drop ] keep ;
 
-: take-rest ( state -- string )
+: take-rest ( state -- sequence )
     [ drop f ] take-until ; inline
 
-: take-until-char ( state ch -- string )
+: take-until-object ( state obj -- sequence )
     '[ _ = ] take-until ;
-
-: string-parse-end? ( state -- ? ) get-next not ;
