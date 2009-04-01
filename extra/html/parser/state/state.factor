@@ -12,30 +12,30 @@ TUPLE: state-parser sequence n ;
         swap >>sequence
         0 >>n ;
 
-: (get-char) ( n state -- char/f )
+: state-parser-nth ( n state -- char/f )
     sequence>> ?nth ; inline
 
-: get-char ( state -- char/f )
-    [ n>> ] keep (get-char) ; inline
+: current ( state -- char/f )
+    [ n>> ] keep state-parser-nth ; inline
 
-: get-next ( state -- char/f )
-    [ n>> 1 + ] keep (get-char) ; inline
+: peek-next ( state -- char/f )
+    [ n>> 1 + ] keep state-parser-nth ; inline
 
 : next ( state -- state )
     [ 1 + ] change-n ; inline
 
 : get+increment ( state -- char/f )
-    [ get-char ] [ next drop ] bi ; inline
+    [ current ] [ next drop ] bi ; inline
 
 : state-parse ( sequence quot -- )
     [ <state-parser> ] dip call ; inline
 
 :: skip-until ( state quot: ( obj -- ? ) -- )
-    state get-char [
+    state current [
         quot call [ state next quot skip-until ] unless
     ] when* ; inline recursive
 
-: state-parse-end? ( state -- ? ) get-next not ;
+: state-parse-end? ( state -- ? ) peek-next not ;
 
 : take-until ( state quot: ( obj -- ? ) -- sequence/f )
     over state-parse-end? [
@@ -65,3 +65,7 @@ TUPLE: state-parser sequence n ;
 
 : take-until-object ( state obj -- sequence )
     '[ _ = ] take-until ;
+
+: take-stuff ( state delimiter -- sequence )
+    
+    ;
