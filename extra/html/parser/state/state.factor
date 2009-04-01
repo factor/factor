@@ -24,15 +24,15 @@ TUPLE: state-parser sequence n ;
 : peek-next ( state-parser -- char/f )
     [ n>> 1 + ] keep state-parser-nth ; inline
 
-: next ( state-parser -- state-parser )
+: advance ( state-parser -- state-parser )
     [ 1 + ] change-n ; inline
 
 : get+increment ( state-parser -- char/f )
-    [ current ] [ next drop ] bi ; inline
+    [ current ] [ advance drop ] bi ; inline
 
 :: skip-until ( state-parser quot: ( obj -- ? ) -- )
     state-parser current [
-        state-parser quot call [ state-parser next quot skip-until ] unless
+        state-parser quot call [ state-parser advance quot skip-until ] unless
     ] when ; inline recursive
 
 : state-parse-end? ( state-parser -- ? ) peek-next not ;
@@ -67,7 +67,7 @@ TUPLE: state-parser sequence n ;
     ] take-until :> found
     found dup length
     growing length 1- - head
-    state-parser next drop ;
+    state-parser advance drop ;
     
 : skip-whitespace ( state-parser -- state-parser )
     [ [ current blank? not ] take-until drop ] keep ;

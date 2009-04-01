@@ -38,7 +38,7 @@ SYMBOL: tagstack
         swap >>text ; inline
 
 : (read-quote) ( state-parser ch -- string )
-    '[ [ current _ = ] take-until ] [ next drop ] bi ;
+    '[ [ current _ = ] take-until ] [ advance drop ] bi ;
 
 : read-single-quote ( state-parser -- string )
     CHAR: ' (read-quote) ;
@@ -69,12 +69,12 @@ SYMBOL: tagstack
     ">" take-until-sequence dtd new-tag push-tag ;
 
 : read-bang ( state-parser -- )
-    next dup { [ current CHAR: - = ] [ peek-next CHAR: - = ] } 1&&
-    [ next next read-comment ] [ read-dtd ] if ;
+    advance dup { [ current CHAR: - = ] [ peek-next CHAR: - = ] } 1&&
+    [ advance advance read-comment ] [ read-dtd ] if ;
 
 : read-tag ( state-parser -- string )
     [ [ current "><" member? ] take-until ]
-    [ dup current CHAR: < = [ next ] unless drop ] bi ;
+    [ dup current CHAR: < = [ advance ] unless drop ] bi ;
 
 : read-until-< ( state-parser -- string )
     [ current CHAR: < = ] take-until ;
@@ -104,7 +104,7 @@ SYMBOL: tagstack
     ] state-parse ;
 
 : read-< ( state-parser -- string/f )
-    next dup current [
+    advance dup current [
         CHAR: ! = [ read-bang f ] [ read-tag ] if
     ] [
         drop f
