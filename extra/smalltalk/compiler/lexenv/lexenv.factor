@@ -10,7 +10,7 @@ IN: smalltalk.compiler.lexenv
 ! self: word or f for top-level forms
 ! class: class word or f for top-level forms
 ! method: generic word or f for top-level forms
-TUPLE: lexenv local-readers local-writers self class method ;
+TUPLE: lexenv local-readers local-writers self return class method ;
 
 : <lexenv> ( -- lexenv ) lexenv new ; inline
 
@@ -21,6 +21,7 @@ CONSTANT: empty-lexenv T{ lexenv }
         [ [ local-readers>> ] bi@ assoc-union >>local-readers ]
         [ [ local-writers>> ] bi@ assoc-union >>local-writers ]
         [ [ self>> ] either? >>self ]
+        [ [ return>> ] either? >>return ]
         [ [ class>> ] either? >>class ]
         [ [ method>> ] either? >>method ]
     } 2cleave ;
