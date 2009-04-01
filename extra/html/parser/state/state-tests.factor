@@ -53,11 +53,16 @@ IN: html.parser.state.tests
 [ "cd" ]
 [ "abcd" <state-parser> [ "ab" take-sequence drop ] [ "cd" take-sequence ] bi ] unit-test
 
-
 [ f ]
 [
     "\"abc\" asdf" <state-parser>
     [ CHAR: \ CHAR: " take-quoted-string drop ] [ "asdf" take-sequence ] bi
+] unit-test
+
+[ "abc\\\"def" ]
+[
+    "\"abc\\\"def\" asdf" <state-parser>
+    CHAR: \ CHAR: " take-quoted-string
 ] unit-test
 
 [ "asdf" ]
@@ -82,3 +87,6 @@ IN: html.parser.state.tests
 
 [ "c" ]
 [ "c" <state-parser> take-token ] unit-test
+
+[ { "a" "b" "c" "abcd e \\\"f g" } ]
+[ "a b c  \"abcd e \\\"f g\"" CHAR: \ CHAR: " tokenize-line ] unit-test
