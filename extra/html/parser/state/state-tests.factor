@@ -79,3 +79,6 @@ IN: html.parser.state.tests
     [ CHAR: \ CHAR: " take-quoted-string drop ]
     [ "\"abc" take-sequence ] bi
 ] unit-test
+
+[ "c" ]
+[ "c" <state-parser> take-token ] unit-test
