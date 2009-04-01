@@ -59,11 +59,11 @@ C: <transaction> transaction
         [ dup [ over [ swap call ] dip ] dip 1 days time+ ] dip each-day
     ] [
         3drop
-    ] if ;
+    ] if ; inline recursive
 
 : process-to-date ( account date -- account )
     over interest-last-paid>> 1 days time+
-    [ dupd process-day ] spin each-day ;
+    [ dupd process-day ] spin each-day ; inline
 
 : inserting-transactions ( account transactions -- account )
     [ [ date>> process-to-date ] keep >>transaction ] each ;

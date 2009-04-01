@@ -109,3 +109,5 @@ SYMBOL: load-vocab-hook ! ( name -- vocab )
 
 PREDICATE: runnable-vocab < vocab
     vocab-main >boolean ;
+
+INSTANCE: vocab-spec definition

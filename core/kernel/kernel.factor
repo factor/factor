@@ -23,6 +23,10 @@ GENERIC: call ( callable -- )
 
 GENERIC: execute ( word -- )
 
+GENERIC: ?execute ( word -- value )
+
+M: object ?execute ;
+
 DEFER: if
 
 : ? ( ? true false -- true/false )

@@ -58,7 +58,7 @@ M: metrics-paint draw-boundary
     COLOR: red gl-color
     [ dim>> ] [ >label< line-metrics ] bi
     [ [ first ] [ ascent>> ] bi* [ nip 0 swap 2array ] [ 2array ] 2bi gl-line ]
-    [ drop gl-rect ]
+    [ drop { 0 0 } swap gl-rect ]
     2bi ;
 
 : <metrics-gadget> ( text font -- gadget )

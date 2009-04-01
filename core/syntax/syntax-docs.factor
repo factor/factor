@@ -556,18 +556,18 @@ HELP: BIN:
 { $examples { $example "USE: prettyprint" "BIN: 100 ." "4" } } ;
 
 HELP: GENERIC:
-{ $syntax "GENERIC: word" "GENERIC: word ( stack -- effect )" }
+{ $syntax "GENERIC: word ( stack -- effect )" }
 { $values { "word" "a new word to define" } }
 { $description "Defines a new generic word in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." } ;
 
 HELP: GENERIC#
-{ $syntax "GENERIC# word n" "GENERIC# word n ( stack -- effect )" }
+{ $syntax "GENERIC# word n ( stack -- effect )" }
 { $values { "word" "a new word to define" } { "n" "the stack position to dispatch on" } }
 { $description "Defines a new generic word which dispatches on the " { $snippet "n" } "th most element from the top of the stack in the current vocabulary. Initially, it contains no methods, and thus will throw a " { $link no-method } " error when called." }
 { $notes
     "The following two definitions are equivalent:"
-    { $code "GENERIC: foo" }
-    { $code "GENERIC# foo 0" }
+    { $code "GENERIC: foo ( obj -- )" }
+    { $code "GENERIC# foo 0 ( obj -- )" }
 } ;
 
 HELP: MATH:
@@ -576,7 +576,7 @@ HELP: MATH:
 { $description "Defines a new generic word which uses the " { $link math-combination } " method combination." } ;
 
 HELP: HOOK:
-{ $syntax "HOOK: word variable" "HOOK: word variable ( stack -- effect ) " }
+{ $syntax "HOOK: word variable ( stack -- effect ) " }
 { $values { "word" "a new word to define" } { "variable" word } }
 { $description "Defines a new hook word in the current vocabulary. Hook words are generic words which dispatch on the value of a variable, so methods are defined with " { $link POSTPONE: M: } ". Hook words differ from other generic words in that the dispatch value is removed from the stack before the chosen method is called." }
 { $examples

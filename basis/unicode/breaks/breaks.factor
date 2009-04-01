@@ -60,7 +60,7 @@ SYMBOL: table
 : finish-table ( -- table )
     table get [ [ 1 = ] map ] map ;
 
-: eval-seq ( seq -- seq ) [ dup word? [ execute ] when ] map ;
+: eval-seq ( seq -- seq ) [ ?execute ] map ;
 
 : (set-table) ( class1 class2 val -- )
     [ table get nth ] dip '[ _ or ] change-nth ;
@@ -101,6 +101,16 @@ PRIVATE>
     [ grapheme-class [ nip ] [ grapheme-break? ] 2bi ] find drop
     nip swap length or 1+ ;
 
+: first-grapheme-from ( start str -- i )
+    over tail-slice first-grapheme + ;
+
+: last-grapheme ( str -- i )
+    unclip-last-slice grapheme-class swap
+    [ grapheme-class dup rot grapheme-break? ] find-last drop ?1+ nip ;
+
+: last-grapheme-from ( end str -- i )
+    swap head-slice last-grapheme ;
+
 <PRIVATE
 
 : >pieces ( str quot: ( str -- i ) -- graphemes )
@@ -113,10 +123,6 @@ PRIVATE>
 
 : string-reverse ( str -- rts )
     >graphemes reverse concat ;
-
-: last-grapheme ( str -- i )
-    unclip-last-slice grapheme-class swap
-    [ grapheme-class dup rot grapheme-break? ] find-last drop ?1+ nip ;
 
 <PRIVATE
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.order namespaces make sequences words io
+USING: arrays kernel math math.order math.matrices namespaces make sequences words io
 math.vectors ui.gadgets ui.baseline-alignment columns accessors strings.tables
 math.rectangles fry ;
 IN: ui.gadgets.grids
@@ -32,9 +32,6 @@ PRIVATE>
 : grid-remove ( grid pair -- grid ) [ <gadget> ] dip grid-add ;
 
 <PRIVATE
-
-: cross-zip ( seq1 seq2 -- seq1xseq2 )
-    [ [ 2array ] with map ] curry map ;
 
 TUPLE: cell pref-dim baseline cap-height ;
 
@@ -116,7 +113,7 @@ M: grid layout* [ grid>> ] [ <grid-layout> ] bi grid-layout ;
 
 M: grid children-on ( rect gadget -- seq )
     dup children>> empty? [ 2drop f ] [
-        { 0 1 } swap grid>>
+        [ { 0 1 } ] dip grid>>
         [ 0 <column> fast-children-on ] keep
         <slice> concat
     ] if ;
