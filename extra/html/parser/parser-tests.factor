@@ -50,7 +50,7 @@ V{
             { "foo" "bar" }
             { "href" "http://factorcode.org/" }
             { "baz" "quux" }
-            { "nofollow" f }
+            { "nofollow" "nofollow" }
         } f f }
 }
 ] [ "<a   href  =    \"http://factorcode.org/\"    nofollow  foo   =  bar baz='quux'a=pirsqd  >" parse-html ] unit-test
