@@ -1,11 +1,11 @@
 ! Copyright (C) 2006 Chris Double, Daniel Ehrenberg.
-! Portions copyright (C) 2008 Slava Pestov.
+! Portions copyright (C) 2008, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: xml.traversal kernel assocs math.order
-    strings sequences xml.data xml.writer
-    io.streams.string combinators xml xml.entities.html io.files io
-    http.client namespaces make xml.syntax hashtables
-    calendar.format accessors continuations urls present ;
+USING: xml.traversal kernel assocs math.order strings sequences
+xml.data xml.writer io.streams.string combinators xml
+xml.entities.html io.files io http.client namespaces make
+xml.syntax hashtables calendar.format accessors continuations
+urls present byte-arrays ;
 IN: syndication
 
 : any-tag-named ( tag names -- tag-inside )
@@ -106,12 +106,15 @@ TUPLE: entry title url description date ;
         { "feed" [ atom1.0 ] }
     } case ;
 
-: string>feed ( string -- feed )
-    [ string>xml xml>feed ] with-html-entities ;
+GENERIC: parse-feed ( seq -- feed )
+
+M: string parse-feed [ string>xml xml>feed ] with-html-entities ;
+
+M: byte-array parse-feed [ bytes>xml xml>feed ] with-html-entities ;
 
 : download-feed ( url -- feed )
     #! Retrieve an news syndication file, return as a feed tuple.
-    http-get nip string>feed ;
+    http-get nip parse-feed ;
 
 ! Atom generation
 
