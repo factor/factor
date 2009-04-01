@@ -311,7 +311,7 @@ void find_data_references(CELL look_for_)
 /* Dump all code blocks for debugging */
 void dump_code_heap(void)
 {
-	CELL size = 0;
+	CELL reloc_size = 0, literal_size = 0;
 
 	F_BLOCK *scan = first_block(&code_heap);
 
@@ -324,11 +324,13 @@ void dump_code_heap(void)
 			status = "free";
 			break;
 		case B_ALLOCATED:
-			size += object_size(((F_CODE_BLOCK *)scan)->relocation);
+			reloc_size += object_size(((F_CODE_BLOCK *)scan)->relocation);
+			literal_size += object_size(((F_CODE_BLOCK *)scan)->literals);
 			status = "allocated";
 			break;
 		case B_MARKED:
-			size += object_size(((F_CODE_BLOCK *)scan)->relocation);
+			reloc_size += object_size(((F_CODE_BLOCK *)scan)->relocation);
+			literal_size += object_size(((F_CODE_BLOCK *)scan)->literals);
 			status = "marked";
 			break;
 		default:
@@ -343,7 +345,8 @@ void dump_code_heap(void)
 		scan = next_block(&code_heap,scan);
 	}
 	
-	print_cell(size); print_string(" bytes of relocation data\n");
+	print_cell(reloc_size); print_string(" bytes of relocation data\n");
+	print_cell(literal_size); print_string(" bytes of literal data\n");
 }
 
 void factorbug(void)
