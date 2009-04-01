@@ -13,7 +13,8 @@ ARTICLE: "integer-functions" "Integer functions"
 "Tests:"
 { $subsection power-of-2? }
 { $subsection even? }
-{ $subsection odd? } ;
+{ $subsection odd? }
+{ $subsection divisor? } ;
 
 ARTICLE: "arithmetic-functions" "Arithmetic functions"
 "Computing additive and multiplicative inverses:"
@@ -268,6 +269,11 @@ HELP: gcd
 { $values { "x" integer } { "y" integer } { "a" integer } { "d" integer } }
 { $description "Computes the positive greatest common divisor " { $snippet "d" } " of " { $snippet "x" } " and " { $snippet "y" } ", and another value " { $snippet "a" } " satisfying:" { $code "a*y = d mod x" } }
 { $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "y" } " modulo " { $snippet "x" } "." } ;
+
+HELP: divisor?
+{ $values { "x" integer } { "y" integer } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "y" } " is a divisor of " { $snippet "x" } ". This is the same thing as saying " { $snippet "x" } " is divisible by " { $snippet "y" } "." }
+{ $notes "Returns t for both negative and positive divisors, as well as trivial and non-trivial divisors." } ;
 
 HELP: mod-inv
 { $values { "x" integer } { "n" integer } { "y" integer } }
