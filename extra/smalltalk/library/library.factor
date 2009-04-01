@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel present io math sequences assocs math.ranges fry
-tools.time locals smalltalk.selectors smalltalk.ast smalltalk.classes ;
+USING: kernel present io math sequences assocs math.ranges
+math.order fry tools.time locals smalltalk.selectors
+smalltalk.ast smalltalk.classes ;
 IN: smalltalk.library
 
 SELECTOR: print
@@ -9,6 +10,16 @@ SELECTOR: asString
 
 M: object selector-print dup present print ;
 M: object selector-asString present ;
+
+SELECTOR: print:
+SELECTOR: nextPutAll:
+SELECTOR: tab
+SELECTOR: nl
+
+M: object selector-print: [ present ] dip stream-print nil ;
+M: object selector-nextPutAll: selector-print: ;
+M: object selector-tab "    " swap selector-print: ;
+M: object selector-nl stream-nl nil ;
 
 SELECTOR: +
 SELECTOR: -
@@ -30,6 +41,12 @@ M: object selector-<= swap <= ;
 M: object selector->= swap >= ;
 M: object selector-=  swap =  ;
 
+SELECTOR: min:
+SELECTOR: max:
+
+M: object selector-min: min ;
+M: object selector-max: max ;
+
 SELECTOR: ifTrue:
 SELECTOR: ifFalse:
 SELECTOR: ifTrue:ifFalse:
@@ -37,6 +54,10 @@ SELECTOR: ifTrue:ifFalse:
 M: object selector-ifTrue: [ call( -- result ) ] [ drop nil ] if ;
 M: object selector-ifFalse: [ drop nil ] [ call( -- result ) ] if ;
 M: object selector-ifTrue:ifFalse: [ drop call( -- result ) ] [ nip call( -- result ) ] if ;
+
+SELECTOR: isNil
+
+M: object selector-isNil nil eq? ;
 
 SELECTOR: at:
 SELECTOR: at:put:
