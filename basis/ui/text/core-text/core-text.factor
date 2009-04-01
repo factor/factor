@@ -18,12 +18,11 @@ M: core-text-renderer string-dim
     [ cached-line dim>> ]
     if-empty ;
 
-M: core-text-renderer finish-text-rendering
-    text-handle>> purge-cache
+M: core-text-renderer flush-layout-cache
     cached-lines get purge-cache ;
 
 : rendered-line ( font string -- texture )
-    world get text-handle>>
+    world get world-text-handle
     [ cached-line [ image>> ] [ loc>> ] bi <texture> ]
     2cache ;
 
