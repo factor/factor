@@ -53,7 +53,7 @@ PRIVATE>
 
 
 : euler001c ( -- answer )
-    1000 [ { 3 5 } [ mod 0 = ] with contains? ] filter sum ;
+    1000 [ { 3 5 } [ mod 0 = ] with any? ] filter sum ;
 
 ! [ euler001c ] 100 ave-time
 ! 0 ms ave run time - 0.06 SD (100 trials)
