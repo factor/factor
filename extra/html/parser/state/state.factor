@@ -98,19 +98,16 @@ TUPLE: state-parser sequence n ;
         start-n state-parser (>>n) f
     ] if ;
 
-: take-token ( state-parser -- string )
+: (take-token) ( state-parser -- string )
     skip-whitespace [ current { [ blank? ] [ f = ] } 1|| ] take-until ;
 
-:: (tokenize-line) ( state-parser escape-char quote-char -- )
+:: take-token* ( state-parser escape-char quote-char -- string/f )
     state-parser skip-whitespace
     dup current {
-        { quote-char [
-            [ escape-char quote-char take-quoted-string , ]
-            [ escape-char quote-char (tokenize-line) ] bi
-        ] }
-        { f [ drop ] }
-        [ drop [ take-token , ] [ escape-char quote-char (tokenize-line) ] bi ]
+        { quote-char [ escape-char quote-char take-quoted-string ] }
+        { f [ drop f ] }
+        [ drop (take-token) ]
     } case ;
 
-: tokenize-line ( line escape-char quote-char -- seq )
-    [ <state-parser> ] 2dip [ (tokenize-line) ] { } make ;
+: take-token ( state-parser -- string/f )
+    CHAR: \ CHAR: " take-token* ;
