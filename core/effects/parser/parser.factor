@@ -15,6 +15,7 @@ ERROR: bad-effect ;
                 scan {
                     { "(" [ ")" parse-effect ] }
                     { f [ ")" unexpected-eof ] }
+                    [ bad-effect ]
                 } case 2array
             ] when
         ] if
