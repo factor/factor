@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math kernel sequences accessors fry circular
-unicode.case unicode.categories locals ;
+unicode.case unicode.categories locals combinators.short-circuit ;
 
 IN: html.parser.state
 
@@ -12,20 +12,21 @@ TUPLE: state-parser sequence n ;
         swap >>sequence
         0 >>n ;
 
-: state-parser-nth ( n state-parser -- char/f )
-    sequence>> ?nth ; inline
+: offset  ( state-parser offset -- char/f )
+    swap
+    [ n>> + ] [ sequence>> ?nth ] bi ; inline
 
-: current ( state-parser -- char/f )
-    [ n>> ] keep state-parser-nth ; inline
+: current ( state-parser -- char/f ) 0 offset ; inline
 
-: previous ( state-parser -- char/f )
-    [ n>> 1 - ] keep state-parser-nth ; inline
+: previous ( state-parser -- char/f ) -1 offset ; inline
 
-: peek-next ( state-parser -- char/f )
-    [ n>> 1 + ] keep state-parser-nth ; inline
+: peek-next ( state-parser -- char/f ) 1 offset ; inline
 
 : advance ( state-parser -- state-parser )
     [ 1 + ] change-n ; inline
+
+: advance* ( state-parser -- )
+    advance drop ; inline
 
 : get+increment ( state-parser -- char/f )
     [ current ] [ advance drop ] bi ; inline
@@ -80,3 +81,13 @@ TUPLE: state-parser sequence n ;
 
 : state-parse ( sequence quot -- )
     [ <state-parser> ] dip call ; inline
+
+:: take-quoted-string ( state-parser escape-char quote-char -- string )
+    state-parser advance
+    [
+        {
+            [ { [ previous quote-char = ] [ current quote-char = ] } 1&& ]
+            [ current quote-char = not ]
+        } 1||
+    ] take-while
+    state-parser advance* ;
