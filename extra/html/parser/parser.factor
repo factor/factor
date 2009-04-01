@@ -3,7 +3,7 @@
 USING: accessors arrays hashtables html.parser.state
 html.parser.utils kernel namespaces sequences
 unicode.case unicode.categories combinators.short-circuit
-quoting ;
+quoting fry ;
 IN: html.parser
 
 
@@ -19,7 +19,7 @@ SYMBOL: tagstack
 
 : closing-tag? ( string -- ? )
     [ f ]
-    [ [ first ] [ peek ] bi [ CHAR: / = ] bi@ or ] if-empty ;
+    [ { [ first CHAR: / = ] [ peek CHAR: / = ] } 1|| ] if-empty ;
 
 : <tag> ( name attributes closing? -- tag )
     tag new
@@ -35,11 +35,14 @@ SYMBOL: tagstack
         swap >>name
         swap >>text ; inline
 
+: (read-quote) ( state-parser ch -- string )
+    '[ [ current _ = ] take-until ] [ next drop ] bi ;
+
 : read-single-quote ( state-parser -- string )
-    [ [ current CHAR: ' = ] take-until ] [ next drop ] bi ;
+    CHAR: ' (read-quote) ;
 
 : read-double-quote ( state-parser -- string )
-    [ [ current CHAR: " = ] take-until ] [ next drop ] bi ;
+    CHAR: " (read-quote) ;
 
 : read-quote ( state-parser -- string )
     dup get+increment CHAR: ' =
