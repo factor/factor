@@ -66,3 +66,16 @@ IN: html.parser.state.tests
     [ CHAR: \ CHAR: " take-quoted-string drop ]
     [ skip-whitespace "asdf" take-sequence ] bi
 ] unit-test
+
+[ f ]
+[
+    "\"abc asdf" <state-parser>
+    CHAR: \ CHAR: " take-quoted-string
+] unit-test
+
+[ "\"abc" ]
+[
+    "\"abc asdf" <state-parser>
+    [ CHAR: \ CHAR: " take-quoted-string drop ]
+    [ "\"abc" take-sequence ] bi
+] unit-test
