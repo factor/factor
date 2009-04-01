@@ -11,6 +11,9 @@ TUPLE: tag name attributes text closing? ;
 SINGLETON: text
 SINGLETON: dtd
 SINGLETON: comment
+
+<PRIVATE
+
 SYMBOL: tagstack
 
 : push-tag ( tag -- )
@@ -117,6 +120,8 @@ SYMBOL: tagstack
 
 : tag-parse ( quot -- vector )
     V{ } clone tagstack [ state-parse ] with-variable ; inline
+
+PRIVATE>
 
 : parse-html ( string -- vector )
     [ (parse-html) tagstack get ] tag-parse ;
