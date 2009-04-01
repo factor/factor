@@ -36,7 +36,7 @@ TUPLE: state-parser sequence n ;
         state-parser quot call [ state-parser advance quot skip-until ] unless
     ] when ; inline recursive
 
-: state-parse-end? ( state-parser -- ? ) peek-next not ;
+: state-parse-end? ( state-parser -- ? ) current not ;
 
 : take-until ( state-parser quot: ( obj -- ? ) -- sequence/f )
     over state-parse-end? [
@@ -96,3 +96,6 @@ TUPLE: state-parser sequence n ;
     ] [
         start-n state-parser (>>n) f
     ] if ;
+
+: take-token ( state-parser -- string )
+    skip-whitespace [ current { [ blank? ] [ f = ] } 1|| ] take-until ;
