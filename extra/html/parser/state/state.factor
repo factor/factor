@@ -18,6 +18,9 @@ TUPLE: state-parser sequence n ;
 : current ( state -- char/f )
     [ n>> ] keep state-parser-nth ; inline
 
+: previous ( state -- char/f )
+    [ n>> 1 - ] keep state-parser-nth ; inline
+
 : peek-next ( state -- char/f )
     [ n>> 1 + ] keep state-parser-nth ; inline
 
@@ -26,9 +29,6 @@ TUPLE: state-parser sequence n ;
 
 : get+increment ( state -- char/f )
     [ current ] [ next drop ] bi ; inline
-
-: state-parse ( sequence quot -- )
-    [ <state-parser> ] dip call ; inline
 
 :: skip-until ( state quot: ( obj -- ? ) -- )
     state current [
@@ -45,6 +45,9 @@ TUPLE: state-parser sequence n ;
         [ skip-until ]
         [ drop [ n>> ] [ sequence>> ] bi ] 2tri subseq
     ] if ; inline
+
+: take-while ( state quot: ( obj -- ? ) -- sequence/f )
+    [ not ] compose take-until ; inline
 
 :: take-until-sequence ( state-parser sequence -- sequence' )
     sequence length <growing-circular> :> growing
@@ -66,6 +69,5 @@ TUPLE: state-parser sequence n ;
 : take-until-object ( state obj -- sequence )
     '[ _ = ] take-until ;
 
-: take-stuff ( state delimiter -- sequence )
-    
-    ;
+: state-parse ( sequence quot -- )
+    [ <state-parser> ] dip call ; inline
