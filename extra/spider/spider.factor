@@ -8,7 +8,7 @@ continuations calendar prettyprint dlists deques locals ;
 IN: spider
 
 TUPLE: spider base count max-count sleep max-depth initial-links
-filters spidered todo nonmatching filtered quiet ;
+filters spidered todo nonmatching quiet ;
 
 TUPLE: spider-result url depth headers fetch-time parsed-html
 links processing-time timestamp ;
@@ -40,7 +40,6 @@ TUPLE: unique-deque assoc deque ;
         over >>base
         swap 0 <unique-deque> [ push-url ] keep >>todo
         <unique-deque> >>nonmatching
-        <unique-deque> >>filtered
         0 >>max-depth
         0 >>count
         1/0. >>max-count
@@ -59,9 +58,6 @@ TUPLE: unique-deque assoc deque ;
 
 : add-nonmatching ( links level spider -- )
     nonmatching>> push-links ;
-
-: add-filtered ( links level spider -- )
-    filtered>> push-links ;
 
 : filter-base-links ( spider spider-result -- base-links nonmatching-links )
     [ base>> host>> ] [ links>> prune ] bi*
@@ -110,6 +106,7 @@ TUPLE: unique-deque assoc deque ;
     {
         [ todo>> deque>> deque-empty? not ]
         [ [ todo>> peek-url depth>> ] [ max-depth>> ] bi < ]
+        [ [ count>> ] [ max-count>> ] bi < ]
     } 1&& ;
 
 : setup-next-url ( spider -- spider url depth )
