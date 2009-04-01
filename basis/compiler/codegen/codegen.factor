@@ -53,7 +53,7 @@ SYMBOL: labels
     V{ } clone literal-table set
     V{ } clone calls set
     compiling-word set
-    compiled-stack-traces? compiling-word get f ? add-literal ;
+    compiled-stack-traces? [ compiling-word get add-literal ] when ;
 
 : generate ( mr -- asm )
     [
