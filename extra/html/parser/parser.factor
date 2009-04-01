@@ -42,10 +42,10 @@ SYMBOL: tagstack
 : make-dtd-tag ( string -- tag ) dtd new-tag ; inline
 
 : read-single-quote ( state-parser -- string )
-    [ [ CHAR: ' = ] take-until ] [ next drop ] bi ;
+    [ [ current CHAR: ' = ] take-until ] [ next drop ] bi ;
 
 : read-double-quote ( state-parser -- string )
-    [ [ CHAR: " = ] take-until ] [ next drop ] bi ;
+    [ [ current CHAR: " = ] take-until ] [ next drop ] bi ;
 
 : read-quote ( state-parser -- string )
     dup get+increment CHAR: ' =
@@ -53,14 +53,14 @@ SYMBOL: tagstack
 
 : read-key ( state-parser -- string )
     skip-whitespace
-    [ { [ CHAR: = = ] [ blank? ] } 1|| ] take-until ;
+    [ current { [ CHAR: = = ] [ blank? ] } 1|| ] take-until ;
 
 : read-= ( state-parser -- )
     skip-whitespace
-    [ [ CHAR: = = ] take-until drop ] [ next drop ] bi ;
+    [ [ current CHAR: = = ] take-until drop ] [ next drop ] bi ;
 
 : read-token ( state-parser -- string )
-    [ blank? ] take-until ;
+    [ current blank? ] take-until ;
 
 : read-value ( state-parser -- string )
     skip-whitespace
@@ -82,11 +82,11 @@ SYMBOL: tagstack
     ] if ;
 
 : read-tag ( state-parser -- string )
-    [ [ "><" member? ] take-until ]
+    [ [ current "><" member? ] take-until ]
     [ dup current CHAR: < = [ next ] unless drop ] bi ;
 
 : read-until-< ( state-parser -- string )
-    [ CHAR: < = ] take-until ;
+    [ current CHAR: < = ] take-until ;
 
 : parse-text ( state-parser -- )
     read-until-< [ make-text-tag push-tag ] unless-empty ;
