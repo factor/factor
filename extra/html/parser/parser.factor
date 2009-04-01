@@ -64,7 +64,7 @@ SYMBOL: tagstack
 
 : read-value ( state-parser -- string )
     skip-whitespace
-    dup get-char quote? [ read-quote ] [ read-token ] if
+    dup current quote? [ read-quote ] [ read-token ] if
     [ blank? ] trim ;
 
 : read-comment ( state-parser -- )
@@ -74,7 +74,7 @@ SYMBOL: tagstack
     ">" take-until-sequence make-dtd-tag push-tag ;
 
 : read-bang ( state-parser -- )
-    next dup { [ get-char CHAR: - = ] [ get-next CHAR: - = ] } 1&& [
+    next dup { [ current CHAR: - = ] [ peek-next CHAR: - = ] } 1&& [
         next next
         read-comment
     ] [
@@ -83,7 +83,7 @@ SYMBOL: tagstack
 
 : read-tag ( state-parser -- string )
     [ [ "><" member? ] take-until ]
-    [ dup get-char CHAR: < = [ next ] unless drop ] bi ;
+    [ dup current CHAR: < = [ next ] unless drop ] bi ;
 
 : read-until-< ( state-parser -- string )
     [ CHAR: < = ] take-until ;
@@ -111,7 +111,7 @@ SYMBOL: tagstack
     ] state-parse ;
 
 : read-< ( state-parser -- string/f )
-    next dup get-char [
+    next dup current [
         CHAR: ! = [ read-bang f ] [ read-tag ] if
     ] [
         drop f
@@ -121,7 +121,7 @@ SYMBOL: tagstack
     read-< [ (parse-tag) make-tag push-tag ] unless-empty ;
 
 : (parse-html) ( state-parser -- )
-    dup get-next [
+    dup peek-next [
         [ parse-text ] [ parse-tag ] [ (parse-html) ] tri
     ] [ drop ] if ;
 
