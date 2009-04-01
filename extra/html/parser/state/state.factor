@@ -32,8 +32,8 @@ TUPLE: state-parser sequence n ;
 
 :: skip-until ( state quot: ( obj -- ? ) -- )
     state current [
-        quot call [ state next quot skip-until ] unless
-    ] when* ; inline recursive
+        state quot call [ state next quot skip-until ] unless
+    ] when ; inline recursive
 
 : state-parse-end? ( state -- ? ) peek-next not ;
 
@@ -53,7 +53,7 @@ TUPLE: state-parser sequence n ;
     sequence length <growing-circular> :> growing
     state-parser
     [
-        growing push-growing-circular
+        current growing push-growing-circular
         sequence growing sequence=
     ] take-until :> found
     found dup length
@@ -61,13 +61,13 @@ TUPLE: state-parser sequence n ;
     state-parser next drop ;
     
 : skip-whitespace ( state -- state )
-    [ [ blank? not ] take-until drop ] keep ;
+    [ [ current blank? not ] take-until drop ] keep ;
 
 : take-rest ( state -- sequence )
     [ drop f ] take-until ; inline
 
 : take-until-object ( state obj -- sequence )
-    '[ _ = ] take-until ;
+    '[ current _ = ] take-until ;
 
 : state-parse ( sequence quot -- )
     [ <state-parser> ] dip call ; inline
