@@ -34,3 +34,21 @@ IN: html.parser.state.tests
 
 [ { 1 2 } ]
 [ { 1 2 3 4 } <state-parser> { 3 4 } take-until-sequence ] unit-test
+
+[ "ab" ]
+[ "abcd" <state-parser> "ab" take-sequence ] unit-test
+
+[ f ]
+[ "abcd" <state-parser> "lol" take-sequence ] unit-test
+
+[ "ab" ]
+[
+    "abcd" <state-parser>
+    [ "lol" take-sequence drop ] [ "ab" take-sequence ] bi
+] unit-test
+
+[ "" ]
+[ "abcd" <state-parser> "" take-sequence ] unit-test
+
+[ "cd" ]
+[ "abcd" <state-parser> [ "ab" take-sequence drop ] [ "cd" take-sequence ] bi ] unit-test
