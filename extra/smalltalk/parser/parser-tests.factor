@@ -49,9 +49,9 @@ test         = <foreign parse-smalltalk Literal>
 [ B{ 1 2 3 4 } ] [ "#[1 2 3 4]" test-Literal ] unit-test
 [ { nil t f } ] [ "#(nil true false)" test-Literal ] unit-test
 [ { nil { t f } } ] [ "#(nil (true false))" test-Literal ] unit-test
-[ T{ ast-block f { } { } } ] [ "[]" test-Literal ] unit-test
-[ T{ ast-block f { "x" } { T{ ast-return f T{ ast-name f "x" } } } } ] [ "[ :x|^x]" test-Literal ] unit-test
-[ T{ ast-block f { } { T{ ast-return f self } } } ] [ "[^self]" test-Literal ] unit-test
+[ T{ ast-block f { } { } { } } ] [ "[]" test-Literal ] unit-test
+[ T{ ast-block f { "x" } { } { T{ ast-return f T{ ast-name f "x" } } } } ] [ "[ :x|^x]" test-Literal ] unit-test
+[ T{ ast-block f { } { } { T{ ast-return f self } } } ] [ "[^self]" test-Literal ] unit-test
 
 [
     T{ ast-block
@@ -191,6 +191,19 @@ test         = <foreign parse-smalltalk Expression>
 [ "12 sqrt + 1; + 2" test-Expression ] unit-test
 
 [
+    T{ ast-cascade
+       { receiver T{ ast-message-send f 12 "squared" } }
+       { messages
+         {
+           T{ ast-message f "to:" { 100 } }
+           T{ ast-message f "sqrt" }
+         }
+       }
+    }
+]
+[ "12 squared to: 100; sqrt" test-Expression ] unit-test
+
+[
     T{ ast-message-send f
         T{ ast-message-send f 1 "+" { 2 } }
         "*"
@@ -228,12 +241,8 @@ test         = <foreign parse-smalltalk LocalVariableDeclarationList>
 [ T{ ast-local-variables f { "i" "j" } } ] [ " |  i j   |" test-LocalVariableDeclarationList ] unit-test
 
 
-EBNF: test-MessageSend
-test         = <foreign parse-smalltalk MessageSend>
-;EBNF
-
 [ T{ ast-message-send f T{ ast-name f "x" } "foo:bar:" { 1 2 } } ]
-[ "x foo:1 bar:2" test-MessageSend ] unit-test
+[ "x foo:1 bar:2" test-Expression ] unit-test
 
 [
     T{ ast-message-send
@@ -247,12 +256,14 @@ test         = <foreign parse-smalltalk MessageSend>
         { 10 100 }
     }
 ]
-[ "3 factorial + 4 factorial between: 10 and: 100" test-MessageSend ] unit-test
+[ "3 factorial + 4 factorial between: 10 and: 100" test-Expression ] unit-test
 
-[ T{ ast-sequence f { 1 2 } } ] [ "1. 2" parse-smalltalk ] unit-test
+[ T{ ast-sequence f { } { 1 2 } } ] [ "1. 2" parse-smalltalk ] unit-test
+
+[ T{ ast-sequence f { } { 1 2 } } ] [ "1. 2." parse-smalltalk ] unit-test
 
 [
-    T{ ast-sequence f
+    T{ ast-sequence f { }
         {
             T{ ast-class
                { name "Test" }
@@ -265,7 +276,7 @@ test         = <foreign parse-smalltalk MessageSend>
 [ "class Test [|a|]" parse-smalltalk ] unit-test
 
 [
-    T{ ast-sequence f
+    T{ ast-sequence f { }
         {
             T{ ast-class
                { name "Test1" }

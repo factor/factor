@@ -105,7 +105,7 @@ BlockLiteral = "["
                  => [[ args ]]
                 )?:args
                 ExecutableCode:body
-                "]" => [[ args >array body ast-block boa ]]
+                "]" => [[ args >array body <ast-block> ]]
 
 Literal = (ConstantReference
                 | FloatingPointLiteral
@@ -129,7 +129,7 @@ UnaryMessage = OptionalWhiteSpace
 BinaryMessage = OptionalWhiteSpace
                 BinaryMessageSelector:selector
                 OptionalWhiteSpace
-                (MessageSend | Operand):rhs
+                (UnaryMessageSend | Operand):rhs
                 => [[ selector { rhs } ast-message boa ]]
                                    
 KeywordMessageSegment = Keyword:k OptionalWhiteSpace (BinaryMessageSend | UnaryMessageSend | Operand):arg => [[ { k arg } ]]
@@ -140,13 +140,13 @@ KeywordMessage = OptionalWhiteSpace
 
 Message = BinaryMessage | UnaryMessage | KeywordMessage
 
-UnaryMessageSend = (MessageSend | Operand):lhs
-              Message:h
+UnaryMessageSend = (UnaryMessageSend | Operand):lhs
+              UnaryMessage:h
               (OptionalWhiteSpace ";" Message:m => [[ m ]])*:t
               => [[ lhs t h prefix >array <ast-cascade> ]]
 
-BinaryMessageSend = (MessageSend | Operand):lhs
-              Message:h
+BinaryMessageSend = (BinaryMessageSend | UnaryMessageSend | Operand):lhs
+              BinaryMessage:h
               (OptionalWhiteSpace ";" Message:m => [[ m ]])*:t
               => [[ lhs t h prefix >array <ast-cascade> ]]
 
@@ -155,10 +155,8 @@ KeywordMessageSend = (BinaryMessageSend | UnaryMessageSend | Operand):lhs
               (OptionalWhiteSpace ";" Message:m => [[ m ]])*:t
               => [[ lhs t h prefix >array <ast-cascade> ]]
 
-MessageSend = BinaryMessageSend | UnaryMessageSend | KeywordMessageSend
-
 Expression = OptionalWhiteSpace
-             (MessageSend | Operand):e
+             (KeywordMessageSend | BinaryMessageSend | UnaryMessageSend | Operand):e
              => [[ e ]]
 
 AssignmentOperation = OptionalWhiteSpace BindableIdentifier:i
@@ -176,13 +174,15 @@ LocalVariableDeclarationList = OptionalWhiteSpace "|" OptionalWhiteSpace
                  => [[ t h prefix ]]
                 )?:b OptionalWhiteSpace "|" => [[ b >array ast-local-variables boa ]]
 
-ExecutableCode = (LocalVariableDeclarationList)?:locals
-                 ((Statement:s OptionalWhiteSpace "." => [[ s ]])*:h
-                 FinalStatement:t (".")? => [[ h t suffix ]])?:body
-                 OptionalWhiteSpace
-                 => [[ body locals [ suffix ] when* >array ]]
+EndStatement = "."
 
-TopLevelForm = ExecutableCode => [[ ast-sequence boa ]]
+ExecutableCode = (LocalVariableDeclarationList)?:locals
+                 (Statement:s OptionalWhiteSpace EndStatement => [[ s ]])*:h
+                 (FinalStatement:t (EndStatement)? => [[ t ]])?:t
+                 OptionalWhiteSpace
+                 => [[ h t [ suffix ] when* locals [ prefix ] when* >array ]]
+
+TopLevelForm = ExecutableCode => [[ <ast-sequence> ]]
 
 UnaryMethodHeader = UnaryMessageSelector:selector
                   => [[ { selector { } } ]]
@@ -200,7 +200,7 @@ MethodDeclaration = OptionalWhiteSpace "method" OptionalWhiteSpace MethodHeader:
         OptionalWhiteSpace "["
         ExecutableCode:code
         "]"
-        => [[ header first2 code ast-block boa ast-method boa ]]
+        => [[ header first2 code <ast-block> ast-method boa ]]
 
 ClassDeclaration = OptionalWhiteSpace "class" OptionalWhiteSpace Identifier:name
         OptionalWhiteSpace
@@ -209,9 +209,9 @@ ClassDeclaration = OptionalWhiteSpace "class" OptionalWhiteSpace Identifier:name
         (OptionalWhiteSpace LocalVariableDeclarationList:l => [[ l names>> ]])?:ivars
         (MethodDeclaration:h
          (OptionalWhiteSpace
-          "."
+          EndStatement
           OptionalWhiteSpace
-          MethodDeclaration:m => [[ m ]])*:t (".")?
+          MethodDeclaration:m => [[ m ]])*:t (EndStatement)?
           => [[ t h prefix ]]
          )?:methods
         OptionalWhiteSpace "]"
