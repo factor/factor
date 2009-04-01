@@ -21,6 +21,11 @@ M: ast-name compile-ast name>> swap lookup-reader ;
 : compile-arguments ( lexenv ast -- quot )
     arguments>> [ compile-ast ] with map [ ] join ;
 
+: compile-new ( lexenv ast -- quot )
+    [ receiver>> compile-ast ]
+    [ compile-arguments ] 2bi
+    [ new ] 3append ;
+
 : compile-ifTrue:ifFalse: ( lexenv ast -- quot )
     [ receiver>> compile-ast ]
     [ compile-arguments ] 2bi
@@ -29,6 +34,7 @@ M: ast-name compile-ast name>> swap lookup-reader ;
 M: ast-message-send compile-ast
     dup selector>> {
         { "ifTrue:ifFalse:" [ compile-ifTrue:ifFalse: ] }
+        { "new" [ compile-new ] }
         [
             drop
             [ compile-arguments ]
