@@ -15,11 +15,10 @@ SLOT: i
     [ 1+ ] change-i drop ; inline
 
 : sequence-read1 ( stream -- elt/f )
-    [ >sequence-stream< ?nth ]
-    [ next ] bi ; inline
+    [ >sequence-stream< ?nth ] [ next ] bi ; inline
 
 : add-length ( n stream -- i+n )
-    [ i>> + ] [ underlying>> length ] bi min  ; inline
+    [ i>> + ] [ underlying>> length ] bi min ; inline
 
 : (sequence-read) ( n stream -- seq/f )
     [ add-length ] keep
@@ -32,8 +31,8 @@ SLOT: i
     [ (sequence-read) ] [ 2drop f ] if ; inline
 
 : find-sep ( seps stream -- sep/f n )
-    swap [ >sequence-stream< ] dip
-    [ memq? ] curry find-from swap ; inline
+    swap [ >sequence-stream< swap tail-slice ] dip
+    [ memq? ] curry find swap ; inline
 
 : sequence-read-until ( separators stream -- seq sep/f )
     [ find-sep ] keep

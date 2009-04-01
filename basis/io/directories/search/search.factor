@@ -65,9 +65,9 @@ ERROR: file-not-found ;
         _ [ _ _ find-file [ file-not-found ] unless* ] attempt-all
     ] [
         drop f
-    ] recover ;
+    ] recover ; inline
 
 : find-all-in-directories ( directories bfs? quot: ( obj -- ? ) -- paths/f )
-    '[ _ _ find-all-files ] map concat ;
+    '[ _ _ find-all-files ] map concat ; inline
 
 os windows? [ "io.directories.search.windows" require ] when

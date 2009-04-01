@@ -1,8 +1,12 @@
 IN: game-input.tests
-USING: game-input tools.test kernel system threads ;
+USING: ui game-input tools.test kernel system threads
+combinators.short-circuit calendar ;
 
-os windows? os macosx? or [
+{
+    [ os windows? ui-running? and ]
+    [ os macosx? ]
+} 0|| [
     [ ] [ open-game-input ] unit-test
-    [ ] [ yield ] unit-test
+    [ ] [ 1 seconds sleep ] unit-test
     [ ] [ close-game-input ] unit-test
 ] when

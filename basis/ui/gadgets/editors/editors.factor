@@ -172,11 +172,10 @@ TUPLE: selected-line start end first? last? ;
 
 :: draw-selection ( line pair editor -- )
     pair [ editor font>> line offset>x ] map :> pair
-    pair first 0 2array [
-        editor selection-color>> gl-color
-        pair second pair first - round 1 max
-        editor line-height 2array gl-fill-rect
-    ] with-translation ;
+    editor selection-color>> gl-color
+    pair first 0 2array
+    pair second pair first - round 1 max editor line-height 2array
+    gl-fill-rect ;
 
 : draw-unselected-line ( line editor -- )
     font>> swap draw-text ;
