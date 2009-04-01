@@ -134,7 +134,7 @@ ERROR: no-vocab vocab ;
     vocabulary>> using get [ conjoin ] [ drop ] if* ;
 
 : ($values.) ( array -- )
-    [
+    [ bl ] [
         "{ " write
         dup array? [ first ] when
         dup lookup-type [
@@ -145,7 +145,7 @@ ERROR: no-vocab vocab ;
             null add-using
         ] if
         " }" write
-    ] each ;
+    ] interleave ;
 
 : 4bl ( -- )
     "    " write ; inline
