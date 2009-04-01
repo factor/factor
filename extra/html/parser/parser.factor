@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables html.parser.state
-html.parser.utils kernel make namespaces sequences
+html.parser.utils kernel namespaces sequences
 unicode.case unicode.categories combinators.short-circuit
 quoting ;
 IN: html.parser
@@ -30,16 +30,10 @@ SYMBOL: tagstack
 : make-tag ( string attribs -- tag )
     [ [ closing-tag? ] keep "/" trim1 ] dip rot <tag> ;
 
-: new-tag ( string type -- tag )
+: new-tag ( text name -- tag )
     tag new
         swap >>name
         swap >>text ; inline
-
-: make-text-tag ( string -- tag ) text new-tag ; inline
-
-: make-comment-tag ( string -- tag ) comment new-tag ; inline
-
-: make-dtd-tag ( string -- tag ) dtd new-tag ; inline
 
 : read-single-quote ( state-parser -- string )
     [ [ current CHAR: ' = ] take-until ] [ next drop ] bi ;
@@ -68,10 +62,10 @@ SYMBOL: tagstack
     [ blank? ] trim ;
 
 : read-comment ( state-parser -- )
-    "-->" take-until-sequence make-comment-tag push-tag ;
+    "-->" take-until-sequence comment new-tag push-tag ;
 
 : read-dtd ( state-parser -- )
-    ">" take-until-sequence make-dtd-tag push-tag ;
+    ">" take-until-sequence dtd new-tag push-tag ;
 
 : read-bang ( state-parser -- )
     next dup { [ current CHAR: - = ] [ peek-next CHAR: - = ] } 1&& [
@@ -89,7 +83,7 @@ SYMBOL: tagstack
     [ current CHAR: < = ] take-until ;
 
 : parse-text ( state-parser -- )
-    read-until-< [ make-text-tag push-tag ] unless-empty ;
+    read-until-< [ text new-tag push-tag ] unless-empty ;
 
 : (parse-attributes) ( state-parser -- )
     skip-whitespace
@@ -98,12 +92,12 @@ SYMBOL: tagstack
     ] [
         [
             [ read-key >lower ] [ read-= ] [ read-value ] tri
-            2array ,
+            swap set
         ] keep (parse-attributes)
     ] if ;
 
 : parse-attributes ( state-parser -- hashtable )
-    [ (parse-attributes) ] { } make >hashtable ;
+    [ (parse-attributes) ] H{ } make-assoc ;
 
 : (parse-tag) ( string -- string' hashtable )
     [
