@@ -21,11 +21,22 @@ M: ast-name compile-ast name>> swap lookup-reader ;
 : compile-arguments ( lexenv ast -- quot )
     arguments>> [ compile-ast ] with map [ ] join ;
 
-M: ast-message-send compile-ast
-    [ compile-arguments ]
+: compile-ifTrue:ifFalse: ( lexenv ast -- quot )
     [ receiver>> compile-ast ]
-    [ nip selector>> selector>generic ]
-    2tri [ append ] dip suffix ;
+    [ compile-arguments ] 2bi
+    [ if ] 3append ;
+
+M: ast-message-send compile-ast
+    dup selector>> {
+        { "ifTrue:ifFalse:" [ compile-ifTrue:ifFalse: ] }
+        [
+            drop
+            [ compile-arguments ]
+            [ receiver>> compile-ast ]
+            [ nip selector>> selector>generic ]
+            2tri [ append ] dip suffix
+        ]
+    } case ;
 
 M: ast-cascade compile-ast
     [ receiver>> compile-ast ]
@@ -40,8 +51,8 @@ M: ast-cascade compile-ast
     ] 2bi append ;
 
 M: ast-return compile-ast
-    value>> compile-ast
-    [ return-continuation get continue-with ] append ;
+    [ value>> compile-ast ] [ drop return>> 1quotation ] 2bi
+    [ continue-with ] 3append ;
 
 : (compile-sequence) ( lexenv asts -- quot )
     [ drop [ nil ] ] [
@@ -106,7 +117,7 @@ M: ast-block compile-ast
     [ lexenv self>> suffix ] dip <lambda> ;
 
 : compile-method-body ( lexenv block -- quot )
-    [ [ (compile-method-body) ] [ arguments>> length 1+ ] bi ] keep
+    [ [ (compile-method-body) ] [ arguments>> length 1+ ] bi ] 2keep
     make-return ;
 
 : compile-method ( lexenv ast-method -- )
@@ -115,7 +126,7 @@ M: ast-block compile-ast
     2bi define ;
 
 : <class-lexenv> ( class -- lexenv )
-    <lexenv> swap >>class "self" <local-reader> >>self ;
+    <lexenv> swap >>class "self" <local> >>self "^" <local> >>return ;
 
 M: ast-class compile-ast
     nip
@@ -136,5 +147,5 @@ M: ast-foreign compile-ast
     [ nil ] ;
 
 : compile-smalltalk ( statement -- quot )
-    [ [ empty-lexenv ] dip compile-sequence nip 0 ]
-    keep make-return ;
+    [ empty-lexenv ] dip [ compile-sequence nip 0 ]
+    2keep make-return ;

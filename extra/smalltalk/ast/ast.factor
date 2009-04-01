@@ -45,5 +45,9 @@ M: ast-sequence arguments>> drop { } ;
     [ ast-cascade boa ]
     if ;
 
+! Methods return self by default
+: <ast-method> ( class arguments body -- method )
+    self suffix <ast-block> ast-method boa ;
+
 TUPLE: symbol { name string } ;
 MEMO: intern ( name -- symbol ) symbol boa ;

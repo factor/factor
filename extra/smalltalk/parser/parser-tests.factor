@@ -1,5 +1,6 @@
 IN: smalltalk.parser.tests
-USING: smalltalk.parser smalltalk.ast peg.ebnf tools.test accessors
+USING: smalltalk.parser smalltalk.ast
+peg.ebnf tools.test accessors
 io.files io.encodings.ascii kernel ;
 
 EBNF: test-Character

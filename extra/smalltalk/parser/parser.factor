@@ -200,7 +200,7 @@ MethodDeclaration = OptionalWhiteSpace "method" OptionalWhiteSpace MethodHeader:
         OptionalWhiteSpace "["
         ExecutableCode:code
         "]"
-        => [[ header first2 code <ast-block> ast-method boa ]]
+        => [[ header first2 code <ast-method> ]]
 
 ClassDeclaration = OptionalWhiteSpace "class" OptionalWhiteSpace Identifier:name
         OptionalWhiteSpace
