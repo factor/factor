@@ -165,6 +165,41 @@ test         = <foreign parse-smalltalk Expression>
 [ "((1 < 10) ifTrue: [ 'HI' ] ifFalse: [ 'BYE' ]) print" test-Expression ] unit-test
 
 [
+    T{ ast-cascade
+       { receiver 12 }
+       { messages
+         {
+           T{ ast-message f "sqrt" }
+           T{ ast-message f "+" { 2 } }
+         }
+       }
+    }
+]
+[ "12 sqrt; + 2" test-Expression ] unit-test
+
+[
+    T{ ast-cascade
+       { receiver T{ ast-message-send f 12 "sqrt" } }
+       { messages
+         {
+           T{ ast-message f "+" { 1 } }
+           T{ ast-message f "+" { 2 } }
+         }
+       }
+    }
+]
+[ "12 sqrt + 1; + 2" test-Expression ] unit-test
+
+[
+    T{ ast-message-send f
+        T{ ast-message-send f 1 "+" { 2 } }
+        "*"
+        { 3 }
+    }
+]
+[ "1+2*3" test-Expression ] unit-test
+
+[
     T{ ast-message-send
        { receiver
          T{ ast-message-send
@@ -214,15 +249,38 @@ test         = <foreign parse-smalltalk KeywordMessageSend>
 ]
 [ "3 factorial + 4 factorial between: 10 and: 100" test-KeywordMessageSend ] unit-test
 
-[ { 1 2 } ] [ "1. 2" parse-smalltalk ] unit-test
+[ T{ ast-sequence f { 1 2 } } ] [ "1. 2" parse-smalltalk ] unit-test
 
 [
-    T{ ast-class
-       { name "Test" }
-       { superclass "Object" }
-       { ivars { "a" } }
+    T{ ast-sequence f
+        {
+            T{ ast-class
+               { name "Test" }
+               { superclass "Object" }
+               { ivars { "a" } }
+            }
+        }
     }
 ]
 [ "class Test [|a|]" parse-smalltalk ] unit-test
+
+[
+    T{ ast-sequence f
+        {
+            T{ ast-class
+               { name "Test1" }
+               { superclass "Object" }
+               { ivars { "a" } }
+            }
+
+            T{ ast-class
+               { name "Test2" }
+               { superclass "Test1" }
+               { ivars { "b" } }
+            }
+        }
+    }
+]
+[ "class Test1 [|a|]. class Test2 extends Test1 [|b|]" parse-smalltalk ] unit-test
 
 [ ] [ "vocab:smalltalk/parser/test.st" ascii file-contents parse-smalltalk drop ] unit-test

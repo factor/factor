@@ -3,7 +3,7 @@
 USING: accessors arrays assocs combinators.short-circuit
 continuations fry kernel namespaces quotations sequences sets
 generalizations slots locals.types generalizations splitting math
-locals.rewrite.closures generic words smalltalk.ast
+locals.rewrite.closures generic words combinators smalltalk.ast
 smalltalk.compiler.lexenv smalltalk.selectors
 smalltalk.classes ;
 IN: smalltalk.compiler
@@ -22,8 +22,20 @@ M: ast-message-send need-return-continuation?
         [ arguments>> need-return-continuation? ]
     } 1&& ;
 
+M: ast-cascade need-return-continuation?
+    {
+        [ receiver>> need-return-continuation? ]
+        [ messages>> need-return-continuation? ]
+    } 1&& ;
+
+M: ast-message need-return-continuation?
+    arguments>> need-return-continuation? ;
+
 M: ast-assignment need-return-continuation?
     value>> need-return-continuation? ;
+
+M: ast-sequence need-return-continuation?
+    statements>> need-return-continuation? ;
 
 M: array need-return-continuation? [ need-return-continuation? ] any? ;
 
@@ -37,13 +49,24 @@ M: ast-block assigned-locals
     [ body>> assigned-locals ] [ arguments>> ] bi diff ;
 
 M: ast-message-send assigned-locals
-    [ arguments>> assigned-locals ]
     [ receiver>> assigned-locals ]
+    [ arguments>> assigned-locals ]
     bi append ;
+
+M: ast-cascade assigned-locals
+    [ arguments>> assigned-locals ]
+    [ messages>> assigned-locals ]
+    bi append ;
+
+M: ast-message assigned-locals
+    arguments>> assigned-locals ;
 
 M: ast-assignment assigned-locals
     [ name>> dup ast-name? [ name>> 1array ] [ drop { } ] if ]
     [ value>> assigned-locals ] bi append ;
+
+M: ast-sequence assigned-locals
+    statements>> assigned-locals ;
 
 M: array assigned-locals
     [ assigned-locals ] map concat ;
@@ -60,15 +83,36 @@ ERROR: unbound-local name ;
 
 M: ast-name compile-ast name>> swap lookup-reader ;
 
+: compile-arguments ( lexenv ast -- quot )
+    arguments>> [ compile-ast ] with map [ ] join ;
+
 M: ast-message-send compile-ast
-    [ arguments>> [ compile-ast ] with map [ ] join ]
+    [ compile-arguments ]
     [ receiver>> compile-ast ]
     [ nip selector>> selector>generic ]
     2tri [ append ] dip suffix ;
 
+M: ast-cascade compile-ast
+    [ receiver>> compile-ast ]
+    [
+        messages>> [
+            [ compile-arguments \ dip ]
+            [ selector>> selector>generic ] bi
+            [ ] 3sequence
+        ] with map
+        unclip-last [ [ [ drop ] append ] map ] dip suffix
+        cleave>quot
+    ] 2bi append ;
+
 M: ast-return compile-ast
     value>> compile-ast
     [ return-continuation get continue-with ] append ;
+
+: compile-sequence ( lexenv asts -- quot )
+    [ drop [ nil ] ] [ [ compile-ast ] with map [ drop ] join ] if-empty ;
+
+M: ast-sequence compile-ast
+    statements>> compile-sequence ;
 
 GENERIC: contains-blocks? ( obj -- ? )
 
@@ -110,7 +154,7 @@ M: ast-assignment compile-ast
         [ nip local-readers>> values ]
         [ lexenv-union ] 2bi
     ] [ body>> ] bi
-    [ drop [ nil ] ] [ [ compile-ast ] with map [ drop ] join ] if-empty ;
+    compile-sequence ;
 
 M: ast-block compile-ast
     compile-block <lambda> '[ _ ] ;

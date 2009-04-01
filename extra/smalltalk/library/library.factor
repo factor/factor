@@ -1,17 +1,15 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel present io math sequences assocs math.ranges
-locals smalltalk.selectors smalltalk.ast smalltalk.classes ;
+USING: kernel present io math sequences assocs math.ranges fry
+tools.time locals smalltalk.selectors smalltalk.ast smalltalk.classes ;
 IN: smalltalk.library
 
-! Some unary selectors
 SELECTOR: print
 SELECTOR: asString
 
 M: object selector-print dup present print ;
 M: object selector-asString present ;
 
-! Some binary selectors
 SELECTOR: +
 SELECTOR: -
 SELECTOR: *
@@ -32,7 +30,6 @@ M: object selector-<= swap <= ;
 M: object selector->= swap >= ;
 M: object selector-=  swap =  ;
 
-! Some keyword selectors
 SELECTOR: ifTrue:
 SELECTOR: ifFalse:
 SELECTOR: ifTrue:ifFalse:
@@ -77,3 +74,7 @@ M: object selector-value:value:value:value: call( input input input input -- res
 SELECTOR: new
 
 M: object selector-new new ;
+
+SELECTOR: time
+
+M: object selector-time '[ _ call( -- result ) ] time ;

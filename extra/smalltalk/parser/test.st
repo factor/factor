@@ -32,7 +32,7 @@ class TreeNode extends Object [
             nextPutAll: ' check: '; print: longLivedTree itemCheck; nl
     ]
 
-    binarytrees [
+    method binarytrees [
         self binarytrees: self arg to: self stdout.
         ^''
     ]
@@ -63,4 +63,4 @@ class TreeNode extends Object [
     ]
 ]
 
-Tests binarytrees.
+Tests binarytrees

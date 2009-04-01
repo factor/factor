@@ -4,6 +4,8 @@ USING: peg peg.ebnf smalltalk.ast sequences sequences.deep strings
 math.parser kernel arrays byte-arrays math assocs accessors ;
 IN: smalltalk.parser
 
+! :mode=text:noTabs=true:
+
 ! Based on http://chronos-st.blogspot.com/2007/12/smalltalk-in-one-page.html
 
 ERROR: bad-number str ;
@@ -120,43 +122,52 @@ Operand =       Literal
                 | Reference
                 | NestedExpression
 
-UnaryMessage = UnaryMessageSelector
+UnaryMessage = OptionalWhiteSpace
+               UnaryMessageSelector:s !(":")
+               => [[ s { } ast-message boa ]]
 UnaryMessageOperand = UnaryMessageSend | Operand
 UnaryMessageSend = UnaryMessageOperand:receiver
-                   OptionalWhiteSpace UnaryMessageSelector:selector !(":")
-                   => [[ receiver selector { } ast-message-send boa ]]
+                   UnaryMessage:h
+                   (OptionalWhiteSpace ";" UnaryMessage:m => [[ m ]])*:t
+                   => [[ receiver t h prefix >array <ast-cascade> ]]
 
-BinaryMessage = BinaryMessageSelector OptionalWhiteSpace BinaryMessageOperand
+BinaryMessage = OptionalWhiteSpace
+                BinaryMessageSelector:selector
+                OptionalWhiteSpace
+                BinaryMessageOperand:rhs
+                => [[ selector { rhs } ast-message boa ]]
+                                   
 BinaryMessageOperand = BinaryMessageSend | UnaryMessageSend | Operand
-BinaryMessageSend-1 = BinaryMessageOperand:lhs
-                    OptionalWhiteSpace
-                    BinaryMessageSelector:selector
-                    OptionalWhiteSpace
-                    UnaryMessageOperand:rhs
-                    => [[ lhs selector { rhs } ast-message-send boa ]]
-BinaryMessageSend = (BinaryMessageSend:lhs
-                    OptionalWhiteSpace
-                    BinaryMessageSelector:selector
-                    OptionalWhiteSpace
-                    UnaryMessageOperand:rhs
-                    => [[ lhs selector { rhs } ast-message-send boa ]])
-                    | BinaryMessageSend-1
+BinaryMessageSend = (BinaryMessageSend | UnaryMessageSend | Operand):lhs
+                    BinaryMessage:h
+                   (OptionalWhiteSpace ";" BinaryMessage:m => [[ m ]])*:t
+                   => [[ lhs t h prefix >array <ast-cascade> ]]
 
 KeywordMessageSegment = Keyword:k OptionalWhiteSpace BinaryMessageOperand:arg => [[ { k arg } ]]
+KeywordMessage = OptionalWhiteSpace
+                 KeywordMessageSegment:h
+                 (OptionalWhiteSpace KeywordMessageSegment:s => [[ s ]])*:t
+                 => [[ t h prefix unzip [ concat ] dip ast-message boa ]]
 KeywordMessageSend = (BinaryMessageSend | UnaryMessageSend | Operand):receiver
                      OptionalWhiteSpace
-                     KeywordMessageSegment:h
-                     (OptionalWhiteSpace KeywordMessageSegment:s => [[ s ]])*:t
-                     => [[ receiver t h prefix unzip [ concat ] dip ast-message-send boa ]]
+                     KeywordMessage:m
+                     => [[ receiver m 1array <ast-cascade> ]]
+
+Message = BinaryMessage | UnaryMessage | KeywordMessage
+
+MessageSend = (MessageSend | Operand):lhs
+              Message:h
+              (OptionalWhiteSpace ";" Message:m => [[ m ]])*:t
+              => [[ lhs t h prefix >array <ast-cascade> ]]
 
 Expression = OptionalWhiteSpace
-             (KeywordMessageSend | BinaryMessageSend | UnaryMessageSend | Operand):e
+             (MessageSend | Operand):e
              => [[ e ]]
 
 AssignmentOperation = OptionalWhiteSpace BindableIdentifier:i
                       OptionalWhiteSpace ":=" OptionalWhiteSpace => [[ i ast-name boa ]]
 AssignmentStatement = AssignmentOperation:a Statement:s => [[ a s ast-assignment boa ]]
-Statement = AssignmentStatement | Expression
+Statement = ClassDeclaration | ForeignClassDeclaration | AssignmentStatement | Expression
 
 MethodReturnOperator = OptionalWhiteSpace "^"
 FinalStatement = (MethodReturnOperator Statement:s => [[ s ast-return boa ]])
@@ -168,10 +179,12 @@ LocalVariableDeclarationList = OptionalWhiteSpace "|" OptionalWhiteSpace
                  => [[ t h prefix ]]
                 )?:b OptionalWhiteSpace "|" => [[ b >array ast-local-variables boa ]]
 
-ExecutableCode = (LocalVariableDeclarationList)?
-                 ((Statement:s OptionalWhiteSpace "." => [[ s ]])*
-                 FinalStatement:f (".")? => [[ f ]])?
-                 => [[ sift >array ]]
+ExecutableCode = (LocalVariableDeclarationList)?:locals
+                 ((Statement:s OptionalWhiteSpace "." => [[ s ]])*:h
+                 FinalStatement:t (".")? => [[ h t suffix ]])?:body
+                 => [[ body locals [ suffix ] when* >array ]]
+
+TopLevelForm = ExecutableCode => [[ ast-sequence boa ]]
 
 UnaryMethodHeader = UnaryMessageSelector:selector
                   => [[ { selector { } } ]]
@@ -206,6 +219,6 @@ ForeignClassDeclaration = OptionalWhiteSpace "foreign"
                           => [[ class name ast-foreign boa ]]
 End = !(.)
 
-Program = (ClassDeclaration|ForeignClassDeclaration|ExecutableCode) => [[ nil or ]] End
+Program = TopLevelForm End
 
 ;EBNF
