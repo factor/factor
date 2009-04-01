@@ -44,6 +44,19 @@ V{
 
 [
 V{
+    T{ tag f "a"
+        H{
+            { "a" "pirsqd" }
+            { "foo" "bar" }
+            { "href" "http://factorcode.org/" }
+            { "baz" "quux" }
+            { "nofollow" "nofollow" }
+        } f f }
+}
+] [ "<a   href  =    \"http://factorcode.org/\"    nofollow  foo   =  bar baz='quux'a=pirsqd  >" parse-html ] unit-test
+
+[
+V{
     T{ tag f "html" H{ } f f }
     T{ tag f "head" H{ } f f }
     T{ tag f "head" H{ } f t }
