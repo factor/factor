@@ -1,19 +1,9 @@
-USING: alien alien.fortran kernel system combinators
-alien.libraries ;
+USING: alien.fortran kernel math.blas.config namespaces ;
 IN: math.blas.ffi
 
 <<
-"blas" {
-    { [ os macosx? ] [ "libblas.dylib" intel-unix-abi add-fortran-library ] }
-    { [ os windows? cpu x86.32? and ] [ "blas.dll" f2c-abi add-fortran-library ] }
-    { [ os windows? cpu x86.64? and ] [ "blas.dll" gfortran-abi add-fortran-library ] }
-    {
-        [ os [ freebsd? ] [ linux? cpu x86.32? and ] bi or ]
-        [ "libblas.so" gfortran-abi add-fortran-library ]
-    }
-    { [ os [ freebsd? ] [ linux? ] bi or ] [ "libblas.so" gfortran-abi add-fortran-library ] }
-    [ "libblas.so" f2c-abi add-fortran-library ]
-} cond
+"blas" blas-library blas-fortran-abi [ get ] bi@
+add-fortran-library
 >>
 
 LIBRARY: blas

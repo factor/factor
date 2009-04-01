@@ -8,5 +8,5 @@ V{
     { deploy-word-props? f }
     { deploy-c-types? f }
     { "stop-after-last-window?" t }
-    { deploy-name "Minnesota Talk" }
+    { deploy-name "Chicago Talk" }
 }
