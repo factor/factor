@@ -19,3 +19,11 @@ kernel io.streams.string xml.writer ;
 /* a comment */ "> <string-reader> htmlize-stream
     write-xml
 ] unit-test
+
+[ "<span class=\"MARKUP\">: foo</span> <span class=\"MARKUP\">;</span>" ] [
+    { ": foo ;" } "factor" htmlize-lines xml>string
+] unit-test
+
+[ ":foo" ] [
+    { ":foo" } "factor" htmlize-lines xml>string
+] unit-test

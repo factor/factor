@@ -79,7 +79,7 @@ TUPLE: hashtable
 : grow-hash ( hash -- )
     [ [ >alist ] [ assoc-size 1+ ] bi ] keep
     [ reset-hash ] keep
-    swap (rehash) ; inline
+    swap (rehash) ;
 
 : ?grow-hash ( hash -- )
     dup hash-large? [
@@ -95,7 +95,7 @@ TUPLE: hashtable
 PRIVATE>
 
 : <hashtable> ( n -- hash )
-    hashtable new [ reset-hash ] keep ;
+    hashtable new [ reset-hash ] keep ; inline
 
 M: hashtable at* ( key hash -- value ? )
     key@ [ 3 fixnum+fast slot t ] [ 2drop f f ] if ;

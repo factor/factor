@@ -4,6 +4,7 @@ CFLAGS += -fPIC
 PLAF_DLL_OBJS += vm/os-macosx.o vm/mach_signal.o
 
 DLL_EXTENSION = .dylib
+SHARED_DLL_EXTENSION = .dylib
 
 SHARED_FLAG = -dynamiclib
 

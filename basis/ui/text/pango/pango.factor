@@ -14,12 +14,11 @@ M: pango-renderer string-dim
     [ " " string-dim { 0 1 } v* ]
     [ cached-layout logical-rect>> dim>> [ >integer ] map ] if-empty ;
 
-M: pango-renderer finish-text-rendering
-    text-handle>> purge-cache
+M: pango-renderer flush-layout-cache
     cached-layouts get purge-cache ;
 
 : rendered-layout ( font string -- texture )
-    world get text-handle>>
+    world get world-text-handle
     [ cached-layout [ image>> ] [ text-position vneg ] bi <texture> ]
     2cache ;
 
