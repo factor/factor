@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math kernel sequences accessors fry circular
-unicode.case unicode.categories locals combinators.short-circuit ;
+unicode.case unicode.categories locals combinators.short-circuit
+make combinators ;
 
 IN: html.parser.state
 
@@ -87,7 +88,7 @@ TUPLE: state-parser sequence n ;
     state-parser advance
     [
         {
-            [ { [ previous quote-char = ] [ current quote-char = ] } 1&& ]
+            [ { [ previous escape-char = ] [ current quote-char = ] } 1&& ]
             [ current quote-char = not ]
         } 1||
     ] take-while :> string
@@ -99,3 +100,17 @@ TUPLE: state-parser sequence n ;
 
 : take-token ( state-parser -- string )
     skip-whitespace [ current { [ blank? ] [ f = ] } 1|| ] take-until ;
+
+:: (tokenize-line) ( state-parser escape-char quote-char -- )
+    state-parser skip-whitespace
+    dup current {
+        { quote-char [
+            [ escape-char quote-char take-quoted-string , ]
+            [ escape-char quote-char (tokenize-line) ] bi
+        ] }
+        { f [ drop ] }
+        [ drop [ take-token , ] [ escape-char quote-char (tokenize-line) ] bi ]
+    } case ;
+
+: tokenize-line ( line escape-char quote-char -- seq )
+    [ <state-parser> ] 2dip [ (tokenize-line) ] { } make ;
