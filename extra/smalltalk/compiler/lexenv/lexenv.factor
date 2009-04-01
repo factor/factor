@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel accessors quotations slots words
 sequences namespaces combinators combinators.short-circuit
-smalltalk.classes ;
+summary smalltalk.classes ;
 IN: smalltalk.compiler.lexenv
 
 ! local-readers: assoc string => word
@@ -38,6 +38,8 @@ CONSTANT: empty-lexenv T{ lexenv }
     classes get at dup [ [ ] curry ] when ;
 
 ERROR: bad-identifier name ;
+
+M: bad-identifier summary drop "Unknown identifier" ;
 
 : lookup-reader ( name lexenv -- reader-quot )
     {
