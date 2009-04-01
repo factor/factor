@@ -12,32 +12,32 @@ TUPLE: state-parser sequence n ;
         swap >>sequence
         0 >>n ;
 
-: state-parser-nth ( n state -- char/f )
+: state-parser-nth ( n state-parser -- char/f )
     sequence>> ?nth ; inline
 
-: current ( state -- char/f )
+: current ( state-parser -- char/f )
     [ n>> ] keep state-parser-nth ; inline
 
-: previous ( state -- char/f )
+: previous ( state-parser -- char/f )
     [ n>> 1 - ] keep state-parser-nth ; inline
 
-: peek-next ( state -- char/f )
+: peek-next ( state-parser -- char/f )
     [ n>> 1 + ] keep state-parser-nth ; inline
 
-: next ( state -- state )
+: advance ( state-parser -- state-parser )
     [ 1 + ] change-n ; inline
 
-: get+increment ( state -- char/f )
-    [ current ] [ next drop ] bi ; inline
+: get+increment ( state-parser -- char/f )
+    [ current ] [ advance drop ] bi ; inline
 
-:: skip-until ( state quot: ( obj -- ? ) -- )
-    state current [
-        state quot call [ state next quot skip-until ] unless
+:: skip-until ( state-parser quot: ( obj -- ? ) -- )
+    state-parser current [
+        state-parser quot call [ state-parser advance quot skip-until ] unless
     ] when ; inline recursive
 
-: state-parse-end? ( state -- ? ) peek-next not ;
+: state-parse-end? ( state-parser -- ? ) peek-next not ;
 
-: take-until ( state quot: ( obj -- ? ) -- sequence/f )
+: take-until ( state-parser quot: ( obj -- ? ) -- sequence/f )
     over state-parse-end? [
         2drop f
     ] [
@@ -46,8 +46,17 @@ TUPLE: state-parser sequence n ;
         [ drop [ n>> ] [ sequence>> ] bi ] 2tri subseq
     ] if ; inline
 
-: take-while ( state quot: ( obj -- ? ) -- sequence/f )
+: take-while ( state-parser quot: ( obj -- ? ) -- sequence/f )
     [ not ] compose take-until ; inline
+
+:: take-sequence ( state-parser sequence -- obj/f )
+    state-parser [ n>> dup sequence length + ] [ sequence>> ] bi <slice>
+    sequence sequence= [
+        sequence
+        state-parser [ sequence length + ] change-n drop
+    ] [
+        f
+    ] if ;
 
 :: take-until-sequence ( state-parser sequence -- sequence' )
     sequence length <growing-circular> :> growing
@@ -58,15 +67,15 @@ TUPLE: state-parser sequence n ;
     ] take-until :> found
     found dup length
     growing length 1- - head
-    state-parser next drop ;
+    state-parser advance drop ;
     
-: skip-whitespace ( state -- state )
+: skip-whitespace ( state-parser -- state-parser )
     [ [ current blank? not ] take-until drop ] keep ;
 
-: take-rest ( state -- sequence )
+: take-rest ( state-parser -- sequence )
     [ drop f ] take-until ; inline
 
-: take-until-object ( state obj -- sequence )
+: take-until-object ( state-parser obj -- sequence )
     '[ current _ = ] take-until ;
 
 : state-parse ( sequence quot -- )

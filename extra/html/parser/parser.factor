@@ -1,17 +1,19 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables html.parser.state
-html.parser.utils kernel make namespaces sequences
+html.parser.utils kernel namespaces sequences
 unicode.case unicode.categories combinators.short-circuit
-quoting ;
+quoting fry ;
 IN: html.parser
-
 
 TUPLE: tag name attributes text closing? ;
 
 SINGLETON: text
 SINGLETON: dtd
 SINGLETON: comment
+
+<PRIVATE
+
 SYMBOL: tagstack
 
 : push-tag ( tag -- )
@@ -19,7 +21,7 @@ SYMBOL: tagstack
 
 : closing-tag? ( string -- ? )
     [ f ]
-    [ [ first ] [ peek ] bi [ CHAR: / = ] bi@ or ] if-empty ;
+    [ { [ first CHAR: / = ] [ peek CHAR: / = ] } 1|| ] if-empty ;
 
 : <tag> ( name attributes closing? -- tag )
     tag new
@@ -30,22 +32,19 @@ SYMBOL: tagstack
 : make-tag ( string attribs -- tag )
     [ [ closing-tag? ] keep "/" trim1 ] dip rot <tag> ;
 
-: new-tag ( string type -- tag )
+: new-tag ( text name -- tag )
     tag new
         swap >>name
         swap >>text ; inline
 
-: make-text-tag ( string -- tag ) text new-tag ; inline
-
-: make-comment-tag ( string -- tag ) comment new-tag ; inline
-
-: make-dtd-tag ( string -- tag ) dtd new-tag ; inline
+: (read-quote) ( state-parser ch -- string )
+    '[ [ current _ = ] take-until ] [ advance drop ] bi ;
 
 : read-single-quote ( state-parser -- string )
-    [ [ current CHAR: ' = ] take-until ] [ next drop ] bi ;
+    CHAR: ' (read-quote) ;
 
 : read-double-quote ( state-parser -- string )
-    [ [ current CHAR: " = ] take-until ] [ next drop ] bi ;
+    CHAR: " (read-quote) ;
 
 : read-quote ( state-parser -- string )
     dup get+increment CHAR: ' =
@@ -54,10 +53,6 @@ SYMBOL: tagstack
 : read-key ( state-parser -- string )
     skip-whitespace
     [ current { [ CHAR: = = ] [ blank? ] } 1|| ] take-until ;
-
-: read-= ( state-parser -- )
-    skip-whitespace
-    [ [ current CHAR: = = ] take-until drop ] [ next drop ] bi ;
 
 : read-token ( state-parser -- string )
     [ current blank? ] take-until ;
@@ -68,42 +63,40 @@ SYMBOL: tagstack
     [ blank? ] trim ;
 
 : read-comment ( state-parser -- )
-    "-->" take-until-sequence make-comment-tag push-tag ;
+    "-->" take-until-sequence comment new-tag push-tag ;
 
 : read-dtd ( state-parser -- )
-    ">" take-until-sequence make-dtd-tag push-tag ;
+    ">" take-until-sequence dtd new-tag push-tag ;
 
 : read-bang ( state-parser -- )
-    next dup { [ current CHAR: - = ] [ peek-next CHAR: - = ] } 1&& [
-        next next
-        read-comment
-    ] [
-        read-dtd
-    ] if ;
+    advance dup { [ current CHAR: - = ] [ peek-next CHAR: - = ] } 1&&
+    [ advance advance read-comment ] [ read-dtd ] if ;
 
 : read-tag ( state-parser -- string )
     [ [ current "><" member? ] take-until ]
-    [ dup current CHAR: < = [ next ] unless drop ] bi ;
+    [ dup current CHAR: < = [ advance ] unless drop ] bi ;
 
 : read-until-< ( state-parser -- string )
     [ current CHAR: < = ] take-until ;
 
 : parse-text ( state-parser -- )
-    read-until-< [ make-text-tag push-tag ] unless-empty ;
+    read-until-< [ text new-tag push-tag ] unless-empty ;
+
+: parse-key/value ( state-parser -- key value )
+    [ read-key >lower ]
+    [ skip-whitespace "=" take-sequence ]
+    [ swap [ read-value ] [ drop f ] if ] tri ;
 
 : (parse-attributes) ( state-parser -- )
     skip-whitespace
     dup state-parse-end? [
         drop
     ] [
-        [
-            [ read-key >lower ] [ read-= ] [ read-value ] tri
-            2array ,
-        ] keep (parse-attributes)
+        [ parse-key/value swap set ] [ (parse-attributes) ] bi
     ] if ;
 
 : parse-attributes ( state-parser -- hashtable )
-    [ (parse-attributes) ] { } make >hashtable ;
+    [ (parse-attributes) ] H{ } make-assoc ;
 
 : (parse-tag) ( string -- string' hashtable )
     [
@@ -111,7 +104,7 @@ SYMBOL: tagstack
     ] state-parse ;
 
 : read-< ( state-parser -- string/f )
-    next dup current [
+    advance dup current [
         CHAR: ! = [ read-bang f ] [ read-tag ] if
     ] [
         drop f
@@ -127,6 +120,8 @@ SYMBOL: tagstack
 
 : tag-parse ( quot -- vector )
     V{ } clone tagstack [ state-parse ] with-variable ; inline
+
+PRIVATE>
 
 : parse-html ( string -- vector )
     [ (parse-html) tagstack get ] tag-parse ;
