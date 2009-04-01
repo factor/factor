@@ -75,7 +75,10 @@ void relocate_code_block(F_CODE_BLOCK *relocating);
 
 CELL compiled_code_format(void);
 
-bool stack_traces_p(void);
+INLINE bool stack_traces_p(void)
+{
+	return userenv[STACK_TRACES_ENV] != F;
+}
 
 F_CODE_BLOCK *add_code_block(
 	CELL type,
