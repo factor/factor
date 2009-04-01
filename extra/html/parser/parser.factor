@@ -51,10 +51,6 @@ SYMBOL: tagstack
     skip-whitespace
     [ current { [ CHAR: = = ] [ blank? ] } 1|| ] take-until ;
 
-: read-=1 ( state-parser -- )
-    skip-whitespace
-    [ [ current CHAR: = = ] take-until drop ] [ next drop ] bi ;
-
 : read-token ( state-parser -- string )
     [ current blank? ] take-until ;
 
