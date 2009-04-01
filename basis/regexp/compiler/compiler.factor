@@ -84,21 +84,24 @@ C: <box> box
     { } assoc-like [ first integer? ] partition
     [ [ literals>cases ] keep ] dip non-literals>dispatch ;
 
-:: step ( last-match index str quot final? direction -- last-index/f )
+: advance ( index backwards? -- index+/-1 )
+    -1 1 ? + >fixnum ; inline
+
+: check ( index string backwards? -- in-bounds? )
+    [ drop -1 eq? not ] [ length < ] if ; inline
+
+:: step ( last-match index str quot final? backwards? -- last-index/f )
     final? index last-match ?
-    index str bounds-check? [
-        index direction + str
+    index str backwards? check [
+        index backwards? advance str
         index str nth-unsafe
         quot call
     ] when ; inline
 
-: direction ( -- n )
-    backwards? get -1 1 ? ;
-
 : transitions>quot ( transitions final-state? -- quot )
     dup shortest? get and [ 2drop [ drop nip ] ] [
-        [ split-literals swap case>quot ] dip direction
-        '[ { array-capacity string } declare _ _ _ step ]
+        [ split-literals swap case>quot ] dip backwards? get
+        '[ { fixnum string } declare _ _ _ step ]
     ] if ;
 
 : word>quot ( word dfa -- quot )
@@ -122,10 +125,13 @@ C: <box> box
 : dfa>main-word ( dfa -- word )
     states>words [ states>code ] keep start-state>> ;
 
+: word-template ( quot -- quot' )
+    '[ drop [ f ] 2dip over array-capacity? _ [ 2drop ] if ] ;
+
 PRIVATE>
 
 : dfa>word ( dfa -- quot )
-    dfa>main-word execution-quot '[ drop [ f ] 2dip @ ]
+    dfa>main-word execution-quot word-template
     (( start-index string regexp -- i/f )) define-temp ;
 
 : dfa>shortest-word ( dfa -- word )
