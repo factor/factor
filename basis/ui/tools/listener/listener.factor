@@ -263,8 +263,9 @@ M: listener-operation invoke-command ( target command -- )
 
 : listener-run-files ( seq -- )
     [
-        [ \ listener-run-files ] dip
-        '[ _ [ run-file ] each ] call-listener
+        '[ _ [ run-file ] each ]
+        \ listener-run-files
+        call-listener
     ] unless-empty ;
 
 : com-end ( listener -- )

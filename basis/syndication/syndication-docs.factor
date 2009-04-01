@@ -35,9 +35,9 @@ HELP: download-feed
 { $values { "url" url } { "feed" feed } }
 { $description "Downloads a feed from a URL using the " { $link "http.client" } "." } ;
 
-HELP: string>feed
-{ $values { "string" string } { "feed" feed } }
-{ $description "Parses a feed in string form." } ;
+HELP: parse-feed
+{ $values { "seq" "a string or a byte array" } { "feed" feed } }
+{ $description "Parses a feed." } ;
 
 HELP: xml>feed
 { $values { "xml" xml } { "feed" feed } }
@@ -58,7 +58,7 @@ $nl
 { $subsection <entry> }
 "Reading feeds:"
 { $subsection download-feed }
-{ $subsection string>feed }
+{ $subsection parse-feed }
 { $subsection xml>feed }
 "Writing feeds:"
 { $subsection feed>xml }
