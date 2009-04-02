@@ -348,7 +348,7 @@ M: duration time-
     #! good for any date since October 15, 1582
     [
         dup 2 <= [ [ 1- ] [ 12 + ] bi* ] when
-        [ dup [ 4 /i + ] keep [ 100 /i - ] keep 400 /i + ] dip
+        [ dup [ 4 /i + ] [ 100 /i - ] [ 400 /i + ] tri ] dip
         [ 1+ 3 * 5 /i + ] keep 2 * +
     ] dip 1+ + 7 mod ;
 
