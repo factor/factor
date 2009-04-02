@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math kernel sequences accessors fry circular
 unicode.case unicode.categories locals combinators.short-circuit
-make combinators ;
+make combinators io splitting ;
 
 IN: html.parser.state
 
@@ -74,8 +74,12 @@ TUPLE: state-parser sequence n ;
 : skip-whitespace ( state-parser -- state-parser )
     [ [ current blank? not ] take-until drop ] keep ;
 
+: take-rest-slice ( state-parser -- sequence/f )
+    [ sequence>> ] [ n>> ] bi
+    2dup [ length ] dip < [ 2drop f ] [ tail-slice ] if ; inline
+
 : take-rest ( state-parser -- sequence )
-    [ drop f ] take-until ; inline
+    [ take-rest-slice ] [ sequence>> like ] bi ;
 
 : take-until-object ( state-parser obj -- sequence )
     '[ current _ = ] take-until ;
@@ -111,3 +115,6 @@ TUPLE: state-parser sequence n ;
 
 : take-token ( state-parser -- string/f )
     CHAR: \ CHAR: " take-token* ;
+
+: write-full ( state-parser -- ) sequence>> write ;
+: write-rest ( state-parser -- ) take-rest write ;

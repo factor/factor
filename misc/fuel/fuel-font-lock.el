@@ -58,6 +58,7 @@
   (number constant  "integers and floats")
   (ratio constant  "ratios")
   (declaration keyword "declaration words")
+  (ebnf-form constant "EBNF: ... ;EBNF form")
   (parsing-word keyword  "parsing words")
   (setter-word function-name "setter words (>>foo)")
   (getter-word function-name "getter words (foo>>)")
@@ -75,7 +76,9 @@
 (defun fuel-font-lock--syntactic-face (state)
   (if (nth 3 state) 'factor-font-lock-string
     (let ((c (char-after (nth 8 state))))
-      (cond ((or (char-equal c ?\ ) (char-equal c ?\n))
+      (cond ((or (char-equal c ?\ )
+                 (char-equal c ?\n)
+                 (char-equal c ?E))
              (save-excursion
                (goto-char (nth 8 state))
                (beginning-of-line)
@@ -85,6 +88,8 @@
                       'factor-font-lock-symbol)
                      ((looking-at-p "C-ENUM:\\( \\|\n\\)")
                       'factor-font-lock-constant)
+                     ((looking-at-p "E")
+                      'factor-font-lock-ebnf-form)
                      (t 'default))))
             ((or (char-equal c ?U) (char-equal c ?C))
              'factor-font-lock-parsing-word)
