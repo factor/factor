@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit kernel make math math.ranges
-sequences project-euler.common ;
+USING: combinators.short-circuit kernel make math math.functions math.ranges
+    sequences project-euler.common ;
 IN: project-euler.014
 
 ! http://projecteuler.net/index.php?section=problems&id=14
@@ -59,7 +59,7 @@ PRIVATE>
 <PRIVATE
 
 : worth-calculating? ( n -- ? )
-    1- 3 { [ mod 0 = ] [ / even? ] } 2&& ;
+    1- 3 { [ divisor? ] [ / even? ] } 2&& ;
 
 PRIVATE>
 

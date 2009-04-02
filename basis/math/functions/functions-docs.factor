@@ -271,9 +271,9 @@ HELP: gcd
 { $notes "If " { $snippet "d" } " is 1, then " { $snippet "a" } " is the inverse of " { $snippet "y" } " modulo " { $snippet "x" } "." } ;
 
 HELP: divisor?
-{ $values { "x" integer } { "y" integer } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "y" } " is a divisor of " { $snippet "x" } ". This is the same thing as saying " { $snippet "x" } " is divisible by " { $snippet "y" } "." }
-{ $notes "Returns t for both negative and positive divisors, as well as trivial and non-trivial divisors." } ;
+{ $values { "m" integer } { "n" integer } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "n" } " is a divisor of " { $snippet "m" } ". This is the same thing as asking if " { $snippet "m" } " is divisible by " { $snippet "n" } "." }
+{ $notes "Returns t for both negative and positive divisors, as well as for trivial and non-trivial divisors." } ;
 
 HELP: mod-inv
 { $values { "x" integer } { "n" integer } { "y" integer } }
