@@ -1,7 +1,7 @@
 ! Copyright (C) 2008, 2009 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays calendar combinators.short-circuit
-continuations debugger http.client io.directories io.files io.launcher
+continuations debugger io.directories io.files io.launcher
 io.pathnames io.encodings.ascii kernel make mason.common mason.config
 mason.platform mason.report mason.email namespaces sequences ;
 IN: mason.child
@@ -9,20 +9,8 @@ IN: mason.child
 : make-cmd ( -- args )
     gnu-make platform 2array ;
 
-: dll-url ( -- url )
-    "http://factorcode.org/dlls/"
-    target-cpu get "x86.64" = [ "64/" append ] when ;
-
-: download-dlls ( -- )
-    target-os get "winnt" = [
-        dll-url "build-support/dlls.txt" ascii file-lines
-        [ append download ] with each
-    ] when ;
-
 : make-vm ( -- )
     "factor" [
-        download-dlls
-
         <process>
             make-cmd >>command
             "../compile-log" >>stdout
