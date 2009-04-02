@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel combinators sequences
 math windows.gdi32 windows.types images destructors
-accessors fry ;
+accessors fry locals ;
 IN: windows.offscreen
 
 : (bitmap-info) ( dim -- BITMAPINFO )
@@ -22,26 +22,32 @@ IN: windows.offscreen
         } 2cleave
     ] keep ;
 
-: make-offscreen-dc-and-bitmap ( dim -- hDC hBitmap bits )
-    f CreateCompatibleDC
+: make-bitmap ( dim dc -- hBitmap bits )
     [ nip ]
     [
         swap (bitmap-info) DIB_RGB_COLORS f <void*>
         [ f 0 CreateDIBSection ] keep *void*
     ] 2bi
-    [ 2dup SelectObject drop ] dip ;
+    [ [ SelectObject drop ] keep ] dip ;
+
+: make-offscreen-dc-and-bitmap ( dim -- dc hBitmap bits )
+    [ f CreateCompatibleDC ] dip over make-bitmap ;
 
 : bitmap>byte-array ( bits dim -- byte-array )
     product 4 * memory>byte-array ;
 
 : bitmap>image ( bits dim -- image )
     [ bitmap>byte-array ] keep
-    <image> swap >>dim swap >>bitmap XBGR >>component-order ;
+    <image>
+        swap >>dim
+        swap >>bitmap
+        BGRX >>component-order
+        t >>upside-down? ;
 
-: make-bitmap-image ( dim quot: ( hDC -- ) -- image )
-    '[
-        [
-            make-offscreen-dc-and-bitmap
-            [ &DeleteDC @ ] [ &DeleteObject drop ] [ ] tri*
-        ] keep bitmap>byte-array
-    ] with-destructors ; inline
+: with-memory-dc ( quot: ( hDC -- ) -- )
+    [ [ f CreateCompatibleDC &DeleteDC ] dip call ] with-destructors ; inline
+
+:: make-bitmap-image ( dim dc quot -- image )
+    dim dc make-bitmap [ &DeleteObject drop ] dip
+    quot dip
+    dim bitmap>image ; inline

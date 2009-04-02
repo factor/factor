@@ -433,12 +433,7 @@ M: windows-ui-backend do-events
     style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
 
 : make-RECT ( world -- RECT )
-    [ window-loc>> dup ] [ dim>> ] bi v+
-    "RECT" <c-object>
-    over first over set-RECT-right
-    swap second over set-RECT-bottom
-    over first over set-RECT-left
-    swap second over set-RECT-top ;
+    [ window-loc>> ] [ dim>> ] bi <RECT> ;
 
 : default-position-RECT ( RECT -- )
     dup get-RECT-dimensions [ 2drop ] 2dip

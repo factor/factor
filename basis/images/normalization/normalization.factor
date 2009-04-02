@@ -61,6 +61,18 @@ M: ARGB normalize-component-order*
 M: ABGR normalize-component-order*
     drop ARGB>RGBA BGRA>RGBA ;
 
+: fix-XBGR ( bitmap -- bitmap' )
+    dup 4 <sliced-groups> [ [ 255 0 ] dip set-nth ] each ;
+
+M: XBGR normalize-component-order*
+    drop fix-XBGR ABGR normalize-component-order* ;
+
+: fix-BGRX ( bitmap -- bitmap' )
+    dup 4 <sliced-groups> [ [ 255 3 ] dip set-nth ] each ;
+
+M: BGRX normalize-component-order*
+    drop fix-BGRX BGRA normalize-component-order* ;
+
 : normalize-scan-line-order ( image -- image )
     dup upside-down?>> [
         dup dim>> first 4 * '[
