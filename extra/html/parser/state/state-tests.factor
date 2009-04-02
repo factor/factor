@@ -93,3 +93,9 @@ IN: html.parser.state.tests
 
 [ "abcd e \\\"f g" ]
 [ "\"abcd e \\\"f g\"" <state-parser> CHAR: \ CHAR: " take-token* ] unit-test
+
+[ "" ]
+[ "" <state-parser> take-rest ] unit-test
+
+[ "" ]
+[ "abc" <state-parser> dup "abc" take-sequence drop take-rest ] unit-test
