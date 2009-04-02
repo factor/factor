@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math kernel sequences accessors fry circular
-unicode.case ascii locals combinators.short-circuit
+unicode.case unicode.categories locals combinators.short-circuit
 make combinators io splitting ;
 
 IN: html.parser.state
