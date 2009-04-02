@@ -1,4 +1,4 @@
-USING: assocs memoize locals kernel accessors init fonts
+USING: assocs memoize locals kernel accessors init fonts math
 combinators windows windows.types windows.gdi32 ;
 IN: windows.fonts
 
@@ -10,7 +10,7 @@ IN: windows.fonts
     } at-default ;
     
 MEMO:: (cache-font) ( font -- HFONT )
-    font size>> ! nHeight
+    font size>> neg ! nHeight
     0 0 0 ! nWidth, nEscapement, nOrientation
     font bold?>> FW_BOLD FW_NORMAL ? ! fnWeight
     font italic?>> TRUE FALSE ? ! fdwItalic
