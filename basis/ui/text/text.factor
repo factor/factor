@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays sequences math math.order opengl opengl.gl
-strings fonts colors accessors ;
+strings fonts colors accessors namespaces ui.gadgets.worlds ;
 IN: ui.text
 
 <PRIVATE
@@ -10,9 +10,13 @@ SYMBOL: font-renderer
 
 HOOK: init-text-rendering font-renderer ( world -- )
 
-HOOK: finish-text-rendering font-renderer ( world -- )
+: world-text-handle ( world -- handle )
+    dup text-handle>> [ dup init-text-rendering ] unless
+    text-handle>> ;
 
-M: object finish-text-rendering drop ;
+HOOK: flush-layout-cache font-renderer ( -- )
+
+[ flush-layout-cache ] flush-layout-cache-hook set-global
 
 HOOK: string-dim font-renderer ( font string -- dim )
 
@@ -69,3 +73,13 @@ M: array draw-text
             [ [ 0.0 ] 2dip string-height 0.0 glTranslated ] 2bi
         ] with each
     ] do-matrix ;
+
+USING: vocabs.loader namespaces system combinators ;
+
+"ui-backend" get [
+    {
+        { [ os macosx? ] [ "core-text" ] }
+        { [ os windows? ] [ "pango" ] }
+        { [ os unix? ] [ "pango" ] }
+    } cond
+] unless* "ui.text." prepend require

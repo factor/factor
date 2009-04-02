@@ -4,8 +4,7 @@ USING: arrays assocs io kernel math models namespaces make dlists
 deques sequences threads sequences words continuations init
 combinators hashtables concurrency.flags sets accessors calendar fry
 destructors ui.gadgets ui.gadgets.private ui.gadgets.worlds
-ui.gadgets.tracks ui.gestures ui.backend ui.render ui.text
-ui.text.private ;
+ui.gadgets.tracks ui.gestures ui.backend ui.render ;
 IN: ui
 
 <PRIVATE
@@ -63,7 +62,7 @@ M: world graft*
 : (ungraft-world) ( world -- )
     {
         [ handle>> select-gl-context ]
-        [ text-handle>> dispose ]
+        [ text-handle>> [ dispose ] when* ]
         [ images>> [ dispose ] when* ]
         [ hand-clicked close-global ]
         [ hand-gadget close-global ]
@@ -95,8 +94,7 @@ M: world ungraft*
 : restore-world ( world -- )
     {
         [ reset-world ]
-        [ init-text-rendering ]
-        [ f >>images drop ]
+        [ f >>text-handle f >>images drop ]
         [ restore-gadget ]
     } cleave ;
 
