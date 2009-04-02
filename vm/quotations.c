@@ -180,7 +180,8 @@ void jit_compile(CELL quot, bool relocate)
 	GROWABLE_ARRAY(literals);
 	REGISTER_ROOT(literals);
 
-	GROWABLE_ARRAY_ADD(literals,stack_traces_p() ? quot : F);
+	if(stack_traces_p())
+		GROWABLE_ARRAY_ADD(literals,quot);
 
 	bool stack_frame = jit_stack_frame_p(untag_object(array));
 

@@ -1,0 +1,1 @@
+Tests if the preprocessor bails on an infinite loop caused by mutually recursive #include lines.

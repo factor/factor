@@ -175,8 +175,8 @@ PRIVATE>
     ] [ protocol>> ] bi
     secure-protocol? [ >secure-addr ] when ;
 
-: ensure-port ( url -- url )
-    dup protocol>> '[ _ protocol-port or ] change-port ;
+: ensure-port ( url -- url' )
+    clone dup protocol>> '[ _ protocol-port or ] change-port ;
 
 ! Literal syntax
 SYNTAX: URL" lexer get skip-blank parse-string >url parsed ;

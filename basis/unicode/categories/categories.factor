@@ -3,7 +3,7 @@
 USING: unicode.categories.syntax sequences unicode.data ;
 IN: unicode.categories
 
-CATEGORY: blank Zs Zl Zp | "\r\n" member? ;
+CATEGORY: blank Zs Zl Zp | "\r\n\t" member? ;
 CATEGORY: letter Ll | "Other_Lowercase" property? ;
 CATEGORY: LETTER Lu | "Other_Uppercase" property? ;
 CATEGORY: Letter Lu Ll Lt Lm Lo Nl ;

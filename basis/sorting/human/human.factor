@@ -11,7 +11,7 @@ IN: sorting.human
 
 : human>=< ( obj1 obj2 -- >=< ) human<=> invert-comparison ; inline
 
-: human-compare ( obj1 obj2 quot -- <=> ) bi@ human<=> ;
+: human-compare ( obj1 obj2 quot -- <=> ) bi@ human<=> ; inline
 
 : human-sort ( seq -- seq' ) [ human<=> ] sort ;
 

@@ -138,7 +138,7 @@ IN: bootstrap.syntax
     ] define-core-syntax
 
     "CONSTANT:" [
-        CREATE scan-object define-constant
+        CREATE-WORD scan-object define-constant
     ] define-core-syntax
 
     ":" [
