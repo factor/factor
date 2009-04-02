@@ -20,6 +20,8 @@ TIP: "Power tools: " { $links see edit help about apropos time infer. } ;
 
 TIP: "Tips of the day implement the " { $link "definition-protocol" } " and new tips of the day can be defined using the " { $link POSTPONE: TIP: } " parsing word." ;
 
+TIP: "Try some simple demo applications, then look at the source code in " { $snippet "extra/" } ": " { $code "\"demos\" run" } ;
+
 HELP: TIP:
 { $syntax "TIP: content ;" }
 { $values { "content" "a markup element" } }
