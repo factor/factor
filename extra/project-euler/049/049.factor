@@ -43,7 +43,7 @@ HINTS: count-digits fixnum ;
 
 : potential-sequences ( -- seq )
     1000 9999 primes-between
-    collect-permutations [ length 3 > ] filter ;
+    collect-permutations [ length 3 >= ] filter ;
 
 : arithmetic-terms ( m n -- seq )
     2dup [ swap - ] keep + 3array ;
