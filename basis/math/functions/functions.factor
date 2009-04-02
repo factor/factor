@@ -111,7 +111,7 @@ PRIVATE>
 : lcm ( a b -- c )
     [ * ] 2keep gcd nip /i ; foldable
 
-: divisor? ( x y -- ? )
+: divisor? ( m n -- ? )
     mod 0 = ;
 
 : mod-inv ( x n -- y )
