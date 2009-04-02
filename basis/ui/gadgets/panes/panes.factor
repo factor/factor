@@ -75,7 +75,8 @@ M: pane gadget-selection ( pane -- string/f )
 GENERIC: draw-selection ( loc obj -- )
 
 : if-fits ( rect quot -- )
-    [ clip get over contains-rect? ] dip [ drop ] if ; inline
+    [ clip get origin get vneg offset-rect over contains-rect? ] dip
+    [ drop ] if ; inline
 
 M: gadget draw-selection ( loc gadget -- )
     swap offset-rect [
