@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2009 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math kernel sequences accessors fry circular
-unicode.case unicode.categories locals ;
+unicode.case unicode.categories locals combinators.short-circuit
+make combinators io splitting ;
 
 IN: html.parser.state
 
@@ -12,20 +13,21 @@ TUPLE: state-parser sequence n ;
         swap >>sequence
         0 >>n ;
 
-: state-parser-nth ( n state-parser -- char/f )
-    sequence>> ?nth ; inline
+: offset  ( state-parser offset -- char/f )
+    swap
+    [ n>> + ] [ sequence>> ?nth ] bi ; inline
 
-: current ( state-parser -- char/f )
-    [ n>> ] keep state-parser-nth ; inline
+: current ( state-parser -- char/f ) 0 offset ; inline
 
-: previous ( state-parser -- char/f )
-    [ n>> 1 - ] keep state-parser-nth ; inline
+: previous ( state-parser -- char/f ) -1 offset ; inline
 
-: peek-next ( state-parser -- char/f )
-    [ n>> 1 + ] keep state-parser-nth ; inline
+: peek-next ( state-parser -- char/f ) 1 offset ; inline
 
 : advance ( state-parser -- state-parser )
     [ 1 + ] change-n ; inline
+
+: advance* ( state-parser -- )
+    advance drop ; inline
 
 : get+increment ( state-parser -- char/f )
     [ current ] [ advance drop ] bi ; inline
@@ -35,7 +37,7 @@ TUPLE: state-parser sequence n ;
         state-parser quot call [ state-parser advance quot skip-until ] unless
     ] when ; inline recursive
 
-: state-parse-end? ( state-parser -- ? ) peek-next not ;
+: state-parse-end? ( state-parser -- ? ) current not ;
 
 : take-until ( state-parser quot: ( obj -- ? ) -- sequence/f )
     over state-parse-end? [
@@ -72,11 +74,47 @@ TUPLE: state-parser sequence n ;
 : skip-whitespace ( state-parser -- state-parser )
     [ [ current blank? not ] take-until drop ] keep ;
 
+: take-rest-slice ( state-parser -- sequence/f )
+    [ sequence>> ] [ n>> ] bi
+    2dup [ length ] dip < [ 2drop f ] [ tail-slice ] if ; inline
+
 : take-rest ( state-parser -- sequence )
-    [ drop f ] take-until ; inline
+    [ take-rest-slice ] [ sequence>> like ] bi ;
 
 : take-until-object ( state-parser obj -- sequence )
     '[ current _ = ] take-until ;
 
 : state-parse ( sequence quot -- )
     [ <state-parser> ] dip call ; inline
+
+:: take-quoted-string ( state-parser escape-char quote-char -- string )
+    state-parser n>> :> start-n
+    state-parser advance
+    [
+        {
+            [ { [ previous escape-char = ] [ current quote-char = ] } 1&& ]
+            [ current quote-char = not ]
+        } 1||
+    ] take-while :> string
+    state-parser current quote-char = [
+        state-parser advance* string
+    ] [
+        start-n state-parser (>>n) f
+    ] if ;
+
+: (take-token) ( state-parser -- string )
+    skip-whitespace [ current { [ blank? ] [ f = ] } 1|| ] take-until ;
+
+:: take-token* ( state-parser escape-char quote-char -- string/f )
+    state-parser skip-whitespace
+    dup current {
+        { quote-char [ escape-char quote-char take-quoted-string ] }
+        { f [ drop f ] }
+        [ drop (take-token) ]
+    } case ;
+
+: take-token ( state-parser -- string/f )
+    CHAR: \ CHAR: " take-token* ;
+
+: write-full ( state-parser -- ) sequence>> write ;
+: write-rest ( state-parser -- ) take-rest write ;
