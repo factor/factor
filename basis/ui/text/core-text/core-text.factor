@@ -10,9 +10,6 @@ IN: ui.text.core-text
 
 SINGLETON: core-text-renderer
 
-M: core-text-renderer init-text-rendering
-    <cache-assoc> >>text-handle drop ;
-
 M: core-text-renderer string-dim
     [ " " string-dim { 0 1 } v* ]
     [ cached-line dim>> ]

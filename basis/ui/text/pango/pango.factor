@@ -7,9 +7,6 @@ IN: ui.text.pango
 
 SINGLETON: pango-renderer
 
-M: pango-renderer init-text-rendering
-    <cache-assoc> >>text-handle drop ;
-
 M: pango-renderer string-dim
     [ " " string-dim { 0 1 } v* ]
     [ cached-layout logical-rect>> dim>> [ >integer ] map ] if-empty ;
