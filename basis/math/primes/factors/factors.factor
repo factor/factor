@@ -1,6 +1,6 @@
 ! Copyright (C) 2007-2009 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators kernel make math math.primes sequences ;
+USING: arrays combinators kernel make math math.functions math.primes sequences ;
 IN: math.primes.factors
 
 <PRIVATE
@@ -11,7 +11,7 @@ IN: math.primes.factors
     swap ;
 
 : write-factor ( n d -- n' d' )
-    2dup mod zero? [
+    2dup divisor? [
         [ [ count-factor ] keep swap 2array , ] keep
         ! If the remainder is a prime number, increase d so that
         ! the caller stops looking for factors.
