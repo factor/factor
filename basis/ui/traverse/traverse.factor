@@ -1,7 +1,7 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors namespaces make sequences kernel math arrays io
-ui.gadgets generic combinators ;
+ui.gadgets generic combinators fry sets ;
 IN: ui.traverse
 
 TUPLE: node value children ;
@@ -85,3 +85,13 @@ M: node gadget-text*
 
 : gadget-at-path ( parent path -- gadget )
     [ swap nth-gadget ] each ;
+
+GENERIC# leaves* 1 ( tree assoc -- )
+
+M: node leaves* [ children>> ] dip leaves* ;
+
+M: array leaves* '[ _ leaves* ] each ;
+
+M: gadget leaves* conjoin ;
+
+: leaves ( tree -- assoc ) H{ } clone [ leaves* ] keep ;

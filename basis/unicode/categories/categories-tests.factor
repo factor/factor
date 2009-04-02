@@ -12,3 +12,8 @@ IN: unicode.categories.tests
 [ "Lo" ] [ HEX: 3450 category ] unit-test
 [ "Lo" ] [ HEX: 4DB5 category ] unit-test
 [ "Cs" ] [ HEX: DD00 category ] unit-test
+[ t ] [ CHAR: \t blank? ] unit-test
+[ t ] [ CHAR: \s blank? ] unit-test
+[ t ] [ CHAR: \r blank? ] unit-test
+[ t ] [ CHAR: \n blank? ] unit-test
+[ f ] [ CHAR: a blank? ] unit-test

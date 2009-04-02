@@ -96,7 +96,7 @@
 			#if defined(FACTOR_X86)
 				#include "os-solaris-x86.32.h"
 			#elif defined(FACTOR_AMD64)
-				#incluide "os-solaris-x86.64.h"
+				#include "os-solaris-x86.64.h"
 			#else
 				#error "Unsupported Solaris flavor"
 			#endif
