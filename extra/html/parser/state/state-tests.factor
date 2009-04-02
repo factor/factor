@@ -52,3 +52,50 @@ IN: html.parser.state.tests
 
 [ "cd" ]
 [ "abcd" <state-parser> [ "ab" take-sequence drop ] [ "cd" take-sequence ] bi ] unit-test
+
+[ f ]
+[
+    "\"abc\" asdf" <state-parser>
+    [ CHAR: \ CHAR: " take-quoted-string drop ] [ "asdf" take-sequence ] bi
+] unit-test
+
+[ "abc\\\"def" ]
+[
+    "\"abc\\\"def\" asdf" <state-parser>
+    CHAR: \ CHAR: " take-quoted-string
+] unit-test
+
+[ "asdf" ]
+[
+    "\"abc\" asdf" <state-parser>
+    [ CHAR: \ CHAR: " take-quoted-string drop ]
+    [ skip-whitespace "asdf" take-sequence ] bi
+] unit-test
+
+[ f ]
+[
+    "\"abc asdf" <state-parser>
+    CHAR: \ CHAR: " take-quoted-string
+] unit-test
+
+[ "\"abc" ]
+[
+    "\"abc asdf" <state-parser>
+    [ CHAR: \ CHAR: " take-quoted-string drop ]
+    [ "\"abc" take-sequence ] bi
+] unit-test
+
+[ "c" ]
+[ "c" <state-parser> take-token ] unit-test
+
+[ f ]
+[ "" <state-parser> take-token ] unit-test
+
+[ "abcd e \\\"f g" ]
+[ "\"abcd e \\\"f g\"" <state-parser> CHAR: \ CHAR: " take-token* ] unit-test
+
+[ "" ]
+[ "" <state-parser> take-rest ] unit-test
+
+[ "" ]
+[ "abc" <state-parser> dup "abc" take-sequence drop take-rest ] unit-test

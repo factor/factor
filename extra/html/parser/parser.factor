@@ -85,7 +85,7 @@ SYMBOL: tagstack
 : parse-key/value ( state-parser -- key value )
     [ read-key >lower ]
     [ skip-whitespace "=" take-sequence ]
-    [ swap [ read-value ] [ drop f ] if ] tri ;
+    [ swap [ read-value ] [ drop dup ] if ] tri ;
 
 : (parse-attributes) ( state-parser -- )
     skip-whitespace

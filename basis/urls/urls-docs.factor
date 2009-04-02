@@ -65,9 +65,8 @@ HELP: derive-url
 } ;
 
 HELP: ensure-port
-{ $values { "url" url } }
-{ $description "If the URL does not specify a port number, fill in the default for the URL's protocol. If the protocol is unknown, the port number is not changed." }
-{ $side-effects "url" }
+{ $values { "url" url } { "url'" url } }
+{ $description "If the URL does not specify a port number, create a new URL which is equal except the port number is set to the default for the URL's protocol. If the protocol is unknown, outputs an exact copy of the input URL." }
 { $examples
     { $example
         "USING: accessors prettyprint urls ;"
