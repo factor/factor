@@ -25,8 +25,11 @@ IN: mason.child
     builds-factor-image "." copy-file-into
     builds-factor-image "factor" copy-file-into ;
 
+: factor-vm ( -- string )
+    target-os get "winnt" = "./factor.com" "./factor" ? ;
+
 : boot-cmd ( -- cmd )
-    "./factor"
+    factor-vm
     "-i=" boot-image-name append
     "-no-user-init"
     3array ;
@@ -42,7 +45,7 @@ IN: mason.child
         try-process
     ] with-directory ;
 
-: test-cmd ( -- cmd ) { "./factor" "-run=mason.test" } ;
+: test-cmd ( -- cmd ) factor-vm "-run=mason.test" 2array ;
 
 : test ( -- )
     "factor" [
