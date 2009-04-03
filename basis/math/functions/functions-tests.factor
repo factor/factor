@@ -32,13 +32,13 @@ IN: math.functions.tests
 
 [ 1.0 ] [ 0 cosh ] unit-test
 [ 0.0 ] [ 1 acosh ] unit-test
-            
+
 [ 1.0 ] [ 0 cos ] unit-test
 [ 0.0 ] [ 1 acos ] unit-test
-            
+
 [ 0.0 ] [ 0 sinh ] unit-test
 [ 0.0 ] [ 0 asinh ] unit-test
-            
+
 [ 0.0 ] [ 0 sin ] unit-test
 [ 0.0 ] [ 0 asin ] unit-test
 
@@ -97,10 +97,16 @@ IN: math.functions.tests
 
 : verify-gcd ( a b -- ? )
     2dup gcd
-    [ rot * swap rem ] dip = ; 
+    [ rot * swap rem ] dip = ;
 
 [ t ] [ 123 124 verify-gcd ] unit-test
 [ t ] [ 50 120 verify-gcd ] unit-test
+
+[ t ] [ 0 42 divisor? ] unit-test
+[ t ] [ 42 7 divisor? ] unit-test
+[ t ] [ 42 -7 divisor? ] unit-test
+[ t ] [ 42 42 divisor? ] unit-test
+[ f ] [ 42 16 divisor? ] unit-test
 
 [ 3 ] [ 5 7 mod-inv ] unit-test
 [ 78572682077 ] [ 234829342 342389423843 mod-inv ] unit-test

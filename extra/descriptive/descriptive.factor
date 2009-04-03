@@ -1,13 +1,16 @@
 USING: words kernel sequences locals locals.parser
 locals.definitions accessors parser namespaces continuations
-summary definitions generalizations arrays ;
+summary definitions generalizations arrays prettyprint debugger io ;
 IN: descriptive
 
 ERROR: descriptive-error args underlying word ;
 
-M: descriptive-error summary
-    word>> "The " swap name>> " word encountered an error."
-    3append ;
+M: descriptive-error error.
+    "The word " write dup word>> pprint " encountered an error." print
+    "Arguments:" print
+    dup args>> stack.
+    "Error:" print
+    underlying>> error. ;
 
 <PRIVATE
 
