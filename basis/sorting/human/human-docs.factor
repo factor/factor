@@ -35,7 +35,7 @@ HELP: human-compare
 HELP: human-sort
 { $values
      { "seq" sequence }
-     { "seq'" sequence }
+     { "sortedseq" sequence }
 }
 { $description "Sorts a sequence of objects by comparing the magnitude of any integers in the input string using the <=> word." } ;
 
