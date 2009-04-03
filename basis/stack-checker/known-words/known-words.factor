@@ -605,6 +605,8 @@ M: object infer-call*
 
 \ fflush { alien } { } define-primitive
 
+\ fseek { alien integer integer } { } define-primitive
+
 \ fclose { alien } { } define-primitive
 
 \ <wrapper> { object } { wrapper } define-primitive

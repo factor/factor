@@ -42,11 +42,12 @@ IN: tools.deploy.macosx
 
 : create-app-dir ( vocab bundle-name -- vm )
     [
-        nip
-        [ copy-dll ]
-        [ copy-nib ]
-        [ "Contents/Resources" append-path make-directories ]
-        tri
+        nip {
+            [ copy-dll ]
+            [ copy-nib ]
+            [ "Contents/Resources" append-path make-directories ]
+            [ "Contents/Resources" copy-theme ]
+        } cleave
     ]
     [ create-app-plist ]
     [ "Contents/MacOS/" append-path copy-vm ] 2tri

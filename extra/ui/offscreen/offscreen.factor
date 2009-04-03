@@ -1,7 +1,7 @@
 ! (c) 2008 Joe Groff, see license for details
 USING: accessors continuations images.bitmap kernel math
-sequences ui.gadgets ui.gadgets.worlds ui ui.backend
-destructors ;
+sequences ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.private ui ui.backend destructors ;
 IN: ui.offscreen
 
 TUPLE: offscreen-world < world ;
