@@ -20,7 +20,7 @@ PRIVATE>
 
 MACRO: compare-slots ( sort-specs -- <=> )
     #! sort-spec: { accessors comparator }
-    [ slot-comparator ] map '[ _ 2|| +eq+ or ] ;
+    '[ _ [ slot-comparator ] map 2|| +eq+ or ] ;
 
 : sort-by-slots ( seq sort-specs -- seq' )
     '[ _ compare-slots ] sort ;
