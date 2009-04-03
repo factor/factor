@@ -1,5 +1,6 @@
 #define DLLEXPORT
 #define NULL_DLL NULL
+#define FSEEK fseeko
 
 void c_to_factor_toplevel(CELL quot);
 void init_signals(void);
