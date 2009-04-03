@@ -3,7 +3,7 @@
 USING: accessors assocs cache colors.constants destructors fry kernel
 opengl opengl.gl combinators images images.tesselation grouping
 specialized-arrays.float locals sequences math math.vectors
-math.matrices generalizations fry columns ;
+math.matrices generalizations fry columns arrays ;
 IN: opengl.textures
 
 : gen-texture ( -- id ) [ glGenTextures ] (gen-gl-object) ;
@@ -17,6 +17,7 @@ M: BGR component-order>format drop GL_BGR GL_UNSIGNED_BYTE ;
 M: RGBA component-order>format drop GL_RGBA GL_UNSIGNED_BYTE ;
 M: ARGB component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8_REV ;
 M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
+M: BGRX component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
 
 GENERIC: draw-texture ( texture -- )
 
@@ -24,7 +25,7 @@ GENERIC: draw-scaled-texture ( dim texture -- )
 
 <PRIVATE
 
-TUPLE: single-texture loc dim texture-coords texture display-list disposed ;
+TUPLE: single-texture image loc dim texture-coords texture display-list disposed ;
 
 : repeat-last ( seq n -- seq' )
     over peek pad-tail concat ;
@@ -44,7 +45,7 @@ TUPLE: single-texture loc dim texture-coords texture display-list disposed ;
     tri * group ; inline
 
 : power-of-2-image ( image -- image )
-    dup dim>> [ 0 = ] all? [
+    dup dim>> [ [ 0 = ] [ power-of-2? ] bi or ] all? [
         clone dup
         [ image-rows ]
         [ dim>> [ next-power-of-2 ] map ]
@@ -92,26 +93,30 @@ TUPLE: single-texture loc dim texture-coords texture display-list disposed ;
 
 : draw-textured-rect ( dim texture -- )
     [
-        (draw-textured-rect)
-        GL_TEXTURE_2D 0 glBindTexture
+        [ image>> has-alpha? [ GL_BLEND glDisable ] unless ]
+        [ (draw-textured-rect) GL_TEXTURE_2D 0 glBindTexture ]
+        [ image>> has-alpha? [ GL_BLEND glEnable ] unless ]
+        tri
     ] with-texturing ;
 
-: texture-coords ( dim -- coords )
-    [ dup next-power-of-2 /f ] map
-    { { 0 0 } { 1 0 } { 1 1 } { 0 1 } } [ v* ] with map
+: texture-coords ( texture -- coords )
+    [
+        [ dim>> ] [ image>> dim>> ] bi v/
+        { { 0 0 } { 1 0 } { 1 1 } { 0 1 } }
+        [ v* ] with map
+    ] keep
+    image>> upside-down?>> [ [ first2 1 swap - 2array ] map ] when
     float-array{ } join ;
 
 : make-texture-display-list ( texture -- dlist )
     GL_COMPILE [ [ dim>> ] keep draw-textured-rect ] make-dlist ;
 
-: <single-texture> ( image loc -- texture )
-   single-texture new swap >>loc
-    swap
-    [ dim>> >>dim ] keep
-    [ dim>> product 0 = ] keep '[
-        _
-        [ dim>> texture-coords >>texture-coords ]
-        [ power-of-2-image make-texture >>texture ] bi
+: <single-texture> ( image loc dim -- texture )
+    [ power-of-2-image ] 2dip
+    single-texture new swap >>dim swap >>loc swap >>image
+    dup image>> dim>> product 0 = [
+        dup texture-coords >>texture-coords
+        dup image>> make-texture >>texture
         dup make-texture-display-list >>display-list
     ] unless ;
 
@@ -133,19 +138,20 @@ TUPLE: multi-texture grid display-list loc disposed ;
 
 : <texture-grid> ( image-grid loc -- grid )
     [ dup image-locs ] dip
-    '[ [ _ v+ <single-texture> |dispose ] 2map ] 2map ;
+    '[ [ _ v+ over dim>> <single-texture> |dispose ] 2map ] 2map ;
 
 : draw-textured-grid ( grid -- )
     [ [ [ dim>> ] keep (draw-textured-rect) ] each ] each ;
 
+: grid-has-alpha? ( grid -- ? )
+    first first image>> has-alpha? ;
+
 : make-textured-grid-display-list ( grid -- dlist )
     GL_COMPILE [
         [
-            [
-                [
-                    [ dim>> ] keep (draw-textured-rect)
-                ] each
-            ] each
+            [ grid-has-alpha? [ GL_BLEND glDisable ] unless ]
+            [ [ [ [ dim>> ] keep (draw-textured-rect) ] each ] each ]
+            [ grid-has-alpha? [ GL_BLEND glEnable ] unless ] tri
             GL_TEXTURE_2D 0 glBindTexture
         ] with-texturing
     ] make-dlist ;
@@ -163,11 +169,14 @@ M: multi-texture draw-texture display-list>> [ glCallList ] when* ;
 
 M: multi-texture dispose* grid>> [ [ dispose ] each ] each ;
 
-CONSTANT: max-texture-size { 256 256 }
+CONSTANT: max-texture-size { 512 512 }
 
 PRIVATE>
 
-: <texture> ( image loc -- texture )
-    over dim>> max-texture-size [ <= ] 2all?
+: small-texture? ( dim -- ? )
+    max-texture-size [ <= ] 2all? ;
+
+: <texture> ( image loc dim -- texture )
+    pick dim>> small-texture?
     [ <single-texture> ]
-    [ [ max-texture-size tesselate ] dip <multi-texture> ] if ;
+    [ drop [ max-texture-size tesselate ] dip <multi-texture> ] if ;
