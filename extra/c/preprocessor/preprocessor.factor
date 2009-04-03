@@ -3,24 +3,41 @@
 USING: html.parser.state io io.encodings.utf8 io.files
 io.streams.string kernel combinators accessors io.pathnames
 fry sequences arrays locals namespaces io.directories
-assocs math splitting make ;
+assocs math splitting make unicode.categories
+combinators.short-circuit ;
 IN: c.preprocessor
 
 : initial-library-paths ( -- seq )
     V{ "/usr/include" } clone ;
 
+: initial-symbol-table ( -- hashtable )
+    H{
+        { "__APPLE__" "" }
+        { "__amd64__" "" }
+        { "__x86_64__" "" }
+    } clone ;
+
 TUPLE: preprocessor-state library-paths symbol-table
 include-nesting include-nesting-max processing-disabled?
-ifdef-nesting warnings ;
+ifdef-nesting warnings errors
+pragmas
+include-nexts
+ifs elifs elses ;
 
 : <preprocessor-state> ( -- preprocessor-state )
     preprocessor-state new
         initial-library-paths >>library-paths
-        H{ } clone >>symbol-table
+        initial-symbol-table >>symbol-table
         0 >>include-nesting
         200 >>include-nesting-max
         0 >>ifdef-nesting
-        V{ } clone >>warnings ;
+        V{ } clone >>warnings
+        V{ } clone >>errors
+        V{ } clone >>pragmas
+        V{ } clone >>include-nexts
+        V{ } clone >>ifs
+        V{ } clone >>elifs
+        V{ } clone >>elses ;
 
 DEFER: preprocess-file
 
@@ -64,8 +81,13 @@ ERROR: header-file-missing path ;
 
 : readlns ( -- string ) [ (readlns) ] { } make concat ;
 
+: take-define-identifier ( state-parser -- string )
+    skip-whitespace
+    [ current { [ blank? ] [ CHAR: ( = ] } 1|| ] take-until ;
+
 : handle-define ( preprocessor-state state-parser -- )
-    [ take-token ] [ take-rest ] bi 
+    [ take-define-identifier ]
+    [ skip-whitespace take-rest ] bi 
     "\\" ?tail [ readlns append ] when
     spin symbol-table>> set-at ;
 
@@ -86,9 +108,25 @@ ERROR: header-file-missing path ;
 : handle-endif ( preprocessor-state state-parser -- )
     drop [ 1 - ] change-ifdef-nesting drop ;
 
+: handle-if ( preprocessor-state state-parser -- )
+    [ [ 1 + ] change-ifdef-nesting ] dip
+    skip-whitespace take-rest swap ifs>> push ;
+
+: handle-elif ( preprocessor-state state-parser -- )
+    skip-whitespace take-rest swap elifs>> push ;
+
+: handle-else ( preprocessor-state state-parser -- )
+    skip-whitespace take-rest swap elses>> push ;
+
+: handle-pragma ( preprocessor-state state-parser -- )
+    skip-whitespace take-rest swap pragmas>> push ;
+
+: handle-include-next ( preprocessor-state state-parser -- )
+    skip-whitespace take-rest swap include-nexts>> push ;
+
 : handle-error ( preprocessor-state state-parser -- )
-    skip-whitespace
-    nip take-rest throw ;
+    skip-whitespace take-rest swap errors>> push ;
+    ! nip take-rest throw ;
 
 : handle-warning ( preprocessor-state state-parser -- )
     skip-whitespace
@@ -104,11 +142,11 @@ ERROR: header-file-missing path ;
         { "ifdef" [ handle-ifdef ] }
         { "ifndef" [ handle-ifndef ] }
         { "endif" [ handle-endif ] }
-        { "if" [ 2drop ] }
-        { "elif" [ 2drop ] }
-        { "else" [ 2drop ] }
-        { "pragma" [ 2drop ] }
-        { "include_next" [ 2drop ] }
+        { "if" [ handle-if ] }
+        { "elif" [ handle-elif ] }
+        { "else" [ handle-else ] }
+        { "pragma" [ handle-pragma ] }
+        { "include_next" [ handle-include-next ] }
         [ unknown-c-preprocessor ]
     } case ;
 
