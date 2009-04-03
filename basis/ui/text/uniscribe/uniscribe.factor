@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs cache kernel math.vectors sequences
+USING: accessors assocs cache kernel math math.vectors sequences fonts
 namespaces opengl.textures ui.text ui.text.private ui.gadgets.worlds 
 windows.uniscribe ;
 IN: ui.text.uniscribe
@@ -16,15 +16,16 @@ M: uniscribe-renderer flush-layout-cache
 
 : rendered-script-string ( font string -- texture )
     world get world-text-handle
-    [ cached-script-string [ image>> ] [ text-position vneg ] bi <texture> ]
+    [ cached-script-string [ image>> { 0 0 } ] [ size>> ] bi <texture> ]
     2cache ;
 
 M: uniscribe-renderer draw-string ( font string -- )
-    [ drop ] [ rendered-script-string draw-texture ] if-empty ;
+    dup dup selection? [ string>> ] when empty?
+    [ 2drop ] [ rendered-script-string draw-texture ] if ;
 
 M: uniscribe-renderer x>offset ( x font string -- n )
     [ 2drop 0 ] [
-        cached-script-string x>line-offset drop
+        cached-script-string x>line-offset 0 = [ 1+ ] unless
     ] if-empty ;
 
 M: uniscribe-renderer offset>x ( n font string -- x )

@@ -19,9 +19,11 @@ M: core-text-renderer flush-layout-cache
     cached-lines get purge-cache ;
 
 : rendered-line ( font string -- texture )
-    world get world-text-handle
-    [ cached-line [ image>> ] [ loc>> ] bi <texture> ]
-    2cache ;
+    world get world-text-handle [
+        cached-line
+        [ image>> ] [ loc>> ] [ image>> dim>> ] tri
+        <texture>
+    ] 2cache ;
 
 M: core-text-renderer draw-string ( font string -- )
     rendered-line draw-texture ;
