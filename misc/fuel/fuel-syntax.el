@@ -48,7 +48,7 @@
     "B" "BIN:"
     "C:" "C-ENUM:" "C-STRUCT:" "C-UNION:" "CHAR:" "CONSTANT:" "call-next-method"
     "DEFER:"
-    "ERROR:" "EXCLUDE:"
+    "EBNF:" ";EBNF" "ERROR:" "EXCLUDE:"
     "f" "FORGET:" "FROM:" "FUNCTION:"
     "GENERIC#" "GENERIC:"
     "HELP:" "HEX:" "HOOK:"
@@ -254,6 +254,8 @@
     ("\\_<<\\(\"\\)\\_>" (1 "<b"))
     ("\\_<\\(\"\\)>\\_>" (1 ">b"))
     ;; Multiline constructs
+    ("\\_<\\(E\\)BNF:\\( \\|\n\\)" (1 "<b"))
+    ("\\_<;EBN\\(F\\)\\_>" (1 ">b"))
     ("\\_<\\(U\\)SING: \\(;\\)" (1 "<b") (2 ">b"))
     ("\\_<USING:\\( \\)" (1 "<b"))
     ("\\_<\\(C\\)-ENUM: \\(;\\)" (1 "<b") (2 ">b"))

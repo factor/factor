@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.functions namespaces sequences
-strings system vocabs.loader threads accessors combinators
-locals classes.tuple math.order summary combinators.short-circuit ;
+USING: accessors arrays classes.tuple combinators combinators.short-circuit
+    kernel locals math math.functions math.order namespaces sequences strings
+    summary system threads vocabs.loader ;
 IN: calendar
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
@@ -136,7 +136,7 @@ CONSTANT: day-abbreviations3
 GENERIC: leap-year? ( obj -- ? )
 
 M: integer leap-year? ( year -- ? )
-    dup 100 mod zero? 400 4 ? mod zero? ;
+    dup 100 divisor? 400 4 ? divisor? ;
 
 M: timestamp leap-year? ( timestamp -- ? )
     year>> leap-year? ;
@@ -348,7 +348,7 @@ M: duration time-
     #! good for any date since October 15, 1582
     [
         dup 2 <= [ [ 1- ] [ 12 + ] bi* ] when
-        [ dup [ 4 /i + ] keep [ 100 /i - ] keep 400 /i + ] dip
+        [ dup [ 4 /i + ] [ 100 /i - ] [ 400 /i + ] tri ] dip
         [ 1+ 3 * 5 /i + ] keep 2 * +
     ] dip 1+ + 7 mod ;
 
