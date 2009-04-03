@@ -60,7 +60,7 @@ M: topic url-of topic>filename ;
 : help>html ( topic -- xml )
     [ article-title ]
     [ drop help-stylesheet ]
-    [ [ help ] with-html-writer ]
+    [ [ print-topic ] with-html-writer ]
     tri simple-page ;
           
 : generate-help-file ( topic -- )

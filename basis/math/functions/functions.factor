@@ -111,6 +111,9 @@ PRIVATE>
 : lcm ( a b -- c )
     [ * ] 2keep gcd nip /i ; foldable
 
+: divisor? ( m n -- ? )
+    mod 0 = ;
+
 : mod-inv ( x n -- y )
     [ nip ] [ gcd 1 = ] 2bi
     [ dup 0 < [ + ] [ nip ] if ]
@@ -198,7 +201,7 @@ M: real sin fsin ;
 
 GENERIC: sinh ( x -- y ) foldable
 
-M: complex sinh 
+M: complex sinh
     >float-rect
     [ [ fsinh ] [ fcos ] bi* * ]
     [ [ fcosh ] [ fsin ] bi* * ] 2bi rect> ;
