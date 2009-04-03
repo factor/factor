@@ -20,7 +20,7 @@ typedef wchar_t F_CHAR;
 #define STRNCMP wcsncmp
 #define STRDUP _wcsdup
 #define MIN(a,b) ((a)>(b)?(b):(a))
-#define FSEEK _fseeki64
+#define FSEEK fseek
 
 #ifdef WIN64
 	#define CELL_FORMAT "%Iu"
