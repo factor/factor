@@ -1354,7 +1354,7 @@ FUNCTION: HRGN CreateRectRgn ( int x, int y, int w, int h ) ;
 ! FUNCTION: CreateRoundRectRgn
 ! FUNCTION: CreateScalableFontResourceA
 ! FUNCTION: CreateScalableFontResourceW
-! FUNCTION: CreateSolidBrush
+FUNCTION: HBRUSH CreateSolidBrush ( COLORREF colorref ) ;
 ! FUNCTION: DdEntry0
 ! FUNCTION: DdEntry1
 ! FUNCTION: DdEntry10
@@ -1501,6 +1501,7 @@ DESTRUCTOR: DeleteObject
 FUNCTION: BOOL ExtTextOutW ( HDC hdc, int X, int Y, UINT fuOptions, RECT* lprc, LPCTSTR lpString, UINT cbCount, INT* lpDx ) ;
 ALIAS: ExtTextOut ExtTextOutW
 ! FUNCTION: FillPath
+FUNCTION: int FillRect ( HDC hDC, RECT* lprc, HBRUSH hbr ) ;
 ! FUNCTION: FillRgn
 ! FUNCTION: FixBrushOrgEx
 ! FUNCTION: FlattenPath
@@ -1779,7 +1780,7 @@ ALIAS: GetTextMetrics GetTextMetricsW
 ! FUNCTION: PtVisible
 ! FUNCTION: QueryFontAssocStatus
 ! FUNCTION: RealizePalette
-! FUNCTION: Rectangle
+FUNCTION: BOOL Rectangle ( HDC hdc, int x, int y, int w, int h ) ;
 ! FUNCTION: RectInRegion
 ! FUNCTION: RectVisible
 ! FUNCTION: RemoveFontMemResourceEx
