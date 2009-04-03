@@ -179,7 +179,7 @@ void primitive_fseek(void)
 		break;
 	}
 
-	if(fseeko(file,offset,whence) == -1)
+	if(FSEEK(file,offset,whence) == -1)
 	{
 		io_error();
 
