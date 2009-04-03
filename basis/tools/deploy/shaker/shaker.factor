@@ -276,7 +276,6 @@ IN: tools.deploy.shaker
                 lexer-factory
                 print-use-hook
                 root-cache
-                vocab-roots
                 vocabs:dictionary
                 vocabs:load-vocab-hook
                 word
