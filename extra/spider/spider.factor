@@ -15,13 +15,6 @@ filters spidered todo nonmatching quiet currently-spidering
 TUPLE: spider-result url depth headers
 fetched-in parsed-html links processed-in fetched-at ;
 
-TUPLE: todo-url url depth ;
-
-: <todo-url> ( url depth -- todo-url )
-    todo-url new
-        swap >>depth
-        swap >>url ;
-
 : <spider> ( base -- spider )
     >url
     spider new

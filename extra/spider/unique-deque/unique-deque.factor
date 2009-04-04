@@ -3,6 +3,13 @@
 USING: accessors assocs deques dlists kernel spider ;
 IN: spider.unique-deque
 
+TUPLE: todo-url url depth ;
+
+: <todo-url> ( url depth -- todo-url )
+    todo-url new
+        swap >>depth
+        swap >>url ;
+
 TUPLE: unique-deque assoc deque ;
 
 : <unique-deque> ( -- unique-deque )
