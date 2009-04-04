@@ -141,6 +141,7 @@ GENERIC# accept-completion-hook 1 ( item popup -- )
         t >>selection-required?
         t >>single-click?
         30 >>min-cols
+        10 >>min-rows
         10 >>max-rows
         dup '[ _ accept-completion ] >>action ;
 

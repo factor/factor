@@ -49,13 +49,13 @@ M: pane-stream stream-element-type drop +character+ ;
 : pane-caret&mark ( pane -- caret mark )
     [ caret>> ] [ mark>> ] bi ; inline
 
-: selected-children ( pane -- seq )
+: selected-subtree ( pane -- seq )
     [ pane-caret&mark sort-pair ] keep gadget-subtree ;
 
 M: pane gadget-selection? pane-caret&mark and ;
 
 M: pane gadget-selection ( pane -- string/f )
-    selected-children gadget-text ;
+    selected-subtree gadget-text ;
 
 : init-prototype ( pane -- pane )
     <shelf> +baseline+ >>align >>prototype ; inline
@@ -72,31 +72,12 @@ M: pane gadget-selection ( pane -- string/f )
     [ >>last-line ] [ 1 track-add ] bi
     dup prepare-last-line ; inline
 
-GENERIC: draw-selection ( loc obj -- )
-
-: if-fits ( rect quot -- )
-    [ clip get over contains-rect? ] dip [ drop ] if ; inline
-
-M: gadget draw-selection ( loc gadget -- )
-    swap offset-rect [
-        rect-bounds gl-fill-rect
-    ] if-fits ;
-
-M: node draw-selection ( loc node -- )
-    2dup value>> swap offset-rect [
-        drop 2dup
-        [ value>> loc>> v+ ] keep
-        children>> [ draw-selection ] with each
-    ] if-fits 2drop ;
-
-M: pane draw-gadget*
+M: pane selected-children
     dup gadget-selection? [
-        [ selection-color>> gl-color ]
-        [
-            [ loc>> vneg ] keep selected-children
-            [ draw-selection ] with each
-        ] bi
-    ] [ drop ] if ;
+        [ selected-subtree leaves ]
+        [ selection-color>> ]
+        bi
+    ] [ drop f f ] if ;
 
 : scroll-pane ( pane -- )
     dup scrolls?>> [ scroll>bottom ] [ drop ] if ;
