@@ -261,7 +261,7 @@ M: table model-changed
     row-rect [ { 0 1 } v* ] change-dim ;
 
 : (select-row) ( table n -- )
-    [ dup [ [ thin-row-rect dup unparse show ] [ drop ] 2bi scroll>rect ] [ 2drop ] if ]
+    [ dup [ [ thin-row-rect ] [ drop ] 2bi scroll>rect ] [ 2drop ] if ]
     [ >>selected-index relayout-1 ]
     2bi ;
 
