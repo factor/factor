@@ -132,9 +132,7 @@ void init_factor(F_PARAMETERS *p)
 	userenv[CPU_ENV] = tag_object(from_char_string(FACTOR_CPU_STRING));
 	userenv[OS_ENV] = tag_object(from_char_string(FACTOR_OS_STRING));
 	userenv[CELL_SIZE_ENV] = tag_fixnum(sizeof(CELL));
-	userenv[STACK_TRACES_ENV] = tag_boolean(p->stack_traces);
-	userenv[EXECUTABLE_ENV] = (p->executable_path ?
-		tag_object(from_native_string(p->executable_path)) : F);
+	userenv[EXECUTABLE_ENV] = (p->executable_path ? tag_object(from_native_string(p->executable_path)) : F);
 	userenv[ARGS_ENV] = F;
 	userenv[EMBEDDED_ENV] = F;
 
@@ -142,7 +140,10 @@ void init_factor(F_PARAMETERS *p)
 	gc_off = false;
 
 	if(!stage2)
+	{
+		userenv[STACK_TRACES_ENV] = tag_boolean(p->stack_traces);
 		do_stage1_init();
+	}
 }
 
 /* May allocate memory */

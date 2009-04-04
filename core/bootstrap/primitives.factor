@@ -510,6 +510,7 @@ tuple
     { "fputc" "io.streams.c" (( ch alien -- )) }
     { "fwrite" "io.streams.c" (( string alien -- )) }
     { "fflush" "io.streams.c" (( alien -- )) }
+    { "fseek" "io.streams.c" (( alien offset whence -- )) }
     { "fclose" "io.streams.c" (( alien -- )) }
     { "<wrapper>" "kernel" (( obj -- wrapper )) }
     { "(clone)" "kernel" (( obj -- newobj )) }
