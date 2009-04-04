@@ -84,7 +84,7 @@ TUPLE: unique-deque assoc deque ;
 
 : normalize-hrefs ( links spider -- links' )
     currently-spidering>> present swap
-    [ dup url-absolute? [ derive-url ] [ url-append-path >url ] if ] with map ;
+    [ [ >url ] bi@ derive-url ] with map ;
 
 : print-spidering ( url depth -- )
     "depth: " write number>string write
