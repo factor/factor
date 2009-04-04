@@ -121,7 +121,7 @@ DEFER: (parse-paragraph)
         ] if
     ] if ;
 
-: take-until ( state delimiter -- string/f state' )
+: take-until ( state delimiter -- string state'/f )
     V{ } clone (take-until) ;
 
 : count= ( string -- n )
@@ -186,11 +186,12 @@ DEFER: (parse-paragraph)
 
 : parse-code ( state -- state' item )
     dup 1 look CHAR: [ =
-    [ unclip-slice make-paragraph ] [
-        "{" take-until
-        [ rest ] dip
-        "}]" take-until
-        [ code boa ] dip swap
+    [ take-line make-paragraph ] [
+        dup "{" take-until [
+            [ nip rest ] dip
+            "}]" take-until
+            [ code boa ] dip swap
+        ] [ drop take-line make-paragraph ] if*
     ] if ;
 
 : parse-item ( state -- state' item )

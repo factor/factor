@@ -20,7 +20,7 @@ PRIVATE>
 
 : rendered-image ( path -- texture )
     world get image-texture-cache
-    [ cached-image { 0 0 } <texture> ] cache ;
+    [ cached-image [ { 0 0 } ] keep dim>> <texture> ] cache ;
 
 : draw-image ( image-name -- )
     rendered-image draw-texture ;

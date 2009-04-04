@@ -157,6 +157,8 @@ IN: tools.deploy.shaker
                 "specializer"
                 "step-into"
                 "step-into?"
+                ! UI needs this
+                ! "superclass"
                 "transform-n"
                 "transform-quot"
                 "tuple-dispatch-generic"
@@ -275,7 +277,6 @@ IN: tools.deploy.shaker
                 lexer-factory
                 print-use-hook
                 root-cache
-                vocab-roots
                 vocabs:dictionary
                 vocabs:load-vocab-hook
                 word
