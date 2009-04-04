@@ -1,7 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors math.order sorting.slots tools.test
-sorting.human arrays sequences kernel assocs multiline ;
+sorting.human arrays sequences kernel assocs multiline
+sorting.functor ;
 IN: sorting.literals.tests
 
 TUPLE: sort-test a b c tuple2 ;
@@ -76,6 +77,9 @@ TUPLE: tuple2 d ;
 [ { } ]
 [ { } { { a>> <=> } { b>> >=< } { c>> <=> } } sort-by-slots ] unit-test
 
+[ { } ]
+[ { } { } sort-by-slots ] unit-test
+
 [
     {
         T{ sort-test { a 6 } { tuple2 T{ tuple2 { d 1 } } } }
@@ -142,4 +146,16 @@ TUPLE: tuple2 d ;
         T{ sort-test { a 6 } { tuple2 T{ tuple2 { d 3 } } } }
         T{ sort-test { a 5 } { tuple2 T{ tuple2 { d 4 } } } }
     } { { tuple2>> d>> } { a>> } } split-by-slots [ >array ] map
+] unit-test
+
+
+[ { "a" "b" "c" } ] [ { "b" "c" "a" } { <=> <=> } sort-by ] unit-test
+[ { "b" "c" "a" } ] [ { "b" "c" "a" } { } sort-by ] unit-test
+
+<< "length-test" [ length ] define-sorting >>
+
+[ { { 1 } { 1 2 3 } { 1 3 2 } { 3 2 1 } } ]
+[
+    { { 3 2 1 } { 1 2 3 } { 1 3 2 } { 1 } }
+    { length-test<=> <=> } sort-by
 ] unit-test
