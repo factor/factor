@@ -14,7 +14,7 @@ SYMBOL: timings
     broken-pages push ;
 
 : record-page-timings ( url spider-result -- )
-    fetch-time>> 2array timings get push ;
+    fetched-in>> 2array timings get push ;
 
 : record-network-failure ( url -- )
     network-failures get push ;
