@@ -58,6 +58,7 @@ M: viewport pref-dim* gadget-child pref-viewport-dim ;
     {
         [ scroller-value vneg offset-rect ]
         [ viewport>> dim>> rect-min ]
+        [ viewport>> loc>> offset-rect ]
         [ viewport>> [ v- { 0 0 } vmin ] [ v- { 0 0 } vmax ] with-rect-extents v+ ]
         [ scroller-value v+ ]
         [ scroll ]
