@@ -149,7 +149,7 @@ M: sequence bson-write ( array -- )
     [ [ MDB_OID_FIELD ] dip write-pair ] [ drop ] if ; inline
 
 : skip-field? ( name -- boolean )
-    { "_id" "_mdb" } member? ; inline
+    { "_id" "_mfd" } member? ; inline
 
 M: assoc bson-write ( assoc -- )
     '[ _  [ write-oid ] keep

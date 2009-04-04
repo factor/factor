@@ -20,7 +20,8 @@ TUPLE: mdb-collection
 { size integer initial: -1 }
 { max integer initial: -1 } ;
 
-CONSTRUCTOR: mdb-collection ( name -- collection ) ;
+: <mdb-collection> ( name -- collection )
+    [ mdb-collection new ] dip >>name ; inline
 
 CONSTANT: MDB-GENERAL-ERROR 1
 
@@ -73,6 +74,10 @@ SYNTAX: r/ ( token -- mdbregexp )
       [ >>mdb-stream ] prepose
       with-disposal ] with-scope ; inline
   
+: build-id-selector ( assoc -- selector )
+    [ MDB_OID_FIELD swap at ] keep
+    H{ } clone [ set-at ] keep ;
+
 <PRIVATE
 
 : index-collection ( -- ns )
@@ -161,7 +166,8 @@ M: mdb-collection create-collection ( mdb-collection -- )
              [ [ size>> "size" ] dip set-at ]
              [ [ max>> "max" ] dip set-at ] 2tri ] when
         ] 2bi
-    ] keep <mdb-query-msg> 1 >>return# send-query-plain objects>> first check-ok
+    ] keep <mdb-query-msg> 1 >>return# send-query-plain
+    objects>> first check-ok
     [ "could not create collection" throw ] unless ;
 
 : load-collection-list ( -- collection-list )
@@ -238,7 +244,7 @@ GENERIC: find-one ( mdb-query -- result/f )
 M: mdb-query-msg find-one
     1 >>return# send-query-plain objects>> [ first ] [ f ] if* ;
 
-GENERIC: count ( collection query -- result )
+GENERIC: count ( collection selector -- result )
 M: assoc count
     [ "count" H{ } clone [ set-at ] keep ] dip
     [ over [ "query" ] dip set-at ] when*
