@@ -99,3 +99,6 @@ IN: html.parser.state.tests
 
 [ "" ]
 [ "abc" <state-parser> dup "abc" take-sequence drop take-rest ] unit-test
+
+[ f ]
+[ "abc" <state-parser> "abcdefg" take-sequence ] unit-test
