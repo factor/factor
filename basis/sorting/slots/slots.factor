@@ -8,7 +8,7 @@ IN: sorting.slots
 <PRIVATE
 
 : short-circuit-comparator ( word -- quot )
-    '[ _ execute dup +eq+ eq? [ drop f ] when ] ; inline
+    execute dup +eq+ eq? [ drop f ] when ; inline
 
 : slot-comparator ( seq -- quot )
     [
@@ -16,7 +16,7 @@ IN: sorting.slots
         [ '[ [ _ execute ] bi@ ] ] map concat
     ] [
         peek
-        '[ @ _ execute dup +eq+ eq? [ drop f ] when ]
+        '[ @ _ short-circuit-comparator ]
     ] bi ;
 
 PRIVATE>
@@ -29,11 +29,10 @@ MACRO: compare-slots ( sort-specs -- <=> )
     '[ _ compare-slots ] sort ;
 
 MACRO: compare-seq ( seq -- quot )
-    [ short-circuit-comparator ] map '[ _ 2|| +eq+ or ] ;
+    [ '[ _ short-circuit-comparator ] ] map '[ _ 2|| +eq+ or ] ;
 
 : sort-by ( seq sort-seq -- sortedseq )
     '[ _ compare-seq ] sort ;
-
 
 MACRO: split-by-slots ( accessor-seqs -- quot )
     [ [ '[ [ _ execute ] bi@ ] ] map concat [ = ] compose ] map
