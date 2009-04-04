@@ -141,7 +141,7 @@ M: editor ungraft*
 : scroll>caret ( editor -- )
     dup graft-state>> second [
         [
-            [ caret-loc ] [ caret-dim { 1 0 } v+ ] bi <rect>
+            [ caret-loc ] [ caret-dim { 2 1 } v+ ] bi <rect>
         ] keep scroll>rect
     ] [ drop ] if ;
 
