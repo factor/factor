@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Sascha Matzke.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs bson.constants byte-arrays byte-vectors
-calendar fry io io.binary io.encodings io.encodings.string io.encodings.private
-io.encodings.utf8.private io.encodings.utf8 kernel math math.parser namespaces quotations
-sequences sequences.private serialize strings tools.walker words ;
+calendar fry io io.binary io.encodings io.encodings.binary
+io.encodings.utf8 io.streams.byte-array kernel math math.parser
+namespaces quotations sequences sequences.private serialize strings
+words ;
 
 
 IN: bson.writer
@@ -126,14 +127,17 @@ M: oid bson-write ( oid -- )
     [ a>> write-longlong ] [ b>> write-int32 ] bi ;
 
 M: objid bson-write ( oid -- )
-    T_Binary_UUID write-byte
-    id>> '[ _ write-utf8-string ] with-length-prefix ;
+    id>> [ binary ] dip '[ _ write-cstring ] with-byte-writer
+    [ length write-int32 ] keep
+    T_Binary_UUID write-byte write ;
 
 M: objref bson-write ( objref -- )
-    T_Binary_Custom write-byte
+    [ binary ] dip
     '[ _
        [ ns>> write-cstring ]
-       [ objid>> id>> write-cstring ] bi ] with-length-prefix ;
+       [ objid>> id>> write-cstring ] bi ] with-byte-writer
+    [ length write-int32 ] keep
+    T_Binary_Custom write-byte write ;
        
 M: mdbregexp bson-write ( regexp -- )
    [ regexp>> write-cstring ]
@@ -145,8 +149,8 @@ M: sequence bson-write ( array -- )
        write-eoo ] with-length-prefix ;
 
 : write-oid ( assoc -- )
-    [ MDB_OID_FIELD ] dip at*
-    [ [ MDB_OID_FIELD ] dip write-pair ] [ drop ] if ; inline
+    [ MDB_OID_FIELD ] dip at
+    [ [ MDB_OID_FIELD ] dip write-pair ] when* ; inline
 
 : skip-field? ( name -- boolean )
     { "_id" "_mfd" } member? ; inline
