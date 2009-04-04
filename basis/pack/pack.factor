@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays assocs byte-arrays io
 io.binary io.streams.string kernel math math.parser namespaces
-make parser prettyprint quotations sequences strings vectors
+make parser quotations sequences strings vectors
 words macros math.functions math.bitwise fry generalizations
 combinators.smart io.streams.byte-array io.encodings.binary
 math.vectors combinators multiline endian ;

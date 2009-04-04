@@ -11,7 +11,7 @@ void iterate_relocations(F_CODE_BLOCK *compiled, RELOCATION_ITERATOR iter)
 	{
 		F_BYTE_ARRAY *relocation = untag_object(compiled->relocation);
 
-		CELL index = 1;
+		CELL index = stack_traces_p() ? 1 : 0;
 
 		F_REL *rel = (F_REL *)(relocation + 1);
 		F_REL *rel_end = (F_REL *)((char *)rel + byte_array_capacity(relocation));
@@ -195,8 +195,6 @@ void mark_code_block(F_CODE_BLOCK *compiled)
 
 	copy_handle(&compiled->literals);
 	copy_handle(&compiled->relocation);
-
-	flush_icache_for(compiled);
 }
 
 void mark_stack_frame_step(F_STACK_FRAME *frame)
@@ -370,11 +368,6 @@ void deposit_integers(CELL here, F_ARRAY *array, CELL format)
 	}
 }
 
-bool stack_traces_p(void)
-{
-	return to_boolean(userenv[STACK_TRACES_ENV]);
-}
-
 CELL compiled_code_format(void)
 {
 	return untag_fixnum_fast(userenv[JIT_CODE_FORMAT]);
@@ -430,6 +423,10 @@ F_CODE_BLOCK *add_code_block(
 	UNREGISTER_UNTAGGED(code);
 	UNREGISTER_ROOT(relocation);
 	UNREGISTER_ROOT(literals);
+
+	/* slight space optimization */
+	if(type_of(literals) == ARRAY_TYPE && array_capacity(untag_object(literals)) == 0)
+		literals = F;
 
 	/* compiled header */
 	compiled->block.type = type;

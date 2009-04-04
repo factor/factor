@@ -54,10 +54,10 @@ M: viewport pref-dim* gadget-child pref-viewport-dim ;
     2dup control-value = [ 2drop ] [ set-control-value ] if ;
 
 : (scroll>rect) ( rect scroller -- )
-    [ [ loc>> ] [ dim>> { 1 1 } v+ ] bi <rect> ] dip
     {
         [ scroller-value vneg offset-rect ]
         [ viewport>> dim>> rect-min ]
+        [ viewport>> loc>> offset-rect ]
         [ viewport>> [ v- { 0 0 } vmin ] [ v- { 0 0 } vmax ] with-rect-extents v+ ]
         [ scroller-value v+ ]
         [ scroll ]

@@ -30,6 +30,9 @@ M: line-gadget line-height font>> font-metrics height>> ceiling ;
 : validate-line ( m gadget -- n )
     control-value [ drop f ] [ length 1- min 0 max ] if-empty ;
 
+: valid-line? ( n gadget -- ? )
+    control-value length 1- 0 swap between? ;
+
 : visible-line ( gadget quot -- n )
     '[
         [ clip get @ origin get [ second ] bi@ - ] dip

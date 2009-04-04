@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors combinators.smart sorting.human
-models colors.constants present
+models colors.constants present sorting.slots
 ui ui.gadgets.tables ui.gadgets.scrollers ;
 IN: color-table
 
@@ -29,7 +29,7 @@ M: color-renderer row-value
     drop named-color ;
 
 : <color-table> ( -- table )
-    named-colors human-sort <model>
+    named-colors { human<=> } sort-by <model>
     color-renderer
     <table>
         5 >>gap

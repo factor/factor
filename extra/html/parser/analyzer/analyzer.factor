@@ -3,7 +3,7 @@
 USING: assocs html.parser kernel math sequences strings ascii
 arrays generalizations shuffle unicode.case namespaces make
 splitting http accessors io combinators http.client urls
-urls.encoding fry prettyprint ;
+urls.encoding fry prettyprint sets ;
 IN: html.parser.analyzer
 
 TUPLE: link attributes clickable ;
@@ -126,7 +126,17 @@ TUPLE: link attributes clickable ;
     [ [
         [ name>> "a" = ]
         [ attributes>> "href" swap key? ] bi and ] filter
-    ] map sift [ [ attributes>> "href" swap at ] map ] map concat ;
+    ] map sift
+    [ [ attributes>> "href" swap at ] map ] map concat
+    [ >url ] map ;
+
+: find-frame-links ( vector -- vector' )
+    [ name>> "frame" = ] find-between-all
+    [ [ attributes>> "src" swap at ] map sift ] map concat sift
+    [ >url ] map ;
+
+: find-all-links ( vector -- vector' )
+    [ find-hrefs ] [ find-frame-links ] bi append prune ;
 
 : find-forms ( vector -- vector' )
     "form" over find-opening-tags-by-name
