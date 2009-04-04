@@ -4,15 +4,15 @@ USING: accessors fry html.parser html.parser.analyzer
 http.client kernel tools.time sets assocs sequences
 concurrency.combinators io threads namespaces math multiline
 math.parser inspector urls logging combinators.short-circuit
-continuations calendar prettyprint dlists deques locals
-present ;
+continuations calendar prettyprint dlists deques locals ;
 IN: spider
 
 TUPLE: spider base count max-count sleep max-depth initial-links
-filters spidered todo nonmatching quiet currently-spidering ;
+filters spidered todo nonmatching quiet currently-spidering
+#threads follow-robots ;
 
-TUPLE: spider-result url depth headers fetch-time parsed-html
-links processing-time timestamp ;
+TUPLE: spider-result url depth headers
+fetched-in parsed-html links processed-in fetched-at ;
 
 TUPLE: todo-url url depth ;
 
@@ -51,7 +51,8 @@ TUPLE: unique-deque assoc deque ;
         0 >>max-depth
         0 >>count
         1/0. >>max-count
-        H{ } clone >>spidered ;
+        H{ } clone >>spidered
+        1 >>#threads ;
 
 <PRIVATE
 
@@ -79,12 +80,8 @@ TUPLE: unique-deque assoc deque ;
     [ add-nonmatching ]
     [ tuck [ apply-filters ] 2dip add-todo ] 2bi ;
 
-: url-absolute? ( url -- ? )
-    present "http://" head? ;
-
-: normalize-hrefs ( links spider -- links' )
-    currently-spidering>> present swap
-    [ [ >url ] bi@ derive-url ] with map ;
+: normalize-hrefs ( base links -- links' )
+    [ derive-url ] with map ;
 
 : print-spidering ( url depth -- )
     "depth: " write number>string write
@@ -94,7 +91,9 @@ TUPLE: unique-deque assoc deque ;
     f url spider spidered>> set-at
     [ url http-get ] benchmark :> fetch-time :> html :> headers
     [
-        html parse-html [ ] [ find-all-links spider normalize-hrefs ] bi
+        html parse-html
+        spider currently-spidering>>
+        over find-all-links normalize-hrefs
     ] benchmark :> processing-time :> links :> parsed-html
     url depth headers fetch-time parsed-html links processing-time
     now spider-result boa ;
@@ -107,11 +106,12 @@ TUPLE: unique-deque assoc deque ;
 
 \ spider-page ERROR add-error-logging
 
-: spider-sleep ( spider -- )
-    sleep>> [ sleep ] when* ;
+: spider-sleep ( spider -- ) sleep>> [ sleep ] when* ;
 
-:: queue-initial-links ( spider -- spider )
-    spider initial-links>> spider normalize-hrefs 0 spider add-todo spider ;
+: queue-initial-links ( spider -- )
+    [
+        [ currently-spidering>> ] [ initial-links>> ] bi normalize-hrefs 0
+    ] keep add-todo ;
 
 : spider-page? ( spider -- ? )
     {
@@ -121,7 +121,7 @@ TUPLE: unique-deque assoc deque ;
     } 1&& ;
 
 : setup-next-url ( spider -- spider url depth )
-    dup todo>> peek-url url>> present >>currently-spidering
+    dup todo>> peek-url url>> >>currently-spidering
     dup todo>> pop-url [ url>> ] [ depth>> ] bi ;
 
 : spider-next-page ( spider -- )
@@ -138,5 +138,5 @@ PRIVATE>
 
 : run-spider ( spider -- spider )
     "spider" [
-        queue-initial-links [ run-spider-loop ] keep
+        dup queue-initial-links [ run-spider-loop ] keep
     ] with-logging ;
