@@ -21,16 +21,14 @@ DEFER: mdb-persistent?
 : tuple-instance ( tuple-info -- instance )
     mdbinfo>tuple-class new ; inline 
 
-: [keys>tuple] ( mirror assoc -- quot: ( elt -- ) )
-   '[ dup _ at assoc>tuple swap _ set-at ] ;  
-
 : prepare-assoc>tuple ( assoc -- tuple keylist mirror assoc )
    [ tuple-info tuple-instance dup
      <mirror> [ keys ] keep ] keep swap ; inline
 
 : make-tuple ( assoc -- tuple )
-   prepare-assoc>tuple [keys>tuple] each
-   [ set-persistent ] keep ; inline 
+   prepare-assoc>tuple
+   '[ dup _ at assoc>tuple swap _ set-at ] each
+   [ set-persistent ] keep ; inline recursive
 
 : at+ ( value key assoc -- value )
     2dup key?
@@ -88,5 +86,5 @@ M: tuple tuple>selector ( tuple -- assoc )
     [ [ dup tuple-info?
         [ make-tuple ]
         [ ] if ] [ drop ] recover
-    ] [ ] if ; inline
+    ] [ ] if ; inline recursive
 
