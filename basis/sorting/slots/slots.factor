@@ -7,8 +7,8 @@ IN: sorting.slots
 
 <PRIVATE
 
-: short-circuit-comparator ( word -- quot )
-    execute dup +eq+ eq? [ drop f ] when ; inline
+: short-circuit-comparator ( obj1 obj2 word --  comparator/? )
+    execute dup +eq+ eq? [ drop f ] when ;
 
 : slot-comparator ( seq -- quot )
     [
@@ -33,6 +33,12 @@ MACRO: compare-seq ( seq -- quot )
 
 : sort-by ( seq sort-seq -- sortedseq )
     '[ _ compare-seq ] sort ;
+
+: sort-keys-by ( seq sort-seq -- sortedseq )
+    '[ [ first ] bi@ _ compare-seq ] sort ;
+
+: sort-values-by ( seq sort-seq -- sortedseq )
+    '[ [ second ] bi@ _ compare-seq ] sort ;
 
 MACRO: split-by-slots ( accessor-seqs -- quot )
     [ [ '[ [ _ execute ] bi@ ] ] map concat [ = ] compose ] map
