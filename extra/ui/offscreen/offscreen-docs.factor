@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel quotations ui.gadgets
-images.bitmap strings ui.gadgets.worlds ;
+images strings ui.gadgets.worlds ;
 IN: ui.offscreen
 
 HELP: <offscreen-world>
@@ -26,9 +26,9 @@ HELP: do-offscreen
 HELP: gadget>bitmap
 { $values
      { "gadget" gadget }
-     { "bitmap" bitmap }
+     { "image" image }
 }
-{ $description "Renders " { $snippet "gadget" } " to an " { $link offscreen-world } " and creates a " { $link bitmap } " from its contents." } ;
+{ $description "Renders " { $snippet "gadget" } " to an " { $link offscreen-world } " and creates an " { $link image } " from its contents." } ;
 
 HELP: offscreen-world
 { $class-description "The class of " { $link world } " objects that render to an offscreen buffer." } ;
@@ -36,9 +36,9 @@ HELP: offscreen-world
 HELP: offscreen-world>bitmap
 { $values
      { "world" offscreen-world }
-     { "bitmap" bitmap }
+     { "image" image }
 }
-{ $description "Saves a copy of the contents of " { $snippet "world" } " to a " { $link bitmap } " object." } ;
+{ $description "Saves a copy of the contents of " { $snippet "world" } " to a " { $link image } " object." } ;
 
 HELP: open-offscreen
 { $values

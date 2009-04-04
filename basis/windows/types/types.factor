@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax namespaces kernel words ;
+USING: alien alien.c-types alien.syntax namespaces kernel words
+sequences math math.bitwise math.vectors colors ;
 IN: windows.types
 
 TYPEDEF: char                CHAR
@@ -244,14 +245,14 @@ C-STRUCT: RECT
     { "LONG" "right" }
     { "LONG" "bottom" } ;
 
-! C-STRUCT: PAINTSTRUCT
-    ! { "HDC" " hdc" }
-    ! { "BOOL" "fErase" }
-    ! { "RECT" "rcPaint" }
-    ! { "BOOL" "fRestore" }
-    ! { "BOOL" "fIncUpdate" }
-    ! { "BYTE[32]" "rgbReserved" }
-! ;
+C-STRUCT: PAINTSTRUCT
+    { "HDC" " hdc" }
+    { "BOOL" "fErase" }
+    { "RECT" "rcPaint" }
+    { "BOOL" "fRestore" }
+    { "BOOL" "fIncUpdate" }
+    { "BYTE[32]" "rgbReserved" }
+;
 
 C-STRUCT: BITMAPINFOHEADER
     { "DWORD"  "biSize" }
@@ -282,6 +283,10 @@ TYPEDEF: void* PAINTSTRUCT
 C-STRUCT: POINT
     { "LONG" "x" }
     { "LONG" "y" } ; 
+
+C-STRUCT: SIZE
+    { "LONG" "cx" }
+    { "LONG" "cy" } ; 
 
 C-STRUCT: MSG
     { "HWND" "hWnd" }
@@ -327,6 +332,14 @@ C-STRUCT: RECT
     { "LONG" "right" }
     { "LONG" "bottom" } ;
 
+: <RECT> ( loc dim -- RECT )
+    over v+
+    "RECT" <c-object>
+    over first over set-RECT-right
+    swap second over set-RECT-bottom
+    over first over set-RECT-left
+    swap second over set-RECT-top ;
+
 TYPEDEF: RECT* PRECT
 TYPEDEF: RECT* LPRECT
 TYPEDEF: PIXELFORMATDESCRIPTOR PFD
@@ -363,3 +376,36 @@ C-STRUCT: ACCEL
     { "WORD" "key" }
     { "WORD" "cmd" } ;
 TYPEDEF: ACCEL* LPACCEL
+
+TYPEDEF: DWORD COLORREF
+TYPEDEF: DWORD* LPCOLORREF
+
+: RGB ( r g b -- COLORREF )
+    { 16 8 0 } bitfield ; inline
+
+: color>RGB ( color -- COLORREF )
+    >rgba-components drop [ 255 * >integer ] tri@ RGB ;
+
+C-STRUCT: TEXTMETRICW
+    { "LONG" "tmHeight" }
+    { "LONG" "tmAscent" }
+    { "LONG" "tmDescent" }
+    { "LONG" "tmInternalLeading" }
+    { "LONG" "tmExternalLeading" }
+    { "LONG" "tmAveCharWidth" }
+    { "LONG" "tmMaxCharWidth" }
+    { "LONG" "tmWeight" }
+    { "LONG" "tmOverhang" }
+    { "LONG" "tmDigitizedAspectX" }
+    { "LONG" "tmDigitizedAspectY" }
+    { "WCHAR" "tmFirstChar" }
+    { "WCHAR" "tmLastChar" }
+    { "WCHAR" "tmDefaultChar" }
+    { "WCHAR" "tmBreakChar" }
+    { "BYTE" "tmItalic" }
+    { "BYTE" "tmUnderlined" }
+    { "BYTE" "tmStruckOut" }
+    { "BYTE" "tmPitchAndFamily" }
+    { "BYTE" "tmCharSet" } ;
+
+TYPEDEF: TEXTMETRICW* LPTEXTMETRIC

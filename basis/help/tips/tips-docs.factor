@@ -1,6 +1,6 @@
 IN: help.tips
 USING: help.markup help.syntax debugger prettyprint see help help.vocabs
-help.apropos tools.time stack-checker editors ;
+help.apropos tools.time stack-checker editors memory ;
 
 TIP: "To look at the most recent error, run " { $link :error } ". To look at the most recent error's callstack, run " { $link :c } "." ;
 
@@ -19,6 +19,10 @@ TIP: "You can write graphical applications using the " { $link "ui" } "." ;
 TIP: "Power tools: " { $links see edit help about apropos time infer. } ;
 
 TIP: "Tips of the day implement the " { $link "definition-protocol" } " and new tips of the day can be defined using the " { $link POSTPONE: TIP: } " parsing word." ;
+
+TIP: "Try some simple demo applications, then look at the source code in " { $snippet "extra/" } ": " { $snippet "\"demos\" run" } ;
+
+TIP: "To save time on reloading big libraries such as the " { $vocab-link "furnace" } " web framework, save the image after loading them using the " { $link save } " word." ;
 
 HELP: TIP:
 { $syntax "TIP: content ;" }

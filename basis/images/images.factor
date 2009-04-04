@@ -1,10 +1,12 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel ;
+USING: combinators kernel accessors ;
 IN: images
 
 SINGLETONS: L BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR
 R16G16B16 R32G32B32 R16G16B16A16 R32G32B32A32 ;
+
+UNION: alpha-channel BGRA RGBA ABGR ARGB R16G16B16A16 R32G32B32A32 ;
 
 : bytes-per-pixel ( component-order -- n )
     {
@@ -28,5 +30,7 @@ R16G16B16 R32G32B32 R16G16B16A16 R32G32B32A32 ;
 TUPLE: image dim component-order upside-down? bitmap ;
 
 : <image> ( -- image ) image new ; inline
+
+: has-alpha? ( image -- ? ) component-order>> alpha-channel? ;
 
 GENERIC: load-image* ( path tuple -- image )
