@@ -51,9 +51,16 @@ TUPLE: state-parser sequence n ;
 : take-while ( state-parser quot: ( obj -- ? ) -- sequence/f )
     [ not ] compose take-until ; inline
 
+: <safe-slice> ( from to seq -- slice/f )
+    3dup {
+        [ 2drop 0 < ]
+        [ [ drop ] 2dip length > ]
+        [ drop > ]
+    } 3|| [ 3drop f ] [ slice boa ] if ; inline
+
 :: take-sequence ( state-parser sequence -- obj/f )
-    state-parser [ n>> dup sequence length + ] [ sequence>> ] bi <slice>
-    sequence sequence= [
+    state-parser [ n>> dup sequence length + ] [ sequence>> ] bi
+    <safe-slice> sequence sequence= [
         sequence
         state-parser [ sequence length + ] change-n drop
     ] [
