@@ -9,6 +9,7 @@ void primitive_fread(void);
 void primitive_fputc(void);
 void primitive_fwrite(void);
 void primitive_fflush(void);
+void primitive_fseek(void);
 void primitive_fclose(void);
 
 /* Platform specific primitives */

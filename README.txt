@@ -113,12 +113,6 @@ the command prompt using the console application:
 
   factor.com -i=boot.<cpu>.image
 
-Before bootstrapping, you will need to download the DLLs for the Pango
-text rendering library. The required DLLs are listed in
-build-support/dlls.txt and are available from the following location:
-
-  <http://factorcode.org/dlls>
-
 Once bootstrapped, double-clicking factor.exe or factor.com starts
 the Factor UI.
 
