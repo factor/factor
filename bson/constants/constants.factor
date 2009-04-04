@@ -2,10 +2,8 @@ USING: accessors constructors kernel strings uuid ;
 
 IN: bson.constants
 
-TUPLE: objid id ;
-
 : <objid> ( -- objid )
-   objid new uuid1 >>id ; inline
+   uuid1 ; inline
 
 TUPLE: oid { a initial: 0 } { b initial: 0 } ;
 

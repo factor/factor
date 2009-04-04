@@ -11,7 +11,6 @@ GENERIC: tuple>assoc ( tuple -- assoc )
 GENERIC: tuple>selector ( tuple -- selector )
 
 DEFER: assoc>tuple
-DEFER: mdb-persistent?
 
 <PRIVATE
 
@@ -41,19 +40,23 @@ DEFER: mdb-persistent?
 : add-storable ( assoc ns -- )
    [ H{ } clone ] dip mdb-store-list get at+
    [ dup [ MDB_OID_FIELD ] dip at ] dip set-at ; inline
- 
-: write-tuple-fields ( mirror assoc conv-quot -- )
-   swap [ dup ] dip ! m a a q
-   '[ [ dup mdb-persistent?
+
+: write-field? ( tuple key value -- ? )
+   [ [ 2drop ] dip not ] [ drop transient-slot? ] 3bi or not ; inline
+
+: write-tuple-fields ( mirror tuple assoc quot: ( tuple -- assoc ) -- )
+   swap dupd ! m t q q a 
+   '[ _ 2over write-field?
+      [ dup mdb-persistent?
         [ _ keep
           [ tuple-collection ] keep
           [ add-storable ] dip
           [ tuple-collection ] [ _id>> ] bi <objref> ]
-        [ dup data-tuple? _ [ ] if ] if _ set-at ] [ drop ] if*
+        [ dup data-tuple? _ [ ] if ] if swap _ set-at ] [ 2drop ] if
    ] assoc-each ; 
 
-: prepare-assoc ( tuple -- assoc mirror assoc )
-   <mirror> H{ } clone tuck ; inline
+: prepare-assoc ( tuple -- assoc mirror tuple assoc )
+   H{ } clone swap [ <mirror> ] keep pick ; inline
 
 : ensure-mdb-info ( tuple -- tuple )    
    dup _id>> [ <objid> >>_id ] unless

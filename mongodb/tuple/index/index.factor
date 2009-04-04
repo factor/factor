@@ -1,11 +1,15 @@
 USING: kernel fry accessors formatting linked-assocs assocs sequences sequences.deep
 mongodb.tuple.collection combinators mongodb.tuple.collection ; 
 
+IN: mongodb.tuple
+
+SINGLETONS: +fieldindex+ +compoundindex+ +deepindex+ ;
+
 IN: mongodb.tuple.index
 
-TUPLE: tuple-index name spec ;
+FROM: mongodb.tuple => +fieldindex+ +compoundindex+ +deepindex+ ;
 
-SYMBOLS: +transient+ +load+ +fieldindex+ +compoundindex+ +deepindex+ ;
+TUPLE: tuple-index name spec ;
 
 <PRIVATE
 
@@ -47,7 +51,7 @@ SYMBOLS: +transient+ +load+ +fieldindex+ +compoundindex+ +deepindex+ ;
 PRIVATE>
 
 : tuple-index-list ( mdb-collection/class -- seq )
-    mdb-slot-list V{ } clone tuck
+    mdb-slot-map V{ } clone tuck
     '[ [ is-index-declaration? ] filter
        build-index-seq _ push 
     ] assoc-each flatten ;

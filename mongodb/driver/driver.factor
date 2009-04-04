@@ -195,6 +195,7 @@ MEMO: reserved-namespace? ( name -- ? )
 PRIVATE>
 
 MEMO: ensure-collection ( collection -- fq-collection )
+    dup mdb-collection? [ name>> ] when
     "." split1 over mdb name>> =
     [ nip ] [ drop ] if
     [ ] [ reserved-namespace? ] bi

@@ -77,7 +77,6 @@ M: timestamp bson-type? ( timestamp -- type ) drop T_Date ;
 M: mdbregexp bson-type? ( regexp -- type ) drop T_Regexp ;
 
 M: oid bson-type? ( word -- type ) drop T_OID ;
-M: objid bson-type? ( objid -- type ) drop T_Binary ;
 M: objref bson-type? ( objref -- type ) drop T_Binary ;
 M: quotation bson-type? ( quotation -- type ) drop T_Binary ; 
 M: byte-array bson-type? ( byte-array -- type ) drop T_Binary ; 
@@ -126,16 +125,11 @@ M: quotation bson-write ( quotation -- )
 M: oid bson-write ( oid -- )
     [ a>> write-longlong ] [ b>> write-int32 ] bi ;
 
-M: objid bson-write ( oid -- )
-    id>> [ binary ] dip '[ _ write-cstring ] with-byte-writer
-    [ length write-int32 ] keep
-    T_Binary_UUID write-byte write ;
-
 M: objref bson-write ( objref -- )
     [ binary ] dip
     '[ _
        [ ns>> write-cstring ]
-       [ objid>> id>> write-cstring ] bi ] with-byte-writer
+       [ objid>> write-cstring ] bi ] with-byte-writer
     [ length write-int32 ] keep
     T_Binary_Custom write-byte write ;
        

@@ -28,17 +28,17 @@ PRIVATE>
    dup _mfd>> [ ] [ H{ } clone [ >>_mfd ] keep ] if* nip ; inline
 
 : dirty? ( tuple -- ? )
-   MDB_DIRTY_FLAG tuple-meta at ;
+    MDB_DIRTY_FLAG tuple-meta at ;
 
 : set-dirty ( tuple -- )
-   t MDB_DIRTY_FLAG tuple-meta set-at ;
+    [ t MDB_DIRTY_FLAG ] dip tuple-meta set-at ;
 
 : persistent? ( tuple -- ? )
-   MDB_PERSISTENT_FLAG tuple-meta at ;
+    MDB_PERSISTENT_FLAG tuple-meta at ;
 
 : set-persistent ( tuple -- )
-   t MDB_PERSISTENT_FLAG tuple-meta set-at ;
+    [ t MDB_PERSISTENT_FLAG ] dip tuple-meta set-at ;
 
 : needs-store? ( tuple -- ? )
-   [ persistent? not ] [ dirty? ] bi or ;
+    [ persistent? not ] [ dirty? ] bi or ;
 

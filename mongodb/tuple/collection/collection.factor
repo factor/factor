@@ -1,9 +1,15 @@
 
 USING: accessors arrays assocs bson.constants classes classes.tuple
-continuations fry kernel mongodb.driver sequences
+combinators continuations fry kernel mongodb.driver sequences strings
 vectors words ;
 
+IN: mongodb.tuple
+
+SINGLETONS: +transient+ +load+ ;
+
 IN: mongodb.tuple.collection
+
+FROM: mongodb.tuple => +transient+ +load+ ;
 
 MIXIN: mdb-persistent
 
@@ -14,7 +20,7 @@ TUPLE: mdb-tuple-collection < mdb-collection { classes } ;
 
 GENERIC: tuple-collection ( object -- mdb-collection )
 
-GENERIC: mdb-slot-list  ( tuple -- string )
+GENERIC: mdb-slot-map  ( tuple -- string )
 
 <PRIVATE
 
@@ -27,7 +33,7 @@ CONSTANT: MDB_COLLECTION_MAP "_mdb_col_map"
     [ nip ]
     [ superclass [ (mdb-collection) ] [ f ] if* ] if* ; inline recursive
 
-: (mdb-slot-list) ( class -- slot-defs )
+: (mdb-slot-map) ( class -- slot-defs )
     superclasses [ MDB_SLOTDEF_LIST word-prop ] map assoc-combine  ; inline 
 
 : split-optl ( seq -- key options )
@@ -59,8 +65,8 @@ PRIVATE>
     over all-slots [ name>> ] map [ MDB_OID_FIELD ] dip member?
     [  ] [ MDB_ADDON_SLOTS prepend ] if ; inline
 
-: set-slot-options ( class options -- )
-    '[ MDB_SLOTDEF_LIST _ optl>map set-word-prop ] keep
+: set-slot-map ( class options -- )
+    '[ _ optl>map MDB_SLOTDEF_LIST set-word-prop ] keep
     dup tuple-collection link-collection ; inline
   
 M: tuple-class tuple-collection ( tuple -- mdb-collection )
@@ -69,22 +75,44 @@ M: tuple-class tuple-collection ( tuple -- mdb-collection )
 M: mdb-persistent tuple-collection ( tuple -- mdb-collection )
     class (mdb-collection) ;
  
-M: mdb-persistent mdb-slot-list ( tuple -- string )
-    class (mdb-slot-list) ;
+M: mdb-persistent mdb-slot-map ( tuple -- string )
+    class (mdb-slot-map) ;
 
-M: tuple-class mdb-slot-list ( class -- assoc )
-    (mdb-slot-list) ;
+M: tuple-class mdb-slot-map ( class -- assoc )
+    (mdb-slot-map) ;
 
-M: mdb-collection mdb-slot-list ( collection -- assoc )
-    classes>> [ mdb-slot-list ] map assoc-combine ;
+M: mdb-collection mdb-slot-map ( collection -- assoc )
+    classes>> [ mdb-slot-map ] map assoc-combine ;
+
+<PRIVATE
 
 : collection-map ( -- assoc )
-    MDB_COLLECTION_MAP mdb-persistent word-prop
+    mdb-persistent MDB_COLLECTION_MAP word-prop
     [ mdb-persistent MDB_COLLECTION_MAP H{ } clone
       [ set-word-prop ] keep ] unless* ; inline
+
+: slot-option? ( tuple slot option -- ? )
+    [ swap mdb-slot-map at ] dip
+    '[ _ swap key? ] [ f ] if* ;
   
-: <mdb-tuple-collection> ( name -- mdb-tuple-collection )
+PRIVATE>
+
+GENERIC: <mdb-tuple-collection> ( name -- mdb-tuple-collection )
+M: string <mdb-tuple-collection> ( name -- mdb-tuple-collection )
     collection-map [ ] [ key? ] 2bi 
     [ at ] [ [ mdb-tuple-collection new dup ] 2dip 
              [ [ >>name ] keep ] dip set-at ] if ; inline
+M: mdb-tuple-collection <mdb-tuple-collection> ( mdb-tuple-collection -- mdb-tuple-collection ) ;
+M: mdb-collection <mdb-tuple-collection> ( mdb-collection -- mdb-tuple-collection )
+    [ name>> <mdb-tuple-collection> ] keep
+    {
+        [ capped>> >>capped ]
+        [ size>> >>size ]
+        [ max>> >>max ]
+    } cleave ;
 
+: transient-slot? ( tuple slot -- ? )
+    +transient+ slot-option? ;
+
+: load-slot? ( tuple slot -- ? )
+    +load+ slot-option? ;

@@ -186,11 +186,6 @@ M: bson-binary-custom element-binary-read ( size type -- dbref )
     read-cstring
     read-cstring objref boa ;
 
-M: bson-binary-uuid element-binary-read ( size type -- object )
-    2drop
-    read-cstring
-    objid boa ;
-
 M: bson-binary-bytes element-binary-read ( size type -- bytes )
     drop read ;
 

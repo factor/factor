@@ -1,12 +1,9 @@
-USING: accessors assocs classes classes.mixin classes.tuple vectors math
-classes.tuple.parser formatting generalizations kernel sequences fry combinators
-linked-assocs sequences.deep mongodb.driver continuations memoize bson.constants
-prettyprint strings compiler.units slots tools.walker words arrays ;
+USING: accessors assocs classes.mixin classes.tuple
+classes.tuple.parser compiler.units fry kernel mongodb.driver
+mongodb.msg mongodb.tuple.collection mongodb.tuple.index
+mongodb.tuple.persistent mongodb.tuple.state sequences strings ;
 
 IN: mongodb.tuple
-
-USING: mongodb.tuple.state mongodb.tuple.persistent mongodb.tuple.collection
-mongodb.tuple.index mongodb.msg ; 
 
 SYNTAX: MDBTUPLE:
     parse-tuple-definition
@@ -14,15 +11,16 @@ SYNTAX: MDBTUPLE:
     define-tuple-class ; 
 
 : define-persistent ( class collection options -- )
+    [ <mdb-tuple-collection> ] dip
     [ [ dup ] dip link-collection ] dip ! cl options
     [ dup '[ _ mdb-persistent add-mixin-instance ] with-compilation-unit ] dip 
-    set-slot-options ;
+    set-slot-map ;
 
 : ensure-table ( class -- )
     tuple-collection
     [ create-collection ]
     [ [ tuple-index-list ] keep
-      '[ _ swap [ name>> ] [ spec>> ] bi ensure-index ] each
+      '[ _ name>> swap [ name>> ] [ spec>> ] bi ensure-index ] each
     ] bi ;
 
 : ensure-tables ( classes -- )
@@ -31,7 +29,7 @@ SYNTAX: MDBTUPLE:
 : drop-table ( class -- )
       tuple-collection
       [ [ tuple-index-list ] keep
-        '[ _ swap name>> drop-index ] each ]
+        '[ _ name>> swap name>> drop-index ] each ]
       [ name>> drop-collection ] bi ;
 
 : recreate-table ( class -- )
@@ -41,19 +39,19 @@ SYNTAX: MDBTUPLE:
 <PRIVATE
 
 GENERIC: id-selector ( object -- selector )
-M: objid id-selector ( objid -- selector )
+M: string id-selector ( objid -- selector )
    "_id" H{ } clone [ set-at ] keep ; inline
 M: mdb-persistent id-selector ( mdb-persistent -- selector )
-   id>> id-selector ;
+   _id>> id-selector ;
 
 : (save-tuples) ( collection assoc -- )
    swap '[ [ _ ] 2dip
            [ id-selector ] dip
-           <update> update ] assoc-each ; inline
+           <update> >upsert update ] assoc-each ; inline
 PRIVATE>
  
 : save-tuple ( tuple -- )
-   tuple>assoc [ (save-tuples) ] assoc-each ;
+   tuple>storable [ (save-tuples) ] assoc-each ;
  
 : update-tuple ( tuple -- )
    save-tuple ;
