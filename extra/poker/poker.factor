@@ -112,15 +112,17 @@ CONSTANT: VALUE_STR { "" "Straight Flush" "Four of a Kind" "Full House" "Flush"
 : rank-bits ( cards -- q )
     0 [ bitor ] reduce -16 shift ;
 
-! Needs MEMO: to prevent unique5 lookup twice?
 : lookup ( cards table -- value )
     [ rank-bits ] dip nth ;
 
 : unique5? ( cards -- ? )
     unique5-table lookup 0 > ;
 
+: map-product ( seq quot -- n )
+    [ 1 ] 2dip [ dip * ] curry [ swap ] prepose each ; inline
+
 : prime-bits ( cards -- q )
-    [ HEX: FF bitand ] map product ;
+    [ HEX: FF bitand ] map-product ;
 
 : hand-value ( cards -- value )
     {
