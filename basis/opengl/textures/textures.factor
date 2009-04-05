@@ -81,17 +81,13 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
     ] with-texturing ;
 
 : texture-coords ( texture -- coords )
+    [ [ dim>> ] [ image>> dim>> [ next-power-of-2 ] map ] bi v/ ]
     [
-        [ [ dim>> ] [ image>> dim>> [ next-power-of-2 ] map ] bi v/ ]
-        [
-            image>> upside-down?>>
-            { { 0 1 } { 1 1 } { 1 0 } { 0 0 } }
-            { { 0 0 } { 1 0 } { 1 1 } { 0 1 } } ?
-        ] bi
-        [ v* ] with map
-    ] keep
-    drop ! image>> upside-down?>> [ [ first2 1 swap - 2array ] map ] when
-    float-array{ } join ;
+        image>> upside-down?>>
+        { { 0 1 } { 1 1 } { 1 0 } { 0 0 } }
+        { { 0 0 } { 1 0 } { 1 1 } { 0 1 } } ?
+    ] bi
+    [ v* ] with map float-array{ } join ;
 
 : make-texture-display-list ( texture -- dlist )
     GL_COMPILE [ [ dim>> ] keep draw-textured-rect ] make-dlist ;
