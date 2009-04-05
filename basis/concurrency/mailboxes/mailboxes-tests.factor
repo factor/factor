@@ -1,6 +1,6 @@
 IN: concurrency.mailboxes.tests
-USING: concurrency.mailboxes concurrency.count-downs vectors
-sequences threads tools.test math kernel strings namespaces
+USING: concurrency.mailboxes concurrency.count-downs concurrency.conditions
+vectors sequences threads tools.test math kernel strings namespaces
 continuations calendar destructors ;
 
 { 1 1 } [ [ integer? ] mailbox-get? ] must-infer-as
@@ -75,3 +75,15 @@ continuations calendar destructors ;
 [ ] [ "d" get 5 seconds await-timeout ] unit-test
 
 [ ] [ "m" get dispose ] unit-test
+
+[ { "foo" "bar" } ] [
+    <mailbox>
+    "foo" over mailbox-put
+    "bar" over mailbox-put
+    mailbox-get-all
+] unit-test
+
+[
+    <mailbox> 1 seconds mailbox-get-timeout
+] [ wait-timeout? ] must-fail-with
+    
