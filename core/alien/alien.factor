@@ -49,7 +49,7 @@ M: alien equal?
         2drop f
     ] if ;
 
-M: simple-alien hashcode* nip alien-address ;
+M: simple-alien hashcode* nip dup expired>> [ drop 1234 ] [ alien-address ] if ;
 
 ERROR: alien-callback-error ;
 
