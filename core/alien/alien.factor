@@ -49,6 +49,8 @@ M: alien equal?
         2drop f
     ] if ;
 
+M: simple-alien hashcode* nip alien-address ;
+
 ERROR: alien-callback-error ;
 
 : alien-callback ( return parameters abi quot -- alien )
