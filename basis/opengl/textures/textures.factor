@@ -53,8 +53,8 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
 : init-texture ( -- )
     GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_NEAREST glTexParameteri
     GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_NEAREST glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP_TO_EDGE glTexParameteri
-    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP_TO_EDGE glTexParameteri ;
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_REPEAT glTexParameteri
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_REPEAT glTexParameteri ;
 
 : with-texturing ( quot -- )
     GL_TEXTURE_2D [
@@ -82,11 +82,15 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
 
 : texture-coords ( texture -- coords )
     [
-        [ dim>> ] [ image>> dim>> [ next-power-of-2 ] map ] bi v/
-        { { 0 0 } { 1 0 } { 1 1 } { 0 1 } }
+        [ [ dim>> ] [ image>> dim>> [ next-power-of-2 ] map ] bi v/ ]
+        [
+            image>> upside-down?>>
+            { { 0 1 } { 1 1 } { 1 0 } { 0 0 } }
+            { { 0 0 } { 1 0 } { 1 1 } { 0 1 } } ?
+        ] bi
         [ v* ] with map
     ] keep
-    image>> upside-down?>> [ [ first2 1 swap - 2array ] map ] when
+    drop ! image>> upside-down?>> [ [ first2 1 swap - 2array ] map ] when
     float-array{ } join ;
 
 : make-texture-display-list ( texture -- dlist )
