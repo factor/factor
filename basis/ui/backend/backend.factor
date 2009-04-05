@@ -29,6 +29,6 @@ HOOK: offscreen-pixels ui-backend ( world -- alien w h )
 
 : with-gl-context ( handle quot -- )
     swap [ select-gl-context call ] keep
-    glFlush flush-gl-context gl-error ; inline
+    flush-gl-context gl-error ; inline
 
 HOOK: (with-ui) ui-backend ( quot -- )
