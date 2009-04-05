@@ -1,10 +1,11 @@
-USING: accessors assocs classes fry kernel linked-assocs math mirrors
-namespaces sequences strings vectors words bson.constants 
-continuations mongodb.driver mongodb.tuple.collection mongodb.tuple.state ;
+USING: accessors assocs bson.constants combinators.short-circuit
+constructors continuations fry kernel mirrors mongodb.tuple.collection
+mongodb.tuple.state namespaces sequences words bson.writer combinators
+hashtables linked-assocs ;
 
 IN: mongodb.tuple.persistent
 
-SYMBOL: mdb-store-list
+SYMBOLS: object-map ;
 
 GENERIC: tuple>assoc ( tuple -- assoc )
 
@@ -15,7 +16,7 @@ DEFER: assoc>tuple
 <PRIVATE
 
 : mdbinfo>tuple-class ( tuple-info -- class )
-    [ first ] keep second lookup ; inline
+   [ first ] keep second lookup ; inline
 
 : tuple-instance ( tuple-info -- instance )
     mdbinfo>tuple-class new ; inline 
@@ -27,7 +28,7 @@ DEFER: assoc>tuple
 : make-tuple ( assoc -- tuple )
    prepare-assoc>tuple
    '[ dup _ at assoc>tuple swap _ set-at ] each
-   [ set-persistent ] keep ; inline recursive
+   [ mark-persistent ] keep ; inline recursive
 
 : at+ ( value key assoc -- value )
     2dup key?
@@ -38,21 +39,43 @@ DEFER: assoc>tuple
     [ assoc? not ] [ drop f ] if  ; inline
 
 : add-storable ( assoc ns -- )
-   [ H{ } clone ] dip mdb-store-list get at+
+   [ H{ } clone ] dip object-map get at+
    [ dup [ MDB_OID_FIELD ] dip at ] dip set-at ; inline
 
 : write-field? ( tuple key value -- ? )
-   [ [ 2drop ] dip not ] [ drop transient-slot? ] 3bi or not ; inline
+   pick mdb-persistent? [ 
+      { [ [ 2drop ] dip not ]
+        [ drop transient-slot? ] } 3|| not ] [ 3drop t ] if ; inline
+
+TUPLE: cond-value value quot ;
+
+CONSTRUCTOR: cond-value ( value quot -- cond-value ) ;
+
+: write-mdb-persistent ( value quot: ( tuple -- assoc ) -- value' )
+   over needs-store?
+   [ over [ (( tuple -- assoc )) call-effect ] dip 
+     [ tuple-collection name>> ] keep
+     [ add-storable ] dip
+   ] [ drop ] if 
+   [ tuple-collection name>> ] [ _id>> ] bi <objref> ; inline
+
+: write-field ( value quot: ( tuple -- assoc ) -- value' )
+   <cond-value> {
+      { [ dup value>> mdb-special-value? ] [ value>> ]  }
+      { [ dup value>> mdb-persistent? ]
+        [ [ value>> ] [ quot>> ] bi write-mdb-persistent ] }
+      { [ dup value>> data-tuple? ]
+        [ [ value>> ] [ quot>> ] bi (( tuple -- assoc )) call-effect ]  }
+      { [ dup value>> [ hashtable? ] [ linked-assoc? ] bi or ]
+        [ [ value>> ] [ quot>> ] bi '[ _ write-field ] assoc-map ] }
+      [ value>> ]
+   } cond ; inline recursive
 
 : write-tuple-fields ( mirror tuple assoc quot: ( tuple -- assoc ) -- )
-   swap dupd ! m t q q a 
+   swap ! m t q q a 
    '[ _ 2over write-field?
-      [ dup mdb-persistent?
-        [ _ keep
-          [ tuple-collection ] keep
-          [ add-storable ] dip
-          [ tuple-collection ] [ _id>> ] bi <objref> ]
-        [ dup data-tuple? _ [ ] if ] if swap _ set-at ] [ 2drop ] if
+      [ _ write-field swap _ set-at ]
+      [ 2drop ] if
    ] assoc-each ; 
 
 : prepare-assoc ( tuple -- assoc mirror tuple assoc )
@@ -60,20 +83,21 @@ DEFER: assoc>tuple
 
 : ensure-mdb-info ( tuple -- tuple )    
    dup _id>> [ <objid> >>_id ] unless
-   [ set-persistent ] keep ; inline
+   [ mark-persistent ] keep ; inline
 
-: with-store-list ( quot: ( -- ) -- store-assoc )
-   [ H{ } clone dup mdb-store-list ] dip with-variable ; inline
+: with-object-map ( quot: ( -- ) -- store-assoc )
+   [ H{ } clone dup object-map ] dip with-variable ; inline
 
 : (tuple>assoc) ( tuple -- assoc )
    [ prepare-assoc [ tuple>assoc ] write-tuple-fields ] keep
-   over set-tuple-info ;
+   over set-tuple-info ; inline
 
 PRIVATE>
 
-GENERIC: tuple>storable ( tuple -- storable ) 
-M: mdb-persistent tuple>storable ( mdb-persistent -- store-list )
-   '[ _ [ tuple>assoc ] keep tuple-collection add-storable ] with-store-list ; inline
+GENERIC: tuple>storable ( tuple -- storable )
+
+M: mdb-persistent tuple>storable ( mdb-persistent -- object-map )
+   '[ _ [ tuple>assoc ] write-mdb-persistent drop ] with-object-map ; inline
 
 M: mdb-persistent tuple>assoc ( tuple -- assoc )
    ensure-mdb-info (tuple>assoc) ;

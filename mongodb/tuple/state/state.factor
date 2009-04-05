@@ -1,4 +1,5 @@
-USING: classes kernel accessors sequences assocs mongodb.tuple.collection ;
+USING: classes kernel accessors sequences fry assocs mongodb.tuple.collection
+advice words classes.tuple slots ;
 
 IN: mongodb.tuple.state
 
@@ -7,8 +8,12 @@ IN: mongodb.tuple.state
 CONSTANT: MDB_TUPLE_INFO       "_mfd_t_info"
 CONSTANT: MDB_DIRTY_FLAG       "d?"
 CONSTANT: MDB_PERSISTENT_FLAG  "p?"
+CONSTANT: MDB_DIRTY_ADVICE     "mdb-dirty-set"
 
 PRIVATE>
+
+: advised-with? ( name word loc -- ? )
+   word-prop key? ; inline
 
 : <tuple-info> ( tuple -- tuple-info )
     class V{ } clone tuck  
@@ -28,17 +33,35 @@ PRIVATE>
    dup _mfd>> [ ] [ H{ } clone [ >>_mfd ] keep ] if* nip ; inline
 
 : dirty? ( tuple -- ? )
-    MDB_DIRTY_FLAG tuple-meta at ;
+   [ MDB_DIRTY_FLAG ] dip tuple-meta at ;
 
-: set-dirty ( tuple -- )
-    [ t MDB_DIRTY_FLAG ] dip tuple-meta set-at ;
+: mark-dirty ( tuple -- )
+   [ t MDB_DIRTY_FLAG ] dip tuple-meta set-at ;
 
 : persistent? ( tuple -- ? )
-    MDB_PERSISTENT_FLAG tuple-meta at ;
+   [ MDB_PERSISTENT_FLAG ] dip tuple-meta at ;
 
-: set-persistent ( tuple -- )
-    [ t MDB_PERSISTENT_FLAG ] dip tuple-meta set-at ;
+: mark-persistent ( tuple -- )
+   [ t MDB_PERSISTENT_FLAG ] dip tuple-meta [ set-at ] keep
+   [ f MDB_DIRTY_FLAG ] dip set-at ;
 
 : needs-store? ( tuple -- ? )
-    [ persistent? not ] [ dirty? ] bi or ;
+   [ persistent? not ] [ dirty? ] bi or ;
 
+<PRIVATE
+
+: create-advice ( word -- )
+   MDB_DIRTY_ADVICE over after advised-with?
+   [ drop ]
+   [ [ [ dup mark-dirty ] MDB_DIRTY_ADVICE ] dip advise-after ] if ;
+
+: (annotate-writer) ( class name -- )
+   writer-word "methods" word-prop at
+   [ create-advice ] when* ;
+
+PRIVATE>
+
+: annotate-writers ( class -- )
+   dup all-slots [ name>> ] map
+   MDB_ADDON_SLOTS '[ _ memq? not ] filter
+   [ (annotate-writer) ] with each ;

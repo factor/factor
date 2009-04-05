@@ -1,7 +1,7 @@
 USING: accessors assocs classes.mixin classes.tuple
-classes.tuple.parser compiler.units fry kernel mongodb.driver
+classes.tuple.parser compiler.units fry kernel sequences mongodb.driver
 mongodb.msg mongodb.tuple.collection mongodb.tuple.index
-mongodb.tuple.persistent mongodb.tuple.state sequences strings ;
+mongodb.tuple.persistent mongodb.tuple.state strings ;
 
 IN: mongodb.tuple
 
@@ -13,7 +13,8 @@ SYNTAX: MDBTUPLE:
 : define-persistent ( class collection options -- )
     [ <mdb-tuple-collection> ] dip
     [ [ dup ] dip link-collection ] dip ! cl options
-    [ dup '[ _ mdb-persistent add-mixin-instance ] with-compilation-unit ] dip 
+    [ dup '[ _ mdb-persistent add-mixin-instance ] with-compilation-unit ] dip
+    [ dup annotate-writers ] dip 
     set-slot-map ;
 
 : ensure-table ( class -- )
@@ -39,8 +40,10 @@ SYNTAX: MDBTUPLE:
 <PRIVATE
 
 GENERIC: id-selector ( object -- selector )
+
 M: string id-selector ( objid -- selector )
    "_id" H{ } clone [ set-at ] keep ; inline
+
 M: mdb-persistent id-selector ( mdb-persistent -- selector )
    _id>> id-selector ;
 

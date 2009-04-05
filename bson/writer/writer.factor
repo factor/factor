@@ -4,7 +4,7 @@ USING: accessors assocs bson.constants byte-arrays byte-vectors
 calendar fry io io.binary io.encodings io.encodings.binary
 io.encodings.utf8 io.streams.byte-array kernel math math.parser
 namespaces quotations sequences sequences.private serialize strings
-words ;
+words combinators.short-circuit ;
 
 
 IN: bson.writer
@@ -164,3 +164,6 @@ PRIVATE>
 : assoc>stream ( assoc -- )
     bson-write ; inline
 
+: mdb-special-value? ( value -- ? )
+   { [ timestamp? ] [ quotation? ] [ mdbregexp? ]
+     [ oid? ] [ byte-array? ] } 1|| ;
