@@ -87,4 +87,4 @@ f initialize-test set-global
 
 [ 7575 ] [ initialize-test [ 7575 ] initialize-alien ] unit-test
 
-[ { BAD-ALIEN } ] [ { BAD-ALIEN BAD-ALIEN BAD-ALIEN } prune ] unit-test
+[ V{ BAD-ALIEN } ] [ { BAD-ALIEN BAD-ALIEN BAD-ALIEN } prune ] unit-test
