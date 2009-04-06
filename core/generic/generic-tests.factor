@@ -105,9 +105,6 @@ M: shit big-generic-test "shit" ;
 [ float ] [ \ real \ float math-class-max ] unit-test
 [ fixnum ] [ \ fixnum \ null math-class-max ] unit-test
 
-[ t ] [ { hashtable equal? } method-spec? ] unit-test
-[ f ] [ { word = } method-spec? ] unit-test
-
 ! Regression
 TUPLE: first-one ;
 TUPLE: second-one ;
