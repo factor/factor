@@ -47,9 +47,26 @@ watching-site "WATCHING_SITE" {
     { "site-id" "SITE_ID" INTEGER +user-assigned-id+ }
 } define-persistent
 
-TUPLE: reporting-site email url up? changed? last-up? error last-error ;
+TUPLE: spidering-site < watching-site max-depth max-count ;
 
-<PRIVATE
+SLOT: site
+
+M: watching-site site>>
+    site-id>> site new swap >>site-id select-tuple ;
+
+SLOT: account
+
+M: watching-site account>>
+    account-name>> account new swap >>account-name select-tuple ;
+
+spidering-site "SPIDERING_SITE" {
+    { "account-name" "ACCOUNT_NAME" VARCHAR +user-assigned-id+ }
+    { "site-id" "SITE_ID" INTEGER +user-assigned-id+ }
+    { "max-depth" "MAX_DEPTH" INTEGER }
+    { "max-count" "MAX_COUNT" INTEGER }
+} define-persistent
+
+TUPLE: reporting-site site-id email url up? changed? last-up? error last-error ;
 
 : set-notify-site-watchers ( site new-up? -- site )
     [ over up?>> = [ t >>changed? ] unless ] keep >>up? ;
@@ -81,8 +98,6 @@ TUPLE: reporting-site email url up? changed? last-up? error last-error ;
 
 : select-account/site ( username url -- account site )
     insert-site site-id>> ;
-
-PRIVATE>
 
 : watch-site ( username url -- )
     select-account/site <watching-site> insert-tuple ;

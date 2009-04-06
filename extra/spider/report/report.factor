@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators kernel math
 math.statistics namespaces sequences sorting xml.syntax
-spider ;
+spider urls html ;
 IN: spider.report
 
 SYMBOL: network-failures
@@ -87,27 +87,37 @@ SYMBOL: time-std
     slowest-pages-table
     timing-summary-table
     [XML
-    <h2>Slowest pages</h2>
+    <h3>Slowest pages</h3>
     <->
 
-    <h2>Summary</h2>
+    <h3>Summary</h3>
     <->
     XML] ;
 
 : generate-report ( -- html )
+    url get dup
     report-broken-pages
     report-network-failures
     report-timings
     [XML
-    <h1>Broken pages</h1>
+    <h1>Spider report</h1>
+    URL: <a href=<->><-></a>
+
+    <h2>Broken pages</h2>
     <->
 
-    <h1>Network failures</h1>
+    <h2>Network failures</h2>
     <->
 
-    <h1>Load times</h1>
+    <h2>Load times</h2>
     <->
     XML] ;
 
 : spider-report ( spider -- html )
-    [ spidered>> process-results generate-report ] with-scope ;
+    [ "Spider report" f ] dip
+    [
+        [ base>> url set ]
+        [ spidered>> process-results ] bi
+        generate-report
+    ] with-scope
+    simple-page ;
