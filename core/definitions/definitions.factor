@@ -3,6 +3,8 @@
 USING: kernel sequences namespaces assocs graphs math math.order ;
 IN: definitions
 
+MIXIN: definition
+
 ERROR: no-compilation-unit definition ;
 
 SYMBOLS: inlined-dependency flushed-dependency called-dependency ;
