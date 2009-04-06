@@ -278,11 +278,7 @@ GENERIC: generic-see-test-with-f ( obj -- obj )
 M: f generic-see-test-with-f ;
 
 [ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
-    [ { POSTPONE: f generic-see-test-with-f } see ] with-string-writer
-] unit-test
-
-[ "USING: prettyprint.tests ;\nM: f generic-see-test-with-f ;\n" ] [
-    [ \ f \ generic-see-test-with-f method see ] with-string-writer
+    [ M\ f generic-see-test-with-f see ] with-string-writer
 ] unit-test
 
 PREDICATE: predicate-see-test < integer even? ;
@@ -309,5 +305,5 @@ GENERIC: ended-up-ballin' ( a -- b )
 M: started-out-hustlin' ended-up-ballin' ; inline
 
 [ "USING: prettyprint.tests ;\nM: started-out-hustlin' ended-up-ballin' ; inline\n" ] [
-    [ { started-out-hustlin' ended-up-ballin' } see ] with-string-writer
+    [ M\ started-out-hustlin' ended-up-ballin' see ] with-string-writer
 ] unit-test
