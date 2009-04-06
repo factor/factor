@@ -188,5 +188,8 @@ M: generic subwords
 M: generic forget*
     [ subwords forget-all ] [ call-next-method ] bi ;
 
+M: class forget-methods
+    [ implementors ] [ [ swap method ] curry ] bi map forget-all ;
+
 : xref-generics ( -- )
     all-words [ subwords [ xref ] each ] each ;
