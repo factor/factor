@@ -10,9 +10,6 @@ IN: ui.text.core-text
 
 SINGLETON: core-text-renderer
 
-M: core-text-renderer init-text-rendering
-    <cache-assoc> >>text-handle drop ;
-
 M: core-text-renderer string-dim
     [ " " string-dim { 0 1 } v* ]
     [ cached-line dim>> ]
@@ -22,9 +19,9 @@ M: core-text-renderer flush-layout-cache
     cached-lines get purge-cache ;
 
 : rendered-line ( font string -- texture )
-    world get world-text-handle
-    [ cached-line [ image>> ] [ loc>> ] bi <texture> ]
-    2cache ;
+    world get world-text-handle [
+        cached-line [ image>> ] [ loc>> ] bi <texture>
+    ] 2cache ;
 
 M: core-text-renderer draw-string ( font string -- )
     rendered-line draw-texture ;

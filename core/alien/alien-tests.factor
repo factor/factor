@@ -1,6 +1,6 @@
 USING: accessors alien alien.accessors alien.syntax byte-arrays arrays
 kernel kernel.private namespaces tools.test sequences libc math
-system prettyprint layouts alien.libraries ;
+system prettyprint layouts alien.libraries sets ;
 IN: alien.tests
 
 [ t ] [ -1 <alien> alien-address 0 > ] unit-test
@@ -86,3 +86,5 @@ f initialize-test set-global
 [ ] [ initialize-test get BAD-ALIEN >>alien drop ] unit-test
 
 [ 7575 ] [ initialize-test [ 7575 ] initialize-alien ] unit-test
+
+[ V{ BAD-ALIEN } ] [ { BAD-ALIEN BAD-ALIEN BAD-ALIEN } prune ] unit-test

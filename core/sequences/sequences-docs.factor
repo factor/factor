@@ -311,7 +311,7 @@ HELP: each-index
 
 HELP: map-index
 { $values
-     { "seq" sequence } { "quot" quotation } }
+  { "seq" sequence } { "quot" quotation } { "newseq" sequence } }
 { $description "Calls the quotation with the element of the sequence and its index on the stack, with the index on the top of the stack. Collects the outputs of the quotation and outputs them in a sequence of the same type as the input sequence." }
 { $examples { $example "USING: sequences prettyprint math ;"
 "{ 10 20 30 } [ + ] map-index ."
