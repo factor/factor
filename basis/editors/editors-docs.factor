@@ -22,7 +22,7 @@ HELP: edit
     "A word's documentation:"
     { $code "\\ foo >link edit" }
     "A method definition:"
-    { $code "{ editor draw-gadget* } edit" }
+    { $code "M\\ fixnum + edit" }
     "A help article:"
     { $code "\"handbook\" >link edit" }
 } ;
