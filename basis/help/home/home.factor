@@ -21,7 +21,7 @@ M: apropos add-recent-where recent-searches ;
 M: object add-recent-where f ;
 
 : $recent ( element -- )
-    first get [ nl ] [ 1array $pretty-link ] interleave ;
+    first get reverse [ nl ] [ 1array $pretty-link ] interleave ;
 
 : $recent-searches ( element -- )
     drop recent-searches get [ <$link> ] map $list ;
