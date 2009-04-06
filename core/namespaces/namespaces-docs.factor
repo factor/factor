@@ -32,7 +32,7 @@ ARTICLE: "namespaces.private" "Namespace implementation details"
 { $subsection >n }
 { $subsection ndrop } ;
 
-ARTICLE: "namespaces" "Variables and namespaces"
+ARTICLE: "namespaces" "Dynamic variables and namespaces"
 "The " { $vocab-link "namespaces" } " vocabulary implements simple dynamically-scoped variables."
 $nl
 "A variable is an entry in an assoc of bindings, where the assoc is implicit rather than passed on the stack. These assocs are termed " { $emphasis "namespaces" } ". Nesting of scopes is implemented with a search order on namespaces, defined by a " { $emphasis "namestack" } ". Since namespaces are just assoc, any object can be used as a variable, however by convention, variables are keyed by symbols (see " { $link "words.symbol" } ")."
@@ -43,7 +43,6 @@ $nl
 "Various utility words abstract away common variable access patterns:"
 { $subsection "namespaces-change" }
 { $subsection "namespaces-combinators" }
-{ $subsection "namespaces-global" }
 "Implementation details your code probably does not care about:"
 { $subsection "namespaces.private" }
 "An alternative to dynamic scope is lexical scope. Lexically-scoped values and closures are implemented in the " { $vocab-link "locals" } " vocabulary." ;
