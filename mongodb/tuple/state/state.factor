@@ -1,5 +1,5 @@
 USING: classes kernel accessors sequences fry assocs mongodb.tuple.collection
-advice words classes.tuple slots ;
+advice words classes.tuple slots generic ;
 
 IN: mongodb.tuple.state
 
@@ -56,8 +56,7 @@ PRIVATE>
    [ [ [ dup mark-dirty ] MDB_DIRTY_ADVICE ] dip advise-after ] if ;
 
 : (annotate-writer) ( class name -- )
-   writer-word "methods" word-prop at
-   [ create-advice ] when* ;
+   writer-word method [ create-advice ] when* ;
 
 PRIVATE>
 
