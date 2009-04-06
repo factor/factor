@@ -73,15 +73,12 @@ IN: project-euler.054
     "resource:extra/project-euler/054/poker.txt" ascii file-lines
     [ [ 14 head-slice ] [ 14 tail-slice* ] bi 2array ] map ;
 
-: player1-win? ( hand1 hand2 -- ? )
-    before? ; inline
-
 PRIVATE>
 
 : euler054 ( -- answer )
-    source-054 [ [ <hand> ] map first2 player1-win? ] count ;
+    source-054 [ [ <hand> ] map first2 before? ] count ;
 
 ! [ euler054 ] 100 ave-time
-! 36 ms ave run time - 2.71 SD (100 trials)
+! 34 ms ave run time - 2.65 SD (100 trials)
 
 SOLUTION: euler054
