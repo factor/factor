@@ -44,7 +44,7 @@ IN: project-euler.common
 
 : (sum-divisors) ( n -- sum )
     dup sqrt >integer [1,b] [
-        [ 2dup mod 0 = [ 2dup / + , ] [ drop ] if ] each
+        [ 2dup divisor? [ 2dup / + , ] [ drop ] if ] each
         dup perfect-square? [ sqrt >fixnum neg , ] [ drop ] if
     ] { } make sum ;
 
@@ -57,7 +57,7 @@ PRIVATE>
     >lower [ CHAR: a - 1+ ] sigma ;
 
 : cartesian-product ( seq1 seq2 -- seq1xseq2 )
-    swap [ swap [ 2array ] with map ] with map concat ;
+    [ [ 2array ] with map ] curry map concat ;
 
 : log10 ( m -- n )
     log 10 log / ;
@@ -74,6 +74,9 @@ PRIVATE>
 
 : number>digits ( n -- seq )
     [ dup 0 = not ] [ 10 /mod ] produce reverse nip ;
+
+: number-length ( n -- m )
+    log10 floor 1+ >integer ;
 
 : nth-triangle ( n -- n )
     dup 1+ * 2 / ;
@@ -117,7 +120,7 @@ PRIVATE>
     factor-2s dup [ 1+ ]
     [ perfect-square? -1 0 ? ]
     [ dup sqrt >fixnum [1,b] ] tri* [
-        dupd mod 0 = [ [ 2 + ] dip ] when
+        dupd divisor? [ [ 2 + ] dip ] when
     ] each drop * ;
 
 ! These transforms are for generating primitive Pythagorean triples
@@ -134,4 +137,3 @@ SYNTAX: SOLUTION:
     [ drop in get vocab (>>main) ]
     [ [ . ] swap prefix (( -- )) define-declared ]
     2bi ;
-

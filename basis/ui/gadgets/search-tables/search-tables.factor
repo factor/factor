@@ -28,6 +28,7 @@ TUPLE: search-field < track field ;
 
 : <search-field> ( model -- gadget )
     horizontal search-field new-track
+        0 >>fill
         { 5 5 } >>gap
         +baseline+ >>align
         swap <model-field> 10 >>min-cols >>field

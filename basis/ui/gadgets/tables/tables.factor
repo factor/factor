@@ -268,12 +268,13 @@ M: table model-changed
 : mouse-row ( table -- n )
     [ hand-rel second ] keep y>line ;
 
+: if-mouse-row ( table true: ( table mouse-index -- ) false: ( table -- ) -- )
+    [ [ mouse-row ] keep 2dup valid-line? ]
+    [ ] [ '[ nip @ ] ] tri* if ; inline
+
 : table-button-down ( table -- )
     dup takes-focus?>> [ dup request-focus ] when
-    dup control-value empty? [ drop ] [
-        dup [ mouse-row ] keep validate-line
-        [ >>mouse-index ] [ (select-row) ] bi
-    ] if ;
+    [ swap [ >>mouse-index ] [ (select-row) ] bi ] [ drop ] if-mouse-row ;
 
 PRIVATE>
 
@@ -283,11 +284,14 @@ PRIVATE>
     [ 2drop ]
     if ;
 
+: row-action? ( table -- ? )
+    [ [ mouse-row ] keep valid-line? ]
+    [ single-click?>> hand-click# get 2 = or ] bi and ;
+
 <PRIVATE
 
 : table-button-up ( table -- )
-    dup single-click?>> hand-click# get 2 = or
-    [ row-action ] [ update-selected-value ] if ;
+    dup row-action? [ row-action ] [ update-selected-value ] if ;
 
 : select-row ( table n -- )
     over validate-line
@@ -319,13 +323,6 @@ PRIVATE>
 
 : next-page ( table -- )
     1 prev/next-page ;
-
-: valid-row? ( row table -- ? )
-    control-value length 1- 0 swap between? ;
-
-: if-mouse-row ( table true false -- )
-    [ [ mouse-row ] keep 2dup valid-row? ]
-    [ ] [ '[ nip @ ] ] tri* if ; inline
 
 : show-mouse-help ( table -- )
     [

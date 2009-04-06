@@ -7,10 +7,10 @@ IN: alien.fortran
 ARTICLE: "alien.fortran-abis" "Fortran ABIs"
 "Fortran does not have a standard ABI like C does. Factor supports the following Fortran ABIs:"
 { $list
-    { { $subsection gfortran-abi } " is used by gfortran, the Fortran compiler included with GCC 4." }
-    { { $subsection f2c-abi } " is used by the F2C Fortran-to-C translator and G77, the Fortran compiler included with GCC 3.x and earlier. It is also used by gfortran when compiling with the -ff2c flag." }
-    { { $subsection intel-unix-abi } " is used by the Intel Fortran Compiler on Linux and Mac OS X." }
-    { { $subsection intel-windows-abi } " is used by the Intel Fortran Compiler on Windows." }
+    { { $link gfortran-abi } " is used by gfortran, the Fortran compiler included with GCC 4." }
+    { { $link f2c-abi } " is used by the F2C Fortran-to-C translator and G77, the Fortran compiler included with GCC 3.x and earlier. It is also used by gfortran when compiling with the -ff2c flag." }
+    { { $link intel-unix-abi } " is used by the Intel Fortran Compiler on Linux and Mac OS X." }
+    { { $link intel-windows-abi } " is used by the Intel Fortran Compiler on Windows." }
 }
 "A library's ABI is specified when that library is opened by the " { $link add-fortran-library } " word." ;
 

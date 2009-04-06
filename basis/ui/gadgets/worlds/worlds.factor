@@ -3,8 +3,7 @@
 USING: accessors arrays assocs continuations kernel math models
 namespaces opengl sequences io combinators combinators.short-circuit
 fry math.vectors math.rectangles cache ui.gadgets ui.gestures
-ui.render ui.text ui.text.private ui.backend ui.gadgets.tracks
-ui.commands ;
+ui.render ui.backend ui.gadgets.tracks ui.commands ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < track
@@ -53,7 +52,6 @@ M: world request-focus-on ( child gadget -- )
         swap >>status
         swap >>title
         swap 1 track-add
-    dup init-text-rendering
     dup request-focus ;
 
 : <world> ( gadget title status -- world )
@@ -74,15 +72,20 @@ M: world remove-gadget
     2dup layers>> memq?
     [ layers>> delq ] [ call-next-method ] if ;
 
+SYMBOL: flush-layout-cache-hook
+
+flush-layout-cache-hook [ [ ] ] initialize
+
 : (draw-world) ( world -- )
     dup handle>> [
         {
             [ init-gl ]
             [ draw-gadget ]
-            [ finish-text-rendering ]
+            [ text-handle>> [ purge-cache ] when* ]
             [ images>> [ purge-cache ] when* ]
         } cleave
-    ] with-gl-context ;
+    ] with-gl-context
+    flush-layout-cache-hook get call( -- ) ;
 
 : draw-world? ( world -- ? )
     #! We don't draw deactivated worlds, or those with 0 size.

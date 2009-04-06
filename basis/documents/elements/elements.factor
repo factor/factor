@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators documents fry kernel math sequences
-unicode.categories accessors ;
+accessors unicode.categories unicode.breaks combinators.short-circuit ;
 IN: documents.elements
 
 GENERIC: prev-elt ( loc document elt -- newloc )
@@ -20,27 +20,32 @@ SINGLETON: char-elt
 
 <PRIVATE
 
-: (prev-char) ( loc document quot -- loc )
+: prev ( loc document quot: ( loc document -- loc ) -- loc )
     {
         { [ pick { 0 0 } = ] [ 2drop ] }
         { [ pick second zero? ] [ drop [ first 1- ] dip line-end ] }
         [ call ]
     } cond ; inline
 
-: (next-char) ( loc document quot -- loc )
+: next ( loc document quot: ( loc document -- loc ) -- loc )
     {
         { [ 2over doc-end = ] [ 2drop ] }
         { [ 2over line-end? ] [ 2drop first 1+ 0 2array ] }
         [ call ]
     } cond ; inline
 
+: modify-col ( loc document quot: ( col str -- col' ) -- loc )
+    pick [
+        [ [ first2 swap ] dip doc-line ] dip call
+    ] dip =col ; inline
+
 PRIVATE>
 
 M: char-elt prev-elt
-    drop [ drop -1 +col ] (prev-char) ;
+    drop [ [ last-grapheme-from ] modify-col ] prev ;
 
 M: char-elt next-elt
-    drop [ drop 1 +col ] (next-char) ;
+    drop [ [ first-grapheme-from ] modify-col ] next ;
 
 SINGLETON: one-char-elt
 
@@ -50,21 +55,16 @@ M: one-char-elt next-elt 2drop ;
 
 <PRIVATE
 
-: (word-elt) ( loc document quot -- loc )
-    pick [
-        [ [ first2 swap ] dip doc-line ] dip call
-    ] dip =col ; inline
-
-: ((word-elt)) ( n seq -- n seq ? )
+: blank-at? ( n seq -- n seq ? )
     2dup ?nth blank? ;
 
 : break-detector ( ? -- quot )
     '[ blank? _ xor ] ; inline
 
-: (prev-word) ( col str ? -- col )
+: prev-word ( col str ? -- col )
     break-detector find-last-from drop ?1+ ;
 
-: (next-word) ( col str ? -- col )
+: next-word ( col str ? -- col )
     [ break-detector find-from drop ] [ drop length ] 2bi or ;
 
 PRIVATE>
@@ -73,23 +73,23 @@ SINGLETON: one-word-elt
 
 M: one-word-elt prev-elt
     drop
-    [ [ 1- ] dip f (prev-word) ] (word-elt) ;
+    [ [ 1- ] dip f prev-word ] modify-col ;
 
 M: one-word-elt next-elt
     drop
-    [ f (next-word) ] (word-elt) ;
+    [ f next-word ] modify-col ;
 
 SINGLETON: word-elt
 
 M: word-elt prev-elt
     drop
-    [ [ [ 1- ] dip ((word-elt)) (prev-word) ] (word-elt) ]
-    (prev-char) ;
+    [ [ [ 1- ] dip blank-at? prev-word ] modify-col ]
+    prev ;
 
 M: word-elt next-elt
     drop
-    [ [ ((word-elt)) (next-word) ] (word-elt) ]
-    (next-char) ;
+    [ [ blank-at? next-word ] modify-col ]
+    next ;
 
 SINGLETON: one-line-elt
 

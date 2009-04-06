@@ -1,4 +1,4 @@
-! Copyright (c) 2007, 2008 Aaron Schaefer, Samuel Tardieu.
+! Copyright (c) 2007, 2008, 2009 Aaron Schaefer, Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: definitions io io.files io.pathnames kernel math math.parser
     prettyprint project-euler.ave-time sequences vocabs vocabs.loader
@@ -14,14 +14,14 @@ USING: definitions io io.files io.pathnames kernel math math.parser
     project-euler.037 project-euler.038 project-euler.039 project-euler.040
     project-euler.041 project-euler.042 project-euler.043 project-euler.044
     project-euler.045 project-euler.046 project-euler.047 project-euler.048
-    project-euler.052 project-euler.053 project-euler.055 project-euler.056
-    project-euler.057 project-euler.059 project-euler.067 project-euler.071
-    project-euler.073 project-euler.075 project-euler.076 project-euler.079
-    project-euler.092 project-euler.097 project-euler.099 project-euler.100
-    project-euler.116 project-euler.117 project-euler.134 project-euler.148
-    project-euler.150 project-euler.151 project-euler.164 project-euler.169
-    project-euler.173 project-euler.175 project-euler.186 project-euler.190
-    project-euler.203 project-euler.215 ;
+    project-euler.049 project-euler.052 project-euler.053 project-euler.054
+    project-euler.055 project-euler.056 project-euler.057 project-euler.059
+    project-euler.067 project-euler.071 project-euler.073 project-euler.075
+    project-euler.076 project-euler.079 project-euler.092 project-euler.097
+    project-euler.099 project-euler.100 project-euler.116 project-euler.117
+    project-euler.134 project-euler.148 project-euler.150 project-euler.151
+    project-euler.164 project-euler.169 project-euler.173 project-euler.175
+    project-euler.186 project-euler.190 project-euler.203 project-euler.215 ;
 IN: project-euler
 
 <PRIVATE

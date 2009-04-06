@@ -2,13 +2,14 @@ USING: alien byte-arrays help.markup help.syntax math math.blas.vectors sequence
 IN: math.blas.matrices
 
 ARTICLE: "math.blas-summary" "Basic Linear Algebra Subroutines (BLAS) interface"
-"Factor provides an interface to high-performance vector and matrix math routines available in the system's BLAS library. A set of specialized types are provided for handling packed, unboxed vector data:"
+"Factor provides an interface to high-performance vector and matrix math routines available in implementations of the BLAS math library. A set of specialized types are provided for handling packed, unboxed vector data:"
 { $subsection "math.blas-types" }
 "Scalar-vector and vector-vector operations are available in the " { $vocab-link "math.blas.vectors" } " vocabulary:"
 { $subsection "math.blas.vectors" }
 "Vector-matrix and matrix-matrix operations are available in the " { $vocab-link "math.blas.matrices" } " vocabulary:"
 { $subsection "math.blas.matrices" }
-"The low-level BLAS Fortran interface can be accessed directly through the " { $vocab-link "math.blas.ffi" } " vocabulary." ;
+"The low-level BLAS Fortran interface can be accessed directly through the " { $vocab-link "math.blas.ffi" } " vocabulary. The BLAS interface can be configured to use different underlying BLAS implementations:"
+{ $subsection "math.blas.config" } ;
 
 ARTICLE: "math.blas-types" "BLAS interface types"
 "BLAS vectors come in single- and double-precision, real and complex flavors:"
