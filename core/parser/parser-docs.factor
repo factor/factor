@@ -92,9 +92,7 @@ ARTICLE: "parser" "The parser"
 "This parser is a general facility for reading textual representations of objects and definitions. The parser is implemented in the " { $vocab-link "parser" } " and " { $vocab-link "syntax" } " vocabularies."
 $nl
 "This section concerns itself with usage and extension of the parser. Standard syntax is described in " { $link "syntax" } "."
-{ $subsection "vocabulary-search" }
 { $subsection "parser-files" }
-{ $subsection "top-level-forms" }
 "The parser can be extended."
 { $subsection "parsing-words" }
 { $subsection "parser-lexer" }
