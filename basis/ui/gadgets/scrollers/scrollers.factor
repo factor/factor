@@ -29,6 +29,13 @@ M: gadget viewport-column-header drop f ;
 
 : scroll-down-line ( scroller -- ) y>> 1 swap slide-by-line ;
 
+: set-scroll-position ( value scroller -- )
+    [
+        viewport>> [ dim>> { 0 0 } ] [ gadget-child pref-dim ] bi
+        4array flip
+    ] keep
+    2dup control-value = [ 2drop ] [ set-control-value ] if ;
+
 <PRIVATE
 
 : do-mouse-scroll ( scroller -- )
@@ -46,21 +53,14 @@ scroller H{
 
 M: viewport pref-dim* gadget-child pref-viewport-dim ;
 
-: scroll ( value scroller -- )
-    [
-        viewport>> [ dim>> { 0 0 } ] [ gadget-child pref-dim ] bi
-        4array flip
-    ] keep
-    2dup control-value = [ 2drop ] [ set-control-value ] if ;
-
 : (scroll>rect) ( rect scroller -- )
-    [ [ loc>> ] [ dim>> { 1 1 } v+ ] bi <rect> ] dip
     {
-        [ scroller-value vneg offset-rect ]
+        [ scroll-position vneg offset-rect ]
         [ viewport>> dim>> rect-min ]
+        [ viewport>> loc>> offset-rect ]
         [ viewport>> [ v- { 0 0 } vmin ] [ v- { 0 0 } vmax ] with-rect-extents v+ ]
-        [ scroller-value v+ ]
-        [ scroll ]
+        [ scroll-position v+ ]
+        [ set-scroll-position ]
     } cleave ;
 
 : relative-scroll-rect ( rect gadget scroller -- newrect )
@@ -72,7 +72,7 @@ M: viewport pref-dim* gadget-child pref-viewport-dim ;
     2&& ;
 
 : (update-scroller) ( scroller -- )
-    [ scroller-value ] keep scroll ;
+    [ scroll-position ] keep set-scroll-position ;
 
 : (scroll>gadget) ( gadget scroller -- )
     2dup swap child? [
@@ -82,7 +82,8 @@ M: viewport pref-dim* gadget-child pref-viewport-dim ;
     ] [ f >>follows (update-scroller) drop ] if ;
 
 : (scroll>bottom) ( scroller -- )
-    [ viewport>> gadget-child pref-dim { 0 1 } v* ] keep scroll ;
+    [ viewport>> gadget-child pref-dim { 0 1 } v* ] keep
+    set-scroll-position ;
 
 GENERIC: update-scroller ( scroller follows -- )
 

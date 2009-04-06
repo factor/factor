@@ -163,6 +163,31 @@ void primitive_fwrite(void)
 	}
 }
 
+void primitive_fseek(void)
+{
+	int whence = to_fixnum(dpop());
+	FILE *file = unbox_alien();
+	off_t offset = to_signed_8(dpop());
+
+	switch(whence)
+	{
+	case 0: whence = SEEK_SET; break;
+	case 1: whence = SEEK_CUR; break;
+	case 2: whence = SEEK_END; break;
+	default:
+		critical_error("Bad value for whence",whence);
+		break;
+	}
+
+	if(FSEEK(file,offset,whence) == -1)
+	{
+		io_error();
+
+		/* Still here? EINTR */
+		critical_error("Don't know what to do; EINTR from fseek()?",0);
+	}
+}
+
 void primitive_fflush(void)
 {
 	FILE *file = unbox_alien();

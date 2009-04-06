@@ -506,7 +506,7 @@ PRIVATE>
     [ [ 0 = ] 2dip if ] 2curry
     each-index ; inline
 
-: map-index ( seq quot -- )
+: map-index ( seq quot -- newseq )
     prepare-index 2map ; inline
 
 : reduce-index ( seq identity quot -- )

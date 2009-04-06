@@ -7,9 +7,6 @@ IN: ui.text.pango
 
 SINGLETON: pango-renderer
 
-M: pango-renderer init-text-rendering
-    <cache-assoc> >>text-handle drop ;
-
 M: pango-renderer string-dim
     [ " " string-dim { 0 1 } v* ]
     [ cached-layout logical-rect>> dim>> [ >integer ] map ] if-empty ;
@@ -18,9 +15,9 @@ M: pango-renderer flush-layout-cache
     cached-layouts get purge-cache ;
 
 : rendered-layout ( font string -- texture )
-    world get world-text-handle
-    [ cached-layout [ image>> ] [ text-position vneg ] bi <texture> ]
-    2cache ;
+    world get world-text-handle [
+        cached-layout [ image>> ] [ text-position vneg ] bi <texture>
+    ] 2cache ;
 
 M: pango-renderer draw-string ( font string -- )
     rendered-layout draw-texture ;

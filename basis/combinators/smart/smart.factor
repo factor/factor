@@ -4,6 +4,9 @@ USING: accessors fry generalizations kernel macros math.order
 stack-checker math ;
 IN: combinators.smart
 
+MACRO: drop-outputs ( quot -- quot' )
+    dup infer out>> '[ @ _ ndrop ] ;
+
 MACRO: output>sequence ( quot exemplar -- newquot )
     [ dup infer out>> ] dip
     '[ @ _ _ nsequence ] ;

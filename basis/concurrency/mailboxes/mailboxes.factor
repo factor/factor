@@ -49,7 +49,7 @@ M: mailbox dispose* threads>> notify-all ;
 
 : mailbox-get-all-timeout ( mailbox timeout -- array )
     block-if-empty
-    [ dup mailbox-empty? ]
+    [ dup mailbox-empty? not ]
     [ dup data>> pop-back ]
     produce nip ;
 
