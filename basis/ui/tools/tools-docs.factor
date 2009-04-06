@@ -55,7 +55,7 @@ $nl
 
 ARTICLE: "ui-tools" "UI developer tools"
 "The " { $vocab-link "ui.tools" } " vocabulary hierarchy implements a collection of simple developer tools."
-$nl
+{ $subsection "starting-ui-tools" }
 "To take full advantage of the UI tools, you should be using a supported text editor. See " { $link "editor" } "."
 $nl
 "Common functionality:"
@@ -66,7 +66,7 @@ $nl
 { $subsection "ui-listener" }
 { $subsection "ui-browser" }
 { $subsection "ui-inspector" }
-{ $subsection "ui-profiler" }
+{ $subsection "ui.tools.profiler" }
 { $subsection "ui-walker" }
 { $subsection "ui.tools.deploy" }
 "Platform-specific features:"

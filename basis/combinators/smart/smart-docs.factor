@@ -108,17 +108,19 @@ HELP: append-outputs-as
 
 
 ARTICLE: "combinators.smart" "Smart combinators"
-"The " { $vocab-link "combinators.smart" } " vocabulary implements " { $emphasis "smart combinators" } ". A smart combinator is one whose behavior depends on the static stack effect of an input quotation." $nl
-"Smart inputs from a sequence:"
+"The macros in the " { $vocab-link "combinators.smart" } " vocabulary look at the static stack effects of input quotations and generate code which produces or consumes the relevant number of stack values." $nl
+"Call a quotation and discard all output values:"
+{ $subsection drop-outputs }
+"Take all input values from a sequence:"
 { $subsection input<sequence }
-"Smart outputs to a sequence:"
+"Store all output values to a sequence:"
 { $subsection output>sequence }
 { $subsection output>array }
-"Reducing the output of a quotation:"
+"Reducing the set of output values:"
 { $subsection reduce-outputs }
-"Summing the output of a quotation:"
+"Summing output values:"
 { $subsection sum-outputs }
-"Appending the results of a quotation:"
+"Concatenating output values:"
 { $subsection append-outputs }
 { $subsection append-outputs-as } ;
 
