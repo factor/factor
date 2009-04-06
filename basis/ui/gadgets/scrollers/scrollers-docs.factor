@@ -15,7 +15,7 @@ HELP: scroll-position
 { $values { "scroller" scroller } { "loc" "a pair of integers" } }
 { $description "Outputs the offset of the top-left corner of the scroller's " { $link viewport } "'s child." } ;
 
-{ scroll-position scroll scroll>bottom scroll>top scroll>rect } related-words
+{ scroll-position set-scroll-position scroll>bottom scroll>top scroll>rect } related-words
 
 HELP: <scroller>
 { $values { "gadget" gadget } { "scroller" "a new " { $link scroller } } }
@@ -23,7 +23,7 @@ HELP: <scroller>
 
 { <viewport> <scroller> } related-words
 
-HELP: scroll
+HELP: set-scroll-position
 { $values { "scroller" scroller } { "value" "a pair of integers" } }
 { $description "Sets the offset of the top-left corner of the scroller's " { $link viewport } "'s child." } ;
 
