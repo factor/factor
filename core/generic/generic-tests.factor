@@ -161,7 +161,7 @@ M: sequence generic-forget-test-2 = ;
 ] unit-test
 
 [ ] [
-    [ { sequence generic-forget-test-2 } forget ] with-compilation-unit
+    [ M\ sequence generic-forget-test-2 forget ] with-compilation-unit
 ] unit-test
 
 [ f ] [
@@ -231,7 +231,7 @@ M: number c-n-m-cache ;
 
 [ 3 ] [ 2 c-n-m-cache ] unit-test
 
-[ ] [ [ { integer c-n-m-cache } forget ] with-compilation-unit ] unit-test
+[ ] [ [ M\ integer c-n-m-cache forget ] with-compilation-unit ] unit-test
 
 [ 2 ] [ 2 c-n-m-cache ] unit-test
 
