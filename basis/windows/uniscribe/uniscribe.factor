@@ -71,11 +71,8 @@ TUPLE: script-string font string metrics ssa size image disposed ;
 : draw-script-string ( dc script-string -- )
     [ font>> set-dc-colors ] keep (draw-script-string) ;
 
-: script-string-bitmap-size ( script-string -- dim )
-    size>> dup small-texture? [ [ next-power-of-2 ] map ] when ;
-
 :: make-script-string-image ( dc script-string -- image )
-    script-string script-string-bitmap-size dc
+    script-string size>> dc
     [ dc script-string draw-script-string ] make-bitmap-image ;
 
 : set-dc-font ( dc font -- )

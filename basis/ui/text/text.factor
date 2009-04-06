@@ -66,7 +66,7 @@ M: string draw-text draw-string ;
 M: selection draw-text draw-string ;
 
 M: array draw-text
-    GL_MODELVIEW [
+    [
         [
             [ draw-string ]
             [ [ 0.0 ] 2dip string-height 0.0 glTranslated ] 2bi

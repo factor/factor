@@ -41,18 +41,18 @@ M: effect pprint* effect>string "(" ")" surround text ;
 : pprint-prefix ( word quot -- )
     <block swap pprint-word call block> ; inline
 
+M: parsing-word pprint*
+    \ POSTPONE: [ pprint-word ] pprint-prefix ;
+
 M: word pprint*
-    dup parsing-word? [
-        \ POSTPONE: [ pprint-word ] pprint-prefix
-    ] [
-        {
-            [ "break-before" word-prop line-break ]
-            [ pprint-word ]
-            [ ?start-group ]
-            [ ?end-group ]
-            [ "break-after" word-prop line-break ]
-        } cleave
-    ] if ;
+    [ pprint-word ] [ ?start-group ] [ ?end-group ] tri ;
+
+M: method-body pprint*
+    <block
+    \ M\ pprint-word
+    [ "method-class" word-prop pprint-word ]
+    [ "method-generic" word-prop pprint-word ] bi
+    block> ;
 
 M: real pprint* number>string text ;
 
@@ -206,8 +206,8 @@ M: curry pprint* pprint-object ;
 M: compose pprint* pprint-object ;
 
 M: wrapper pprint*
-    dup wrapped>> word? [
-        <block \ \ pprint-word wrapped>> pprint-word block>
-    ] [
-        pprint-object
-    ] if ;
+    {
+        { [ dup wrapped>> method-body? ] [ wrapped>> pprint* ] }
+        { [ dup wrapped>> word? ] [ <block \ \ pprint-word wrapped>> pprint-word block> ] }
+        [ pprint-object ]
+    } cond ;

@@ -37,7 +37,7 @@ IN: tetris.gl
 
 : draw-tetris ( width height tetris -- )
     #! width and height are in pixels
-    GL_MODELVIEW [
+    [
         {
             [ board>> scale-board ]
             [ board>> draw-board ]
