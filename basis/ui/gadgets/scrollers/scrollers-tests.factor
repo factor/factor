@@ -74,7 +74,7 @@ dup layout
         drop
         "g2" get scroll>gadget
         "s" get layout
-        "s" get scroller-value
+        "s" get scroll-position
     ] map [ { 0 0 } = ] all?
 ] unit-test
 
