@@ -11,11 +11,11 @@ HELP: find-scroller
 { $values { "gadget" gadget } { "scroller/f" { $maybe scroller } } }
 { $description "Finds the first parent of " { $snippet "gadget" } " which is a " { $link scroller } ". Outputs " { $link f } " if the gadget is not contained in a " { $link scroller } "." } ;
 
-HELP: scroller-value
+HELP: scroll-position
 { $values { "scroller" scroller } { "loc" "a pair of integers" } }
 { $description "Outputs the offset of the top-left corner of the scroller's " { $link viewport } "'s child." } ;
 
-{ scroller-value scroll scroll>bottom scroll>top scroll>rect } related-words
+{ scroll-position scroll scroll>bottom scroll>top scroll>rect } related-words
 
 HELP: <scroller>
 { $values { "gadget" gadget } { "scroller" "a new " { $link scroller } } }
@@ -48,8 +48,8 @@ ARTICLE: "ui.gadgets.scrollers" "Scroller gadgets"
 { $subsection scroller }
 { $subsection <scroller> }
 "Getting and setting the scroll position:"
-{ $subsection scroller-value }
-{ $subsection scroll }
+{ $subsection scroll-position }
+{ $subsection set-scroll-position }
 "Writing scrolling-aware gadgets:"
 { $subsection scroll>bottom }
 { $subsection scroll>top }
