@@ -3,8 +3,6 @@
 USING: kernel sequences namespaces assocs graphs math math.order ;
 IN: definitions
 
-MIXIN: definition
-
 ERROR: no-compilation-unit definition ;
 
 SYMBOLS: inlined-dependency flushed-dependency called-dependency ;
@@ -42,7 +40,7 @@ GENERIC: set-where ( loc defspec -- )
 
 GENERIC: forget* ( defspec -- )
 
-M: object forget* drop ;
+M: f forget* drop ;
 
 SYMBOL: forgotten-definitions
 
@@ -52,8 +50,6 @@ SYMBOL: forgotten-definitions
 : forget ( defspec -- ) [ forgotten-definition ] [ forget* ] bi ;
 
 : forget-all ( definitions -- ) [ forget ] each ;
-
-GENERIC: synopsis* ( defspec -- )
 
 GENERIC: definer ( defspec -- start end )
 
