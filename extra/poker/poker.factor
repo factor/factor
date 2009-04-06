@@ -4,8 +4,10 @@ USING: accessors ascii binary-search combinators kernel locals math
     math.bitwise math.order poker.arrays sequences splitting ;
 IN: poker
 
-! The algorithm used is based on Cactus Kev's Poker Hand Evaluator:
+! The algorithm used is based on Cactus Kev's Poker Hand Evaluator with
+! the Senzee Perfect Hash Optimization:
 !     http://www.suffecool.net/poker/evaluator.html
+!     http://www.senzee5.com/2006/06/some-perfect-hash.html
 
 <PRIVATE
 
@@ -124,14 +126,22 @@ CONSTANT: VALUE_STR { "" "Straight Flush" "Four of a Kind" "Full House" "Flush"
 : prime-bits ( cards -- q )
     [ HEX: FF bitand ] map-product ;
 
+: perfect-hash-find ( q -- value )
+    #! magic to convert a hand's unique identifying bits to the
+    #! proper index for fast lookup in a table of hand values
+    HEX: E91AAA35 +
+    dup -16 shift bitxor
+    dup   8 shift w+
+    dup  -4 shift bitxor
+    [ -8 shift HEX: 1FF bitand adjustments-table nth ]
+    [ dup 2 shift w+ -19 shift ] bi
+    bitxor values-table nth ;
+
 : hand-value ( cards -- value )
     {
         { [ dup flush?   ] [ flushes-table lookup ] }
         { [ dup unique5? ] [ unique5-table lookup ] }
-        [
-            prime-bits products-table sorted-index
-            values-table nth
-        ]
+        [ prime-bits perfect-hash-find ]
     } cond ;
 
 : >card-rank ( card -- str )
