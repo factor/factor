@@ -15,8 +15,8 @@ HELP: do-enabled
 { $description "Wraps a quotation in " { $link glEnable } "/" { $link glDisable } " calls." } ;
 
 HELP: do-matrix
-{ $values { "mode" { $link GL_MODELVIEW } " or " { $link GL_PROJECTION } } { "quot" quotation } }
-{ $description "Saves and restores the matrix specified by " { $snippet "mode" } " before and after calling the quotation." } ;
+{ $values { "quot" quotation } }
+{ $description "Saves and restores the current matrix before and after calling the quotation." } ;
 
 HELP: gl-line
 { $values { "a" "a pair of integers" } { "b" "a pair of integers" } }

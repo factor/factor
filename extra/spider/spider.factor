@@ -4,42 +4,16 @@ USING: accessors fry html.parser html.parser.analyzer
 http.client kernel tools.time sets assocs sequences
 concurrency.combinators io threads namespaces math multiline
 math.parser inspector urls logging combinators.short-circuit
-continuations calendar prettyprint dlists deques locals ;
+continuations calendar prettyprint dlists deques locals
+spider.unique-deque ;
 IN: spider
 
 TUPLE: spider base count max-count sleep max-depth initial-links
 filters spidered todo nonmatching quiet currently-spidering
-#threads follow-robots ;
+#threads follow-robots? robots ;
 
 TUPLE: spider-result url depth headers
 fetched-in parsed-html links processed-in fetched-at ;
-
-TUPLE: todo-url url depth ;
-
-: <todo-url> ( url depth -- todo-url )
-    todo-url new
-        swap >>depth
-        swap >>url ;
-
-TUPLE: unique-deque assoc deque ;
-
-: <unique-deque> ( -- unique-deque )
-    H{ } clone <dlist> unique-deque boa ;
-
-: url-exists? ( url unique-deque -- ? )
-    [ url>> ] [ assoc>> ] bi* key? ;
-
-: push-url ( url depth unique-deque -- )
-    [ <todo-url> ] dip 2dup url-exists? [
-        2drop
-    ] [
-        [ [ [ t ] dip url>> ] [ assoc>> ] bi* set-at ]
-        [ deque>> push-back ] 2bi
-    ] if ;
-
-: pop-url ( unique-deque -- todo-url ) deque>> pop-front ;
-
-: peek-url ( unique-deque -- todo-url ) deque>> peek-front ;
 
 : <spider> ( base -- spider )
     >url
@@ -89,13 +63,13 @@ TUPLE: unique-deque assoc deque ;
 
 :: new-spidered-result ( spider url depth -- spider-result )
     f url spider spidered>> set-at
-    [ url http-get ] benchmark :> fetch-time :> html :> headers
+    [ url http-get ] benchmark :> fetched-at :> html :> headers
     [
         html parse-html
         spider currently-spidering>>
         over find-all-links normalize-hrefs
     ] benchmark :> processing-time :> links :> parsed-html
-    url depth headers fetch-time parsed-html links processing-time
+    url depth headers fetched-at parsed-html links processing-time
     now spider-result boa ;
 
 :: spider-page ( spider url depth -- )
