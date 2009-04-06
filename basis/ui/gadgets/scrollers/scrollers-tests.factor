@@ -45,13 +45,13 @@ IN: ui.gadgets.scrollers.tests
 
     [ { 100 100 } ] [ "s" get viewport>> gadget-child pref-dim ] unit-test
 
-    [ ] [ { 0 0 } "s" get scroll ] unit-test
+    [ ] [ { 0 0 } "s" get set-scroll-position ] unit-test
 
     [ { 0 0 } ] [ "s" get model>> range-min-value ] unit-test
 
     [ { 100 100 } ] [ "s" get model>> range-max-value ] unit-test
 
-    [ ] [ { 10 20 } "s" get scroll ] unit-test
+    [ ] [ { 10 20 } "s" get set-scroll-position ] unit-test
 
     [ { 10 20 } ] [ "s" get model>> range-value ] unit-test
 
