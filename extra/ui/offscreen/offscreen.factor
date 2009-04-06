@@ -1,7 +1,7 @@
 ! (c) 2008 Joe Groff, see license for details
-USING: accessors continuations images.bitmap kernel math
-sequences ui.gadgets ui.gadgets.worlds ui ui.backend
-destructors ;
+USING: accessors alien.c-types continuations images kernel math
+sequences ui.gadgets ui.gadgets.private ui.gadgets.worlds
+ui.private ui ui.backend destructors locals ;
 IN: ui.offscreen
 
 TUPLE: offscreen-world < world ;
@@ -19,18 +19,24 @@ M: offscreen-world ungraft*
 
 : open-offscreen ( gadget -- world )
     "" f <offscreen-world>
-    [ open-world-window dup relayout-1 ] keep
+    [ open-world-window ] [ relayout-1 ] [ ] tri
     notify-queued ;
 
 : close-offscreen ( world -- )
     ungraft notify-queued ;
 
-: offscreen-world>bitmap ( world -- bitmap )
-    offscreen-pixels bgra>bitmap ;
+:: bgrx>bitmap ( alien w h -- image )
+    <image>
+        { w h } >>dim
+        alien w h * 4 * memory>byte-array >>bitmap
+        BGRX >>component-order ;
+
+: offscreen-world>bitmap ( world -- image )
+    offscreen-pixels bgrx>bitmap ;
 
 : do-offscreen ( gadget quot: ( offscreen-world -- ) -- )
     [ open-offscreen ] dip
     over [ slip ] [ close-offscreen ] [ ] cleanup ; inline
 
-: gadget>bitmap ( gadget -- bitmap )
+: gadget>bitmap ( gadget -- image )
     [ offscreen-world>bitmap ] do-offscreen ;

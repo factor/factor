@@ -9,11 +9,11 @@ IN: compiler.tests
 
 <<
 : libfactor-ffi-tests-path ( -- string )
-    "resource:" normalize-path
+    "resource:" (normalize-path)
     {
         { [ os winnt? ]  [ "libfactor-ffi-test.dll" ] }
         { [ os macosx? ] [ "libfactor-ffi-test.dylib" ] }
-        { [ os unix?  ]  [ "libfactor-ffi-test.a" ] }
+        { [ os unix?  ]  [ "libfactor-ffi-test.so" ] }
     } cond append-path ;
 
 "f-cdecl" libfactor-ffi-tests-path "cdecl" add-library

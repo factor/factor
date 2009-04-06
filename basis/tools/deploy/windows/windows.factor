@@ -9,11 +9,6 @@ IN: tools.deploy.windows
 : copy-dll ( bundle-name -- )
     "resource:factor.dll" swap copy-file-into ;
 
-: copy-pango ( bundle-name -- )
-    "resource:build-support/dlls.txt" ascii file-lines
-    [ "resource:" prepend-path ] map
-    swap copy-files-into ;
-
 :: copy-vm ( executable bundle-name extension -- vm )
     vm "." split1-last drop extension append
     bundle-name executable ".exe" append append-path
@@ -22,9 +17,7 @@ IN: tools.deploy.windows
 : create-exe-dir ( vocab bundle-name -- vm )
     dup copy-dll
     deploy-ui? get [
-        [ copy-pango ]
-        [ "" copy-theme ]
-        [ ".exe" copy-vm ] tri
+        [ "" copy-theme ] [ ".exe" copy-vm ] bi
     ] [ ".com" copy-vm ] if ;
 
 M: winnt deploy*

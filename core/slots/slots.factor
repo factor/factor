@@ -97,7 +97,7 @@ ERROR: bad-slot-value value class ;
     "writing" associate ;
 
 : define-writer-generic ( name -- )
-    writer-word (( object value -- )) define-simple-generic ;
+    writer-word (( value object -- )) define-simple-generic ;
 
 : define-writer ( class slot-spec -- )
     [ nip name>> define-writer-generic ] [

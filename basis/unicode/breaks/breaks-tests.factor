@@ -9,6 +9,9 @@ IN: unicode.breaks.tests
 [ 3 ] [ "\u001112\u001161\u0011abA\u000300a"
         dup last-grapheme head last-grapheme ] unit-test
 
+[ 3 ] [ 2 "hello" first-grapheme-from ] unit-test
+[ 1 ] [ 2 "hello" last-grapheme-from ] unit-test
+
 : grapheme-break-test ( -- filename )
     "vocab:unicode/breaks/GraphemeBreakTest.txt" ;
 

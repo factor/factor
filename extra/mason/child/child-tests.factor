@@ -32,3 +32,11 @@ USING: mason.child mason.config tools.test namespaces ;
         boot-cmd
     ] with-scope
 ] unit-test
+
+[ { "./factor.com" "-i=boot.x86.32.image" "-no-user-init" } ] [
+    [
+        "winnt" target-os set
+        "x86.32" target-cpu set
+        boot-cmd
+    ] with-scope
+] unit-test
