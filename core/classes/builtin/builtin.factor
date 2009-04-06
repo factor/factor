@@ -55,7 +55,7 @@ M: anonymous-intersection (flatten-class)
     [
         builtins get sift [ (flatten-class) ] each
     ] [
-        unclip [ assoc-intersect ] reduce [ swap set ] assoc-each
+        [ ] [ assoc-intersect ] map-reduce [ swap set ] assoc-each
     ] if-empty ;
 
 M: anonymous-complement (flatten-class)
