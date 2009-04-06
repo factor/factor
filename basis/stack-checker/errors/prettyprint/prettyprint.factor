@@ -4,6 +4,8 @@ USING: accessors kernel prettyprint io debugger
 sequences assocs stack-checker.errors summary effects ;
 IN: stack-checker.errors.prettyprint
 
+M: inference-error summary error>> summary ;
+
 M: inference-error error-help error>> error-help ;
 
 M: inference-error error.
