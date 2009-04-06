@@ -133,7 +133,7 @@ M: integer forget-robustness-generic ;
 [
     [ ] [ \ forget-robustness-generic forget ] unit-test
     [ ] [ \ forget-robustness forget ] unit-test
-    [ ] [ { forget-robustness forget-robustness-generic } forget ] unit-test
+    [ ] [ M\ forget-robustness forget-robustness-generic forget ] unit-test
 ] with-compilation-unit
 
 ! rapido found this one
