@@ -62,6 +62,7 @@ IN: bootstrap.syntax
     "W{"
     "["
     "\\"
+    "M\\"
     "]"
     "delimiter"
     "f"

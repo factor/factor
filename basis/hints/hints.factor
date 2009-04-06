@@ -65,7 +65,6 @@ M: object specializer-declaration class ;
 
 SYNTAX: HINTS:
     scan-object
-    dup method-spec? [ first2 method ] when
     [ redefined ]
     [ parse-definition "specializer" set-word-prop ] bi ;
 
@@ -119,6 +118,6 @@ SYNTAX: HINTS:
 
 \ >be { { bignum fixnum } { fixnum fixnum } } "specializer" set-word-prop
 
-\ hashtable \ at* method { { fixnum object } { word object } } "specializer" set-word-prop
+M\ hashtable at* { { fixnum object } { word object } } "specializer" set-word-prop
 
-\ hashtable \ set-at method { { object fixnum object } { object word object } } "specializer" set-word-prop
+M\ hashtable set-at { { object fixnum object } { object word object } } "specializer" set-word-prop
