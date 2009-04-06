@@ -559,7 +559,7 @@ DEFER: subclass-reset-test-3
 
 GENERIC: break-me ( obj -- )
 
-[ ] [ [ { integer break-me } forget ] with-compilation-unit ] unit-test
+[ ] [ [ M\ integer break-me forget ] with-compilation-unit ] unit-test
 
 [ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test ;" <string-reader> "subclass-reset-test" parse-stream drop ] unit-test
 [ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-1 < subclass-reset-test ;" eval ] unit-test
