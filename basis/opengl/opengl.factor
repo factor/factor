@@ -44,9 +44,8 @@ MACRO: all-enabled ( seq quot -- )
 MACRO: all-enabled-client-state ( seq quot -- )
     [ words>values ] dip '[ _ _ (all-enabled-client-state) ] ;
 
-: do-matrix ( mode quot -- )
-    swap [ glMatrixMode glPushMatrix call ] keep
-    glMatrixMode glPopMatrix ; inline
+: do-matrix ( quot -- )
+    glPushMatrix call glPopMatrix ; inline
 
 : gl-material ( face pname params -- )
     float-array{ } like glMaterialfv ;
@@ -165,7 +164,7 @@ MACRO: set-draw-buffers ( buffers -- )
 : delete-dlist ( id -- ) 1 glDeleteLists ;
 
 : with-translation ( loc quot -- )
-    GL_MODELVIEW [ [ gl-translate ] dip call ] do-matrix ; inline
+    [ [ gl-translate ] dip call ] do-matrix ; inline
 
 : fix-coordinates ( point1 point2 -- x1 y2 x2 y2 )
     [ first2 [ >fixnum ] bi@ ] bi@ ;
@@ -177,6 +176,7 @@ MACRO: set-draw-buffers ( buffers -- )
     fix-coordinates glViewport ;
 
 : init-matrices ( -- )
+    #! Leaves with matrix mode GL_MODELVIEW
     GL_PROJECTION glMatrixMode
     glLoadIdentity
     GL_MODELVIEW glMatrixMode

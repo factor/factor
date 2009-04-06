@@ -174,8 +174,7 @@ GENERIC: update-methods ( class seq -- )
         [ forget ] [ drop ] if
     ] [ 2drop ] if ;
 
-: forget-methods ( class -- )
-    [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
+GENERIC: forget-methods ( class -- )
 
 GENERIC: class-forgotten ( use class -- )
 
