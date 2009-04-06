@@ -11,12 +11,7 @@ TUPLE: transition-table transitions start-state final-states ;
         H{ } clone >>transitions
         H{ } clone >>final-states ;
 
-: maybe-initialize-key ( key hashtable -- )
-    ! Why do we have to do this?
-    2dup key? [ 2drop ] [ [ H{ } clone ] 2dip set-at ] if ;
-
 :: (set-transition) ( from to obj hash -- )
-    to condition? [ to hash maybe-initialize-key ] unless
     from hash at
     [ [ to obj ] dip set-at ]
     [ to obj associate from hash set-at ] if* ;
@@ -25,7 +20,6 @@ TUPLE: transition-table transitions start-state final-states ;
     transitions>> (set-transition) ;
 
 :: (add-transition) ( from to obj hash -- )
-    to hash maybe-initialize-key
     from hash at
     [ [ to obj ] dip push-at ]
     [ to 1vector obj associate from hash set-at ] if* ;
