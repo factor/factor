@@ -1616,7 +1616,7 @@ $nl
 { $subsection "sequences.deep" }
 "Using sequences for looping:"
 { $subsection "sequences-integers" }
-{ $subsection "ranges" }
+{ $subsection "math.ranges" }
 "For inner loops:"
 { $subsection "sequences-unsafe" } ;
 
