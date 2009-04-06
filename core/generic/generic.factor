@@ -24,11 +24,6 @@ M: generic definition drop f ;
 : method ( class generic -- method/f )
     "methods" word-prop at ;
 
-PREDICATE: method-spec < pair
-    first2 generic? swap class? and ;
-
-INSTANCE: method-spec definition
-
 : order ( generic -- seq )
     "methods" word-prop keys sort-classes ;
 
@@ -90,9 +85,6 @@ TUPLE: check-method class generic ;
 PREDICATE: method-body < word
     "method-generic" word-prop >boolean ;
 
-M: method-spec stack-effect
-    first2 method stack-effect ;
-
 M: method-body stack-effect
     "method-generic" word-prop stack-effect ;
 
@@ -139,24 +131,6 @@ M: default-method irrelevant? drop t ;
     dupd <default-method> "default-method" set-word-prop ;
 
 ! Definition protocol
-M: method-spec where
-    dup first2 method [ ] [ second ] ?if where ;
-
-M: method-spec set-where
-    first2 method set-where ;
-
-M: method-spec definer
-    first2 method definer ;
-
-M: method-spec definition
-    first2 method definition ;
-
-M: method-spec forget*
-    first2 method [ forgotten-definition ] [ forget* ] bi ;
-
-M: method-spec smart-usage
-    second smart-usage ;
-
 M: method-body definer
     drop \ M: \ ; ;
 
@@ -213,6 +187,9 @@ M: generic subwords
 
 M: generic forget*
     [ subwords forget-all ] [ call-next-method ] bi ;
+
+M: class forget-methods
+    [ implementors ] [ [ swap method ] curry ] bi map forget-all ;
 
 : xref-generics ( -- )
     all-words [ subwords [ xref ] each ] each ;

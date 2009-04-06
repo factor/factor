@@ -167,6 +167,8 @@ $nl
 ARTICLE: "syntax" "Syntax"
 "Factor has two main forms of syntax: " { $emphasis "definition" } " syntax and " { $emphasis "literal" } " syntax. Code is data, so the syntax for code is a special case of object literal syntax. This section documents literal syntax. Definition syntax is covered in " { $link "words" } ". Extending the parser is the main topic of " { $link "parser" } "."
 { $subsection "parser-algorithm" }
+{ $subsection "vocabulary-search" }
+{ $subsection "top-level-forms" }
 { $subsection "syntax-comments" }
 { $subsection "syntax-literals" }
 { $subsection "syntax-immediate" } ;
@@ -762,7 +764,9 @@ HELP: >>
 { $description "Marks the end of a parse time code block." } ;
 
 HELP: call-next-method
+{ $syntax "call-next-method" }
 { $description "Calls the next applicable method. Only valid inside a method definition. The values at the top of the stack are passed on to the next method, and they must be compatible with that method's class specializer." }
+{ $notes "This word looks like an ordinary word but it is a parsing word. It cannot be factored out of a method definition, since the code expansion references the current method object directly." }
 { $errors
     "Throws a " { $link no-next-method } " error if this is the least specific method, and throws an " { $link inconsistent-next-method } " error if the values at the top of the stack are not compatible with the current method's specializer."
 } ;

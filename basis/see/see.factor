@@ -7,7 +7,7 @@ definitions effects generic generic.standard io io.pathnames
 io.streams.string io.styles kernel make namespaces prettyprint
 prettyprint.backend prettyprint.config prettyprint.custom
 prettyprint.sections sequences sets sorting strings summary
-words words.symbol ;
+words words.symbol words.constant words.alias ;
 IN: see
 
 GENERIC: synopsis* ( defspec -- )
@@ -29,8 +29,16 @@ GENERIC: see* ( defspec -- )
 : comment. ( text -- )
     H{ { font-style italic } } styled-text ;
 
+GENERIC: print-stack-effect? ( word -- ? )
+
+M: parsing-word print-stack-effect? drop f ;
+M: symbol print-stack-effect? drop f ;
+M: constant print-stack-effect? drop f ;
+M: alias print-stack-effect? drop f ;
+M: word print-stack-effect? drop t ;
+
 : stack-effect. ( word -- )
-    [ [ parsing-word? ] [ symbol? ] bi or not ] [ stack-effect ] bi and
+    [ print-stack-effect? ] [ stack-effect ] bi and
     [ effect>string comment. ] when* ;
 
 <PRIVATE
@@ -67,9 +75,6 @@ M: hook-generic synopsis*
         [ "combination" word-prop var>> pprint* ]
         [ stack-effect. ]
     } cleave ;
-
-M: method-spec synopsis*
-    first2 method synopsis* ;
 
 M: method-body synopsis*
     [ definer. ]
@@ -113,9 +118,6 @@ M: object see*
         dup definer nip [ pprint-word ] when* declarations.
         block>
     ] with-use ;
-
-M: method-spec see*
-    first2 method see* ;
 
 GENERIC: see-class* ( word -- )
 

@@ -104,6 +104,7 @@ IN: bootstrap.syntax
 
     "POSTPONE:" [ scan-word parsed ] define-core-syntax
     "\\" [ scan-word <wrapper> parsed ] define-core-syntax
+    "M\\" [ scan-word scan-word method <wrapper> parsed ] define-core-syntax
     "inline" [ word make-inline ] define-core-syntax
     "recursive" [ word make-recursive ] define-core-syntax
     "foldable" [ word make-foldable ] define-core-syntax

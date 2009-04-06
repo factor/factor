@@ -130,8 +130,6 @@ M: node node>quot drop ;
 
 GENERIC: optimized. ( quot/word -- )
 
-M: method-spec optimized. first2 method optimized. ;
-
 M: word optimized. specialized-def optimized. ;
 
 M: callable optimized. build-tree optimize-tree nodes>quot . ;
