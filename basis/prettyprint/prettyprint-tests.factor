@@ -180,28 +180,6 @@ DEFER: parse-error-file
     "string-layout-test" string-layout check-see
 ] unit-test
 
-! Define dummy words for the below...
-: <NSRect> ( a b c d -- e ) ;
-: <PixelFormat> ( -- fmt ) ;
-: send ( obj -- ) ;
-
-\ send soft "break-after" set-word-prop
-
-: final-soft-break-test ( -- str )
-    {
-        "USING: kernel sequences ;"
-        "IN: prettyprint.tests"
-        ": final-soft-break-layout ( class dim -- view )"
-        "    [ \"alloc\" send 0 0 ] dip first2 <NSRect>"
-        "    <PixelFormat> \"initWithFrame:pixelFormat:\" send"
-        "    dup 1 \"setPostsBoundsChangedNotifications:\" send"
-        "    dup 1 \"setPostsFrameChangedNotifications:\" send ;"
-    } ;
-
-[ t ] [
-    "final-soft-break-layout" final-soft-break-test check-see
-] unit-test
-
 : narrow-test ( -- str )
     {
         "USING: arrays combinators continuations kernel sequences ;"
