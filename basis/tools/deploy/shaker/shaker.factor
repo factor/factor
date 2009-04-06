@@ -170,8 +170,6 @@ IN: tools.deploy.shaker
         
         strip-prettyprint? [
             {
-                "break-before"
-                "break-after"
                 "delimiter"
                 "flushable"
                 "foldable"

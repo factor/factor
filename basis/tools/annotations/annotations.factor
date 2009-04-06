@@ -20,9 +20,6 @@ M: word reset
         f "unannotated-def" set-word-prop
     ] [ drop ] if ;
 
-M: method-spec reset
-    first2 method reset ;
-
 ERROR: cannot-annotate-twice word ;
 
 <PRIVATE
@@ -31,9 +28,6 @@ ERROR: cannot-annotate-twice word ;
     dup "unannotated-def" word-prop [
         cannot-annotate-twice
     ] when ;
-
-: method-spec>word ( obj -- word )
-    dup method-spec? [ first2 method ] when ;
 
 : save-unannotated-def ( word -- )
     dup def>> "unannotated-def" set-word-prop ;
@@ -44,7 +38,7 @@ ERROR: cannot-annotate-twice word ;
 PRIVATE>
 
 : annotate ( word quot -- )
-    [ method-spec>word check-annotate-twice ] dip
+    [ check-annotate-twice ] dip
     [ over save-unannotated-def (annotate) ] with-compilation-unit ;
 
 <PRIVATE
@@ -101,9 +95,6 @@ M: generic annotate-methods
     [ "methods" word-prop values ] dip [ annotate ] curry each ;
 
 M: word annotate-methods
-    annotate ;
-
-M: method-spec annotate-methods
     annotate ;
 
 : breakpoint ( word -- )
