@@ -25,7 +25,7 @@ M: object specializer-declaration class ;
     [ drop object eq? not ] assoc-filter
     [ [ t ] ] [
         [ swap specializer-predicate append ] { } assoc>map
-        unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
+        [ ] [ swap [ f ] \ if 3array append [ ] like ] map-reduce
     ] if-empty ;
 
 : specializer-cases ( quot word -- default alist )

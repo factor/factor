@@ -99,7 +99,7 @@ SYMBOL: spill-counts
 : interval-to-spill ( active-intervals current -- live-interval )
     #! We spill the interval with the most distant use location.
     start>> '[ dup _ [ >= ] find-use nip ] { } map>assoc
-    unclip-slice [ [ [ second ] bi@ > ] most ] reduce first ;
+    [ ] [ [ [ second ] bi@ > ] most ] map-reduce first ;
 
 : assign-spill ( before after -- before after )
     #! If it has been spilled already, reuse spill location.
