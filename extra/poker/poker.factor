@@ -155,6 +155,19 @@ CONSTANT: VALUE_STR { "" "Straight Flush" "Four of a Kind" "Full House" "Flush"
         [ drop "S" ]
     } cond ;
 
+: hand-rank ( hand -- rank )
+    value>> {
+        { [ dup 6185 > ] [ drop HIGH_CARD ] }        ! 1277 high card
+        { [ dup 3325 > ] [ drop ONE_PAIR ] }         ! 2860 one pair
+        { [ dup 2467 > ] [ drop TWO_PAIR ] }         !  858 two pair
+        { [ dup 1609 > ] [ drop THREE_OF_A_KIND ] }  !  858 three-kind
+        { [ dup 1599 > ] [ drop STRAIGHT ] }         !   10 straights
+        { [ dup 322 > ]  [ drop FLUSH ] }            ! 1277 flushes
+        { [ dup 166 > ]  [ drop FULL_HOUSE ] }       !  156 full house
+        { [ dup 10 > ]   [ drop FOUR_OF_A_KIND ] }   !  156 four-kind
+        [ drop STRAIGHT_FLUSH ]                      !   10 straight-flushes
+    } cond ;
+
 PRIVATE>
 
 TUPLE: hand
@@ -169,23 +182,10 @@ M: hand equal?
     " " split [ >ckf ] map
     dup hand-value hand boa ;
 
-: hand-rank ( hand -- rank )
-    value>> {
-        { [ dup 6185 > ] [ drop HIGH_CARD ] }        ! 1277 high card
-        { [ dup 3325 > ] [ drop ONE_PAIR ] }         ! 2860 one pair
-        { [ dup 2467 > ] [ drop TWO_PAIR ] }         !  858 two pair
-        { [ dup 1609 > ] [ drop THREE_OF_A_KIND ] }  !  858 three-kind
-        { [ dup 1599 > ] [ drop STRAIGHT ] }         !   10 straights
-        { [ dup 322 > ]  [ drop FLUSH ] }            ! 1277 flushes
-        { [ dup 166 > ]  [ drop FULL_HOUSE ] }       !  156 full house
-        { [ dup 10 > ]   [ drop FOUR_OF_A_KIND ] }   !  156 four-kind
-        [ drop STRAIGHT_FLUSH ]                      !   10 straight-flushes
-    } cond ;
-
-: >value ( hand -- str )
-    hand-rank VALUE_STR nth ;
-
 : >cards ( hand -- str )
     cards>> [
         [ >card-rank ] [ >card-suit ] bi append
     ] map " " join ;
+
+: >value ( hand -- str )
+    hand-rank VALUE_STR nth ;
