@@ -373,3 +373,23 @@ SYMBOL: a
 ] unit-test
 
 [ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test
+
+! Check behavior of 307 redirect (reported by Chris Double)
+[ ] [
+    <dispatcher>
+        add-quit-action
+        <action>
+            [ "b" <temporary-redirect> ] >>submit
+        "a" add-responder
+        <action>
+            [
+                request get post-data>> data>> "data" =
+                [ "OK" "text/plain" <content> ] [ "OOPS" throw ] if
+            ] >>submit
+        "b" add-responder
+    test-httpd
+] unit-test
+
+[ "OK" ] [ "data" "http://localhost/a" add-port http-post nip ] unit-test
+
+[ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test
