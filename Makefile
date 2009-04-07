@@ -166,7 +166,7 @@ factor-ffi-test: vm/ffi_test.o
 
 clean:
 	rm -f vm/*.o
-	rm -f factor*.dll libfactor.{a,so,dylib} libfactor-ffi-test.{a,so,dylib}
+	rm -f factor*.dll libfactor.{a,so,dylib} libfactor-ffi-test.{a,so,dylib} Factor.app/Contents/Frameworks/libfactor.dylib
 
 vm/resources.o:
 	$(WINDRES) vm/factor.rs vm/resources.o

@@ -38,12 +38,12 @@ SYMBOL: running-site-watcher
 
 PRIVATE>
 
-: watch-sites ( db -- )
-    [ find-sites check-sites sites-to-report send-reports ] with-db ;
+: watch-sites ( -- )
+    find-sites check-sites sites-to-report send-reports ;
 
 : run-site-watcher ( db -- )
     [ running-site-watcher get ] dip '[ 
-        [ _ watch-sites ] site-watcher-frequency get every
+        [ _ [ watch-sites ] with-db ] site-watcher-frequency get every
         running-site-watcher set
     ] unless ;
 

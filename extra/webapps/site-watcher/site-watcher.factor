@@ -8,65 +8,14 @@ furnace.auth.features.registration furnace.auth.login
 furnace.boilerplate furnace.redirection html.forms http.server
 http.server.dispatchers kernel namespaces site-watcher site-watcher.db
 site-watcher.private urls validators io.sockets.secure.unix.debug
-io.servers.connection db db.tuples sequences ;
+io.servers.connection db db.tuples sequences webapps.site-watcher.common
+webapps.site-watcher.watching webapps.site-watcher.spidering ;
 QUALIFIED: assocs
 IN: webapps.site-watcher
 
-TUPLE: site-watcher-app < dispatcher ;
-
-CONSTANT: site-list-url URL" $site-watcher-app/"
-
 : <main-action> ( -- action )
     <page-action>
-        [
-            logged-in?
-            [ URL" $site-watcher-app/list" <redirect> ]
-            [ { site-watcher-app "main" } <chloe-content> ] if
-        ] >>display ;
-
-: <site-list-action> ( -- action )
-    <page-action>
-        { site-watcher-app "site-list" } >>template
-        [
-            ! Silly query
-            username watching-sites
-            "sites" set-value
-        ] >>init
-    <protected>
-        "list watched sites" >>description ;
-
-: <add-site-action> ( -- action )
-    <action>
-        [
-            { { "url" [ v-url ] } } validate-params
-        ] >>validate
-        [
-            username "url" value watch-site
-            site-list-url <redirect>
-        ] >>submit
-    <protected>
-        "add a watched site" >>description ;
-
-: <remove-site-action> ( -- action )
-    <action>
-        [
-            { { "url" [ v-url ] } } validate-params
-        ] >>validate
-        [
-            username "url" value unwatch-site
-            site-list-url <redirect>
-        ] >>submit
-    <protected>
-        "remove a watched site" >>description ;
-
-: <check-sites-action> ( -- action )
-    <action>
-        [
-            watch-sites
-            site-list-url <redirect>
-        ] >>submit
-    <protected>
-        "check watched sites" >>description ;
+        { site-watcher-app "main" } >>template ;
 
 : <update-notify-action> ( -- action )
     <page-action>
@@ -95,10 +44,14 @@ CONSTANT: site-list-url URL" $site-watcher-app/"
 : <site-watcher-app> ( -- dispatcher )
     site-watcher-app new-dispatcher
         <main-action> "" add-responder
-        <site-list-action> "list" add-responder
-        <add-site-action> "add" add-responder
-        <remove-site-action> "remove" add-responder
+        <watch-list-action> "watch-list" add-responder
+        <add-watched-site-action> "add-watch" add-responder
+        <remove-watched-site-action> "remove-watch" add-responder
         <check-sites-action> "check" add-responder
+        <spider-list-action> "spider-list" add-responder
+        <add-spidered-site-action> "add-spider" add-responder
+        <remove-spidered-site-action> "remove-spider" add-responder
+        <spider-sites-action> "spider" add-responder
         <update-notify-action> "update-notify" add-responder ;
 
 : <login-config> ( responder -- responder' )
@@ -125,12 +78,13 @@ site-watcher-db <alloy>
 main-responder set-global
 
 M: site-watcher-app init-user-profile
-    drop
+    drop B
     "username" value "email" value <account> insert-tuple ;
 
 : init-db ( -- )
     site-watcher-db [
-        { site account watching-site } [ ensure-table ] each
+        { site account watching-site spidering-site }
+        [ ensure-table ] each
     ] with-db ;
 
 : start-site-watcher ( -- )

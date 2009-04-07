@@ -23,7 +23,7 @@ $nl
 ARTICLE: "colors" "Colors"
 "The " { $vocab-link "colors" } " vocabulary defines a protocol for colors, with a concrete implementation for RGBA colors. This vocabulary is used by " { $vocab-link "io.styles" } ", " { $vocab-link "ui" } " and other vocabularies, but it is independent of them."
 $nl
-"RGBA colors:"
+"RGBA colors with floating point components in the range " { $snippet "[0,1]" } ":"
 { $subsection rgba }
 { $subsection <rgba> }
 "Converting a color to RGBA:"
