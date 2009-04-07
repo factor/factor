@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors continuations db db.sqlite db.tuples db.types
 io.directories io.files.temp kernel io.streams.string calendar
-debugger combinators.smart sequences ;
+debugger combinators.smart sequences arrays ;
 IN: site-watcher.db
 
-TUPLE: account account-id account-name email twitter sms ;
+TUPLE: account account-name email twitter sms ;
 
 : <account> ( account-name email -- account )
     account new
@@ -24,6 +24,12 @@ TUPLE: site site-id url up? changed? last-up error last-error ;
 : <site> ( url -- site )
     site new
         swap >>url ;
+
+: site-with-url ( url -- site )
+    <site> select-tuple ;
+
+: site-with-id ( id -- site )
+    site new swap >>site-id select-tuple ;
 
 site "SITE" {
     { "site-id" "SITE_ID" INTEGER +db-assigned-id+ }
@@ -49,10 +55,12 @@ watching-site "WATCHING_SITE" {
 
 TUPLE: spidering-site < watching-site max-depth max-count ;
 
+C: <spidering-site> spidering-site
+
 SLOT: site
 
 M: watching-site site>>
-    site-id>> site new swap >>site-id select-tuple ;
+    site-id>> site-with-id ;
 
 SLOT: account
 
@@ -60,11 +68,24 @@ M: watching-site account>>
     account-name>> account new swap >>account-name select-tuple ;
 
 spidering-site "SPIDERING_SITE" {
-    { "account-name" "ACCOUNT_NAME" VARCHAR +user-assigned-id+ }
-    { "site-id" "SITE_ID" INTEGER +user-assigned-id+ }
     { "max-depth" "MAX_DEPTH" INTEGER }
     { "max-count" "MAX_COUNT" INTEGER }
 } define-persistent
+
+: spidering-sites ( username -- sites )
+    spidering-site new swap >>account-name select-tuples ;
+
+: insert-site ( url -- site )
+    <site> dup select-tuple [ ] [ dup t >>up? insert-tuple ] ?if ;
+
+: select-account/site ( username url -- account site )
+    insert-site site-id>> ;
+
+: add-spidered-site ( username url -- )
+    select-account/site 10 10 <spidering-site> insert-tuple ;
+
+: remove-spidered-site ( username url -- )
+    select-account/site 10 10 <spidering-site> delete-tuples ;
 
 TUPLE: reporting-site site-id email url up? changed? last-up? error last-error ;
 
@@ -89,15 +110,9 @@ TUPLE: reporting-site site-id email url up? changed? last-up? error last-error ;
     [ [ reporting-site boa ] input<sequence ] map
     "update site set changed = 0;" sql-command ;
 
-: insert-site ( url -- site )
-    <site> dup select-tuple [ ] [ dup t >>up? insert-tuple ] ?if ;
-
 : insert-account ( account-name email -- ) <account> insert-tuple ;
 
 : find-sites ( -- seq ) f <site> select-tuples ;
-
-: select-account/site ( username url -- account site )
-    insert-site site-id>> ;
 
 : watch-site ( username url -- )
     select-account/site <watching-site> insert-tuple ;
