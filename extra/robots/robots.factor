@@ -85,7 +85,7 @@ PRIVATE>
 : parse-robots.txt ( string -- sitemaps rules-seq )
     normalize-robots.txt [
         [ <rules> dup ] dip [ parse-robots.txt-line drop ] with each
-    ] map first ;
+    ] map ;
 
 : robots ( url -- robots )
     >url
