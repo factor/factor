@@ -1,8 +1,8 @@
-USING: http http.server http.client http.client.private tools.test multiline
-io.streams.string io.encodings.utf8 io.encodings.8-bit
-io.encodings.binary io.encodings.string kernel arrays splitting
-sequences assocs io.sockets db db.sqlite continuations urls
-hashtables accessors namespaces xml.data ;
+USING: http http.server http.client http.client.private tools.test
+multiline io.streams.string io.encodings.utf8 io.encodings.8-bit
+io.encodings.binary io.encodings.string io.encodings.ascii kernel
+arrays splitting sequences assocs io.sockets db db.sqlite
+continuations urls hashtables accessors namespaces xml.data ;
 IN: http.tests
 
 [ "text/plain" latin1 ] [ "text/plain" parse-content-type ] unit-test
@@ -359,4 +359,17 @@ SYMBOL: a
 ! Test basic auth
 [ "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==" ] [ <request> "Aladdin" "open sesame" set-basic-auth "Authorization" header ] unit-test
 
+! Test a corner case with static responder
+[ ] [
+    <dispatcher>
+        add-quit-action
+        "vocab:http/test/foo.html" <static> >>default
+    test-httpd
+] unit-test
 
+[ t ] [
+    "http://localhost/" add-port http-get nip
+    "vocab:http/test/foo.html" ascii file-contents =
+] unit-test
+
+[ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test
