@@ -39,10 +39,11 @@ SYMBOL: time-std
     timings get sort-values
     [ slowest short tail* reverse slowest-pages set ]
     [
-        values
-        [ mean 1000000 /f mean-time set ]
-        [ median 1000000 /f median-time set ]
-        [ std 1000000 /f time-std set ] tri
+        values [
+            [ mean 1000000 /f mean-time set ]
+            [ median 1000000 /f median-time set ]
+            [ std 1000000 /f time-std set ] tri
+        ] unless-empty
     ] bi ;
 
 : process-results ( results -- )

@@ -163,17 +163,13 @@ TUPLE: id3v1-info title artist album year comment genre ;
         } cond
     ] with-mapped-uchar-file ;
 
-: (find-id3-frame) ( id3 name quot: ( obj -- obj' ) -- obj' )
-    [ swap frames>> at* ] dip
-    [ data>> ] prepose [ drop f ] if ; inline
-
 PRIVATE>
 
 : mp3>id3 ( path -- id3v2-info/f )
     dup file-info size>> 0 <= [ drop f ] [ (mp3>id3) ] if ; inline
 
 : find-id3-frame ( id3 name -- obj/f )
-    [ ] (find-id3-frame) ; inline
+    swap frames>> at* [ data>> ] when ; inline
 
 : title ( id3 -- title/f ) "TIT2" find-id3-frame ; inline
 
@@ -186,7 +182,7 @@ PRIVATE>
 : comment ( id3 -- comment/f ) "COMM" find-id3-frame ; inline
 
 : genre ( id3 -- genre/f )
-    "TCON" [ parse-genre ] (find-id3-frame) ; inline
+    "TCON" find-id3-frame parse-genre ; inline
 
 : find-mp3s ( path -- seq )
     [ >lower ".mp3" tail? ] find-all-files ; inline
