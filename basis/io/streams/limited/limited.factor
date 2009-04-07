@@ -22,7 +22,7 @@ M: decoder limit ( stream limit mode -- stream' )
     [ clone ] 2dip '[ _ _ limit ] change-stream ;
 
 M: object limit ( stream limit mode -- stream' )
-    <limited-stream> ;
+    over [ <limited-stream> ] [ 2drop ] if ;
 
 GENERIC: unlimited ( stream -- stream' )
 
@@ -32,9 +32,11 @@ M: decoder unlimited ( stream -- stream' )
 M: object unlimited ( stream -- stream' )
     stream>> stream>> ;
 
-: limit-input ( limit mode -- ) input-stream [ -rot limit ] change ;
+: limit-input ( limit mode -- )
+    [ input-stream ] 2dip '[ _ _ limit ] change ;
 
-: unlimited-input ( -- ) input-stream [ unlimited ] change ;
+: unlimited-input ( -- )
+    input-stream [ unlimited ] change ;
 
 : with-unlimited-stream ( stream quot -- )
     [ clone unlimited ] dip call ; inline
