@@ -1,7 +1,6 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: delegate sequences.private sequences assocs
-io definitions kernel continuations ;
+USING: delegate sequences.private sequences assocs io ;
 IN: delegate.protocols
 
 PROTOCOL: sequence-protocol
@@ -19,7 +18,3 @@ stream-read-until ;
 
 PROTOCOL: output-stream-protocol
 stream-flush stream-write1 stream-write stream-nl ;
-
-PROTOCOL: definition-protocol
-where set-where forget uses
-synopsis* definer definition ;
