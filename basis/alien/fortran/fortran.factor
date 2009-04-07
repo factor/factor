@@ -8,7 +8,7 @@ io.encodings.ascii io.encodings.string shuffle effects math.ranges
 math.order sorting strings system alien.libraries ;
 IN: alien.fortran
 
-SINGLETONS: f2c-abi gfortran-abi intel-unix-abi intel-windows-abi ;
+SINGLETONS: f2c-abi g95-abi gfortran-abi intel-unix-abi intel-windows-abi ;
 
 << 
 : add-f2c-libraries ( -- )
@@ -42,30 +42,35 @@ library-fortran-abis [ H{ } clone ] initialize
 
 HOOK: fortran-c-abi fortran-abi ( -- abi )
 M: f2c-abi fortran-c-abi "cdecl" ;
+M: g95-abi fortran-c-abi "cdecl" ;
 M: gfortran-abi fortran-c-abi "cdecl" ;
 M: intel-unix-abi fortran-c-abi "cdecl" ;
 M: intel-windows-abi fortran-c-abi "cdecl" ;
 
 HOOK: real-functions-return-double? fortran-abi ( -- ? )
 M: f2c-abi real-functions-return-double? t ;
+M: g95-abi real-functions-return-double? f ;
 M: gfortran-abi real-functions-return-double? f ;
 M: intel-unix-abi real-functions-return-double? f ;
 M: intel-windows-abi real-functions-return-double? f ;
 
 HOOK: complex-functions-return-by-value? fortran-abi ( -- ? )
 M: f2c-abi complex-functions-return-by-value? f ;
+M: g95-abi complex-functions-return-by-value? f ;
 M: gfortran-abi complex-functions-return-by-value? t ;
 M: intel-unix-abi complex-functions-return-by-value? f ;
 M: intel-windows-abi complex-functions-return-by-value? f ;
 
 HOOK: character(1)-maps-to-char? fortran-abi ( -- ? )
 M: f2c-abi character(1)-maps-to-char? f ;
+M: g95-abi character(1)-maps-to-char? f ;
 M: gfortran-abi character(1)-maps-to-char? f ;
 M: intel-unix-abi character(1)-maps-to-char? t ;
 M: intel-windows-abi character(1)-maps-to-char? t ;
 
 HOOK: mangle-name fortran-abi ( name -- name' )
 M: f2c-abi mangle-name lowercase-name-with-extra-underscore ;
+M: f95-abi mangle-name lowercase-name-with-extra-underscore ;
 M: gfortran-abi mangle-name lowercase-name-with-underscore ;
 M: intel-unix-abi mangle-name lowercase-name-with-underscore ;
 M: intel-windows-abi mangle-name >upper ;
