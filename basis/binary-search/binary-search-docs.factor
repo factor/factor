@@ -14,7 +14,7 @@ $nl
 
 HELP: sorted-index
 { $values { "obj" object } { "seq" "a sorted sequence" } { "i" "an index, or " { $link f } } }
-{ $description "Outputs the index and value of the element closest to " { $snippet "elt" } " in the sequence. See " { $link search } " for details." }
+{ $description "Outputs the index of the element closest to " { $snippet "elt" } " in the sequence. See " { $link search } " for details." }
 { $notes "If the sequence has at least one element, this word always outputs a valid index, because it finds the closest match, not necessarily an exact one. In this respect its behavior differs from " { $link index } "." } ;
 
 { index index-from last-index last-index-from sorted-index } related-words

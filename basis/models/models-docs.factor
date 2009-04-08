@@ -133,7 +133,6 @@ $nl
 { $subsection "models-impl" }
 { $subsection "models.arrow" }
 { $subsection "models.product" }
-{ $subsection "models-history" }
 { $subsection "models-range" }
 { $subsection "models-delay" } ;
 

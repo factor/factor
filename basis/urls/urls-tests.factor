@@ -1,5 +1,5 @@
 IN: urls.tests
-USING: urls urls.private tools.test
+USING: urls urls.private tools.test prettyprint
 arrays kernel assocs present accessors ;
 
 CONSTANT: urls
@@ -227,3 +227,5 @@ urls [
 [ "http://localhost/?foo=bar" >url ] unit-test
 
 [ "/" ] [ "http://www.jedit.org" >url path>> ] unit-test
+
+[ "USING: urls ;\nURL\" foo\"" ] [ URL" foo" unparse-use ] unit-test

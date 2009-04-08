@@ -80,12 +80,12 @@ ARTICLE: "encodings-descriptors" "Encoding descriptors"
 "An encoding descriptor is something which can be used with binary input or output streams to encode or decode bytes stored in a certain representation. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use are defined in the following vocabularies:"
 { $subsection "io.encodings.binary" }
 { $subsection "io.encodings.utf8" }
-{ $subsection "io.encodings.utf16" }
+{ $vocab-subsection "UTF-16 encoding" "io.encodings.utf16" }
 { $vocab-subsection "UTF-32 encoding" "io.encodings.utf32" }
 { $vocab-subsection "Strict encodings" "io.encodings.strict" }
 "Legacy encodings:"
 { $vocab-subsection "8-bit encodings" "io.encodings.8-bit" }
-{ $vocab-subsection "ASCII" "io.encodings.ascii" }
+{ $vocab-subsection "ASCII encoding" "io.encodings.ascii" }
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "encodings-protocol" "Encoding protocol"

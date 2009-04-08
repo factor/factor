@@ -1,0 +1,21 @@
+IN: models.arrow.smart
+USING: help.syntax help.markup models.product ;
+
+HELP: <smart-arrow>
+{ $values { "quot" { $quotation "( ... -- output )" } } }
+{ $description "A macro that expands into a form with the stack effect of the quotation. The form constructs a model which applies the quotation to values from an underlying " { $link product } " model having as many components as the quotation has inputs." }
+{ $examples
+  "A model which adds the values of two existing models:"
+  { $example
+    "USING: models models.arrows.smart accessors math prettyprint ;"
+    "1 <model> 2 <model> [ + ] <smart-arrow>"
+    "[ activate-model ] [ value>> ] bi ."
+    "3"
+  }
+} ;
+
+ARTICLE: "models.arrows.smart" "Smart arrow models"
+"The " { $vocab-link "models.arrows.smart" } " vocabulary generalizes arrows to arbitrary input arity. They're called “smart” because they resemble " { $link "combinators.smart" } "."
+{ $subsection <smart-arrow> } ;
+
+ABOUT: "models.arrows.smart"
