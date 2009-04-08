@@ -117,9 +117,6 @@ CONSTANT: VALUE_STR { "" "Straight Flush" "Four of a Kind" "Full House" "Flush"
 : lookup ( cards table -- value )
     [ rank-bits ] dip nth ;
 
-: unique5? ( cards -- ? )
-    unique5-table lookup 0 > ;
-
 : map-product ( seq quot -- n )
     [ 1 ] 2dip [ dip * ] curry [ swap ] prepose each ; inline
 
@@ -138,11 +135,11 @@ CONSTANT: VALUE_STR { "" "Straight Flush" "Four of a Kind" "Full House" "Flush"
     bitxor values-table nth ;
 
 : hand-value ( cards -- value )
-    {
-        { [ dup flush?   ] [ flushes-table lookup ] }
-        { [ dup unique5? ] [ unique5-table lookup ] }
-        [ prime-bits perfect-hash-find ]
-    } cond ;
+    dup flush? [ flushes-table lookup ] [
+        dup unique5-table lookup dup 0 > [ nip ] [
+            drop prime-bits perfect-hash-find
+        ] if
+    ] if ;
 
 : >card-rank ( card -- str )
     -8 shift HEX: F bitand RANK_STR nth ;
