@@ -70,7 +70,7 @@ M: intel-windows-abi character(1)-maps-to-char? t ;
 
 HOOK: mangle-name fortran-abi ( name -- name' )
 M: f2c-abi mangle-name lowercase-name-with-extra-underscore ;
-M: f95-abi mangle-name lowercase-name-with-extra-underscore ;
+M: g95-abi mangle-name lowercase-name-with-extra-underscore ;
 M: gfortran-abi mangle-name lowercase-name-with-underscore ;
 M: intel-unix-abi mangle-name lowercase-name-with-underscore ;
 M: intel-windows-abi mangle-name >upper ;
