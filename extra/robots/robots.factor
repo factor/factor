@@ -3,11 +3,21 @@
 USING: accessors http.client kernel unicode.categories
 sequences urls splitting combinators splitting.monotonic
 combinators.short-circuit assocs unicode.case arrays
-math.parser calendar.format make ;
+math.parser calendar.format make fry present globs
+multiline regexp.combinators regexp ;
 IN: robots
 
 ! visit-time is GMT, request-rate is pages/second 
 ! crawl-rate is seconds
+
+TUPLE: robots site sitemap rules rules-quot ;
+
+: <robots> ( site sitemap rules -- robots )
+    \ robots new
+        swap >>rules
+        swap >>sitemap
+        swap >>site ;
+
 TUPLE: rules user-agents allows disallows
 visit-time request-rate crawl-delay unknowns ;
 
@@ -40,8 +50,8 @@ visit-time request-rate crawl-delay unknowns ;
         H{ } clone >>unknowns ;
 
 : add-user-agent ( rules agent -- rules ) over user-agents>> push ;
-: add-allow ( rules allow -- rules ) over allows>> push ;
-: add-disallow ( rules disallow -- rules ) over disallows>> push ;
+: add-allow ( rules allow -- rules ) >url over allows>> push ;
+: add-disallow ( rules disallow -- rules ) >url over disallows>> push ;
 
 : parse-robots.txt-line ( rules seq -- rules )
     first2 swap {
@@ -57,6 +67,19 @@ visit-time request-rate crawl-delay unknowns ;
         [ pick unknowns>> push-at ]
     } case ;
 
+: derive-urls ( url seq -- seq' )
+    [ derive-url present ] with { } map-as ;
+
+: robot-rules-quot ( robots -- quot )
+    [
+        [ site>> ] [ rules>> allows>> ] bi
+        derive-urls [ <glob> ] map
+        <or>
+    ] [
+        [ site>> ] [ rules>> disallows>> ] bi
+        derive-urls [ <glob> ] map <and> <not>
+    ] bi 2array <or> '[ _ matches? ] ;
+
 PRIVATE>
 
 : parse-robots.txt ( string -- sitemaps rules-seq )
@@ -64,5 +87,6 @@ PRIVATE>
         [ <rules> dup ] dip [ parse-robots.txt-line drop ] with each
     ] map ;
 
-: robots ( url -- sitemaps rules-seq )
-    get-robots.txt nip parse-robots.txt ;
+: robots ( url -- robots )
+    >url
+    dup get-robots.txt nip parse-robots.txt <robots> ;

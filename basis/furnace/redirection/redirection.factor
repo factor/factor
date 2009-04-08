@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors combinators namespaces fry urls http
-http.server http.server.redirection http.server.responses
+USING: kernel accessors combinators namespaces fry urls urls.secure
+http http.server http.server.redirection http.server.responses
 http.server.remapping http.server.filters furnace.utilities ;
 IN: furnace.redirection
 

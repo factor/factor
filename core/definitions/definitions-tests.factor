@@ -20,14 +20,11 @@ TUPLE: some-class ;
 
 M: some-class some-generic ;
 
-TUPLE: another-class some-generic ;
-
 [ ] [
     [
-        {
-            some-generic
-            some-class
-            { another-class some-generic }
-        } forget-all
+        \ some-generic
+        \ some-class
+        2array
+        forget-all
     ] with-compilation-unit
 ] unit-test

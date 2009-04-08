@@ -1,23 +1,33 @@
 ! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: debugger help help.topics help.crossref help.home kernel
-models compiler.units assocs words vocabs accessors fry
-combinators.short-circuit namespaces sequences models
-models.history help.apropos combinators ui.commands ui.gadgets
-ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks
-ui.gestures ui.gadgets.buttons ui.gadgets.packs
-ui.gadgets.editors ui.gadgets.labels ui.gadgets.status-bar
-ui.gadgets.glass ui.gadgets.borders ui.tools.common
-ui.tools.browser.popups ui ;
+USING: debugger help help.topics help.crossref help.home kernel models
+compiler.units assocs words vocabs accessors fry arrays
+combinators.short-circuit namespaces sequences models help.apropos
+combinators ui ui.commands ui.gadgets ui.gadgets.panes
+ui.gadgets.scrollers ui.gadgets.tracks ui.gestures ui.gadgets.buttons
+ui.gadgets.packs ui.gadgets.editors ui.gadgets.labels
+ui.gadgets.status-bar ui.gadgets.glass ui.gadgets.borders ui.gadgets.viewports
+ui.tools.common ui.tools.browser.popups ui.tools.browser.history ;
 IN: ui.tools.browser
 
-TUPLE: browser-gadget < tool pane scroller search-field popup ;
+TUPLE: browser-gadget < tool history pane scroller search-field popup ;
 
 { 650 400 } browser-gadget set-tool-dim
 
+M: browser-gadget history-value
+    [ control-value ] [ scroller>> scroll-position ]
+    bi 2array ;
+
+M: browser-gadget set-history-value
+    [ first2 ] dip
+    [ set-control-value ] [ scroller>> set-scroll-position ]
+    bi-curry bi* ;
+
 : show-help ( link browser-gadget -- )
-    [ >link ] [ model>> ] bi*
-    [ [ add-recent ] [ add-history ] bi* ] [ set-model ] 2bi ;
+    [ >link ] dip
+    [ [ add-recent ] [ history>> add-history ] bi* ]
+    [ model>> set-model ]
+    2bi ;
 
 : <help-pane> ( browser-gadget -- gadget )
     model>> [ '[ _ print-topic ] try ] <pane-control> ;
@@ -41,7 +51,8 @@ TUPLE: browser-gadget < tool pane scroller search-field popup ;
 : <browser-gadget> ( link -- gadget )
     vertical browser-gadget new-track
         1 >>fill
-        swap >link <history> >>model
+        swap >link <model> >>model
+        dup <history> >>history
         dup <search-field> >>search-field
         dup <browser-toolbar> { 3 3 } <border> { 1 0 } >>fill f track-add
         dup <help-pane> >>pane
@@ -93,9 +104,9 @@ M: browser-gadget focusable-child* search-field>> ;
 
 \ show-browser H{ { +nullary+ t } } define-command
 
-: com-back ( browser -- ) model>> go-back ;
+: com-back ( browser -- ) history>> go-back ;
 
-: com-forward ( browser -- ) model>> go-forward ;
+: com-forward ( browser -- ) history>> go-forward ;
 
 : com-home ( browser -- ) "help.home" swap show-help ;
 

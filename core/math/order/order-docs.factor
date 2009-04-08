@@ -87,7 +87,14 @@ ARTICLE: "order-specifiers" "Ordering specifiers"
 { $subsection +lt+ }
 { $subsection +eq+ }
 { $subsection +gt+ } ;
-    
+
+ARTICLE: "math.order.example" "Linear order example"
+"A tuple class which defines an ordering among instances by comparing the values of the " { $snippet "id" } " slot:"
+{ $code
+  "TUPLE: sprite id name bitmap ;"
+  "M: sprite <=> [ id>> ] compare ;"
+} ;
+
 ARTICLE: "math.order" "Linear order protocol"
 "Some classes have an intrinsic order amongst instances:"
 { $subsection <=> }
@@ -101,6 +108,8 @@ ARTICLE: "math.order" "Linear order protocol"
 { $subsection before? }
 { $subsection after=? }
 { $subsection before=? }
+"Out of the above generic words, it suffices to implement " { $link <=> } " alone. The others may be provided as an optimization."
+{ $subsection "math.order.example" }
 { $see-also "sequences-sorting" } ;
 
 ABOUT: "math.order"
