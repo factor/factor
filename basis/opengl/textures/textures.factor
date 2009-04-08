@@ -3,8 +3,10 @@
 USING: accessors assocs cache colors.constants destructors fry kernel
 opengl opengl.gl combinators images images.tesselation grouping
 specialized-arrays.float sequences math math.vectors
-math.matrices generalizations fry arrays ;
+math.matrices generalizations fry arrays namespaces ;
 IN: opengl.textures
+
+SYMBOL: non-power-of-2-textures?
 
 : gen-texture ( -- id ) [ glGenTextures ] (gen-gl-object) ;
 
@@ -29,9 +31,14 @@ GENERIC: draw-scaled-texture ( dim texture -- )
 
 TUPLE: single-texture image dim loc texture-coords texture display-list disposed ;
 
+: adjust-texture-dim ( dim -- dim' )
+    non-power-of-2-textures? get [
+        [ next-power-of-2 ] map
+    ] unless ;
+
 : (tex-image) ( image -- )
     [ GL_TEXTURE_2D 0 GL_RGBA ] dip
-    [ dim>> first2 [ next-power-of-2 ] bi@ 0 ]
+    [ dim>> adjust-texture-dim first2 0 ]
     [ component-order>> component-order>format f ] bi
     glTexImage2D ;
 
@@ -81,7 +88,7 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
     ] with-texturing ;
 
 : texture-coords ( texture -- coords )
-    [ [ dim>> ] [ image>> dim>> [ next-power-of-2 ] map ] bi v/ ]
+    [ [ dim>> ] [ image>> dim>> adjust-texture-dim ] bi v/ ]
     [
         image>> upside-down?>>
         { { 0 1 } { 1 1 } { 1 0 } { 0 0 } }
