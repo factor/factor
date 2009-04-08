@@ -133,7 +133,7 @@ M: integer forget-robustness-generic ;
 [
     [ ] [ \ forget-robustness-generic forget ] unit-test
     [ ] [ \ forget-robustness forget ] unit-test
-    [ ] [ { forget-robustness forget-robustness-generic } forget ] unit-test
+    [ ] [ M\ forget-robustness forget-robustness-generic forget ] unit-test
 ] with-compilation-unit
 
 ! rapido found this one
@@ -559,7 +559,7 @@ DEFER: subclass-reset-test-3
 
 GENERIC: break-me ( obj -- )
 
-[ ] [ [ { integer break-me } forget ] with-compilation-unit ] unit-test
+[ ] [ [ M\ integer break-me forget ] with-compilation-unit ] unit-test
 
 [ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test ;" <string-reader> "subclass-reset-test" parse-stream drop ] unit-test
 [ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-1 < subclass-reset-test ;" eval ] unit-test

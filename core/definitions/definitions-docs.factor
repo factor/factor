@@ -56,11 +56,24 @@ $nl
 { $subsection redefine-error } ;
 
 ARTICLE: "definitions" "Definitions"
-"A " { $emphasis "definition" } " is an artifact read from a source file. This includes words, methods, help articles, and path names (which represent the source file at that location). Words for working with definitions are found in the " { $vocab-link "definitions" } " vocabulary."
+"A " { $emphasis "definition" } " is an artifact read from a source file. Words for working with definitions are found in the " { $vocab-link "definitions" } " vocabulary."
+$nl
+"Definitions are defined using parsing words. Examples of definitions together with their defining parsing words are words (" { $link POSTPONE: : } "), methods (" { $link POSTPONE: M: } "), and vocabularies (" { $link POSTPONE: IN: } ")."
+$nl
+"All definitions share some common traits:"
+{ $list
+  "There is a word to list all definitions of a given type"
+  "There is a parsing word for creating new definitions"
+  "There is an ordinary word which is the runtime equivalent of the parsing word, for introspection"
+  "Instances of the definition may be introspected and modified with the definition protocol"
+}
+"For every source file loaded into the system, a list of definitions is maintained. Pathname objects implement the definition protocol, acting over the definitions their source files contain. See " { $link "source-files" } " for details."
 { $subsection "definition-protocol" }
 { $subsection "definition-crossref" }
 { $subsection "definition-checking" }
 { $subsection "compilation-units" }
+"A parsing word to remove definitions:"
+{ $subsection POSTPONE: FORGET: }
 { $see-also "see" "parser" "source-files" "words" "generic" "help-impl" } ;
 
 ABOUT: "definitions"

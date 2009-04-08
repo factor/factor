@@ -2,7 +2,7 @@ USING: help.syntax help.markup arrays sequences ;
 
 IN: math.ranges
 
-ARTICLE: "ranges" "Ranges"
+ARTICLE: "math.ranges" "Numeric ranges"
 "A " { $emphasis "range" } " is a virtual sequence with real number elements "
 "ranging from " { $emphasis "a" } " to " { $emphasis "b" } " by " { $emphasis "step" } ". Ascending as well as descending ranges are supported."
 $nl
@@ -24,4 +24,4 @@ $nl
 { $code "100 1 [a,b] product" }
 "A range can be converted into a concrete sequence using a word such as " { $link >array } ". In most cases this is unnecessary since ranges implement the sequence protocol already. It is necessary if a mutable sequence is needed, for use with words such as " { $link set-nth } " or " { $link change-each } "." ;
   
-ABOUT: "ranges"
+ABOUT: "math.ranges"

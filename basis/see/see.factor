@@ -76,9 +76,6 @@ M: hook-generic synopsis*
         [ stack-effect. ]
     } cleave ;
 
-M: method-spec synopsis*
-    first2 method synopsis* ;
-
 M: method-body synopsis*
     [ definer. ]
     [ "method-class" word-prop pprint-word ]
@@ -121,9 +118,6 @@ M: object see*
         dup definer nip [ pprint-word ] when* declarations.
         block>
     ] with-use ;
-
-M: method-spec see*
-    first2 method see* ;
 
 GENERIC: see-class* ( word -- )
 
