@@ -47,8 +47,8 @@ TUPLE: file-responder root hook special allow-listings ;
     if ;
 
 : serving-path ( filename -- filename )
-    [ file-responder get root>> trim-tail-separators "/" ] dip
-    "" or trim-head-separators 3append ;
+    [ file-responder get root>> trim-tail-separators ] dip
+    [ "/" swap trim-head-separators 3append ] unless-empty ;
 
 : serve-file ( filename -- response )
     dup mime-type
