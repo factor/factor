@@ -1,6 +1,9 @@
-USING: words kernel sequences locals locals.parser
+! Copyright (c) 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
+USING: words kernel sequences locals locals.parser fry
 locals.definitions accessors parser namespaces continuations
-summary definitions generalizations arrays prettyprint debugger io ;
+summary definitions generalizations arrays prettyprint debugger io
+effects tools.annotations ;
 IN: descriptive
 
 ERROR: descriptive-error args underlying word ;
@@ -22,6 +25,10 @@ M: descriptive-error error.
     swapd in>> rethrower [ recover ] 2curry ;
 
 PRIVATE>
+
+: make-descriptive ( word -- )
+    dup [ ] [ def>> ] [ stack-effect ] tri [descriptive]
+    '[ drop _ ] annotate-methods ;
 
 : define-descriptive ( word def effect -- )
     [ drop "descriptive-definition" set-word-prop ]
