@@ -76,3 +76,9 @@ IN: io.streams.limited.tests
         [ decoder? ] both?
     ] with-destructors
 ] unit-test
+
+[ "HELL" ] [
+    "HELLO"
+    [ f stream-throws limit-input 4 read ]
+    with-string-reader
+] unit-test

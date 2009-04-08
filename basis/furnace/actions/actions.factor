@@ -9,6 +9,7 @@ http.server.responses
 furnace.utilities
 furnace.redirection
 furnace.conversations
+furnace.chloe-tags
 html.forms
 html.components
 html.components
