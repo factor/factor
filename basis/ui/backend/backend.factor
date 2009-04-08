@@ -1,6 +1,6 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces opengl opengl.gl ;
+USING: kernel namespaces opengl opengl.gl fry ;
 IN: ui.backend
 
 SYMBOL: ui-backend
@@ -28,7 +28,7 @@ GENERIC: flush-gl-context ( handle -- )
 HOOK: offscreen-pixels ui-backend ( world -- alien w h )
 
 : with-gl-context ( handle quot -- )
-    swap [ select-gl-context call ] keep
-    flush-gl-context gl-error ; inline
+    '[ select-gl-context @ ]
+    [ flush-gl-context gl-error ] bi ; inline
 
 HOOK: (with-ui) ui-backend ( quot -- )
