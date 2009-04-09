@@ -59,10 +59,10 @@ TUPLE: script-string font string metrics ssa size image disposed ;
         ssa>> ! ssa
         0 ! iX
         0 ! iY
-        0 ! uOptions
-        f ! prc
+        ETO_OPAQUE ! uOptions
     ]
-    [ selection-start/end ] bi
+    [ [ { 0 0 } ] dip size>> <RECT> ]
+    [ selection-start/end ] tri
     ! iMinSel
     ! iMaxSel
     FALSE ! fDisabled
@@ -108,7 +108,7 @@ M: script-string dispose*
 
 SYMBOL: cached-script-strings
 
-: cached-script-string ( string font -- script-string )
+: cached-script-string ( font string -- script-string )
     cached-script-strings get-global [ <script-string> ] 2cache ;
 
 [ <cache-assoc> cached-script-strings set-global ]
