@@ -475,7 +475,7 @@ ERROR: unknown-component-order ifd ;
         { { 16 16 16 } [ R16G16B16 ] }
         { { 8 8 8 8 } [ RGBA ] }
         { { 8 8 8 } [ RGB ] }
-        { 8 [ L ] }
+        { 8 [ LA ] }
         [ unknown-component-order ]
     } case ;
 
