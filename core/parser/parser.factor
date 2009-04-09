@@ -190,6 +190,7 @@ SYMBOL: interactive-vocabs
     "tools.annotations"
     "tools.crossref"
     "tools.disassembler"
+    "tools.errors"
     "tools.memory"
     "tools.profiler"
     "tools.test"

@@ -9,7 +9,8 @@ combinators generic.math classes.builtin classes compiler.units
 generic.standard vocabs init kernel.private io.encodings
 accessors math.order destructors source-files parser
 classes.tuple.parser effects.parser lexer compiler.errors
-generic.parser strings.parser vocabs.loader vocabs.parser see ;
+generic.parser strings.parser vocabs.loader vocabs.parser see
+source-files.errors ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -268,11 +269,6 @@ M: duplicate-slot-names summary
 M: invalid-slot-name summary
     drop "Invalid slot name" ;
 
-: file. ( file -- ) path>> <pathname> . ;
-
-M: source-file-error error.
-    [ file>> file. ] [ error>> error. ] bi ;
-
 M: source-file-error summary
     error>> summary ;
 
@@ -309,12 +305,13 @@ M: lexer-error compute-restarts
 M: lexer-error error-help
     error>> error-help ;
 
-M: compiler-error compiler-error. ( error -- )
+M: source-file-error error.
     [
         [
             [
-                [ line#>> # ": " % ]
-                [ word>> synopsis % ] bi
+                [ file>> [ % ": " % ] when* ]
+                [ line#>> [ # ": " % ] when* ]
+                [ summary % ] tri
             ] "" make
         ] [
             [
@@ -324,7 +321,7 @@ M: compiler-error compiler-error. ( error -- )
         ] bi format nl
     ] [ error>> error. ] bi ;
 
-M: compiler-error error. compiler-error. ;
+M: compiler-error summary word>> synopsis ;
 
 M: bad-effect summary
     drop "Bad stack effect declaration" ;
