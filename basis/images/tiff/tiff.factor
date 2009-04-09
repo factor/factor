@@ -463,6 +463,7 @@ ERROR: unknown-component-order ifd ;
         { { 16 16 16 } [ 2 seq>native-endianness ] }
         { { 8 8 8 8 } [ ] }
         { { 8 8 8 } [ ] }
+        { 8 [ ] }
         [ unknown-component-order ]
     } case >>bitmap ;
 
@@ -474,11 +475,11 @@ ERROR: unknown-component-order ifd ;
         { { 16 16 16 } [ R16G16B16 ] }
         { { 8 8 8 8 } [ RGBA ] }
         { { 8 8 8 } [ RGB ] }
+        { 8 [ L ] }
         [ unknown-component-order ]
     } case ;
 
 : normalize-alpha-data ( seq -- byte-array )
-    ! [ normalize-alpha-data ] change-bitmap
     B{ } like dup
     byte-array>float-array
     4 <sliced-groups>
