@@ -41,7 +41,7 @@ M: missing-effect summary
 
 M: effect-error summary
     [
-        "Stack effect declaration of the word  " %
+        "Stack effect declaration of the word " %
         word>> name>> % " is wrong" %
     ] "" make ;
 
