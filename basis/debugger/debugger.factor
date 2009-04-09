@@ -309,7 +309,7 @@ M: lexer-error compute-restarts
 M: lexer-error error-help
     error>> error-help ;
 
-M: object compiler-error. ( error -- )
+M: compiler-error compiler-error. ( error -- )
     [
         [
             [
@@ -323,6 +323,8 @@ M: object compiler-error. ( error -- )
             ] H{ } make-assoc
         ] bi format nl
     ] [ error>> error. ] bi ;
+
+M: compiler-error error. compiler-error. ;
 
 M: bad-effect summary
     drop "Bad stack effect declaration" ;
