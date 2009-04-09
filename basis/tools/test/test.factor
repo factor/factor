@@ -45,7 +45,8 @@ SYMBOL: failed-tests
     word/quot dup word? [ '[ _ execute ] ] when :> quot
     [ quot infer drop f f ] [ t ] recover ; inline
 
-SINGLETON: did-not-fail
+TUPLE: did-not-fail ;
+CONSTANT: did-not-fail T{ did-not-fail }
 
 M: did-not-fail summary drop "Did not fail" ;
 
@@ -130,7 +131,7 @@ M: test-failure error. ( error -- )
             [ length # " tests failed, " % ]
             [ length # " tests passed." % ]
             bi*
-        ] "" make print nl
+        ] "" make nl print nl
     ] [ drop errors. ] 2bi ;
 
 : run-tests ( prefix -- failed passed )
