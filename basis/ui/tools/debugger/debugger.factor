@@ -86,9 +86,7 @@ debugger "gestures" f {
 
 : com-traceback ( debugger -- ) continuation>> traceback-window ;
 
-: com-help ( debugger -- ) error>> (:help) ;
-
-\ com-help H{ { +listener+ t } } define-command
+: com-help ( debugger -- ) error>> error-help-window ;
 
 : com-edit ( debugger -- ) error>> (:edit) ;
 

@@ -87,9 +87,6 @@ IN: ui.tools.operations
 } define-operation
 
 ! Compiler errors
-: edit-error ( error -- )
-    [ file>> ] [ line#>> ] bi edit-location ;
-
 [ compiler-error? ] \ edit-error H{
     { +primary+ t }
     { +secondary+ t }

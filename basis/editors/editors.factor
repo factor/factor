@@ -81,6 +81,9 @@ M: object error-line
 : :edit ( -- )
     error get (:edit) ;
 
+: edit-error ( error -- )
+    [ file>> ] [ line#>> ] bi edit-location ;
+
 : edit-each ( seq -- )
     [
         [ "Editing " write . ]
