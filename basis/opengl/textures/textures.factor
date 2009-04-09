@@ -20,6 +20,8 @@ M: RGBA component-order>format drop GL_RGBA GL_UNSIGNED_BYTE ;
 M: ARGB component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8_REV ;
 M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
 M: BGRX component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
+M: LA component-order>format drop GL_LUMINANCE_ALPHA GL_UNSIGNED_BYTE ;
+M: L component-order>format drop GL_LUMINANCE GL_UNSIGNED_BYTE ;
 
 SLOT: display-list
 
