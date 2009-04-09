@@ -6,7 +6,7 @@ combinators math.ranges unicode.categories byte-arrays
 io.encodings.string io.encodings.utf16 assocs math.parser
 combinators.short-circuit fry namespaces combinators.smart
 splitting io.encodings.ascii arrays io.files.info unicode.case
-io.directories.search literals ;
+io.directories.search literals math.functions ;
 IN: id3
 
 <PRIVATE
@@ -100,8 +100,12 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
         } cleave
     ] output>array sift ;
 
-: >28bitword ( seq -- int )
+: seq>synchsafe ( seq -- n )
     0 [ [ 7 shift ] dip bitor ] reduce ; inline
+
+: synchsafe>seq ( n -- seq )
+    dup 1+ log2 1+ 7 / ceiling
+    [ [ -7 shift ] keep HEX: 7f bitand  ] replicate nip reverse ; inline
 
 : filter-text-data ( data -- filtered )
     [ printable? ] filter ; inline
@@ -121,7 +125,7 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
     [ <frame> ] dip
     {
         [ 4 head-slice decode-text >>tag ]
-        [ [ 4 8 ] dip subseq >28bitword >>size ]
+        [ [ 4 8 ] dip subseq seq>synchsafe >>size ]
         [ [ 8 10 ] dip subseq >byte-array >>flags ]
         [ read-frame-data decode-text >>data ]
     } cleave ; inline
@@ -144,7 +148,7 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
     {
         [ [ 3 5 ] dip <slice> >array >>version ]
         [ [ 5 ] dip nth >>flags ]
-        [ [ 6 10 ] dip <slice> >28bitword >>size ]
+        [ [ 6 10 ] dip <slice> seq>synchsafe >>size ]
     } cleave ; inline
 
 : merge-frames ( id3 assoc -- id3 )
