@@ -1,15 +1,6 @@
-USING: help.markup help.syntax quotations kernel irc.messages irc.messages.base irc.messages.parser ;
+USING: help.markup help.syntax quotations kernel
+irc.messages irc.messages.base irc.messages.parser irc.client.chats ;
 IN: irc.client
-
-HELP: irc-client "IRC Client object" ;
-
-HELP: irc-server-chat "Chat for server messages unmanaged by other chats" ;
-
-HELP: irc-channel-chat "Chat for irc channels" ;
-
-HELP: irc-nick-chat "Chat for irc users" ;
-
-HELP: irc-profile "IRC Client profile object" ;
 
 HELP: connect-irc "Connecting to an irc server"
 { $values { "irc-client" "an irc client object" } }
@@ -69,6 +60,7 @@ ARTICLE: "irc.client" "IRC Client"
   { { $link mode } "mode change" }
   { { $link unhandled } "uninmplemented/unhandled message" }
   }
+
 { $heading "Special messages" }
 "Some special messages that are created by the library and not by the irc server."
 { $table
@@ -79,7 +71,7 @@ ARTICLE: "irc.client" "IRC Client"
 
 { $heading "Example:" }
 { $code
-  "USING: irc.client ;"
+  "USING: irc.client irc.client.chats ;"
   "SYMBOL: bot"
   "SYMBOL: mychannel"
   "! Create the profile and client objects"
@@ -91,7 +83,7 @@ ARTICLE: "irc.client" "IRC Client"
   "! Register and start chat (this joins the channel)"
   "mychannel get bot get attach-chat"
   "! Send a message to the channel"
-  "\"what's up?\" mychannel get speak"
+  "\"Hello World!\" mychannel get speak"
   "! Read a message from the channel"
   "mychannel get hear"
 }
