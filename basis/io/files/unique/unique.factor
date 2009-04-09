@@ -64,7 +64,7 @@ PRIVATE>
     [ unique-directory ] dip
     '[ _ with-temporary-directory ] [ delete-tree ] bi ; inline
 
-: unique-file ( path -- path' )
+: unique-file ( prefix -- path )
     "" make-unique-file ;
 
 {
