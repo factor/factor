@@ -38,10 +38,12 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
         [ next-power-of-2 ] map
     ] unless ;
 
-: (tex-image) ( image -- )
-    [ GL_TEXTURE_2D 0 GL_RGBA ] dip
-    [ dim>> adjust-texture-dim first2 0 ]
-    [ component-order>> component-order>format f ] bi
+: (tex-image) ( image bitmap -- )
+    [
+        [ GL_TEXTURE_2D 0 GL_RGBA ] dip
+        [ dim>> adjust-texture-dim first2 0 ]
+        [ component-order>> component-order>format ] bi
+    ] dip
     glTexImage2D ;
 
 : (tex-sub-image) ( image -- )
@@ -55,7 +57,9 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
     gen-texture [
         GL_TEXTURE_BIT [
             GL_TEXTURE_2D swap glBindTexture
-            [ (tex-image) ] [ (tex-sub-image) ] bi
+            non-power-of-2-textures? get
+            [ dup bitmap>> (tex-image) ]
+            [ [ f (tex-image) ] [ (tex-sub-image) ] bi ] if
         ] do-attribs
     ] keep ;
 
