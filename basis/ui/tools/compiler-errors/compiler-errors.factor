@@ -3,13 +3,13 @@
 USING: accessors arrays sequences sorting assocs colors.constants
 combinators combinators.smart combinators.short-circuit editors
 compiler.errors compiler.units fonts kernel io.pathnames
-stack-checker.errors math.parser math.order models models.arrow
-models.search debugger namespaces summary locals ui ui.commands
-ui.gadgets ui.gadgets.panes ui.gadgets.tables ui.gadgets.labeled
-ui.gadgets.tracks ui.gestures ui.operations ui.tools.browser
-ui.tools.common ui.gadgets.scrollers ui.tools.inspector
-ui.gadgets.status-bar ui.operations ui.gadgets.buttons
-ui.gadgets.borders ui.images ;
+stack-checker.errors source-files.errors math.parser math.order models
+models.arrow models.search debugger namespaces summary locals ui
+ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.tables
+ui.gadgets.labeled ui.gadgets.tracks ui.gestures ui.operations
+ui.tools.browser ui.tools.common ui.gadgets.scrollers
+ui.tools.inspector ui.gadgets.status-bar ui.operations
+ui.gadgets.buttons ui.gadgets.borders ui.images ;
 IN: ui.tools.compiler-errors
 
 TUPLE: error-list-gadget < tool source-file error source-file-table error-table error-display ;
@@ -30,7 +30,7 @@ M: source-file-renderer column-alignment drop { 0 1 } ;
 M: source-file-renderer filled-column drop 0 ;
 
 : <source-file-model> ( model -- model' )
-    [ group-by-source-file >alist sort-keys f prefix ] <arrow> ;
+    [ values group-by-source-file >alist sort-keys f prefix ] <arrow> ;
 
 :: <source-file-table> ( error-list -- table )
     error-list model>> <source-file-model>
@@ -53,15 +53,12 @@ GENERIC: error-icon ( error -- icon )
 : <error-icon> ( name -- image-name )
     "vocab:ui/tools/error-list/icons/" ".tiff" surround <image-name> ;
 
-M: inference-error error-icon
-    type>> {
+M: compiler-error error-icon
+    compiler-error-type {
         { +error+ [ "compiler-error" ] }
         { +warning+ [ "compiler-warning" ] }
+        { +linkage+ [ "linkage-error" ] }
     } case <error-icon> ;
-
-M: object error-icon drop "HAI" ;
-
-M: compiler-error error-icon error>> error-icon ;
 
 M: error-renderer row-columns
     drop [

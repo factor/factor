@@ -16,7 +16,7 @@ IN: tools.errors
     ] assoc-each ;
 
 : compiler-errors. ( type -- )
-    errors-of-type errors. ;
+    errors-of-type values errors. ;
 
 : :errors ( -- ) +error+ compiler-errors. ;
 
