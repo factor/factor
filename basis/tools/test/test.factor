@@ -5,13 +5,18 @@ continuations debugger effects fry generalizations io io.files
 io.styles kernel lexer locals macros math.parser namespaces
 parser prettyprint quotations sequences source-files splitting
 stack-checker summary unicode.case vectors vocabs vocabs.loader words
-tools.vocabs tools.errors source-files.errors io.streams.string make ;
+tools.vocabs tools.errors source-files.errors io.streams.string make
+compiler.errors ;
 IN: tools.test
 
-TUPLE: test-failure < source-file-error experiment continuation ;
+TUPLE: test-failure < source-file-error continuation ;
 
-SYMBOL: passed-tests
-SYMBOL: failed-tests
+SYMBOL: +test-failure+
+
+M: test-failure source-file-error-type drop +test-failure+ ;
+
+SYMBOL: test-failures
+test-failures [ V{ } clone ] initialize
 
 <PRIVATE
 
@@ -19,15 +24,13 @@ SYMBOL: failed-tests
     test-failure new
         swap >>line#
         swap >>file
-        swap >>experiment
+        swap >>asset
         swap >>error
         error-continuation get >>continuation ;
 
 : failure ( error experiment file line# -- )
     "--> test failed!" print
-    <test-failure> failed-tests get push ;
-
-: success ( experiment -- ) passed-tests get push ;
+    <test-failure> test-failures get push ;
 
 : file-failure ( error file -- )
     [ f ] [ f ] bi* failure ;
@@ -71,7 +74,7 @@ MACRO: <experiment> ( word -- )
 :: experiment ( word: ( -- error ? ) file line# -- )
     word <experiment> :> e
     e experiment.
-    word execute [ e file line# failure ] [ drop e success ] if ; inline
+    word execute [ e file line# failure ] [ drop ] if ; inline
 
 : parse-test ( accum word -- accum )
     literalize parsed
@@ -90,16 +93,8 @@ SYNTAX: TEST:
 >>
 
 : run-test-file ( path -- )
-    [ run-file ] [ swap file-failure ] recover ;
-
-: collect-results ( quot -- failed passed )
-    [
-        V{ } clone failed-tests set
-        V{ } clone passed-tests set
-        call
-        failed-tests get
-        passed-tests get
-    ] with-scope ; inline
+    [ [ test-failures get ] dip '[ file>> _ = not ] filter-here ]
+    [ [ run-file ] [ swap file-failure ] recover ] bi ;
 
 : run-vocab-tests ( vocab -- )
     dup vocab source-loaded?>> [
@@ -118,30 +113,19 @@ TEST: must-fail-with
 TEST: must-fail
 
 M: test-failure summary
-    [ experiment>> experiment. ] with-string-writer ;
+    [ asset>> experiment. ] with-string-writer ;
 
 M: test-failure error. ( error -- )
     [ call-next-method ]
     [ traceback-button. ]
     bi ;
 
-: results. ( failed passed -- )
-    [
-        [
-            [ length # " tests failed, " % ]
-            [ length # " tests passed." % ]
-            bi*
-        ] "" make nl print nl
-    ] [ drop errors. ] 2bi ;
-
-: run-tests ( prefix -- failed passed )
-    [ child-vocabs [ run-vocab-tests ] each ] collect-results ;
+: :failures ( -- ) test-failures get errors. ;
 
 : test ( prefix -- )
-    run-tests results. ;
+    [ child-vocabs [ run-vocab-tests ] each ] with-compiler-errors
+    test-failures get [
+        ":failures - show " write length pprint " failing tests." print
+    ] unless-empty ;
 
-: run-all-tests ( -- failed passed )
-    "" run-tests ;
-
-: test-all ( -- )
-    run-all-tests results. ;
+: test-all ( -- ) "" test ;

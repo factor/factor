@@ -5,15 +5,11 @@ continuations math math.parser accessors definitions
 source-files.errors ;
 IN: compiler.errors
 
-SYMBOLS: +error+ +warning+ +linkage+ ;
+SYMBOLS: +compiler-error+ +compiler-warning+ +linkage-error+ ;
 
-TUPLE: compiler-error < source-file-error word ;
+TUPLE: compiler-error < source-file-error ;
 
-GENERIC: compiler-error-type ( error -- ? )
-
-M: object compiler-error-type drop +error+ ;
-
-M: compiler-error compiler-error-type error>> compiler-error-type ;
+M: compiler-error source-file-error-type error>> source-file-error-type ;
 
 SYMBOL: compiler-errors
 
@@ -23,7 +19,7 @@ SYMBOL: with-compiler-errors?
 
 : errors-of-type ( type -- assoc )
     compiler-errors get-global
-    swap [ [ nip compiler-error-type ] dip eq? ] curry
+    swap [ [ nip source-file-error-type ] dip eq? ] curry
     assoc-filter ;
 
 : (compiler-report) ( what type word -- )
@@ -40,14 +36,14 @@ SYMBOL: with-compiler-errors?
     ] if ;
 
 : compiler-report ( -- )
-    "semantic errors" +error+ "errors" (compiler-report)
-    "semantic warnings" +warning+ "warnings" (compiler-report)
-    "linkage errors" +linkage+ "linkage" (compiler-report) ;
+    "compiler errors" +compiler-error+ "errors" (compiler-report)
+    "compiler warnings" +compiler-warning+ "warnings" (compiler-report)
+    "linkage errors" +linkage-error+ "linkage" (compiler-report) ;
 
 : <compiler-error> ( error word -- compiler-error )
     \ compiler-error new
         swap
-        [ >>word ]
+        [ >>asset ]
         [ where [ first2 ] [ "<unknown file>" 0 ] if* [ >>file ] [ >>line# ] bi* ] bi
         swap >>error ;
 

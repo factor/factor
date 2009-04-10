@@ -18,8 +18,8 @@ IN: tools.errors
 : compiler-errors. ( type -- )
     errors-of-type values errors. ;
 
-: :errors ( -- ) +error+ compiler-errors. ;
+: :errors ( -- ) +compiler-error+ compiler-errors. ;
 
-: :warnings ( -- ) +warning+ compiler-errors. ;
+: :warnings ( -- ) +compiler-warning+ compiler-errors. ;
 
-: :linkage ( -- ) +linkage+ compiler-errors. ;
+: :linkage ( -- ) +linkage-error+ compiler-errors. ;

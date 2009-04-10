@@ -88,7 +88,6 @@ SYMBOL: bootstrap-time
 
         run-bootstrap-init
     ] with-compiler-errors
-    :errors
 
     f error set-global
     f error-continuation set-global
