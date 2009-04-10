@@ -49,6 +49,7 @@ $nl
     { "associative mapping" { "an object whose class implements the " { $link "assocs-protocol" } } }
     { "boolean"               { { $link t } " or " { $link f } } }
     { "class"                 { "a set of objects identified by a " { $emphasis "class word" } " together with a discriminating predicate. See " { $link "classes" } } }
+    { "combinator"            { "a word taking a quotation or another word as input; a higher-order function. See " { $link "combinators" } } }
     { "definition specifier"  { "an instance of " { $link definition } " which implements the " { $link "definition-protocol" } } }
     { "generalized boolean"   { "an object interpreted as a boolean; a value of " { $link f } " denotes false and anything else denotes true" } }
     { "generic word"          { "a word whose behavior depends can be specialized on the class of one of its inputs. See " { $link "generic" } } }
@@ -56,6 +57,7 @@ $nl
     { "object"                { "any datum which can be identified" } }
     { "ordering specifier"    { "see " { $link "order-specifiers" } } }
     { "pathname string"       { "an OS-specific pathname which identifies a file" } }
+    { "quotation"             { "an anonymous function; an instance of the " { $link quotation } " class. More generally, instances of the " { $link callable } " class can be used in many places documented to expect quotations" } }
     { "sequence" { "a sequence; see " { $link "sequence-protocol" } } }
     { "slot"                  { "a component of an object which can store a value" } }
     { "stack effect"          { "a pictorial representation of a word's inputs and outputs, for example " { $snippet "+ ( x y -- z )" } ". See " { $link "effects" } } }
