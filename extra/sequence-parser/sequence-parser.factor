@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math kernel sequences accessors fry circular
 unicode.case unicode.categories locals combinators.short-circuit
-make combinators io splitting math.parser ;
+make combinators io splitting math.parser math.ranges
+generalizations sorting.functor math.order sorting.slots ;
 IN: sequence-parser
 
 TUPLE: sequence-parser sequence n ;
@@ -146,7 +147,7 @@ TUPLE: sequence-parser sequence n ;
     CHAR: \ CHAR: " take-token* ;
 
 : take-integer ( sequence-parser -- n/f )
-    [ current digit? ] take-while string>number ;
+    [ current digit? ] take-while ;
 
 :: take-n ( sequence-parser n -- seq/f )
     n sequence-parser [ n>> + ] [ sequence>> length ] bi > [
@@ -163,6 +164,65 @@ TUPLE: sequence-parser sequence n ;
         ] [
             drop f
         ] if
+    ] with-sequence-parser ;
+
+: take-c++-comment ( sequence-parser -- seq/f )
+    [
+        dup "//" take-sequence [
+            [
+                [
+                    { [ current CHAR: \n = ] [ sequence-parse-end? ] } 1||
+                ] take-until
+            ] [
+                advance drop
+            ] bi
+        ] [
+            drop f
+        ] if
+    ] with-sequence-parser ;
+
+: c-identifier-begin? ( ch -- ? )
+    CHAR: a CHAR: z [a,b]
+    CHAR: A CHAR: Z [a,b]
+    { CHAR: _ } 3append member? ;
+
+: c-identifier-ch? ( ch -- ? )
+    CHAR: a CHAR: z [a,b]
+    CHAR: A CHAR: Z [a,b]
+    CHAR: 0 CHAR: 9 [a,b]
+    { CHAR: _ } 4 nappend member? ;
+
+: take-c-identifier ( state-parser -- string/f )
+    [
+        dup current c-identifier-begin? [
+            [ current c-identifier-ch? ] take-while
+        ] [
+            drop f
+        ] if
+    ] with-sequence-parser ;
+
+<< "length" [ length ] define-sorting >>
+
+: sort-tokens ( seq -- seq' )
+    { length>=< <=> } sort-by ;
+
+: take-first-matching ( state-parser seq -- seq )
+    swap
+    '[ _ [ swap take-sequence ] with-sequence-parser ] find nip ;
+
+
+: take-longest ( state-parser seq -- seq )
+    sort-tokens take-first-matching ;
+
+: take-c-integer ( state-parser -- string/f )
+    [
+        dup take-integer [
+            swap
+            { "ull" "uLL" "Ull" "ULL" "ll" "LL" "l" "L" "u" "U" }
+            take-longest [ append ] when*
+        ] [
+            drop f
+        ] if*
     ] with-sequence-parser ;
 
 : write-full ( sequence-parser -- ) sequence>> write ;
