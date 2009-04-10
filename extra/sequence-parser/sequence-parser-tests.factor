@@ -138,3 +138,15 @@ IN: sequence-parser.tests
 [ f ] [ "" <sequence-parser> 4 take-n ] unit-test
 [ "abcd" ] [ "abcd" <sequence-parser> 4 take-n ] unit-test
 [ "abcd" "efg" ] [ "abcdefg" <sequence-parser> [ 4 take-n ] [ take-rest ] bi ] unit-test
+
+[ "asdfasdf" ] [
+    "/*asdfasdf*/" <sequence-parser> take-c-comment 
+] unit-test
+
+[ "k" ] [
+    "/*asdfasdf*/k" <sequence-parser> [ take-c-comment drop ] [ take-rest ] bi
+] unit-test
+
+[ "/*asdfasdf" ] [
+    "/*asdfasdf" <sequence-parser> [ take-c-comment drop ] [ take-rest ] bi
+] unit-test
