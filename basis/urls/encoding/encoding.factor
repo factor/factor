@@ -72,6 +72,15 @@ PRIVATE>
         ] when*
     ] 2keep set-at ;
 
+: assoc-strings ( assoc -- assoc' )
+    [
+        {
+            { [ dup not ] [ ] }
+            { [ dup array? ] [ [ present ] map ] }
+            [ present 1array ]
+        } cond
+    ] assoc-map ;
+
 PRIVATE>
 
 : query>assoc ( query -- assoc )
@@ -86,11 +95,8 @@ PRIVATE>
 
 : assoc>query ( assoc -- str )
     [
-        dup array? [ [ present ] map ] [ present 1array ] if
-    ] assoc-map
-    [
-        [
+        assoc-strings [
             [ url-encode ] dip
-            [ url-encode "=" glue , ] with each
+            [ [ url-encode "=" glue , ] with each ] [ , ] if*
         ] assoc-each
     ] { } make "&" join ;
