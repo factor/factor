@@ -336,7 +336,7 @@ CLASS: {
 
 ! Initialization
 { "updateFactorGadgetSize:" "void" { "id" "SEL" "id" }
-    [ 2drop dup view-dim swap window (>>dim) yield ]
+    [ 2drop [ window ] [ view-dim ] bi >>dim drop yield ]
 }
 
 { "doCommandBySelector:" "void" { "id" "SEL" "SEL" }

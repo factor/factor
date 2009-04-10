@@ -1,12 +1,22 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache colors.constants destructors fry kernel
-opengl opengl.gl combinators images images.tesselation grouping
-specialized-arrays.float sequences math math.vectors
-math.matrices generalizations fry arrays namespaces ;
+opengl opengl.gl opengl.capabilities combinators images
+images.tesselation grouping specialized-arrays.float sequences math
+math.vectors math.matrices generalizations fry arrays namespaces
+system ;
 IN: opengl.textures
 
 SYMBOL: non-power-of-2-textures?
+
+: check-extensions ( -- )
+    #! ATI frglx driver doesn't implement GL_ARB_texture_non_power_of_two properly.
+    #! See thread 'Linux font display problem' April 2009 on Factor-talk
+    gl-vendor "ATI Technologies Inc." = not os macosx? or [
+        "2.0" { "GL_ARB_texture_non_power_of_two" }
+        has-gl-version-or-extensions?
+        non-power-of-2-textures? set
+    ] when ;
 
 : gen-texture ( -- id ) [ glGenTextures ] (gen-gl-object) ;
 

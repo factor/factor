@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations kernel math models
-namespaces opengl opengl.capabilities opengl.textures sequences io
-combinators combinators.short-circuit fry math.vectors math.rectangles
-cache ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
+namespaces opengl opengl.textures sequences io combinators
+combinators.short-circuit fry math.vectors math.rectangles cache
+ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
 ui.commands ;
 IN: ui.gadgets.worlds
 
@@ -76,10 +76,6 @@ M: world remove-gadget
 SYMBOL: flush-layout-cache-hook
 
 flush-layout-cache-hook [ [ ] ] initialize
-
-: check-extensions ( -- )
-    "2.0" { "GL_ARB_texture_non_power_of_two" } has-gl-version-or-extensions?
-    non-power-of-2-textures? set ;
 
 : (draw-world) ( world -- )
     dup handle>> [
