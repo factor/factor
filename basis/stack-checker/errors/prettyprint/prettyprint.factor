@@ -79,3 +79,12 @@ M: inconsistent-recursive-call-error summary
 M: unknown-primitive-error summary
     drop
     "Cannot determine stack effect statically" ;
+
+M: transform-expansion-error summary
+    drop
+    "Compiler transform threw an error" ;
+
+M: transform-expansion-error error.
+    [ summary print ]
+    [ "Word: " write word>> . nl ]
+    [ error>> error. ] tri ;

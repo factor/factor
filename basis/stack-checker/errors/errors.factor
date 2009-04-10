@@ -82,3 +82,8 @@ TUPLE: unknown-primitive-error ;
 
 : unknown-primitive-error ( -- * )
     \ unknown-primitive-error inference-warning ;
+
+TUPLE: transform-expansion-error word error ;
+
+: transform-expansion-error ( word error -- * )
+    \ transform-expansion-error inference-error ;
