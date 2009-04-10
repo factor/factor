@@ -32,8 +32,10 @@ test-failures [ V{ } clone ] initialize
     "--> test failed!" print
     <test-failure> test-failures get push ;
 
-: file-failure ( error file -- )
-    [ f ] [ f ] bi* failure ;
+SYMBOL: file
+
+: file-failure ( error -- )
+    f file get f failure ;
 
 :: (unit-test) ( output input -- error ? )
     [ { } input with-datastack output assert-sequence= f f ] [ t ] recover ; inline
@@ -71,14 +73,17 @@ MACRO: <experiment> ( word -- )
 : experiment. ( seq -- )
     [ first write ": " write ] [ rest . ] bi ;
 
-:: experiment ( word: ( -- error ? ) file line# -- )
+:: experiment ( word: ( -- error ? ) line# -- )
     word <experiment> :> e
     e experiment.
-    word execute [ e file line# failure ] [ drop ] if ; inline
+    word execute [
+        file get [
+            e file get line# failure
+        ] [ rethrow ] if
+    ] [ drop ] if ; inline
 
 : parse-test ( accum word -- accum )
     literalize parsed
-    file get dup [ path>> ] when parsed
     lexer get line>> parsed
     \ experiment parsed ; inline
 
@@ -93,8 +98,10 @@ SYNTAX: TEST:
 >>
 
 : run-test-file ( path -- )
-    [ [ test-failures get ] dip '[ file>> _ = not ] filter-here ]
-    [ [ run-file ] [ swap file-failure ] recover ] bi ;
+    dup file [
+        test-failures get [ file>> file get = not ] filter-here
+        '[ _ run-file ] [ file-failure ] recover
+    ] with-variable ;
 
 : run-vocab-tests ( vocab -- )
     dup vocab source-loaded?>> [
@@ -113,7 +120,7 @@ TEST: must-fail-with
 TEST: must-fail
 
 M: test-failure summary
-    [ asset>> experiment. ] with-string-writer ;
+    asset>> [ [ experiment. ] with-string-writer ] [ "Top-level form" ] if* ;
 
 M: test-failure error. ( error -- )
     [ call-next-method ]
