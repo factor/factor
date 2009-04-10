@@ -10,7 +10,7 @@ ui.gadgets.labeled ui.gadgets.tracks ui.gestures ui.operations
 ui.tools.browser ui.tools.common ui.gadgets.scrollers
 ui.tools.inspector ui.gadgets.status-bar ui.operations
 ui.gadgets.buttons ui.gadgets.borders ui.images tools.test ;
-IN: ui.tools.compiler-errors
+IN: ui.tools.error-list
 
 TUPLE: error-list-gadget < tool source-file error source-file-table error-table error-display ;
 
