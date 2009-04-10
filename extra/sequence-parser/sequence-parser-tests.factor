@@ -17,11 +17,37 @@ IN: sequence-parser.tests
     ] parse-sequence
 ] unit-test
 
-[ "foo " " bar" ]
+[ "foo " "and bar" ]
 [
     "foo and bar" [
         [ "and" take-until-sequence ] [ take-rest ] bi 
     ] parse-sequence
+] unit-test
+
+[ "foo " " bar" ]
+[
+    "foo and bar" [
+        [ "and" take-until-sequence ]
+        [ "and" take-sequence drop ]
+        [ take-rest ] tri
+    ] parse-sequence
+] unit-test
+
+[ "foo " " bar" ]
+[
+    "foo and bar" [
+        [ "and" take-until-sequence* ]
+        [ take-rest ] bi
+    ] parse-sequence
+] unit-test
+
+[ { 1 2 } ]
+[ { 1 2 3 4 } <sequence-parser> { 3 4 } take-until-sequence ] unit-test
+
+[ f "aaaa" ]
+[
+    "aaaa" <sequence-parser>
+    [ "b" take-until-sequence ] [ take-rest ] bi
 ] unit-test
 
 [ 6 ]
@@ -31,9 +57,6 @@ IN: sequence-parser.tests
 
 [ { 1 2 } ]
 [ { 1 2 3 } <sequence-parser> [ current 3 = ] take-until ] unit-test
-
-[ { 1 2 } ]
-[ { 1 2 3 4 } <sequence-parser> { 3 4 } take-until-sequence ] unit-test
 
 [ "ab" ]
 [ "abcd" <sequence-parser> "ab" take-sequence ] unit-test
@@ -102,3 +125,16 @@ IN: sequence-parser.tests
 
 [ f ]
 [ "abc" <sequence-parser> "abcdefg" take-sequence ] unit-test
+
+[ 1234 ]
+[ "1234f" <sequence-parser> take-integer ] unit-test
+
+[ "yes" ]
+[
+    "yes1234f" <sequence-parser>
+    [ take-integer drop ] [ "yes" take-sequence ] bi 
+] unit-test
+
+[ f ] [ "" <sequence-parser> 4 take-n ] unit-test
+[ "abcd" ] [ "abcd" <sequence-parser> 4 take-n ] unit-test
+[ "abcd" "efg" ] [ "abcdefg" <sequence-parser> [ 4 take-n ] [ take-rest ] bi ] unit-test
