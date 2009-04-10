@@ -70,8 +70,8 @@ M:: cocoa-ui-backend (open-window) ( world -- )
     world dim>> <FactorView> :> view
     view world world>NSRect <ViewWindow> :> window
     view -> release
-    window world window-loc>> auto-position
     world view register-window
+    window world window-loc>> auto-position
     world window save-position
     window install-window-delegate
     view window <window-handle> world (>>handle)
