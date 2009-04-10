@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math kernel sequences accessors fry circular
 unicode.case unicode.categories locals combinators.short-circuit
-make combinators io splitting ;
+make combinators io splitting math.parser ;
 IN: sequence-parser
 
 TUPLE: sequence-parser sequence n ;
@@ -66,17 +66,33 @@ TUPLE: sequence-parser sequence n ;
         f
     ] if ;
 
-:: take-until-sequence ( sequence-parser sequence -- sequence' )
+: take-sequence* ( sequence-parser sequence -- )
+    take-sequence drop ;
+
+:: take-until-sequence ( sequence-parser sequence -- sequence'/f )
+    sequence-parser n>> :> saved
     sequence length <growing-circular> :> growing
     sequence-parser
     [
         current growing push-growing-circular
         sequence growing sequence=
     ] take-until :> found
-    found dup length
-    growing length 1- - head
-    sequence-parser advance drop ;
-    
+    growing sequence sequence= [
+        found dup length
+        growing length 1- - head
+        sequence-parser [ growing length - 1 + ] change-n drop
+        ! sequence-parser advance drop
+    ] [
+        saved sequence-parser (>>n)
+        f
+    ] if ;
+
+:: take-until-sequence* ( sequence-parser sequence -- sequence'/f )
+    sequence-parser sequence take-until-sequence :> out
+    out [
+        sequence-parser [ sequence length + ] change-n drop
+    ] when out ;
+
 : skip-whitespace ( sequence-parser -- sequence-parser )
     [ [ current blank? not ] take-until drop ] keep ;
 
@@ -121,6 +137,17 @@ TUPLE: sequence-parser sequence n ;
 
 : take-token ( sequence-parser -- string/f )
     CHAR: \ CHAR: " take-token* ;
+
+: take-integer ( sequence-parser -- n/f )
+    [ current digit? ] take-while string>number ;
+
+:: take-n ( sequence-parser n -- seq/f )
+    n sequence-parser [ n>> + ] [ sequence>> length ] bi > [
+        f
+    ] [
+        sequence-parser n>> dup n + sequence-parser sequence>> subseq
+        sequence-parser [ n + ] change-n drop
+    ] if ;
 
 : write-full ( sequence-parser -- ) sequence>> write ;
 : write-rest ( sequence-parser -- ) take-rest write ;
