@@ -17,9 +17,14 @@ IN: stack-checker.transforms
         [ dup infer-word apply-word/effect ]
     } cond ;
 
+: call-transformer ( word stack quot -- newquot )
+    '[ _ _ with-datastack [ length 1 assert= ] [ first ] bi nip ]
+    [ transform-expansion-error ]
+    recover ;
+
 :: ((apply-transform)) ( word quot values stack rstate -- )
     rstate recursive-state
-    [ stack quot with-datastack first ] with-variable
+    [ word stack quot call-transformer ] with-variable
     [
         word inlined-dependency depends-on
         values [ length meta-d shorten-by ] [ #drop, ] bi
