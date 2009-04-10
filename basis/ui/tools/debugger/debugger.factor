@@ -8,7 +8,7 @@ ui.gadgets.buttons ui.gadgets.labels ui.gadgets.panes
 ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.tables
 ui.gadgets.tracks ui.gadgets.scrollers ui.gadgets.panes
 ui.gadgets.borders ui.gadgets.status-bar ui.tools.traceback
-ui.tools.inspector ;
+ui.tools.inspector ui.tools.browser ;
 IN: ui.tools.debugger
 
 TUPLE: debugger < track error restarts restart-hook restart-list continuation ;

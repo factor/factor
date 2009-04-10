@@ -321,7 +321,7 @@ M: source-file-error error.
         ] bi format nl
     ] [ error>> error. ] bi ;
 
-M: compiler-error summary word>> synopsis ;
+M: compiler-error summary asset>> summary ;
 
 M: bad-effect summary
     drop "Bad stack effect declaration" ;

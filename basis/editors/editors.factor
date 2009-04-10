@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser lexer kernel namespaces sequences definitions
-io.files io.backend io.pathnames io summary continuations
-tools.crossref tools.vocabs prettyprint source-files assocs
+USING: parser lexer kernel namespaces sequences definitions io.files
+io.backend io.pathnames io summary continuations tools.crossref
+tools.vocabs prettyprint source-files source-files.errors assocs
 vocabs vocabs.loader splitting accessors debugger prettyprint
 help.topics ;
 IN: editors

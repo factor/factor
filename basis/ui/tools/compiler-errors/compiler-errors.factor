@@ -2,14 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays sequences sorting assocs colors.constants
 combinators combinators.smart combinators.short-circuit editors
-compiler.errors compiler.units fonts kernel io.pathnames
+compiler.errors compiler.units fonts kernel io.pathnames prettyprint
 stack-checker.errors source-files.errors math.parser math.order models
 models.arrow models.search debugger namespaces summary locals ui
 ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.tables
 ui.gadgets.labeled ui.gadgets.tracks ui.gestures ui.operations
 ui.tools.browser ui.tools.common ui.gadgets.scrollers
 ui.tools.inspector ui.gadgets.status-bar ui.operations
-ui.gadgets.buttons ui.gadgets.borders ui.images ;
+ui.gadgets.buttons ui.gadgets.borders ui.images tools.test ;
 IN: ui.tools.compiler-errors
 
 TUPLE: error-list-gadget < tool source-file error source-file-table error-table error-display ;
@@ -17,7 +17,7 @@ TUPLE: error-list-gadget < tool source-file error source-file-table error-table 
 SINGLETON: source-file-renderer
 
 M: source-file-renderer row-columns
-    drop [ first2 length number>string 2array ] [ { "All" "" } ] if* ;
+    drop first2 length number>string 2array ;
 
 M: source-file-renderer row-value
     drop dup [ first <pathname> ] when ;
@@ -30,7 +30,7 @@ M: source-file-renderer column-alignment drop { 0 1 } ;
 M: source-file-renderer filled-column drop 0 ;
 
 : <source-file-model> ( model -- model' )
-    [ values group-by-source-file >alist sort-keys f prefix ] <arrow> ;
+    [ group-by-source-file >alist sort-keys ] <arrow> ;
 
 :: <source-file-table> ( error-list -- table )
     error-list model>> <source-file-model>
@@ -48,36 +48,33 @@ M: source-file-renderer filled-column drop 0 ;
 
 SINGLETON: error-renderer
 
-GENERIC: error-icon ( error -- icon )
-
-: <error-icon> ( name -- image-name )
+: error-icon ( type -- icon )
+    {
+        { +compiler-error+ [ "compiler-error" ] }
+        { +compiler-warning+ [ "compiler-warning" ] }
+        { +linkage-error+ [ "linkage-error" ] }
+        { +test-failure+ [ "unit-test-error" ] }
+    } case
     "vocab:ui/tools/error-list/icons/" ".tiff" surround <image-name> ;
-
-M: compiler-error error-icon
-    compiler-error-type {
-        { +error+ [ "compiler-error" ] }
-        { +warning+ [ "compiler-warning" ] }
-        { +linkage+ [ "linkage-error" ] }
-    } case <error-icon> ;
 
 M: error-renderer row-columns
     drop [
         {
-            [ error-icon ]
+            [ source-file-error-type error-icon ]
             [ line#>> number>string ]
-            [ word>> name>> ]
+            [ asset>> unparse-short ]
             [ error>> summary ]
         } cleave
     ] output>array ;
 
 M: error-renderer prototype-row
-    drop [ "compiler-error" <error-icon> "" "" "" ] output>array ;
+    drop [ +compiler-error+ error-icon "" "" "" ] output>array ;
 
 M: error-renderer row-value
     drop ;
 
 M: error-renderer column-titles
-    drop { "" "Line" "Word" "Error" } ;
+    drop { "" "Line" "Asset" "Error" } ;
 
 M: error-renderer column-alignment drop { 0 1 0 0 } ;
 
@@ -85,8 +82,8 @@ M: error-renderer column-alignment drop { 0 1 0 0 } ;
     [ [ [ file>> ] [ line#>> ] bi 2array ] compare ] sort ;
 
 : <error-table-model> ( error-list -- model )
-    [ model>> [ values ] <arrow> ] [ source-file>> ] bi
-    [ swap { [ drop not ] [ [ string>> ] [ file>> ] bi* = ] } 2|| ] <search>
+    [ model>> ] [ source-file>> ] bi
+    [ [ file>> ] [ string>> ] bi* = ] <search>
     [ sort-errors ] <arrow> ;
 
 :: <error-table> ( error-list -- table )
@@ -161,7 +158,8 @@ SINGLETON: updater
 
 M: updater definitions-changed
     2drop
-    compiler-errors get-global
+    compiler-errors get-global values
+    test-failures get-global append
     compiler-error-model get-global
     set-model ;
 
