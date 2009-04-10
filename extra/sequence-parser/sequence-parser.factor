@@ -12,6 +12,12 @@ TUPLE: sequence-parser sequence n ;
         swap >>sequence
         0 >>n ;
 
+:: with-sequence-parser ( sequence-parser quot -- seq/f )
+    sequence-parser n>> :> n
+    sequence-parser quot call [
+        n sequence-parser (>>n) f
+    ] unless* ; inline
+
 : offset  ( sequence-parser offset -- char/f )
     swap
     [ n>> + ] [ sequence>> ?nth ] bi ; inline
@@ -33,7 +39,8 @@ TUPLE: sequence-parser sequence n ;
 
 :: skip-until ( sequence-parser quot: ( obj -- ? ) -- )
     sequence-parser current [
-        sequence-parser quot call [ sequence-parser advance quot skip-until ] unless
+        sequence-parser quot call
+        [ sequence-parser advance quot skip-until ] unless
     ] when ; inline recursive
 
 : sequence-parse-end? ( sequence-parser -- ? ) current not ;
@@ -148,6 +155,15 @@ TUPLE: sequence-parser sequence n ;
         sequence-parser n>> dup n + sequence-parser sequence>> subseq
         sequence-parser [ n + ] change-n drop
     ] if ;
+
+: take-c-comment ( sequence-parser -- seq/f )
+    [
+        dup "/*" take-sequence [
+            "*/" take-until-sequence*
+        ] [
+            drop f
+        ] if
+    ] with-sequence-parser ;
 
 : write-full ( sequence-parser -- ) sequence>> write ;
 : write-rest ( sequence-parser -- ) take-rest write ;
