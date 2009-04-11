@@ -12,10 +12,7 @@ IN: ui
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
 
-ERROR: no-window handle ;
-
-: window ( handle -- world )
-    windows get-global ?at [ no-window ] unless ;
+: window ( handle -- world ) windows get-global at ;
 
 : window-focus ( handle -- gadget ) window world-focus ;
 
