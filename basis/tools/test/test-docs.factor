@@ -3,33 +3,23 @@ IN: tools.test
 
 ARTICLE: "tools.test.write" "Writing unit tests"
 "Assert that a quotation outputs a specific set of values:"
-{ $subsection unit-test }
+{ $subsection POSTPONE: unit-test }
 "Assert that a quotation throws an error:"
-{ $subsection must-fail }
-{ $subsection must-fail-with }
+{ $subsection POSTPONE: must-fail }
+{ $subsection POSTPONE: must-fail-with }
 "Assert that a quotation or word has a specific static stack effect (see " { $link "inference" } "):"
-{ $subsection must-infer }
-{ $subsection must-infer-as } ;
+{ $subsection POSTPONE: must-infer }
+{ $subsection POSTPONE: must-infer-as } ;
 
 ARTICLE: "tools.test.run" "Running unit tests"
 "The following words run test harness files; any test failures are collected and printed at the end:"
 { $subsection test }
-{ $subsection test-all } ;
-
-ARTICLE: "tools.test.failure" "Handling test failures"
-"Most of the time the words documented in " { $link "tools.test.run" } " are used because they print all test failures in human-readable form. Some tools inspect the test failures and takes some kind of action instead, for example, " { $vocab-link "mason" } "."
-$nl
-"The following words output an association list mapping vocabulary names to sequences of failures; a failure is an array having the shape " { $snippet "{ error test continuation }" } ", and the elements are as follows:"
-{ $list
-    { { $snippet "error" } " - the error thrown by the unit test" }
-    { { $snippet "test" } " - a pair " { $snippet "{ output input }" } " containing expected output and a unit test quotation which didn't produce this output" }
-    { { $snippet "continuation" } " - the traceback at the point of the error" }
-}
-"The following words run test harness files and output failures:"
-{ $subsection run-tests }
-{ $subsection run-all-tests }
+{ $subsection test-all }
 "The following word prints failures:"
-{ $subsection test-failures. } ;
+{ $subsection :failures }
+"Unit test failurs are instances of a class, and are stored in a global variable:"
+{ $subsection test-failure }
+{ $subsection test-failures } ;
 
 ARTICLE: "tools.test" "Unit testing"
 "A unit test is a piece of code which starts with known input values, then compares the output of a word with an expected output, where the expected output is defined by the word's contract."
@@ -45,8 +35,7 @@ $nl
 $nl
 "If the test harness needs to define words, they should be placed in a vocabulary named " { $snippet { $emphasis "vocab" } ".tests" } " where " { $emphasis "vocab" } " is the vocab being tested."
 { $subsection "tools.test.write" }
-{ $subsection "tools.test.run" }
-{ $subsection "tools.test.failure" } ;
+{ $subsection "tools.test.run" } ;
 
 ABOUT: "tools.test"
 
@@ -78,17 +67,8 @@ HELP: test
 { $values { "prefix" "a vocabulary name" } }
 { $description "Runs unit tests for the vocabulary named " { $snippet "prefix" } " and all of its child vocabularies." } ;
 
-HELP: run-tests
-{ $values { "prefix" "a vocabulary name" } { "failures" "an association list of unit test failures" } }
-{ $description "Runs unit tests for the vocabulary named " { $snippet "prefix" } " and all of its child vocabularies. Outputs unit test failures as documented in " { $link "tools.test.failure" } "." } ;
-
 HELP: test-all
 { $description "Runs unit tests for all loaded vocabularies." } ;
 
-HELP: run-all-tests
-{ $values { "failures" "an association list of unit test failures" } }
-{ $description "Runs unit tests for all loaded vocabularies and outputs unit test failures as documented in " { $link "tools.test.failure" } "." } ;
-
-HELP: test-failures.
-{ $values { "assoc" "an association list of unit test failures" } }
-{ $description "Prints unit test failures output by " { $link run-tests } " or " { $link run-all-tests } " to " { $link output-stream } "." } ;
+HELP: :failures
+{ $description "Prints all pending unit test failures." } ;

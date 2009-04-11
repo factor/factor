@@ -3,7 +3,7 @@
 USING: accessors arrays kernel continuations assocs namespaces
 sequences words vocabs definitions hashtables init sets
 math math.order classes classes.algebra classes.tuple
-classes.tuple.private generic ;
+classes.tuple.private generic compiler.errors ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -41,7 +41,7 @@ SYMBOL: compiler-impl
 HOOK: recompile compiler-impl ( words -- alist )
 
 ! Non-optimizing compiler
-M: f recompile [ f ] { } map>assoc ;
+M: f recompile [ [ f swap compiler-error ] each ] [ [ f ] { } map>assoc ] bi ;
 
 ! Trivial compiler. We don't want to touch the code heap
 ! during stage1 bootstrap, it would just waste time.
