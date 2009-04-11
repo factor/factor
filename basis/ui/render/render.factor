@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math.rectangles math.vectors namespaces kernel accessors
-assocs combinators sequences opengl opengl.gl opengl.glu colors
+assocs combinators sequences opengl opengl.gl colors
 colors.constants ui.gadgets ui.pens ;
 IN: ui.render
 
@@ -22,7 +22,7 @@ SYMBOL: viewport-translation
         dim>>
         [ { 0 1 } v* viewport-translation set ]
         [ [ { 0 0 } ] dip gl-viewport ]
-        [ [ 0 ] dip first2 0 gluOrtho2D ] tri
+        [ [ 0 ] dip first2 0 1 -1 glOrtho ] tri
     ]
     [ clip set ] bi
     do-clip ;
