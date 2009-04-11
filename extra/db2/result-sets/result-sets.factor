@@ -26,4 +26,3 @@ GENERIC# column-typed 1 ( result-set column -- sql )
 
 : sql-row-typed ( result-set -- seq )
     dup #columns [ column-typed ] with map ;
-

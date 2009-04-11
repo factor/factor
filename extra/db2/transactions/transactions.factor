@@ -1,9 +1,8 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: db2 ;
+USING: continuations db2 db2.connections namespaces ;
 IN: db2.transactions
 
-! Transactions
 SYMBOL: in-transaction
 
 HOOK: begin-transaction db-connection ( -- )
