@@ -52,7 +52,7 @@ TUPLE: sequence-parser sequence n ;
     ] [
         [ drop n>> ]
         [ skip-until ]
-        [ drop [ n>> ] [ sequence>> ] bi ] 2tri subseq
+        [ drop [ n>> ] [ sequence>> ] bi ] 2tri subseq f like
     ] if ; inline
 
 : take-while ( sequence-parser quot: ( obj -- ? ) -- sequence/f )
@@ -103,6 +103,45 @@ TUPLE: sequence-parser sequence n ;
 
 : skip-whitespace ( sequence-parser -- sequence-parser )
     [ [ current blank? not ] take-until drop ] keep ;
+
+: skip-whitespace-eol ( sequence-parser -- sequence-parser )
+    [ [ current " \t\r" member? not ] take-until drop ] keep ;
+
+: take-c-comment ( sequence-parser -- seq/f )
+    [
+        dup "/*" take-sequence [
+            "*/" take-until-sequence*
+        ] [
+            drop f
+        ] if
+    ] with-sequence-parser ;
+
+: take-c++-comment ( sequence-parser -- seq/f )
+    [
+        dup "//" take-sequence [
+            [
+                [
+                    { [ current CHAR: \n = ] [ sequence-parse-end? ] } 1||
+                ] take-until
+            ] [
+                advance drop
+            ] bi
+        ] [
+            drop f
+        ] if
+    ] with-sequence-parser ;
+
+: skip-whitespace/comments ( sequence-parser -- sequence-parser )
+    skip-whitespace-eol
+    {
+        { [ dup take-c-comment ] [ skip-whitespace/comments ] }
+        { [ dup take-c++-comment ] [ skip-whitespace/comments ] }
+        [ ]
+    } cond ;
+
+: take-define-identifier ( sequence-parser -- string )
+    skip-whitespace/comments
+    [ current { [ blank? ] [ CHAR: ( = ] } 1|| ] take-until ;
 
 : take-rest-slice ( sequence-parser -- sequence/f )
     [ sequence>> ] [ n>> ] bi
@@ -157,30 +196,6 @@ TUPLE: sequence-parser sequence n ;
         sequence-parser [ n + ] change-n drop
     ] if ;
 
-: take-c-comment ( sequence-parser -- seq/f )
-    [
-        dup "/*" take-sequence [
-            "*/" take-until-sequence*
-        ] [
-            drop f
-        ] if
-    ] with-sequence-parser ;
-
-: take-c++-comment ( sequence-parser -- seq/f )
-    [
-        dup "//" take-sequence [
-            [
-                [
-                    { [ current CHAR: \n = ] [ sequence-parse-end? ] } 1||
-                ] take-until
-            ] [
-                advance drop
-            ] bi
-        ] [
-            drop f
-        ] if
-    ] with-sequence-parser ;
-
 : c-identifier-begin? ( ch -- ? )
     CHAR: a CHAR: z [a,b]
     CHAR: A CHAR: Z [a,b]
@@ -192,29 +207,30 @@ TUPLE: sequence-parser sequence n ;
     CHAR: 0 CHAR: 9 [a,b]
     { CHAR: _ } 4 nappend member? ;
 
-: take-c-identifier ( state-parser -- string/f )
-    [
-        dup current c-identifier-begin? [
-            [ current c-identifier-ch? ] take-while
-        ] [
-            drop f
-        ] if
-    ] with-sequence-parser ;
+: (take-c-identifier) ( sequence-parser -- string/f )
+    dup current c-identifier-begin? [
+        [ current c-identifier-ch? ] take-while
+    ] [
+        drop f
+    ] if ;
+
+: take-c-identifier ( sequence-parser -- string/f )
+    [ (take-c-identifier) ] with-sequence-parser ;
 
 << "length" [ length ] define-sorting >>
 
 : sort-tokens ( seq -- seq' )
     { length>=< <=> } sort-by ;
 
-: take-first-matching ( state-parser seq -- seq )
+: take-first-matching ( sequence-parser seq -- seq )
     swap
     '[ _ [ swap take-sequence ] with-sequence-parser ] find nip ;
 
 
-: take-longest ( state-parser seq -- seq )
+: take-longest ( sequence-parser seq -- seq )
     sort-tokens take-first-matching ;
 
-: take-c-integer ( state-parser -- string/f )
+: take-c-integer ( sequence-parser -- string/f )
     [
         dup take-integer [
             swap
@@ -224,6 +240,20 @@ TUPLE: sequence-parser sequence n ;
             drop f
         ] if*
     ] with-sequence-parser ;
+
+CONSTANT: c-punctuators
+    {
+        "[" "]" "(" ")" "{" "}" "." "->"
+        "++" "--" "&" "*" "+" "-" "~" "!"
+        "/" "%" "<<" ">>" "<" ">" "<=" ">=" "==" "!=" "^" "|" "&&" "||"
+        "?" ":" ";" "..."
+        "=" "*=" "/=" "%=" "+=" "-=" "<<=" ">>=" "&=" "^=" "|="
+        "," "#" "##"
+        "<:" ":>" "<%" "%>" "%:" "%:%:"
+    }
+
+: take-c-punctuator ( sequence-parser -- string/f )
+    c-punctuators take-longest ;
 
 : write-full ( sequence-parser -- ) sequence>> write ;
 : write-rest ( sequence-parser -- ) take-rest write ;
