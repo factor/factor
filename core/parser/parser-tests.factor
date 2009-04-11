@@ -3,7 +3,7 @@ io.streams.string namespaces classes effects source-files assocs
 sequences strings io.files io.pathnames definitions
 continuations sorting classes.tuple compiler.units debugger
 vocabs vocabs.loader accessors eval combinators lexer
-vocabs.parser words.symbol multiline ;
+vocabs.parser words.symbol multiline source-files.errors ;
 IN: parser.tests
 
 \ run-file must-infer

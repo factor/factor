@@ -1,4 +1,5 @@
-USING: help.markup help.syntax parser source-files vocabs.loader ;
+USING: help.markup help.syntax parser source-files
+source-files.errors vocabs.loader ;
 IN: editors
 
 ARTICLE: "editor" "Editor integration"

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces arrays sequences io words fry
 continuations vocabs assocs dlists definitions math graphs generic
-combinators deques search-deques macros io stack-checker
+combinators deques search-deques macros io source-files.errors stack-checker
 stack-checker.state stack-checker.inlining combinators.short-circuit
 compiler.errors compiler.units compiler.tree.builder
 compiler.tree.optimizer compiler.cfg.builder compiler.cfg.optimizer
@@ -54,7 +54,7 @@ SYMBOLS: +optimized+ +unoptimized+ ;
 
 : ignore-error? ( word error -- ? )
     [ [ inline? ] [ macro? ] bi or ]
-    [ compiler-error-type +warning+ eq? ] bi* and ;
+    [ source-file-error-type +compiler-warning+ eq? ] bi* and ;
 
 : fail ( word error -- * )
     [ 2dup ignore-error? [ 2drop ] [ swap compiler-error ] if ]

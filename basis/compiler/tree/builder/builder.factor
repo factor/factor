@@ -42,8 +42,10 @@ IN: compiler.tree.builder
 : check-cannot-infer ( word -- )
     dup "cannot-infer" word-prop [ cannot-infer-effect ] [ drop ] if ;
 
+TUPLE: do-not-compile word ;
+
 : check-no-compile ( word -- )
-    dup "no-compile" word-prop [ cannot-infer-effect ] [ drop ] if ;
+    dup "no-compile" word-prop [ do-not-compile inference-warning ] [ drop ] if ;
 
 : build-tree-from-word ( word -- nodes )
     [

@@ -1,31 +1,26 @@
-! Copyright (C) 2007, 2008 Slava Pestov.
+! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces make assocs io sequences
-sorting continuations math math.parser ;
+continuations math math.parser accessors definitions
+source-files.errors ;
 IN: compiler.errors
 
-SYMBOL: +error+
-SYMBOL: +warning+
-SYMBOL: +linkage+
+SYMBOLS: +compiler-error+ +compiler-warning+ +linkage-error+ ;
 
-GENERIC: compiler-error-type ( error -- ? )
+TUPLE: compiler-error < source-file-error ;
 
-M: object compiler-error-type drop +error+ ;
-
-GENERIC# compiler-error. 1 ( error word -- )
+M: compiler-error source-file-error-type error>> source-file-error-type ;
 
 SYMBOL: compiler-errors
+
+compiler-errors [ H{ } clone ] initialize
 
 SYMBOL: with-compiler-errors?
 
 : errors-of-type ( type -- assoc )
     compiler-errors get-global
-    swap [ [ nip compiler-error-type ] dip eq? ] curry
+    swap [ [ nip source-file-error-type ] dip eq? ] curry
     assoc-filter ;
-
-: compiler-errors. ( type -- )
-    errors-of-type >alist sort-keys
-    [ swap compiler-error. ] assoc-each ;
 
 : (compiler-report) ( what type word -- )
     over errors-of-type assoc-empty? [ 3drop ] [
@@ -41,27 +36,25 @@ SYMBOL: with-compiler-errors?
     ] if ;
 
 : compiler-report ( -- )
-    "semantic errors" +error+ "errors" (compiler-report)
-    "semantic warnings" +warning+ "warnings" (compiler-report)
-    "linkage errors" +linkage+ "linkage" (compiler-report) ;
+    "compiler errors" +compiler-error+ "errors" (compiler-report)
+    "compiler warnings" +compiler-warning+ "warnings" (compiler-report)
+    "linkage errors" +linkage-error+ "linkage" (compiler-report) ;
 
-: :errors ( -- ) +error+ compiler-errors. ;
-
-: :warnings ( -- ) +warning+ compiler-errors. ;
-
-: :linkage ( -- ) +linkage+ compiler-errors. ;
+: <compiler-error> ( error word -- compiler-error )
+    \ compiler-error new
+        swap
+        [ >>asset ]
+        [ where [ first2 ] [ "<unknown file>" 0 ] if* [ >>file ] [ >>line# ] bi* ] bi
+        swap >>error ;
 
 : compiler-error ( error word -- )
-    with-compiler-errors? get [
-        compiler-errors get pick
-        [ set-at ] [ delete-at drop ] if
-    ] [ 2drop ] if ;
+    compiler-errors get-global pick
+    [ [ [ <compiler-error> ] keep ] dip set-at ] [ delete-at drop ] if ;
 
 : with-compiler-errors ( quot -- )
     with-compiler-errors? get "quiet" get or [ call ] [
         [
             with-compiler-errors? on
-            V{ } clone compiler-errors set-global
             [ compiler-report ] [ ] cleanup
         ] with-scope
     ] if ; inline
