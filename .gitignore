@@ -25,3 +25,4 @@ build-support/wordsize
 .#*
 *.swo
 checksums.txt
+a.out
