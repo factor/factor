@@ -57,7 +57,7 @@ M: lexer-error error-line
     [ error>> error-line ] [ line>> ] bi or ;
 
 M: source-file-error error-file
-    [ error>> error-file ] [ file>> path>> ] bi or ;
+    [ error>> error-file ] [ file>> ] bi or ;
 
 M: source-file-error error-line
     error>> error-line ;
