@@ -3,7 +3,7 @@
 USING: combinators kernel accessors ;
 IN: images
 
-SINGLETONS: L BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR
+SINGLETONS: L LA BGR RGB BGRA RGBA ABGR ARGB RGBX XRGB BGRX XBGR
 R16G16B16 R32G32B32 R16G16B16A16 R32G32B32A32 ;
 
 UNION: alpha-channel BGRA RGBA ABGR ARGB R16G16B16A16 R32G32B32A32 ;
@@ -11,6 +11,7 @@ UNION: alpha-channel BGRA RGBA ABGR ARGB R16G16B16A16 R32G32B32A32 ;
 : bytes-per-pixel ( component-order -- n )
     {
         { L [ 1 ] }
+        { LA [ 2 ] }
         { BGR [ 3 ] }
         { RGB [ 3 ] }
         { BGRA [ 4 ] }

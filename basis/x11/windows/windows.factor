@@ -6,10 +6,10 @@ arrays fry ;
 IN: x11.windows
 
 : create-window-mask ( -- n )
-    { CWBackPixel CWBorderPixel CWColormap CWEventMask } flags ;
+    { CWColormap CWEventMask } flags ;
 
 : create-colormap ( visinfo -- colormap )
-    dpy get root get rot XVisualInfo-visual AllocNone
+    [ dpy get root get ] dip XVisualInfo-visual AllocNone
     XCreateColormap ;
 
 : event-mask ( -- n )
@@ -29,8 +29,6 @@ IN: x11.windows
 
 : window-attributes ( visinfo -- attributes )
     "XSetWindowAttributes" <c-object>
-    0 over set-XSetWindowAttributes-background_pixel
-    0 over set-XSetWindowAttributes-border_pixel
     [ [ create-colormap ] dip set-XSetWindowAttributes-colormap ] keep
     event-mask over set-XSetWindowAttributes-event_mask ;
 
