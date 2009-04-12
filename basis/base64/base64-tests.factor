@@ -23,5 +23,8 @@ IN: base64.tests
     ascii encode >base64-lines >string
 ] unit-test
 
+[ { 33 52 17 40 12 51 33 43 18 33 23 } base64> ]
+[ malformed-base64? ] must-fail-with
+
 \ >base64 must-infer
 \ base64> must-infer

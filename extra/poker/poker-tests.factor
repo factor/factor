@@ -1,4 +1,4 @@
-USING: accessors poker poker.private tools.test ;
+USING: accessors poker poker.private tools.test math.order kernel ;
 IN: poker.tests
 
 [ 134236965 ] [ "KD" >ckf ] unit-test
