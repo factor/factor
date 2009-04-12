@@ -15,7 +15,7 @@ HELP: irc-profile "IRC Client profile object" ;
 
 HELP: irc-chat-end "Message sent to a chat when it has been detached from the client, the chat should stop after it receives this message." ;
 
-HELP: irc-end "Message sent when the client isn't running anymore, a chat should stop after it receives this message." ;
+HELP: irc-end "Message sent when the client isn't running anymore, the chat should stop after it receives this message." ;
 
 HELP: irc-disconnected "Message sent to notify chats that connection was lost." ;
 
