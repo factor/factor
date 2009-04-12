@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math.order sorting sequences definitions
-namespaces arrays ;
+namespaces arrays splitting io math.parser math ;
 IN: source-files.errors
 
 TUPLE: source-file-error error asset file line# ;
@@ -41,6 +41,19 @@ source-file-error-types [ V{ } clone ] initialize
 
 : error-icon-path ( type -- icon )
     source-file-error-types get at first ;
+
+: error-summary ( -- )
+    source-file-error-types get [
+        [ name>> "+" ?head drop "+" ?tail drop ]
+        [ second call length ] bi*
+    ] assoc-map
+    [ nip 0 > ] assoc-filter
+    [
+        over
+        [ ":" write write ]
+        [ " - print " write number>string write bl ]
+        [ { { CHAR: - CHAR: \s } } substitute write "s" print ] tri*
+    ] assoc-each ;
 
 : all-errors ( -- errors )
     source-file-error-types get
