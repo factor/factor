@@ -6,7 +6,7 @@ combinators math.ranges unicode.categories byte-arrays
 io.encodings.string io.encodings.utf16 assocs math.parser
 combinators.short-circuit fry namespaces combinators.smart
 splitting io.encodings.ascii arrays io.files.info unicode.case
-io.directories.search ;
+io.directories.search literals math.functions ;
 IN: id3
 
 <PRIVATE
@@ -37,58 +37,83 @@ CONSTANT: genres
         "Primus" "Porn Groove" "Satire" "Slow Jam" "Club" "Tango" 
         "Samba" "Folklore" "Ballad" "Power Ballad" "Rhythmic Soul" 
         "Freestyle" "Duet" "Punk Rock" "Drum Solo" "A capella" 
-        "Euro-House" "Dance Hall"
+        "Euro-House" "Dance Hall" "Goa" "Drum & Bass" "Club-House"
+        "Hardcore" "Terror" "Indie" "BritPop" "Negerpunk"
+        "Polsk Punk" "Beat" "Christian Gangsta Rap" "Heavy Metal"
+        "Black Metal" "Crossover" "Contemporary Christian"
+        "Christian Rock"
     }
 
 TUPLE: header version flags size ;
 
-TUPLE: frame frame-id flags size data ;
+TUPLE: frame tag flags size data ;
 
-TUPLE: id3v2-info header frames ;
+TUPLE: id3 header frames
+title artist album year comment genre
+speed genre-name start-time end-time ;
 
-TUPLE: id3v1-info title artist album year comment genre ;
-
-: <id3v1-info> ( -- object ) id3v1-info new ; inline
-
-: <id3v2-info> ( header frames -- object )
-    [ [ frame-id>> ] keep ] H{ } map>assoc id3v2-info boa ;
+: <id3> ( -- id3 )
+    id3 new
+    H{ } clone >>frames ; inline
 
 : <header> ( -- object ) header new ; inline
 
 : <frame> ( -- object ) frame new ; inline
 
-: id3v2? ( mmap -- ? ) "ID3" head? ; inline
+: id3v2? ( seq -- ? ) "ID3" head? ; inline
 
-: id3v1? ( mmap -- ? )
-    { [ length 128 >= ] [ 128 tail-slice* "TAG" head? ] } 1&& ; inline
+CONSTANT: id3v1-length 128
+CONSTANT: id3v1-offset 128
+CONSTANT: id3v1+-length 227
+CONSTANT: id3v1+-offset $[ 128 227 + ]
 
-: id3v1-frame ( string key -- frame )
-    <frame>
-        swap >>frame-id
-        swap >>data ; inline
+: id3v1? ( seq -- ? )
+    {
+        [ length id3v1-offset >= ]
+        [ id3v1-length tail-slice* "TAG" head? ]
+    } 1&& ; inline
 
-: id3v1>id3v2 ( id3v1 -- id3v2 )
+: id3v1+? ( seq -- ? )
+    {
+        [ length id3v1+-offset >= ]
+        [ id3v1+-length tail-slice* "TAG+" head? ]
+    } 1&& ; inline
+
+: pair>frame ( string key -- frame/f )
+    over [
+        <frame>
+            swap >>tag
+            swap >>data
+    ] [
+        2drop f
+    ] if ; inline
+
+: id3v1>frames ( id3v1 -- seq )
     [
         {
-            [ title>> "TIT2" id3v1-frame ]
-            [ artist>> "TPE1" id3v1-frame ]
-            [ album>> "TALB" id3v1-frame ]
-            [ year>> "TYER" id3v1-frame ]
-            [ comment>> "COMM" id3v1-frame ]
-            [ genre>> "TCON" id3v1-frame ]
+            [ title>> "TIT2" pair>frame ]
+            [ artist>> "TPE1" pair>frame ]
+            [ album>> "TALB" pair>frame ]
+            [ year>> "TYER" pair>frame ]
+            [ comment>> "COMM" pair>frame ]
+            [ genre>> "TCON" pair>frame ]
         } cleave
-    ] output>array f swap <id3v2-info> ; inline
+    ] output>array sift ;
 
-: >28bitword ( seq -- int )
+: seq>synchsafe ( seq -- n )
     0 [ [ 7 shift ] dip bitor ] reduce ; inline
+
+: synchsafe>seq ( n -- seq )
+    dup 1+ log2 1+ 7 / ceiling
+    [ [ -7 shift ] keep HEX: 7f bitand  ] replicate nip reverse ; inline
 
 : filter-text-data ( data -- filtered )
     [ printable? ] filter ; inline
 
-: valid-frame-id? ( id -- ? )
+: valid-tag? ( id -- ? )
     [ { [ digit? ] [ LETTER? ] } 1|| ] all? ; inline
 
-: read-frame-data ( frame mmap -- frame data )
+: read-frame-data ( frame seq -- frame data )
     [ 10 over size>> 10 + ] dip <slice> filter-text-data ; inline
 
 : decode-text ( string -- string' )
@@ -96,44 +121,48 @@ TUPLE: id3v1-info title artist album year comment genre ;
     { { HEX: ff HEX: fe } { HEX: fe HEX: ff } } member?
     utf16 ascii ? decode ; inline
 
-: (read-frame) ( mmap -- frame )
+: (read-frame) ( seq -- frame )
     [ <frame> ] dip
     {
-        [ 4 head-slice decode-text >>frame-id ]
-        [ [ 4 8 ] dip subseq >28bitword >>size ]
+        [ 4 head-slice decode-text >>tag ]
+        [ [ 4 8 ] dip subseq seq>synchsafe >>size ]
         [ [ 8 10 ] dip subseq >byte-array >>flags ]
         [ read-frame-data decode-text >>data ]
     } cleave ; inline
 
-: read-frame ( mmap -- frame/f )
-    dup 4 head-slice valid-frame-id?
+: read-frame ( seq -- frame/f )
+    dup 4 head-slice valid-tag?
     [ (read-frame) ] [ drop f ] if ; inline
 
-: remove-frame ( mmap frame -- mmap )
+: remove-frame ( seq frame -- seq )
     size>> 10 + tail-slice ; inline
 
-: read-frames ( mmap -- frames )
-    [ dup read-frame dup ]
-    [ [ remove-frame ] keep ]
-    produce 2nip ; inline
+: frames>assoc ( seq -- assoc )
+    [ [ tag>> ] keep ] H{ } map>assoc ; inline
+
+: read-frames ( seq -- assoc )
+    [ dup read-frame dup ] [ [ remove-frame ] keep ] produce 2nip ; inline
     
-: read-v2-header ( seq -- id3header )
+: read-v2-header ( seq -- header )
     [ <header> ] dip
     {
         [ [ 3 5 ] dip <slice> >array >>version ]
         [ [ 5 ] dip nth >>flags ]
-        [ [ 6 10 ] dip <slice> >28bitword >>size ]
+        [ [ 6 10 ] dip <slice> seq>synchsafe >>size ]
     } cleave ; inline
 
-: read-v2-tag-data ( seq -- id3v2-info )
-    10 cut-slice
-    [ read-v2-header ]
-    [ read-frames ] bi* <id3v2-info> ; inline
-    
-: skip-to-v1-data ( seq -- seq ) 125 tail-slice* ; inline
+: merge-frames ( id3 assoc -- id3 )
+    [ dup frames>> ] dip update ; inline
 
-: (read-v1-tag-data) ( seq -- mp3-file )
-    [ <id3v1-info> ] dip
+: merge-id3v1 ( id3 -- id3 )
+    dup id3v1>frames frames>assoc merge-frames ; inline
+
+: read-v2-tags ( id3 seq -- id3 )
+    10 cut-slice
+    [ read-v2-header >>header ]
+    [ read-frames frames>assoc merge-frames ] bi* ; inline
+    
+: extract-v1-tags ( id3 seq -- id3 )
     {
         [ 30 head-slice decode-text filter-text-data >>title ]
         [ [ 30 60 ] dip subseq decode-text filter-text-data >>artist ]
@@ -143,8 +172,30 @@ TUPLE: id3v1-info title artist album year comment genre ;
         [ [ 124 ] dip nth number>string >>genre ]
     } cleave ; inline
 
-: read-v1-tag-data ( seq -- mp3-file )
-    skip-to-v1-data (read-v1-tag-data) ; inline
+: read-v1-tags ( id3 seq -- id3 )
+    id3v1-offset tail-slice* 3 tail-slice
+    extract-v1-tags ; inline
+
+: extract-v1+-tags ( id3 seq -- id3 )
+    {
+        [ 60 head-slice decode-text filter-text-data [ append ] change-title ]
+        [
+            [ 60 120 ] dip subseq decode-text filter-text-data
+            [ append ] change-artist
+        ]
+        [
+            [ 120 180 ] dip subseq decode-text filter-text-data
+            [ append ] change-album
+        ]
+        [ [ 180 ] dip nth >>speed ]
+        [ [ 181 211 ] dip subseq decode-text >>genre-name ]
+        [ [ 211 217 ] dip subseq decode-text >>start-time ]
+        [ [ 217 223 ] dip subseq decode-text >>end-time ]
+    } cleave ; inline
+
+: read-v1+-tags ( id3 seq -- id3 )
+    id3v1+-offset tail-slice* 4 tail-slice
+    extract-v1+-tags ; inline
 
 : parse-genre ( string -- n/f )
     dup "(" ?head-slice drop ")" ?tail-slice drop
@@ -154,34 +205,35 @@ TUPLE: id3v1-info title artist album year comment genre ;
         drop
     ] if ; inline
 
-: (mp3>id3) ( path -- id3v2-info/f )
+: (mp3>id3) ( path -- id3v2/f )
     [
+        [ <id3> ] dip
         {
-            { [ dup id3v2? ] [ read-v2-tag-data ] }
-            { [ dup id3v1? ] [ read-v1-tag-data id3v1>id3v2 ] }
-            [ drop f ]
-        } cond
+            [ dup id3v1? [ read-v1-tags merge-id3v1 ] [ drop ] if ]
+            [ dup id3v1+? [ read-v1+-tags merge-id3v1 ] [ drop ] if ]
+            [ dup id3v2? [ read-v2-tags ] [ drop ] if ]
+        } cleave
     ] with-mapped-uchar-file ;
 
 PRIVATE>
 
-: mp3>id3 ( path -- id3v2-info/f )
+: mp3>id3 ( path -- id3/f )
     dup file-info size>> 0 <= [ drop f ] [ (mp3>id3) ] if ; inline
 
 : find-id3-frame ( id3 name -- obj/f )
     swap frames>> at* [ data>> ] when ; inline
 
-: title ( id3 -- title/f ) "TIT2" find-id3-frame ; inline
+: title ( id3 -- string/f ) "TIT2" find-id3-frame ; inline
 
-: artist ( id3 -- artist/f ) "TPE1" find-id3-frame ; inline
+: artist ( id3 -- string/f ) "TPE1" find-id3-frame ; inline
 
-: album ( id3 -- album/f ) "TALB" find-id3-frame ; inline
+: album ( id3 -- string/f ) "TALB" find-id3-frame ; inline
 
-: year ( id3 -- year/f ) "TYER" find-id3-frame ; inline
+: year ( id3 -- string/f ) "TYER" find-id3-frame ; inline
 
-: comment ( id3 -- comment/f ) "COMM" find-id3-frame ; inline
+: comment ( id3 -- string/f ) "COMM" find-id3-frame ; inline
 
-: genre ( id3 -- genre/f )
+: genre ( id3 -- string/f )
     "TCON" find-id3-frame parse-genre ; inline
 
 : find-mp3s ( path -- seq )
