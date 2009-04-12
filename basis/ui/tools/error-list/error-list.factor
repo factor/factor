@@ -139,16 +139,16 @@ TUPLE: error-display < track ;
     vertical error-display new-track
         add-toolbar
         swap error>> >>model
-        dup model>> [ print-error ] <pane-control> <scroller> 1 track-add ;
+        dup model>> [ [ print-error ] when* ] <pane-control> <scroller> 1 track-add ;
 
 : com-inspect ( error-display -- )
-    model>> value>> inspector ;
+    model>> value>> [ inspector ] when* ;
 
 : com-help ( error-display -- )
-    model>> value>> error>> error-help-window ;
+    model>> value>> [ error>> error-help-window ] when* ;
 
 : com-edit ( error-display -- )
-    model>> value>> edit-error ;
+    model>> value>> [ edit-error ] when* ;
 
 error-display "toolbar" f {
     { f com-inspect }
