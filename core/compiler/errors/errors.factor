@@ -41,11 +41,7 @@ SYMBOL: with-compiler-errors?
     "linkage errors" +linkage-error+ "linkage" (compiler-report) ;
 
 : <compiler-error> ( error word -- compiler-error )
-    \ compiler-error new
-        swap
-        [ >>asset ]
-        [ where [ first2 ] [ "<unknown file>" 0 ] if* [ >>file ] [ >>line# ] bi* ] bi
-        swap >>error ;
+    \ compiler-error <definition-error> ;
 
 : compiler-error ( error word -- )
     compiler-errors get-global pick

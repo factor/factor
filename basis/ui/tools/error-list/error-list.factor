@@ -1,17 +1,17 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays sequences sorting assocs colors.constants fry
-combinators combinators.smart combinators.short-circuit editors memoize
-compiler.errors compiler.units fonts kernel io.pathnames prettyprint
-tools.test stack-checker.errors source-files.errors math.parser
-math.order models models.arrow models.arrow.smart models.search
-models.mapping debugger namespaces summary locals ui ui.commands
-ui.gadgets ui.gadgets.panes ui.gadgets.tables ui.gadgets.labeled
-ui.gadgets.tracks ui.gestures ui.operations ui.tools.browser
-ui.tools.common ui.gadgets.scrollers ui.tools.inspector
-ui.gadgets.status-bar ui.operations ui.gadgets.buttons
-ui.gadgets.borders ui.gadgets.packs ui.gadgets.labels
-ui.baseline-alignment ui.images ;
+combinators combinators.smart combinators.short-circuit editors make
+memoize compiler.errors compiler.units fonts kernel io.pathnames
+prettyprint tools.test help.lint stack-checker.errors
+source-files.errors math.parser init math.order models models.arrow
+models.arrow.smart models.search models.mapping debugger namespaces
+summary locals ui ui.commands ui.gadgets ui.gadgets.panes
+ui.gadgets.tables ui.gadgets.labeled ui.gadgets.tracks ui.gestures
+ui.operations ui.tools.browser ui.tools.common ui.gadgets.scrollers
+ui.tools.inspector ui.gadgets.status-bar ui.operations
+ui.gadgets.buttons ui.gadgets.borders ui.gadgets.packs
+ui.gadgets.labels ui.baseline-alignment ui.images ;
 IN: ui.tools.error-list
 
 CONSTANT: error-types
@@ -19,6 +19,7 @@ CONSTANT: error-types
         +compiler-warning+
         +compiler-error+
         +test-failure+
+        +help-lint-failure+
         +linkage-error+
     }
 
@@ -29,8 +30,9 @@ MEMO: error-list-icon ( object -- object )
     {
         { +compiler-error+ [ "compiler-error" ] }
         { +compiler-warning+ [ "compiler-warning" ] }
-        { +linkage-error+ [ "linkage-error" ] }
         { +test-failure+ [ "unit-test-error" ] }
+        { +help-lint-failure+ [ "help-lint-error" ] }
+        { +linkage-error+ [ "linkage-error" ] }
     } case error-list-icon ;
 
 : <checkboxes> ( alist -- gadget )
@@ -79,8 +81,8 @@ M: source-file-renderer filled-column drop 1 ;
         [ invoke-primary-operation ] >>action
         COLOR: dark-gray >>column-line-color
         6 >>gap
-        30 >>min-rows
-        30 >>max-rows
+        10 >>min-rows
+        10 >>max-rows
         60 >>min-cols
         60 >>max-cols
         t >>selection-required?
@@ -124,8 +126,8 @@ M: error-renderer column-alignment drop { 0 1 0 0 } ;
         [ invoke-primary-operation ] >>action
         COLOR: dark-gray >>column-line-color
         6 >>gap
-        30 >>min-rows
-        30 >>max-rows
+        20 >>min-rows
+        20 >>max-rows
         60 >>min-cols
         60 >>max-cols
         t >>selection-required?
@@ -197,13 +199,18 @@ SINGLETON: updater
 
 M: updater definitions-changed
     2drop
-    compiler-errors get-global values
-    test-failures get-global append
+    [
+        compiler-errors get-global values %
+        test-failures get-global %
+        lint-failures get-global values %
+    ] { } make
     compiler-error-model get-global
     set-model ;
 
-updater remove-definition-observer
-updater add-definition-observer
+[
+    updater remove-definition-observer
+    updater add-definition-observer
+] "ui.tools.error-list" add-init-hook
 
 : error-list-window ( -- )
     compiler-error-model get-global <error-list-gadget>
