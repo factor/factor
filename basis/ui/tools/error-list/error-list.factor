@@ -26,7 +26,7 @@ MEMO: error-icon ( type -- image-name )
 
 : <error-toggle> ( -- model gadget )
     #! Linkage errors are not shown by default.
-    error-types [ dup +linkage-error+ eq? not <model> ] { } map>assoc
+    error-types get keys [ dup +linkage-error+ eq? not <model> ] { } map>assoc
     [ [ [ error-icon ] dip ] assoc-map <checkboxes> ]
     [ <mapping> ] bi ;
 
@@ -75,7 +75,7 @@ SINGLETON: error-renderer
 M: error-renderer row-columns
     drop [
         {
-            [ source-file-error-type error-icon ]
+            [ error-type error-icon ]
             [ line#>> number>string ]
             [ asset>> unparse-short ]
             [ error>> summary ]
@@ -142,7 +142,7 @@ error-display "toolbar" f {
     [ <toolbar> ] [ error-toggle>> "Show errors:" label-on-left add-gadget ] bi ;
 
 : <error-model> ( visible-errors model -- model' )
-    [ swap '[ source-file-error-type _ at ] filter ] <smart-arrow> ;
+    [ swap '[ error-type _ at ] filter ] <smart-arrow> ;
 
 :: <error-list-gadget> ( model -- gadget )
     vertical error-list-gadget new-track
@@ -193,3 +193,9 @@ M: updater definitions-changed
 : error-list-window ( -- )
     compiler-error-model get-global <error-list-gadget>
     "Errors" open-status-window ;
+
+: show-error-list ( -- )
+    [ error-list-gadget? ] find-window
+    [ raise-window ] [ error-list-window ] if* ;
+
+\ show-error-list H{ { +nullary+ t } } define-command

@@ -124,11 +124,11 @@ SYMBOL: vocab-articles
 : check-class-description ( word element -- )
     [ class? not ]
     [ { $class-description } swap elements empty? not ] bi* and
-    [ "A word that is not a class has a $class-description" throw ] when ;
+    [ "A word that is not a class has a $class-description" simple-lint-error ] when ;
 
 : check-article-title ( article -- )
     article-title first LETTER?
-    [ "Article title must begin with a capital letter" throw ] unless ;
+    [ "Article title must begin with a capital letter" simple-lint-error ] unless ;
 
 : check-elements ( element -- )
     {

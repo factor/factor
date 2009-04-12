@@ -53,11 +53,18 @@ SYMBOLS: +optimized+ +unoptimized+ ;
     f swap compiler-error ;
 
 : ignore-error? ( word error -- ? )
-    [ [ inline? ] [ macro? ] bi or ]
-    [ source-file-error-type +compiler-warning+ eq? ] bi* and ;
+    [
+        {
+            [ inline? ]
+            [ macro? ]
+            [ "transform-quot" word-prop ]
+            [ "no-compile" word-prop ]
+            [ "special" word-prop ]
+        } 1||
+    ] [ error-type +compiler-warning+ eq? ] bi* and ;
 
 : fail ( word error -- * )
-    [ 2dup ignore-error? [ 2drop ] [ swap compiler-error ] if ]
+    [ 2dup ignore-error? [ drop f ] when swap compiler-error ]
     [
         drop
         [ compiled-unxref ]
@@ -121,6 +128,8 @@ t compile-dependencies? set-global
 
 : compile-call ( quot -- )
     [ dup infer define-temp ] with-compilation-unit execute ;
+
+\ compile-call t "no-compile" set-word-prop
 
 SINGLETON: optimizing-compiler
 
