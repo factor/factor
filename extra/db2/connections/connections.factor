@@ -5,13 +5,19 @@ IN: db2.connections
 
 TUPLE: db-connection handle ;
 
+: new-db-connection ( handle class -- db-connection )
+    new
+        swap >>handle ; inline
+
 GENERIC: db-open ( db -- db-connection )
-HOOK: db-close db-connection ( handle -- )
+
+GENERIC: db-close ( handle  -- )
+
 HOOK: parse-db-error db-connection ( error -- error' )
 
 M: db-connection dispose ( db-connection -- )
-    [ db-close f ] change-handle drop ;
+    [ db-close ] [ f >>handle drop ] bi ;
 
 : with-db ( db quot -- )
-    [ db-open db-connection dup ] dip
+    [ db-open db-connection over ] dip
     '[ _ [ drop @ ] with-disposal ] with-variable ; inline
