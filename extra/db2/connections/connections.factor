@@ -10,9 +10,7 @@ TUPLE: db-connection handle ;
         swap >>handle ; inline
 
 GENERIC: db-open ( db -- db-connection )
-
 GENERIC: db-close ( handle  -- )
-
 HOOK: parse-db-error db-connection ( error -- error' )
 
 M: db-connection dispose ( db-connection -- )
