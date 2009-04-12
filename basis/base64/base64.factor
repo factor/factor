@@ -5,6 +5,8 @@ io.streams.byte-array kernel math namespaces
 sequences strings io.crlf ;
 IN: base64
 
+ERROR: malformed-base64 ;
+
 <PRIVATE
 
 : read1-ignoring ( ignoring -- ch )
@@ -17,8 +19,6 @@ IN: base64
 : ch>base64 ( ch -- ch )
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
     nth ; inline
-
-ERROR: malformed-base64 ;
 
 : base64>ch ( ch -- ch )
     {
