@@ -43,7 +43,7 @@ M: mb-writer dispose drop ;
 : read-matching-message ( chat quot: ( msg -- ? ) -- irc-message )
     [ in-messages>> 0.1 seconds ] dip mailbox-get-timeout? ;
 
-: with-irc ( quot: ( -- ) -- )
+: spawning-irc ( quot: ( -- ) -- )
     [ spawn-client ] dip [ (terminate-irc) ] compose with-irc ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -59,7 +59,7 @@ M: mb-writer dispose drop ;
 
   { "someuser" } [ ":someuser!n=user@some.where PRIVMSG factorbot :hi"
                    string>irc-message chat-name ] unit-test
-] with-irc
+] spawning-irc
 
 { privmsg "#channel" "hello" } [
     "#channel" "hello" strings>privmsg
@@ -71,7 +71,7 @@ M: mb-writer dispose drop ;
     ":some.where 001 factorbot2 :Welcome factorbot2" %push-line
     irc> nick>>
   ] unit-test
-] with-irc
+] spawning-irc
 
 ! Test connect
 { V{ "NICK factorbot" "USER factorbot hostname servername :irc.factor" } } [
@@ -89,7 +89,7 @@ M: mb-writer dispose drop ;
 [ { "JOIN #factortest" } [
       "#factortest" %join %pop-output-line
   ] unit-test
-] with-irc
+] spawning-irc
 
 [ { join_ "#factortest"} [
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
@@ -101,7 +101,7 @@ M: mb-writer dispose drop ;
       [ join? ] read-matching-message
       [ class ] [ channel>> ] bi
   ] unit-test
-] with-irc
+] spawning-irc
 
 [ { privmsg "#factortest" "hello" } [
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
@@ -109,7 +109,7 @@ M: mb-writer dispose drop ;
       [ privmsg? ] read-matching-message
       [ class ] [ target>> ] [ trailing>> ] tri
   ] unit-test
-] with-irc
+] spawning-irc
 
 [ { privmsg "factorbot" "hello" } [
       "ircuser" <irc-nick-chat>  [ %add-named-chat ] keep
@@ -117,7 +117,7 @@ M: mb-writer dispose drop ;
       [ privmsg? ] read-matching-message
       [ class ] [ target>> ] [ trailing>> ] tri
   ] unit-test
-] with-irc
+] spawning-irc
 
 [ { mode "#factortest" "+ns" } [
       "#factortest" <irc-channel-chat>  [ %add-named-chat ] keep
@@ -125,7 +125,7 @@ M: mb-writer dispose drop ;
       [ mode? ] read-matching-message
       [ class ] [ name>> ] [ mode>> ] tri
   ] unit-test
-] with-irc
+] spawning-irc
 
 ! Participant lists tests
 [ { { "ircuser" } } [
@@ -133,7 +133,7 @@ M: mb-writer dispose drop ;
       ":ircuser!n=user@isp.net JOIN :#factortest" %push-line
       participants>> keys
   ] unit-test
-] with-irc
+] spawning-irc
 
 [ { { "ircuser2" } } [
       "#factortest" <irc-channel-chat>
@@ -142,7 +142,7 @@ M: mb-writer dispose drop ;
       ":ircuser!n=user@isp.net PART #factortest" %push-line
       participants>> keys
   ] unit-test
-] with-irc
+] spawning-irc
 
 [ { { "ircuser2" } } [
       "#factortest" <irc-channel-chat>
@@ -151,7 +151,7 @@ M: mb-writer dispose drop ;
       ":ircuser!n=user@isp.net QUIT" %push-line
       participants>> keys
   ] unit-test
-] with-irc
+] spawning-irc
 
 [ { { "ircuser2" } } [
       "#factortest" <irc-channel-chat>
@@ -160,7 +160,7 @@ M: mb-writer dispose drop ;
       ":ircuser2!n=user2@isp.net KICK #factortest ircuser" %push-line
       participants>> keys
   ] unit-test
-] with-irc
+] spawning-irc
 
 [ { H{ { "ircuser2" T{ participant { nick "ircuser2" } } } } } [
       "#factortest" <irc-channel-chat>
@@ -169,7 +169,7 @@ M: mb-writer dispose drop ;
       ":ircuser!n=user2@isp.net NICK :ircuser2" %push-line
       participants>>
   ] unit-test
-] with-irc
+] spawning-irc
 
 [ { H{ { "factorbot" T{ participant { nick "factorbot" } { operator t } } }
        { "ircuser" T{ participant { nick "ircuser" } } }
@@ -186,7 +186,7 @@ M: mb-writer dispose drop ;
       } %push-lines
       participants>>
   ] unit-test
-] with-irc
+] spawning-irc
 
 [ { mode "#factortest" "+o" "ircuser" } [
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
@@ -195,7 +195,7 @@ M: mb-writer dispose drop ;
       [ mode? ] read-matching-message
       { [ class ] [ name>> ] [ mode>> ] [ parameter>> ] } cleave
   ] unit-test
-] with-irc
+] spawning-irc
 
 [ { T{ participant { nick "ircuser" } { operator t } } } [
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
@@ -203,11 +203,11 @@ M: mb-writer dispose drop ;
       ":ircserver.net MODE #factortest +o ircuser" %push-line
       participants>> "ircuser" swap at
   ] unit-test
-] with-irc
+] spawning-irc
 
 ! Send privmsg
 [ { "PRIVMSG #factortest :hello" } [
       "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
       "hello" swap (speak) %pop-output-line
   ] unit-test
-] with-irc
+] spawning-irc

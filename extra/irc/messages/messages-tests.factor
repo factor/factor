@@ -26,7 +26,8 @@ IN: irc.messages.tests
      { command "JOIN" }
      { parameters { } }
      { trailing "#factortest" }
-     { sender "someuser" } } }
+     { sender "someuser" }
+     { channel "#factortest" } } }
 [ ":someuser!n=user@some.where JOIN :#factortest"
   string>irc-message f >>timestamp ] unit-test
 
