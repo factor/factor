@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors db2.connections fry io.pools kernel
 namespaces ;
-IN: db.pools
+IN: db2.pools
 
 TUPLE: db-pool < pool db ;
 

@@ -6,11 +6,15 @@ IN: db2.transactions
 SYMBOL: in-transaction
 
 HOOK: begin-transaction db-connection ( -- )
+
 HOOK: commit-transaction db-connection ( -- )
+
 HOOK: rollback-transaction db-connection ( -- )
 
 M: db-connection begin-transaction ( -- ) "BEGIN" sql-command ;
+
 M: db-connection commit-transaction ( -- ) "COMMIT" sql-command ;
+
 M: db-connection rollback-transaction ( -- ) "ROLLBACK" sql-command ;
 
 : in-transaction? ( -- ? ) in-transaction get ;

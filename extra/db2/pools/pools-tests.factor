@@ -1,6 +1,8 @@
-IN: db.pools.tests
-USING: db.pools tools.test continuations io.files io.files.temp
-io.directories namespaces accessors kernel math destructors ;
+USING: accessors continuations db2.pools db2.sqlite
+db2.sqlite.connections destructors io.directories io.files
+io.files.temp kernel math namespaces tools.test
+db2.sqlite.connections ;
+IN: db2.pools.tests
 
 \ <db-pool> must-infer
 
@@ -9,7 +11,6 @@ io.directories namespaces accessors kernel math destructors ;
 { 1 0 } [ [ ] with-pooled-db ] must-infer-as
 
 ! Test behavior after image save/load
-USE: db.sqlite
 
 [ "pool-test.db" temp-file delete-file ] ignore-errors
 
