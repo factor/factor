@@ -5,6 +5,8 @@ io.streams.byte-array kernel math namespaces
 sequences strings io.crlf ;
 IN: base64
 
+ERROR: malformed-base64 ;
+
 <PRIVATE
 
 : read1-ignoring ( ignoring -- ch )
@@ -25,7 +27,7 @@ IN: base64
         f 0 f f f 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
         22 23 24 25 f f f f f f 26 27 28 29 30 31 32 33 34 35 36 37 38 39
         40 41 42 43 44 45 46 47 48 49 50 51
-    } nth ; inline
+    } nth [ malformed-base64 ] unless* ; inline
 
 SYMBOL: column
 
@@ -47,8 +49,6 @@ SYMBOL: column
 : encode-pad ( seq n -- )
     [ 3 0 pad-tail binary [ encode3 ] with-byte-writer ]
     [ 1+ ] bi* head-slice 4 CHAR: = pad-tail write-lines ; inline
-
-ERROR: malformed-base64 ;
 
 : decode4 ( seq -- )
     [ 0 [ base64>ch swap 6 shift bitor ] reduce 3 >be ]
