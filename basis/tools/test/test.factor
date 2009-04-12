@@ -99,7 +99,7 @@ SYNTAX: TEST:
 
 : run-test-file ( path -- )
     dup file [
-        test-failures get [ file>> file get = not ] filter-here
+        test-failures get file get +test-failure+ delete-file-errors
         '[ _ run-file ] [ file-failure ] recover
     ] with-variable ;
 
