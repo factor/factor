@@ -16,7 +16,9 @@ ARTICLE: "tools.test.run" "Running unit tests"
 { $subsection test }
 { $subsection test-all }
 "The following word prints failures:"
-{ $subsection :failures }
+{ $subsection :test-failures }
+"Help lint failures are also shown in the " { $link "ui.tools.error-list" } "."
+$nl
 "Unit test failurs are instances of a class, and are stored in a global variable:"
 { $subsection test-failure }
 { $subsection test-failures } ;
@@ -70,5 +72,5 @@ HELP: test
 HELP: test-all
 { $description "Runs unit tests for all loaded vocabularies." } ;
 
-HELP: :failures
+HELP: :test-failures
 { $description "Prints all pending unit test failures." } ;

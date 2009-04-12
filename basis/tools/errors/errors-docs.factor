@@ -5,17 +5,16 @@ words quotations io ;
 ARTICLE: "compiler-errors" "Compiler warnings and errors"
 "After loading a vocabulary, you might see messages like:"
 { $code
-    ":errors - print 2 compiler errors."
-    ":warnings - print 50 compiler warnings."
+    ":errors - print 2 compiler errors"
+    ":warnings - print 50 compiler warnings"
 }
-"These warnings arise from the compiler's stack effect checker. Warnings are non-fatal conditions -- not all code has a static stack effect, so you try to minimize warnings but understand that in many cases they cannot be eliminated. Errors indicate programming mistakes, such as erroneous stack effect declarations."
-$nl
-"The precise warning and error conditions are documented in " { $link "inference-errors" } "."
+"These messages arise from the compiler's stack effect checker. Production code should not have any warnings and errors in it. Warning and error conditions are documented in " { $link "inference-errors" } "."
 $nl
 "Words to view warnings and errors:"
-{ $subsection :errors }
 { $subsection :warnings }
-{ $subsection :linkage } ;
+{ $subsection :errors }
+{ $subsection :linkage }
+"Compiler warnings and errors are also shown in the " { $link "ui.tools.error-list" } "." ;
 
 HELP: compiler-error
 { $values { "error" "an error" } { "word" word } }
