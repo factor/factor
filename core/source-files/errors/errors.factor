@@ -1,6 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel math.order sorting sequences definitions ;
+USING: accessors assocs kernel math.order sorting sequences definitions
+namespaces arrays ;
 IN: source-files.errors
 
 TUPLE: source-file-error error asset file line# ;
@@ -28,3 +29,20 @@ GENERIC: source-file-error-type ( error -- type )
         [ swap file>> = ] [ swap source-file-error-type = ]
         bi-curry* bi and not
     ] 2curry filter-here ;
+
+SYMBOL: source-file-error-types
+
+source-file-error-types [ V{ } clone ] initialize
+
+: error-types ( -- seq ) source-file-error-types get keys ;
+
+: define-error-type ( type icon quot -- )
+    2array swap source-file-error-types get set-at ;
+
+: error-icon-path ( type -- icon )
+    source-file-error-types get at first ;
+
+: all-errors ( -- errors )
+    source-file-error-types get
+    [ second second call( -- seq ) ] map
+    concat ;

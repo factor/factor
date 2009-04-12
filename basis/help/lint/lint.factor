@@ -15,6 +15,10 @@ TUPLE: help-lint-error < source-file-error ;
 
 SYMBOL: +help-lint-failure+
 
++help-lint-failure+
+"vocab:ui/tools/error-list/icons/help-lint-error.tiff"
+[ lint-failures get values ] define-error-type
+
 M: help-lint-error source-file-error-type drop +help-lint-failure+ ;
 
 <PRIVATE
