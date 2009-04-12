@@ -1,12 +1,22 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs cache colors.constants destructors fry kernel
-opengl opengl.gl combinators images images.tesselation grouping
-specialized-arrays.float sequences math math.vectors
-math.matrices generalizations fry arrays namespaces ;
+opengl opengl.gl opengl.capabilities combinators images
+images.tesselation grouping specialized-arrays.float sequences math
+math.vectors math.matrices generalizations fry arrays namespaces
+system ;
 IN: opengl.textures
 
 SYMBOL: non-power-of-2-textures?
+
+: check-extensions ( -- )
+    #! ATI frglx driver doesn't implement GL_ARB_texture_non_power_of_two properly.
+    #! See thread 'Linux font display problem' April 2009 on Factor-talk
+    gl-vendor "ATI Technologies Inc." = not os macosx? or [
+        "2.0" { "GL_ARB_texture_non_power_of_two" }
+        has-gl-version-or-extensions?
+        non-power-of-2-textures? set
+    ] when ;
 
 : gen-texture ( -- id ) [ glGenTextures ] (gen-gl-object) ;
 
@@ -20,6 +30,8 @@ M: RGBA component-order>format drop GL_RGBA GL_UNSIGNED_BYTE ;
 M: ARGB component-order>format drop GL_BGRA_EXT GL_UNSIGNED_INT_8_8_8_8_REV ;
 M: BGRA component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
 M: BGRX component-order>format drop GL_BGRA_EXT GL_UNSIGNED_BYTE ;
+M: LA component-order>format drop GL_LUMINANCE_ALPHA GL_UNSIGNED_BYTE ;
+M: L component-order>format drop GL_LUMINANCE GL_UNSIGNED_BYTE ;
 
 SLOT: display-list
 
@@ -36,10 +48,12 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
         [ next-power-of-2 ] map
     ] unless ;
 
-: (tex-image) ( image -- )
-    [ GL_TEXTURE_2D 0 GL_RGBA ] dip
-    [ dim>> adjust-texture-dim first2 0 ]
-    [ component-order>> component-order>format f ] bi
+: (tex-image) ( image bitmap -- )
+    [
+        [ GL_TEXTURE_2D 0 GL_RGBA ] dip
+        [ dim>> adjust-texture-dim first2 0 ]
+        [ component-order>> component-order>format ] bi
+    ] dip
     glTexImage2D ;
 
 : (tex-sub-image) ( image -- )
@@ -53,7 +67,9 @@ TUPLE: single-texture image dim loc texture-coords texture display-list disposed
     gen-texture [
         GL_TEXTURE_BIT [
             GL_TEXTURE_2D swap glBindTexture
-            [ (tex-image) ] [ (tex-sub-image) ] bi
+            non-power-of-2-textures? get
+            [ dup bitmap>> (tex-image) ]
+            [ [ f (tex-image) ] [ (tex-sub-image) ] bi ] if
         ] do-attribs
     ] keep ;
 
