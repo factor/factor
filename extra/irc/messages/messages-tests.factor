@@ -1,3 +1,5 @@
+! Copyright (C) 2009 Bruno Deferrari
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test accessors arrays
        irc.messages.parser irc.messages ;
 EXCLUDE: sequences => join ;
