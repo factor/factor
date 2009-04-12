@@ -67,7 +67,7 @@ ARTICLE: "irc.client" "IRC Client"
 "Some special messages that are created by the library and not by the irc server."
 { $table
   { { $link irc-chat-end } "sent to a chat when it has been detached from the client, the chat should stop after it receives this message. " }
-  { { $link irc-end } " sent when the client isn't running anymore, chats should stop after it receives this message." }
+  { { $link irc-end } " sent when the client isn't running anymore, the chat should stop after it receives this message." }
   { { $link irc-disconnected } " sent to notify chats that connection was lost." }
   { { $link irc-connected } " sent to notify chats that a connection with the irc server was established." } }
 
