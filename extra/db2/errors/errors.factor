@@ -1,10 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel continuations fry words constructors ;
+USING: accessors kernel continuations fry words constructors
+db2.connections ;
 IN: db2.errors
 
 ERROR: db-error ;
 ERROR: sql-error location ;
+HOOK: parse-sql-error db-connection ( error -- error' )
 
 ERROR: sql-unknown-error < sql-error message ;
 CONSTRUCTOR: sql-unknown-error ( message -- error ) ;

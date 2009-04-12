@@ -3,20 +3,11 @@
 USING: accessors alien.c-types arrays calendar.format
 combinators db2.connections db2.sqlite.ffi db2.errors
 io.backend io.encodings.string io.encodings.utf8 kernel math
-namespaces present sequences serialize urls ;
+namespaces present sequences serialize urls db2.sqlite.errors ;
 IN: db2.sqlite.lib
 
 : ?when ( object quot -- object' ) dupd when ; inline
 
-ERROR: sqlite-error < db-error n string ;
-ERROR: sqlite-sql-error < sql-error n string ;
-
-: throw-sqlite-error ( n -- * )
-    dup sqlite-error-messages nth sqlite-error ;
-
-: sqlite-statement-error ( -- * )
-    SQLITE_ERROR
-    db-connection get handle>> sqlite3_errmsg sqlite-sql-error ;
 
 : sqlite-check-result ( n -- )
     {
