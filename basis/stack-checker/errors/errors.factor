@@ -11,7 +11,7 @@ IN: stack-checker.errors
 
 TUPLE: inference-error error type word ;
 
-M: inference-error source-file-error-type type>> ;
+M: inference-error error-type type>> ;
 
 : (inference-error) ( ... class type -- * )
     [ boa ] dip

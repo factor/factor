@@ -80,11 +80,11 @@ SYMBOL: load-help?
 PRIVATE>
 
 : require ( vocab -- )
-    [ load-vocab drop ] with-compiler-errors ;
+    load-vocab drop ;
 
 : reload ( name -- )
     dup vocab
-    [ [ [ load-source ] [ load-docs ] bi ] with-compiler-errors ]
+    [ [ load-source ] [ load-docs ] bi ]
     [ require ]
     ?if ;
 
@@ -125,9 +125,7 @@ PRIVATE>
 [
     dup vocab-name blacklist get at* [ rethrow ] [
         drop dup find-vocab-root
-        [ [ (load-vocab) ] with-compiler-errors ]
-        [ dup vocab [ ] [ no-vocab ] ?if ]
-        if
+        [ (load-vocab) ] [ dup vocab [ ] [ no-vocab ] ?if ] if
     ] if
 ] load-vocab-hook set-global
 

@@ -1,13 +1,11 @@
 ! Copyright (C) 2007, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces make assocs io sequences
-continuations math math.parser accessors definitions
-source-files.errors ;
+USING: accessors source-files.errors kernel namespaces assocs ;
 IN: compiler.errors
 
 TUPLE: compiler-error < source-file-error ;
 
-M: compiler-error source-file-error-type error>> source-file-error-type ;
+M: compiler-error error-type error>> error-type ;
 
 SYMBOL: compiler-errors
 
@@ -15,34 +13,34 @@ compiler-errors [ H{ } clone ] initialize
 
 SYMBOLS: +compiler-error+ +compiler-warning+ +linkage-error+ ;
 
-+compiler-error+ "vocab:ui/tools/error-list/icons/compiler-error.tiff" [ compiler-errors get values ] define-error-type
-+compiler-warning+ "vocab:ui/tools/error-list/icons/compiler-warning.tiff" [ f ] define-error-type
-+linkage-error+ "vocab:ui/tools/error-list/icons/linkage-error.tiff" [ f ] define-error-type
-
-SYMBOL: with-compiler-errors?
-
 : errors-of-type ( type -- assoc )
     compiler-errors get-global
-    swap [ [ nip source-file-error-type ] dip eq? ] curry
+    swap [ [ nip error-type ] dip eq? ] curry
     assoc-filter ;
 
-: (compiler-report) ( what type word -- )
-    over errors-of-type assoc-empty? [ 3drop ] [
-        [
-            ":" %
-            %
-            " - print " %
-            errors-of-type assoc-size #
-            " " %
-            %
-            "." %
-        ] "" make print
-    ] if ;
+T{ error-type
+   { type +compiler-error+ }
+   { word ":errors" }
+   { plural "compiler errors" }
+   { icon "vocab:ui/tools/error-list/icons/compiler-error.tiff" }
+   { quot [ +compiler-error+ errors-of-type values ] }
+} define-error-type
 
-: compiler-report ( -- )
-    "compiler errors" +compiler-error+ "errors" (compiler-report)
-    "compiler warnings" +compiler-warning+ "warnings" (compiler-report)
-    "linkage errors" +linkage-error+ "linkage" (compiler-report) ;
+T{ error-type
+   { type +compiler-warning+ }
+   { word ":warnings" }
+   { plural "compiler warnings" }
+   { icon "vocab:ui/tools/error-list/icons/compiler-warning.tiff" }
+   { quot [ +compiler-warning+ errors-of-type values ] }
+} define-error-type
+
+T{ error-type
+   { type +linkage-error+ }
+   { word ":linkage" }
+   { plural "linkage errors" }
+   { icon "vocab:ui/tools/error-list/icons/linkage-error.tiff" }
+   { quot [ +linkage-error+ errors-of-type values ] }
+} define-error-type
 
 : <compiler-error> ( error word -- compiler-error )
     \ compiler-error <definition-error> ;
@@ -50,11 +48,3 @@ SYMBOL: with-compiler-errors?
 : compiler-error ( error word -- )
     compiler-errors get-global pick
     [ [ [ <compiler-error> ] keep ] dip set-at ] [ delete-at drop ] if ;
-
-: with-compiler-errors ( quot -- )
-    with-compiler-errors? get "quiet" get or [ call ] [
-        [
-            with-compiler-errors? on
-            [ compiler-report ] [ ] cleanup
-        ] with-scope
-    ] if ; inline

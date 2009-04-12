@@ -15,18 +15,11 @@ $nl
 "Words to view warnings and errors:"
 { $subsection :errors }
 { $subsection :warnings }
-{ $subsection :linkage }
-"Words such as " { $link require } " use a combinator which counts errors and prints a report at the end:"
-{ $subsection with-compiler-errors } ;
+{ $subsection :linkage } ;
 
 HELP: compiler-error
 { $values { "error" "an error" } { "word" word } }
-{ $description "If inside a " { $link with-compiler-errors } ", saves the error for future persual via " { $link :errors } ", " { $link :warnings } " and " { $link :linkage } ". If not inside a " { $link with-compiler-errors } ", ignores the error." } ;
-
-HELP: with-compiler-errors
-{ $values { "quot" quotation } }
-{ $description "Calls the quotation and collects any compiler warnings and errors. Compiler warnings and errors are summarized at the end and can be viewed with " { $link :errors } ", " { $link :warnings } ", and " { $link :linkage } "." }
-{ $notes "Nested calls to " { $link with-compiler-errors } " are ignored, and only the outermost call collects warnings and errors." } ;
+{ $description "Saves the error for future persual via " { $link :errors } ", " { $link :warnings } " and " { $link :linkage } "." } ;
 
 HELP: :errors
 { $description "Prints all serious compiler errors from the most recent compile to " { $link output-stream } "." } ;
