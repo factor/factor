@@ -16,7 +16,10 @@ SYMBOL: +test-failure+
 M: test-failure source-file-error-type drop +test-failure+ ;
 
 SYMBOL: test-failures
+
 test-failures [ V{ } clone ] initialize
+
++test-failure+ "vocab:ui/tools/error-list/icons/unit-test-error.tiff" [ test-failures get ] define-error-type
 
 <PRIVATE
 

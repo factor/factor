@@ -5,8 +5,6 @@ continuations math math.parser accessors definitions
 source-files.errors ;
 IN: compiler.errors
 
-SYMBOLS: +compiler-error+ +compiler-warning+ +linkage-error+ ;
-
 TUPLE: compiler-error < source-file-error ;
 
 M: compiler-error source-file-error-type error>> source-file-error-type ;
@@ -14,6 +12,12 @@ M: compiler-error source-file-error-type error>> source-file-error-type ;
 SYMBOL: compiler-errors
 
 compiler-errors [ H{ } clone ] initialize
+
+SYMBOLS: +compiler-error+ +compiler-warning+ +linkage-error+ ;
+
++compiler-error+ "vocab:ui/tools/error-list/icons/compiler-error.tiff" [ compiler-errors get values ] define-error-type
++compiler-warning+ "vocab:ui/tools/error-list/icons/compiler-warning.tiff" [ f ] define-error-type
++linkage-error+ "vocab:ui/tools/error-list/icons/linkage-error.tiff" [ f ] define-error-type
 
 SYMBOL: with-compiler-errors?
 

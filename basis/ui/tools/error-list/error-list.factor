@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays sequences sorting assocs colors.constants fry
 combinators combinators.smart combinators.short-circuit editors make
-memoize compiler.errors compiler.units fonts kernel io.pathnames
-prettyprint tools.test help.lint stack-checker.errors
+memoize compiler.units fonts kernel io.pathnames prettyprint
 source-files.errors math.parser init math.order models models.arrow
 models.arrow.smart models.search models.mapping debugger namespaces
 summary locals ui ui.commands ui.gadgets ui.gadgets.panes
@@ -11,29 +10,15 @@ ui.gadgets.tables ui.gadgets.labeled ui.gadgets.tracks ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.gadgets.scrollers
 ui.tools.inspector ui.gadgets.status-bar ui.operations
 ui.gadgets.buttons ui.gadgets.borders ui.gadgets.packs
-ui.gadgets.labels ui.baseline-alignment ui.images ;
+ui.gadgets.labels ui.baseline-alignment ui.images
+compiler.errors ;
 IN: ui.tools.error-list
 
-CONSTANT: error-types
-    {
-        +compiler-warning+
-        +compiler-error+
-        +test-failure+
-        +help-lint-failure+
-        +linkage-error+
-    }
+CONSTANT: source-file-icon
+    T{ image-name f "vocab:ui/tools/error-list/icons/source-file.tiff" }
 
-MEMO: error-list-icon ( object -- object )
-    "vocab:ui/tools/error-list/icons/" ".tiff" surround <image-name> ;
-
-: error-icon ( type -- icon )
-    {
-        { +compiler-error+ [ "compiler-error" ] }
-        { +compiler-warning+ [ "compiler-warning" ] }
-        { +test-failure+ [ "unit-test-error" ] }
-        { +help-lint-failure+ [ "help-lint-error" ] }
-        { +linkage-error+ [ "linkage-error" ] }
-    } case error-list-icon ;
+MEMO: error-icon ( type -- image-name )
+    error-icon-path <image-name> ;
 
 : <checkboxes> ( alist -- gadget )
     [ <shelf> { 15 0 } >>gap ] dip
@@ -50,9 +35,6 @@ visible-errors source-file error
 error-toggle source-file-table error-table error-display ;
 
 SINGLETON: source-file-renderer
-
-: source-file-icon ( -- image-name )
-    "source-file" error-list-icon ;
 
 M: source-file-renderer row-columns
     drop first2
@@ -81,8 +63,8 @@ M: source-file-renderer filled-column drop 1 ;
         [ invoke-primary-operation ] >>action
         COLOR: dark-gray >>column-line-color
         6 >>gap
-        10 >>min-rows
-        10 >>max-rows
+        5 >>min-rows
+        5 >>max-rows
         60 >>min-cols
         60 >>max-cols
         t >>selection-required?
@@ -126,8 +108,8 @@ M: error-renderer column-alignment drop { 0 1 0 0 } ;
         [ invoke-primary-operation ] >>action
         COLOR: dark-gray >>column-line-color
         6 >>gap
-        20 >>min-rows
-        20 >>max-rows
+        5 >>min-rows
+        5 >>max-rows
         60 >>min-cols
         60 >>max-cols
         t >>selection-required?
@@ -199,11 +181,7 @@ SINGLETON: updater
 
 M: updater definitions-changed
     2drop
-    [
-        compiler-errors get-global values %
-        test-failures get-global %
-        lint-failures get-global values %
-    ] { } make
+    all-errors
     compiler-error-model get-global
     set-model ;
 
@@ -214,4 +192,4 @@ M: updater definitions-changed
 
 : error-list-window ( -- )
     compiler-error-model get-global <error-list-gadget>
-    "Compiler errors" open-status-window ;
+    "Errors" open-status-window ;
