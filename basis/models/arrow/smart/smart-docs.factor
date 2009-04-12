@@ -7,7 +7,7 @@ HELP: <smart-arrow>
 { $examples
   "A model which adds the values of two existing models:"
   { $example
-    "USING: models models.arrows.smart accessors math prettyprint ;"
+    "USING: models models.arrow.smart accessors kernel math prettyprint ;"
     "1 <model> 2 <model> [ + ] <smart-arrow>"
     "[ activate-model ] [ value>> ] bi ."
     "3"
