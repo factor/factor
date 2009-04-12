@@ -4,6 +4,7 @@ USING: assocs continuations fry help help.lint.checks
 help.topics io kernel namespaces parser sequences
 source-files.errors tools.vocabs vocabs words classes
 locals ;
+FROM: help.lint.checks => all-vocabs ;
 IN: help.lint
 
 SYMBOL: lint-failures
@@ -38,7 +39,7 @@ PRIVATE>
 : check-word ( word -- )
     [ with-file-vocabs ] vocabs-quot set
     dup word-help [
-        dup '[
+        [ >link ] keep '[
             _ dup word-help
             [ check-values ]
             [ check-class-description ]
