@@ -86,7 +86,8 @@ void load_image(F_PARAMETERS *p)
 	}
 
 	F_HEADER h;
-	fread(&h,sizeof(F_HEADER),1,file);
+	if(fread(&h,sizeof(F_HEADER),1,file) != 1)
+		fatal_error("Cannot read image header",0);
 
 	if(h.magic != IMAGE_MAGIC)
 		fatal_error("Bad image: magic number check failed",h.magic);
@@ -145,27 +146,19 @@ bool save_image(const F_CHAR *filename)
 			h.userenv[i] = userenv[i];
 	}
 
-	fwrite(&h,sizeof(F_HEADER),1,file);
+	bool ok = true;
 
-	if(fwrite((void*)tenured->start,h.data_size,1,file) != 1)
+	if(fwrite(&h,sizeof(F_HEADER),1,file) != 1) ok = false;
+	if(fwrite((void*)tenured->start,h.data_size,1,file) != 1) ok = false;
+	if(fwrite(first_block(&code_heap),h.code_size,1,file) != 1) ok = false;
+	if(fclose(file)) ok = false;
+
+	if(!ok)
 	{
-		print_string("Save data heap failed: "); print_string(strerror(errno)); nl();
-		return false;
+		print_string("save-image failed: "); print_string(strerror(errno)); nl();
 	}
 
-	if(fwrite(first_block(&code_heap),h.code_size,1,file) != 1)
-	{
-		print_string("Save code heap failed: "); print_string(strerror(errno)); nl();
-		return false;
-	}
-
-	if(fclose(file))
-	{
-		print_string("Failed to close image file: "); print_string(strerror(errno)); nl();
-		return false;
-	}
-
-	return true;
+	return ok;
 }
 
 void primitive_save_image(void)
