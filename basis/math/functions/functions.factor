@@ -81,7 +81,7 @@ PRIVATE>
     2dup [ real? ] both? [ drop 0 >= ] [ 2drop f ] if ; inline
 
 : 0^ ( x -- z )
-    dup zero? [ drop 0./0. ] [ 0 < 1./0. 0 ? ] if ; inline
+    dup zero? [ drop 0/0. ] [ 0 < 1/0. 0 ? ] if ; inline
 
 : (^mod) ( n x y -- z )
     make-bits 1 [
