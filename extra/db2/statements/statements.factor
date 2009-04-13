@@ -1,10 +1,10 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors continuations destructors fry kernel
-sequences db2.result-sets db2.connections ;
+sequences db2.result-sets db2.connections db2.errors ;
 IN: db2.statements
 
-TUPLE: statement handle sql in out ;
+TUPLE: statement handle sql in out type ;
 
 : new-statement ( sql in out class -- statement )
     new
@@ -13,12 +13,15 @@ TUPLE: statement handle sql in out ;
         swap >>sql ;
 
 HOOK: <statement> db-connection ( sql in out -- statement )
+GENERIC: statement>result-set* ( statement -- result-set )
 GENERIC: execute-statement* ( statement type -- )
-GENERIC: statement>result-set ( statement -- result-set )
+
+: statement>result-set ( statement -- result-set )
+    [ statement>result-set* ]
+    [ dup sql-error? [ parse-sql-error ] when rethrow ] recover ;
 
 M: object execute-statement* ( statement type -- )
-    drop '[ _ statement>result-set dispose ]
-    [ parse-db-error rethrow ] recover ;
+    drop statement>result-set dispose ;
 
 : execute-one-statement ( statement -- )
     dup type>> execute-statement* ;

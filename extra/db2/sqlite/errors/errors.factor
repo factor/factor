@@ -8,9 +8,6 @@ IN: db2.sqlite.errors
 ERROR: sqlite-error < db-error n string ;
 ERROR: sqlite-sql-error < sql-error n string ;
 
-: throw-sqlite-error ( n -- * )
-    dup sqlite-error-messages nth sqlite-error ;
-
 : sqlite-statement-error ( -- * )
     SQLITE_ERROR
     db-connection get handle>> sqlite3_errmsg sqlite-sql-error ;
@@ -18,20 +15,21 @@ ERROR: sqlite-sql-error < sql-error n string ;
 TUPLE: unparsed-sqlite-error error ;
 C: <unparsed-sqlite-error> unparsed-sqlite-error
 
-: sqlite-table-error ( table message -- error )
-    {
-        { sql-table-exists [ <sql-table-exists> ] }
-    } case ;
-
 EBNF: parse-sqlite-sql-error
 
-TableMessage = " already exists" => [[ sql-table-exists ]]
+TableMessage = " already exists"
+SyntaxError = ": syntax error"
 
 SqliteError =
     "table " (!(TableMessage).)+:table TableMessage:message
-      => [[ table >string message sqlite-table-error ]]
+      => [[ table >string <sql-table-exists> ]]
+    | "near " (!(SyntaxError).)+:syntax SyntaxError:message
+      => [[ syntax >string <sql-syntax-error> ]]
     | "no such table: " .+:table
       => [[ table >string <sql-table-missing> ]]
     | .*:error
       => [[ error >string <unparsed-sqlite-error> ]]
 ;EBNF
+
+: throw-sqlite-error ( n -- * )
+    dup sqlite-error-messages nth sqlite-error ;

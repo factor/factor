@@ -18,3 +18,4 @@ PRIVATE>
 
 : sql-query ( sql -- sequence )
     f f <statement> [ statement>result-sequence ] with-disposal ;
+

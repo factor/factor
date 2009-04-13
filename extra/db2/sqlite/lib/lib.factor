@@ -8,7 +8,6 @@ IN: db2.sqlite.lib
 
 : ?when ( object quot -- object' ) dupd when ; inline
 
-
 : sqlite-check-result ( n -- )
     {
         { SQLITE_OK [ ] }
