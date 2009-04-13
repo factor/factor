@@ -4,7 +4,7 @@ USING: arrays hashtables io kernel math math.parser memory
 namespaces parser lexer sequences strings io.styles
 vectors words generic system combinators continuations debugger
 definitions compiler.units accessors colors prettyprint fry
-sets vocabs.parser ;
+sets vocabs.parser source-files.errors ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
@@ -68,6 +68,8 @@ SYMBOL: max-stack-items
 
 10 max-stack-items set-global
 
+SYMBOL: error-summary-hook
+
 <PRIVATE
 
 : title. ( string -- )
@@ -105,8 +107,10 @@ SYMBOL: max-stack-items
     "( " in get auto-use? get [ " - auto" append ] when " )" 3append
     H{ { background T{ rgba f 1 0.7 0.7 1 } } } format bl flush ;
 
+[ error-summary ] error-summary-hook set-global
+
 : listen ( -- )
-    visible-vars. stacks. prompt.
+    error-summary-hook get call( -- ) visible-vars. stacks. prompt.
     [ read-quot [ [ call-error-hook ] recover ] [ bye ] if* ]
     [ dup lexer-error? [ call-error-hook ] [ rethrow ] if ] recover ;
 

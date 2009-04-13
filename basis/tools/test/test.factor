@@ -13,13 +13,19 @@ TUPLE: test-failure < source-file-error continuation ;
 
 SYMBOL: +test-failure+
 
-M: test-failure source-file-error-type drop +test-failure+ ;
+M: test-failure error-type drop +test-failure+ ;
 
 SYMBOL: test-failures
 
 test-failures [ V{ } clone ] initialize
 
-+test-failure+ "vocab:ui/tools/error-list/icons/unit-test-error.tiff" [ test-failures get ] define-error-type
+T{ error-type
+   { type +test-failure+ }
+   { word ":test-failures" }
+   { plural "unit test failures" }
+   { icon "vocab:ui/tools/error-list/icons/unit-test-error.tiff" }
+   { quot [ test-failures get ] }
+} define-error-type
 
 <PRIVATE
 
@@ -130,12 +136,9 @@ M: test-failure error. ( error -- )
     [ traceback-button. ]
     bi ;
 
-: :failures ( -- ) test-failures get errors. ;
+: :test-failures ( -- ) test-failures get errors. ;
 
 : test ( prefix -- )
-    [ child-vocabs [ run-vocab-tests ] each ] with-compiler-errors
-    test-failures get [
-        ":failures - show " write length pprint " failing tests." print
-    ] unless-empty ;
+    child-vocabs [ run-vocab-tests ] each ;
 
 : test-all ( -- ) "" test ;

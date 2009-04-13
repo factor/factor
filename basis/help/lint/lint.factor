@@ -3,7 +3,7 @@
 USING: assocs continuations fry help help.lint.checks
 help.topics io kernel namespaces parser sequences
 source-files.errors tools.vocabs vocabs words classes
-locals ;
+locals tools.errors ;
 FROM: help.lint.checks => all-vocabs ;
 IN: help.lint
 
@@ -15,11 +15,15 @@ TUPLE: help-lint-error < source-file-error ;
 
 SYMBOL: +help-lint-failure+
 
-+help-lint-failure+
-"vocab:ui/tools/error-list/icons/help-lint-error.tiff"
-[ lint-failures get values ] define-error-type
+T{ error-type
+   { type +help-lint-failure+ }
+   { word ":lint-failures" }
+   { plural "help lint failures" }
+   { icon "vocab:ui/tools/error-list/icons/help-lint-error.tiff" }
+   { quot [ lint-failures get values ] }
+} define-error-type
 
-M: help-lint-error source-file-error-type drop +help-lint-failure+ ;
+M: help-lint-error error-type drop +help-lint-failure+ ;
 
 <PRIVATE
 
@@ -66,8 +70,7 @@ PRIVATE>
 
 : check-vocab ( vocab -- )
     "Checking " write dup write "..." print
-    vocab
-    [ check-about ]
+    [ vocab check-about ]
     [ words [ check-word ] each ]
     [ vocab-articles get at [ check-article ] each ]
     tri ;
@@ -83,6 +86,8 @@ PRIVATE>
     ] with-scope ;
 
 : help-lint-all ( -- ) "" help-lint ;
+
+: :lint-failures ( -- ) lint-failures get errors. ;
 
 : unlinked-words ( words -- seq )
     all-word-help [ article-parent not ] filter ;

@@ -380,7 +380,7 @@ TUPLE: no-such-library name ;
 M: no-such-library summary
     drop "Library not found" ;
 
-M: no-such-library source-file-error-type drop +linkage-error+ ;
+M: no-such-library error-type drop +linkage-error+ ;
 
 : no-such-library ( name -- )
     \ no-such-library boa
@@ -391,7 +391,7 @@ TUPLE: no-such-symbol name ;
 M: no-such-symbol summary
     drop "Symbol not found" ;
 
-M: no-such-symbol source-file-error-type drop +linkage-error+ ;
+M: no-such-symbol error-type drop +linkage-error+ ;
 
 : no-such-symbol ( name -- )
     \ no-such-symbol boa

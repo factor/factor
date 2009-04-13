@@ -4,14 +4,14 @@ USING: accessors arrays sequences sorting assocs colors.constants fry
 combinators combinators.smart combinators.short-circuit editors make
 memoize compiler.units fonts kernel io.pathnames prettyprint
 source-files.errors math.parser init math.order models models.arrow
-models.arrow.smart models.search models.mapping debugger namespaces
+models.arrow.smart models.search models.mapping models.delay debugger namespaces
 summary locals ui ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.tables ui.gadgets.labeled ui.gadgets.tracks ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.gadgets.scrollers
 ui.tools.inspector ui.gadgets.status-bar ui.operations
 ui.gadgets.buttons ui.gadgets.borders ui.gadgets.packs
 ui.gadgets.labels ui.baseline-alignment ui.images
-compiler.errors ;
+compiler.errors calendar ;
 IN: ui.tools.error-list
 
 CONSTANT: source-file-icon
@@ -26,7 +26,7 @@ MEMO: error-icon ( type -- image-name )
 
 : <error-toggle> ( -- model gadget )
     #! Linkage errors are not shown by default.
-    error-types [ dup +linkage-error+ eq? not <model> ] { } map>assoc
+    error-types get keys [ dup +linkage-error+ eq? not <model> ] { } map>assoc
     [ [ [ error-icon ] dip ] assoc-map <checkboxes> ]
     [ <mapping> ] bi ;
 
@@ -75,7 +75,7 @@ SINGLETON: error-renderer
 M: error-renderer row-columns
     drop [
         {
-            [ source-file-error-type error-icon ]
+            [ error-type error-icon ]
             [ line#>> number>string ]
             [ asset>> unparse-short ]
             [ error>> summary ]
@@ -142,7 +142,7 @@ error-display "toolbar" f {
     [ <toolbar> ] [ error-toggle>> "Show errors:" label-on-left add-gadget ] bi ;
 
 : <error-model> ( visible-errors model -- model' )
-    [ swap '[ source-file-error-type _ at ] filter ] <smart-arrow> ;
+    [ swap '[ error-type _ at ] filter ] <smart-arrow> ;
 
 :: <error-list-gadget> ( model -- gadget )
     vertical error-list-gadget new-track
@@ -173,23 +173,26 @@ error-list-gadget "toolbar" f {
     { T{ key-down f f "F1" } error-list-help }
 } define-command-map
 
-SYMBOL: compiler-error-model
+SYMBOL: error-list-model
 
-compiler-error-model [ f <model> ] initialize
+error-list-model [ f <model> ] initialize
 
 SINGLETON: updater
 
-M: updater definitions-changed
-    2drop
-    all-errors
-    compiler-error-model get-global
-    set-model ;
+M: updater errors-changed
+    drop f error-list-model get-global set-model ;
 
-[
-    updater remove-definition-observer
-    updater add-definition-observer
-] "ui.tools.error-list" add-init-hook
+[ updater add-error-observer ] "ui.tools.error-list" add-init-hook
+
+: <error-list-model> ( -- model )
+    error-list-model get-global
+    1/2 seconds <delay> [ drop all-errors ] <arrow> ;
 
 : error-list-window ( -- )
-    compiler-error-model get-global <error-list-gadget>
-    "Errors" open-status-window ;
+    <error-list-model> <error-list-gadget> "Errors" open-status-window ;
+
+: show-error-list ( -- )
+    [ error-list-gadget? ] find-window
+    [ raise-window ] [ error-list-window ] if* ;
+
+\ show-error-list H{ { +nullary+ t } } define-command

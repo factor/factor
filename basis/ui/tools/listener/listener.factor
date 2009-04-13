@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs calendar combinators locals
-colors.constants combinators.short-circuit compiler.units
-help.tips concurrency.flags concurrency.mailboxes continuations
-destructors documents documents.elements fry hashtables help
-help.markup io io.styles kernel lexer listener math models
+source-files.errors colors.constants combinators.short-circuit
+compiler.units help.tips concurrency.flags concurrency.mailboxes
+continuations destructors documents documents.elements fry hashtables
+help help.markup io io.styles kernel lexer listener math models
 models.delay models.arrow namespaces parser prettyprint quotations
 sequences strings threads tools.vocabs vocabs vocabs.loader
 vocabs.parser words debugger ui ui.commands ui.pens.solid ui.gadgets
@@ -13,7 +13,7 @@ ui.gadgets.labeled ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.listener.completion ui.tools.listener.popups
-ui.tools.listener.history ;
+ui.tools.listener.history ui.tools.error-list ;
 IN: ui.tools.listener
 
 ! If waiting is t, we're waiting for user input, and invoking
@@ -356,10 +356,17 @@ interactor "completion" f {
     { T{ key-down f { C+ } "r" } history-completion-popup }
 } define-command-map
 
+: ui-error-summary ( -- )
+    all-errors empty? [
+        { "Press " { $command tool "common" show-error-list } " to view errors." }
+        print-element nl
+    ] unless ;
+
 : listener-thread ( listener -- )
     dup listener-streams [
         [ com-browse ] help-hook set
         '[ [ _ input>> ] 2dip debugger-popup ] error-hook set
+        [ ui-error-summary ] error-summary-hook set
         tip-of-the-day. nl
         listener
     ] with-streams* ;
