@@ -33,10 +33,9 @@ M: help-lint-error error-type drop +help-lint-failure+ ;
 PRIVATE>
 
 : help-lint-error ( error topic -- )
-    over [
-        [ <help-lint-error> ] keep
-        lint-failures get set-at
-    ] [ nip lint-failures get delete-at ] if ;
+    lint-failures get pick
+    [ [ [ <help-lint-error> ] keep ] dip set-at ] [ delete-at drop ] if
+    notify-error-observers ;
 
 <PRIVATE
 
