@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test db2.statements kernel db2 db2.tester
-continuations db2.errors accessors ;
+continuations db2.errors accessors db2.types ;
 IN: db2.statements.tests
 
 { 1 0 } [ [ drop ] statement-each ] must-infer-as
@@ -45,6 +45,21 @@ IN: db2.statements.tests
         { "clubber" }
         "select os from computer where name = ?;" sql-bind-query
     ] unit-test
+
+    [ { { "windows" } } ] [
+        { { VARCHAR "clubber" } }
+        "select os from computer where name = ?;" sql-bind-typed-query
+    ] unit-test
+
+    [ ] [
+        {
+            { VARCHAR "clubber" }
+            { VARCHAR "windows" }
+        }
+        "insert into computer (name, os) values(?, ?);"
+        sql-bind-typed-command
+    ] unit-test
+
 
     ;
 
