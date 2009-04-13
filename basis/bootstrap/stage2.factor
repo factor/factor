@@ -81,13 +81,11 @@ SYMBOL: bootstrap-time
         "none" require
     ] if
 
-    [
-        load-components
+    load-components
 
-        millis over - core-bootstrap-time set-global
+    millis over - core-bootstrap-time set-global
 
-        run-bootstrap-init
-    ] with-compiler-errors
+    run-bootstrap-init
 
     f error set-global
     f error-continuation set-global

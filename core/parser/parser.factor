@@ -281,11 +281,9 @@ print-use-hook [ [ ] ] initialize
 
 : parse-file ( file -- quot )
     [
-        [
-            [ parsing-file ] keep
-            [ utf8 <file-reader> ] keep
-            parse-stream
-        ] with-compiler-errors
+        [ parsing-file ] keep
+        [ utf8 <file-reader> ] keep
+        parse-stream
     ] [
         over parse-file-restarts rethrow-restarts
         drop parse-file

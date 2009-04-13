@@ -62,7 +62,7 @@ GENERIC: definitions-changed ( assoc obj -- )
     definition-observers get push ;
 
 : remove-definition-observer ( obj -- )
-    definition-observers get delete ;
+    definition-observers get delq ;
 
 : notify-definition-observers ( assoc -- )
     definition-observers get

@@ -4,7 +4,7 @@ ui.gestures ;
 IN: ui.operations
 
 : $operations ( element -- )
-    >quotation call
+    >quotation call( -- obj )
     f operations>commands
     command-map. ;
 

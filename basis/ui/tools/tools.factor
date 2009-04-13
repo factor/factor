@@ -30,4 +30,5 @@ tool "common" f {
     { T{ key-down f { A+ } "w" } close-window }
     { T{ key-down f { A+ } "q" } com-exit }
     { T{ key-down f f "F2" } refresh-all }
+    { T{ key-down f f "F3" } show-error-list }
 } define-command-map

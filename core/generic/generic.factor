@@ -33,6 +33,8 @@ M: generic definition drop f ;
 
 GENERIC: effective-method ( generic -- method )
 
+\ effective-method t "no-compile" set-word-prop
+
 : next-method-class ( class generic -- class/f )
     order [ class<= ] with filter reverse dup length 1 =
     [ drop f ] [ second ] if ;
