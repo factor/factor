@@ -4,7 +4,7 @@ USING: accessors arrays assocs calendar combinators locals
 source-files.errors colors.constants combinators.short-circuit
 compiler.units help.tips concurrency.flags concurrency.mailboxes
 continuations destructors documents documents.elements fry hashtables
-help help.markup io io.styles kernel lexer listener math models
+help help.markup io io.styles kernel lexer listener math models sets
 models.delay models.arrow namespaces parser prettyprint quotations
 sequences strings threads tools.vocabs vocabs vocabs.loader
 vocabs.parser words debugger ui ui.commands ui.pens.solid ui.gadgets
@@ -14,6 +14,7 @@ ui.gadgets.status-bar ui.gadgets.tracks ui.gadgets.borders ui.gestures
 ui.operations ui.tools.browser ui.tools.common ui.tools.debugger
 ui.tools.listener.completion ui.tools.listener.popups
 ui.tools.listener.history ui.tools.error-list ;
+FROM: source-files.errors => all-errors ;
 IN: ui.tools.listener
 
 ! If waiting is t, we're waiting for user input, and invoking
@@ -357,10 +358,12 @@ interactor "completion" f {
 } define-command-map
 
 : ui-error-summary ( -- )
-    all-errors empty? [
+    all-errors [
+        [ error-type ] map prune
+        [ error-icon-path 1array \ $image prefix " " 2array ] { } map-as
         { "Press " { $command tool "common" show-error-list } " to view errors." }
-        print-element nl
-    ] unless ;
+        append print-element nl
+    ] unless-empty ;
 
 : listener-thread ( listener -- )
     dup listener-streams [
