@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences ;
+USING: accessors kernel sequences combinators ;
 IN: db2.result-sets
 
 TUPLE: result-set sql in out handle n max ;
@@ -16,10 +16,14 @@ GENERIC# column-typed 1 ( result-set column -- sql )
     dup #rows >>max
     0 >>n ;
 
-: new-result-set ( query handle class -- result-set )
+: new-result-set ( query class -- result-set )
     new
-        swap >>handle
-        swap [ sql>> >>sql ] [ in>> >>in ] [ out>> >>out ] tri ;
+        swap {
+            [ handle>> >>handle ]
+            [ sql>> >>sql ]
+            [ in>> >>in ]
+            [ out>> >>out ]
+        } cleave ;
 
 : sql-row ( result-set -- seq )
     dup #columns [ column ] with map ;

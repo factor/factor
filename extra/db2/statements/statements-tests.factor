@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test db2.statements kernel db2 db2.tester
-continuations db2.errors ;
+continuations db2.errors accessors ;
 IN: db2.statements.tests
 
 { 1 0 } [ [ drop ] statement-each ] must-infer-as
@@ -10,6 +10,9 @@ IN: db2.statements.tests
 
 : test-sql-command ( -- )
     [ "drop table computer;" sql-command ] ignore-errors
+
+    [ "drop table computer;" sql-command ]
+    [ [ sql-table-missing? ] [ table>> "computer" = ] bi and ] must-fail-with
 
     [ ] [
         "create table computer(name varchar, os varchar);"
@@ -32,7 +35,17 @@ IN: db2.statements.tests
     [ "selectt" sql-query ]
     [ sql-syntax-error? ] must-fail-with
 
+    [ ] [
+        { "clubber" "windows" }
+        "insert into computer (name, os) values(?, ?);"
+        sql-bind-command
+    ] unit-test
+
+    [ { { "windows" } } ] [
+        { "clubber" }
+        "select os from computer where name = ?;" sql-bind-query
+    ] unit-test
+
     ;
 
 [ test-sql-command ] test-dbs
-
