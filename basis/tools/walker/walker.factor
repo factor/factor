@@ -92,7 +92,7 @@ M: object add-breakpoint ;
 : (step-into-call-next-method) ( method -- )
     next-method-quot (step-into-quot) ;
 
-{
+<< {
     (step-into-quot)
     (step-into-dip)
     (step-into-2dip)
@@ -102,7 +102,7 @@ M: object add-breakpoint ;
     (step-into-execute)
     (step-into-continuation)
     (step-into-call-next-method)
-} [ t "no-compile" set-word-prop ] each
+} [ t "no-compile" set-word-prop ] each >>
 
 ! Messages sent to walker thread
 SYMBOL: step
