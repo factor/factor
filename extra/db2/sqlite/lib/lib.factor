@@ -50,6 +50,9 @@ IN: db2.sqlite.lib
 : sqlite-bind-uint64 ( handle i n -- )
     sqlite3-bind-uint64 sqlite-check-result ;
 
+: sqlite-bind-boolean ( handle name obj -- )
+    >boolean 1 0 ? sqlite-bind-int ;
+
 : sqlite-bind-double ( handle i x -- )
     sqlite3_bind_double sqlite-check-result ;
 
@@ -113,3 +116,6 @@ IN: db2.sqlite.lib
 
 : sqlite-bind-sequence ( handle sequence -- )
     [ 1+ swap sqlite-bind-text ] assoc-with each-index ;
+
+: >sqlite-result-set ( statement -- result-set )
+    sqlite-result-set new-result-set dup advance-row ;

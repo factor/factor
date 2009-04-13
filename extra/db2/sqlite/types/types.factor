@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays calendar.format combinators db2.types
-db2.sqlite.ffi db2.sqlite.lib
+db2.sqlite.ffi db2.sqlite.lib math fry
 kernel present sequences serialize urls ;
 IN: db2.sqlite.types
 
@@ -26,6 +26,30 @@ IN: db2.sqlite.types
         { +db-assigned-id+ [ sqlite-bind-int-by-name ] }
         { +random-id+ [ sqlite-bind-int64-by-name ] }
         { NULL [ sqlite-bind-null-by-name ] }
+        [ no-sql-type ]
+    } case ;
+
+: bind-next-sqlite-type ( handle key value type -- )
+    dup array? [ first ] when
+    {
+        { INTEGER [ sqlite-bind-int ] }
+        { BIG-INTEGER [ sqlite-bind-int64 ] }
+        { SIGNED-BIG-INTEGER [ sqlite-bind-int64 ] }
+        { UNSIGNED-BIG-INTEGER [ sqlite-bind-uint64 ] }
+        { BOOLEAN [ sqlite-bind-boolean ] }
+        { TEXT [ sqlite-bind-text ] }
+        { VARCHAR [ sqlite-bind-text ] }
+        { DOUBLE [ sqlite-bind-double ] }
+        { DATE [ timestamp>ymd sqlite-bind-text ] }
+        { TIME [ timestamp>hms sqlite-bind-text ] }
+        { DATETIME [ timestamp>ymdhms sqlite-bind-text ] }
+        { TIMESTAMP [ timestamp>ymdhms sqlite-bind-text ] }
+        { BLOB [ sqlite-bind-blob ] }
+        { FACTOR-BLOB [ object>bytes sqlite-bind-blob ] }
+        { URL [ present sqlite-bind-text ] }
+        { +db-assigned-id+ [ sqlite-bind-int ] }
+        { +random-id+ [ sqlite-bind-int64 ] }
+        { NULL [ drop sqlite-bind-null ] }
         [ no-sql-type ]
     } case ;
 
@@ -60,3 +84,5 @@ IN: db2.sqlite.types
         [ no-sql-type ]
     } case ;
 
+: sqlite-bind-typed-sequence ( handle sequence -- )
+    [ 1+ swap first2 swap bind-next-sqlite-type ] assoc-with each-index ;
