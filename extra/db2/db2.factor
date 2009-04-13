@@ -23,7 +23,7 @@ PRIVATE>
 : sql-bind-command ( sequence string -- )
     f f <statement> [
         sqlite-maybe-prepare [
-            handle>> '[ [ _ ] 2dip 1+ swap sqlite-bind-text ] each-index
+            handle>> swap sqlite-bind-sequence
         ] [
             sqlite-result-set new-result-set advance-row
         ] bi
@@ -32,7 +32,7 @@ PRIVATE>
 : sql-bind-query ( in-sequence string -- out-sequence )
     f f <statement> [
         sqlite-maybe-prepare [
-            handle>> '[ [ _ ] 2dip 1+ swap sqlite-bind-text ] each-index
+            handle>> swap sqlite-bind-sequence
         ] [
             statement>result-sequence
         ] bi

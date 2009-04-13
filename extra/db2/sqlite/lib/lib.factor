@@ -8,6 +8,9 @@ IN: db2.sqlite.lib
 
 : ?when ( object quot -- object' ) dupd when ; inline
 
+: assoc-with ( object sequence quot -- obj curry )
+    swapd [ [ -rot ] dip  call ] 2curry ; inline
+
 : sqlite-check-result ( n -- )
     {
         { SQLITE_OK [ ] }
@@ -107,3 +110,6 @@ IN: db2.sqlite.lib
 
 : sqlite-next ( prepared -- ? )
     sqlite3_step sqlite-step-has-more-rows? ;
+
+: sqlite-bind-sequence ( handle sequence -- )
+    [ 1+ swap sqlite-bind-text ] assoc-with each-index ;
