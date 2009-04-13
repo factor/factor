@@ -7,8 +7,6 @@ SINGLETONS: +fieldindex+ +compoundindex+ +deepindex+ ;
 
 IN: mongodb.tuple.index
 
-FROM: mongodb.tuple => +fieldindex+ +compoundindex+ +deepindex+ ;
-
 TUPLE: tuple-index name spec ;
 
 <PRIVATE

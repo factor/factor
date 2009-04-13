@@ -12,6 +12,8 @@ CONSTANT: MDB_DIRTY_ADVICE     "mdb-dirty-set"
 
 PRIVATE>
 
+SYMBOL: mdb-dirty-handling?
+
 : advised-with? ( name word loc -- ? )
    word-prop key? ; inline
 

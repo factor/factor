@@ -1,7 +1,7 @@
 
 USING: accessors arrays assocs bson.constants classes classes.tuple
 combinators continuations fry kernel mongodb.driver sequences strings
-vectors words ;
+vectors words combinators.smart ;
 
 IN: mongodb.tuple
 
@@ -50,7 +50,7 @@ CONSTANT: MDB_COLLECTION_MAP "_mdb_col_map"
 PRIVATE>
 
 : MDB_ADDON_SLOTS ( -- slots )
-    { } [ MDB_OID_FIELD MDB_META_FIELD ] with-datastack ; inline
+    [ MDB_OID_FIELD MDB_META_FIELD ] output>array ; inline
 
 : link-class ( collection class -- )
     over classes>>
