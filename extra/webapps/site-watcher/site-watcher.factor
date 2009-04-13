@@ -69,7 +69,7 @@ IN: webapps.site-watcher
         8431 >>secure ;
 
 : site-watcher-db ( -- db )
-    "resource:test.db" <sqlite-db> ;
+    "test.db" temp-file <sqlite-db> ;
 
 <site-watcher-app>
 <login-config>

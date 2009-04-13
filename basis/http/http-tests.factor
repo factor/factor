@@ -393,6 +393,10 @@ SYMBOL: a
 [ "OK" ] [ "data" "http://localhost/a" add-port http-post nip ] unit-test
 
 ! Check that download throws errors (reported by Chris Double)
-[ "http://localhost/tweet_my_twat" add-port download ] must-fail
+[
+    "resource:temp" [
+        "http://localhost/tweet_my_twat" add-port download
+    ] with-directory
+] must-fail
 
 [ ] [ "http://localhost/quit" add-port http-get 2drop ] unit-test
