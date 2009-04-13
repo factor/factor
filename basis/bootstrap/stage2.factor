@@ -4,7 +4,7 @@ USING: accessors init namespaces words words.symbol io
 kernel.private math memory continuations kernel io.files
 io.pathnames io.backend system parser vocabs sequences
 vocabs.loader combinators splitting source-files strings
-definitions assocs compiler.errors compiler.units math.parser
+definitions assocs compiler.units math.parser
 generic sets command-line ;
 IN: bootstrap.stage2
 
