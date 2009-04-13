@@ -4,7 +4,7 @@ USING: arrays hashtables io kernel math math.parser memory
 namespaces parser lexer sequences strings io.styles
 vectors words generic system combinators continuations debugger
 definitions compiler.units accessors colors prettyprint fry
-sets vocabs.parser source-files.errors ;
+sets vocabs.parser source-files.errors locals ;
 IN: listener
 
 GENERIC: stream-read-quot ( stream -- quot/f )
@@ -31,14 +31,6 @@ M: object stream-read-quot
     V{ } clone read-quot-loop ;
 
 : read-quot ( -- quot/f ) input-stream get stream-read-quot ;
-
-<PRIVATE
-
-SYMBOL: quit-flag
-
-PRIVATE>
-
-: bye ( -- ) quit-flag on ;
 
 SYMBOL: visible-vars
 
@@ -98,28 +90,43 @@ SYMBOL: error-summary-hook
         ] dip
     ] when stack. ;
 
-: stacks. ( -- )
+: datastack. ( datastack -- )
     display-stacks? get [
-        datastack [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
-    ] when ;
+        [ nl "--- Data stack:" title. trimmed-stack. ] unless-empty
+    ] [ drop ] if ;
 
 : prompt. ( -- )
-    "( " in get auto-use? get [ " - auto" append ] when " )" 3append
+    in get auto-use? get [ " - auto" append ] when "( " " )" surround
     H{ { background T{ rgba f 1 0.7 0.7 1 } } } format bl flush ;
 
 [ error-summary ] error-summary-hook set-global
 
-: listen ( -- )
-    error-summary-hook get call( -- ) visible-vars. stacks. prompt.
-    [ read-quot [ [ call-error-hook ] recover ] [ bye ] if* ]
-    [ dup lexer-error? [ call-error-hook ] [ rethrow ] if ] recover ;
+: call-error-summary-hook ( -- )
+    error-summary-hook get call( -- ) ;
 
-: until-quit ( -- )
-    quit-flag get [ quit-flag off ] [ listen until-quit ] if ;
+:: (listener) ( datastack -- )
+    call-error-summary-hook
+    visible-vars.
+    datastack datastack.
+    prompt.
+
+    [
+        read-quot [
+            '[ datastack _ with-datastack ]
+            [ call-error-hook datastack ]
+            recover
+            (listener)
+        ] when*
+    ] [
+        dup lexer-error?
+        [ call-error-hook datastack (listener) ]
+        [ rethrow ]
+        if
+    ] recover ;
 
 PRIVATE>
 
 : listener ( -- )
-    [ until-quit ] with-interactive-vocabs ;
+    [ [ { } (listener) ] with-interactive-vocabs ] with-return ;
 
 MAIN: listener
