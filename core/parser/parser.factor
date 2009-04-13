@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math namespaces
-sequences strings vectors words words.symbol quotations io combinators
-sorting splitting math.parser effects continuations io.files vocabs
-io.encodings.utf8 source-files classes hashtables compiler.errors
-compiler.units accessors sets lexer vocabs.parser effects.parser slots ;
+sequences strings vectors words words.symbol quotations io
+combinators sorting splitting math.parser effects continuations
+io.files vocabs io.encodings.utf8 source-files classes
+hashtables compiler.units accessors sets lexer vocabs.parser
+effects.parser slots ;
 IN: parser
 
 : location ( -- loc )
@@ -159,7 +160,6 @@ SYMBOL: interactive-vocabs
     "assocs"
     "combinators"
     "compiler"
-    "compiler.errors"
     "compiler.units"
     "continuations"
     "debugger"
