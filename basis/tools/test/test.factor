@@ -39,7 +39,8 @@ T{ error-type
 
 : failure ( error experiment file line# -- )
     "--> test failed!" print
-    <test-failure> test-failures get push ;
+    <test-failure> test-failures get push
+    notify-error-observers ;
 
 SYMBOL: file
 
