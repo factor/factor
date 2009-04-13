@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: html.parser.state io io.encodings.utf8 io.files
+USING: sequence-parser io io.encodings.utf8 io.files
 io.streams.string kernel combinators accessors io.pathnames
 fry sequences arrays locals namespaces io.directories
 assocs math splitting make unicode.categories
@@ -41,7 +41,7 @@ ifs elifs elses ;
 
 DEFER: preprocess-file
 
-ERROR: unknown-c-preprocessor state-parser name ;
+ERROR: unknown-c-preprocessor sequence-parser name ;
 
 ERROR: bad-include-line line ;
 
@@ -69,8 +69,16 @@ ERROR: header-file-missing path ;
         drop
     ] if ;
 
-: handle-include ( preprocessor-state state-parser -- )
-    skip-whitespace advance dup previous {
+: skip-whitespace/comments ( sequence-parser -- sequence-parser )
+    skip-whitespace
+    {
+        { [ dup take-c-comment ] [ skip-whitespace/comments ] }
+        { [ dup take-c++-comment ] [ skip-whitespace/comments ] }
+        [ ]
+    } cond ;
+
+: handle-include ( preprocessor-state sequence-parser -- )
+    skip-whitespace/comments advance dup previous {
         { CHAR: < [ CHAR: > take-until-object read-standard-include ] }
         { CHAR: " [ CHAR: " take-until-object read-local-include ] }
         [ bad-include-line ]
@@ -81,58 +89,58 @@ ERROR: header-file-missing path ;
 
 : readlns ( -- string ) [ (readlns) ] { } make concat ;
 
-: take-define-identifier ( state-parser -- string )
-    skip-whitespace
+: take-define-identifier ( sequence-parser -- string )
+    skip-whitespace/comments
     [ current { [ blank? ] [ CHAR: ( = ] } 1|| ] take-until ;
 
-: handle-define ( preprocessor-state state-parser -- )
+: handle-define ( preprocessor-state sequence-parser -- )
     [ take-define-identifier ]
-    [ skip-whitespace take-rest ] bi 
+    [ skip-whitespace/comments take-rest ] bi 
     "\\" ?tail [ readlns append ] when
     spin symbol-table>> set-at ;
 
-: handle-undef ( preprocessor-state state-parser -- )
+: handle-undef ( preprocessor-state sequence-parser -- )
     take-token swap symbol-table>> delete-at ;
 
-: handle-ifdef ( preprocessor-state state-parser -- )
+: handle-ifdef ( preprocessor-state sequence-parser -- )
     [ [ 1 + ] change-ifdef-nesting ] dip
     take-token over symbol-table>> key?
     [ drop ] [ t >>processing-disabled? drop ] if ;
 
-: handle-ifndef ( preprocessor-state state-parser -- )
+: handle-ifndef ( preprocessor-state sequence-parser -- )
     [ [ 1 + ] change-ifdef-nesting ] dip
     take-token over symbol-table>> key?
     [ t >>processing-disabled? drop ]
     [ drop ] if ; 
 
-: handle-endif ( preprocessor-state state-parser -- )
+: handle-endif ( preprocessor-state sequence-parser -- )
     drop [ 1 - ] change-ifdef-nesting drop ;
 
-: handle-if ( preprocessor-state state-parser -- )
+: handle-if ( preprocessor-state sequence-parser -- )
     [ [ 1 + ] change-ifdef-nesting ] dip
-    skip-whitespace take-rest swap ifs>> push ;
+    skip-whitespace/comments take-rest swap ifs>> push ;
 
-: handle-elif ( preprocessor-state state-parser -- )
-    skip-whitespace take-rest swap elifs>> push ;
+: handle-elif ( preprocessor-state sequence-parser -- )
+    skip-whitespace/comments take-rest swap elifs>> push ;
 
-: handle-else ( preprocessor-state state-parser -- )
-    skip-whitespace take-rest swap elses>> push ;
+: handle-else ( preprocessor-state sequence-parser -- )
+    skip-whitespace/comments take-rest swap elses>> push ;
 
-: handle-pragma ( preprocessor-state state-parser -- )
-    skip-whitespace take-rest swap pragmas>> push ;
+: handle-pragma ( preprocessor-state sequence-parser -- )
+    skip-whitespace/comments take-rest swap pragmas>> push ;
 
-: handle-include-next ( preprocessor-state state-parser -- )
-    skip-whitespace take-rest swap include-nexts>> push ;
+: handle-include-next ( preprocessor-state sequence-parser -- )
+    skip-whitespace/comments take-rest swap include-nexts>> push ;
 
-: handle-error ( preprocessor-state state-parser -- )
-    skip-whitespace take-rest swap errors>> push ;
+: handle-error ( preprocessor-state sequence-parser -- )
+    skip-whitespace/comments take-rest swap errors>> push ;
     ! nip take-rest throw ;
 
-: handle-warning ( preprocessor-state state-parser -- )
-    skip-whitespace
+: handle-warning ( preprocessor-state sequence-parser -- )
+    skip-whitespace/comments
     take-rest swap warnings>> push ;
 
-: parse-directive ( preprocessor-state state-parser string -- )
+: parse-directive ( preprocessor-state sequence-parser string -- )
     {
         { "warning" [ handle-warning ] }
         { "error" [ handle-error ] }
@@ -150,7 +158,7 @@ ERROR: header-file-missing path ;
         [ unknown-c-preprocessor ]
     } case ;
 
-: parse-directive-line ( preprocessor-state state-parser -- )
+: parse-directive-line ( preprocessor-state sequence-parser -- )
     advance dup take-token
     pick processing-disabled?>> [
         "endif" = [
@@ -162,14 +170,14 @@ ERROR: header-file-missing path ;
         parse-directive
     ] if ;
 
-: preprocess-line ( preprocessor-state state-parser -- )
-    skip-whitespace dup current CHAR: # =
+: preprocess-line ( preprocessor-state sequence-parser -- )
+    skip-whitespace/comments dup current CHAR: # =
     [ parse-directive-line ]
     [ swap processing-disabled?>> [ drop ] [ write-full nl ] if ] if ;
 
 : preprocess-lines ( preprocessor-state -- )
     readln 
-    [ <state-parser> [ preprocess-line ] [ drop preprocess-lines ] 2bi ]
+    [ <sequence-parser> [ preprocess-line ] [ drop preprocess-lines ] 2bi ]
     [ drop ] if* ;
 
 ERROR: include-nested-too-deeply ;

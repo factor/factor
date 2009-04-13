@@ -60,7 +60,6 @@ SYMBOL: main-vocab-hook
 : default-cli-args ( -- )
     global [
         "quiet" off
-        "script" off
         "e" off
         "user-init" on
         embedded? "quiet" set

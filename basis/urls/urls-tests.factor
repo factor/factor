@@ -80,6 +80,15 @@ CONSTANT: urls
             }
             "ftp://slava:secret@ftp.kernel.org/"
         }
+        {
+            T{ url
+               { protocol "http" }
+               { host "foo.com" }
+               { path "/" }
+               { query H{ { "a" f } } }
+            }
+            "http://foo.com/?a"
+        }
     }
 
 urls [

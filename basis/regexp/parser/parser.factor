@@ -102,8 +102,10 @@ MEMO: simple-category-table ( -- table )
         { CHAR: s dotall }
     } ;
 
+ERROR: nonexistent-option name ;
+
 : ch>option ( ch -- singleton )
-    options-assoc at ;
+    dup options-assoc at [ ] [ nonexistent-option ] ?if ;
 
 : option>ch ( option -- string )
     options-assoc value-at ;
