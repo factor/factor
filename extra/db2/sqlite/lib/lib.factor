@@ -114,8 +114,5 @@ IN: db2.sqlite.lib
 : sqlite-next ( prepared -- ? )
     sqlite3_step sqlite-step-has-more-rows? ;
 
-: sqlite-bind-sequence ( handle sequence -- )
-    [ 1+ swap sqlite-bind-text ] assoc-with each-index ;
-
 : >sqlite-result-set ( statement -- result-set )
     sqlite-result-set new-result-set dup advance-row ;

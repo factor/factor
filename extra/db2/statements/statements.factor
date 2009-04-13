@@ -15,6 +15,9 @@ TUPLE: statement handle sql in out type ;
 HOOK: <statement> db-connection ( sql in out -- statement )
 GENERIC: statement>result-set* ( statement -- result-set )
 GENERIC: execute-statement* ( statement type -- )
+GENERIC: prepare-statement* ( statement -- statement' )
+GENERIC: bind-sequence ( sequence statement -- )
+GENERIC: bind-typed-sequence ( sequence statement -- )
 
 : statement>result-set ( statement -- result-set )
     [ statement>result-set* ]
@@ -30,6 +33,9 @@ M: object execute-statement* ( statement type -- )
     dup sequence?
     [ [ execute-one-statement ] each ]
     [ execute-one-statement ] if ;
+
+: prepare-statement ( statement -- statement )
+    dup handle>> [ prepare-statement* ] unless ;
 
 : statement-each ( statement quot: ( statement -- ) -- )
     over more-rows?

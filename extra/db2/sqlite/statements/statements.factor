@@ -14,8 +14,6 @@ M: sqlite-statement dispose
     handle>>
     [ [ sqlite3_reset drop ] [ sqlite-finalize ] bi ] when* ;
 
-: sqlite-maybe-prepare ( statement -- statement )
-    dup handle>> [
-        db-connection get handle>> over sql>> sqlite-prepare
-        >>handle
-    ] unless ;
+M: sqlite-statement prepare-statement* ( statement -- statement )
+    db-connection get handle>> over sql>> sqlite-prepare
+    >>handle ;

@@ -84,5 +84,12 @@ IN: db2.sqlite.types
         [ no-sql-type ]
     } case ;
 
-: sqlite-bind-typed-sequence ( handle sequence -- )
-    [ 1+ swap first2 swap bind-next-sqlite-type ] assoc-with each-index ;
+M: sqlite-statement bind-sequence ( sequence statement -- )
+    handle>> '[
+        [ _ ] 2dip 1+ swap sqlite-bind-text
+    ] each-index ;
+
+M: sqlite-statement bind-typed-sequence ( sequence statement -- )
+    handle>> '[
+        [ _ ] 2dip 1+ swap first2 swap bind-next-sqlite-type
+    ] each-index ;
