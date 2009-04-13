@@ -92,7 +92,7 @@ ARTICLE: "tuple-constructors" "Tuple constructors"
 $nl
 "Constructors play a part in enforcing the invariant that slot values must always match slot declarations. The " { $link new } " word fills in the tuple with initial values, and " { $link boa } " ensures that the values on the stack match the corresponding slot declarations. See " { $link "tuple-declarations" } "."
 $nl
-"All tuple construction should be done through constructor words, and construction primitives should be encapsulated and never called outside of the vocabulary where the class is defined, because this encourages looser coupling. For example, a constructor word could be changed to use memoization instead of always constructing a new instance, or it could be changed to construt a different class, without breaking callers."
+"All tuple construction should be done through constructor words, and construction primitives should be encapsulated and never called outside of the vocabulary where the class is defined, because this encourages looser coupling. For example, a constructor word could be changed to use memoization instead of always constructing a new instance, or it could be changed to construct a different class, without breaking callers."
 $nl
 "Examples of constructors:"
 { $code
@@ -220,13 +220,13 @@ ARTICLE: "tuple-examples" "Tuple examples"
     "    <employee> \"project manager\" >>position ;" }
 "An alternative strategy is to define the most general BOA constructor first:"
 { $code
-    ": <employee> ( name position -- person )"
+    ": <employee> ( name position -- employee )"
     "    40000 employee boa ;"
 }
 "Now we can define more specific constructors:"
 { $code
-    ": <manager> ( name -- person )"
-    "    \"manager\" <person> ;" }
+    ": <manager> ( name -- employee )"
+    "    \"manager\" <employee> ;" }
 "An example using reader words:"
 { $code
     "TUPLE: check to amount number ;"
@@ -256,7 +256,7 @@ ARTICLE: "tuple-examples" "Tuple examples"
     ": next-position ( role -- newrole )"
     "    positions [ index 1+ ] keep nth ;"
     ""
-    ": promote ( person -- person )"
+    ": promote ( employee -- employee )"
     "    [ 1.2 * ] change-salary"
     "    [ next-position ] change-position ;"
 }

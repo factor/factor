@@ -14,7 +14,7 @@ PLAF_EXE_OBJS += vm/main-unix.o
 ifdef NO_UI
 	X11_UI_LIBS =
 else
-	X11_UI_LIBS = -lpango-1.0 -lpangocairo-1.0 -lcairo -lglib-2.0 -lgobject-2.0 -lGL -lGLU -lX11
+	X11_UI_LIBS = -lpango-1.0 -lpangocairo-1.0 -lcairo -lglib-2.0 -lgobject-2.0 -lGL -lX11
 endif
 
 # CFLAGS += -fPIC

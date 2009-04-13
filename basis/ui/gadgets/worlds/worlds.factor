@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs continuations kernel math models
-namespaces opengl sequences io combinators combinators.short-circuit
-fry math.vectors math.rectangles cache ui.gadgets ui.gestures
-ui.render ui.backend ui.gadgets.tracks ui.commands ;
+namespaces opengl opengl.textures sequences io combinators
+combinators.short-circuit fry math.vectors math.rectangles cache
+ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
+ui.commands ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < track
@@ -78,6 +79,7 @@ flush-layout-cache-hook [ [ ] ] initialize
 
 : (draw-world) ( world -- )
     dup handle>> [
+        check-extensions
         {
             [ init-gl ]
             [ draw-gadget ]
