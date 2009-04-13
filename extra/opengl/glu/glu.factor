@@ -1,8 +1,17 @@
 ! Copyright (C) 2005 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.syntax kernel sequences words ;
+USING: alien alien.libraries alien.syntax kernel sequences words system
+combinators ;
 IN: opengl.glu
 
+os {
+    { [ dup macosx? ] [ drop ] }
+    { [ dup windows? ] [ drop ] }
+    { [ dup unix? ] [ drop "glu" "libGLU.so.1" "cdecl" add-library ] }
+} cond
+
+LIBRARY: glu
+ 
 ! These are defined as structs in glu.h, but we only ever use pointers to them
 TYPEDEF: void* GLUnurbs*
 TYPEDEF: void* GLUquadric*
@@ -253,3 +262,6 @@ FUNCTION: GLint gluUnProject ( GLdouble winX, GLdouble winY, GLdouble winZ, GLdo
 ! FUNCTION: GLint gluBuild3DMipmaps ( GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, void* data ) ;
 ! FUNCTION: GLboolean gluCheckExtension ( GLubyte* extName, GLubyte* extString ) ;
 ! FUNCTION: GLint gluUnProject4 ( GLdouble winX, GLdouble winY, GLdouble winZ, GLdouble clipW, GLdouble* model, GLdouble* proj, GLint* view, GLdouble nearVal, GLdouble farVal, GLdouble* objX, GLdouble* objY, GLdouble* objZ, GLdouble* objW ) ;
+
+: gl-look-at ( eye focus up -- )
+    [ first3 ] tri@ gluLookAt ;
