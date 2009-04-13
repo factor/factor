@@ -214,14 +214,13 @@ M: condition error-help error>> error-help ;
 
 M: assert summary drop "Assertion failed" ;
 
-M: assert error.
-    "Assertion failed" print
+M: assert-sequence summary drop "Assertion failed" ;
+
+M: assert-sequence error.
     standard-table-style [
-        15 length-limit set
-        5 line-limit set
-        [ expect>> [ [ "Expect:" write ] with-cell pprint-cell ] with-row ]
-        [ got>> [ [ "Got:" write ] with-cell pprint-cell ] with-row ] bi
-    ] tabular-output nl ;
+        [ "=== Expected:" print expected>> stack. ]
+        [ "=== Got:" print got>> stack. ] bi
+    ] tabular-output ;
 
 M: immutable summary drop "Sequence is immutable" ;
 
