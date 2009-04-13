@@ -23,36 +23,24 @@ PRIVATE>
 
 : sql-bind-command ( sequence string -- )
     f f <statement> [
-        sqlite-maybe-prepare [
-            handle>> swap sqlite-bind-sequence
-        ] [
-            >sqlite-result-set drop
-        ] bi
+        prepare-statement
+        [ bind-sequence ] [ statement>result-set drop ] bi
     ] with-disposal ;
 
 : sql-bind-query ( in-sequence string -- out-sequence )
     f f <statement> [
-        sqlite-maybe-prepare [
-            handle>> swap sqlite-bind-sequence
-        ] [
-            statement>result-sequence
-        ] bi
+        prepare-statement
+        [ bind-sequence ] [ statement>result-sequence ] bi
     ] with-disposal ;
 
 : sql-bind-typed-command ( in-sequence string -- )
     f f <statement> [
-        sqlite-maybe-prepare [
-            handle>> swap sqlite-bind-typed-sequence
-        ] [
-            >sqlite-result-set drop
-        ] bi
+        prepare-statement
+        [ bind-typed-sequence ] [ statement>result-set drop ] bi
     ] with-disposal ;
 
 : sql-bind-typed-query ( in-sequence string -- out-sequence )
     f f <statement> [
-        sqlite-maybe-prepare [
-            handle>> swap sqlite-bind-typed-sequence
-        ] [
-            statement>result-sequence
-        ] bi
+        prepare-statement
+        [ bind-typed-sequence ] [ statement>result-sequence ] bi
     ] with-disposal ;
