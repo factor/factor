@@ -130,3 +130,10 @@ IN: ui.gadgets.packs.tests
 
 [ V{ { 0 0 } { 30 10 } } ]
 [ "g" get children>> [ loc>> ] map ] unit-test
+
+<shelf> +baseline+ >>align
+<gadget> { 24 24 } >>dim add-gadget
+12 9 { 15 15 } <baseline-gadget> add-gadget
+"g" set
+
+[ { 39 24 } ] [ "g" get pref-dim ] unit-test
