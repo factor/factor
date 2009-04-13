@@ -71,13 +71,13 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
     {
         [ length id3v1-offset >= ]
         [ id3v1-length tail-slice* "TAG" head? ]
-    } 1&& ; inline
+    } 1&& ;
 
 : id3v1+? ( seq -- ? )
     {
         [ length id3v1+-offset >= ]
         [ id3v1+-length tail-slice* "TAG+" head? ]
-    } 1&& ; inline
+    } 1&& ;
 
 : pair>frame ( string key -- frame/f )
     over [
@@ -86,7 +86,7 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
             swap >>data
     ] [
         2drop f
-    ] if ; inline
+    ] if ;
 
 : id3v1>frames ( id3v1 -- seq )
     [
@@ -101,25 +101,25 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
     ] output>array sift ;
 
 : seq>synchsafe ( seq -- n )
-    0 [ [ 7 shift ] dip bitor ] reduce ; inline
+    0 [ [ 7 shift ] dip bitor ] reduce ;
 
 : synchsafe>seq ( n -- seq )
     dup 1+ log2 1+ 7 / ceiling
-    [ [ -7 shift ] keep HEX: 7f bitand  ] replicate nip reverse ; inline
+    [ [ -7 shift ] keep HEX: 7f bitand  ] replicate nip reverse ;
 
 : filter-text-data ( data -- filtered )
-    [ printable? ] filter ; inline
+    [ printable? ] filter ;
 
 : valid-tag? ( id -- ? )
-    [ { [ digit? ] [ LETTER? ] } 1|| ] all? ; inline
+    [ { [ digit? ] [ LETTER? ] } 1|| ] all? ;
 
 : read-frame-data ( frame seq -- frame data )
-    [ 10 over size>> 10 + ] dip <slice> filter-text-data ; inline
+    [ 10 over size>> 10 + ] dip <slice> filter-text-data ;
 
 : decode-text ( string -- string' )
     dup 2 short head
     { { HEX: ff HEX: fe } { HEX: fe HEX: ff } } member?
-    utf16 ascii ? decode ; inline
+    utf16 ascii ? decode ;
 
 : (read-frame) ( seq -- frame )
     [ <frame> ] dip
@@ -128,20 +128,20 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
         [ [ 4 8 ] dip subseq seq>synchsafe >>size ]
         [ [ 8 10 ] dip subseq >byte-array >>flags ]
         [ read-frame-data decode-text >>data ]
-    } cleave ; inline
+    } cleave ;
 
 : read-frame ( seq -- frame/f )
     dup 4 head-slice valid-tag?
-    [ (read-frame) ] [ drop f ] if ; inline
+    [ (read-frame) ] [ drop f ] if ;
 
 : remove-frame ( seq frame -- seq )
-    size>> 10 + tail-slice ; inline
+    size>> 10 + tail-slice ;
 
 : frames>assoc ( seq -- assoc )
-    [ [ tag>> ] keep ] H{ } map>assoc ; inline
+    [ [ tag>> ] keep ] H{ } map>assoc ;
 
 : read-frames ( seq -- assoc )
-    [ dup read-frame dup ] [ [ remove-frame ] keep ] produce 2nip ; inline
+    [ dup read-frame dup ] [ [ remove-frame ] keep ] produce 2nip ;
     
 : read-v2-header ( seq -- header )
     [ <header> ] dip
@@ -149,18 +149,18 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
         [ [ 3 5 ] dip <slice> >array >>version ]
         [ [ 5 ] dip nth >>flags ]
         [ [ 6 10 ] dip <slice> seq>synchsafe >>size ]
-    } cleave ; inline
+    } cleave ;
 
 : merge-frames ( id3 assoc -- id3 )
-    [ dup frames>> ] dip update ; inline
+    [ dup frames>> ] dip update ;
 
 : merge-id3v1 ( id3 -- id3 )
-    dup id3v1>frames frames>assoc merge-frames ; inline
+    dup id3v1>frames frames>assoc merge-frames ;
 
 : read-v2-tags ( id3 seq -- id3 )
     10 cut-slice
     [ read-v2-header >>header ]
-    [ read-frames frames>assoc merge-frames ] bi* ; inline
+    [ read-frames frames>assoc merge-frames ] bi* ;
     
 : extract-v1-tags ( id3 seq -- id3 )
     {
@@ -170,11 +170,11 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
         [ [ 90 94 ] dip subseq decode-text filter-text-data >>year ]
         [ [ 94 124 ] dip subseq decode-text filter-text-data >>comment ]
         [ [ 124 ] dip nth number>string >>genre ]
-    } cleave ; inline
+    } cleave ;
 
 : read-v1-tags ( id3 seq -- id3 )
     id3v1-offset tail-slice* 3 tail-slice
-    extract-v1-tags ; inline
+    extract-v1-tags ;
 
 : extract-v1+-tags ( id3 seq -- id3 )
     {
@@ -191,11 +191,11 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
         [ [ 181 211 ] dip subseq decode-text >>genre-name ]
         [ [ 211 217 ] dip subseq decode-text >>start-time ]
         [ [ 217 223 ] dip subseq decode-text >>end-time ]
-    } cleave ; inline
+    } cleave ;
 
 : read-v1+-tags ( id3 seq -- id3 )
     id3v1+-offset tail-slice* 4 tail-slice
-    extract-v1+-tags ; inline
+    extract-v1+-tags ;
 
 : parse-genre ( string -- n/f )
     dup "(" ?head-slice drop ")" ?tail-slice drop
@@ -203,7 +203,7 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
         genres ?nth swap or
     ] [
         drop
-    ] if ; inline
+    ] if ;
 
 : (mp3>id3) ( path -- id3v2/f )
     [
@@ -218,29 +218,29 @@ CONSTANT: id3v1+-offset $[ 128 227 + ]
 PRIVATE>
 
 : mp3>id3 ( path -- id3/f )
-    dup file-info size>> 0 <= [ drop f ] [ (mp3>id3) ] if ; inline
+    dup file-info size>> 0 <= [ drop f ] [ (mp3>id3) ] if ;
 
 : find-id3-frame ( id3 name -- obj/f )
-    swap frames>> at* [ data>> ] when ; inline
+    swap frames>> at* [ data>> ] when ;
 
-: title ( id3 -- string/f ) "TIT2" find-id3-frame ; inline
+: title ( id3 -- string/f ) "TIT2" find-id3-frame ;
 
-: artist ( id3 -- string/f ) "TPE1" find-id3-frame ; inline
+: artist ( id3 -- string/f ) "TPE1" find-id3-frame ;
 
-: album ( id3 -- string/f ) "TALB" find-id3-frame ; inline
+: album ( id3 -- string/f ) "TALB" find-id3-frame ;
 
-: year ( id3 -- string/f ) "TYER" find-id3-frame ; inline
+: year ( id3 -- string/f ) "TYER" find-id3-frame ;
 
-: comment ( id3 -- string/f ) "COMM" find-id3-frame ; inline
+: comment ( id3 -- string/f ) "COMM" find-id3-frame ;
 
 : genre ( id3 -- string/f )
-    "TCON" find-id3-frame parse-genre ; inline
+    "TCON" find-id3-frame parse-genre ;
 
 : find-mp3s ( path -- seq )
-    [ >lower ".mp3" tail? ] find-all-files ; inline
+    [ >lower ".mp3" tail? ] find-all-files ;
 
 : mp3-paths>id3s ( seq -- seq' )
-    [ dup mp3>id3 ] { } map>assoc ; inline
+    [ dup mp3>id3 ] { } map>assoc ;
 
 : parse-mp3-directory ( path -- seq )
     find-mp3s mp3-paths>id3s ;
