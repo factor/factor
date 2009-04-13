@@ -1,7 +1,7 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math.order sorting sequences definitions
-namespaces arrays splitting io math.parser math ;
+namespaces arrays splitting io math.parser math init ;
 IN: source-files.errors
 
 TUPLE: source-file-error error asset file line# ;
@@ -56,3 +56,15 @@ error-types [ V{ } clone ] initialize
     error-types get values
     [ quot>> call( -- seq ) ] map
     concat ;
+
+GENERIC: errors-changed ( observer -- )
+
+SYMBOL: error-observers
+
+[ V{ } clone error-observers set-global ] "source-files.errors" add-init-hook
+
+: add-error-observer ( observer -- ) error-observers get push ;
+
+: remove-error-observer ( observer -- ) error-observers get delq ;
+
+: notify-error-observers ( -- ) error-observers get [ errors-changed ] each ;
