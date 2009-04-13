@@ -1,7 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs compiler.errors debugger io kernel sequences
-source-files.errors ;
+USING: assocs debugger io kernel sequences source-files.errors ;
 IN: tools.errors
 
 #! Tools for source-files.errors. Used by tools.tests and others
@@ -14,12 +13,3 @@ IN: tools.errors
         [ [ nl ] [ error. ] interleave ]
         bi*
     ] assoc-each ;
-
-: compiler-errors. ( type -- )
-    errors-of-type values errors. ;
-
-: :errors ( -- ) +compiler-error+ compiler-errors. ;
-
-: :warnings ( -- ) +compiler-warning+ compiler-errors. ;
-
-: :linkage ( -- ) +linkage-error+ compiler-errors. ;

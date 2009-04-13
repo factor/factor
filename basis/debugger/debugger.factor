@@ -8,7 +8,7 @@ classes.mixin classes.tuple continuations continuations.private
 combinators generic.math classes.builtin classes compiler.units
 generic.standard vocabs init kernel.private io.encodings
 accessors math.order destructors source-files parser
-classes.tuple.parser effects.parser lexer compiler.errors
+classes.tuple.parser effects.parser lexer
 generic.parser strings.parser vocabs.loader vocabs.parser see
 source-files.errors ;
 IN: debugger
@@ -320,8 +320,6 @@ M: source-file-error error.
             ] H{ } make-assoc
         ] bi format nl
     ] [ error>> error. ] bi ;
-
-M: compiler-error summary asset>> summary ;
 
 M: bad-effect summary
     drop "Bad stack effect declaration" ;
