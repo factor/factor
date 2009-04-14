@@ -14,7 +14,7 @@ IN: db2.statements.tests
     [ [ sql-table-missing? ] [ table>> "computer" = ] bi and ] must-fail-with
 
     [ ] [
-        "create table computer(name varchar, os varchar);"
+        "create table computer(name varchar, os varchar, version integer);"
         sql-command
     ] unit-test ;
 
@@ -40,8 +40,8 @@ IN: db2.statements.tests
     [ sql-syntax-error? ] must-fail-with
 
     [ ] [
-        "insert into computer (name, os) values(?, ?);"
-        { "clubber" "windows" }
+        "insert into computer (name, os, version) values(?, ?, ?);"
+        { "clubber" "windows" "7" }
         f <statement>
         sql-bind-command
     ] unit-test
@@ -51,22 +51,22 @@ IN: db2.statements.tests
         { "clubber" } f <statement> sql-bind-query
     ] unit-test
 
-    [ { { "windows" } } ] [
-        "select os from computer where name = ?;"
+    [ { { "windows" 7 } } ] [
+        "select os, version from computer where name = ?;"
         { { VARCHAR "clubber" } }
-        { VARCHAR }
+        { VARCHAR INTEGER }
         <statement> sql-bind-typed-query
     ] unit-test
 
     [ ] [
-        "insert into computer (name, os) values(?, ?);"
+        "insert into computer (name, os, version) values(?, ?, ?);"
         {
-            { VARCHAR "clubber" }
-            { VARCHAR "windows" }
+            { VARCHAR "paulie" }
+            { VARCHAR "netbsd" }
+            { INTEGER 7 }
         } f <statement>
         sql-bind-typed-command
     ] unit-test
-
 
     ;
 
