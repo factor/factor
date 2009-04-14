@@ -30,7 +30,7 @@ SYMBOL: line-ideal
     { [ lines>> car 1list? ] [ top-fits? ] } 1|| ;
 
 :: min-by ( seq quot -- elt )
-    f 1.0/0.0 seq [| key value new |
+    f 1/0. seq [| key value new |
         new quot call :> newvalue
         newvalue value < [ new newvalue ] [ key value ] if
     ] each drop ; inline
