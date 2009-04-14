@@ -122,7 +122,7 @@ M: bignum (log2) bignum-log2 ;
         2drop 0.0
     ] [
         dup zero? [
-            2drop 1.0/0.0
+            2drop 1/0.
         ] [
             pre-scale
             /f-loop over odd?
