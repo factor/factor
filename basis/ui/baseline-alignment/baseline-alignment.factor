@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel locals math math.order math.vectors
+USING: arrays kernel locals math math.functions math.order math.vectors
 sequences ui.gadgets accessors combinators ;
 IN: ui.baseline-alignment
 
@@ -46,8 +46,8 @@ TUPLE: gadget-metrics height ascent descent cap-height ;
     ascent [
         cap-height 2 / :> mid-line 
         graphics-height 2 /
-        [ ascent mid-line - max mid-line + >integer ]
-        [ descent mid-line + max mid-line - >integer ] bi
+        [ ascent mid-line - max mid-line + ceiling >integer ]
+        [ descent mid-line + max mid-line - floor >integer ] bi
     ] [ f f ] if ;
 
 : (measure-metrics) ( children sizes -- graphics-height ascent descent cap-height )
