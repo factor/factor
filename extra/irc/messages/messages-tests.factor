@@ -1,19 +1,12 @@
+! Copyright (C) 2009 Bruno Deferrari
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test accessors arrays
-       irc.messages irc.messages.private ;
+       irc.messages.parser irc.messages ;
 EXCLUDE: sequences => join ;
 IN: irc.messages.tests
 
 
-{ "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
-
-{ T{ irc-message
-     { line ":someuser!n=user@some.where PRIVMSG #factortest :hi" }
-     { prefix "someuser!n=user@some.where" }
-     { command  "PRIVMSG" }
-     { parameters { "#factortest" } }
-     { trailing "hi" } } }
-[ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
-  string>irc-message f >>timestamp ] unit-test
+! { "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
 
 { T{ privmsg
      { line ":someuser!n=user@some.where PRIVMSG #factortest :hi" }
@@ -21,18 +14,22 @@ IN: irc.messages.tests
      { command "PRIVMSG" }
      { parameters { "#factortest" } }
      { trailing "hi" }
-     { name "#factortest" } } }
+     { target "#factortest" }
+     { text "hi" }
+     { sender "someuser" } } }
 [ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
-  parse-irc-line f >>timestamp ] unit-test
+  string>irc-message f >>timestamp ] unit-test
 
 { T{ join
      { line ":someuser!n=user@some.where JOIN :#factortest" }
      { prefix "someuser!n=user@some.where" }
      { command "JOIN" }
      { parameters { } }
-     { trailing "#factortest" } } }
+     { trailing "#factortest" }
+     { sender "someuser" }
+     { channel "#factortest" } } }
 [ ":someuser!n=user@some.where JOIN :#factortest"
-  parse-irc-line f >>timestamp ] unit-test
+  string>irc-message f >>timestamp ] unit-test
 
 { T{ mode
      { line ":ircserver.net MODE #factortest +ns" }
@@ -42,7 +39,7 @@ IN: irc.messages.tests
      { name "#factortest" }
      { mode "+ns" } } }
 [ ":ircserver.net MODE #factortest +ns"
-  parse-irc-line f >>timestamp ] unit-test
+  string>irc-message f >>timestamp ] unit-test
 
 { T{ mode
      { line ":ircserver.net MODE #factortest +o someuser" }
@@ -53,18 +50,19 @@ IN: irc.messages.tests
      { mode "+o" }
      { parameter "someuser" } } }
 [ ":ircserver.net MODE #factortest +o someuser"
-  parse-irc-line f >>timestamp ] unit-test
+  string>irc-message f >>timestamp ] unit-test
 
 { T{ nick
      { line ":someuser!n=user@some.where NICK :someuser2" }
      { prefix "someuser!n=user@some.where" }
      { command "NICK" }
      { parameters  { } }
-     { trailing "someuser2" } } }
+     { trailing "someuser2" }
+     { sender "someuser" } } }
 [ ":someuser!n=user@some.where NICK :someuser2"
-  parse-irc-line f >>timestamp ] unit-test
+  string>irc-message f >>timestamp ] unit-test
 
-{ T{ nick-in-use
+{ T{ rpl-nickname-in-use
      { line ":ircserver.net 433 * nickname :Nickname is already in use" }
      { prefix "ircserver.net" }
      { command "433" }
@@ -72,4 +70,4 @@ IN: irc.messages.tests
      { name "nickname" }
      { trailing "Nickname is already in use" } } }
 [ ":ircserver.net 433 * nickname :Nickname is already in use"
-  parse-irc-line f >>timestamp ] unit-test
+  string>irc-message f >>timestamp ] unit-test
