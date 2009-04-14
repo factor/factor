@@ -4,11 +4,6 @@ USING: accessors combinators db2.connections db2.sqlite
 db2.sqlite.errors db2.sqlite.lib kernel db2.errors ;
 IN: db2.sqlite.connections
 
-TUPLE: sqlite-db-connection < db-connection ;
-
-: <sqlite-db-connection> ( handle -- db-connection )
-    sqlite-db-connection new-db-connection ;
-
 M: sqlite-db db-open ( db -- db-connection )
     path>> sqlite-open <sqlite-db-connection> ;
 
