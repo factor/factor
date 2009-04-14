@@ -97,7 +97,8 @@ M: error-renderer column-titles
 M: error-renderer column-alignment drop { 0 1 0 0 } ;
 
 : sort-errors ( seq -- seq' )
-    [ [ [ file>> ] [ line#>> ] bi 2array ] compare ] sort ;
+    [ [ [ asset>> ] [ line#>> ] bi 2array ] keep ] { } map>assoc
+    sort-keys values ;
 
 : file-matches? ( error pathname/f -- ? )
     [ file>> ] [ dup [ string>> ] when ] bi* = ;
