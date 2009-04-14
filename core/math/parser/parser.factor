@@ -50,7 +50,9 @@ SYMBOL: radix
 SYMBOL: negative?
 
 : string>natural ( seq radix -- n/f )
-    [ [ digit> ] dip (digits>integer) ] each-digit ; inline
+    over empty? [ 2drop f ] [
+        [ [ digit> ] dip (digits>integer) ] each-digit
+    ] if ; inline
 
 : sign ( -- str ) negative? get "-" "+" ? ;
 
