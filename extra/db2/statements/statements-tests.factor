@@ -4,8 +4,8 @@ USING: tools.test db2.statements kernel db2 db2.tester
 continuations db2.errors accessors db2.types ;
 IN: db2.statements.tests
 
-{ 1 0 } [ [ drop ] statement-each ] must-infer-as
-{ 1 1 } [ [ ] statement-map ] must-infer-as
+{ 1 0 } [ [ drop ] result-set-each ] must-infer-as
+{ 1 1 } [ [ ] result-set-map ] must-infer-as
 
 : create-computer-table ( -- )
     [ "drop table computer;" sql-command ] ignore-errors
@@ -54,7 +54,8 @@ IN: db2.statements.tests
     [ { { "windows" } } ] [
         "select os from computer where name = ?;"
         { { VARCHAR "clubber" } }
-        f <statement> sql-bind-typed-query
+        { VARCHAR }
+        <statement> sql-bind-typed-query
     ] unit-test
 
     [ ] [

@@ -37,17 +37,17 @@ M: object execute-statement* ( statement type -- )
 : prepare-statement ( statement -- statement )
     dup handle>> [ prepare-statement* ] unless ;
 
-: statement-each ( statement quot: ( statement -- ) -- )
+: result-set-each ( statement quot: ( statement -- ) -- )
     over more-rows?
-    [ [ call ] 2keep over advance-row statement-each ]
+    [ [ call ] 2keep over advance-row result-set-each ]
     [ 2drop ] if ; inline recursive
 
-: statement-map ( statement quot -- sequence )
-    accumulator [ statement-each ] dip { } like ; inline
+: result-set-map ( statement quot -- sequence )
+    accumulator [ result-set-each ] dip { } like ; inline
 
 : statement>result-sequence ( statement -- sequence )
-    statement>result-set [ [ sql-row ] statement-map ] with-disposal ;
+    statement>result-set [ [ sql-row ] result-set-map ] with-disposal ;
 
 : statement>typed-result-sequence ( statement -- sequence )
-    [ out>> ] [ statement>result-set ] bi
-    [ [ sql-row-typed ] with statement-map ] with-disposal ;
+    statement>result-set
+    [ [ sql-row-typed ] result-set-map ] with-disposal ;
