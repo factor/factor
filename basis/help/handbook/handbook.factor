@@ -206,7 +206,6 @@ ARTICLE: "tools" "Developer tools"
 { $subsection "tools.crossref" }
 { $subsection "inspector" }
 { $subsection "tools.completion" }
-{ $subsection "summary" }
 "Debugging tools:"
 { $subsection "tools.annotations" }
 { $subsection "tools.test" }
