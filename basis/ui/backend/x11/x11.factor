@@ -225,7 +225,7 @@ M: x-clipboard paste-clipboard
     utf8 encode dup length XChangeProperty drop ;
 
 : set-class ( dpy window -- )
-    XA_WM_CLASS XA_STRING 8 PropModeReplace "Factor"
+    XA_WM_CLASS XA_UTF8_STRING 8 PropModeReplace "Factor"
     utf8 encode dup length XChangeProperty drop ;
 
 M: x11-ui-backend set-title ( string world -- )
