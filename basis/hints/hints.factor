@@ -3,7 +3,7 @@
 USING: parser words definitions kernel sequences assocs arrays
 kernel.private fry combinators accessors vectors strings sbufs
 byte-arrays byte-vectors io.binary io.streams.string splitting
-math generic generic.standard generic.standard.engines classes
+math math.parser generic generic.standard generic.standard.engines classes
 hashtables ;
 IN: hints
 
@@ -117,6 +117,8 @@ SYNTAX: HINTS:
 \ >le { { fixnum fixnum } { bignum fixnum } } "specializer" set-word-prop
 
 \ >be { { bignum fixnum } { fixnum fixnum } } "specializer" set-word-prop
+
+\ base> { string fixnum } "specializer" set-word-prop
 
 M\ hashtable at* { { fixnum object } { word object } } "specializer" set-word-prop
 
