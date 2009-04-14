@@ -253,12 +253,12 @@ ARTICLE: "handbook-language-reference" "Language reference"
 { $subsection "conventions" }
 { $subsection "syntax" }
 { $subsection "effects" }
+{ $subsection "evaluator" }
 "Data types:"
 { $subsection "booleans" }
 { $subsection "numbers" }
 { $subsection "collections" }
-"Evaluation semantics:"
-{ $subsection "evaluator" }
+"Evaluation:"
 { $subsection "words" }
 { $subsection "shuffle-words" }
 { $subsection "combinators" }
