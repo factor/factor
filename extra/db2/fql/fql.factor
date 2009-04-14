@@ -12,10 +12,8 @@ GENERIC: normalize-fql ( object -- sequence/fql-statement )
 
 ! M: object normalize-fql ;
 
-
 : ?1array ( obj -- array )
     dup string? [ 1array ] when ; inline
-
 
 TUPLE: insert into names values ;
 CONSTRUCTOR: insert ( into names values -- obj ) ;
