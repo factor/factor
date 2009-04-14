@@ -23,12 +23,6 @@ GENERIC: error-type ( error -- type )
         [ where [ first2 [ >>file ] [ >>line# ] bi* ] when* ] bi
         swap >>error ; inline
 
-: delete-file-errors ( seq file type -- )
-    [
-        [ swap file>> = ] [ swap error-type = ]
-        bi-curry* bi and not
-    ] 2curry filter-here ;
-
 SYMBOL: error-types
 
 error-types [ V{ } clone ] initialize
@@ -68,3 +62,10 @@ SYMBOL: error-observers
 : remove-error-observer ( observer -- ) error-observers get delq ;
 
 : notify-error-observers ( -- ) error-observers get [ errors-changed ] each ;
+
+: delete-file-errors ( seq file type -- )
+    [
+        [ swap file>> = ] [ swap error-type = ]
+        bi-curry* bi and not
+    ] 2curry filter-here
+    notify-error-observers ;
