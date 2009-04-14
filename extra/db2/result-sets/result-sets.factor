@@ -1,6 +1,6 @@
 ! Copyright (C) 2009 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences combinators ;
+USING: accessors kernel sequences combinators fry ;
 IN: db2.result-sets
 
 TUPLE: result-set sql in out handle n max ;
@@ -10,7 +10,7 @@ GENERIC: #columns ( result-set -- n )
 GENERIC: advance-row ( result-set -- )
 GENERIC: more-rows? ( result-set -- ? )
 GENERIC# column 1 ( result-set column -- obj )
-GENERIC# column-typed 1 ( result-set column -- sql )
+GENERIC# column-typed 2 ( result-set column type -- sql )
 
 : init-result-set ( result-set -- result-set )
     dup #rows >>max
@@ -29,4 +29,5 @@ GENERIC# column-typed 1 ( result-set column -- sql )
     dup #columns [ column ] with map ;
 
 : sql-row-typed ( result-set -- seq )
-    dup #columns [ B column-typed ] with map ;
+    [ #columns ] [ out>> ] [ ] tri
+    '[ [ _ ] 2dip column-typed ] 2map ;
